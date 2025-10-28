@@ -1,126 +1,180 @@
-Return-Path: <netdev+bounces-233624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 584AAC166C0
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 19:17:09 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66B82C166B3
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 19:15:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7188C3B35FF
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 18:15:48 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4EB534E4983
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 18:15:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E84D634C142;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF8CF34B1A7;
 	Tue, 28 Oct 2025 18:15:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hos7kiH1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r0tiKs/r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ABC6EAE7
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 18:15:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD74934A3A7
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 18:15:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761675314; cv=none; b=XjSM4BFyKjKAvckMzYphN7IZ41miwJ/L2z5qQxmFAiSKe0b+8+uHa2nY8CrBVyg+0tV+Xo52lhDXaXghrPeVNNfylIlAU/KrXDEL9f5QqLZVR4+GZ0vT//Bli5rWPMjCpvAVgukLyN/u5J7SEOo6duDBtdeG/ZFRhL7BMCn5SZ8=
+	t=1761675314; cv=none; b=DLJaeBgWQfliuVJ5EVL7KqKAHQO52VPWgpRhBMhuOBwDkxs4ba83dR77WRawQ9eCALa0qymA1pHEGZ8o8eeuyVaCcc39dYTS9WV8TcMrS6/0G27Acc6uujrjhpq8fcDKJbMYRzWcf6uIkipmqb6WumS+gZt6Lpnr+vKA3WpUfEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1761675314; c=relaxed/simple;
-	bh=IdoA2Hsz3DXflOJ/uWb+OTuJMtFaS4jo6XzpS3PQUeQ=;
+	bh=zcodzi+mOUD575N1xZUuQjOVYQWEPdnlbLws09uvbS4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Sf857JnFfyfgXrMoUaV6i8pl3caPgF2V0yJYjrLG53Kco6zlA2NNsXraBtw7ByqQxm0dYXZ+PXrlrzc36th8Gkc6SRXwbsqRXBLiYOcAWeYpu/pmKK9eCB0VzphMP/IlcMwTbazvqGcZ5gzId+E5Z2uTSDaL8N6UdeqsbsYnmuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hos7kiH1; arc=none smtp.client-ip=209.85.214.178
+	 To:Cc:Content-Type; b=aoklD5If+NCZ3T5b4dz/vBbn0zrsA3luxUDwXWWu9G1yGf8koGcLvbvOybwUx1ctzOb3hpWI8Rkgw4AeMgJLgOiOgp7eHv3GzHGHwBudIjVCN/+7fZmXLaR9ymyJkLvkj7YBHvFRDkTaL7VXSflD1N4XGKzAz3CQkvd4VpzRMU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r0tiKs/r; arc=none smtp.client-ip=209.85.208.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-27eeafd4882so30495ad.0
-        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 11:15:13 -0700 (PDT)
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-62faa04afd9so1835a12.1
+        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 11:15:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761675313; x=1762280113; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1761675310; x=1762280110; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=IdoA2Hsz3DXflOJ/uWb+OTuJMtFaS4jo6XzpS3PQUeQ=;
-        b=hos7kiH1QkxP5Yn+Mr7DeH8J/uhebmsARHUY36bT4jEhsJsW1ZLZUMQocC2fUFLn7G
-         CYQEjpBNMWxnWRJ14kJiv4ReQjDVydfTYiWoAI8zyQR/BfwJ3TxkAHXVEfkHt6kaXLiw
-         b6nudCd2hwD5KAG0IddF0HpHsDHN4sMhrzG6I8PfYbJu9ffE4mSIVfq1hDz4LqlC5cYV
-         exyNic+sSo8c08Uy9Kg+n9VqB9bibtOw7DrK/97ycbx/0NyI1Nv+XrVVSA0QCDj5y/nB
-         dW2fKXGCjiELmy6dzxoNmoY9oQnX6PUcxTCXcB8VOon5uHioFilht5+IlmdemcJQbfLa
-         nJSg==
+        bh=90CnYkLqp/HfEgrb/R2001RwImjbO3xI814fyvRa22M=;
+        b=r0tiKs/rZibsCd8ahmR55owTUYeh6bHRd4nIwH2ileRjsH43Rj6/yZUkEq+eF0foBy
+         CJ8Q9CGGDLvFdnpJwEKb7cXwmpPkhHY/rCa+5SGuRBEwWnmnDRG2l+yB1hzEIzWcg4+d
+         cC8OS7Eiu2IymWkMiaaRrJhqwQZG+DaemBr1t97Doqa/IOMnEL53zosbK1EQwUjOsU4I
+         EMydPxhrkIETG+gT5AFyAWGT3Xpa8SlLaFJWxhO+pBxg7TEUm9U6nORo+fDirsPmvpM2
+         d8R3p0GQrcBVR1Riz2kVknfwL7O6RMQ3VBKjmrdeXBHFSHMAC7ic7LqOzv6k5QnSaCrw
+         /3Hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761675313; x=1762280113;
+        d=1e100.net; s=20230601; t=1761675310; x=1762280110;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=IdoA2Hsz3DXflOJ/uWb+OTuJMtFaS4jo6XzpS3PQUeQ=;
-        b=i6HRRVkWYfxMbvXnjlZcGdBqB4fY2ER5MxTzYMLwk56ccB34mAzWoQwLyib8V+4Qd4
-         d4vO45msBCGNo8Uew/REqlAaX2WbRpRm8Xt0rdSTOpetDSspInEeRlAyQ8WKDIvEkWkt
-         H9kB0ckYLKoDHqMXqa62LkVj7WpMx1yDgR7cz4FQHCe2hvjXNTf22IBLZu/IMHm9uJJF
-         oa6SBTDt9Ju83HX6BnZiO44EozqXmXsSziImtY2t/Qe5ASup8gYKfBqCWxnjr7B9GuEm
-         wRZjovBpOvkX0o1ogKTw17qQsPShMWXds1HVnzxgYVvod0p5VTSGtFkjqqQ23ZP+biew
-         9ucg==
-X-Forwarded-Encrypted: i=1; AJvYcCV0fdjvAls6m3glJKFj3e+ciKmt3Mi2TLZ/p5EAmr91sKjPkahA7W7hapTzxSJLTJaLY5LlxrM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyI/828xZ0GzFk8qasC5k7bqwcVpvVHbdWApSQZ/Mq3tkksav+7
-	2gtr+MFIUTYAt6B39xwLucuc/j0Bhn4jM3xPhqCellonCIITUOagwdL6cEMbpA5n31Fk+BzA2ow
-	OlNpYN/jh4bz87i+mh3FCtegNFra2Bo5DkfJ0xKNl
-X-Gm-Gg: ASbGncuCq/XHQhCqvWFHZasj+7KKx1fc230HXQdiORQCJ4MnnypSLlVJ26nDNn7JdeB
-	finzv0GFWHHBI7k6Yy6JLrzbESzeMXkbcH9zlzJN6KVlDba4fW1y+C7HNKP+AZaMwZIahrCVCyK
-	gDse9ohh+h6NSAtBJZTphGJ4lx3gr/4UVJpezvL2bvFd4p7ijrd+kzokTH3TRa9JFbhDM00NROK
-	cT9HrIJa4nefMo196QQqJfNNeoRcnAC1l9YP9AfDR0Sfo337eoT9uqYEA==
-X-Google-Smtp-Source: AGHT+IERGgSXUSFxn2JeNfQ2C86EuHjvzEyZOaIycK2W0jkA78IAxEYdTtDG+mA9d+7pqLJIChA0NWObPqGrobS4WTk=
-X-Received: by 2002:a17:903:22c3:b0:291:6858:ee60 with SMTP id
- d9443c01a7336-294de36e83fmr559985ad.4.1761675312071; Tue, 28 Oct 2025
- 11:15:12 -0700 (PDT)
+        bh=90CnYkLqp/HfEgrb/R2001RwImjbO3xI814fyvRa22M=;
+        b=W5TWNaO72By/vfpiO1I6azSh1tPRtQG/vk84NmmHkxj6tGabi2G0bnjpguinFFwJDI
+         ookqbyssAqmFDStXYeSfiNZPE0a4jTBdlYEvGTUNRnQHxjXOrkHwpX1g8kiizuvJfUmz
+         jVC4BQ7AmAEdPthdfaRRrYLBmHq6mLk7O/Cp11jZGJJua8clN44MQKjlxldmzyF+WB8O
+         V3WE0vpGF/7uGUYTU16EYgRlmILjcbbLt67RCdyli8rXLQbeHa9ncg64bOXTtmrPJK/O
+         eYWVO3D846I8JMa2Zo+WqIDZpeRvCEFrPINHY7AcAv2L0+3eqcZ8NTkVOOwhegL8l+eg
+         SdZA==
+X-Gm-Message-State: AOJu0YwLRJUN/IqUPZo66U9f+PXR2ay6yIteMQVOdQRa+GYFfYI5XqJ+
+	WvB1TRPPswBTFSop4+mWwmuLN9RnAydMBLyLW0xJWENGDeDiKRJ1L6YvDJgmdGZlMn9VwCsmG4P
+	ApwsU7566vHVPfBhXQADLuflFvY09VGP/h2zNWEUQ
+X-Gm-Gg: ASbGncvUlxaQhAkVz04qUSQYrRPb9nzwSeN1re+EvBnJfHHjCyxGKheeKLZBniVuTIH
+	mDc7gedBl6+TvMjhAsLvnE6BRKezbIk8nnu7tYRYu1cPoS5Mj8uktEr+XjRsH4kMo+T+wvNSVKE
+	rmwkuI7s2ypfVDFJGTY4VcwgI6FNeIscnnC0GyLdTUxNIdDCbXCUVKCSMvj2NAP7UAanJhds7sb
+	B4wv1Fbri9p1W1kxKTMcdNTJPRDHRDFenG5YlYPyA5VNicoYyv1xbXCXBiKZDbZemTMrUbFGJXw
+	zj5gGeiI
+X-Google-Smtp-Source: AGHT+IFGnyCN3zgN8K6ce1633alPnV+t1u1HwJdU9ixfZelf0wNhCjeSiC9lfXC+1TzDuDePP/xzY2NeqRfJ0sklIhc=
+X-Received: by 2002:a50:f69e:0:b0:62f:9f43:2117 with SMTP id
+ 4fb4d7f45d1cf-640427a26f9mr16444a12.0.1761675309791; Tue, 28 Oct 2025
+ 11:15:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251025-idpf-fix-arm-kcfi-build-error-v1-0-ec57221153ae@kernel.org>
- <20251025-idpf-fix-arm-kcfi-build-error-v1-2-ec57221153ae@kernel.org>
- <CABCJKuesdSH2xhm_NZOjxHWpt5M866EL_RUBdQNZ54ov7ObH-Q@mail.gmail.com>
- <CACRpkdaeOYEcK9w1oy59WBqjNrK7q5zT2rzg8pHgDdZdKWVKZg@mail.gmail.com> <20251028175243.GB1548965@ax162>
-In-Reply-To: <20251028175243.GB1548965@ax162>
-From: Sami Tolvanen <samitolvanen@google.com>
-Date: Tue, 28 Oct 2025 11:14:35 -0700
-X-Gm-Features: AWmQ_bnDLfsfNIG5--yjR8bWyBut4gyt9iExhd25ip84kUhmdr4d3xv1vPYI1-Q
-Message-ID: <CABCJKudsbd6=8B+fkzbw6TkL-dVvSoT3Co=fW+jWOnuBtxsLKg@mail.gmail.com>
-Subject: Re: [PATCH 2/3] ARM: Select ARCH_USES_CFI_GENERIC_LLVM_PASS
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: Linus Walleij <linus.walleij@linaro.org>, Kees Cook <kees@kernel.org>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, "David S. Miller" <davem@davemloft.net>, 
+References: <20251028060714.2970818-1-shivajikant@google.com> <aQEHQReSmbXeIw15@devvm11784.nha0.facebook.com>
+In-Reply-To: <aQEHQReSmbXeIw15@devvm11784.nha0.facebook.com>
+From: Shivaji Kant <shivajikant@google.com>
+Date: Tue, 28 Oct 2025 23:44:56 +0530
+X-Gm-Features: AWmQ_bk9Ft9L4-npWFOyIyWZjKp1gH6GTtSfFcauCkHpz5Kyx8u4ygXXvXcAjdA
+Message-ID: <CAMEhMpmUxn2VS2T7PPaM0WtbJT02RWN-CEmD8dmsPGFPkH_tqw@mail.gmail.com>
+Subject: Re: [PATCH] net: devmem: Remove dst (ENODEV) check in net_devmem_get_binding
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
-	Russell King <linux@armlinux.org.uk>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Michal Kubiak <michal.kubiak@intel.com>, linux-kernel@vger.kernel.org, 
-	llvm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, 
-	netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org
+	Simon Horman <horms@kernel.org>, Mina Almasry <almasrymina@google.com>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Pavel Begunkov <asml.silence@gmail.com>, 
+	Pranjal Shrivastava <praan@google.com>, Vedant Mathur <vedantmathur@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 28, 2025 at 10:52=E2=80=AFAM Nathan Chancellor <nathan@kernel.o=
-rg> wrote:
+On Tue, Oct 28, 2025 at 11:41=E2=80=AFPM Bobby Eshleman <bobbyeshleman@gmai=
+l.com> wrote:
 >
-> On Mon, Oct 27, 2025 at 11:56:21PM +0100, Linus Walleij wrote:
-> > On Mon, Oct 27, 2025 at 4:54=E2=80=AFPM Sami Tolvanen <samitolvanen@goo=
-gle.com> wrote:
-> > > Instead of working around issues with the generic pass, would it make
-> > > more sense to just disable arm32 CFI with older Clang versions
-> > > entirely? Linus, any thoughts?
+> On Tue, Oct 28, 2025 at 06:07:14AM +0000, Shivaji Kant wrote:
+> > The Devmem TX binding lookup function, performs a strict
+> > check against the socket's destination cache (`dst`) to
+> > ensure the bound `dmabuf_id` corresponds to the correct
+> > network device (`dst->dev->ifindex =3D=3D binding->dev->ifindex`).
 > >
-> > We have people using this with the default compilers that come with
-> > Debiand and Fedora. I would say as soon as the latest release of
-> > the major distributions supports this, we can drop support for older
-> > compilers.
+> > However, this check incorrectly fails and returns `-ENODEV`
+> > if the socket's route cache entry (`dst`) is merely missing
+> > or expired (`dst =3D=3D NULL`). This scenario is observed during
+> > network events, such as when flow steering rules are deleted,
+> > leading to a temporary route cache invalidation.
+> >
+> > The parent caller, `tcp_sendmsg_locked()`, is already
+> > responsible for acquiring or validating the route (`dst_entry`).
+> > If `dst` is `NULL`, `tcp_sendmsg_locked()` will correctly
+> > derive the route before transmission.
+> >
+> > This patch removes the `dst` validation from
+> > `net_devmem_get_binding()`. The function now only validates
+> > the existence of the binding and its TX vector, relying on the
+> > calling context for device/route correctness. This allows
+> > temporary route cache misses to be handled gracefully by the
+> > TCP/IP stack without ENODEV error on the Devmem TX path.
+> >
+> > Reported-by: Eric Dumazet <edumazet@google.com>
+> > Reported-by: Vedant Mathur <vedantmathur@google.com>
+> > Suggested-by: Eric Dumazet <edumazet@google.com>
+> > Fixes: bd61848900bf ("net: devmem: Implement TX path")
+> > Signed-off-by: Shivaji Kant <shivajikant@google.com>
+> > ---
+> >  net/core/devmem.c | 27 ++++++++++++++++++++++++---
+> >  1 file changed, 24 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/net/core/devmem.c b/net/core/devmem.c
+> > index d9de31a6cc7f..1d04754bc756 100644
+> > --- a/net/core/devmem.c
+> > +++ b/net/core/devmem.c
+> > @@ -17,6 +17,7 @@
+> >  #include <net/page_pool/helpers.h>
+> >  #include <net/page_pool/memory_provider.h>
+> >  #include <net/sock.h>
+> > +#include <net/tcp.h>
+> >  #include <trace/events/page_pool.h>
+> >
+> >  #include "devmem.h"
+> > @@ -357,7 +358,8 @@ struct net_devmem_dmabuf_binding *net_devmem_get_bi=
+nding(struct sock *sk,
+> >                                                        unsigned int dma=
+buf_id)
+> >  {
+> >       struct net_devmem_dmabuf_binding *binding;
+> > -     struct dst_entry *dst =3D __sk_dst_get(sk);
+> > +     struct net_device *dst_dev;
+> > +     struct dst_entry *dst;
+> >       int err =3D 0;
+> >
+> >       binding =3D net_devmem_lookup_dmabuf(dmabuf_id);
+> > @@ -366,16 +368,35 @@ struct net_devmem_dmabuf_binding *net_devmem_get_=
+binding(struct sock *sk,
+> >               goto out_err;
+> >       }
+> >
+> > +     rcu_read_lock();
+> > +     dst =3D __sk_dst_get(sk);
+> > +     /* If dst is NULL (route expired), attempt to rebuild it. */
+> > +     if (unlikely(!dst)) {
+> > +             if (inet_csk(sk)->icsk_af_ops->rebuild_header(sk)) {
+> > +                     err =3D -EHOSTUNREACH;
+> > +                     goto out_unlock;
+> > +             }
 >
-> Okay, I think that is reasonable enough. This is not a very large
-> workaround and I do not expect these type of workarounds to be necessary
-> frequently so I think it is worth keeping this working if people are
-> actually using it. That means we could mandate the backend version of
-> kCFI for ARM with Debian Forky in 2027.
+> Echoing your discussion with Eric, I think the message might want to
+> call out this part. Besides that, all looks good!
+>
+> Pending that nit:
+>
+> Reviewed-by: Bobby Eshleman <bobbyeshleman@meta.com>
+>
+> Best,
+> Bobby
 
-Yeah, it's a bit unfortunate, but I agree that we shouldn't break
-existing users until newer Clang is actually available in distros.
-
-Sami
+Thanks Bobby for the review.
+Will surely update the description in the v2 patch.
 
