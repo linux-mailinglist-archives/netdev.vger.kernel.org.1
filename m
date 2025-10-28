@@ -1,144 +1,99 @@
-Return-Path: <netdev+bounces-233540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1428BC153F0
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 15:50:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DA30C15495
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 15:57:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6078463280
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 14:44:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94CA73AE3CC
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 14:51:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFF1F339B2A;
-	Tue, 28 Oct 2025 14:44:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CE1D253B5C;
+	Tue, 28 Oct 2025 14:50:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TLAljYi1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eM3+yCt1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3EC819ADBA;
-	Tue, 28 Oct 2025 14:44:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73D712512C8;
+	Tue, 28 Oct 2025 14:50:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761662691; cv=none; b=Q4YjKzSBUlUWJceTXkd8fUe9PF/oNgvt+YMoMW9FVvMNzUXAC6hZn68/4SyjmIXBexTQoT90IssE+9MkqYxG4CLJc/By/3UH7XyLRetagus8MirxzzQcSkjridSlZomk7EyO7E2q2dkdqUoYv3Diy7o/fpcNeDVT9HkYg2KODaw=
+	t=1761663033; cv=none; b=C7EjEApMwZn910Mj35+l1l6Gz2b09SWgADosXHm24IFUQeaJxKnplZjw2rCeKlxqBgMnkKGCAubmHg4exfOLaUJbYjXY/9snq1VDT3bx2rLHFzeYls82ZbxNYSYEPQ7qDpzNb71gj4uDMektkWFg6kV3MBrtt3zTYj6Bx+ke5Hw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761662691; c=relaxed/simple;
-	bh=fuPk2vf7KDqzwHVW9GxJh9JwUPAx4o37mqyOQ65OjsA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GMeX8y0MkD8NdTHYsUQQna+/0gOaGTWIIvDbtE+Wrju7lWNiBxYgdpQ3hS1Y+ccFLXHOzJutwlGMJb6kdlsWX2rqSNoTBSFNtHiA6OaMJbS8+OjLA/Lg1Qju0Dp0jDKOnct50nUaYJsyz/t3p838dXEskK3UTIaHWcjw1oXjg4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TLAljYi1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B640C4CEE7;
-	Tue, 28 Oct 2025 14:44:47 +0000 (UTC)
+	s=arc-20240116; t=1761663033; c=relaxed/simple;
+	bh=6K/S8d0IVvVTkkQFbLMvHUlIli4SloaGEMV2HIrhuwM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=tywDSaCk9eAQC8SjEnAwdNwotcCtehyIlZir3gSpF7Byk0jHcPFXau4rC1/F+ReUiK59lE3R+/ONKWCgAvs3YTD1l8e/Ybh3LUwyFFz9fz86+DwFFtumoRKkkmrFvlg6W6s52nxIRy+1xOcj4oZwPtvt11ECtNhFowJyO5p6NR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eM3+yCt1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2944C4CEE7;
+	Tue, 28 Oct 2025 14:50:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761662691;
-	bh=fuPk2vf7KDqzwHVW9GxJh9JwUPAx4o37mqyOQ65OjsA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=TLAljYi1+jk/WhrIiqhIINxvGFpBqh32vlKGDHG3QuwonoRqUlG1ghczULAFAyrdZ
-	 ATscMcsqe7wIKzxij7h9z3ekG5i2WZG3pH3f7tvImg/mEsisU2gmkBGZNdADN5B8EO
-	 36USKwSp68WptmLr+K8Dn2Xbgq6KkADMhn6czbx7Hmji1nIGXlXCTSXTDe3rDCf8M6
-	 F1ONo9On4+Nqyr7Mo+QTsHsQLHsPLhTR6mPbYcmM6N9cK0QYdYNWGsiYMgKndo4b27
-	 sRn5ZioW1MTT6HKYY304EHGC7aUDlUmnIlMbqTOGpfQ0/y9MFU/McePA4jY5jLoGbx
-	 TWrgkcXFT5Xag==
-Date: Tue, 28 Oct 2025 14:44:44 +0000
-From: Simon Horman <horms@kernel.org>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com,
-	sdf@fomichev.me, ast@kernel.org, daniel@iogearbox.net,
-	hawk@kernel.org, john.fastabend@gmail.com, joe@dama.to,
-	willemdebruijn.kernel@gmail.com, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next v3 1/9] xsk: introduce XDP_GENERIC_XMIT_BATCH
- setsockopt
-Message-ID: <aQDW3HK6bx2LgfBY@horms.kernel.org>
-References: <20251021131209.41491-1-kerneljasonxing@gmail.com>
- <20251021131209.41491-2-kerneljasonxing@gmail.com>
- <aPt_WLQXPDOcmd1M@horms.kernel.org>
- <CAL+tcoDnAv7+kG4WdAh1ELP0=bj_1og+DdD-JS4YuWzZC+9OhA@mail.gmail.com>
+	s=k20201202; t=1761663033;
+	bh=6K/S8d0IVvVTkkQFbLMvHUlIli4SloaGEMV2HIrhuwM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=eM3+yCt18RfkfiycnlMD+IvDLDucmNxUByaJkwdlM7uZYjsJ8fBZwFjTAzV0RB5lL
+	 sFPDBmjn86sWiCRf+aR1aShxtEs70ohGhHYM0uMFfNlX2oR8FE/OwHVPS3YBnJiuUa
+	 UJuD2VaKLrJjcttYbLX9gAqgYAx9KvOAsHAeZmxGY9PXzYGrrFQJf6kZMLF03R764c
+	 xPthxPygltd4liezV6i2XVnOkOwImZNv7ws4EOyWJnJbOpUFe7/RmHElLefFyY4a5e
+	 evRh8bFWhCOLbQFsclRhijStG53G74u9aTqhOgA4dpVlbd4a3ehw7FztfGk/TrwtAW
+	 YnZmkl9H7GdRQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB21C39EFA55;
+	Tue, 28 Oct 2025 14:50:11 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAL+tcoDnAv7+kG4WdAh1ELP0=bj_1og+DdD-JS4YuWzZC+9OhA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 0/2] net: stmmac: Add support for coarse
+ timestamping
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176166301074.2258992.15898542633680780702.git-patchwork-notify@kernel.org>
+Date: Tue, 28 Oct 2025 14:50:10 +0000
+References: <20251024070720.71174-1-maxime.chevallier@bootlin.com>
+In-Reply-To: <20251024070720.71174-1-maxime.chevallier@bootlin.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: alexandre.torgue@foss.st.com, joabreu@synopsys.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ mcoquelin.stm32@gmail.com, richardcochran@gmail.com, linux@armlinux.org.uk,
+ kory.maincent@bootlin.com, vadim.fedorenko@linux.dev,
+ alexis.lothore@bootlin.com, thomas.petazzoni@bootlin.com,
+ netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 
-On Sat, Oct 25, 2025 at 05:08:39PM +0800, Jason Xing wrote:
-> Hi Simon,
-> 
-> On Fri, Oct 24, 2025 at 9:30 PM Simon Horman <horms@kernel.org> wrote:
-> >
-> > On Tue, Oct 21, 2025 at 09:12:01PM +0800, Jason Xing wrote:
-> >
-> > ...
-> >
-> > > index 7b0c68a70888..ace91800c447 100644
-> >
-> > ...
-> >
-> > > @@ -1544,6 +1546,55 @@ static int xsk_setsockopt(struct socket *sock, int level, int optname,
-> > >               WRITE_ONCE(xs->max_tx_budget, budget);
-> > >               return 0;
-> > >       }
-> > > +     case XDP_GENERIC_XMIT_BATCH:
-> > > +     {
-> > > +             struct xsk_buff_pool *pool = xs->pool;
-> > > +             struct xsk_batch *batch = &xs->batch;
-> > > +             struct xdp_desc *descs;
-> > > +             struct sk_buff **skbs;
-> > > +             unsigned int size;
-> > > +             int ret = 0;
-> > > +
-> > > +             if (optlen != sizeof(size))
-> > > +                     return -EINVAL;
-> > > +             if (copy_from_sockptr(&size, optval, sizeof(size)))
-> > > +                     return -EFAULT;
-> > > +             if (size == batch->generic_xmit_batch)
-> > > +                     return 0;
-> > > +             if (size > xs->max_tx_budget || !pool)
-> > > +                     return -EACCES;
-> > > +
-> > > +             mutex_lock(&xs->mutex);
-> > > +             if (!size) {
-> > > +                     kfree(batch->skb_cache);
-> > > +                     kvfree(batch->desc_cache);
-> > > +                     batch->generic_xmit_batch = 0;
-> > > +                     goto out;
-> > > +             }
-> > > +
-> > > +             skbs = kmalloc(size * sizeof(struct sk_buff *), GFP_KERNEL);
-> > > +             if (!skbs) {
-> > > +                     ret = -ENOMEM;
-> > > +                     goto out;
-> > > +             }
-> > > +             descs = kvcalloc(size, sizeof(struct xdp_desc), GFP_KERNEL);
-> > > +             if (!descs) {
-> > > +                     kfree(skbs);
-> > > +                     ret = -ENOMEM;
-> > > +                     goto out;
-> > > +             }
-> > > +             if (batch->skb_cache)
-> > > +                     kfree(batch->skb_cache);
-> > > +             if (batch->desc_cache)
-> > > +                     kvfree(batch->desc_cache);
-> >
-> > Hi Jason,
-> >
-> > nit: kfree and kvfree are no-ops when passed NULL,
-> >      so the conditions above seem unnecessary.
-> 
-> Yep, but the checkpatch complains. I thought it might be good to keep
-> it because normally we need to check the validation of the pointer
-> first and then free it. WDYT?
+Hello:
 
-I don't feel particularly strongly about this.
-But I would lean to wards removing the if() conditions
-because they are unnecessary: less is more.
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Fri, 24 Oct 2025 09:07:16 +0200 you wrote:
+> Hello everyone,
+> 
+> This is V2 for coarse timetamping support in stmmac. This version uses a
+> dedicated devlink param "ts_coarse" to control this mode.
+> 
+> This doesn't conflict with Russell's cleanup of hwif.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v2,1/2] net: stmmac: Move subsecond increment configuration in dedicated helper
+    https://git.kernel.org/netdev/net-next/c/792000fbcd0c
+  - [net-next,v2,2/2] net: stmmac: Add a devlink attribute to control timestamping mode
+    https://git.kernel.org/netdev/net-next/c/6920fa0c764d
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
