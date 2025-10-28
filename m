@@ -1,260 +1,113 @@
-Return-Path: <netdev+bounces-233592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7763EC1602F
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 17:59:46 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F9FAC15FF9
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 17:58:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BB0A1B24AA0
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 16:55:13 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A658D4E424E
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 16:58:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B11B1346E7E;
-	Tue, 28 Oct 2025 16:53:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4997347BBA;
+	Tue, 28 Oct 2025 16:57:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ax+uLPLK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bKZZAXbC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 179AC346E45
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 16:53:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAFBC346E4A;
+	Tue, 28 Oct 2025 16:57:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761670423; cv=none; b=tB+iajCUJFFblaz+08mytIrWlfYd28ZtN1WgRZbzdMtrBnkuwaf0vJUcBcUSEqYLqp8JKXXdaEJfEyBLtJOrZzy8kgAYtQ7MKA8oVEJBvG1eiacFEoIs30nMVZJ+6SoVAh+PfTR3xKDz1H3OzFnsGmjh0JRQyHhLn25//Jra61U=
+	t=1761670661; cv=none; b=EEeQ+PNZCiL4oyq2M/2R2qgTL0N8cXYmXl6PdM89olSRY0wK/vXpcARYrGdDlW5JZnfqotm3xrOxbf5NgsOunbhDDWtT9Jw+wBNU6P3qNjOP0fZHqQm2Y/XwNEodU5gjqkplxIsnWARfNADz6/8YQwiLoiS7/4pgGVEswc69KcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761670423; c=relaxed/simple;
-	bh=a+BVvzrwV1CHGlTlYUIJV+7YjR6u7eO+a8yqU1J8ytU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=F+NSWvpL/81BWdvpO9rtp9NDg+Cu/aXvuIpfa0v+tHY4D7aoB8V8qaR80FRzVS8+yyai3lZ4cZV7b2O4BoyVLwT6sxHJpfYAoXqYQPrUr6K2I/YAec0IOXD6JGBY5+V02ecGWWUB/qmspTD60JzapQBCPoAc5wo1+mgMhvniKT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ax+uLPLK; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-b553412a19bso4066065a12.1
-        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 09:53:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761670421; x=1762275221; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=itpY6fWxqeX4M4304ZwecURirqEEYOU47REyVN9009E=;
-        b=Ax+uLPLK61NZisKuYv+/g3hFbV1vju1oaV8dve6Cjtq1lbFbqKs5TGNzykiUdmVB0T
-         PTRY6J7n6YLeLw6dAasizxQhWfPQHMhFnsNtmKeBXDTY4yC/57bK4n0ShSwWpgI6Lc2t
-         ooTDpUKsFs3izuAq90wKET8lFpDFhYnhlIpaanHp/67tdJydpB7e1g7bwPLQKzlZbHTT
-         0tmEi37bfdvez7SGKcLX6veFci6q7/Rt71Dz4Yq6MSWzsoP5KHXh8KVC4vM0iBTOGrR4
-         bYlY14M9skVjkdWWuYjSLEKLlZNel8EzEvJG0mxABHWngZ0wCxbDO0NeP9OdH72+mB0F
-         qdyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761670421; x=1762275221;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=itpY6fWxqeX4M4304ZwecURirqEEYOU47REyVN9009E=;
-        b=nDZg39k7mzTck3pM3hdhUjzY081CdFlmCxZlX8O0qLZCmuDx89S9kCL1/JwUpiOSMx
-         EIhmUMv4FpHur42G5LNDVIzYIdHklxLDPizI2NJzvLqwymfMB3v7dTxp2ooC73ldIJzb
-         WKpIT0kJfIJfaQW4P84iJ1U5ZJn8QvYYOUeu0IVu94srj0B4ETRUwnokI8kt3mbv3adW
-         EVzm28Rp3q7o44Koj2D9wORW/qfkgBmB2tbZY5tj60otbdz9G8mZKpXT4BYUVM8sE1++
-         2rGR3F/RNZAaACu7895r8GBBr/IDn28aueZA5utWN4Ad0mhT7AfSD3gVoIDwZgWDqa4e
-         b3vw==
-X-Forwarded-Encrypted: i=1; AJvYcCWOdVc+PUVxMZZ+Nx9w+NbyNu5uPdDCnFX2Hz7CYoQAMZkXM6pfeT/cwMWiO9XAFt8ZCK67j/E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIO1wkraZaE4SFPYFtWWIxnBr/8SYcfSpCcOahsMeDi0HX1+Tp
-	qmGSFFoysQwbM0O72TB+bnrhq2jqrmN9KlGCngOjRP6pS36yiMAJb0biTZPs2bzG92ATsozY61N
-	YBOkvOxQYJ0kX0rDOCxlnB0v8po2W9SE=
-X-Gm-Gg: ASbGncsQtX6rSFlgy21HicLSzx9BQpmLNrlnBwWd5CG35A0TgRurMqiqtwnASnfLe4T
-	k4U5IrzzIPGwF8Pea/QPt+83pc8ArT1WOjdiIVlxRcbpGmYCNzBjWRjTyLLytGGU00LXYe0epp1
-	yj+DKCBrAegZ698vAZNvOYVPkPPJEHzch7+HmoQOkpVBU5ipTrPxpDuxJVvWTm9tjJGK/HKADpr
-	PUECQRVmM8aL/CWhAFV0FnTTCwnB7cLro62Z0zOhlZwZvxXQdPY+s0QYiGEmq2mPd8crA/wKX+2
-X-Google-Smtp-Source: AGHT+IFZEuiAxXllEb5ThZ9cDzWH7QzvhaLhrFTs/VyutI0B0iRzuC0dIO1ADn/bUPkm6lWvMXjk8vR+ST2dStv0xes=
-X-Received: by 2002:a17:903:228c:b0:290:ad79:c613 with SMTP id
- d9443c01a7336-294cb536f8dmr48858475ad.47.1761670421153; Tue, 28 Oct 2025
- 09:53:41 -0700 (PDT)
+	s=arc-20240116; t=1761670661; c=relaxed/simple;
+	bh=aj4lytZnlp+F0c2g1w8XC6BgNEmmQKZC46OI2bAFwmk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=afIUcqq6u4TZEiLI+bXjY3w8XvJ/0J/+rN8cv8AGOSA4wmPpqzx60PMLZt9bBCvGxaSRs3ksZKL602lI9b4RDOTqOy0qRyu1DOoEsS8ljiSTofn/aog05KVrbCrf7WGZm84wOgZ9Q8QgLqN1jt5jTph9uWiw1sej2A/7jmG49u4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bKZZAXbC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AC24C4CEE7;
+	Tue, 28 Oct 2025 16:57:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761670661;
+	bh=aj4lytZnlp+F0c2g1w8XC6BgNEmmQKZC46OI2bAFwmk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bKZZAXbCQA4ewEygt5zEzAIUVvysfVH7HckBmmYlFuM0K06eK+sNEY3Yqm08MLSo7
+	 R7Z9ADayAgT54bom4OrpRI6H+IErcwqnSm4BrWqJ+i3LMPT5kR9BcmoiTQmNma6k/q
+	 mriCP13Oobv/udMmazO5NWpg2ZsLhNPDsbUnN1TP3asySuHq+NdeLq0lmW/16/SlxT
+	 ffcjHuQmgNEFXuBFyrqGvCWgdiRGY2DAq8JFcGqzxj7AuAx8mAJxLCyaA63Dmh4bCs
+	 hMzX/PpQtBpUcKVuP04rMq8sYG82qfKo6H5c76BMuJ2rAPuXwrf3siDjeTqgazLQoY
+	 fjtlxWRGBoVxQ==
+Date: Tue, 28 Oct 2025 16:57:35 +0000
+From: Simon Horman <horms@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>,
+	Cosmin Ratiu <cratiu@nvidia.com>
+Subject: Re: [PATCH net] net/mlx5: Don't zero user_count when destroying FDB
+ tables
+Message-ID: <aQD1_13OxXT16XPR@horms.kernel.org>
+References: <1761510019-938772-1-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251024212914.1474337-1-ameryhung@gmail.com> <20251024212914.1474337-3-ameryhung@gmail.com>
-In-Reply-To: <20251024212914.1474337-3-ameryhung@gmail.com>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Tue, 28 Oct 2025 09:53:26 -0700
-X-Gm-Features: AWmQ_bmAQCui-ii54BCiuN56VMT3wOf7NRO0nY_eo3hlD-7GxlxaE6lxnI2x5n4
-Message-ID: <CAEf4BzYnB74djXyb08m7tJE9MGxT-iVOOBsNQO3PFGFDW=vRLA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v4 2/6] bpf: Support associating BPF program with struct_ops
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, tj@kernel.org, martin.lau@kernel.org, 
-	kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1761510019-938772-1-git-send-email-tariqt@nvidia.com>
 
-On Fri, Oct 24, 2025 at 2:29=E2=80=AFPM Amery Hung <ameryhung@gmail.com> wr=
-ote:
->
-> Add a new BPF command BPF_PROG_ASSOC_STRUCT_OPS to allow associating
-> a BPF program with a struct_ops map. This command takes a file
-> descriptor of a struct_ops map and a BPF program and set
-> prog->aux->st_ops_assoc to the kdata of the struct_ops map.
->
-> The command does not accept a struct_ops program nor a non-struct_ops
-> map. Programs of a struct_ops map is automatically associated with the
-> map during map update. If a program is shared between two struct_ops
-> maps, prog->aux->st_ops_assoc will be poisoned to indicate that the
-> associated struct_ops is ambiguous. The pointer, once poisoned, cannot
-> be reset since we have lost track of associated struct_ops. For other
-> program types, the associated struct_ops map, once set, cannot be
-> changed later. This restriction may be lifted in the future if there is
-> a use case.
->
-> A kernel helper bpf_prog_get_assoc_struct_ops() can be used to retrieve
-> the associated struct_ops pointer. The returned pointer, if not NULL, is
-> guaranteed to be valid and point to a fully updated struct_ops struct.
-> For struct_ops program reused in multiple struct_ops map, the return
-> will be NULL. The call must be paired with bpf_struct_ops_put() once the
-> caller is done with the struct_ops.
->
-> To make sure the returned pointer to be valid, the command increases the
-> refcount of the map for every associated non-struct_ops programs. For
-> struct_ops programs, since they do not increase the refcount of
-> struct_ops map, bpf_prog_get_assoc_struct_ops() has to bump the refcount
-> of the map to prevent a map from being freed while the program runs.
-> This can happen if a struct_ops program schedules a time callback that
-> runs after the struct_ops map is freed.
->
-> struct_ops implementers should note that the struct_ops returned may or
-> may not be attached. The struct_ops implementer will be responsible for
-> tracking and checking the state of the associated struct_ops map if the
-> use case requires an attached struct_ops.
->
-> Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> ---
->  include/linux/bpf.h            | 16 ++++++
->  include/uapi/linux/bpf.h       | 17 ++++++
->  kernel/bpf/bpf_struct_ops.c    | 98 ++++++++++++++++++++++++++++++++++
->  kernel/bpf/core.c              |  3 ++
->  kernel/bpf/syscall.c           | 46 ++++++++++++++++
->  tools/include/uapi/linux/bpf.h | 17 ++++++
->  6 files changed, 197 insertions(+)
->
+On Sun, Oct 26, 2025 at 10:20:19PM +0200, Tariq Toukan wrote:
+> From: Cosmin Ratiu <cratiu@nvidia.com>
+> 
+> esw->user_count tracks how many TC rules are added on an esw via
+> mlx5e_configure_flower -> mlx5_esw_get -> atomic64_inc(&esw->user_count)
+> 
+> esw.user_count was unconditionally set to 0 in
+> esw_destroy_legacy_fdb_table and esw_destroy_offloads_fdb_tables.
+> 
+> These two together can lead to the following sequence of events:
+> 1. echo 1 > /sys/class/net/eth2/device/sriov_numvfs
+>   - mlx5_core_sriov_configure -...-> esw_create_legacy_table ->
+>     atomic64_set(&esw->user_count, 0)
+> 2. tc qdisc add dev eth2 ingress && \
+>    tc filter replace dev eth2 pref 1 protocol ip chain 0 ingress \
+>        handle 1 flower action ct nat zone 64000 pipe
+>   - mlx5e_configure_flower -> mlx5_esw_get ->
+>     atomic64_inc(&esw->user_count)
+> 3. echo 0 > /sys/class/net/eth2/device/sriov_numvfs
+>   - mlx5_core_sriov_configure -..-> esw_destroy_legacy_fdb_table
+>     -> atomic64_set(&esw->user_count, 0)
+> 4. devlink dev eswitch set pci/0000:08:00.0 mode switchdev
+>   - mlx5_devlink_eswitch_mode_set -> mlx5_esw_try_lock ->
+>     atomic64_read(&esw->user_count) == 0
+>   - then proceed to a WARN_ON in:
+>   esw_offloads_start -> mlx5_eswitch_enable_locke -> esw_offloads_enable
+>   -> mlx5_esw_offloads_rep_load -> mlx5e_vport_rep_load ->
+>   mlx5e_netdev_change_profile -> mlx5e_detach_netdev ->
+>   mlx5e_cleanup_nic_rx -> mlx5e_tc_nic_cleanup ->
+>   mlx5e_mod_hdr_tbl_destroy
+> 
+> Fix this by not clearing out the user_count when destroying FDB tables,
+> so that the check in mlx5_esw_try_lock can prevent the mode change when
+> there are TC rules configured, as originally intended.
+> 
+> Fixes: 2318b8bb94a3 ("net/mlx5: E-switch, Destroy legacy fdb table when needed")
+> Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
-[...]
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-> @@ -1394,6 +1414,84 @@ int bpf_struct_ops_link_create(union bpf_attr *att=
-r)
->         return err;
->  }
->
-> +int bpf_prog_assoc_struct_ops(struct bpf_prog *prog, struct bpf_map *map=
-)
-> +{
-> +       struct bpf_map *st_ops_assoc;
-> +
-> +       guard(mutex)(&prog->aux->st_ops_assoc_mutex);
-> +
-> +       st_ops_assoc =3D rcu_access_pointer(prog->aux->st_ops_assoc);
-
-we don't have RCU lock here, can this trigger lockdep warnings due to
-rcu_access_pointer() use?
-
-> +
-> +       if (st_ops_assoc && st_ops_assoc =3D=3D map)
-> +               return 0;
-> +
-> +       if (st_ops_assoc) {
-> +               if (prog->type !=3D BPF_PROG_TYPE_STRUCT_OPS)
-> +                       return -EBUSY;
-> +
-
-put st_ops_assoc map (if it's not BPF_PTR_POISON already, of course),
-otherwise we are leaking refcount
-
-pw-bot: cr
-
-> +               rcu_assign_pointer(prog->aux->st_ops_assoc, BPF_PTR_POISO=
-N);
-> +       } else {
-> +               if (prog->type !=3D BPF_PROG_TYPE_STRUCT_OPS)
-> +                       bpf_map_inc(map);
-> +
-> +               rcu_assign_pointer(prog->aux->st_ops_assoc, map);
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +void bpf_prog_disassoc_struct_ops(struct bpf_prog *prog)
-> +{
-> +       struct bpf_map *st_ops_assoc;
-> +
-> +       guard(mutex)(&prog->aux->st_ops_assoc_mutex);
-> +
-> +       st_ops_assoc =3D rcu_access_pointer(prog->aux->st_ops_assoc);
-> +
-> +       if (!st_ops_assoc || st_ops_assoc =3D=3D BPF_PTR_POISON)
-> +               return;
-> +
-> +       if (prog->type !=3D BPF_PROG_TYPE_STRUCT_OPS)
-> +               bpf_map_put(st_ops_assoc);
-> +
-> +       RCU_INIT_POINTER(prog->aux->st_ops_assoc, NULL);
-> +}
-> +
-> +/*
-> + * Get a reference to the struct_ops struct (i.e., kdata) associated wit=
-h a
-> + * program. Must be paired with bpf_struct_ops_put().
-> + *
-> + * If the returned pointer is not NULL, it must points to a valid and
-> + * initialized struct_ops. The struct_ops may or may not be attached.
-> + * Kernel struct_ops implementers are responsible for tracking and check=
-ing
-> + * the state of the struct_ops if the use case requires an attached stru=
-ct_ops.
-> + */
-> +void *bpf_prog_get_assoc_struct_ops(const struct bpf_prog_aux *aux)
-> +{
-> +       struct bpf_struct_ops_map *st_map;
-> +       struct bpf_map *map;
-> +
-> +       scoped_guard(rcu) {
-> +               map =3D rcu_dereference(aux->st_ops_assoc);
-> +               if (!map || map =3D=3D BPF_PTR_POISON)
-> +                       return NULL;
-> +
-> +               map =3D bpf_map_inc_not_zero(map);
-
-I think this is buggy. When timer callback happens, the map can be
-long gone, and its underlying memory reused for something else. So
-this bpf_map_inc_not_zero() can crash or just corrupt some memory. RCU
-inside this function doesn't do much for us, it happens way too late.
-
-It's also suboptimal that we now require callers of
-bpf_prog_get_assoc_struct_ops() to do manual ref put.
-
-Have you considered getting prog->aux->st_ops_assoc ref incremented
-when scheduling async callback instead? Then we won't need all this
-hackery and caller will just be working with borrowed map reference?
-
-> +               if (IS_ERR(map))
-> +                       return NULL;
-> +       }
-> +
-> +       st_map =3D (struct bpf_struct_ops_map *)map;
-> +
-> +       if (smp_load_acquire(&st_map->kvalue.common.state) =3D=3D BPF_STR=
-UCT_OPS_STATE_INIT) {
-> +               bpf_map_put(map);
-> +               return NULL;
-> +       }
-> +
-> +       return &st_map->kvalue.data;
-> +}
-> +EXPORT_SYMBOL_GPL(bpf_prog_get_assoc_struct_ops);
-> +
->  void bpf_map_struct_ops_info_fill(struct bpf_map_info *info, struct bpf_=
-map *map)
->  {
-
-[...]
 
