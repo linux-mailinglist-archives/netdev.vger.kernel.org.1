@@ -1,135 +1,181 @@
-Return-Path: <netdev+bounces-233492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E2B5C14620
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 12:33:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F078EC1467A
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 12:39:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 169FC4688C8
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 11:31:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B33471AA4B1F
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 11:39:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5F6B30DEA2;
-	Tue, 28 Oct 2025 11:30:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCC84307ADA;
+	Tue, 28 Oct 2025 11:39:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A5gZQ4j0"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="xYhysw+u";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="lZvHAfsw"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36E423081B0
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 11:30:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A2A309DCB;
+	Tue, 28 Oct 2025 11:39:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761651039; cv=none; b=P6gddORo3fCMgIe11jMIHfXFVQWJ/qAgPVTH3okgwE9eQUStMW4DnSBdW5z0OCmqct40q/qAHU3QeeHJc4qUchIdKn1COruDAZFvPj4LWe08D0CSLV+fXraj7atdXjRstJyYhg0/IHiBnXXSner32anAai8C62oaJ44GDPyfG9I=
+	t=1761651551; cv=none; b=AgFYBbacn6ChtzTfAK1zuKWvFspjb4S/ZyU3ucXJmk0OmbwTfaUX+Mi7n7oliYNCZgICxq3UoicwzQoh2AZl6VVnfjKm0dGMXgdDr0OzBB4SmQAbYo52ut8fQh048ZXUSIRO67Er/03yskU3N8gEjPfMA3wCG04boLMaE/u5cuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761651039; c=relaxed/simple;
-	bh=uLz1nCOc13P72Z9cLqgJATuBA1im88R9TxqI9YQCXBY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=co7yjDbkaH/D/qqgDeyclaM3H4g6jdjYtqVnWIJo+rUHcxwDYKFvT7LuRNlFoY5GZP0Q9Om6mcH1RMvtG6HJ02Ese4J5FbU5Jre2zT7wbJn2++UN2/89jetw6VKX2wAvgoLlwDPtsXPecNq9tYUao/k6GKOKX8Mf960XDtaRk1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A5gZQ4j0; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761651034;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6wj7YAztZrM6wj1+S+3q5JHWOPj4KIXwKeK9N2bqLfU=;
-	b=A5gZQ4j0xLIsGcgO2HUNkY0U3Ui72riAn6/pLfsfJd7vhw4IgnyBoh2JVae9HT6iOgOwoJ
-	uVgnFuqWFL97Ame9GmTrOYjQ87bSePLcY3PN9MgPT014WDkm7JiVKr7Uh4Lx3s00auQPUV
-	rOJPnxtTyj+5Q5dRTbHvP5VcPmJ8v5M=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-108-NUa5F8TtMq6c5ZLRyiw9BA-1; Tue, 28 Oct 2025 07:30:32 -0400
-X-MC-Unique: NUa5F8TtMq6c5ZLRyiw9BA-1
-X-Mimecast-MFC-AGG-ID: NUa5F8TtMq6c5ZLRyiw9BA_1761651032
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-475ddd57999so27020875e9.1
-        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 04:30:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761651032; x=1762255832;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6wj7YAztZrM6wj1+S+3q5JHWOPj4KIXwKeK9N2bqLfU=;
-        b=nC0PZ83aetqyQ2nSti8Kw2aqqskJ1gEpkEnrXpGqldyLtyey2uifJMzvr0ox3RNKoj
-         EsxCjJwEgziollpwdATEjTHiLa0qXRprCOOK1Xc/I+ar9cG0ZQHgOkL4TfaDOSMf558t
-         FU1c0B/RqVEJoVoJYpIQi6wDMCt2NOOgmUZ4T+WuuQ9Z4idT2557IePh4ntWAqBpqWJa
-         tcZCTRouGjzzrIDOLG/Oe+xhyHHTM/Ob6q2itKzvyE+atge24a1bi2w7+zBBI+NCUXT6
-         MRy3NJTiA6i24GFNq98gVVUnzA/dRiKfPhaXXMg32xMkOFSzAkBHnH7ZgZhYdcG3SBKY
-         qgZA==
-X-Forwarded-Encrypted: i=1; AJvYcCVvM/ETxoKeqaEPeT1uKF7A/fgbBd0yPjtaP8JA/XUEYaKCZSs2DT8FjD8jyahvDVrwlXRkjf8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEA2ve+186eCT4zp/XECH2XaphrlSiG8vUhY0yucrGAfPWvZrJ
-	wcA8ZhVuz+rRhkVdFPOaHEHHO6BvVBQfwpa7h9QJ1Lo3iTUtlE2cbpcy8GGS4MXUI1+I37Cap5y
-	6UwbWrM1x4vb1uyDHh0wlD36gS34xOSUY1C+juCepoRSxpzUPQRGdZYHHIA==
-X-Gm-Gg: ASbGncvBqSiz6Pkc5LnbkiSleRe11q9V7ehaXDWYVClUKCixcf+MEUuww+dI2ByAOh2
-	0jdLdJ0Fd8SPAmomuEiOO3BLGOAMMrhk7ICIYyJ0q0tgbDMvTCIZNoQIPUVbWymcczE5vZu5LJx
-	NfOuP/PbSwcsin3lzb9P84ZS0WTGLdbLOpCQQyIh5CEcLOeog5ujed+OxUi5LW8/nnM98gzM4NB
-	qebN+fjZmvmlZVU5N5q07Pk37wE1ojknVFvScNLcI1vguRORIs9+6PNOx39Mx5quqtilME5jn33
-	r6kW0Ay+inFPPxkaC1rgoX5jKbYAuD6wIRyP5EjLqBugNC+gZ0ZZ6+ti2QtixWGthrX6rA1gM5p
-	nkJDzLmyH9K1WBGnKBo9GR/xDDs8eDnyT/hXMEa7P2BywoZw=
-X-Received: by 2002:a05:600c:4446:b0:475:da13:2566 with SMTP id 5b1f17b1804b1-47717e6095fmr25034845e9.35.1761651031654;
-        Tue, 28 Oct 2025 04:30:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG1UoWkDkAxEnPYbIqlYF36LNiS1od7f4r/oylsQ8lGjLYMkIaaEI5SdiPojR2VWZlNQPGbIA==
-X-Received: by 2002:a05:600c:4446:b0:475:da13:2566 with SMTP id 5b1f17b1804b1-47717e6095fmr25034235e9.35.1761651031148;
-        Tue, 28 Oct 2025 04:30:31 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-475dd489fa4sm187152685e9.16.2025.10.28.04.30.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Oct 2025 04:30:30 -0700 (PDT)
-Message-ID: <c10939d2-437e-47fb-81e9-05723442c935@redhat.com>
-Date: Tue, 28 Oct 2025 12:30:27 +0100
+	s=arc-20240116; t=1761651551; c=relaxed/simple;
+	bh=UAxLNhoB84hQRN0kOuuikbSKdb0pgZp04mtjcw3gneI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VgU+Z2ZginrBt6sgDUXKbp3zMynw9f+HJvBN3MkPB+k00RGrDgKf99WBsaJ8+6V02W1wGU7zpxe3ZCBTZviYOL61KMAmEFOBUa/ksuTrCKujeiPWWCVvsKVW5ggmuDlaaTdn+68OwL9C+SUJ1wjr4Em97rEqBsdqyd+uBO2zVYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=xYhysw+u; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=lZvHAfsw; arc=none smtp.client-ip=103.168.172.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailfout.phl.internal (Postfix) with ESMTP id 9BBC9EC02B9;
+	Tue, 28 Oct 2025 07:39:07 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-05.internal (MEProxy); Tue, 28 Oct 2025 07:39:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1761651547; x=
+	1761737947; bh=6FNvSF4bdDqt8+VEMT250QI+6dV1cBTjXy9CJpJx+OY=; b=x
+	Yhysw+uz7P1p7ROv7c5N3pNs9FeTbDUT6hKyoWxonvfhvc6qLfSgSR8hRy4IUUtR
+	qS61iQB2JIx+DJ7xg2J0avBYC32ylrUKfIV94ljhQbPwpIQ/m7tR08Su3yhwktox
+	n1PFqUEiMTgdGA6Mwa8F75ZMBLAJ8Kovd3lw9yPmY/h0P14TtgGo6DTBHuKvBHyD
+	qemBMLW5sMXsTUiKcQOvj9mVnommN/czjzhNFR66S5fUGhUOm4wpb8Dr8kzBKzki
+	OkYNo5/ViIr+O8ULAkcThxnvljyEBZd8E3E4joIyavYx1o2uhsEwvbrj3j8hR0Xn
+	BcQiVDpTQXa/y3WC0VbKg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1761651547; x=1761737947; bh=6FNvSF4bdDqt8+VEMT250QI+6dV1cBTjXy9
+	CJpJx+OY=; b=lZvHAfswUW8xbsw49HIqDI/XyRbtPdzWwwGkVl3HAUGa2P0pSvU
+	01C+HMDHmbhYNLxHNsWCaEOnJS1su0ik3dwUZEwMiIehy+eTSacwFcRQfrpEUP8z
+	YPXQCyIO9wX8w8hz5uF5u/FH+otd7FMPsFGIJzUxnsZkpjZPQLygJy565Zso3WWZ
+	4RQYojlD1eUaFDuUIIU8oU4S7B/tv180W2qO55tp0RjIIEGbxBfOlvASRNUB+uBN
+	G2yeixN2+w6MslZTNA7GuMtBi6DT9Gq9Xrbtcf/hajuoZGsHfUeK0Jx/8g4+3Cf6
+	yJwgUFajxqVDoezkLiRhCp+1xhntHZfkRMw==
+X-ME-Sender: <xms:WqsAaf4K4jYStqcnN3YLfgqcZxNDBqP1ETWoGsN3EAWSpYCgnXe46g>
+    <xme:WqsAaRfJElK_9gado7_GwFdTnt5h7qHY5C4TP0blhedYi6rwxFvGk9KG3TlXw8vNk
+    1U0gBLcYz6zvQ4zUzPXxZ3Jg609WUacVTnAWGS-dg48-Vf6bOmxKZE>
+X-ME-Received: <xmr:WqsAaa6BhJmomZXtgfYfg8-1dOW3eqkFMzBk1bxqBLKAXdu4aq1gMrzu4wPV>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduiedtjeehucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeelpdhmohgu
+    vgepshhmthhpohhuthdprhgtphhtthhopehtrghnmhgrhiesmhgrrhhvvghllhdrtghomh
+    dprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohep
+    hhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhgvohhnsehkvghrnhgvlh
+    drohhrghdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdrohhr
+    ghdrrghupdhrtghpthhtohepsggshhhushhhrghnvdesmhgrrhhvvghllhdrtghomhdprh
+    gtphhtthhopehsghhouhhthhgrmhesmhgrrhhvvghllhdrtghomhdprhgtphhtthhopehl
+    ihhnuhigqdgtrhihphhtohesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhope
+    hnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:WqsAaW-MygqBWjpGd-m6mCepbeB67YtaxNEtQ2yEPmKy1A0bjXBrmA>
+    <xmx:WqsAaUFd26bnFFCKSV_MuQCEWDtkoQ06RQyd78vAaKJuLDMmGdKyLA>
+    <xmx:WqsAaTWSHVBKitKOFXXcj8DuRv3g7fe-1gTfVk6ghY3SZZEI0Aj8XA>
+    <xmx:WqsAaY9HjwC3aVWHBHLCnb96MqCmm32XOM30tZQ-xCX5nnlwq1_qpg>
+    <xmx:W6sAaZ_BVG8u2-e1YtNlN-rLINIc7K7Gmf3OUkLDzeCYtk0ATpC3wO76>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 28 Oct 2025 07:39:06 -0400 (EDT)
+Date: Tue, 28 Oct 2025 12:39:04 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Tanmay Jagdale <tanmay@marvell.com>
+Cc: davem@davemloft.net, horms@kernel.org, leon@kernel.org,
+	herbert@gondor.apana.org.au, bbhushan2@marvell.com,
+	sgoutham@marvell.com, linux-crypto@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v5 15/15] octeontx2-pf: ipsec: Add XFRM state
+ and policy hooks for inbound flows
+Message-ID: <aQCrWAVZh2VlOl54@krikkit>
+References: <20251026150916.352061-1-tanmay@marvell.com>
+ <20251026150916.352061-16-tanmay@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3 1/3] net,mptcp: fix proto fallback detection with
- BPF sockmap
-To: Jiayuan Chen <jiayuan.chen@linux.dev>, mptcp@lists.linux.dev
-Cc: stable@vger.kernel.org, Jakub Sitnicki <jakub@cloudflare.com>,
- John Fastabend <john.fastabend@gmail.com>, Eric Dumazet
- <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
- Willem de Bruijn <willemb@google.com>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Matthieu Baerts <matttbe@kernel.org>,
- Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
- Florian Westphal <fw@strlen.de>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20251023125450.105859-1-jiayuan.chen@linux.dev>
- <20251023125450.105859-2-jiayuan.chen@linux.dev>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251023125450.105859-2-jiayuan.chen@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20251026150916.352061-16-tanmay@marvell.com>
 
-On 10/23/25 2:54 PM, Jiayuan Chen wrote:
-> When the server has MPTCP enabled but receives a non-MP-capable request
-> from a client, it calls mptcp_fallback_tcp_ops().
-> 
-> Since non-MPTCP connections are allowed to use sockmap, which replaces
-> sk->sk_prot, using sk->sk_prot to determine the IP version in
-> mptcp_fallback_tcp_ops() becomes unreliable. This can lead to assigning
-> incorrect ops to sk->sk_socket->ops.
+2025-10-26, 20:39:10 +0530, Tanmay Jagdale wrote:
+> +static int cn10k_ipsec_policy_add(struct xfrm_policy *x,
+> +				  struct netlink_ext_ack *extack)
+> +{
+> +	struct cn10k_inb_sw_ctx_info *inb_ctx_info = NULL, *inb_ctx;
+> +	struct net_device *netdev = x->xdo.dev;
+> +	bool disable_rule = true;
+> +	struct otx2_nic *pf;
+> +	int ret = 0;
+> +
+> +	if (x->xdo.dir != XFRM_DEV_OFFLOAD_IN) {
+> +		netdev_err(netdev, "ERR: Can only offload Inbound policies\n");
+> +		ret = -EINVAL;
 
-I don't see how sockmap could modify the to-be-accepted socket sk_prot
-before mptcp_fallback_tcp_ops(), as such call happens before the fd is
-installed, and AFAICS sockmap can only fetch sockets via fds.
+missing goto/return?
 
-Is this patch needed?
+> +	}
+> +
+> +	if (x->xdo.type != XFRM_DEV_OFFLOAD_PACKET) {
+> +		netdev_err(netdev, "ERR: Only Packet mode supported\n");
+> +		ret = -EINVAL;
 
-/P
+missing goto/return?
 
+> +	}
+> +
+> +	pf = netdev_priv(netdev);
+> +
+> +	/* If XFRM state was added before policy, then the inb_ctx_info instance
+> +	 * would be allocated there.
+> +	 */
+> +	list_for_each_entry(inb_ctx, &pf->ipsec.inb_sw_ctx_list, list) {
+> +		if (inb_ctx->reqid == x->xfrm_vec[0].reqid) {
+> +			inb_ctx_info = inb_ctx;
+> +			disable_rule = false;
+> +			break;
+> +		}
+> +	}
+> +
+> +	if (!inb_ctx_info) {
+> +		/* Allocate a structure to track SA related info in driver */
+> +		inb_ctx_info = devm_kzalloc(pf->dev, sizeof(*inb_ctx_info), GFP_KERNEL);
+
+I'm not so familiar with devm_*, but according to the kdoc for
+devm_kmalloc, this will get freed automatically when the driver goes
+away (but not earlier). This could take a long time. Shouldn't this be
+manually freed in the error path of this function, and somewhere
+during the policy_delete/policy_free calls?
+
+I see that you've got a devm_kfree in cn10k_ipsec_inb_add_state, so
+something similar here?
+
+
+[...]
+> +static void cn10k_ipsec_policy_free(struct xfrm_policy *x)
+> +{
+> +	return;
+>  }
+
+The stack can handle a NULL .xdo_dev_policy_free, so this empty
+implementation is not needed. But I'm not sure releasing all
+policy-related resources at delete time (even via WQ) is safe, so
+possibly some of the work done in cn10k_ipsec_policy_delete should be
+moved here (similar comment for the existing cn10k_ipsec_del_state
+code vs adding .xdo_dev_state_free).
+
+-- 
+Sabrina
 
