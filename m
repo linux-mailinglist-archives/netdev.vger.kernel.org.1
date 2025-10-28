@@ -1,404 +1,135 @@
-Return-Path: <netdev+bounces-233494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 616E9C1468D
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 12:40:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3ACEC146D1
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 12:43:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 23A9D4E5C38
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 11:40:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF6E2466D4C
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 11:43:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BB0E308F18;
-	Tue, 28 Oct 2025 11:40:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48AB930B511;
+	Tue, 28 Oct 2025 11:43:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mAFHpO/E"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hN/IF4hv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC4B305E0C
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 11:40:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FC6930ACF0
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 11:43:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761651610; cv=none; b=uRErKOAbNYAJC0/SEw0lbNKkGF+9Txw0odQN9njSh6NkmF9SYMFZ6DL5M5MjGGMU0vmF2/4XrsStxg7Qwe7HLZP+F0nUwZhJanivbUScY3FWE/yx4ilFqva2aJ23qMDJwQrGiDzKnpFgIJwCcu62HXDjmXscx3VK0kU8kaiU++E=
+	t=1761651798; cv=none; b=ZH5ScSG/FA33mGn28EypOSy/DznItr2O1tK2CvgbvEsPRTO9o+8Jqfb5C6BKe0Z9s4dWKGpbOodU3oU0/2AhPLa/FOjYNCO9sa6A2GnXUnHC8Yoa9glxh/iuOkymyieQPPlDhnFCi5d4yVIyYZ5tD4uW3Y7N1UI+GrvbpdrKBBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761651610; c=relaxed/simple;
-	bh=S8+Ja3ralZ2WxCdLK1ixOt+mF2q4rBG1Bbc1fFOF20Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Aj3gBFQNobenmmbzSzfecd6FC600suVLm5LRAmb0WVqekevkXYMKE4LeGRgCpu9P47+o8x4UluCIQBwS/9trFa0Wo0QTCWNTmXBxic1cy3nxLQAFUVGrY8MGtboAkIXvdd9CG9XO52l+RyMKkzjYhwBtPeJCFRJknuMzZ/X5Mmg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mAFHpO/E; arc=none smtp.client-ip=209.85.210.178
+	s=arc-20240116; t=1761651798; c=relaxed/simple;
+	bh=yGVq8gF2tUQexob86KGNBoc3W0yZw6td9K+Fy7ylHo4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dGARqr86USPU8dSFVzJ7FjH4e7JhiewPa9hepNIOlSWqj5UP/hyRYU7Oen1oI7aUHn5Abg2RLeeaOpQ3JYwe2TvnO3Pj3F8OiuoaC3wfOea5H1Slt5mFwh7H8RgOl1d4tjNITIRafilWaDp0soTuoA+CdtPhZbKSLKIHI0ap/RQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hN/IF4hv; arc=none smtp.client-ip=209.85.218.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-79af647cef2so4989185b3a.3
-        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 04:40:07 -0700 (PDT)
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b6d345d7ff7so70890166b.1
+        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 04:43:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761651607; x=1762256407; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=UQGkMpWQvkIrFU/utWIdl52vdzB7gtbaDaCLqaVvZwY=;
-        b=mAFHpO/ERlvBgzENIiDBUGgcqj2edkDJ5i9oq4kHVh+9p+z6ZI63uZz1aLXo1wC8pd
-         ZPL1yImqUIAtp+tn6Qbn+M4Z5dUo7RfyfipXqi/I3exuGe2I0N6hO2HD6Q4jj5lg5+T7
-         UalETiVjsShfaZeXFw4Ra+MRgQhQwf097kkyVw8vfu1bXloevb+Cn+q3rzxKhcsBJ5Cb
-         ncNYm61tSwDapv6xoT+E7eCuEBCteb944Jv1J6iZKeOHaYTHhkUZsErmUux9XcVLw9Yf
-         WcUBSS2cPHXxcCVlLMxXkUsUcdB9aN7zXS4U5B60nt4k12R8K/EOs7RnK9z9cm4HUBqv
-         9jyw==
+        d=gmail.com; s=20230601; t=1761651794; x=1762256594; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bnZs2RMUETbMZcfBovNxnautSVDoIsvh/Vcc2VRjKM0=;
+        b=hN/IF4hvDxuuXsbRaa9PL/Is/CtrzJUsQwfHUVvAcvaTamtVUoVAn6+gCdFiTJcJT7
+         K79egEEQGnKbah9N0sOciTo3v+ZkEAXWYL4dnJDum7CL/+bEnrUA6ijFhDIK6tJpw0nB
+         XaqanuqgFCRTd6B/baa5cERb0pH5k862iGpiVAilJGxyI9dFG6yf2P75Q3MYY2yVUXTa
+         njtuxGUiAWcezijrgnB/4T5Wnh+IU89XtLdP5p/cuxCrOnhFRK55mhZ1elVpzLCDhk9c
+         8vOWvI+O4lEU8TupawjpK+eVNUuuPnnN18mNE9RhTYVl1yxQR9IPXvwz0mALPQWQpWrU
+         iqWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761651607; x=1762256407;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UQGkMpWQvkIrFU/utWIdl52vdzB7gtbaDaCLqaVvZwY=;
-        b=gRybCtsvS3KivAVMXFHj/6oszHQ3KjlEe0rE5HcMRmT5AeL/5Q7/C8P0QdHBmpJuOX
-         lDBIV80bXClezaDRodAkg7NuLfVPFYQDfW7Qe9X2HpXR/A2IaphIG0k/N1m4/IkNk+KR
-         AbioKKdnyyqHEKTmcJqURum01h/gSPqCphdOYN32eDgOUFx+Ng2vQ5LAhGGp+roIXTEM
-         7rO8T8orV8xvEg6+S9gBvMrXDwrjzyKuiceZNgIhmKS3X38F4QJlVPpKRJUK2QwzyasN
-         UWAirBUIyGh2Lm/Ijhh7xgYhZe48mdfy4nPvR0mgjUEUGd34RwQ16BVmVzWT2coi1k78
-         P2Hg==
-X-Forwarded-Encrypted: i=1; AJvYcCXDRmTIxz+aO+yoKpgZ87wPj68lIXumcfJeVZ/B3+T+ySKxftCZDCuHkKBGxRK6fs95UED9/Cg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9OZlGnaEC+f62u4EgzSs1HXrT30fBZLSqoTnPXQqX8mfc8xAS
-	p4mXaCSXRXIDFO8/SICFx+38rokt1HfK7VP+30fk9HvcGKcvJ771GZaf
-X-Gm-Gg: ASbGncsKe8J2u7McHS966CBtU1qsHUIvz8q/+jORPrF7n95AZ/+c3kJzXiOkWnOcBMt
-	x3r+hj+rrhiwbqq9vs5+bg9HOKAa9ZZtXW8PNP3JJbzsyLPuNWlumfxbJzuOuP3ghkjR76lYgK6
-	3EPTEg7Q6QBBKUNUE+X9lry+MkD+yEE277xFOoQO3osdpgbE23eGE1NoUkIvyZqdSJgwwIh6jsx
-	gQ3moV3Zkdblgr3A6km0BkhIjdNX2fq2gm2DB1UrZXaYPd7uaLAdMLWrx2aKSNZMcMA7HFfmMyI
-	+We54R/RxUi1V/5TNUWPzuNTZDV1fqPrRK9Agdn7lEiYZR9Inqbmkft1BCPAaZ7FoRUoLLoMEqB
-	syW0je9IwM3CtwVgrKm6HHqZOOjKqwOiwD6CY+gvK6fDSnCP20SJGwV0KTwktOWGU0szKP87XFV
-	AI
-X-Google-Smtp-Source: AGHT+IELfm1V2/9P9RcJo7ple69Pu8CkbUuJnvOHx1MhFw0DK3gnvsbENWcBcTkx8E417BUE9yB8ag==
-X-Received: by 2002:a05:6a20:3ca7:b0:2ff:3752:8375 with SMTP id adf61e73a8af0-344d3a4fdbamr4255473637.45.1761651607102;
-        Tue, 28 Oct 2025 04:40:07 -0700 (PDT)
-Received: from archie.me ([210.87.74.117])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b71268bd810sm10351782a12.6.2025.10.28.04.40.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Oct 2025 04:40:06 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id 931944209E50; Tue, 28 Oct 2025 18:40:03 +0700 (WIB)
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Documentation <linux-doc@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>,
-	Linux BPF <bpf@vger.kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Bagas Sanjaya <bagasdotme@gmail.com>
-Subject: [PATCH net-next] net: Reorganize networking documentation toctree
-Date: Tue, 28 Oct 2025 18:39:24 +0700
-Message-ID: <20251028113923.41932-2-bagasdotme@gmail.com>
-X-Mailer: git-send-email 2.51.1
+        d=1e100.net; s=20230601; t=1761651794; x=1762256594;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bnZs2RMUETbMZcfBovNxnautSVDoIsvh/Vcc2VRjKM0=;
+        b=XxKMQXeAERDyX0i2c8H+49YlsmoImQ3G62zsaZrGwJL0MwFHzy1UYlKIC/S/+vL/8P
+         JByKKYCOkbHJDUsohWSHqNR0KllC6LQSubTM88iFTWsyifpP2qXP8xRtWh42HSeUFRPQ
+         ETFENS/Dt6Uqy8jy0uLaO8psBbJLh2CCr1ppPZq3ZPSkJDrGCoaSNNgWz6/K4diMcDKf
+         YN3FQ/yMYIk2l7pT7Hhq3au5D70cjD0zi6+8M3h5CgM5n7sWcN/2oB7s65q3TJn+CzPq
+         aPbN0JEkujwymY1rGsJeCtDAOkouAGKO5t4hmFPPhKtpL+Uth8qebnvbYb9yQk7zn3sW
+         /18g==
+X-Forwarded-Encrypted: i=1; AJvYcCUKQ1FeJ46MvL3+5162LhU1E9H3I37ivTZUj21F2wMR7kMckcGrdZmMGJDW30ZGkGCLM83w37U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzU0SFqtelRQ6KpunyzXvnRSYXDQdm1Qfc2ifVdiygqi8LGm9Gb
+	8AApU0hgeX8xNoBvWrhqlqdm4ZC7ttWNaDaj/0BQiaoyytKtjzicRfIt
+X-Gm-Gg: ASbGncuSOcsGYFOXe4bX14g33lJSGRa9tQkW5nJ5SzKBOvIm+JqxCU7ciAIfr+Q5ugF
+	waJ0pAG6Tn/UecPRoq6nQyqgQ9UEiQCLeDJ8iVTcb5EhB0svJm8n2hr+/EC2ZQ2zAOo4/oU0QXG
+	cxXlICRc0NPAN+GohCKeRA/j5W3ePB5ZUUZ++lZlgQUnnmkxD7oofvG+D8CyVxLPREvqFHW36/B
+	AXdcSejtJoG/o4KcRANBQfrwof1B8jwI8EMzl5PwOnI7CbuvsilUznYQ6srhsduKW7a1VQB0WlK
+	eyM5wc8shbKiShgBVdYZVtpa/QUjB4O9s6O0hJo2ApRxyhdA5IMUJWkhrUfS99SbE/3ZKDxP3/H
+	DjruHuyJ8JMNRkZv3ZKtSdg8iPHxLDKgMDK1Jl5prNXzSEUv2UD5G3zQacqXt5wNGOFVIhwYZuk
+	TeGQPfGaMztbPrQ60kE4BpiNnioW/xWtLU//PhTmfNcVLd312oOL5qhudHGtBRM8KzLVOgzs+9b
+	wYnCjDX56TFmskRkNs6liRq05j7jmyndkHok55ZD/IuyPY8jVAdZw==
+X-Google-Smtp-Source: AGHT+IF3bVuUSQU+alNARg7/R6qmJGQ06NbQbI0VrYE7H37TwU5eAm2jU1tQRdun4pLRt3QQNki5aQ==
+X-Received: by 2002:a17:907:958f:b0:b6d:f416:2f3 with SMTP id a640c23a62f3a-b6df416071fmr70842766b.19.1761651794317;
+        Tue, 28 Oct 2025 04:43:14 -0700 (PDT)
+Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b6d8548ed8fsm1084055466b.73.2025.10.28.04.43.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Oct 2025 04:43:13 -0700 (PDT)
+Message-ID: <a4a3dce4-0f2c-4153-abbe-81e5d2715bbe@gmail.com>
+Date: Tue, 28 Oct 2025 12:43:12 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=4925; i=bagasdotme@gmail.com; h=from:subject; bh=S8+Ja3ralZ2WxCdLK1ixOt+mF2q4rBG1Bbc1fFOF20Q=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDJkMq17fbp63pyIq0/jpJI47M/d/5uKyXvj/X43GNtfj+ /9Yf02L6yhlYRDjYpAVU2SZlMjXdHqXkciF9rWOMHNYmUCGMHBxCsBEipwZGXZ5L11wZYK8MaPh Kf+v2rG88zJv9U6uKZ/RHm79yuRxkSwjw1WBxJ36EQf4Z4mJJP2yUTi45cp5aZbry750OqZLM8a nsQAA
-X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v15 nf-next 3/3] netfilter: nft_chain_filter: Add bridge
+ double vlan and pppoe
+To: Florian Westphal <fw@strlen.de>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Nikolay Aleksandrov <razor@blackwall.org>,
+ Ido Schimmel <idosch@nvidia.com>, netfilter-devel@vger.kernel.org,
+ netdev@vger.kernel.org, bridge@lists.linux.dev
+References: <20250925183043.114660-1-ericwouds@gmail.com>
+ <20250925183043.114660-4-ericwouds@gmail.com> <aN425i3sBuYiC5D5@strlen.de>
+From: Eric Woudstra <ericwouds@gmail.com>
+Content-Language: en-US
+In-Reply-To: <aN425i3sBuYiC5D5@strlen.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Current netdev docs has one large, unorganized toctree that makes
-finding relevant docs harder like a needle in a haystack. Split the
-toctree into four categories: networking core; protocols; devices; and
-assorted miscellaneous.
 
-While at it, also sort the toctree entries and reduce toctree depth.
 
-Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
----
- Documentation/networking/index.rst | 241 ++++++++++++++++-------------
- 1 file changed, 136 insertions(+), 105 deletions(-)
+On 10/2/25 10:25 AM, Florian Westphal wrote:
+> Eric Woudstra <ericwouds@gmail.com> wrote:
+>> This adds the capability to evaluate 802.1ad, QinQ, PPPoE and PPPoE-in-Q
+>> packets in the bridge filter chain.
+> 
+> Same comment as previous patch, this needs to explain the why, not the what.
+> 
+> nft_do_chain_bridge() passes all packets to the interpreter, so the
+> above statement is not correct either, you can already filter on all of
+> these packet types.  This exposes NFT_PKTINFO_L4PROTO etc, which is
+> different than what this commit message says.
 
-diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-index c775cababc8c17..ca86e544c5c8e2 100644
---- a/Documentation/networking/index.rst
-+++ b/Documentation/networking/index.rst
-@@ -5,138 +5,169 @@ Refer to :ref:`netdev-FAQ` for a guide on netdev development process specifics.
- 
- Contents:
- 
-+Networking core
-+---------------
-+
- .. toctree::
--   :maxdepth: 2
-+   :maxdepth: 1
- 
-    af_xdp
--   bareudp
--   batman-adv
--   can
--   can_ucan_protocol
--   device_drivers/index
--   diagnostic/index
--   dsa/index
--   devlink/index
--   caif/index
--   ethtool-netlink
--   ieee802154
--   iso15765-2
--   j1939
--   kapi
--   msg_zerocopy
--   failover
--   net_dim
--   net_failover
--   page_pool
--   phy
--   sfp-phylink
--   alias
--   bridge
--   snmp_counter
-    checksum-offloads
--   segmentation-offloads
--   scaling
--   tls
--   tls-offload
--   tls-handshake
--   nfc
--   6lowpan
--   6pack
--   arcnet-hardware
--   arcnet
--   atm
--   ax25
--   bonding
--   cdc_mbim
--   dctcp
--   devmem
--   dns_resolver
-+   diagnostic/index
-    driver
--   eql
--   fib_trie
--   filter
--   generic-hdlc
--   generic_netlink
--   ../netlink/specs/index
--   gen_stats
--   gtp
--   ila
--   ioam6-sysctl
--   iou-zcrx
--   ip_dynaddr
--   ipsec
--   ip-sysctl
--   ipv6
--   ipvlan
--   ipvs-sysctl
--   kcm
--   l2tp
--   lapb-module
-+   kapi
-    mac80211-injection
--   mctp
--   mpls-sysctl
--   mptcp
--   mptcp-sysctl
--   multiqueue
--   multi-pf-netdev
-+   msg_zerocopy
-    napi
-    net_cachelines/index
--   netconsole
-    netdev-features
--   netdevices
--   netfilter-sysctl
-    netif-msg
--   netmem
--   nexthop-group-resilient
--   nf_conntrack-sysctl
--   nf_flowtable
--   oa-tc6-framework
--   openvswitch
--   operstates
-    packet_mmap
--   phonet
-+   page_pool
-+   phy
-    phy-link-topology
--   pktgen
-+   scaling
-+   segmentation-offloads
-+   skbuff
-+   strparser
-+   timestamping
-+   xdp-rx-metadata
-+   xsk-tx-metadata
-+
-+Protocols
-+---------
-+
-+.. toctree::
-+   :maxdepth: 1
-+
-+   6pack
-+   arcnet
-+   ax25
-+   bareudp
-+   caif/index
-+   can
-+   can_ucan_protocol
-+   dctcp
-+   gtp
-+   ila
-+   ipsec
-+   ipv6
-+   iso15765-2
-+   j1939
-+   l2tp
-+   mctp
-+   mptcp
-+   oa-tc6-framework
-+   phonet
-+   psp
-+   rxrpc
-+   sctp
-+   tcp-thin
-+   tcp_ao
-+   tipc
-+   tls
-+   tls-handshake
-+   tls-offload
-+   udplite
-+   vxlan
-+   x25
-+
-+Networking devices
-+------------------
-+
-+.. toctree::
-+   :maxdepth: 1
-+
-+   6lowpan
-+   arcnet-hardware
-+   bonding
-+   bridge
-+   cdc_mbim
-+   device_drivers/index
-+   devlink/index
-+   devmem
-+   dsa/index
-+   eql
-+   ipvlan
-+   multi-pf-netdev
-+   multiqueue
-+   netconsole
-+   netdevices
-+   netmem
-+   operstates
-    plip
-    ppp_generic
-+   representors
-+   sriov
-+   statistics
-+   switchdev
-+   team
-+   tuntap
-+   vrf
-+   x25-iface
-+
-+Packet filtering
-+----------------
-+
-+.. toctree::
-+   :maxdepth: 1
-+
-+   filter
-+   netfilter-sysctl
-+   nf_conntrack-sysctl
-+   nf_flowtable
-+   tc-actions-env-rules
-+   tc-queue-filters
-+   tproxy
-+
-+Miscellaneous
-+-------------
-+
-+.. toctree::
-+   :maxdepth: 1
-+
-+   ../netlink/specs/index
-+   alias
-+   atm
-+   batman-adv
-+   dns_resolver
-+   ethtool-netlink
-+   failover
-+   fib_trie
-+   gen_stats
-+   generic-hdlc
-+   generic_netlink
-+   ieee802154
-+   ioam6-sysctl
-+   iou-zcrx
-+   ip-sysctl
-+   ip_dynaddr
-+   ipvs-sysctl
-+   kcm
-+   lapb-module
-+   mpls-sysctl
-+   mptcp-sysctl
-+   net_dim
-+   net_failover
-+   nexthop-group-resilient
-+   nfc
-+   openvswitch
-+   pktgen
-    proc_net_tcp
-    pse-pd/index
--   psp
-    radiotap-headers
-    rds
-    regulatory
--   representors
--   rxrpc
--   sctp
-    secid
-    seg6-sysctl
--   skbuff
-+   sfp-phylink
-    smc-sysctl
--   sriov
--   statistics
--   strparser
--   switchdev
-+   snmp_counter
-    sysfs-tagging
--   tc-actions-env-rules
--   tc-queue-filters
--   tcp_ao
--   tcp-thin
--   team
--   timestamping
--   tipc
--   tproxy
--   tuntap
--   udplite
--   vrf
--   vxlan
--   x25
--   x25-iface
-    xfrm_device
-    xfrm_proc
-    xfrm_sync
-    xfrm_sysctl
--   xdp-rx-metadata
--   xsk-tx-metadata
- 
- .. only::  subproject and html
- 
+So I have corrected the commit messages now, but:
 
-base-commit: 5f30bc470672f7b38a60d6641d519f308723085c
--- 
-An old man doll... just what I always wanted! - Clara
+> I also vaguely remember I commented that this changes (breaks?) existing
+> behaviour for a rule like "tcp dport 22 accept" which may now match e.g.
+> a PPPoE packet.
+> 
+> Pablo, whats your take on this?  Do we need a new NFPROTO_BRIDGE
+> expression that can munge (populate) nft_pktinfo with the l4 data?
+> 
+> That would move this off to user policy (config) land.
+> 
+> (or extend nft_meta_bridge, doesn't absolutely require a brand new expression).
+> 
+Did you get any answer on this somewhere? I think that answer may affect
+this commit, so I'll wait before sending the next version for now.
 
 
