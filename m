@@ -1,119 +1,152 @@
-Return-Path: <netdev+bounces-233608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66F4CC164CC
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 18:50:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D6665C164D2
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 18:50:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 30A81542505
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 17:46:41 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B82B55427FB
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 17:46:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5435C225402;
-	Tue, 28 Oct 2025 17:46:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2FD434D4DC;
+	Tue, 28 Oct 2025 17:46:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1BEcJJLy"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="MfIJ5fEW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F75345CB1
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 17:46:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68429345CB1
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 17:46:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761673598; cv=none; b=mxwjbkP3MgBYUzbq343Mg4wy455msSVfI43pMEeuC/7qghKRd34nXFqwG9Ooo4DJt+8zoCcaseSZDhnAJCzaIu5lYZdjv3AIZEf5Vgsse5NZ4PsloJdgM8Eg3n3sfsxHDDu4z5sgjXuYKXpMrzCE2PB+dCiHJA+xmWEY4AmCn1E=
+	t=1761673605; cv=none; b=I2oxgbu1OikJA6ib+h6Mq3K3CiR/qPhE8AhEqrWWNSpey8xOpj7vkGcfgFlbqXeWurXQHpaBJq47awslPhj3sahqF/Hwj+o97BQzLKCPXCIEzE49bd8TSA3NiOPbj6ewOW8bJ/A8q7zPeSc2nx2MvmerJCmLmrXm5qbS1hoB7Qw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761673598; c=relaxed/simple;
-	bh=zbeFB5x+OiO/YBlHryfxJUhkT1VVN+D+SSFnhU3x8NA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Mfhm6Z+o107lwyc1TBV2gtmbslBZRHM7nVPUv5s7CDJgpbnQK+UnIOkBkwO25bUn+D+AUGrt8izrOD5MQr0wTdz9erkx15eTKIHplw/9S2W3WmwKduSSf6LQkKCx/QNVlNFMwuEMJx6Y+DiCKZeBXynK3m7VbQPvpjK3gWZ9HQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1BEcJJLy; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-290deb0e643so58406805ad.2
-        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 10:46:36 -0700 (PDT)
+	s=arc-20240116; t=1761673605; c=relaxed/simple;
+	bh=V1fR79vInIGBpuvSpGpDL2OEYifZYBP3nTnFa8Y0KQM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LmSrwtMu0I7sdQbBeQPCpc0QvuDcE6E/C4hWRGZiBUYGaEQCLdMCXyBfqLi4dQqLllSAseadQU9gnlMUAftnAD2obdHzlH5auryL4eRevKdbp308YB0NYgG7GG5W6wV5anYRxiEKAKC6oSDsXUy/DVDVqb5XBn+D8GfpZov7dH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=MfIJ5fEW; arc=none smtp.client-ip=209.85.167.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-443aa90f025so3722184b6e.0
+        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 10:46:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761673596; x=1762278396; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FZsqDuuVhLg2NXCb+AK09lT0i/+l6zu9Qik25XigEBg=;
-        b=1BEcJJLy4qnXOuqgJLVDM14sgdOzCgZUQrwBkZ0emRZlk3uVYEY3ou0f5wqWdXbIR1
-         PDhnCWnwDid77QrN1aM4YKaA/CBqmxIgYtystHvdt8mCpEnR3CZjSmVq90ipAbs3AjoK
-         z6sYey6ZeJ8VffM9XF2yNv8r5O7nRvQA53YQotFGcSA92AWhMV0xVOrlyaU8tzw7tBFv
-         /OU7U7z9EnEVhEWIjdIMu9RsiP4mu0TDNjwrDjFVMji7g6Q76x/k2tlty6ft/NPI2XKk
-         TngJzDUaAH10lPjE7VaUFpkAKrOlFvza4glhgW8C0wv7fy6NEFJRKNeMRxdtVSmlfWo/
-         6KHw==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1761673601; x=1762278401; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MevMVlrLfyU/NRV+2DywzpiJ+/LGIhcHIxG4WKNoNb0=;
+        b=MfIJ5fEWhY0j8g8amWPzAIjCgAxCU5JMDDInq9SAgeYRcFmz0mHpnRkJmsaVj8MbU8
+         Sr6bsqp1s4X1vJQQUZS1frelSdn3SU/Y7SOU5UalcjWxc0DcNBWo/DcBoXZ632Kem8U9
+         gQcbFfCwWB9hFcJ2xktQ7bC7WmCUFqpLC89ZBJM/GZG0REwZQ3Q7++Sjxdn2zV+EqXcL
+         XjIVi0dD4zBcnxxjHNBnZ+88d70sN/sN/yUG+yTG978xD1c5srnhZRVaJ+ErJcitCPO4
+         /Go8VSiR0BU/k1e7V5wLwShiv7R6WD4TjeAor5GIn1m61U2q1u+y7MhfWmIxUTcJj7iN
+         51Cg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761673596; x=1762278396;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FZsqDuuVhLg2NXCb+AK09lT0i/+l6zu9Qik25XigEBg=;
-        b=l21Psk9bEJJgVHU4ur6uAU6CHcWL0tXzmmAkdvlrDBDDP9b/Y7UjmI/H2mp1qh+raC
-         jHaAVz3kqtw/fDveP8WtePb3M3qxZ/aAmJAFkMolcJJj6t/B6m5wZsAGfGwqOwLqklqW
-         yKzHO6ute+n1TiHSNmw/33KcwBeUpButJ7i+UXkjwf5tZf/UTBtd5IyEiEkNlBtoSIqX
-         /OMS9WYvj6GnbLpUS+3XrwN5sSNXKOcB3AC8/NrevSPdJ0iGUr1tE3L3VFPyoK7zRNzx
-         U9ltQ53hN6HG4hSwB39sG5ePtwc6GXIj+8/vBdxm92Qdrsaiz0t6Yf0N8O+iAEWXRxOW
-         f2Ww==
-X-Forwarded-Encrypted: i=1; AJvYcCXWRvdC1HnbgiwVsvkyuJEfHS788G6J/uTwEHmls3FLav7E1dTHSsT8cBmav9LJFhxes/B5JAk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxvIJUgCZWvf2YDf5cqYLnccjqBc/ElgLB6q1dkicLgYz82T0gZ
-	DmOAQ+4pLy2OV5xC1IfCIs5uCKAGVfLX0XDZUN/+OLW/2Ff/F0XPj5JyLoxMFINN6HDmSIc1aSa
-	+/3dnqGIs9imQQaEBZ7PAJ7YjB7xAHTs1WT4Kjodt
-X-Gm-Gg: ASbGncsMsnDSkmMQ8gkBa56oK8w6itb9D1czxXfYnEEBLytuCikozskg6sQtp+yWIvv
-	o3dBGXJXU36UXVaKBJd87qwlP91dzn+GM1w2PS1SkrKrA0zAmEIT7KAuwKQm+rk1rrNK9P4oYGy
-	1q03/RW20VZQIgaMXFPAvtY58JvTPBQyoKit3iGoF8FYRcFPTzlHlOGe5uhw3B/jemt2Vl+bW9M
-	7vxHLPCPw4JoEjw7vfJ8fW9Jj1gPhR1oQc5cXRqK3OoktAYwGoE1EUUk+xr1DusyiO3/dl9pXcE
-	V4jUCaD78aBtCTYKjaN2HG7fiw==
-X-Google-Smtp-Source: AGHT+IEyAtvA64a9Fz09y7bkrGKSTDnLoZo59oLJkzz4zp6Jx0c74zjHwyphq+qc6DK8/4/JpG8+oZMDB3LfYAyEiLE=
-X-Received: by 2002:a17:902:cf0e:b0:27e:f16f:61a3 with SMTP id
- d9443c01a7336-294dee49b4dmr322365ad.23.1761673595961; Tue, 28 Oct 2025
- 10:46:35 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761673601; x=1762278401;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MevMVlrLfyU/NRV+2DywzpiJ+/LGIhcHIxG4WKNoNb0=;
+        b=O9AiLLg6AOizIyKIOf6fSQVwvfNmfAP0sJE6BWoPNi+wuYHY8kL/ibVTdRspbM8/B8
+         jquCqzvt0heYAxdszuINhQesT46SbZyxd+I0inhHhgGtPEC95lri96ySYj2w9Gc7NNCm
+         oM7u+z3Fyd9sI2JqdoEjKW1NWWy3e/g6H/s41NFH+iaw+yv/EEV2ep3TE9bWXr0nMTor
+         R/o78nR5vIwBTIUXCm3QKYF80ilhBefcO3DY4C7VC0FX4zf2rvNLj0RYjw9kgqfO7jbm
+         oC5sX81s1CNPOErpZlBAbRQqPmkqoB0XZFp9O0RKxaOSIfUdZVpGgAFDMbIoU/asWtrC
+         aFhg==
+X-Forwarded-Encrypted: i=1; AJvYcCV4NvNvYsJ2d3DDiRBNRd3s0TwjKGtCMuJa6LSVu/vJU7vRbS1XM4HX5QtQ3i4x/dBbB7XNpzY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2CmA5bJLRSqypDg7Un0/779MgTvpw7Sy2Mdl9ZaeB2hV5vDw/
+	JbePvlhC7fWiLKaANIld/bGJu13l0LNumWNHHPS2rNAw6NCSbZEubpYtAbFRfwV2vOI=
+X-Gm-Gg: ASbGnctsMhD52H2xSFB/x73R++NXF0Ez7VT4C0WKRBNHw11SWz7cxHuy1gPJh9DPGCW
+	ZfD6U6cfNFGOd3YSEUdEYf/o2lFrTBLZ/BzlakcMrsfqB16dnOFGGPuH0SMGKcFrqxgf7jKbB1X
+	55iTd8IUHlEOYRSgX4I0/TzpbRhzW1Ukc8pgH8JYLrZ6R0C2RrrRY3vjQwqXHzM2UybzON55X7o
+	w5JBi/GTLWyESfGqTMqncko2Zg+ab259vywrB2ZSsgynkHAIxtdOUsaczAWSjqp1RPb+P/UJECz
+	mRenRM0+1xu66tnANoexMqhXcLfJNXagk6dt7+TxVkb9x33rngem35s/AxXf7tbNvsABdnQIsHV
+	qLncl87EbCbL0o/yj4JsJQhLPWpQGj6ROEGXBsSEo+sWsHjvWc3M43MIjaSfzvPqTvJ+d5GozPu
+	00/E7KgyxOci9xU/bKJnd8PsJRoMK5
+X-Google-Smtp-Source: AGHT+IF8goPemxSTArcLzWxGKm63RF4SSCDwhYMKJrOBvsVsH/LGsTT6xGkdlmluZ0TTdS2TeZJxdA==
+X-Received: by 2002:a05:6808:152c:b0:43f:7287:a5e3 with SMTP id 5614622812f47-44f7a3ffcdfmr173797b6e.28.1761673601426;
+        Tue, 28 Oct 2025 10:46:41 -0700 (PDT)
+Received: from localhost ([2a03:2880:12ff:5::])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-44da3e435d2sm2765845b6e.6.2025.10.28.10.46.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Oct 2025 10:46:41 -0700 (PDT)
+From: David Wei <dw@davidwei.uk>
+To: io-uring@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Pavel Begunkov <asml.silence@gmail.com>
+Subject: [PATCH v4 0/8] io_uring zcrx ifq sharing
+Date: Tue, 28 Oct 2025 10:46:31 -0700
+Message-ID: <20251028174639.1244592-1-dw@davidwei.uk>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251028033812.2043964-1-kuniyu@google.com> <20251028033812.2043964-11-kuniyu@google.com>
- <aQEAPIZOxe4aHt2z@debian>
-In-Reply-To: <aQEAPIZOxe4aHt2z@debian>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Tue, 28 Oct 2025 10:46:24 -0700
-X-Gm-Features: AWmQ_bmj7K_zk_YCx_ylvGk23YBOVm_V_QYVwlWDfCIKqrFzpudcmjMtlCabihE
-Message-ID: <CAAVpQUBDcAw-6kivPdcmJtwXsRHP3XRaOV2j0zOU_T0EMCOGoA@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 10/13] mpls: Convert mpls_dump_routes() to RCU.
-To: Guillaume Nault <gnault@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 28, 2025 at 10:41=E2=80=AFAM Guillaume Nault <gnault@redhat.com=
-> wrote:
->
-> On Tue, Oct 28, 2025 at 03:37:05AM +0000, Kuniyuki Iwashima wrote:
-> > @@ -2768,6 +2773,8 @@ static const struct rtnl_msg_handler mpls_rtnl_ms=
-g_handlers[] __initdata_or_modu
-> >       {THIS_MODULE, PF_MPLS, RTM_NEWROUTE, mpls_rtm_newroute, NULL, 0},
-> >       {THIS_MODULE, PF_MPLS, RTM_DELROUTE, mpls_rtm_delroute, NULL, 0},
-> >       {THIS_MODULE, PF_MPLS, RTM_GETROUTE, mpls_getroute, mpls_dump_rou=
-tes, 0},
-> > +     {THIS_MODULE, PF_MPLS, RTM_GETROUTE, mpls_getroute, mpls_dump_rou=
-tes,
-> > +      RTNL_FLAG_DUMP_UNLOCKED},
->
-> I can't see any reason to keep the old RTM_GETROUTE declaration here.
-> It's going to be overridden by the one with RTNL_FLAG_DUMP_UNLOCKED.
+Each ifq is bound to a HW RX queue with no way to share this across
+multiple rings. It is possible that one ring will not be able to fully
+saturate an entire HW RX queue due to userspace work. There are two ways
+to handle more work:
 
-Oh I think I made a mistake while rebasing and reordering patches :)
+  1. Move work to other threads, but have to pay context switch overhead
+     and cold caches.
+  2. Add more rings with ifqs, but HW RX queues are a limited resource.
 
-Will remove it in v2.
+This patchset add a way for multiple rings to share the same underlying
+src ifq that is bound to a HW RX queue. Rings with shared ifqs can issue
+io_recvzc on zero copy sockets, just like the src ring.
 
-Thanks!
+Userspace are expected to create rings in separate threads and not
+processes, such that all rings share the same address space. This is
+because the sharing and synchronisation of refill rings is purely done
+in userspace with no kernel involvement e.g. dst rings do not mmap the
+refill ring. Also, userspace must distribute zero copy sockets steered
+into the same HW RX queue across rings sharing the ifq.
 
----
-pw-bot: cr
+v4:
+ - lock rings in seq instead of both
+ - drop export io_lock_two_rings()
+ - break circular ref between ifq and ring ctx
+ - remove io_shutdown_zcrx_ifqs()
+ - copy reg struct to user before writing ifq to ctx->zcrx_ctxs
+
+v3:
+ - drop ifq->proxy
+ - use dec_and_test to clean up ifq
+
+v2:
+ - split patch
+
+David Wei (8):
+  io_uring/memmap: remove unneeded io_ring_ctx arg
+  io_uring/memmap: refactor io_free_region() to take user_struct param
+  io_uring/rsrc: refactor io_{un}account_mem() to take {user,mm}_struct
+    param
+  io_uring/zcrx: add io_zcrx_ifq arg to io_zcrx_free_area()
+  io_uring/zcrx: add user_struct and mm_struct to io_zcrx_ifq
+  io_uring/zcrx: move io_unregister_zcrx_ifqs() down
+  io_uring/zcrx: add refcount to ifq and remove ifq->ctx
+  io_uring/zcrx: share an ifq between rings
+
+ include/uapi/linux/io_uring.h |   4 +
+ io_uring/io_uring.c           |  11 +--
+ io_uring/kbuf.c               |   4 +-
+ io_uring/memmap.c             |  20 ++---
+ io_uring/memmap.h             |   2 +-
+ io_uring/register.c           |   6 +-
+ io_uring/rsrc.c               |  26 +++---
+ io_uring/rsrc.h               |   6 +-
+ io_uring/zcrx.c               | 149 ++++++++++++++++++++++++----------
+ io_uring/zcrx.h               |   8 +-
+ 10 files changed, 149 insertions(+), 87 deletions(-)
+
+-- 
+2.47.3
+
 
