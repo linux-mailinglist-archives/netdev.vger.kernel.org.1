@@ -1,94 +1,246 @@
-Return-Path: <netdev+bounces-233552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E09BFC15539
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 16:07:23 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 129EDC15572
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 16:08:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 927CE1894F1A
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 15:04:38 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9EEAC4EEA18
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 15:04:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E78B8274643;
-	Tue, 28 Oct 2025 15:04:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E99D6222599;
+	Tue, 28 Oct 2025 15:04:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="let3/ilr";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="L8PT2jlU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a6-smtp.messagingengine.com (fout-a6-smtp.messagingengine.com [103.168.172.149])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A7126B2C8
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 15:04:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD50D275B06
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 15:04:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761663847; cv=none; b=U6UQQ+GXu4o0ZBBMucCAf8WzkEXBhZcUr2HJE4Z6//J1ta4PUwDFUhr0knEO2F9wmN8JDaTbDJm1Gt9voRECv7p6njz1wx5dfPHhFtPcmq+0dunvCyJcgc3j24gpjFCvMy/iUGU5GTBUw8oJahnafuUdQ1Hsqflq2jlkwBWo/NU=
+	t=1761663883; cv=none; b=WvaFTBc2isNMjrO/n+loSmwcZtnhlzPdUhUGkFkf4u0OwNJpTJ//abh4mhj2612NCKaEpS2tmoY31KztU8CckwIv6kjJxdS8cPGbqkp/MKyVmw7LS1T0arGL4gr8Jb8pkhjhqFLk69CYOrE1aSeFEgSSzSHwq0Hw9p3Q4+ARHxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761663847; c=relaxed/simple;
-	bh=YHNJ3+2Bl0kXz1AE7uKw8z2pj21d9oEcl/qcI/UkoCc=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=GEQkEpzoUo91vcW3xeMrDj3H9kltlFUi5m2wnWwb4x/vj8dg+hLRC/rA/TxKa2uEqcC5emn4LCeCYiCF0LWW/MqaGmsamW81GHZOgkGJOAtgqEj0DBYP0SF2b0n84x2m7TvXtMc5MocLGRxBRak6dzqewy1oZm+v8c9HI+AKExQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-430d4a4dec5so231545615ab.1
-        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 08:04:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761663843; x=1762268643;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2WbENtpIuxc4z77nqKLhall3y31i7mXKp7vtElyIPCA=;
-        b=dN+c3GWaon1K6X69Z+XUTUziV+tdwd6zPJVSM7lGCJkyYIOwJbs/UZru//9aFerRaX
-         v1EWKiZiHr8D5q2OezibsdY6AI1CjHVl8/5jJpEcWq/4+f+mHG9jeV7uo+9fjlWqRHEo
-         EVb1a6BGVT50OKP4/RXQfdVj3bjvQBMyVNzTjoU8iPLrNW+qxomSy8u5U+jiSnGTEVs7
-         ej64Y1vc8bX+GqXW2nANLpL/21xyhdVhevi492t3ZWHLRedBJWAPxBYGOaI3XQiybSWJ
-         7H/S1diBnraq/ygzkkSJKWc99nO1vd1haym/l5unkSUKRvmzxG/HwzpWegbtR6prTqLz
-         037A==
-X-Forwarded-Encrypted: i=1; AJvYcCXw68SwDBuBv//RFtSv1X1hVF5bux9RRwAMlQ9et9BSsKsFovZrH1NoY/YNIIN0MuuHDgXxLCg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwROfJOCvmrjjqTxbODXXS+l0Oaw3XWWRWTStEEgKkltQ49VSu9
-	JJe3Pz/rhMqHAEa/jxue2yrTX/UFxzf7aQjkBDbWW3sHs30NvqotPFiGZ12MVhJxY+d+lKf2gBG
-	uPui3aVvweBpCqEa/rycArgTXjRXYL+iS+Dnkr58BZKVB0DmjE7UhWUVup0c=
-X-Google-Smtp-Source: AGHT+IF+EohZbBrSDQXXa4N4mZZlU7T6UimJk72y+wdqPoE4ji9fLb3tKUW2m3rfuTPzLylKbckQOUKWRw9X7p6OZ45VrZPr0uoA
+	s=arc-20240116; t=1761663883; c=relaxed/simple;
+	bh=VU4yAreZLxH/RexY58C3WpTb8cAXs3U8BzYluzB1U3M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HOsOj0QvNiTtWwRLoran4VBliTAeqUDPe0LgachCRKx27Xcl0VXkqi0LQGJjtkgYRn0uvG1zslcE0LwPGrJEpqMahf8HiM9E4ZQq2AMkdTVu0Hnn+9rYVyCfk+U/HGzLkAUC8zmPt3F8O9ove7j0lp6XguSO9hQW4WW+kvUfpeo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=let3/ilr; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=L8PT2jlU; arc=none smtp.client-ip=103.168.172.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
+	by mailfout.phl.internal (Postfix) with ESMTP id AD297EC0313;
+	Tue, 28 Oct 2025 11:04:39 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-06.internal (MEProxy); Tue, 28 Oct 2025 11:04:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1761663879; x=
+	1761750279; bh=x60ITIcygNx6GFU92V4j3pXVB2M8vZbcFMB7zEsDanI=; b=l
+	et3/ilr7ailG76QYmwNepc+jDuA+eB22k2/3bEk+ktwdRnV1d6+GG7GjTkv4QQ3P
+	d2V2hCknHmUNr3G/m4zyjbL4kR20/Fn/EW3WbiIOZxZGIRqCTGFYjon+3T/98c72
+	Th0QrR/3Bitrav9BGy5DPOrAyICddwi2qQvagmROJz8hm41+kHk1g8QoAqRKzjBR
+	0ia/pHxwt2QjcC8gZx5nIfMpdI49D0pvhb2SNHgXSfL7wJiaMFvzG6Ay6614Ns+/
+	gA7hYLNz4VkxsAUeTJEAPh3HF+q3dEfLS3Wymb3NNkjKaeBHJgm9KONOtwp8ZVcy
+	wo9RtmtkRhAT45gHT841w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1761663879; x=1761750279; bh=x60ITIcygNx6GFU92V4j3pXVB2M8vZbcFMB
+	7zEsDanI=; b=L8PT2jlUCoDTLDYwZC/FX1uHcU8IxFRzrWOhDDAY4zumzk4q2Hm
+	cbiy+zvmwXXVQbUBTgMWpcRILrcUhe8HSbjq1QJ/3mUL0VEkRJSf0kgLig/dVriy
+	Qx9t9M+nDhSN7ZsCwVutETeGwl8hvaXH9di+fa5g/Tm3viRHRut9SYlBHLAFTXIz
+	gGsQj4LzFL70umI0ovPrnuJqZgjlqVNyP/L0i1qOrc0EkW8xv6DNy86RGnqzcgKl
+	z4kVZlyxJGOjqkF7gi41znH/A/EgNRj+gnyuk/FH8gU3oGlqLpTcwD3WrCWU+iRM
+	efJsdI+IBiKA67CDe1qAwpsp00lA0lD9I0Q==
+X-ME-Sender: <xms:htsAaTkQGvIdrttA72B9oDJmcbDEOvjWae59tV_bdPkdOHjen7BDdw>
+    <xme:htsAaSvxHNlT6DbQV4nLAsO9XXRp1GrajBTL5H-r7jSOHtPBvll-nKgrgia4a8RAs
+    cXBU5iHtfAnhnW41xgF11GOfmH_WwVESP_nXDcG4jPs-oYwm4yNFw>
+X-ME-Received: <xmr:htsAaWpsbt81P9zqnuMZk1w4EyPhi0WeeDxs7LYBk8UVvxebfb_FOnZM7rjN>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduieduudeiucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepgefhffdtvedugfekffejvdeiieelhfetffeffefghedvvefhjeejvdek
+    feelgefgnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdr
+    nhgvthdpnhgspghrtghpthhtohepuddupdhmohguvgepshhmthhpohhuthdprhgtphhtth
+    hopehjihgrnhgsohhlsehnvhhiughirgdrtghomhdprhgtphhtthhopehsthgvfhhfvghn
+    rdhklhgrshhsvghrthesshgvtghunhgvthdrtghomhdprhgtphhtthhopehnvghtuggvvh
+    esvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghvvghmsegurghvvghm
+    lhhofhhtrdhnvghtpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtph
+    htthhopegtrhgrthhiuhesnhhvihguihgrrdgtohhmpdhrtghpthhtohephhgvrhgsvghr
+    thesghhonhguohhrrdgrphgrnhgrrdhorhhgrdgruhdprhgtphhtthhopegvughumhgrii
+    gvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdr
+    tghomh
+X-ME-Proxy: <xmx:htsAaQfQVPIhbB256kyHoG6IgLlaeSCXyr51v-ALqUJcxO93-BRYMQ>
+    <xmx:htsAaWkWyAElS3DyzBolDqtR0O3zp11ffSjh46ZXXWeOflGQQSNMog>
+    <xmx:htsAafYdzm_Z9_zlQFq6QDGNteTQ1mmuy7TlKzm1yTebMJVlkrZbcA>
+    <xmx:htsAaT5cAANHA0pKDH3AIU-76vjVTRARri1BqlgdX8K1eJBYIGGTZw>
+    <xmx:h9sAaWLLm7PghlWyVWX_jageI4_eh_CZAcUVCOMLmtdKNlt6co2uzPcj>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 28 Oct 2025 11:04:38 -0400 (EDT)
+Date: Tue, 28 Oct 2025 16:04:36 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Jianbo Liu <jianbol@nvidia.com>, steffen.klassert@secunet.com
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	Cosmin Ratiu <cratiu@nvidia.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>
+Subject: Re: [PATCH ipsec v3 2/2] xfrm: Determine inner GSO type from packet
+ inner protocol
+Message-ID: <aQDbhJuZqFokEO31@krikkit>
+References: <20251028023013.9836-1-jianbol@nvidia.com>
+ <20251028023013.9836-3-jianbol@nvidia.com>
+ <aQCjCEDvL4VJIsoV@krikkit>
+ <c1a673ab-0382-445e-aa45-2b8fe2f6bc40@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:b4f:b0:431:d763:193a with SMTP id
- e9e14a558f8ab-4320f8388e4mr49779265ab.21.1761663843270; Tue, 28 Oct 2025
- 08:04:03 -0700 (PDT)
-Date: Tue, 28 Oct 2025 08:04:03 -0700
-In-Reply-To: <6890f71a.050a0220.7f033.0010.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6900db63.050a0220.17b81f.0026.GAE@google.com>
-Subject: Re: [syzbot] [kernfs?] possible deadlock in kernfs_remove
-From: syzbot <syzbot+2d7d0fbb5fb979113ff3@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, eadavis@qq.com, gregkh@linuxfoundation.org, 
-	hdanton@sina.com, linux-kernel@vger.kernel.org, ming.lei@redhat.com, 
-	netdev@vger.kernel.org, nilay@linux.ibm.com, sunjunchao2870@gmail.com, 
-	sunjunchao@bytedance.com, syzkaller-bugs@googlegroups.com, tj@kernel.org, 
-	yukuai3@huawei.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <c1a673ab-0382-445e-aa45-2b8fe2f6bc40@nvidia.com>
 
-syzbot suspects this issue was fixed by commit:
+2025-10-28, 21:36:17 +0800, Jianbo Liu wrote:
+> 
+> 
+> On 10/28/2025 7:03 PM, Sabrina Dubroca wrote:
+> > 2025-10-28, 04:22:48 +0200, Jianbo Liu wrote:
+> > > The GSO segmentation functions for ESP tunnel mode
+> > > (xfrm4_tunnel_gso_segment and xfrm6_tunnel_gso_segment) were
+> > > determining the inner packet's L2 protocol type by checking the static
+> > > x->inner_mode.family field from the xfrm state.
+> > > 
+> > > This is unreliable. In tunnel mode, the state's actual inner family
+> > > could be defined by x->inner_mode.family or by
+> > > x->inner_mode_iaf.family. Checking only the former can lead to a
+> > > mismatch with the actual packet being processed, causing GSO to create
+> > > segments with the wrong L2 header type.
+> > > 
+> > > This patch fixes the bug by deriving the inner mode directly from the
+> > > packet's inner protocol stored in XFRM_MODE_SKB_CB(skb)->protocol.
+> > > 
+> > > Instead of replicating the code, this patch modifies the
+> > > xfrm_ip2inner_mode helper function. It now correctly returns
+> > > &x->inner_mode if the selector family (x->sel.family) is already
+> > > specified, thereby handling both specific and AF_UNSPEC cases
+> > > appropriately.
+> > 
+> > (nit: I think this paragraph goes a bit too much into describing the
+> > changes between versions)
+> > 
+> > > With this change, ESP GSO can use xfrm_ip2inner_mode to get the
+> > > correct inner mode. It doesn't affect existing callers, as the updated
+> > > logic now mirrors the checks they were already performing externally.
+> > 
+> > Sorry, maybe I wasn't clear, but I meant that the callers should also
+> > be updated to not do the AF_UNSPEC check anymore (note: this will
+> > cause merge conflicts with your "NULL inner_mode" cleanup patch [1]).
+> > 
+> > And I think it would be nicer to split the refactoring into a separate
+> > patch. So this series would be:
+> > 
+> > patch 1: fix xfrm_dev_offload_ok and xfrm_get_inner_ipproto (same as now)
+> > patch 2: modify xfrm_ip2inner_mode and remove the AF_UNSPEC check and
+> >           setting inner_mode = &x->inner_mode from all callers
+> >           [no behavior change, just a refactoring to prepare for patch 3]
+> > patch 3: use xfrm_ip2inner_mode for GSO (same as your v2 patch 2/2)
+> > 
+> > Does that seem ok to you?
+> > 
+> > 
+> > And to avoid the merge conflict with [1], maybe it also makes more
+> > sense to integrate that clean up in patch 2 from the list above, so
+> > for ip_vti we'd have:
+> > 
+> > diff --git a/net/ipv4/ip_vti.c b/net/ipv4/ip_vti.c
+> > index 95b6bb78fcd2..89784976c65e 100644
+> > --- a/net/ipv4/ip_vti.c
+> > +++ b/net/ipv4/ip_vti.c
+> > @@ -118,16 +118,7 @@ static int vti_rcv_cb(struct sk_buff *skb, int err)
+> >   	x = xfrm_input_state(skb);
+> > -	inner_mode = &x->inner_mode;
+> > -
+> > -	if (x->sel.family == AF_UNSPEC) {
+> > -		inner_mode = xfrm_ip2inner_mode(x, XFRM_MODE_SKB_CB(skb)->protocol);
+> > -		if (inner_mode == NULL) {
+> > -			XFRM_INC_STATS(dev_net(skb->dev),
+> > -				       LINUX_MIB_XFRMINSTATEMODEERROR);
+> > -			return -EINVAL;
+> > -		}
+> > -	}
+> > +	inner_mode = xfrm_ip2inner_mode(x, XFRM_MODE_SKB_CB(skb)->protocol);
+> >   	family = inner_mode->family;
+> > 
+> > 
+> > Does that sound reasonable?
+> 
+> I have a concern regarding backporting.
+> 
+> Patches 1 and 3 in your proposed structure are bug fixes that should ideally
+> go into the ipsec tree and be suitable for stable backports.
+> Patch 2 should be targeted to ipsec-next as refactoring often does.
 
-commit 8f5845e0743bf3512b71b3cb8afe06c192d6acc4
-Author: Julian Sun <sunjunchao2870@gmail.com>
-Date:   Tue Aug 12 15:42:57 2025 +0000
+If it's part of a bugfix series, I think it's ok to do a small refactoring.
 
-    block: restore default wbt enablement
+> If so, patch 3 becomes dependent on a change that won't exist in older
+> kernels, making it difficult to backport cleanly.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=13b977e2580000
-start commit:   759dfc7d04ba netlink: avoid infinite retry looping in netl..
-git tree:       net
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ac0888b9ad46cd69
-dashboard link: https://syzkaller.appspot.com/bug?extid=2d7d0fbb5fb979113ff3
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1136d9bc580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1536d9bc580000
+It shouldn't be a problem to backport the refactoring, as this is code
+that doesn't change much (the code around calls of xfrm_ip2inner_mode
+hasn't been modified since 2019).
 
-If the result looks correct, please mark the issue as fixed by replying with:
+> To maintain backportability for the GSO fix, I'd prefer to keep the
+> modification to xfrm_ip2inner_mode within the same patch that fixes the GSO
+> code (which is currently my v3 patch 2/2).
+> 
+> My proposed plan is:
+> 
+> Send the patch 1 and patch 3 (including the xfrm_ip2inner_mode change)
+> together to the ipsec tree. They are self-contained fixes.
 
-#syz fix: block: restore default wbt enablement
+So, keep v3 of this series unchanged.
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+> Separately, after those are accepted, I can modify and re-submit that patch
+> [1] to ipsec-next that removes the now-redundant checks from the other
+> callers (VTI, etc.), leveraging the updated helper function.
+> 
+> This way, the critical fixes are self-contained and backportable, while the
+> cleanup of other callers happens later in the development cycle.
+
+The only (small) drawback is leaving the duplicate code checking
+AF_UNSPEC in the existing callers of xfrm_ip2inner_mode, but I guess
+that's ok.
+
+
+Steffen, is it ok for you to
+
+ - have a duplicate AF_UNSPEC check in callers of xfrm_ip2inner_mode
+   (the existing "default to x->inner_mode, call xfrm_ip2inner_mode if
+   AF_UNSPEC", and the new one added to xfrm_ip2inner_mode by this
+   patch) in the ipsec tree and then in stable?
+
+ - do the clean up (like the diff I pasted in my previous email, or
+   something smaller if [1] is applied separately) in ipsec-next after
+   ipsec is merged into it?
+
+
+[1] https://lore.kernel.org/netdev/20251027023818.46446-1-jianbol@nvidia.com/
+
+
+-- 
+Sabrina
 
