@@ -1,246 +1,136 @@
-Return-Path: <netdev+bounces-233542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B1E7C1542F
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 15:54:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31368C1546B
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 15:56:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3CF214E6484
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 14:53:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AB21189AA13
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 14:55:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C5242571DA;
-	Tue, 28 Oct 2025 14:53:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D2BD1531C8;
+	Tue, 28 Oct 2025 14:55:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="it10JmqX"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="mR/3megF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B91222562
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 14:53:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0CD71F03D9
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 14:55:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761663216; cv=none; b=ZihG7AqkRhUI7gnO14wlfRkBq3TVd9DarMlIbjU7dNRqx/74duZkiaNZxl5LUM7JXo8JSCYzGEFDesGVWcOCvhsO+yYCQK6D/6DxsZGcQv6VtZYue0iVBxKIBTJPfXMRdTwJVzUXTU1u8UYVR4HTSB8nevZ2iSekI8R2H+VVQ2M=
+	t=1761663303; cv=none; b=qI4CpSbKwN/E+Crn0zcWg3RG6KhBRcspQdP/Z706XVNbMtFtm96rbb+hSZWBKHTHSYJ6/+Q3FJT2bMHqWBRFJtdkd2CDry/SPrW8yBrb5zlGUFt95DxwfEIZEvjir8Qllcq87K239E8616C5CgHzVV4qazQdDbjnBGFyYtMasZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761663216; c=relaxed/simple;
-	bh=eBV5tomgADNHlVSvWwPHW4U38dRIY2x7fDBeiWqcT0U=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lTZEfJKRfVYpFIhilhc0rxHvtWP+AVo1kc7u5E2cJSn3tDrd4w8Oxbv5XHv4nARYME5UbyEFNLO6DVfayZ+n1ZQ608RUcpquUGwiaims2Mo1hO/qyZr/URSlFVaTahUE1VpUmJ75lIXi2fTXxhZjl/uhUDiKj2cUU2Om/FqI6Qc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=it10JmqX; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-33e27cda4d7so7338507a91.0
-        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 07:53:34 -0700 (PDT)
+	s=arc-20240116; t=1761663303; c=relaxed/simple;
+	bh=2PFvZeR6FZ5y/R3/+WHESxKSPwUDsScr1IwZ5KkE4Yo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=raA1PMM7DaGjFs/pokLrySYoIw8bBCg+Zf5xNPwqL0QNEN9K892DVReIW+Uodjz83QjJNqO7ISpw+oBkNcx7ivBGQ4NPx6AOM+t7+Yu277ppcqDe+Rbm8kRPyk1gK/KlNqtnk7ZDCpXb00WDnTqH8r1jSPlwFn/ctldjPDXQlc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=mR/3megF; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-7a26ea3bf76so8035396b3a.2
+        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 07:55:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761663214; x=1762268014; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jIalhegjjb9A0mID8JmFLQUJM2t6ufSIdsLy0MIR4mQ=;
-        b=it10JmqXmnmjfv2NfAd8tgLIGdh6CNPoEHlLxGIVAtbafHKVqyzperEHxcVPhVjECW
-         CikbGOyUlUUFvEi8ehmGSRyh3cjZgCHlQ5R+/+RuR4uUbt2l3k18vgscRRh7WQbDIkWH
-         S7Va6mq8MQuqP7cWDDLakG4Ox7BkKn+7q7JMzazvIZ6MbH0nwP8+Q8/DeAhgnbhKLxIb
-         B89Pi0tvxBjvABS0BNuE37g7D1NlI6Li5hFnR2kJoQiGyn2a/7pC27HZXu9enhjLskot
-         WZkkp6Ts1/pRUBgHruo+3dEAwgDXB9+71TLTiTfoANVLjsm+qqHXapxO2teAH7JUSK0s
-         XoGg==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1761663301; x=1762268101; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=r7Xa21oSxQFb3c2s+CxJq7KCyQuGsxMn8gSjW30YCMI=;
+        b=mR/3megFe1plV232xR6jXmuEoJmt9vUP88DqOKO6vYQ1M4z24FJh6FmExmzX6fX09j
+         O0YXp0AaOlDu67jI8otM2x+1dnOE6dQsb+w8aPO1fi0l+4HAW9P+Xz1SM+ufRmxOkFok
+         IqgvghS/seNrT/NXHh3Oo4FnvCtSUG6cyJ/a+Xbv19h/53eyOKkd0HvhI/nvRR5x6Cex
+         uTYIJD5EgqQlZqcxqLu0qaB55mm9OMFFkubhtDqG7HBn1mzLw6A9YH51EPj8CCtOxngT
+         87mHDEeuGMcwkd+pv9YTAcLR1dihB/l9dPpk/pZfyWzqwJz8VMbjNj88dKHEQsxpU5/1
+         x7Qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761663214; x=1762268014;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jIalhegjjb9A0mID8JmFLQUJM2t6ufSIdsLy0MIR4mQ=;
-        b=DEGrAY4v3YyLxrBSXv9eB8aWlFotQI8UxxHOCs+w+4VHAG5kwtmwOtvyMpgbsC4EVV
-         rQkDiMS8Xgrfxp8cFnZwJoZx83dnbmAIH1lTtO3v75QRs2/BwHF0T7RE3XzhGL7K/bZy
-         SXIhz/VDJHgYvGYnGBpm2yLaBmfbOqfJXSIdPgM1xJnLm+61U6k90Sw8E4+tA3cBKkGv
-         3sBl6nT3buJSWebuDKLhnjqVxUtg9oPQh0gtCZrCfGHxA9U93zoPnvl9sOtzAW1SGcfr
-         Qx3Ld+ItGrYQ3U8sy69HqVbBBtGeG0BVodSEtt8TkBNNjd7kvh5nlUAthPRgRMFGrNLG
-         ckoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXcGBfdgwFp4QL02vjTwZil0M+SRgpB6N1ofaPLIp1Zk0Y1zvpaa9tA5C9V1xYqjXXmypPpp2A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzD4DLhigiCjcisE8eb5uO2zIh/G/plavHbVxcTlStTWs9ouVy4
-	p7rbg1kay9fu21NAmPJhxe9iw9MANHuhR4b8/JeScjFCy/cT13mgJ1i5
-X-Gm-Gg: ASbGnctQpz8jw3SbmlMPX9QUWwvCe1aC91x9/6D11LQyEKHTtMlhcwIlwsyIyK/gRBJ
-	3zzHSgFGkyYgDvCTmdUB1z6J2dLNMma2o5+ADHTt538Bjo9NxGkT51+3S6mT0J3seLRcYXIg8Rp
-	VCYaVbezfHsqwXQlw6LX+tF72X1tR47HQ7sOR35j0ZBiS/GQEOaWvY4LGgdVLMA/kyfMvuZlDQA
-	eeCKCTcWMRR6xZ9B4v0dwBKP6dJND6gz/IE3rDmFJL2Da5YIBdOcZbvFEFoRF4xO5GuBPLcwoir
-	4jEBySx2kYudBmE/4ElqmBOqrX2c12HTnrPB1vnZUfq8FA4lnEiBQxyjiWEUxekQPMtlY76lOq8
-	iwalgJt24y1kaKU0F5p0l6OIpYktFmXLYCR7xDjdkTOoWkhq8wRIXyTzGjez0z/Lw3Pj6Sbfnss
-	s=
-X-Google-Smtp-Source: AGHT+IG5Jh5Qx7F5nYFMpvwvX4h43bkvhS5OSWOasULrME1OQBV2BPufImkgArWA+uvLmx1JjQh1Ww==
-X-Received: by 2002:a17:90b:5243:b0:33b:b673:1b07 with SMTP id 98e67ed59e1d1-3402875c4b1mr3926768a91.9.1761663213732;
-        Tue, 28 Oct 2025 07:53:33 -0700 (PDT)
-Received: from snowman ([2401:4900:615d:9a55:694d:60a0:5539:22d3])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3402a52c997sm1495828a91.4.2025.10.28.07.53.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Oct 2025 07:53:33 -0700 (PDT)
-From: Khushal Chitturi <kc9282016@gmail.com>
-To: chuck.lever@oracle.com
-Cc: linux-nfs@vger.kernel.org,
-	jlayton@kernel.org,
-	neil@brown.name,
-	okorniev@redhat.com,
-	Dai.Ngo@oracle.com,
-	tom@talpey.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Khushal Chitturi <kc9282016@gmail.com>
-Subject: [PATCH v2] xdrgen: handle _XdrString in union encoder/decoder
-Date: Tue, 28 Oct 2025 20:23:17 +0530
-Message-ID: <20251028145317.15021-1-kc9282016@gmail.com>
-X-Mailer: git-send-email 2.51.1
-In-Reply-To: <20251026180018.9248-1-kc9282016@gmail.com>
-References: <20251026180018.9248-1-kc9282016@gmail.com>
+        d=1e100.net; s=20230601; t=1761663301; x=1762268101;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=r7Xa21oSxQFb3c2s+CxJq7KCyQuGsxMn8gSjW30YCMI=;
+        b=r7/TcqvjHHSq0z4NunVsjKKhrAv/L4u99H2Ej/6H/tQzNhmUINOqvKWFkuSgYA3drT
+         BOj8GCTCoaHjqPJmbKTsn3iy1ql46uIHWy9hN2mumCSRrKqddwl/rWZfIugeS5Gc3aM/
+         7QeEnVBRihpeZnPJXIbWBqNJFyTJa42yqPdjfORlimP0NqdpZ8E0OV9ILFaOmMkvpsBH
+         Eso7Rr1OgeRwdXav5N3RuwuG1CemsBFEJEFDmE1xwfiPRcaFc6enctJvGsTPAr1PrsZE
+         k6vTLkVLTLBmEMoW19y/24Dg0dam23P9l2Y9Sz0/KGfRD2lXsqA5MUHDBQqBVwNdoEkR
+         WlXg==
+X-Forwarded-Encrypted: i=1; AJvYcCWnufHZDsPEZX9jlS2AJqhcuYSk2WEQOtgAdpCniDjusOkynbXoH/NrsE4pQF7iawfoYo0UPds=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNCXCunZU6w456Ye2+lgYi0UyJl5l4SrvcoOEJE7CWryFMLdQe
+	1zoPhDVplBtTIn0R2gegC+WZlT0e77u7RON1ir9jweKgouINJ5V1PZtScw3Hrlmvq5M=
+X-Gm-Gg: ASbGncv7XQk/6wr54jVxP1ZBnRstidlopvDQ/j42V/a6i7Iu0GKhrQ7X4bCmaSU5Zi3
+	XSqeyzoYafXj2vQ8kJ1ORTxPCNTUpI5NlwbK2CTD81Wpd/izTmq5bgT/UX4VeV62Wu144RXK0nT
+	aF6s4s5mO2Gp5qAKSlTF1yZKoT/ZwkOQxW2jcgv+/4wc5woBPjI9o0xduE/fkXcYy6lSAInyhsn
+	DiKs8phOphxM0tYcGBZED0CPvU+clkgij5a9jiROJ7W2vwjzqC1wr2wJUNpWCPBBVS9UJf7EbTx
+	ADZ+XiBmjj0c34cck+u95aS5HofYPZWaTe4L9s1Q8IfWh+Fhz2pFAXhcgSNX3/3WS2+C+ENA52W
+	H3tvMaJx5BCpPdb5md/Go1kKFesZqeoKZPvcUiF+J3PizIkwfmM895cW+fbMbhmMEApWQjQXsfB
+	Oy8YY1qQGyAF7W4XxLjqkATohsGeqMVKXJA0iOR/COhgnGhmVARS/xKzxmt9BFXQ1Oe9nT
+X-Google-Smtp-Source: AGHT+IERVBWP3CiTECEuDyQSl8za0TIzSRK2W4YtwpnPOl80PRQRDD5vRcY4w8hz6WjAmch11Vxu4w==
+X-Received: by 2002:a05:6a20:6a28:b0:2ef:1d19:3d3 with SMTP id adf61e73a8af0-344d228dd62mr5056634637.14.1761663301065;
+        Tue, 28 Oct 2025 07:55:01 -0700 (PDT)
+Received: from ?IPV6:2a03:83e0:1156:1:c8f:b917:4342:fa09? ([2620:10d:c090:500::5:1375])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a4140530d3sm12157441b3a.40.2025.10.28.07.55.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Oct 2025 07:55:00 -0700 (PDT)
+Message-ID: <74cac804-27b5-4d25-9055-5e4b85be20d6@davidwei.uk>
+Date: Tue, 28 Oct 2025 07:54:59 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 1/3] io_uring/rsrc: rename and export
+ io_lock_two_rings()
+To: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+References: <20251026173434.3669748-1-dw@davidwei.uk>
+ <20251026173434.3669748-2-dw@davidwei.uk>
+ <c3a45eaa-0936-41a7-92cd-3332fd621f6a@gmail.com>
+Content-Language: en-US
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <c3a45eaa-0936-41a7-92cd-3332fd621f6a@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Running xdrgen on xdrgen/tests/test.x fails when
-generating encoder or decoder functions for union
-members of type _XdrString. It was because _XdrString
-does not have a spec attribute like _XdrBasic,
-leading to AttributeError.
+On 2025-10-27 03:04, Pavel Begunkov wrote:
+> On 10/26/25 17:34, David Wei wrote:
+>> Rename lock_two_rings() to io_lock_two_rings() and export. This will be
+>> used when sharing a src ifq owned by one ring with another ring. During
+>> this process both rings need to be locked in a deterministic order,
+>> similar to the current user io_clone_buffers().
+> 
+> unlock();
+> double_lock();
+> 
+> It's quite a bad pattern just like any temporary unlocks in the
+> registration path, it gives a lot of space for exploitation.
+> 
+> Ideally, it'd be
+> 
+> lock(ctx1);
+> zcrx = grab_zcrx(ctx1, id); // with some refcounting inside
+> unlock(ctx1);
+> 
+> lock(ctx2);
+> install(ctx2, zcrx);
+> unlock(ctx2);
 
-This patch updates emit_union_case_spec_definition
-and emit_union_case_spec_decoder/encoder to handle
-_XdrString by assigning type_name = "char *" and
-avoiding referencing to spec.
+Thanks, I've refactored this to lock rings in sequence instead of both
+rings.
 
-Testing: Fixed xdrgen tool was run on originally failing
-test file (tools/net/sunrpc/xdrgen/tests/test.x) and now
-completes without AttributeError. Modified xdrgen tool was
-also run against nfs4_1.x (Documentation/sunrpc/xdr/nfs4_1.x).
-The output header file matches with nfs4_1.h
-(include/linux/sunrpc/xdrgen/nfs4_1.h).
-This validates the patch for all XDR input files currently
-within the kernel.
+> 
+> And as discussed, we need to think about turning it into a temp
+> file, bc of sync, and it's also hard to send an io_uring fd.
+> Though, that'd need moving bits around to avoid refcounting
+> cycles.
+> 
 
-Changes since v1:
-- Corrected email address in Signed-off-by.
-- Wrapped patch description lines to 72 characters.
-
-Signed-off-by: Khushal Chitturi <kc9282016@gmail.com>
----
- tools/net/sunrpc/xdrgen/generators/union.py   | 35 ++++++++++++++-----
- .../templates/C/union/encoder/string.j2       |  6 ++++
- 2 files changed, 32 insertions(+), 9 deletions(-)
- create mode 100644 tools/net/sunrpc/xdrgen/templates/C/union/encoder/string.j2
-
-diff --git a/tools/net/sunrpc/xdrgen/generators/union.py b/tools/net/sunrpc/xdrgen/generators/union.py
-index 2cca00e279cd..3118dfdddcc4 100644
---- a/tools/net/sunrpc/xdrgen/generators/union.py
-+++ b/tools/net/sunrpc/xdrgen/generators/union.py
-@@ -1,3 +1,4 @@
-+# SPDX-License-Identifier: GPL-2.0
- #!/usr/bin/env python3
- # ex: set filetype=python:
- 
-@@ -8,7 +9,7 @@ from jinja2 import Environment
- from generators import SourceGenerator
- from generators import create_jinja2_environment, get_jinja2_template
- 
--from xdr_ast import _XdrBasic, _XdrUnion, _XdrVoid, get_header_name
-+from xdr_ast import _XdrBasic, _XdrUnion, _XdrVoid, _XdrString, get_header_name
- from xdr_ast import _XdrDeclaration, _XdrCaseSpec, public_apis, big_endian
- 
- 
-@@ -40,13 +41,20 @@ def emit_union_case_spec_definition(
-     """Emit a definition for an XDR union's case arm"""
-     if isinstance(node.arm, _XdrVoid):
-         return
--    assert isinstance(node.arm, _XdrBasic)
-+    if isinstance(node.arm, _XdrString):
-+        type_name = "char *"
-+        classifier = ""
-+    else:
-+        type_name = node.arm.spec.type_name
-+        classifier = node.arm.spec.c_classifier
-+
-+    assert isinstance(node.arm, (_XdrBasic, _XdrString))
-     template = get_jinja2_template(environment, "definition", "case_spec")
-     print(
-         template.render(
-             name=node.arm.name,
--            type=node.arm.spec.type_name,
--            classifier=node.arm.spec.c_classifier,
-+            type=type_name,
-+            classifier=classifier,
-         )
-     )
- 
-@@ -84,6 +92,12 @@ def emit_union_case_spec_decoder(
- 
-     if isinstance(node.arm, _XdrVoid):
-         return
-+    if isinstance(node.arm, _XdrString):
-+        type_name = "char *"
-+        classifier = ""
-+    else:
-+        type_name = node.arm.spec.type_name
-+        classifier = node.arm.spec.c_classifier
- 
-     if big_endian_discriminant:
-         template = get_jinja2_template(environment, "decoder", "case_spec_be")
-@@ -92,13 +106,13 @@ def emit_union_case_spec_decoder(
-     for case in node.values:
-         print(template.render(case=case))
- 
--    assert isinstance(node.arm, _XdrBasic)
-+    assert isinstance(node.arm, (_XdrBasic, _XdrString))
-     template = get_jinja2_template(environment, "decoder", node.arm.template)
-     print(
-         template.render(
-             name=node.arm.name,
--            type=node.arm.spec.type_name,
--            classifier=node.arm.spec.c_classifier,
-+            type=type_name,
-+            classifier=classifier,
-         )
-     )
- 
-@@ -169,7 +183,10 @@ def emit_union_case_spec_encoder(
- 
-     if isinstance(node.arm, _XdrVoid):
-         return
--
-+    if isinstance(node.arm, _XdrString):
-+        type_name = "char *"
-+    else:
-+        type_name = node.arm.spec.type_name
-     if big_endian_discriminant:
-         template = get_jinja2_template(environment, "encoder", "case_spec_be")
-     else:
-@@ -181,7 +198,7 @@ def emit_union_case_spec_encoder(
-     print(
-         template.render(
-             name=node.arm.name,
--            type=node.arm.spec.type_name,
-+            type=type_name,
-         )
-     )
- 
-diff --git a/tools/net/sunrpc/xdrgen/templates/C/union/encoder/string.j2 b/tools/net/sunrpc/xdrgen/templates/C/union/encoder/string.j2
-new file mode 100644
-index 000000000000..2f035a64f1f4
---- /dev/null
-+++ b/tools/net/sunrpc/xdrgen/templates/C/union/encoder/string.j2
-@@ -0,0 +1,6 @@
-+{# SPDX-License-Identifier: GPL-2.0 #}
-+{% if annotate %}
-+		/* member {{ name }} (variable-length string) */
-+{% endif %}
-+		if (!xdrgen_encode_string(xdr, ptr->u.{{ name }}, {{ maxsize }}))
-+			return false;
--- 
-2.51.1
-
+My next version of this adds a refcount to ifq and decouple its lifetime
+from ring ctx as a first step. Could we defer turning ifq into a file as
+a follow up?
 
