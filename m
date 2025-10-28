@@ -1,323 +1,193 @@
-Return-Path: <netdev+bounces-233577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5ACCC15BB7
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 17:18:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C482C15C71
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 17:25:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E61F1890AFE
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 16:12:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 650991C60037
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 16:19:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F026342C80;
-	Tue, 28 Oct 2025 16:12:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97B5B33033A;
+	Tue, 28 Oct 2025 16:15:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kTFwPIyW"
+	dkim=pass (2048-bit key) header.d=nokia.com header.i=@nokia.com header.b="Rnan+xA9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from GVXPR05CU001.outbound.protection.outlook.com (mail-swedencentralazon11013030.outbound.protection.outlook.com [52.101.83.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84EE723ABBD
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 16:12:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761667938; cv=none; b=a1xc8S18QnDYkqRtPPJCtqJqVYP5vE3tL3sy9l6wwuLuUcE8ktMQ0mk4vhCxbs0MFZdYy5McorbAYG0c5bAxcstH9uL8v8qK05nG4N0CtkIItz6dPkevQ6lm3WejwGwqNGuwC/Un9btY9vS1ppfHkm1QmXcmgWRO5EXt9sLmeX0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761667938; c=relaxed/simple;
-	bh=YmU+S2dpj2lpvbkcXW1CLOnuN+/RJrukgDz9Fq/nJcg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZPKvWf+NSR7xsC63VJ0DxYuSDjaEO77Hj0j7JXua6s6n40CDHurThsXkCIEhuNzRg8gG9fdRUXeiQHRSq0oRTPZ38EIGkkuVo7qTTVCtVewMd2ZcnKJUFA85U4lr+Rx5qvynzPVHwa1+07ygP3iOvrObdBgFICywURlpV9JKv+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kTFwPIyW; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-58b027beea6so9389e87.1
-        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 09:12:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761667935; x=1762272735; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qxRI++0kUA4C88E54g3jys1xp+GEI9qFS2ZGVb0fFIA=;
-        b=kTFwPIyW2dqp1qBON3q/aXQV5MLtLqLwIwvT8Pdqff9vx1eZEwHjNAZlcA0PgpDmJ2
-         glAR3Wzmw91lfDywd77xM/fDySLBzYiGwZc8nQOsrH8GkOXPyfDbSeeQ/ClWeqe9rR8A
-         4djVL1fkGJGx9aTTDyx0PdjpkDFCmNlCAAqh28LyBfBw5tmjxqMoIBAWrqAQGCOP92M6
-         YJTW5Jclzi5nmQhqNNsG6dXfGcBXEXCMj5U9KZ6tz7lrUVg5kSZ4/U52vHtbUzIZ8XtI
-         awBqQoOcC6cYOz96B/dYfXAUAnxDrsEjGhZjVHERUUONPO1uC3k7OAa5cS8/C1+beTCA
-         HGLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761667935; x=1762272735;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qxRI++0kUA4C88E54g3jys1xp+GEI9qFS2ZGVb0fFIA=;
-        b=H7kmCoMml2e7qOOQhrrUiKNDhr4qPIskPtJR7kWbxc2rquWhQ52hD0Q/9k4pW6XUCm
-         BM296qCY3MP1JK6QPhToU+rXJaK/IBEx/Wl7GgYrdhbFrbRVGsqcgUGyDYaSkaD5/LRn
-         Zoieu/whd1eFrogLa4J3BLuR+8gOYCpv7mbi4J5tZU7l8d7xqntWAbGRQy130hiAnM3+
-         p8MA63tloHC0n/SvvVDnqwVtiYgiDBRIX0jQQ+cmZCSnSCJ46Plr5S2GIzMhL0xI+OE4
-         Fd1E5rbeybHtNd2CqCSsMboXzA7wh3mJyyVFP6vB0vpaxJWQnz/WRc3i0sH7KTep2Ryb
-         Y11g==
-X-Forwarded-Encrypted: i=1; AJvYcCU/AfP7BE87d2Mpe56CNIAhi3ivcueI+LKR4dwq3H7/w5DdZP4xuLi8miW6LEsz4WNByO9L75M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzW4/KulQn4DOtIjf0Ss19JKb7M3m+q3RjlXvIooxv23bIoNU+j
-	UVpc8PPKwQjTcL2ZTajszFTQJt3h6JRMjs759iiMeAGg3QYXaTk7mXQ3emQk2flTwTaSTR50EIO
-	sf2g3f9p5ExifjCUxbmtwARcd8bJ9LfZLO05ZqXGY
-X-Gm-Gg: ASbGncsWheM57usHaMODn6cixhsnB0PpvH7A2XjiRpzfiSHZ6fyOYYxVjENiR37aFCJ
-	9+fS9DttFBMppnX/8k3vgaKBCBAobOBY2ko7GsGo/QJybMkBnzJsqMT4m+aINkwU9uRbknn1ZeK
-	N0HZDWObN3l863UGiBzX+XOqBSsZiT9791nO75Jo1VePuZuiVD9FlMRxSkQtRASvx0etMiL/OA3
-	fmNK6j/BwJ8Pb7zLCxc1nHdjRSQxzhMvya/erVrahw3cMlAS7GYgiGkAXzB7YBVPE470t4Bl2yF
-	7ynHSPRpyebBAnWj/Get4CXT2w==
-X-Google-Smtp-Source: AGHT+IGHjnuV06Q110K/XiF/19HksKvviTMay1daMlenEI88sIR67s4zP4V81F71auWP2H80fovhcnl0+5UV0L8pGUg=
-X-Received: by 2002:a05:6512:b84:b0:586:8e3c:9456 with SMTP id
- 2adb3069b0e04-5930eed566dmr430517e87.0.1761667934253; Tue, 28 Oct 2025
- 09:12:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3D61274FC1;
+	Tue, 28 Oct 2025 16:15:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.83.30
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761668151; cv=fail; b=MuK+CfQjHQkeFW5pefBP94zimOlB1uaL4zpEL0T0DbIoh55/OHtt04oL+oliTeqtXoKjZx3y+nzLtydnunV5o6sFfk1TlngxXlujpF7k42yxuHreZTFbbLr5w5cg0qUdvy/niiP2hNnbPdr9CDk/2vAWFuXf5s8dOqQGcWZRgng=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761668151; c=relaxed/simple;
+	bh=15Uun+TfWPxE9t4ZBi95mdLDPVZqukoFneDOFkSCuKE=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=miy2UYWi2v7SwxF5n2bVKktgNCUqHBOhe4hjLHBlU6fi0GMjBKA/OEQl8jukdAj1hlZmept3cn5Ir/Gc6/WuFpB3fDN5coDay2FTP0XsKWNgxWsEG7NEfYPAhqTBDhq2ofi9sU3yUpzbKlzMUaNTOcMzFYCFDFrnxFLi4UbZv2w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia.com; spf=fail smtp.mailfrom=nokia.com; dkim=pass (2048-bit key) header.d=nokia.com header.i=@nokia.com header.b=Rnan+xA9; arc=fail smtp.client-ip=52.101.83.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=PgBmcaXZk3H93NsQ9AbT5x1GS/leLg8qjZfr8cIqG7JsE2OCgWwWQ9XRNOA+l9S2fmEZQAeutIZnY0g/sP/FfT+lcQSCS8Rjta446pSeK3BTaIfmrERWNwNJinZ+kc4B6Dvdwpvh7JsRYBWBQMP7/VC9MO0vKqnbla1lDznTp4WWFZKNbF7aj8gJwHX0bwiYwA+C+gTBS5k6HM29XDQ0ezk0kqPnuepjHoN0obucWnXvLeqnfjFNzgY3Qmilys5vx4vkxYt9cdZ/qNx1uw59dlaNEsU1BHCqrcX7he3S9E+fbz5TVxVcnAw9Q32Qa1mm1jlVqo96c+hk3h4JNnqJfg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sO0BuLF2bdggtBOt5cPXgU6xJJCPNIDkcLNFXrCL6Rs=;
+ b=ZRsSjad5y8Tb/6ZtIPet6v2SOPKcehsGSVqfOCFqkAHNwTd9PCVE9yKy/C4Og5V329WriDCAMVE8GJimrQ1erLqvpUQbDmWCsbvAheOG3/iDlxFHeyCk5QKcp3b2xWkY1IQKarrRVoevHU0Dpfod1Zm6jx0jnldV+SAcrtv48uAb19nVjuQc9zqeFEDmjVD+/Plp8iXXNlhAdjrOxMy9N9RSUz2wF5lzhbQbezHf+9eujadUG/uByeII/G9SFPCmeLAQIcaeX6ynZl1hD2ZEXGqLZxvrD/GQrg446PWkR6zfpj4x90v34MU5u0QpEVtKW76b8KogcVxklJDNWfbxNA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nokia.com; dmarc=pass action=none header.from=nokia.com;
+ dkim=pass header.d=nokia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sO0BuLF2bdggtBOt5cPXgU6xJJCPNIDkcLNFXrCL6Rs=;
+ b=Rnan+xA98zAP8rC6SdmocjqknviQi2Mxs0E/ajdn6sv5TxukowbUz2yS0ZYQuKhunLM03WOsFyAOlQoLhCQrT8q1qmFISAgQUBqNyqrbPXVxv47nUT/jjEKwUxyJoUIBBzVWjLuXF4keNY0sCrSUqi0Td31nLq9d8lWVuGRKPOcGYyR97k3D++XSnZ38QxZdQvQGlxSy5lSw9UR8eI2447ne9NPN86aIcaDjRhgrlsn67ROLv8/o7+9FN+L9fkvd2uU5vLrjBDTSo9ebol1lNnuLupbEcQIF6JN9M18qFhTP3pnAoeNATd1/y0n9QZoogf9gLva3vlyaMJ/IZ9S0Pw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nokia.com;
+Received: from PAWPR07MB9688.eurprd07.prod.outlook.com (2603:10a6:102:383::17)
+ by PR3PR07MB6700.eurprd07.prod.outlook.com (2603:10a6:102:6d::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.19; Tue, 28 Oct
+ 2025 16:15:44 +0000
+Received: from PAWPR07MB9688.eurprd07.prod.outlook.com
+ ([fe80::3a2d:5997:c1c7:3809]) by PAWPR07MB9688.eurprd07.prod.outlook.com
+ ([fe80::3a2d:5997:c1c7:3809%6]) with mapi id 15.20.9253.017; Tue, 28 Oct 2025
+ 16:15:44 +0000
+From: Stefan Wiehler <stefan.wiehler@nokia.com>
+To: Xin Long <lucien.xin@gmail.com>,
+	"David S . Miller " <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>
+Cc: linux-sctp@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Stefan Wiehler <stefan.wiehler@nokia.com>
+Subject: [PATCH net v3 0/3] Fix SCTP diag locking issues
+Date: Tue, 28 Oct 2025 17:12:25 +0100
+Message-ID: <20251028161506.3294376-1-stefan.wiehler@nokia.com>
+X-Mailer: git-send-email 2.51.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: FR5P281CA0041.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:f3::19) To PAWPR07MB9688.eurprd07.prod.outlook.com
+ (2603:10a6:102:383::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251023074410.78650-1-byungchul@sk.com> <20251023074410.78650-3-byungchul@sk.com>
- <CAHS8izME4W3ENXNXf4Cxegmk9xnRmKajpRMQ18L0=FGTFebeaw@mail.gmail.com> <64E18E02-727B-47C4-8849-486AB98CACD8@nvidia.com>
-In-Reply-To: <64E18E02-727B-47C4-8849-486AB98CACD8@nvidia.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 28 Oct 2025 09:12:00 -0700
-X-Gm-Features: AWmQ_bmxv3BL-tBNLLwsdAEGZyVMyLK1NK7F8-nJ_Ys_3boWKRkq5vfhkylVKmE
-Message-ID: <CAHS8izNuSkxn1HZJ-1W_wa7QsQFE5yKUjbfSgKEzv9tLLOYveQ@mail.gmail.com>
-Subject: Re: [RFC mm v4 2/2] mm: introduce a new page type for page pool in
- page type
-To: Zi Yan <ziy@nvidia.com>
-Cc: Byungchul Park <byungchul@sk.com>, linux-mm@kvack.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kernel_team@skhynix.com, harry.yoo@oracle.com, 
-	ast@kernel.org, daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org, 
-	hawk@kernel.org, john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com, 
-	leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com, andrew+netdev@lunn.ch, 
-	edumazet@google.com, pabeni@redhat.com, akpm@linux-foundation.org, 
-	david@redhat.com, lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, 
-	vbabka@suse.cz, rppt@kernel.org, surenb@google.com, mhocko@suse.com, 
-	horms@kernel.org, jackmanb@google.com, hannes@cmpxchg.org, 
-	ilias.apalodimas@linaro.org, willy@infradead.org, brauner@kernel.org, 
-	kas@kernel.org, yuzhao@google.com, usamaarif642@gmail.com, 
-	baolin.wang@linux.alibaba.com, toke@redhat.com, asml.silence@gmail.com, 
-	bpf@vger.kernel.org, linux-rdma@vger.kernel.org, sfr@canb.auug.org.au, 
-	dw@davidwei.uk, ap420073@gmail.com, dtatulea@nvidia.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAWPR07MB9688:EE_|PR3PR07MB6700:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8275411e-bec7-45b5-b5b9-08de163d3f1a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|7416014|1800799024|366016|10070799003;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?lTQDSN0MF8ww6byzPfgRDf1diCzNYCsvlLZv+9cxL3uJYLA6yRoc0rNtCAjw?=
+ =?us-ascii?Q?ZTeBeHvTNoRsBvRZ6LKiA+60Yr14kspxrLRAK1sQvp3OrKXLxkaYrWSbqpEX?=
+ =?us-ascii?Q?FSVHEe5Ew5h+OjsZgxJlp5m4h9yh/OlNoBUeGNRpJqvxXqQulTcRAMaJCsQw?=
+ =?us-ascii?Q?gII2mZggcMSzVbSs6B8vRx2yA/V9FpAGq7t8KJ81YBDeKb3bHza2RpE+QI4T?=
+ =?us-ascii?Q?Jqhc09eKP+Js1xiLNyWeDKhWCRiWUt81C3JvnPzQwrDvJQR6ZkN6m60QH4qi?=
+ =?us-ascii?Q?ECQZSkTtz00tICfUHqK+/ESTDfNVb/bVquMw+KMO78ignGp5ukt2XUUlmyRE?=
+ =?us-ascii?Q?I38/L+T+gtx8CXpAKCnzbyNWB0EMdjimqquvHcCPYUzECYi/6OWBRZN45Jxo?=
+ =?us-ascii?Q?ZEJtGJMHitWD5L/tnCdcOUKdb/xZzI/8vUoksQyJyDnWhN8fAE0wXQ1QvYUj?=
+ =?us-ascii?Q?vc7PMiNoTQ8A9N8klvxZ4VII88682vuVgMVHLbmP2p08XzMkYfklAkngUncR?=
+ =?us-ascii?Q?96iwKLfa3vRaX+6wheNDpiDtWKX2NZ6wzGcZeSA+Is7BEbKOZe6UGm9bDmZ2?=
+ =?us-ascii?Q?HPLPIZkRCnrKpEtzvKLY7AmF0oHwh1Qsryol2T7Affd3KvaPIyPeNLNIuyXG?=
+ =?us-ascii?Q?kmc+5WHHEw3XUkEqqdB9dOV6baqIvvYDJk6dlo9qGyl630DtBzVuZ32WdJQR?=
+ =?us-ascii?Q?L8av6E9O/FtSfRDFIDYWKBOUbFnvwzvMGBfuUBtMYx8RMPu2rv3zu3jMJoXs?=
+ =?us-ascii?Q?dWePFOrBgzDdUiHxs8Lz7KdGvyLTGRKo0sF36ZnY8ozZqUR3K83FDqI3UilE?=
+ =?us-ascii?Q?eblbk/8dO6BmWwx6AAQ9ZjouavFbRmRuTKaiqo33k+ov9PxiBCLVqpadDG95?=
+ =?us-ascii?Q?RVXQ+OfyuY7mv8ye4xscoWdj8/PyG+o4egBj4nv+jszlqRK9bqpthZH4GsFg?=
+ =?us-ascii?Q?CeS7xShH4vwNab+Oa/xjnlYHFA3rAji6A2mBxt21N3kg9aksyXa3D8UqYG5S?=
+ =?us-ascii?Q?3Upy+OY3DPEfgXODKt80kjRazphM4ZXNY6KbtBoEkFAsb6THB3SPcPkx2umA?=
+ =?us-ascii?Q?wruQVGFsuNh4dgC1yNBQscL8e0R8YPxxlAHfkh4dvDfR0BpSTQ0L9s8TWApb?=
+ =?us-ascii?Q?VPWiiDp7shykhoObqpVOLVhRPs4Yc6la+NBBLLmZIqyaSBQkFbM87yrykCrI?=
+ =?us-ascii?Q?6eTQ3b5U4j+2W+D7vzx3BqSk4wcZ2BWOHbMi5aB/BCBbeAWtmxzI2QuRWQQl?=
+ =?us-ascii?Q?KTf7RKiXeybifxWbgFMfk/Lf1BSv1YkRmIlcNxYmo1HaPFHiy8fTXE45g83X?=
+ =?us-ascii?Q?nImOjqy9xiZ2jqj+oyvlHa8Lr7scjGSHsai5N4aSfXZpWkz12TApWO+5uh8j?=
+ =?us-ascii?Q?Sp/UmX0WMKvtRPLxDf5pqTg5wTYmJPUlMjBRbadb5o46CmU5xBELaJRKCHBs?=
+ =?us-ascii?Q?xv4FwopkaIds5Ga4Xl4AnBAHlGOvlYIEzcz5M5LWGZuMM+33F2Aj3g=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAWPR07MB9688.eurprd07.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(10070799003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?Tyykl+qbv4pWeHQnvQMtRsg4vD2rmQlq1rY7ITXPwx1eObTYWm3kg4Q3xJQR?=
+ =?us-ascii?Q?/sc7CF67krjwiCIBVJJcGYzgY/3+HvT0GX7s1H4XIkNvR/Yd9yINWSTQS8Rx?=
+ =?us-ascii?Q?a8v9WpCGRqFlAXkJo30ik3py1zq1rDAE9bR2RrvVeLEshnIf91XHC5fM5/1s?=
+ =?us-ascii?Q?MOjmnqfUEO3zJp9AK/4GHdW30a4awdAcDlWkdREf2+LDtRqDOj3C6npqJwXq?=
+ =?us-ascii?Q?w82z8SyveeloRH9AiZZJpUgCObQndollcHoNy6Ot2uygkJH7VrdzGC0avvcB?=
+ =?us-ascii?Q?xdUN2+Z6PCs8DB19/+eqwVz5ADr+oEM2N4dm4NLjIVqKq8SA/OdJYDrP/o2S?=
+ =?us-ascii?Q?H4RBY0gUn+hlP5OlAqSEzroA/FGphcIV9KAKkx0bENXEv8/tyqvMi7IqI+gH?=
+ =?us-ascii?Q?uhDf1fHQOAt0OpKjypVEheoPqScTiP/5AGjampbHIpoG0i9HY53z3Let08m/?=
+ =?us-ascii?Q?JzddULB2eL8oVnZ4l6gincVptVbfN/BOWmYu1RvUenaqE25U7OMReIJcH6rW?=
+ =?us-ascii?Q?ZwQqhxdLEFMVXMNnNoc4HXGbIDzoySN8ZGb7zySC7QXhIiDmamQ2z84QeBsw?=
+ =?us-ascii?Q?dyVmUPUWi2qt/xcIIL2NfLnbE9+4rnDGoW8GkQ+NceI69AmgA6GYhTFmdePJ?=
+ =?us-ascii?Q?7lhJrPUjJQCgCF9rTxYdn3sXYZAeprgB2NmYo7F9nwjOl9qkh3QKwftd/4Gd?=
+ =?us-ascii?Q?CV/YV6jStauNfDQSbR3x4+E7D0P65mgwlf+Hn2aiK2BPdUHRiTbtMNrhyfo8?=
+ =?us-ascii?Q?XScx7g+JFeJztxrMqzRN53xy6rK8LqcY9uYx88OhsXx3MalEToDCbdzLdGgg?=
+ =?us-ascii?Q?VGzgIzHzsg+VizWNCq/J+UCtx+fbMcVk72lIKUAITxg2o/6wvofO8Mnz40WF?=
+ =?us-ascii?Q?vzhccrXqEt7XdaucM8gO0eKgd3A0DfNwD40pewsFJvddi2vj6s9c4v+/uQTl?=
+ =?us-ascii?Q?MgnbskmdcywBzWIjG+TjpyzZEfxKtUrKE2Hv/+E+xUovTg3JfUFCrZjy5bVt?=
+ =?us-ascii?Q?Uo7U7/3kHotQvbNqYNNWd0GZWcsi+aiKKLBXuWFPDO7K+WPmIwzfvb3qicCR?=
+ =?us-ascii?Q?mMk+ZyVJqm7kA7Zw3Bu1PIWNMq3vQQiAMAmwuA5th2QRYlpbOlYkAs5gpPdn?=
+ =?us-ascii?Q?nKougKVXwx2PhAZAl+qtRq9pF2wW7afCfn2eTi/oTYexoRLMiVOoOIqKeGBM?=
+ =?us-ascii?Q?Q8Pi38ujww2mHXm78Ji9kV/m2q5IOf0LSH5YFrTt5+xYQiof735AuY6ydsKH?=
+ =?us-ascii?Q?kifiMjIJeVBUUuUEDwMbAHztWFgnOEeUgOAPPPOY6E3+0kNWDuMO7B1nZPZB?=
+ =?us-ascii?Q?++eFi1hclwaL0fXWx9iBjKwyjinmD+mSc0QmGveBequp7J/enpAK7Sh7/Pri?=
+ =?us-ascii?Q?J1/TfGr8mcW5w6NX1sFkoK81jGaxiBF1zEkdaKNKRQgshTUtWVSOCnQtWS8i?=
+ =?us-ascii?Q?SykD6yy3LmjtsRIXv71Ax6g8NL3JDeyxpxqrTVc6rT20ck4YToUNX4z/sBh1?=
+ =?us-ascii?Q?IgDSjSJcdY5Fie6pVkGQBPeHMqky9GPxnTBM2QODgCa2F8rc+Va5mhFv40HF?=
+ =?us-ascii?Q?mJVo8qi1jS20jScwg5+ak815wL6nc80cHiqhhcuAfCDfURt3+9b0qkxW+AhP?=
+ =?us-ascii?Q?9NsHzDE8lEVDI2rG7F+Mr8KWdTJXOGwHDXIPu7Kpr4UlX0LtiVcEs7ad1GuK?=
+ =?us-ascii?Q?LEtjNA=3D=3D?=
+X-OriginatorOrg: nokia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8275411e-bec7-45b5-b5b9-08de163d3f1a
+X-MS-Exchange-CrossTenant-AuthSource: PAWPR07MB9688.eurprd07.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Oct 2025 16:15:44.2604
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 5d471751-9675-428d-917b-70f44f9630b0
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tTs+Y26SunlFqRLEE5wdblAdx4snugRGD9EAu6KsQsf3iecZqbk8Yj6EeP1GuGy//fGHI1C95hCWW7Fn/7YOTSVSqJfTld/5GQtb+QgkddY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PR3PR07MB6700
 
-On Mon, Oct 27, 2025 at 6:45=E2=80=AFPM Zi Yan <ziy@nvidia.com> wrote:
->
-> On 27 Oct 2025, at 21:28, Mina Almasry wrote:
->
-> > On Thu, Oct 23, 2025 at 12:45=E2=80=AFAM Byungchul Park <byungchul@sk.c=
-om> wrote:
-> >>
-> >> ->pp_magic field in struct page is current used to identify if a page
-> >> belongs to a page pool.  However, ->pp_magic will be removed and page
-> >> type bit in struct page e.i. PGTY_netpp can be used for that purpose.
-> >>
-> >> Introduce and use the page type APIs e.g. PageNetpp(), __SetPageNetpp(=
-),
-> >> and __ClearPageNetpp() instead, and remove the existing APIs accessing
-> >> ->pp_magic e.g. page_pool_page_is_pp(), netmem_or_pp_magic(), and
-> >> netmem_clear_pp_magic().
-> >>
-> >> This work was inspired by the following link:
-> >>
-> >> [1] https://lore.kernel.org/all/582f41c0-2742-4400-9c81-0d46bf4e8314@g=
-mail.com/
-> >>
-> >> While at it, move the sanity check for page pool to on free.
-> >>
-> >> Suggested-by: David Hildenbrand <david@redhat.com>
-> >> Co-developed-by: Pavel Begunkov <asml.silence@gmail.com>
-> >> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> >> Signed-off-by: Byungchul Park <byungchul@sk.com>
-> >> Acked-by: David Hildenbrand <david@redhat.com>
-> >> Acked-by: Zi Yan <ziy@nvidia.com>
-> >> ---
-> >> Hi Mina,
-> >>
-> >> I dropped your Reviewed-by tag since there are updates on some comment=
-s
-> >> in network part.  Can I still keep your Reviewed-by?
-> >>
-> >>         Byungchul
-> >> ---
-> >>  .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |  2 +-
-> >>  include/linux/mm.h                            | 27 +++---------------=
--
-> >>  include/linux/page-flags.h                    |  6 +++++
-> >>  include/net/netmem.h                          |  2 +-
-> >>  mm/page_alloc.c                               |  8 +++---
-> >>  net/core/netmem_priv.h                        | 17 +++---------
-> >>  net/core/page_pool.c                          | 14 +++++-----
-> >>  7 files changed, 25 insertions(+), 51 deletions(-)
-> >>
-> >> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c b/driver=
-s/net/ethernet/mellanox/mlx5/core/en/xdp.c
-> >> index 5d51600935a6..def274f5c1ca 100644
-> >> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-> >> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-> >> @@ -707,7 +707,7 @@ static void mlx5e_free_xdpsq_desc(struct mlx5e_xdp=
-sq *sq,
-> >>                                 xdpi =3D mlx5e_xdpi_fifo_pop(xdpi_fifo=
-);
-> >>                                 page =3D xdpi.page.page;
-> >>
-> >> -                               /* No need to check page_pool_page_is_=
-pp() as we
-> >> +                               /* No need to check PageNetpp() as we
-> >>                                  * know this is a page_pool page.
-> >>                                  */
-> >>                                 page_pool_recycle_direct(pp_page_to_nm=
-desc(page)->pp,
-> >> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> >> index b6fdf3557807..f5155f1c75f5 100644
-> >> --- a/include/linux/mm.h
-> >> +++ b/include/linux/mm.h
-> >> @@ -4361,10 +4361,9 @@ int arch_lock_shadow_stack_status(struct task_s=
-truct *t, unsigned long status);
-> >>   * DMA mapping IDs for page_pool
-> >>   *
-> >>   * When DMA-mapping a page, page_pool allocates an ID (from an xarray=
-) and
-> >> - * stashes it in the upper bits of page->pp_magic. We always want to =
-be able to
-> >> - * unambiguously identify page pool pages (using page_pool_page_is_pp=
-()). Non-PP
-> >> - * pages can have arbitrary kernel pointers stored in the same field =
-as pp_magic
-> >> - * (since it overlaps with page->lru.next), so we must ensure that we=
- cannot
-> >> + * stashes it in the upper bits of page->pp_magic. Non-PP pages can h=
-ave
-> >> + * arbitrary kernel pointers stored in the same field as pp_magic (si=
-nce
-> >> + * it overlaps with page->lru.next), so we must ensure that we cannot
-> >>   * mistake a valid kernel pointer with any of the values we write int=
-o this
-> >>   * field.
-> >>   *
-> >> @@ -4399,26 +4398,6 @@ int arch_lock_shadow_stack_status(struct task_s=
-truct *t, unsigned long status);
-> >>  #define PP_DMA_INDEX_MASK GENMASK(PP_DMA_INDEX_BITS + PP_DMA_INDEX_SH=
-IFT - 1, \
-> >>                                   PP_DMA_INDEX_SHIFT)
-> >>
-> >> -/* Mask used for checking in page_pool_page_is_pp() below. page->pp_m=
-agic is
-> >> - * OR'ed with PP_SIGNATURE after the allocation in order to preserve =
-bit 0 for
-> >> - * the head page of compound page and bit 1 for pfmemalloc page, as w=
-ell as the
-> >> - * bits used for the DMA index. page_is_pfmemalloc() is checked in
-> >> - * __page_pool_put_page() to avoid recycling the pfmemalloc page.
-> >> - */
-> >> -#define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
-> >> -
-> >> -#ifdef CONFIG_PAGE_POOL
-> >> -static inline bool page_pool_page_is_pp(const struct page *page)
-> >> -{
-> >> -       return (page->pp_magic & PP_MAGIC_MASK) =3D=3D PP_SIGNATURE;
-> >> -}
-> >> -#else
-> >> -static inline bool page_pool_page_is_pp(const struct page *page)
-> >> -{
-> >> -       return false;
-> >> -}
-> >> -#endif
-> >> -
-> >>  #define PAGE_SNAPSHOT_FAITHFUL (1 << 0)
-> >>  #define PAGE_SNAPSHOT_PG_BUDDY (1 << 1)
-> >>  #define PAGE_SNAPSHOT_PG_IDLE  (1 << 2)
-> >> diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
-> >> index 0091ad1986bf..edf5418c91dd 100644
-> >> --- a/include/linux/page-flags.h
-> >> +++ b/include/linux/page-flags.h
-> >> @@ -934,6 +934,7 @@ enum pagetype {
-> >>         PGTY_zsmalloc           =3D 0xf6,
-> >>         PGTY_unaccepted         =3D 0xf7,
-> >>         PGTY_large_kmalloc      =3D 0xf8,
-> >> +       PGTY_netpp              =3D 0xf9,
-> >>
-> >>         PGTY_mapcount_underflow =3D 0xff
-> >>  };
-> >> @@ -1078,6 +1079,11 @@ PAGE_TYPE_OPS(Zsmalloc, zsmalloc, zsmalloc)
-> >>  PAGE_TYPE_OPS(Unaccepted, unaccepted, unaccepted)
-> >>  FOLIO_TYPE_OPS(large_kmalloc, large_kmalloc)
-> >>
-> >> +/*
-> >> + * Marks page_pool allocated pages.
-> >> + */
-> >> +PAGE_TYPE_OPS(Netpp, netpp, netpp)
-> >> +
-> >>  /**
-> >>   * PageHuge - Determine if the page belongs to hugetlbfs
-> >>   * @page: The page to test.
-> >> diff --git a/include/net/netmem.h b/include/net/netmem.h
-> >> index 651e2c62d1dd..0ec4c7561081 100644
-> >> --- a/include/net/netmem.h
-> >> +++ b/include/net/netmem.h
-> >> @@ -260,7 +260,7 @@ static inline unsigned long netmem_pfn_trace(netme=
-m_ref netmem)
-> >>   */
-> >>  #define pp_page_to_nmdesc(p)                                         =
-  \
-> >>  ({                                                                   =
-  \
-> >> -       DEBUG_NET_WARN_ON_ONCE(!page_pool_page_is_pp(p));             =
-  \
-> >> +       DEBUG_NET_WARN_ON_ONCE(!PageNetpp(p));                        =
-  \
-> >>         __pp_page_to_nmdesc(p);                                       =
-  \
-> >>  })
-> >>
-> >> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-> >> index fb91c566327c..c69ed3741bbc 100644
-> >> --- a/mm/page_alloc.c
-> >> +++ b/mm/page_alloc.c
-> >> @@ -1042,7 +1042,6 @@ static inline bool page_expected_state(struct pa=
-ge *page,
-> >>  #ifdef CONFIG_MEMCG
-> >>                         page->memcg_data |
-> >>  #endif
-> >> -                       page_pool_page_is_pp(page) |
-> >
-> > Shouldn't you replace the page_pool_page_is_pp check with a PageNetpp
-> > check in this call site and below? Or is that no longer necessary for
-> > some reason?
->
-> It is done in the hunk below this one:
->
-> @@ -1379,9 +1376,12 @@ __always_inline bool free_pages_prepare(struct pag=
-e *page,
->                 mod_mthp_stat(order, MTHP_STAT_NR_ANON, -1);
->                 folio->mapping =3D NULL;
->         }
-> -       if (unlikely(page_has_type(page)))
-> +       if (unlikely(page_has_type(page))) {
-> +               /* networking expects to clear its page type before relea=
-sing */
-> +               WARN_ON_ONCE(PageNetpp(page));
->                 /* Reset the page_type (which overlays _mapcount) */
->                 page->page_type =3D UINT_MAX;
-> +       }
->
->         if (is_check_pages_enabled()) {
->                 if (free_page_is_bad(page))
->
-> where
-> free_pages_prepare()
->   -> free_page_is_bad()
->     -> page_expected_state()
->
+- Hold RCU read lock while iterating over address list in
+  inet_diag_msg_sctpaddrs_fill()
+- Prevent TOCTOU out-of-bounds write
+- Hold sock lock while iterating over address list in sctp_sock_dump_one()
 
-Thanks, looks fine to me then. I'm not extremely familiar with this
-code so I won't give a Reviewed-by, but here is an ack, FWIW:
+v3:
+- Elaborate on TOCTOU call path
+- Merge 3 patches into series
+v2:
+- Add changelog and credit, release sock lock in ENOMEM error path:
+  https://patchwork.kernel.org/project/netdevbpf/patch/20251027102541.2320627-2-stefan.wiehler@nokia.com/
+- Add changelog and credit:
+  https://patchwork.kernel.org/project/netdevbpf/patch/20251027101328.2312025-2-stefan.wiehler@nokia.com/
+v1:
+- https://patchwork.kernel.org/project/netdevbpf/patch/20251023191807.74006-2-stefan.wiehler@nokia.com/
+- https://patchwork.kernel.org/project/netdevbpf/patch/20251027084835.2257860-1-stefan.wiehler@nokia.com/
+- https://patchwork.kernel.org/project/netdevbpf/patch/20251027085007.2259265-1-stefan.wiehler@nokia.com/
 
-Acked-by: Mina Almasry <almasrymina@google.com>
+Stefan Wiehler (3):
+  sctp: Hold RCU read lock while iterating over address list
+  sctp: Prevent TOCTOU out-of-bounds write
+  sctp: Hold sock lock while iterating over address list
 
---=20
-Thanks,
-Mina
+ net/sctp/diag.c | 21 ++++++++++++++++-----
+ 1 file changed, 16 insertions(+), 5 deletions(-)
+
+-- 
+2.51.0
+
 
