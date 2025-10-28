@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-233600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92CE2C1628F
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 18:31:27 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27E6AC16379
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 18:38:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1A88035649F
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 17:31:26 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D5C4550041C
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 17:33:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A957234F470;
-	Tue, 28 Oct 2025 17:30:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43B0333C508;
+	Tue, 28 Oct 2025 17:33:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sEZPV+QX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s1mC8cuU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71F8734D4ED;
-	Tue, 28 Oct 2025 17:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1920D204F93;
+	Tue, 28 Oct 2025 17:33:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761672606; cv=none; b=W72gTCuAflE0AqCPFIDNBvSx5y2UByVwPdLU03uxthcSbUiFhr8z1bkEgSJLlbI+aPgcAtfclUeB9y7L+Q1uGyvD2+p7YkpoT07ZvF2xzf6Utc395V8lGUyknHfBB0F3XZIt4tBlezY5ng1ZKuSTYAEu/9o9X8YlVi72QRFz1SM=
+	t=1761672829; cv=none; b=ATgR2fLQNeMl81niHxXtX5oooEtc39pgjfTFbNDF93TAU96sDWO730o2dN5M2Z09JdO0SZJFbHrf0H2Vk8kd6ZpnwkzaYjbHsoqJWl0pO45kncUH2ns5bq0WGlJtvijMBL1KKdzctjJoyf4297ziB/5e6I9NiaVlQ90eDiaK1KQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761672606; c=relaxed/simple;
-	bh=MyipjujNs1EeYdDhDdXYXgWCyMVvZAP8Yv0PCmnJf2E=;
+	s=arc-20240116; t=1761672829; c=relaxed/simple;
+	bh=mcsf05i8u4J3+oFVqtIoZGziu63YltUoJ/4sahdqeNU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=asPiYIq4E59h1HccxoojaiP7cjm8Pl8TbfBXK+NY+eQh4xVqbRcS41glk0G5JD15a3z/SpD8YCUq7xnFObfg1ALZYYB/cSLjdkC+Xv+I35dYPgVbPKahmFR8EezuIyf8YjITnzUyW29eXe0S6RBE4dEFPNvd6Z0U9FZcGDraCP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sEZPV+QX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40665C4CEE7;
-	Tue, 28 Oct 2025 17:30:03 +0000 (UTC)
+	 MIME-Version:Content-Type; b=kUlN/VJbDkbLo0FK28ce4b1++izUhfLy2z9Bm+uTD1JEj9qSUTRrIvo4FK58FY8NAuBfnjXPJ18C1NRdxO0GD++eibFzMBNnbVMnLONPC8zBYZdIiN/QRINbZleCkAoVB0cQMrGFyj4ERLjAQW7vDuPgXkj2o5qoZgwgd60/y6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s1mC8cuU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E67ACC4CEE7;
+	Tue, 28 Oct 2025 17:33:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761672604;
-	bh=MyipjujNs1EeYdDhDdXYXgWCyMVvZAP8Yv0PCmnJf2E=;
+	s=k20201202; t=1761672828;
+	bh=mcsf05i8u4J3+oFVqtIoZGziu63YltUoJ/4sahdqeNU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sEZPV+QXYcBvYdpymZErgqWe9wLkt0QaMns3WrHVFPTO8TQzk53x1hMuuT2PCdlXg
-	 xCh00MvKTDvxYFMiWAJ7urINcumdLpA6ji78nDOsa/AYNBpsMQItfwSpTnT10uD58D
-	 AGK/DJaMNR1zEF7iG0uv41mx/m74m7LYtUewm5rm6Kg5ksfBJnPPm7cXExNi7IzI4U
-	 c6CECLmNDqhtzxppeDPaztgNtXBVpTT6AavCfazQTd1ube8XIuMoyGIqqUD6dlvvTm
-	 aEdSKDQTOf9pPq1cimG9TD3wdUeuOZhaRvxhMDgM71Z/sIUMYtdJTRvT2u6SDRRg8q
-	 P0m4WSlOG4FDQ==
-Date: Tue, 28 Oct 2025 10:30:01 -0700
+	b=s1mC8cuUGQOasLd3sdNHuWbrTIpe3FxZLjTcAJ32TkJz6Mwhhgw68S+iBGqxPRpMd
+	 Y1LT7B0VyaMXQMTm4vR+dgC/IxImJZ7axvSwFR1Ol1Kg0KVN5uqrHOfnWBScGts92B
+	 dbTHCUK40OwzjOkC24tMtFwJ4iwP+parvjj6EXq5sdmqSf98B4gwapW83gfUbrY4LB
+	 AOwSLdbE1Ls/rmdD93m/HpANQx/PJ78vw/nXgF0j65wt+RKHGHJaOLWJrA1xCC2ZHo
+	 +wUPdMBM48xuX8SZMguJMt7hdMzhxxK2n6iEcqzJH4Y15MzXDUL4FA84umjUAZ2mm7
+	 oa12hQn6AZHoQ==
+Date: Tue, 28 Oct 2025 10:33:47 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Paolo Abeni <pabeni@redhat.com>
 Cc: Daniel Zahka <daniel.zahka@gmail.com>, "David S . Miller"
@@ -54,11 +54,12 @@ Cc: Daniel Zahka <daniel.zahka@gmail.com>, "David S . Miller"
  linux-kselftest@vger.kernel.org
 Subject: Re: [PATCH net-next v2 3/5] psp: add stats from psp spec to driver
  facing api
-Message-ID: <20251028103001.7cafeb03@kernel.org>
-In-Reply-To: <d4c31a2f-590a-4b83-b6b3-25f33a51193a@redhat.com>
+Message-ID: <20251028103347.67a4dbf3@kernel.org>
+In-Reply-To: <20251028103001.7cafeb03@kernel.org>
 References: <20251028000018.3869664-1-daniel.zahka@gmail.com>
 	<20251028000018.3869664-4-daniel.zahka@gmail.com>
 	<d4c31a2f-590a-4b83-b6b3-25f33a51193a@redhat.com>
+	<20251028103001.7cafeb03@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,17 +69,21 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 28 Oct 2025 10:02:16 +0100 Paolo Abeni wrote:
-> This makes static checker unhappy:
+On Tue, 28 Oct 2025 10:30:01 -0700 Jakub Kicinski wrote:
+> On Tue, 28 Oct 2025 10:02:16 +0100 Paolo Abeni wrote:
+> > This makes static checker unhappy:
+> > 
+> > /home/cocci/testing/include/net/psp/types.h:167:6-18: WARNING use
+> > flexible-array member instead
+> > (https://www.kernel.org/doc/html/latest/process/deprecated.html#zero-length-and-one-element-arrays)
+> > 
+> > I think/guess the warning could be avoided using something alike the
+> > following (completely untested!!!):  
 > 
-> /home/cocci/testing/include/net/psp/types.h:167:6-18: WARNING use
-> flexible-array member instead
-> (https://www.kernel.org/doc/html/latest/process/deprecated.html#zero-length-and-one-element-arrays)
-> 
-> I think/guess the warning could be avoided using something alike the
-> following (completely untested!!!):
+> It's not a VLA, it's an end marker for calculating offsets.
+> The patch is fine, we should have added in the commit msg that the
+> false positive from cocci is expected.
 
-It's not a VLA, it's an end marker for calculating offsets.
-The patch is fine, we should have added in the commit msg that the
-false positive from cocci is expected.
+I guess we could avoid this problem by naming the union.
+Let's do that instead..
 
