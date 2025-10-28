@@ -1,98 +1,79 @@
-Return-Path: <netdev+bounces-233678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7DBCC173F3
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 23:58:56 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 601B3C17440
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 00:03:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 13A7C4FB302
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 22:56:39 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3D4534EED48
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 23:01:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2E3B369997;
-	Tue, 28 Oct 2025 22:56:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 954F42D7DDA;
+	Tue, 28 Oct 2025 23:01:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="heVv1CNy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UIdDZmyJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C8E0368F2A
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 22:56:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CFF9226D00;
+	Tue, 28 Oct 2025 23:01:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761692196; cv=none; b=EqLI3Ommpe58DfQGYMq+utDH7W6dTrAB0dnDNzGCiDWg8yM3P4Th6bEOdmwcpRX0t7DhC+tRn2ZJZWceshYpEjyObPxMQhengIAqR/VKC02nVo+H+kvJrmFQnGsTBt0M0Qu8A+DE6x1NSb7yVr7HkSPAyYK4p/pSCyUpn+D7lq0=
+	t=1761692468; cv=none; b=mgGXsTLYq/N1Wbpot7uUpoGnaSFljeFcVORKv56/BuUnw0B0KoREcijW7KPypxtUO2+9jr6tb6fnJXmRQz55pRQ20VHxZ5KcBHCCsFcNeDqPy7gj+j1ul+lJTpBQCIbR51IleumhaCl7UQUo3BNfW1nwiGkn3yzaNzSoTiNas7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761692196; c=relaxed/simple;
-	bh=gzMyNe3bYkOUhw79LF+xYL5EvdebU7mf2v9T40MCS9o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=miXR48fR1xJk2rKiRSlp+oikFBE8BuvxQpKbJZDfUYmdp+PZhNRkX3LReSmdq2DqwS+cFKrHIdVWvA5Lldt6NgmSCwyxJbDuYwLsW86715Wg+R7YBgvoy4GUN6PY1vbNzEbACFm+tnhF4rGitvUNYQfpsibG4Po3jOWlezTuBbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=heVv1CNy; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=kovtO3jpsFBAOlD0JU7rGvDonyEjNTvLsJSB8rr789Y=; b=heVv1CNytQ+EMhWg+itzf3hMLf
-	z7TlYYlr7jVkez/qnFXcXubDrHdR8Y4BUlcg+rmxdADigr+FNjN+GJBrnApej5gXJbGYKKyuJhjVa
-	KdqJUnu8BYAd2F+UOSkzt/Rp8rnpJLQ8CHVGNIDPX6przlrEiKApCQFshOLMKSvYhhlY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vDscA-00CL3p-LX; Tue, 28 Oct 2025 23:56:30 +0100
-Date: Tue, 28 Oct 2025 23:56:30 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, kernel-team@meta.com,
-	andrew+netdev@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	pabeni@redhat.com, davem@davemloft.net
-Subject: Re: [net-next PATCH 8/8] fbnic: Add phydev representing PMD to
- phylink setup
-Message-ID: <fa8c2fe1-23a3-4fd0-94a7-50446631c287@lunn.ch>
-References: <176133835222.2245037.11430728108477849570.stgit@ahduyck-xeon-server.home.arpa>
- <176133848870.2245037.4413688703874426341.stgit@ahduyck-xeon-server.home.arpa>
- <6ca8f12d-9413-400d-bfc4-9a6c4a2d8896@lunn.ch>
- <CAKgT0UdqH0swVcQFypY8tbDpL58ZDNLpkmQMPNzQep1=eb1hQQ@mail.gmail.com>
+	s=arc-20240116; t=1761692468; c=relaxed/simple;
+	bh=FaaO/U8ks8JbiSUKHoN4+iFu4ESdUEig964Hq+IAu1Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=A9uwEH0Qn7iTVZn8khmkqk/FJ/rhS6NxonXzvNQDn1a8jxeQ2/N9Y6uMJZRTFYFlsHUtTeMg5YKnDC4OD/YpX4qbVOvNqSD+B+f9RWRh/AVp33gSwUMK91HGBjiwgSiK0wYUyyiLu4cb5IKGvEu5ko0g730bic40tLtvWC9Hk+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UIdDZmyJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8835C4CEE7;
+	Tue, 28 Oct 2025 23:01:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761692468;
+	bh=FaaO/U8ks8JbiSUKHoN4+iFu4ESdUEig964Hq+IAu1Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=UIdDZmyJqmQ0fWHU4KLp2zdtgehE7cpjYc5E3zBWrPmENoDphd+b+9pdJ45rDpPxJ
+	 /Z7WtxTTG9IOzdCFf89OewhazEMjPswOqhHoNZjy8taN/JPTXa9MMkVypymRDuesI2
+	 evRDYmAAWOGK+FWHd00J3JgRJk4NJznonpP5y+f+kS6yTED7cH2ak54/RTajJY8r3/
+	 21ShqQ0GDnET5xB985gp5aJwZ2dV9XWbwyBP22EHL/3scB3OwAsuPKOMe0T9exRvqe
+	 x3wA6LDFRYsovx40KCFU3S92CdMbjCJCwCFV2rB27LEnscnnd1hpo5NvUfKPDuOVvV
+	 I+5QcwQneTP8A==
+Date: Tue, 28 Oct 2025 16:01:07 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Fernando Fernandez Mancera <fmancera@suse.de>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com,
+ maciej.fijalkowski@intel.com, sdf@fomichev.me, kerneljasonxing@gmail.com,
+ fw@strlen.de
+Subject: Re: [PATCH 2/2 bpf v2] xsk: avoid data corruption on cq descriptor
+ number
+Message-ID: <20251028160107.5c161a4f@kernel.org>
+In-Reply-To: <20251028183032.5350-2-fmancera@suse.de>
+References: <20251028183032.5350-1-fmancera@suse.de>
+	<20251028183032.5350-2-fmancera@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKgT0UdqH0swVcQFypY8tbDpL58ZDNLpkmQMPNzQep1=eb1hQQ@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> > > +     phylink_resume(fbn->phylink);
-> >
-> > When was is suspended?
-> 
-> We don't use the start/stop calls. Instead we use the resume/suspend
-> calls in order to deal with the fact that we normally aren't fully
-> resetting the link. The first call automatically gets converted to a
-> phylink_start because the bit isn't set for the MAC_WOL, however all
-> subsequent setups it becomes a resume so that we aren't tearing the
-> link down fully in order to avoid blocking the BMC which is sharing
-> the link similar to how a WOL connection would.
+On Tue, 28 Oct 2025 19:30:32 +0100 Fernando Fernandez Mancera wrote:
+> Since commit 30f241fcf52a ("xsk: Fix immature cq descriptor
+> production"), the descriptor number is stored in skb control block and
+> xsk_cq_submit_addr_locked() relies on it to put the umem addrs onto
+> pool's completion queue.
 
-/**
- * phylink_resume() - handle a network device resume event
- * @pl: a pointer to a &struct phylink returned from phylink_create()
- *
- * Undo the effects of phylink_suspend(), returning the link to an
- * operational state.
- */
+Looking at the past discussion it sounds like you want to optimize 
+the single descriptor case? Can you not use a magic pointer for that?
 
-There needs to be a call to phylink_suspend() before you call
-phylink_resume(). If there is a prior call to phylink_suspend() all is
-O.K.
+	#define XSK_DESTRUCT_SINGLE_BUF	(void *)1
+	destructor_arg = XSK_DESTRUCT_SINGLE_BUF
 
-Russell gets unhappy if you don't follow the documentation. The
-documentation is part of the API, part of the contract. If you break
-the contract, don't be surprised is your driver breaks sometime in the
-future.
-
-	Andrew
+Let's target this fix at net, please, I think the complexity here is
+all in skbs paths.
 
