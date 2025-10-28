@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-233364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id F33C3C12865
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 02:21:48 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD626C12866
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 02:22:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D8642500D3A
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 01:21:07 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 134E85038E5
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 01:21:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4510A226165;
-	Tue, 28 Oct 2025 01:20:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C642C227563;
+	Tue, 28 Oct 2025 01:20:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HCmvE60q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PvuTPhBa"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D752225788;
-	Tue, 28 Oct 2025 01:20:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ECE5226D1E
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 01:20:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761614453; cv=none; b=DVrbCZ9AqM+UoYvy1Tl2W/sLZZ7tZjqJUtb4iHvIO/VP1Mb9kws1LCJ3FH/7ejn7xXFq2rPwOtTf18Kp/tjPrJLMrKRcBH0ujViaGdxK0WpHepKc8hPaJ59P903gGC9F0I3GYJaohJqXW8tI/R1/C/8S4KQYfbgCXW16bXBMTqo=
+	t=1761614454; cv=none; b=LAqLQLxpz6uQwfY4Uc84QcdxJfQBMOw5hDnBLdMf0Co+SD56ebHHYoI9L3eDBVdrNYKBwa73epnWh5RnIdIqvt4bm6tyYVTWytexPkkR50VIf2aNOodIhJ9DwOo2lVuwd5Eu9ZHgmmpOOo4QQ8kD3HIfLmjHfz7e18RPWBx9LdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761614453; c=relaxed/simple;
-	bh=zEWRBnfP++561c+hL3LHaBk8829cXR+Sa0dDa6dDuds=;
+	s=arc-20240116; t=1761614454; c=relaxed/simple;
+	bh=iG62UREZT8DJmnlOSvLqmVDWri0tK8c/me48r3tGJ1o=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Kohm7pploKn0az0fWoFmsXmgqgwThSwM91k0LGsCabXm+N4i4hkVLd5XYdbo9JXN9MLIo3viirT5/o4+mTHdmeXEM4v90Qjq5zjqC5o0RKP6/wK32Tb9MLpN/oDxtYHRatJU3MMoI4I9XAIPIn1VoRhbrDYEjFUbpFB+0KkdUUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HCmvE60q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7EA6C4CEF1;
-	Tue, 28 Oct 2025 01:20:52 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=i4kWJvjS5hZE/Arn1oFkJ6NXznxKDTJBhc/LAyI38Ghhh+YrlTPsMNzegVZgU9Mk+4LqmBZz+VW/85aHBtDcdIPcPj2FansYeqEKuPU+ntxcD/hn2TbN17J9GX/00ohQMS6hfSQ3XubQAYY1BzkK4dcVwxbeHYAkaEOeWuc/qwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PvuTPhBa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 202DDC4CEF1;
+	Tue, 28 Oct 2025 01:20:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761614452;
-	bh=zEWRBnfP++561c+hL3LHaBk8829cXR+Sa0dDa6dDuds=;
+	s=k20201202; t=1761614454;
+	bh=iG62UREZT8DJmnlOSvLqmVDWri0tK8c/me48r3tGJ1o=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=HCmvE60qeuSj9x2KsY5VKfX/WYmhx6x2GTyLWWMVN3WhIhNfmilAhE4GBUy65i6oB
-	 Fnd1jQ84NEF5120jMVrmIJPNwf27eC7grbKM2bG/HmSTd6+fFJNDoAmR1zfRm5XWFX
-	 GOYIzS7FNIeN274DUot8y+0uDuMDtGGfY0GKnA3jGhi8VhE10LFPeu1eRO7ZO+N302
-	 23tPp5QefYkGwsyvZMqF81OSwvPpt631sKAW74El50/63dZHhYTp7ixyfEDKeA9rdl
-	 XbGwHPBOdHF3kXsquPvH5AfOVuq2tJCRRS/cmsalbSuCPGgeKuhR8s/wNDUMY/+YTk
-	 xN9bw2CoYcu8g==
+	b=PvuTPhBaBus4B2vpKH5wFU74HEUgAhtzt1lAYLPkmtkd3KbmHUTrvTEyp9JmPt06S
+	 UhI7ajANXXCIXeqPee6MBJRvGGQHzBMZS6u0atLYgCsbLqwdlG9DaDzl4AhRqJqIAr
+	 5G3MuX32e5otR45Iz73K8PHlFyTYSfE0LVfAKlrRr+IYrHIulo/mKcdFkh8p8MyIUK
+	 scFaVPe2THDr7oKArLB37u9bfsPyhnVGGRj0E0DSMU4+yrxkH1SsO2Syb+Uj7V+6+F
+	 on1eIZXET2oI3sBoxR5qLPMgfUhY2zZk1WH7Q0j7H5S0yG4pDgzw79sUlM11gCo5V/
+	 oT+f1NHHl6aVg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADE439D60B9;
-	Tue, 28 Oct 2025 01:20:31 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E6A39D60B9;
+	Tue, 28 Oct 2025 01:20:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,61 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5 0/6] convert net drivers to ndo_hwtstamp API
- part
- 2
+Subject: Re: [PATCH net-next 1/2] batman-adv: Start new development cycle
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176161443074.1651448.3590346832482597545.git-patchwork-notify@kernel.org>
-Date: Tue, 28 Oct 2025 01:20:30 +0000
-References: <20251023220457.3201122-1-vadim.fedorenko@linux.dev>
-In-Reply-To: <20251023220457.3201122-1-vadim.fedorenko@linux.dev>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: shenjian15@huawei.com, salil.mehta@huawei.com, shaojijie@huawei.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, sgoutham@marvell.com, gakula@marvell.com,
- sbhatta@marvell.com, bbhushan2@marvell.com, tariqt@nvidia.com,
- brett.creeley@amd.com, niklas.soderlund@ragnatech.se, paul@pbarker.dev,
- yoshihiro.shimoda.uh@renesas.com, linux-renesas-soc@vger.kernel.org,
- richardcochran@gmail.com, linux@armlinux.org.uk, vladimir.oltean@nxp.com,
- horms@kernel.org, jacob.e.keller@intel.com, netdev@vger.kernel.org
+ <176161443200.1651448.12590891600883134266.git-patchwork-notify@kernel.org>
+Date: Tue, 28 Oct 2025 01:20:32 +0000
+References: <20251024092315.232636-2-sw@simonwunderlich.de>
+In-Reply-To: <20251024092315.232636-2-sw@simonwunderlich.de>
+To: Simon Wunderlich <sw@simonwunderlich.de>
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+ b.a.t.m.a.n@lists.open-mesh.org
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+by Simon Wunderlich <sw@simonwunderlich.de>:
 
-On Thu, 23 Oct 2025 22:04:51 +0000 you wrote:
-> This is part 2 of patchset to convert drivers which support HW
-> timestamping to use .ndo_hwtstamp_get()/.ndo_hwtstamp_set() callbacks.
-> The new API uses netlink to communicate with user-space and have some
-> test coverage.
+On Fri, 24 Oct 2025 11:23:14 +0200 you wrote:
+> This version will contain all the (major or even only minor) changes for
+> Linux 6.19.
 > 
-> v4 -> v5:
->  fix ionic dirver build with CONFIG_PTP_1588_CLOCK=n
-> v3 -> v4:
->  fix commit message in patch 6
-> v2 -> v3:
->  use NL_SET_ERR_MSG_MOD() variant to report errors back to user-space
-> v1 -> v2:
->  hns3: actually set up new ndo callbacks
->  ionic: remove _lif_ portion from name to align with other ndo callbacks
+> The version number isn't a semantic version number with major and minor
+> information. It is just encoding the year of the expected publishing as
+> Linux -rc1 and the number of published versions this year (starting at 0).
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v5,1/6] octeontx2: convert to ndo_hwtstamp API
-    https://git.kernel.org/netdev/net-next/c/a5c12b060efe
-  - [net-next,v5,2/6] mlx4: convert to ndo_hwtstamp API
-    https://git.kernel.org/netdev/net-next/c/7a07dc723fad
-  - [net-next,v5,3/6] ionic: convert to ndo_hwtstamp API
-    https://git.kernel.org/netdev/net-next/c/38efb0ba3cd0
-  - [net-next,v5,4/6] net: ravb: convert to ndo_hwtstamp API
-    https://git.kernel.org/netdev/net-next/c/faac57cddfc2
-  - [net-next,v5,5/6] net: renesas: rswitch: convert to ndo_hwtstamp API
-    https://git.kernel.org/netdev/net-next/c/87e1b590f776
-  - [net-next,v5,6/6] net: hns3: add hwtstamp_get/hwtstamp_set ops
-    https://git.kernel.org/netdev/net-next/c/329021eeae03
+  - [net-next,1/2] batman-adv: Start new development cycle
+    https://git.kernel.org/netdev/net-next/c/e5ae07b2ef86
+  - [net-next,2/2] batman-adv: use skb_crc32c() instead of skb_seq_read()
+    https://git.kernel.org/netdev/net-next/c/ed5730f3f733
 
 You are awesome, thank you!
 -- 
