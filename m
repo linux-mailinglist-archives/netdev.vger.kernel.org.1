@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-233505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A3A8C14890
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 13:09:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 446BDC148B4
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 13:11:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB8B8480622
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 12:04:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37094482DDC
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 12:07:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AAE930596F;
-	Tue, 28 Oct 2025 12:04:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 071AD328B7D;
+	Tue, 28 Oct 2025 12:07:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="t8YAuRVS"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gn8t0AYS"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64A68302178;
-	Tue, 28 Oct 2025 12:04:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A893328617;
+	Tue, 28 Oct 2025 12:07:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761653089; cv=none; b=TvBcF+0iLlaoyuLF46+c/b2UKjkwzLQTSIxfp5lm6/i0LanZSXZ5hnD/MPeTV9/JBCzc6ZaHO3nOlM0hgLFNEIp7ssQ+DpfQZVMhcFj5lnWaUe3EtaIA1uFV/ZoiQRApCpwN8gzTCOJBXc40R0p0/cTu2X0Hia04e0xmyjYlAWM=
+	t=1761653274; cv=none; b=a8puJqZuKpSkwSv1aZBlOq6gCUwdBJh8LmDMl1sm2C7sWu0N6HPmJwiHo6gGS/5Xe093JE+2ETOTju4aHVTqtjKfDXUEoN3ONW222suMkwXGVum87AFpz1gZU3eDut2Ucv9fZj4id1CupbnpmEbsQtTdwdnrNF2C2YKbJVbRRqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761653089; c=relaxed/simple;
-	bh=Hyvkq2EXoQ5wgFjIXtkqyhoA7AzY70qYK0/S/ucP78U=;
+	s=arc-20240116; t=1761653274; c=relaxed/simple;
+	bh=u1SunBnJBpR3XIC+GQFPqQVA2buWUe167n+DlUNaLiY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oIKuCvqbEMFYle1aulEmtuG6oPDmOIncHV92aNkSmoawwdN4eXS1u8Hjp/pGskqUMVnXTVg63cPEgGMOdyFBcQLxf5HNhH/PVg58ikuPKNiCmn9bNAxNTW11sEnboRTk6Q2x9agDBZSZHcp2xduLSah5G7BDeL7F7PCAYI/jb8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=t8YAuRVS; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=n6fGP3v7tC651/B3T3Le2nJsXqCcrJ2IpL/VbyVajZ0lN3jf4V0MBMTBEDwEX7Al+AXZdi4ou01+ZEZFpLwJ7Y+arXV1xmn1jxLmwwxxDmKVYucNTiKRew+kCN4otMLD576PeFFbAGqd/WrIXTns+IyFhxPqbxxrFU1g6W22qSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=gn8t0AYS; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,23 +36,23 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=DSY2Q74ssn6ovblRz78TrpaRvJmpAdTlQqQBuBEykFc=; b=t8YAuRVSS0ItPRShf3J5WoDyqa
-	rtz9PLZJKiJxOADsKuZRRrBAOqiWJdnZsDHneoACpagwT6S2pwNG96rNfAfRGeLmBZ2YVwnd3NCW9
-	5FRGXUr3yERNqGi6zuzJZ1P29fOJmsNYH0cNQQ95M7L3GuJ5aW/hMzWKem6cUIMrkDhs=;
+	bh=X5pj/Ju4W3WzXkRM3dEkWqpDn5kaHUpFK+0+QS6hL58=; b=gn8t0AYSHyyAmvUzFAEQMJxmsj
+	dOSwzv5Fuey/AAKEJmS6XptbjgxYc2wv5dQYw3C3riwGSOrqrA0vrOBdQsdjg22hybrVmZY6fHVYQ
+	ctzTFq5nZUQ+z2QiJNh/4y/TB46t9P+V0/MPN0fpJjpJjcCmoqpM9hFqbicTGBOW5g/U=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vDiRD-00CIAc-Ok; Tue, 28 Oct 2025 13:04:31 +0100
-Date: Tue, 28 Oct 2025 13:04:31 +0100
+	id 1vDiUB-00CIBi-03; Tue, 28 Oct 2025 13:07:35 +0100
+Date: Tue, 28 Oct 2025 13:07:34 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Horatiu Vultur <horatiu.vultur@microchip.com>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: phy:  micrel: lan8842 erratas
-Message-ID: <8b14b2b8-709e-4c83-8028-19ab2df1bac2@lunn.ch>
-References: <20251027124026.64232-1-horatiu.vultur@microchip.com>
- <4eefecbe-fa8f-41de-aeae-4d261cce5c1f@lunn.ch>
- <20251028073354.7r5pgrbrcqtqxcjt@DEN-DL-M31836.microchip.com>
+To: Yi Cong <cong.yi@linux.dev>
+Cc: Frank.Sae@motor-comm.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	hkallweit1@gmail.com, kuba@kernel.org, linux@armlinux.org.uk,
+	netdev@vger.kernel.org, stable@vger.kernel.org, yicong@kylinos.cn
+Subject: Re: [PATCH] net: phy: motorcomm: Fix the issue in the code regarding
+ the incorrect use of time units
+Message-ID: <2610bc26-44e6-48a3-87c6-acfa30f60dad@lunn.ch>
+References: <e1311746-9882-4063-84af-3939466096e9@lunn.ch>
+ <20251028062110.296530-1-cong.yi@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,22 +61,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251028073354.7r5pgrbrcqtqxcjt@DEN-DL-M31836.microchip.com>
+In-Reply-To: <20251028062110.296530-1-cong.yi@linux.dev>
 
-> > I notice there is no Fixes: tag. So you don't think these are worth
-> > back porting?
+> > >  #define YT8521_CCR_RXC_DLY_EN			BIT(8)
+> > > -#define YT8521_CCR_RXC_DLY_1_900_NS		1900
+> > > +#define YT8521_CCR_RXC_DLY_1_900_PS		1900
+> >
+> > This could be down to interpretation.
+> >
+> > #define YT8521_CCR_RXC_DLY_1.900_NS		1900
+> >
+> > would be technically correct, but not valid for cpp(1). So the . is
+> > replaced with a _ .
+> >
+> > #define YT8521_CCR_RXC_DLY_1900_PS		1900
+> >
+> > would also be correct, but that is not what you have in your patch,
+> > you leave the _ in place.
 > 
-> Definetly I would like to be ported but the issue was there from
-> beginning when the lan8842 was added, so I was not sure if it is OK to
-> send it to net.
+> Alright, I didn't realize that 1_950 represents 1.950;
+> I thought the underscores were used for code neatness,
+> making numbers like 900 and 1050 the same length, for example:
+> #define YT8521_RC1R_RGMII_0_900_PS
+> #define YT8521_RC1R_RGMII_1_050_PS
+> 
+> In that case, is my patch still necessary?
 
-https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
+I think it is unnecessary.
 
-says:
+If you want, you could add a comment which explains that the _ should
+be read as a .  However, this does appear elsewhere in Linux, it is
+one of those things you learn with time.
 
-It must either fix a real bug that bothers people or just add a device ID.
+    Andrew
 
-Does this bother people?
-
-	Andrew
+---
+pw-bot: cr
 
