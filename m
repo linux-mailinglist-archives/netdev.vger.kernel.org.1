@@ -1,111 +1,94 @@
-Return-Path: <netdev+bounces-233442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB91FC13532
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 08:37:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BF85C13577
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 08:42:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3482A4F01D8
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 07:35:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 463921883F73
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 07:42:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AC221F4E34;
-	Tue, 28 Oct 2025 07:35:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="wUYWTRfQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D18222D795;
+	Tue, 28 Oct 2025 07:42:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E58161EE033;
-	Tue, 28 Oct 2025 07:35:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+Received: from chinatelecom.cn (smtpnm6-08.21cn.com [182.42.159.130])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D153E23EAB8
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 07:42:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=182.42.159.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761636941; cv=none; b=irBWCp+fG0Fz1//SVd7W7nDqTzE02qLUdTYcQmjv940vAha4jbsIZY7fyUQLJjFfh3Hhbbsny7TI7iH9kQPh8tuLXqq2Oem4XiHBmfzSAlF6eOUKDO75AAQJ8BW0HODCQOqamDuyD3lfbLPsBvrkJtOJCMqIbmp2fmI29DYis3Y=
+	t=1761637327; cv=none; b=ocesoH4rOld4FjO6iheKuEH/D0C9i5Q14ojoTB1pEl5P8w9hHhhEtvlPlVub6QGSrHgKNwsJjVkJmfedQGNSqKUlaOgm1w8o3oqSOyjy5UIlGIzTkTh0y/OIukgCA2U1l0jSktrv9L+laPEhMi6pf3mVpSZv14N+fSFLV1l71ks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761636941; c=relaxed/simple;
-	bh=uLdIGu/opKZqTUfCVdvxeIGlRUtIfnhZ9CWDlHJaLCQ=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mRKCUxH/U5EzlGZeJYyqy6QjDVnp4SG/3hoskltCB9jLWjCrKClx5DYEp/YPia7/lhXMeUINmHCoF2UUad8LfcZ9qGY2sCPfRJrc7Zh02uCf0H/jd0C03xz007cpNTdEMfcflXfhXq25nA7VswEvxK8IEjVRS7XZXERGnVExY2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=wUYWTRfQ; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1761636939; x=1793172939;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=uLdIGu/opKZqTUfCVdvxeIGlRUtIfnhZ9CWDlHJaLCQ=;
-  b=wUYWTRfQzJbQSZ791aC9uzv3mOlwsvV3dKFVdwMAiXo3tM/9JjO9TUvc
-   LgpxzIaCoh3vP15drghtZrg+7DIAuTUoJm3arj1Gw3p7XJXLF8AQ17nmQ
-   LLR/r0ZYGKBN7JBvpGFtnkz6N+XLYTivSjQOiqXsWIc+5lC46xec3xoi0
-   W4p+CwQVcDvERvOI0Kwa1P0uOzFA6jPf1qCEByemF82SRrjqBZe6FG105
-   KarO82o9UiWhItfDKUX339tbyJdTBouDQLx6Ad0cuLR6YSzKyhoxks24J
-   aAgwyViU0LR1g3NFROY7Li8ebNasse/ASjYAOq4eLVCBfd8iAqCabrvK6
-   Q==;
-X-CSE-ConnectionGUID: 6tHLyAsXQCmJ696quaN52w==
-X-CSE-MsgGUID: wH4d5CSfSbi/v+QioxxwCQ==
-X-IronPort-AV: E=Sophos;i="6.19,260,1754982000"; 
-   d="scan'208";a="215693261"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 28 Oct 2025 00:35:33 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Tue, 28 Oct 2025 00:35:08 -0700
-Received: from localhost (10.10.85.11) by chn-vm-ex01.mchp-main.com
- (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
- Transport; Tue, 28 Oct 2025 00:35:08 -0700
-Date: Tue, 28 Oct 2025 08:33:54 +0100
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: phy:  micrel: lan8842 erratas
-Message-ID: <20251028073354.7r5pgrbrcqtqxcjt@DEN-DL-M31836.microchip.com>
-References: <20251027124026.64232-1-horatiu.vultur@microchip.com>
- <4eefecbe-fa8f-41de-aeae-4d261cce5c1f@lunn.ch>
+	s=arc-20240116; t=1761637327; c=relaxed/simple;
+	bh=606YGgEfIlHDfi6pSUV3ijYpXH8pd+wQknKkEyhPtXs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Lp2JX6Q2eG0WjsmRMHijYQ/xvN7EwWkyBhT/wIIm+edSErvEG01sLZM4aL5yVNpClm2GOHp8mUlQi9hSI9ZjIJrJt4tka+BX+EOxO3VbGVOVhHZYMCF5L17djZx/mWBLT/thaoa4LwDPfyt06kuLDEHWK4f0OLsHp5jEkajt2so=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chinatelecom.cn; spf=pass smtp.mailfrom=chinatelecom.cn; arc=none smtp.client-ip=182.42.159.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chinatelecom.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chinatelecom.cn
+HMM_SOURCE_IP:192.168.137.232:0.230931900
+HMM_ATTACHE_NUM:0000
+HMM_SOURCE_TYPE:SMTP
+Received: from clientip-27.148.194.68 (unknown [192.168.137.232])
+	by chinatelecom.cn (HERMES) with SMTP id B3B2D904FDDA;
+	Tue, 28 Oct 2025 15:34:51 +0800 (CST)
+X-189-SAVE-TO-SEND: liyonglong@chinatelecom.cn
+Received: from  ([27.148.194.68])
+	by gateway-ssl-dep-79cdd9d55b-2nzwx with ESMTP id 3256557da404483dac94efec0516385a for kuba@kernel.org;
+	Tue, 28 Oct 2025 15:34:53 CST
+X-Transaction-ID: 3256557da404483dac94efec0516385a
+X-Real-From: liyonglong@chinatelecom.cn
+X-Receive-IP: 27.148.194.68
+X-MEDUSA-Status: 0
+Sender: liyonglong@chinatelecom.cn
+Message-ID: <44342ead-92c9-4467-b5e6-86076684e2ee@chinatelecom.cn>
+Date: Tue, 28 Oct 2025 15:34:48 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-In-Reply-To: <4eefecbe-fa8f-41de-aeae-4d261cce5c1f@lunn.ch>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 1/2] net: ip: add drop reasons when handling ip
+ fragments
+To: kuba@kernel.org
+Cc: netdev@vger.kernel.org, edumazet@google.com, horms@kernel.org
+References: <1761532365-10202-1-git-send-email-liyonglong@chinatelecom.cn>
+ <1761532365-10202-2-git-send-email-liyonglong@chinatelecom.cn>
+Content-Language: en-US
+From: YonglongLi <liyonglong@chinatelecom.cn>
+In-Reply-To: <1761532365-10202-2-git-send-email-liyonglong@chinatelecom.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-The 10/27/2025 14:05, Andrew Lunn wrote:
-> 
-> On Mon, Oct 27, 2025 at 01:40:26PM +0100, Horatiu Vultur wrote:
-> > Add two erratas for lan8842. The errata document can be found here [1].
-> > This is fixing the module 2 ("Analog front-end not optimized for
-> > PHY-side shorted center taps") and module 7 ("1000BASE-T PMA EEE TX wake
-> > timer is non-compliant")
-> 
-> Hi Horatiu
+Hi Jakub,
 
-Hi Andrew,
+Thank you for your response. I'm sorry for the late reply.
+‌My email system seems to have some issues, and I loss  your reply msg.
+I get your response information from web page: https://lore.kernel.org/netdev.
 
-> 
-> Could this be split into two patches, since there are two erratas?
 
-Yes, I will split them in the next version
+> Personally IDK if this is sufficiently semantically significant
+> to warrant merging. FRAG_FAILED means "unidentified error during
+> fragmentation"? ip_frag_next() only returns -ENOMEM and
+> SKB_DROP_REASON_NOMEM already exists, so just use that.
 
-> 
-> I notice there is no Fixes: tag. So you don't think these are worth
-> back porting?
+Yes, I agree. use NOMEM instead of FRAG_FAILED.
 
-Definetly I would like to be ported but the issue was there from
-beginning when the lan8842 was added, so I was not sure if it is OK to
-send it to net.
 
-> 
->         Andrew
+> FRAG_OUTPUT_FAILED means something failed in output so it'd be more
+> meaningful to figure out what failed there, instead of adding
+> a bunch of ${CALLER}_OUTPUT_FAILED
+
+The skb send failed in output() is frag skb, The skb droped outside of output() is the
+origin skb. I think if we want to get detail drop reason we can use kfree_skb_reason
+in output() (maybe anther patch set in future).
+In my opinion, drop reason of the origin skb outside of output() can be not so meaningfull.
+
 
 -- 
-/Horatiu
+Li YongLong
+
 
