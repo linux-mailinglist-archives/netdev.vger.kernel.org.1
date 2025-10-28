@@ -1,95 +1,58 @@
-Return-Path: <netdev+bounces-233594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26EE1C160FF
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 18:10:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EDC7C161CF
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 18:21:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E3ADD4E3E1C
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 17:10:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1C324028A3
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 17:14:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5267348473;
-	Tue, 28 Oct 2025 17:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFC5C34888A;
+	Tue, 28 Oct 2025 17:14:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HeRHG5qE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uG5Yf5qv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f194.google.com (mail-pl1-f194.google.com [209.85.214.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 087E334678A
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 17:10:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 922CB333439;
+	Tue, 28 Oct 2025 17:14:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761671428; cv=none; b=KsYcxAj0XqWedB2v+MBG4vNfb6EwT/Zbq6DpqFJfmTUEoM4BnCabW0w9DR8/ZB2k+xlRJTfaaSW33X4A0pXVXN5lp3hcBSQyQA/IBsXZMzMrCLn++JeZ724Io8UblIMmvjUrV15wTmU46azC3F1QoZ9wCsXF+s87YCbUHD48xHY=
+	t=1761671649; cv=none; b=IFz/tFlu3IOigEYkpr849/JyCRGFn3XD6I6W/5DBCZc4i1gvHuItq8vyRZ36k3Hc8kvGSrT0zxbKTbIhosZ8ud9CBKun/DI5OuA2gt2APJN1ObxIRAnlgWOIoPMeb+Gs6gBkZHqZIbXmy9Ayis33S555yoGZyT0bpdSHVQBjskE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761671428; c=relaxed/simple;
-	bh=m3I9dtve6TdfQpeD/5c1k/FwNdSdObvUw7hMoEvNVYM=;
+	s=arc-20240116; t=1761671649; c=relaxed/simple;
+	bh=glmcZYpjKXnFwE6F/vjUEs+ItYDJ3pXzGYYKvXVsvv4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=In6y0fKyQV+k3dcQVPu8fd6fBMpBY3l26LRWndhcBjkyEM4vTYR4sCOafIcLjb0UDjyIFbHTsm0ekKo05Exq9UR3CrAztu5SOYwa5EJTeZeRBXvqRXmCs/ON0Lnyl4DDLo6XjczfEulQxzzO3VvkJMpgFyQDGiIBc6MKDOXsAZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HeRHG5qE; arc=none smtp.client-ip=209.85.214.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f194.google.com with SMTP id d9443c01a7336-290ac2ef203so59724425ad.1
-        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 10:10:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761671426; x=1762276226; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NkkeBtodNmN2EMa9qJLybudRjmngQqkOpn4I47bN1Os=;
-        b=HeRHG5qEN5uTjjY3ibkWq33IiamipujAhi60b9r1rM5RRPJZix2+MocaWLMsgNdzzn
-         rCRaFyrKnHeUaypQDn1k3K/dqscVruRVqMTp+igbGbC+db5aiAfFYeE0f5PSLqzGly0B
-         Ovbu07ITP9IM/2fwN+YgCr6l72LfCsLXcf98t50rQ2aT51I9i9QHnWZBcPUJfgmI0dRC
-         hcDVe7L3na0X+uTihwIrNh/OF7NNAdsSDaUs/thpRtSEuaO3pAwmuCxPhAYF4SvzmzBq
-         +g5mLWYTq+KRd+hIVppWWv9JlGPQ/3UNy/vJ92ZwMl4d1BKAHGUXeTSQGuqNK8db6i73
-         GIMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761671426; x=1762276226;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NkkeBtodNmN2EMa9qJLybudRjmngQqkOpn4I47bN1Os=;
-        b=Toxa0O1tOpwxnRxNYLtGnK+fhFVOVHSnNyzKf+2jYh8cbEOlUmHimsB1Rx/TgJZs18
-         3cithMKTI4rPf63Av3SmGss3focFslzgu8N0Ajc21JHR1Fb6qAMJXOqKm0w0aii5xdYG
-         fExkThAwHA2GGz8mRIDGXxNN8RMMuW+FIHtcwpmBHLfAoNx3ChnyYWo/Z+QtuxL9ohiH
-         2jVydk9UYhfywRLolYfRFGf3n20t7Rcx2TO6iWbpjG407iJlsPUziqusr9V0rgwnsfy4
-         9I8vwOv9uGYNDpyFs0sokc0o1oFbOmUJdbb2SvBvc4R41ChZLeR0TVssC1l2xDHQVs0/
-         TlOw==
-X-Forwarded-Encrypted: i=1; AJvYcCUSrLYZnmbb3yeZhzrkpF3/zULTSNbqo8bMFem+XJ10vhbhMYcSNRrfNSk7RCmcVAM5Bpevh6k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz9FcfRRvUpQsOSnl/2WFcrm3kCHfQYqbeQpxFY4BI/os/BqloR
-	ttlCfMmoRfP2qwDdw8X0B+TfA96abe64K4kRvq2V3nmXD3fdqaKPnKgR
-X-Gm-Gg: ASbGncvwn543RdQzhutZwLTXnyIiqVYA7YnjT2YgfkeNGMneQIEhMDTXcmhyRGaWWdF
-	in9r19q0WFcsXrdbiYOELvbKzJ1Dr9WXsS0krGgfpfJf7eJkAyjUri6dl4snZcsKWKxWqVk0bsS
-	2frcx3lj8AsWd2u5XJOrezwmu7Mr6xA7hxUm3ErVbiGigKlfQxsS+xvUDngTOofGZ1BqzNkDtVv
-	y5x3rOhzkwoaQ7vqMBIeie96fNH1sRcPklPKnEX74g0iT84/mZ7ZnNqcpXYW3CpGn8MW4TaHtMk
-	H4r3fNLB8HrE3wL9H7FmdrbFAdbzDcU+x20d8dYAFqUbNoQ7g3IsWdVa6/zy4kjpO/sNhyPRGds
-	0f/NONiia23UdapmE7IBhUV0gStM5QKApbAn3PE+Wt/r//hd7SEDKFCfTMOJaZ8i9KCGK9MNN3H
-	xtwflmT4otYnewVLdpQZI=
-X-Google-Smtp-Source: AGHT+IGQ8ffNexl4HmIkFUmg1fdyuZl4JbBMFVH6xuxPDuvHwL2uHadtShWy1RlMi1Xof4Eda3TnCw==
-X-Received: by 2002:a17:902:ec83:b0:27e:ec72:f67 with SMTP id d9443c01a7336-294cb391897mr51139475ad.6.1761671426009;
-        Tue, 28 Oct 2025 10:10:26 -0700 (PDT)
-Received: from fedora ([103.120.31.122])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29498cf3bbcsm121911965ad.15.2025.10.28.10.10.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Oct 2025 10:10:25 -0700 (PDT)
-Date: Tue, 28 Oct 2025 22:40:14 +0530
-From: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] selftest: net: fix socklen_t type mismatch in
- sctp_collision test
-Message-ID: <aQD49ukK0XMUHTUP@fedora>
-References: <20251026174649.276515-1-ankitkhushwaha.linux@gmail.com>
- <aQDyGhMehBxVL1Sy@horms.kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=btOOAsUUMOrT56IExL9GuE/Maete2Cox9WR9hD72kCgiWjiU86AKYm0+u/zPyejPUdF6EcC1X4IbjykfUUE/BGepzPSSqIKMdKQLIGuVOJsO82dbIbJTTHeGYTloarwlYA2c+NJ03S9fvYSHjNfgrAEmLYIXmgvEtxfC3JxWz1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uG5Yf5qv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D63E4C4CEE7;
+	Tue, 28 Oct 2025 17:14:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761671649;
+	bh=glmcZYpjKXnFwE6F/vjUEs+ItYDJ3pXzGYYKvXVsvv4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uG5Yf5qvkbJE0Ln5prAeloihXLy7XMs7e+JhhmNxASNUkE7GpZyQoZv7OucQwQOgT
+	 86yk/dh0WMorWCungcR6uuLp9M1YfKwpwTL4/A6vm/lgFq1aHmP7L36io0LefgS2YB
+	 f6oFsWDzmCAlTRxE15vGG6PcOH46rINEoz96VIDj2ncgqB4CBXyvCcLh+eej9UvnLE
+	 5mIzAPJVOGK9N7xi5n/kwBgw93M5Xsw5Lqi9i9UTaEyAXHeE9H7z0IED5cByltsyCW
+	 qsk3bARS3creEQiZHBhZHCXlA2uUowQQKGKVB1NcpD8z9bfMoAsqrWFSz7UwD/IvuJ
+	 ybrber+t4Vunw==
+Date: Tue, 28 Oct 2025 17:14:03 +0000
+From: Simon Horman <horms@kernel.org>
+To: Wang Liang <wangliang74@huawei.com>
+Cc: kuba@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, shuah@kernel.org,
+	acardace@redhat.com, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	yuehaibing@huawei.com, zhangchangzhong@huawei.com
+Subject: Re: [PATCH net] selftests: netdevsim: Fix ethtool-coalesce.sh fail
+ by installing ethtool-common.sh
+Message-ID: <aQD52zzmW1YDC1iH@horms.kernel.org>
+References: <20251027043007.1315917-1-wangliang74@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,25 +61,62 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aQDyGhMehBxVL1Sy@horms.kernel.org>
+In-Reply-To: <20251027043007.1315917-1-wangliang74@huawei.com>
 
-On Tue, Oct 28, 2025 at 04:40:58PM +0000, Simon Horman wrote:
-> Hi Ankit,
+On Mon, Oct 27, 2025 at 12:30:07PM +0800, Wang Liang wrote:
+> The script "ethtool-common.sh" is not installed in INSTALL_PATH, and
+> triggers some errors when I try to run the test
+> 'drivers/net/netdevsim/ethtool-coalesce.sh':
 > 
-> Please preserve reverse xmas tree order - longest line to shortest - for
-> local variable declarations in Networking code.
+>   TAP version 13
+>   1..1
+>   # timeout set to 600
+>   # selftests: drivers/net/netdevsim: ethtool-coalesce.sh
+>   # ./ethtool-coalesce.sh: line 4: ethtool-common.sh: No such file or directory
+>   # ./ethtool-coalesce.sh: line 25: make_netdev: command not found
+>   # ethtool: bad command line argument(s)
+>   # ./ethtool-coalesce.sh: line 124: check: command not found
+>   # ./ethtool-coalesce.sh: line 126: [: -eq: unary operator expected
+>   # FAILED /0 checks
+>   not ok 1 selftests: drivers/net/netdevsim: ethtool-coalesce.sh # exit=1
 > 
-> In this case, I think that would be as follows (completely untested).
+> Install this file to avoid this error. After this patch:
 > 
-> 	struct sockaddr_in saddr = {}, daddr = {};
-> 	socklen_t len = sizeof(daddr);
-> 	struct timeval tv = {25, 0};
-> 	char buf[] = "hello";
-> 	int sd, ret;
->
-Hi Simon,
-Thanks for your reply, i will send v2 patch with requested changes.
+>   TAP version 13
+>   1..1
+>   # timeout set to 600
+>   # selftests: drivers/net/netdevsim: ethtool-coalesce.sh
+>   # PASSED all 22 checks
+>   ok 1 selftests: drivers/net/netdevsim: ethtool-coalesce.sh
+> 
+> Fixes: fbb8531e58bd ("selftests: extract common functions in ethtool-common.sh")
+> Signed-off-by: Wang Liang <wangliang74@huawei.com>
+> ---
+>  tools/testing/selftests/drivers/net/netdevsim/Makefile | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+
+> diff --git a/tools/testing/selftests/drivers/net/netdevsim/Makefile b/tools/testing/selftests/drivers/net/netdevsim/Makefile
+> index daf51113c827..653141a654a0 100644
+> --- a/tools/testing/selftests/drivers/net/netdevsim/Makefile
+> +++ b/tools/testing/selftests/drivers/net/netdevsim/Makefile
+> @@ -20,4 +20,6 @@ TEST_PROGS := \
+>  	udp_tunnel_nic.sh \
+>  # end of TEST_PROGS
+>  
+> +TEST_FILES := ethtool-common.sh
+> +
+>  include ../../../lib.mk
+
+Hi Wang Liang,
+
+As per commit f07f91a36090 ("selftests: net: unify the Makefile formats")
+I think the desired format is as follows (completely untested!):
+
+TEST_FILES := \
+	ethtool-common.sh \
+# end of TEST_PROGS
 
 -- 
-Ankit
+pw-bot: changes-requested
 
