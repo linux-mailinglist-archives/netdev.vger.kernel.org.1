@@ -1,103 +1,111 @@
-Return-Path: <netdev+bounces-233441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7526DC13514
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 08:36:43 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB91FC13532
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 08:37:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D23541891707
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 07:32:53 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3482A4F01D8
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 07:35:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F4771DD0EF;
-	Tue, 28 Oct 2025 07:32:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AC221F4E34;
+	Tue, 28 Oct 2025 07:35:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="E1TDoIWG"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="wUYWTRfQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D440933EC
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 07:32:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E58161EE033;
+	Tue, 28 Oct 2025 07:35:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761636746; cv=none; b=Ziq7htwRsWuXW2Bcwcl55tLIEPIKGXDo9S4G8nyX/2aZxBlINh2lImrUa2ZVuYS0Y7Xa3KfvM7NMbTGBQAt0IuLhlSa6JJ00sXitCXDi1eWyv1CTyNCAtvStW84H9liVGjmc+7/7FBEiTyBBiETetqvqnCwkgqVTv4+BqM7F6ZY=
+	t=1761636941; cv=none; b=irBWCp+fG0Fz1//SVd7W7nDqTzE02qLUdTYcQmjv940vAha4jbsIZY7fyUQLJjFfh3Hhbbsny7TI7iH9kQPh8tuLXqq2Oem4XiHBmfzSAlF6eOUKDO75AAQJ8BW0HODCQOqamDuyD3lfbLPsBvrkJtOJCMqIbmp2fmI29DYis3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761636746; c=relaxed/simple;
-	bh=QgjanEDKdZW1E/ynJYUU7L7dgOBgDc3MfXfqKRoQCDo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HU0CBEjUrNV87O7TCWyF32ShSzs+dn+lNNrtBcEEn9tV6/2eLWIzuLkA/PXcPrx8eYPvBGbbkpW3AwSPS59+gKJp1ptDeCN1W0ig8bq+knPPfU9bDiJkkvoXcq/HIFsxr7Vbe2yK/3m2h+WPzz6y/tRRoiKTLl5OvnDmY8Eyd4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=E1TDoIWG; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 0DE211A16F4;
-	Tue, 28 Oct 2025 07:32:23 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id D636E606AB;
-	Tue, 28 Oct 2025 07:32:22 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E60B3102F251A;
-	Tue, 28 Oct 2025 08:32:04 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1761636742; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=Q/suucpwQP5ri710TiMw7ND697IjPa4KHiZZ9pnqduk=;
-	b=E1TDoIWGzE2+RVZDXJaei9238MNXcbAWWFfVjCxz3SBiqDHKNY++tGjRxCsHL+AvcuRA60
-	xw1WbkUtQ08J9stsrW0WD2ydJWmkKvjjiv8KqyRZO1W2tWyLXOEM3g/OpywbIc9G271OCg
-	n7qt1vixSTlKsAdLruiH9QXlLa2BROmMfiL094WgSwIrEiM8QTdz4y0oF17LupOxz/nJxo
-	FFaCl6KYxxci8cPuwyHO6Imr2CkY88kkKGUibekDRtosOKu9gX8OtZ28obfHjKP0hEnwTA
-	U8BX+hKWREqLV9tvS79sJa9sIYn9UNqbVwCyZVu3yfWRygbMtxCIPexsPmulFA==
-Message-ID: <c06dc4a6-85b4-41e9-9060-06303f7bbdbc@bootlin.com>
-Date: Tue, 28 Oct 2025 08:32:03 +0100
+	s=arc-20240116; t=1761636941; c=relaxed/simple;
+	bh=uLdIGu/opKZqTUfCVdvxeIGlRUtIfnhZ9CWDlHJaLCQ=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mRKCUxH/U5EzlGZeJYyqy6QjDVnp4SG/3hoskltCB9jLWjCrKClx5DYEp/YPia7/lhXMeUINmHCoF2UUad8LfcZ9qGY2sCPfRJrc7Zh02uCf0H/jd0C03xz007cpNTdEMfcflXfhXq25nA7VswEvxK8IEjVRS7XZXERGnVExY2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=wUYWTRfQ; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1761636939; x=1793172939;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=uLdIGu/opKZqTUfCVdvxeIGlRUtIfnhZ9CWDlHJaLCQ=;
+  b=wUYWTRfQzJbQSZ791aC9uzv3mOlwsvV3dKFVdwMAiXo3tM/9JjO9TUvc
+   LgpxzIaCoh3vP15drghtZrg+7DIAuTUoJm3arj1Gw3p7XJXLF8AQ17nmQ
+   LLR/r0ZYGKBN7JBvpGFtnkz6N+XLYTivSjQOiqXsWIc+5lC46xec3xoi0
+   W4p+CwQVcDvERvOI0Kwa1P0uOzFA6jPf1qCEByemF82SRrjqBZe6FG105
+   KarO82o9UiWhItfDKUX339tbyJdTBouDQLx6Ad0cuLR6YSzKyhoxks24J
+   aAgwyViU0LR1g3NFROY7Li8ebNasse/ASjYAOq4eLVCBfd8iAqCabrvK6
+   Q==;
+X-CSE-ConnectionGUID: 6tHLyAsXQCmJ696quaN52w==
+X-CSE-MsgGUID: wH4d5CSfSbi/v+QioxxwCQ==
+X-IronPort-AV: E=Sophos;i="6.19,260,1754982000"; 
+   d="scan'208";a="215693261"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 28 Oct 2025 00:35:33 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Tue, 28 Oct 2025 00:35:08 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex01.mchp-main.com
+ (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
+ Transport; Tue, 28 Oct 2025 00:35:08 -0700
+Date: Tue, 28 Oct 2025 08:33:54 +0100
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: <hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: phy:  micrel: lan8842 erratas
+Message-ID: <20251028073354.7r5pgrbrcqtqxcjt@DEN-DL-M31836.microchip.com>
+References: <20251027124026.64232-1-horatiu.vultur@microchip.com>
+ <4eefecbe-fa8f-41de-aeae-4d261cce5c1f@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH 3/8] net: phy: Add 25G-CR, 50G-CR, 100G-CR2
- support to C45 genphy
-To: Alexander Duyck <alexander.duyck@gmail.com>, netdev@vger.kernel.org
-Cc: kuba@kernel.org, kernel-team@meta.com, andrew+netdev@lunn.ch,
- hkallweit1@gmail.com, linux@armlinux.org.uk, pabeni@redhat.com,
- davem@davemloft.net
-References: <176133835222.2245037.11430728108477849570.stgit@ahduyck-xeon-server.home.arpa>
- <176133845391.2245037.2378678349333571121.stgit@ahduyck-xeon-server.home.arpa>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <176133845391.2245037.2378678349333571121.stgit@ahduyck-xeon-server.home.arpa>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <4eefecbe-fa8f-41de-aeae-4d261cce5c1f@lunn.ch>
 
-Hi Alexander,
-
-On 24/10/2025 22:40, Alexander Duyck wrote:
-> From: Alexander Duyck <alexanderduyck@fb.com>
+The 10/27/2025 14:05, Andrew Lunn wrote:
 > 
-> Add support for 25G-CR, 50G-CR, 50G-CR2, and 100G-CR2 the c45 genphy. Note
-> that 3 of the 4 are IEEE compliant so they are a direct copy from the
-> clause 45 specification, the only exception to this is 50G-CR2 which is
-> part of the Ethernet Consortium specification which never referenced how to
-> handle this in the MDIO registers.
+> On Mon, Oct 27, 2025 at 01:40:26PM +0100, Horatiu Vultur wrote:
+> > Add two erratas for lan8842. The errata document can be found here [1].
+> > This is fixing the module 2 ("Analog front-end not optimized for
+> > PHY-side shorted center taps") and module 7 ("1000BASE-T PMA EEE TX wake
+> > timer is non-compliant")
 > 
-> Since 50GBase-CR2 isn't an IEEE standard it doesn't have a value in the
-> extended capabilities registers. To account for that I am adding a define
-> that is aliasing the 100GBase-CR4 to represent it as that is the media type
-> used to carry data for 50R2, it is just that the PHY is carrying two 2 with
-> 2 lanes each over the 4 lane cable. For now I am representing it with ctrl1
-> set to 50G and ctrl2 being set to 100R4, and using the 100R4 capability to
-> identify if it is supported or not.I
+> Hi Horatiu
 
-If 50GBase-CR2 isn't part of IEEE standards and doesn't appear in the
-C45 ext caps, does it really belong in a genphy helper ?
+Hi Andrew,
 
-You should be able to support it through the .config_anef() callback in
-the PHY driver. I'm absolutely not familiar with these high-speed interfaces,
-so maybe this is very common...
+> 
+> Could this be split into two patches, since there are two erratas?
 
-Maxime
+Yes, I will split them in the next version
 
+> 
+> I notice there is no Fixes: tag. So you don't think these are worth
+> back porting?
+
+Definetly I would like to be ported but the issue was there from
+beginning when the lan8842 was added, so I was not sure if it is OK to
+send it to net.
+
+> 
+>         Andrew
+
+-- 
+/Horatiu
 
