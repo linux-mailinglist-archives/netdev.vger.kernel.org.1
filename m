@@ -1,123 +1,231 @@
-Return-Path: <netdev+bounces-233583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C65B8C15E22
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 17:42:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 22071C15E43
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 17:43:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 316573AF090
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 16:32:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 109C1420FF5
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 16:35:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD35B2874ED;
-	Tue, 28 Oct 2025 16:32:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A39882F616B;
+	Tue, 28 Oct 2025 16:35:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B5/hDdTC"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="AFx+lTO/";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="0OCrF9SP";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="AFx+lTO/";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="0OCrF9SP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8409F26CE36;
-	Tue, 28 Oct 2025 16:32:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B9AC2192E4
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 16:35:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761669151; cv=none; b=qVDsGhTP0L5GYSVDKPTrlU0uc8tAIen43b9cS7FTGGrMJHG9AkNFHDcftU+0xP205b8yipuQMcd7SXoy6bnTKp0KOzVd6LWAUm0NCVzcXgDKWGaToWs2u+8LGTdh3P8m3OykcHWkfW3lhm+n2bgG4FxWMK6D+DSrzpX/GhHk9GQ=
+	t=1761669303; cv=none; b=AoHaRwYF4lqrKB76iHgvBSo4yEsSATCQ+9WLVi+/0+jVjPe1nNxoHU2tAOaQjsxxdxwEsdTEYsqCuZy43xRCDkgLarB9W14bhFWE/nqZ/OrlCU9c4ranNb1cXGKHH2CBW5VcrYjXkO/UCy8qyUCdzEV6PxbtoiMQ7dDIcVWxwI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761669151; c=relaxed/simple;
-	bh=JdNgZ8T1nHVUE8GPyM0NLn6jOeFU81bhy/i+g3NI+Iw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P9bHI2xF3V5mThn8wBgszjyC6siAQvtCJVJBAdVveSYIDvICWxdpDNWvoaQQ7794G2ePkojyGkLu6PP9b8wWn+S5Ins0w1s7zuMvDEwo8586kUfvtMYz+ojfl0vmVoASH0BfHYTvQ3Pv2dcAzwoEWtx4XnMq0OKeYXx0ZIgd73Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B5/hDdTC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2438EC4CEE7;
-	Tue, 28 Oct 2025 16:32:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761669151;
-	bh=JdNgZ8T1nHVUE8GPyM0NLn6jOeFU81bhy/i+g3NI+Iw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=B5/hDdTCd8eh28z64MNb7J7i+gD6fyQgRoCm07cmOvUKD2bw3LfNNtHz0egPa06j4
-	 qa+y8sTGpB+XeV94EVtENhOC6WtgJUXusS+ZZcNf7GLPU0UewxE3sU2CCI7hTwiSq0
-	 jH/SxsTe/3l0WLhlSTn1WTxdtsiNOKRRtK7mdrfALRMfbCwW/3Csc4irgk0w7IjSa/
-	 0/BvomNJgTbHVBCDyb/SP15KN8Tk/jJkUatGIoa5Wjt0KaetJQFRJniaV104c8o/gJ
-	 91laSL/RBaJhKKuZR7mm9+LFIDUhNnAqqAgeTwdmnD25rfUzkdMTWydU4OflYW3uI5
-	 UKhKYzqaWSFDg==
-Date: Tue, 28 Oct 2025 16:32:26 +0000
-From: Simon Horman <horms@kernel.org>
-To: Rakuram Eswaran <rakuram.e96@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, hswong3i@gmail.com,
-	hlhung3i@gmail.com, khalid@kernel.org, skhan@linuxfoundation.org,
-	david.hunter.linux@gmail.com,
-	linux-kernel-mentees@lists.linuxfoundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: tcp_lp: fix kernel-doc warnings and update outdated
- reference links
-Message-ID: <aQDwGpQttEEsj9ik@horms.kernel.org>
-References: <20251025-net_ipv4_tcp_lp_c-v1-1-058cc221499e@gmail.com>
+	s=arc-20240116; t=1761669303; c=relaxed/simple;
+	bh=ehZTqzLesFvK0zNxNOB5Kro9fA0DfjJGFU5qk0PqFvY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=c+apfveUvi+SLtKcEIttBc9idLyTRSgSgvENtqPUJDUgUZJ8ldrVpTBvjnWfgm4uSoQL0moyDIRfnSZuOlB02rT8hP2DIbGk8ICIRNTP6hxZ+/lwla6e/6hKEnEXmaFDXmFXdL0sbQCl1gBg00GyfVNKycc8Hj1PX0/TOkjIfh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=AFx+lTO/; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=0OCrF9SP; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=AFx+lTO/; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=0OCrF9SP; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id C0BB3218DF;
+	Tue, 28 Oct 2025 16:34:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1761669299; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=phyOXUwhpPX8VIgv4J33dCN3/ofby5jscWO6ji9fPD4=;
+	b=AFx+lTO/IUHNrg3exXUr8cWEVK1pW+00GEyZYgNubbQDVBMViMr5bI3JkfVRWC62YvAoTw
+	5NF6ekZgg2nY9PDdT+dKc9ii/bvOqgxvaeW2L/EY1PhH7fotZxfMrvodEBG7uL+qL6CzYv
+	uJsgnDaprGFZ9Z6WOO1Lp/2jpzI5Yao=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1761669299;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=phyOXUwhpPX8VIgv4J33dCN3/ofby5jscWO6ji9fPD4=;
+	b=0OCrF9SPjgMnAlrDvip9JHtYAXepPyIMRDfWLatFrQq75HbZUI8wFvBR6j3uIo7Zl89oAW
+	J+r+HHHwMluaKnCA==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="AFx+lTO/";
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=0OCrF9SP
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1761669299; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=phyOXUwhpPX8VIgv4J33dCN3/ofby5jscWO6ji9fPD4=;
+	b=AFx+lTO/IUHNrg3exXUr8cWEVK1pW+00GEyZYgNubbQDVBMViMr5bI3JkfVRWC62YvAoTw
+	5NF6ekZgg2nY9PDdT+dKc9ii/bvOqgxvaeW2L/EY1PhH7fotZxfMrvodEBG7uL+qL6CzYv
+	uJsgnDaprGFZ9Z6WOO1Lp/2jpzI5Yao=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1761669299;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=phyOXUwhpPX8VIgv4J33dCN3/ofby5jscWO6ji9fPD4=;
+	b=0OCrF9SPjgMnAlrDvip9JHtYAXepPyIMRDfWLatFrQq75HbZUI8wFvBR6j3uIo7Zl89oAW
+	J+r+HHHwMluaKnCA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 54EC713693;
+	Tue, 28 Oct 2025 16:34:59 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id TmCpEbPwAGncHQAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Tue, 28 Oct 2025 16:34:59 +0000
+Message-ID: <c02c0369-ece0-4437-aa56-e8e36d945a23@suse.de>
+Date: Tue, 28 Oct 2025 17:34:46 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251025-net_ipv4_tcp_lp_c-v1-1-058cc221499e@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2 bpf] xsk: avoid data corruption on cq descriptor
+ number
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org, magnus.karlsson@intel.com,
+ maciej.fijalkowski@intel.com, sdf@fomichev.me, kerneljasonxing@gmail.com,
+ fw@strlen.de
+References: <20251028160200.4204-1-fmancera@suse.de>
+ <20251028160200.4204-2-fmancera@suse.de>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <20251028160200.4204-2-fmancera@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: C0BB3218DF
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-4.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:mid,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	ARC_NA(0.00)[];
+	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_TLS_ALL(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,fomichev.me,gmail.com,strlen.de];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	TO_DN_NONE(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DKIM_TRACE(0.00)[suse.de:+]
+X-Spam-Score: -4.51
 
-On Sat, Oct 25, 2025 at 05:35:18PM +0530, Rakuram Eswaran wrote:
-> Fix kernel-doc warnings in tcp_lp.c by adding missing parameter
-> descriptions for tcp_lp_cong_avoid() and tcp_lp_pkts_acked() when
-> building with W=1.
-> 
-> Also replace invalid URLs in the file header comment with the currently
-> valid links to the TCP-LP paper and implementation page.
-> 
-> No functional changes.
-> 
-> Signed-off-by: Rakuram Eswaran <rakuram.e96@gmail.com>
-> ---
-> Below W=1 build warnings:
-> net/ipv4/tcp_lp.c:121 function parameter 'ack' not described in 'tcp_lp_cong_avoid'
-> net/ipv4/tcp_lp.c:121 function parameter 'acked' not described in 'tcp_lp_cong_avoid'
-> net/ipv4/tcp_lp.c:271 function parameter 'sample' not described in 'tcp_lp_pkts_acked'
-> 
-> The new URLs were verified through archive.org to confirm they match
-> the content of the original references.
-> ---
->  net/ipv4/tcp_lp.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/ipv4/tcp_lp.c b/net/ipv4/tcp_lp.c
-> index 52fe17167460fc433ec84434795f7cbef8144767..976b56644a8a746946e5028dcb054e4c3e249680 100644
-> --- a/net/ipv4/tcp_lp.c
-> +++ b/net/ipv4/tcp_lp.c
-> @@ -23,9 +23,9 @@
->   * Original Author:
->   *   Aleksandar Kuzmanovic <akuzma@northwestern.edu>
->   * Available from:
-> - *   http://www.ece.rice.edu/~akuzma/Doc/akuzma/TCP-LP.pdf
-> + *   https://users.cs.northwestern.edu/~akuzma/doc/TCP-LP-ToN.pdf
 
-It's not important, but FTR, I notice that these
-seem to be different versions of the same paper.
 
->   * Original implementation for 2.4.19:
-> - *   http://www-ece.rice.edu/networks/TCP-LP/
-> + *   https://users.cs.northwestern.edu/~akuzma/rice/TCP-LP/linux/tcp-lp-linux.htm
+On 10/28/25 5:02 PM, Fernando Fernandez Mancera wrote:
+> Since commit 30f241fcf52a ("xsk: Fix immature cq descriptor
+> production"), the descriptor number is stored in skb control block and
+> xsk_cq_submit_addr_locked() relies on it to put the umem addrs onto
+> pool's completion queue.
+>[...]
+>   
+>   	len = desc->len;
+> @@ -804,6 +823,11 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+>   			if (unlikely(err))
+>   				goto free_err;
+>   
+> +			if (!skb_ext_add(skb, SKB_EXT_XDP)) {
+> +				err = -ENOMEM;
+> +				goto free_err;
+> +			}
+> +
 
-It's probably not important, but I think the following would
-be a better drop-in replacement. That said, perhaps your choice
-is a better one for the purposes of the comment above.
+This is a leftover. Without it, the logic simplified and indeed the 
+performance for non-fragmented traffic is not affected at all.
 
-   https://users.cs.northwestern.edu/~akuzma/rice/TCP-LP/
+While reviewing this, consider this line is dropped. I will send a V2 in 
+24 hours anyway as this is indeed introducing a buggy behavior.
 
-That notwithstanding, this looks good to me.
+>   			xsk_skb_init_misc(skb, xs, desc->addr);
+>   			if (desc->options & XDP_TX_METADATA) {
+>   				err = xsk_skb_metadata(skb, buffer, desc,
+> @@ -814,6 +838,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+>   		} else {
+>   			int nr_frags = skb_shinfo(skb)->nr_frags;
+>   			struct xsk_addr_node *xsk_addr;
+> +			struct xdp_skb_ext *ext;
+>   			struct page *page;
+>   			u8 *vaddr;
+>   
+> @@ -828,6 +853,22 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+>   				goto free_err;
+>   			}
+>   
+> +			ext = skb_ext_find(skb, SKB_EXT_XDP);
+> +			if (!ext) {
+> +				ext = skb_ext_add(skb, SKB_EXT_XDP);
+> +				if (!ext) {
+> +					__free_page(page);
+> +					err = -ENOMEM;
+> +					goto free_err;
+> +				}
+> +				memset(ext, 0, sizeof(*ext));
+> +				INIT_LIST_HEAD(&ext->addrs_list);
+> +				ext->num_descs = 1;
+> +			} else if (ext->num_descs == 0) {
+> +				INIT_LIST_HEAD(&ext->addrs_list);
+> +				ext->num_descs = 1;
+> +			}
+> +
+>   			xsk_addr = kmem_cache_zalloc(xsk_tx_generic_cache, GFP_KERNEL);
+>   			if (!xsk_addr) {
+>   				__free_page(page);
+> @@ -843,12 +884,11 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+>   			refcount_add(PAGE_SIZE, &xs->sk.sk_wmem_alloc);
+>   
+>   			xsk_addr->addr = desc->addr;
+> -			list_add_tail(&xsk_addr->addr_node, &XSKCB(skb)->addrs_list);
+> +			list_add_tail(&xsk_addr->addr_node, &ext->addrs_list);
+> +			xsk_inc_num_desc(skb);
+>   		}
+>   	}
+>   
+> -	xsk_inc_num_desc(skb);
+> -
+>   	return skb;
+>   
+>   free_err:
+> @@ -857,7 +897,6 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+>   
+>   	if (err == -EOVERFLOW) {
+>   		/* Drop the packet */
+> -		xsk_inc_num_desc(xs->skb);
+>   		xsk_drop_skb(xs->skb);
+>   		xskq_cons_release(xs->tx);
+>   	} else {
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-
-...
 
