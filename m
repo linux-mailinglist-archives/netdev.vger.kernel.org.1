@@ -1,123 +1,78 @@
-Return-Path: <netdev+bounces-233694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38C08C176F8
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 00:58:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85581C176FE
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 00:58:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E96641A246C7
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 23:58:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2EE13B6683
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 23:58:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39F333064A2;
-	Tue, 28 Oct 2025 23:57:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F63530BBBF;
+	Tue, 28 Oct 2025 23:58:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="DtBgppHx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mDW7RrOK"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64C022206BB
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 23:57:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F8A307AC6;
+	Tue, 28 Oct 2025 23:57:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761695871; cv=none; b=nYo/1w9ba0Ve3Yq9mtpoRBnkyfhLb/HqwH8Dhhx8lxWV+ABmSGFR8X1HOShASpZOmBvlxk941tloQsaxt2b8wqrpAUKFJgqi1YscqkCxy2tVIAueozoi+Y3Ujq1svp1D1bCb/M/sE6lPfNX3LW4+x1nSXSHw0GpjZRsHOSFV8RA=
+	t=1761695880; cv=none; b=qhh4zJesi4PhqqgfI4vd+84ApNKIuVjT6JDG18vEgLBG+Q3KLRvNABjyS/1l8m1XgSWp1t6q2RTyAGHm8jYpm7czaF+YxUUbbmcw+MU/1AqPSt6E4VplJxaqbEL0Uc+d8HmfRGmByz3T0tmyzSMV3boYwvd3ml4YeXSwxd3/aeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761695871; c=relaxed/simple;
-	bh=4kMhXIfA7aPxZm8cEf7NrodCPPDBCJKsDOsaoKin8Dk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UPCTqbOKMQhViqjMHMaxGIbFtekX7n5CZvpYo5SbbQWvKAX5qmHu24h8jSUVCC5cYWOVDqo2kh/cf6rJElK7kdmbrAz7Ctl62R8jKehiUsmo4RqpeihvS+XKLsThAPKFBJwiIbbQWXz/BcswWm61n9n4dTBJqHhmBIygx3r2zW4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=DtBgppHx; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=+ScJmt+/0Os57nukiGynVFNomd71ekgTNx8UM6wvsiM=; b=DtBgppHxDmU/Kd/3Ruec8pBeu9
-	6L3U554pxuSnq3NejqoXqHrRGkn4CGgFOyXlGnlK2d3m8IhamY8ccmOa/Weu3O3yKOFJHEUx+1Y/4
-	LmIEwOegwyaAUS7t2ONwQ8gbkOo4Ol4aZP4uDJtf31ZGScnCN104FG6jGbZIRqX9wvCqtkXNQB0Dh
-	t1SBNH/GoA5fPpPFsDtqTHqtyMZyEMZ/vZ39fryyZhzCP0a78gVpIMzPiDGBO+oMyndDGoWGg7V/d
-	Om1WFXacBpBrjt0/M+XKNHB0TWaxBLR6z7exMpMC/BriAozJJzMvxfpNrI3fPxfRtYBLekG4RtUxP
-	hqt671pg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56542)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vDtZP-000000003fK-1CVt;
-	Tue, 28 Oct 2025 23:57:43 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vDtZN-000000006xv-1h3p;
-	Tue, 28 Oct 2025 23:57:41 +0000
-Date: Tue, 28 Oct 2025 23:57:41 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH net-next 0/8] net: stmmac: hwif.c cleanups
-Message-ID: <aQFYdRZV9CQVuqFu@shell.armlinux.org.uk>
-References: <aPt1l6ocBCg4YlyS@shell.armlinux.org.uk>
- <20251028164257.067bdbcd@kernel.org>
+	s=arc-20240116; t=1761695880; c=relaxed/simple;
+	bh=nE2NJLHROko0alBLv6YqPW8LGiyGs8HTmlyMDEfRYQY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jYWUIaDDtX9TFSTnWgcWzRxzoupXYKL5DkrRVpkf6tNbWUce+RZJCAbU+HWIS0P+znQ+RGJOBCIZmXTdS7DaU6oiGd2Jz1UnZAQhCnFcs9j+ORzV/pFuMjqGIJzawJNB7F9q9oQPZZMOMTuBvMhqnoaVC1Y6OMemKVB/mEGeyb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mDW7RrOK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3F5EC4CEE7;
+	Tue, 28 Oct 2025 23:57:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761695879;
+	bh=nE2NJLHROko0alBLv6YqPW8LGiyGs8HTmlyMDEfRYQY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mDW7RrOK14KV7C8wTB6IM7YI+HpyyZfXI/4MAxBxYE3Ob8/DJIROhoKgMUKYNCxi3
+	 T894OHpazzq4S4RJ4UaZmq7birG9ugP38wZisuROFJz244EtQxBkajTkvhnyhV799Z
+	 z77ED/I7miSX3X3O1ly+ucwp+K3X+/PwXfbjGY1DtjKE79tbXZHSJlbkUhA5iJa2td
+	 RhD9dW6H8g+Msu596yozb80eoq83yInfwyQO7pCZN5OY6mpy9ljcSmtwJMmqMbe93I
+	 YYXbMoHdBCnxghg6JKTu7qOCJ+0E2Bw0GdWzzLse3B3cMa7k5qj127ay2MPN0gWZf8
+	 vkDyJXJt0hGYw==
+Date: Tue, 28 Oct 2025 16:57:57 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
+ Frank.Li@nxp.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, richardcochran@gmail.com,
+ imx@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org
+Subject: Re: [PATCH v3 net-next 0/6] net: enetc: Add i.MX94 ENETC support
+Message-ID: <20251028165757.3b7c2f96@kernel.org>
+In-Reply-To: <20251027014503.176237-1-wei.fang@nxp.com>
+References: <20251027014503.176237-1-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251028164257.067bdbcd@kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 28, 2025 at 04:42:57PM -0700, Jakub Kicinski wrote:
-> On Fri, 24 Oct 2025 13:48:23 +0100 Russell King (Oracle) wrote:
-> > This series cleans up hwif.c:
-> > 
-> > - move the reading of the version information out of stmmac_hwif_init()
-> >   into its own function, stmmac_get_version(), storing the result in a
-> >   new struct.
-> > 
-> > - simplify stmmac_get_version().
-> > 
-> > - read the version register once, passing it to stmmac_get_id() and
-> >   stmmac_get_dev_id().
-> > 
-> > - move stmmac_get_id() and stmmac_get_dev_id() into
-> >   stmmac_get_version()
-> > 
-> > - define version register fields and use FIELD_GET() to decode
-> > 
-> > - start tackling the big loop in stmmac_hwif_init() - provide a
-> >   function, stmmac_hwif_find(), which looks up the hwif entry, thus
-> >   making a much smaller loop, which improves readability of this code.
-> > 
-> > - change the use of '^' to '!=' when comparing the dev_id, which is
-> >   what is really meant here.
-> > 
-> > - reorganise the test after calling stmmac_hwif_init() so that we
-> >   handle the error case in the indented code, and the success case
-> >   with no indent, which is the classical arrangement.
-> 
-> This one needs a respin (patch 6 vs your IRQ masking changes?).
+On Mon, 27 Oct 2025 09:44:57 +0800 Wei Fang wrote:
+> i.MX94 NETC has two kinds of ENETCs, one is the same as i.MX95, which
+> can be used as a standalone network port. The other one is an internal
+> ENETC, it connects to the CPU port of NETC switch through the pseudo
+> MAC. Also, i.MX94 have multiple PTP Timers, which is different from
+> i.MX95. Any PTP Timer can be bound to a specified standalone ENETC by
+> the IERB ETBCR registers. Currently, this patch only add ENETC support
+> and Timer support for i.MX94. The switch will be added by a separate
+> patch set.
 
-Ah, I see it, rebase can cope with that, but not application. Bah.
-Another week of waiting for it to be applied. :(
-
-I'm going to start sending larger patch series...
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Is there a reason to add the imx94 code after imx95?
+If in doubt order things alphabetically.
 
