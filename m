@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-233409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233410-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEA30C12C7F
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 04:40:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74AF2C12C6A
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 04:39:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 876275E161E
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 03:39:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5380A1AA6CEF
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 03:39:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A24F9284889;
-	Tue, 28 Oct 2025 03:38:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C9692848AF;
+	Tue, 28 Oct 2025 03:38:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Bb2ykBdE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AfiBR3Wb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1255A27B33B
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 03:38:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AA9F27E7F0
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 03:38:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761622717; cv=none; b=tHikevcvlNEf7wxEhHzE8tfhE2ye1CGfnpWGIfMzAnXBAjvFEVOQCUlWAxO8R8qiAgF3TMhaa45cZK7Fsjdx6IKVMA1fYtRkxkG7SCFPjyubT9IUqOnHToAo+A57moWv65oyQBucefwUYNOp93o5exNbJjFCZWtAtM0BEIqCNvQ=
+	t=1761622719; cv=none; b=pYtgMxQmwmGF/fxkYmZcb8Vs//S1qsy0sgv6QOo2FeEHjmOT8Rfr/g589GqiF9za9jDieX10PJP4IjeHqNKD1WvbtP/12ostgjt+1Hrx/EA/MfoQFTqg+VrFZWb+0tU6Xg7Kx0PjFrz1o/wcOOxDDtHoZGGSnPRUnqpNxYTF/mM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761622717; c=relaxed/simple;
-	bh=LQTJoWhkA7p8Kn+nPWkc5JQgf04FIGOfWB1kBmhoRuY=;
+	s=arc-20240116; t=1761622719; c=relaxed/simple;
+	bh=Ciy85sL/Ok8WRgT++rHLwRqkbPGQQI9Af6kG6VtjlpM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=LBWTMwat8F4Vi8hIULdhAS68RL71FlXf40JJ5NF3+pzO9Emjxq61+A3iA4Rz8eupqMl1G5zwQ2qyWI693tTLjNpPUM9Sq1MjlFLvjiw74s+iyZMLlTY3+wDhY+lRqS0wQMcF+l4PVhzJHEMaqNdFBGIGbFdf5Ms4js/a1ERJgmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Bb2ykBdE; arc=none smtp.client-ip=209.85.210.202
+	 To:Cc:Content-Type; b=Drh9aRnUSNereXnG14Lj+cqwSul4L17VIBo4W0K0skV2ZQzOk1okFyELXUBh20RHXOlrODde1/5lMusaQbgDxiRm9nsXQNeGhyIK/1OfT0Qr7R7usHvf4GGrQHznB3/5iZXHGBrkdH9ArkaRpQ/7TiAuDgPjYasufEOT/aC45DY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AfiBR3Wb; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-77f610f7325so4073646b3a.1
-        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 20:38:35 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b62ebb4e7c7so4186304a12.3
+        for <netdev@vger.kernel.org>; Mon, 27 Oct 2025 20:38:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761622715; x=1762227515; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1761622717; x=1762227517; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bmcDw6wJ9Aln5Uwrd+WG7F46T4aErd25tY/Ukh4C7Oc=;
-        b=Bb2ykBdE6+Gz+6/guWSMmtJt1QrtUh0LbrpR//ccs41cjM6KFecgooYUPWw0mbWs3Z
-         AGx8MPSnaC3D3A/7H2q/KVV3MqYFTPWKej39bqCmJwl+4+gRSCkY4K7OVaylICKd2Tea
-         PbzQyQesq3cbhiY3yfrVU5/HYrSPpS+BklAmKFMbVc9C/4I/eQ4MOkagFsjg6GMS/G6M
-         NQ6jH+Lj5CLjubV4tC1xH3t4w1rlDSq+Eo7RjEQSkNeNnI+JhrfTe5BwBc/nUcyDNZOC
-         RcbAzNlvYIA17c51BDA0vtwKty2zk9PCczRFLTVNkjjD0E3Ko2o8BpqLVvilo6hAIjOm
-         sZYQ==
+        bh=KAS+ToV0wmB6/IwwMCqaHREdhZGb/0nnGDLX49eqJ2A=;
+        b=AfiBR3WbMlZGcsspUUQUEMEsuPFZh1SfdN2c11A4ltAi5SVQck0TWM3kdzTgFy3mwN
+         feMcbtWHdkFerHnMLZbCBkBjrtLgwv/3l2DZYzrrzO1Qha3U++4ejmEqFj3PnU2GsuMz
+         0O7RjfIxXmgqz1phozYh1H4ii81ptsneof0S42NvEiS/RJRFfvtuCBc+kNXAcdNRXW1F
+         l1FMYqjlLWBOMJXkY609QnLnJRmp9oETST0+XkRe694w4s0yMlnuOqcmAJmimtr1FpCk
+         zvPN1RbxNSHiQXGkhkU3jhGXrFBi/Si8s5HSsZGWEpasvbv1414+ylGmELxJVUkFPnkU
+         YOSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761622715; x=1762227515;
+        d=1e100.net; s=20230601; t=1761622717; x=1762227517;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bmcDw6wJ9Aln5Uwrd+WG7F46T4aErd25tY/Ukh4C7Oc=;
-        b=FhfOTJHNB9A/Slfnx7Riqy7SqyBbslg56b5g02Mf91O1UHf1jNMRVnmQe8mg/ytXnz
-         fmzvdWRt7IZxc6MRhZMShghD9PgIDl2knU9hq0FlLumD1u7IwmlneflEqVkSrigSqVxN
-         uD33gDVVDg1ZtPpxcXgkWVpPls9qfGSp+PNtlHMqNFxoakJJkhYzDunzva5e87wawfjw
-         C2FSCECiQvXR21A7kkRuAsggn6t1ZBKnL/uGWEMIALVMnZrBxEk0KyVuqG0yPwpyedzR
-         +mc3lFPsZBApaQho4oeqqterGu5X9BjKxbgGQMV2M1Lz0qqiHc5GZZ4COTQQbA4sXdM5
-         vf9A==
-X-Forwarded-Encrypted: i=1; AJvYcCWMnkoWKW6d0o7nf6aXjm7G4GsExpychVHhjN7znQoZNhn5xGK174vhzwbmNiQsTwZpwm4w9uY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw37VblA/vySeeOsCQEvvyRpykXR/pozisZyMakcIrC2NFFKbY1
-	wE1Kafu9LmwxUx/RkkH+CAtmcqfd3/URFdxhSqJDJYjaZOfy9H0CFuqAVc8e22mqyEkqKm8maqW
-	ymnW4Vw==
-X-Google-Smtp-Source: AGHT+IHzt/vBQxj1A2NPAmNUlJYlxb64ciLh85UYJzxCeiHBOmNIGYysMbVevjSyBMoqmCjP/xfdsBZube4=
-X-Received: from pfqn15.prod.google.com ([2002:aa7:984f:0:b0:77f:2e96:5d3])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a00:234a:b0:7a2:766f:518e
- with SMTP id d2e1a72fcca58-7a441c46abcmr2133006b3a.23.1761622715368; Mon, 27
- Oct 2025 20:38:35 -0700 (PDT)
-Date: Tue, 28 Oct 2025 03:37:01 +0000
+        bh=KAS+ToV0wmB6/IwwMCqaHREdhZGb/0nnGDLX49eqJ2A=;
+        b=F/MWEQeay5HP02XrA0hVyybah3gcyPO0LXAzZOcRQtymcCI6D3rSnrGUSvr0oq/RDT
+         bJqKynAajtp6C8LdYfAXFuv6JR0PMX8+K45u3lJWzyzYql3ssDF7DtPId7R8YNlnSYV7
+         meE7pFvhHcF7WRnbmT6bIaEGrILBp0+2F3vtyrd9qXPmkxRplAXkXNEK8gzUHkPQ9tUi
+         sUPYZ7BXM+DLufPMOgjYhezClO42lR2uHzKD39HCYhm/kCGSzoW4LqTNp6rtL87Sajw5
+         0JDO00y+DVgrPAwjs/3U1+8E3o9wbODuGxjnAp6DO6ogAUXBef+Jd6bvaa4MpByuDBxZ
+         K2xw==
+X-Forwarded-Encrypted: i=1; AJvYcCVxX/nPBljmNxEpTaGjevihrtSeez79AAyI4CNV5ukxWN2wOqH7npuSm40sees6dcJtx3f6suQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJnpJxZCMdAinL3ZOKRACvZPABJv2OWXnNqZHjp4WijPpA+5/I
+	pv/h5Keeq3fxUgoqGOM/pAuSowASuy4iqV+ZnXetvTPfvv6zjh0wNosD9xuM+rezfKNC5nTfkxs
+	f/eDxfA==
+X-Google-Smtp-Source: AGHT+IHg9A2OaZZjr5OFVM5B3wlIQW8Etd1z0644vxnh0GN8k3EXwsTICq5M505+21F9o9G20gUth5edIDQ=
+X-Received: from pjwx16.prod.google.com ([2002:a17:90a:c2d0:b0:33f:df7f:3c2b])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:734c:b0:2b0:ff55:f830
+ with SMTP id adf61e73a8af0-344d3e46471mr2330281637.51.1761622716916; Mon, 27
+ Oct 2025 20:38:36 -0700 (PDT)
+Date: Tue, 28 Oct 2025 03:37:02 +0000
 In-Reply-To: <20251028033812.2043964-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251028033812.2043964-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.51.1.838.g19442a804e-goog
-Message-ID: <20251028033812.2043964-7-kuniyu@google.com>
-Subject: [PATCH v1 net-next 06/13] mpls: Add mpls_dev_rcu().
+Message-ID: <20251028033812.2043964-8-kuniyu@google.com>
+Subject: [PATCH v1 net-next 07/13] mpls: Pass net to mpls_dev_get().
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
@@ -83,108 +83,92 @@ Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-mpls_dev_get() uses rcu_dereference_rtnl() to fetch dev->mpls_ptr.
+We will replace RTNL with a per-netns mutex to protect dev->mpls_ptr.
 
-We will replace RTNL with a dedicated mutex to protect the field.
+Then, we will use rcu_dereference_protected() with the lockdep_is_held()
+annotation, which requires net to access the per-netns mutex.
 
-Then, we will use rcu_dereference_protected() for clarity.
+However, dev_net(dev) is not safe without RTNL.
 
-Let's add mpls_dev_rcu() for the RCU reader.
+Let's pass net to mpls_dev_get().
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- net/mpls/af_mpls.c       | 12 ++++++------
- net/mpls/internal.h      |  5 +++++
- net/mpls/mpls_iptunnel.c |  2 +-
- 3 files changed, 12 insertions(+), 7 deletions(-)
+ net/mpls/af_mpls.c  | 11 ++++++-----
+ net/mpls/internal.h |  3 ++-
+ 2 files changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/net/mpls/af_mpls.c b/net/mpls/af_mpls.c
-index efc6c7da5766..10130b90c439 100644
+index 10130b90c439..a715b12860e9 100644
 --- a/net/mpls/af_mpls.c
 +++ b/net/mpls/af_mpls.c
-@@ -136,7 +136,7 @@ void mpls_stats_inc_outucastpkts(struct net *net,
- 	struct mpls_dev *mdev;
+@@ -708,7 +708,7 @@ static int mpls_nh_assign_dev(struct net *net, struct mpls_route *rt,
  
- 	if (skb->protocol == htons(ETH_P_MPLS_UC)) {
--		mdev = mpls_dev_get(dev);
-+		mdev = mpls_dev_rcu(dev);
- 		if (mdev)
- 			MPLS_INC_STATS_LEN(mdev, skb->len,
- 					   tx_packets,
-@@ -358,7 +358,7 @@ static int mpls_forward(struct sk_buff *skb, struct net_device *dev,
+ 	/* Ensure this is a supported device */
+ 	err = -EINVAL;
+-	if (!mpls_dev_get(dev))
++	if (!mpls_dev_get(net, dev))
+ 		goto errout_put;
  
- 	/* Careful this entire function runs inside of an rcu critical section */
- 
--	mdev = mpls_dev_get(dev);
-+	mdev = mpls_dev_rcu(dev);
- 	if (!mdev)
- 		goto drop;
- 
-@@ -467,7 +467,7 @@ static int mpls_forward(struct sk_buff *skb, struct net_device *dev,
- 	return 0;
- 
- tx_err:
--	out_mdev = out_dev ? mpls_dev_get(out_dev) : NULL;
-+	out_mdev = out_dev ? mpls_dev_rcu(out_dev) : NULL;
- 	if (out_mdev)
- 		MPLS_INC_STATS(out_mdev, tx_errors);
- 	goto drop;
-@@ -1118,7 +1118,7 @@ static int mpls_fill_stats_af(struct sk_buff *skb,
- 	struct mpls_dev *mdev;
- 	struct nlattr *nla;
+ 	if ((nh->nh_via_table == NEIGH_LINK_TABLE) &&
+@@ -1288,7 +1288,7 @@ static int mpls_netconf_get_devconf(struct sk_buff *in_skb,
+ 	if (!dev)
+ 		goto errout;
  
 -	mdev = mpls_dev_get(dev);
-+	mdev = mpls_dev_rcu(dev);
++	mdev = mpls_dev_get(net, dev);
  	if (!mdev)
- 		return -ENODATA;
+ 		goto errout;
  
-@@ -1138,7 +1138,7 @@ static size_t mpls_get_stats_af_size(const struct net_device *dev)
+@@ -1611,6 +1611,7 @@ static int mpls_dev_notify(struct notifier_block *this, unsigned long event,
+ 			   void *ptr)
  {
+ 	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
++	struct net *net = dev_net(dev);
  	struct mpls_dev *mdev;
+ 	unsigned int flags;
+ 	int err;
+@@ -1625,7 +1626,7 @@ static int mpls_dev_notify(struct notifier_block *this, unsigned long event,
+ 		goto out;
+ 	}
  
 -	mdev = mpls_dev_get(dev);
-+	mdev = mpls_dev_rcu(dev);
++	mdev = mpls_dev_get(net, dev);
  	if (!mdev)
- 		return 0;
+ 		goto out;
  
-@@ -1341,7 +1341,7 @@ static int mpls_netconf_dump_devconf(struct sk_buff *skb,
+@@ -1658,7 +1659,7 @@ static int mpls_dev_notify(struct notifier_block *this, unsigned long event,
+ 		if (err)
+ 			goto err;
  
- 	rcu_read_lock();
- 	for_each_netdev_dump(net, dev, ctx->ifindex) {
 -		mdev = mpls_dev_get(dev);
-+		mdev = mpls_dev_rcu(dev);
- 		if (!mdev)
- 			continue;
- 		err = mpls_netconf_fill_devconf(skb, mdev,
++		mdev = mpls_dev_get(net, dev);
+ 		if (mdev) {
+ 			mpls_dev_sysctl_unregister(dev, mdev);
+ 			RCU_INIT_POINTER(dev->mpls_ptr, NULL);
+@@ -1666,7 +1667,7 @@ static int mpls_dev_notify(struct notifier_block *this, unsigned long event,
+ 		}
+ 		break;
+ 	case NETDEV_CHANGENAME:
+-		mdev = mpls_dev_get(dev);
++		mdev = mpls_dev_get(net, dev);
+ 		if (mdev) {
+ 			mpls_dev_sysctl_unregister(dev, mdev);
+ 			err = mpls_dev_sysctl_register(dev, mdev);
 diff --git a/net/mpls/internal.h b/net/mpls/internal.h
-index e491427ea08a..080e82010022 100644
+index 080e82010022..0df01a5395ee 100644
 --- a/net/mpls/internal.h
 +++ b/net/mpls/internal.h
-@@ -185,6 +185,11 @@ static inline struct mpls_entry_decoded mpls_entry_decode(struct mpls_shim_hdr *
- 	return result;
+@@ -190,7 +190,8 @@ static inline struct mpls_dev *mpls_dev_rcu(const struct net_device *dev)
+ 	return rcu_dereference(dev->mpls_ptr);
  }
  
-+static inline struct mpls_dev *mpls_dev_rcu(const struct net_device *dev)
-+{
-+	return rcu_dereference(dev->mpls_ptr);
-+}
-+
- static inline struct mpls_dev *mpls_dev_get(const struct net_device *dev)
+-static inline struct mpls_dev *mpls_dev_get(const struct net_device *dev)
++static inline struct mpls_dev *mpls_dev_get(const struct net *net,
++					    const struct net_device *dev)
  {
  	return rcu_dereference_rtnl(dev->mpls_ptr);
-diff --git a/net/mpls/mpls_iptunnel.c b/net/mpls/mpls_iptunnel.c
-index cfbab7b2fec7..1a1a0eb5b787 100644
---- a/net/mpls/mpls_iptunnel.c
-+++ b/net/mpls/mpls_iptunnel.c
-@@ -153,7 +153,7 @@ static int mpls_xmit(struct sk_buff *skb)
- 	return LWTUNNEL_XMIT_DONE;
- 
- drop:
--	out_mdev = out_dev ? mpls_dev_get(out_dev) : NULL;
-+	out_mdev = out_dev ? mpls_dev_rcu(out_dev) : NULL;
- 	if (out_mdev)
- 		MPLS_INC_STATS(out_mdev, tx_errors);
- 	kfree_skb(skb);
+ }
 -- 
 2.51.1.838.g19442a804e-goog
 
