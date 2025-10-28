@@ -1,63 +1,95 @@
-Return-Path: <netdev+bounces-233593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F9FAC15FF9
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 17:58:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 26EE1C160FF
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 18:10:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A658D4E424E
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 16:58:12 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E3ADD4E3E1C
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 17:10:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4997347BBA;
-	Tue, 28 Oct 2025 16:57:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5267348473;
+	Tue, 28 Oct 2025 17:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bKZZAXbC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HeRHG5qE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f194.google.com (mail-pl1-f194.google.com [209.85.214.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAFBC346E4A;
-	Tue, 28 Oct 2025 16:57:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 087E334678A
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 17:10:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761670661; cv=none; b=EEeQ+PNZCiL4oyq2M/2R2qgTL0N8cXYmXl6PdM89olSRY0wK/vXpcARYrGdDlW5JZnfqotm3xrOxbf5NgsOunbhDDWtT9Jw+wBNU6P3qNjOP0fZHqQm2Y/XwNEodU5gjqkplxIsnWARfNADz6/8YQwiLoiS7/4pgGVEswc69KcQ=
+	t=1761671428; cv=none; b=KsYcxAj0XqWedB2v+MBG4vNfb6EwT/Zbq6DpqFJfmTUEoM4BnCabW0w9DR8/ZB2k+xlRJTfaaSW33X4A0pXVXN5lp3hcBSQyQA/IBsXZMzMrCLn++JeZ724Io8UblIMmvjUrV15wTmU46azC3F1QoZ9wCsXF+s87YCbUHD48xHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761670661; c=relaxed/simple;
-	bh=aj4lytZnlp+F0c2g1w8XC6BgNEmmQKZC46OI2bAFwmk=;
+	s=arc-20240116; t=1761671428; c=relaxed/simple;
+	bh=m3I9dtve6TdfQpeD/5c1k/FwNdSdObvUw7hMoEvNVYM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=afIUcqq6u4TZEiLI+bXjY3w8XvJ/0J/+rN8cv8AGOSA4wmPpqzx60PMLZt9bBCvGxaSRs3ksZKL602lI9b4RDOTqOy0qRyu1DOoEsS8ljiSTofn/aog05KVrbCrf7WGZm84wOgZ9Q8QgLqN1jt5jTph9uWiw1sej2A/7jmG49u4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bKZZAXbC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1AC24C4CEE7;
-	Tue, 28 Oct 2025 16:57:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761670661;
-	bh=aj4lytZnlp+F0c2g1w8XC6BgNEmmQKZC46OI2bAFwmk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bKZZAXbCQA4ewEygt5zEzAIUVvysfVH7HckBmmYlFuM0K06eK+sNEY3Yqm08MLSo7
-	 R7Z9ADayAgT54bom4OrpRI6H+IErcwqnSm4BrWqJ+i3LMPT5kR9BcmoiTQmNma6k/q
-	 mriCP13Oobv/udMmazO5NWpg2ZsLhNPDsbUnN1TP3asySuHq+NdeLq0lmW/16/SlxT
-	 ffcjHuQmgNEFXuBFyrqGvCWgdiRGY2DAq8JFcGqzxj7AuAx8mAJxLCyaA63Dmh4bCs
-	 hMzX/PpQtBpUcKVuP04rMq8sYG82qfKo6H5c76BMuJ2rAPuXwrf3siDjeTqgazLQoY
-	 fjtlxWRGBoVxQ==
-Date: Tue, 28 Oct 2025 16:57:35 +0000
-From: Simon Horman <horms@kernel.org>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=In6y0fKyQV+k3dcQVPu8fd6fBMpBY3l26LRWndhcBjkyEM4vTYR4sCOafIcLjb0UDjyIFbHTsm0ekKo05Exq9UR3CrAztu5SOYwa5EJTeZeRBXvqRXmCs/ON0Lnyl4DDLo6XjczfEulQxzzO3VvkJMpgFyQDGiIBc6MKDOXsAZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HeRHG5qE; arc=none smtp.client-ip=209.85.214.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f194.google.com with SMTP id d9443c01a7336-290ac2ef203so59724425ad.1
+        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 10:10:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761671426; x=1762276226; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=NkkeBtodNmN2EMa9qJLybudRjmngQqkOpn4I47bN1Os=;
+        b=HeRHG5qEN5uTjjY3ibkWq33IiamipujAhi60b9r1rM5RRPJZix2+MocaWLMsgNdzzn
+         rCRaFyrKnHeUaypQDn1k3K/dqscVruRVqMTp+igbGbC+db5aiAfFYeE0f5PSLqzGly0B
+         Ovbu07ITP9IM/2fwN+YgCr6l72LfCsLXcf98t50rQ2aT51I9i9QHnWZBcPUJfgmI0dRC
+         hcDVe7L3na0X+uTihwIrNh/OF7NNAdsSDaUs/thpRtSEuaO3pAwmuCxPhAYF4SvzmzBq
+         +g5mLWYTq+KRd+hIVppWWv9JlGPQ/3UNy/vJ92ZwMl4d1BKAHGUXeTSQGuqNK8db6i73
+         GIMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761671426; x=1762276226;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NkkeBtodNmN2EMa9qJLybudRjmngQqkOpn4I47bN1Os=;
+        b=Toxa0O1tOpwxnRxNYLtGnK+fhFVOVHSnNyzKf+2jYh8cbEOlUmHimsB1Rx/TgJZs18
+         3cithMKTI4rPf63Av3SmGss3focFslzgu8N0Ajc21JHR1Fb6qAMJXOqKm0w0aii5xdYG
+         fExkThAwHA2GGz8mRIDGXxNN8RMMuW+FIHtcwpmBHLfAoNx3ChnyYWo/Z+QtuxL9ohiH
+         2jVydk9UYhfywRLolYfRFGf3n20t7Rcx2TO6iWbpjG407iJlsPUziqusr9V0rgwnsfy4
+         9I8vwOv9uGYNDpyFs0sokc0o1oFbOmUJdbb2SvBvc4R41ChZLeR0TVssC1l2xDHQVs0/
+         TlOw==
+X-Forwarded-Encrypted: i=1; AJvYcCUSrLYZnmbb3yeZhzrkpF3/zULTSNbqo8bMFem+XJ10vhbhMYcSNRrfNSk7RCmcVAM5Bpevh6k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9FcfRRvUpQsOSnl/2WFcrm3kCHfQYqbeQpxFY4BI/os/BqloR
+	ttlCfMmoRfP2qwDdw8X0B+TfA96abe64K4kRvq2V3nmXD3fdqaKPnKgR
+X-Gm-Gg: ASbGncvwn543RdQzhutZwLTXnyIiqVYA7YnjT2YgfkeNGMneQIEhMDTXcmhyRGaWWdF
+	in9r19q0WFcsXrdbiYOELvbKzJ1Dr9WXsS0krGgfpfJf7eJkAyjUri6dl4snZcsKWKxWqVk0bsS
+	2frcx3lj8AsWd2u5XJOrezwmu7Mr6xA7hxUm3ErVbiGigKlfQxsS+xvUDngTOofGZ1BqzNkDtVv
+	y5x3rOhzkwoaQ7vqMBIeie96fNH1sRcPklPKnEX74g0iT84/mZ7ZnNqcpXYW3CpGn8MW4TaHtMk
+	H4r3fNLB8HrE3wL9H7FmdrbFAdbzDcU+x20d8dYAFqUbNoQ7g3IsWdVa6/zy4kjpO/sNhyPRGds
+	0f/NONiia23UdapmE7IBhUV0gStM5QKApbAn3PE+Wt/r//hd7SEDKFCfTMOJaZ8i9KCGK9MNN3H
+	xtwflmT4otYnewVLdpQZI=
+X-Google-Smtp-Source: AGHT+IGQ8ffNexl4HmIkFUmg1fdyuZl4JbBMFVH6xuxPDuvHwL2uHadtShWy1RlMi1Xof4Eda3TnCw==
+X-Received: by 2002:a17:902:ec83:b0:27e:ec72:f67 with SMTP id d9443c01a7336-294cb391897mr51139475ad.6.1761671426009;
+        Tue, 28 Oct 2025 10:10:26 -0700 (PDT)
+Received: from fedora ([103.120.31.122])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29498cf3bbcsm121911965ad.15.2025.10.28.10.10.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Oct 2025 10:10:25 -0700 (PDT)
+Date: Tue, 28 Oct 2025 22:40:14 +0530
+From: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
 	"David S. Miller" <davem@davemloft.net>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>,
-	Cosmin Ratiu <cratiu@nvidia.com>
-Subject: Re: [PATCH net] net/mlx5: Don't zero user_count when destroying FDB
- tables
-Message-ID: <aQD1_13OxXT16XPR@horms.kernel.org>
-References: <1761510019-938772-1-git-send-email-tariqt@nvidia.com>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] selftest: net: fix socklen_t type mismatch in
+ sctp_collision test
+Message-ID: <aQD49ukK0XMUHTUP@fedora>
+References: <20251026174649.276515-1-ankitkhushwaha.linux@gmail.com>
+ <aQDyGhMehBxVL1Sy@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,48 +98,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1761510019-938772-1-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <aQDyGhMehBxVL1Sy@horms.kernel.org>
 
-On Sun, Oct 26, 2025 at 10:20:19PM +0200, Tariq Toukan wrote:
-> From: Cosmin Ratiu <cratiu@nvidia.com>
+On Tue, Oct 28, 2025 at 04:40:58PM +0000, Simon Horman wrote:
+> Hi Ankit,
 > 
-> esw->user_count tracks how many TC rules are added on an esw via
-> mlx5e_configure_flower -> mlx5_esw_get -> atomic64_inc(&esw->user_count)
+> Please preserve reverse xmas tree order - longest line to shortest - for
+> local variable declarations in Networking code.
 > 
-> esw.user_count was unconditionally set to 0 in
-> esw_destroy_legacy_fdb_table and esw_destroy_offloads_fdb_tables.
+> In this case, I think that would be as follows (completely untested).
 > 
-> These two together can lead to the following sequence of events:
-> 1. echo 1 > /sys/class/net/eth2/device/sriov_numvfs
->   - mlx5_core_sriov_configure -...-> esw_create_legacy_table ->
->     atomic64_set(&esw->user_count, 0)
-> 2. tc qdisc add dev eth2 ingress && \
->    tc filter replace dev eth2 pref 1 protocol ip chain 0 ingress \
->        handle 1 flower action ct nat zone 64000 pipe
->   - mlx5e_configure_flower -> mlx5_esw_get ->
->     atomic64_inc(&esw->user_count)
-> 3. echo 0 > /sys/class/net/eth2/device/sriov_numvfs
->   - mlx5_core_sriov_configure -..-> esw_destroy_legacy_fdb_table
->     -> atomic64_set(&esw->user_count, 0)
-> 4. devlink dev eswitch set pci/0000:08:00.0 mode switchdev
->   - mlx5_devlink_eswitch_mode_set -> mlx5_esw_try_lock ->
->     atomic64_read(&esw->user_count) == 0
->   - then proceed to a WARN_ON in:
->   esw_offloads_start -> mlx5_eswitch_enable_locke -> esw_offloads_enable
->   -> mlx5_esw_offloads_rep_load -> mlx5e_vport_rep_load ->
->   mlx5e_netdev_change_profile -> mlx5e_detach_netdev ->
->   mlx5e_cleanup_nic_rx -> mlx5e_tc_nic_cleanup ->
->   mlx5e_mod_hdr_tbl_destroy
-> 
-> Fix this by not clearing out the user_count when destroying FDB tables,
-> so that the check in mlx5_esw_try_lock can prevent the mode change when
-> there are TC rules configured, as originally intended.
-> 
-> Fixes: 2318b8bb94a3 ("net/mlx5: E-switch, Destroy legacy fdb table when needed")
-> Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
-> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> 	struct sockaddr_in saddr = {}, daddr = {};
+> 	socklen_t len = sizeof(daddr);
+> 	struct timeval tv = {25, 0};
+> 	char buf[] = "hello";
+> 	int sd, ret;
+>
+Hi Simon,
+Thanks for your reply, i will send v2 patch with requested changes.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-
+-- 
+Ankit
 
