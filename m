@@ -1,110 +1,92 @@
-Return-Path: <netdev+bounces-233686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5DF4C17641
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 00:44:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 65B9EC17647
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 00:45:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CE9A4012D2
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 23:44:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22B2D3A99C0
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 23:45:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F6EB36A5F2;
-	Tue, 28 Oct 2025 23:44:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67D6122D4E9;
+	Tue, 28 Oct 2025 23:45:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qcxC+VpR"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="s9hBZqgV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03A3F280033;
-	Tue, 28 Oct 2025 23:44:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1144D7405A
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 23:45:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761695079; cv=none; b=cpqGieIfHy+rdK814oGNGBhqJMfUS41h+tLqAvDAOLaBviKwXCNULNjxYk0+PDg9ZD9HHUV0gp7DA7GiVNCJLNRuJcqyfnBeVbq+LrpKmooWMEmTHG0TOId4AALuBcSeNsuV7zIWYL69JUtGR60Mv5Y4pdb1GMBEXx/v3OLdfJA=
+	t=1761695122; cv=none; b=QmlSJqZzLBSD1oWGTJLx0LJzoYUyN9oM763YmcL/uZVBfAmOwlo0EUfKVLjWdgZmj3i/wrvTcu3imiOMtzpsidaIQ4KwbC9KBrkYMcTVwVPBHqZgTasxGKyfdR7/vMgptDiS6JYYuqgAeIm9UfTx5ylv37CEfd9HCkpAJ4MmZ2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761695079; c=relaxed/simple;
-	bh=XV5KEoN5jVwlWM4qV2jaupzENzhi6N4X0KoX4O9lcMI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EjKrohds+hF8n/XtOGz9rffjetlkQYBuXzKq7kWcaqXe07KKAABdsmG1aqynA6dRGNOFYcg/jtpECYJ6KjdlCJFFouo+1oyeYcHb5XMKLtbc4b76/n59YaX2gbEEKzl23hn2Lhms37U1Ew7O3Vz3Z/admfTK02EdDSR0f8DK8F8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qcxC+VpR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0722FC4CEE7;
-	Tue, 28 Oct 2025 23:44:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761695078;
-	bh=XV5KEoN5jVwlWM4qV2jaupzENzhi6N4X0KoX4O9lcMI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qcxC+VpRGSxvjnAptq7vMQhAjA3xm8GK7cR2b0MYTw44nGtUNN+s3VNU1kIlmc1Wl
-	 UxLIWGbgBpHFj7akzF3LBarMQSVU2N0EjOtcfU6Bh+29lneFI84Y2R07cX9nrsaibi
-	 3LUGa0zyU5pnDJYgR8ep81+varLgqxGgw6yHggaE6dCfloGHcR/RusaEdUcU+vWLuK
-	 FVfJpCo7eR3c2Zapx0I6k8OLdVAc5CirrF9ASiqvgMKWCVZEykxkobE32DKh9i6gQw
-	 RPx8XsjiJm4snCgnT3ZsLhUqdqny9iwyJraXmeQUMXmIUFseDzrVaPOwye+q9plFEz
-	 PpYEOkY1MlcJw==
-Date: Tue, 28 Oct 2025 16:44:37 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Wei <dw@davidwei.uk>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
- razor@blackwall.org, willemb@google.com, sdf@fomichev.me,
- john.fastabend@gmail.com, martin.lau@kernel.org, jordan@jrife.io,
- maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, toke@redhat.com,
- yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
-Subject: Re: [PATCH net-next v3 02/15] net: Implement
- netdev_nl_bind_queue_doit
-Message-ID: <20251028164437.20b48513@kernel.org>
-In-Reply-To: <77a3eb52-b0e0-440e-80a0-6e89322e33e9@davidwei.uk>
-References: <20251020162355.136118-1-daniel@iogearbox.net>
-	<20251020162355.136118-3-daniel@iogearbox.net>
-	<412f4b9a-61bb-4ac8-9069-16a62338bd87@redhat.com>
-	<34c1e9d1-bfc1-48f9-a0ce-78762574fa10@iogearbox.net>
-	<20251023190851.435e2afa@kernel.org>
-	<77a3eb52-b0e0-440e-80a0-6e89322e33e9@davidwei.uk>
+	s=arc-20240116; t=1761695122; c=relaxed/simple;
+	bh=pvORYJ5rE/jqWp1h5Wifw8LnZkhqt67QzZd23qnqtEs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EGRbBJHT+X2yTqRdCI6iZZiO5XzjG1BOujmdWRLHb8Z9sC5uRlF4EBQhe54K5IDtPbYy965m6mVN1/VeO7gEtBWy3oycRddCnpBvsRC+rvMdCqPyrZfboO3mufqikUzHTABobB0LpKE6Ti9ZC40CAv/13kwX4h3z9VHbkNwbgso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=s9hBZqgV; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <cd154e3c-0cac-4ead-a3d0-39dc617efa74@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1761695118;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bVdLbIqZfPVV9nzaikXAAecCSd3I2FTL+HXFgib0190=;
+	b=s9hBZqgVlWkSOYt6BK5gYHgMND6u8gafxaO3QunUF18Km/MlmW4ZJJnamgtdya4sIRTTe5
+	Krw+3ruO6soP5Svqstsmj+NMp81kDf572yxl555qKDIyUmenGdBF4GwGMzubUe6w2AHYYG
+	NjuB85dDSetbSCOCyivijDWUHG/XNBI=
+Date: Tue, 28 Oct 2025 23:45:13 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH] ptp: guard ptp_clock_gettime() if neither gettimex64 nor
+To: Jakub Kicinski <kuba@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>
+Cc: richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, junjie.cao@intel.com, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com,
+ syzbot+c8c0e7ccabd456541612@syzkaller.appspotmail.com,
+ syzkaller-bugs@googlegroups.com, thostet@google.com
+References: <aQDOpeQIU1G4nA1F@hoboy.vegasvil.org>
+ <20251028155318.2537122-1-kuniyu@google.com>
+ <20251028161309.596beef2@kernel.org>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20251028161309.596beef2@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 28 Oct 2025 14:59:05 -0700 David Wei wrote:
-> On 2025-10-23 19:08, Jakub Kicinski wrote:
-> > On Thu, 23 Oct 2025 14:48:15 +0200 Daniel Borkmann wrote:  
-> >> It is needed given we need to always ensure lock ordering for the two devices,
-> >> that is, the order is always from the virtual to the physical device.  
-> > 
-> > You do seem to be taking the lock before you check if the device was
-> > the type you expected tho.  
+On 28.10.2025 23:13, Jakub Kicinski wrote:
+> On Tue, 28 Oct 2025 15:51:50 +0000 Kuniyuki Iwashima wrote:
+>> From: Richard Cochran <richardcochran@gmail.com>
+>> Date: Tue, 28 Oct 2025 07:09:41 -0700
+>>> On Tue, Oct 28, 2025 at 05:51:43PM +0800, Junjie Cao wrote:
+>>>> Syzbot reports a NULL function pointer call on arm64 when
+>>>> ptp_clock_gettime() falls back to ->gettime64() and the driver provides
+>>>> neither ->gettimex64() nor ->gettime64(). This leads to a crash in the
+>>>> posix clock gettime path.
+>>>
+>>> Drivers must provide a gettime method.
+>>>
+>>> If they do not, then that is a bug in the driver.
+>>
+>> AFAICT, only GVE does not have gettime() and settime(), and
+>> Tim (CCed) was preparing a fix and mostly ready to post it.
 > 
-> I believe this is okay. Let's say we have two netdevs, A that is real
-> and B that is virtual. 
+> cc: Vadim who promised me a PTP driver test :) Let's make sure we
+> tickle gettime/setting in that test..
 
-Now imagine they are both virtual.
-
-> User calls netdev_nl_bind_queue_doit() twice in
-> two different contexts, 1 with the correct order (A as src, B as dst)
-> and 2 with the incorrect order (B as src, A as dst). We always try to
-> lock dst first, then src.
-> 
->          1                 2
-> lock(dst == B)
->                    lock(dst == A)
->                    is not virtual...
->                    unlock(A)
-> lock(src == A)
-> 
-> 
->          1                 2
->                    lock(dst == A)
-> lock(dst == B)
->                    is not virtual...
->                    unlock(A)
-> lock(src == A)
-> 
-> The check will prevent ABBA by never taking that final lock to complete
-> the cycle. Please check and lmk if I'm off, stuff like this makes my
-> brain hurt.
-
+Heh, call gettime/settime is easy. But in case of absence of these callbacks
+the kernel will crash - not sure we can gather good signal in such case?
 
