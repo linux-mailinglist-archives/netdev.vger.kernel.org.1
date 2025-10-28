@@ -1,218 +1,148 @@
-Return-Path: <netdev+bounces-233386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73ECCC129D3
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 03:00:50 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E9FCC12A06
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 03:05:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 554EB4E19EE
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 02:00:49 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5AB944E107A
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 02:05:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53CF01E86E;
-	Tue, 28 Oct 2025 02:00:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C5991A8412;
+	Tue, 28 Oct 2025 02:05:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Eoff3n9C"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="sGanh5Ne"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14E7028E9
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 02:00:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA5A0F50F;
+	Tue, 28 Oct 2025 02:05:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761616847; cv=none; b=tpXC5gP/NVxA2VwEPj1i+DryMq7M2UKKVmpQrsmHeNfuL4nrDO81PoJNPbjw9Gz8qsRMX7Kde/BiJJCBZVEQ87Kg7PrDO+NhXuGCe8Tfvi32kbbYPc+6j9DwFGxX6x7XPKvG6IMUlm3cHkOD3hqAyIvjckRKyL0okIZEMsIL09Y=
+	t=1761617121; cv=none; b=WrB1JYUyZhpdz4ItHV/ljx8/bMYTnGHAOxEPNbX3+Co9B/TVgGzMXGdm92o1HoCN/u/EKkRHou5jqsgQkQbh0olOZZYUNqQ+zwFBwSc59+e0Foz/iSxZqx77ykpFs6Db8jr2CnEgz5TRUWbPmpq4j3fJsFQFAlgsG20YCMJPuGY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761616847; c=relaxed/simple;
-	bh=rf4AIEHEW2a3laeNL4F6QNbR7b20jJ5mQqfGwNYjOKM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZtSRiS4xmcLTh/vvJhu+K5d6WaprpnZVueZ02UsL7JH+FhbO3Uiz5jiLh2fwKJnuhsS370Tpei57XUjemdhrqVx3wo+Dk6inrSga4Izdcn0N8VPyZcdPD9I7JL71f3IDtd/KTO6zoZQW4ZJwjSCUMhcEckK5/NK+aktZwi7Ycs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Eoff3n9C; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761616832;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=fOQmhmBDEYiwvDVP6Wx0SsY1m99stZnZK9xXTiCWbmI=;
-	b=Eoff3n9CRed5URbWwNozoIdyhrxXvgUMSnJE5AdRahNur0fht3tIpT2Mga2I5xckNBwrTw
-	xej/x8o+ULlHU6Nkphfp1w0Bwm7s6CKDNaWvgYpncCjFetGzpBUmZeGG0FVi+lpTHclHKU
-	jcxxB560oNolAfrYGbp2AQOWnYpqgfY=
-From: Yi Cong <cong.yi@linux.dev>
-To: Frank.Sae@motor-comm.com,
-	andrew+netdev@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net
-Cc: kuba@kernel.org,
-	netdev@vger.kernel.org,
-	Yi Cong <yicong@kylinos.cn>,
-	stable@vger.kernel.org
-Subject: [PATCH] net: phy: motorcomm: Fix the issue in the code regarding the incorrect use of time units
-Date: Tue, 28 Oct 2025 09:59:23 +0800
-Message-Id: <20251028015923.252909-1-cong.yi@linux.dev>
+	s=arc-20240116; t=1761617121; c=relaxed/simple;
+	bh=/QtiO7t/dggNE4jC07IMjjMm/+jAfX83TmfutRs9W2g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hC+auW5GxyhiQb9fQ+E5VEtA/JYmwn9DrUNFmb7RdEd0a0ZYmhOcjJzpZ8IojX0RfRHgKgJINUxBwFb0pKbcq79Fr1J7ZXPsRy/86OZkXFgRoj5BZP1clgSWo/vpHdQ8HFSOiJjDMw6YAkdfHW29kbHus/l3wOAKZf61x/6gWoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=sGanh5Ne; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=GQuLB8waf5DwY5p0Hg1kGKo+ab3hK5Wpw4AlIb4e7Ro=; b=sGanh5Ne98mP44YSdlFCUu5WI5
+	bKVrHiVM//qLgkKjfnOr6y06C9e3zsiqQ4Fw/pbwP+/mN57FR+PhRLVXLMu/odZE7dzbrS3f8DIwD
+	lAs1BzN0eIscDZ+lPAQXfuICdjPM90mVuXQQOkgsWBpmiv3KCAFc/2nWXRHN/DCTMfrc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vDZ55-00CFpt-46; Tue, 28 Oct 2025 03:05:03 +0100
+Date: Tue, 28 Oct 2025 03:05:03 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	shuah@kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v2] selftests: drv-net: replace the nsim ring
+ test with a drv-net one
+Message-ID: <a55df0a7-4adf-45bf-b448-eeb68ba5592e@lunn.ch>
+References: <20251027192131.2053792-1-kuba@kernel.org>
+ <57359fb9-195c-4a4a-b102-f7739453a94f@lunn.ch>
+ <20251027171539.565e63f2@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251027171539.565e63f2@kernel.org>
 
-From: Yi Cong <yicong@kylinos.cn>
+On Mon, Oct 27, 2025 at 05:15:39PM -0700, Jakub Kicinski wrote:
+> On Mon, 27 Oct 2025 20:46:00 +0100 Andrew Lunn wrote:
+> > > +    def test_config(config):
+> > > +        try:
+> > > +            cfg.eth.channels_set(ehdr | config)
+> > > +            get = cfg.eth.channels_get(ehdr)
+> > > +            for k, v in config.items():
+> > > +                ksft_eq(get.get(k, 0), v)
+> > > +        except NlError as e:
+> > > +            failed.append(mix)
+> > > +            ksft_pr("Can't set", config, e)
+> > > +        else:
+> > > +            ksft_pr("Okay", config)  
+> > 
+> > We expect failure to leave the configuration unchanged. So i would
+> > actually do:
+> > 
+> > try:
+> > 	before = get()
+> > 	set()
+> > except:
+> > 	after = get()
+> > 	fail(after != before)
+> 
+> Please allow me to introduce you to the magic of defer() ;)
 
-Currently, NS (nanoseconds) is being used, but according to the datasheet,
-the correct unit should be PS (picoseconds).
+That is why i don't like magic, especially in tests which have no
+documentation of the expected results. For me, tests should be dumb,
+often boringly repetitive, and at least 50% comments, explaining what
+is being tested, what the expected outcome is, and most importantly,
+why that is the expected outcome.
 
-Fixes: 4869a146cd60 ("net: phy: Add BIT macro for Motorcomm yt8521/yt8531 gigabit ethernet phy")
-Cc: stable@vger.kernel.org
-Signed-off-by: Yi Cong <yicong@kylinos.cn>
----
- drivers/net/phy/motorcomm.c | 102 ++++++++++++++++++------------------
- 1 file changed, 51 insertions(+), 51 deletions(-)
+> This registers a command to run after the test completely exits:
+> 
+> +    defer(cfg.eth.channels_set, ehdr | restore)
+> 
+> > Also, does nlError contain the error code?
+> > 
+> >         fail(e.errcode not in (EINVAL, EOPNOTSUPP))
+> > 
+> > It would be good to detect and fail ENOTSUPP, which does appear every
+> > so often, when it should not.
+> 
+> Dunno, checkpatch warns about ENOTSUPP. I don't that think checking 
+> for funny error codes in every test scales :(
 
-diff --git a/drivers/net/phy/motorcomm.c b/drivers/net/phy/motorcomm.c
-index a3593e663059..81491c71e75b 100644
---- a/drivers/net/phy/motorcomm.c
-+++ b/drivers/net/phy/motorcomm.c
-@@ -171,7 +171,7 @@
-  * 1b1 enable 1.9ns rxc clock delay
-  */
- #define YT8521_CCR_RXC_DLY_EN			BIT(8)
--#define YT8521_CCR_RXC_DLY_1_900_NS		1900
-+#define YT8521_CCR_RXC_DLY_1_900_PS		1900
- 
- #define YT8521_CCR_MODE_SEL_MASK		(BIT(2) | BIT(1) | BIT(0))
- #define YT8521_CCR_MODE_UTP_TO_RGMII		0
-@@ -196,22 +196,22 @@
- #define YT8521_RC1R_RX_DELAY_MASK		GENMASK(13, 10)
- #define YT8521_RC1R_FE_TX_DELAY_MASK		GENMASK(7, 4)
- #define YT8521_RC1R_GE_TX_DELAY_MASK		GENMASK(3, 0)
--#define YT8521_RC1R_RGMII_0_000_NS		0
--#define YT8521_RC1R_RGMII_0_150_NS		1
--#define YT8521_RC1R_RGMII_0_300_NS		2
--#define YT8521_RC1R_RGMII_0_450_NS		3
--#define YT8521_RC1R_RGMII_0_600_NS		4
--#define YT8521_RC1R_RGMII_0_750_NS		5
--#define YT8521_RC1R_RGMII_0_900_NS		6
--#define YT8521_RC1R_RGMII_1_050_NS		7
--#define YT8521_RC1R_RGMII_1_200_NS		8
--#define YT8521_RC1R_RGMII_1_350_NS		9
--#define YT8521_RC1R_RGMII_1_500_NS		10
--#define YT8521_RC1R_RGMII_1_650_NS		11
--#define YT8521_RC1R_RGMII_1_800_NS		12
--#define YT8521_RC1R_RGMII_1_950_NS		13
--#define YT8521_RC1R_RGMII_2_100_NS		14
--#define YT8521_RC1R_RGMII_2_250_NS		15
-+#define YT8521_RC1R_RGMII_0_000_PS		0
-+#define YT8521_RC1R_RGMII_0_150_PS		1
-+#define YT8521_RC1R_RGMII_0_300_PS		2
-+#define YT8521_RC1R_RGMII_0_450_PS		3
-+#define YT8521_RC1R_RGMII_0_600_PS		4
-+#define YT8521_RC1R_RGMII_0_750_PS		5
-+#define YT8521_RC1R_RGMII_0_900_PS		6
-+#define YT8521_RC1R_RGMII_1_050_PS		7
-+#define YT8521_RC1R_RGMII_1_200_PS		8
-+#define YT8521_RC1R_RGMII_1_350_PS		9
-+#define YT8521_RC1R_RGMII_1_500_PS		10
-+#define YT8521_RC1R_RGMII_1_650_PS		11
-+#define YT8521_RC1R_RGMII_1_800_PS		12
-+#define YT8521_RC1R_RGMII_1_950_PS		13
-+#define YT8521_RC1R_RGMII_2_100_PS		14
-+#define YT8521_RC1R_RGMII_2_250_PS		15
- 
- /* LED CONFIG */
- #define YT8521_MAX_LEDS				3
-@@ -800,40 +800,40 @@ struct ytphy_cfg_reg_map {
- 
- static const struct ytphy_cfg_reg_map ytphy_rgmii_delays[] = {
- 	/* for tx delay / rx delay with YT8521_CCR_RXC_DLY_EN is not set. */
--	{ 0,	YT8521_RC1R_RGMII_0_000_NS },
--	{ 150,	YT8521_RC1R_RGMII_0_150_NS },
--	{ 300,	YT8521_RC1R_RGMII_0_300_NS },
--	{ 450,	YT8521_RC1R_RGMII_0_450_NS },
--	{ 600,	YT8521_RC1R_RGMII_0_600_NS },
--	{ 750,	YT8521_RC1R_RGMII_0_750_NS },
--	{ 900,	YT8521_RC1R_RGMII_0_900_NS },
--	{ 1050,	YT8521_RC1R_RGMII_1_050_NS },
--	{ 1200,	YT8521_RC1R_RGMII_1_200_NS },
--	{ 1350,	YT8521_RC1R_RGMII_1_350_NS },
--	{ 1500,	YT8521_RC1R_RGMII_1_500_NS },
--	{ 1650,	YT8521_RC1R_RGMII_1_650_NS },
--	{ 1800,	YT8521_RC1R_RGMII_1_800_NS },
--	{ 1950,	YT8521_RC1R_RGMII_1_950_NS },	/* default tx/rx delay */
--	{ 2100,	YT8521_RC1R_RGMII_2_100_NS },
--	{ 2250,	YT8521_RC1R_RGMII_2_250_NS },
-+	{ 0,	YT8521_RC1R_RGMII_0_000_PS },
-+	{ 150,	YT8521_RC1R_RGMII_0_150_PS },
-+	{ 300,	YT8521_RC1R_RGMII_0_300_PS },
-+	{ 450,	YT8521_RC1R_RGMII_0_450_PS },
-+	{ 600,	YT8521_RC1R_RGMII_0_600_PS },
-+	{ 750,	YT8521_RC1R_RGMII_0_750_PS },
-+	{ 900,	YT8521_RC1R_RGMII_0_900_PS },
-+	{ 1050,	YT8521_RC1R_RGMII_1_050_PS },
-+	{ 1200,	YT8521_RC1R_RGMII_1_200_PS },
-+	{ 1350,	YT8521_RC1R_RGMII_1_350_PS },
-+	{ 1500,	YT8521_RC1R_RGMII_1_500_PS },
-+	{ 1650,	YT8521_RC1R_RGMII_1_650_PS },
-+	{ 1800,	YT8521_RC1R_RGMII_1_800_PS },
-+	{ 1950,	YT8521_RC1R_RGMII_1_950_PS },	/* default tx/rx delay */
-+	{ 2100,	YT8521_RC1R_RGMII_2_100_PS },
-+	{ 2250,	YT8521_RC1R_RGMII_2_250_PS },
- 
- 	/* only for rx delay with YT8521_CCR_RXC_DLY_EN is set. */
--	{ 0    + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_0_000_NS },
--	{ 150  + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_0_150_NS },
--	{ 300  + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_0_300_NS },
--	{ 450  + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_0_450_NS },
--	{ 600  + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_0_600_NS },
--	{ 750  + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_0_750_NS },
--	{ 900  + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_0_900_NS },
--	{ 1050 + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_1_050_NS },
--	{ 1200 + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_1_200_NS },
--	{ 1350 + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_1_350_NS },
--	{ 1500 + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_1_500_NS },
--	{ 1650 + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_1_650_NS },
--	{ 1800 + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_1_800_NS },
--	{ 1950 + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_1_950_NS },
--	{ 2100 + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_2_100_NS },
--	{ 2250 + YT8521_CCR_RXC_DLY_1_900_NS,	YT8521_RC1R_RGMII_2_250_NS }
-+	{ 0    + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_0_000_PS },
-+	{ 150  + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_0_150_PS },
-+	{ 300  + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_0_300_PS },
-+	{ 450  + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_0_450_PS },
-+	{ 600  + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_0_600_PS },
-+	{ 750  + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_0_750_PS },
-+	{ 900  + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_0_900_PS },
-+	{ 1050 + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_1_050_PS },
-+	{ 1200 + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_1_200_PS },
-+	{ 1350 + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_1_350_PS },
-+	{ 1500 + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_1_500_PS },
-+	{ 1650 + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_1_650_PS },
-+	{ 1800 + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_1_800_PS },
-+	{ 1950 + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_1_950_PS },
-+	{ 2100 + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_2_100_PS },
-+	{ 2250 + YT8521_CCR_RXC_DLY_1_900_PS,	YT8521_RC1R_RGMII_2_250_PS }
- };
- 
- static u32 ytphy_get_delay_reg_value(struct phy_device *phydev,
-@@ -890,10 +890,10 @@ static int ytphy_rgmii_clk_delay_config(struct phy_device *phydev)
- 	rx_reg = ytphy_get_delay_reg_value(phydev, "rx-internal-delay-ps",
- 					   ytphy_rgmii_delays, tb_size,
- 					   &rxc_dly_en,
--					   YT8521_RC1R_RGMII_1_950_NS);
-+					   YT8521_RC1R_RGMII_1_950_PS);
- 	tx_reg = ytphy_get_delay_reg_value(phydev, "tx-internal-delay-ps",
- 					   ytphy_rgmii_delays, tb_size, NULL,
--					   YT8521_RC1R_RGMII_1_950_NS);
-+					   YT8521_RC1R_RGMII_1_950_PS);
- 
- 	switch (phydev->interface) {
- 	case PHY_INTERFACE_MODE_RGMII:
--- 
-2.25.1
+How about in the nlError constructor? That gives you a single
+location, and you can accept EINVAL, EOPNOTSUPP, ENODEV, ENOMEM, maybe
+ETOOBIG. Cause the test to fail for everything else. If anybody
+reports test failures with other errno values, the list can be
+expanded, if they are sensible.
 
+> > > +    # Try to reach min on all settings
+> > > +    for param in params:
+> > > +        val = rings[param]
+> > > +        while True:
+> > > +            try:
+> > > +                cfg.eth.rings_set({'header':{'dev-index': cfg.ifindex},
+> > > +                                   param: val // 2})
+> > > +                val //= 2
+> > > +                if val <= 1:
+> > > +                    break
+> > > +            except NlError:
+> > > +                break  
+> > 
+> > Is 0 ever valid? I would actually test 0 and make sure it fails with
+> > EINVAL, or EOPNOTSUPP. Getting range checks wrong is a typical bug, so
+> > it is good to test them. The happy days cases are boring because
+> > developers tend to test those, so they are hardly worth testings. Its
+> > the edge cases which should be tested.
+> 
+> I believe that 0 is a valid settings. I don't have much experience with
+> devices which support it. But presumably using 0 to disable mini/jumbo
+> rings would make sense for example? And max validation is done by the
+> core so nothing interesting to explore there at the driver level :(
+
+Looking at the code, it seems to cost nothing to actually test 0, if
+you say it could be valid. That might also find an off-by-one error,
+if it causes something to go negative/large positive.
+
+	Andrew
 
