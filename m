@@ -1,171 +1,193 @@
-Return-Path: <netdev+bounces-233486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3A82C143D3
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 12:01:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE7A2C14461
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 12:08:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F6BA624A75
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 10:59:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 889581887DD6
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 11:04:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6809B3093BF;
-	Tue, 28 Oct 2025 10:57:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BED62E7F2C;
+	Tue, 28 Oct 2025 11:03:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GoX60KGy"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="hL6g78HH";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="0DfJs6zU"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB1023090EA
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 10:57:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 105AC304BA2
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 11:03:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761649076; cv=none; b=qa9OswDXGxN8H+xbMwNj18m9fGnewU6lGA3BAy/CoIeF9mRYYx11K+nx15ZwWxHf/2zVdo6aFx6lKtSX7KaFSgcNQC6XAXmTGJAbYGk6NzuKQKwZ8ZxsHFDCEX/lTOIyyAIEjUzZJc2FrfjVRE0lKAtCs5+XJNakD4YPQG8hdkM=
+	t=1761649424; cv=none; b=HJljoS4851jNvrhLIdnw2cY6hpg7jDjAuMj8+umNJhGBavbdksed8eTLfSQMON/9A/ne9+5Ustb1xbVYpPfleoXRDS0120d3qgV7uChhYLm6x3iEkRhp0ZpG0eeiCxcwPK+/iegBnIvZoBKww8i8I2WU+lNhlVB/fuKGz5NMNus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761649076; c=relaxed/simple;
-	bh=dhQt0bKJ9jTDhVK4Se77dIyzwulKfyFM8IP6do1bd2Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=g4FzPYmJgyGrbCVOp7Z1C9s5rqH2VJtTd7Mhpt+aCo8Mcw1K2uhUOWkQRa4OhohaNA7FSwJpChUY9/2VlRiBB470Rqllbw3hrD5Am3lz5ljjFCdRTxC/3QTYJyCYiNGg7EK1vsaUSzSmrAYnGrtQDHtYv+DGtF7/WFhxFmtT92o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GoX60KGy; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761649073;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ss7g9OPGrAkY9kUcGCclPiLcw52MVKuR0CuNg2oTpdY=;
-	b=GoX60KGyBU7TaI352OE0Ic9ZAlHFkRFOugnC/z/ujAlg5NvjtAiSj88+61XRw1nuXR+yGB
-	T/68B741Q7uOr0fjluU/s+fmHlKCRgGl0S5Zhsx7lwvrDUjbOVy3jV2kFL16qHcBr03flA
-	BylgLV1b4MzMPmzKFSs2jZx8sGOyO1g=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-482-rq8ACNe6ODy7rB4D81qtMA-1; Tue, 28 Oct 2025 06:57:52 -0400
-X-MC-Unique: rq8ACNe6ODy7rB4D81qtMA-1
-X-Mimecast-MFC-AGG-ID: rq8ACNe6ODy7rB4D81qtMA_1761649071
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4710d174c31so54460555e9.0
-        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 03:57:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761649071; x=1762253871;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ss7g9OPGrAkY9kUcGCclPiLcw52MVKuR0CuNg2oTpdY=;
-        b=ESYyL6X/8he20MXIkWhffsrTsmRXGEq/PL5v76nkYGjTKP3CoXvwSWu05WVS8QGRgP
-         6lnVLzcG0IaBjmlJPROlS/ZJ8oimJp1g5wPKEUxqVvajWoLbhNfPxiO4Aq1VASMPnRbY
-         pm5QaM35cgaIqd0N9+M9zTe15hT7Gb0uLXiKkC+Ua8Y+9kUrIYAJTr/pfZ7LFZ4N46ow
-         6gLn5Kx1bN0ASFRA/ZehGGJg8N14mhCMicpnHhJBecA1ESkuBQmD+kG1cyqdjOWpZBDx
-         EipKT5vCBrcpzfNK+565xj5BEWT2vaCtCjxAmpw6t+wjm2U8Z987vMZS4OzKyby11uYZ
-         3rWg==
-X-Forwarded-Encrypted: i=1; AJvYcCU9AIEv3fY5s0bzvj0TZB1pF/CjvCGfoxGNLPSHFmK8bcRMxG7EC4xXJF0T3L7K/3T84/1mdZs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWE9JTFo0Pu4SrpkeXyIfkpW/C350nT6iGD/MEWk3lz0SIGwDL
-	BkXtHebyZc+A0p77TdOyxgrjQRU9g1Kky219cOOYXkwDkpLqyztHmZ+XUN9iAttJyK1AZVmMJjq
-	IaOY/wJrJeNEfK0RqyfJJWh91Inm2nf3KO4okO2J4QKXxz+Y9P5I0fb8kMg==
-X-Gm-Gg: ASbGnctnsJAJczUbJvkJ2fymCjM8H5ZMnK62usWLv0cTEpSdkbyfDYc3d65NMs2pkAO
-	Ray3pl7XdB+FaQiDxNtCYGFsE96l/D3Yw8zLjoey/cJHB6mdlMV/Jp/95uMCdd/ppXCKUgNjenu
-	9Fkf5sjBJkrLA4InuYJrZE0gMzoqAzTzm8vXkeXgRaWe4TOyKOFQQzoQCMt88uTheVK6hMTTvqG
-	rAmksGGGAfBO26G1rGTlN9iXFWn3SGcBVPgn1DePSN1ThQaGks1TO3dYozVgn03Q0IBtBi0/KKR
-	Jrhf6kTfVjUV4FPnYhpd/EZOv2t7L7yRVdJ2SZY45g64AvYThO7U/jddDKDXELp9eTts+2dUKwH
-	H8SmiemPeo4UzCE7wx7siIKRVmxUkhFimzqRZmYqQaBxTdNY=
-X-Received: by 2002:a05:600c:34c7:b0:475:e067:f23d with SMTP id 5b1f17b1804b1-47717e30340mr24822195e9.25.1761649071043;
-        Tue, 28 Oct 2025 03:57:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IErU20c2eSasDdwQZzdlRNWvVKDbbva3lmpIExHrHtMT8SPwj/9JiHFRH8lMSjet+8CB83SCA==
-X-Received: by 2002:a05:600c:34c7:b0:475:e067:f23d with SMTP id 5b1f17b1804b1-47717e30340mr24821915e9.25.1761649070539;
-        Tue, 28 Oct 2025 03:57:50 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-475dd47853csm191118005e9.13.2025.10.28.03.57.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Oct 2025 03:57:50 -0700 (PDT)
-Message-ID: <05efdc9a-8704-476e-8179-1a9fc0ada749@redhat.com>
-Date: Tue, 28 Oct 2025 11:57:47 +0100
+	s=arc-20240116; t=1761649424; c=relaxed/simple;
+	bh=6+SVeCHcDo+dTjAZi2LgbANQoIWvtBXY8JWAqFJ9fL8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZgkVC0LWFDa6ZZ53dzG2xF8+8m+WpHVMJg2Ky4jWQ3zTRUKxFXjBpa3V6PoJWcBcN2Mv196dCnoV4OYXaQKa89jpepr9vBxjmW0Hdnkc53RyCT+aHrUdipwImWB8kUvmtozWtd/mpRRn5am4JOoPlmKJ2/2Eujvr2jzm4SvguJc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=hL6g78HH; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=0DfJs6zU; arc=none smtp.client-ip=103.168.172.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
+	by mailfout.phl.internal (Postfix) with ESMTP id 07689EC0377;
+	Tue, 28 Oct 2025 07:03:40 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-05.internal (MEProxy); Tue, 28 Oct 2025 07:03:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1761649420; x=
+	1761735820; bh=Ei+of7EvLgIKE771IeYWhC5OPvi8h8EKNo0c0ZuGw4I=; b=h
+	L6g78HHFIgheejVCDcwUWg5IgoMHafD0LIrlaPJ3W2h5KgImucihqwyFICOFuxPD
+	y0O9OgC3XkyrhAs3pWu0+bNGeqA6mOF22ywlSaicXDQPn8YP5cFZElB2VobTXZMY
+	J9fyPjMwCw4Uvu9gVzIBB9Eli9WOteMEQqRBC2pjipGMtENmzV6PqUvpvgszJCxq
+	A9f8ZemGVabbUo7ADZm4Px0sypN0VphxGK8AYrlnrF35ISvX2aAQoC+e0aSeyrne
+	KOw3BeTC2uuX7wGC0eWRIIlwrLBYJx8bqfc6kTIBhavoFCktmrAqUNDvbtzs3vfx
+	crcjRqDxz1U8aLe+lQE6w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1761649420; x=1761735820; bh=Ei+of7EvLgIKE771IeYWhC5OPvi8h8EKNo0
+	c0ZuGw4I=; b=0DfJs6zUlUMQOySxMsDBcdSwMDpeHMvj4BRzSYVCf/cG55qbfWz
+	gFUsoPjVwE23iqR2WBVlnOI9wCFBd4KJO/bv6+2Ect7ltJqoPVYGg3UwQtm4B/v3
+	tz9DbndonE4nSe2elnavYBwWQNG7j++GL1ci51tTw8QYEhqkoHA64INKybt+YHmE
+	n9p7Mc4xmIRlnNZmVExdjJYHLpPhkSvWsGtx51JZbJU/TdLKIqv14TqLFNFMwEMu
+	VpvSe/nsaBHlIizAjzL506dPzmPc1+QfyJRbjtyS5oWQPg1+/cnn8tCfmVe/n2dV
+	36J5ejKaRyOxzNJmTlFqrlMVRGzU8mDpA2Q==
+X-ME-Sender: <xms:C6MAaekjIyuI0hKsmTJBj_xmxQSwL-z884RsDdlrjaN95gP4HfbrcQ>
+    <xme:C6MAaRtz6g99j4YsjKOt2P-q0JdP7lS0QzNJaTnQ7JYDL97UMdGu0Wzg4sw8dFF95
+    MiXkeWMhExs3LdVR-3lgZfCDgxtExWMufq_kJBW4HPOldiEyLGR6g>
+X-ME-Received: <xmr:C6MAaZpf7MAXblYXcEnl1ioFFdEla4VphZjl-4myIKS8YYT0ijowX09TkqZQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduiedtieekucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepgefhffdtvedugfekffejvdeiieelhfetffeffefghedvvefhjeejvdek
+    feelgefgnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdr
+    nhgvthdpnhgspghrtghpthhtohepuddupdhmohguvgepshhmthhpohhuthdprhgtphhtth
+    hopehjihgrnhgsohhlsehnvhhiughirgdrtghomhdprhgtphhtthhopehnvghtuggvvhes
+    vhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghvvghmsegurghvvghmlh
+    hofhhtrdhnvghtpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphht
+    thhopehsthgvfhhfvghnrdhklhgrshhsvghrthesshgvtghunhgvthdrtghomhdprhgtph
+    htthhopegtrhgrthhiuhesnhhvihguihgrrdgtohhmpdhrtghpthhtohephhgvrhgsvghr
+    thesghhonhguohhrrdgrphgrnhgrrdhorhhgrdgruhdprhgtphhtthhopegvughumhgrii
+    gvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdr
+    tghomh
+X-ME-Proxy: <xmx:C6MAaXd7su0C4GKhEMOrcmZVlBoFTpNWGR33HiFDCf3ZDZ0pD2l9SA>
+    <xmx:C6MAaRm18Ftv7shi1f4JyJl1Uvjy6cTYNk7ED1OQtXRh57klnNoLMQ>
+    <xmx:C6MAaebO6zstTNlvuehme-K5Mex0T_MM10Tiei4WKp80LweHMVlHAg>
+    <xmx:C6MAaW5S3NXnfQL769df00K6HDao5l6n0jdzZYk4VccTanxwE_jUNw>
+    <xmx:C6MAaVKYR-8JC4hqW-83JIAigp1SxQUMEEITwr08SP15Yv1X2s9KWKdC>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 28 Oct 2025 07:03:38 -0400 (EDT)
+Date: Tue, 28 Oct 2025 12:03:36 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Jianbo Liu <jianbol@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	steffen.klassert@secunet.com, Cosmin Ratiu <cratiu@nvidia.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>
+Subject: Re: [PATCH ipsec v3 2/2] xfrm: Determine inner GSO type from packet
+ inner protocol
+Message-ID: <aQCjCEDvL4VJIsoV@krikkit>
+References: <20251028023013.9836-1-jianbol@nvidia.com>
+ <20251028023013.9836-3-jianbol@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 2/6] net: ti: icssg-prueth: Add XSK pool
- helpers
-To: Meghana Malladi <m-malladi@ti.com>, horms@kernel.org,
- namcao@linutronix.de, vadim.fedorenko@linux.dev, jacob.e.keller@intel.com,
- christian.koenig@amd.com, sumit.semwal@linaro.org, sdf@fomichev.me,
- john.fastabend@gmail.com, hawk@kernel.org, daniel@iogearbox.net,
- ast@kernel.org, kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
- andrew+netdev@lunn.ch
-Cc: linaro-mm-sig@lists.linaro.org, dri-devel@lists.freedesktop.org,
- linux-media@vger.kernel.org, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, srk@ti.com,
- Vignesh Raghavendra <vigneshr@ti.com>, Roger Quadros <rogerq@kernel.org>,
- danishanwar@ti.com
-References: <20251023093927.1878411-1-m-malladi@ti.com>
- <20251023093927.1878411-3-m-malladi@ti.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251023093927.1878411-3-m-malladi@ti.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20251028023013.9836-3-jianbol@nvidia.com>
 
-On 10/23/25 11:39 AM, Meghana Malladi wrote:
-> @@ -1200,6 +1218,109 @@ static int emac_xdp_setup(struct prueth_emac *emac, struct netdev_bpf *bpf)
->  	return 0;
->  }
->  
-> +static int prueth_xsk_pool_enable(struct prueth_emac *emac,
-> +				  struct xsk_buff_pool *pool, u16 queue_id)
-> +{
-> +	struct prueth_rx_chn *rx_chn = &emac->rx_chns;
-> +	u32 frame_size;
-> +	int ret;
-> +
-> +	if (queue_id >= PRUETH_MAX_RX_FLOWS ||
-> +	    queue_id >= emac->tx_ch_num) {
-> +		netdev_err(emac->ndev, "Invalid XSK queue ID %d\n", queue_id);
-> +		return -EINVAL;
-> +	}
-> +
-> +	frame_size = xsk_pool_get_rx_frame_size(pool);
-> +	if (frame_size < PRUETH_MAX_PKT_SIZE)
-> +		return -EOPNOTSUPP;
-> +
-> +	ret = xsk_pool_dma_map(pool, rx_chn->dma_dev, PRUETH_RX_DMA_ATTR);
-> +	if (ret) {
-> +		netdev_err(emac->ndev, "Failed to map XSK pool: %d\n", ret);
-> +		return ret;
-> +	}
-> +
-> +	if (netif_running(emac->ndev)) {
-> +		/* stop packets from wire for graceful teardown */
-> +		ret = icssg_set_port_state(emac, ICSSG_EMAC_PORT_DISABLE);
-> +		if (ret)
-> +			return ret;
-> +		prueth_destroy_rxq(emac);
-> +	}
-> +
-> +	emac->xsk_qid = queue_id;
-> +	prueth_set_xsk_pool(emac, queue_id);
-> +
-> +	if (netif_running(emac->ndev)) {
-> +		ret = prueth_create_rxq(emac);
+2025-10-28, 04:22:48 +0200, Jianbo Liu wrote:
+> The GSO segmentation functions for ESP tunnel mode
+> (xfrm4_tunnel_gso_segment and xfrm6_tunnel_gso_segment) were
+> determining the inner packet's L2 protocol type by checking the static
+> x->inner_mode.family field from the xfrm state.
+> 
+> This is unreliable. In tunnel mode, the state's actual inner family
+> could be defined by x->inner_mode.family or by
+> x->inner_mode_iaf.family. Checking only the former can lead to a
+> mismatch with the actual packet being processed, causing GSO to create
+> segments with the wrong L2 header type.
+> 
+> This patch fixes the bug by deriving the inner mode directly from the
+> packet's inner protocol stored in XFRM_MODE_SKB_CB(skb)->protocol.
+> 
+> Instead of replicating the code, this patch modifies the
+> xfrm_ip2inner_mode helper function. It now correctly returns
+> &x->inner_mode if the selector family (x->sel.family) is already
+> specified, thereby handling both specific and AF_UNSPEC cases
+> appropriately.
 
-It looks like this falls short of Jakub's request on v2:
+(nit: I think this paragraph goes a bit too much into describing the
+changes between versions)
 
-https://lore.kernel.org/netdev/20250903174847.5d8d1c9f@kernel.org/
+> With this change, ESP GSO can use xfrm_ip2inner_mode to get the
+> correct inner mode. It doesn't affect existing callers, as the updated
+> logic now mirrors the checks they were already performing externally.
 
-about not freeing the rx queue for reconfig.
+Sorry, maybe I wasn't clear, but I meant that the callers should also
+be updated to not do the AF_UNSPEC check anymore (note: this will
+cause merge conflicts with your "NULL inner_mode" cleanup patch [1]).
 
-I think you should:
-- stop the H/W from processing incoming packets,
-- spool all the pending packets
-- attach/detach the xsk_pool
-- refill the ring
-- re-enable the H/W
+And I think it would be nicer to split the refactoring into a separate
+patch. So this series would be:
 
-/P
+patch 1: fix xfrm_dev_offload_ok and xfrm_get_inner_ipproto (same as now)
+patch 2: modify xfrm_ip2inner_mode and remove the AF_UNSPEC check and
+         setting inner_mode = &x->inner_mode from all callers
+         [no behavior change, just a refactoring to prepare for patch 3]
+patch 3: use xfrm_ip2inner_mode for GSO (same as your v2 patch 2/2)
 
+Does that seem ok to you?
+
+
+And to avoid the merge conflict with [1], maybe it also makes more
+sense to integrate that clean up in patch 2 from the list above, so
+for ip_vti we'd have:
+
+diff --git a/net/ipv4/ip_vti.c b/net/ipv4/ip_vti.c
+index 95b6bb78fcd2..89784976c65e 100644
+--- a/net/ipv4/ip_vti.c
++++ b/net/ipv4/ip_vti.c
+@@ -118,16 +118,7 @@ static int vti_rcv_cb(struct sk_buff *skb, int err)
+ 
+ 	x = xfrm_input_state(skb);
+ 
+-	inner_mode = &x->inner_mode;
+-
+-	if (x->sel.family == AF_UNSPEC) {
+-		inner_mode = xfrm_ip2inner_mode(x, XFRM_MODE_SKB_CB(skb)->protocol);
+-		if (inner_mode == NULL) {
+-			XFRM_INC_STATS(dev_net(skb->dev),
+-				       LINUX_MIB_XFRMINSTATEMODEERROR);
+-			return -EINVAL;
+-		}
+-	}
++	inner_mode = xfrm_ip2inner_mode(x, XFRM_MODE_SKB_CB(skb)->protocol);
+ 
+ 	family = inner_mode->family;
+ 
+
+
+Does that sound reasonable?
+
+[1] https://lore.kernel.org/netdev/20251027023818.46446-1-jianbol@nvidia.com/
+
+-- 
+Sabrina
 
