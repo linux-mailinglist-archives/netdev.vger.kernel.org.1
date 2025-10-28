@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-233363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79C83C12850
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 02:21:04 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id F33C3C12865
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 02:21:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CF2B467F40
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 01:21:03 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D8642500D3A
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 01:21:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40F5E2253A0;
-	Tue, 28 Oct 2025 01:20:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4510A226165;
+	Tue, 28 Oct 2025 01:20:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KzmcPUpK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HCmvE60q"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17A422236FA;
-	Tue, 28 Oct 2025 01:20:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D752225788;
+	Tue, 28 Oct 2025 01:20:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761614452; cv=none; b=dO/3ycecrUUSCuSiYpGcSNIvAmdhFE7gspPbTs7yScgAJ9lYFTLAEeq0Z0SRrq1NCfLoD7q4khueJIXXNR9bfIYv3pXRwSIypHRZYGB/vIT9CqnvOYKIBJBIbM96a8zwt3us1pQmy9QgM4ExAxgyq+q7tXp0gKSmSHTDAUenVeM=
+	t=1761614453; cv=none; b=DVrbCZ9AqM+UoYvy1Tl2W/sLZZ7tZjqJUtb4iHvIO/VP1Mb9kws1LCJ3FH/7ejn7xXFq2rPwOtTf18Kp/tjPrJLMrKRcBH0ujViaGdxK0WpHepKc8hPaJ59P903gGC9F0I3GYJaohJqXW8tI/R1/C/8S4KQYfbgCXW16bXBMTqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761614452; c=relaxed/simple;
-	bh=yrcBwH2XXOkOdtxLeN4gWFNmIm8tCpGg1cn6gXY9UDA=;
+	s=arc-20240116; t=1761614453; c=relaxed/simple;
+	bh=zEWRBnfP++561c+hL3LHaBk8829cXR+Sa0dDa6dDuds=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Zo/4S3pD3EJH+A5/vS6tnDEb1DlLz0hvUhGHIq9Vh05BFk5jy3pVIsmJRCTguvc2+3Yd6yYqONQV11FR/4vd/pduD/02SLHnM0616BrMLZBFWU5H8S7egZzx47D64hPJDfRM1Ir5X2+m74ekPvwZBnS987aNg6yUhmFMDnmx7qA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KzmcPUpK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67C7EC4CEFB;
-	Tue, 28 Oct 2025 01:20:51 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Kohm7pploKn0az0fWoFmsXmgqgwThSwM91k0LGsCabXm+N4i4hkVLd5XYdbo9JXN9MLIo3viirT5/o4+mTHdmeXEM4v90Qjq5zjqC5o0RKP6/wK32Tb9MLpN/oDxtYHRatJU3MMoI4I9XAIPIn1VoRhbrDYEjFUbpFB+0KkdUUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HCmvE60q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7EA6C4CEF1;
+	Tue, 28 Oct 2025 01:20:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761614451;
-	bh=yrcBwH2XXOkOdtxLeN4gWFNmIm8tCpGg1cn6gXY9UDA=;
+	s=k20201202; t=1761614452;
+	bh=zEWRBnfP++561c+hL3LHaBk8829cXR+Sa0dDa6dDuds=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KzmcPUpKt8vwH07caBjcJ6bq6gqr1breDACWYwlbOlnOVB6r+Y80NqX9O3IM8kXoZ
-	 QxtIFTHeEUvbD4Km84UvCY02UD2C/juINQDHLHHCl4CJAUizRQHGhqZ0hfD60vi4fF
-	 CMTMSh7IPi7sMIPOEvZ0qILV0nKB1Vzd+AhWkm1Ba9hDbDNpqHauxR0/Mg9idyAzZM
-	 gLebOUFH5l2jl551EdztMnw392kv0I7Lywi6ih5Vl/EnjKhoNfeaocrNpPscBWH5xm
-	 wrqk5Ha1z+FcGJonI3biNhM14X+CZJq7Cc8c5lXZqdw1KAQUQmFVMdC0bfIBFKE7D7
-	 7yd2UPdjwt8AQ==
+	b=HCmvE60qeuSj9x2KsY5VKfX/WYmhx6x2GTyLWWMVN3WhIhNfmilAhE4GBUy65i6oB
+	 Fnd1jQ84NEF5120jMVrmIJPNwf27eC7grbKM2bG/HmSTd6+fFJNDoAmR1zfRm5XWFX
+	 GOYIzS7FNIeN274DUot8y+0uDuMDtGGfY0GKnA3jGhi8VhE10LFPeu1eRO7ZO+N302
+	 23tPp5QefYkGwsyvZMqF81OSwvPpt631sKAW74El50/63dZHhYTp7ixyfEDKeA9rdl
+	 XbGwHPBOdHF3kXsquPvH5AfOVuq2tJCRRS/cmsalbSuCPGgeKuhR8s/wNDUMY/+YTk
+	 xN9bw2CoYcu8g==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE09C39D60B9;
-	Tue, 28 Oct 2025 01:20:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADE439D60B9;
+	Tue, 28 Oct 2025 01:20:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,59 +52,61 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 net-next 0/8] sctp: Avoid redundant initialisation in
- sctp_accept() and sctp_do_peeloff().
+Subject: Re: [PATCH net-next v5 0/6] convert net drivers to ndo_hwtstamp API
+ part
+ 2
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176161442950.1651448.1798701747287698660.git-patchwork-notify@kernel.org>
-Date: Tue, 28 Oct 2025 01:20:29 +0000
-References: <20251023231751.4168390-1-kuniyu@google.com>
-In-Reply-To: <20251023231751.4168390-1-kuniyu@google.com>
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: marcelo.leitner@gmail.com, lucien.xin@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- kuni1840@gmail.com, netdev@vger.kernel.org, linux-sctp@vger.kernel.org
+ <176161443074.1651448.3590346832482597545.git-patchwork-notify@kernel.org>
+Date: Tue, 28 Oct 2025 01:20:30 +0000
+References: <20251023220457.3201122-1-vadim.fedorenko@linux.dev>
+In-Reply-To: <20251023220457.3201122-1-vadim.fedorenko@linux.dev>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: shenjian15@huawei.com, salil.mehta@huawei.com, shaojijie@huawei.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, sgoutham@marvell.com, gakula@marvell.com,
+ sbhatta@marvell.com, bbhushan2@marvell.com, tariqt@nvidia.com,
+ brett.creeley@amd.com, niklas.soderlund@ragnatech.se, paul@pbarker.dev,
+ yoshihiro.shimoda.uh@renesas.com, linux-renesas-soc@vger.kernel.org,
+ richardcochran@gmail.com, linux@armlinux.org.uk, vladimir.oltean@nxp.com,
+ horms@kernel.org, jacob.e.keller@intel.com, netdev@vger.kernel.org
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 23 Oct 2025 23:16:49 +0000 you wrote:
-> When sctp_accept() and sctp_do_peeloff() allocates a new socket,
-> somehow sk_alloc() is used, and the new socket goes through full
-> initialisation, but most of the fields are overwritten later.
+On Thu, 23 Oct 2025 22:04:51 +0000 you wrote:
+> This is part 2 of patchset to convert drivers which support HW
+> timestamping to use .ndo_hwtstamp_get()/.ndo_hwtstamp_set() callbacks.
+> The new API uses netlink to communicate with user-space and have some
+> test coverage.
 > 
->   1)
->   sctp_accept()
->   |- sctp_v[46]_create_accept_sk()
->   |  |- sk_alloc()
->   |  |- sock_init_data()
->   |  |- sctp_copy_sock()
->   |  `- newsk->sk_prot->init() / sctp_init_sock()
->   |
->   `- sctp_sock_migrate()
->      `- sctp_copy_descendant(newsk, oldsk)
+> v4 -> v5:
+>  fix ionic dirver build with CONFIG_PTP_1588_CLOCK=n
+> v3 -> v4:
+>  fix commit message in patch 6
+> v2 -> v3:
+>  use NL_SET_ERR_MSG_MOD() variant to report errors back to user-space
+> v1 -> v2:
+>  hns3: actually set up new ndo callbacks
+>  ionic: remove _lif_ portion from name to align with other ndo callbacks
 > 
 > [...]
 
 Here is the summary with links:
-  - [v3,net-next,1/8] sctp: Defer SCTP_DBG_OBJCNT_DEC() to sctp_destroy_sock().
-    https://git.kernel.org/netdev/net-next/c/622e8838a298
-  - [v3,net-next,2/8] sctp: Don't copy sk_sndbuf and sk_rcvbuf in sctp_sock_migrate().
-    https://git.kernel.org/netdev/net-next/c/2d4df59aae91
-  - [v3,net-next,3/8] sctp: Don't call sk->sk_prot->init() in sctp_v[46]_create_accept_sk().
-    https://git.kernel.org/netdev/net-next/c/b7185792f80a
-  - [v3,net-next,4/8] net: Add sk_clone().
-    https://git.kernel.org/netdev/net-next/c/151b98d10ef7
-  - [v3,net-next,5/8] sctp: Use sk_clone() in sctp_accept().
-    https://git.kernel.org/netdev/net-next/c/16942cf4d3e3
-  - [v3,net-next,6/8] sctp: Remove sctp_pf.create_accept_sk().
-    https://git.kernel.org/netdev/net-next/c/c49ed521f177
-  - [v3,net-next,7/8] sctp: Use sctp_clone_sock() in sctp_do_peeloff().
-    https://git.kernel.org/netdev/net-next/c/b7ddb55f3127
-  - [v3,net-next,8/8] sctp: Remove sctp_copy_sock() and sctp_copy_descendant().
-    https://git.kernel.org/netdev/net-next/c/71068e2e1b6b
+  - [net-next,v5,1/6] octeontx2: convert to ndo_hwtstamp API
+    https://git.kernel.org/netdev/net-next/c/a5c12b060efe
+  - [net-next,v5,2/6] mlx4: convert to ndo_hwtstamp API
+    https://git.kernel.org/netdev/net-next/c/7a07dc723fad
+  - [net-next,v5,3/6] ionic: convert to ndo_hwtstamp API
+    https://git.kernel.org/netdev/net-next/c/38efb0ba3cd0
+  - [net-next,v5,4/6] net: ravb: convert to ndo_hwtstamp API
+    https://git.kernel.org/netdev/net-next/c/faac57cddfc2
+  - [net-next,v5,5/6] net: renesas: rswitch: convert to ndo_hwtstamp API
+    https://git.kernel.org/netdev/net-next/c/87e1b590f776
+  - [net-next,v5,6/6] net: hns3: add hwtstamp_get/hwtstamp_set ops
+    https://git.kernel.org/netdev/net-next/c/329021eeae03
 
 You are awesome, thank you!
 -- 
