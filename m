@@ -1,115 +1,177 @@
-Return-Path: <netdev+bounces-233604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53636C1646C
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 18:46:51 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 124E9C163F1
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 18:43:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 81E444FEFF4
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 17:42:16 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id DD2653564BC
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 17:43:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A75534B41E;
-	Tue, 28 Oct 2025 17:42:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21A4734CFDD;
+	Tue, 28 Oct 2025 17:42:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mev9YXuM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l64mDNkp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f195.google.com (mail-pf1-f195.google.com [209.85.210.195])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CDB1199FAC
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 17:42:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F8AE34C9BF
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 17:42:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761673329; cv=none; b=pRyyL1yZ1DJKfuaEr8QPzwsvrmab+ClOaXEdcXFLxXa9s1HIk4oilIh35GqG/8a4FeFzn/wSyzA2GB793vyhxr/K+MsByqgsh5roDTUUVkmTL4brmB8s/HXgGJlVxvT8FvmjCHlNKSixIXLeRldBo/cAgdTLtGvuHwQkjk2L8yY=
+	t=1761673365; cv=none; b=iFWvz4kXwP9QDG54nefP7AMAmohsKOXBuLfq6sB/cqFVbtdXy14DmKRhTOJnqfn3HE0lBO+10UeJRZwvi3VE4BRSHyCFGRJi5wh0lEoVISmMdffpRfzFdC5UYZK1QVM5MDADz3QAJKNWGkdGHBGfHjEEHw6Ubbp+2vn0xGSQdL4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761673329; c=relaxed/simple;
-	bh=Im6VzXUuwdDDmZDQbOVnf4aGedh78bR8cSlODEcvMy8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gLpRte6dPkdR9RU1z3he4gQQVA7GCjI9n33D5esOFo1GhDIvl2irWF1IYlpllX+cGQc/9XUumh1n8kpE2dN5sdROi1dV+6shrALmrcKMnS6MeGmncy7Nf1iD9hb+GCdzDjTf5zdb1re5tIEZec0iVIee1FpnJIjAfHhVvg7AA1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mev9YXuM; arc=none smtp.client-ip=209.85.210.195
+	s=arc-20240116; t=1761673365; c=relaxed/simple;
+	bh=NB4/159VAJ/LOLYrEdLoYDe6gQW8IwjruqaLuSzroRI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=djvfZzYi3guCbQITsuls6uVg6JfVW0xEojnnY9SzVrJFQ+IqsGu2OS1mFqad1I2xIApj04CVRLOiNZHdA/kYbAtleZpDeRKBSHfBKIm8Y/iuuEuPSNpHhMb8C7/Q6wx5Bq4nWy45cOaeu+KZwkW0Soie2I+FdE+aO6rPsuS5PmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l64mDNkp; arc=none smtp.client-ip=209.85.210.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f195.google.com with SMTP id d2e1a72fcca58-7a26b9a936aso3700233b3a.0
-        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 10:42:06 -0700 (PDT)
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7a28c7e3577so3678351b3a.1
+        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 10:42:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761673326; x=1762278126; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rXtwgLeN1ZS1AfyQjxZpzxTFmTVASzIiRqR3Osccy0Y=;
-        b=mev9YXuMu+qGoKD5lO6M3V82corZbeb3NZfCrDXaH1LDRt4woQP5QwrwwbJkiMJfCq
-         1twF+S2v6rhmhlOlGUwYLeGnaEM2/BgKcd3SNbx4fldJXXGfeRm3D2+pT7ZQkpVCQ1j5
-         5oYGP1mEviDdX2A/lX6Al9kcOZFJriJIOIpG2hNpSuq0J/+TznBAG48X+99zpOPP4Nch
-         4qTwLOqDvGsYmwmuLLlTNpLrg7hOyCh4ix1Xb6MojWH+dzoW2g3tZtbdmSKYBl2OoJsG
-         yzjYTY+X9uvCpszPm5kUECSy29R0ARE52nN0Yy/IAbi2ho8QoP5bR5F49wrYMmZBoXJP
-         6Khw==
+        d=gmail.com; s=20230601; t=1761673363; x=1762278163; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pUzQKBks4b6XgtXD3YeHoVuqCQLUAhrUCly5cGOnfSg=;
+        b=l64mDNkpwyGxcOssSDTg7IatUFkEZGofVjCs2qt1FewOF6/6Mpobaw9ECAmBH+SC3U
+         tOTITFF/N3wjho6Ta984rJdEWi01dosMFY7ZlShOvoXkMxPmTOU3nItgCzDZc9rzM8en
+         NQTddCEyArdIevNn/fpsO+6pUkTMnQuirbEBxYJisTf5ezg/GGy1zTp7f9NmDq4T0mVO
+         q9WIuyi01+8S8yufqgtTRSAi0XWqMXuhuoo8H246EkE/K3sjmlPOUGMACkD8nSIK58Uy
+         MNTPc/n2iJVlYSCsrjQAX2pLig36SlK5wPb+abvVHmSOkn1csneA1Ulnm51gGjNPv7xb
+         o71w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761673326; x=1762278126;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rXtwgLeN1ZS1AfyQjxZpzxTFmTVASzIiRqR3Osccy0Y=;
-        b=dZLrfOz+v3IXfztIPhNE7gNDSYl6Twj+4TwimDvF2DipUu3y6h5pWvR/St6U8IJf4c
-         j7EI6Yi3fmUBDAE/CWrzBNaNXE/mrHJ6hpbFn2bXOtfyzY5zOSFRo3CdeKukFBAKQ7T3
-         sKzf10Al7J1O1BHphfP5rD8Q8wACSypnhn4dRNKCq2YoXwzqRsWrp3sq61jywTfDeaSg
-         d5iK/jXCPfZY+3pnqNMbVOSeq0HVGf+IGavBTUaBaCbvnpYKYS62Uz3wd9ucH1/bdce1
-         0OGMXWgxU8YNb7yiGnjFk3EAVpLFnfa6l7W9P5UGQy6aTCqw0/hMNk/G2IbWNNdH3KkY
-         DHcg==
-X-Forwarded-Encrypted: i=1; AJvYcCWqQwsF0HH1rMO6Q/XpWSnRA0VTTdo4dEZ3iozg9J1DfpIepZEGE2Gix0NVPAT63NErkmeOOaE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKueX27dJXZBcW7yZxOCBwELFLnNc8OyrB5t9DpV6dKrnooI8A
-	itFdDhN3u/fnClyb31I8rETsOQ02DYFZ7Ti8al81icZtv3yHC1f/yp38lNZou4ihgfQ=
-X-Gm-Gg: ASbGncu5F0RUz4EGk68fOyUkcoDEGIOTwFiOVFyPNm7OjYmuB4TkR7QNbH0WtBjDrmw
-	ABxw/4poNsEh2GeoCD7RfHSaBWuNLNp4zYW8uVzzzUSWoEemtjhG+2er5I+L3hc2XPY0ZE2P8Hm
-	BpzEOhdZatT7DqqalZOl3M/mW8GMfqFcLNBta+zUDVONbFXk8+mo41NZ7zglGutWOlwbXF/Y7je
-	JaLuQpQlHSB1w638jBpa21c4rYYSbpoB2fl47t0Dm9BtXxOqjCzJ2FIsHkwsM614Dcnfxq8FNxu
-	DNeMKctl0crEhSgEWUYLBQKoxcQgIpkiEqegla0hXcxkMZylRzknrf+aXCYQ+cG7mK7fwhT2wm0
-	sO37nl/4ZLkR9fVU2NxZsmInZlGeoM9fGvVNVnD9fZfiqPD4d8Yf2yGSd/TWebF53xxnV3YI0+L
-	41DgzIOV7vb8YVlEIzAo0=
-X-Google-Smtp-Source: AGHT+IHY648HfWpg/1mCsYtX8S4x0CTFltDo3CpRCwoMSOqHKLBzLVsRp/I93hYx56RK6MNiNgUYAA==
-X-Received: by 2002:a05:6a20:2588:b0:341:84ee:7596 with SMTP id adf61e73a8af0-344d228adf8mr5688460637.16.1761673326191;
-        Tue, 28 Oct 2025 10:42:06 -0700 (PDT)
-Received: from fedora ([103.120.31.122])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b71268bd810sm11197981a12.6.2025.10.28.10.42.00
+        d=1e100.net; s=20230601; t=1761673363; x=1762278163;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pUzQKBks4b6XgtXD3YeHoVuqCQLUAhrUCly5cGOnfSg=;
+        b=mhe6jp8Db7kUOFU00yvGRC+4LkYNN4kf+rnIlPCtVexAhi5/mAuImWFVCBkRV1ucCZ
+         QrLwF5GO2q6TwYEr8FsInb5HJUbnE7ipY4rfz42sFxsmAhdeWjKQVu/1jPHss7w1Waxj
+         j1CSCeSv+l7RG9gAyYHNCvP0KPjcdvvAhV4vdeUXXOgMSW9u5v8MhN8kDIVqJsr78CK3
+         95p371LIldzbQR0E92WlkgUzq/oO5vQzBWYmlWmVb2l5uBERC/wrogaTRbg6rQIPrG1t
+         Va1a+Y+haKDdg8S0NHIZM02rUQLoNJeYtaigqkWBHGU9xpWxqJJ6U6xbEOqxuI7z9AYI
+         vGiA==
+X-Gm-Message-State: AOJu0YwwgtKiEGMr9F4xlQMbTED66Jli7sDpcfSCsIZO5KY0v18vKzDo
+	b7DESssBE/DRJ2PwRG1ZLAci8hcYsDlKFF+UBz8uNezcIGEW73Bzx0bM
+X-Gm-Gg: ASbGncsGbmmiU5AKroZ0BEnwAyKpmASNgCPU+PxHooFnPv9PKJ9mcxNzdStxcRnVZzH
+	jNEjVvFSKl1M1lZJj8fKBsd4PoSY9hGznzejY5X8fGhbcGuFI4LXdM9+t9gbviUbBhPyeRmh5Jk
+	lxo75sljJlQRB3Ya0+hYOPOCNfsr2puJ8R0dLvzE1U1uaQyaMAF2Um1KwQDc3Jd6SRjDiBqCvqP
+	eXi+lO6uOgAuUkxm+9kzIOigAfhWouE+a7EVZJXPzwCsFNauW9mLpZ616N6Sw+QBwl7iUyV911v
+	lWHQA4uHns7sa3hwuXRJyI2ZzM5p2g8fyT8DPkG29XkqDjR6XpYnXjb27cIkr12H14z2QI7s8dI
+	6/S08EU/WHGN0TtLQBFORRqaRULZ7epKedaveSd0oedo32AQvYUwiK54apfBLRAm3viZLn3602K
+	1DMf8tD0nkH+cPfBdJP/Z6tT7fT0Y4F6Mxv4VRg+UxuEiEP74ex0U7siIbBQ7Iv1iyX1U=
+X-Google-Smtp-Source: AGHT+IFkagOU2linMs2kD3kWq1TGqg7rAVt5JSOnY9BDlaUoP7+rT5UX8pceuf3wIHeJnBVA96Qorg==
+X-Received: by 2002:a05:6a21:3289:b0:266:1f27:a01e with SMTP id adf61e73a8af0-344d3e45d1amr5219012637.39.1761673362484;
+        Tue, 28 Oct 2025 10:42:42 -0700 (PDT)
+Received: from debian.domain.name ([223.181.113.110])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b71268bde68sm11086746a12.1.2025.10.28.10.42.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Oct 2025 10:42:05 -0700 (PDT)
-Date: Tue, 28 Oct 2025 23:11:56 +0530
-From: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>
-Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Tue, 28 Oct 2025 10:42:41 -0700 (PDT)
+From: I Viswanath <viswanathiyyappan@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	sdf@fomichev.me,
+	kuniyu@google.com,
+	ahmed.zaki@intel.com,
+	aleksander.lobakin@intel.com,
+	jacob.e.keller@intel.com
+Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Muhammad Usama Anjum <usama.anjum@collabora.com>
-Subject: Re: [PATCH v2] selftest: net: fix socklen_t type mismatch in
- sctp_collision test
-Message-ID: <aQEAZLv8V0asoe4r@fedora>
-References: <20251028172947.53153-1-ankitkhushwaha.linux@gmail.com>
+	skhan@linuxfoundation.org,
+	linux-kernel-mentees@lists.linux.dev,
+	david.hunter.linux@gmail.com,
+	khalid@kernel.org,
+	I Viswanath <viswanathiyyappan@gmail.com>
+Subject: [RFC/RFT PATCH net-next v3 0/2] net: Split ndo_set_rx_mode into snapshot and deferred write
+Date: Tue, 28 Oct 2025 23:12:20 +0530
+Message-ID: <20251028174222.1739954-1-viswanathiyyappan@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251028172947.53153-1-ankitkhushwaha.linux@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-Hi, 
-Forgot to include changelog section in v2. 
+This is an implementation of the idea provided by Jakub here
 
-Changelog:
-v2: 
-- formatting fixes compared to v1
+https://lore.kernel.org/netdev/20250923163727.5e97abdb@kernel.org/
 
-v1: https://lore.kernel.org/linux-kselftest/20251026174649.276515-1-ankitkhushwaha.linux@gmail.com/
+ndo_set_rx_mode is problematic because it cannot sleep.
 
-Thanks
---
-Ankit
+To address this, this series proposes dividing existing set_rx_mode
+implementations into set_rx_mode and write_rx_config
+
+The new set_rx_mode will be responsible for updating the rx_config
+snapshot which will be used by ndo_write_rx_config to update the hardware
+
+In brief, The callback implementations should look something like:
+
+set_rx_mode():
+    prepare_rx_config();
+    update_snapshot();
+
+write_rx_config():
+    read_snapshot();
+    do_io();
+
+write_rx_config() is called from a work item making it sleepable
+during the do_io() section.
+
+This model should work correctly if the following conditions hold:
+
+1. write_rx_config should use the rx_config set by the most recent
+    call to set_rx_mode before its execution.
+
+2. If a set_rx_mode call happens during execution of write_rx_config,
+    write_rx_config should be rescheduled.
+
+3. All calls to modify rx_mode should pass through the set_rx_mode +
+    schedule write_rx_config execution flow.
+
+1 and 2 are guaranteed because of the properties of work queues
+
+Drivers need to ensure 3
+
+ndo_write_rx_config has been implemented for 8139cp driver as proof of
+concept
+
+To use this model, a driver needs to implement the
+ndo_write_rx_config callback, have a member rx_config in
+the priv struct and replace all calls to set rx mode with
+schedule_and_set_rx_mode();
+---
+v1:
+Link: https://lore.kernel.org/netdev/20251020134857.5820-1-viswanathiyyappan@gmail.com/
+
+v2:
+- Exported set_and_schedule_rx_config as a symbol for use in modules
+- Fixed incorrect cleanup for the case of rx_work alloc failing in alloc_netdev_mqs
+- Removed the locked version (cp_set_rx_mode) and renamed __cp_set_rx_mode to cp_set_rx_mode
+Link: https://lore.kernel.org/netdev/20251026175445.1519537-1-viswanathiyyappan@gmail.com/
+
+v3:
+- Added RFT tag
+- Corrected mangled patch
+
+I Viswanath (2):
+  net: Add ndo_write_rx_config and helper structs and functions:
+  net: ethernet: Implement ndo_write_rx_config callback for the 8139cp
+    driver
+
+ drivers/net/ethernet/realtek/8139cp.c | 78 ++++++++++++++++-----------
+ include/linux/netdevice.h             | 38 ++++++++++++-
+ net/core/dev.c                        | 53 ++++++++++++++++--
+ 3 files changed, 131 insertions(+), 38 deletions(-)
+-- 
+2.34.1
+
 
