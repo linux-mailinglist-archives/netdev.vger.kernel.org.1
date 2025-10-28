@@ -1,95 +1,152 @@
-Return-Path: <netdev+bounces-233446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B892AC13646
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 08:55:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7527EC1363A
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 08:54:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4BB505029B6
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 07:52:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11728566EB0
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 07:54:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41A792BE7D2;
-	Tue, 28 Oct 2025 07:52:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Kiu7UYNS";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="TS/rXFHh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C1D6212FB9;
+	Tue, 28 Oct 2025 07:54:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from stargate.chelsio.com (unknown [12.32.117.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B7BF29A9C9;
-	Tue, 28 Oct 2025 07:52:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8FFB7405A
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 07:54:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=12.32.117.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761637944; cv=none; b=s2vaxRTgsMRpi18BO6DvDfu7Fkh4OFyk6oR3Zedkiecw9bMQFtI6CmfeR0z0E6QpQ/diBEMGNoeJDQQ9SG8ySsSPZcBk56ODbCjvrnNe5z7Wqec6BHGRQQBh8xH99noPwtk87kk3FTquWNpntPs9mZ1OQhPg9cfx3H0kCoHE+JM=
+	t=1761638052; cv=none; b=VZ96yEdC4CDepFzRqtfEgctIB9rNsqllYs9EmZ3PSuGXl9yVnxV2w9YZaxVZOaOEdncjmvNPNSh6yTEHwpGNkVAoNM4RA48Yx6Gc/xTeiQDue2uM+T74E9BD+bhQEqpCpwwad2yS+VdmRFc/zuLfssJ7UFYZdzvGIOy2uQNCJlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761637944; c=relaxed/simple;
-	bh=BlH1k/7FQlfjC1lJDoXjs5d1U9toPAOhi2tez2K7Kzg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F9FWL0fncMj852YnkqlCVnFGCfiX9PwCt6NgJiNars2LSai1Npo/1fb4rtJ/UHsPVYR5gSuWWhIGFNFmYdan5I5/PAT+RyOca/LxL4N8SHAg6aPL0rVvQtnzWhzRVssAW0Rfa55mtifvt/HPk+IBlJZAFCtMrgJ0QzOIJnnp93s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Kiu7UYNS; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=TS/rXFHh; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Tue, 28 Oct 2025 08:52:18 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1761637940;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OHWV/31bypuym5GRXjxOlk2qZBuAxqMswHw50rJip1Q=;
-	b=Kiu7UYNSsTpAQpdqw2sVW2UvD1GqQshrx6wqHmt3innhVdRFyZU1pVblsbB4m5qBBfDp0W
-	lN8MnHStEMXA3UD13GEfJx76HHjOAb1UxoalqdxptlZOEEQzkJ5rztbNUHBIObrX9VIJiD
-	mjCm4hWNWv7+NoZ92y3/aI9bgATAD3PtkwRH7kWeYeZc4hBZbh014CPC3EyeWT09bmTh5+
-	+M/HUd5pqe+i5ckJVS6ZdIOMSgB0dhL7pP9Wle1TMXnBpnQ6zJBRRTwF+m0IAW9aedIu2q
-	TwxjO6v9tS3EsRCk4jo73UAvCJojwIHplVF37X+5LJq4MFHFWIQ3FZDk4iZmiQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1761637940;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OHWV/31bypuym5GRXjxOlk2qZBuAxqMswHw50rJip1Q=;
-	b=TS/rXFHhiwPMG/jXJvataZ1SJRJMP44uwocqxI6+TbbESv3cus8zaGjEMZdGKn/eRKY4dj
-	z7oADzXFJeZWgpDw==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Yonghong Song <yonghong.song@linux.dev>
-Cc: Sahil Chandna <chandna.sahil@gmail.com>,
-	syzbot+b0cff308140f79a9c4cb@syzkaller.appspotmail.com,
-	andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
-	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com,
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org,
-	linux-kernel@vger.kernel.org, listout@listout.xyz,
-	martin.lau@linux.dev, netdev@vger.kernel.org, sdf@fomichev.me,
-	song@kernel.org, syzkaller-bugs@googlegroups.com,
-	linux-rt-devel@lists.linux.dev
-Subject: Re: [syzbot] [bpf?] WARNING in bpf_bprintf_prepare (3)
-Message-ID: <20251028075218.aw9YABrW@linutronix.de>
-References: <68f6a4c8.050a0220.1be48.0011.GAE@google.com>
- <14371cf8-e49a-4c68-b763-fa7563a9c764@linux.dev>
- <aPklOxw0W-xUbMEI@chandna.localdomain>
- <8dd359dd-b42f-4676-bb94-07288b38fac1@linux.dev>
- <aP5_JbddrpnDs-WN@chandna.localdomain>
- <95e1fd95-896f-4d33-956f-a0ef0e0f152c@linux.dev>
+	s=arc-20240116; t=1761638052; c=relaxed/simple;
+	bh=/nUgYEUyPA6TIENt//WlMDGNUaS7z9Hkn6eKAtIsvzE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UnsqALwRFSeyftwU64qZbQNZwr/+cdbHPbyvPSPjo+rReuPuHvX5yELqcnykp/IVR3SU+fFQ0grRAJfrFaf5ODcYspqwTD022/BBD8cdpkVk1BUnMPkBD8dFgPPEsKBpBnIQf/ViGVSnYSm5vdSpTDgkAveGzJTuVBfBYdn/5Rs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chelsio.com; spf=pass smtp.mailfrom=chelsio.com; arc=none smtp.client-ip=12.32.117.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=chelsio.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chelsio.com
+Received: from fcoeperf6.blr.asicdesigners.com (fcoeperf6.blr.asicdesigners.com [10.193.187.161])
+	by stargate.chelsio.com (8.14.7/8.14.7) with ESMTP id 59S7re3J027682;
+	Tue, 28 Oct 2025 00:53:41 -0700
+From: Harshita V Rajput <harshitha.vr@chelsio.com>
+To: kuba@kernel.org, davem@davemloft.net, kernelxing@tencent.com
+Cc: imx@lists.linux.dev, netdev@vger.kernel.org, edumazet@google.com,
+        pabeni@redhat.com, Harshita V Rajput <harshitha.vr@chelsio.com>,
+        Potnuri Bharat Teja <bharat@chelsio.com>
+Subject: [PATCH] cxgb4: flower: add support for fragmentation
+Date: Tue, 28 Oct 2025 13:22:55 +0530
+Message-ID: <20251028075255.1391596-1-harshitha.vr@chelsio.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <95e1fd95-896f-4d33-956f-a0ef0e0f152c@linux.dev>
+Content-Transfer-Encoding: 8bit
 
-On 2025-10-27 20:45:25 [-0700], Yonghong Song wrote:
-> This should work, but local lock disable interrupts which could have
-> negative side effects on the system. We don't want this.
-> That is the reason we have 3 nested level for bpf_bprintf_buffers.
-> 
-> Please try my above preempt_disalbe/enable() solution.
+This patch adds support for matching fragmented packets in tc flower
+filters.
 
-I meant to look into this yesterday but got distracted with other
-things. I try to take a look.
+Previously, commit 93a8540aac72 ("cxgb4: flower: validate control flags")
+added a check using flow_rule_match_has_control_flags() to reject
+any rules with control flags, as the driver did not support
+fragmentation at that time.
 
-Sebastian
+Now, with this patch, support for FLOW_DIS_IS_FRAGMENT is added:
+- The driver checks for control flags using
+  flow_rule_is_supp_control_flags(), as recommended in
+  commit d11e63119432 ("flow_offload: add control flag checking helpers").
+- If the fragmentation flag is present, the driver sets `fs->val.frag` and
+  `fs->mask.frag` accordingly in the filter specification.
+
+Since fragmentation is now supported, the earlier check that rejected all
+control flags (flow_rule_match_has_control_flags()) has been removed.
+
+Signed-off-by: Harshita V Rajput <harshitha.vr@chelsio.com>
+Signed-off-by: Potnuri Bharat Teja <bharat@chelsio.com>
+---
+ .../ethernet/chelsio/cxgb4/cxgb4_tc_flower.c  | 40 +++++++++++--------
+ 1 file changed, 24 insertions(+), 16 deletions(-)
+
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_flower.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_flower.c
+index 0765d000eaef..e2b5554531b5 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_flower.c
++++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_tc_flower.c
+@@ -161,20 +161,9 @@ static struct ch_tc_flower_entry *ch_flower_lookup(struct adapter *adap,
+ 
+ static void cxgb4_process_flow_match(struct net_device *dev,
+ 				     struct flow_rule *rule,
++				     u16 addr_type,
+ 				     struct ch_filter_specification *fs)
+ {
+-	u16 addr_type = 0;
+-
+-	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_CONTROL)) {
+-		struct flow_match_control match;
+-
+-		flow_rule_match_control(rule, &match);
+-		addr_type = match.key->addr_type;
+-	} else if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_IPV4_ADDRS)) {
+-		addr_type = FLOW_DISSECTOR_KEY_IPV4_ADDRS;
+-	} else if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_IPV6_ADDRS)) {
+-		addr_type = FLOW_DISSECTOR_KEY_IPV6_ADDRS;
+-	}
+ 
+ 	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_BASIC)) {
+ 		struct flow_match_basic match;
+@@ -327,9 +316,6 @@ static int cxgb4_validate_flow_match(struct netlink_ext_ack *extack,
+ 		return -EOPNOTSUPP;
+ 	}
+ 
+-	if (flow_rule_match_has_control_flags(rule, extack))
+-		return -EOPNOTSUPP;
+-
+ 	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_BASIC)) {
+ 		struct flow_match_basic match;
+ 
+@@ -858,6 +844,7 @@ int cxgb4_flow_rule_replace(struct net_device *dev, struct flow_rule *rule,
+ {
+ 	struct adapter *adap = netdev2adap(dev);
+ 	struct filter_ctx ctx;
++	u16 addr_type = 0;
+ 	u8 inet_family;
+ 	int fidx, ret;
+ 
+@@ -867,7 +854,28 @@ int cxgb4_flow_rule_replace(struct net_device *dev, struct flow_rule *rule,
+ 	if (cxgb4_validate_flow_match(extack, rule))
+ 		return -EOPNOTSUPP;
+ 
+-	cxgb4_process_flow_match(dev, rule, fs);
++	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_CONTROL)) {
++		struct flow_match_control match;
++
++		flow_rule_match_control(rule, &match);
++		addr_type = match.key->addr_type;
++
++		if (match.mask->flags & FLOW_DIS_IS_FRAGMENT) {
++			fs->val.frag = match.key->flags & FLOW_DIS_IS_FRAGMENT;
++			fs->mask.frag = true;
++		}
++
++		if (!flow_rule_is_supp_control_flags(FLOW_DIS_IS_FRAGMENT,
++						     match.mask->flags, extack))
++			return -EOPNOTSUPP;
++
++	} else if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_IPV4_ADDRS)) {
++		addr_type = FLOW_DISSECTOR_KEY_IPV4_ADDRS;
++	} else if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_IPV6_ADDRS)) {
++		addr_type = FLOW_DISSECTOR_KEY_IPV6_ADDRS;
++	}
++
++	cxgb4_process_flow_match(dev, rule, addr_type, fs);
+ 	cxgb4_process_flow_actions(dev, &rule->action, fs);
+ 
+ 	fs->hash = is_filter_exact_match(adap, fs);
+-- 
+2.43.0
+
 
