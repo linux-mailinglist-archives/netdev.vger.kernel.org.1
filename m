@@ -1,180 +1,127 @@
-Return-Path: <netdev+bounces-233623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66B82C166B3
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 19:15:48 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id B726DC16714
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 19:22:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4EB534E4983
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 18:15:47 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4A5634E8B39
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 18:22:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF8CF34B1A7;
-	Tue, 28 Oct 2025 18:15:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2410E34EEE2;
+	Tue, 28 Oct 2025 18:20:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r0tiKs/r"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NrK9+tTZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-yx1-f47.google.com (mail-yx1-f47.google.com [74.125.224.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD74934A3A7
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 18:15:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5257634DCD6
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 18:20:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761675314; cv=none; b=DLJaeBgWQfliuVJ5EVL7KqKAHQO52VPWgpRhBMhuOBwDkxs4ba83dR77WRawQ9eCALa0qymA1pHEGZ8o8eeuyVaCcc39dYTS9WV8TcMrS6/0G27Acc6uujrjhpq8fcDKJbMYRzWcf6uIkipmqb6WumS+gZt6Lpnr+vKA3WpUfEw=
+	t=1761675616; cv=none; b=Cf4t4L7Mf7hdG+oixdmc7GWz3VR6BaQHRFJ34RuCya4oJgNctaK9U6k06djLESb+EFr3gVW8zBAS2G6dQicSXA2QpLY1pR9PTksDbG/+M6DDoX1/okI2DghmG/LaCYrQl7O6lokJpOQUHuebMCKWoABiazB/3Y7ikq5yqsuCAJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761675314; c=relaxed/simple;
-	bh=zcodzi+mOUD575N1xZUuQjOVYQWEPdnlbLws09uvbS4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aoklD5If+NCZ3T5b4dz/vBbn0zrsA3luxUDwXWWu9G1yGf8koGcLvbvOybwUx1ctzOb3hpWI8Rkgw4AeMgJLgOiOgp7eHv3GzHGHwBudIjVCN/+7fZmXLaR9ymyJkLvkj7YBHvFRDkTaL7VXSflD1N4XGKzAz3CQkvd4VpzRMU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r0tiKs/r; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-62faa04afd9so1835a12.1
-        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 11:15:11 -0700 (PDT)
+	s=arc-20240116; t=1761675616; c=relaxed/simple;
+	bh=fVD8zVGoOJR8NtTaumfAAfOnBXb59cGQbZXEVlQfwd8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mfs20Vt9sxiNZCvObRndVMGN0dmcZrJzySUG9xZmMMouKt67UfITaegawTs9C7SqJOFQjd8fsk2Vnty/AI7Ioctl7aqr3l9atOd72byENECFqDkCCltulV+07bQo2Vm04Hqy9TPlHrAz1fcHyV113OfoGTdRgabk0PJaDMVd+J0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NrK9+tTZ; arc=none smtp.client-ip=74.125.224.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f47.google.com with SMTP id 956f58d0204a3-63e3a7a67a4so6816320d50.1
+        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 11:20:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761675310; x=1762280110; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=90CnYkLqp/HfEgrb/R2001RwImjbO3xI814fyvRa22M=;
-        b=r0tiKs/rZibsCd8ahmR55owTUYeh6bHRd4nIwH2ileRjsH43Rj6/yZUkEq+eF0foBy
-         CJ8Q9CGGDLvFdnpJwEKb7cXwmpPkhHY/rCa+5SGuRBEwWnmnDRG2l+yB1hzEIzWcg4+d
-         cC8OS7Eiu2IymWkMiaaRrJhqwQZG+DaemBr1t97Doqa/IOMnEL53zosbK1EQwUjOsU4I
-         EMydPxhrkIETG+gT5AFyAWGT3Xpa8SlLaFJWxhO+pBxg7TEUm9U6nORo+fDirsPmvpM2
-         d8R3p0GQrcBVR1Riz2kVknfwL7O6RMQ3VBKjmrdeXBHFSHMAC7ic7LqOzv6k5QnSaCrw
-         /3Hw==
+        d=gmail.com; s=20230601; t=1761675613; x=1762280413; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=e+rUkvl/D9zKzyhn+VEYSVN5inKSvpG15TNg9Q9Niq8=;
+        b=NrK9+tTZmtBoFdCEqOScvruet8btNL0A/WQIwbU3hkehG1AbI08JEmxsP5BfqQOX7a
+         tXoYBGb0LQx2FYPOAEkfXMCw0mOebE8IrIlVM7cf8AQXDZ9bhMA9rV0iKd4UeAYyQ4aP
+         H//SXIbO7HrnmBmMDGIzb/taC/32jDu1fenhChBvVpZ8orobcwRbSl+hrcD/PIxNeIsR
+         S/qoVdm2HBpdwhNPNkpa+4f9JlhxenUdpY+Xn6uSZ6ntM+1byLwMShcG7SVBPQX+8mX3
+         PPGEWCPJjNK7UOPWV45JBcqRK39tqroXcFYlOt47J/+TQmcUfQp5ZA49fh8g4GLIpNfZ
+         FsBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761675310; x=1762280110;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=90CnYkLqp/HfEgrb/R2001RwImjbO3xI814fyvRa22M=;
-        b=W5TWNaO72By/vfpiO1I6azSh1tPRtQG/vk84NmmHkxj6tGabi2G0bnjpguinFFwJDI
-         ookqbyssAqmFDStXYeSfiNZPE0a4jTBdlYEvGTUNRnQHxjXOrkHwpX1g8kiizuvJfUmz
-         jVC4BQ7AmAEdPthdfaRRrYLBmHq6mLk7O/Cp11jZGJJua8clN44MQKjlxldmzyF+WB8O
-         V3WE0vpGF/7uGUYTU16EYgRlmILjcbbLt67RCdyli8rXLQbeHa9ncg64bOXTtmrPJK/O
-         eYWVO3D846I8JMa2Zo+WqIDZpeRvCEFrPINHY7AcAv2L0+3eqcZ8NTkVOOwhegL8l+eg
-         SdZA==
-X-Gm-Message-State: AOJu0YwLRJUN/IqUPZo66U9f+PXR2ay6yIteMQVOdQRa+GYFfYI5XqJ+
-	WvB1TRPPswBTFSop4+mWwmuLN9RnAydMBLyLW0xJWENGDeDiKRJ1L6YvDJgmdGZlMn9VwCsmG4P
-	ApwsU7566vHVPfBhXQADLuflFvY09VGP/h2zNWEUQ
-X-Gm-Gg: ASbGncvUlxaQhAkVz04qUSQYrRPb9nzwSeN1re+EvBnJfHHjCyxGKheeKLZBniVuTIH
-	mDc7gedBl6+TvMjhAsLvnE6BRKezbIk8nnu7tYRYu1cPoS5Mj8uktEr+XjRsH4kMo+T+wvNSVKE
-	rmwkuI7s2ypfVDFJGTY4VcwgI6FNeIscnnC0GyLdTUxNIdDCbXCUVKCSMvj2NAP7UAanJhds7sb
-	B4wv1Fbri9p1W1kxKTMcdNTJPRDHRDFenG5YlYPyA5VNicoYyv1xbXCXBiKZDbZemTMrUbFGJXw
-	zj5gGeiI
-X-Google-Smtp-Source: AGHT+IFGnyCN3zgN8K6ce1633alPnV+t1u1HwJdU9ixfZelf0wNhCjeSiC9lfXC+1TzDuDePP/xzY2NeqRfJ0sklIhc=
-X-Received: by 2002:a50:f69e:0:b0:62f:9f43:2117 with SMTP id
- 4fb4d7f45d1cf-640427a26f9mr16444a12.0.1761675309791; Tue, 28 Oct 2025
- 11:15:09 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761675613; x=1762280413;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=e+rUkvl/D9zKzyhn+VEYSVN5inKSvpG15TNg9Q9Niq8=;
+        b=psQz8UzVJ6n1r52ro7uuhQ98qZiFa6WW7EJD6o2s6vsTNuFH/OYira/0R96lUSr8Yy
+         Eap/w6+Kfx0hucKzQfDiCKBMHaF2VxUkjsnfDzJ1BFqWnc8p82m/EU7h3VKOaNO9UBht
+         m7HlgO/bI8H+p5+muXfD2oa4xY22qmIBYaxb0hKJfnTEpc59zlBJJaWwYj3T+GdPOKZu
+         GU8l8TEF7hDbNFqtprvn5bwGpOeE47CZe5bjMegf2aZ0UjjuJiZZJHDiygGyZ1liNTLS
+         VrdZBmE+KtbvLfdRsHyUao9GkROxJiyXZ7oyiLYphFQBT0iEgDRIkY0IqN2sp4m5f/i7
+         YOqg==
+X-Forwarded-Encrypted: i=1; AJvYcCWN3JGYyQ7UQ/RrY7N1TSWVoJ4PcQ1o7iwYvXtKRpgGlp8m3bSuIo+zQWFWLJHtK9W3l/v3c80=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwkpIPeJhGiFKSAS50S2DJJB+tlANGArAW1NQ12lUbJs8YMymc1
+	cf82mNrrbseNK4e8qCLXT8cv9NqoVmtaZAujDYRdTdDQky7lmEyrPcr4
+X-Gm-Gg: ASbGncux3Q8Sl5hocLFr7M2eTSlbHueBGpGwMGlz0XJQMeCdQPRYKpjd1JbPXL77okX
+	BNUCYag7Ky4yOi+1D4Evs+sttzmmeXSy11Isft6NnP0xuy+HPfOFxIJOh/2NgAffg+xFxIY79Kj
+	8MJ98FSfWIYWT2yfO+BmJAMC2eG+Ln0q3h239Wc0rW6Wd2EFe8OihpJzbiYU+8L45BZcZWosBU4
+	MCiddCfmZjqRK+xjQUWI48pFr/24/GIcZebbuE3juQPQQXNUTFtZaCT9AfpSaN+g7dme0GX89TG
+	tMzigSwUBD6B7KPs0MjiCrunRQrajQxbk8YUVYpbi6MCDGT3BW8hP7amemwkKxvyMZrJCoOwmFz
+	v7Ig+SNboMAuQ5J8rgiUPT8WtLG6y/GRdUn1ZvoUaKDfEhmS5nOsNVTGani7J6ItHb4tOHcJ/A9
+	NQnrFHCSb2qyqOsqtPiBKx7Xqe5DH4GG6clEGd
+X-Google-Smtp-Source: AGHT+IECradbC/V5zPn66y4q4ZGUhUmHrlC+iHH0inghtcGySqIEBdHH/OeoOeHNcRqi2EB+aeyQgA==
+X-Received: by 2002:a05:690c:25c3:b0:783:7081:c48a with SMTP id 00721157ae682-78628e7d68emr2711617b3.26.1761675613298;
+        Tue, 28 Oct 2025 11:20:13 -0700 (PDT)
+Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:71::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-785ed14081dsm29213987b3.6.2025.10.28.11.20.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Oct 2025 11:20:12 -0700 (PDT)
+Date: Tue, 28 Oct 2025 11:20:11 -0700
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Simon Horman <horms@kernel.org>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next 03/12] selftests/vsock: reuse logic for
+ vsock_test through wrapper functions
+Message-ID: <aQEJW9hGIPbWsRhM@devvm11784.nha0.facebook.com>
+References: <20251022-vsock-selftests-fixes-and-improvements-v1-0-edeb179d6463@meta.com>
+ <20251022-vsock-selftests-fixes-and-improvements-v1-3-edeb179d6463@meta.com>
+ <aP-kmqhvo4AFv1qm@horms.kernel.org>
+ <aP+zgF7zF9T3ovuS@devvm11784.nha0.facebook.com>
+ <aP/DQLcX9uaY6kXN@devvm11784.nha0.facebook.com>
+ <20251027162244.0101a099@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251028060714.2970818-1-shivajikant@google.com> <aQEHQReSmbXeIw15@devvm11784.nha0.facebook.com>
-In-Reply-To: <aQEHQReSmbXeIw15@devvm11784.nha0.facebook.com>
-From: Shivaji Kant <shivajikant@google.com>
-Date: Tue, 28 Oct 2025 23:44:56 +0530
-X-Gm-Features: AWmQ_bk9Ft9L4-npWFOyIyWZjKp1gH6GTtSfFcauCkHpz5Kyx8u4ygXXvXcAjdA
-Message-ID: <CAMEhMpmUxn2VS2T7PPaM0WtbJT02RWN-CEmD8dmsPGFPkH_tqw@mail.gmail.com>
-Subject: Re: [PATCH] net: devmem: Remove dst (ENODEV) check in net_devmem_get_binding
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Mina Almasry <almasrymina@google.com>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Pavel Begunkov <asml.silence@gmail.com>, 
-	Pranjal Shrivastava <praan@google.com>, Vedant Mathur <vedantmathur@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251027162244.0101a099@kernel.org>
 
-On Tue, Oct 28, 2025 at 11:41=E2=80=AFPM Bobby Eshleman <bobbyeshleman@gmai=
-l.com> wrote:
->
-> On Tue, Oct 28, 2025 at 06:07:14AM +0000, Shivaji Kant wrote:
-> > The Devmem TX binding lookup function, performs a strict
-> > check against the socket's destination cache (`dst`) to
-> > ensure the bound `dmabuf_id` corresponds to the correct
-> > network device (`dst->dev->ifindex =3D=3D binding->dev->ifindex`).
-> >
-> > However, this check incorrectly fails and returns `-ENODEV`
-> > if the socket's route cache entry (`dst`) is merely missing
-> > or expired (`dst =3D=3D NULL`). This scenario is observed during
-> > network events, such as when flow steering rules are deleted,
-> > leading to a temporary route cache invalidation.
-> >
-> > The parent caller, `tcp_sendmsg_locked()`, is already
-> > responsible for acquiring or validating the route (`dst_entry`).
-> > If `dst` is `NULL`, `tcp_sendmsg_locked()` will correctly
-> > derive the route before transmission.
-> >
-> > This patch removes the `dst` validation from
-> > `net_devmem_get_binding()`. The function now only validates
-> > the existence of the binding and its TX vector, relying on the
-> > calling context for device/route correctness. This allows
-> > temporary route cache misses to be handled gracefully by the
-> > TCP/IP stack without ENODEV error on the Devmem TX path.
-> >
-> > Reported-by: Eric Dumazet <edumazet@google.com>
-> > Reported-by: Vedant Mathur <vedantmathur@google.com>
-> > Suggested-by: Eric Dumazet <edumazet@google.com>
-> > Fixes: bd61848900bf ("net: devmem: Implement TX path")
-> > Signed-off-by: Shivaji Kant <shivajikant@google.com>
-> > ---
-> >  net/core/devmem.c | 27 ++++++++++++++++++++++++---
-> >  1 file changed, 24 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/net/core/devmem.c b/net/core/devmem.c
-> > index d9de31a6cc7f..1d04754bc756 100644
-> > --- a/net/core/devmem.c
-> > +++ b/net/core/devmem.c
-> > @@ -17,6 +17,7 @@
-> >  #include <net/page_pool/helpers.h>
-> >  #include <net/page_pool/memory_provider.h>
-> >  #include <net/sock.h>
-> > +#include <net/tcp.h>
-> >  #include <trace/events/page_pool.h>
-> >
-> >  #include "devmem.h"
-> > @@ -357,7 +358,8 @@ struct net_devmem_dmabuf_binding *net_devmem_get_bi=
-nding(struct sock *sk,
-> >                                                        unsigned int dma=
-buf_id)
-> >  {
-> >       struct net_devmem_dmabuf_binding *binding;
-> > -     struct dst_entry *dst =3D __sk_dst_get(sk);
-> > +     struct net_device *dst_dev;
-> > +     struct dst_entry *dst;
-> >       int err =3D 0;
-> >
-> >       binding =3D net_devmem_lookup_dmabuf(dmabuf_id);
-> > @@ -366,16 +368,35 @@ struct net_devmem_dmabuf_binding *net_devmem_get_=
-binding(struct sock *sk,
-> >               goto out_err;
-> >       }
-> >
-> > +     rcu_read_lock();
-> > +     dst =3D __sk_dst_get(sk);
-> > +     /* If dst is NULL (route expired), attempt to rebuild it. */
-> > +     if (unlikely(!dst)) {
-> > +             if (inet_csk(sk)->icsk_af_ops->rebuild_header(sk)) {
-> > +                     err =3D -EHOSTUNREACH;
-> > +                     goto out_unlock;
-> > +             }
->
-> Echoing your discussion with Eric, I think the message might want to
-> call out this part. Besides that, all looks good!
->
-> Pending that nit:
->
-> Reviewed-by: Bobby Eshleman <bobbyeshleman@meta.com>
->
-> Best,
-> Bobby
+On Mon, Oct 27, 2025 at 04:22:44PM -0700, Jakub Kicinski wrote:
+> On Mon, 27 Oct 2025 12:08:48 -0700 Bobby Eshleman wrote:
+> > > > shellcheck has some (new) things to say about this patch too.
+> > > > Could you take a look over them?
+> > 
+> > It looks like the errors are SC2317 and SC2119, but are false-positives.
+> > Invoking a program as a variable (e.g., "${VSOCK_TEST}") is tripping
+> > SC2317 (command unreachable), and SC2119 is due to log_{guest,host}()
+> > being passed zero arguments (logging its stdin instead).
+> > 
+> > I also see that SC2317 has many other false positives elsewhere in the
+> > file (80+), reporting even lines like `rm "${QEMU_PIDFILE}"` as
+> > unreachable. I wonder if we should add a patch to this series to disable
+> > this check at the file-level?
+> 
+> Yes, FWIW, don't hesitate to disable things at the file level.
+> We should probably revisit which of the checks need to be disabled
+> globally. But file level is also useful for manual testing.
 
-Thanks Bobby for the review.
-Will surely update the description in the v2 patch.
+Got it, will do!
+
+Thanks,
+Bobby
 
