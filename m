@@ -1,68 +1,82 @@
-Return-Path: <netdev+bounces-233481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08390C141B6
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 11:30:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA62EC141F8
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 11:35:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BF6A581AB5
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 10:30:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C04401983E62
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 10:35:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2495030597F;
-	Tue, 28 Oct 2025 10:30:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2DA413A244;
+	Tue, 28 Oct 2025 10:35:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aIz761tk"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="gJi84TZA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A5A30595D;
-	Tue, 28 Oct 2025 10:30:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3BB421D3F8
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 10:35:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761647414; cv=none; b=FPUkwduTwA+RzvoCWKUxcI4rAPpqTFg7O0cncIJZkypM8VNylO0cm7NO15rGCdgMMRDomWZ6fk0VErf74uxNsjzTuRL2hcN4Mp8p+Zlbqi2rtni9muxLkPuxX01+wEl1Y7IK25UCleUxKQQzDw2AkVGmxxF2GqMX+Dsv2CXImWM=
+	t=1761647731; cv=none; b=e8ErmS3I9BHgtYyGaLCwMnUrZ3Hao7Voo1okQQ5GFU0hNDsiec+p7aBTravE18gudRgrU1k00x8riFUImO0+GpU80t1kDYkFuHclilJ9v62RCFvpy/gNM8ConEwccsiAb2W+FWa99rdn7ksKbPFnZ+3+S32fins8rNzs9c+1D0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761647414; c=relaxed/simple;
-	bh=i1oPG+ZRf9OGbhOOSsSjORFIrBtTLS/S2tOyv4Wk8Uo=;
+	s=arc-20240116; t=1761647731; c=relaxed/simple;
+	bh=37j6Sr/ADCNKJ2W9ZTuM+vo/clhFfG0EN0rSE2Lhd/E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f1bBpUfaFBJIrB9vqUuhBZ59tj1Vz+gGcJsXqfB6i8PFGTVV9LqgvF7Qwb/Ljo/sKLBmMPZObjZtmmfMFVtMgO22MMwaQ/wAfI4bDBi7uOSZpRps0DCQ9MkPQk8AWl1ogRQerHAFcd1afAepGb8lw7+PtJlgF+VG3WR+Tzv0dcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aIz761tk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3943BC4CEE7;
-	Tue, 28 Oct 2025 10:30:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761647413;
-	bh=i1oPG+ZRf9OGbhOOSsSjORFIrBtTLS/S2tOyv4Wk8Uo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aIz761tkfMijGB9dzdh0STq9BQJHU88Zo9UFP6+HR5Xd8nnP5rNt1c0YecS8UUc76
-	 /vBdjapAWJbyYr+ekyE2DL1r43K0mC/5MspG+YVXW4LLo17/mr2qrahIEM6KgS2Zo6
-	 kWGgBMeTlRsUFiqaEIaUkXxUvFcH8CVOC0m76yRFtNriBD0qIxda9ohFQqVRU9C5Uu
-	 WqCISo1yRBGqCnft3OK+/XYzYNrGYqDgF+Rh0YwqkBCrbI6P2XbQDWc15IXmPbHlW4
-	 ltqWOPcOWLIxBN/gxwRe+fYKVy0ofU1yoLWInHC3iFcsGoUBtvBQfs2xiq7H6Tp7k8
-	 wLpzcIbGGY3jA==
-Date: Tue, 28 Oct 2025 10:30:06 +0000
-From: Simon Horman <horms@kernel.org>
-To: Christian Brauner <brauner@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>,
-	Jeff Layton <jlayton@kernel.org>, Jann Horn <jannh@google.com>,
-	Mike Yuan <me@yhndnzj.com>,
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>,
-	Lennart Poettering <mzxreary@0pointer.de>,
-	Daan De Meyer <daan.j.demeyer@gmail.com>,
-	Aleksa Sarai <cyphar@cyphar.com>,
-	Amir Goldstein <amir73il@gmail.com>, Tejun Heo <tj@kernel.org>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
-	linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
-	bpf@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH v3 11/70] ns: add active reference count
-Message-ID: <aQCbLrYf_KTdxZjU@horms.kernel.org>
-References: <20251024-work-namespace-nstree-listns-v3-0-b6241981b72b@kernel.org>
- <20251024-work-namespace-nstree-listns-v3-11-b6241981b72b@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=IU5d2d5adCsDoxWU/hd85N6r2726gWNvrRhgjR36mrVAiTNL/++IZP3KnNsANICbnLyBY+VjPJEgV7EsKDSruR2TNzZ/hNSHxNetQZfZ4TP+q6mMihhzFGMAdqajwX0zBAgUDZkgEg6fj7SeINtGLGx2Via53+rrxB+MmYIo5gY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=gJi84TZA; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=7HIcXgRn4F/ZV4CqVmuIzaxh6G+n/mevlVZ22fTlXFc=; b=gJi84TZAGLfLo0NYavISvKgFUX
+	Qv30sQmkW3RmiPp+TlkX9LjRD7O9xBorYxG8MfLh+6L0bmCKgpIgKxlCX8+1UeXuud9NzAz1+6I1p
+	1vpRv84Dv2MCo2NmnREhrDSelsTpEAk2JRpRuJ8KzY3z2EIprzeag8An4O3Nzt+8WoMpirVrBKz6e
+	zGxX/OYOgnHPjV5g8Ap8ic0ubT8iX0NNl5ophPzAxs5zKaf1rNy5zFmQZk61WnBWfMA3whi9aEfJW
+	CrZo8/4G4YTk68Kjw54uHCDQhM5e2upsg+dg7y1nITG0flqjGU5ldiw7cFY/XgsaygykhVRunSVkf
+	8zi9L2YQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41302)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vDh2f-0000000033x-2aUs;
+	Tue, 28 Oct 2025 10:35:05 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vDh2a-000000006U0-1mOG;
+	Tue, 28 Oct 2025 10:35:00 +0000
+Date: Tue, 28 Oct 2025 10:35:00 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Alexis Lothor__ <alexis.lothore@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Boon Khai Ng <boon.khai.ng@altera.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Furong Xu <0x1207@gmail.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	Yu-Chun Lin <eleanor15x@gmail.com>
+Subject: Re: [PATCH net-next 3/3] net: stmmac: add support specifying PCS
+ supported interfaces
+Message-ID: <aQCcVOYV15SeHAMU@shell.armlinux.org.uk>
+References: <aP03aQLADMg-J_4W@shell.armlinux.org.uk>
+ <E1vClC5-0000000Bcbb-1WUk@rmk-PC.armlinux.org.uk>
+ <604b68ce-595f-4d50-92ad-3d1d5a1b4989@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,41 +85,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251024-work-namespace-nstree-listns-v3-11-b6241981b72b@kernel.org>
+In-Reply-To: <604b68ce-595f-4d50-92ad-3d1d5a1b4989@bootlin.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, Oct 24, 2025 at 12:52:40PM +0200, Christian Brauner wrote:
+On Tue, Oct 28, 2025 at 11:16:00AM +0100, Maxime Chevallier wrote:
+> Hello Russell,
+> 
+> On 25/10/2025 22:48, Russell King (Oracle) wrote:
+> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> 
+> Maybe this needs a commit log, even a small one ? :(
 
-...
+Thanks for giving Jakub a reason to mark this "changes required." :D
+I'm not really expecting this to be merged as-is. So why didn't I
+post it as RFC? Too many people see "RFC" as a sign to ignore the
+patch series. Some people claim that "RFC" means it isn't ready and
+thus isn't worth reviewing/testing/etc. I say to those people... I
+can learn their game and work around their behaviour.
 
-> diff --git a/kernel/nsproxy.c b/kernel/nsproxy.c
+Yes, it will need a better commit log, but what I'm much much more
+interested in is having people who are using the integrated PCS (in
+SGMII mode as that's all we support) to test this, especially
+dwmac-qcom-ethqos folk.
 
-...
+The 2.5G support was submitted by Sneh Shah, and my attempts to make
+contact have resulted in no response.
 
-> +void get_cred_namespaces(struct task_struct *tsk)
-> +{
-> +	ns_ref_active_get(tsk->real_cred->user_ns);
-
-Hi Christian,
-
-real_cred is protected by RCU, but this code doesn't seem to take
-that into account. Or, at least Sparse doesn't think so:
-
-.../nsproxy.c:264:9: error: no generic selection for 'struct user_namespace *const [noderef] __rcu user_ns'
-.../nsproxy.c:264:9: warning: dereference of noderef expression
-
-> +}
-> +
-> +void exit_cred_namespaces(struct task_struct *tsk)
-> +{
-> +	ns_ref_active_put(tsk->real_cred->user_ns);
-
-Likewise here.
-
-> +}
-> +
->  int exec_task_namespaces(void)
->  {
->  	struct task_struct *tsk = current;
-
-...
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
