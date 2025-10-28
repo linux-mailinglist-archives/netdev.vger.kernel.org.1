@@ -1,394 +1,243 @@
-Return-Path: <netdev+bounces-233382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C06CC12949
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 02:45:30 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04786C12964
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 02:49:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A9CD5E199C
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 01:45:29 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B62704E9E4D
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 01:49:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 966E225393B;
-	Tue, 28 Oct 2025 01:45:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9A992494FF;
+	Tue, 28 Oct 2025 01:49:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="rkFyW4yQ"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="udUHRTRU"
 X-Original-To: netdev@vger.kernel.org
-Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012068.outbound.protection.outlook.com [52.101.53.68])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011027.outbound.protection.outlook.com [40.93.194.27])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D2E51C862D;
-	Tue, 28 Oct 2025 01:45:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5195F215F6B
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 01:48:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.27
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761615926; cv=fail; b=Halky1zG9Bg0xtUpFo9Iff9g00wYFJ+34nJCDzcAUAQyyNE21A9VRZXxAXqRN+ankEy75k6+0i9vg2R/hY9A6CKEhq4oJwnnMB2MM8d99t4RUowltDuzQHZyfeKtNLPvT9TZ90FsGr4/4OtuxMXWAVA8tapW49zMk6b5efW/Bns=
+	t=1761616141; cv=fail; b=WutOFuIrz7NgjZ51Jv8Tx+22BBsjDvDKj4LHTliOg3z7F/3i6DNoww0zD2JVNJ6fJ5uWb4D/c9HcQgDtDp/yukFzYp+n9QxwKRk5F44xk+pJyygw/Cu9dfOgAUZzlNXjKBODA9nqHSmaX1UY3JwZ0APLohQ7cEM2fjzJg0kg/yo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761615926; c=relaxed/simple;
-	bh=NUqT/nezGtLdy5IfQVYeWXyY3tqClFHnUUZyltqhbvA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=F92menANr4bgy50ZROiy0QiQD6GNQgNBeF1YYkW6ByQ5LELsfrRHe8eZ39bln3tf3ytHBCuwqydyaCTuXebp9IPYc4B+jQYH+cPu11rDasFTlPAaSlpCtVBQ6Q7pFQtV8qvk1bVubNDEi5qi5bq68rSyvNJkXlrjkYI7rgSWxq8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=rkFyW4yQ; arc=fail smtp.client-ip=52.101.53.68
+	s=arc-20240116; t=1761616141; c=relaxed/simple;
+	bh=LRhbQopkXDGyHs8+4ZkL94KPmoR/p3+F6O4wXgmJa9g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=rnUaNIWvP21XYvhA099i1ZGGHZtZwOlyxX8pfH3Xd4zh7XLKTTX1YJynLCTSzZTX8aGNXVZxxkP00aA7E7521QyxZy4xNBGn5klN1p7FOY1RpXZhPCFrg8/IhV/xKsPFTToTeuOEFhbWEWuiegV427MWly0pwLqtsHmCwxqmXJM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=udUHRTRU; arc=fail smtp.client-ip=40.93.194.27
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZSx4oamWJNgfNXm+R+FnTzjIbWgR3ktj4Mz6pYkrPAghMtLVV8VCvLMW9bdm6NXuRG/hQF8mK7uGzlw9Zr4vo6VcLDs1Vgo5oNkhYYKhd0IdRUwLINhcu0SOQtxGcs4osivNJpv7o5e68Q2/OQ2nEAEMhgI94QAYNkz6QEtWKz8kATfJrXODQK2QRVYgTVnox+iJHPYKBqsbtVOx1/aKzeUXQJMQA/KRz+BLSgMv7rI+m90w9GxNOrevklmfNVj8JW+siHIv7sEvnhDcQQFAM6G/27/0bJSNqw/69WYqPMokMPxsGPYDJ/SWyrnAH5Izv5HszvdEWZnmrxhk+CJb+w==
+ b=hIiA1V1WBSdNcYET3gi+o1NRVQhCMKqrZ/qXk1UB7/M0Z6Tzjs5WBq0XRDccIGf5VmN+2zu6ivDHGIGdtVHcHSnn/juz62HZrbVGYM1VdxGz7DDsBCi4aUuENl6AUfDsW40Rft001qLLpQw2zPf6GiVXUAlf0SSVf/cjn0ORllwWwqoznUrzeVqnwmZ68dk57ZvdKXqYcyMsLQcwFjhZ/LSDEb6wErbOHU3WvQLp0SWCQI3SqRff12QgbLo8VKKyVpqjbmarIKhxI9iq8eT27i5sLp1I92M4zcgfMlq+fXWrw1vVNqQyEJ91a0mlcI2Ebxs1G7HKnNai1ANnXlTpbA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ud9O1uixdlQe2iCK7qWurbaPA5koJSUBtKJQnyAKLMY=;
- b=zQvUepQFejWxABU5NcW6GTyvHDOFSvHBZZUWYvSUhSmY58f/w/pY1kn9Vuv2ImArhphUd2vTAPVbLkHKD0cB3mpxRFmidWVNeyFFVexTzd+7g6aF8ZZpJNUkRMz3qq4UiEvd9XghxNUa0tq69IGf19VzaIT0WRb6NHFDk2moOhGj4FeiaXa0aLBIhcTze17gwTgdGz9VnbpAFrnNSpEL75IMP7Eu0+9fTDcLfd9ftmXOo4Lfe95c4d/O5WIANbgko14dbYsKURXWLNM7YIFOv+NefqwY0dJRoBw0zPANW6euFI4dVyn1JzyvidfhtUTyfNh+iVIv+u7d8JEH+XshBg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
+ bh=qyhSZrb58g7/mhkC8mdhCxWJp1P0VyqtpGrXvdFyZyA=;
+ b=PWR6M5O3WsIqtXQVIJ9jPpRX3wtsEJknTIRpT1SRJQg8S6/gC2KGzlxuYH/VEXfPJ0QGrMtN7drn7brauEc9x16pTVhMFpOopdhqS26GC/0psEJtznjqd11inpnC2kr7dMao81YjMYrNESiG7k4v6LhqxHMoUCIliBP3CVz2Y86FkRWsgK9mpIYPWUsik1oPZXjTjt4/V0FMB1cMZO38MPLp0+GMKAR0B9SWVInmu/wVn1p4MFz8dArlSYJGvDk3LhojFVFHnmCqUOdFQXjoJVYHKm40sJRHXGrwqRHPNVusVZ6iCvj7mVFzY1nL61cdrgT7KnbL8AjSE1hhimXE1Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=queasysnail.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ud9O1uixdlQe2iCK7qWurbaPA5koJSUBtKJQnyAKLMY=;
- b=rkFyW4yQN6ndwKK5xd/q2mUodbH2WC10IG1RJFZDMDxEThcy+H7dQLbgSj+bcXz7/llGZbTLo1bimMgJ3nfAcDYOWxQfzy4oBjj6XprKqN19DyLR8L1mtrzinTjpZzsNNorC5OUIDy7K5yQGLB8ZGRRJRlCRIlFUtvASthy3wWrO8WfBJsJNjYFiONEEY99w0r5LVxHisHkHXwLfdDcJoaI6YiwKSuox4o0n3D6aYrVGRidew9aND79eK73Cx/IY6lGeDAXKLLlKsRXB4bqgGMySoMWXDrtY2XvNoBqV5ANHT56ynOUXeneJyHZIM9GrGJSiN27IJclhyt7u7Zx4yQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DS7PR12MB9473.namprd12.prod.outlook.com (2603:10b6:8:252::5) by
- PH8PR12MB7301.namprd12.prod.outlook.com (2603:10b6:510:222::12) with
+ bh=qyhSZrb58g7/mhkC8mdhCxWJp1P0VyqtpGrXvdFyZyA=;
+ b=udUHRTRU4nL32MMfPV+9QpzYNUn7l115T55aIAUEg/3I9YTHTjz9dSZdGcFWgyGsomagVvRKnl6+TfOxbB7U//3Cw6U4Q9b2g/PSAbDncPDmvzj3bxQ/jEJd6giYXrtmUbifeCeVIXN5g+AsAtJFs98jZknFAIv2ABdiLwIzyrIDl7VGu4kIQQNe5muHatK0tenDcfTzmzGzn/RE6Gvf+pluCG3CsYSvIDanFoIOtRqyvDYXZNN6X1m+n5bmYPKaZW3VSDEKK/ztHcSM4WViMlh5R6uF5WxeenXVTg3mVk32NMAzDMQYuq1O8qMD16kl1h7jWhHXbqeBlRd8l3vT4Q==
+Received: from BY1P220CA0020.NAMP220.PROD.OUTLOOK.COM (2603:10b6:a03:5c3::7)
+ by LV3PR12MB9234.namprd12.prod.outlook.com (2603:10b6:408:1a0::8) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.18; Tue, 28 Oct
- 2025 01:45:19 +0000
-Received: from DS7PR12MB9473.namprd12.prod.outlook.com
- ([fe80::5189:ecec:d84a:133a]) by DS7PR12MB9473.namprd12.prod.outlook.com
- ([fe80::5189:ecec:d84a:133a%5]) with mapi id 15.20.9253.017; Tue, 28 Oct 2025
- 01:45:18 +0000
-From: Zi Yan <ziy@nvidia.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: Byungchul Park <byungchul@sk.com>, linux-mm@kvack.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel_team@skhynix.com, harry.yoo@oracle.com, ast@kernel.org,
- daniel@iogearbox.net, davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
- john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com,
- leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com, andrew+netdev@lunn.ch,
- edumazet@google.com, pabeni@redhat.com, akpm@linux-foundation.org,
- david@redhat.com, lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com,
- vbabka@suse.cz, rppt@kernel.org, surenb@google.com, mhocko@suse.com,
- horms@kernel.org, jackmanb@google.com, hannes@cmpxchg.org,
- ilias.apalodimas@linaro.org, willy@infradead.org, brauner@kernel.org,
- kas@kernel.org, yuzhao@google.com, usamaarif642@gmail.com,
- baolin.wang@linux.alibaba.com, toke@redhat.com, asml.silence@gmail.com,
- bpf@vger.kernel.org, linux-rdma@vger.kernel.org, sfr@canb.auug.org.au,
- dw@davidwei.uk, ap420073@gmail.com, dtatulea@nvidia.com
-Subject: Re: [RFC mm v4 2/2] mm: introduce a new page type for page pool in
- page type
-Date: Mon, 27 Oct 2025 21:45:15 -0400
-X-Mailer: MailMate (2.0r6272)
-Message-ID: <64E18E02-727B-47C4-8849-486AB98CACD8@nvidia.com>
-In-Reply-To: <CAHS8izME4W3ENXNXf4Cxegmk9xnRmKajpRMQ18L0=FGTFebeaw@mail.gmail.com>
-References: <20251023074410.78650-1-byungchul@sk.com>
- <20251023074410.78650-3-byungchul@sk.com>
- <CAHS8izME4W3ENXNXf4Cxegmk9xnRmKajpRMQ18L0=FGTFebeaw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: BL1PR13CA0417.namprd13.prod.outlook.com
- (2603:10b6:208:2c2::32) To DS7PR12MB9473.namprd12.prod.outlook.com
- (2603:10b6:8:252::5)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.19; Tue, 28 Oct
+ 2025 01:48:55 +0000
+Received: from SJ5PEPF00000203.namprd05.prod.outlook.com
+ (2603:10b6:a03:5c3:cafe::d8) by BY1P220CA0020.outlook.office365.com
+ (2603:10b6:a03:5c3::7) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9253.19 via Frontend Transport; Tue,
+ 28 Oct 2025 01:49:11 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SJ5PEPF00000203.mail.protection.outlook.com (10.167.244.36) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9275.10 via Frontend Transport; Tue, 28 Oct 2025 01:48:54 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.34; Mon, 27 Oct
+ 2025 18:48:38 -0700
+Received: from [172.29.246.187] (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Mon, 27 Oct
+ 2025 18:48:34 -0700
+Message-ID: <b92ec23d-f877-4dc3-a95f-c9b66120686c@nvidia.com>
+Date: Tue, 28 Oct 2025 09:47:31 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH ipsec v2 2/2] xfrm: Determine inner GSO type from packet
+ inner protocol
+To: Sabrina Dubroca <sd@queasysnail.net>
+CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<steffen.klassert@secunet.com>, Cosmin Ratiu <cratiu@nvidia.com>, Herbert Xu
+	<herbert@gondor.apana.org.au>, David Ahern <dsahern@kernel.org>, Eric Dumazet
+	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+	<horms@kernel.org>
+References: <20251027025006.46596-1-jianbol@nvidia.com>
+ <20251027025006.46596-3-jianbol@nvidia.com> <aP-QvtNf-Vp5oHLX@krikkit>
+Content-Language: en-US
+From: Jianbo Liu <jianbol@nvidia.com>
+In-Reply-To: <aP-QvtNf-Vp5oHLX@krikkit>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB9473:EE_|PH8PR12MB7301:EE_
-X-MS-Office365-Filtering-Correlation-Id: 78ea4b62-9cbb-4ad7-2cec-08de15c3a64d
+X-MS-TrafficTypeDiagnostic: SJ5PEPF00000203:EE_|LV3PR12MB9234:EE_
+X-MS-Office365-Filtering-Correlation-Id: dc3a8cdb-3647-4356-ad60-08de15c426e0
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|366016|376014;
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|7416014|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?d2JLUzRUc2sxS1NrZVZBRkQ5dS9FM2lDVVd4ZlhVSXA0aENQWExZQm1TSEJk?=
- =?utf-8?B?Mjc3b2VpZEpaanZ4SVJ5OGxCVHB6MkVlNjRGZXJKTFRhc2lRazZpQmxnMXdH?=
- =?utf-8?B?NWVaZlU4cnFrR3lzQzd5TjNzdit1TCt4bmZ1VWY2OC83Y0pmUTYrTXNSQWZn?=
- =?utf-8?B?bVFHRHNaSURMOVRCaGU5dmlYVVc1emY2VWNGRTA0RjZUaWUrSGI5NWQ5SkM0?=
- =?utf-8?B?b3NMTlZRUXo3U1c5aEZmTUFMRjVvNGovczhoNER0RG5mR3lQbHppcnpaU2x5?=
- =?utf-8?B?bkxKOEdaWEJRd2t5ME5TM0E2bk9YQjcrQVF2UXc2Wm5GQmpPa0Jvb0p4WURh?=
- =?utf-8?B?MVNsMDFSYU1yRGhJbE44K0xzbXZOYUU2Z2p3bTAzUXJ0cWxJdGVSaHhTT0pO?=
- =?utf-8?B?Wi85bmhsNHhUNFhoOVdvcHNlTkR6YTIzT3NTdVdFK3pTMzI1cWpJcnBWT09x?=
- =?utf-8?B?OVdzYlJFb2t6ajFBL0ljbnRDVzM2c1VESU01eGllN2FNKzJrbWhKM240ZEhx?=
- =?utf-8?B?OFRvUWNhZ0NwV2R6b1Qrd3kxZHRRNFpJTXJ2ZXMzdHdKdnd1MFBjWENtZmlT?=
- =?utf-8?B?NW95aUZrRXIrTkRyeGVLTUVTUU9nMWdMTFRrRGhUbzdmdUZsSkxwRnFIQzhq?=
- =?utf-8?B?dWNtMWZsM0FOKzQzeFJmOE1ORXdhelRBNFh4S2E5SjRkelpvdnJibFp6UVNE?=
- =?utf-8?B?UzNpVlpUYy90UktqbGdXWDdOWkJQSnREODJtcTN1eXgvRjVIQ05RMXgyUzIy?=
- =?utf-8?B?S3pBMU42V1cwcWRlT0xVTk5CZHhrdTJ4NytRN2Z3c1ZOTWdnZ0FrRjJuZEJU?=
- =?utf-8?B?L2NlZVNUZHUyMndCWmc2bkpSZUhNbDV5YzRHS3VRUEU4dnBOQTM1NFkwNWdt?=
- =?utf-8?B?Q1pKZTlzMmJwaW1LTVY4ZDlseGQvWDJUOUd1bUxLMDRVbkJoNWNXYUZIQ2c3?=
- =?utf-8?B?Tit2YzBlcEVQQi83RzBSRUk2dnUzTDVuRDlDc2VIaWdQSDNNdGZaTGR3eGxE?=
- =?utf-8?B?YldtWkxidjgzS1FReFlQaCtSR1pwMXpKWkVvMFAzN2s0WnN0OCtMTTRHWXhP?=
- =?utf-8?B?TXA1WDZNNHEzSnM2OE9oc2k0RGIzMjFtaFZ4NDNKaDlPTTRNSUpDUm8ycDd5?=
- =?utf-8?B?bGdQZWk0ZDRpeDhmS2lvd2NIM3RnSGFCSU1FQVJPVTdiNHd3SkVpVjVlMDRU?=
- =?utf-8?B?SHJTeEdNcHJKZ3Mwa3F4NkpUdFJYQ0hxTitBb3kyYmVSajVPeDg5bEVNZWNx?=
- =?utf-8?B?aXoycXpHSFFtQ2hjZjJTZWlGYmpGd2E4LzYvSW9GNTJheFFuUVhvSVJ5c1k4?=
- =?utf-8?B?bU5acXNnczFaWmJDS0c5MlF4M2g5c0dvUEFqMnMrTDEyakg3eVhFKzF2Z0pr?=
- =?utf-8?B?TXFMTHhjdTRBUHhpcFpkcmpxS0ZRTitMQWF2TkJqaGU3VEpwNFloSkU4MTlH?=
- =?utf-8?B?UXhrZzNGZzRlaTF3ZkpScVF4Qy9QbEJDRWFEdnlwVzMwMEMrc0hyTDhoaHkz?=
- =?utf-8?B?K2p6Rjl0UkNVSWVUSTNwOU1UVWp5OE5remU1YnkvZ2hNY2RhcVZJWFZIN2pG?=
- =?utf-8?B?Q3VDSHc5SkhpU1QzVGRBMWxhdjVWbExjOVI3cTJ0QWc4NEVmalRBaWZFd3A1?=
- =?utf-8?B?N3BvVVkwQ2NCdnpzaUdld05FcEpldjVTd0lLM3dneXRPQnRTLzZBOGhpVEpQ?=
- =?utf-8?B?NTREcW1KS2tSNVd1YXFXSFZIbUgzcHk0Q2o1bVNWL29BKzl1cmszenlIQ1Nu?=
- =?utf-8?B?NVNKa295UE1aL2ozeWZ5RTVQb01XL2VlN1JHNERhazBvL2VSa1h3MjZ2c2Y5?=
- =?utf-8?B?dDZMM0k3bFI2WFYxN1FEa3VIYURtMUswZ2ppWE9jYkVuUjVleVVMMjhyRE1V?=
- =?utf-8?B?TUN5YW1PWkV0NjVkMDFZOVhtWXR0UUtxVDdyM2dYQkZFT1AyZkpTZitGRHN2?=
- =?utf-8?B?VVVDbXFGeFJKK0kvYk9OcldWUVZrZXRncUpVRFV5d1BvdnAyemw3cTlKYkVz?=
- =?utf-8?B?UDBTbXN2bTJ3PT0=?=
+	=?utf-8?B?eVUzMVJ6RVE3T1ZqejdPRjlrVFg5Tm93TC90VUh1ZzRuM0dXeVhVQU5ndG95?=
+ =?utf-8?B?L2VFeS9mNEJMbU5XUE42Y1l1Ykpaam9RYitiQ3BGcmlKSVlEUUlpa2xNc0I0?=
+ =?utf-8?B?WmRTR2IxaG5jWnhoL2hQai9rRnRWSmhXTkhrdkduenZ5YVY3S3dvNEZtam1z?=
+ =?utf-8?B?M3lBYlRhRkdFY09WNVRJcVR2dHlFYnYyUEVicjJzaUpVcnJ6ZER2RXNyMWlZ?=
+ =?utf-8?B?Wld4WExYQmhrRVhBTTNYQnBhZVRnWndZZEdYbktzS3FpaTRZK2l1aVNiSjRs?=
+ =?utf-8?B?Um55cURwbC9YRVhyeVhmaTdGLzNDaHV2T2NkSk1hc25yMjhXM2NqazBUTUNZ?=
+ =?utf-8?B?dWVwV1FJOElhQ1RLaWxoZzNRZUpKMDhkSFQ0K3JCR01sMm0waVpKYmNOVHFv?=
+ =?utf-8?B?SjZ1YzdsLzNUVTd0V3ZOTEdXaUViSFVhSGlONlE2YThhVWUvbW5xVUZLdVFt?=
+ =?utf-8?B?bnZzcXBaRHhOS3plN3pFNERiR3Q2cmpRTUs4RWM4YzBxcWxSdFEvYnZhUmJk?=
+ =?utf-8?B?OEVMeTRPT3Ywc0UzeW93eFR6dkx6VzNBM1M2NG1zSko0cXRUdlhYYm1EVnlR?=
+ =?utf-8?B?WnY2TmU5SHBXTzg3amM3dTN6SVJkOGVFVnIwSmN2RE50SEdPakFCRlY4WlRz?=
+ =?utf-8?B?bEx5WXJUL1ExMGhmWjN5V1dOd1gyZWVvSzB5WndpUVpwc1RyYzFXL1pIanRE?=
+ =?utf-8?B?M3RKNVRPZXVzOU40SEdROTAxblp5YjJRVUloMmhjRTlGOHpBSDQwNHJyRFl6?=
+ =?utf-8?B?ZUJIZWFFeVpNMjdWNCtSVWdocHkyNjdSbUFpblU1Smxuc01HVlhDZEdIT1cv?=
+ =?utf-8?B?ZFNTcjFJRElYV3NXQjMvWkRtU3h2citLcUNzTGRRbkJwS0ZjN2g5R1lVbGxF?=
+ =?utf-8?B?dFZIQVM5c3NKM1N6ekFuNk9jNGY0dkwxQXNzb2tYT2Z1ckFzTWdjWFovTWJw?=
+ =?utf-8?B?d00yb3h4bmxMUzNRRXF5VmRZQU5UbS9zMHhGNVFRdHdDdWNRbVBOdTVzQTVX?=
+ =?utf-8?B?M2tOSGpGVFRiR1RKL093cFZmMFo3VFNsaFRQZ2xsMTRoYUVTNHlOQnVJUG1y?=
+ =?utf-8?B?RENwR0x0ckxTcjNwZHV5cUQwQ2JHL3oxL1BmVGZaM1YrYzVRMDlhMXp5Z1ZJ?=
+ =?utf-8?B?VWhCYis0c1lhV3ltelkwN1h1V0gzT0hJY0MzbDhHdFZaMFhOVmUxeUgwOFEy?=
+ =?utf-8?B?WXZFQlZSbm45S09MeXBKOTJTc2Q0WkZFTGJvTFRkSm83bDVzdXk1RWwyUG80?=
+ =?utf-8?B?S1VUbDF2MlBoSEtNREk4bjJtQlN5aHlhOUVPczZSQ2JWOFl3V1Jxb1NHazZD?=
+ =?utf-8?B?UkZucFJQbHJ6a1ZwZVJsajdiVE1PdWlZVXNoczBVaUswTUhnenpkQkQweXF4?=
+ =?utf-8?B?VWlrWmErd1FsVGx3MmcvcW81bGkreW9YYUp3dkdZczdsYWV3OEphNGs3aTVh?=
+ =?utf-8?B?V0phUFFTc3ZEb3lOT21reWQxZmNKdDVFcnljWGMwQWUyTGxQd1ljbXI4MGF0?=
+ =?utf-8?B?SVpBVERZZGZkamNnL2RBblV6dldjMzVueE9abkNvZEdQaEdEZTdMbXFQUWUw?=
+ =?utf-8?B?a2hSYzlrRVFGSFlvTjRWQ0R2SUoydHdCQVlONGtnLys2Y1pjMzFRQ3h1S2I1?=
+ =?utf-8?B?NzRDeVBTSUMxUXE2elp6SDlwWkVFamI0UHBvWFFxZ1A0a3BmNzJRbk1lc2py?=
+ =?utf-8?B?ZjJMQ0M0SHo2ZkpTMldBd1JWd0dGdmpQaGcybE9XTnFaMzVRODlPWWJzOFBB?=
+ =?utf-8?B?N1RDb1JGNTVFYVhqZGw0aktoV1RzdnJUbURJOW8wUXdwVmUrRG90MExZdEdB?=
+ =?utf-8?B?WEI5Tll1eldyY2JvTmtaTmhleTVKY1JWa0pxbVJ0aUJ3YlhEZWhHSlhnZVY4?=
+ =?utf-8?B?LzVxMVFZM0U4ZGRrVUp6STBQVHJDZWlHc3Zzb2tjTnFjU0xZcnNNa3ptOTN2?=
+ =?utf-8?B?bVZ2V2ZtQkVBN21aZFZtUUFlRjJHVTV6SEl1clE0Y0RYK3EraUI2UzlSeE91?=
+ =?utf-8?B?RWhSZDl5UG9iT1M0MkxxbUFEMDBjd3ZiT3VaNW5Yb0RNeEFHdmEzRFdIbytT?=
+ =?utf-8?B?Snh2T3VSZU9OMjAyRDVXY3NRdXNzUW40Y3dxZz09?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB9473.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?eSsxT1VIWTJYSUwzL29OUmNkNlIybjJ5c1M4Z3E2ZjNoV1paWE9oUUU3cHVq?=
- =?utf-8?B?Z2VNa1hIdyt1dlIrKyt3NEZyVk04MVhNTkV6bTZRcUVGZUp5aUx4d3gyeXJh?=
- =?utf-8?B?RmhQWE1YcTJvQzNrcnFVczBwOWQ1MDhoMURqb0dLTU9HdS9jeksxU3Q4L2px?=
- =?utf-8?B?QnNBRWN2a2tjWFdQTVlqN0RRZ0hHdXJBMFpiRUlmMVRSeHNwaTlMYVFaeFJE?=
- =?utf-8?B?V3JSbHBkSE5oNVEzRFkzZmZhdGlEK0xrTS94MFFOSUM1K2lhV3VpSUViUmVV?=
- =?utf-8?B?aDJEQjlIRkg0blVMTDNPeUtWV3NIbm5XbHFrOElDcHpTNlFJaE5NeXFaM2Z4?=
- =?utf-8?B?Qm02ejF4Wi9UaUdIYVdBYW5TMlIyTzhCZXlkdi8ydEFmdVpJTUVuaC9OTGN0?=
- =?utf-8?B?V2dzU3U0K2s5dlNtbS92V3MzUWNmWFJJU0xPc1RPZEhpTTNQdG1tYmhwd2hH?=
- =?utf-8?B?ZUdkcFVQZVJPdjFkb3RuaXd2bGNQM2Vhc3dIYlk2Ky9RQ01RcCt4Zk5GRENK?=
- =?utf-8?B?d1ptVlRhSEFhZzlLV0VSbkRpcWJmZzAvMWU0NkQyMHB0UWJZbjQxdDdBVFpI?=
- =?utf-8?B?ZmFIRTlCdGErbS95bFhZTUpKWFlZc3ovMEt4MEp3SVdYTHNJODNsczN2TWdU?=
- =?utf-8?B?WnRQNm9QRXFGc1pmNHFuenlYK1dDenpZeTBodmFEczZJVDdYd0UwQlM2cnRE?=
- =?utf-8?B?VjNMVXN6bnNzYzVYTkpxVm5TUzhpT1ZwMER2Vis5enZFWDBwVHAvRkxyVWt6?=
- =?utf-8?B?UU1OSEVvWUNrN2h2OVhYTkFDem15MURKa2VucjhWQ0ZYL2xwbmsyM1U3Z2pv?=
- =?utf-8?B?R2xlNXZabzIxdUtFV2JDN0NwL1VlWmRqQngraUJ4V0pHYTZSNEhJaHk4bThW?=
- =?utf-8?B?bU1sckFOKzJFMmJnVXk4c29NQzBJU2c1Rk5aUFN6NzFwb1NEcWNrMUNHemVw?=
- =?utf-8?B?WEx2RXFYYWpiN0tsRWNmdmlxTXhCT1JRcktNUnYvSUpKREZXbjI0M2FKWmND?=
- =?utf-8?B?UTZFdU5LbVBMYjVRQ1dkWDVZdkMrZGY4U1hZSWtBT2I5RE83WkFjL1NLc2Jk?=
- =?utf-8?B?S2pwSVpqNzNNN1hpSWhNSzVtT1FXb3hCWThvMm95NVExMWEzNHlNajdpUEow?=
- =?utf-8?B?WlovQlZDOEpTMnhpbUlzd1Jld1R4eDI0SWFtaUVJdmM0OVluaExwTHd0N0dC?=
- =?utf-8?B?aU1hU094dE9sUUlqRVFUNzdOYjU0bEhjc3ZyTTBuYTM5NHRkUHJWcDhJZkxq?=
- =?utf-8?B?T3ZXd21iUGxVd0xJUkRneGxPeFBxNFRqZ2hWeHRsa1psUFk0MzlIQXdVODI3?=
- =?utf-8?B?ZmtjVzZwVkFHektXQXM1MG14emhuZEZkRkx0bDZrdHdxenpKSkwyMDZ1clor?=
- =?utf-8?B?VmhjZk9PTlFnWFJOQzByODhKeG9qaVViWTdhQUw4M3d6ZC9mUWwzdWV6c3Ev?=
- =?utf-8?B?Q010bnhQUDllZ1o3a21ONXZkT2p6NUg1Y3BrZ2hLdWhKV3lNdmZEUndtUEU2?=
- =?utf-8?B?bks2TUNmaml3MWdxTFIzRm51ZTB3UmpaNnZuaWtBaEVjY1JzZU5OcGRpNXkx?=
- =?utf-8?B?SGY0b1RSTk5oeXFYeDZzWnVuTkcrSVo2UHY5cklPWVVwUzVwOThvWkZPMjMv?=
- =?utf-8?B?OVl2TjhtcWZ0QUhGTXg4R2Vya1BWN0c4eWkwN0t6dndtSnJkWTk4N21xSTJ5?=
- =?utf-8?B?dURNa1hYT2dSMDRBUnZ0VFVSZXBiNllkaGFMQTVUYjhsT0xsQ090SDFOODFF?=
- =?utf-8?B?Zm9LaGp6WVQvdGpzMnppaEFsRFZCazlBYXk3Q09qelZyLzFQTEJLeXlNMVJp?=
- =?utf-8?B?Q3ZrekRmbDFaTlkyOG5hMmkreUlCNkUwTitxeDJDcGNvMTZaNjBpRlBvcFRR?=
- =?utf-8?B?clp6ZWpXSE8xOHhLTGhjdkdMbS9DWVd4eG94ZnlTeEt1S0VtUzBvNmkxcDQ4?=
- =?utf-8?B?M2RDY1l4eldFTFhmcU5uM013Z3M5b05DTVFlK3hrWlZaV1ZlSmhGdjZ1L0Z4?=
- =?utf-8?B?V2NKS1VTTERzUUNiRHYrK0dvRWV4RHRjYzZocUxkYU5EVnhhenE3M2VyNHNq?=
- =?utf-8?B?UXQvNmtGTlZsK2xRZkJxbzJ4ZnNYN0VONUpocCsrc3hySFZMSys4UGRpU0dL?=
- =?utf-8?Q?CvWAsW/ruemfA9Phl7mdkUV6+?=
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(7416014)(376014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 78ea4b62-9cbb-4ad7-2cec-08de15c3a64d
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB9473.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Oct 2025 01:45:18.7697
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Oct 2025 01:48:54.2900
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Network-Message-Id: dc3a8cdb-3647-4356-ad60-08de15c426e0
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0pHwn86y9X6+M25hxWLoBxGI82BfjcBqnvat2Hk/mwJLQKOHZYlvbxfW4QAkniO7
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7301
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ5PEPF00000203.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9234
 
-On 27 Oct 2025, at 21:28, Mina Almasry wrote:
 
-> On Thu, Oct 23, 2025 at 12:45=E2=80=AFAM Byungchul Park <byungchul@sk.com=
-> wrote:
+
+On 10/27/2025 11:33 PM, Sabrina Dubroca wrote:
+> 2025-10-27, 04:40:59 +0200, Jianbo Liu wrote:
+>> The GSO segmentation functions for ESP tunnel mode
+>> (xfrm4_tunnel_gso_segment and xfrm6_tunnel_gso_segment) were
+>> determining the inner packet's L2 protocol type by checking the static
+>> x->inner_mode.family field from the xfrm state.
 >>
->> ->pp_magic field in struct page is current used to identify if a page
->> belongs to a page pool.  However, ->pp_magic will be removed and page
->> type bit in struct page e.i. PGTY_netpp can be used for that purpose.
+>> This is unreliable. In tunnel mode, the state's actual inner family
+>> could be defined by x->inner_mode.family or by
+>> x->inner_mode_iaf.family. Checking only the former can lead to a
+>> mismatch with the actual packet being processed, causing GSO to create
+>> segments with the wrong L2 header type.
 >>
->> Introduce and use the page type APIs e.g. PageNetpp(), __SetPageNetpp(),
->> and __ClearPageNetpp() instead, and remove the existing APIs accessing
->> ->pp_magic e.g. page_pool_page_is_pp(), netmem_or_pp_magic(), and
->> netmem_clear_pp_magic().
+>> This patch fixes the bug by deriving the inner mode directly from the
+>> packet's inner protocol stored in XFRM_MODE_SKB_CB(skb)->protocol.
 >>
->> This work was inspired by the following link:
->>
->> [1] https://lore.kernel.org/all/582f41c0-2742-4400-9c81-0d46bf4e8314@gma=
-il.com/
->>
->> While at it, move the sanity check for page pool to on free.
->>
->> Suggested-by: David Hildenbrand <david@redhat.com>
->> Co-developed-by: Pavel Begunkov <asml.silence@gmail.com>
->> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
->> Signed-off-by: Byungchul Park <byungchul@sk.com>
->> Acked-by: David Hildenbrand <david@redhat.com>
->> Acked-by: Zi Yan <ziy@nvidia.com>
+>> Fixes: 26dbd66eab80 ("esp: choose the correct inner protocol for GSO on inter address family tunnels")
+>> Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
+>> Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
 >> ---
->> Hi Mina,
+>> V2:
+>>   - Change subject prefix, and send to "ipsec".
+>>   - Add Fixes tag.
 >>
->> I dropped your Reviewed-by tag since there are updates on some comments
->> in network part.  Can I still keep your Reviewed-by?
+>>   net/ipv4/esp4_offload.c | 6 ++++--
+>>   net/ipv6/esp6_offload.c | 6 ++++--
+>>   2 files changed, 8 insertions(+), 4 deletions(-)
 >>
->>         Byungchul
->> ---
->>  .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |  2 +-
->>  include/linux/mm.h                            | 27 +++----------------
->>  include/linux/page-flags.h                    |  6 +++++
->>  include/net/netmem.h                          |  2 +-
->>  mm/page_alloc.c                               |  8 +++---
->>  net/core/netmem_priv.h                        | 17 +++---------
->>  net/core/page_pool.c                          | 14 +++++-----
->>  7 files changed, 25 insertions(+), 51 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c b/drivers/=
-net/ethernet/mellanox/mlx5/core/en/xdp.c
->> index 5d51600935a6..def274f5c1ca 100644
->> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
->> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
->> @@ -707,7 +707,7 @@ static void mlx5e_free_xdpsq_desc(struct mlx5e_xdpsq=
- *sq,
->>                                 xdpi =3D mlx5e_xdpi_fifo_pop(xdpi_fifo);
->>                                 page =3D xdpi.page.page;
->>
->> -                               /* No need to check page_pool_page_is_pp=
-() as we
->> +                               /* No need to check PageNetpp() as we
->>                                  * know this is a page_pool page.
->>                                  */
->>                                 page_pool_recycle_direct(pp_page_to_nmde=
-sc(page)->pp,
->> diff --git a/include/linux/mm.h b/include/linux/mm.h
->> index b6fdf3557807..f5155f1c75f5 100644
->> --- a/include/linux/mm.h
->> +++ b/include/linux/mm.h
->> @@ -4361,10 +4361,9 @@ int arch_lock_shadow_stack_status(struct task_str=
-uct *t, unsigned long status);
->>   * DMA mapping IDs for page_pool
->>   *
->>   * When DMA-mapping a page, page_pool allocates an ID (from an xarray) =
-and
->> - * stashes it in the upper bits of page->pp_magic. We always want to be=
- able to
->> - * unambiguously identify page pool pages (using page_pool_page_is_pp()=
-). Non-PP
->> - * pages can have arbitrary kernel pointers stored in the same field as=
- pp_magic
->> - * (since it overlaps with page->lru.next), so we must ensure that we c=
-annot
->> + * stashes it in the upper bits of page->pp_magic. Non-PP pages can hav=
-e
->> + * arbitrary kernel pointers stored in the same field as pp_magic (sinc=
-e
->> + * it overlaps with page->lru.next), so we must ensure that we cannot
->>   * mistake a valid kernel pointer with any of the values we write into =
-this
->>   * field.
->>   *
->> @@ -4399,26 +4398,6 @@ int arch_lock_shadow_stack_status(struct task_str=
-uct *t, unsigned long status);
->>  #define PP_DMA_INDEX_MASK GENMASK(PP_DMA_INDEX_BITS + PP_DMA_INDEX_SHIF=
-T - 1, \
->>                                   PP_DMA_INDEX_SHIFT)
->>
->> -/* Mask used for checking in page_pool_page_is_pp() below. page->pp_mag=
-ic is
->> - * OR'ed with PP_SIGNATURE after the allocation in order to preserve bi=
-t 0 for
->> - * the head page of compound page and bit 1 for pfmemalloc page, as wel=
-l as the
->> - * bits used for the DMA index. page_is_pfmemalloc() is checked in
->> - * __page_pool_put_page() to avoid recycling the pfmemalloc page.
->> - */
->> -#define PP_MAGIC_MASK ~(PP_DMA_INDEX_MASK | 0x3UL)
->> -
->> -#ifdef CONFIG_PAGE_POOL
->> -static inline bool page_pool_page_is_pp(const struct page *page)
->> -{
->> -       return (page->pp_magic & PP_MAGIC_MASK) =3D=3D PP_SIGNATURE;
->> -}
->> -#else
->> -static inline bool page_pool_page_is_pp(const struct page *page)
->> -{
->> -       return false;
->> -}
->> -#endif
->> -
->>  #define PAGE_SNAPSHOT_FAITHFUL (1 << 0)
->>  #define PAGE_SNAPSHOT_PG_BUDDY (1 << 1)
->>  #define PAGE_SNAPSHOT_PG_IDLE  (1 << 2)
->> diff --git a/include/linux/page-flags.h b/include/linux/page-flags.h
->> index 0091ad1986bf..edf5418c91dd 100644
->> --- a/include/linux/page-flags.h
->> +++ b/include/linux/page-flags.h
->> @@ -934,6 +934,7 @@ enum pagetype {
->>         PGTY_zsmalloc           =3D 0xf6,
->>         PGTY_unaccepted         =3D 0xf7,
->>         PGTY_large_kmalloc      =3D 0xf8,
->> +       PGTY_netpp              =3D 0xf9,
->>
->>         PGTY_mapcount_underflow =3D 0xff
->>  };
->> @@ -1078,6 +1079,11 @@ PAGE_TYPE_OPS(Zsmalloc, zsmalloc, zsmalloc)
->>  PAGE_TYPE_OPS(Unaccepted, unaccepted, unaccepted)
->>  FOLIO_TYPE_OPS(large_kmalloc, large_kmalloc)
->>
->> +/*
->> + * Marks page_pool allocated pages.
->> + */
->> +PAGE_TYPE_OPS(Netpp, netpp, netpp)
->> +
->>  /**
->>   * PageHuge - Determine if the page belongs to hugetlbfs
->>   * @page: The page to test.
->> diff --git a/include/net/netmem.h b/include/net/netmem.h
->> index 651e2c62d1dd..0ec4c7561081 100644
->> --- a/include/net/netmem.h
->> +++ b/include/net/netmem.h
->> @@ -260,7 +260,7 @@ static inline unsigned long netmem_pfn_trace(netmem_=
-ref netmem)
->>   */
->>  #define pp_page_to_nmdesc(p)                                           =
-\
->>  ({                                                                     =
-\
->> -       DEBUG_NET_WARN_ON_ONCE(!page_pool_page_is_pp(p));               =
-\
->> +       DEBUG_NET_WARN_ON_ONCE(!PageNetpp(p));                          =
-\
->>         __pp_page_to_nmdesc(p);                                         =
-\
->>  })
->>
->> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
->> index fb91c566327c..c69ed3741bbc 100644
->> --- a/mm/page_alloc.c
->> +++ b/mm/page_alloc.c
->> @@ -1042,7 +1042,6 @@ static inline bool page_expected_state(struct page=
- *page,
->>  #ifdef CONFIG_MEMCG
->>                         page->memcg_data |
->>  #endif
->> -                       page_pool_page_is_pp(page) |
->
-> Shouldn't you replace the page_pool_page_is_pp check with a PageNetpp
-> check in this call site and below? Or is that no longer necessary for
-> some reason?
+>> diff --git a/net/ipv4/esp4_offload.c b/net/ipv4/esp4_offload.c
+>> index e0d94270da28..05828d4cb6cd 100644
+>> --- a/net/ipv4/esp4_offload.c
+>> +++ b/net/ipv4/esp4_offload.c
+>> @@ -122,8 +122,10 @@ static struct sk_buff *xfrm4_tunnel_gso_segment(struct xfrm_state *x,
+>>   						struct sk_buff *skb,
+>>   						netdev_features_t features)
+>>   {
+>> -	__be16 type = x->inner_mode.family == AF_INET6 ? htons(ETH_P_IPV6)
+>> -						       : htons(ETH_P_IP);
+>> +	const struct xfrm_mode *inner_mode = xfrm_ip2inner_mode(x,
+>> +					XFRM_MODE_SKB_CB(skb)->protocol);
+> 
+> I don't think this is correct. inner_mode_iaf is not always set by
+> __xfrm_init_state, only when we have a AF_UNSPEC selector, which is
+> not always the case for cross-family tunnels. So we would end up with
+> inner_mode->family = 0 here, and pass the wrong type to
+> skb_eth_gso_segment.
+> 
+> Other users of xfrm_ip2inner_mode (in ip_vti/ip6_vti, xfrmi) only call
+> it when we have an AF_UNSPEC selector, then we know inner_mode_iaf is
+> valid and can be used. Otherwise, the selector (ie x->inner_mode)
+> should have the right family for the packet (and all callers of
+> xfrm_ip2inner_mode use x->inner_mode when the selector is not
+> AF_UNSPEC).
+> 
+> 
+> Maybe it would be better to move the AF_UNSPEC check into
+> xfrm_ip2inner_mode, something like:
+> 
+> static inline const struct xfrm_mode *xfrm_ip2inner_mode(struct xfrm_state *x, int ipproto)
+> {
+> 	if (x->sel.family != AF_UNSPEC)
+> 		return &x->inner_mode;
+> 
+> 	if ((ipproto == IPPROTO_IPIP && x->props.family == AF_INET) ||
+> 	    (ipproto == IPPROTO_IPV6 && x->props.family == AF_INET6))
+> 		return &x->inner_mode;
+> 	else
+> 		return &x->inner_mode_iaf;
+> }
+> 
+> 
+> since that's what all the callers are doing anyway?
+> 
+> Then it would be valid to use xfrm_ip2inner_mode like you're doing.
 
-It is done in the hunk below this one:
+It makes sense. I will submit v3 soon. Thanks!
 
-@@ -1379,9 +1376,12 @@ __always_inline bool free_pages_prepare(struct page =
-*page,
- 		mod_mthp_stat(order, MTHP_STAT_NR_ANON, -1);
- 		folio->mapping =3D NULL;
- 	}
--	if (unlikely(page_has_type(page)))
-+	if (unlikely(page_has_type(page))) {
-+		/* networking expects to clear its page type before releasing */
-+		WARN_ON_ONCE(PageNetpp(page));
- 		/* Reset the page_type (which overlays _mapcount) */
- 		page->page_type =3D UINT_MAX;
-+	}
+> 
 
- 	if (is_check_pages_enabled()) {
- 		if (free_page_is_bad(page))
-
-where
-free_pages_prepare()
-  -> free_page_is_bad()
-    -> page_expected_state()
-
---
-Best Regards,
-Yan, Zi
 
