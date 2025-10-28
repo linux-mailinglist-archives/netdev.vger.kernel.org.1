@@ -1,142 +1,255 @@
-Return-Path: <netdev+bounces-233561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7483C1570E
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 16:28:08 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id C99B6C1573B
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 16:29:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 328C440564F
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 15:27:09 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 49373354FD5
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 15:29:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BF38341AC3;
-	Tue, 28 Oct 2025 15:26:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DBA833DEED;
+	Tue, 28 Oct 2025 15:29:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H+4v4gLk"
+	dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b="h+By7Gqw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00190b01.pphosted.com (mx0b-00190b01.pphosted.com [67.231.157.127])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD9C340DA4
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 15:26:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8D8C18991E;
+	Tue, 28 Oct 2025 15:29:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.157.127
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761665198; cv=none; b=qrJI+Ma/+mqwK+fDWfUdZFmMWnJymc/gt4gsgGYugkcPu4XisvdVqvnLxlUZPV9JtdTgXEwBnBOvrqp36flSJpBgluTSRWaBdWrZvmjqb6SiGwM+FV40uSC05cciUrqmfvZxm7iMEJ7hGTg/Vb7X6PoCrdPxWHsqy4iVsIA5zJk=
+	t=1761665358; cv=none; b=iSJMmy3PSLYXRxtRPzAMLA4doTwUT1czxJnSf6Z6fdxK0tEnMImQWMK1yu2dl5MU7CES8CMFL5HibdtW+pPTD9MWXclbzd2/hnF5VVpjG3nMfUyzfRvCWIWlCmj3Miaeqv62Swf0nvCthynFbuzKHx3Ox317xJazQGIwCH0elyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761665198; c=relaxed/simple;
-	bh=4M2/3ejgEOnPWTU2k4hO2uU/c3DMXoSdd9TFkij3CjA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BFwO0wd5OjHb4IE6p7zvr88S97rfX+cttE3+MAcVtHAHbYvpdEIgbGIit8A+542K/w7EgOYwJVNGAQF1RPHm2ZkduqT5D4C5cAP0U/nf1rK1arherUQw4j4EnVdtDEaDufNO2SWJQW29xKeu1q9fbVPpSIWE8LwOPZ23fb7WqkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H+4v4gLk; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-475dbc3c9efso25884175e9.0
-        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 08:26:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761665194; x=1762269994; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IMaVfQlDtYuJ6c5NZttg0Mv3ou88wdr4jRmdcFT8ouM=;
-        b=H+4v4gLktyhkWnO7rIvfpaDbP1EZoak/ELNlG+aWCfSIyjmweJzP4qr/KzOkYurWYB
-         yv/nXmXbRxYPaF9C55CiKtriWItZytTj2aI3KHdclvZT8ySVryPTUZCYV7QiyDC4Sp6S
-         xX+d3Gz1o0GZmOeTfCbsduadmbmLgI5UUxq7j8LVYDAloFBK3SOLFNm+31cD8ZECGNF+
-         NhRxi8lKh+p32c/6WVVGmahp2Xj+eEw8QRWIaqN33uijiLA4jTCnJoKMGvP3XLWSRgXT
-         KhGDnIeRUnFJ3ONf7cZDUt8tCFSi8WPsf44ThO+7skv40UKVCatVggN5xXocoTNAarM2
-         lrbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761665194; x=1762269994;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IMaVfQlDtYuJ6c5NZttg0Mv3ou88wdr4jRmdcFT8ouM=;
-        b=ez4F2e5xHRHwYuWOJiXY50+OiV/fRQ9wRn54GWzFV1diihFbaIy/nXsEoNzFHdjk87
-         0HwKvk3Z1PBmJX4qpnIA5rU/NTVuziS1LuEWg7l+pEjeyJffJ3XKTZsVnoLgHV1kkMos
-         exkkYjfnkNrwRzDNikn2mo/H6iTs3GjH5cW+QQGPo8WiSDhajUxxIJ+XozsJ8z7Qn1HI
-         ftZgxgIXHDvMHOu9inyvGgoJMAJW8GiuJIM7LSEsFklXFHpGV6j8yE3rbUYVvVNzH7kX
-         y/KRQ5sbRIssQ7WHVaPNwdY0sdSGGtoH1pdgvgEXUvs71aNpjPiB3CIVajlJ51/SjXRW
-         zAZw==
-X-Gm-Message-State: AOJu0YyLmoHGPwbcyJHN/c/VoPcdpca1aS2FOSEUc6AN9Bpgk5D6vF51
-	4kP1UO3BtWYMroCGsQnNECQuxVmzD24xYoKhf11nvF/vtXfL4vIAoHgNB4RqN1Ec9wtsKLRlHJV
-	Wr0DQRO4PHJ2D0JP2vjLncyKFL8HCC7M=
-X-Gm-Gg: ASbGncu68tFRBWkHk8Rk8QO0I7IwiLH7Fvgkac9pEpB51jTPsTuJfmvyrUc2tnQFzlL
-	tMcS/ryampmFGdBR1HnNTLt4j9B6xogl7QDNA9pIGNqk9HHW7e0dKMWkGwMhUTw+DgVASgOaMWX
-	GrTNAa4l/6cn+E88OTkOFp7VIJercmk58pc4r5hctRGmVnzd9/7YcTXPZ9qGeGVsoAlTN/kKawx
-	w4QWNmxP5Is2QLcltfecbzqmu2uTSJIZj5qcdtryD4e57WOSXA/PRNQyzVWqdJcrVt+I1RC6X7l
-	SQjF30gmOFH+bFK8sw==
-X-Google-Smtp-Source: AGHT+IFecXEBer9gY3Fw6bXmh2cLauGwvMSJKmcd/nJJQmi8Wb6V42y+e2nXPa7xL85yaGozx7KScirkyKtgA+pwrqA=
-X-Received: by 2002:a05:600c:8216:b0:471:d2f:7987 with SMTP id
- 5b1f17b1804b1-47717e30970mr33123315e9.26.1761665194193; Tue, 28 Oct 2025
- 08:26:34 -0700 (PDT)
+	s=arc-20240116; t=1761665358; c=relaxed/simple;
+	bh=NCfCXzIFfkH6cFsk3rxSj8Jx0+Jy0Qv0I9QNFqtB8UI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LEPaQGARAxQ2W4Dfg4JNRbsCJel/sFQ/qvyFyYy97gDscwsUU5bRU0azbCuUFn35NIEfLIsDk1stXfTvx3lCp9OZdi8+DVfcbbrs/5TB989cxSLCl20GrYKGWcMi6CdQ1xfdk+Yitcz1g5kprhKYupG7ridfcLZChjPGDqan3vA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com; spf=pass smtp.mailfrom=akamai.com; dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b=h+By7Gqw; arc=none smtp.client-ip=67.231.157.127
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=akamai.com
+Received: from pps.filterd (m0050102.ppops.net [127.0.0.1])
+	by m0050102.ppops.net-00190b01. (8.18.1.11/8.18.1.11) with ESMTP id 59SEUeXD2489895;
+	Tue, 28 Oct 2025 15:29:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=akamai.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=jan2016.eng; bh=zEj64/+eigdpoB38YMajnvera82FtERxf
+	iJQI0UokSI=; b=h+By7GqweTiQdjkRJIgV1/sNqfaL/7lEMD+ZsBDMd4EZNNdCb
+	7scHagyObYLsLfZbXAVC2PedcHmXoFYLc3iT8laXDNKQj7g3QhIpMyzzkB5GmOc3
+	7jEj6xx6Hpt9luDiMnS3EMHrmf0U+lNrQPGJOiiNYhyyMiMII1o58yzn7eklEyvj
+	q28w+YodUwopsK9ahyLSefLW0z7AN0YFKUFdo3Jz5kh2EXIR2OqxABFbQiYartim
+	3kEaCIUplojlV2kHEHRI4dA2s6czCPTy7qh3U3jMxfUz8Ng8vDw/ZwHEtt8IbGnx
+	jqfnYX1u6rv1jRaR+ZnkHZef5se9CTcdxQ0qg==
+Received: from prod-mail-ppoint1 (prod-mail-ppoint1.akamai.com [184.51.33.18])
+	by m0050102.ppops.net-00190b01. (PPS) with ESMTPS id 4a2weya8ag-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 28 Oct 2025 15:29:09 +0000 (GMT)
+Received: from pps.filterd (prod-mail-ppoint1.akamai.com [127.0.0.1])
+	by prod-mail-ppoint1.akamai.com (8.18.1.2/8.18.1.2) with ESMTP id 59SEAXIH012449;
+	Tue, 28 Oct 2025 11:29:08 -0400
+Received: from prod-mail-relay02.akamai.com ([172.27.118.35])
+	by prod-mail-ppoint1.akamai.com (PPS) with ESMTP id 4a2yc1gbbb-1;
+	Tue, 28 Oct 2025 11:29:08 -0400
+Received: from muc-lhvdhd.munich.corp.akamai.com (muc-lhvdhd.munich.corp.akamai.com [172.29.2.201])
+	by prod-mail-relay02.akamai.com (Postfix) with ESMTP id 5072283;
+	Tue, 28 Oct 2025 15:29:07 +0000 (UTC)
+From: Nick Hudson <nhudson@akamai.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+        =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
+Cc: Nick Hudson <nhudson@akamai.com>, Max Tottenham <mtottenh@akamai.com>,
+        kvm@vger.kernel.org, virtualization@lists.linux.dev,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v2] vhost: add a new ioctl VHOST_GET_VRING_WORKER_INFO and use in net.c
+Date: Tue, 28 Oct 2025 15:28:54 +0000
+Message-Id: <20251028152856.1554948-1-nhudson@akamai.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <176133835222.2245037.11430728108477849570.stgit@ahduyck-xeon-server.home.arpa>
- <176133845391.2245037.2378678349333571121.stgit@ahduyck-xeon-server.home.arpa>
- <59f1c869-58c0-4158-82d7-e7b11870b790@lunn.ch>
-In-Reply-To: <59f1c869-58c0-4158-82d7-e7b11870b790@lunn.ch>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Tue, 28 Oct 2025 08:25:56 -0700
-X-Gm-Features: AWmQ_bkaUO1kkrdof1AVi8vi6kcMrBG7lqOhVJnvIyuE4P4QiZgjLGqZ7Jd_MEU
-Message-ID: <CAKgT0UduBJYty0WRzQMuzg64rbdMyZ_ubhgOh-q_Df6NPXsA9A@mail.gmail.com>
-Subject: Re: [net-next PATCH 3/8] net: phy: Add 25G-CR, 50G-CR, 100G-CR2
- support to C45 genphy
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, kernel-team@meta.com, 
-	andrew+netdev@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk, 
-	pabeni@redhat.com, davem@davemloft.net
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-28_05,2025-10-22_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 suspectscore=0
+ malwarescore=0 mlxlogscore=999 spamscore=0 mlxscore=0 bulkscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2510020000 definitions=main-2510280129
+X-Authority-Analysis: v=2.4 cv=UbxciaSN c=1 sm=1 tr=0 ts=6900e145 cx=c_pps
+ a=StLZT/nZ0R8Xs+spdojYmg==:117 a=StLZT/nZ0R8Xs+spdojYmg==:17
+ a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=X7Ea-ya5AAAA:8
+ a=EHjAbftWRgUkfAlJtAYA:9 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-ORIG-GUID: F9R5Oc0P0kde7f6IO1DXITIYgfYapybP
+X-Proofpoint-GUID: F9R5Oc0P0kde7f6IO1DXITIYgfYapybP
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI4MDEzMCBTYWx0ZWRfX8dzQFMjJxKZf
+ /XzXIUHfPcI5yQc2ckPrJ6Ixiv7jU41ALCqgvMOIdtyV5qvf7TdH3Gpm869HqLqiooASU1qI1CH
+ Sp5UQHV5ksN27HHBOqR2gnAvfqJnjaUoV5+nUKBdrqGBBqNKQgvsWd5h9jy2cIZ/n01BInj/rZZ
+ lM2yz15uDtTafnQ36WYYxxfWgj3XYwTfxS/4ZtGRxbjYhWsrocwYZGNnX8H0O3+9txtp58mLRZR
+ Y3QANl1FtKN22htXgzMoy8N/IsZ6XqvFkk5Zm+k7/ahGTYjKBD/hW9fuWtT6krFfnGzP6mxs/Dv
+ 9zqKapeOMzKYRvdOw/6JENR2+mPlGhxD5+LTOMfxMXSUUvWQrv8jR1opfiSgk4tNeA2wEZbWKUJ
+ WCdaGZeziFH29xaZvrGyvlZDsSQ7Ag==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-28_05,2025-10-22_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 impostorscore=0
+ suspectscore=0 malwarescore=0 spamscore=0 phishscore=0 bulkscore=0
+ adultscore=0 priorityscore=1501 lowpriorityscore=0 clxscore=1015
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510210000 definitions=main-2510280130
 
-On Tue, Oct 28, 2025 at 5:57=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
->
-> On Fri, Oct 24, 2025 at 01:40:53PM -0700, Alexander Duyck wrote:
-> > From: Alexander Duyck <alexanderduyck@fb.com>
-> >
-> > Add support for 25G-CR, 50G-CR, 50G-CR2, and 100G-CR2 the c45 genphy. N=
-ote
-> > that 3 of the 4 are IEEE compliant so they are a direct copy from the
-> > clause 45 specification, the only exception to this is 50G-CR2 which is
-> > part of the Ethernet Consortium specification which never referenced ho=
-w to
-> > handle this in the MDIO registers.
+The vhost_net (and vhost_sock) drivers create worker tasks to handle
+the virtual queues. Provide a new ioctl VHOST_GET_VRING_WORKER_INFO that
+can be used to determine the PID of these tasks so that, for example,
+they can be pinned to specific CPU(s).
 
-I will go ahead and split this up as you suggested in the other email.
+Signed-off-by: Nick Hudson <nhudson@akamai.com>
+Reviewed-by: Max Tottenham <mtottenh@akamai.com>
+---
+ drivers/vhost/net.c              |  5 +++++
+ drivers/vhost/vhost.c            | 19 +++++++++++++++++++
+ include/linux/sched/vhost_task.h |  2 ++
+ include/uapi/linux/vhost.h       |  3 +++
+ include/uapi/linux/vhost_types.h | 13 +++++++++++++
+ kernel/vhost_task.c              | 12 ++++++++++++
+ 6 files changed, 54 insertions(+)
 
-> Does the Ethernet Consortium have other media types which are not in
-> 802.3? Does your scheme work for all of them?
->
->         Andrew
+diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+index 35ded4330431..e86bd5d7d202 100644
+--- a/drivers/vhost/net.c
++++ b/drivers/vhost/net.c
+@@ -1804,6 +1804,11 @@ static long vhost_net_ioctl(struct file *f, unsigned int ioctl,
+ 		return vhost_net_reset_owner(n);
+ 	case VHOST_SET_OWNER:
+ 		return vhost_net_set_owner(n);
++	case VHOST_GET_VRING_WORKER_INFO:
++		mutex_lock(&n->dev.mutex);
++		r = vhost_worker_ioctl(&n->dev, ioctl, argp);
++		mutex_unlock(&n->dev.mutex);
++		return r;
+ 	default:
+ 		mutex_lock(&n->dev.mutex);
+ 		r = vhost_dev_ioctl(&n->dev, ioctl, argp);
+diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+index 8570fdf2e14a..20ad9d190dc3 100644
+--- a/drivers/vhost/vhost.c
++++ b/drivers/vhost/vhost.c
+@@ -1012,6 +1012,7 @@ long vhost_worker_ioctl(struct vhost_dev *dev, unsigned int ioctl,
+ 			void __user *argp)
+ {
+ 	struct vhost_vring_worker ring_worker;
++	struct vhost_vring_worker_info ring_worker_info;
+ 	struct vhost_worker_state state;
+ 	struct vhost_worker *worker;
+ 	struct vhost_virtqueue *vq;
+@@ -1050,6 +1051,7 @@ long vhost_worker_ioctl(struct vhost_dev *dev, unsigned int ioctl,
+ 	/* vring worker ioctls */
+ 	case VHOST_ATTACH_VRING_WORKER:
+ 	case VHOST_GET_VRING_WORKER:
++	case VHOST_GET_VRING_WORKER_INFO:
+ 		break;
+ 	default:
+ 		return -ENOIOCTLCMD;
+@@ -1082,6 +1084,23 @@ long vhost_worker_ioctl(struct vhost_dev *dev, unsigned int ioctl,
+ 		if (copy_to_user(argp, &ring_worker, sizeof(ring_worker)))
+ 			ret = -EFAULT;
+ 		break;
++	case VHOST_GET_VRING_WORKER_INFO:
++		worker = rcu_dereference_check(vq->worker,
++					       lockdep_is_held(&dev->mutex));
++		if (!worker) {
++			ret = -EINVAL;
++			break;
++		}
++
++		memset(&ring_worker_info, 0, sizeof(ring_worker_info));
++		ring_worker_info.index = idx;
++		ring_worker_info.worker_id = worker->id;
++		ring_worker_info.worker_pid = task_pid_vnr(vhost_get_task(worker->vtsk));
++
++		if (copy_to_user(argp, &ring_worker_info, sizeof(ring_worker_info)))
++			ret = -EFAULT;
++		break;
++
+ 	default:
+ 		ret = -ENOIOCTLCMD;
+ 		break;
+diff --git a/include/linux/sched/vhost_task.h b/include/linux/sched/vhost_task.h
+index 25446c5d3508..568f9596f29e 100644
+--- a/include/linux/sched/vhost_task.h
++++ b/include/linux/sched/vhost_task.h
+@@ -11,4 +11,6 @@ void vhost_task_start(struct vhost_task *vtsk);
+ void vhost_task_stop(struct vhost_task *vtsk);
+ void vhost_task_wake(struct vhost_task *vtsk);
+ 
++struct task_struct *vhost_get_task(struct vhost_task *vtsk);
++
+ #endif /* _LINUX_SCHED_VHOST_TASK_H */
+diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+index c57674a6aa0d..c32aa8c71952 100644
+--- a/include/uapi/linux/vhost.h
++++ b/include/uapi/linux/vhost.h
+@@ -101,6 +101,9 @@
+ /* Return the vring worker's ID */
+ #define VHOST_GET_VRING_WORKER _IOWR(VHOST_VIRTIO, 0x16,		\
+ 				     struct vhost_vring_worker)
++/* Return the vring worker's ID and PID */
++#define VHOST_GET_VRING_WORKER_INFO _IOWR(VHOST_VIRTIO, 0x17,	\
++				     struct vhost_vring_worker_info)
+ 
+ /* The following ioctls use eventfd file descriptors to signal and poll
+  * for events. */
+diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost_types.h
+index 1c39cc5f5a31..28e00f8ade85 100644
+--- a/include/uapi/linux/vhost_types.h
++++ b/include/uapi/linux/vhost_types.h
+@@ -63,6 +63,19 @@ struct vhost_vring_worker {
+ 	unsigned int worker_id;
+ };
+ 
++/* Per-virtqueue worker mapping entry */
++struct vhost_vring_worker_info {
++	/* vring index */
++	unsigned int index;
++	/*
++	 * The id of the vhost_worker returned from VHOST_NEW_WORKER or
++	 * allocated as part of vhost_dev_set_owner.
++	 */
++	unsigned int worker_id;
++
++	__kernel_pid_t worker_pid;  /* PID/TID of worker thread, -1 if none */
++};
++
+ /* no alignment requirement */
+ struct vhost_iotlb_msg {
+ 	__u64 iova;
+diff --git a/kernel/vhost_task.c b/kernel/vhost_task.c
+index 27107dcc1cbf..aa87a7f0c98a 100644
+--- a/kernel/vhost_task.c
++++ b/kernel/vhost_task.c
+@@ -67,6 +67,18 @@ static int vhost_task_fn(void *data)
+ 	do_exit(0);
+ }
+ 
++/**
++ * vhost_get_task - get a pointer to the vhost_task's task_struct
++ * @vtsk: vhost_task to return the task for
++ *
++ * return the vhost_task's task.
++ */
++struct task_struct *vhost_get_task(struct vhost_task *vtsk)
++{
++	return vtsk->task;
++}
++EXPORT_SYMBOL_GPL(vhost_get_task);
++
+ /**
+  * vhost_task_wake - wakeup the vhost_task
+  * @vtsk: vhost_task to wake
+-- 
+2.34.1
 
-Looking at the latest spec on the consortium website
-(https://ethernettechnologyconsortium.org/wp-content/uploads/2021/10/Ethern=
-et-Technology-Consortium_800G-Specification_r1.1.pdf)
-it looks like they are adding 800G-KR8/CR8 and 400G-KR8/CR8. In the
-case of these two we would have to come up with a different approach
-as the implementation for them appears to be doing some sort of
-bonding of a pair of 4 lane links.
-
-The only other "consortium mode" is another implementation of
-25G-KR/CR which I could have followed the same approach on. The IEEE
-mode is close enough for now that there wasn't a point in splitting it
-off as a type of its own. In fact I got this idea from copying how the
-SFP bus code handles this
-(https://elixir.bootlin.com/linux/v6.18-rc3/source/drivers/net/phy/sfp-bus.=
-c#L251).
-There is already logic that is setting the 25G link capability when it
-detects the 100G cable. The general idea would be that we would end up
-with the 50R2 eventually slipping in there as well since the same
-cable can support all 3 types.
-
-I suppose if we wanted to be more consistent between these setups we
-could treat this more like the setup described for the 400/800 setup
-and instead of having one PHY doing 1/2 of 100G we could treat it as a
-bonded pair of PHYs doing 25G. As it stands I am going to have to
-present 2 instances of the PCS/PMA anyway as the vendor config and
-RSFEC ultimately has to be setup twice even though we are managing the
-core PCS logic through only the first instance.
 
