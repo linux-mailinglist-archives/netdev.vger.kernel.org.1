@@ -1,82 +1,55 @@
-Return-Path: <netdev+bounces-233490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05DC3C144E4
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 12:14:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3104AC14590
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 12:27:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6DA0F4008B6
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 11:14:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D1AB1A652AB
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 11:27:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC29F3043DC;
-	Tue, 28 Oct 2025 11:14:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC605307ACB;
+	Tue, 28 Oct 2025 11:26:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R0OZqRxO"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="yYdtv9h5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 135072FFDCE
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 11:14:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8104E218EB1
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 11:26:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761650063; cv=none; b=scHsfVfKqb/xYka5muAYP3xOMga2IPgs7+LpU+3De/s+FJYSctAbHmuTByOoU5Q4Pk5TJbtsJzuoDTJUZRfBFip34dluP8N6w6tPGpZjv8Xea1q+Frszh3EXw9FCqgrcXZj8+Ss+uHuYpStzgXzD5y1OqrbrIa35iQA05WSjF+w=
+	t=1761650814; cv=none; b=qXv/5oc0eqG3RerM1dO1lEt/KuYFLurSHsur3cqy8zhpzuint+uhYeWAo6oP/BaB9YxdqCER4iUQYTQgSXXSRqdI8yteiaX4UIjza+H9i9O7LkGxwjF3IL48TndURQr45pv7/JOqPpkaFPeo+ieQtqNjINmn168YaBIJMLvEpgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761650063; c=relaxed/simple;
-	bh=UvfI+0Dexvqi89jOuSdlxco1E27i3zPPumESPPyhntQ=;
+	s=arc-20240116; t=1761650814; c=relaxed/simple;
+	bh=1FYBSuautEIAG7T+Ol4+igQ37gAQWUTKdQpXOUVndIE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=k3tnh25OXW8lgDNgZIkmhC9dTzFeQHPeRPxuvb/ekfdiY1ZYUqoPYLm1xS+DOxxzJxYVSpPA99GOvHgHfv12cbv/fulOe8f+UKN1PcZ13GxLn4x1r2bW49dHG55X9wcJcoAG9A5WaZEom5zwUGeMS9pPzbuyTH3LPz8yJvTd3nE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R0OZqRxO; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b3e7cc84b82so913594366b.0
-        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 04:14:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761650060; x=1762254860; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YjFpI9BYeJIGawQior8vsJoD7SmwJll5ZNIMlbkQNe0=;
-        b=R0OZqRxOtBqxX/rZBL4S2C3y3U3RNMl6iz0/8oIqXKU28NYDvTmLrqGxYShitik6MK
-         VAPqJiZFBjuDjj9f9zlX5DkBXo8nscRRtYYNnHTeHO8825Ypcd0Y0W2KvHLiMrNYw+AL
-         9kmWhZ9K7qpj/mOCKh/lyDJg1MNNLapfnFeMmNSRFLMK6BYKQV0Hwjocg3p/FV16BNlu
-         a+4fz630T6RaGNUF7jLe1QCGdCnsIgurM/D3uU0rtstzJ7tHjcDiUtq9Y79At3lkmaHc
-         PzRTa56pXXPgmBSJ65ev5DJwY4cSK+MMLNH8+i3Wmk6122maSf1jnSvPS1tQFpwhCBw6
-         za4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761650060; x=1762254860;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YjFpI9BYeJIGawQior8vsJoD7SmwJll5ZNIMlbkQNe0=;
-        b=Hdc2ngMCycGfXqJ8EvRMbAen2MPjqI1vcWUQP0n10yZh1kr+Vp3I1cdHBQ8PEtDBdK
-         f3Y2/W5wbxC16g2/HrlG80doMY4KaigvQdrZoxLG3xqxYucmxSEOZYIJGBz/m/j0up40
-         UQAcud59TtS+5JfvG3Hp6qG5YzlkI1GjV4nKp97nmbql81eH+5s5+M0jKN99QvNkP8bU
-         XimbKdIAS/iI3mlMGndDDNLR8rR6StVeiG6E2bEU+YKMNvBQjnQDtPPEHDiuA6yI3r2F
-         U8MdfPrUGzJ7d9LyHgHEUCF3KGc5NxfggMgVp+hYJq1mLyaCXVlSXxeIQ+4FF8V0ftQd
-         V/SQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUBX6xpnuWjh9xW77EPCxA9m5KIIHB3/ptuOeULdbx1gKjqEQrCOd6QlLl3JOtmAvZRq1KfEDE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjQKD25TQNvmeD6cbLd3vfFHPBPDpN+nJVlajkKtgz9N8yMDsC
-	dqoRGgWIpO5LN7YZgM0ZXO8u0hpJ3Lgfoqj81nnWxskniu4uiuRZJME+
-X-Gm-Gg: ASbGncsEza5iodzoLYF/e8b4upcUx7CKDAnUfoKi9G2TUbfiNdgradaAWIlr2+otvX2
-	j6ymnSlkFGVZ5GGJ/5dExvo/6aIiEitmSCqxPfJpPen/+D0xQX1zZLgZxSLzSra2hCCf+xb0Gfx
-	uksQn82/OrnMew9irNywyul6D7N/bJxdjIGlWX6yJmvfH4K3o1OFTEPPq5CLmcSe7Q0bbQSr74A
-	0YayC342t6u+U5/PZEr/1iwE1H/WUS1yQBsgec9gLJQ+19eGeKnxgI50DXW/rvOJkXpL1lKM0Kp
-	k1Wl+kk2TpJOfn9tcunFBB1MfrHfYYOswRZncNvYaHPHDjxGi9NSpUBUGqo/x1qChJatfTY8Jcj
-	pm894W3ifvUBGsYg5TcyEYT0ELVtJvUl7yqJzU4cfyHHWyvCWSYUGntxsW5ylx7VSAkbp2eta3L
-	6UzbqmVyHW6ShiqyMNHM+sE1oLM23+t/6Y2D1N0erSzXRU+HVoFInF+C1a4rIiKPbArMg0KM0IF
-	5hhbi1QjhyKaQmMV85SNOKerUF65rgzdGOh+i0novUW1MaOx9CltQ==
-X-Google-Smtp-Source: AGHT+IGFhB1uFC3jfUFSa2Q1GaChneZzYP9rrCvUKq1g/2kn74sMQ9tiDca6CquKILqpFbpXF/Q/Kg==
-X-Received: by 2002:a17:907:7f0a:b0:b4a:ed12:ce51 with SMTP id a640c23a62f3a-b6dba498fe6mr339684266b.23.1761650059938;
-        Tue, 28 Oct 2025 04:14:19 -0700 (PDT)
-Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b6d853077ddsm1052436566b.11.2025.10.28.04.14.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Oct 2025 04:14:19 -0700 (PDT)
-Message-ID: <05610ae5-4a8a-47e9-808b-7ff98fade78e@gmail.com>
-Date: Tue, 28 Oct 2025 12:14:17 +0100
+	 In-Reply-To:Content-Type; b=hkhoQjugT8T902CRN0WKGda3qkwMzWkpWuimlEarFjDrfm7In4z0kGNLf+OidUvN8TlAIll3uZPI5KmeAijXL3SgySFuTDVs3kz4OqQ77fU9IuEzqepJtBxOw2Mq0AMnFRS7FsmN83qcUhe3n6LEGbJz0If5dNHbT8Sb8W8w8Vs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=yYdtv9h5; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 44650C0BE9D;
+	Tue, 28 Oct 2025 11:26:29 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 702EE606AB;
+	Tue, 28 Oct 2025 11:26:49 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id EA45E102F23B7;
+	Tue, 28 Oct 2025 12:26:29 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1761650808; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=uLE0eTiI6TFyVoJFE00DU2l+ZzaA7D7Dyj0PBL3xFBY=;
+	b=yYdtv9h5uVkWuAPwLtXjyYlPWVrzUpwiuyAJcIxNZS3FnWiI8ct9+zIZaKSdyGWZdZP7Zq
+	6Dy6UfGWkGAJ6vFf6UrdpipfXfA+/6y0JZjGcBXy1n08RfqyODVLfzUarGcsQWBSNy6Eq6
+	ShVX2TJDnIWddhfA0wJRrTJmaZNtRt7CbZRMqp+pBfjTC+obK/NtCiqbCJwfebKY6zOXzG
+	8a1/owtEn59F7gvrHb+ZdptxURxJG459LLZXNevh9GK7QhH5hFvT4z5jM8IQmEt2I1K6d0
+	QT1GSDByFzGwmPhP8J2WgmRwdnFbGX8WtLq8Fn5+PYxER96BAEyr833Ax30ZIA==
+Message-ID: <c2686441-7201-470f-b1b5-063c347bea2e@bootlin.com>
+Date: Tue, 28 Oct 2025 12:26:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,60 +57,66 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 12/15] arm64: dts: mediatek: mt7981b-openwrt-one: Enable
- Ethernet
-To: Sjoerd Simons <sjoerd@collabora.com>, Andrew Lunn <andrew@lunn.ch>,
- "Lucien.Jheng" <lucienzx159@gmail.com>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
- <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Ryder Lee <ryder.lee@mediatek.com>, Jianjun Wang
- <jianjun.wang@mediatek.com>, Bjorn Helgaas <bhelgaas@google.com>,
- Lorenzo Pieralisi <lpieralisi@kernel.org>,
- =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
- Manivannan Sadhasivam <mani@kernel.org>,
- Chunfeng Yun <chunfeng.yun@mediatek.com>, Vinod Koul <vkoul@kernel.org>,
- Kishon Vijay Abraham I <kishon@kernel.org>, Lee Jones <lee@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>,
- kernel@collabora.com, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, linux-pci@vger.kernel.org,
- linux-phy@lists.infradead.org, netdev@vger.kernel.org,
- Daniel Golle <daniel@makrotopia.org>, Bryan Hinton <bryan@bryanhinton.com>
-References: <20251016-openwrt-one-network-v1-0-de259719b6f2@collabora.com>
- <20251016-openwrt-one-network-v1-12-de259719b6f2@collabora.com>
- <4f82aa17-1bf8-4d72-bc1f-b32f364e1cf6@lunn.ch>
- <8f5335a703905dea9d8d0c1840862a3478da1ca7.camel@collabora.com>
-From: Eric Woudstra <ericwouds@gmail.com>
+Subject: Re: [PATCH net-next 3/3] net: stmmac: add support specifying PCS
+ supported interfaces
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Alexis Lothor__ <alexis.lothore@bootlin.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Boon Khai Ng <boon.khai.ng@altera.com>,
+ Daniel Machon <daniel.machon@microchip.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Furong Xu <0x1207@gmail.com>, Jacob Keller <jacob.e.keller@intel.com>,
+ Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Yu-Chun Lin <eleanor15x@gmail.com>
+References: <aP03aQLADMg-J_4W@shell.armlinux.org.uk>
+ <E1vClC5-0000000Bcbb-1WUk@rmk-PC.armlinux.org.uk>
+ <604b68ce-595f-4d50-92ad-3d1d5a1b4989@bootlin.com>
+ <aQCcVOYV15SeHAMU@shell.armlinux.org.uk>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 Content-Language: en-US
-In-Reply-To: <8f5335a703905dea9d8d0c1840862a3478da1ca7.camel@collabora.com>
+In-Reply-To: <aQCcVOYV15SeHAMU@shell.armlinux.org.uk>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-
-
-On 10/21/25 10:21 PM, Sjoerd Simons wrote:
-> On Fri, 2025-10-17 at 19:31 +0200, Andrew Lunn wrote:
->>> +&mdio_bus {
->>> +	phy15: ethernet-phy@f {
->>> +		compatible = "ethernet-phy-id03a2.a411";
->>> +		reg = <0xf>;
->>> +		interrupt-parent = <&pio>;
->>> +		interrupts = <38 IRQ_TYPE_EDGE_FALLING>;
+On 28/10/2025 11:35, Russell King (Oracle) wrote:
+> On Tue, Oct 28, 2025 at 11:16:00AM +0100, Maxime Chevallier wrote:
+>> Hello Russell,
 >>
->> This is probably wrong. PHY interrupts are generally level, not edge.
+>> On 25/10/2025 22:48, Russell King (Oracle) wrote:
+>>> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+>>
+>> Maybe this needs a commit log, even a small one ? :(
 > 
-> Sadly i can't find a datasheet for the PHY, so can't really validate that easily. Maybe Eric can
-> comment here as the author of the relevant PHY driver.
-> 
-> I'd note that the mt7986a-bananapi-bpi-r3-mini dts has the same setup for this PHY, however that's
-> ofcourse not authoritative.
-> 
+> Thanks for giving Jakub a reason to mark this "changes required." :D
+> I'm not really expecting this to be merged as-is. So why didn't I
+> post it as RFC? Too many people see "RFC" as a sign to ignore the
+> patch series. Some people claim that "RFC" means it isn't ready and
+> thus isn't worth reviewing/testing/etc. I say to those people... I
+> can learn their game and work around their behaviour.
 
-Lucien would have access to the correct information about the interrupt.
+Yeah this series needs to be tested and discussed, I am rounding up all
+my stmmac platforms in my ever-growing pile of HW as I'm building my
+own test farm, but all the glue stmmac boards I have are the ones that
+are fairly well maintained (imx-dwmac, dwmac-stm32, sdwmac-socfpga...).
+I don't have any stmmac that use the integrated PCS :(
+
+> 
+> Yes, it will need a better commit log, but what I'm much much more
+> interested in is having people who are using the integrated PCS (in
+> SGMII mode as that's all we support) to test this, especially
+> dwmac-qcom-ethqos folk.
+
+Let's hope we can get some test indeed :/ 
+
+Maxime
+
+> The 2.5G support was submitted by Sneh Shah, and my attempts to make
+> contact have resulted in no response.
+> 
 
 
