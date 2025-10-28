@@ -1,390 +1,165 @@
-Return-Path: <netdev+bounces-233628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FD3BC167D1
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 19:31:00 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id E319DC1682B
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 19:38:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C2B4F357A1A
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 18:30:59 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3FC9F504D37
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 18:33:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D118F34E75E;
-	Tue, 28 Oct 2025 18:30:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5329034A791;
+	Tue, 28 Oct 2025 18:33:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="bf7CeKvT";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="aN0SjHa8";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="bf7CeKvT";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="aN0SjHa8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GnBPq+XD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C252234E750
-	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 18:30:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0E6429B793
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 18:33:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761676253; cv=none; b=F9RG9Hy5K20sLFLFCFkEeQXdo3r+xgkylc/Owp17xmkj5pTXGncrmqNrPifqrO/DygT71DUIYqrMsMB5JqmWWYCzuBbpQ0QPScs+CxWyiwJh/f1oUt4lh1OV4W1dR2SKJkl6CmD3MHKWlud1K6XdqmZWrhz8EHRLdw3TJq0eFXQ=
+	t=1761676431; cv=none; b=L99SCjYQMzz+yxZSf98pM2DF04p5zXPtw/lLw3T9LDL0E+BO1Sm+pNKtf6TjwjDPmZs6YmH91zdRUPzFTkUJVzXY8kDz/Kt0iat9d7JzYonrKn1nxGk5VaGrOW5CR81WwPTItwFU9/Y69Z3/j5pRg8QA2TmY/iHnCq2lPi2+bHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761676253; c=relaxed/simple;
-	bh=TXCxGW8rG1+zX8Wh0mRyaK/1g+9YLJL5sbSnA05UUcU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=b/4hLQU5cadIuhcVSttbMreycNJpAKFfw8wWKSQXHFGI80QQURkahS14M8n8q/jVshMPn1WRsXpHIp5suf2fwf09Fz8TVzZvIqBneIUSQBRqxLGodrTEMhaJ291RSmNeLp+v8RkLNu6ZxNHMuw45TQQT/4Nw0rXescFDzeWu9PY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=bf7CeKvT; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=aN0SjHa8; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=bf7CeKvT; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=aN0SjHa8; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 2A5121F74B;
-	Tue, 28 Oct 2025 18:30:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1761676246; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JooO2FSwoMAU4knk3KoKUMGx7eFVJl+Pmf3nQCHNsLE=;
-	b=bf7CeKvTJmKlqIBf+FtyHp1flyatwuzrLzpunvaJqQa/Wrld6VOtYTAa68gQd9W4CRU/qb
-	RyT4GsPs2oqGuwRtx9C+TVX2Zv6wYxY45yG1SF+Wdsw/AeYwsi1GE5kx66/bi5/13H7ibw
-	l7PuX5t5XRrzUS7jWi/w30e1Z4dAeGQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1761676246;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JooO2FSwoMAU4knk3KoKUMGx7eFVJl+Pmf3nQCHNsLE=;
-	b=aN0SjHa8W/a+yMWD65cCeEzyJ48OxzPn11beuWrGwzj1951BRUqDwhhanHB/HaJvDdu/dQ
-	JAmW/oNo+/Ck/oBA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1761676246; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JooO2FSwoMAU4knk3KoKUMGx7eFVJl+Pmf3nQCHNsLE=;
-	b=bf7CeKvTJmKlqIBf+FtyHp1flyatwuzrLzpunvaJqQa/Wrld6VOtYTAa68gQd9W4CRU/qb
-	RyT4GsPs2oqGuwRtx9C+TVX2Zv6wYxY45yG1SF+Wdsw/AeYwsi1GE5kx66/bi5/13H7ibw
-	l7PuX5t5XRrzUS7jWi/w30e1Z4dAeGQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1761676246;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JooO2FSwoMAU4knk3KoKUMGx7eFVJl+Pmf3nQCHNsLE=;
-	b=aN0SjHa8W/a+yMWD65cCeEzyJ48OxzPn11beuWrGwzj1951BRUqDwhhanHB/HaJvDdu/dQ
-	JAmW/oNo+/Ck/oBA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9E89C13693;
-	Tue, 28 Oct 2025 18:30:45 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 2OG4I9ULAWlINAAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Tue, 28 Oct 2025 18:30:45 +0000
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com,
-	sdf@fomichev.me,
-	kerneljasonxing@gmail.com,
-	fw@strlen.de,
-	Fernando Fernandez Mancera <fmancera@suse.de>
-Subject: [PATCH 2/2 bpf v2] xsk: avoid data corruption on cq descriptor number
-Date: Tue, 28 Oct 2025 19:30:32 +0100
-Message-ID: <20251028183032.5350-2-fmancera@suse.de>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251028183032.5350-1-fmancera@suse.de>
-References: <20251028183032.5350-1-fmancera@suse.de>
+	s=arc-20240116; t=1761676431; c=relaxed/simple;
+	bh=N8rKAtjbv6LE141WmroC0g0cbpM5XEtFR0xQakQ9+3U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O/O8caOllvdR4SfZYfngXcJlP0oh+dhte4nvit3kgFU0T11osDXoEMRwOhXKliWF3wFrAhDrsyd25QsJEePD8hGIScZBnuDUBdpkCFIQKHOHrYpur62plK1ODZN3SJIdPi5P+qx+K/WYFBWDfnQd6izo4Bw28zmI+VOeje6ZEMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GnBPq+XD; arc=none smtp.client-ip=209.85.128.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-785bf425f96so2835667b3.1
+        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 11:33:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761676429; x=1762281229; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=/1XSltVjAzAnQ4Amthq/umVOWdJNZ6/4qr8PfcWtQ5I=;
+        b=GnBPq+XDDp7PPoNxsucDdmcNDWW9GmoIkdMlbEE10ZuIMpilTsifEwJl8g3bxteoaG
+         Og0h4XbAirQVaeRGc9VV8us2v/qaqKj0dcxo2d5SkTFnT02zynL+zq/ZKBN82sClhOJu
+         3/tQWjXFCgBa24YkVcINfhoe1rnz62CvBO5LYa4NNKE5MzPEv2uWx7HgzoyD2SWbyOrx
+         jXm7IgJnh2gk9s7TPH75g6gE3y0pnTn0xN2RTqIxOka9UnB42jwJe9/WW3Zfw1SOoNo3
+         gfmPhr10hmz9CAvZMi8dcYPHgD71D0K+9/vpFe6W+hOduwYjbwIU0ITOZXPeDF05E6ZJ
+         xWzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761676429; x=1762281229;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/1XSltVjAzAnQ4Amthq/umVOWdJNZ6/4qr8PfcWtQ5I=;
+        b=g5Tmo7qJL6k2+TBuQzOgd1JDGYB0sCA3he0zjn9P5+/Ywo/958a+YSMBJj0sf9+LUN
+         Mh6KwsJFgI8S+lN4E9bmPrwnj1mkMpmA7LnzxAUgNR1YCGcY178CwDGpIX2zN0GwsY9A
+         edmn1Gm6HCaAtPOX/2s9wMmyxZCx59XCPQTu9t91RufK15Jy/TrYqm+MhO42fvQMi9Cq
+         G7W6obsipHbDbv1GJ5YH719SynIcsm5L5HuIEu1yrFsdyUyW5xuH0f2nClinO/9RwWs5
+         we/woBZzE14b/QSIHHVEqKr0+hFfYkysacBPpOckABzE9oJGTdmXq+45tVciRew2+jsL
+         JkTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXlaAf+9IZEFwe/sA7CgT8v4USSKj+1NGQBph9GjVceRAZHJco+u4P3QhyQBtweDxN83HCtFIA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzzJJjyQNHnnSTu7d3cXhLkk+mvhQK+7F/d24Xb7aS9VEz2NdQa
+	OzLO3m1Cu0d3PWutHILezc7vGGQtgzk3MPmiHfFZqWKxVvw4H+VAr1Dh
+X-Gm-Gg: ASbGncsOC9aU2z70wo07agc2LnURgyKNCOtbxUPimT9Wp6ZR1zIAevNXbFIouJ8Qhcp
+	A/C9EDXXsOB6mEoM5ah58K1frCmmCbA4C18idR16tWZeE3no1yxH9c3D7YgVawJPO+/pbkNbIME
+	uW6n5nJ1YiNaDl7MlFug9NWlyQ+PAP8IEbyfVfQX3F5v+2T3004T2TZp9BFXlUTL+EgcHGR6lYY
+	qSKwaYnDDrSna3Vwct4u7mjig9FlcVeyT86jUFjAUyuHLHeQ8kVJsMEWAOJEOa/zMV8oQGYHLBk
+	kvUN7ihXPDyWez45rRjzZJ1SwK1RKvilVl8154R9YYWLuZv3pvH/pgcYDU1ZuY2b3vRsxnc9Ilb
+	E06PI0Du2APLMFtu/WdeSXak8N8hh6X86VdWCzEjpSNfwH+QtbCCtOImBS7LLnWe1E2Cmee9GBL
+	jpToHL5ZYNQWgEV1Z+0WZ4GeY05Z/62NTR11Qq
+X-Google-Smtp-Source: AGHT+IEttZ9BDz7ytrfWJAq7n0ugR4HwbpMEa8x1zfMG1He+winHmzAjdRiu+KVVA5WIcmY+KLnWfg==
+X-Received: by 2002:a05:690e:124a:b0:63e:25e7:8098 with SMTP id 956f58d0204a3-63f77331a80mr208720d50.29.1761676428601;
+        Tue, 28 Oct 2025 11:33:48 -0700 (PDT)
+Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:4e::])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-63f4c4545a3sm3428991d50.22.2025.10.28.11.33.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Oct 2025 11:33:48 -0700 (PDT)
+Date: Tue, 28 Oct 2025 11:33:46 -0700
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	David Ahern <dsahern@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v5 2/4] net: devmem: refactor
+ sock_devmem_dontneed for autorelease split
+Message-ID: <aQEMiuOlUutoi1iw@devvm11784.nha0.facebook.com>
+References: <20251023-scratch-bobbyeshleman-devmem-tcp-token-upstream-v5-0-47cb85f5259e@meta.com>
+ <20251023-scratch-bobbyeshleman-devmem-tcp-token-upstream-v5-2-47cb85f5259e@meta.com>
+ <CAHS8izNB6s97X8srfZQ1upUNOOx0vwj4Aa9gMUZvneoyefqdrw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_CONTAINS_FROM(1.00)[];
-	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,fomichev.me,gmail.com,strlen.de,suse.de];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,suse.de:email];
-	FROM_HAS_DN(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	RCVD_COUNT_TWO(0.00)[2];
-	RCVD_TLS_ALL(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com]
-X-Spam-Flag: NO
-X-Spam-Score: -2.80
-X-Spam-Level: 
+In-Reply-To: <CAHS8izNB6s97X8srfZQ1upUNOOx0vwj4Aa9gMUZvneoyefqdrw@mail.gmail.com>
 
-Since commit 30f241fcf52a ("xsk: Fix immature cq descriptor
-production"), the descriptor number is stored in skb control block and
-xsk_cq_submit_addr_locked() relies on it to put the umem addrs onto
-pool's completion queue.
+On Mon, Oct 27, 2025 at 05:36:35PM -0700, Mina Almasry wrote:
+> On Thu, Oct 23, 2025 at 2:00 PM Bobby Eshleman <bobbyeshleman@gmail.com> wrote:
+> >
+> > From: Bobby Eshleman <bobbyeshleman@meta.com>
+> >
+> > Refactor sock_devmem_dontneed() in preparation for supporting both
+> > autorelease and manual token release modes.
+> >
+> > Split the function into two parts:
+> > - sock_devmem_dontneed(): handles input validation, token allocation,
+> >   and copying from userspace
+> > - sock_devmem_dontneed_autorelease(): performs the actual token release
+> >   via xarray lookup and page pool put
+> >
+> > This separation allows a future commit to add a parallel
+> > sock_devmem_dontneed_manual_release() function that uses a different
+> > token tracking mechanism (per-niov reference counting) without
+> > duplicating the input validation logic.
+> >
+> > The refactoring is purely mechanical with no functional change. Only
+> > intended to minimize the noise in subsequent patches.
+> >
+> > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+> > ---
+> >  net/core/sock.c | 52 ++++++++++++++++++++++++++++++++--------------------
+> >  1 file changed, 32 insertions(+), 20 deletions(-)
+> >
+> > diff --git a/net/core/sock.c b/net/core/sock.c
+> > index a99132cc0965..e7b378753763 100644
+> > --- a/net/core/sock.c
+> > +++ b/net/core/sock.c
+> > @@ -1082,30 +1082,13 @@ static int sock_reserve_memory(struct sock *sk, int bytes)
+> >  #define MAX_DONTNEED_FRAGS 1024
+> >
+> >  static noinline_for_stack int
+> > -sock_devmem_dontneed(struct sock *sk, sockptr_t optval, unsigned int optlen)
+> > +sock_devmem_dontneed_autorelease(struct sock *sk, struct dmabuf_token *tokens,
+> 
+> Kind of a misnomer. This helper doesn't seem to autorelease, but
+> really release the provided tokens, I guess. I would have
+> sock_devmem_dontneed_tokens, but naming is hard :D
+> 
+> Either way, looks correct code move,
+> 
+> Reviewed-by: Mina Almasry <almasrymina@google.com>
 
-skb control block shouldn't be used for this purpose as after transmit
-xsk doesn't have control over it and other subsystems could use it. This
-leads to the following kernel panic due to a NULL pointer dereference.
+Should we come up with a new name for "autorelease"? I was hoping to
+find a name that could be consistent from the uAPI down into the token
+handling code. Maybe "reap" is more clear than "release", since the real
+difference is whether or not the kernel will reap leaked references on
+close?
 
- BUG: kernel NULL pointer dereference, address: 0000000000000000
- #PF: supervisor read access in kernel mode
- #PF: error_code(0x0000) - not-present page
- PGD 0 P4D 0
- Oops: Oops: 0000 [#1] SMP NOPTI
- CPU: 2 UID: 1 PID: 927 Comm: p4xsk.bin Not tainted 6.16.12+deb14-cloud-amd64 #1 PREEMPT(lazy)  Debian 6.16.12-1
- Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-debian-1.17.0-1 04/01/2014
- RIP: 0010:xsk_destruct_skb+0xd0/0x180
- [...]
- Call Trace:
-  <IRQ>
-  ? napi_complete_done+0x7a/0x1a0
-  ip_rcv_core+0x1bb/0x340
-  ip_rcv+0x30/0x1f0
-  __netif_receive_skb_one_core+0x85/0xa0
-  process_backlog+0x87/0x130
-  __napi_poll+0x28/0x180
-  net_rx_action+0x339/0x420
-  handle_softirqs+0xdc/0x320
-  ? handle_edge_irq+0x90/0x1e0
-  do_softirq.part.0+0x3b/0x60
-  </IRQ>
-  <TASK>
-  __local_bh_enable_ip+0x60/0x70
-  __dev_direct_xmit+0x14e/0x1f0
-  __xsk_generic_xmit+0x482/0xb70
-  ? __remove_hrtimer+0x41/0xa0
-  ? __xsk_generic_xmit+0x51/0xb70
-  ? _raw_spin_unlock_irqrestore+0xe/0x40
-  xsk_sendmsg+0xda/0x1c0
-  __sys_sendto+0x1ee/0x200
-  __x64_sys_sendto+0x24/0x30
-  do_syscall_64+0x84/0x2f0
-  ? __pfx_pollwake+0x10/0x10
-  ? __rseq_handle_notify_resume+0xad/0x4c0
-  ? restore_fpregs_from_fpstate+0x3c/0x90
-  ? switch_fpu_return+0x5b/0xe0
-  ? do_syscall_64+0x204/0x2f0
-  ? do_syscall_64+0x204/0x2f0
-  ? do_syscall_64+0x204/0x2f0
-  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-  </TASK>
- [...]
- Kernel panic - not syncing: Fatal exception in interrupt
- Kernel Offset: 0x1c000000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+Maybe NETDEV_A_DMABUF_REAP_ON_CLOSE on the netlink side, and
+sock_devmem_dontneed_tokens() and sock_devmem_dontneed_no_reap() here?
 
-Use the skb XDP extension to store the number of cq descriptors along
-with a list of umem addresses.
-
-Fixes: 30f241fcf52a ("xsk: Fix immature cq descriptor production")
-Closes: https://lore.kernel.org/netdev/0435b904-f44f-48f8-afb0-68868474bf1c@nop.hu/
-Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
----
-v2: remove some leftovers on skb_build and simplify fragmented traffic
-logic
----
- net/xdp/xsk.c | 70 +++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 49 insertions(+), 21 deletions(-)
-
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index 7b0c68a70888..7c04cadf79b9 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -41,15 +41,8 @@ struct xsk_addr_node {
- 	struct list_head addr_node;
- };
- 
--struct xsk_addr_head {
--	u32 num_descs;
--	struct list_head addrs_list;
--};
--
- static struct kmem_cache *xsk_tx_generic_cache;
- 
--#define XSKCB(skb) ((struct xsk_addr_head *)((skb)->cb))
--
- void xsk_set_rx_need_wakeup(struct xsk_buff_pool *pool)
- {
- 	if (pool->cached_need_wakeup & XDP_WAKEUP_RX)
-@@ -562,6 +555,7 @@ static void xsk_cq_submit_addr_locked(struct xsk_buff_pool *pool,
- 				      struct sk_buff *skb)
- {
- 	struct xsk_addr_node *pos, *tmp;
-+	struct xdp_skb_ext *ext;
- 	u32 descs_processed = 0;
- 	unsigned long flags;
- 	u32 idx;
-@@ -573,14 +567,16 @@ static void xsk_cq_submit_addr_locked(struct xsk_buff_pool *pool,
- 			     (u64)(uintptr_t)skb_shinfo(skb)->destructor_arg);
- 	descs_processed++;
- 
--	if (unlikely(XSKCB(skb)->num_descs > 1)) {
--		list_for_each_entry_safe(pos, tmp, &XSKCB(skb)->addrs_list, addr_node) {
-+	ext = skb_ext_find(skb, SKB_EXT_XDP);
-+	if (unlikely(ext)) {
-+		list_for_each_entry_safe(pos, tmp, &ext->addrs_list, addr_node) {
- 			xskq_prod_write_addr(pool->cq, idx + descs_processed,
- 					     pos->addr);
- 			descs_processed++;
- 			list_del(&pos->addr_node);
- 			kmem_cache_free(xsk_tx_generic_cache, pos);
- 		}
-+		skb_ext_del(skb, SKB_EXT_XDP);
- 	}
- 	xskq_prod_submit_n(pool->cq, descs_processed);
- 	spin_unlock_irqrestore(&pool->cq_lock, flags);
-@@ -597,12 +593,19 @@ static void xsk_cq_cancel_locked(struct xsk_buff_pool *pool, u32 n)
- 
- static void xsk_inc_num_desc(struct sk_buff *skb)
- {
--	XSKCB(skb)->num_descs++;
-+	struct xdp_skb_ext *ext;
-+
-+	ext = skb_ext_find(skb, SKB_EXT_XDP);
-+	if (ext)
-+		ext->num_descs++;
- }
- 
- static u32 xsk_get_num_desc(struct sk_buff *skb)
- {
--	return XSKCB(skb)->num_descs;
-+	struct xdp_skb_ext *ext;
-+
-+	ext = skb_ext_find(skb, SKB_EXT_XDP);
-+	return ext ? ext->num_descs : 1;
- }
- 
- static void xsk_destruct_skb(struct sk_buff *skb)
-@@ -621,12 +624,9 @@ static void xsk_destruct_skb(struct sk_buff *skb)
- static void xsk_skb_init_misc(struct sk_buff *skb, struct xdp_sock *xs,
- 			      u64 addr)
- {
--	BUILD_BUG_ON(sizeof(struct xsk_addr_head) > sizeof(skb->cb));
--	INIT_LIST_HEAD(&XSKCB(skb)->addrs_list);
- 	skb->dev = xs->dev;
- 	skb->priority = READ_ONCE(xs->sk.sk_priority);
- 	skb->mark = READ_ONCE(xs->sk.sk_mark);
--	XSKCB(skb)->num_descs = 0;
- 	skb->destructor = xsk_destruct_skb;
- 	skb_shinfo(skb)->destructor_arg = (void *)(uintptr_t)addr;
- }
-@@ -636,12 +636,15 @@ static void xsk_consume_skb(struct sk_buff *skb)
- 	struct xdp_sock *xs = xdp_sk(skb->sk);
- 	u32 num_descs = xsk_get_num_desc(skb);
- 	struct xsk_addr_node *pos, *tmp;
-+	struct xdp_skb_ext *ext;
- 
--	if (unlikely(num_descs > 1)) {
--		list_for_each_entry_safe(pos, tmp, &XSKCB(skb)->addrs_list, addr_node) {
-+	ext = skb_ext_find(skb, SKB_EXT_XDP);
-+	if (unlikely(ext)) {
-+		list_for_each_entry_safe(pos, tmp, &ext->addrs_list, addr_node) {
- 			list_del(&pos->addr_node);
- 			kmem_cache_free(xsk_tx_generic_cache, pos);
- 		}
-+		skb_ext_del(skb, SKB_EXT_XDP);
- 	}
- 
- 	skb->destructor = sock_wfree;
-@@ -727,6 +730,18 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
- 				return ERR_PTR(err);
- 		}
- 	} else {
-+		struct xdp_skb_ext *ext;
-+
-+		ext = skb_ext_find(skb, SKB_EXT_XDP);
-+		if (!ext) {
-+			ext = skb_ext_add(skb, SKB_EXT_XDP);
-+			if (!ext)
-+				return ERR_PTR(-ENOMEM);
-+			memset(ext, 0, sizeof(*ext));
-+			INIT_LIST_HEAD(&ext->addrs_list);
-+			ext->num_descs = 1;
-+		}
-+
- 		xsk_addr = kmem_cache_zalloc(xsk_tx_generic_cache, GFP_KERNEL);
- 		if (!xsk_addr)
- 			return ERR_PTR(-ENOMEM);
-@@ -736,7 +751,8 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
- 		 * would be dropped, which implies freeing all list elements
- 		 */
- 		xsk_addr->addr = desc->addr;
--		list_add_tail(&xsk_addr->addr_node, &XSKCB(skb)->addrs_list);
-+		list_add_tail(&xsk_addr->addr_node, &ext->addrs_list);
-+		xsk_inc_num_desc(skb);
- 	}
- 
- 	len = desc->len;
-@@ -814,6 +830,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 		} else {
- 			int nr_frags = skb_shinfo(skb)->nr_frags;
- 			struct xsk_addr_node *xsk_addr;
-+			struct xdp_skb_ext *ext;
- 			struct page *page;
- 			u8 *vaddr;
- 
-@@ -828,6 +845,19 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 				goto free_err;
- 			}
- 
-+			ext = skb_ext_find(skb, SKB_EXT_XDP);
-+			if (!ext) {
-+				ext = skb_ext_add(skb, SKB_EXT_XDP);
-+				if (!ext) {
-+					__free_page(page);
-+					err = -ENOMEM;
-+					goto free_err;
-+				}
-+				memset(ext, 0, sizeof(*ext));
-+				INIT_LIST_HEAD(&ext->addrs_list);
-+				ext->num_descs = 1;
-+			}
-+
- 			xsk_addr = kmem_cache_zalloc(xsk_tx_generic_cache, GFP_KERNEL);
- 			if (!xsk_addr) {
- 				__free_page(page);
-@@ -843,12 +873,11 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 			refcount_add(PAGE_SIZE, &xs->sk.sk_wmem_alloc);
- 
- 			xsk_addr->addr = desc->addr;
--			list_add_tail(&xsk_addr->addr_node, &XSKCB(skb)->addrs_list);
-+			list_add_tail(&xsk_addr->addr_node, &ext->addrs_list);
-+			xsk_inc_num_desc(skb);
- 		}
- 	}
- 
--	xsk_inc_num_desc(skb);
--
- 	return skb;
- 
- free_err:
-@@ -857,7 +886,6 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
- 
- 	if (err == -EOVERFLOW) {
- 		/* Drop the packet */
--		xsk_inc_num_desc(xs->skb);
- 		xsk_drop_skb(xs->skb);
- 		xskq_cons_release(xs->tx);
- 	} else {
--- 
-2.51.0
-
+Best,
+Bobby
 
