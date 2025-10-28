@@ -1,239 +1,113 @@
-Return-Path: <netdev+bounces-233449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7E91C137AF
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 09:16:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5474BC137CF
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 09:17:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 638EF3BFDCD
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 08:16:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7E6A3B4D05
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 08:17:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 056A927F016;
-	Tue, 28 Oct 2025 08:16:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93C9D2D6E63;
+	Tue, 28 Oct 2025 08:17:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HWoiZ3Qn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gkb9fflf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C177E1BC4E;
-	Tue, 28 Oct 2025 08:16:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CE0425C6FF;
+	Tue, 28 Oct 2025 08:17:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761639369; cv=none; b=t7HQoP0c1JcxwyAsfqdPFEA1Pu0g6L8atNyHHNd8e2msQz+kcw2TSz2728eptaQS13QYq3ZJvbEVJPDu51kSKKTjboK6FCgY8gzJonej8EYajfuYefyXu4ymhcSYzAg0rMF7L0LqpQp/k01Bv28wAJEDT9R5NLnIQ09s/E/Q7XI=
+	t=1761639434; cv=none; b=REjafO7pAtHmID2B6OAOILJnYOUNy4TbYSDjtmh8W45GzoezEK5NC7KcuZjfJi6LWN+vx6OvJHeLhlFd/Q0clX8zDkkyjhZ+YVPs8qdHrwzTrrlxvr2n3Rpbc47NJP1zfCxEIlfWoSh2DWX8SavAfcZ2/K188qSUIezBQlVrvDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761639369; c=relaxed/simple;
-	bh=ZAfmU0FpKyd3OOPLc6LD6luNCN153GGX0iR9vaXLeYE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=otmV0zyntr+wL+fRG12nXohnP6RA0GgUe3CiE8X4nEEGyNVEYcNId5/X72nNpTrKFHB3Qw6BjX1HeuUY3/tuwNAQRjIs0s72KWLcBXR8qFOoORgHQUBGRZ0OXnEUDcHuS1zoIdg/buBB0W5OqVM/ainVgXQN6pGk5zYRqhjX++g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HWoiZ3Qn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F795C4CEE7;
-	Tue, 28 Oct 2025 08:16:08 +0000 (UTC)
+	s=arc-20240116; t=1761639434; c=relaxed/simple;
+	bh=YQctKbpXEnrgC6pJ0qwElwn6iJJlPUjdz6XA74x5wBg=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ovaJ65qKrQQ6a15k5O+L4/BIo7znc76IY3Y4jkEqSmaDsvOesuLVLpEXWstePwVpmJyPd+OEZTy/XHqFb9VDfiGFc1QY3wXz0tL9HvXVblvz6LkwEb7nuxlUP1XHs13AD6dBc3BNDaoj1mIpLRmbZH3iE54miOUuOkcnjqUrLBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gkb9fflf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C299C4CEE7;
+	Tue, 28 Oct 2025 08:17:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761639369;
-	bh=ZAfmU0FpKyd3OOPLc6LD6luNCN153GGX0iR9vaXLeYE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HWoiZ3Qn5h7Wj7+GlNEaku5DiODphQqYkXj3x7kSib8C3OczC4kdBt20OExXPaCGy
-	 nEvr1LCh5A99hln7xzGEDbRznpr7JjpBJDfxauEN0o7/VU5yHbdMxneK7MUUc/kZdy
-	 ovkt0Gm220ye/xikz0kX2Mg8XZn5JGKQo+GsifRdzJl4UZIic/+z8W+w5aZ3A5plKU
-	 +2YsiRlkl5AHZ1M3IwtsDMARTNoo+oInELCcgFUiaSyN6zNB6PFSzq72oxgCaVBT86
-	 40QJbPnkpz5kLUT9Jr2KVjIDamUPnSvxnOo1v81BDGoLSp3+qOam7sLtD/yMzPS9XN
-	 Vcm++bCNu8P7Q==
-Date: Tue, 28 Oct 2025 09:16:06 +0100
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konradybcio@kernel.org>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Richard Cochran <richardcochran@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Vinod Koul <vkoul@kernel.org>, Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH v3 1/8] dt-bindings: net: qcom: document the ethqos
- device for SCMI-based systems
-Message-ID: <20251028-wonderful-orchid-emu-25cd02@kuoka>
-References: <20251027-qcom-sa8255p-emac-v3-0-75767b9230ab@linaro.org>
- <20251027-qcom-sa8255p-emac-v3-1-75767b9230ab@linaro.org>
+	s=k20201202; t=1761639433;
+	bh=YQctKbpXEnrgC6pJ0qwElwn6iJJlPUjdz6XA74x5wBg=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Gkb9fflfFkSsHc1HRyBL8VVXfwBdN27pzlaVxIrsGEG1+beyzHZJV5xjMzVwaob0b
+	 2Z2MEk7uYrH8d7Wusk/VafRWVu1YCW2dkhYQ8rZDTB/437uJZrWAj5Zw+fae6Y9Iy/
+	 0mI4lmtu5iP/v+dCF+MwJqSb6pOgR6is/NUiPQX2myMYM9Un/UC4JFso0L3XrJwk9f
+	 8ltdWxKrdQf+ZsWlIrHPblAGJpGAkfiwd4a/MMF4S4EtbXjZ0fvAuMvQXO/vHY5QbE
+	 lHn+mdiTNSFOrKRNbOQhTnjytOH3PdMyNHE+jZnopKZ1Mnb37TL7s1bD3upnVBkMe0
+	 +ed88RC5LFkLQ==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net 0/4] mptcp: various rare sending issues
+Date: Tue, 28 Oct 2025 09:16:51 +0100
+Message-Id: <20251028-net-mptcp-send-timeout-v1-0-38ffff5a9ec8@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20251027-qcom-sa8255p-emac-v3-1-75767b9230ab@linaro.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAPN7AGkC/x3MQQqAIBBA0avErBtIMayuEi1Cx5pFJmoRhHdPW
+ v7F+y8kikwJpuaFSDcnPn0N0TZg9tVvhGxrg+xkLzqp0VPGI2QTMJG3mPmg88qonRFKK2cHNUL
+ FIZLj5x/PUA0spXyC4lNTbQAAAA==
+X-Change-ID: 20251027-net-mptcp-send-timeout-7fc1474fd849
+To: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Florian Westphal <fw@strlen.de>, 
+ Yonglong Li <liyonglong@chinatelecom.cn>
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
+ linux-kernel@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ stable@vger.kernel.org
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1219; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=YQctKbpXEnrgC6pJ0qwElwn6iJJlPUjdz6XA74x5wBg=;
+ b=owGbwMvMwCVWo/Th0Gd3rumMp9WSGDIZqv8f3LPyYoyqG++xrYb3loaJh7QsXpW146iU2n7dv
+ QENRseMOkpYGMS4GGTFFFmk2yLzZz6v4i3x8rOAmcPKBDKEgYtTACai+p3hu9tDx/U3/l4IFX/0
+ ycT+g+fq1ZnvSmeXP6pI5oxvtnu8luE3K1e7zqPfh3yE1mVsu3n5WbzU9etPMl8cW/VTdia78j8
+ DVgA=
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-On Mon, Oct 27, 2025 at 04:44:49PM +0100, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> 
-> Describe the firmware-managed variant of the QCom DesignWare MAC. As the
-> properties here differ a lot from the HLOS-managed variant, lets put it
-> in a separate file.
-> 
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> ---
->  .../devicetree/bindings/net/qcom,ethqos-scmi.yaml  | 101 +++++++++++++++++++++
->  .../devicetree/bindings/net/snps,dwmac.yaml        |   5 +-
->  MAINTAINERS                                        |   1 +
->  3 files changed, 106 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/qcom,ethqos-scmi.yaml b/Documentation/devicetree/bindings/net/qcom,ethqos-scmi.yaml
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..b821299d7b30cdb802d9ee5d9fa17542b8334bd2
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/qcom,ethqos-scmi.yaml
-> @@ -0,0 +1,101 @@
-> +# SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/qcom,ethqos-scmi.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Qualcomm Ethernet ETHQOS device (firmware managed)
-> +
-> +maintainers:
-> +  - Bjorn Andersson <andersson@kernel.org>
-> +  - Konrad Dybcio <konradybcio@kernel.org>
-> +  - Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> +
-> +description:
-> +  dwmmac based Qualcomm ethernet devices which support Gigabit
-> +  ethernet (version v2.3.0 and onwards) with clocks, interconnects, etc.
-> +  managed by firmware
-> +
-> +allOf:
-> +  - $ref: snps,dwmac.yaml#
-> +
-> +properties:
-> +  compatible:
-> +    const: qcom,sa8255p-ethqos
-> +
-> +  reg:
-> +    maxItems: 2
-> +
-> +  reg-names:
-> +    items:
-> +      - const: stmmaceth
-> +      - const: rgmii
-> +
-> +  interrupts:
-> +    items:
-> +      - description: Combined signal for various interrupt events
-> +      - description: The interrupt that occurs when HW safety error triggered
-> +
-> +  interrupt-names:
-> +    items:
-> +      - const: macirq
-> +      - const: sfty
-> +
-> +  power-domains:
-> +    minItems: 3
+Here are various fixes from Paolo, addressing very occasional issues on
+the sending side:
 
-maxItems instead
+- Patch 1: drop an optimisation that could lead to timeout in case of
+  race conditions. A fix for up to v5.11.
 
-But the other problem is that it is conflicting with snps,dwmac.yaml
-which says max 1 is allowed. You need to fix that, along with
-restricting other users of that shared schema to maxItems: 1.
+- Patch 2: fix stream corruption under very specific conditions. A fix
+  for up to v5.13.
 
-> +
-> +  power-domain-names:
-> +    items:
-> +      - const: core
-> +      - const: mdio
-> +      - const: serdes
-> +
-> +  iommus:
-> +    maxItems: 1
-> +
-> +  dma-coherent: true
-> +
-> +  phys: true
+- Patch 3: restore MPTCP-level zero window probe after a recent fix. A
+  fix for up to v5.16.
 
-Missing maxItems.
+- Patch 4: new MIB counter to track MPTCP-level zero windows probe to
+  help catching issues similar to the one fixed by the previous patch.
 
-> +
-> +  phy-names:
-> +    const: serdes
-> +
-> +required:
-> +  - compatible
-> +  - reg-names
-> +  - power-domains
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Paolo Abeni (4):
+      mptcp: drop bogus optimization in __mptcp_check_push()
+      mptcp: fix MSG_PEEK stream corruption
+      mptcp: restore window probe
+      mptcp: zero window probe mib
 
-power-domain-names
-
-Shouldn't phys be required? How device can work sometimes without its
-phy?
-
-
-> +
-> +unevaluatedProperties: false
-> +
-> +examples:
-> +  - |
-> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
-> +
-> +    ethernet: ethernet@7a80000 {
-> +        compatible = "qcom,sa8255p-ethqos";
-> +        reg = <0x23040000 0x10000>,
-> +              <0x23056000 0x100>;
-> +        reg-names = "stmmaceth", "rgmii";
-> +
-> +        iommus = <&apps_smmu 0x120 0x7>;
-> +
-> +        interrupts = <GIC_SPI 946 IRQ_TYPE_LEVEL_HIGH>,
-> +                     <GIC_SPI 782 IRQ_TYPE_LEVEL_HIGH>;
-> +        interrupt-names = "macirq", "sfty";
-> +
-> +        dma-coherent;
-> +
-> +        snps,tso;
-> +        snps,pbl = <32>;
-> +        rx-fifo-depth = <16384>;
-> +        tx-fifo-depth = <16384>;
-> +
-> +        phy-handle = <&ethernet_phy>;
-> +        phy-mode = "2500base-x";
-
-Incomplete example - missing phys.
-
-> +
-> +        snps,mtl-rx-config = <&mtl_rx_setup1>;
-> +        snps,mtl-tx-config = <&mtl_tx_setup1>;
-> +
-> +        power-domains = <&scmi8_pd 0>, <&scmi8_pd 1>, <&scmi8_dvfs 0>;
-> +        power-domain-names = "core", "mdio","serdes";
-> +    };
-> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> index dd3c72e8363e70d101ed2702e2ea3235ee38e2a0..312d1bbc2ad1051520355039f5587381cbd1e01c 100644
-> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> @@ -71,6 +71,7 @@ properties:
->          - loongson,ls7a-dwmac
->          - nxp,s32g2-dwmac
->          - qcom,qcs404-ethqos
-> +        - qcom,sa8255p-ethqos
->          - qcom,sa8775p-ethqos
->          - qcom,sc8280xp-ethqos
->          - qcom,sm8150-ethqos
-> @@ -180,7 +181,8 @@ properties:
->            - const: ahb
->  
->    power-domains:
-> -    maxItems: 1
-> +    minItems: 1
-> +    maxItems: 3
-
-Ah, you did it. But you need to update all other bindings as well.
+ net/mptcp/mib.c      |  1 +
+ net/mptcp/mib.h      |  1 +
+ net/mptcp/protocol.c | 57 +++++++++++++++++++++++++++++++++-------------------
+ net/mptcp/protocol.h |  2 +-
+ 4 files changed, 39 insertions(+), 22 deletions(-)
+---
+base-commit: 210b35d6a7ea415494ce75490c4b43b4e717d935
+change-id: 20251027-net-mptcp-send-timeout-7fc1474fd849
 
 Best regards,
-Krzysztof
+-- 
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
