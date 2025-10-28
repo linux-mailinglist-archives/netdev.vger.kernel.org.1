@@ -1,181 +1,404 @@
-Return-Path: <netdev+bounces-233493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F078EC1467A
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 12:39:38 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 616E9C1468D
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 12:40:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B33471AA4B1F
-	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 11:39:44 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 23A9D4E5C38
+	for <lists+netdev@lfdr.de>; Tue, 28 Oct 2025 11:40:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCC84307ADA;
-	Tue, 28 Oct 2025 11:39:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BB0E308F18;
+	Tue, 28 Oct 2025 11:40:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="xYhysw+u";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="lZvHAfsw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mAFHpO/E"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A2A309DCB;
-	Tue, 28 Oct 2025 11:39:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC4B305E0C
+	for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 11:40:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761651551; cv=none; b=AgFYBbacn6ChtzTfAK1zuKWvFspjb4S/ZyU3ucXJmk0OmbwTfaUX+Mi7n7oliYNCZgICxq3UoicwzQoh2AZl6VVnfjKm0dGMXgdDr0OzBB4SmQAbYo52ut8fQh048ZXUSIRO67Er/03yskU3N8gEjPfMA3wCG04boLMaE/u5cuE=
+	t=1761651610; cv=none; b=uRErKOAbNYAJC0/SEw0lbNKkGF+9Txw0odQN9njSh6NkmF9SYMFZ6DL5M5MjGGMU0vmF2/4XrsStxg7Qwe7HLZP+F0nUwZhJanivbUScY3FWE/yx4ilFqva2aJ23qMDJwQrGiDzKnpFgIJwCcu62HXDjmXscx3VK0kU8kaiU++E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761651551; c=relaxed/simple;
-	bh=UAxLNhoB84hQRN0kOuuikbSKdb0pgZp04mtjcw3gneI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VgU+Z2ZginrBt6sgDUXKbp3zMynw9f+HJvBN3MkPB+k00RGrDgKf99WBsaJ8+6V02W1wGU7zpxe3ZCBTZviYOL61KMAmEFOBUa/ksuTrCKujeiPWWCVvsKVW5ggmuDlaaTdn+68OwL9C+SUJ1wjr4Em97rEqBsdqyd+uBO2zVYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=xYhysw+u; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=lZvHAfsw; arc=none smtp.client-ip=103.168.172.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-05.internal (phl-compute-05.internal [10.202.2.45])
-	by mailfout.phl.internal (Postfix) with ESMTP id 9BBC9EC02B9;
-	Tue, 28 Oct 2025 07:39:07 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-05.internal (MEProxy); Tue, 28 Oct 2025 07:39:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1761651547; x=
-	1761737947; bh=6FNvSF4bdDqt8+VEMT250QI+6dV1cBTjXy9CJpJx+OY=; b=x
-	Yhysw+uz7P1p7ROv7c5N3pNs9FeTbDUT6hKyoWxonvfhvc6qLfSgSR8hRy4IUUtR
-	qS61iQB2JIx+DJ7xg2J0avBYC32ylrUKfIV94ljhQbPwpIQ/m7tR08Su3yhwktox
-	n1PFqUEiMTgdGA6Mwa8F75ZMBLAJ8Kovd3lw9yPmY/h0P14TtgGo6DTBHuKvBHyD
-	qemBMLW5sMXsTUiKcQOvj9mVnommN/czjzhNFR66S5fUGhUOm4wpb8Dr8kzBKzki
-	OkYNo5/ViIr+O8ULAkcThxnvljyEBZd8E3E4joIyavYx1o2uhsEwvbrj3j8hR0Xn
-	BcQiVDpTQXa/y3WC0VbKg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1761651547; x=1761737947; bh=6FNvSF4bdDqt8+VEMT250QI+6dV1cBTjXy9
-	CJpJx+OY=; b=lZvHAfswUW8xbsw49HIqDI/XyRbtPdzWwwGkVl3HAUGa2P0pSvU
-	01C+HMDHmbhYNLxHNsWCaEOnJS1su0ik3dwUZEwMiIehy+eTSacwFcRQfrpEUP8z
-	YPXQCyIO9wX8w8hz5uF5u/FH+otd7FMPsFGIJzUxnsZkpjZPQLygJy565Zso3WWZ
-	4RQYojlD1eUaFDuUIIU8oU4S7B/tv180W2qO55tp0RjIIEGbxBfOlvASRNUB+uBN
-	G2yeixN2+w6MslZTNA7GuMtBi6DT9Gq9Xrbtcf/hajuoZGsHfUeK0Jx/8g4+3Cf6
-	yJwgUFajxqVDoezkLiRhCp+1xhntHZfkRMw==
-X-ME-Sender: <xms:WqsAaf4K4jYStqcnN3YLfgqcZxNDBqP1ETWoGsN3EAWSpYCgnXe46g>
-    <xme:WqsAaRfJElK_9gado7_GwFdTnt5h7qHY5C4TP0blhedYi6rwxFvGk9KG3TlXw8vNk
-    1U0gBLcYz6zvQ4zUzPXxZ3Jg609WUacVTnAWGS-dg48-Vf6bOmxKZE>
-X-ME-Received: <xmr:WqsAaa6BhJmomZXtgfYfg8-1dOW3eqkFMzBk1bxqBLKAXdu4aq1gMrzu4wPV>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduiedtjeehucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeelpdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopehtrghnmhgrhiesmhgrrhhvvghllhdrtghomh
-    dprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohep
-    hhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhgvohhnsehkvghrnhgvlh
-    drohhrghdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdrohhr
-    ghdrrghupdhrtghpthhtohepsggshhhushhhrghnvdesmhgrrhhvvghllhdrtghomhdprh
-    gtphhtthhopehsghhouhhthhgrmhesmhgrrhhvvghllhdrtghomhdprhgtphhtthhopehl
-    ihhnuhigqdgtrhihphhtohesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhope
-    hnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:WqsAaW-MygqBWjpGd-m6mCepbeB67YtaxNEtQ2yEPmKy1A0bjXBrmA>
-    <xmx:WqsAaUFd26bnFFCKSV_MuQCEWDtkoQ06RQyd78vAaKJuLDMmGdKyLA>
-    <xmx:WqsAaTWSHVBKitKOFXXcj8DuRv3g7fe-1gTfVk6ghY3SZZEI0Aj8XA>
-    <xmx:WqsAaY9HjwC3aVWHBHLCnb96MqCmm32XOM30tZQ-xCX5nnlwq1_qpg>
-    <xmx:W6sAaZ_BVG8u2-e1YtNlN-rLINIc7K7Gmf3OUkLDzeCYtk0ATpC3wO76>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 28 Oct 2025 07:39:06 -0400 (EDT)
-Date: Tue, 28 Oct 2025 12:39:04 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Tanmay Jagdale <tanmay@marvell.com>
-Cc: davem@davemloft.net, horms@kernel.org, leon@kernel.org,
-	herbert@gondor.apana.org.au, bbhushan2@marvell.com,
-	sgoutham@marvell.com, linux-crypto@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v5 15/15] octeontx2-pf: ipsec: Add XFRM state
- and policy hooks for inbound flows
-Message-ID: <aQCrWAVZh2VlOl54@krikkit>
-References: <20251026150916.352061-1-tanmay@marvell.com>
- <20251026150916.352061-16-tanmay@marvell.com>
+	s=arc-20240116; t=1761651610; c=relaxed/simple;
+	bh=S8+Ja3ralZ2WxCdLK1ixOt+mF2q4rBG1Bbc1fFOF20Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Aj3gBFQNobenmmbzSzfecd6FC600suVLm5LRAmb0WVqekevkXYMKE4LeGRgCpu9P47+o8x4UluCIQBwS/9trFa0Wo0QTCWNTmXBxic1cy3nxLQAFUVGrY8MGtboAkIXvdd9CG9XO52l+RyMKkzjYhwBtPeJCFRJknuMzZ/X5Mmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mAFHpO/E; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-79af647cef2so4989185b3a.3
+        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 04:40:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761651607; x=1762256407; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=UQGkMpWQvkIrFU/utWIdl52vdzB7gtbaDaCLqaVvZwY=;
+        b=mAFHpO/ERlvBgzENIiDBUGgcqj2edkDJ5i9oq4kHVh+9p+z6ZI63uZz1aLXo1wC8pd
+         ZPL1yImqUIAtp+tn6Qbn+M4Z5dUo7RfyfipXqi/I3exuGe2I0N6hO2HD6Q4jj5lg5+T7
+         UalETiVjsShfaZeXFw4Ra+MRgQhQwf097kkyVw8vfu1bXloevb+Cn+q3rzxKhcsBJ5Cb
+         ncNYm61tSwDapv6xoT+E7eCuEBCteb944Jv1J6iZKeOHaYTHhkUZsErmUux9XcVLw9Yf
+         WcUBSS2cPHXxcCVlLMxXkUsUcdB9aN7zXS4U5B60nt4k12R8K/EOs7RnK9z9cm4HUBqv
+         9jyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761651607; x=1762256407;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UQGkMpWQvkIrFU/utWIdl52vdzB7gtbaDaCLqaVvZwY=;
+        b=gRybCtsvS3KivAVMXFHj/6oszHQ3KjlEe0rE5HcMRmT5AeL/5Q7/C8P0QdHBmpJuOX
+         lDBIV80bXClezaDRodAkg7NuLfVPFYQDfW7Qe9X2HpXR/A2IaphIG0k/N1m4/IkNk+KR
+         AbioKKdnyyqHEKTmcJqURum01h/gSPqCphdOYN32eDgOUFx+Ng2vQ5LAhGGp+roIXTEM
+         7rO8T8orV8xvEg6+S9gBvMrXDwrjzyKuiceZNgIhmKS3X38F4QJlVPpKRJUK2QwzyasN
+         UWAirBUIyGh2Lm/Ijhh7xgYhZe48mdfy4nPvR0mgjUEUGd34RwQ16BVmVzWT2coi1k78
+         P2Hg==
+X-Forwarded-Encrypted: i=1; AJvYcCXDRmTIxz+aO+yoKpgZ87wPj68lIXumcfJeVZ/B3+T+ySKxftCZDCuHkKBGxRK6fs95UED9/Cg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9OZlGnaEC+f62u4EgzSs1HXrT30fBZLSqoTnPXQqX8mfc8xAS
+	p4mXaCSXRXIDFO8/SICFx+38rokt1HfK7VP+30fk9HvcGKcvJ771GZaf
+X-Gm-Gg: ASbGncsKe8J2u7McHS966CBtU1qsHUIvz8q/+jORPrF7n95AZ/+c3kJzXiOkWnOcBMt
+	x3r+hj+rrhiwbqq9vs5+bg9HOKAa9ZZtXW8PNP3JJbzsyLPuNWlumfxbJzuOuP3ghkjR76lYgK6
+	3EPTEg7Q6QBBKUNUE+X9lry+MkD+yEE277xFOoQO3osdpgbE23eGE1NoUkIvyZqdSJgwwIh6jsx
+	gQ3moV3Zkdblgr3A6km0BkhIjdNX2fq2gm2DB1UrZXaYPd7uaLAdMLWrx2aKSNZMcMA7HFfmMyI
+	+We54R/RxUi1V/5TNUWPzuNTZDV1fqPrRK9Agdn7lEiYZR9Inqbmkft1BCPAaZ7FoRUoLLoMEqB
+	syW0je9IwM3CtwVgrKm6HHqZOOjKqwOiwD6CY+gvK6fDSnCP20SJGwV0KTwktOWGU0szKP87XFV
+	AI
+X-Google-Smtp-Source: AGHT+IELfm1V2/9P9RcJo7ple69Pu8CkbUuJnvOHx1MhFw0DK3gnvsbENWcBcTkx8E417BUE9yB8ag==
+X-Received: by 2002:a05:6a20:3ca7:b0:2ff:3752:8375 with SMTP id adf61e73a8af0-344d3a4fdbamr4255473637.45.1761651607102;
+        Tue, 28 Oct 2025 04:40:07 -0700 (PDT)
+Received: from archie.me ([210.87.74.117])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b71268bd810sm10351782a12.6.2025.10.28.04.40.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Oct 2025 04:40:06 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id 931944209E50; Tue, 28 Oct 2025 18:40:03 +0700 (WIB)
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux Networking <netdev@vger.kernel.org>,
+	Linux BPF <bpf@vger.kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Bagas Sanjaya <bagasdotme@gmail.com>
+Subject: [PATCH net-next] net: Reorganize networking documentation toctree
+Date: Tue, 28 Oct 2025 18:39:24 +0700
+Message-ID: <20251028113923.41932-2-bagasdotme@gmail.com>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20251026150916.352061-16-tanmay@marvell.com>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4925; i=bagasdotme@gmail.com; h=from:subject; bh=S8+Ja3ralZ2WxCdLK1ixOt+mF2q4rBG1Bbc1fFOF20Q=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDJkMq17fbp63pyIq0/jpJI47M/d/5uKyXvj/X43GNtfj+ /9Yf02L6yhlYRDjYpAVU2SZlMjXdHqXkciF9rWOMHNYmUCGMHBxCsBEipwZGXZ5L11wZYK8MaPh Kf+v2rG88zJv9U6uKZ/RHm79yuRxkSwjw1WBxJ36EQf4Z4mJJP2yUTi45cp5aZbry750OqZLM8a nsQAA
+X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
+Content-Transfer-Encoding: 8bit
 
-2025-10-26, 20:39:10 +0530, Tanmay Jagdale wrote:
-> +static int cn10k_ipsec_policy_add(struct xfrm_policy *x,
-> +				  struct netlink_ext_ack *extack)
-> +{
-> +	struct cn10k_inb_sw_ctx_info *inb_ctx_info = NULL, *inb_ctx;
-> +	struct net_device *netdev = x->xdo.dev;
-> +	bool disable_rule = true;
-> +	struct otx2_nic *pf;
-> +	int ret = 0;
-> +
-> +	if (x->xdo.dir != XFRM_DEV_OFFLOAD_IN) {
-> +		netdev_err(netdev, "ERR: Can only offload Inbound policies\n");
-> +		ret = -EINVAL;
+Current netdev docs has one large, unorganized toctree that makes
+finding relevant docs harder like a needle in a haystack. Split the
+toctree into four categories: networking core; protocols; devices; and
+assorted miscellaneous.
 
-missing goto/return?
+While at it, also sort the toctree entries and reduce toctree depth.
 
-> +	}
-> +
-> +	if (x->xdo.type != XFRM_DEV_OFFLOAD_PACKET) {
-> +		netdev_err(netdev, "ERR: Only Packet mode supported\n");
-> +		ret = -EINVAL;
+Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+---
+ Documentation/networking/index.rst | 241 ++++++++++++++++-------------
+ 1 file changed, 136 insertions(+), 105 deletions(-)
 
-missing goto/return?
+diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
+index c775cababc8c17..ca86e544c5c8e2 100644
+--- a/Documentation/networking/index.rst
++++ b/Documentation/networking/index.rst
+@@ -5,138 +5,169 @@ Refer to :ref:`netdev-FAQ` for a guide on netdev development process specifics.
+ 
+ Contents:
+ 
++Networking core
++---------------
++
+ .. toctree::
+-   :maxdepth: 2
++   :maxdepth: 1
+ 
+    af_xdp
+-   bareudp
+-   batman-adv
+-   can
+-   can_ucan_protocol
+-   device_drivers/index
+-   diagnostic/index
+-   dsa/index
+-   devlink/index
+-   caif/index
+-   ethtool-netlink
+-   ieee802154
+-   iso15765-2
+-   j1939
+-   kapi
+-   msg_zerocopy
+-   failover
+-   net_dim
+-   net_failover
+-   page_pool
+-   phy
+-   sfp-phylink
+-   alias
+-   bridge
+-   snmp_counter
+    checksum-offloads
+-   segmentation-offloads
+-   scaling
+-   tls
+-   tls-offload
+-   tls-handshake
+-   nfc
+-   6lowpan
+-   6pack
+-   arcnet-hardware
+-   arcnet
+-   atm
+-   ax25
+-   bonding
+-   cdc_mbim
+-   dctcp
+-   devmem
+-   dns_resolver
++   diagnostic/index
+    driver
+-   eql
+-   fib_trie
+-   filter
+-   generic-hdlc
+-   generic_netlink
+-   ../netlink/specs/index
+-   gen_stats
+-   gtp
+-   ila
+-   ioam6-sysctl
+-   iou-zcrx
+-   ip_dynaddr
+-   ipsec
+-   ip-sysctl
+-   ipv6
+-   ipvlan
+-   ipvs-sysctl
+-   kcm
+-   l2tp
+-   lapb-module
++   kapi
+    mac80211-injection
+-   mctp
+-   mpls-sysctl
+-   mptcp
+-   mptcp-sysctl
+-   multiqueue
+-   multi-pf-netdev
++   msg_zerocopy
+    napi
+    net_cachelines/index
+-   netconsole
+    netdev-features
+-   netdevices
+-   netfilter-sysctl
+    netif-msg
+-   netmem
+-   nexthop-group-resilient
+-   nf_conntrack-sysctl
+-   nf_flowtable
+-   oa-tc6-framework
+-   openvswitch
+-   operstates
+    packet_mmap
+-   phonet
++   page_pool
++   phy
+    phy-link-topology
+-   pktgen
++   scaling
++   segmentation-offloads
++   skbuff
++   strparser
++   timestamping
++   xdp-rx-metadata
++   xsk-tx-metadata
++
++Protocols
++---------
++
++.. toctree::
++   :maxdepth: 1
++
++   6pack
++   arcnet
++   ax25
++   bareudp
++   caif/index
++   can
++   can_ucan_protocol
++   dctcp
++   gtp
++   ila
++   ipsec
++   ipv6
++   iso15765-2
++   j1939
++   l2tp
++   mctp
++   mptcp
++   oa-tc6-framework
++   phonet
++   psp
++   rxrpc
++   sctp
++   tcp-thin
++   tcp_ao
++   tipc
++   tls
++   tls-handshake
++   tls-offload
++   udplite
++   vxlan
++   x25
++
++Networking devices
++------------------
++
++.. toctree::
++   :maxdepth: 1
++
++   6lowpan
++   arcnet-hardware
++   bonding
++   bridge
++   cdc_mbim
++   device_drivers/index
++   devlink/index
++   devmem
++   dsa/index
++   eql
++   ipvlan
++   multi-pf-netdev
++   multiqueue
++   netconsole
++   netdevices
++   netmem
++   operstates
+    plip
+    ppp_generic
++   representors
++   sriov
++   statistics
++   switchdev
++   team
++   tuntap
++   vrf
++   x25-iface
++
++Packet filtering
++----------------
++
++.. toctree::
++   :maxdepth: 1
++
++   filter
++   netfilter-sysctl
++   nf_conntrack-sysctl
++   nf_flowtable
++   tc-actions-env-rules
++   tc-queue-filters
++   tproxy
++
++Miscellaneous
++-------------
++
++.. toctree::
++   :maxdepth: 1
++
++   ../netlink/specs/index
++   alias
++   atm
++   batman-adv
++   dns_resolver
++   ethtool-netlink
++   failover
++   fib_trie
++   gen_stats
++   generic-hdlc
++   generic_netlink
++   ieee802154
++   ioam6-sysctl
++   iou-zcrx
++   ip-sysctl
++   ip_dynaddr
++   ipvs-sysctl
++   kcm
++   lapb-module
++   mpls-sysctl
++   mptcp-sysctl
++   net_dim
++   net_failover
++   nexthop-group-resilient
++   nfc
++   openvswitch
++   pktgen
+    proc_net_tcp
+    pse-pd/index
+-   psp
+    radiotap-headers
+    rds
+    regulatory
+-   representors
+-   rxrpc
+-   sctp
+    secid
+    seg6-sysctl
+-   skbuff
++   sfp-phylink
+    smc-sysctl
+-   sriov
+-   statistics
+-   strparser
+-   switchdev
++   snmp_counter
+    sysfs-tagging
+-   tc-actions-env-rules
+-   tc-queue-filters
+-   tcp_ao
+-   tcp-thin
+-   team
+-   timestamping
+-   tipc
+-   tproxy
+-   tuntap
+-   udplite
+-   vrf
+-   vxlan
+-   x25
+-   x25-iface
+    xfrm_device
+    xfrm_proc
+    xfrm_sync
+    xfrm_sysctl
+-   xdp-rx-metadata
+-   xsk-tx-metadata
+ 
+ .. only::  subproject and html
+ 
 
-> +	}
-> +
-> +	pf = netdev_priv(netdev);
-> +
-> +	/* If XFRM state was added before policy, then the inb_ctx_info instance
-> +	 * would be allocated there.
-> +	 */
-> +	list_for_each_entry(inb_ctx, &pf->ipsec.inb_sw_ctx_list, list) {
-> +		if (inb_ctx->reqid == x->xfrm_vec[0].reqid) {
-> +			inb_ctx_info = inb_ctx;
-> +			disable_rule = false;
-> +			break;
-> +		}
-> +	}
-> +
-> +	if (!inb_ctx_info) {
-> +		/* Allocate a structure to track SA related info in driver */
-> +		inb_ctx_info = devm_kzalloc(pf->dev, sizeof(*inb_ctx_info), GFP_KERNEL);
-
-I'm not so familiar with devm_*, but according to the kdoc for
-devm_kmalloc, this will get freed automatically when the driver goes
-away (but not earlier). This could take a long time. Shouldn't this be
-manually freed in the error path of this function, and somewhere
-during the policy_delete/policy_free calls?
-
-I see that you've got a devm_kfree in cn10k_ipsec_inb_add_state, so
-something similar here?
-
-
-[...]
-> +static void cn10k_ipsec_policy_free(struct xfrm_policy *x)
-> +{
-> +	return;
->  }
-
-The stack can handle a NULL .xdo_dev_policy_free, so this empty
-implementation is not needed. But I'm not sure releasing all
-policy-related resources at delete time (even via WQ) is safe, so
-possibly some of the work done in cn10k_ipsec_policy_delete should be
-moved here (similar comment for the existing cn10k_ipsec_del_state
-code vs adding .xdo_dev_state_free).
-
+base-commit: 5f30bc470672f7b38a60d6641d519f308723085c
 -- 
-Sabrina
+An old man doll... just what I always wanted! - Clara
+
 
