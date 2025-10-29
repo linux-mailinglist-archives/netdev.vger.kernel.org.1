@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-234129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCACAC1CDFA
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 20:04:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7966BC1CDFD
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 20:04:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8A9624E15F2
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 19:02:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6214D1A21D8F
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 19:03:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8242B32D440;
-	Wed, 29 Oct 2025 19:02:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82961358D07;
+	Wed, 29 Oct 2025 19:02:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="HJOfBpFO"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Oe6V1+IO"
 X-Original-To: netdev@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010031.outbound.protection.outlook.com [52.101.85.31])
+Received: from SN4PR0501CU005.outbound.protection.outlook.com (mail-southcentralusazon11011013.outbound.protection.outlook.com [40.93.194.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FD0F2F692B
-	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 19:02:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E98D72F692B
+	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 19:02:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.194.13
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761764545; cv=fail; b=ZwAvnW/m9ElkTdEVhUOAyUWlw5u2f4K3hs2JRU/QkqzxVMdIeoxeOQrmMghc2xiB7A/SMNmYF9o4DoBtTycpkh6l/AtQjV/zTyPK/MOxLJA65RicxMS6+nAG9aeMG+LsIW8NTfXGKY2PfswESiscWXUc5zwT2itFSokpCwxK4hU=
+	t=1761764551; cv=fail; b=Igq2CUnyYAb32xX0KOgBeSz1gnO9kPNE6ZsLQwIWP2UYLLah0Oyg32XNO43f+R0hMTbKgjDhWvF4dz/5NsJKorDQap1dvxSzL+QedcmQsOdMnLO+d7RLH/FzUivg6UpSzxcjMWt/8Uol8oymNhBn0QC6B/OAyHKQbMJ/Cw+RYCo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761764545; c=relaxed/simple;
-	bh=N3od4Wa5FLKL9cVbQ3zsJgGPQMki8+dVfj/mOMVlaQE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eYz3SJneEEPd1k47jtUGGrIq5PxjRu7Yyony0O5I4MFoHAw/JF/C0TuqB4q1v7cx00lnCyJbUww6eUgu7IB0XYd7UQc6cV+PmpBqEbB0C8ZX2quyEcyCsfKs+GFROIqAcO3j0yD5ctAp6hSqr6AQx8RvKYTU7zIQeiYXApDBXA0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=HJOfBpFO; arc=fail smtp.client-ip=52.101.85.31
+	s=arc-20240116; t=1761764551; c=relaxed/simple;
+	bh=zucbdOFrNvJl+K66AELZKzP1oWgMJ7PO7PguJmHTAT4=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KQ7Rcyjo3CcM1/qgZpXjWRFpH0pTuGDYE+KD2iAyo20xVtPNwMifp30mq3LQLkwTSO7gjpoYXafleWa0+01o9Yzs4Eldzrenz+dAFxzMz13C2eaitsk4Q74hgPsYSyi6QQ/m+ULkPw10Yq7Eul7pjWfnHeHwKuIfa2al6JP1I6s=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Oe6V1+IO; arc=fail smtp.client-ip=40.93.194.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rCsfVzawahoZFtCXyAWxd30OVPmxyKpyGqiPe0kUdP2xwFGpAtCETlA19tF4mTdE4b1NPWP18/bc6vUL6yO1WgphnIEelRGKkGEomU71NRs7ieTJu2a2osIdX9lmkMPODGLyuMyL9QF5cCPx1jDlupr7zQcT95mMuquJV6TkzkGAHNkqM6RyMAQSV6nUam4ZgGj0ONU920RjeHZodI+EPG/KPpuzOaKtQVCl8JoblkarYTcYB6LwPI5f8nXaroKnxNp3htNelemvblKRfUTx1H1nZoeJH9pDa95KrNN/R1rHG5QMVruYL3RpmudLEhKy+dYI7M9cIUY0wrV8L4S94g==
+ b=hxbSnlbhG7g9n8Zv0v500QSwDQGRYeRU03+ODidXJiSapsiiMEuQb3vsr+onS0WpOWK1d7Y9ZOlQ0S4eCa/0fApVG2f18qMuTFjirBGFJfMGMEM/BE+DkdteXoC/Vgx38Bsej/6zQU3wUfvJdiLxmlzuQs681o4mBFjg6pAZLIEn4pxH+PBj4pdGGui5EQZMkLWtkMs7w3KUFHouwxTyPQ6x4WkcKvujmHS5umsWKSLkfShnWhAOzeGn8hvzAr4Iwiptj/Rd2V4gUl5cttNomRqTjRQb1tdw8lBk7W/1sW5NyjtdyB9QnURFFU2fitVA2DSMD75x3M0E3LXiIldbgw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=APO+OsF6yzE2KClNIqeO7ZT2WaSEbW4mJTZYsioQ6X0=;
- b=WxIeflSkh7ZsNQvuJTCKleqLtw7PpBLvXv0zrvHwkySsomTGanKA1yqWvX4RZaIGnj/7c7e3MqXmFj5uvQdu5QNWHm6Tt44kJKtp4llNGL6luX9qppqFUFDYv2FJAfyFkMpvAyRaQE0Eu1ScUkn/0jOUJ8GHYkPsaApOSva/F2FgGhIk+flumNsa5kazI4EvLk/FAuWb8Gzdx6avYGL43QRCj4pPlQlW2mXU2cSoYykedsauy9wEDrAY/BTBvgqGCejGHWupaNqFexzftRDancQdp5/vHSws6q+vgRiIMJlzYSrQjjBsrQpXqUywz83Y+/Zu6CjM9hSN80MGmzTLOA==
+ bh=uJWkJbVYq1I0VqFSA/GY+VXIiWGgEnfmiAwv7mjzfUY=;
+ b=BOEYWmigCKQcuNNB6HxLRL//6o3piZYyKmelLthkHd4QRP7wenqsles6/DUqyYyWj09zOumvEEP+E4QilR7k0dsNbAfCRfVCDYCS11WLzTZM9k7qfJHWxgipXEdF39rTAeCQRzWfizIZVvHZgjodS2MfOQgYn356VRrBz9WJRfRFRQtTSZbu7UlRU24nj+CYUrgw3L2NVHFiaZIEddRlCsVLknTga4ghJ89ghIRei3ijpctqmfrcG7HC4vwFXXMWmfvZlDitJQDh78aWdjP0MEn43w43aJCrMknmpKv+SRczt/ZQ1vHDs3bMZ7hTAh8KaT2sNkUTowfTEok3wSnspg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=APO+OsF6yzE2KClNIqeO7ZT2WaSEbW4mJTZYsioQ6X0=;
- b=HJOfBpFOBBiBcA1YsKbzXgXFiGkxP5yO7U1UuoECqueXlXQ7J1BKQuRI7ZQMfkLqeouvdvSCsXywJou4jGswywIRxdwKzQgeomG13a9EQFOdWoKCDHPR/gXcpMwFoeSUYA9zCZ5p9iCITtPH7LlmV3AYd6su04MFFSDyCfTOAng=
-Received: from CH5PR02CA0011.namprd02.prod.outlook.com (2603:10b6:610:1ed::28)
- by DM4PR12MB5915.namprd12.prod.outlook.com (2603:10b6:8:68::12) with
+ bh=uJWkJbVYq1I0VqFSA/GY+VXIiWGgEnfmiAwv7mjzfUY=;
+ b=Oe6V1+IObxwTwBmZxd+UsZu4DehwsIUU/XU78uGE5pgGTUQNOqurR7PGPFeXQECYmIPfzj5jTTA+x1y4XlzXOny8AlqzJRIISrIzkEDb0HiejapouvDHmXKOcw6QFJJtGn7yYO8bzOeZLMBuwGwH5mvZ5NpOspvKs0Ge/nj72Hk=
+Received: from CH2PR05CA0016.namprd05.prod.outlook.com (2603:10b6:610::29) by
+ MN0PR12MB6224.namprd12.prod.outlook.com (2603:10b6:208:3c0::21) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.13; Wed, 29 Oct
- 2025 19:02:19 +0000
-Received: from DS3PEPF000099DD.namprd04.prod.outlook.com
- (2603:10b6:610:1ed:cafe::be) by CH5PR02CA0011.outlook.office365.com
- (2603:10b6:610:1ed::28) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9275.14 via Frontend Transport; Wed,
- 29 Oct 2025 19:02:19 +0000
+ 2025 19:02:25 +0000
+Received: from DS3PEPF000099DB.namprd04.prod.outlook.com
+ (2603:10b6:610:0:cafe::88) by CH2PR05CA0016.outlook.office365.com
+ (2603:10b6:610::29) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9298.4 via Frontend Transport; Wed,
+ 29 Oct 2025 19:02:24 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -62,23 +63,25 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
 Received: from satlexmb07.amd.com (165.204.84.17) by
- DS3PEPF000099DD.mail.protection.outlook.com (10.167.17.199) with Microsoft
+ DS3PEPF000099DB.mail.protection.outlook.com (10.167.17.197) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9275.10 via Frontend Transport; Wed, 29 Oct 2025 19:02:19 +0000
+ 15.20.9275.10 via Frontend Transport; Wed, 29 Oct 2025 19:02:23 +0000
 Received: from airavat.amd.com (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 29 Oct
- 2025 12:01:40 -0700
+ 2025 12:02:17 -0700
 From: Raju Rangoju <Raju.Rangoju@amd.com>
 To: <netdev@vger.kernel.org>
 CC: <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
 	<davem@davemloft.net>, <andrew+netdev@lunn.ch>,
 	<maxime.chevallier@bootlin.com>, <Shyam-sundar.S-k@amd.com>, Raju Rangoju
 	<Raju.Rangoju@amd.com>
-Subject: [PATCH net-next v5 2/5] amd-xgbe: introduce support ethtool selftest
-Date: Thu, 30 Oct 2025 00:31:13 +0530
-Message-ID: <20251029190116.3220985-1-Raju.Rangoju@amd.com>
+Subject: [PATCH net-next v5 3/5] amd-xgbe: add ethtool phy selftest
+Date: Thu, 30 Oct 2025 00:31:14 +0530
+Message-ID: <20251029190116.3220985-2-Raju.Rangoju@amd.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20251029190116.3220985-1-Raju.Rangoju@amd.com>
+References: <20251029190116.3220985-1-Raju.Rangoju@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,424 +94,143 @@ X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF000099DD:EE_|DM4PR12MB5915:EE_
-X-MS-Office365-Filtering-Correlation-Id: 73ad1ccb-6339-41c4-0de5-08de171daf49
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099DB:EE_|MN0PR12MB6224:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0384f4c9-44c4-498c-6287-08de171db191
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700013|376014|1800799024;
+	BCL:0;ARA:13230040|376014|82310400026|1800799024|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?O+Nrz0vt84BFsd/YGgdTaf4FBbCe9DWWC4hc3ouf7mOdYTh/TYgF54f3FMig?=
- =?us-ascii?Q?PQoxpRnozzQW7BXFWYyeYy4GjmVbLdFRJMMO7RWp0CPLlRxHvix63pZO6AAL?=
- =?us-ascii?Q?Rt+Ygd2dGdWjuueMRoARz+Hzv8JQqyzHJUEnzUd5aOGP8x0ARXiEVr/F+9dX?=
- =?us-ascii?Q?NsN3qAV2cksmFUM8bWBUBt7xjyYpere3NKfTp/6pZglfismL9yFM+EAYHNnT?=
- =?us-ascii?Q?lUEbd9Ft6tunCcME8xVO0ifzx57YN/Po6YS6h39ACFd8kBYazqwl8vLugtIs?=
- =?us-ascii?Q?DO487hm1rPZKg1OWi/QmBLNocIhThH3cGGnS/9vuGlSKNx4yhnW5qcOgGvar?=
- =?us-ascii?Q?nzplhyxlHvWcxvksBUqgwyZIjr+tubdOP8jzjXOiffDaHDLu1S2pSI7qb8Ek?=
- =?us-ascii?Q?c8Dbe12sDI086QqbbyTVHDylhtqOcDUwoIkIIaqam8p/dp8YrTgRl2w1HLbZ?=
- =?us-ascii?Q?bJr7fw6HrE/r7sdJ8Q1/HTmCFwAHsmvNAvPiJDHnhhBfpfkYlDaRGBsn4xJQ?=
- =?us-ascii?Q?28X6hqqf/i2qmpYFJQ9993D+PTCn9gir1783V2xq7QBONCZEhLMg8O/O4l/7?=
- =?us-ascii?Q?jbmql5C6uMVd+p5+I6quO4e4Go4g5vbSpYjgbgPcZzlqVl02U9u1ouwxQfUD?=
- =?us-ascii?Q?Og7Q6LJIo9CfVH7vl7uEGaRJboBN7IU0KnsZZswJN5Um/9Zfm7oFilk1PRDA?=
- =?us-ascii?Q?+zroc2dTsZeuyfD5c4hMO7gDLHxHpFbZcFFLEG5ORlJq9Swm/bWKZcyev8sB?=
- =?us-ascii?Q?VtcX14KWjxtfTFoXAeu+pk7xdUO8LUXAevE7mbjPiDXyec7JLUerBq4EtgFf?=
- =?us-ascii?Q?37SUoQYi0dFbJ5xH2gFvtcmmyvxGUCi0G8nZAK/1xlYCendT+bXqhALAYdZz?=
- =?us-ascii?Q?KI8fd7wwjrZmw2SVQJxZKFde9guucNmONHbQE+LsrwsTKh/KO+aHVdZFfe6q?=
- =?us-ascii?Q?O5+gglAp9Qzmg3BHuiK5UcttFinpem10z6fLIAHnTLqKVhN5KohKjCYt0X6p?=
- =?us-ascii?Q?puxzaMCnvs0MqNwh2bWZJhWuCzPsrHr/AYC1E0a2m9iFMe4ebj/3vWe504Rd?=
- =?us-ascii?Q?UK54NZhxQfHRHE6sjGJvHzB+ISRod6LtYHM+Be7rbDX9hoE7diKZ/jvWuxbq?=
- =?us-ascii?Q?huC4HsTsAXStoe9KyNPHqDqrZpoY8/iHMLJhBKavY0S0WpvwA9p75twFISea?=
- =?us-ascii?Q?7Jb0vnhnjkFgCGj5ja3nN53MTYXpdqtY9coAVPwSvxbUNjDz/BSMw7WOoOUL?=
- =?us-ascii?Q?6HuNij1yvHZ8P3p/pgZW3fe6AxmQvUkvlDtERP1jjOoxkewiDDhZySzpmde3?=
- =?us-ascii?Q?33O5VSP4JKMURuOqjMkh3GvwxOTkZ+5o7yuFqjcUQt9Z1RcLjd+MGCf1IWPZ?=
- =?us-ascii?Q?nGgAjPi8tykIrNW6PT8r222MmmnleC7e9uZEa7rBK9po/KOq7nSqdV/TKqq0?=
- =?us-ascii?Q?F/7vC0w4cNVUEZwUSnnLqmAvo46Y25WAnCQ3P9iFH9eHXb9XYkcZ/aUsxh1v?=
- =?us-ascii?Q?1wchd+fwWUVsNC/nw7n01i7B8OtyzWRx13gCf9DsadArc2ZTooOuJ9rdtR0s?=
- =?us-ascii?Q?Bl8uWXQj7FEBoHNZUM0=3D?=
+	=?us-ascii?Q?c9vDjO3BGTivZqOzwHjJQo0/ghygg9eeWSInAA0MMptisK4prEShY226R91u?=
+ =?us-ascii?Q?Z9S5R0Jpu7pBlromOR3rsVnAnbhpBgbjUQPcK+Dc/LAlXyuLskzDkFQOsxkW?=
+ =?us-ascii?Q?xVZEecUR5Ub17DE5++556HuBBOrblvYirpMAkSqFq5f7n8HPU2h3PVK2ynb5?=
+ =?us-ascii?Q?fHlxW7CGV1Y/2x5k0nMfFuVnDhXYuFXawuwMg2tzpeDevxmhpxNLT4BTO53I?=
+ =?us-ascii?Q?EcmivD8YgmM1d7hpqYRaj1V1g4KznVuQP5dJERKTTsKEbLZnTOZ6aYfHSXs6?=
+ =?us-ascii?Q?x6GdQODSSkPW3pwjP/H0PngEomCBqbLzNnTOXX+f99Cz2e1Rabmd5qtPzuhV?=
+ =?us-ascii?Q?QJLe3DTR1kJn5qtYo1N15QVNGZtX8+M/DAyIJxwCw5NEoWb8BsAuxSbnONOz?=
+ =?us-ascii?Q?VgXRbQ6x5+65/jw2q4r3kZHghEQ5K/b617OiJO6oW7OHjzu8ZEqyyDuUFaYp?=
+ =?us-ascii?Q?RLVwn8orogKirEjmRYU7NluHuL3Noffe10VTKaNqYbNNihzffC5B8x51OuTm?=
+ =?us-ascii?Q?zGJSEfelmcnwQQXpDrWPnmaoaYZ2cEG0Q4SPEgPU3jIHpDz3Rpik9usl085/?=
+ =?us-ascii?Q?JM5MbaZxRDbyiIa4KJbl+ClJ5hGEiMtKiisc/j1fxADpwxoa6GuBa2UddnfJ?=
+ =?us-ascii?Q?saaysjV5hggi0WJGveHOSRENXwxzze/5u29Y+udkbrHiReLAqkQwJxKEEzEF?=
+ =?us-ascii?Q?pa83OpjyksTBHccIq1g8ur9xyZT5MeGm2hFUPzGtWDuJDIdT5H57PHx/RJuy?=
+ =?us-ascii?Q?bAYV/7WDGzL3VJ9zsd/cS7l9aTXRAZFJ2fGbbxn6yh2TIENmqFIzyu64QOl1?=
+ =?us-ascii?Q?xC0LWUaO66SnSpUiV4zDCUt3jzAfW0z+Ja85GKVFLAOGKTIH/S/ZJB1seJ+8?=
+ =?us-ascii?Q?YSiXulTlAlBMrcmVkb+QrkZwip2sZpEaxN2Ya6WsCyuY6cBRq0UQm/9XzmKL?=
+ =?us-ascii?Q?mnN4TqW7luiGlpqESB7uzMNxNFnCpeRZh7j6JCW3wnwgkoKDyibl6uXrW6Y0?=
+ =?us-ascii?Q?2d0+gCs0j1E94DtzHSChV1cZwXX8pyuUevtWZzMgya0RrdaQEN2aExHWU0r6?=
+ =?us-ascii?Q?VWmA6bwsTIPimpF7EVsN8OIac+y86NVw/X5G7UBezoI8pUjWBV1H0Ev8s/4a?=
+ =?us-ascii?Q?d2gTfEY4n7yBxDPi83+6nc+cyrv//+zDtJR6O8hJzZQYIMWkyAPUPkHjTw61?=
+ =?us-ascii?Q?MRx508d00dGDKBEDPx92AHVmBHZPooQt3CUbTmt8sgztObSllvDp+pOOuHGn?=
+ =?us-ascii?Q?4sTpDYGnrIqYm8cxubs1+vD2wOW05g4qJB0CR7CHPwxDhTpyy+4PwV1qVyLu?=
+ =?us-ascii?Q?Z00wi2AEhAVJ7tPdFHeLrXWS+RHnrCdR+X9do2WaE+1+5hbrft/ENgZm9kwS?=
+ =?us-ascii?Q?yDSyDRBpEwpBqUEju3C+BL0KWMw61Q+h9jNLrcHtWGsu+2lfxWYGBRA9rLum?=
+ =?us-ascii?Q?EjANHGkO2I/9k6ShfJx2jj+w9/hPf5vfcyabsokxG4bk+euvDUYWgJOsrbj1?=
+ =?us-ascii?Q?n5LELPHZJlV16+yYEsU8boqeaXEIcmLvpHKfV/RicEhvdrgJxTRwFtR7ZISD?=
+ =?us-ascii?Q?dWAjPMs6/9ypMgQq4Dw=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(376014)(1800799024);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(36860700013);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Oct 2025 19:02:19.4763
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Oct 2025 19:02:23.2977
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 73ad1ccb-6339-41c4-0de5-08de171daf49
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0384f4c9-44c4-498c-6287-08de171db191
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DS3PEPF000099DD.namprd04.prod.outlook.com
+	DS3PEPF000099DB.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5915
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6224
 
-Add support for ethtool selftest for MAC loopback. This includes the
-sanity check and helps in finding the misconfiguration of HW. Use the
-existing selftest infrastructure to create test packets.
+Adds support for ethtool PHY loopback selftest. It uses
+genphy_loopback function, which use BMCR loopback bit to
+enable or disable loopback.
 
 Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
 ---
-Changes since v4:
- - move the helper functions to appropriate file
-Changes since v3:
- - reuse the existing selftest framework for packet creation
 Changes since v2:
- - fix build warnings for xtensa arch
-Changes since v1:
- - fix build warnings for s390 arch reported by kernel test robot
+ - fix build warnings for alpha arch
 
- drivers/net/ethernet/amd/Kconfig              |   1 +
- drivers/net/ethernet/amd/xgbe/Makefile        |   2 +-
- drivers/net/ethernet/amd/xgbe/xgbe-dev.c      |  17 ++
- drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c  |   7 +
- drivers/net/ethernet/amd/xgbe/xgbe-selftest.c | 237 ++++++++++++++++++
- drivers/net/ethernet/amd/xgbe/xgbe.h          |  10 +
- 6 files changed, 273 insertions(+), 1 deletion(-)
- create mode 100644 drivers/net/ethernet/amd/xgbe/xgbe-selftest.c
+ drivers/net/ethernet/amd/xgbe/xgbe-selftest.c | 40 +++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
-diff --git a/drivers/net/ethernet/amd/Kconfig b/drivers/net/ethernet/amd/Kconfig
-index b39c6f3e1eda..d54dca3074eb 100644
---- a/drivers/net/ethernet/amd/Kconfig
-+++ b/drivers/net/ethernet/amd/Kconfig
-@@ -165,6 +165,7 @@ config AMD_XGBE
- 	select CRC32
- 	select PHYLIB
- 	select AMD_XGBE_HAVE_ECC if X86
-+	select NET_SELFTESTS
- 	help
- 	  This driver supports the AMD 10GbE Ethernet device found on an
- 	  AMD SoC.
-diff --git a/drivers/net/ethernet/amd/xgbe/Makefile b/drivers/net/ethernet/amd/xgbe/Makefile
-index 980e27652237..5992f7fd4d9b 100644
---- a/drivers/net/ethernet/amd/xgbe/Makefile
-+++ b/drivers/net/ethernet/amd/xgbe/Makefile
-@@ -5,7 +5,7 @@ amd-xgbe-objs := xgbe-main.o xgbe-drv.o xgbe-dev.o \
- 		 xgbe-desc.o xgbe-ethtool.o xgbe-mdio.o \
- 		 xgbe-hwtstamp.o xgbe-ptp.o xgbe-pps.o \
- 		 xgbe-i2c.o xgbe-phy-v1.o xgbe-phy-v2.o \
--		 xgbe-platform.o
-+		 xgbe-platform.o xgbe-selftest.o
- 
- amd-xgbe-$(CONFIG_PCI) += xgbe-pci.o
- amd-xgbe-$(CONFIG_AMD_XGBE_DCB) += xgbe-dcb.o
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
-index e5391a2eca51..ffc7d83522c7 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
-@@ -3578,3 +3578,20 @@ void xgbe_init_function_ptrs_dev(struct xgbe_hw_if *hw_if)
- 
- 	DBGPR("<--xgbe_init_function_ptrs\n");
- }
-+
-+int xgbe_enable_mac_loopback(struct xgbe_prv_data *pdata)
-+{
-+	/* Enable MAC loopback mode */
-+	XGMAC_IOWRITE_BITS(pdata, MAC_RCR, LM, 1);
-+
-+	/* Wait for loopback to stabilize */
-+	usleep_range(10, 15);
-+
-+	return 0;
-+}
-+
-+void xgbe_disable_mac_loopback(struct xgbe_prv_data *pdata)
-+{
-+	/* Disable MAC loopback mode */
-+	XGMAC_IOWRITE_BITS(pdata, MAC_RCR, LM, 0);
-+}
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c b/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
-index b6e1b67a2d0e..0d19b09497a0 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c
-@@ -85,6 +85,9 @@ static void xgbe_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
- 	int i;
- 
- 	switch (stringset) {
-+	case ETH_SS_TEST:
-+		xgbe_selftest_get_strings(pdata, data);
-+		break;
- 	case ETH_SS_STATS:
- 		for (i = 0; i < XGBE_STATS_COUNT; i++)
- 			ethtool_puts(&data, xgbe_gstring_stats[i].stat_string);
-@@ -131,6 +134,9 @@ static int xgbe_get_sset_count(struct net_device *netdev, int stringset)
- 	int ret;
- 
- 	switch (stringset) {
-+	case ETH_SS_TEST:
-+		ret = xgbe_selftest_get_count(pdata);
-+		break;
- 	case ETH_SS_STATS:
- 		ret = XGBE_STATS_COUNT +
- 		      (pdata->tx_ring_count * 2) +
-@@ -760,6 +766,7 @@ static const struct ethtool_ops xgbe_ethtool_ops = {
- 	.set_ringparam = xgbe_set_ringparam,
- 	.get_channels = xgbe_get_channels,
- 	.set_channels = xgbe_set_channels,
-+	.self_test = xgbe_selftest_run,
- };
- 
- const struct ethtool_ops *xgbe_get_ethtool_ops(void)
 diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-selftest.c b/drivers/net/ethernet/amd/xgbe/xgbe-selftest.c
-new file mode 100644
-index 000000000000..2e9c8f5a68ca
---- /dev/null
+index 2e9c8f5a68ca..dd397790ec0a 100644
+--- a/drivers/net/ethernet/amd/xgbe/xgbe-selftest.c
 +++ b/drivers/net/ethernet/amd/xgbe/xgbe-selftest.c
-@@ -0,0 +1,237 @@
-+// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-3-Clause)
-+/*
-+ * Copyright (c) 2014-2025, Advanced Micro Devices, Inc.
-+ * Copyright (c) 2014, Synopsys, Inc.
-+ * All rights reserved
-+ *
-+ * Author: Raju Rangoju <Raju.Rangoju@amd.com>
-+ */
-+#include <linux/crc32.h>
-+#include <linux/ip.h>
-+#include <linux/udp.h>
-+#include <net/tcp.h>
-+#include <net/udp.h>
-+#include <net/checksum.h>
-+#include <net/selftests.h>
-+
-+#include "xgbe.h"
-+#include "xgbe-common.h"
-+
-+#define XGBE_LOOPBACK_NONE	0
-+#define XGBE_LOOPBACK_MAC	1
-+
-+struct xgbe_test {
-+	char name[ETH_GSTRING_LEN];
-+	int lb;
-+	int (*fn)(struct xgbe_prv_data *pdata);
-+};
-+
-+static u8 xgbe_test_id;
-+
-+static int xgbe_test_loopback_validate(struct sk_buff *skb,
-+				       struct net_device *ndev,
-+				       struct packet_type *pt,
-+				       struct net_device *orig_ndev)
+@@ -19,6 +19,7 @@
+ 
+ #define XGBE_LOOPBACK_NONE	0
+ #define XGBE_LOOPBACK_MAC	1
++#define XGBE_LOOPBACK_PHY	2
+ 
+ struct xgbe_test {
+ 	char name[ETH_GSTRING_LEN];
+@@ -151,11 +152,36 @@ static int xgbe_test_mac_loopback(struct xgbe_prv_data *pdata)
+ 	return __xgbe_test_loopback(pdata, &attr);
+ }
+ 
++static int xgbe_test_phy_loopback(struct xgbe_prv_data *pdata)
 +{
-+	struct net_test_priv *tdata = pt->af_packet_priv;
-+	const unsigned char *dst = tdata->packet->dst;
-+	const unsigned char *src = tdata->packet->src;
-+	struct netsfhdr *hdr;
-+	struct ethhdr *eh;
-+	struct iphdr *ih;
-+	struct tcphdr *th;
-+	struct udphdr *uh;
++	struct net_packet_attrs attr = {};
++	int ret;
 +
-+	skb = skb_unshare(skb, GFP_ATOMIC);
-+	if (!skb)
-+		goto out;
-+
-+	if (skb_linearize(skb))
-+		goto out;
-+
-+	if (skb_headlen(skb) < (NET_TEST_PKT_SIZE - ETH_HLEN))
-+		goto out;
-+
-+	eh = (struct ethhdr *)skb_mac_header(skb);
-+	if (dst) {
-+		if (!ether_addr_equal_unaligned(eh->h_dest, dst))
-+			goto out;
-+	}
-+	if (src) {
-+		if (!ether_addr_equal_unaligned(eh->h_source, src))
-+			goto out;
++	if (!pdata->netdev->phydev) {
++		netdev_err(pdata->netdev, "phydev not found: cannot start PHY loopback test\n");
++		return -EOPNOTSUPP;
 +	}
 +
-+	ih = ip_hdr(skb);
-+
-+	if (tdata->packet->tcp) {
-+		if (ih->protocol != IPPROTO_TCP)
-+			goto out;
-+
-+		th = (struct tcphdr *)((u8 *)ih + 4 * ih->ihl);
-+		if (th->dest != htons(tdata->packet->dport))
-+			goto out;
-+
-+		hdr = (struct netsfhdr *)((u8 *)th + sizeof(*th));
-+	} else {
-+		if (ih->protocol != IPPROTO_UDP)
-+			goto out;
-+
-+		uh = (struct udphdr *)((u8 *)ih + 4 * ih->ihl);
-+		if (uh->dest != htons(tdata->packet->dport))
-+			goto out;
-+
-+		hdr = (struct netsfhdr *)((u8 *)uh + sizeof(*uh));
-+	}
-+
-+	if (hdr->magic != cpu_to_be64(NET_TEST_PKT_MAGIC))
-+		goto out;
-+	if (tdata->packet->id != hdr->id)
-+		goto out;
-+
-+	tdata->ok = true;
-+	complete(&tdata->comp);
-+out:
-+	kfree_skb(skb);
-+	return 0;
-+}
-+
-+static int __xgbe_test_loopback(struct xgbe_prv_data *pdata,
-+				struct net_packet_attrs *attr)
-+{
-+	struct net_test_priv *tdata;
-+	struct sk_buff *skb = NULL;
-+	int ret = 0;
-+
-+	tdata = kzalloc(sizeof(*tdata), GFP_KERNEL);
-+	if (!tdata)
-+		return -ENOMEM;
-+
-+	tdata->ok = false;
-+	init_completion(&tdata->comp);
-+
-+	tdata->pt.type = htons(ETH_P_IP);
-+	tdata->pt.func = xgbe_test_loopback_validate;
-+	tdata->pt.dev = pdata->netdev;
-+	tdata->pt.af_packet_priv = tdata;
-+	tdata->packet = attr;
-+
-+	dev_add_pack(&tdata->pt);
-+
-+	skb = net_test_get_skb(pdata->netdev, xgbe_test_id, attr);
-+	if (!skb) {
-+		ret = -ENOMEM;
-+		goto cleanup;
-+	}
-+
-+	xgbe_test_id++;
-+	ret = dev_direct_xmit(skb, attr->queue_mapping);
++	ret = phy_loopback(pdata->netdev->phydev, true, 0);
 +	if (ret)
-+		goto cleanup;
++		return ret;
 +
-+	if (!attr->timeout)
-+		attr->timeout = NET_LB_TIMEOUT;
++	attr.dst = pdata->netdev->dev_addr;
++	ret = __xgbe_test_loopback(pdata, &attr);
 +
-+	wait_for_completion_timeout(&tdata->comp, attr->timeout);
-+	ret = tdata->ok ? 0 : -ETIMEDOUT;
-+
-+	if (ret)
-+		netdev_err(pdata->netdev, "Response timedout: ret %d\n", ret);
-+cleanup:
-+	dev_remove_pack(&tdata->pt);
-+	kfree(tdata);
++	phy_loopback(pdata->netdev->phydev, false, 0);
 +	return ret;
 +}
 +
-+static int xgbe_test_mac_loopback(struct xgbe_prv_data *pdata)
-+{
-+	struct net_packet_attrs attr = {};
-+
-+	attr.dst = pdata->netdev->dev_addr;
-+	return __xgbe_test_loopback(pdata, &attr);
-+}
-+
-+static const struct xgbe_test xgbe_selftests[] = {
-+	{
-+		.name = "MAC Loopback   ",
-+		.lb = XGBE_LOOPBACK_MAC,
-+		.fn = xgbe_test_mac_loopback,
-+	},
-+};
-+
-+void xgbe_selftest_run(struct net_device *dev,
-+		       struct ethtool_test *etest, u64 *buf)
-+{
-+	struct xgbe_prv_data *pdata = netdev_priv(dev);
-+	int count = xgbe_selftest_get_count(pdata);
-+	int i, ret;
-+
-+	memset(buf, 0, sizeof(*buf) * count);
-+	xgbe_test_id = 0;
-+
-+	if (etest->flags != ETH_TEST_FL_OFFLINE) {
-+		netdev_err(pdata->netdev, "Only offline tests are supported\n");
-+		etest->flags |= ETH_TEST_FL_FAILED;
-+		return;
-+	} else if (!netif_carrier_ok(dev)) {
-+		netdev_err(pdata->netdev,
-+			   "Invalid link, cannot execute tests\n");
-+		etest->flags |= ETH_TEST_FL_FAILED;
-+		return;
-+	}
-+
-+	/* Wait for queues drain */
-+	msleep(200);
-+
-+	for (i = 0; i < count; i++) {
-+		ret = 0;
-+
-+		switch (xgbe_selftests[i].lb) {
-+		case XGBE_LOOPBACK_MAC:
-+			ret = xgbe_enable_mac_loopback(pdata);
-+			break;
-+		case XGBE_LOOPBACK_NONE:
-+			break;
-+		default:
-+			ret = -EOPNOTSUPP;
-+			break;
-+		}
-+
-+		/*
-+		 * First tests will always be MAC / PHY loopback.
-+		 * If any of them is not supported we abort earlier.
-+		 */
-+		if (ret) {
-+			netdev_err(pdata->netdev, "Loopback not supported\n");
-+			etest->flags |= ETH_TEST_FL_FAILED;
-+			break;
-+		}
-+
-+		ret = xgbe_selftests[i].fn(pdata);
-+		if (ret && (ret != -EOPNOTSUPP))
-+			etest->flags |= ETH_TEST_FL_FAILED;
-+		buf[i] = ret;
-+
-+		switch (xgbe_selftests[i].lb) {
-+		case XGBE_LOOPBACK_MAC:
-+			xgbe_disable_mac_loopback(pdata);
-+			break;
-+		default:
-+			break;
-+		}
-+	}
-+}
-+
-+void xgbe_selftest_get_strings(struct xgbe_prv_data *pdata, u8 *data)
-+{
-+	u8 *p = data;
-+	int i;
-+
-+	for (i = 0; i < xgbe_selftest_get_count(pdata); i++)
-+		ethtool_puts(&p, xgbe_selftests[i].name);
-+}
-+
-+int xgbe_selftest_get_count(struct xgbe_prv_data *pdata)
-+{
-+	return ARRAY_SIZE(xgbe_selftests);
-+}
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe.h b/drivers/net/ethernet/amd/xgbe/xgbe.h
-index 381f72a33d1a..dc03082c59aa 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe.h
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe.h
-@@ -1322,6 +1322,16 @@ void xgbe_update_tstamp_time(struct xgbe_prv_data *pdata, unsigned int sec,
- int xgbe_pps_config(struct xgbe_prv_data *pdata, struct xgbe_pps_config *cfg,
- 		    int index, bool on);
+ static const struct xgbe_test xgbe_selftests[] = {
+ 	{
+ 		.name = "MAC Loopback   ",
+ 		.lb = XGBE_LOOPBACK_MAC,
+ 		.fn = xgbe_test_mac_loopback,
++	}, {
++		.name = "PHY Loopback   ",
++		.lb = XGBE_LOOPBACK_NONE,
++		.fn = xgbe_test_phy_loopback,
+ 	},
+ };
  
-+/* Selftest functions */
-+void xgbe_selftest_run(struct net_device *dev,
-+		       struct ethtool_test *etest, u64 *buf);
-+void xgbe_selftest_get_strings(struct xgbe_prv_data *pdata, u8 *data);
-+int xgbe_selftest_get_count(struct xgbe_prv_data *pdata);
-+
-+/* Loopback control */
-+int xgbe_enable_mac_loopback(struct xgbe_prv_data *pdata);
-+void xgbe_disable_mac_loopback(struct xgbe_prv_data *pdata);
-+
- #ifdef CONFIG_DEBUG_FS
- void xgbe_debugfs_init(struct xgbe_prv_data *);
- void xgbe_debugfs_exit(struct xgbe_prv_data *);
+@@ -187,6 +213,13 @@ void xgbe_selftest_run(struct net_device *dev,
+ 		ret = 0;
+ 
+ 		switch (xgbe_selftests[i].lb) {
++		case XGBE_LOOPBACK_PHY:
++			ret = -EOPNOTSUPP;
++			if (dev->phydev)
++				ret = phy_loopback(dev->phydev, true, 0);
++			if (!ret)
++				break;
++			fallthrough;
+ 		case XGBE_LOOPBACK_MAC:
+ 			ret = xgbe_enable_mac_loopback(pdata);
+ 			break;
+@@ -213,6 +246,13 @@ void xgbe_selftest_run(struct net_device *dev,
+ 		buf[i] = ret;
+ 
+ 		switch (xgbe_selftests[i].lb) {
++		case XGBE_LOOPBACK_PHY:
++			ret = -EOPNOTSUPP;
++			if (dev->phydev)
++				ret = phy_loopback(dev->phydev, false, 0);
++			if (!ret)
++				break;
++			fallthrough;
+ 		case XGBE_LOOPBACK_MAC:
+ 			xgbe_disable_mac_loopback(pdata);
+ 			break;
 -- 
 2.34.1
 
