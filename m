@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-234100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1F08C1C7A1
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 18:37:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61124C1C9AE
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 18:54:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B78A24E0F0D
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 17:34:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A20876421E3
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 17:34:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39015354707;
-	Wed, 29 Oct 2025 17:33:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECDD5354705;
+	Wed, 29 Oct 2025 17:33:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3qWyvtlH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pASYb19+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ADD934FF4E
-	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 17:33:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4539E351FD6
+	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 17:33:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761759237; cv=none; b=C0MEYt3Qd2yRxY63bcZiluAUYm5QrDeBKuTv1pjj/O0JaYmutOdy/FNH8Qishilid2PovmWAqcKPawdPCUz+qt3jXHPsVGsJ4gPCKJy3i/Uq56+4jtlD/KfQ6dql05x/lhaZ1XwZ+vUZtnXsn8h3wDTAnFBs4ojLW1AYOY89c8c=
+	t=1761759238; cv=none; b=i3jcwGBD5PhcF7xXMzwvRfgPyt3/Xd3R0J/VNJo8AoRzYDLnUbQf5LMpmAIBFOJZKujYuLapvO+SRbR4JiKrxq7widl1p3REQ9iidYHjUVlv/o87kEsIiBZ7upmr23/JEznZCoEMgk8TpRva2u+JUsUsxw2CH5mwxfuTfyE/OG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761759237; c=relaxed/simple;
-	bh=5iy/wwIGvMx/u9vqYbk9vtDUiNneqqgi035hemG3SIQ=;
+	s=arc-20240116; t=1761759238; c=relaxed/simple;
+	bh=t62v2UcW3JQfy3Z3xBt4KM6t9Hwd0jP2/Yi2WKSsJFc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TmbVLN39RT2M6V8GVnopv4gn0BZ3UgRc0f8SxrHSn2nJwloqt3cHym/SEpwk++pXCE8UbeSDpXTeWnbF4P14KNZMqlFW47HvSAJ1osnaJ6NhnKBIs/g7jrhUloSMWwThvIqa1/yv7NuMyKDeK5UnC0nXSOnJCgyo9NpGYkK7P8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3qWyvtlH; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=AWDtI5mSlwICiMjcdpUagsS8Hci7IYluXKmTM0A0uYPk03q3gfkdiF+6pfscMCacqyf/HKjfIohocD237/L+7pMyACgjrw5x8MTb1mH2nmnu3V0+Lj5Gc6KPyvwZr8O72qXprmaHYcAc0mu7XW8ECBP4lSrsIVclALahtam4cIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pASYb19+; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-290c2d13a01so1315025ad.0
-        for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 10:33:55 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-33d75897745so299171a91.0
+        for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 10:33:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761759235; x=1762364035; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1761759236; x=1762364036; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=T72f2YJoFtcxUABDqdIi5wZEhGV8fPTHo1QAsr92eVU=;
-        b=3qWyvtlHD3vxGTZ6o7SaEBSIcgz4vpebGBVfacUpC/U0B9dzeCw96r+dIUMGtzdUGW
-         Hij3tS+lcn98f2H24CL5ioqoLf9OzsrI504flvy91ud/wl0gZguGnFr0SYFNA41cjIkX
-         XPOM382iXe9ZdcQceCLeamV9thErhbLeU5fql8ddyJjMWg7VclpROgICvbQ8vb7VOdS8
-         v4ebUdGztlKfPe0xJLAxbzg3TFxLJ9MGEHB7F0OaeLQdOvIP83abQnex0CGjMVDxWPeP
-         2NYUVQCm7VRK+pof/Ti8fwDW2LqFg3VwCHS4OFQVtdQHV7kwMYwfWbnNH+i04vle9ICo
-         QnQA==
+        bh=gNlI8nbdk53Q8ydY5c8X4OC/Zy9cxMqJqIA3Kc6FCs0=;
+        b=pASYb19+YbGDqYlcNd8wIxhCGJ+7dslscYQkAUnt4XwBRk8pPa/1VuvO98GheSI+mE
+         2FxI3CPXh5m6JkH1ZiOvIzqE/ouRB7hAkeSr7GaIABQXf2XGCUVPMecwkEo9jgymxg/i
+         62ui3KHdHVEuud7XvoOzes9YZyRdt2oR+Ecksopa9FJUoEjoVSaeAoiJN3L+PAhnmAOe
+         GdIfkh0MZvU0lEDIETFC7sQjKLfE3GKGnqwPxKqIeOt0S/EPHWN1X+iVOU9Qld8DO+x1
+         STKMc5GKhvSEtYe6DGkYsNcvrsG09XnWQp/eQS8NL83G3kTxwCd9yhrNipijjXDf5tTM
+         rR1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761759235; x=1762364035;
+        d=1e100.net; s=20230601; t=1761759236; x=1762364036;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=T72f2YJoFtcxUABDqdIi5wZEhGV8fPTHo1QAsr92eVU=;
-        b=GgXwB1euJzbd5YHwj7PZY5UdI7iwCkC1afMtlAp0UzDKKlXdmVJNgc5NdxoV4LXBVq
-         EyCosbI2Ism/GhFdNAtevl/43mznhUYQMLXCAu3bV50niEHBao8un4Kbwv2YweYPkny4
-         Tq05rX6jpauda6n11Nxoj/cSKHMgVvlsyOPGUQQVElVKXbVwvi6mksZQlR4iw/lqRyy9
-         Keyzq5K6A5FGGd1P//cBmbFWH2VA1ZGcwjKClDplqWUp65+eVour7rlpCeezQIM7KyZm
-         ZHqtbHmTcZGfc5fOLLKDtL8OPI3MOOhHqNLT2jftaFYpvLkKByNRNti2Bj23AuufrGN8
-         uH+g==
-X-Forwarded-Encrypted: i=1; AJvYcCUhGcKNRNjI4pl1a2IBSXw7iiXGXI+drmK2I5o+RMBdsIuC1jlanDe4uM9DBM/f+7YmyWc6mAc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzte2nlOZnTm9Su9RhLZfUVnj2GQeMug4fGsvXghnJu21kmrONs
-	QGjD4c1s6G3RIbhLfdZ2ITvylnFf6QKS278y0tK7vX96ypIjxOXyHMs8LJc4SEFKhv9KpPYbzZo
-	K4O5+nQ==
-X-Google-Smtp-Source: AGHT+IEzVkndTN0kBA2/Z/5kxw/Kd3kKVUm2zVBT1HkaCLKEV/tCUnpin1sR0iEsoqOZoz6+/Z8PdvOR6K0=
-X-Received: from pjtz19.prod.google.com ([2002:a17:90a:cb13:b0:33b:cf89:6fe6])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:dac7:b0:271:9b0e:54ca
- with SMTP id d9443c01a7336-294ed0c556dmr4471965ad.13.1761759234837; Wed, 29
- Oct 2025 10:33:54 -0700 (PDT)
-Date: Wed, 29 Oct 2025 17:32:57 +0000
+        bh=gNlI8nbdk53Q8ydY5c8X4OC/Zy9cxMqJqIA3Kc6FCs0=;
+        b=jENB15sQQJwkOnS8p9GvghspjAPNvzEmE5WHPXBlh0W1aognIj/jbJN9c2HbAxiJ/C
+         FvvkciCY8f9+dCzlTwqec/Pkj6kFqQ3ehcjEmr2VidU52ieTL4aBAhmVHGMWA3Fe9Ozc
+         JBZiQ8q8kiqMNnJlORd1bvMvweuxtX2PO0+OwXFLqG/D1/nhWT48j+CPMw7Oo49jMu7i
+         I6nqXuwhd99S+OeGVKXfd0cKmZc/TPz7A2zxvtvFFS9R5Z32o+niVnelcrol4dv8m/kq
+         jdRp86Z9aRMcmzosl/qPNZiDgmew7RhOzQuFJy3BWcPGN5HdBznV8AjNgyr/DPFj1wBy
+         Id0w==
+X-Forwarded-Encrypted: i=1; AJvYcCWhbKvrJM4oXEz52b1FzWHHuM8DFvL/7931Zrnm/MfmNpL3u/ybK7ta8w7MdKYeh+LPh7HKFQc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLvhZjoFl/VmKu98Wa/j7+VcnFCAKqxQzWT1cftLuXIvJ6B/69
+	pLm107mX9lJCyvrvSCwe0kPqrEqIt+wVfeRKZ8aI1Vx2CJdNC/taMw0ngvpfa4Ki9L7RwL4DKqs
+	MTbTB5Q==
+X-Google-Smtp-Source: AGHT+IHEUG4mUblmfZ77Htaa8rzoQl407pF0uL8mOvx1D1k8Pim+HB7WPJzRYHX/KRyKFz9a56GJEGQZGpQ=
+X-Received: from pjca5.prod.google.com ([2002:a17:90b:5b85:b0:33b:51fe:1a93])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:3944:b0:32b:623d:ee91
+ with SMTP id 98e67ed59e1d1-3403a2f21a3mr3719893a91.27.1761759236376; Wed, 29
+ Oct 2025 10:33:56 -0700 (PDT)
+Date: Wed, 29 Oct 2025 17:32:58 +0000
 In-Reply-To: <20251029173344.2934622-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,9 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251029173344.2934622-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.51.1.851.g4ebd6896fd-goog
-Message-ID: <20251029173344.2934622-6-kuniyu@google.com>
-Subject: [PATCH v2 net-next 05/13] mpls: Use in6_dev_rcu() and dev_net_rcu()
- in mpls_forward() and mpls_xmit().
+Message-ID: <20251029173344.2934622-7-kuniyu@google.com>
+Subject: [PATCH v2 net-next 06/13] mpls: Add mpls_dev_rcu().
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
@@ -84,115 +83,108 @@ Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
 	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-mpls_forward() and mpls_xmit() are called under RCU.
+mpls_dev_get() uses rcu_dereference_rtnl() to fetch dev->mpls_ptr.
 
-Let's use in6_dev_rcu() and dev_net_rcu() there to annotate
-as such.
+We will replace RTNL with a dedicated mutex to protect the field.
 
-Now we pass net to mpls_stats_inc_outucastpkts() not to read
-dev_net_rcu() twice.
+Then, we will use rcu_dereference_protected() for clarity.
+
+Let's add mpls_dev_rcu() for the RCU reader.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- net/mpls/af_mpls.c       | 15 ++++++++-------
- net/mpls/internal.h      |  3 ++-
- net/mpls/mpls_iptunnel.c |  4 ++--
- 3 files changed, 12 insertions(+), 10 deletions(-)
+ net/mpls/af_mpls.c       | 12 ++++++------
+ net/mpls/internal.h      |  5 +++++
+ net/mpls/mpls_iptunnel.c |  2 +-
+ 3 files changed, 12 insertions(+), 7 deletions(-)
 
 diff --git a/net/mpls/af_mpls.c b/net/mpls/af_mpls.c
-index c5bbf712f8be..efc6c7da5766 100644
+index efc6c7da5766..10130b90c439 100644
 --- a/net/mpls/af_mpls.c
 +++ b/net/mpls/af_mpls.c
-@@ -129,7 +129,8 @@ bool mpls_pkt_too_big(const struct sk_buff *skb, unsigned int mtu)
- }
- EXPORT_SYMBOL_GPL(mpls_pkt_too_big);
+@@ -136,7 +136,7 @@ void mpls_stats_inc_outucastpkts(struct net *net,
+ 	struct mpls_dev *mdev;
  
--void mpls_stats_inc_outucastpkts(struct net_device *dev,
-+void mpls_stats_inc_outucastpkts(struct net *net,
-+				 struct net_device *dev,
- 				 const struct sk_buff *skb)
+ 	if (skb->protocol == htons(ETH_P_MPLS_UC)) {
+-		mdev = mpls_dev_get(dev);
++		mdev = mpls_dev_rcu(dev);
+ 		if (mdev)
+ 			MPLS_INC_STATS_LEN(mdev, skb->len,
+ 					   tx_packets,
+@@ -358,7 +358,7 @@ static int mpls_forward(struct sk_buff *skb, struct net_device *dev,
+ 
+ 	/* Careful this entire function runs inside of an rcu critical section */
+ 
+-	mdev = mpls_dev_get(dev);
++	mdev = mpls_dev_rcu(dev);
+ 	if (!mdev)
+ 		goto drop;
+ 
+@@ -467,7 +467,7 @@ static int mpls_forward(struct sk_buff *skb, struct net_device *dev,
+ 	return 0;
+ 
+ tx_err:
+-	out_mdev = out_dev ? mpls_dev_get(out_dev) : NULL;
++	out_mdev = out_dev ? mpls_dev_rcu(out_dev) : NULL;
+ 	if (out_mdev)
+ 		MPLS_INC_STATS(out_mdev, tx_errors);
+ 	goto drop;
+@@ -1118,7 +1118,7 @@ static int mpls_fill_stats_af(struct sk_buff *skb,
+ 	struct mpls_dev *mdev;
+ 	struct nlattr *nla;
+ 
+-	mdev = mpls_dev_get(dev);
++	mdev = mpls_dev_rcu(dev);
+ 	if (!mdev)
+ 		return -ENODATA;
+ 
+@@ -1138,7 +1138,7 @@ static size_t mpls_get_stats_af_size(const struct net_device *dev)
  {
  	struct mpls_dev *mdev;
-@@ -141,13 +142,13 @@ void mpls_stats_inc_outucastpkts(struct net_device *dev,
- 					   tx_packets,
- 					   tx_bytes);
- 	} else if (skb->protocol == htons(ETH_P_IP)) {
--		IP_UPD_PO_STATS(dev_net(dev), IPSTATS_MIB_OUT, skb->len);
-+		IP_UPD_PO_STATS(net, IPSTATS_MIB_OUT, skb->len);
- #if IS_ENABLED(CONFIG_IPV6)
- 	} else if (skb->protocol == htons(ETH_P_IPV6)) {
--		struct inet6_dev *in6dev = __in6_dev_get(dev);
-+		struct inet6_dev *in6dev = in6_dev_rcu(dev);
  
- 		if (in6dev)
--			IP6_UPD_PO_STATS(dev_net(dev), in6dev,
-+			IP6_UPD_PO_STATS(net, in6dev,
- 					 IPSTATS_MIB_OUT, skb->len);
- #endif
- 	}
-@@ -342,7 +343,7 @@ static bool mpls_egress(struct net *net, struct mpls_route *rt,
- static int mpls_forward(struct sk_buff *skb, struct net_device *dev,
- 			struct packet_type *pt, struct net_device *orig_dev)
- {
--	struct net *net = dev_net(dev);
-+	struct net *net = dev_net_rcu(dev);
- 	struct mpls_shim_hdr *hdr;
- 	const struct mpls_nh *nh;
- 	struct mpls_route *rt;
-@@ -434,7 +435,7 @@ static int mpls_forward(struct sk_buff *skb, struct net_device *dev,
- 	dec.ttl -= 1;
- 	if (unlikely(!new_header_size && dec.bos)) {
- 		/* Penultimate hop popping */
--		if (!mpls_egress(dev_net(out_dev), rt, skb, dec))
-+		if (!mpls_egress(net, rt, skb, dec))
- 			goto err;
- 	} else {
- 		bool bos;
-@@ -451,7 +452,7 @@ static int mpls_forward(struct sk_buff *skb, struct net_device *dev,
- 		}
- 	}
+-	mdev = mpls_dev_get(dev);
++	mdev = mpls_dev_rcu(dev);
+ 	if (!mdev)
+ 		return 0;
  
--	mpls_stats_inc_outucastpkts(out_dev, skb);
-+	mpls_stats_inc_outucastpkts(net, out_dev, skb);
+@@ -1341,7 +1341,7 @@ static int mpls_netconf_dump_devconf(struct sk_buff *skb,
  
- 	/* If via wasn't specified then send out using device address */
- 	if (nh->nh_via_table == MPLS_NEIGH_TABLE_UNSPEC)
+ 	rcu_read_lock();
+ 	for_each_netdev_dump(net, dev, ctx->ifindex) {
+-		mdev = mpls_dev_get(dev);
++		mdev = mpls_dev_rcu(dev);
+ 		if (!mdev)
+ 			continue;
+ 		err = mpls_netconf_fill_devconf(skb, mdev,
 diff --git a/net/mpls/internal.h b/net/mpls/internal.h
-index 3a5feca27d6a..e491427ea08a 100644
+index e491427ea08a..080e82010022 100644
 --- a/net/mpls/internal.h
 +++ b/net/mpls/internal.h
-@@ -197,7 +197,8 @@ int nla_get_labels(const struct nlattr *nla, u8 max_labels, u8 *labels,
- bool mpls_output_possible(const struct net_device *dev);
- unsigned int mpls_dev_mtu(const struct net_device *dev);
- bool mpls_pkt_too_big(const struct sk_buff *skb, unsigned int mtu);
--void mpls_stats_inc_outucastpkts(struct net_device *dev,
-+void mpls_stats_inc_outucastpkts(struct net *net,
-+				 struct net_device *dev,
- 				 const struct sk_buff *skb);
+@@ -185,6 +185,11 @@ static inline struct mpls_entry_decoded mpls_entry_decode(struct mpls_shim_hdr *
+ 	return result;
+ }
  
- #endif /* MPLS_INTERNAL_H */
++static inline struct mpls_dev *mpls_dev_rcu(const struct net_device *dev)
++{
++	return rcu_dereference(dev->mpls_ptr);
++}
++
+ static inline struct mpls_dev *mpls_dev_get(const struct net_device *dev)
+ {
+ 	return rcu_dereference_rtnl(dev->mpls_ptr);
 diff --git a/net/mpls/mpls_iptunnel.c b/net/mpls/mpls_iptunnel.c
-index 6e73da94af7f..cfbab7b2fec7 100644
+index cfbab7b2fec7..1a1a0eb5b787 100644
 --- a/net/mpls/mpls_iptunnel.c
 +++ b/net/mpls/mpls_iptunnel.c
-@@ -53,7 +53,7 @@ static int mpls_xmit(struct sk_buff *skb)
+@@ -153,7 +153,7 @@ static int mpls_xmit(struct sk_buff *skb)
+ 	return LWTUNNEL_XMIT_DONE;
  
- 	/* Find the output device */
- 	out_dev = dst->dev;
--	net = dev_net(out_dev);
-+	net = dev_net_rcu(out_dev);
- 
- 	if (!mpls_output_possible(out_dev) ||
- 	    !dst->lwtstate || skb_warn_if_lro(skb))
-@@ -128,7 +128,7 @@ static int mpls_xmit(struct sk_buff *skb)
- 		bos = false;
- 	}
- 
--	mpls_stats_inc_outucastpkts(out_dev, skb);
-+	mpls_stats_inc_outucastpkts(net, out_dev, skb);
- 
- 	if (rt) {
- 		if (rt->rt_gw_family == AF_INET6)
+ drop:
+-	out_mdev = out_dev ? mpls_dev_get(out_dev) : NULL;
++	out_mdev = out_dev ? mpls_dev_rcu(out_dev) : NULL;
+ 	if (out_mdev)
+ 		MPLS_INC_STATS(out_mdev, tx_errors);
+ 	kfree_skb(skb);
 -- 
 2.51.1.851.g4ebd6896fd-goog
 
