@@ -1,148 +1,188 @@
-Return-Path: <netdev+bounces-234074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id F35F2C1C471
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 17:55:25 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF2B6C1C372
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 17:48:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D88C5508770
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 16:47:21 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2077A344082
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 16:48:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78FCE2D063E;
-	Wed, 29 Oct 2025 16:46:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45A3F2F548C;
+	Wed, 29 Oct 2025 16:47:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="YW2HyLaR"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="P9JbqjjN"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B621625A359;
-	Wed, 29 Oct 2025 16:46:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 652172F4A05
+	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 16:47:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761756409; cv=none; b=DUr+n10AkJxdoObF+KdeM49M1NVvh8rPcclFsrov1iaC0tIGL7/WDglVQi3892zk91cwfAhxOc7TZAON5UuEiiFbS0LELOdhVFyGlu+hKyd+kV6+OtN6+3oiMwBeA89+Y36OroxgiA5R89cWutaqh5dT4zhLQgQgPX4Oe5lG6Ug=
+	t=1761756478; cv=none; b=nV6PYI7jRh6xTOfhMy/9Mr9C0w809+mvXSLHBu9VhxqtGu9lHWTVmtfkxNKwNWXdUmRKBSlAxl4RqpnXt1ACMWNt27dubdqBHFSfrZfN5X6CHM9T3WkUB5JcDPZk/9qq2dybMkx4/HEhD13x0gvr0QZrhGBW1L7O8+Dx6q4h+mc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761756409; c=relaxed/simple;
-	bh=TDXvwBfHT+9Q+fyL3LUDJND5eqVMnrq1CTZDEBVx7kc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pW1IahNki/uJ1jPh/pFHVApTpXI+wuOBlrEhqNHRxKiT4AW+T9E+DJBt+O6/mv51iKXb3Jt0L679y02bV4etOZaGQF3E9m0oiE8U/ttxMNPTEBXtiocPzmlf5cEEgD4X8+t6lykINrQ2TgwX9Dj/xuoWcpfLxUiT5Nok2hDK8R0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=YW2HyLaR; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=ezBqsnAVQOjC1ykpTlU6d2On8atja4ltAjGiclusszY=; b=YW2HyLaRK7BVrvPyVqgQf5r2at
-	us2HpLLk1XAm4QIvFH9TMlYA8iEzLGNie8E3+PvYpWmV4jrHejUlGSUyVywe8NijODSWPFQHLmO/x
-	Se4Gh3p46aChCz0Qarn+rMbSaXB/PLMy+i50U5RUNy14ufqwQfnIW4O1imMOxNayHJW0oI69/juk1
-	wbf9j09n9MmuMS5dpdaMvt9T3WM3sjEkKDrVkB1YvmRBQ8ZknKgvMvHsFRaCROA0ge6kgbj1kJF9O
-	Y3AkwFS3aczh/ZgKVBZW8EHKt3Jrjjfy7jqSP5oZ7G5Wo2obSpn0kxFaliP31eOJ9yltwq48XTrEZ
-	igcWDBnw==;
-Received: from sslproxy01.your-server.de ([78.46.139.224])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1vE9JR-0001Wb-1M;
-	Wed, 29 Oct 2025 17:46:17 +0100
-Received: from localhost ([127.0.0.1])
-	by sslproxy01.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1vE9JQ-00051F-1R;
-	Wed, 29 Oct 2025 17:46:16 +0100
-Message-ID: <ceda0507-e25a-43af-bad6-e9ede474ff94@iogearbox.net>
-Date: Wed, 29 Oct 2025 17:46:15 +0100
+	s=arc-20240116; t=1761756478; c=relaxed/simple;
+	bh=vIeGqyVGKrSdApqCZkZRhZ14gVeP6rCHTgitactBbW4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=n5pZRLkT27nRnYyuhmGWuMCKKN+NCePTpPnItzcWGn25qiS+YU9lI1OueVsiiMNYXdlmg8+2EGfMymJkM7a/ounmd3HhbpsJE5zIf4Rb2bZtEZCgCtFZI4rXIgQ60IagGgkQG0Qytqf2D2clEgnLo3HsMDYrgCqlasiwWkr0l2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=P9JbqjjN; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 038721A1739;
+	Wed, 29 Oct 2025 16:47:48 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id BDEA4606E8;
+	Wed, 29 Oct 2025 16:47:47 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id E09BA117F83F2;
+	Wed, 29 Oct 2025 17:47:42 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1761756467; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=+ZD8qKKAj7LLIn7XZPJ61tzZK6etWByMbTQs5Vyy61w=;
+	b=P9JbqjjN9yPnHT3N4tDhHFGOu9FQV/HLNyBTOiqudEKDTT+oeEjRseC6TTgT/X8LViQLBM
+	QVWNxol3vphN+liQJmMbKiJXyq2oz5f7v8TeIYAGg4WMaEC0Poc65n3Rotkejz8HjlkI/w
+	NBC6MG2WU4JcOk94md6EVFWVXQuF7O7ELd8G/5VXdbXr9mLmyYfFX5NzfZpiEeeXlTIUQK
+	IY+1OhN/5Jz5YuDfEBTonv5gNSd/EnEYDyNCfL8gEgf3he1e1c5PBqwujuG+VImdOWdvH+
+	4qYNm/jHKrGQD0RHVWw7hG4xkyrMn1QiG7tRZxgFryO4ew0sm28S4lp+X6sCvw==
+Date: Wed, 29 Oct 2025 17:47:40 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Jiaming Zhang <r772577952@gmail.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org,
+ pabeni@redhat.com, horms@kernel.org, kuniyu@google.com,
+ linux-kernel@vger.kernel.org, sdf@fomichev.me, syzkaller@googlegroups.com,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Subject: Re: [Linux Kernel Bug] KASAN: null-ptr-deref Read in
+ generic_hwtstamp_ioctl_lower
+Message-ID: <20251029174740.0f064865@kmaincent-XPS-13-7390>
+In-Reply-To: <20251029161934.xwxzqoknqmwtrsgv@skbuf>
+References: <CANypQFZ8KO=eUe7YPC+XdtjOAvdVyRnpFk_V3839ixCbdUNsGA@mail.gmail.com>
+	<20251029110651.25c4936d@kmaincent-XPS-13-7390>
+	<20251029161934.xwxzqoknqmwtrsgv@skbuf>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 02/15] net: Implement
- netdev_nl_bind_queue_doit
-To: David Wei <dw@davidwei.uk>, Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
- razor@blackwall.org, pabeni@redhat.com, willemb@google.com, sdf@fomichev.me,
- john.fastabend@gmail.com, martin.lau@kernel.org, jordan@jrife.io,
- maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, toke@redhat.com,
- yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
-References: <20251020162355.136118-1-daniel@iogearbox.net>
- <20251020162355.136118-3-daniel@iogearbox.net>
- <20251023192842.31a2efc0@kernel.org>
- <2f2333fb-707a-4d21-a32d-776489ddc343@davidwei.uk>
-Content-Language: en-US
-From: Daniel Borkmann <daniel@iogearbox.net>
-Autocrypt: addr=daniel@iogearbox.net; keydata=
- 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
-In-Reply-To: <2f2333fb-707a-4d21-a32d-776489ddc343@davidwei.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: Clear (ClamAV 1.0.9/27807/Wed Oct 29 10:50:39 2025)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
-On 10/28/25 11:41 PM, David Wei wrote:
-> On 2025-10-23 19:28, Jakub Kicinski wrote:
->> On Mon, 20 Oct 2025 18:23:42 +0200 Daniel Borkmann wrote:
->>> +void netdev_rx_queue_peer(struct net_device *src_dev,
->>> +              struct netdev_rx_queue *src_rxq,
->>> +              struct netdev_rx_queue *dst_rxq)
->>> +{
->>> +    netdev_assert_locked(src_dev);
->>> +    netdev_assert_locked(dst_rxq->dev);
->>> +
->>> +    netdev_hold(src_dev, &src_rxq->dev_tracker, GFP_KERNEL);
->>
->> Isn't ->dev_tracker already used by sysfs?
-> 
-> You're right, it is. Can netdevice_tracker not be shared?
-Given this is not common practice, I've added a peer_tracker (given
-this is also only enabled / takes space on debug kernels).
+On Wed, 29 Oct 2025 18:19:34 +0200
+Vladimir Oltean <vladimir.oltean@nxp.com> wrote:
 
-Thanks,
-Daniel
+> On Wed, Oct 29, 2025 at 11:06:51AM +0100, Kory Maincent wrote:
+> > Hello Jiaming,
+> >=20
+> > +Vlad
+> >=20
+> > On Wed, 29 Oct 2025 16:45:37 +0800
+> > Jiaming Zhang <r772577952@gmail.com> wrote:
+> >  =20
+> > > Dear Linux kernel developers and maintainers,
+> > >=20
+> > > We are writing to report a null pointer dereference bug discovered in
+> > > the net subsystem. This bug is reproducible on the latest version
+> > > (v6.18-rc3, commit dcb6fa37fd7bc9c3d2b066329b0d27dedf8becaa).
+> > >=20
+> > > The root cause is in tsconfig_prepare_data(), where a local
+> > > kernel_hwtstamp_config struct (cfg) is initialized using {}, setting
+> > > all its members to zero. Consequently, cfg.ifr becomes NULL.
+> > >=20
+> > > cfg is then passed as: tsconfig_prepare_data() ->
+> > > dev_get_hwtstamp_phylib() -> vlan_hwtstamp_get() (via
+> > > dev->netdev_ops->ndo_hwtstamp_get) -> generic_hwtstamp_get_lower() ->
+> > > generic_hwtstamp_ioctl_lower().
+> > >=20
+> > > The function generic_hwtstamp_ioctl_lower() assumes cfg->ifr is a
+> > > valid pointer and attempts to access cfg->ifr->ifr_ifru. This access
+> > > dereferences the NULL pointer, triggering the bug. =20
+> >=20
+> > Thanks for spotting this issue!
+> >=20
+> > In the ideal world we would have all Ethernet driver supporting the
+> > hwtstamp_get/set NDOs but that not currently the case.=09
+> > Vladimir Oltean was working on this but it is not done yet.=20
+> > $ git grep SIOCGHWTSTAMP drivers/net/ethernet | wc -l
+> > 16 =20
+>=20
+> Vadim also took the initiative and submitted (is still submitting?) some
+> more conversions, whereas I lost all steam.
+
+Ok no worry I was simply pointing this out, people will convert it when they
+want to use the new netlink API.
+=20
+> > > As a potential fix, we can declare a local struct ifreq variable in
+> > > tsconfig_prepare_data(), zero-initializing it, and then assigning its
+> > > address to cfg.ifr before calling dev_get_hwtstamp_phylib(). This
+> > > ensures that functions down the call chain receive a valid pointer. =
+=20
+> >=20
+> > If we do that we will have legacy IOCTL path inside the Netlink path and
+> > that's not something we want.
+> > In fact it is possible because the drivers calling
+> > generic_hwtstamp_get/set_lower functions are already converted to hwtst=
+amp
+> > NDOs therefore the NDO check in tsconfig_prepare_data is not working on
+> > these case. =20
+>=20
+> I remember we had this discussion before.
+>=20
+> | This is why I mentioned by ndo_hwtstamp_set() conversion, because
+> | suddenly it is a prerequisite for any further progress to be done.
+> | You can't convert SIOCSHWTSTAMP to netlink if there are some driver
+> | implementations which still use ndo_eth_ioctl(). They need to be
+> | UAPI-agnostic.
+>=20
+> https://lore.kernel.org/netdev/20231122140850.li2mvf6tpo3f2fhh@skbuf/
+>=20
+> I'm not sure what was your agreement with the netdev maintainer
+> accepting the tsconfig netlink work with unconverted device drivers left
+> in the tree.
+
+I did like 21th versions and there was not many people active in the review=
+s.
+No one stand against this work.
+
+> > IMO the solution is to add a check on the ifr value in the
+> > generic_hwtstamp_set/get_lower functions like that:
+> >=20
+> > int generic_hwtstamp_set_lower(struct net_device *dev,
+> > 			       struct kernel_hwtstamp_config *kernel_cfg,
+> > 			       struct netlink_ext_ack *extack)
+> > {
+> > ...
+> >=20
+> > 	/* Netlink path with unconverted lower driver */
+> > 	if (!kernel_cfg->ifr)
+> > 		return -EOPNOTSUPP;
+> >=20
+> > 	/* Legacy path: unconverted lower driver */
+> > 	return generic_hwtstamp_ioctl_lower(dev, SIOCSHWTSTAMP, kernel_cfg);
+> > } =20
+>=20
+> This plugs one hole (two including _get). How many more are there? If
+> this is an oversight, the entire tree needs to be reviewed for
+> ndo_hwtstamp_get() / ndo_hwtstamp_test() pointer tests which were used
+> as an indication that this net device is netlink ready. Stacked
+> virtual interfaces are netlink-ready only when the entire chain down to
+> the physical interface is netlink-ready.
+
+I don't see this as a hole. The legacy ioctl path still works.
+If people want to use the new Netlink path on their board, yes they need to
+convert all the parts of the chain to hwtstamp NDOs. If they don't they will
+get now a EOPNOTSUPP error instead of a null pointer dereference koops.
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
