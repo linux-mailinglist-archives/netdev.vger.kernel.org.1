@@ -1,389 +1,107 @@
-Return-Path: <netdev+bounces-234076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4572C1C469
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 17:55:15 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80CC5C1C53F
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 18:03:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B90D91887A91
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 16:50:01 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D0FF14F18AC
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 16:58:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D3322D24B4;
-	Wed, 29 Oct 2025 16:49:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4F45314A8F;
+	Wed, 29 Oct 2025 16:58:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EKwlFX0U"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mPRjma+G"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9F5B176FB1;
-	Wed, 29 Oct 2025 16:49:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5EA6170A11;
+	Wed, 29 Oct 2025 16:58:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761756572; cv=none; b=NCndAbGp2HBtAbX4tYH5c+v+ajg1bEijTfYbwPbU/y2JT8E/YHmz8u84HS9Jp8njbjE0opBSU7+V3qrpmAnK77n1A4XZwvHSTK8Pr+AhlNPRHi8XmdmCFPtKpS3C8kuaq8gxfczc7WmxLR1TouWq2qbm1Aj90enjnm1jnK/OcjE=
+	t=1761757090; cv=none; b=NPPUNuW7yGl3p4lpc3v262qyK0WPWXmD+apsxlOR3KQpZKqzPiS3fNW8D0qTIsL+tFJgYH/FxZfUztj3R/qBtkk/G/L+O6fpyBYumLPSUJf8Yn5pvNEOYHAxH7+SjE3GobzUZSfk7xSWsIPvXJIwS8RTGTV1GdnFzsJ6MRPLfUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761756572; c=relaxed/simple;
-	bh=rhYRhUuBSlENWAjKgfd7BGOH0Spbe/wg1aHymUGStUI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=n12z4J32THFIiuXFp09etIpUue0iZQgsF8t/P2iw6xoX2Ep8QtjDBYUmRfxbZZWv6KvjtsHPKzfS2vSdByKT++57xb3J1sNMUbU/soXCyucX6OEhsCPxr99uZfvPIVS2embYlbnsWk++Sikj5M0CbGV2hET3UecDUHIeLHxwCc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EKwlFX0U; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2A9DC4CEF7;
-	Wed, 29 Oct 2025 16:49:31 +0000 (UTC)
+	s=arc-20240116; t=1761757090; c=relaxed/simple;
+	bh=TWRhxQ6lLOpfdDuv/vN7QnMJztCMDUTiyAp9KaEX3MU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=k+KNxlbgE8BvlbjBIdEG5A0IOP3wsCoTUm3dmv6DnyoKii3ZV6L0fZO+LCtMh54ZGBoYs8ipqkFpvbPkldEhBZVXPJylkU31PSLVOE7eyb1xlFuvJ4AfXHS9Lsp/qZ3yW892IiGFmwgCmVbbsCD0fftRpN7YM4JaG4f2TY+lOiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mPRjma+G; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FFCCC4CEF7;
+	Wed, 29 Oct 2025 16:58:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761756572;
-	bh=rhYRhUuBSlENWAjKgfd7BGOH0Spbe/wg1aHymUGStUI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=EKwlFX0UnTghSaNOJ1dI4HCZhr3cL/96joGsABUYMnIwFdtjD1bVmnyYiNtNM/V7X
-	 fvrnFp+MVCGnful8aKg9j8S0y+9q1WhZ6IDrrPZI6Wdcmo05xiN3mTy8UfM65mObi7
-	 s2E0TMKbK2s5h+GVjB4pGxAiBV16zSuPCMl5WuB7u4S0/jCWYJnC9+dKyuWxnwsZQ/
-	 e70aCSkggdx/zMBLamNd78ujmc7OcAKe3ZlLRYAEHY3xsB538k2J9FIw7sRyjGsMMy
-	 xWL1ttlyi42sJ2KcQJIPxxPybC6ZmUGhQo5GQmWmAgDg32zUnMzt3BgCdp5Cnhe9/c
-	 kIfuy3qyCfncA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	andrew@lunn.ch,
-	shuah@kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next v3] selftests: drv-net: replace the nsim ring test with a drv-net one
-Date: Wed, 29 Oct 2025 09:49:30 -0700
-Message-ID: <20251029164930.2923448-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.51.0
+	s=k20201202; t=1761757089;
+	bh=TWRhxQ6lLOpfdDuv/vN7QnMJztCMDUTiyAp9KaEX3MU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mPRjma+GbaSR8xxoPG4M5GtfQYWCs9dVLJIGyaSTpNLs6caBPK/BOLahoKjgzrXP9
+	 rSO44cmdo+YORxkEk8ynAp9OnBsxnRTH4RLvK8bwvpr9pZVyfIU0VnHSZFkSNLXlms
+	 0lM/2smK3AtJhaBAR6+DbKNvn1NBqGPvR64LwdkUZMEZJlv0TjezC4vuRappIJhnPf
+	 Z1SkG2jerGOlckV3zGLVD5Cy6tSwdM7M91RsgCsoghKkFIF/M5oMB+XzcbWACbceXp
+	 /MKFl1L6TyRKjbwbmGno/Kf81wyPAnZwzz0QVOIbOj9XjL/u9cJXaM1jJXCNEQ0PpW
+	 nzClTroBsH2Ew==
+Date: Wed, 29 Oct 2025 16:58:05 +0000
+From: Simon Horman <horms@kernel.org>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next 03/12] selftests/vsock: reuse logic for
+ vsock_test through wrapper functions
+Message-ID: <aQJHnfsWll7Di-V0@horms.kernel.org>
+References: <20251022-vsock-selftests-fixes-and-improvements-v1-0-edeb179d6463@meta.com>
+ <20251022-vsock-selftests-fixes-and-improvements-v1-3-edeb179d6463@meta.com>
+ <aP-kmqhvo4AFv1qm@horms.kernel.org>
+ <aP+zgF7zF9T3ovuS@devvm11784.nha0.facebook.com>
+ <aP/DQLcX9uaY6kXN@devvm11784.nha0.facebook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aP/DQLcX9uaY6kXN@devvm11784.nha0.facebook.com>
 
-We are trying to move away from netdevsim-only tests and towards
-tests which can be run both against netdevsim and real drivers.
+On Mon, Oct 27, 2025 at 12:08:48PM -0700, Bobby Eshleman wrote:
+> On Mon, Oct 27, 2025 at 11:01:36AM -0700, Bobby Eshleman wrote:
+> > On Mon, Oct 27, 2025 at 04:58:02PM +0000, Simon Horman wrote:
+> > > On Wed, Oct 22, 2025 at 06:00:07PM -0700, Bobby Eshleman wrote:
+> > > > From: Bobby Eshleman <bobbyeshleman@meta.com>
+> > > > 
+> > > > Add wrapper functions vm_vsock_test() and host_vsock_test() to invoke
+> > > > the vsock_test binary. This encapsulates several items of repeat logic,
+> > > > such as waiting for the server to reach listening state and
+> > > > enabling/disabling the bash option pipefail to avoid pipe-style logging
+> > > > from hiding failures.
+> > > > 
+> > > > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+> > > 
+> > > shellcheck has some (new) things to say about this patch too.
+> > > Could you take a look over them?
+> > > 
+> > > ...
+> > 
+> 
+> It looks like the errors are SC2317 and SC2119, but are false-positives.
+> Invoking a program as a variable (e.g., "${VSOCK_TEST}") is tripping
+> SC2317 (command unreachable), and SC2119 is due to log_{guest,host}()
+> being passed zero arguments (logging its stdin instead).
 
-Replace the simple bash script we have for checking ethtool -g/-G
-on netdevsim with a Python test tweaking those params as well
-as channel count.
+Sorry about that, I thought I saw something meaningful in there.
+I guess I was mistaken.
 
-The new test is not exactly equivalent to the netdevsim one,
-but real drivers don't often support random ring sizes,
-let alone modifying max values via debugfs.
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-v3:
- - let ring sizes fall all the way down to 0
-v2: https://lore.kernel.org/20251027192131.2053792-1-kuba@kernel.org
- - add the new test to Makefile and remove the old one
-   turns out NIPA checking for Makefile presence was busted
-v1: https://lore.kernel.org/20251024215552.1249838-1-kuba@kernel.org
-
-CC: andrew@lunn.ch
-CC: shuah@kernel.org
-CC: linux-kselftest@vger.kernel.org
----
- tools/testing/selftests/drivers/net/Makefile  |   1 +
- .../selftests/drivers/net/netdevsim/Makefile  |   1 -
- .../drivers/net/netdevsim/ethtool-ring.sh     |  85 ---------
- .../selftests/drivers/net/ring_reconfig.py    | 167 ++++++++++++++++++
- 4 files changed, 168 insertions(+), 86 deletions(-)
- delete mode 100755 tools/testing/selftests/drivers/net/netdevsim/ethtool-ring.sh
- create mode 100755 tools/testing/selftests/drivers/net/ring_reconfig.py
-
-diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
-index 6e41635bd55a..68e0bb603a9d 100644
---- a/tools/testing/selftests/drivers/net/Makefile
-+++ b/tools/testing/selftests/drivers/net/Makefile
-@@ -22,6 +22,7 @@ TEST_PROGS := \
- 	ping.py \
- 	psp.py \
- 	queues.py \
-+	ring_reconfig.py \
- 	shaper.py \
- 	stats.py \
- 	xdp.py \
-diff --git a/tools/testing/selftests/drivers/net/netdevsim/Makefile b/tools/testing/selftests/drivers/net/netdevsim/Makefile
-index daf51113c827..833abd8e6fdc 100644
---- a/tools/testing/selftests/drivers/net/netdevsim/Makefile
-+++ b/tools/testing/selftests/drivers/net/netdevsim/Makefile
-@@ -8,7 +8,6 @@ TEST_PROGS := \
- 	ethtool-features.sh \
- 	ethtool-fec.sh \
- 	ethtool-pause.sh \
--	ethtool-ring.sh \
- 	fib.sh \
- 	fib_notifications.sh \
- 	hw_stats_l3.sh \
-diff --git a/tools/testing/selftests/drivers/net/netdevsim/ethtool-ring.sh b/tools/testing/selftests/drivers/net/netdevsim/ethtool-ring.sh
-deleted file mode 100755
-index c969559ffa7a..000000000000
---- a/tools/testing/selftests/drivers/net/netdevsim/ethtool-ring.sh
-+++ /dev/null
-@@ -1,85 +0,0 @@
--#!/bin/bash
--# SPDX-License-Identifier: GPL-2.0-only
--
--source ethtool-common.sh
--
--function get_value {
--    local query="${SETTINGS_MAP[$1]}"
--
--    echo $(ethtool -g $NSIM_NETDEV | \
--        tail -n +$CURR_SETT_LINE | \
--        awk -F':' -v pattern="$query:" '$0 ~ pattern {gsub(/[\t ]/, "", $2); print $2}')
--}
--
--function update_current_settings {
--    for key in ${!SETTINGS_MAP[@]}; do
--        CURRENT_SETTINGS[$key]=$(get_value $key)
--    done
--    echo ${CURRENT_SETTINGS[@]}
--}
--
--if ! ethtool -h | grep -q set-ring >/dev/null; then
--    echo "SKIP: No --set-ring support in ethtool"
--    exit 4
--fi
--
--NSIM_NETDEV=$(make_netdev)
--
--set -o pipefail
--
--declare -A SETTINGS_MAP=(
--    ["rx"]="RX"
--    ["rx-mini"]="RX Mini"
--    ["rx-jumbo"]="RX Jumbo"
--    ["tx"]="TX"
--)
--
--declare -A EXPECTED_SETTINGS=(
--    ["rx"]=""
--    ["rx-mini"]=""
--    ["rx-jumbo"]=""
--    ["tx"]=""
--)
--
--declare -A CURRENT_SETTINGS=(
--    ["rx"]=""
--    ["rx-mini"]=""
--    ["rx-jumbo"]=""
--    ["tx"]=""
--)
--
--MAX_VALUE=$((RANDOM % $((2**32-1))))
--RING_MAX_LIST=$(ls $NSIM_DEV_DFS/ethtool/ring/)
--
--for ring_max_entry in $RING_MAX_LIST; do
--    echo $MAX_VALUE > $NSIM_DEV_DFS/ethtool/ring/$ring_max_entry
--done
--
--CURR_SETT_LINE=$(ethtool -g $NSIM_NETDEV | grep -i -m1 -n 'Current hardware settings' | cut -f1 -d:)
--
--# populate the expected settings map
--for key in ${!SETTINGS_MAP[@]}; do
--    EXPECTED_SETTINGS[$key]=$(get_value $key)
--done
--
--# test
--for key in ${!SETTINGS_MAP[@]}; do
--    value=$((RANDOM % $MAX_VALUE))
--
--    ethtool -G $NSIM_NETDEV "$key" "$value"
--
--    EXPECTED_SETTINGS[$key]="$value"
--    expected=${EXPECTED_SETTINGS[@]}
--    current=$(update_current_settings)
--
--    check $? "$current" "$expected"
--    set +x
--done
--
--if [ $num_errors -eq 0 ]; then
--    echo "PASSED all $((num_passes)) checks"
--    exit 0
--else
--    echo "FAILED $num_errors/$((num_errors+num_passes)) checks"
--    exit 1
--fi
-diff --git a/tools/testing/selftests/drivers/net/ring_reconfig.py b/tools/testing/selftests/drivers/net/ring_reconfig.py
-new file mode 100755
-index 000000000000..f9530a8b0856
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/ring_reconfig.py
-@@ -0,0 +1,167 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+"""
-+Test channel and ring size configuration via ethtool (-L / -G).
-+"""
-+
-+from lib.py import ksft_run, ksft_exit, ksft_pr
-+from lib.py import ksft_eq
-+from lib.py import NetDrvEpEnv, EthtoolFamily, GenerateTraffic
-+from lib.py import defer, NlError
-+
-+
-+def channels(cfg) -> None:
-+    """
-+    Twiddle channel counts in various combinations of parameters.
-+    We're only looking for driver adhering to the requested config
-+    if the config is accepted and crashes.
-+    """
-+    ehdr = {'header':{'dev-index': cfg.ifindex}}
-+    chans = cfg.eth.channels_get(ehdr)
-+
-+    all_keys = ["rx", "tx", "combined"]
-+    mixes = [{"combined"}, {"rx", "tx"}, {"rx", "combined"}, {"tx", "combined"},
-+             {"rx", "tx", "combined"},]
-+
-+    # Get the set of keys that device actually supports
-+    restore = {}
-+    supported = set()
-+    for key in all_keys:
-+        if key + "-max" in chans:
-+            supported.add(key)
-+            restore |= {key + "-count": chans[key + "-count"]}
-+
-+    defer(cfg.eth.channels_set, ehdr | restore)
-+
-+    def test_config(config):
-+        try:
-+            cfg.eth.channels_set(ehdr | config)
-+            get = cfg.eth.channels_get(ehdr)
-+            for k, v in config.items():
-+                ksft_eq(get.get(k, 0), v)
-+        except NlError as e:
-+            failed.append(mix)
-+            ksft_pr("Can't set", config, e)
-+        else:
-+            ksft_pr("Okay", config)
-+
-+    failed = []
-+    for mix in mixes:
-+        if not mix.issubset(supported):
-+            continue
-+
-+        # Set all the values in the mix to 1, other supported to 0
-+        config = {}
-+        for key in all_keys:
-+            config[key + "-count"] = 1 if key in mix else 0
-+        test_config(config)
-+
-+    for mix in mixes:
-+        if not mix.issubset(supported):
-+            continue
-+        if mix in failed:
-+            continue
-+
-+        # Set all the values in the mix to max, other supported to 0
-+        config = {}
-+        for key in all_keys:
-+            config[key + "-count"] = chans[key + '-max'] if key in mix else 0
-+        test_config(config)
-+
-+
-+def _configure_min_ring_cnt(cfg) -> None:
-+    """ Try to configure a single Rx/Tx ring. """
-+    ehdr = {'header':{'dev-index': cfg.ifindex}}
-+    chans = cfg.eth.channels_get(ehdr)
-+
-+    all_keys = ["rx-count", "tx-count", "combined-count"]
-+    restore = {}
-+    config = {}
-+    for key in all_keys:
-+        if key in chans:
-+            restore[key] = chans[key]
-+            config[key] = 0
-+
-+    if chans.get('combined-count', 0) > 1:
-+        config['combined-count'] = 1
-+    elif chans.get('rx-count', 0) > 1 and chans.get('tx-count', 0) > 1:
-+        config['tx-count'] = 1
-+        config['rx-count'] = 1
-+    else:
-+        # looks like we're already on 1 channel
-+        return
-+
-+    cfg.eth.channels_set(ehdr | config)
-+    defer(cfg.eth.channels_set, ehdr | restore)
-+
-+
-+def ringparam(cfg) -> None:
-+    """
-+    Tweak the ringparam configuration. Try to run some traffic over min
-+    ring size to make sure it actually functions.
-+    """
-+    ehdr = {'header':{'dev-index': cfg.ifindex}}
-+    rings = cfg.eth.rings_get(ehdr)
-+
-+    restore = {}
-+    maxes = {}
-+    params = set()
-+    for key in rings.keys():
-+        if 'max' in key:
-+            param = key[:-4]
-+            maxes[param] = rings[key]
-+            params.add(param)
-+            restore[param] = rings[param]
-+
-+    defer(cfg.eth.rings_set, ehdr | restore)
-+
-+    # Speed up the reconfig by configuring just one ring
-+    _configure_min_ring_cnt(cfg)
-+
-+    # Try to reach min on all settings
-+    for param in params:
-+        val = rings[param]
-+        while True:
-+            try:
-+                cfg.eth.rings_set({'header':{'dev-index': cfg.ifindex},
-+                                   param: val // 2})
-+                if val == 0:
-+                    break
-+                val //= 2
-+            except NlError:
-+                break
-+
-+        get = cfg.eth.rings_get(ehdr)
-+        ksft_eq(get[param], val)
-+
-+        ksft_pr(f"Reached min for '{param}' at {val} (max {rings[param]})")
-+
-+    GenerateTraffic(cfg).wait_pkts_and_stop(10000)
-+
-+    # Try max across all params, if the driver supports large rings
-+    # this may OOM so we ignore errors
-+    try:
-+        ksft_pr("Applying max settings")
-+        config = {p: maxes[p] for p in params}
-+        cfg.eth.rings_set(ehdr | config)
-+    except NlError as e:
-+        ksft_pr("Can't set max params", config, e)
-+    else:
-+        GenerateTraffic(cfg).wait_pkts_and_stop(10000)
-+
-+
-+def main() -> None:
-+    """ Ksft boiler plate main """
-+
-+    with NetDrvEpEnv(__file__) as cfg:
-+        cfg.eth = EthtoolFamily()
-+
-+        ksft_run([channels,
-+                  ringparam],
-+                 args=(cfg, ))
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
--- 
-2.51.0
-
+> 
+> I also see that SC2317 has many other false positives elsewhere in the
+> file (80+), reporting even lines like `rm "${QEMU_PIDFILE}"` as
+> unreachable. I wonder if we should add a patch to this series to disable
+> this check at the file-level?
+> 
+> Best,
+> Bobby
+> 
 
