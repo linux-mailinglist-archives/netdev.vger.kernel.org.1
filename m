@@ -1,627 +1,139 @@
-Return-Path: <netdev+bounces-233845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B34EC19232
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 09:44:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4783C191A4
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 09:39:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE95F3B8373
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 08:30:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33E651C61B47
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 08:33:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 162C631C58E;
-	Wed, 29 Oct 2025 08:23:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4620330B15;
+	Wed, 29 Oct 2025 08:26:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LD18+JxD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jKK4/puC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3E0631BCAC
-	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 08:23:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 130FB31076D
+	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 08:26:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761726199; cv=none; b=nNPRYhOfppF4uwOpmi7JmmdnpsacYX0AUxZppw0psbThjMw+fCf4Cv9jSk1ZB4hpsl5n3BYlr++wZ+rwf692Mw00VAdivNftBESa2YUnS4Y+1zWalHJqt+iZusuwTTr3+4ZBrJAScmDQ2QDiefQXBweOcwgRx71VcPA5h6TK7xk=
+	t=1761726393; cv=none; b=LgHlZz5rKk+96aPTk3MKd4SmU4sVaGFz+/Y6O/+29RUxKjlUA5KgmzRa4U6APaconwLYZ6GIOOMQRqcmMrEK+uA1MCCQ7PK9MK6XZX4UhiGJhNMbPrvM8s1R1RKaECi2PUcN9U6hAV5oaK9pK4YQ04G7T+zYmzBghjy/kIVuyVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761726199; c=relaxed/simple;
-	bh=BudCRENGljleU4jw/J30tPJ8Ha/lVoPujgu+8unYncA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JS7Snxo615zpwS6/tDSs5r6jxW0PBtj8xut8fI+gfwdj8M7yVnWcxd6KYc1KdmdS1d1YOg+W0GuYgbJLMHgEnCd/WE2hAWQgO1cdAHcJxaZHxtgMAehytXmRDpgcKV2sp8OIcG8VvCT8/GEd3CmPLUV/7ke3HzLBUtRtS4zR9kE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LD18+JxD; arc=none smtp.client-ip=209.85.214.171
+	s=arc-20240116; t=1761726393; c=relaxed/simple;
+	bh=TSdqCvWTW91ah16HH+aiKsyB97s9GEE5xmypLgw9rrA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HQeSRl14yy7KUiiUNMp/dIphsnjYGV6slMYvaxx8JjkIOuKLJMVa49Oc5aUobfHX2q9mETBvuceKuCDPowlstX/5hSbnrrc6eutrZ/CoYuQhq0ysX58yCGs2ojKhZsOIgrGh/ul7IXQ7N0nvykFGs9AJI1Qo84+lobvvPPGvfCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jKK4/puC; arc=none smtp.client-ip=209.85.216.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-290a3a4c7ecso79037585ad.0
-        for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 01:23:16 -0700 (PDT)
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-32ec291a325so5411700a91.1
+        for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 01:26:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761726196; x=1762330996; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0wTAuzeBtDgOSqyXzQwljRZm7ZgqX8CCjhJgVNNXB70=;
-        b=LD18+JxDgRS88iTVUUoYj2fuKa8YW3mSXs0shi8e+3wd1kH4s27FGnH86g2a5yfwr5
-         5faIrlU0MI05OlZSJaw5OkTPChUQd3kztvWqa/L9HldwO8QdkV+FhqWTKIZVgV/axhgl
-         DOEP3ovgrQeJjJeO595FUPZWGe+8KKMKeTaCaACLT8FUwkyR5ejj6+iHg8Hx7uvc83WU
-         eqZ+/nP6bdv/pmLCoz4XWxvrrUMjXTpnqSbuoc3R7ScaKWfetrqzSdJb1xJIxITW4zsK
-         kObLFUgZEd4PPZtnwIyCeJuxSjQZxkND/w3saD2cob8YM7yRyyXVglJYujOsFopAnfim
-         QPfA==
+        d=gmail.com; s=20230601; t=1761726391; x=1762331191; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=sudBY2RiWFsiu5y15PJlszzmNRDJVFNp8bjRqr+zwxs=;
+        b=jKK4/puCGBcAevsO/FfE0HT3f4VP5VycYg7IUUROfPmdQ2UBUAw+7Fn7AV7KscVsiN
+         3z9WhrOb6HeXbzktvrLtOqHqsyTyAISDQ7z3OZsgkZPTFryGou5JpSpNCPbtxk5vHKEr
+         J6k6CjlptgZZjvQCwzS48W6mgMesGMXRMzfAvGz4vQ2xHFcceUg9gOOElzJ4tUahgAOO
+         xxBm9LPwU+3y+hS6zkNmW92pMkHhHbmefC/0RvqX43GQBiKIWf72BhPeuXJysbLTjVHW
+         +ysKiroV/xUROCHm+r/wUBT0BgQXTnEBacMpdgDB8X5l4H9g+rQV3ZL5LbWpxDIjVnuf
+         6dfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761726196; x=1762330996;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0wTAuzeBtDgOSqyXzQwljRZm7ZgqX8CCjhJgVNNXB70=;
-        b=lfwJHVMJmEWXPwh4bgNP81XetEnk5bWLqQ0FIYwZ4h5Crkd1bKAzWTtBUOBzUj//Bu
-         L2uwUmyOlmiemz4JVMUhb42dUWDU44g7OrPtkQOpkv9Qz4syhVsS13UYRdRMI7BRMx1h
-         mekhnuGfl2FLKn2q3vhWBfxBnGZibp/al3iCslTiU00kHmfBChPpg2JcMi2FqAia1sYN
-         XiHlyjrziRhYB0XG2jrrgfNMbpf9fJRotxCq9rV19XbmGsdr3mAx+1c6uQLYc1CdqZYR
-         ADwtxtHgmRXQ4b7YRYR3FTTxQAKqLVOfSht3fUiQMz7vz2mqXrKhQqS/Yk4X4XBekfyc
-         RySg==
-X-Gm-Message-State: AOJu0Yz03lmzcYqqb9Dz13L1tGXxjP73apOXQAOdM2jv31ALPNKtvCf2
-	i3Sbd68nsEYevrOauGzgzmQyoKgAbQnYILGs55FKDVPlxiupoEhzjytj9TN+qBf9Stc=
-X-Gm-Gg: ASbGnctUBaejesJET0ymBUEr19cU5BNokWJsWO6DGYQ3MlxI0L/VWovmjOXAeR8rdgS
-	4VyLoFVBiS0Z987sGwvGJdyjWVXX4P9UiK7AoUlOtmqzwL6eRZ7/Ib6xfswtRsT6oapd51j42vy
-	yGaC+fJSwXoWoUuOmvPXKFoReWKbyIo4Az5ZDknELLxpB0iTFKDM/X9Xkk9rOS1a9Q02kdZKwET
-	GllHsffKlUzS7jJ54nwvZ3YkKuwxP479ec0/yAWVKY3QAnbr7l44Z2+ZXc4sXmnnDFS0ACyR0q1
-	ggzZKeUq9OIuun7HcFKoKRWYs7fP46VWCQLlk9NQQ0tdD6ZeGQEer87nnUqWCRP5gQJX0e4uc1B
-	Wog/yr2paklUlJfREGgMdkULRFRGWwz1ntn89cai3VTWwupZO9sDJixbpIESzfrePCr5eh0k6CQ
-	CCK+9Dk8fYA0HI9wM=
-X-Google-Smtp-Source: AGHT+IHX7B4va/Tn+hwi/F8PQGoRX19Do39HGb6b6T9yWfBdT5kdTctQvLTbMEwxXgCZunDQ1Res5A==
-X-Received: by 2002:a17:902:ceca:b0:264:a34c:c6d with SMTP id d9443c01a7336-294def2e7aemr24942695ad.37.1761726195946;
-        Wed, 29 Oct 2025 01:23:15 -0700 (PDT)
-Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29498d09958sm141906005ad.24.2025.10.29.01.23.09
+        d=1e100.net; s=20230601; t=1761726391; x=1762331191;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sudBY2RiWFsiu5y15PJlszzmNRDJVFNp8bjRqr+zwxs=;
+        b=lwEBxEbxuJ5rSY04J9LAA+CODfceF0f89LGYsHd3P9Q9VLw+Cb70qm5ATp5vp7XQaf
+         fnVsh9dStMiKbpEW1zsbRrEig+gYeKPts1vlSuDuDqzrHyDT8cyk5dUvBSYMh6rrctWd
+         EFZvV36O5rgByrceu+cmVnHeBl4mBaUFmM8E2XRu4HYVLb2HzY8wnAEGOz7FfKCUrJmC
+         M/BCFuyeTXOf+pmLzAYWxPsVsku+gGk+MBlQLxb6JHnxUkfZb94YagnogYz6nuTmM2oU
+         5UKIM/n6DfHYv7WpEt2v1vTfsXeo5Jav5A/hliTjxKcuUrgj8Ag7DDe4YU0wnkDzo/pI
+         dncQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVex6tG+hEkcW2gdqrLjnn2JTPlh5XwTCtCrr68bLc2cUNWm3d20t9oUf7HUcyu7lehz9KCXgg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwpiLihIogIFwDDISOmGu0zC4faH2AdynnjOjppUrlVAhHAAarT
+	24m/OhgqVtS3VxbSnR3U6ue5vsP8Pg+paUjkKOp2OD5lohYItYN85Crz
+X-Gm-Gg: ASbGncuWFillGutRwYvtd+7eRriWwRE8QU0/SIGf9881joV/xBjvXcBVauR89vKRR0x
+	xubEU4CXD1mtXpMUu/53L7lJIgTy43B3YY2rosqwp0t1toDFxz6H2Gt0nE+u0rl38/qJqNu8UGI
+	XnqwL5bYHW3szt3W3CdK5Sr5K+fy3ptW9dIzotfKapdtKFf9D7AdWIham5/+S/VcdqUd4uFGQGa
+	3g3cgLJ9y+LfYSGgGPGKl/Phka8WeymOPMOxv6l3P/3mor+TSrXRwJ5CbucgOPz+DqAleCbJpQb
+	XadwbjB37C/yMW+J6tMsAbbCYb1F21un30ASLEQEjMI6DnJp4B5kDPickrGb6etAiTNOOFl3ewf
+	KqS8dOYm3Fiv3zQpAYyiFhmnLRSuZIQ9vpqlHAcNtg1+Hn0wyPh1Kx5ZL2r0mu+z7/24/Iq/UgQ
+	4AgKO30KuOcDg=
+X-Google-Smtp-Source: AGHT+IF0PkWaskgERMPwSh5sbmy7XRCCr5pEGKg0NaEs3tSvnGcQ3TbjA8agGFwfJCYIZIsLOPwfEA==
+X-Received: by 2002:a17:90a:d64d:b0:32e:5d87:8abc with SMTP id 98e67ed59e1d1-3403a302f52mr2369411a91.36.1761726391321;
+        Wed, 29 Oct 2025 01:26:31 -0700 (PDT)
+Received: from archie.me ([210.87.74.117])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b7ffeab2617sm7527888a12.33.2025.10.29.01.26.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Oct 2025 01:23:15 -0700 (PDT)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Donald Hunter <donald.hunter@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
+        Wed, 29 Oct 2025 01:26:29 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id 25E284206925; Wed, 29 Oct 2025 15:26:19 +0700 (WIB)
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux Networking <netdev@vger.kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	Jan Stancek <jstancek@redhat.com>,
-	"Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
-	=?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Shuah Khan <shuah@kernel.org>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Guillaume Nault <gnault@redhat.com>,
-	Petr Machata <petrm@nvidia.com>,
-	linux-kselftest@vger.kernel.org,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCH net-next 3/3] selftests: net: add YNL test framework
-Date: Wed, 29 Oct 2025 08:22:45 +0000
-Message-ID: <20251029082245.128675-4-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20251029082245.128675-1-liuhangbin@gmail.com>
-References: <20251029082245.128675-1-liuhangbin@gmail.com>
+	Jonathan Corbet <corbet@lwn.net>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Bagas Sanjaya <bagasdotme@gmail.com>
+Subject: [PATCH net-next 0/6] xfrm docs update
+Date: Wed, 29 Oct 2025 15:26:08 +0700
+Message-ID: <20251029082615.39518-1-bagasdotme@gmail.com>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1475; i=bagasdotme@gmail.com; h=from:subject; bh=TSdqCvWTW91ah16HH+aiKsyB97s9GEE5xmypLgw9rrA=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDJmM55X/B/rYqRzZO2+edHLWY6YF3021jkR9WHFo19FO1 2dhfDFrO0pZGMS4GGTFFFkmJfI1nd5lJHKhfa0jzBxWJpAhDFycAjARoasM/4OYtr5i+J2+WGLi LYXFcuonAyakn3n9Uyu8Ztd+nlkrXq5g+O/kFL9ot/tLZ11fg6ztygIVNqHyF20yvi+vXcCZnjB 1PiMA
+X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
 Content-Transfer-Encoding: 8bit
 
-Add a test framework for YAML Netlink (YNL) tools, covering both CLI and
-ethtool functionality. The framework includes:
+Hi,
 
-1) cli: family listing, netdev, ethtool, rt-* families, and nlctrl
-   operations
-2) ethtool: device info, statistics, ring/coalesce/pause parameters, and
-   feature gettings
+Here are xfrm documentation patches. Patches [1-4/6] are formatting polishing;
+[5/6] groups the docs and [6/6] adds MAINTAINERS entries for them.
 
-The current YNL syntax is a bit obscure, and end users may not always know
-how to use it. This test framework provides usage examples and also serves
-as a regression test to catch potential breakages caused by future changes.
+Enjoy!
 
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
- tools/testing/selftests/Makefile           |   1 +
- tools/testing/selftests/net/ynl/Makefile   |  18 ++
- tools/testing/selftests/net/ynl/cli.sh     | 234 +++++++++++++++++++++
- tools/testing/selftests/net/ynl/config     |   6 +
- tools/testing/selftests/net/ynl/ethtool.sh | 188 +++++++++++++++++
- tools/testing/selftests/net/ynl/settings   |   1 +
- 6 files changed, 448 insertions(+)
- create mode 100644 tools/testing/selftests/net/ynl/Makefile
- create mode 100755 tools/testing/selftests/net/ynl/cli.sh
- create mode 100644 tools/testing/selftests/net/ynl/config
- create mode 100755 tools/testing/selftests/net/ynl/ethtool.sh
- create mode 100644 tools/testing/selftests/net/ynl/settings
+Bagas Sanjaya (6):
+  Documentation: xfrm_device: Wrap iproute2 snippets in literal code
+    block
+  Documentation: xfrm_device: Use numbered list for offloading steps
+  Documentation: xfrm_device: Separate hardware offload sublists
+  Documentation: xfrm_sync: Properly reindent list text
+  net: Move XFRM documentation into its own subdirectory
+  MAINTAINERS: Add entry for XFRM documentation
 
-diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
-index c46ebdb9b8ef..3335a8dc7cff 100644
---- a/tools/testing/selftests/Makefile
-+++ b/tools/testing/selftests/Makefile
-@@ -78,6 +78,7 @@ TARGETS += net/ovpn
- TARGETS += net/packetdrill
- TARGETS += net/rds
- TARGETS += net/tcp_ao
-+TARGETS += net/ynl
- TARGETS += nolibc
- TARGETS += nsfs
- TARGETS += pci_endpoint
-diff --git a/tools/testing/selftests/net/ynl/Makefile b/tools/testing/selftests/net/ynl/Makefile
-new file mode 100644
-index 000000000000..0144c47b69ab
---- /dev/null
-+++ b/tools/testing/selftests/net/ynl/Makefile
-@@ -0,0 +1,18 @@
-+# SPDX-License-Identifier: GPL-2.0
-+# Makefile for YNL tests
-+
-+TEST_PROGS := \
-+	cli.sh \
-+	ethtool.sh \
-+# end of TEST_PROGS
-+
-+TEST_FILES := \
-+	settings \
-+# end of TEST_FILES
-+
-+TEST_INCLUDES := \
-+	$(wildcard ../lib/sh/*.sh) \
-+	../lib.sh \
-+# end of TEST_INCLUDES
-+
-+include ../../lib.mk
-diff --git a/tools/testing/selftests/net/ynl/cli.sh b/tools/testing/selftests/net/ynl/cli.sh
-new file mode 100755
-index 000000000000..ecc2e349c4e6
---- /dev/null
-+++ b/tools/testing/selftests/net/ynl/cli.sh
-@@ -0,0 +1,234 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+# Test YNL CLI functionality
-+
-+# shellcheck disable=SC1091,SC2034,SC2154,SC2317
-+source ../lib.sh
-+
-+readonly NSIM_ID="1338"
-+readonly NSIM_DEV_NAME="nsim${NSIM_ID}"
-+readonly VETH_A="veth_a"
-+readonly VETH_B="veth_b"
-+
-+ALL_TESTS="
-+	cli_list_families
-+	cli_netdev_ops
-+	cli_ethtool_ops
-+	cli_rt_ops
-+	cli_nlctrl_ops
-+"
-+
-+# Test listing available families
-+cli_list_families()
-+{
-+	RET=0
-+
-+	ynl --list-families &>/dev/null
-+	check_err $? "failed to list families"
-+
-+	log_test "YNL CLI list families"
-+}
-+
-+# Test netdev family operations (dev-get, queue-get)
-+cli_netdev_ops()
-+{
-+	RET=0
-+
-+	local dev_output
-+	local ifindex
-+	ifindex=$(ip netns exec "$testns" cat /sys/class/net/"$NSIM_DEV_NAME"/ifindex)
-+
-+	dev_output=$(ip netns exec "$testns" ynl --family netdev \
-+		--do dev-get --json "{\"ifindex\": $ifindex}" 2>/dev/null)
-+	check_err $? "failed to get netdev dev info for $NSIM_DEV_NAME"
-+
-+	echo "$dev_output" | grep -q "ifindex"
-+	check_err $? "netdev dev-get output missing ifindex"
-+
-+	ip netns exec "$testns" ynl --family netdev \
-+		--dump queue-get --json "{\"ifindex\": $ifindex}" &>/dev/null
-+	check_err $? "failed to get netdev queue info for $NSIM_DEV_NAME"
-+
-+	log_test "YNL CLI netdev operations"
-+}
-+
-+# Test ethtool family operations (rings-get, linkinfo-get)
-+cli_ethtool_ops()
-+{
-+	RET=0
-+
-+	local rings_output
-+	rings_output=$(ip netns exec "$testns" ynl --family ethtool \
-+		--do rings-get --json "{\"header\": {\"dev-name\": \"$NSIM_DEV_NAME\"}}" 2>/dev/null)
-+	check_err $? "failed to get ethtool rings info for $NSIM_DEV_NAME"
-+
-+	echo "$rings_output" | grep -q "header"
-+	check_err $? "ethtool rings-get output missing header"
-+
-+	local linkinfo_output
-+	linkinfo_output=$(ip netns exec "$testns" ynl --family ethtool \
-+		--do linkinfo-get --json "{\"header\": {\"dev-name\": \"$VETH_A\"}}" 2>/dev/null)
-+	check_err $? "failed to get ethtool linkinfo for $VETH_A"
-+
-+	echo "$linkinfo_output" | grep -q "header"
-+	check_err $? "ethtool linkinfo-get output missing header"
-+
-+	log_test "YNL CLI ethtool operations"
-+}
-+
-+# Test rt-* family operations (route, addr, link, neigh, rule)
-+cli_rt_ops()
-+{
-+	RET=0
-+	if ! ynl --list-families 2>/dev/null | grep -q "rt-"; then
-+		log_test_skip "YNL CLI rt-* operations" "no rt-* families available"
-+		return "$ksft_skip"
-+	fi
-+
-+	local ifindex
-+	ifindex=$(ip netns exec "$testns" cat /sys/class/net/"$NSIM_DEV_NAME"/ifindex)
-+
-+	if ynl --list-families 2>/dev/null | grep -q "rt-route"; then
-+		# Add route: 192.0.2.0/24 dev $dev scope link
-+		ip netns exec "$testns" ynl --family rt-route --do newroute --create \
-+			--json "{\"dst\": \"192.0.2.0\", \"oif\": $ifindex, \"rtm-dst-len\": 24, \"rtm-family\": 2, \"rtm-scope\": 253, \"rtm-type\": 1, \"rtm-protocol\": 3, \"rtm-table\": 254}" &>/dev/null
-+
-+		local route_output
-+		route_output=$(ip netns exec "$testns" ynl --family rt-route \
-+			--dump getroute 2>/dev/null)
-+		check_err $? "failed to get route info"
-+
-+		echo "$route_output" | grep -q "192.0.2.0"
-+		check_err $? "added route 192.0.2.0 not found in route output"
-+
-+		ip netns exec "$testns" ynl --family rt-route --do delroute \
-+			--json "{\"dst\": \"192.0.2.0\", \"oif\": $ifindex, \"rtm-dst-len\": 24, \"rtm-family\": 2, \"rtm-scope\": 253, \"rtm-type\": 1, \"rtm-protocol\": 3, \"rtm-table\": 254}" &>/dev/null
-+	fi
-+
-+	if ynl --list-families 2>/dev/null | grep -q "rt-addr"; then
-+		ip netns exec "$testns" ynl --family rt-addr --do newaddr \
-+			--json "{\"ifa-index\": $ifindex, \"local\": \"192.0.2.100\", \"ifa-prefixlen\": 24, \"ifa-family\": 2}" &>/dev/null
-+
-+		local addr_output
-+		addr_output=$(ip netns exec "$testns" ynl --family rt-addr \
-+			--dump getaddr 2>/dev/null)
-+		check_err $? "failed to get address info"
-+
-+		echo "$addr_output" | grep -q "192.0.2.100"
-+		check_err $? "added address 192.0.2.100 not found in address output"
-+
-+		ip netns exec "$testns" ynl --family rt-addr --do deladdr \
-+			--json "{\"ifa-index\": $ifindex, \"local\": \"192.0.2.100\", \"ifa-prefixlen\": 24, \"ifa-family\": 2}" &>/dev/null
-+	fi
-+
-+	if ynl --list-families 2>/dev/null | grep -q "rt-link"; then
-+		ip netns exec "$testns" ynl --family rt-link --do newlink --create \
-+			--json "{\"ifname\": \"dummy0\", \"linkinfo\": {\"kind\": \"dummy\"}}" &>/dev/null
-+
-+		local link_output
-+		link_output=$(ip netns exec "$testns" ynl --family rt-link \
-+			--dump getlink 2>/dev/null)
-+		check_err $? "failed to get link info"
-+
-+		echo "$link_output" | grep -q "$NSIM_DEV_NAME"
-+		check_err $? "test device not found in link output"
-+
-+		echo "$link_output" | grep -q "dummy0"
-+		check_err $? "created dummy0 interface not found in link output"
-+
-+		ip netns exec "$testns" ynl --family rt-link --do dellink \
-+			--json "{\"ifname\": \"dummy0\"}" &>/dev/null
-+	fi
-+
-+	if ynl --list-families 2>/dev/null | grep -q "rt-neigh"; then
-+		# Add neighbor: 192.0.2.1 dev nsim1338 lladdr 11:22:33:44:55:66 PERMANENT
-+		ip netns exec "$testns" ynl --family rt-neigh --do newneigh --create \
-+			--json "{\"ndm-ifindex\": $ifindex, \"dst\": \"192.0.2.1\", \"lladdr\": \"11:22:33:44:55:66\", \"ndm-family\": 2, \"ndm-state\": 128}" &>/dev/null
-+
-+		local neigh_output
-+		neigh_output=$(ip netns exec "$testns" ynl --family rt-neigh \
-+			--dump getneigh 2>/dev/null)
-+		check_err $? "failed to get neighbor info"
-+
-+		echo "$neigh_output" | grep -q "192.0.2.1"
-+		check_err $? "added neighbor 192.0.2.1 not found in neighbor output"
-+
-+		ip netns exec "$testns" ynl --family rt-neigh --do delneigh \
-+			--json "{\"ndm-ifindex\": $ifindex, \"dst\": \"192.0.2.1\", \"lladdr\": \"11:22:33:44:55:66\", \"ndm-family\": 2}" &>/dev/null
-+	fi
-+
-+	if ynl --list-families 2>/dev/null | grep -q "rt-rule"; then
-+		# Add rule: from 192.0.2.0/24 lookup 100 none
-+		ip netns exec "$testns" ynl --family rt-rule --do newrule \
-+			--json "{\"family\": 2, \"src-len\": 24, \"src\": \"192.0.2.0\", \"table\": 100}" &>/dev/null
-+
-+		local rule_output
-+		rule_output=$(ip netns exec "$testns" ynl --family rt-rule \
-+			--dump getrule 2>/dev/null)
-+		check_err $? "failed to get rule info"
-+
-+		echo "$rule_output" | grep -q "192.0.2.0"
-+		check_err $? "added rule with src 192.0.2.0 not found in rule output"
-+
-+		ip netns exec "$testns" ynl --family rt-rule --do delrule \
-+			--json "{\"family\": 2, \"src-len\": 24, \"src\": \"192.0.2.0\", \"table\": 100}" &>/dev/null
-+	fi
-+
-+	log_test "YNL CLI rt-* operations"
-+}
-+
-+# Test nlctrl family operations
-+cli_nlctrl_ops()
-+{
-+	RET=0
-+
-+	local family_output
-+	family_output=$(ynl --family nlctrl \
-+		--do getfamily --json "{\"family-name\": \"netdev\"}" 2>/dev/null)
-+	check_err $? "failed to get nlctrl family info for netdev"
-+
-+	echo "$family_output" | grep -q "family-name"
-+	check_err $? "nlctrl getfamily output missing family-name"
-+
-+	echo "$family_output" | grep -q "family-id"
-+	check_err $? "nlctrl getfamily output missing family-id"
-+
-+	log_test "YNL CLI nlctrl getfamily"
-+}
-+
-+setup()
-+{
-+	if ! modprobe netdevsim &>/dev/null; then
-+		log_test_skip "all YNL CLI tests" "netdevsim module not available"
-+		exit "$ksft_skip"
-+	fi
-+
-+	setup_ns testns
-+
-+	if ! create_netdevsim "$NSIM_ID" "$testns" &>/dev/null; then
-+		log_test_skip "all YNL CLI tests" "failed to create netdevsim device"
-+		exit "$ksft_skip"
-+	fi
-+
-+	if ! ip -n "$testns" link add "$VETH_A" type veth peer name "$VETH_B"; then
-+		log_test_skip "all YNL CLI tests" "failed to create veth pair"
-+		exit "$ksft_skip"
-+	fi
-+
-+	ip -n "$testns" link set "$VETH_A" up
-+	ip -n "$testns" link set "$VETH_B" up
-+}
-+
-+cleanup()
-+{
-+	cleanup_netdevsim "$NSIM_ID"
-+	cleanup_all_ns
-+}
-+
-+trap cleanup EXIT
-+
-+require_command "ynl"
-+setup
-+tests_run
-+
-+exit "$EXIT_STATUS"
-diff --git a/tools/testing/selftests/net/ynl/config b/tools/testing/selftests/net/ynl/config
-new file mode 100644
-index 000000000000..339f1309c03f
---- /dev/null
-+++ b/tools/testing/selftests/net/ynl/config
-@@ -0,0 +1,6 @@
-+CONFIG_DUMMY=m
-+CONFIG_INET_DIAG=y
-+CONFIG_IPV6=y
-+CONFIG_NET_NS=y
-+CONFIG_NETDEVSIM=m
-+CONFIG_VETH=m
-diff --git a/tools/testing/selftests/net/ynl/ethtool.sh b/tools/testing/selftests/net/ynl/ethtool.sh
-new file mode 100755
-index 000000000000..a70552afd7e2
---- /dev/null
-+++ b/tools/testing/selftests/net/ynl/ethtool.sh
-@@ -0,0 +1,188 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+# Test YNL ethtool functionality
-+
-+# shellcheck disable=SC1091,SC2034,SC2154,SC2317
-+source ../lib.sh
-+
-+readonly NSIM_ID="1337"
-+readonly NSIM_DEV_NAME="nsim${NSIM_ID}"
-+readonly VETH_A="veth_a"
-+readonly VETH_B="veth_b"
-+
-+ALL_TESTS="
-+	ethtool_device_info
-+	ethtool_statistics
-+	ethtool_ring_params
-+	ethtool_coalesce_params
-+	ethtool_pause_params
-+	ethtool_features_info
-+	ethtool_channels_info
-+	ethtool_time_stamping
-+"
-+
-+# Uses veth device as netdevsim doesn't support basic ethtool device info
-+ethtool_device_info()
-+{
-+	RET=0
-+
-+	local info_output
-+	info_output=$(ip netns exec "$testns" ynl-ethtool "$VETH_A" 2>/dev/null)
-+	check_err $? "failed to get device info for $VETH_A"
-+
-+	echo "$info_output" | grep -q "Settings for"
-+	check_err $? "device info output missing expected content"
-+
-+	log_test "YNL ethtool device info"
-+}
-+
-+ethtool_statistics()
-+{
-+	RET=0
-+
-+	local stats_output
-+	stats_output=$(ip netns exec "$testns" ynl-ethtool --statistics "$NSIM_DEV_NAME" 2>/dev/null)
-+	check_err $? "failed to get statistics for $NSIM_DEV_NAME"
-+
-+	echo "$stats_output" | grep -q -E "(NIC statistics|packets|bytes)"
-+	check_err $? "statistics output missing expected content"
-+
-+	log_test "YNL ethtool statistics"
-+}
-+
-+ethtool_ring_params()
-+{
-+	RET=0
-+
-+	local ring_output
-+	ring_output=$(ip netns exec "$testns" ynl-ethtool --show-ring "$NSIM_DEV_NAME" 2>/dev/null)
-+	check_err $? "failed to get ring parameters for $NSIM_DEV_NAME"
-+
-+	if [[ -n "$ring_output" ]]; then
-+		echo "$ring_output" | grep -q -E "(Ring parameters|RX|TX)"
-+		check_err $? "ring parameters output missing expected content"
-+	fi
-+
-+	if ! ip netns exec "$testns" ynl-ethtool --set-ring "$NSIM_DEV_NAME" rx 64 2>/dev/null; then
-+		check_err 1 "set-ring command failed unexpectedly"
-+	fi
-+
-+	log_test "YNL ethtool ring parameters (show/set)"
-+}
-+
-+ethtool_coalesce_params()
-+{
-+	RET=0
-+
-+	ip netns exec "$testns" ynl-ethtool --show-coalesce "$NSIM_DEV_NAME" &>/dev/null
-+	check_err $? "failed to get coalesce parameters for $NSIM_DEV_NAME"
-+
-+	if ! ip netns exec "$testns" ynl-ethtool --set-coalesce "$NSIM_DEV_NAME" rx-usecs 50 2>/dev/null; then
-+		check_err 1 "set-coalesce command failed unexpectedly"
-+	fi
-+
-+	log_test "YNL ethtool coalesce parameters (show/set)"
-+}
-+
-+ethtool_pause_params()
-+{
-+	RET=0
-+
-+	ip netns exec "$testns" ynl-ethtool --show-pause "$NSIM_DEV_NAME" &>/dev/null
-+	check_err $? "failed to get pause parameters for $NSIM_DEV_NAME"
-+
-+	if ! ip netns exec "$testns" ynl-ethtool --set-pause "$NSIM_DEV_NAME" tx 1 rx 1 2>/dev/null; then
-+		check_err 1 "set-pause command failed unexpectedly"
-+	fi
-+
-+	log_test "YNL ethtool pause parameters (show/set)"
-+}
-+
-+ethtool_features_info()
-+{
-+	RET=0
-+
-+	local features_output
-+	features_output=$(ip netns exec "$testns" ynl-ethtool --show-features "$NSIM_DEV_NAME" 2>/dev/null)
-+	check_err $? "failed to get features for $NSIM_DEV_NAME"
-+
-+	if [[ -n "$features_output" ]]; then
-+		echo "$features_output" | grep -q -E "(Features|offload)"
-+		check_err $? "features output missing expected content"
-+	fi
-+
-+	log_test "YNL ethtool features info (show/set)"
-+}
-+
-+ethtool_channels_info()
-+{
-+	RET=0
-+
-+	local channels_output
-+	channels_output=$(ip netns exec "$testns" ynl-ethtool --show-channels "$NSIM_DEV_NAME" 2>/dev/null)
-+	check_err $? "failed to get channels for $NSIM_DEV_NAME"
-+
-+	if [[ -n "$channels_output" ]]; then
-+		echo "$channels_output" | grep -q -E "(Channel|Combined|RX|TX)"
-+		check_err $? "channels output missing expected content"
-+	fi
-+
-+	if ! ip netns exec "$testns" ynl-ethtool --set-channels "$NSIM_DEV_NAME" combined-count 1 2>/dev/null; then
-+		check_err 1 "set-channels command failed unexpectedly"
-+	fi
-+
-+	log_test "YNL ethtool channels info (show/set)"
-+}
-+
-+ethtool_time_stamping()
-+{
-+	RET=0
-+
-+	local ts_output
-+	ts_output=$(ip netns exec "$testns" ynl-ethtool --show-time-stamping "$NSIM_DEV_NAME" 2>/dev/null)
-+	check_err $? "failed to get time stamping info for $NSIM_DEV_NAME"
-+
-+	if [[ -n "$ts_output" ]]; then
-+		echo "$ts_output" | grep -q -E "(Time stamping|timestamping|SOF_TIMESTAMPING)"
-+		check_err $? "time stamping output missing expected content"
-+	fi
-+
-+	log_test "YNL ethtool time stamping"
-+}
-+
-+setup()
-+{
-+	if ! modprobe netdevsim &>/dev/null; then
-+		log_test_skip "all YNL ethtool tests" "netdevsim module not available"
-+		exit "$ksft_skip"
-+	fi
-+
-+	setup_ns testns
-+
-+	if ! create_netdevsim "$NSIM_ID" "$testns" >/dev/null 2>&1; then
-+		log_test_skip "all YNL ethtool tests" "failed to create netdevsim device"
-+		exit "$ksft_skip"
-+	fi
-+
-+	if ! ip -n "$testns" link add "$VETH_A" type veth peer name "$VETH_B" 2>/dev/null; then
-+		log_test_skip "all YNL ethtool tests" "failed to create veth pair"
-+		exit "$ksft_skip"
-+	fi
-+
-+	ip -n "$testns" link set "$VETH_A" up
-+	ip -n "$testns" link set "$VETH_B" up
-+}
-+
-+cleanup()
-+{
-+	cleanup_netdevsim "$NSIM_ID" 2>/dev/null
-+	cleanup_all_ns
-+}
-+
-+trap cleanup EXIT
-+
-+require_command "ynl-ethtool"
-+setup
-+tests_run
-+
-+exit "$EXIT_STATUS"
-diff --git a/tools/testing/selftests/net/ynl/settings b/tools/testing/selftests/net/ynl/settings
-new file mode 100644
-index 000000000000..6091b45d226b
---- /dev/null
-+++ b/tools/testing/selftests/net/ynl/settings
-@@ -0,0 +1 @@
-+timeout=120
+ Documentation/networking/index.rst            |  5 +-
+ Documentation/networking/xfrm/index.rst       | 13 +++
+ .../networking/{ => xfrm}/xfrm_device.rst     | 20 +++--
+ .../networking/{ => xfrm}/xfrm_proc.rst       |  0
+ .../networking/{ => xfrm}/xfrm_sync.rst       | 83 ++++++++++---------
+ .../networking/{ => xfrm}/xfrm_sysctl.rst     |  0
+ MAINTAINERS                                   |  1 +
+ 7 files changed, 70 insertions(+), 52 deletions(-)
+ create mode 100644 Documentation/networking/xfrm/index.rst
+ rename Documentation/networking/{ => xfrm}/xfrm_device.rst (95%)
+ rename Documentation/networking/{ => xfrm}/xfrm_proc.rst (100%)
+ rename Documentation/networking/{ => xfrm}/xfrm_sync.rst (68%)
+ rename Documentation/networking/{ => xfrm}/xfrm_sysctl.rst (100%)
+
+
+base-commit: 61958b33ef0bab1c1874c933cd3910f495526782
 -- 
-2.50.1
+An old man doll... just what I always wanted! - Clara
 
 
