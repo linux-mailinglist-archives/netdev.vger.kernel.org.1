@@ -1,123 +1,146 @@
-Return-Path: <netdev+bounces-233806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39EFBC18BAA
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 08:40:20 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76C66C18C84
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 08:50:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A49F81A23932
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 07:39:50 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 486E0507E74
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 07:47:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E858B30FF25;
-	Wed, 29 Oct 2025 07:39:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 655CE311C21;
+	Wed, 29 Oct 2025 07:45:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="PseL/xc2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y/XzqotP"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a8-smtp.messagingengine.com (fout-a8-smtp.messagingengine.com [103.168.172.151])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E39930F803
-	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 07:39:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6341311959
+	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 07:45:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761723556; cv=none; b=lhG0wdVf2d9Mp3DzgI1vo4/HjVMvOpFZrrAeuhzXCTUdflnQrb+V9nMVr/7WVlZt5KYzEGp4InzjPAgZ5xbDKfcBEkR94+D12t6M7kDyol1eQrAYrBwrMP2kJ3bp40dIf9v1NuGsGMlelpBNbYRH5S07GLxateodkJGQa5sjV+4=
+	t=1761723908; cv=none; b=KYEpJoMW5hQHnl8uxACP7TFK4Biculwrnymwv8HDcNzNuGm2SxrZDgIncNyELetZKpHxohiBvlx99LX4TABdxrcq1ZFwP+JFfGTP3FRE7wFzBv/cnnDtW3AENqgkJaF/lebCoXhWQjSWT0neU3mm4TJ4hNlOXRpnTsSIoyBhIkI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761723556; c=relaxed/simple;
-	bh=LDCxUFs2Wb5l2tbf8t3vbu4Og2Gs5wy6yjjsqpMzZXw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q5DwMjNeR2wW60Eqmhz/DogBiqOCfpZ9ZepRCg9SHy41/3aiXuL1ci4QIGTxGHz3If5lJZc6TfztaD8HAv8uKdzFtChbpjWSTO5r2RC8Cl79fgGB06F33SwCn00VOzR9+DsGSFWP5r4KXYIxx82TnJZZbX/Ly7GeW8BkKDeMkrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=PseL/xc2; arc=none smtp.client-ip=103.168.172.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfout.phl.internal (Postfix) with ESMTP id 4082EEC037B;
-	Wed, 29 Oct 2025 03:39:14 -0400 (EDT)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Wed, 29 Oct 2025 03:39:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1761723554; x=1761809954; bh=9W84WQ0iV7TU6/IodCkj3ymKS+1kDzInew+
-	aFr//GYk=; b=PseL/xc2MHryQHplmgbKByYWapiiEYXfL3xgZBHJrhZSRJbtiNb
-	GWZO2Bc7fovfuk5aELLfaIYm7dwdUZCP4jahl2BndZbif9W//flhAgJW4HZwSwn/
-	E2aJxH/zKyX1M9CFF/wK4U2RCYBIVxeweczONB9KRMYVTz09W0zd+eaniPmNx+8G
-	++40cK3nGBBc9uVbSxxa2tXolOeB2eHAaq+On0v4fhkyRBwVJHuqLhi0IR+mG0ld
-	uLYxs4z1+vjdRJTn7D5IwvSizRPte862nrVUpp7O9IyAPrMgyRcHigZQFITEFL07
-	rd8sgGwYDw+AldLYw4PYyviRxrEH1CXswZw==
-X-ME-Sender: <xms:ocQBabzUMeo_q0Tp8Tnd-uGZ6j9nblmuhO0I8zpWbeeXOWr-2UcayQ>
-    <xme:ocQBaV1cXNTeGRadrCndAydWGV3DLQ_zHA0FHlaO6ZTGmEikXFEEmzwF7bfRuRyV1
-    nr-w1X2YkiuXcTZ7Wm__RJ3o6DelnDUnGcpVtRVYS3UlJ2gE5E>
-X-ME-Received: <xmr:ocQBaY-2KLk8nX5HD6kUjlQ3DIzTyAcC3DaiizvgG_v14st9c5thUcfu>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduieefudehucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcuufgt
-    hhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrthhtvg
-    hrnhepvddufeevkeehueegfedtvdevfefgudeifeduieefgfelkeehgeelgeejjeeggefh
-    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepihguoh
-    hstghhsehiughoshgthhdrohhrghdpnhgspghrtghpthhtohepledpmhhouggvpehsmhht
-    phhouhhtpdhrtghpthhtohepthhonhhghhgrohessggrmhgrihgtlhhouhgurdgtohhmpd
-    hrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthht
-    ohepvghrrghnsggvsehmvghllhgrnhhogidrtghomhdprhgtphhtthhopehjihhrihesmh
-    gvlhhlrghnohigrdgtohhmpdhrtghpthhtohepgihihihouhdrfigrnhhgtghonhhgsehg
-    mhgrihhlrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtph
-    htthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohephhhorhhm
-    sheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtg
-    homh
-X-ME-Proxy: <xmx:ocQBaVrqusXXOhB3ReHhiFmYhf9vJSGRCyZTQVutB1wtN_emboRWKA>
-    <xmx:ocQBaSTUmrdRy_BLnvjWV_SRAzPz0m_py8NDMHig8Qp3UVmnb-031w>
-    <xmx:ocQBaYNhViKh0XDI8tqKGGyBeKjkFVKok0BJBUqpCKbE8y8whka-3Q>
-    <xmx:ocQBaQgzLoLRRcnUnTAOuLEtVtOCHTA96cLqgW-HLXrKf3jMtm2dCg>
-    <xmx:osQBadHjkvN9th27Ulcygsu8tqt9Ee37huncGajkuzn1YptPrq3xegjP>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 29 Oct 2025 03:39:12 -0400 (EDT)
-Date: Wed, 29 Oct 2025 09:39:11 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: Tonghao Zhang <tonghao@bamaicloud.com>
-Cc: netdev@vger.kernel.org, Eran Ben Elisha <eranbe@mellanox.com>,
-	Jiri Pirko <jiri@mellanox.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next] net: add net cookie for net device trace events
-Message-ID: <aQHEn0Hrazq9aPWA@shredder>
-References: <20251028043244.82288-1-tonghao@bamaicloud.com>
+	s=arc-20240116; t=1761723908; c=relaxed/simple;
+	bh=BpTz6wyxzgFePsE1XYKQzbSZygBAeSVul/fpXowQG6U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Wsm8pT9Ou/PM02yQi3sXnqQw36va2LUOceDVdri/U+soVkvMz+LNilNVs4fX2rTgXuelVQN5DxACM6Id4M/TYTWjfEwJPfrn2aRaTtkaGPisQCrJxqPucJOieyxMgqgSp3DG5VltYczIJQXzP6roVSw/SALwNSo2MQMTG0ROmLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y/XzqotP; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761723905;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2IO9uHdt14tKqgu7NcmSLY4LLxup1JDL8am31B4OZNM=;
+	b=Y/XzqotPVTdpfyxPvThhprhLqDuE8RLmm2+FIO2QP+oPmo5TrDtFR/0iM6sAMnWmzsU4DE
+	YG9ojBEXhPdv0NrgiBuIdEgNthAVI6i/+x9N5lYrwbWDAX3qSOmMJ2DgqZ6jKcFYi5BEgw
+	iqdcS8AicqNc+XNMWRh06/nGqNfGoDs=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-136-U34KAEhUOHixRWxtkPKs-A-1; Wed,
+ 29 Oct 2025 03:45:02 -0400
+X-MC-Unique: U34KAEhUOHixRWxtkPKs-A-1
+X-Mimecast-MFC-AGG-ID: U34KAEhUOHixRWxtkPKs-A_1761723900
+Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A8B0E1808972;
+	Wed, 29 Oct 2025 07:44:59 +0000 (UTC)
+Received: from [10.44.32.34] (unknown [10.44.32.34])
+	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CD6551800579;
+	Wed, 29 Oct 2025 07:44:53 +0000 (UTC)
+Message-ID: <b3f45ab3-348b-4e3e-95af-5dc16bb1be96@redhat.com>
+Date: Wed, 29 Oct 2025 08:44:52 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251028043244.82288-1-tonghao@bamaicloud.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/2] dpll: add phase-adjust-gran pin attribute
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Michal Schmidt <mschmidt@redhat.com>,
+ Petr Oros <poros@redhat.com>, Prathosh Satish
+ <Prathosh.Satish@microchip.com>, Vadim Fedorenko
+ <vadim.fedorenko@linux.dev>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Donald Hunter <donald.hunter@gmail.com>, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20251024144927.587097-1-ivecera@redhat.com>
+ <20251024144927.587097-2-ivecera@redhat.com>
+ <20251028183919.785258a9@kernel.org>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <20251028183919.785258a9@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
 
-On Tue, Oct 28, 2025 at 12:32:44PM +0800, Tonghao Zhang wrote:
-> In a multi-network card or container environment, this is needed in order
-> to differentiate between trace events relating to net devices that exist
-> in different network namespaces and share the same name.
-> 
-> for xmit_timeout trace events:
-> [002] ..s1.  1838.311662: net_dev_xmit_timeout: dev=eth0 driver=virtio_net queue=10 net_cookie=3
-> [007] ..s1.  1839.335650: net_dev_xmit_timeout: dev=eth0 driver=virtio_net queue=10 net_cookie=4100
-> [007] ..s1.  1844.455659: net_dev_xmit_timeout: dev=eth0 driver=virtio_net queue=10 net_cookie=3
-> [002] ..s1.  1850.087647: net_dev_xmit_timeout: dev=eth0 driver=virtio_net queue=10 net_cookie=3
-> 
-> Cc: Eran Ben Elisha <eranbe@mellanox.com>
-> Cc: Jiri Pirko <jiri@mellanox.com>
-> Cc: Cong Wang <xiyou.wangcong@gmail.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Simon Horman <horms@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Suggested-by: Ido Schimmel <idosch@idosch.org>
-> Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
+Hi Kuba,
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+On 10/29/25 2:39 AM, Jakub Kicinski wrote:
+> On Fri, 24 Oct 2025 16:49:26 +0200 Ivan Vecera wrote:
+>> +      -
+>> +        name: phase-adjust-gran
+>> +        type: s32
+>> +        doc: |
+>> +          Granularity of phase adjustment, in picoseconds. The value of
+>> +          phase adjustment must be a multiple of this granularity.
+> 
+> Do we need this to be signed?
+> 
+To have it unsigned brings a need to use explicit type casting in the 
+core and driver's code. The phase adjustment can be both positive and
+negative it has to be signed. The granularity specifies that adjustment
+has to be multiple of granularity value so the core checks for zero
+remainder (this patch) and the driver converts the given adjustment
+value using division by the granularity.
+
+If we would have phase-adjust-gran and corresponding structure fields
+defined as u32 then we have to explicitly cast the granularity to s32
+because for:
+
+<snip>
+s32 phase_adjust, remainder;
+u32 phase_gran = 1000;
+
+phase_adjust = 5000;
+remainder = phase_adjust % phase_gran;
+/* remainder = 0 -> OK for positive adjust */
+
+phase_adjust = -5000;
+remainder = phase_adjust % phase_gran;
+/* remainder = 296
+  * Wrong for negative adjustment because phase_adjust is casted to u32
+  * prior division -> 2^32 - 5000 = 4294962296.
+  * 4294962296 % 1000 = 296
+  */
+
+  remainder = phase_adjust % (s32)phase_gran;
+  /* remainder = 0
+   * Now OK because phase_adjust remains to be s32
+   */
+</snip>
+
+Similarly for division in the driver code if the granularity would be
+u32.
+
+So I have proposed phase adjustment granularity to be s32 to avoid these
+explicit type castings and potential bugs in drivers.
+
+Thanks,
+Ivan
+
 
