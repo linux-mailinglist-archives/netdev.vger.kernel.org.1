@@ -1,93 +1,113 @@
-Return-Path: <netdev+bounces-233768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDC7BC18095
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 03:20:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3744BC180A7
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 03:27:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F35A41C67EE9
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 02:20:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A8CE1A220D1
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 02:27:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F18C2253FF;
-	Wed, 29 Oct 2025 02:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD1FB2C236B;
+	Wed, 29 Oct 2025 02:27:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pRH/Zish"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="h+xYBjTn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0702F224B0E;
-	Wed, 29 Oct 2025 02:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57E761F0994
+	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 02:27:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761704429; cv=none; b=T407B939BYrPyz1fbwqC+Cj5QlqEfNiFtJLg2xnlddCHqAVv748ZxzKzji3NZwpnuIPWKfTLn+Saaas49GIkdKz74A0fdLywnDix3++lVexVkd8G6S2xQMiRkkQMWBIt1Blm90bz9Lzsu48bkxXVjOnLzh+78KXMmT1A97URO/c=
+	t=1761704850; cv=none; b=Lq/vTWgwvzZAea+suNm8mf9k2Ft0YXAHQ+o70e5VtxK7+UItOJETWMvOIjyDgK48DX5w0uOUnUIf/XqKxfHdgzuc4UcAyju83igB/NsEWzG4JCwZypBGSKU85EepAvH9kQrmcj6x3tEexZYpDHjCNh/J+cGZV4XBMaZnlXY8DVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761704429; c=relaxed/simple;
-	bh=gqlrnFgCwni2QD8CDRB3o7cz9/QMgUMtjgK7QZSCHH4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=OZOykPuLHRv9+zVzAPAhj291auQ+8eRGeulUcd7cyXquSZ1PA4IZbSuGLw5FvXvEn6aNNHJ/H4p6oK51lBaX/KjmcwwDUrtE/FomSU0/raXjWy/4J7NWeYvdtL+V37OuC6FfUxMfmcAYO6p2Iz/07Gota1qY5f9MCEGxCKnFPJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pRH/Zish; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 739ADC4CEE7;
-	Wed, 29 Oct 2025 02:20:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761704428;
-	bh=gqlrnFgCwni2QD8CDRB3o7cz9/QMgUMtjgK7QZSCHH4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pRH/ZishxO66AfD4edHnJdwIETSmjyXlQZGOp+H+GyDpdAKCRRYtQ/3Sez/7tZgrm
-	 jS/NzKMxpyqQQgXJFBn5hrIkkrvxSBkB0kiGeX+FEXCl5e+YaZqYxO0VsxPp0a8K3h
-	 YF/dfXCZ0SSHkC61NlWF5YAHhARLCMDsbp/l/H/ZiOMg+OdnRYkh/khd/BAUeLTy6t
-	 Eyd01Q7mXQVDWcVqyHkX6iG5tOIHW4HiSyCDdWWEZ0roFiiARD3OLJV0tGglBeDv52
-	 XxEersqizLGb/UP5GzW8d0R5cLLecdVbzy3+KKjG3XR1jkPcEH4fQ8ywwCMHyqOgyr
-	 1b4vdng5C1FRA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E0C39FEB75;
-	Wed, 29 Oct 2025 02:20:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1761704850; c=relaxed/simple;
+	bh=ZAa8YrfBZCJJvU2+LBOiK9HqGPmJmDvCTByCdVc/+HY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YWywLi7aQ9/fa5UVWJoP0i2k2P0/J3cB4HCMsmr/iQuiy6onc4g3I5teyzeq3gMhNRQbEiitOTpJ23VhKwyw/drxbrvJK708P0yOLvHkP8CatwLcjt3wklo4qxhQWuaBAl3L2Yw5+8jAzeqQVSyA5Fq7lO2WhHj6HZ5YuaxCKm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=h+xYBjTn; arc=none smtp.client-ip=91.218.175.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <91de05f5-3475-45eb-bbf7-162365186297@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1761704846;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KpJ/2UeKPOQj3QH3COAUSbB7u7mUiVa8jSdlFJvPeMY=;
+	b=h+xYBjTnwvtV8tO5ZhjdcS7E0G6taAoRUCOOgWBTWHbElXWR3LpAeUx5YkqzPzBMa90Pbi
+	Ya7p27k5tTBBM1w7JB/Xmi72kuhvRm/TUhsOHq7Si8JL74OLnArhYLYHtmvCBjORNeYfVT
+	mpMW4w3z6E3xICCX7KpnzwvHz/9T23A=
+Date: Wed, 29 Oct 2025 10:27:18 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH net-next 1/3] net: stmmac: Add generic suspend/resume
+ helper for PCI-based controllers
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Yao Zi <ziyao@disroot.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Huacai Chen <chenhuacai@kernel.org>, Philipp Stanner <phasta@kernel.org>,
+ Tiezhu Yang <yangtiezhu@loongson.cn>, Qunqin Zhao <zhaoqunqin@loongson.cn>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, Furong Xu <0x1207@gmail.com>,
+ Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+ Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20251028154332.59118-1-ziyao@disroot.org>
+ <20251028154332.59118-2-ziyao@disroot.org>
+ <aQDoZaET4D64KfQA@shell.armlinux.org.uk>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yanteng Si <si.yanteng@linux.dev>
+In-Reply-To: <aQDoZaET4D64KfQA@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: phy: motorcomm: Add support for PHY LEDs on YT8531
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176170440584.2467162.6911069666444153662.git-patchwork-notify@kernel.org>
-Date: Wed, 29 Oct 2025 02:20:05 +0000
-References: <20251026133652.1288732-1-cnsztl@gmail.com>
-In-Reply-To: <20251026133652.1288732-1-cnsztl@gmail.com>
-To: Tianling Shen <cnsztl@gmail.com>
-Cc: Frank.Sae@motor-comm.com, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, shaojijie@huawei.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Sun, 26 Oct 2025 21:36:52 +0800 you wrote:
-> The LED registers on YT8531 are exactly same as YT8521, so simply
-> reuse yt8521_led_hw_* functions.
-> 
-> Tested on OrangePi R1 Plus LTS and Zero3.
-> 
-> Signed-off-by: Tianling Shen <cnsztl@gmail.com>
-> 
-> [...]
-
-Here is the summary with links:
-  - net: phy: motorcomm: Add support for PHY LEDs on YT8531
-    https://git.kernel.org/netdev/net-next/c/a8abe8e210c1
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+X-Migadu-Flow: FLOW_OUT
 
 
+在 2025/10/28 下午11:59, Russell King (Oracle) 写道:
+> On Tue, Oct 28, 2025 at 03:43:30PM +0000, Yao Zi wrote:
+>> Most glue driver for PCI-based DWMAC controllers utilize similar
+>> platform suspend/resume routines. Add a generic implementation to reduce
+>> duplicated code.
+>>
+>> Signed-off-by: Yao Zi <ziyao@disroot.org>
+>> ---
+>>   drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  2 +
+>>   .../net/ethernet/stmicro/stmmac/stmmac_main.c | 37 +++++++++++++++++++
+> I would prefer not to make stmmac_main.c even larger by including bus
+> specific helpers there. We already have stmmac_pltfm.c for those which
+> use struct platform_device. The logical name would be stmmac_pci.c, but
+> that's already taken by a driver.
+>
+> One way around that would be to rename stmmac_pci.c to dwmac-pci.c
+> (glue drivers tend to be named dwmac-foo.c) and then re-use
+> stmmac_pci.c for PCI-related stuff in the same way that stmmac_pltfm.c
+> is used.
+>
+> Another idea would be stmmac_libpci.c.
+
+I also don't want stmmac_main.c to grow larger, and I prefer
+
+stmmac_libpci.c instead. Another approach - maybe we can
+
+keep these helper functions in stmmac_pci.c and just declare
+
+them as extern where needed?
+
+
+Thanks,
+
+Yanteng
+
+>
 
