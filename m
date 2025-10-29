@@ -1,140 +1,163 @@
-Return-Path: <netdev+bounces-233771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 111E3C18191
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 03:51:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14046C181B2
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 03:59:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C27503A63B6
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 02:51:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC1A73B89B7
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 02:59:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B56E2E9EAE;
-	Wed, 29 Oct 2025 02:51:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 426F32EC55D;
+	Wed, 29 Oct 2025 02:59:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="YyoAlZeZ"
+	dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b="sBl827Su"
 X-Original-To: netdev@vger.kernel.org
-Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F13422D8771;
-	Wed, 29 Oct 2025 02:51:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11C1817A310;
+	Wed, 29 Oct 2025 02:59:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761706275; cv=none; b=Raclevhfsd0FbXzuftJcpYjEZnpE+xAGGsb6uBDeopV75g9jMCXyWzdaKaPq2Mo3a8P8iPmHHgFYeopK6rFDQF0AM5eRA3t/5R+W4neUyDRZ6VPyd3qP+XJBmbcJJ8DdnoHYpGyCGqIfNA1iapJ7qI/m9lFcFeRjJlQR3hWLrrQ=
+	t=1761706777; cv=none; b=SOqc2cuA4COEjeTrCLmAO2yBl2lxQs7xxNvNGGXbcs3Qbq8A4BVhvTJQ2a9qfW82SxBoKfZGRZUvZpwflzzQpzr+k/v2+c4Pwh2ogHmAfmq+yBJYU0svE7UC/n3dnhad+RmSJHY8OrL54s5XBHEOWyPrMmX/PJHOQmPMM0/y8o0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761706275; c=relaxed/simple;
-	bh=W9VoCT4gQBCMLqQaUXPnZORlOcgCbfiASlcaHQdclFg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GoebTC+prNoKOOB2VMzi1PXW3zycfomgbhHAa+CqVfnm31SYyYL3jD0rLf3KePfNhmf+Obg2QbmVaMO5Tm51JGXMlg3qzdKSjHWyDJKBLkGR2VwZWvZur5WKdkKgoRPqTXkXhWuJoN2zN/kMInM5tFdBuQe0Xtm/lX+Fqortmo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=YyoAlZeZ; arc=none smtp.client-ip=178.21.23.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
-Received: from mail01.disroot.lan (localhost [127.0.0.1])
-	by disroot.org (Postfix) with ESMTP id 4CA2925BEE;
-	Wed, 29 Oct 2025 03:51:10 +0100 (CET)
-X-Virus-Scanned: SPAM Filter at disroot.org
-Received: from layka.disroot.org ([127.0.0.1])
- by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
- id clOHwhEflVSb; Wed, 29 Oct 2025 03:51:09 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
-	t=1761706269; bh=W9VoCT4gQBCMLqQaUXPnZORlOcgCbfiASlcaHQdclFg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To;
-	b=YyoAlZeZm5c21EOABCq3ODJ1Iod3fPlMv5bzMYxcTOU+Y48qwdWYDc+ZL5IhshSuT
-	 vE3u2jENFI7jbeh0QqmFqa7lt7svL84Vr8DHa4J/HF4AWME4RNlc0Sryn1g7Z9LNyU
-	 WyX5X3hDFKbdDJQ8HC00Hry90gKdx0bf+QH+XsNMW0ARCYqEXYRrblbm4o4d6YJy8B
-	 a62ZyPJG0O0t+EqcBfw8276QZQeqs60qIHv/VSBpx4UlfWp7YRsjo6iVuReTc9safK
-	 XNXRUec+aarsC80YiYA+krgMJTJAC2Oki1JriJmzLSw4g0xEbSFmXRX9HeTP+bMcEX
-	 gI1ckP8k6lqUw==
-Date: Wed, 29 Oct 2025 02:50:50 +0000
-From: Yao Zi <ziyao@disroot.org>
-To: Yanteng Si <si.yanteng@linux.dev>,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Philipp Stanner <phasta@kernel.org>,
-	Tiezhu Yang <yangtiezhu@loongson.cn>,
-	Qunqin Zhao <zhaoqunqin@loongson.cn>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Furong Xu <0x1207@gmail.com>,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/3] net: stmmac: Add generic suspend/resume
- helper for PCI-based controllers
-Message-ID: <aQGA8b5Il-U2IlJi@pie>
-References: <20251028154332.59118-1-ziyao@disroot.org>
- <20251028154332.59118-2-ziyao@disroot.org>
- <aQDoZaET4D64KfQA@shell.armlinux.org.uk>
- <91de05f5-3475-45eb-bbf7-162365186297@linux.dev>
+	s=arc-20240116; t=1761706777; c=relaxed/simple;
+	bh=3C4LK3yhmTxdX/lbtOU2wNo/rvyXok5BkicTvWpPRiM=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FGA0vTYKcYjcLyfmPwvZmqhYutEPWa+9VkonZzHU0/hB+Daq1co0EGUrSx5t7A90syjvSOuPjWiATC0F44avdeJ4kAace57Jw8kwmJZDJMN/rqeYD4SbnwIqYqlUbyU2Mz+uQaJ3haHwWXd/+2VXpsDgyuuitVpHB5UQBGJ/nHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; dkim=pass (2048-bit key) header.d=windriver.com header.i=@windriver.com header.b=sBl827Su; arc=none smtp.client-ip=205.220.178.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250811.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59T1vjWq2567042;
+	Wed, 29 Oct 2025 02:59:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=windriver.com;
+	 h=cc:content-transfer-encoding:content-type:date:from
+	:in-reply-to:message-id:mime-version:references:subject:to; s=
+	PPS06212021; bh=orvursf417qpdmLDGFURg5es0bnAKOClQ3zlkzfPbMk=; b=
+	sBl827SuBXPAP9R31QUsWhh48Qqo1juED9NyAAOtXDBKrjcG4f/4mA199zb6Uw6b
+	BcQljI8H5D/uO5YSTsRyQ2BOO2a0m7TK3Sw/7R8gNHLUZ8MRAbZHdx2GomEFfzBj
+	UUhz6gi2WOTTP4m3I1BhMfR1NM3ol0c2wfsOVYjgWGj7hvVFDrM+cdzWEXZpmoZ8
+	dKuNsl9T4L5N1fREHdAkf8zw8vp25gK1Q1Xtghk+cwDrpz19uyno/WUGpk95a5jV
+	RhrOTX+35Gz51xwClEnbShyxTMHV01gE4H1/E+GCo3u5KGUBkYFb8cNaD7ccCeZz
+	pTX4d0FP08atCuhPK/Ldbw==
+Received: from ala-exchng02.corp.ad.wrs.com ([128.224.246.37])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 4a3489gaxu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Wed, 29 Oct 2025 02:59:09 +0000 (GMT)
+Received: from ala-exchng01.corp.ad.wrs.com (10.11.224.121) by
+ ALA-EXCHNG02.corp.ad.wrs.com (10.11.224.122) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.61; Tue, 28 Oct 2025 19:59:07 -0700
+Received: from pek-lpd-ccm6.wrs.com (10.11.232.110) by
+ ala-exchng01.corp.ad.wrs.com (10.11.224.121) with Microsoft SMTP Server id
+ 15.1.2507.61 via Frontend Transport; Tue, 28 Oct 2025 19:59:05 -0700
+From: Lizhi Xu <lizhi.xu@windriver.com>
+To: <pabeni@redhat.com>
+CC: <dan.carpenter@linaro.org>, <davem@davemloft.net>, <edumazet@google.com>,
+        <horms@kernel.org>, <kuba@kernel.org>, <linux-hams@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <lizhi.xu@windriver.com>,
+        <netdev@vger.kernel.org>,
+        <syzbot+2860e75836a08b172755@syzkaller.appspotmail.com>,
+        <syzkaller-bugs@googlegroups.com>
+Subject: Re: [PATCH V4] netrom: Preventing the use of abnormal neighbor
+Date: Wed, 29 Oct 2025 10:59:04 +0800
+Message-ID: <20251029025904.63619-1-lizhi.xu@windriver.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <785c8add-ab09-47b2-94bf-a4bfe8c13388@redhat.com>
+References: <785c8add-ab09-47b2-94bf-a4bfe8c13388@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <91de05f5-3475-45eb-bbf7-162365186297@linux.dev>
+Content-Type: text/plain
+X-Proofpoint-GUID: Qle8lwbp3_mE3r4qzFcLBoM2_DByylm7
+X-Proofpoint-ORIG-GUID: Qle8lwbp3_mE3r4qzFcLBoM2_DByylm7
+X-Authority-Analysis: v=2.4 cv=E83AZKdl c=1 sm=1 tr=0 ts=690182fd cx=c_pps
+ a=Lg6ja3A245NiLSnFpY5YKQ==:117 a=Lg6ja3A245NiLSnFpY5YKQ==:17
+ a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=U1BIhdE-NrZgBzzozqwA:9
+ a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDI5MDAyMiBTYWx0ZWRfX8NiZpAPpJ0kE
+ OyuQrvyW2k95RzHJ7+045dpCsNvrqha9RVty0Xmpgu4FFgJ9I2j2Nzr7fpg90zVfonHO8KgKh0o
+ xh/iOMVz6hvRoS32IblrE56m6FsTDComHjNNZ5EdkDLZ9h47D6gAZHjy+hgmkDGvYBIdp/aBXcN
+ Z0gLQV5XXxXvMo/vliksVRfWFrriXAFxbdjQpbwdp9BIxP6nA2Ppa8/O0UCOEQwQAJ2bFWU0aaF
+ W+038DlYHCk/pnAHfLQI+3YVd/k4iMj1kewXxlZFwNlM7f5TogYUBNDkXIkS3jlfzi+Ww14kxi/
+ UB5KZ+AR0qnKWuZKbhuY/+tu8QN9Mf86vvAo8fcqXVsd6RDZ3xoRLQg9AqobMmnRnAubnZnfWx7
+ BHqSD3WUI/TVWdFsFL+1siibuqAztQ==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.80.40
+ definitions=2025-10-29_01,2025-10-22_01,2025-03-28_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 suspectscore=0 phishscore=0 priorityscore=1501 impostorscore=0
+ lowpriorityscore=0 malwarescore=0 spamscore=0 clxscore=1015 bulkscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2510290022
 
-On Wed, Oct 29, 2025 at 10:27:18AM +0800, Yanteng Si wrote:
+On Tue, 28 Oct 2025 15:13:37 +0100, Paolo Abeni wrote:
+> > The root cause of the problem is that multiple different tasks initiate
+> > SIOCADDRT & NETROM_NODE commands to add new routes, there is no lock
+> > between them to protect the same nr_neigh.
+> >
+> > Task0 can add the nr_neigh.refcount value of 1 on Task1 to routes[2].
+> > When Task2 executes nr_neigh_put(nr_node->routes[2].neighbour), it will
+> > release the neighbour because its refcount value is 1.
+> >
+> > In this case, the following situation causes a UAF on Task2:
+> >
+> > Task0					Task1						Task2
+> > =====					=====						=====
+> > nr_add_node()
+> > nr_neigh_get_dev()			nr_add_node()
+> > 					nr_node_lock()
+> > 					nr_node->routes[2].neighbour->count--
+> > 					nr_neigh_put(nr_node->routes[2].neighbour);
+> > 					nr_remove_neigh(nr_node->routes[2].neighbour)
+> > 					nr_node_unlock()
+> > nr_node_lock()
+> > nr_node->routes[2].neighbour = nr_neigh
+> > nr_neigh_hold(nr_neigh);								nr_add_node()
+> > 											nr_neigh_put()
+> > 											if (nr_node->routes[2].neighbour->count
+> > Description of the UAF triggering process:
+> > First, Task 0 executes nr_neigh_get_dev() to set neighbor refcount to 3.
+> > Then, Task 1 puts the same neighbor from its routes[2] and executes
+> > nr_remove_neigh() because the count is 0. After these two operations,
+> > the neighbor's refcount becomes 1. Then, Task 0 acquires the nr node
+> > lock and writes it to its routes[2].neighbour.
+> > Finally, Task 2 executes nr_neigh_put(nr_node->routes[2].neighbour) to
+> > release the neighbor. The subsequent execution of the neighbor->count
+> > check triggers a UAF.
 > 
-> 在 2025/10/28 下午11:59, Russell King (Oracle) 写道:
-> > On Tue, Oct 28, 2025 at 03:43:30PM +0000, Yao Zi wrote:
-> > > Most glue driver for PCI-based DWMAC controllers utilize similar
-> > > platform suspend/resume routines. Add a generic implementation to reduce
-> > > duplicated code.
-> > > 
-> > > Signed-off-by: Yao Zi <ziyao@disroot.org>
-> > > ---
-> > >   drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  2 +
-> > >   .../net/ethernet/stmicro/stmmac/stmmac_main.c | 37 +++++++++++++++++++
-> > I would prefer not to make stmmac_main.c even larger by including bus
-> > specific helpers there. We already have stmmac_pltfm.c for those which
-> > use struct platform_device. The logical name would be stmmac_pci.c, but
-> > that's already taken by a driver.
-> > 
-> > One way around that would be to rename stmmac_pci.c to dwmac-pci.c
-> > (glue drivers tend to be named dwmac-foo.c) and then re-use
-> > stmmac_pci.c for PCI-related stuff in the same way that stmmac_pltfm.c
-> > is used.
-> > 
-> > Another idea would be stmmac_libpci.c.
+> I looked at the code quite a bit and I think this could possibly avoid
+> the above mentioned race, but this whole area looks quite confusing to me.
 > 
-> I also don't want stmmac_main.c to grow larger, and I prefer
-> 
-> stmmac_libpci.c instead.
+> I think it would be helpful if you could better describe the relevant
+> scenario starting from the initial setup (no nodes, no neighs).
+OK. Let me fill in the origin of neigh.
 
-Okay, then I'll separate the code into stmmac_libpci.c instead. This
-also avoids moving code around, making it easier to track git log in the
-future.
+Task3
+=====
+nr_add_node()
+[146]if ((nr_neigh = kmalloc(sizeof(*nr_neigh), GFP_ATOMIC)) == NULL)
+[253]nr_node->routes[2].neighbour = nr_neigh;
+[255]nr_neigh_hold(nr_neigh);
+[256]nr_neigh->count++;
 
-> Another approach - maybe we can
-> 
-> keep these helper functions in stmmac_pci.c and just declare
-> 
-> them as extern where needed?
+neigh is created on line 146 in nr_add_node(), and added to node on
+lines 253-256. It occurs before all Task0, Task1, and Task2.
 
-stmmac_pci.c is a standalone DWMAC glue driver, none of its symbols are
-for external usage. I don't think it's appropriate to put these helpers
-in the driver. Furthermore, this will also require PCI-based glues
-making use of these helpers to depend on an unrelated driver,
-introducing unnecessary code size, which doesn't sound like a good idea
-to me.
+Note:
+1. [x], x is line number.
+2. During my debugging process, I didn't pay attention to where the node
+was created, and I apologize that I cannot provide the relevant creation
+process.
 
-I'd still like to introduce stmmac_libpci.c for these helpers.
-
-> Thanks,
-> 
-> Yanteng
-> 
-> > 
-
-Best regards,
-Yao Zi
+BR,
+Lizhi
 
