@@ -1,406 +1,93 @@
-Return-Path: <netdev+bounces-233721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22A55C17867
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 01:23:11 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD6BCC1783A
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 01:20:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A873E422D2C
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 00:19:11 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F11205051EB
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 00:19:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D134D23E342;
-	Wed, 29 Oct 2025 00:18:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56BF0230BCB;
+	Wed, 29 Oct 2025 00:19:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ohPHCvG0"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0648222126C;
-	Wed, 29 Oct 2025 00:18:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2099E22126C;
+	Wed, 29 Oct 2025 00:19:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761697120; cv=none; b=ndsJKwPHvdHovYll2MWbbw3NzduSVy9uaof9uhoSEVTO0U+I62gwXfEw7AtFRB3l4hpIed8O6lkC/PsaRD0uR+835ZX9erPAKChdKTyoFiCIke+OYkCAb2IYG24st3jcl/ROqv/HHimMfszsPxrXfY4jPrWCWudWzlKO1C0d+a0=
+	t=1761697142; cv=none; b=cLa1YKtxKDTPxxVFfik0TJkiHD+moH+0d6p+yRk98Vv8T4uVj5ch+Rtspd32vnghe42o5dT2cTO3+rUftOylToWfQQ0XmpNtOuBYRyb0SgX0DcIaQgUPXUtuhLtCBxKWtAhOaBbWgNBoarJ1LfBALmcqOHNIUTcWLklh+iEbieY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761697120; c=relaxed/simple;
-	bh=QLauGTKig0HxiN4gCnMy8BZ//xmOiVQiSIfNB6qxwso=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TfwYZKBmQSvmwe2RKzxAvUrDWLPk19YwvQi9BWitgChbdmRYXP6vobAkm2FdKCFB3A/xai1Vt4vRNed7MDRDRLLvb/1rOCAENRhbb9RyKGHary7bjIB42ZfWRO3qAIiHm/QpZFdxT4vDe8izSJjJmOj2vMSTKvb2mqv6Fr2HhLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.98.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1vDtta-000000004CT-1Wmj;
-	Wed, 29 Oct 2025 00:18:34 +0000
-Date: Wed, 29 Oct 2025 00:18:30 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Andreas Schirm <andreas.schirm@siemens.com>,
-	Lukas Stockmann <lukas.stockmann@siemens.com>,
-	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
-	Peter Christen <peter.christen@siemens.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: [PATCH net-next v4 10/12] dt-bindings: net: dsa: lantiq,gswip: add
- support for MaxLinear GSW1xx switches
-Message-ID: <02272a098447ab0de6d2e9d686469fc6ce355c7d.1761693288.git.daniel@makrotopia.org>
-References: <cover.1761693288.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1761697142; c=relaxed/simple;
+	bh=ujGzzSLZ9fPuiQOeQOzkkm0n9rELeoo+/MNLK3bPcMo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PEnbWWOq5Nu/pHzAIT1tQxtwp669nea68eO1vHSNGNOU8NSshloRvnb9FiXV/MfDgZaI3bbi5+C3M8rDjcHsnzJV4Ep+bqu2cnPO3RFavd5VSVBFmMeyumkyHjfpvCbIqHcj3Gc0HVlW99bt2xrl4dZpo0+p467lIeljM3kuflg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ohPHCvG0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD5FDC4CEE7;
+	Wed, 29 Oct 2025 00:19:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761697141;
+	bh=ujGzzSLZ9fPuiQOeQOzkkm0n9rELeoo+/MNLK3bPcMo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ohPHCvG0JrE/mc51mrTNg7QOcwJs0oMbOLsKxA3ct19i9iunF0VtCERMo7Zm+ExKU
+	 fsjcvCCGVg339pBNTyo6wJZ0XSzEvuKb2pvJXwjty4gRZITsGGUATPrut/nZlY5hY/
+	 hzFicSLVugtwm0weEBiBzcCKJpUEIODyfi7HEgyAMlZv38uCcpDzBa+OYxRslOzovB
+	 1KWkHT1rzSUu4DdMUJrV4d7sjEEjFWHV5ySVigOX67bXUH+LyZoNWQpKCN7uh/yZj5
+	 KOnuTfVkFnIBxU1ln9Uk2EJeuz56ojCp9b37Z0oIp3TkOeYOUa5bM+PYKhvYq/o9js
+	 7aYsxrmeg6+Kw==
+Date: Tue, 28 Oct 2025 17:19:00 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: "robh@kernel.org" <robh@kernel.org>, "krzk+dt@kernel.org"
+ <krzk+dt@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>, Claudiu
+ Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ Clark Wang <xiaoning.wang@nxp.com>, Frank Li <frank.li@nxp.com>,
+ "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "davem@davemloft.net"
+ <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+ "pabeni@redhat.com" <pabeni@redhat.com>, "richardcochran@gmail.com"
+ <richardcochran@gmail.com>, "imx@lists.linux.dev" <imx@lists.linux.dev>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>
+Subject: Re: [PATCH v3 net-next 0/6] net: enetc: Add i.MX94 ENETC support
+Message-ID: <20251028171900.5f0ba82c@kernel.org>
+In-Reply-To: <PAXPR04MB8510AC62551ABD89E75EB97188FAA@PAXPR04MB8510.eurprd04.prod.outlook.com>
+References: <20251027014503.176237-1-wei.fang@nxp.com>
+	<20251028165757.3b7c2f96@kernel.org>
+	<PAXPR04MB8510AC62551ABD89E75EB97188FAA@PAXPR04MB8510.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1761693288.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Extend the Lantiq GSWIP device tree binding to also cover MaxLinear
-GSW1xx switches which are based on the same hardware IP but connected
-via MDIO instead of being memory-mapped.
+On Wed, 29 Oct 2025 00:13:14 +0000 Wei Fang wrote:
+> > On Mon, 27 Oct 2025 09:44:57 +0800 Wei Fang wrote:  
+> > > i.MX94 NETC has two kinds of ENETCs, one is the same as i.MX95, which
+> > > can be used as a standalone network port. The other one is an internal
+> > > ENETC, it connects to the CPU port of NETC switch through the pseudo
+> > > MAC. Also, i.MX94 have multiple PTP Timers, which is different from
+> > > i.MX95. Any PTP Timer can be bound to a specified standalone ENETC by
+> > > the IERB ETBCR registers. Currently, this patch only add ENETC support
+> > > and Timer support for i.MX94. The switch will be added by a separate
+> > > patch set.  
+> > 
+> > Is there a reason to add the imx94 code after imx95?  
+> 
+> Actually, i.MX94 is the latest i.MX SoC, which is tapped out after
+> i.MX95 (about 1 year).
 
-Add compatible strings for MaxLinear GSW120, GSW125, GSW140, GSW141,
-and GSW145 switches and adjust the schema to handle the different
-connection methods with conditional properties.
+I see, so there is some logic behind it.
 
-Add MaxLinear GSW125 example showing MDIO-connected configuration.
-
-Signed-off-by: Daniel Golle <daniel@makrotopia.org>
----
-v4:
- * drop maxlinear,rx-inverted and maxlinear,tx-inverted properties for
-   now in favor of upcoming generic properties
-
-v3:
- * add maxlinear,rx-inverted and maxlinear,tx-inverted properties
-
-v2:
- * remove git conflict left-overs which somehow creeped in
- * indent example with 4 spaces instead of tabs
-
- .../bindings/net/dsa/lantiq,gswip.yaml        | 267 +++++++++++++-----
- 1 file changed, 194 insertions(+), 73 deletions(-)
-
-diff --git a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
-index ab3ee4ecd938..e1849accfc20 100644
---- a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
-+++ b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
-@@ -4,7 +4,12 @@
- $id: http://devicetree.org/schemas/net/dsa/lantiq,gswip.yaml#
- $schema: http://devicetree.org/meta-schemas/core.yaml#
- 
--title: Lantiq GSWIP Ethernet switches
-+title: Lantiq GSWIP and MaxLinear GSW1xx Ethernet switches
-+
-+description:
-+  Lantiq GSWIP and MaxLinear GSW1xx switches share the same hardware IP.
-+  Lantiq switches are embedded in SoCs and accessed via memory-mapped I/O,
-+  while MaxLinear switches are standalone ICs connected via MDIO.
- 
- $ref: dsa.yaml#
- 
-@@ -37,6 +42,100 @@ patternProperties:
-               Configure the RMII reference clock to be a clock output
-               rather than an input. Only applicable for RMII mode.
- 
-+allOf:
-+  - if:
-+      properties:
-+        compatible:
-+          contains:
-+            enum:
-+              - lantiq,xrx200-gswip
-+              - lantiq,xrx300-gswip
-+              - lantiq,xrx330-gswip
-+    then:
-+      properties:
-+        reg:
-+          minItems: 3
-+          maxItems: 3
-+          description: Memory-mapped register regions (switch, mdio, mii)
-+        reg-names:
-+          items:
-+            - const: switch
-+            - const: mdio
-+            - const: mii
-+        mdio:
-+          $ref: /schemas/net/mdio.yaml#
-+          unevaluatedProperties: false
-+
-+          properties:
-+            compatible:
-+              const: lantiq,xrx200-mdio
-+
-+          required:
-+            - compatible
-+        gphy-fw:
-+          type: object
-+          properties:
-+            '#address-cells':
-+              const: 1
-+
-+            '#size-cells':
-+              const: 0
-+
-+            compatible:
-+              items:
-+                - enum:
-+                    - lantiq,xrx200-gphy-fw
-+                    - lantiq,xrx300-gphy-fw
-+                    - lantiq,xrx330-gphy-fw
-+                - const: lantiq,gphy-fw
-+
-+            lantiq,rcu:
-+              $ref: /schemas/types.yaml#/definitions/phandle
-+              description: phandle to the RCU syscon
-+
-+          patternProperties:
-+            "^gphy@[0-9a-f]{1,2}$":
-+              type: object
-+
-+              additionalProperties: false
-+
-+              properties:
-+                reg:
-+                  minimum: 0
-+                  maximum: 255
-+                  description:
-+                    Offset of the GPHY firmware register in the RCU register
-+                    range
-+
-+                resets:
-+                  items:
-+                    - description: GPHY reset line
-+
-+                reset-names:
-+                  items:
-+                    - const: gphy
-+
-+              required:
-+                - reg
-+
-+          required:
-+            - compatible
-+            - lantiq,rcu
-+
-+          additionalProperties: false
-+      required:
-+        - reg-names
-+    else:
-+      properties:
-+        reg:
-+          maxItems: 1
-+          description: MDIO bus address
-+        reg-names: false
-+        gphy-fw: false
-+        mdio:
-+          $ref: /schemas/net/mdio.yaml#
-+          unevaluatedProperties: false
-+
- maintainers:
-   - Hauke Mehrtens <hauke@hauke-m.de>
- 
-@@ -46,78 +145,11 @@ properties:
-       - lantiq,xrx200-gswip
-       - lantiq,xrx300-gswip
-       - lantiq,xrx330-gswip
--
--  reg:
--    minItems: 3
--    maxItems: 3
--
--  reg-names:
--    items:
--      - const: switch
--      - const: mdio
--      - const: mii
--
--  mdio:
--    $ref: /schemas/net/mdio.yaml#
--    unevaluatedProperties: false
--
--    properties:
--      compatible:
--        const: lantiq,xrx200-mdio
--
--    required:
--      - compatible
--
--  gphy-fw:
--    type: object
--    properties:
--      '#address-cells':
--        const: 1
--
--      '#size-cells':
--        const: 0
--
--      compatible:
--        items:
--          - enum:
--              - lantiq,xrx200-gphy-fw
--              - lantiq,xrx300-gphy-fw
--              - lantiq,xrx330-gphy-fw
--          - const: lantiq,gphy-fw
--
--      lantiq,rcu:
--        $ref: /schemas/types.yaml#/definitions/phandle
--        description: phandle to the RCU syscon
--
--    patternProperties:
--      "^gphy@[0-9a-f]{1,2}$":
--        type: object
--
--        additionalProperties: false
--
--        properties:
--          reg:
--            minimum: 0
--            maximum: 255
--            description:
--              Offset of the GPHY firmware register in the RCU register range
--
--          resets:
--            items:
--              - description: GPHY reset line
--
--          reset-names:
--            items:
--              - const: gphy
--
--        required:
--          - reg
--
--    required:
--      - compatible
--      - lantiq,rcu
--
--    additionalProperties: false
-+      - maxlinear,gsw120
-+      - maxlinear,gsw125
-+      - maxlinear,gsw140
-+      - maxlinear,gsw141
-+      - maxlinear,gsw145
- 
- required:
-   - compatible
-@@ -132,6 +164,7 @@ examples:
-             reg = <0xe108000 0x3100>,  /* switch */
-                   <0xe10b100 0xd8>,    /* mdio */
-                   <0xe10b1d8 0x130>;   /* mii */
-+            reg-names = "switch", "mdio", "mii";
-             dsa,member = <0 0>;
- 
-             ports {
-@@ -230,3 +263,91 @@ examples:
-                     };
-             };
-     };
-+
-+  - |
-+    #include <dt-bindings/leds/common.h>
-+
-+    mdio {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        switch@1f {
-+            compatible = "maxlinear,gsw125";
-+            reg = <0x1f>;
-+
-+            ports {
-+                #address-cells = <1>;
-+                #size-cells = <0>;
-+
-+                port@0 {
-+                    reg = <0>;
-+                    label = "lan0";
-+                    phy-handle = <&switchphy0>;
-+                    phy-mode = "internal";
-+                };
-+
-+                port@1 {
-+                    reg = <1>;
-+                    label = "lan1";
-+                    phy-handle = <&switchphy1>;
-+                    phy-mode = "internal";
-+                };
-+
-+                port@4 {
-+                    reg = <4>;
-+                    label = "wan";
-+                    phy-mode = "1000base-x";
-+                    maxlinear,rx-inverted;
-+                    managed = "in-band-status";
-+                };
-+
-+                port@5 {
-+                    reg = <5>;
-+                    phy-mode = "rgmii-id";
-+                    tx-internal-delay-ps = <2000>;
-+                    rx-internal-delay-ps = <2000>;
-+                    ethernet = <&eth0>;
-+
-+                    fixed-link {
-+                        speed = <1000>;
-+                        full-duplex;
-+                    };
-+                };
-+            };
-+
-+            mdio {
-+                #address-cells = <1>;
-+                #size-cells = <0>;
-+
-+                switchphy0: switchphy@0 {
-+                    reg = <0>;
-+
-+                    leds {
-+                        #address-cells = <1>;
-+                        #size-cells = <0>;
-+
-+                        led@0 {
-+                            reg = <0>;
-+                            color = <LED_COLOR_ID_GREEN>;
-+                            function = LED_FUNCTION_LAN;
-+                        };
-+                    };
-+                };
-+
-+                switchphy1: switchphy@1 {
-+                    reg = <1>;
-+
-+                    leds {
-+                        #address-cells = <1>;
-+                        #size-cells = <0>;
-+
-+                        led@0 {
-+                            reg = <0>;
-+                            color = <LED_COLOR_ID_GREEN>;
-+                            function = LED_FUNCTION_LAN;
-+                        };
-+                    };
-+                };
-+            };
-+        };
-+    };
--- 
-2.51.1
+I'm not sure this will still be clear 10 years from now to the people
+who come after us. 1 year is not a long time. But up to you..
 
