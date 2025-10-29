@@ -1,315 +1,187 @@
-Return-Path: <netdev+bounces-233863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D6E8C19820
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 10:55:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 379DCC1987D
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 10:58:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 496E342800B
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 09:51:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA39A3A7A7A
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 09:55:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B0D32FC88B;
-	Wed, 29 Oct 2025 09:51:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D156D314A9F;
+	Wed, 29 Oct 2025 09:55:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CX8MYJP7"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="qg9Wm18M"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011038.outbound.protection.outlook.com [52.101.62.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 624D12E172D
-	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 09:51:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761731512; cv=none; b=aGxtiHXrrz/fb+LV5octYPz2ghxoNr74qMVsvKjHxlux2WaUDcDt4RzUP7LQzt4YjGGCOVFtpCuT8JKAZoXBuzWgATnT7DQWZygvK5fEsFsMR2t48qqZStp4LvbBf9vzMvZ6zgiRo7UgH17c3hdnU2caphQJUPxVY21WhbXkpks=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761731512; c=relaxed/simple;
-	bh=3ctYAHi6DJclcyE7coYuy7pWxtwy4LclfvTw5P2GL2c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=I70xUh9UwE8FDvPUwX9EwXgRk2EsNTrFu13mMt4b4UnpiSIyuVk3d1cb0Xm22v5Tl5sU2q3KP8WWG257RqCUhbS0zziqN1Cg6SP+cxIGi/VJwc/iciXopLbTkGo/qPl7ZmQrIWdphTxnsQjB+VwG+saeOP5WIz5VOLBWbRKtQ58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CX8MYJP7; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761731509;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dSvQNycfQkKBJnPHMBo2XhC9DfYUYCzMFCZMQnQ2D1g=;
-	b=CX8MYJP73goBv12Okwu0Ytc0L4sEIKbA0iBDyPGBfoRl0ad8QKOW/naQjhBTAt5cp3SJuX
-	qvRNJFCGWqEHWR3GnaIBn3FKc1QfAKWbm598ujBTGGudznwPed/UeMESfXMEGuuvOD8WRm
-	Bpw+nuSYY1vy0cfqIcQB52emThZtIwA=
-Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
- [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-402-INkdn193PjqRXNuGiQEFzQ-1; Wed, 29 Oct 2025 05:51:47 -0400
-X-MC-Unique: INkdn193PjqRXNuGiQEFzQ-1
-X-Mimecast-MFC-AGG-ID: INkdn193PjqRXNuGiQEFzQ_1761731507
-Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-785c4b8a18bso79690677b3.1
-        for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 02:51:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761731507; x=1762336307;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dSvQNycfQkKBJnPHMBo2XhC9DfYUYCzMFCZMQnQ2D1g=;
-        b=D9unJ3ZXoy+ZwboIDXMr3uWDNzMiNdt6vNeJFOQVG5woPFLC/sV7+K51Sedgmb1xhJ
-         e0G1LRUJ51Ixdneg1xbnBvlBKvsZYBXKX4bNYTJcIGwuunirt2V3FZ5rRS98TaeF/fKO
-         w/tGs15F+jGegVBttLl+6zIxnxFPq3ToT3EM8jjXjnG67am76WlEKbNPh+YFqH6NvfgI
-         MThVgJHz0hqbQT0jAt7kWHFHj2ALCVgweahYFp0BLyHNqQYX6YzFNjh0l0uHTZzx01jU
-         HUqRfO7T+OZsjYz2zv/qiGIAQi2E0piOm2dYfYZA2Y8rU2D4dD2urx3L7uj3oAdNydeR
-         y5bA==
-X-Gm-Message-State: AOJu0YwJX6MBDyZBC2XvNlHwH+vQd2HeZf0xDgCeCO8TirvX3ZbQV+0e
-	2Vx5ZgjBXBDy7wDrQhZ6STuJ+IXD5ajfYIEtEufbyEB1BX6deY8U0QsRqDHAb5kctBd8ex7qCxr
-	8UEQbC+gxCUxfF7Mn3G37Q4gfsskUjHURYTWuAXP8ChkAqnBBUi4to7YkvQIqPtzwj2dHKxsUpI
-	uv2KqDEwDIaNJQG/v5Yx/IFHdhxVQNbYUX
-X-Gm-Gg: ASbGncug3XXsIBgw5wkbrfSZubkwN9NwfKS7e58J4mv+WQPZ1movh8NOhX/za6ZWaAF
-	m9BlTWSh9VSjcjB05a2RloQgpZ2WbJhm8rwEbEirTK8W1wAHtZwLYgpb9qmw3QxAnpgjZpF159F
-	4x6XTokpkArRDx3aUA7ob7kf5khrGEEjfOkmg26xWhC7kUBVtzlpbm2Q==
-X-Received: by 2002:a05:690c:fd6:b0:781:f505:ed4e with SMTP id 00721157ae682-78628e4f46amr21479587b3.15.1761731506773;
-        Wed, 29 Oct 2025 02:51:46 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGEzWJM9jea1p2fAq8glt00SwBhMSy2nwCLKOKfOguoWCKNhGzVQbjIFRn8wy4aWQMHyerELZoelpivUDfKJNA=
-X-Received: by 2002:a05:690c:fd6:b0:781:f505:ed4e with SMTP id
- 00721157ae682-78628e4f46amr21479437b3.15.1761731506436; Wed, 29 Oct 2025
- 02:51:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5258D28850E
+	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 09:55:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.38
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761731701; cv=fail; b=pvi+okc5dwf93tMsM7+NRbtMCbPOT/h6gmo9vis61Co6tCd3/z9FbLBUBmy1sspYIaXV3o5ZzGWpNnsd/mkvAoHrbKFTjGC+ypIy5twFV/npg+Fu4UvvqLwNHbHryR7x2505M5+K8xoZRMFlq/vnwC6AjkbPG1GvjjX0KrLKMrs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761731701; c=relaxed/simple;
+	bh=lTolmOQIpovpp5u2ksZ5YbUhOs0WX42+ILQxlwrD6rg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=cJzf5J7lILViIItmFC6IeR3aNYm0eEo1GsLODhW7f+nuoW72kzOimPconr9PFndujFm6UNKUiFG1gyIA+hYH5K6fllX9fsBUjX+TwPDFIDAKqd7RjP0/ve/i0Mh3Dly06kF5HFOF2GBi6A6cVxVxRv8WfuyslRUr/pNsu95UjVg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=qg9Wm18M; arc=fail smtp.client-ip=52.101.62.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=FQ5Eg9ucuXycspHL8bXVZxtdS9LO3L6gGrfYqJyqPvmLcjDPDadn/04yT4J4w3u+heac0RS0OEKQT/s4nCqaYUHwG7Cdx0yjLuLwBffUPkRYAPVnIYljTPvNHGyI3sOJ8w2+wUH71Q61usdZa9XM1iVCkm0wVYHXWj02JJHliKVlAd0g0KGYfaZaVJ9DRiA6TGYItzTIJpbSF1JauNd5EvXDNT0+Qf28f0vbiGO+SxdU6dw9tHr5m0U2dAyZFt1VB9BuO5PmLNt2CvfrTKpv0Fp214UORCdBf7uJ03nUGSgQe106okYiQnZlORqmtlN2R4e/hIq7VNehEZokF0LVBg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Hwau+YK+ip2E+PeUDdVjqWuZGRmZ3OkQIJJNpNUq4Ow=;
+ b=Bwl4h3Nykl60HEYx1ulEDMwJDmSrY6BLUF4KGNfe1DYgTOVh/HWwwCUWskx5U8g6ZRuCu3rrDWY678Exj+HU1N+Pe4QETx8xH75FsBbYz7cN0Px7PN2lh2UnOVP5uB3PyX8A+66IMjIElPXxnge8wr5mm6IZSw45ASolzxQvAujfewZW9S3d0ddxfgDSDsRmZUH+pP1dzTgM6g8Ym5jxN0jHxXNcjsXldYxwG0Uki5OKcGcp9PRWVgf8yjVeUZIPRnuJH0TfglqohT9vjo0AE1GrLRG7GWyAy0NbSE7XdqMOFsBdwRm8/+usFt8aAy7wjtpT4CsMZbh3DwCwcexKHw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Hwau+YK+ip2E+PeUDdVjqWuZGRmZ3OkQIJJNpNUq4Ow=;
+ b=qg9Wm18MZg9yEYgxK/nRXhNUmFp9lGtk/xfqv3hhzR27DYaZ8sqAJpGX1o4N8m7U5sIuxvMSCF0CM4PyUN4EawxxdcdGXU+dYLz7WVSxTdIW0W/XItRWXQHkKhd10zauNBWwWGtKugkhz52g4+NJrAEaHpFzQDz3880X1Iwkx9shCDugzv/vrojhQo+bMgeRLXANYOBHti869OZMtSiOeANQpMtDD9RljvUmAroDbty84uLpyXN9SNh0V9rNNZUX0cCVoPL/OkZH6mOqLETrgaaQ1R7rLKdMeA5XSERYCnorWyBLYPDF1fmTLcuMrd8v21DNpV6BlI29dd5avhTPPw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by CY5PR12MB6405.namprd12.prod.outlook.com (2603:10b6:930:3e::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.18; Wed, 29 Oct
+ 2025 09:54:55 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::6f7f:5844:f0f7:acc2%7]) with mapi id 15.20.9253.017; Wed, 29 Oct 2025
+ 09:54:55 +0000
+Date: Wed, 29 Oct 2025 11:54:43 +0200
+From: Ido Schimmel <idosch@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, pabeni@redhat.com,
+	edumazet@google.com, horms@kernel.org, dsahern@kernel.org,
+	petrm@nvidia.com, willemb@google.com, daniel@iogearbox.net,
+	fw@strlen.de, ishaangandhi@gmail.com, rbonica@juniper.net,
+	tom@herbertland.com, Justin Iurman <justin.iurman@uliege.be>
+Subject: Re: [PATCH net-next v2 0/3] icmp: Add RFC 5837 support
+Message-ID: <aQHkY6TsBcNL79rO@shredder>
+References: <20251027082232.232571-1-idosch@nvidia.com>
+ <20251028180432.7f73ef56@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251028180432.7f73ef56@kernel.org>
+X-ClientProxiedBy: TL2P290CA0025.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:3::20) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251029030913.20423-1-xuanzhuo@linux.alibaba.com> <20251029030913.20423-5-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <20251029030913.20423-5-xuanzhuo@linux.alibaba.com>
-From: Paolo Abeni <pabeni@redhat.com>
-Date: Wed, 29 Oct 2025 10:51:34 +0100
-X-Gm-Features: AWmQ_blOtBS1xkDDvOPVhShD5k6_MMXBlNHRXnEXktvcG2KGbdWIECDRKNwCopg
-Message-ID: <CAF6piCLkv6kFqoq7OQfJ=Su9AVHSQ9J7DzaumOSf5xuf9w-kyA@mail.gmail.com>
-Subject: Re: [PATCH net v4 4/4] virtio-net: correct hdr_len handling for
- tunnel gso
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Heng Qi <hengqi@linux.alibaba.com>, Willem de Bruijn <willemb@google.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Alvaro Karsz <alvaro.karsz@solid-run.com>, 
-	virtualization@lists.linux.dev
-Content-Type: multipart/mixed; boundary="000000000000a1ea1506424914b7"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|CY5PR12MB6405:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3f2d35e0-e37d-45a3-b898-08de16d13690
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?kq3EDj0BTgMBIJjkDcJzy7XSg5kYzM+I9lTijgjY53MpA9Bo6zO2vJx16JPP?=
+ =?us-ascii?Q?0BgJodGhIq4r7Kp8GDTXXxCK7X9kiy6hkzIslM4wVR1A/MAbQHEONPJtjRnO?=
+ =?us-ascii?Q?ttwgIsAjrySlW4xtaQclXMOZmV10qMk0nvnrf/pm1q3rPkCbCq8cHcBU+hu4?=
+ =?us-ascii?Q?oY4qNbL6TDR1GMgqbsZsek7Ob3rpEKveOlMwu3RTxcbUmm3sxE7+Uz8N3dpQ?=
+ =?us-ascii?Q?B6fdaiPmoKisws0BUHi5X922cS6JOcpNDC8oytVjheeUr+e/biIaRZhMMwpa?=
+ =?us-ascii?Q?OAF9n3fLJc4JeDsI0A2mMqFnVp0bFNnzn1L5JytHdZQkB3ChwKnZKAWt68zB?=
+ =?us-ascii?Q?PjcuZnvzsutr+7Lg7N78JvCXnkrhCSlgCUIhf910K75S7i8yI5yugp4Io6nN?=
+ =?us-ascii?Q?hR7iN4WjrfEdrnhFi5TW77TFJm1H4o6ZyUALxeocP9PHhsr/Ab8w0wO+D9tD?=
+ =?us-ascii?Q?2bBLHj7XzFLSvBiGlCI4Bg3g03dZylb0JoTKUpkahtC3pMFDMP1O4lJLm3N8?=
+ =?us-ascii?Q?NgGtji4LSWw1YQqVJLhgl59J65pIwUFZV4Dl3tSZ5+vbfnXXKxqbxIgG59Yi?=
+ =?us-ascii?Q?VAvkF869XFHE8Dlf4c42xRavNeo6qS2P4UXVI+Cc3/aB+dn0JpGyNyi9M7qP?=
+ =?us-ascii?Q?JAhAaTcLbobAIrTgGTRpFjv8r0V86ohv41wM8VhwCJojTgdOm3XsFaHpJQdP?=
+ =?us-ascii?Q?lN4oWllThQUHea47osA7QfmDnjOQRVrPICl7F9dRvHUglRrQPanBobGg3mE2?=
+ =?us-ascii?Q?rItqXA8cr/KUcuUxBbnHMw8cljRrEzxYrlAXVF3f2ekaAD34+kEcbmexUPW8?=
+ =?us-ascii?Q?zaiGAIGITDTwQ6dpJWxWCQUqwThH6ruNvytDwngvlQlM1oSI4udfrM2azfk1?=
+ =?us-ascii?Q?ARtQnYuIygedIKst35mH9rH6od9SXnJRiTZ4qfmzb3mfZX+Sdu4rbAXAMHj8?=
+ =?us-ascii?Q?v6PNubMsjUwFQiAJpIGaZ0M/pFZ1e8+/VHllhpa9SCfUsYyYyOI5mIhY8AOq?=
+ =?us-ascii?Q?XgES5+uzbi1tygQOd+j4Bu9VR9AhqdwQkgYXQHegvzSR3n4ZsU+Y/ZGIc4Aq?=
+ =?us-ascii?Q?Gmorotvden8t0HOHsX2oZpBwaUgVZl39wM4sflq2e4g9AZYwS6tFxI/IOwkj?=
+ =?us-ascii?Q?eQKuZoHf4Sx79fCErYN018M/2Skb9MgAOu7zn1ny+yt0NC9DRKWwU9PSqzR7?=
+ =?us-ascii?Q?fUrJPCTP8qqoheogrf7MFfHydKvrnpnM8+xK3go5uiqwH4V4aeN4CaCWYxoG?=
+ =?us-ascii?Q?liJGA95Ly1uAZFwSq7qgN1GBzT07q8c/jtuh2MC46PFhg6i/dU2jAS9ZpeXD?=
+ =?us-ascii?Q?GwNHUkyilrCDtMVzaOWadDfRc3nwJbdIJD2RWGZpAnzaP0UeVhliwZHuKV6o?=
+ =?us-ascii?Q?AC9jnMaFYfEy82dXaj0ytPaCk70dsbDSiK3jReXbNT3z62YwRMc5bAJv3cCO?=
+ =?us-ascii?Q?rp4EnE6tEcCBLdakhUbEFJVTaUvzNGqk?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?OXX2cGfDNZuxIZab+H6TMe6wEq2UUXLeyOc7+LlAJ4WoRZyx90OhOv5d+obu?=
+ =?us-ascii?Q?d0cQT5VFKkgWm9DBatP3Cy40Vq1xbiGAb5dF53v55tr8oMxjvd8BCrkC7TAG?=
+ =?us-ascii?Q?kWNfISaKgP2hhBhfSLax6LoEbfN5/+cZ8Fzb4hD1DMIZHUD3Pap9Z1F0CVsu?=
+ =?us-ascii?Q?NknhPjRJ34MybT09CzOspXaxwjFLW26+y/k0MAL5pCbak9zOn/Rnl3MblF/m?=
+ =?us-ascii?Q?ba2eDsRmeX1peLS02WJM5ieVdu4jv0AhX8zwzSXJfvL3scq1iu9kjDnHSd20?=
+ =?us-ascii?Q?OVDEh5ybuzNdJlhyxwbkcfk5r53x/RHt+KmYMeUAOAUGpjb0KbSBAVsyd8Ya?=
+ =?us-ascii?Q?kRUYR0i7BnKEV1PNQuoiR19tLzVM++HKQH0PGFZZq9Sy8BAxlibE+w8o4Orf?=
+ =?us-ascii?Q?QfCcLDMs2HuBIdwpQcPrP5jSEuMFeL2qL++XOIDoSn8o39Zp05dMlnWoRspd?=
+ =?us-ascii?Q?pNiPcxPksHtrOqzaWWYEKUlB5VMh3AlfvfQSVJ40rfJWhtmLO4kNuBDH9cQ9?=
+ =?us-ascii?Q?RCrIREuZPiCYuw5otSNPHkQHRNngq/72oeJgo/260hd07raj1J1mZYKgCyI/?=
+ =?us-ascii?Q?tD9ODRU9H6cHer0d89FqZz27QjwHybQRM4PWxMbVmUMnJJFl+/jbsQBBTX8Z?=
+ =?us-ascii?Q?WJk0w9stod1VHkaxVolZ8SQJb5YZqaroZUN4RKbjCWyEBORONFMW7ih0at2c?=
+ =?us-ascii?Q?9ZkGC+BIgjiHn/a4jMNacycMsMNM69rfYqghxG3cPITqfl/ot4qUDBdbxWVI?=
+ =?us-ascii?Q?kdwlbRpkb0lSQ0FnGWlAbbaQmKCAlp+T2L7gA3XtKh9X6KWzPD0YqGrTun1X?=
+ =?us-ascii?Q?144M+y7zn0J31jZykInuy+zTYP2HLQsiczrGZoWDOYNJXz69R7KiCKzjBCRf?=
+ =?us-ascii?Q?JQQvRd0Lnf8rYZPnfhfU4VWZuJeADzy1ZYrrORbCzo6jtuG5Wr1kID7TKRWW?=
+ =?us-ascii?Q?vZDwVha5KZaX1EjN7pXH3J5+QPVKSr46Z/mX9O+91fqyoR94S36v02P6yZge?=
+ =?us-ascii?Q?o5LWX1k/qw1OEAX0yWynHjGn42Q3kImxSRvPyp3V8ulT0exspGrG1e5KUuR4?=
+ =?us-ascii?Q?z5ariSioQpHEnKlU+DBBxd1tAdl6N9VXhBXxnsMruQ1COg1mMWfOVCXev0xI?=
+ =?us-ascii?Q?UqjnDwpXwKM6vcZWmOKKLA5Vb35nSbaXB+t/AgApSG+Xetks1KKH6v79mTtS?=
+ =?us-ascii?Q?EPh28+/DWBzzFp/fs5g+Xl7wLDn5fkMS5oHa3VwerYzGwPZQl6WcbE8mLj8x?=
+ =?us-ascii?Q?PdKyR1+gMICb8tDW0oYhbGx95HUH1iPUOXNaZQ8iqi1b5ISq3Ak+E5emZrPo?=
+ =?us-ascii?Q?Bpm8b9Ku95jVRMxEFcM46oS4NxOePc5pyQ6avHn8tMpsyzo2Elk2bltFbg8+?=
+ =?us-ascii?Q?rmwxnjv4Tq9nUL2n7E4byycnOY/Crftmanj+J0O5cowDp989HsOG+pMsSWMv?=
+ =?us-ascii?Q?8n+czvkEKthQJAdBCW1xZVKcbwyH3/6mpVLaY0Xf6OgXK5pHTJbkH4ch1Rwb?=
+ =?us-ascii?Q?HI1X8ADu1+FgPrO9h9JUpkCxH5RkX7aYPqYAdjY6vcAWJRhKN1o0ceIR3vN0?=
+ =?us-ascii?Q?cp+gSU3uOwhMm5u5z7NUAP46/7mPu3M3f2i87i0M?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3f2d35e0-e37d-45a3-b898-08de16d13690
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Oct 2025 09:54:55.4294
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: C4OnNfjKKox6Az8cOTq+A8cZrll6Hw0Aw98oOo6kuc5w8K1FRBcw4jLIqBN8cOs90BHRmUSFUFh49QCcC8eeBA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6405
 
---000000000000a1ea1506424914b7
-Content-Type: multipart/alternative; boundary="000000000000a1ea1406424914b5"
+On Tue, Oct 28, 2025 at 06:04:32PM -0700, Jakub Kicinski wrote:
+> On Mon, 27 Oct 2025 10:22:29 +0200 Ido Schimmel wrote:
+> > This patchset extends certain ICMP error messages (e.g., "Time
+> > Exceeded") with incoming interface information in accordance with RFC
+> > 5837 [1]. This is required for more meaningful traceroute results in
+> > unnumbered networks. Like other ICMP settings, the feature is controlled
+> > via a per-{netns, address family} sysctl. The interface and the
+> > implementation are designed to support more ICMP extensions.
+> 
+> Is there supposed to be any relation between the ICMP message attrs 
+> and what's provided via IOAM? For interface ID in IOAM we have
+> the ioam6_id attr instead of ifindex.
 
---000000000000a1ea1406424914b5
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+RFC 5837 precedes IOAM and I don't see any references from IOAM to RFC
+5837. RFC 5837 is pretty clear about the interface index that should be
+provided:
 
-On Wed, Oct 29, 2025 at 4:09=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
-om>
-wrote:
-> diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
-> index 6ef0b737d548..46b04816d333 100644
-> --- a/include/linux/virtio_net.h
-> +++ b/include/linux/virtio_net.h
-> @@ -207,6 +207,14 @@ static inline int virtio_net_hdr_to_skb(struct
-sk_buff *skb,
->         return __virtio_net_hdr_to_skb(skb, hdr, little_endian,
-hdr->gso_type);
->  }
->
-> +static inline int virtio_net_tcp_hdrlen(const struct sk_buff *skb, bool
-tnl)
-> +{
-> +       if (tnl)
-> +               return inner_tcp_hdrlen(skb);
-> +
-> +       return tcp_hdrlen(skb);
-> +}
-> +
->  static inline int virtio_net_hdr_from_skb(const struct sk_buff *skb,
->                                           struct virtio_net_hdr *hdr,
->                                           bool little_endian,
-> @@ -217,25 +225,33 @@ static inline int virtio_net_hdr_from_skb(const
-struct sk_buff *skb,
->
->         if (skb_is_gso(skb)) {
->                 struct skb_shared_info *sinfo =3D skb_shinfo(skb);
-> +               bool tnl =3D false;
->                 u16 hdr_len =3D 0;
->
-> -               /* In certain code paths (such as the af_packet.c receive
-path),
-> -                * this function may be called without a transport header=
-.
-> -                * In this case, we do not need to set the hdr_len.
-> -                */
-> -               if (skb_transport_header_was_set(skb))
-> -                       hdr_len =3D skb_transport_offset(skb);
-> +               if (sinfo->gso_type & (SKB_GSO_UDP_TUNNEL |
-> +                                      SKB_GSO_UDP_TUNNEL_CSUM)) {
-> +                       tnl =3D true;
-> +                       hdr_len =3D skb_inner_transport_offset(skb);
-> +
-> +               } else {
-> +                       /* In certain code paths (such as the af_packet.c
-receive path),
-> +                        * this function may be called without a
-transport header.
-> +                        * In this case, we do not need to set the
-hdr_len.
-> +                        */
-> +                       if (skb_transport_header_was_set(skb))
-> +                               hdr_len =3D skb_transport_offset(skb);
-> +               }
->
->                 hdr->gso_size =3D __cpu_to_virtio16(little_endian,
->                                                   sinfo->gso_size);
->                 if (sinfo->gso_type & SKB_GSO_TCPV4) {
->                         hdr->gso_type =3D VIRTIO_NET_HDR_GSO_TCPV4;
->                         if (hdr_len)
-> -                               hdr_len +=3D tcp_hdrlen(skb);
-> +                               hdr_len +=3D virtio_net_tcp_hdrlen(skb,
-tnl);
->                 } else if (sinfo->gso_type & SKB_GSO_TCPV6) {
->                         hdr->gso_type =3D VIRTIO_NET_HDR_GSO_TCPV6;
->                         if (hdr_len)
-> -                               hdr_len +=3D tcp_hdrlen(skb);
-> +                               hdr_len +=3D virtio_net_tcp_hdrlen(skb,
-tnl);
->                 } else if (sinfo->gso_type & SKB_GSO_UDP_L4) {
->                         hdr->gso_type =3D VIRTIO_NET_HDR_GSO_UDP_L4;
->                         if (hdr_len)
+"The ifIndex of the interface of interest MAY be included. This is the
+32-bit ifIndex assigned to the interface by the device as specified by
+the Interfaces Group MIB [RFC2863]".
 
-I think it's a bit of a pity that the non-UDP tunnel path had to do all the
-additional conditionals.
+> Would it make sense to add some info about relation to IOAM to the
+> commit msg (or even docs?). Or is it obvious to folks more familiar
+> with IP RFCs than I am?
 
-The (completely untested) alternative attached here would reduce them a bit=
-.
-
-Still I'm a bit concerned by all the 'if (hdr_len)' unconditionally
-sprinkled around by the previous patch. The virtio spec says that hdr_len
-is valid if and only if the VIRTIO_NET_F_GUEST_HDRLEN feature has been
-negotiated.
-
-What about moving hdr->hdr_len initialization in a separate helper and
-calling it only when the relevant feature has been negotiated?
-
-Thanks,
-
-Paolo
-
---000000000000a1ea1406424914b5
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: base64
-
-PGRpdiBkaXI9Imx0ciI+PGRpdiBkaXI9Imx0ciI+T24gV2VkLCBPY3QgMjksIDIwMjUgYXQgNDow
-OeKAr0FNIFh1YW4gWmh1byAmbHQ7PGEgaHJlZj0ibWFpbHRvOnh1YW56aHVvQGxpbnV4LmFsaWJh
-YmEuY29tIiB0YXJnZXQ9Il9ibGFuayI+eHVhbnpodW9AbGludXguYWxpYmFiYS5jb208L2E+Jmd0
-OyB3cm90ZTo8YnI+Jmd0OyBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9saW51eC92aXJ0aW9fbmV0Lmgg
-Yi9pbmNsdWRlL2xpbnV4L3ZpcnRpb19uZXQuaDxicj4mZ3Q7IGluZGV4IDZlZjBiNzM3ZDU0OC4u
-NDZiMDQ4MTZkMzMzIDEwMDY0NDxicj4mZ3Q7IC0tLSBhL2luY2x1ZGUvbGludXgvdmlydGlvX25l
-dC5oPGJyPiZndDsgKysrIGIvaW5jbHVkZS9saW51eC92aXJ0aW9fbmV0Lmg8YnI+Jmd0OyBAQCAt
-MjA3LDYgKzIwNywxNCBAQCBzdGF0aWMgaW5saW5lIGludCB2aXJ0aW9fbmV0X2hkcl90b19za2Io
-c3RydWN0IHNrX2J1ZmYgKnNrYiw8YnI+Jmd0OyDCoCDCoCDCoCDCoCByZXR1cm4gX192aXJ0aW9f
-bmV0X2hkcl90b19za2Ioc2tiLCBoZHIsIGxpdHRsZV9lbmRpYW4sIGhkci0mZ3Q7Z3NvX3R5cGUp
-Ozxicj4mZ3Q7IMKgfTxicj4mZ3Q7PGJyPiZndDsgK3N0YXRpYyBpbmxpbmUgaW50IHZpcnRpb19u
-ZXRfdGNwX2hkcmxlbihjb25zdCBzdHJ1Y3Qgc2tfYnVmZiAqc2tiLCBib29sIHRubCk8YnI+Jmd0
-OyArezxicj4mZ3Q7ICsgwqAgwqAgwqAgaWYgKHRubCk8YnI+Jmd0OyArIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIHJldHVybiBpbm5lcl90Y3BfaGRybGVuKHNrYik7PGJyPiZndDsgKzxicj4mZ3Q7ICsg
-wqAgwqAgwqAgcmV0dXJuIHRjcF9oZHJsZW4oc2tiKTs8YnI+Jmd0OyArfTxicj4mZ3Q7ICs8YnI+
-Jmd0OyDCoHN0YXRpYyBpbmxpbmUgaW50IHZpcnRpb19uZXRfaGRyX2Zyb21fc2tiKGNvbnN0IHN0
-cnVjdCBza19idWZmICpza2IsPGJyPiZndDsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgc3RydWN0IHZpcnRpb19uZXRfaGRyICpo
-ZHIsPGJyPiZndDsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgYm9vbCBsaXR0bGVfZW5kaWFuLDxicj4mZ3Q7IEBAIC0yMTcsMjUg
-KzIyNSwzMyBAQCBzdGF0aWMgaW5saW5lIGludCB2aXJ0aW9fbmV0X2hkcl9mcm9tX3NrYihjb25z
-dCBzdHJ1Y3Qgc2tfYnVmZiAqc2tiLDxicj4mZ3Q7PGJyPiZndDsgwqAgwqAgwqAgwqAgaWYgKHNr
-Yl9pc19nc28oc2tiKSkgezxicj4mZ3Q7IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIHN0cnVjdCBz
-a2Jfc2hhcmVkX2luZm8gKnNpbmZvID0gc2tiX3NoaW5mbyhza2IpOzxicj4mZ3Q7ICsgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgYm9vbCB0bmwgPSBmYWxzZTs8YnI+Jmd0OyDCoCDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCB1MTYgaGRyX2xlbiA9IDA7PGJyPiZndDs8YnI+Jmd0OyAtIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIC8qIEluIGNlcnRhaW4gY29kZSBwYXRocyAoc3VjaCBhcyB0aGUgYWZfcGFja2V0LmMg
-cmVjZWl2ZSBwYXRoKSw8YnI+Jmd0OyAtIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgKiB0aGlzIGZ1
-bmN0aW9uIG1heSBiZSBjYWxsZWQgd2l0aG91dCBhIHRyYW5zcG9ydCBoZWFkZXIuPGJyPiZndDsg
-LSDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCogSW4gdGhpcyBjYXNlLCB3ZSBkbyBub3QgbmVlZCB0
-byBzZXQgdGhlIGhkcl9sZW4uPGJyPiZndDsgLSDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCovPGJy
-PiZndDsgLSDCoCDCoCDCoCDCoCDCoCDCoCDCoCBpZiAoc2tiX3RyYW5zcG9ydF9oZWFkZXJfd2Fz
-X3NldChza2IpKTxicj4mZ3Q7IC0gwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgaGRy
-X2xlbiA9IHNrYl90cmFuc3BvcnRfb2Zmc2V0KHNrYik7PGJyPiZndDsgKyDCoCDCoCDCoCDCoCDC
-oCDCoCDCoCBpZiAoc2luZm8tJmd0O2dzb190eXBlICZhbXA7IChTS0JfR1NPX1VEUF9UVU5ORUwg
-fDxicj4mZ3Q7ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqBTS0JfR1NPX1VEUF9UVU5ORUxfQ1NVTSkpIHs8YnI+Jmd0OyArIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIHRubCA9IHRydWU7PGJyPiZndDsgKyDCoCDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBoZHJfbGVuID0gc2tiX2lubmVyX3RyYW5zcG9ydF9vZmZz
-ZXQoc2tiKTs8YnI+Jmd0OyArPGJyPiZndDsgKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCB9IGVsc2Ug
-ezxicj4mZ3Q7ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgLyogSW4gY2VydGFp
-biBjb2RlIHBhdGhzIChzdWNoIGFzIHRoZSBhZl9wYWNrZXQuYyByZWNlaXZlIHBhdGgpLDxicj4m
-Z3Q7ICsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAqIHRoaXMgZnVuY3Rpb24g
-bWF5IGJlIGNhbGxlZCB3aXRob3V0IGEgdHJhbnNwb3J0IGhlYWRlci48YnI+Jmd0OyArIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgKiBJbiB0aGlzIGNhc2UsIHdlIGRvIG5vdCBu
-ZWVkIHRvIHNldCB0aGUgaGRyX2xlbi48YnI+Jmd0OyArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgKi88YnI+Jmd0OyArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IGlmIChza2JfdHJhbnNwb3J0X2hlYWRlcl93YXNfc2V0KHNrYikpPGJyPiZndDsgKyDCoCDCoCDC
-oCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBoZHJfbGVuID0gc2tiX3RyYW5z
-cG9ydF9vZmZzZXQoc2tiKTs8YnI+Jmd0OyArIMKgIMKgIMKgIMKgIMKgIMKgIMKgIH08YnI+Jmd0
-Ozxicj4mZ3Q7IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIGhkci0mZ3Q7Z3NvX3NpemUgPSBfX2Nw
-dV90b192aXJ0aW8xNihsaXR0bGVfZW5kaWFuLDxicj4mZ3Q7IMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIHNp
-bmZvLSZndDtnc29fc2l6ZSk7PGJyPiZndDsgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgaWYgKHNp
-bmZvLSZndDtnc29fdHlwZSAmYW1wOyBTS0JfR1NPX1RDUFY0KSB7PGJyPiZndDsgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgaGRyLSZndDtnc29fdHlwZSA9IFZJUlRJT19ORVRf
-SERSX0dTT19UQ1BWNDs8YnI+Jmd0OyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDC
-oCBpZiAoaGRyX2xlbik8YnI+Jmd0OyAtIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIGhkcl9sZW4gKz0gdGNwX2hkcmxlbihza2IpOzxicj4mZ3Q7ICsgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgaGRyX2xlbiArPSB2aXJ0aW9f
-bmV0X3RjcF9oZHJsZW4oc2tiLCB0bmwpOzxicj4mZ3Q7IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IH0gZWxzZSBpZiAoc2luZm8tJmd0O2dzb190eXBlICZhbXA7IFNLQl9HU09fVENQVjYpIHs8YnI+
-Jmd0OyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBoZHItJmd0O2dzb190eXBl
-ID0gVklSVElPX05FVF9IRFJfR1NPX1RDUFY2Ozxicj4mZ3Q7IMKgIMKgIMKgIMKgIMKgIMKgIMKg
-IMKgIMKgIMKgIMKgIMKgIGlmIChoZHJfbGVuKTxicj4mZ3Q7IC0gwqAgwqAgwqAgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgwqAgaGRyX2xlbiArPSB0Y3BfaGRybGVuKHNrYik7PGJy
-PiZndDsgKyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBoZHJf
-bGVuICs9IHZpcnRpb19uZXRfdGNwX2hkcmxlbihza2IsIHRubCk7PGJyPiZndDsgwqAgwqAgwqAg
-wqAgwqAgwqAgwqAgwqAgfSBlbHNlIGlmIChzaW5mby0mZ3Q7Z3NvX3R5cGUgJmFtcDsgU0tCX0dT
-T19VRFBfTDQpIHs8YnI+Jmd0OyDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCDCoCBo
-ZHItJmd0O2dzb190eXBlID0gVklSVElPX05FVF9IRFJfR1NPX1VEUF9MNDs8YnI+PGRpdj4mZ3Q7
-IMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIMKgIGlmIChoZHJfbGVuKTwvZGl2Pjxk
-aXY+PGJyPjwvZGl2PjxkaXY+SSB0aGluayBpdCYjMzk7cyBhIGJpdCBvZiBhIHBpdHkgdGhhdCB0
-aGUgbm9uLVVEUCB0dW5uZWwgcGF0aCBoYWQgdG8gZG8gYWxsIHRoZSBhZGRpdGlvbmFsIGNvbmRp
-dGlvbmFscy48L2Rpdj48ZGl2Pjxicj48L2Rpdj48ZGl2PlRoZSAoY29tcGxldGVseSB1bnRlc3Rl
-ZCkgYWx0ZXJuYXRpdmUgYXR0YWNoZWQgaGVyZSB3b3VsZCByZWR1Y2UgdGhlbSBhIGJpdC48L2Rp
-dj48ZGl2Pjxicj48L2Rpdj48ZGl2PlN0aWxsIEkmIzM5O20gYSBiaXQgY29uY2VybmVkIGJ5IGFs
-bCB0aGUgJiMzOTtpZsKgKGhkcl9sZW4pJiMzOTsgdW5jb25kaXRpb25hbGx5IHNwcmlua2xlZCBh
-cm91bmQgYnkgdGhlIHByZXZpb3VzIHBhdGNoLiBUaGUgdmlydGlvIHNwZWMgc2F5cyB0aGF0IGhk
-cl9sZW4gaXMgdmFsaWQgaWYgYW5kIG9ubHkgaWYgdGhlIFZJUlRJT19ORVRfRl9HVUVTVF9IRFJM
-RU4gZmVhdHVyZSBoYXMgYmVlbiBuZWdvdGlhdGVkLjwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+
-V2hhdCBhYm91dCBtb3ZpbmcgaGRyLSZndDtoZHJfbGVuIGluaXRpYWxpemF0aW9uIGluIGEgc2Vw
-YXJhdGUgaGVscGVyIGFuZCBjYWxsaW5nIGl0IG9ubHkgd2hlbiB0aGUgcmVsZXZhbnQgZmVhdHVy
-ZSBoYXMgYmVlbiBuZWdvdGlhdGVkPzwvZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+VGhhbmtzLDwv
-ZGl2PjxkaXY+PGJyPjwvZGl2PjxkaXY+UGFvbG88L2Rpdj48L2Rpdj4NCjwvZGl2Pg0K
---000000000000a1ea1406424914b5--
---000000000000a1ea1506424914b7
-Content-Type: application/octet-stream; name=diffs
-Content-Disposition: attachment; filename=diffs
-Content-Transfer-Encoding: base64
-Content-ID: <f_mhbst4ow0>
-X-Attachment-Id: f_mhbst4ow0
-
-ZGlmZiAtLWdpdCBhL2luY2x1ZGUvbGludXgvdmlydGlvX25ldC5oIGIvaW5jbHVkZS9saW51eC92
-aXJ0aW9fbmV0LmgKaW5kZXggNmVmMGI3MzdkNTQ4Li42NzI0OTJiOTQ1OGYgMTAwNjQ0Ci0tLSBh
-L2luY2x1ZGUvbGludXgvdmlydGlvX25ldC5oCisrKyBiL2luY2x1ZGUvbGludXgvdmlydGlvX25l
-dC5oCkBAIC00MjAsMTAgKzQyMCwxMyBAQCB2aXJ0aW9fbmV0X2hkcl90bmxfZnJvbV9za2IoY29u
-c3Qgc3RydWN0IHNrX2J1ZmYgKnNrYiwKICAgICAgICAgdmhkci0+aGFzaF9oZHIuaGFzaF9yZXBv
-cnQgPSAwOwogICAgICAgICB2aGRyLT5oYXNoX2hkci5wYWRkaW5nID0gMDsKIAotCS8qIExldCB0
-aGUgYmFzaWMgcGFyc2luZyBkZWFsIHdpdGggcGxhaW4gR1NPIGZlYXR1cmVzLiAqLwotCXNrYl9z
-aGluZm8oc2tiKS0+Z3NvX3R5cGUgJj0gfnRubF9nc29fdHlwZTsKKwkvKiBUaGUgYmFzaWMgcGFy
-c2luZyB3aWxsIGxvb2sgb25seSBmb3IgdGhlIHRyYW5zcG9ydCBoZWFkZXIsCisJICogbGV0IGl0
-IHJlZmVyIHRvIHRoZSByZWxldmFudCBvbmUKKwkgKi8KKwlvdXRlcl90aCA9IHNrYi0+dHJhbnNw
-b3J0X2hlYWRlciAtIHNrYl9oZWFkcm9vbShza2IpOworCXNrYi0+dHJhbnNwb3J0X2hlYWRlciA9
-IHNrYi0+aW5uZXJfdHJhbnNwb3J0X2hlYWRlcjsKIAlyZXQgPSB2aXJ0aW9fbmV0X2hkcl9mcm9t
-X3NrYihza2IsIGhkciwgdHJ1ZSwgZmFsc2UsIHZsYW5faGxlbik7Ci0Jc2tiX3NoaW5mbyhza2Ip
-LT5nc29fdHlwZSB8PSB0bmxfZ3NvX3R5cGU7CisJc2tiLT50cmFuc3BvcnRfaGVhZGVyID0gb3V0
-ZXJfdGggKyBza2JfaGVhZHJvb20oc2tiKTsKIAlpZiAocmV0KQogCQlyZXR1cm4gcmV0OwogCg==
---000000000000a1ea1506424914b7--
-
+I'm pretty sure that when people are told that the message contains "the
+32-bit ifIndex" they don't think about "the wide IOAM id of this
+interface".
 
