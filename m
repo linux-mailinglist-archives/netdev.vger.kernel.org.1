@@ -1,100 +1,155 @@
-Return-Path: <netdev+bounces-233764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD4C3C18009
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 03:08:06 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 597A4C1802A
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 03:09:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D86851C23796
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 02:08:30 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A5664503DEF
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 02:08:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92D582820DB;
-	Wed, 29 Oct 2025 02:08:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98B3E2820DB;
+	Wed, 29 Oct 2025 02:08:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u1IVfK03"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="lPEndVtb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 659A513B58C;
-	Wed, 29 Oct 2025 02:08:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F32F12E8DEF
+	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 02:08:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761703682; cv=none; b=K+5sb5O7UvqDB+gKc8B2odzgGlFABmFS6lb/L4W5tIYf7Br/S02adFZnbZKscTy/GfFy5WSH9vOFa6hikJwgJVQ0vDtDeLuQU8H3GzHaSXhWfQu72+o0roHwTVCMip67btvoo0OXq0Kecq/Jpj93l0kiu2xik8bQlGCZmOLfl1U=
+	t=1761703694; cv=none; b=pCoYfb7VsmnVhm6hvU8a7poqbG++zBnU/NCL5eF90muBfzhvsEQrhqIHgdeO7cKfFd838YF/YFZzP7o32Zc8g/3V4EqStUWw0jqj6BHxx9xAsjgYs243McSg+3wff0pO/3OveijyRKJrKhbMwJxrPJs+epY2eWQxU+UwxR6/nHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761703682; c=relaxed/simple;
-	bh=x7M+GHSAVsoCL8DBq5oS9mhQFrezimpsQJKSbDMb0Gc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=e1EcpsI2+R2V9VMnMElE+x6PnqKVkBDEHfOFfZXY1AWJ7e8U7+pm/CtDD1th0THnnc4QBsHyFw7CgwLO3NZvCNSAnDbpLsEdfnLVwwusOs+wrf75Jf235eOTQNASGXqlIXe9DBMvH01G6/AkSlYw5oSWoz4xvkTs/NH2FEAJi1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u1IVfK03; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60D74C4CEE7;
-	Wed, 29 Oct 2025 02:08:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761703681;
-	bh=x7M+GHSAVsoCL8DBq5oS9mhQFrezimpsQJKSbDMb0Gc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=u1IVfK03hZKQI7NsIO5yORbLzwnlFsm2l7P6fV5SopDDEbyxQztF/FsGChkl1PmOR
-	 O18obhqBxxgcmW/fpLgUMEEiZ1nSKnRxADKho0M+Hrr07HhkBQE0I//ZieGQIbyCDg
-	 bc9sUqSYK858+pr5heIbd1prRgnz+8+z6/5OcQpGuwmsujZGfUgvkj4zMIR455uHcf
-	 krfFAO8pkMUO6LA1jN4xBqLJAdibw6voIbfRJCfrfWLvV4Hy11R4B6o7kXp4nwsdZm
-	 iIYELGunUmwsEV09GTyr1048zD93zBD4efqvrGKDwKwpUd3EJOfHfFJ7ypM7NOewRA
-	 InGNm5L81k9CA==
-Date: Tue, 28 Oct 2025 19:08:00 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Roger Quadros <rogerq@kernel.org>
-Cc: Siddharth Vadapalli <s-vadapalli@ti.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell
- King <linux@armlinux.org.uk>, danishanwar@ti.com, srk@ti.com,
- linux-omap@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5 8/9] net: ethernet: ti: am65-cpsw: add
- network flow classification support
-Message-ID: <20251028190800.2ee4f80e@kernel.org>
-In-Reply-To: <20251024-am65-cpsw-rx-class-v5-8-c7c2950a2d25@kernel.org>
-References: <20251024-am65-cpsw-rx-class-v5-0-c7c2950a2d25@kernel.org>
-	<20251024-am65-cpsw-rx-class-v5-8-c7c2950a2d25@kernel.org>
+	s=arc-20240116; t=1761703694; c=relaxed/simple;
+	bh=DZB1KNfyJicdFq2XENqQyno5NTovyzK4zCwNpClQJZU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uN2GL/KYIxNj0heMXS01su0at6YBLAI9Q5gPiH5oEsZ9gbGNHXIlbN9rYGHyRelrf0d9AqYKrBdWqdfE3+5w1n8yrmPEA0MpICjm07dKEPhhT1X6f3qOKQj0Uv7ZriXCOSBO0lb773GshmUHVlKRyagYC+qeha1Fpe16idQyVnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=lPEndVtb; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-78af743c232so6186045b3a.1
+        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 19:08:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1761703692; x=1762308492; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=b7eBpQyclD0Km8KHgiZXvZe1KUtyHdkLCjFK6BIXujg=;
+        b=lPEndVtbWhF0dyxQA6qs/+vw24e1Ezz1axyI0SnQQ1Q03fo3+Ydyb1/dkbn15ECgcb
+         HCJLWhI6vezFYdpsa3yBYl5pErsPu4rCsoWVnLwEmH28X+JOcPdptE9a7vs12VPMIeT7
+         U8uDN5mHsxjE31R+CF7bYMyo0sQ51pmjxXnz0EnjpMFAqsBVdTxR1mVg/Zw45n4acZ+f
+         OVIPme4jxaMoSwyxb55JCngY/Cz8trLNJOcK1s7xd+f4ObAfMQI23L7BH2FoFE91cTEO
+         nCQZYIMhbzXXBwG+OQhoxt5O0/HWDy+PcCT+RTQ4CaI+Ex/7466nwvudYQQ8xjNvV/8F
+         j5og==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761703692; x=1762308492;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=b7eBpQyclD0Km8KHgiZXvZe1KUtyHdkLCjFK6BIXujg=;
+        b=bGo3tDB40p77JReiiBErqg73Pd4F50kiglCDutW1zpvErxmSYXIa8CGexCw9xosvjd
+         YGlcCL4d8YVKDWHW559PFWjU3PCajd5Imp4si8MwToh6tavSufTKbVzNZtYUVMEDMVrg
+         pyVsrz/lJobhrykNOdFOeFKghEshJg972LFPQk0sv/0NeYlZFaAwKKGdGK8oxJauc5SK
+         Nw6gfS3JhIcqVlC07GfwLVwdtumr0IziklW2+qoKEGeUSsvV1EQOM/DmRuvDV4eHlh5m
+         nJUbB4TbxHN1+u0SubK+vSg5Uxe/L2wytJyUyw4aWTR2ZPq2gPtewqZXjDxicfVxzNwZ
+         z83A==
+X-Gm-Message-State: AOJu0YzF91DYzbwiDQdNkkeoZvo/bmBYmlhHjWFJ5GzJI49Yp49IW1TN
+	RcrWrjDZDY/8PngH2lLhVuFYV3zpi8eihklEisQQBzKFW1CjPg0c9WPm6w9hW1K4LqzkrvaCXzu
+	nrF1aOwI=
+X-Gm-Gg: ASbGncu7oOvy4+qR+q+yl1zA27VA2usHnv+pfY0xRVgg/KXZGC1zZxqC7P5DIzsNPmi
+	D195YE8UIFpsZ16SrXWWKcWbBuRMycKf2TYOt1acR6kUVTpV/HPyjuyUueFx7jOrS4sznWr/8JC
+	IkU6S2BPl5/bz5b51NBHrfeoIlpeI9Kdd++ATJLIaIZoNSA9akOomUZrHClZ+6CCIpwQggdnGYs
+	63eWlM6WutTEX1dNnVXCI39INfNFWf2zpaMD91SrkJLJYny+9dzPZmAH3rEpzfa4sqBAcYOBwQw
+	8YPB2Hx0qtldtoBxZP7o3HDPHC94sj1RKbY/zE2bFzpssyCJ1TU219wxNJ22GmMsRfYvGvAHgTm
+	4Y1sxh+IVoBYY2Wpuk7iBt7WO49NpEvbYQ1qoInzFYvtVAC2gPbha0hXGm9BdC/gCX7wNB/nH+S
+	P4epEkEnlO36kFyTqm7U9YCm6+YKzxqPe54Si+gVw=
+X-Google-Smtp-Source: AGHT+IEWHDznxIYhkt4nsOAIu1DCYbl63hbFFlY4qk3uZRryNFT6SYOErTMxVSowKpCM2aBWKfmZ/A==
+X-Received: by 2002:a05:6a00:2d0b:b0:7a2:81fe:b748 with SMTP id d2e1a72fcca58-7a4dfd08245mr1490684b3a.0.1761703691563;
+        Tue, 28 Oct 2025 19:08:11 -0700 (PDT)
+Received: from [192.168.86.109] ([136.27.45.11])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a414012b19sm13068960b3a.12.2025.10.28.19.08.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Oct 2025 19:08:11 -0700 (PDT)
+Message-ID: <b6b3cef5-195c-40cc-8c37-cebdee05a5bd@davidwei.uk>
+Date: Tue, 28 Oct 2025 19:08:10 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 03/15] net: Add peer info to queue-get
+ response
+To: Jakub Kicinski <kuba@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
+ razor@blackwall.org, pabeni@redhat.com, willemb@google.com, sdf@fomichev.me,
+ john.fastabend@gmail.com, martin.lau@kernel.org, jordan@jrife.io,
+ maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, toke@redhat.com,
+ yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
+References: <20251020162355.136118-1-daniel@iogearbox.net>
+ <20251020162355.136118-4-daniel@iogearbox.net>
+ <20251023193333.751b686a@kernel.org>
+ <17f5b871-9bd9-4313-b123-67afa0f69272@iogearbox.net>
+ <20251024161832.2ff28238@kernel.org>
+Content-Language: en-US
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <20251024161832.2ff28238@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Fri, 24 Oct 2025 23:46:07 +0300 Roger Quadros wrote:
+On 2025-10-24 16:18, Jakub Kicinski wrote:
+> On Fri, 24 Oct 2025 14:59:39 +0200 Daniel Borkmann wrote:
+>> On 10/24/25 4:33 AM, Jakub Kicinski wrote:
+>>> On Mon, 20 Oct 2025 18:23:43 +0200 Daniel Borkmann wrote:
+>>>> Add a nested peer field to the queue-get response that returns the peered
+>>>> ifindex and queue id.
+>>>>
+>>>> Example with ynl client:
+>>>>
+>>>>     # ip netns exec foo ./pyynl/cli.py \
+>>>>         --spec ~/netlink/specs/netdev.yaml \
+>>>>         --do queue-get \
+>>>>         --json '{"ifindex": 3, "id": 1, "type": "rx"}'
+>>>>     {'id': 1, 'ifindex': 3, 'peer': {'id': 15, 'ifindex': 4, 'netns-id': 21}, 'type': 'rx'}
+>>>
+>>> I'm struggling with the roles of what is src and dst and peer :(
+>>> No great suggestion off the top of my head but better terms would
+>>> make this much easier to review.
+>>>
+>>> The example seems to be from the container side. Do we need to show peer
+>>> info on the container side? Not just on the host side?
+>>
+>> I think up to us which side we want to show. My thinking was to allow user
+>> introspection from both, but we don't have to. Right now the above example
+>> was from the container side, but technically it could be either side depending
+>> in which netns the phys dev would be located.
+>>
+>> The user knows which is which based on the ifindex passed to the queue-get
+>> query: if the ifindex is from a virtual device (e.g. netkit type), then the
+>> 'peer' section shows the phys dev, and vice versa, if the ifindex is from a
+>> phys device (say, mlx5), then the 'peer' section shows the virtual one.
+>>
+>> Maybe I'll provide a better more in-depth example with both sides and above
+>> explanation in the commit msg for v4..
+> 
+> Yes, FWIW my mental model is that "leaking" host information into the
+> container is best avoided. Not a problem, but shouldn't be done without
+> a clear reason.
+> Typical debug scenario can be covered from the host side (container X
+> is having issues with queue Y, dump all the queues, find out which one
+> is bound to X/Y).
 
-> +/* rxnfc_lock must be held */
-> +static void am65_cpsw_del_rule(struct am65_cpsw_port *port,
-> +			       struct am65_cpsw_rxnfc_rule *rule)
-> +{
-> +	int loc;
-> +
-> +	/* reverse location as higher locations have higher priority
-> +	 * but ethtool expects lower locations to have higher priority
-> +	 */
-> +	loc = port->rxnfc_max - rule->location - 1;
-> +
-> +	cpsw_ale_policer_clr_entry(port->common->ale, loc,
-> +				   &rule->cfg);
-> +	list_del(&rule->list);
-> +	port->rxnfc_count--;
-> +	port->policer_in_use_bitmask &= ~BIT(rule->location);
+Makes sense, I didn't consider leaking host info in a container. Happy
+to remove the introspection from the container side, leaving it only on
+the host side when queues are dumped.
 
-__clear_bit()
-Please use bitmap helpers everywhere, especially for scanning 
-the bitmap to find unused bits
-
-> +	struct am65_cpsw_common *common = am65_ndev_to_common(ndev);
-> +	struct am65_cpsw_port *port = am65_ndev_to_port(ndev);
-> +
-> +	switch (rxnfc->cmd) {
-> +	case ETHTOOL_GRXRINGS:
-
-please implement ::get_rx_ring_count instead
--- 
-pw-bot: cr
+Like Daniel mentioned, I didn't add 'src/real' or 'dst/virtual' because
+I believed this information is implicit to the user when querying a
+netdev based on its type. Do you find this to be confusing? Happy to add
+a clarifying field in the nested struct.
 
