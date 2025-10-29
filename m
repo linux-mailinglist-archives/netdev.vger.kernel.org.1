@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-234163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D958C1D6C2
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 22:24:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B6555C1D761
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 22:40:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6ADDF4E3563
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 21:24:49 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5871B4E3018
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 21:40:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B10B31AF1E;
-	Wed, 29 Oct 2025 21:24:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71D8431A056;
+	Wed, 29 Oct 2025 21:40:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wismer.xyz header.i=@wismer.xyz header.b="YQkCf5I+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wismer.xyz header.i=@wismer.xyz header.b="FPz/K/Y2"
 X-Original-To: netdev@vger.kernel.org
-Received: from out11.tophost.ch (out11.tophost.ch [46.232.182.220])
+Received: from out26.tophost.ch (out26.tophost.ch [46.232.182.235])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98BCA31A811;
-	Wed, 29 Oct 2025 21:24:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.232.182.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB4C213C914;
+	Wed, 29 Oct 2025 21:40:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.232.182.235
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761773060; cv=none; b=IMZPvcFG43VreR2+1qFc1fz+WDNH5yzJsbdVCwNgkqS/5KE2Ok6h+wuwBluOXl/YHvt+l3ucDKEFRcF4oSZnj/+Z34aR6PVeNVVn9Kvnzbx4Gi5DUfMm8rAja+C3xerE8XnbuufX/LQlrQu+ptap/q6tpVUkDxeMEJYB32EyBCk=
+	t=1761774022; cv=none; b=V1nLRBC0SbrO6s8jwASxSYZsvkmJ/n579dRwcaOD/Cxdn4UPT62qzrOoUk5LdK1qac7ipO/Mh3wzvSz5SqvcU2/I+gUix4yvbRJNRijT2H1ntu9XroGX4gr7EZyoQ6gGkTNtvinqvp52xKNumnU/UKlcZbQPTl3ljYwWrmI3Qe8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761773060; c=relaxed/simple;
-	bh=5L7zNitMrCynopVaeYimqsTCTjTt+L910aX0TIOdi6w=;
+	s=arc-20240116; t=1761774022; c=relaxed/simple;
+	bh=KsLICYSdai358ng0LbivT+XEiH/kal9SLt5IS1MUsRQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mLqus4tzWWCl2o7o4NU3xWRxBa1dY4EFTFoC6SD3kS6kZPDoYICbTQ1u+8hhx5rBz4Qj93OI6uYr3Ow9ZDtKN85xNFr7nEYdtjRZPPSMx6Z4N9sZ/bM13lEnSxbhU0YUUQY7xt6OjQKwT4wnHClIofvfjQgTJxf0/bNlFb8pehE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wismer.xyz; spf=pass smtp.mailfrom=wismer.xyz; dkim=pass (2048-bit key) header.d=wismer.xyz header.i=@wismer.xyz header.b=YQkCf5I+; arc=none smtp.client-ip=46.232.182.220
+	 MIME-Version; b=bucPGpF2T3y3gzRJSw2JLchlCxvI9An5Ugkxt7ZTBLDp3R4k1dKFjRo85W0BQH8yPCL1KxmBMlK5U/cNpFlyakdPfALKM3JyjhBFIeITqr6oQ5MfioPE72vrM9y5+jhcU5gYmdNxWlHGoHG7PJzQbCAZdv4/miCZeFn5vGq0d4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wismer.xyz; spf=pass smtp.mailfrom=wismer.xyz; dkim=pass (2048-bit key) header.d=wismer.xyz header.i=@wismer.xyz header.b=FPz/K/Y2; arc=none smtp.client-ip=46.232.182.235
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wismer.xyz
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wismer.xyz
 Received: from srv125.tophost.ch ([194.150.248.5])
-	by filter2.tophost.ch with esmtps  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	by filter4.tophost.ch with esmtps  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <thomas@wismer.xyz>)
-	id 1vEDe6-007W5d-8q; Wed, 29 Oct 2025 22:23:58 +0100
+	id 1vEDeP-00EABt-KW; Wed, 29 Oct 2025 22:24:16 +0100
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=wismer.xyz;
 	s=default; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
 	Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
 	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
 	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
 	List-Post:List-Owner:List-Archive;
-	bh=yoAKw2vS++tYIngxX0SuyCYOCpOStRoJkAwPCeP3S9M=; b=YQkCf5I+ALIN7oqrwtpZNL3eMm
-	m+Nl9FV9gm7AHsTMjPI4v3Wx84dbclB46xwwyyATJomuf9SptiWTQa5qkCJD3AQG7i3cEP6pH3nob
-	hWy1S5tPQgpusSA0sHAOH95KztZ0ITW1b6O/ZFG2sjE+CD6gorg/AqxHtvIb8Pr7My5P6a37cvJit
-	fqVBrn2hfgvjmSmHwX7KpEj8foBcWUwKHQK1Ks2SK70uGhqZc4fHUXE13JX+JuHEa5fCb6RcWXrXk
-	DdP6+tuyJgHpnoCsEzcehvfQJrmCRkY3kWDoJ3XLiT3s65menRrXVLwMjozCal6DdPskiy7U6355i
-	40BDPL5Q==;
+	bh=MCaTi5+1GdvtDvu93JLcxGyOsiwEWFfOOZdGKf+f5WM=; b=FPz/K/Y2Fn/1cbmSQ6IdK2LtDl
+	62el0AbYDSohkObKYK1HerVTZwU9l5OKqbFA6NOLcaXPTDC5tLoAMLmzHaKz45fx0VAeh7qiK6+mZ
+	h47Wv1eyltgc/7p+UGd4NbNkyEpKzxH6xnWFmXMW8wdrykqT+FrGebST95E+sa7ZXgarz10wiGJ6L
+	U5IkhOUgnAQhJN7dIveDupoXNqZnOo0OO/OQ30jqWLdV90oSnKbkBCuQDwBdaMUQNLhQZdF510Kib
+	4oOfEHmXcRFmM3yeXkYVBYYDlRab0zTJfv7NT6TuO5y9So3yK2IrZIs7mymliiVX+XeI2k5ZOL9Lr
+	khQX7ZvQ==;
 Received: from [2001:1680:4957:0:9918:f56f:598b:c8cf] (port=39522 helo=pavilion.lan)
 	by srv125.tophost.ch with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <thomas@wismer.xyz>)
-	id 1vEDe3-0000000Bf5t-3hdf;
-	Wed, 29 Oct 2025 22:23:50 +0100
+	id 1vEDeP-0000000Bf5t-1AjL;
+	Wed, 29 Oct 2025 22:24:11 +0100
 From: Thomas Wismer <thomas@wismer.xyz>
 To: Oleksij Rempel <o.rempel@pengutronix.de>,
 	Kory Maincent <kory.maincent@bootlin.com>,
@@ -69,10 +69,11 @@ Cc: Thomas Wismer <thomas@wismer.xyz>,
 	Thomas Wismer <thomas.wismer@scs.ch>,
 	netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 1/2] net: pse-pd: tps23881: Add support for TPS23881B
-Date: Wed, 29 Oct 2025 22:23:09 +0100
-Message-ID: <20251029212312.108749-2-thomas@wismer.xyz>
+	linux-kernel@vger.kernel.org,
+	Conor Dooley <conor.dooley@microchip.com>
+Subject: [PATCH net-next v3 2/2] dt-bindings: pse-pd: ti,tps23881: Add TPS23881B
+Date: Wed, 29 Oct 2025 22:23:10 +0100
+Message-ID: <20251029212312.108749-3-thomas@wismer.xyz>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251029212312.108749-1-thomas@wismer.xyz>
 References: <20251029212312.108749-1-thomas@wismer.xyz>
@@ -88,196 +89,61 @@ X-Authenticated-Sender: srv125.tophost.ch: thomas@wismer.xyz
 X-Spampanel-Domain: smtpout.tophost.ch
 X-Spampanel-Username: 194.150.248.5
 Authentication-Results: tophost.ch; auth=pass smtp.auth=194.150.248.5@smtpout.tophost.ch
-X-Spampanel-Outgoing-Class: ham
-X-Spampanel-Outgoing-Evidence: SB/global_tokens (2.72480316127e-05)
+X-Spampanel-Outgoing-Class: unsure
+X-Spampanel-Outgoing-Evidence: Combined (0.50)
 X-Recommended-Action: accept
-X-Filter-ID: 9kzQTOBWQUFZTohSKvQbgI7ZDo5ubYELi59AwcWUnuVZQvGvn4K/7Zk8zu9RRyuPgK+PRbzytXp4
- k/nlUIXxByu2SmbhJN1U9FKs8X3+Nt208ASTx3o2OZ4zYnDmkLm5Mv/tafLC72ko3Lqe/Da7zE/7
- Q/NVRqfIOabVCFo92tiXjZljmnURpwhXdrCYLPTCCtmoQhY2xrBb8C+tWUvqrqBKsSdhvd/J5sX5
- daZjkYv0hq6Ot6Cbd9hg3807OZKQzthz0vNkOX8Em4cj6D/wdR983ISMXlZYfkTQnVvsLb89W7vD
- 6C469DIPe8wH3iOJTcWsqU26dvDcYIYzaKVPzizNp/gleLRyr2ddmlcu+i1jPgDrl7KDWN+JeAU8
- 1aNgksp0UtIrN0U07614AkdB++MTbkn6z1fsm8NoMVdUr8MDPUrsZkS8fIjQg/OlnCq9AIC5Z5Eo
- vuL59tfrqmU9AeFRYyZjHLqYAy4+QNNyid5H8SumKJ6G2ITZ1QpN+fKlKhj6uW6qT1824h/4yzd+
- H8TZI7fFfQwiuwD2LcLdqjNFmtMtCFuKzK3WYzvpld0/yccMnl06aHo07R+V2VbvDXc+galx1KGI
- Pp5jnkiI48S3blKfwQpggXpr4ijI5V97nizzgiBlcUwLhZK/ZHw1RW2vtunYtDoJKroVCwUDp7ih
- aBebofsQYy7uM//cA97r0u9hv6vc4kaDyrzZqOtFmK1bblyi1IQHML781Fw9zcg+brEB5tT8n2C4
- 3qr6GPgBPePj0AiYMnkOYZl+Ft1345P9xZQpbwIfPGEkJ7JPA9m1MXnnxJmpdTzcav9Zei+nRAUa
- ZyvXYsGqun+gsnRrw9cqQ6eOFFZwao7/xkqL8SFLn/njN5eSj526f3kLYY1T5OizFD8wHF+OCza+
- k8F3h5b57iIXJcFWfgW9vfNN4J9ziRqBqIWqcU9OsvOjmYsTO6lGf94dXO5RbYSkVkYTk9CCMtzM
- bzqEtclFlLyp+exUU27PTl4PhGkfKkdwRPwXu3J+dYVP2195qubJ4gqr1hKOhcObZXWnkEw+6F9C
- GyZ44Q+DLPyX+MwClyz83U21vdxEpryD5dRQwVJRy59S49/2asmSeEn7rbCFmtlyFQtmzUzC/xba
- RN+VVj9DUh3TZXBi9hWEAP02Kq9O1EK/Tbf2/8vpL7yPXbArHUEGc233Y80OmAux3oN13+ztUzne
- lPksOlPd27Tf6L4y2yJOHolDOboZZUDh7jQajPahhQx+RFViJuI2LjmPuFh6Mem6TuJQIjD+/1YH
- vr6rTwNvlu5yIYYIEeILcVRr4wYNKSfJRGDMIez6j2IAdtaWfixj647lNwN4qOsSZg+fYhVZG4tF
- IS9w/C9ZAlaBtta5Gi5ak/yCah0K2qOyN9cETXcvLMBBWEBWT5ImHngsOZ6DSvxHvRZErPK++q6A
- c+xgiBi5JVKuVYa6QR3fZ9CNC7P9BW1oT5qIEWguCTF5tOP3jiRyYhI9XWnYQVnAKttrUvQ=
+X-Filter-ID: 9kzQTOBWQUFZTohSKvQbgI7ZDo5ubYELi59AwcWUnuV5syPzpWv16mXo6WqDDpKEChjzQ3JIZVFF
+ 8HV60IETFiu2SmbhJN1U9FKs8X3+Nt208ASTx3o2OZ4zYnDmkLm5Mv/tafLC72ko3Lqe/Da7zC9N
+ dw2t5iMEflZxRNqEOiZKZR2tNRPIxp/vINc/oXVUCtmoQhY2xrBb8C+tWUvqrqBKsSdhvd/J5sX5
+ daZjkYv0hq6Ot6Cbd9hg3807OZKQzthz0vNkOX8Em4cj6D/wdel5pGtBZGkILbtkwjuL+TU9W7vD
+ 6C469DIPe8wH3iOJ3xyMg3et4b3PQUopDmbZCssYHNuxAmlPRpR5yzngsxCROUzReCS8EpKh0It9
+ L25JS816nuiE0t5pG6MLXGczoanVmeCF7bI0BP7dENKtPTBPq+vGO3Vx+SwwWschmkdvs376y2A4
+ OBi1/UyqO7jQnnICeA+KlS7G8xqewTcs6w6HLg3eq1lKkYVFbZT99AeINpdbOTIWFiLv1jhppNXa
+ xS6MN8xFxlxHZge6OlcoYA//qN5p5dmu6xjQN9nmCfj7VmpmZJyx9iy0UVkVD75IgLollI+8fg4q
+ Ktu8I/h2Z0dHZM6qE0STp2v0JiRE8jha5ZR/nf5efcITxrfNKzy0W9Bd37g8M9SCqD8uOq9nJ+Mm
+ AyVp7BgHET6y8CCeFlQ7QPOIjlkSAfAYMUguLL/iJ9vYqKPILmSoZcvfXhdPMA/OB6L3DS5gd1SE
+ E3USj80Z55NePwA7jxwlhcjVdk/mr85ytrd63MVeviF0i7IZfcqGEigUra+zu74YMVqBb/nqBf/o
+ O9ENx2nriip8WhgYbnEnhEbOEzk5yB9ZHNSFnOX3WOuu10rVtxDPgG7Vtev3VUWM7vJdUMhhfiBi
+ T4p0qQinxQdAM7oWNvokRStU21kywDQw+mt8yiYotxY5kTqW31/E3ahF5MMcDI7KdpjQKSCN+J6l
+ bGev7o3ca3HK7nAdJ4O6PN0m2d+J9ACj3NF3yf2emCiQ6AuTowflAWn4v/afTNuGqIKbeT3Q0BtD
+ AboBIkUL/j1Y48GvmeURQjjEeKVXbbsuQxCT7KwYHrWmLStOsQFbw8vrkGLslTiuxw4nPK5DkQL/
+ /M3fHsVNrsMGJz4RQfBVfxkAwoVpA4J/KzRZEq6vMKhJ9oG2v1yvThzPEGEatp9rvw0eoI0HqUDY
+ Z5lBVqqSQepN0b2sqifLOj/1zwA5Elj0L2+pr2KRBXGwDoDEJrayfp9Tsh2+VPTlfegw9R5Cyryt
+ +7lKCjnJY+t4m7skVkCUrb1O+GFi8/GtOCoPdeOKuroIXJBF3iBhveOWAg2/DdpIH6kX9BAh5T56
+ bZ65fgYTpVbNpCTXfzY/9c8AORJY9C9vqa9ikQVx1Rhgh1oSgTV2HRO5RU/ccaLd8PL+e7kGwNtP
+ GEbZHUTlo9rdeDz1q6e5q9bAUPzG/Nre5J0/CRkN14v1yHfTQHe0DazGWAam0o2Vp5zQ/L8xL7hr
+ JSk60SF3F6RYOYr2
 X-Report-Abuse-To: spam@filter1.tophost.ch
 X-Complaints-To: abuse@filter1.tophost.ch
 
 From: Thomas Wismer <thomas.wismer@scs.ch>
 
-The TPS23881B uses different firmware than the TPS23881. Trying to load the
-TPS23881 firmware on a TPS23881B device fails and must be omitted.
+Add the TPS23881B I2C power sourcing equipment controller to the list of
+supported devices.
 
-The TPS23881B ships with a more recent ROM firmware. Moreover, no updated
-firmware has been released yet and so the firmware loading step must be
-skipped. As of today, the TPS23881B is intended to use its ROM firmware.
+Falling back to the TPS23881 predecessor device is not suitable as firmware
+loading needs to handled differently by the driver. The TPS23881 and
+TPS23881B devices require different firmware. Trying to load the TPS23881
+firmware on a TPS23881B device fails and must therefore be omitted.
 
 Signed-off-by: Thomas Wismer <thomas.wismer@scs.ch>
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
 ---
- drivers/net/pse-pd/tps23881.c | 69 +++++++++++++++++++++++++++--------
- 1 file changed, 54 insertions(+), 15 deletions(-)
+ Documentation/devicetree/bindings/net/pse-pd/ti,tps23881.yaml | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/pse-pd/tps23881.c b/drivers/net/pse-pd/tps23881.c
-index b724b222ab44..76ec1555d60d 100644
---- a/drivers/net/pse-pd/tps23881.c
-+++ b/drivers/net/pse-pd/tps23881.c
-@@ -55,8 +55,6 @@
- #define TPS23881_REG_TPON	BIT(0)
- #define TPS23881_REG_FWREV	0x41
- #define TPS23881_REG_DEVID	0x43
--#define TPS23881_REG_DEVID_MASK	0xF0
--#define TPS23881_DEVICE_ID	0x02
- #define TPS23881_REG_CHAN1_CLASS	0x4c
- #define TPS23881_REG_SRAM_CTRL	0x60
- #define TPS23881_REG_SRAM_DATA	0x61
-@@ -1012,8 +1010,28 @@ static const struct pse_controller_ops tps23881_ops = {
- 	.pi_get_pw_req = tps23881_pi_get_pw_req,
- };
+diff --git a/Documentation/devicetree/bindings/net/pse-pd/ti,tps23881.yaml b/Documentation/devicetree/bindings/net/pse-pd/ti,tps23881.yaml
+index bb1ee3398655..0b3803f647b7 100644
+--- a/Documentation/devicetree/bindings/net/pse-pd/ti,tps23881.yaml
++++ b/Documentation/devicetree/bindings/net/pse-pd/ti,tps23881.yaml
+@@ -16,6 +16,7 @@ properties:
+   compatible:
+     enum:
+       - ti,tps23881
++      - ti,tps23881b
  
--static const char fw_parity_name[] = "ti/tps23881/tps23881-parity-14.bin";
--static const char fw_sram_name[] = "ti/tps23881/tps23881-sram-14.bin";
-+struct tps23881_info {
-+	u8 dev_id;	/* device ID and silicon revision */
-+	const char *fw_parity_name;	/* parity code firmware file name */
-+	const char *fw_sram_name;	/* SRAM code firmware file name */
-+};
-+
-+enum tps23881_model {
-+	TPS23881,
-+	TPS23881B,
-+};
-+
-+static const struct tps23881_info tps23881_info[] = {
-+	[TPS23881] = {
-+		.dev_id = 0x22,
-+		.fw_parity_name = "ti/tps23881/tps23881-parity-14.bin",
-+		.fw_sram_name = "ti/tps23881/tps23881-sram-14.bin",
-+	},
-+	[TPS23881B] = {
-+		.dev_id = 0x24,
-+		/* skip SRAM load, ROM provides Clause 145 hardware-level support */
-+	},
-+};
- 
- struct tps23881_fw_conf {
- 	u8 reg;
-@@ -1085,16 +1103,17 @@ static int tps23881_flash_sram_fw_part(struct i2c_client *client,
- 	return ret;
- }
- 
--static int tps23881_flash_sram_fw(struct i2c_client *client)
-+static int tps23881_flash_sram_fw(struct i2c_client *client,
-+				  const struct tps23881_info *info)
- {
- 	int ret;
- 
--	ret = tps23881_flash_sram_fw_part(client, fw_parity_name,
-+	ret = tps23881_flash_sram_fw_part(client, info->fw_parity_name,
- 					  tps23881_fw_parity_conf);
- 	if (ret)
- 		return ret;
- 
--	ret = tps23881_flash_sram_fw_part(client, fw_sram_name,
-+	ret = tps23881_flash_sram_fw_part(client, info->fw_sram_name,
- 					  tps23881_fw_sram_conf);
- 	if (ret)
- 		return ret;
-@@ -1412,6 +1431,7 @@ static int tps23881_setup_irq(struct tps23881_priv *priv, int irq)
- static int tps23881_i2c_probe(struct i2c_client *client)
- {
- 	struct device *dev = &client->dev;
-+	const struct tps23881_info *info;
- 	struct tps23881_priv *priv;
- 	struct gpio_desc *reset;
- 	int ret;
-@@ -1422,6 +1442,10 @@ static int tps23881_i2c_probe(struct i2c_client *client)
- 		return -ENXIO;
- 	}
- 
-+	info = i2c_get_match_data(client);
-+	if (!info)
-+		return -EINVAL;
-+
- 	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
- 	if (!priv)
- 		return -ENOMEM;
-@@ -1440,7 +1464,7 @@ static int tps23881_i2c_probe(struct i2c_client *client)
- 		 * to Load TPS2388x SRAM and Parity Code over I2C" (Rev E))
- 		 * indicates we should delay that programming by at least 50ms. So
- 		 * we'll wait the entire 50ms here to ensure we're safe to go to the
--		 * SRAM loading proceedure.
-+		 * SRAM loading procedure.
- 		 */
- 		msleep(50);
- 	}
-@@ -1449,20 +1473,27 @@ static int tps23881_i2c_probe(struct i2c_client *client)
- 	if (ret < 0)
- 		return ret;
- 
--	if (FIELD_GET(TPS23881_REG_DEVID_MASK, ret) != TPS23881_DEVICE_ID) {
-+	if (ret != info->dev_id) {
- 		dev_err(dev, "Wrong device ID\n");
- 		return -ENXIO;
- 	}
- 
--	ret = tps23881_flash_sram_fw(client);
--	if (ret < 0)
--		return ret;
-+	if (info->fw_sram_name) {
-+		ret = tps23881_flash_sram_fw(client, info);
-+		if (ret < 0)
-+			return ret;
-+	}
- 
- 	ret = i2c_smbus_read_byte_data(client, TPS23881_REG_FWREV);
- 	if (ret < 0)
- 		return ret;
- 
--	dev_info(&client->dev, "Firmware revision 0x%x\n", ret);
-+	if (ret == 0xFF) {
-+		dev_err(&client->dev, "Device entered safe mode\n");
-+		return -ENXIO;
-+	}
-+	dev_info(&client->dev, "Firmware revision 0x%x%s\n", ret,
-+		 ret == 0x00 ? " (ROM firmware)" : "");
- 
- 	/* Set configuration B, 16 bit access on a single device address */
- 	ret = i2c_smbus_read_byte_data(client, TPS23881_REG_GEN_MASK);
-@@ -1498,13 +1529,21 @@ static int tps23881_i2c_probe(struct i2c_client *client)
- }
- 
- static const struct i2c_device_id tps23881_id[] = {
--	{ "tps23881" },
-+	{ "tps23881", .driver_data = (kernel_ulong_t)&tps23881_info[TPS23881] },
-+	{ "tps23881b", .driver_data = (kernel_ulong_t)&tps23881_info[TPS23881B] },
- 	{ }
- };
- MODULE_DEVICE_TABLE(i2c, tps23881_id);
- 
- static const struct of_device_id tps23881_of_match[] = {
--	{ .compatible = "ti,tps23881", },
-+	{
-+		.compatible = "ti,tps23881",
-+		.data = &tps23881_info[TPS23881]
-+	},
-+	{
-+		.compatible = "ti,tps23881b",
-+		.data = &tps23881_info[TPS23881B]
-+	},
- 	{ },
- };
- MODULE_DEVICE_TABLE(of, tps23881_of_match);
+   reg:
+     maxItems: 1
 -- 
 2.43.0
 
