@@ -1,152 +1,124 @@
-Return-Path: <netdev+bounces-233977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BCFBC1B1B3
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 15:12:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DCAFC1B258
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 15:19:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 92A1E5A8FE7
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 13:44:13 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 13C5F5A95DD
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 13:45:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFD5B3358A4;
-	Wed, 29 Oct 2025 13:34:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A39A33F375;
+	Wed, 29 Oct 2025 13:36:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="IlvV06IP"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="kyGtX2Pt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2AE3335091;
-	Wed, 29 Oct 2025 13:34:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFBC9290DBB
+	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 13:36:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761744855; cv=none; b=O+G699u/yPzi3HMJ74brY+af8nN3V3yYqweQZzu42TOMJM+nC/xFBDbbqI2/I6tXXnufWiDlB9J7xeXRNo2kAqr97fK+P3M8bEb/hXgRk4tcE7HY0WTrQTpMo2ZRsPdsMPGpIG3oSnZ/P83LHF7GB4gq90PuFmAimc1tW8dKhx8=
+	t=1761745000; cv=none; b=QPuYzdHCzZ+nxDvkNiph6ZqXjMFPAo6o1FalQ8nOstK5FwIjVs6qwEgiT26UOqVZpAItceylHHl5/hVs5w+XS2Y01OL5BNW3dHFC1cb4by70R7TKoLvtyGP8VquACXldVorXmSkHnyrDh9pjTh+KYI9rmyvZ/0+Lwkj0QRqLdIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761744855; c=relaxed/simple;
-	bh=yYeetJE7nU39JRPQ2bAqGA8v27+L3KLdnP1omdhZg9g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fjRBV7v0PsWCKnA6XW8Lrq9h7TS0IOzyrE8mpF2TY9/uJ4fhlyNTGqOyOlQcwEe0sWXgSYnpVH/r5lOjuCNCROQXmUqx76MZIqZBZDq0h1soKSJRgA3s9Ved+hSpOc/DiMsBb5RQpzo2NJC+ndbOanty/EuSRwPQWwys3ynJeL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=IlvV06IP; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 6C7FB1A1747;
-	Wed, 29 Oct 2025 13:34:10 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 3C4CB606E8;
-	Wed, 29 Oct 2025 13:34:10 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A5403117F80A7;
-	Wed, 29 Oct 2025 14:34:01 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1761744849; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=wKk+FxFdhXoaDcRKRxsyJt9b/J7SbDXNlJUTNBILMfk=;
-	b=IlvV06IPxNV2S5cD3etgy/hG0vlnjV/OCq7pn1FljLu3y+j9LSE8lJ+s37shkWZW0mMdTk
-	eMWXv/Ppz0BCT8/zs8UuD+EDdLzvwEnPhHnKlk5bQNO5EsyUOnileffmhKTPKgfHHXd3R/
-	WxEHlJKZA8JGmH50riHR7E4iq6+ohacOWUHCtPz5Iam2AquOuVF+6uysOV1+ZW8cLz8c/z
-	QIMN1lgRw7C07B+283adVEJrTHS2iQcpxEtErsytiGX5WR0C7O89fvYuR2tyAHMIABCYtP
-	K8gHywFCOqvzhRqY3WUxcJsw8jeNI7TOi8tlzCFEYg5pQPBLkO5tIyOTPpuF/Q==
-Message-ID: <a871daac-364e-4c2c-8343-d458b373e1fd@bootlin.com>
-Date: Wed, 29 Oct 2025 14:34:00 +0100
+	s=arc-20240116; t=1761745000; c=relaxed/simple;
+	bh=Wjvd24PZ6lX6SZVjlm0MRWQ3CTydIvzI0NC4nd8c68o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Brupwnhn1cOWiic3DAi8e6yXEYY5kZHWIgwvlu0hqF3uWOBOUrGs3dlI2h2OMQl/JRobepzaaGMj3E+2NWAaZePX0vqZ57fuac5JWgnOStneYuDimOBbnSWXjgQGIbAZSZxri982f+uoHX2mCAFV0/nprU3pO7/NuRj/9ImtddA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=kyGtX2Pt; arc=none smtp.client-ip=209.85.222.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-89f44f98acbso515174385a.1
+        for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 06:36:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1761744997; x=1762349797; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=v0AdKLzPillHi033TMRXHFAVev4P+ahw30kja1SvViY=;
+        b=kyGtX2Pt0UHjizPvA4lOssULuwTGHR9TEKag3P+qN5gGIQBojcV7/DZp0KnEG3AmEO
+         +w2UrwIJI1lLQZSRIAwm5eT4grenYjw6r7gppwhNKhxblhI0ePyYebiVdvC82j39QYpD
+         8WqbbCLniutr9aYtwe1EHKcffxCTkXUMd22YD2aMBssJJAnO4sCeJeURoq2PKOw89lbv
+         3oc8uVnwgFFyd/83v2i2eLT71/hb6VrWfd+OIYj+O63RQn2u11JcZaf45evyHHjThmS9
+         r/wJ3jESGZYFroLhp1ptpOXWC0xXCR6fvB66+63zxzeWF3JdoXOwklXQScr0Jh5IuJtl
+         8pgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761744997; x=1762349797;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v0AdKLzPillHi033TMRXHFAVev4P+ahw30kja1SvViY=;
+        b=h0b65Tv2C6uQ0f3F1A7h+7vAatrjSrfxPbYusTKdSlY0tp1so87PdJn7QCc8aGmltz
+         xa0Pd6NEPa9FTU6i9mOMy6qGVSXwBcTG0+Y+tN45Ggww4w5dItu/G36HE7R88ZtB7guP
+         7pClnFRa5U2UvtX0Z1RVJ+uh1TxT7JW5Sn6V+zxmeANQ43pwj5+8vqPI3m5Qtwe2z/Vp
+         F7sDmLVNgOQ+0rX9bAfHd7Z6z/UlssIvI4cr59a6svcJE6uhFRDqMIGF54t+IMNYXPN5
+         UzuSQxk18nXQeqMnTuWzjxRyKURIVFozAf9AIAdGpXtIpt/q2JUvVftz1c16nOCwckj8
+         MBgg==
+X-Forwarded-Encrypted: i=1; AJvYcCWfWBjDGaRtnEVQIsQnbjlYar9PWeh+wY2tJaTbu1FMWO0BEkSB1fTzSwY0aihDkYDlNNAGsNc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxoJGzoyQN6N3n8gZWA1amOMATjaVkiO5H04de5o7qYtdS9B9UG
+	D7sVUraMpeR5h0AX040mBSGfgk75BdOdJZ/Q4EykCy0kBQkcLiQEMpNsBJmBheLotPs=
+X-Gm-Gg: ASbGncsKhMdynvqcpAgOPrU62b+CSxdK9Lsfvg6y0Mq176OHfw9/2Ic8PZYIk65z+/M
+	L3103Fn5aU7O6sABO/oj2tTSjRB6DN5BaW91l3LaZ/u09xr66JVldxi2t1XSd47b2D5NkcIwzLU
+	EeIXKGKGXEsW0S1TLqsPb4KunopVHbNe3CGTyPAW852Qh01KRK8ZZyk+n3oI4OSzzvIeqx64OuM
+	GCgudoZPe/aQYmz/eqSh6L7tKlKmjsozZc9N00Xn8lEZf2Rs1Ej3RmYHmae6mlJOP/kQGScY8wB
+	ngZFrZtjfRFtgjy0ysr9k5uazkSQ5m8m/JFzAqtEQcwNWXdq5z7PSRbxCIjJCCeqkDTw8WUFe3W
+	5o3aoh33romRevUFdc7DQVVhzmtA8LnzhHZnwmNo5CNP2icsW7hOqQkEYgzGrcma5uBAWgyGd9e
+	1nkIX2s1IP+uztBBMCJLQHR5FYjvakSYnThr9845Pd2SaXq6rxg4sT72kx
+X-Google-Smtp-Source: AGHT+IGAE0SOpZpoN41adN34IF2YwVMvQ9wz7z8YvoKLlmaz7aDJPXOZRSV/8w6Q6v+YU59eEE8YQQ==
+X-Received: by 2002:a05:620a:404b:b0:892:5b57:ea3c with SMTP id af79cd13be357-8a8e37bb07bmr368352285a.2.1761744997082;
+        Wed, 29 Oct 2025 06:36:37 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-47-55-120-4.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.120.4])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-89f2421fc6fsm1046414485a.9.2025.10.29.06.36.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Oct 2025 06:36:36 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1vE6Lr-00000004eO9-3vrt;
+	Wed, 29 Oct 2025 10:36:35 -0300
+Date: Wed, 29 Oct 2025 10:36:35 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Jonathan Cameron <jonathan.cameron@huawei.com>
+Cc: Pavan Chebbi <pavan.chebbi@broadcom.com>, michael.chan@broadcom.com,
+	dave.jiang@intel.com, saeedm@nvidia.com, davem@davemloft.net,
+	corbet@lwn.net, edumazet@google.com, gospo@broadcom.com,
+	kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, selvin.xavier@broadcom.com, leon@kernel.org,
+	kalesh-anakkur.purayil@broadcom.com
+Subject: Re: [PATCH net-next v5 5/5] bnxt_fwctl: Add documentation entries
+Message-ID: <20251029133635.GM760669@ziepe.ca>
+References: <20251014081033.1175053-1-pavan.chebbi@broadcom.com>
+ <20251014081033.1175053-6-pavan.chebbi@broadcom.com>
+ <20251028164651.00001823@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/4] net: stmmac: socfpga: Agilex5 EMAC platform
- configuration
-To: rohan.g.thomas@altera.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Steffen Trumtrar <s.trumtrar@pengutronix.de>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20251029-agilex5_ext-v1-0-1931132d77d6@altera.com>
- <20251029-agilex5_ext-v1-1-1931132d77d6@altera.com>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20251029-agilex5_ext-v1-1-1931132d77d6@altera.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251028164651.00001823@huawei.com>
 
-Hi Rohan,
-
-On 29/10/2025 09:06, Rohan G Thomas via B4 Relay wrote:
-> From: Rohan G Thomas <rohan.g.thomas@altera.com>
+On Tue, Oct 28, 2025 at 04:46:51PM +0000, Jonathan Cameron wrote:
+> On Tue, 14 Oct 2025 01:10:33 -0700
+> Pavan Chebbi <pavan.chebbi@broadcom.com> wrote:
 > 
-> Agilex5 HPS EMAC uses the dwxgmac-3.10a IP, unlike previous socfpga
-> platforms which use dwmac1000 IP. Due to differences in platform
-> configuration, Agilex5 requires a distinct setup.
+> > Add bnxt_fwctl to the driver and fwctl documentation pages.
+> > 
+> > Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
+> > Reviewed-by: Dave Jiang <dave.jiang@intel.com>
+> > Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 > 
-> Introduce a setup_plat_dat() callback in socfpga_dwmac_ops to handle
-> platform-specific setup. This callback is invoked before
-> stmmac_dvr_probe() to ensure the platform data is correctly
-> configured. Also, implemented separate setup_plat_dat() callback for
-> current socfpga platforms and Agilex5.
+> Would be useful to provide a reference to userspace code that is
+> making use of this.
 > 
-> Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
-> ---
->  .../net/ethernet/stmicro/stmmac/dwmac-socfpga.c    | 53 ++++++++++++++++++----
->  1 file changed, 43 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-> index 2ff5db6d41ca08a1652d57f3eb73923b9a9558bf..3dae4f3c103802ed1c2cd390634bd5473192d4ee 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-> @@ -44,6 +44,7 @@
->  struct socfpga_dwmac;
->  struct socfpga_dwmac_ops {
->  	int (*set_phy_mode)(struct socfpga_dwmac *dwmac_priv);
-> +	void (*setup_plat_dat)(struct socfpga_dwmac *dwmac_priv);
->  };
->  
->  struct socfpga_dwmac {
-> @@ -441,6 +442,39 @@ static int socfpga_dwmac_init(struct platform_device *pdev, void *bsp_priv)
->  	return dwmac->ops->set_phy_mode(dwmac);
->  }
->  
-> +static void socfpga_common_plat_dat(struct socfpga_dwmac *dwmac)
-> +{
-> +	struct plat_stmmacenet_data *plat_dat = dwmac->plat_dat;
-> +
-> +	plat_dat->bsp_priv = dwmac;
-> +	plat_dat->fix_mac_speed = socfpga_dwmac_fix_mac_speed;
-> +	plat_dat->init = socfpga_dwmac_init;
-> +	plat_dat->pcs_init = socfpga_dwmac_pcs_init;
-> +	plat_dat->pcs_exit = socfpga_dwmac_pcs_exit;
-> +	plat_dat->select_pcs = socfpga_dwmac_select_pcs;
-> +}
-> +
-> +static void socfpga_gen5_setup_plat_dat(struct socfpga_dwmac *dwmac)
-> +{
-> +	struct plat_stmmacenet_data *plat_dat = dwmac->plat_dat;
-> +
-> +	socfpga_common_plat_dat(dwmac);
-> +
-> +	plat_dat->core_type = DWMAC_CORE_GMAC;
-> +
-> +	/* Rx watchdog timer in dwmac is buggy in this hw */
-> +	plat_dat->riwt_off = 1;
-> +}
-> +
-> +static void socfpga_agilex5_setup_plat_dat(struct socfpga_dwmac *dwmac)
-> +{
-> +	struct plat_stmmacenet_data *plat_dat = dwmac->plat_dat;
-> +
-> +	socfpga_common_plat_dat(dwmac);
+> Jason / others, did we ever get the central repo for user space code
+> set up?
 
-I"m not familiar with this device (I only have a Cyclone V on hand), does
-it still make sense to try to instantiate a Lynx (i.e. Altera TSE) PCS
-for that IP ?
+No, we have some fragemented userspace repos at the moment only. I've
+been looking around for someone who'd like to take on the challenge
 
-Maxime
-
+Jason
 
