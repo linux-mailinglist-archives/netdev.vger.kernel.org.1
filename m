@@ -1,114 +1,107 @@
-Return-Path: <netdev+bounces-234191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82FB7C1DA97
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 00:16:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 178E6C1DA54
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 00:12:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2FFE918998B6
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 23:15:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 015C11895F07
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 23:12:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D4323128D5;
-	Wed, 29 Oct 2025 23:13:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D882D2F0C79;
+	Wed, 29 Oct 2025 23:12:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i3lmr3uJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TIWpBivi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CA3B309EF8
-	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 23:13:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF58B2EDD76;
+	Wed, 29 Oct 2025 23:12:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761779634; cv=none; b=EXmFGG6yhZOaXifubXK9P3UC4x0GvBfcPUoxLV8PCt0cYhAMZNDLe5i5623NBfdpyEMPHDngNuzOhZI+ysffvn6f9ev9zBpCyBfoIuo+Fo0fckOJViIufLcKH8iDfrfveg7GrgIiNX6kQxt1nk+U+AITzjHYD/KkN0rqrucAlMI=
+	t=1761779540; cv=none; b=CeEqM4iS2DyAum0jqI9O9EHwhzvD+Xqzis4RaNlDZKgVALeZbEDBcMVMieL/Xq6ttaCMDW4EQvQuo2KfxFHvoEqciz1Timl3vb0rrTIUFhOoEl7Qd2ZSH69T1H9xc8cnVBTQrSTv8JNniIRAkxOHT8c+KeosvlQa0Db1PrZ5+Ho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761779634; c=relaxed/simple;
-	bh=SeVDkZlIraS8XA6+quM/yQEwl7cpbqk7o7HvCLpKn9s=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JdB5MgO3POd5ub4tDFtxVQnAGMNtQN1zfUkgzH7PlfokGQr7kOQq3+UsnA5SBfcuD0dsVJt+dKaHgDUfuVUT/tcYuCDxrSou+pY3S8SLOhAi7ZhoqUNvggDxq8mmrS0n5C3M4qZddvy4qFf3EIKeBgvbw2D8GhIH4nW8oULZEcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i3lmr3uJ; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761779633; x=1793315633;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=SeVDkZlIraS8XA6+quM/yQEwl7cpbqk7o7HvCLpKn9s=;
-  b=i3lmr3uJ55Z3W7iOQ23H4UnKTUDyV1zrg0Knti0ERaDdsZ2iilYYNmUA
-   I57sBL9mMrtKSUabtJND8+bh0q5paC2briI4WCnz8KWV5j/5fJOytZpoc
-   mWMR9yl8/jPGv/vCeHLd+5sOhgE5iR2dnbuzm/XGjiCtCUM+na7WE0V11
-   Q90FlBVOunqszMDOvQL82fclviV/J79f/jBbQ8h5/Fcl6oZqsxeIcA110
-   s7/N9QrQ68xiM8t8MM1h5S3LIGLvATBWF+IQ7VnqspaOvGQ8FCUYrHMJq
-   bOReRpm+TswS6hsxlym8N447npxiUi5UbVhc7m35PWVUP+ZorkedMk7yf
-   w==;
-X-CSE-ConnectionGUID: brr1H6CYT4Oa1Nvjn8R54A==
-X-CSE-MsgGUID: 4MZSwKStS8y7goLV7TyW9A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="63817612"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="63817612"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 16:13:47 -0700
-X-CSE-ConnectionGUID: FZzGHJnlQz6ti9ZBCiRebQ==
-X-CSE-MsgGUID: QZESgXiOR+Geia0Z2r39Yg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,265,1754982000"; 
-   d="scan'208";a="185729710"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa007.jf.intel.com with ESMTP; 29 Oct 2025 16:13:47 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Alok Tiwari <alok.a.tiwari@oracle.com>,
-	anthony.l.nguyen@intel.com,
-	horms@kernel.org,
-	alok.a.tiwarilinux@gmail.com
-Subject: [PATCH net-next 9/9] igbvf: fix misplaced newline in VLAN add warning message
-Date: Wed, 29 Oct 2025 16:12:16 -0700
-Message-ID: <20251029231218.1277233-10-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20251029231218.1277233-1-anthony.l.nguyen@intel.com>
-References: <20251029231218.1277233-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1761779540; c=relaxed/simple;
+	bh=6BSN0rcgs0DzYKrINPAj7MX3VIGewgEfCuLdqxbHYy0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=e4y1hTpBxcWA8gdZZsxzCUUWJExwPsSxoX1Iq62YrYRTkSwq2bqhHlbwDYtMcTYrI+BGTRt8aAw29yZQufjzf6BtBojt09QSxfSUlGWP0YVPaM9pRmmXbZt9g/WC2uxwpnwOy9xTXKkhKPp6IR1Vee/YDWoeYEcn58ft2jGIrFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TIWpBivi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E19EC4CEFD;
+	Wed, 29 Oct 2025 23:12:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761779540;
+	bh=6BSN0rcgs0DzYKrINPAj7MX3VIGewgEfCuLdqxbHYy0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TIWpBiviwQBhOUhXDzqDUdup8/QMGxvPROL3Axo0HLdi0+uNAo7e0NPmiF4jf18hp
+	 Ykbt83g34Uz7CAfh81KcMaE8wzb+eUWnFc7V8yU5E9i22oUoxyenpCTBA3S1wQ2DTQ
+	 ubAMBMBlbLKZ0OIx6ID2Habv5I2lPlWD3g0NM3eFTxyW2mkMQWe9GB31AahtVGfdf6
+	 OJfeRgcv+XiphoWVqMKewDBTR9SGne0SP5NUUoue8koZBiVrWp+z0rQh01bVLwRQ0u
+	 xYpS7kzBaPXwr3jEbKcNovb7X0T4btOx1GiJ022H3VSPyfE806h/kMiDOuNAHo0Uck
+	 qpEhEwg4MH0VA==
+Date: Wed, 29 Oct 2025 16:12:18 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, <bpf@vger.kernel.org>,
+ <ast@kernel.org>, <daniel@iogearbox.net>, <netdev@vger.kernel.org>,
+ <magnus.karlsson@intel.com>, <aleksander.lobakin@intel.com>,
+ <ilias.apalodimas@linaro.org>, <toke@redhat.com>, <lorenzo@kernel.org>,
+ <syzbot+ff145014d6b0ce64a173@syzkaller.appspotmail.com>, Ihor Solodrai
+ <ihor.solodrai@linux.dev>, Octavian Purdila <tavip@google.com>
+Subject: Re: [PATCH v4 bpf 1/2] xdp: introduce xdp_convert_skb_to_buff()
+Message-ID: <20251029161218.15aef43e@kernel.org>
+In-Reply-To: <aQH5+ojHJ1V9jfk8@boxer>
+References: <20251027121318.2679226-1-maciej.fijalkowski@intel.com>
+	<20251027121318.2679226-2-maciej.fijalkowski@intel.com>
+	<11142984-9bbe-4611-bbe7-fa5494036b8f@kernel.org>
+	<20251028185314.1ad62578@kernel.org>
+	<aQH5+ojHJ1V9jfk8@boxer>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
+On Wed, 29 Oct 2025 12:26:50 +0100 Maciej Fijalkowski wrote:
+> > I still think _all_ frags which may end up here are from the per CPU PP
+> > since we CoW the skbs. So:  
+> 
+> Agree!
+> 
+> > 
+> > 	DEBUG_NET_WARN_ON_ONCE(!skb->pp_recycle);
+> > 	xdp->rxq->mem.type = MEM_TYPE_PAGE_POOL;  
+> 
+> This has to be conditional as it is fine to use this helper for
+> MEM_TYPE_PAGE_SHARED, plus the mem type has to be updated per packet.
+> 
+> > ? It is legal to have pp and non-pp frags in a single skb AFAIK.  
+> 
+> Ok, but not in this case where data origins from CoW path.
 
-Corrected the dev_warn format string:
-- "Vlan id %d\n is not added" -> "Vlan id %d is not added\n"
+Right.
 
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/igbvf/netdev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I guess what I'm saying is that right now we have 4 callers:
+ - XDP generic
+ - veth
+ - devmap 
+ - cpumap
+these all go thru skb_pp_cow_data() if skb has frags.
 
-diff --git a/drivers/net/ethernet/intel/igbvf/netdev.c b/drivers/net/ethernet/intel/igbvf/netdev.c
-index 61dfcd8cb370..ac57212ab02b 100644
---- a/drivers/net/ethernet/intel/igbvf/netdev.c
-+++ b/drivers/net/ethernet/intel/igbvf/netdev.c
-@@ -1235,7 +1235,7 @@ static int igbvf_vlan_rx_add_vid(struct net_device *netdev,
- 	spin_lock_bh(&hw->mbx_lock);
- 
- 	if (hw->mac.ops.set_vfta(hw, vid, true)) {
--		dev_warn(&adapter->pdev->dev, "Vlan id %d\n is not added", vid);
-+		dev_warn(&adapter->pdev->dev, "Vlan id %d is not added\n", vid);
- 		spin_unlock_bh(&hw->mbx_lock);
- 		return -EINVAL;
- 	}
--- 
-2.47.1
+You're right that in theory someone can call this function
+on a private skb they just constructed (IOW they know they 
+don't need to CoW). But IIUC (1) such caller doesn't exist
+today; (2) why wouldn't that caller run XDP before allocating
+the skb..
 
+So my thinking was to keep this simple for now, used fixed
+MEM_TYPE_PAGE_POOL. Add that DEBUG_WARN() and in the kdoc
+say that we expect the skbs to have gone thru skb_pp_cow_data().
+
+Worry about conditionals when the odd new user appears.
 
