@@ -1,78 +1,97 @@
-Return-Path: <netdev+bounces-233746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CB8FC17EFD
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 02:39:29 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C798C17F0C
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 02:40:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AFA33B3ECC
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 01:39:27 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3013C4EA0C2
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 01:40:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3C312DECBA;
-	Wed, 29 Oct 2025 01:39:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97B952DF136;
+	Wed, 29 Oct 2025 01:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JMclFGt6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cQ0wa4P/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A79D928030E;
-	Wed, 29 Oct 2025 01:39:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F22117B50F;
+	Wed, 29 Oct 2025 01:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761701962; cv=none; b=kDvSxusygfACfGAAiXsNdgPNEzfMBe15Wk7I57rmm8WU6bUr9G8zKii2WvLyZt9lVh9GGJ4a14vDSY62/X/Nt+YMG+9fIKwPono5dAObQTLMGxa8UnBeZcAc9Ptxa3hKiUdizQv6TOt8a+iUs9OgXYhJJNMwqqXdXoLNAP9nqBg=
+	t=1761702029; cv=none; b=cZmkGwBo2rCNO4tXNxx6wr+ZI5QNFTwyMQIKeSeRGalpaAO8E3uG+aqP6LAuAb7RWQJsDMppb4aQ3IiGsKKzAXjUB+KTY79NFKKEoofnzgUPrs97rJshRTWrcwlevMghuudz8/TT++7EvJ47TSled7XJZGPE3KZSMoPehzMuK80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761701962; c=relaxed/simple;
-	bh=TdVf4GG+VvQqkIiqP7oZKfyOWHbs5MmM5eQZ64Mh9Hg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LJU3A9eEOABA0PjbjhQIn+58bT2e58ZyVBQckRlcpQNZnRm+bjxRjzbKiAOpi2grgLutqSI1KT9ZIAnvkp8mG7K2/EWtYY+RoeWtiBKhr81LlE0amtqwjlZAspe2pE9my64DNXgcuzdpw57AGc2fQM/sb+SCvbR4jDqktj7LQe0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JMclFGt6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B54BC4CEE7;
-	Wed, 29 Oct 2025 01:39:20 +0000 (UTC)
+	s=arc-20240116; t=1761702029; c=relaxed/simple;
+	bh=bkoIx5cfSNbT0j4HYKvnuvXjFNeqGny9Rm8Z3tZZwYU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=BisKkvwSJlRb8EmiqNvTLd7h40sg8qkNgbWGyTrPzPPFD6MMhDp/aMjRRWquIibGFXECls0v0wD7fhALhiLoYY67EiUcXRRE1PpgmVFCx4jWs/t/gs+so319v0qdjRdkmMymz8Qb8qeXYAjvUPJW4YT+MlW6wo4b91Te+WXfQZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cQ0wa4P/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECA12C4CEE7;
+	Wed, 29 Oct 2025 01:40:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761701961;
-	bh=TdVf4GG+VvQqkIiqP7oZKfyOWHbs5MmM5eQZ64Mh9Hg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=JMclFGt6R8ki7/nkzVp79KcVOCYlT2e4AvLKmFeZgOkEbKmyGz8+1gUSjSygfZc3A
-	 g5BvPW0nDyBmVaDOTamVYbYRiKfKKqPzuefnhTVSd2Voj8sLxEEiofChODKLJ8fbrV
-	 ctq8Ostrqtoof54UdON3+x8Wth9WVjhIlYZY7nJKm+Okja/H5FM36dAQ+XBDKy52PR
-	 PYhnchDSNhpWR3dtkh0reNBTsApHDzOHzI6SYIjsr0tXIJIafhfqBhZKTvnc1EURp3
-	 0OQMfwxIPswR4E71tUa1OdJvO2RcZnVBwUP7mbfTGMLyh1rAWBzg1h3XHNo7HDkQ3J
-	 liLRt+2SZJf5Q==
-Date: Tue, 28 Oct 2025 18:39:19 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Michal Schmidt <mschmidt@redhat.com>, Petr Oros
- <poros@redhat.com>, Prathosh Satish <Prathosh.Satish@microchip.com>, Vadim
- Fedorenko <vadim.fedorenko@linux.dev>, Arkadiusz Kubalewski
- <arkadiusz.kubalewski@intel.com>, Jiri Pirko <jiri@resnulli.us>, Jonathan
- Corbet <corbet@lwn.net>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/2] dpll: add phase-adjust-gran pin attribute
-Message-ID: <20251028183919.785258a9@kernel.org>
-In-Reply-To: <20251024144927.587097-2-ivecera@redhat.com>
-References: <20251024144927.587097-1-ivecera@redhat.com>
-	<20251024144927.587097-2-ivecera@redhat.com>
+	s=k20201202; t=1761702029;
+	bh=bkoIx5cfSNbT0j4HYKvnuvXjFNeqGny9Rm8Z3tZZwYU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=cQ0wa4P/vFxecHrqRLdYzY3n7Tz2rq/Lh5hgtGnX8Xt/xEfbPqlpNXFOLRbMekhbV
+	 9SAh4kUg9MnGVGVUkrNyjzqMBZXbUkptyTbS4DTxsJE9slYbyA8FKMAHVOiUZoEmGe
+	 F/PJ57qc3WmpPN6chpVQMr1dD75sp1Ptn9nN0GyOYQfEauLysGj3w+1226GjllcPCU
+	 bjxwia4bethcHtol2PVkhd/9HehAxJRb4k8A25B6S0h8jfXO+qSDAdxS/NDe3bxJHt
+	 p4K1e4SIyTf08EymkvLOiocvZJGEIn1zWSWP/AsaiCB7f7dfXJcXcWVh+UoCHMd0zc
+	 vD8aKIl187M3A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE9539FEB71;
+	Wed, 29 Oct 2025 01:40:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] dpll: fix device-id-get and pin-id-get to return
+ errors
+ properly
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176170200650.2457978.16336444534158307365.git-patchwork-notify@kernel.org>
+Date: Wed, 29 Oct 2025 01:40:06 +0000
+References: <20251024190733.364101-1-poros@redhat.com>
+In-Reply-To: <20251024190733.364101-1-poros@redhat.com>
+To: Petr Oros <poros@redhat.com>
+Cc: vadim.fedorenko@linux.dev, arkadiusz.kubalewski@intel.com,
+ jiri@resnulli.us, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ivecera@redhat.com, mschmidt@redhat.com
 
-On Fri, 24 Oct 2025 16:49:26 +0200 Ivan Vecera wrote:
-> +      -
-> +        name: phase-adjust-gran
-> +        type: s32
-> +        doc: |
-> +          Granularity of phase adjustment, in picoseconds. The value of
-> +          phase adjustment must be a multiple of this granularity.
+Hello:
 
-Do we need this to be signed?
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri, 24 Oct 2025 21:07:33 +0200 you wrote:
+> The device-id-get and pin-id-get handlers were ignoring errors from
+> the find functions and sending empty replies instead of returning
+> error codes to userspace.
+> 
+> When dpll_device_find_from_nlattr() or dpll_pin_find_from_nlattr()
+> returned an error (e.g., -EINVAL for "multiple matches" or -ENODEV
+> for "not found"), the handlers checked `if (!IS_ERR(ptr))` and
+> skipped adding the device/pin handle to the message, but then still
+> sent the empty message as a successful reply.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] dpll: fix device-id-get and pin-id-get to return errors properly
+    https://git.kernel.org/netdev/net/c/36fedc44e37e
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
