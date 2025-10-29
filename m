@@ -1,230 +1,164 @@
-Return-Path: <netdev+bounces-234150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 209C4C1D4A4
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 21:50:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83968C1D4DA
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 21:53:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3921A189F2D4
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 20:51:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7779842548C
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 20:53:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC34B2F83A7;
-	Wed, 29 Oct 2025 20:50:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D50A431A061;
+	Wed, 29 Oct 2025 20:52:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XI8NuLpL"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="FLF1GT7q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 000FB21579F
-	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 20:50:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90C773161B3;
+	Wed, 29 Oct 2025 20:52:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761771044; cv=none; b=lJBGPqqk2nfBrKpTcyHZVye74cAdYIvEnhY9PR95EUwVn4HdcElesIOlhm9SufkaVOJlOrexRAF+ol1zlHJI3CPKcEHVX5VJaye+YhSkKwUoeaVhYPcoOH1V2TsmM0pfdODdL1JNP9npmYfZpSyCsjH3k3x/OnHCFXNW4dksnOM=
+	t=1761771129; cv=none; b=NnOHAcaftT9D3A/EN1u43Ex9Rkph48FMiHkO+82Ckfw7yrYpu/4ul0on5rjisA4hQmQbfdXB1700qrsfsRI/QO6JMEFf1yATvvvDzfvr3MHGm3TVjY/z5ZC1rA30YTLAOWR2QkxHfmgregaETMLBzLogpIrRs5OSmPJsJeqBMXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761771044; c=relaxed/simple;
-	bh=6zjWDKHvDUmCspfnhUpUidENGOH1u4Q7Al0J9CBMnyY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Cxgm6AZr35pzE50MlcFrRMEOA+z+nxfIluKEt2DgFnlQS4Wnr0eNhzvj1NKNhHlXbpQ7BqLaZ79scOkc8ECiLc3ZLWKFnKQqo2WB+MZANs+QQN5oz4e3QExacuguhU6b7kmxbpYY0ZGillzHzsZJT+r2NlMYq2LkaCsexKWknkU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XI8NuLpL; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-42708097bbdso47102f8f.3
-        for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 13:50:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761771041; x=1762375841; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=QhItZvJg11h14RqD8DEUafH4SOcvlIckRX4IB4jy1L4=;
-        b=XI8NuLpLMLtEHd1v6jOs/Xn65v1qzCSkyduXna5NyAOEMV2MUSdgrA7FZ2yf99NJ+L
-         Cg6wWp2critoCEpOGrsEIOXUNY5pg8D18lxMh8Kbf/hp0InIFopGWw22y3sdrRSjtonl
-         1UFTzmzq3LHwjIt4LbbZwBTWMbeR61rDOOq1Gdu0W23lhxOlLIGUFW4IxDhZQ3f2FiTp
-         Vjt8KO87WXLRdp1Pre966wgZoXCaDVDVWwOcZhimGrA+8NHDY586ajoE5HlAY3tu9Zy+
-         SoIKY+15ICHdi179rYLfo99ENKogyEetvi05kqa+MhlJiSrPsviYBoGGWJ7fgTZNcPfm
-         N4zQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761771041; x=1762375841;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QhItZvJg11h14RqD8DEUafH4SOcvlIckRX4IB4jy1L4=;
-        b=DQPxTUKmpjmkpRmvAS9vffhvs/Uka0sMEl1JdLSm/B3i1mM8T9515pB1OBUioxNZaM
-         93rwJEa721T4/2q2tyfQjpLbVpi+8TZ08PG703L6QTyaeoN/ohhq0uB5vxYHU+Tf9Y6r
-         4Uut/RFVV4EVlrw1GqDGx/fzDBBdpAJU3txBLsHQcNqq5DCj7CF9CYOUg8QbHnrpM3IB
-         WtGMSPXVrUqz3B+c+19lpcBB9nWzQWIbasjrJQCCjhNkLQtSI8uF4jdDCFRSCcR4MCaT
-         aGZiYBkTKZMfXQxL5dLQegUHd7HwH0031TRhpXSCb6JWkXwXMQvvqGeFazScE3NAW1FF
-         X+zA==
-X-Gm-Message-State: AOJu0YzjuZX7DuGlRVU2W2temH/pOodKo6ahVWyJjYw0jjoXfrkhBBOH
-	Z4vNU4HkGC/91e44kwl/pKab3jjMQj+ghTfnJ7eyz1ZV0/2xJNS1tEIo
-X-Gm-Gg: ASbGnctV1ige4Xm9JeaQHAUVaMHt/osu5zCMux0u6C3fbkJu8AqJWt1OK3ThMB3CTyn
-	Ywukj/SNaSKf70OpFVsJSmGqCVLgXKLHFN/Osi6vxyE4ObWoif2GPEdPeVbLEVVdIteTm7pTUvg
-	/HJuKB9bMF00rdud2qN/KAbz3NAfD8qEj5hayuKS53YYeUhkVYytXXCRLmzTjQvIp2QxkbNZ9hz
-	9Hi7zS3AoHkBz23+yRwgWcI94rV8KQb4AX7ZQ0aKhda7CfTsz9ZbPVVxLRIB00l3lXfpnjecdta
-	GLpU0Jo9gAvyCxqdkRuIfbRK+c246ZEvT5urBOkeJD5poUTWE0gz8XhtDErGUlN0gOL9ixD9t8x
-	+cvyGK37ZYH7D0O+KZWfhy11LDgd+6XcxyvusC2Vui5Dtrda/i0Ba8t58akVfM3tseI+MltLvOg
-	RtSlk=
-X-Google-Smtp-Source: AGHT+IFNSHCKQVaEkNNF6OQaV8zGl5KuFF0WiI/XF0XmsBzjv3pnZsHeYY3KYhcSA/ruRUVTWFvagw==
-X-Received: by 2002:a05:6000:2088:b0:3ee:1125:fb68 with SMTP id ffacd0b85a97d-429aef70b89mr2039673f8f.2.1761771040974;
-        Wed, 29 Oct 2025 13:50:40 -0700 (PDT)
-Received: from localhost ([2a03:2880:31ff:8::])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429952b79absm27775131f8f.3.2025.10.29.13.50.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Oct 2025 13:50:40 -0700 (PDT)
-From: Gustavo Luiz Duarte <gustavold@gmail.com>
-Date: Wed, 29 Oct 2025 13:50:24 -0700
-Subject: [PATCH net] netconsole: Acquire su_mutex before navigating configs
- hierarchy
+	s=arc-20240116; t=1761771129; c=relaxed/simple;
+	bh=KV9UVgCkqouJnikGNIjL29VEwbmmtAbHwtbsaIvTk2s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZoLLE/zinOhAgUU3yVOUzKwI3QOx2KjGhkPHsLXS5NRf065Flukut+TIovtPV+omOHTqs9jbUkP8hprPxiAigs6N5jgMRm4KbGk74VSHKmoXGXJ5NT2csiMRD1vgFDQxFB+wtyZfuD6rNt4FYac1Ntraj+W8xLPDPcYPNPABzsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=FLF1GT7q; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1761771115;
+	bh=KV9UVgCkqouJnikGNIjL29VEwbmmtAbHwtbsaIvTk2s=;
+	h=From:To:Cc:Subject:Date:From;
+	b=FLF1GT7qr19AGWmGkFOlLhJpotsQeztnM/cvmXV8BDFjNK0Safqa2JBEE0NdZCC+2
+	 7Z06qImjnZTVd+1WXnBm8YWJ/O3rU+R8oTqcPUR5B6OgKWH50S2XNwoXmQxfYxkNkp
+	 Ic7aPKA20q0BBGhXyJmsqswAMrwopq7AFQLvN3oYPQ8KPFRAZGsDL2FndquGJQOGvJ
+	 0uGi8LSu5NoFsGkuU0sCQRTA0s11dCvOoyDCTXFjxlbxD8Z7iXKDBeyT+kjfWJJJ6p
+	 SqPVZMtpfT4W6OJvHyVu7HnxKRrtp/JonnYZA7IbEYCgwEtL4CgVyC8mmwMK9Mxz0J
+	 +CCtc277b24yQ==
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 43E3460115;
+	Wed, 29 Oct 2025 20:51:55 +0000 (UTC)
+Received: by x201s (Postfix, from userid 1000)
+	id CDBD92021CC; Wed, 29 Oct 2025 20:51:29 +0000 (UTC)
+From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	wireguard@lists.zx2c4.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v1 00/11] wireguard: netlink: ynl conversion
+Date: Wed, 29 Oct 2025 20:51:08 +0000
+Message-ID: <20251029205123.286115-1-ast@fiberby.net>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251029-netconsole-fix-warn-v1-1-0d0dd4622f48@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAA9+AmkC/x2MywoCMQwAf6XkbKANPqq/Ih5KN9WApNLKrlD67
- 4Y9DsPMgM5NuMPNDWi8SpeqBuHgIL+SPhllMQbydAqeIip/c9Ve34xFfrilpphj8bnQ9UiXM1j
- 5aWxuv97BAnjM+Qc58uNzagAAAA==
-To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Matthew Wood <thepacketgeek@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Gustavo Luiz Duarte <gustavold@gmail.com>
-X-Mailer: b4 0.13.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-There is a race between operations that iterate over the userdata
-cg_children list and concurrent add/remove of userdata items through
-configfs. The update_userdata() function iterates over the
-nt->userdata_group.cg_children list, and count_extradata_entries() also
-iterates over this same list to count nodes.
+This series completes the implementation of YNL for wireguard,
+as previously announced[1].
 
-Quoting from Documentation/filesystems/configfs.rst:
-> A subsystem can navigate the cg_children list and the ci_parent pointer
-> to see the tree created by the subsystem.  This can race with configfs'
-> management of the hierarchy, so configfs uses the subsystem mutex to
-> protect modifications.  Whenever a subsystem wants to navigate the
-> hierarchy, it must do so under the protection of the subsystem
-> mutex.
+This series consist of 5 parts:
+1) Patch 01-03 - Misc. changes
+2) Patch    04 - Add YNL specification for wireguard
+3) Patch 05-07 - Transition to a generated UAPI header
+4) Patch    08 - Adds a sample program for the generated C library
+5) Patch 09-11 - Transition to generated netlink policy code
 
-Without proper locking, if a userdata item is added or removed
-concurrently while these functions are iterating, the list can be
-accessed in an inconsistent state. For example, the list_for_each() loop
-can reach a node that is being removed from the list by list_del_init()
-which sets the nodes' .next pointer to point to itself, so the loop will
-never end (or reach the WARN_ON_ONCE in update_userdata() ).
+The main benefit of having a YNL specification is unlocked after the
+first 2 parts, the RFC version seems to already have spawned a new
+Rust netlink binding[2] using wireguard as it's main example.
 
-Fix this by holding the configfs subsystem mutex (su_mutex) during all
-operations that iterate over cg_children.
-This includes:
-- userdatum_value_store() which calls update_userdata() to iterate over
-  cg_children
-- All sysdata_*_enabled_store() functions which call
-  count_extradata_entries() to iterate over cg_children
+Part 3 and 5 validates that the specification is complete and aligned,
+the generated code might have a few warts, but they don't matter too
+much, and are mostly a transitional problem[3].
 
-The su_mutex must be acquired before dynamic_netconsole_mutex to avoid
-potential lock ordering issues, as configfs operations may already hold
-su_mutex when calling into our code.
+Part 4 is possible after part 2, but is ordered after part 3,
+as it needs to duplicate the UAPI header in tools/include.
 
-Fixes: df03f830d099 ("net: netconsole: cache userdata formatted string in netconsole_target")
-Signed-off-by: Gustavo Luiz Duarte <gustavold@gmail.com>
----
- drivers/net/netconsole.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+For the non-generated kernel C code the diff stat looks like this:
 
-diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index 194570443493..9e17632e0bc6 100644
---- a/drivers/net/netconsole.c
-+++ b/drivers/net/netconsole.c
-@@ -931,6 +931,7 @@ static ssize_t userdatum_value_store(struct config_item *item, const char *buf,
- 	if (count > MAX_EXTRADATA_VALUE_LEN)
- 		return -EMSGSIZE;
- 
-+	mutex_lock(&netconsole_subsys.su_mutex);
- 	mutex_lock(&dynamic_netconsole_mutex);
- 
- 	ret = strscpy(udm->value, buf, sizeof(udm->value));
-@@ -944,6 +945,7 @@ static ssize_t userdatum_value_store(struct config_item *item, const char *buf,
- 	ret = count;
- out_unlock:
- 	mutex_unlock(&dynamic_netconsole_mutex);
-+	mutex_unlock(&netconsole_subsys.su_mutex);
- 	return ret;
- }
- 
-@@ -969,6 +971,7 @@ static ssize_t sysdata_msgid_enabled_store(struct config_item *item,
- 	if (ret)
- 		return ret;
- 
-+	mutex_lock(&netconsole_subsys.su_mutex);
- 	mutex_lock(&dynamic_netconsole_mutex);
- 	curr = !!(nt->sysdata_fields & SYSDATA_MSGID);
- 	if (msgid_enabled == curr)
-@@ -989,6 +992,7 @@ static ssize_t sysdata_msgid_enabled_store(struct config_item *item,
- 	ret = strnlen(buf, count);
- unlock:
- 	mutex_unlock(&dynamic_netconsole_mutex);
-+	mutex_unlock(&netconsole_subsys.su_mutex);
- 	return ret;
- }
- 
-@@ -1003,6 +1007,7 @@ static ssize_t sysdata_release_enabled_store(struct config_item *item,
- 	if (ret)
- 		return ret;
- 
-+	mutex_lock(&netconsole_subsys.su_mutex);
- 	mutex_lock(&dynamic_netconsole_mutex);
- 	curr = !!(nt->sysdata_fields & SYSDATA_RELEASE);
- 	if (release_enabled == curr)
-@@ -1023,6 +1028,7 @@ static ssize_t sysdata_release_enabled_store(struct config_item *item,
- 	ret = strnlen(buf, count);
- unlock:
- 	mutex_unlock(&dynamic_netconsole_mutex);
-+	mutex_unlock(&netconsole_subsys.su_mutex);
- 	return ret;
- }
- 
-@@ -1037,6 +1043,7 @@ static ssize_t sysdata_taskname_enabled_store(struct config_item *item,
- 	if (ret)
- 		return ret;
- 
-+	mutex_lock(&netconsole_subsys.su_mutex);
- 	mutex_lock(&dynamic_netconsole_mutex);
- 	curr = !!(nt->sysdata_fields & SYSDATA_TASKNAME);
- 	if (taskname_enabled == curr)
-@@ -1057,6 +1064,7 @@ static ssize_t sysdata_taskname_enabled_store(struct config_item *item,
- 	ret = strnlen(buf, count);
- unlock:
- 	mutex_unlock(&dynamic_netconsole_mutex);
-+	mutex_unlock(&netconsole_subsys.su_mutex);
- 	return ret;
- }
- 
-@@ -1072,6 +1080,7 @@ static ssize_t sysdata_cpu_nr_enabled_store(struct config_item *item,
- 	if (ret)
- 		return ret;
- 
-+	mutex_lock(&netconsole_subsys.su_mutex);
- 	mutex_lock(&dynamic_netconsole_mutex);
- 	curr = !!(nt->sysdata_fields & SYSDATA_CPU_NR);
- 	if (cpu_nr_enabled == curr)
-@@ -1100,6 +1109,7 @@ static ssize_t sysdata_cpu_nr_enabled_store(struct config_item *item,
- 	ret = strnlen(buf, count);
- unlock:
- 	mutex_unlock(&dynamic_netconsole_mutex);
-+	mutex_unlock(&netconsole_subsys.su_mutex);
- 	return ret;
- }
- 
+$ git diff --stat net-next/main..wg-ynl include/ drivers/ \
+	':(exclude)*netlink_gen*'
+ drivers/net/wireguard/Makefile  |   1 +
+ drivers/net/wireguard/netlink.c |  70 +++---------
+ include/uapi/linux/wireguard.h  | 190 ++++++--------------------------
+ 3 files changed, 47 insertions(+), 214 deletions(-)
+
+[1] [PATCH net 0/4] tools: ynl-gen: misc fixes + wireguard ynl plan
+    https://lore.kernel.org/r/20250901145034.525518-1-ast@fiberby.net/
+
+[2] https://github.com/one-d-wide/netlink-bindings/
+
+[3] https://lore.kernel.org/r/20251014123201.6ecfd146@kernel.org/
 
 ---
-base-commit: 210b35d6a7ea415494ce75490c4b43b4e717d935
-change-id: 20251028-netconsole-fix-warn-c8f0cf294276
+v1:
+- Policy arguement to nla_parse_nested() changed to NULL (thanks Johannes).
+- Added attr-cnt-name to the spec, to reduce the diff a bit.
+- Refined the doc in the spec a bit.
+- Reword commit messages a bit.
+- Reordered the patches, and reduced the series from 14 to 11 patches.
 
-Best regards,
+RFC: https://lore.kernel.org/r/20250904-wg-ynl-rfc@fiberby.net/
+
+diff -Naur a/sent/0904/b/0002-wireguard-netlink-validate-nested-arrays-in-policy.patch 0001-wireguard-netlink-validate-nested-arrays-in-policy.patch
+diff -Naur a/sent/0904/b/0001-wireguard-netlink-use-WG_KEY_LEN-in-policies.patch 0002-wireguard-netlink-use-WG_KEY_LEN-in-policies.patch
+diff -Naur a/sent/0904/b/0013-wireguard-netlink-enable-strict-genetlink-validation.patch 0003-wireguard-netlink-enable-strict-genetlink-validation.patch
+diff -Naur a/sent/0904/b/0003-netlink-specs-add-specification-for-wireguard.patch 0004-netlink-specs-add-specification-for-wireguard.patch
+
+
+
+
+
+Asbjørn Sloth Tønnesen (11):
+  wireguard: netlink: validate nested arrays in policy
+  wireguard: netlink: use WG_KEY_LEN in policies
+  wireguard: netlink: enable strict genetlink validation
+  netlink: specs: add specification for wireguard
+  uapi: wireguard: move enum wg_cmd
+  uapi: wireguard: move flag enums
+  uapi: wireguard: generate header with ynl-gen
+  tools: ynl: add sample for wireguard
+  wireguard: netlink: convert to split ops
+  wireguard: netlink: rename netlink handlers
+  wireguard: netlink: generate netlink code
+
+ Documentation/netlink/specs/wireguard.yaml | 307 +++++++++++++++++++++
+ MAINTAINERS                                |   3 +
+ drivers/net/wireguard/Makefile             |   1 +
+ drivers/net/wireguard/netlink.c            |  70 +----
+ drivers/net/wireguard/netlink_gen.c        |  77 ++++++
+ drivers/net/wireguard/netlink_gen.h        |  29 ++
+ include/uapi/linux/wireguard.h             | 190 +++----------
+ tools/include/uapi/linux/wireguard.h       |  79 ++++++
+ tools/net/ynl/samples/.gitignore           |   1 +
+ tools/net/ynl/samples/wireguard.c          | 104 +++++++
+ 10 files changed, 647 insertions(+), 214 deletions(-)
+ create mode 100644 Documentation/netlink/specs/wireguard.yaml
+ create mode 100644 drivers/net/wireguard/netlink_gen.c
+ create mode 100644 drivers/net/wireguard/netlink_gen.h
+ create mode 100644 tools/include/uapi/linux/wireguard.h
+ create mode 100644 tools/net/ynl/samples/wireguard.c
+
 -- 
-Gustavo Luiz Duarte <gustavold@gmail.com>
+2.51.0
 
 
