@@ -1,127 +1,138 @@
-Return-Path: <netdev+bounces-233841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233842-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E90DC1911B
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 09:34:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 62A37C19144
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 09:36:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA2611C81840
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 08:29:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C17A61CC4CAE
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 08:30:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49C472EBBB0;
-	Wed, 29 Oct 2025 08:20:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9409F31A57A;
+	Wed, 29 Oct 2025 08:22:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bbpPYvcj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y7YsI0GK"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA79260583
-	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 08:20:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AE7431A567
+	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 08:22:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761726005; cv=none; b=cYzFFEjjJn1i1HcY4wq0A1tkp8ArpNZ5PtrkRY9Gk6tLCAwrlILKluYDZg3MLmn+tXuxpkhZjtKj/MQe/sXE9OhLE+wNJwrT/U+pEQGAv3fxPAiGKR9O5ma8aO+u36fZaXaQaLZ32qVWjkb5rT92N6aGu7Tjzc6JlXQ3BMMVk3M=
+	t=1761726179; cv=none; b=cVFKsL++FPcinyHBQGEep5MTWzeE8Fsr29u21UqnFwxuW2+uN9cEDxSOUSFw77mpyZdxSx4fTCE5q3A4A2zq0tTXjvn2MOda5jFU+4rPyM/5Yc3yzu6twYe4Cpx3hUUcL6nGGWjGPXK4gixKZEbUoAzhLm/WMGPOmQZZeykIr3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761726005; c=relaxed/simple;
-	bh=dF3Bio0TgnJ38n1yJDNKl2Un84TNaqbPbXxpnnYQNmY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RQs593GM/CjIgkAwJiIhjA2mdZxJAq59dbyidURBoOEfbAbkT2KPJyxAMQcc+SvDkb0RgMSEheEuJNFNS5nEWfVy+zrcGHUZMU9PZR32WlqsR88pWzOYkSb6VJ/mazP8tm1W2eqe1TjM2a6r7nzWxirpQB7r24dzmWQdJCKOZdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bbpPYvcj; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761726002;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jlHEB3885pfS5dzEnYONWhgNpmOARZh1obJdxfgK8IE=;
-	b=bbpPYvcjCJmE3PLd+21MfD5M7J1pQZPlUttyOk9YAbe8sZlxshvOgBHc+6AhU4isEOFKT6
-	DurP8pi8qYK4YPBN5i3h6Eo+OymCslatmOSCL2B9wksdcwnKhwe8PfmEGRZ9OzCk8qyA4j
-	U/VCaHJ9iEVlJjAiAx5ooE4sqnDr8fM=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-643-uvH4pPgyN7qOlL9IYifPJQ-1; Wed, 29 Oct 2025 04:20:01 -0400
-X-MC-Unique: uvH4pPgyN7qOlL9IYifPJQ-1
-X-Mimecast-MFC-AGG-ID: uvH4pPgyN7qOlL9IYifPJQ_1761726000
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-471201dc0e9so39603005e9.2
-        for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 01:20:00 -0700 (PDT)
+	s=arc-20240116; t=1761726179; c=relaxed/simple;
+	bh=II2ZeAq5d1PqZyNvFep+lfOCaOaR9aIDJK3qwqZxtvA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AhdQq+lqUjUfbmvg+BhnP3yyet1saZZ6Ok8JKaDddGKsbdib5ZZYzbxdTtpG/mxszfzSOLcQagmzqBjGTn4HW2e1J2bGWjSRPEGCiOywU5lOTYWLwUuOTvx9nn1aZUSN2kBirG5TpG43a5CMRCsMdbc5IGLj9+Bzt7gmAtgQfG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y7YsI0GK; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-b5a631b9c82so4248980a12.1
+        for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 01:22:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761726176; x=1762330976; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pjESO5fQEKLuX6fwGQrrMr1sS1AZEXE62NjhuH0WeLY=;
+        b=Y7YsI0GKGozgk7tmV4wM/+RTg0rdqLe5ZwTyElLj9fuq6sgLRjNPFcw8pFEBntVbuh
+         vKJ4L1Uonwx2pZNkmrtldJNEzGXxPdonFJv+ETTvehVct+XxpIOp6hT34kEZc0twjYNF
+         q+ImXDbunIud/CKTivfI/JbdKaXLabWLVKJ5azemMdMIidWdrDxP7dEkOh5Gd5tPXk43
+         +BAjgg9TP5ogfFcgQ3fKMf1+QsqvPL8s+Ko1xf/8YR/YHdV3r6T+YV4Rq/BzoC3oJ0iy
+         E8Gp9J/hU8tlnpQZXvpQLEOfLkuAU5MmH7Zb0hVUxuHxbrA7hCQg1pbnEADOI8J+wNeL
+         ydMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761726000; x=1762330800;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jlHEB3885pfS5dzEnYONWhgNpmOARZh1obJdxfgK8IE=;
-        b=jP7q78AaxlYzJ/xd1n0qcoJkVDP+dCZkMA7JIYeM07PQXthYGe2G1ftIDkmD2Aa+5I
-         is6AM8BDo4avYzP733chypUcGSKTkZSwTTP/9qI0qNJELVp9N0fSacebnYsSyg3RnvG2
-         hW2VfCF4XuXE9ZqM3dU4dnT2vOoniMADOVty3jpb9nkVCJjFUWdDkWTA2qtyoydHDlJ3
-         0qFNYSVTJENffPC96GYLXfqvEiDhKVnJYR0fhliLoQZw8oOw53Vht+uvFm5Qiiy35aTp
-         3UbCk0S1liK3lhrMimutoj/jtDleMJ05Bu84ahQDVGVXysF+sSyTy6ZRlatvZXGSbtmo
-         NWMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWhg5qnukRNHpMRvxJmsCq6LmAbL8Qph86UPEafpFTLR3Usbpz7IzSmCaYAbEZbSr724+5LOWk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNHMzEa+Q5M1Hn17Y+vERVduaGCWIJHi5yPn0a84IPwbD/MlIN
-	m54ubtc1bSPmKsDTBkYVI75uPIt/VIVSOE1mSI/TrfrHDINVqDgrB87rKxzhHw35T6cJR59AhBF
-	nCCpZFZYOeK6yixcKHyuJG/ffQ9rU9CPCMKig1BaYMb9is3VaBKb4N9GVQYgK5bDrWw==
-X-Gm-Gg: ASbGncvfF+VQnciTKmJchomra9c1YjC4vSRHGiFMJ6uanJV28m+k+xGpkZdv6fQlOrF
-	4hhtxKMy1l1xqiNWHLG8zieQWG0W7wyHYJhwrDqru0pnRj7vEUzUYXBp7Vaac2ICJuO6o7rArnG
-	AsxQ0aPVc5OJmQ6vAjE+84WTcSfzywuswfWednn682xbbirLw7P6XmKJ6FGiMfSL/i+YvHHxmjq
-	9aR0TflXWfzl4gC/mhTZXkpbnaDBaiK7V1MeJqqtgbB3/enm7pKX0LST96OhpZlMAaHxQh+fTKX
-	cru1z6GK4NeYxnqOnhh+k6/GXnZKnlP2MWD/B6qezbGEIgi1UrRrspKJ+0PI17IypcMccKGN30P
-	K72kFqsqs37Lu5J/hnGQYV5NWXjjcOwOCoMP47abBVWyyoTU=
-X-Received: by 2002:a05:600c:3f0d:b0:468:86e0:de40 with SMTP id 5b1f17b1804b1-4771e32f67amr17216375e9.4.1761725999688;
-        Wed, 29 Oct 2025 01:19:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFIKqhZC0CRaoe+oh+5iFeCWKZfBRUDuYDM2nN5t0zCHgNGsk8VxrCIMd1bsBbPfplLJXnHhw==
-X-Received: by 2002:a05:600c:3f0d:b0:468:86e0:de40 with SMTP id 5b1f17b1804b1-4771e32f67amr17216155e9.4.1761725999244;
-        Wed, 29 Oct 2025 01:19:59 -0700 (PDT)
-Received: from ?IPV6:2a0d:3344:2712:7e10:4d59:d956:544f:d65c? ([2a0d:3344:2712:7e10:4d59:d956:544f:d65c])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4771e3937b3sm33177645e9.5.2025.10.29.01.19.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Oct 2025 01:19:58 -0700 (PDT)
-Message-ID: <d0f1f8f5-8edf-4409-a3ee-376828f85618@redhat.com>
-Date: Wed, 29 Oct 2025 09:19:57 +0100
+        d=1e100.net; s=20230601; t=1761726176; x=1762330976;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pjESO5fQEKLuX6fwGQrrMr1sS1AZEXE62NjhuH0WeLY=;
+        b=SnmiFOfXQHuwG5fI3LuAxxK08P0HzAqTRB9Gue7wJ/ddwMZSwreh6DqtYlHzbykugZ
+         9ydY3IXCWbSdodB4Wr6DVO+hYx6gZmK6SSFB9zqXf5SaFazFASRlllR3LKclqKWmXfKW
+         8PGhd3nLLQqZyvicE7kFDgan4qW+cg6RxtM3Lntxf1hG2gbBH/t/ZBseZtmJYOPZhqJ6
+         zZgcjmCR5Enz8fH0frSY8186cnzATHB2Jcqeo9RTBla+7CjvsHS2kGd7a72TzKIfgHZ9
+         eVPk+XYLxqcS2RwmlUh1AFX/apa2GtJ7jTYu3jaC0tFuKOtI9bLWXoBwSzpnYuvwV7/s
+         M5rA==
+X-Gm-Message-State: AOJu0Yz9kJtjcEuAqVJJZuA97hiXJ9Kcsa+PmVlkD4QP3krnGB4LpXsw
+	cAlDmo9UVN9DrxNVfCdiXJ87zNMH9jYtdibO1m3fLTIMWBcCA50y5kRIqfqJ33h0UVE=
+X-Gm-Gg: ASbGncsZF4vkhnW8LK5L5oOww4BIHISFVDw78A+vwdoI3MAGbxCXYTkB8ThMaCqjDKa
+	nu0JLB6FO5zIJxy1GH26Ioym9fQXmcd4QcmhbsKxkMuTohhrczIYLAAqPDrE8CYacSmU3KauPlB
+	QneExWbfwIfKb3KIWzmbOeG/bTwYqr2ZGfifjv1KMm043ppymwuf6Wzht1i6Z0ht2MhWfi2AGNB
+	al97HEa477r3TH169D4N1/lhuJPDzdZ/tH7YNfOpSkviBzXp9x94+/T5RLqwnBhvBRLieRftTSh
+	UafdiNDbaOXpx9+u0rZbcuO7XozhsdQjGxjU8RWhhzzMVqAqw2Wtrz6g+zxVmAArnxO0N5wjXhA
+	x0ALCak8fsBgi4uB35ZLdfyAi4Ho6FdQ3jlcLW9WO+9ETdWkDLZEPV5UzA15BjUvYvesI1mqCMJ
+	nm58ucrG4G16q1eLCutD2W+mu8Sg==
+X-Google-Smtp-Source: AGHT+IFtlmUFHwbjWAVa70at2N/ziNZo4fE2Wvt/G/+dSsYuVmuZ+70lod3hZaRVGg519qEMJmCkWg==
+X-Received: by 2002:a17:903:187:b0:262:2ae8:2517 with SMTP id d9443c01a7336-294dedfc7dbmr23710645ad.5.1761726176352;
+        Wed, 29 Oct 2025 01:22:56 -0700 (PDT)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29498d09958sm141906005ad.24.2025.10.29.01.22.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Oct 2025 01:22:55 -0700 (PDT)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jan Stancek <jstancek@redhat.com>,
+	"Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
+	=?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Shuah Khan <shuah@kernel.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Guillaume Nault <gnault@redhat.com>,
+	Petr Machata <petrm@nvidia.com>,
+	linux-kselftest@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCH net-next 0/3] Add YNL test framework and library improvements
+Date: Wed, 29 Oct 2025 08:22:42 +0000
+Message-ID: <20251029082245.128675-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] virtio_net: fix alignment for virtio_net_hdr_v1_hash
-To: Jason Wang <jasowang@redhat.com>, mst@redhat.com,
- xuanzhuo@linux.alibaba.com, eperezma@redhat.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org
-Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
-References: <20251029012434.75576-1-jasowang@redhat.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251029012434.75576-1-jasowang@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 10/29/25 2:24 AM, Jason Wang wrote:
-> From: "Michael S. Tsirkin" <mst@redhat.com>
-> 
-> Changing alignment of header would mean it's no longer safe to cast a
-> 2 byte aligned pointer between formats. Use two 16 bit fields to make
-> it 2 byte aligned as previously.
-> 
-> This fixes the performance regression since
-> commit ("virtio_net: enable gso over UDP tunnel support.") as it uses
-> virtio_net_hdr_v1_hash_tunnel which embeds
-> virtio_net_hdr_v1_hash. Pktgen in guest + XDP_DROP on TAP + vhost_net
-> shows the TX PPS is recovered from 2.4Mpps to 4.45Mpps.
-> 
-> Fixes: 56a06bd40fab ("virtio_net: enable gso over UDP tunnel support.")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> Signed-off-by: Jason Wang <jasowang@redhat.com>
+This series enhances YNL tools with some functionalities and adds
+YNL selftest framework.
 
-Whoops, I replied to the older thread before reading this one.
+Changes include:
+- Add MAC address parsing support in YNL library
+- Fix rt-rule spec consistency with other rt-* families
+- Add selftests covering CLI and ethtool functionality
 
-Acked-by: Paolo Abeni <pabeni@redhat.com>
+The tests provide usage examples and regression testing for YNL tools.
+
+Hangbin Liu (3):
+  tools: ynl: Add MAC address parsing support
+  netlink: specs: update rt-rule src/dst attribute types to support IPv4
+    addresses
+  selftests: net: add YNL test framework
+
+ Documentation/netlink/specs/rt-rule.yaml   |   6 +-
+ tools/net/ynl/pyynl/lib/ynl.py             |   9 +
+ tools/testing/selftests/Makefile           |   1 +
+ tools/testing/selftests/net/ynl/Makefile   |  18 ++
+ tools/testing/selftests/net/ynl/cli.sh     | 234 +++++++++++++++++++++
+ tools/testing/selftests/net/ynl/config     |   6 +
+ tools/testing/selftests/net/ynl/ethtool.sh | 188 +++++++++++++++++
+ tools/testing/selftests/net/ynl/settings   |   1 +
+ 8 files changed, 461 insertions(+), 2 deletions(-)
+ create mode 100644 tools/testing/selftests/net/ynl/Makefile
+ create mode 100755 tools/testing/selftests/net/ynl/cli.sh
+ create mode 100644 tools/testing/selftests/net/ynl/config
+ create mode 100755 tools/testing/selftests/net/ynl/ethtool.sh
+ create mode 100644 tools/testing/selftests/net/ynl/settings
+
+-- 
+2.50.1
 
 
