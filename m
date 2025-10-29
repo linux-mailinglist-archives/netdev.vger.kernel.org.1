@@ -1,96 +1,60 @@
-Return-Path: <netdev+bounces-234077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4095CC1C475
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 17:55:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4572C1C469
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 17:55:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA5011884147
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 16:50:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B90D91887A91
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 16:50:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51CE72D8DB9;
-	Wed, 29 Oct 2025 16:49:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D3322D24B4;
+	Wed, 29 Oct 2025 16:49:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="aPT2ffJd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EKwlFX0U"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 810E62EBB90
-	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 16:49:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9F5B176FB1;
+	Wed, 29 Oct 2025 16:49:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761756592; cv=none; b=N6WQmZa2Tb/fDGFLEW9D5NYBtI86HRvoOHGFGtIDRFyF83hxe+2gH3Wvm+yzhPZ6sId9l3ZirXLmn8DvTiTmrRdzjW/fFCdqZc9OpMfImVwxk9cbbPZpi0EdIISo8i2ANqbSONTDi13fwOUdzv0VBRei6h9re0t/dfrPu6l1zwA=
+	t=1761756572; cv=none; b=NCndAbGp2HBtAbX4tYH5c+v+ajg1bEijTfYbwPbU/y2JT8E/YHmz8u84HS9Jp8njbjE0opBSU7+V3qrpmAnK77n1A4XZwvHSTK8Pr+AhlNPRHi8XmdmCFPtKpS3C8kuaq8gxfczc7WmxLR1TouWq2qbm1Aj90enjnm1jnK/OcjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761756592; c=relaxed/simple;
-	bh=OEKL+9e2U3k4zPS08GAvKmJoJlX2pn2d23xiFWOcqGQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Mn8fUwLacvWnZEU6Iqkmq7GY8ektpkfECc+LSv1to4ldYLP4Z3AlRvVNkSLZRZEJ+Odwn/1mCX/6O4wn6xInjr3CJwyRNt6ZUprYTe0Q3vrrAlMaVuMHiEcBqdYfGPBtAsGyWDqV+LIbO70Y96zmIXf/hlntmNmXSiCMYvS8wrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=aPT2ffJd; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b6d3effe106so16127166b.2
-        for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 09:49:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1761756589; x=1762361389; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Zy4Dq16ZdBGq2XMHipktaR8r2SSMWMibdB6/S9CNfRI=;
-        b=aPT2ffJdXP0qmh4LV4gVswR8Ax9A5i2MyUJ1KPgrE70TQhhdgt0S93zrwA5ysm/raR
-         sljA+vDR4OTCRWAq4lyuNCyCJ0z14SVK35NV4K1g2UTKbeFP83sLMqAHiOzO34Vvoypn
-         sN6hpKBiqUk3RylCqa+AZg8B0O+dcPDu747yGdCtDpubpV7vdL1KiQXGQJnylB/5Eyp5
-         fFn7SMelFPj0WW6dnk1Phah7Zm8RDyx/jE400aBarNYvZwM4Y450gxkfA8scf4XnBUO3
-         1fA9eZjjMFNLKRnX4JQF6gEQB4bJESRHPeIiQt0k4X93q/rqbV2rl7mhrv3EUFYIi3nl
-         +AwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761756589; x=1762361389;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Zy4Dq16ZdBGq2XMHipktaR8r2SSMWMibdB6/S9CNfRI=;
-        b=cl8XlqhPxCy68rw4lWy3Ctqsp750pr4lCgpSVkqLLQEhXicY1y3R/kevc2K+SiMkgp
-         GlneFQ0SSn89HB5YE9MUzbud/dBM94TcSUt1CNtdPpPas9wT6RXq5k7CavrQQLk1l5AP
-         q+YZ9YQRk0iNqh7zGWeoC6Q7lh1v0rRqkVfuTYVp9zbnYaSlwd9xR/9wVeDwmDQ1yEXo
-         hkPghPQNJ8/rce+GIDFL1sAxDi1hV29R6fP1mmGBJdjJgEDYrHW+YqECoy7fACt1J9Hy
-         QOF4dmr7MKJ5WhHF56gqH0rWtsnzVESmv2HvFt39wkycNFyYk5EpLsxpXJnsv+U399za
-         dkrA==
-X-Forwarded-Encrypted: i=1; AJvYcCVIC+Gf7bbPPbysyBOKSL0dDxYUcrSrqIXn03RSLJ3yLGgQr56UDoPfTGENnb41iwxq+MOlW4o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSF7n9z4uCGruqtjTQFxYfd2A9OHZVRxeGjTZHgRPsVCpVmV9f
-	Ms4vVUwdmmcV8aAF6jGt92D9iDoCR/BuneTgJn4O+Px1psy95DTXs7LSk7n+nGXjMus=
-X-Gm-Gg: ASbGncsG481EzXDyWHReIyvtoSA3BXoYNphi6TushaKEj9n9YXEvvn9P/ynmZ21kWLx
-	8sgMUYfdLF3uWkuabYqf9Mf4aWMYqUk8UZvgMwxnvu2oDlg3t4qJ48NSZ0R1pFVz2BYYfPfDwpU
-	g5le8qpMeVfYoxdDU2mNLzf7z0LgKJfoSg+n6TgDWu6/JwK499xhw2xpr7ZrWpvYrhHx+udVpug
-	Gces20RUgkraQ3ljL+gRYhPUsxeO+VRSvozeDpQyZe64wzDMP+GK8/dgvskLmIcqNYDYn2E7JLU
-	yKN/h2Ovx6GXjAIhD50MIitm9oypbW+UcE4vfZlN8I5WBhHvT+P7vPChlrZc7XgT38IlRcF5N4O
-	c1R1EE8zNqTjTU3D1MukRGOdt5slO7TTA2xkt9lhKYXdWIBSaW9OlkGySR9MXAguLarJHtpUd3h
-	J+oEbarfHV1S3tmh9rb300eg1kqg==
-X-Google-Smtp-Source: AGHT+IGr6hvPmvwVBK5nlktNTc8D2W7+2SjHOd2HB7EwZx7Q0yftf2aEDh2HBq/ZyO8gNseBq3fqiw==
-X-Received: by 2002:a17:906:c28b:b0:b4f:3169:3ec3 with SMTP id a640c23a62f3a-b703d2faeb6mr244928366b.21.1761756588793;
-        Wed, 29 Oct 2025 09:49:48 -0700 (PDT)
-Received: from dev-mattc2.dev.purestorage.com ([208.88.159.128])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-b6d8992aa28sm1449152366b.41.2025.10.29.09.49.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Oct 2025 09:49:48 -0700 (PDT)
-From: Matthew W Carlis <mattc@purestorage.com>
-To: gal@nvidia.com
-Cc: adailey@purestorage.com,
-	ashishk@purestorage.com,
-	kuba@kernel.org,
-	mattc@purestorage.com,
-	mbloch@nvidia.com,
-	msaggi@purestorage.com,
-	netdev@vger.kernel.org,
-	saeedm@nvidia.com,
-	tariqt@nvidia.com
-Subject: Re: [PATCH 1/1] net/mlx5: query_mcia_reg fail logging at debug severity
-Date: Wed, 29 Oct 2025 10:49:24 -0600
-Message-ID: <20251029164924.25404-1-mattc@purestorage.com>
-X-Mailer: git-send-email 2.46.0
-In-Reply-To: <3edcad0c-f9e8-4eeb-bd63-a37d9945a05c@nvidia.com>
-References: <3edcad0c-f9e8-4eeb-bd63-a37d9945a05c@nvidia.com>
+	s=arc-20240116; t=1761756572; c=relaxed/simple;
+	bh=rhYRhUuBSlENWAjKgfd7BGOH0Spbe/wg1aHymUGStUI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=n12z4J32THFIiuXFp09etIpUue0iZQgsF8t/P2iw6xoX2Ep8QtjDBYUmRfxbZZWv6KvjtsHPKzfS2vSdByKT++57xb3J1sNMUbU/soXCyucX6OEhsCPxr99uZfvPIVS2embYlbnsWk++Sikj5M0CbGV2hET3UecDUHIeLHxwCc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EKwlFX0U; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2A9DC4CEF7;
+	Wed, 29 Oct 2025 16:49:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761756572;
+	bh=rhYRhUuBSlENWAjKgfd7BGOH0Spbe/wg1aHymUGStUI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=EKwlFX0UnTghSaNOJ1dI4HCZhr3cL/96joGsABUYMnIwFdtjD1bVmnyYiNtNM/V7X
+	 fvrnFp+MVCGnful8aKg9j8S0y+9q1WhZ6IDrrPZI6Wdcmo05xiN3mTy8UfM65mObi7
+	 s2E0TMKbK2s5h+GVjB4pGxAiBV16zSuPCMl5WuB7u4S0/jCWYJnC9+dKyuWxnwsZQ/
+	 e70aCSkggdx/zMBLamNd78ujmc7OcAKe3ZlLRYAEHY3xsB538k2J9FIw7sRyjGsMMy
+	 xWL1ttlyi42sJ2KcQJIPxxPybC6ZmUGhQo5GQmWmAgDg32zUnMzt3BgCdp5Cnhe9/c
+	 kIfuy3qyCfncA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	andrew@lunn.ch,
+	shuah@kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next v3] selftests: drv-net: replace the nsim ring test with a drv-net one
+Date: Wed, 29 Oct 2025 09:49:30 -0700
+Message-ID: <20251029164930.2923448-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,34 +63,327 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-On Wed, 29 Oct 2025, Gal Pressman wrote:
-> Allow me to split the discussion to two questions:
-> 1. Is this an error?
-> 2. Should it be logged?
-> 
-> Do we agree that the answer to #1 is yes?
-> 
-> For #2, I think it should, but we can probably improve the situation
-> with extack instead of a print.
+We are trying to move away from netdevsim-only tests and towards
+tests which can be run both against netdevsim and real drivers.
 
-I think its an 'expected error' if the module is not present. I agree.
+Replace the simple bash script we have for checking ethtool -g/-G
+on netdevsim with a Python test tweaking those params as well
+as channel count.
 
-For 2 I think if the user runs "ethtool -m" on a port with no module,
-they received an error message stating something along the lines of
-"module not present" and the kernel didn't have any log messages about
-it that would be near to 'the best' solution. I specifically suffer pain
-from the case of an unused port (no module installed).
+The new test is not exactly equivalent to the netdevsim one,
+but real drivers don't often support random ring sizes,
+let alone modifying max values via debugfs.
 
-I took a peek at the SFP+ and QSFP connector specifications. It looks
-like they do have pins reserved for module presence so I'm wondering if
-the firmware exposes a mechanism for the mlx driver to check the module
-presence. This would clear up essentially every issue with this particular
-case because I have curious people seeing the existing message & then
-questioning me about whether is the cause of some other problem 
-(much of the time not even a networking problem) when in the port is
-simply 'unused'.
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+v3:
+ - let ring sizes fall all the way down to 0
+v2: https://lore.kernel.org/20251027192131.2053792-1-kuba@kernel.org
+ - add the new test to Makefile and remove the old one
+   turns out NIPA checking for Makefile presence was busted
+v1: https://lore.kernel.org/20251024215552.1249838-1-kuba@kernel.org
 
-Cheers!
--Matt
+CC: andrew@lunn.ch
+CC: shuah@kernel.org
+CC: linux-kselftest@vger.kernel.org
+---
+ tools/testing/selftests/drivers/net/Makefile  |   1 +
+ .../selftests/drivers/net/netdevsim/Makefile  |   1 -
+ .../drivers/net/netdevsim/ethtool-ring.sh     |  85 ---------
+ .../selftests/drivers/net/ring_reconfig.py    | 167 ++++++++++++++++++
+ 4 files changed, 168 insertions(+), 86 deletions(-)
+ delete mode 100755 tools/testing/selftests/drivers/net/netdevsim/ethtool-ring.sh
+ create mode 100755 tools/testing/selftests/drivers/net/ring_reconfig.py
+
+diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
+index 6e41635bd55a..68e0bb603a9d 100644
+--- a/tools/testing/selftests/drivers/net/Makefile
++++ b/tools/testing/selftests/drivers/net/Makefile
+@@ -22,6 +22,7 @@ TEST_PROGS := \
+ 	ping.py \
+ 	psp.py \
+ 	queues.py \
++	ring_reconfig.py \
+ 	shaper.py \
+ 	stats.py \
+ 	xdp.py \
+diff --git a/tools/testing/selftests/drivers/net/netdevsim/Makefile b/tools/testing/selftests/drivers/net/netdevsim/Makefile
+index daf51113c827..833abd8e6fdc 100644
+--- a/tools/testing/selftests/drivers/net/netdevsim/Makefile
++++ b/tools/testing/selftests/drivers/net/netdevsim/Makefile
+@@ -8,7 +8,6 @@ TEST_PROGS := \
+ 	ethtool-features.sh \
+ 	ethtool-fec.sh \
+ 	ethtool-pause.sh \
+-	ethtool-ring.sh \
+ 	fib.sh \
+ 	fib_notifications.sh \
+ 	hw_stats_l3.sh \
+diff --git a/tools/testing/selftests/drivers/net/netdevsim/ethtool-ring.sh b/tools/testing/selftests/drivers/net/netdevsim/ethtool-ring.sh
+deleted file mode 100755
+index c969559ffa7a..000000000000
+--- a/tools/testing/selftests/drivers/net/netdevsim/ethtool-ring.sh
++++ /dev/null
+@@ -1,85 +0,0 @@
+-#!/bin/bash
+-# SPDX-License-Identifier: GPL-2.0-only
+-
+-source ethtool-common.sh
+-
+-function get_value {
+-    local query="${SETTINGS_MAP[$1]}"
+-
+-    echo $(ethtool -g $NSIM_NETDEV | \
+-        tail -n +$CURR_SETT_LINE | \
+-        awk -F':' -v pattern="$query:" '$0 ~ pattern {gsub(/[\t ]/, "", $2); print $2}')
+-}
+-
+-function update_current_settings {
+-    for key in ${!SETTINGS_MAP[@]}; do
+-        CURRENT_SETTINGS[$key]=$(get_value $key)
+-    done
+-    echo ${CURRENT_SETTINGS[@]}
+-}
+-
+-if ! ethtool -h | grep -q set-ring >/dev/null; then
+-    echo "SKIP: No --set-ring support in ethtool"
+-    exit 4
+-fi
+-
+-NSIM_NETDEV=$(make_netdev)
+-
+-set -o pipefail
+-
+-declare -A SETTINGS_MAP=(
+-    ["rx"]="RX"
+-    ["rx-mini"]="RX Mini"
+-    ["rx-jumbo"]="RX Jumbo"
+-    ["tx"]="TX"
+-)
+-
+-declare -A EXPECTED_SETTINGS=(
+-    ["rx"]=""
+-    ["rx-mini"]=""
+-    ["rx-jumbo"]=""
+-    ["tx"]=""
+-)
+-
+-declare -A CURRENT_SETTINGS=(
+-    ["rx"]=""
+-    ["rx-mini"]=""
+-    ["rx-jumbo"]=""
+-    ["tx"]=""
+-)
+-
+-MAX_VALUE=$((RANDOM % $((2**32-1))))
+-RING_MAX_LIST=$(ls $NSIM_DEV_DFS/ethtool/ring/)
+-
+-for ring_max_entry in $RING_MAX_LIST; do
+-    echo $MAX_VALUE > $NSIM_DEV_DFS/ethtool/ring/$ring_max_entry
+-done
+-
+-CURR_SETT_LINE=$(ethtool -g $NSIM_NETDEV | grep -i -m1 -n 'Current hardware settings' | cut -f1 -d:)
+-
+-# populate the expected settings map
+-for key in ${!SETTINGS_MAP[@]}; do
+-    EXPECTED_SETTINGS[$key]=$(get_value $key)
+-done
+-
+-# test
+-for key in ${!SETTINGS_MAP[@]}; do
+-    value=$((RANDOM % $MAX_VALUE))
+-
+-    ethtool -G $NSIM_NETDEV "$key" "$value"
+-
+-    EXPECTED_SETTINGS[$key]="$value"
+-    expected=${EXPECTED_SETTINGS[@]}
+-    current=$(update_current_settings)
+-
+-    check $? "$current" "$expected"
+-    set +x
+-done
+-
+-if [ $num_errors -eq 0 ]; then
+-    echo "PASSED all $((num_passes)) checks"
+-    exit 0
+-else
+-    echo "FAILED $num_errors/$((num_errors+num_passes)) checks"
+-    exit 1
+-fi
+diff --git a/tools/testing/selftests/drivers/net/ring_reconfig.py b/tools/testing/selftests/drivers/net/ring_reconfig.py
+new file mode 100755
+index 000000000000..f9530a8b0856
+--- /dev/null
++++ b/tools/testing/selftests/drivers/net/ring_reconfig.py
+@@ -0,0 +1,167 @@
++#!/usr/bin/env python3
++# SPDX-License-Identifier: GPL-2.0
++
++"""
++Test channel and ring size configuration via ethtool (-L / -G).
++"""
++
++from lib.py import ksft_run, ksft_exit, ksft_pr
++from lib.py import ksft_eq
++from lib.py import NetDrvEpEnv, EthtoolFamily, GenerateTraffic
++from lib.py import defer, NlError
++
++
++def channels(cfg) -> None:
++    """
++    Twiddle channel counts in various combinations of parameters.
++    We're only looking for driver adhering to the requested config
++    if the config is accepted and crashes.
++    """
++    ehdr = {'header':{'dev-index': cfg.ifindex}}
++    chans = cfg.eth.channels_get(ehdr)
++
++    all_keys = ["rx", "tx", "combined"]
++    mixes = [{"combined"}, {"rx", "tx"}, {"rx", "combined"}, {"tx", "combined"},
++             {"rx", "tx", "combined"},]
++
++    # Get the set of keys that device actually supports
++    restore = {}
++    supported = set()
++    for key in all_keys:
++        if key + "-max" in chans:
++            supported.add(key)
++            restore |= {key + "-count": chans[key + "-count"]}
++
++    defer(cfg.eth.channels_set, ehdr | restore)
++
++    def test_config(config):
++        try:
++            cfg.eth.channels_set(ehdr | config)
++            get = cfg.eth.channels_get(ehdr)
++            for k, v in config.items():
++                ksft_eq(get.get(k, 0), v)
++        except NlError as e:
++            failed.append(mix)
++            ksft_pr("Can't set", config, e)
++        else:
++            ksft_pr("Okay", config)
++
++    failed = []
++    for mix in mixes:
++        if not mix.issubset(supported):
++            continue
++
++        # Set all the values in the mix to 1, other supported to 0
++        config = {}
++        for key in all_keys:
++            config[key + "-count"] = 1 if key in mix else 0
++        test_config(config)
++
++    for mix in mixes:
++        if not mix.issubset(supported):
++            continue
++        if mix in failed:
++            continue
++
++        # Set all the values in the mix to max, other supported to 0
++        config = {}
++        for key in all_keys:
++            config[key + "-count"] = chans[key + '-max'] if key in mix else 0
++        test_config(config)
++
++
++def _configure_min_ring_cnt(cfg) -> None:
++    """ Try to configure a single Rx/Tx ring. """
++    ehdr = {'header':{'dev-index': cfg.ifindex}}
++    chans = cfg.eth.channels_get(ehdr)
++
++    all_keys = ["rx-count", "tx-count", "combined-count"]
++    restore = {}
++    config = {}
++    for key in all_keys:
++        if key in chans:
++            restore[key] = chans[key]
++            config[key] = 0
++
++    if chans.get('combined-count', 0) > 1:
++        config['combined-count'] = 1
++    elif chans.get('rx-count', 0) > 1 and chans.get('tx-count', 0) > 1:
++        config['tx-count'] = 1
++        config['rx-count'] = 1
++    else:
++        # looks like we're already on 1 channel
++        return
++
++    cfg.eth.channels_set(ehdr | config)
++    defer(cfg.eth.channels_set, ehdr | restore)
++
++
++def ringparam(cfg) -> None:
++    """
++    Tweak the ringparam configuration. Try to run some traffic over min
++    ring size to make sure it actually functions.
++    """
++    ehdr = {'header':{'dev-index': cfg.ifindex}}
++    rings = cfg.eth.rings_get(ehdr)
++
++    restore = {}
++    maxes = {}
++    params = set()
++    for key in rings.keys():
++        if 'max' in key:
++            param = key[:-4]
++            maxes[param] = rings[key]
++            params.add(param)
++            restore[param] = rings[param]
++
++    defer(cfg.eth.rings_set, ehdr | restore)
++
++    # Speed up the reconfig by configuring just one ring
++    _configure_min_ring_cnt(cfg)
++
++    # Try to reach min on all settings
++    for param in params:
++        val = rings[param]
++        while True:
++            try:
++                cfg.eth.rings_set({'header':{'dev-index': cfg.ifindex},
++                                   param: val // 2})
++                if val == 0:
++                    break
++                val //= 2
++            except NlError:
++                break
++
++        get = cfg.eth.rings_get(ehdr)
++        ksft_eq(get[param], val)
++
++        ksft_pr(f"Reached min for '{param}' at {val} (max {rings[param]})")
++
++    GenerateTraffic(cfg).wait_pkts_and_stop(10000)
++
++    # Try max across all params, if the driver supports large rings
++    # this may OOM so we ignore errors
++    try:
++        ksft_pr("Applying max settings")
++        config = {p: maxes[p] for p in params}
++        cfg.eth.rings_set(ehdr | config)
++    except NlError as e:
++        ksft_pr("Can't set max params", config, e)
++    else:
++        GenerateTraffic(cfg).wait_pkts_and_stop(10000)
++
++
++def main() -> None:
++    """ Ksft boiler plate main """
++
++    with NetDrvEpEnv(__file__) as cfg:
++        cfg.eth = EthtoolFamily()
++
++        ksft_run([channels,
++                  ringparam],
++                 args=(cfg, ))
++    ksft_exit()
++
++
++if __name__ == "__main__":
++    main()
+-- 
+2.51.0
 
 
