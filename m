@@ -1,60 +1,65 @@
-Return-Path: <netdev+bounces-234177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32045C1D98D
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 23:38:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F609C1D9C9
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 23:47:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D375E3A35CE
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 22:38:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D3C33B2D28
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 22:47:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EBCD29E0E7;
-	Wed, 29 Oct 2025 22:38:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F8992D593E;
+	Wed, 29 Oct 2025 22:47:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qfVh3pyY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vi79FU2i"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCB7421D5B0
-	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 22:38:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4442718C008;
+	Wed, 29 Oct 2025 22:47:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761777494; cv=none; b=QjSgLw/L8jgZ/EoR8sJnOQ5iT83c6eQhUJfJNUNg6dbxZLfw6CWTsW2Mi+Hb2pcijuM1FptOJzd4rJJLy0TiHSS2ecebcMnA2pImd+eHV88O/lpayK0AAAdXBd6GHu6g4pS4KZ/anIXgRmMYYssO1GzZi1qHDp4Z2bjMf6SOIo0=
+	t=1761778053; cv=none; b=RpmGrXWko17UYRuBUMUPCKs2HQZRtuZCbamJfQ2uhan7HmAXgaadWH7Kad69R3jN8Zyg4IXic/p/dd8tzYwvTf2JJJgny8lDgsmLGcPC/Egz0pboHfhmNdG0Mw+efuffIoHtzipziPPdV5+DG/1V5NnViLOIMLeAqNCmLSrfz6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761777494; c=relaxed/simple;
-	bh=BVskhov3Xg8BYfhlY7/y2ipqSmtxG6yGEuH9tMUeDtI=;
+	s=arc-20240116; t=1761778053; c=relaxed/simple;
+	bh=ryjH8DOV/UmGWhG3rwsW4BNeO6byJ5BvmSUiIvYDcxw=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GyPBieFxHDFmjgU3ArMxd7YXcblWsH2C54mu40Iq9uY/7LU/ps/T+v28KIgXICDo9GLNthjnzx4qvW8+Spco4FaEy4KBZejZiOsDhCOFo83QFYaLj+vFZS7ZucgrDtIBrmBCyCx0wm/HXKMMJb1yGyQDfLHh0Sbq3jvnwkx96Z0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qfVh3pyY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FAB4C4CEF7;
-	Wed, 29 Oct 2025 22:38:13 +0000 (UTC)
+	 MIME-Version:Content-Type; b=LKdH40e07nUlGU8BnXgr9AkKP2yfufJ4kWKfVcKfL1En1Nrh6e1fED9eVEj2zXJzP2XHjuyv2u84eIa1yHW8y5V0+Q9UmpFu475kofPWyZDZGbWSfQJNj+MZ+0uPbWqCOEJ+FTU45Ien3jVAWCVXV2AVKG2tgwc7aPoo0N03bmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vi79FU2i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 082E5C4CEF7;
+	Wed, 29 Oct 2025 22:47:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761777493;
-	bh=BVskhov3Xg8BYfhlY7/y2ipqSmtxG6yGEuH9tMUeDtI=;
+	s=k20201202; t=1761778052;
+	bh=ryjH8DOV/UmGWhG3rwsW4BNeO6byJ5BvmSUiIvYDcxw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qfVh3pyYvwWRZb001lqs6biHuaDkOjAI69YU/OmcEfNitws5PNDLhGC4RnEGdrLCQ
-	 tmVJZeFhBJvIfYRrAndGACnDeTeJo0+5NBpWOpUNEzQRrKiAdfIfqlkH5SSrvLQqYb
-	 aPMLD8pJoet3kiLP3z1Y0UtyBNXaPGeKob5AJnuvUhck+nCeml09LYOaJ9dTe82D+m
-	 aHUX5zjTamltNtYjQPe0eyexMGYjYo+w90BWu793V00vcdi8CDtSs+jqwpTXiM5UMB
-	 69lFnJkqzNKad+ARn14iwS738ZSmW8xRrXuLKcx6+L3uXjLNDMgJRWSgRzgGOV+X/1
-	 9wpKFouZFBOPA==
-Date: Wed, 29 Oct 2025 15:38:12 -0700
+	b=Vi79FU2i8AcbFIOZGQWwroM7FBAzHDeyG2cKBQ5zsi0fWF13IV7T1BURw539oSim4
+	 ljvU8Q0SFFmBACxI97p4+ye9lVcjFho6/5FfbIwNOXRPdyQ31C6MbYkarpcy7eWhCm
+	 rnYjRIgUeVGTvY32IM8ZRI2OlUB3CefPN++Xfue3fwSQP6iPzEtiIi4XF7p/0J5WOB
+	 t05jgj0SXsxx3GnoyBEreoqK9SuIqDXmj5YWu9v6hTsfuCUcPaKanvjBHKIKITkLbA
+	 kwVywBjbSL13xUVWHo69EpKNHFaaQcXuWsacAcigk4kH+Gb8Dl659f4hyBBNAMuFfs
+	 lymW2EL8ONerA==
+Date: Wed, 29 Oct 2025 15:47:30 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Michal Kubecek <mkubecek@suse.cz>, netdev@vger.kernel.org, Kory Maincent
- <kory.maincent@bootlin.com>
-Subject: Re: [PATCH ethtool-next] netlink: tsconfig: add HW time stamping
- configuration
-Message-ID: <20251029153812.10bd6397@kernel.org>
-In-Reply-To: <8693b213-2d22-4e47-99bb-5d8ca4f48dd5@linux.dev>
-References: <20251004202715.9238-1-vadim.fedorenko@linux.dev>
-	<5w25bm7gnbrq4cwtefmunmcylqav524roamuvoz2zv5piadpek@4vpzw533uuyd>
-	<ef2ea988-bbfb-469e-b833-dbe8f5ddc5b7@linux.dev>
-	<zsoujuddzajo3qbrvde6rnzeq6ic5x7jofz3voab7dmtzh3zpw@h3bxd54btzic>
-	<8693b213-2d22-4e47-99bb-5d8ca4f48dd5@linux.dev>
+To: David Wei <dw@davidwei.uk>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, davem@davemloft.net, razor@blackwall.org,
+ pabeni@redhat.com, willemb@google.com, sdf@fomichev.me,
+ john.fastabend@gmail.com, martin.lau@kernel.org, jordan@jrife.io,
+ maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, toke@redhat.com,
+ yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
+Subject: Re: [PATCH net-next v3 03/15] net: Add peer info to queue-get
+ response
+Message-ID: <20251029154730.1a0ac990@kernel.org>
+In-Reply-To: <b6b3cef5-195c-40cc-8c37-cebdee05a5bd@davidwei.uk>
+References: <20251020162355.136118-1-daniel@iogearbox.net>
+	<20251020162355.136118-4-daniel@iogearbox.net>
+	<20251023193333.751b686a@kernel.org>
+	<17f5b871-9bd9-4313-b123-67afa0f69272@iogearbox.net>
+	<20251024161832.2ff28238@kernel.org>
+	<b6b3cef5-195c-40cc-8c37-cebdee05a5bd@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,35 +69,40 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 29 Oct 2025 18:53:20 +0000 Vadim Fedorenko wrote:
-> >> Well, yes, it's only 1 bit is supposed to be set. Unfortunately, netlink
-> >> interface was added this way almost a year ago, we cannot change it
-> >> anymore without breaking user-space API.  
+On Tue, 28 Oct 2025 19:08:10 -0700 David Wei wrote:
+> >> I think up to us which side we want to show. My thinking was to allow user
+> >> introspection from both, but we don't have to. Right now the above example
+> >> was from the container side, but technically it could be either side depending
+> >> in which netns the phys dev would be located.
+> >>
+> >> The user knows which is which based on the ifindex passed to the queue-get
+> >> query: if the ifindex is from a virtual device (e.g. netkit type), then the
+> >> 'peer' section shows the phys dev, and vice versa, if the ifindex is from a
+> >> phys device (say, mlx5), then the 'peer' section shows the virtual one.
+> >>
+> >> Maybe I'll provide a better more in-depth example with both sides and above
+> >> explanation in the commit msg for v4..  
 > > 
-> > The netlink interface only mirrors what we already had in struct
-> > ethtool_ts_info (i.e. the ioctl interface). Therefore my question was
-> > not really about this part of kernel API (which is fixed already) but
-> > rather about the ethtool command line syntax.
-> > 
-> > In other words, what I really want to ask is: Can we be absolutely sure
-> > that it can never possibly happen in the future that we might need to
-> > set more than one bit in a set message?
-> > 
-> > If the answer is positive, I'm OK with the patch but perhaps we should
-> > document it explicitly in the TSCONFIG_SET description in kernel file
-> > Documentation/networking/ethtool-netlink.rst  
+> > Yes, FWIW my mental model is that "leaking" host information into the
+> > container is best avoided. Not a problem, but shouldn't be done without
+> > a clear reason.
+> > Typical debug scenario can be covered from the host side (container X
+> > is having issues with queue Y, dump all the queues, find out which one
+> > is bound to X/Y).  
 > 
-> Well, I cannot say about long-long future, but for the last decade we
-> haven't had a need for multiple bits to be set up. I would assume that
-> the reality will be around the same.
+> Makes sense, I didn't consider leaking host info in a container. Happy
+> to remove the introspection from the container side, leaving it only on
+> the host side when queues are dumped.
 > 
-> Jakub/Kory do you have thoughts?
+> Like Daniel mentioned, I didn't add 'src/real' or 'dst/virtual' because
+> I believed this information is implicit to the user when querying a
+> netdev based on its type. Do you find this to be confusing? Happy to add
+> a clarifying field in the nested struct.
 
-hard to prove a negative, is the question leading to a different
-argument format which will let us set multiple bits? Looks like
-we could potentially allow specifying tx / rx-filter multiple
-times? Or invent new keywords for the extra bits which presumably 
-would be somehow orthogonal to filtering?
+In veth/netkit we call "peer" the other side of an equal pipe. Same for
+ndo_get_peer_dev. Queue is not a peering situation, but rather an attachment
+/ delegation of a sub-object from one netdev to another.
 
-tl;dr I'm unclear on the exact concern..
+I'd use a term like delegation or grant when talking about the HW
+queue. And assignment in context of virtual.
 
