@@ -1,118 +1,152 @@
-Return-Path: <netdev+bounces-233976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57886C1AECC
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 14:50:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BCFBC1B1B3
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 15:12:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1243E5A14F2
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 13:29:53 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 92A1E5A8FE7
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 13:44:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 742BA25785A;
-	Wed, 29 Oct 2025 13:24:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFD5B3358A4;
+	Wed, 29 Oct 2025 13:34:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mNOSdOAy"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="IlvV06IP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2388426980B;
-	Wed, 29 Oct 2025 13:24:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2AE3335091;
+	Wed, 29 Oct 2025 13:34:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761744242; cv=none; b=jcSG4fBZnuzVCe8PvQZ86zf6SxWS7YVFx1LmPg4uAgJcOEnxshLmr/MoG7PhW58t/F6IpNGIIJhyCpF4g6tjfku5xuPv6X6Fd32unoT2dGtMOau/RLIDIkKCqUKve5AeRMa9ndbHBAPviJzHPR+Tre3xkgTvB29ueEroRWfWDHQ=
+	t=1761744855; cv=none; b=O+G699u/yPzi3HMJ74brY+af8nN3V3yYqweQZzu42TOMJM+nC/xFBDbbqI2/I6tXXnufWiDlB9J7xeXRNo2kAqr97fK+P3M8bEb/hXgRk4tcE7HY0WTrQTpMo2ZRsPdsMPGpIG3oSnZ/P83LHF7GB4gq90PuFmAimc1tW8dKhx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761744242; c=relaxed/simple;
-	bh=tnQ7CAQ/zrazskDouHnus3UXop3oRcNTaKyJpkol4Y4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BmK0kP8LQU4GmWIZDJmzyevRGghMm7y8XwjMTPHmoX/1BtGj5X07LGW9/p0E/J+VjjHCSTZO7l5PuFhUlJgij5VQIopwx9ihQcbMyB8/DoabRbRvCDDksYlMU+cL6dsoNLOCIqMSowEB5hA8Hb5LnpbYjKlwdFYA4cp5ZcJ2R1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mNOSdOAy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA982C4CEF7;
-	Wed, 29 Oct 2025 13:23:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761744240;
-	bh=tnQ7CAQ/zrazskDouHnus3UXop3oRcNTaKyJpkol4Y4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mNOSdOAyHbR1VT/fF2/pkmXxetdEzzrKRuVqgkh1vAl0cw2TE7FbX9LXe+xQVy0Wd
-	 GHUxzdoNjbJ8DOnGyUjAHVcDWHzV0x/OQbJOcRGPBj/H6KHrK9wk8lKPRz3oRlA8yZ
-	 1iRW3c8Eg11hR3E1tPmdtpRpZUaIu4Fv1o+wPwlkTgoxO95Wmdr4m6yMNIY/mhk4SG
-	 Y1+B+pJfTPYKuUbD/AWB5VoYivRdvEKKcMYRrnYlFJ0djwF9QuFkIy5mVfS7+uWKjy
-	 EmYOnbWmT1O185HtStSd04ZYpyopo4on0Ta9FEFVGNQ8vvit3zJfVgXinV0wo0cEKZ
-	 5BCqVzBhaNuLQ==
-Date: Wed, 29 Oct 2025 14:23:49 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Miklos Szeredi <miklos@szeredi.hu>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, Chuck Lever <chuck.lever@oracle.com>, 
-	Alexander Aring <alex.aring@gmail.com>, Trond Myklebust <trondmy@kernel.org>, 
-	Anna Schumaker <anna@kernel.org>, Steve French <sfrench@samba.org>, 
-	Paulo Alcantara <pc@manguebit.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
-	Bharath SM <bharathsm@microsoft.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
-	David Howells <dhowells@redhat.com>, Tyler Hicks <code@tyhicks.com>, NeilBrown <neil@brown.name>, 
-	Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
-	Amir Goldstein <amir73il@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Carlos Maiolino <cem@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, 
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, netfs@lists.linux.dev, 
-	ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org, linux-xfs@vger.kernel.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v3 06/13] vfs: make vfs_create break delegations on
- parent directory
-Message-ID: <20251029-lenken-scham-0cf009d5a7dd@brauner>
-References: <20251021-dir-deleg-ro-v3-0-a08b1cde9f4c@kernel.org>
- <20251021-dir-deleg-ro-v3-6-a08b1cde9f4c@kernel.org>
+	s=arc-20240116; t=1761744855; c=relaxed/simple;
+	bh=yYeetJE7nU39JRPQ2bAqGA8v27+L3KLdnP1omdhZg9g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fjRBV7v0PsWCKnA6XW8Lrq9h7TS0IOzyrE8mpF2TY9/uJ4fhlyNTGqOyOlQcwEe0sWXgSYnpVH/r5lOjuCNCROQXmUqx76MZIqZBZDq0h1soKSJRgA3s9Ved+hSpOc/DiMsBb5RQpzo2NJC+ndbOanty/EuSRwPQWwys3ynJeL0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=IlvV06IP; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 6C7FB1A1747;
+	Wed, 29 Oct 2025 13:34:10 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 3C4CB606E8;
+	Wed, 29 Oct 2025 13:34:10 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A5403117F80A7;
+	Wed, 29 Oct 2025 14:34:01 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1761744849; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=wKk+FxFdhXoaDcRKRxsyJt9b/J7SbDXNlJUTNBILMfk=;
+	b=IlvV06IPxNV2S5cD3etgy/hG0vlnjV/OCq7pn1FljLu3y+j9LSE8lJ+s37shkWZW0mMdTk
+	eMWXv/Ppz0BCT8/zs8UuD+EDdLzvwEnPhHnKlk5bQNO5EsyUOnileffmhKTPKgfHHXd3R/
+	WxEHlJKZA8JGmH50riHR7E4iq6+ohacOWUHCtPz5Iam2AquOuVF+6uysOV1+ZW8cLz8c/z
+	QIMN1lgRw7C07B+283adVEJrTHS2iQcpxEtErsytiGX5WR0C7O89fvYuR2tyAHMIABCYtP
+	K8gHywFCOqvzhRqY3WUxcJsw8jeNI7TOi8tlzCFEYg5pQPBLkO5tIyOTPpuF/Q==
+Message-ID: <a871daac-364e-4c2c-8343-d458b373e1fd@bootlin.com>
+Date: Wed, 29 Oct 2025 14:34:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20251021-dir-deleg-ro-v3-6-a08b1cde9f4c@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/4] net: stmmac: socfpga: Agilex5 EMAC platform
+ configuration
+To: rohan.g.thomas@altera.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Steffen Trumtrar <s.trumtrar@pengutronix.de>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20251029-agilex5_ext-v1-0-1931132d77d6@altera.com>
+ <20251029-agilex5_ext-v1-1-1931132d77d6@altera.com>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20251029-agilex5_ext-v1-1-1931132d77d6@altera.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Tue, Oct 21, 2025 at 11:25:41AM -0400, Jeff Layton wrote:
-> In order to add directory delegation support, we need to break
-> delegations on the parent whenever there is going to be a change in the
-> directory.
+Hi Rohan,
+
+On 29/10/2025 09:06, Rohan G Thomas via B4 Relay wrote:
+> From: Rohan G Thomas <rohan.g.thomas@altera.com>
 > 
-> Add a delegated_inode parameter to vfs_create. Most callers are
-> converted to pass in NULL, but do_mknodat() is changed to wait for a
-> delegation break if there is one.
+> Agilex5 HPS EMAC uses the dwxgmac-3.10a IP, unlike previous socfpga
+> platforms which use dwmac1000 IP. Due to differences in platform
+> configuration, Agilex5 requires a distinct setup.
 > 
-> Reviewed-by: Jan Kara <jack@suse.cz>
-> Reviewed-by: NeilBrown <neil@brown.name>
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> Introduce a setup_plat_dat() callback in socfpga_dwmac_ops to handle
+> platform-specific setup. This callback is invoked before
+> stmmac_dvr_probe() to ensure the platform data is correctly
+> configured. Also, implemented separate setup_plat_dat() callback for
+> current socfpga platforms and Agilex5.
+> 
+> Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
 > ---
->  fs/ecryptfs/inode.c      |  2 +-
->  fs/namei.c               | 26 +++++++++++++++++++-------
->  fs/nfsd/nfs3proc.c       |  2 +-
->  fs/nfsd/vfs.c            |  3 +--
->  fs/open.c                |  2 +-
->  fs/overlayfs/overlayfs.h |  2 +-
->  fs/smb/server/vfs.c      |  2 +-
->  include/linux/fs.h       |  2 +-
->  8 files changed, 26 insertions(+), 15 deletions(-)
+>  .../net/ethernet/stmicro/stmmac/dwmac-socfpga.c    | 53 ++++++++++++++++++----
+>  1 file changed, 43 insertions(+), 10 deletions(-)
 > 
-> diff --git a/fs/ecryptfs/inode.c b/fs/ecryptfs/inode.c
-> index 88631291b32535f623a3fbe4ea9b6ed48a306ca0..661709b157ce854c3bfdfdb13f7c10435fad9756 100644
-> --- a/fs/ecryptfs/inode.c
-> +++ b/fs/ecryptfs/inode.c
-> @@ -189,7 +189,7 @@ ecryptfs_do_create(struct inode *directory_inode,
->  	rc = lock_parent(ecryptfs_dentry, &lower_dentry, &lower_dir);
->  	if (!rc)
->  		rc = vfs_create(&nop_mnt_idmap, lower_dir,
-> -				lower_dentry, mode, true);
-> +				lower_dentry, mode, true, NULL);
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+> index 2ff5db6d41ca08a1652d57f3eb73923b9a9558bf..3dae4f3c103802ed1c2cd390634bd5473192d4ee 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+> @@ -44,6 +44,7 @@
+>  struct socfpga_dwmac;
+>  struct socfpga_dwmac_ops {
+>  	int (*set_phy_mode)(struct socfpga_dwmac *dwmac_priv);
+> +	void (*setup_plat_dat)(struct socfpga_dwmac *dwmac_priv);
+>  };
+>  
+>  struct socfpga_dwmac {
+> @@ -441,6 +442,39 @@ static int socfpga_dwmac_init(struct platform_device *pdev, void *bsp_priv)
+>  	return dwmac->ops->set_phy_mode(dwmac);
+>  }
+>  
+> +static void socfpga_common_plat_dat(struct socfpga_dwmac *dwmac)
+> +{
+> +	struct plat_stmmacenet_data *plat_dat = dwmac->plat_dat;
+> +
+> +	plat_dat->bsp_priv = dwmac;
+> +	plat_dat->fix_mac_speed = socfpga_dwmac_fix_mac_speed;
+> +	plat_dat->init = socfpga_dwmac_init;
+> +	plat_dat->pcs_init = socfpga_dwmac_pcs_init;
+> +	plat_dat->pcs_exit = socfpga_dwmac_pcs_exit;
+> +	plat_dat->select_pcs = socfpga_dwmac_select_pcs;
+> +}
+> +
+> +static void socfpga_gen5_setup_plat_dat(struct socfpga_dwmac *dwmac)
+> +{
+> +	struct plat_stmmacenet_data *plat_dat = dwmac->plat_dat;
+> +
+> +	socfpga_common_plat_dat(dwmac);
+> +
+> +	plat_dat->core_type = DWMAC_CORE_GMAC;
+> +
+> +	/* Rx watchdog timer in dwmac is buggy in this hw */
+> +	plat_dat->riwt_off = 1;
+> +}
+> +
+> +static void socfpga_agilex5_setup_plat_dat(struct socfpga_dwmac *dwmac)
+> +{
+> +	struct plat_stmmacenet_data *plat_dat = dwmac->plat_dat;
+> +
+> +	socfpga_common_plat_dat(dwmac);
 
-Starts to look like we should epxlore whether a struct create_args (or
-some other name) similar to struct renamedata I did some years ago would
-help make the code a bit more legible in the future.
+I"m not familiar with this device (I only have a Cyclone V on hand), does
+it still make sense to try to instantiate a Lynx (i.e. Altera TSE) PCS
+for that IP ?
+
+Maxime
+
 
