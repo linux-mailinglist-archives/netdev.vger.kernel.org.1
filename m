@@ -1,64 +1,95 @@
-Return-Path: <netdev+bounces-233807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76C66C18C84
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 08:50:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BD6D7C18CAF
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 08:53:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 486E0507E74
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 07:47:49 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DB8854F49FC
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 07:52:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 655CE311C21;
-	Wed, 29 Oct 2025 07:45:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81C4730F940;
+	Wed, 29 Oct 2025 07:52:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y/XzqotP"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="VlmSMFxl";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="g18in9NY";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="VlmSMFxl";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="g18in9NY"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6341311959
-	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 07:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 865AD2206AC
+	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 07:52:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761723908; cv=none; b=KYEpJoMW5hQHnl8uxACP7TFK4Biculwrnymwv8HDcNzNuGm2SxrZDgIncNyELetZKpHxohiBvlx99LX4TABdxrcq1ZFwP+JFfGTP3FRE7wFzBv/cnnDtW3AENqgkJaF/lebCoXhWQjSWT0neU3mm4TJ4hNlOXRpnTsSIoyBhIkI=
+	t=1761724328; cv=none; b=ZuY0j6+5jhH7ONdU5MDj/nfhqfqbhprJB/xvVPGtmLDFgylR91c+P1mvHAAQ294CaoFQClb4QYh4kalkVycQmlCL/s06Ds1aV0cfWdTAEYo3iRVRNqv0BOurCvIP4A7pKE6FTsThOVbBZu59/9nMqCy+k4+EI++iYEZIYY/0BdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761723908; c=relaxed/simple;
-	bh=BpTz6wyxzgFePsE1XYKQzbSZygBAeSVul/fpXowQG6U=;
+	s=arc-20240116; t=1761724328; c=relaxed/simple;
+	bh=EdxIjKui8u45fzpK9ep7REM1Y/DVveM7ve5cTI4ft+k=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Wsm8pT9Ou/PM02yQi3sXnqQw36va2LUOceDVdri/U+soVkvMz+LNilNVs4fX2rTgXuelVQN5DxACM6Id4M/TYTWjfEwJPfrn2aRaTtkaGPisQCrJxqPucJOieyxMgqgSp3DG5VltYczIJQXzP6roVSw/SALwNSo2MQMTG0ROmLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y/XzqotP; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761723905;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 In-Reply-To:Content-Type; b=f1D43926pH65gvG6YHUdHx/XfDztGoyTbTlrvr1S9gTYA3Q7IPKuf86lU9rPZoy5gvxDpZd9AWulG3zbnSa1THdMnI3dvwAF7AS83QAurpQ/U69khbH3el+lCHtwBUIlaat5qlaz06/jTrUDIUCDdy7yB+vy9btVJ7a+nrjhCDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=VlmSMFxl; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=g18in9NY; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=VlmSMFxl; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=g18in9NY; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 99D7322752;
+	Wed, 29 Oct 2025 07:52:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1761724324; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=2IO9uHdt14tKqgu7NcmSLY4LLxup1JDL8am31B4OZNM=;
-	b=Y/XzqotPVTdpfyxPvThhprhLqDuE8RLmm2+FIO2QP+oPmo5TrDtFR/0iM6sAMnWmzsU4DE
-	YG9ojBEXhPdv0NrgiBuIdEgNthAVI6i/+x9N5lYrwbWDAX3qSOmMJ2DgqZ6jKcFYi5BEgw
-	iqdcS8AicqNc+XNMWRh06/nGqNfGoDs=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-136-U34KAEhUOHixRWxtkPKs-A-1; Wed,
- 29 Oct 2025 03:45:02 -0400
-X-MC-Unique: U34KAEhUOHixRWxtkPKs-A-1
-X-Mimecast-MFC-AGG-ID: U34KAEhUOHixRWxtkPKs-A_1761723900
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	bh=vu+F0d+EF+KmPmt6EnZZvWO28Q6HugHteealXWB3bpc=;
+	b=VlmSMFxllvxjFJ2kuDNbi/W3QfFvcZXWp9HhCQo+5UnMl4dSEhuXS404+nEkaZQofaNuPa
+	L8H6Zh0m4/BqNv19bLnGMvzWaS9DSHs9rXW1Bg0al1iwfT1HbGeHhwUsw3C38eEiEhzp6s
+	qvhfemF9BkDxy3VPtGWzbctll75fadQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1761724324;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vu+F0d+EF+KmPmt6EnZZvWO28Q6HugHteealXWB3bpc=;
+	b=g18in9NYF2CXyJrSKB+emRR0+3rqxYNLP6KhjfoakdUvzj5xG5utWWXGhanZf3NE25aeHd
+	4UipgEoLi9F6JUAQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1761724324; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vu+F0d+EF+KmPmt6EnZZvWO28Q6HugHteealXWB3bpc=;
+	b=VlmSMFxllvxjFJ2kuDNbi/W3QfFvcZXWp9HhCQo+5UnMl4dSEhuXS404+nEkaZQofaNuPa
+	L8H6Zh0m4/BqNv19bLnGMvzWaS9DSHs9rXW1Bg0al1iwfT1HbGeHhwUsw3C38eEiEhzp6s
+	qvhfemF9BkDxy3VPtGWzbctll75fadQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1761724324;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vu+F0d+EF+KmPmt6EnZZvWO28Q6HugHteealXWB3bpc=;
+	b=g18in9NYF2CXyJrSKB+emRR0+3rqxYNLP6KhjfoakdUvzj5xG5utWWXGhanZf3NE25aeHd
+	4UipgEoLi9F6JUAQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A8B0E1808972;
-	Wed, 29 Oct 2025 07:44:59 +0000 (UTC)
-Received: from [10.44.32.34] (unknown [10.44.32.34])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CD6551800579;
-	Wed, 29 Oct 2025 07:44:53 +0000 (UTC)
-Message-ID: <b3f45ab3-348b-4e3e-95af-5dc16bb1be96@redhat.com>
-Date: Wed, 29 Oct 2025 08:44:52 +0100
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2FBB61396A;
+	Wed, 29 Oct 2025 07:52:04 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id DsCrCKTHAWkjIAAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Wed, 29 Oct 2025 07:52:04 +0000
+Message-ID: <b21cf80c-5d69-4914-aa45-00f9527f3436@suse.de>
+Date: Wed, 29 Oct 2025 08:51:58 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,81 +97,74 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] dpll: add phase-adjust-gran pin attribute
+Subject: Re: [PATCH 2/2 bpf v2] xsk: avoid data corruption on cq descriptor
+ number
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Michal Schmidt <mschmidt@redhat.com>,
- Petr Oros <poros@redhat.com>, Prathosh Satish
- <Prathosh.Satish@microchip.com>, Vadim Fedorenko
- <vadim.fedorenko@linux.dev>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Donald Hunter <donald.hunter@gmail.com>, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20251024144927.587097-1-ivecera@redhat.com>
- <20251024144927.587097-2-ivecera@redhat.com>
- <20251028183919.785258a9@kernel.org>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com,
+ maciej.fijalkowski@intel.com, sdf@fomichev.me, kerneljasonxing@gmail.com,
+ fw@strlen.de
+References: <20251028183032.5350-1-fmancera@suse.de>
+ <20251028183032.5350-2-fmancera@suse.de> <20251028160107.5c161a4f@kernel.org>
 Content-Language: en-US
-From: Ivan Vecera <ivecera@redhat.com>
-In-Reply-To: <20251028183919.785258a9@kernel.org>
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <20251028160107.5c161a4f@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,fomichev.me,gmail.com,strlen.de];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,imap1.dmz-prg2.suse.org:helo]
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
+X-Spam-Level: 
 
-Hi Kuba,
 
-On 10/29/25 2:39 AM, Jakub Kicinski wrote:
-> On Fri, 24 Oct 2025 16:49:26 +0200 Ivan Vecera wrote:
->> +      -
->> +        name: phase-adjust-gran
->> +        type: s32
->> +        doc: |
->> +          Granularity of phase adjustment, in picoseconds. The value of
->> +          phase adjustment must be a multiple of this granularity.
+
+On 10/29/25 12:01 AM, Jakub Kicinski wrote:
+> On Tue, 28 Oct 2025 19:30:32 +0100 Fernando Fernandez Mancera wrote:
+>> Since commit 30f241fcf52a ("xsk: Fix immature cq descriptor
+>> production"), the descriptor number is stored in skb control block and
+>> xsk_cq_submit_addr_locked() relies on it to put the umem addrs onto
+>> pool's completion queue.
 > 
-> Do we need this to be signed?
+> Looking at the past discussion it sounds like you want to optimize
+> the single descriptor case? Can you not use a magic pointer for that?
 > 
-To have it unsigned brings a need to use explicit type casting in the 
-core and driver's code. The phase adjustment can be both positive and
-negative it has to be signed. The granularity specifies that adjustment
-has to be multiple of granularity value so the core checks for zero
-remainder (this patch) and the driver converts the given adjustment
-value using division by the granularity.
+> 	#define XSK_DESTRUCT_SINGLE_BUF	(void *)1
+> 	destructor_arg = XSK_DESTRUCT_SINGLE_BUF
+> 
+> Let's target this fix at net, please, I think the complexity here is
+> all in skbs paths.
 
-If we would have phase-adjust-gran and corresponding structure fields
-defined as u32 then we have to explicitly cast the granularity to s32
-because for:
+I might be missing something here but if the destructor_arg pointer is 
+used to do this, where should we store the umem address associated with 
+it? In the proposed approach the skb extension should not be increased 
+for non-fragmented traffic as there is only a single descriptor and 
+therefore we can store the umem address in destructor_arg directly.
 
-<snip>
-s32 phase_adjust, remainder;
-u32 phase_gran = 1000;
-
-phase_adjust = 5000;
-remainder = phase_adjust % phase_gran;
-/* remainder = 0 -> OK for positive adjust */
-
-phase_adjust = -5000;
-remainder = phase_adjust % phase_gran;
-/* remainder = 296
-  * Wrong for negative adjustment because phase_adjust is casted to u32
-  * prior division -> 2^32 - 5000 = 4294962296.
-  * 4294962296 % 1000 = 296
-  */
-
-  remainder = phase_adjust % (s32)phase_gran;
-  /* remainder = 0
-   * Now OK because phase_adjust remains to be s32
-   */
-</snip>
-
-Similarly for division in the driver code if the granularity would be
-u32.
-
-So I have proposed phase adjustment granularity to be s32 to avoid these
-explicit type castings and potential bugs in drivers.
+The size of the skb extension will only increase for fragmented traffic 
+(multiple descriptors).. but sure, if there is a fallback to the 
+slowpath, it will burden a bit the performance. Although, for that to 
+happen the must have tried to use AF_XDP family initially.. AFAICS, the 
+size of skb extension is only increased when skb_ext_add() is called.
 
 Thanks,
-Ivan
-
+Fernando.
 
