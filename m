@@ -1,60 +1,71 @@
-Return-Path: <netdev+bounces-233742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id A94E5C17E43
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 02:26:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CE6DC17ED0
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 02:34:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 75DAD4EC1BF
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 01:26:10 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 61CE44ECDB7
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 01:34:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5010A2D3A96;
-	Wed, 29 Oct 2025 01:26:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB4BB2DE200;
+	Wed, 29 Oct 2025 01:34:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="idNYHHoX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i2CacSQj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27BC617B50F;
-	Wed, 29 Oct 2025 01:26:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B5D2D0637;
+	Wed, 29 Oct 2025 01:33:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761701167; cv=none; b=qkY/BrAjWRCFtM1RmnGFJcol3qWqy31U3skFML7riueTiqoc/XtdJpVSCQCZKNc19aYRt7+k5N9kenNVoEXTTX41FiGBea2yhhoSdMI3t9Cd8/XmZOfBfLPg0L8oeAQOFu4CzkCooVFrvo0fZCZnTpYqNHhs+SkjChB690/+e70=
+	t=1761701640; cv=none; b=YRvLjjpXdjyDkWgLBB+IIZXtv8AYamcGiaVwp5JN61GLpgQyeyZWeG4oxvDjxrZsGIfl+4Q9IEAFTVUtvxdQP849Ym+TDqLgv6I4sfEnfgRlIaq2bF8DajVxvYW86Nx58hg1bNvh21M6KkxoVz9M87m0cYvfUg4Q0WETxchg/Rg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761701167; c=relaxed/simple;
-	bh=6lVql+4xrJUU8L0Plfqy3I66gi1LL1lw3Wf2hqWqjH0=;
+	s=arc-20240116; t=1761701640; c=relaxed/simple;
+	bh=z3Yc/tloRcuK+HMyEVQv+U3jCVDjfWF9XOBpQagP+cI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K/8j72Im32+7bNWpHakwlaDYEtPpQZ7MQ1f82Qd1LT73lOvki+ZPQnHzy/SQEha32tJXts3J1b/qOMnKStBK0ju3IOQ4UFUVvc+KmFbSFMcdy+VOwKEi4GmHTAaT9TJ2QD4s/MIk5dwJeRHdpXS/968YqefuED6Bo0optXsPd0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=idNYHHoX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93617C4CEE7;
-	Wed, 29 Oct 2025 01:26:06 +0000 (UTC)
+	 MIME-Version:Content-Type; b=KzLkxx8dVGWLz4CO2/83tiQpb0ap2OSOcSJJ94l3WeL7ExNhggunkMByOaKs8Uql2lLmqaxTPzcRu7SD6uOQrWPdZDnFsz0XHGddZwqFREsKgZNNpiHf8DIcfCwC9iTUwymWt06gSBv6+5lrUzZ3t0XXv6LY5Uhw/49iNpl9VTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i2CacSQj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA927C4CEE7;
+	Wed, 29 Oct 2025 01:33:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761701167;
-	bh=6lVql+4xrJUU8L0Plfqy3I66gi1LL1lw3Wf2hqWqjH0=;
+	s=k20201202; t=1761701639;
+	bh=z3Yc/tloRcuK+HMyEVQv+U3jCVDjfWF9XOBpQagP+cI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=idNYHHoXRWUWxhq9Wp3VloF9yWGXyOnFvjtO4jhITTVgsT8HDlHwNf29Xazjj+Gg/
-	 56qsOPQrwWo5yYkcGZgNj2ZAWyVnO7FPEMVHlDslCJky2x52ydnnAO2x6cbFeAK33L
-	 +O4ZaZojt7sgTK/8gWkkwybGVHmOaqreM9HOzOabJjyqSjy+08XargkDtL8Aa6rg5G
-	 9TCFldWOw6EfZ57BgiEuLdtAotuRPTcxataCHw0d4ZsERfhx3hl/YAO/CNvmy2H8X7
-	 bUfMIxO0+0PZ+hCsN/TiSJ1X8880unnQUwa6ZbGym/QOofanFn/oICq1X20Jxr+F8O
-	 qoTB87pHKHFUA==
-Date: Tue, 28 Oct 2025 18:26:05 -0700
+	b=i2CacSQjHmj9Ut0QvjXn1yYD5TGTQrCJ7pqAe6TCS1ETgHaXGlSxkPdPXJENowIKr
+	 0dcWqbsoOMUnEU/I/CruVsiu1FngyDTvYg1X16idYC/1Zs+zy+SVhrgEe3k78xr5pA
+	 n7QZZPCDOwjpz9h+DjS1S8uEFVcNmIbOSYJRD/BA2OloR2NxGyUW01F57/MCKEW5a9
+	 bpQNcHPzyY7lIbPHuF2Ra5gUjlMSH29F+lI24DtTJLkpiWgvBjqg21XETQYbfePRvw
+	 N/q2GamWYah9nYQeCmC+MHDHZb9qHEGFecyQ9MMnrAcDfUTGTfZye0kTc6deTq4r76
+	 MiSZKe7WozKrw==
+Date: Tue, 28 Oct 2025 18:33:56 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Buday Csaba <buday.csaba@prolan.hu>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Philipp Zabel <p.zabel@pengutronix.de>,
- <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v4 4/4] net: mdio: reset PHY before attempting
- to access registers in fwnode_mdiobus_register_phy
-Message-ID: <20251028182605.06840664@kernel.org>
-In-Reply-To: <bebbaef2c6801f6973ea00500a594ed934e40e47.1761124022.git.buday.csaba@prolan.hu>
-References: <cover.1761124022.git.buday.csaba@prolan.hu>
-	<bebbaef2c6801f6973ea00500a594ed934e40e47.1761124022.git.buday.csaba@prolan.hu>
+To: Byungchul Park <byungchul@sk.com>
+Cc: linux-mm@kvack.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
+ harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
+ davem@davemloft.net, hawk@kernel.org, john.fastabend@gmail.com,
+ sdf@fomichev.me, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
+ mbloch@nvidia.com, andrew+netdev@lunn.ch, edumazet@google.com,
+ pabeni@redhat.com, akpm@linux-foundation.org, david@redhat.com,
+ lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
+ rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org,
+ jackmanb@google.com, hannes@cmpxchg.org, ziy@nvidia.com,
+ ilias.apalodimas@linaro.org, willy@infradead.org, brauner@kernel.org,
+ kas@kernel.org, yuzhao@google.com, usamaarif642@gmail.com,
+ baolin.wang@linux.alibaba.com, almasrymina@google.com, toke@redhat.com,
+ asml.silence@gmail.com, bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
+ sfr@canb.auug.org.au, dw@davidwei.uk, ap420073@gmail.com,
+ dtatulea@nvidia.com
+Subject: Re: [RFC mm v4 1/2] page_pool: check if nmdesc->pp is !NULL to
+ confirm its usage as pp for net_iov
+Message-ID: <20251028183356.29601348@kernel.org>
+In-Reply-To: <20251023074410.78650-2-byungchul@sk.com>
+References: <20251023074410.78650-1-byungchul@sk.com>
+	<20251023074410.78650-2-byungchul@sk.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,36 +75,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 22 Oct 2025 11:08:53 +0200 Buday Csaba wrote:
-> +/* Hard-reset a PHY before registration */
-> +static int fwnode_reset_phy(struct mii_bus *bus, u32 addr,
-> +			    struct fwnode_handle *phy_node)
-> +{
-> +	struct mdio_device *tmpdev;
-> +	int err;
-> +
-> +	tmpdev = mdio_device_create(bus, addr);
-> +	if (IS_ERR(tmpdev))
-> +		return PTR_ERR(tmpdev);
-> +
-> +	fwnode_handle_get(phy_node);
-> +	device_set_node(&tmpdev->dev, phy_node);
-> +	err = mdio_device_register_reset(tmpdev);
-> +	if (err) {
-> +		mdio_device_free(tmpdev);
-> +		return err;
+On Thu, 23 Oct 2025 16:44:09 +0900 Byungchul Park wrote:
+> As a preparation, the check for net_iov, that is not page-backed, should
+> avoid using ->pp_magic since net_iov doens't have to do with page type.
 
-Should we worry about -EPROBE_DEFER on any of the error paths here?
-If not maybe consider making this function void? We can add errors
-back if the caller starts to care.
+doesn't
 
-> +	}
-> +
-> +	if (mdio_device_has_reset(tmpdev)) {
-> +		dev_info(&bus->dev,
-> +			 "PHY device at address %d not detected, resetting PHY.",
-> +			 addr);
+> Instead, nmdesc->pp can be used if a net_iov or its nmdesc belongs to a
+> page pool, by making sure nmdesc->pp is NULL otherwise.
 
-IDK if this is still strictly necessary but I guess \n at the end of
-the info msg would be idiomatic
+Please explain in the commit message why the new branch in
+netmem_is_pp() is necessary. We used to identify the pages based
+on PP_SIGNATURE, now we identify them based on page_type.
 
