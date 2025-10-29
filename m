@@ -1,194 +1,186 @@
-Return-Path: <netdev+bounces-234011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69B2EC1B92E
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 16:14:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E734C1BAC2
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 16:32:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9595B5A8515
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 14:26:17 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A09855C7370
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 14:45:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9C9229B8D9;
-	Wed, 29 Oct 2025 14:25:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EE4A2E040D;
+	Wed, 29 Oct 2025 14:39:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tyzeamCx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N2OP5Ifu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87EAE279DAD;
-	Wed, 29 Oct 2025 14:25:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DD7C2C0296
+	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 14:39:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761747957; cv=none; b=tCGMkbH0V0IzXg8+zcI+mHjnpq8xeqGpJ98gAiCPd5hYKIW09Mf20hzyUKHFLOSZoIdSeiiEdXuvBz3GyuBjdSLBs4xRpxXWK0S4N9PLbalSOkMzTMutdeP/VFGdUPAbqaJWWzqM9lOSdwcdqx+W52VfaUa6ESQ3/S+dN/lnftk=
+	t=1761748771; cv=none; b=tI2CqQAfCHKL0ZHHwB7bz/Wye1dO3vQkTeOQII7V1e96DI4iVKRUSR5UEn7j5aUZ+8SGDSM+VcPWADVKmHR125Ax6w5mIKzDuxTb9PT1vINq6xHFausVvxD/ART14KRYx1FqmYT/zR1NfEybnqiye4krASXeaLmI1bwabRLz/AE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761747957; c=relaxed/simple;
-	bh=/+m6iaLC0y8uWmkcCY6x46zjKoMEvP59Em2DnUNlUQQ=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=diA7VjPN++5vTwB68fQ9EfJuG5a5cuUzKZqkwu1/XX9TQ0y1PPnp+UKVIHa2TuofyXycddgTOwk02NA9RI+s64kHhU1wFppl6KqAyCj1mfgJFbmbdSc/fyj310GEVMtq7yERC07f9hrxIfQCj4IKHKFzbpt6tPVAbX1Obp/kwok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tyzeamCx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5AEAC4CEF8;
-	Wed, 29 Oct 2025 14:25:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761747957;
-	bh=/+m6iaLC0y8uWmkcCY6x46zjKoMEvP59Em2DnUNlUQQ=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=tyzeamCxzKQNjRoRx/GdN3bKl+3qM4dQEvmBtQC9RnsBFsXj+OmD29nwII9XnqHHS
-	 yp4CVGDsaxCKMYQbhRcdjjzWfmzs2aszsf/DSeQUoqIqftsQ6LCGdQiVwcbpx4p6Vh
-	 +4iu2EorZg668PD06pWjAmISJoPmG73YPbc4lZNhmkobdgjdii5pYAfGeENbiyNBsj
-	 c8JyOVD78DBgAf0RYVCyuAvRH8zoUWsUfcNLZuT8sbNH4WGqNaHT9xHbSKCGobzECi
-	 mor1Fg+QN/K51Q4Ki0r6X546M5fM12Oqo9VClqs08BWs6KaaYaBKHDOTcqIHI9V70S
-	 1eUYT3bn41r7w==
-Content-Type: multipart/mixed; boundary="===============3524767868395641498=="
+	s=arc-20240116; t=1761748771; c=relaxed/simple;
+	bh=AXo1SVGHBK9qT4qVLa9ToApVKadhJSI2IuUi88Evw0I=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=G5mS+RIK/caL7Ba5nqjt+TFx1G85BNogzSxTN0P6gJi5in5M2/KU3xuP94oQoEXTgI0eAr5wR8NNLBnc8pAOp/BEG7ZXsEW+O66oiRJQGESXMW7fWUCkZ+ndWiFz68L5vInoR1tdGQ8a6k6iF/X/qUQ+iboK5XSZ4VLkzZO3Ov0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N2OP5Ifu; arc=none smtp.client-ip=209.85.219.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-87d8fa51993so85477036d6.1
+        for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 07:39:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761748768; x=1762353568; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4JTNUO8XZtm3BiSnNgj+nAIXLdP3RxRAv6TMRPMgtSY=;
+        b=N2OP5Ifus6hJ1yeW3L3j1483QZYWnqbE/H0wK2W3QtsPN0soNwuPQK74sVwSF/l59v
+         O74/OsZeVVRxr8pL+CWWm/28wv6g77E33zqhov4jD6J7LBvmzEfJ1DlOtshoIkjkJmMQ
+         dqGT52sXRRSQ+/JHn1dFM0b3gyDk1oHA8S6SbRB4YfcZCjKuGl/H9bCM62Ns5H0OQ3+R
+         q6Z5VYMPCtwO9ido2YvxzOYcRmEowqCQRHJO+oCqYAuYR/IN6HuzG5bXumd7iRJUEa6T
+         1OEu1cZBzp7daLZ7OsSnjdMmDv7QY6oljSpVH4fWGtj7vWUGz1KBQLScld/LEaZ6OWBU
+         ZIRw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761748768; x=1762353568;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4JTNUO8XZtm3BiSnNgj+nAIXLdP3RxRAv6TMRPMgtSY=;
+        b=XvzhEATzpnbTwur3BbJb5uPC99s8UZBnsSnSFgDCwoIlOTRzd7+QcQvzsj9UHc/lBT
+         O8USo8F+k+I0hT6f6Ldg0EHORUyMpCLKmFSefIfO3f033e4qH5ykzal0VCinh+1V8HaQ
+         XNPlwRC3I7YwLU0WAYkG0YHBb07xgbVi87HF29Dbf+BPWB3/dxDWBfFEbLWDUoTWXxO7
+         +58Wkggiab5FhYFSjK+kr1JKx30+TC1FQ6oDBdLZFHweXMsFxinRVW6oKmUvCWFw1um7
+         oo9meJvhlpvA0S4KvsB25gh7hfEh1jZusTdBUzStf3jm34ieqrGyUA2PubcfuwvksJBq
+         6iPw==
+X-Gm-Message-State: AOJu0YzpjzhYKNByaUDmVFQpAFlDlq98SBaaMQlo5EgHm7QvRUaGtR15
+	ub0xeYDuLAtaiViceiAWDEMZXeCTMP9KdlHfiy6K68NEsGJtvZK+qD6pqRojvIKo2SA=
+X-Gm-Gg: ASbGncswMH99c9lv0T0ZGnX/496S9x8r5hhtZ0w8PamkNgAmftSuW3OoWQraugw6MzZ
+	Wl82GpdeD53jMZR8SoGc0GPFlBfY9HtTY5xAjGgAVqFCyDyFt5+zg6GhtQMejdyFOcQA9iwUekA
+	FYFW0GmtF/9BffpT5kDFS0/D9i2abkplC38Zfm6YEuZnBXcVK7kK/Ik9vyG+CMqNrxQ9+NIHUWM
+	gbywl3xLlwbZM3FS7LFrG5Q/TgYNKv/5QmnVmPK6666FJslMrdxuVIZeDBTJIa7D0W9OiH3hzK1
+	onPU2cp7zNbMJnMAiJUlH+RE+8uAwkOWuVLNXv2vYcgcI86EE+agn75xmgP9c7/HLeiHBRcROfL
+	QKg6sByWuavL5TeFCk45BXqg4t8HFYGwNDynhgVmwx4Ngwn21bIG0GQ9zp2L2InEeDgg85AkM4i
+	xrZVvjFn/dybE3BOEOP1WhlQR8JpE+qsmR54e9eRpZ
+X-Google-Smtp-Source: AGHT+IGyzU3okljrfBCf/3gBF/UjoS6yWE5KKQezp4IEEcQDSObh9/ucSBvOo47HR55wvw5r0njlKQ==
+X-Received: by 2002:a05:6214:242a:b0:856:d1d4:d127 with SMTP id 6a1803df08f44-88009ad5454mr40989826d6.4.1761748767895;
+        Wed, 29 Oct 2025 07:39:27 -0700 (PDT)
+Received: from wsfd-netdev58.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-87fc48a8bc4sm99556176d6.7.2025.10.29.07.39.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Oct 2025 07:39:27 -0700 (PDT)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>,
+	quic@lists.linux.dev
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Metzmacher <metze@samba.org>,
+	Moritz Buhl <mbuhl@openbsd.org>,
+	Tyler Fanelli <tfanelli@redhat.com>,
+	Pengtao He <hepengtao@xiaomi.com>,
+	Thomas Dreibholz <dreibh@simula.no>,
+	linux-cifs@vger.kernel.org,
+	Steve French <smfrench@gmail.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Tom Talpey <tom@talpey.com>,
+	kernel-tls-handshake@lists.linux.dev,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Benjamin Coddington <bcodding@redhat.com>,
+	Steve Dickson <steved@redhat.com>,
+	Hannes Reinecke <hare@suse.de>,
+	Alexander Aring <aahringo@redhat.com>,
+	David Howells <dhowells@redhat.com>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	John Ericson <mail@johnericson.me>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	"D . Wythe" <alibuda@linux.alibaba.com>,
+	Jason Baron <jbaron@akamai.com>,
+	illiliti <illiliti@protonmail.com>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Daniel Stenberg <daniel@haxx.se>,
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Subject: [PATCH net-next v4 01/15] net: define IPPROTO_QUIC and SOL_QUIC constants
+Date: Wed, 29 Oct 2025 10:35:43 -0400
+Message-ID: <c02ccb3edc527cbb1aa64145a679994dd149d0da.1761748557.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.47.1
+In-Reply-To: <cover.1761748557.git.lucien.xin@gmail.com>
+References: <cover.1761748557.git.lucien.xin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <5c1c4101d42cc486366273556492d9be559f521d16629bbcd6b3adc6a4b746f0@mail.kernel.org>
-In-Reply-To: <20251029-xsk-v6-11-5a63a64dff98@bootlin.com>
-References: <20251029-xsk-v6-11-5a63a64dff98@bootlin.com>
-Subject: Re: [PATCH bpf-next v6 11/15] selftests/bpf: test_xsk: Don't exit immediately when workers fail
-From: bot+bpf-ci@kernel.org
-To: bastien.curutchet@bootlin.com,bjorn@kernel.org,magnus.karlsson@intel.com,maciej.fijalkowski@intel.com,jonathan.lemon@gmail.com,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,martin.lau@linux.dev,eddyz87@gmail.com,song@kernel.org,yonghong.song@linux.dev,john.fastabend@gmail.com,kpsingh@kernel.org,sdf@fomichev.me,haoluo@google.com,jolsa@kernel.org,mykolal@fb.com,shuah@kernel.org,davem@davemloft.net,kuba@kernel.org,hawk@kernel.org
-Cc: thomas.petazzoni@bootlin.com,alexis.lothore@bootlin.com,netdev@vger.kernel.org,bpf@vger.kernel.org,linux-kselftest@vger.kernel.org,linux-kernel@vger.kernel.org,bastien.curutchet@bootlin.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Wed, 29 Oct 2025 14:25:54 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 
---===============3524767868395641498==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This patch adds IPPROTO_QUIC and SOL_QUIC constants to the networking
+subsystem. These definitions are essential for applications to set
+socket options and protocol identifiers related to the QUIC protocol.
 
+QUIC does not possess a protocol number allocated from IANA, and like
+IPPROTO_MPTCP, IPPROTO_QUIC is merely a value used when opening a QUIC
+socket with:
 
-```
-commit f89231e503dc0b97c81f4bb32d28532fb3471acd
-Author: Bastien Curutchet (eBPF Foundation) <bastien.curutchet@bootlin.com>
+  socket(AF_INET, SOCK_STREAM, IPPROTO_QUIC);
 
-selftests/bpf: test_xsk: Don't exit immediately when workers fail
+Note we did not opt for UDP ULP for QUIC implementation due to several
+considerations:
 
-This commit converts the test program from using exit_with_error()
-(which immediately terminates) to proper error propagation through
-return values. This allows the test suite to continue running after
-failures.
+- QUIC's connection Migration requires at least 2 UDP sockets for one
+  QUIC connection at the same time, not to mention the multipath
+  feature in one of its draft RFCs.
 
-> diff --git a/tools/testing/selftests/bpf/test_xsk.c b/tools/testing/selftests/bpf/test_xsk.c
-> index 2c955e109..2c392d5b9 100644
-> --- a/tools/testing/selftests/bpf/test_xsk.c
-> +++ b/tools/testing/selftests/bpf/test_xsk.c
+- In-Kernel QUIC, as a Transport Protocol, wants to provide users with
+  the TCP or SCTP like Socket APIs, like connect()/listen()/accept()...
+  Note that a single UDP socket might even be used for multiple QUIC
+  connections.
 
-[ ... ]
+The use of IPPROTO_QUIC type sockets over UDP tunnel will effectively
+address these challenges and provides a more flexible and scalable
+solution.
 
-> @@ -759,7 +761,7 @@ static bool is_metadata_correct(struct pkt *pkt, void *buffer, u64 addr)
->  	return true;
->  }
->
-> -static bool is_adjust_tail_supported(struct xsk_xdp_progs *skel_rx)
-> +static int is_adjust_tail_supported(struct xsk_xdp_progs *skel_rx, bool *supported)
->  {
->  	struct bpf_map *data_map;
->  	int adjust_value = 0;
-> @@ -769,19 +771,21 @@ static bool is_adjust_tail_supported(struct xsk_xdp_progs *skel_rx)
->  	data_map = bpf_object__find_map_by_name(skel_rx->obj, "xsk_xdp_.bss");
->  	if (!data_map || !bpf_map__is_internal(data_map)) {
->  		ksft_print_msg("Error: could not find bss section of XDP program\n");
-> -		exit_with_error(errno);
-> +		return -EINVAL;
->  	}
->
->  	ret = bpf_map_lookup_elem(bpf_map__fd(data_map), &key, &adjust_value);
->  	if (ret) {
->  		ksft_print_msg("Error: bpf_map_lookup_elem failed with error %d\n", ret);
-> -		exit_with_error(errno);
-> +		return ret;
->  	}
->
->  	/* Set the 'adjust_value' variable to -EOPNOTSUPP in the XDP program if the adjust_tail
->  	 * helper is not supported. Skip the adjust_tail test case in this scenario.
->  	 */
-> -	return adjust_value != -EOPNOTSUPP;
-> +	*supported = adjust_value != -EOPNOTSUPP;
-> +
-> +	return 0;
->  }
-
-[ ... ]
-
-> @@ -1584,29 +1614,41 @@ void *worker_testapp_validate_rx(void *arg)
->  	int err;
->
->  	if (test->current_step == 1) {
-> -		thread_common_ops(test, ifobject);
-> +		err = thread_common_ops(test, ifobject);
->  	} else {
->  		xsk_clear_xskmap(ifobject->xskmap);
->  		err = xsk_update_xskmap(ifobject->xskmap, ifobject->xsk->xsk, 0);
-> -		if (err) {
-> +		if (err)
->  			ksft_print_msg("Error: Failed to update xskmap, error %s\n",
->  				       strerror(-err));
-> -			exit_with_error(-err);
-> -		}
->  	}
->
->  	pthread_barrier_wait(&barr);
->
-> +	/* We leave only now in case of error to avoid getting stuck in the barrier */
-> +	if (err) {
-> +		test->fail = true;
-> +		pthread_exit(NULL);
-> +	}
-> +
->  	err = receive_pkts(test);
->
->  	if (!err && ifobject->validation_func)
->  		err = ifobject->validation_func(ifobject);
->
->  	if (err) {
-> -		if (test->adjust_tail && !is_adjust_tail_supported(ifobject->xdp_progs))
-> -			test->adjust_tail_support = false;
-> -		else
-> +		if (!test->adjust_tail) {
->  			test->fail = true;
-> +		} else {
-> +			bool supported;
-> +
-> +			if (is_adjust_tail_supported(ifobject->xdp_progs, &supported))
-> +				test->fail = true;
-> +			if (!supported)
-> +				test->adjust_tail_support = false;
-> +			else
-> +				test->fail = true;
-> +		}
->  	}
-
-Can the 'supported' variable be read uninitialized here? When
-is_adjust_tail_supported() returns an error (non-zero), it doesn't
-write to the *supported output parameter. The function returns early
-from either the data_map check or bpf_map_lookup_elem() failure without
-setting *supported. Then the code unconditionally checks "if (!supported)"
-which would read uninitialized stack memory.
-
-The control flow is:
-  is_adjust_tail_supported() returns error
-  -> test->fail = true is set
-  -> execution continues to "if (!supported)"
-  -> reads uninitialized 'supported' variable
-
-Should this be structured with an else clause to only check 'supported'
-when is_adjust_tail_supported() returns success?
-
-
-```
-
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
 ---
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+ include/linux/socket.h  | 1 +
+ include/uapi/linux/in.h | 2 ++
+ 2 files changed, 3 insertions(+)
 
-In-Reply-To-Subject: `selftests/bpf: test_xsk: Don't exit immediately when workers fail`
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/18910697393
+diff --git a/include/linux/socket.h b/include/linux/socket.h
+index 3b262487ec06..a7c05b064583 100644
+--- a/include/linux/socket.h
++++ b/include/linux/socket.h
+@@ -386,6 +386,7 @@ struct ucred {
+ #define SOL_MCTP	285
+ #define SOL_SMC		286
+ #define SOL_VSOCK	287
++#define SOL_QUIC	288
+ 
+ /* IPX options */
+ #define IPX_TYPE	1
+diff --git a/include/uapi/linux/in.h b/include/uapi/linux/in.h
+index ced0fc3c3aa5..34becd90d3a6 100644
+--- a/include/uapi/linux/in.h
++++ b/include/uapi/linux/in.h
+@@ -85,6 +85,8 @@ enum {
+ #define IPPROTO_RAW		IPPROTO_RAW
+   IPPROTO_SMC = 256,		/* Shared Memory Communications		*/
+ #define IPPROTO_SMC		IPPROTO_SMC
++  IPPROTO_QUIC = 261,		/* A UDP-Based Multiplexed and Secure Transport	*/
++#define IPPROTO_QUIC		IPPROTO_QUIC
+   IPPROTO_MPTCP = 262,		/* Multipath TCP connection		*/
+ #define IPPROTO_MPTCP		IPPROTO_MPTCP
+   IPPROTO_MAX
+-- 
+2.47.1
 
---===============3524767868395641498==--
 
