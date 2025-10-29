@@ -1,197 +1,329 @@
-Return-Path: <netdev+bounces-234148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22E0BC1D3D2
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 21:40:16 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7D5AC1D411
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 21:44:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AA39D4E16A5
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 20:40:12 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2F5BF347D82
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 20:44:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 198703563E3;
-	Wed, 29 Oct 2025 20:40:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02B773563C7;
+	Wed, 29 Oct 2025 20:44:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="CC0XWT/g"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="gq3YGVmN"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C789726D4F7;
-	Wed, 29 Oct 2025 20:40:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39E95233722;
+	Wed, 29 Oct 2025 20:43:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761770407; cv=none; b=Ep74pMR8ih/rRU+2RPBnRrPvgEFnFxieabQtPfJE5DWwXoAAd9b17T98s8kR3pZ1oErWZoe2QPZQZZs0a8avL2g7irwLPuUREPb26IKouopmkY6Ml4HetXSU9+0MowGXd3/xNiYifyQFtOji9YJJYrwPGpkQMCqamqdQnzgdrUw=
+	t=1761770639; cv=none; b=Xty+wT0CIKhbRDtDiu8QzNHd/e7dhk0Tvjwwl+eXCA9jQlN/eYvPyyzV+uftfUoEoZy1Yan47Bp79WnFk8FHPuQnlF7jGy2E5yDDMgneCEdHC/41RBdjddl8RCM4DN29zGy0X6W4XXzJSIQE/xPCyRIaXp9/GGnZGYgKtj2PZDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761770407; c=relaxed/simple;
-	bh=Hldxg5wIX16oQThtCclBJU/YEZZATtqu9a9yX5sNY5I=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QZ0fCnPflbTLcpKfZ6DYIrzt3az7f8kzLy/dA6KWjVgEP35boqSDOGJaU1kq9JedA4cJVKbGqy/vAFsOGAQknp6AEj8MnTnARbvCos2hpL1KvK+ojudODfNJ40ztpVF7ae1WwWknIxXBacv+bCHPpouP9yhJ4WnMX/IbIVISjWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=CC0XWT/g; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=UV/VmOJCOfLSipmv50W1vAFDC6k/baUxYyh/BQCyEpA=; b=CC0XWT/gfXNtu9Xw5kcAcNJ/7D
-	yWbrdA638vB4KAJV8RGlYsc6Ws5RkqqKz45UMdC50XRJ4pnRFP2l49817DC8qVTbMtEebXL3maUOZ
-	DRdErQwugmWKqXn/Gf+GxJOzI1obcnkSQ7BdSbmaIRxDsT6Znsn8gnzNg6x3wTuYcC5Z65B/n9PyO
-	8M/z8w05VAfLdi1mFm7xbI9OY5a6mtub8h1LeGKLwAOXasLScVh1w1ftwWuoMKKPSqR+13y2saV9w
-	Kgju7ioVCuGwVwR+Ym3oXehyVm1F4POmZ5szpJVB8Iy12mekI2xUeEQ/qT8dVY1CpUP/4v40VRmwU
-	3MkSU6Gg==;
-Received: from [50.53.43.113] (helo=[192.168.254.34])
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vECxY-00000002pOM-05SB;
-	Wed, 29 Oct 2025 20:39:56 +0000
-Message-ID: <f226af11-adbb-444f-9322-1dd3116321f7@infradead.org>
-Date: Wed, 29 Oct 2025 13:39:55 -0700
+	s=arc-20240116; t=1761770639; c=relaxed/simple;
+	bh=pLK0RmIcI+uBzpaVWm3UjzZFRr7tpTzhtKddIue0iKY=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=rphNYTE+pcCbzhFHHkr0t7CFT0Y5qVC3JzE0X4vpdirOR9tx3atBHMCrp1YTRXBuh8k2RP/J68gNKrCbRsNDHhQrH9yokJeWwarmNf+ZxzMEsEDtLRMrlOxO+gOZ2f6bdZSeUySBKRZ4CM0azJadEr1JnaOTTUCO9Lp2OGXQDSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=gq3YGVmN; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1006)
+	id DC910211D8A7; Wed, 29 Oct 2025 13:43:51 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com DC910211D8A7
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1761770631;
+	bh=ijZ2rJhqIbi7vXqkeZlwbgMNLmV5tgqHCq7j6cxSiZ0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=gq3YGVmNWlr9qLiZ+qH0AdxC1YswIWQoPJArSmvjk86p/y78ChvM7hs8ZjK5CCEts
+	 PZzabpB6J9y1L9h7ngVl59KCPVWpdl9X1M95JO4nJnXFp76zmZsn5h+qklgavvhliq
+	 kLKcBwq4x8t47ZHEAeZZKJyTN4mkfFeDwLE3keVw=
+From: Haiyang Zhang <haiyangz@linux.microsoft.com>
+To: linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Long Li <longli@microsoft.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Simon Horman <horms@kernel.org>,
+	Leon Romanovsky <leon@kernel.org>,
+	Shradha Gupta <shradhagupta@linux.microsoft.com>,
+	Maxim Levitsky <mlevitsk@redhat.com>,
+	Erni Sri Satya Vennela <ernis@linux.microsoft.com>,
+	Yury Norov <yury.norov@gmail.com>,
+	Dipayaan Roy <dipayanroy@linux.microsoft.com>,
+	Shiraz Saleem <shirazsaleem@microsoft.com>,
+	Saurabh Sengar <ssengar@linux.microsoft.com>,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: paulros@microsoft.com
+Subject: [net-next,v4] net: mana: Support HW link state events
+Date: Wed, 29 Oct 2025 13:43:10 -0700
+Message-Id: <1761770601-16920-1-git-send-email-haiyangz@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] docs: kdoc: fix duplicate section warning message
-To: Jacob Keller <jacob.e.keller@intel.com>, Jonathan Corbet
- <corbet@lwn.net>, Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20251029-jk-fix-kernel-doc-duplicate-return-warning-v1-1-28ed58bec304@intel.com>
- <94b517b7-ff20-463b-a748-12e080840985@infradead.org>
- <e8e0cc0d-3f71-42a9-b549-39840952ef0c@intel.com>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <e8e0cc0d-3f71-42a9-b549-39840952ef0c@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
+From: Haiyang Zhang <haiyangz@microsoft.com>
 
+Handle the NIC hardware link state events received from the HW
+channel, then set the proper link state accordingly.
 
-On 10/29/25 1:04 PM, Jacob Keller wrote:
-> 
-> 
-> On 10/29/2025 12:45 PM, Randy Dunlap wrote:
->> Hi Jacob,
->>
->> On 10/29/25 11:30 AM, Jacob Keller wrote:
->>> The python version of the kernel-doc parser emits some strange warnings
->>> with just a line number in certain cases:
->>>
->>> $ ./scripts/kernel-doc -Wall -none 'include/linux/virtio_config.h'
->>> Warning: 174
->>> Warning: 184
->>> Warning: 190
->>> Warning: include/linux/virtio_config.h:226 No description found for return value of '__virtio_test_bit'
->>> Warning: include/linux/virtio_config.h:259 No description found for return value of 'virtio_has_feature'
->>> Warning: include/linux/virtio_config.h:283 No description found for return value of 'virtio_has_dma_quirk'
->>> Warning: include/linux/virtio_config.h:392 No description found for return value of 'virtqueue_set_affinity'
->>>
->>> I eventually tracked this down to the lone call of emit_msg() in the
->>> KernelEntry class, which looks like:
->>>
->>>   self.emit_msg(self.new_start_line, f"duplicate section name '{name}'\n")
->>>
->>> This looks like all the other emit_msg calls. Unfortunately, the definition
->>> within the KernelEntry class takes only a message parameter and not a line
->>> number. The intended message is passed as the warning!
->>>
->>> Pass the filename to the KernelEntry class, and use this to build the log
->>> message in the same way as the KernelDoc class does.
->>>
->>> To avoid future errors, mark the warning parameter for both emit_msg
->>> definitions as a keyword-only argument. This will prevent accidentally
->>> passing a string as the warning parameter in the future.
->>>
->>> Also fix the call in dump_section to avoid an unnecessary additional
->>> newline.
->>>
->>> Fixes: e3b42e94cf10 ("scripts/lib/kdoc/kdoc_parser.py: move kernel entry to a class")
->>> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
->>> ---
->>> We recently discovered this while working on some netdev text
->>> infrastructure. All of the duplicate section warnings are not being logged
->>> properly, which was confusing the warning comparison logic we have for
->>> testing patches in NIPA.
->>>
->>> This appears to have been caused by the optimizations in:
->>> https://lore.kernel.org/all/cover.1745564565.git.mchehab+huawei@kernel.org/
->>>
->>> Before this fix:
->>> $ ./scripts/kernel-doc -Wall -none 'include/linux/virtio_config.h'
->>> Warning: 174
->>> Warning: 184
->>> Warning: 190
->>> Warning: include/linux/virtio_config.h:226 No description found for return value of '__virtio_test_bit'
->>> Warning: include/linux/virtio_config.h:259 No description found for return value of 'virtio_has_feature'
->>> Warning: include/linux/virtio_config.h:283 No description found for return value of 'virtio_has_dma_quirk'
->>> Warning: include/linux/virtio_config.h:392 No description found for return value of 'virtqueue_set_affinity'
->>>
->>> After this fix:
->>> $ ./scripts/kernel-doc -Wall -none 'include/linux/virtio_config.h'
->>> Warning: include/linux/virtio_config.h:174 duplicate section name 'Return'
->>> Warning: include/linux/virtio_config.h:184 duplicate section name 'Return'
->>> Warning: include/linux/virtio_config.h:190 duplicate section name 'Return'
->>> Warning: include/linux/virtio_config.h:226 No description found for return value of '__virtio_test_bit'
->>> Warning: include/linux/virtio_config.h:259 No description found for return value of 'virtio_has_feature'
->>> Warning: include/linux/virtio_config.h:283 No description found for return value of 'virtio_has_dma_quirk'
->>> Warning: include/linux/virtio_config.h:392 No description found for return value of 'virtqueue_set_affinity'
->>> ---
->>>  scripts/lib/kdoc/kdoc_parser.py | 20 ++++++++++++--------
->>>  1 file changed, 12 insertions(+), 8 deletions(-)
->>>
->>
->>> ---
->>> base-commit: e53642b87a4f4b03a8d7e5f8507fc3cd0c595ea6
->>> change-id: 20251029-jk-fix-kernel-doc-duplicate-return-warning-bd57ea39c628
->>
->> What is that base-commit? I don't have it.
->> It doesn't apply to linux-next (I didn't check docs-next).
->> It does apply cleanly to kernel v6.18-rc3.
->>
-> 
-> Hm. Its e53642b87a4f ("Merge tag 'v6.18-rc3-smb-server-fixes' of
-> git://git.samba.org/ksmbd") which was the top of
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git as of
-> when I made the commit. I wasn't sure which tree to base on since I'm
-> not a regular contributor to the docs stuff, so I just based on Linus's
-> tree instead of linux-next.
-> 
->> and it does fix the Warning messages to be something useful. Thanks.
->>
->> We'll have to see if Mauro already has a fix for this. (I reported
->> it a couple of weeks ago.)
-> 
-> I searched mail archives but didn't find a report, so hence the patch.
-> If this already has a proper fix thats fine.
-> 
+And, add a feature bit, GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE,
+to inform the NIC hardware this handler exists.
 
-It was discussed here and Mauro said that he sent a patch but I still
-see those warnings in linux-next-20251029.
+Our MANA NIC only sends out the link state down/up messages
+when we need to let the VM rerun DHCP client and change IP
+address. So, add netif_carrier_on() in the probe(), let the NIC
+show the right initial state in /sys/class/net/ethX/operstate.
 
-https://lore.kernel.org/all/jd5uf3ud2khep2oqyos3uhfkuptvcm4zgboelfxjut43bxpr6o@ye24ej7g3p7n/
+Signed-off-by: Haiyang Zhang <haiyangz@microsoft.com>
+---
+v4:
+  Remove the netif_carrier_ok(), and add READ/WRITE_ONCE. Also,
+  more details in the commit message as suggested by Jakub Kicinski.
 
->> If not, then this will need to apply to docs-next AFAIK.
->>  
-> 
-> Ok, I can rebase if it is necessary. I'll check that out, and can send a
-> v2 if Mauro hasn't already fixed it somehow else.
-> 
->> And not a problem with this patch, but those Returns: lines for
->> each callback function shouldn't be there as Returns:. This is a
->> struct declaration, not a function (or macro) declaration/definition.
->>
-> 
-> Yep, thats an issue with the header. They're doing something weird by
-> doing some sort of sub-documentation for each method of an ops struct. I
-> don't really know what the best fix is for this doc file, nor do I
-> particularly care. I just used it as an example because its the one that
-> we ran into while looking at output from the netdev testing infrastructure.
+v3:
+  Don't stop / start the queues, and use disable_work_sync() as
+  suggested by Jakub Kicinski.
 
+v2:
+  Updated link up/down to be symmetric, and other minor changes based
+  on comments from Andrew Lunn.
+
+---
+ .../net/ethernet/microsoft/mana/gdma_main.c   |  1 +
+ .../net/ethernet/microsoft/mana/hw_channel.c  | 12 +++++
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 54 +++++++++++++++++--
+ include/net/mana/gdma.h                       |  4 +-
+ include/net/mana/hw_channel.h                 |  2 +
+ include/net/mana/mana.h                       |  4 ++
+ 6 files changed, 71 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+index 43f034e180c4..effe0a2f207a 100644
+--- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
++++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+@@ -528,6 +528,7 @@ static void mana_gd_process_eqe(struct gdma_queue *eq)
+ 	case GDMA_EQE_HWC_INIT_DONE:
+ 	case GDMA_EQE_HWC_SOC_SERVICE:
+ 	case GDMA_EQE_RNIC_QP_FATAL:
++	case GDMA_EQE_HWC_SOC_RECONFIG_DATA:
+ 		if (!eq->eq.callback)
+ 			break;
+ 
+diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+index ada6c78a2bef..aa4e2731e2ba 100644
+--- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
++++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+@@ -118,6 +118,7 @@ static void mana_hwc_init_event_handler(void *ctx, struct gdma_queue *q_self,
+ 	struct gdma_dev *gd = hwc->gdma_dev;
+ 	union hwc_init_type_data type_data;
+ 	union hwc_init_eq_id_db eq_db;
++	struct mana_context *ac;
+ 	u32 type, val;
+ 	int ret;
+ 
+@@ -196,6 +197,17 @@ static void mana_hwc_init_event_handler(void *ctx, struct gdma_queue *q_self,
+ 			hwc->hwc_timeout = val;
+ 			break;
+ 
++		case HWC_DATA_HW_LINK_CONNECT:
++		case HWC_DATA_HW_LINK_DISCONNECT:
++			ac = gd->gdma_context->mana.driver_data;
++			if (!ac)
++				break;
++
++			WRITE_ONCE(ac->link_event, type);
++			schedule_work(&ac->link_change_work);
++
++			break;
++
+ 		default:
+ 			dev_warn(hwc->dev, "Received unknown reconfig type %u\n", type);
+ 			break;
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index 0142fd98392c..739087081dfd 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -20,6 +20,7 @@
+ 
+ #include <net/mana/mana.h>
+ #include <net/mana/mana_auxiliary.h>
++#include <net/mana/hw_channel.h>
+ 
+ static DEFINE_IDA(mana_adev_ida);
+ 
+@@ -84,7 +85,6 @@ static int mana_open(struct net_device *ndev)
+ 	/* Ensure port state updated before txq state */
+ 	smp_wmb();
+ 
+-	netif_carrier_on(ndev);
+ 	netif_tx_wake_all_queues(ndev);
+ 	netdev_dbg(ndev, "%s successful\n", __func__);
+ 	return 0;
+@@ -100,6 +100,46 @@ static int mana_close(struct net_device *ndev)
+ 	return mana_detach(ndev, true);
+ }
+ 
++static void mana_link_state_handle(struct work_struct *w)
++{
++	struct mana_context *ac;
++	struct net_device *ndev;
++	u32 link_event;
++	bool link_up;
++	int i;
++
++	ac = container_of(w, struct mana_context, link_change_work);
++
++	rtnl_lock();
++
++	link_event = READ_ONCE(ac->link_event);
++
++	if (link_event == HWC_DATA_HW_LINK_CONNECT)
++		link_up = true;
++	else if (link_event == HWC_DATA_HW_LINK_DISCONNECT)
++		link_up = false;
++	else
++		goto out;
++
++	/* Process all ports */
++	for (i = 0; i < ac->num_ports; i++) {
++		ndev = ac->ports[i];
++		if (!ndev)
++			continue;
++
++		if (link_up) {
++			netif_carrier_on(ndev);
++
++			__netdev_notify_peers(ndev);
++		} else {
++			netif_carrier_off(ndev);
++		}
++	}
++
++out:
++	rtnl_unlock();
++}
++
+ static bool mana_can_tx(struct gdma_queue *wq)
+ {
+ 	return mana_gd_wq_avail_space(wq) >= MAX_TX_WQE_SIZE;
+@@ -3059,9 +3099,6 @@ int mana_attach(struct net_device *ndev)
+ 	/* Ensure port state updated before txq state */
+ 	smp_wmb();
+ 
+-	if (apc->port_is_up)
+-		netif_carrier_on(ndev);
+-
+ 	netif_device_attach(ndev);
+ 
+ 	return 0;
+@@ -3154,7 +3191,6 @@ int mana_detach(struct net_device *ndev, bool from_close)
+ 	smp_wmb();
+ 
+ 	netif_tx_disable(ndev);
+-	netif_carrier_off(ndev);
+ 
+ 	if (apc->port_st_save) {
+ 		err = mana_dealloc_queues(ndev);
+@@ -3243,6 +3279,8 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
+ 		goto free_indir;
+ 	}
+ 
++	netif_carrier_on(ndev);
++
+ 	debugfs_create_u32("current_speed", 0400, apc->mana_port_debugfs, &apc->speed);
+ 
+ 	return 0;
+@@ -3431,6 +3469,8 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
+ 
+ 	if (!resuming) {
+ 		ac->num_ports = num_ports;
++
++		INIT_WORK(&ac->link_change_work, mana_link_state_handle);
+ 	} else {
+ 		if (ac->num_ports != num_ports) {
+ 			dev_err(dev, "The number of vPorts changed: %d->%d\n",
+@@ -3438,6 +3478,8 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
+ 			err = -EPROTO;
+ 			goto out;
+ 		}
++
++		enable_work(&ac->link_change_work);
+ 	}
+ 
+ 	if (ac->num_ports == 0)
+@@ -3500,6 +3542,8 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+ 	int err;
+ 	int i;
+ 
++	disable_work_sync(&ac->link_change_work);
++
+ 	/* adev currently doesn't support suspending, always remove it */
+ 	if (gd->adev)
+ 		remove_adev(gd);
+diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
+index 57df78cfbf82..637f42485dba 100644
+--- a/include/net/mana/gdma.h
++++ b/include/net/mana/gdma.h
+@@ -590,6 +590,7 @@ enum {
+ 
+ /* Driver can self reset on FPGA Reconfig EQE notification */
+ #define GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE BIT(17)
++#define GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE BIT(6)
+ 
+ #define GDMA_DRV_CAP_FLAGS1 \
+ 	(GDMA_DRV_CAP_FLAG_1_EQ_SHARING_MULTI_VPORT | \
+@@ -599,7 +600,8 @@ enum {
+ 	 GDMA_DRV_CAP_FLAG_1_DEV_LIST_HOLES_SUP | \
+ 	 GDMA_DRV_CAP_FLAG_1_DYNAMIC_IRQ_ALLOC_SUPPORT | \
+ 	 GDMA_DRV_CAP_FLAG_1_SELF_RESET_ON_EQE | \
+-	 GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE)
++	 GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE | \
++	 GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE)
+ 
+ #define GDMA_DRV_CAP_FLAGS2 0
+ 
+diff --git a/include/net/mana/hw_channel.h b/include/net/mana/hw_channel.h
+index 83cf93338eb3..16feb39616c1 100644
+--- a/include/net/mana/hw_channel.h
++++ b/include/net/mana/hw_channel.h
+@@ -24,6 +24,8 @@
+ #define HWC_INIT_DATA_PF_DEST_CQ_ID	11
+ 
+ #define HWC_DATA_CFG_HWC_TIMEOUT 1
++#define HWC_DATA_HW_LINK_CONNECT 2
++#define HWC_DATA_HW_LINK_DISCONNECT 3
+ 
+ #define HW_CHANNEL_WAIT_RESOURCE_TIMEOUT_MS 30000
+ 
+diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
+index 0921485565c0..8906901535f5 100644
+--- a/include/net/mana/mana.h
++++ b/include/net/mana/mana.h
+@@ -477,6 +477,10 @@ struct mana_context {
+ 	struct dentry *mana_eqs_debugfs;
+ 
+ 	struct net_device *ports[MAX_PORTS_IN_MANA_DEV];
++
++	/* Link state change work */
++	struct work_struct link_change_work;
++	u32 link_event;
+ };
+ 
+ struct mana_port_context {
 -- 
-~Randy
+2.34.1
 
 
