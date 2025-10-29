@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-234082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12AF8C1C563
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 18:04:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D226C1C579
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 18:05:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 79D9A5610F9
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 16:59:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E35551885A52
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 17:01:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D4F633F379;
-	Wed, 29 Oct 2025 16:59:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6642342169;
+	Wed, 29 Oct 2025 17:01:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QGS3cZ1T"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zu711m+N"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EE5124113D;
-	Wed, 29 Oct 2025 16:59:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B827D325487;
+	Wed, 29 Oct 2025 17:01:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761757158; cv=none; b=AWKP8KNcSTe/CWeGeibJvI80+E8MaS6aOmrCnZpUXYrbUKXkcTjJYSsjGaU8BrWQFMPBWpAwPUgDQA3Sg46jvg3Q7IDyo7nJZLjdfNz0Wui/GfMEQYCeXDAxzgDetuFbo510mmR/iZmUAiDsOleQyZJHC992ZnaesmOgjDtsDb4=
+	t=1761757279; cv=none; b=JbnyLluT18lGdgCIGV53M005SrQycHhbNMlccVVt3/3wH7vcl9xqxVKrhXsO8wotYVT/JEEY9uDw5jailcgzpvTmy6J891KlfIxOnVW7fPWVEdijOxqGpVd7xL6wloOuAeUm4tYnqm05uvSqXzyoIt5l8/wlOrmSfFZrwYlhHqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761757158; c=relaxed/simple;
-	bh=cq9FRbC1uoLV1g1AWfwYfVmonPzFmlTMYY4Ey/5BDBc=;
+	s=arc-20240116; t=1761757279; c=relaxed/simple;
+	bh=k3byeLcVOKPHdmvu7ueh69faz2jI7pjQAcxa1p62ckY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QZuZW+hZeossE0UxMyHpQtpmIC7VZZ17E7e/a1ptQBXQKuk2GeqJka0D+J6MSmlj9puvws4+VM3LHl2FsrrZHEzJPGWr1Ek8cikltUHRj5vbgvKL25ZcPrSAGE55uCnsJxgCQluVQhu4g8HenMRwxFIe331/R9lJvZrEs8TDPAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QGS3cZ1T; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 183ECC4CEF7;
-	Wed, 29 Oct 2025 16:59:15 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=CYscKOPLVZRVjOwfFqWV9kl/mRrhbE9uY6GYBXKWifYOFmB4W5wQ7wZZxTI0303pVXGXIoxvPpSUe79sVcVQPsz++8FdygBKNrJzOwPdV+dY6aLOq2frSf/Pfjf0/EDMQbv7iGsMzMDhY3XzVcbjSqjdT6tMOsBYI36k0UjORnc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zu711m+N; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F967C4CEF7;
+	Wed, 29 Oct 2025 17:01:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761757157;
-	bh=cq9FRbC1uoLV1g1AWfwYfVmonPzFmlTMYY4Ey/5BDBc=;
+	s=k20201202; t=1761757279;
+	bh=k3byeLcVOKPHdmvu7ueh69faz2jI7pjQAcxa1p62ckY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QGS3cZ1TrBsy/y9U2p0BYB60DW0TV75feVd8WIxw9BZEZ0RYG8kHNrQxSUF6tRKLr
-	 AZHYP7KmztrXUq6Dw2pNHkPnsUtYFVDtt6g379llyr8qx8PhELSX0wE/9iU66+Q5MB
-	 xAFFuUvRBjr0KKOB9U8vWf69vD43ho93QnpjIOo/+qmK3z0wTaX+FOY9+5eBq/I9gP
-	 oFqV1bsznvJf5uK7Vtd4bKYsxjv3o08Jkpv++xAdrxj6Gz3JkXoY6+nhzWkzTmdHhm
-	 c+JMDqyKpLspUOG1onKWasIR38Qqxz3aQ835s41EDSIhycH4OJ1WDRGYYtsjCEHiyb
-	 ymbixFZ2GCm2A==
-Date: Wed, 29 Oct 2025 16:59:14 +0000
+	b=Zu711m+N+fJ2KQqcxeqOJBhzhogcWZmD4nMAZA+88M/KFM28pAQqKcu2AtrSy8BT+
+	 jNJNmsB/B9Y26Hrgre1Mjnz49nNFeLd1VGEofroOCL/kqWnU+mCDWIX5IKBhlpe8Nu
+	 ra0GlDEBBAVG8oP4OROkxuPsTtmgIPPdhCXSslS4u35Ja7vRPosno3YdcARqYs3LHg
+	 hw3lMOLWyTjmvbQWW3qcIGyyPIIC8tEmCiSPRrrWdJQ4BEirpECcHtan18y8QIU4K/
+	 eeixI3DeWwWRkSGldGIRPSDh5qs/SCRiIo+9xYfXQIRQmgPPI24+K3RtMsvVQiiAt8
+	 m4UlkIMd/42EQ==
+Date: Wed, 29 Oct 2025 17:01:15 +0000
 From: Simon Horman <horms@kernel.org>
 To: Bobby Eshleman <bobbyeshleman@gmail.com>
 Cc: Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
@@ -49,11 +49,11 @@ Cc: Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
 	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next 06/12] selftests/vsock: speed up tests by
- reducing the QEMU pidfile timeout
-Message-ID: <aQJH4mTKNVlEDgjC@horms.kernel.org>
+Subject: Re: [PATCH net-next 11/12] selftests/vsock: add 1.37 to tested
+ virtme-ng versions
+Message-ID: <aQJIW9ooMiAHZ6Np@horms.kernel.org>
 References: <20251022-vsock-selftests-fixes-and-improvements-v1-0-edeb179d6463@meta.com>
- <20251022-vsock-selftests-fixes-and-improvements-v1-6-edeb179d6463@meta.com>
+ <20251022-vsock-selftests-fixes-and-improvements-v1-11-edeb179d6463@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,18 +62,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251022-vsock-selftests-fixes-and-improvements-v1-6-edeb179d6463@meta.com>
+In-Reply-To: <20251022-vsock-selftests-fixes-and-improvements-v1-11-edeb179d6463@meta.com>
 
-On Wed, Oct 22, 2025 at 06:00:10PM -0700, Bobby Eshleman wrote:
+On Wed, Oct 22, 2025 at 06:00:15PM -0700, Bobby Eshleman wrote:
 > From: Bobby Eshleman <bobbyeshleman@meta.com>
 > 
-> Reduce the time waiting for the QEMU pidfile from three minutes to five
-> seconds. The three minute time window was chosen to make sure QEMU had
-> enough time to fully boot up. This, however, is an unreasonably long
-> delay for QEMU to write the pidfile, which happens earlier when the QEMU
-> process starts (not after VM boot). The three minute delay becomes
-> noticeably wasteful in future tests that expect QEMU to fail and wait a
-> full three minutes for a pidfile that will never exist.
+> Testing with 1.37 shows all tests passing but emits the warning:
+> 
+> warning: vng version 'virtme-ng 1.37' has not been tested and may not function properly.
+> 	The following versions have been tested: 1.33 1.36
+> 
+> This patch adds 1.37 to the virtme-ng versions to get rid of the above
+> warning.
 > 
 > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
 
