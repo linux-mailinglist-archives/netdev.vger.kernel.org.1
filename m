@@ -1,299 +1,340 @@
-Return-Path: <netdev+bounces-234144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F066C1D240
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 21:08:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E763C1D285
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 21:10:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A43F189F0F1
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 20:08:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 103443AC8E3
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 20:10:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C60E93587A1;
-	Wed, 29 Oct 2025 20:08:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DE1E35A93B;
+	Wed, 29 Oct 2025 20:09:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CMtctcTL"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RjqIIFhF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1685E3546F4;
-	Wed, 29 Oct 2025 20:08:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761768482; cv=fail; b=YfgqJQcDfW9V43Vt6o56tPumB3h/w1ZJvBm8Vmc4bb+Lsum0TXFzX20p1pK9czMhHRECUDZ2CFm2793NNeLofIf8835RUmQ6pVvJLa9Q62lvg2w6kdoaPl7IMFTgTY/ZtPGjEHxkLIu1LlsTV6U6nJVADq/ttM3GU1gUbl8wWOs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761768482; c=relaxed/simple;
-	bh=zkjTliTw5Gkyuu/y2+IVqkYaUdy5jmVGkM5+wyEqdto=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=ddJoQgUI58ON4vwgybe4PBmotd5O7nmAeE2SfMLHL8wQfV+22gquW+WhQ45YAD3JjxbZXL2N0WNgfRHSyECTpaS9IVMOZbvW9KPxRCqZjtvWAcGPwrTvRuPxQsK/Ti6U6uXIFfacXxkFmUYXmtVVFMZryOTlviWYin+7vEZu3LM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CMtctcTL; arc=fail smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761768481; x=1793304481;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:mime-version;
-  bh=zkjTliTw5Gkyuu/y2+IVqkYaUdy5jmVGkM5+wyEqdto=;
-  b=CMtctcTLTulQnY5IvbRLv4X7YSa2VlSTN94fhqTkhqcl2ytnxxfyxFR0
-   wsLxYERAaFE9uBZ1D47pivG4ySq4tIVI5gxFr/XJHtzSt/SG9/MfQrBVU
-   iPSMxYltIaSahguYy090ja43zEhC14IPMSjUIUdgY1C3uahd8Lz7d/ldo
-   ssw73UW2D/Fz+oJyLO4t6NZ8OyX2eLYK6pPG0ot8oAJhqIpRSiDi9FTck
-   Lka8qeshh7/4TjIg8yZZhRqfwjE6t0gWrS0D7tpugH3lGihp1D2GFdrZe
-   SwXC2QE/7wWG/o9KaWaMONkUZJQMV+UrdKcZ4E4N1r80Oa4jl22QKQhgO
-   A==;
-X-CSE-ConnectionGUID: baHPTG1pTOaBZAKaBvNr2Q==
-X-CSE-MsgGUID: OcNINHVMTZWtt//32y30dw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11597"; a="63940073"
-X-IronPort-AV: E=Sophos;i="6.19,264,1754982000"; 
-   d="asc'?scan'208";a="63940073"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 13:08:00 -0700
-X-CSE-ConnectionGUID: kf6VsBLDTFGDbZxacYEo3A==
-X-CSE-MsgGUID: jLByVT8SQJm34kQUHm/cNQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,264,1754982000"; 
-   d="asc'?scan'208";a="190120052"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 13:08:00 -0700
-Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Wed, 29 Oct 2025 13:07:59 -0700
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Wed, 29 Oct 2025 13:07:59 -0700
-Received: from BN1PR04CU002.outbound.protection.outlook.com (52.101.56.50) by
- edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Wed, 29 Oct 2025 13:07:59 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=BGfM3b4pWnEPhdk1muoQtGlxcMOP41zNOsn8XND9vi58HwPCzJIDsy8i9kQ0g9h3T4e4RHqr5pYHlTxFmRMiEuusXJvmIeI8h1QSl2Y5Ly5muuxoUvjxYEwZhIlAsmgYixY/S0obV/zu52a4QGSBMkzJ8VuL8feAbAlYezrruZtvFp7B/a5bvts2nFUcgWF612TY0a8w6StfBvSJl6OqZLsZAbM4/nMA0Kn6Ufe/DgfaS/CJagX+zN4qvDGk15q22f2M84WnXwi/R/44VV2jowMFxi0gFZsJliD3J24FEZAoTs33tqLoqvG289e/ZlTo30Mb00Ji3DtKaHPX7Cbvvw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LrnJzhLgobT5Os0aXgjYZxFZ0xekf9NRM5cQa5zn4Xw=;
- b=N63WSB6n/z/SwokUYMi73erc69ipTsIl1EFcCzHV+7L2HvjPrlokmhquFe4XSdtwBru8mKZxJzjjgXSwnO/dkPKeGBgfk8qQleuzspGaHfDhZvt582/DDtPLqmePQ19heIemWxVvsEWmRPlM8V2cz/2kvVBm1vaKI7mfjshg4e1UwmST43dg3XWYVrIJCCl0IEafbEiOLV90tO6u27AVmVLfRh21LvsSxP+ztD00fozyv+GLZU34SClLark2r/GCoKIfOa5Vg7DXTrVWFJJ5Doyw8fZrGuO6/27Y0e5OhzF6YvgU+dJOCI68s+ICDAna/1ajPWk+IElfeiGszplE2Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by DM3PR11MB8760.namprd11.prod.outlook.com (2603:10b6:0:4b::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.19; Wed, 29 Oct
- 2025 20:07:56 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::81f7:c6c0:ca43:11c3]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::81f7:c6c0:ca43:11c3%3]) with mapi id 15.20.9253.017; Wed, 29 Oct 2025
- 20:07:56 +0000
-Message-ID: <68a4b852-4eeb-4f97-af2a-58714b59be97@intel.com>
-Date: Wed, 29 Oct 2025 13:07:54 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V3] net: ethernet: ti: netcp: Standardize
- knav_dma_open_channel to return NULL on error
-To: Nishanth Menon <nm@ti.com>, Jakub Kicinski <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "David S. Miller"
-	<davem@davemloft.net>
-CC: Simon Horman <horms@kernel.org>, =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?=
-	<u.kleine-koenig@baylibre.com>, Eric Dumazet <edumazet@google.com>, "Andrew
- Lunn" <andrew+netdev@lunn.ch>, Santosh Shilimkar <ssantosh@kernel.org>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>
-References: <20251029132310.3087247-1-nm@ti.com>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-Autocrypt: addr=jacob.e.keller@intel.com; keydata=
- xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
- J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
- qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
- CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
- UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
- MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
- apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
- cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
-In-Reply-To: <20251029132310.3087247-1-nm@ti.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="------------E3pF8tRUX0G0W28bhprvxcH6"
-X-ClientProxiedBy: MW4PR04CA0280.namprd04.prod.outlook.com
- (2603:10b6:303:89::15) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 917B835A15F
+	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 20:09:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761768584; cv=none; b=TimFVpfXF8K9pRflf7udt6ks8vTqfcNHOS17TP/Gzex3tsxrrfoExMiq2nQZR6BVVH6Nc+qWtf2PGEjERHybTjuZtIQ7sDZDCjZZWHf+MPWUATaVe+Uvevo/zLnYQV/1At+WoqdakJqCgTWbX/B1zrO8YepGo/PyH/goraPLKmc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761768584; c=relaxed/simple;
+	bh=9KlZ3BmSvBvwuGLoIKuNx44zOkkrcJ/lQtN0jx1YEgY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LdlLGZw/455s7GV3eJMOx7JQbKpUs2FACDV5Jtp2oiHXrxtwV3rI8mpJLO2P9UgGLUi2a7ObVIPUrJbtZGg3Btb+xvgNLBHETOi9B/Un3MWhLL1JVQOuZYsPOzqd7d2ekxyubAKf6jV/d+EvFIE1hwWk8RK1HXyFdBpWabLSOnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RjqIIFhF; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1761768579;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=l2jBIAEtyZRCtU+BFL7XvhVFRjM8Rw7m2YMp4kiWArQ=;
+	b=RjqIIFhF7zWtM4I3KCHxfUhSrNVK6QKFplZZwmX7Sv0E9ykceBcSmWxzhtL7XgS+/vndLz
+	gdkw0oRzUntR4XasdnH95JJVPHnYOmIwLvReGbEOxq8kiNUvZM7su1ietrMnWCe41sOGWg
+	s5WxYpXWC8FRg8t8TBdT+quJ6Y6EuyU=
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: netdev@vger.kernel.org,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>
+Subject: [PATCH net-next] ti: netcp: convert to ndo_hwtstamp callbacks
+Date: Wed, 29 Oct 2025 20:09:22 +0000
+Message-ID: <20251029200922.590363-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|DM3PR11MB8760:EE_
-X-MS-Office365-Filtering-Correlation-Id: 49de2d8d-a2c1-4adb-64e0-08de1726d9c6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7416014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?Mjhqeno5cjFTVTdzWUoyWTk0YnFFSDFKeFUyUzhWL0VFemRZSW9QTWhPQTlG?=
- =?utf-8?B?UHRwRWVPcWJOWmlOb05icVhya0J1UXlrVmtRU2dqdkJlenRXY283S1ZnUVl3?=
- =?utf-8?B?SFlialBOeUZvV1hJSmpmTUFMTDV5cklQQW40V0ZwVGE5SkRNQTZlMjlRODl1?=
- =?utf-8?B?ZzQrN0lOWk1KalJuQ0lydWRkRU9zQ2ZIdEoyYUdIYzRwcW44WGtoTVowSkhD?=
- =?utf-8?B?SEtzMURsVmVrWUdVblEvVmJHT2ZXWFJRdE16ZXZELzN0cndMemRqb1hQNjdE?=
- =?utf-8?B?WmFONkcrdXdTK0FySUs4VnRGYVhmcC95UFhZRWlyNzNXT0FISmcwaDRLL2hv?=
- =?utf-8?B?djI4MUVGN2RQSDExcy9PbXdSb01nZ2RvZHU5WmJ2YWhIcFRCS0ZMTXZuQkxN?=
- =?utf-8?B?cHM5ald3MTBsWlVJdkIvYmpyVUY0eXBSUEtudTN0V1VZQWpTdTllNFZlakhN?=
- =?utf-8?B?bktTVGFyWWhWWisyTTRCQmx6T2ZTU3gyTUtScE5WTldTQ213ZDZ6WUt2Mmt3?=
- =?utf-8?B?cks1Q2JtYnJYVFYvdVVPVzVlLzl2SHllZUJjVVpSMlRzNFhiTlVwc050bkhY?=
- =?utf-8?B?OFBkUkJHNGdZUG9kekpSSHVFQ09Ma2h2NGRnQ1k0MnU0a0RNaStVMnlFSmNJ?=
- =?utf-8?B?WndRdFFVZjE1ZytidEZjK2F0NTJjbFNRV3ExKzQ5aVVNWW5pbFo5ZGdvME5p?=
- =?utf-8?B?OW0yNkZNR2UrbnROcnZWMmg1emdzREtKRWJBbUZYemxvdldDUEJzMks1NTdN?=
- =?utf-8?B?czVLRVJ2UHJySFhnbmFmemovRW5TYzA1bnFaelZpOUQ2RXN5bU82S0lCSkd0?=
- =?utf-8?B?QldEaWxFS0tTR2s4MG5Bb1p3ZXdvNlNSTkQ1SSs2ZFhjZU9xT3pFNzd5dC94?=
- =?utf-8?B?RGVBU085UVFRdWcrVTlqeVppQ05tc0ZZRjYwaUxEcWlnNU0yckYwQkxHd0pr?=
- =?utf-8?B?WHB3RTU1YXoyVkVXS2ZBUnN3UTZZYjJGSDRmVU92ajRjRjFPbXp4Z1hjUW0w?=
- =?utf-8?B?SUVkejE5RTZxSTlNTk9seVpwQ1EvT25tSVYwQWJmZFJiSUEvaVJ6ejFMb0N5?=
- =?utf-8?B?cXVvV1hTdlpjVHlQZHpxbUFtVlRER3EwaWxPMSs0RjBnZlR0TWFBVTRUZ0xT?=
- =?utf-8?B?OVlaQnlOdnM2ZC9XOTJDclcyU0E4USs0ZGo2K0daQm9FdlFTNy95eU5KeHd4?=
- =?utf-8?B?bWt4bi85M2xOMG4zbzhBZFZpRzEwdGJkdDd0N2Nqbmk4SjRiRkRPTTYxUzVa?=
- =?utf-8?B?VVZXWGtpekZ2QmhsSGsyNVRHZlNLd3ZESGNRZmYvTHNCRFhRcEk1d29FY3Fs?=
- =?utf-8?B?MW9HV2ZrUFlaQmFRbFA4K2lBSldkRDdneFlwRlZrRWdhWXFiWlJVdGJVUjFP?=
- =?utf-8?B?Q3ZocGlyV1hoMTliZEw4TGtPeVJISjU2enVoYng1WUhScjlGbkNrRjBYRUx2?=
- =?utf-8?B?SUMxNDczRjhEUDFxdXB3QXRGTG9pbE9VbTVDREg4dEJYd2RUZW1JZWhGa0NS?=
- =?utf-8?B?Y0VEV0o5TmlOZ2Fya08rWjEydElGWXpvdmlIK2xvUXQ1aklvQUU5OFhGZy85?=
- =?utf-8?B?OUdTR3FvK2lZckUxZHZnakswNDY3V2U5R0t1TXpyZ3I5Q0d5anBNK0RsOGVQ?=
- =?utf-8?B?M3V6dll3RW5lcHFRdk1vRkFWR3ZTSk5hY2tFQ2JwelVzVkIyb2xXd3RZRXhi?=
- =?utf-8?B?MjBpNnFlM3NIL2wrc3FaWmEzVUNPaXZBa0N6Z0IzV1BOU1loVFAwM0hSTTFH?=
- =?utf-8?B?aE5Vd3dpTy9CaDYzd0NBMjFqRE55VzR2V3ZyMk1BdWNHSFR6SWRmanNsSk5n?=
- =?utf-8?B?cjQ3dzMyNlBaVGx6Uk1DQTFaa1FZM0RiZEhMaTdRYTVpSlltS2dCOHFUMW0z?=
- =?utf-8?B?UU13N1BCMmxQSHlsd2FEVXNmN2d4bUJyQXgvUG4yTmg5bG1IYTlVZWJ0b2kx?=
- =?utf-8?Q?i4BVDKjB21a4mwJR5DTspaLKAcRQZiCj?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VSsvcDFHcnlyTWV4bDhtU3l4WmptSW5qeUM2SlpEaGNqZmN5TnhQQ2dzMDQv?=
- =?utf-8?B?RFNYdkpFTUJiR3kxaHhoK29QdERoek5GKzZjUkw5emlidTkrM0xLa0dPMTQy?=
- =?utf-8?B?OXhWQWhPbGpYU3l0N0l5WTBuQ1pGVUpIRkFoSXRzQzNQTFliWmtSbW1IVk5j?=
- =?utf-8?B?SHdMb3Zjay8ybXZUc2tQS2tGUURVREthTUw0NFErWFljTjR5UDFpUTQ4Z09G?=
- =?utf-8?B?SGdOTHlrR0NGOURPR0E2R0Y1MmRHR1pXWHJoZVZsMitIMTBwaysvcHNlMkZs?=
- =?utf-8?B?SllIMUJDRDA2b1hjNmZ3SDJOWFV6dGNmMmJCcDZWaTE0bkhPQllhYmw1NThS?=
- =?utf-8?B?MzR1cXl5Qm45Qng5T0t3NkZEWXovTnNTMFhTcWRZNjd2N2IvWHdpeTBwVjFj?=
- =?utf-8?B?aS9EN2JXS1FJZFAvVjdOL1U3d0NYYTh6Y2l6UWFsRFpHL2p1N0dvUmQzdWx3?=
- =?utf-8?B?b3gzWHN4NlJMZWg0ejhXTWNWM2Z6b09jYys4cHZKUFRDci9XRXJNc0ZLWndU?=
- =?utf-8?B?RzBseGhqRUdMUEpLOURBYXVJQW1RVXhrUGF2S1FJSDdqcEZnNHhTblYxaVBo?=
- =?utf-8?B?emJpNGdPcnNrUzNoRkVxMWdHcXhadURoMUVpUjlRTG40SGlSMjZpVDIvUDhr?=
- =?utf-8?B?Vkk5QnNuUnl2ZldUSmVDaWIvQnVZVlNieU9JcHJGcXVjQ1BtbzU4SjRJNHhD?=
- =?utf-8?B?a3I2eUFkUGJQS3dzMERuaC8wdklKaHlkQzJQZ0VPSHRLWUZMQWt0VEM3RXA2?=
- =?utf-8?B?VTVUOG1WMytaSDk3UnBwdXZtK0RSY1MvT3VTOWZGcnVJOHE5eGZnaDR2Q2VJ?=
- =?utf-8?B?OFN4T2trS1l4bVQvYW05c1FXYkdnbFlRTVhFYlFRT205SW51NEhUQ2RmMTdX?=
- =?utf-8?B?RFpOam43TnpQRWxFcWVmWE12SHd2dGNJUXpOb3p1czBZaGRKQlI4TlZFWmhm?=
- =?utf-8?B?UVBXRFJCSHRUQUloMHRkVGlYZ0JzU2dPQzl1MVduVEtiUFlIa3hpYUw5QUY0?=
- =?utf-8?B?SW05TTg2dlBGMGxVVkFuakpDMy96OXUyMWkrZXc1aC9tbjdvMGoxVGxEdklk?=
- =?utf-8?B?RTNPMmNiWFZXU0FXS2FJeEh2SXpvUEQzcWZ5OVkxUUVlMHRpMXBFZXlvQUlS?=
- =?utf-8?B?anUvQTJ4RXBiM3hqL1FMdjB0K0pENmQrYTNYSUZjMGZqelljTXp5RXVnSGcy?=
- =?utf-8?B?UGZjQWErUVM5NUdhci8xZDdoaDd0eWFQc1Q5M3ZhMHJNR0ZtVzE3amFKNDFn?=
- =?utf-8?B?alR2bTd1UTNnRmpOZjM4bDd1UHUxN3NDSUUwUzIxbmRaRXVPeHFhUEFhZU56?=
- =?utf-8?B?K2w5bWFRQW1jUzBMTDRBM0p1ZVE2OVFWb1JFdnB1U1FPRExKcFdXTXZWalhQ?=
- =?utf-8?B?ZTZTNHA1ZWsxZG1aVUZlOXVMN2pnem44NURnOXFMSFdib0NtRXgrRFAwVFhu?=
- =?utf-8?B?NkttZklwYUxqNXhjUG80WUptU1ZSa1VxK05xSmJuRTRxNnFHQUxxeWdEdlly?=
- =?utf-8?B?S1U0SFcxMWQzd01vWjNsLzNjVkc1RFVwQTdUa2xOZ0FkR1NFZUlvVVVLY3Rh?=
- =?utf-8?B?MjFQaVZJdWN0U3dkOUhDdFdpQUVLN2FORE5zQmtuTDdPMCs3OGY2TTI0bUFN?=
- =?utf-8?B?M3NVc0Y3bXB3UkowUGhaUno3RkJUY3RWTDdqWHNkbVlNcEJnRkVTbmNQbUpx?=
- =?utf-8?B?QlM3dXlFWmlrTDk1VXNsbjJEWFdyVWdzd1BmRE42ZnhheXpBamhnU0pJOVZk?=
- =?utf-8?B?ekNoVUxtSkI5aGhJV2ZDSFNJdnlNbzZYV0JCMmd0WDI5bDkycVlXaVBQc0FC?=
- =?utf-8?B?Q2hyTU9CYXB0bk93VnVOQm1LNDUyU0dUaE90cXpIbHcvRXFjYnFBRnBLSmw3?=
- =?utf-8?B?Q21RcEFpTTVsdStIdkQrMUU4UXpVYVFWWWd3ZERwUFB5OFdxNkpza1gwYVJS?=
- =?utf-8?B?bld3d2NrUk8yeGpQWlY1UlN5MXU3aUx1dUJnWGdhaVZvYmh6YWVxNzRNK0Yw?=
- =?utf-8?B?MnZXWVViSHhocTl4eWNOTUp1SDBzZTBkNGUyaHE5VWU5b1hZMlJMWFdwU2NL?=
- =?utf-8?B?NE1qOXNJYXpQckJaK2gxMmJOOUQ4bHV6Y3RzWE56TTIxRitlbVE4TWJ2RFc4?=
- =?utf-8?B?UCs3UUYwaG83N2gyeC9yc1N1REYvRUpKSE91Rlg5cnhUYkNKcmY4Q2tlUDU3?=
- =?utf-8?B?Snc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 49de2d8d-a2c1-4adb-64e0-08de1726d9c6
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Oct 2025 20:07:56.6216
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zTowS4Qf4nu4DfgcpXbkEHC98Nq0wv4FnZ195fjRTtoU0W35/TkQrgyLR7+FmyOWMzyjrBij9DH0Lhteka7revLX0591aSYzjDImXBOJ8Lc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR11MB8760
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
---------------E3pF8tRUX0G0W28bhprvxcH6
-Content-Type: multipart/mixed; boundary="------------Zkbr1zKtlw104y1YSrIu0Grw";
- protected-headers="v1"
-Message-ID: <68a4b852-4eeb-4f97-af2a-58714b59be97@intel.com>
-Date: Wed, 29 Oct 2025 13:07:54 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V3] net: ethernet: ti: netcp: Standardize
- knav_dma_open_channel to return NULL on error
-To: Nishanth Menon <nm@ti.com>, Jakub Kicinski <kuba@kernel.org>,
- "pabeni@redhat.com" <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>
-Cc: Simon Horman <horms@kernel.org>,
- =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
- Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Santosh Shilimkar <ssantosh@kernel.org>,
- Siddharth Vadapalli <s-vadapalli@ti.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20251029132310.3087247-1-nm@ti.com>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-Autocrypt: addr=jacob.e.keller@intel.com; keydata=
- xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
- J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
- qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
- CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
- UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
- MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
- apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
- cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
-In-Reply-To: <20251029132310.3087247-1-nm@ti.com>
+Convert TI NetCP driver to use ndo_hwtstamp_get()/ndo_hwtstamp_set()
+callbacks. The logic is slightly changed, because I believe the original
+logic was not really correct. Config reading part is using the very
+first module to get the configuration instead of iterating over all of
+them and keep the last one as the configuration is supposed to be identical
+for all modules. HW timestamp config set path is now trying to configure
+all modules, but in case of error from one module it adds extack
+message. This way the configuration will be as synchronized as possible.
 
---------------Zkbr1zKtlw104y1YSrIu0Grw
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+There are only 2 modules using netcp core infrastructure, and both use
+the very same function to configure HW timestamping, so no actual
+difference in behavior is expected.
 
+Compile test only.
 
+Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+---
+ drivers/net/ethernet/ti/netcp.h       |  5 ++
+ drivers/net/ethernet/ti/netcp_core.c  | 56 +++++++++++++++++++++
+ drivers/net/ethernet/ti/netcp_ethss.c | 72 +++++++++++++++------------
+ 3 files changed, 101 insertions(+), 32 deletions(-)
 
-On 10/29/2025 6:23 AM, Nishanth Menon wrote:
-> diff --git a/drivers/soc/ti/knav_dma.c b/drivers/soc/ti/knav_dma.c
-> index a25ebe6cd503..e69f0946de29 100644
-> --- a/drivers/soc/ti/knav_dma.c
-> +++ b/drivers/soc/ti/knav_dma.c
-> @@ -402,7 +402,7 @@ static int of_channel_match_helper(struct device_no=
-de *np, const char *name,
->   * @name:	slave channel name
->   * @config:	dma configuration parameters
->   *
-> - * Returns pointer to appropriate DMA channel on success or error.
-> + * Returns pointer to appropriate DMA channel on success or NULL on er=
-ror.
->   */
+diff --git a/drivers/net/ethernet/ti/netcp.h b/drivers/net/ethernet/ti/netcp.h
+index 7007eb8bed36..b9cbd3b4a8a2 100644
+--- a/drivers/net/ethernet/ti/netcp.h
++++ b/drivers/net/ethernet/ti/netcp.h
+@@ -207,6 +207,11 @@ struct netcp_module {
+ 	int	(*del_vid)(void *intf_priv, int vid);
+ 	int	(*ioctl)(void *intf_priv, struct ifreq *req, int cmd);
+ 	int	(*set_rx_mode)(void *intf_priv, bool promisc);
++	int	(*hwtstamp_get)(void *intf_priv,
++				struct kernel_hwtstamp_config *cfg);
++	int	(*hwtstamp_set)(void *intf_priv,
++				struct kernel_hwtstamp_config *cfg,
++				struct netlink_ext_ack *extack);
+ 
+ 	/* used internally */
+ 	struct list_head	module_list;
+diff --git a/drivers/net/ethernet/ti/netcp_core.c b/drivers/net/ethernet/ti/netcp_core.c
+index 857820657bac..8c7b78d1fe36 100644
+--- a/drivers/net/ethernet/ti/netcp_core.c
++++ b/drivers/net/ethernet/ti/netcp_core.c
+@@ -1781,6 +1781,60 @@ static int netcp_ndo_stop(struct net_device *ndev)
+ 	return 0;
+ }
+ 
++static int netcp_ndo_hwtstamp_get(struct net_device *ndev,
++				  struct kernel_hwtstamp_config *config)
++{
++	struct netcp_intf *netcp = netdev_priv(ndev);
++	struct netcp_intf_modpriv *intf_modpriv;
++	struct netcp_module *module;
++	int err = -EOPNOTSUPP;
++
++	if (!netif_running(ndev))
++		return -EINVAL;
++
++	for_each_module(netcp, intf_modpriv) {
++		module = intf_modpriv->netcp_module;
++		if (!module->hwtstamp_get)
++			continue;
++
++		err = module->hwtstamp_get(intf_modpriv->module_priv, config);
++		break;
++	}
++
++	return err;
++}
++
++static int netcp_ndo_hwtstamp_set(struct net_device *ndev,
++				  struct kernel_hwtstamp_config *config,
++				  struct netlink_ext_ack *extack)
++{
++	struct netcp_intf *netcp = netdev_priv(ndev);
++	struct netcp_intf_modpriv *intf_modpriv;
++	struct netcp_module *module;
++	int ret = -1, err = -EOPNOTSUPP;
++
++	if (!netif_running(ndev))
++		return -EINVAL;
++
++	for_each_module(netcp, intf_modpriv) {
++		module = intf_modpriv->netcp_module;
++		if (!module->hwtstamp_set)
++			continue;
++
++		err = module->hwtstamp_set(intf_modpriv->module_priv, config,
++					   extack);
++		if ((err < 0) && (err != -EOPNOTSUPP)) {
++			NL_SET_ERR_MSG_WEAK_MOD(extack,
++						"At least one module failed to setup HW timestamps");
++			ret = err;
++		}
++		if (err == 0)
++			ret = err;
++	}
++
++	return (ret == 0) ? 0 : err;
++}
++
+ static int netcp_ndo_ioctl(struct net_device *ndev,
+ 			   struct ifreq *req, int cmd)
+ {
+@@ -1952,6 +2006,8 @@ static const struct net_device_ops netcp_netdev_ops = {
+ 	.ndo_tx_timeout		= netcp_ndo_tx_timeout,
+ 	.ndo_select_queue	= dev_pick_tx_zero,
+ 	.ndo_setup_tc		= netcp_setup_tc,
++	.ndo_hwtstamp_get	= netcp_ndo_hwtstamp_get,
++	.ndo_hwtstamp_set	= netcp_ndo_hwtstamp_set,
+ };
+ 
+ static int netcp_create_interface(struct netcp_device *netcp_device,
+diff --git a/drivers/net/ethernet/ti/netcp_ethss.c b/drivers/net/ethernet/ti/netcp_ethss.c
+index 55a1a96cd834..0ae44112812c 100644
+--- a/drivers/net/ethernet/ti/netcp_ethss.c
++++ b/drivers/net/ethernet/ti/netcp_ethss.c
+@@ -2591,20 +2591,26 @@ static int gbe_rxtstamp(struct gbe_intf *gbe_intf, struct netcp_packet *p_info)
+ 	return 0;
+ }
+ 
+-static int gbe_hwtstamp_get(struct gbe_intf *gbe_intf, struct ifreq *ifr)
++static int gbe_hwtstamp_get(void *intf_priv, struct kernel_hwtstamp_config *cfg)
+ {
+-	struct gbe_priv *gbe_dev = gbe_intf->gbe_dev;
+-	struct cpts *cpts = gbe_dev->cpts;
+-	struct hwtstamp_config cfg;
++	struct gbe_intf *gbe_intf = intf_priv;
++	struct gbe_priv *gbe_dev;
++	struct phy_device *phy;
++
++	gbe_dev = gbe_intf->gbe_dev;
+ 
+-	if (!cpts)
++	if (!gbe_dev->cpts)
++		return -EOPNOTSUPP;
++
++	phy = gbe_intf->slave->phy;
++	if (phy_has_hwtstamp(phy))
+ 		return -EOPNOTSUPP;
+ 
+-	cfg.flags = 0;
+-	cfg.tx_type = gbe_dev->tx_ts_enabled ? HWTSTAMP_TX_ON : HWTSTAMP_TX_OFF;
+-	cfg.rx_filter = gbe_dev->rx_ts_enabled;
++	cfg->flags = 0;
++	cfg->tx_type = gbe_dev->tx_ts_enabled ? HWTSTAMP_TX_ON : HWTSTAMP_TX_OFF;
++	cfg->rx_filter = gbe_dev->rx_ts_enabled;
+ 
+-	return copy_to_user(ifr->ifr_data, &cfg, sizeof(cfg)) ? -EFAULT : 0;
++	return 0;
+ }
+ 
+ static void gbe_hwtstamp(struct gbe_intf *gbe_intf)
+@@ -2637,19 +2643,23 @@ static void gbe_hwtstamp(struct gbe_intf *gbe_intf)
+ 	writel(ctl,    GBE_REG_ADDR(slave, port_regs, ts_ctl_ltype2));
+ }
+ 
+-static int gbe_hwtstamp_set(struct gbe_intf *gbe_intf, struct ifreq *ifr)
++static int gbe_hwtstamp_set(void *intf_priv, struct kernel_hwtstamp_config *cfg,
++			    struct netlink_ext_ack *extack)
+ {
+-	struct gbe_priv *gbe_dev = gbe_intf->gbe_dev;
+-	struct cpts *cpts = gbe_dev->cpts;
+-	struct hwtstamp_config cfg;
++	struct gbe_intf *gbe_intf = intf_priv;
++	struct gbe_priv *gbe_dev;
++	struct phy_device *phy;
+ 
+-	if (!cpts)
++	gbe_dev = gbe_intf->gbe_dev;
++
++	if (!gbe_dev->cpts)
+ 		return -EOPNOTSUPP;
+ 
+-	if (copy_from_user(&cfg, ifr->ifr_data, sizeof(cfg)))
+-		return -EFAULT;
++	phy = gbe_intf->slave->phy;
++	if (phy_has_hwtstamp(phy))
++		return phy->mii_ts->hwtstamp(phy->mii_ts, cfg, extack);
+ 
+-	switch (cfg.tx_type) {
++	switch (cfg->tx_type) {
+ 	case HWTSTAMP_TX_OFF:
+ 		gbe_dev->tx_ts_enabled = 0;
+ 		break;
+@@ -2660,7 +2670,7 @@ static int gbe_hwtstamp_set(struct gbe_intf *gbe_intf, struct ifreq *ifr)
+ 		return -ERANGE;
+ 	}
+ 
+-	switch (cfg.rx_filter) {
++	switch (cfg->rx_filter) {
+ 	case HWTSTAMP_FILTER_NONE:
+ 		gbe_dev->rx_ts_enabled = HWTSTAMP_FILTER_NONE;
+ 		break;
+@@ -2668,7 +2678,7 @@ static int gbe_hwtstamp_set(struct gbe_intf *gbe_intf, struct ifreq *ifr)
+ 	case HWTSTAMP_FILTER_PTP_V1_L4_SYNC:
+ 	case HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ:
+ 		gbe_dev->rx_ts_enabled = HWTSTAMP_FILTER_PTP_V1_L4_EVENT;
+-		cfg.rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_EVENT;
++		cfg->rx_filter = HWTSTAMP_FILTER_PTP_V1_L4_EVENT;
+ 		break;
+ 	case HWTSTAMP_FILTER_PTP_V2_L4_EVENT:
+ 	case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
+@@ -2680,7 +2690,7 @@ static int gbe_hwtstamp_set(struct gbe_intf *gbe_intf, struct ifreq *ifr)
+ 	case HWTSTAMP_FILTER_PTP_V2_SYNC:
+ 	case HWTSTAMP_FILTER_PTP_V2_DELAY_REQ:
+ 		gbe_dev->rx_ts_enabled = HWTSTAMP_FILTER_PTP_V2_EVENT;
+-		cfg.rx_filter = HWTSTAMP_FILTER_PTP_V2_EVENT;
++		cfg->rx_filter = HWTSTAMP_FILTER_PTP_V2_EVENT;
+ 		break;
+ 	default:
+ 		return -ERANGE;
+@@ -2688,7 +2698,7 @@ static int gbe_hwtstamp_set(struct gbe_intf *gbe_intf, struct ifreq *ifr)
+ 
+ 	gbe_hwtstamp(gbe_intf);
+ 
+-	return copy_to_user(ifr->ifr_data, &cfg, sizeof(cfg)) ? -EFAULT : 0;
++	return 0;
+ }
+ 
+ static void gbe_register_cpts(struct gbe_priv *gbe_dev)
+@@ -2745,12 +2755,15 @@ static inline void gbe_unregister_cpts(struct gbe_priv *gbe_dev)
+ {
+ }
+ 
+-static inline int gbe_hwtstamp_get(struct gbe_intf *gbe_intf, struct ifreq *req)
++static inline int gbe_hwtstamp_get(struct gbe_intf *gbe_intf,
++				   struct kernel_hwtstamp_config *cfg)
+ {
+ 	return -EOPNOTSUPP;
+ }
+ 
+-static inline int gbe_hwtstamp_set(struct gbe_intf *gbe_intf, struct ifreq *req)
++static inline int gbe_hwtstamp_set(struct gbe_intf *gbe_intf,
++				   struct kernel_hwtstamp_config *cfg,
++				   struct netlink_ext_ack *extack)
+ {
+ 	return -EOPNOTSUPP;
+ }
+@@ -2816,15 +2829,6 @@ static int gbe_ioctl(void *intf_priv, struct ifreq *req, int cmd)
+ 	struct gbe_intf *gbe_intf = intf_priv;
+ 	struct phy_device *phy = gbe_intf->slave->phy;
+ 
+-	if (!phy_has_hwtstamp(phy)) {
+-		switch (cmd) {
+-		case SIOCGHWTSTAMP:
+-			return gbe_hwtstamp_get(gbe_intf, req);
+-		case SIOCSHWTSTAMP:
+-			return gbe_hwtstamp_set(gbe_intf, req);
+-		}
+-	}
+-
+ 	if (phy)
+ 		return phy_mii_ioctl(phy, req, cmd);
+ 
+@@ -3824,6 +3828,8 @@ static struct netcp_module gbe_module = {
+ 	.add_vid	= gbe_add_vid,
+ 	.del_vid	= gbe_del_vid,
+ 	.ioctl		= gbe_ioctl,
++	.hwtstamp_get	= gbe_hwtstamp_get,
++	.hwtstamp_set	= gbe_hwtstamp_set,
+ };
+ 
+ static struct netcp_module xgbe_module = {
+@@ -3841,6 +3847,8 @@ static struct netcp_module xgbe_module = {
+ 	.add_vid	= gbe_add_vid,
+ 	.del_vid	= gbe_del_vid,
+ 	.ioctl		= gbe_ioctl,
++	.hwtstamp_get	= gbe_hwtstamp_get,
++	.hwtstamp_set	= gbe_hwtstamp_set,
+ };
+ 
+ static int __init keystone_gbe_init(void)
+-- 
+2.47.3
 
-Minor nit: you could make this a proper kdoc returns by using "Return:"
-or "Returns:" here to introduce this as a section instead of just a comme=
-nt.
-
-That would fix a kdoc warning too.
-
---------------Zkbr1zKtlw104y1YSrIu0Grw--
-
---------------E3pF8tRUX0G0W28bhprvxcH6
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wnsEABYIACMWIQQgQFSp1zOQVirsQx5qll0+bw8o6AUCaQJ0GgUDAAAAAAAKCRBqll0+bw8o6M+A
-AQDKfWPccZsR2hCXn4NOzWK3cOn/dbUim0Wc3GUy5U9QlgEAuBYXuE0rWSfSnPOHrjY+sb0A23qu
-1G6THFKUt7jBbQA=
-=qOBU
------END PGP SIGNATURE-----
-
---------------E3pF8tRUX0G0W28bhprvxcH6--
 
