@@ -1,63 +1,61 @@
-Return-Path: <netdev+bounces-234078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 831E4C1C687
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 18:19:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 803A1C1C774
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 18:35:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91978623040
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 16:50:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D941427035
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 16:56:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BADA2F5484;
-	Wed, 29 Oct 2025 16:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1BEF3358AE;
+	Wed, 29 Oct 2025 16:56:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T6Woaoc4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hsim+f4U"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E87922D24B4;
-	Wed, 29 Oct 2025 16:50:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DE672F5484;
+	Wed, 29 Oct 2025 16:56:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761756620; cv=none; b=fLyqJBIUSfwzjhySHK8lDfWOkJm05MwhrWrH83cnPlDJ+NQVnNe9a953f1XfNyC3rQIighhrPpQ9/G3cDBNftAjLHbLskynNiv5ozcF50lRTfXoF7K8l/4Rg/C23M9Oasc0P6Zr6y6Q8rxnKQgHanIj1N5XX7zQM1T2j7Q2RCaM=
+	t=1761756988; cv=none; b=h+9khaJfqlkIfs+YAtFF5kcqMzG1lZBl+wn1vdn9cwuI4DIbbLF8GVeRDYbAy8RduVsBK7uqBExAf5MMkTUmXuBlwgeaOiCGLMU2McE4Bk2K2NMgLDth5Y1Q2zjqXrshl50kSMyPab56cPG/p7bxzZXojAm+ctMu/2O0n1T7hXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761756620; c=relaxed/simple;
-	bh=hYRW+X8pMcb2ZzVrrEksNmJaTmIrkeo60sx4OKvUG/w=;
+	s=arc-20240116; t=1761756988; c=relaxed/simple;
+	bh=Oa13GPH1llD3qXCFZYwJ2bGtThuhGwzIJ6GZwuWlg8M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A+PgV/PiCUp0oSvQllIwPavzUItF2sC/zCOQGB0Q5gN6YrN2aqgNDnUJA+8o7tSvkx1KS3G2SoE5eyT28yY5FhaCinWOIfOlzDSf3729i+FQBloGKz5jas00F3/Nd8Bit9EJRKxdhn9Fe/vGSqscmPZPK0ystpbvPnUPS2y65m8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T6Woaoc4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D76D7C4CEF8;
-	Wed, 29 Oct 2025 16:50:16 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=n5n7EepMm382yJy87Pyfj7zUdrbaaUymAp1lM3h1ZJqNypN41AdXoMoo8onlm33EzEZYi6A34nk2yD3+s3dQ9v2tZdM2d93J3DYsTVtCUDfrKxPV5xpsWwlPLAeelUJJQ4UAHNgEWM7fZYyHli5hqMDR/A+hGPU6NyOcep6dZXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hsim+f4U; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49B0BC4CEF7;
+	Wed, 29 Oct 2025 16:56:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761756619;
-	bh=hYRW+X8pMcb2ZzVrrEksNmJaTmIrkeo60sx4OKvUG/w=;
+	s=k20201202; t=1761756988;
+	bh=Oa13GPH1llD3qXCFZYwJ2bGtThuhGwzIJ6GZwuWlg8M=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=T6Woaoc4Cq9YOMkKIKv2HpuqXctdbQekZkN35NcSt4n5u61/TX//refZ5Fl0ZfxPq
-	 rvlicEr42rRJWnckoASNCLBFdHLsHL9rD+DphTWfa/VaRLsba7cTXq3qjwB84wDmtZ
-	 VUPeLMyN84QltryqfVHceXniiOOimw9pKgtojngcalu6rc+VtqJcjcRyWef1o1+DkP
-	 Kdnc6ZqT/KdUchdG2390Fp4Ls337BjjTde0EnKkC8HyR6xDSTr5S2LBtHQcfgQQHpw
-	 wdXPi49mF7OeFM2mZWkAo7iVbX0H84m7e5FPsQy7y4mpiTr7Mih21f5rXCgxw9pjCL
-	 zZhRS5gb6Sy9g==
-Date: Wed, 29 Oct 2025 16:50:14 +0000
+	b=hsim+f4Us6tf7GPVHovGBJalZUC/7lmoNPKAqpsZOw3sb6MzpZR/LLR1SBhHjAjty
+	 +o3l88CIMGAgzkLgw7fP/AdMryqw9z1gBr4xYA6XMCakvAehy4YRrxmB9nfC9AYs+Q
+	 TmT3/LQ5bcSwA+W7OLsdz2WH+BW15ug+zN9Tt2DJZm4HIGs1kP0nj4PHHIUl0Jb/Q5
+	 F2eMPGjqQzVr8R3SQqNU47Lp/mVpnMF7/4rogSNZZjbNWtte0VHnLsRF8cULI1mdNN
+	 gb9422zro3HI75h4cy0BqsI1BR0H2kVRz7LIn4QjKdl/JxWj9lGhYanpA/kUtS681m
+	 klC0DZnCtQzXQ==
+Date: Wed, 29 Oct 2025 16:56:24 +0000
 From: Simon Horman <horms@kernel.org>
-To: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Muhammad Usama Anjum <usama.anjum@collabora.com>
-Subject: Re: [PATCH v2] selftest: net: fix socklen_t type mismatch in
- sctp_collision test
-Message-ID: <aQJFxrzPh-87QU5K@horms.kernel.org>
-References: <20251028172947.53153-1-ankitkhushwaha.linux@gmail.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next 02/12] selftests/vsock: make wait_for_listener()
+ work even if pipefail is on
+Message-ID: <aQJHOIGW_bIzBpYc@horms.kernel.org>
+References: <20251022-vsock-selftests-fixes-and-improvements-v1-0-edeb179d6463@meta.com>
+ <20251022-vsock-selftests-fixes-and-improvements-v1-2-edeb179d6463@meta.com>
+ <aP-iXJQVPBCjfPHi@horms.kernel.org>
+ <aP+yKDYZR6+/kzI2@devvm11784.nha0.facebook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,33 +64,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251028172947.53153-1-ankitkhushwaha.linux@gmail.com>
+In-Reply-To: <aP+yKDYZR6+/kzI2@devvm11784.nha0.facebook.com>
 
-On Tue, Oct 28, 2025 at 10:59:47PM +0530, Ankit Khushwaha wrote:
-> Socket APIs like recvfrom(), accept(), and getsockname() expect socklen_t*
-> arg, but tests were using int variables. This causes -Wpointer-sign 
-> warnings on platforms where socklen_t is unsigned.
+On Mon, Oct 27, 2025 at 10:55:52AM -0700, Bobby Eshleman wrote:
+> On Mon, Oct 27, 2025 at 04:48:28PM +0000, Simon Horman wrote:
+> > On Wed, Oct 22, 2025 at 06:00:06PM -0700, Bobby Eshleman wrote:
+> > > From: Bobby Eshleman <bobbyeshleman@meta.com>
+> > > 
+> > > Save/restore pipefail to not mistakenly trip the if-condition
+> > > in wait_for_listener().
+> > > 
+> > > awk doesn't gracefully handle SIGPIPE with a non-zero exit code, so grep
+> > > exiting upon finding a match causes false-positives when the pipefail
+> > > option is used. This will enable pipefail usage, so that we can losing
+> > > failures when piping test output into log() functions.
+> > > 
+> > > Fixes: a4a65c6fe08b ("selftests/vsock: add initial vmtest.sh for vsock")
+> > > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+> > > ---
+> > >  tools/testing/selftests/vsock/vmtest.sh | 12 ++++++++++++
+> > >  1 file changed, 12 insertions(+)
+> > > 
+> > > diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
+> > > index 561600814bef..ec3ff443f49a 100755
+> > > --- a/tools/testing/selftests/vsock/vmtest.sh
+> > > +++ b/tools/testing/selftests/vsock/vmtest.sh
+> > > @@ -243,6 +243,7 @@ wait_for_listener()
+> > >  	local port=$1
+> > >  	local interval=$2
+> > >  	local max_intervals=$3
+> > > +	local old_pipefail
+> > >  	local protocol=tcp
+> > >  	local pattern
+> > >  	local i
+> > > @@ -251,6 +252,13 @@ wait_for_listener()
+> > >  
+> > >  	# for tcp protocol additionally check the socket state
+> > >  	[ "${protocol}" = "tcp" ] && pattern="${pattern}0A"
+> > > +
+> > > +	# 'grep -q' exits on match, sending SIGPIPE to 'awk', which exits with
+> > > +	# an error, causing the if-condition to fail when pipefail is set.
+> > > +	# Instead, temporarily disable pipefail and restore it later.
+> > > +	old_pipefail=$(set -o | awk '/^pipefail[[:space:]]+(on|off)$/{print $2}')
+> > > +	set +o pipefail
+> > > +
+> > >  	for i in $(seq "${max_intervals}"); do
+> > >  		if awk '{print $2" "$4}' /proc/net/"${protocol}"* | \
+> > >  		   grep -q "${pattern}"; then
+> > 
+> > Hi Bobby,
+> > 
+> > I agree this is a problem. But I'm wondering if you considered
+> > moving the pattern matching into the awk script. I'm no awk expert.
+> > But suspect that would lead to a more elegant solution.
+> > 
 > 
-> Change the variable type from int to socklen_t to resolve the warning and
-> ensure type safety across platforms.
+> I bet you are right.
 > 
-> warning fixed:
+> Playing around with awk, I find that this seems to work:
 > 
-> sctp_collision.c:62:70: warning: passing 'int *' to parameter of 
-> type 'socklen_t *' (aka 'unsigned int *') converts between pointers to 
-> integer types with different sign [-Wpointer-sign]
->    62 |                 ret = recvfrom(sd, buf, sizeof(buf), 
-> 									0, (struct sockaddr *)&daddr, &len);
->       |                                                           ^~~~
-> /usr/include/sys/socket.h:165:27: note: passing argument to 
-> parameter '__addr_len' here
->   165 |                          socklen_t *__restrict __addr_len);
->       |                                                ^
+> $ pattern=":$(printf '%04X' ${port}) 0A"
+> $ awk -v pattern="${pattern}" 'BEGIN {rc=1} $2" "$4 ~ pattern {rc=0}
+> 	END {exit rc}' /proc/net/tcp && echo FOUND
 > 
-> Reviewed-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
-> Signed-off-by: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
+> I think it beats doing the save/restore on pipefail?
 
-Thanks for the update.
-
-Reviewed-by: Simon Horman <horms@kernel.org>
+Yes, I think so.
 
