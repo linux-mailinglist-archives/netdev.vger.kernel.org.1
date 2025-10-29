@@ -1,94 +1,89 @@
-Return-Path: <netdev+bounces-233886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEC0AC1A053
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 12:30:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1D2CC1A22F
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 13:08:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 73D15357FBD
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 11:30:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EED04201B6
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 12:08:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FBD5339B2D;
-	Wed, 29 Oct 2025 11:28:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFFEE337B92;
+	Wed, 29 Oct 2025 12:08:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="As0ogIMo";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Zo4aZ89o"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="lkje4u8J"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BDA3335091;
-	Wed, 29 Oct 2025 11:28:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB6F031E0EF
+	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 12:07:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761737338; cv=none; b=c3CCtnkvNnrH6FheG4IqFnsEPQltsprDPTLDOcU1VU6s5sP55xzsF51Qkm8l3s5kk3ABZKg6B/EbJkMx1z8da/eLQyGSD2juMw1ZHSQQrlJuip0A3XfnZjtBtGmQJUNNHo1Z5eT59P/MUVcqp6u51SlxBhjsWAKdiQ4xE1wiO4I=
+	t=1761739681; cv=none; b=UeW6wYqMCYPxXEyNwOXJkRKC76MdoRwHDeQvPba7E9cUYFz/g2Lfjxx+x9LfYViRG2+G/izRmgdHVjOhLm0tZkkA0HzlTH1Q8JOBit/0yQx47IJNLYoFhsqzBfEFBFal+tfbIgTK2klUBDCAptwZdflt4UeUz5wFH53aPxc7/00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761737338; c=relaxed/simple;
-	bh=Mv+1E8etoCgDP3bz8A9b50Vpx0C+KRGIBeAjz0H3eKU=;
+	s=arc-20240116; t=1761739681; c=relaxed/simple;
+	bh=YBIjbAkhGGp2DY/DK7FxV7Az/58+uISZFS9I6yvFkgw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fvA1kSO81ypa8AK4S1IaKFCXjf0LOEmGCnATPzUi9Qo6Mn2dl9gQcvJqHP9XMzBWrraxy/G0dEEUu4PhG7xxmNUY+puuFFRnqNvMzbC2GzUmt1OpD/ENxy2FMwiCGV2wizZmtf1rqEYbtr05//sfGsnmGCMjHgHpmslpBXUULWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=As0ogIMo; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Zo4aZ89o; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Wed, 29 Oct 2025 12:28:49 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1761737330;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Mv+1E8etoCgDP3bz8A9b50Vpx0C+KRGIBeAjz0H3eKU=;
-	b=As0ogIMoE2eFOvZ0RbnoHyeQrwhm/YIRIoiFghUv9xvF21tdzFz4VII3wocV0dimToTlSk
-	pKXlkOsSs0YqFvWWJWG6unAd0XW3SOh7timMutU3uUetvaIcb12+RF7THehFyTJTleSwqD
-	jqTEaPq47AkBmAIN/XCSwxD0K4q4AwLzxnFeXh+utRBYj8P1hrKvaua0GX36LXakKbTtPa
-	f3D9XhqtHWcffhXunmK4h3X3B4JhiA5Lgou3ksd8B4RVw0kgbJCqatnesxUpP6WpKmXqJT
-	GyK2zBjULRz2gaocI63Ov4YD0H036E1WOLqC3LyIuwIbJrAkAchizajzesMAvA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1761737330;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Mv+1E8etoCgDP3bz8A9b50Vpx0C+KRGIBeAjz0H3eKU=;
-	b=Zo4aZ89oxN92/246kUF9Gw2VR0NZsbpJ4SZkzfgAY7PVmQp533w21Z8pB5ehRvk/Zb6SRM
-	6Cr46N2f02NfRxAA==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Sahil Chandna <chandna.sahil@gmail.com>
-Cc: Yonghong Song <yonghong.song@linux.dev>,
-	syzbot+b0cff308140f79a9c4cb@syzkaller.appspotmail.com,
-	andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
-	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com,
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org,
-	linux-kernel@vger.kernel.org, listout@listout.xyz,
-	martin.lau@linux.dev, netdev@vger.kernel.org, sdf@fomichev.me,
-	song@kernel.org, syzkaller-bugs@googlegroups.com,
-	linux-rt-devel@lists.linux.dev
-Subject: Re: [syzbot] [bpf?] WARNING in bpf_bprintf_prepare (3)
-Message-ID: <20251029112849.JpP8SlBO@linutronix.de>
-References: <68f6a4c8.050a0220.1be48.0011.GAE@google.com>
- <14371cf8-e49a-4c68-b763-fa7563a9c764@linux.dev>
- <aPklOxw0W-xUbMEI@chandna.localdomain>
- <8dd359dd-b42f-4676-bb94-07288b38fac1@linux.dev>
- <aP5_JbddrpnDs-WN@chandna.localdomain>
- <95e1fd95-896f-4d33-956f-a0ef0e0f152c@linux.dev>
- <aQH5EtKBbklfH0Wq@chandna.localdomain>
+	 Content-Type:Content-Disposition:In-Reply-To; b=GmHSQgqxVnk3xjRrqpNUzps3R3nXTf6S8V39BBO2Ii3uFsXeDO+GgcyD0cQpHp+D0w/kkXvOQ8Kx7JZeR3wWna4JYWK3JzOHlif6pwdzxHcCKcko7p3nIrFqm6SxNp6pUnUamXFOa2CiGaf7BR1HClF56rRh4gWxVOS/kdF6JV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=lkje4u8J; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=bapFYtojQQH06sqvAiPT2KvyrRhSWdKVCMzfs7j2LOA=; b=lkje4u8Jj5UM2OG3YFh8AWZ29n
+	cypiFFrNToeqAB1ICQYK16YRcigNsmXs6XLrGBOnpl4iqsbqpc9kCMqnUlJbLDHn5tpwLJlvYTRuK
+	zEcsCTTaWRawYYPNX7xnDIOeV+J01mekxC9utaKAv+SBy69o/SgVF0/D0whpQbeeTto4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vE4xj-00COnU-Lh; Wed, 29 Oct 2025 13:07:35 +0100
+Date: Wed, 29 Oct 2025 13:07:35 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Yi Cong <cong.yi@linux.dev>
+Cc: Frank.Sae@motor-comm.com, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org,
+	Yi Cong <yicong@kylinos.cn>
+Subject: Re: [PATCH net-next 1/2] net: phy: motorcomm: correct the default rx
+ delay config for the rgmii
+Message-ID: <94ef8610-dc90-4d4a-a607-17ed2ced06c6@lunn.ch>
+References: <20251029030043.39444-1-cong.yi@linux.dev>
+ <20251029030043.39444-2-cong.yi@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aQH5EtKBbklfH0Wq@chandna.localdomain>
+In-Reply-To: <20251029030043.39444-2-cong.yi@linux.dev>
 
-On 2025-10-29 16:52:58 [+0530], Sahil Chandna wrote:
-> Shall I submit a patch with your suggested changes ?
+On Wed, Oct 29, 2025 at 11:00:42AM +0800, Yi Cong wrote:
+> From: Yi Cong <yicong@kylinos.cn>
+> 
+> According to the dataSheet, rx delay default value is set to 0.
 
-would you mind waiting a bit?
+You need to be careful here, or you will break working boards. Please
+add to the commit message why this is safe.
 
-> Regards,
-> Sahil
+Also, motorcomm,yt8xxx.yaml says:
 
-Sebastian
+  rx-internal-delay-ps:
+    description: |
+      RGMII RX Clock Delay used only when PHY operates in RGMII mode with
+      internal delay (phy-mode is 'rgmii-id' or 'rgmii-rxid') in pico-seconds.
+    enum: [ 0, 150, 300, 450, 600, 750, 900, 1050, 1200, 1350, 1500, 1650,
+            1800, 1900, 1950, 2050, 2100, 2200, 2250, 2350, 2500, 2650, 2800,
+            2950, 3100, 3250, 3400, 3550, 3700, 3850, 4000, 4150 ]
+    default: 1950
+
+    Andrew
+
+---
+pw-bot: cr
 
