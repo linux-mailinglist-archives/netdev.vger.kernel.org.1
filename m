@@ -1,102 +1,81 @@
-Return-Path: <netdev+bounces-233857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E882CC1948F
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 10:05:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 631CAC194F5
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 10:10:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A5FD1AA3C0A
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 09:02:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B6664032D9
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 09:00:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 034D32DC355;
-	Wed, 29 Oct 2025 09:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E48E82DF6F8;
+	Wed, 29 Oct 2025 09:00:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WzQ19/Tk"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="d5sgSfoD"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F3502E2663
-	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 09:01:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9501C2EC0B5;
+	Wed, 29 Oct 2025 09:00:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761728518; cv=none; b=X8G6cboeiXrVSYlB0kP80IiiDZvqZgijBoLoPXLJQF8gp0dpLblNs0sszUjQ3TEgnio+c76Fpjpv2sMylhTyQ3CmXcJQNOS4YlQMK464bIkRMXw0jt0KC8qxr6P2Yy3n8HeH0X83H0hZI0OXLVJG6d5pE3nncVYgTebJiBaSoek=
+	t=1761728437; cv=none; b=ao9Yn9I6DdiEl0BTrlEd8lPMBMyvFz6SXutlyV1jO1ztRbg2v68BTIJhB9/gxIhuxiiJx54LtaE21bh+HxvFqvVlKXV/2bKbGHnASwEgVS75SWtAjmGtVvjZAOg8UoJbvft/KzP0VuprqqxSwrkXtqx+bBbtYPJYHMVbXEQJJ4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761728518; c=relaxed/simple;
-	bh=0U0kFLASix37zELIkWNxq8vUqzlq9j+qqfasMEzbtCU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Mo79OqARUrlfaCK2QFY5rel1O6ZWOVvu6FrXXbyEaFRfNfz8J/3TD8tCBcpxnsznfV7hkyG3Ltgz1whLhNnJtLiYx7GI6ZiIpNSveVW0sm8cHaejXR063VyEy0RXFkBy52NR1SATrB5JDX0lb0/j+huWXlNRk87AcOiU8VKukW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WzQ19/Tk; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761728516;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0U0kFLASix37zELIkWNxq8vUqzlq9j+qqfasMEzbtCU=;
-	b=WzQ19/TkYND7jhNUeVENLQnaScwLJamnqRbgUmcsv2M9qYWhW8cDWvJEemed6eudZIWvHm
-	wCW8rjUvnLgdhmlZq+mXjBCU03t0pspBVAUVEAoE3KuXLCPWCW1z9OLxgKcIEvZlRgAxfr
-	wiQk+ONKtYjwBGvaxOh/peSSpijwGkg=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-131-hamXRya4NAGKj1rem8jcWg-1; Wed, 29 Oct 2025 05:01:53 -0400
-X-MC-Unique: hamXRya4NAGKj1rem8jcWg-1
-X-Mimecast-MFC-AGG-ID: hamXRya4NAGKj1rem8jcWg_1761728512
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-b6d546f68a0so648464766b.1
-        for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 02:01:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761728512; x=1762333312;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0U0kFLASix37zELIkWNxq8vUqzlq9j+qqfasMEzbtCU=;
-        b=M8GibEpz5m9LOyyuzrczZdPsRtAd+m7ttyWs8lHCxsdrsivvNNDs0n5Ws5VKW3VSS2
-         uvnjzf6ppcg/BOgWXJZiP3s0MuPRDWj8zWfoci7312SkSRsT+Tew6/6px6upy64Y8sWx
-         vBGSbpsOviYHV+RFtj4zugaUJIUyYH3cUrc7lfFdBAa8hh0xdHQpBxH9fHeHVVCyG0rM
-         YUbdOKCD+BvK8zAaKC/kwn++lJD5VtYKSEj35BfEqR9cRwXg8cASSaulp9P7Qd4qN97R
-         ryHQMx4LsOGwwMhAcSwP7setfECv2+v/MCuuSsijzEbi9YOHKeeYRUzjGfCp2ZxSPM9I
-         D+Xw==
-X-Forwarded-Encrypted: i=1; AJvYcCUx/FCzyVYVc2eoZsJlWJO3GLLbAenjCi2W8S6+PTNtzPDPQAY4GH9LY1abBlD4X0G7Cn2E65o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFEXFrmv9tBcR0DbvIvN5/H2RjP9ELd6QIR7wX8r3VKiQ2P1X3
-	9DJCLF8lFd8VSoBN7Od36peroNYqxuDFWS3abIQjCQHvnaTy9v63nt3dZt20D/kE9cBjpuaXVSE
-	ZjAi5/1HWwNBwQXPaOQkfaDi98VkciIyoGZHrhdZHoxWI8+P6aHnhUI0Wxw==
-X-Gm-Gg: ASbGncviUZJ/Nihkn8jp7gYvp5V3u2tsPR13ZZyV/5/8WxxfiVmXUeoljQQXpUlyKlK
-	ybV0q4JXX7xMLT0RyGkXn4PCSzUqlgpomgwEWU0+laEfmqjiNXeo0fHEFmbLn6+fKDpxOQxBh3/
-	t13pkuSScXxBrHCIsetVAoixSZaQHlUD5FhODLqzLqZy1rVPMsSXI6TDnpSUwrowdOZlbpicBcB
-	D+mW0GhIASevrBaVMKq0ZMMo41WdfOz91q35sHubOwNn708hK9FYORR608qh3cEYJF1gaH2VPMC
-	bHtbqDtrxrePkQJpN/SfwOtNOW1AYLEClZJ1QZ8Z2YHOtX7IklSfnC0BSkc8aeqe5OQahZ4O2SJ
-	tE82EW3e6gNHKtk6BWRUH7ew=
-X-Received: by 2002:a17:907:74e:b0:b6d:961e:fbcd with SMTP id a640c23a62f3a-b703d55d4aamr202755566b.50.1761728512239;
-        Wed, 29 Oct 2025 02:01:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFMkTxdQ+/5aKXOuyyh5AS0UFPHYZnXvO/Q6mw+JBd9i8Az/ovnrbFoR0xn/NRL22/zzcs1Fw==
-X-Received: by 2002:a17:907:74e:b0:b6d:961e:fbcd with SMTP id a640c23a62f3a-b703d55d4aamr202751666b.50.1761728511716;
-        Wed, 29 Oct 2025 02:01:51 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b6d853eeea7sm1373575066b.47.2025.10.29.02.01.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Oct 2025 02:01:50 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 623092EAE5D; Wed, 29 Oct 2025 10:01:48 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Adrian Moreno <amorenoz@redhat.com>, netdev@vger.kernel.org
-Cc: kuba@kernel.org, nicolas.dichtel@6wind.com, Adrian Moreno
- <amorenoz@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Xiao Liang <shaw.leon@gmail.com>,
- Cong Wang <cong.wang@bytedance.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] rtnetlink: honor RTEXT_FILTER_SKIP_STATS in
- IFLA_STATS
-In-Reply-To: <20251029080154.3794720-1-amorenoz@redhat.com>
-References: <20251029080154.3794720-1-amorenoz@redhat.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Wed, 29 Oct 2025 10:01:48 +0100
-Message-ID: <875xbydqtf.fsf@toke.dk>
+	s=arc-20240116; t=1761728437; c=relaxed/simple;
+	bh=r+8AkXtHvMdBuc5ddtmrYiAIeDBwDa/C1wlavh7P2cY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bLcnWC3XF1oyiicPH/hoAy8ydm8xMgKnB6KvVXfpHeIE9Xw9gaTwsbFDacJaCUeot2SchMBOYno5Ab590g0zzH+644WV87bkNsavW6328lrHyZjpG+XHBuZcFSJobPIRmBkA4PqWSA64mERR3irXn1Zq1YYrmIN0ybD92cRNKfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=d5sgSfoD; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=zsXgaZ1WpsggfrTMGBX3c0/kSEKjs6qv8khvpgW4L/Q=; b=d5sgSfoD66+VVXT0M/tWTdKuck
+	pvi43DUOd0EQYyYKbSXK2pQnAnl04cvG20GRDI+Ho7eYwyTZlZu6ld5S1LtnNiLwi8o7NK8/kSY23
+	cKAJm1yBNu4H0U4qcPJ/6Eg28DY5RIjIFKb9d+J02BKggdIRaEKUTEuL/AV9i+iua+iuZl4jdQnzV
+	TNiUmBnnMXj5/d3wcDMPn1qSr3RmuG1Uz/XX/z/f3B8SqEuplu4j2UhhtQq4M+LGPZh4AMyWQ/BSv
+	mBSanHh1dx1VlJ8tp0EQkRQe9FbViaz9cqR4OOourohrKRLlCVsEyYyQGFNPklsyunj/fb0M4PMzT
+	Idcx7tlg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43710)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vE22O-0000000048E-0rrQ;
+	Wed, 29 Oct 2025 09:00:12 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vE22I-000000007OI-0McV;
+	Wed, 29 Oct 2025 09:00:06 +0000
+Date: Wed, 29 Oct 2025 09:00:05 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Yanteng Si <si.yanteng@linux.dev>
+Cc: Yao Zi <ziyao@disroot.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Philipp Stanner <phasta@kernel.org>,
+	Tiezhu Yang <yangtiezhu@loongson.cn>,
+	Qunqin Zhao <zhaoqunqin@loongson.cn>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Furong Xu <0x1207@gmail.com>,
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+	Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/3] net: stmmac: Add generic suspend/resume
+ helper for PCI-based controllers
+Message-ID: <aQHXlbDRAu76m5by@shell.armlinux.org.uk>
+References: <20251028154332.59118-1-ziyao@disroot.org>
+ <20251028154332.59118-2-ziyao@disroot.org>
+ <aQDoZaET4D64KfQA@shell.armlinux.org.uk>
+ <91de05f5-3475-45eb-bbf7-162365186297@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,28 +83,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <91de05f5-3475-45eb-bbf7-162365186297@linux.dev>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Adrian Moreno <amorenoz@redhat.com> writes:
+On Wed, Oct 29, 2025 at 10:27:18AM +0800, Yanteng Si wrote:
+> 在 2025/10/28 下午11:59, Russell King (Oracle) 写道:
+> > On Tue, Oct 28, 2025 at 03:43:30PM +0000, Yao Zi wrote:
+> > > Most glue driver for PCI-based DWMAC controllers utilize similar
+> > > platform suspend/resume routines. Add a generic implementation to reduce
+> > > duplicated code.
+> > > 
+> > > Signed-off-by: Yao Zi <ziyao@disroot.org>
+> > > ---
+> > >   drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  2 +
+> > >   .../net/ethernet/stmicro/stmmac/stmmac_main.c | 37 +++++++++++++++++++
+> > I would prefer not to make stmmac_main.c even larger by including bus
+> > specific helpers there. We already have stmmac_pltfm.c for those which
+> > use struct platform_device. The logical name would be stmmac_pci.c, but
+> > that's already taken by a driver.
+> > 
+> > One way around that would be to rename stmmac_pci.c to dwmac-pci.c
+> > (glue drivers tend to be named dwmac-foo.c) and then re-use
+> > stmmac_pci.c for PCI-related stuff in the same way that stmmac_pltfm.c
+> > is used.
+> > 
+> > Another idea would be stmmac_libpci.c.
+> 
+> I also don't want stmmac_main.c to grow larger, and I prefer
+> stmmac_libpci.c instead. Another approach - maybe we can
+> keep these helper functions in stmmac_pci.c and just declare
+> them as extern where needed?
 
-> Gathering interface statistics can be a relatively expensive operation
-> on certain systems as it requires iterating over all the cpus.
->
-> RTEXT_FILTER_SKIP_STATS was first introduced [1] to skip AF_INET6
-> statistics from interface dumps and it was then extended [2] to
-> also exclude IFLA_VF_INFO.
->
-> The semantics of the flag does not seem to be limited to AF_INET
-> or VF statistics and having a way to query the interface status
-> (e.g: carrier, address) without retrieving its statistics seems
-> reasonable. So this patch extends the use RTEXT_FILTER_SKIP_STATS
-> to also affect IFLA_STATS.
->
-> [1] https://lore.kernel.org/all/20150911204848.GC9687@oracle.com/
-> [2] https://lore.kernel.org/all/20230611105108.122586-1-gal@nvidia.com/
->
-> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+stmmac_pci.c is itself a glue driver, supporting PCI IDs:
 
-Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+	0x0700, 0x1108	- synthetic ID
+	0x104a, 0xcc09	- ST Micro MAC
+	0x16c3, 0x7102	- Synopsys GMAC5
 
+I don't think we should try to turn a glue driver into a library,
+even though it would be the easier option (we could reuse
+CONFIG_STMMAC_PCI.)
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
