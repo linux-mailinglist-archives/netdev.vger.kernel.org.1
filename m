@@ -1,172 +1,156 @@
-Return-Path: <netdev+bounces-233795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08FE0C18949
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 08:04:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B54FBC18943
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 08:03:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id ECE464FAB33
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 07:00:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38E2D18917D8
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 07:02:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BD8C2FFDF5;
-	Wed, 29 Oct 2025 07:00:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69FA02FFDF5;
+	Wed, 29 Oct 2025 07:02:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qt9O+/xp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j29ntzDM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6B2C2F7AA9
-	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 07:00:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B77752EFDBB
+	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 07:02:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761721222; cv=none; b=kW8P9EikvskVtHBMasEyA3lNMAblPRDZTHt8K1qDw44QhWngCVtXOrIOMnNC1F4azbGpv1HQd666GxBzYIXYpNZWFF39u611SkNALywAv9zBUOquM5OcPH1tdYTpN9Xar909JGPH7+8zcKy/hoIdIlE5MC26JiEpyaVPJOAtY10=
+	t=1761721333; cv=none; b=Fb/xHjCIpq+bAqwxOGg6VH5IlYP2olBbt1lCDnDgWI/7W+7qdkOiZt/E3SfUquadJFzpF8fzCieW5u08m82/CHkqMQKhYW3Vj0JP7Wyvcp0NWFmZ1v6NuUA3xZ7MVQXbfIaOmadCa4C4r0PfGGtfy39QNCtO9gStIjZrimEuGT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761721222; c=relaxed/simple;
-	bh=gkjQTtCLf0j42+7c4QiatRaAEiOfdoHMhDAaPnHUHTE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=G8ObjYJvIMAIDEkdxXYHbQwCCBR01aPjZ6VBdZCUMwAZaAOpkns/WBO89C+BQnJNOK8abkz4n/iGn60eRBXSzf5KtS86kaCFRWOP+6UzGz9wlfKf32cJlN3ISvYLSM3+Q3b8CT3tLGTJBsa2E2Olt59aIevAJDOQTzyLa24Ccng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qt9O+/xp; arc=none smtp.client-ip=209.85.210.169
+	s=arc-20240116; t=1761721333; c=relaxed/simple;
+	bh=bOMMbexI6aDIrNtf5vFEnbq7xQbKAIAvzY9lE5k/XRM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=SI40E7IbcpC6c5xdGczifpJ4H1tgWaxSWz0Hnxf41PF+IOvqPrEUX2JHBExYgB7B+21u9oYfukShXy+9qjpyYxYn/ncqdq6om6mmehupwN/dc6oMONd8OlScx+ndqFR9DPyEp2DTrbceauVYu3/RMWsCqWnoOEK7S/AJTP+mx4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j29ntzDM; arc=none smtp.client-ip=209.85.218.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7a1603a098eso4147039b3a.1
-        for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 00:00:20 -0700 (PDT)
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-b6d5e04e0d3so367943166b.2
+        for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 00:02:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761721220; x=1762326020; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=KJXiYv+0JaCGm/J27+WUyeK7V+2nQTA8wgQaLCrqXU0=;
-        b=Qt9O+/xpw+cg/cSQD29SeUf00j4R4fyrxs5tpZTExwE440AMJzVlThbsg5M0UNlfcu
-         LC2HILR/4Knc87y2fM8o0VU3zIhx9F6lku253LSHF9QvOwm2UrFMnbG7GzHg7CrG+PY+
-         fLrf5L05HdvxtTZ+GRiP2uiRFwJTYGUl+4n1U/UGObfJ0fCgL1AndvXfopZcFkVv4VWt
-         OpXGAnWWL8LPTuCSQggIh7U/ieUQJ7M7u/nEOnxrlv1bKnlngu6pxd+YoZr+cMvKimtQ
-         7k2YmksjcYpg8nFFB/YLzyBkJtzn6qmcypboJzTo5VJ5YEKslie56H6ub7e5OyHwCwjN
-         lr6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761721220; x=1762326020;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1761721330; x=1762326130; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KJXiYv+0JaCGm/J27+WUyeK7V+2nQTA8wgQaLCrqXU0=;
-        b=VV055p+JCB6xWAkpnkV0pq8f25PMrPeqnzixeMRter399aRkF+6uQE4sfVi2gokkgi
-         IGOQ+vPjfhGM3rSOd0uMB7+F6lZWEUko26JXU9M4sLCQEmQ04WKI80pbG8ONFgYko/tK
-         HOx2yEp7FkfT/uA3XpcX4kyCCp12aECc+C4ZYzG0jVXHOkWrfC9mL64JP9OyK2AtVwDM
-         vYCCcB6FBpVx49IQgSHtu+cAPmrGHYjcb64V8pSNSv/rszxw8x02SkTYz1z9Ex4EozIQ
-         1C8ntN171NntiYsXmStDEVtxIHF00OJKIOwyTwLiImpYmAWyjQfunhaSYiTnBUrHgoA2
-         /wmg==
-X-Forwarded-Encrypted: i=1; AJvYcCXUkhv42vUTSVAZWoEbBhj+aMnL8D7P5C/7C3VepgktbqvSsX9PT49MmBl63KR9PUu8JdPyDM4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2ubKQ2d0f9TCBAf2g+588RSC8BL4lHFzEEBclRtnw/ot4WGRc
-	QydytMtfAjh/61zou7ljXDEazqoV3Qo69tlUaKqRJHTg5HIux9I2wzhleDkiAw==
-X-Gm-Gg: ASbGnctTknr3DV13lBypZz9Bn7L3srW/k+zVGro4dlqkdqETjfVnLj4Zj3tNHc6DJDt
-	ShZw5JGULhHKK+BVvs6YBCcKWcV3qjOhUm14UOlspglwxYzlpb0IvPKyO9HKU9Hff25oxKjpcrH
-	yf8gQQyFIAPuQgXqz9m5Nmx/NJj6B2MEQg5Arz2xoXFiO6zLzXAIMrjgpQl2wI9wIJfgT8MwMA6
-	MIIEBmszslmdj6UejUg+BHwObsc2vvCzSEDv6Gqivk4Sv6Ah4sWCsaDua2qDX2t8bvPHQ6ff6QE
-	wk3v9ItZ0UJQkuTVe4xuEdvkZWyszVMedEosmOh6TGy5vSS1oxJALJ7KEqkljdurjvRZhCcWfUv
-	1gYJcIlibrHrnFV8wqc+kecjrSOwNzdDVRWqj+6bU6lO+YTVFQJ8DVQX+On5I8D9bgPT+GYpvSY
-	F1zf2AbzpDQxdPZGVom+dFAzaTPvFHxlvTvecsh3h1RetoFagPzks=
-X-Google-Smtp-Source: AGHT+IFPikg+hMI4IFqA6vaJO2l1s8acnlRUaJizqFH3e6TpbdLv1AcvrswIyXSpjFqa9G3n1MszZQ==
-X-Received: by 2002:a05:6a00:1391:b0:7a2:7d09:cf40 with SMTP id d2e1a72fcca58-7a4e2cfc52emr2017185b3a.9.1761721219674;
-        Wed, 29 Oct 2025 00:00:19 -0700 (PDT)
-Received: from ?IPV6:2405:201:8000:a149:4670:c55c:fe13:754d? ([2405:201:8000:a149:4670:c55c:fe13:754d])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a4140168f7sm13939567b3a.11.2025.10.29.00.00.14
+        bh=WJozr33q7O27eAQclKBlJRIBGxacAxdnJElnx38SopM=;
+        b=j29ntzDMrMILNznyMnLaFNonyxUQlkI17x0SAIP+O3S3kkRi6A5wz4D8Sh4N6ipdP5
+         bXNJXLez1aVZ9szkbqccEd65LzvkN8QJFNy29rRUEaRL2S1fTqWSrAlNnLNLkx5AG+rk
+         Yh9Xg2JEralnbPrlvuVekssLc4/FLAxJBPNLj8K6NLZqJKv2mvsshXtIC+HRo+Hm5EH6
+         inOLl3GfFrmR/sEI7AD1KVrW29YDyiHfIUtSQkHRoG3gBQlu9w/RSkS3mLAG0SV4P7ol
+         q4O2r8FzF55Z4oFF63Pw/GV2F1psb4ALwL+c6Mqu8zS+Kcmixkt3E349qPGnB8v/pk/T
+         rciA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761721330; x=1762326130;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WJozr33q7O27eAQclKBlJRIBGxacAxdnJElnx38SopM=;
+        b=qwo+nEPfS3GgS+LubpOAYQ1P9tZ+GZmJFy4xCm1spjVG14phNOrEYCLmd3OOhAyziV
+         OCEW7TX02HjxwiMaadK5GDXxdytI55haVBNWNOk9fG5Yx4nvnpNBKuqL0oN6ff54NSuE
+         sD6E1+Jl1BFo/h1mTwgQsVzZFXtanDbVRzSL2lV6Ajqw1O8IPD12IbJLFuQROm9U4Mcc
+         MPEHAL3Or7EQaJ2Os72y5ArPIoXymUw7joqHhiqB/dErDFcIGlDEWITXMXirL61wuW2b
+         HeME8teF0H2x4xfnsLvF5re9TYEJeVftyE1tFa5A2HP96QPNzCqZjN4eiID/Qa/vRzbL
+         Tz/w==
+X-Forwarded-Encrypted: i=1; AJvYcCUNuxnWOGGcBcbRU5OKxYlQlY5SjoBR192KJUSoU4sLC5TPK38L5Dy9Bh/m9pcDukNQDKWbhEE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwbtEtY40k2LIcBEr3YMZWq0hR57OWgZ0oWFqXYF+eW2iJnIuPB
+	P5j1Ev1pB0tBCuqzGEHX1nBP2/U/xcMYheulVVMeBUflyu+Gd349WikV
+X-Gm-Gg: ASbGnctIvuc9YmwAKyA3cc5G2G5sIViTg/CyhswNzvVhvgozG3IHVZKYPFUm/J9Yq23
+	w9NOwJWmlXE726438Vob4r44X6QAzeo9XwhHG9/ghRkxCnjR75Yde++UKbVEhQLsULnsMhUEpcl
+	sAMBcetMPdbsQw9Pryu1QRCkj7YNoJpojGt6F8eHsWl4s7/vFAIDP29Y9uKBrqFuW6F7rn5ZECC
+	V6PpDN+hxMvHoS0i0xykuaM6JKnVtqNhRHMVBEUGTetssA8319JRft6797QRYrK5XNOugVeatJx
+	QxfpJY/8uZFHC0xYxgjVCw6+/63305ue7c/q8S6xzpNbAbG6z2oXBg2dwusp7P3EBN5TBUwG2YF
+	j+04BQy0dX+/nxQ2Oj/jtznLQD8pJ76kwXyGj+dKHotnI5eMjur/MzGkh+a0NeUcO1u+493CsiS
+	tL
+X-Google-Smtp-Source: AGHT+IGTI1ZIZClWng4yye7JAJ7wCJzANK4Z/hes/dqfq35lpCLXUzEK0uKqA6TU/xduUI8nwCqpug==
+X-Received: by 2002:a17:907:971b:b0:b0d:ee43:d762 with SMTP id a640c23a62f3a-b703d2cdeadmr175477166b.4.1761721329730;
+        Wed, 29 Oct 2025 00:02:09 -0700 (PDT)
+Received: from localhost ([212.73.77.104])
+        by smtp.gmail.com with UTF8SMTPSA id a640c23a62f3a-b6d853386d8sm1318508566b.18.2025.10.29.00.02.07
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Oct 2025 00:00:19 -0700 (PDT)
-Message-ID: <60657a94-8b91-41d5-9cf7-61ed5ceb2161@gmail.com>
-Date: Wed, 29 Oct 2025 12:30:13 +0530
+        Wed, 29 Oct 2025 00:02:09 -0700 (PDT)
+From: Askar Safin <safinaskar@gmail.com>
+To: brauner@kernel.org
+Cc: amir73il@gmail.com,
+	arnd@arndb.de,
+	bpf@vger.kernel.org,
+	cgroups@vger.kernel.org,
+	cyphar@cyphar.com,
+	daan.j.demeyer@gmail.com,
+	edumazet@google.com,
+	hannes@cmpxchg.org,
+	jack@suse.cz,
+	jannh@google.com,
+	jlayton@kernel.org,
+	josef@toxicpanda.com,
+	kuba@kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	me@yhndnzj.com,
+	mzxreary@0pointer.de,
+	netdev@vger.kernel.org,
+	tglx@linutronix.de,
+	tj@kernel.org,
+	viro@zeniv.linux.org.uk,
+	zbyszek@in.waw.pl
+Subject: Re: [PATCH v3 11/70] ns: add active reference count
+Date: Wed, 29 Oct 2025 10:02:01 +0300
+Message-ID: <20251029070201.2327405-1-safinaskar@gmail.com>
+X-Mailer: git-send-email 2.47.3
+In-Reply-To: <20251024-work-namespace-nstree-listns-v3-11-b6241981b72b@kernel.org>
+References: <20251024-work-namespace-nstree-listns-v3-11-b6241981b72b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] net: ethernet: emulex: benet: fix adapter->fw_on_flash
- truncation warning
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: ajit.khaparde@broadcom.com, sriharsha.basavapatna@broadcom.com,
- somnath.kotur@broadcom.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, skhan@linuxfoundation.org, khalid@kernel.org,
- david.hunter.linux@gmail.com, linux-kernel-mentees@lists.linux.dev
-References: <20251024181541.5532-1-spyjetfayed@gmail.com>
- <20251028184254.1d902b50@kernel.org>
-Content-Language: en-US
-From: Ankan Biswas <spyjetfayed@gmail.com>
-Autocrypt: addr=spyjetfayed@gmail.com; keydata=
- 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
- TRpGew2ozniUMliyaLH9UH6/e9Us
-In-Reply-To: <20251028184254.1d902b50@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 10/29/25 7:12 AM, Jakub Kicinski wrote:
-> On Fri, 24 Oct 2025 23:45:41 +0530 Ankan Biswas wrote:
->> The benet driver copies both fw_ver (32 bytes) and fw_on_flash (32 bytes)
->> into ethtool_drvinfo->fw_version (32 bytes), leading to a potential
->> string truncation warning when built with W=1.
->>
->> Store fw_on_flash in ethtool_drvinfo->erom_version instead, which some
->> drivers use to report secondary firmware information.
-> 
-> You are changing user-visible behavior to silence a W=1 warning.
-> I can't stress enough how bad of an idea this is.
-> Please find a better fix.. or leave this code be.
+Christian Brauner <brauner@kernel.org>:
+> Currently namespace file handles allow much broader access to namespaces
+> than what is currently possible via (1)-(4). The reason is that
 
-Hi Jakub,
-
-Thanks for the feedback. I felt this would be better than the value 
-appearing truncated to the user. However, yes this is not the ideal fix. 
-Will avoid modifying user-visible behavior.
-
-An ideal fix may require a lot more changes, which may not be worth the 
-effort at this point, so I guess it is better to drop this patch.
+There is no any (4) here.
 
 
-Best Regards,
-Ankan Biswas
+> On current kernels a namespace is visible to userspace in the
+> following cases:
+[...]
+> (3) The namespace is a hierarchical namespace type and is the parent of
+>     a single or multiple child namespaces.
+[...]
+> To handle this nicely we introduce an active reference count which
+> tracks (1)-(3). This is easy to do as all of these things are already
+[...]
+> + * Inactive -> Active:
+> + *   When walking a hierarchical namespace tree upwards and reopening
+> + *   parent namespaces via NS_GET_PARENT that only exist because they
+> + *   are a parent of an actively used namespace it is possible to
+> + *   necrobump an inactive namespace back to the active state.
+
+These quoted parts contradict to each other. You say "we introduce an
+active reference count which tracks (1)-(3)", and (3) says "The namespace
+is a hierarchical namespace type and is the parent of a single or multiple
+child namespaces". I. e. active reference will count such parents. But then
+in code you say:
+
+> + * Inactive -> Active:
+> + *   When walking a hierarchical namespace tree upwards and reopening
+> + *   parent namespaces via NS_GET_PARENT that only exist because they
+> + *   are a parent of an actively used namespace it is possible to
+> + *   necrobump an inactive namespace back to the active state.
+
+I. e. now you say that such parents are inactive and can become active.
+
+
+
+
+-- 
+Askar Safin
 
