@@ -1,60 +1,63 @@
-Return-Path: <netdev+bounces-234069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01B41C1C666
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 18:17:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 831E4C1C687
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 18:19:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 876C0643652
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 16:39:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91978623040
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 16:50:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A4E934CFB9;
-	Wed, 29 Oct 2025 16:38:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BADA2F5484;
+	Wed, 29 Oct 2025 16:50:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LiiArGjK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T6Woaoc4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C3142F3C39;
-	Wed, 29 Oct 2025 16:38:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E87922D24B4;
+	Wed, 29 Oct 2025 16:50:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761755924; cv=none; b=t9t79NawgerzkCM4vyEXoUi4asYlok/UiDAnKXt/l9KnTj6eGRo1MManNmXNA8EJ0RnBnvg64UGVISrKmQPBBzur+k5nftkX5ll6vRak0Lap0Djjoh+r0/T3tyLaLWKj27PSxwCpZgjPuYHjXh4yAPgMM1tWMPfZmFnSGvnuJdw=
+	t=1761756620; cv=none; b=fLyqJBIUSfwzjhySHK8lDfWOkJm05MwhrWrH83cnPlDJ+NQVnNe9a953f1XfNyC3rQIighhrPpQ9/G3cDBNftAjLHbLskynNiv5ozcF50lRTfXoF7K8l/4Rg/C23M9Oasc0P6Zr6y6Q8rxnKQgHanIj1N5XX7zQM1T2j7Q2RCaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761755924; c=relaxed/simple;
-	bh=NpJye4Kg45PtQqDQSfWJQGGDc2/wv57nCBVyYwi1X/Y=;
+	s=arc-20240116; t=1761756620; c=relaxed/simple;
+	bh=hYRW+X8pMcb2ZzVrrEksNmJaTmIrkeo60sx4OKvUG/w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oZQ2LfGy39rVjSQCGtrb7da28PEyuMW+A3KFXHkZxyIXKVDJuwhXYnA+lCjF8LYk6eJm50Bi8dc3EAKmxhiTALGuH9qY4y/3gIoJhrz4iah3fdbFJeZqWBteN1DgQCcfA/bMKONaIYGwrquzmnTx9LrIC30cFMyHTkY0yjf2I08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LiiArGjK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1F3AC4CEF7;
-	Wed, 29 Oct 2025 16:38:41 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=A+PgV/PiCUp0oSvQllIwPavzUItF2sC/zCOQGB0Q5gN6YrN2aqgNDnUJA+8o7tSvkx1KS3G2SoE5eyT28yY5FhaCinWOIfOlzDSf3729i+FQBloGKz5jas00F3/Nd8Bit9EJRKxdhn9Fe/vGSqscmPZPK0ystpbvPnUPS2y65m8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T6Woaoc4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D76D7C4CEF8;
+	Wed, 29 Oct 2025 16:50:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761755923;
-	bh=NpJye4Kg45PtQqDQSfWJQGGDc2/wv57nCBVyYwi1X/Y=;
+	s=k20201202; t=1761756619;
+	bh=hYRW+X8pMcb2ZzVrrEksNmJaTmIrkeo60sx4OKvUG/w=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LiiArGjK7HpD1cID4dWvqnKuJst9muBqYAiRBZ29g+PkVhUN+JayxqUW3Xqeu80ng
-	 1Gg/iF8KghUWierQ1+I7Wdb2hWWleaaJVYFAUmboo5fK6/8BSSroGA+xA0c6U0PaJz
-	 lIdYzbcZqiu8Yr5Axa8Fn5pptNPloFEQXwNMwgVHATReUwnnSGE5YwYA2cu85XXTJ0
-	 l9K5TyFVXKeiXt47lyZ69awvEHn5xhI/X7BCKuTm/EV5ICPireZRzeLo715Wy2PZ/l
-	 twkln//Num7bkM7s3GfeEpq12a1vZr4/+MtnFaK/qo9aGUF6OSbQcVd+Kcx8E8GSMb
-	 N9ov9eYRr+MnQ==
-Date: Wed, 29 Oct 2025 16:38:39 +0000
+	b=T6Woaoc4Cq9YOMkKIKv2HpuqXctdbQekZkN35NcSt4n5u61/TX//refZ5Fl0ZfxPq
+	 rvlicEr42rRJWnckoASNCLBFdHLsHL9rD+DphTWfa/VaRLsba7cTXq3qjwB84wDmtZ
+	 VUPeLMyN84QltryqfVHceXniiOOimw9pKgtojngcalu6rc+VtqJcjcRyWef1o1+DkP
+	 Kdnc6ZqT/KdUchdG2390Fp4Ls337BjjTde0EnKkC8HyR6xDSTr5S2LBtHQcfgQQHpw
+	 wdXPi49mF7OeFM2mZWkAo7iVbX0H84m7e5FPsQy7y4mpiTr7Mih21f5rXCgxw9pjCL
+	 zZhRS5gb6Sy9g==
+Date: Wed, 29 Oct 2025 16:50:14 +0000
 From: Simon Horman <horms@kernel.org>
-To: Stefan Wiehler <stefan.wiehler@nokia.com>
-Cc: Xin Long <lucien.xin@gmail.com>,
-	"David S . Miller " <davem@davemloft.net>,
+To: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>, Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Kuniyuki Iwashima <kuniyu@google.com>, linux-sctp@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v3 1/3] sctp: Hold RCU read lock while iterating over
- address list
-Message-ID: <aQJDD7FH1EWe2Quc@horms.kernel.org>
-References: <20251028161506.3294376-1-stefan.wiehler@nokia.com>
- <20251028161506.3294376-2-stefan.wiehler@nokia.com>
+	Shuah Khan <shuah@kernel.org>, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Muhammad Usama Anjum <usama.anjum@collabora.com>
+Subject: Re: [PATCH v2] selftest: net: fix socklen_t type mismatch in
+ sctp_collision test
+Message-ID: <aQJFxrzPh-87QU5K@horms.kernel.org>
+References: <20251028172947.53153-1-ankitkhushwaha.linux@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,55 +66,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251028161506.3294376-2-stefan.wiehler@nokia.com>
+In-Reply-To: <20251028172947.53153-1-ankitkhushwaha.linux@gmail.com>
 
-On Tue, Oct 28, 2025 at 05:12:26PM +0100, Stefan Wiehler wrote:
-> With CONFIG_PROVE_RCU_LIST=y and by executing
+On Tue, Oct 28, 2025 at 10:59:47PM +0530, Ankit Khushwaha wrote:
+> Socket APIs like recvfrom(), accept(), and getsockname() expect socklen_t*
+> arg, but tests were using int variables. This causes -Wpointer-sign 
+> warnings on platforms where socklen_t is unsigned.
 > 
->   $ netcat -l --sctp &
->   $ netcat --sctp localhost &
->   $ ss --sctp
+> Change the variable type from int to socklen_t to resolve the warning and
+> ensure type safety across platforms.
 > 
-> one can trigger the following Lockdep-RCU splat(s):
-
-...
-
-> diff --git a/net/sctp/diag.c b/net/sctp/diag.c
-> index 996c2018f0e6..1a8761f87bf1 100644
-> --- a/net/sctp/diag.c
-> +++ b/net/sctp/diag.c
-> @@ -73,19 +73,23 @@ static int inet_diag_msg_sctpladdrs_fill(struct sk_buff *skb,
->  	struct nlattr *attr;
->  	void *info = NULL;
->  
-> +	rcu_read_lock();
->  	list_for_each_entry_rcu(laddr, address_list, list)
->  		addrcnt++;
-> +	rcu_read_unlock();
->  
->  	attr = nla_reserve(skb, INET_DIAG_LOCALS, addrlen * addrcnt);
->  	if (!attr)
->  		return -EMSGSIZE;
->  
->  	info = nla_data(attr);
-
-Hi Stefan,
-
-If the number of entries in list increases while rcu_read_lock is not held,
-between when addrcnt is calculated and when info is written, then can an
-overrun occur while writing info?
-
-> +	rcu_read_lock();
->  	list_for_each_entry_rcu(laddr, address_list, list) {
->  		memcpy(info, &laddr->a, sizeof(laddr->a));
->  		memset(info + sizeof(laddr->a), 0, addrlen - sizeof(laddr->a));
->  		info += addrlen;
->  	}
-> +	rcu_read_unlock();
->  
->  	return 0;
->  }
-> -- 
-> 2.51.0
+> warning fixed:
 > 
+> sctp_collision.c:62:70: warning: passing 'int *' to parameter of 
+> type 'socklen_t *' (aka 'unsigned int *') converts between pointers to 
+> integer types with different sign [-Wpointer-sign]
+>    62 |                 ret = recvfrom(sd, buf, sizeof(buf), 
+> 									0, (struct sockaddr *)&daddr, &len);
+>       |                                                           ^~~~
+> /usr/include/sys/socket.h:165:27: note: passing argument to 
+> parameter '__addr_len' here
+>   165 |                          socklen_t *__restrict __addr_len);
+>       |                                                ^
+> 
+> Reviewed-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+> Signed-off-by: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
+
+Thanks for the update.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
 
