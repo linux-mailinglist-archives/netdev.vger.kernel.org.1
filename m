@@ -1,185 +1,239 @@
-Return-Path: <netdev+bounces-234117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2DF2C1CBA8
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 19:16:30 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9967AC1CC7F
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 19:31:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A36B2567374
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 18:05:42 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3CD054E0553
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 18:31:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85CD5246BB9;
-	Wed, 29 Oct 2025 18:05:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADD6E3563C1;
+	Wed, 29 Oct 2025 18:31:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fccf3tKi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YDywUxIv"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF8CE261588
-	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 18:05:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6152F746C;
+	Wed, 29 Oct 2025 18:31:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761761140; cv=none; b=oOXqYSZaMu6K0dsShiOAFXdNKaROB+DaJe+TwZBXugxotOXDcs0cBF2Lo3F0i983REaSiHCZxcQUiYtus0E/6EWXRDDZ4y18/UqMEXBWle3wIxBYEfyhqkMsV6QPQ5Qd/xwe6XZr+djt0j1SR8kBM8jP8ApipfiFxIq53RdykNo=
+	t=1761762683; cv=none; b=CiRByYiAxKeH7m/luk0Lv+BxTFz8SS5w0sbW3fe2+xgeXade66mMJoT6wXvGxd1Ilz8EzpOrtFuBDJuNFZ1Jae0Tw7CE+qKtGTcQ2Ch9j3L0Bt1p7xmc/LklU6onwWawcmloEy3cTOVxnd55FP+IvPQHT8+0AUKS2decpXzbnDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761761140; c=relaxed/simple;
-	bh=aab43vnKM1ss0I9X3ZkZ8BKt0Ft4cLo8wB19nB+wzAE=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=rl6u69nWaSbcZ2H5z3fwVmGX1QV7N0NIQU8E62TLlhDVfpeVqRcH/pwrUrvaikfehAtYLnI9qYZQWdrEdlC6cfsV9OgcWTaoCqXJGhsMQgCAAio/hdDu2oZT6vPLGurBb9bOsZI9nRDZj1sZpuSm/tdcz403ih5SSUFNC76LAqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Fccf3tKi; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761761137;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lNxXxUzXoqQQT9w5Yf9S20ddLNixsnFzdxWTN/CN8Uk=;
-	b=Fccf3tKiWG9S52afAyAOsWCc4QU6A56y6UCDpk60MyHGQIaHU0IKyvj+mHvvFHxlqUsjh7
-	vPp6eleLSPVdKsfRVqWM1B1p87L2aYcc6jSpnU+zj/5QfS7JjJxhWDw8DhJFWBgRrYilPN
-	nkCApV1e5vz/J7206NtptugLwusvACw=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-463-INfZKbnaOAmxQppONxiugQ-1; Wed, 29 Oct 2025 14:05:36 -0400
-X-MC-Unique: INfZKbnaOAmxQppONxiugQ-1
-X-Mimecast-MFC-AGG-ID: INfZKbnaOAmxQppONxiugQ_1761761136
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-8a4ef35cc93so35227785a.3
-        for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 11:05:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761761136; x=1762365936;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lNxXxUzXoqQQT9w5Yf9S20ddLNixsnFzdxWTN/CN8Uk=;
-        b=O9y+3FWQSGERSs41B2yD5DUQw/x+Al2mh+6yKJS3iYkpjebg+2ZgSCNTLD2/AzKBMg
-         0LfrXDXkpLY+bFHyChI3l4+nufG3D19FZ+DIFKpNg5InZhPwET/fefCBlNCA/M3PjqK+
-         zXEhQiKRhn+1L5KiiscerMZizzvfgPtgvovwQDrsD/QKWJahqqwI5t9ne5ysPx2OwjlG
-         f3KncyzjEQ1MJOuYHykocE1l6Dwvcb/vJYu6LD/Wf3YiKQZJlk4vnOiVWM7N0acvjHrg
-         OVXxCI6mfZa8sGP3i8xlGRUK1KUpWuWHi5F9gLR0SjZJAFhScskMgao90ZDRykA4Y22H
-         mUhA==
-X-Forwarded-Encrypted: i=1; AJvYcCU3rmWTXdlhZdJMp+KF6uT30QFPAD4n2llj0ccqmAIt5JcuAv6fAUb9WKKF+qTHy76tg6OTxHI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYvK5N7ZiEvxh1LjtjdS4NgWNmh0PSB9G2Uo9An/pzp3d2q2ow
-	FKJRnl0S+FOzxwJEEHrgus2fnXWDqZxPJ3oxO5Kq3UK3M2inXiTntZ87dOztZpnfuaGq07tAaOg
-	LRWJ9AraCyT4Bv1Mjd0C+w9NTlke73HgSvhJ3OTHGPs8L3sbWwQD/mul5sg==
-X-Gm-Gg: ASbGnctn2tY7PQIeMNV/29NhAONcnSS23FOxr93OpXoi1ZVzgWBZRMHffBxi6wUSkqw
-	UywNcnDqM3C174n3TQK4EGjX0yOHViNzRRYCN+dxJv0BUn2/M+eXE4PRaqL7S4dvmY25chFY9uU
-	pU0zOunVECtAwvb12tkfwExvmRwYS6y191fO3kK/pHOU6e1z8HUGjKTmUu9hFROm4Tt4cWO+A5B
-	Dr1U7IIrpj+qHBIc0xP3jAclZMHp+/uT4CEiT/yjh7+tjCV+qXfRAxsPZZqhuVVBSNqO5hP4aRQ
-	qZlO+8xKU85JLUL/OSLm90wz49yGpIu5q3PbU5qT5DNTDzP0ARSqkkyO58mlF7zMLgtqHBS1YeT
-	/PqQnGNLNI5MoHmt8hlpGTR5Eqojdx8CshlXNua4IhY3dlQ==
-X-Received: by 2002:a05:620a:29cd:b0:8a6:92d1:2db5 with SMTP id af79cd13be357-8a8e473a6e6mr573643785a.24.1761761120462;
-        Wed, 29 Oct 2025 11:05:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEE6iTF4BqCkm725oJpB//2W/KjYfs5LBPrMdbtexGrXjP/dhJ17Z6sn/BKCKYXRH3K32fmkA==
-X-Received: by 2002:a05:620a:29cd:b0:8a6:92d1:2db5 with SMTP id af79cd13be357-8a8e473a6e6mr573635985a.24.1761761119960;
-        Wed, 29 Oct 2025 11:05:19 -0700 (PDT)
-Received: from ?IPV6:2601:188:c102:b180:1f8b:71d0:77b1:1f6e? ([2601:188:c102:b180:1f8b:71d0:77b1:1f6e])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-89f2421f6a5sm1111574885a.5.2025.10.29.11.05.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Oct 2025 11:05:19 -0700 (PDT)
-From: Waiman Long <llong@redhat.com>
-X-Google-Original-From: Waiman Long <longman@redhat.com>
-Message-ID: <7821fb40-5082-4d11-b539-4c5abc2e572c@redhat.com>
-Date: Wed, 29 Oct 2025 14:05:17 -0400
+	s=arc-20240116; t=1761762683; c=relaxed/simple;
+	bh=rFbi7t1GmGErUNK4uhpTSb/Y5veEcgHn+WO9PSvt4aA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=kKxPwmGFYJnsgUcHXkpz+vioopAyGbGfZOU7vTv9HYDfHAucisSligKnnAryk6bTHxf6JnChdocJ4mbUQXvQ7a7YF44mKUATn2NIT16TQiQUyeGWNLLVQ6J4tRYdeIR8hSbK1lkCngFdkRp2TX74iFARFTUuJq6CFZsmkvVX3GU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YDywUxIv; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1761762681; x=1793298681;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:to:cc;
+  bh=rFbi7t1GmGErUNK4uhpTSb/Y5veEcgHn+WO9PSvt4aA=;
+  b=YDywUxIv/YG8VrlA6K4W0r75L6yk3nCilw4E1UE79gdK265kI8tO4LXR
+   xDiZXgMo3h1yPbXQ8FI9uxRpOkHcdOrAPSMP5s/3YjNhaGmQLUX687Ddw
+   Nf/quyGomHtJUv77SBOrReE6P4zlzanGjBdF1EcEZ4Jf4d2FdEcMYG8BV
+   SzFUOPBwEbNhYEs0G62nLf6D1gCVpRu8fLKnRuRnEcuebt2GU7/XFCII+
+   i5sDen7TueUaXgVeeoAlqtdad61TLQ5fM+R4z8stzzUHYxGS5B0BqyzQS
+   lMchskk89Q+17oY5+labOUdmdUpUphse9dg1rgcNJXPoHHbzD6Zehi0Nn
+   A==;
+X-CSE-ConnectionGUID: zno6siMITMeymPguEQ/iZw==
+X-CSE-MsgGUID: BwvMySZzThOnZ7SckLUg5w==
+X-IronPort-AV: E=McAfee;i="6800,10657,11597"; a="75343141"
+X-IronPort-AV: E=Sophos;i="6.19,264,1754982000"; 
+   d="scan'208";a="75343141"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 11:31:20 -0700
+X-CSE-ConnectionGUID: aiKdA1VnQpiY3f64HthNUw==
+X-CSE-MsgGUID: NMPSGFOARG6RC3ANIEG+1g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,264,1754982000"; 
+   d="scan'208";a="185668954"
+Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.90]) ([10.166.28.90])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 11:31:21 -0700
+From: Jacob Keller <jacob.e.keller@intel.com>
+Date: Wed, 29 Oct 2025 11:30:42 -0700
+Subject: [PATCH] docs: kdoc: fix duplicate section warning message
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 18/33] cpuset: Remove cpuset_cpu_is_isolated()
-To: Frederic Weisbecker <frederic@kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Bjorn Helgaas <bhelgaas@google.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Danilo Krummrich
- <dakr@kernel.org>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Gabriele Monaco <gmonaco@redhat.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
- Lai Jiangshan <jiangshanlai@gmail.com>,
- Marco Crivellari <marco.crivellari@suse.com>, Michal Hocko
- <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
- Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
- Phil Auld <pauld@redhat.com>, "Rafael J . Wysocki" <rafael@kernel.org>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>, Simon Horman <horms@kernel.org>,
- Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Vlastimil Babka <vbabka@suse.cz>, Will Deacon <will@kernel.org>,
- cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-block@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20251013203146.10162-1-frederic@kernel.org>
- <20251013203146.10162-19-frederic@kernel.org>
-Content-Language: en-US
-In-Reply-To: <20251013203146.10162-19-frederic@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20251029-jk-fix-kernel-doc-duplicate-return-warning-v1-1-28ed58bec304@intel.com>
+X-B4-Tracking: v=1; b=H4sIAFNdAmkC/x2NwQ6CMBAFf4Xs2U2gBhR/xXCo7RNXyEK2oCaEf
+ 7fhOIeZ2SjBBIluxUaGjySZNEN1Kii8vPZgiZnJla6uStfye+Cn/HiAKUaOU+C4zqMEv4ANy2r
+ KX28q2vMj1hf4cxsad6UcnA1ZPWb3bt//SlpusHwAAAA=
+X-Change-ID: 20251029-jk-fix-kernel-doc-duplicate-return-warning-bd57ea39c628
+To: Jonathan Corbet <corbet@lwn.net>, 
+ Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, 
+ Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>
+X-Mailer: b4 0.15-dev-f4b34
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6136;
+ i=jacob.e.keller@intel.com; h=from:subject:message-id;
+ bh=rFbi7t1GmGErUNK4uhpTSb/Y5veEcgHn+WO9PSvt4aA=;
+ b=owGbwMvMwCWWNS3WLp9f4wXjabUkhkym2Aqx+4q9WwLWZF36V7T50JoZsrJsaxZXfjL+P9Nn0
+ 4+dJ3vqOkpZGMS4GGTFFFkUHEJWXjeeEKb1xlkOZg4rE8gQBi5OAZjIlWCGv6LvjVh5nO8Jb5ta
+ 93aKqlfqrGXnatWce5xXHTpy9fXpd7EMPxnP2nDGzDVy61r0x3/C44JTj8znTE2xm7u2b/uz/Nu
+ iFewA
+X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
+ fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
 
-On 10/13/25 4:31 PM, Frederic Weisbecker wrote:
-> The set of cpuset isolated CPUs is now included in HK_TYPE_DOMAIN
-> housekeeping cpumask. There is no usecase left interested in just
-> checking what is isolated by cpuset and not by the isolcpus= kernel
-> boot parameter.
->
-> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-> ---
->   include/linux/cpuset.h          |  6 ------
->   include/linux/sched/isolation.h |  3 +--
->   kernel/cgroup/cpuset.c          | 12 ------------
->   3 files changed, 1 insertion(+), 20 deletions(-)
->
-> diff --git a/include/linux/cpuset.h b/include/linux/cpuset.h
-> index 051d36fec578..a10775a4f702 100644
-> --- a/include/linux/cpuset.h
-> +++ b/include/linux/cpuset.h
-> @@ -78,7 +78,6 @@ extern void cpuset_lock(void);
->   extern void cpuset_unlock(void);
->   extern void cpuset_cpus_allowed(struct task_struct *p, struct cpumask *mask);
->   extern bool cpuset_cpus_allowed_fallback(struct task_struct *p);
-> -extern bool cpuset_cpu_is_isolated(int cpu);
->   extern nodemask_t cpuset_mems_allowed(struct task_struct *p);
->   #define cpuset_current_mems_allowed (current->mems_allowed)
->   void cpuset_init_current_mems_allowed(void);
-> @@ -208,11 +207,6 @@ static inline bool cpuset_cpus_allowed_fallback(struct task_struct *p)
->   	return false;
->   }
->   
-> -static inline bool cpuset_cpu_is_isolated(int cpu)
-> -{
-> -	return false;
-> -}
-> -
->   static inline nodemask_t cpuset_mems_allowed(struct task_struct *p)
->   {
->   	return node_possible_map;
-> diff --git a/include/linux/sched/isolation.h b/include/linux/sched/isolation.h
-> index 94d5c835121b..0f50c152cf68 100644
-> --- a/include/linux/sched/isolation.h
-> +++ b/include/linux/sched/isolation.h
-> @@ -76,8 +76,7 @@ static inline bool housekeeping_cpu(int cpu, enum hk_type type)
->   static inline bool cpu_is_isolated(int cpu)
->   {
->   	return !housekeeping_test_cpu(cpu, HK_TYPE_DOMAIN) ||
-> -	       !housekeeping_test_cpu(cpu, HK_TYPE_TICK) ||
-> -	       cpuset_cpu_is_isolated(cpu);
-> +	       !housekeeping_test_cpu(cpu, HK_TYPE_TICK);
->   }
->   
+The python version of the kernel-doc parser emits some strange warnings
+with just a line number in certain cases:
 
-You can also remove the "<linux/cpuset.h>" include from isolation.h 
-which was added by commit 3232e7aad11e5 ("cgroup/cpuset: Include 
-isolated cpuset CPUs in cpu_is_isolated() check") which introduces 
-cpuset_cpu_is_isolated().
+$ ./scripts/kernel-doc -Wall -none 'include/linux/virtio_config.h'
+Warning: 174
+Warning: 184
+Warning: 190
+Warning: include/linux/virtio_config.h:226 No description found for return value of '__virtio_test_bit'
+Warning: include/linux/virtio_config.h:259 No description found for return value of 'virtio_has_feature'
+Warning: include/linux/virtio_config.h:283 No description found for return value of 'virtio_has_dma_quirk'
+Warning: include/linux/virtio_config.h:392 No description found for return value of 'virtqueue_set_affinity'
 
-Cheers,
-Longman
+I eventually tracked this down to the lone call of emit_msg() in the
+KernelEntry class, which looks like:
 
+  self.emit_msg(self.new_start_line, f"duplicate section name '{name}'\n")
+
+This looks like all the other emit_msg calls. Unfortunately, the definition
+within the KernelEntry class takes only a message parameter and not a line
+number. The intended message is passed as the warning!
+
+Pass the filename to the KernelEntry class, and use this to build the log
+message in the same way as the KernelDoc class does.
+
+To avoid future errors, mark the warning parameter for both emit_msg
+definitions as a keyword-only argument. This will prevent accidentally
+passing a string as the warning parameter in the future.
+
+Also fix the call in dump_section to avoid an unnecessary additional
+newline.
+
+Fixes: e3b42e94cf10 ("scripts/lib/kdoc/kdoc_parser.py: move kernel entry to a class")
+Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+---
+We recently discovered this while working on some netdev text
+infrastructure. All of the duplicate section warnings are not being logged
+properly, which was confusing the warning comparison logic we have for
+testing patches in NIPA.
+
+This appears to have been caused by the optimizations in:
+https://lore.kernel.org/all/cover.1745564565.git.mchehab+huawei@kernel.org/
+
+Before this fix:
+$ ./scripts/kernel-doc -Wall -none 'include/linux/virtio_config.h'
+Warning: 174
+Warning: 184
+Warning: 190
+Warning: include/linux/virtio_config.h:226 No description found for return value of '__virtio_test_bit'
+Warning: include/linux/virtio_config.h:259 No description found for return value of 'virtio_has_feature'
+Warning: include/linux/virtio_config.h:283 No description found for return value of 'virtio_has_dma_quirk'
+Warning: include/linux/virtio_config.h:392 No description found for return value of 'virtqueue_set_affinity'
+
+After this fix:
+$ ./scripts/kernel-doc -Wall -none 'include/linux/virtio_config.h'
+Warning: include/linux/virtio_config.h:174 duplicate section name 'Return'
+Warning: include/linux/virtio_config.h:184 duplicate section name 'Return'
+Warning: include/linux/virtio_config.h:190 duplicate section name 'Return'
+Warning: include/linux/virtio_config.h:226 No description found for return value of '__virtio_test_bit'
+Warning: include/linux/virtio_config.h:259 No description found for return value of 'virtio_has_feature'
+Warning: include/linux/virtio_config.h:283 No description found for return value of 'virtio_has_dma_quirk'
+Warning: include/linux/virtio_config.h:392 No description found for return value of 'virtqueue_set_affinity'
+---
+ scripts/lib/kdoc/kdoc_parser.py | 20 ++++++++++++--------
+ 1 file changed, 12 insertions(+), 8 deletions(-)
+
+diff --git a/scripts/lib/kdoc/kdoc_parser.py b/scripts/lib/kdoc/kdoc_parser.py
+index 2376f180b1fa..2acf9f6e5c35 100644
+--- a/scripts/lib/kdoc/kdoc_parser.py
++++ b/scripts/lib/kdoc/kdoc_parser.py
+@@ -254,7 +254,7 @@ SECTION_DEFAULT = "Description"  # default section
+ 
+ class KernelEntry:
+ 
+-    def __init__(self, config, ln):
++    def __init__(self, config, fname, ln):
+         self.config = config
+ 
+         self._contents = []
+@@ -274,6 +274,8 @@ class KernelEntry:
+ 
+         self.leading_space = None
+ 
++        self.fname = fname
++
+         # State flags
+         self.brcount = 0
+         self.declaration_start_line = ln + 1
+@@ -288,9 +290,11 @@ class KernelEntry:
+         return '\n'.join(self._contents) + '\n'
+ 
+     # TODO: rename to emit_message after removal of kernel-doc.pl
+-    def emit_msg(self, log_msg, warning=True):
++    def emit_msg(self, ln, msg, *, warning=True):
+         """Emit a message"""
+ 
++        log_msg = f"{self.fname}:{ln} {msg}"
++
+         if not warning:
+             self.config.log.info(log_msg)
+             return
+@@ -336,7 +340,7 @@ class KernelEntry:
+                 # Only warn on user-specified duplicate section names
+                 if name != SECTION_DEFAULT:
+                     self.emit_msg(self.new_start_line,
+-                                  f"duplicate section name '{name}'\n")
++                                  f"duplicate section name '{name}'")
+                 # Treat as a new paragraph - add a blank line
+                 self.sections[name] += '\n' + contents
+             else:
+@@ -387,15 +391,15 @@ class KernelDoc:
+             self.emit_msg(0,
+                           'Python 3.7 or later is required for correct results')
+ 
+-    def emit_msg(self, ln, msg, warning=True):
++    def emit_msg(self, ln, msg, *, warning=True):
+         """Emit a message"""
+ 
+-        log_msg = f"{self.fname}:{ln} {msg}"
+-
+         if self.entry:
+-            self.entry.emit_msg(log_msg, warning)
++            self.entry.emit_msg(ln, msg, warning=warning)
+             return
+ 
++        log_msg = f"{self.fname}:{ln} {msg}"
++
+         if warning:
+             self.config.log.warning(log_msg)
+         else:
+@@ -440,7 +444,7 @@ class KernelDoc:
+         variables used by the state machine.
+         """
+ 
+-        self.entry = KernelEntry(self.config, ln)
++        self.entry = KernelEntry(self.config, self.fname, ln)
+ 
+         # State flags
+         self.state = state.NORMAL
+
+---
+base-commit: e53642b87a4f4b03a8d7e5f8507fc3cd0c595ea6
+change-id: 20251029-jk-fix-kernel-doc-duplicate-return-warning-bd57ea39c628
+
+Best regards,
+--  
+Jacob Keller <jacob.e.keller@intel.com>
 
 
