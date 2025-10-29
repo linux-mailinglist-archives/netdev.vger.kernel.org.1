@@ -1,74 +1,93 @@
-Return-Path: <netdev+bounces-233767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DFCEC18067
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 03:14:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BDC7BC18095
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 03:20:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 734D01A60414
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 02:14:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F35A41C67EE9
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 02:20:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B07C22EA17E;
-	Wed, 29 Oct 2025 02:14:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F18C2253FF;
+	Wed, 29 Oct 2025 02:20:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pQilL4Y8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pRH/Zish"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C2432E9EB5
-	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 02:14:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0702F224B0E;
+	Wed, 29 Oct 2025 02:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761704058; cv=none; b=KP3pNDfc0U59YB+CZXluzXIShF81xm1H0px7w+uWPCkssBxHfQrQncbvwkUBIHO3BAH7Fl2x+nxfGdykd5s56k932OWXqNRXq3+83DGekTDxiu7Be907ZbvFzIyNOiLTFXDJ9rWPMEtEpXuEJEIchkU4jaB7d8AdWHTJT25naLs=
+	t=1761704429; cv=none; b=T407B939BYrPyz1fbwqC+Cj5QlqEfNiFtJLg2xnlddCHqAVv748ZxzKzji3NZwpnuIPWKfTLn+Saaas49GIkdKz74A0fdLywnDix3++lVexVkd8G6S2xQMiRkkQMWBIt1Blm90bz9Lzsu48bkxXVjOnLzh+78KXMmT1A97URO/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761704058; c=relaxed/simple;
-	bh=ZZs5A8zSwRdMCQqEtcKlclb9H2qXuaiodNOXE4S+CDc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gR1qhAjRxRQOhfDPnQh+koKdYYCXVC8lAGL4R5gGDtW82Xbwxq2d84WH3u3Z2qPlZWxosJbEiY3/TPsEgYseA2hkQuEIb2cjtFhfmIozSAn1V9T1MhrKWSEg6m/qnCqum4AazXH7f8BFPsOwlUV/nOPWvxCeR9A2rm49qhKWtxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pQilL4Y8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D249C4CEE7;
-	Wed, 29 Oct 2025 02:14:17 +0000 (UTC)
+	s=arc-20240116; t=1761704429; c=relaxed/simple;
+	bh=gqlrnFgCwni2QD8CDRB3o7cz9/QMgUMtjgK7QZSCHH4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=OZOykPuLHRv9+zVzAPAhj291auQ+8eRGeulUcd7cyXquSZ1PA4IZbSuGLw5FvXvEn6aNNHJ/H4p6oK51lBaX/KjmcwwDUrtE/FomSU0/raXjWy/4J7NWeYvdtL+V37OuC6FfUxMfmcAYO6p2Iz/07Gota1qY5f9MCEGxCKnFPJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pRH/Zish; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 739ADC4CEE7;
+	Wed, 29 Oct 2025 02:20:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761704057;
-	bh=ZZs5A8zSwRdMCQqEtcKlclb9H2qXuaiodNOXE4S+CDc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pQilL4Y8X+EaWjLdNR59tvNDTg2C2X+e5BEK33KR9K4PH/8Mqz+tLftrKn7YHNJK9
-	 3pYSovj1o6HesJX+wqbeY3SmueycvFDzkUdHUtcJjTHEZAwxwhVYaDPa96Dx/UaF6Y
-	 Pqiwm1ndpEAwt7oYHZYAYSJU1eIWVzlSjWu/Meh2alAYY+ZYZnQBKfrc9p4j/5DMoI
-	 YjGrI3Ti60fpw4cltXMZ4GWQLei0pUoE4H2K3v80RmdeNvPtlAEAQOo3mRhsO01qjg
-	 VIQcwK1Hv6a9Y1grWMSSKyRWUtlzTO/nYB8NMPD1kv+gbugA5nPN+SNo7n3YNbOrgZ
-	 Ma3daooSMZu4g==
-Date: Tue, 28 Oct 2025 19:14:16 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Raju Rangoju <Raju.Rangoju@amd.com>
-Cc: <netdev@vger.kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
- <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
- <maxime.chevallier@bootlin.com>, <Shyam-sundar.S-k@amd.com>
-Subject: Re: [PATCH net-next v4 5/5] amd-xgbe: add ethtool jumbo frame
- selftest
-Message-ID: <20251028191416.78de3614@kernel.org>
-In-Reply-To: <20251028084923.1047010-4-Raju.Rangoju@amd.com>
-References: <20251028084923.1047010-1-Raju.Rangoju@amd.com>
-	<20251028084923.1047010-4-Raju.Rangoju@amd.com>
+	s=k20201202; t=1761704428;
+	bh=gqlrnFgCwni2QD8CDRB3o7cz9/QMgUMtjgK7QZSCHH4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=pRH/ZishxO66AfD4edHnJdwIETSmjyXlQZGOp+H+GyDpdAKCRRYtQ/3Sez/7tZgrm
+	 jS/NzKMxpyqQQgXJFBn5hrIkkrvxSBkB0kiGeX+FEXCl5e+YaZqYxO0VsxPp0a8K3h
+	 YF/dfXCZ0SSHkC61NlWF5YAHhARLCMDsbp/l/H/ZiOMg+OdnRYkh/khd/BAUeLTy6t
+	 Eyd01Q7mXQVDWcVqyHkX6iG5tOIHW4HiSyCDdWWEZ0roFiiARD3OLJV0tGglBeDv52
+	 XxEersqizLGb/UP5GzW8d0R5cLLecdVbzy3+KKjG3XR1jkPcEH4fQ8ywwCMHyqOgyr
+	 1b4vdng5C1FRA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E0C39FEB75;
+	Wed, 29 Oct 2025 02:20:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] net: phy: motorcomm: Add support for PHY LEDs on YT8531
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176170440584.2467162.6911069666444153662.git-patchwork-notify@kernel.org>
+Date: Wed, 29 Oct 2025 02:20:05 +0000
+References: <20251026133652.1288732-1-cnsztl@gmail.com>
+In-Reply-To: <20251026133652.1288732-1-cnsztl@gmail.com>
+To: Tianling Shen <cnsztl@gmail.com>
+Cc: Frank.Sae@motor-comm.com, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, shaojijie@huawei.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, 28 Oct 2025 14:19:23 +0530 Raju Rangoju wrote:
->  	skb = skb_unshare(skb, GFP_ATOMIC);
->  	if (!skb)
-> -		goto out;
-> +		goto out;;
+Hello:
 
-double semicolon
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Sun, 26 Oct 2025 21:36:52 +0800 you wrote:
+> The LED registers on YT8531 are exactly same as YT8521, so simply
+> reuse yt8521_led_hw_* functions.
+> 
+> Tested on OrangePi R1 Plus LTS and Zero3.
+> 
+> Signed-off-by: Tianling Shen <cnsztl@gmail.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - net: phy: motorcomm: Add support for PHY LEDs on YT8531
+    https://git.kernel.org/netdev/net-next/c/a8abe8e210c1
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
