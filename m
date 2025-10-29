@@ -1,177 +1,157 @@
-Return-Path: <netdev+bounces-234180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 959EBC1DA1A
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 23:59:43 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16E60C1DA6D
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 00:13:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F861188F442
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 23:00:07 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 657944E3217
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 23:13:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8DFB2E62C8;
-	Wed, 29 Oct 2025 22:59:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CD862E5B09;
+	Wed, 29 Oct 2025 23:13:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VW+cqAVC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HGhcp+hd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE062E5B09;
-	Wed, 29 Oct 2025 22:59:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 117732F25E6
+	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 23:13:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761778778; cv=none; b=mjyb6DNM6Br0lJjGLPlBaLtHhTzSTJPmgYCJJKJf9FlpejvrcPTwTS0ZMwjiZW1DifX0clqKgx6O5NZxnUy+untv6wn902BNPqx/Bn3gxmpqnFOnmS+fh99P1wbiv5jdObO4RfLIgkKOEGK95moeWMs32PIdmqr3WmkMyE9rBQ4=
+	t=1761779627; cv=none; b=a5bgvitGcYxz1NY+HoHPqfgZOom2hib44FAKj+6/9LWfAjLYfk171m5h3pZaFWp1eadcEDHULV5ISX5riT/RxGyTpy7/psfN1X5Q1JLFDmEmyNlT08d8ymL2T18eufj03dpOYVGQtSrmShex5IPxr8WWn/nJEO1sJvI3la7O05A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761778778; c=relaxed/simple;
-	bh=vsALvB66YS+oJy282YuBqx/N0hfKCbNNomExS9wRJt8=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=JFA+W2ng789wTJ0/p1Z72Gt5EqoVOWJrB9UpUIS8ZE9EzpgRBi3RXo9iKT+Wan3DdORdtF4UYVmD2YXeEWltx0NV2fmVMzn/k/098LrRA5aYf9LGvTM2cIa1IYSPddgnNxWIKSTcDn2yVH3JctNZkSgWmLFwXtEkotYzbqU6BJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VW+cqAVC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ABF48C4CEF7;
-	Wed, 29 Oct 2025 22:59:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761778778;
-	bh=vsALvB66YS+oJy282YuBqx/N0hfKCbNNomExS9wRJt8=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=VW+cqAVChbcju/OS+KUzpStrv2sueDIYN9CDWXmcyU6K80XvHR5bH/bvA4geaO3DL
-	 mXSsdy4o3zXxC8laWH8Ep2ziTb0BJ3UmVMUWrKgmdmjiN9ibuCh4BZh2NK8NXHuBoe
-	 6H/xDPLgK0SFm39rE0XG8KAxuE8Kmix6baMVLLz4O2cLOxiLdfUP+I5FY6LgHYaSk+
-	 lFNks44MYgpMFkF1inhro/puyOjhPF0i4nO3xGN2YrKOg82ZDKGzn2jrfaqgD41yiE
-	 nbEEF2ZdwzqL53BwAhWdd5T5Ppd3UD9bc/5oY5WbOx65bRwHO817ivw4ousKa/+i4M
-	 fG/7jrJfjFVeA==
-Content-Type: multipart/mixed; boundary="===============7878305878613788522=="
+	s=arc-20240116; t=1761779627; c=relaxed/simple;
+	bh=DAkYfmRlyjhKsFZLWKSbdNJmW5wlXaLYXHZQ4JfW8MI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ui8yCV900TYX0lC4Njv8CPwCK2qUrzd4NBKtV7E8RTuZS3vmpqqdirhyRvbynvCZh9rv26XokIs8+VoPgvyDYE/G0qpLbHCuOGfh0p+o4ih3N5lrQEgCcnlDjI/I/jAcy8k28f5JW/V1jrKHrTf0UjGt9vygGvLCNlZSgG0cBO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HGhcp+hd; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1761779626; x=1793315626;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=DAkYfmRlyjhKsFZLWKSbdNJmW5wlXaLYXHZQ4JfW8MI=;
+  b=HGhcp+hddEdV4sogxDQl9wlyheUDBT66h6VzvgEQXGdAMutbP8eQHVQX
+   hD0m8VGKzFtXB1U4y5rpSwMmmpnzeYX2/npzDN/elxFlB8a1ZQZOz7Ww+
+   eloVon2MmPhc1O8oWe1Le7ckBfF/VYj0S7I1qntJu8BLxdQw+T2SpXiIK
+   kwxyIQyokLKFZhPx1y9seoiLfSL3oUvTueT76FqmFOcsnQiOZ6pCzrhwt
+   1jJCLyM5GhRe3ihRnLcDmWnkHZE7DdiHolay25+cav3+37hjKehymrPlT
+   1DbGTcv/ZJsXbMktOTXD9wKp5FMSKeLEzDmt7pfcDUmfZ7AAXW9q8PfRQ
+   g==;
+X-CSE-ConnectionGUID: 8CmhN1pBRX2EjwnZiui7dA==
+X-CSE-MsgGUID: T41qWumFSTe/sCcgVnnqfg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="63817602"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="63817602"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 16:13:46 -0700
+X-CSE-ConnectionGUID: 1hcyBpLASV22eVM8+skYZw==
+X-CSE-MsgGUID: FpQUBaheSnqBj3dwmOVyVQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,265,1754982000"; 
+   d="scan'208";a="185729682"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa007.jf.intel.com with ESMTP; 29 Oct 2025 16:13:46 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 0/9][pull request] Intel Wired LAN Driver Updates 2025-10-29 (ice, i40e, idpf, ixgbe, igbvf)
+Date: Wed, 29 Oct 2025 16:12:07 -0700
+Message-ID: <20251029231218.1277233-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <e9f13992d679d08d193cb40c15c70fbf4adfe9d94a6235b20858fbe161be58a1@mail.kernel.org>
-In-Reply-To: <20251029221315.2694841-3-maciej.fijalkowski@intel.com>
-References: <20251029221315.2694841-3-maciej.fijalkowski@intel.com>
-Subject: Re: [PATCH v5 bpf 2/2] veth: update mem type in xdp_buff
-From: bot+bpf-ci@kernel.org
-To: maciej.fijalkowski@intel.com,bpf@vger.kernel.org,ast@kernel.org,daniel@iogearbox.net,hawk@kernel.org
-Cc: netdev@vger.kernel.org,magnus.karlsson@intel.com,aleksander.lobakin@intel.com,ilias.apalodimas@linaro.org,toke@redhat.com,lorenzo@kernel.org,kuba@kernel.org,maciej.fijalkowski@intel.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Wed, 29 Oct 2025 22:59:36 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
 
---===============7878305878613788522==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+For ice:
+Michal converts driver to utilize Page Pool and libeth APIs. Conversion
+is based on similar changes done for iavf in order to simplify buffer
+management, improve maintainability, and increase code reuse across
+Intel Ethernet drivers.
 
+Additional details:
+https://lore.kernel.org/intel-wired-lan/20250925092253.1306476-1-michal.kubiak@intel.com/
 
-```
-commit 96d6e22337a81e8606de33d22173ff80ab961bc8
-Author: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Alexander adds support for header split, configurable via ethtool.
 
-veth: update mem type in xdp_buff
+Grzegorz allows for use of 100Mbps on E825C SGMII devices.
 
-The commit fixes a page_pool leak by properly detecting page_pool memory
-and using appropriate reference counting APIs. The xdp_buff mem type is
-now dynamically set based on skb->pp_recycle instead of always using
-MEM_TYPE_PAGE_SHARED.
+For i40e:
+Jay Vosburgh avoids sending link state changes to VF if it is already in
+the requested state.
 
-Closes: https://lore.kernel.org/bpf/CAADnVQ+bBofJDfieyOYzSmSujSfJwDTQhiz3aJw7hE+4E2_iPA@mail.gmail.com/
+For idpf:
+Sreedevi removes duplicated defines.
 
-> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-> index a3046142c..187f30e2c 100644
-> --- a/drivers/net/veth.c
-> +++ b/drivers/net/veth.c
+For ixgbe:
+Alok Tiwari fixes some typos.
 
-[ ... ]
+For igbvf:
+Alok Tiwari fixes output of VLAN warning message.
 
-> @@ -733,7 +733,7 @@ static void veth_xdp_rcv_bulk_skb(struct veth_rq *rq, void **frames,
->  	}
->  }
->
-> -static void veth_xdp_get(struct xdp_buff *xdp)
-> +static void veth_xdp_get_shared(struct xdp_buff *xdp)
->  {
->  	struct skb_shared_info *sinfo = xdp_get_shared_info_from_buff(xdp);
->  	int i;
-> @@ -746,12 +746,33 @@ static void veth_xdp_get(struct xdp_buff *xdp)
->  		__skb_frag_ref(&sinfo->frags[i]);
->  }
->
-> +static void veth_xdp_get_pp(struct xdp_buff *xdp)
-> +{
-> +	struct skb_shared_info *sinfo = xdp_get_shared_info_from_buff(xdp);
-> +	int i;
-> +
-> +	page_pool_ref_page(virt_to_page(xdp->data));
-> +	if (likely(!xdp_buff_has_frags(xdp)))
-> +		return;
-> +
-> +	for (i = 0; i < sinfo->nr_frags; i++) {
-> +		skb_frag_t *frag = &sinfo->frags[i];
-> +
-> +		page_pool_ref_page(netmem_to_page(frag->netmem));
-> +	}
-> +}
-> +
-> +static void veth_xdp_get(struct xdp_buff *xdp)
-> +{
-> +	xdp->rxq->mem.type == MEM_TYPE_PAGE_POOL ?
-> +		veth_xdp_get_pp(xdp) : veth_xdp_get_shared(xdp);
-> +}
-> +
+The following are changes since commit a8abe8e210c175b1d5a7e53df069e107b65c13cb:
+  net: phy: motorcomm: Add support for PHY LEDs on YT8531
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 100GbE
 
-[ ... ]
+Alexander Lobakin (1):
+  ice: implement configurable header split for regular Rx
 
-> @@ -822,24 +831,24 @@ static struct sk_buff *veth_xdp_rcv_skb(struct veth_rq *rq,
->  	case XDP_TX:
->  		veth_xdp_get(xdp);
->  		consume_skb(skb);
-> -		xdp->rxq->mem = rq->xdp_mem;
->  		if (unlikely(veth_xdp_tx(rq, xdp, bq) < 0)) {
->  			trace_xdp_exception(rq->dev, xdp_prog, act);
->  			stats->rx_drops++;
->  			goto err_xdp;
->  		}
+Alok Tiwari (2):
+  ixgbe: fix typos in ixgbe driver comments
+  igbvf: fix misplaced newline in VLAN add warning message
 
-Can veth_xdp_rcv_skb() leak page references in the XDP_TX error path?
-When veth_xdp_tx() fails, the code jumps to err_xdp without releasing
-the page references acquired by veth_xdp_get(). The skb was already
-consumed, so the pages still have the extra references from either
-veth_xdp_get_pp() or veth_xdp_get_shared().
+Grzegorz Nitka (1):
+  ice: Allow 100M speed for E825C SGMII device
 
-veth_xdp_tx() can return -EOVERFLOW when xdp_convert_buff_to_frame()
-returns NULL, which is a reachable error path.
+Jay Vosburgh (1):
+  i40e: avoid redundant VF link state updates
 
->  		stats->xdp_tx++;
-> +		rq->xdp_rxq.mem = rq->xdp_mem;
->  		rcu_read_unlock();
->  		goto xdp_xmit;
->  	case XDP_REDIRECT:
->  		veth_xdp_get(xdp);
->  		consume_skb(skb);
-> -		xdp->rxq->mem = rq->xdp_mem;
->  		if (xdp_do_redirect(rq->dev, xdp, xdp_prog)) {
->  			stats->rx_drops++;
->  			goto err_xdp;
->  		}
+Michal Kubiak (3):
+  ice: remove legacy Rx and construct SKB
+  ice: drop page splitting and recycling
+  ice: switch to Page Pool
 
-Similar question for the XDP_REDIRECT case - when xdp_do_redirect()
-fails, does this also leak the page references taken by veth_xdp_get()?
+Sreedevi Joshi (1):
+  idpf: remove duplicate defines in IDPF_CAP_RSS
 
->  		stats->xdp_redirect++;
-> +		rq->xdp_rxq.mem = rq->xdp_mem;
->  		rcu_read_unlock();
->  		goto xdp_xmit;
->  	default:
+ drivers/net/ethernet/intel/Kconfig            |   1 +
+ .../ethernet/intel/i40e/i40e_virtchnl_pf.c    |  12 +
+ drivers/net/ethernet/intel/ice/ice.h          |   4 +-
+ drivers/net/ethernet/intel/ice/ice_base.c     | 170 +++--
+ drivers/net/ethernet/intel/ice/ice_common.c   |   1 +
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  |  37 +-
+ .../net/ethernet/intel/ice/ice_lan_tx_rx.h    |   3 +
+ drivers/net/ethernet/intel/ice/ice_lib.c      |   1 -
+ drivers/net/ethernet/intel/ice/ice_main.c     |  21 +-
+ drivers/net/ethernet/intel/ice/ice_txrx.c     | 710 ++++--------------
+ drivers/net/ethernet/intel/ice/ice_txrx.h     | 132 +---
+ drivers/net/ethernet/intel/ice/ice_txrx_lib.c |  65 +-
+ drivers/net/ethernet/intel/ice/ice_txrx_lib.h |   9 -
+ drivers/net/ethernet/intel/ice/ice_xsk.c      | 146 +---
+ drivers/net/ethernet/intel/ice/ice_xsk.h      |   6 +-
+ drivers/net/ethernet/intel/ice/virt/queues.c  |   5 +-
+ drivers/net/ethernet/intel/idpf/idpf.h        |   2 -
+ drivers/net/ethernet/intel/igbvf/netdev.c     |   2 +-
+ .../net/ethernet/intel/ixgbe/ixgbe_82599.c    |   4 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c  |   4 +-
+ 20 files changed, 364 insertions(+), 971 deletions(-)
 
+-- 
+2.47.1
 
-```
-
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
-
-In-Reply-To-Subject: `veth: update mem type in xdp_buff`
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/18923812102
-
---===============7878305878613788522==--
 
