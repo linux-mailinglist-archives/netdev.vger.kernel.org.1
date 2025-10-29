@@ -1,307 +1,200 @@
-Return-Path: <netdev+bounces-233986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E486C1B7BC
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 15:59:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 804D0C1B1BC
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 15:13:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B17266783B
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 13:54:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E7B66E0DF3
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 13:57:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6059B244687;
-	Wed, 29 Oct 2025 13:43:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C27A42C11C5;
+	Wed, 29 Oct 2025 13:52:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Cc3W224A"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="I7Uy3BYV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F91C358D18
-	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 13:43:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 732631EF0B0;
+	Wed, 29 Oct 2025 13:52:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761745387; cv=none; b=RCHHtiU2yhAfQMobZt1tE2bi4lARmegbX7ZC7HQaSg150Jrl7l+15KulKQ3jfLsfo9lRiYfiwAKB1xueaOz5ExpeVlKto4rHkespIAcuKUTVLl33IQ59GkBs12rRgicsy/ESEM2eQfwwjW5VsBbAZL+khv3nMI8Ecn+ykUmzKvc=
+	t=1761745956; cv=none; b=MTfgWxt/yuKmIjFcbsZj4o8UAD2L3R7oZ5sHE6SKI7OsGxsnyzCT/f+uJlsv1Nw1PiRChuRaK259QnzmNJtodaf+nJ2cvtAI0c8an8UyKDwlX5GP6sVFWTU/fnabC5kmyGBRD+tsU2I1efB0jMNiqZQpsqNm5yx15vOwd4BhO28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761745387; c=relaxed/simple;
-	bh=7soHO9LaDuEcrh4CS1BaPHwK4b5qra2+PXKb/ErM4yc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B7UJSUrAVnF8P4+Uhs0LSh3Mn6m3WG73YsMYo13fzlMQXf5v79uMagk8cvpLcHKkynKIrar2g+rQUcaSX0iCvR3oY0T/x8s6YzNgN0zPZApNXZ3DCdpx6h/pzN1bIlH6vV7K1otcRQNIeefifLX2PBsQrTp6KNHTMzpeA+aP0DQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Cc3W224A; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4ed0c8e4dbcso353501cf.0
-        for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 06:43:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761745384; x=1762350184; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3Efu2b3TBu5wmyvdmKqEZLni7Qy5XpG2TvGkeSVZD7U=;
-        b=Cc3W224AD44KJBeEM78txSo9nLY73PuEAFQATv4j7s+oL+/xXZpU451jHAKhtbu3fY
-         7dXQaT9o/8MRCg66JQKf00AC1kTko5iJmLtBaIz32XMgXpI7WFvMxd1eCR5yE6ndgD+L
-         EXkwpoPBGS657HViQEVgxC31U/3JB4EVeH0h/tcm6bUKDtjKecSoE+N5yxfN4aO4g4tt
-         Om4FSlZV9gP6JgNLnNagLaH+jYaxxgvo5Qa4il7KgX3iJWMHhHbJTz8X+UP43LKDF2lo
-         Iumbt9zE6N1YUWgvKG9btpkOFlSYibpWaPiLvb88tiO28Y9pUx+Ov0GglpNSKfSfUYW+
-         zWlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761745384; x=1762350184;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3Efu2b3TBu5wmyvdmKqEZLni7Qy5XpG2TvGkeSVZD7U=;
-        b=oy+YGz5Rox9nJGi9TWQKsOQDErgiUZl5ZYcqF9fF4rQsLvoJcJFuNe4iJ/noOlOfjC
-         +26AojQBfYy0PInQFU9o5WUUJCFqrWsDcz5ZV2swhVGWzBsmUkr+1UgYviDvjaKVXNmq
-         FbL84824qxZezRk4dif0yJnWaRybobC8NAuuEeGILCyqn39kvN6yYlF34zBQOpfw7Yjn
-         wm6kk2p0NNFIVWcb2wFPnEXjBj1JHORrg6LuFt8JTOWW4ti11joZ8ED+sWnfNrtfdIk+
-         AN3TJ+ZSKfnaGGD6wMcc2d0Ul8mnWdBwEbk2ZHWwD+MuZ1U+AOAbFKNFUhIvLjQJqeNt
-         BEYw==
-X-Forwarded-Encrypted: i=1; AJvYcCUZC+0FBr8K3zLBHEWIg+itJFHabl0GdLx9DouqrSGtm2em2j49QvcHtGsEFnESuHEsyrz17w8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxTt6NDvd7/y+L7MeCaKI228EG/ipcNiUq1oTRZpsTxPR2O01fC
-	Eqjpn955sTMDIgcbZf9Gck5EIDUdGUGwu1G/44Wl/BdWY8rcF7HrJLdEAwKiCmXw1E7mxoNU+vv
-	q2KGF5kP3WwObvJrrmLh7mG7+GY1oaFplBMJ330Qi
-X-Gm-Gg: ASbGncuKNnwpMJpRBkq5IzgwqfXtCB2T4bjHcy0vcX58ZEZYHhAVM0h2WQPi+GzGrqy
-	d5us9rEYGi1QhFZvdm1Z+BkcqtdYUI+kVK9Fi9+7yPlglQbID0J4NX1zgUnKxG3WxMcWL4P80zV
-	KM0lJENTdoXqd5ULP59JSgUlZWJbjm4zVevPzYwtv9kgEtAeEkzmkP4Iy415iCfeRaIIQE8y8XE
-	lVHM3Mk3E7UDEunB/hMqXug7SZyA2BBIzRLlnuLaALMUzXTxyMs9w47yjK2HEyWt1cqSq+mmU1v
-	YYROji2nIXjU85TpzGcldpYLU7YTAV/BTP1R8UZG6OwAyllzpQ==
-X-Google-Smtp-Source: AGHT+IFep33ARYzlPHTxdEMcSpa5nOb5jyduzTR8U+HMJiuH9EhqsySS+kqdMKz2s3RAh8Z2dflJHLBxW9htAh56QOQ=
-X-Received: by 2002:a05:622a:4d99:b0:4b7:9a9e:833f with SMTP id
- d75a77b69052e-4ed1657e9f6mr6357411cf.7.1761745383809; Wed, 29 Oct 2025
- 06:43:03 -0700 (PDT)
+	s=arc-20240116; t=1761745956; c=relaxed/simple;
+	bh=rW3784dFwWK1ESSqmaBPg+kT0mzp+FqU2lvt8I3dmu4=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=t2xfanb/gYIS4cGbu0hLYa37OKNHNinACbPBjsD272g03icRfpNUeLmMYIrs12SoZMOvzE/Tw0/zyNZUeFUhlionbdQnht22oUuGYZk7TXYpqO/t55ac57w6jOyDOglpLbTMmZiKvQThelAVI3WLHBPoYbWthumMLRbjFZPBVXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=I7Uy3BYV; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 9D5C54E413BF;
+	Wed, 29 Oct 2025 13:52:32 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 5778F606E8;
+	Wed, 29 Oct 2025 13:52:32 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 5A263117F80EE;
+	Wed, 29 Oct 2025 14:52:25 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1761745951; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=rhH66cXrlh+mBW9/j7oTqaX5K/p8LcUvQAyFmm6+5Q8=;
+	b=I7Uy3BYV/Ou2rYMnDh1/hbLmhYDx1/ph/I5ohpr9w/G0N3i9SxBnYKHMBHwx5cfopu9avr
+	Xq3vg2TbT0osKF5zTEKv82/yopurT8c8NTcGNl/ijT9MJskiz9eOawGpq0Pq4yFzU9rI+v
+	95y+tRGSQQOkhp8Z6SgnFCzD7LrS2aZZ9YRuIQnHyCM439BGEAIvP6n3Paw1kNDrRgwBuX
+	Dx6a91hs0BOhslhMx3KBN7LLeWLo8NH/9Yykcb0tqO5FFOsRnHdwcLiUeLNIZsMtOYwDmO
+	+myXpz7eDahFuhdLvKc/qx6zu76DMar/M9ciSClSYcpff5ALg6ZgMPOBv3tj8Q==
+From: "Bastien Curutchet (eBPF Foundation)" <bastien.curutchet@bootlin.com>
+Subject: [PATCH bpf-next v6 00/15] selftests/bpf: Integrate test_xsk.c to
+ test_progs framework
+Date: Wed, 29 Oct 2025 14:52:21 +0100
+Message-Id: <20251029-xsk-v6-0-5a63a64dff98@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251028-net-tcp-recv-autotune-v3-0-74b43ba4c84c@kernel.org> <20251028-net-tcp-recv-autotune-v3-4-74b43ba4c84c@kernel.org>
-In-Reply-To: <20251028-net-tcp-recv-autotune-v3-4-74b43ba4c84c@kernel.org>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Wed, 29 Oct 2025 09:42:46 -0400
-X-Gm-Features: AWmQ_blM3nXt0K4DkE9fj5uTx0bD3zz8OQN-MjU7m93BFU5U1NDhs27rt6_9h4A
-Message-ID: <CADVnQykUuOTK2M5LfkzvBNU+_tPLQj=8e2sm4EdVyzfktohuZQ@mail.gmail.com>
-Subject: Re: [PATCH net v3 4/4] tcp: fix too slow tcp_rcvbuf_grow() action
-To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, mptcp@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIABUcAmkC/23NwU7DMAyA4VeZciYoseOk2Yn3QByW1GUR0ExNV
+ RVNfXeiFMHEOFr29/sqCk+JizgermLiJZWUxzrYh4OI59P4yjL1dRaggBToTq7lTao4eMXeUa+
+ NqJeXiYe0tsqzCJdBjrzO4qVuzqnMefps+UW3fSuhxlZatFTSoTMO/Mlj8E8h5/k9jY8xf7TCA
+ r/KK9gVVKVdtGioJ9B0r/BWmV1hVZGxA0bUpvtHmRsF38pUBYrJEbrQOXuv6Edppe2uqCprIXr
+ i0Cn159e2bV+O8hcnegEAAA==
+X-Change-ID: 20250218-xsk-0cf90e975d14
+To: =?utf-8?q?Bj=C3=B6rn_T=C3=B6pel?= <bjorn@kernel.org>, 
+ Magnus Karlsson <magnus.karlsson@intel.com>, 
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
+ Jonathan Lemon <jonathan.lemon@gmail.com>, 
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, 
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, 
+ Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ Alexis Lothore <alexis.lothore@bootlin.com>, netdev@vger.kernel.org, 
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ "Bastien Curutchet (eBPF Foundation)" <bastien.curutchet@bootlin.com>
+X-Mailer: b4 0.14.2
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Tue, Oct 28, 2025 at 7:58=E2=80=AFAM Matthieu Baerts (NGI0)
-<matttbe@kernel.org> wrote:
->
-> From: Eric Dumazet <edumazet@google.com>
->
-> While the blamed commits apparently avoided an overshoot,
-> they also limited how fast a sender can increase BDP at each RTT.
->
-> This is not exactly a revert, we do not add the 16 * tp->advmss
-> cushion we had, and we are keeping the out_of_order_queue
-> contribution.
->
-> Do the same in mptcp_rcvbuf_grow().
->
-> Tested:
->
-> emulated 50ms rtt (tcp_stream --tcp-tx-delay 50000), cubic 20 second flow=
-.
-> net.ipv4.tcp_rmem set to "4096 131072 67000000"
->
-> perf record -a -e tcp:tcp_rcvbuf_grow sleep 20
-> perf script
->
-> Before:
->
-> We can see we fail to roughly double RWIN at each RTT.
-> Sender is RWIN limited while CWND is ramping up (before getting tcp_wmem
-> limited).
->
-> tcp_stream 33793 [010]  825.717525: tcp:tcp_rcvbuf_grow: time=3D100869 rt=
-t_us=3D50428 copied=3D49152 inq=3D0 space=3D40960 ooo=3D0 scaling_ratio=3D2=
-19 rcvbuf=3D131072 rcv_ssthresh=3D103970 window_clamp=3D112128 rcv_wnd=3D10=
-6496
-> tcp_stream 33793 [010]  825.768966: tcp:tcp_rcvbuf_grow: time=3D51447 rtt=
-_us=3D50362 copied=3D86016 inq=3D0 space=3D49152 ooo=3D0 scaling_ratio=3D21=
-9 rcvbuf=3D131072 rcv_ssthresh=3D107474 window_clamp=3D112128 rcv_wnd=3D106=
-496
-> tcp_stream 33793 [010]  825.821539: tcp:tcp_rcvbuf_grow: time=3D52577 rtt=
-_us=3D50243 copied=3D114688 inq=3D0 space=3D86016 ooo=3D0 scaling_ratio=3D2=
-19 rcvbuf=3D201096 rcv_ssthresh=3D167377 window_clamp=3D172031 rcv_wnd=3D16=
-7936
-> tcp_stream 33793 [010]  825.871781: tcp:tcp_rcvbuf_grow: time=3D50248 rtt=
-_us=3D50237 copied=3D167936 inq=3D0 space=3D114688 ooo=3D0 scaling_ratio=3D=
-219 rcvbuf=3D268129 rcv_ssthresh=3D224722 window_clamp=3D229375 rcv_wnd=3D2=
-25280
-> tcp_stream 33793 [010]  825.922475: tcp:tcp_rcvbuf_grow: time=3D50698 rtt=
-_us=3D50183 copied=3D241664 inq=3D0 space=3D167936 ooo=3D0 scaling_ratio=3D=
-219 rcvbuf=3D392617 rcv_ssthresh=3D331217 window_clamp=3D335871 rcv_wnd=3D3=
-23584
-> tcp_stream 33793 [010]  825.973326: tcp:tcp_rcvbuf_grow: time=3D50855 rtt=
-_us=3D50213 copied=3D339968 inq=3D0 space=3D241664 ooo=3D0 scaling_ratio=3D=
-219 rcvbuf=3D564986 rcv_ssthresh=3D478674 window_clamp=3D483327 rcv_wnd=3D4=
-62848
-> tcp_stream 33793 [010]  826.023970: tcp:tcp_rcvbuf_grow: time=3D50647 rtt=
-_us=3D50248 copied=3D491520 inq=3D0 space=3D339968 ooo=3D0 scaling_ratio=3D=
-219 rcvbuf=3D794811 rcv_ssthresh=3D671778 window_clamp=3D679935 rcv_wnd=3D6=
-51264
-> tcp_stream 33793 [010]  826.074612: tcp:tcp_rcvbuf_grow: time=3D50648 rtt=
-_us=3D50227 copied=3D700416 inq=3D0 space=3D491520 ooo=3D0 scaling_ratio=3D=
-219 rcvbuf=3D1149124 rcv_ssthresh=3D974881 window_clamp=3D983039 rcv_wnd=3D=
-942080
-> tcp_stream 33793 [010]  826.125452: tcp:tcp_rcvbuf_grow: time=3D50845 rtt=
-_us=3D50225 copied=3D987136 inq=3D8192 space=3D700416 ooo=3D0 scaling_ratio=
-=3D219 rcvbuf=3D1637502 rcv_ssthresh=3D1392674 window_clamp=3D1400831 rcv_w=
-nd=3D1339392
-> tcp_stream 33793 [010]  826.175698: tcp:tcp_rcvbuf_grow: time=3D50250 rtt=
-_us=3D50198 copied=3D1347584 inq=3D0 space=3D978944 ooo=3D0 scaling_ratio=
-=3D219 rcvbuf=3D2288672 rcv_ssthresh=3D1949729 window_clamp=3D1957887 rcv_w=
-nd=3D1945600
-> tcp_stream 33793 [010]  826.225947: tcp:tcp_rcvbuf_grow: time=3D50252 rtt=
-_us=3D50240 copied=3D1945600 inq=3D0 space=3D1347584 ooo=3D0 scaling_ratio=
-=3D219 rcvbuf=3D3150516 rcv_ssthresh=3D2687010 window_clamp=3D2695167 rcv_w=
-nd=3D2691072
-> tcp_stream 33793 [010]  826.276175: tcp:tcp_rcvbuf_grow: time=3D50233 rtt=
-_us=3D50224 copied=3D2691072 inq=3D0 space=3D1945600 ooo=3D0 scaling_ratio=
-=3D219 rcvbuf=3D4548617 rcv_ssthresh=3D3883041 window_clamp=3D3891199 rcv_w=
-nd=3D3887104
-> tcp_stream 33793 [010]  826.326403: tcp:tcp_rcvbuf_grow: time=3D50233 rtt=
-_us=3D50229 copied=3D3887104 inq=3D0 space=3D2691072 ooo=3D0 scaling_ratio=
-=3D219 rcvbuf=3D6291456 rcv_ssthresh=3D5370482 window_clamp=3D5382144 rcv_w=
-nd=3D5373952
-> tcp_stream 33793 [010]  826.376723: tcp:tcp_rcvbuf_grow: time=3D50323 rtt=
-_us=3D50218 copied=3D5373952 inq=3D0 space=3D3887104 ooo=3D0 scaling_ratio=
-=3D219 rcvbuf=3D9087658 rcv_ssthresh=3D7755537 window_clamp=3D7774207 rcv_w=
-nd=3D7757824
-> tcp_stream 33793 [010]  826.426991: tcp:tcp_rcvbuf_grow: time=3D50274 rtt=
-_us=3D50196 copied=3D7757824 inq=3D180224 space=3D5373952 ooo=3D0 scaling_r=
-atio=3D219 rcvbuf=3D12563759 rcv_ssthresh=3D10729233 window_clamp=3D1074790=
-3 rcv_wnd=3D10575872
-> tcp_stream 33793 [010]  826.477229: tcp:tcp_rcvbuf_grow: time=3D50241 rtt=
-_us=3D50078 copied=3D10731520 inq=3D180224 space=3D7577600 ooo=3D0 scaling_=
-ratio=3D219 rcvbuf=3D17715667 rcv_ssthresh=3D15136529 window_clamp=3D151551=
-99 rcv_wnd=3D14983168
-> tcp_stream 33793 [010]  826.527482: tcp:tcp_rcvbuf_grow: time=3D50258 rtt=
-_us=3D50153 copied=3D15138816 inq=3D360448 space=3D10551296 ooo=3D0 scaling=
-_ratio=3D219 rcvbuf=3D24667870 rcv_ssthresh=3D21073410 window_clamp=3D21102=
-591 rcv_wnd=3D20766720
-> tcp_stream 33793 [010]  826.577712: tcp:tcp_rcvbuf_grow: time=3D50234 rtt=
-_us=3D50228 copied=3D21073920 inq=3D0 space=3D14778368 ooo=3D0 scaling_rati=
-o=3D219 rcvbuf=3D34550339 rcv_ssthresh=3D29517041 window_clamp=3D29556735 r=
-cv_wnd=3D29519872
-> tcp_stream 33793 [010]  826.627982: tcp:tcp_rcvbuf_grow: time=3D50275 rtt=
-_us=3D50220 copied=3D29519872 inq=3D540672 space=3D21073920 ooo=3D0 scaling=
-_ratio=3D219 rcvbuf=3D49268707 rcv_ssthresh=3D42090625 window_clamp=3D42147=
-839 rcv_wnd=3D41627648
-> tcp_stream 33793 [010]  826.678274: tcp:tcp_rcvbuf_grow: time=3D50296 rtt=
-_us=3D50185 copied=3D42053632 inq=3D761856 space=3D28979200 ooo=3D0 scaling=
-_ratio=3D219 rcvbuf=3D67000000 rcv_ssthresh=3D57238168 window_clamp=3D57316=
-406 rcv_wnd=3D56606720
-> tcp_stream 33793 [010]  826.728627: tcp:tcp_rcvbuf_grow: time=3D50357 rtt=
-_us=3D50128 copied=3D43913216 inq=3D851968 space=3D41291776 ooo=3D0 scaling=
-_ratio=3D219 rcvbuf=3D67000000 rcv_ssthresh=3D57290728 window_clamp=3D57316=
-406 rcv_wnd=3D56524800
-> tcp_stream 33793 [010]  827.131364: tcp:tcp_rcvbuf_grow: time=3D50239 rtt=
-_us=3D50127 copied=3D43843584 inq=3D655360 space=3D43061248 ooo=3D0 scaling=
-_ratio=3D219 rcvbuf=3D67000000 rcv_ssthresh=3D57290728 window_clamp=3D57316=
-406 rcv_wnd=3D56696832
-> tcp_stream 33793 [010]  827.181613: tcp:tcp_rcvbuf_grow: time=3D50254 rtt=
-_us=3D50115 copied=3D43843584 inq=3D524288 space=3D43188224 ooo=3D0 scaling=
-_ratio=3D219 rcvbuf=3D67000000 rcv_ssthresh=3D57290728 window_clamp=3D57316=
-406 rcv_wnd=3D56807424
-> tcp_stream 33793 [010]  828.339635: tcp:tcp_rcvbuf_grow: time=3D50283 rtt=
-_us=3D50110 copied=3D43843584 inq=3D458752 space=3D43319296 ooo=3D0 scaling=
-_ratio=3D219 rcvbuf=3D67000000 rcv_ssthresh=3D57290728 window_clamp=3D57316=
-406 rcv_wnd=3D56864768
-> tcp_stream 33793 [010]  828.440350: tcp:tcp_rcvbuf_grow: time=3D50404 rtt=
-_us=3D50099 copied=3D43843584 inq=3D393216 space=3D43384832 ooo=3D0 scaling=
-_ratio=3D219 rcvbuf=3D67000000 rcv_ssthresh=3D57290728 window_clamp=3D57316=
-406 rcv_wnd=3D56922112
-> tcp_stream 33793 [010]  829.195106: tcp:tcp_rcvbuf_grow: time=3D50154 rtt=
-_us=3D50077 copied=3D43843584 inq=3D196608 space=3D43450368 ooo=3D0 scaling=
-_ratio=3D219 rcvbuf=3D67000000 rcv_ssthresh=3D57290728 window_clamp=3D57316=
-406 rcv_wnd=3D57090048
->
-> After:
->
-> It takes few steps to increase RWIN. Sender is no longer RWIN limited.
->
-> tcp_stream 50826 [010]  935.634212: tcp:tcp_rcvbuf_grow: time=3D100788 rt=
-t_us=3D50315 copied=3D49152 inq=3D0 space=3D40960 ooo=3D0 scaling_ratio=3D2=
-19 rcvbuf=3D131072 rcv_ssthresh=3D103970 window_clamp=3D112128 rcv_wnd=3D10=
-6496
-> tcp_stream 50826 [010]  935.685642: tcp:tcp_rcvbuf_grow: time=3D51437 rtt=
-_us=3D50361 copied=3D86016 inq=3D0 space=3D49152 ooo=3D0 scaling_ratio=3D21=
-9 rcvbuf=3D160875 rcv_ssthresh=3D132969 window_clamp=3D137623 rcv_wnd=3D131=
-072
-> tcp_stream 50826 [010]  935.738299: tcp:tcp_rcvbuf_grow: time=3D52660 rtt=
-_us=3D50256 copied=3D139264 inq=3D0 space=3D86016 ooo=3D0 scaling_ratio=3D2=
-19 rcvbuf=3D502741 rcv_ssthresh=3D411497 window_clamp=3D430079 rcv_wnd=3D41=
-3696
-> tcp_stream 50826 [010]  935.788544: tcp:tcp_rcvbuf_grow: time=3D50249 rtt=
-_us=3D50233 copied=3D307200 inq=3D0 space=3D139264 ooo=3D0 scaling_ratio=3D=
-219 rcvbuf=3D728690 rcv_ssthresh=3D618717 window_clamp=3D623371 rcv_wnd=3D6=
-18496
-> tcp_stream 50826 [010]  935.838796: tcp:tcp_rcvbuf_grow: time=3D50258 rtt=
-_us=3D50202 copied=3D618496 inq=3D0 space=3D307200 ooo=3D0 scaling_ratio=3D=
-219 rcvbuf=3D2450338 rcv_ssthresh=3D1855709 window_clamp=3D2096187 rcv_wnd=
-=3D1859584
-> tcp_stream 50826 [010]  935.889140: tcp:tcp_rcvbuf_grow: time=3D50347 rtt=
-_us=3D50166 copied=3D1261568 inq=3D0 space=3D618496 ooo=3D0 scaling_ratio=
-=3D219 rcvbuf=3D4376503 rcv_ssthresh=3D3725291 window_clamp=3D3743961 rcv_w=
-nd=3D3706880
-> tcp_stream 50826 [010]  935.939435: tcp:tcp_rcvbuf_grow: time=3D50300 rtt=
-_us=3D50185 copied=3D2478080 inq=3D24576 space=3D1261568 ooo=3D0 scaling_ra=
-tio=3D219 rcvbuf=3D9082648 rcv_ssthresh=3D7733731 window_clamp=3D7769921 rc=
-v_wnd=3D7692288
-> tcp_stream 50826 [010]  935.989681: tcp:tcp_rcvbuf_grow: time=3D50251 rtt=
-_us=3D50221 copied=3D4915200 inq=3D114688 space=3D2453504 ooo=3D0 scaling_r=
-atio=3D219 rcvbuf=3D16574936 rcv_ssthresh=3D14108110 window_clamp=3D1417933=
-9 rcv_wnd=3D14024704
-> tcp_stream 50826 [010]  936.039967: tcp:tcp_rcvbuf_grow: time=3D50289 rtt=
-_us=3D50279 copied=3D9830400 inq=3D114688 space=3D4800512 ooo=3D0 scaling_r=
-atio=3D219 rcvbuf=3D32695050 rcv_ssthresh=3D27896187 window_clamp=3D2796959=
-3 rcv_wnd=3D27815936
-> tcp_stream 50826 [010]  936.090172: tcp:tcp_rcvbuf_grow: time=3D50211 rtt=
-_us=3D50200 copied=3D19841024 inq=3D114688 space=3D9715712 ooo=3D0 scaling_=
-ratio=3D219 rcvbuf=3D67000000 rcv_ssthresh=3D57245176 window_clamp=3D573164=
-06 rcv_wnd=3D57163776
-> tcp_stream 50826 [010]  936.140430: tcp:tcp_rcvbuf_grow: time=3D50262 rtt=
-_us=3D50197 copied=3D39501824 inq=3D114688 space=3D19726336 ooo=3D0 scaling=
-_ratio=3D219 rcvbuf=3D67000000 rcv_ssthresh=3D57245176 window_clamp=3D57316=
-406 rcv_wnd=3D57163776
-> tcp_stream 50826 [010]  936.190527: tcp:tcp_rcvbuf_grow: time=3D50101 rtt=
-_us=3D50071 copied=3D43655168 inq=3D262144 space=3D39387136 ooo=3D0 scaling=
-_ratio=3D219 rcvbuf=3D67000000 rcv_ssthresh=3D57259192 window_clamp=3D57316=
-406 rcv_wnd=3D57032704
-> tcp_stream 50826 [010]  936.240719: tcp:tcp_rcvbuf_grow: time=3D50197 rtt=
-_us=3D50057 copied=3D43843584 inq=3D262144 space=3D43393024 ooo=3D0 scaling=
-_ratio=3D219 rcvbuf=3D67000000 rcv_ssthresh=3D57259192 window_clamp=3D57316=
-406 rcv_wnd=3D57032704
-> tcp_stream 50826 [010]  936.341271: tcp:tcp_rcvbuf_grow: time=3D50297 rtt=
-_us=3D50123 copied=3D43843584 inq=3D131072 space=3D43581440 ooo=3D0 scaling=
-_ratio=3D219 rcvbuf=3D67000000 rcv_ssthresh=3D57259192 window_clamp=3D57316=
-406 rcv_wnd=3D57147392
-> tcp_stream 50826 [010]  936.642503: tcp:tcp_rcvbuf_grow: time=3D50131 rtt=
-_us=3D50084 copied=3D43843584 inq=3D0 space=3D43712512 ooo=3D0 scaling_rati=
-o=3D219 rcvbuf=3D67000000 rcv_ssthresh=3D57259192 window_clamp=3D57316406 r=
-cv_wnd=3D57262080
->
-> Fixes: 65c5287892e9 ("tcp: fix sk_rcvbuf overshoot")
-> Fixes: e118cdc34dd1 ("mptcp: rcvbuf auto-tuning improvement")
-> Reported-by: Neal Cardwell <ncardwell@google.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/589
-> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-> ---
+Hi all,
 
-Reviewed-by: Neal Cardwell <ncardwell@google.com>
+The test_xsk.sh script covers many AF_XDP use cases. The tests it runs
+are defined in xksxceiver.c. Since this script is used to test real
+hardware, the goal here is to leave it as it is, and only integrate the
+tests that run on veth peers into the test_progs framework.
 
-Thanks, Eric and Matthieu!
+I've looked into what could improve the speed in the CI:
+- some tests are skipped when run on veth peers in a VM (because they
+  rely on huge page allocation or HW rings). This skipping logic still
+  takes some time and can be easily avoided.
+- the TEARDOWN test is quite long (several seconds on its own) because
+  it runs the same test 10 times in a row to ensure the teardown process
+  works properly
 
-neal
+With theses tests fully skipped in the CI and the veth setup done only
+once for each mode (DRV / SKB), the execution time is reduced to about 5
+seconds on my setup.
+```
+$ tools/testing/selftests/bpf/vmtest.sh -d $HOME/ebpf/output-regular/ -- time ./test_progs -t xsk
+[...]
+real    0m 5.04s
+user    0m 0.38s
+sys     0m 1.61s
+```
+
+It still feels a bit long, but there are 24 tests run in both DRV and
+SKB modes which means around 100ms for each one. I'm not sure I can make
+it much faster without randomizing the tests so that not all of them run
+in every CI execution.
+
+PATCH 1 extracts test_xsk[.c/.h] from xskxceiver[.c/.h] to make the
+tests available to test_progs.
+PATCH 2 to 7 fix small issues in the current test
+PATCH 8 to 13 handle all errors to release resources instead of calling
+exit() when any error occurs.
+PATCH 14 isolates the tests that won't fit in the CI
+PATCH 15 integrates the CI tests to the test_progs framework
+
+Signed-off-by: Bastien Curutchet (eBPF Foundation) <bastien.curutchet@bootlin.com>
+---
+Changes in v6:
+- Setup veth peer once for each mode instead of once for each substest
+- Rename the 'flaky' table 'skip-ci' table and move the automatically
+  skipped and the longest tests into it
+- Link to v5: https://lore.kernel.org/r/20251016-xsk-v5-0-662c95eb8005@bootlin.com
+
+Changes in v5:
+- Rebase on latest bpf-next_base
+- Move XDP_ADJUST_TAIL_SHRINK_MULTI_BUFF to the flaky table
+- Add Maciej's reviewed-by
+- Link to v4: https://lore.kernel.org/r/20250924-xsk-v4-0-20e57537b876@bootlin.com
+
+Changes in v4:
+- Fix test_xsk.sh's summary report.
+- Merge PATCH 11 & 12 together, otherwise PATCH 11 fails to build.
+- Split old PATCH 3 in two patches. The first one fixes
+  testapp_stats_rx_dropped(), the second one fixes
+  testapp_xdp_shared_umem(). The unecessary frees (in
+  testapp_stats_rx_full() and testapp_stats_fill_empty() are removed)
+- Link to v3: https://lore.kernel.org/r/20250904-xsk-v3-0-ce382e331485@bootlin.com
+
+Changes in v3:
+- Rebase on latest bpf-next_base to integrate commit c9110e6f7237 ("selftests/bpf:
+Fix count write in testapp_xdp_metadata_copy()").
+- Move XDP_METADATA_COPY_* tests from flaky-tests to nominal tests
+- Link to v2: https://lore.kernel.org/r/20250902-xsk-v2-0-17c6345d5215@bootlin.com
+
+Changes in v2:
+- Rebase on the latest bpf-next_base and integrate the newly added tests
+  to the work (adjust_tail* and tx_queue_consumer tests)
+- Re-order patches to split xkxceiver sooner.
+- Fix the bug reported by Maciej.
+- Fix verbose mode in test_xsk.sh by keeping kselftest (remove PATCH 1,
+  7 and 8)
+- Link to v1: https://lore.kernel.org/r/20250313-xsk-v1-0-7374729a93b9@bootlin.com
+
+---
+Bastien Curutchet (eBPF Foundation) (15):
+      selftests/bpf: test_xsk: Split xskxceiver
+      selftests/bpf: test_xsk: Initialize bitmap before use
+      selftests/bpf: test_xsk: Fix __testapp_validate_traffic()'s return value
+      selftests/bpf: test_xsk: fix memory leak in testapp_stats_rx_dropped()
+      selftests/bpf: test_xsk: fix memory leak in testapp_xdp_shared_umem()
+      selftests/bpf: test_xsk: Wrap test clean-up in functions
+      selftests/bpf: test_xsk: Release resources when swap fails
+      selftests/bpf: test_xsk: Add return value to init_iface()
+      selftests/bpf: test_xsk: Don't exit immediately when xsk_attach fails
+      selftests/bpf: test_xsk: Don't exit immediately when gettimeofday fails
+      selftests/bpf: test_xsk: Don't exit immediately when workers fail
+      selftests/bpf: test_xsk: Don't exit immediately if validate_traffic fails
+      selftests/bpf: test_xsk: Don't exit immediately on allocation failures
+      selftests/bpf: test_xsk: Isolate non-CI tests
+      selftests/bpf: test_xsk: Integrate test_xsk.c to test_progs framework
+
+ tools/testing/selftests/bpf/Makefile              |   11 +-
+ tools/testing/selftests/bpf/prog_tests/test_xsk.c | 2595 ++++++++++++++++++++
+ tools/testing/selftests/bpf/prog_tests/test_xsk.h |  298 +++
+ tools/testing/selftests/bpf/prog_tests/xsk.c      |  151 ++
+ tools/testing/selftests/bpf/xskxceiver.c          | 2696 +--------------------
+ tools/testing/selftests/bpf/xskxceiver.h          |  156 --
+ 6 files changed, 3183 insertions(+), 2724 deletions(-)
+---
+base-commit: 4481a8590725400f37d3015f0ee0d53a2cdc1bd6
+change-id: 20250218-xsk-0cf90e975d14
+
+Best regards,
+-- 
+Bastien Curutchet (eBPF Foundation) <bastien.curutchet@bootlin.com>
+
 
