@@ -1,69 +1,91 @@
-Return-Path: <netdev+bounces-234195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3F0FC1DAB6
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 00:17:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E4ABC1DAAA
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 00:17:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9A7B44E4891
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 23:17:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F1B93A9595
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 23:17:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5800C30100C;
-	Wed, 29 Oct 2025 23:16:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EE053093CE;
+	Wed, 29 Oct 2025 23:16:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wT8b7EQu"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="vx797a16"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 129882FB962
-	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 23:16:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC15D2F656B
+	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 23:16:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761779818; cv=none; b=KiBwLe7Tg7vPCurZSYP3hEBBq1qyCvAJXw+KPCZraTPNTRRyAdqPih8F+a1OoD+lBM9P1oePnlW8RvUtrGu52oQFpU+Joqmbam8wNlyRGqkQSKoXngwGRYgwe/ad/Ovkfrh+0CttNz6zJCybtDWjUysA5xy489OS1AHRriC5x/U=
+	t=1761779819; cv=none; b=HX4ZTDaz7OSgBWUWZpNsDvyJ9LBSTA6UwSAMOkLyNp0qD8hQGPD78XDpp5jg8lr70NGPPY3LezGD8YwXPDPex2OJyl8dQ8UoOjGHm7xGpAvRJcHuCb05pI90C6C6FXaFjcr/nNzQZXmP5pNwm4WoOdSWx3cK6ASiUXHjqh0nc9A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761779818; c=relaxed/simple;
-	bh=Ycgs+WJf0rX/3P2j0uxtgEizFAHSZxQl8X4dVHDOte8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=anY10yfahM5Gr0KR08Mjyyvv3ZFZE+a8LxHHj8n/lgBQe66eBpQaxHau8+EjahN9sNYmLlDjSSqA6tVdr9n/vj7OKTJ1en3Ae+Lma9WqTeOTHRP3nePfJwcZ8vPIy8a6Kr5xiFkvE0an1mNhqZJWtTTjOmCWuDJNdTHcI23p1Sg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wT8b7EQu; arc=none smtp.client-ip=91.218.175.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761779814;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2rQ/6gGDRhyD58zZl7qcXPr50QtQkldHySxwTL0+jeE=;
-	b=wT8b7EQuXoJbSgyjuUkiyP66g+TZmX4HIX4RN5zw2swDXxFFT7Ba68x7VZ5BLnQR336qnb
-	ZA+259ZSrXyc5v7NqIcztl+aADJ2s/ZLnv3mXDPKv/d/ImSCPevkjEu8RMuyf3AXfjpgjo
-	ZfqXDjx0MUeXr0SA/vGVWBP+m2hi76A=
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-To: Marc Kleine-Budde <mkl@pengutronix.de>,
-	Vincent Mailhol <mailhol@kernel.org>,
-	=?UTF-8?q?Stefan=20M=C3=A4tje?= <stefan.maetje@esd.eu>,
-	socketcan@esd.eu,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Thomas Kopp <thomas.kopp@microchip.com>,
-	Oliver Hartkopp <socketcan@hartkopp.net>,
-	Jimmy Assarsson <extja@kvaser.com>,
-	Axel Forsman <axfo@kvaser.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: linux-can@vger.kernel.org,
-	netdev@vger.kernel.org,
+	s=arc-20240116; t=1761779819; c=relaxed/simple;
+	bh=JUeejtpj8GTJk/bWvRgUfL4yXr1jHbbKuz4+egibNgs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=q1s6MkAGzOqs2Hp8Bk3mqR/hlfBnPYaUNusr/N8S8CpHw0zITZXD0QI4WRx5qt0PAslDOG1hItc+Af4FHKDbRMaNVyNZKhF+sWdsJZ/EeYYfKttEd9WX1mfoeBlyzp19K3EOMOljZVAk4viXjLYt0fg07XZVCgchZI4p+D/jpqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=vx797a16; arc=none smtp.client-ip=209.85.210.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-74526ca79beso233955a34.0
+        for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 16:16:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1761779816; x=1762384616; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=W9npAGNAvB/GkXlLNAKo8gMpxVLoAPVmTQZH+Cu98zw=;
+        b=vx797a16GhyevlG6eW9xdv6oVXq4ZueRsiBdYmoOlTeNukujb/YgUFKor7WcGMlTGd
+         E/9V6wsQFkB3rr8mhS9mIkSkmASqDudOCfRDBejtaciHsGKKGRT1q8lv/Pp09Cts0gG1
+         FJDUChH4Sde48oq7NYKjzKMnkLHM34FM6TZ0omb2ZQkl0k19yFhp1dyEwncvy0VOsoi0
+         UlFq1+jZWvt8yQI7RqQtlIoW4VvBE6QqptOs5JARwBqblJuXXNnFuHBCrkzlMsBsv+lF
+         iM3CLXCt67AeinNOuuAF2CLL5T6r9biIfqIQdBO/hJFN4BwmdOtVX6Bi+m721Kp/HArP
+         Q+xw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761779816; x=1762384616;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=W9npAGNAvB/GkXlLNAKo8gMpxVLoAPVmTQZH+Cu98zw=;
+        b=kzIS4IcSmcb4Gs6ddJEgHyWJjV0HY1gt3Psz4Echv8FhjNmrJwUsdCjMhl6mGPGyrJ
+         1pFU54lV/LSP6AP66nO3ul8i8VgeJmVOhRMtylQ2u0KFBTFQGpCoNd04pjhrF9w+LK/H
+         Kve6fRbn3u5WtKOUdLymIIdALhXP2/Rlouqe4ei3Y0uLm1mwsK6oW6dmh1XD4O7Z7Z/C
+         2poaIkEKtX0pBqyuYyWEglK0ERPmZ4dqydOf26hEhiAThq2e8stoZhKYibYeURl+f9ok
+         bhjx5rTeuJhUm7ITnCtbfnlpsavSLZeccqJjjShQPUvPZc36JztSK6zOxDURy9tHCDYn
+         XJZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUiLhZBC03+KNtP6E8eEDSN/e8n99hV145wSeZ0dnsi6cSPpnk1C6MKERRWwXa1bCBes3flti8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzj18NUb2V1X/5Tht/MQn5v4xhVWwkIkMf3VINqOk4q6teJRF+o
+	VTVhbOrxv/xJrzpcsYt2eS7TtCuDWNXMqeUSMy/2XQV2zkVBbN9R59ownw8eYCoIFZc=
+X-Gm-Gg: ASbGncudiJjKQv7/nEdPyc9faEKEldeJBPihRgWoJSXU3yB+WpY7pD4DnGnDrcnSDXh
+	HKDUGQzRj00IuYgfmYMObuZGti7s+pfHeJoGRzl1eE7zzGm60eVWK9+3tUqtWhLuFiYSBvKG4Vu
+	ieFAZkl+Z1G1uciAgsAhfpfTe+nMnOEfb1m9x6g5KumVGINI3svAPMIDmJ1RYWhkfErWiCiGIHd
+	1cGDTCWs8RFGDwjrwt0wagQGUmPj4S1uqFBPWNDHa+vOQvQ/AkYCFPieKCOP1pnlgvomlWRaJHf
+	Lrty+hBghqXXXawGajwIwl8szwrKj+3vGkDZFHuCb1DqFK2l9yjs8VYeJ0rbhgY8tB/VAYOrJdK
+	fOomccFhHVwK0DFYVYWJRLTHgQ421tNdtSqsPMWxL2MtkaIdcgKiSL7+yroGVPaUrsJv+u7jJQn
+	HvHBZ724niGglRUqbboII=
+X-Google-Smtp-Source: AGHT+IGcWOsufyfCBaHb0HQVZelrHAbKEeNnGWYfHdRQh0ZHXnKFny/zbfmewmRP+D3U0mdDU64lLQ==
+X-Received: by 2002:a05:6830:6a96:b0:757:aee6:4a59 with SMTP id 46e09a7af769-7c68cf4bbf6mr753917a34.18.1761779816418;
+        Wed, 29 Oct 2025 16:16:56 -0700 (PDT)
+Received: from localhost ([2a03:2880:12ff:70::])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7c681eb5595sm1336806a34.3.2025.10.29.16.16.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Oct 2025 16:16:56 -0700 (PDT)
+From: David Wei <dw@davidwei.uk>
+To: io-uring@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Jacob Keller <jacob.e.keller@intel.com>
-Subject: [PATCH net-next 3/3] can: peak_usb: convert to use ndo_hwtstamp callbacks
-Date: Wed, 29 Oct 2025 23:16:20 +0000
-Message-ID: <20251029231620.1135640-4-vadim.fedorenko@linux.dev>
-In-Reply-To: <20251029231620.1135640-1-vadim.fedorenko@linux.dev>
-References: <20251029231620.1135640-1-vadim.fedorenko@linux.dev>
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH v2 0/2] net: io_uring/zcrx: call netdev_queue_get_dma_dev() under instance lock
+Date: Wed, 29 Oct 2025 16:16:52 -0700
+Message-ID: <20251029231654.1156874-1-dw@davidwei.uk>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,75 +93,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
 
-Convert driver to use ndo_hwtstamp_set()/ndo_hwtstamp_get() callbacks.
-ndo_eth_ioctl handler does nothing after conversion - remove it.
+netdev ops must be called under instance lock or rtnl_lock, but
+io_register_zcrx_ifq() isn't doing this for netdev_queue_get_dma_dev().
+Fix this by taking the instance lock using netdev_get_by_index_lock().
 
-Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
----
- drivers/net/can/usb/peak_usb/pcan_usb_core.c | 39 +++++++++-----------
- 1 file changed, 18 insertions(+), 21 deletions(-)
+netdev_get_by_index_lock() isn't exported by default, so the first patch
+is a prep patch to export this under linux/netdevice.h.
 
-diff --git a/drivers/net/can/usb/peak_usb/pcan_usb_core.c b/drivers/net/can/usb/peak_usb/pcan_usb_core.c
-index 94b1d7f15d27..cf48bb26d46d 100644
---- a/drivers/net/can/usb/peak_usb/pcan_usb_core.c
-+++ b/drivers/net/can/usb/peak_usb/pcan_usb_core.c
-@@ -784,36 +784,33 @@ static int peak_usb_set_data_bittiming(struct net_device *netdev)
- 	return 0;
- }
- 
--static int peak_eth_ioctl(struct net_device *netdev, struct ifreq *ifr, int cmd)
-+static int peak_hwtstamp_get(struct net_device *netdev,
-+			     struct kernel_hwtstamp_config *config)
- {
--	struct hwtstamp_config hwts_cfg = { 0 };
--
--	switch (cmd) {
--	case SIOCSHWTSTAMP: /* set */
--		if (copy_from_user(&hwts_cfg, ifr->ifr_data, sizeof(hwts_cfg)))
--			return -EFAULT;
--		if (hwts_cfg.tx_type == HWTSTAMP_TX_OFF &&
--		    hwts_cfg.rx_filter == HWTSTAMP_FILTER_ALL)
--			return 0;
--		return -ERANGE;
--
--	case SIOCGHWTSTAMP: /* get */
--		hwts_cfg.tx_type = HWTSTAMP_TX_OFF;
--		hwts_cfg.rx_filter = HWTSTAMP_FILTER_ALL;
--		if (copy_to_user(ifr->ifr_data, &hwts_cfg, sizeof(hwts_cfg)))
--			return -EFAULT;
-+	config->tx_type = HWTSTAMP_TX_OFF;
-+	config->rx_filter = HWTSTAMP_FILTER_ALL;
-+
-+	return 0;
-+}
-+
-+static int peak_hwtstamp_set(struct net_device *netdev,
-+			     struct kernel_hwtstamp_config *config,
-+			     struct netlink_ext_ack *extack)
-+{
-+	if (config->tx_type == HWTSTAMP_TX_OFF &&
-+	    config->rx_filter == HWTSTAMP_FILTER_ALL)
- 		return 0;
- 
--	default:
--		return -EOPNOTSUPP;
--	}
-+	NL_SET_ERR_MSG_MOD(extack, "Only RX HWTSTAMP_FILTER_ALL is supported");
-+	return -ERANGE;
- }
- 
- static const struct net_device_ops peak_usb_netdev_ops = {
- 	.ndo_open = peak_usb_ndo_open,
- 	.ndo_stop = peak_usb_ndo_stop,
--	.ndo_eth_ioctl = peak_eth_ioctl,
- 	.ndo_start_xmit = peak_usb_ndo_start_xmit,
-+	.ndo_hwtstamp_get = peak_hwtstamp_get,
-+	.ndo_hwtstamp_set = peak_hwtstamp_set,
- };
- 
- /* CAN-USB devices generally handle 32-bit CAN channel IDs.
+Extended the instance lock section to include attaching a memory
+provider. Could not move io_zcrx_create_area() outside, since the dmabuf
+codepath IORING_ZCRX_AREA_DMABUF requires ifq->dev. Happy to do whatever
+here, either keep this extended section or relock for net_mp_open_rxq().
+
+v2:
+ - add Fixes tag
+ - export netdev_get_by_index_lock()
+ - use netdev_get_by_index_lock() + netdev_hold()
+ - extend lock section to include net_mp_open_rxq()
+
+David Wei (2):
+  net: export netdev_get_by_index_lock()
+  net: io_uring/zcrx: call netdev_queue_get_dma_dev() under instance
+    lock
+
+ include/linux/netdevice.h |  1 +
+ io_uring/zcrx.c           | 15 +++++++++------
+ net/core/dev.c            |  1 +
+ net/core/dev.h            |  1 -
+ 4 files changed, 11 insertions(+), 7 deletions(-)
+
 -- 
 2.47.3
 
