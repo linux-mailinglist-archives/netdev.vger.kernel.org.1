@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-234007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCBACC1B700
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 15:55:06 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id B27BCC1B68D
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 15:51:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8ADF7622A3E
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 14:08:52 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BA1745685ED
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 14:15:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CEB22D29A9;
-	Wed, 29 Oct 2025 14:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF25F25229C;
+	Wed, 29 Oct 2025 14:15:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="e30NhYV5"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="hMxSONcS"
 X-Original-To: netdev@vger.kernel.org
 Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEAA62C08BB;
-	Wed, 29 Oct 2025 14:00:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81D88254AE1;
+	Wed, 29 Oct 2025 14:15:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761746404; cv=none; b=bd+lN7YmwGbmlUHLWJeRoLqKraMc6ricvuZxG3YCnMIt5li/VsrYD8L+JpYUvohi6whwhat/RbB9O6/sbQgbcfUHjYMuxP7md3FAmfV0/SQOyQBUYo4LJMdX51HIaDgWrNHrEwruqrS43g2ise7wcZrzDB7xTFPjPmdOqUF+SLI=
+	t=1761747332; cv=none; b=VQffQ4xEPlN4HYY8kge84OH3RdqbV6u/Gz0z8Pwuzgyir15z1mkjthz5VbpbbznSWOoGH89Xj6QWPuQa+kTZ4FTKXcNe3otN8Zlc0y+tPlE6QXs4sl/Yq7OQtast5L1RwMDa0X3Kzjk5eoznZW7GqVprIL3TsjxG72LqxJgsOUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761746404; c=relaxed/simple;
-	bh=B9N5m4FMkeZUHUzR55GjpsvD3RNy4NqgzEWOKwz8dgM=;
+	s=arc-20240116; t=1761747332; c=relaxed/simple;
+	bh=RZm6bZIS4bNLDUlPnk4g887+82E7lvxrRpfpy6mBLtE=;
 	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V+xisBf19E6sBwt7Jf+V3bJgcUJTMxY2P6AFvusVtUWHhmyup8PODh9LtsaKW01k73MeN64tc7Tvwsne6HM70v9PBWA6lLaF043KCfiqwkGyvy0XwaG8GvUBQ5C7xhDbzTLWfaXAuKeltucoO/IDdS8urgh9BXr3MpzHxstq5Aw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=e30NhYV5; arc=none smtp.client-ip=193.68.50.107
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y8PRAas1J5Ah9hjVeTjSTJMp/8vZV7f1j6ea/oMYJRZKF5kaCtoEENgljAPK8dPEghItFef167xarFWo6xi6waIY9wJ06pDCIsez/RTUkJXt3q69yrQV2G0O6dzLk42NTugiaEZPMtvJWKsy35MlezMMC7BqjcHrr3dXqGt94Yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=hMxSONcS; arc=none smtp.client-ip=193.68.50.107
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
 Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
-	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id C77E7A1477;
-	Wed, 29 Oct 2025 14:59:59 +0100 (CET)
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 2CD66A103D;
+	Wed, 29 Oct 2025 15:15:28 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
 	:cc:content-type:content-type:date:from:from:in-reply-to
 	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to; s=mail; bh=Th5b5crsMjrM5576TzmgnufvSOw4CYAbIgMlncT6eYE=; b=
-	e30NhYV55d72/DmQIXSob8phZ2V1oXf6zxY+J8wp5scQfdlVBX323YgYdFcBN9dI
-	/awjtjLN2r27xTce5tMNHCBKO4gh0fg9JorD1lSR/ja59xy1KtGdLrlYw1tJxkzE
-	stFz+hJhB5V79rdYLM59HgbgsltcpF8EzfX1c6rmsXLetQT4w+fPMusiIMn+Zh6X
-	FIXoAg3rjeJu4V7QN2KM+gA5LJ7yddCP6Cu4mDRBLsAkoo+ieVsw03NXR2tc96+W
-	872DjeeqbfmypePYMRsYVXQ76J6aamXhJ8wFOBfO5H6R3EkUbrXgEYS0miAP2VXh
-	LH2LbyxV6WNP6mxZ+ySxSMgYB9CaLVQuhb1spMFUGOdfWTjBvHEgPmDxKV82endi
-	ydJXasIOGmliexAKJ3rQi081oQldTWk2FAWOMU3G+DHdfO2bEtkky55ILNwppsnA
-	EKHBfDxgRWJ4xltO8qZUXzVHczK47WRuI0+zCzwVX8tkWDRtKu9MZk5acHFjlpC1
-	vTyoR2ihhOsrpfNR2Mb/a2YfjeQKpnjXAsMgU9OE2jBuLz+jkzZ3NjKtS187eX8B
-	9pys1d9Y4pE9Yoy2+wgjcxXS9TzVjArjipHQ9xswg+VaCisosNFGPCTVh6Crg5af
-	BqBtJI8n+qjHMwK1PKu9SjSC+gfiwIJPRJ16drVp4hI=
-Date: Wed, 29 Oct 2025 14:59:58 +0100
+	:to; s=mail; bh=S6KdbNwAQ7YpbZD9A84wYipdmyYEdIHycsiERqFOZJc=; b=
+	hMxSONcS++SGDe0QWqHBdwTHBHSJ0/QPvJguHK3Chras0irk42VtLSKpYYMxJXpt
+	BbrEhVf42ipJSHJdtCdc55vm9eyHKPHVo/sWfHviBtGtqJ/rqFeo2/CsSLTd5aHB
+	RlJRdnCik1WOu62Wi0+udkzydUGIQZpXwIq1NWKkUnueBAyvaLN9IeCPZIkU0IUe
+	mP2ofuTmwGC3T9oFwcV+4OS+opkEvntKr+/LS+58WWiJMedZJjKnPTZ25OF2yZSq
+	AKPRoG0L3pXL5JhA5P6B/7yAqiwlaNJeD1ZoMER9ol/0f4Q3XhRG435NCOktKy//
+	xCNwGWUPmWKNrUzJ1VAay1BQIRL5HAWe/DF1n25pElNE5YJyJbg/AtoBpOIowCkx
+	ibLpmoI+RZlHYMyHdBNAytwcONMnSHOOrXDh2X7RQCvWs6ThzBSiLqVaLkWzGO3f
+	3u6a+b4K382OlLzSoNOufJ2SAKHu8Y9Ft7RW5rsZOg1QD/rTjcTzbh8JYF8/ixHB
+	m+/P7ww0NtOI867MoS3wIvHZKmoXqdaWk/kz2H3hiHNbiZ938TiGB8WQoL0XdnP4
+	8i7ksBTgBCxk4t7YJpPw3obPnuBIb1z9q5htPUYDl6V3mnOPpyCJpUI3gK8fj1mL
+	4uWE9jfrfQRWvXma+utowZ0Q5yH+lJyj8JrUtXZ/7EA=
+Date: Wed, 29 Oct 2025 15:15:27 +0100
 From: Buday Csaba <buday.csaba@prolan.hu>
 To: Andrew Lunn <andrew@lunn.ch>
 CC: Heiner Kallweit <hkallweit1@gmail.com>, Russell King
@@ -57,12 +57,12 @@ CC: Heiner Kallweit <hkallweit1@gmail.com>, Russell King
  Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>, Philipp Zabel <p.zabel@pengutronix.de>,
 	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v5 1/4] net: mdio: common handling of phy reset
- properties
-Message-ID: <aQId3lVoDBE0557D@debianbuilder>
+Subject: Re: [PATCH net-next v5 3/4] net: mdio: reset PHY before attempting
+ to access registers in fwnode_mdiobus_register_phy
+Message-ID: <aQIhf3dXOxS4vd2W@debianbuilder>
 References: <cover.1761732347.git.buday.csaba@prolan.hu>
- <a96ac9a58165a4ea15b1c96cab3bbc5d568e9cba.1761732347.git.buday.csaba@prolan.hu>
- <3a937e5c-0c0f-431f-a300-9d4c60f3a3ff@lunn.ch>
+ <5f8d93021a7aa6eeb4fb67ab27ddc7de9101c59f.1761732347.git.buday.csaba@prolan.hu>
+ <e61e1c1c-083b-472f-8edd-b16832ca578e@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,85 +71,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <3a937e5c-0c0f-431f-a300-9d4c60f3a3ff@lunn.ch>
-X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1761746399;VERSION=8000;MC=3337100537;ID=153779;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
+In-Reply-To: <e61e1c1c-083b-472f-8edd-b16832ca578e@lunn.ch>
+X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1761747327;VERSION=8000;MC=1979873367;ID=153868;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
 X-ESET-Antispam: OK
 X-EsetResult: clean, is OK
 X-EsetId: 37303A296767155F677362
 
-On Wed, Oct 29, 2025 at 02:03:30PM +0100, Andrew Lunn wrote:
-> On Wed, Oct 29, 2025 at 11:23:41AM +0100, Buday Csaba wrote:
-> > Unify the handling of reset properties for an `mdio_device`.
-> > Replace mdiobus_register_gpiod() and mdiobus_register_reset() with
-> > mdio_device_register_reset() and mdio_device_unregister_reset(),
-> > and move them from mdio_bus.c to mdio_device.c, where they belong.
-> 
-> You should probably mention here that there are two sets of reset
-> properties. One set applies to the bus as a whole, and the second is
-> per device on the bus. You would expect the whole bus properties to be
-> handled in mdio_bus.c, where as the per device properties might make
-> more sense in mdio_device.c. So you can comment you are only moving
-> the per device reset code.
-> 
-
-Okay, I will do that.
-
-> > 
-> > The new functions handle both reset-controllers and reset-gpios,
-> > and also read the corresponding firmware properties from the
-> > device tree, which were previously handled in fwnode_mdio.c.
-> > This makes tracking the reset properties easier.
-> 
-> Please split this patch.
-> 
-> It is normal when moving a function to just move it, make no
-> additional changes. That makes the change smaller, easier to review,
-> since it is all about, does the new location make sense?
-> 
-> Once it is in the new location, you can then have patches which
-> refactor it.
-
-Understood, I will change it accordingly.
-
-> 
-> > -static int mdiobus_register_gpiod(struct mdio_device *mdiodev)
-> > -{
-> > -	/* Deassert the optional reset signal */
-> > -	mdiodev->reset_gpio = gpiod_get_optional(&mdiodev->dev,
-> > -						 "reset", GPIOD_OUT_LOW);
-> > -	if (IS_ERR(mdiodev->reset_gpio))
-> > -		return PTR_ERR(mdiodev->reset_gpio);
-> > -
-> > -	if (mdiodev->reset_gpio)
-> > -		gpiod_set_consumer_name(mdiodev->reset_gpio, "PHY reset");
-> > -
-> > -	return 0;
-> > -}
-> > -
-> 
-> > +/**
-> > + * mdio_device_register_reset - Read and initialize the reset properties of
-> > + *				an mdio device
-> > + * @mdiodev: mdio_device structure
-> > + *
-> > + * Return: Zero if successful, negative error code on failure
-> > + */
-> > +int mdio_device_register_reset(struct mdio_device *mdiodev)
+On Wed, Oct 29, 2025 at 02:20:14PM +0100, Andrew Lunn wrote:
+> > +/* Hard-reset a PHY before registration */
+> > +static int fwnode_reset_phy(struct mii_bus *bus, u32 addr,
+> > +			    struct fwnode_handle *phy_node)
 > > +{
+> > +	struct mdio_device *tmpdev;
+> > +	int rc;
+> > +
+> > +	tmpdev = mdio_device_create(bus, addr);
+> > +	if (IS_ERR(tmpdev))
+> > +		return PTR_ERR(tmpdev);
+> > +
+> > +	fwnode_handle_get(phy_node);
+> 
+> You add a _get() here. Where is the corresponding _put()?
+
+When mdio_device_free() is called, it eventually invokes
+mdio_device_release(). There is the corresponding _put(), that will
+release the reference. I also verified this with a stack trace.
+
+> 
+> Also, fwnode_handle_get() returns a handle. Why do you throw it away?
+> What is the point of this get?
+>
+
+I copied this initialization stub from of_mdiobus_register_device()
+in of_mdio.c. The same pattern is used there:
+
+	fwnode_handle_get(fwnode);
+	device_set_node(&mdiodev->dev, fwnode);
+
+It is kind of awkward that we need to half-establish a device, just
+to assert the reset, but I could not think of any better solution, that
+does not lead to a large amount of code duplication.
+
+> > +	device_set_node(&tmpdev->dev, phy_node);
+> > +	rc = mdio_device_register_reset(tmpdev);
+> > +	if (rc) {
+> > +		mdio_device_free(tmpdev);
+> > +		return rc;
+> > +	}
+> > +
+> > +	mdio_device_reset(tmpdev, 1);
+> > +	mdio_device_reset(tmpdev, 0);
+> > +
+> > +	mdio_device_unregister_reset(tmpdev);
+> > +	mdio_device_free(tmpdev);
 > > +
 > > +	return 0;
 > > +}
-> > +EXPORT_SYMBOL(mdio_device_register_reset);
-> 
-> Before it did not require an EXPORT_SYMBOL, but now it does?  That
-> makes me wounder if it is in the correct place. This should be a core
-> function, why would something outside of the core need it?
-
-I am using these in the third patch in fwnode_mdio.c, so I assumed it was
-necessary. But you are right, neither can be in a module. I will remove it.
-
-> 
-> Also, please use the _GPL variant.
+> > +
 > 
 > 	Andrew
 > 
