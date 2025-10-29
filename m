@@ -1,60 +1,58 @@
-Return-Path: <netdev+bounces-234204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95DC6C1DCC3
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 00:51:03 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9476C1DCDE
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 00:51:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AE73F4E21F5
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 23:51:01 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 564D734D199
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 23:51:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42A4E30B512;
-	Wed, 29 Oct 2025 23:50:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69EFC2D29D6;
+	Wed, 29 Oct 2025 23:51:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sqc5fjb9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CURIbAjj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16AD92EC562;
-	Wed, 29 Oct 2025 23:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B332253A0;
+	Wed, 29 Oct 2025 23:51:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761781822; cv=none; b=kuIWvfSufBa9oG1/N/fGfzAlk26xTt0hRg+xE/xG30WRPZKHBIiJp0U4aIqo8aLzviGheXdBtQC3U5xlUD60qh26i0CpZZZOvH0xUcBQBgl0Zt4JHX1EKGNOLAP9OFtuLtaCsr6H5CNxZPHcq6+mLWcWnUQI517/+kH3CvVuM4I=
+	t=1761781905; cv=none; b=nY9Iy9rgSltSrmEg3efGtjbi7MknuGg71GjsUFdiyk6xhb9ne9TwGpx68p7FCqGpsPFySPeW3naAUi3YkxlxKbk4hVCZJONkdXPLax/Kd6H3LJFI0NN9wBUKUvY1+eBgX1qQS1kQUi4UnxAaIcx2zsuvFWkeB9x88d3NW1ApAX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761781822; c=relaxed/simple;
-	bh=fM//3UDeJnK4Agl2SUP3JZUXYOZx0yS20VihghA7GxQ=;
+	s=arc-20240116; t=1761781905; c=relaxed/simple;
+	bh=bemvtufsqEuublejEd0iHnY077YL2bDIHuKx8v68uLs=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DksP3N8Y7eEePqQeZGjmnH9lJ5oOJ7cciAKRvacA1k/uC+83EA58KmoWqRDxpKJ4chUMvy/pWpIk6DM61pkz4+gPkn+O2Imwl5XTi1YtdcG6lXS75UzFKNBhJ+RkwXI5jqqflyj+GRCQJFArG+y73GEWLQUgZk6V8Cx0g3PysEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sqc5fjb9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBF1BC4CEF7;
-	Wed, 29 Oct 2025 23:50:20 +0000 (UTC)
+	 MIME-Version:Content-Type; b=U8s7RWDn6VY2ro8KbIox1RQN2+vo1A2dQpsMDGZbNxUUq1GSdGhjprpKIlO0zlO0lygLIlRxjEvbvbZBnP/eAbyGkc2dpdi3N/ZyWGK/H6hL3OgeDuaXwy/H3k0Oz3KxyxTn2Gf9ZaNRjtJyapSI/qfMAZUO3Jb6Ums/D3F6ILc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CURIbAjj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 58CD9C4CEF7;
+	Wed, 29 Oct 2025 23:51:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761781821;
-	bh=fM//3UDeJnK4Agl2SUP3JZUXYOZx0yS20VihghA7GxQ=;
+	s=k20201202; t=1761781904;
+	bh=bemvtufsqEuublejEd0iHnY077YL2bDIHuKx8v68uLs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=sqc5fjb9Uh5RQNNDeH7O7qarXlnkKxveuz2lA+X4ROGgQfEo8IwAJsQjH+cyg8dS2
-	 kHcaWxX/69z0zKPGPeDdf9sonkMTm1KFPcE1rzTqddaoSkE+98n+SY+5afW0Yv8ykx
-	 ZARLcTCHfRF37tK9PTRst77WBBgi7qO442I8QtLd2/0bbz5WcLP+dkkdxvXxgAf6/D
-	 lLJv9a4azDYUjqqlp7LF21ayXsidiID/STC7g9e42NM3ZYr5csNhmSAY/pcfqgag1g
-	 EyrvgdyJzmW6JLeok1XctY7bBFHmbGm1y80vMeGPylEwrjENF78HJ4My9/Q8pLygEP
-	 ulizgZWSwGCfg==
-Date: Wed, 29 Oct 2025 16:50:20 -0700
+	b=CURIbAjjJcvJMiB89JuWBFPHPKX8FLZ4XVvsvd41U5D8v1+Iqo+KDyUmDJ4lvgPXZ
+	 wIAQNOECZTj4TITgFeGuDsTTbuoP2oxVoPHZ6XG05zx/O4tFiuNlarljKUklmp1qCf
+	 moaLrS+CJDJZmAfdtftIV8VdIYuj+BTnxBN1l7jHmK7gp2O6cqKV7RidQ/S5/LW6xB
+	 8cL1dWabhEuR2545w4xz2k9orIBU664aRy2rbOTkeuq/UM10O/ZZssJgwAqPtsbDXO
+	 +4ujTxbssbmd4neU3I2t0l0MSL0iJDUUluV1Sl9WFBElR3feCKRyz5w4TMo31oEEOA
+	 RTuJB0JsjxOaQ==
+Date: Wed, 29 Oct 2025 16:51:43 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
- hawk@kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com,
- aleksander.lobakin@intel.com, ilias.apalodimas@linaro.org, toke@redhat.com,
- lorenzo@kernel.org, syzbot+ff145014d6b0ce64a173@syzkaller.appspotmail.com,
- Ihor Solodrai <ihor.solodrai@linux.dev>, Octavian Purdila
- <tavip@google.com>
-Subject: Re: [PATCH v5 bpf 1/2] xdp: introduce xdp_convert_skb_to_buff()
-Message-ID: <20251029165020.26b5dd90@kernel.org>
-In-Reply-To: <20251029221315.2694841-2-maciej.fijalkowski@intel.com>
-References: <20251029221315.2694841-1-maciej.fijalkowski@intel.com>
-	<20251029221315.2694841-2-maciej.fijalkowski@intel.com>
+To: David Wei <dw@davidwei.uk>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, Jens Axboe
+ <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH v2 1/2] net: export netdev_get_by_index_lock()
+Message-ID: <20251029165143.30704d62@kernel.org>
+In-Reply-To: <20251029231654.1156874-2-dw@davidwei.uk>
+References: <20251029231654.1156874-1-dw@davidwei.uk>
+	<20251029231654.1156874-2-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,12 +62,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 29 Oct 2025 23:13:14 +0100 Maciej Fijalkowski wrote:
-> +	xdp->rxq->mem.type = skb->pp_recycle ? MEM_TYPE_PAGE_POOL :
-> +					       MEM_TYPE_PAGE_SHARED;
+On Wed, 29 Oct 2025 16:16:53 -0700 David Wei wrote:
+> +EXPORT_SYMBOL(netdev_get_by_index_lock);
 
-You really need to stop sending patches before I had a chance 
-to reply :/ And this is wrong.
--- 
-pw-bot: cr
+I don't think io_uring can be a module? No need to export
 
