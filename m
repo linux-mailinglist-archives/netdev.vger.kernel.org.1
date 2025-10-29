@@ -1,118 +1,131 @@
-Return-Path: <netdev+bounces-233752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DC91C17F48
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 02:56:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A9C0C17F6D
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 03:00:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6D1704E20A9
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 01:56:28 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7E6F94EDF72
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 02:00:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB6742DFA48;
-	Wed, 29 Oct 2025 01:56:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75AC82E2DFB;
+	Wed, 29 Oct 2025 02:00:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BYEqokpC"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68B572D0C7A;
-	Wed, 29 Oct 2025 01:56:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D3942D7392
+	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 01:59:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761702983; cv=none; b=gB6BdnOVcDL0D1rYvYxjHADIDpA6jvgR8UDD4xjQ2Kv9gANCLij0nxJB9SVwtoooeuOdz6LS2m89sOHaP4QiIKpXEygKBGrVqnkPheYkpWmeNJ9XH/ltAxQ4OP4A2VKxsZRq9C3MFDiw38KXL3Nh67SxYv9/+m1dt5+eVnKMnzI=
+	t=1761703201; cv=none; b=Qda7BytdeIAVNBEw/8FIw+Ve5lEq8Ilv7t6Q1os5P+ABKl4li7XzFtwDYWLdn5IxZSzC48Gb2ikgLPaqTa00m+u6Fz1Pi3RCyuq8jeTQ/LTUSMdviMfL2nCzLG6n7LaB8HsiCXgJjirthMX47BoOaO1JegZyA5WOBbbEIx6iZds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761702983; c=relaxed/simple;
-	bh=oNEBHuq2LmK+th/kjOkTgOWVlI8Rc6Yn1bP3zYucX84=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZUgrdtD2rLDnF5HKNmFK7kIx0uZmPAO2d+9LVGvSi9rSLnVeOyy9gaI+PTMC8fyoWE6NP7hx+rPoO/Qn5kdrFJURLuHwb/Ow9hq6yuXPrKU04LG8tB1kxQgM/Z5eIx/bcfWE2HUfQ1T6oBMCd/9wWKWHxhPmuNpqj1ne8lIEhuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-c45ff70000001609-f7-6901743d1673
-Date: Wed, 29 Oct 2025 10:56:08 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: linux-mm@kvack.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
-	harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
-	davem@davemloft.net, hawk@kernel.org, john.fastabend@gmail.com,
-	sdf@fomichev.me, saeedm@nvidia.com, leon@kernel.org,
-	tariqt@nvidia.com, mbloch@nvidia.com, andrew+netdev@lunn.ch,
-	edumazet@google.com, pabeni@redhat.com, akpm@linux-foundation.org,
-	david@redhat.com, lorenzo.stoakes@oracle.com,
-	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
-	surenb@google.com, mhocko@suse.com, horms@kernel.org,
-	jackmanb@google.com, hannes@cmpxchg.org, ziy@nvidia.com,
-	ilias.apalodimas@linaro.org, willy@infradead.org,
-	brauner@kernel.org, kas@kernel.org, yuzhao@google.com,
-	usamaarif642@gmail.com, baolin.wang@linux.alibaba.com,
-	almasrymina@google.com, toke@redhat.com, asml.silence@gmail.com,
-	bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
-	sfr@canb.auug.org.au, dw@davidwei.uk, ap420073@gmail.com,
-	dtatulea@nvidia.com
-Subject: Re: [RFC mm v4 1/2] page_pool: check if nmdesc->pp is !NULL to
- confirm its usage as pp for net_iov
-Message-ID: <20251029015608.GA37879@system.software.com>
-References: <20251023074410.78650-1-byungchul@sk.com>
- <20251023074410.78650-2-byungchul@sk.com>
- <20251028183356.29601348@kernel.org>
+	s=arc-20240116; t=1761703201; c=relaxed/simple;
+	bh=hP8eF0K4Fnew1ZKu7xTTUKH7Tg+SmdBmlL5J3VUiePw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jdC/Ei2qqscjcyPtMU19jXKWrdzgdUc1YV0VJl0xRQmPmWqHEn/Ds1OSRFEe/0oij9lw6EK0P2o04tRebOMLe33+mfON7U04e4YrUlVEyKThOzH05GNyxNTcXcDaXgvAd0Hs3+Yo6qC7vvh6OBiYmThUdAKqwkZAp08UWOUylDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BYEqokpC; arc=none smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-b55517e74e3so6109728a12.2
+        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 18:59:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761703199; x=1762307999; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gfqaQ+uC7bdG4ILE549OVeYT25uPWQdC6S7HhQE7unI=;
+        b=BYEqokpCBsHmtejJeGUUev3w4G2PKT4TwDvORE6nxjSHaAIbyTLgVNkyBuNEZxQo1g
+         y8Zgzg82TE7OOepAHXgTHjAEdOa4ypPcM+jYW4Zc/qmhP6Rtwr/J7q774IOMYYe7lJjD
+         389zWAtpNb4n/ioo1xgK0liZMwMMHCYzfM+C6qVdPokRientoMBCQqqR5ErpxKAvgBSK
+         Fpfbi4AocSyGTjr94ukXQvhZzM+AIm1ok+HrpYg3Skq8RcizUCCiqtCiTDqWQL9iByxj
+         mXyM8sOUJiC4EHHhX983FH/176GdiP96W60sIZN9GbpmNFyoG9woVf89bCmoJlUHIoE+
+         lZ9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761703199; x=1762307999;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gfqaQ+uC7bdG4ILE549OVeYT25uPWQdC6S7HhQE7unI=;
+        b=VC49nyHM12V+JZi/R9jVDv3uuMTKhMnCXLtifOaXhE0UQh5+uHveA4Rh21pIjXmKTZ
+         ZLDx3UD7oKW71P8+VvrdqQDDlJTgifq3qg38t5TKe4u3dFb3uTLcUkT5RSvgp76Ab1PI
+         oyINsYr18y9B7kZdcrUMqy2tXXIC9uEScpi4En8oKcQvcmNyOaqlEb/y6R4FlRAKGYHP
+         5tntC/hYCj77n9rcW38FaQQM9n3Wq1riF0mqisdQmPrEBQn6bTTyhA82ZJB+2bGLqBLB
+         TXVv8fyozJx1VYPBdSYRm8Z/nrAfyMpDGQlXrphMZRppxWavkkv19P/RLyIoQ1dGhI+G
+         YnTw==
+X-Forwarded-Encrypted: i=1; AJvYcCWFOZmayQsxvPF6gII1TH5josJMKTVaZ4iy+L5oXijMgKeFc6qEVEJDO7QboTAskDCSI6a6CTA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBv9n8pbhmam8yiNemJDhMOW0eJoX3/SK3y5EOtoNAjyXejR+Z
+	9bdlmiBrNtmr+q2ttr+26LVbSur8zI/RzTojeCDEqoEuo5uEr/gMR0m5
+X-Gm-Gg: ASbGncvo3dcvf/+iCi/IkWufXKvvq2h/eOFacW6FOxkDW9MQ3wcyCQ4D7nBpHcEQkd+
+	DoJd3vJsVosmSMV+K7WIPGR5/723Y/tJdmE1Gi1JNvCi3l142kw28Vd8zaqe3RCWNlzo6if03ro
+	65dL7zwLV8mVyFIhir6MfChZUIqIgfv/LYuSpqm7IRc/maHp456d6rrUeV/ZMgpDYFNW3MCBGD+
+	pfMJL4VKzl0Okp6SblE2viOC7t+GrtH7zDPzrTeVh4e5Yzbu3KttexYhtJuoQm/kI945OyLo6Iz
+	s3gYiI0mMqBdQ2ocMhFZ/NTp7FsLVmHpXMUls85CaS89XVqIsXvI61gjnOdkOKfB/baiI/PPOiR
+	Zk7u9sV5NlxhJTS/NvNMm2NN+ySX4hkdZBjs/cwI5/ITrU3WkNGe+k02WiZXyWbB7KcqZSF48cs
+	qFDTJYtnFewZM=
+X-Google-Smtp-Source: AGHT+IFlhaFEy5i7fb+WJyyvynWY8Siu4ggFFXY3WiOcoLFv8mNx7LPXoJr5hXn1kPXaKhQcEU3+vQ==
+X-Received: by 2002:a17:902:dac8:b0:290:c94b:8381 with SMTP id d9443c01a7336-294dedd419emr16660645ad.7.1761703198547;
+        Tue, 28 Oct 2025 18:59:58 -0700 (PDT)
+Received: from archie.me ([210.87.74.117])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a41403fa75sm13177538b3a.28.2025.10.28.18.59.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Oct 2025 18:59:57 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id CED3F4206925; Wed, 29 Oct 2025 08:59:47 +0700 (WIB)
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux Networking <netdev@vger.kernel.org>
+Cc: Breno Leitao <leitao@debian.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+	Bagas Sanjaya <bagasdotme@gmail.com>
+Subject: [PATCH net-next] Doucmentation: netconsole: Separate literal code blocks for full netcat command name versions
+Date: Wed, 29 Oct 2025 08:59:40 +0700
+Message-ID: <20251029015940.10350-1-bagasdotme@gmail.com>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251028183356.29601348@kernel.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUxTZxTH99zn9t5LY81dBXmmm3GdZoYEBILmbEHDzBKfDyok+mXMZDb2
-	blTbYlpeTVyqYhQjlSEqLSwDjbzWsJWNvgTMVqCAmM1UwetgoPhCVECCiPIi2GrM/PbLOf/z
-	O+fDEbC6R7FC0JuyJLNJa9BwSlY5tqQqdlMW0sc/7l4HFY1ODhpe5kHNHY8CZpwjDFTUNyOY
-	munnYbE1gOBZeycHT9omEVysmsZQ8U8BC88bZzF4fSMIHpdd5uBBYJiHBtd2GKp+yELLcTeG
-	4dNdHBQVzGFonRnn4YinNiRusvJwvdmmgNLZSxjc1js83PBVcDDoXFTAQ38RC92OOhYmzrZj
-	GLKlQKByOUz3jCJob3QzMH3qZw567T4G/mjt5eFMsJKDewVDCIJtwyycnT/BQflhG4K5lyHl
-	ePGUAso7BvmUOHpYljnaNvoU09/rbjO0r+wnlspXrjLU6/iPp5WubNpUG0NPykFMXfWFHHVN
-	lvB0oK+Fo11lcyz13v2Cej3PGFp0dJxLi0pXJuskgz5HMq/fvEeZ8cpn4w4EFXkNVX8jK3Kz
-	J1GEQMQkci101Ds+d+T8G2bFtcR3vFQRZk78nMjyDA5zpLiGFDTZQxmlgMUJnpTJg6GQICwT
-	jaSj1xjOqEQgiy/qcTijFk8g0ubtZd42PiTd9vtvFmAxhsgLj5jwLBZXkpoFIVyOEBOIvfoC
-	F+Yo8TPyZ3MnE/YQcUogo4XX8NtDPyJ/1cpsMRId72kd72kd/2srEa5Har0px6jVG5LiMvJN
-	+ry4vZlGFwq9WPWh+W89aPL6Tj8SBaRZooq/8IFerdDmWPKNfkQErIlUjZ4OlVQ6bf5ByZz5
-	nTnbIFn8aKXAaqJVidO5OrX4gzZL2i9JByTzuy4jRKywovMls/ZF54ODxbryru9tm+qid3nu
-	5+7QrS10zKcNDJiTTQmfXKI/Pi3eMpt3c9mtY6WuuaHUX9PZWNfwwpUNO7Y4X/TYU5N2GwKJ
-	W0sDzC8l+RtTsrdZ+hOqc79aerfT/Y1nbNXXp2K/3DdiDc4n7mlUGVb3J+8aW9OS+vHF35pv
-	fur/V8NaMrQJMdhs0b4Gq9SA+l4DAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SXUhTcRjG+5//Of9zthyczOxUdtEqpEEfRtHbJ14EHYoiuonqQtc65HBb
-	taloFCwbZZbTPiy3ZkwlLbWEWepGVmxmWdGHpp2o1OzDPsSkzHLmbCui7h6e5/c8783L4ehL
-	zFROb0qTzCatQU2UtHLD8oNzV6Yh/QJvLg+ummoCVT8yoaK7gYHh6l4KXJV1CAaHn7Mw1tiM
-	4GvTbQKfAl8QlJUMYXA9tNHwrSaIwevrRfCx6BKBt809LFR51kNX+Tsarh2ux9CTf4dAnm0E
-	Q+NwPwvZDRfCw7VWFgLFLQw8qrMzcCp4HkO9tZuFNp+LQGf1GAPv/Hk0tDgv0jBQ2IShy54I
-	ze5YGLrXh6Cppp6CoWPFBNodPgquNrazcLLVTeC1rQtBa6CHhsKfOQTOHrAjGPkRnuwvGGTg
-	7K1ONnG+eECWiRjo+4zFKxefUWJH0XFalK/fpUSv8yUruj3pYu0FjZgrt2LRU3mEiJ4vJ1jx
-	Rcc1It4pGqFF76ulorfhKyXmHewnG2O3KlfskAz6DMk8f1WyMmXUZye7W5nMqpIHyIrq6Vyk
-	4AR+kXA6+8xvTfOzBd/hU0xEEz5ekOVhHNEx/CzBVusIM0oO8wOsUCR3hiGOm8gbhVvtxgij
-	4kEY+16JI0w0n4OEgLed+hNMEFocb34fwLxGkEMfqEgX89OEihAXsRV8guAoLyURPYmfKdys
-	u00VIJXzv7bzv7bzX9uNcCWK0ZsyjFq9YfE8S2pKlkmfOU+3y+hB4Scq3//zeAMabFvjRzyH
-	1FGqBaXj9NGMNsOSZfQjgcPqGFVffthS7dBm7ZXMu5LM6QbJ4kfTOFo9WbV2s5Qcze/Upkmp
-	krRbMv9NKU4x1Yq6O3XeMWaKYU1B/uWOwkMz6kYSEzRRtn56TvrCh0/8CteS6Sv7NOMLXsXH
-	jeriP0PbfeK4Ejq6ddU5zdOBM8GPul5tRtU63Z4cHbW5efEbU1KNNVNxQ97HrzOPixNWV9i3
-	LMl/v6yMCXY8z45NjQps2p6b/DipJy748sXT16Fto2rakqJN0GCzRfsLmdJKBkADAAA=
-X-CFilter-Loop: Reflected
+X-Developer-Signature: v=1; a=openpgp-sha256; l=865; i=bagasdotme@gmail.com; h=from:subject; bh=hP8eF0K4Fnew1ZKu7xTTUKH7Tg+SmdBmlL5J3VUiePw=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDJmMJVKXNp3r85oX7K8e5aYyNynwSkWpxenE3JLd3R5fN ryO13LoKGVhEONikBVTZJmUyNd0epeRyIX2tY4wc1iZQIYwcHEKwEQkORgZHnKHpSvqlLE9y83a 8WfdhcUsXgFb+ptNtvq4bli0qqjLn5FhWa54mShDdGOaW7fsfJOs4jAWu22fdU8+s5ojnf/pphM TAA==
+X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 28, 2025 at 06:33:56PM -0700, Jakub Kicinski wrote:
-> On Thu, 23 Oct 2025 16:44:09 +0900 Byungchul Park wrote:
-> > As a preparation, the check for net_iov, that is not page-backed, should
-> > avoid using ->pp_magic since net_iov doens't have to do with page type.
-> 
-> doesn't
-> 
-> > Instead, nmdesc->pp can be used if a net_iov or its nmdesc belongs to a
-> > page pool, by making sure nmdesc->pp is NULL otherwise.
-> 
-> Please explain in the commit message why the new branch in
-> netmem_is_pp() is necessary. We used to identify the pages based
-> on PP_SIGNATURE, now we identify them based on page_type.
+Both full and short (abbreviated) command name versions of netcat
+example are combined in single literal code block due to 'or::'
+paragraph being indented. Unindent it to separate the versions.
 
-Yes, I will.  It'd be much better.  Thank you very much for the comment.
+Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+---
+ Documentation/networking/netconsole.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-	Byungchul
+diff --git a/Documentation/networking/netconsole.rst b/Documentation/networking/netconsole.rst
+index 59cb9982afe60a..0816ce64dcfd68 100644
+--- a/Documentation/networking/netconsole.rst
++++ b/Documentation/networking/netconsole.rst
+@@ -91,7 +91,7 @@ for example:
+ 
+ 	nc -u -l -p <port>' / 'nc -u -l <port>
+ 
+-    or::
++   or::
+ 
+ 	netcat -u -l -p <port>' / 'netcat -u -l <port>
+ 
+
+base-commit: 61958b33ef0bab1c1874c933cd3910f495526782
+-- 
+An old man doll... just what I always wanted! - Clara
+
 
