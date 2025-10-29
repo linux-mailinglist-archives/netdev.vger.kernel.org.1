@@ -1,65 +1,68 @@
-Return-Path: <netdev+bounces-234178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F609C1D9C9
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 23:47:38 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A742C1D9E4
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 23:50:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D3C33B2D28
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 22:47:36 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 27A063454B4
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 22:50:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F8992D593E;
-	Wed, 29 Oct 2025 22:47:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DD122DF148;
+	Wed, 29 Oct 2025 22:50:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vi79FU2i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BWxyrc1r"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4442718C008;
-	Wed, 29 Oct 2025 22:47:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54538239573;
+	Wed, 29 Oct 2025 22:50:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761778053; cv=none; b=RpmGrXWko17UYRuBUMUPCKs2HQZRtuZCbamJfQ2uhan7HmAXgaadWH7Kad69R3jN8Zyg4IXic/p/dd8tzYwvTf2JJJgny8lDgsmLGcPC/Egz0pboHfhmNdG0Mw+efuffIoHtzipziPPdV5+DG/1V5NnViLOIMLeAqNCmLSrfz6A=
+	t=1761778244; cv=none; b=qJX+5ai5wgIEIq6rC29J5GLJUqeU2J3jxA8aYX5XIIp2J2fcocAW0ROBsYK8rxNU0E+jK0sv4ujjbv8/90dbygHSzug+eL08Dh90jovKAvjKnrzNh7ITz7v1p6Qu3feXt87BtQC+TMly/2WUVtmq7O8Mh/pjY1KgKci/dlaKFbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761778053; c=relaxed/simple;
-	bh=ryjH8DOV/UmGWhG3rwsW4BNeO6byJ5BvmSUiIvYDcxw=;
+	s=arc-20240116; t=1761778244; c=relaxed/simple;
+	bh=mTQHrDxKx7IV8KOA3AyIUBpcpmWdEWskPrlRI2H7uIo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LKdH40e07nUlGU8BnXgr9AkKP2yfufJ4kWKfVcKfL1En1Nrh6e1fED9eVEj2zXJzP2XHjuyv2u84eIa1yHW8y5V0+Q9UmpFu475kofPWyZDZGbWSfQJNj+MZ+0uPbWqCOEJ+FTU45Ien3jVAWCVXV2AVKG2tgwc7aPoo0N03bmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vi79FU2i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 082E5C4CEF7;
-	Wed, 29 Oct 2025 22:47:31 +0000 (UTC)
+	 MIME-Version:Content-Type; b=LeA+JKHCSWCSysS+5WX+MwVKYxkTND8MmytMgCyASQsj0VikHon1/5ALk8VdE8EDCX+ngrbE8VQYuupv+P+4qxFq2wRwIL2iB78fwkZRERK8fQmOT4UO3WW4y32VIFzVhlf5TFYUrt6Mhx32KFA0fz0a59R7rVARgJSCd8abFHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BWxyrc1r; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D6B3C4CEF7;
+	Wed, 29 Oct 2025 22:50:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761778052;
-	bh=ryjH8DOV/UmGWhG3rwsW4BNeO6byJ5BvmSUiIvYDcxw=;
+	s=k20201202; t=1761778243;
+	bh=mTQHrDxKx7IV8KOA3AyIUBpcpmWdEWskPrlRI2H7uIo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Vi79FU2i8AcbFIOZGQWwroM7FBAzHDeyG2cKBQ5zsi0fWF13IV7T1BURw539oSim4
-	 ljvU8Q0SFFmBACxI97p4+ye9lVcjFho6/5FfbIwNOXRPdyQ31C6MbYkarpcy7eWhCm
-	 rnYjRIgUeVGTvY32IM8ZRI2OlUB3CefPN++Xfue3fwSQP6iPzEtiIi4XF7p/0J5WOB
-	 t05jgj0SXsxx3GnoyBEreoqK9SuIqDXmj5YWu9v6hTsfuCUcPaKanvjBHKIKITkLbA
-	 kwVywBjbSL13xUVWHo69EpKNHFaaQcXuWsacAcigk4kH+Gb8Dl659f4hyBBNAMuFfs
-	 lymW2EL8ONerA==
-Date: Wed, 29 Oct 2025 15:47:30 -0700
+	b=BWxyrc1rNIVq3ghKKjMEPb+CHpbOQR4VH/HpURcGL3WkMqxVbgR5EA97L8sMLsTIo
+	 fUcumSh7i0QaKI057eCuOl6khpjKC1dPpmPPaWiBvHP9fJFVl9TbFCcCsgJMYZ2jzb
+	 70Eo7KdNpH+h5MNmGi6RnzTy+U/khF4kKQGf6J/wU847J1HdF5vZBwioqyRRRJYfM5
+	 BfigAmwxQ4Y5Ox8N+vasb29xMlsf7fpNqgTNL5uTOBY4WUfY7x/IfsJPcXP8Kl0MHH
+	 75dDEw9a0k5u0lPqlFK/y9E1bU05HR1EHGI6iadBlyqv9vHI3U5DL9KiQ5I4fAOorB
+	 DsCiy3Qkc042Q==
+Date: Wed, 29 Oct 2025 15:50:42 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: David Wei <dw@davidwei.uk>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, davem@davemloft.net, razor@blackwall.org,
- pabeni@redhat.com, willemb@google.com, sdf@fomichev.me,
- john.fastabend@gmail.com, martin.lau@kernel.org, jordan@jrife.io,
- maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, toke@redhat.com,
- yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
-Subject: Re: [PATCH net-next v3 03/15] net: Add peer info to queue-get
- response
-Message-ID: <20251029154730.1a0ac990@kernel.org>
-In-Reply-To: <b6b3cef5-195c-40cc-8c37-cebdee05a5bd@davidwei.uk>
-References: <20251020162355.136118-1-daniel@iogearbox.net>
-	<20251020162355.136118-4-daniel@iogearbox.net>
-	<20251023193333.751b686a@kernel.org>
-	<17f5b871-9bd9-4313-b123-67afa0f69272@iogearbox.net>
-	<20251024161832.2ff28238@kernel.org>
-	<b6b3cef5-195c-40cc-8c37-cebdee05a5bd@davidwei.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ davem@davemloft.net, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, Richard
+ Cochran <richardcochran@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Vadim Fedorenko
+ <vadim.fedorenko@linux.dev>, Alexis =?UTF-8?B?TG90aG9yw6k=?=
+ <alexis.lothore@bootlin.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 2/2] net: stmmac: Add a devlink attribute to
+ control timestamping mode
+Message-ID: <20251029155042.208ecff4@kernel.org>
+In-Reply-To: <71310577-7cea-42ce-8442-49e09e0b958a@bootlin.com>
+References: <20251024070720.71174-1-maxime.chevallier@bootlin.com>
+	<20251024070720.71174-3-maxime.chevallier@bootlin.com>
+	<20251028151925.12784dca@kernel.org>
+	<71310577-7cea-42ce-8442-49e09e0b958a@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,40 +72,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 28 Oct 2025 19:08:10 -0700 David Wei wrote:
-> >> I think up to us which side we want to show. My thinking was to allow user
-> >> introspection from both, but we don't have to. Right now the above example
-> >> was from the container side, but technically it could be either side depending
-> >> in which netns the phys dev would be located.
-> >>
-> >> The user knows which is which based on the ifindex passed to the queue-get
-> >> query: if the ifindex is from a virtual device (e.g. netkit type), then the
-> >> 'peer' section shows the phys dev, and vice versa, if the ifindex is from a
-> >> phys device (say, mlx5), then the 'peer' section shows the virtual one.
-> >>
-> >> Maybe I'll provide a better more in-depth example with both sides and above
-> >> explanation in the commit msg for v4..  
-> > 
-> > Yes, FWIW my mental model is that "leaking" host information into the
-> > container is best avoided. Not a problem, but shouldn't be done without
-> > a clear reason.
-> > Typical debug scenario can be covered from the host side (container X
-> > is having issues with queue Y, dump all the queues, find out which one
-> > is bound to X/Y).  
-> 
-> Makes sense, I didn't consider leaking host info in a container. Happy
-> to remove the introspection from the container side, leaving it only on
-> the host side when queues are dumped.
-> 
-> Like Daniel mentioned, I didn't add 'src/real' or 'dst/virtual' because
-> I believed this information is implicit to the user when querying a
-> netdev based on its type. Do you find this to be confusing? Happy to add
-> a clarifying field in the nested struct.
+On Wed, 29 Oct 2025 07:59:10 +0100 Maxime Chevallier wrote:
+> The patch was applied, should we revert or add another patch to rename
+> that parameter ?
 
-In veth/netkit we call "peer" the other side of an equal pipe. Same for
-ndo_get_peer_dev. Queue is not a peering situation, but rather an attachment
-/ delegation of a sub-object from one netdev to another.
-
-I'd use a term like delegation or grant when talking about the HW
-queue. And assignment in context of virtual.
+I think an incremental patch is best here. You're using the register
+naming in the driver code so I suppose you won't even have to make many
+changes there.
 
