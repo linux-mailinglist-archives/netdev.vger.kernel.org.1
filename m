@@ -1,195 +1,145 @@
-Return-Path: <netdev+bounces-233793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47020C188E5
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 07:57:43 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 738D2C18918
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 07:59:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB015189BDC7
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 06:57:29 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 16407349BCA
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 06:59:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A04AA30B52B;
-	Wed, 29 Oct 2025 06:54:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 671D72EA754;
+	Wed, 29 Oct 2025 06:59:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gmd1lTif"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="o/f2BvsK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F256430B526
-	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 06:54:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA1891F3BA4
+	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 06:59:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761720866; cv=none; b=M+DVDeoX8HzTflflwDbwmzNxWaeVyT82/5NoIfC4XhTmEiAiAx5oSknO3dEVJJuqeARS2FZQCw5FpUiB4pbT4+ahAB+mgsZM6dCWcJp3s5PdOb+a6BLaMIMV3w/wHDI2Jn830Q0hA15qq9M7BrKJoF0xrtylbQTqvbxhgzRG/Fs=
+	t=1761721169; cv=none; b=YGw/Ip3WZdtKkQgE4L5PaXbmF7hQR0QogB5+51De15sBz97wbu5FZBAnjwF+NaYKDCy1fgjYEAspIvnfDgTIRTG6BstkSmax4Da1n+fxHxqAXg+z1Bd+085008bhLPsLMly8e0t9NMEN4wCn+nBzNoqYghcb9W3L+T6BXh9+i20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761720866; c=relaxed/simple;
-	bh=/YijMjlE2vWiw2UXTGzGnWn1QC2iSvLdrJWg7msXoMI=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=mi0V2VdyH1vnwly5VzjsAbI0ltOfP60sbBGL5ydX2mfftxVi00GVwWilY6cvYxOZN6ujP6gEx+68Mqbi74rMGDK4rUQqRJgWfIbRgteoRuzY2jXn9aLgNB+Unmqj6AY5Mdd7TNeZj9G83KVg7I92q19SoPhC+ZoS3rzmwoLKbXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--shivajikant.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gmd1lTif; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--shivajikant.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-290b13c5877so138758705ad.0
-        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 23:54:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761720864; x=1762325664; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=CDj7jmhJVOkaR2dbH09y572vZCI8Dh5xWwGXXOtX7e8=;
-        b=gmd1lTifXOpVPgX2FfTFVXPgyvmQRBtu6ZpVjh6hjBfUZi8W60Is7F7/pWbQQn2xS8
-         VsEtzIAMCy0HjIG9m8G5+W356KEm6q93rOq5fGVkqX5nXu9/EU40OAAEgJOJ5NE9K8es
-         3MixPeUh/wu0qZePDpDnRyUtzEiNp+LebV0Z+06Ra3RtEpCjWiyFrSOaEaTjgBjEWdvr
-         6u5HXswyBqpm2hPPkzUkBajPRbEVsu1J/4x6bOz5ur0WfTi/TpXvRMilqcWXDQfurcs+
-         wRaraVYKVFTIhwK5oaCWOFnAfnCKMrKPSwcGIihLBqFxlJ7D66zuD5vBrrHtsEkaUL32
-         0m6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761720864; x=1762325664;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CDj7jmhJVOkaR2dbH09y572vZCI8Dh5xWwGXXOtX7e8=;
-        b=UoRx1d5atZXXr1dz6jWgtO7Sg5XTmTVUfU+F1kea6keoK30mIWb0YgYN0342xxv7Ep
-         i2enJwGkAzacsKf6rS25m3x3NyNprxC0Uc1btVttYIfsX6dU/MWbhij3gGJV3QzaO3ET
-         A6ZyDae2SUmx+Gm/lLdCSm/j6h8MEQnoh5A139BaltHV0PBYgV4mFWbvaqKOhBqRophr
-         u8TBs8Stcym6N5nMw+FI/MHm5rzKQuapGkj7D7m7ZdmnpQPCBd2vzjpMfKgeuCPMPtad
-         o05M5mheouzvU0++kW/PCGOQG6qNILaXfs9U/UDBO6dtbVZyb1Fxm3LsRFXpZvGXsGox
-         Z/Qg==
-X-Gm-Message-State: AOJu0YzZTf/ndYsOlk/pAG8Mfe9M/lxf0WG+0KqmZvQNj25J+xqK54/4
-	hRxxCiCsaRtGtr2aoNpuZDAfowpRObSlBIpBRJAiWy2keiV02ZbjV5fDD8JyG8SuwHro1NBmdV1
-	x9SC1lIby69TVfU5M6XaCQRIuH5/gFYkU5Hjj7GrCpjX/pia/8GefOiwO9NJH4eGHgj8pMFy0RH
-	RBdVr6FVJ1f0ovcCTSjcslE8HAPSz8JK2e9FSudpG7EdqP4s32fSZn1HlKRkmkccA=
-X-Google-Smtp-Source: AGHT+IEzYsfJZiUS4uonDVfQfLjRNfV4gNO9JSsRtvp4TQDnzuDUBpCLvqAtZVOn0jTeDyGTElJ2zlsExatC7mFeNQ==
-X-Received: from plrs15.prod.google.com ([2002:a17:902:b18f:b0:290:28e2:ce44])
- (user=shivajikant job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:902:c411:b0:26b:da03:60db with SMTP id d9443c01a7336-294dedf453bmr22768025ad.13.1761720864089;
- Tue, 28 Oct 2025 23:54:24 -0700 (PDT)
-Date: Wed, 29 Oct 2025 06:54:19 +0000
+	s=arc-20240116; t=1761721169; c=relaxed/simple;
+	bh=kWhnFmEBQExl8DKtrg8teAgBLG0Bzqsg1+3VyWXOmm4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=r+dvksYWAN6cNxPa0FROiWy7ESHtMlsLCYEVp2YthXS97LF/az/9bo0WxDZJvXWHfE4vFxLsnEwuApGIC4izxkPy1Xk5H/K/yDnV37ldfrbzyFiieJCh7MIFSXYHGTvQY8VrscodABXK4ZYXz9vGGAatk8YHYZISmwyYvoMqoAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=o/f2BvsK; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 8222CC0BEBA;
+	Wed, 29 Oct 2025 06:59:03 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id C0F63606E8;
+	Wed, 29 Oct 2025 06:59:23 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D513F103115AD;
+	Wed, 29 Oct 2025 07:59:11 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1761721162; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=F+KTjI1TM7mg6rcCTezA/+UdyBmDty2R5itDbwstprQ=;
+	b=o/f2BvsK1UFERMGggVndtxtQP6Off6yNARbRDm45ax8eVzx6q68dtBRTepmeXOju2Zrq3a
+	jaH+noqfpaC8Gu9aTjShhjImZRq0X0lMCzzDXyVJkOV7o4wSw+RMjBH+bXzHKaF9tkTROV
+	xfMczXjE0dkfTw6GY31uyOk+FWRoY+ASP+3TunTC9hMPsZKyBfeTrlkyznVPrxgBCea9mQ
+	2Xi6esdXpqoG2p1KkVm/nKFR0lzaKIy8qT0jhpGlqno5jw0YDmn+UgDngAdIfvQmhRa5BL
+	6T0m1GLtxuLgtVRF0l+z7bz9fdL2atrz2GKf0Q2UD7zXVuJDHwzF8H2BIqxAaw==
+Message-ID: <71310577-7cea-42ce-8442-49e09e0b958a@bootlin.com>
+Date: Wed, 29 Oct 2025 07:59:10 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.1.851.g4ebd6896fd-goog
-Message-ID: <20251029065420.3489943-1-shivajikant@google.com>
-Subject: [PATCH net v2] net: devmem: refresh devmem TX dst in case of route invalidation
-From: Shivaji Kant <shivajikant@google.com>
-To: netdev@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Mina Almasry <almasrymina@google.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Pavel Begunkov <asml.silence@gmail.com>, Pranjal Shrivastava <praan@google.com>, 
-	Shivaji Kant <shivajikant@google.com>, Bobby Eshleman <bobbyeshleman@meta.com>, 
-	Vedant Mathur <vedantmathur@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 2/2] net: stmmac: Add a devlink attribute to
+ control timestamping mode
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Richard Cochran <richardcochran@gmail.com>,
+ Russell King <linux@armlinux.org.uk>,
+ =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20251024070720.71174-1-maxime.chevallier@bootlin.com>
+ <20251024070720.71174-3-maxime.chevallier@bootlin.com>
+ <20251028151925.12784dca@kernel.org>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20251028151925.12784dca@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-The zero-copy Device Memory (Devmem) transmit path
-relies on the socket's route cache (`dst_entry`) to
-validate that the packet is being sent via the network
-device to which the DMA buffer was bound.
+Hi Jakub,
 
-However, this check incorrectly fails and returns `-ENODEV`
-if the socket's route cache entry (`dst`) is merely missing
-or expired (`dst == NULL`). This scenario is observed during
-network events, such as when flow steering rules are deleted,
-leading to a temporary route cache invalidation.
+On 28/10/2025 23:19, Jakub Kicinski wrote:
+> Sorry didn't get to review this in time.
+> 
+> On Fri, 24 Oct 2025 09:07:18 +0200 Maxime Chevallier wrote:
+>> +   * - ``ts_coarse``
+> 
+> This is not a great name IMHO. Is "coarse" from the PRM?
 
-This patch fixes -ENODEV error for `net_devmem_get_binding()`
-by doing the following:
+Yes, it uses "fine/coarse"
 
-1.  It attempts to rebuild the route via `rebuild_header()`
-if the route is initially missing (`dst == NULL`). This
-allows the TCP/IP stack to recover from transient route
-cache misses.
-2.  It uses `rcu_read_lock()` and `dst_dev_rcu()` to safely
-access the network device pointer (`dst_dev`) from the
-route, preventing use-after-free conditions if the
-device is concurrently removed.
-3.  It maintains the critical safety check by validating
-that the retrieved destination device (`dst_dev`) is
-exactly the device registered in the Devmem binding
-(`binding->dev`).
+> It's the increment that's coarse, right? Not the timestamp
+> This naming confuses me greatly.
 
-These changes prevent unnecessary ENODEV failures while
-maintaining the critical safety requirement that the
-Devmem resources are only used on the bound network device.
+That is true, the ts_ was added as this configuration is done based
+on the timestamping control registers, and is refered to as
+"timestamping control fine update" in the register defs :(
 
-Reviewed-by: Bobby Eshleman <bobbyeshleman@meta.com>
-Reported-by: Eric Dumazet <edumazet@google.com>
-Reported-by: Vedant Mathur <vedantmathur@google.com>
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Fixes: bd61848900bf ("net: devmem: Implement TX path")
-Signed-off-by: Shivaji Kant <shivajikant@google.com>
----
-v2:
-  - Updated the patch description
-  - Added Reviewed-by: Bobby Eshleman <bobbyeshleman@meta.com>
-v1: https://lore.kernel.org/netdev/20251028060714.2970818-1-shivajikant@google.com/
----
- net/core/devmem.c | 27 ++++++++++++++++++++++++---
- 1 file changed, 24 insertions(+), 3 deletions(-)
+So you are correct that in the end the clock frequency is coarsely
+adjusted.
 
-diff --git a/net/core/devmem.c b/net/core/devmem.c
-index d9de31a6cc7f..1d04754bc756 100644
---- a/net/core/devmem.c
-+++ b/net/core/devmem.c
-@@ -17,6 +17,7 @@
- #include <net/page_pool/helpers.h>
- #include <net/page_pool/memory_provider.h>
- #include <net/sock.h>
-+#include <net/tcp.h>
- #include <trace/events/page_pool.h>
- 
- #include "devmem.h"
-@@ -357,7 +358,8 @@ struct net_devmem_dmabuf_binding *net_devmem_get_binding(struct sock *sk,
- 							 unsigned int dmabuf_id)
- {
- 	struct net_devmem_dmabuf_binding *binding;
--	struct dst_entry *dst = __sk_dst_get(sk);
-+	struct net_device *dst_dev;
-+	struct dst_entry *dst;
- 	int err = 0;
- 
- 	binding = net_devmem_lookup_dmabuf(dmabuf_id);
-@@ -366,16 +368,35 @@ struct net_devmem_dmabuf_binding *net_devmem_get_binding(struct sock *sk,
- 		goto out_err;
- 	}
- 
-+	rcu_read_lock();
-+	dst = __sk_dst_get(sk);
-+	/* If dst is NULL (route expired), attempt to rebuild it. */
-+	if (unlikely(!dst)) {
-+		if (inet_csk(sk)->icsk_af_ops->rebuild_header(sk)) {
-+			err = -EHOSTUNREACH;
-+			goto out_unlock;
-+		}
-+		dst = __sk_dst_get(sk);
-+		if (unlikely(!dst)) {
-+			err = -ENODEV;
-+			goto out_unlock;
-+		}
-+	}
-+
- 	/* The dma-addrs in this binding are only reachable to the corresponding
- 	 * net_device.
- 	 */
--	if (!dst || !dst->dev || dst->dev->ifindex != binding->dev->ifindex) {
-+	dst_dev = dst_dev_rcu(dst);
-+	if (unlikely(!dst_dev) || unlikely(dst_dev != binding->dev)) {
- 		err = -ENODEV;
--		goto out_err;
-+		goto out_unlock;
- 	}
- 
-+	rcu_read_unlock();
- 	return binding;
- 
-+out_unlock:
-+	rcu_read_unlock();
- out_err:
- 	if (binding)
- 		net_devmem_dmabuf_binding_put(binding);
--- 
-2.51.1.851.g4ebd6896fd-goog
+The patch was applied, should we revert or add another patch to rename
+that parameter ?
 
+> 
+>> +     - Boolean
+>> +     - runtime
+>> +     - Enable the Coarse timestamping mode. In Coarse mode, the ptp clock is
+>> +       expected to be updated through an external PPS input, but the subsecond
+> 
+> I guess the definition of "PPS input" got diluted but technically it
+> means Pulse Per Second, right? Here IIUC we need an actual 50MHz clock
+> fed in?
+
+For GM, yes indeed. I can update the doc accordingly.
+
+> 
+>> +       increment used for timestamping is set to 1/ptp_clock_rate. In Fine mode
+>> +       (i.e. Coarse mode == false), the ptp clock frequency is adjusted more
+>> +       frequently, but the subsecond increment is set to 2/ptp_clock_rate.
+>> +       Coarse mode is suitable for PTP Grand Master operation. If unsure, leave
+>> +       the parameter to False.
+> 
+> My understanding based on your previous explanation is that basically
+> in one of the modes the frequency cannot be adjusted. It's only usable
+> if a very stable reference clock is fed into the device (or otherwise
+> we "trust" the clock that's fed in). So that's why Grand Master.
+> 
+> In the other mode we can tweak the frequency more accurately.
+> But it comes at a cost of the HW time incrementing 2x larger step.
+> 
+> If that's the case I think we should update the documentation and
+> rename the knob to indicate that it's the frequency adjustment that's
+> coarse.
+
+That's fine by me, just let me know abut the exact process, I can followup
+on that :)
+
+Maxime
 
