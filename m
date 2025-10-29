@@ -1,155 +1,112 @@
-Return-Path: <netdev+bounces-234138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43FEEC1D1BF
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 21:00:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A03F4C1D1DA
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 21:00:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 07C794E3DA9
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 19:59:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6AC318882C2
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 20:01:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45F533655CD;
-	Wed, 29 Oct 2025 19:57:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BDEB26D4F7;
+	Wed, 29 Oct 2025 20:00:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="knuFZdka"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="p7MCeK9b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E0683644B6
-	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 19:57:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3176C2BDC05
+	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 20:00:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761767859; cv=none; b=YbubesYe6Pcp6Nv7byjJ1j1HY7TJ1yojk96/57VQjRWizWqEoZp2C5Dr5Dmp9EZCmZD0dDxlv7FKQ3eJJXt1DVFvdVV7FJrTCGTnByRLJJBzJf2YE1EMkSX5btkn92a5qqL4UgCu8IiYAIUcvLAKY45lNpvrt5QM/0Jp+g+DJy0=
+	t=1761768053; cv=none; b=o4UKvkXz9o7Kg7tDNRtYCiJWVwBVQNlVmxwl4Wluvy43PcBBm97C6zyz3F1+rCVsV7CMBWjlWps9+6rqWA838vSNGXCttEnTmlzEqqGU+n/4RN+RMlvyB+gYNYd2xdV+1v/Dg86ztCUaijurkWQ46OkrRZCjY1o4xlbLo6CyoVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761767859; c=relaxed/simple;
-	bh=+rNIfhn612wSnJwTsWfa3rI2oXBKL1DitnLLKvmVa24=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SyLH6B6S/vh+w70FQKLzIc/iIfjLuEYtIlZP/Z4l0d7+mCpKwyn4l32qKGNpAQvC8y73iV0XXRTEkCaTJwugzmXetnFR9k3UrEQzjxHk3xM2PTHjCbg61aSquGptRXah58mAlvUnY65QH1hMO72QbePGU3If/HgPte4Kxy8dGA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=knuFZdka; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-781206cce18so369890b3a.0
-        for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 12:57:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761767856; x=1762372656; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=N5AE88Ciiu4y1L+Whuiba6HLMWI7gvS/KpyPblrUqXI=;
-        b=knuFZdkavo3jbuzWz+lLMRxkQuCzsSky2G4PW0+DWx8/yWDaGZChYNV6P2mYA7AzPv
-         tp9m/vIfjmCc1zte/F2y5QFwYmww0dntAFzarR7RW652V380u5DAiRBPpo1wK1dWUgqY
-         43ZObmpXPXYVD5HLSa8XwJnyvgM38MTujAFadPluslaJCoqcDd5Mst+MUTTyGQCPFyVN
-         XXaRmScND7qeRHvwEKeQ1Ybd3xmF0cIjb8J7FHSE59DAaF/6rT2jwbQsZD9cUL3+aYMq
-         od6YQpJ5JdNlXErBJJ2U3izfTb5gxulCnKJF36/Mps50lnVL3VD/7rYubSe2ZSRbJvOY
-         Mrbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761767856; x=1762372656;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=N5AE88Ciiu4y1L+Whuiba6HLMWI7gvS/KpyPblrUqXI=;
-        b=e4Mj7ZqxuZvO9OJBjEHImVeT6/wEYplgPjeZg3s4kwX0JKqzlHEy4XyZEgJGYEVspP
-         D8IwE8TGClOngHgoC8P/u9YF4ToTDaTV9FEWmKgifxPApd4YfEMcEDqK8eY9ZNJ2KTX4
-         z1p88VpetyGvZiOyztA0TowBwCgQmrsymEhuQWHDz2+N93whQel1CzzwNO4YQZ7IZWCT
-         c948eOjuncTqEsLfrWiUZVB6EqOo2VUpGYGFYoQvlzJQLggYP8FygyKR3lC6ouNRlB5/
-         oePH3ZMtJRGvaz2NOO6LmamFg+qJ26p6piALOriqnrzKSGA26n35lsSQKaGRCYVeDviS
-         HCRQ==
-X-Gm-Message-State: AOJu0YygOI2U2XS2HHcchgZ3v2i2Z38sul6JEbnF+ROjAWVRBtJZzT37
-	HivVba2rpJxtQUJf63rMwUYsfzkcEvjmkky1Nf4X52P/Yri1i2U686CMIKq5hPb5qP7bl+rM2B8
-	10tNREVKqL+j8Viv2KfyEUPHWSdSCoXo=
-X-Gm-Gg: ASbGnctSrw3iv7oNUzSMwqRbiJBhBC4hTJ/xCnEkg0Xsh/+ADOcah6pcihaG2H0Axdx
-	dYnMEXeBIlx1goPdcWhX8IBak/2/4HNBA586quxJ753oYHSHMu8VW5EWRCsYQHZoH34M55F7XyR
-	xK11SzCSlNbPEkxXNKVWDQENt+jJjX0EPCLhMCay5kW4BfmQcwQ3DNeiTcl0p/CSaiJcfISty1c
-	j5Z/A1I9+ZcZwyQY70Y18x3uVYDlqVV4OCvUZly+bZFwjJyNxGDgvLkSerIi/TI166hOnaYSg==
-X-Google-Smtp-Source: AGHT+IFNCX0ckOsChso5kJGqid4SLOaalcmgzvE+F5pb8cfkVkc0r3f/yGGJSksDBL4n2c6XJFS70z/v5MFaLPK0zXQ=
-X-Received: by 2002:a05:6a00:3a27:b0:781:1110:f175 with SMTP id
- d2e1a72fcca58-7a61506a504mr866733b3a.14.1761767856388; Wed, 29 Oct 2025
- 12:57:36 -0700 (PDT)
+	s=arc-20240116; t=1761768053; c=relaxed/simple;
+	bh=cAl8PTzwlCfv/ZSCIc8Jmo++UMAa37FmLHixN//+s+o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qeqn6aXRtknUkNtb/Xbh9Dfiyudv/OE9KCBGh2HIJ70u4uw7q+tBa8upPCUab2o0plfAi1j8ChWNy8uGwbtUUPTq0c1rqNM81KJkpat50o1JyNU8+KAV5XluQyv0wkNVTuOrZRGUM6Awji6f6pvCuChdt/CRGSjOSLKmxAb0L3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=p7MCeK9b; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id E9F13C0DA92;
+	Wed, 29 Oct 2025 20:00:25 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 29213606E8;
+	Wed, 29 Oct 2025 20:00:46 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B2E18117FD2C2;
+	Wed, 29 Oct 2025 21:00:42 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1761768045; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=bXshXnMKFZiIa2RH1dRuubi2wGIQvRRV+/Dk8h2OBkM=;
+	b=p7MCeK9bmuC9IRnnF1FYFFgP27vTSlPONTdMICb+qDQ5KODhOcXI1HsJJPhGhAGytv7aM4
+	6Zmkx+CuTBd70yduXTlVkUNCayTedUBAt2+D0ioUFc7nJQwvrSys2Cl1w6EdmiJ9JvUmOP
+	GFwVNSn18nyh66qEWKyy3h9XChY2TfPBGIgU/n1mTnZrXkJ53gytuDDbrBcdaO+0oMt1pG
+	lcdIABXXTIsBiVNO2tZyvhKLEoei50qciXGNKggGBJ/7BHnD3OKhRr2+7cqnndZaHk2y7M
+	DsfjveZvaWM8GakhbdCAuqBCk06KzTxsx2AzehizXyTe6IevvNgODC+zaRKlGg==
+Message-ID: <462415bb-92dd-418c-9fd6-90f1f3194d68@bootlin.com>
+Date: Wed, 29 Oct 2025 21:00:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1761748557.git.lucien.xin@gmail.com> <91ff36185099cd97626a7a8782d756cf3e963c82.1761748557.git.lucien.xin@gmail.com>
- <67b38b36-b6fa-4cab-b14f-8ba271f02065@samba.org>
-In-Reply-To: <67b38b36-b6fa-4cab-b14f-8ba271f02065@samba.org>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Wed, 29 Oct 2025 15:57:25 -0400
-X-Gm-Features: AWmQ_bnwX6EuAJChCufrlpzg_AX6H7XB1Uf5xbfwoMjEpTiQtpfFTcbK0dDvD94
-Message-ID: <CADvbK_f4rN-7bvvwWDVm-B+h6QiSwQbK7EKsWh5kTuHJjuGjTA@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 02/15] net: build socket infrastructure for
- QUIC protocol
-To: Stefan Metzmacher <metze@samba.org>
-Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
-	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Moritz Buhl <mbuhl@openbsd.org>, 
-	Tyler Fanelli <tfanelli@redhat.com>, Pengtao He <hepengtao@xiaomi.com>, 
-	Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Benjamin Coddington <bcodding@redhat.com>, Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, 
-	Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>, 
-	Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe" <alibuda@linux.alibaba.com>, 
-	Jason Baron <jbaron@akamai.com>, illiliti <illiliti@protonmail.com>, 
-	Sabrina Dubroca <sd@queasysnail.net>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
-	Daniel Stenberg <daniel@haxx.se>, Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 5/5] amd-xgbe: add ethtool jumbo frame
+ selftest
+To: Raju Rangoju <Raju.Rangoju@amd.com>, netdev@vger.kernel.org
+Cc: pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+ davem@davemloft.net, andrew+netdev@lunn.ch, Shyam-sundar.S-k@amd.com
+References: <20251029190116.3220985-1-Raju.Rangoju@amd.com>
+ <20251029190116.3220985-4-Raju.Rangoju@amd.com>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20251029190116.3220985-4-Raju.Rangoju@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Wed, Oct 29, 2025 at 12:22=E2=80=AFPM Stefan Metzmacher <metze@samba.org=
-> wrote:
->
-> Hi Xin,
->
-> > This patch lays the groundwork for QUIC socket support in the kernel.
-> > It defines the core structures and protocol hooks needed to create
-> > QUIC sockets, without implementing any protocol behavior at this stage.
-> >
-> > Basic integration is included to allow building the module via
-> > CONFIG_IP_QUIC=3Dm.
-> >
-> > This provides the scaffolding necessary for adding actual QUIC socket
-> > behavior in follow-up patches.
-> >
-> > Signed-off-by: Pengtao He <hepengtao@xiaomi.com>
-> > Signed-off-by: Xin Long <lucien.xin@gmail.com>
->
-> ...
->
-> > +module_init(quic_init);
-> > +module_exit(quic_exit);
-> > +
-> > +MODULE_ALIAS("net-pf-" __stringify(PF_INET) "-proto-261");
-> > +MODULE_ALIAS("net-pf-" __stringify(PF_INET6) "-proto-261");
->
-> Shouldn't this use MODULE_ALIAS_NET_PF_PROTO(PF_INET, IPPROTO_QUIC)
-> instead?
->
-Hi, Stefan,
+Hi Raju,
 
-If we switch to using MODULE_ALIAS_NET_PF_PROTO(), we still need to
-keep using the numeric value 261:
+On 29/10/2025 20:01, Raju Rangoju wrote:
+> Adds support for jumbo frame selftest. Works only for
+> mtu size greater than 1500.
+> 
+> Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
+> ---
+> Changes since v4:
+>  - remove double semicolon
+> 
+>  drivers/net/ethernet/amd/xgbe/xgbe-dev.c      |  2 ++
+>  drivers/net/ethernet/amd/xgbe/xgbe-selftest.c | 23 +++++++++++++++++++
+>  2 files changed, 25 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
+> index ffc7d83522c7..b646ae575e6a 100644
+> --- a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
+> +++ b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
+> @@ -211,6 +211,7 @@ static void xgbe_config_sph_mode(struct xgbe_prv_data *pdata)
+>  	}
+>  
+>  	XGMAC_IOWRITE_BITS(pdata, MAC_RCR, HDSMS, XGBE_SPH_HDSMS_SIZE);
+> +	pdata->sph = true;
+>  }
+>  
+>  static void xgbe_disable_sph_mode(struct xgbe_prv_data *pdata)
+> @@ -223,6 +224,7 @@ static void xgbe_disable_sph_mode(struct xgbe_prv_data *pdata)
+>  
+>  		XGMAC_DMA_IOWRITE_BITS(pdata->channel[i], DMA_CH_CR, SPH, 0);
+>  	}
+> +	pdata->sph = false;
+>  }
 
-  MODULE_ALIAS_NET_PF_PROTO(PF_INET, 261);
-  MODULE_ALIAS_NET_PF_PROTO(PF_INET6, 261);
+looks like this hunk belongs to the previous patch for split header :)
 
-IPPROTO_QUIC is defined as an enum, not a macro. Since
-MODULE_ALIAS_NET_PF_PROTO() relies on __stringify(proto), it can=E2=80=99t
-stringify enum values correctly, and it would generate:
+Maxime
 
-  alias:          net-pf-10-proto-IPPROTO_QUIC
-  alias:          net-pf-2-proto-IPPROTO_QUIC
-
-instead of:
-
-  alias:          net-pf-10-proto-261
-  alias:          net-pf-2-proto-261
-
-Thanks.
 
