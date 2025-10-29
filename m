@@ -1,58 +1,63 @@
-Return-Path: <netdev+bounces-234200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6145AC1DB0D
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 00:33:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45ED3C1DB28
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 00:37:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0DF0534C202
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 23:33:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F25753AC648
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 23:37:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 402742F6169;
-	Wed, 29 Oct 2025 23:33:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A3B2F999A;
+	Wed, 29 Oct 2025 23:37:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="koj3qsXu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TECs7yeM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A617224B1E
-	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 23:33:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67A13283FEA;
+	Wed, 29 Oct 2025 23:37:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761780794; cv=none; b=sqFYHPAgyMMEdx2DlJaywlp50cox9yv2JQOTQIBtArxvE2RTfOS1phiwmrFdQSZOF27/9Bgw9qaCnWlyvf5VxMdM8AzATAqYKK/JdJpqb++3Ssef8kAPNL8J5dmWPIThEGhUQPhMtXVha61txg7J4E8IhuBbFiM+ENG7olIAOwk=
+	t=1761781065; cv=none; b=FEN8fj5zCycjH27NC5WI7BQ0/02Q7kRcrl2mgCInylS9mhcn0ID0Ne3T5o7ks8LxBiuv5fJokxGjGuyIjaGjt3v7nTdWmDspGJEPjQD/yCOIghiyu03qiYoxUEDMrPhw4qiaInISY2SoJjsf4POpQBX0t0TdawMjW1TtRjT4LGg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761780794; c=relaxed/simple;
-	bh=srXMJwzDFInEa9m9dIuxYh8FywxH/wohhkngOUjXQO4=;
+	s=arc-20240116; t=1761781065; c=relaxed/simple;
+	bh=m1IJ3wz/HYcYihE+8vU8MyPQBw9ffxLK5KkdfAv1QvU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WL7Y1TwiQVY5Nkjp2R1nSdzz+vh0H1vu0kf7lbkstjFBtpHiw5h9j6QI5MnCOSo4PwrKSZqfRrC5npdCDOZxI5EmxCnvubPMQDVFNg0JLHmBczeJCWcC7qVj19q6/o/Z1ck/S570gU6TL4ywQEaGKT8q4owKAzthuUn7XodIiJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=koj3qsXu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22977C4CEF7;
-	Wed, 29 Oct 2025 23:33:12 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Bsf9tF2rVKwMNJUUUyuxdee76LbbpLxbanFJOILMNRgS3ClNYB2+TVsWcNyoehhsCtUGduS7L2GNCN4rIqUqDSSjdvCZNIkRn2YmpaKsf+PWXC7RJp0rI+7ekYrmpXCRA264kodaj5DjfYknMUH6G10Wuk8e28FZlRqXJmK9XKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TECs7yeM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DAEDC4CEF7;
+	Wed, 29 Oct 2025 23:37:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761780792;
-	bh=srXMJwzDFInEa9m9dIuxYh8FywxH/wohhkngOUjXQO4=;
+	s=k20201202; t=1761781065;
+	bh=m1IJ3wz/HYcYihE+8vU8MyPQBw9ffxLK5KkdfAv1QvU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=koj3qsXuZjiUspAs5WDcIHGP4q4G/9cyE1cs+sNgZ5PXXPB2O01FzYk63zLLJizXc
-	 QsvyDLDe0u0CBUJxiCVHyXgeZ1wl1N7baM84Fp8Ae+KCOfM15vwwyk1tIa4ic3YvSy
-	 AiFw+J9c4XlOBqWINT46l0jpCA3nO+nYprNJ8KqNdMuQ/uUpGAHtcrxNmeU2PQRtsc
-	 BH6hm3ShpBWkBglCtGZmWE3t12pvN4Ei0HokLqwYHid6HFlZbJJ91z73gVRND/aOcW
-	 lEOXnBP3eRWUNia2vKg+wCH4heM7Khc90WdMw8AqegdBmJrMWNnqyhuGtc3Vhu3C3M
-	 nHYSAT+PD3YEg==
-Date: Wed, 29 Oct 2025 16:33:11 -0700
+	b=TECs7yeMNwVkBCp8r74tqDLyQ0eq5Is8+FrKb302/MG5MLEAlJJqaulE1XI0Npd78
+	 NQSFYTF3owwzz9jIAzHz+NCjL77APXSlqYI9VEQ1u9i6EPJw7CVCSrJa8l5SdeNMM4
+	 YV8YX3ZbKXGXGO8/CvBbkA9xgE10hUKWIbigy/rhUyERxw2HH4q/IdS95UpdEehYTC
+	 283x+OLO8u2MeFPyYdztTola032beAOtmJgyMHr+ePpx4KWOXbJFlBCUEEKhJGcb8f
+	 tk+1FzLue3w2Cv1RzK3X6ugI1T4y1WO3jln8SgHbO477qTPVKH+DLgDmT62lDQd84O
+	 v2wb8BISZ6Rag==
+Date: Wed, 29 Oct 2025 16:37:42 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Matthew W Carlis <mattc@purestorage.com>
-Cc: gal@nvidia.com, adailey@purestorage.com, ashishk@purestorage.com,
- mbloch@nvidia.com, msaggi@purestorage.com, netdev@vger.kernel.org,
- saeedm@nvidia.com, tariqt@nvidia.com
-Subject: Re: [PATCH 1/1] net/mlx5: query_mcia_reg fail logging at debug
- severity
-Message-ID: <20251029163311.3ad31ac8@kernel.org>
-In-Reply-To: <20251029164924.25404-1-mattc@purestorage.com>
-References: <3edcad0c-f9e8-4eeb-bd63-a37d9945a05c@nvidia.com>
-	<20251029164924.25404-1-mattc@purestorage.com>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jan Stancek
+ <jstancek@redhat.com>, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
+ =?UTF-8?B?QXNiasO4cm4=?= Sloth =?UTF-8?B?VMO4bm5lc2Vu?= <ast@fiberby.net>,
+ Stanislav Fomichev <sdf@fomichev.me>, Shuah Khan <shuah@kernel.org>, Ido
+ Schimmel <idosch@nvidia.com>, Guillaume Nault <gnault@redhat.com>, Petr
+ Machata <petrm@nvidia.com>, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 2/3] netlink: specs: update rt-rule src/dst
+ attribute types to support IPv4 addresses
+Message-ID: <20251029163742.3d96c18d@kernel.org>
+In-Reply-To: <20251029082245.128675-3-liuhangbin@gmail.com>
+References: <20251029082245.128675-1-liuhangbin@gmail.com>
+	<20251029082245.128675-3-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,29 +67,19 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 29 Oct 2025 10:49:24 -0600 Matthew W Carlis wrote:
-> On Wed, 29 Oct 2025, Gal Pressman wrote:
-> > Allow me to split the discussion to two questions:
-> > 1. Is this an error?
-> > 2. Should it be logged?
-> > 
-> > Do we agree that the answer to #1 is yes?
-> > 
-> > For #2, I think it should, but we can probably improve the situation
-> > with extack instead of a print.  
-> 
-> I think its an 'expected error' if the module is not present. I agree.
-> 
-> For 2 I think if the user runs "ethtool -m" on a port with no module,
-> they received an error message stating something along the lines of
-> "module not present" and the kernel didn't have any log messages about
-> it that would be near to 'the best' solution. 
+On Wed, 29 Oct 2025 08:22:44 +0000 Hangbin Liu wrote:
+>        -
+>          name: dst
+> -        type: u32
+> +        type: binary
+> +        display-hint: ipv4
+>        -
+>          name: src
+> -        type: u32
+> +        type: binary
+> +        display-hint: ipv4
 
-I assume you mean error message specifically from the CLI or whatever
-API the user is exercising? If so I agree.
-
-The system logs are for fatal / unexpected conditions. AFAIU returning
--EIO is the _expected_ way to find out that module is not plugged in.
-If there's a better API I suppose we can make ethtool call it first
-to avoid the error.
+This will be annoying For C / C++, and you didn't set the max len 
+so I think we'll also have to malloc each time. Do we not support
+display-hint for scalars?
 
