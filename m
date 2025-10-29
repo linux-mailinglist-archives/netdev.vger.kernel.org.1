@@ -1,181 +1,124 @@
-Return-Path: <netdev+bounces-233696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54F70C17726
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 01:01:29 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8BD3C17731
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 01:02:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87E5D1A654CD
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 00:01:43 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0EFE84F142C
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 00:01:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B134883F;
-	Wed, 29 Oct 2025 00:01:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 853848F5B;
+	Wed, 29 Oct 2025 00:01:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RrID+pVC"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Vyad4FrE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BA363D6F
-	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 00:01:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87003A41
+	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 00:01:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761696076; cv=none; b=WNarMLBzBMx1qVIgsW5E7WPXg075SK6rn7Ncz19aQbIFm8fFg/Mx6+4635D/WlAU/YoWRZ9BICmKZWiokqrVmd5j3TuF0ugA3L5ZyyYYbMVxuIOY+SeKdWpc4DoKjRGxELIoSBTJD547N9GW6OHjguo+Z19JR83kEP02QRZmu9Q=
+	t=1761696096; cv=none; b=CzKGHvYeMRzCUpm60CF39Bwrl2MPvmQqI/DOU0+bjHmQTjVVi2K/DPQHo27lK2SokqWzz2gN7baryFKbDuZzvQEIz7TlvCcz3RBsp0qQjs4uAMOz1P8SYVwJ2Hr30/mamuIyINrtmTXAFy8DM3u0rVZVcbm89gpVdYV8O/7bRVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761696076; c=relaxed/simple;
-	bh=KSsYzrOROHvpveELtj2P3rV5KHC8RF3TgZLr336dA44=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=idxtxS4spVonBBI4lAGXb8yeez0vs3sqqfhU1Wyey9Fq6Tx5Q+rC60frgqNwTv9iENJjFazo4lyaBzuw53caA3vxNcyHa7MrZA8p8Gp+0tALWV8vi/gVGwQITUT23+9zcwDZDjiZVJWgawHN1R2csTCPXVFFcZ6bRzwI0JK7QFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RrID+pVC; arc=none smtp.client-ip=209.85.166.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-940dbb1e343so20484439f.0
-        for <netdev@vger.kernel.org>; Tue, 28 Oct 2025 17:01:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761696074; x=1762300874; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yKrUqAEKrt2jMEwY5jFnhV9CSrg3ZApnj6UHXbNZRz8=;
-        b=RrID+pVCWCPAIACb78qHpH6TcrDqJKijYBuKIZosdngHuTXgN0lVOG1tjxbeyCa7SB
-         PfEQCYoJjUyR3xeu+D+pRTyVoxr7zzKx+9J2ExADi8iF6eUWNmnmvYyiw+OtWnct/uEj
-         GxsxQsIgIHGNmrY/gSNL10SMAM7B70hpWLav6D67HJGkO2DlOOqiuqKAZaJ9dRt8wgYv
-         4NMQv73htvfJCUfnbGAOqK+KAfkZPqKPYZnuR0ynMDo7hy6qUUeSWik7X9FkQDeFuxj2
-         fFHPfpcIwiKKwGKttHdVRqbRxkHft5uMJxfp827CiW6AXzNVesdY31EuiwtqGViMBzo+
-         vyzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761696074; x=1762300874;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yKrUqAEKrt2jMEwY5jFnhV9CSrg3ZApnj6UHXbNZRz8=;
-        b=oip8mQILDGUtJv9999hSeXqMUKSqoTPwMyWhOilzwqD15IPZY2626huXAw6Ev1ijJC
-         qiTbs3JBumZP1GPKrEKwnQHaV+n4JbyBCZ0B2ian06rpH2w3G6RT4bTnXNCjpGgCX3ee
-         EWF3+K0ulg96yigZD0UBADtH3jtp8ZO2Z1+/PVyJNVFvwwo/DBOfWkLNsatqDb2nIYV5
-         fjgz8nA/h194Xc3i6OEUndC7YpNgyL/64vRRfpGAWrHtyu9Zcq7qzNDyx67/k5zCrCIl
-         dIELANlrujBMWjm+GE5AWgYyBRiK9k12oyGPOf/M6gAxfK+o5y7O+hQ3JXvwGV9YrOXd
-         UqSA==
-X-Forwarded-Encrypted: i=1; AJvYcCVg7ngQenLsjxPZjFNzOGqQSpH9lrZQ00jHtgmk7wWD9LBUYRVgVC+zYvMr6krsXL7JsSZJPNw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBxL1Uuu8ER5kgXaTG4DIjXC5tXcLANamZwaM28GYKH7iwtt7r
-	zEnVxt7b1bzYrK+mviJDLZFNk66g4K2pJol6vs9g9L8tlR+wGiiiD98/ZIRQ9g31aMAZSMk0Cfp
-	IroL5tt9wk6ZjTbX10GzE7YHYzqBeJDQ=
-X-Gm-Gg: ASbGnctcpdQLz1IV1m/UzPq4LYZnQhhYhamKfc4NrOAF7BPEqM7eMJ7SbPBs3Xneyyx
-	OFsH33mQsAS1wY5tsA8M9x2Fsg3VhqmIpolOPO4l8/V33kKuOevQGq2Ts5bYc/Yl5u3bHN88udl
-	LRJYV7njzgvPWJwcwsxSVp6kl+/3UDf5uV7pXUdKlHuGiSgbpQC9ggM4L8OsgX35zJkg8eoxl6P
-	AvsrS7pg3jLSOgCU99p4MbZzyry5dSJmFq5lZa85TMNjybzkcX+dGomYv8=
-X-Google-Smtp-Source: AGHT+IGgLc96ZMr6l+/NUQL1N7IsFmNZTxHwZhGsXXdYttZwvnG2iOf3+nncQ6djkp1cF/5AZXtX8idEXUBgTmL2Y14=
-X-Received: by 2002:a92:cda5:0:b0:42f:a6b7:922b with SMTP id
- e9e14a558f8ab-432103d8780mr67405685ab.7.1761696073792; Tue, 28 Oct 2025
- 17:01:13 -0700 (PDT)
+	s=arc-20240116; t=1761696096; c=relaxed/simple;
+	bh=8mVwAQHQcMN7XIIFIbLD9IFQQThwuKYQQA3VP/7U9CI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=FNRCdqwkEEK6/nzLWs5jBtjiZCK0Iut8yeR0klJSM5gKJlbUDCAA8mEJ8EaC2mj3yKcugK7JiGZ/0fqjYhBvDQxZ8WWbYDhnsLvxqEL5X0Izp7SUgXURUXXPsH2mmis/e5xZtXi6/EkTHT5/ULkYPDpUFQoTXxwuIoxnGJFkbIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Vyad4FrE; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=M3WA5E7+cy9RohdVFrjxmxJVZbOtCukuTF1uMkF0/0U=; b=Vyad4FrEExaL7FkATlCAhSO1Tm
+	SdG0BZo7VdEY0Tt0bvik1+wXq6izLDz10l+Gh+ibkFdT8pEvvIKdv8+c2EKZzQPeDfoMEJmLdtiKs
+	1ur4x7fRCKhId0rUbGKvX8yagFrABdz+Hgq+0FZqZmJfoLvl+0pOPYWjBr3sKRQ9UXzuubm+tu9qx
+	W+FCY9OYF1q35EXP6+Yw2J79AGCTMRp+jZACw6YqmUp5OdH4X2JiWOoslYCNemsQYJuoYTVdSoii/
+	p/ZF+W8K8jFqMNmboMn8+4bRnyJdzcBdtP3AUxgG+hg2/XRvca6W8kk929WjWlMt7SW6irJE4r5pV
+	peELBMCA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57384)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vDtd1-000000003g6-34U2;
+	Wed, 29 Oct 2025 00:01:27 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vDtcz-000000006yS-2jNj;
+	Wed, 29 Oct 2025 00:01:25 +0000
+Date: Wed, 29 Oct 2025 00:01:25 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>
+Subject: [PATCH net-next v3 0/8] net: stmmac: hwif.c cleanups
+Message-ID: <aQFZVSGJuv8-_DIo@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251021131209.41491-1-kerneljasonxing@gmail.com>
- <20251021131209.41491-2-kerneljasonxing@gmail.com> <aPt_WLQXPDOcmd1M@horms.kernel.org>
- <CAL+tcoDnAv7+kG4WdAh1ELP0=bj_1og+DdD-JS4YuWzZC+9OhA@mail.gmail.com> <aQDW3HK6bx2LgfBY@horms.kernel.org>
-In-Reply-To: <aQDW3HK6bx2LgfBY@horms.kernel.org>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 29 Oct 2025 08:00:37 +0800
-X-Gm-Features: AWmQ_bnfQud7JTOfOAs9f495lJaHp_F0FO0O7ztnBuAzpwXum4nybDK_Fz258Do
-Message-ID: <CAL+tcoC6AAB3Ag_LpNUp6_WLoNziK4Du0=wtPWN8hm_SbdRSaA@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 1/9] xsk: introduce XDP_GENERIC_XMIT_BATCH setsockopt
-To: Simon Horman <horms@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com, joe@dama.to, willemdebruijn.kernel@gmail.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, Oct 28, 2025 at 10:44=E2=80=AFPM Simon Horman <horms@kernel.org> wr=
-ote:
->
-> On Sat, Oct 25, 2025 at 05:08:39PM +0800, Jason Xing wrote:
-> > Hi Simon,
-> >
-> > On Fri, Oct 24, 2025 at 9:30=E2=80=AFPM Simon Horman <horms@kernel.org>=
- wrote:
-> > >
-> > > On Tue, Oct 21, 2025 at 09:12:01PM +0800, Jason Xing wrote:
-> > >
-> > > ...
-> > >
-> > > > index 7b0c68a70888..ace91800c447 100644
-> > >
-> > > ...
-> > >
-> > > > @@ -1544,6 +1546,55 @@ static int xsk_setsockopt(struct socket *soc=
-k, int level, int optname,
-> > > >               WRITE_ONCE(xs->max_tx_budget, budget);
-> > > >               return 0;
-> > > >       }
-> > > > +     case XDP_GENERIC_XMIT_BATCH:
-> > > > +     {
-> > > > +             struct xsk_buff_pool *pool =3D xs->pool;
-> > > > +             struct xsk_batch *batch =3D &xs->batch;
-> > > > +             struct xdp_desc *descs;
-> > > > +             struct sk_buff **skbs;
-> > > > +             unsigned int size;
-> > > > +             int ret =3D 0;
-> > > > +
-> > > > +             if (optlen !=3D sizeof(size))
-> > > > +                     return -EINVAL;
-> > > > +             if (copy_from_sockptr(&size, optval, sizeof(size)))
-> > > > +                     return -EFAULT;
-> > > > +             if (size =3D=3D batch->generic_xmit_batch)
-> > > > +                     return 0;
-> > > > +             if (size > xs->max_tx_budget || !pool)
-> > > > +                     return -EACCES;
-> > > > +
-> > > > +             mutex_lock(&xs->mutex);
-> > > > +             if (!size) {
-> > > > +                     kfree(batch->skb_cache);
-> > > > +                     kvfree(batch->desc_cache);
-> > > > +                     batch->generic_xmit_batch =3D 0;
-> > > > +                     goto out;
-> > > > +             }
-> > > > +
-> > > > +             skbs =3D kmalloc(size * sizeof(struct sk_buff *), GFP=
-_KERNEL);
-> > > > +             if (!skbs) {
-> > > > +                     ret =3D -ENOMEM;
-> > > > +                     goto out;
-> > > > +             }
-> > > > +             descs =3D kvcalloc(size, sizeof(struct xdp_desc), GFP=
-_KERNEL);
-> > > > +             if (!descs) {
-> > > > +                     kfree(skbs);
-> > > > +                     ret =3D -ENOMEM;
-> > > > +                     goto out;
-> > > > +             }
-> > > > +             if (batch->skb_cache)
-> > > > +                     kfree(batch->skb_cache);
-> > > > +             if (batch->desc_cache)
-> > > > +                     kvfree(batch->desc_cache);
-> > >
-> > > Hi Jason,
-> > >
-> > > nit: kfree and kvfree are no-ops when passed NULL,
-> > >      so the conditions above seem unnecessary.
-> >
-> > Yep, but the checkpatch complains. I thought it might be good to keep
-> > it because normally we need to check the validation of the pointer
-> > first and then free it. WDYT?
->
-> I don't feel particularly strongly about this.
-> But I would lean to wards removing the if() conditions
-> because they are unnecessary: less is more.
+Hi,
 
-I see. I will do it :)
+This series cleans up hwif.c:
 
-Thanks,
-Jason
+- move the reading of the version information out of stmmac_hwif_init()
+  into its own function, stmmac_get_version(), storing the result in a
+  new struct.
+
+- simplify stmmac_get_version().
+
+- read the version register once, passing it to stmmac_get_id() and
+  stmmac_get_dev_id().
+
+- move stmmac_get_id() and stmmac_get_dev_id() into
+  stmmac_get_version()
+
+- define version register fields and use FIELD_GET() to decode
+
+- start tackling the big loop in stmmac_hwif_init() - provide a
+  function, stmmac_hwif_find(), which looks up the hwif entry, thus
+  making a much smaller loop, which improves readability of this code.
+
+- change the use of '^' to '!=' when comparing the dev_id, which is
+  what is really meant here.
+
+- reorganise the test after calling stmmac_hwif_init() so that we
+  handle the error case in the indented code, and the success case
+  with no indent, which is the classical arrangement.
+
+---
+v3:
+- fix conflict with PCS IRQ changes
+v2:
+- fix "verison" typo, impacting patches 2, 3, and 4.
+- added reviewed-by / tested-bys
+
+ drivers/net/ethernet/stmicro/stmmac/common.h |   3 +
+ drivers/net/ethernet/stmicro/stmmac/hwif.c   | 166 +++++++++++++++------------
+ 2 files changed, 98 insertions(+), 71 deletions(-)
+ 
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
