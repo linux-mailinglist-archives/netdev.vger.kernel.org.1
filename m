@@ -1,108 +1,175 @@
-Return-Path: <netdev+bounces-234042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D2D1C1BAE0
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 16:32:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E879C1BB52
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 16:38:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 811501894C9A
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 15:32:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E831E1893969
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 15:38:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B5F632ED51;
-	Wed, 29 Oct 2025 15:32:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CA9933769D;
+	Wed, 29 Oct 2025 15:38:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="txNTXsun"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ax2hQ8rx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7782C2580EE
-	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 15:32:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18D44337117;
+	Wed, 29 Oct 2025 15:38:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761751944; cv=none; b=JHfO7jWCMThHw4GCOPJeaZx1idUs32kD7cmxldFXnOIUubOY9aiJdRXvvcD5FgemhvApdxVHQDHPUXqBU6It5twpqMjyKZFimJ3XAL4i8b+zxEifovYkMKR9MKqTQCQExy33AwIFUTTBL+hWEQZNQcfDlxYv4TED3haLyIzJTDc=
+	t=1761752309; cv=none; b=uMY9mI8Wp+7fUvHqN1ej72N1kYjgUX/5H4+AbnOtrOkZ56dpSE9cKi36iFRDCwy8ULyzwV0gXQyT6NF9SaUHuCIf95/Oo+zq3V6/VBXDvMMIa7a+QyfcApD3fT+BKySZCK9y6kA9+F9l1od9uldm3bp76g7Z7fEbojrxEldg+KA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761751944; c=relaxed/simple;
-	bh=rZ9KpwdCb25wLdoor5bEUUPNL0/IlGb9p3USmph/OTM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AoRN8PbKKi0nArBgaaIkfrpHFb9gjHT8MF/2Mm5faNuW39uYLdXvyMKuLXQEjrOMrDhxBOQgGCZjjWqrPZIW4/Tmn543wIDP2rof7JLh6DHIbW7DG6/EHygnKNpTaxgvxaBHgz7R1S9F4vgZP588DAJ/a/3iUMcDLmTNGNw1czE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=txNTXsun; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 6AFEFC0DA89;
-	Wed, 29 Oct 2025 15:32:00 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id C3712606E8;
-	Wed, 29 Oct 2025 15:32:20 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B2E1C117F8299;
-	Wed, 29 Oct 2025 16:32:15 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1761751939; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=kMrJceTWmN53UT1PewSFVb4RviFH0RPzPzL22omqM6k=;
-	b=txNTXsun1RNXE5oMhI32sx086EmmN/aHvNbQnBpoXl7AK4QbUQXEXBBNgqrfQw9zFIbdrN
-	PX1LK3Ri1VKMgACDqen+T9kHRu2KJgZYbrRJXI+ga2qcV4P7wFLfnNb6+IGDeFhvva4O2T
-	v/0X17NXSAOkbciY7T3+/0fRQq8cZzYjCQ6okWlw4ZGOi+jhGs1Pet0789auvh8JCg5gmi
-	MhRl2YnCVf21nk8jtZHbqzIthM8w6wgLyXXyR5j9BxGzXH2poy/omzMcIuM66+Fd2SqK9L
-	m+2r074paejLimn5tH61qhFJy6hx8rF+t54mXUQzIgM1XfK7gtoAoNTufq5h2A==
-Message-ID: <7ba29151-699e-4e69-9826-9de05714a380@bootlin.com>
-Date: Wed, 29 Oct 2025 16:32:15 +0100
+	s=arc-20240116; t=1761752309; c=relaxed/simple;
+	bh=h0yjNbZ9rEgJMPE1DAuciMAwui8RU187z1uWv/LoOek=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BsfaeDJsIC5orN28sNRrAQFHaI/zWuwE45Fc78QEbYzpgSiTk9h5t8OS8mXW62Kr/K+uvES79ayIx967LkI+8LVwwJoqkcHNxZZ+wN0YuCDgkWYBVpLOsXH6+7W0SqQKLz7tMWJE+/4QExNonQiaU7GQYKJOcBunvgNPaT5cpu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ax2hQ8rx; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1761752307; x=1793288307;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=h0yjNbZ9rEgJMPE1DAuciMAwui8RU187z1uWv/LoOek=;
+  b=Ax2hQ8rxhU70mdFpiCCFfOTfwCaMX5IJy9Laq4vFLXZsLr835cszUCSX
+   LJD5si3JIlKthsu3F14cKiWdWQleYjYdXTpdiqsBAaVR0zgEJtIPuL7vr
+   pD88j0bzMHBT1GzoheC81oV4hQcg7t2xEZ+aIWqPhI8xlojG/Eixt8dE9
+   EQn5zmLuy5YwAK/Tsse21/UpMAWXF8Ae2YehyVMAY8fqvqjaqTXJDFVPR
+   ZaKTQviI/mBn51/raYo15lvUFdYYiFV+N9x1Pectmd8c0v7x3LtZEuzuA
+   hJyPITKNoU9mmyx06haQFI8B6IMSvHBLgROSDhMLvYc9H53E3gxfPl6VX
+   A==;
+X-CSE-ConnectionGUID: nEbJpcAhThOid+/LKIYh7Q==
+X-CSE-MsgGUID: ZMVKevxIQAOIzDTXHp2n5g==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="67714471"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="67714471"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 08:38:27 -0700
+X-CSE-ConnectionGUID: zv4HsIMeSQa/JSeFH5jq/w==
+X-CSE-MsgGUID: 9Re0tlPTTPuR8lcp49lyRA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,264,1754982000"; 
+   d="scan'208";a="184942610"
+Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
+  by orviesa010.jf.intel.com with ESMTP; 29 Oct 2025 08:38:23 -0700
+Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1vE8Fg-000Kjl-0b;
+	Wed, 29 Oct 2025 15:38:20 +0000
+Date: Wed, 29 Oct 2025 23:35:12 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jason Wang <jasowang@redhat.com>, mst@redhat.com,
+	xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net] virtio_net: fix alignment for virtio_net_hdr_v1_hash
+Message-ID: <202510292352.dvaYVyZt-lkp@intel.com>
+References: <20251029012434.75576-1-jasowang@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/4] net: stmmac: socfpga: Agilex5 EMAC platform
- configuration
-To: rohan.g.thomas@altera.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Steffen Trumtrar <s.trumtrar@pengutronix.de>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20251029-agilex5_ext-v1-0-1931132d77d6@altera.com>
- <20251029-agilex5_ext-v1-1-1931132d77d6@altera.com>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20251029-agilex5_ext-v1-1-1931132d77d6@altera.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251029012434.75576-1-jasowang@redhat.com>
 
-Hi Rohan,
+Hi Jason,
 
-As this patch also impacts other socfpga variants, I gave it a try
-on Cyclone V, all is fine :)
+kernel test robot noticed the following build errors:
 
-On 29/10/2025 09:06, Rohan G Thomas via B4 Relay wrote:
-> From: Rohan G Thomas <rohan.g.thomas@altera.com>
-> 
-> Agilex5 HPS EMAC uses the dwxgmac-3.10a IP, unlike previous socfpga
-> platforms which use dwmac1000 IP. Due to differences in platform
-> configuration, Agilex5 requires a distinct setup.
-> 
-> Introduce a setup_plat_dat() callback in socfpga_dwmac_ops to handle
-> platform-specific setup. This callback is invoked before
-> stmmac_dvr_probe() to ensure the platform data is correctly
-> configured. Also, implemented separate setup_plat_dat() callback for
-> current socfpga platforms and Agilex5.
-> 
-> Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
+[auto build test ERROR on net/main]
 
-Thanks for your explanation about the TSE PCS,
+url:    https://github.com/intel-lab-lkp/linux/commits/Jason-Wang/virtio_net-fix-alignment-for-virtio_net_hdr_v1_hash/20251029-092814
+base:   net/main
+patch link:    https://lore.kernel.org/r/20251029012434.75576-1-jasowang%40redhat.com
+patch subject: [PATCH net] virtio_net: fix alignment for virtio_net_hdr_v1_hash
+config: x86_64-kexec (https://download.01.org/0day-ci/archive/20251029/202510292352.dvaYVyZt-lkp@intel.com/config)
+compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251029/202510292352.dvaYVyZt-lkp@intel.com/reproduce)
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202510292352.dvaYVyZt-lkp@intel.com/
 
-Maxime
+All errors (new ones prefixed by >>):
+
+   In file included from net/packet/af_packet.c:86:
+>> include/linux/virtio_net.h:404:24: error: no member named 'hash_value' in 'struct virtio_net_hdr_v1_hash'
+     404 |         vhdr->hash_hdr.hash_value = 0;
+         |         ~~~~~~~~~~~~~~ ^
+   1 error generated.
 
 
+vim +404 include/linux/virtio_net.h
+
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  376  
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  377  /*
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  378   * vlan_hlen always refers to the outermost MAC header. That also
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  379   * means it refers to the only MAC header, if the packet does not carry
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  380   * any encapsulation.
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  381   */
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  382  static inline int
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  383  virtio_net_hdr_tnl_from_skb(const struct sk_buff *skb,
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  384  			    struct virtio_net_hdr_v1_hash_tunnel *vhdr,
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  385  			    bool tnl_hdr_negotiated,
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  386  			    bool little_endian,
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  387  			    int vlan_hlen)
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  388  {
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  389  	struct virtio_net_hdr *hdr = (struct virtio_net_hdr *)vhdr;
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  390  	unsigned int inner_nh, outer_th;
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  391  	int tnl_gso_type;
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  392  	int ret;
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  393  
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  394  	tnl_gso_type = skb_shinfo(skb)->gso_type & (SKB_GSO_UDP_TUNNEL |
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  395  						    SKB_GSO_UDP_TUNNEL_CSUM);
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  396  	if (!tnl_gso_type)
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  397  		return virtio_net_hdr_from_skb(skb, hdr, little_endian, false,
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  398  					       vlan_hlen);
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  399  
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  400  	/* Tunnel support not negotiated but skb ask for it. */
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  401  	if (!tnl_hdr_negotiated)
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  402  		return -EINVAL;
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  403  
+b2284768c6b32a Jason Wang  2025-10-22 @404          vhdr->hash_hdr.hash_value = 0;
+b2284768c6b32a Jason Wang  2025-10-22  405          vhdr->hash_hdr.hash_report = 0;
+b2284768c6b32a Jason Wang  2025-10-22  406          vhdr->hash_hdr.padding = 0;
+b2284768c6b32a Jason Wang  2025-10-22  407  
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  408  	/* Let the basic parsing deal with plain GSO features. */
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  409  	skb_shinfo(skb)->gso_type &= ~tnl_gso_type;
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  410  	ret = virtio_net_hdr_from_skb(skb, hdr, true, false, vlan_hlen);
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  411  	skb_shinfo(skb)->gso_type |= tnl_gso_type;
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  412  	if (ret)
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  413  		return ret;
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  414  
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  415  	if (skb->protocol == htons(ETH_P_IPV6))
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  416  		hdr->gso_type |= VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV6;
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  417  	else
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  418  		hdr->gso_type |= VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV4;
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  419  
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  420  	if (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_TUNNEL_CSUM)
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  421  		hdr->flags |= VIRTIO_NET_HDR_F_UDP_TUNNEL_CSUM;
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  422  
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  423  	inner_nh = skb->inner_network_header - skb_headroom(skb);
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  424  	outer_th = skb->transport_header - skb_headroom(skb);
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  425  	vhdr->inner_nh_offset = cpu_to_le16(inner_nh);
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  426  	vhdr->outer_th_offset = cpu_to_le16(outer_th);
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  427  	return 0;
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  428  }
+a2fb4bc4e2a6a0 Paolo Abeni 2025-07-08  429  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
