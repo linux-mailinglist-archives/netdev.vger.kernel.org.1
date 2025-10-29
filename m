@@ -1,89 +1,101 @@
-Return-Path: <netdev+bounces-234110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21166C1C853
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 18:41:29 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7E88C1C8DD
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 18:46:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B5DA04E2D80
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 17:38:38 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8FFE134BFB2
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 17:46:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7818354AFF;
-	Wed, 29 Oct 2025 17:37:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A31542F25E0;
+	Wed, 29 Oct 2025 17:46:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XUlka1of"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EHdQBQxG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 999F73546E8;
-	Wed, 29 Oct 2025 17:37:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7ED4122652D
+	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 17:46:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761759468; cv=none; b=ZBlwFOXyGb7JJve/Pj+RGnwaUoJrDKlrsjUsfEM/xTp3LFZJH9NWwckAyXUU1z0RW7jxreBtzjhUCL0BuNPCRg/Y2VOMYVmoj8CICs78cnw2CeF+M7sRm9nmME3UhJNuN7M3seb+5VBwBExKvHVPsFS6f6/eHIZ8vSr/z7Fiagg=
+	t=1761759970; cv=none; b=B+WdwoAOUqAa7uCHViEYR4Q9Y2el/uyP2LPZdzOqnAhceFIoevmViNmsF5IRIEAQj3MJHDjT9M58URw3wKazZa7xptBPhboNGmUInrLASJt+Icuk3a/Fj4+uIxqiZhkuLMgBkdiHT6P0ucQKNUWXDrhr1JFE5ohfX9IHLU+NKQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761759468; c=relaxed/simple;
-	bh=O6jud5d+j/EicD6vnEBKOGqip2gC46w/u/IX3P9LvwY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OI6gqZLEM6lbQUyGga2oEK6Hfm09FJvx5a32TCvKmXW3y9IWz/U6R/QbgX2EamBPA9RxgjCQaonGzDqvsgfmJs5OrJwrTFjDCARfUH66yAPR/REQyNKEiqwNmNwJCecarrxgrSx+ncKPJR8U/CqZfmxoz6c5LFxPPthxpW6Vl/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XUlka1of; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56793C4CEFB;
-	Wed, 29 Oct 2025 17:37:45 +0000 (UTC)
+	s=arc-20240116; t=1761759970; c=relaxed/simple;
+	bh=HmmGYhM5wEFgtrVaXjxp+kjvktfBMuB0AXjpjmQyndk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RmlWFiYhsMNT82EKlQ1D451mvJvA+RFn1YAZ7IHKNAUoj4mSc/ubctq/f41g6cvDNZ7a9NneUuPxsM+mq8wuIV8PnHGAGg/Qp8z1EOvWQrV2OGeT5BeejA/iHtzur5iCsp3sQ0gB7f0K6YcVzenUaJoU8jiuHBHvWmVfLqkC9zg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EHdQBQxG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EADAC4CEF7;
+	Wed, 29 Oct 2025 17:46:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761759468;
-	bh=O6jud5d+j/EicD6vnEBKOGqip2gC46w/u/IX3P9LvwY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XUlka1ofVAdnLbHLJZmQZXDPM/PLX7ONqQaOeKJa02ikNxrBwx97gFSL7ZeyYPAeF
-	 7Sm80ljxOslM3L8HXWvPjNOzgMxISb4X9Sk52lOkr5A9RG4GkTIDApYWl8bAwVFBmE
-	 xLPHa5pjLE0HCjbFlcJrJTQ1/a/F5j9IUMqr7H20UY76ee58LmaUo/o53SjijcDMfi
-	 tYO/Deero+CKyYLDq0p+MbJSO9f9hjab/c6kQT37hHkc3LZzQxFIynXilig80vOLdR
-	 26pkYcACW9Sl/0LKH97MaLyy45mS+SYVGhYOjEPHxAszagyzyPaz7zhEcAVfRRmYi8
-	 JF2yG0lhERxhg==
-Date: Wed, 29 Oct 2025 17:37:43 +0000
-From: Simon Horman <horms@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Wang Liang <wangliang74@huawei.com>, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	shuah@kernel.org, acardace@redhat.com, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	yuehaibing@huawei.com, zhangchangzhong@huawei.com
-Subject: Re: [PATCH net] selftests: netdevsim: Fix ethtool-coalesce.sh fail
- by installing ethtool-common.sh
-Message-ID: <aQJQ57TPZqKbNCRJ@horms.kernel.org>
-References: <20251027043007.1315917-1-wangliang74@huawei.com>
- <aQD52zzmW1YDC1iH@horms.kernel.org>
- <20251028170842.3fdaea7e@kernel.org>
+	s=k20201202; t=1761759970;
+	bh=HmmGYhM5wEFgtrVaXjxp+kjvktfBMuB0AXjpjmQyndk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=EHdQBQxGrigT0cw/abOb5INfu25d5i0Kqz92X3A8EkxRWnHQM8Qpaq5u80MLeKi7W
+	 E2wq5Q+yeRAIW2J7CDio7MGrSYZByPakLCeWOfjtFd9HXXPzvPN0Jj1bUGMvDZ3tmG
+	 SVIl5a5J6MOYJeZ9tC2Ji6l9ykNJt50eK7x0nDJ0yYJbXi2Lm03N4cvVeM6EhvSnlo
+	 o125+/nRNvrDgvSCch9Qu2W8ymtcpciIoVUV/8JCGMVV0KcYRcI4Q70cipcjRmK+Ab
+	 C7p/FyT+0usW6DV3B24SsUOu0tHIZUS9ZkHiMKYCreWg7qqrglpZlX8GcZ3TxtXi62
+	 R4sDMdorsZg2g==
+From: Allison Henderson <achender@kernel.org>
+To: netdev@vger.kernel.org
+Cc: allison.henderson@oracle.com
+Subject: [PATCH net-next v1 0/2] net/rds: RDS-TCP bug fix collection, subset 1: Work queue scalability
+Date: Wed, 29 Oct 2025 10:46:07 -0700
+Message-ID: <20251029174609.33778-1-achender@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251028170842.3fdaea7e@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 28, 2025 at 05:08:42PM -0700, Jakub Kicinski wrote:
-> On Tue, 28 Oct 2025 17:14:03 +0000 Simon Horman wrote:
-> > > +TEST_FILES := ethtool-common.sh
-> > > +
-> > >  include ../../../lib.mk  
-> > 
-> > Hi Wang Liang,
-> > 
-> > As per commit f07f91a36090 ("selftests: net: unify the Makefile formats")
-> > I think the desired format is as follows (completely untested!):
-> > 
-> > TEST_FILES := \
-> > 	ethtool-common.sh \
-> > # end of TEST_PROGS
-> 
-> I believe we (intentionally) allow simple single entry assignment like
-> in this patch. But there have been bugs in this check which I only fixed
-> last weekend so please LMK if I'm missing something..
+From: Allison Henderson <allison.henderson@oracle.com>
 
-Sorry, I was just going by manual inspection. If the patch meets
-your expectations as-is, then there are no further objections from me.
+Hi all,
+
+This is subset 1 of the RDS-TCP bug fix collection series I posted last
+week.  The greater series aims to correct multiple rds-tcp bugs that
+can cause dropped or out of sequence messages.  The set was starting to
+get a bit large, so I've broken it down into smaller sets to make
+reviews more manageable.
+
+In this subset, we focus on work queue scalability.  Messages queues
+are refactored to operate in parallel across multiple connections,
+which improves response times and avoids timeouts.
+
+The entire set can be viewed in the rfc here:
+https://lore.kernel.org/netdev/20251022191715.157755-1-achender@kernel.org/
+
+Questions, comments, flames appreciated!
+Thanks!
+Allison
+
+Change Log:
+rfc->v1
+ - Fixed lkp warnings and white space cleanup
+ - Split out the workqueue changes as a subset
+
+Allison Henderson (2):
+  net/rds: Add per cp work queue
+  net/rds: Give each connection its own workqueue
+
+ net/rds/connection.c | 15 +++++++++++++--
+ net/rds/ib_recv.c    |  2 +-
+ net/rds/ib_send.c    |  2 +-
+ net/rds/rds.h        |  1 +
+ net/rds/send.c       |  8 ++++----
+ net/rds/tcp_recv.c   |  2 +-
+ net/rds/tcp_send.c   |  2 +-
+ net/rds/threads.c    | 16 ++++++++--------
+ 8 files changed, 30 insertions(+), 18 deletions(-)
+
+-- 
+2.43.0
+
 
