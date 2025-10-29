@@ -1,88 +1,140 @@
-Return-Path: <netdev+bounces-234202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 108C0C1DB3D
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 00:42:06 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id B28C1C1DB46
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 00:44:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4906E188DFA1
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 23:42:30 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0AAAD34A35B
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 23:44:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C703831A05E;
-	Wed, 29 Oct 2025 23:42:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6C3331AF1E;
+	Wed, 29 Oct 2025 23:44:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M84m9vWE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GwFEiEah"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D9853191AC;
-	Wed, 29 Oct 2025 23:42:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 587CA31A7F3
+	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 23:44:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761781321; cv=none; b=mD82nqHNlTxBg12OHVbjASNfrjEqXC7lqbVrMLIfL2hCf5HqQoB50guci04qp4hUEFDGWJUE+bVpHFxdYFmPoU68U8ngyQOnyHIw6cY8qd34qtscPBnrHM7xaChN9N95N2ohcMcPs5sMDtHo+HWhX/FcwM730hFD7oA0+fUWxwk=
+	t=1761781471; cv=none; b=vGExYElQ41qWO7PTxjfHSOUXC4F91pTirD49/4X5IYjGnXswjxFOeBfn+LfAUmtRZGjyS9BZaDifNDBbQf7ygX7FwWCiVTpZ7RkrinQXqDMLE1U1ADZbZAb328DrHVtlvA2G5ZgTHpyw/t7wP/eydHZDgfwuQEJHyZyyv/MeBlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761781321; c=relaxed/simple;
-	bh=ONAv1gW9fNgvWAkNTAuKtk3AzICyi5zhrnXhg0Unp50=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uZJ60p8efrpZf1AwYsamkvsVSY8kC4O+SbodXmlToUHhe/81dNLXZl/Uk+qcWNYTqxmOjQeNJl+SRm4tXcyqFSwxkPLoFP+I9yIKiiU9FRV9kkrrT7CUMEzGN5eDEFM/OTmLgroO6BwgJST7ehVAkabL4l0H/DAVe7Jv3LJRRk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M84m9vWE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBF55C4CEF7;
-	Wed, 29 Oct 2025 23:42:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761781321;
-	bh=ONAv1gW9fNgvWAkNTAuKtk3AzICyi5zhrnXhg0Unp50=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=M84m9vWEi2Jzjby28FXCgF5D9Ysf9dYV68EDTvaZnYs5a9xj6NjCMeBDDVagLYPkX
-	 RwxOJEw+ezouMChE2y4Wremvm4OKDQullm0HMZ3MDql5wkK1NHUigxs+bvfQoKmSTR
-	 eYzD55GILvlfolMQI61eiqLl/u4UNftvYsBxVd/eCtYyZMvtKguOCge2QACWDeYiM2
-	 oC2ri90B17Sy+ueuIY78t2tr8zr1033KthRSXuU0x2DdwWrQR8v35voln/h0jggZZN
-	 A50ijpN8A/G4i5Jk0EYUa1OAOkZ8MIl/17729LNHXMPwepIsMh2tYh64OpXYAAFuah
-	 SJWOemadF4LXA==
-Date: Wed, 29 Oct 2025 16:41:59 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jan Stancek
- <jstancek@redhat.com>, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
- =?UTF-8?B?QXNiasO4cm4=?= Sloth =?UTF-8?B?VMO4bm5lc2Vu?= <ast@fiberby.net>,
- Stanislav Fomichev <sdf@fomichev.me>, Shuah Khan <shuah@kernel.org>, Ido
- Schimmel <idosch@nvidia.com>, Guillaume Nault <gnault@redhat.com>, Petr
- Machata <petrm@nvidia.com>, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next 3/3] selftests: net: add YNL test framework
-Message-ID: <20251029164159.2dbc615a@kernel.org>
-In-Reply-To: <20251029082245.128675-4-liuhangbin@gmail.com>
-References: <20251029082245.128675-1-liuhangbin@gmail.com>
-	<20251029082245.128675-4-liuhangbin@gmail.com>
+	s=arc-20240116; t=1761781471; c=relaxed/simple;
+	bh=C14yLC6DsL60xkjRCmGeFPk3Gn5KURyJgVCcNTU66fU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ME/hd2qWfjm7k3fnj0gn5dwLhWHvaFgu7ombi7sObhZCWFFeyMyR/j+4w8m7zk3QyYl71wjGqddAZcmJHeFL3G4XlHK42IXV14UbHkRnwxZJwFqiw4majf0sxxCiGplfE0xF+FcRKqp2YeHRPvLyJa/dlr+G/5InmlBU6BbLx3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GwFEiEah; arc=none smtp.client-ip=209.85.166.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-945a5731dd3so18022439f.0
+        for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 16:44:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761781469; x=1762386269; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=C14yLC6DsL60xkjRCmGeFPk3Gn5KURyJgVCcNTU66fU=;
+        b=GwFEiEah8BDlzxvMA50AAe7BwLeYSjyJI4GAA+G0PQJuwuiHhpnHsI5xO2Exe5dB54
+         tmiVrGG5vw1pjUhmHDYcp93+qI2dTXm1gp/8256+gIzvC7G0pGOKoSh52nTNnRuZICYn
+         B/80q2vJLpNj3v/lCxTu0lXlnAqk3p1NH2B1klbUjD3PbYItpIP98LT2xMHSmc5Mvf5U
+         U+YyWGLYKgXg3rpqisy9ozRBzS2XkhuGesMa4aJVjZh4s2IBGscb+ntOzAspDIheB/pt
+         67tgoXN7eSi8eBW5dzUv8kDuB4aop/Myc4r0bggYSEEBJheG5TtFMbZlwoLxyXxbwoJo
+         o+7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761781469; x=1762386269;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=C14yLC6DsL60xkjRCmGeFPk3Gn5KURyJgVCcNTU66fU=;
+        b=Gpv9zBaeZcMEoCBstGEW7f2vITs5tMVs8C3LnGIvt9vdln6zM/aOZ8p/x0U1Jp0iTP
+         +3Fc/mhzKZ8Ns0Wsisl/0VvkarTf7tvAoZL3jtm0RsCDwJJa4+uqq2YCAg0fSgCoUfet
+         47wOh66Yfbv7fbX5N4B4sTdlwW4K9uF4UeKtV/tU9N8bRXrxPmYq8QNdxD77uVvZCyOc
+         HTLsCXslB5GIeXyjuccLqzsrQnRoiF2e863Ua6lsulid2pM1DLwqsBSW/K3KUaiFr0JW
+         vQvmyRTyk54Nc+YUbnLeT1+57mc1OLjd1ARR+t1bqhFGOmvcs9m+G/mck6geZg7dWRdD
+         jaZw==
+X-Forwarded-Encrypted: i=1; AJvYcCW5Gf5shkhvvYnME0YaHoBDKcvsqeIc80/hGXe8snt4RwYMZal8xAEwCPkfhfqHsOXfSWubkIw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxh8mQ7XSc9rP30cugMfpvmMOEK1n54rvmPD8J/3A0o8w1TJeGv
+	a57Up0xVrGCo2dOBXdFfeCfSWvecbtHjyB1DzMB0ZPXwtpP4CvjTQwC71F0EVmKbMY+9dW2dvdV
+	wZ2kG+wwsy+j/ZDgUI+xrcR5RBGJxCbY=
+X-Gm-Gg: ASbGncsdzZ3qyhSLIFdMunW+dZZMRt1MTc2y5hqFzt4mahkOs0lZZZ1oUojBPQ20Dah
+	sPC4d+HXjqSJdbOgzQ4bWT/oV/NCQ56aoX0gLJH2Qvg9CfQzVUNsRE0Hzh+w/6xgxn/AxbZzSTV
+	bq53rx4o7MndmwZRFx58RReOcyZLA/tktJD+nunnkbcxs96XOCPwxewfBy+Jp8CLWABPXSFk3qX
+	uuoZzlwIsu5IonU0URKw6CYz002ItcOkSMUMf95twstsK8AjTWVnjb4/i4=
+X-Google-Smtp-Source: AGHT+IF051QtcmqoluW3Zbt6+K5qGMnPgAEPPNdIeK5IV4SWt6/GI3ng/eThxjoKwT+TXLjEFXmmdl07QJrrQEd1DKg=
+X-Received: by 2002:a05:6e02:1a44:b0:42f:94f5:4662 with SMTP id
+ e9e14a558f8ab-432f9036ee7mr65960145ab.18.1761781469434; Wed, 29 Oct 2025
+ 16:44:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20251025065310.5676-1-kerneljasonxing@gmail.com>
+ <20251025065310.5676-2-kerneljasonxing@gmail.com> <aQI3TfFZPPaWQOS/@boxer>
+In-Reply-To: <aQI3TfFZPPaWQOS/@boxer>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 30 Oct 2025 07:43:53 +0800
+X-Gm-Features: AWmQ_bnb6zOVaQ7G9s4oKpQ3eRGnQtV4E_7f8NgI0IC-42GOSl7f17rWn3b6mng
+Message-ID: <CAL+tcoBwKd9v6A8j_6wgN7y8Y-_4N6VM-Pdnv4x49eUx5RcGag@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] xsk: avoid using heavy lock when the pool is
+ not shared
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
+	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
+	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
+	horms@kernel.org, andrew+netdev@lunn.ch, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 29 Oct 2025 08:22:45 +0000 Hangbin Liu wrote:
-> Add a test framework for YAML Netlink (YNL) tools, covering both CLI and
-> ethtool functionality. The framework includes:
-> 
-> 1) cli: family listing, netdev, ethtool, rt-* families, and nlctrl
->    operations
-> 2) ethtool: device info, statistics, ring/coalesce/pause parameters, and
->    feature gettings
-> 
-> The current YNL syntax is a bit obscure, and end users may not always know
-> how to use it. This test framework provides usage examples and also serves
-> as a regression test to catch potential breakages caused by future changes.
+On Wed, Oct 29, 2025 at 11:48=E2=80=AFPM Maciej Fijalkowski
+<maciej.fijalkowski@intel.com> wrote:
+>
+> On Sat, Oct 25, 2025 at 02:53:09PM +0800, Jason Xing wrote:
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > The commit f09ced4053bc ("xsk: Fix race in SKB mode transmit with
+> > shared cq") uses a heavy lock (spin_lock_irqsave) for the shared
+> > pool scenario which is that multiple sockets share the same pool.
+> >
+> > It does harm to the case where the pool is only owned by one xsk.
+> > The patch distinguishes those two cases through checking if the xsk
+> > list only has one xsk. If so, that means the pool is exclusive and
+> > we don't need to hold the lock and disable IRQ at all. The benefit
+> > of this is to avoid those two operations being executed extremely
+> > frequently.
+>
+> Even with a single CQ producer we need to have related code within
+> critical section. One core can be in process context via sendmsg() and
+> for some reason xmit failed and driver consumed skb (destructor called).
+>
+> Other core can be at same time calling the destructor on different skb
+> that has been successfully xmitted, doing the Tx completion via driver's
+> NAPI. This means that without locking the SPSC concept would be violated.
+>
+> So I'm afraid I have to nack this.
 
-Hm, my knee-jerk reaction was that we should avoid adding too much ynl
-stuff to the kernel at this point. But looking closer it's not that
-long.
+But that will not happen around cq->cached_prod. All the possible
+places where cached_prod is modified are in the process context. I've
+already pointed out the different subtle cases in patch [2/2].
 
-Do I understand correctly, tho, that you're testing _system_ YNL?
-Not what's in tree?
+SPSC is all about the global state of producer and consumer that can
+affect both layers instead of local or cached ones. So that's why we
+can apply a lockless policy in this patch when the pool is exclusive
+and why we can use a smaller lock as patch [2/2] shows.
+
+As to how to prevent the case like Jakub mentioned, so far I cannot
+find a good solution unless introducing a new option that limits one
+xsk binding to only one unique pool. But probably it's not worth it.
+It's the reason why I will scrap this patch in V2.
+
+Thanks,
+Jason
 
