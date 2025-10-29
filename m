@@ -1,156 +1,185 @@
-Return-Path: <netdev+bounces-234116-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234117-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A86B1C1CB9F
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 19:15:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F2DF2C1CBA8
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 19:16:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13B4458402E
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 18:03:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A36B2567374
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 18:05:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6388A3546FF;
-	Wed, 29 Oct 2025 18:03:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85CD5246BB9;
+	Wed, 29 Oct 2025 18:05:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fccf3tKi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72F0F2F8BC0
-	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 18:03:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF8CE261588
+	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 18:05:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761761014; cv=none; b=CI/opdlii6hg8rdd55ESm02HQHGD78kXeYZraTreNnCxVA/riU+bs9ND56tU40QPjarmmBZkKIqxPl8GNYkg/kA3ZtjVOicrZvmIjJsspEnKXTxcxX/WpaxdChRXXz2hLEwghNepeqFutOME2rldWlE3R1X9vDls2ycLuuBExWA=
+	t=1761761140; cv=none; b=oOXqYSZaMu6K0dsShiOAFXdNKaROB+DaJe+TwZBXugxotOXDcs0cBF2Lo3F0i983REaSiHCZxcQUiYtus0E/6EWXRDDZ4y18/UqMEXBWle3wIxBYEfyhqkMsV6QPQ5Qd/xwe6XZr+djt0j1SR8kBM8jP8ApipfiFxIq53RdykNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761761014; c=relaxed/simple;
-	bh=syqo7xCuXUYrqut5p8BBEanGYt8ZtnsUm4qRlabrwco=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Qge6BbTbbeOaxaEeie0U0FX3PQJsHgyoNl2vitqk4iejQOju9XeImDoZeXk2zHYJHz4XsznWCnHKs7mm+IuXNlWyFYVHOyeURw+KjNyR6jdjJzMZHcbPuCcE5+YoQ/IUip1z5gjlHY4Kd/gTOb54F8S+IoB732mwAadcG5f3Exo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-43300f41682so1014515ab.1
-        for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 11:03:32 -0700 (PDT)
+	s=arc-20240116; t=1761761140; c=relaxed/simple;
+	bh=aab43vnKM1ss0I9X3ZkZ8BKt0Ft4cLo8wB19nB+wzAE=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=rl6u69nWaSbcZ2H5z3fwVmGX1QV7N0NIQU8E62TLlhDVfpeVqRcH/pwrUrvaikfehAtYLnI9qYZQWdrEdlC6cfsV9OgcWTaoCqXJGhsMQgCAAio/hdDu2oZT6vPLGurBb9bOsZI9nRDZj1sZpuSm/tdcz403ih5SSUFNC76LAqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Fccf3tKi; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761761137;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lNxXxUzXoqQQT9w5Yf9S20ddLNixsnFzdxWTN/CN8Uk=;
+	b=Fccf3tKiWG9S52afAyAOsWCc4QU6A56y6UCDpk60MyHGQIaHU0IKyvj+mHvvFHxlqUsjh7
+	vPp6eleLSPVdKsfRVqWM1B1p87L2aYcc6jSpnU+zj/5QfS7JjJxhWDw8DhJFWBgRrYilPN
+	nkCApV1e5vz/J7206NtptugLwusvACw=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-463-INfZKbnaOAmxQppONxiugQ-1; Wed, 29 Oct 2025 14:05:36 -0400
+X-MC-Unique: INfZKbnaOAmxQppONxiugQ-1
+X-Mimecast-MFC-AGG-ID: INfZKbnaOAmxQppONxiugQ_1761761136
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-8a4ef35cc93so35227785a.3
+        for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 11:05:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761761011; x=1762365811;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jECNCXKfYRDxfdNyvFJKOWdk9c6wb6d7+f4Gyt+JTNQ=;
-        b=Tfo1X79YR/pBNE5aQXzYce4einqZAXBZt9+82z8928j54plEK7jsCIaR4MQssGW1vd
-         FNjrKYXGAS4HdhrFEcRXh5EfHnG+ORB4NHz+qgkeuVCeRIh0Mi78GG+C7T+GvCcuvXjr
-         9+vQipqpeyCoHjSAGzabqDwcXAci5Ll7wZYLp+9aR3bM5Q8BocaHa9Enr6fTqtJ3pjkU
-         IeCbuQ+BsWcf/oh3u4afQyN7RnbfbQq1BPCIaJk9ECrXfMKRLqMVAsFNoNGN5SBtlGid
-         TJtn8PLTryC0EhW+cEUtgEOgwPVvIjtVUT5InKvcZDOqdkHqrae94NgA1Hk/bEavcEG1
-         atCA==
-X-Forwarded-Encrypted: i=1; AJvYcCU667Lje2jMQ2sq3JevoCxs0nIMgMoty8lCdd1SP0ZNEWsENyk5GRgZzeBM5Q+bw68yTcKN/hE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyeEDhtsCFWQs90PnG5kiVloKt3cIpoHAZmfxHZsr6x6JiIQGmx
-	Mq0sY0F2YrJyCGtR43MH8OliO1ZJrA04zi6imAZm2HmOoMzi4ezB+tEblnN2vRc2P3RdtVuXwUq
-	XzIqr7SNco73isoUTa5P0RcvDIZHcCnYbT0nEJnuAd/4vI3yINsF7XyBOmy8=
-X-Google-Smtp-Source: AGHT+IGjjScvaZdUlvuzShIZdlgiBoqfNig3J+Ddu9saSgtyIVixyMSUgpMK292LoYOesfx22ZRpn+tuHMuONI7l3xxBdvNCclqy
+        d=1e100.net; s=20230601; t=1761761136; x=1762365936;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:user-agent:mime-version:date:message-id:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lNxXxUzXoqQQT9w5Yf9S20ddLNixsnFzdxWTN/CN8Uk=;
+        b=O9y+3FWQSGERSs41B2yD5DUQw/x+Al2mh+6yKJS3iYkpjebg+2ZgSCNTLD2/AzKBMg
+         0LfrXDXkpLY+bFHyChI3l4+nufG3D19FZ+DIFKpNg5InZhPwET/fefCBlNCA/M3PjqK+
+         zXEhQiKRhn+1L5KiiscerMZizzvfgPtgvovwQDrsD/QKWJahqqwI5t9ne5ysPx2OwjlG
+         f3KncyzjEQ1MJOuYHykocE1l6Dwvcb/vJYu6LD/Wf3YiKQZJlk4vnOiVWM7N0acvjHrg
+         OVXxCI6mfZa8sGP3i8xlGRUK1KUpWuWHi5F9gLR0SjZJAFhScskMgao90ZDRykA4Y22H
+         mUhA==
+X-Forwarded-Encrypted: i=1; AJvYcCU3rmWTXdlhZdJMp+KF6uT30QFPAD4n2llj0ccqmAIt5JcuAv6fAUb9WKKF+qTHy76tg6OTxHI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYvK5N7ZiEvxh1LjtjdS4NgWNmh0PSB9G2Uo9An/pzp3d2q2ow
+	FKJRnl0S+FOzxwJEEHrgus2fnXWDqZxPJ3oxO5Kq3UK3M2inXiTntZ87dOztZpnfuaGq07tAaOg
+	LRWJ9AraCyT4Bv1Mjd0C+w9NTlke73HgSvhJ3OTHGPs8L3sbWwQD/mul5sg==
+X-Gm-Gg: ASbGnctn2tY7PQIeMNV/29NhAONcnSS23FOxr93OpXoi1ZVzgWBZRMHffBxi6wUSkqw
+	UywNcnDqM3C174n3TQK4EGjX0yOHViNzRRYCN+dxJv0BUn2/M+eXE4PRaqL7S4dvmY25chFY9uU
+	pU0zOunVECtAwvb12tkfwExvmRwYS6y191fO3kK/pHOU6e1z8HUGjKTmUu9hFROm4Tt4cWO+A5B
+	Dr1U7IIrpj+qHBIc0xP3jAclZMHp+/uT4CEiT/yjh7+tjCV+qXfRAxsPZZqhuVVBSNqO5hP4aRQ
+	qZlO+8xKU85JLUL/OSLm90wz49yGpIu5q3PbU5qT5DNTDzP0ARSqkkyO58mlF7zMLgtqHBS1YeT
+	/PqQnGNLNI5MoHmt8hlpGTR5Eqojdx8CshlXNua4IhY3dlQ==
+X-Received: by 2002:a05:620a:29cd:b0:8a6:92d1:2db5 with SMTP id af79cd13be357-8a8e473a6e6mr573643785a.24.1761761120462;
+        Wed, 29 Oct 2025 11:05:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEE6iTF4BqCkm725oJpB//2W/KjYfs5LBPrMdbtexGrXjP/dhJ17Z6sn/BKCKYXRH3K32fmkA==
+X-Received: by 2002:a05:620a:29cd:b0:8a6:92d1:2db5 with SMTP id af79cd13be357-8a8e473a6e6mr573635985a.24.1761761119960;
+        Wed, 29 Oct 2025 11:05:19 -0700 (PDT)
+Received: from ?IPV6:2601:188:c102:b180:1f8b:71d0:77b1:1f6e? ([2601:188:c102:b180:1f8b:71d0:77b1:1f6e])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-89f2421f6a5sm1111574885a.5.2025.10.29.11.05.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Oct 2025 11:05:19 -0700 (PDT)
+From: Waiman Long <llong@redhat.com>
+X-Google-Original-From: Waiman Long <longman@redhat.com>
+Message-ID: <7821fb40-5082-4d11-b539-4c5abc2e572c@redhat.com>
+Date: Wed, 29 Oct 2025 14:05:17 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3c04:b0:430:d5b8:6160 with SMTP id
- e9e14a558f8ab-432f907430dmr50783115ab.29.1761761011589; Wed, 29 Oct 2025
- 11:03:31 -0700 (PDT)
-Date: Wed, 29 Oct 2025 11:03:31 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <690256f3.050a0220.32483.0219.GAE@google.com>
-Subject: [syzbot] [net?] BUG: unable to handle kernel NULL pointer dereference
- in pc_clock_settime
-From: syzbot <syzbot+a546141ca6d53b90aba3@syzkaller.appspotmail.com>
-To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, richardcochran@gmail.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 18/33] cpuset: Remove cpuset_cpu_is_isolated()
+To: Frederic Weisbecker <frederic@kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>
+Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Danilo Krummrich
+ <dakr@kernel.org>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Gabriele Monaco <gmonaco@redhat.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+ Lai Jiangshan <jiangshanlai@gmail.com>,
+ Marco Crivellari <marco.crivellari@suse.com>, Michal Hocko
+ <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+ Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+ Phil Auld <pauld@redhat.com>, "Rafael J . Wysocki" <rafael@kernel.org>,
+ Roman Gushchin <roman.gushchin@linux.dev>,
+ Shakeel Butt <shakeel.butt@linux.dev>, Simon Horman <horms@kernel.org>,
+ Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Vlastimil Babka <vbabka@suse.cz>, Will Deacon <will@kernel.org>,
+ cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-block@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20251013203146.10162-1-frederic@kernel.org>
+ <20251013203146.10162-19-frederic@kernel.org>
+Content-Language: en-US
+In-Reply-To: <20251013203146.10162-19-frederic@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On 10/13/25 4:31 PM, Frederic Weisbecker wrote:
+> The set of cpuset isolated CPUs is now included in HK_TYPE_DOMAIN
+> housekeeping cpumask. There is no usecase left interested in just
+> checking what is isolated by cpuset and not by the isolcpus= kernel
+> boot parameter.
+>
+> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> ---
+>   include/linux/cpuset.h          |  6 ------
+>   include/linux/sched/isolation.h |  3 +--
+>   kernel/cgroup/cpuset.c          | 12 ------------
+>   3 files changed, 1 insertion(+), 20 deletions(-)
+>
+> diff --git a/include/linux/cpuset.h b/include/linux/cpuset.h
+> index 051d36fec578..a10775a4f702 100644
+> --- a/include/linux/cpuset.h
+> +++ b/include/linux/cpuset.h
+> @@ -78,7 +78,6 @@ extern void cpuset_lock(void);
+>   extern void cpuset_unlock(void);
+>   extern void cpuset_cpus_allowed(struct task_struct *p, struct cpumask *mask);
+>   extern bool cpuset_cpus_allowed_fallback(struct task_struct *p);
+> -extern bool cpuset_cpu_is_isolated(int cpu);
+>   extern nodemask_t cpuset_mems_allowed(struct task_struct *p);
+>   #define cpuset_current_mems_allowed (current->mems_allowed)
+>   void cpuset_init_current_mems_allowed(void);
+> @@ -208,11 +207,6 @@ static inline bool cpuset_cpus_allowed_fallback(struct task_struct *p)
+>   	return false;
+>   }
+>   
+> -static inline bool cpuset_cpu_is_isolated(int cpu)
+> -{
+> -	return false;
+> -}
+> -
+>   static inline nodemask_t cpuset_mems_allowed(struct task_struct *p)
+>   {
+>   	return node_possible_map;
+> diff --git a/include/linux/sched/isolation.h b/include/linux/sched/isolation.h
+> index 94d5c835121b..0f50c152cf68 100644
+> --- a/include/linux/sched/isolation.h
+> +++ b/include/linux/sched/isolation.h
+> @@ -76,8 +76,7 @@ static inline bool housekeeping_cpu(int cpu, enum hk_type type)
+>   static inline bool cpu_is_isolated(int cpu)
+>   {
+>   	return !housekeeping_test_cpu(cpu, HK_TYPE_DOMAIN) ||
+> -	       !housekeeping_test_cpu(cpu, HK_TYPE_TICK) ||
+> -	       cpuset_cpu_is_isolated(cpu);
+> +	       !housekeeping_test_cpu(cpu, HK_TYPE_TICK);
+>   }
+>   
 
-syzbot found the following issue on:
+You can also remove the "<linux/cpuset.h>" include from isolation.h 
+which was added by commit 3232e7aad11e5 ("cgroup/cpuset: Include 
+isolated cpuset CPUs in cpu_is_isolated() check") which introduces 
+cpuset_cpu_is_isolated().
 
-HEAD commit:    b98c94eed4a9 arm64: mte: Do not warn if the page is alread..
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=11260e14580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=158bd6857eb7a550
-dashboard link: https://syzkaller.appspot.com/bug?extid=a546141ca6d53b90aba3
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-userspace arch: arm64
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/2c82e514449b/disk-b98c94ee.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/a322ed38c368/vmlinux-b98c94ee.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/059db7d7114e/Image-b98c94ee.gz.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+a546141ca6d53b90aba3@syzkaller.appspotmail.com
-
-Unable to handle kernel NULL pointer dereferenc
-Unable to handle kernel NULL pointer dereference at virtual address 0000000000000000
-Mem abort info:
-  ESR = 0x0000000086000006
-  EC = 0x21: IABT (current EL), IL = 32 bits
-  SET = 0, FnV = 0
-  EA = 0, S1PTW = 0
-  FSC = 0x06: level 2 translation fault
-user pgtable: 4k pages, 48-bit VAs, pgdp=0000000133ddc000
-[0000000000000000] pgd=0800000105883403, p4d=0800000105883403, pud=0800000127709403, pmd=0000000000000000
-Internal error: Oops: 0000000086000006 [#1]  SMP
-Modules linked in:
-CPU: 1 UID: 0 PID: 7008 Comm: syz.4.69 Not tainted syzkaller #0 PREEMPT 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/30/2025
-pstate: 83400805 (Nzcv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=-c)
-pc : 0x0
-lr : ptp_clock_settime+0x148/0x264 drivers/ptp/ptp_clock.c:107
-sp : ffff8000a2957c40
-x29: ffff8000a2957c40 x28: ffff0000cbad5c40 x27: 00000000fffffffb
-x26: 1fffe0001975ab88 x25: 000000003b9aca00 x24: dfff800000000000
-x23: 00000001ed5d7404 x22: 0000000000989680 x21: 0000000000000000
-x20: ffff0000cca30600 x19: ffff8000a2957d00 x18: 00000000ffffffff
-x17: ffff800093305000 x16: ffff800082de95c8 x15: 0000000000000001
-x14: 1ffff0001452af70 x13: 0000000000000000 x12: 0000000000000000
-x11: ffff70001452af71 x10: 0000000000ff0100 x9 : 0000000000000000
-x8 : 0000000000000000 x7 : ffff8000877add70 x6 : 0000000000000000
-x5 : ffff800093586d90 x4 : 0000000000000002 x3 : ffff80008adffef8
-x2 : 0000000000000001 x1 : ffff8000a2957d00 x0 : ffff0000cca30600
-Call trace:
- 0x0 (P)
- pc_clock_settime+0x224/0x298 kernel/time/posix-clock.c:304
- __do_sys_clock_settime kernel/time/posix-timers.c:1131 [inline]
- __se_sys_clock_settime kernel/time/posix-timers.c:1115 [inline]
- __arm64_sys_clock_settime+0x208/0x254 kernel/time/posix-timers.c:1115
- __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
- invoke_syscall+0x98/0x254 arch/arm64/kernel/syscall.c:49
- el0_svc_common+0x1e0/0x23c arch/arm64/kernel/syscall.c:132
- do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
- el0_svc+0x5c/0x254 arch/arm64/kernel/entry-common.c:746
- el0t_64_sync_handler+0x84/0x12c arch/arm64/kernel/entry-common.c:765
- el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:596
----[ end trace 0000000000000000 ]---
+Cheers,
+Longman
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
