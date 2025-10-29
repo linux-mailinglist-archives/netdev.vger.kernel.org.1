@@ -1,59 +1,60 @@
-Return-Path: <netdev+bounces-234127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9C2AC1CDBA
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 19:59:51 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7D09C1CDDC
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 20:02:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D3BD3B18E6
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 18:59:50 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 34B514E0615
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 19:01:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEDFE3043CB;
-	Wed, 29 Oct 2025 18:59:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33A072C21DD;
+	Wed, 29 Oct 2025 19:01:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="wKZT6blH"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Hk4RwRhv"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH8PR06CU001.outbound.protection.outlook.com (mail-westus3azon11012038.outbound.protection.outlook.com [40.107.209.38])
+Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010004.outbound.protection.outlook.com [52.101.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30C952EA485
-	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 18:59:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.209.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D6D6305E37
+	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 19:00:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.4
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761764387; cv=fail; b=AvBGcr3FCQqKk96oGpM2MQY4xwGQfIPKO5GoxMlTBfzpQ4f1YWF8VRP5pXB01KlPbU03pIf8DQyAEfADwmH7xbP8ZfGQZV2NuA8yP5YV90acAOtJqBOfCdRoTuLMBvE7hWUJXU9beTkV7Q+e4ZkFXKpnCB7sWkvzaGHhsK50V2k=
+	t=1761764463; cv=fail; b=moTwGgGqySTeAAkNzMILJc+qZvc1lzWMzaVi+Q/FJDY5FG47K3Oq1OI3yj/84/QZ7z0qFWUcdlHejpv1hwi0ENQHixsToRchp+XhOApK0UPIea4hox6W/Jrt/O2tgKGQvFwHoFWmmSvJ/vzkUV6xhyK9KnB6T0QVTrwFWodYNEY=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761764387; c=relaxed/simple;
-	bh=AIe67SS4P8iklpTht9bcTq1UIWduS1xw8QWDgrLwDlI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jNlPznsuamLGl9GaY/zmBRjmecYDuJUNje8VIz7Fj0Vp6eGtSfoO+gdHjQ178Q+bcVYI1VxEQRNMqZJU1UGagkkKAnOwr8bpyf8ZdrcE7X5XnnZkFt53hXj1o2ustyoqWBWuX/7dbikTbq2vZo7Fr89Olq5Eo9m/y/WYVupNGRk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=wKZT6blH; arc=fail smtp.client-ip=40.107.209.38
+	s=arc-20240116; t=1761764463; c=relaxed/simple;
+	bh=FjjQoDCdPKhaAftDaTSFJpIkEYDvXcrvmq53RfHDIZs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=j+TA5kL7oidq/XLfLFmlgSUxecAXEzO0sMAmrbLdY2FrhuEfACdxcfY8HbIVK42WtMhc+WejwxjYM13N7D/aM7MsgmW5TngPVa+CRKvlmEa/fN6RCnXekHmQVlPR4XNLipP7/EZSNxIcuImhWwRZE4+Mu+ppW17ihd4+5cm7h10=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Hk4RwRhv; arc=fail smtp.client-ip=52.101.85.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=si9f6QGtOZF8vHpzUAIv4vpvEcqAmaR+cnku4NouM91iom5RebHXALUK53UnCMuGlgfpH5D1xxUqdRV3+w3KoMJlaKswWYE7VaCnX3G5FuiEs9dakVj8eisjjV3MCpWRaJxZ6pKJXb0oxxavU2wkaMcA14u5qpIKgsAX3SOwWzY8GJWUsYlKlnJ7s8NK2TCLbxaQ3qf9aSo4lct0GF0buH8m3+Gr5hwoG234gWrKiRj+zdCeyyOwitUInlCxo0zx4vY+zLpg2maVO9YSVQWJNCgrf9bXYcEaWjGwWDrOwXPWmRE7h76sir+zoDhOgLNVMB9DJnJYYg1tKTif+3EVyg==
+ b=gGtaqMnBfHy5VwHlEnhca+o+Lmno2fXreqzt/a0glgwM+3f4e8AQNYZxaL3ybfCYlPsvNy+vyk9G2ye8MPfvHiMoOf8e3fLLWmQjLfJr81JVDr7vipgWcpBu55riGhh+4pnzcQgkIZZfgOv6Rc0OGPuxPdCLlurogoY6hBZzq5e46Eoje5iOnWp3++xZoPMo4DlTK/sYgjbnIiMfjNgohJ2d48p/oa+WQFUz/hNclZvHzmEIFuc+N7vxgIr6jgwuypNRUyPJvnHqrnQpMu8iiLZZDErBaN0drpO5ZHuO7zmuIPLOUvHR13sOtpZvgFsO818R+4kTrGKTUMz45AeMzw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Iuqkue9gf64KstX/tux2hD0D00WROirfFdrVcOBM81c=;
- b=mUrdoz4K8XiXguQx6SH+aR4AQErcV96bOAzaugJsTDyAhGWsdeooF/pi/fMetUXmpo81+7g68S2KL8rCAvxpBJTL78LuxtuIB6giOiz454W9qB9tYuydQ+yhDyJ1aapqnFdf+HVYasiPbHH2Ewv1RxAXipZgaI928RTPbx4WJdLZofA02WLUsf0LBm9aEXLlwkZ0Ug7UZ63tHxycSFbFnww+OQn8oPUpVZi95bKHbY5DMPfnsbt5H4S6Kyq8afC1RxkF6EGzeYR/d67TaBdaMRpqzv6/T3x1jtKO3tyHq77iyIpgygSgnMLdKyA2/xQJazeusjSVe3VgmNAueKY1Ow==
+ bh=96ELShoeWw8oERdD5e/bVLuIeS9KCmLsimewmAT2Jk8=;
+ b=i1j4RM1ZuPwNCkOzXWsZG89Ld1BfWPZSzJRbkXT+plQPk7XckucH21x5VgGBjBIanHev4cxej7zWHdAGlIX3j0Cd7zkh7qBUndJk0sBJMrXuaWqiq0zeJZNHZSi9rg1NPJPeBFUy8mrtFhQk8oWYHJnM2TZ/XxJHK54BYxfHp9lRJmnlZxX+ZnOO5n0BHedLTAN9gUWatLAccBOk5mYVXZTVpdnTmsTz0dR1sRm4pqeoN1zQ4ivEbfd7koq6L3wmyZZwlJ/q4FS1UH7nUcSENm3/Tv07rvWhmlqQ+glz8bE7FvDWlQRQaHRas2rpLu1m7qKog7V8Li7etOrxmILsFg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Iuqkue9gf64KstX/tux2hD0D00WROirfFdrVcOBM81c=;
- b=wKZT6blHc8UmhKQ6fQqZptEp/NLoCsnFnb+NLBYXzMsjNMU6cNZVT/dJKeDV+RKVoYnH8f7F1QLor5MqdErUh1k1hbohmuCnbrzgvjEXJuMABM393/KEeBGrsgUog0BfdfJi9NUrZfQl0ryLuQ0h5HJ9APKvGQKufzpHvoGH47E=
-Received: from CH2PR05CA0004.namprd05.prod.outlook.com (2603:10b6:610::17) by
- CY3PR12MB9653.namprd12.prod.outlook.com (2603:10b6:930:ff::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9275.12; Wed, 29 Oct 2025 18:59:43 +0000
-Received: from DS3PEPF000099DB.namprd04.prod.outlook.com
- (2603:10b6:610:0:cafe::e1) by CH2PR05CA0004.outlook.office365.com
- (2603:10b6:610::17) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9298.4 via Frontend Transport; Wed,
- 29 Oct 2025 18:59:43 +0000
+ bh=96ELShoeWw8oERdD5e/bVLuIeS9KCmLsimewmAT2Jk8=;
+ b=Hk4RwRhvOEq+jwa14segKWNBI6qx9DmfZw844cyhl9TjrvEeoaaM2yLfNMDnWhlbXOqz80AuAmyliLp5ek47WbcCw32yTal/EjCHvN0Ld2Si8Gg2qSsmHMz8iOzCVi7zhO55SWw023LNHhVnOgrQ8xt4uh0bG0ZjJDl3iZQ5NtQ=
+Received: from CH5PR02CA0023.namprd02.prod.outlook.com (2603:10b6:610:1ed::24)
+ by MN2PR12MB4423.namprd12.prod.outlook.com (2603:10b6:208:24f::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.19; Wed, 29 Oct
+ 2025 19:00:46 +0000
+Received: from DS3PEPF000099DD.namprd04.prod.outlook.com
+ (2603:10b6:610:1ed:cafe::95) by CH5PR02CA0023.outlook.office365.com
+ (2603:10b6:610:1ed::24) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9275.14 via Frontend Transport; Wed,
+ 29 Oct 2025 19:00:44 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -61,22 +62,23 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
 Received: from satlexmb07.amd.com (165.204.84.17) by
- DS3PEPF000099DB.mail.protection.outlook.com (10.167.17.197) with Microsoft
+ DS3PEPF000099DD.mail.protection.outlook.com (10.167.17.199) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9275.10 via Frontend Transport; Wed, 29 Oct 2025 18:59:42 +0000
+ 15.20.9275.10 via Frontend Transport; Wed, 29 Oct 2025 19:00:45 +0000
 Received: from airavat.amd.com (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Wed, 29 Oct
- 2025 11:59:38 -0700
+ 2025 12:00:41 -0700
 From: Raju Rangoju <Raju.Rangoju@amd.com>
 To: <netdev@vger.kernel.org>
 CC: <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
 	<davem@davemloft.net>, <andrew+netdev@lunn.ch>,
-	<maxime.chevallier@bootlin.com>, <Shyam-sundar.S-k@amd.com>, Raju Rangoju
-	<Raju.Rangoju@amd.com>
-Subject: [PATCH net-next v5 0/5] amd-xgbe: introduce support for ethtool selftests
-Date: Thu, 30 Oct 2025 00:29:07 +0530
-Message-ID: <20251029185907.3220756-1-Raju.Rangoju@amd.com>
+	<maxime.chevallier@bootlin.com>, <horms@kernel.org>,
+	<o.rempel@pengutronix.de>, <gerhard@engleder-embedded.com>,
+	<Shyam-sundar.S-k@amd.com>, Raju Rangoju <Raju.Rangoju@amd.com>
+Subject: [PATCH net-next v5 1/5] net: selftests: export packet creation helpers for driver use
+Date: Thu, 30 Oct 2025 00:30:23 +0530
+Message-ID: <20251029190023.3220775-1-Raju.Rangoju@amd.com>
 X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -90,93 +92,223 @@ X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF000099DB:EE_|CY3PR12MB9653:EE_
-X-MS-Office365-Filtering-Correlation-Id: 59453017-8c09-45e9-b844-08de171d51f3
+X-MS-TrafficTypeDiagnostic: DS3PEPF000099DD:EE_|MN2PR12MB4423:EE_
+X-MS-Office365-Filtering-Correlation-Id: aee8e7e8-9bd4-433e-1b28-08de171d7754
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026;
+	BCL:0;ARA:13230040|36860700013|1800799024|376014|7416014|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?il3JFigt0V7SrpCVmnaybcE48ThNKEnw3obkLbLFoCzPlQrV5qHcuwmoU5ST?=
- =?us-ascii?Q?m7w5x298gXUvKGYPriEbG/eqqXsT2dji6RPxjHAq8uyE95cluHf1NN7eqviV?=
- =?us-ascii?Q?gtSnI01vESy4OEi0OXzd+VFRV6BOWMJdykuze4evSov58cPvMI3Zw/coc71X?=
- =?us-ascii?Q?p8MRAXEwP0aqjS62WWmic0NSjmdHl/kK8Nj3DnUllzqoj48p7DqemQ1lClVR?=
- =?us-ascii?Q?annSjkFJkve2OSGqlltalJr2Eqm0lgds1hBY92GM8WYJyvH0mEnZViSPqh/u?=
- =?us-ascii?Q?BsOtlyDqnSyeWW0lcYSaoETF7BRSF9MQ3I1I4e2ZmByo+ffAEiJvNUU3wpIC?=
- =?us-ascii?Q?DvSSV+gm3X490rmldwnB3qK7VPhMjKaiLGadOgnex1JN3zhdexH/VxzuaY0x?=
- =?us-ascii?Q?jcohK58O9I2DEk4PmlZjDCfvef3MWeMrPwwVaG3tDSM4KcfUh2be/iV0kUwW?=
- =?us-ascii?Q?xOmHoBrJz3FNhdH9JJDl8tq/hefhh0Qc0xYeX+Afm+76NDBgVH7H998z/tUX?=
- =?us-ascii?Q?X7Pqpy0cGekhCL+dD3XbnxJTlXjYA2bplgW4kslWf6DYbmIIAzJugMlhQYzK?=
- =?us-ascii?Q?t5JKxTjC0W5r9KG/RGm6ekZpiHOTHemZlBRtDtgQ0VRWxZiCQVlXnXDsLXU/?=
- =?us-ascii?Q?rtvBEcPgudPY4pjsEaVZ6TxSOki45WOQlwoSMRf3zMwsUa8BPcYCl8yc7j7G?=
- =?us-ascii?Q?rMRWN2AWQy71YPcXVEaHdHwMVU1G3/PGSl8l3dSqvYiD6xDSRsM1Hrrt6STh?=
- =?us-ascii?Q?mJIRGtjqmTQd7pL4h93+CQpfRtiR0WArJOU+Kqgzc3MFY8Jg2RVWx+23k3It?=
- =?us-ascii?Q?AyyST/v3ECH349HRdi9vFtxha5GOFlDaw/IWqXSfoHGBM6WV9glsFBN4NIsy?=
- =?us-ascii?Q?0ENG6o2jHyJk7M9jImqSO4itVfTBzKvoNJ5JniHzmher/pKiKYsB3IvVTbOW?=
- =?us-ascii?Q?LGb35d46IFE8yG3GyMJvjFOYdUdOWX99GbydiLNx7/5xzJsTyugHvyUQuwXg?=
- =?us-ascii?Q?gbtWa6ZM4zyhggUzyQmEp4slaQOHE524XLKBVfnCjNvLR9aRDtKpXSr2Csb6?=
- =?us-ascii?Q?WxQKuio6WivkdCizua+Rq5eY87LpDietiLwms04CS7M/KzixrvK/XhjZ3Dd5?=
- =?us-ascii?Q?GOqEl8W9eNkUrHrwANBkel2H1TMjgO4qJolXDZGdYBQH5ui6Vzizy3RsTN9X?=
- =?us-ascii?Q?6Q0EIqOjZ/DZttXlb2NrkuepD5ViodHhWIo55dFIGaIo8UYy0rrjkcFq7inZ?=
- =?us-ascii?Q?oQawqA06wEgxuDQsxsbecm8BmbZWcjNtcbMtWCHLwh0rPDvCQUQ9EYXi2SuG?=
- =?us-ascii?Q?vw/YURGfbu/5wlZykWoPORynZtJzFUV4Xj+U+LgTmACKI4nsMGCr+ZDv0VD+?=
- =?us-ascii?Q?aSOtwpolUZ7yBoFvjxT7CC/COmBBQ0F9XN+ugM8B5vzoLVVK9daDpVCbsRUi?=
- =?us-ascii?Q?d9ESbG62426/TidGvB2KTIVjjcgR0FOiIjho/LIfwfIOogTDj9c8qLtH/WXa?=
- =?us-ascii?Q?CLVyH26SJ/R1APac8Zp63eB/tJVN+3I+cP84lRJbDEKuZDGfjBPK3g3ziSc+?=
- =?us-ascii?Q?+NtD8YDOYJZa/jBBKKc=3D?=
+	=?us-ascii?Q?KOvfD2KT4BES9mylydlUw+NumTbIE92WE6TPoGx5lh4F0KXHT4mnPLC2oRBg?=
+ =?us-ascii?Q?nWE6ZSPFyq6D/FhTqgACTtJLaaV1DO+lnf0/nN1X3eXKi+TAfaUJwmaimq54?=
+ =?us-ascii?Q?M3Q8zpJu5Y9VYJmn+DnM3HUk2PYAsY7+ywhEjliimOfVDyhmIkOI+jynZ2d3?=
+ =?us-ascii?Q?rST9RSa4e98hqP/CC9vb28KBXpVxxWp2qkKNse9F3SqUIsQs49EofzT5E/qw?=
+ =?us-ascii?Q?mGXz6x8/0eJLcgJrjrzkk8fA6+DDVCZmYlF/aO7PJg3F/7dSclC7MW/BayKn?=
+ =?us-ascii?Q?cnuHnUxRFVA67DjUqXybVLLFdFZZd9lkkLdqgm+h/bSUUlQQH7GSu2ucSPXT?=
+ =?us-ascii?Q?ZV5Wxb/DdlFS5MwUp2GlqNQt25uU4BCguvWfETTNH3rOEPFalRUpHCBGyiNT?=
+ =?us-ascii?Q?vvQl54fYG0vjTCp8kSvIEUdKp0IfhaVbOx1/LqUS2V88VHj86Gu0EL78V0Dt?=
+ =?us-ascii?Q?iZEY8zBOq/z5hMJ02YEqbtLCCwzHVpVp3vmoH4VumcL379OLMzcSe8L5jl0b?=
+ =?us-ascii?Q?0gNyd0hjy0+wPi7Uw0KmP8tOcK/n0eDA9Cxp7gtVwUIQycOp/EqwfpjAb07b?=
+ =?us-ascii?Q?OVTv3STpwFEYDHSbJjMiNdCv7oML4amaJZ/hvp6v0Oc7IaI/W2AAAmiqh0JW?=
+ =?us-ascii?Q?aS4Aceku+2rw8UWUZ/1D6dBUfseNTl/21udo3LUdj6l8Oc9JC89oVSnI8GY8?=
+ =?us-ascii?Q?lmkGOWmAKCSk+QG241BWBLaeF+hWYvgGBw+7ynhPKsNv41ijEwsKv/mua0YG?=
+ =?us-ascii?Q?qv+E/0TtCs7akSBer3Gr3j4Fqr2s92thJQUqoBOMh/9WtVqwdXVwluk5iZbK?=
+ =?us-ascii?Q?owgqRjzjzSUNAGQH7WEnqDHG+slvPKxlyqBfYLlc7uGqFdrMqwYB1hCiRXbW?=
+ =?us-ascii?Q?LDj3Okila4yDT6VgWzCnJD9qgdIQpVPTjRh1R4WUXzuK58TFTmPMVr6xXsEl?=
+ =?us-ascii?Q?tvQWRFXMnNpqo3++LLwWwLC+iYH6PvK0XJM/Q80CDClCZ19Zgifg9ZqmxitH?=
+ =?us-ascii?Q?VB1XTI+pQvhMC2zt4dxW9C9hrRG898IctZnC9zmI+1p5h13Fehlhg4N0Qphi?=
+ =?us-ascii?Q?NU0NKTyvuSaQJIDVNQ0eEtBFaG5Nn9dRutRBaUcgi6NckQNxJe3po3UnL6tg?=
+ =?us-ascii?Q?YCwHwka+9fYjcTotXgSwNfIKBDVitxt+Xysqx/tpw+PTvZFcT3OaLj7Zdk1r?=
+ =?us-ascii?Q?hLJrPmkEgu9ZgmGPr8RD1fkyGKxhIiJdjI1nGOPxi4VjqY8Ci+aHLcuQkFQc?=
+ =?us-ascii?Q?JC0CdTYFiM2flYrdIMRMxOcPP7ocRUwv9i0HEx09HJ0y2AwT9JZYajQmS/wG?=
+ =?us-ascii?Q?R9fczLBpCHyAMbMuiEPcOsX5biwFVhFRuYjvKdFOpn7VjcnZibDOhI/zQFNn?=
+ =?us-ascii?Q?gknv1PTGjk44ub/u66lrEg89/ZtVi1XL3pZ2LfeD2GhiVyZ2GcPzq8cJQvb+?=
+ =?us-ascii?Q?xKEIe+zpMP6wAk1teL9kbXxTvb4yN53MODW3mT2XHJmm4bcyxk4WvU1OcXpk?=
+ =?us-ascii?Q?irZRBLM8iFTPzd/yzcDK/YhkOEXIP4mW1uAHySIR0AAUi20HFXQhm1/f9UKQ?=
+ =?us-ascii?Q?I0FxbV6a3v6IbMBb9b8=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(7416014)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Oct 2025 18:59:42.8815
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Oct 2025 19:00:45.5887
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 59453017-8c09-45e9-b844-08de171d51f3
+X-MS-Exchange-CrossTenant-Network-Message-Id: aee8e7e8-9bd4-433e-1b28-08de171d7754
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	DS3PEPF000099DB.namprd04.prod.outlook.com
+	DS3PEPF000099DD.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY3PR12MB9653
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4423
 
-This patch series introduces support for ethtool selftests, which helps
-in finding the misconfiguration of HW. Makes use of network selftest
-packet creation infrastructure.
+Export the network selftest packet creation infrastructure to allow
+network drivers to reuse the existing selftest framework instead of
+duplicating packet creation code.
 
-Supports the following tests:
-
- - MAC loopback selftest
- - PHY loopback selftest
- - Split header selftest
- - Jubmo frame selftest
-
+Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
+---
 Changes since v4:
- - remove double semicolon
- - move the helper functions to appropriate file
  - add inline keyword to static function in header file
+
 Changes since v3:
- - add new patch to export packet creation helpers for driver use
-Changes since v2:
- - fix build warnings for xtensa and alpha arch Changes since v1:
- - fix build warnings for s390 arch reported by kernel test robot
+ - add this patch to expose existing selftest framework for packet creation
 
-Raju Rangoju (5):
-  net: selftests: export packet creation helpers for driver use
-  amd-xgbe: introduce support ethtool selftest
-  amd-xgbe: add ethtool phy selftest
-  amd-xgbe: add ethtool split header selftest
-  amd-xgbe: add ethtool jumbo frame selftest
+ include/net/selftests.h | 45 ++++++++++++++++++++++++++++++++++++++
+ net/core/selftests.c    | 48 ++++++-----------------------------------
+ 2 files changed, 52 insertions(+), 41 deletions(-)
 
- drivers/net/ethernet/amd/Kconfig              |   1 +
- drivers/net/ethernet/amd/xgbe/Makefile        |   2 +-
- drivers/net/ethernet/amd/xgbe/xgbe-dev.c      |  19 +
- drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c  |   7 +
- drivers/net/ethernet/amd/xgbe/xgbe-selftest.c | 346 ++++++++++++++++++
- drivers/net/ethernet/amd/xgbe/xgbe.h          |  11 +
- include/net/selftests.h                       |  45 +++
- net/core/selftests.c                          |  48 +--
- 8 files changed, 437 insertions(+), 42 deletions(-)
- create mode 100644 drivers/net/ethernet/amd/xgbe/xgbe-selftest.c
-
+diff --git a/include/net/selftests.h b/include/net/selftests.h
+index e65e8d230d33..c36e07406ad4 100644
+--- a/include/net/selftests.h
++++ b/include/net/selftests.h
+@@ -3,9 +3,48 @@
+ #define _NET_SELFTESTS
+ 
+ #include <linux/ethtool.h>
++#include <linux/netdevice.h>
++
++struct net_packet_attrs {
++	const unsigned char *src;
++	const unsigned char *dst;
++	u32 ip_src;
++	u32 ip_dst;
++	bool tcp;
++	u16 sport;
++	u16 dport;
++	int timeout;
++	int size;
++	int max_size;
++	u8 id;
++	u16 queue_mapping;
++	bool bad_csum;
++};
++
++struct net_test_priv {
++	struct net_packet_attrs *packet;
++	struct packet_type pt;
++	struct completion comp;
++	int double_vlan;
++	int vlan_id;
++	int ok;
++};
++
++struct netsfhdr {
++	__be32 version;
++	__be64 magic;
++	u8 id;
++} __packed;
++
++#define NET_TEST_PKT_SIZE (sizeof(struct ethhdr) + sizeof(struct iphdr) + \
++			   sizeof(struct netsfhdr))
++#define NET_TEST_PKT_MAGIC	0xdeadcafecafedeadULL
++#define NET_LB_TIMEOUT		msecs_to_jiffies(200)
+ 
+ #if IS_ENABLED(CONFIG_NET_SELFTESTS)
+ 
++struct sk_buff *net_test_get_skb(struct net_device *ndev, u8 id,
++				 struct net_packet_attrs *attr);
+ void net_selftest(struct net_device *ndev, struct ethtool_test *etest,
+ 		  u64 *buf);
+ int net_selftest_get_count(void);
+@@ -13,6 +52,12 @@ void net_selftest_get_strings(u8 *data);
+ 
+ #else
+ 
++static inline struct sk_buff *net_test_get_skb(struct net_device *ndev, u8 id,
++					       struct net_packet_attrs *attr)
++{
++	return NULL;
++}
++
+ static inline void net_selftest(struct net_device *ndev, struct ethtool_test *etest,
+ 				u64 *buf)
+ {
+diff --git a/net/core/selftests.c b/net/core/selftests.c
+index 3d79133a91a6..8b81feb82c4a 100644
+--- a/net/core/selftests.c
++++ b/net/core/selftests.c
+@@ -14,46 +14,10 @@
+ #include <net/tcp.h>
+ #include <net/udp.h>
+ 
+-struct net_packet_attrs {
+-	const unsigned char *src;
+-	const unsigned char *dst;
+-	u32 ip_src;
+-	u32 ip_dst;
+-	bool tcp;
+-	u16 sport;
+-	u16 dport;
+-	int timeout;
+-	int size;
+-	int max_size;
+-	u8 id;
+-	u16 queue_mapping;
+-	bool bad_csum;
+-};
+-
+-struct net_test_priv {
+-	struct net_packet_attrs *packet;
+-	struct packet_type pt;
+-	struct completion comp;
+-	int double_vlan;
+-	int vlan_id;
+-	int ok;
+-};
+-
+-struct netsfhdr {
+-	__be32 version;
+-	__be64 magic;
+-	u8 id;
+-} __packed;
+-
+ static u8 net_test_next_id;
+ 
+-#define NET_TEST_PKT_SIZE (sizeof(struct ethhdr) + sizeof(struct iphdr) + \
+-			   sizeof(struct netsfhdr))
+-#define NET_TEST_PKT_MAGIC	0xdeadcafecafedeadULL
+-#define NET_LB_TIMEOUT		msecs_to_jiffies(200)
+-
+-static struct sk_buff *net_test_get_skb(struct net_device *ndev,
+-					struct net_packet_attrs *attr)
++struct sk_buff *net_test_get_skb(struct net_device *ndev, u8 id,
++				 struct net_packet_attrs *attr)
+ {
+ 	struct sk_buff *skb = NULL;
+ 	struct udphdr *uhdr = NULL;
+@@ -142,8 +106,8 @@ static struct sk_buff *net_test_get_skb(struct net_device *ndev,
+ 	shdr = skb_put(skb, sizeof(*shdr));
+ 	shdr->version = 0;
+ 	shdr->magic = cpu_to_be64(NET_TEST_PKT_MAGIC);
+-	attr->id = net_test_next_id;
+-	shdr->id = net_test_next_id++;
++	attr->id = id;
++	shdr->id = id;
+ 
+ 	if (attr->size) {
+ 		void *payload = skb_put(skb, attr->size);
+@@ -190,6 +154,7 @@ static struct sk_buff *net_test_get_skb(struct net_device *ndev,
+ 
+ 	return skb;
+ }
++EXPORT_SYMBOL_GPL(net_test_get_skb);
+ 
+ static int net_test_loopback_validate(struct sk_buff *skb,
+ 				      struct net_device *ndev,
+@@ -286,12 +251,13 @@ static int __net_test_loopback(struct net_device *ndev,
+ 	tpriv->packet = attr;
+ 	dev_add_pack(&tpriv->pt);
+ 
+-	skb = net_test_get_skb(ndev, attr);
++	skb = net_test_get_skb(ndev, net_test_next_id, attr);
+ 	if (!skb) {
+ 		ret = -ENOMEM;
+ 		goto cleanup;
+ 	}
+ 
++	net_test_next_id++;
+ 	ret = dev_direct_xmit(skb, attr->queue_mapping);
+ 	if (ret < 0) {
+ 		goto cleanup;
 -- 
 2.34.1
 
