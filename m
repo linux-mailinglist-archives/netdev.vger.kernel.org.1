@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-233716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9753DC17840
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 01:20:41 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9CE3C17813
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 01:19:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B0EA406FF0
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 00:17:59 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 11FFC4FC764
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 00:18:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE5B4230D1E;
-	Wed, 29 Oct 2025 00:17:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1845322E004;
+	Wed, 29 Oct 2025 00:17:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26384212550;
-	Wed, 29 Oct 2025 00:17:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62B7C23BCF5;
+	Wed, 29 Oct 2025 00:17:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761697047; cv=none; b=KNeaAxIWg80PAQ8XHnXJfv9+gZo7N7DfhRJ1+dbDn6t3qdWN6gMAjE6Rddavc+yqdHqmP0swFZpj1dyl2OGA54225ylsUdICAF6A+SSXetqp0COZPmgOtvTcD3zcvAZ6sk/Aq6aC3IG+nenXRim4jgHBnLR6WXKJo5HKwst7Ug4=
+	t=1761697056; cv=none; b=gOHq8WNaQJxZ819E4LISz0jQYASlFOhsPj/UculYGXJfepVjYetFo3Xbqv42EpcMCijZ0qIjmW4QxqUCl06h7WCapgODLr9bqaxYjNEr3Uy3gv+gJy8w46Ge+oez72UAL0KWwDql2U+WU6nSP5e1sqmyrGx7hIq3v6ektxNm7Rw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761697047; c=relaxed/simple;
-	bh=9qhvYaWZnj8DF0ebDBa8YXKdXmS2sYbWsC7Me4xCd2Q=;
+	s=arc-20240116; t=1761697056; c=relaxed/simple;
+	bh=FYW/ilzSG9YwOVk2s8EMDnrv5vbU4KXbr9GLieIaDGY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O1hQMvUW/rW3nuueX1rhVlesz2B5k/Ea0l1jL+hAcFT2OPzXnIGGSXPYb8591gUECEFkR7S+d0sZ6rbgv2hoiHDdVJWXNGzaOJ9NpAAIWhUGhT3U3PESEeY3aU3Q2ymn4p+WwsQAVmGdSpU/EyvWqc12l1/mLc1Tevzx0aSz+xY=
+	 Content-Type:Content-Disposition:In-Reply-To; b=cQHaW3ZKF4/B9r9CQiIcSX7znIdosH7S6URba6A8OS/HNfC7sx28P8hBr6vBi1kWhVANKlhs4eynGXS1P6NIjM1uxjie/XT1N3GfTfxIiydii5y+W1w3Y5ujtswyGg6wX2hhKpS/NyWR/o0V8v34yDskRkZKjW/TOFfw849PRQQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -33,9 +33,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.98.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1vDtsQ-000000004As-0Dgc;
-	Wed, 29 Oct 2025 00:17:22 +0000
-Date: Wed, 29 Oct 2025 00:17:18 +0000
+	id 1vDtsX-000000004BI-3vMh;
+	Wed, 29 Oct 2025 00:17:30 +0000
+Date: Wed, 29 Oct 2025 00:17:26 +0000
 From: Daniel Golle <daniel@makrotopia.org>
 To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -58,9 +58,9 @@ Cc: Andreas Schirm <andreas.schirm@siemens.com>,
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
 	"Livia M. Rosu" <lrosu@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: [PATCH net-next v4 05/12] net: dsa: lantiq_gswip: define and use
- GSWIP_TABLE_MAC_BRIDGE_VAL1_VALID
-Message-ID: <7d1a0368e95da42999af379d90de5d791283d24e.1761693288.git.daniel@makrotopia.org>
+Subject: [PATCH net-next v4 06/12] dt-bindings: net: dsa: lantiq,gswip: add
+ support for MII delay properties
+Message-ID: <836cd386e9c407eca88bd97aaca24dd02ff0c087.1761693288.git.daniel@makrotopia.org>
 References: <cover.1761693288.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -72,49 +72,81 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1761693288.git.daniel@makrotopia.org>
 
-When adding FDB entries to the MAC bridge table on GSWIP 2.2 or later it
-is needed to set an (undocumented) bit to mark the entry as valid. If this
-bit isn't set for entries in the MAC bridge table, then those entries won't
-be considered as valid MAC addresses.
+Add support for standard tx-internal-delay-ps and rx-internal-delay-ps
+properties on port nodes to allow fine-tuning of RGMII clock delays.
+
+The GSWIP switch hardware supports delay values in 500 picosecond
+increments from 0 to 3500 picoseconds, with a post-reset default of 2000
+picoseconds for both TX and RX delays. The driver currently sets the
+delay to 0 in case the PHY is setup to carry out the delay by the
+corresponding interface modes ("rgmii-id", "rgmii-rxid", "rgmii-txid").
+
+This corresponds to the driver changes that allow adjusting MII delays
+using Device Tree properties instead of relying solely on the PHY
+interface mode.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
-v4: keep previous behavior for GSWIP 2.1 and earlier
+v4:
+ * remove misleading defaults
 
- drivers/net/dsa/lantiq/lantiq_gswip.h        | 1 +
- drivers/net/dsa/lantiq/lantiq_gswip_common.c | 7 ++++++-
- 2 files changed, 7 insertions(+), 1 deletion(-)
+v3:
+ * redefine ports node so properties are defined actually apply
+ * RGMII port with 2ps delay is 'rgmii-id' mode
 
-diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.h b/drivers/net/dsa/lantiq/lantiq_gswip.h
-index 56de869fc472..42000954d842 100644
---- a/drivers/net/dsa/lantiq/lantiq_gswip.h
-+++ b/drivers/net/dsa/lantiq/lantiq_gswip.h
-@@ -224,6 +224,7 @@
- #define  GSWIP_TABLE_MAC_BRIDGE_KEY3_FID	GENMASK(5, 0)	/* Filtering identifier */
- #define  GSWIP_TABLE_MAC_BRIDGE_VAL0_PORT	GENMASK(7, 4)	/* Port on learned entries */
- #define  GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC	BIT(0)		/* Static, non-aging entry */
-+#define  GSWIP_TABLE_MAC_BRIDGE_VAL1_VALID	BIT(1)		/* Valid bit */
+ .../bindings/net/dsa/lantiq,gswip.yaml        | 31 +++++++++++++++++--
+ 1 file changed, 28 insertions(+), 3 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
+index f3154b19af78..8ccbc8942eb3 100644
+--- a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
+@@ -6,8 +6,31 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
  
- #define XRX200_GPHY_FW_ALIGN	(16 * 1024)
+ title: Lantiq GSWIP Ethernet switches
  
-diff --git a/drivers/net/dsa/lantiq/lantiq_gswip_common.c b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-index 0ac87eb23bb5..ff2cdb230e2c 100644
---- a/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-+++ b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-@@ -1149,7 +1149,12 @@ static int gswip_port_fdb(struct dsa_switch *ds, int port,
- 	mac_bridge.key[2] = addr[1] | (addr[0] << 8);
- 	mac_bridge.key[3] = FIELD_PREP(GSWIP_TABLE_MAC_BRIDGE_KEY3_FID, fid);
- 	mac_bridge.val[0] = add ? BIT(port) : 0; /* port map */
--	mac_bridge.val[1] = GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC;
-+	if (GSWIP_VERSION_GE(priv, GSWIP_VERSION_2_2_ETC))
-+		mac_bridge.val[1] = add ? (GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC |
-+					   GSWIP_TABLE_MAC_BRIDGE_VAL1_VALID) : 0;
-+	else
-+		mac_bridge.val[1] = GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC;
+-allOf:
+-  - $ref: dsa.yaml#/$defs/ethernet-ports
++$ref: dsa.yaml#
 +
- 	mac_bridge.valid = add;
++patternProperties:
++  "^(ethernet-)?ports$":
++    type: object
++    patternProperties:
++      "^(ethernet-)?port@[0-6]$":
++        $ref: dsa-port.yaml#
++        unevaluatedProperties: false
++
++        properties:
++          tx-internal-delay-ps:
++            enum: [0, 500, 1000, 1500, 2000, 2500, 3000, 3500]
++            description:
++              RGMII TX Clock Delay defined in pico seconds.
++              The delay lines adjust the MII clock vs. data timing.
++              If this property is not present the delay is determined by
++              the interface mode.
++          rx-internal-delay-ps:
++            enum: [0, 500, 1000, 1500, 2000, 2500, 3000, 3500]
++            description:
++              RGMII RX Clock Delay defined in pico seconds.
++              The delay lines adjust the MII clock vs. data timing.
++              If this property is not present the delay is determined by
++              the interface mode.
  
- 	err = gswip_pce_table_entry_write(priv, &mac_bridge);
+ maintainers:
+   - Hauke Mehrtens <hauke@hauke-m.de>
+@@ -113,8 +136,10 @@ examples:
+                     port@0 {
+                             reg = <0>;
+                             label = "lan3";
+-                            phy-mode = "rgmii";
++                            phy-mode = "rgmii-id";
+                             phy-handle = <&phy0>;
++                            tx-internal-delay-ps = <2000>;
++                            rx-internal-delay-ps = <2000>;
+                     };
+ 
+                     port@1 {
 -- 
 2.51.1
 
