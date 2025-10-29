@@ -1,113 +1,100 @@
-Return-Path: <netdev+bounces-233769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3744BC180A7
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 03:27:35 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB7D0C180D1
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 03:31:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A8CE1A220D1
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 02:27:59 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E68064FC01C
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 02:30:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD1FB2C236B;
-	Wed, 29 Oct 2025 02:27:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBB3C199E94;
+	Wed, 29 Oct 2025 02:30:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="h+xYBjTn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e8hSh2qv"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57E761F0994
-	for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 02:27:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B378C86323;
+	Wed, 29 Oct 2025 02:30:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761704850; cv=none; b=Lq/vTWgwvzZAea+suNm8mf9k2Ft0YXAHQ+o70e5VtxK7+UItOJETWMvOIjyDgK48DX5w0uOUnUIf/XqKxfHdgzuc4UcAyju83igB/NsEWzG4JCwZypBGSKU85EepAvH9kQrmcj6x3tEexZYpDHjCNh/J+cGZV4XBMaZnlXY8DVw=
+	t=1761705033; cv=none; b=EpyVqsrVtPvFqdQjWUUDG105wJdXQDcWo/hQUOSU3a96tcsQq0mx6V/SqeZOa+b2/YMoSa7OyjLOmmm8mKkGKXP9HFINRSqUFIfXxhkkk6BtQC7Lm6q+IsPfOTdWstM3Z5uG2QNfecXJSjSDvqMeiUzcBFKNI4beWRRFQHrtrsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761704850; c=relaxed/simple;
-	bh=ZAa8YrfBZCJJvU2+LBOiK9HqGPmJmDvCTByCdVc/+HY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YWywLi7aQ9/fa5UVWJoP0i2k2P0/J3cB4HCMsmr/iQuiy6onc4g3I5teyzeq3gMhNRQbEiitOTpJ23VhKwyw/drxbrvJK708P0yOLvHkP8CatwLcjt3wklo4qxhQWuaBAl3L2Yw5+8jAzeqQVSyA5Fq7lO2WhHj6HZ5YuaxCKm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=h+xYBjTn; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <91de05f5-3475-45eb-bbf7-162365186297@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761704846;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KpJ/2UeKPOQj3QH3COAUSbB7u7mUiVa8jSdlFJvPeMY=;
-	b=h+xYBjTnwvtV8tO5ZhjdcS7E0G6taAoRUCOOgWBTWHbElXWR3LpAeUx5YkqzPzBMa90Pbi
-	Ya7p27k5tTBBM1w7JB/Xmi72kuhvRm/TUhsOHq7Si8JL74OLnArhYLYHtmvCBjORNeYfVT
-	mpMW4w3z6E3xICCX7KpnzwvHz/9T23A=
-Date: Wed, 29 Oct 2025 10:27:18 +0800
+	s=arc-20240116; t=1761705033; c=relaxed/simple;
+	bh=CVpJtmL1FdG28qO/fDboA1mMwi/59287bA8TQeWmj+c=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=He59YK1QkYWQN5kB2DLXia3sUir5SAGRIl8pNzh9oApsp+VtnDxFL1mRCzKq1SiMGGJAIeYsuesiJ/zhCISQtKx4R6JJSFNEJPdjKD5MXrHIv/3lt/NTG72vmmva2JwuDgomeVo/zjL/Rxm+N5lOeCjrpcqZPP3d+qtva6Aq9xs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e8hSh2qv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D93DC4CEE7;
+	Wed, 29 Oct 2025 02:30:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761705032;
+	bh=CVpJtmL1FdG28qO/fDboA1mMwi/59287bA8TQeWmj+c=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=e8hSh2qvvhN+MTPjiT3RTfr/Pmn3KTUKXUUoeFFiHoBqtYFOhSD2fYE3fzeUa9R6F
+	 PmYyPVefsj1VZXN9ZO1Xhmx3bnUjEFA6UrcIPlYaboMDxHo29+2M1RdH7XxBVvGro7
+	 xnnPF3xaG+Y9XmrmOJDPl7/LE2f4nOqlvLjOOCWOVf7SQzE83R9b60J8Lvq3iqifqp
+	 MyjN97/+orrZMvqM5UseWiPOhCanvEfQLTOexTtwZulGVcUlJjX/rsBXCegBGtLuDQ
+	 8yJmQinKZPk4PJ/FPLH/M7u9aIOJ5XZLK7JYItAHywYx9TBKwCuTR7uYaduYW3XPha
+	 iM9PHDCaqPL8w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADE739FEB75;
+	Wed, 29 Oct 2025 02:30:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next 1/3] net: stmmac: Add generic suspend/resume
- helper for PCI-based controllers
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Yao Zi <ziyao@disroot.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Huacai Chen <chenhuacai@kernel.org>, Philipp Stanner <phasta@kernel.org>,
- Tiezhu Yang <yangtiezhu@loongson.cn>, Qunqin Zhao <zhaoqunqin@loongson.cn>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, Furong Xu <0x1207@gmail.com>,
- Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
- Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20251028154332.59118-1-ziyao@disroot.org>
- <20251028154332.59118-2-ziyao@disroot.org>
- <aQDoZaET4D64KfQA@shell.armlinux.org.uk>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yanteng Si <si.yanteng@linux.dev>
-In-Reply-To: <aQDoZaET4D64KfQA@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Subject: Re: [PATCH V2 net 0/3] bug fixes for the hibmcge ethernet driver
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176170500975.2468647.13996100995604445036.git-patchwork-notify@kernel.org>
+Date: Wed, 29 Oct 2025 02:30:09 +0000
+References: <20251025014642.265259-1-shaojijie@huawei.com>
+In-Reply-To: <20251025014642.265259-1-shaojijie@huawei.com>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ shenjian15@huawei.com, liuyonglong@huawei.com, chenhao418@huawei.com,
+ lantao5@huawei.com, huangdonghua3@h-partners.com,
+ yangshuaisong@h-partners.com, jacob.e.keller@intel.com,
+ jonathan.cameron@huawei.com, salil.mehta@huawei.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+
+Hello:
+
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Sat, 25 Oct 2025 09:46:39 +0800 you wrote:
+> This patch set is intended to fix several issues for hibmcge driver:
+> 1. Patch1 fixes the issue where buf avl irq is disabled after irq_handle.
+> 2. Patch2 eliminates the error logs in scenarios without phy.
+> 3. Patch3 fixes the issue where the network port becomes unusable
+>    after a PCIe RAS event.
+> 
+> 
+> [...]
+
+Here is the summary with links:
+  - [V2,net,1/3] net: hibmcge: fix rx buf avl irq is not re-enabled in irq_handle issue
+    https://git.kernel.org/netdev/net/c/12d2303db892
+  - [V2,net,2/3] net: hibmcge: remove unnecessary check for np_link_fail in scenarios without phy.
+    https://git.kernel.org/netdev/net/c/71eb8d1e0756
+  - [V2,net,3/3] net: hibmcge: fix the inappropriate netif_device_detach()
+    https://git.kernel.org/netdev/net/c/7e2958aee59c
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-在 2025/10/28 下午11:59, Russell King (Oracle) 写道:
-> On Tue, Oct 28, 2025 at 03:43:30PM +0000, Yao Zi wrote:
->> Most glue driver for PCI-based DWMAC controllers utilize similar
->> platform suspend/resume routines. Add a generic implementation to reduce
->> duplicated code.
->>
->> Signed-off-by: Yao Zi <ziyao@disroot.org>
->> ---
->>   drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  2 +
->>   .../net/ethernet/stmicro/stmmac/stmmac_main.c | 37 +++++++++++++++++++
-> I would prefer not to make stmmac_main.c even larger by including bus
-> specific helpers there. We already have stmmac_pltfm.c for those which
-> use struct platform_device. The logical name would be stmmac_pci.c, but
-> that's already taken by a driver.
->
-> One way around that would be to rename stmmac_pci.c to dwmac-pci.c
-> (glue drivers tend to be named dwmac-foo.c) and then re-use
-> stmmac_pci.c for PCI-related stuff in the same way that stmmac_pltfm.c
-> is used.
->
-> Another idea would be stmmac_libpci.c.
-
-I also don't want stmmac_main.c to grow larger, and I prefer
-
-stmmac_libpci.c instead. Another approach - maybe we can
-
-keep these helper functions in stmmac_pci.c and just declare
-
-them as extern where needed?
-
-
-Thanks,
-
-Yanteng
-
->
 
