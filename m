@@ -1,113 +1,150 @@
-Return-Path: <netdev+bounces-233786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-233787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C01CEC18661
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 07:14:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07C96C18670
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 07:16:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D56973ABA1F
-	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 06:14:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79EAF1A6570C
+	for <lists+netdev@lfdr.de>; Wed, 29 Oct 2025 06:17:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2217C2FD7B2;
-	Wed, 29 Oct 2025 06:14:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B40992F6912;
+	Wed, 29 Oct 2025 06:16:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="e+WwOI0R"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="JOUdQo6g"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
+Received: from canpmsgout12.his.huawei.com (canpmsgout12.his.huawei.com [113.46.200.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FDA02F12BB;
-	Wed, 29 Oct 2025 06:14:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD4EA13AD26;
+	Wed, 29 Oct 2025 06:16:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761718465; cv=none; b=YPl2cNd0Sl4s32mwOgcvvEyeFp+2nx2nQluzvMbnnxJYHoTQgyLruat4dVl0bVka87mGppBuuaoVGMTOYeGC+P3nDMqV8DAN4GoJF6qBrLUlwwkRJqRMVqRmFqfZFAj0f2itPIpGTrQ1AAluJ59GEhJ0NmoE2QTRwgmtg30rSNo=
+	t=1761718602; cv=none; b=dU9Uw/KqoVU5GS7vHZjYgj+Ywtp8QYdPe28Hdpz/FNbV5jjnCvhURlCQ42RU8M7Q8OKR8J8Bn80rq4ELhvIo9f3FEWCZaiaFdbubBTzjS80dX3d9HaFwUj+7COgDPE7eOiBfMhPuxdVEpr7Znz1wI2+tlQqgePRPVxvzuRkMLoo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761718465; c=relaxed/simple;
-	bh=CqTEutJd2iH+SNvmxd+5gxkNpnMuzCbcCo7+YPwtpRk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kZ4qsuapaM0GF9cj99rN7U5yBFdNAk3pM5T4GoxaImet6Hia3QkVz7z7GModkJuYzUdp+mp3EPtbX7VDVo0g4iHNYuHYobF494eK23CZ14iti0PGB1+oUHHkO5ZBgY5lPt02zbXcHu9opWxdfiTF+mQ3KLQtuHKtcjpoUPjaapo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=e+WwOI0R; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1761718459; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=n/Wg+0g3Nyy/TFISVde9M4JkfxmwIT9/CJq8QDTfiTQ=;
-	b=e+WwOI0R9ZrPrfBiNyr6LG5isCqREIwOxb6EmMNG6gjWvitWLC+2DBmwi8wcOZBUXnjIzNa1SLGFeD1N0zYatl7gE6UdTwCb5vlV5Xl86V6fPlcLeGkTLeV684ufMFMkTh6ROyw7vP9oh9kVydiVLYqXpLbHmd48BvRx2XddUf0=
-Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WrEi384_1761718457 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 29 Oct 2025 14:14:18 +0800
-Date: Wed, 29 Oct 2025 14:14:17 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com    >
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>, ast@kernel.org,
-	andrii.nakryiko@gmail.com, daniel@iogearbox.net, andrii@kernel.org,
-	pabeni@redhat.com, song@kernel.org, sdf@google.com,
-	haoluo@google.com, yhs@fb.com, edumazet@google.com,
-	john.fastabend@gmail.com, kpsingh@kernel.org, jolsa@kernel.org,
-	mjambigi@linux.ibm.com, wenjia@linux.ibm.com, wintera@linux.ibm.com,
-	dust.li@linux.alibaba.com, tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com, bpf@vger.kernel.org, davem@davemloft.net,
-	kuba@kernel.org, netdev@vger.kernel.org, sidraya@linux.ibm.com,
-	jaka@linux.ibm.com
-Subject: Re: [PATCH bpf-next v3 0/3] net/smc: Introduce smc_hs_ctrl
-Message-ID: <20251029061417.GA22337@j66a10360.sqa.eu95>
-References: <20250929063400.37939-1-alibuda@linux.alibaba.com>
- <20251028121531.GA51645@j66a10360.sqa.eu95>
- <fea9adf1-3c61-4213-bc84-9429bf3e82a7@linux.dev>
+	s=arc-20240116; t=1761718602; c=relaxed/simple;
+	bh=Cswn/ODB/iilmA5fctmmzI7NG2iSTcFYCVrhUBYBM5s=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EDosKnuAW/Mf25M8ddbeJyArYGCtpYgspYeMkyUEp3PWjKopl18hFNB7lhEte76leS5R2nTht8UONrAv7o/e13K7JThqx32QsGrGCGsbl1FV97qs0ytGIQBM5kJA547hB9b78uHTSevxFv/bfdnJrE4Y/FHNsduabdks3YcobUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=JOUdQo6g; arc=none smtp.client-ip=113.46.200.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=Igz6711lV9ZY2n386/l3Sd0NFW+W1fdFastr6bYAwgQ=;
+	b=JOUdQo6gnLrD9smX3bZyl4jS5t3GZrEM7NUrI1FQqbg7F0BlHYp0Bj2lWSkDoM9pQ6r9Ttfmm
+	xox6mxIbBs+K+oM3moVeDIFI9rr3cXMUXiw6cQ+izR9014dMJZ/DTogyiZ3xRuRknQ1MW7MqCwZ
+	pc+syDFzbZEx1KM/LAmj1so=
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by canpmsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4cxH722QLJznTXs;
+	Wed, 29 Oct 2025 14:15:58 +0800 (CST)
+Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
+	by mail.maildlp.com (Postfix) with ESMTPS id 977271402C3;
+	Wed, 29 Oct 2025 14:16:35 +0800 (CST)
+Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.188.120) by
+ kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 29 Oct 2025 14:16:34 +0800
+From: Fan Gong <gongfan1@huawei.com>
+To: Fan Gong <gongfan1@huawei.com>, Zhu Yikai <zhuyikai1@h-partners.com>,
+	<netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, <Markus.Elfring@web.de>, <pavan.chebbi@broadcom.com>
+CC: <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>, luosifu
+	<luosifu@huawei.com>, Xin Guo <guoxin09@huawei.com>, Shen Chenyang
+	<shenchenyang1@hisilicon.com>, Zhou Shuai <zhoushuai28@huawei.com>, Wu Like
+	<wulike1@huawei.com>, Shi Jing <shijing34@huawei.com>, Luo Yang
+	<luoyang82@h-partners.com>, Meny Yossefi <meny.yossefi@huawei.com>, Gur Stavi
+	<gur.stavi@huawei.com>
+Subject: [PATCH net-next v04 0/5] net: hinic3: PF initialization
+Date: Wed, 29 Oct 2025 14:16:24 +0800
+Message-ID: <cover.1761711549.git.zhuyikai1@h-partners.com>
+X-Mailer: git-send-email 2.51.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fea9adf1-3c61-4213-bc84-9429bf3e82a7@linux.dev>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ kwepemf100013.china.huawei.com (7.202.181.12)
 
-On Tue, Oct 28, 2025 at 05:30:12PM -0700, Martin KaFai Lau wrote:
-> On 10/28/25 5:15 AM, D. Wythe wrote:
-> >On Mon, Sep 29, 2025 at 02:33:57PM +0800, D. Wythe wrote:
-> >>This patch aims to introduce BPF injection capabilities for SMC and
-> >>includes a self-test to ensure code stability.
-> >>
-> >>Since the SMC protocol isn't ideal for every situation, especially
-> >>short-lived ones, most applications can't guarantee the absence of
-> >
-> >
-> >Hi bpf folks,
-> >
-> >I've noticed this patch has been pending for a while, and I wanted to
-> >gently check in. Is there any specific concerns or feedback regarding
-> >it from the BPF side? I'm keen to address any issues and move it
-> >forward.
-> 
-> The original v1 started last year. The bpf side had been responsive
-> but the progress stopped for months and the smc side review had been
-> slow also. I doubt how well will this be supported in the future and
-> put this to the bottom of my list since then.
-> 
-> The set does not apply on bpf-next/net now. Please re-spin.
+This is [1/3] part of hinic3 Ethernet driver second submission.
+With this patch hinic3 becomes a complete Ethernet driver with
+pf and vf.
 
-Hi Martin,
+The driver parts contained in this patch:
+Add support for PF framework based on the VF code.
+Add PF management interfaces to communicate with HW.
+Add ops to configure NIC features.
+Support mac filter to unicast and multicast.
+Add netdev notifier.
 
-Thanks for your feedback and for surfacing these long-standing
-concerns regarding the patchset. I fully appreciate your perspective on
-its previous progress.
+Changes:
 
-You're right that this patchset has been in the pipeline for a
-significant amount of time, influenced by the past pace of SMC-side
-reviews. However, the good news is that its future support should no
-longer be a concern. Dust and I, along with two maintainers from IBM,
-have been co-maintaining the SMC subsystem for some time now. From our
-discussions, I believe that the IBM maintainers are in agreement
-and open to the progress of this specific patchset, and Dust Li has already
-provided an ACK. This collective and aligned support should effectively address
-previous worries about SMC-side review.
+PATCH 01 V01: https://lore.kernel.org/netdev/cover.1760502478.git.zhuyikai1@h-partners.com/
 
-Best regards,
-D. Wythe
+PATCH 01 V02: https://lore.kernel.org/netdev/cover.1760685059.git.zhuyikai1@h-partners.com/
+* Change the order of hinic3_netdev_event (Jakub Kicinski)
+* Use netdev_hold/put instead of dev_hold/put (Jakub Kicinski)
+* Remove the semicolon at the end of switch case (Jakub Kicinski)
+* Remove redundant PF judgement in hinic3_rx_tx_flush (Paven Chebbi)
+* change hinic3_send_mbox_to_mgmt errcode to EFAULT (Paven Chebbi)
+* Optimize hinic3_set_bdf_ctxt parameters (Paven Chebbi)
+* Modify main and CC recipients (Markus Elfring)
+
+PATCH 01 V03: https://lore.kernel.org/netdev/cover.1761362580.git.zhuyikai1@h-partners.com/
+* Use disable_delayed_work_sync instead of cancel_delayed_work_sync (Paolo Abeni)
+* Fill in the missing hinic3_sync_time & hinic3_free_ppf_work (Paolo Abeni)
+* Refactor hinic3_mac_filter_sync to implement linux coding style(err label)
+  and improve readability (Paolo Abeni & Markus Elfring)
+
+PATCH 01 V04:
+* Use linux error value(EADDRINUSE) instead of custom value in set_mac (Simon Horman)
+* Use "hinic3_check_pf_set_vf_already" function instead of macro (Simon Horman)
+
+Fan Gong (5):
+  hinic3: Add PF framework
+  hinic3: Add PF management interfaces
+  hinic3: Add NIC configuration ops
+  hinic3: Add mac filter ops
+  hinic3: Add netdev register interfaces
+
+ drivers/net/ethernet/huawei/hinic3/Makefile   |   1 +
+ .../net/ethernet/huawei/hinic3/hinic3_csr.h   |   6 +
+ .../ethernet/huawei/hinic3/hinic3_filter.c    | 412 ++++++++++++++++++
+ .../ethernet/huawei/hinic3/hinic3_hw_comm.c   | 115 +++++
+ .../ethernet/huawei/hinic3/hinic3_hw_comm.h   |   6 +
+ .../ethernet/huawei/hinic3/hinic3_hw_intf.h   |  24 +
+ .../net/ethernet/huawei/hinic3/hinic3_hwdev.c |  97 ++++-
+ .../net/ethernet/huawei/hinic3/hinic3_hwdev.h |  21 +
+ .../net/ethernet/huawei/hinic3/hinic3_hwif.c  |  89 +++-
+ .../net/ethernet/huawei/hinic3/hinic3_hwif.h  |  23 +
+ .../net/ethernet/huawei/hinic3/hinic3_irq.c   | 138 +++++-
+ .../net/ethernet/huawei/hinic3/hinic3_lld.c   |  52 ++-
+ .../net/ethernet/huawei/hinic3/hinic3_main.c  | 261 ++++++++++-
+ .../net/ethernet/huawei/hinic3/hinic3_mbox.c  |  55 ++-
+ .../net/ethernet/huawei/hinic3/hinic3_mbox.h  |   2 +
+ .../net/ethernet/huawei/hinic3/hinic3_mgmt.c  | 309 ++++++++++++-
+ .../net/ethernet/huawei/hinic3/hinic3_mgmt.h  |  53 +++
+ .../huawei/hinic3/hinic3_mgmt_interface.h     |  69 +++
+ .../huawei/hinic3/hinic3_netdev_ops.c         | 380 ++++++++++++++++
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.c   | 283 +++++++++++-
+ .../ethernet/huawei/hinic3/hinic3_nic_cfg.h   |  47 ++
+ .../ethernet/huawei/hinic3/hinic3_nic_dev.h   |  84 +++-
+ .../net/ethernet/huawei/hinic3/hinic3_rx.h    |  20 +
+ .../net/ethernet/huawei/hinic3/hinic3_tx.h    |  18 +
+ 24 files changed, 2534 insertions(+), 31 deletions(-)
+ create mode 100644 drivers/net/ethernet/huawei/hinic3/hinic3_filter.c
+
+
+base-commit: 16a2206354d169bfd13552ad577e07ce66e439ab
+-- 
+2.43.0
+
 
