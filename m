@@ -1,124 +1,208 @@
-Return-Path: <netdev+bounces-234327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234328-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20886C1F6BC
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 11:01:05 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77C11C1F70B
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 11:04:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1486B1A20028
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 10:01:29 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 328784EA589
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 10:02:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A1B2351FC2;
-	Thu, 30 Oct 2025 10:00:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8DE234E777;
+	Thu, 30 Oct 2025 10:01:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j0Vc3+3O"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="RCRCoZgA";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="hy/Ad1X4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75898351FB9
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 10:00:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BC9734E74B
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 10:01:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761818443; cv=none; b=VammceXoHoZCeZRpUFNCYt09oE5O4iyMp4pNuI1j0C40zCFioAPyc738YCA6Cu/7WVuq+IQpcSHG7lES6OO7xPqdz0L12QveR7Tovb7WMt4imS7jZ8w5tbwABA7D3Mx/9iDJpA6CQ2ge6iP+K5QgWBsD9gHNMttwOZvuF0je/RI=
+	t=1761818515; cv=none; b=iFWZMWfS3oXa2Ai2fKJUPVinIJBC4S3UL7WCBPiTYU0bHdRsf8XCrLAkH3MIjtBqLnyi0UA5q/bTxVHcHEdO8V8Y1mCLH0W0sNdjs3eevMukeN7nFWAJmfqn+BzS++8DaHJ2rUxu6ODRN6fGPWB0Ron/+akz/FgKGpB2h39E4+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761818443; c=relaxed/simple;
-	bh=346+e760JgoDE0rOIL0Z5pYbipi8wDRqFLzWehKJTz4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ay5hUf94HueBQq52gZnQr/eur5eYDufBcJaHUyUucP4WPqCfxHyP6zKxR5LbtOA1aLwjBXCdBA+iWzXtDqRbqgBHNgTxs8Eco/qyPPRR8Wem8q/H/ZDpnlS7FZz+aLE5MbF2AnhM2DmP9q8EbWeGvXDj8BoxFlr3HPOpIPTy6fo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j0Vc3+3O; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAED5C4CEFD;
-	Thu, 30 Oct 2025 10:00:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761818443;
-	bh=346+e760JgoDE0rOIL0Z5pYbipi8wDRqFLzWehKJTz4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=j0Vc3+3O3qdNfktHo/tNOQyTgGwEDv47FN0tvy0nfUM40i18abYLnDjoHv1eAVAsW
-	 0/0OU+q6I8gXEI3LqSAQMJS3b6jNJPwVFu3vo1zNhreMp/mv51VBfmYeQr9BYaRUZr
-	 aXqlqS/aFv2NPIt6q4OOTFpWPgJGdp4hUNqQJOB5iYMCuFG9EZ95ON+/JjtxRjFmxQ
-	 BNtaOEnGlhn1la11L6QxDtdXtnakEWuh2JOKQBmAnR05f6alBoDp7QSQzujt0VJYnV
-	 CA5hkx9QgeTOsbCySV02A1wMv/Ese+fTSdoU70kXC0qAX5kstmvrPEKvNLp/absLR+
-	 XYnYDDg9oBLEg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF6B3A55FA9;
-	Thu, 30 Oct 2025 10:00:20 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1761818515; c=relaxed/simple;
+	bh=dXTC3SLxzp5wKcJKxLFNRweVNbKkU4TNi6Ad5nvL8nw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WuPcR3zi+/qmt4zCm/u1zDCov2+05ozmKqKXbZQ85cT9ptPzDZIrtYIK0MsYVFk65mLbI6yj6onqh8iWnQaJ09HSHKeIaEUvOtZSKIPIOo0GA3LWo1blKO5Y8LZNPj+15mF4P0LGGWYTujqC3/ed4W4PUOkaBwr9oFd2Xe5uqSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=RCRCoZgA; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=hy/Ad1X4; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59U9WU6A3117271
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 10:01:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	32h5K3ewwycqfrD/0JMWOprkDGOg3ozbJGj35ETznY0=; b=RCRCoZgA56ns6yDd
+	+yKBRhyBmEiRgH/A3pfEKSzWFhIR04h7Iz2FBrAGKfLc8PNTcxkcTOvIzbApPQnO
+	zDTib+W4cS1qTj+QOlhY2vSJ3etZp+sTAEwLusnkHsPrzHDq4O1Z/pYMi79ythDq
+	HtT/tGGuL+gK8LCKQW8g0luvCNoG+3ZxzKX1JCixIYksRw0511e+nmCkoUINzVe0
+	fj/cqmy6hR+2cS7ZV1/an2juZI/oX1duW9iPspKJtHEbpHz18dmNN87yFf3SzUw2
+	784rl2kTyWAGr9bq6ouvOMZgCqbnb8Kt/QF1esQkIyl0JK3hzK5uh+va+rxWJjwA
+	qDOypA==
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com [209.85.160.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4a45frg3dy-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 10:01:53 +0000 (GMT)
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-4e8934ae68aso2022991cf.2
+        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 03:01:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1761818512; x=1762423312; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=32h5K3ewwycqfrD/0JMWOprkDGOg3ozbJGj35ETznY0=;
+        b=hy/Ad1X4S9hsy6BorcZQAirjpATjozR2dVkjeDfnyheHjgSVKRiq3VcHjHvahYZNCi
+         VW9fz7Uilj0gGCCZeeYNIeuMcxuOCqkK0N8BSXJM8A5zFQYkXNmtqjSQALQRQb8Qs0bR
+         Dy5u2lGjXGexfHF9jOa+/mgeNui3IhaEtHW/mu5Nu8pOrPRaQ6Yr0mkeDa4Gte/7gAdW
+         ejUIvdje7Es0AZVLrfQSlbDE1u2lpRjgKiwKmwA8mlvZGgqW+e7P4+PhZ+d1ZCaJfpJe
+         aKI1d+MVvJSCnoOTkZhwOBEmR0yV6f1hGqizbm8Y+uP10mFliso6y8FfxOf/AXXm6xxa
+         cJZw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761818512; x=1762423312;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=32h5K3ewwycqfrD/0JMWOprkDGOg3ozbJGj35ETznY0=;
+        b=iNcFeKiN0O+iwKtuLvyQlAvlw/x/g0binBoCUiE2Q6AXvhP5cqeaX5hon15Z3s8SeL
+         yVRJSWhM8i265SrkI9HKX2zAO2KQMN3EBBk5sxlOyEyY0TtJ0h896xkhWqgY9LG8QPXU
+         oapoiaTdLM9chqrjIw8/vFMtDFRXax9u62z7LqVeVdO9D1Wv6jC7MuefBxTsDe7joSOK
+         7a/fL/uWE5zBZKv9Spn9qoL2nb+gmVCi9WVRyHbHx7CH1u35ts0LKnBtkWrkFsOrc/qh
+         iIDda8Ij+1oR0eX1dCX7CSuKydsrggiAPVS6Q4gTWmj2bFpAh3xgLQ/gcKo9ejbkUoGY
+         8HfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX86Q1He4Pn2ngOTIfn1i/+EB+OXWqFCnVgyv3WVsYN6zgxHlNUMbkVtZRP97ire3wy8sdf98w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxjsVAeAM5jBtFZHed75bx9/ZlaMLyS2C5uUhIwld5h5tvmoakr
+	cFNZxt00Bb6hhich5MN/iUaGBpdCIa3jhoHtsG2lJq5utsIrs/WrQ9j4TfW5IIrTT2soyYc1eVX
+	dz6wsECbFVCKZ3AxOdEmfMvM5KM3gLG+LR6agwoi+KwheBbu69P2okcnfKLY=
+X-Gm-Gg: ASbGncsmK8+naY5agf+rKjX99ahPU7gLkaSC1ol8mJrnRBhNRcQyAMpk9NpAwfhSOJm
+	yGeInIQd07VbjLJtHf5npd1EIQuM0ORgMtndm32oRuGYBgrQwFbZVAMX2Jk0rqluTaRg3WTarip
+	to56HbuSEFDsBhv31t1y3LahLkeoRouhAjh6+asatqdcxQ16xlHwh7EZ2AMaa2oBt1NGgNW8+qh
+	GMfk3ukFNfisLceE4IWAdl8M8yf5KLCBs8y6Yk3R8UWdhU6uCVF5kPPYa6ZltannX7C0vBRGGzU
+	V36U/G6MbmYadvbxihOap/8mrXgPEZh2QjDFrsGwtfd80owFblHaY8aXAYd8u5WwftyBf6rt5+J
+	3EhIi83HAyXWv5bSKuLzaqIaZ4qPMheb70BYxuWF0FHq9x825hgR7RaU0
+X-Received: by 2002:ac8:5f0e:0:b0:4ec:ed46:ab6d with SMTP id d75a77b69052e-4ed15c0e8f8mr55333831cf.9.1761818512274;
+        Thu, 30 Oct 2025 03:01:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFRkwzCLPCxSVHJgMpfb+sSifTWDoxG9G5XDKheZ5CxBk6Vcn9HesLaF6FBOsZzqqrVE4rY6g==
+X-Received: by 2002:ac8:5f0e:0:b0:4ec:ed46:ab6d with SMTP id d75a77b69052e-4ed15c0e8f8mr55333381cf.9.1761818511580;
+        Thu, 30 Oct 2025 03:01:51 -0700 (PDT)
+Received: from [192.168.119.202] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7058770e28sm164872366b.13.2025.10.30.03.01.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Oct 2025 03:01:51 -0700 (PDT)
+Message-ID: <7a774a6d-3f8f-4f77-9752-571eadd599bf@oss.qualcomm.com>
+Date: Thu, 30 Oct 2025 11:01:48 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next v4 00/11] Add CN20K NIX and NPA contexts
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176181841975.3782609.17766308913063444963.git-patchwork-notify@kernel.org>
-Date: Thu, 30 Oct 2025 10:00:19 +0000
-References: <1761388367-16579-1-git-send-email-sbhatta@marvell.com>
-In-Reply-To: <1761388367-16579-1-git-send-email-sbhatta@marvell.com>
-To: Subbaraya Sundeep <sbhatta@marvell.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, gakula@marvell.com,
- hkelam@marvell.com, bbhushan2@marvell.com, jerinj@marvell.com,
- lcherian@marvell.com, sgoutham@marvell.com, saikrishnag@marvell.com,
- netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: stmmac: qcom-ethqos: remove MAC_CTRL_REG
+ modification
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+        Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+        Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
+References: <E1vE3GG-0000000CCuC-0ac9@rmk-PC.armlinux.org.uk>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <E1vE3GG-0000000CCuC-0ac9@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Authority-Analysis: v=2.4 cv=KupAGGWN c=1 sm=1 tr=0 ts=69033791 cx=c_pps
+ a=mPf7EqFMSY9/WdsSgAYMbA==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=EUspDBNiAAAA:8 a=YjBZYspd3xVaAZo-ivoA:9
+ a=QEXdDO2ut3YA:10 a=dawVfQjAaf238kedN5IG:22
+X-Proofpoint-ORIG-GUID: EoSBaCTIJ_Jm2kBQFOAsq5EnfTl9vQt0
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDMwMDA4MSBTYWx0ZWRfXx+tVAkjbx4E0
+ kWvfeOk1TAqnp/PggGsVZjYT0YMIpi610YYHJAnwnCsAjtTdMKU4wbt5nQ5SioeLKPT2KXhuz1i
+ 0OVT3dWmU0qkO+h1Bkm+D3XQJk1m2qCpTBJwXWU0cPurF4A26+ukU+969yjSDgbHMbgaDRBXB/+
+ wXBvsDaHPs65GPwmCW9gzhu1zjqKS/2VSFhnKFs19VOYtIU4QOfV7n4kJZXQgBR2wLXGUvrE5bS
+ VvAGcxCQF/GPiNSplQ+dN6O8wPcAXCbVLNxO54YpdkoJ+TOwjpM5xE6bZlFwOy5zxchGA4MvDMI
+ I0TY14cJ0duaIeixyDKK84AjsnqpPBEKAOznpctJqZrm4kiUgnqmPf8FRIEG2pmdMlUeIk2e4Oh
+ EOpj1maTnH5VBG7JonXiA492DzbbPA==
+X-Proofpoint-GUID: EoSBaCTIJ_Jm2kBQFOAsq5EnfTl9vQt0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-10-30_02,2025-10-29_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 suspectscore=0 bulkscore=0 priorityscore=1501
+ clxscore=1015 spamscore=0 impostorscore=0 adultscore=0 phishscore=0
+ malwarescore=0 classifier=typeunknown authscore=0 authtc= authcc=
+ route=outbound adjust=0 reason=mlx scancount=1 engine=8.22.0-2510240001
+ definitions=main-2510300081
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Sat, 25 Oct 2025 16:02:36 +0530 you wrote:
-> The hardware contexts of blocks NIX and NPA in CN20K silicon are
-> different than that of previous silicons CN10K and CN9XK. This
-> patchset adds the new contexts of CN20K in AF and PF drivers.
-> A new mailbox for enqueuing contexts to hardware is added.
+On 10/29/25 11:18 AM, Russell King (Oracle) wrote:
+> When operating in "SGMII" mode (Cisco SGMII or 2500BASE-X), qcom-ethqos
+> modifies the MAC control register in its ethqos_configure_sgmii()
+> function, which is only called from one path:
 > 
-> Patch 1 simplifies context writing and reading by using max context
-> size supported by hardware instead of using each context size.
-> Patch 2 and 3 adds NIX block contexts in AF driver and extends
-> debugfs to display those new contexts
-> Patch 4 and 5 adds NPA block contexts in AF driver and extends
-> debugfs to display those new contexts
-> Patch 6 omits NDC configuration since CN20K NPA does not use NDC
-> for caching its contexts
-> Patch 7 and 8 uses the new NIX and NPA contexts in PF/VF driver.
-> Patch 9, 10 and 11 are to support more bandwidth profiles present in
-> CN20K for RX ratelimiting and to display new profiles in debugfs
+> stmmac_mac_link_up()
+> +- reads MAC_CTRL_REG
+> +- masks out priv->hw->link.speed_mask
+> +- sets bits according to speed (2500, 1000, 100, 10) from priv->hw.link.speed*
+> +- ethqos_fix_mac_speed()
+> |  +- qcom_ethqos_set_sgmii_loopback(false)
+> |  +- ethqos_update_link_clk(speed)
+> |  `- ethqos_configure(speed)
+> |     `- ethqos_configure_sgmii(speed)
+> |        +- reads MAC_CTRL_REG,
+> |        +- configures PS/FES bits according to speed
+> |        `- writes MAC_CTRL_REG as the last operation
+> +- sets duplex bit(s)
+> +- stmmac_mac_flow_ctrl()
+> +- writes MAC_CTRL_REG if changed from original read
+> ...
 > 
-> [...]
+> As can be seen, the modification of the control register that
+> stmmac_mac_link_up() overwrites the changes that ethqos_fix_mac_speed()
+> does to the register. This makes ethqos_configure_sgmii()'s
+> modification questionable at best.
+> 
+> Analysing the values written, GMAC4 sets the speed bits as:
+> speed_mask = GMAC_CONFIG_FES | GMAC_CONFIG_PS
+> speed2500 = GMAC_CONFIG_FES                     B14=1 B15=0
+> speed1000 = 0                                   B14=0 B15=0
+> speed100 = GMAC_CONFIG_FES | GMAC_CONFIG_PS     B14=1 B15=1
+> speed10 = GMAC_CONFIG_PS                        B14=0 B15=1
+> 
+> Whereas ethqos_configure_sgmii():
+> 2500: clears ETHQOS_MAC_CTRL_PORT_SEL           B14=X B15=0
+> 1000: clears ETHQOS_MAC_CTRL_PORT_SEL           B14=X B15=0
+> 100: sets ETHQOS_MAC_CTRL_PORT_SEL |            B14=1 B15=1
+>           ETHQOS_MAC_CTRL_SPEED_MODE
+> 10: sets ETHQOS_MAC_CTRL_PORT_SEL               B14=0 B15=1
+>     clears ETHQOS_MAC_CTRL_SPEED_MODE
+> 
+> Thus, they appear to be doing very similar, with the exception of the
+> FES bit (bit 14) for 1G and 2.5G speeds.
 
-Here is the summary with links:
-  - [net-next,v4,01/11] octeontx2-af: Simplify context writing and reading to hardware
-    https://git.kernel.org/netdev/net-next/c/85708c5d5f5b
-  - [net-next,v4,02/11] octeontx2-af: Add cn20k NIX block contexts
-    https://git.kernel.org/netdev/net-next/c/b5dcdde074d5
-  - [net-next,v4,03/11] octeontx2-af: Extend debugfs support for cn20k NIX
-    https://git.kernel.org/netdev/net-next/c/45229e9a9ab5
-  - [net-next,v4,04/11] octeontx2-af: Add cn20k NPA block contexts
-    https://git.kernel.org/netdev/net-next/c/8a8b13012774
-  - [net-next,v4,05/11] octeontx2-af: Extend debugfs support for cn20k NPA
-    https://git.kernel.org/netdev/net-next/c/e4a8e78aca5e
-  - [net-next,v4,06/11] octeontx2-af: Skip NDC operations for cn20k
-    https://git.kernel.org/netdev/net-next/c/a861e5809f3e
-  - [net-next,v4,07/11] octeontx2-pf: Initialize cn20k specific aura and pool contexts
-    https://git.kernel.org/netdev/net-next/c/d322fbd17203
-  - [net-next,v4,08/11] octeontx2-pf: Initialize new NIX SQ context for cn20k
-    https://git.kernel.org/netdev/net-next/c/81f12533572d
-  - [net-next,v4,09/11] octeontx2-af: Accommodate more bandwidth profiles for cn20k
-    https://git.kernel.org/netdev/net-next/c/f7774633cf25
-  - [net-next,v4,10/11] octeontx2-af: Display new bandwidth profiles too in debugfs
-    https://git.kernel.org/netdev/net-next/c/47a1208776d7
-  - [net-next,v4,11/11] octeontx2-pf: Use new bandwidth profiles in receive queue
-    https://git.kernel.org/netdev/net-next/c/33d8a1f45729
+Without any additional knowledge, the register description says:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+2500: B14=1 B15=0
+1000: B14=0 B15=0
+ 100: B14=1 B15=1
+  10: B14=0 B15=1
 
+(so the current state of this driver)
 
+and it indeed seems to match the values set in dwmac4_setup()
+
+Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+
+Konrad
 
