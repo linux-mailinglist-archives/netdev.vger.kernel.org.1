@@ -1,232 +1,199 @@
-Return-Path: <netdev+bounces-234505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61140C2238E
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 21:22:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65E25C22402
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 21:32:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C5C0734FE85
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 20:22:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 691F93A56AE
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 20:31:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E89034D3BF;
-	Thu, 30 Oct 2025 20:22:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0616A2765DF;
+	Thu, 30 Oct 2025 20:31:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dpPJ9ceV"
+	dkim=pass (2048-bit key) header.d=rootcommit.com header.i=@rootcommit.com header.b="KUb3umUm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from bee.birch.relay.mailchannels.net (bee.birch.relay.mailchannels.net [23.83.209.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A63A734D3B9;
-	Thu, 30 Oct 2025 20:22:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27E062AEF5;
+	Thu, 30 Oct 2025 20:30:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.209.14
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761855770; cv=fail; b=jyWx6BNinYpSXEzDPJip4WI//QUtRffbsZeFOfVU4jLLdUxCkdMwqSDdkahaURKiXYhthPi/wLQeZwPCBUwe7IoHUiGGJvYwXSc/LaMwUa0SXDOdaBv8so9h+0aqzo4VzamiKKyagJ4t7Z4bYUGA07d4qV8BnNBen7pBLr2kFEE=
+	t=1761856260; cv=pass; b=JJ/WqXendqE6TsogY1SOhfgQa/4RBBB4LGfG5wCFoYsJi3B1+ex2asa7ziFzJJ6DSfg3jhavL9KLK0TG0zok4OqOLEt4cAqRAoNikxtymadX+gTvJuxM9aRokVEGHOTPbMjXhhusPaglT7QWl450dMdKh9Ov1cgpi+5cbr1Fw+k=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761855770; c=relaxed/simple;
-	bh=aSeFjK31Tt+rsnIEwrAxi4gAqcecXMVpHsGueF18638=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=nfL7w8ewa9lbYkxBKYiq6H9VtVGSR5wuGujCwVibFtJx+cdR79l7eTZQ1eOLolP4RF6LJGbuBBkaJ1ARjavb5TSF7AI5BTuQi2NwgzQswJIoCx0PCHkU5xiw0zIpX/JU0yt1qXePbGHO0vOvPmCWfUQ0Em5G9KoOIcsxHwF4EPc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dpPJ9ceV; arc=fail smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761855768; x=1793391768;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=aSeFjK31Tt+rsnIEwrAxi4gAqcecXMVpHsGueF18638=;
-  b=dpPJ9ceVa+DbiCGIcs1I1MxHSSh2Blb7+XFPsY5ujdub/EE2dMdSorJy
-   Fr/1W+OuVyHyQWQim+zNcZf3HMgxzVM8pyG6HZtygtYHokK4Bp86RCrs3
-   RTbTDcXzyGp0KN2cw1M31WN1GxdFA5Swjsf4ufOKQEiFv8fqSJ24zPNW9
-   Zw9uqx4AGXn30HkQOMSG8Lbx/qVtNdCB3+vT5OIhgAsG27Xu2N4Nmg9Mw
-   RRkEzZUi14Z8P8SEIdimOVxncxmzYQGc0u9/lSYcdwcnkc7ljL3DPQ8rb
-   8nxW1BKo7HNazXuPrCXYkusAhS8/KtcRmeRVWf1WypZkSNzB1Utip9W4G
-   w==;
-X-CSE-ConnectionGUID: AR3IXT2ZStixxkpdIYoPMg==
-X-CSE-MsgGUID: 6PeBw4PoRoCMsscgNgGP0w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11598"; a="66624807"
-X-IronPort-AV: E=Sophos;i="6.19,267,1754982000"; 
-   d="scan'208";a="66624807"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2025 13:22:45 -0700
-X-CSE-ConnectionGUID: C98oSqv7REqhllFoMmBvFQ==
-X-CSE-MsgGUID: C9vAws7CRzWjqV89DqIouw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,267,1754982000"; 
-   d="scan'208";a="186490785"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2025 13:22:45 -0700
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Thu, 30 Oct 2025 13:22:44 -0700
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Thu, 30 Oct 2025 13:22:44 -0700
-Received: from CH4PR04CU002.outbound.protection.outlook.com (40.107.201.49) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Thu, 30 Oct 2025 13:22:44 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=AieUbf0a9TuXMyPbIelv762mDysOjNFOhVa/tvVhnEPeRlIN//WcQIyPihqm7FhO19Elysjg6BAbEM78S8MzNvalRWfpzykoKDzGJEoqhkVzvg8Ta8d7Td2hmvaFj0XhlXKTN6Vo5bg2S0qYPZLxEDvN5S1+e4E+14Q7O6Drv8uHyaz15n5fS1WhoUqBwUNoblVTxcdvKBBUme/nwfnwknzV/L22rAYDq/i1nSZqfjQr629i2j3i+l9KvawZjK04C8TM/WMWR2FGszHUkeyfM9FQW797ntDmBvocY0fi9KGrCNjgXKPtAzDKytwHbZWSJlZJWnlRTj3xHlRSue3/8g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CNNYpIrE38Q44KUIGz1XL/hYo5H1GZbcATENPntieFg=;
- b=cgmin9y0ZoFvmhhriySmAQEbr/kL3N5tSUIkoNQWi65OblXRWVExX5xVnnIP6lzmW6mi3+qT4/ZghRAeEqqDV7h4KYks5Gi8wRUxXW2GFYKdLQnlArmGiIkdBQPe3iYgQHteLxVMeW2kWMG8rM1mFtLEEmDb6kDdpIir9EgVxkX2i9wy5F8bwQk4kZPX8yYE7NNp15POpI/FMMafwGOWLng7UthP0oNjQlYSji4iZQr5DLD5fdAAtfieW+YZC2Wkfjy3+4OzDIUFkn2hG7Oa/6QOXvTFDNWmrJs+aYUAXMKWyN3t34JtQdLVAzw3t4tjeJHoEv51m3IhyQJWknHi2A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- MW6PR11MB8338.namprd11.prod.outlook.com (2603:10b6:303:247::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9275.13; Thu, 30 Oct 2025 20:22:41 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca%4]) with mapi id 15.20.9275.013; Thu, 30 Oct 2025
- 20:22:41 +0000
-Date: Thu, 30 Oct 2025 21:22:34 +0100
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <bpf@vger.kernel.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
-	<hawk@kernel.org>, <netdev@vger.kernel.org>, <magnus.karlsson@intel.com>,
-	<aleksander.lobakin@intel.com>, <ilias.apalodimas@linaro.org>,
-	<toke@redhat.com>, <lorenzo@kernel.org>,
-	<syzbot+ff145014d6b0ce64a173@syzkaller.appspotmail.com>, Ihor Solodrai
-	<ihor.solodrai@linux.dev>, Octavian Purdila <tavip@google.com>
-Subject: Re: [PATCH v5 bpf 1/2] xdp: introduce xdp_convert_skb_to_buff()
-Message-ID: <aQPJCvBgR3d7lY+g@boxer>
-References: <20251029221315.2694841-1-maciej.fijalkowski@intel.com>
- <20251029221315.2694841-2-maciej.fijalkowski@intel.com>
- <20251029165020.26b5dd90@kernel.org>
- <aQNWlB5UL+rK8ZE5@boxer>
- <20251030082519.5db297f3@kernel.org>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20251030082519.5db297f3@kernel.org>
-X-ClientProxiedBy: VI1PR04CA0121.eurprd04.prod.outlook.com
- (2603:10a6:803:f0::19) To DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19)
+	s=arc-20240116; t=1761856260; c=relaxed/simple;
+	bh=aEyoDquK8jAwPsAQ35ZiPdK20ciUdFTGMEON6HpyF4U=;
+	h=Message-ID:MIME-Version:Cc:Subject:To:References:From:In-Reply-To:
+	 Content-Type:Date; b=P/6bhEgcgvr/0L0QSG+A3Iv/HHY5A1CT2AwpDwQXJZCPto20FJ6kwfdaZq4fMM2r9M5asmyr85bYOeiGs1P8I7FC0LEhP9nNBYxCGfw7qsiOE1HUDwWiB8LyexfH6kTCgibtcymzmEYlPdq+yr5OEjB9HfRHrLbzCQlT3WlAYic=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rootcommit.com; spf=pass smtp.mailfrom=rootcommit.com; dkim=pass (2048-bit key) header.d=rootcommit.com header.i=@rootcommit.com header.b=KUb3umUm; arc=pass smtp.client-ip=23.83.209.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rootcommit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rootcommit.com
+X-Sender-Id: hostingeremail|x-authuser|michael.opdenacker@rootcommit.com
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+	by relay.mailchannels.net (Postfix) with ESMTP id 2FD83122527;
+	Thu, 30 Oct 2025 20:30:51 +0000 (UTC)
+Received: from fr-int-smtpout24.hostinger.io (trex-green-5.trex.outbound.svc.cluster.local [100.121.213.161])
+	(Authenticated sender: hostingeremail)
+	by relay.mailchannels.net (Postfix) with ESMTPA id D7509121E4F;
+	Thu, 30 Oct 2025 20:30:47 +0000 (UTC)
+ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1761856250; a=rsa-sha256;
+	cv=none;
+	b=W4sLALF+qWRi6YFhm9pKU0AhFcAeETFdMSMjeuNgQOOe30Svjb5143UUVJioNqozSV0J9m
+	NuBzhcujJx3fTIqg5ENq3I84VIy5IDJOvDb/youv2e3Y7+j7OEQxlXu7LkuOm05vejeglH
+	sf1W0o6qYupVeOHlLL7gBwoJIg6oCRh94JG9QgwhUtMmTjUArSjSLZxQJmL5v4fbcLoW2+
+	f3kCCOhw4XU2p9DeiKcB+MrJkC138i+ozw5mQbD02j5+Oc/JlrpJXkoLX6v65+xeFXYqpa
+	urNLiw9HSRIvQHFihW94tf5m64SXUoYvAvhYVhP2nJuUNm/3J7/qOnsEYnR5Mg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+	s=arc-2022; t=1761856250;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:dkim-signature;
+	bh=a/3w0tSYmbrdB8Bc4VelKk3WHGunz92aPVIP7o7nUFc=;
+	b=bNxOHqPHJFk4pM9jx7Fekg0BHSeXHBdSyjGJVawywlQhTDcYZxUCVMR04hvlq7tgFK9Z66
+	lqU+bsxS8CAyYaRvYjDYoqGj2uXohbt5/ntKBlzGzljYIB8FWLbqKUwsy0pM2aK8SDbUp3
+	RMiJizSUdyFnMDP+XxoLt27fDvYWqdNkt2d4hF0gOAWgO4F0qqd5Lb+bfRIV+zEuyYHJoD
+	zlcrGKUrw2tPDLxfVW+PskBJ2mh7U1LoVsFuiZLqllpqVPILPZ3c3+YXUNVDyRevPxFzK7
+	WzgSXd0HwUkU1mbPawObgvyXZOxJ+GDkcxOaVX8mB9V46MReFnBO6k8ndqtuQA==
+ARC-Authentication-Results: i=1;
+	rspamd-768b565cdb-w6swn;
+	auth=pass smtp.auth=hostingeremail
+ smtp.mailfrom=michael.opdenacker@rootcommit.com
+X-Sender-Id: hostingeremail|x-authuser|michael.opdenacker@rootcommit.com
+X-MC-Relay: Neutral
+X-MailChannels-SenderId:
+ hostingeremail|x-authuser|michael.opdenacker@rootcommit.com
+X-MailChannels-Auth-Id: hostingeremail
+X-Thoughtful-Abortive: 7dfbeef6333ef82d_1761856250704_2966912137
+X-MC-Loop-Signature: 1761856250703:941208266
+X-MC-Ingress-Time: 1761856250703
+Received: from fr-int-smtpout24.hostinger.io (fr-int-smtpout24.hostinger.io
+ [148.222.54.15])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
+	by 100.121.213.161 (trex/7.1.3);
+	Thu, 30 Oct 2025 20:30:50 +0000
+Received: from [IPV6:2001:861:4450:d360:c0a5:3392:2a75:70e6] (unknown [IPv6:2001:861:4450:d360:c0a5:3392:2a75:70e6])
+	(Authenticated sender: michael.opdenacker@rootcommit.com)
+	by smtp.hostinger.com (smtp.hostinger.com) with ESMTPSA id 4cyG2q1f02z1xmj;
+	Thu, 30 Oct 2025 20:30:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rootcommit.com;
+	s=hostingermail-a; t=1761856246;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=a/3w0tSYmbrdB8Bc4VelKk3WHGunz92aPVIP7o7nUFc=;
+	b=KUb3umUme+l1IZqbe9VYEU0d+/Tfpt4Xuvf0mIDDtIk8O+OnQAIooo1HyJSHxZqyjWcZqn
+	cGHfiM9bVWL+WnYI9ArPL/DGnwDQ/s7J/VfTILVwUpdva5klS/XbnbpT0BDmm3v6m/72bF
+	7QFl8Mj8QC5g4yxhkznK8yPVWhyQr2lbsWffIJVQfKrVHAM6PZQ/K37EiU+COSbyYiuiF1
+	HRXfyl34zjYy4OAAmGG9U4kb3C2Hkal5BtqaVuODDxmVAfA0U3tbotkkKV9koXDewL/Y4f
+	avu5mRahhaTp0+H1XrAdEvR57RErj1vhld5vLOrBSzZyKd+Mb2137TUde7dz3g==
+Message-ID: <b0624cd1-c223-459b-81dd-ddfe05ea23bf@rootcommit.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|MW6PR11MB8338:EE_
-X-MS-Office365-Filtering-Correlation-Id: b987e6a3-67f5-4489-406b-08de17f213cc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7416014;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?R55NtJ+jbjnmhG4ycuMW8r0t67QWqpRHE/oPXR2+Jf6r2jGMhtCUKPdgQwAB?=
- =?us-ascii?Q?+Oglamn26SBtmwan7fXmm047KE1/tvEnoxLX9Vn2PV/Jpokuu150K5/Lf14N?=
- =?us-ascii?Q?iWe7nCzkvjRknX7WAvHpo7aOg2CrNnPFyVLsKoCD1q9MsRCT8t1nxR7ozvHn?=
- =?us-ascii?Q?g83UM0q8/Md54i1KaHIH2onrPVypBana6+lEji9WkN039a4201Rdle97LVv/?=
- =?us-ascii?Q?7f7xXUGED5wcDLX0HTX7rYW86PAmEMtmSRUiQ7zHN0p7bBJV2t/nQ+myPUth?=
- =?us-ascii?Q?/0TTy/92nIG0VUyVkKtumGrIPUqt5eO+3YmloiF6ew3e+vrWCxEj9qOefjBX?=
- =?us-ascii?Q?cyJ3IkdmGQHqEkWKzxOrNwnRoEzhSyBjkgqMSfQav4Imjb10mgI3+iPvPpqN?=
- =?us-ascii?Q?aZbF+xG7esOldhQw+byP/QEz49pe2GLBgXF9qMnvA85j4eVEf0ESZ1px7KDC?=
- =?us-ascii?Q?Zk56DTHJPfEF7RM3fFYPkGo/PFxjnLllcul9/i/yhafHJCLTGOGZSx8hAtgb?=
- =?us-ascii?Q?K+q5g1BikEayloRfmX4oMGwj4dJmvPkABMqw4uM0MrB2qJx8SZO4pC/ReeEg?=
- =?us-ascii?Q?+xggK9m7ZJbpluuIjUNEB765kj0jtRhXgoEpeoKTG4Uir//kt4L8XgnD9toF?=
- =?us-ascii?Q?hcn9v9UmN/1i9lpML/GFJT4KYMSWFo1YFKvfYX2x4IhRtfClikR6oEFvRWMu?=
- =?us-ascii?Q?QqE48nxYH41jplgKwUSlcbv1BNsCLHdqXWDnJV+NBZ1M2PBLHuOS8eU5+7w1?=
- =?us-ascii?Q?EwIZVFYOkAETFtImRIeF8HQDDUfv/xyDmxPgjcxtnf1tGZbowbQc0LTtuwdK?=
- =?us-ascii?Q?1N/F/EWTlm2H4fESCg4cfVA/O20NCU8UbRtOX3QP3Pzc0JfhbHCRiKO66dMK?=
- =?us-ascii?Q?O+42p6REeipHuKADaJ6LGB62wQFCd3iv3cKN80laX2mbzQGflfjWAcixfi/N?=
- =?us-ascii?Q?G8WS5I1nw+qFBiy7qEAZjX973hcf72eFhb6hLbB2+oWQFXNrS/BEQerFdFXL?=
- =?us-ascii?Q?nmo30o/DXFihCgEz8PG0cyqG/OMYH5LA5BvJSqVTlmE/JCKfF1VPhvoTpdG/?=
- =?us-ascii?Q?SnMVmgH5YgAQP5ymP/llQEedDo27I9/xPPQgwFqxnGtNsYW6O0F02GhIEiwR?=
- =?us-ascii?Q?1FGeC5D06eYMImyl7YHWZwGc8W7F2uUwrkVRwPkmgMXGysU1rvR0P75Qsniz?=
- =?us-ascii?Q?EbcfOsqX3mSTHmPJWYrUnj7cPNzme6LHEqzs51idzIVSh7aSvVQD/c35WAmy?=
- =?us-ascii?Q?zhtTBHIJtpdRwkAATYAv0RiLqtTbm2LWUi0ciqzPRTYNzKVP4jLa3g1XEBF2?=
- =?us-ascii?Q?BiCUjuO50ssud0rRLev5jwHdBuBMQZzqFH2FyJ4HGR6/L09H/YDOOfTTFbQt?=
- =?us-ascii?Q?WgMQuzKE5b1sRPIlXHIXv9R+AyY9cpE8G7/538MdRr8/6p1gqLt1uDPxWwai?=
- =?us-ascii?Q?srm6XZvZg0VBSWrUEp2Xp/m9ttEpedKd?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?BWsHdliSYQ43rZzDY5aP/A5hJBjqzuS3gNytJUv78FsxOfCgqYb8TgRPDouA?=
- =?us-ascii?Q?qikSHo2Hp8MIkxuxEJGr5sRxHUkEIkG0ZSnMVn62IS9SNFZOLk2FbvxI79EF?=
- =?us-ascii?Q?RjlSZsfVtueFJr0DZE2SI9umtreUguMloFYNDuQuDybeWoLe2kHyKU6Z8r5h?=
- =?us-ascii?Q?v+w5vfSHZxYFvjrxXA8RjM3WpGF1zV2csWXf/reliLmHu9DAKosrcnJRG1QT?=
- =?us-ascii?Q?FLHakTvBwUAHWoo8k8LYKf45JO0yf+LRqqzyIDz2B4WGabacVbl5UiYD0ElB?=
- =?us-ascii?Q?OyDUUQ2HFI3vGnFaltPGm3nGM2i+/TYaqf6Fqi9tby0iCBsOlrA5ymLodtHK?=
- =?us-ascii?Q?Ap+DzD2/foz0g6e13PQvUL/pvLTUDmjcTRLyceh7gA9Sod2TgfcKATQjOxjn?=
- =?us-ascii?Q?J7nR9cifM4KlJK6XqRvLCwZ+98GhaSBO4KI6VEv3Ji7bFxi2gsroq4//1QF3?=
- =?us-ascii?Q?/94Zn2mGW8aaNEgHSszQhq5Vh4gIuOslQe5d9YqvOW7XmodbrDTgOv6MBPka?=
- =?us-ascii?Q?D+gPenvcELI5Avxw5IDt4PWgtY7XvXRll/qVTJLOyAnswheF6nUpV02Yihpv?=
- =?us-ascii?Q?Sq3W0YJNgnQU4hs/JmEsu4/4ySQkahCIegfmi1UHf12u5puw52CPsg72h7Xl?=
- =?us-ascii?Q?k6K2CxRx/ynDCQhagFCvlJqbXexX8un2lQGuVvhzODzzpC8cwdRJA2zRr26P?=
- =?us-ascii?Q?8/ZPL42epa6juEjVK3PllJ/CNW5dJ2WBWwgFnf/BvxzyJe16+bBeKs6g50E7?=
- =?us-ascii?Q?DoEFXVrYO+GViczwHyt7KRUcHVYseSsfKQQajl3D6B5EPgYTMVNiqxPos/0i?=
- =?us-ascii?Q?w9O97E2r8ExsFbcLrpRJkZlDfF5MTDjByk0Gs4V3Tq3Q9cpws0gJC4UV3x5V?=
- =?us-ascii?Q?XgxYnZwya7yrlYNzCAto6FuVLxKZNpvg3DItb9yb+KvzNgBWmVf71smz4NHo?=
- =?us-ascii?Q?03oUNl7MlvBnMjhUttFDWohVj4bkQKwuhRIVChc6okKn8NcmbR/wmFHZPXIw?=
- =?us-ascii?Q?3KUvf91p3ekS1HcUcRg+WeHA5DKbzs/m7jwOwbr33mlsukIg2Gj2Jtcv35ZW?=
- =?us-ascii?Q?u8VJOrVpjF1pycAPePf4CMl/56k5wbMWOJKUkENldmDFM/430cfgzDI6lhrT?=
- =?us-ascii?Q?2y+tUepzVwp1oDnXxHrfeln8ImZWS9JytXInSnBw+uJCCgfY3dHCaqmo0CD9?=
- =?us-ascii?Q?IRedJ89eK04kEaYF+0wtQdBwvPEmhb1/on1fXxhk5nq60hIDOvnHSvkVDuqX?=
- =?us-ascii?Q?nBYNbY2PJiwwNI+Rw7/XybqxB9ra9gxycqzDIxhJ/UJ6rwmuCmlLJTNeqSs9?=
- =?us-ascii?Q?AJDnPiaG0yP5ViaQ1c39uZI3GvBzF5EZ0MBUpGvuL375oYknw6qQHH+/7uDg?=
- =?us-ascii?Q?lDvm08ZO1BFQMPTOdoZTBZkqxVsFTcBI1IQ4haanbSeUiwnZAEEJKFQS6BeV?=
- =?us-ascii?Q?76Qqmdfo2ya/jYCviwyje4H/JkqCDC7HbCaJOtBSvUduMPr1MGjEZ6s5a7sa?=
- =?us-ascii?Q?IH8NXxGWihsAYq9NplS1Cif0/C2mPxWwhY1xvJV7u8HIU4RCGfg3Z9PaHdYh?=
- =?us-ascii?Q?pv+jBzfPjLXr1NGganqiuGYICgM4jGXIswi9NhJe7FYn4yv5n0eT7ST5vC6B?=
- =?us-ascii?Q?9Q=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: b987e6a3-67f5-4489-406b-08de17f213cc
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2025 20:22:41.7036
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: skOqd9NagILZNudVk4SLZXvnPtuXrhQXUsxBthvORLpILiA2FPOdiOPC9TGEmV7Lo7dwuzyaJeR8R1EV10LkUFQO4+kO30fnhavDgyTuQ7U=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR11MB8338
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Cc: michael.opdenacker@rootcommit.com, netdev@vger.kernel.org,
+ linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: spacemit: Implement emac_set_pauseparam properly
+To: Vivian Wang <wangruikang@iscas.ac.cn>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Yixun Lan <dlan@gentoo.org>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Troy Mitchell <troy.mitchell@linux.spacemit.com>
+References: <20251030-k1-ethernet-fix-autoneg-v1-1-baa572607ccc@iscas.ac.cn>
+Content-Language: en-US, fr
+From: Michael Opdenacker <michael.opdenacker@rootcommit.com>
+Organization: Root Commit
+In-Reply-To: <20251030-k1-ethernet-fix-autoneg-v1-1-baa572607ccc@iscas.ac.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Date: Thu, 30 Oct 2025 20:30:42 +0000 (UTC)
+X-CM-Analysis: v=2.4 cv=Lflu6Sfi c=1 sm=1 tr=0 ts=6903caf6 a=oMt8lXEVxmMAvUTv2ASLGA==:617 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=NEAV23lmAAAA:8 a=d70CFdQeAAAA:8 a=J2c-WwRuk2R10H0XxeMA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10 a=NcxpMcIZDGm-g932nG_k:22
+X-CM-Envelope: MS4xfDFDEgdfardwUXzuBuR06atOkE6SSVOwQrmHHmrTNGXJHeYVxusT/9hE/NioNVKaOlepWagMqC+D5Q3T+2W962ludmIA2u9300rs8JLhqXRwlpqzwX4M MFf9UPIPfXHJfXSpraVAWY8YGDgne+pB6Y5OJB5/31YRJwyqp74hdJvfkhD6a4n2C62p4rdwS1YlgxDn8wrQ5A6qEtA++lEeEkkz2voj7dVCNaQB9JZpZn/n 713oZYTAyiLt10pcr3UunZS+Ev+jNOaVHzEQoX1ni/lvpd72LCBAhDjM2R3yeeRKYV/2fsesLhRDWzca9vPv+tHPlU93czUqLAbU41gCK5wXoeKMW0TiXAyM usj45M9xNUSqrdkVAh/Hc9ZlaqhO89H97nYT5Qm4DI5Kly6w6nN40dlkDAJ29s59eFgaxQbloaJXKfZ4m3AVXs+hz9/2m664ih8Ou/xV+1035TLnYiG4VqYs 0OHFRS6Ul1DiFJAfrEDxjLSF26kNxaDUQUAMcOqU4k4vg4Yplljoj8j5HP7nIXlIUXo6mxX1cMjWD7xMPgHqNsiNS5WeX/hBSgkVxHLIMrPW9iJCu2OLJqK3 bdcZokvTk9RTFkZwBJvMPI8spnmBdooBlYmWSuNgjy6ybm6PTnd7Vzv5PpTClndSPRGQE7CphIsPUsDGrqfBnWG/cLpfLjFHY3o35c7IGMoQRp9Xi9ASUStV iX7CBJQYXDg/Qxx4zRdXOVLJqsXdkCN+LPtLk4aocTmA0PhtGdy4EWfVB81hxdfOT0kZZrUazI//H1Hiqsm8sW+si5CIzBgJux7NrupIzSP0C1RTSk0VFIEY 9KkcrGnThmWQSvMeNrg=
+X-AuthUser: michael.opdenacker@rootcommit.com
 
-On Thu, Oct 30, 2025 at 08:25:19AM -0700, Jakub Kicinski wrote:
-> On Thu, 30 Oct 2025 13:14:16 +0100 Maciej Fijalkowski wrote:
-> > On Wed, Oct 29, 2025 at 04:50:20PM -0700, Jakub Kicinski wrote:
-> > > On Wed, 29 Oct 2025 23:13:14 +0100 Maciej Fijalkowski wrote:  
-> > > > +	xdp->rxq->mem.type = skb->pp_recycle ? MEM_TYPE_PAGE_POOL :
-> > > > +					       MEM_TYPE_PAGE_SHARED;  
-> > > 
-> > > You really need to stop sending patches before I had a chance 
-> > > to reply :/ And this is wrong.  
-> > 
-> > Why do you say so?
-> > 
-> > netif_receive_generic_xdp()
-> > 	netif_skb_check_for_xdp()
-> > 	skb_cow_data_for_xdp() failed
-> > 		go through skb linearize path
-> > 			returned skb data is backed by kmalloc, not page_pool,
-> > 			means mem type for this particular xdp_buff has to be
-> > 			MEM_TYPE_PAGE_SHARED
-> > 
-> > Are we on the same page now?
-> 
-> No, I think I already covered this, maybe you disagreed and I missed it.
-> 
-> The mem_type set here is expected to be used only for freeing pages. 
-> XDP can only free fagments (when pkt is trimmed), it cannot free the
-> head from under the skb. So only fragments matter here, we can ignore
-> the head.
 
-...and given that linearize path would make skb a frag-less one...okay -
-I'm buying this! :D I have some other thoughts, but I would like to
-finally close this pandora's box, you probably have similar feelings.
+On 10/30/25 15:31, Vivian Wang wrote:
+> emac_set_pauseparam (the set_pauseparam callback) didn't properly update
+> phydev->advertising. Fix it by changing it to call phy_set_asym_pause.
+>
+> Also simplify/reorganize related code around this.
+>
+> Fixes: bfec6d7f2001 ("net: spacemit: Add K1 Ethernet MAC")
+> Signed-off-by: Vivian Wang <wangruikang@iscas.ac.cn>
+> ---
+>   drivers/net/ethernet/spacemit/k1_emac.c | 48 ++++++++++++++-------------------
+>   1 file changed, 20 insertions(+), 28 deletions(-)
 
-So plain assignment like:
-xdp->rxq->mem.type = MEM_TYPE_PAGE_POOL;
 
-would be fine for you? Plus AI reviewer has kicked me in the nuts on veth
-patch so have to send v6 anyways.
+Tested on OrangePi RV2 through performance tests, on 
+https://github.com/spacemit-com/linux/commits/for-next. No regressions 
+found:
+
+root@orangepi-rv2-mainline:~# iperf3 -c 172.24.0.1
+Connecting to host 172.24.0.1, port 5201
+[  5] local 172.24.0.2 port 49948 connected to 172.24.0.1 port 5201
+[ ID] Interval           Transfer     Bitrate         Retr  Cwnd
+[  5]   0.00-1.00   sec   113 MBytes   946 Mbits/sec    0    339 KBytes
+[  5]   1.00-2.00   sec   112 MBytes   943 Mbits/sec    0    447 KBytes
+[  5]   2.00-3.00   sec   113 MBytes   948 Mbits/sec    0    447 KBytes
+[  5]   3.00-4.00   sec   112 MBytes   941 Mbits/sec    0    475 KBytes
+[  5]   4.00-5.00   sec   112 MBytes   940 Mbits/sec    0    505 KBytes
+[  5]   5.00-6.00   sec   112 MBytes   944 Mbits/sec    0    567 KBytes
+[  5]   6.00-7.00   sec   113 MBytes   949 Mbits/sec    0    600 KBytes
+[  5]   7.00-8.00   sec   112 MBytes   939 Mbits/sec    0    600 KBytes
+[  5]   8.00-9.00   sec   112 MBytes   936 Mbits/sec    0    600 KBytes
+[  5]   9.00-10.01  sec   113 MBytes   940 Mbits/sec    0    600 KBytes
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-10.01  sec  1.10 GBytes   943 Mbits/sec    0   sender
+[  5]   0.00-10.02  sec  1.10 GBytes   940 Mbits/sec     receiver
+
+iperf Done.
+root@orangepi-rv2-mainline:~# iperf3 -s
+-----------------------------------------------------------
+Server listening on 5201 (test #1)
+-----------------------------------------------------------
+Accepted connection from 172.24.0.1, port 47834
+[  5] local 172.24.0.2 port 5201 connected to 172.24.0.1 port 47840
+[ ID] Interval           Transfer     Bitrate
+[  5]   0.00-1.00   sec   112 MBytes   934 Mbits/sec
+[  5]   1.00-2.00   sec   112 MBytes   941 Mbits/sec
+[  5]   2.00-3.00   sec   112 MBytes   942 Mbits/sec
+[  5]   3.00-4.00   sec   112 MBytes   942 Mbits/sec
+[  5]   4.00-5.00   sec   112 MBytes   942 Mbits/sec
+[  5]   5.00-6.00   sec   112 MBytes   942 Mbits/sec
+[  5]   6.00-7.00   sec   112 MBytes   942 Mbits/sec
+[  5]   7.00-8.00   sec   112 MBytes   942 Mbits/sec
+[  5]   8.00-9.00   sec   112 MBytes   941 Mbits/sec
+[  5]   9.00-10.00  sec   112 MBytes   942 Mbits/sec
+[  5]  10.00-10.01  sec   640 KBytes  1.04 Gbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate
+[  5]   0.00-10.01  sec  1.10 GBytes   941 Mbits/sec     receiver
+-----------------------------------------------------------
+Server listening on 5201 (test #2)
+-----------------------------------------------------------
+
+Tested-by: Michael Opdenacker <michael.opdenacker@rootcommit.com>
+Thanks!
+Michael.
+
+-- 
+Michael Opdenacker
+Root Commit
+Yocto Project and OpenEmbedded Training course - Learn by doing:
+https://rootcommit.com/training/yocto/
+
 
