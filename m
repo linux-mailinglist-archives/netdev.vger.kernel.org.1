@@ -1,271 +1,125 @@
-Return-Path: <netdev+bounces-234354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4AEAC1F99E
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 11:40:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77EFFC1FA28
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 11:49:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 051D03A7C9E
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 10:39:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 251231884B19
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 10:50:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D045A32570D;
-	Thu, 30 Oct 2025 10:39:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 925803396E0;
+	Thu, 30 Oct 2025 10:49:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l91wTmF5"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="KnRZ5xVc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 417853321D8
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 10:39:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761820779; cv=fail; b=U6WDsEMK5xmFeSS0FiSKZ+MLwKYUh1vpgxtbrbPPK6vOR5bQdlu5x+4+F22CjY3GgRdthlnwaC6uOLw1a9qjFz8bPDVkZV14UZv1PldoieIsiM/h+feak5FHQ3uCHPOXo2vpWcqDIWCQ6/00lVqywNrKafzyAoC6tqd/zu2WE9I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761820779; c=relaxed/simple;
-	bh=bInHWfFpe6LGuA30upDsP0rNppxTexeaRrsrokwCGVQ=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=IeHszlufHOQ7DtBNgjPwqB+qNmf8d4lSTSagUHNWIfXNYnO9uDneJRa46yK5b0P30YQV2cbCsFx+eij0BsuM4x0xiY8Gjjbz6khWaZJjvZKwRaNcIL11fzeKzhN1CZAxTIbtEcmphNV+jJ3YKEzbAxoAcBBY2qD3RVL7LECpXFg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l91wTmF5; arc=fail smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761820778; x=1793356778;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=bInHWfFpe6LGuA30upDsP0rNppxTexeaRrsrokwCGVQ=;
-  b=l91wTmF5Syf2vrhLP+TPvFU4Xpf0BuNY47r+pZB6bw2rhXuNk8WBwpDj
-   +Dd3o2eDsKGKT4c6Dysv7q5XcWvEww6ofKpio+24V3S01eHn7rzLgLhl2
-   AtfmKXdg6L+5OCnyuckIeE73ij++fZ1AaoUyd/JAWSUAls8wpW6OJWm38
-   CdTVqnpK3AEXnk/QLF0Ttp0YDAYoJr31pBGTVRQoc/LLTg9duJKPue0n+
-   ljJ3mB3xKu5c4XiAXCiJg5v05hju3OwY/wVWpeGZqIydlSmeT40eqzjYY
-   hFTDZvPpDI6ahcqxpkLNUjHce3mzYYQF1ZaD+sWREZ2ZzUBmF1X3Hu2Oo
-   A==;
-X-CSE-ConnectionGUID: WOXpnK+eQfOM5Qo0MgEpDw==
-X-CSE-MsgGUID: bnxC7/5JTmqj4eKQHkFE5w==
-X-IronPort-AV: E=McAfee;i="6800,10657,11597"; a="63991171"
-X-IronPort-AV: E=Sophos;i="6.19,266,1754982000"; 
-   d="scan'208";a="63991171"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2025 03:39:38 -0700
-X-CSE-ConnectionGUID: R67JyesKQQ2ZABMeZnFqyg==
-X-CSE-MsgGUID: T9JrhWQNTPigj5mGaAP9Jg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,266,1754982000"; 
-   d="scan'208";a="185579601"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2025 03:39:37 -0700
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Thu, 30 Oct 2025 03:39:36 -0700
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Thu, 30 Oct 2025 03:39:36 -0700
-Received: from PH7PR06CU001.outbound.protection.outlook.com (52.101.201.60) by
- edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Thu, 30 Oct 2025 03:39:36 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=menZNFtfYjsApvrwi/fmUDba/D9w2NmLe9G4tMe1tlXlCoKFPSXDRmp9DpXs1fSYV51R0Z2Bx8g8+MgaO0NJ9Y8PAgA7E17UEJWj4ia6L8gNXoBcIpxw66jPJvfdaPgIMJczJeSoSBXcOMNFPbiNIMQevwoXv5MZY1ct5zYUDzqEq//btmSF2fZNncM3/rLVVnu21htyVtWKF0Sq3qV7oCJz68fdwhIPcmDlmBU1VvJeVywRMsuXxCbLD2ja5wk8HiBYLmqA2yz1Z4DJLzaDL6bGXARzBfkV/KVpdOn2n7q6hd8bu3Fb9LMJHyWkst7RaKV2vTcA2UL15DCcZglCmw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=czEW/QTGlic+LSLBHgAhgjhksEGYrd4CIgAQ2J8fBjY=;
- b=UF/PqgUb0yBrxgCkahiVit9N/ODLTDqF5KwTjeYcqqYkSJuOIrb0uimpEkexQ8lIMi750rxNMxrnRFU0HsoDZp03BPD6c//+34bVBZUx3SaOGf9XeWSfqp6wj1tn91y7qElkzpYTW47VMsJpP8J1O9rKB7EmWlAsd+8FK8Zu3MXQZg5YYoCCYV1g+eQE4mdqYg0znAGLv+TTOqCp/pJ0ZnaSFXujbrDrhJK4r3wL/d4f7+UjQOaxiE8pW2WeCuys7h+7d5MQ2wVNoh0k34DbRHwsoTG3MhMM5jGwTy7yPCOfr4ug9OuL0/ae7W9J+T5fq8zDQqeS3RNMGsqVSufkfw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by PH7PR11MB7516.namprd11.prod.outlook.com (2603:10b6:510:275::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.13; Thu, 30 Oct
- 2025 10:39:34 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.9275.013; Thu, 30 Oct 2025
- 10:39:34 +0000
-Message-ID: <621665db-e881-4adc-8caa-9275a4ed7a50@intel.com>
-Date: Thu, 30 Oct 2025 11:39:30 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next v3] ice: use netif_get_num_default_rss_queues()
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, Paul Menzel
-	<pmenzel@molgen.mpg.de>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<aleksander.lobakin@intel.com>, <jacob.e.keller@intel.com>, "Aleksandr
- Loktionov" <aleksandr.loktionov@intel.com>
-References: <20251030083053.2166525-1-michal.swiatkowski@linux.intel.com>
- <370cf4f0-c0a8-480a-939d-33c75961e587@molgen.mpg.de>
- <aQMxvzYqJkwNBYf0@mev-dev.igk.intel.com>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Content-Language: en-US
-In-Reply-To: <aQMxvzYqJkwNBYf0@mev-dev.igk.intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: DU2PR04CA0072.eurprd04.prod.outlook.com
- (2603:10a6:10:232::17) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFCBA1EF39E;
+	Thu, 30 Oct 2025 10:49:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761821376; cv=none; b=ZqNXuSHXVITV6syRQSr82ofrQcguFon9q9RQup02fIZm4roV/ztLEiy+DeVUcyleTUCcCrJb3kFN+Lv45ikp1mMucvIcxmOh1z1F2TpI3+yxcR6YctMpwN9f0rB5sXaUah4brM0waioQfT4M3WE+miOU5xZVf6m0/4ML59oObcU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761821376; c=relaxed/simple;
+	bh=QZIq4QpcjCi+U9bq12x/wte+do2PQHZY3yjvYitMMgo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dIEI/wCs3joL6OdmdNzImUsoylw5SP0n1L6tJLcT0UF4Ofd4VElL27hih4E18XpWd2ZcucX74envDBuhgJaZUFzI/W2URKT7HBuOxna8hTQ/vqxCeYS05bmqN4W4dNE/OMr8t8ffj7CzKrg4Xt3T4dEKx91ofWrRj/NuZgCiKHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=KnRZ5xVc; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=zHfHVPnhSgO0iB2CVKBRrVMgdptuKxMneZV2BdH/BJs=; t=1761821375; x=1763030975; 
+	b=KnRZ5xVcapfNGamkRzWRX9/Mc+Y1timWLqIrgTVWechY+gnXocE2JvzaIl/XD05XMJubc0s0zyL
+	ea+oWvxMV91hKRkg5uXH1z0GJmFq8zg4pTykzfUUqH3SIwglpQ6ZscVQgjssSHSKE9Dmwv6W5Ytak
+	GOrZ0+hWOg+4yR/Z8TGY5gRqb4EOgw4EL8wl+utcbmEaFBj3jdTNIDq63+MbUNsW5n4H6MiGAYJyI
+	nZAojBsI1mJ0OufT3cV7DggOJxCUpx+5ab2L6CF+2faDib7QC4Bx/Amu23O6fRF71Cblz2CpZICgG
+	+IzlpH2KOZbkRMwjXJkuWI8PObyhvrEpFmFA==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1vEQDe-0000000GLuF-0oFz;
+	Thu, 30 Oct 2025 11:49:26 +0100
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Subject: [GIT PULL] wireless-2025-10-30
+Date: Thu, 30 Oct 2025 11:48:05 +0100
+Message-ID: <20251030104919.12871-3-johannes@sipsolutions.net>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|PH7PR11MB7516:EE_
-X-MS-Office365-Filtering-Correlation-Id: 89e22e78-230c-4cc9-eeb4-08de17a09dd9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?NWRRSkEwSzVaaVpXa1U2MlFqUHZ0VlJ0dU15dHBGeXQ5SnpXdWZ3TGhZZkoz?=
- =?utf-8?B?bjlzM3I5aXhnYlhaUUYyUEsxVE5XcVJPNU9OMXFxRXpDdXlFVmdRMjZ5UkRs?=
- =?utf-8?B?TFdyT3JDWDBzUGpYRVl6NnBZckFVTjRMTUo5eFpmZE8wUkdTVGNIdkNsM1V6?=
- =?utf-8?B?K05GNG1FTWtPZ2I3Q25ra3diRVd5VnhNVmtaSFlxNFU3ZlJBM290MDVZNXZ6?=
- =?utf-8?B?VjNWZnFCSEJGbGZLNVgrMUNVQUVFeXRvaHp5V3AzcEMyTDlidjVERzFXbWd4?=
- =?utf-8?B?ZXNFYXk5RFFaTldJQXVTaTZVUVFhd0NscE1pQUxPNlBlVllVS29XU0FhcmEw?=
- =?utf-8?B?ZlFBYjZxRVBIOEt6cXF6Tk83MU1LVUJFMEVZdmhJTVBpcXlnNkJZYVBCdFUv?=
- =?utf-8?B?WDlnOE8zUUZqRlFSb2RyQ0ZkZlNpRWxPZmhEUG9YYTZFdlhKNG9qcVd6TTRM?=
- =?utf-8?B?blRWZEJ2RTA0aW1qWmJBbXlINmRaejU3a21pS1RiUFdqSzk5elVOclVmZnhs?=
- =?utf-8?B?eFJRSUlvWXNGVmwrN2txcWxmU0ZUM1BQQXpYSnNjK1NkUHJEbVlHZC9CbFZU?=
- =?utf-8?B?TUdRRUZBQXVMbk1vbk44cngxdW4vTjk5bUNhd1pGZEdFb0xMNlR2TUJjRlVH?=
- =?utf-8?B?aHhZaGRvQTRTL01HZUszSzdQYkV5Vyt3UGFrdzRhcEk1UzlQemtmMGl1WWZ1?=
- =?utf-8?B?Z2hjb0RmVG5DbXJwSVJTaXpPSEt6VFNLU0VlaStmbnc3aWd4bXUwU04wd253?=
- =?utf-8?B?OG56VG1ZU2RDcG0rNEtLRGcrS2E4a0MyQm9xNjg1a0RsWEVuWjhlRjlYOGhr?=
- =?utf-8?B?ZDZ3bWZrRVM1R0srUFlQZVJLcis2ZmU5eEM4eithRkI5enl1ZEVuRDFGdk5p?=
- =?utf-8?B?NVhUaHZpSHZHVlM0VytXK2tWd29BRldGRmIwd0tpQU5ERjVadmp3VXR3bFlU?=
- =?utf-8?B?c0k1MGxpTkFZOHVPRTdLTWhBc3BIN2kweWM5bVVMZE5MS2F0bTZpM2FZWUt1?=
- =?utf-8?B?RnZ3SEdjR1NZK1V1VmpKNXlNeHRxcDdHNDRvRlgxR21yc01kMGdud3dENjJv?=
- =?utf-8?B?MGN5cS9tVXJDeE5lelNUV1dwa01EdTBraUgxOHBheUJSczI3Yis3K2YwYi9C?=
- =?utf-8?B?UXA2NzNWYlhCdEhqSHhQR2cwdEM3ZDF2amNKbkNodW5tUllmd0YvN3hSNWla?=
- =?utf-8?B?TkVPak9qdlRldEovaktScEZxTFFSSW1RcDhWYWNEN1Y4cUlZczU3aWRtblFy?=
- =?utf-8?B?UjcrbU8rUytkWUhrbUMxakFZYmFQTW50M2Y2ZXNQYlFVcHZ1MDhvV1Rydlkw?=
- =?utf-8?B?V3hpOHl0THhxOVBzaUlzRDVKT2tDR2gwcUhsUFdaNm5DL2pLaUUvZHdWTmsw?=
- =?utf-8?B?WHZLMEpqNWJ0L09KSkhWUXIyaGFDR2k0Szdya3RhMW12YTBDUXJFL2VKUjBy?=
- =?utf-8?B?UjJ0S21WQlNWVUlBaktQbmRWR3hjam5RV2xRMlpVNFFzd05MS1Z0c0g3YlA4?=
- =?utf-8?B?aEFRelREeTdIdmZZN3czTFVnSkhMTlc5WHZEbTVwVzlQN202RHhYdlhwZmtt?=
- =?utf-8?B?dnJiYjVocVNKcHI3N1pCTlMxN1NwaEw4aytEZDdhQkJxMWxHcG00Y0hCbUc0?=
- =?utf-8?B?SnlGeVdEdzdTSWFKei9ENERjV2h1emZoVm9CODNtUDB4RUptY1FQYVhhVjNh?=
- =?utf-8?B?NmFUUGo4bTZDekpWQit1ajdVUVdWR01WNFZkTDIrSjJsOTdITXRDeUR5UXRE?=
- =?utf-8?B?azBxRDRBNEJyajNaUC9jY1k4RWIxRVVoYXYzOWNydWtnRk5uQStlVVJiQklp?=
- =?utf-8?B?bnpVY2pqNFpNTzZtdTdLL1pYdDZNcFVQZWZUK3Q5ZFZiL2dOdXZmd0FWcTRt?=
- =?utf-8?B?bVNKQVpmU0VnOEE5QnE4Y2RuUGVmMDgvd2FuV1RXMENwTitqQ0hsOVRSZmR2?=
- =?utf-8?Q?ELNnko+2SxpM2QSJ6PTmYs8uKHAGNaH9?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MmpkQnFLNXo0V3Q3eDArMWJuYmt0OHNaT3ZKcFBWMWdkeEhwdWdMMmZqWS9Z?=
- =?utf-8?B?V2xwK0wzUFBvWFREaktaUUxRMXV3Rmk3cnhNeGNZWThVSUlLanBKdHY2dllp?=
- =?utf-8?B?bnZXNGZOUTNxcGVRVzh6UjFjY0dSY1JiTkY3enptMExlU2FBYW5IRmNPbnJq?=
- =?utf-8?B?SG5kejY2dHArSGN0dnZETzJrOTlkb2ZKRXZRdnBQVU80NTQ4QWhPcUlDcEl2?=
- =?utf-8?B?TE5jQS8waVRsZXJnWDF1Q0lvMHg0TTJ1YmYxNmhMVERDMkN1SHg1VWxHcWFa?=
- =?utf-8?B?ckVMTTRrcFNkU3VNZ1MzVU5ENDVoSXBpZDlSVTZ6Qmt0Snl5NnhKMHdrb1Bt?=
- =?utf-8?B?VFdEYXk5ZUl2OEFJRFlDQ09IZCtEeWxycTVWUFVRdXVzV1BpcGtDcVpndjl2?=
- =?utf-8?B?bU9QTEc0bGhKTkl3VlRtZFFSamNNc012NEhMQ3BncFZMMElLRlVHaWJYNUpk?=
- =?utf-8?B?VWlqSEZ2ZlpmOUNKQmQyYmJEN2pwUEYxc3AxNnJhQTVJc1RCcjFBNEE1K0s5?=
- =?utf-8?B?amdjME5GR3dtaW1mdTh3VmtHMThnRW84QUZiSE5hSXpiS1YrdDVGUUhiYTZz?=
- =?utf-8?B?RExMSjdia3J6cy9kL2Z4SkJ5ZG01LzBQWmJvRzNYYzVZSUs5L0lHU1dpbC9w?=
- =?utf-8?B?MFJHdi9wSzhKMlV1MkNlYk02dXBZalRMTkxGZmk4RklhNE1CTzgrNXMzelVv?=
- =?utf-8?B?cHRhUmtHRmdLYUZVdzJvdWxkaE41Qml6UTFpdjFVSEd4TTBUdU5uV3kreWIx?=
- =?utf-8?B?Y211RGsxa2ZPMlZCZ1hnN0JFN3pwbDJkelU2eUpzSDl3dUpISDJqc3YxU3pr?=
- =?utf-8?B?NFBZcmZzTEhsOGt4Z082RFYwcldGbCtpdE9ZM21UaFF4YmVtOUkvbUhZNU9Q?=
- =?utf-8?B?bEFBVFFLeWlXSERURDhjT0prR3JCYTJVaTdaRHRUUWJrZVFMenNSVkdlTUFS?=
- =?utf-8?B?cy9sZTFtMkRGWUlVR3NyODJTTTVvVmNSendGNjhtUVQ4L3J6M2xueXY3Y0lt?=
- =?utf-8?B?S0dlcHVHVXFNamlVUkVjZnJqcTVLaFBuRmVvcmN3UlQxaG0yc0FoWFhsem5C?=
- =?utf-8?B?dUpzN3JNZlp3TGFGRUtmS0hyTFpmRXFjKzhMTEx3aEVkdW0rWGl4WTJqS3FR?=
- =?utf-8?B?TVJqT2RkOFMzaFkyeFczVFVJdGNYUHd5R1Y2aVRmYk1FSmUxbGF0YjBUeisv?=
- =?utf-8?B?M3JkOHNoMG9HaERWZEE4VjR6cUtkS3hQTTBxVmhGRUozZmU1dnZsdkhMcXFX?=
- =?utf-8?B?NmNqUmFNM0tIcHJkU1NheHUwMzRYMWNpL1lLQll6bzk3YkN0VVdaUUZyc3Bn?=
- =?utf-8?B?UjdxNExkbUExOXF0US9oTE5nRmdlLysvODZwQWthNGJBdU1JUUtyTXcrRlU4?=
- =?utf-8?B?T2p1ei9aem5Sd2RoaExtZ3N4YXN0cUUyL21VTVRPR2dqTW9FOUpWWGxISjUr?=
- =?utf-8?B?bmpaczh0M3VvcEE0S1B6ajBTTGRUaUplV0t4YnVtTktlMHcxTFY3S0tnMFpo?=
- =?utf-8?B?MkIyZG1BWU53a1RRZlhYSmsxU24yZEVDSENUelEwN1NrVk9MVWdMc3NaUU81?=
- =?utf-8?B?YnRSS1hWY3VGZ2V5WVVuVUdtRW02RGVSc3BEU3QxeVllWXdJWHNOTlhnS3VM?=
- =?utf-8?B?Q3lKemF6cDlWdHNudXRQTnJqaUx3RW9JaSt2V1IzUms0K25DUlZzZzZmUHFo?=
- =?utf-8?B?UUROaXNNNkhHVXovNFBydFYrQWlLN0d6bGMyZzRtTlQwTlgzcFF5cWVFWkEz?=
- =?utf-8?B?RnczSFdDNnkwTkkzbG40VmJxUXVjSGF4QjFUaStPS2dMbEZVUXl6dExKWnlS?=
- =?utf-8?B?V0FQS1lBNjRmcXdKQjRZNW9iQjJTSVdUM3BUWDdYL1U5RnVVdUo3T2Rnbm84?=
- =?utf-8?B?Z1NFZyswTHJ3WjhiWGxjNHd3YzBTa0hoQWR1bHdvTVE2c0dPWVFMbWpkR0pG?=
- =?utf-8?B?NnlsTDlXbnBYcjhuVXErQkxma1hrclhDU3lCalBNVnBoK0JtbFNCRlNEVHRM?=
- =?utf-8?B?OUFaWXZHYmdvZmVxSW10dmRRUHI5Vy9kZzc1SVNoL3ZLOHZXcFNrMzRDcTFq?=
- =?utf-8?B?bDQ1MGlzYm9iLzdwTmRlZGZrWjhLcmVIemhTdldFOVpQMXlSRFZvUk5maFRJ?=
- =?utf-8?B?QVVISDZzZnVoNlNFQWpWTkVVcVBoTWdNN25HRHhtNGRJbkNtSWw2Nlg2TTZx?=
- =?utf-8?B?VVE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 89e22e78-230c-4cc9-eeb4-08de17a09dd9
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2025 10:39:34.6134
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: QlLRRH5Bsgd2ouhBJy9hvS0PsxLn/gMRWfvFsNLuoCoC82t/vebKczCNt4dgeOZcejmAYIMg2YdH8TPgIaOH2pzk9HCe6z5Riqy5leoADag=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7516
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
-On 10/30/25 10:37, Michal Swiatkowski wrote:
-> On Thu, Oct 30, 2025 at 10:10:32AM +0100, Paul Menzel wrote:
->> Dear Michal,
->>
->>
->> Thank you for your patch. For the summary, I’d add:
->>
->> ice: Use netif_get_num_default_rss_queues() to decrease queue number
+Hi,
 
-I would instead just say:
-ice: cap the default number of queues to 64
+This is the "not quite Halloween" edition, but there's
+nothing scary here ;-) The hrtimer work is maybe more
+than I'd strictly like, but all of the affected features
+turned out to be pretty broken due to long timer slack,
+and it doesn't fundamentally change the behaviour apart
+from using the more precise timers.
 
-as this is exactly what happens. Then next paragraph could be:
-Use netif_get_num_default_rss_queues() as a better base (instead of
-the number of CPU cores), but still cap it to 64 to avoid excess IRQs
-assigned to PF (what would leave, in some cases, nothing for VFs).
+Please pull and let us know if there's any problem.
 
-sorry for such late nitpicks
-and, see below too
+Thanks,
+johannes
 
->>
->> Am 30.10.25 um 09:30 schrieb Michal Swiatkowski:
->>> On some high-core systems (like AMD EPYC Bergamo, Intel Clearwater
->>> Forest) loading ice driver with default values can lead to queue/irq
->>> exhaustion. It will result in no additional resources for SR-IOV.
->>
->> Could you please elaborate how to make the queue/irq exhaustion visible?
->>
-> 
-> What do you mean? On high core system, lets say num_online_cpus()
-> returns 288, on 8 ports card we have online 256 irqs per eqch PF (2k in
-> total). Driver will load with the 256 queues (and irqs) on each PF.
-> Any VFs creation command will fail due to no free irqs available.
 
-this clearly means this is a -net material,
-even if this commit will be rather unpleasant for backports to stable
 
-> (echo X > /sys/class/net/ethX/device/sriov_numvfs)
-> 
->>> In most cases there is no performance reason for more than half
->>> num_cpus(). Limit the default value to it using generic
->>> netif_get_num_default_rss_queues().
->>>
->>> Still, using ethtool the number of queues can be changed up to
->>> num_online_cpus(). It can be done by calling:
->>> $ethtool -L ethX combined $(nproc)
->>>
->>> This change affects only the default queue amount.
->>
->> How would you judge the regression potential, that means for people where
->> the defaults work good enough, and the queue number is reduced now?
->>
-> 
-> You can take a look into commit that introduce /2 change in
-> netif_get_num_default_rss_queues() [1]. There is a good justification
-> for such situation. In short, heaving physical core number is just a
-> wasting of CPU resources.
-> 
-> [1] https://lore.kernel.org/netdev/20220315091832.13873-1-ihuguet@redhat.com/
-> 
-[...]
+The following changes since commit a83155cc4ec5dd8c99edb541dc12d3bd8e97eae9:
+
+  Merge tag 'wireless-2025-10-23' of https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless (2025-10-23 17:15:48 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2025-10-30
+
+for you to fetch changes up to 70e8335485966d7d4ed85976dceab52803b151a2:
+
+  wifi: zd1211rw: fix potential memory leak in __zd_usb_enable_rx() (2025-10-30 08:41:10 +0100)
+
+----------------------------------------------------------------
+Couple of new fixes:
+ - ath10k: revert a patch that had caused issues on some devices
+ - cfg80211/mac80211: use hrtimers for some things where the
+                      precise timing matters
+ - zd1211rw: fix a long-standing potential leak
+
+----------------------------------------------------------------
+Abdun Nihaal (1):
+      wifi: zd1211rw: fix potential memory leak in __zd_usb_enable_rx()
+
+Baochen Qiang (1):
+      Revert "wifi: ath10k: avoid unnecessary wait for service ready message"
+
+Benjamin Berg (4):
+      wifi: cfg80211: add an hrtimer based delayed work item
+      wifi: mac80211: use wiphy_hrtimer_work for ttlm_work
+      wifi: mac80211: use wiphy_hrtimer_work for ml_reconf_work
+      wifi: mac80211: use wiphy_hrtimer_work for csa.switch_work
+
+Johannes Berg (1):
+      Merge tag 'ath-current-20251027' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath
+
+ drivers/net/wireless/ath/ath10k/wmi.c        | 39 +++++++-------
+ drivers/net/wireless/zydas/zd1211rw/zd_usb.c |  1 +
+ include/net/cfg80211.h                       | 78 ++++++++++++++++++++++++++++
+ net/mac80211/chan.c                          |  2 +-
+ net/mac80211/ieee80211_i.h                   |  8 +--
+ net/mac80211/link.c                          |  4 +-
+ net/mac80211/mlme.c                          | 52 +++++++++----------
+ net/wireless/core.c                          | 56 ++++++++++++++++++++
+ net/wireless/trace.h                         | 21 ++++++++
+ 9 files changed, 209 insertions(+), 52 deletions(-)
 
