@@ -1,117 +1,190 @@
-Return-Path: <netdev+bounces-234492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B104AC21B2D
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 19:10:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FFC1C21C0A
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 19:24:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47FAD463CAD
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 18:09:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17C6D421EB5
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 18:24:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BF6F32C33D;
-	Thu, 30 Oct 2025 18:09:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA39836CA86;
+	Thu, 30 Oct 2025 18:23:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1lVw3Fc8"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="S5LExwFu";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="67hFey5E";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="S5LExwFu";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="67hFey5E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B8B32D6E71
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 18:09:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BA4736C248
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 18:23:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761847778; cv=none; b=SWoqNRaMsuKUBDf4fAxpLLamWVVeWXuJPQZoNYWMN95YgqIhKu8UJdrGYV+XZiXefwFbehaIC8W8G+vIfrjf+Wc6Tn8LeyT/YCg4dQo/Pp4CD0NGbltjH3Z3TqGmKIes1TYp56+/VQ2/iTWjYWmHm4ZVWqGpuYmUCq1SIZBpB8k=
+	t=1761848633; cv=none; b=pfPohkrt8HZ6ha+QyIDYgFrZ/1yrIQjpoom/9NjBhWRv5YBancOWEarV995fLUCmuP7FkoOiLlEKVsEhr48MuEW35XeoHZV2+HMA0osing262rc5f9tQi9lLWGkP/SGcpcAl8l/nkoQUkST/b82evL1qTB0hw2pAkm/zOEnEuvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761847778; c=relaxed/simple;
-	bh=Hs1pM8LrCPsKFJMLLjY40/qaHszKmItfHSs5Ip57vv4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=s0OHLr/Dj43LOJPZWq5f2LIft/xnupk19epxU6lcYrpdrrchzgtkAliP9aUIaU7rUOP14S1hoi7bEI5+tYfmKbitAPYHl7VTCUh2RxZp4DOQg38qcCDGc63SwKToINC4QVObMR7AXyzftMuw2bGkR07D3OIFcIFriWgC8D0e+do=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--thostet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1lVw3Fc8; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--thostet.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-33da1f30fdfso3059459a91.3
-        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 11:09:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761847776; x=1762452576; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=pxbU2yjowbmDAWtqBINWVzp9cCDjUVE/Z7xeFsXr6PI=;
-        b=1lVw3Fc8wL1jBa7zFVcl/cJcWzRyl9gjk7pXGec0peLITzTw0SQBuozZllmN+GeJYl
-         JluP9K8N7wRmEgco4O0Kzfka2ZBJq35V5zmFk70LuHLGqxQuBDJ/nD3FjK6gtuT05J+/
-         ICR+M2NVxeowcp2HsgvoCMT/IzWGVmjX+gvYbb0ulB9iQl9u6+VlE86g+/UIqWscB6eC
-         QIw1TcbIB3KDazBrPLhj+8ffVoDZhHdDu0bXq5JpN82klfTnAtwcI4Fvh5TDMtduTTCK
-         Tq9JBPRh4rfuJ8mq1talBKBiSXpso6FeRKiwNlHoqwHBrsNp6nuNfBh+xRrsE1WNsRi+
-         tkew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761847776; x=1762452576;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pxbU2yjowbmDAWtqBINWVzp9cCDjUVE/Z7xeFsXr6PI=;
-        b=IxZZ6sFzIoTgsSVoeKP0lXRGFZ0pkfexvdWcs9q0yOWACbGeo1HNFwRvSuQq+VQgKq
-         iswmfFa14b6Yw8LD4OYB46IMWk5p12jl4FikFTEbhZ/eBc6E0T79y6mu80LsVyaWXLYJ
-         0CUaIstZabU1jERnQRMOS1i8FWCh+3a/7XyCVtLqQ2F7JfwzyJ4WFZOZETxTWROJJVbB
-         9nePZq0P/FMpH4x2aJF8mup6vRlQ7JUyqzFX32uoSbDYR1Wnl6oOINZ1nPJiGhcjFirR
-         oIGve+evHqidOW/7Ao9NaEMb8AfBYPZCqMLi9nfoBm5sZ/cdpvJ9cuP1YSyadbTk+Som
-         8sSw==
-X-Gm-Message-State: AOJu0YxjRXlP/cnfSkHRNhhXRlzh6Cz9aUcsakoAN7w8TEyslMuc2YH4
-	8+EGtXVHtUPYuAhsrrtMYXWIzGcPc4XWaBj3dftbX6/Oh/Qr9LPG66myxFfsXFmvG5DPf3qy7ZM
-	PdlMxNg0PPhp6s1JuvYYz3fV/0j/J6KtuVsNMUiANhnAaUWmnTRhgfEFc0eUGlKFL3MHnRcl2+L
-	7rOa/gj4UbCbv3Hgsk3zOE1VcIdeRdYk7Y+YiQ9d+61A==
-X-Google-Smtp-Source: AGHT+IEKGSgDJLK8DZHzMkJrDQDVHZwHSDHdaAuqpHRm1Zrxjo98F2lFQTGqgyjvBI4CUV7pCmHq1okdBWDF
-X-Received: from pjyw17.prod.google.com ([2002:a17:90a:ea11:b0:340:5f65:4ff4])
- (user=thostet job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:51d1:b0:330:84c8:92d0
- with SMTP id 98e67ed59e1d1-3408306b9damr858011a91.24.1761847775593; Thu, 30
- Oct 2025 11:09:35 -0700 (PDT)
-Date: Thu, 30 Oct 2025 11:08:32 -0700
+	s=arc-20240116; t=1761848633; c=relaxed/simple;
+	bh=Qld2mLu50qe/pyWgBHfnl51lKI0Y1ew1JinZer3T+O8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Qf5nKuog8xAdmyA0kTjXKQ3FZAEXsHg9Bp0dgXYnVKSUyN8W90XxEyH/xC1VjlcLrzVw5kuAaS75ggOOHzmidmRzcv5Lj7MklaHjdik7JhkpScMFze1fQJOS3smFqnfvyPx8Lqc7zoFhIkzVdNkWNGOsDU20r/Cwq2nJN3Ow9I8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=S5LExwFu; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=67hFey5E; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=S5LExwFu; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=67hFey5E; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from lion.mk-sys.cz (unknown [10.100.225.114])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 795BA337B3;
+	Thu, 30 Oct 2025 18:23:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1761848630; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Qld2mLu50qe/pyWgBHfnl51lKI0Y1ew1JinZer3T+O8=;
+	b=S5LExwFuwGl5kCaV9unvK65K+uBjh54bvw3OcHFQHV2fFakT18ncK+SoGWwuvc5RtrY5l3
+	68vZ1JDShcoMMMwwJVvctlXqtBg+nYwgTIvftK1jKqKCJqlyanQ8gJx1Q/MGHx9+xsOIkM
+	uSaKsHtUg6FM4yW5oQnyQW+/6heRjC0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1761848630;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Qld2mLu50qe/pyWgBHfnl51lKI0Y1ew1JinZer3T+O8=;
+	b=67hFey5E5c8zl/R42MeFXdQCC+RUQSEFAAGxuQgpu+5bpQjQWCFkfYuQTX59LyU5fCnAAO
+	V9X3ibH1tTIk36CA==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1761848630; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Qld2mLu50qe/pyWgBHfnl51lKI0Y1ew1JinZer3T+O8=;
+	b=S5LExwFuwGl5kCaV9unvK65K+uBjh54bvw3OcHFQHV2fFakT18ncK+SoGWwuvc5RtrY5l3
+	68vZ1JDShcoMMMwwJVvctlXqtBg+nYwgTIvftK1jKqKCJqlyanQ8gJx1Q/MGHx9+xsOIkM
+	uSaKsHtUg6FM4yW5oQnyQW+/6heRjC0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1761848630;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Qld2mLu50qe/pyWgBHfnl51lKI0Y1ew1JinZer3T+O8=;
+	b=67hFey5E5c8zl/R42MeFXdQCC+RUQSEFAAGxuQgpu+5bpQjQWCFkfYuQTX59LyU5fCnAAO
+	V9X3ibH1tTIk36CA==
+Received: by lion.mk-sys.cz (Postfix, from userid 1000)
+	id 5989F20057; Thu, 30 Oct 2025 19:23:50 +0100 (CET)
+Date: Thu, 30 Oct 2025 19:23:50 +0100
+From: Michal Kubecek <mkubecek@suse.cz>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org, 
+	Kory Maincent <kory.maincent@bootlin.com>
+Subject: Re: [PATCH ethtool-next] netlink: tsconfig: add HW time stamping
+ configuration
+Message-ID: <7rnzkle3ekgmfco4rum5zt7ayqkqxspklafpjc5iwsyv7a3la5@uxz54po7u6jh>
+References: <20251004202715.9238-1-vadim.fedorenko@linux.dev>
+ <5w25bm7gnbrq4cwtefmunmcylqav524roamuvoz2zv5piadpek@4vpzw533uuyd>
+ <ef2ea988-bbfb-469e-b833-dbe8f5ddc5b7@linux.dev>
+ <zsoujuddzajo3qbrvde6rnzeq6ic5x7jofz3voab7dmtzh3zpw@h3bxd54btzic>
+ <8693b213-2d22-4e47-99bb-5d8ca4f48dd5@linux.dev>
+ <20251029153812.10bd6397@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.2.997.g839fc31de9-goog
-Message-ID: <20251030180832.388729-1-thostet@google.com>
-Subject: [PATCH net] ptp: Return -EINVAL on ptp_clock_register if required ops
- are NULL
-From: Tim Hostetler <thostet@google.com>
-To: netdev@vger.kernel.org
-Cc: richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	linux-kernel@vger.kernel.org, Tim Hostetler <thostet@google.com>, stable@vger.kernel.org, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="7hpuf4tjdydwydmu"
+Content-Disposition: inline
+In-Reply-To: <20251029153812.10bd6397@kernel.org>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-5.90 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SIGNED_PGP(-2.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	NEURAL_HAM_SHORT(-0.20)[-0.999];
+	FROM_HAS_DN(0.00)[];
+	RCVD_COUNT_ONE(0.00)[1];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	MISSING_XM_UA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	ARC_NA(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	RCVD_TLS_LAST(0.00)[];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCPT_COUNT_THREE(0.00)[4]
+X-Spam-Flag: NO
+X-Spam-Score: -5.90
 
-ptp_clock should never be registered unless it stubs one of gettimex64()
-or gettime64() and settime64(). WARN_ON_ONCE and error out if either set
-of function pointers is null.
 
-Cc: stable@vger.kernel.org
-Fixes: d7d38f5bd7be ("ptp: use the 64 bit get/set time methods for the posix clock.")
-Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
-Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
-Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
-Signed-off-by: Tim Hostetler <thostet@google.com>
----
- drivers/ptp/ptp_clock.c | 4 ++++
- 1 file changed, 4 insertions(+)
+--7hpuf4tjdydwydmu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-index ef020599b771..0bc79076771b 100644
---- a/drivers/ptp/ptp_clock.c
-+++ b/drivers/ptp/ptp_clock.c
-@@ -325,6 +325,10 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
- 	if (info->n_alarm > PTP_MAX_ALARMS)
- 		return ERR_PTR(-EINVAL);
- 
-+	if (WARN_ON_ONCE((!info->gettimex64 && !info->gettime64) ||
-+			 !info->settime64))
-+		return ERR_PTR(-EINVAL);
-+
- 	/* Initialize a clock structure. */
- 	ptp = kzalloc(sizeof(struct ptp_clock), GFP_KERNEL);
- 	if (!ptp) {
--- 
-2.51.1.851.g4ebd6896fd-goog
+On Wed, Oct 29, 2025 at 03:38:12PM GMT, Jakub Kicinski wrote:
+> On Wed, 29 Oct 2025 18:53:20 +0000 Vadim Fedorenko wrote:
+> > >> Well, yes, it's only 1 bit is supposed to be set. Unfortunately, net=
+link
+> > >> interface was added this way almost a year ago, we cannot change it
+> > >> anymore without breaking user-space API. =20
+> > >=20
+> > > The netlink interface only mirrors what we already had in struct
+> > > ethtool_ts_info (i.e. the ioctl interface). Therefore my question was
+> > > not really about this part of kernel API (which is fixed already) but
+> > > rather about the ethtool command line syntax.
+> > >=20
+> > > In other words, what I really want to ask is: Can we be absolutely su=
+re
+> > > that it can never possibly happen in the future that we might need to
+> > > set more than one bit in a set message?
+> > >=20
+> > > If the answer is positive, I'm OK with the patch but perhaps we should
+> > > document it explicitly in the TSCONFIG_SET description in kernel file
+> > > Documentation/networking/ethtool-netlink.rst =20
+> >=20
+> > Well, I cannot say about long-long future, but for the last decade we
+> > haven't had a need for multiple bits to be set up. I would assume that
+> > the reality will be around the same.
+> >=20
+> > Jakub/Kory do you have thoughts?
+>=20
+> hard to prove a negative, is the question leading to a different
+> argument format which will let us set multiple bits? Looks like
+> we could potentially allow specifying tx / rx-filter multiple
+> times? Or invent new keywords for the extra bits which presumably=20
+> would be somehow orthogonal to filtering?
+>=20
+> tl;dr I'm unclear on the exact concern..
 
+My only concern was to make (reasonably) sure we won't have to make an
+incompatible change of the command line syntax. But you are right that
+there is alwasy an option to have e.g. "rx-filter" and "rx-filters"
+(mutually exclusive).
+
+Michal
+
+--7hpuf4tjdydwydmu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmkDrTIACgkQ538sG/LR
+dpW1iAf9ETDvU5DkDzCBTZV37VpNSUkW6NfR9t4tKmu74F2x1xo91xiRCBiSqo8u
+K9LCZWqK8+ZZQ1elsrWBD03bhIrsKVnP47SF1R5CtXIxMm9cPK9v68oR5/A/Rl81
+b2HyDYpRgYaGXCOvs7KfIcpoCFJC8Z78sbAB2H3sxYI/t7MX1iJpCMYur+HO6kPF
+eqwnSJQ+MFQXYlvaWxXJb5LaYKeeWJI1l3vMp5WyuikhaXf5PK1d8snbLvx2skLs
+zJBVVnzNfXATqd5TmO6aOvpG24u/lO7dLOr7ePt/+FtNM4ztCz/MCFheiRvM4h2e
+ElSBqX+uWyM6WRIEWK0Gao+nN/Mq/Q==
+=oO2m
+-----END PGP SIGNATURE-----
+
+--7hpuf4tjdydwydmu--
 
