@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-234224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234225-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FEEEC1DF92
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 02:01:19 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12385C1DF95
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 02:01:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73424406FC0
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 01:01:09 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B27E834C107
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 01:01:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7D0524678F;
-	Thu, 30 Oct 2025 01:00:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C709325334B;
+	Thu, 30 Oct 2025 01:00:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SjvOMK3B"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZsY8r/tP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA642459EA;
-	Thu, 30 Oct 2025 01:00:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ED4B24C676;
+	Thu, 30 Oct 2025 01:00:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761786039; cv=none; b=rPT1B931J6dvMaV4jK3fsEAvrVAFwUvuBC0SbdaBYczGrxY8H3CabxKoF5+1DfSwS2ff9Zox+y3zdeOlwEjpOOSzs1v64K7xmOkyrmx7C5XpsXFHzto8pJJM78e7+MV9NX5aK6ymBL6QlqfksZ1pXcEMgYxq0JgYmvovsAkx9ys=
+	t=1761786040; cv=none; b=dvqWiL8v5pxsKYSy/wd0PjHfa6JH9kik+uEKAFvpPz4LKOz+OMaSOkZXL+HXxKISFIU1tSAo2kd7Q4ZsnQ9V1bYaWcadM9rZ+vo+mvd1dR7FnXKv8V+fiBsxwK1OzROOAOT3hhkjksNZjbDx2SoEdE+Yoylop02yvPwXQeGcLKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761786039; c=relaxed/simple;
-	bh=sDHL2SfL9e48SuVb3CsnFf6tl1w0ApA8EeIFwZChLms=;
+	s=arc-20240116; t=1761786040; c=relaxed/simple;
+	bh=FeM8HVJBhTZO6+1LBH3GZUGU/aI6V8cPlHvRHye71g8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=dCMJVmy++sb1exfd2P4IiPenDrRAqTg/Rh7+Cq4XQiAICpaLReFe932r6W0tnLrEsMaU+RnSgxEJmjQkDt6nGdgRRMoZKOwFOkw1DPGommBOljl5yG1XxlV66IrY4VVQnvhLk45J8JVEoeqWUFIYex6a4GHzvfp8HyBZZZH+3pc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SjvOMK3B; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA3E2C4CEFF;
-	Thu, 30 Oct 2025 01:00:38 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=kvZ6Q2Bj70N5vHpfIQA3xJdk2XlTMIRF0rYD8tgxvLYnZ8C80De8q97FbMK7bB4gGUUimrBRBadEhszoBAepQqn6p3SmpsVb/jj79CEei7gdGNlvBLXX86qV7iR6ksex+28/Qtl2AhyFt+9oS2awNcxOStgSLR6eElZoeJ0i6xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZsY8r/tP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76ED8C4CEFD;
+	Thu, 30 Oct 2025 01:00:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761786039;
-	bh=sDHL2SfL9e48SuVb3CsnFf6tl1w0ApA8EeIFwZChLms=;
+	s=k20201202; t=1761786040;
+	bh=FeM8HVJBhTZO6+1LBH3GZUGU/aI6V8cPlHvRHye71g8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=SjvOMK3Bb8waaIba9bXVIPojOmkYM7oxWxaFQsHYMAdckUNP2SWTCsTNa5BxbRR8/
-	 K4Nnvhp/lVn+GFdPw+OFdFbNYwiUuv8x/d7RTuyfOGvJcDftMW0m3TKKQ/pmR2m7lT
-	 AYz6MdWCKyEs+kJsKuTVnXcyZXNzVCwSg78oBTjq2YNHGeX+nK3Mfh3Qkrighm2i+R
-	 qYyM4LakGkPc3i4ILOHCcVCgDPDUtcYJ6T7qJkM7GUxMcxJ0bpIayzMkSlACr5u94/
-	 3fAK2OBo1eETqv0zJW86tPkkGveszBHqu/GiJ/JeuIxZNhzGXytsC+7PAygtipOf4w
-	 O4qJo/2L3HmKA==
+	b=ZsY8r/tPnPWkacu8kfv11EmY5C7ejwS79oxg7fvBg8PRDrLSV1x9oylbCb+W8hPvx
+	 MzrasjrPF1kuOVNucN61HNZG4MTOua4BsNL/Enyy01Q/pXAy3ow5dBN+7KG4jtNI/X
+	 zwT6LNaoMu6KgJAYvsxlVNBAS42mdfWeNJ2IWvqinnn0yi0V+djzFYfMrBa6irr7gb
+	 BGEyUr4Ec9EuQzjJxGElchz8TzhuZ0ufnQB02NnQV4pKRFyvrWJjvMVdY4DEMWdJq4
+	 k7FWK9LspJoHA09196q+BthAvPVS6J5KHhdiGx2XP0Qf2NZ3q4hrOXUxWFvszt8P8S
+	 P7JRBsMVB02Zw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33BDE3A55EC7;
-	Thu, 30 Oct 2025 01:00:17 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD7D3A55EC7;
+	Thu, 30 Oct 2025 01:00:18 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 0/1] selftests: net: use BASH for bareudp testing
+Subject: Re: [PATCH net v3] net: mctp: Fix tx queue stall
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176178601574.3269431.2615356628282051961.git-patchwork-notify@kernel.org>
-Date: Thu, 30 Oct 2025 01:00:15 +0000
-References: <20251027095710.2036108-1-po-hsu.lin@canonical.com>
-In-Reply-To: <20251027095710.2036108-1-po-hsu.lin@canonical.com>
-To: Po-Hsu Lin <po-hsu.lin@canonical.com>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
- edoardo.canepa@canonical.com
+ <176178601724.3269431.3994061659121973030.git-patchwork-notify@kernel.org>
+Date: Thu, 30 Oct 2025 01:00:17 +0000
+References: <20251027065530.2045724-1-jinliangw@google.com>
+In-Reply-To: <20251027065530.2045724-1-jinliangw@google.com>
+To: Jinliang Wang <jinliangw@google.com>
+Cc: jk@codeconstruct.com.au, matt@codeconstruct.com.au,
+ netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 27 Oct 2025 17:57:09 +0800 you wrote:
-> The bareudp.sh script uses /bin/sh and it will load another lib.sh
-> BASH script at the very beginning.
+On Sun, 26 Oct 2025 23:55:30 -0700 you wrote:
+> The tx queue can become permanently stuck in a stopped state due to a
+> race condition between the URB submission path and its completion
+> callback.
 > 
-> But on some operating systems like Ubuntu, /bin/sh is actually pointed to
-> DASH, thus it will try to run BASH commands with DASH and consequently
-> leads to syntax issues.
+> The URB completion callback can run immediately after usb_submit_urb()
+> returns, before the submitting function calls netif_stop_queue(). If
+> this occurs, the queue state management becomes desynchronized, leading
+> to a stall where the queue is never woken.
 > 
 > [...]
 
 Here is the summary with links:
-  - [1/1] selftests: net: use BASH for bareudp testing
-    https://git.kernel.org/netdev/net/c/9311e9540a8b
+  - [net,v3] net: mctp: Fix tx queue stall
+    https://git.kernel.org/netdev/net/c/da2522df3fcc
 
 You are awesome, thank you!
 -- 
