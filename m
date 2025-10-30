@@ -1,140 +1,147 @@
-Return-Path: <netdev+bounces-234288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BD3BC1ED80
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 08:50:35 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BBEDC1EE5E
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 09:03:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 74BF719C0A14
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 07:50:59 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1F9BD34AA9C
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 08:03:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FD132EDD70;
-	Thu, 30 Oct 2025 07:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 571002EF646;
+	Thu, 30 Oct 2025 08:03:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d8PUAp/7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DnWYRW95"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9F532FFDF3
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 07:50:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97E6737A3DF
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 08:03:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761810630; cv=none; b=lt9Jhz26NYuGTT+Joyk22FxNUI3Vg0OhcSk+NVxNyrIZIwcrsciacngx+IK9q06hTdiBM5DpCx+3Vdrl1+r7amv4PkY6BFZnfXxFm1j7EMHwrQivWPK8GtyVBIfjNLW+ATWa9GCTXnN8k/gWZqpNOexsi5EG+WrtfYx1BuZa0q0=
+	t=1761811388; cv=none; b=jCFKXnnFqQmheeJixoWxKXbz9PAErE8OQvSj+ffx9nJXYEO4CMUhy17ciCCZW31TTlfR/l0/BDXRpztlQsQMdpCiMUTCcagGbfz+7xNjDcyfH5626xYU/HWZKE6UVILPl6i+bWVf4ZZipEhM8o5NBqc/85eQB3Y7WnuWDienWOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761810630; c=relaxed/simple;
-	bh=JEl9GC42JmfajoHCarU2JPEtxV/Dvh3GNqFUPBkz8So=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=P7hgZmgq1N2e/Rw2iYNj3+pjngQuUXt5JDaFq76eLnTK6R8wVtJgN0wGbLqo9kliQ2JTWtAvBCQbziHgnKRchyb2cUInXGlDXelSy4HkpIQq2iLLDNFr+XkDlYNovPZS/EECjhfPGLfoH/IttwdvELU3Clnh6Mn1ZDbRjS3rnKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d8PUAp/7; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-78af3fe5b17so741953b3a.2
-        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 00:50:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761810628; x=1762415428; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vdDJYs2ftj9g3gsNmVUwfcn6X4b2n8l3NR5CnT8xsbU=;
-        b=d8PUAp/75/QKRXkvqcwfPDCm23XFiMmFSdAKkxyBcCJ4Ft/nxDzTzn/r5+ChTRoTXZ
-         CgIAfjk2mvYQlI9AD0GO50UDn4Uz4RQz+8d6Rtg/Y5PML8fxlrw2RRj42ZVZYviSFLC7
-         2TEh0w6GY7j7fuUCg247cD9wRmQFLycP2pwIRNP+mfZoApeOWHic09OLzYRZWZ50HVQn
-         cDe0/7YhpPTltn+2TnBtVrJ/kO5EPIFKD1xf8t+hZWwG/lDHJx02QHGOrKqREYrgZ31b
-         kMv2klfC+Za1Pj+TWsZVVt8q+cwjkrDK6zGFNucnfoYyYD+0z7E5lNb5sktlA+2w+Zmt
-         getQ==
+	s=arc-20240116; t=1761811388; c=relaxed/simple;
+	bh=+v9TYg0I32wj9TIv39/8XJR+K77d8shcdZ4JpLtQeWw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CX99aC7mXFWPV53JRntyS0DiGzxMQHoggZcQ3FMVHm1hxH6c4WV/ChxWN9h0gMNg5HVvpGToeIy8pf4KulGNUEAjw51j+dE3IHdolHqtODxy5+NmEktxP/4UUsXuzNv2rOVMCxtzuCMX+zw5lZjIHoevMB6425Uoy+sRD75pzPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DnWYRW95; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761811384;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OGlXAC9k2Rj+4zSzAHyi3VogDCtRFy8S0qEf2+An3Yc=;
+	b=DnWYRW95TGGnVhgDOCyJUJ9ArdTBk72R5Nd0toBX3DIG/d5Qrlyu5Kwn+AHZYm1PqCo/9q
+	HOAiO+/G+vDlwRB/EIWha1s9FtE4zruNrPbIjjurh7ianaG7Y15L8GcMbMCJcn9EzdxPz7
+	aTIYo+OsIZhvEX0WfTbFcCCkdawoqa0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-275-L5R-6jqxON6vb37Pn_xMpg-1; Thu, 30 Oct 2025 04:03:02 -0400
+X-MC-Unique: L5R-6jqxON6vb37Pn_xMpg-1
+X-Mimecast-MFC-AGG-ID: L5R-6jqxON6vb37Pn_xMpg_1761811381
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4770eded72cso6956525e9.0
+        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 01:03:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761810628; x=1762415428;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vdDJYs2ftj9g3gsNmVUwfcn6X4b2n8l3NR5CnT8xsbU=;
-        b=aw3I6//GnnyO4AbXrQ69R6mkxu54+wJEWKMXIjLZTvKFtjbj3S9QrV05DNkIVG82Y2
-         a0j7s2cVpUi7eCmkNpR+liusNZtR9rfPL1/s0dGqCIehq81t5+WN/RsJ3AdUyB+PG+2W
-         LXadkjg+DjNKL61P20NnIBmFeyGQ0k8WqtC9TRl9Rgyc67M1jYvJTrHPOTivDm1WL65i
-         ZXdH+5ZcQTvCCeC4doHGV4J8lA20/M/rQ9rLr0cc5ryYmzLtZ2ewgbMdfKOrH3mYSbTi
-         vZQNzimFXBgU4DjU0rFRY3zg4mQyHXuJRvwutjvHK61HQ24nG6+BbQi0l/j2ZVWxZ3uv
-         a5bQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVUqeaw0ShtZhyobBQJqBVjkdEPQJy0SVdcbMtmHsR1XPBb9Dg/saMwYfKsvuDRV9Bko34WUr8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdUIgBhp+/cDP9p4bK/BVhWFYQVQgGA20f4VifhQltLyyMmECT
-	izTCdrSoiDQkoy/+w1k9r090hyoC1naj2CgyDoBca+Dxj18/l466MWAi
-X-Gm-Gg: ASbGncvuK6z+BTTO4QFoUZWmYLB/YZ9up70RSLmqUe8OzvcZf9KNp9fnZF8Z6ngvEiC
-	qSTV6zVanaLx1zFRP8i0YSt3K/To3w63kCxluZTuoMe331gXRf/rdOa4qgIF3hzGxwDxdJvTx9U
-	QJjmT3iQAnyY/M1l5Zn4VEG1rLEXI/EHhrK3jHlHGdxGbrcqp/dQIO4B3QtTallzFdoSj6WEPdn
-	H9Ob4AkggUV3Kuv7CgPyQWVSkNHeJ7z9obiFRLTdkXhyn1hIodIymFSzcamq+MYh8kmC0NUfHFd
-	3OcZ39zHkzDb5KSp36PZ9MAj7ELCjFVA0Bixbg6+COG1+z77WXxD62QOqlmMU+RQhyeDTrnYHV1
-	4afdHx4iV1j3KmR/FS+TDUlvVEUSfXRoJ89GlQeNLv8B1fd0Dm1xPWXCtFZEO2n0FFvUGPBoRDM
-	gjjekPGOQrLuI=
-X-Google-Smtp-Source: AGHT+IEnOW3OBrwdrAR2/T02/vIwASDH7t9uKYiCN2IyW2jPQ7gCDPSDpZfSRXEfWPjcVg3PiiwQKA==
-X-Received: by 2002:a17:90b:4c09:b0:32d:d408:e86 with SMTP id 98e67ed59e1d1-3404c3ff4b8mr2592187a91.7.1761810627892;
-        Thu, 30 Oct 2025 00:50:27 -0700 (PDT)
-Received: from archie.me ([210.87.74.117])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34050bb62casm1554574a91.20.2025.10.30.00.50.26
+        d=1e100.net; s=20230601; t=1761811381; x=1762416181;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OGlXAC9k2Rj+4zSzAHyi3VogDCtRFy8S0qEf2+An3Yc=;
+        b=pe39PYDnKRZm0O04Pjlf+fstLhOair/Sj4A9P/csTeOAHZP8VKpCFIRuW/Th8muuF/
+         EqlY0ux3YbUX8V4V9gAs3eqAbKVacxf4CHwNVk898W9WteLHGnjSBvzjkm4E4hJQvTVJ
+         KVG5JwtqFlA1do4rKYjMemzbUuK7sHsxZQSDkjpMOt3Kp7FBITjU64DSr9gNNTHtn6Au
+         ujbSBZzUt5SE90nklEJ13tNSQLfOCHoqGCTCQyOg6YiwIokji7j6GmhDFyL7IucaIpVP
+         ZWoF13IH48dv232+bQQcpRuvIPaZsUt4rWTDC3u/8ATieZBCVvMpj4eqwxmeoNkwm3Gl
+         wLbQ==
+X-Gm-Message-State: AOJu0YxXrQ25uTlt8DksDc+jMHaoTTsGj+Wi3lXxlVKdjhCwB04Y7W2p
+	3N1PfpfOurh0jepV+8IX08cy7Ffm/RuX2GfsThjSsgQedmo4SDNe8My42YwhCK80ZRxLwkSJIfu
+	+6jJv8roX19+fd5ObF5FdkTfK8huqvRrfME6zTpQ4D/CbW09fMrbHXFBLpw==
+X-Gm-Gg: ASbGnctCEVRtQ0GgJHnDjW+C2m2TBSXwhvNpMKVkdJM1BZgEvxl3qj1w46N2RgEe91j
+	o7BhXrDV8FFVsKm32nIzsGBguxWk2UcwVQjxhEsub0CkG3b/+tSuhsIF6YkbxpZng4xpCfaDTUo
+	KmmhpHcf39oPFRqXH1wD3O15DDB8Fv3Hc1nHIilHF2UoUQam7is08BVXJdtiwZZXYzlv567Ac+o
+	4dB+hxKnKFjPxj4tlvGpakd18itpoj8oOoP23gr6xDAFP1zQ+NLgTgC1Jkf4jtz95KeGKyutdqI
+	6dunBy7gfIY7ElmBVdAJtNQz4wZL8WrDY1acivfWnUrEyy4C+F6GUWAp9DhmG4ePdLGN
+X-Received: by 2002:a7b:ce96:0:b0:471:611:c1e2 with SMTP id 5b1f17b1804b1-4772622261fmr15795895e9.3.1761811381061;
+        Thu, 30 Oct 2025 01:03:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEIk/aVFQrnT9Hu3ayvn/eJjBsnEhmM/97mhlhQ2wqghUOS1OPCyVarI+Iir3/xbIPyjDpwIw==
+X-Received: by 2002:a7b:ce96:0:b0:471:611:c1e2 with SMTP id 5b1f17b1804b1-4772622261fmr15795425e9.3.1761811380513;
+        Thu, 30 Oct 2025 01:03:00 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:152e:9d00:de90:c0da:d265:6f70])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47728999a4bsm24950915e9.2.2025.10.30.01.02.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Oct 2025 00:50:26 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id 7AD704209E4B; Thu, 30 Oct 2025 14:50:17 +0700 (WIB)
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Documentation <linux-doc@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>
-Cc: Breno Leitao <leitao@debian.org>,
+        Thu, 30 Oct 2025 01:03:00 -0700 (PDT)
+Date: Thu, 30 Oct 2025 04:02:57 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Bagas Sanjaya <bagasdotme@gmail.com>
-Subject: [PATCH net-next v2] Documentation: netconsole: Separate literal code blocks for full and short netcat command name versions
-Date: Thu, 30 Oct 2025 14:50:13 +0700
-Message-ID: <20251030075013.40418-1-bagasdotme@gmail.com>
-X-Mailer: git-send-email 2.51.1
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Heng Qi <hengqi@linux.alibaba.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Alvaro Karsz <alvaro.karsz@solid-run.com>,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH net v4 0/4] fixes two virtio-net related bugs.
+Message-ID: <20251030033025-mutt-send-email-mst@kernel.org>
+References: <20251029030913.20423-1-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1137; i=bagasdotme@gmail.com; h=from:subject; bh=JEl9GC42JmfajoHCarU2JPEtxV/Dvh3GNqFUPBkz8So=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDJnMEpucuOR/GChNmvJz0qIJUgtObFj4kHXNrRd7Y3S/7 HO5+iZGv6OUhUGMi0FWTJFlUiJf0+ldRiIX2tc6wsxhZQIZwsDFKQAT2SvAyHB0dYPejlmlOdet 1/wKtCh4v+HUdsMvXz9+4uJlLd/LnnCBkeHxnq3C29++ajx83tl4/4u4vh0aSRHVUcyLbULmMCj t2MoLAA==
-X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251029030913.20423-1-xuanzhuo@linux.alibaba.com>
 
-Both full and short (abbreviated) command name versions of netcat
-example are combined in single literal code block due to 'or::'
-paragraph being indented one more space than the preceding paragraph
-(before the short version example).
+On Wed, Oct 29, 2025 at 11:09:09AM +0800, Xuan Zhuo wrote:
+> As discussed in http://lore.kernel.org/all/20250919013450.111424-1-xuanzhuo@linux.alibaba.com
+> Commit #1 Move the flags into the existing if condition; the issue is that it introduces a
+> small amount of code duplication.
+> 
+> Commit #3 is new to fix the hdr len in tunnel gso feature.
 
-Unindent it to separate the versions.
 
-Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
----
-Changes since v1 [1]:
 
-  - Apply proofreading suggestions on patch title and description (Randy)
+I think these are completely independent right?
 
-[1]: https://lore.kernel.org/linux-doc/20251029015940.10350-1-bagasdotme@gmail.com/
+When there is no dependency it is best to send
+patches separately, this way they do not block each other.
 
- Documentation/networking/netconsole.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/networking/netconsole.rst b/Documentation/networking/netconsole.rst
-index 59cb9982afe60a..0816ce64dcfd68 100644
---- a/Documentation/networking/netconsole.rst
-+++ b/Documentation/networking/netconsole.rst
-@@ -91,7 +91,7 @@ for example:
- 
- 	nc -u -l -p <port>' / 'nc -u -l <port>
- 
--    or::
-+   or::
- 
- 	netcat -u -l -p <port>' / 'netcat -u -l <port>
- 
-
-base-commit: 1bae0fd90077875b6c9c853245189032cbf019f7
--- 
-An old man doll... just what I always wanted! - Clara
+> 
+> Thanks.
+> 
+> v4:
+>    1. add commit "virtio-net: Ensure hdr_len is not set unless the header is forwarded to the device." @Jason
+> 
+> v3:
+>    1. recode the #3 for tunnel gso, and test it
+> 
+> 
+> 
+> Xuan Zhuo (4):
+>   virtio-net: fix incorrect flags recording in big mode
+>   virtio-net: Ensure hdr_len is not set unless the header is forwarded
+>     to the device.
+>   virtio-net: correct hdr_len handling for VIRTIO_NET_F_GUEST_HDRLEN
+>   virtio-net: correct hdr_len handling for tunnel gso
+> 
+>  drivers/net/virtio_net.c   | 16 +++++++++----
+>  include/linux/virtio_net.h | 48 ++++++++++++++++++++++++++++++--------
+>  2 files changed, 49 insertions(+), 15 deletions(-)
+> 
+> --
+> 2.32.0.3.g01195cf9f
 
 
