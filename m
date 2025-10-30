@@ -1,420 +1,198 @@
-Return-Path: <netdev+bounces-234428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A279C20938
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 15:27:05 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFD1BC2094D
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 15:28:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 540B442496C
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 14:25:05 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1C00B34F2DD
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 14:28:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18DE026B955;
-	Thu, 30 Oct 2025 14:24:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0681726A1B5;
+	Thu, 30 Oct 2025 14:28:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T0Y+YHy5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FW1r1LY5"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6B7326A1CF
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 14:24:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 722CE25A34B
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 14:28:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761834293; cv=none; b=uPK13taUw7SHt0R3oo9+yaC79Bq/RZg4PWsgaXf+SAhp8UPdCEYMKdt/SWaNlJcB2zH+WYyec/pcFOSHj4/ke8q2eNvHR/+5gYiwqfDpci3BS1LgSO04I5hLsQqvXVm9g1JmOTjjaBuLVEozeXS7ch2XfWLUS5O6P3vVhMqNQh0=
+	t=1761834495; cv=none; b=bHrpk8vUqP133BTAL/nli0fpMZMn7/+C+Y5v1NfOKbw53w3CCrtGxPxDFY4NTRNG8ww3Mle3/7Agxq5NWu8CRGrSAu1RJTBrNjuEXUuWWWzgDaILdugPSR9IPBra8THrYcB3UcqP/0aUaZgsOvow0DW+JwxZkd+RIAJDtkuTk2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761834293; c=relaxed/simple;
-	bh=cbRji5smRT1vcaorG6gHQjSz03HGWszJDkAlppuBN9s=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=atnAGI/qJG6GhDUu6+4m6QCF3CALRBIBdHIPP9arxvGozDH5CUuR4VI1kVwrSL3kM28W07vwlJxEC+jd5io+4CAmNDnixFMPJCrEoKmGXUML4IVDmKhRH62hA7N7j+fanyg0/d03YvP3VcSM1I0NiSB6lyynw6OaCCMPdgOsyl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T0Y+YHy5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761834289;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=mZVJ1MysJf9HvK2dLJ/M3JIjPeNWLhLG665s/jqHrkM=;
-	b=T0Y+YHy5+rDNlyl92xelvxUB0bpk/HdbzXBhcWiy4mdwL9PlUVOcS3TN5ddrLzHrugnBkz
-	xGDzUiWgMmVRRMMpjK97tEoM/hA9uqL0FiLQT3BfjJReBfP9fNytKr09GsAmf+vLs6piv8
-	ukPA07CUUotdIPO7M5kNRRe5KMayeiY=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-187-1Rhk3uxrN5-zOkrtqKrWAQ-1; Thu,
- 30 Oct 2025 10:24:43 -0400
-X-MC-Unique: 1Rhk3uxrN5-zOkrtqKrWAQ-1
-X-Mimecast-MFC-AGG-ID: 1Rhk3uxrN5-zOkrtqKrWAQ_1761834282
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6FBDC1955EA6;
-	Thu, 30 Oct 2025 14:24:42 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.44.33.237])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EFC431955BE3;
-	Thu, 30 Oct 2025 14:24:39 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [GIT PULL] Networking for v6.18-rc4
-Date: Thu, 30 Oct 2025 15:24:15 +0100
-Message-ID: <20251030142415.29023-1-pabeni@redhat.com>
+	s=arc-20240116; t=1761834495; c=relaxed/simple;
+	bh=XofufYTIvVz0xFJFDMwmm6sP18q7o2xd40JtSUXhtAs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GK7CWuK1cmxRlOVFtmJr4gEZGp6h+Tnf6PyTkumuDcl5AIXIBEemvkLZzhZfGV9xphjS/ObKDs2R980/bfY/aayDC/EjF5TEfBy3WNDVTP6H9f9hvV2OHHxwqJ2x0Pj/nB+O6I/4Scac9iIAYvEnZ8buRGoudSI8DTxaGpyJyx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FW1r1LY5; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7a4c202a30aso1275097b3a.2
+        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 07:28:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761834493; x=1762439293; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cuCA5wWQIDpUIW6qlKdvaKlw1rWMEkNLw7LaZvFkQQE=;
+        b=FW1r1LY5MXOhfTBolumPD7ILbPaooLDt/Aiwoni7dB8VechTrX4GStZhFvQeCAyiBC
+         VTI5QIzXr+rRsb1pFgg788Vqt1EeLm3Vgh5CG0wP26Zhvwv0no54RaRA/rnsM9LWHCDh
+         Bz5PFu5nzhvmUpdSGS4TCJ9VfXAuvqFuOHO2ItydtTlD4DR/R/ig9c+cpePuaTblfVVe
+         PCbGzJKAuIjxFpfGFA/86c+uDt4/DEbZU9OmLfw9iw6sGJ43xiXdXhPfHeCkXF9DMelH
+         9FXmAnBFlf+xDdmpGlAQXr30iChx9Hda+KcmiyJ0GgDYX2JvgidiNIABR8ac6rilqccE
+         j6qQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761834493; x=1762439293;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cuCA5wWQIDpUIW6qlKdvaKlw1rWMEkNLw7LaZvFkQQE=;
+        b=MRM6DpKS3dfX5oqAkuUSMMTrxvPM3FTBF8e2xyce/Yr6HTMWJSEjqQ2WG3LBQcQRdZ
+         DgZ/4/Ke44scvxxvrzgUPVTO5oOvPcvUQWkq7gsiJIxc5xffoch16U5wWBufRJMKnuJT
+         AlqKAj1aV4waW4oq79kmeOG0kCd3nYuqYWYBP8lz2W0nPHklgg8LEWOt3LiARBNybcG9
+         ar/+Jmk+KCfzAXoAbG1Kx59x/P+zaXyKVcqPclS88NS5xoiZmjoQWxFaYJNjGffWcFWH
+         KGRKLhjN79XyRHhx9LOkdhISK5IRqyg3oUVsWBGar6J2klCuRqHQcp2JfmdYybgI4QHC
+         fXOQ==
+X-Gm-Message-State: AOJu0YzTRRudow317EWnq+tK/dMj7fOId72y+pQmoR4pIn7CK1uwbXtO
+	53DXKWhHvUsPdtP42Mx2MAyMIoOofMxdwqk1u212hRqaeiEGBPRyuxhAuvhFmZB8rlN3HXOHvTa
+	YKW0IWoh/kQq0rtivL3btm1dZ5sBJ1IQ=
+X-Gm-Gg: ASbGncsuEvhkKcviFRgscPrt9nLYp3Lzm0FOqTSVRz9cR33k9HYURTaBZeUXXY+JOAu
+	X6SxymZAU8z7nWPsRxfVpx7lTcTj5DvWdcZDUHPTl4jzIRXv32L93srml/CQ7L3kLu9BgLNLdzL
+	11Kdp306u64HF+yRaRFriN6yGrZHymaZ1v41gNoGVKRLvAdhxWjbd61cstTPPb8x0X8CnPbJAp0
+	el2yGiCHXuTuzm+M4TwXmZg2S2KGpCtkHAjyWQOrC332/7RjmOSmk4BNtVrDBxJ25fIP8o79NuW
+	qn0qbs+3lqNWWIJd2QwpVCEgmNfj
+X-Google-Smtp-Source: AGHT+IGSYvw5mArOho8Chrlid2Yf9zFIgqFqjnuZ41Vc14qeGP9OaC3SkBO5TkyH/r8UCkIM4dvPWepO1U0aCamvif4=
+X-Received: by 2002:a05:6a00:181b:b0:7a3:455e:3fa5 with SMTP id
+ d2e1a72fcca58-7a621813833mr5006811b3a.0.1761834493501; Thu, 30 Oct 2025
+ 07:28:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
-
-Hi Linus!
-
-The following changes since commit ab431bc39741e9d9bd3102688439e1864c857a74:
-
-  Merge tag 'net-6.18-rc3' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-10-23 07:03:18 -1000)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.18-rc4
-
-for you to fetch changes up to 51e5ad549c43b557c7da1e4d1a1dcf061b4a5f6c:
-
-  net: sctp: fix KMSAN uninit-value in sctp_inq_pop (2025-10-30 11:21:05 +0100)
-
-----------------------------------------------------------------
-Including fixes from wireless, Bluetooth and netfilter.
-
-Current release - regressions:
-
-  - tcp: fix too slow tcp_rcvbuf_grow() action
-
-  - bluetooth: fix corruption in h4_recv_buf() after cleanup
-
-Previous releases - regressions:
-
-  - mptcp: restore window probe
-
-  - bluetooth:
-    - fix connection cleanup with BIG with 2 or more BIS
-    - fix crash in set_mesh_sync and set_mesh_complete
-
-  - batman-adv: release references to inactive interfaces
-
-  - nic: ice: fix usage of logical PF id
-
-  - nic: sfc: fix potential memory leak in efx_mae_process_mport()
-
-Previous releases - always broken:
-
-  - devmem: refresh devmem TX dst in case of route invalidation
-
-  - netfilter: add seqadj extension for natted connections
-
-  - wifi:
-    - iwlwifi: fix potential use after free in iwl_mld_remove_link()
-    - brcmfmac: fix crash while sending action frames in standalone AP Mode
-
-  - eth: mlx5e: cancel tls RX async resync request in error flows
-
-  - eth: ixgbe: fix memory leak and use-after-free in ixgbe_recovery_probe()
-
-  - eth: hibmcge: fix rx buf avl irq is not re-enabled in irq_handle issue
-
-  - eth: cxgb4: fix potential use-after-free in ipsec callback
-
-  - eth: nfp: fix memory leak in nfp_net_alloc()
-
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-
-----------------------------------------------------------------
-Abdun Nihaal (2):
-      sfc: fix potential memory leak in efx_mae_process_mport()
-      nfp: xsk: fix memory leak in nfp_net_alloc()
-
-Aloka Dixit (1):
-      wifi: mac80211: reset FILS discovery and unsol probe resp intervals
-
-Andrii Melnychenko (1):
-      netfilter: nft_ct: add seqadj extension for natted connections
-
-Bagas Sanjaya (2):
-      MAINTAINERS: mark ISDN subsystem as orphan
-      Documentation: netconsole: Remove obsolete contact people
-
-Bui Quang Minh (1):
-      virtio-net: drop the multi-buffer XDP packet in zerocopy
-
-Calvin Owens (1):
-      Bluetooth: fix corruption in h4_recv_buf() after cleanup
-
-Cen Zhang (1):
-      Bluetooth: hci_sync: fix race in hci_cmd_sync_dequeue_once
-
-Chris Lu (1):
-      Bluetooth: btmtksdio: Add pmctrl handling for BT closed state during reset
-
-Cosmin Ratiu (1):
-      net/mlx5: Don't zero user_count when destroying FDB tables
-
-Dan Carpenter (1):
-      wifi: iwlwifi: fix potential use after free in iwl_mld_remove_link()
-
-Dr. David Alan Gilbert (1):
-      MAINTAINERS: wcn36xx: Add linux-wireless list
-
-Emanuele Ghidoli (1):
-      net: phy: dp83867: Disable EEE support as not implemented
-
-Emmanuel Grumbach (1):
-      wifi: nl80211: call kfree without a NULL check
-
-Eric Dumazet (3):
-      trace: tcp: add three metrics to trace_tcp_rcvbuf_grow()
-      tcp: add newval parameter to tcp_rcvbuf_grow()
-      tcp: fix too slow tcp_rcvbuf_grow() action
-
-Fernando Fernandez Mancera (1):
-      netfilter: nft_connlimit: fix possible data race on connection count
-
-Florian Westphal (1):
-      netfilter: nft_ct: enable labels for get case too
-
-Frédéric Danis (1):
-      Revert "Bluetooth: L2CAP: convert timeouts to secs_to_jiffies()"
-
-Gokul Sivakumar (1):
-      wifi: brcmfmac: fix crash while sending Action Frames in standalone AP Mode
-
-Grzegorz Nitka (3):
-      ice: fix lane number calculation
-      ice: fix destination CGU for dual complex E825
-      ice: fix usage of logical PF id
-
-Gustavo Luiz Duarte (1):
-      netconsole: Fix race condition in between reader and writer of userdata
-
-Hangbin Liu (1):
-      tools: ynl: avoid print_field when there is no reply
-
-Ivan Vecera (1):
-      dpll: zl3073x: Fix output pin registration
-
-Jakub Kicinski (10):
-      Merge tag 'wireless-2025-10-23' of https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless
-      Merge tag 'for-net-2025-10-24' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth
-      Merge tag 'batadv-net-pullrequest-20251024' of https://git.open-mesh.org/linux-merge
-      Merge branch 'bug-fixes-for-the-hibmcge-ethernet-driver'
-      Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
-      Merge branch 'tcp-fix-receive-autotune-again'
-      Merge branch 'mptcp-various-rare-sending-issues'
-      Merge tag 'nf-25-10-29' of https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
-      Merge branch 'tls-introduce-and-use-rx-async-resync-request-cancel-function'
-      Merge branch 'net-stmmac-fixes-for-stmmac-tx-vlan-insert-and-est'
-
-Jijie Shao (4):
-      net: hns3: return error code when function fails
-      net: hibmcge: fix rx buf avl irq is not re-enabled in irq_handle issue
-      net: hibmcge: remove unnecessary check for np_link_fail in scenarios without phy.
-      net: hibmcge: fix the inappropriate netif_device_detach()
-
-Jinliang Wang (1):
-      net: mctp: Fix tx queue stall
-
-Johan Hovold (1):
-      Bluetooth: rfcomm: fix modem control handling
-
-Johannes Berg (3):
-      Merge tag 'ath-current-20251006' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath
-      wifi: mac80211: fix key tailroom accounting leak
-      Merge tag 'iwlwifi-fixes-2025-10-19' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next
-
-Karthik M (1):
-      wifi: ath12k: free skb during idr cleanup callback
-
-Kiran K (1):
-      Bluetooth: btintel_pcie: Fix event packet loss issue
-
-Kohei Enju (5):
-      ixgbe: fix memory leak and use-after-free in ixgbe_recovery_probe()
-      igc: power up the PHY before the link test
-      igb: use EOPNOTSUPP instead of ENOTSUPP in igb_get_sset_count()
-      igc: use EOPNOTSUPP instead of ENOTSUPP in igc_ethtool_get_sset_count()
-      ixgbe: use EOPNOTSUPP instead of ENOTSUPP in ixgbe_ptp_feature_enable()
-
-Krzysztof Kozlowski (1):
-      dt-bindings: net: sparx5: Narrow properly LAN969x register space windows
-
-Lizhi Xu (1):
-      usbnet: Prevents free active kevent
-
-Loic Poulain (1):
-      wifi: ath10k: Fix memory leak on unsupported WMI command
-
-Luiz Augusto von Dentz (5):
-      Bluetooth: ISO: Fix BIS connection dst_type handling
-      Bluetooth: HCI: Fix tracking of advertisement set/instance 0x00
-      Bluetooth: ISO: Fix another instance of dst_type handling
-      Bluetooth: hci_conn: Fix connection cleanup with BIG with 2 or more BIS
-      Bluetooth: hci_core: Fix tracking of periodic advertisement
-
-Mark Pearson (1):
-      wifi: ath11k: Add missing platform IDs for quirk table
-
-Miaoqian Lin (1):
-      net: usb: asix_devices: Check return value of usbnet_get_endpoints
-
-Paolo Abeni (5):
-      mptcp: fix subflow rcvbuf adjust
-      mptcp: drop bogus optimization in __mptcp_check_push()
-      mptcp: fix MSG_PEEK stream corruption
-      mptcp: restore window probe
-      mptcp: zero window probe mib
-
-Pauli Virtanen (1):
-      Bluetooth: MGMT: fix crash in set_mesh_sync and set_mesh_complete
-
-Pavel Zhigulin (1):
-      net: cxgb4/ch_ipsec: fix potential use-after-free in ch_ipsec_xfrm_add_state() callback
-
-Petr Oros (3):
-      tools: ynl: fix string attribute length to include null terminator
-      dpll: spec: add missing module-name and clock-id to pin-get reply
-      dpll: fix device-id-get and pin-id-get to return errors properly
-
-Po-Hsu Lin (1):
-      selftests: net: use BASH for bareudp testing
-
-Rafał Miłecki (1):
-      bcma: don't register devices disabled in OF
-
-Rameshkumar Sundaram (1):
-      wifi: ath11k: avoid bit operation on key flags
-
-Ranganath V N (1):
-      net: sctp: fix KMSAN uninit-value in sctp_inq_pop
-
-Rohan G Thomas (3):
-      net: stmmac: vlan: Disable 802.1AD tag insertion offload
-      net: stmmac: Consider Tx VLAN offload tag length for maxSDU
-      net: stmmac: est: Fix GCL bounds checks
-
-Shahar Shitrit (3):
-      net: tls: Change async resync helpers argument
-      net: tls: Cancel RX async resync request on rcd_delta overflow
-      net/mlx5e: kTLS, Cancel RX async resync request in error flows
-
-Shivaji Kant (1):
-      net: devmem: refresh devmem TX dst in case of route invalidation
-
-Sven Eckelmann (1):
-      batman-adv: Release references to inactive interfaces
-
-Thanh Quan (1):
-      net: phy: dp83869: fix STRAP_OPMODE bitmask
-
- CREDITS                                            |  4 ++
- .../bindings/net/microchip,sparx5-switch.yaml      |  4 +-
- Documentation/netlink/specs/dpll.yaml              |  2 +
- Documentation/networking/netconsole.rst            |  3 -
- MAINTAINERS                                        |  9 +--
- drivers/bcma/main.c                                |  6 ++
- drivers/bluetooth/bpa10x.c                         |  4 +-
- drivers/bluetooth/btintel_pcie.c                   | 11 +--
- drivers/bluetooth/btmtksdio.c                      | 12 ++++
- drivers/bluetooth/btmtkuart.c                      |  4 +-
- drivers/bluetooth/btnxpuart.c                      |  4 +-
- drivers/bluetooth/hci_ag6xx.c                      |  2 +-
- drivers/bluetooth/hci_aml.c                        |  2 +-
- drivers/bluetooth/hci_ath.c                        |  2 +-
- drivers/bluetooth/hci_bcm.c                        |  2 +-
- drivers/bluetooth/hci_h4.c                         |  6 +-
- drivers/bluetooth/hci_intel.c                      |  2 +-
- drivers/bluetooth/hci_ll.c                         |  2 +-
- drivers/bluetooth/hci_mrvl.c                       |  6 +-
- drivers/bluetooth/hci_nokia.c                      |  4 +-
- drivers/bluetooth/hci_qca.c                        |  2 +-
- drivers/bluetooth/hci_uart.h                       |  2 +-
- drivers/dpll/dpll_netlink.c                        | 36 +++++-----
- drivers/dpll/zl3073x/dpll.c                        |  2 +-
- .../chelsio/inline_crypto/ch_ipsec/chcr_ipsec.c    |  7 +-
- .../net/ethernet/hisilicon/hibmcge/hbg_common.h    |  1 +
- drivers/net/ethernet/hisilicon/hibmcge/hbg_err.c   | 10 +--
- drivers/net/ethernet/hisilicon/hibmcge/hbg_hw.c    |  3 +
- drivers/net/ethernet/hisilicon/hibmcge/hbg_irq.c   |  1 +
- drivers/net/ethernet/hisilicon/hibmcge/hbg_mdio.c  |  1 -
- .../ethernet/hisilicon/hns3/hns3pf/hclge_main.c    |  3 +-
- .../ethernet/hisilicon/hns3/hns3pf/hclge_mdio.c    |  9 ++-
- .../ethernet/hisilicon/hns3/hns3pf/hclge_mdio.h    |  2 +-
- drivers/net/ethernet/intel/ice/ice_common.c        | 35 ++++++++-
- drivers/net/ethernet/intel/ice/ice_flex_pipe.c     |  2 +-
- drivers/net/ethernet/intel/ice/ice_sbq_cmd.h       |  1 +
- drivers/net/ethernet/intel/igb/igb_ethtool.c       |  2 +-
- drivers/net/ethernet/intel/igc/igc_ethtool.c       |  5 +-
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c      |  2 +-
- drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c       |  2 +-
- .../ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c | 41 +++++++++--
- .../mellanox/mlx5/core/en_accel/ktls_txrx.h        |  4 ++
- drivers/net/ethernet/mellanox/mlx5/core/en_rx.c    |  4 ++
- .../net/ethernet/mellanox/mlx5/core/esw/legacy.c   |  1 -
- .../ethernet/mellanox/mlx5/core/eswitch_offloads.c |  1 -
- .../net/ethernet/netronome/nfp/nfp_net_common.c    |  6 +-
- drivers/net/ethernet/sfc/mae.c                     |  4 ++
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  | 32 ++++-----
- drivers/net/ethernet/stmicro/stmmac/stmmac_tc.c    |  4 +-
- drivers/net/ethernet/stmicro/stmmac/stmmac_vlan.c  |  2 +-
- drivers/net/mctp/mctp-usb.c                        |  8 ++-
- drivers/net/netconsole.c                           | 21 +++---
- drivers/net/phy/dp83867.c                          |  6 ++
- drivers/net/phy/dp83869.c                          |  4 +-
- drivers/net/usb/asix_devices.c                     | 12 +++-
- drivers/net/usb/usbnet.c                           |  2 +
- drivers/net/virtio_net.c                           | 11 ++-
- drivers/net/wireless/ath/ath10k/wmi.c              |  1 +
- drivers/net/wireless/ath/ath11k/core.c             | 54 ++++++++++++--
- drivers/net/wireless/ath/ath11k/mac.c              | 10 +--
- drivers/net/wireless/ath/ath12k/mac.c              | 34 ++++-----
- .../broadcom/brcm80211/brcmfmac/cfg80211.c         |  3 +-
- .../net/wireless/broadcom/brcm80211/brcmfmac/p2p.c | 28 +++-----
- .../net/wireless/broadcom/brcm80211/brcmfmac/p2p.h |  3 +-
- drivers/net/wireless/intel/iwlwifi/mld/link.c      |  5 +-
- include/net/bluetooth/hci.h                        |  1 +
- include/net/bluetooth/hci_core.h                   |  1 +
- include/net/bluetooth/l2cap.h                      |  4 +-
- include/net/bluetooth/mgmt.h                       |  2 +-
- include/net/tcp.h                                  |  2 +-
- include/net/tls.h                                  | 25 +++----
- include/trace/events/tcp.h                         |  9 +++
- net/batman-adv/originator.c                        | 14 +++-
- net/bluetooth/hci_conn.c                           |  7 ++
- net/bluetooth/hci_event.c                          | 11 ++-
- net/bluetooth/hci_sync.c                           | 21 +++---
- net/bluetooth/iso.c                                | 10 ++-
- net/bluetooth/l2cap_core.c                         |  4 +-
- net/bluetooth/mgmt.c                               | 26 ++++---
- net/bluetooth/rfcomm/tty.c                         | 26 +++----
- net/core/devmem.c                                  | 27 ++++++-
- net/ipv4/tcp_input.c                               | 21 ++++--
- net/mac80211/cfg.c                                 |  3 +
- net/mac80211/key.c                                 | 11 ++-
- net/mptcp/mib.c                                    |  1 +
- net/mptcp/mib.h                                    |  1 +
- net/mptcp/protocol.c                               | 83 ++++++++++++++--------
- net/mptcp/protocol.h                               |  2 +-
- net/netfilter/nft_connlimit.c                      |  2 +-
- net/netfilter/nft_ct.c                             | 30 +++++++-
- net/sctp/input.c                                   |  2 +-
- net/tls/tls_device.c                               |  4 +-
- net/wireless/nl80211.c                             |  3 +-
- tools/net/ynl/lib/ynl-priv.h                       |  4 +-
- tools/net/ynl/pyynl/ethtool.py                     |  3 +
- tools/testing/selftests/net/bareudp.sh             |  2 +-
- 96 files changed, 597 insertions(+), 285 deletions(-)
-
+References: <cover.1761748557.git.lucien.xin@gmail.com> <91ff36185099cd97626a7a8782d756cf3e963c82.1761748557.git.lucien.xin@gmail.com>
+ <67b38b36-b6fa-4cab-b14f-8ba271f02065@samba.org> <CADvbK_f4rN-7bvvwWDVm-B+h6QiSwQbK7EKsWh5kTuHJjuGjTA@mail.gmail.com>
+ <b9300291-e828-47fa-b4d1-66934636bd7b@samba.org> <CADvbK_f=E11=dszeJos98RvBY5POXujgT0dFo-LG6QQuGW20Kg@mail.gmail.com>
+ <0b65e74c-71bb-494d-9b05-0ee20f27e840@samba.org>
+In-Reply-To: <0b65e74c-71bb-494d-9b05-0ee20f27e840@samba.org>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Thu, 30 Oct 2025 10:28:01 -0400
+X-Gm-Features: AWmQ_blojTdIYKtFmYVhDD9RZMLgIE9kL3y8nlMJgL7u2g9jepaBDc3oSEs4qws
+Message-ID: <CADvbK_cPEnNfcUXaHm3Aub0dkerqnwG4NB_EJ_eQZTc80c28_Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 02/15] net: build socket infrastructure for
+ QUIC protocol
+To: Stefan Metzmacher <metze@samba.org>
+Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
+	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Moritz Buhl <mbuhl@openbsd.org>, 
+	Tyler Fanelli <tfanelli@redhat.com>, Pengtao He <hepengtao@xiaomi.com>, 
+	Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
+	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Benjamin Coddington <bcodding@redhat.com>, Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, 
+	Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>, 
+	Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe" <alibuda@linux.alibaba.com>, 
+	Jason Baron <jbaron@akamai.com>, illiliti <illiliti@protonmail.com>, 
+	Sabrina Dubroca <sd@queasysnail.net>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
+	Daniel Stenberg <daniel@haxx.se>, Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Oct 30, 2025 at 10:17=E2=80=AFAM Stefan Metzmacher <metze@samba.org=
+> wrote:
+>
+> Am 30.10.25 um 15:13 schrieb Xin Long:
+> > On Thu, Oct 30, 2025 at 7:29=E2=80=AFAM Stefan Metzmacher <metze@samba.=
+org> wrote:
+> >>
+> >> Am 29.10.25 um 20:57 schrieb Xin Long:
+> >>> On Wed, Oct 29, 2025 at 12:22=E2=80=AFPM Stefan Metzmacher <metze@sam=
+ba.org> wrote:
+> >>>>
+> >>>> Hi Xin,
+> >>>>
+> >>>>> This patch lays the groundwork for QUIC socket support in the kerne=
+l.
+> >>>>> It defines the core structures and protocol hooks needed to create
+> >>>>> QUIC sockets, without implementing any protocol behavior at this st=
+age.
+> >>>>>
+> >>>>> Basic integration is included to allow building the module via
+> >>>>> CONFIG_IP_QUIC=3Dm.
+> >>>>>
+> >>>>> This provides the scaffolding necessary for adding actual QUIC sock=
+et
+> >>>>> behavior in follow-up patches.
+> >>>>>
+> >>>>> Signed-off-by: Pengtao He <hepengtao@xiaomi.com>
+> >>>>> Signed-off-by: Xin Long <lucien.xin@gmail.com>
+> >>>>
+> >>>> ...
+> >>>>
+> >>>>> +module_init(quic_init);
+> >>>>> +module_exit(quic_exit);
+> >>>>> +
+> >>>>> +MODULE_ALIAS("net-pf-" __stringify(PF_INET) "-proto-261");
+> >>>>> +MODULE_ALIAS("net-pf-" __stringify(PF_INET6) "-proto-261");
+> >>>>
+> >>>> Shouldn't this use MODULE_ALIAS_NET_PF_PROTO(PF_INET, IPPROTO_QUIC)
+> >>>> instead?
+> >>>>
+> >>> Hi, Stefan,
+> >>>
+> >>> If we switch to using MODULE_ALIAS_NET_PF_PROTO(), we still need to
+> >>> keep using the numeric value 261:
+> >>>
+> >>>     MODULE_ALIAS_NET_PF_PROTO(PF_INET, 261);
+> >>>     MODULE_ALIAS_NET_PF_PROTO(PF_INET6, 261);
+> >>>
+> >>> IPPROTO_QUIC is defined as an enum, not a macro. Since
+> >>> MODULE_ALIAS_NET_PF_PROTO() relies on __stringify(proto), it can=E2=
+=80=99t
+> >>> stringify enum values correctly, and it would generate:
+> >>>
+> >>>     alias:          net-pf-10-proto-IPPROTO_QUIC
+> >>>     alias:          net-pf-2-proto-IPPROTO_QUIC
+> >>
+> >> Yes, now I remember...
+> >>
+> >> Maybe we can use something like this:
+> >>
+> >> -  IPPROTO_QUIC =3D 261,          /* A UDP-Based Multiplexed and Secur=
+e Transport */
+> >> +#define __IPPROTO_QUIC 261     /* A UDP-Based Multiplexed and Secure =
+Transport */
+> >> +  IPPROTO_QUIC =3D __IPPROTO_QUIC,
+> >>
+> >> and then
+> >>
+> >> MODULE_ALIAS_NET_PF_PROTO(PF_INET, __IPPROTO_QUIC)
+> >>
+> >> In order to make things clearer.
+> >>
+> >> What do you think?
+> >>
+> > That might be a good idea to make things clearer later on.
+> >
+> > But for now, I=E2=80=99d prefer not to add something special just for Q=
+UIC in
+> > include/uapi/linux/in.h.  We can revisit it later together with SCTP,
+> > L2TP, and SMC to keep things consistent.
+>
+> Ok, maybe this would do it for now?
+>
+> MODULE_ALIAS_NET_PF_PROTO(PF_INET, 261); /* IPPROTO_QUIC =3D=3D 261 */
+>
+Yep, fine by me. :-)
+
+> I'll do the same for IPPROTO_SMBDIRECT...
+>
+> metze
 
