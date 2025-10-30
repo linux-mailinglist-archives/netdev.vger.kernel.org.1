@@ -1,165 +1,284 @@
-Return-Path: <netdev+bounces-234349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EB37C1F94A
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 11:34:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CDB44C1F953
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 11:35:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED3AE4283BF
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 10:30:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08CF0424F53
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 10:30:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37B16351FB1;
-	Thu, 30 Oct 2025 10:28:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36DC12F8BEE;
+	Thu, 30 Oct 2025 10:30:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="IGUOwze7";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="RGqch72S"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Gx4Ls7sA"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b8-smtp.messagingengine.com (fout-b8-smtp.messagingengine.com [202.12.124.151])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16B9C350D52
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 10:28:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F95134DB57
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 10:30:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761820122; cv=none; b=S2tKmWdnl/JlmeoNBaGQQTVdgJZNWTDRqQfJ5gcEEc73/SUZkLlajnUwS5grfKVPCfBeo97E+gXBWt82HcdW7XnnBia/GYoIKlu97iUdqgKA0jUPCw9p2Pgc6rdCFTn6Usj/0VpnJacrX3UYtlouUcVsdm+r9PPxLXc+fifIryk=
+	t=1761820217; cv=none; b=UsKXB0+n3HvdMIBRmAjlhU7yd8xcqT1XGanFjIHcwbPWKAxB19d7N46zqIbJTf2eJH42TOiLgWVOvc/4gW8pFX6yGcwUEIgD58OG0Ta2kcGwJ+ICezWJrlCuTL0AQb2neqG/MgAwWlN9SS66ToBdHm8//R04kH9tpn0WZdJsR90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761820122; c=relaxed/simple;
-	bh=0/baVWMxFoAo/Ib95gC0lBZ45HRVyqvAZbY/K71GKk0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=e09I3kqBYz+Ka6CR4OgCfd8fbkbP8LIDWlN0WE/hPqUf+wddHUjTxqvir/d3Qqas5WZNVjOQB/Jpz5BCFmqpQ7MUN5UCGxAuzHqaZV13hmTWaA0VEJCnNvA2ku6q1SQz0WF3lKIXtTNIS/OSLHeTNfIz3QHkRww9ITI7EUdZFQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=IGUOwze7; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=RGqch72S; arc=none smtp.client-ip=202.12.124.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailfout.stl.internal (Postfix) with ESMTP id AC26A1D0018C;
-	Thu, 30 Oct 2025 06:28:37 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-01.internal (MEProxy); Thu, 30 Oct 2025 06:28:37 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1761820117; x=
-	1761906517; bh=pv3kIQ2je0JxNKKQubVH5mPhZIsYYqq5229K/Th1UN8=; b=I
-	GUOwze75oK88VMJczvny8YRTIqd4p0raiiywhcuzOs5jGEkioPeCor/Nc/mSSrcI
-	YxSMXKF2tHJc+0RI8u5pv+aHO4H6gLdFnKHqeCK5GRgZIFZ3i/WUIHzrBNw5QCiQ
-	30ZrC5cd2qDchmQRxVWQiMbFQ4iYpknlcTQrEfhJV2HZqpxFvxkgLR7tTBIhzcsb
-	dbQce5hVj2xNSSKkacE0FtLVRaCoKZxnpCmgEkrgM/cE/uOBiA9XdXRfFNnSVN8l
-	boK3/fRgGwu+Be4B1w21QE14YTBQawkNzFO/HkuYXvknA1FdGd0DQfFfSPyUz7/L
-	/tj2fcfNNw/v/OSWGeEcQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1761820117; x=1761906517; bh=pv3kIQ2je0JxNKKQubVH5mPhZIsYYqq5229
-	K/Th1UN8=; b=RGqch72SMmum/KbE8hS5aknTDxEI5caW70xQNOIPHkfgClo6ovZ
-	waYQi9z4cpHEF0XBm3ueN73EV7GTbDatbwklWSI/G2lJftadRPPxwirvmgjPcNlv
-	mBe3GBXRzqq3M7005APRDKrK2WUMRKU+o7Nw+2Wq0icXevg0517xn9zHMcVBkZ/Q
-	mFBJA4Gahh8xJwgdagd1nfQKvPs37l2jtNsChdR1EiKG7ktBIA7wHHolrjh17Rlc
-	Z/jsbcLRCk3/6sz3rlLh+Q4DcRG1n1Igho/CbbbqeJ8HK+bjkqPJMyv71fVmmHe4
-	5qLAOrCeIXc61jwqigfhzbvtWjYMbn0dJKw==
-X-ME-Sender: <xms:1D0DaUaGMCXWMm2cSWMNU5BbBR8oH3r_n2cm2FArk-VtmVr_1UE9JA>
-    <xme:1D0DabTiuOF4_G4Pq9BWNg-EWrY83dIGtUNjOZ8TlJxOP1F8srdSyqEnxwJ0eRz9I
-    fJF7oC9dx1sQNP8uHuMilc8YOzC2I494XEu7M_StCnxyUu1qxPJ3N8>
-X-ME-Received: <xmr:1D0Dab9ZIR3Po3y6SYzTDWDlTfZYoTiPTMZIo-6VkXdZ-RqFz2dZwqBVOwee>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduieeifeejucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeduuddpmhho
-    uggvpehsmhhtphhouhhtpdhrtghpthhtohepshhtvghffhgvnhdrkhhlrghsshgvrhhtse
-    hsvggtuhhnvghtrdgtohhmpdhrtghpthhtohepjhhirghnsgholhesnhhvihguihgrrdgt
-    ohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtg
-    hpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehkuhgs
-    rgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheptghrrghtihhusehnvhhiughirgdrtg
-    homhdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdrohhrghdr
-    rghupdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtth
-    hopehprggsvghnihesrhgvughhrghtrdgtohhm
-X-ME-Proxy: <xmx:1D0DaTg7Gnm14shy7ifD9Pa3B01GQqJMqnp1o34EwJEJVSWyKnIkxw>
-    <xmx:1D0DaUbAUBHh_HWQ-9Sha3VKKa3ODYrvm1Aw4uNawq05H_pkrGFzJg>
-    <xmx:1D0DaQ__VhOxbfoy6auPXZnYWyqjK3ZJDRAmDUFtg5AOPUPci2MSSQ>
-    <xmx:1D0DaeOpkM_bo0BgzQx_v6wD_ljTaBurID7XUXat0DmoRzr4tOyhhw>
-    <xmx:1T0DaaUfJbPuilo9FEJuEV45K2UWV-UmWsxPVZj9R8dgar0OlIZZgQ3V>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 30 Oct 2025 06:28:35 -0400 (EDT)
-Date: Thu, 30 Oct 2025 11:28:34 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Jianbo Liu <jianbol@nvidia.com>, netdev@vger.kernel.org,
-	davem@davemloft.net, kuba@kernel.org,
-	Cosmin Ratiu <cratiu@nvidia.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>
-Subject: Re: [PATCH ipsec v3 2/2] xfrm: Determine inner GSO type from packet
- inner protocol
-Message-ID: <aQM90v2J9maIvTlU@krikkit>
-References: <20251028023013.9836-1-jianbol@nvidia.com>
- <20251028023013.9836-3-jianbol@nvidia.com>
- <aQCjCEDvL4VJIsoV@krikkit>
- <c1a673ab-0382-445e-aa45-2b8fe2f6bc40@nvidia.com>
- <aQDbhJuZqFokEO31@krikkit>
- <aQMc64pcTzvkupc1@secunet.com>
+	s=arc-20240116; t=1761820217; c=relaxed/simple;
+	bh=IfIdHdQLq4yotsjQgOHDIuVVZRQ9KlW83RRMlTa7kM0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iBRhH39AROY6eX1yWBKiArrs4V2HyyvKnREemsooc9qMt46jc4APW7Shz22H2WkFwN7Yx/EWOft9yHMQF1QfL2Uo9USJ75RX8Olb811mMXw7YheXvqngHqn2KVkYJSM6JzvQ5IF/S5VSmvmGe4A9ZkHNdu2VXcuPcPZ18s23MCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Gx4Ls7sA; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 6FEDF4E413EF
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 10:30:12 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 43E6E6068C;
+	Thu, 30 Oct 2025 10:30:12 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C5EA5102F2500;
+	Thu, 30 Oct 2025 11:30:09 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1761820211; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=6uY0D16mFNvYxpCJvbMOjToK3gBXmGfbF4RVLD8mqjc=;
+	b=Gx4Ls7sA4dhXtcKi6yTByomyZpYKlGNs3uP8Xy3siVSj88xaTS4IXrtxLDIVKocQ2+ErEL
+	AyA4kqh8fUZ3mb+JSbNtHNzWRtw7tmyz2mFyyMDArkLS//o7hwrR4ML4pHE0hEHAOqo9zb
+	66lyLHBQ7e7qv9CQje9IWoC5yiQJWsxVx6hdVBMk5eDVak23GKNN3Nl0JSDNEIgbGnxoAY
+	YiKDX6DpYxDoIMY8JluV8c/q5zCywNuwO40srVhN12goyd6tH5OCA+iBCOxv8TT29hArQZ
+	qKxtmmrYnpmsvxh5Txrgmwl5hRY+Xqq2aKbkdxItxvmClEoU8RYaqgRtt/zeog==
+Date: Thu, 30 Oct 2025 11:30:07 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ Vladimir Oltean <vladimir.oltean@nxp.com>
+Subject: Re: [PATCH net-next] ti: netcp: convert to ndo_hwtstamp callbacks
+Message-ID: <20251030113007.1acc78b6@kmaincent-XPS-13-7390>
+In-Reply-To: <20251029200922.590363-1-vadim.fedorenko@linux.dev>
+References: <20251029200922.590363-1-vadim.fedorenko@linux.dev>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aQMc64pcTzvkupc1@secunet.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
-2025-10-30, 09:08:11 +0100, Steffen Klassert wrote:
-> On Tue, Oct 28, 2025 at 04:04:36PM +0100, Sabrina Dubroca wrote:
-> > 2025-10-28, 21:36:17 +0800, Jianbo Liu wrote:
-> > > 
-> > > My proposed plan is:
-> > > 
-> > > Send the patch 1 and patch 3 (including the xfrm_ip2inner_mode change)
-> > > together to the ipsec tree. They are self-contained fixes.
-> > 
-> > So, keep v3 of this series unchanged.
-> > 
-> > > Separately, after those are accepted, I can modify and re-submit that patch
-> > > [1] to ipsec-next that removes the now-redundant checks from the other
-> > > callers (VTI, etc.), leveraging the updated helper function.
-> > > 
-> > > This way, the critical fixes are self-contained and backportable, while the
-> > > cleanup of other callers happens later in the development cycle.
-> > 
-> > The only (small) drawback is leaving the duplicate code checking
-> > AF_UNSPEC in the existing callers of xfrm_ip2inner_mode, but I guess
-> > that's ok.
-> > 
-> > 
-> > Steffen, is it ok for you to
-> > 
-> >  - have a duplicate AF_UNSPEC check in callers of xfrm_ip2inner_mode
-> >    (the existing "default to x->inner_mode, call xfrm_ip2inner_mode if
-> >    AF_UNSPEC", and the new one added to xfrm_ip2inner_mode by this
-> >    patch) in the ipsec tree and then in stable?
-> > 
-> >  - do the clean up (like the diff I pasted in my previous email, or
-> >    something smaller if [1] is applied separately) in ipsec-next after
-> >    ipsec is merged into it?
-> 
-> I'm OK with this, I can take v3 as is.
+On Wed, 29 Oct 2025 20:09:22 +0000
+Vadim Fedorenko <vadim.fedorenko@linux.dev> wrote:
 
-Ok. In that case, you can add:
+> Convert TI NetCP driver to use ndo_hwtstamp_get()/ndo_hwtstamp_set()
+> callbacks. The logic is slightly changed, because I believe the original
+> logic was not really correct. Config reading part is using the very
+> first module to get the configuration instead of iterating over all of
+> them and keep the last one as the configuration is supposed to be identic=
+al
+> for all modules. HW timestamp config set path is now trying to configure
+> all modules, but in case of error from one module it adds extack
+> message. This way the configuration will be as synchronized as possible.
 
-Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+On the case the hwtstamp_set return the extack error the hwtstamp_get will
+return something that might not be true as not all module will have the same
+config. Is it acceptable?
+=20
+> There are only 2 modules using netcp core infrastructure, and both use
+> the very same function to configure HW timestamping, so no actual
+> difference in behavior is expected.
+>=20
+> Compile test only.
+>=20
+> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> b/drivers/net/ethernet/ti/netcp_ethss.c index 55a1a96cd834..0ae44112812c
+> 100644 --- a/drivers/net/ethernet/ti/netcp_ethss.c
+> +++ b/drivers/net/ethernet/ti/netcp_ethss.c
+> @@ -2591,20 +2591,26 @@ static int gbe_rxtstamp(struct gbe_intf *gbe_intf,
+> struct netcp_packet *p_info) return 0;
+>  }
+> =20
+> -static int gbe_hwtstamp_get(struct gbe_intf *gbe_intf, struct ifreq *ifr)
+> +static int gbe_hwtstamp_get(void *intf_priv, struct kernel_hwtstamp_conf=
+ig
+> *cfg) {
+> -	struct gbe_priv *gbe_dev =3D gbe_intf->gbe_dev;
+> -	struct cpts *cpts =3D gbe_dev->cpts;
+> -	struct hwtstamp_config cfg;
+> +	struct gbe_intf *gbe_intf =3D intf_priv;
+> +	struct gbe_priv *gbe_dev;
+> +	struct phy_device *phy;
+> +
+> +	gbe_dev =3D gbe_intf->gbe_dev;
+> =20
+> -	if (!cpts)
+> +	if (!gbe_dev->cpts)
+> +		return -EOPNOTSUPP;
+> +
+> +	phy =3D gbe_intf->slave->phy;
+> +	if (phy_has_hwtstamp(phy))
+>  		return -EOPNOTSUPP;
 
-for both patches.
+This condition should be removed.
+The selection between PHY or MAC timestamping is now done in the net core:
+https://elixir.bootlin.com/linux/v6.17.1/source/net/core/dev_ioctl.c#L244
 
-Thanks.
+> =20
+> -	cfg.flags =3D 0;
+> -	cfg.tx_type =3D gbe_dev->tx_ts_enabled ? HWTSTAMP_TX_ON :
+> HWTSTAMP_TX_OFF;
+> -	cfg.rx_filter =3D gbe_dev->rx_ts_enabled;
+> +	cfg->flags =3D 0;
+> +	cfg->tx_type =3D gbe_dev->tx_ts_enabled ? HWTSTAMP_TX_ON :
+> HWTSTAMP_TX_OFF;
+> +	cfg->rx_filter =3D gbe_dev->rx_ts_enabled;
+> =20
+> -	return copy_to_user(ifr->ifr_data, &cfg, sizeof(cfg)) ? -EFAULT : 0;
+> +	return 0;
+>  }
+> =20
+>  static void gbe_hwtstamp(struct gbe_intf *gbe_intf)
+> @@ -2637,19 +2643,23 @@ static void gbe_hwtstamp(struct gbe_intf *gbe_int=
+f)
+>  	writel(ctl,    GBE_REG_ADDR(slave, port_regs, ts_ctl_ltype2));
+>  }
+> =20
+> -static int gbe_hwtstamp_set(struct gbe_intf *gbe_intf, struct ifreq *ifr)
+> +static int gbe_hwtstamp_set(void *intf_priv, struct kernel_hwtstamp_conf=
+ig
+> *cfg,
+> +			    struct netlink_ext_ack *extack)
+>  {
+> -	struct gbe_priv *gbe_dev =3D gbe_intf->gbe_dev;
+> -	struct cpts *cpts =3D gbe_dev->cpts;
+> -	struct hwtstamp_config cfg;
+> +	struct gbe_intf *gbe_intf =3D intf_priv;
+> +	struct gbe_priv *gbe_dev;
+> +	struct phy_device *phy;
+> =20
+> -	if (!cpts)
+> +	gbe_dev =3D gbe_intf->gbe_dev;
+> +
+> +	if (!gbe_dev->cpts)
+>  		return -EOPNOTSUPP;
+> =20
+> -	if (copy_from_user(&cfg, ifr->ifr_data, sizeof(cfg)))
+> -		return -EFAULT;
+> +	phy =3D gbe_intf->slave->phy;
+> +	if (phy_has_hwtstamp(phy))
+> +		return phy->mii_ts->hwtstamp(phy->mii_ts, cfg, extack);
 
--- 
-Sabrina
+Same.
+
+> =20
+> -	switch (cfg.tx_type) {
+> +	switch (cfg->tx_type) {
+>  	case HWTSTAMP_TX_OFF:
+>  		gbe_dev->tx_ts_enabled =3D 0;
+>  		break;
+> @@ -2660,7 +2670,7 @@ static int gbe_hwtstamp_set(struct gbe_intf *gbe_in=
+tf,
+> struct ifreq *ifr) return -ERANGE;
+>  	}
+> =20
+> -	switch (cfg.rx_filter) {
+> +	switch (cfg->rx_filter) {
+>  	case HWTSTAMP_FILTER_NONE:
+>  		gbe_dev->rx_ts_enabled =3D HWTSTAMP_FILTER_NONE;
+>  		break;
+> @@ -2668,7 +2678,7 @@ static int gbe_hwtstamp_set(struct gbe_intf *gbe_in=
+tf,
+> struct ifreq *ifr) case HWTSTAMP_FILTER_PTP_V1_L4_SYNC:
+>  	case HWTSTAMP_FILTER_PTP_V1_L4_DELAY_REQ:
+>  		gbe_dev->rx_ts_enabled =3D HWTSTAMP_FILTER_PTP_V1_L4_EVENT;
+> -		cfg.rx_filter =3D HWTSTAMP_FILTER_PTP_V1_L4_EVENT;
+> +		cfg->rx_filter =3D HWTSTAMP_FILTER_PTP_V1_L4_EVENT;
+>  		break;
+>  	case HWTSTAMP_FILTER_PTP_V2_L4_EVENT:
+>  	case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
+> @@ -2680,7 +2690,7 @@ static int gbe_hwtstamp_set(struct gbe_intf *gbe_in=
+tf,
+> struct ifreq *ifr) case HWTSTAMP_FILTER_PTP_V2_SYNC:
+>  	case HWTSTAMP_FILTER_PTP_V2_DELAY_REQ:
+>  		gbe_dev->rx_ts_enabled =3D HWTSTAMP_FILTER_PTP_V2_EVENT;
+> -		cfg.rx_filter =3D HWTSTAMP_FILTER_PTP_V2_EVENT;
+> +		cfg->rx_filter =3D HWTSTAMP_FILTER_PTP_V2_EVENT;
+>  		break;
+>  	default:
+>  		return -ERANGE;
+> @@ -2688,7 +2698,7 @@ static int gbe_hwtstamp_set(struct gbe_intf *gbe_in=
+tf,
+> struct ifreq *ifr)=20
+>  	gbe_hwtstamp(gbe_intf);
+> =20
+> -	return copy_to_user(ifr->ifr_data, &cfg, sizeof(cfg)) ? -EFAULT : 0;
+> +	return 0;
+>  }
+> =20
+>  static void gbe_register_cpts(struct gbe_priv *gbe_dev)
+> @@ -2745,12 +2755,15 @@ static inline void gbe_unregister_cpts(struct
+> gbe_priv *gbe_dev) {
+>  }
+> =20
+> -static inline int gbe_hwtstamp_get(struct gbe_intf *gbe_intf, struct ifr=
+eq
+> *req) +static inline int gbe_hwtstamp_get(struct gbe_intf *gbe_intf,
+> +				   struct kernel_hwtstamp_config *cfg)
+>  {
+>  	return -EOPNOTSUPP;
+>  }
+> =20
+> -static inline int gbe_hwtstamp_set(struct gbe_intf *gbe_intf, struct ifr=
+eq
+> *req) +static inline int gbe_hwtstamp_set(struct gbe_intf *gbe_intf,
+> +				   struct kernel_hwtstamp_config *cfg,
+> +				   struct netlink_ext_ack *extack)
+>  {
+>  	return -EOPNOTSUPP;
+>  }
+> @@ -2816,15 +2829,6 @@ static int gbe_ioctl(void *intf_priv, struct ifreq
+> *req, int cmd) struct gbe_intf *gbe_intf =3D intf_priv;
+>  	struct phy_device *phy =3D gbe_intf->slave->phy;
+> =20
+> -	if (!phy_has_hwtstamp(phy)) {
+> -		switch (cmd) {
+> -		case SIOCGHWTSTAMP:
+> -			return gbe_hwtstamp_get(gbe_intf, req);
+> -		case SIOCSHWTSTAMP:
+> -			return gbe_hwtstamp_set(gbe_intf, req);
+> -		}
+> -	}
+> -
+>  	if (phy)
+>  		return phy_mii_ioctl(phy, req, cmd);
+> =20
+> @@ -3824,6 +3828,8 @@ static struct netcp_module gbe_module =3D {
+>  	.add_vid	=3D gbe_add_vid,
+>  	.del_vid	=3D gbe_del_vid,
+>  	.ioctl		=3D gbe_ioctl,
+> +	.hwtstamp_get	=3D gbe_hwtstamp_get,
+> +	.hwtstamp_set	=3D gbe_hwtstamp_set,
+>  };
+> =20
+>  static struct netcp_module xgbe_module =3D {
+> @@ -3841,6 +3847,8 @@ static struct netcp_module xgbe_module =3D {
+>  	.add_vid	=3D gbe_add_vid,
+>  	.del_vid	=3D gbe_del_vid,
+>  	.ioctl		=3D gbe_ioctl,
+> +	.hwtstamp_get	=3D gbe_hwtstamp_get,
+> +	.hwtstamp_set	=3D gbe_hwtstamp_set,
+>  };
+> =20
+>  static int __init keystone_gbe_init(void)
+
+
+
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
