@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-234267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD295C1E576
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 05:20:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EFC2C1E579
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 05:20:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5F46189BB2F
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 04:20:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93A9B189BA55
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 04:21:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F5A42D3750;
-	Thu, 30 Oct 2025 04:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A7252F39CC;
+	Thu, 30 Oct 2025 04:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="kySlEFHe"
+	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="T4tZDlWH"
 X-Original-To: netdev@vger.kernel.org
 Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B0A02C21E8;
-	Thu, 30 Oct 2025 04:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 236992ECEAE;
+	Thu, 30 Oct 2025 04:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761798025; cv=none; b=E93uG2eUVsZmKk2dy0aTlkdvl2pyXjiJnOcMUkAOc30LdFQZZuDnZ/RxquxI0ZGGWy036y3062sWsc6JPnMOvANNaheNGJ9sDkJsv/HsIENWuJXBhmHYYZUtFJpTFmzu2fVzIOv5HbyJzJDFG9AKZ/UKtl1womC7JWgO2rYiuGo=
+	t=1761798031; cv=none; b=GmvJZmQ4IJorN8w8LzMLfjrkxIFv87fYmsGGiaONIvc1nT1SRZzJw7IqUPJ1nH9qQt1w2B8SUYWW+wQ7zESETFZTXCUIffdGCXA3IXAwut+zz7Zi4zfHmAw8zsR3s1scBrdOvU85Mh9srwdjLe6VZ1Dk2EJfm52w8RXN5xPcinw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761798025; c=relaxed/simple;
-	bh=ecanBVZbeQeqsoKmcHaVdA4jHY+biqa4WJT8mJV1324=;
+	s=arc-20240116; t=1761798031; c=relaxed/simple;
+	bh=44Zt9W/bC9x5iLI09BjyMHjk9QtDms/2NPbHRbAgGqg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bcr/MCJxgn7FOmumReyfB1cqZWCJWFiWtFQQYBoZN9LQFubJsMiUr46eM82jEqIxshMcpXGLqJBzH+kAzMht79+I1W5sU73GPJ9hGgeyuNG7jhFJlVmop2sfSavdN1hqJWH15nB+xgI46GUNcC5YJPsmlSXvFmxXJ5nolhfIBSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=kySlEFHe; arc=none smtp.client-ip=178.21.23.139
+	 MIME-Version; b=L9vZfxuOoMjPdUcjx66r0y6hZoekZKd/S2MSwu4Vb58n4OR7S3WxWYwG8N1yfRpNG9NUK6jd1D4Ex/uGl5qS7rM+ayJMjW4Id++HEE+RSehOSJfFyC8AIKnTTK3j7lcFr/+tgJE9HwoAzbVmAPbEkkEboswk0pf1wdonjfH+gWg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=T4tZDlWH; arc=none smtp.client-ip=178.21.23.139
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
 Received: from mail01.disroot.lan (localhost [127.0.0.1])
-	by disroot.org (Postfix) with ESMTP id 9D69925D25;
-	Thu, 30 Oct 2025 05:20:21 +0100 (CET)
+	by disroot.org (Postfix) with ESMTP id 97F6725DC2;
+	Thu, 30 Oct 2025 05:20:27 +0100 (CET)
 X-Virus-Scanned: SPAM Filter at disroot.org
 Received: from layka.disroot.org ([127.0.0.1])
  by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
- id 89qqx2VHsHf0; Thu, 30 Oct 2025 05:20:21 +0100 (CET)
+ id TIPh9HpXZRR8; Thu, 30 Oct 2025 05:20:27 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
-	t=1761798021; bh=ecanBVZbeQeqsoKmcHaVdA4jHY+biqa4WJT8mJV1324=;
+	t=1761798027; bh=44Zt9W/bC9x5iLI09BjyMHjk9QtDms/2NPbHRbAgGqg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=kySlEFHeZT1I7AWj5ee50sW1B36cXrXGCUx1phKt+9V3mll+Ucl4tvDeeCqsdvh2m
-	 AVq+JeVxulACFO8yOtVIw31VmWsu0i6lyWLQBBXoXrYAhd9IGNLupjS/Pg/MI78vAq
-	 WBw5sqeX5B1Efo+VgMVm0btCV+7JCZtPElKgcKCK8ebnIybhIGWg6PTZaXpAEHRyEp
-	 189B0IYfjRFrFuArONgUbNrXscnquD4YZkc9HpSmwahy5401q1os810KZsb4Vgjxge
-	 L8fqx1sXfQedpzApMC7OTLvsIbDDCSMmlA3ZTHEdhmfMloNrkAsBhfro4d1C1q808n
-	 vCdjUCMnN6hGw==
+	b=T4tZDlWHEls7KUmbSDupeH6YpvlQYq5mcauHAZI3eGG+T5qLzJbooBLEczuvQgoF2
+	 47NX3FoWkZo1EDHuzK/Mdf5l/ZCqazpSfu2PHESdDsUW9xreBXL2tw7BdufFD55Iuj
+	 xC34EyUJvGqe2y4/jsnpwQ9zCzCjIIkb2qUuBl6EAIfd4EELpp8o75sSCed9r40cjO
+	 ucGnUHsk238hOazuZKVHrRkeQNMwUcHnlb1ruImEUTYMqSnlkwCje5WNU4ekE0+9Os
+	 lbET+m6JGgvtTFEEAOWjrnBq9agmwmkB7gJAKljY4svt4HbsfRfCPMvw0QXVHJ4tZS
+	 OIuKt4Uwt3fMw==
 From: Yao Zi <ziyao@disroot.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -66,9 +66,9 @@ To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Jacob Keller <jacob.e.keller@intel.com>
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 1/3] net: stmmac: Add generic suspend/resume helper for PCI-based controllers
-Date: Thu, 30 Oct 2025 04:19:14 +0000
-Message-ID: <20251030041916.19905-2-ziyao@disroot.org>
+Subject: [PATCH net-next v2 2/3] net: stmmac: loongson: Use generic PCI suspend/resume routines
+Date: Thu, 30 Oct 2025 04:19:15 +0000
+Message-ID: <20251030041916.19905-3-ziyao@disroot.org>
 In-Reply-To: <20251030041916.19905-1-ziyao@disroot.org>
 References: <20251030041916.19905-1-ziyao@disroot.org>
 Precedence: bulk
@@ -79,124 +79,89 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Most glue driver for PCI-based DWMAC controllers utilize similar
-platform suspend/resume routines. Add a generic implementation to reduce
-duplicated code.
+Convert glue driver for Loongson DWMAC controller to use the generic
+platform suspend/resume routines for PCI controllers, instead of
+implementing its own one.
 
 Signed-off-by: Yao Zi <ziyao@disroot.org>
 ---
- drivers/net/ethernet/stmicro/stmmac/Kconfig   |  9 ++++
- drivers/net/ethernet/stmicro/stmmac/Makefile  |  1 +
- .../ethernet/stmicro/stmmac/stmmac_libpci.c   | 48 +++++++++++++++++++
- .../ethernet/stmicro/stmmac/stmmac_libpci.h   | 12 +++++
- 4 files changed, 70 insertions(+)
- create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_libpci.c
- create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_libpci.h
+ drivers/net/ethernet/stmicro/stmmac/Kconfig   |  1 +
+ .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 36 ++-----------------
+ 2 files changed, 4 insertions(+), 33 deletions(-)
 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-index 87c5bea6c2a2..598bc56edd8d 100644
+index 598bc56edd8d..4b6911c62e6f 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
 +++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-@@ -349,6 +349,15 @@ config DWMAC_VISCONTI
- 
- endif
- 
-+config STMMAC_LIBPCI
-+	tristate "STMMAC PCI helper library"
-+	depends on PCI
-+	depends on STMMAC_ETH
-+	default y
-+	help
-+	  This selects the PCI bus helpers for the stmmac driver. If you
-+	  have a controller with PCI interface, say Y or M here.
-+
- config DWMAC_INTEL
- 	tristate "Intel GMAC support"
- 	default X86
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Makefile b/drivers/net/ethernet/stmicro/stmmac/Makefile
-index 1681a8a28313..7bf528731034 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Makefile
-+++ b/drivers/net/ethernet/stmicro/stmmac/Makefile
-@@ -44,6 +44,7 @@ obj-$(CONFIG_DWMAC_VISCONTI)	+= dwmac-visconti.o
- stmmac-platform-objs:= stmmac_platform.o
- dwmac-altr-socfpga-objs := dwmac-socfpga.o
- 
-+obj-$(CONFIG_STMMAC_LIBPCI)	+= stmmac_libpci.o
- obj-$(CONFIG_STMMAC_PCI)	+= stmmac-pci.o
- obj-$(CONFIG_DWMAC_INTEL)	+= dwmac-intel.o
- obj-$(CONFIG_DWMAC_LOONGSON)	+= dwmac-loongson.o
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_libpci.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_libpci.c
-new file mode 100644
-index 000000000000..5c5dd502f79a
---- /dev/null
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_libpci.c
-@@ -0,0 +1,48 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * PCI bus helpers for STMMAC driver
-+ * Copyright (C) 2025 Yao Zi <ziyao@disroot.org>
-+ */
-+
-+#include <linux/device.h>
-+#include <linux/pci.h>
-+
+@@ -373,6 +373,7 @@ config DWMAC_LOONGSON
+ 	default MACH_LOONGSON64
+ 	depends on (MACH_LOONGSON64 || COMPILE_TEST) && STMMAC_ETH && PCI
+ 	depends on COMMON_CLK
++	depends on STMMAC_LIBPCI
+ 	help
+ 	  This selects the LOONGSON PCI bus support for the stmmac driver,
+ 	  Support for ethernet controller on Loongson-2K1000 SoC and LS7A1000 bridge.
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+index 2a3ac0136cdb..584dc4ff8320 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+@@ -8,6 +8,7 @@
+ #include <linux/device.h>
+ #include <linux/of_irq.h>
+ #include "stmmac.h"
 +#include "stmmac_libpci.h"
-+
-+int stmmac_pci_plat_suspend(struct device *dev, void *bsp_priv)
-+{
-+	struct pci_dev *pdev = to_pci_dev(dev);
-+	int ret;
-+
-+	ret = pci_save_state(pdev);
-+	if (ret)
-+		return ret;
-+
-+	pci_disable_device(pdev);
-+	pci_wake_from_d3(pdev, true);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(stmmac_pci_plat_suspend);
-+
-+int stmmac_pci_plat_resume(struct device *dev, void *bsp_priv)
-+{
-+	struct pci_dev *pdev = to_pci_dev(dev);
-+	int ret;
-+
-+	pci_restore_state(pdev);
-+	pci_set_power_state(pdev, PCI_D0);
-+
-+	ret = pci_enable_device(pdev);
-+	if (ret)
-+		return ret;
-+
-+	pci_set_master(pdev);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(stmmac_pci_plat_resume);
-+
-+MODULE_DESCRIPTION("STMMAC PCI helper library");
-+MODULE_AUTHOR("Yao Zi <ziyao@disroot.org>");
-+MODULE_LICENSE("GPL");
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_libpci.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_libpci.h
-new file mode 100644
-index 000000000000..71553184f982
---- /dev/null
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_libpci.h
-@@ -0,0 +1,12 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Copyright (C) 2025 Yao Zi <ziyao@disroot.org>
-+ */
-+
-+#ifndef __STMMAC_LIBPCI_H__
-+#define __STMMAC_LIBPCI_H__
-+
-+int stmmac_pci_plat_suspend(struct device *dev, void *bsp_priv);
-+int stmmac_pci_plat_resume(struct device *dev, void *bsp_priv);
-+
-+#endif /* __STMMAC_LIBPCI_H__ */
+ #include "dwmac_dma.h"
+ #include "dwmac1000.h"
+ 
+@@ -525,37 +526,6 @@ static int loongson_dwmac_fix_reset(struct stmmac_priv *priv, void __iomem *ioad
+ 				  10000, 2000000);
+ }
+ 
+-static int loongson_dwmac_suspend(struct device *dev, void *bsp_priv)
+-{
+-	struct pci_dev *pdev = to_pci_dev(dev);
+-	int ret;
+-
+-	ret = pci_save_state(pdev);
+-	if (ret)
+-		return ret;
+-
+-	pci_disable_device(pdev);
+-	pci_wake_from_d3(pdev, true);
+-	return 0;
+-}
+-
+-static int loongson_dwmac_resume(struct device *dev, void *bsp_priv)
+-{
+-	struct pci_dev *pdev = to_pci_dev(dev);
+-	int ret;
+-
+-	pci_restore_state(pdev);
+-	pci_set_power_state(pdev, PCI_D0);
+-
+-	ret = pci_enable_device(pdev);
+-	if (ret)
+-		return ret;
+-
+-	pci_set_master(pdev);
+-
+-	return 0;
+-}
+-
+ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ {
+ 	struct plat_stmmacenet_data *plat;
+@@ -600,8 +570,8 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+ 	plat->bsp_priv = ld;
+ 	plat->setup = loongson_dwmac_setup;
+ 	plat->fix_soc_reset = loongson_dwmac_fix_reset;
+-	plat->suspend = loongson_dwmac_suspend;
+-	plat->resume = loongson_dwmac_resume;
++	plat->suspend = stmmac_pci_plat_suspend;
++	plat->resume = stmmac_pci_plat_resume;
+ 	ld->dev = &pdev->dev;
+ 	ld->loongson_id = readl(res.addr + GMAC_VERSION) & 0xff;
+ 
 -- 
 2.51.2
 
