@@ -1,62 +1,65 @@
-Return-Path: <netdev+bounces-234465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7E72C20EDD
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 16:29:03 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id C54F5C20F67
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 16:35:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AA671A65CCE
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 15:25:49 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5B6664EC7D0
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 15:35:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B36F5363377;
-	Thu, 30 Oct 2025 15:25:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 712F93655D3;
+	Thu, 30 Oct 2025 15:34:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nPOkELgo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m9fDkfRa"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AEF83126DE;
-	Thu, 30 Oct 2025 15:25:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 488853655CF;
+	Thu, 30 Oct 2025 15:34:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761837921; cv=none; b=GzmvyA2/je83acNonwzlXIdAu5pgPaJHqtyY0YFRch5KzGPPeURkCAZcZ9RRlCCqITaONl3My0XylaKihJXPjcwS73ncXGgPnQADZiuTk7b1530RVmaMLRdOCQT2tmjcRprJPQumQ4xLfZN3/wnCOZygUPZyJd60vjQNWDcurJc=
+	t=1761838488; cv=none; b=pylXX9DAM2r85WkkJV2u8P6v24jf8sbxUyAhEdFDm6bZxQoHPZ603bOMkie00nUj9FnUNC5onQ/TjamPzTeybTWNKwuvIU6LOTS1W5h+Jru5JF/dghc7OuwDf0TlKVMBA8n3ML72jSGUX5cgqMj5a4ChcOYJxi8aC629tlnK9LA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761837921; c=relaxed/simple;
-	bh=rVj0mmo+D/FS9xgUYHTrULZTWgmWZ6swyh8aUSSb9so=;
+	s=arc-20240116; t=1761838488; c=relaxed/simple;
+	bh=0cI5L+2GoYgkgOTgvSKGNPMHZMHPezyi0/RCkUUrMvY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CzBj5DkxguUFla7wlYnuORsBiGPps7EIKfpP0QQgTcnyhGx92GV5UujaSTt0BxytvkFufa4jESnrDxms5HswhBB3JqlnpbETOzgY6LKjh0MunAEyIivr8/SUnPy/4FGcHxv77NNDlwOMfRtzTxLGTei+Igs+sM158jhw73BLSi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nPOkELgo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EFA7C4CEF8;
-	Thu, 30 Oct 2025 15:25:20 +0000 (UTC)
+	 MIME-Version:Content-Type; b=USqr1xQepLqv0xRnTQGxgns2fF6azYOE9fDnQ5ewnWxjUrQI2bcSv+fo4NVw0rKZosuwjIIflzcsw/JvBH5AewRegrJRgHwYdb4Y3VK3kBBg3AxuvZuZI+7AkhuKnzZkqXn5/U4K+1judIaRThi6OyQojhmqcmMcIO3aTl0/JSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m9fDkfRa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 065E6C113D0;
+	Thu, 30 Oct 2025 15:34:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761837921;
-	bh=rVj0mmo+D/FS9xgUYHTrULZTWgmWZ6swyh8aUSSb9so=;
+	s=k20201202; t=1761838487;
+	bh=0cI5L+2GoYgkgOTgvSKGNPMHZMHPezyi0/RCkUUrMvY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nPOkELgoVBmqDLPHdmStpHtdtOc/Xqy1xONmjGiS5n1dEy5Z9lsQN+ej4b1jbO6RL
-	 3Qha8fn1SJO8Cd1FLa7BZn+96ULX3ADZcksQJkb6Y4dD56Q8kRCvNe5V3BdoHRFVBk
-	 0IhwkTGVkvMkJUvB+SCUIhrXy//JGxQZZNFPC86sC+zm8Vz71WFblqo3C0JicdKZ0f
-	 Ym4A5sAuraGYWej3NGH4wUE0Yg4prInvErugU0PioRroiD7gbuyu2F5C52J3MGLrFx
-	 eN4fgYEKo7QDIEpnSBg6/4Wx0pRp/Gfg3FjXOvxoQh5SaRXZ0rbtnNPJjoj8XCgErM
-	 /VKCieJ90/zFw==
-Date: Thu, 30 Oct 2025 08:25:19 -0700
+	b=m9fDkfRaNMJ7A0XCkjp6LZEMhnz+MmFhlftqSt0xcTJjIqo/rnsB+LUmC3/YkyEbP
+	 bhDRvvcITsJXszBPKD22+92IRNaNpI82Sh1LHYtuWNZtFgMQ0+/n9XVovXVzob4GK2
+	 UFJ2ZulPvlD/n3iWCIl/cmOJ4dWIxYOk4dq5biqSAFIrLFxrkguMn7YUPQiL8PBmuY
+	 sOxmI07SCILIS04ISQSq8PWU2T76LXoMoWv6Ym1YwQoiSI9OL59EnOM+BRDOhsymwa
+	 bh6+1QTaaI3HAJu2mGZznjqXPOkxEkORfhfQSsG48RBToJrnsBrzzxYSMbKk+0Em1e
+	 P3KGtIozugWEQ==
+Date: Thu, 30 Oct 2025 08:34:46 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: <bpf@vger.kernel.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
- <hawk@kernel.org>, <netdev@vger.kernel.org>, <magnus.karlsson@intel.com>,
- <aleksander.lobakin@intel.com>, <ilias.apalodimas@linaro.org>,
- <toke@redhat.com>, <lorenzo@kernel.org>,
- <syzbot+ff145014d6b0ce64a173@syzkaller.appspotmail.com>, Ihor Solodrai
- <ihor.solodrai@linux.dev>, Octavian Purdila <tavip@google.com>
-Subject: Re: [PATCH v5 bpf 1/2] xdp: introduce xdp_convert_skb_to_buff()
-Message-ID: <20251030082519.5db297f3@kernel.org>
-In-Reply-To: <aQNWlB5UL+rK8ZE5@boxer>
-References: <20251029221315.2694841-1-maciej.fijalkowski@intel.com>
-	<20251029221315.2694841-2-maciej.fijalkowski@intel.com>
-	<20251029165020.26b5dd90@kernel.org>
-	<aQNWlB5UL+rK8ZE5@boxer>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jan Stancek
+ <jstancek@redhat.com>, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
+ =?UTF-8?B?QXNiasO4cm4=?= Sloth =?UTF-8?B?VMO4bm5lc2Vu?= <ast@fiberby.net>,
+ Stanislav Fomichev <sdf@fomichev.me>, Shuah Khan <shuah@kernel.org>, Ido
+ Schimmel <idosch@nvidia.com>, Guillaume Nault <gnault@redhat.com>, Petr
+ Machata <petrm@nvidia.com>, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 2/3] netlink: specs: update rt-rule src/dst
+ attribute types to support IPv4 addresses
+Message-ID: <20251030083446.16b8cefb@kernel.org>
+In-Reply-To: <aQMHJlwcchqtoAa7@fedora>
+References: <20251029082245.128675-1-liuhangbin@gmail.com>
+	<20251029082245.128675-3-liuhangbin@gmail.com>
+	<20251029163742.3d96c18d@kernel.org>
+	<aQMHJlwcchqtoAa7@fedora>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,31 +69,23 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 30 Oct 2025 13:14:16 +0100 Maciej Fijalkowski wrote:
-> On Wed, Oct 29, 2025 at 04:50:20PM -0700, Jakub Kicinski wrote:
-> > On Wed, 29 Oct 2025 23:13:14 +0100 Maciej Fijalkowski wrote:  
-> > > +	xdp->rxq->mem.type = skb->pp_recycle ? MEM_TYPE_PAGE_POOL :
-> > > +					       MEM_TYPE_PAGE_SHARED;  
-> > 
-> > You really need to stop sending patches before I had a chance 
-> > to reply :/ And this is wrong.  
+On Thu, 30 Oct 2025 06:35:18 +0000 Hangbin Liu wrote:
+> > This will be annoying For C / C++, and you didn't set the max len 
+> > so I think we'll also have to malloc each time. Do we not support
+> > display-hint for scalars?  
 > 
-> Why do you say so?
+> Ah, I didn't notice this. Should we convert all the
 > 
-> netif_receive_generic_xdp()
-> 	netif_skb_check_for_xdp()
-> 	skb_cow_data_for_xdp() failed
-> 		go through skb linearize path
-> 			returned skb data is backed by kmalloc, not page_pool,
-> 			means mem type for this particular xdp_buff has to be
-> 			MEM_TYPE_PAGE_SHARED
+>  type: binary
+>  display-hint: ipv4
 > 
-> Are we on the same page now?
+> to
+> 
+>  type: u32
+>  byte-order: big-endian
+>  display-hint: ipv4
 
-No, I think I already covered this, maybe you disagreed and I missed it.
-
-The mem_type set here is expected to be used only for freeing pages. 
-XDP can only free fagments (when pkt is trimmed), it cannot free the
-head from under the skb. So only fragments matter here, we can ignore
-the head.
+I think we should try. Technically it may change some kernel policies,
+but without min/max-like checks the byte-order should be a nop for the
+policy.
 
