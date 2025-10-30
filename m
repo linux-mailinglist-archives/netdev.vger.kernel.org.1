@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-234459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9CC4C20E17
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 16:19:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEB4EC20DCB
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 16:16:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D954A1A225F3
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 15:14:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2472D3A4699
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 15:16:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D070032A3F2;
-	Thu, 30 Oct 2025 15:14:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D34DF35BDD0;
+	Thu, 30 Oct 2025 15:16:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kD6iLxC5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lb8ML0A0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC3522222B2
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 15:14:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2AD12475CF;
+	Thu, 30 Oct 2025 15:16:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761837264; cv=none; b=Ru6djmy+eXG/+fFumhPWiUxALFYHgY33Mx4K525JJ0Q/TmQ89EjtPRj9AhgdcAsdkXYHyRlhxzzTXWjpg3CeZ0/lJV0B6HhUbJrjMkItbnsYRPHkNIxEN2C5Fl97Jyce2ksKVOnNqNi/KwLa3kV7ymmx1yWdSrwU7jIP4Njiwy8=
+	t=1761837402; cv=none; b=dX6zHkw+8YAveNPbO5xMyITf3Guc+IyNGadpCX5QevdhWwwNv5QnbMAYTadiGsTfWoHhAlmF1UOSF2IEE+1CcJU9R9GMqtEunaz3s9nTgcMsOsSUaqiNKRBMXWo+CuDXnTcFUGk4Q8RQ1FoASP6y38yVtzk4lv+sAFBD9+yCk90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761837264; c=relaxed/simple;
-	bh=psWbWhUPwX1ZHJCxk5AblVP7r5p/NFWJtCoe0iurEQ0=;
+	s=arc-20240116; t=1761837402; c=relaxed/simple;
+	bh=4+yxJdVWRUpvLUb8dzyxv1tQWFiB2p7Ngn9oUHSppMQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=S3tPObotaC3bU0UkUFoppVenRLX/Ae/OnroTqdgNr77OUUUe5foBZjzPRZ2oPcnKj9P93lsu6vEy1vnOqvx/S3igdWyC04cT9UiOG+u0AjGNdDCH5FuiNjd5OvIHXZfUyhNThLwsEo9R0LOt1uVc1j1h9idhA24tKVSxkLOBlWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kD6iLxC5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED56FC4CEF1;
-	Thu, 30 Oct 2025 15:14:23 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Ya3RZvPtoy5sn65lDBMkAmAHQjvMR3omMymTS30I3/mkM3MMe0cB8uKx6qp/C4Kw4X0GKunfO2IpN1wZ+zTR9q2XaiFRuzK3a667YkgFh1WP142bMAfoMnEZAgV9GRNLi2eYXjB0iUjcaehA2p5HSUPaiamhFKd36HIT6EE1YAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lb8ML0A0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 89E04C4CEFF;
+	Thu, 30 Oct 2025 15:16:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761837264;
-	bh=psWbWhUPwX1ZHJCxk5AblVP7r5p/NFWJtCoe0iurEQ0=;
+	s=k20201202; t=1761837402;
+	bh=4+yxJdVWRUpvLUb8dzyxv1tQWFiB2p7Ngn9oUHSppMQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=kD6iLxC5675z+FY+zI8txsfMA268s/zV9OKCDi1RrLJdM6oeLav/MZuZeOhwMSfTu
-	 zaEt2s75otS2kfqwtJGTh8gFin5vVUKaIXDyzduxzaLWB+JI8lD6r/ibz55YsaWD57
-	 3t7/t0G1I2P1+7SbHRFBr6/mXZwRIG9ymeUa29P5EUdi43L4ybsgsC1hh+6P2Q7xC2
-	 bPwoAIQguiJdaLCrNl9NRUCfhvnxp48wJDAj4GCcuHoXyxNi2ehAfDrt5wu4FHEauG
-	 tpJDdljRNn5ZylSt177w8t7+FxyttC9TI0zjnGLOhjt77MHGs9pk0S4aJphT7i9403
-	 J7bHUF7Jzpv0g==
-Date: Thu, 30 Oct 2025 08:14:23 -0700
+	b=lb8ML0A0VPc6tdgaSOSAfHmeIMSbxoDBxBwe5SoA4e/L4MmxWSoepXJizQT+H10gA
+	 n5YJZfoyt8mklixtKo19fFt3x3/b0exacYD0A74wlVanDSu3i79dzz5fcl06iqNSLB
+	 ehir8yadLlhCFgw9+R9r+g/AsDF2gu0eq7fjNAgw3v8Kx8fG1dVQZF+5Iw3u0p6Z7G
+	 FGbxLf9pRpKEIO7ajJ4Fa2/7thXte654YlTZ20gCP47MC0iMLTkgBAo5hqQ6i/cFLM
+	 Wlz/NbmidGJ67zAqJSb9l1ZftHCjfe4yHXcikALDqRBN6MkSpSnCRmMg8lW0iD0SZ+
+	 SToer1BlmeBeA==
+Date: Thu, 30 Oct 2025 08:16:40 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Michal Kubecek
- <mkubecek@suse.cz>, netdev@vger.kernel.org
-Subject: Re: [PATCH ethtool-next] netlink: tsconfig: add HW time stamping
- configuration
-Message-ID: <20251030081423.2bb43db6@kernel.org>
-In-Reply-To: <20251030153723.7448a18e@kmaincent-XPS-13-7390>
-References: <20251004202715.9238-1-vadim.fedorenko@linux.dev>
-	<5w25bm7gnbrq4cwtefmunmcylqav524roamuvoz2zv5piadpek@4vpzw533uuyd>
-	<ef2ea988-bbfb-469e-b833-dbe8f5ddc5b7@linux.dev>
-	<zsoujuddzajo3qbrvde6rnzeq6ic5x7jofz3voab7dmtzh3zpw@h3bxd54btzic>
-	<8693b213-2d22-4e47-99bb-5d8ca4f48dd5@linux.dev>
-	<20251029153812.10bd6397@kernel.org>
-	<20251030153723.7448a18e@kmaincent-XPS-13-7390>
+To: Yibo Dong <dong100@mucse.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ horms@kernel.org, corbet@lwn.net, andrew+netdev@lunn.ch,
+ danishanwar@ti.com, vadim.fedorenko@linux.dev, geert+renesas@glider.be,
+ mpe@ellerman.id.au, lorenzo@kernel.org, lukas.bulwahn@redhat.com,
+ netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v16 5/5] net: rnpgbe: Add register_netdev
+Message-ID: <20251030081640.694aff44@kernel.org>
+In-Reply-To: <24FCCB72DBB477C9+20251030023838.GA2730@nic-Precision-5820-Tower>
+References: <20251027032905.94147-1-dong100@mucse.com>
+	<20251027032905.94147-6-dong100@mucse.com>
+	<20251029192135.0bada779@kernel.org>
+	<24FCCB72DBB477C9+20251030023838.GA2730@nic-Precision-5820-Tower>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,9 +66,18 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 30 Oct 2025 15:37:23 +0100 Kory Maincent wrote:
-> Jakub, as it is already in uAPI but not used at all, would it be possible to
-> change it or is it already too late?
+On Thu, 30 Oct 2025 10:38:38 +0800 Yibo Dong wrote:
+> > >  #include <linux/types.h>
+> > >  #include <linux/mutex.h>
+> > > +#include <linux/netdevice.h>  
+> > 
+> > Why do you need to include netdevice.h here now?
+> > This patch doesn't add anything that'd need it to the header.
+> >   
+> 
+> It is for 'u8 perm_addr[ETH_ALEN];'
+> Maybe I should just "#include <linux/if_ether.h>" for this patch. 
 
-We'd need a very strong reason to consider changing it now.
+I see, that's fine. Then again, I'm not sure why you store the perm
+addr in the struct in the first place. It's already stored in netdevice.
 
