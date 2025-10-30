@@ -1,174 +1,187 @@
-Return-Path: <netdev+bounces-234298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2B42C1F032
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 09:38:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D6ECC1F039
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 09:38:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 44576188F870
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 08:37:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F0BE3AE4F1
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 08:38:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2572B31280E;
-	Thu, 30 Oct 2025 08:36:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94DBD338910;
+	Thu, 30 Oct 2025 08:38:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="b301ppCx"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Xrl/WCti";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="kHsHJoCe";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Xrl/WCti";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="kHsHJoCe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 477DA30170D;
-	Thu, 30 Oct 2025 08:36:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A8D338900
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 08:38:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761813403; cv=none; b=Bn0/t3duKkIZ9rIu9i14mu3t7f35dOacbiYNO04AgpMXMkRLZxtVlgqMuM3L2wOmbMoW5y9lMEcJUf4/HS9ifrpXLJ2biKrPwuoUJ4VHVi9Mb1bZm7raweLjdlDPC1/SaAdacFyJUX/eMU6MZsdflypCfvz3BUh/kl4qM1uvlXI=
+	t=1761813486; cv=none; b=cc4ubf7iRnLkinx3QDwHAlvXX4tQArwQfAkXKsAB5AE0UcWmrD5xsJVunBe0liEcJBEf/heZ8afd0E3BcC7M1SpAR2ClUwvgho5ZJlQo+TVxeUSCFt66jhhvHsmK3ZQqZlYnCznDEyCiyRmaMlOyAQCJtdfaGCHPZFp0zEies7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761813403; c=relaxed/simple;
-	bh=1JNCPHckQsQWix8dflRYg6fL5EFdVbqFZ47yvvDxetQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h+l0uPAeGQ3v2//24baLnu3yIIgesUXjMe5Uyea7OXZqHIvUW7/lzHw3LOTx7n4jI+sX6+Ys2tgz7xp6ib2FUWyChSLrIK37e7/2UdeVmFCIOWzKB5WNWXR6WPz9M0TZ0R2gg6jwoETY4H3tei47GXaNBqJKRpKrIhuGYxRI2wc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=b301ppCx; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761813401; x=1793349401;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=1JNCPHckQsQWix8dflRYg6fL5EFdVbqFZ47yvvDxetQ=;
-  b=b301ppCxpzlRK8ExXn7IFEWb6H3hpc5LJ9J9dWJ0l0F/N3NzSzRDB1IS
-   jJTJ7NuaNGZHJPtld8o/LXxiq9Vn7CGKk9CZB7IFqHTzBASUIv6BwnM7X
-   Hnld7besXux+Qads0wwkYXhFKhqEjLmy0Dc6/jBbS+cUc/CVmwZHo+CFF
-   4iiDvKo3GbMHWI+iGmSZXzOBnRfTujUgnY8IzCVc0q62OCRNUQquB8fFK
-   D4559WKEog522wt48GwP0HqlMe1VMVQVUEvRyxE79VdHG6pxuMuuuKJoj
-   WVU1YadmpqCL8rzqI1BkJIJ+k0VBxhPVU24uf3sWe0xH2WNZYlntNpRh3
-   Q==;
-X-CSE-ConnectionGUID: Ne1ivf9aQe+6ZHaAo9MrOw==
-X-CSE-MsgGUID: zLQoWG3ORoKRfmSjMUSVyg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11597"; a="67600484"
-X-IronPort-AV: E=Sophos;i="6.19,266,1754982000"; 
-   d="scan'208";a="67600484"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2025 01:36:40 -0700
-X-CSE-ConnectionGUID: D+2op7OhQIa4sO1T8EBovg==
-X-CSE-MsgGUID: dIReLDwRTZy6lSWzPzt7zg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,266,1754982000"; 
-   d="scan'208";a="185774788"
-Received: from black.igk.intel.com ([10.91.253.5])
-  by fmviesa006.fm.intel.com with ESMTP; 30 Oct 2025 01:36:35 -0700
-Received: by black.igk.intel.com (Postfix, from userid 1003)
-	id 2586695; Thu, 30 Oct 2025 09:36:34 +0100 (CET)
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Raag Jadav <raag.jadav@intel.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	linux-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org
-Cc: Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Phil Sutter <phil@nwl.cc>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next v1 1/1] treewide: Rename ERR_PTR_PCPU() --> PCPU_ERR_PTR()
-Date: Thu, 30 Oct 2025 09:35:53 +0100
-Message-ID: <20251030083632.3315128-1-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1761813486; c=relaxed/simple;
+	bh=b3BmUeai7NSgi6gaI6pNqpck6u1VsQisyA6qdrDFrnI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ITXNNiUvy3nJFZ1NbKItCovtLZHr6Q1wXwl/vtUs3d6/grp7TWKe11zySO5bjrC2CU+4t4SqoH5o+iNa4UgbfCUJaxM4vIz0I+nzl3vcGHkBtCpzRqKOF1fnQPgu6/LWOiSmbaJ3Q6oYM/txNlNGgjwyuSvBm315J8XyWhN8yoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Xrl/WCti; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=kHsHJoCe; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Xrl/WCti; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=kHsHJoCe; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 17A2D33899;
+	Thu, 30 Oct 2025 08:38:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1761813483; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=V53nKA2HJa5rNDn7FCq67g4jdt3pT7RYKdpGCn1BnEw=;
+	b=Xrl/WCtiuFyQsKvvtSFuZ1sHgy/OhTQKzMOLqURyMWe2sF0jObb6so1q/dX3mirtyAO/0W
+	u96L7Sp/eRKGHBSO9LQGR/0w+3KISlS0qVtaG8a+uOMPmTQdFRXWHVHKBJ9NhLXJJdZPkD
+	8LKnmcWpIy9yJuuvVi4dsr4euRG8UDs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1761813483;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=V53nKA2HJa5rNDn7FCq67g4jdt3pT7RYKdpGCn1BnEw=;
+	b=kHsHJoCeuwCeSPM9KpxCdPdCi7doswPiL5uCzfIOD7l4+StxKzOkNcqB2MHg57M6/6dcn7
+	woZaGZVlcYHnTiAg==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1761813483; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=V53nKA2HJa5rNDn7FCq67g4jdt3pT7RYKdpGCn1BnEw=;
+	b=Xrl/WCtiuFyQsKvvtSFuZ1sHgy/OhTQKzMOLqURyMWe2sF0jObb6so1q/dX3mirtyAO/0W
+	u96L7Sp/eRKGHBSO9LQGR/0w+3KISlS0qVtaG8a+uOMPmTQdFRXWHVHKBJ9NhLXJJdZPkD
+	8LKnmcWpIy9yJuuvVi4dsr4euRG8UDs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1761813483;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=V53nKA2HJa5rNDn7FCq67g4jdt3pT7RYKdpGCn1BnEw=;
+	b=kHsHJoCeuwCeSPM9KpxCdPdCi7doswPiL5uCzfIOD7l4+StxKzOkNcqB2MHg57M6/6dcn7
+	woZaGZVlcYHnTiAg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 9EA1513393;
+	Thu, 30 Oct 2025 08:38:02 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 0AXmI+ojA2knPwAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Thu, 30 Oct 2025 08:38:02 +0000
+Message-ID: <b7974772-2e34-44df-924f-702e96ac20d3@suse.de>
+Date: Thu, 30 Oct 2025 09:38:02 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2 bpf v2] xsk: avoid data corruption on cq descriptor
+ number
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, magnus.karlsson@intel.com,
+ maciej.fijalkowski@intel.com, sdf@fomichev.me, kerneljasonxing@gmail.com,
+ fw@strlen.de
+References: <20251028183032.5350-1-fmancera@suse.de>
+ <20251028183032.5350-2-fmancera@suse.de> <20251028160107.5c161a4f@kernel.org>
+ <b21cf80c-5d69-4914-aa45-00f9527f3436@suse.de>
+ <20251029162245.5ea2ee3e@kernel.org>
+Content-Language: en-US
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+In-Reply-To: <20251029162245.5ea2ee3e@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	MID_RHS_MATCH_FROM(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[vger.kernel.org,intel.com,fomichev.me,gmail.com,strlen.de];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	URIBL_BLOCKED(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:mid];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:mid]
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
+X-Spam-Level: 
 
-Make the namespace of specific ERR_PTR() macro leading the thing.
-This is already done for IOMEM_ERR_PTR(). Follow the same pattern
-in PCPU_ERR_PTR().
 
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
 
-I believe taking it via net-next makes most of sense, if no objections.
+On 10/30/25 12:22 AM, Jakub Kicinski wrote:
+> On Wed, 29 Oct 2025 08:51:58 +0100 Fernando Fernandez Mancera wrote:
+>> On 10/29/25 12:01 AM, Jakub Kicinski wrote:
+>>> On Tue, 28 Oct 2025 19:30:32 +0100 Fernando Fernandez Mancera wrote:
+>>>> Since commit 30f241fcf52a ("xsk: Fix immature cq descriptor
+>>>> production"), the descriptor number is stored in skb control block and
+>>>> xsk_cq_submit_addr_locked() relies on it to put the umem addrs onto
+>>>> pool's completion queue.
+>>>
+>>> Looking at the past discussion it sounds like you want to optimize
+>>> the single descriptor case? Can you not use a magic pointer for that?
+>>>
+>>> 	#define XSK_DESTRUCT_SINGLE_BUF	(void *)1
+>>> 	destructor_arg = XSK_DESTRUCT_SINGLE_BUF
+>>>
+>>> Let's target this fix at net, please, I think the complexity here is
+>>> all in skbs paths.
+>>
+>> I might be missing something here but if the destructor_arg pointer is
+>> used to do this, where should we store the umem address associated with
+>> it? In the proposed approach the skb extension should not be increased
+>> for non-fragmented traffic as there is only a single descriptor and
+>> therefore we can store the umem address in destructor_arg directly.
+> 
+> I see. Pointers are always aligned to 8B, you can stash the "pointer
+> type" there. If the bottom bit is 1 it's a umem and the skb was
+> single-chunk. If it's non-0 then it's a full kmalloc'ed struct.
+> 
 
- include/linux/err.h           | 2 +-
- kernel/events/hw_breakpoint.c | 4 ++--
- net/netfilter/nf_tables_api.c | 6 +++---
- 3 files changed, 6 insertions(+), 6 deletions(-)
+That is a good point. Pointer tagging might be a good solution here. 
+Thanks, let me try that.
 
-diff --git a/include/linux/err.h b/include/linux/err.h
-index 1d60aa86db53..8aafcf9492a4 100644
---- a/include/linux/err.h
-+++ b/include/linux/err.h
-@@ -42,7 +42,7 @@ static inline void * __must_check ERR_PTR(long error)
- }
- 
- /* Return the pointer in the percpu address space. */
--#define ERR_PTR_PCPU(error) ((void __percpu *)(unsigned long)ERR_PTR(error))
-+#define PCPU_ERR_PTR(error) ((void __percpu *)(unsigned long)ERR_PTR(error))
- 
- /* Cast an error pointer to __iomem. */
- #define IOMEM_ERR_PTR(error) (__force void __iomem *)ERR_PTR(error)
-diff --git a/kernel/events/hw_breakpoint.c b/kernel/events/hw_breakpoint.c
-index 8ec2cb688903..67fc1367d649 100644
---- a/kernel/events/hw_breakpoint.c
-+++ b/kernel/events/hw_breakpoint.c
-@@ -849,7 +849,7 @@ register_wide_hw_breakpoint(struct perf_event_attr *attr,
- 
- 	cpu_events = alloc_percpu(typeof(*cpu_events));
- 	if (!cpu_events)
--		return ERR_PTR_PCPU(-ENOMEM);
-+		return PCPU_ERR_PTR(-ENOMEM);
- 
- 	cpus_read_lock();
- 	for_each_online_cpu(cpu) {
-@@ -868,7 +868,7 @@ register_wide_hw_breakpoint(struct perf_event_attr *attr,
- 		return cpu_events;
- 
- 	unregister_wide_hw_breakpoint(cpu_events);
--	return ERR_PTR_PCPU(err);
-+	return PCPU_ERR_PTR(err);
- }
- EXPORT_SYMBOL_GPL(register_wide_hw_breakpoint);
- 
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index eed434e0a970..1b5286545a3c 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -2228,14 +2228,14 @@ static struct nft_stats __percpu *nft_stats_alloc(const struct nlattr *attr)
- 	err = nla_parse_nested_deprecated(tb, NFTA_COUNTER_MAX, attr,
- 					  nft_counter_policy, NULL);
- 	if (err < 0)
--		return ERR_PTR_PCPU(err);
-+		return PCPU_ERR_PTR(err);
- 
- 	if (!tb[NFTA_COUNTER_BYTES] || !tb[NFTA_COUNTER_PACKETS])
--		return ERR_PTR_PCPU(-EINVAL);
-+		return PCPU_ERR_PTR(-EINVAL);
- 
- 	newstats = netdev_alloc_pcpu_stats(struct nft_stats);
- 	if (newstats == NULL)
--		return ERR_PTR_PCPU(-ENOMEM);
-+		return PCPU_ERR_PTR(-ENOMEM);
- 
- 	/* Restore old counters on this cpu, no problem. Per-cpu statistics
- 	 * are not exposed to userspace.
--- 
-2.50.1
+>> The size of the skb extension will only increase for fragmented traffic
+>> (multiple descriptors).. but sure, if there is a fallback to the
+>> slowpath, it will burden a bit the performance. Although, for that to
+>> happen the must have tried to use AF_XDP family initially.. AFAICS, the
+>> size of skb extension is only increased when skb_ext_add() is called.
+> 
+> To be clear by adding an skb extension you are de-facto allocating
+> a bit in the skb struct. Just one of the bits of the active_extensions
+> field instead of a separate bitfield. If you can depend on the socket
+> association instead this is quite wasteful.
+> 
 
 
