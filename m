@@ -1,98 +1,110 @@
-Return-Path: <netdev+bounces-234295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234296-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AF3AC1EEB8
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 09:12:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 53D2AC1EECA
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 09:14:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60C82188C18D
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 08:12:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE37B19C120A
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 08:13:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B5BD32E733;
-	Thu, 30 Oct 2025 08:11:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29E68335BAF;
+	Thu, 30 Oct 2025 08:12:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b4iTK/Fm"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="bGulg08Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5739232E13E
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 08:11:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F0D32E733;
+	Thu, 30 Oct 2025 08:12:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761811913; cv=none; b=NXY48ZpbVmVn6zXf+QR22MsTOoMZrnkpOnPHRefQv/KqlzCourkducDmPiqXGBemPv6uRS68UijCKQWHh82WRg8Hx+9Ob3ugmkiuu5XTWQE7AggMvWw4CvdURm/xxFX+aUsOODZDObGvbgpoqjIm2VuKJFH/YcNoDVQJNmPmhfY=
+	t=1761811961; cv=none; b=fINnu3xFBIrROcm6i51HfoNG80SdD0uXvk1GTnsf9yXS+kMq/lmBj7pDnSEepZWyKi0GklfZnP1Allv/s3GAfm/2Q5BcF58lqDEg1FxG2/+oi8K1+ur0W6SqRkC25+y4TQhDfwTxJPa1NsvRwTn++hzRNGb8iiJFb6NhW9BPSTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761811913; c=relaxed/simple;
-	bh=vCcTYuH6mTu6qyvg70BghXWQVnQ8I0gdNc3/3b60Ajw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lKv9NJ2ERZa3EAq5isW9SaTihschfn+7eveOE8qBqGUbUnubTH9E0gPYeNgPUD0/4Ytv45K/XqH6yxbl6JPnFEsS5pBLwI87dSicF/wcOUBBApb+aBrKoykzAhVnSkZOgHwA3RXC7TvoMKs5wCEVRbv5iw/TPFHuze9dL0TjMnM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b4iTK/Fm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3838AC4CEFF
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 08:11:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761811913;
-	bh=vCcTYuH6mTu6qyvg70BghXWQVnQ8I0gdNc3/3b60Ajw=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=b4iTK/FmXmNI6qUZedlTwzN5uSyHwBXWniVl8o7fCmHXlHzGzlso/P/nfsGTdExpP
-	 M21qPYWOTnF0oOR12CpycfC1yosNRFGW0/4VpPOeyhsXJQLXitdRMUBFugwU5n0el3
-	 cFr6846EQWLhfz3rkB4PGzVtGbjdCI+TFCcuDy5xaLKg1G2Si28sGruIskjPv9d5Bt
-	 ZjZoHm2HIeGeDQbghisjN8hNvwJfswpv3bXg5OovTbO2CN7eMXGA5zsEG0+1shUWut
-	 C3dMfb+Ubd53l/JGFANxD7fX2fSpmrPRzfeQHAx5WO6xNVoe/q/mwVJcCqVok/xbVL
-	 VVXp08t6X/PmA==
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b70406feed3so209939066b.3
-        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 01:11:53 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUNn+TGKnosKTgmkj8f4bWdfYAM5Ck1KS7heOPhsQj3iQ6E4dtPcsEQtVVA//F4GJcoaywob38=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgFsojJEagVtb1UzQVN0hp14e5XfH5el4jnYMwZTH5+AHnFNiJ
-	woSU9YKS9nGhUmpU3Emf9PShkeqQoQ5SdCGr1Sbsm96b5/dHDmNLiI/hRZfFSjbW3j7RUifwv2e
-	ASo/A/x40j7BgXrJG4OJHSsovXJoG+mo=
-X-Google-Smtp-Source: AGHT+IF5P/qdVOfbIIV+SEJSLe/A1R1mpnSYlz9hP4HAxa+hEO5mYBlCRES28Qi95wHLRZ3k7iN612R/4zMk5bAAmFs=
-X-Received: by 2002:a17:907:940a:b0:b6d:692e:9a84 with SMTP id
- a640c23a62f3a-b7053e2c694mr214741166b.38.1761811911789; Thu, 30 Oct 2025
- 01:11:51 -0700 (PDT)
+	s=arc-20240116; t=1761811961; c=relaxed/simple;
+	bh=qUof08cVvZpyI5pyttc7D1uPQ9Ry6bp7QcptSABtIRY=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=erThUYH/fr9re4dfi8bxHJzMdQCtNflI/fuP0ys76x9ixxBJr6uwRMrT6+pIOSkmbwkP/2ljmp6bqK90KyBnha5EAojDn3bNC3oE27GUDLzfVbc3pU2jx5D6GkOu8SMrmu0GzPHJeeL69Qv9bajYsW6nAd1lilP+Pmz4wt3VZG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=bGulg08Y; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id 1191420860;
+	Thu, 30 Oct 2025 09:12:37 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id 9910oo1jPUIX; Thu, 30 Oct 2025 09:12:36 +0100 (CET)
+Received: from EXCH-01.secunet.de (unknown [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id 7C94A20820;
+	Thu, 30 Oct 2025 09:12:36 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 7C94A20820
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1761811956;
+	bh=KlpxZU8es++alJ0W+sTnPbvdyFIjY0cf6QVcV6Ki/IU=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=bGulg08YA9llBIt1RWZnBlnizYu0G4gacfmoBKqE5+4CVKh4bXiP8CYxiqAN+T1d4
+	 OSUQqyqy4lB7VaN0KoCxk8PNjdsPKkdtMAFI2Z+XXEa0OIhVCHcdfBF2bMnviknA6v
+	 MgISJ1Z127ktGUvW0hlo16cS04e54culL2GWC0OZrfMSFYmPHiVR/CAyAgqyIhmTOc
+	 BZUVvOl7jEZhiQs54KxiUMvTxwI2MZam09E5a2vxRPVBGtsPYDR4erzczlvbTEBPTJ
+	 1CTSYlI2yq5LmHerlsuLh57oF5cwidtBpvODVtxsij6kpiLfYpWCzfpYPNKYfU6f0e
+	 Q7gGzztRdHDQg==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.2562.17; Thu, 30 Oct
+ 2025 09:12:36 +0100
+Received: (nullmailer pid 1011608 invoked by uid 1000);
+	Thu, 30 Oct 2025 08:12:35 -0000
+Date: Thu, 30 Oct 2025 09:12:35 +0100
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+CC: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux
+ Documentation <linux-doc@vger.kernel.org>, Linux Networking
+	<netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
+	<corbet@lwn.net>, Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH net-next 6/6] MAINTAINERS: Add entry for XFRM
+ documentation
+Message-ID: <aQMd886miv39BEPC@secunet.com>
+References: <20251029082615.39518-1-bagasdotme@gmail.com>
+ <20251029082615.39518-7-bagasdotme@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251030064736.24061-1-dqfext@gmail.com>
-In-Reply-To: <20251030064736.24061-1-dqfext@gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Thu, 30 Oct 2025 17:11:39 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9nkQFgXPpKpOY+O_B5HRLeyiZKO5a4X5MdfjYoO_O+Aw@mail.gmail.com>
-X-Gm-Features: AWmQ_bl_8SFNU2Ia4p8afvCEYgPx8n2HX4p9nIHde5wt-h4qbFdQlg8ez7H-da0
-Message-ID: <CAKYAXd9nkQFgXPpKpOY+O_B5HRLeyiZKO5a4X5MdfjYoO_O+Aw@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: server: avoid busy polling in accept loop
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Tom Talpey <tom@talpey.com>, Ronnie Sahlberg <lsahlber@redhat.com>, Hyunchul Lee <hyc.lee@gmail.com>, 
-	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20251029082615.39518-7-bagasdotme@gmail.com>
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ EXCH-01.secunet.de (10.32.0.171)
 
-On Thu, Oct 30, 2025 at 3:47=E2=80=AFPM Qingfang Deng <dqfext@gmail.com> wr=
-ote:
->
-> The ksmbd listener thread was using busy waiting on a listening socket by
-> calling kernel_accept() with SOCK_NONBLOCK and retrying every 100ms on
-> -EAGAIN. Since this thread is dedicated to accepting new connections,
-> there is no need for non-blocking mode.
->
-> Switch to a blocking accept() call instead, allowing the thread to sleep
-> until a new connection arrives. This avoids unnecessary wakeups and CPU
-> usage.
->
-> Also remove:
->   - TCP_NODELAY, which has no effect on a listening socket.
->   - sk_rcvtimeo and sk_sndtimeo assignments, which only caused accept()
->     to return -EAGAIN prematurely.
->
-> Fixes: 0626e6641f6b ("cifsd: add server handler for central processing an=
-d tranport layers")
-> Signed-off-by: Qingfang Deng <dqfext@gmail.com>
-Applied it to #ksmbd-for-next-next.
-Thanks!
+On Wed, Oct 29, 2025 at 03:26:14PM +0700, Bagas Sanjaya wrote:
+> XFRM patches are supposed to be sent to maintainers under "NETWORKING
+> [IPSEC]" heading, but it doesn't cover XFRM docs yet. Add the entry.
+> 
+> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+> ---
+>  MAINTAINERS | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index d652f4f27756ef..4f33daad40bed6 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -18041,6 +18041,7 @@ L:	netdev@vger.kernel.org
+>  S:	Maintained
+>  T:	git git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec.git
+>  T:	git git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec-next.git
+> +F:	Documentation/networking/xfrm/
+
+That means that I'm now responsible for this.
+But I'm OK with it if nobody has objections on it.
 
