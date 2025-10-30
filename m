@@ -1,147 +1,330 @@
-Return-Path: <netdev+bounces-234362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C59B0C1FCA9
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 12:21:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFDECC1FC8E
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 12:20:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DEB8189AB68
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 11:19:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF90A3BC7D4
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 11:19:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFBD2343D69;
-	Thu, 30 Oct 2025 11:18:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 535662E62CE;
+	Thu, 30 Oct 2025 11:19:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kb3kSYB+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XGWaO0vW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 307022E5429
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 11:18:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB97A13FEE
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 11:19:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761823086; cv=none; b=SIgXIUf7EwgPQv/suoSDw+kFpqHV2nh6DeqcCb8Py+64ModXFcp8l+Z3hiRak140VRg8yaS46S7rFuh/yuiBUGbLPP6xdvTQTKljddJxbjHvqTW6/aYlHhQB0L+MrSI89MFlN2kcb6VI4WeE3oBbw2CywuJOEHw6rFm/IPVb7aY=
+	t=1761823151; cv=none; b=ZDnor9CAY82joFTgnSiNXB1K+qhOS113Fo1TzQ3JpOkI7qTcsamXikO7sPlQPh7b6p2uTzAK/JtcXDTG8dvVIoXSeYeKvjX1F9iKoAJKoA+gI9HT1Pm1iUIAiz9B4K0KPA7iX0hXQ3JENHdPCAhDiZX3MIsjfzbGHnC1T4Q6EwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761823086; c=relaxed/simple;
-	bh=zDrcC5GJxSK7Ji8wHBSk5s/mSLGf7VLCyLmVbQ62M6g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HTa1GYDbVm6BsS/UQr+Lujat3iI/174VhZ6VpLWRHw2ml88mWexT3jAPqShZzC5a2eEU7cHOsAaildE0JFkbxwMRc/DuzpF3F32VIAdJbxBjE6e1rmfSzyk1T8SBzmHboHZj3dLj5i94v+5kP25+rbOBLu144GCqwlprV+ty0wc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kb3kSYB+; arc=none smtp.client-ip=209.85.166.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-940dbb1e343so84475339f.0
-        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 04:18:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761823084; x=1762427884; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AnjkRvMkBIKfE5g1/0FeD48NJujoOxw0nQk05fABqm8=;
-        b=Kb3kSYB+ldi+GbhDJUDhRYgsGgiDr9uf4s+cYNVfog4hG4P7s+Wp3WKRg7NQcHsvMQ
-         sbmAnYA6Vlx82/GlGFjczzh1XqElrp4Xs/4IsfWpFRwVf9C4kUex9pmJwzc/JM9Djdc6
-         wGQw1FjUesJKLVVX6rZhl9DaF7OiTjcqVBMmFTyKHyrI+j36aKkYu0QNYCcsrdep6w6W
-         X0kxKrNoJSmQiw1YCcTL0GelFlo3bhNneku4sPC/DWMYdTCevvsxC1pDmS9TpcBbMGsR
-         JbEGHR/it6YSp/XmA+FetRxIZVYvYudKrCGVHAy4B1dsfCjU7qkk3U238DO+HMplAHvw
-         yAfQ==
+	s=arc-20240116; t=1761823151; c=relaxed/simple;
+	bh=SqGP57j1BFjvp7wUYmK415ErWkC3oNsnubQ4R58rroM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SDD4V3NFZWgln2UB5mWZxAGsLmYICyT+n/WeNAfyc+NdecrTKOFmKAtEpO94GowCA9azpg7lDvwTaXrBE3nANEew2HKrLLqf2F4qgl/tyER+wrmAujE1UlKn/VySLPFn0whcwPA2gSh0awQLyEi9/BauLNHdabKo6iv6FjjHS/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XGWaO0vW; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761823147;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vMwKC3+0iiuTfiX2G4lkWZWPjWZGvGY/CWCvsFc2T7A=;
+	b=XGWaO0vWDEB9yLLLZ3BLXSoAqZmHaBHJOxneu7qQSWr9bWGFGp6vg7mSp06j+dXwEws90T
+	cfJRUHVPqWNUY/rY+eKRsJTVkKeLTR148tBzeYQCjcVVDu+LcloKZVRQhlp0NOU8fj0T9r
+	sDeRgvu7W9+PRzWcMY1Vd5LADyMIY5w=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-451-ioOnkRqyPp6Q4qf0FThmBA-1; Thu, 30 Oct 2025 07:19:06 -0400
+X-MC-Unique: ioOnkRqyPp6Q4qf0FThmBA-1
+X-Mimecast-MFC-AGG-ID: ioOnkRqyPp6Q4qf0FThmBA_1761823145
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-475de0566adso6452945e9.0
+        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 04:19:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761823084; x=1762427884;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AnjkRvMkBIKfE5g1/0FeD48NJujoOxw0nQk05fABqm8=;
-        b=b8E10pbo1I7I7mkP4EjJdq/1MMb5jwB3Y1X6bmbGp41qZZyH8G16bhnHVtdwPuQtQZ
-         rfTc8iX8w/T2DximfPsv2L4HiJ4/5QGUf5BsCDjhc5o/dFHqm76ta/ydc62bGgEz3g2x
-         GXwKWetSj8YHa9ZBTK8DrlEnXJ3p2JzK1l/nbdn6P7aRQKDx3Cje6uNr/YCacWCMPEC8
-         wi5r8WgjVB3vxllXG/aCezGycOxN4EN5181Cb4nDlGdDK0WNLWBQ8kDRIETnhOTCFRm9
-         tH3k0saKx0FE2fshMw5aHfpB0KE9/t9XsLQeW02bANuYu5JP3ZjTIgGuosbEKVF4CRwW
-         Jlww==
-X-Forwarded-Encrypted: i=1; AJvYcCV/jB2ejgpLygyc3aTBaQET/ImjcbWopVU3ZcBuul3wyQfu0FjvszGPaXeBwgOQSa3rAzfYZVY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwDC0YIUJ+9OvSQmDq3KT5Qum/E5qU87ZWQqxcZ4N/IqnCTMGJH
-	WsCgRTcHWETqP8L1Htd7An9j2M4s5eG4f6ppSMyEZqsPhLbiIUj+GDOhai65TD9SUZchFn4kOIE
-	AdPOdU1GFGFM856ZtAFxmAuyImQXvGWo=
-X-Gm-Gg: ASbGncshr6jbafeBdShFskBVxTyZNq5aNPjYmpCjRxTQb3634wuXmGCFiEiCOkRgrOW
-	b8toME8aoDVy+tJPcm3yBje0hBmACmhmyKhKHkWwUKGKPiflFG8Px/n5ywUwNcdlu3DTN1r768o
-	OcjOX76ady+gl0CqTbKn4jLhdd1nUd7Kbvev+vuGK17T4Evu5QPo36C+ocPGDEW3GSQgpkG9egE
-	8sv7lYe9KzPDnPuo+5vEfup9zRsrdvqqfu9PK34CoKbywwYrfoJTuRoMtLK4WKKWA1TH/g=
-X-Google-Smtp-Source: AGHT+IFjYZSNf5b3bFjLFO/ww09HkUIGFNXY28HL+DLlplYADC6BMo7pzFokHHmEQe3ahOaOb/z+WYSc4dOL8YKuAlY=
-X-Received: by 2002:a05:6e02:228a:b0:431:d685:a32a with SMTP id
- e9e14a558f8ab-433011f4f3cmr39332745ab.6.1761823084219; Thu, 30 Oct 2025
- 04:18:04 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761823145; x=1762427945;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vMwKC3+0iiuTfiX2G4lkWZWPjWZGvGY/CWCvsFc2T7A=;
+        b=MrXMOqRXNQf8+tFcfD08ZTkeQgpBgClAhusjJXk30cztEA1gAatYHmXAyIWZVe3A0k
+         wApbPAkYNQw2ZtWe+a19273prMtYsxz2xyc93XN+27hKsniBvDL478aOgILBexY6rGZF
+         K+sRziWJxVmO454pm4otwNga5j3CNc+twSaFG6cu3OeMCdxjAH/YyWJxu5ydPOvcV75R
+         jyOaHy6ab0ppgAXilZDwzn1508bO1ohWVlHbiPdEKjAVNIbAS809cGT6LJoZx77y8Mf9
+         QmEQaKO+p7lmPp+M7PPr04+3lKjb0nc1eECm4srXIhMdvgqYs19UrPhiD0+MA/dKzEZI
+         d1bw==
+X-Forwarded-Encrypted: i=1; AJvYcCXY9iyr2PTUhc5RI0doIK6bl9EuYxzM210t3Z7d5ifcddpxCCHeShemzbvc7LlqTVcZwhwEmRU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVKbc+k8rvTtbXK8MDtfpcziXxCq0x7u+4ZiGwBYHFIP8pQEGJ
+	uyE9iQUt0nE6o2IghOA+hx0kzLCmkYbb7/rwMhNxF3OAKDpw17dfHLCeYLU1D0BjsQiHxi4Fl6/
+	O097+jiqUJh6D19g5mM60PxvnK9gIIZB5FHsZSNE4JUwALEtRi54HrAn4mA==
+X-Gm-Gg: ASbGncsWW127nPodnJ9amFXrk4ZL4rOyDw40vXAowW7TAfOeZRYaTRb9LnK8vvchaFY
+	m2XFotbXv0Xt1oZHzTfv2Vhf8ORJPdKr1jVvU42i0V0VGUh7RdgPkiz+FYnFezbz3+KWl7PxLgf
+	OOj8cawz0gju6iSKHW6nJFeKZsHT021ki++Z/E44DWlCJcI4AhERkMsnWXc8IoxtTYlJnwgPtti
+	pfEpwyAMuonBP/ILwIQ1BRM3IOl+4jZWijq+Pz3W3gXKh/XZW9blp5R3JnLz/V6+bM1qLEqf2wG
+	XjTvbiLInAs1HeZa6CPmoa+hZf4VqRoGSXtxZf6iYiLQ7oseqkeSamrlDH0iJPSxuzn5EX/wGYP
+	68mt4ZSzMKucZ8N1sTYBZsxneBDkVzHlhSagby9itAFbv
+X-Received: by 2002:a05:600d:8389:b0:475:da13:256b with SMTP id 5b1f17b1804b1-4771e3cb77cmr32176605e9.38.1761823145298;
+        Thu, 30 Oct 2025 04:19:05 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFReuX3rLd07pv/+w9iCs0nl/ibXlBBJ1rbE7rMVq6o7uKjPrhhDCpdnOglyD29qJXrGhGaNA==
+X-Received: by 2002:a05:600d:8389:b0:475:da13:256b with SMTP id 5b1f17b1804b1-4771e3cb77cmr32176325e9.38.1761823144846;
+        Thu, 30 Oct 2025 04:19:04 -0700 (PDT)
+Received: from ?IPV6:2a0d:3341:b8a2:8d10:2aab:5fa:9fa0:d7e6? ([2a0d:3341:b8a2:8d10:2aab:5fa:9fa0:d7e6])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477289e7cf5sm36534505e9.14.2025.10.30.04.19.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Oct 2025 04:19:04 -0700 (PDT)
+Message-ID: <b55d868c-7bc1-4e25-aef4-cdf385208400@redhat.com>
+Date: Thu, 30 Oct 2025 12:19:02 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251026145824.81675-1-kerneljasonxing@gmail.com>
- <54d1ac44-8e53-4056-8061-0c620d9ec4bf@redhat.com> <e290a675-fc1e-4edf-833c-aa82af073d30@intel.com>
-In-Reply-To: <e290a675-fc1e-4edf-833c-aa82af073d30@intel.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 30 Oct 2025 19:17:27 +0800
-X-Gm-Features: AWmQ_bmnROwfpAdiuZGw8HjV-5Z0NcRHwx0YijpygGa_flsHGmonev7UefW_R34
-Message-ID: <CAL+tcoCu=7MFm9kioQnQmAQYkqbC_PNr-j3UyVEqyxhe7T2Fig@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] xsk: add indirect call for xsk_destruct_skb
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com, joe@dama.to, willemdebruijn.kernel@gmail.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 05/12] virtio_net: Query and set flow filter
+ caps
+To: Daniel Jurgens <danielj@nvidia.com>, netdev@vger.kernel.org,
+ mst@redhat.com, jasowang@redhat.com, alex.williamson@redhat.com
+Cc: virtualization@lists.linux.dev, parav@nvidia.com, shshitrit@nvidia.com,
+ yohadt@nvidia.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
+ shameerali.kolothum.thodi@huawei.com, jgg@ziepe.ca, kevin.tian@intel.com,
+ kuba@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com
+References: <20251027173957.2334-1-danielj@nvidia.com>
+ <20251027173957.2334-6-danielj@nvidia.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251027173957.2334-6-danielj@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 30, 2025 at 7:00=E2=80=AFPM Alexander Lobakin
-<aleksander.lobakin@intel.com> wrote:
->
-> From: Paolo Abeni <pabeni@redhat.com>
-> Date: Thu, 30 Oct 2025 11:15:18 +0100
->
-> > On 10/26/25 3:58 PM, Jason Xing wrote:
-> >> From: Jason Xing <kernelxing@tencent.com>
-> >>
-> >> Since Eric proposed an idea about adding indirect call for UDP and
-> >
-> > Minor nit:                          ^^^^^^
-> >
-> > either 'remove an indirect call' or 'adding indirect call wrappers'
-> >
-> >> managed to see a huge improvement[1], the same situation can also be
-> >> applied in xsk scenario.
-> >>
-> >> This patch adds an indirect call for xsk and helps current copy mode
-> >> improve the performance by around 1% stably which was observed with
-> >> IXGBE at 10Gb/sec loaded.
-> >
-> > If I follow the conversation correctly, Jakub's concern is mostly about
-> > this change affecting only the copy mode.
-> >
-> > Out of sheer ignorance on my side is not clear how frequent that
-> > scenario is. AFAICS, applications could always do zero-copy with proper
-> > setup, am I correct?!?
->
-> It is correct only when the target driver implements zero-copy
-> driver-side XSk. While it's true for modern Ethernet drivers for real
-> NICs, "virtual" drivers like virtio-net, veth etc. usually don't have it.
-> It's not as common usecase as using XSk on real NICs, but still valid
-> and widely used.
-> For example, virtio-net has a shortcut where it can send XSk skbs
-> without copying everything from the userspace (the no-linear-head mode),
-> so there generic XSk mode is way faster there than usually.
->
-> Also worth noting that there were attempts to introduce driver-side XSk
-> zerocopy for virtio-net (and probably veth, I don't remember) on LKML,
-> but haven't been upstreamed yet.
+On 10/27/25 6:39 PM, Daniel Jurgens wrote:
+> When probing a virtnet device, attempt to read the flow filter
+> capabilities. In order to use the feature the caps must also
+> be set. For now setting what was read is sufficient.
+> 
+> Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
+> Reviewed-by: Parav Pandit <parav@nvidia.com>
+> Reviewed-by: Shahar Shitrit <shshitrit@nvidia.com>
+> ---
+> v4:
+>     - Validate the length in the selector caps
+>     - Removed __free usage.
+>     - Removed for(int.
+> v5:
+>     - Remove unneed () after MAX_SEL_LEN macro (test bot)
+> v6:
+>     - Fix sparse warning "array of flexible structures" Jakub K/Simon H
+>     - Use new variable and validate ff_mask_size before set_cap. MST
+> ---
+>  drivers/net/virtio_net.c           | 171 +++++++++++++++++++++++++++++
+>  include/linux/virtio_admin.h       |   1 +
+>  include/uapi/linux/virtio_net_ff.h |  91 +++++++++++++++
+>  3 files changed, 263 insertions(+)
+>  create mode 100644 include/uapi/linux/virtio_net_ff.h
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index a757cbcab87f..a9fde879fdbf 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -26,6 +26,9 @@
+>  #include <net/netdev_rx_queue.h>
+>  #include <net/netdev_queues.h>
+>  #include <net/xdp_sock_drv.h>
+> +#include <linux/virtio_admin.h>
+> +#include <net/ipv6.h>
+> +#include <net/ip.h>
+>  
+>  static int napi_weight = NAPI_POLL_WEIGHT;
+>  module_param(napi_weight, int, 0444);
+> @@ -281,6 +284,14 @@ static const struct virtnet_stat_desc virtnet_stats_tx_speed_desc_qstat[] = {
+>  	VIRTNET_STATS_DESC_TX_QSTAT(speed, ratelimit_packets, hw_drop_ratelimits),
+>  };
+>  
+> +struct virtnet_ff {
+> +	struct virtio_device *vdev;
+> +	bool ff_supported;
+> +	struct virtio_net_ff_cap_data *ff_caps;
+> +	struct virtio_net_ff_cap_mask_data *ff_mask;
+> +	struct virtio_net_ff_actions *ff_actions;
+> +};
+> +
+>  #define VIRTNET_Q_TYPE_RX 0
+>  #define VIRTNET_Q_TYPE_TX 1
+>  #define VIRTNET_Q_TYPE_CQ 2
+> @@ -493,6 +504,8 @@ struct virtnet_info {
+>  	struct failover *failover;
+>  
+>  	u64 device_stats_cap;
+> +
+> +	struct virtnet_ff ff;
+>  };
+>  
+>  struct padded_vnet_hdr {
+> @@ -6753,6 +6766,160 @@ static const struct xdp_metadata_ops virtnet_xdp_metadata_ops = {
+>  	.xmo_rx_hash			= virtnet_xdp_rx_hash,
+>  };
+>  
+> +static size_t get_mask_size(u16 type)
+> +{
+> +	switch (type) {
+> +	case VIRTIO_NET_FF_MASK_TYPE_ETH:
+> +		return sizeof(struct ethhdr);
+> +	case VIRTIO_NET_FF_MASK_TYPE_IPV4:
+> +		return sizeof(struct iphdr);
+> +	case VIRTIO_NET_FF_MASK_TYPE_IPV6:
+> +		return sizeof(struct ipv6hdr);
+> +	case VIRTIO_NET_FF_MASK_TYPE_TCP:
+> +		return sizeof(struct tcphdr);
+> +	case VIRTIO_NET_FF_MASK_TYPE_UDP:
+> +		return sizeof(struct udphdr);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +#define MAX_SEL_LEN (sizeof(struct ipv6hdr))
+> +
+> +static void virtnet_ff_init(struct virtnet_ff *ff, struct virtio_device *vdev)
+> +{
+> +	size_t ff_mask_size = sizeof(struct virtio_net_ff_cap_mask_data) +
+> +			      sizeof(struct virtio_net_ff_selector) *
+> +			      VIRTIO_NET_FF_MASK_TYPE_MAX;
+> +	struct virtio_admin_cmd_query_cap_id_result *cap_id_list;
+> +	struct virtio_net_ff_selector *sel;
+> +	size_t real_ff_mask_size;
+> +	int err;
+> +	int i;
+> +
+> +	cap_id_list = kzalloc(sizeof(*cap_id_list), GFP_KERNEL);
+> +	if (!cap_id_list)
+> +		return;
+> +
+> +	err = virtio_admin_cap_id_list_query(vdev, cap_id_list);
+> +	if (err)
+> +		goto err_cap_list;
+> +
+> +	if (!(VIRTIO_CAP_IN_LIST(cap_id_list,
+> +				 VIRTIO_NET_FF_RESOURCE_CAP) &&
+> +	      VIRTIO_CAP_IN_LIST(cap_id_list,
+> +				 VIRTIO_NET_FF_SELECTOR_CAP) &&
+> +	      VIRTIO_CAP_IN_LIST(cap_id_list,
+> +				 VIRTIO_NET_FF_ACTION_CAP)))
+> +		goto err_cap_list;
+> +
+> +	ff->ff_caps = kzalloc(sizeof(*ff->ff_caps), GFP_KERNEL);
+> +	if (!ff->ff_caps)
+> +		goto err_cap_list;
+> +
+> +	err = virtio_admin_cap_get(vdev,
+> +				   VIRTIO_NET_FF_RESOURCE_CAP,
+> +				   ff->ff_caps,
+> +				   sizeof(*ff->ff_caps));
+> +
+> +	if (err)
+> +		goto err_ff;
+> +
+> +	/* VIRTIO_NET_FF_MASK_TYPE start at 1 */
+> +	for (i = 1; i <= VIRTIO_NET_FF_MASK_TYPE_MAX; i++)
+> +		ff_mask_size += get_mask_size(i);
+> +
+> +	ff->ff_mask = kzalloc(ff_mask_size, GFP_KERNEL);
+> +	if (!ff->ff_mask)
+> +		goto err_ff;
+> +
+> +	err = virtio_admin_cap_get(vdev,
+> +				   VIRTIO_NET_FF_SELECTOR_CAP,
+> +				   ff->ff_mask,
+> +				   ff_mask_size);
+> +
+> +	if (err)
+> +		goto err_ff_mask;
+> +
+> +	ff->ff_actions = kzalloc(sizeof(*ff->ff_actions) +
+> +					VIRTIO_NET_FF_ACTION_MAX,
+> +					GFP_KERNEL);
+> +	if (!ff->ff_actions)
+> +		goto err_ff_mask;
+> +
+> +	err = virtio_admin_cap_get(vdev,
+> +				   VIRTIO_NET_FF_ACTION_CAP,
+> +				   ff->ff_actions,
+> +				   sizeof(*ff->ff_actions) + VIRTIO_NET_FF_ACTION_MAX);
+> +
+> +	if (err)
+> +		goto err_ff_action;
+> +
+> +	err = virtio_admin_cap_set(vdev,
+> +				   VIRTIO_NET_FF_RESOURCE_CAP,
+> +				   ff->ff_caps,
+> +				   sizeof(*ff->ff_caps));
+> +	if (err)
+> +		goto err_ff_action;
+> +
+> +	real_ff_mask_size = sizeof(struct virtio_net_ff_cap_mask_data);
+> +	sel = (void *)&ff->ff_mask->selectors[0];
+> +
+> +	for (i = 0; i < ff->ff_mask->count; i++) {
+> +		if (sel->length > MAX_SEL_LEN) {
+> +			err = -EINVAL;
+> +			goto err_ff_action;
+> +		}
+> +		real_ff_mask_size += sizeof(struct virtio_net_ff_selector) + sel->length;
+> +		sel = (void *)sel + sizeof(*sel) + sel->length;
+> +	}
+> +
+> +	if (real_ff_mask_size > ff_mask_size) {
+> +		err = -EINVAL;
+> +		goto err_ff_action;
+> +	}
+> +
+> +	err = virtio_admin_cap_set(vdev,
+> +				   VIRTIO_NET_FF_SELECTOR_CAP,
+> +				   ff->ff_mask,
+> +				   ff_mask_size);
+> +	if (err)
+> +		goto err_ff_action;
+> +
+> +	err = virtio_admin_cap_set(vdev,
+> +				   VIRTIO_NET_FF_ACTION_CAP,
+> +				   ff->ff_actions,
+> +				   sizeof(*ff->ff_actions) + VIRTIO_NET_FF_ACTION_MAX);
+> +	if (err)
+> +		goto err_ff_action;
+> +
+> +	ff->vdev = vdev;
+> +	ff->ff_supported = true;
+> +
+> +	kfree(cap_id_list);
+> +
+> +	return;
+> +
+> +err_ff_action:
+> +	kfree(ff->ff_actions);
+> +err_ff_mask:
+> +	kfree(ff->ff_mask);
+> +err_ff:
+> +	kfree(ff->ff_caps);
+> +err_cap_list:
+> +	kfree(cap_id_list);
 
-Thanks for the added context. One minor thing I need to say is that
-virtio_net has zc mode but it requires the host to support a series of
-features which means at a hyperscaler it's really hard to ask hosts to
-upgrade their kernels and on the contrary it's effortless to upgrade
-VMs. Indeed, veth doesn't have zc mode.
+Minor nit: AFAICS the ff->ff_{caps,mask,actions} pointers can be left !=
+NULL even after free. That should not cause issue at cleanup time, as
+double free is protected by/avoided with 'ff_supported'.
 
-Thanks,
-Jason
+Still it could foul kmemleak check. I think it would be better to either
+clear such fields here or set such fields only on success (and work with
+local variable up to that point).
+
+Not a blocker anyway.
+
+/P
+
 
