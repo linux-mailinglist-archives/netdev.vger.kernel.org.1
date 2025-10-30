@@ -1,157 +1,104 @@
-Return-Path: <netdev+bounces-234396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98589C200C3
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 13:39:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 68EF8C20101
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 13:42:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CE313AED16
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 12:37:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E6073B1742
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 12:40:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6EF231D371;
-	Thu, 30 Oct 2025 12:37:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3443E32AAC9;
+	Thu, 30 Oct 2025 12:40:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o9RtIYgy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 275142EA72A
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 12:37:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2DC626AC3;
+	Thu, 30 Oct 2025 12:40:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761827853; cv=none; b=MDdfB7YnTJsGDSe2V6S01QJ0OKtd0cidVUzi2pRVD6e8Mfy72zOpIVX/WJQW8fPJFzF6zf8WVmsA4whad/xgFvCiDUZ8pOsSNnW/tooLkHnLFpI8k8uG4/FX95JnLwKtzKay+oqHE2KXbTrrvaBtgP3buVc1bF8To9isx03jUKo=
+	t=1761828037; cv=none; b=PZ4Eus55o4x1KFJ9bLo7103j1HHuQYWDDl5U0LsUDWoGBx5eKJckCG56qmbwjmytQWSDyvSWVR6Wbn1G1+jRq6QFVwBm5XVSiIA6Q9C8Sw0H91iX24ph6GHqQmf68K6NmXbMuvZDK0Y9v7f30TwsO+QIZpI5e3Px5I63QEcKbD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761827853; c=relaxed/simple;
-	bh=+BEb5A3FVsu+J3Ry977bg1bez4uF76Mqs/ReUtil/A8=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=kRlBx4qvZOVOvT0b2ywPBTpXBoJcEgHpe6RJo7/cNTwfJ4Sgzh/XAAbBFnX0v1gibxuSFuZWX0IpDQDc6RjcE69W+aBIiCDxlPTDOCEvtJAo9nhTYDC/e38ZytKd/ntOP4cLgLfZTMO+P2molHpswdBQ3WzxuDZS7i8tuxxSptA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-430ced58cd2so32226265ab.3
-        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 05:37:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761827851; x=1762432651;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=R8cwPAlKZVSjF+/N6Fi1I5B5KzPONFRHbaCRMS20ttE=;
-        b=trjRXoFdyFMa9mJPlZJURtHhRQv35u5bvmx7EhKVvJjjosaIrut4ksy0nRH/gU+yI0
-         i4wjQ1zN8Wf7FTCXg/ySVuFMuVGUYndK7cl3SxZ0YLuXqUSYCAM3hpv6hE8lpp2xrDmV
-         s3Y2/gjm4TJSNQ+uRFQagYNt3bVwvm6B6Ek30fXcTPRwCPJe+iYIQ1hBXMZdloylcZee
-         dsGmGDNr4DCS2LhOHUuRzP8gxk3cKWoPZhIDmvTMsqxQ4iMLubxkPMroWbkbmFQXzAG6
-         9jOhnMnTJr0PG1XcY/F097b+EB7+dDGi3z6UckWdKW8MpC0Z9tvcazmWM+Gd1GFr55a3
-         2jDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV4FxG7ro01+d8iVWjewM243dAT1Vv0LWCd/Qu4gSPNKT4c65QN5XQPtbT5XM4zmfsToNXCAmQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKRMdNmJFYWNAQhOIdZsitvI4AzH2TMYyWBvXvn8TmYL82MlTs
-	Tcel2O0NhzJooIR0eX8bm0f5dzfY7azM3YTBmbvdAoppG8vwEiewHhgwyPtTs3Y7blQz9MiBaRO
-	hDg1GiGZtaJ4npJXl9wDoEV4epWYY93S7wtyJObOMuElZshx1byquF41iz9Q=
-X-Google-Smtp-Source: AGHT+IHAL/7dLlSaaFS1lZzxZx7lwZe6fajDitXF2Ab8bmEqN6QMZo9ihZqPzBCwhcK3YS2VoWwHGmnITEWkc0+3wYOdFjhvw3P5
+	s=arc-20240116; t=1761828037; c=relaxed/simple;
+	bh=Vwti+Oyqhh3Vszbl9HbC46xxrM6AGGSoT0/ulRpfj74=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Vr6X7neMUo9gicLC2s0jOrlBayb3ibqsweJYu/fI259LZSTiGiOLctu3/cXH1ZyURddChD+9ae9foUxbMH9A8UMt0QO0zz4KzXdC5LwK7tV20NV3ZH2R5UbQf2j2/+N7Cou5hDe5TWWOg6KwLO2JahVqGaMdOQYImAqi4vvPZaU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o9RtIYgy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79A1CC4CEF1;
+	Thu, 30 Oct 2025 12:40:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761828036;
+	bh=Vwti+Oyqhh3Vszbl9HbC46xxrM6AGGSoT0/ulRpfj74=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=o9RtIYgyvHzfQjqglILBG0OitmyfsCh0DVy1RNTpjIkhMR/gbFVlqfNvGgAPxXwYi
+	 44Utyug2eNkfAgYyMfNutwHXbCgrMXfjcnohEW1jyNcac02ylUOqDoMdIGwa1QxERo
+	 2v/hpcu8nWiq/X/0R6rfWagSphb1ATQ/SH5BDS0FOXj/JzSBVfgGTKdbASAw96W9H9
+	 GBJ+ajWNmKuATFZhku3HIVfNT13jCYsi2rQ3NVwBSrXnz6n35KIz3VS2U5BUSSqoen
+	 kruzgbmrDQrfgUtiib5Zi/JnmNR+eMk1pNXfNs9qkd+UmpkDr4kkEC1ZiHOYVzKkyq
+	 RfYLD1Jww3JfQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E8B3A72A60;
+	Thu, 30 Oct 2025 12:40:14 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:74a:b0:42f:983e:e54d with SMTP id
- e9e14a558f8ab-432f8f81cc3mr94139635ab.4.1761827851395; Thu, 30 Oct 2025
- 05:37:31 -0700 (PDT)
-Date: Thu, 30 Oct 2025 05:37:31 -0700
-In-Reply-To: <6889adf3.050a0220.5d226.0002.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <69035c0b.050a0220.3344a1.0441.GAE@google.com>
-Subject: Re: [syzbot] [netfilter?] WARNING in __nf_unregister_net_hook (9)
-From: syzbot <syzbot+78ac1e46d2966eb70fda@syzkaller.appspotmail.com>
-To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
-	fw@strlen.de, horms@kernel.org, kadlec@netfilter.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
-	phil@nwl.cc, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v6 0/2] net/smc: make wr buffer count
+ configurable 
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176182801326.3832937.9219593539259854803.git-patchwork-notify@kernel.org>
+Date: Thu, 30 Oct 2025 12:40:13 +0000
+References: <20251027224856.2970019-1-pasic@linux.ibm.com>
+In-Reply-To: <20251027224856.2970019-1-pasic@linux.ibm.com>
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
+ alibuda@linux.alibaba.com, dust.li@linux.alibaba.com, sidraya@linux.ibm.com,
+ wenjia@linux.ibm.com, mjambigi@linux.ibm.com, tonylu@linux.alibaba.com,
+ netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-s390@vger.kernel.org, guwen@linux.alibaba.com,
+ guangguan.wang@linux.alibaba.com, bagasdotme@gmail.com
 
-syzbot has found a reproducer for the following issue on:
+Hello:
 
-HEAD commit:    efd3e30e651d Merge branch 'net-stmmac-hwif-c-cleanups'
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=17ea1704580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=5683686a5f7ee53f
-dashboard link: https://syzkaller.appspot.com/bug?extid=78ac1e46d2966eb70fda
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12afbc92580000
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/a6eb09423004/disk-efd3e30e.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/f8a2fb326497/vmlinux-efd3e30e.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/a8cdcb8113e1/bzImage-efd3e30e.xz
+On Mon, 27 Oct 2025 23:48:54 +0100 you wrote:
+> The current value of SMC_WR_BUF_CNT is 16 which leads to heavy
+> contention on the wr_tx_wait workqueue of the SMC-R linkgroup and its
+> spinlock when many connections are competing for the work request
+> buffers. Currently up to 256 connections per linkgroup are supported.
+> 
+> To make things worse when finally a buffer becomes available and
+> smc_wr_tx_put_slot() signals the linkgroup's wr_tx_wait wq, because
+> WQ_FLAG_EXCLUSIVE is not used all the waiters get woken up, most of the
+> time a single one can proceed, and the rest is contending on the
+> spinlock of the wq to go to sleep again.
+> 
+> [...]
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+78ac1e46d2966eb70fda@syzkaller.appspotmail.com
+Here is the summary with links:
+  - [net-next,v6,1/2] net/smc: make wr buffer count configurable
+    https://git.kernel.org/netdev/net-next/c/aef3cdb47bbb
+  - [net-next,v6,2/2] net/smc: handle -ENOMEM from smc_wr_alloc_link_mem gracefully
+    https://git.kernel.org/netdev/net-next/c/8f736087e52f
 
-------------[ cut here ]------------
-hook not found, pf 5 num 0
-WARNING: CPU: 1 PID: 9032 at net/netfilter/core.c:514 __nf_unregister_net_hook+0x30a/0x700 net/netfilter/core.c:514
-Modules linked in:
-CPU: 1 UID: 0 PID: 9032 Comm: syz.0.994 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
-RIP: 0010:__nf_unregister_net_hook+0x30a/0x700 net/netfilter/core.c:514
-Code: d5 18 f8 05 01 90 48 8b 44 24 10 0f b6 04 28 84 c0 0f 85 e3 03 00 00 41 8b 17 48 c7 c7 00 72 72 8c 44 89 ee e8 67 4f 14 f8 90 <0f> 0b 90 90 e9 d8 01 00 00 e8 a8 17 d7 01 89 c3 31 ff 89 c6 e8 fd
-RSP: 0018:ffffc9000c396938 EFLAGS: 00010246
-RAX: a02a0e56549ab800 RBX: ffff8880583d1480 RCX: ffff888059800000
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000002
-RBP: dffffc0000000000 R08: ffff8880b8924293 R09: 1ffff11017124852
-R10: dffffc0000000000 R11: ffffed1017124853 R12: ffff88807acf2480
-R13: 0000000000000005 R14: ffff88802701a488 R15: ffff88807796ae3c
-FS:  00007fba157656c0(0000) GS:ffff888126240000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000555576f79808 CR3: 000000007f6c4000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- nft_unregister_flowtable_ops net/netfilter/nf_tables_api.c:8979 [inline]
- nft_flowtable_event net/netfilter/nf_tables_api.c:9758 [inline]
- __nf_tables_flowtable_event+0x5bf/0x8c0 net/netfilter/nf_tables_api.c:9803
- nf_tables_flowtable_event+0x103/0x160 net/netfilter/nf_tables_api.c:9834
- notifier_call_chain+0x1b6/0x3e0 kernel/notifier.c:85
- call_netdevice_notifiers_extack net/core/dev.c:2267 [inline]
- call_netdevice_notifiers net/core/dev.c:2281 [inline]
- unregister_netdevice_many_notify+0x1860/0x2390 net/core/dev.c:12333
- unregister_netdevice_many net/core/dev.c:12396 [inline]
- unregister_netdevice_queue+0x33c/0x380 net/core/dev.c:12210
- unregister_netdevice include/linux/netdevice.h:3390 [inline]
- hsr_dev_finalize+0x707/0xaa0 net/hsr/hsr_device.c:800
- hsr_newlink+0x8ad/0x9f0 net/hsr/hsr_netlink.c:128
- rtnl_newlink_create+0x310/0xb00 net/core/rtnetlink.c:3833
- __rtnl_newlink net/core/rtnetlink.c:3950 [inline]
- rtnl_newlink+0x16e4/0x1c80 net/core/rtnetlink.c:4065
- rtnetlink_rcv_msg+0x7cf/0xb70 net/core/rtnetlink.c:6951
- netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2550
- netlink_unicast_kernel net/netlink/af_netlink.c:1318 [inline]
- netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1344
- netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1894
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg+0x21c/0x270 net/socket.c:742
- ____sys_sendmsg+0x505/0x830 net/socket.c:2630
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2684
- __sys_sendmsg net/socket.c:2716 [inline]
- __do_sys_sendmsg net/socket.c:2721 [inline]
- __se_sys_sendmsg net/socket.c:2719 [inline]
- __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2719
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fba1498efc9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fba15765038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fba14be5fa0 RCX: 00007fba1498efc9
-RDX: 0000000000000000 RSI: 00002000000000c0 RDI: 0000000000000005
-RBP: 00007fba14a11f91 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fba14be6038 R14: 00007fba14be5fa0 R15: 00007ffcbfaff8c8
- </TASK>
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
 
