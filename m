@@ -1,190 +1,148 @@
-Return-Path: <netdev+bounces-234493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FFC1C21C0A
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 19:24:07 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73CD1C21C1C
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 19:25:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17C6D421EB5
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 18:24:05 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 21C8834DBE7
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 18:25:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA39836CA86;
-	Thu, 30 Oct 2025 18:23:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2922134AAF0;
+	Thu, 30 Oct 2025 18:25:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="S5LExwFu";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="67hFey5E";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="S5LExwFu";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="67hFey5E"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="LcageyWg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BA4736C248
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 18:23:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A727238C2F;
+	Thu, 30 Oct 2025 18:25:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761848633; cv=none; b=pfPohkrt8HZ6ha+QyIDYgFrZ/1yrIQjpoom/9NjBhWRv5YBancOWEarV995fLUCmuP7FkoOiLlEKVsEhr48MuEW35XeoHZV2+HMA0osing262rc5f9tQi9lLWGkP/SGcpcAl8l/nkoQUkST/b82evL1qTB0hw2pAkm/zOEnEuvg=
+	t=1761848714; cv=none; b=cWE9fcXKqJso1r3C4WJU8SKXhd04nfnVNixO9iiEp1+ksd4jsK9w0pro6t+cto9KGjxu3Wr9w9BEvRgIgul8gbe95XZqIkDpPMMx9mLE74vbmYhunVVriIkT5pZN4uYjzX7/GLM2ilRLNKPJzvJrhSfX1OmdGZ7jNM6NZeYkOlg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761848633; c=relaxed/simple;
-	bh=Qld2mLu50qe/pyWgBHfnl51lKI0Y1ew1JinZer3T+O8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Qf5nKuog8xAdmyA0kTjXKQ3FZAEXsHg9Bp0dgXYnVKSUyN8W90XxEyH/xC1VjlcLrzVw5kuAaS75ggOOHzmidmRzcv5Lj7MklaHjdik7JhkpScMFze1fQJOS3smFqnfvyPx8Lqc7zoFhIkzVdNkWNGOsDU20r/Cwq2nJN3Ow9I8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=S5LExwFu; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=67hFey5E; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=S5LExwFu; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=67hFey5E; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from lion.mk-sys.cz (unknown [10.100.225.114])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 795BA337B3;
-	Thu, 30 Oct 2025 18:23:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1761848630; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Qld2mLu50qe/pyWgBHfnl51lKI0Y1ew1JinZer3T+O8=;
-	b=S5LExwFuwGl5kCaV9unvK65K+uBjh54bvw3OcHFQHV2fFakT18ncK+SoGWwuvc5RtrY5l3
-	68vZ1JDShcoMMMwwJVvctlXqtBg+nYwgTIvftK1jKqKCJqlyanQ8gJx1Q/MGHx9+xsOIkM
-	uSaKsHtUg6FM4yW5oQnyQW+/6heRjC0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1761848630;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Qld2mLu50qe/pyWgBHfnl51lKI0Y1ew1JinZer3T+O8=;
-	b=67hFey5E5c8zl/R42MeFXdQCC+RUQSEFAAGxuQgpu+5bpQjQWCFkfYuQTX59LyU5fCnAAO
-	V9X3ibH1tTIk36CA==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1761848630; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Qld2mLu50qe/pyWgBHfnl51lKI0Y1ew1JinZer3T+O8=;
-	b=S5LExwFuwGl5kCaV9unvK65K+uBjh54bvw3OcHFQHV2fFakT18ncK+SoGWwuvc5RtrY5l3
-	68vZ1JDShcoMMMwwJVvctlXqtBg+nYwgTIvftK1jKqKCJqlyanQ8gJx1Q/MGHx9+xsOIkM
-	uSaKsHtUg6FM4yW5oQnyQW+/6heRjC0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1761848630;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Qld2mLu50qe/pyWgBHfnl51lKI0Y1ew1JinZer3T+O8=;
-	b=67hFey5E5c8zl/R42MeFXdQCC+RUQSEFAAGxuQgpu+5bpQjQWCFkfYuQTX59LyU5fCnAAO
-	V9X3ibH1tTIk36CA==
-Received: by lion.mk-sys.cz (Postfix, from userid 1000)
-	id 5989F20057; Thu, 30 Oct 2025 19:23:50 +0100 (CET)
-Date: Thu, 30 Oct 2025 19:23:50 +0100
-From: Michal Kubecek <mkubecek@suse.cz>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org, 
-	Kory Maincent <kory.maincent@bootlin.com>
-Subject: Re: [PATCH ethtool-next] netlink: tsconfig: add HW time stamping
- configuration
-Message-ID: <7rnzkle3ekgmfco4rum5zt7ayqkqxspklafpjc5iwsyv7a3la5@uxz54po7u6jh>
-References: <20251004202715.9238-1-vadim.fedorenko@linux.dev>
- <5w25bm7gnbrq4cwtefmunmcylqav524roamuvoz2zv5piadpek@4vpzw533uuyd>
- <ef2ea988-bbfb-469e-b833-dbe8f5ddc5b7@linux.dev>
- <zsoujuddzajo3qbrvde6rnzeq6ic5x7jofz3voab7dmtzh3zpw@h3bxd54btzic>
- <8693b213-2d22-4e47-99bb-5d8ca4f48dd5@linux.dev>
- <20251029153812.10bd6397@kernel.org>
+	s=arc-20240116; t=1761848714; c=relaxed/simple;
+	bh=jy5cYh95SFIAyzZsrUnBHjH8llGVA2Sbu4Bpf5WBPzw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UNkPyXe+vwSbVBz9lIhlwb9WO3w/f/qktiasLC8bqVBHPSlA3E15e3ORklnfUZPUN/9fyysHU1qtvwC9Dy8xAYV0UHc7Gon1a6NA1eU69ptvA/mt4TDZzvDRwDTKRffh42ICVAYYcB7ZW+cIrvInXiueod495Fj1UyIccC7MQdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=LcageyWg; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 914C64E41401;
+	Thu, 30 Oct 2025 18:25:07 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 4CC2860331;
+	Thu, 30 Oct 2025 18:25:07 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3921E1180980D;
+	Thu, 30 Oct 2025 19:24:56 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1761848706; h=from:subject:date:message-id:to:cc:mime-version:
+	 content-transfer-encoding; bh=vSJU4peJj+Pvauv54hPV1/HslESIG4pVWkh58D4A9/c=;
+	b=LcageyWgxYbyW3qRtqSBLny73lhZbVIesEoOXkAHs9iHO4lt9kUO+hc8vkIVeSDm2+HfJR
+	MTQVRE4RK4fZ21SKCaahaDk6klLPcHTvysUYvkt5e+TRD037gCtRJeX66i8jEyKeoTjb/P
+	DXr0jNMudu8Wp3sONhj/2AssyTKgoSyIDhCOIewXG3CFjxIWnkNHtCSc1uvfpJuHLmSmcB
+	+9fQ2ZD1z+dqc+C6UjelZIb8UpEYFppAshc6Oy9nc6MlW942USNH/leAu8scetsDiPr32A
+	fxfOGrjcqwCnS7yDylZpacXVgzkHa/ddaRi0gyVEr8QKVm/fCphs9RnrLdsHyA==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	davem@davemloft.net,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	=?UTF-8?q?Alexis=20Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] net: stmmac: rename devlink parameter ts_coarse into phc_coarse_adj
+Date: Thu, 30 Oct 2025 19:24:53 +0100
+Message-ID: <20251030182454.182406-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="7hpuf4tjdydwydmu"
-Content-Disposition: inline
-In-Reply-To: <20251029153812.10bd6397@kernel.org>
-X-Spam-Level: 
-X-Spamd-Result: default: False [-5.90 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SIGNED_PGP(-2.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	MIME_GOOD(-0.20)[multipart/signed,text/plain];
-	NEURAL_HAM_SHORT(-0.20)[-0.999];
-	FROM_HAS_DN(0.00)[];
-	RCVD_COUNT_ONE(0.00)[1];
-	MIME_TRACE(0.00)[0:+,1:+,2:~];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	ARC_NA(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_TLS_LAST(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCPT_COUNT_THREE(0.00)[4]
-X-Spam-Flag: NO
-X-Spam-Score: -5.90
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 
+The devlink param "ts_coarse" doesn't indicate that we get coarse
+timestamps, but rather that the PHC clock adjusments are coarse as the
+frequency won't be continuously adjusted. Adjust the devlink parameter
+name to reflect that.
 
---7hpuf4tjdydwydmu
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The Coarse terminlogy comes from the dwmac register naming, update the
+documentation to better explain what the parameter is about.
 
-On Wed, Oct 29, 2025 at 03:38:12PM GMT, Jakub Kicinski wrote:
-> On Wed, 29 Oct 2025 18:53:20 +0000 Vadim Fedorenko wrote:
-> > >> Well, yes, it's only 1 bit is supposed to be set. Unfortunately, net=
-link
-> > >> interface was added this way almost a year ago, we cannot change it
-> > >> anymore without breaking user-space API. =20
-> > >=20
-> > > The netlink interface only mirrors what we already had in struct
-> > > ethtool_ts_info (i.e. the ioctl interface). Therefore my question was
-> > > not really about this part of kernel API (which is fixed already) but
-> > > rather about the ethtool command line syntax.
-> > >=20
-> > > In other words, what I really want to ask is: Can we be absolutely su=
-re
-> > > that it can never possibly happen in the future that we might need to
-> > > set more than one bit in a set message?
-> > >=20
-> > > If the answer is positive, I'm OK with the patch but perhaps we should
-> > > document it explicitly in the TSCONFIG_SET description in kernel file
-> > > Documentation/networking/ethtool-netlink.rst =20
-> >=20
-> > Well, I cannot say about long-long future, but for the last decade we
-> > haven't had a need for multiple bits to be set up. I would assume that
-> > the reality will be around the same.
-> >=20
-> > Jakub/Kory do you have thoughts?
->=20
-> hard to prove a negative, is the question leading to a different
-> argument format which will let us set multiple bits? Looks like
-> we could potentially allow specifying tx / rx-filter multiple
-> times? Or invent new keywords for the extra bits which presumably=20
-> would be somehow orthogonal to filtering?
->=20
-> tl;dr I'm unclear on the exact concern..
+With this change, the parameter can now be adjusted using:
+  devlink dev param set <dev> name phc_coarse_adj value true cmode runtime
 
-My only concern was to make (reasonably) sure we won't have to make an
-incompatible change of the command line syntax. But you are right that
-there is alwasy an option to have e.g. "rx-filter" and "rx-filters"
-(mutually exclusive).
+Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+---
+ Documentation/networking/devlink/stmmac.rst   | 21 +++++++++++++------
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |  2 +-
+ 2 files changed, 16 insertions(+), 7 deletions(-)
 
-Michal
+diff --git a/Documentation/networking/devlink/stmmac.rst b/Documentation/networking/devlink/stmmac.rst
+index e8e33d1c7baf..47e3ff10bc08 100644
+--- a/Documentation/networking/devlink/stmmac.rst
++++ b/Documentation/networking/devlink/stmmac.rst
+@@ -19,13 +19,22 @@ The ``stmmac`` driver implements the following driver-specific parameters.
+      - Type
+      - Mode
+      - Description
+-   * - ``ts_coarse``
++   * - ``phc_coarse_adj``
+      - Boolean
+      - runtime
+-     - Enable the Coarse timestamping mode. In Coarse mode, the ptp clock is
+-       expected to be updated through an external PPS input, but the subsecond
+-       increment used for timestamping is set to 1/ptp_clock_rate. In Fine mode
+-       (i.e. Coarse mode == false), the ptp clock frequency is adjusted more
+-       frequently, but the subsecond increment is set to 2/ptp_clock_rate.
++     - Enable the Coarse timestamping mode, as defined in the DWMAC TRM.
++       A detailed explanation of this timestamping mode can be found in the
++       Socfpga Functionnal Description [1].
++
++       In Coarse mode, the ptp clock is expected to be fed by a high-precision
++       clock that is externally adjusted, and the subsecond increment used for
++       timestamping is set to 1/ptp_clock_rate.
++
++       In Fine mode (i.e. Coarse mode == false), the ptp clock frequency is
++       continuously adjusted, but the subsecond increment is set to
++       2/ptp_clock_rate.
++
+        Coarse mode is suitable for PTP Grand Master operation. If unsure, leave
+        the parameter to False.
++
++       [1] https://www.intel.com/content/www/us/en/docs/programmable/683126/21-2/functional-description-of-the-emac.html
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index ba4eeba14baa..618d1b8dc2f0 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -7446,7 +7446,7 @@ static int stmmac_dl_ts_coarse_get(struct devlink *dl, u32 id,
+ }
+ 
+ static const struct devlink_param stmmac_devlink_params[] = {
+-	DEVLINK_PARAM_DRIVER(STMMAC_DEVLINK_PARAM_ID_TS_COARSE, "ts_coarse",
++	DEVLINK_PARAM_DRIVER(STMMAC_DEVLINK_PARAM_ID_TS_COARSE, "phc_coarse_adj",
+ 			     DEVLINK_PARAM_TYPE_BOOL,
+ 			     BIT(DEVLINK_PARAM_CMODE_RUNTIME),
+ 			     stmmac_dl_ts_coarse_get,
+-- 
+2.49.0
 
---7hpuf4tjdydwydmu
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmkDrTIACgkQ538sG/LR
-dpW1iAf9ETDvU5DkDzCBTZV37VpNSUkW6NfR9t4tKmu74F2x1xo91xiRCBiSqo8u
-K9LCZWqK8+ZZQ1elsrWBD03bhIrsKVnP47SF1R5CtXIxMm9cPK9v68oR5/A/Rl81
-b2HyDYpRgYaGXCOvs7KfIcpoCFJC8Z78sbAB2H3sxYI/t7MX1iJpCMYur+HO6kPF
-eqwnSJQ+MFQXYlvaWxXJb5LaYKeeWJI1l3vMp5WyuikhaXf5PK1d8snbLvx2skLs
-zJBVVnzNfXATqd5TmO6aOvpG24u/lO7dLOr7ePt/+FtNM4ztCz/MCFheiRvM4h2e
-ElSBqX+uWyM6WRIEWK0Gao+nN/Mq/Q==
-=oO2m
------END PGP SIGNATURE-----
-
---7hpuf4tjdydwydmu--
 
