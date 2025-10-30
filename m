@@ -1,84 +1,83 @@
-Return-Path: <netdev+bounces-234507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234508-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FC35C224F8
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 21:43:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DB70C226AC
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 22:28:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8328C4F191E
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 20:40:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C95418871D3
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 21:27:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8A03335551;
-	Thu, 30 Oct 2025 20:35:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20D62329E58;
+	Thu, 30 Oct 2025 21:27:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=sjoerd@collabora.com header.b="eE9lQAyj"
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=sjoerd@collabora.com header.b="g3yElmKq"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
+Received: from sender4-op-o15.zoho.com (sender4-op-o15.zoho.com [136.143.188.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118C4329E76;
-	Thu, 30 Oct 2025 20:35:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 238C7235053;
+	Thu, 30 Oct 2025 21:27:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.15
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761856532; cv=pass; b=G27TFIa/DIBtc5MpHr34Feapl65OM52nQezihjuFZjLxD21ap+o5FcpcuvdR8HeE+DHA+RRBvCUazbkimXaNteRPYrTGviAW0/XijmLhTk3yRAFCufck5a/WaYLwfb1fLsaxkNBw+7NuG4N2CY3WCEeP5wjJkMXrY9KCaTmdgtU=
+	t=1761859632; cv=pass; b=BXyPcIki9LLZgGonFXmG/LTP3kC8pjDMCD/r3Vzu4sJOPWlCnpk9ZHuCcbwgZ5t1XN4f2mPJKeZmxaevasVUphpDsyMS33p4LMjo2AgQY5oWOAHqMmsKW/5+pS2x4RdegOMIOClgB8VTuceu3M/a+EwnXNowdXIp94DVBUNDhmg=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761856532; c=relaxed/simple;
-	bh=ORDHBq2wSgguhYiKPUgFjArpWqxxv043hPSpzGj95z8=;
+	s=arc-20240116; t=1761859632; c=relaxed/simple;
+	bh=+FeCx4UfMrohbrMdvHoPB10eAhqDKvesqpVDKI/q1Wg=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=oGNxEwDsnYIOtx5dI3dEea0jPVmX1qNZsg06NKbDqVn5g3MX4Dl4PPFLXtOeC/Xu/KKC6KnWXET/K9S/mqQH3hd2vGYmGIfH6YLYT5fAoxbwps3u1C7a/kgKdqp/7wD+W8wKTclKbAdoRdO9K4D/vjoEhXvMTtDTSmq0Iic8Bp4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=sjoerd@collabora.com header.b=eE9lQAyj; arc=pass smtp.client-ip=136.143.188.112
+	 Content-Type:MIME-Version; b=HAxs80PY8MD4ju8MOijcKUwVUAVpDY4JXrFLnHDyKdjOcCJXq0V+P7eM8cmlImM+8N58DnhKwyOLJuCqTOAakSKj+/z/M2sIWvReP1cidmMhFimw8VQLmVU9ID8khVZ9K9xwaDs9N4fTq4nwBcFgx5+gw1Ws1FUSL2OsSQEO67E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=sjoerd@collabora.com header.b=g3yElmKq; arc=pass smtp.client-ip=136.143.188.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1761856485; cv=none; 
+ARC-Seal: i=1; a=rsa-sha256; t=1761859574; cv=none; 
 	d=zohomail.com; s=zohoarc; 
-	b=gkFbZ213okCftKgeKgIIwNoz8BwA4nDP6MzCr0YARnjslWbS8bf914DjEU26RKsesu0i7gZx4BTfyz1xxAgNbQMZ+hOgVrrgyBtWW8VMvkD1hskA7r5/OPkLeophqY65m9j/4O4l1Y9P6SwMdoSy8qMjWiwQU/R+tvzDuY+qM+k=
+	b=AMHNToO9uyH2UOzZxFbb68jVb8fRSxPJkx2uGcVBs/9gdG16OTxWSqbRDtjo45Z/FlXyS/FV+J25HRLJ6eE0mwzhoQpGPt8aSSAi4kt0fH/jZQCCxK7BQgcUefeohbYXnHcKtgTmArbRM/+KYIPB10Vi91lWfVPR0oE7a0Tgd88=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1761856485; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=+Wkm4p/uQ+Vqh1gCohypGhEVZ1/dwpzLDQlD8Bjlil8=; 
-	b=Gnr8xIhUAPzV2qfRb1oLqyxVo5sYZWiNHe+DDVUg/CHGOPZtjMxE9wPQmju6dCohAzktipJKP2YWvL5u9mW/WZSFsCaUWNk3l1EeVNWUSTxJB/E4oPJwqb0FZwBiY+h8vUyCgRnA6upcsdDuS10nEcP/oYKeYkbfFBQxcXmxQAc=
+	t=1761859574; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=ixRLpty5QKDOE0ulxvqD55Wb9bzwJbHlOe5KFSOLS1E=; 
+	b=C87w96dCEC6ElqmbmEvGOSTnDEU0vYB9JwkPlW+pp3+V/xALKyuPcmjyx712KT7yM4Yys2ExWU7CSClHlyTQ3hojI79O+7j1ufpxDUUgtjl8GcQp9VlndlyKTulH4INak4h+0reqYs9iVQrstaEVzyH089qEufBmTQ5g+eC7R0w=
 ARC-Authentication-Results: i=1; mx.zohomail.com;
 	dkim=pass  header.i=collabora.com;
 	spf=pass  smtp.mailfrom=sjoerd@collabora.com;
 	dmarc=pass header.from=<sjoerd@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1761856485;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1761859574;
 	s=zohomail; d=collabora.com; i=sjoerd@collabora.com;
 	h=Message-ID:Subject:Subject:From:From:To:To:Cc:Cc:Date:Date:In-Reply-To:References:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-Id:Reply-To;
-	bh=+Wkm4p/uQ+Vqh1gCohypGhEVZ1/dwpzLDQlD8Bjlil8=;
-	b=eE9lQAyjvcD+VsAFUGr3EGVzq1lb8anctgxPOFZUE+IyjqTE06JyDOHlv1dZWFZ+
-	GJu62lcDIBD5F/Za7yXXSFfmLJl7bfrpDY2VhzDNK66M909P75cdhk3qdwz/uSfrpMY
-	nlZLfK3BN7dj33lt0OVX5CDVbVQpWIkm0m886a44=
-Received: by mx.zohomail.com with SMTPS id 1761856481126419.9479106165559;
-	Thu, 30 Oct 2025 13:34:41 -0700 (PDT)
-Message-ID: <f2c3e18fe22284c4a5ab0ce085e2d17be844a0a8.camel@collabora.com>
-Subject: Re: [PATCH 10/15] arm64: dts: mediatek: mt7981b: Add Ethernet and
- WiFi offload support
+	bh=ixRLpty5QKDOE0ulxvqD55Wb9bzwJbHlOe5KFSOLS1E=;
+	b=g3yElmKq8LU2i4TbafpRnAEbkB1BmNCRln05g6k8WHT1ZVYQGKWV23fb3FJSpnWi
+	9Hx5p5E79qn3bFI5Npy3N0kbsz9U6rX3ggbLg03vvs5D9YK8cdErhhhtfzjfFgkdU8r
+	9MNcrZ/v/23ECwSTe6xbuIllyt+ePSWN22sOQvNU=
+Received: by mx.zohomail.com with SMTPS id 1761859569654684.60417196483;
+	Thu, 30 Oct 2025 14:26:09 -0700 (PDT)
+Message-ID: <7d7595a0a33b4e56828beea86f6037bd9ecc8f8d.camel@collabora.com>
+Subject: Re: [PATCH 11/15] arm64: dts: mediatek: mt7981b-openwrt-one: Enable
+ SPI NOR
 From: Sjoerd Simons <sjoerd@collabora.com>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-  Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
- <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno	
- <angelogioacchino.delregno@collabora.com>, Ryder Lee
- <ryder.lee@mediatek.com>,  Jianjun Wang <jianjun.wang@mediatek.com>, Bjorn
- Helgaas <bhelgaas@google.com>, Lorenzo Pieralisi	 <lpieralisi@kernel.org>,
- Krzysztof =?UTF-8?Q?Wilczy=C5=84ski?=	 <kwilczynski@kernel.org>, Manivannan
- Sadhasivam <mani@kernel.org>, Chunfeng Yun	 <chunfeng.yun@mediatek.com>,
- Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>,
- Lee Jones <lee@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,  "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Lorenzo
- Bianconi <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>, 
-	kernel@collabora.com, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, 	linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, 	linux-pci@vger.kernel.org,
- linux-phy@lists.infradead.org, netdev@vger.kernel.org,  Bryan Hinton
- <bryan@bryanhinton.com>
-Date: Thu, 30 Oct 2025 21:34:28 +0100
-In-Reply-To: <aPEhiVdgkVLvF9Et@makrotopia.org>
+To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>,  Matthias Brugger
+ <matthias.bgg@gmail.com>, Ryder Lee <ryder.lee@mediatek.com>, Jianjun Wang	
+ <jianjun.wang@mediatek.com>, Bjorn Helgaas <bhelgaas@google.com>, Lorenzo
+ Pieralisi <lpieralisi@kernel.org>, Krzysztof =?UTF-8?Q?Wilczy=C5=84ski?=
+ <kwilczynski@kernel.org>,  Manivannan Sadhasivam	 <mani@kernel.org>,
+ Chunfeng Yun <chunfeng.yun@mediatek.com>, Vinod Koul	 <vkoul@kernel.org>,
+ Kishon Vijay Abraham I <kishon@kernel.org>, Lee Jones	 <lee@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"	
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski	
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Lorenzo Bianconi	
+ <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>
+Cc: kernel@collabora.com, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mediatek@lists.infradead.org, linux-pci@vger.kernel.org, 
+	linux-phy@lists.infradead.org, netdev@vger.kernel.org, Daniel Golle
+	 <daniel@makrotopia.org>, Bryan Hinton <bryan@bryanhinton.com>
+Date: Thu, 30 Oct 2025 22:26:00 +0100
+In-Reply-To: <c9865ab0-cbc2-47b5-b7cf-acb8b9c52695@collabora.com>
 References: <20251016-openwrt-one-network-v1-0-de259719b6f2@collabora.com>
-	 <20251016-openwrt-one-network-v1-10-de259719b6f2@collabora.com>
-	 <aPEhiVdgkVLvF9Et@makrotopia.org>
+	 <20251016-openwrt-one-network-v1-11-de259719b6f2@collabora.com>
+	 <c9865ab0-cbc2-47b5-b7cf-acb8b9c52695@collabora.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.56.2-5 
@@ -90,50 +89,148 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-ZohoMailClient: External
 
-On Thu, 2025-10-16 at 17:47 +0100, Daniel Golle wrote:
-> On Thu, Oct 16, 2025 at 12:08:46PM +0200, Sjoerd Simons wrote:
-> > Add device tree nodes for the Ethernet subsystem on MT7981B SoC,
-> > including:
-> > - Ethernet MAC controller with dual GMAC support
-> > - Wireless Ethernet Dispatch (WED)
-> > - SGMII PHY controllers for high-speed Ethernet interfaces
-> > - Reserved memory regions for WiFi offload processor
+On Thu, 2025-10-16 at 13:28 +0200, AngeloGioacchino Del Regno wrote:
+> Il 16/10/25 12:08, Sjoerd Simons ha scritto:
+> > The openwrt one has a SPI NOR flash which from factory is used for:
+> > * Recovery system
+> > * WiFi eeprom data
+> > * ethernet Mac addresses
+> >=20
+> > Describe this following the same partitions as the openwrt configuratio=
+n
+> > uses.
 > >=20
 > > Signed-off-by: Sjoerd Simons <sjoerd@collabora.com>
 > > ---
-> > =C2=A0arch/arm64/boot/dts/mediatek/mt7981b.dtsi | 133 +++++++++++++++++=
-+++++++++++++
-> > =C2=A01 file changed, 133 insertions(+)
+> > =C2=A0 .../boot/dts/mediatek/mt7981b-openwrt-one.dts=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 | 83 ++++++++++++++++++++++
+> > =C2=A0 1 file changed, 83 insertions(+)
 > >=20
-> > diff --git a/arch/arm64/boot/dts/mediatek/mt7981b.dtsi
-> > b/arch/arm64/boot/dts/mediatek/mt7981b.dtsi
-> > index 13950fe6e8766..c85fa0ddf2da8 100644
-> > --- a/arch/arm64/boot/dts/mediatek/mt7981b.dtsi
-> > +++ b/arch/arm64/boot/dts/mediatek/mt7981b.dtsi
-
-[snip]
-> > 			mdio_bus: mdio-bus {
-> > +				#address-cells =3D <1>;
-> > +				#size-cells =3D <0>;
+> > diff --git a/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts
+> > b/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts
+> > index b6ca628ee72fd..9878009385cc6 100644
+> > --- a/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts
+> > +++ b/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts
+> > @@ -3,6 +3,7 @@
+> > =C2=A0 /dts-v1/;
+> > =C2=A0=20
+> > =C2=A0 #include "mt7981b.dtsi"
+> > +#include "dt-bindings/pinctrl/mt65xx.h"
+> > =C2=A0=20
+> > =C2=A0 / {
+> > =C2=A0=C2=A0	compatible =3D "openwrt,one", "mediatek,mt7981b";
+> > @@ -54,6 +55,25 @@ mux {
+> > =C2=A0=C2=A0		};
+> > =C2=A0=C2=A0	};
+> > =C2=A0=20
+> > +	spi2_flash_pins: spi2-pins {
+> > +		mux {
+> > +			function =3D "spi";
+> > +			groups =3D "spi2";
+> > +		};
 > > +
-> > +				int_gbe_phy: ethernet-phy@0 {
-> > +					compatible =3D "ethernet-phy-ieee802.3-c22";
-> > +					reg =3D <0>;
-> > +					phy-mode =3D "gmii";
-> > +					phy-is-integrated;
-> > +					nvmem-cells =3D <&phy_calibration>;
-> > +					nvmem-cell-names =3D "phy-cal-data";
+> > +		conf-pu {
+> > +			bias-pull-up =3D <MTK_PUPD_SET_R1R0_11>;
+> > +			drive-strength =3D <MTK_DRIVE_8mA>;
 >=20
-> Please also define the two LEDs here with their corresponding (only)
-> pinctrl options for each of them, with 'status =3D "disabled";'. This
-> makes it easier for boards to make use of the Ethernet PHY leds by just
-> referencing the LED and setting the status to 'okay'.
-
-I left those out on purpose as i can't easily validate them. They're probab=
-ly better to be added once
-someone adds a board using the hw led control.
-
+> drive-strength =3D <8>;
 >=20
+> > +			pins =3D "SPI2_CS", "SPI2_WP";
+> > +		};
+> > +
+> > +		conf-pd {
+> > +			bias-pull-down =3D <MTK_PUPD_SET_R1R0_11>;
+> > +			drive-strength =3D <MTK_DRIVE_8mA>;
+>=20
+> ditto
+>=20
+> > +			pins =3D "SPI2_CLK", "SPI2_MOSI", "SPI2_MISO";
+> > +		};
+> > +	};
+> > +
+> > =C2=A0=C2=A0	uart0_pins: uart0-pins {
+> > =C2=A0=C2=A0		mux {
+> > =C2=A0=C2=A0			function =3D "uart";
+> > @@ -62,6 +82,69 @@ mux {
+> > =C2=A0=C2=A0	};
+> > =C2=A0 };
+> > =C2=A0=20
+> > +&spi2 {
+> > +	pinctrl-names =3D "default";
+> > +	pinctrl-0 =3D <&spi2_flash_pins>;
+> > +	status =3D "okay";
+> > +
+> > +	flash@0 {
+> > +		compatible =3D "jedec,spi-nor";
+> > +		reg =3D <0>;
+> > +		spi-max-frequency =3D <40000000>;
+> > +		#address-cells =3D <1>;
+> > +		#size-cells =3D <1>;
+> > +
+> > +		partitions {
+> > +			compatible =3D "fixed-partitions";
+> > +			#address-cells =3D <1>;
+> > +			#size-cells =3D <1>;
+> > +
+> > +			partition@0 {
+> > +				reg =3D <0x00000 0x40000>;
+> > +				label =3D "bl2-nor";
+> > +			};
+> > +
+> > +			partition@40000 {
+> > +				reg =3D <0x40000 0xc0000>;
+> > +				label =3D "factory";
+> > +				read-only;
+> > +
+> > +				nvmem-layout {
+> > +					compatible =3D "fixed-layout";
+> > +					#address-cells =3D <1>;
+> > +					#size-cells =3D <1>;
+> > +
+> > +					eeprom_factory_0: eeprom@0 {
+>=20
+> wifi_calibration:
+>=20
+> > +						reg =3D <0x0 0x1000>;
+> > +					};
+> > +
+> > +					macaddr_factory_4: macaddr@4 {
+>=20
+> macaddr_factory_gmac1?
+>=20
+> You're not using this in the later commit where you enable ethernet nodes=
+,
+> did you miss adding that to gmac1 or what is this used for?
+
+gmac1 gets its mac from u-boot, passed in through device-tree; Haven't chec=
+ked where u-boot gets it
+from yet. I did spot it at offset 0x2a in this factory data, so that seems =
+likely candidate.
+
+However this particular mac is used by the wifi phy. I discovered after sen=
+ding this patch the kernel
+driver loads it directly from the "eeprom" area, so we could potentially dr=
+op this node.=20
+
+As mentioned in the commit message, I kept the same layouts as openwrt uses=
+. Though i'd be fine to
+minimize the nvmem cells just to what's referenced in the dtb.
+
+> > +						reg =3D <0x4 0x6>;
+> > +						compatible =3D "mac-base";
+> > +						#nvmem-cell-cells =3D <1>;
+> > +					};
+> > +
+> > +					macaddr_factory_24: macaddr@24 {
+>=20
+> macaddr_factory_gmac0 ?
+
+
+That seems nicer, will add that in V2 (same for the previous naming suggest=
+ion)
+
+
+
 --=20
 Sjoerd Simons
 Collabora Ltd.
