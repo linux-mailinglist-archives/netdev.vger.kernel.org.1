@@ -1,103 +1,107 @@
-Return-Path: <netdev+bounces-234333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15F3EC1F7F9
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 11:22:46 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3827EC1F80E
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 11:23:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1A333B660B
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 10:22:37 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D8EF23490CD
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 10:23:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAE8233B955;
-	Thu, 30 Oct 2025 10:22:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C736350D4C;
+	Thu, 30 Oct 2025 10:23:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="CXz6YxhC"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 032D226B2C8
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 10:22:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE71A251795;
+	Thu, 30 Oct 2025 10:23:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761819755; cv=none; b=I7bH4M4dcwNnxXRpir2+B6ZCrqkvX5qceKM6/98MgFCxmVidZGJu4+RmMm/+Ig5cEVrUYHi67njqL2X4Nru+EvFISmLxPQf+LhIwT/F02lc4s4jOuFPdxS+IcatUuoAdYPVeRg1DY882FcjhnoEgBPL3cfY/Pnbi7QS85ajpIFw=
+	t=1761819818; cv=none; b=AMlkHBAnB8+BfzFmPw+oeGhMimXmHTL9zKFIBUGsCpuoegExXtvV1uflKy/mprR/JA86XHIHP7eM/eluKQsJYdMLKDMouiKxodRGgqv/O1J1vTf52teFDDrLPlXubm1HZKa6GnB1TRguLalA4FOiYo+EsV4V+oXWKnydFtoqlGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761819755; c=relaxed/simple;
-	bh=h6ZeZMm+kh/ZMKD2CWbwzRP0dY/DOi2RxLvBAU5tIYo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VFul14qvb3tDXwTuaE2P3afgxe3BtUDXlUFN5jG9gct+2WMDWEeINK5gMgg9o8NQvd3UBL3af5fbO9fUxMjaX9hlDzXrIhKawyEYtG0XmWl3d0ODFzEeETgsN6jKGdX0+3tSEE/do1qlGnpiNlEHyL6pruifxK9/J0nYKPcgV+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vEPnK-00035h-B2; Thu, 30 Oct 2025 11:22:14 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vEPnI-006C7e-30;
-	Thu, 30 Oct 2025 11:22:12 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1vEPnI-008rEb-2Z;
-	Thu, 30 Oct 2025 11:22:12 +0100
-Date: Thu, 30 Oct 2025 11:22:12 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Thomas Wismer <thomas@wismer.xyz>
-Cc: Kory Maincent <kory.maincent@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Thomas Wismer <thomas.wismer@scs.ch>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 1/2] net: pse-pd: tps23881: Add support for
- TPS23881B
-Message-ID: <aQM8VF2YN7fACzNm@pengutronix.de>
-References: <20251029212312.108749-1-thomas@wismer.xyz>
- <20251029212312.108749-2-thomas@wismer.xyz>
+	s=arc-20240116; t=1761819818; c=relaxed/simple;
+	bh=fuo8mVB1LJ1UJcAcfHOwfE0IREKq+lDaZM6IoRG/b40=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nmkcABpncMt3nMcIWT47peIJwWkfdUCsrHUk2uGqjzInOL9WxNEtL2E1Isp9HrlAflOQiZqE5GlicEEqzl9f3AwSNJJ9dNo0+bo2HdTSes0vyynys6v6NlWolsJx0r0MTqHxWJlahPp78CjfJRv2kx5tan2QT4yuHl/BGbHtEhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=CXz6YxhC; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1761819817; x=1793355817;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=fuo8mVB1LJ1UJcAcfHOwfE0IREKq+lDaZM6IoRG/b40=;
+  b=CXz6YxhCXUTCXYCgkF8cXVYmNN+X4bkEOdKj9fdPntPPJOYJe74v+QId
+   XINNM3rVjNQNjNAxRspJtEQwhmGjojnT2k4EUxFa9R9qlDB9NoR9FJIlt
+   VXNSGyvC+z1AOFlg/N1x0uOFNCQ9bDW093hMGftkqxIcXzlN+xedRczTV
+   QQcFV4d2X3MQyadKfRV1kEllubmiehWLvgoPueTA9RmZHxM7xLshN1hUb
+   lyBlqg6m5/DFJqxOWJURjSGJp6tVzVORanrNa/kWj6MuFY+sA4Ec6Uk19
+   c5KI+hrVga1F0CFalAVszThXiu4Uii+CrD4qAUQlNH6RKBmhfwFjfhBE8
+   g==;
+X-CSE-ConnectionGUID: moOtIzkOTD2Ia0UYYeMXcg==
+X-CSE-MsgGUID: mLpJK8PnQRONTeoUR90LeQ==
+X-IronPort-AV: E=Sophos;i="6.19,266,1754982000"; 
+   d="scan'208";a="48460657"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 30 Oct 2025 03:23:36 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Thu, 30 Oct 2025 03:23:05 -0700
+Received: from che-ll-i17164.microchip.com (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.58 via Frontend Transport; Thu, 30 Oct 2025 03:23:02 -0700
+From: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
+To: <Parthiban.Veerasooran@microchip.com>, <andrew@lunn.ch>,
+	<hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Parthiban
+ Veerasooran" <parthiban.veerasooran@microchip.com>
+Subject: [PATCH net-next 0/2] net: phy: microchip_t1s: Add support for LAN867x Rev.D0 PHY
+Date: Thu, 30 Oct 2025 15:52:56 +0530
+Message-ID: <20251030102258.180061-1-parthiban.veerasooran@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20251029212312.108749-2-thomas@wismer.xyz>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 29, 2025 at 10:23:09PM +0100, Thomas Wismer wrote:
-> From: Thomas Wismer <thomas.wismer@scs.ch>
-> 
-> The TPS23881B uses different firmware than the TPS23881. Trying to load the
-> TPS23881 firmware on a TPS23881B device fails and must be omitted.
-> 
-> The TPS23881B ships with a more recent ROM firmware. Moreover, no updated
-> firmware has been released yet and so the firmware loading step must be
-> skipped. As of today, the TPS23881B is intended to use its ROM firmware.
-> 
-> Signed-off-by: Thomas Wismer <thomas.wismer@scs.ch>
+This patch series adds support for the latest Microchip LAN8670/1/2 Rev.D0
+10BASE-T1S PHYs to the microchip_t1s driver.
 
-Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
+The new Rev.D0 silicon introduces updated initialization requirements and
+link status handling behavior compared to earlier revisions (Rev.C2 and
+below). These updates are necessary for full compliance with the OPEN
+Alliance 10BASE-T1S specification and are documented in Microchip
+Application Note AN1699 Revision G (DS60001699G – October 2025).
 
-Thank you.
+Summary of changes:
+- Implements Rev.D0-specific configuration sequence as described in AN1699
+  Rev.G.
+- Introduces link status control configuration for LAN867x Rev.D0.
+
+Parthiban Veerasooran (2):
+  net: phy: microchip_t1s: add support for Microchip LAN867X Rev.D0 PHY
+  net: phy: microchip_t1s: configure link status control for LAN867x
+    Rev.D0
+
+ drivers/net/phy/Kconfig         |  2 +-
+ drivers/net/phy/microchip_t1s.c | 96 ++++++++++++++++++++++++++++++++-
+ 2 files changed, 96 insertions(+), 2 deletions(-)
+
+
+base-commit: 1bae0fd90077875b6c9c853245189032cbf019f7
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.34.1
+
 
