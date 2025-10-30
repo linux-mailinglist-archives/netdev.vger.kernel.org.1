@@ -1,96 +1,133 @@
-Return-Path: <netdev+bounces-234481-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234482-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22D07C215EA
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 18:06:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 64A4EC215FB
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 18:07:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B9D624F0D0F
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 17:01:31 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 83DBA4F117D
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 17:01:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B74FD32572C;
-	Thu, 30 Oct 2025 17:01:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E805432C93D;
+	Thu, 30 Oct 2025 17:01:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hshMB7zF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Id6Po+8H"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72D43321448
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 17:01:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02CA132B99E
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 17:01:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761843690; cv=none; b=PubtF2QSjMntts6bpxYi7CiP2I4iGDN3TIxMVASEj/HWx88nKqQ9hjlU6lSEXDhwM7soX6qaIvHefyM6Vdb0petzQdBcQ/tsP8gPuUi8JpJet/0QSjpWXf7RhHCdmRfw/MLinsGG/+AGbc/GWYRrvDf1k98HC2pp365culnFVAg=
+	t=1761843708; cv=none; b=UVwww5EVqpfqkfo6VD2OSIuqKWZPbPyYAKk6uRORzS5nypaD88lQHdlug+rFotU74+Ku9FfWwHJaoq6+Kz7KwRJ8LaWrg1VDit0mVDW0GBG/GgNfY/zJ/cQSOmYFx3U0l7e15hwoFUmOGlKL0vx2XBrRvn8itG8QDPoxR+602BQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761843690; c=relaxed/simple;
-	bh=EMkTe5//7qv1XWV422KN8xspB0t/VQ1gSJlzCDctkaI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f5NHjX+884YQmoQ1GfbFjiUM+Gmejxc3vEiCTRmEzX0qIfvsal/s3iMrEV3GU3N/i0ARLTA24dNDMGH+AidcDgBo+I3knRpTy398SJXATvjWRirs36KljTSL0N3agN39HZ7jeR/pSf23kTmZa/lpqM3/n7Ex/D2ZxHewHpdvk5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hshMB7zF; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 87A7C4E413FD;
-	Thu, 30 Oct 2025 17:01:23 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 5D55C60331;
-	Thu, 30 Oct 2025 17:01:23 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 0EE3511808C73;
-	Thu, 30 Oct 2025 18:01:12 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1761843676; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=EMkTe5//7qv1XWV422KN8xspB0t/VQ1gSJlzCDctkaI=;
-	b=hshMB7zF+gkFqyq6bl9jykM2OeEhu6uin46xfXRg+nW6jD/EoyI86+Cevr0BlkVRA+IAPs
-	r30qa5P3JR9EYdKoGgr6kayWE3GLKodepSWTzc7rENCsu4mFb9APSqieSPURvw8pS/3Wo8
-	TVkZmttIn3xTa3rCBPQeDUzViFvEkCB4Iy4Gx38f5QFvqHwCgBuKR629lv0vp47gHxTPIi
-	an0Ke6AB1GdPJr8RPmTshs+lVj1IXXj4VHLw6HKG3iThT2BNuVhoif8+XLMx1TUwILq+fs
-	03mOMaLQre1GzwWW9H8oe5JT7O/bMS7Ta958iUDeTzqIPvQbTywUZCq7mV96vA==
-Date: Thu, 30 Oct 2025 18:01:11 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>, Vincent Mailhol
- <mailhol@kernel.org>, Stefan =?UTF-8?B?TcOkdGpl?= <stefan.maetje@esd.eu>,
- socketcan@esd.eu, Manivannan Sadhasivam <mani@kernel.org>, Thomas Kopp
- <thomas.kopp@microchip.com>, Oliver Hartkopp <socketcan@hartkopp.net>,
- Jimmy Assarsson <extja@kvaser.com>, Axel Forsman <axfo@kvaser.com>,
- linux-can@vger.kernel.org, netdev@vger.kernel.org, Jakub Kicinski
- <kuba@kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>, Jacob Keller
- <jacob.e.keller@intel.com>
-Subject: Re: [PATCH net-next 1/3] can: convert generic HW timestamp ioctl to
- ndo_hwtstamp callbacks
-Message-ID: <20251030180111.0f95189c@kmaincent-XPS-13-7390>
-In-Reply-To: <20251029231620.1135640-2-vadim.fedorenko@linux.dev>
-References: <20251029231620.1135640-1-vadim.fedorenko@linux.dev>
-	<20251029231620.1135640-2-vadim.fedorenko@linux.dev>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1761843708; c=relaxed/simple;
+	bh=sooSORsPeZ3LygJqT5OoURzlI5Ieddf28x98E/UvMx0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=V2Bre10piXdvfTTgxmh9F+lM3jnqO5MNjVE2Eqwrw47xFTOka3l3E+j3z34BIhPYCCWuyWpq1xVMh7fpjPYrGMLyKY0BduLPVxFZk6OUCTeER9X0FZvcVpzdxAoMxQpZ+jD0iXkJm5JwCEnOpJ7RPpK/3u1XmYYdAulT9eRbBRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Id6Po+8H; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4eccff716f4so10471cf.0
+        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 10:01:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761843703; x=1762448503; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=G1iMEFORPqMQ+iho8BLiV6S+XB4wtm9heoss738r53U=;
+        b=Id6Po+8Hbkjo7uuCeYLGk45eOg2dcbILg8rKzMbvzEqY8Mb2TAHb1DShwbUCdFS16F
+         BU+/TEP8KEFoZvwkpi2Qx1zfAC/EExNmwAzAwko/6ZbrDdD5BwYcGKudmUW8zLU2GK2a
+         AxyOf6u+Hp4hbPYVFhdaAsL3YqWH+37IBIls//MOBcdKCQ6zKKaHVzO5+swtaHVu6tEV
+         NARpEG/qZXeH3jzz8tCCRrYbYjrAYPrM//zZmni7mdbngsTjkkzKHIxaeRI5CSlQe6th
+         /ZmiUQ7gwzyELaLqe06Bg/pClmNMJ2mjhP6z9g8t93UNyxzdhegmb/2XePqh0VtDt3y5
+         ypkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761843703; x=1762448503;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=G1iMEFORPqMQ+iho8BLiV6S+XB4wtm9heoss738r53U=;
+        b=bBCLEGQESiqaaGoHfTZAj1BPU5uaGjCnO/rN032RiFF3TdaAVolplRRscfpH/BPFQO
+         kpd17t3p8pE/O8kld348mE2FrTHtifhDw1FRNko/vWqs9o+EjV4IDhBaGlSFsObgGAAL
+         YNPq9f8A+mcLgQyuoSYAjgyXY08YJM16+PGG4KqNMF+zb2cxOeQg9SekrhnM7Vg/DeoN
+         jKtjQHFaczakJwAiGikHpiKqY6AuKd13Ri0c57TSmcrNOA8x9d6K4pVK9XH6RqEG354U
+         jCxx4dHcUsuUKJZnxnL1YTZGzAjE6kFEaZpZZYX+ggsdCNumafXkZgyLmOr9aU3mIZfY
+         Uxzg==
+X-Forwarded-Encrypted: i=1; AJvYcCUcXy5xrEYMyV0kvl7OrmoQNbkg7OkYP79U8y/9S8TNNbBJi8UV8F4QfpH6+Vfbk2B7ll+SsrE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxbCP0qkla8lC6WPi65GmnjoL6vvyNK2dO6Go7+eNps9ERRNmWu
+	rWRBNe7neoCle76lgzQJLMbXgTQy/ihnwdihQghGxPaQg6VrblT0XaYX1yCsCs6SpXr3995/ZC9
+	6xxLfHhwua07xYwmZtru9+fZ6+eUcnOXH604wzquv
+X-Gm-Gg: ASbGncuWAyZd9he0Nq1jhuSdOcgIZgqVMSlAsuWY2W+ZrBUNic1L4NwPX3RUhRl8vqW
+	c1t7L+XEmAGPRHIRGES/YGMZQ4WSqNnU7/vUn6Q+BIDxuutj9AH0KS0m30R26XrjMxJpoK4Wo/x
+	ADiD3X5JJ9vhZE73tQ3JmdiIWpvX0DcjDSnTRdaSynGCydchVh4+NEIqmP+AoUeWtqMyAV7nOtx
+	RQuMMd4FoweU3KY60aqK+6O0MdJjt0ClajF6GJXayoTze3U1r07SwNmKCU00VIYHJHd4hnM1lBX
+	smMsVaWZoBRdWYk=
+X-Google-Smtp-Source: AGHT+IGbG4+JAXpeJAmQffn7xWMZ9l7FqDYhPXtR/Bl29uXQjOOthQu/w+R0T5LEuNPACks8hR5w566lrqYHX864Wdo=
+X-Received: by 2002:ac8:5c93:0:b0:4e5:7827:f4b9 with SMTP id
+ d75a77b69052e-4ed23b7ca8emr7250611cf.3.1761843702284; Thu, 30 Oct 2025
+ 10:01:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20251029184555.3852952-1-joshwash@google.com> <aQMzWoIQvSa9ywe4@horms.kernel.org>
+ <aQM0eqE2klsOq6A0@horms.kernel.org>
+In-Reply-To: <aQM0eqE2klsOq6A0@horms.kernel.org>
+From: Tim Hostetler <thostet@google.com>
+Date: Thu, 30 Oct 2025 10:01:28 -0700
+X-Gm-Features: AWmQ_bkWK5DKVnu-rjTZf6RGexQ8qogsXqxUgk0Pfahr11VmaBz_miV-42qS7t4
+Message-ID: <CAByH8UuzrzJ4h1dbOKbAf8oCi-_PAcX_Z-aGp=+EDJnkBPvpOA@mail.gmail.com>
+Subject: Re: [PATCH net 0/2] gve: Fix NULL dereferencing with PTP clock
+To: Simon Horman <horms@kernel.org>
+Cc: Joshua Washington <joshwash@google.com>, netdev@vger.kernel.org, 
+	Richard Cochran <richardcochran@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
 
-On Wed, 29 Oct 2025 23:16:18 +0000
-Vadim Fedorenko <vadim.fedorenko@linux.dev> wrote:
+On Thu, Oct 30, 2025 at 2:48=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
+te:
+>
+> On Thu, Oct 30, 2025 at 09:43:57AM +0000, Simon Horman wrote:
+> > On Wed, Oct 29, 2025 at 11:45:38AM -0700, Joshua Washington wrote:
+> > > From: Tim Hostetler <thostet@google.com>
+> > >
+> > > This patch series fixes NULL dereferences that are possible with gve'=
+s
+> > > PTP clock due to not stubbing certain ptp_clock_info callbacks.
+> > >
+> > > Tim Hostetler (2):
+> > >   gve: Implement gettimex64 with -EOPNOTSUPP
+> > >   gve: Implement settime64 with -EOPNOTSUPP
+> > >
+> > >  drivers/net/ethernet/google/gve/gve_ptp.c | 15 +++++++++++++++
+> > >  1 file changed, 15 insertions(+)
+> >
+> > Hi Joshua and Tim,
+> >
+> > I think that the approach of enhancing the caller to only
+> > call these callbacks if they are non NULL, as per the patch below,
+> > seems more robust. It would fix all drivers in one go.
+> >
+> > - [PATCH] ptp: guard ptp_clock_gettime() if neither gettimex64 nor
+> >   https://lore.kernel.org/all/20251028095143.396385-1-junjie.cao@intel.=
+com/
+>
+> Oops, I see that I should have read to the end of that thread
+> where Tim joins the discussion.
+>
+> It seems that this patchset is appropriate as it's expected
+> that drivers expect an implementation of a variant of these callbacks.
 
-> Can has generic implementation of ndo_eth_ioctl which implements only HW
-> timestamping commands. Implement generic ndo_hwtstamp callbacks and use
-> it in drivers instead of generic ioctl interface.
->=20
-> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-
-Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
-
-Thank you!
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Right, one of the gettime64 variants and settime64 are required
+(whereas the other function callbacks aren't required from my
+inspection). I actually have a patch I'll be sending out pretty soon
+that will prevent the registration of a ptp_clock that doesn't
+implement the required callbacks to prevent a bug like this from
+happening again.
 
