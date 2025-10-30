@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-234245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27EDCC1E158
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 03:00:58 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB1A0C1E192
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 03:10:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C531934D51D
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 02:00:57 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B53134E5C3C
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 02:10:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA4B02F361A;
-	Thu, 30 Oct 2025 02:00:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E8CF2F9C2C;
+	Thu, 30 Oct 2025 02:10:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IRTOC1bp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NQOgDPuR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5D112EBBA3
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 02:00:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70DFD286D7D;
+	Thu, 30 Oct 2025 02:10:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761789640; cv=none; b=h7TQoB2sAnlgH9BX3sVZs29XZFqLFxAl7DmTy+Mh4w8+SS9eoVbrvbENEKK4RIz94BVyqAxu0TpmwhTkaseod2df7BkYpac6USMPGqZGcFqa0f6A6m3wbrNJLF23MjJD3vNFujPfRLB+5pIqg5QCfQxVbi9251mUjRvEpZJAqD0=
+	t=1761790234; cv=none; b=pVcYwHommUHTiRpT8VAVkIW1FTStD+PQV5kroH0R6OFMJVg54aYazfJ/x1PCYtvfvjmoMGhvaOilJ195rlh55v9Jt6ZgjcKCNii948jj1YgrkOSJNF+vTItk+XRe780P3m3RSWq/oYlIgb8Xcdh7SP6FBntFmOf0h5x523MJkyM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761789640; c=relaxed/simple;
-	bh=TF+xR6KkE5OxIUkvy+8hHfKZ6+KB/cpOjzBZ3NfVqqU=;
+	s=arc-20240116; t=1761790234; c=relaxed/simple;
+	bh=qYrpYpN6+1EHjkbZwU9+wYqpCq+V6IjQpvO7dJMl1JU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ut3w6qRdwkfGE9E2P00OEq2qZ3g2i4IfZmBUn2byUuZzVjb7Y9g8IfoHOzsAkgu8BcfM5ni9+mvQDVcP1SeNw7VloC6GzeW4+bwgA9c/LHxx18VcY5cNL9FDPZWpyEuEqjt1YY7qdBMC623l3HB/lINZ0usFwZBXH01K97jxkR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IRTOC1bp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9743BC4CEFD;
-	Thu, 30 Oct 2025 02:00:40 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Z8WrCIKI1/Q/l0yZPB/upE4IZ2fwVDulS+fTSUac9ujXw3SzHG077cCnRgBHW3EmsGx/O1bGKTda6WpxdB8OmrorJZSAxdQF3yX5hQnFTESQ4wDH/CLCNdtEQWgB13gJXqHri925S5notB9xh5bfEaVtNv9Mj+ucYPVxVFNwDcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NQOgDPuR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 433DEC4CEF7;
+	Thu, 30 Oct 2025 02:10:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761789640;
-	bh=TF+xR6KkE5OxIUkvy+8hHfKZ6+KB/cpOjzBZ3NfVqqU=;
+	s=k20201202; t=1761790234;
+	bh=qYrpYpN6+1EHjkbZwU9+wYqpCq+V6IjQpvO7dJMl1JU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=IRTOC1bpzA0kKLl18DqZ2dgnna/3cQnn4+WjtiR4iC1LuGUru3GrZx9p8l8KGMkZ+
-	 q5A2hgO6cs8ZuchhZNhelEp5cceJPktfnyn/p1MskQDcVFnt8NDh+TR4jpgA82kHLV
-	 a44FDRqic4yuZZbwVTcTJzh1hwstNCOFjJ9m16p9GsiGvnJclrPEIXxktoNbY12EcC
-	 a/lGzfZ7Xka8HlEbGNsXBjdp1ZF39BwjhFficNpwajotUCJwMA01UA//eePWi1tVHu
-	 NFlogkCIy53t9ZMe25+8MNhX89gz6g44JAKASaSS8Nf0CzI8Q9PYiHVAEosoAUoF+1
-	 xT6250KQsYmUg==
+	b=NQOgDPuRkaHdL7Nj6GetaxC2vpgxqU34qHLhL+fbZXZ2z5QonDKq2SlwT+VxjKVUV
+	 r9PKPqUPu6KK6qK4/usOSFXDJ3BJEENNTRbTMzY9aOABqPMkkljk76DrY22lhwAouh
+	 NHOC7ABvvWISGy3nU0KG39EBCIYmXwvF1x5ntVw4KlAcnZNxYdcAscoFds6wnq+uKt
+	 SoDGhttFSm3/1v86XhShuC0xnFWuLNsQDn/7ogUWTvmQyLvMi75Oq5RUWt/NZl/XAl
+	 Aeee9yf7LA8gGPkv/jNWVchP/kK9y6k7vB/RiSMER3KIMN02aPCuSS9vtt37/+9+9k
+	 iQghuWLYZm3Mw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id CBAC43A55ED9;
-	Thu, 30 Oct 2025 02:00:18 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DCB3A55ED9;
+	Thu, 30 Oct 2025 02:10:12 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,44 +52,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net-next] net: stmmac: mdio: fix incorrect phy address
- check
+Subject: Re: [PATCH v3 net-next 0/4] net: phy: add iterator
+ mdiobus_for_each_phy
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176178961774.3282477.10436173337048887248.git-patchwork-notify@kernel.org>
-Date: Thu, 30 Oct 2025 02:00:17 +0000
-References: <e869999b-2d4b-4dc1-9890-c2d3d1e8d0f8@gmail.com>
-In-Reply-To: <e869999b-2d4b-4dc1-9890-c2d3d1e8d0f8@gmail.com>
+ <176179021125.3284947.14137231536759252044.git-patchwork-notify@kernel.org>
+Date: Thu, 30 Oct 2025 02:10:11 +0000
+References: <07fc63e8-53fd-46aa-853e-96187bba9d44@gmail.com>
+In-Reply-To: <07fc63e8-53fd-46aa-853e-96187bba9d44@gmail.com>
 To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
- andrew+netdev@lunn.ch, pabeni@redhat.com, edumazet@google.com,
- kuba@kernel.org, davem@davemloft.net,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
- linux@armlinux.org.uk
+Cc: wei.fang@nxp.com, shenwei.wang@nxp.com, xiaoning.wang@nxp.com,
+ s-vadapalli@ti.com, rogerq@kernel.org, andrew@lunn.ch, andrew+netdev@lunn.ch,
+ linux@armlinux.org.uk, pabeni@redhat.com, kuba@kernel.org,
+ edumazet@google.com, davem@davemloft.net, netdev@vger.kernel.org,
+ linux-omap@vger.kernel.org, imx@lists.linux.dev
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat, 25 Oct 2025 20:35:47 +0200 you wrote:
-> max_addr is the max number of addresses, not the highest possible address,
-> therefore check phydev->mdio.addr > max_addr isn't correct.
-> To fix this change the semantics of max_addr, so that it represents
-> the highest possible address. IMO this is also a little bit more intuitive
-> wrt name max_addr.
+On Sat, 25 Oct 2025 20:48:20 +0200 you wrote:
+> Add and use an iterator for all PHY's on a MII bus, and phy_find_next()
+> as a prerequisite.
 > 
-> Fixes: 4a107a0e8361 ("net: stmmac: mdio: use phy_find_first to simplify stmmac_mdio_register")
-> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> Reported-by: Simon Horman <horms@kernel.org>
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> v2:
+> - rename iterator to mdiobus_for_each_phy
+> v3:
+> - add missing return value description for phy_find_next
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,net-next] net: stmmac: mdio: fix incorrect phy address check
-    https://git.kernel.org/netdev/net-next/c/cf35f4347ddd
+  - [v3,net-next,1/4] net: phy: add iterator mdiobus_for_each_phy
+    https://git.kernel.org/netdev/net-next/c/26888de97b2f
+  - [v3,net-next,2/4] net: fec: use new iterator mdiobus_for_each_phy
+    https://git.kernel.org/netdev/net-next/c/0514010d553a
+  - [v3,net-next,3/4] net: davinci_mdio: use new iterator mdiobus_for_each_phy
+    https://git.kernel.org/netdev/net-next/c/4575875065de
+  - [v3,net-next,4/4] net: phy: use new iterator mdiobus_for_each_phy in mdiobus_prevent_c45_scan
+    https://git.kernel.org/netdev/net-next/c/d4780abb8cce
 
 You are awesome, thank you!
 -- 
