@@ -1,64 +1,63 @@
-Return-Path: <netdev+bounces-234468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 671DEC20FA6
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 16:40:08 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35427C20FCA
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 16:42:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B9F83B0A97
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 15:39:49 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D6FEB34F289
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 15:42:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF68936336B;
-	Thu, 30 Oct 2025 15:39:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C1593644BE;
+	Thu, 30 Oct 2025 15:42:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f8U9w3BZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GmGSbGrb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97F16157480;
-	Thu, 30 Oct 2025 15:39:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FBFE3644BA;
+	Thu, 30 Oct 2025 15:41:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761838786; cv=none; b=JaJVq0VHG2Gep6A1TtJDObf0gfpIbaVXMgoqD7dYPZ+pDv6UAw9fPjZorO16CafwLxldK4SVo+p6lpA5sjXsISe/EG8xecJdKGxdLbobwoYyPTSR7bxC3s2f8TazH0gO5OrBAl7kZw9CitoNA3neV05VbhjEDVXK7zvYRF3ptY0=
+	t=1761838920; cv=none; b=MjwY/tvsk11oRXv8WsrrwB+mL0SozFHLKyvYEArtOlbcHfw1Vwil97UH97S0uI09RrdqFwDmw9OFwmjfEloftO/ldMZMGd1P9znzXjr1xPbZqgfZlLvJ/L94xe2PgLn3eJiKjb1v/CoLUE/vgoNVnX0BaY5aCDkbiOnpI3WAqQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761838786; c=relaxed/simple;
-	bh=5jqdHhX0I4KMiLwoW0KNxN68J+JobxHWa2UkGLceI74=;
+	s=arc-20240116; t=1761838920; c=relaxed/simple;
+	bh=8Jq8ov3JKHNk+eVSjjv5F9o8vwOEzm1GthmDKzsDmRQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=B6dWVKn1P3i4CHp62KSagbwriKmurQv+AE1LF0/ZEy00d9olCdcYNAA3u6KlKxJPDbr3XuUVM2GGZXr0vyWla+wfjCLn3XfYOSZ+cZf5e2UOvj+JNQ1YvDOiWj668CE7Cq/zjjY924s1VnespAbk+VIVFNVSEESHayX13nm9MoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f8U9w3BZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86F48C4CEF1;
-	Thu, 30 Oct 2025 15:39:45 +0000 (UTC)
+	 MIME-Version:Content-Type; b=XhmdWzMCrMRfhi2K2yQYpvTv1BAk4UFl479Z1PpHJBWXmKzpPJcVntEU7nwRVpKihYqyiDQjNRfNCGJOiuYumdIodr7roHDu5U4iNxY8/LCd+vG3Sh++GKsolEbcfz/n5O5uoHcYadQcmiNE/k0LAJmStrTH9paP6R/dTh1mKhE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GmGSbGrb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A33DC4CEF1;
+	Thu, 30 Oct 2025 15:41:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761838786;
-	bh=5jqdHhX0I4KMiLwoW0KNxN68J+JobxHWa2UkGLceI74=;
+	s=k20201202; t=1761838919;
+	bh=8Jq8ov3JKHNk+eVSjjv5F9o8vwOEzm1GthmDKzsDmRQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=f8U9w3BZPQbzFxBJtOiVVxCeZTZXtZRLy02kRyVIpZSbGCI2TOdhOBhdQzRuN5PGb
-	 VEM5VJ0/61eIYAwTwIMOGQoXS/IEkckAnJhBcyXZd1yH0HP4X4wzowGvR7M+bfjTNS
-	 QWvA48MrahhyPBVC2XmAu7J/X/DtALpGGa3SVGReYY+Mv2kXrrMFUxom/WDJLyehhA
-	 Uzm2uQ0n3IVNfj+zwudpX+3dWs5iWD3zAeREECFiXQmmk+A3XK+bUQWVaV1rqVJ5HQ
-	 gihqqXLqe1JJjN8xEOogLO0h66MlHfnQ+Bnm/YgBfkN61P8x9vQ+EJq5KHtGUcBfdw
-	 LNDBNURQ1Ifew==
-Date: Thu, 30 Oct 2025 08:39:44 -0700
+	b=GmGSbGrbowTZAcFCMEHFnLyqaXEtYyQk1uiyYRoIZWwFlHEd4xLD1q1NL3Y7YN2x8
+	 8TTrp96KuJFe17wzZab6A/SDvTQpZZ3J4aQ9BtaG0+HRA4UceUXFcWolIEKxJntGKE
+	 ayeU7h9kpFVpU7gHMv9oQ1zBcP5+/+lwsGyDDyoyI0AMGgEayd+MGLVmrHx7wpYdf2
+	 xL1LdujLrbwRSSCZV0aIP9/CuWsxmMgn5w4RhVdHrz9mR9ZW4HWfJGU2PCYEYEMLR4
+	 jC0SrF8vs6P6n3RdVQJGh3bOd0NpmYYoX4eIprwWLcUwGMMxITlOqHjnz53N1Pnxwa
+	 c/ViuHLCovsLw==
+Date: Thu, 30 Oct 2025 08:41:58 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jan Stancek
- <jstancek@redhat.com>, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
- =?UTF-8?B?QXNiasO4cm4=?= Sloth =?UTF-8?B?VMO4bm5lc2Vu?= <ast@fiberby.net>,
- Stanislav Fomichev <sdf@fomichev.me>, Shuah Khan <shuah@kernel.org>, Ido
- Schimmel <idosch@nvidia.com>, Guillaume Nault <gnault@redhat.com>, Petr
- Machata <petrm@nvidia.com>, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next 3/3] selftests: net: add YNL test framework
-Message-ID: <20251030083944.722833ac@kernel.org>
-In-Reply-To: <aQL--I9z19zRJ4vo@fedora>
-References: <20251029082245.128675-1-liuhangbin@gmail.com>
-	<20251029082245.128675-4-liuhangbin@gmail.com>
-	<20251029164159.2dbc615a@kernel.org>
-	<aQL--I9z19zRJ4vo@fedora>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Bagas Sanjaya <bagasdotme@gmail.com>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Documentation
+ <linux-doc@vger.kernel.org>, Linux Networking <netdev@vger.kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Herbert Xu
+ <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH net-next 6/6] MAINTAINERS: Add entry for XFRM
+ documentation
+Message-ID: <20251030084158.61455ddc@kernel.org>
+In-Reply-To: <aQMd886miv39BEPC@secunet.com>
+References: <20251029082615.39518-1-bagasdotme@gmail.com>
+	<20251029082615.39518-7-bagasdotme@gmail.com>
+	<aQMd886miv39BEPC@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,23 +67,29 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 30 Oct 2025 06:00:24 +0000 Hangbin Liu wrote:
-> > Hm, my knee-jerk reaction was that we should avoid adding too much ynl
-> > stuff to the kernel at this point. But looking closer it's not that
-> > long.
+On Thu, 30 Oct 2025 09:12:35 +0100 Steffen Klassert wrote:
+> On Wed, Oct 29, 2025 at 03:26:14PM +0700, Bagas Sanjaya wrote:
+> > XFRM patches are supposed to be sent to maintainers under "NETWORKING
+> > [IPSEC]" heading, but it doesn't cover XFRM docs yet. Add the entry.
 > > 
-> > Do I understand correctly, tho, that you're testing _system_ YNL?
-> > Not what's in tree?  
+> > Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+> > ---
+> >  MAINTAINERS | 1 +
+> >  1 file changed, 1 insertion(+)
+> > 
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index d652f4f27756ef..4f33daad40bed6 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -18041,6 +18041,7 @@ L:	netdev@vger.kernel.org
+> >  S:	Maintained
+> >  T:	git git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec.git
+> >  T:	git git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec-next.git
+> > +F:	Documentation/networking/xfrm/  
 > 
-> Kind of. With this we can test both the system's YNL and also make sure the
-> YNL interface has no regression.
+> That means that I'm now responsible for this.
+> But I'm OK with it if nobody has objections on it.
 
-Meaning we still test the spec, right?
-
-To state the obvious ideally we'd test both the specs and the Python
-tools. Strictly better, and without it adding tests for new Python
-features will be a little annoying for people running the selftest.
-
-Maybe the solution is as simple as finding and alias'ing ynl to the
-cli.py ?
+Definitely no objections :) 
+Let me mark this series as "Awaiting Upstream".
 
