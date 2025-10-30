@@ -1,107 +1,164 @@
-Return-Path: <netdev+bounces-234476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68D8AC212A7
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 17:26:17 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A72BC2146C
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 17:46:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D22541A65EEC
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 16:24:16 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3E3484EDDF9
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 16:43:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05338368F43;
-	Thu, 30 Oct 2025 16:22:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44EE12E8DEF;
+	Thu, 30 Oct 2025 16:43:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BVYb5z3t"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gwKxHfwC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C66368F37;
-	Thu, 30 Oct 2025 16:22:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A038A2E0B44
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 16:43:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761841367; cv=none; b=Cka+AGjuEXxKLFR90QLn1bygqMMElPAyfUWpULei0S1O7Qfbl5dV+MyZTCfzI9OWXwQ1I8qG9+PWZKXN0DFk7lmu88gE/cUC9erYYPo2Y0HxzzGKN4JN9wUwW4ZAbD2RhhYtNli0j8PI6R+OOqRPTWzg1NrPX+Tekw2eg3UK2zk=
+	t=1761842621; cv=none; b=tPnRc3PrSis6EwmZSxJDfamyaJrmQTwQL/l/HFf/nQz6FP2yIvRobKbkkyTyvfNJt55MDUDAa4eFpbaFUaTJYZrRPvHaxF3mUu0pMPQRgtxvnzCGEpWkrv5jdm5oSg2OxzAFpBTsQ+K7I3HrH+RQ3BuGebg31suPF5AkQrVWAm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761841367; c=relaxed/simple;
-	bh=VDLc8wUfMBSZNHsTbwVHcHE2r/TpbECK6ZwoaGE9bcI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o80PDPqs2xv07Mjs+zMIQQQnb+D5qPe/MSGwgRFIwhSr5k1cQpeSi0/J7YHXOCV8KBTHfL8ulc00JLSeiteeyyb9kOg0fFxdZbhFtBfTP6TiFkB4BTkyFvW44TFc9TX2N0orGxhnzVgTelY9/5Zbnkq/RB/fexcegcp/fJZzV3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BVYb5z3t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8964BC4CEFF;
-	Thu, 30 Oct 2025 16:22:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761841367;
-	bh=VDLc8wUfMBSZNHsTbwVHcHE2r/TpbECK6ZwoaGE9bcI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BVYb5z3trxs2/DUJp6hHyeKT2RqD6IpINkn5QIPGiFA5vFJhBjWaH8YxLg+7EaIyW
-	 qXELbIvNlCahXkknztW6GYX+PxOxK9gdd2OUnxFFORbZRVKAbXWdEAnXYoVxDWKs69
-	 9a8zuUwvN1rv3DStopO/i9oUl/A/q6g6Wn7dI71bxuQXttlWR4S0Gs9WJcb7Wc5g2c
-	 GMdo6n8YYQAoJ3y8Ue34Lnl09s9C4YyXzlp0Z+t08Z4bVp57xvjT049lHB3GQto8MZ
-	 UvA9khQTUZ514QAoMh0A+C3h45ZCApwD+c9FJz7R4GyGsIXGgzoGtqQWBChrp6WVmr
-	 WJHJMImU+9tGg==
-From: Bjorn Andersson <andersson@kernel.org>
-To: Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Varadarajan Narayanan <quic_varada@quicinc.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Anusha Rao <quic_anusha@quicinc.com>,
-	Devi Priya <quic_devipriy@quicinc.com>,
-	Manikanta Mylavarapu <quic_mmanikan@quicinc.com>,
-	Georgi Djakov <djakov@kernel.org>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Luo Jie <quic_luoj@quicinc.com>
-Cc: linux-arm-msm@vger.kernel.org,
-	linux-clk@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	devicetree@vger.kernel.org,
-	linux-pm@vger.kernel.org,
-	netdev@vger.kernel.org,
-	quic_kkumarcs@quicinc.com,
-	quic_linchen@quicinc.com,
-	quic_leiwei@quicinc.com,
-	quic_pavir@quicinc.com,
-	quic_suruchia@quicinc.com,
-	Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Subject: Re: (subset) [PATCH v7 00/10] Add Network Subsystem (NSS) clock controller support for IPQ5424 SoC
-Date: Thu, 30 Oct 2025 11:25:39 -0500
-Message-ID: <176184154218.475875.7725687193388038475.b4-ty@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251014-qcom_ipq5424_nsscc-v7-0-081f4956be02@quicinc.com>
-References: <20251014-qcom_ipq5424_nsscc-v7-0-081f4956be02@quicinc.com>
+	s=arc-20240116; t=1761842621; c=relaxed/simple;
+	bh=ScsR3RF3FUX3H0ckwAV5EMhCJGDEfRpRd7qgc2we++s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PKUYGDmqtujRuj/g00XBekVO7LObuv00eKp+CG4Rm4cli5SDarPGdloyo9PsYiCdVn6Wy5iuGikzVT8uNT+STEklaAVD3s4iDCZr0HSEKuToNt51sOOBcSKzBCMzVFC/avlOoqmTheYr+lVEegm/avCMkzNWUtWDB/bIk8TxKuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gwKxHfwC; arc=none smtp.client-ip=209.85.166.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-940d327df21so49669339f.1
+        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 09:43:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761842618; x=1762447418; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ScsR3RF3FUX3H0ckwAV5EMhCJGDEfRpRd7qgc2we++s=;
+        b=gwKxHfwCYoDeF2l7+1rYYozkU19wcxaqNZNTmSchga5ZKcM2aj5JnnPI8emoYCA1CW
+         EtJdkejzwNzd8Qoh0N3sdlthqKnl5P5EgCnCNuipEa4qvXWycwxZLkmkfKFTo9m/vugq
+         Yikfam5ZQCaz+r/XfL5yPGBbiQL6wlMSGbM5grfQozd+C7AzCysjXV7grZbWS/XJmITD
+         17ezdD1IRAhAtwCE1OAsnb1yRgguF8hX7RWtQvOLR0f0oE3tbXq2HadPmT6N7GHaeR+8
+         Itg+UfDO6wBJ6h+ILddO5Vgpxv7GhuiPxcb2Y4xTSJcXP4rlDKnYkUkpVaBAbF4QDnyd
+         1U9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761842618; x=1762447418;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ScsR3RF3FUX3H0ckwAV5EMhCJGDEfRpRd7qgc2we++s=;
+        b=KaLzOEgpPI1hQLuf9UA12i9Jy1oGviBuY7Ayt8iBxPn3BvrPKsqy81a4H7qHGaYVx7
+         ut6rjUgBCDHacG0fUYgGSFQMWuSyaw02GVdrBSJZqUYqcDYe1Zsfnmq1N7LnzhVWDMyx
+         cWXObQoLh8/4fdWeGuVf0r5RVtHyXxvOGYV2SeIPWRPqwyQVxq0CsPuK+uFv4ex2mqYf
+         5LMLwinalUyB9IAkdWeOlZudpYMeB5ISqcFtgEnvOZpL45EqdDSTO47XXk2zPt5uo+5E
+         S1Jyo6YzCOOR5LSz0vYrz7Z4DqBQb3kv1S61v6h7OFA9SOMtcEIly9lkdptK6KULffbn
+         yeig==
+X-Forwarded-Encrypted: i=1; AJvYcCVxV0Jw1iwlvQCpUnCmbj5I4IjambLMgMkBHNhcYLsyC/iJx+7iyDcXNrL5Afdl2lTnhU5+Ulo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzeJN1a0kMONG2dPpzcHnS6+GYtvfASzRZr2HgKIaBg2f+q9FQT
+	X2MUa8/AnXyKQSg5wkvzNmCQ5hhiftKOjubeBquOHJLeq24QoAAH5nPTf+WPZ+vOD4PKIxxtPZ6
+	xjZwlnwZPSrkpWf9AP6A88j78aylMqBg=
+X-Gm-Gg: ASbGncsaR+Y/wXCXiTr6cfXCjX0D4E5IPScncktRzM1Pk5XBLUDF0dGaFv9DaR6DAI3
+	PP58VT9WrWzF0SK3IlVCRM+lIiSje6vtkGaIrNLB1JW0BeciB1Nf41ELUTm1AuYMLH/iEJZJ8Y1
+	Jlu9qyMdYxcpr1MwQ7g85stM+BUH9rNJ2YqKwFIpLIKJNLah3o3HrEOBY1c2r1F+ZQ8aSh0wfxk
+	bprvYMe70HF+wucV6LCvn/AG9DrEHujCW2P+DslGqY12Nsm7wUs78PCj+17Ff6Mhke2+q4=
+X-Google-Smtp-Source: AGHT+IHABHHYgP9UPdSaAL9Tyr/Tjj/DmATyHoB6SRmjVOqGejrhf07RZdi3a9r4TiomtoZ/2gaNdIWdCVNC+c/+k40=
+X-Received: by 2002:a05:6e02:17ce:b0:430:d061:d9f7 with SMTP id
+ e9e14a558f8ab-4330d1ea721mr5802175ab.23.1761842617639; Thu, 30 Oct 2025
+ 09:43:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+References: <20251026145824.81675-1-kerneljasonxing@gmail.com>
+ <54d1ac44-8e53-4056-8061-0c620d9ec4bf@redhat.com> <e290a675-fc1e-4edf-833c-aa82af073d30@intel.com>
+ <20251030085535.4f658dd8@kernel.org>
+In-Reply-To: <20251030085535.4f658dd8@kernel.org>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 31 Oct 2025 00:43:01 +0800
+X-Gm-Features: AWmQ_bkAsHoydT5-J9trWZVBP9fFUV3qIY4KlwFsxFEgD--IX4m49PzB2kXlj48
+Message-ID: <CAL+tcoAm_ScONpFUACi3TcrgKx_DUecZmEXpRJVOMwJHa29K9w@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] xsk: add indirect call for xsk_destruct_skb
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net, 
+	edumazet@google.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
+	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
+	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
+	john.fastabend@gmail.com, joe@dama.to, willemdebruijn.kernel@gmail.com, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Oct 30, 2025 at 11:55=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+>
+> On Thu, 30 Oct 2025 11:59:58 +0100 Alexander Lobakin wrote:
+> > >> managed to see a huge improvement[1], the same situation can also be
+> > >> applied in xsk scenario.
+> > >>
+> > >> This patch adds an indirect call for xsk and helps current copy mode
+> > >> improve the performance by around 1% stably which was observed with
+> > >> IXGBE at 10Gb/sec loaded.
+> > >
+> > > If I follow the conversation correctly, Jakub's concern is mostly abo=
+ut
+> > > this change affecting only the copy mode.
+> > >
+> > > Out of sheer ignorance on my side is not clear how frequent that
+> > > scenario is. AFAICS, applications could always do zero-copy with prop=
+er
+> > > setup, am I correct?!?
+> >
+> > It is correct only when the target driver implements zero-copy
+> > driver-side XSk. While it's true for modern Ethernet drivers for real
+> > NICs, "virtual" drivers like virtio-net, veth etc. usually don't have i=
+t.
+> > It's not as common usecase as using XSk on real NICs, but still valid
+> > and widely used.
+>
+> To be clear my main concern is that the XDP<>skb conversions are
+> an endless source of bugs and complexity. We have one fix for XDP->skb
+> on the list from Maciej and another for AF_XDP from Fernando which
+> tried to create an XDP skb_ext. We are digging a deeper and deeper
+> hole with all this fallback stuff, and it will affect performance
+> of both normal skb and XDP paths. Optimizing AF_XDP fallback is
+> shortsighted.
 
-On Tue, 14 Oct 2025 22:35:25 +0800, Luo Jie wrote:
-> The NSS clock controller on the IPQ5424 SoC provides clocks and resets
-> to the networking related hardware blocks such as the Packet Processing
-> Engine (PPE) and UNIPHY (PCS). Its parent clocks are sourced from the
-> GCC, CMN PLL, and UNIPHY blocks.
-> 
-> Additionally, register the gpll0_out_aux GCC clock, which serves as one
-> of the parent clocks for some of the NSS clocks.
-> 
-> [...]
+Sorry, I have to say I'm against the whole point :(
 
-Applied, thanks!
+1. Every feature has bugs. Just taking a look at the history of those
+well-known features like LRO/GRO/GSO, you must be aware that so many
+nasty bugs have been found.
+2. The so-called fallback is not something that nobody uses and nobody
+cares. It has its right valid position and has actually been used by
+many applications. Searching in the github, you can find many related
+supports in their own repos. Being generic doesn't mean being
+shortsighted and useless. There are a few so-called fallback features
+other than this, like SMC-R for RDMA.
+3. Back to the main point we've discussed, there are many cases that
+don't support zerocopy mode and I don't see anyone who volunteers to
+complete the rest of them. So currently and at least in these recent
+years I can predict that copy mode can be used widely.
+4. I'm working on something that is really beneficial to me and some
+people like me who need to accelerate the transmission in copy mode.
+There's still a huge gap between zc and copy mode, but sadly we have
+no chance to use zc mode. Optimizing the copy mode then becomes my
+primary job after work.
 
-[09/10] arm64: dts: qcom: ipq5424: Add NSS clock controller node
-        commit: e7a1bf542c3b254e4f3e8981e2b769f5c7424960
+I fully understand what you meant here. But the fact is the fact...
 
-Best regards,
--- 
-Bjorn Andersson <andersson@kernel.org>
+As to the maintenance, I believe we're able to cover this area and
+make it better and better in every aspect. I really hope we don't get
+stuck in these minor optimizations, shall we? I have more copy mode
+patches on the way... I really appreciate that we can merge it and
+move on. Many thanks here!
+
+Thanks,
+Jason
 
