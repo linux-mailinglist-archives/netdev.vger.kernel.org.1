@@ -1,105 +1,149 @@
-Return-Path: <netdev+bounces-234259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A29CC1E2F8
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 04:06:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E7E2AC1E2BE
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 03:59:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B396D1888A7A
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 03:06:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D6CD188AAF2
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 03:00:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A8342EA731;
-	Thu, 30 Oct 2025 03:06:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB14332C93E;
+	Thu, 30 Oct 2025 02:59:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G460pf5w"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="vbsfuC9X"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from canpmsgout08.his.huawei.com (canpmsgout08.his.huawei.com [113.46.200.223])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BDC02D0636;
-	Thu, 30 Oct 2025 03:06:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA8681D90DD;
+	Thu, 30 Oct 2025 02:59:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761793574; cv=none; b=NXy7QMs3cpIoXcVYX6z92WzG1JH9xzXU2PFhB6mI0C9wLx1dHZp8pererfoHu4VB+0XsclILdA/UCWEvvN+1ZAE8S0B/yTibRwIzCnAlDUhZ9Mva5jAgt3T6jtD4VnlEopqL2B2FtJOZBbAblXjWuoAmXWeyAYbPdWJDulHQq8k=
+	t=1761793183; cv=none; b=UktoQ5o0WPbdPfjsaTW7XvwhYSxosuML44oZHL6xW6RcCfo7JZH4ysqQ5Z7b8zZIetNw7Qay1q8yUUheMRfH8QBwDBvKBG7A4f5+pXJs5mYDlAn18iUgXzQfad+u5luBz3v4zVvwugUKJZBTVeVEdf8fx8rnVj9RGMzNPFvkMgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761793574; c=relaxed/simple;
-	bh=dVUd0kxP8SBgNKarJK8Wzf0YKtUqqRpN45iifynlBCo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mKT2b94EcQeO0/6gOEV14ZMFG6Xp24uJMDRQrQJT/15EbAyqlBkXw5a8FWObed7yPNgTWGbHSktOrhHyafKLdC2UBwwFb0Yp8usVhMn48azvPbgbi49IIE8bxXKT2SDkZ5LrI9dh3XQUBJmDMIxP0VYG/RdSgTYohTzvREMiMSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G460pf5w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1EE2C4CEF7;
-	Thu, 30 Oct 2025 03:06:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761793574;
-	bh=dVUd0kxP8SBgNKarJK8Wzf0YKtUqqRpN45iifynlBCo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=G460pf5wZhF+5PaPtXWKUHL7xcNeYSTZq5hk994ffhXrjkGhrgreSpGNZyneEKfoD
-	 PwDjfzcQDKLl4mDUwnv0v9ccHu48LXdI+LxeCtNmvPCEEJbLlaZ5k/ZFATc9bxk/79
-	 sPPII1vhsbTRFwgdxKyQnXM61r0Kf2nMvvLB7v5ZWlquSgOxG3zVFqIBiRq6rX+8Ra
-	 Bb6lAPLQSaYbv/9J6r8ZAwC066QnJMnbmdK5pTmgaFEDRUdXWwBgrFtkAwDpwHRpZL
-	 RyxMPd7Gq4YechklQOWL+7lWM55HuaYxKL1P/QUz7dFcEL2F2C+7l2DQ+Ff9PmgkXg
-	 CnMEEcH/JeC3A==
-From: Kees Cook <kees@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Nathan Chancellor <nathan@kernel.org>
-Cc: Kees Cook <kees@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Nick Desaulniers <nick.desaulniers+lkml@gmail.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Sami Tolvanen <samitolvanen@google.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Michal Kubiak <michal.kubiak@intel.com>,
-	linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org
-Subject: Re: [PATCH 0/3] Resolve ARM kCFI build failure in idpf xsk.c
-Date: Wed, 29 Oct 2025 20:06:09 -0700
-Message-Id: <176179356659.2479588.16940248582240491111.b4-ty@kernel.org>
+	s=arc-20240116; t=1761793183; c=relaxed/simple;
+	bh=Z4FwOYA/MldwEQbaY9hWHxKlarFAnNtyi81ff7lqBLM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tfMk7+QeM3QwuoycY1dcGvvdCi2OBxI7YZmXyeIGbjfOcZLmDQMBWOhtZ2eyh4rOhtzPq21UP54PDQnl1osaefnimhgjP9fgws6a3fWsnpHqb9nWq8R9Txyh6TVFSPvzJ3nCKD9aHxvXmYsGApHXrPD9l8/1nFnCiHKItRI2TWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=vbsfuC9X; arc=none smtp.client-ip=113.46.200.223
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=yN4Cw98grPeKEFg5pNB+m6iIWvIp3cWZHIUyPfIenTE=;
+	b=vbsfuC9XET+2HODu4FEzZ2m7E/fMvEt9RbeE13q5ubLuYFpkC1cnMHO90l4jR6gQUrXlBn8P7
+	QrsqasZ/n27l9rXAoFxBsB/SaLRZcABI97ByDZ9gyptCft3ogCbcLoR/T83CALJ1/bmOwmJfFRR
+	9MeIeSpgpWHZCV9be7EjZKo=
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by canpmsgout08.his.huawei.com (SkyGuard) with ESMTPS id 4cxpjL3mjYzmV6g;
+	Thu, 30 Oct 2025 10:59:02 +0800 (CST)
+Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
+	by mail.maildlp.com (Postfix) with ESMTPS id C66EA14013B;
+	Thu, 30 Oct 2025 10:59:31 +0800 (CST)
+Received: from huawei.com (10.50.85.128) by dggpemf500016.china.huawei.com
+ (7.185.36.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 30 Oct
+ 2025 10:59:30 +0800
+From: Wang Liang <wangliang74@huawei.com>
+To: <kuba@kernel.org>, <andrew@lunn.ch>, <davem@davemloft.net>,
+	<edumazet@google.com>, <pabeni@redhat.com>, <shuah@kernel.org>,
+	<horms@kernel.org>, <sd@queasysnail.net>
+CC: <netdev@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <yuehaibing@huawei.com>,
+	<zhangchangzhong@huawei.com>, <wangliang74@huawei.com>
+Subject: [PATCH net] selftests: netdevsim: Fix ethtool-features.sh fail
+Date: Thu, 30 Oct 2025 11:22:03 +0800
+Message-ID: <20251030032203.442961-1-wangliang74@huawei.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20251025-idpf-fix-arm-kcfi-build-error-v1-0-ec57221153ae@kernel.org>
-References: <20251025-idpf-fix-arm-kcfi-build-error-v1-0-ec57221153ae@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems500001.china.huawei.com (7.221.188.70) To
+ dggpemf500016.china.huawei.com (7.185.36.197)
 
-On Sat, 25 Oct 2025 21:53:17 +0100, Nathan Chancellor wrote:
-> This series resolves a build failure that is seen in
-> drivers/net/ethernet/intel/idpf/xsk.c after commit 9705d6552f58 ("idpf:
-> implement Rx path for AF_XDP") in 6.18-rc1 with ARCH=arm and
-> CONFIG_CFI=y. See patch 3 for a simplified reproducer on top of
-> defconfig.
-> 
-> I think this could go via hardening or net.
-> 
-> [...]
+The test 'ethtool-features.sh' failed with the below output:
 
-Applied to for-linus/hardening, thanks!
+  TAP version 13
+  1..1
+  # timeout set to 600
+  # selftests: drivers/net/netdevsim: ethtool-features.sh
+  # Warning: file ethtool-features.sh is not executable
+  # ethtool: bad command line argument(s)
+  # For more information run ethtool -h
+  # ethtool: bad command line argument(s)
+  # For more information run ethtool -h
+  # ethtool: bad command line argument(s)
+  # For more information run ethtool -h
+  # ethtool: bad command line argument(s)
+  # For more information run ethtool -h
+  # ethtool: bad command line argument(s)
+  # For more information run ethtool -h
+  # ethtool: bad command line argument(s)
+  # For more information run ethtool -h
+  # ethtool: bad command line argument(s)
+  # For more information run ethtool -h
+  # ethtool: bad command line argument(s)
+  # For more information run ethtool -h
+  # ethtool: bad command line argument(s)
+  # For more information run ethtool -h
+  # ethtool: bad command line argument(s)
+  # For more information run ethtool -h
+  # FAILED 10/10 checks
+  not ok 1 selftests: drivers/net/netdevsim: ethtool-features.sh # exit=1
 
-[1/3] compiler_types: Introduce __nocfi_generic
-      https://git.kernel.org/kees/c/39c89ee6e9c4
-[2/3] ARM: Select ARCH_USES_CFI_GENERIC_LLVM_PASS
-      https://git.kernel.org/kees/c/1ed9e6b1004f
-[3/3] libeth: xdp: Disable generic kCFI pass for libeth_xdp_tx_xmit_bulk()
-      https://git.kernel.org/kees/c/c57f5fee54df
+Similar to commit 18378b0e49d9 ("selftests/damon: Add executable
+permission to test scripts"), the script 'ethtool-features.sh' has no
+executable permission, which leads to the warning 'file
+ethtool-features.sh is not executable'.
 
-Take care,
+Old version ethtool (my ethtool version is 5.16) does not support command
+'ethtool --json -k enp1s0', which leads to the output 'ethtool: bad
+command line argument(s)'.
 
+This patch adds executable permission to script 'ethtool-features.sh', and
+check 'ethtool --json -k' support. After this patch:
+
+  TAP version 13
+  1..1
+  # timeout set to 600
+  # selftests: drivers/net/netdevsim: ethtool-features.sh
+  # SKIP: No --json -k support in ethtool
+  ok 1 selftests: drivers/net/netdevsim: ethtool-features.sh
+
+Fixes: 0189270117c3 ("selftests: netdevsim: add a test checking ethtool features")
+Signed-off-by: Wang Liang <wangliang74@huawei.com>
+---
+ .../selftests/drivers/net/netdevsim/ethtool-features.sh      | 5 +++++
+ 1 file changed, 5 insertions(+)
+ mode change 100644 => 100755 tools/testing/selftests/drivers/net/netdevsim/ethtool-features.sh
+
+diff --git a/tools/testing/selftests/drivers/net/netdevsim/ethtool-features.sh b/tools/testing/selftests/drivers/net/netdevsim/ethtool-features.sh
+old mode 100644
+new mode 100755
+index bc210dc6ad2d..f771dc6839ea
+--- a/tools/testing/selftests/drivers/net/netdevsim/ethtool-features.sh
++++ b/tools/testing/selftests/drivers/net/netdevsim/ethtool-features.sh
+@@ -7,6 +7,11 @@ NSIM_NETDEV=$(make_netdev)
+ 
+ set -o pipefail
+ 
++if ! ethtool --json -k $NSIM_NETDEV > /dev/null 2>&1; then
++	echo "SKIP: No --json -k support in ethtool"
++	exit $ksft_skip
++fi
++
+ FEATS="
+   tx-checksum-ip-generic
+   tx-scatter-gather
 -- 
-Kees Cook
+2.34.1
 
 
