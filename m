@@ -1,125 +1,127 @@
-Return-Path: <netdev+bounces-234393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5274AC1FFE7
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 13:26:02 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23E01C2001C
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 13:28:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C04A134E0FB
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 12:26:01 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9D2684EB1B5
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 12:27:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28AE93002BB;
-	Thu, 30 Oct 2025 12:25:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B57973126A3;
+	Thu, 30 Oct 2025 12:26:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CPxcQ94s"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hEA+RQhV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 675721487F6
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 12:25:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16ED42E1C64
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 12:26:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761827158; cv=none; b=A3dWmLNvUFTzFxrwzvLz0RwRWIEjsW4l8CxOCD0oGNtDM2N4363F7uNoHeL/WLU1cwkqSRhpKBC4PP1hYSA1ndB00RBQwjNARPbcOJN825G3K1qDqmTTkS7i+I5AmYmLpVLk6+YLq6203tQN2bntvMLyhIUYdsc5PCKbawK+YtM=
+	t=1761827215; cv=none; b=l+ZJWGW2T2eSpuT9XYNITnTT6gqRUuDH/Ct6cRCwXGpwjEazkb099eVUOr0unAVFSueQO1Wjedm9zLwscivPw0P61EkQvo4HLWkUvcL1sGtse9t6EIxdAtbWDKiRWrapEaFI2TV3FyjtLb9W00nG0IYbplvpgOpT3rXhZxwcfRs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761827158; c=relaxed/simple;
-	bh=WIT7iMRJ7OSZlliXRHCGuVNFqaRK0Qn3YehYj0PAXkg=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=dq9KqxH7bdAEJ7S29Gt3VVmG59PgJcmjGUW99qxEq5J3UP0XTn1uC3Yk5V6Tyv3ehp2+RgJVXvRs3dmDRrpuS6QY8g9fZ9bGCVf1obfCU5GrSJfgufvytPuHNzuyuv0XoANq4sndPwUaj1XxSPF/L8TptPEnNTsU1MdpsD6Uquo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CPxcQ94s; arc=none smtp.client-ip=209.85.128.50
+	s=arc-20240116; t=1761827215; c=relaxed/simple;
+	bh=d9/zvrjKXYg+QYrj/8LeTZG6rpOZbM+r7q2gKiYKqJo=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=q56K5bkJlKN0+/4CQtU0Gwqcs0uvIv/WSTytlbGjmKcKjNaL2i38z5A/bsNd17Kd+CdG85jqNCjQmRj35xtOMR9ZfcET3wyrHPLYHRZtB/3eVuil/4Y+Vlip9iRJLz6WTeKxcLTYxH0TVmpK1rcGsu1HUq0c3SzAxFx3KsxYs5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hEA+RQhV; arc=none smtp.client-ip=209.85.160.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-46e6a689bd0so10021975e9.1
-        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 05:25:56 -0700 (PDT)
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4ed0aef49abso10202391cf.3
+        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 05:26:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761827154; x=1762431954; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=oGeWVKiRUJ90B38LnVV+UroicCqLs8iq7lgOfzkxg3k=;
-        b=CPxcQ94suzsWC8OEXwHaT4ivDxSzL3bwRvOV1a7JMe5anAzgCPcGIZCv2JP0/t9dEs
-         HqOrDiH5zanLtbx60CrHVIqehJj9X51cyF9qv9NHooFG8A1T1ArL47+T9nMF0NPH8fyN
-         w6Ul1Sbr354CovJUnvkGFqAz7AlXT0E2edLWYLjh9dWBs/lkx6+AJOhar6z8M175qrDZ
-         ekqwHPwRwWx8eLgd9hc/F32Q5NlBm8vANc2ztGhJWDpQgJ+lCSkEDZr871ywTOO2rRVx
-         vwMQo29YB1DovetZscQroPkw+Ruvj+jhdJFmWygRCHE8uLb5URl+FlYTq2zhgUFaEpQk
-         nEGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761827154; x=1762431954;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1761827213; x=1762432013; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oGeWVKiRUJ90B38LnVV+UroicCqLs8iq7lgOfzkxg3k=;
-        b=DiXBu7U8msFBuhbtmZw6qKjHsX58zUKfyDfuuzmxGqkDqEw9ZSwzJzFJacjSKr0sVR
-         dnKZZ7zyfqjAyovl0INPF0G+EsYz58RKNhvCWU5NQS5HxTqbZ5bwXeT/0WoW6899v5aW
-         O3V8WH2SmE1KI26Sqd686+V4cOetwFPHLg0+/JhMinRg68sQlsvOM7wDmw2u5b1Or7vk
-         V8tJ7xX2hQRMEExM+/BIXtLqdPD0rs8FuyYlBr/Z/tiZbJHH2IuNb/1zOlwvs/KgQQBl
-         alRNhQkuCSjmhggI4t6G0Lwy4ILi5Fx5mj1EEbQVc1TQqT0ueh2gmanzTNLjy47mOipE
-         yX+w==
-X-Gm-Message-State: AOJu0YxbxL1JJoVC/y3MwHHvITYElLiAgM50NhBV1L0KTxespiEsVyVl
-	wyHqHyGC39u6ZWARrcJM3l1pmX0jDB9g+WuxNmKsOeQIasnZojpAqmdlx1/khdqS
-X-Gm-Gg: ASbGnctt1MEpr7nN8HVVvqUCvFOGsehkSFeQkCCgWzXjsNNqS4a2YkYn0dBnpX6CSa0
-	GbqsefRX6OpPAYKHgnkvXS4N9e+PYPxYfPva1GTN3RMtZKuLni+iHRmQplsBJ3E/qupcLW8jfS8
-	6g91Wv5GGnbCStUltyhf8/lpXikxyHGt8fjXNSyT501dxzs84YJP5WW1PIvp0PJ8xsyFL+Xuq/3
-	FHL3djmgWMvGtebVCX8BgmXCchVbgvAu3r01Fgy5ogqSYcNvKjl+kY166JJAO5ejkAwsw1qF+Sn
-	dsy+1WAVYJNvxfV//920SSRrw+rgwN2l6suDpmKfn0D3hPkTuTzL5OU5wzY+WN9w65iMulDCroO
-	5NqIIQtXsAzWoxA4odQmiTttMaWDlVGdYRkdModFa8ROCosLm5Jabp7CEvzrc+rC8ymKQ2nDay7
-	htEOP1sYVrtFxrtAC/WnJgSjE=
-X-Google-Smtp-Source: AGHT+IErZdBpTz1fHBDyJEqgwajA23XD6cRF+ZC/Od6th31hfbyZ1eqg6dJ7PKKt1YwPep+CGF3dlg==
-X-Received: by 2002:a05:600c:35c3:b0:46e:3d41:6001 with SMTP id 5b1f17b1804b1-4772684f823mr31649405e9.34.1761827154212;
-        Thu, 30 Oct 2025 05:25:54 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:3088:3c7e:2941:e648])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477289adaf8sm46592765e9.7.2025.10.30.05.25.53
+        bh=XK1leWk0uoFzx3ZfDZcnhZKJLtFjNiryXl9rvCCnzAQ=;
+        b=hEA+RQhVvaTCJNVXVSPTdZGCzPpEmBj3WG+f7SlT09yq50fbPrdveR60aidzhSyNmH
+         1p9zowtvvXi5G6boIvylTCcDYdAZHT/TWkNuvhzpn3R3F1Cj/3Nc9ax15srWSwpPZas6
+         DTyMv1hjn2FJwFlLhkDc8NDmUpV3mFhvCGFUCm0nfZQ2SoNOG1xhyd7zbR/LLNiHaRaV
+         bQnA8TE2vW0CF5sH4pMQby5A3eldEHLTo1VsLDSR/fHRgseEAWdpjTqUeCBiL5UGG+N1
+         ElDtlem11qSQr6LesPVdebPleBzc8BZMSkhqQj5+OSC038qEjhNPbYHxntSZUvLgxCoS
+         WWIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761827213; x=1762432013;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=XK1leWk0uoFzx3ZfDZcnhZKJLtFjNiryXl9rvCCnzAQ=;
+        b=BfSrs2MySoWHwmF2WHoSpXhxxq/z5izbYl1m14CDYt/Z9QsLavL9BSKwy9edtbRPPw
+         5Zvr5soSmbrQMjoljF+W+IdfrduqrnE1JW/198BdExexOrSq3z1ka8tL8yjZhMMGTnlE
+         qXUmTKnNr+eTSBXzsBsMtsQoY6wB6Xn27V4Z60aX47xVeZJvaKR09CXmdioshK4bRTbG
+         jWIQE3AKoWKKeUC5pm07jeZ+G9z3G1VTyLygs+lcOqEk1w4jw626zByvDRr70vv6aYHM
+         FiELvhl03UlDBbc/8DFDBuRuk2VeTtPvsMpiVY5JCNch1dbYfmxjowOyrGpev1DEl2bH
+         LJqg==
+X-Forwarded-Encrypted: i=1; AJvYcCXjYrjPAJXUBdMZGXR7fzvYaA6G+CURP8Ta33iZCOWyBM4atJHR+MdZyO10wMLPtj5co92FojA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPn9yJE82erPUlIz5YX8h2PmbKPcHoKnej2s2bexjhe/0Fxi7s
+	B/5TjakaEjfq5sK6fs3d43fLSMeqzk7F2aJ1KXNonKweuEOCMKu9bqAxXKBaqA==
+X-Gm-Gg: ASbGncu6zz6sXcZbe4GRdnoIn6VTq855k2FRvDKWtWEi+rqOsye5hbX/yAwchNYQHFO
+	tu1SfK+DZ5k2t6jUwGcN8XuRc6N+wAYNU/9kmgxUMSSU1JwI9EB+nTmUzrD5+F8cG7bBP7v7k8d
+	40pbFmkmZsdV5GlS1W8sVYH4w7qEMI7PxeSJYqywtsedEqBOkwL0mCjZDg2DsDo5JDlbML40StA
+	ZtYU4g09mOT4xs/aG2mSJO4E4r30C//ikz48m0DzK54g8G5HWgDkt2+Fsdh24Y1zCQShktUs1LL
+	Gg4YFNJKqSI48HDbmRZ3jvG34ke9NVO7Zd/o0X4Vo2NtuC/zCEr47AZkjM1XALA4Q0gb8SLdmGG
+	QKoW9JfivoahSd0mNj6IiRXukSiT5MHuD8IOLxvlQDJ5kYNi0IkFrTQjvHqvdaoNQSJfP8cdEq/
+	d/yqdHzH7nVUkWz/SJzQN4qO6L9Du3ulGNgVGdFrTZUsieZ2LjrmDc
+X-Google-Smtp-Source: AGHT+IE3veiBOtkriA2O+bI9hXSGvHwgX2QoH8sB+O1LcfgeWybMR21FkAqWM/FAYBGpbjpV2ybS6A==
+X-Received: by 2002:a05:622a:198c:b0:4ec:4827:f601 with SMTP id d75a77b69052e-4ed2213c2f3mr34333001cf.26.1761827212916;
+        Thu, 30 Oct 2025 05:26:52 -0700 (PDT)
+Received: from gmail.com (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
+        by smtp.gmail.com with UTF8SMTPSA id d75a77b69052e-4eba37d72ecsm114282391cf.9.2025.10.30.05.26.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Oct 2025 05:25:53 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: ynl with nftables.yaml
-In-Reply-To: <MN0PR18MB58472AF35605FF6FC96EE6DDD3FBA@MN0PR18MB5847.namprd18.prod.outlook.com>
-Date: Thu, 30 Oct 2025 12:25:17 +0000
-Message-ID: <m2o6popoeq.fsf@gmail.com>
-References: <MN0PR18MB58472AF35605FF6FC96EE6DDD3FBA@MN0PR18MB5847.namprd18.prod.outlook.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        Thu, 30 Oct 2025 05:26:51 -0700 (PDT)
+Date: Thu, 30 Oct 2025 08:26:51 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Anubhav Singh <anubhavsinggh@google.com>, 
+ netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Coco Li <lixiaoyan@google.com>, 
+ Anubhav Singh <anubhavsinggh@google.com>
+Message-ID: <willemdebruijn.kernel.1ebc537b3da9e@gmail.com>
+In-Reply-To: <20251030062818.1562228-1-anubhavsinggh@google.com>
+References: <20251030055714.1553346-1-anubhavsinggh@google.com>
+ <20251030062818.1562228-1-anubhavsinggh@google.com>
+Subject: Re: [PATCH net v2] selftests/net: fix out-of-order delivery of FIN in
+ gro:tcp test
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Ratheesh Kannoth <rkannoth@marvell.com> writes:
+Anubhav Singh wrote:
+> Due to the gro_sender sending data packets and FIN packets
+> in very quick succession, these are received almost simultaneously
+> by the gro_receiver. FIN packets are sometimes processed before the
+> data packets leading to intermittent (~1/100) test failures.
+> 
+> This change adds a delay of 100ms before sending FIN packets
+> in gro:tcp test to avoid the out-of-order delivery. The same
+> mitigation already exists for the gro:ip test.
+> 
+> Fixes: 7d1575014a63 ("selftests/net: GRO coalesce test")
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> Signed-off-by: Anubhav Singh <anubhavsinggh@google.com>
+> ---
+> Changes in v2:
+>  - Add 'Shuah Khan <shuah@kernel.org>' to the CC list.
 
-> Hi List,
->
-> When I get below error, when I execute the example command mentioned in https://lwn.net/Articles/970364/ .  
->
-> ####################
-> root@localhost:~/linux# ./tools/net/ynl/pyynl/cli.py  --spec Documentation/netlink/specs/nftables.yaml  --multi batch-begin '{"res-id": 10}'  --multi newtable '{"name": "test", "nfgen-family": 1}'  --multi newchain '{"name": "chain", "table": "test", "nfgen-family": 1}'  --multi batch-end '{"res-id": 10}'
-> Traceback (most recent call last):
->   File "/root/linux/./tools/net/ynl/pyynl/cli.py", line 163, in <module>
->     main()
->     ~~~~^^
->   File "/root/linux/./tools/net/ynl/pyynl/cli.py", line 123, in main
->     ynl = YnlFamily(spec, args.schema, args.process_unknown,
->                     recv_size=args.dbg_small_recv)
->   File "/root/linux/tools/net/ynl/pyynl/lib/ynl.py", line 468, in __init__
->     super().__init__(def_path, schema)
->     ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
->   File "/root/linux/tools/net/ynl/pyynl/lib/nlspec.py", line 462, in __init__
->     jsonschema.validate(self.yaml, schema)
->     ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
->   File "/usr/local/lib/python3.13/site-packages/jsonschema/validators.py", line 1332, in validate
->     raise error
-> jsonschema.exceptions.ValidationError: 'set id' does not match '^[0-9a-z-]+$'
->
-> Failed validating 'pattern' in schema['properties']['attribute-sets']['items']['properties']['attributes']['items']['properties']['name']:
->     {'type': 'string', 'pattern': '^[0-9a-z-]+$'}
->
-> On instance['attribute-sets'][34]['attributes'][1]['name']:
->     'set id'
+Remember to not repost within 24 hours:
 
-Yes, there is an invalid attribute name in nftables.yaml. The attribute should be
-set-id
+https://kernel.org/doc/html/latest/process/maintainer-netdev.html#tl-dr
 
