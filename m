@@ -1,144 +1,96 @@
-Return-Path: <netdev+bounces-234464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 418B0C20EDA
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 16:28:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7E72C20EDD
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 16:29:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0ACD1A63FA6
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 15:25:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AA671A65CCE
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 15:25:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73B15363370;
-	Thu, 30 Oct 2025 15:24:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B36F5363377;
+	Thu, 30 Oct 2025 15:25:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="blOdIk+Z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nPOkELgo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE222264F99
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 15:24:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AEF83126DE;
+	Thu, 30 Oct 2025 15:25:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761837879; cv=none; b=mgt9GTXyEhIHeKOfWHcFg6yonxIh/mvceTRQijIJ3D10hmw90KRMY3DavFeVYUdDkqWJQit3A5NA/VOmIvSRQlhHFohVZ6AMKuA6BKhz2T8DnnMp1m3qX8jZxRCVUgWX8oAvv49AfQtxMVdrnqDUXHARWh64P3aiofWzI/uSjL8=
+	t=1761837921; cv=none; b=GzmvyA2/je83acNonwzlXIdAu5pgPaJHqtyY0YFRch5KzGPPeURkCAZcZ9RRlCCqITaONl3My0XylaKihJXPjcwS73ncXGgPnQADZiuTk7b1530RVmaMLRdOCQT2tmjcRprJPQumQ4xLfZN3/wnCOZygUPZyJd60vjQNWDcurJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761837879; c=relaxed/simple;
-	bh=8C45GNay6861gaofOOL4oU9RBTEls5L8G9ZvIb5db98=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=gDdijgIPKXO8/WRHkxIyw7KJTpDSnzaqrVcVVNLYOvTy80gKuEfEvVavjBjBTqALRVsiPlPhL+UDj8EZjrTKvZHHhKJ3ZleD8CS2T3LML1efQ9wcVdRTHVfKg1mCirYDni9ryME3U4GmYTbmyFK8Q8dFALEfuSm5NGXYKNbEots=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=blOdIk+Z; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-429b7eecf7cso689920f8f.0
-        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 08:24:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761837876; x=1762442676; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ppRB7YyVaZda9cCc1DXsVyW0gFyW4C6mJ0qs6JyLsnM=;
-        b=blOdIk+ZwTsd0mrjX+C9+am32cuHs3v98qaW4MJ3Cz1qH9sGAQyDCg38ZmNoKlLrp6
-         Gv9BV047AcGKPJJAtrRDWZzTpmTmbTEy1dByg0Y+kbe5QtL7+vPicoC33a1qoFyWE6oW
-         yYPf+4KYzmyzo0XSoDoDiGbjyKVDe04GALtlbo/Eq/abIPok9i8Ee4Tb6Dr/5Z5f3aMt
-         8pHcMU/hcJqCfJ5pspiIF2gFMfGCydnno1HbgOwymgPlqeM5SVgXEBOSgUwe9jf2JuIP
-         M24wK/rOMl7Y0rbWtzWHtrkfoFbf1U92Yo6U2QT5moJQKZfs1OWGjTqp1RouGkUhJl33
-         sAOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761837876; x=1762442676;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ppRB7YyVaZda9cCc1DXsVyW0gFyW4C6mJ0qs6JyLsnM=;
-        b=sSmz6TmzZWUUvIxQmuh/xqVa8/4YDOrG+GwZpp8mfwBOKpIjSFSrBc5fcKm6btB0cN
-         SgOzv5XfCwgtIbcmZcaSw93et8X00ju94vCFiHC4lADx6Itj+doyCa65i4aQlETZ8lUM
-         KnUN/t3IqUiOXwrqVY1IVHQCRwIwKIOp1Ti2Arb2eVSnFM78t4NNfJqyYWy+hVWPya/J
-         iGIJasJkX4Y5tJi062xwxowHfurlWP4NdUzcjqvtT7pdkNitbH1ItvqhziUldoMSB/ax
-         ktWXyJhjTa11wNZooZJVqHhXzaMYrzsq/SatSR3pxoKAA/9l8wV36Ci6YSKAX8S3fsgQ
-         8rgw==
-X-Forwarded-Encrypted: i=1; AJvYcCWXC1Te9+L5xoiMVX2hl66lQ9JXIsnlgRhD1/e49GSAq/z5PC6BghRCZI71sG1zeJmezJ6wmJY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhR8dxZURks+2Ivl9mWmRFqIaP53j///Qwdk7JOLRCJ3rA8w3U
-	K/sZLqJiSKx+6DNeZcq8JVYJGicopO8FDDAdqmZ3+qI9/TZI9uSPnM/t
-X-Gm-Gg: ASbGnct+HpTY4aC4T0+F/oocOIfv4dA/5idVHrz7fKalQ+AI9Sk6v14M/DmhjuNSYdY
-	sHFV1CfSFT5H63ISjgPa8FrQD6E/J0k8tVfc8jCFFuAHFZJQAVK8mgeVSqP0qkqLf2Bxix8Rc2b
-	6PO9IRxfKlAQbahqzxnl26sTID0cnSsFdr7gqoLkw1gm0nA3wsDQrzb7f/N1+PyqaTq+5Xp6TvK
-	tNfHLYCREhkYfVUvmPqcFtr3BxabNIjeSqAONbpkKoesCzLlnYnbOJebNVMVkVXtWT6FYzv0Bcn
-	EyMLX85/2QcAH3sETHbxxjxbnAYdmeGIENq+LKCQz3sjiGSFvtM5J2IC9peNVqrbt5pQu29gHd2
-	iTnBoeGQpOdSOS3Og0PcxNQfDk2fajXyDevLV1GFB2JIshOvWimIVw/uqwQSqKxx6nqr/OQ8pw6
-	nsr1UQ+hicNnbRZN0qUXR9ZflW91n/rparBVgJAivolW715Yc8LNHXdkmd0KGQ4g==
-X-Google-Smtp-Source: AGHT+IGTSPHyRHnpOIOisch7G5qfAF9ch437FEwTxTCgRLNzqnQFbmm7G2y8Ecy7rIZ9KTe8hn7EZA==
-X-Received: by 2002:a05:6000:1843:b0:425:86b1:113a with SMTP id ffacd0b85a97d-429b4c68afamr3801431f8f.16.1761837875751;
-        Thu, 30 Oct 2025 08:24:35 -0700 (PDT)
-Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429bca06fa5sm362612f8f.14.2025.10.30.08.24.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Oct 2025 08:24:35 -0700 (PDT)
-Message-ID: <b0890420-6897-4ef9-a15a-8b9721ce85d0@gmail.com>
-Date: Thu, 30 Oct 2025 15:24:33 +0000
+	s=arc-20240116; t=1761837921; c=relaxed/simple;
+	bh=rVj0mmo+D/FS9xgUYHTrULZTWgmWZ6swyh8aUSSb9so=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CzBj5DkxguUFla7wlYnuORsBiGPps7EIKfpP0QQgTcnyhGx92GV5UujaSTt0BxytvkFufa4jESnrDxms5HswhBB3JqlnpbETOzgY6LKjh0MunAEyIivr8/SUnPy/4FGcHxv77NNDlwOMfRtzTxLGTei+Igs+sM158jhw73BLSi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nPOkELgo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EFA7C4CEF8;
+	Thu, 30 Oct 2025 15:25:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761837921;
+	bh=rVj0mmo+D/FS9xgUYHTrULZTWgmWZ6swyh8aUSSb9so=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nPOkELgoVBmqDLPHdmStpHtdtOc/Xqy1xONmjGiS5n1dEy5Z9lsQN+ej4b1jbO6RL
+	 3Qha8fn1SJO8Cd1FLa7BZn+96ULX3ADZcksQJkb6Y4dD56Q8kRCvNe5V3BdoHRFVBk
+	 0IhwkTGVkvMkJUvB+SCUIhrXy//JGxQZZNFPC86sC+zm8Vz71WFblqo3C0JicdKZ0f
+	 Ym4A5sAuraGYWej3NGH4wUE0Yg4prInvErugU0PioRroiD7gbuyu2F5C52J3MGLrFx
+	 eN4fgYEKo7QDIEpnSBg6/4Wx0pRp/Gfg3FjXOvxoQh5SaRXZ0rbtnNPJjoj8XCgErM
+	 /VKCieJ90/zFw==
+Date: Thu, 30 Oct 2025 08:25:19 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: <bpf@vger.kernel.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
+ <hawk@kernel.org>, <netdev@vger.kernel.org>, <magnus.karlsson@intel.com>,
+ <aleksander.lobakin@intel.com>, <ilias.apalodimas@linaro.org>,
+ <toke@redhat.com>, <lorenzo@kernel.org>,
+ <syzbot+ff145014d6b0ce64a173@syzkaller.appspotmail.com>, Ihor Solodrai
+ <ihor.solodrai@linux.dev>, Octavian Purdila <tavip@google.com>
+Subject: Re: [PATCH v5 bpf 1/2] xdp: introduce xdp_convert_skb_to_buff()
+Message-ID: <20251030082519.5db297f3@kernel.org>
+In-Reply-To: <aQNWlB5UL+rK8ZE5@boxer>
+References: <20251029221315.2694841-1-maciej.fijalkowski@intel.com>
+	<20251029221315.2694841-2-maciej.fijalkowski@intel.com>
+	<20251029165020.26b5dd90@kernel.org>
+	<aQNWlB5UL+rK8ZE5@boxer>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 7/8] io_uring/zcrx: add refcount to ifq and remove
- ifq->ctx
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-References: <20251028174639.1244592-1-dw@davidwei.uk>
- <20251028174639.1244592-8-dw@davidwei.uk>
- <810d45da-7d60-460a-a250-eacf07f3d005@gmail.com>
- <9fe0088d-f592-47c4-8b95-7c85a494cf70@gmail.com>
-Content-Language: en-US
-In-Reply-To: <9fe0088d-f592-47c4-8b95-7c85a494cf70@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 10/29/25 16:16, Pavel Begunkov wrote:
-> On 10/29/25 15:22, Pavel Begunkov wrote:
->> On 10/28/25 17:46, David Wei wrote:
-...>>>   void io_unregister_zcrx_ifqs(struct io_ring_ctx *ctx)
->>>   {
->>>       struct io_zcrx_ifq *ifq;
->>> @@ -743,7 +730,10 @@ void io_unregister_zcrx_ifqs(struct io_ring_ctx *ctx)
->>>           }
->>>           if (!ifq)
->>>               break;
->>> -        io_zcrx_ifq_free(ifq);
->>> +        if (refcount_dec_and_test(&ifq->refs)) {
->>> +            io_zcrx_scrub(ifq);
->>> +            io_zcrx_ifq_free(ifq);
->>> +        }
->>>       }
->>>       xa_destroy(&ctx->zcrx_ctxs);
->>> @@ -894,15 +884,11 @@ static int io_pp_zc_init(struct page_pool *pp)
->>>       if (ret)
->>>           return ret;
->>> -    percpu_ref_get(&ifq->ctx->refs);
->>>       return 0;
->>
->> refcount_inc();
+On Thu, 30 Oct 2025 13:14:16 +0100 Maciej Fijalkowski wrote:
+> On Wed, Oct 29, 2025 at 04:50:20PM -0700, Jakub Kicinski wrote:
+> > On Wed, 29 Oct 2025 23:13:14 +0100 Maciej Fijalkowski wrote:  
+> > > +	xdp->rxq->mem.type = skb->pp_recycle ? MEM_TYPE_PAGE_POOL :
+> > > +					       MEM_TYPE_PAGE_SHARED;  
+> > 
+> > You really need to stop sending patches before I had a chance 
+> > to reply :/ And this is wrong.  
 > 
-> Which would add another ref cycle problem, the same that IIRC
-> was solved with two step shutdown + release. I'll take a closer
-> look.
+> Why do you say so?
+> 
+> netif_receive_generic_xdp()
+> 	netif_skb_check_for_xdp()
+> 	skb_cow_data_for_xdp() failed
+> 		go through skb linearize path
+> 			returned skb data is backed by kmalloc, not page_pool,
+> 			means mem type for this particular xdp_buff has to be
+> 			MEM_TYPE_PAGE_SHARED
+> 
+> Are we on the same page now?
 
-The simplest solution is to keep the two 2 level release and
-split refcounting for sharing. It's still better as now
-shutdown can be folded into the io_uring ifq unregstration
-helper.
+No, I think I already covered this, maybe you disagreed and I missed it.
 
-https://github.com/isilence/linux.git zcrx/zcrx-sharing
-https://github.com/isilence/liburing.git zcrx/zcrx-sharing
-
-I fixed up synchronisation and drafted the export/import via
-a file part, take a look.
-
--- 
-Pavel Begunkov
-
+The mem_type set here is expected to be used only for freeing pages. 
+XDP can only free fagments (when pkt is trimmed), it cannot free the
+head from under the skb. So only fragments matter here, we can ignore
+the head.
 
