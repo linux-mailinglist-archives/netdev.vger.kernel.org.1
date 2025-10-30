@@ -1,148 +1,119 @@
-Return-Path: <netdev+bounces-234494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73CD1C21C1C
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 19:25:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F1D4C21C64
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 19:31:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 21C8834DBE7
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 18:25:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B3B8188A84E
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 18:32:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2922134AAF0;
-	Thu, 30 Oct 2025 18:25:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C748C2E62D0;
+	Thu, 30 Oct 2025 18:31:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="LcageyWg"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="nxGbq1Hs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A727238C2F;
-	Thu, 30 Oct 2025 18:25:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8561C36CA89;
+	Thu, 30 Oct 2025 18:31:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761848714; cv=none; b=cWE9fcXKqJso1r3C4WJU8SKXhd04nfnVNixO9iiEp1+ksd4jsK9w0pro6t+cto9KGjxu3Wr9w9BEvRgIgul8gbe95XZqIkDpPMMx9mLE74vbmYhunVVriIkT5pZN4uYjzX7/GLM2ilRLNKPJzvJrhSfX1OmdGZ7jNM6NZeYkOlg=
+	t=1761849090; cv=none; b=Kv21mihaKna5rCnF+OGvyI7z4v1czfVy5L696POMb5G5vnT/RwBXVGG+NdEMt19IrMh1pwtYQzd2xFXfASp+Udf8/IR8u7JTYXsvjw640nIKM/JI0Z+BwU8/lIqADUnea/hMx+9qOPeZubvK4AmKllvhBybz1CyXsJi6FAPCguw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761848714; c=relaxed/simple;
-	bh=jy5cYh95SFIAyzZsrUnBHjH8llGVA2Sbu4Bpf5WBPzw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UNkPyXe+vwSbVBz9lIhlwb9WO3w/f/qktiasLC8bqVBHPSlA3E15e3ORklnfUZPUN/9fyysHU1qtvwC9Dy8xAYV0UHc7Gon1a6NA1eU69ptvA/mt4TDZzvDRwDTKRffh42ICVAYYcB7ZW+cIrvInXiueod495Fj1UyIccC7MQdY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=LcageyWg; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 914C64E41401;
-	Thu, 30 Oct 2025 18:25:07 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 4CC2860331;
-	Thu, 30 Oct 2025 18:25:07 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3921E1180980D;
-	Thu, 30 Oct 2025 19:24:56 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1761848706; h=from:subject:date:message-id:to:cc:mime-version:
-	 content-transfer-encoding; bh=vSJU4peJj+Pvauv54hPV1/HslESIG4pVWkh58D4A9/c=;
-	b=LcageyWgxYbyW3qRtqSBLny73lhZbVIesEoOXkAHs9iHO4lt9kUO+hc8vkIVeSDm2+HfJR
-	MTQVRE4RK4fZ21SKCaahaDk6klLPcHTvysUYvkt5e+TRD037gCtRJeX66i8jEyKeoTjb/P
-	DXr0jNMudu8Wp3sONhj/2AssyTKgoSyIDhCOIewXG3CFjxIWnkNHtCSc1uvfpJuHLmSmcB
-	+9fQ2ZD1z+dqc+C6UjelZIb8UpEYFppAshc6Oy9nc6MlW942USNH/leAu8scetsDiPr32A
-	fxfOGrjcqwCnS7yDylZpacXVgzkHa/ddaRi0gyVEr8QKVm/fCphs9RnrLdsHyA==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	=?UTF-8?q?Alexis=20Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] net: stmmac: rename devlink parameter ts_coarse into phc_coarse_adj
-Date: Thu, 30 Oct 2025 19:24:53 +0100
-Message-ID: <20251030182454.182406-1-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.49.0
+	s=arc-20240116; t=1761849090; c=relaxed/simple;
+	bh=uin4RI4/pIOxXnnoD2ASnp5Z81AsKTxkLGQnh2WoqJk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=B/XQsy9R0F3k0hpybKeL4fugfCb5d2ndw/5gDbBaifMpGqbaUA1cCGSOZYDglbUpWg9KJoX6Drn/1R2A+M56ScqWeIYx1zPRg9CldE/XnyFvfcmB5kjl0zkIZzwX4RI9o+v/6egVU/RWdkRiiQGpxlHtstIm+bJeJe67xHpMvjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=nxGbq1Hs; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=XJhc0WlpDBfeauiKFBCI1q6BfUgIV5i0Qbnqf5nRY2M=; b=nxGbq1HsGT0XCYnL6qtbLHSUDz
+	VXpTWF6LDrZUQ71huQqAAGCcAITZuZrUp0vmeIlA5ax8nLbfveGpQOfatQK9Lu9OKiqj6C9uP7+x5
+	0OvzasZXh77sMLy9hVdgmhu5W9edveKZC4Ll6L79O92CWUFSBdV4ODXE2mNCToFyZnwE4fbHiVPLD
+	l/sDnYxvWp5pKz6QTYeYl2+x3WOhPOVjQvczgPz0AYaJWdg91Fh2ZtNjtmt8w0rYgOmOa1VNEh1qf
+	15fe4dyvdZH+5EPfN0/ikGq7aJfFDfYIBx54LEGyVmT/RDwb2W4G1UBdYwPR3anNoLfYvejl+fvj1
+	gmPf5qDQ==;
+Received: from [50.53.43.113] (helo=[192.168.254.34])
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vEXQj-00000004c4K-310B;
+	Thu, 30 Oct 2025 18:31:25 +0000
+Message-ID: <8a7a5d0b-792a-4fb1-92dd-89734c85458e@infradead.org>
+Date: Thu, 30 Oct 2025 11:31:25 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] Documentation: netconsole: Separate literal
+ code blocks for full and short netcat command name versions
+To: Bagas Sanjaya <bagasdotme@gmail.com>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Documentation <linux-doc@vger.kernel.org>,
+ Linux Networking <netdev@vger.kernel.org>
+Cc: Breno Leitao <leitao@debian.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>
+References: <20251030075013.40418-1-bagasdotme@gmail.com>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20251030075013.40418-1-bagasdotme@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The devlink param "ts_coarse" doesn't indicate that we get coarse
-timestamps, but rather that the PHC clock adjusments are coarse as the
-frequency won't be continuously adjusted. Adjust the devlink parameter
-name to reflect that.
 
-The Coarse terminlogy comes from the dwmac register naming, update the
-documentation to better explain what the parameter is about.
 
-With this change, the parameter can now be adjusted using:
-  devlink dev param set <dev> name phc_coarse_adj value true cmode runtime
+On 10/30/25 12:50 AM, Bagas Sanjaya wrote:
+> Both full and short (abbreviated) command name versions of netcat
+> example are combined in single literal code block due to 'or::'
+> paragraph being indented one more space than the preceding paragraph
+> (before the short version example).
+> 
+> Unindent it to separate the versions.
+> 
+> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
- Documentation/networking/devlink/stmmac.rst   | 21 +++++++++++++------
- .../net/ethernet/stmicro/stmmac/stmmac_main.c |  2 +-
- 2 files changed, 16 insertions(+), 7 deletions(-)
+Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
+Tested-by: Randy Dunlap <rdunlap@infradead.org>
 
-diff --git a/Documentation/networking/devlink/stmmac.rst b/Documentation/networking/devlink/stmmac.rst
-index e8e33d1c7baf..47e3ff10bc08 100644
---- a/Documentation/networking/devlink/stmmac.rst
-+++ b/Documentation/networking/devlink/stmmac.rst
-@@ -19,13 +19,22 @@ The ``stmmac`` driver implements the following driver-specific parameters.
-      - Type
-      - Mode
-      - Description
--   * - ``ts_coarse``
-+   * - ``phc_coarse_adj``
-      - Boolean
-      - runtime
--     - Enable the Coarse timestamping mode. In Coarse mode, the ptp clock is
--       expected to be updated through an external PPS input, but the subsecond
--       increment used for timestamping is set to 1/ptp_clock_rate. In Fine mode
--       (i.e. Coarse mode == false), the ptp clock frequency is adjusted more
--       frequently, but the subsecond increment is set to 2/ptp_clock_rate.
-+     - Enable the Coarse timestamping mode, as defined in the DWMAC TRM.
-+       A detailed explanation of this timestamping mode can be found in the
-+       Socfpga Functionnal Description [1].
-+
-+       In Coarse mode, the ptp clock is expected to be fed by a high-precision
-+       clock that is externally adjusted, and the subsecond increment used for
-+       timestamping is set to 1/ptp_clock_rate.
-+
-+       In Fine mode (i.e. Coarse mode == false), the ptp clock frequency is
-+       continuously adjusted, but the subsecond increment is set to
-+       2/ptp_clock_rate.
-+
-        Coarse mode is suitable for PTP Grand Master operation. If unsure, leave
-        the parameter to False.
-+
-+       [1] https://www.intel.com/content/www/us/en/docs/programmable/683126/21-2/functional-description-of-the-emac.html
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index ba4eeba14baa..618d1b8dc2f0 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -7446,7 +7446,7 @@ static int stmmac_dl_ts_coarse_get(struct devlink *dl, u32 id,
- }
- 
- static const struct devlink_param stmmac_devlink_params[] = {
--	DEVLINK_PARAM_DRIVER(STMMAC_DEVLINK_PARAM_ID_TS_COARSE, "ts_coarse",
-+	DEVLINK_PARAM_DRIVER(STMMAC_DEVLINK_PARAM_ID_TS_COARSE, "phc_coarse_adj",
- 			     DEVLINK_PARAM_TYPE_BOOL,
- 			     BIT(DEVLINK_PARAM_CMODE_RUNTIME),
- 			     stmmac_dl_ts_coarse_get,
+again.
+
+> ---
+> Changes since v1 [1]:
+> 
+>   - Apply proofreading suggestions on patch title and description (Randy)
+> 
+> [1]: https://lore.kernel.org/linux-doc/20251029015940.10350-1-bagasdotme@gmail.com/
+> 
+>  Documentation/networking/netconsole.rst | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/networking/netconsole.rst b/Documentation/networking/netconsole.rst
+> index 59cb9982afe60a..0816ce64dcfd68 100644
+> --- a/Documentation/networking/netconsole.rst
+> +++ b/Documentation/networking/netconsole.rst
+> @@ -91,7 +91,7 @@ for example:
+>  
+>  	nc -u -l -p <port>' / 'nc -u -l <port>
+>  
+> -    or::
+> +   or::
+>  
+>  	netcat -u -l -p <port>' / 'netcat -u -l <port>
+>  
+> 
+> base-commit: 1bae0fd90077875b6c9c853245189032cbf019f7
+
 -- 
-2.49.0
-
+~Randy
 
