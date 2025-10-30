@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-234319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E9D3C1F565
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 10:39:22 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3DEEC1F56F
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 10:39:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D09E31890493
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 09:39:02 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 19CBF4EA022
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 09:39:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37632345754;
-	Thu, 30 Oct 2025 09:37:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FAF2347BB1;
+	Thu, 30 Oct 2025 09:38:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="QDbMxw4/"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="RfV63aZ9"
 X-Original-To: netdev@vger.kernel.org
-Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013057.outbound.protection.outlook.com [40.107.162.57])
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11011038.outbound.protection.outlook.com [52.101.65.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5D15340D81;
-	Thu, 30 Oct 2025 09:37:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.57
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8875C346E42;
+	Thu, 30 Oct 2025 09:38:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.38
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761817076; cv=fail; b=qYzHsfF9TYu5VS0T6HV62rqPuO+bDH3HxcmKX7QllqbYUZAK0d8Mk95sZjZScbgrw99FJOFD8x1nj67DKgTaIkjjFnyxz4HNvEaDQa2evKB0SkBzOcNOBaw09B9k+GgpDoq2rcF4lRmEUSvcUaKHUbtPmKGAZYaZvG3bn2eO/nk=
+	t=1761817082; cv=fail; b=OHcHGCzPOmvZ4aQ6jbw/NrD7v8UNYx81Md/jj3MeljJ30Xw9QhlJfvMkiKr4JMezkpciwFVIazCC9AzbDWmBttUZx6N8dY+7WsaPPGTK5JR+bwIy85i2FOMd/HKr58frFcy1hxbSTZicv4KCpxvaAlXSovrNZzJ226IBULtycQU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761817076; c=relaxed/simple;
-	bh=9f+owVOJB+fuu4/UJ23d7SrKdOjiONXau6Rr4/NSQM0=;
+	s=arc-20240116; t=1761817082; c=relaxed/simple;
+	bh=sWt86e1ST4/2vw+V3UGZTwzz9X6Uj6EY+dkiZelR08I=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Bxtsgxwarh9t0Pjg5cFVvRZmlvoGODkA7fIROfxdHtFO+D6Y8um4LOj8e2EWrVySDnKMMJv5LY1dc+A/NQAGo3wMyspwC0W5s4q/bSFmsVUKoi7Ng1lbDjSBbTfV9j+emnwL0eKIkv5BIlm15shv52mQvsyP+Xcz+60MbSkbju8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=QDbMxw4/; arc=fail smtp.client-ip=40.107.162.57
+	 Content-Type:MIME-Version; b=V+hhEj7+tMa7Sm4Tv1AeWetDedIsm0ZFK3FZZLnyLmnuivL8g/QHnURX7OLymX1C2x5Me21ZVGs+Z5L4l5+3+QYjoEUomgzrdLhy3o7KfcyoofF5o0n2XtgalzyvTOsGsoae5T11aILy+ay2ep27ivXFI5MXYZ1PpoNtZrMk43A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=RfV63aZ9; arc=fail smtp.client-ip=52.101.65.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QV7I1hY2TnJASe/19Myt9LlDj+roKyjLMnCkMIIYFcf080AWKCnwHp7dxDSKfxzZw/1Sv7j8pl9erwA/MHHujNonoYLBCIUobN5tQlDAvALrPUktEDqtrwiWmVZntMS1Dnxp7IEufIwVqurILwSAmZYcVeupYhlk2iaf2S7eZLcEv80LkgU3KkB2hSkbl4CCVrvfcsYuSAVHt7/BkeOaPTi0zB6dpKjETtvrw8lIvUXCCuer3XQTut3DbSDb5iC6zzvnhurPymLMbcg9jM8VAnYXRZt4sraztYp1EUz47Xlw36fRonalX1ndVTxyNBifOqqapI42WLTv8eONPtX4GA==
+ b=t/Y7wQIKHB2gq2BWMhBnSoQS3+JIUXE1z7kR4Lhi96W9SmLm22twOXxvrl/3ujs6v+/J9zG+8Q7aKa3koQdfiisH+HzwctEJiVKzP+s4V7jqM9cF68JQTE8bqFlYk1oqbQw3+1jo1bKWer4vnPha/yz5AESW9PWt2+h1J/BWrzns+Pd6/+0Nk4V0nNjLKG5KVFZVpfhKueXw3UuXMWXOubiqRlW2BxO7+9x8AiyrGzlvoIhxL/tNN2oOzPRcfCWFdBD2b/HG8cWs6sFNy6PbtOxmE18eMdEspJ2mEtXGLKNEQd7OxpoRHAdDvX8uGmzCtnUD3j5SZxb4szx9EyAnnA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bgdYLHV8Mr87VwiQks1SY2FXK8Wf9A3pCie1pIrMKRU=;
- b=WvvJXNsjh2LQqdacuuqoEIaMNLceLH2XtPJ2kWwxq7Ofw5KyJPnaJHQxefZ52mSShJDoNm7U9PGgfPo+adMzOntkYWNbyyuuUSZq9tOBLbyboF3rYq0wFsYtTAZSzhCdawzKWhhsWRaHDd+8sL+aZosmlipslUBy0UnkGUtciJ+XKMb2EDdZL+CD74FXuB6ms/J4+RU88Zec8SS4ytxDVRYZYSIPpGkKyxWOQIIa6RiEbQNVOTTtCTiFn2NFahUCJIRx7K8r9uLueQnT80fy8ydB3vMLd3lTfUuMGPSFcxsNGfrvkLT85RPvLD/lPVOJJESMCwkK/JEpA4RMcOwuPg==
+ bh=BwFOiK3ouMKDF4kJtJ+QcmT/4d8UpatWOdCZFOfzJKE=;
+ b=y5T7N/JHSM1AdOtgyw3vjwxWX4tKM9t7Xp++Un81iFcsVPdA9q0e5Vgk+j1QST3UaMF9gy3vEkDwo2U+KS/Y+7gSmL/D/h2l88eyUz0BTbZt2WoUpSr53E/EaA+YTgU1gu+GrbH0YIIoV5AbOfEtU07N7ZZTmOKszqPYuDdce0ZJ0OyKvBXN3OtvEvPd/eeItH+D8OtMFWUuuP7Rf6YEBNNVq8YJiAqLtEYbBuXkDNkKRr6Ad44AZxHCAPxaYBGIJ57GXpTWTqfSU5K/dX8oAfkMhLom5i12DtZ3NesCIKnlSWjjgw6aVs77L0CI82ryk4+IxGX5AvR5G/HEgt+3wA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bgdYLHV8Mr87VwiQks1SY2FXK8Wf9A3pCie1pIrMKRU=;
- b=QDbMxw4/bm50ISx7iPpPcqmGnbwz+iDaYP2X8fNE38v8hUsT9NzERkSfTqMAhIAhERi7pzJDsNCEAjEQ42RwdyglzdYx2jpvIHSlplk6yfNEXEqAds2z4zep7A87+NtlK33oTIEZlwaU1gEnfS1H46AYyKg52yzJpFVyqNfuCV3qebb2jVUQlWW0V/irgyz2rTeRk+Weoc+fk1kgD/kHGJaRQAs0nkuO5mLWfqNgbAfBgTAcWbJHKHUqutw+H58zkvPNWzVL746XSi+SadSlzg9oC85bSjnpWYLYsFAdmFQW3Uw27FLt4BBfddybGLgLtg5PUsXuYlM/siHf7Sl1zw==
+ bh=BwFOiK3ouMKDF4kJtJ+QcmT/4d8UpatWOdCZFOfzJKE=;
+ b=RfV63aZ9hmo9oxNgJFNrUH9dMefw84tB+dJjLQ0rf7ASkWXrE0PFAN/792yAopnf6rhhrlESh5s/n3OI7bjoULit9WlF/2zVgQ154uG15xOeJOsfeKQJcO5B5fPCpUtm4tgpSh4e8Wfh3XGYphaZmgrMHsrclY3CifNlQ2WUhp+RXPsGhpnB+4sfCwEHgIppe3IHtrx7wHamcP+BanYosgtpY/X7c87mXp7JDOSuBGBszLrU5hx3mUyHSt7CWPCRbqtWKgaIyZqjCeasz2EPl5Zs7cBu+L/f5CJXAPKPMufYCIWoSwxmYGmRTaTgXAZVp0zgCPhS/AhaAHs7zYcQKQ==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by PA4PR04MB7950.eurprd04.prod.outlook.com (2603:10a6:102:c6::9) with
+ by DB9PR04MB9356.eurprd04.prod.outlook.com (2603:10a6:10:36a::9) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.13; Thu, 30 Oct
- 2025 09:37:51 +0000
+ 2025 09:37:57 +0000
 Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
  ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
  ([fe80::a7c2:e2fa:8e04:40db%4]) with mapi id 15.20.9275.013; Thu, 30 Oct 2025
- 09:37:51 +0000
+ 09:37:57 +0000
 From: Wei Fang <wei.fang@nxp.com>
 To: claudiu.manoil@nxp.com,
 	vladimir.oltean@nxp.com,
@@ -69,9 +69,9 @@ Cc: aziz.sellami@nxp.com,
 	imx@lists.linux.dev,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 2/3] net: enetc: set external MDIO PHY address for i.MX94 ENETC
-Date: Thu, 30 Oct 2025 17:15:37 +0800
-Message-Id: <20251030091538.581541-3-wei.fang@nxp.com>
+Subject: [PATCH net-next 3/3] net: enetc: add port MDIO support for ENETC v4
+Date: Thu, 30 Oct 2025 17:15:38 +0800
+Message-Id: <20251030091538.581541-4-wei.fang@nxp.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251030091538.581541-1-wei.fang@nxp.com>
 References: <20251030091538.581541-1-wei.fang@nxp.com>
@@ -87,206 +87,156 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB8510:EE_|PA4PR04MB7950:EE_
-X-MS-Office365-Filtering-Correlation-Id: 77c5b24b-5fa7-4e57-3660-08de1797fe89
+X-MS-TrafficTypeDiagnostic: PAXPR04MB8510:EE_|DB9PR04MB9356:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2d6491b6-6712-4957-3459-08de1798011e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|52116014|376014|1800799024|366016|19092799006|38350700014;
+	BCL:0;ARA:13230040|1800799024|52116014|366016|19092799006|376014|38350700014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?bhNIro7s0lc6iEYaoerRQSL2B4IWGv6QO3tLM5z47qk3mpvdTkrN2vjRvFl6?=
- =?us-ascii?Q?IF7Usc2Lt1sh30uYUY2YDLv0t2tOnQzHBSLlr4lr6pKxFaD7vSPn34B05M/U?=
- =?us-ascii?Q?IjDIZ6D+uC9UPOA4nszoIO2jmDTPUa6Xpw7tBn8HOHoqAoJBee9YrK0eXqMD?=
- =?us-ascii?Q?pBkOFJH7PiklILh9lhbnDNru6axYLDo8zU1B+NgugpgNja9UqEuQNhoml4S2?=
- =?us-ascii?Q?47d7iUvSA4YN9xO+EGZgaHoJQk9Gvpc80ylTu1BniNgbM80e0mDxrbsr9WnM?=
- =?us-ascii?Q?LI+WsLc/+mD7EJelxOHB6d6QukCAkYDOEr07dKjdoNHuWU6+pLXTgaLmP+95?=
- =?us-ascii?Q?CwaTC9WB6VtloE70k1G5PcuX/vt1R/8j3V2Bv/IDAGv2J/hwyeeiIsF7H5lM?=
- =?us-ascii?Q?kQ0ut3yoGdyPtfb2UOMHwcbb9Awg6QMcISoTkDdGZDmEG0+LNhIdYiYUTj7e?=
- =?us-ascii?Q?ZMrSYVZL45XlqxMgHxncP2hITb6jv2cM7tmtDs42ui3p8u78EA/CKFRqy3cP?=
- =?us-ascii?Q?e/cdiqdSI3hyUcUn2R0BFlelgJoyM7xa9IHXnjDL5pJNE6BMKHcHgW3WLovP?=
- =?us-ascii?Q?xCz8riOgrbvEtYOS8FxGTl7+TzycSLkHNnVifio/wwTP6V8vfHndDPqPvcPK?=
- =?us-ascii?Q?lkuFbSxP+do5CxryQXj1WnWt4sd/2mEUzUuCkxqVjB8jbGeHWKmlVK4XZYeZ?=
- =?us-ascii?Q?svuk1E1PG6bTgxkGOCgGUDW4lD+zRbKtMI7IzYHs7XcWA65VtOZ96/3Vj1NN?=
- =?us-ascii?Q?M8x1C+dDrxLhNrf9kZiD9aiLS2NWzlIUEYLzKDvt8QkjphulHN0RN/YGhfs5?=
- =?us-ascii?Q?u6yMJe9Sk2tdIMfUMWi+rydYemhr0Vp57Xv3h8Ysc3GjfnF7YHGG8m7PoVnm?=
- =?us-ascii?Q?2DAe1f0id9AIcKCTUCtxxuF5f308Zbf2CKWsoAIoH/51iIEY+91mSg33SGKg?=
- =?us-ascii?Q?+MzoOlmFlF6Ei6K9sgOgR0PSBxvROAXyuf+V9t85zwzG6DkI8xkJeGyNbrLy?=
- =?us-ascii?Q?m9qCFoMrN7K4MmR1go2Fo6VbIR46+j1tR8uvLwNusZI68GKY4o123Zw/zaDA?=
- =?us-ascii?Q?fZqu7jRogAl8CfXyQob6ZMtep22CqjrNd0AbBYVQkzrqKCVNr1LQQpB6LoLn?=
- =?us-ascii?Q?/x9p4jmtpp5IbgwJAPTmoRluAsYtX4Blu0F/KrditFBuQVxNtHbmQZkwxaA6?=
- =?us-ascii?Q?dS95fZiFh9JObKBcVE8jwAiFC4r/922iSB5Rj2nQeHvmeMGWG+tBXCWQOX/I?=
- =?us-ascii?Q?nVRLS/5NJIgzQPYZe43nxEeW8DKpV6yrATpz3xbn0m6nlzwiVoqNXSurvjPd?=
- =?us-ascii?Q?HogFAhjhgGMT0E40kr3ievCItOV9pfLZUUO62pYBly2FhbgCiGysF0apPHIM?=
- =?us-ascii?Q?WZquLjHjTbEmb5mVA8G+wYEitAsuzzMtN3CvpOQ36ic7aJPyv2by1FmtoF1R?=
- =?us-ascii?Q?Pkxer33ZTF5/S3fNttiyAq4yQtHXKfFr7LPU12gHwm3v79UUOvn6tCV2E9Z5?=
- =?us-ascii?Q?e+8eBYcS/k6KJG0dIOv1NrZJReswBHKWyQH2?=
+	=?us-ascii?Q?3Vve1VGedUmNuVGtetQt6nveoAyebL3/ywXAoiSymsJMVu6A5c04tpsy2QYD?=
+ =?us-ascii?Q?w4R1ZrHCpHAZmM6x6LHWI5/NYm6/FC24auK+IC9lSfmMr6rUM9uAHgSNASki?=
+ =?us-ascii?Q?7ALr137snKfd+g2JwQztrx4sQE15+5F61DgZiaDVsMgIeX3SV02JGCjXTMuG?=
+ =?us-ascii?Q?YTGNOTV5Hsi2ST9DxgisCGgHi1M8qeEYJ5sXwt3BUJrIvmHslwJYSgGrPrXk?=
+ =?us-ascii?Q?npCF6lc2a0BtGFlQcwPftI7tEZgJVz2iO5CPEvSR3j8687xxwcOAdY3RKsI8?=
+ =?us-ascii?Q?QtWxI1rxlrTCo1gUimdjxLRoKymQ2s/9D7K1Qgruu8RW3hZAUpfKxUx0vZk+?=
+ =?us-ascii?Q?8IU9xnbtcqsoPCSsyBQqOr1D6CQuAPljlMmH38Fznwl8TNWXlWy8LSBdsEcL?=
+ =?us-ascii?Q?NAd1e36DCaY2q9RUCNDOzs9HQbe0vn6mx2Uv7sDnqGU8fAmZK5vWS4ClbwV5?=
+ =?us-ascii?Q?kOpp4jQJjxMNWZ8ISHzptYKshkQRR+NI+T2iy4XlkMP+kDzY7VASnKA7HdRa?=
+ =?us-ascii?Q?nkWlszDCerindlEIbtboX+KxhQDM+d302l0yDmtwpk5TE6KTXfkMwuWQDQlA?=
+ =?us-ascii?Q?ahilyKiVePaHRDui5YpLl89+NQHeMR/KEomNt1Q84Rjwg84uEV/2rCmrMSFB?=
+ =?us-ascii?Q?UNRqPdZXYfBdgb+YHhItf2yfH0LQNcKy4PQo0It7KoobbZmUcKQkitpnmyFJ?=
+ =?us-ascii?Q?iEhtpk/f/1d4seDRFQQ2QfwYo/UvnSLvyayIGix7rNxC5Sk8oiNtJJhCjk2H?=
+ =?us-ascii?Q?6c81unfMtl2m6+VDouGhoSSAxTivgMdZfVgSq3jQWJSft1khzqgZSWms8cFH?=
+ =?us-ascii?Q?9quaQDQOD3B1COQ5N+h5CIifAIA3dQa9PG+qHkDkpaQ9MVO/pJZsbe6192g0?=
+ =?us-ascii?Q?5dGJ/ExvXLQqOHFCW/SgnV2Z1qfhi2K5f29VDdrzXGy8kwMxIWKmyoXJOpOj?=
+ =?us-ascii?Q?9DFW3NnQqVwDfO0Bxe3ceyuIvAmnQawODyiM5oMke7T1pFWHhyGKR/gLG7ue?=
+ =?us-ascii?Q?pMv3Sr1X6FUHikw1A6prvOGMcCML3NiHXu/oz//OlKY5yXsIwIsadTzlJroe?=
+ =?us-ascii?Q?6qzRCphj/d1euRLF8UQAsxY1vrkphWx4wpfaCNZgkmiLiRM/JpBFcvzePmbq?=
+ =?us-ascii?Q?wYUsNA/YttJMVe6MDqnKiGbfqOH/PQBBMwlhU3oOmQBVnrw3Kv4dmEIuZ45z?=
+ =?us-ascii?Q?/kHJbZb7FmRi6S3s4rXiomscn1kRut497xtiVx17PLuu1u58UTVt6TFmu9Xe?=
+ =?us-ascii?Q?C+nl0veYcwlrPYE6IqGMORI1xTAVWoHqdLl7MpVMfYHfs4Rw1kjIN4/3u+Ps?=
+ =?us-ascii?Q?Bq6SQL2xoG/bi5pLcGMnDEwowWqMTX6mgBuSm3bRe1su5HKY9HKlMWt0iK3h?=
+ =?us-ascii?Q?3zCWk+jdNJxhd+lCLnb1le0cehQ/JM3gs9ObL8JtjTYicePGbZ9ErO7b8bjc?=
+ =?us-ascii?Q?E9QLWqT8NJLtpqCTZiYutrmcfISB8r8fJ8/jWy1mz+buTfZCWcKnWx7LitAo?=
+ =?us-ascii?Q?g1T00SqVMZo8HFs/aHzK/CPsHQQLuxTmbYRY?=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(376014)(1800799024)(366016)(19092799006)(38350700014);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(52116014)(366016)(19092799006)(376014)(38350700014);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?EhDFm5iYSfAzZ9vg6la5X3NVm8P+DWS6Z6C+W8Umefp5+S7Aw7dACXod3u3j?=
- =?us-ascii?Q?0iyHvj8Wy1woc6RDVHVktzRUfZJjqI6QW6WSU6DJF9kLNxvF23JrHivaRLFI?=
- =?us-ascii?Q?wOqw5xXF1Tp07TrQ9E+qk1pE/fiuPyuny4QCDJo/PCW85QILpNF8eOiZvyuW?=
- =?us-ascii?Q?ZIQMm5h3HLhSp4bHeYgmA4J+PVNEk30UtapUXZautD9r02eqhVxjeWJZG1Wm?=
- =?us-ascii?Q?LonfdXKmmDnwfXt1Zb20IY+dZbFEYtCiMGKxEoafNUjK/hA/R7Y2Ld7fi8h5?=
- =?us-ascii?Q?GcUTf2iGpplPx6uZtIX27xx612fpKaoWR/AMu4f4Rsy4ts++crc+KJlLB0oX?=
- =?us-ascii?Q?cp2Xz7dEmoVMXpmw6bO+ZIlWNPuvHT9hpO0roGSGbk4Vd1PkibNm7lUMTTbf?=
- =?us-ascii?Q?K5JyUlvp4emyMmPwDeTev8GiFNgGbslCF4mtLxlwU3Ql8Py8Tw5sVU2+LSEm?=
- =?us-ascii?Q?fLoyrV+UR24z39fwx9QXogG4llq2W7FM1eeg3tcN+LbSBi53gR25mdS/E0uT?=
- =?us-ascii?Q?ovmeLjBs8+jbbQ2sWy0QkccVGA20+j2gkVX168EAetfNzdQbMyPgrlblM/k4?=
- =?us-ascii?Q?sLxttH2dGkE60AJAe5FTMHFoJMsVrWPJ1d9d41tvhPYMCtMRTCDrYlMhVeyu?=
- =?us-ascii?Q?hWPTfbOkN0Zle5BuVnzIj6tTeQRv2ZkInORHVgzwT/y84nSoVxR20o7YZKsp?=
- =?us-ascii?Q?jmgE210Rl4zJUgAVS4EccOSVDSQ38MKGs8zLDsUdlacPydxapO2EtSCISC/G?=
- =?us-ascii?Q?kMGNQQDAVy4EubYxI4WeODmg6Xh9KbeKXfpJV5uEaOl+e7/h9KinryNNczfk?=
- =?us-ascii?Q?tsy/ALxmih4guDjGsqu3ThrK1HjGTuJFI5vaNMwWQRLiJZMzEiAt7h7jZDqh?=
- =?us-ascii?Q?ZZsGM+B/T79ysAh9dKQf3YqFRRfkZ66pH7fIH4zLDV9Z8xHi1bz1WHNEWqeW?=
- =?us-ascii?Q?YJRUQkK8IP+VE3WobdG329f/OrZPajCIdUcImWlMoISRAbKB6Iw0KqGseQOa?=
- =?us-ascii?Q?w/AJRSBfcRU/DzN4BR6dz2+cyMrTfnttYtlSdhPq2aLUuCnb6A5SvZFRn1qd?=
- =?us-ascii?Q?cwmgLH5rnZRrsLfdLoTnKjT1vPDx8NU2WTHAE/WMzNbGBSiJuEMMCNwaWEEi?=
- =?us-ascii?Q?NUJhkYwj4AnAmh9OeagKr71s0WDSF0ouEjltDRxDDZ6mFRFoQ5CEIYxrIm+U?=
- =?us-ascii?Q?qYYu9sq3uYlivKVWA5jrAPWf/oTyhtpM01MnpGfTHX8dvMZKZ6vfNi4ITkPG?=
- =?us-ascii?Q?KR1C2hMdk1tPBPf0Ib06ySEVZaTw14QaIWwKKzpG6ojfmNy6uL3mEzuFlbGR?=
- =?us-ascii?Q?UJA/LywwJAq9plYLh8J3FRIFPkMUfQg7xdmWKmJxTj+6XrJZ6GI1wAqWdNcG?=
- =?us-ascii?Q?0dURXXJmHcIPu2MhMO7j3Vlqj+XVEj/EVbMiWlTezuboM/1H8/jGYYK4tXLw?=
- =?us-ascii?Q?/KksSpWgayiU7+mQqbFOuuLmYeRiNzf6BfI9NXkxMHIo6CTtOe+izZ3T9Rfe?=
- =?us-ascii?Q?/I+ruooer4L1BKGZ60wLtQAUOK9CUbfFw2RJXehgUf40GGgg1CcmP6AvSj60?=
- =?us-ascii?Q?vgaqdppcpTPrEx4uwPx1Gf4mImLLc2Hd90FjSDUZ?=
+	=?us-ascii?Q?Rt/NvgyhPCvNlKIScOTNKHdCe68aNriBHFTtPmBGkR3MEFfnJlH4ZPe0bb/j?=
+ =?us-ascii?Q?dDWU3cGVm+hwX/tmyCbESAp8//iqK1ydF/0iwnOAihj8vfqgU0SQo0kZypTf?=
+ =?us-ascii?Q?rYsHyajByHQlJIc0/HYPtQzLL+SGmh32QoYfiM9BJHOPUqm8ZlWe9+YXc4ki?=
+ =?us-ascii?Q?/gjHu+k6K/Vw6oWk3F8RMzAXLxbJSamN0+YDDFuYpj3WfuPdyOekGsf+OLxn?=
+ =?us-ascii?Q?dFT5wsthqDqGcMTUKNdE4Od6HnsaQbfIpyu/Q+FAG3Cyw40G+RNKlABUQUWx?=
+ =?us-ascii?Q?bM3h6N8vYpuRrVAmEf0zyz/Es7pt6sATw15lS8dAKgRoERYIT5CY6lMLQxit?=
+ =?us-ascii?Q?KDHug8LxrGUOKU1/2b+aQ/G0lyWnAsKWklwxqMTub0DgxgGBes5VUoD+5xvT?=
+ =?us-ascii?Q?GbfhcKQgvAJYAy1Fa1ob7lnK8Min/Emu4wPC6cpuqSnjyFT2rUlhLbzKsVwR?=
+ =?us-ascii?Q?io+y+i59RcAg8o5Thw0eRskJLI8MgUYOUMxkAjM372GfXz1KX7XzVJW+cCP6?=
+ =?us-ascii?Q?SRVLcQfFAcKDdO4WQKTB5Pznd5kfz1pyL+mCcugENlCfy4JJgdJSUcjsNOkw?=
+ =?us-ascii?Q?DttCTu0SE6XoFrpi34ywiqGjImAbhCcvRNpaOdP7foEh8DMqQxc/HunXWJLm?=
+ =?us-ascii?Q?fWgR3ZpPhYa8cmOkAASHKCHZrlcAYKT7zO5U5P6wI6Fy4eMali79OzAVNDKj?=
+ =?us-ascii?Q?ryyxbKZY+KQXbbPGSJ4dG9EQKiXpXo6qYuphqCRz0mLhK1FImpc+/JGYA46L?=
+ =?us-ascii?Q?NrwMEFI692/4291CDp8u2HGd1tzYlOb4dY72BSKzocSEZH5lh2pYTTYK6hjr?=
+ =?us-ascii?Q?g5AsOdvb0Q3XT5jvNwymDozM6a0UK0bRUmLHDsYPb+JIzL14u730YQ4+7rzk?=
+ =?us-ascii?Q?yabc4N1MybRf7uVoEW+zF8eqHFhi71O6nYOPIVt4utjG2bBt4SjS3Z789T+8?=
+ =?us-ascii?Q?O2IjYqgPRKFjci1kvJp8OUAEsINjX017Ziu3LLdme7ob76GELsSWyBZVNK6n?=
+ =?us-ascii?Q?9ctz+g2ROlcXQdyj6zsi5bheO+iuq20cgqMLVwub9nDlosmXR4cLXwC/XCqK?=
+ =?us-ascii?Q?ClpncBMkRgxRtuRg5z5jV2yc3Yr4UHwNkyibNBOikh6C1rphrT5EnezdmCc+?=
+ =?us-ascii?Q?pSBvg3w8h5u6LvaW4ZsFaHUnG88KP90SbLoWjpat2NuyVGybELiAOUYhWVgE?=
+ =?us-ascii?Q?uaMYyId2C7TbTsxWZkpVHPDKVrXDlnPHmTL6yNA84Ac96vQW2H8Oh3+rKbXa?=
+ =?us-ascii?Q?Msfz7n+92lxD7YUxud0jQfpsH01g4heLJbu/0/O4t7udJiQYhSu8wLm617/b?=
+ =?us-ascii?Q?g5XX6tBcJbKeo+2hCnbKfg0XrXgsx7P2bml6AhAfpC8yQ2srY1i1jApYKxJQ?=
+ =?us-ascii?Q?4ywntKyGgQ7NG4cmElv4SEKxMIKkSLPrGjt5dhUN3+Z0KJ0YU2NfIOeB3sKo?=
+ =?us-ascii?Q?03rRtffcMZ/Ue2HeO3L4i/K0aVuAQzQk+KfMGrmFAFtDCycdEH6nL0/MMwr5?=
+ =?us-ascii?Q?+pn7dY5WyN9vqkWmLSd6boWtU0CBkvMZVUyHySpwEKIm0sTPEi27v/MA+JrQ?=
+ =?us-ascii?Q?Hfpr/Ya6Dq/Re11eU04MTzMPoEmjJioHates3WKL?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 77c5b24b-5fa7-4e57-3660-08de1797fe89
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2d6491b6-6712-4957-3459-08de1798011e
 X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2025 09:37:51.3841
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2025 09:37:57.2076
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: tLfYQZPMw4fJJ2D/mjEzdo3K1tyQBRLh+VCOEQFvHpij29sYNtQ+osR/DD8j10ls56fQVIgvBEC34hB7wDXpjw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4PR04MB7950
+X-MS-Exchange-CrossTenant-UserPrincipalName: XyLcNxmE4msarAIeNGlYxWxP16hkKpwwMVH8OsdMvhiHrPSQ0KL7UGg8R2G+qSR4fOQdVL4NITp6gtWrfTRHfw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB9356
 
-LaBCR[MDIO_PHYAD_PRTAD] indicates link external MDIO PHY's address for
-clause 22 and external MDIO port address for clause 45. Each ENETC port
-or switch port has a corresponding LaBCR register. Once this field is
-configured with the correct PHY address, the switch port or ENETC port
-can use its own a set of MDIO registers to access and control its
-external PHY. Currently, this patch only configures the PHY address for
-ENETCs, because the switch support is not added yet.
+The NETC IP provides two ways for ENETC to access the external PHY, one
+is the external MDIO interface is controlled by EMDIO module, and EMDIO
+provides a way for different ENETCs to share a set of MDIO signals to
+access their PHYs. And this EMDIO support has been added in the commit
+a52201fb9caa ("net: enetc: add i.MX95 EMDIO support"). The other way
+is that each ENETC has its set of MDIO registers to access and control
+its PHY.
+
+In addition, each ENETC has one internal MDIO interface for managing
+on-die PHY (PCS). So add port internal and external MDIO support for
+ENETC v4.
 
 Signed-off-by: Wei Fang <wei.fang@nxp.com>
 ---
- .../ethernet/freescale/enetc/netc_blk_ctrl.c  | 74 ++++++++++++++++---
- 1 file changed, 64 insertions(+), 10 deletions(-)
+ drivers/net/ethernet/freescale/enetc/enetc4_hw.h   |  6 ++++++
+ .../net/ethernet/freescale/enetc/enetc_pf_common.c | 14 ++++++++++++--
+ 2 files changed, 18 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/freescale/enetc/netc_blk_ctrl.c b/drivers/net/ethernet/freescale/enetc/netc_blk_ctrl.c
-index 1d499276465f..4617cbc70f5a 100644
---- a/drivers/net/ethernet/freescale/enetc/netc_blk_ctrl.c
-+++ b/drivers/net/ethernet/freescale/enetc/netc_blk_ctrl.c
-@@ -325,13 +325,29 @@ static int netc_unlock_ierb_with_warm_reset(struct netc_blk_ctrl *priv)
- 				 1000, 100000, true, priv->prb, PRB_NETCRR);
- }
+diff --git a/drivers/net/ethernet/freescale/enetc/enetc4_hw.h b/drivers/net/ethernet/freescale/enetc/enetc4_hw.h
+index ebea4298791c..3ed0f7a02767 100644
+--- a/drivers/net/ethernet/freescale/enetc/enetc4_hw.h
++++ b/drivers/net/ethernet/freescale/enetc/enetc4_hw.h
+@@ -170,6 +170,9 @@
+ /* Port MAC 0/1 Maximum Frame Length Register */
+ #define ENETC4_PM_MAXFRM(mac)		(0x5014 + (mac) * 0x400)
  
-+static int netc_get_phy_addr(struct device_node *np)
-+{
-+	struct device_node *phy_node;
-+	u32 addr;
-+	int err;
++/* Port internal MDIO base address, use to access PCS */
++#define ENETC4_PM_IMDIO_BASE		0x5030
 +
-+	phy_node = of_parse_phandle(np, "phy-handle", 0);
-+	if (!phy_node)
-+		return 0;
-+
-+	err = of_property_read_u32(phy_node, "reg", &addr);
-+	of_node_put(phy_node);
-+	if (err)
-+		return err;
-+
-+	return addr;
-+}
-+
- static int imx95_enetc_mdio_phyaddr_config(struct platform_device *pdev)
- {
- 	struct netc_blk_ctrl *priv = platform_get_drvdata(pdev);
- 	struct device_node *np = pdev->dev.of_node;
--	struct device_node *phy_node;
--	int bus_devfn, err;
--	u32 addr;
-+	int bus_devfn, addr;
+ /* Port MAC 0/1 Pause Quanta Register */
+ #define ENETC4_PM_PAUSE_QUANTA(mac)	(0x5054 + (mac) * 0x400)
  
- 	/* Update the port EMDIO PHY address through parsing phy properties.
- 	 * This is needed when using the port EMDIO but it's harmless when
-@@ -346,14 +362,15 @@ static int imx95_enetc_mdio_phyaddr_config(struct platform_device *pdev)
- 			if (bus_devfn < 0)
- 				return bus_devfn;
+@@ -198,6 +201,9 @@
+ #define   SSP_1G			2
+ #define  PM_IF_MODE_ENA			BIT(15)
  
--			phy_node = of_parse_phandle(gchild, "phy-handle", 0);
--			if (!phy_node)
--				continue;
-+			addr = netc_get_phy_addr(gchild);
-+			if (addr < 0)
-+				return addr;
++/* Port external MDIO Base address, use to access off-chip PHY */
++#define ENETC4_EMDIO_BASE		0x5c00
++
+ /**********************ENETC Pseudo MAC port registers************************/
+ /* Port pseudo MAC receive octets counter (64-bit) */
+ #define ENETC4_PPMROCR			0x5080
+diff --git a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
+index 9c634205e2a7..76263b8566bb 100644
+--- a/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
++++ b/drivers/net/ethernet/freescale/enetc/enetc_pf_common.c
+@@ -176,7 +176,12 @@ static int enetc_mdio_probe(struct enetc_pf *pf, struct device_node *np)
+ 	bus->parent = dev;
+ 	mdio_priv = bus->priv;
+ 	mdio_priv->hw = &pf->si->hw;
+-	mdio_priv->mdio_base = ENETC_EMDIO_BASE;
++
++	if (is_enetc_rev1(pf->si))
++		mdio_priv->mdio_base = ENETC_EMDIO_BASE;
++	else
++		mdio_priv->mdio_base = ENETC4_EMDIO_BASE;
++
+ 	snprintf(bus->id, MII_BUS_ID_SIZE, "%s", dev_name(dev));
  
--			err = of_property_read_u32(phy_node, "reg", &addr);
--			of_node_put(phy_node);
--			if (err)
--				return err;
-+			/* The default value of LaBCR[MDIO_PHYAD_PRTAD ] is
-+			 * 0, so no need to set the register.
-+			 */
-+			if (!addr)
-+				continue;
+ 	err = of_mdiobus_register(bus, np);
+@@ -221,7 +226,12 @@ static int enetc_imdio_create(struct enetc_pf *pf)
+ 	bus->phy_mask = ~0;
+ 	mdio_priv = bus->priv;
+ 	mdio_priv->hw = &pf->si->hw;
+-	mdio_priv->mdio_base = ENETC_PM_IMDIO_BASE;
++
++	if (is_enetc_rev1(pf->si))
++		mdio_priv->mdio_base = ENETC_PM_IMDIO_BASE;
++	else
++		mdio_priv->mdio_base = ENETC4_PM_IMDIO_BASE;
++
+ 	snprintf(bus->id, MII_BUS_ID_SIZE, "%s-imdio", dev_name(dev));
  
- 			switch (bus_devfn) {
- 			case IMX95_ENETC0_BUS_DEVFN:
-@@ -479,6 +496,39 @@ static int imx94_enetc_update_tid(struct netc_blk_ctrl *priv,
- 	return 0;
- }
- 
-+static int imx94_enetc_mdio_phyaddr_config(struct netc_blk_ctrl *priv,
-+					   struct device_node *np)
-+{
-+	int bus_devfn, addr;
-+
-+	bus_devfn = netc_of_pci_get_bus_devfn(np);
-+	if (bus_devfn < 0)
-+		return bus_devfn;
-+
-+	addr = netc_get_phy_addr(np);
-+	if (addr <= 0)
-+		return addr;
-+
-+	switch (bus_devfn) {
-+	case IMX94_ENETC0_BUS_DEVFN:
-+		netc_reg_write(priv->ierb, IERB_LBCR(IMX94_ENETC0_LINK),
-+			       LBCR_MDIO_PHYAD_PRTAD(addr));
-+		break;
-+	case IMX94_ENETC1_BUS_DEVFN:
-+		netc_reg_write(priv->ierb, IERB_LBCR(IMX94_ENETC1_LINK),
-+			       LBCR_MDIO_PHYAD_PRTAD(addr));
-+		break;
-+	case IMX94_ENETC2_BUS_DEVFN:
-+		netc_reg_write(priv->ierb, IERB_LBCR(IMX94_ENETC2_LINK),
-+			       LBCR_MDIO_PHYAD_PRTAD(addr));
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	return 0;
-+}
-+
- static int imx94_ierb_init(struct platform_device *pdev)
- {
- 	struct netc_blk_ctrl *priv = platform_get_drvdata(pdev);
-@@ -493,6 +543,10 @@ static int imx94_ierb_init(struct platform_device *pdev)
- 			err = imx94_enetc_update_tid(priv, gchild);
- 			if (err)
- 				return err;
-+
-+			err = imx94_enetc_mdio_phyaddr_config(priv, gchild);
-+			if (err)
-+				return err;
- 		}
- 	}
- 
+ 	err = mdiobus_register(bus);
 -- 
 2.34.1
 
