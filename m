@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-234456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234457-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5512AC20C8D
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 15:59:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E683BC20D43
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 16:07:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2FAAC4F2ADC
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 14:54:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4D65188E10A
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 15:02:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08C3927F759;
-	Thu, 30 Oct 2025 14:53:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B85242DF13E;
+	Thu, 30 Oct 2025 15:01:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qvNcPDRh"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="s7j2QD18"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7182427F195;
-	Thu, 30 Oct 2025 14:53:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 149922DA759;
+	Thu, 30 Oct 2025 15:01:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761836036; cv=none; b=aGmoRbXLmc5jTJimxddfYda6nBU8Iw26wXsQDBEUUYm9TNPysFGQa9CwmHiCi8nBIKM2yeOcewhdznk/tXsvnjC8gTSOEo5Fj7aSxYHNyNJfvZ7rtcXRGtya5ZJuTriWxmhNUUDWYIkP9HqGpN12dVT6cSrETibsAVFb9NUhkV4=
+	t=1761836504; cv=none; b=Z++fzE56MceQ9DclFEGr83t1d1CsvdpZi2Apd2HKqsU7R0SP6SETEv2xbddvszI8/cjUT9MlB7zsIdsM6yBOWamOmddCY1YgOMdP8Apz68Z+cTzSF7k64mSd56FyFOscFKdiiSQ8dXRuhxh8cXss7Y0Zzy1UmsJ6Zhg7jFMC+zs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761836036; c=relaxed/simple;
-	bh=nb8d7w8la803yo5UP2oJCicx+U4WvvvQT7Uug6wtgmY=;
+	s=arc-20240116; t=1761836504; c=relaxed/simple;
+	bh=HoI9A5dBBG/SP18tn0qdYgJCPMwIZpw/yCunp7reoSE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JLTFytLnh43JwQk0zpauQcVDOzo6FnU7B7+C3kB8kXc8ghF7P4Q4zIAX0mJa5vY6ENo8Tqobml7BXrMpT2w3DxtIXcWh1Z2Em/mYBLTogVWtBIc9fdy0iaQzykJjnaOyCZZzYq8bi/h7b2hbkjLL9DjpvY/fv3zszYzOObFny/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qvNcPDRh; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=GuxtjlSmQThPicJV0jlJuD/XKJ2uhX77Xrpz4gVb8p/Rzjn4pjHYRPp/Ae5f43t58adeCC8Rk+dwQzuWIzV0bB6MU3Z8VJqMDGS5U63Hl+e+V58LwzhX+vBawJMorggNrmw+n0LzIO04FgXvZthJjQwzD/K1sau8cf3WNtW1MhI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=s7j2QD18; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,23 +36,47 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Kj7qOkOQBYxTY25+TU8TMzDFc8CdJqCAS3UHxTj/Oeg=; b=qvNcPDRha2U/HuBozi6InB/chZ
-	gNOFo+/oeujtyI0ZobhIQLf0+hJXc7tXWfMuUgxc8dFeSqhuU1XY7qFwHCWoSj+HtVJ+zDYBZ8NbS
-	XGQBk1ZDgudSv+IVQjZ/I3B7Zkmz6VJUJvXzbdgxNqqHEo7EDU5/ngKjhCx7FQpGC4oA=;
+	bh=Ev+WYGcskpqGIIHF3ivwDxrnkr+tx39eqoXSZQFeHS4=; b=s7j2QD18Ifk5JJ5i3kDidFZBGP
+	1ZSafhgxrWn784jyyT40jnXFTQXSOup0KQKwY0Qo//PIMODPXAD/K0lT2Jo6jU1ML+h1zR92GcqOD
+	kXNyTJI+rAUedXLIAnw9SP//oUMikCeIIXltq+lT5vdFqrocJ7jb1+VOe3Zua8Y0+qmg=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vEU27-00CWHk-5r; Thu, 30 Oct 2025 15:53:47 +0100
-Date: Thu, 30 Oct 2025 15:53:47 +0100
+	id 1vEU9W-00CWJa-69; Thu, 30 Oct 2025 16:01:26 +0100
+Date: Thu, 30 Oct 2025 16:01:26 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 2/2] net: phy: microchip_t1s: configure link
- status control for LAN867x Rev.D0
-Message-ID: <3ecf0e2a-37ea-4d2c-96a5-b83a03cc77c2@lunn.ch>
-References: <20251030102258.180061-1-parthiban.veerasooran@microchip.com>
- <20251030102258.180061-3-parthiban.veerasooran@microchip.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+	Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>
+Subject: Re: [PATCH net-next v14 01/16] dt-bindings: net: Introduce the
+ ethernet-connector description
+Message-ID: <b8561c97-483f-4f43-897c-4bc3a4b916b4@lunn.ch>
+References: <20251013143146.364919-1-maxime.chevallier@bootlin.com>
+ <20251013143146.364919-2-maxime.chevallier@bootlin.com>
+ <382973b8-85d3-4bdd-99c4-fd26a4838828@bootlin.com>
+ <b6a80aba-638f-45fd-8c40-9b836367c0ea@lunn.ch>
+ <7a611937-a2af-4780-9b88-cf9f282f88b3@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,26 +85,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251030102258.180061-3-parthiban.veerasooran@microchip.com>
+In-Reply-To: <7a611937-a2af-4780-9b88-cf9f282f88b3@bootlin.com>
 
-On Thu, Oct 30, 2025 at 03:52:58PM +0530, Parthiban Veerasooran wrote:
-> Configure the link status in the Link Status Control register for
-> LAN8670/1/2 Rev.D0 PHYs, depending on whether PLCA or CSMA/CD mode
-> is enabled. When PLCA is enabled, the link status reflects the PLCA
-> status. When PLCA is disabled (CSMA/CD mode), the PHY does not support
-> autonegotiation, so the link status is forced active by setting
-> the LINK_STATUS_SEMAPHORE bit.
+> So that being said, an option could be to only focus on pairs, only
+> for medium = BaseT, and ditch the "lanes" terminology, at least when
+> it comes to the DT bindings.
 > 
-> The link status control is configured:
-> - During PHY initialization, for default CSMA/CD mode.
-> - Whenever PLCA configuration is updated.
-> 
-> This ensures correct link reporting and consistent behavior for
-> LAN867x Rev.D0 devices.
-> 
-> Signed-off-by: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
+> Does that sound good ?
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+That sounds reasonable.
 
-    Andrew
+In the binding, maybe try to express that we might in the future
+extend it. You can do that with conditionals. medium is required.  If
+medium = BaseT then pairs is required. That leaves it open, e.g. in
+the future we could add medium = BaseKS, and require that has lanes.
+
+	Andrew
 
