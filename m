@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-234230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87A5EC1DFEF
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 02:10:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 27BA1C1DFF2
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 02:10:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 371364E3F7E
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 01:10:33 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5AA0D4E516C
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 01:10:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 261B522576E;
-	Thu, 30 Oct 2025 01:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D49C724337B;
+	Thu, 30 Oct 2025 01:10:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RkLYAEx8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eqMIkijQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5E6167272;
-	Thu, 30 Oct 2025 01:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B034623EAAA
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 01:10:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761786630; cv=none; b=LByfjyVqdpaoVNwf39k8+uwITQXL4+Mj/FZdTfQItcOu/+HZLd4JboBJnxhPTRknsqkYhXZNTUFCzs924E+cELTxx3hTDUsoWdT5Hv1hgZ81rUQARCMDu31vFOiW8t1AY8VrbEnBp0gWH9LVYPWTaHz9bZhOBx06ImCMJBhlJcs=
+	t=1761786633; cv=none; b=LN9RiGqXiBbvxhPyL3KNxvqzwRwbSSxetVYTf1srvTw31mTHXvpVf2ihoCkO6+tL8e+buPDHdTvaOrMC98wngra+V4+hJ7e0vbhgyeCZVq8xPxruMCffJVh8XWQs1WCxw3KQS+FVGUDsC1D/B1H4zuZq6wFGkZdoxE9M5ZmSHUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761786630; c=relaxed/simple;
-	bh=bhyYle5OnQlLM7vWdXD+m/nM5n0USIuUMEVTwEtnhVo=;
+	s=arc-20240116; t=1761786633; c=relaxed/simple;
+	bh=QCIVjUB/Lf+h+f5WGpF/c+kQXr6idJdgIAWWlRccSGU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=X2iJqusw9BY0nA/In+T9DQnc0HwQfV8k5xQVhK9PGALCk/lItJTTFgA0dZZ5Jz5LJxHYijPEWDvj44IzFnW0ZVQFV8z0AS+4Eg+jdPUfHvh7Cc3Wjre/EWqf1BI2CN/C0PUGXWrslnqZbKMvSr8+4jCyHsrclkkQ7w6p9zJfnbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RkLYAEx8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78BDAC4CEF7;
-	Thu, 30 Oct 2025 01:10:29 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=rqjRq3bfEm7/T+himlmHL7h4jgpCpCDHs2qfeMp2GplrCHOQ4I/QlRWREqkf3PHStJudAZeHaKVeJmEO3OJFCRdenfyFvjenT72Zp3suM50lM6Klm5RIQlfh8J0iUgv9IznO+0lRptGUoDEXj9w8x4tN5vsqI49raFo65OvnqhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eqMIkijQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D672C4CEF7;
+	Thu, 30 Oct 2025 01:10:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761786629;
-	bh=bhyYle5OnQlLM7vWdXD+m/nM5n0USIuUMEVTwEtnhVo=;
+	s=k20201202; t=1761786633;
+	bh=QCIVjUB/Lf+h+f5WGpF/c+kQXr6idJdgIAWWlRccSGU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RkLYAEx8byv79th2y5WYRIVVJGDQBN4EIwdX/tKwYbRRvJoGT6LeIVac7Re7/0yGh
-	 3GZnsIimGh7OW83rofeEBNhZwzHv6YhUbFNZ2IJC1J3roCkxrIVvUnJhmP4Rxw5HO3
-	 YOS0yBB5H3JcD63S+Jvf/MQVPF1tID8PQZ7xfIMet4a6V+BmYVjemeCVjSLF1M905+
-	 8Xg8W9x6nwDiE67ik95LHLKFBsr8xHNnE73yovUbCoFfO09axajPhh5bOvJw+nJef9
-	 x/do0CsGnzibLS+NSVxyhtHYJ48zyfj50u7QUbaWsiCsw3r3Niv6eX/w7RqVC+I8JI
-	 4LAxmh8lnn1XA==
+	b=eqMIkijQzb6p3T/rXlMrCTIDvnq4VME+YyMSyAzDiW/jvUn9llsOgfqqEWwcTqyVt
+	 E96d64D3rexIiMeLqFYglq1cDHhxDU4xbf7R/BVCbYdzq65X0VSVtnf250R6i0Cfry
+	 ByeJ1Lo4XVl+sVpTmh8AGCAsCqOIEHTW54H0wpOWnas9GxPWA6yGxy4KvNwTnCy8H4
+	 R8DYVKwUIWH6MNeeddW+OZGftlBGkm0uNsF1CHlelgupHtvvFPhUlH31yjglwgbh90
+	 mvWK6lsW9s+0fRY2pQG7gXQ0pbKT3+4EsxNZcUfnFAtdnPXp64D1d1WVShzIFi2Q2M
+	 v2KR1oi9WmWog==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE1783A55EC7;
-	Thu, 30 Oct 2025 01:10:07 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CE93A55EC7;
+	Thu, 30 Oct 2025 01:10:11 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [net,PATCH v2] net: phy: dp83869: fix STRAP_OPMODE bitmask
+Subject: Re: [PATCH v1 net-next] net: sched: Don't use WARN_ON_ONCE() for
+ -ENOMEM
+ in tcf_classify().
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176178660651.3271894.12130005044811502264.git-patchwork-notify@kernel.org>
-Date: Thu, 30 Oct 2025 01:10:06 +0000
-References: <20251027140320.8996-1-marek.vasut+renesas@mailbox.org>
-In-Reply-To: <20251027140320.8996-1-marek.vasut+renesas@mailbox.org>
-To: Marek Vasut <marek.vasut+renesas@mailbox.org>
-Cc: netdev@vger.kernel.org, thanh.quan.xn@renesas.com, andrew@lunn.ch,
- hai.pham.ud@renesas.com, davem@davemloft.net, dmurphy@ti.com,
- edumazet@google.com, hkallweit1@gmail.com, kuba@kernel.org,
- pabeni@redhat.com, linux@armlinux.org.uk, linux-renesas-soc@vger.kernel.org
+ <176178661024.3271894.11855573840456625314.git-patchwork-notify@kernel.org>
+Date: Thu, 30 Oct 2025 01:10:10 +0000
+References: <20251028035859.2067690-1-kuniyu@google.com>
+In-Reply-To: <20251028035859.2067690-1-kuniyu@google.com>
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, kuni1840@gmail.com, netdev@vger.kernel.org,
+ syzbot+87e1289a044fcd0c5f62@syzkaller.appspotmail.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 27 Oct 2025 15:02:43 +0100 you wrote:
-> From: Thanh Quan <thanh.quan.xn@renesas.com>
+On Tue, 28 Oct 2025 03:58:23 +0000 you wrote:
+> As demonstrated by syzbot, WARN_ON_ONCE() in tcf_classify() can
+> be easily triggered by fault injection. [0]
 > 
-> According to the TI DP83869HM datasheet Revision D (June 2025), section
-> 7.6.1.41 STRAP_STS Register, the STRAP_OPMODE bitmask is bit [11:9].
-> Fix this.
+> We should not use WARN_ON_ONCE() for the simple -ENOMEM case.
 > 
-> In case the PHY is auto-detected via PHY ID registers, or not described
-> in DT, or, in case the PHY is described in DT but the optional DT property
-> "ti,op-mode" is not present, then the driver reads out the PHY functional
-> mode (RGMII, SGMII, ...) from hardware straps.
+> Also, we provide SKB_DROP_REASON_NOMEM for the same error.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] net: phy: dp83869: fix STRAP_OPMODE bitmask
-    https://git.kernel.org/netdev/net/c/298574936a6c
+  - [v1,net-next] net: sched: Don't use WARN_ON_ONCE() for -ENOMEM in tcf_classify().
+    https://git.kernel.org/netdev/net-next/c/b8a7826e4b1a
 
 You are awesome, thank you!
 -- 
