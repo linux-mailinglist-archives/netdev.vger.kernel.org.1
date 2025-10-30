@@ -1,237 +1,125 @@
-Return-Path: <netdev+bounces-234508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DB70C226AC
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 22:28:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 026E5C226C1
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 22:33:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C95418871D3
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 21:27:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36AAD1896470
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 21:33:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20D62329E58;
-	Thu, 30 Oct 2025 21:27:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 153AE2D9496;
+	Thu, 30 Oct 2025 21:32:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=sjoerd@collabora.com header.b="g3yElmKq"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FQ5exwrp"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-op-o15.zoho.com (sender4-op-o15.zoho.com [136.143.188.15])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 238C7235053;
-	Thu, 30 Oct 2025 21:27:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761859632; cv=pass; b=BXyPcIki9LLZgGonFXmG/LTP3kC8pjDMCD/r3Vzu4sJOPWlCnpk9ZHuCcbwgZ5t1XN4f2mPJKeZmxaevasVUphpDsyMS33p4LMjo2AgQY5oWOAHqMmsKW/5+pS2x4RdegOMIOClgB8VTuceu3M/a+EwnXNowdXIp94DVBUNDhmg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761859632; c=relaxed/simple;
-	bh=+FeCx4UfMrohbrMdvHoPB10eAhqDKvesqpVDKI/q1Wg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=HAxs80PY8MD4ju8MOijcKUwVUAVpDY4JXrFLnHDyKdjOcCJXq0V+P7eM8cmlImM+8N58DnhKwyOLJuCqTOAakSKj+/z/M2sIWvReP1cidmMhFimw8VQLmVU9ID8khVZ9K9xwaDs9N4fTq4nwBcFgx5+gw1Ws1FUSL2OsSQEO67E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=sjoerd@collabora.com header.b=g3yElmKq; arc=pass smtp.client-ip=136.143.188.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1761859574; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=AMHNToO9uyH2UOzZxFbb68jVb8fRSxPJkx2uGcVBs/9gdG16OTxWSqbRDtjo45Z/FlXyS/FV+J25HRLJ6eE0mwzhoQpGPt8aSSAi4kt0fH/jZQCCxK7BQgcUefeohbYXnHcKtgTmArbRM/+KYIPB10Vi91lWfVPR0oE7a0Tgd88=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1761859574; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=ixRLpty5QKDOE0ulxvqD55Wb9bzwJbHlOe5KFSOLS1E=; 
-	b=C87w96dCEC6ElqmbmEvGOSTnDEU0vYB9JwkPlW+pp3+V/xALKyuPcmjyx712KT7yM4Yys2ExWU7CSClHlyTQ3hojI79O+7j1ufpxDUUgtjl8GcQp9VlndlyKTulH4INak4h+0reqYs9iVQrstaEVzyH089qEufBmTQ5g+eC7R0w=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=sjoerd@collabora.com;
-	dmarc=pass header.from=<sjoerd@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1761859574;
-	s=zohomail; d=collabora.com; i=sjoerd@collabora.com;
-	h=Message-ID:Subject:Subject:From:From:To:To:Cc:Cc:Date:Date:In-Reply-To:References:Content-Type:Content-Transfer-Encoding:MIME-Version:Message-Id:Reply-To;
-	bh=ixRLpty5QKDOE0ulxvqD55Wb9bzwJbHlOe5KFSOLS1E=;
-	b=g3yElmKq8LU2i4TbafpRnAEbkB1BmNCRln05g6k8WHT1ZVYQGKWV23fb3FJSpnWi
-	9Hx5p5E79qn3bFI5Npy3N0kbsz9U6rX3ggbLg03vvs5D9YK8cdErhhhtfzjfFgkdU8r
-	9MNcrZ/v/23ECwSTe6xbuIllyt+ePSWN22sOQvNU=
-Received: by mx.zohomail.com with SMTPS id 1761859569654684.60417196483;
-	Thu, 30 Oct 2025 14:26:09 -0700 (PDT)
-Message-ID: <7d7595a0a33b4e56828beea86f6037bd9ecc8f8d.camel@collabora.com>
-Subject: Re: [PATCH 11/15] arm64: dts: mediatek: mt7981b-openwrt-one: Enable
- SPI NOR
-From: Sjoerd Simons <sjoerd@collabora.com>
-To: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,  Matthias Brugger
- <matthias.bgg@gmail.com>, Ryder Lee <ryder.lee@mediatek.com>, Jianjun Wang	
- <jianjun.wang@mediatek.com>, Bjorn Helgaas <bhelgaas@google.com>, Lorenzo
- Pieralisi <lpieralisi@kernel.org>, Krzysztof =?UTF-8?Q?Wilczy=C5=84ski?=
- <kwilczynski@kernel.org>,  Manivannan Sadhasivam	 <mani@kernel.org>,
- Chunfeng Yun <chunfeng.yun@mediatek.com>, Vinod Koul	 <vkoul@kernel.org>,
- Kishon Vijay Abraham I <kishon@kernel.org>, Lee Jones	 <lee@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"	
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski	
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Lorenzo Bianconi	
- <lorenzo@kernel.org>, Felix Fietkau <nbd@nbd.name>
-Cc: kernel@collabora.com, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mediatek@lists.infradead.org, linux-pci@vger.kernel.org, 
-	linux-phy@lists.infradead.org, netdev@vger.kernel.org, Daniel Golle
-	 <daniel@makrotopia.org>, Bryan Hinton <bryan@bryanhinton.com>
-Date: Thu, 30 Oct 2025 22:26:00 +0100
-In-Reply-To: <c9865ab0-cbc2-47b5-b7cf-acb8b9c52695@collabora.com>
-References: <20251016-openwrt-one-network-v1-0-de259719b6f2@collabora.com>
-	 <20251016-openwrt-one-network-v1-11-de259719b6f2@collabora.com>
-	 <c9865ab0-cbc2-47b5-b7cf-acb8b9c52695@collabora.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.2-5 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E79F019309E;
+	Thu, 30 Oct 2025 21:32:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761859976; cv=none; b=VnskQeE9xoTbOPBLnbUdKEuajbNP7HJngZQtlF0fAQvSx+dza3csYFLVqQRF1xNTa5MJymC/+dsbBovuLqSPs/4wGcHlKuFnjcNEgE5vRDRBkdehtewoEmRyNAs9UPD2er3G9ao3gjc54TfcYnDeYIQqpiH0C7gQpUqslnvxAK0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761859976; c=relaxed/simple;
+	bh=6iFZg16Z00OIQdSxKMvbQN1oC0YEeu711Oa6UefUkcY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wbpvr+kSAR1omxkwBGuYzqzds6YK3nF1lUqQtG2e8qz5Y/hw+q3fi5xFYSzEM8Gl2dyU0S9+KW7wJm89JrDnTZGFwiPJnVEMQsalSABxU9VupWph4OC2DAH4N0iOnL/30IZ4mDB7lkJJXEhKjx8tFqWgrj6NOW+BUgrG2dwIlUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FQ5exwrp; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=vbEdMMd/alv82EZhs0oPuJJdyvSbCwrjtSlWnhwOMUI=; b=FQ5exwrph/BeEvhhVCtUCO2pqe
+	iAck5hK/q3oIAN8VUYIHc1IpVEvI5rcN6QeW0NJyzn9xlrny4h8KQKJ3SRxHGKpwLqbjiK/9FIR9Y
+	1rPE9XUw8D+fbci2VhjaEMDJP2sVgazYxVN92Z6/zI+S69Wzc3qOd+GFcDFkqSy9tRSg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vEaFs-00CY1x-9Y; Thu, 30 Oct 2025 22:32:24 +0100
+Date: Thu, 30 Oct 2025 22:32:24 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vivian Wang <wangruikang@iscas.ac.cn>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Yixun Lan <dlan@gentoo.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Troy Mitchell <troy.mitchell@linux.spacemit.com>,
+	netdev@vger.kernel.org, linux-riscv@lists.infradead.org,
+	spacemit@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: spacemit: Implement emac_set_pauseparam properly
+Message-ID: <2eb5f9fc-d173-4b9e-89a3-87ad17ddd163@lunn.ch>
+References: <20251030-k1-ethernet-fix-autoneg-v1-1-baa572607ccc@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-ZohoMailClient: External
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251030-k1-ethernet-fix-autoneg-v1-1-baa572607ccc@iscas.ac.cn>
 
-On Thu, 2025-10-16 at 13:28 +0200, AngeloGioacchino Del Regno wrote:
-> Il 16/10/25 12:08, Sjoerd Simons ha scritto:
-> > The openwrt one has a SPI NOR flash which from factory is used for:
-> > * Recovery system
-> > * WiFi eeprom data
-> > * ethernet Mac addresses
-> >=20
-> > Describe this following the same partitions as the openwrt configuratio=
-n
-> > uses.
-> >=20
-> > Signed-off-by: Sjoerd Simons <sjoerd@collabora.com>
-> > ---
-> > =C2=A0 .../boot/dts/mediatek/mt7981b-openwrt-one.dts=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 | 83 ++++++++++++++++++++++
-> > =C2=A0 1 file changed, 83 insertions(+)
-> >=20
-> > diff --git a/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts
-> > b/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts
-> > index b6ca628ee72fd..9878009385cc6 100644
-> > --- a/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts
-> > +++ b/arch/arm64/boot/dts/mediatek/mt7981b-openwrt-one.dts
-> > @@ -3,6 +3,7 @@
-> > =C2=A0 /dts-v1/;
-> > =C2=A0=20
-> > =C2=A0 #include "mt7981b.dtsi"
-> > +#include "dt-bindings/pinctrl/mt65xx.h"
-> > =C2=A0=20
-> > =C2=A0 / {
-> > =C2=A0=C2=A0	compatible =3D "openwrt,one", "mediatek,mt7981b";
-> > @@ -54,6 +55,25 @@ mux {
-> > =C2=A0=C2=A0		};
-> > =C2=A0=C2=A0	};
-> > =C2=A0=20
-> > +	spi2_flash_pins: spi2-pins {
-> > +		mux {
-> > +			function =3D "spi";
-> > +			groups =3D "spi2";
-> > +		};
-> > +
-> > +		conf-pu {
-> > +			bias-pull-up =3D <MTK_PUPD_SET_R1R0_11>;
-> > +			drive-strength =3D <MTK_DRIVE_8mA>;
->=20
-> drive-strength =3D <8>;
->=20
-> > +			pins =3D "SPI2_CS", "SPI2_WP";
-> > +		};
-> > +
-> > +		conf-pd {
-> > +			bias-pull-down =3D <MTK_PUPD_SET_R1R0_11>;
-> > +			drive-strength =3D <MTK_DRIVE_8mA>;
->=20
-> ditto
->=20
-> > +			pins =3D "SPI2_CLK", "SPI2_MOSI", "SPI2_MISO";
-> > +		};
-> > +	};
-> > +
-> > =C2=A0=C2=A0	uart0_pins: uart0-pins {
-> > =C2=A0=C2=A0		mux {
-> > =C2=A0=C2=A0			function =3D "uart";
-> > @@ -62,6 +82,69 @@ mux {
-> > =C2=A0=C2=A0	};
-> > =C2=A0 };
-> > =C2=A0=20
-> > +&spi2 {
-> > +	pinctrl-names =3D "default";
-> > +	pinctrl-0 =3D <&spi2_flash_pins>;
-> > +	status =3D "okay";
-> > +
-> > +	flash@0 {
-> > +		compatible =3D "jedec,spi-nor";
-> > +		reg =3D <0>;
-> > +		spi-max-frequency =3D <40000000>;
-> > +		#address-cells =3D <1>;
-> > +		#size-cells =3D <1>;
-> > +
-> > +		partitions {
-> > +			compatible =3D "fixed-partitions";
-> > +			#address-cells =3D <1>;
-> > +			#size-cells =3D <1>;
-> > +
-> > +			partition@0 {
-> > +				reg =3D <0x00000 0x40000>;
-> > +				label =3D "bl2-nor";
-> > +			};
-> > +
-> > +			partition@40000 {
-> > +				reg =3D <0x40000 0xc0000>;
-> > +				label =3D "factory";
-> > +				read-only;
-> > +
-> > +				nvmem-layout {
-> > +					compatible =3D "fixed-layout";
-> > +					#address-cells =3D <1>;
-> > +					#size-cells =3D <1>;
-> > +
-> > +					eeprom_factory_0: eeprom@0 {
->=20
-> wifi_calibration:
->=20
-> > +						reg =3D <0x0 0x1000>;
-> > +					};
-> > +
-> > +					macaddr_factory_4: macaddr@4 {
->=20
-> macaddr_factory_gmac1?
->=20
-> You're not using this in the later commit where you enable ethernet nodes=
-,
-> did you miss adding that to gmac1 or what is this used for?
+On Thu, Oct 30, 2025 at 10:31:44PM +0800, Vivian Wang wrote:
+> emac_set_pauseparam (the set_pauseparam callback) didn't properly update
+> phydev->advertising. Fix it by changing it to call phy_set_asym_pause.
 
-gmac1 gets its mac from u-boot, passed in through device-tree; Haven't chec=
-ked where u-boot gets it
-from yet. I did spot it at offset 0x2a in this factory data, so that seems =
-likely candidate.
+This patch is doing a lot more than that.
 
-However this particular mac is used by the wifi phy. I discovered after sen=
-ding this patch the kernel
-driver loads it directly from the "eeprom" area, so we could potentially dr=
-op this node.=20
+Please break this patch up into smaller parts.
 
-As mentioned in the commit message, I kept the same layouts as openwrt uses=
-. Though i'd be fine to
-minimize the nvmem cells just to what's referenced in the dtb.
+One obvious part you can break out is emac_get_pauseparam() reading
+from hardware rather that state variables.
 
-> > +						reg =3D <0x4 0x6>;
-> > +						compatible =3D "mac-base";
-> > +						#nvmem-cell-cells =3D <1>;
-> > +					};
-> > +
-> > +					macaddr_factory_24: macaddr@24 {
->=20
-> macaddr_factory_gmac0 ?
+>  static int emac_set_pauseparam(struct net_device *dev,
+>  			       struct ethtool_pauseparam *pause)
+>  {
+>  	struct emac_priv *priv = netdev_priv(dev);
+> -	u8 fc = 0;
+> +	struct phy_device *phydev = dev->phydev;
+>  
+> -	priv->flow_control_autoneg = pause->autoneg;
+> +	if (!phydev)
+> +		return -ENODEV;
 
+I'm not sure that is the correct condition. emac_up() will fail if it
+cannot find the PHY. What you need to be testing here is if the
+interface is admin down, and so is not connected to the PHY. If so,
+-ENETDOWN would be more appropriate.
 
-That seems nicer, will add that in V2 (same for the previous naming suggest=
-ion)
+> -	if (pause->autoneg) {
+> -		emac_set_fc_autoneg(priv);
+> -	} else {
+> -		if (pause->tx_pause)
+> -			fc |= FLOW_CTRL_TX;
+> +	if (!phy_validate_pause(phydev, pause))
+> +		return -EINVAL;
+>  
+> -		if (pause->rx_pause)
+> -			fc |= FLOW_CTRL_RX;
+> +	priv->flow_control_autoneg = pause->autoneg;
+>  
+> -		emac_set_fc(priv, fc);
+> -	}
+> +	phy_set_asym_pause(dev->phydev, pause->rx_pause, pause->tx_pause);
 
+It is hard to read what this patch is doing, but there are 3 use cases.
 
+1) general autoneg for link speed etc, and pause autoneg
+2) general autoneg for link speed etc, and forced pause
+3) forced link speed etc, and forced pause.
 
---=20
-Sjoerd Simons
-Collabora Ltd.
+I don't see all these being handled. It gets much easier to get this
+right if you make use of phylink, since phylink handles all the
+business logic for you.
+
+	Andrew
 
