@@ -1,125 +1,107 @@
-Return-Path: <netdev+bounces-234509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 026E5C226C1
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 22:33:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69C0FC226CD
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 22:33:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36AAD1896470
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 21:33:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 452F14014C5
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 21:33:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 153AE2D9496;
-	Thu, 30 Oct 2025 21:32:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 054852E0922;
+	Thu, 30 Oct 2025 21:33:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FQ5exwrp"
+	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="R73CrVQc"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E79F019309E;
-	Thu, 30 Oct 2025 21:32:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 671252D8370;
+	Thu, 30 Oct 2025 21:33:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.88.28
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761859976; cv=none; b=VnskQeE9xoTbOPBLnbUdKEuajbNP7HJngZQtlF0fAQvSx+dza3csYFLVqQRF1xNTa5MJymC/+dsbBovuLqSPs/4wGcHlKuFnjcNEgE5vRDRBkdehtewoEmRyNAs9UPD2er3G9ao3gjc54TfcYnDeYIQqpiH0C7gQpUqslnvxAK0=
+	t=1761860005; cv=none; b=emw0xzpwR+AEfDplyFFggYL7dQ+3wa6nYGZfkg2P6vQWLQaELV7Vxxz8SsZCObHfVDy8AzRI/w0sXffuIXgozPoWADgL2bzM7Pmb/lpsUlInZMKjLzQQTPFjEtHAxuv9pPAudz9BqnjaxCbDYRLsBEDtBxKlxkKpRLQcOpGmctQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761859976; c=relaxed/simple;
-	bh=6iFZg16Z00OIQdSxKMvbQN1oC0YEeu711Oa6UefUkcY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wbpvr+kSAR1omxkwBGuYzqzds6YK3nF1lUqQtG2e8qz5Y/hw+q3fi5xFYSzEM8Gl2dyU0S9+KW7wJm89JrDnTZGFwiPJnVEMQsalSABxU9VupWph4OC2DAH4N0iOnL/30IZ4mDB7lkJJXEhKjx8tFqWgrj6NOW+BUgrG2dwIlUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FQ5exwrp; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=vbEdMMd/alv82EZhs0oPuJJdyvSbCwrjtSlWnhwOMUI=; b=FQ5exwrph/BeEvhhVCtUCO2pqe
-	iAck5hK/q3oIAN8VUYIHc1IpVEvI5rcN6QeW0NJyzn9xlrny4h8KQKJ3SRxHGKpwLqbjiK/9FIR9Y
-	1rPE9XUw8D+fbci2VhjaEMDJP2sVgazYxVN92Z6/zI+S69Wzc3qOd+GFcDFkqSy9tRSg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vEaFs-00CY1x-9Y; Thu, 30 Oct 2025 22:32:24 +0100
-Date: Thu, 30 Oct 2025 22:32:24 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Vivian Wang <wangruikang@iscas.ac.cn>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Yixun Lan <dlan@gentoo.org>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Troy Mitchell <troy.mitchell@linux.spacemit.com>,
-	netdev@vger.kernel.org, linux-riscv@lists.infradead.org,
-	spacemit@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: spacemit: Implement emac_set_pauseparam properly
-Message-ID: <2eb5f9fc-d173-4b9e-89a3-87ad17ddd163@lunn.ch>
-References: <20251030-k1-ethernet-fix-autoneg-v1-1-baa572607ccc@iscas.ac.cn>
+	s=arc-20240116; t=1761860005; c=relaxed/simple;
+	bh=qL8Bp6akPiS702R8PFiz2HYe41/kvXKllf/LH2OiE+M=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=WkI9eMFiT0z/hxCXMhnAGcIwwV3Govcecf+Ny/NokCvjeKL+HWi43CSMulW6RBF0ehNg61BRbC3Ge1KHREUUL6Yul6H0dzv3k6YtVF34Th/HxEpNSZQtn66lnyZOCrsiFyJHPwImo6RuUatk+AG3QVMdMIPmTQJd5DP1RdXimlE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net; spf=pass smtp.mailfrom=lwn.net; dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b=R73CrVQc; arc=none smtp.client-ip=45.79.88.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 7696A40AED
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+	t=1761860003; bh=xrHvEuPMe2ofdeJRnWawdla26z3fgauhjifsrjuJitw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=R73CrVQcCE8QZlYOPKnzeco14oegk2TrCcQYFauAuXjayWw1STOEdetA/q7khlQ1B
+	 hjo7vEGsBv+eDgOwl7H0MyVDrCrNHSDPIF+3vs7FTfhfl0C4hU+oxrt01TQkN9lkhr
+	 XbSSuokQmXj+dnF7TbWbM3fPQM0RyP6UnDG65SOh1ksyfHn+i7rzHxpzQ63ub1pmat
+	 IUfxnCR4Q/jlweJOUorSv9fvLdHFfDiDGnT4VzVaieGxwxNGWjekMv1xHGAZARIaDd
+	 aamB+HX7c1yvaxbktH2UWiAtZiWrxZ9I1oFPLSysmbBab1GhD1/No6NEzEFBG7VvyN
+	 te7AYWLhxBynQ==
+Received: from localhost (unknown [IPv6:2601:280:4600:2da9::1fe])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by ms.lwn.net (Postfix) with ESMTPSA id 7696A40AED;
+	Thu, 30 Oct 2025 21:33:23 +0000 (UTC)
+From: Jonathan Corbet <corbet@lwn.net>
+To: Jacob Keller <jacob.e.keller@intel.com>, Mauro Carvalho Chehab
+ <mchehab+huawei@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Jacob Keller <jacob.e.keller@intel.com>
+Subject: Re: [PATCH v2] docs: kdoc: fix duplicate section warning message
+In-Reply-To: <20251030-jk-fix-kernel-doc-duplicate-return-warning-v2-1-ec4b5c662881@intel.com>
+References: <20251030-jk-fix-kernel-doc-duplicate-return-warning-v2-1-ec4b5c662881@intel.com>
+Date: Thu, 30 Oct 2025 15:33:22 -0600
+Message-ID: <873470m5wd.fsf@trenco.lwn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251030-k1-ethernet-fix-autoneg-v1-1-baa572607ccc@iscas.ac.cn>
+Content-Type: text/plain
 
-On Thu, Oct 30, 2025 at 10:31:44PM +0800, Vivian Wang wrote:
-> emac_set_pauseparam (the set_pauseparam callback) didn't properly update
-> phydev->advertising. Fix it by changing it to call phy_set_asym_pause.
+Jacob Keller <jacob.e.keller@intel.com> writes:
 
-This patch is doing a lot more than that.
+> The python version of the kernel-doc parser emits some strange warnings
+> with just a line number in certain cases:
+>
+> $ ./scripts/kernel-doc -Wall -none 'include/linux/virtio_config.h'
+> Warning: 174
+> Warning: 184
+> Warning: 190
+> Warning: include/linux/virtio_config.h:226 No description found for return value of '__virtio_test_bit'
+> Warning: include/linux/virtio_config.h:259 No description found for return value of 'virtio_has_feature'
+> Warning: include/linux/virtio_config.h:283 No description found for return value of 'virtio_has_dma_quirk'
+> Warning: include/linux/virtio_config.h:392 No description found for return value of 'virtqueue_set_affinity'
+>
+> I eventually tracked this down to the lone call of emit_msg() in the
+> KernelEntry class, which looks like:
+>
+>   self.emit_msg(self.new_start_line, f"duplicate section name '{name}'\n")
+>
+> This looks like all the other emit_msg calls. Unfortunately, the definition
+> within the KernelEntry class takes only a message parameter and not a line
+> number. The intended message is passed as the warning!
+>
+> Pass the filename to the KernelEntry class, and use this to build the log
+> message in the same way as the KernelDoc class does.
+>
+> To avoid future errors, mark the warning parameter for both emit_msg
+> definitions as a keyword-only argument. This will prevent accidentally
+> passing a string as the warning parameter in the future.
+>
+> Also fix the call in dump_section to avoid an unnecessary additional
+> newline.
+>
+> Fixes: e3b42e94cf10 ("scripts/lib/kdoc/kdoc_parser.py: move kernel entry to a class")
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 
-Please break this patch up into smaller parts.
+This one applies, thanks.
 
-One obvious part you can break out is emac_get_pauseparam() reading
-from hardware rather that state variables.
-
->  static int emac_set_pauseparam(struct net_device *dev,
->  			       struct ethtool_pauseparam *pause)
->  {
->  	struct emac_priv *priv = netdev_priv(dev);
-> -	u8 fc = 0;
-> +	struct phy_device *phydev = dev->phydev;
->  
-> -	priv->flow_control_autoneg = pause->autoneg;
-> +	if (!phydev)
-> +		return -ENODEV;
-
-I'm not sure that is the correct condition. emac_up() will fail if it
-cannot find the PHY. What you need to be testing here is if the
-interface is admin down, and so is not connected to the PHY. If so,
--ENETDOWN would be more appropriate.
-
-> -	if (pause->autoneg) {
-> -		emac_set_fc_autoneg(priv);
-> -	} else {
-> -		if (pause->tx_pause)
-> -			fc |= FLOW_CTRL_TX;
-> +	if (!phy_validate_pause(phydev, pause))
-> +		return -EINVAL;
->  
-> -		if (pause->rx_pause)
-> -			fc |= FLOW_CTRL_RX;
-> +	priv->flow_control_autoneg = pause->autoneg;
->  
-> -		emac_set_fc(priv, fc);
-> -	}
-> +	phy_set_asym_pause(dev->phydev, pause->rx_pause, pause->tx_pause);
-
-It is hard to read what this patch is doing, but there are 3 use cases.
-
-1) general autoneg for link speed etc, and pause autoneg
-2) general autoneg for link speed etc, and forced pause
-3) forced link speed etc, and forced pause.
-
-I don't see all these being handled. It gets much easier to get this
-right if you make use of phylink, since phylink handles all the
-business logic for you.
-
-	Andrew
+jon
 
