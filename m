@@ -1,198 +1,183 @@
-Return-Path: <netdev+bounces-234425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E65DC2084A
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 15:13:46 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20C25C20850
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 15:14:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09A0D18919C2
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 14:08:58 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 6DA273485F4
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 14:13:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D06DA20DD75;
-	Thu, 30 Oct 2025 14:08:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6D1622A4E9;
+	Thu, 30 Oct 2025 14:13:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="GSqqoIRB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eHVy2D7W"
 X-Original-To: netdev@vger.kernel.org
-Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11013039.outbound.protection.outlook.com [40.93.201.39])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58F4656B81
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 14:08:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.39
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761833309; cv=fail; b=pCnunSSOdVgPryr2UEqiq0xb/BhSYYaaSTzlC3K7RGHWBKqxxGirwaJDI4TqQLk90pc+uCgnYYQtEaqGt4/x+ZLMh+aUv5TyxYXq8MdEzf2cO8XoNv6uM9rNwP+Lxc7GWHPzNPN0f4riM213/jsKBW+QHvoexVMTNGq2UOFB5uo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761833309; c=relaxed/simple;
-	bh=lqw2n5U67F+O7SPiPQ/mM2pmQXyCFx8Q5j77xr+Qyf8=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=hrtXUgqJmVM09g1JU696W32T2aDPelCWfhb0/ODTKSTSswlDQ+Ogd3tKKwhyRsDdb31oA8a1gq7ufkyqohXvR7vkemF6Y0wkfRAV24aoHci52fdSH01zVaytLYlutPx3YQFMOlzdhOQUepMAcCyhBOMGoS4pcfoGCAvE+RAT7c0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=GSqqoIRB; arc=fail smtp.client-ip=40.93.201.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=VfnWRkI+TV52f9vFLH8vtAc3/TOjGxfVUeiGvC5T6A6A7YTzODAaZua/vcF0IBIjVTq/XrPShRI16q67cRZHbc/cqGKcgSIwaX7tYlcK/g32VDBF6NgHCFQennBAxBhxbvBW9vUb3jbheIqZG+ADD/6KjoaVPf2gBOy7WLrOgRZdXyfLHNPaJ+dLDfIlJ4NQv7mWFcWxCK2gFpI0NHi4e2LpKLWSpurLndwC13XebkqsI9hBwLN7IFGiRalBpFEJRcVZ4NE46chqCWlD3p2HV5aJJIMnMqLUc8YzHkHlE7tjmrBHhXI42rGZSgaZyrFeehwyOCnG2HrGgUPzOPnAZg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0cQuyLlX+aCbkGNGRvDJ9ohR882KXjMceABL7mBegbE=;
- b=Nk4XWRTiFTqaZFeObcEsgpmxu17VSWTXiAHwLAvmbf/VMRJHx/cDXIO/ifg4xtJ54WYGkXYcZM38I49QG16Y3vu42rf881JwopIXfxAzsudARP7uN39pS+yTBGigp6EER2zBgEl5v3HXTd71CWFy25Q9MIHbKeN8TSK7XTUQC9yxxQ5hiI95aCuRCfxSYUpDD6rq7g1VhFARNTC/ps56M2SYlFAx2vUtlCqyKgNd3awPb88pnJydPAbmeeaIehUV5sC0KVpAhBYn59BNmY9xgzYUQr+01G3LR11IsrH+bKDF3Y2tS2nbNI7NQZbbs1b2rj29pZw8Ro+bKHpwIz4hqQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0cQuyLlX+aCbkGNGRvDJ9ohR882KXjMceABL7mBegbE=;
- b=GSqqoIRBppB6RyjqZ/MQHTBn/0ZqZNTVuIAio9b7iLbmuUa6GdArbObaPXCDNHxdK9+f7IGQ2ZP30Wk8o0RoxqUBiiC/hhf7Fq4DyJ64Ho2+ZDwkh/lc8eLm1EgKzjDs18HjzeEmrMrqAzoTqzPKcEFjSoXti7v+pL0uqFtBDLWpjepk9MD0haHSvJhWVDXrblrLBZvaOsNsarrfV3GuOIuskCq4/MlQi4bAo3+hALbokdFVmW9wDKfWAlyh+nZ63gHqJ8TtJhTAlesLFyuhNeeYWHowcdbhDL54zUMipU34Pm6WO8etJP4bZQouIMesB/HT8LmzYrmrFFjPF+BP3g==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MW4PR12MB7309.namprd12.prod.outlook.com (2603:10b6:303:22f::17)
- by PH8PR12MB6865.namprd12.prod.outlook.com (2603:10b6:510:1c8::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.13; Thu, 30 Oct
- 2025 14:08:21 +0000
-Received: from MW4PR12MB7309.namprd12.prod.outlook.com
- ([fe80::ea00:2082:ce2d:74c]) by MW4PR12MB7309.namprd12.prod.outlook.com
- ([fe80::ea00:2082:ce2d:74c%5]) with mapi id 15.20.9253.018; Thu, 30 Oct 2025
- 14:08:21 +0000
-Message-ID: <b473a2c1-6bc7-4830-bb0b-85ec7315f7a7@nvidia.com>
-Date: Thu, 30 Oct 2025 09:08:18 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 08/12] virtio_net: Use existing classifier if
- possible
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, mst@redhat.com,
- jasowang@redhat.com, alex.williamson@redhat.com
-Cc: virtualization@lists.linux.dev, parav@nvidia.com, shshitrit@nvidia.com,
- yohadt@nvidia.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
- shameerali.kolothum.thodi@huawei.com, jgg@ziepe.ca, kevin.tian@intel.com,
- kuba@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com
-References: <20251027173957.2334-1-danielj@nvidia.com>
- <20251027173957.2334-9-danielj@nvidia.com>
- <9d469be5-e2f3-427d-9e6b-5d9c239fcb79@redhat.com>
-Content-Language: en-US
-From: Dan Jurgens <danielj@nvidia.com>
-In-Reply-To: <9d469be5-e2f3-427d-9e6b-5d9c239fcb79@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN7PR04CA0105.namprd04.prod.outlook.com
- (2603:10b6:806:122::20) To MW4PR12MB7309.namprd12.prod.outlook.com
- (2603:10b6:303:22f::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49C5E17A2E0
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 14:13:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761833635; cv=none; b=aIMZkSoKa++tNCiDGEis12yfiHDqUdbwCm8pZ7oy3JqFwK9g/xdy83X0D6SlgFoSzc4wpp8jN6dxXf65E1NBXtcSVFZxY8dtX9MJnpITS+FX3xISWKv34wirQ9Xjduo4bK0MZYkC4jBG6ty7C7TfiNdtv6vC7lVQfIsAcFiBuoY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761833635; c=relaxed/simple;
+	bh=/T40+ChYVbQJjlFEBDtmTJc9Zvc0liM/GgUzEfzM00E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sLPw+4quHullGr/oibPoQCLx6qYRKfdF1lWXSWPbnPMtX+dTKj4h2/ws2yiXuemay6ihgcGzbNyRBeW4Mc01LMua4ObqMljUTk4LQ8UWewlR3xIsnTjPBmtj7uxxkOHO9YqozVvT10aNldqVo3SXJw0RC//vkijyHYyZwcgpR+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eHVy2D7W; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-b6a73db16efso1046909a12.3
+        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 07:13:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761833634; x=1762438434; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1GwPV67fM5V5sQ6RejEBhGju2a3kknsbjfFsnKSUOpA=;
+        b=eHVy2D7WRcphOaj87/QwpBl9oYE+GZn2waBmcjDWnwwimajWcNUejMXDxN/5suVs6X
+         chA40DSePRmjEvUhxFdAbw90WmOPh0i3PF27gJJ30ugi1dTdSp5B/7HSg785GGfrudff
+         +hvvxdTLrz+vn1XJQnDH78AodpXxGlW7kLpOY1CeVOyFnYxkAlLMG+eH9FVJOsAE4pQ4
+         UkHU8SollZY+5lQGBNDe5qWxwjbMoj5I1biHIDQLXXEq65xOjB4QBy459g+lq44rYXM7
+         27OrwV9TQ0LizRDYXaJuCbUNU5gTQ8bWFX8C3wf9adotrD9KChcjePyuVSqt2vdhjOJs
+         ZatQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761833634; x=1762438434;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1GwPV67fM5V5sQ6RejEBhGju2a3kknsbjfFsnKSUOpA=;
+        b=Ib0xCCe9Cowm2LB61Vr4NvaAPIQw3j790ao5jFrryJV0AYN2v46k4Wjeuy02U4cyhI
+         qZkZulzpgR5A3SQ95OZUSX4DcJVajFbKXHEJQBFeo6tN5ls/6PULaqBJsgknXepVHFKw
+         mgMyqYgP2sKWc1lHBCKG3mO6vbNcp7vsKIsRLoVZCvFZPPoS7j6Hhes18qR2JjmTXjWz
+         PVl5tlgEN0UtPAo/RIVwghXDalkdu3IqNuwqQy1DyDlFcas3WqLdCoWfSZK48J+K3wiR
+         81uC4bJEGWIQxQYiMMU9znEnXSiVXm5aqgI3Hvxgw2aQ5cDsVt2/XQyEdFNEWP47Qwtm
+         2OBA==
+X-Gm-Message-State: AOJu0YxpWgtQwCzT6NzYn9rvH8cq3LxHxwtG6IaOZssAh01lt/L+9WgL
+	nuZPxuwjVmMO9VVrMc5fMWmLATRvuTqAeO/GX572Sr2YsTZcve4xcXLJuT1WSIr9HraHYDW+okt
+	57HVI2uB+s3UXpnkJr9XUti62QcA0cWE=
+X-Gm-Gg: ASbGnctUuyqIyopeK+8KIM1DnArMdHaEFk8IVHS4SXOlBc/i/PWXEoFb0t2th/CGcrg
+	nVNEE1/ZJTEGlghe8fzs4JHHDknNE4Ct3L1HLpKFX7kflO3qITi6VIn5XJme+G4cIgLYJotgdCI
+	Nljueah7dEwuNne8afPu9zwAtneqATu2bmrM6soEP59pmedSmn6DZTU0qvx/Vv7X5RCSWP57m4t
+	1ph/eGyPRMHmbtdlGHbKMEkYdCer6sf2blL2wnR6rN2EjsCTDy/DkouxFo33rkQRbEiPcJHGftQ
+	osmr9eENkiXinbr7bw==
+X-Google-Smtp-Source: AGHT+IGQeZf3/xDx9PN4GOOFJoj/NMC2uHC5MkG58KIcW+QZIEsnabkEgg4aAn3sUpRS5Lsc0ZRHkz4/xmiVriMCfJo=
+X-Received: by 2002:a17:903:2349:b0:267:bd8d:19e with SMTP id
+ d9443c01a7336-294dee35d83mr74289795ad.22.1761833633536; Thu, 30 Oct 2025
+ 07:13:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR12MB7309:EE_|PH8PR12MB6865:EE_
-X-MS-Office365-Filtering-Correlation-Id: 94d7fffe-3ed7-41e9-4040-08de17bdc826
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?T21DQlhsTGo0bUhaNXBjVmg0RnFLdWlSYmJrRWk1MEcwWkphM1pKMUt1OFR2?=
- =?utf-8?B?QmhUemZQdXVCbkdjM2MxTE5BT2JXZUs0TEZsRUZwRFdqRno5N0F0eEJWdXk4?=
- =?utf-8?B?MUhEYk9XNk9mc3d6SWZFaGxDVXpKa2VZdHZXVWpFd3FNcE9XVC9wTlVObUpw?=
- =?utf-8?B?UE1TNjc1aGFySFMwNkM0WGlCZEE0N2pIaHhqODAwdWY5TXlubExja0hQSXB6?=
- =?utf-8?B?RXBoVkZmcXlrditPTmlOeGc1aC9vVU1kQWZrM2pTMFhCSjdRTHBpWUFxY1l4?=
- =?utf-8?B?R3VGN2YwU3BDaXlKTk5ITFBDZkExNUFsQXpISlhERWVLYVlDc3FMTDIxL25j?=
- =?utf-8?B?RTluSUk3K3BOc3RYSWJKcEdqWlZ6bXlianNCUWNqUU1sSWVpaDIyWXQ2YnEz?=
- =?utf-8?B?eWZqYzN3SGg3SEJWbkRJQUNjYU5QN2NBbnBsQnhuSTNMd2FKR0J6VGF6QXlB?=
- =?utf-8?B?c2xreVhRTm5EM1hZc1dwbDN5eDRtTExxWHZnZDNNdVBTK1BCQ01FTVRpclhF?=
- =?utf-8?B?Q2psc0JqRWpxM1UvWS96eC9tSzJZcm41S053ZFpZZU5oaWlvOGl6NnU4V01w?=
- =?utf-8?B?YlVlN3hnVGpscTBuVTBTWCtYR0w0ZXB1bkVGY2t4U2JvdUFySmhVd2pYcmFs?=
- =?utf-8?B?bGE5emNySUNxYklHQjgwUjRxNCtMcUF6QnhoVzMzQzEzUjhlZ1FXNThIRkRS?=
- =?utf-8?B?WHlQeERkYlFoVnM2VDRIOVFMVDUyekY5K1JHSFpSZDk2a0JrM3VPVnBkRlcv?=
- =?utf-8?B?TlFVc1NjQUozUmpXZHBpdVpTS0VqUmI2RDc2K3ROQUN4RGlTaVdodDBSMGlN?=
- =?utf-8?B?cENNOUtsUnBGL0NuVm53MXVrM2lma09zd1NHR25PMFJtbU9FTVJ3cGs3Uk9o?=
- =?utf-8?B?Qmc4OGlVa3Q2b01xMURkNEZRd3JJYTl6c0cwOUJQR1FPZFljUlltRmppMlkz?=
- =?utf-8?B?cDhQS1VpbmVkb0ppWHFqaVlCemMyUUs3VlE0YUJjYktWN1RpaEZqbkJvVHVt?=
- =?utf-8?B?KzVIWVpSMk0wTnd2dTJnS0xrZG1XMGJic2VmMXlGcUVkYU5HWU9paUVxUHR6?=
- =?utf-8?B?d2xqNzZ3UTFEQ3BaaWdSNXdUZXJvc1hkamlZMUtIYjB5NVV5dk8zWXVENjkx?=
- =?utf-8?B?bXQvM3pTTHBuZWpDcXd0b0dneGFMeTJyZUpUTjlTTG8ramE1MTJ2d3V1NkE2?=
- =?utf-8?B?NU5mWlF3MFRqbHRLeHR1V3Zsb0hzWmcxVGhhYXVtU1Q2eFBYOGNOcGdrQjAy?=
- =?utf-8?B?VElWejN2WkIyejJpVmM2eHFqdjNNR2lLdldrUEdpMDlHakw3OXN2MmNpOVMw?=
- =?utf-8?B?bWhlSlcrSW9FSWpSekU3TTNVT3JBdU1OaUV2emFaRDNjdzUwMC9VU1dpM2R2?=
- =?utf-8?B?YW9RZlV6Qm1sZTRPMFNrSkNTa3NDTmFsTG5ZRDVmQk9zb1ZqcUJNQWVRTXA2?=
- =?utf-8?B?OXFJU1FvL0NKZmt5dzNaK1IyRkJVbXNoMUhZRDBPY0RKdlFiZGd4M0NXUFcw?=
- =?utf-8?B?R1ZmZ1poYWhHQTNQZmJjaTE4aDkxYzFQSXlXT3M4OWxFWE1icHNmZ1VFeXB0?=
- =?utf-8?B?K0FiZHVGSzAxNE9va1NqR0hkblNoUDEveUc2SmJ1dlczaDVIUWczdVUyT0c5?=
- =?utf-8?B?dkR6dXlINis5SXJQVnhHejRZR0x4Mk01MzZrZlczZ29PMmF6UlFvS09RczZL?=
- =?utf-8?B?Nng5SmZvRlRWUm82TWN2WUh4bTM5QVdFaVpHUEZJbTZrNCt5R0hPQld2UkJI?=
- =?utf-8?B?ZWdjZWpBQW5tNUs0LzFEMXdNcUZscDU3T2hxTUpFWXdsRlJwcDNoaWJGVTFD?=
- =?utf-8?B?cmVBOEgxekFOdzAxNEtNL28ycXlJZkY4WkJjMmVqaCtPVWhxdEw3UHcwNTI2?=
- =?utf-8?B?MXpEcjA4NDBuRWwwdzhWY2o2R3NNMVB3RXFpZHYwRUxvNWNOMWtqTjlwUlk2?=
- =?utf-8?Q?1F59gOZhnEUGuRx17Axh3OsygpS5eBvw?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR12MB7309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?c29lTzc2UWhqT3RMN0JTMFJqTG94RUQwT2tlTUVORW9rdGtmcFpIOTA2Q05D?=
- =?utf-8?B?STZ0Y2J4Mm9KN1RsbW9yZjZSQXQ5TklGQTJQQ1V1Y1BMU3lNWXZXSE1zZHRn?=
- =?utf-8?B?Tis5LzVHWk9XL0o5OStaem1zKzVpQ3hHdWVqb2l1ZnppMERCVDJEQlUvQzVE?=
- =?utf-8?B?UHFvOHUvOUpTcGo0b2Z6b0tLYjZNS2pSU21MK1ZjNUpwWUE5SDdXVEVXYVBF?=
- =?utf-8?B?Tmg1WmF1VGZ3TERqMjNTbzc4bkpLMXdVYjdTZ3RqTUlkSnIzQjRRSytIVlRO?=
- =?utf-8?B?UzA0TkVPemFDN3k2L1UrRmpZcGFNNXpNMjBZeTY1QjlyUDdBeVVQaStpUVRq?=
- =?utf-8?B?OGFLTEJ0d3RPdTJoY3A3eVk5WVB2ckhVZVl5ZHE2a21IY280bVlVRGgyWkR0?=
- =?utf-8?B?VWJpN09IUENQZDNzaVc4VzFlNHdET0tYWWZzdTR5dU8ydXE3Vll2SFM4M3Zw?=
- =?utf-8?B?Y2JUUTYxdTRyNW9qa0lmbmJNN1Rzd3piOGRpZG1IWnN4K0QyMFNkdlV2eVpz?=
- =?utf-8?B?bXRIRGNObXdrcWFuNzlqRytBOFk3K2kzQkZ0c0ZzWElBV2RlNVdNU3NERUVD?=
- =?utf-8?B?OGpVQmJrY3pBZ1RvVG5UQm16eXIzU2x3TUZEWHZMc2hzUlQ1dGVseHJzSmI4?=
- =?utf-8?B?QnVteEl6V1Ixdnc3bU5hOGpyNFNYQ2pHNkszdWpPcmZ0ekNEQVhKZUZCRmlh?=
- =?utf-8?B?ZmRjSkNFcXUvL0xObXBDZlFpYjI1Z0tRY1kwanZZNVBwRHVjKzZRejgyUXlv?=
- =?utf-8?B?MTJwd01WM0JlOUJnM1gxYUxQWnJUcHJjanRISzRkR20zNWZLbDhKS0t1MklQ?=
- =?utf-8?B?cm9oQnc3SHg2Uzg5cXJzeFR0ZTdoSUpDUUNIYWo3U2RJQjZzTnRZbXhGdVhy?=
- =?utf-8?B?cmh1engxWTExTkpENmhLaG9YWlRVbmp0N2ZTU04ranhzR3h6cUYwWDRRbHdw?=
- =?utf-8?B?M1BMeTFJbWYzaWp0bG1GMHdjQm52eWxGSlJkV1M5VnVFYXY4cXIzNHBQdnNK?=
- =?utf-8?B?RmVOWVE1b0M1NTNTTWh4aTBqZGFFeGtsM2NhVSt0cmt5UlFFczFuYnRyd00v?=
- =?utf-8?B?OEpjTXZtT1crZStiQWQ1K1BaSkowc2pCdFdRT0dxL28zeWF4TVJyTVpDbHg0?=
- =?utf-8?B?V0VvRjVBc0FjR2hKeDUyanV6QjN1a1NuQmpDNkJoWkZyemMrMXYwTlpMK1l3?=
- =?utf-8?B?aHNPeHFEYi84czFqZzBnWCtkR0sxNUJEbGtud3lOcTRSU2Z1cTUxU25oNHJ2?=
- =?utf-8?B?dGtpUlE3cVFVQXBkSVpxRzRiNmEzY09YaTVvZGRPMzRuM042NGNiVUc5bUFj?=
- =?utf-8?B?dVBwMDFLZC85RUZqR3pKQlE5bFVjRFA0ZVRGOFoyaFdnQkEyMGEyM3pqWFBz?=
- =?utf-8?B?QW0wZ21XZnZxRkFkMVBvQ1pad2VuNmxRL2Q5UVo2d2tCUEoxZG9UbDVEWUkz?=
- =?utf-8?B?WGZQUERIa2REajJvazQ4Y1QzM0Y3RnNnMERvajkrVWFHbUtWdXJiSndqMk1i?=
- =?utf-8?B?cERjTzBWOG1GbS81aDE3dlZoREVZR1UzZmo2Y3FMc2QyZVJCTG51SkFUTmpF?=
- =?utf-8?B?ZjYzSGlIOXp3Nm5MOXk1TWNHVGxDcUovZnBMeHdmYWsySHRJTTcrMC9ReEdj?=
- =?utf-8?B?NEplNHRSNWtaT2pVUnlxRVVySjIwM3ZUVGd2cVJNS2RVTVV1UFp3d1hWSmE4?=
- =?utf-8?B?eU0wV29jQ3NuOXloZ1NUNC9ldnVFeDlmdkJ6S3pzY2FyOURIUXFjSlBIdDBk?=
- =?utf-8?B?UVNIWGR4aWFwbGxmS3FjcDQxWnRBQXk5OTMvS0EwYUJzaklhSVcvTUxQbVJU?=
- =?utf-8?B?aFJJNnRvUXJxNlBFNVBIZjJGVHNYM0xVbXJidnhaSE5uQ2phU21RbVREeFlI?=
- =?utf-8?B?VWFpSUxLblNVZy82c0dCNTJRRllUckQ4SDBaMmJyOWF3Uy9TRTV0bEpGOXRw?=
- =?utf-8?B?VE91RWoxa0JGWGNENWw3cm4yMytmelIySWx3VnBIVTBGWHV5cSsrTVhRbVIw?=
- =?utf-8?B?cjBIRGNrNjdsbVZxY1YwNVdLL2VOVlN0TGJ2Q0c5TlJCTUpiWDljMDNVZDh0?=
- =?utf-8?B?ZE1HNStPS1QzcUovMlhpMGdpemNSaWlBdXlPN1h1TEh3OHZ1eXhrVDVaTGc1?=
- =?utf-8?Q?m5biiz0jKLq3+rch0HISheulR?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 94d7fffe-3ed7-41e9-4040-08de17bdc826
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR12MB7309.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2025 14:08:20.9163
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /GF8HMj3UKeaASyNP9xMy1uCWoS/WgFSL3ouz4LbWXmpMpaRFDKlL6rdoz2gK9x9Nj0TwsnK9CQv1naPt9u9bQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6865
+References: <cover.1761748557.git.lucien.xin@gmail.com> <91ff36185099cd97626a7a8782d756cf3e963c82.1761748557.git.lucien.xin@gmail.com>
+ <67b38b36-b6fa-4cab-b14f-8ba271f02065@samba.org> <CADvbK_f4rN-7bvvwWDVm-B+h6QiSwQbK7EKsWh5kTuHJjuGjTA@mail.gmail.com>
+ <b9300291-e828-47fa-b4d1-66934636bd7b@samba.org>
+In-Reply-To: <b9300291-e828-47fa-b4d1-66934636bd7b@samba.org>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Thu, 30 Oct 2025 10:13:40 -0400
+X-Gm-Features: AWmQ_bkH59qmzfsesvc02GCEqCTGnpE58Lv-Efw4wO4JNI_ID0XqW9PU-fQIxTI
+Message-ID: <CADvbK_f=E11=dszeJos98RvBY5POXujgT0dFo-LG6QQuGW20Kg@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 02/15] net: build socket infrastructure for
+ QUIC protocol
+To: Stefan Metzmacher <metze@samba.org>
+Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
+	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Moritz Buhl <mbuhl@openbsd.org>, 
+	Tyler Fanelli <tfanelli@redhat.com>, Pengtao He <hepengtao@xiaomi.com>, 
+	Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
+	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Benjamin Coddington <bcodding@redhat.com>, Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, 
+	Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>, 
+	Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe" <alibuda@linux.alibaba.com>, 
+	Jason Baron <jbaron@akamai.com>, illiliti <illiliti@protonmail.com>, 
+	Sabrina Dubroca <sd@queasysnail.net>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
+	Daniel Stenberg <daniel@haxx.se>, Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/30/25 6:31 AM, Paolo Abeni wrote:
-> On 10/27/25 6:39 PM, Daniel Jurgens wrote:
->> @@ -7082,8 +7097,9 @@ validate_classifier_selectors(struct virtnet_ff *ff,
->>  			      int num_hdrs)
->>  {
->>  	struct virtio_net_ff_selector *selector = (void *)classifier->selectors;
->> +	int i;
->>  
->> -	for (int i = 0; i < num_hdrs; i++) {
->> +	for (i = 0; i < num_hdrs; i++) {
->>  		if (!validate_mask(ff, selector))
->>  			return -EINVAL;
-> 
-> Minor nit: this chunk possibly belongs to in patch 6/12.
-> 
-> /P
-> 
-Yes, you're right. Thanks
+On Thu, Oct 30, 2025 at 7:29=E2=80=AFAM Stefan Metzmacher <metze@samba.org>=
+ wrote:
+>
+> Am 29.10.25 um 20:57 schrieb Xin Long:
+> > On Wed, Oct 29, 2025 at 12:22=E2=80=AFPM Stefan Metzmacher <metze@samba=
+.org> wrote:
+> >>
+> >> Hi Xin,
+> >>
+> >>> This patch lays the groundwork for QUIC socket support in the kernel.
+> >>> It defines the core structures and protocol hooks needed to create
+> >>> QUIC sockets, without implementing any protocol behavior at this stag=
+e.
+> >>>
+> >>> Basic integration is included to allow building the module via
+> >>> CONFIG_IP_QUIC=3Dm.
+> >>>
+> >>> This provides the scaffolding necessary for adding actual QUIC socket
+> >>> behavior in follow-up patches.
+> >>>
+> >>> Signed-off-by: Pengtao He <hepengtao@xiaomi.com>
+> >>> Signed-off-by: Xin Long <lucien.xin@gmail.com>
+> >>
+> >> ...
+> >>
+> >>> +module_init(quic_init);
+> >>> +module_exit(quic_exit);
+> >>> +
+> >>> +MODULE_ALIAS("net-pf-" __stringify(PF_INET) "-proto-261");
+> >>> +MODULE_ALIAS("net-pf-" __stringify(PF_INET6) "-proto-261");
+> >>
+> >> Shouldn't this use MODULE_ALIAS_NET_PF_PROTO(PF_INET, IPPROTO_QUIC)
+> >> instead?
+> >>
+> > Hi, Stefan,
+> >
+> > If we switch to using MODULE_ALIAS_NET_PF_PROTO(), we still need to
+> > keep using the numeric value 261:
+> >
+> >    MODULE_ALIAS_NET_PF_PROTO(PF_INET, 261);
+> >    MODULE_ALIAS_NET_PF_PROTO(PF_INET6, 261);
+> >
+> > IPPROTO_QUIC is defined as an enum, not a macro. Since
+> > MODULE_ALIAS_NET_PF_PROTO() relies on __stringify(proto), it can=E2=80=
+=99t
+> > stringify enum values correctly, and it would generate:
+> >
+> >    alias:          net-pf-10-proto-IPPROTO_QUIC
+> >    alias:          net-pf-2-proto-IPPROTO_QUIC
+>
+> Yes, now I remember...
+>
+> Maybe we can use something like this:
+>
+> -  IPPROTO_QUIC =3D 261,          /* A UDP-Based Multiplexed and Secure T=
+ransport */
+> +#define __IPPROTO_QUIC 261     /* A UDP-Based Multiplexed and Secure Tra=
+nsport */
+> +  IPPROTO_QUIC =3D __IPPROTO_QUIC,
+>
+> and then
+>
+> MODULE_ALIAS_NET_PF_PROTO(PF_INET, __IPPROTO_QUIC)
+>
+> In order to make things clearer.
+>
+> What do you think?
+>
+That might be a good idea to make things clearer later on.
+
+But for now, I=E2=80=99d prefer not to add something special just for QUIC =
+in
+include/uapi/linux/in.h.  We can revisit it later together with SCTP,
+L2TP, and SMC to keep things consistent.
+
+Thanks.
 
