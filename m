@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-234222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF0E5C1DF74
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 02:00:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECFC7C1DF86
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 02:00:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 93F084E345A
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 01:00:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F5A5407042
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 01:00:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A84981E492D;
-	Thu, 30 Oct 2025 01:00:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B8BC23E229;
+	Thu, 30 Oct 2025 01:00:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s03gnIFy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QplQC59I"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 757C818859B;
-	Thu, 30 Oct 2025 01:00:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C32B523D7C2;
+	Thu, 30 Oct 2025 01:00:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761786036; cv=none; b=YiId91nui1ExsU3o2oZluLW4RCCrX5+1Vxy/W6hDMWy5lioP5DR/Q7mxkDpRzaVbMdGz/n1p+LDOkkq6G6ZAWoJ7tTJJc5Mk46qhjJG7ohMPLFN8g8z4bWKd3brJd3DZnXbo41rnhSAG8mBaf79gvCjxaySwicsd1k2/DlGljGY=
+	t=1761786037; cv=none; b=DYzqKyZ8NDTpkMh5kbuhsMdQj1FUNM/yk1iXATpcYv5iO+Mk8XIZutMsPc7NacLm6dt1nsuD/CgkAdlrOA3+/7ivtiD0Qs1coJP35HRPpZJKYJgpOX404OOOcyXpPV7QnN3KEgYj5DBiC2F0Rybu2HMqnuqaTQ/I+vaT6pmYmmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761786036; c=relaxed/simple;
-	bh=9CpQD46gVkqEhgWniJBg3R6m/D/ettVhiiDDMTrdbhs=;
+	s=arc-20240116; t=1761786037; c=relaxed/simple;
+	bh=ZkCBJfYfaF9HJb+lOVAzByIByWqsfRoPhi3YIUIjZX4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=D2tYcGWVHWf54XC4YTt1s0Uvd8ObqTIqSiXKYohZvjIpiIDvfBjIVOcBvKN9LrztdUcnNV0BtaS+SecPqZfUmRlTNaW4F5Uvzx5V0dmm+OdyWqadLov3oRHBYtKhB0g3DixIGfqoOPDbTb30hEnCh7Mu55EjCCWQM/Rv3Td8Dbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s03gnIFy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0468CC4CEF7;
-	Thu, 30 Oct 2025 01:00:36 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=Cjul7YcuZwWQOVLLDAOMbdeWYaTTg42WkCX3CmeCv+TbS6OXdlbs8QMy68QqR0UR3zBaTpQUCrN2SetdgBSZ/wma1aN8LZ4TrhydRlz2zilbKJqXTKdKivBVpES1HVVbOBIGziMSYg3r0Ed7H9xXaUO8GXCle8Bx6g85nklPPg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QplQC59I; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D384C4CEF7;
+	Thu, 30 Oct 2025 01:00:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761786036;
-	bh=9CpQD46gVkqEhgWniJBg3R6m/D/ettVhiiDDMTrdbhs=;
+	s=k20201202; t=1761786037;
+	bh=ZkCBJfYfaF9HJb+lOVAzByIByWqsfRoPhi3YIUIjZX4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=s03gnIFye+GODHHou3jNIhpFV9EkCbyo1DIXnawbmmGYFYLCVcdG5Tmxf0SnvGOi/
-	 g2O/JAG+VPXywz+Uw9Iy9AEpWhEtkFcWv5dg5bXiZcvw7aRx2U+bC9eybcMAkEi8gM
-	 ycMnG+3LyO94A3BxYcPa/4JlLetDWAl9kJf/ftJGD972cr26TZ3Oh1odGTAOCagEz3
-	 JLXy42IsUgIumpaQ2yjESYShq2cJxDwlpvlXbZ22IpkEgLaYwtLFmhpsfi4ibLrcse
-	 5qhSES3fITGwE+FcvuEDsWodywbpVYb+fgkieqYDtdfu1zsygJdt2g6+gawX0riZ3F
-	 JGXwpTapW3Ujg==
+	b=QplQC59IIsCGex0mbem0ePPMCP7UxytkOTJdFza9Ht5g92A9rMX3R6z28h0Q6dBdW
+	 TkT+RkAYq9PWjacNk/ukCz3RomED3sRQYt0J6adw+dOSf/lLE3XKWzk4THtXOAyXP2
+	 i99TdsT9kb6TfYdXed25+qmvc4rYasnE/NpUWUrjWbwwbTK0p4P7Gh0CQyZ4rGIXzA
+	 +49LSc/nKbFRDoeG2ELHtLw0AFTLLN2i1MeSqjAITR3ep7Ngvplic2aTjI8g7POOQ7
+	 bdkbDuS2PBSOBoo+Xwlbcxs565wOk9fk80hMITuAphrVdKZqUVYYXMxbw28cRLxpje
+	 a75fIMAMZ/ZPg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DFC3A55EC7;
-	Thu, 30 Oct 2025 01:00:14 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE8ED3A55EC7;
+	Thu, 30 Oct 2025 01:00:15 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,44 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] net: usb: asix_devices: Check return value of
- usbnet_get_endpoints
+Subject: Re: [PATCH net] net/mlx5: Don't zero user_count when destroying FDB
+ tables
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176178601301.3269431.1195749424522419303.git-patchwork-notify@kernel.org>
-Date: Thu, 30 Oct 2025 01:00:13 +0000
-References: <20251026164318.57624-1-linmq006@gmail.com>
-In-Reply-To: <20251026164318.57624-1-linmq006@gmail.com>
-To: Miaoqian Lin <linmq006@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, o.rempel@pengutronix.de,
- xu.yang_2@nxp.com, yuichtsu@amazon.com, max.schulze@online.de,
- khalasa@piap.pl, dhollis@davehollis.com, gregkh@suse.de, david-b@pacbell.net,
- linux-usb@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org
+ <176178601425.3269431.7440616130656460451.git-patchwork-notify@kernel.org>
+Date: Thu, 30 Oct 2025 01:00:14 +0000
+References: <1761510019-938772-1-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <1761510019-938772-1-git-send-email-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
+ leon@kernel.org, mbloch@nvidia.com, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, gal@nvidia.com,
+ dtatulea@nvidia.com, cratiu@nvidia.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 27 Oct 2025 00:43:16 +0800 you wrote:
-> The code did not check the return value of usbnet_get_endpoints.
-> Add checks and return the error if it fails to transfer the error.
+On Sun, 26 Oct 2025 22:20:19 +0200 you wrote:
+> From: Cosmin Ratiu <cratiu@nvidia.com>
 > 
-> Found via static anlaysis and this is similar to
-> commit 07161b2416f7 ("sr9800: Add check for usbnet_get_endpoints").
+> esw->user_count tracks how many TC rules are added on an esw via
+> mlx5e_configure_flower -> mlx5_esw_get -> atomic64_inc(&esw->user_count)
 > 
-> Fixes: 933a27d39e0e ("USB: asix - Add AX88178 support and many other changes")
-> Fixes: 2e55cc7210fe ("[PATCH] USB: usbnet (3/9) module for ASIX Ethernet adapters")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Miaoqian Lin <linmq006@gmail.com>
+> esw.user_count was unconditionally set to 0 in
+> esw_destroy_legacy_fdb_table and esw_destroy_offloads_fdb_tables.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] net: usb: asix_devices: Check return value of usbnet_get_endpoints
-    https://git.kernel.org/netdev/net/c/dc89548c6926
+  - [net] net/mlx5: Don't zero user_count when destroying FDB tables
+    https://git.kernel.org/netdev/net/c/53110232c95f
 
 You are awesome, thank you!
 -- 
