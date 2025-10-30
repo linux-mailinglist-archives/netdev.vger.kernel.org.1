@@ -1,219 +1,103 @@
-Return-Path: <netdev+bounces-234332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D19C7C1F7DE
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 11:20:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15F3EC1F7F9
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 11:22:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 840304E248C
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 10:20:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1A333B660B
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 10:22:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64E1933C532;
-	Thu, 30 Oct 2025 10:20:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="HUYE+L+l"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAE8233B955;
+	Thu, 30 Oct 2025 10:22:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67CC4DF71;
-	Thu, 30 Oct 2025 10:20:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 032D226B2C8
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 10:22:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761819640; cv=none; b=H7pqwq8Szt4i77WjXzPpyqc8OvCXFJMpAtQjDowdBeB5f1bpoKXcykKf0cqlPDtuVLSwnFLNqncsh/F/Ptlyi5YehKtl+/lWkMhsDSHWk5JCkTh2E47YC1yq2aSBQASZNYwfSr9rHdkqwvTKNOZ7YyYd4QUffzkTM2IHGsYdIAQ=
+	t=1761819755; cv=none; b=I7bH4M4dcwNnxXRpir2+B6ZCrqkvX5qceKM6/98MgFCxmVidZGJu4+RmMm/+Ig5cEVrUYHi67njqL2X4Nru+EvFISmLxPQf+LhIwT/F02lc4s4jOuFPdxS+IcatUuoAdYPVeRg1DY882FcjhnoEgBPL3cfY/Pnbi7QS85ajpIFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761819640; c=relaxed/simple;
-	bh=wZjI85gc9ds4oQnAVEj16miooQY7I47A8VGPHhee+JU=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=ti5BUWtm0LnXUbhx2urLJqnRUvZ+wl1zSn2xLdfDa5wfQ+aFKZFAMVn1Llz9ut3nTHGXquqcwGzSlwLpbKZQd3gKHI52dD8qQw2iyCwhD2QMJ5dZ4bQBvEHfJmtUIqiESK6oYmt/1ipW1uzvVDNTkxKizvMbH5RG68K6pBQcOmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=HUYE+L+l; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Om8QogJvG48OeHmfYzHSM2+A2/jNKspDMEUl+aS+ED4=; b=HUYE+L+lroDttVxCJDA1cv5R9Z
-	hBxZq/tXa2zO7c0xlkBkj7hu9fAtMC8+pnobfxc/qw+F0eax+pdXGDWZ3amnLHWZrHOJW9CSKEwjP
-	baSkOW8c2QcDJYA6ejxNPHebRAnH074DnOi0YQjAsyTMEVu6FHwl/hHMP63Bv6+5MGs2Mjktu4jL1
-	l+Js+F96qZKqTYbZo0frPvDWuO7Fj6R8dsGOLcKP+yuntpffsYjJANa6R2Qc1t0ejQ+qkxih5HXNv
-	fXgfgdwbbwqkdQqbVheyKS6vEICr+bHRLVPl6YaopllL/tdBiJpXISqtZbZF/AcUY5xg9yHDMW1++
-	nEN+OHfA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:33222 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1vEPlh-000000005Vd-14RR;
-	Thu, 30 Oct 2025 10:20:33 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1vEPlg-0000000CFHY-282A;
-	Thu, 30 Oct 2025 10:20:32 +0000
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	s=arc-20240116; t=1761819755; c=relaxed/simple;
+	bh=h6ZeZMm+kh/ZMKD2CWbwzRP0dY/DOi2RxLvBAU5tIYo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VFul14qvb3tDXwTuaE2P3afgxe3BtUDXlUFN5jG9gct+2WMDWEeINK5gMgg9o8NQvd3UBL3af5fbO9fUxMjaX9hlDzXrIhKawyEYtG0XmWl3d0ODFzEeETgsN6jKGdX0+3tSEE/do1qlGnpiNlEHyL6pruifxK9/J0nYKPcgV+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vEPnK-00035h-B2; Thu, 30 Oct 2025 11:22:14 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vEPnI-006C7e-30;
+	Thu, 30 Oct 2025 11:22:12 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vEPnI-008rEb-2Z;
+	Thu, 30 Oct 2025 11:22:12 +0100
+Date: Thu, 30 Oct 2025 11:22:12 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Thomas Wismer <thomas@wismer.xyz>
+Cc: Kory Maincent <kory.maincent@bootlin.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>
-Subject: [PATCH net-next v2] net: stmmac: qcom-ethqos: remove MAC_CTRL_REG
- modification
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Thomas Wismer <thomas.wismer@scs.ch>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 1/2] net: pse-pd: tps23881: Add support for
+ TPS23881B
+Message-ID: <aQM8VF2YN7fACzNm@pengutronix.de>
+References: <20251029212312.108749-1-thomas@wismer.xyz>
+ <20251029212312.108749-2-thomas@wismer.xyz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1vEPlg-0000000CFHY-282A@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Thu, 30 Oct 2025 10:20:32 +0000
+In-Reply-To: <20251029212312.108749-2-thomas@wismer.xyz>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-When operating in "SGMII" mode (Cisco SGMII or 2500BASE-X), qcom-ethqos
-modifies the MAC control register in its ethqos_configure_sgmii()
-function, which is only called from one path:
+On Wed, Oct 29, 2025 at 10:23:09PM +0100, Thomas Wismer wrote:
+> From: Thomas Wismer <thomas.wismer@scs.ch>
+> 
+> The TPS23881B uses different firmware than the TPS23881. Trying to load the
+> TPS23881 firmware on a TPS23881B device fails and must be omitted.
+> 
+> The TPS23881B ships with a more recent ROM firmware. Moreover, no updated
+> firmware has been released yet and so the firmware loading step must be
+> skipped. As of today, the TPS23881B is intended to use its ROM firmware.
+> 
+> Signed-off-by: Thomas Wismer <thomas.wismer@scs.ch>
 
-stmmac_mac_link_up()
-+- reads MAC_CTRL_REG
-+- masks out priv->hw->link.speed_mask
-+- sets bits according to speed (2500, 1000, 100, 10) from priv->hw.link.speed*
-+- ethqos_fix_mac_speed()
-|  +- qcom_ethqos_set_sgmii_loopback(false)
-|  +- ethqos_update_link_clk(speed)
-|  `- ethqos_configure(speed)
-|     `- ethqos_configure_sgmii(speed)
-|        +- reads MAC_CTRL_REG,
-|        +- configures PS/FES bits according to speed
-|        `- writes MAC_CTRL_REG as the last operation
-+- sets duplex bit(s)
-+- stmmac_mac_flow_ctrl()
-+- writes MAC_CTRL_REG if changed from original read
-...
+Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
-As can be seen, the modification of the control register that
-stmmac_mac_link_up() overwrites the changes that ethqos_fix_mac_speed()
-does to the register. This makes ethqos_configure_sgmii()'s
-modification questionable at best.
-
-Analysing the values written, GMAC4 sets the speed bits as:
-speed_mask = GMAC_CONFIG_FES | GMAC_CONFIG_PS
-speed2500 = GMAC_CONFIG_FES                     B14=1 B15=0
-speed1000 = 0                                   B14=0 B15=0
-speed100 = GMAC_CONFIG_FES | GMAC_CONFIG_PS     B14=1 B15=1
-speed10 = GMAC_CONFIG_PS                        B14=0 B15=1
-
-Whereas ethqos_configure_sgmii():
-2500: clears ETHQOS_MAC_CTRL_PORT_SEL           B14=X B15=0
-1000: clears ETHQOS_MAC_CTRL_PORT_SEL           B14=X B15=0
-100: sets ETHQOS_MAC_CTRL_PORT_SEL |            B14=1 B15=1
-          ETHQOS_MAC_CTRL_SPEED_MODE
-10: sets ETHQOS_MAC_CTRL_PORT_SEL               B14=0 B15=1
-    clears ETHQOS_MAC_CTRL_SPEED_MODE
-
-Thus, they appear to be doing very similar, with the exception of the
-FES bit (bit 14) for 1G and 2.5G speeds.
-
-Given that stmmac_mac_link_up() will write the MAC_CTRL_REG after
-ethqos_configure_sgmii(), remove the unnecessary update in the
-glue driver's ethqos_configure_sgmii() method, simplifying the code.
-
-Konrad states:
-
-Without any additional knowledge, the register description says:
-
-2500: B14=1 B15=0
-1000: B14=0 B15=0
- 100: B14=1 B15=1
-  10: B14=0 B15=1
-
-Tested-by: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
-Reviewed-by: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
-v2: added tested-by/reviewed-by, added additional comments from Konrad
-w.r.t. the register description to commit description (which is the
-reason for resending.)
-
- .../ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c  | 16 +---------------
- 1 file changed, 1 insertion(+), 15 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-index d1e48b524d7a..1a616a71c36a 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-@@ -76,10 +76,6 @@
- #define RGMII_CONFIG2_DATA_DIVIDE_CLK_SEL	BIT(6)
- #define RGMII_CONFIG2_TX_CLK_PHASE_SHIFT_EN	BIT(5)
- 
--/* MAC_CTRL_REG bits */
--#define ETHQOS_MAC_CTRL_SPEED_MODE		BIT(14)
--#define ETHQOS_MAC_CTRL_PORT_SEL		BIT(15)
--
- /* EMAC_WRAPPER_SGMII_PHY_CNTRL1 bits */
- #define SGMII_PHY_CNTRL1_SGMII_TX_TO_RX_LOOPBACK_EN	BIT(3)
- 
-@@ -632,13 +628,9 @@ static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos, int speed)
- {
- 	struct net_device *dev = platform_get_drvdata(ethqos->pdev);
- 	struct stmmac_priv *priv = netdev_priv(dev);
--	int val;
--
--	val = readl(ethqos->mac_base + MAC_CTRL_REG);
- 
- 	switch (speed) {
- 	case SPEED_2500:
--		val &= ~ETHQOS_MAC_CTRL_PORT_SEL;
- 		rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
- 			      RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
- 			      RGMII_IO_MACRO_CONFIG2);
-@@ -646,7 +638,6 @@ static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos, int speed)
- 		ethqos_pcs_set_inband(priv, false);
- 		break;
- 	case SPEED_1000:
--		val &= ~ETHQOS_MAC_CTRL_PORT_SEL;
- 		rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
- 			      RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
- 			      RGMII_IO_MACRO_CONFIG2);
-@@ -654,13 +645,10 @@ static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos, int speed)
- 		ethqos_pcs_set_inband(priv, true);
- 		break;
- 	case SPEED_100:
--		val |= ETHQOS_MAC_CTRL_PORT_SEL | ETHQOS_MAC_CTRL_SPEED_MODE;
- 		ethqos_set_serdes_speed(ethqos, SPEED_1000);
- 		ethqos_pcs_set_inband(priv, true);
- 		break;
- 	case SPEED_10:
--		val |= ETHQOS_MAC_CTRL_PORT_SEL;
--		val &= ~ETHQOS_MAC_CTRL_SPEED_MODE;
- 		rgmii_updatel(ethqos, RGMII_CONFIG_SGMII_CLK_DVDR,
- 			      FIELD_PREP(RGMII_CONFIG_SGMII_CLK_DVDR,
- 					 SGMII_10M_RX_CLK_DVDR),
-@@ -670,9 +658,7 @@ static int ethqos_configure_sgmii(struct qcom_ethqos *ethqos, int speed)
- 		break;
- 	}
- 
--	writel(val, ethqos->mac_base + MAC_CTRL_REG);
--
--	return val;
-+	return 0;
- }
- 
- static int ethqos_configure(struct qcom_ethqos *ethqos, int speed)
+Thank you.
 -- 
-2.47.3
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
