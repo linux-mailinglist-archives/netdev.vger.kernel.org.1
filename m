@@ -1,158 +1,284 @@
-Return-Path: <netdev+bounces-234498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF456C21DA0
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 20:06:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B30FCC22077
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 20:42:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36100188301B
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 19:06:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0F0A1896CA3
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 19:42:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC67730FF04;
-	Thu, 30 Oct 2025 19:06:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8490301482;
+	Thu, 30 Oct 2025 19:42:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QNIzBf2d"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DMJEP7v3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7827B2FC030;
-	Thu, 30 Oct 2025 19:06:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2341F2FF676
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 19:42:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761851185; cv=none; b=tvRVqC4ynUIrQ6pAPG9HQ2V8dvlosVWNj+lxtg67ccK/Xp3RMCRH9npsYCTFrpIZCSC1tX4t+0A0VKnck3LnlI18QenFe2Izzw5nI99IL/IiPAE2EjnObCcwNd+hsw63bQlZWCzOCzmEEvySm1zd2r+908PBptmXMe1HEWMzTBQ=
+	t=1761853332; cv=none; b=TBDCl2xETCKwm9hINH7n2CwC57sc8bmlc48V7Lv1Kj4aoBwjd/DbgFz/apJzEOzcSrJkPLeVn7TzrSROVQC0XBazWY5F7Ha/eC8nKWt/FIj2XBl9swmWMvjROk0HtslsJoqmPMb5U1ilV0RpU1RRrnZuY0oXHfR+yGmevoEQCUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761851185; c=relaxed/simple;
-	bh=v8FQqTUg+Nt8i5VWhtx46IW0ZcboKKiKlIr0lZaJEXY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tzbT+bLBqiyVfXHZSN7WZT/jUQ5BWZAeAo+812wih0KkvNVdEWDZuQehhJoidfliY4WGeTOsA3DLk1LDGoyKgDj1J2obF+vm/ltr8aevu9D4dxAQyY4fm4nJXNhQwZDa6LYbrrqbaWR0wyw47f8rw728WTKz3XRRWOr5KSd4igI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QNIzBf2d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9B77C4CEFD;
-	Thu, 30 Oct 2025 19:06:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761851185;
-	bh=v8FQqTUg+Nt8i5VWhtx46IW0ZcboKKiKlIr0lZaJEXY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=QNIzBf2df2ob42+FAYkoqWOQD/8Ooxsw5WCOeMfJ00wfguWLLixv/Bk00HOdROVYL
-	 XUEV1G1rPGsHNo94hBYIit4p0J8FpztL4NMNo8X4LXytOeCWV5KVCjkN4YHU4k1nGN
-	 7YmLfaDBwdszUJ5mNmhnQyUKZHJlwotnBGawdPE5qvD0K1nz/rjR1wZzTM96WWZIgM
-	 V/L8JcolF1ZqvyZ8joehI73SqE+t/YhP0R7ov0dxLFkMbmlMkvflMLpLtxdyQUFgyh
-	 eaEJxFqcUuryG51oJA5fhuoDzEGseEjyTxcIWzXn923ZFQYjXziFWOmhBuTMiX52IY
-	 BUlu5FKZEL4mA==
-Message-ID: <e3abd249-f348-4504-b1d9-4b5cd3df5822@kernel.org>
-Date: Thu, 30 Oct 2025 20:06:19 +0100
+	s=arc-20240116; t=1761853332; c=relaxed/simple;
+	bh=g8P923d2wAcNniHM4tWlKiF32X+awvKoTzTVJeeZcpQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nOaFTTjkPzSmZRx5/Nu0lSb1GQb0+MBcU1K0u6a2IDDFpht+/OIBPd1rPD+1mcPkxmTbi4RJlsAVKUis1qsxH7eih4KgNFUgJseulqPZoQ3+brOcvCZY/K0hZiN1KywMvS27qR4SexU25kfv4RNC+Jzt8/3yI42EAZe3RvtlYQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DMJEP7v3; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761853329;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=gLwLAME3+HpnffWm8eJyjxkjIM5r9PAIGkrqquvuh8M=;
+	b=DMJEP7v3eBYFdhQ5D1r0XNGQWlYUX3huDIis3S+IhpekJDQzcx3daMoJsZUE679M9xKEv1
+	kjAW6grrF075h1iwig8/45MpYs3O5UXdEHEbjrYn9KhcDCZUztQ+A5qzaFtCxKBu1zYWkk
+	x0t6tWCIe18iJstGJC2rG12WdVhUgQA=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-423-ZVAwOdB-PxS78BTlR9oOxw-1; Thu,
+ 30 Oct 2025 15:42:05 -0400
+X-MC-Unique: ZVAwOdB-PxS78BTlR9oOxw-1
+X-Mimecast-MFC-AGG-ID: ZVAwOdB-PxS78BTlR9oOxw_1761853324
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0CC481805A0E;
+	Thu, 30 Oct 2025 19:42:04 +0000 (UTC)
+Received: from p16v.bos2.lab (unknown [10.44.34.153])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id BFA521800581;
+	Thu, 30 Oct 2025 19:42:01 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>,
+	David Ahern <dsahern@kernel.org>,
+	Petr Oros <poros@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>
+Subject: [PATCH iproute2-next] devlink: Add support for 64bit parameters
+Date: Thu, 30 Oct 2025 20:42:00 +0100
+Message-ID: <20251030194200.1006201-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net V2 2/2] veth: more robust handing of race to avoid txq
- getting stuck
-To: Toshiaki Makita <toshiaki.makita1@gmail.com>
-Cc: Eric Dumazet <eric.dumazet@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, ihor.solodrai@linux.dev,
- "Michael S. Tsirkin" <mst@redhat.com>, makita.toshiaki@lab.ntt.co.jp,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kernel-team@cloudflare.com,
- netdev@vger.kernel.org, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
- <toke@toke.dk>
-References: <176159549627.5396.15971398227283515867.stgit@firesoul>
- <176159553930.5396.4492315010562655785.stgit@firesoul>
- <aacc9c56-bea9-44eb-90fd-726d41b418dd@gmail.com>
- <27e74aeb-89f5-4547-8ecc-232570e2644c@kernel.org>
- <4aa74767-082c-4407-8677-70508eb53a5d@gmail.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <4aa74767-082c-4407-8677-70508eb53a5d@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
+Kernel commit c0ef144695910 ("devlink: Add support for u64 parameters")
+added support for 64bit devlink parameters, add the support for them
+also into devlink utility userspace counterpart.
 
+Cc: Jiri Pirko <jiri@resnulli.us>
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+---
+ devlink/devlink.c | 78 +++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 59 insertions(+), 19 deletions(-)
 
-On 29/10/2025 16.00, Toshiaki Makita wrote:
-> On 2025/10/29 19:33, Jesper Dangaard Brouer wrote:
->> On 28/10/2025 15.56, Toshiaki Makita wrote:
->>> On 2025/10/28 5:05, Jesper Dangaard Brouer wrote:
->>>> (3) Finally, the NAPI completion check in veth_poll() is updated. If 
->>>> NAPI is
->>>> about to complete (napi_complete_done), it now also checks if the 
->>>> peer TXQ
->>>> is stopped. If the ring is empty but the peer TXQ is stopped, NAPI will
->>>> reschedule itself. This prevents a new race where the producer stops 
->>>> the
->>>> queue just as the consumer is finishing its poll, ensuring the 
->>>> wakeup is not missed.
->>> ...
->>>
->>>> @@ -986,7 +979,8 @@ static int veth_poll(struct napi_struct *napi, 
->>>> int budget)
->>>>       if (done < budget && napi_complete_done(napi, done)) {
->>>>           /* Write rx_notify_masked before reading ptr_ring */
->>>>           smp_store_mb(rq->rx_notify_masked, false);
->>>> -        if (unlikely(!__ptr_ring_empty(&rq->xdp_ring))) {
->>>> +        if (unlikely(!__ptr_ring_empty(&rq->xdp_ring) ||
->>>> +                 (peer_txq && netif_tx_queue_stopped(peer_txq)))) {
->>>
->>> Not sure if this is necessary.
->>
->> How sure are you that this isn't necessary?
->>
->>>  From commitlog, your intention seems to be making sure to wake up 
->>> the queue,
->>> but you wake up the queue immediately after this hunk in the same 
->>> function,
->>> so isn't it guaranteed without scheduling another napi?
->>>
->>
->> The above code catches the case, where the ptr_ring is empty and the
->> tx_queue is stopped.  It feels wrong not to reach in this case, but you
->> *might* be right that it isn't strictly necessary, because below code
->> will also call netif_tx_wake_queue() which *should* have a SKB stored
->> that will *indirectly* trigger a restart of the NAPI.
-> 
-> I'm a bit confused.
-> Wrt (3), what you want is waking up the queue, right?
-> Or, what you want is actually NAPI reschedule itself?
+diff --git a/devlink/devlink.c b/devlink/devlink.c
+index f77b4449e8c5..efeb072a4637 100644
+--- a/devlink/devlink.c
++++ b/devlink/devlink.c
+@@ -3419,7 +3419,7 @@ static int cmd_dev_eswitch(struct dl *dl)
+ struct param_val_conv {
+ 	const char *name;
+ 	const char *vstr;
+-	uint32_t vuint;
++	uint64_t vuint;
+ };
+ 
+ static bool param_val_conv_exists(const struct param_val_conv *param_val_conv,
+@@ -3437,7 +3437,7 @@ static bool param_val_conv_exists(const struct param_val_conv *param_val_conv,
+ static int
+ param_val_conv_uint_get(const struct param_val_conv *param_val_conv,
+ 			uint32_t len, const char *name, const char *vstr,
+-			uint32_t *vuint)
++			uint64_t *vuint)
+ {
+ 	uint32_t i;
+ 
+@@ -3453,7 +3453,7 @@ param_val_conv_uint_get(const struct param_val_conv *param_val_conv,
+ 
+ static int
+ param_val_conv_str_get(const struct param_val_conv *param_val_conv,
+-		       uint32_t len, const char *name, uint32_t vuint,
++		       uint32_t len, const char *name, uint64_t vuint,
+ 		       const char **vstr)
+ {
+ 	uint32_t i;
+@@ -3670,6 +3670,7 @@ struct param_ctx {
+ 		uint8_t vu8;
+ 		uint16_t vu16;
+ 		uint32_t vu32;
++		uint64_t vu64;
+ 		const char *vstr;
+ 		bool vbool;
+ 	} value;
+@@ -3730,6 +3731,9 @@ static int cmd_dev_param_set_cb(const struct nlmsghdr *nlh, void *data)
+ 			case MNL_TYPE_U32:
+ 				ctx->value.vu32 = mnl_attr_get_u32(val_attr);
+ 				break;
++			case MNL_TYPE_U64:
++				ctx->value.vu64 = mnl_attr_get_u64(val_attr);
++				break;
+ 			case MNL_TYPE_STRING:
+ 				ctx->value.vstr = mnl_attr_get_str(val_attr);
+ 				break;
+@@ -3749,7 +3753,8 @@ static int cmd_dev_param_set(struct dl *dl)
+ 	struct param_ctx ctx = {};
+ 	struct nlmsghdr *nlh;
+ 	bool conv_exists;
+-	uint32_t val_u32 = 0;
++	uint64_t val_u64 = 0;
++	uint32_t val_u32;
+ 	uint16_t val_u16;
+ 	uint8_t val_u8;
+ 	bool val_bool;
+@@ -3791,8 +3796,8 @@ static int cmd_dev_param_set(struct dl *dl)
+ 						      PARAM_VAL_CONV_LEN,
+ 						      dl->opts.param_name,
+ 						      dl->opts.param_value,
+-						      &val_u32);
+-			val_u8 = val_u32;
++						      &val_u64);
++			val_u8 = val_u64;
+ 		} else {
+ 			err = get_u8(&val_u8, dl->opts.param_value, 10);
+ 		}
+@@ -3808,8 +3813,8 @@ static int cmd_dev_param_set(struct dl *dl)
+ 						      PARAM_VAL_CONV_LEN,
+ 						      dl->opts.param_name,
+ 						      dl->opts.param_value,
+-						      &val_u32);
+-			val_u16 = val_u32;
++						      &val_u64);
++			val_u16 = val_u64;
+ 		} else {
+ 			err = get_u16(&val_u16, dl->opts.param_value, 10);
+ 		}
+@@ -3820,20 +3825,37 @@ static int cmd_dev_param_set(struct dl *dl)
+ 		mnl_attr_put_u16(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u16);
+ 		break;
+ 	case MNL_TYPE_U32:
+-		if (conv_exists)
++		if (conv_exists) {
+ 			err = param_val_conv_uint_get(param_val_conv,
+ 						      PARAM_VAL_CONV_LEN,
+ 						      dl->opts.param_name,
+ 						      dl->opts.param_value,
+-						      &val_u32);
+-		else
++						      &val_u64);
++			val_u32 = val_u64;
++		} else {
+ 			err = get_u32(&val_u32, dl->opts.param_value, 10);
++		}
+ 		if (err)
+ 			goto err_param_value_parse;
+ 		if (val_u32 == ctx.value.vu32)
+ 			return 0;
+ 		mnl_attr_put_u32(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u32);
+ 		break;
++	case MNL_TYPE_U64:
++		if (conv_exists)
++			err = param_val_conv_uint_get(param_val_conv,
++						      PARAM_VAL_CONV_LEN,
++						      dl->opts.param_name,
++						      dl->opts.param_value,
++						      &val_u64);
++		else
++			err = get_u64((__u64 *)&val_u64, dl->opts.param_value, 10);
++		if (err)
++			goto err_param_value_parse;
++		if (val_u64 == ctx.value.vu64)
++			return 0;
++		mnl_attr_put_u64(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u64);
++		break;
+ 	case MNL_TYPE_FLAG:
+ 		err = strtobool(dl->opts.param_value, &val_bool);
+ 		if (err)
+@@ -5325,7 +5347,8 @@ static int cmd_port_param_set(struct dl *dl)
+ 	struct param_ctx ctx = {};
+ 	struct nlmsghdr *nlh;
+ 	bool conv_exists;
+-	uint32_t val_u32 = 0;
++	uint64_t val_u64 = 0;
++	uint32_t val_u32;
+ 	uint16_t val_u16;
+ 	uint8_t val_u8;
+ 	bool val_bool;
+@@ -5363,8 +5386,8 @@ static int cmd_port_param_set(struct dl *dl)
+ 						      PARAM_VAL_CONV_LEN,
+ 						      dl->opts.param_name,
+ 						      dl->opts.param_value,
+-						      &val_u32);
+-			val_u8 = val_u32;
++						      &val_u64);
++			val_u8 = val_u64;
+ 		} else {
+ 			err = get_u8(&val_u8, dl->opts.param_value, 10);
+ 		}
+@@ -5380,8 +5403,8 @@ static int cmd_port_param_set(struct dl *dl)
+ 						      PARAM_VAL_CONV_LEN,
+ 						      dl->opts.param_name,
+ 						      dl->opts.param_value,
+-						      &val_u32);
+-			val_u16 = val_u32;
++						      &val_u64);
++			val_u16 = val_u64;
+ 		} else {
+ 			err = get_u16(&val_u16, dl->opts.param_value, 10);
+ 		}
+@@ -5392,20 +5415,37 @@ static int cmd_port_param_set(struct dl *dl)
+ 		mnl_attr_put_u16(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u16);
+ 		break;
+ 	case MNL_TYPE_U32:
+-		if (conv_exists)
++		if (conv_exists) {
+ 			err = param_val_conv_uint_get(param_val_conv,
+ 						      PARAM_VAL_CONV_LEN,
+ 						      dl->opts.param_name,
+ 						      dl->opts.param_value,
+-						      &val_u32);
+-		else
++						      &val_u64);
++			val_u32 = val_u64;
++		} else {
+ 			err = get_u32(&val_u32, dl->opts.param_value, 10);
++		}
+ 		if (err)
+ 			goto err_param_value_parse;
+ 		if (val_u32 == ctx.value.vu32)
+ 			return 0;
+ 		mnl_attr_put_u32(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u32);
+ 		break;
++	case MNL_TYPE_U64:
++		if (conv_exists)
++			err = param_val_conv_uint_get(param_val_conv,
++						      PARAM_VAL_CONV_LEN,
++						      dl->opts.param_name,
++						      dl->opts.param_value,
++						      &val_u64);
++		else
++			err = get_u64((__u64 *)&val_u64, dl->opts.param_value, 10);
++		if (err)
++			goto err_param_value_parse;
++		if (val_u64 == ctx.value.vu64)
++			return 0;
++		mnl_attr_put_u64(nlh, DEVLINK_ATTR_PARAM_VALUE_DATA, val_u64);
++		break;
+ 	case MNL_TYPE_FLAG:
+ 		err = strtobool(dl->opts.param_value, &val_bool);
+ 		if (err)
+-- 
+2.51.0
 
-I want NAPI to reschedule itself, the queue it woken up later close to
-the exit of the function.  Maybe it is unnecessary to for NAPI to
-reschedule itself here... and that is what you are objecting to?
-
-> My understanding was the former (wake up the queue).
-> If it's correct, (3) seems not necessary because you have already woken 
-> up the queue in the same function.
-> 
-> First NAPI
->   veth_poll()
->     // ptr_ring_empty() and queue_stopped()
->    __napi_schedule() ... schedule second NAPI
->    netif_tx_wake_queue() ... wake up the queue if queue_stopped()
-> 
-> Second NAPI
->   veth_poll()
->    netif_tx_wake_queue() ... this is what you want,
->                              but the queue has been woken up in the 
-> first NAPI
->                              What's the point?
-> 
-
-So, yes I agree that there is a potential for restarting NAPI one time
-too many.  But only *potential* because if NAPI is already/still running
-then the producer will not actually start NAPI.
-
-I guess this is a kind of optimization, to avoid the time it takes to
-restart NAPI. When we see that TXQ is stopped and ptr_ring is empty,
-then we know that a packet will be sitting in the qdisc requeue queue,
-and netif_tx_wake_queue() will very soon fill "produce" a packet into
-ptr_ring (via calling ndo_start_xmit/veth_xmit).
-
-As this is a fixes patch I can drop this optimization. It seems both
-Paolo and you thinks this isn't necessary.
-
---Jesper
 
