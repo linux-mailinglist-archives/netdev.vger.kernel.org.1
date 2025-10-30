@@ -1,181 +1,139 @@
-Return-Path: <netdev+bounces-234283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E91FC1E9D9
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 07:47:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3283EC1EC1E
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 08:30:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 07BEA4E1E97
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 06:47:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C7EB19C51B1
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 07:30:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04C342E1EE7;
-	Thu, 30 Oct 2025 06:47:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A06D337109;
+	Thu, 30 Oct 2025 07:30:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xzb/iaxs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V0ZmbZzI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE1818A6DB
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 06:47:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6238241695
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 07:30:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761806864; cv=none; b=cApggcxbcyWyAi/25NaIRDPA6son9Me+cJ+VAV5duZQ1kpxJ41JhvZL3Bxf7f0jf7Z6rAK6eGAMCz2xrjyvDhIg+0NV+Lybv+LVyCs9w5D8teTV8pJjimOVEUL/VTtDLp3o4aXIICQQe7b1CsDLajTqGHZ/6+LCm8UDxnQ04ZPE=
+	t=1761809408; cv=none; b=YfBj9i/QZTUeGPfdqP3Bd/ql1gqapK3SQ1S6zqwXuysX9dQdgcctFICE4QVfWpVl+UOi2VcaKO43cZbEWdbcZLKJA8RPR3mGUR2IVqgt/N+ws5WGzwYFnC65vfZn4wAJt6HCyuP4CBqnbKnMZZTq5fGl62UfnTtXon5y0LMC+3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761806864; c=relaxed/simple;
-	bh=Me3DvE2ugI06H5NnuFqscw90MT7ZGQysOgv6CrNFg7c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pbM/MrW3D0luVObwbOhSfkdFA+BM6qx1Pp2QzwfHfs7mEZj+7SS3+ohwKYDcQIgCecnrMFf64S93fB+A8ZcqXlU2LfL4neMKXWv7VZ9oL8cxwJFiXK9KvVE6VLmZQVoRJ1ql8vm82EwCWc5qCs/M20PigVMI23szzbsRzzduQoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xzb/iaxs; arc=none smtp.client-ip=209.85.210.169
+	s=arc-20240116; t=1761809408; c=relaxed/simple;
+	bh=JEl9GC42JmfajoHCarU2JPEtxV/Dvh3GNqFUPBkz8So=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NzW8WTpO6qNFm5dU1st+nKgPxT/56GY6lBOPL1fHiXAzXzOLRWvLnnIJgOqlFsVRv5JmwbTllF2Bi4oE7FzibG5XsVCaKGOTuBU2BU9YS6mXXGUeTBbgSTAEUUAxu3dAv4M56C045aXS/QxnGISnqWukzZxih5PBZg4eaCFWrsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V0ZmbZzI; arc=none smtp.client-ip=209.85.216.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7a4176547bfso697115b3a.2
-        for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 23:47:42 -0700 (PDT)
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-33e27a3b153so840299a91.3
+        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 00:30:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761806862; x=1762411662; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1761809404; x=1762414204; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Am9qB9+YZXgr5yZPmS0eVlJwMZhmLJXC12be2I9616g=;
-        b=Xzb/iaxsuyLAEW7w2FsEl0n1/OdunvACjnQh157BAyjM53zFU8BfAcqqWmqSyNCibg
-         Ed7SZNruy6V3HgTi2miNhDG3vE+MXp7qtR1W4d3eQEW/dQFGbaqjd8yV8JjwMGkfi3c9
-         WFWD5tzoXRCOaC7o05O1kh4bV7JaBtGA0TCJAYdmGh30h0PnxveZNPbek+yhOhXGT9Cr
-         DoBG2Rjy5ZbgyEyN9q9JaOHH2LY86iRd/bGO5wBSeOadD2YpGAI205f2Mhqe/AWQwUC3
-         ZJfxqsnSI27j83LkDhn+lP/Ab69hDP+2QZ1EEeGkB1qItKA9M6CviK4CB9wtZUt4mNfC
-         pj5Q==
+        bh=vdDJYs2ftj9g3gsNmVUwfcn6X4b2n8l3NR5CnT8xsbU=;
+        b=V0ZmbZzIGnlOpu/06RNsyXxKeyupSXjb2mOzW3Wqkxq1KrJRk9iKcal67eoeNvpXJi
+         FuOSNPtyqOcDo6QeOpicA7UxeRi99wd0BDn5IPVSXesgeBJvW/ewK8qmvPpDgJFJfGq5
+         Bt6MrW60/qHSifP2n+o93iQeTKGtGGLEpfNwOHx9N3HpZ8aS4jRrR/JR8CjFiTo7TjRW
+         WGxO2AdkSkZjUKtQHZdWh1cQ1ck2D1yYGy8x4bOaT78FmyCLGbNGeNSdu1Hvs3k7kGUS
+         ihHqzSio+tTZvyz9+hqiEGn+Cl+p2lJ6jhoYLNGWZEcSq5umb0Eo/ng3VFBrM/t99X5j
+         ossw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761806862; x=1762411662;
+        d=1e100.net; s=20230601; t=1761809404; x=1762414204;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Am9qB9+YZXgr5yZPmS0eVlJwMZhmLJXC12be2I9616g=;
-        b=cWlt3allnpp6/N7li2wmegyppMI2vid9t4omfqVVIU11AdKYOO5OBHpHKEid7mhJ5V
-         NHhbw1KtdNtYK8iHJgAJ+/U2gXnQfBYzBLCnHmssHN08VWNgjfCm7FAJdDm++dZlBV9l
-         Re8aIjilNvz74KZsmGKAkIwwDJ2+WqOBzmf37pZsq4sgPJYgrTxsaaBLDJWJ2uD9IiK8
-         GmYT8i0Whq8B5oSp3YVpU0uyI2I+SAEqGSYBzK/svMecxpT1OdfBzocvLBcEZ1+bulE5
-         sVopCStcQT3I15f7VArwUqcVVmpcCtwK+uJW/TR7enFPdxNv9lMsNcvQSjbyXi/h1YZr
-         VXfw==
-X-Gm-Message-State: AOJu0YzuQc23pdkW8v1LxklgB85Z7Q8Ba39nuxfO7cV1kqjqSNNIMzrI
-	NgRaBihhwlLYh7B/40RCbRF9IPpDmx00BGhZFzJ+kmRofSMs2I/pWJ2sW8GemaYWGQYGBg==
-X-Gm-Gg: ASbGncslKpzvnloo+5TH/6FKKnyEBnkRLYVBFoa5iL/mL+umHtahw+HIoC9iQ6BMVzr
-	1nDieZfPc/1YWCNmdVHcI9B9kBy7fljfphxvvd1rKhwY1BvGi2x4egQRSil0LGXMR3oRNxPNLMA
-	8m+skF6rbXb/tkM3kEgKqFR+OGMRTD5Vv6KnwZ4ZXUTaJ6BU0z98AuSfEn7sQOAwC8/0pVS8Tus
-	4p00VHc0DIa3+B72RdRvKfZ6CDNaP989xuLtr24kr1V8b+BFF61ExvzkuxvvcI24xrlou5ktxIV
-	puEfAiGJ/GUpVZ+e+6d8LBIQ2inyVaVAKL4n8SMdD9Fwm95K60CVBq6tSfnp7rPy+3wH8ei6wOP
-	G+pXfnC/bxXmP7R6lrzheyFThO3Ae7rNnf4UPwTx+DN0xT7QT4DLq
-X-Google-Smtp-Source: AGHT+IGoeDNjZsXbO3LdK/V2YvdvGX0ZgT9GuusUDEYT4fkoC2bi4mVxlbYzrfAWfqpRdk3dt9E7Mg==
-X-Received: by 2002:a05:6a20:3d86:b0:33b:625:36be with SMTP id adf61e73a8af0-34654ee8c72mr7062588637.38.1761806862086;
-        Wed, 29 Oct 2025 23:47:42 -0700 (PDT)
-Received: from gmail.com ([2a09:bac5:1f0a:28::4:372])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a414012c40sm17799563b3a.6.2025.10.29.23.47.39
+        bh=vdDJYs2ftj9g3gsNmVUwfcn6X4b2n8l3NR5CnT8xsbU=;
+        b=J0E3drEJrvOEaQjiT8qmg3tmO4qM0S4nFoysE8T2dds8e70Lf0dSIhN3rzZgsaRcwb
+         +gMlF8c6FfbrlToxXj4hnIzu/sKuVSakLtnZ1AX+oGI5JkTYjFLpK7ijAO3t5HOYQNF9
+         /ZO+ZzwXMDaVblmrtr2gho83exXyU5JoSequhswri8Bw2y8gwUgc+z6fVAGklRr/p16C
+         CreI0uKBBYqFtdiD8/Fxnd4oZp/yQB37dmirXaRhGCuuekuW6UMgMVZnXfBN00WkK0by
+         xfOiTs8SpEIxFYENyM2m8DMPpnxQCds9TPYOcnNZ8ovAkbWZ8ea0U3EeiXrpQofL/slV
+         XwtA==
+X-Forwarded-Encrypted: i=1; AJvYcCXf4KoZ+MYyejADWMK3QmC1rG8j0A8GXQIXzGo1hwAszjyWtjWmczbchvimCGy890jhc07qy0A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVwKGVUxjZaFC7FBESOo0neWhmbrF7qlqnHz2/XK38x3ts6ocm
+	l8WNyvlZ5XHjWwponybSMzbq7E4Xc+nsJupIsgrzw9AKkD/zE8MnXr5A
+X-Gm-Gg: ASbGncsc/lhFZdiyGt767TSjP3FYqsQ+k1TTUO0lBkVFGBE49ekbDEpeSKLb6Dz28BL
+	fSHLaJ5kGNAy5d1K3RwYD3WIjJlf1apaeB+9rm/xQJx9TncQ4ux6IY4cqgxfrqgg5yp+SIIfu7L
+	9Cfa3sjkPa+fMLBYiSE0YiSiLHwRJ/bw36Uk0gzIvGTKdUcPrCUNPoOiGL5PgmnlgKAMTFzHhiY
+	LEnN73TpCB6xRe3vaHlyB7AJK7F65f8QyGQohUbp6JKrJB6WvA4SkVSkZIPbbKVwsZKYA78mxa/
+	MSlZPNcoW/SPzs9rb/LkbJiG0tPClBmkJBleXFTnICG4brjekdklshyQOtJL9UUrToExLpEWxMC
+	RFwXSjOyF92Bs6AvBO5jD7UWqkfizB8fX3MlFRj7UClZIY5PYEbe6niag1nwVazHzFmqyY9qGp9
+	Ce
+X-Google-Smtp-Source: AGHT+IHmZ2LrOAPsOHzLCV0R7WL6u7SHBbA5fx1AuypMoq9aZiir9lY6E508nqoYTXIY9ZDt2yElfg==
+X-Received: by 2002:a17:90b:3906:b0:33b:ba50:fccc with SMTP id 98e67ed59e1d1-3403a29a3c2mr6444652a91.18.1761809403953;
+        Thu, 30 Oct 2025 00:30:03 -0700 (PDT)
+Received: from archie.me ([210.87.74.117])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3404be704efsm1002505a91.0.2025.10.30.00.30.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Oct 2025 23:47:41 -0700 (PDT)
-From: Qingfang Deng <dqfext@gmail.com>
-To: Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <smfrench@gmail.com>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Tom Talpey <tom@talpey.com>,
-	Ronnie Sahlberg <lsahlber@redhat.com>,
-	Hyunchul Lee <hyc.lee@gmail.com>,
-	linux-cifs@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Subject: [PATCH] ksmbd: server: avoid busy polling in accept loop
-Date: Thu, 30 Oct 2025 14:47:36 +0800
-Message-ID: <20251030064736.24061-1-dqfext@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Thu, 30 Oct 2025 00:30:02 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id 358A34209E4B; Thu, 30 Oct 2025 14:29:49 +0700 (WIB)
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux Networking <netdev@vger.kernel.org>
+Cc: Breno Leitao <leitao@debian.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Bagas Sanjaya <bagasdotme@gmail.com>
+Subject: [PATCH net-next] Documentation: netconsole: Separate literal code blocks for full and short netcat command name versions
+Date: Thu, 30 Oct 2025 14:29:44 +0700
+Message-ID: <20251030072945.38686-1-bagasdotme@gmail.com>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1137; i=bagasdotme@gmail.com; h=from:subject; bh=JEl9GC42JmfajoHCarU2JPEtxV/Dvh3GNqFUPBkz8So=; b=owGbwMvMwCX2bWenZ2ig32LG02pJDJnMwhlOXPI/DJQmTfk5adEEqQUnNix8yLrm1ou9Mbpf9 rlcfROj31HKwiDGxSArpsgyKZGv6fQuI5EL7WsdYeawMoEMYeDiFICJTK1k+F/xcGfWlaBJJ//J ZvqcPx3p9qUw4oXfE9sDYj9fV11zW6zKyPC4x7tt2V7RhLQMT7s017pXX1aHaCvv7b3DduBVTH+ XHhcA
+X-Developer-Key: i=bagasdotme@gmail.com; a=openpgp; fpr=701B806FDCA5D3A58FFB8F7D7C276C64A5E44A1D
 Content-Transfer-Encoding: 8bit
 
-The ksmbd listener thread was using busy waiting on a listening socket by
-calling kernel_accept() with SOCK_NONBLOCK and retrying every 100ms on
--EAGAIN. Since this thread is dedicated to accepting new connections,
-there is no need for non-blocking mode.
+Both full and short (abbreviated) command name versions of netcat
+example are combined in single literal code block due to 'or::'
+paragraph being indented one more space than the preceding paragraph
+(before the short version example).
 
-Switch to a blocking accept() call instead, allowing the thread to sleep
-until a new connection arrives. This avoids unnecessary wakeups and CPU
-usage.
+Unindent it to separate the versions.
 
-Also remove:
-  - TCP_NODELAY, which has no effect on a listening socket.
-  - sk_rcvtimeo and sk_sndtimeo assignments, which only caused accept()
-    to return -EAGAIN prematurely.
-
-Fixes: 0626e6641f6b ("cifsd: add server handler for central processing and tranport layers")
-Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 ---
- fs/smb/server/transport_tcp.c | 22 ++--------------------
- 1 file changed, 2 insertions(+), 20 deletions(-)
+Changes since v1 [1]:
 
-diff --git a/fs/smb/server/transport_tcp.c b/fs/smb/server/transport_tcp.c
-index 7a1e3dcc2cde..57a6aa98e7de 100644
---- a/fs/smb/server/transport_tcp.c
-+++ b/fs/smb/server/transport_tcp.c
-@@ -46,11 +46,6 @@ static struct interface *alloc_iface(char *ifname);
- #define TCP_TRANS(t)	((struct tcp_transport *)container_of(t, \
- 				struct tcp_transport, transport))
+  - Apply proofreading suggestions on patch title and description (Randy)
+
+[1]: https://lore.kernel.org/linux-doc/20251029015940.10350-1-bagasdotme@gmail.com/
+
+ Documentation/networking/netconsole.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Documentation/networking/netconsole.rst b/Documentation/networking/netconsole.rst
+index 59cb9982afe60a..0816ce64dcfd68 100644
+--- a/Documentation/networking/netconsole.rst
++++ b/Documentation/networking/netconsole.rst
+@@ -91,7 +91,7 @@ for example:
  
--static inline void ksmbd_tcp_nodelay(struct socket *sock)
--{
--	tcp_sock_set_nodelay(sock->sk);
--}
--
- static inline void ksmbd_tcp_reuseaddr(struct socket *sock)
- {
- 	sock_set_reuseaddr(sock->sk);
-@@ -241,15 +236,10 @@ static int ksmbd_kthread_fn(void *p)
- 			mutex_unlock(&iface->sock_release_lock);
- 			break;
- 		}
--		ret = kernel_accept(iface->ksmbd_socket, &client_sk,
--				    SOCK_NONBLOCK);
-+		ret = kernel_accept(iface->ksmbd_socket, &client_sk, 0);
- 		mutex_unlock(&iface->sock_release_lock);
--		if (ret) {
--			if (ret == -EAGAIN)
--				/* check for new connections every 100 msecs */
--				schedule_timeout_interruptible(HZ / 10);
-+		if (ret)
- 			continue;
--		}
+ 	nc -u -l -p <port>' / 'nc -u -l <port>
  
- 		if (!server_conf.max_ip_connections)
- 			goto skip_max_ip_conns_limit;
-@@ -455,10 +445,6 @@ static void tcp_destroy_socket(struct socket *ksmbd_socket)
- 	if (!ksmbd_socket)
- 		return;
+-    or::
++   or::
  
--	/* set zero to timeout */
--	ksmbd_tcp_rcv_timeout(ksmbd_socket, 0);
--	ksmbd_tcp_snd_timeout(ksmbd_socket, 0);
--
- 	ret = kernel_sock_shutdown(ksmbd_socket, SHUT_RDWR);
- 	if (ret)
- 		pr_err("Failed to shutdown socket: %d\n", ret);
-@@ -505,7 +491,6 @@ static int create_socket(struct interface *iface)
- 		release_sock(ksmbd_socket->sk);
- 	}
+ 	netcat -u -l -p <port>' / 'netcat -u -l <port>
  
--	ksmbd_tcp_nodelay(ksmbd_socket);
- 	ksmbd_tcp_reuseaddr(ksmbd_socket);
- 
- 	ret = sock_setsockopt(ksmbd_socket,
-@@ -529,9 +514,6 @@ static int create_socket(struct interface *iface)
- 		goto out_error;
- 	}
- 
--	ksmbd_socket->sk->sk_rcvtimeo = KSMBD_TCP_RECV_TIMEOUT;
--	ksmbd_socket->sk->sk_sndtimeo = KSMBD_TCP_SEND_TIMEOUT;
--
- 	ret = kernel_listen(ksmbd_socket, KSMBD_SOCKET_BACKLOG);
- 	if (ret) {
- 		pr_err("Port listen() error: %d\n", ret);
+
+base-commit: 1bae0fd90077875b6c9c853245189032cbf019f7
 -- 
-2.43.0
+An old man doll... just what I always wanted! - Clara
 
 
