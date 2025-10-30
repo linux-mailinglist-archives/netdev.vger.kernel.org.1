@@ -1,205 +1,445 @@
-Return-Path: <netdev+bounces-234412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47249C2044E
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 14:38:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13A48C20502
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 14:47:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F9DC42048F
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 13:35:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A49A91A65849
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 13:45:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08C433557FA;
-	Thu, 30 Oct 2025 13:34:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3677E17A2F0;
+	Thu, 30 Oct 2025 13:45:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="KjruHlCD"
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="BWgPcoTP"
 X-Original-To: netdev@vger.kernel.org
-Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010027.outbound.protection.outlook.com [52.101.61.27])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sonic313-19.consmr.mail.gq1.yahoo.com (sonic313-19.consmr.mail.gq1.yahoo.com [98.137.65.82])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6874C37A3CD;
-	Thu, 30 Oct 2025 13:34:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.27
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761831255; cv=fail; b=BXYy5MtlbHwb0uOh0wL2P3WCOxZIqrriSTB0+xq1iB423miToPEqPYwzfHxe+T4QU+QWGR+6O6furaq0eUSUVtZD+jQEh/vR1JI7hzvPJCKHMrcA659TdUbj7eWxT9u3KxkGtwv9ktddtwztMFwYNTr3dKa0RFFKVWohu0LbyuU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761831255; c=relaxed/simple;
-	bh=Y9QJWGZ80E5MG725RcU9tzDz3sOnBOa/OOKADuNjzFE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ct0FgMSU3jVkTqcofKcqGjtxc/jrOesO/ahrhF7gXm644WdUB+ZmZaDg1GFVk3yN8KbySXL6zG/OQhcYkOy3/fHM8xW2GFr5oiJ062TxElnMeFlPR7Qqkl+NR3Cb7HWzI+4g6Pxnkr6h/twtAmJIoyGaDk78v8Hj7KMPrr4upbU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=KjruHlCD; arc=fail smtp.client-ip=52.101.61.27
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=g//gDUs8beDJB2RCt1fzYnagFdActYFr1V/4/x2vsqZLbpYMU0zVy2D9gKH/sj7uMp6MK1W+bX4HzWEyxVjjscDKgiQ5NQyJjBV6C0RYj9bM66Nzzl1nQbbLypkcRqa7041XlyHTaBhYB7Zuy7QJNwPXo8aHBTNr39s3HnAlh2TA3w0j86pSJboMgxQRxSAl2XS3JXS+0ApqFm5IwgX/oaQlhT1aSc/uIyU5TLEljLlGBZbAP/xHxuaUjeRYC40gQhGKqDiLstZZdTU1tykhE1CGg0wf6eQZSIJPlt/Q7ZyPliJQADTaYrjD/DvNjqyxhlq/iRdtqyuqiEw1hCTdEw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=54SolZFmGdi6UjAf/qCKd4x5MYWktIAg7oCJTq2WZ18=;
- b=HDv+zcZ7ayqfjtf3YBcnoPRmCKy26TWxod7f5q/oG67LHlh9FOLKWldUiWxEac7Z1DG7uRHBFAYjz+HRHRPdoWcmYKpeKwAOs63Xq3J0EO8o0DxS2IUHXhnR/8gtoUUp9SJ4ZqjmK8AvPuxNWGdfRfFYO7m45Cuw/mtCqpVuA5eGmPHv78+R8I42AS3yXEefY1FW9c+XQrNfbgvz2+TM3Po2B7acUVGI6FVoy1EMHB8QEyseAEDRh39Ia4myn8ZfPZog0a3AmmLjBWT4g/HsEIhK+mimy4co5k0YDqtw9i57EC+ewJrsqSrC6V37Dzt2kKkSU+vip2srJl/GUw/Hiw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=54SolZFmGdi6UjAf/qCKd4x5MYWktIAg7oCJTq2WZ18=;
- b=KjruHlCDzalXhTYawG1rg6WJRjNIDe+9ize96Vx4vaizyK5UBy7Mrn7gYgufxnl1/2pLXlGo2aklE7nrdxbPLAndvyKV6Rqd5L4EqjqRAC6YJdlJyH5pp9e8uXhqRYdL7zrKPC1KM44I8TDNuMbpHxGp19ivLFk2utTr1PmYhpBJw6G74r2ZBJYsd0Wh7WAeAk1WHv0IL3jKKDBfCJEd4Nm7ImF5/Le3BZzX7cVTmj/STYQ29B4zDDHy2fu5n2IS1TUZVAhLpz7ffnrXjM2zXQv3ruEPKmh6yhKO5Ke/vlHolLZgEj15KtByTdwlvfzv9oLOfUmmRezF3lDa8iH//g==
-Received: from DM6PR03CA0083.namprd03.prod.outlook.com (2603:10b6:5:333::16)
- by PH7PR12MB7844.namprd12.prod.outlook.com (2603:10b6:510:27b::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9228.16; Thu, 30 Oct
- 2025 13:34:07 +0000
-Received: from CH3PEPF00000015.namprd21.prod.outlook.com
- (2603:10b6:5:333:cafe::3d) by DM6PR03CA0083.outlook.office365.com
- (2603:10b6:5:333::16) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9275.14 via Frontend Transport; Thu,
- 30 Oct 2025 13:34:05 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CH3PEPF00000015.mail.protection.outlook.com (10.167.244.120) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9298.0 via Frontend Transport; Thu, 30 Oct 2025 13:34:06 +0000
-Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Thu, 30 Oct
- 2025 06:33:45 -0700
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail204.nvidia.com
- (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Thu, 30 Oct
- 2025 06:33:44 -0700
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.10)
- with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Thu, 30
- Oct 2025 06:33:40 -0700
-From: Tariq Toukan <tariqt@nvidia.com>
-To: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>
-CC: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
-	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, "Carolina
- Jubran" <cjubran@nvidia.com>, Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next V2 7/7] net/mlx5e: Defer channels closure to reduce interface down time
-Date: Thu, 30 Oct 2025 15:32:39 +0200
-Message-ID: <1761831159-1013140-8-git-send-email-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.8.0
-In-Reply-To: <1761831159-1013140-1-git-send-email-tariqt@nvidia.com>
-References: <1761831159-1013140-1-git-send-email-tariqt@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 553E522083
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 13:45:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=98.137.65.82
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761831922; cv=none; b=m+V7VoHd8d3zwtAlE22T0CkLMgO4iFKTzOYp3eU759o5XH6UzADhAvrpRC3vXP1JslqEvgQQPLPBOhUcf4aq2LY6gSwYpvgsQogpgpUCmkSx9Tg+H32jIyopFpOpOphRnasYopWcMcwXFuCRA23V/Jdoh+gg1PeeG32DRDzsGDM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761831922; c=relaxed/simple;
+	bh=aEFqZw6aFDt12WHgRCSu6gwStoG5nCd1PZ89+g4e2cg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PY+j+xfXSU/y+mR39Ntjt+j3uYCfoZWI3tM3P+JOf76fZfTKLf1IpTqsS09arQuXW3Qjk64Hjn1sTw4P8XpDzlYl6z5mAlP7XNn2SISX7c0vREE8uNiz9ECbabstIQ0G2rw7p/ej5tm3Lah/izx07LUPJccdsfwUhP0cTr9pJlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=BWgPcoTP; arc=none smtp.client-ip=98.137.65.82
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1761831914; bh=yHIYzJpxqjSw6u75ZKXfrlyGuW7/O4GYojD4cOMN2BY=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=BWgPcoTP4IBJEW3c5l1JkKC/uIxHI8GuQK5DLi/XL/gv7cq8NNoSMaO6jXQ67Wm0fnXRYQqkSn43wnBt/mHW/7aUFF3Cg5TMDcghTd9JPR1iijDTsVO873U98i3ivtILpvD9NA9AB8CjCOSKzGDBBWEj3hIXh9aJNEehuiIEKNLLpypU1MEQePmoFToz1wF2ENmRAipaJLNS3EQycZN7QDSKbssfpTr7pjYykBAGGMnIcsBqfQQeDwspkq0thlS5dJhLcFSWI8pnKi97JJ7M5QI087EjJRlPkPmrtc8NU7EFbvDC+6ovn57h+7fMVf0pp7EPmME2oAzIIOMXIheWVA==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1761831914; bh=SyOwVI3iAJvJeZyJQI7ZUsndvIHuoBcRhfbwm5M2LSm=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=mCvHaZ2rd3ByBmrEDxaKS5H6K8vlC7hjd8jHuiUhNzDD5m8DZfw7LRnBNWq2GErOFsoyrTZddRixMK0Elquy6pCNebZj+fw2KNFOacgmny5fQQcxyXy2zQSRQpXL+76D/A5k9Dgwx2jSX/kTxhpFSUyClPx//LDYzdRIEnk8MSBmpwdPHz27y0Jp892MrBfdHxh6ZfeLYQnUPIeN0mTiiKgfqosrK04+JqVYzZA53c5I1nsKC41skzCojPtwnl7MZtggK4WwB/mYIXmtndU8rlrObwkZ2UY4qLWsn+c6pMI223ALU9u7MeScBtvjVa+VjMixEghz1+LtqA3+lTJvYQ==
+X-YMail-OSG: AKm.6p8VM1lVwk1bXEhluTH5IsmruEtbX8HHpv9cfMmjhm_HKG0ApgFeK7OKgZR
+ kJ7rnv.faU2W2A57LzlArpGNm0HuP9rQVxV.yxnYUo8QJY7MwPJVxY6TtkUcsYBAXvyucxwc3Mez
+ aEQXAIv7hmdJglhqZrQ._Si3_A5fXmYwwaw_mtUY67KIGMjpxLFog0WsP7K42Bpff3_Dvbv6cdCg
+ 682vKE0F3lniKm6OOGwmii2KD8xKa50pI3Toe8NeW0yLAgNrCedmtXLfR3RrLh0Zxb82lPEJshWu
+ e9cz3VkINKRbhFWAIs5eWDoLIV2rLOj8BzcHeMA.X5IATxdLbtZfCIjRCklLN.HkeTrtlyXLM3o3
+ HSB39Efru4iGok0cX2KCGKr.Gz8SM5Am2yqFMJZEzUPt9zrEvXeeVI11xU.FAkrIFwXkhazdh9Ez
+ porORi.ODYzq0cZ7nRtwbNf1rYukCoEya0odvJOvIRRcwV5XSCnkYzn_KXCwH2aOe7ro86ObrdHT
+ V1JJHtZ5Pjtl8aW1rO_LVXbI_Cp5MHXO6hXW.kSwFrWSt7Cxj8mUh3dTyuHU1iafJBjbow9AsjJs
+ 6uBT5nxSDONiSB.U7Hkr0kovEW21EOHT51AyS_n75LR98eyadKNHhgtnUymdYLJX8bQoXBEDTICt
+ m0ZkR110Hi9X_hFzyShKHRykIODfYUlepPnSTxwh4kZZvxhFEKbuxvap9Gm_dubBYqGZcb_ixo9N
+ 5MZr8O8RpbdO1RQYeKnM3Bc7rEG7Yi5cegMAvTIQLx6ZuMfFOlTJU40VNLkeN3xeQ5ggTdZp6oRu
+ SiROsYYqKR7EeaF_l8HjP57qtFUmQguusGBXbhu2PiUorQKLw2JpJkIdK.WD6T4N8CgVf9uK.78F
+ lsQcyvG2p07Pcaya_lgZgQTR8L3l8vAhezLInfacoiOZAQoZnILFc8uThe9sKzCb7NCJXqGZftc4
+ Dxbxeql.d9siyukTp_MxegirI0NtXoEoKXVVYYJhUNO5aEZeuUqgrVYG_m.xM.XZ18f_onkGhD8.
+ RoCV5eAqv1nSLJT5DZ1GwgPZvsQrRA95vd3UJEsy2YPjYERQCnmfPKsuATzDqR.V0xpJ3v5IbE_Q
+ bY0AxIc9yo1m45iYF8_meCN9K9IrDpuFdEPs4.dPuDYfz3NsHuS76WSmI6yqo27M5_VYeZXQtcS0
+ qCsGgxjnAc2AkA4e1TGpGeybPaL8QFQl73b8FIJulT0rvKBtFdRgTQBhZ390buGf9ZbcE8gimAN7
+ EKFGllnsXjSzoAlsdN8vm0W.5x4qHMs7pB48n2l5Pxw.fJmsTeJOAIsqJ2olKs4K7wiNABf46qiO
+ e3tc7wqcXN5UpnWBSL.nn29R.7m2r4rqo3nAGTDzLW_DcdHiqYRERFX1XW9B81pQ6qb3o2YuVa.I
+ lYsX2z5TqfBwIrl_TRft0vGMTf3TMqwsGraD53_hSLN7vmj9rVh9zPj161OzmyoiZrQcatWu0FZv
+ emugkz9rAETL6Q1Llm6lS6AiTySJdh7LwIBsEvyGUS9JXmnaMne2XL8ovcRnc5XXyZY.8FGqPflQ
+ B1QSysKDQyxUKD5xU5nog_p_TfZUD8yiXsqeUki.spHxzAcH47X.m0VppQdeTkmNaxxZAKlG_GB.
+ A.bUm5r_7acc0ekx3So9Ch6wCAT.3inj_iPn_fEjUIauMirCJfTm21Zebmwc2ldkkvzPEGtdb7jJ
+ YybGg0e.Jjh9ZMdCxnnHUF7uIO3YTXXhIDf0LAgQAkcilUcMzEirF1hWoVzBB0LwVloUS5ddKuM_
+ BhzdFXCs1ZDZO8NU.prNdZNFLY2iKT1VaZ4.GIooo9OVnwzivCvePaKxAqQTuP0iSpeC2SbeZYC3
+ SxNfDW4ZfIaoiCgzmdmqUm09CWQFSuoBjBQHCc2oOY9GvupWByWbYqwVtsZ0j9K63APmFsyFk.5A
+ iQ7FxBOsetz8lLTOOqfLRHb6cXrDUDpyEBrsr442_Y.DGy.kWpiXd56VKF7Y.oJ1gpbQgK0xA5NG
+ ulVFx.bmzje5ugVYQH8bOvIZrZkPfAc2ae05cfUOfvLnffrmgpQ2q2KOnKTi56lLuFLsf60jZDsQ
+ VzZuCz1dx.gqXH7AMBGTgYLrH05fYRDzdHDBGmhvekdkEPiCRS8Jzn3P8usBg1gw0WT0FLPgzpyO
+ .I3bGlR9i3DqEh2vXllLbliy71Ca.rAxm2.Sww9yJMzuFpokyjW1DLQok75OsWpVyM4KzLQDd0l_
+ 6HSJNWZcqrE3ugAN9Dmxau4IBivIfnSTVFEK_BFuqS8OaiTkylhHheK_3dVO9majLt2JEQkAYdY9
+ o8zObVTpxkqf9ziUm
+X-Sonic-MF: <adelodunolaoluwa@yahoo.com>
+X-Sonic-ID: eb168b63-a1cb-4d05-9a35-dba5ad33248a
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic313.consmr.mail.gq1.yahoo.com with HTTP; Thu, 30 Oct 2025 13:45:14 +0000
+Received: by hermes--production-bf1-748c868fb8-6gpbb (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 80d5fd42e856c29b84fb2d08d66114ff;
+          Thu, 30 Oct 2025 13:45:11 +0000 (UTC)
+Message-ID: <7c4070ed-1702-4288-90c6-7edb90468718@yahoo.com>
+Date: Thu, 30 Oct 2025 14:45:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PEPF00000015:EE_|PH7PR12MB7844:EE_
-X-MS-Office365-Filtering-Correlation-Id: 43020b37-e1c9-4cc3-65f0-08de17b8ffe1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?brIwWtfSk5HW/H5GLWvlcWEBClpr9TG2aXbdJ0PcpKRUyyeLtngfgv/GZet4?=
- =?us-ascii?Q?lKbr1m1gAlwHh+JmBtBRF05U3JAy0+TbdNgsXtaYn/EFeAwoYdj5Gyp+Y0/h?=
- =?us-ascii?Q?Q4/hmcUsdShlbUhwEHzH1rCKsvpBTit6bvP23m7ve+8AYX6Qr77Z64fHYolD?=
- =?us-ascii?Q?N1plbIZD8qGQY5O2g7kh2JWZMhbwkt/B3HpUfdr50r1MDBDKYS5UyZmWDlY2?=
- =?us-ascii?Q?UbVHPAB/KAw3z4ERnn0qcL63/KDMra4Pgs0HJuqmcg44vzo136v3mcxXMsqC?=
- =?us-ascii?Q?PgL+km0je0UAejH769AMfDRLeBLckLrPPq73/f5dj77uLZ74Pp5lMx2aj+1+?=
- =?us-ascii?Q?AKtilDERGFdDoUWa5tM/Aflxef9AsQpeLYCw8CqkTUPoH8V0KZrykuO3Ahan?=
- =?us-ascii?Q?r15mtPi2rA9JVpiu6QkDfDz6XpW/iGkZ7dtP4w9HLHTfDuHU3Ik+LHWS8Rr3?=
- =?us-ascii?Q?iToinYIwSQL4qZw3Fp2hyO22WUwkRG4fQ9plE9mDNLd1IkhKd4Zd/zhzdppo?=
- =?us-ascii?Q?DP4t6swS/jXchSNIbHXK8YyY7FaA3SKc/YDUvuNkBg15hoJB8kNlJBpkg+jO?=
- =?us-ascii?Q?aGGsfiCcPWsjRxKUn7BZK2QvQ8XMeFxpM5pRGzs5HLaZ7+n71USVJNMfCUc6?=
- =?us-ascii?Q?a/hlJAB04gf0RYLdY6Pma7kRgr4tEe8C856ga0kJc7xQopMV1QzGuJd5V8wC?=
- =?us-ascii?Q?o+sfwYeHNfYmp4iVP+6oHXfEuligjzZ3XQwq+e6nCII0Qq7leh2Jhq4nv4Fe?=
- =?us-ascii?Q?rkhb8g0Jzb2s4Yv6f+4PfMkHuglQEph4i7CP2fQbVsnRTCOAymrlLRNlOkQH?=
- =?us-ascii?Q?1VxHZ3Z9DiVrCugexGoTJuyclS4WrFFiOY/4lRrGuTYnGNBklnBc+QBNxbwj?=
- =?us-ascii?Q?LDzHP8noGI8OSkYRNJIdGpkS+NybWS9Yxjj94b2yRHl40qHiytsNukWYANkn?=
- =?us-ascii?Q?AvtG94DqF6iD4cD7joTMhKsxPVo2GcQbw8OI+AIDy0GDdPT0Jiu6UFs7+Vfu?=
- =?us-ascii?Q?npvP6IRCmSYFetocTrBawSUfy5x+qn8zsB5JAjVANvI8ZqQ0LyUQ4JIowndR?=
- =?us-ascii?Q?/D2dF63HTN98Aq9sJiUn2a4BKmk1RW8DoIep7qoWK+6u3tLA22YU2gQGySo8?=
- =?us-ascii?Q?3fEjkr0G1NN8an2FGMcM7CQmdJPqrMv9jFWO0bE0bMRpp9Tn7cuO1t4DyBxM?=
- =?us-ascii?Q?Bb9R+tfncY9H6u5/2Ba+v3xRzGOMDp+e7ZhVgmQgHUNuhY+4PAKqXh9GPc0N?=
- =?us-ascii?Q?v9V23vaZLRLLDOMX7YBxPFzOw12jgbdRsOESW+XTfwX4ps1HYFbeTKptm7iC?=
- =?us-ascii?Q?0ljLuWsKLYaYcu8wMpemIO1twGGuWnXPbj7Y47XjWvuQToaFvCJNQC71cNuA?=
- =?us-ascii?Q?Ed/6K8sVCQ/ahzIXwWpEY//m3H/iMsxV0sXMI3/D15AA6tTw6KRh043BC+h8?=
- =?us-ascii?Q?1P6942nceWsW+10GegWnT8pd/hpbR48o5ByVR0KPPjSQ5oaNaFY0TsVSNovV?=
- =?us-ascii?Q?zVh5A9FKtVfHUw2u2LlqzhJLIJP6zcAeFVeijW9sQqGIYu4mIlZ1ztJlG0V4?=
- =?us-ascii?Q?QEtJIAGBQ6moA9jd/00=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2025 13:34:06.6054
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 43020b37-e1c9-4cc3-65f0-08de17b8ffe1
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH3PEPF00000015.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7844
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] selftests: af_unix: Add tests for ECONNRESET and EOF
+ semantics
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: "=David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>,
+ David Hunter <david.hunter.linux@gmail.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel-mentees@lists.linuxfoundation.org
+References: <20251025190256.11352-1-adelodunolaoluwa.ref@yahoo.com>
+ <20251025190256.11352-1-adelodunolaoluwa@yahoo.com>
+ <CAAVpQUAbDfaiAZ_NCppGE5vsafWoU7V1xvnqtQQM44cwv6jHsA@mail.gmail.com>
+Content-Language: en-US
+From: Sunday Adelodun <adelodunolaoluwa@yahoo.com>
+In-Reply-To: <CAAVpQUAbDfaiAZ_NCppGE5vsafWoU7V1xvnqtQQM44cwv6jHsA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Mailer: WebService/1.1.24652 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
 
-Cap bit tis_tir_td_order=1 indicates that an old firmware requirement /
-limitation no longer exists. When unset, the latency of several firmware
-commands significantly increases with the presence of high number of
-co-existing channels (both old and new sets). Hence, we used to close
-unneeded old channels before invoking those firmware commands.
+On 10/28/25 19:28, Kuniyuki Iwashima wrote:
+> On Sat, Oct 25, 2025 at 12:03 PM Sunday Adelodun
+> <adelodunolaoluwa@yahoo.com> wrote:
+>> Add selftests to verify and document Linux’s intended behaviour for
+>> UNIX domain sockets (SOCK_STREAM and SOCK_DGRAM) when a peer closes.
+>> The tests cover:
+>>
+>>    1. EOF returned when a SOCK_STREAM peer closes normally.
+>>    2. ECONNRESET returned when a SOCK_STREAM peer closes with unread data.
+>>    3. SOCK_DGRAM sockets not returning ECONNRESET on peer close.
+>>
+>> This follows up on review feedback suggesting a selftest to clarify
+>> Linux’s semantics.
+>>
+>> Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
+>> Signed-off-by: Sunday Adelodun <adelodunolaoluwa@yahoo.com>
+>> ---
+>> Changelog:
+>>
+>> Changes made from v1:
+>>
+>> - Patch prefix updated to selftest: af_unix:.
+>>
+>> - All mentions of “UNIX” changed to AF_UNIX.
+>>
+>> - Removed BSD references from comments.
+>>
+>> - Shared setup refactored using FIXTURE_VARIANT().
+>>
+>> - Cleanup moved to FIXTURE_TEARDOWN() to always run.
+>>
+>> - Tests consolidated to reduce duplication: EOF, ECONNRESET, SOCK_DGRAM peer close.
+>>
+>> - Corrected ASSERT usage and initialization style.
+>>
+>> - Makefile updated for new directory af_unix.
+>>
+>>   tools/testing/selftests/net/af_unix/Makefile  |   1 +
+>>   .../selftests/net/af_unix/unix_connreset.c    | 161 ++++++++++++++++++
+>>   2 files changed, 162 insertions(+)
+>>   create mode 100644 tools/testing/selftests/net/af_unix/unix_connreset.c
+>>
+>> diff --git a/tools/testing/selftests/net/af_unix/Makefile b/tools/testing/selftests/net/af_unix/Makefile
+>> index de805cbbdf69..5826a8372451 100644
+>> --- a/tools/testing/selftests/net/af_unix/Makefile
+>> +++ b/tools/testing/selftests/net/af_unix/Makefile
+>> @@ -7,6 +7,7 @@ TEST_GEN_PROGS := \
+>>          scm_pidfd \
+>>          scm_rights \
+>>          unix_connect \
+>> +       unix_connreset \
+>>   # end of TEST_GEN_PROGS
+>>
+>>   include ../../lib.mk
+>> diff --git a/tools/testing/selftests/net/af_unix/unix_connreset.c b/tools/testing/selftests/net/af_unix/unix_connreset.c
+>> new file mode 100644
+>> index 000000000000..c65ec997d77d
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/net/af_unix/unix_connreset.c
+>> @@ -0,0 +1,161 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/*
+>> + * Selftest for AF_UNIX socket close and ECONNRESET behaviour.
+>> + *
+>> + * This test verifies that:
+>> + *  1. SOCK_STREAM sockets return EOF when peer closes normally.
+>> + *  2. SOCK_STREAM sockets return ECONNRESET if peer closes with unread data.
+>> + *  3. SOCK_DGRAM sockets do not return ECONNRESET when peer closes.
+>> + *
+>> + * These tests document the intended Linux behaviour.
+>> + *
+>> + */
+>> +
+>> +#define _GNU_SOURCE
+>> +#include <stdlib.h>
+>> +#include <string.h>
+>> +#include <fcntl.h>
+>> +#include <unistd.h>
+>> +#include <errno.h>
+>> +#include <sys/socket.h>
+>> +#include <sys/un.h>
+>> +#include "../../kselftest_harness.h"
+>> +
+>> +#define SOCK_PATH "/tmp/af_unix_connreset.sock"
+>> +
+>> +static void remove_socket_file(void)
+>> +{
+>> +       unlink(SOCK_PATH);
+>> +}
+>> +
+>> +FIXTURE(unix_sock)
+>> +{
+>> +       int server;
+>> +       int client;
+>> +       int child;
+>> +};
+>> +
+>> +FIXTURE_VARIANT(unix_sock)
+>> +{
+>> +       int socket_type;
+>> +       const char *name;
+>> +};
+>> +
+>> +/* Define variants: stream and datagram */
+>> +FIXTURE_VARIANT_ADD(unix_sock, stream) {
+>> +       .socket_type = SOCK_STREAM,
+>> +       .name = "SOCK_STREAM",
+>> +};
+>> +
+>> +FIXTURE_VARIANT_ADD(unix_sock, dgram) {
+>> +       .socket_type = SOCK_DGRAM,
+>> +       .name = "SOCK_DGRAM",
+>> +};
+> Let's add coverage for SOCK_SEQPACKET,
+> which needs listen() / connect() but other semantics
+> are similar to SOCK_DGRAM.
 
-Today, on capable devices, this is no longer the case. Minimize the
-interface down time by deferring the old channels closure, after the
-activation of the new ones.
+I will add it through:
+if (variant->socket_type == SOCK_STREAM ||
+		variant->socket_type == SOCK_SEQPACKET)
+  
 
-Perf numbers:
-Measured the number of dropped packets in a simple ping flood test,
-during a configuration change operation, that switches the number of
-channels from 247 to 248.
+in both the setup and teardown fixtures with a little bit of modification
 
-Before: 71 packets lost
-After:  15 packets lost, ~80% saving.
+where necessary (especially in the setup fixture).
 
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+And also the fixture_variant_add macro.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index 4edf64e1572a..9650fa6c6a63 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -3384,7 +3384,8 @@ static int mlx5e_switch_priv_channels(struct mlx5e_priv *priv,
- 		}
- 	}
- 
--	mlx5e_close_channels(old_chs);
-+	if (!MLX5_CAP_GEN(priv->mdev, tis_tir_td_order))
-+		mlx5e_close_channels(old_chs);
- 	priv->profile->update_rx(priv);
- 
- 	mlx5e_selq_apply(&priv->selq);
-@@ -3432,6 +3433,9 @@ int mlx5e_safe_switch_params(struct mlx5e_priv *priv,
- 	if (err)
- 		goto err_close;
- 
-+	if (MLX5_CAP_GEN(priv->mdev, tis_tir_td_order))
-+		mlx5e_close_channels(old_chs);
-+
- 	kfree(new_chs);
- 	kfree(old_chs);
- 	return 0;
--- 
-2.31.1
+>> +
+>> +FIXTURE_SETUP(unix_sock)
+>> +{
+>> +       struct sockaddr_un addr = {};
+>> +       int err;
+>> +
+>> +       addr.sun_family = AF_UNIX;
+>> +       strcpy(addr.sun_path, SOCK_PATH);
+>> +
+>> +       self->server = socket(AF_UNIX, variant->socket_type, 0);
+>> +       ASSERT_LT(-1, self->server);
+>> +
+>> +       err = bind(self->server, (struct sockaddr *)&addr, sizeof(addr));
+>> +       ASSERT_EQ(0, err);
+>> +
+>> +       if (variant->socket_type == SOCK_STREAM) {
+>> +               err = listen(self->server, 1);
+>> +               ASSERT_EQ(0, err);
+>> +
+>> +               self->client = socket(AF_UNIX, SOCK_STREAM, 0);
+>> +               ASSERT_LT(-1, self->client);
+>> +
+>> +               err = connect(self->client, (struct sockaddr *)&addr, sizeof(addr));
+>> +               ASSERT_EQ(0, err);
+>> +
+>> +               self->child = accept(self->server, NULL, NULL);
+>> +               ASSERT_LT(-1, self->child);
+>> +       } else {
+>> +               /* Datagram: bind and connect only */
+>> +               self->client = socket(AF_UNIX, SOCK_DGRAM | SOCK_NONBLOCK, 0);
+>> +               ASSERT_LT(-1, self->client);
+>> +
+>> +               err = connect(self->client, (struct sockaddr *)&addr, sizeof(addr));
+>> +               ASSERT_EQ(0, err);
+>> +       }
+>> +}
+>> +
+>> +FIXTURE_TEARDOWN(unix_sock)
+>> +{
+>> +       if (variant->socket_type == SOCK_STREAM)
+>> +               close(self->child);
+>> +
+>> +       close(self->client);
+>> +       close(self->server);
+>> +       remove_socket_file();
+>> +}
+>> +
+>> +/* Test 1: peer closes normally */
+>> +TEST_F(unix_sock, eof)
+>> +{
+>> +       char buf[16] = {};
+>> +       ssize_t n;
+>> +
+>> +       if (variant->socket_type != SOCK_STREAM)
+>> +               SKIP(return, "This test only applies to SOCK_STREAM");
+> Instead of skipping, let's define final ASSERT() results
+> for each type.
+>
+> Same for other 2 tests.
+
+can I use a switch statement in all the tests? say, for example
+
+test1:
+
+...
+
+switch (variant->socket_type) {
+
+case SOCK_STREAM:
+
+case SOCK_SEQPACKET:
+
+         ASSERT_EQ(0, n);
+
+case SOCK_DGRAM:
+
+         ASSERT(-1, n);
+
+         ASSERT_EQ(EAGAIN, errno);
+
+         break;
+
+}
+
+...
+
+test2:
+
+...
+
+switch (variant->socket_type) {
+
+case SOCK_STREAM:
+
+case SOCK_SEQPACKET:
+
+         ASSERT_EQ(-1, n);
+
+         ASSERT_EQ(ECONNRESET, errno);
+
+         break;
+
+case SOCK_DGRAM:
+
+         ASSERT(-1, n);
+
+         ASSERT_EQ(EAGAIN, errno);
+
+         break;
+
+}
+...
+
+test 3:
+
+...
+
+switch (variant->socket_type) {
+
+case SOCK_STREAM:
+
+case SOCK_SEQPACKET:
+
+         ASSERT_EQ(-1, n);
+
+         ASSERT_EQ(ECONNRESET, errno);
+
+         break;
+
+case SOCK_DGRAM:
+
+         ASSERT(-1, n);
+
+         ASSERT_EQ(EAGAIN, errno);
+
+         break;
+
+}
+
+...
+
+if not these, could you kindly shed more light to what you meant
+
+>
+>
+>> +
+>> +       /* Peer closes normally */
+>> +       close(self->child);
+>> +
+>> +       n = recv(self->client, buf, sizeof(buf), 0);
+>> +       TH_LOG("%s: recv=%zd errno=%d (%s)", variant->name, n, errno, strerror(errno));
+>> +       if (n == -1)
+>> +               ASSERT_EQ(ECONNRESET, errno);
+> ... otherwise, we don't see an error here
+>
+>> +
+>> +       if (n != -1)
+>> +               ASSERT_EQ(0, n);
+> and this can be checked unconditionally.
+did you mean I should remove the if (n != -1) ASSERT_EQ(0, n); part?
+
+>
+>> +}
+>> +
+>> +/* Test 2: peer closes with unread data */
+>> +TEST_F(unix_sock, reset_unread)
+>> +{
+>> +       char buf[16] = {};
+>> +       ssize_t n;
+>> +
+>> +       if (variant->socket_type != SOCK_STREAM)
+>> +               SKIP(return, "This test only applies to SOCK_STREAM");
+>> +
+>> +       /* Send data that will remain unread by client */
+>> +       send(self->client, "hello", 5, 0);
+>> +       close(self->child);
+>> +
+>> +       n = recv(self->client, buf, sizeof(buf), 0);
+>> +       TH_LOG("%s: recv=%zd errno=%d (%s)", variant->name, n, errno, strerror(errno));
+>> +       ASSERT_EQ(-1, n);
+>> +       ASSERT_EQ(ECONNRESET, errno);
+>> +}
+>> +
+>> +/* Test 3: SOCK_DGRAM peer close */
+>> +TEST_F(unix_sock, dgram_reset)
+>> +{
+>> +       char buf[16] = {};
+>> +       ssize_t n;
+>> +
+>> +       if (variant->socket_type != SOCK_DGRAM)
+>> +               SKIP(return, "This test only applies to SOCK_DGRAM");
+>> +
+>> +       send(self->client, "hello", 5, 0);
+>> +       close(self->server);
+>> +
+>> +       n = recv(self->client, buf, sizeof(buf), 0);
+>> +       TH_LOG("%s: recv=%zd errno=%d (%s)", variant->name, n, errno, strerror(errno));
+>> +       /* Expect EAGAIN because there is no datagram and peer is closed. */
+>> +       ASSERT_EQ(-1, n);
+>> +       ASSERT_EQ(EAGAIN, errno);
+>> +}
+>> +
+>> +TEST_HARNESS_MAIN
+>> +
+>> --
+>> 2.43.0
+>>
+Thank you very much for the review and comments.
+
+I will send v3 after you review the questions/clarifications I asked in 
+my previous reply.
+Apologies for the delay in responding.
+
+Thanks again for the guidance and patience, really appreciate it.
 
 
