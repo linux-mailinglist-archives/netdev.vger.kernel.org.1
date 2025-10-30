@@ -1,153 +1,82 @@
-Return-Path: <netdev+bounces-234235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5056AC1E04D
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 02:26:11 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00CB2C1E06E
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 02:31:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 57CEB1895185
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 01:26:35 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EFBA14E1415
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 01:31:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C6A72727EE;
-	Thu, 30 Oct 2025 01:26:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8D2C1F5847;
+	Thu, 30 Oct 2025 01:31:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="hQJpEoua"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gsxxGF3Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4541F270EC1;
-	Thu, 30 Oct 2025 01:26:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C49B91A5B92
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 01:31:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761787569; cv=none; b=YzWpl3Y+OjUMCdATNgWSRXvuvFzJxNS3dXy9m9rY6Q61qJOHKtdzuxEcG+TVAZmH3/nReJeK+DGSoGzLnY+TulJ61rqco8j2OVVmKB/Xx+jL8vaYjyP6bx1ytNHFQggwiea7vM7vamQHJYb56609wbFyS2bXwAIe2eZ2TMhE7Ww=
+	t=1761787905; cv=none; b=GLCEIR5At/doROp2iZhpIZGG3QrHq6BJTag0h1PcpMjTez+HNiZ7JAsGDgB/IwC3Ei2YBmdDrlVV3woIo8dqImD/gLrSRjwLl1sk9gv0t1VPuyHXZydlSOjOmHtG8KxZUO8J+gOvVySuTqVqF9U3LIUu5gTJqZ2Wj2vTevHEacM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761787569; c=relaxed/simple;
-	bh=84kPkXhUTbe6LhLgk38kZ2juDmsQcTp5ZsiWx3+UrxA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XMZ4aaqo1+nSujzztwbXzBCFY5d5b75vto1dmarzKrC8ozfnkoQrTN4JCq4h0WDzXvfVUUS+lVk2fr6VpzxEoQcc5scMuruOuj06KKKBEtTqTxcdM/rHHAfG9W4JPOSoULngVXsi9a6tOJn5kckUpQ7kkDlGKXDB/8LAiilLKEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=hQJpEoua; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=DE4GUUSn7PS/fQa45gakfgN1Qyd0uWMtlpLL22+fJDs=; b=hQJpEouaCKg43OLB9uIUt5Si6r
-	LtknmQMFhhEP/mVrtGiYO1NoiHxI9p4Gf3BDkBxLfwv1ZTzvQvOycpYmpbSOsl/ChsST/5JMhAo8J
-	tV7jZPw6dPB1NS0ERA8r1xP6FvxC0NqZbvFZxGuAyar/yoAK//vfwz1DjBB+myOwODjXVP2/JFk5N
-	2sB5qCrtSHdrpU0VC1MC8ilNFJFomczGx6Z/gV1DoSY0rH/DxQZxr4GUbaF0WJdYmm9PxFplliaEY
-	9nhK/JbPV+gza/9FNZhrD9vS4MmgFzeUNEGHbOyALmrui/YC1zx0H/9gsSHVeeU3fUSc2YJtLe9Zx
-	iI/yLEFw==;
-Received: from [50.53.43.113] (helo=[192.168.254.34])
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vEHQR-00000003Ke3-1sDF;
-	Thu, 30 Oct 2025 01:26:03 +0000
-Message-ID: <b585fa87-b804-4f7c-844d-86645c61b2ca@infradead.org>
-Date: Wed, 29 Oct 2025 18:26:02 -0700
+	s=arc-20240116; t=1761787905; c=relaxed/simple;
+	bh=05p+UU6f865M9AorNZxNqh9P/Bx8uoBhGYh4apd4QFk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=P9YAB85oub7Y/mpl/OhgSEDzKjZYWEEndPJtsyXRv74sIc+rRTOZywjbrsTkmK0QjHvr2CdCLABlNvOOPquQoUzRAaIus/SuPYztqPme9cUoYeIOJXmfszNDoKtDpofXwgacXeSGZOwaUBWuv3ITf+iZfBlzSJpToUOqEalH9S8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gsxxGF3Q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9106C4CEF7;
+	Thu, 30 Oct 2025 01:31:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761787905;
+	bh=05p+UU6f865M9AorNZxNqh9P/Bx8uoBhGYh4apd4QFk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gsxxGF3Qr2vLxmjtAQhM6KNH+Nux1X5rC0tUdFNPjbPRcz3BhmH1YyCs1QFjbjKHv
+	 K5HmJieT2RyOUr0iOusJaVFIDfiO3Hr5PWxdIOLGcTK6PIZ0neKDWpGnaZhcJQ/j6d
+	 uv4ENVOvRv4ryytC8H37/yQKejiaO4H+NMRa44Lv3MNnllcuXY27wNcgTEa52/+mo4
+	 mJIi5azfui3Eiy/zltvQPfJ3tJpKuzRaqcvZOcNJspLVMExqMwYk+sA4ebSHKSux92
+	 FOm27g4Leh7wD3TKu+k+2HZ1W/CsfAuidVVaprZvOB6tDxiOD9nuX7q2dqssawbUkk
+	 Ile0CO5/J3apg==
+Date: Wed, 29 Oct 2025 18:31:43 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, pabeni@redhat.com,
+ edumazet@google.com, horms@kernel.org, dsahern@kernel.org,
+ petrm@nvidia.com, willemb@google.com, daniel@iogearbox.net, fw@strlen.de,
+ ishaangandhi@gmail.com, rbonica@juniper.net, tom@herbertland.com, Justin
+ Iurman <justin.iurman@uliege.be>
+Subject: Re: [PATCH net-next v2 0/3] icmp: Add RFC 5837 support
+Message-ID: <20251029183143.09afd245@kernel.org>
+In-Reply-To: <aQHkY6TsBcNL79rO@shredder>
+References: <20251027082232.232571-1-idosch@nvidia.com>
+	<20251028180432.7f73ef56@kernel.org>
+	<aQHkY6TsBcNL79rO@shredder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: Reorganize networking documentation toctree
-To: Bagas Sanjaya <bagasdotme@gmail.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Documentation <linux-doc@vger.kernel.org>,
- Linux Networking <netdev@vger.kernel.org>, Linux BPF <bpf@vger.kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>
-References: <20251028113923.41932-2-bagasdotme@gmail.com>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20251028113923.41932-2-bagasdotme@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-
-
-On 10/28/25 4:39 AM, Bagas Sanjaya wrote:
-> Current netdev docs has one large, unorganized toctree that makes
-> finding relevant docs harder like a needle in a haystack. Split the
-> toctree into four categories: networking core; protocols; devices; and
-> assorted miscellaneous.
+On Wed, 29 Oct 2025 11:54:43 +0200 Ido Schimmel wrote:
+> > Is there supposed to be any relation between the ICMP message attrs 
+> > and what's provided via IOAM? For interface ID in IOAM we have
+> > the ioam6_id attr instead of ifindex.  
 > 
-> While at it, also sort the toctree entries and reduce toctree depth.
-
-Hm, I was going to ask how they are sorted, but I see that it's by
-file name -- chapter headings aren't sorted. E.g., under Protocols,
-
-
-ARCnet
-AX.25
-Bare UDP Tunnelling Module Documentation
-CAIF
-SocketCAN - Controller Area Network
-The UCAN Protocol
-DCTCP (DataCenter TCP)
-The Linux kernel GTP tunneling module
-Identifier Locator Addressing (ILA)
-IPsec
-IPv6
-
-These are sorted by file name. I'm not complaining, just
-making an observation.
-
-Another observation: I find the heading
-  Softnet Driver Issues
-confusing, since I can't find anything in
-Documentation/networking/ that tells me what Softnet means.
-(and yes, I know, you didn't add this, just moved it)
-
-
-I like the organization. Someone might quibble over a few
-entries and which section heading they should be in, but
-that can be changed any time. (mostly items under
-Miscellaneous; e.g. RDS is a protocol)
-
-
-The size of the new index page is nice (about 3 screens on my
-laptop). But I miss seeing the next level of headings
-(:maxdepth: 2 instead of 1). And I don't see any way to find
-that. It would be nice if I could click on a hamburger menu
-somewhere to see finer detailed TOC/index. Or if the
-sidebar TOC could be expanded by clicking on a heading.
-
-
-And I don't think that the line "Contents:" at the top is doing
-any good.
-
-So I tried this patch with :maxdepth: 2. There is still too much
-TOC info there IMO, so using :maxdepth: 1 is good.
-I just wish there was a way to see individual (page) TOCs on demand.
-
-Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
-Tested-by: Randy Dunlap <rdunlap@infradead.org>
-
-Thanks.
-
-> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
-> ---
->  Documentation/networking/index.rst | 241 ++++++++++++++++-------------
->  1 file changed, 136 insertions(+), 105 deletions(-)
+> RFC 5837 precedes IOAM and I don't see any references from IOAM to RFC
+> 5837. RFC 5837 is pretty clear about the interface index that should be
+> provided:
 > 
-> diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-> index c775cababc8c17..ca86e544c5c8e2 100644
-> --- a/Documentation/networking/index.rst
-> +++ b/Documentation/networking/index.rst
-> @@ -5,138 +5,169 @@ Refer to :ref:`netdev-FAQ` for a guide on netdev development process specifics.
+> "The ifIndex of the interface of interest MAY be included. This is the
+> 32-bit ifIndex assigned to the interface by the device as specified by
+> the Interfaces Group MIB [RFC2863]".
 
-
--- 
-~Randy
+Makes sense, thanks. And we have another 4 weeks to change our mind, 
+in case someone from IETF pipes up..
 
