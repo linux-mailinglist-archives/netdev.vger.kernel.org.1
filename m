@@ -1,224 +1,140 @@
-Return-Path: <netdev+bounces-234275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05573C1E732
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 06:42:02 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5DBFC1E78F
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 06:57:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 380123A3BB7
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 05:41:58 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 96FD534B086
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 05:57:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 918822F25E4;
-	Thu, 30 Oct 2025 05:41:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A15D52F60A5;
+	Thu, 30 Oct 2025 05:57:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S75W2zJi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Wh+J4Cdo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC0E82DAFD2;
-	Thu, 30 Oct 2025 05:41:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB6C246333
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 05:57:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761802915; cv=none; b=bV/UyGuFY269xN+0VWmv7Nz8RhTbvUK96TR/jTIPkOANcI+CCJQ97zVnKI3I5Jjg2hSo34eCZrCa15oV8UMiImTwIyvD8BYR2GDqNYMn5N8/qtSG/AyEAE3HJ7g6pHCSn97sieL6ZjgB16HTAVHIna4eMyyOKxWcgo9GA5uRHI4=
+	t=1761803840; cv=none; b=HBopX0cFxTN+/07gvqT0h11MqFgcA38dQc84DzZh2t3UD/soCqCegJEBLnXfI9PPbvXJ77sB1DN7kjPVXjRan0QtJpYlQNGokddGlqc/dz8SRKVazoo4mSfL5h7Pxns34SFh1V8Wu+ldB+M0qiOyfz/ye5w/nYrQ4zC3G9ZfnuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761802915; c=relaxed/simple;
-	bh=nU18lsAq/OyPRT69o4sqp39RtOZX0AOAyhYhm0ktUQg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pq5plqB9h0jAxGcPvtasbjnqxAfu3+eT0aCfFDLlEhcF97RTp98B5bSnKgKFKxxhuiP42ekYHSSEY57UF7mS+F9yqlldBUFfY8XhWtVyGwWNd0FagwSbjl9YCyf4GYasve/fLd+MTTtgK/UdRkGM+yJOasL5/0s1XfSFOsedKUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S75W2zJi; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761802914; x=1793338914;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=nU18lsAq/OyPRT69o4sqp39RtOZX0AOAyhYhm0ktUQg=;
-  b=S75W2zJiOujoBwXD5cM0RuLkFzYbyv1n4302XeukHAEgB7gvPnxCF8oe
-   XDpu6XHiM/gGcucozJucY4qT8PolneZJXeCP0pjLq8N/mAFdoNy0sO7Ij
-   gliVB/UDf31h3WiPQ/vyOVqkWetaxBDgNIHk2ClCnoojPb0fGb0Wwp66i
-   XPfcoSnnX/xTEzVDOkclF9C5f7T8Re13t/pcnc/3/W86kw7Nq7DPVY+6c
-   Jyvz0kA4rMb6v9HWo7JhWdNQZZkcXeY4VOwOrtx7NJ0/cGTNznBHbOG4y
-   GfH9ks4GROlUZGzX5OLYV9nW6YRjV7LXwP8/TTRUqUU9MKzp2/u0uIbsC
-   Q==;
-X-CSE-ConnectionGUID: enApA4umQp+A3hirY8JgFA==
-X-CSE-MsgGUID: lHGfe/I9QLSEGuyPQ0uz8g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11597"; a="63845648"
-X-IronPort-AV: E=Sophos;i="6.19,265,1754982000"; 
-   d="scan'208";a="63845648"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2025 22:41:53 -0700
-X-CSE-ConnectionGUID: gBwJdAhDSdSXnuXl5d1Qjg==
-X-CSE-MsgGUID: C4N+2GgQRb6xQS3KdzVsmA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,265,1754982000"; 
-   d="scan'208";a="189934326"
-Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
-  by orviesa003.jf.intel.com with ESMTP; 29 Oct 2025 22:41:49 -0700
-Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1vELPu-000LVA-0J;
-	Thu, 30 Oct 2025 05:41:46 +0000
-Date: Thu, 30 Oct 2025 13:40:07 +0800
-From: kernel test robot <lkp@intel.com>
-To: Rohan G Thomas via B4 Relay <devnull+rohan.g.thomas.altera.com@kernel.org>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Steffen Trumtrar <s.trumtrar@pengutronix.de>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Rohan G Thomas <rohan.g.thomas@altera.com>
-Subject: Re: [PATCH net-next 4/4] net: stmmac: socfpga: Add hardware
- supported cross-timestamp
-Message-ID: <202510301322.f0J41mwI-lkp@intel.com>
-References: <20251029-agilex5_ext-v1-4-1931132d77d6@altera.com>
+	s=arc-20240116; t=1761803840; c=relaxed/simple;
+	bh=6R8pG/tRTzNsUKnlVMNJEWzkJQEf3TAROqebWC6cqhg=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=o/QwB5W5kFqhleEZVcQd/zNFUag645OI6q73jw91ZgSm/j8rnRzhKDwbpb3ONImOoua5oINkzQ6yuxh4575LK1tO4onZ768fuiWcfr400ycYmEYaygMKNiunnbecE9zXQLf4mFU6vgHtyOVH28mwUhZn99cz8pHW8bNLDlyb/+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--anubhavsinggh.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Wh+J4Cdo; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--anubhavsinggh.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-340410b11b8so579430a91.2
+        for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 22:57:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761803838; x=1762408638; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=9VEDGVLVJs2QlTOJvCsTEKqsco8Sca06dv1X5LS5W+Q=;
+        b=Wh+J4Cdow/qNQdNkOZyV53fcVhJzZtLLVBW5LhE8j2YO3jeUrWbFZfEgDdJa7KPPS5
+         6viiYpwq12W10QvferqaRRlPzKYxqJRlcwyOv9VdmXqxbkfSLOtsONapBZRh5mp2fCmE
+         V5rX3N5isZnMb5nwbGmPHEKQZKFfqhnqFQRmgOzpmy1v9PxY1doN3Rud+GZFSiPFvemb
+         q8IUKfUajsNqmB4LMGgNNWFy6Z/0DPksu1TV4QhuXJfkNpunwe3KRkCDAEP4VuWKKE2J
+         tOjf0PbBtwnz82pAztSRuyIbqC09KNAqg1p7DQ7zgLfjnhhxdWhyuxuUSsmosxmcMzMj
+         rHkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761803838; x=1762408638;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9VEDGVLVJs2QlTOJvCsTEKqsco8Sca06dv1X5LS5W+Q=;
+        b=kN25AQweFM/JAm+wT1XCJQJ+/a8idxXlFbogvi71KiYxsheV2fU5VUqz8fwWr43b+F
+         sQrP9lJNRZQZlzyZWVnO9xlt65ly4fEiHUpOVtl9KVr5niDMMSbsCE3gggJOXkxZ3rKf
+         yrcmcskElKLwijyrTysUQdFQY63D4GXTjGdzxHieeVa5Uc2P7JSK9AJRG+JHG4sG8pvS
+         wc+ALKSHkDclIFFJ+A+AzSrle/6kMN6DSvNdwuYvedkDrAppJJXLMxhr15qfgVpRkw07
+         UftW0PN6qFQ64W3hzpq7SURBTf6BsdI5513NAIt6IPJ1q/aWZb4AoPsxHPoaJvLQgn0d
+         TN7w==
+X-Gm-Message-State: AOJu0Yzb8wgGTtKIKFCVfuHeb4a398Yof09y/lpUbMywfoqB5iD5oZ6m
+	J+UUH96asGQxhzcnq5Dt7H/JPbdHamrHV7Gg5yTePwvu4izZnY5PeaNaqH0RqMiTLuo5l4RihoE
+	g7OH0u3SNWCH6+UTB6Kj3AgfjydxMCN0ZsdsFDXzathW7f+AK7+++Z8SQzl56hwWPtwKfYnXuD7
+	VZDVLKtHt/FQQfxIhcLDROfe/0sLJ03OJlhuXMNWGetgPgyxoYySzN5GEJoCcZcVOeljbqCRUh+
+	A==
+X-Google-Smtp-Source: AGHT+IFtBRiZlB3pV9ozMP4vakNPJihdirBvsYkwCxIfJJ9TsPihH5B52AqKrcsOJZAqPDhUY3Gm+gftjQTazsw/0roa
+X-Received: from pjbnr15.prod.google.com ([2002:a17:90b:240f:b0:32d:e264:a78e])
+ (user=anubhavsinggh job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:518c:b0:338:3e6f:2d63 with SMTP id 98e67ed59e1d1-3404c3ff494mr2476345a91.6.1761803838208;
+ Wed, 29 Oct 2025 22:57:18 -0700 (PDT)
+Date: Thu, 30 Oct 2025 05:57:14 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251029-agilex5_ext-v1-4-1931132d77d6@altera.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.1.851.g4ebd6896fd-goog
+Message-ID: <20251030055714.1553346-1-anubhavsinggh@google.com>
+Subject: [PATCH net] selftests/net: fix out-of-order delivery of FIN in
+ gro:tcp test
+From: Anubhav Singh <anubhavsinggh@google.com>
+To: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Willem de Bruijn <willemb@google.com>, Coco Li <lixiaoyan@google.com>, 
+	Anubhav Singh <anubhavsinggh@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Rohan,
+Due to the gro_sender sending data packets and FIN packets
+in very quick succession, these are received almost simultaneously
+by the gro_receiver. FIN packets are sometimes processed before the
+data packets leading to intermittent (~1/100) test failures.
 
-kernel test robot noticed the following build warnings:
+This change adds a delay of 100ms before sending FIN packets
+in gro:tcp test to avoid the out-of-order delivery. The same
+mitigation already exists for the gro:ip test.
 
-[auto build test WARNING on a8abe8e210c175b1d5a7e53df069e107b65c13cb]
+Fixes: 7d1575014a63 ("selftests/net: GRO coalesce test")
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+Signed-off-by: Anubhav Singh <anubhavsinggh@google.com>
+---
+ tools/testing/selftests/net/gro.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Rohan-G-Thomas-via-B4-Relay/net-stmmac-socfpga-Agilex5-EMAC-platform-configuration/20251029-162502
-base:   a8abe8e210c175b1d5a7e53df069e107b65c13cb
-patch link:    https://lore.kernel.org/r/20251029-agilex5_ext-v1-4-1931132d77d6%40altera.com
-patch subject: [PATCH net-next 4/4] net: stmmac: socfpga: Add hardware supported cross-timestamp
-config: loongarch-allmodconfig (https://download.01.org/0day-ci/archive/20251030/202510301322.f0J41mwI-lkp@intel.com/config)
-compiler: clang version 19.1.7 (https://github.com/llvm/llvm-project cd708029e0b2869e80abe31ddb175f7c35361f90)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251030/202510301322.f0J41mwI-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202510301322.f0J41mwI-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c:390:9: warning: variable 'ret' is uninitialized when used here [-Wuninitialized]
-     390 |         return ret;
-         |                ^~~
-   drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c:312:12: note: initialize the variable 'ret' to silence this warning
-     312 |         int i, ret;
-         |                   ^
-         |                    = 0
-   1 warning generated.
-
-
-vim +/ret +390 drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-
-   301	
-   302	static int smtg_crosststamp(ktime_t *device, struct system_counterval_t *system,
-   303				    void *ctx)
-   304	{
-   305		struct stmmac_priv *priv = (struct stmmac_priv *)ctx;
-   306		u32 num_snapshot, gpio_value, acr_value;
-   307		void __iomem *ptpaddr = priv->ptpaddr;
-   308		void __iomem *ioaddr = priv->hw->pcsr;
-   309		unsigned long flags;
-   310		u64 smtg_time = 0;
-   311		u64 ptp_time = 0;
-   312		int i, ret;
-   313	
-   314		/* Both internal crosstimestamping and external triggered event
-   315		 * timestamping cannot be run concurrently.
-   316		 */
-   317		if (priv->plat->flags & STMMAC_FLAG_EXT_SNAPSHOT_EN)
-   318			return -EBUSY;
-   319	
-   320		mutex_lock(&priv->aux_ts_lock);
-   321		/* Enable Internal snapshot trigger */
-   322		acr_value = readl(ptpaddr + PTP_ACR);
-   323		acr_value &= ~PTP_ACR_MASK;
-   324		switch (priv->plat->int_snapshot_num) {
-   325		case AUX_SNAPSHOT0:
-   326			acr_value |= PTP_ACR_ATSEN0;
-   327			break;
-   328		case AUX_SNAPSHOT1:
-   329			acr_value |= PTP_ACR_ATSEN1;
-   330			break;
-   331		case AUX_SNAPSHOT2:
-   332			acr_value |= PTP_ACR_ATSEN2;
-   333			break;
-   334		case AUX_SNAPSHOT3:
-   335			acr_value |= PTP_ACR_ATSEN3;
-   336			break;
-   337		default:
-   338			mutex_unlock(&priv->aux_ts_lock);
-   339			return -EINVAL;
-   340		}
-   341		writel(acr_value, ptpaddr + PTP_ACR);
-   342	
-   343		/* Clear FIFO */
-   344		acr_value = readl(ptpaddr + PTP_ACR);
-   345		acr_value |= PTP_ACR_ATSFC;
-   346		writel(acr_value, ptpaddr + PTP_ACR);
-   347		/* Release the mutex */
-   348		mutex_unlock(&priv->aux_ts_lock);
-   349	
-   350		/* Trigger Internal snapshot signal. Create a rising edge by just toggle
-   351		 * the GPO0 to low and back to high.
-   352		 */
-   353		gpio_value = readl(ioaddr + XGMAC_GPIO_STATUS);
-   354		gpio_value &= ~XGMAC_GPIO_GPO0;
-   355		writel(gpio_value, ioaddr + XGMAC_GPIO_STATUS);
-   356		gpio_value |= XGMAC_GPIO_GPO0;
-   357		writel(gpio_value, ioaddr + XGMAC_GPIO_STATUS);
-   358	
-   359		/* Time sync done Indication - Interrupt method */
-   360		if (!wait_event_interruptible_timeout(priv->tstamp_busy_wait,
-   361						      dwxgmac_cross_ts_isr(priv),
-   362						      HZ / 100)) {
-   363			priv->plat->flags &= ~STMMAC_FLAG_INT_SNAPSHOT_EN;
-   364			return -ETIMEDOUT;
-   365		}
-   366	
-   367		*system = (struct system_counterval_t) {
-   368			.cycles = 0,
-   369			.cs_id = CSID_ARM_ARCH_COUNTER,
-   370			.use_nsecs = true,
-   371		};
-   372	
-   373		num_snapshot = (readl(ioaddr + XGMAC_TIMESTAMP_STATUS) &
-   374				XGMAC_TIMESTAMP_ATSNS_MASK) >>
-   375				XGMAC_TIMESTAMP_ATSNS_SHIFT;
-   376	
-   377		/* Repeat until the timestamps are from the FIFO last segment */
-   378		for (i = 0; i < num_snapshot; i++) {
-   379			read_lock_irqsave(&priv->ptp_lock, flags);
-   380			stmmac_get_ptptime(priv, ptpaddr, &ptp_time);
-   381			*device = ns_to_ktime(ptp_time);
-   382			read_unlock_irqrestore(&priv->ptp_lock, flags);
-   383		}
-   384	
-   385		get_smtgtime(priv->mii, SMTG_MDIO_ADDR, &smtg_time);
-   386		system->cycles = smtg_time;
-   387	
-   388		priv->plat->flags &= ~STMMAC_FLAG_INT_SNAPSHOT_EN;
-   389	
- > 390		return ret;
-   391	}
-   392	
-
+diff --git a/tools/testing/selftests/net/gro.c b/tools/testing/selftests/net/gro.c
+index 2b1d9f2b3e9e..3fa63bd85dea 100644
+--- a/tools/testing/selftests/net/gro.c
++++ b/tools/testing/selftests/net/gro.c
+@@ -989,6 +989,7 @@ static void check_recv_pkts(int fd, int *correct_payload,
+ 
+ static void gro_sender(void)
+ {
++	const int fin_delay_us = 100 * 1000;
+ 	static char fin_pkt[MAX_HDR_LEN];
+ 	struct sockaddr_ll daddr = {};
+ 	int txfd = -1;
+@@ -1032,15 +1033,22 @@ static void gro_sender(void)
+ 		write_packet(txfd, fin_pkt, total_hdr_len, &daddr);
+ 	} else if (strcmp(testname, "tcp") == 0) {
+ 		send_changed_checksum(txfd, &daddr);
++		/* Adding sleep before sending FIN so that it is not
++		 * received prior to other packets.
++		 */
++		usleep(fin_delay_us);
+ 		write_packet(txfd, fin_pkt, total_hdr_len, &daddr);
+ 
+ 		send_changed_seq(txfd, &daddr);
++		usleep(fin_delay_us);
+ 		write_packet(txfd, fin_pkt, total_hdr_len, &daddr);
+ 
+ 		send_changed_ts(txfd, &daddr);
++		usleep(fin_delay_us);
+ 		write_packet(txfd, fin_pkt, total_hdr_len, &daddr);
+ 
+ 		send_diff_opt(txfd, &daddr);
++		usleep(fin_delay_us);
+ 		write_packet(txfd, fin_pkt, total_hdr_len, &daddr);
+ 	} else if (strcmp(testname, "ip") == 0) {
+ 		send_changed_ECN(txfd, &daddr);
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.51.1.851.g4ebd6896fd-goog
+
 
