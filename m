@@ -1,161 +1,190 @@
-Return-Path: <netdev+bounces-234401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE6D8C20228
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 14:01:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37ADFC202AC
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 14:09:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BBB0560770
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 12:58:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E98F91895C60
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 13:09:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C737C2EBDF4;
-	Thu, 30 Oct 2025 12:58:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 805F1351FA7;
+	Thu, 30 Oct 2025 13:08:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jI+I0PRo"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="bhNYdDbl";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Rzf7128q"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53F3134D923
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 12:58:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1C20340DB8
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 13:08:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761829112; cv=none; b=psBYXx4kS6qwzmCAGrYhIEJX8U5q1RAHySAP0a4+bNelzvhEWVN+PEH50CGazaR5v2WIHVQSKxfM5h/9JtamOFr2RJdL+9jRZOd6aOOYiYuCr9MT8TMy7CUDv5EEGk3Eu2BcwAczPnXAyOK0wznM/wtHxE/gjRVen+HNrtPYc+8=
+	t=1761829730; cv=none; b=l+WPbpqo1H8GUM069pQp522DXRdGVjlkIoDGuy9lHox7PGaMubRQsEuEF8OQw5RaZsb827WId34BX7wyG+UEoFgt4BUtBO7QoPwQA1/RRJ/dkH3AKuI3Qp0RdsYhTPmSsUgw/AIHp77BQsEYunLz7WsJWhnKsWiNUF10xBGS+q0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761829112; c=relaxed/simple;
-	bh=D1G//7urAWctOdMahOdS2bovWwv03yftrhst2ezVZG0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gWqe3sYGek5Mxp5JNeSFaHMhe99joJyKcUnTrVLFdn5CDrjgWG7TAp1TNOZHj1EAQ3sm3ZiNyGS1ftpcCpZT02c39LnsInfhNeqBrq9T/PTcXx81o85xvNwzvmRCc0ljsmkXJYS44CNSPE2fZMBxrOoDVFzz1hl69KUv62R1XQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jI+I0PRo; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=t0K5kbUb8pcLn5pf6DWa47/zoLMaWlXUqTZ3dnwtw/Q=; b=jI
-	+I0PRodIlliLDtjTMPhAODaiABTtxwzFyekm40Cffvgw4wa8iwU21Yq0Ga2mXK2oIv7oennGr/1tT
-	468w/45pU4/I0SKr448rBCBXR0BfZa2PtVC9/wjC+9Mh4oPtuHEvG8mKP22wQzFsv6gVfR667MkEG
-	ETVweXf4EJOnaoI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vESE2-00CVWS-MV; Thu, 30 Oct 2025 13:57:58 +0100
-Date: Thu, 30 Oct 2025 13:57:58 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Yi Cong <cong.yi@linux.dev>
-Cc: Frank.Sae@motor-comm.com, davem@davemloft.net, hkallweit1@gmail.com,
-	kuba@kernel.org, linux@armlinux.org.uk, netdev@vger.kernel.org,
-	yicong@kylinos.cn
-Subject: Re: [PATCH net-next 1/2] net: phy: motorcomm: correct the default rx
- delay config for the rgmii
-Message-ID: <5b97f70c-45c3-41c2-ba7b-d383864f0003@lunn.ch>
-References: <94ef8610-dc90-4d4a-a607-17ed2ced06c6@lunn.ch>
- <20251030022509.267938-1-cong.yi@linux.dev>
+	s=arc-20240116; t=1761829730; c=relaxed/simple;
+	bh=tAvKUtNyHnRRDZkwJQwRV8MtUavJ9kqeOFCmM/bad5o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HOZBCZSTdIR61HyRpyIWDTf3GLlrTsjEzbVkDT14kdqQJsvbwS8oCmN0tFVl82OMYM5aZcO/KrxrirYvpIVkvtnA/unbwjQqFW1+r0dpbQxnM8fAfsyNjaQUgDUn/RnQi2E/zxzRDqHbZCA6DpJO0LgYj+/Fu8dOH2FNyWhxhRs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=bhNYdDbl; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Rzf7128q; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 59U9Q6u11994438
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 13:08:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	smYwHmNh+57aWsOvyq4jjr8shuV36p0KhLpGubvmvxY=; b=bhNYdDblWuBJxjD2
+	mL3qoZCyJ+T442aZtMFZeKLyjL1brsyd+kgrVcdTuCxi6kTz/mVm3sfgOWja9qsx
+	bhXzmS/GuwcopzoczHF6ETNUOu5sYE0HSZNCYqdg6JLjTRUZIjvqREnmi2UgcanI
+	QxWvkkKmvUe6MfTKYPNxKl0XYWPxxp2bxxJ0rrr9BBmg0ZB97cacltYlyhxYp4rD
+	1pOkYutpydNYGIApCeJYOA0O9pd9eR33D+i3YbHN4coAmwp6wnR0gMPn3OfUjMv6
+	1LkNxfeIMqj3XbLynfMP33wzuoVdUtrW224QpUZNJbCllU2eV5+gKXYuwaWiYGm3
+	H4PsWg==
+Received: from mail-vs1-f70.google.com (mail-vs1-f70.google.com [209.85.217.70])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4a3wr71wvy-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 13:08:46 +0000 (GMT)
+Received: by mail-vs1-f70.google.com with SMTP id ada2fe7eead31-5dba35b9404so12926137.0
+        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 06:08:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1761829725; x=1762434525; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=smYwHmNh+57aWsOvyq4jjr8shuV36p0KhLpGubvmvxY=;
+        b=Rzf7128qDjoZnPhL4W9nz/azxyDsCZR7AhCcpeFBQtOxUuNEzN0aPKw8IH8JRYIKXT
+         jWqgTt3GOs7p5u1O/Iq4Aij+nB+C2ftPSmXIvW8GKfwP1zr3f+n9NJ2Ejfp988r+PLjS
+         G5oEjB0iYcyhM93Q1VUcWcAlaxWNa0PnVlVsou2bEPXt2nkW/RGhg/mDq+xz5FXiq4L0
+         98eM417JotHfxBrilFyXE2W9twpPc6t4LZXZ659zYP5Jwz4yAuT0RUnWVk3rbUlcLkMl
+         3ek1byl+cXxJqk+YjxDM9cGFTNUK/Vkvp6BMe++PFXZqpTHbPzLRhk7ELbLnvhql2Qcr
+         Rk1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761829725; x=1762434525;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=smYwHmNh+57aWsOvyq4jjr8shuV36p0KhLpGubvmvxY=;
+        b=PWq2D0kme0laQ1kIjUCIwxD9xdBfTySuZlrhhrkylELMyTj7eUv5zw9J/VkpwkVvhh
+         +2e/981u2yl9cfp39P5IWb7G6fG2fxJS4AXceM4lQH5AWUgE6Qhjc9prWLDTWG8fTw8L
+         Oaws6yQ0Bh2q76crCJFJ6qXzZid8LEMRQEN7AnsmHT+7ZDtMX20EXtUi+e2oBxN3B4vM
+         tEqH2jF0d9Yr7oD1KFqXqYAwEDlVPnPPRJdk7/2cuvlwg4D8rAYAwo7X1XH8lJH+eZX3
+         gKVSwb3NvV0U023m12UV1ipYLlUFfuBxQfuvMxIg+f5nzWxTdCjEXciTcIzb6QAfwGJn
+         kSOw==
+X-Forwarded-Encrypted: i=1; AJvYcCUKrQGmwadIj5MXDEscMutD6KfvLp6v6pd25QdYHx9aLi5kyXLS1FNpQlGdbkSlKwQ8ucqUKZE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YynOpFUUcL3ozuVQknGE27wBhRTQh3cw68ebhWtOgDx2TkEffj9
+	DXAlVzi1Upv/O2yfbHYGARXbZeXmVNJZtkK5puPoVrkhZlgNUqJBl24LhdW0TRvWFfaGo80v/S2
+	vuV3l639BwwWgYc2X2LV9LenSwNWFib4GZZ9jHl+qVEk6cw1KMR+M+2HAkRxokzfqcwg=
+X-Gm-Gg: ASbGncsjsobqrbFpXIvmXBQvQhMvz556LX+uPjUuIPq2slji7B/5JL3UC3kjjlurWGG
+	HcnkvBmOA/6OotgFwNErnBA9XOnRqVefZJ0ZE86pXtzfeZVC1/5i1EOAdct7I0MpPSiejOCP/vv
+	+2k09m5QOEcTAhvrpN1VDcoMI9aYxBa6COaQUD9Yl1COUUS56uPgHR7j99EYnR5Rff8/Ow7zp/a
+	G49F9VwziKZW/oDJ1Y0Xhoyq6n9dByO6ji6WY0DtNH18kUdI7Nia/tYLGl2rWe1oRcKicAuBp0U
+	CzWi7I+NmA9P6A+Yt4qPrbv4dxpXbS4BZdhpmVjV20bYwASfy8gsOoRdDTuJYlxGpaCQhOywi75
+	b0pEJSaI8QYrr7GQcWosjnG8gzuwWsXf3ucEo+kLucPj1pi4n3P4zbn+w
+X-Received: by 2002:a05:6102:9d0:b0:4e9:c913:2c9e with SMTP id ada2fe7eead31-5db905c1411mr1014177137.1.1761829725398;
+        Thu, 30 Oct 2025 06:08:45 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGG/lySLHsbpbMj0FnhN0zM4kCoK9rJ1GOXWXMrK4mIf1oCOtFJHCl0WzymOFvWrOCkEIsQmA==
+X-Received: by 2002:a05:6102:9d0:b0:4e9:c913:2c9e with SMTP id ada2fe7eead31-5db905c1411mr1014159137.1.1761829724874;
+        Thu, 30 Oct 2025 06:08:44 -0700 (PDT)
+Received: from [192.168.119.202] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-63e7ef95e81sm14650483a12.21.2025.10.30.06.08.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Oct 2025 06:08:43 -0700 (PDT)
+Message-ID: <bb2865b6-6c17-49e4-b18f-b9baad771830@oss.qualcomm.com>
+Date: Thu, 30 Oct 2025 14:08:41 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251030022509.267938-1-cong.yi@linux.dev>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: stmmac: qcom-ethqos: remove MAC_CTRL_REG
+ modification
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+        Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
+References: <E1vE3GG-0000000CCuC-0ac9@rmk-PC.armlinux.org.uk>
+ <7a774a6d-3f8f-4f77-9752-571eadd599bf@oss.qualcomm.com>
+ <aQNXTscqFcucETEW@shell.armlinux.org.uk>
+Content-Language: en-US
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <aQNXTscqFcucETEW@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDMwMDEwNyBTYWx0ZWRfX+UplMlI0Y4RQ
+ X/BIzMD9DMbsPf1qIyp0NJjE2PA8uMZn/jXoTnbsKm97UQxYsHXkVd/8BmE2jvVzRc27MQCxmse
+ pjjLtwcKuJ3jGHeXnf4KS8cuQuzKnrdXmIG7kE43PDqMZfEaYWtjxvebTxD2yW7mFXsVasfjPDj
+ tohC06jDT7d4G42wMx2HBCRVPHBuvNx6PsjqgPuBri89r8YUGeWaar+tStNDDUHeSjvMHK2ZS3w
+ 7MFBhx3x5gIrgrW9Qv2hSmx6tehitSCHOCQgm+iA47ZiWCAY15r2v/sUry+qDbC4UuZFxy4+RB9
+ xbCyQm37vV+HDEJ30vEQYnvWqSEIKU4MvcsQMex4Qo+9J9ZZbt76lkz2Sh18qGyJpnoDpqKTueF
+ h8410vUpfBazB99Rta43wsY7Cid5ww==
+X-Authority-Analysis: v=2.4 cv=P+Y3RyAu c=1 sm=1 tr=0 ts=6903635e cx=c_pps
+ a=N1BjEkVkxJi3uNfLdpvX3g==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=x6icFKpwvdMA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=COk6AnOGAAAA:8
+ a=lI0Jfkxq0giiNmayhAwA:9 a=QEXdDO2ut3YA:10 a=crWF4MFLhNY0qMRaF8an:22
+ a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-ORIG-GUID: vj3YK9MTUgns8Hh-EJvkbLREeebBJ5TH
+X-Proofpoint-GUID: vj3YK9MTUgns8Hh-EJvkbLREeebBJ5TH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-10-30_04,2025-10-29_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 suspectscore=0 spamscore=0 lowpriorityscore=0
+ priorityscore=1501 phishscore=0 malwarescore=0 adultscore=0 impostorscore=0
+ bulkscore=0 classifier=typeunknown authscore=0 authtc= authcc= route=outbound
+ adjust=0 reason=mlx scancount=1 engine=8.22.0-2510240001
+ definitions=main-2510300107
 
-On Thu, Oct 30, 2025 at 10:25:09AM +0800, Yi Cong wrote:
-> On Wed, 29 Oct 2025 13:07:35 +0100, Andrew Lunn <andrew@lunn.ch> wrote:
-> >
-> > On Wed, Oct 29, 2025 at 11:00:42AM +0800, Yi Cong wrote:
-> > > From: Yi Cong <yicong@kylinos.cn>
-> > >
-> > > According to the dataSheet, rx delay default value is set to 0.
-> >
-> > You need to be careful here, or you will break working boards. Please
-> > add to the commit message why this is safe.
-> >
-> > Also, motorcomm,yt8xxx.yaml says:
-> >
-> >   rx-internal-delay-ps:
-> >     description: |
-> >       RGMII RX Clock Delay used only when PHY operates in RGMII mode with
-> >       internal delay (phy-mode is 'rgmii-id' or 'rgmii-rxid') in pico-seconds.
-> >     enum: [ 0, 150, 300, 450, 600, 750, 900, 1050, 1200, 1350, 1500, 1650,
-> >             1800, 1900, 1950, 2050, 2100, 2200, 2250, 2350, 2500, 2650, 2800,
-> >             2950, 3100, 3250, 3400, 3550, 3700, 3850, 4000, 4150 ]
-> >     default: 1950
+On 10/30/25 1:17 PM, Russell King (Oracle) wrote:
+> Konrad, Ayaan,
 > 
-> Hi, Andrew, thanks for your reply!
+> Can you shed any light on the manipulation of the RGMII_IO_MACRO_CONFIG
+> and RGMII_IO_MACRO_CONFIG2 registers in ethqos_configure_sgmii()?
 > 
-> Let me add the following information:
+> Specifically:
+> - why would RGMII_CONFIG2_RGMII_CLK_SEL_CFG be set for 2.5G and 1G
+>   speeds, but never be cleared for any other speed?
+
+BIT(16) - "enable to transmit delayed clock in RGMII 100/10 ID Mode"
+
+> - why is RGMII_CONFIG_SGMII_CLK_DVDR set to SGMII_10M_RX_CLK_DVDR
+>   for 10M, but never set to any other value for other speeds?
+
+[18:10] - In short, it configures a divider. The expected value is 0x13
+for 10 Mbps / RMII mode
+
+which seems to have been problematic given:
+
+https://lore.kernel.org/all/20231212092208.22393-1-quic_snehshah@quicinc.com/
+
+But it didn't say what hardware had this issue.. whether it concerns a
+specific SoC or all of them..
+
+A programming guide mentions the new 0x31 value for 10 Mbps in a
+SoC-common paragraph so I suppose it's indeed better-er.. Perhaps issues
+could arise if you switch back to a faster mode?
+> To me, this code looks very suspicious.
 > 
-> The chip documentation I have for the YT8521 and YT8531S:
-> "YT8521SH/YT8521SC Application Note, Version v1.7, Release Date: January 3, 2024"
-> "YT8531SH/YT8531SC Application Note, Version v1.2, Release Date: November 21, 2023"
-> 
-> Both documents specify the RGMII delay configuration as follows:
-> The RX delay value can be set via Ext Reg 0xA003[13:10], where each
-> increment of 1 adds 150ps. After power-on, the default value of
-> bits [13:10] is 0.
-> The TX delay value can be set via Ext Reg 0xA003[3:0], with the
-> default value of bits [3:0] being 1 after power-on.
-> 
-> I reviewed the commit history of this driver code. When YT8521 support
-> was initially added, the code configuration matched the chip manual:
-> 70479a40954c ("net: phy: Add driver for Motorcomm yt8521 gigabit ethernet phy")
-> 
-> However, later when DTS support was added:
-> a6e68f0f8769 ("net: phy: Add dts support for Motorcomm yt8521 gigabit ethernet phy")
-> the default values were changed to 1.950ns.
+> If you have time, please test with a connection capable of 1000BASE-T,
+> 100BASE-TX and 10BASE-T, modifying the advertisement to make it
+> negotiate each of these, and checking that packet transfer is still
+> possible.
 
-Read carefully...
+No HW with an ethernet port at hand, sorry
 
-> >       RGMII RX Clock Delay used only when PHY operates in RGMII mode with
-> >       internal delay (phy-mode is 'rgmii-id' or 'rgmii-rxid') in pico-seconds.
-
-What do rgmii-id and rgmii-rxid mean?
-
-> Indeed, the RGMII standard specifies that the clock signal should be
-> delayed by 1-2ns relative to the data signals to ensure proper setup/hold
-> timing, which is likely the origin of the 1.950ns value in the YAML and
-> current code.
-
-https://elixir.bootlin.com/linux/v6.16.5/source/Documentation/devicetree/bindings/net/ethernet-controller.yaml#L264
-
-> More importantly, the current Motorcomm driver's delay configuration logic
-> is incomplete. In the projects I've worked on, some configurations are
-> obtained from DTS, some from ACPI, but many manufacturers prefer to directly
-> set the delay values in BIOS based on their hardware design.
-
-Which is somewhat fine. If you want to the driver to not touch the PHY
-configuration you use PHY_INTERFACE_MODE_NA
-
-https://elixir.bootlin.com/linux/v6.16.5/source/include/linux/phy.h#L72
-
-However, in general, Linux should not rely on the BIOS, Linux should
-correctly configure the hardware, and in this case, it is trivial to
-do, since it is already all implemented.
-
-> In fact, Motorcomm's Linux 5.4 driver versions guided PC motherboard
-> manufacturers to configure the delay values through BIOS, and the driver
-> code did not touch the delay registers (Ext Reg 0xA003). This means that
-> upgrading to a newer kernel version, where the driver writes 1.950ns
-> by default, could cause communication failures.
-
-Only if the MAC driver requests the PHY to adds delays.
-
-> To summarize, the current issues with the Motorcomm driver are:
-> 1. It only supports configuration via DTS, not via ACPI
->     —— I may implement this myself or coordinate with Motorcomm
->        in the future.
-
-FYI:
-
-https://elixir.bootlin.com/linux/v6.16.5/source/Documentation/firmware-guide/acpi/dsd/phy.rst
-
-You need to work within this framework.
-
-    Andrew
+Konrad
 
