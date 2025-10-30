@@ -1,133 +1,117 @@
-Return-Path: <netdev+bounces-234491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01323C219F6
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 19:01:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B104AC21B2D
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 19:10:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 834F41AA25EE
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 17:59:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47FAD463CAD
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 18:09:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8378836CA90;
-	Thu, 30 Oct 2025 17:57:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BF6F32C33D;
+	Thu, 30 Oct 2025 18:09:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="LWcmn5EG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1lVw3Fc8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D34236CA80
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 17:57:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B8B32D6E71
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 18:09:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761847071; cv=none; b=OvR35EJ+rUGzzRabueyGh6c40bl5Jxpl3FYS5TMk5bVpk4l3g4HBBacR7Uw9KZLMU6KvGbPKl0jPPsycdGNvOGhtrxV8VYri2zLPr3Aw+uYCEtH818joGtHfNPzOnoIsNGhnYgZwScj7QyF/jHD4vnD+/vnmJ5rbOohd9dn20BM=
+	t=1761847778; cv=none; b=SWoqNRaMsuKUBDf4fAxpLLamWVVeWXuJPQZoNYWMN95YgqIhKu8UJdrGYV+XZiXefwFbehaIC8W8G+vIfrjf+Wc6Tn8LeyT/YCg4dQo/Pp4CD0NGbltjH3Z3TqGmKIes1TYp56+/VQ2/iTWjYWmHm4ZVWqGpuYmUCq1SIZBpB8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761847071; c=relaxed/simple;
-	bh=IW22uea8/KAlKg5cRa+wG6k1lKrnIVXiMtydHysWUd0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ck3FQcXnFFDHyXTbJ1ZlHZyDbaNklvcarmpZoT/UUfYg6EduX1Reo8PC4ZhTvP7doZI2swyuFKoDY1rGsSfpZx4QPcWJQtOS+Py1et21zOrdmiCksWAJAMTRcCqT6Qz0HRkQ2klztHY4cLnde65iShDjEDMysVbjXyt3K3AaX/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=LWcmn5EG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 912C1C4CEF1
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 17:57:50 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="LWcmn5EG"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1761847068;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=N2H0PpQjDWHMkJmyxV5TLlWq9KKSjqqnbP4MvuPcJ/Q=;
-	b=LWcmn5EGXm930fUDwoiM1sOw0MUVPWfEnn7aULl+1ZtznZfQ2CqWfGW6HMJx0gsOKdt372
-	mm/+K8s8ipekg5mc42dAUIXJtkQwF3XqV+IY4VQcqL06GF8ILGxKi81x/KDen7Vnvqp3L6
-	4j1JqYNx4J7AHbWVNSQmVX/ze73vgbo=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 73b48681 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO)
-	for <netdev@vger.kernel.org>;
-	Thu, 30 Oct 2025 17:57:48 +0000 (UTC)
-Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-3c9975a3d6eso527926fac.2
-        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 10:57:48 -0700 (PDT)
-X-Gm-Message-State: AOJu0Ywl0aI6KJDm4r3ndQ8GudEmBrz7iv1E4ZOV53zuI+S6dRhV1Cup
-	cFwB4cMmlxvcBz4BnkbrSbBUzYVdZBiYtnBzKy/RbflPNJQscCw9hNREhIWCV3Vu6xDdTv4pBS+
-	YQCmt2B4+pl/+4hh0FkzOhQcJLSOOxE4=
-X-Google-Smtp-Source: AGHT+IHtgJsed/7P84RKFjGZ5mvrCABKn9vY0NV4QFQEy9DUtJZHaS2vVgl5bNeZPw+foREZ86PeECODJf9jigWHHeI=
-X-Received: by 2002:a05:6870:d361:b0:3c9:43b9:f30e with SMTP id
- 586e51a60fabf-3dace29b802mr220347fac.24.1761847067954; Thu, 30 Oct 2025
- 10:57:47 -0700 (PDT)
+	s=arc-20240116; t=1761847778; c=relaxed/simple;
+	bh=Hs1pM8LrCPsKFJMLLjY40/qaHszKmItfHSs5Ip57vv4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=s0OHLr/Dj43LOJPZWq5f2LIft/xnupk19epxU6lcYrpdrrchzgtkAliP9aUIaU7rUOP14S1hoi7bEI5+tYfmKbitAPYHl7VTCUh2RxZp4DOQg38qcCDGc63SwKToINC4QVObMR7AXyzftMuw2bGkR07D3OIFcIFriWgC8D0e+do=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--thostet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1lVw3Fc8; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--thostet.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-33da1f30fdfso3059459a91.3
+        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 11:09:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761847776; x=1762452576; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=pxbU2yjowbmDAWtqBINWVzp9cCDjUVE/Z7xeFsXr6PI=;
+        b=1lVw3Fc8wL1jBa7zFVcl/cJcWzRyl9gjk7pXGec0peLITzTw0SQBuozZllmN+GeJYl
+         JluP9K8N7wRmEgco4O0Kzfka2ZBJq35V5zmFk70LuHLGqxQuBDJ/nD3FjK6gtuT05J+/
+         ICR+M2NVxeowcp2HsgvoCMT/IzWGVmjX+gvYbb0ulB9iQl9u6+VlE86g+/UIqWscB6eC
+         QIw1TcbIB3KDazBrPLhj+8ffVoDZhHdDu0bXq5JpN82klfTnAtwcI4Fvh5TDMtduTTCK
+         Tq9JBPRh4rfuJ8mq1talBKBiSXpso6FeRKiwNlHoqwHBrsNp6nuNfBh+xRrsE1WNsRi+
+         tkew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761847776; x=1762452576;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pxbU2yjowbmDAWtqBINWVzp9cCDjUVE/Z7xeFsXr6PI=;
+        b=IxZZ6sFzIoTgsSVoeKP0lXRGFZ0pkfexvdWcs9q0yOWACbGeo1HNFwRvSuQq+VQgKq
+         iswmfFa14b6Yw8LD4OYB46IMWk5p12jl4FikFTEbhZ/eBc6E0T79y6mu80LsVyaWXLYJ
+         0CUaIstZabU1jERnQRMOS1i8FWCh+3a/7XyCVtLqQ2F7JfwzyJ4WFZOZETxTWROJJVbB
+         9nePZq0P/FMpH4x2aJF8mup6vRlQ7JUyqzFX32uoSbDYR1Wnl6oOINZ1nPJiGhcjFirR
+         oIGve+evHqidOW/7Ao9NaEMb8AfBYPZCqMLi9nfoBm5sZ/cdpvJ9cuP1YSyadbTk+Som
+         8sSw==
+X-Gm-Message-State: AOJu0YxjRXlP/cnfSkHRNhhXRlzh6Cz9aUcsakoAN7w8TEyslMuc2YH4
+	8+EGtXVHtUPYuAhsrrtMYXWIzGcPc4XWaBj3dftbX6/Oh/Qr9LPG66myxFfsXFmvG5DPf3qy7ZM
+	PdlMxNg0PPhp6s1JuvYYz3fV/0j/J6KtuVsNMUiANhnAaUWmnTRhgfEFc0eUGlKFL3MHnRcl2+L
+	7rOa/gj4UbCbv3Hgsk3zOE1VcIdeRdYk7Y+YiQ9d+61A==
+X-Google-Smtp-Source: AGHT+IEKGSgDJLK8DZHzMkJrDQDVHZwHSDHdaAuqpHRm1Zrxjo98F2lFQTGqgyjvBI4CUV7pCmHq1okdBWDF
+X-Received: from pjyw17.prod.google.com ([2002:a17:90a:ea11:b0:340:5f65:4ff4])
+ (user=thostet job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:51d1:b0:330:84c8:92d0
+ with SMTP id 98e67ed59e1d1-3408306b9damr858011a91.24.1761847775593; Thu, 30
+ Oct 2025 11:09:35 -0700 (PDT)
+Date: Thu, 30 Oct 2025 11:08:32 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251030104828.4192906-1-mlichvar@redhat.com>
-In-Reply-To: <20251030104828.4192906-1-mlichvar@redhat.com>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Thu, 30 Oct 2025 18:57:34 +0100
-X-Gmail-Original-Message-ID: <CAHmME9rG1r5fJfubpcyK99g7G9YvnELq5+iW-+ms-Jb9dwPk+g@mail.gmail.com>
-X-Gm-Features: AWmQ_bkmTcv7m9w0feoifZBsBj59MlIJMMDl44XMV-YgfwMdK8cxQTUF1budhtc
-Message-ID: <CAHmME9rG1r5fJfubpcyK99g7G9YvnELq5+iW-+ms-Jb9dwPk+g@mail.gmail.com>
-Subject: Re: [PATCH net-next] wireguard: queuing: preserve napi_id on decapsulation
-To: Miroslav Lichvar <mlichvar@redhat.com>
-Cc: netdev@vger.kernel.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.2.997.g839fc31de9-goog
+Message-ID: <20251030180832.388729-1-thostet@google.com>
+Subject: [PATCH net] ptp: Return -EINVAL on ptp_clock_register if required ops
+ are NULL
+From: Tim Hostetler <thostet@google.com>
+To: netdev@vger.kernel.org
+Cc: richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	linux-kernel@vger.kernel.org, Tim Hostetler <thostet@google.com>, stable@vger.kernel.org, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi Miroslav,
+ptp_clock should never be registered unless it stubs one of gettimex64()
+or gettime64() and settime64(). WARN_ON_ONCE and error out if either set
+of function pointers is null.
 
-On Thu, Oct 30, 2025 at 11:48=E2=80=AFAM Miroslav Lichvar <mlichvar@redhat.=
-com> wrote:
->
-> The socket timestamping option SOF_TIMESTAMPING_OPT_PKTINFO needs the
-> skb napi_id in order to provide the index of the device that captured
-> the receive hardware timestamp. However, wireguard resets most of the
-> skb headers, including the napi_id, which prevents the timestamping
-> option from working as expected and applications that rely on it (e.g.
-> chrony) from using the captured timestamps.
->
-> Preserve the napi_id in wg_reset_packet() on decapsulation in order to
-> make the timestamping option useful with wireguard tunnels and enable
-> highly-accurate synchronization.
+Cc: stable@vger.kernel.org
+Fixes: d7d38f5bd7be ("ptp: use the 64 bit get/set time methods for the posix clock.")
+Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
+Reviewed-by: Kuniyuki Iwashima <kuniyu@google.com>
+Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
+Signed-off-by: Tim Hostetler <thostet@google.com>
+---
+ drivers/ptp/ptp_clock.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Thanks for the patch. Note below:
+diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+index ef020599b771..0bc79076771b 100644
+--- a/drivers/ptp/ptp_clock.c
++++ b/drivers/ptp/ptp_clock.c
+@@ -325,6 +325,10 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 	if (info->n_alarm > PTP_MAX_ALARMS)
+ 		return ERR_PTR(-EINVAL);
+ 
++	if (WARN_ON_ONCE((!info->gettimex64 && !info->gettime64) ||
++			 !info->settime64))
++		return ERR_PTR(-EINVAL);
++
+ 	/* Initialize a clock structure. */
+ 	ptp = kzalloc(sizeof(struct ptp_clock), GFP_KERNEL);
+ 	if (!ptp) {
+-- 
+2.51.1.851.g4ebd6896fd-goog
 
-> +#if defined(CONFIG_NET_RX_BUSY_POLL) || defined(CONFIG_XPS)
-> +               skb->napi_id =3D napi_id;
-> +#endif
-
-Seems incorrect. Although the union where napi_id is defined has that
-define here:
-
-#if defined(CONFIG_NET_RX_BUSY_POLL) || defined(CONFIG_XPS)
-       union {
-               unsigned int    napi_id;
-               unsigned int    sender_cpu;
-       };
-#endif
-
-The skb_napi_id() has the narrower condition here:
-
-static inline unsigned int skb_napi_id(const struct sk_buff *skb)
-{
-#ifdef CONFIG_NET_RX_BUSY_POLL
-       return skb->napi_id;
-#else
-       return 0;
-#endif
-}
-
-So I think all we care about is CONFIG_NET_RX_BUSY_POLL.
-
-Also,
-
-> +       } else {
-
-Why only do this in the !encapsulating case? Are get_timestamp() and
-put_ts_pktinfo() only called when !encapsulating? What about
-skb_get_tx_timestamp()? I've never looked closely at these APIs, so I
-don't know. Seems like it'd be good to check into it for real.
-
-Jason
 
