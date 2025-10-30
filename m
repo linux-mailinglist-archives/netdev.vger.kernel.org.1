@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-234220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0A3EC1DF3A
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 01:51:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C993C1DF43
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 01:51:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A91D189C751
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 00:51:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27AB140356D
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 00:51:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43806225761;
-	Thu, 30 Oct 2025 00:50:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5F0E217F55;
+	Thu, 30 Oct 2025 00:50:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZkUGctQF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zt7er47q"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A10224B04;
-	Thu, 30 Oct 2025 00:50:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4BE41F2382;
+	Thu, 30 Oct 2025 00:50:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761785440; cv=none; b=hmAeY34Z019rW/satapHciloYiQmhbzU/DDgZtlY1aeQtKdCCcKYtj5HueHIcojDPfMNeeXafbKgg1hLn1YhELJRH+BpnLkVWufkB5OrBZObpNsFGdqRKxef/iYO6Gy99HDGloBo2GtNTq4U2bOUWiJYrA0l1/14iBFULk9TIqs=
+	t=1761785446; cv=none; b=cU0COLxHCPWaq0+9pE4UZt2KRDLq+W31H8o3mY9qUuWqN0kugtSA5+pFy4C9Kchze75iHaSpNwpPn696iF60Kws378zqWUx+A6fziLlV8jwX+kcmL2LUBSmNccm6LfHsbK0uMoxbIPIUOXCvtnAHSLlgJFXWBJpN1efNK0ZDOXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761785440; c=relaxed/simple;
-	bh=vnZXyLq7CzL9sjypCE8RPeWNgbfaEYPuQIkY3ng49xM=;
+	s=arc-20240116; t=1761785446; c=relaxed/simple;
+	bh=+DNxT3KQ5JB+d2Ywjk/LC5P+oSgjTwyQe1u8jQS7SRY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DFnoIjsQkSBx7i6+oQjurRWtgCxbPYgbbSvFcqDNUzX2qkNuNVVDTQiMRSO8nlNm6Avic9RQMw8iURNwqUZqFr12SDDyBsFICMBiRNF99HkrtMAplIybH7c5huN0CpUlBz8Eqxu3gm+fjhEiWvB91M3mLuGU7Bwk1JpsbsnIaMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZkUGctQF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1132C116B1;
-	Thu, 30 Oct 2025 00:50:39 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=kER6/alP64alLmO+yGXQ99kgHYP429+6Nb9ax8YhT7zwiyfOGENrimBBl1yAFYtzQlJB+IHDvKzKMASRqeeGU8yRta4UQkLiIEQn6L/p4jwEKMINDrS4LhauAHtSYxgUbghirwja9bd2xF/DaRkIXmVudnk2Mt+P5aDQzmb5hzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zt7er47q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B077C4CEF7;
+	Thu, 30 Oct 2025 00:50:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761785439;
-	bh=vnZXyLq7CzL9sjypCE8RPeWNgbfaEYPuQIkY3ng49xM=;
+	s=k20201202; t=1761785446;
+	bh=+DNxT3KQ5JB+d2Ywjk/LC5P+oSgjTwyQe1u8jQS7SRY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZkUGctQFyCN/F5lPecr/Ww8Xzjr4wKL60ofKS6LsodyB2o/CZQ7NLXu5B9zllme9+
-	 5jXegUsxPPeIhTe9XgXmCBKKR7zNiA7jZUkSprWzO7YVN4DyeK+iCadHy43lMtcQUf
-	 KoyJPmm8OzU+TMerX4SmdsQ2Zexfua6hO/rX97VDzZR9TKzH8jAeoggze4P7gBb/Ls
-	 UFbupCEJ391BZaBJOljzYL0M7tYlsWMdV1TfdGRTdg24U2ujJnoZQf3SjAjwXorrfH
-	 LSNPsPxsUkX6KhtL/ZOUd+S4Mv27wAHYzmWhmAmLBvzzyGDV8GhNlkKHSZ3UXrrNcn
-	 elqn3iYC1uFOQ==
+	b=Zt7er47q1NC7tLvAhddX50TUHGFIRO/3kEyQr221dntfSx1N6Wy+07rKL/Am45spE
+	 stbwe4yh1GZQmtWkH5VemZsxg4/g86pb7hbn6O6kI7eI8fkCrZVaMs9wsdkLXe+CX7
+	 bVR2SXlb0LLRTB7/Q4JTyUF/oFmYrMHaVDp4eo4DXUk8l9EYbqR14S3NV9NwG1J830
+	 0SAkAINje/L0Wvvo8GDz+CD3ibRWzjwwcEZd5pOVbcxojskNeHUAPrp7paxCrApjmy
+	 V8HXUi97wYNO9v+qXeOwhn9uo1uLtRDlDxyL4I423ezHcSmUHCUOiGU+Vu0RtcyllA
+	 2FstgBNyvcxlw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF873A55EC7;
-	Thu, 30 Oct 2025 00:50:17 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 713243A55EC7;
+	Thu, 30 Oct 2025 00:50:24 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] Documentation: netconsole: Remove obsolete
- contact
- people
+Subject: Re: [PATCH v2] selftest: net: fix socklen_t type mismatch in
+ sctp_collision test
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176178541649.3267234.3277325099608180756.git-patchwork-notify@kernel.org>
-Date: Thu, 30 Oct 2025 00:50:16 +0000
-References: <20251028132027.48102-1-bagasdotme@gmail.com>
-In-Reply-To: <20251028132027.48102-1-bagasdotme@gmail.com>
-To: Bagas Sanjaya <bagasdotme@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- netdev@vger.kernel.org, leitao@debian.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- corbet@lwn.net, mpm@selenic.com, satyam@infradead.org,
- xiyou.wangcong@gmail.com
+ <176178542306.3267234.14499254365702593744.git-patchwork-notify@kernel.org>
+Date: Thu, 30 Oct 2025 00:50:23 +0000
+References: <20251028172947.53153-1-ankitkhushwaha.linux@gmail.com>
+In-Reply-To: <20251028172947.53153-1-ankitkhushwaha.linux@gmail.com>
+To: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
+Cc: pablo@netfilter.org, kadlec@netfilter.org, fw@strlen.de, phil@nwl.cc,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, shuah@kernel.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+ usama.anjum@collabora.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 28 Oct 2025 20:20:27 +0700 you wrote:
-> Breno Leitao has been listed in MAINTAINERS as netconsole maintainer
-> since 7c938e438c56db ("MAINTAINERS: make Breno the netconsole
-> maintainer"), but the documentation says otherwise that bug reports
-> should be sent to original netconsole authors.
+On Tue, 28 Oct 2025 22:59:47 +0530 you wrote:
+> Socket APIs like recvfrom(), accept(), and getsockname() expect socklen_t*
+> arg, but tests were using int variables. This causes -Wpointer-sign
+> warnings on platforms where socklen_t is unsigned.
 > 
-> Remove obsolate contact info.
+> Change the variable type from int to socklen_t to resolve the warning and
+> ensure type safety across platforms.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] Documentation: netconsole: Remove obsolete contact people
-    https://git.kernel.org/netdev/net/c/a43303809868
+  - [v2] selftest: net: fix socklen_t type mismatch in sctp_collision test
+    https://git.kernel.org/netdev/net-next/c/afb8f6567a5b
 
 You are awesome, thank you!
 -- 
