@@ -1,127 +1,157 @@
-Return-Path: <netdev+bounces-234394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23E01C2001C
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 13:28:31 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 768A7C20047
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 13:29:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9D2684EB1B5
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 12:27:15 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D99AB4EA689
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 12:28:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B57973126A3;
-	Thu, 30 Oct 2025 12:26:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EAF6314D27;
+	Thu, 30 Oct 2025 12:28:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hEA+RQhV"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A0LW+ue8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16ED42E1C64
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 12:26:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 621413019B6
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 12:28:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761827215; cv=none; b=l+ZJWGW2T2eSpuT9XYNITnTT6gqRUuDH/Ct6cRCwXGpwjEazkb099eVUOr0unAVFSueQO1Wjedm9zLwscivPw0P61EkQvo4HLWkUvcL1sGtse9t6EIxdAtbWDKiRWrapEaFI2TV3FyjtLb9W00nG0IYbplvpgOpT3rXhZxwcfRs=
+	t=1761827332; cv=none; b=bg/i9teZx1fxvz6ateheqhk/lp4OFVzCeOrppZ3LcFA2u1TnKkm1DKHCi6z1EWdQn+iRRx23QdiPe97zoshMmL3CsDsZS0qKQNqpsiOXBl4mAVs0kx86PvQ43hYns9D0CqRaeHDUhcdTnymoIBykv0q11s+Y1k5sE/fib+vAek4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761827215; c=relaxed/simple;
-	bh=d9/zvrjKXYg+QYrj/8LeTZG6rpOZbM+r7q2gKiYKqJo=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=q56K5bkJlKN0+/4CQtU0Gwqcs0uvIv/WSTytlbGjmKcKjNaL2i38z5A/bsNd17Kd+CdG85jqNCjQmRj35xtOMR9ZfcET3wyrHPLYHRZtB/3eVuil/4Y+Vlip9iRJLz6WTeKxcLTYxH0TVmpK1rcGsu1HUq0c3SzAxFx3KsxYs5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hEA+RQhV; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4ed0aef49abso10202391cf.3
-        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 05:26:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761827213; x=1762432013; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XK1leWk0uoFzx3ZfDZcnhZKJLtFjNiryXl9rvCCnzAQ=;
-        b=hEA+RQhVvaTCJNVXVSPTdZGCzPpEmBj3WG+f7SlT09yq50fbPrdveR60aidzhSyNmH
-         1p9zowtvvXi5G6boIvylTCcDYdAZHT/TWkNuvhzpn3R3F1Cj/3Nc9ax15srWSwpPZas6
-         DTyMv1hjn2FJwFlLhkDc8NDmUpV3mFhvCGFUCm0nfZQ2SoNOG1xhyd7zbR/LLNiHaRaV
-         bQnA8TE2vW0CF5sH4pMQby5A3eldEHLTo1VsLDSR/fHRgseEAWdpjTqUeCBiL5UGG+N1
-         ElDtlem11qSQr6LesPVdebPleBzc8BZMSkhqQj5+OSC038qEjhNPbYHxntSZUvLgxCoS
-         WWIA==
+	s=arc-20240116; t=1761827332; c=relaxed/simple;
+	bh=3rsc6ptPvWByOYOhRv+nQJ1v7jnad7jLTGQxU4GRYQg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eMWGpgxQBsDvFSUaaJuRVkoazFlvs6wgOTKtbSJj2iTYT6eway3HaQqtKDpg7MuKaksRXujwrhDDOBDPLLO/uyrAMYzLy6ykuE7j/i+Rfed7igRzrvfDVR8UZKWqUSA1Y2Y8kaQx1TWurBqfesIR+30TPeu2sEEt0qGjSfw0k+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A0LW+ue8; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761827329;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+WMVXs8TQMP3kSanWp9H8RTwHILJeUuZYlKUFoW3Nlw=;
+	b=A0LW+ue8xSq37qODwE/SfXSorgI0WFb9q6F0bfaunm3r084Ibu8fbyvgz9rK3LNFyIs9KG
+	tJH7n7JHa79HqJCqxEyLoobStESqLnLi2GqwejlFEpq4EqimTAIlMBVyh3NyKCvW5ZO37O
+	/dVkacldbuQ62JM35d+J011/iGnR4Dk=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-479-tMCBlDBsM4SGuZjYU8JYRw-1; Thu, 30 Oct 2025 08:28:48 -0400
+X-MC-Unique: tMCBlDBsM4SGuZjYU8JYRw-1
+X-Mimecast-MFC-AGG-ID: tMCBlDBsM4SGuZjYU8JYRw_1761827327
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-475da25c4c4so8666825e9.0
+        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 05:28:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761827213; x=1762432013;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=XK1leWk0uoFzx3ZfDZcnhZKJLtFjNiryXl9rvCCnzAQ=;
-        b=BfSrs2MySoWHwmF2WHoSpXhxxq/z5izbYl1m14CDYt/Z9QsLavL9BSKwy9edtbRPPw
-         5Zvr5soSmbrQMjoljF+W+IdfrduqrnE1JW/198BdExexOrSq3z1ka8tL8yjZhMMGTnlE
-         qXUmTKnNr+eTSBXzsBsMtsQoY6wB6Xn27V4Z60aX47xVeZJvaKR09CXmdioshK4bRTbG
-         jWIQE3AKoWKKeUC5pm07jeZ+G9z3G1VTyLygs+lcOqEk1w4jw626zByvDRr70vv6aYHM
-         FiELvhl03UlDBbc/8DFDBuRuk2VeTtPvsMpiVY5JCNch1dbYfmxjowOyrGpev1DEl2bH
-         LJqg==
-X-Forwarded-Encrypted: i=1; AJvYcCXjYrjPAJXUBdMZGXR7fzvYaA6G+CURP8Ta33iZCOWyBM4atJHR+MdZyO10wMLPtj5co92FojA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPn9yJE82erPUlIz5YX8h2PmbKPcHoKnej2s2bexjhe/0Fxi7s
-	B/5TjakaEjfq5sK6fs3d43fLSMeqzk7F2aJ1KXNonKweuEOCMKu9bqAxXKBaqA==
-X-Gm-Gg: ASbGncu6zz6sXcZbe4GRdnoIn6VTq855k2FRvDKWtWEi+rqOsye5hbX/yAwchNYQHFO
-	tu1SfK+DZ5k2t6jUwGcN8XuRc6N+wAYNU/9kmgxUMSSU1JwI9EB+nTmUzrD5+F8cG7bBP7v7k8d
-	40pbFmkmZsdV5GlS1W8sVYH4w7qEMI7PxeSJYqywtsedEqBOkwL0mCjZDg2DsDo5JDlbML40StA
-	ZtYU4g09mOT4xs/aG2mSJO4E4r30C//ikz48m0DzK54g8G5HWgDkt2+Fsdh24Y1zCQShktUs1LL
-	Gg4YFNJKqSI48HDbmRZ3jvG34ke9NVO7Zd/o0X4Vo2NtuC/zCEr47AZkjM1XALA4Q0gb8SLdmGG
-	QKoW9JfivoahSd0mNj6IiRXukSiT5MHuD8IOLxvlQDJ5kYNi0IkFrTQjvHqvdaoNQSJfP8cdEq/
-	d/yqdHzH7nVUkWz/SJzQN4qO6L9Du3ulGNgVGdFrTZUsieZ2LjrmDc
-X-Google-Smtp-Source: AGHT+IE3veiBOtkriA2O+bI9hXSGvHwgX2QoH8sB+O1LcfgeWybMR21FkAqWM/FAYBGpbjpV2ybS6A==
-X-Received: by 2002:a05:622a:198c:b0:4ec:4827:f601 with SMTP id d75a77b69052e-4ed2213c2f3mr34333001cf.26.1761827212916;
-        Thu, 30 Oct 2025 05:26:52 -0700 (PDT)
-Received: from gmail.com (234.207.85.34.bc.googleusercontent.com. [34.85.207.234])
-        by smtp.gmail.com with UTF8SMTPSA id d75a77b69052e-4eba37d72ecsm114282391cf.9.2025.10.30.05.26.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Oct 2025 05:26:51 -0700 (PDT)
-Date: Thu, 30 Oct 2025 08:26:51 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Anubhav Singh <anubhavsinggh@google.com>, 
- netdev@vger.kernel.org, 
- linux-kselftest@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Shuah Khan <shuah@kernel.org>, 
- Willem de Bruijn <willemb@google.com>, 
- Coco Li <lixiaoyan@google.com>, 
- Anubhav Singh <anubhavsinggh@google.com>
-Message-ID: <willemdebruijn.kernel.1ebc537b3da9e@gmail.com>
-In-Reply-To: <20251030062818.1562228-1-anubhavsinggh@google.com>
-References: <20251030055714.1553346-1-anubhavsinggh@google.com>
- <20251030062818.1562228-1-anubhavsinggh@google.com>
-Subject: Re: [PATCH net v2] selftests/net: fix out-of-order delivery of FIN in
- gro:tcp test
+        d=1e100.net; s=20230601; t=1761827327; x=1762432127;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+WMVXs8TQMP3kSanWp9H8RTwHILJeUuZYlKUFoW3Nlw=;
+        b=qvcXd09wSgTZ0SEfnURgjTXVCYtFlPN5M1aTEdiHkXdDt1oPwALPNcVQ4092AVPeQu
+         m5LnWbdv2BJkk85yrsHfh0JDSI/gtAYTsjGoupPWBFwEXtr33xd7FKF/yjLlJqdI/BLA
+         FTg8g5L9xGpxAubD4zVRBJjxmFxiZWBWf1/1CTxAAtI9f5NfZwC3pTpL2/WuFcsu9amq
+         PjWhRLu+xcJ02eY+z+DfezzlqmBr/nMp+4R9y5IetWNLlpddKRhf7CNq9pPIITfQCAjT
+         oTWPESvXLWeyfbK5wi6NiG8qAp+/irxlOinHNBfJR3s3Dof8m+mDL8+dklH8nLuBtZWN
+         F4Sw==
+X-Forwarded-Encrypted: i=1; AJvYcCU6lPXFzoKds612l22QBXOtcUE0lP4cmREjwkD4ELEo/5pWqK+J9mYrE68FlHZXiFv9nTdEJZk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0GVXlhTGysNUDrtNAoEFETLhBKRYRtprREZRtnBak8TyBoCNe
+	uCGimTtF+16kgBKiSjeZE3KSdzipO3DRSA5TIgwHOGcFjAAvvr7bsoNh9qDQxTQcCOmExNNajZC
+	HopeNuvZqv8l5HaslyBlyro73STJs2AQOmkwfdAoJ25EV7B9MR+OIa8+7cjrxhkp3yw==
+X-Gm-Gg: ASbGncuj7rLz7UAwZk/t8uhYXZ2si7MbCchk6loOw6yuAVJtLw/tFBRmvPlGY5jFlBx
+	dEyV05iQpyasKIp564XblXnE9VmgDWKTUNPzXMM5vyIyR9USVdSOeCcoeoOl/6nVwnXXqqp8GWO
+	dl4ooHxz6b6bGekU/ZZWgMpiOpeRAbwpgIQTxEF5UwR2ACDxq1fMcLxn9QJ3Y1IuEQ30kwVRsLi
+	H6ygDqFiwoA8vh9gKcUi2+q0r4YPktzCzVKuBI/YIFjb5QJsajG5F5OgakieFcB/ldQUjh7uQzp
+	7RJ0dWHxXHKHu7uYk8IAWV9B3zVykThqi8w0pYuEEKBDaGuM7gWfFPXFJth3QpvQpdq96gKonth
+	ezsJX5ktfK5Ct+eTohCwB9pJFERXbAnx+KEHl2dh0pcK+
+X-Received: by 2002:a05:600c:4511:b0:477:e66:4082 with SMTP id 5b1f17b1804b1-4771e1ec1d1mr66499245e9.29.1761827326742;
+        Thu, 30 Oct 2025 05:28:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGQc3JgzM1QEslivftQlK3inQluENUMNYgDE1rjtok3+8IGknzl6HMn3biCdPkc1D7PQaX66g==
+X-Received: by 2002:a05:600c:4511:b0:477:e66:4082 with SMTP id 5b1f17b1804b1-4771e1ec1d1mr66498985e9.29.1761827326363;
+        Thu, 30 Oct 2025 05:28:46 -0700 (PDT)
+Received: from ?IPV6:2a0d:3341:b8a2:8d10:2aab:5fa:9fa0:d7e6? ([2a0d:3341:b8a2:8d10:2aab:5fa:9fa0:d7e6])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477289adc18sm41187325e9.6.2025.10.30.05.28.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Oct 2025 05:28:45 -0700 (PDT)
+Message-ID: <154ebe12-6e3c-4b16-9f55-e10a30f5c989@redhat.com>
+Date: Thu, 30 Oct 2025 13:28:43 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net V2 2/2] veth: more robust handing of race to avoid txq
+ getting stuck
+To: Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
+Cc: Eric Dumazet <eric.dumazet@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ ihor.solodrai@linux.dev, "Michael S. Tsirkin" <mst@redhat.com>,
+ makita.toshiaki@lab.ntt.co.jp, toshiaki.makita1@gmail.com,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kernel-team@cloudflare.com
+References: <176159549627.5396.15971398227283515867.stgit@firesoul>
+ <176159553930.5396.4492315010562655785.stgit@firesoul>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <176159553930.5396.4492315010562655785.stgit@firesoul>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Anubhav Singh wrote:
-> Due to the gro_sender sending data packets and FIN packets
-> in very quick succession, these are received almost simultaneously
-> by the gro_receiver. FIN packets are sometimes processed before the
-> data packets leading to intermittent (~1/100) test failures.
-> 
-> This change adds a delay of 100ms before sending FIN packets
-> in gro:tcp test to avoid the out-of-order delivery. The same
-> mitigation already exists for the gro:ip test.
-> 
-> Fixes: 7d1575014a63 ("selftests/net: GRO coalesce test")
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
-> Signed-off-by: Anubhav Singh <anubhavsinggh@google.com>
-> ---
-> Changes in v2:
->  - Add 'Shuah Khan <shuah@kernel.org>' to the CC list.
+On 10/27/25 9:05 PM, Jesper Dangaard Brouer wrote:
+> (3) Finally, the NAPI completion check in veth_poll() is updated. If NAPI is
+> about to complete (napi_complete_done), it now also checks if the peer TXQ
+> is stopped. If the ring is empty but the peer TXQ is stopped, NAPI will
+> reschedule itself. This prevents a new race where the producer stops the
+> queue just as the consumer is finishing its poll, ensuring the wakeup is not
+> missed.
 
-Remember to not repost within 24 hours:
+[...]
 
-https://kernel.org/doc/html/latest/process/maintainer-netdev.html#tl-dr
+> @@ -986,7 +979,8 @@ static int veth_poll(struct napi_struct *napi, int budget)
+>  	if (done < budget && napi_complete_done(napi, done)) {
+>  		/* Write rx_notify_masked before reading ptr_ring */
+>  		smp_store_mb(rq->rx_notify_masked, false);
+> -		if (unlikely(!__ptr_ring_empty(&rq->xdp_ring))) {
+> +		if (unlikely(!__ptr_ring_empty(&rq->xdp_ring) ||
+> +			     (peer_txq && netif_tx_queue_stopped(peer_txq)))) {
+>  			if (napi_schedule_prep(&rq->xdp_napi)) {
+>  				WRITE_ONCE(rq->rx_notify_masked, true);
+>  				__napi_schedule(&rq->xdp_napi);
+
+Double checking I'm read the code correctly. The above is supposed to
+trigger when something alike the following happens
+
+[producer]				[consumer]
+					veth_poll()
+					[ring empty]
+veth_xmit
+  veth_forward_skb
+  [NETDEV_TX_BUSY]		
+					napi_complete_done()
+					
+  netif_tx_stop_queue
+  __veth_xdp_flush()
+  rq->rx_notify_masked == true
+					WRITE_ONCE(rq->rx_notify_masked,
+						   false);
+
+?
+
+I think the above can't happen, the producer should need to fill the
+whole ring in-between the ring check and napi_complete_done().
+
+Am I misreading it?
+
+/P
+
 
