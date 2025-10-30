@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-234212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 554FBC1DE3E
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 01:20:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F86EC1DE9B
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 01:30:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EB2F14E4C51
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 00:20:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B0B721881DF2
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 00:31:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2A561D88D7;
-	Thu, 30 Oct 2025 00:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5827BFC1D;
+	Thu, 30 Oct 2025 00:30:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pYm9ecyu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K8kd55vj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 782421D6193;
-	Thu, 30 Oct 2025 00:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3305E4C9D
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 00:30:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761783629; cv=none; b=MTI5Mu4gpLdSJralxyyUpBJUVDY5ehVSwmpYGzu1I9jAvrz5UM7ceZaoZLORnpO39ttYidlIBer2D5EinsW0x+mTaYhqVk1I8WENIYlu8a5ulTCWs5FnBuH5sZs7PsbNivRouKYRl/SOVD42QK6P8PXUI6p2xF7kjUDAaTbJmpA=
+	t=1761784240; cv=none; b=FYcgRgzdfKSWIWeXO7pMqeVeVsl7tB8CNg8iS4aoLsOHdno9Qki/gxM4nN3pvZN4nRTtqd+f5JLqo8RA9CytdDsABpyOTvjl91jHrPrDDQf3lb5MlDFzJ3zWKts/rDpKQcBuLpcdnl2lyeqE19DdbNeEdX5C6HV9NbDKxrUNHWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761783629; c=relaxed/simple;
-	bh=YA1yfnRZ2liXKqTDZAOmA5Hts9femG+bdpmh9Kr9slg=;
+	s=arc-20240116; t=1761784240; c=relaxed/simple;
+	bh=tQIruejwpKTnBaTSE8KgQ617sg7pjgA/bUfxzMS/3Mc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pgMlMnJkpG3qzWO9BXSFJgypOM1JnYv+bntoyfiyYb6sLFwZvnqUWq7v+s9Ve7Wpl55ScZKbywO39S874+JDgq030oh2eBb+8EcBdX93D7q/tJ7Z585ZZVM73N/I18EP/b0ZWPyiVi+Jc2MAVkhE/JujgPD//uq6yKBjrapOoGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pYm9ecyu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02EEDC4CEF7;
-	Thu, 30 Oct 2025 00:20:29 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=pLwdTqxkzDiQrqd6PsJq3q/NBaNtvJCRjHoE2NNC7a8JoSblifYD0RpOnjqX6KG8DMdJ/FhYdIdwvvMp7ZBDpYAs8hlNgQZu/TrnsPXPmN51NKCq+3euuW2Gko14gTPZ+t2RTbAHI0Bc3buaLg9QG40WcBHQIVX+2n4SYT3f7tw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K8kd55vj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6B48C4CEF7;
+	Thu, 30 Oct 2025 00:30:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761783629;
-	bh=YA1yfnRZ2liXKqTDZAOmA5Hts9femG+bdpmh9Kr9slg=;
+	s=k20201202; t=1761784239;
+	bh=tQIruejwpKTnBaTSE8KgQ617sg7pjgA/bUfxzMS/3Mc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pYm9ecyuJjBZeWy4Vf0gDyme7aEhCI5k2chRXpPL6rdxc/u+GtbhwO7OdIHoFnhv7
-	 9ZyJSx6y7bcz3VeopCpqRbeKQYIaOcUqMtgcQKYAzU1IuZgjK4Mc0BOliPu0P5aaUt
-	 NsrWEdMva2J3QeDDmSpexQgNvDGKrDWxzeLUtLdWo/KsYotafShyAvRxJUr++eJz2/
-	 AjtmIxvTgzo//yysBRhyNWws5OVMphfrWQ1qjwDhXIq8oY17wkDwtQZEKj93QzgTv9
-	 y2KDSeCX9TaRspnszfjWY6m1S4D0VOLhwI+Jk5MBceH+Q8ZteOipaMB5Rini9P9vmV
-	 RpQvA2660RrvQ==
+	b=K8kd55vjC1NG01Kdeh4jGuJmG/xyIbES63tC9TUeBMt2tYQTLzYa6MU4RACwGJ5mH
+	 7p6TaqzbMBhEG7JjyKuKkrYnU2kdwhKedaSUD644XDpbHMwMDX2yMndmJIiQr4BQBO
+	 JgwtKIRdypeKmf3V//RP/Jr+HxdVtDiyGfuxyg9dtoXLDhklqjAlkJegHPzPFeeZmc
+	 izDHIMn/QUtwD36ei0NengCxMAsJcO+T40YnfHTQ+JLIWVsBpxH9h43N9Vo16Wt7So
+	 AKQO6crKRES5HRK+wvofPWa2+bzZ30Q36TU9EU5WJpC6++NAGOkwd6cYPNuvzcwNcX
+	 WWlf6AFEBWosw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DCA3A55EC7;
-	Thu, 30 Oct 2025 00:20:07 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB1953A55EC7;
+	Thu, 30 Oct 2025 00:30:17 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,53 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: ipv4: Remove extern
- udp_v4_early_demux()/tcp_v4_early_demux() in .c files
+Subject: Re: [PATCH net-next v3 0/8] net: stmmac: hwif.c cleanups
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176178360601.3260110.840499294229416804.git-patchwork-notify@kernel.org>
-Date: Thu, 30 Oct 2025 00:20:06 +0000
-References: <20251025092637.1020960-1-wangliang74@huawei.com>
-In-Reply-To: <20251025092637.1020960-1-wangliang74@huawei.com>
-To: Wang Liang <wangliang74@huawei.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, yuehaibing@huawei.com,
- zhangchangzhong@huawei.com
+ <176178421675.3262354.14278133392680967130.git-patchwork-notify@kernel.org>
+Date: Thu, 30 Oct 2025 00:30:16 +0000
+References: <aQFZVSGJuv8-_DIo@shell.armlinux.org.uk>
+In-Reply-To: <aQFZVSGJuv8-_DIo@shell.armlinux.org.uk>
+To: Russell King (Oracle) <linux@armlinux.org.uk>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com,
+ netdev@vger.kernel.org, pabeni@redhat.com, richardcochran@gmail.com
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat, 25 Oct 2025 17:26:37 +0800 you wrote:
-> Function udp_v4_early_demux() was already declared in 'include/net/udp.h',
-> no need to keep the extern in 'ip_input.c', which may produce the
-> following checkpatch warning:
+On Wed, 29 Oct 2025 00:01:25 +0000 you wrote:
+> Hi,
 > 
->   WARNING: externs should be avoided in .c files
->   #45: FILE: net/ipv4/ip_input.c:322:
->   +enum skb_drop_reason udp_v4_early_demux(struct sk_buff *skb);
+> This series cleans up hwif.c:
+> 
+> - move the reading of the version information out of stmmac_hwif_init()
+>   into its own function, stmmac_get_version(), storing the result in a
+>   new struct.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: ipv4: Remove extern udp_v4_early_demux()/tcp_v4_early_demux() in .c files
-    https://git.kernel.org/netdev/net-next/c/f58abec23da5
+  - [net-next,v3,1/8] net: stmmac: move version handling into own function
+    https://git.kernel.org/netdev/net-next/c/fc18b6e98cce
+  - [net-next,v3,2/8] net: stmmac: simplify stmmac_get_version()
+    https://git.kernel.org/netdev/net-next/c/f49838f77cf6
+  - [net-next,v3,3/8] net: stmmac: consolidate version reading and validation
+    https://git.kernel.org/netdev/net-next/c/c36b97e4ca77
+  - [net-next,v3,4/8] net: stmmac: move stmmac_get_*id() into stmmac_get_version()
+    https://git.kernel.org/netdev/net-next/c/7b2e41fff76f
+  - [net-next,v3,5/8] net: stmmac: use FIELD_GET() for version register
+    https://git.kernel.org/netdev/net-next/c/b2fe9e29b5f6
+  - [net-next,v3,6/8] net: stmmac: provide function to lookup hwif
+    https://git.kernel.org/netdev/net-next/c/7b510ea8e58e
+  - [net-next,v3,7/8] net: stmmac: use != rather than ^ for comparing dev_id
+    https://git.kernel.org/netdev/net-next/c/f9326b139b4c
+  - [net-next,v3,8/8] net: stmmac: reorganise stmmac_hwif_init()
+    https://git.kernel.org/netdev/net-next/c/6436f408eb21
 
 You are awesome, thank you!
 -- 
