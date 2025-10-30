@@ -1,166 +1,180 @@
-Return-Path: <netdev+bounces-234517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80B3FC22748
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 22:46:35 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D182EC22871
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 23:14:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3514F4233D3
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 21:46:34 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7958B34C209
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 22:14:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10564314D24;
-	Thu, 30 Oct 2025 21:46:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ELFpy20B"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE870314D2A;
+	Thu, 30 Oct 2025 22:14:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66F792C2364
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 21:46:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F005C33556B
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 22:14:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761860790; cv=none; b=btJZYkKYBCVurge2P0PoSq2EAEoB1LXFmlvr5e3ab10OZsGXUtQkfZu4YTUY3xVAn+qgTJuRHBezS23CYY34I1ZR+dZBCo0+6lhtozVeFoqNJ8DvaUIKTRXWDLji57M9zsBmC7lUZBI7/sRNOawr4BfhdxKvh+psXiqVMzNq/TM=
+	t=1761862470; cv=none; b=DCV7OTH/TcTxK9q105FBprjdJWM3pDQXJ31FX/A3VaZVaXNpVb0y8VmCmYAExDxuaR28naw3pVteR9csgOvV3aKFQYXdGBA3bpKTbt1i0I03MUjUKJV7ciZWRDMeY0l9TO1sgAf1CqA/S0zK7H3C0tAo0itqGmS8SVvHbqheMos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761860790; c=relaxed/simple;
-	bh=ogoAOc8noYnRP40EX7FiNgpoMABPPHmz1IvTtOqk89A=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=qOlY40DYA4z5KyYOsZqYa/g4eQM/3h3BYFfwlp8DxJqG5n0jiiLj3OvGpuR0EhN6Vricxzb869aYo4ov1581iTTxGJpi299+DVmEZKED3ZRNPoBWn4utOf1bjybiTIOv7GdR/WmwHztoAKFzd9yAuEqyiWofJf/cIJhlin0qfWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ELFpy20B; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b6d3340dc2aso435921866b.0
-        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 14:46:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761860787; x=1762465587; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=e2bmKsWX27KxcoODJGcbcMlZnZNIE40/bwILX8cp33g=;
-        b=ELFpy20B4Debi7/9dj33sL2VbcfQCHr/v+fWcXiyQOHShZ7GB6Kv+9JCGtkx4kIZjP
-         RRrUkZdl26HsF6V7QW2FxRgrVGQ5UVdimz5P1kfrSiwLGzy4ZDh4apPFErU/cXo+Nkq2
-         /vvFiUTrm6JCab+EQiVB3iVGOivHvm4/JLZUlHPfUPeQ1KzP1bYlzVHNRtiJcaGZqbMZ
-         yBHKa2SNScXK2+TF/aQC4pLSsqhtGRCMKu1pMET60AXo0bWez4odkiZbDD1Z6XLICIdp
-         Go1hQ2SxC4mIq1ERKwwduNZ3TvNF89BWvVD9vsgxzknOwhjiyKM5W339camuhUJCA9T9
-         vKUQ==
+	s=arc-20240116; t=1761862470; c=relaxed/simple;
+	bh=6fYhdpG1Ub6R9qOagykrSkOktoB2nv95+eCVFHUdUDA=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=E1D44tmwTKbsVcDTkZdMfGKhESGRN+YPV0ASIPEULskl1O6kvEuB4yE2mExw5tXmQCpYbHme/yVq5JJQBYTnoA3FNr9+Q5LZsHC2UW0Zuqd0jkm+0O7bvkCM0oWrPVQyMR1ajerclQ2TCgxPrt/nIi06TwmiWciFfDry6GB/D/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-4330ba63227so7199895ab.0
+        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 15:14:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761860787; x=1762465587;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=e2bmKsWX27KxcoODJGcbcMlZnZNIE40/bwILX8cp33g=;
-        b=LmAaVq+Sf/5PudELBhLOqsvLndDpZ2FVcI2xFHRfuveaF6f59V1CxchBCzJkpo9nUp
-         vzr9Y5H5glQE7/33esACCDZ2WTgVscXcaJ3Aw8LeSZCNmJ5IAVU12lri+Vxox1mfFwI3
-         Vko/xc9PXjPWPud7HlV8Gjn7pjW3avK2T06TNZ4ybtjy0uZbpIgkuU87Q/R5ePi2OOGi
-         f3O+0Xl5Ov3XZxLm5FmTneFlH1JQMiLE2o2lOklP9vOhvYi28D+9OhkYxgzeYfRDR7gc
-         GL/PyQZzsmeCzu4aReLCY394LNd3JHLMVD71q2EsWxAisDfPBIKDJgys6w6FGO8Uc/tW
-         KgcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVMvuw/rpjlfoffq9x8Mn5/Cee8kXH05RyYKSPQVLpW9zObyOY7Z2wTCBH3tnjuIGc37xD2o1M=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyj6nje2kDcB7vr1riIdpeB1O+mN/CSAZAePtsfdOFSRm7cKWzC
-	pOny/GZBlSKcEbjr8al4/Lx1ShUj57bgnH1yhPRE3lfLY9o+vPRzbjsh
-X-Gm-Gg: ASbGnctCNWIg8SYx7xDEPWn+2BhaweAhtcZpWuQR4RVoKZClW2bjRuz0iqwXIxM+usx
-	10l0nLNmkyrXBpuPdVuBhB4LoYrwKDQHzF2yAt3ihe9uShaAlTtGJLJjptSO/Zl0S58YR2bBEDx
-	nsqE4lK+LyxBt8p7fDeOlzZ/+/vEjBv8VBlvqMQaPqxVg3GLZ86gSAocpG5ROBkchrUe4TBshcd
-	fBs5OP30+Qxx3HBMewc1NJybRVrPWWdXXyi8K4vm0P16Ql1P9DGn7FUKr6RbrDlB5UzWaVhbVCN
-	e8QqpW1mrQf9o/UlzY6eIugLxRyTOAd1LzvmGLu6S9k9mNqAp7ea113N1PsFKBUCI3iFYTuLdXE
-	RXeEvAPAtM35p2ubvdcn7BCEIsFqxVAs9hClxHlrCbx++v6S1rlhu41FsejWW833IqiGZFZ9D62
-	RoYXDN8uqlgAg30CP4g2nYsu9NQMCgsJ8MQA6EX86v72k6slnLlJyTSq/0C7Tqx1uO21banzSux
-	Aw3FB7asIsqnmsWmAzOP7zO07iW2ttXqLGNIU7vCSnLSxP7Gs/QGQ==
-X-Google-Smtp-Source: AGHT+IHttdY4o9D7grpTruZsKEHKhDpt1ULxInoDSp8EgrLjir/7gRBnIDXS9Eo/IhcDhnQCnC8tcQ==
-X-Received: by 2002:a17:907:2d25:b0:b4b:dd7e:65eb with SMTP id a640c23a62f3a-b706e5833c5mr157151366b.25.1761860786678;
-        Thu, 30 Oct 2025 14:46:26 -0700 (PDT)
-Received: from ?IPV6:2003:ea:8f48:be00:f474:dcfc:be2f:4938? (p200300ea8f48be00f474dcfcbe2f4938.dip0.t-ipconnect.de. [2003:ea:8f48:be00:f474:dcfc:be2f:4938])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b6d85359687sm1864847366b.23.2025.10.30.14.46.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Oct 2025 14:46:26 -0700 (PDT)
-Message-ID: <bee046a1-1e77-4057-8b04-fdb2a1bbbd08@gmail.com>
-Date: Thu, 30 Oct 2025 22:46:32 +0100
+        d=1e100.net; s=20230601; t=1761862468; x=1762467268;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HjmADPwuhiKknh1al6I//g5+o5h7/YHoGsWoDdA3Xik=;
+        b=eqx0RE6ycYfePaGQgEmVImRW91G3OaVTx5WTSve7pznXvIDzP7MCGB+PwFQwDyEkpY
+         gPMAu1l8EapzpIbGy+eJwoc6zoeZfbwYyVH10PijUUTL4GhgcidxuGoWGtiRCJbtXECU
+         waZAzE2CY3GmV2yVC/ZXNC3VUKJy1CzGK/phXNJS4FzeBCVKduGvBQF03Z9fgWq7T3SD
+         p8gi1d3rjapC9+AH8Rh6Af5vGCZ3dCF+Ns2W0HQVngWsJ7HGgoeQ/wtW7BrVdO8QuxH2
+         RV1IS1AalON9WVdkdGn1JKzYNsu+w6WSYAL9f0CKE/Scy0R0MebqMhFLX+vBGG4hhlY0
+         DHyg==
+X-Forwarded-Encrypted: i=1; AJvYcCUKypxSEqU/Jii9w1T0bZ2VqWib0AzllF7KbrpWLIKsVBbMOl+uqavWcfDkNXuKtgG7fRDpIx4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzD/dkgY+ZpPSK2tvi+8dS+vWeknw4v3YOOjp3USachZ2MNdQVB
+	w415LqmSpH0JmHT3CWS3NIHbxdyEuPXowRM6OJgAuKQs42MOYjCu8itki3kj4D7jBdo0VEzdHFU
+	ZwPOBWJTJIz2gW3e75G+nm20+JCSM0v5vpT+G64G8oq8d1VE81X3gQeOxUOw=
+X-Google-Smtp-Source: AGHT+IGAQ2hv/3RdL9/kZOY1zexofp89sFzf/nb96X1J0QOY8Q6zTb5XyloQXj89LQY1BlLeIVqIvTewXF86vR9c7m43HfKNRZYV
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 6/6] net: phy: fixed_phy: remove fixed_phy_add
-From: Heiner Kallweit <hkallweit1@gmail.com>
-To: Greg Ungerer <gerg@linux-m68k.org>,
- Geert Uytterhoeven <geert@linux-m68k.org>, Hauke Mehrtens
- <hauke@hauke-m.de>, =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Michael Chan <michael.chan@broadcom.com>, Wei Fang <wei.fang@nxp.com>,
- Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
-Cc: linux-m68k@lists.linux-m68k.org, linux-mips@vger.kernel.org,
- imx@lists.linux.dev, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <0285fcb0-0fb5-4f6f-823c-7b6e85e28ba3@gmail.com>
-Content-Language: en-US
-In-Reply-To: <0285fcb0-0fb5-4f6f-823c-7b6e85e28ba3@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:1aab:b0:42f:a4d7:ebac with SMTP id
+ e9e14a558f8ab-4330bd94293mr25707765ab.4.1761862468057; Thu, 30 Oct 2025
+ 15:14:28 -0700 (PDT)
+Date: Thu, 30 Oct 2025 15:14:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6903e344.050a0220.32483.022d.GAE@google.com>
+Subject: [syzbot] [net?] BUG: corrupted list in team_priority_option_set (6)
+From: syzbot <syzbot+422806e5f4cce722a71f@syzkaller.appspotmail.com>
+To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	jiri@resnulli.us, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-fixed_phy_add() has a number of problems/disadvantages:
-- It uses phy address 0 w/o checking whether a fixed phy with this
-  address exists already.
-- A subsequent call to fixed_phy_register() would also use phy address 0,
-  because fixed_phy_add() doesn't mark it as used.
-- fixed_phy_add() is used from platform code, therefore requires that
-  fixed_phy code is built-in.
+Hello,
 
-Now that for the only two users (coldfire/5272 and bcm47xx) fixed_phy
-creation has been moved to the respective ethernet driver (fec, b44),
-we can remove fixed_phy_add().
+syzbot found the following issue on:
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+HEAD commit:    dcb6fa37fd7b Linux 6.18-rc3
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1596ac92580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=609c87dcb0628493
+dashboard link: https://syzkaller.appspot.com/bug?extid=422806e5f4cce722a71f
+compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-dcb6fa37.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/61176fd888a1/vmlinux-dcb6fa37.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/84e7e9924c22/bzImage-dcb6fa37.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+422806e5f4cce722a71f@syzkaller.appspotmail.com
+
+futex_wake_op: syz.0.2928 tries to shift op by -1; fix this program
+ non-paged memory
+list_del corruption, ffff888058bea080->prev is LIST_POISON2 (dead000000000122)
+------------[ cut here ]------------
+kernel BUG at lib/list_debug.c:59!
+Oops: invalid opcode: 0000 [#1] SMP KASAN NOPTI
+CPU: 3 UID: 0 PID: 21246 Comm: syz.0.2928 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+RIP: 0010:__list_del_entry_valid_or_report+0x13e/0x200 lib/list_debug.c:59
+Code: 48 c7 c7 e0 71 f0 8b e8 30 08 ef fc 90 0f 0b 48 89 ef e8 a5 02 55 fd 48 89 ea 48 89 de 48 c7 c7 40 72 f0 8b e8 13 08 ef fc 90 <0f> 0b 48 89 ef e8 88 02 55 fd 48 89 ea 48 b8 00 00 00 00 00 fc ff
+RSP: 0018:ffffc9000d49f370 EFLAGS: 00010286
+RAX: 000000000000004e RBX: ffff888058bea080 RCX: ffffc9002817d000
+RDX: 0000000000000000 RSI: ffffffff819becc6 RDI: 0000000000000005
+RBP: dead000000000122 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000080000000 R11: 0000000000000001 R12: ffff888039e9c230
+R13: ffff888058bea088 R14: ffff888058bea080 R15: ffff888055461480
+FS:  00007fbbcfe6f6c0(0000) GS:ffff8880d6d0a000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000110c3afcb0 CR3: 00000000382c7000 CR4: 0000000000352ef0
+Call Trace:
+ <TASK>
+ __list_del_entry_valid include/linux/list.h:132 [inline]
+ __list_del_entry include/linux/list.h:223 [inline]
+ list_del_rcu include/linux/rculist.h:178 [inline]
+ __team_queue_override_port_del drivers/net/team/team_core.c:826 [inline]
+ __team_queue_override_port_del drivers/net/team/team_core.c:821 [inline]
+ team_queue_override_port_prio_changed drivers/net/team/team_core.c:883 [inline]
+ team_priority_option_set+0x171/0x2f0 drivers/net/team/team_core.c:1534
+ team_option_set drivers/net/team/team_core.c:376 [inline]
+ team_nl_options_set_doit+0x8ae/0xe60 drivers/net/team/team_core.c:2653
+ genl_family_rcv_msg_doit+0x209/0x2f0 net/netlink/genetlink.c:1115
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0x55c/0x800 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x158/0x420 net/netlink/af_netlink.c:2552
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+ netlink_unicast+0x5aa/0x870 net/netlink/af_netlink.c:1346
+ netlink_sendmsg+0x8c8/0xdd0 net/netlink/af_netlink.c:1896
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0xa98/0xc70 net/socket.c:2630
+ ___sys_sendmsg+0x134/0x1d0 net/socket.c:2684
+ __sys_sendmsg+0x16d/0x220 net/socket.c:2716
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fbbcef8efc9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fbbcfe6f038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007fbbcf1e5fa0 RCX: 00007fbbcef8efc9
+RDX: 0000000000040000 RSI: 0000200000000200 RDI: 0000000000000004
+RBP: 00007fbbcf011f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fbbcf1e6038 R14: 00007fbbcf1e5fa0 R15: 00007fffa3594408
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:__list_del_entry_valid_or_report+0x13e/0x200 lib/list_debug.c:59
+Code: 48 c7 c7 e0 71 f0 8b e8 30 08 ef fc 90 0f 0b 48 89 ef e8 a5 02 55 fd 48 89 ea 48 89 de 48 c7 c7 40 72 f0 8b e8 13 08 ef fc 90 <0f> 0b 48 89 ef e8 88 02 55 fd 48 89 ea 48 b8 00 00 00 00 00 fc ff
+RSP: 0018:ffffc9000d49f370 EFLAGS: 00010286
+RAX: 000000000000004e RBX: ffff888058bea080 RCX: ffffc9002817d000
+RDX: 0000000000000000 RSI: ffffffff819becc6 RDI: 0000000000000005
+RBP: dead000000000122 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000080000000 R11: 0000000000000001 R12: ffff888039e9c230
+R13: ffff888058bea088 R14: ffff888058bea080 R15: ffff888055461480
+FS:  00007fbbcfe6f6c0(0000) GS:ffff8880d6a0a000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007ffcb8535e5c CR3: 00000000382c7000 CR4: 0000000000352ef0
+
+
 ---
- drivers/net/phy/fixed_phy.c | 6 ------
- include/linux/phy_fixed.h   | 2 --
- 2 files changed, 8 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/phy/fixed_phy.c b/drivers/net/phy/fixed_phy.c
-index bdc3a4bff..d498d8a9b 100644
---- a/drivers/net/phy/fixed_phy.c
-+++ b/drivers/net/phy/fixed_phy.c
-@@ -131,12 +131,6 @@ static int __fixed_phy_add(int phy_addr,
- 	return 0;
- }
- 
--void fixed_phy_add(const struct fixed_phy_status *status)
--{
--	__fixed_phy_add(0, status);
--}
--EXPORT_SYMBOL_GPL(fixed_phy_add);
--
- static DEFINE_IDA(phy_fixed_ida);
- 
- static void fixed_phy_del(int phy_addr)
-diff --git a/include/linux/phy_fixed.h b/include/linux/phy_fixed.h
-index 08275ef64..8bade9998 100644
---- a/include/linux/phy_fixed.h
-+++ b/include/linux/phy_fixed.h
-@@ -17,7 +17,6 @@ struct net_device;
- 
- #if IS_ENABLED(CONFIG_FIXED_PHY)
- extern int fixed_phy_change_carrier(struct net_device *dev, bool new_carrier);
--void fixed_phy_add(const struct fixed_phy_status *status);
- struct phy_device *fixed_phy_register(const struct fixed_phy_status *status,
- 				      struct device_node *np);
- struct phy_device *fixed_phy_register_100fd(void);
-@@ -27,7 +26,6 @@ extern int fixed_phy_set_link_update(struct phy_device *phydev,
- 			int (*link_update)(struct net_device *,
- 					   struct fixed_phy_status *));
- #else
--static inline void fixed_phy_add(const struct fixed_phy_status *status) {}
- static inline struct phy_device *
- fixed_phy_register(const struct fixed_phy_status *status,
- 		   struct device_node *np)
--- 
-2.51.1
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
