@@ -1,104 +1,117 @@
-Return-Path: <netdev+bounces-234457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E683BC20D43
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 16:07:57 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCECBC20D92
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 16:13:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4D65188E10A
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 15:02:11 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4318E4ECDFB
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 15:12:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B85242DF13E;
-	Thu, 30 Oct 2025 15:01:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21EDD329C60;
+	Thu, 30 Oct 2025 15:12:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="s7j2QD18"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="zPEnt6Gx"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 149922DA759;
-	Thu, 30 Oct 2025 15:01:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3340C2BE05B;
+	Thu, 30 Oct 2025 15:12:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761836504; cv=none; b=Z++fzE56MceQ9DclFEGr83t1d1CsvdpZi2Apd2HKqsU7R0SP6SETEv2xbddvszI8/cjUT9MlB7zsIdsM6yBOWamOmddCY1YgOMdP8Apz68Z+cTzSF7k64mSd56FyFOscFKdiiSQ8dXRuhxh8cXss7Y0Zzy1UmsJ6Zhg7jFMC+zs=
+	t=1761837139; cv=none; b=IHsFmPEK6W7LRyewJ8uo0rqvvjlFWFVB1X7kbw98iyeNY2Hd4O1q6Jzx9GsIBp9yAWyJWbaJtdZYJaKL2mPKZnRmIgxNWCK5CdX0Zu18mUC6CRkaW6XC8ZpOT+j8N71csuE2v4lQj6Cc+b1euxixQGbU+mw5MhJ7KbYzHza//ko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761836504; c=relaxed/simple;
-	bh=HoI9A5dBBG/SP18tn0qdYgJCPMwIZpw/yCunp7reoSE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GuxtjlSmQThPicJV0jlJuD/XKJ2uhX77Xrpz4gVb8p/Rzjn4pjHYRPp/Ae5f43t58adeCC8Rk+dwQzuWIzV0bB6MU3Z8VJqMDGS5U63Hl+e+V58LwzhX+vBawJMorggNrmw+n0LzIO04FgXvZthJjQwzD/K1sau8cf3WNtW1MhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=s7j2QD18; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Ev+WYGcskpqGIIHF3ivwDxrnkr+tx39eqoXSZQFeHS4=; b=s7j2QD18Ifk5JJ5i3kDidFZBGP
-	1ZSafhgxrWn784jyyT40jnXFTQXSOup0KQKwY0Qo//PIMODPXAD/K0lT2Jo6jU1ML+h1zR92GcqOD
-	kXNyTJI+rAUedXLIAnw9SP//oUMikCeIIXltq+lT5vdFqrocJ7jb1+VOe3Zua8Y0+qmg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vEU9W-00CWJa-69; Thu, 30 Oct 2025 16:01:26 +0100
-Date: Thu, 30 Oct 2025 16:01:26 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
-	Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>
-Subject: Re: [PATCH net-next v14 01/16] dt-bindings: net: Introduce the
- ethernet-connector description
-Message-ID: <b8561c97-483f-4f43-897c-4bc3a4b916b4@lunn.ch>
-References: <20251013143146.364919-1-maxime.chevallier@bootlin.com>
- <20251013143146.364919-2-maxime.chevallier@bootlin.com>
- <382973b8-85d3-4bdd-99c4-fd26a4838828@bootlin.com>
- <b6a80aba-638f-45fd-8c40-9b836367c0ea@lunn.ch>
- <7a611937-a2af-4780-9b88-cf9f282f88b3@bootlin.com>
+	s=arc-20240116; t=1761837139; c=relaxed/simple;
+	bh=3G4lqWMc1AkeEiG7YXtkyeLXQgjioYuAuLZXFGLYomI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EseC9Qha1N2Swynlz6d9J61LtnxAiTFk2OePXMRjn4akSYXnE6hVevZuzTCPujDJiejeWsQl1wpscB89nK6ZS9TyLc89x191lgVh3N3F0TmEKKRPtWwqKrFD3vIXjiIXRgRIFq0yA3OkYEfmCATdFT0UdQEA1ZYjeLAwN9YF1Lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=zPEnt6Gx; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 7C5F31A178F;
+	Thu, 30 Oct 2025 15:12:15 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 4EBB56068C;
+	Thu, 30 Oct 2025 15:12:15 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2BF5311808B5F;
+	Thu, 30 Oct 2025 16:12:08 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1761837133; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=75eS/O8ZNC1UyL0u+tQ9cvsjlhk53nqQlsjqo1BsDyw=;
+	b=zPEnt6Gx1T/+JmQGIi5Xj8VnqeU74tUBVaqL8GRS7d3W8tKP0TTb6IU1r8GFexIH/5C9Oi
+	iZwXrcaZT1t2s4qvNWb8BVcpaWlfxmLO7ukREzj1VqSLNovoXOD5YMSPSjexGNKf9hY8ch
+	B8kWX23mTs7ilbHAtUEH5W2ZX4vG1f1vS2xoOq4kZXGBz9J4iow0UTEyngIyMSWZs0pM4i
+	l0qR6gJKaIpeXC5uawriwcpGUGgDjPQiCMiKsZJehkUiJ6m2/FCUQkcWT7WIS7IJ4k4rVi
+	XoWtn5XwfsAMARi4HB8jNYujGm3YuHy8SnKfzBuulNK2Wd74LYMmxVQv0SzZ8w==
+Message-ID: <fd961879-bf35-44a6-a043-4a335e6fdb70@bootlin.com>
+Date: Thu, 30 Oct 2025 16:12:06 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7a611937-a2af-4780-9b88-cf9f282f88b3@bootlin.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v14 01/16] dt-bindings: net: Introduce the
+ ethernet-connector description
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Herve Codina <herve.codina@bootlin.com>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
+ =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
+ Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+ Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
+ Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
+ Romain Gantois <romain.gantois@bootlin.com>,
+ Daniel Golle <daniel@makrotopia.org>,
+ Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
+ Florian Fainelli <florian.fainelli@broadcom.com>
+References: <20251013143146.364919-1-maxime.chevallier@bootlin.com>
+ <20251013143146.364919-2-maxime.chevallier@bootlin.com>
+ <382973b8-85d3-4bdd-99c4-fd26a4838828@bootlin.com>
+ <b6a80aba-638f-45fd-8c40-9b836367c0ea@lunn.ch>
+ <7a611937-a2af-4780-9b88-cf9f282f88b3@bootlin.com>
+ <b8561c97-483f-4f43-897c-4bc3a4b916b4@lunn.ch>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <b8561c97-483f-4f43-897c-4bc3a4b916b4@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-> So that being said, an option could be to only focus on pairs, only
-> for medium = BaseT, and ditch the "lanes" terminology, at least when
-> it comes to the DT bindings.
+
+
+On 30/10/2025 16:01, Andrew Lunn wrote:
+>> So that being said, an option could be to only focus on pairs, only
+>> for medium = BaseT, and ditch the "lanes" terminology, at least when
+>> it comes to the DT bindings.
+>>
+>> Does that sound good ?
 > 
-> Does that sound good ?
+> That sounds reasonable.
+> 
+> In the binding, maybe try to express that we might in the future
+> extend it. You can do that with conditionals. medium is required.  If
+> medium = BaseT then pairs is required. That leaves it open, e.g. in
+> the future we could add medium = BaseKS, and require that has lanes.
 
-That sounds reasonable.
+Thanks Andrew :) I'll update that then !
 
-In the binding, maybe try to express that we might in the future
-extend it. You can do that with conditionals. medium is required.  If
-medium = BaseT then pairs is required. That leaves it open, e.g. in
-the future we could add medium = BaseKS, and require that has lanes.
-
-	Andrew
+Maxime
 
