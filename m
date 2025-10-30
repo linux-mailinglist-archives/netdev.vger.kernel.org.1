@@ -1,156 +1,165 @@
-Return-Path: <netdev+bounces-234350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A48FEC1F8F3
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 11:31:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EB37C1F94A
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 11:34:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BF8594EB5AF
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 10:30:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED3AE4283BF
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 10:30:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1108F355037;
-	Thu, 30 Oct 2025 10:28:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37B16351FB1;
+	Thu, 30 Oct 2025 10:28:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="htPn6Ax/"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="IGUOwze7";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="RGqch72S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-b8-smtp.messagingengine.com (fout-b8-smtp.messagingengine.com [202.12.124.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55845351FBF
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 10:28:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16B9C350D52
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 10:28:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761820138; cv=none; b=j9ODMAYJrr2FtpJsyaVya8+tuOFsl1041aaBqLzX2pjBSG9DFSxdBNHOn2SIIHhekZbm6IZGcteJm7S0cE9zDZehn0EB9G/3M+u4aZg1v0iftmaJfYXiMoUJkwvGBt+JwURy+hbjsL8QavYgx+9M4Z9MNr5yErIr0LAn8o/Y8pM=
+	t=1761820122; cv=none; b=S2tKmWdnl/JlmeoNBaGQQTVdgJZNWTDRqQfJ5gcEEc73/SUZkLlajnUwS5grfKVPCfBeo97E+gXBWt82HcdW7XnnBia/GYoIKlu97iUdqgKA0jUPCw9p2Pgc6rdCFTn6Usj/0VpnJacrX3UYtlouUcVsdm+r9PPxLXc+fifIryk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761820138; c=relaxed/simple;
-	bh=jNBoWYaJyXehjfJui6hBOb2eVdvz/N6C+xIxssWLtWk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rny3tP3UNQlMKXouV2Cf2YcV3FD3sF8jvDPMXg46AEqu4ndUfDOEmYH1ysbsjk6VNluiVu//++155EExa7763EndOSKhSTZJCUsSlFX9ZLaQntE1x7Ntccn7MF5UitMQgzUOSkqAVwToFQ7EKeWRVLWTMncM0minUSQj/C1NKBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=htPn6Ax/; arc=none smtp.client-ip=209.85.166.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-430c52703b3so7998565ab.1
-        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 03:28:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761820135; x=1762424935; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yjigA2w1+8bqCkfLQcxmjCEh/gZYzzclBBO4UhUv1Os=;
-        b=htPn6Ax/aHlm8UON0DWReBG0fj50YkfX2N6U5sMnaGza7uLZDsvpOp6uWYJm+vX5r3
-         /iw3KB1o5ZlKZ4iIP4vr2g+tk4vvUVExnEMC/WWXIdnGwgV9A5d5568sNs5J2RSvzkVD
-         gcuDGXgvERRqQNwaHrDzGvaNxpHcN6R/EaOn+RReMTjjTd94597vPXSRw7Qi9isCZcqR
-         1tBXZ8KFPIL43gfA8WNL2eID8ekrsO2VGPIYIQsTFPTtrGpkRn/uCWY7ciA7OY7sbuhs
-         r3JBOczByxBVwXXxuj/bb/QS5snENAyss3FObHDiCXzpqRhgcNPgKG2xEyqZS7Pd1P4b
-         alCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761820135; x=1762424935;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yjigA2w1+8bqCkfLQcxmjCEh/gZYzzclBBO4UhUv1Os=;
-        b=Z/gexY4oY2eIO4FhhHG14dh5LjrOORILvEbEJwMn4EqVzv/HlKzOY/BwI7joIdYrGT
-         WNgHqUBr0RmKDpf3ocvbauRasS5l1QqS27t3x6A5Idzc9rfA/9IGiE+Rz/x6tRRvCzgS
-         R2a61w1jHrkJy7nG6bKUi2GSgTmBzbsBlaevnOAfl06RWFc/kPz1p6Ai5gHqJhlFiG3d
-         UbNicPuE17JVCUQMAI5y9h+NV9Yqi3SnVv9id6iXBfw8hb5XLYQHWutrFqP4/vmqdV80
-         ghKuVif3Czq4t+38Yz3d/Rqf/pp/pKJtDoI/1twuT0SzrlcTURQVTLz24boIoe21KjPx
-         EeXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWUWQ1ePXTWOOLr7O5IakIMShEX4kaZDM1Gx0LOIxuMYi49JLHFPbNATRMONdOxgOJ2/dTvjI4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywy+YC9S3/XTPJrYtqTR21co3eSNh7LxZQQvPfM67bOjzWxB+l0
-	YdHTnGkfL0W4O9+MchpLqU2CcRN6hRiY3+kE+osmgUQLtwJ/FMh1YhWvUH+Ft7ui2tes6aj222D
-	Eq8iAQVQM8SSnUVrZU8SjPpCfKhsG9QM=
-X-Gm-Gg: ASbGncu85EnSkVbrlR0QvsDWJf4bUZXGUhDbGLeaV4gHjRQ25e3FKCOMdeKxAhxo8v9
-	pCXh3MjVjMdgHUnJQXfyl5xUEne7ErEjZ2egG18CnY+urT64OWC1cjhADjEpIbY+k93OeplSSJ5
-	GW68K04ftDjKf+DFiGJwDqWoM32jQqGpifTwjnzxRVxXgAtKEb+F+1YIu6xWM1mo9hgIVs/65qb
-	b++w+MbCNgwq+mX4AZwC8TWnVmvyGdcZZyZFdfNlWd5eKSiVl/vRtlTsZz5h1CmOBwn2vBDVfNi
-	zJh51g==
-X-Google-Smtp-Source: AGHT+IECoV3waLMBGW2VDD/GhN0MHNi5SgzaN95ahLWIpxZ39GGeEd2gaiibvGhbBYXakXaddVVs0NWE+UX8+u/LWo8=
-X-Received: by 2002:a05:6e02:2385:b0:42e:2c30:285b with SMTP id
- e9e14a558f8ab-432f902b4afmr77878175ab.20.1761820135381; Thu, 30 Oct 2025
- 03:28:55 -0700 (PDT)
+	s=arc-20240116; t=1761820122; c=relaxed/simple;
+	bh=0/baVWMxFoAo/Ib95gC0lBZ45HRVyqvAZbY/K71GKk0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e09I3kqBYz+Ka6CR4OgCfd8fbkbP8LIDWlN0WE/hPqUf+wddHUjTxqvir/d3Qqas5WZNVjOQB/Jpz5BCFmqpQ7MUN5UCGxAuzHqaZV13hmTWaA0VEJCnNvA2ku6q1SQz0WF3lKIXtTNIS/OSLHeTNfIz3QHkRww9ITI7EUdZFQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=IGUOwze7; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=RGqch72S; arc=none smtp.client-ip=202.12.124.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
+	by mailfout.stl.internal (Postfix) with ESMTP id AC26A1D0018C;
+	Thu, 30 Oct 2025 06:28:37 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-01.internal (MEProxy); Thu, 30 Oct 2025 06:28:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1761820117; x=
+	1761906517; bh=pv3kIQ2je0JxNKKQubVH5mPhZIsYYqq5229K/Th1UN8=; b=I
+	GUOwze75oK88VMJczvny8YRTIqd4p0raiiywhcuzOs5jGEkioPeCor/Nc/mSSrcI
+	YxSMXKF2tHJc+0RI8u5pv+aHO4H6gLdFnKHqeCK5GRgZIFZ3i/WUIHzrBNw5QCiQ
+	30ZrC5cd2qDchmQRxVWQiMbFQ4iYpknlcTQrEfhJV2HZqpxFvxkgLR7tTBIhzcsb
+	dbQce5hVj2xNSSKkacE0FtLVRaCoKZxnpCmgEkrgM/cE/uOBiA9XdXRfFNnSVN8l
+	boK3/fRgGwu+Be4B1w21QE14YTBQawkNzFO/HkuYXvknA1FdGd0DQfFfSPyUz7/L
+	/tj2fcfNNw/v/OSWGeEcQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1761820117; x=1761906517; bh=pv3kIQ2je0JxNKKQubVH5mPhZIsYYqq5229
+	K/Th1UN8=; b=RGqch72SMmum/KbE8hS5aknTDxEI5caW70xQNOIPHkfgClo6ovZ
+	waYQi9z4cpHEF0XBm3ueN73EV7GTbDatbwklWSI/G2lJftadRPPxwirvmgjPcNlv
+	mBe3GBXRzqq3M7005APRDKrK2WUMRKU+o7Nw+2Wq0icXevg0517xn9zHMcVBkZ/Q
+	mFBJA4Gahh8xJwgdagd1nfQKvPs37l2jtNsChdR1EiKG7ktBIA7wHHolrjh17Rlc
+	Z/jsbcLRCk3/6sz3rlLh+Q4DcRG1n1Igho/CbbbqeJ8HK+bjkqPJMyv71fVmmHe4
+	5qLAOrCeIXc61jwqigfhzbvtWjYMbn0dJKw==
+X-ME-Sender: <xms:1D0DaUaGMCXWMm2cSWMNU5BbBR8oH3r_n2cm2FArk-VtmVr_1UE9JA>
+    <xme:1D0DabTiuOF4_G4Pq9BWNg-EWrY83dIGtUNjOZ8TlJxOP1F8srdSyqEnxwJ0eRz9I
+    fJF7oC9dx1sQNP8uHuMilc8YOzC2I494XEu7M_StCnxyUu1qxPJ3N8>
+X-ME-Received: <xmr:1D0Dab9ZIR3Po3y6SYzTDWDlTfZYoTiPTMZIo-6VkXdZ-RqFz2dZwqBVOwee>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggdduieeifeejucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeduuddpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtohepshhtvghffhgvnhdrkhhlrghsshgvrhhtse
+    hsvggtuhhnvghtrdgtohhmpdhrtghpthhtohepjhhirghnsgholhesnhhvihguihgrrdgt
+    ohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtg
+    hpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehkuhgs
+    rgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheptghrrghtihhusehnvhhiughirgdrtg
+    homhdprhgtphhtthhopehhvghrsggvrhhtsehgohhnughorhdrrghprghnrgdrohhrghdr
+    rghupdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtth
+    hopehprggsvghnihesrhgvughhrghtrdgtohhm
+X-ME-Proxy: <xmx:1D0DaTg7Gnm14shy7ifD9Pa3B01GQqJMqnp1o34EwJEJVSWyKnIkxw>
+    <xmx:1D0DaUbAUBHh_HWQ-9Sha3VKKa3ODYrvm1Aw4uNawq05H_pkrGFzJg>
+    <xmx:1D0DaQ__VhOxbfoy6auPXZnYWyqjK3ZJDRAmDUFtg5AOPUPci2MSSQ>
+    <xmx:1D0DaeOpkM_bo0BgzQx_v6wD_ljTaBurID7XUXat0DmoRzr4tOyhhw>
+    <xmx:1T0DaaUfJbPuilo9FEJuEV45K2UWV-UmWsxPVZj9R8dgar0OlIZZgQ3V>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 30 Oct 2025 06:28:35 -0400 (EDT)
+Date: Thu, 30 Oct 2025 11:28:34 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Jianbo Liu <jianbol@nvidia.com>, netdev@vger.kernel.org,
+	davem@davemloft.net, kuba@kernel.org,
+	Cosmin Ratiu <cratiu@nvidia.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>
+Subject: Re: [PATCH ipsec v3 2/2] xfrm: Determine inner GSO type from packet
+ inner protocol
+Message-ID: <aQM90v2J9maIvTlU@krikkit>
+References: <20251028023013.9836-1-jianbol@nvidia.com>
+ <20251028023013.9836-3-jianbol@nvidia.com>
+ <aQCjCEDvL4VJIsoV@krikkit>
+ <c1a673ab-0382-445e-aa45-2b8fe2f6bc40@nvidia.com>
+ <aQDbhJuZqFokEO31@krikkit>
+ <aQMc64pcTzvkupc1@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251026145824.81675-1-kerneljasonxing@gmail.com> <54d1ac44-8e53-4056-8061-0c620d9ec4bf@redhat.com>
-In-Reply-To: <54d1ac44-8e53-4056-8061-0c620d9ec4bf@redhat.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 30 Oct 2025 18:28:18 +0800
-X-Gm-Features: AWmQ_bmQi8GJMMAdtPGC0goZLlXFuCJ4nTdiqFQ0gnXknrj3Q3iOMn21WQjOVi4
-Message-ID: <CAL+tcoDLLqr5q-hvcu0PapnMUwjsewwQjmACG3h3SRWEfSRhYA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] xsk: add indirect call for xsk_destruct_skb
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	bjorn@kernel.org, magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
-	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, joe@dama.to, 
-	willemdebruijn.kernel@gmail.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>, Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <aQMc64pcTzvkupc1@secunet.com>
 
-On Thu, Oct 30, 2025 at 6:15=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On 10/26/25 3:58 PM, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > Since Eric proposed an idea about adding indirect call for UDP and
->
-> Minor nit:                          ^^^^^^
->
-> either 'remove an indirect call' or 'adding indirect call wrappers'
+2025-10-30, 09:08:11 +0100, Steffen Klassert wrote:
+> On Tue, Oct 28, 2025 at 04:04:36PM +0100, Sabrina Dubroca wrote:
+> > 2025-10-28, 21:36:17 +0800, Jianbo Liu wrote:
+> > > 
+> > > My proposed plan is:
+> > > 
+> > > Send the patch 1 and patch 3 (including the xfrm_ip2inner_mode change)
+> > > together to the ipsec tree. They are self-contained fixes.
+> > 
+> > So, keep v3 of this series unchanged.
+> > 
+> > > Separately, after those are accepted, I can modify and re-submit that patch
+> > > [1] to ipsec-next that removes the now-redundant checks from the other
+> > > callers (VTI, etc.), leveraging the updated helper function.
+> > > 
+> > > This way, the critical fixes are self-contained and backportable, while the
+> > > cleanup of other callers happens later in the development cycle.
+> > 
+> > The only (small) drawback is leaving the duplicate code checking
+> > AF_UNSPEC in the existing callers of xfrm_ip2inner_mode, but I guess
+> > that's ok.
+> > 
+> > 
+> > Steffen, is it ok for you to
+> > 
+> >  - have a duplicate AF_UNSPEC check in callers of xfrm_ip2inner_mode
+> >    (the existing "default to x->inner_mode, call xfrm_ip2inner_mode if
+> >    AF_UNSPEC", and the new one added to xfrm_ip2inner_mode by this
+> >    patch) in the ipsec tree and then in stable?
+> > 
+> >  - do the clean up (like the diff I pasted in my previous email, or
+> >    something smaller if [1] is applied separately) in ipsec-next after
+> >    ipsec is merged into it?
+> 
+> I'm OK with this, I can take v3 as is.
 
-Oh, right!
+Ok. In that case, you can add:
 
->
-> > managed to see a huge improvement[1], the same situation can also be
-> > applied in xsk scenario.
-> >
-> > This patch adds an indirect call for xsk and helps current copy mode
-> > improve the performance by around 1% stably which was observed with
-> > IXGBE at 10Gb/sec loaded.
->
-> If I follow the conversation correctly, Jakub's concern is mostly about
-> this change affecting only the copy mode.
+Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 
-Copy mode is worth optimization really. Please see below.
+for both patches.
 
->
-> Out of sheer ignorance on my side is not clear how frequent that
-> scenario is. AFAICS, applications could always do zero-copy with proper
-> setup, am I correct?!?
+Thanks.
 
-In my env, around 2,000,000 packets are sent per second which in turn
-means the destruction function gets called the same number of times.
-
->
-> In such case I think this patch is not worth.
->
-> Otherwise, please describe/explain the real-use case needing the copy mod=
-e.
-
-I gave a detailed explanation in the cover letter [1]. The real use
-case from my side is to support the virtio_net and veth scenario. This
-topic has been discussed in the version 1 of [1] and Jesper also
-acknowledged this point. I also noticed that there remain some
-physical nics that haven't supported zerocopy mode yet and some of
-them[2] are still in progress.
-
-[1]: https://lore.kernel.org/all/20251021131209.41491-1-kerneljasonxing@gma=
-il.com/
-[2]: https://lore.kernel.org/all/20251014105613.2808674-1-m-malladi@ti.com/
-
-Thanks,
-Jason
-
->
-> Thanks,
->
-> Paolo
->
+-- 
+Sabrina
 
