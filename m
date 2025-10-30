@@ -1,164 +1,98 @@
-Return-Path: <netdev+bounces-234477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A72BC2146C
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 17:46:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A52B5C21433
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 17:43:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3E3484EDDF9
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 16:43:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7423188DFE1
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 16:44:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44EE12E8DEF;
-	Thu, 30 Oct 2025 16:43:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9D892ED869;
+	Thu, 30 Oct 2025 16:43:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gwKxHfwC"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fkHOrJy3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A038A2E0B44
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 16:43:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 391752ECE98
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 16:43:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761842621; cv=none; b=tPnRc3PrSis6EwmZSxJDfamyaJrmQTwQL/l/HFf/nQz6FP2yIvRobKbkkyTyvfNJt55MDUDAa4eFpbaFUaTJYZrRPvHaxF3mUu0pMPQRgtxvnzCGEpWkrv5jdm5oSg2OxzAFpBTsQ+K7I3HrH+RQ3BuGebg31suPF5AkQrVWAm4=
+	t=1761842625; cv=none; b=RbE85Ui7jUqnCqVMCqWI0O6m6nv5RaF1Tzd+QNRe5nn88UCAJboaTYyg0dwlvLCzfPkB/KGY1Xn0pnIcrc/5cYwy0kBbqhnp/EJFOOQy7Ct/6VSoqxvn9GfFftEEnn9SFWykfnNx6mkRQPkvinnAQx9kqb4pYpk1bTA4eLAcRvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761842621; c=relaxed/simple;
-	bh=ScsR3RF3FUX3H0ckwAV5EMhCJGDEfRpRd7qgc2we++s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PKUYGDmqtujRuj/g00XBekVO7LObuv00eKp+CG4Rm4cli5SDarPGdloyo9PsYiCdVn6Wy5iuGikzVT8uNT+STEklaAVD3s4iDCZr0HSEKuToNt51sOOBcSKzBCMzVFC/avlOoqmTheYr+lVEegm/avCMkzNWUtWDB/bIk8TxKuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gwKxHfwC; arc=none smtp.client-ip=209.85.166.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-940d327df21so49669339f.1
-        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 09:43:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761842618; x=1762447418; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ScsR3RF3FUX3H0ckwAV5EMhCJGDEfRpRd7qgc2we++s=;
-        b=gwKxHfwCYoDeF2l7+1rYYozkU19wcxaqNZNTmSchga5ZKcM2aj5JnnPI8emoYCA1CW
-         EtJdkejzwNzd8Qoh0N3sdlthqKnl5P5EgCnCNuipEa4qvXWycwxZLkmkfKFTo9m/vugq
-         Yikfam5ZQCaz+r/XfL5yPGBbiQL6wlMSGbM5grfQozd+C7AzCysjXV7grZbWS/XJmITD
-         17ezdD1IRAhAtwCE1OAsnb1yRgguF8hX7RWtQvOLR0f0oE3tbXq2HadPmT6N7GHaeR+8
-         Itg+UfDO6wBJ6h+ILddO5Vgpxv7GhuiPxcb2Y4xTSJcXP4rlDKnYkUkpVaBAbF4QDnyd
-         1U9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761842618; x=1762447418;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ScsR3RF3FUX3H0ckwAV5EMhCJGDEfRpRd7qgc2we++s=;
-        b=KaLzOEgpPI1hQLuf9UA12i9Jy1oGviBuY7Ayt8iBxPn3BvrPKsqy81a4H7qHGaYVx7
-         ut6rjUgBCDHacG0fUYgGSFQMWuSyaw02GVdrBSJZqUYqcDYe1Zsfnmq1N7LnzhVWDMyx
-         cWXObQoLh8/4fdWeGuVf0r5RVtHyXxvOGYV2SeIPWRPqwyQVxq0CsPuK+uFv4ex2mqYf
-         5LMLwinalUyB9IAkdWeOlZudpYMeB5ISqcFtgEnvOZpL45EqdDSTO47XXk2zPt5uo+5E
-         S1Jyo6YzCOOR5LSz0vYrz7Z4DqBQb3kv1S61v6h7OFA9SOMtcEIly9lkdptK6KULffbn
-         yeig==
-X-Forwarded-Encrypted: i=1; AJvYcCVxV0Jw1iwlvQCpUnCmbj5I4IjambLMgMkBHNhcYLsyC/iJx+7iyDcXNrL5Afdl2lTnhU5+Ulo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzeJN1a0kMONG2dPpzcHnS6+GYtvfASzRZr2HgKIaBg2f+q9FQT
-	X2MUa8/AnXyKQSg5wkvzNmCQ5hhiftKOjubeBquOHJLeq24QoAAH5nPTf+WPZ+vOD4PKIxxtPZ6
-	xjZwlnwZPSrkpWf9AP6A88j78aylMqBg=
-X-Gm-Gg: ASbGncsaR+Y/wXCXiTr6cfXCjX0D4E5IPScncktRzM1Pk5XBLUDF0dGaFv9DaR6DAI3
-	PP58VT9WrWzF0SK3IlVCRM+lIiSje6vtkGaIrNLB1JW0BeciB1Nf41ELUTm1AuYMLH/iEJZJ8Y1
-	Jlu9qyMdYxcpr1MwQ7g85stM+BUH9rNJ2YqKwFIpLIKJNLah3o3HrEOBY1c2r1F+ZQ8aSh0wfxk
-	bprvYMe70HF+wucV6LCvn/AG9DrEHujCW2P+DslGqY12Nsm7wUs78PCj+17Ff6Mhke2+q4=
-X-Google-Smtp-Source: AGHT+IHABHHYgP9UPdSaAL9Tyr/Tjj/DmATyHoB6SRmjVOqGejrhf07RZdi3a9r4TiomtoZ/2gaNdIWdCVNC+c/+k40=
-X-Received: by 2002:a05:6e02:17ce:b0:430:d061:d9f7 with SMTP id
- e9e14a558f8ab-4330d1ea721mr5802175ab.23.1761842617639; Thu, 30 Oct 2025
- 09:43:37 -0700 (PDT)
+	s=arc-20240116; t=1761842625; c=relaxed/simple;
+	bh=vvqEQ26fVa/fZR9lYkduY+SUXK+XDxA6Iv16Z0haXps=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=P8cejN4EqeEyNVHZxMJU4LbPdC3liZv5x1Vq0Rn5wfstG/rIP4ynPP8JaOHhmcqUFI+92bizA8VIyzNsYWAJANqeMpxjhbFh2NykMbug4aYSxp7+IErgQyKLSjtmn7bAbdDK/v6Q+VcHuLP32YqLEi2eBDY7U5odhdwDK5Wm0wo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fkHOrJy3; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 722184E413FD;
+	Thu, 30 Oct 2025 16:43:41 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 3F51A60331;
+	Thu, 30 Oct 2025 16:43:41 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 993FF11808C40;
+	Thu, 30 Oct 2025 17:43:39 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1761842620; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=vvqEQ26fVa/fZR9lYkduY+SUXK+XDxA6Iv16Z0haXps=;
+	b=fkHOrJy3jFwDx0odfagf0TEuyiyi8HYGybDjSAQ1GLjVW3zrU67CdbhGbU9aNMbmAlZN9A
+	VYGobyKQTF0us3LaFQUBKh/zi9Z/KMsAKBEhRdkSXAkuxoZCE2BKbpPaLGqh1gPKqSaa+w
+	hpNYOJUIb76ih3ktKNO3KdfhcS28APcI7YcjVaV+kzBfqxoNasTg6LIu/mIWCdSMBWRdpj
+	z0u/+00sZZVq5E5T23qkKgD1SxvsWDkcnK9sgeZZ6SvETz6JVjFV69sklFleli4ozC+/OW
+	s5f6wokOGEDzRhOSC2HOTwIFdOFgTrME3/H4kfR0p2Mh+Boo/DfZSw72Gk3iog==
+Date: Thu, 30 Oct 2025 17:43:38 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Michal Kubecek
+ <mkubecek@suse.cz>, netdev@vger.kernel.org
+Subject: Re: [PATCH ethtool-next] netlink: tsconfig: add HW time stamping
+ configuration
+Message-ID: <20251030174338.4a709908@kmaincent-XPS-13-7390>
+In-Reply-To: <20251030081423.2bb43db6@kernel.org>
+References: <20251004202715.9238-1-vadim.fedorenko@linux.dev>
+	<5w25bm7gnbrq4cwtefmunmcylqav524roamuvoz2zv5piadpek@4vpzw533uuyd>
+	<ef2ea988-bbfb-469e-b833-dbe8f5ddc5b7@linux.dev>
+	<zsoujuddzajo3qbrvde6rnzeq6ic5x7jofz3voab7dmtzh3zpw@h3bxd54btzic>
+	<8693b213-2d22-4e47-99bb-5d8ca4f48dd5@linux.dev>
+	<20251029153812.10bd6397@kernel.org>
+	<20251030153723.7448a18e@kmaincent-XPS-13-7390>
+	<20251030081423.2bb43db6@kernel.org>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251026145824.81675-1-kerneljasonxing@gmail.com>
- <54d1ac44-8e53-4056-8061-0c620d9ec4bf@redhat.com> <e290a675-fc1e-4edf-833c-aa82af073d30@intel.com>
- <20251030085535.4f658dd8@kernel.org>
-In-Reply-To: <20251030085535.4f658dd8@kernel.org>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 31 Oct 2025 00:43:01 +0800
-X-Gm-Features: AWmQ_bkAsHoydT5-J9trWZVBP9fFUV3qIY4KlwFsxFEgD--IX4m49PzB2kXlj48
-Message-ID: <CAL+tcoAm_ScONpFUACi3TcrgKx_DUecZmEXpRJVOMwJHa29K9w@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] xsk: add indirect call for xsk_destruct_skb
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net, 
-	edumazet@google.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	maciej.fijalkowski@intel.com, jonathan.lemon@gmail.com, sdf@fomichev.me, 
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com, joe@dama.to, willemdebruijn.kernel@gmail.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Thu, Oct 30, 2025 at 11:55=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Thu, 30 Oct 2025 11:59:58 +0100 Alexander Lobakin wrote:
-> > >> managed to see a huge improvement[1], the same situation can also be
-> > >> applied in xsk scenario.
-> > >>
-> > >> This patch adds an indirect call for xsk and helps current copy mode
-> > >> improve the performance by around 1% stably which was observed with
-> > >> IXGBE at 10Gb/sec loaded.
-> > >
-> > > If I follow the conversation correctly, Jakub's concern is mostly abo=
-ut
-> > > this change affecting only the copy mode.
-> > >
-> > > Out of sheer ignorance on my side is not clear how frequent that
-> > > scenario is. AFAICS, applications could always do zero-copy with prop=
-er
-> > > setup, am I correct?!?
-> >
-> > It is correct only when the target driver implements zero-copy
-> > driver-side XSk. While it's true for modern Ethernet drivers for real
-> > NICs, "virtual" drivers like virtio-net, veth etc. usually don't have i=
-t.
-> > It's not as common usecase as using XSk on real NICs, but still valid
-> > and widely used.
->
-> To be clear my main concern is that the XDP<>skb conversions are
-> an endless source of bugs and complexity. We have one fix for XDP->skb
-> on the list from Maciej and another for AF_XDP from Fernando which
-> tried to create an XDP skb_ext. We are digging a deeper and deeper
-> hole with all this fallback stuff, and it will affect performance
-> of both normal skb and XDP paths. Optimizing AF_XDP fallback is
-> shortsighted.
+On Thu, 30 Oct 2025 08:14:23 -0700
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-Sorry, I have to say I'm against the whole point :(
+> On Thu, 30 Oct 2025 15:37:23 +0100 Kory Maincent wrote:
+> > Jakub, as it is already in uAPI but not used at all, would it be possib=
+le to
+> > change it or is it already too late? =20
+>=20
+> We'd need a very strong reason to consider changing it now.
 
-1. Every feature has bugs. Just taking a look at the history of those
-well-known features like LRO/GRO/GSO, you must be aware that so many
-nasty bugs have been found.
-2. The so-called fallback is not something that nobody uses and nobody
-cares. It has its right valid position and has actually been used by
-many applications. Searching in the github, you can find many related
-supports in their own repos. Being generic doesn't mean being
-shortsighted and useless. There are a few so-called fallback features
-other than this, like SMC-R for RDMA.
-3. Back to the main point we've discussed, there are many cases that
-don't support zerocopy mode and I don't see anyone who volunteers to
-complete the rest of them. So currently and at least in these recent
-years I can predict that copy mode can be used widely.
-4. I'm working on something that is really beneficial to me and some
-people like me who need to accelerate the transmission in copy mode.
-There's still a huge gap between zc and copy mode, but sadly we have
-no chance to use zc mode. Optimizing the copy mode then becomes my
-primary job after work.
+And I don't think we have a strong enough reason here.
+So lets keep it as a bitmap then.
 
-I fully understand what you meant here. But the fact is the fact...
-
-As to the maintenance, I believe we're able to cover this area and
-make it better and better in every aspect. I really hope we don't get
-stuck in these minor optimizations, shall we? I have more copy mode
-patches on the way... I really appreciate that we can merge it and
-move on. Many thanks here!
-
-Thanks,
-Jason
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
