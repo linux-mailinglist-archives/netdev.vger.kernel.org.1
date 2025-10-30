@@ -1,76 +1,88 @@
-Return-Path: <netdev+bounces-234269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08B15C1E585
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 05:21:38 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00999C1E588
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 05:25:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A49FB3A6A41
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 04:21:21 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B3A5B4E11AE
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 04:25:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A8DD2E1EEE;
-	Thu, 30 Oct 2025 04:21:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 895A72EB5CE;
+	Thu, 30 Oct 2025 04:25:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b="PcX4/nya"
+	dkim=pass (2048-bit key) header.d=cse-iitm-ac-in.20230601.gappssmtp.com header.i=@cse-iitm-ac-in.20230601.gappssmtp.com header.b="ddSVIiQu"
 X-Original-To: netdev@vger.kernel.org
-Received: from layka.disroot.org (layka.disroot.org [178.21.23.139])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FFF92DE71C;
-	Thu, 30 Oct 2025 04:21:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.21.23.139
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9962F2E336E
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 04:25:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761798079; cv=none; b=XwLjGtE0pxKig8GgB/bSKXXN4umQ0Tj2vLu7AsH7v/SEaI6suXEt3cziA+5VSKmESSkjjIJtyflpTb4aUeRq9BK83ofxGzzmr2EZw9Y3agMR51E3etC9cvLRi509/bppzj99SJmu7vK1mUwvDNBxYuaxicMkzBz5yzR1xPNqvHg=
+	t=1761798337; cv=none; b=li1S9uJHT+efb8sRmRTkVQZOBYpqxm4vYCekKW7v1hPiqgoKzRhlYRgKlP+TJ9t2BJztUUD9Ab0DG+WDhOTfD5Zv2nU3Xm/hN6PL+HF4yIn8pl1zTmFrY/p8u4rJlv0Bdbjp5NkylbSRK6dVn9XlS68el9pz/ra/Wf61vaXVyp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761798079; c=relaxed/simple;
-	bh=1vIFpVbedqamb3ASDWpY+TrxMjREjHQZhgAacjsYZ4k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aQ2t8IWi4ZK2JoCa2qMNhB0I8ox5WaWlf6RmnVoBDdip2aZAf66TU4K95Ua+GpFOHyNUWvut1DVI/putBqqj+OEH65tljIXfq0JeZB12fJjDs8IZSHVi2mKjqTBdAXCbNEVRek5cxjmiV3t96Oo97zC1/jze4JFSoeBTaeV3FpU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org; spf=pass smtp.mailfrom=disroot.org; dkim=pass (2048-bit key) header.d=disroot.org header.i=@disroot.org header.b=PcX4/nya; arc=none smtp.client-ip=178.21.23.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=disroot.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=disroot.org
-Received: from mail01.disroot.lan (localhost [127.0.0.1])
-	by disroot.org (Postfix) with ESMTP id 1947E25DB3;
-	Thu, 30 Oct 2025 05:21:16 +0100 (CET)
-X-Virus-Scanned: SPAM Filter at disroot.org
-Received: from layka.disroot.org ([127.0.0.1])
- by localhost (disroot.org [127.0.0.1]) (amavis, port 10024) with ESMTP
- id lg8HJ_cZthlt; Thu, 30 Oct 2025 05:21:15 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=disroot.org; s=mail;
-	t=1761798075; bh=1vIFpVbedqamb3ASDWpY+TrxMjREjHQZhgAacjsYZ4k=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=PcX4/nya2QcIqiqZGEB0LMqN4+S1FbX0w/PiSAFFdF2PsJ4x9UN67P76SccsHD00I
-	 ptaahRXYhVITKszZQvA1I+DycaBN6ExvYXFuaGQlGIKr14Yq6Fg+Jth3QXR1S4JUxm
-	 V4ZmTcLCRYXV63fYxr0gfjA54ocb850f/X5rj2juIYed8vnpgrE0KbKBJXuz+fwpiB
-	 pv3gC1CbcWff46i59+YH3JW00WizZq6DP4Owu0N7XIA8duUayIjK+liy1w9S+ubz47
-	 O7Rf5qkEGq1DK9kVt1SeNFHA9AHgmxLZgQTPdAJujyIvG0fQAOvT6rkRBmW+ggjwcR
-	 zT3M9Jd19UH7Q==
-From: Yao Zi <ziyao@disroot.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Yanteng Si <si.yanteng@linux.dev>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Philipp Stanner <phasta@kernel.org>,
-	Tiezhu Yang <yangtiezhu@loongson.cn>,
-	Qunqin Zhao <zhaoqunqin@loongson.cn>,
-	Yao Zi <ziyao@disroot.org>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Furong Xu <0x1207@gmail.com>,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	Jacob Keller <jacob.e.keller@intel.com>
-Cc: netdev@vger.kernel.org,
+	s=arc-20240116; t=1761798337; c=relaxed/simple;
+	bh=akH7KpJecI4n+QJrs5zH9nQeo0YDkYU2UBuk2BavrVQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WrHd7PS/vAL17g+20/qrciETOXm8O/6lyj7Bd3BgIB9jjBOuKnNaEiL1lKyf0A+zovf0ND/tVxxkej6ua7ip/c6xdfQWx/Beis/m4+PVsRukJMEHv+ZBVycx8OH0/7f5sCcf4/W+o3gZQrukkc8GWjzt3/BW8KkVWXfco1ler9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cse.iitm.ac.in; spf=pass smtp.mailfrom=cse.iitm.ac.in; dkim=pass (2048-bit key) header.d=cse-iitm-ac-in.20230601.gappssmtp.com header.i=@cse-iitm-ac-in.20230601.gappssmtp.com header.b=ddSVIiQu; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cse.iitm.ac.in
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cse.iitm.ac.in
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-290dc630a07so4283815ad.1
+        for <netdev@vger.kernel.org>; Wed, 29 Oct 2025 21:25:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cse-iitm-ac-in.20230601.gappssmtp.com; s=20230601; t=1761798335; x=1762403135; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=P6cUclqtjLqmHCCyJ+ZbRyqsvOdXEkvs5Ie/9Febbuw=;
+        b=ddSVIiQux12DoSrznFw/KgfWv4RCUijOzECd7MSpEVEfbMHrwUyIt5OehVOiCmzOOc
+         PEqvGz065En91gOpJMXKdC6gdLel2icbRZF3/WlU072IIYH3Mu+qrAZ4An6LNZSyoytu
+         cqhM4khFtheDO2UEv03V5UYFVVhxUL+qRUvdlUwR83unDXzAOGzZPn1ck+cWYb2AUeow
+         EmOu6vQZEd/1PPUxnrVgp7bwW8jz/dqUATPGn1ZExFJF59eLkBu43VYDjUWURYWIMykP
+         +ogm+oX0Y7gYh2eBKEhM5Z+j6NGLUq2EcwQb3mkdUlbrlnGxQZEp1ak8fSl/OSw2e/st
+         5fJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761798335; x=1762403135;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=P6cUclqtjLqmHCCyJ+ZbRyqsvOdXEkvs5Ie/9Febbuw=;
+        b=eBjtWUoh2hOkSYXy2xM7WzigE3DDyeTqKItcYcfbzOQ6ALpPAdF1muRV6R+/WLZSP0
+         bNIlQAqW3XEFn2P79BhW+KH3y/6KxZT/FfZjU+I5KambOzTlpuGRNM9SxE2ZGCSlc9UC
+         DsafBRH6K5SgxLU+xAo49Mf7nOPHrnJ49FwO91vp9TV5GK22Ls+vFiQBCP99dziOSnfe
+         4PklSDzTWNWfYXYBiUG6HOIJECvR3NifGBjGzAgupQa2Z3Ps6s+qV+/u4XiRqkM2HHWs
+         MMelrnGguUZoo8hIjxvGcVmmwh/PQEYOzIs9OpQ5CwzRtRSeds77n4AI3aVjzPaFavcV
+         xPjA==
+X-Forwarded-Encrypted: i=1; AJvYcCUH2wf7hiY7beifyl5r+iAOkjMgTrWpcYfdZ6qvHr5zl7o3h0kyTl1SlrLptm8tD7dG7gQLq2M=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw0CVfv0KGPvGe56vJkDrSogkfqRI0EwaDd7LxbDVNViFN57JE3
+	PMLF/VD8iw4zMOUe24h97OwtOBPlYeZ2dKUUvQutFL3mSwwGRzPmi8ogNSBTcqHrhFeS0VhX7SM
+	xGb2V
+X-Gm-Gg: ASbGncvgfbKkWP0FnSGvQQtE5UHuyTb3ok3AIkhsmh348f03Wr6++IurpfM1FiaiF4a
+	TFPcStJxBFs7sGXuaWy952swfknw45ZnGiodXhw/7bDK9AYaI6lRC+lo0MRPOPW4NTwnF5UPt0+
+	9hZNcGdHbRtc0BZXuh3rQMkhgfAgiAWL7+H20L8/MzeFwpBAQGe6sKwEaEym73fX0nnxK3z+ZI5
+	Fa5SBpiV0FXQiHpDuu6S1lpaoBAH/sxwR4yWDIDn4ArKPMtrVbLFHEUY6DnG+wwPfpaZPz+EAd+
+	Mp9U26ClsHqy3IGDAUC2JmrWyNjKWqbKF/PsTTSFAn1fS9R9iBFLsqFSdDDjFOnmfbL4t3g/UC2
+	GtFByZZheYwIM7aGERPg1/27aySOsjZb0ZS8LQHC7AF4fv1b0XUFe/3rOmRl1UqbENKpidYZiB0
+	zPO3iQez7KdclzNC5mufB4fb0x
+X-Google-Smtp-Source: AGHT+IH1qZlCrQ7jvNZuabOFz90UxYltHxbnuJBYmWEXINJqkod6nkwwuZ3kM71t1oIhJR8TNZjC7A==
+X-Received: by 2002:a17:902:e812:b0:28e:acf2:a782 with SMTP id d9443c01a7336-294deea9585mr62399795ad.37.1761798335012;
+        Wed, 29 Oct 2025 21:25:35 -0700 (PDT)
+Received: from localhost.localdomain ([103.158.43.22])
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-29498d0827fsm167991715ad.31.2025.10.29.21.25.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Oct 2025 21:25:34 -0700 (PDT)
+From: Abdun Nihaal <nihaal@cse.iitm.ac.in>
+To: isdn@linux-pingi.de
+Cc: Abdun Nihaal <nihaal@cse.iitm.ac.in>,
+	horms@kernel.org,
+	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 3/3] net: stmmac: pci: Use generic PCI suspend/resume routines
-Date: Thu, 30 Oct 2025 04:19:16 +0000
-Message-ID: <20251030041916.19905-4-ziyao@disroot.org>
-In-Reply-To: <20251030041916.19905-1-ziyao@disroot.org>
-References: <20251030041916.19905-1-ziyao@disroot.org>
+Subject: [PATCH net v2] isdn: mISDN: hfcsusb: fix memory leak in hfcsusb_probe()
+Date: Thu, 30 Oct 2025 09:55:22 +0530
+Message-ID: <20251030042524.194812-1-nihaal@cse.iitm.ac.in>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,90 +91,79 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Convert STMMAC PCI glue driver to use the generic platform
-suspend/resume routines for PCI controllers, instead of implementing its
-own one.
+In hfcsusb_probe(), the memory allocated for ctrl_urb gets leaked when
+setup_instance() fails with an error code. Fix that by freeing the urb
+before freeing the hw structure. Also change the error paths to use the
+goto ladder style.
 
-Signed-off-by: Yao Zi <ziyao@disroot.org>
+Compile tested only. Issue found using a prototype static analysis tool.
+
+Fixes: 69f52adb2d53 ("mISDN: Add HFC USB driver")
+Signed-off-by: Abdun Nihaal <nihaal@cse.iitm.ac.in>
 ---
- drivers/net/ethernet/stmicro/stmmac/Kconfig   |  1 +
- .../net/ethernet/stmicro/stmmac/stmmac_pci.c  | 36 ++-----------------
- 2 files changed, 4 insertions(+), 33 deletions(-)
+v1->v2:
+Updated to use the goto ladder for the error paths, and added a note on
+testing and detection, as suggested by Simon Horman.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-index 4b6911c62e6f..eec81f674857 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-+++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-@@ -382,6 +382,7 @@ config STMMAC_PCI
- 	tristate "STMMAC PCI bus support"
- 	depends on STMMAC_ETH && PCI
- 	depends on COMMON_CLK
-+	depends on STMMAC_LIBPCI
- 	help
- 	  This selects the platform specific bus support for the stmmac driver.
- 	  This driver was tested on XLINX XC2V3000 FF1152AMT0221
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-index 94b3a3b27270..fa92be672c54 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c
-@@ -14,6 +14,7 @@
- #include <linux/dmi.h>
- 
- #include "stmmac.h"
-+#include "stmmac_libpci.h"
- 
- struct stmmac_pci_info {
- 	int (*setup)(struct pci_dev *pdev, struct plat_stmmacenet_data *plat);
-@@ -139,37 +140,6 @@ static const struct stmmac_pci_info snps_gmac5_pci_info = {
- 	.setup = snps_gmac5_default_data,
- };
- 
--static int stmmac_pci_suspend(struct device *dev, void *bsp_priv)
--{
--	struct pci_dev *pdev = to_pci_dev(dev);
--	int ret;
--
--	ret = pci_save_state(pdev);
--	if (ret)
--		return ret;
--
--	pci_disable_device(pdev);
--	pci_wake_from_d3(pdev, true);
--	return 0;
--}
--
--static int stmmac_pci_resume(struct device *dev, void *bsp_priv)
--{
--	struct pci_dev *pdev = to_pci_dev(dev);
--	int ret;
--
--	pci_restore_state(pdev);
--	pci_set_power_state(pdev, PCI_D0);
--
--	ret = pci_enable_device(pdev);
--	if (ret)
--		return ret;
--
--	pci_set_master(pdev);
--
--	return 0;
--}
--
- /**
-  * stmmac_pci_probe
-  *
-@@ -249,8 +219,8 @@ static int stmmac_pci_probe(struct pci_dev *pdev,
- 	plat->safety_feat_cfg->prtyen = 1;
- 	plat->safety_feat_cfg->tmouten = 1;
- 
--	plat->suspend = stmmac_pci_suspend;
--	plat->resume = stmmac_pci_resume;
-+	plat->suspend = stmmac_pci_plat_suspend;
-+	plat->resume = stmmac_pci_plat_resume;
- 
- 	return stmmac_dvr_probe(&pdev->dev, plat, &res);
+Link to v1:
+https://patchwork.kernel.org/project/netdevbpf/patch/20251024173458.283837-1-nihaal@cse.iitm.ac.in/
+
+ drivers/isdn/hardware/mISDN/hfcsusb.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/isdn/hardware/mISDN/hfcsusb.c b/drivers/isdn/hardware/mISDN/hfcsusb.c
+index e54419a4e731..541a20cb58f1 100644
+--- a/drivers/isdn/hardware/mISDN/hfcsusb.c
++++ b/drivers/isdn/hardware/mISDN/hfcsusb.c
+@@ -1904,13 +1904,13 @@ setup_instance(struct hfcsusb *hw, struct device *parent)
+ 	mISDN_freebchannel(&hw->bch[1]);
+ 	mISDN_freebchannel(&hw->bch[0]);
+ 	mISDN_freedchannel(&hw->dch);
+-	kfree(hw);
+ 	return err;
  }
+ 
+ static int
+ hfcsusb_probe(struct usb_interface *intf, const struct usb_device_id *id)
+ {
++	int err;
+ 	struct hfcsusb			*hw;
+ 	struct usb_device		*dev = interface_to_usbdev(intf);
+ 	struct usb_host_interface	*iface = intf->cur_altsetting;
+@@ -2101,20 +2101,28 @@ hfcsusb_probe(struct usb_interface *intf, const struct usb_device_id *id)
+ 	if (!hw->ctrl_urb) {
+ 		pr_warn("%s: No memory for control urb\n",
+ 			driver_info->vend_name);
+-		kfree(hw);
+-		return -ENOMEM;
++		err = -ENOMEM;
++		goto err_free_hw;
+ 	}
+ 
+ 	pr_info("%s: %s: detected \"%s\" (%s, if=%d alt=%d)\n",
+ 		hw->name, __func__, driver_info->vend_name,
+ 		conf_str[small_match], ifnum, alt_used);
+ 
+-	if (setup_instance(hw, dev->dev.parent))
+-		return -EIO;
++	if (setup_instance(hw, dev->dev.parent)) {
++		err = -EIO;
++		goto err_free_urb;
++	}
+ 
+ 	hw->intf = intf;
+ 	usb_set_intfdata(hw->intf, hw);
+ 	return 0;
++
++err_free_urb:
++	usb_free_urb(hw->ctrl_urb);
++err_free_hw:
++	kfree(hw);
++	return err;
+ }
+ 
+ /* function called when an active device is removed */
 -- 
-2.51.2
+2.43.0
 
 
