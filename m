@@ -1,216 +1,473 @@
-Return-Path: <netdev+bounces-234422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97B8AC207F3
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 15:09:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFE5AC207DE
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 15:08:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6813A188D8A1
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 14:04:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C989E3AD51D
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 14:04:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2188AB67A;
-	Thu, 30 Oct 2025 14:03:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3A5F21CC64;
+	Thu, 30 Oct 2025 14:04:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ioKHHEgd"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="AKOvQAAQ";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="IjAloasN";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="XttQy+ro";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="IAUP+Z5O"
 X-Original-To: netdev@vger.kernel.org
-Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011064.outbound.protection.outlook.com [52.101.52.64])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD5D1A7AE3
-	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 14:03:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.64
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761833009; cv=fail; b=fRhOJ05DFdlggyiQGE59Qqo+RDBv7CSWZaj0dcES7MqqGNLHPBVSHRgw29t2iH+H4Bd0GbVUYMxLXP6WXfG10fQFOCpSl7QdNJYEZJRyEp9Y4clY8FyJ9qPxKsFMQDSMi8pqbLX1NrzBxNHkIwSDG11Vxi6UZL/5xsdUw2fbdDI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761833009; c=relaxed/simple;
-	bh=KW3GSZIt5QqW7xSNBN8x8TYz8nP1g6hdORpo9vyI8d0=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=iXygq0twGMkKaT69bbrkONyyM+JJrXuEpnz6KGNwptG4yq7VvEjINJWaZ7RtmxkfdrD2lTL+ZcfioilKwEYpPF3GEPZvyq3MDeiVo6TpxS2L7vPwEKek6nQ83AHuJFLA8anqywdtlEd57eEsvVGm4ZkuqCsuWWoSrY/2vrTGH+Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ioKHHEgd; arc=fail smtp.client-ip=52.101.52.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=GpyCA+SMpBCWKPkd9LGh6AFul9PWLiD6gWK1TPAUrEe1ptFLH0/Nml8IzDd3CfDM9VvOMkpdPtq+1OgNByHdeXw0pUIpG1eBoExoxk5w89K2YtdDi1IcIk271MtpSbEUhXFYmlHdMswtg2Gt3wF7/HY+OI0309fkjwhiBOhXHnMh2bJ6FWKX1IObnmkL9XELKXDpiQpdeTLHkuAoBoIBRet3XeTLqzng8MorwbKAqOBIyGIdK6pkfEDn+tMK79wQt1+aKxOyDBCzZKePH4TKG5QtfsMmqZ94Nb7r96a2BEcwsagES7s9GKM0hoh0jW9xtLW6oLrFQsXtPLwlRtwvAw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Y6POctbfhEPFCOjjPefevDVhKA35ERTCX+WA3KGNeqY=;
- b=L4HBeAqq6ExnRsqjpTYPSDpHqFLJFdT9sp9DqklkbeuNWdcMvl6oMGbX6T5JZ20uLhE+Ms1CLsrfC3HYKZuC8AnRYfL3AJf/ErdmyZDkUaL3decDPyBUVU5A+sqR9cOv2YEm5/UzKKwLQhZVYMAYr311XnplFuPrO4wQjgsU7V3/2LV0WxcSF/xBqxUhhRwDtowZiY3BQZv41F7D6Snhjf9/3aiOipiaab7WwTrBUgDr+VENdl7vNw72D5qQkfLVc1HTK8Zi9YW2iJbtTGxzcvZjm+APx7+SQLH3i5Vsu6ZGolA4QZ2dP07SYg5GdfvJkACVTwLnMVzd2dfM3gLuAA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Y6POctbfhEPFCOjjPefevDVhKA35ERTCX+WA3KGNeqY=;
- b=ioKHHEgdXznDQiJ8r5I1eqmyj0CRXSE+uZJ0u+P4LuQ9tXq86PfQCPg4GLdpHT9n2/gtilNM2bsIWSeGM1iXFsMgKnWO65pSIc1C5+/L5uK1I74nkhearfJweHmvKw5hXT6RSYPEB5jz1eIJJk5Ufs5x5SfeyCdlwwLQSqV1aNXZo+TzRJV56pFOOqqMKcvZmlqkznf5IOvYv0IIxEZpmycJ9o2P3/dH2+zD0vROaVIckWXuo/bm/KEjhvK0VjUWmZjCxMfCbrQg+JCHoCNwycy52yq1/jUwzXfMgCINnRVLEcd3xbyXSvcuX1o7B1KGRXK9VDTU2XA0zeGPiqwJ0A==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from MW4PR12MB7309.namprd12.prod.outlook.com (2603:10b6:303:22f::17)
- by PH8PR12MB6865.namprd12.prod.outlook.com (2603:10b6:510:1c8::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.13; Thu, 30 Oct
- 2025 14:03:24 +0000
-Received: from MW4PR12MB7309.namprd12.prod.outlook.com
- ([fe80::ea00:2082:ce2d:74c]) by MW4PR12MB7309.namprd12.prod.outlook.com
- ([fe80::ea00:2082:ce2d:74c%5]) with mapi id 15.20.9253.018; Thu, 30 Oct 2025
- 14:03:23 +0000
-Message-ID: <e4ac7f20-2643-4f3b-8f85-5b11cd3ab606@nvidia.com>
-Date: Thu, 30 Oct 2025 09:03:20 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 05/12] virtio_net: Query and set flow filter
- caps
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, mst@redhat.com,
- jasowang@redhat.com, alex.williamson@redhat.com
-Cc: virtualization@lists.linux.dev, parav@nvidia.com, shshitrit@nvidia.com,
- yohadt@nvidia.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
- shameerali.kolothum.thodi@huawei.com, jgg@ziepe.ca, kevin.tian@intel.com,
- kuba@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com
-References: <20251027173957.2334-1-danielj@nvidia.com>
- <20251027173957.2334-6-danielj@nvidia.com>
- <b55d868c-7bc1-4e25-aef4-cdf385208400@redhat.com>
-Content-Language: en-US
-From: Dan Jurgens <danielj@nvidia.com>
-In-Reply-To: <b55d868c-7bc1-4e25-aef4-cdf385208400@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA0PR11CA0120.namprd11.prod.outlook.com
- (2603:10b6:806:d1::35) To MW4PR12MB7309.namprd12.prod.outlook.com
- (2603:10b6:303:22f::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C9EDB67A
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 14:04:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761833069; cv=none; b=G9ZzW/Sk9w+1N9FP5NTlTbwWhUEbVW4ihUj+CLyHM+a8QBTuV/z83rKwL+i2NxTQ436jL0WaYD5HymEYj80InQygSN8t0M2K0OwXFGOtdqRpwfi8vb7gFkygXD8+BJ+yiCtIcTDnTi0VNMHtSa9kK/TQzJvquhnGDS3wdHWEol0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761833069; c=relaxed/simple;
+	bh=cDFHJ3Ac8G5d2p50z+19mx9jVg1vbpkyhkXtsfi3pAU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UEsQLtTZ6DXO6ehMxVAem0bB4JY1zG+R0ge4/PYPMvrts2X1dvvqHrcpu64h8oqIpvNy2bi8kDvdCcEqAp3Reidx8x2iBJQhy+pgUsPJWYlb5OsvZOGs2LIJPRJhIuuiGMqhLEuNXufDeGWAJ551PXyUOfn53Fx6hHcKSmlL5zM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=AKOvQAAQ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=IjAloasN; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=XttQy+ro; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=IAUP+Z5O; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id CAAFE3371B;
+	Thu, 30 Oct 2025 14:04:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1761833061; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=o7YyrSOH2QLNsgcISh8hBytUZ1hCCVjc9jS7W/QNySY=;
+	b=AKOvQAAQchaSpOZ8xtcKUT+pzrfrYBklhsz8MjjrttZLtFue+CJEK67IE/C1DHBkbhBPkU
+	lVWiwZ8Z4DaZZJXzSR/EniYZZiGC8BJaFpqqkhb7HEZ+pJO2Ga4TZTKuqpLC29r9X+OisE
+	50RCNjsbzUP/kxn4U81u+o+yzK8Er/Q=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1761833061;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=o7YyrSOH2QLNsgcISh8hBytUZ1hCCVjc9jS7W/QNySY=;
+	b=IjAloasNJGJk7p//p3pFNDUxsK7Ujxx7Y76bhTQK7UyiLVTP81ygmAaOu+7iJPs4bB/da7
+	mv4fKyppIgcD37Bw==
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=XttQy+ro;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=IAUP+Z5O
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1761833057; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=o7YyrSOH2QLNsgcISh8hBytUZ1hCCVjc9jS7W/QNySY=;
+	b=XttQy+roIeeAMU2rUMvqNDS/QCc6aFRYw1qmB/mZu8IpI7VRGs5Gqy1FDwmCHYmmFsv+gx
+	RUQ7fNrfHNeZdiI4ooOOAga+N1EG6FEK8ge6lYtCX6qn81efooB06yqXQ1vc47TV9N/8zH
+	D2XOgpjkhH/f5OnePcfbPhsDH4fLdRc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1761833057;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=o7YyrSOH2QLNsgcISh8hBytUZ1hCCVjc9jS7W/QNySY=;
+	b=IAUP+Z5ODi1vRndJOhMKvlRMldEHZ90EBFxj4D3QmDEnjnbpgxTnxeAaYQ1aBFQHmThX0B
+	Y9ivXGAwhIB9WlDg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 04FC61396A;
+	Thu, 30 Oct 2025 14:04:16 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 8GAXOmBwA2kMCQAAD6G6ig
+	(envelope-from <fmancera@suse.de>); Thu, 30 Oct 2025 14:04:16 +0000
+From: Fernando Fernandez Mancera <fmancera@suse.de>
+To: netdev@vger.kernel.org
+Cc: csmate@nop.hu,
+	kerneljasonxing@gmail.com,
+	maciej.fijalkowski@intel.com,
+	bjorn@kernel.org,
+	sdf@fomichev.me,
+	jonathan.lemon@gmail.com,
+	bpf@vger.kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	Fernando Fernandez Mancera <fmancera@suse.de>
+Subject: [PATCH net v3] xsk: avoid data corruption on cq descriptor number
+Date: Thu, 30 Oct 2025 15:03:55 +0100
+Message-ID: <20251030140355.4059-1-fmancera@suse.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR12MB7309:EE_|PH8PR12MB6865:EE_
-X-MS-Office365-Filtering-Correlation-Id: 350d5e96-8a7d-4167-64df-08de17bd16df
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?YjZGcTNlaXlzanVhdkpKZ1RZbmNJcE1kV1pSdFhJTkdIdG11aUhrekpOQURZ?=
- =?utf-8?B?QmN6OHE3MU83UFZYc21IZWJVYlVQZ01OQ0VwNmJ0dkljK0tBbXBpM0dMdzhP?=
- =?utf-8?B?Vk53NVBCcDNBcDFHdGU3OFg2djF0akVPT3NVcWxZeU5QbThFUHMvQm1zNFBC?=
- =?utf-8?B?NGFPK25ST1ZrVUMwNkNGWUdvbCtadXBaTXR3TTNmQnlYUFk1MzVmclFaN3Q0?=
- =?utf-8?B?K001TURpRVZsZWVTb3F1RXdyTVI0SkwrRG9oc3lHWTZ5eitQU1A5NEFZV3pK?=
- =?utf-8?B?U0YwSUlqOUtDUGNsb3pyNVROd3JiemQwNmpvdFhNTmh2TlRacVZScVptOG9v?=
- =?utf-8?B?QTBXS3EvMVdSeEhHKytOZHZBV2FzaXMyR2NSV2xDQlI5Z0MxaVBNMjJ4ZUNp?=
- =?utf-8?B?RlV2M2RDQ253b1dCbzI3eFphV3MrNUFWbkxaZVZkNXRBQjV4K2tBK2g1RVNP?=
- =?utf-8?B?ak5nNnkvYXpoMmJETnRUUytiSVB5Y0hubVhYWHgvN2xML1UyUGxJaVAwUEsr?=
- =?utf-8?B?SzlUMnBlSGVsd3V0L3NQUUpXUWMxTUcrSHNxWnF1UUx2eHVjZnp6ZVpwYVdD?=
- =?utf-8?B?VjFLSHp2WmxnY1VFRmk2UDJLaWVEMEVQc0FNdGNqR2ZrK2dLcjZnbk9hZGg5?=
- =?utf-8?B?QmUydy9ZNFJvMFlIWTR1K24wanJmdWRRYUpQZklWVUF0MmFHd1ZKN1FQQjRD?=
- =?utf-8?B?a293WWhOZHh3bU4xeUJKY3dML2NLMWIxZ2Rib1lwdGpPeGUvS2h2OXNHQzkr?=
- =?utf-8?B?M0g3UXJqRnpaYTZHdkQ1ekp1UjRiUmY5YmRrMmJCcEkvcUkxdVczbTBSR1VU?=
- =?utf-8?B?NVFOclYwSURJUmJWeDRNQjJneUZaZTZtOXp3NUdLNGpyeHBpUDl2UkZETDlG?=
- =?utf-8?B?OXd6c1lMQVV2YWFESVJFQUhBQVhJdWhPRDNZZnh2KzBPRWhpVG84MldSOGJY?=
- =?utf-8?B?M0FhZ0tNYVhmV2I5NWhEYytqV1ZVUUpGTUZDMExna3NreEFSZUxrZnFrRkQv?=
- =?utf-8?B?bE1ZdXZsZjk5S2VNbG14cDBQQzdaMnIzdHB3WTEvS0pob21RdCtGd0JSbThY?=
- =?utf-8?B?ZDdmeDRyTXpPOUxTNUlKdDhYYzg3SklObW9YcDRWSTk4MSsvN1JoaXlrRWI1?=
- =?utf-8?B?NFd0QTJHSlJybzBpWXQvSFhMT3ZYdUV2NjIvQld3UjQ1UnVSaHFnc3V1RjdG?=
- =?utf-8?B?QnlKQmNVZDhadlZXUzRKZ1pKQWFvRGlRcFVpZ01YTFNqSWxVVlR5VTJaUmF6?=
- =?utf-8?B?Y2FEbTdObDMrdGlnUTk0Tk9HaG5jd3VMUytRSHhwTC9zMVp5MzErSGhGNEVt?=
- =?utf-8?B?Zng3eEF1TnlPajg0eGVNaVY0RUZTbk5zMHo5eDZhdXNib0NGUnhNZTlNUnds?=
- =?utf-8?B?aFd1RDV0Z1lxSE9zbXR2elRmeUpWUDl6V0JMSDJoaHlIT1Z5Z3ZzWWtXS0lY?=
- =?utf-8?B?TjhMaEtENkJSZEpPR29MbFJhWGVHcXRsZVdmVmZlTG1jd2VjRVJWYlJ4NW9L?=
- =?utf-8?B?bkVqWjM2eTNtWUg1VVBjaTI3eHllQ2dGMnV6bS9TMXU0bnpYZWE3UklsV0kr?=
- =?utf-8?B?QXZaVnk1S2dRVFBpRXNvbmQzSlp1SWJSM09WQ0x2Sk9lcFRVc0RzWWh2Ly9j?=
- =?utf-8?B?YVdZR0dTMmNaeWg4U2dwM2N1K3lQUjE1VFZEeElIMHluUDBEY254TkhKV2tF?=
- =?utf-8?B?U211YkFnb2ZMbENZM3dTSGZkYm1VZXRNL0taakZ4OU9IT0ZJQXpPVTc2cHRl?=
- =?utf-8?B?S2crbEIrL0x4Uk00THFEREdjRVEzYnNQWFNTNk5BTmNoQ2hMYTFqaGNVaGdr?=
- =?utf-8?B?MC90OFdqc2F6R0g3N1JtTHpWdHZ0N0U3b3BDeGxaMWJ5MTdhOUJROVlBNGll?=
- =?utf-8?B?Ym80Yk1PZk1PUFplSHhtL0hvZlJYZ09SWDdYTnNxcjhrNWRuRFpIMFZ2bHZl?=
- =?utf-8?Q?Nl3FJp6otlIEASXBeWTHYi1259hZBCXB?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR12MB7309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WXV5R25DTFFlc0tLOFZWdldnbC9KY3NGR25tZnluNVVBQk9kbUpnM3pqbzQw?=
- =?utf-8?B?cHJiY2xmQzlSU1dmK3ZmcFp3T2U4M2FoYlU5ZTVDbnVYdXdXelZjQmhZMVBx?=
- =?utf-8?B?Q2xaNkRIckNpK3lINWhEWFFIZFlVQUhtV3AvV3BSM2xLbnpQSW1vZnF0ZEd4?=
- =?utf-8?B?ODhoWmptcEMyajRGODlWOTEwSFVtanpuZjBBcndtV0dtbWxMUE9ieFdKbDB5?=
- =?utf-8?B?WS91Q29YU2ljOWRSM0UrOFkzVk5aa3Yza0ZtVUNiODYrTGJiaUVaRUpMa2Vt?=
- =?utf-8?B?WGxYVG5peHhadEVDL29WMStjekxhemh5OUFQVlN3N0EvUTJCbFJvaG1DMzVq?=
- =?utf-8?B?dUZnbFRrQjRsV0cwckhzSU01djE3ZlFpeTBUbDExSzB3TDFWVjE3aktMRi9O?=
- =?utf-8?B?ck5yUUhZNG01QzlTV0tLTUgxbFk2ZFhhRnRKdWFid0ZnRXZVUDBDdDUwS29W?=
- =?utf-8?B?c3lTZGExaU12cEh3MWxoaGxkZXA0anprZ2dMS0ljVCtaeTNPdVV1L1RoSFRa?=
- =?utf-8?B?S2s1VlNRM0JRTXdidGdBWmNyVWNhRGdWUjhJZVY0WmxBaTc5UHVwOG5GNGIr?=
- =?utf-8?B?ZlFZSXZhUTMybDAxYjh0VFdkSzMrS1VLWTFJMEFtOVlwbG92RW15QkZudjEx?=
- =?utf-8?B?MUdQUzZHNTUxOUZYdEovNmRDUXdocko1ZEREMmFkcDcwVFFQbUUxTTdBdEVx?=
- =?utf-8?B?MkxXNHFSR2NOQnpNck04d2orRFROOXlhT3JFc1BZNFpwdXFnVkZFc0lHUTZH?=
- =?utf-8?B?R2VrOGNYYWl4UGdyTjdYVmtsQUhvbXFFWjRmTnlDeTBtZklPenB0cUxLdGJ3?=
- =?utf-8?B?QXplZHFBckxZVEIrYzdnZGtZd2RsYUVmWVhLRm9xNlhiK3ExMG1CckdvNGtq?=
- =?utf-8?B?LzF1N1c1enZ2MXFmRmp0RGJmNGZzYSs5R2o0SE9HUWpMeERSWkNxYlk0VGhN?=
- =?utf-8?B?dkNTTU8yUGFOMmwyN3lhUHgxSnI1SEg0THlrV1NOSFR6V0JjMGhqTW5GU1dY?=
- =?utf-8?B?eTdERDFUTHB3ZlkxRnZPdVJFVHhFUkUrRmRCQ3pvWDdoaWphcCszTFE5S21Y?=
- =?utf-8?B?M3dHcEV0RmtOZ2pjTVJVcVg4TmlLc1NkekdJWE9NZG9YcnJaVmh4WWxta1Z1?=
- =?utf-8?B?dDNGMkNHMmVMREFIYm5DaDZhVjROY0FNdW1SRzB3ZmlJQWgvZGQrNkU4SjNa?=
- =?utf-8?B?OStDamVOYnlGK1M5blJocktFNjZUbDhsalA4RlNkRUEycnZTQ05wdDV2ejNW?=
- =?utf-8?B?elBDemh6MVFCamZYUE1La2xvcHZycVZKd01FQlRtbEVEKy9VRS9DQ2xGUTNu?=
- =?utf-8?B?Z0NhWExMOGloMUlIOTJVOTJDc2NFb1ZFaCtUYkgvUDByNmJNYTNDdzBScGha?=
- =?utf-8?B?eExnTy9NS1ZxVENMRENSL0cvM29xazM1UlZ5RUpGbHBCTllMMk1kYnVFVjcv?=
- =?utf-8?B?ekEyVk5ZbDdVcUgzckhIL3RQMlBpdUlKdDkzdGVmaDAvQ25ndTNhZFRJZTFa?=
- =?utf-8?B?NGJoVWFsRkRxN0J4SCtidno5ZmhKLzVsNTM5bW41QVZXUTA2VTQ1QWJGU0NV?=
- =?utf-8?B?cHRDdnNqTDR0SnNvTGlpSXoxM0I5cHlOMmkzTTBBaDJZdEhDVTdBVkRUSnB1?=
- =?utf-8?B?QUwxVVFXem0vYXRWdHJOTXAvMHFHekZ3SVp5em5wMzlsVHp1Q01MeEt1QVVL?=
- =?utf-8?B?dEpJQzBONlZPT0gwNXdPU0NoS3BUNzNHRWpkQUxlVURPZm5OUUVEMmhpY3VH?=
- =?utf-8?B?Q3prWHpDRVUrcFB1cjFnUlp1SExOanpoUGh1cTFEdGNmQ0k3eHlBenczT0xi?=
- =?utf-8?B?cUtTZVdsWFB0eTlrSHk5aXRwbkdmMm5OdE1oeUtCalhvN1JuQ0xaajB5Qm02?=
- =?utf-8?B?Q3FHU2hnclRrSnlvZ1ZhMXowNkdvTXgyTW5Eb1FFdis4VlAvcW1jU0ZlQ2tq?=
- =?utf-8?B?T3pabWpEMU5NblVpTjBpUUtoU0pFOVRqVW1TV1pYeW82YWN1akFVb1B4c0NJ?=
- =?utf-8?B?U3M3QlBkZ25na3FUZGIxWCtYY1lid25QcnlibkVMZ3JBcWM0THJlZkdXenF0?=
- =?utf-8?B?QW80UnF1UjZPT0VxbW56VGlDemc2SGxQb2JGN2cxWmJLVmJzNUdWUExEc3hL?=
- =?utf-8?Q?S4u5p4vq4fxZmLsR91PfJ9owB?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 350d5e96-8a7d-4167-64df-08de17bd16df
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR12MB7309.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2025 14:03:23.6566
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2ZZfGKw9YUFa8UUr4u1vwhCG09GoDRdVTQCchWQtuxAJ6d8keW3FkCjAsI9nYzIGC5gmJvkcNwnXTBby57ssjw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6865
+Content-Transfer-Encoding: 8bit
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Rspamd-Queue-Id: CAAFE3371B
+X-Rspamd-Action: no action
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-1.51 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	ARC_NA(0.00)[];
+	RCPT_COUNT_TWELVE(0.00)[14];
+	MIME_TRACE(0.00)[0:+];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	FREEMAIL_CC(0.00)[nop.hu,gmail.com,intel.com,kernel.org,fomichev.me,vger.kernel.org,davemloft.net,google.com,redhat.com,suse.de];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.de:dkim,suse.de:mid,suse.de:email];
+	TAGGED_RCPT(0.00)[];
+	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DKIM_TRACE(0.00)[suse.de:+];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com]
+X-Spam-Score: -1.51
 
-On 10/30/25 6:19 AM, Paolo Abeni wrote:
-> On 10/27/25 6:39 PM, Daniel Jurgens wrote:
->> When probing a virtnet device, attempt to read the flow filter
->> capabilities. In order to use the feature the caps must also
->> be set. For now setting what was read is sufficient.
->>
->> Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
->> Reviewed-by: Parav Pandit <parav@nvidia.com>
->> Reviewed-by: Shahar Shitrit <shshitrit@nvidia.com>
->> ---
+Since commit 30f241fcf52a ("xsk: Fix immature cq descriptor
+production"), the descriptor number is stored in skb control block and
+xsk_cq_submit_addr_locked() relies on it to put the umem addrs onto
+pool's completion queue.
 
->> +err_ff_action:
->> +	kfree(ff->ff_actions);
->> +err_ff_mask:
->> +	kfree(ff->ff_mask);
->> +err_ff:
->> +	kfree(ff->ff_caps);
->> +err_cap_list:
->> +	kfree(cap_id_list);
-> 
-> Minor nit: AFAICS the ff->ff_{caps,mask,actions} pointers can be left !=
-> NULL even after free. That should not cause issue at cleanup time, as
-> double free is protected by/avoided with 'ff_supported'.
-> 
-> Still it could foul kmemleak check. I think it would be better to either
-> clear such fields here or set such fields only on success (and work with
-> local variable up to that point).
-> 
-> Not a blocker anyway.
-> 
-> /P
-> 
+skb control block shouldn't be used for this purpose as after transmit
+xsk doesn't have control over it and other subsystems could use it. This
+leads to the following kernel panic due to a NULL pointer dereference.
 
-I can do that. Thanks for reviewing.
+ BUG: kernel NULL pointer dereference, address: 0000000000000000
+ #PF: supervisor read access in kernel mode
+ #PF: error_code(0x0000) - not-present page
+ PGD 0 P4D 0
+ Oops: Oops: 0000 [#1] SMP NOPTI
+ CPU: 2 UID: 1 PID: 927 Comm: p4xsk.bin Not tainted 6.16.12+deb14-cloud-amd64 #1 PREEMPT(lazy)  Debian 6.16.12-1
+ Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.17.0-debian-1.17.0-1 04/01/2014
+ RIP: 0010:xsk_destruct_skb+0xd0/0x180
+ [...]
+ Call Trace:
+  <IRQ>
+  ? napi_complete_done+0x7a/0x1a0
+  ip_rcv_core+0x1bb/0x340
+  ip_rcv+0x30/0x1f0
+  __netif_receive_skb_one_core+0x85/0xa0
+  process_backlog+0x87/0x130
+  __napi_poll+0x28/0x180
+  net_rx_action+0x339/0x420
+  handle_softirqs+0xdc/0x320
+  ? handle_edge_irq+0x90/0x1e0
+  do_softirq.part.0+0x3b/0x60
+  </IRQ>
+  <TASK>
+  __local_bh_enable_ip+0x60/0x70
+  __dev_direct_xmit+0x14e/0x1f0
+  __xsk_generic_xmit+0x482/0xb70
+  ? __remove_hrtimer+0x41/0xa0
+  ? __xsk_generic_xmit+0x51/0xb70
+  ? _raw_spin_unlock_irqrestore+0xe/0x40
+  xsk_sendmsg+0xda/0x1c0
+  __sys_sendto+0x1ee/0x200
+  __x64_sys_sendto+0x24/0x30
+  do_syscall_64+0x84/0x2f0
+  ? __pfx_pollwake+0x10/0x10
+  ? __rseq_handle_notify_resume+0xad/0x4c0
+  ? restore_fpregs_from_fpstate+0x3c/0x90
+  ? switch_fpu_return+0x5b/0xe0
+  ? do_syscall_64+0x204/0x2f0
+  ? do_syscall_64+0x204/0x2f0
+  ? do_syscall_64+0x204/0x2f0
+  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+  </TASK>
+ [...]
+ Kernel panic - not syncing: Fatal exception in interrupt
+ Kernel Offset: 0x1c000000 from 0xffffffff81000000 (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
 
+Instead use the skb destructor_arg pointer along with pointer tagging.
+As pointers are always aligned to 8B, use the bottom bit to indicate
+whether this a single address or an allocated struct containing several
+addresses.
+
+Fixes: 30f241fcf52a ("xsk: Fix immature cq descriptor production")
+Closes: https://lore.kernel.org/netdev/0435b904-f44f-48f8-afb0-68868474bf1c@nop.hu/
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Fernando Fernandez Mancera <fmancera@suse.de>
+---
+v2: remove some leftovers on skb_build and simplify fragmented traffic
+logic
+
+v3: drop skb extension approach, instead use pointer tagging in
+destructor_arg to know whether we have a single address or an allocated
+struct with multiple ones. Also, move from bpf to net as requested
+
+Note: tested with the crash reproducer and xdpsock tool
+---
+ net/xdp/xsk.c | 130 ++++++++++++++++++++++++++++----------------------
+ 1 file changed, 74 insertions(+), 56 deletions(-)
+
+diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+index 7b0c68a70888..d7354a3e2545 100644
+--- a/net/xdp/xsk.c
++++ b/net/xdp/xsk.c
+@@ -36,20 +36,13 @@
+ #define TX_BATCH_SIZE 32
+ #define MAX_PER_SOCKET_BUDGET 32
+ 
+-struct xsk_addr_node {
+-	u64 addr;
+-	struct list_head addr_node;
+-};
+-
+-struct xsk_addr_head {
++struct xsk_addrs {
+ 	u32 num_descs;
+-	struct list_head addrs_list;
++	u64 addrs[MAX_SKB_FRAGS + 1];
+ };
+ 
+ static struct kmem_cache *xsk_tx_generic_cache;
+ 
+-#define XSKCB(skb) ((struct xsk_addr_head *)((skb)->cb))
+-
+ void xsk_set_rx_need_wakeup(struct xsk_buff_pool *pool)
+ {
+ 	if (pool->cached_need_wakeup & XDP_WAKEUP_RX)
+@@ -558,29 +551,53 @@ static int xsk_cq_reserve_locked(struct xsk_buff_pool *pool)
+ 	return ret;
+ }
+ 
++static bool xsk_skb_destructor_is_addr(struct sk_buff *skb)
++{
++	return (uintptr_t)skb_shinfo(skb)->destructor_arg & 0x1UL;
++}
++
++static u64 xsk_skb_destructor_get_addr(struct sk_buff *skb)
++{
++	return (u64)((uintptr_t)skb_shinfo(skb)->destructor_arg & ~0x1UL);
++}
++
++static u32 xsk_get_num_desc(struct sk_buff *skb)
++{
++	struct xsk_addrs *xsk_addr;
++
++	if (xsk_skb_destructor_is_addr(skb))
++		return 1;
++
++	xsk_addr = (struct xsk_addrs *)skb_shinfo(skb)->destructor_arg;
++
++	return xsk_addr->num_descs;
++}
++
+ static void xsk_cq_submit_addr_locked(struct xsk_buff_pool *pool,
+ 				      struct sk_buff *skb)
+ {
+-	struct xsk_addr_node *pos, *tmp;
++	u32 num_descs = xsk_get_num_desc(skb);
++	struct xsk_addrs *xsk_addr;
+ 	u32 descs_processed = 0;
+ 	unsigned long flags;
+-	u32 idx;
++	u32 idx, i;
+ 
+ 	spin_lock_irqsave(&pool->cq_lock, flags);
+ 	idx = xskq_get_prod(pool->cq);
+ 
+-	xskq_prod_write_addr(pool->cq, idx,
+-			     (u64)(uintptr_t)skb_shinfo(skb)->destructor_arg);
+-	descs_processed++;
++	if (unlikely(num_descs > 1)) {
++		xsk_addr = (struct xsk_addrs *)skb_shinfo(skb)->destructor_arg;
+ 
+-	if (unlikely(XSKCB(skb)->num_descs > 1)) {
+-		list_for_each_entry_safe(pos, tmp, &XSKCB(skb)->addrs_list, addr_node) {
++		for (i = 0; i < num_descs; i++) {
+ 			xskq_prod_write_addr(pool->cq, idx + descs_processed,
+-					     pos->addr);
++					     xsk_addr->addrs[i]);
+ 			descs_processed++;
+-			list_del(&pos->addr_node);
+-			kmem_cache_free(xsk_tx_generic_cache, pos);
+ 		}
++		kmem_cache_free(xsk_tx_generic_cache, xsk_addr);
++	} else {
++		xskq_prod_write_addr(pool->cq, idx,
++				     xsk_skb_destructor_get_addr(skb));
++		descs_processed++;
+ 	}
+ 	xskq_prod_submit_n(pool->cq, descs_processed);
+ 	spin_unlock_irqrestore(&pool->cq_lock, flags);
+@@ -595,16 +612,6 @@ static void xsk_cq_cancel_locked(struct xsk_buff_pool *pool, u32 n)
+ 	spin_unlock_irqrestore(&pool->cq_lock, flags);
+ }
+ 
+-static void xsk_inc_num_desc(struct sk_buff *skb)
+-{
+-	XSKCB(skb)->num_descs++;
+-}
+-
+-static u32 xsk_get_num_desc(struct sk_buff *skb)
+-{
+-	return XSKCB(skb)->num_descs;
+-}
+-
+ static void xsk_destruct_skb(struct sk_buff *skb)
+ {
+ 	struct xsk_tx_metadata_compl *compl = &skb_shinfo(skb)->xsk_meta;
+@@ -621,27 +628,22 @@ static void xsk_destruct_skb(struct sk_buff *skb)
+ static void xsk_skb_init_misc(struct sk_buff *skb, struct xdp_sock *xs,
+ 			      u64 addr)
+ {
+-	BUILD_BUG_ON(sizeof(struct xsk_addr_head) > sizeof(skb->cb));
+-	INIT_LIST_HEAD(&XSKCB(skb)->addrs_list);
+ 	skb->dev = xs->dev;
+ 	skb->priority = READ_ONCE(xs->sk.sk_priority);
+ 	skb->mark = READ_ONCE(xs->sk.sk_mark);
+-	XSKCB(skb)->num_descs = 0;
+ 	skb->destructor = xsk_destruct_skb;
+-	skb_shinfo(skb)->destructor_arg = (void *)(uintptr_t)addr;
++	skb_shinfo(skb)->destructor_arg = (void *)((uintptr_t)addr | 0x1UL);
+ }
+ 
+ static void xsk_consume_skb(struct sk_buff *skb)
+ {
+ 	struct xdp_sock *xs = xdp_sk(skb->sk);
+ 	u32 num_descs = xsk_get_num_desc(skb);
+-	struct xsk_addr_node *pos, *tmp;
++	struct xsk_addrs *xsk_addr;
+ 
+ 	if (unlikely(num_descs > 1)) {
+-		list_for_each_entry_safe(pos, tmp, &XSKCB(skb)->addrs_list, addr_node) {
+-			list_del(&pos->addr_node);
+-			kmem_cache_free(xsk_tx_generic_cache, pos);
+-		}
++		xsk_addr = (struct xsk_addrs *)skb_shinfo(skb)->destructor_arg;
++		kmem_cache_free(xsk_tx_generic_cache, xsk_addr);
+ 	}
+ 
+ 	skb->destructor = sock_wfree;
+@@ -701,7 +703,6 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
+ {
+ 	struct xsk_buff_pool *pool = xs->pool;
+ 	u32 hr, len, ts, offset, copy, copied;
+-	struct xsk_addr_node *xsk_addr;
+ 	struct sk_buff *skb = xs->skb;
+ 	struct page *page;
+ 	void *buffer;
+@@ -727,16 +728,27 @@ static struct sk_buff *xsk_build_skb_zerocopy(struct xdp_sock *xs,
+ 				return ERR_PTR(err);
+ 		}
+ 	} else {
+-		xsk_addr = kmem_cache_zalloc(xsk_tx_generic_cache, GFP_KERNEL);
+-		if (!xsk_addr)
+-			return ERR_PTR(-ENOMEM);
++		struct xsk_addrs *xsk_addr;
++
++		if (xsk_skb_destructor_is_addr(skb)) {
++			xsk_addr = kmem_cache_zalloc(xsk_tx_generic_cache,
++						     GFP_KERNEL);
++			if (!xsk_addr)
++				return ERR_PTR(-ENOMEM);
++
++			xsk_addr->num_descs = 1;
++			xsk_addr->addrs[0] = xsk_skb_destructor_get_addr(skb);
++			skb_shinfo(skb)->destructor_arg = (void *)xsk_addr;
++		} else {
++			xsk_addr = (struct xsk_addrs *)skb_shinfo(skb)->destructor_arg;
++		}
+ 
+ 		/* in case of -EOVERFLOW that could happen below,
+ 		 * xsk_consume_skb() will release this node as whole skb
+ 		 * would be dropped, which implies freeing all list elements
+ 		 */
+-		xsk_addr->addr = desc->addr;
+-		list_add_tail(&xsk_addr->addr_node, &XSKCB(skb)->addrs_list);
++		xsk_addr->addrs[xsk_addr->num_descs] = desc->addr;
++		xsk_addr->num_descs++;
+ 	}
+ 
+ 	len = desc->len;
+@@ -813,7 +825,7 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+ 			}
+ 		} else {
+ 			int nr_frags = skb_shinfo(skb)->nr_frags;
+-			struct xsk_addr_node *xsk_addr;
++			struct xsk_addrs *xsk_addr;
+ 			struct page *page;
+ 			u8 *vaddr;
+ 
+@@ -828,11 +840,20 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+ 				goto free_err;
+ 			}
+ 
+-			xsk_addr = kmem_cache_zalloc(xsk_tx_generic_cache, GFP_KERNEL);
+-			if (!xsk_addr) {
+-				__free_page(page);
+-				err = -ENOMEM;
+-				goto free_err;
++			if (xsk_skb_destructor_is_addr(skb)) {
++				xsk_addr = kmem_cache_zalloc(xsk_tx_generic_cache,
++							     GFP_KERNEL);
++				if (!xsk_addr) {
++					__free_page(page);
++					err = -ENOMEM;
++					goto free_err;
++				}
++
++				xsk_addr->num_descs = 1;
++				xsk_addr->addrs[0] = xsk_skb_destructor_get_addr(skb);
++				skb_shinfo(skb)->destructor_arg = (void *)xsk_addr;
++			} else {
++				xsk_addr = (struct xsk_addrs *)skb_shinfo(skb)->destructor_arg;
+ 			}
+ 
+ 			vaddr = kmap_local_page(page);
+@@ -842,13 +863,11 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+ 			skb_add_rx_frag(skb, nr_frags, page, 0, len, PAGE_SIZE);
+ 			refcount_add(PAGE_SIZE, &xs->sk.sk_wmem_alloc);
+ 
+-			xsk_addr->addr = desc->addr;
+-			list_add_tail(&xsk_addr->addr_node, &XSKCB(skb)->addrs_list);
++			xsk_addr->addrs[xsk_addr->num_descs] = desc->addr;
++			xsk_addr->num_descs++;
+ 		}
+ 	}
+ 
+-	xsk_inc_num_desc(skb);
+-
+ 	return skb;
+ 
+ free_err:
+@@ -857,7 +876,6 @@ static struct sk_buff *xsk_build_skb(struct xdp_sock *xs,
+ 
+ 	if (err == -EOVERFLOW) {
+ 		/* Drop the packet */
+-		xsk_inc_num_desc(xs->skb);
+ 		xsk_drop_skb(xs->skb);
+ 		xskq_cons_release(xs->tx);
+ 	} else {
+@@ -1904,7 +1922,7 @@ static int __init xsk_init(void)
+ 		goto out_pernet;
+ 
+ 	xsk_tx_generic_cache = kmem_cache_create("xsk_generic_xmit_cache",
+-						 sizeof(struct xsk_addr_node),
++						 sizeof(struct xsk_addrs),
+ 						 0, SLAB_HWCACHE_ALIGN, NULL);
+ 	if (!xsk_tx_generic_cache) {
+ 		err = -ENOMEM;
+-- 
+2.51.0
 
 
