@@ -1,153 +1,125 @@
-Return-Path: <netdev+bounces-234293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E856DC1EE70
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 09:06:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9984EC1EE8B
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 09:08:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E8C43AD838
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 08:06:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF8FB1895965
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 08:08:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A0512F12C4;
-	Thu, 30 Oct 2025 08:06:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE8002FFF9B;
+	Thu, 30 Oct 2025 08:08:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="jlsLX77L"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="HWXdQYUv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A00517AE11;
-	Thu, 30 Oct 2025 08:05:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB80D21D3C9
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 08:08:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761811561; cv=none; b=A17rChyBtDPD795qhm0JSfE7CQlJwuz0bmACTnFb4NvY48DVPAjVsb3E7vQv1AHtfpyUvmEi+rDGAtFiZ0wqBW0y+5qBeFOx1+A6tucY6FNl4/Mor345+UH05V976XLVxAY/atnmm97BfSfqnsZWsKDj7JP6WJXFttx8R8fVzFQ=
+	t=1761811704; cv=none; b=JtUbqyeD36m8h+SzMrmKu3g1uGu/IzYY8ontJKckh4YF+zGB7beA+b3Bc7VcOhrOtm6f76GQtwhDwRmMdXFx07br/fohV3mLuaiD+k0GagqF9HDWkgANAeTW74USIlVNY53AVCFsxgeCwYpOEXmAyGsMUP2EzOwP0UjFQibp9RQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761811561; c=relaxed/simple;
-	bh=Op1t4LLfAXhJLesSQQ0Zr9Tb4KUF5kV6yD/hPL9PUSI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Pw7LC46vPp7p8X179FovFtlvDqJ2n9d6KZVros8cus0yUQcvQsNj2VkxfoxwDaQb5E2SpKUGJJqf/gRKV1ngEzeXjZsXZK9LN2xQfYvehtRqzN7bl5B20uidSzZnt+zLiV9B5XBDuc0oS+JFKpYHdlW9WGFHg/vhHrBte5QCEx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=jlsLX77L; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id BB3A81A1781;
-	Thu, 30 Oct 2025 08:05:56 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 7DDD96068C;
-	Thu, 30 Oct 2025 08:05:56 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BD087102F2130;
-	Thu, 30 Oct 2025 09:05:48 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1761811555; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=yhO0zoxEkB9DzrUVoWIN7bjo6McuuEao4alqEu6uLBQ=;
-	b=jlsLX77LeQNohInoJWs+ecJrRdx6EBTro8CMxvC3JPE0B4chG8p7w/UusCVGAaMnr+1by2
-	rFS5EtZPlcXC37k9JwKwOBoYt/KYglMziIUjDzOeGvfy321aj9dfJZF9TnzJcKpv8gTVZw
-	rgLMYpNIMH3sL363P1TBpmaGeu8RfX01IID9c9hEo0zVBeGeBD5S9L0Csk06GDMAt5wAWR
-	orRWpcqnFmdeK7ZqniILIj0pWgsfiFoZfrm98KdvQUeXP/V3MSLz2BA0/sAmWDaqW+xkM8
-	gJ2vmYsvzbnERCIb3kxPlDOb25QcesuUIsBpG5o16ja0PzlrIZZ1T59M42FzBQ==
-Message-ID: <0e576e3d-7e77-43ec-8ec2-5867dcb44960@bootlin.com>
-Date: Thu, 30 Oct 2025 09:05:47 +0100
+	s=arc-20240116; t=1761811704; c=relaxed/simple;
+	bh=iYmSRn54aVNb5cInRyR2epoXsk8M+oHPrtX+OlZJLhk=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cT6Z/SjKkWy+xLyKd5Xt+azKxWXcXWVuvYTAWBgoqVQuUhR3TZI22Mu8QWw57XrqJUcK/1SW7OX8nXOe1ya3m3ZxZ9zHBoYxgMiiFPo9d1zIX/4N55qdKwd4GRXGTdwzJcxj7FaBDxHa4VLMNYahRvPAzRAS+ruek+ZidxgFcfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=HWXdQYUv; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id DCCEA20891;
+	Thu, 30 Oct 2025 09:08:12 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id ZcLPqL8usikz; Thu, 30 Oct 2025 09:08:12 +0100 (CET)
+Received: from EXCH-01.secunet.de (unknown [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id 5740E2083F;
+	Thu, 30 Oct 2025 09:08:12 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 5740E2083F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1761811692;
+	bh=XZ8vwGAWf1a2UoylOo0fa3gnmQ0Co9koDKimV5Qtnd4=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=HWXdQYUvimHyZxg8jY8w58XHzfgWO2IlTETmHE+kX2upfty9BL43hGogXVi9x5Xi1
+	 5XwFz3CTL4kpl9RwJTpjSAS/9CriKsdq/XpjvZxoHcWJA+KRpP0Hpwj6k50eDVCP/E
+	 MvLRLcLobSx1DVmt74QdyN2weLnNBDcsDE6nWVhihNjtNlonoZQhW5VY96VlEJy63B
+	 Fs1Dn1apsjcXk/hG5Kc19/xaYhAuD8nOw1+uN3a68/effy/ai9V0PhN0luZHhncb/8
+	 KDY6V8ifAzhkIJT77PJjQ3qRNNBR8JdwsGHeU36RnLBjI4RFrMLTLL8hjBGKfx2sPt
+	 s2tZDsvhitO5w==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.2562.17; Thu, 30 Oct
+ 2025 09:08:11 +0100
+Received: (nullmailer pid 1008396 invoked by uid 1000);
+	Thu, 30 Oct 2025 08:08:11 -0000
+Date: Thu, 30 Oct 2025 09:08:11 +0100
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Sabrina Dubroca <sd@queasysnail.net>
+CC: Jianbo Liu <jianbol@nvidia.com>, <netdev@vger.kernel.org>,
+	<davem@davemloft.net>, <kuba@kernel.org>, Cosmin Ratiu <cratiu@nvidia.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, David Ahern
+	<dsahern@kernel.org>
+Subject: Re: [PATCH ipsec v3 2/2] xfrm: Determine inner GSO type from packet
+ inner protocol
+Message-ID: <aQMc64pcTzvkupc1@secunet.com>
+References: <20251028023013.9836-1-jianbol@nvidia.com>
+ <20251028023013.9836-3-jianbol@nvidia.com>
+ <aQCjCEDvL4VJIsoV@krikkit>
+ <c1a673ab-0382-445e-aa45-2b8fe2f6bc40@nvidia.com>
+ <aQDbhJuZqFokEO31@krikkit>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v6 00/15] selftests/bpf: Integrate test_xsk.c to
- test_progs framework
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Magnus Karlsson <magnus.karlsson@intel.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Jonathan Lemon <jonathan.lemon@gmail.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- Alexis Lothore <alexis.lothore@bootlin.com>,
- Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
- "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-References: <20251029-xsk-v6-0-5a63a64dff98@bootlin.com>
- <CAADnVQ+ESBTW-+NOQ55HXLwODFZa+uHWzMpPAq1FfjPP4otH_A@mail.gmail.com>
-From: Bastien Curutchet <bastien.curutchet@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <CAADnVQ+ESBTW-+NOQ55HXLwODFZa+uHWzMpPAq1FfjPP4otH_A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <aQDbhJuZqFokEO31@krikkit>
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ EXCH-01.secunet.de (10.32.0.171)
 
-Hi,
+On Tue, Oct 28, 2025 at 04:04:36PM +0100, Sabrina Dubroca wrote:
+> 2025-10-28, 21:36:17 +0800, Jianbo Liu wrote:
+> > 
+> > My proposed plan is:
+> > 
+> > Send the patch 1 and patch 3 (including the xfrm_ip2inner_mode change)
+> > together to the ipsec tree. They are self-contained fixes.
+> 
+> So, keep v3 of this series unchanged.
+> 
+> > Separately, after those are accepted, I can modify and re-submit that patch
+> > [1] to ipsec-next that removes the now-redundant checks from the other
+> > callers (VTI, etc.), leveraging the updated helper function.
+> > 
+> > This way, the critical fixes are self-contained and backportable, while the
+> > cleanup of other callers happens later in the development cycle.
+> 
+> The only (small) drawback is leaving the duplicate code checking
+> AF_UNSPEC in the existing callers of xfrm_ip2inner_mode, but I guess
+> that's ok.
+> 
+> 
+> Steffen, is it ok for you to
+> 
+>  - have a duplicate AF_UNSPEC check in callers of xfrm_ip2inner_mode
+>    (the existing "default to x->inner_mode, call xfrm_ip2inner_mode if
+>    AF_UNSPEC", and the new one added to xfrm_ip2inner_mode by this
+>    patch) in the ipsec tree and then in stable?
+> 
+>  - do the clean up (like the diff I pasted in my previous email, or
+>    something smaller if [1] is applied separately) in ipsec-next after
+>    ipsec is merged into it?
 
-On 10/29/25 7:54 PM, Alexei Starovoitov wrote:
-> On Wed, Oct 29, 2025 at 6:52 AM Bastien Curutchet (eBPF Foundation)
-> <bastien.curutchet@bootlin.com> wrote:
->>
->> Hi all,
->>
->> The test_xsk.sh script covers many AF_XDP use cases. The tests it runs
->> are defined in xksxceiver.c. Since this script is used to test real
->> hardware, the goal here is to leave it as it is, and only integrate the
->> tests that run on veth peers into the test_progs framework.
->>
->> I've looked into what could improve the speed in the CI:
->> - some tests are skipped when run on veth peers in a VM (because they
->>    rely on huge page allocation or HW rings). This skipping logic still
->>    takes some time and can be easily avoided.
->> - the TEARDOWN test is quite long (several seconds on its own) because
->>    it runs the same test 10 times in a row to ensure the teardown process
->>    works properly
->>
->> With theses tests fully skipped in the CI and the veth setup done only
->> once for each mode (DRV / SKB), the execution time is reduced to about 5
->> seconds on my setup.
->> ```
->> $ tools/testing/selftests/bpf/vmtest.sh -d $HOME/ebpf/output-regular/ -- time ./test_progs -t xsk
->> [...]
->> real    0m 5.04s
->> user    0m 0.38s
->> sys     0m 1.61s
-> 
-> This is fine. I see
-> Summary: 2/48 PASSED, 0 SKIPPED, 0 FAILED
-> 
-> real    0m8.165s
-> user    0m1.795s
-> sys     0m4.740s
-> 
-> on debug kernel with kasan which is ok.
-> > But it conflicts with itself :(
-> 
-> $ test_progs -j -t xsk
-> 
-> All error logs:
-> setup_veth:FAIL:ip link add veth0 numtxqueues 4 numrxqueues 4 type
-> veth peer name veth1 numtxqueues 4 numrxqueues 4 unexpected error: 512
-> (errno 2)
-> test_xsk_drv:FAIL:setup veth unexpected error: -1 (errno 2)
-> #664     xsk_drv:FAIL
-> Summary: 1/24 PASSED, 0 SKIPPED, 1 FAILED
-> 
-> Pls fix the parallel run and not by adding "_serial", of course.
-Oups, in my quest for speed I removed the 'test_ns' prefix. It didn't 
-seem necessary since all tests are run at once, but I forgot about 
-parallel execution between the DRV and SKB modes..
-
-Sorry about this, I'll put back the 'test_ns' prefix.
-
-It will be a good opportunity to address some of the AI feedback I received.
-
-
-Best regards,
-Bastien
+I'm OK with this, I can take v3 as is.
 
