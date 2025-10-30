@@ -1,110 +1,172 @@
-Return-Path: <netdev+bounces-234296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53D2AC1EECA
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 09:14:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D24EC1EF3A
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 09:20:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE37B19C120A
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 08:13:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48EBC424A24
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 08:18:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29E68335BAF;
-	Thu, 30 Oct 2025 08:12:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E362337BB8;
+	Thu, 30 Oct 2025 08:17:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="bGulg08Y"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bCyHLPDf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F0D32E733;
-	Thu, 30 Oct 2025 08:12:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F351330B12
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 08:17:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761811961; cv=none; b=fINnu3xFBIrROcm6i51HfoNG80SdD0uXvk1GTnsf9yXS+kMq/lmBj7pDnSEepZWyKi0GklfZnP1Allv/s3GAfm/2Q5BcF58lqDEg1FxG2/+oi8K1+ur0W6SqRkC25+y4TQhDfwTxJPa1NsvRwTn++hzRNGb8iiJFb6NhW9BPSTk=
+	t=1761812273; cv=none; b=Rf7PFLFESQoV3vNNNubdXHUG3vdDJtGKKt/u6Ek3OIhwH8HfjjR7gE+YnSk6SOv+m7D3/yYP8/aac4CTdgB2+5zk89aPhgzzisUafh/+vm5RtvqpSS4gPwveq2Z78J8TQarc9OSesQXJD1rif0jEhxje5Oi+OIiVD3xhI89NB88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761811961; c=relaxed/simple;
-	bh=qUof08cVvZpyI5pyttc7D1uPQ9Ry6bp7QcptSABtIRY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=erThUYH/fr9re4dfi8bxHJzMdQCtNflI/fuP0ys76x9ixxBJr6uwRMrT6+pIOSkmbwkP/2ljmp6bqK90KyBnha5EAojDn3bNC3oE27GUDLzfVbc3pU2jx5D6GkOu8SMrmu0GzPHJeeL69Qv9bajYsW6nAd1lilP+Pmz4wt3VZG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=bGulg08Y; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by mx1.secunet.com (Postfix) with ESMTP id 1191420860;
-	Thu, 30 Oct 2025 09:12:37 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from mx1.secunet.com ([127.0.0.1])
- by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id 9910oo1jPUIX; Thu, 30 Oct 2025 09:12:36 +0100 (CET)
-Received: from EXCH-01.secunet.de (unknown [10.32.0.231])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx1.secunet.com (Postfix) with ESMTPS id 7C94A20820;
-	Thu, 30 Oct 2025 09:12:36 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com 7C94A20820
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1761811956;
-	bh=KlpxZU8es++alJ0W+sTnPbvdyFIjY0cf6QVcV6Ki/IU=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=bGulg08YA9llBIt1RWZnBlnizYu0G4gacfmoBKqE5+4CVKh4bXiP8CYxiqAN+T1d4
-	 OSUQqyqy4lB7VaN0KoCxk8PNjdsPKkdtMAFI2Z+XXEa0OIhVCHcdfBF2bMnviknA6v
-	 MgISJ1Z127ktGUvW0hlo16cS04e54culL2GWC0OZrfMSFYmPHiVR/CAyAgqyIhmTOc
-	 BZUVvOl7jEZhiQs54KxiUMvTxwI2MZam09E5a2vxRPVBGtsPYDR4erzczlvbTEBPTJ
-	 1CTSYlI2yq5LmHerlsuLh57oF5cwidtBpvODVtxsij6kpiLfYpWCzfpYPNKYfU6f0e
-	 Q7gGzztRdHDQg==
-Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.2562.17; Thu, 30 Oct
- 2025 09:12:36 +0100
-Received: (nullmailer pid 1011608 invoked by uid 1000);
-	Thu, 30 Oct 2025 08:12:35 -0000
-Date: Thu, 30 Oct 2025 09:12:35 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Bagas Sanjaya <bagasdotme@gmail.com>
-CC: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux
- Documentation <linux-doc@vger.kernel.org>, Linux Networking
-	<netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
-	<corbet@lwn.net>, Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH net-next 6/6] MAINTAINERS: Add entry for XFRM
- documentation
-Message-ID: <aQMd886miv39BEPC@secunet.com>
-References: <20251029082615.39518-1-bagasdotme@gmail.com>
- <20251029082615.39518-7-bagasdotme@gmail.com>
+	s=arc-20240116; t=1761812273; c=relaxed/simple;
+	bh=ck1HslZ0kp7J+WUPymd8AWip7MysypRZtLhSaaOAht4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qMcEcRinWWheHImHeKcl+rN5vpmwyGc+QeSLH1ARUb/tlX3CumaCsqBoUNkTAu3EGWdFYdxTTWO/hY8NoUbLf57yRFygUt1W/ulqvyvFP7psu2R/sgHsKaDCZ7ZqFhF4zlBFx6GJojqO5F3OneRnOMazwkcBjI/JM5019CdGJVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bCyHLPDf; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761812269;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=62lhztl4PsEx1t/ejtRJFKI6a/pEqBnCixqR/6fg7Gg=;
+	b=bCyHLPDfKv7g/b8xvvj/ZiR4JFO6/pqfQ+icQubrr9NjC5+drNLokZnulFrN6fJyBU/Byw
+	5kaAb/68+TWv2M2GYEjLuCyjxQydU+gGcDOLtiSp3IpE7PPzCKR69N5MoqCUZzYUYyIPjC
+	Z9Zchj1R3ps+DzOiGVA0jGZSPluP/X8=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-553-13Jpqqk0OemcwAsO-xo8pw-1; Thu, 30 Oct 2025 04:17:47 -0400
+X-MC-Unique: 13Jpqqk0OemcwAsO-xo8pw-1
+X-Mimecast-MFC-AGG-ID: 13Jpqqk0OemcwAsO-xo8pw_1761812267
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-427013eb71dso441455f8f.2
+        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 01:17:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761812266; x=1762417066;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=62lhztl4PsEx1t/ejtRJFKI6a/pEqBnCixqR/6fg7Gg=;
+        b=b7M+EvXR++uvHDa3eRf2oBp+/c4TTGh69MIqHTBXoPP0w7CZgxdCWkGi6KkEjsbDAa
+         BADOhCM9dazo79ZlzLmVbOHuSI0RLm0fLLfuGGhAetj2gkrrLpw0VueBZo9Dbk5L59aK
+         mTsGfk8PeP+nkuZfs1BJj9j3CCQmI8sFaroYg6NQrZPUiBbw5hutCJf5f9mYnf8SD/kr
+         Vr9a33dAywGLQ5cz1aEUpPJu9Q+oLHnNXyu/XA4/BPxkwJap8TJpx/2hfqrKUWIyWF1S
+         M5o3PtNemXgKp7LtDapSFOTh12qDIe09sBs7Rt9DCrb4zlJjLv+2+pCpj4cOpiUGSaed
+         pq2w==
+X-Forwarded-Encrypted: i=1; AJvYcCXclVBp8z/yJZKMl25VqP76mkyshtKiQwn5UHhLNhCCi5QaWzGUU4veEe+ZQX1jF+69JJoo/wA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwnH36HjoDTjKqGbZLoBckyFey5zXZ2BPPUpo1lk5DSgc7iKABL
+	iH7VYSoOW+xMEyY+Oq0GmopxEGjx4ZWWV/zE5+H8y3nGupflP1GNeNilrwIjWh943Z9CNTG0zaZ
+	abJO233x35JJnqcg89PtJgAHsB0/tJcTe0YrdJw5hW/so3BJX5bxsG8m8N/6VzPiw3Q==
+X-Gm-Gg: ASbGncui5a4rnXGRImae5VZjPyx3EMORMPOQtylZ+E6Rn4+2xoL9hVCcSN0nT6KOsCh
+	V5XvUDBwS9OEnh21+19YhGtpizKhjA5nFkl9+Yj1MxMpdiwSmuswLLgGnjW8gLj1IUZOc0Bnu0j
+	5cxKnV0O/pC275hibkm18fmGeyIeqq4yNK9zt6g6ys3YHB+9ddUchsyocBiI9EHRMxo98pkYkat
+	aSR3Hf+G+Vxmk+5CHklszjdl7Jd9z7YrTVqlcWCf11YBaxaeDT6G82UXP1yZVR/Te6rR5QNQAqj
+	sVmj7Da6sEex01zEn7qKh2McZzkrsMOtUyjAezX6w5/feGRHZMT3+iOT/57VZ/cL8uqr
+X-Received: by 2002:a05:6000:240c:b0:429:8a40:e995 with SMTP id ffacd0b85a97d-429b4ca2efemr2051338f8f.61.1761812266312;
+        Thu, 30 Oct 2025 01:17:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFCC3j3pkeyjV7zwh2zWVtG7xi2X9bxfuD0Q0xhE4+gU6d0C0xhwka/NPYq7UvjEnPJvnZ1gw==
+X-Received: by 2002:a05:6000:240c:b0:429:8a40:e995 with SMTP id ffacd0b85a97d-429b4ca2efemr2051295f8f.61.1761812265790;
+        Thu, 30 Oct 2025 01:17:45 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc0:152e:9d00:de90:c0da:d265:6f70])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429952df473sm30541624f8f.42.2025.10.30.01.17.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Oct 2025 01:17:45 -0700 (PDT)
+Date: Thu, 30 Oct 2025 04:17:42 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net] virtio_net: fix alignment for virtio_net_hdr_v1_hash
+Message-ID: <20251030041636-mutt-send-email-mst@kernel.org>
+References: <20251029012434.75576-1-jasowang@redhat.com>
+ <d0f1f8f5-8edf-4409-a3ee-376828f85618@redhat.com>
+ <CACGkMEsTd6uCOCre8HK=5G14zu+xVOPOORZ2xcV_n9Kg6w8F5Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251029082615.39518-7-bagasdotme@gmail.com>
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- EXCH-01.secunet.de (10.32.0.171)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACGkMEsTd6uCOCre8HK=5G14zu+xVOPOORZ2xcV_n9Kg6w8F5Q@mail.gmail.com>
 
-On Wed, Oct 29, 2025 at 03:26:14PM +0700, Bagas Sanjaya wrote:
-> XFRM patches are supposed to be sent to maintainers under "NETWORKING
-> [IPSEC]" heading, but it doesn't cover XFRM docs yet. Add the entry.
+On Thu, Oct 30, 2025 at 10:40:13AM +0800, Jason Wang wrote:
+> On Wed, Oct 29, 2025 at 4:20 PM Paolo Abeni <pabeni@redhat.com> wrote:
+> >
+> > On 10/29/25 2:24 AM, Jason Wang wrote:
+> > > From: "Michael S. Tsirkin" <mst@redhat.com>
+> > >
+> > > Changing alignment of header would mean it's no longer safe to cast a
+> > > 2 byte aligned pointer between formats. Use two 16 bit fields to make
+> > > it 2 byte aligned as previously.
+> > >
+> > > This fixes the performance regression since
+> > > commit ("virtio_net: enable gso over UDP tunnel support.") as it uses
+> > > virtio_net_hdr_v1_hash_tunnel which embeds
+> > > virtio_net_hdr_v1_hash. Pktgen in guest + XDP_DROP on TAP + vhost_net
+> > > shows the TX PPS is recovered from 2.4Mpps to 4.45Mpps.
+> > >
+> > > Fixes: 56a06bd40fab ("virtio_net: enable gso over UDP tunnel support.")
+> > > Cc: stable@vger.kernel.org
+> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > > Signed-off-by: Jason Wang <jasowang@redhat.com>
+> >
+> > Whoops, I replied to the older thread before reading this one.
+> >
+> > Acked-by: Paolo Abeni <pabeni@redhat.com>
 > 
-> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
-> ---
->  MAINTAINERS | 1 +
->  1 file changed, 1 insertion(+)
+> I apologize, build will be broken since
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index d652f4f27756ef..4f33daad40bed6 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -18041,6 +18041,7 @@ L:	netdev@vger.kernel.org
->  S:	Maintained
->  T:	git git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec.git
->  T:	git git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec-next.git
-> +F:	Documentation/networking/xfrm/
+> commit b2284768c6b32aa224ca7d0ef0741beb434f03aa
+> Author: Jason Wang <jasowang@redhat.com>
+> Date:   Wed Oct 22 11:44:21 2025 +0800
+> 
+>     virtio-net: zero unused hash fields
+> 
+> I will prepare a new version.
+> 
+> Btw, it looks like there's an uAPI change that may break builds of the
+> userspace:
 
-That means that I'm now responsible for this.
-But I'm OK with it if nobody has objections on it.
+No, I think this has not been out long enough to matter.
+QEMU imports linux headers extremely quickly but it can adapt.
+
+
+> diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
+> index 8bf27ab8bcb4..1db45b01532b 100644
+> --- a/include/uapi/linux/virtio_net.h
+> +++ b/include/uapi/linux/virtio_net.h
+> @@ -193,7 +193,8 @@ struct virtio_net_hdr_v1 {
+> 
+>  struct virtio_net_hdr_v1_hash {
+>         struct virtio_net_hdr_v1 hdr;
+> -       __le32 hash_value;
+> +       __le16 hash_value_lo;
+> +       __le16 hash_value_hi;
+> 
+> We can have a kernel only version for this but it probably means we
+> need a kernel only version for all the future extension of vnet
+> header?
+> 
+> Thanks
+> 
+
+Let's not complicate things too much please.
+
+-- 
+MST
+
 
