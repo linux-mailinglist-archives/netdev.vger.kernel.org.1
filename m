@@ -1,110 +1,134 @@
-Return-Path: <netdev+bounces-234286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70AC2C1ECDE
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 08:39:00 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12E26C1ED0E
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 08:41:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24499188AE2D
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 07:38:59 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D455C4E8032
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 07:40:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7964C337681;
-	Thu, 30 Oct 2025 07:38:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A29D2337B85;
+	Thu, 30 Oct 2025 07:40:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="NFQa9raw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DDQfTdex"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1018A2DF710;
-	Thu, 30 Oct 2025 07:38:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39B7719E99F
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 07:40:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761809910; cv=none; b=ioQqJ0W8CBN+BxoQTegJsDOqywQLjjCQ8+JQMC0hEJkfX28hoA+kZ8SN4rP5gZag5JuDyAZ4JZdbZcWje+eYVksYbUQ81KMj+/kt4EkpHsnCCAYtPVBknq5LimUVEidEN37dz1EiWpuZyFRNFImdnaHtx1s25HOgk8SA/fn6FV0=
+	t=1761810052; cv=none; b=YvY4KB4/y/C4Lu+jfYrSzyHrSevGiDDxX5JLOzOOc+1VeNAQdJC1G1tLPknWz5IBLmq17MjCSes8yYRyPuOql5lRMcK6zxX1ObLEN3pVEWk7eDDiMIZCO0gZlLhi1nIv1eAJk5u6kqCNxKvW3KAe+dZk0ObZ3R9nNT6U1iNPz/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761809910; c=relaxed/simple;
-	bh=dLE70Vb7ALl+7w9D13VKYrToxonM3UZ+Iq+NTt2I2zw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rW8QhDDP6FN/AP4kDjjbEgPgZ4sZZzah8CVnpuggKzfVMi0GrIkxV45gaQBHRMp5qBqJervF59yR7A4bKEr6PgB3+qP3kh+HqWMcbOOF84zmNw8nTzHuixUS4WWgD9Y2JOSfHNYNIJjVQzgEResUl71iVoTScEcTyo5d3xPtDT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=NFQa9raw; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id C71F41A178F;
-	Thu, 30 Oct 2025 07:38:23 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 8A6886068C;
-	Thu, 30 Oct 2025 07:38:23 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id EBD5D117FDA39;
-	Thu, 30 Oct 2025 08:38:13 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1761809902; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=PQ79r995lrIt1vl1eAOi6ClCmWaLJS9lKpg7n7yo+7E=;
-	b=NFQa9rawQavfjzTLyyQ/Y0W+PMKaWgvzn9L9RhvvAHFzCf9Pt80fJTBxc0NGK7DXKca4ER
-	oW9Z+VETAQJ5x9/ZRMYfm77dyHEBBzqStxjHtB8G/wdr+zwk/qwo9/ExJFYTLoiyidJPNe
-	KreJ2ai4gjuoJzCetoYuz1bHPZHsfjBgj51Wnfaa/BpPGgv7VCs3uYMk0xBngf+zmqs3Kn
-	CK4pBpnGydgYFRMmA7DDVGucOO48KxOBIYkAwRhYcsIFf9BQZruNNCLnxNb64brCOoig0g
-	pcfySQcPOA7YwXDQOnFe7H21OgD2mtEcuYP12CdvgxK3z7WZvuDa/Zb0YFxdDQ==
-Message-ID: <da8d9585-d464-4611-98c0-a10d84874297@bootlin.com>
-Date: Thu, 30 Oct 2025 08:38:12 +0100
+	s=arc-20240116; t=1761810052; c=relaxed/simple;
+	bh=H1hjxQGjEC5L4T4UtQNNrJaSLGQSRQrdJRzQ9oj29ac=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hjKKSRjGUlliuiwUFVppstqzJ+KmL0lMzsnaJkG4aBoM+d6nE/Isk4ntscF15ZNGTeTLV2gtqlY6nPo/X1i1/kx5x3zAW+3zs+0O8JW7r7y/SU9L2CihDb+T5MfGE7hqNl7aDSPcf0tL6LNUI+OZCJcmscycg5g/MZvI70eucV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DDQfTdex; arc=none smtp.client-ip=209.85.215.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-b8c0c0cdd61so642766a12.2
+        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 00:40:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761810050; x=1762414850; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=H1hjxQGjEC5L4T4UtQNNrJaSLGQSRQrdJRzQ9oj29ac=;
+        b=DDQfTdex7r2tKhbvtJhdJQnl1VIYrxggBEO9A31p5H5dDCW8sMEVcFNI6M04Qnt2rj
+         oGYweSn0EC8NNgEP+ip8ZKYbboivkpqdfWWGowk7tqnmGbBUP7zAoJ4jtIQFGEGGjzBU
+         Vupgs3Jtkk1brsvOy6dF1bT1jquMLhUXUInk+LsTZsGouSuEdeYU5uwoD9F7SgCW6Qgx
+         34AZbpZLSkw4+Ya0MS/iAwOfPTnrAETU2mjU+iLb90TkuzPnGk/eMXqycO0JWh/7xzvz
+         4mvVkWw49Dh3r+ETaaLYWbdHVgrwoCAzqg5TV1U++AkLwzTsT5S8zvAkbiITH+gFdJH9
+         Yj/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761810050; x=1762414850;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=H1hjxQGjEC5L4T4UtQNNrJaSLGQSRQrdJRzQ9oj29ac=;
+        b=r4qMJPGW0YaenmtaGmuVeYqbmEal5BDF1V/GfQx7YQaKJFCTvYjL+qUlGAIva5Wpct
+         vI4zJaRrxY4XDuofvCT/vUI7tS4NssrR/1W5qsECW9xPdO8bCKzOM+qA4FiaK+SkbVcw
+         TVO0XKgQfqclDssl2PZkLo97oVEaw2Meemd3gfhIVGoia4fsH32DnrB33uBermOYxvuW
+         YgbB4nbtkRJTJC6cLNU8bJe4uk4DrfRMr16BmQxLV7zuUZakIXBS5iH5/WSUJ0yhKG1c
+         /BwqrU6Cs/0bIy0NZzYD2qrU7k0gnE15QDi98tzwrcYqRWkuSDeIFTrL6mg3EUhNqgC5
+         PGkA==
+X-Forwarded-Encrypted: i=1; AJvYcCXkX7y/0UDpnOM+SUpQVKweClreGrkXqsvXi/BfFVDbORqMd5MD4E6Xc7slEaov7hHNXHWqjPU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxd2UATmxUXlttqRZTGLKdrNxly5n6ENBxPliva+uGzeTWfJ7Ml
+	gv2an/UrxHiRy/5vt/U94dK/ygWG8z+ExAnR2oFz3ht0gSYjEIiFOktn
+X-Gm-Gg: ASbGncvTNA9DjmL+yIDAgXsmvTiHJwqE6HnsjFeqx2e0brrkUnQCQE0ICpWYzBjkOf6
+	gOPffZMXsKrCnP8zrsJfuzgcOhTfaefVonPgVE4T1pTd8zx/wLYRjmL9y65gXA9n56r0dByeMRe
+	fZjMWeeGuicB7p+VB5SbVnnwplabLF9anThSLXtOnmOfF3TzXvBKr3hd8p4bnCOdM4VUJC3v85a
+	0p/QQj6SerngXAbiJZaINB6FYC/B0titp/qOoZnKjj4xo6k/VF3Kv0v6FWNCNi0ECMyQ2V6zPcF
+	/nDQCI25m99M0HK+M2dyYCoyy1yYQwDaz1Gy2qo+y1lGRc7GtdYnVQqoaB3Ok2ZHGHLI1mPZrU8
+	AAUSMGztYYflyohk1wM3yYEKWY+bxV82R81of3JovsJ29alY+nx3Jkuz8pnw9p18856WKWbhQtm
+	KrW/MbhWDxUEs=
+X-Google-Smtp-Source: AGHT+IEhJrBVY2OU2QdJTvc4eWg0c6Su8jbKCtvPUTeYudGOdXSEj26zmCHIN6FgAx0W7VrJvvw/gw==
+X-Received: by 2002:a17:902:f601:b0:24c:cb60:f6f0 with SMTP id d9443c01a7336-294ee479ab4mr28678895ad.58.1761810050370;
+        Thu, 30 Oct 2025 00:40:50 -0700 (PDT)
+Received: from archie.me ([210.87.74.117])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29498d09a33sm174420525ad.32.2025.10.30.00.40.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Oct 2025 00:40:49 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id 130774209E4B; Thu, 30 Oct 2025 14:40:41 +0700 (WIB)
+Date: Thu, 30 Oct 2025 14:40:41 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux Networking <netdev@vger.kernel.org>
+Cc: Breno Leitao <leitao@debian.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>
+Subject: Re: [PATCH net-next] Documentation: netconsole: Separate literal
+ code blocks for full and short netcat command name versions
+Message-ID: <aQMWeZyZoT2vV-Z3@archie.me>
+References: <20251030072945.38686-1-bagasdotme@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 2/3] net: stmmac: loongson: Use generic PCI
- suspend/resume routines
-To: Yao Zi <ziyao@disroot.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Yanteng Si <si.yanteng@linux.dev>, Huacai Chen <chenhuacai@kernel.org>,
- "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Philipp Stanner <phasta@kernel.org>, Tiezhu Yang <yangtiezhu@loongson.cn>,
- Qunqin Zhao <zhaoqunqin@loongson.cn>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, Furong Xu <0x1207@gmail.com>,
- Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
- Jacob Keller <jacob.e.keller@intel.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20251030041916.19905-1-ziyao@disroot.org>
- <20251030041916.19905-3-ziyao@disroot.org>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <20251030041916.19905-3-ziyao@disroot.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="KqaALex6Sku4dIYk"
+Content-Disposition: inline
+In-Reply-To: <20251030072945.38686-1-bagasdotme@gmail.com>
 
-Hi,
 
-On 30/10/2025 05:19, Yao Zi wrote:
-> Convert glue driver for Loongson DWMAC controller to use the generic
-> platform suspend/resume routines for PCI controllers, instead of
-> implementing its own one.
-> 
-> Signed-off-by: Yao Zi <ziyao@disroot.org>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/Kconfig   |  1 +
->  .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 36 ++-----------------
->  2 files changed, 4 insertions(+), 33 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> index 598bc56edd8d..4b6911c62e6f 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> +++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> @@ -373,6 +373,7 @@ config DWMAC_LOONGSON
->  	default MACH_LOONGSON64
->  	depends on (MACH_LOONGSON64 || COMPILE_TEST) && STMMAC_ETH && PCI
->  	depends on COMMON_CLK
-> +	depends on STMMAC_LIBPCI
+--KqaALex6Sku4dIYk
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-If we go with a dedicated module for this, "select STMMAC_LIBPCI" would
-make more sense here I think. The same applies for the next patch.
+On Thu, Oct 30, 2025 at 02:29:44PM +0700, Bagas Sanjaya wrote:
+> Both full and short (abbreviated) command name versions of netcat
+> example are combined in single literal code block due to 'or::'
+> paragraph being indented one more space than the preceding paragraph
+> (before the short version example).
+>=20
+> Unindent it to separate the versions.
 
-Maxime
+Please ignore this patch (missing v2). I'll resend shortly.
 
+--=20
+pw-bot: changes-requested
+
+--KqaALex6Sku4dIYk
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaQMWeQAKCRD2uYlJVVFO
+o7SuAQC6Oq6KaPgD/blKnKE2tBWgL49wdzToS+7PXDDYHKZU1gD8DYRUeyiRXmJT
+h5Qq9SRDuqwPzWA50zNlXOYlpQH/dg0=
+=8ULH
+-----END PGP SIGNATURE-----
+
+--KqaALex6Sku4dIYk--
 
