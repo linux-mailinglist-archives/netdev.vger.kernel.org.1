@@ -1,152 +1,140 @@
-Return-Path: <netdev+bounces-234329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9F67C1F795
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 11:15:05 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF958C1F79E
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 11:15:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 66B4A34DB21
-	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 10:15:05 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4C7F034CA02
+	for <lists+netdev@lfdr.de>; Thu, 30 Oct 2025 10:15:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6120A34FF4F;
-	Thu, 30 Oct 2025 10:14:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F31F33B955;
+	Thu, 30 Oct 2025 10:15:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="kvAGlboN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iuBmItiB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBB6933F39D;
-	Thu, 30 Oct 2025 10:14:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E00323164D8
+	for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 10:15:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761819295; cv=none; b=KMdc8p35zomScsguqsFnTuOCX87TEnlt6KnUB/VOvyBl+5DjtOWc6eDYUz46k3gOjXEZ508keGIG8pNcPW5VXjwuFBxA0Oy3zmZospgJAowVvU0QMAlIQJuGWDx6411h6q50odO0TirRZBX+AKxOcb8s5YmFhPSdH+XPhmKS/qw=
+	t=1761819356; cv=none; b=bRwHSFyGiZP5aZPi6WGWTY9GA4dRZRx81tWPo8fS6b20WVNzhteeSMSax71oChMKoWfZjfviLFhZaHeuOVCiiu4mtXbIl5LyVcR6eAjhvnv6Rs5ODSPB6j3OXADfb1GtnxhX2lfHNSrudrNc7U6H1go4bLzC60QX7508IwI1hWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761819295; c=relaxed/simple;
-	bh=9+26W/7FccezvQBu6jAWgN6OcPPx65WqQb+oWvycV2k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BlTA+ttTaXkUNFSigTkNcRnLXMbBrAlmIIZrTCYOZ9vFl4jSXmoYksaITg+6bUX213a7eDszZYfZN2BkKSEH72+gfy6sqP1BwFI9mWzR5Qmyjcp1v/9yb6u22a85DAIe8CKtLF1M2UgBeOVehPfpoq3ZYgqfPFBCwqHipbTKiAM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=kvAGlboN; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 22EC91A1777;
-	Thu, 30 Oct 2025 10:14:50 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id E311D6068C;
-	Thu, 30 Oct 2025 10:14:49 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 6D4A5102F2500;
-	Thu, 30 Oct 2025 11:14:46 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1761819289; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=fFivBrtf6Fyg74mEnmhhcfVb7sdHf9IjJ5FCXLS4tic=;
-	b=kvAGlboNHT7htE3FpUCOqYWVZEDMz/8kSwDiIZskRyxxK4ecuuGIebMcAxtPK2S6JB82a3
-	j+PHwi0uebvfgGIkpI8YI2EASSwzN9ll2WBkS1sV02z3jV35UlKFyk6Nk831b1kC8zIwMp
-	pe7C57xf8V/eNg3ObX7YfXgNH0AySHql6l3VaiLYj3tSxFRg33vmcaI/XQzcaBYVbghsmP
-	6vDOReyQjyz5f7UgC2O3+qrU36V/v5JwFMrHsm07De13vj5fUSVH2zCbjKF74Qa4zR7ocv
-	ecTY1uUR4NBpCGchIpFxmOepkh917uoIIisNomdurxDbf2+d6X3U9o+Q+boFuA==
-Date: Thu, 30 Oct 2025 11:14:45 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Jiaming Zhang <r772577952@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
- kuba@kernel.org, kuniyu@google.com, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, pabeni@redhat.com, sdf@fomichev.me,
- syzkaller@googlegroups.com, vladimir.oltean@nxp.com, stable@vger.kernel.org
-Subject: Re: [PATCH] net: core: prevent NULL deref in
- generic_hwtstamp_ioctl_lower()
-Message-ID: <20251030111445.0fe0b313@kmaincent-XPS-13-7390>
-In-Reply-To: <20251030093621.3563440-1-r772577952@gmail.com>
-References: <20251029110651.25c4936d@kmaincent-XPS-13-7390>
-	<20251030093621.3563440-1-r772577952@gmail.com>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1761819356; c=relaxed/simple;
+	bh=HwuBL7/j8iddX6AaVhQYYIFhCQoJyE/42FRGYgfEbzE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qxXU0bKYBEV1NdqWEuabKjGNUhOEdOjv+LKRQEKvE0acvfHyhj8xJsorWi8Byd+g/MluXTWe2dVDLhk6i7C3+xUAm2r/CjCrjdN1lgOPYHXf3jEURAZZzGsdBJ/zvCCsB01jGZlQVysk30xFJMIZb19HcxyPCVB6UQH9WyQ6xPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iuBmItiB; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761819353;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=bOlCRowd2cbEJIalDQ+zCUHAgo4uy8C8YJgtAhPsurY=;
+	b=iuBmItiBGExQqtwFU2sN6ljWYVN4O5301yz4O3Lic6xX0w7A0Gvqqt529dR8Pwhrcs/k0z
+	3e+6XlmRcgIMCckCWakkYPQDMQrD2sbjMGRNOviwuxkmo6tHm2nBGovZxCIEKCGcLzZhBk
+	IMGzbrVYskdZy+0wdgS1Sx4orZrQvLk=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-16-D0qlzfo0MMu71SQvbCp8zA-1; Thu, 30 Oct 2025 06:15:22 -0400
+X-MC-Unique: D0qlzfo0MMu71SQvbCp8zA-1
+X-Mimecast-MFC-AGG-ID: D0qlzfo0MMu71SQvbCp8zA_1761819321
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-476b8c02445so8463625e9.1
+        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 03:15:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761819321; x=1762424121;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bOlCRowd2cbEJIalDQ+zCUHAgo4uy8C8YJgtAhPsurY=;
+        b=w/CxYnx4ODQnGyvTYbo//L4q7/mWPnes215wsZuD/fNqoHCqD+b58QIuIOmSas4iGA
+         DDMYFdZfSMsI3NvHwu51J2BHZwrfazSuB0E05m2DiN5TtBQ48mTTlj+pbFs6k/jTx3yH
+         Yt/FhmToklPsYj5V0S06PS5KzWLQnqhzEHSVJb3bR4yTQOZcOa7FPInA3pNc8bGBGqMg
+         xkBjPmH1XPA+v8jNfVbpmlTTAPvJe580rrsWWGz7dj01dx5p8LcOmF5mcvRyyhxf8TOe
+         afUlEN+MSs3alQArSt+Gyu3RT6VK24XiVJGIVmx0IIibx9G7jzx0G4JUkgdGAKB1Ajt8
+         V6mQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUogFl2veE5Q//pw4rsnctgR1ghQAt4EH4nO+HnpA31w/vp3oM2mHQ4uw+PgbEYqi+3xAT1+rU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSKZMu8rm3qRZ2V+4Ee0Rvs9b8wsCChRabUuxzZKjtvpfmsJ4u
+	9oncYk124h741ytAejZij23LA+O81kDayh+wHuuEJbq+tcBw1DoHLqdRsaJyYQJTMhu2RP5Q1x5
+	v5cIXss8kXtSTCtO1xPcyFsv1mGuDEI+y5+RjxnqpJBrc5mqmafg8z9ptWklp5FmXpQ==
+X-Gm-Gg: ASbGnctkrywdm2lCItxN3PpSH6tZzDuAQdz3Y7e1lWZdejmqEdvM3RwD1DKMximoa9O
+	RKloROuu4T/LGStIU+N9PO82wzAAqCj4+URjWvA0Xl+j2I+6te/lf5wvcnA/9pboAuP/lR5Wxb1
+	GBrtpQ1PHN3u26lHjcx7bF2i9jnUFeNC9D+Nd2Sa43xjJzbXgTsIG3cPTFhg2yK02RybgqWfkLM
+	LbuKLAa5ODdfuTxF7BYbzlJqFzQjSiQb8kQaa6jTR1qxxAPHJZH3yagxNSV+ldzNSw1RsnFQBtH
+	k3e8enQj0dkM0JVOSBtoY5JQJag40HIcKjNCvbi6z7bVa2o/fBAzvomBl5micI+dIRV2ZnVeJVm
+	2ZA3fO9/Ws5mq03u/15Z9PcGypgEKMInhK7Cag1kGGHxc
+X-Received: by 2002:a05:600c:35c3:b0:46e:3d41:6001 with SMTP id 5b1f17b1804b1-4772684f823mr26611995e9.34.1761819321144;
+        Thu, 30 Oct 2025 03:15:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEyPrpvB9n94QmEp5mdsdi+Ry3jLFqF5DP/uud3K/QL/6/hTmUd566gZ2nFWiXbJf2cLc4FZA==
+X-Received: by 2002:a05:600c:35c3:b0:46e:3d41:6001 with SMTP id 5b1f17b1804b1-4772684f823mr26611665e9.34.1761819320702;
+        Thu, 30 Oct 2025 03:15:20 -0700 (PDT)
+Received: from ?IPV6:2a0d:3341:b8a2:8d10:2aab:5fa:9fa0:d7e6? ([2a0d:3341:b8a2:8d10:2aab:5fa:9fa0:d7e6])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4772899fe36sm32094485e9.2.2025.10.30.03.15.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Oct 2025 03:15:20 -0700 (PDT)
+Message-ID: <54d1ac44-8e53-4056-8061-0c620d9ec4bf@redhat.com>
+Date: Thu, 30 Oct 2025 11:15:18 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] xsk: add indirect call for xsk_destruct_skb
+To: Jason Xing <kerneljasonxing@gmail.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, bjorn@kernel.org,
+ magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
+ jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org,
+ daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+ joe@dama.to, willemdebruijn.kernel@gmail.com
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+ Jason Xing <kernelxing@tencent.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>
+References: <20251026145824.81675-1-kerneljasonxing@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251026145824.81675-1-kerneljasonxing@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Transfer-Encoding: 7bit
 
-On Thu, 30 Oct 2025 09:36:21 +0000
-Jiaming Zhang <r772577952@gmail.com> wrote:
+On 10/26/25 3:58 PM, Jason Xing wrote:
+> From: Jason Xing <kernelxing@tencent.com>
+> 
+> Since Eric proposed an idea about adding indirect call for UDP and
 
-> The ethtool tsconfig Netlink path can trigger a null pointer
-> dereference. A call chain such as:
->=20
->   tsconfig_prepare_data() ->
->   dev_get_hwtstamp_phylib() ->
->   vlan_hwtstamp_get() ->
->   generic_hwtstamp_get_lower() ->
->   generic_hwtstamp_ioctl_lower()
->=20
-> results in generic_hwtstamp_ioctl_lower() being called with
-> kernel_cfg->ifr as NULL.
->=20
-> The generic_hwtstamp_ioctl_lower() function does not expect a
-> NULL ifr and dereferences it, leading to a system crash.
->=20
-> Fix this by adding a NULL check for kernel_cfg->ifr in
-> generic_hwtstamp_get/set_lower(). If ifr is NULL, return
-> -EOPNOTSUPP to prevent the call to the legacy IOCTL helper.
->=20
-> Fixes: 6e9e2eed4f39 ("net: ethtool: Add support for tsconfig command to
-> get/set hwtstamp config") Closes:
-> https://lore.kernel.org/lkml/cd6a7056-fa6d-43f8-b78a-f5e811247ba8@linux.d=
-ev/T/#mf5df538e21753e3045de98f25aa18d948be07df3
-> Signed-off-by: Jiaming Zhang <r772577952@gmail.com> ---
->  net/core/dev_ioctl.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
->=20
-> diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
-> index ad54b12d4b4c..39eaf6ba981a 100644
-> --- a/net/core/dev_ioctl.c
-> +++ b/net/core/dev_ioctl.c
-> @@ -474,6 +474,10 @@ int generic_hwtstamp_get_lower(struct net_device *de=
-v,
->  		return err;
->  	}
-> =20
-> +	/* Netlink path with unconverted driver */
+Minor nit:                          ^^^^^^
 
-nit: "lower driver", to be precise.
+either 'remove an indirect call' or 'adding indirect call wrappers'
 
-With this change:
-Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
+> managed to see a huge improvement[1], the same situation can also be
+> applied in xsk scenario.
+> 
+> This patch adds an indirect call for xsk and helps current copy mode
+> improve the performance by around 1% stably which was observed with
+> IXGBE at 10Gb/sec loaded. 
 
-Thank you!
+If I follow the conversation correctly, Jakub's concern is mostly about
+this change affecting only the copy mode.
 
-> +	if (!kernel_cfg->ifr)
-> +		return -EOPNOTSUPP;
-> +
->  	/* Legacy path: unconverted lower driver */
->  	return generic_hwtstamp_ioctl_lower(dev, SIOCGHWTSTAMP, kernel_cfg);
->  }
-> @@ -498,6 +502,10 @@ int generic_hwtstamp_set_lower(struct net_device *de=
-v,
->  		return err;
->  	}
-> =20
-> +	/* Netlink path with unconverted driver */
+Out of sheer ignorance on my side is not clear how frequent that
+scenario is. AFAICS, applications could always do zero-copy with proper
+setup, am I correct?!?
 
-same.
+In such case I think this patch is not worth.
 
-> +	if (!kernel_cfg->ifr)
-> +		return -EOPNOTSUPP;
-> +
->  	/* Legacy path: unconverted lower driver */
->  	return generic_hwtstamp_ioctl_lower(dev, SIOCSHWTSTAMP, kernel_cfg);
->  }
+Otherwise, please describe/explain the real-use case needing the copy mode.
 
+Thanks,
 
+Paolo
 
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
 
