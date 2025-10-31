@@ -1,94 +1,64 @@
-Return-Path: <netdev+bounces-234724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44F73C26830
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 19:01:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A80EC268AB
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 19:16:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 586264E7FD1
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 18:01:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 037C23AE179
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 18:16:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 814BC350A0A;
-	Fri, 31 Oct 2025 18:01:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9755034DCC2;
+	Fri, 31 Oct 2025 18:16:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="s7BzkPma"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JmK3nULs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 843A63502BF
-	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 18:01:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 697EE23D28B
+	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 18:16:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761933699; cv=none; b=ZO6gPihL/3TKbmJcFkqU+uVFyAdcJ94FvWLCn8vptJbgc2bc8ezXC1DK1/aPvbcBodx1xaqdVDbOvLTBrK+B2sRsJyGDBxJ0bYj2MxylXaYjsIVliF7FQHm0m0nZrNEp6aX0lxjvHg9jg8FEmWkPzx0FuNi73IHW+xPMvouaYV4=
+	t=1761934603; cv=none; b=TEE9BVZunKZO5+FkgWy6bUPcI2/8u9Tb+/CRAVuL+T4TX7IsJucnVVT4YlC0J2k2c2HUJd/uYe8s9risFc/tAAdFyZdS9Loggb8o+0ndatZT3GkpHaIStoaf/mVbRxfzb98xTQDAfDNG53i6fakVWNUCGVlXMH5xwuOS/OPBUzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761933699; c=relaxed/simple;
-	bh=81+nJ650azoIXDBc6RcFb6YDuiULytfHKOAtUCKouK4=;
+	s=arc-20240116; t=1761934603; c=relaxed/simple;
+	bh=JnGr5vUYfVAVza81n1ZuarMPqOm1k7qNnjeylSO/u4k=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sjvz76jedarqtqcYACRk9qZGCx2HA7mlg/N3bRM6uVKp18pV/rB6cdJ+fX1XH1TB2XXps8WvBqRW8sunfT+XKlq/I1h38r0lVd0Ks6xhmtbjDDNqffZfG0mFtEy2xYNKxDPTztmlLGu2yhRwBCaKBU4mR6AyQZMM3VgA6iQb2G0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=s7BzkPma; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-b6ce806af3eso2506395a12.0
-        for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 11:01:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1761933697; x=1762538497; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=virWIerUx49P6zwM9hCjO2u0AG9r9qg+xRXO7tQjwas=;
-        b=s7BzkPmacwRMLjit3NFkO4A8WjrTbk+xNXWZm74IjJ6JS/z1rAEVygdLp8tcdI9v31
-         ftEBVhHqXhze9SvtFdDbwXXOkFdYYSjJNfFEKMSMs1945033P7dCuYZlyuE+u9CXlRe0
-         ZJ65v17pU/9ywT9tRgfOz0xLhxgnbI4g0stCLF0gfP4ehqd8NEJIWTcp+XWmP5xGXXpv
-         57+MtccO4V33a91ZLReDG+8A8mJGw0KnqvcFulFuGB24xkJkYK0Ujt/hZ3+Qv0us98v9
-         TLhkLGMawxwz7pi03yjI6Z012KZd9zqIvIhGNkk3ZicZ57+9dEMHOBcVXdqcEPwZCKHF
-         cT+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761933697; x=1762538497;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=virWIerUx49P6zwM9hCjO2u0AG9r9qg+xRXO7tQjwas=;
-        b=IV3gR03YnpJeKnq48tQo0fej2ltNmvJpc5bpi8kX7tcEYhsJpmDo5MrQIxFRg6LqKU
-         ywg8xgZz75YSn4Rp9HmnpYcN4UQQDdbOUkkVOGEG/0+E5FRrlLCZwcuJ/QdWkI2b47ji
-         E4LHq2b+dwIszc4kFri1lqA/OOYo+6iRHHYlhxQbR9c3GHpri/mlDHYO+yL4KucDxEyg
-         VaCTej/U3VzlATKxppUcO75rf2hAYlkt7Zduk5ddRI5EnBppqJtFRA/v7vHlOzaHY9u5
-         xZ95UPlpz8sfL0RrJYULWVPI0h4YUHJjBPUkPgRIDMuhnCEvrYvGmHo93+drodmgNIpj
-         6qeg==
-X-Forwarded-Encrypted: i=1; AJvYcCWT9JzfZcCeNpFY8Ev5yCw6gvn10xR06QTXk8GZKqiPu22wRi0iTzALyHYglcJ36P9UAiXOGW0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyVkDlcqpRcpaFlXIBTXvwwiyRWssWRJnPAoNdGnt5ZRLRkeJOb
-	Kb41qSjynSj4/Z7at4MRQElzPR7ofFcSPpLm4w6FWpZooeQ02hzzfpsZ9j56WmrA8LQ=
-X-Gm-Gg: ASbGncujkA9T6Z9BBwRmDWSiB9EgGU3TLdy90T6Y7gC+Xm2fGFhkL5vDT0GAvRVskCB
-	LTwwCSW2Z2sP7oxIQWvIZe4qllvSJRn7tiHW+uz7l3qWJymF6k7tgKVfwYkp72EgdUS4mfYo+8u
-	smSTCQTUkdloFR643At7UEsYlDI2oZ9crq6Lnk75IOVPoquuevubhe0rT5sQTOaf3WiucgLeUBy
-	IN1uvwIQfDU7ovITf+OZKj7TXW14phm4vu9HCcj2RRXavvnD6Le3cZMoLHPq5scPLEG4CwM/uOW
-	kdJZW/0YlcReFbdSg2UZdN1N40lVJzXEeArf9rUGPSeVKONHF5X+4HwPbmi98b7Fs/XF2sU2Fmj
-	k2n9YYaPh7SGILCh4YgLo7tQ4zA0drg2gpksCB2C8592X2fiERZq1t8W821QQrrYLhsspnUzM1N
-	GzrUrdgXQar1Kry61aJViMAh0oHS3w8abBvA==
-X-Google-Smtp-Source: AGHT+IGLscsEnHzdJ0wSF1z/pg6r+/MX7xr+3OX5V0qn3x0wM3NQrWp77SgBn0CVsTBJv7XWMAUWpA==
-X-Received: by 2002:a17:902:e74e:b0:294:9476:494a with SMTP id d9443c01a7336-2951a533f8dmr53661025ad.56.1761933696540;
-        Fri, 31 Oct 2025 11:01:36 -0700 (PDT)
-Received: from phoenix (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29551168756sm2955035ad.16.2025.10.31.11.01.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Oct 2025 11:01:36 -0700 (PDT)
-Date: Fri, 31 Oct 2025 11:01:33 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Christoph Schwarz <cschwarz@arista.com>
-Cc: Eric Dumazet <edumazet@google.com>, Neal Cardwell
- <ncardwell@google.com>, netdev@vger.kernel.org
-Subject: Re: TCP sender stuck despite receiving ACKs from the peer
-Message-ID: <20251031110133.3d469992@phoenix>
-In-Reply-To: <a673f379-9b0c-4d02-8884-23c62930513a@arista.com>
-References: <CA+suKw5OhWLJe_7uth4q=qxVpsD4qpwGRENORwA=beNLpiDuwg@mail.gmail.com>
-	<CADVnQy=Bm2oNE7Ra7aiA2AQGcMUPjHcmhvQsp+ubvncU2YeN2A@mail.gmail.com>
-	<bcff860e-749b-4911-9eba-41b47c00c305@arista.com>
-	<CANn89iKRXpKkCzRw_7+VyG6jD2Tm5VUPQ-0bhQKUwh2sgzJZuA@mail.gmail.com>
-	<CANn89iJcLepEin7EtBETrZ36bjoD9LrR=k4cfwWh046GB+4f9A@mail.gmail.com>
-	<CANn89i+=rqOAi3SJ0yj47x9X=ScDX5-dD2GmAVRsVGNP9XDBEw@mail.gmail.com>
-	<a673f379-9b0c-4d02-8884-23c62930513a@arista.com>
+	 MIME-Version:Content-Type; b=SB5x4jCveBKlPwLVV0FUPpdhuZJJPHiE34h9GQo0wIW/1SV6r0G6j2ZJEd9g3+mPDl+JmIAYc1fWAvTTYWjTOkjWQHf1hT9Pz71SaGX+vJPcN4gah+wpmPy4E6VAengzd1nalhduppccBgzgYgj8H2oryTQAIPMeWHoi0SG9KwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JmK3nULs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E322C4CEE7;
+	Fri, 31 Oct 2025 18:16:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761934603;
+	bh=JnGr5vUYfVAVza81n1ZuarMPqOm1k7qNnjeylSO/u4k=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JmK3nULsKWb4OBVjVEIiQPxIWECn/zWUWrH03JI1dsV8J6T8ZSr5nuNescmInN8K9
+	 HYZ319GYROw8OfkDz2RIMOzkw3A2gnGjKgJKXtTuG2RvvOI7q01uk5C86vC3qcdPnT
+	 Z2CbDx/Yy7siPbUNnEJM/SSyRNAWzcsSpIOhH6YbuAF5wFeUvU2dzoXC9xgeDj+nzE
+	 Q7HznMnBwHtZTvBwlEytqTpb76ij7EVPGxwlIFTwKG+Yb8FxST0jYignNsySn0zLCo
+	 plMd3mzLB03sIZSkDRzK7oyh8y0NsfFB3bUMxVKw5Wc45xk+qnCiRMs24BQKQ1eAWf
+	 cYWPbbEMtIU4w==
+Date: Fri, 31 Oct 2025 11:16:41 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: airoha: Add TCP LRO support
+Message-ID: <20251031111641.08471c44@kernel.org>
+In-Reply-To: <aQR2Z51Q45Zl99m_@lore-desk>
+References: <20250610-airoha-eth-lro-v1-1-3b128c407fd8@kernel.org>
+	<CANn89iJsNWkWzAJbOvaBNjozuLOQBcpVo1bnvfeGq5Zm6h9e=Q@mail.gmail.com>
+	<aEg1lvstEFgiZST1@lore-rh-laptop>
+	<20250611173626.54f2cf58@kernel.org>
+	<aEtAZq8Th7nOdakk@lore-rh-laptop>
+	<20250612155721.4bb76ab1@kernel.org>
+	<aFATYATliil63D5R@lore-desk>
+	<aQR2Z51Q45Zl99m_@lore-desk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,14 +68,37 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 31 Oct 2025 10:43:36 -0700
-Christoph Schwarz <cschwarz@arista.com> wrote:
+On Fri, 31 Oct 2025 09:42:15 +0100 Lorenzo Bianconi wrote:
+> > > Hm, truesize is the buffer size, right? If the driver allocated n bytes
+> > > of memory for packets it sent up the stack, the truesizes of the skbs
+> > > it generated must add up to approximately n bytes.  
+> > 
+> > With 'truesize' I am referring to the real data size contained in the x-order
+> > page returned by the hw. If this size is small, I was thinking to just allocate
+> > a skb for it, copy the data from the x-order page into it and re-insert the
+> > x-order page into the page_pool running page_pool_put_full_page().
+> > Let me do some tests with order-2 page to see if the GRO can compensate the
+> > reduced page size.  
+> 
+> Sorry for the late reply about this item.
+> I carried out some comparison tests between GRO-only and GRO+LRO with order-2
+> pages [0]. The system is using a 2.5Gbps link. The device is receiving a single TCP
+> stream. MTU is set to 1500B.
+> 
+> - GRO only:			~1.6Gbps
+> - GRO+LRO (order-2 pages):	~2.1Gbps
+> 
+> In both cases we can't reach the line-rate. Do you think the difference can justify
+> the hw LRO support? Thanks in advance.
+>  
+> [0] the hw LRO requires contiguous memory pages to work. I reduced the size to
+> order-2 from order-5 (original implementation).
 
-> The "parent" device is served by a proprietary device driver for a 
-> switch ASIC, and implements TX flow control, with the TX queue being 
-> stopped frequently. It does not have TSO capabilities. We could look 
-> into adding that, but as of now it is not an option.
+I think we're mostly advising about real world implications of 
+the approach rather than nacking. I can't say for sure if potentially
+terrible skb->len/skb->truesize ratio will matter for a router
+application. Maybe not.
 
-You really should not expect any on mailing list support for anything
-that uses proprietary device driver. I.e "not my problem go away"
+BTW is the device doing header-data split or the LRO frame has headers
+and payload in a single buffer?
 
