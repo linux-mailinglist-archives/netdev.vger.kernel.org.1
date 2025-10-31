@@ -1,127 +1,163 @@
-Return-Path: <netdev+bounces-234680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234693-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38E0EC2619C
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 17:26:12 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 892B5C26111
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 17:19:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85ECE583CBF
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 16:09:32 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 65D2F4FB88C
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 16:14:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CCD4302766;
-	Fri, 31 Oct 2025 16:05:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27D6924BD0C;
+	Fri, 31 Oct 2025 16:08:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="r/Eg/NM9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lNm3q3Fx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B63632F693E;
-	Fri, 31 Oct 2025 16:05:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D879D34F46C;
+	Fri, 31 Oct 2025 16:08:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761926752; cv=none; b=sBZTTpOrQ9ZZMJXSKXrRu2LBEdJF/V4m5JsMyqcuEBQ/f8RpQYjbV6fwWu7rYoWmulRY0KT1Rv5xqDn7TGYs5qxiSvxoEIkKGzM/whYTRCj+2F1aAIf7QETC1jOf6KqnY9fqzgi7Qt3XITvTtZiJhiw8YFc/cnGGVOgWd+J+ACU=
+	t=1761926893; cv=none; b=p+yYkcKVqoV8FNRNoUrm167b133MfLytUbu+JacqnA9h94m5jyuxAxnRe+Tb5Jf5gpcXjzF9hY9L+Cq98LdvsPJe+VOgkydK4MwwJRgaxw6SSfSAFTfeNGOyVQvWyy3wCREhOKHSSnh7Ge7eUHqzdR41i3vf9RfLJs79RhFWq4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761926752; c=relaxed/simple;
-	bh=95X8NfNg94Ut5ngq92r3DA5Bj+TwY3d3z4iHIBxI1SI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=JBZjicEE6DJKEPL9kTJ+whqVA1azcGNSVFrG+9sZfxMmv9D4xM77Y63mtnrzm20nCAZanyAdZqXYSzJWIeZYNytAusTCqbfLeXkE2889tjepHoH6EFEanQ61yB0ZS4KgFw5+MWDyag1Nw5A/tcwpbdaL90g8ptzoFetceysJGQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=r/Eg/NM9; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id E8B3B4E41445;
-	Fri, 31 Oct 2025 16:05:48 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id BFB0260704;
-	Fri, 31 Oct 2025 16:05:48 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 0DFA511818067;
-	Fri, 31 Oct 2025 17:05:46 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1761926748; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=lo3kX3rnuQel+DCOioyxlIMM2H/4F/tW6UiRMe3mpSw=;
-	b=r/Eg/NM9wAN7B/lEvAH/7SeK4ifGkCo9EPiCrT5CP0328hJO4vDoD+Uv5Mq4J2SCgzo+4g
-	PGBPV05ydRhdkXovgas4BwohBayeChJ/7tHqdSqmpEuAR11hL4GYy56Cc9TKSE637j3UBA
-	wfnJvUBI3gD71fMY6B9yBJo1HWiujRpqciGrECY0BhtuhEg6ojmLmXv8viAyALZuf8konV
-	Nt2+8vtKOeKxuWXffAvkoVxkvuorxcOdcWecCo39nmcUR9MDucyiFCKntp5W9QB8uItvXr
-	mNVVzlkfKlQlrLip+Fw5Mjg2UE39avqRr1qRuLYpoEFcY87mNAkt4MxqRlQ5PA==
-From: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-Date: Fri, 31 Oct 2025 17:05:40 +0100
-Subject: [PATCH net 3/3] net: dsa: microchip: Immediately assing IRQ
- numbers
+	s=arc-20240116; t=1761926893; c=relaxed/simple;
+	bh=DBnRWCc9yOikTyJAePQMQXl8JnrzRu+fPN1hD2Ld8qU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eIRAAy3Cv3mCN0owTp9W7KpkNHE4M9QWuKYpJsfjNNGLN/mxGC507nhKV7iHJADgz4jVdALLlBQtcVc9etJPLt6xC015TAx9uehTdnNOSGcAinmRUswvAKQ0hcIR84Br7oi0H8yA+D137fPjosoTfDDNGsX4HEv5H2ErYtMrT7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lNm3q3Fx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDA40C4CEE7;
+	Fri, 31 Oct 2025 16:08:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761926892;
+	bh=DBnRWCc9yOikTyJAePQMQXl8JnrzRu+fPN1hD2Ld8qU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lNm3q3FxkqsL5QWMXLypsadCbVDHoS7srbuL3umgOILAgP2CmodbUjbmVgoYLqLve
+	 gqW5tz1EPBizlAZk5MqElD4DQfIHAxzmtN19JFglozpQKcQGBxYMl7yLPgL06f0Alc
+	 Wmr5T7iw805pUJEirQ0gG/+y+Tb8PrWnxbGm6rEfbp7xc7L8cnr1zQFwXjAnhR1hBH
+	 leAVv9GH6W28+5E2FEe+8vxpWiPWLa7dvgRWsbm9oHb0ZrOKO2qaDT1p5UMDci9pYi
+	 2qfoSEzL1lmFVYHaphzP0WGPUKmYmpipLpz2ALLuOYx0tXFwTP1Ngxt7pTzWQPBIkK
+	 d4ltC1wGy9Gzg==
+Date: Fri, 31 Oct 2025 17:08:09 +0100
+From: Frederic Weisbecker <frederic@kernel.org>
+To: Chen Ridong <chenridong@huaweicloud.com>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
+	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, linux-pci@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 11/33] cpuset: Provide lockdep check for cpuset lock held
+Message-ID: <aQTe6X5XXSp8_3z5@localhost.localdomain>
+References: <20251013203146.10162-1-frederic@kernel.org>
+ <20251013203146.10162-12-frederic@kernel.org>
+ <b94f6159-a280-4890-a02a-f19ff808de5b@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251031-ksz-fix-v1-3-7e46de999ed1@bootlin.com>
-References: <20251031-ksz-fix-v1-0-7e46de999ed1@bootlin.com>
-In-Reply-To: <20251031-ksz-fix-v1-0-7e46de999ed1@bootlin.com>
-To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Richard Cochran <richardcochran@gmail.com>
-Cc: Pascal Eberhard <pascal.eberhard@se.com>, 
- =?utf-8?q?Miqu=C3=A8l_Raynal?= <miquel.raynal@bootlin.com>, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-X-Mailer: b4 0.14.2
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <b94f6159-a280-4890-a02a-f19ff808de5b@huaweicloud.com>
 
-The IRQ numbers created through irq_create_mapping() are only assigned
-to ptpmsg_irq[n].num at the end of the IRQ setup. So if an error occurs
-between their creation and their assignment (for instance during the
-request_threaded_irq() step), we enter the error path and try to release
-the not yet assigned ptpmsg_irq[n].num.
+Le Tue, Oct 14, 2025 at 09:29:25PM +0800, Chen Ridong a écrit :
+> 
+> 
+> On 2025/10/14 4:31, Frederic Weisbecker wrote:
+> > cpuset modifies partitions, including isolated, while holding the cpuset
+> > mutex.
+> > 
+> > This means that holding the cpuset mutex is safe to synchronize against
+> > housekeeping cpumask changes.
+> > 
+> > Provide a lockdep check to validate that.
+> > 
+> > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> > ---
+> >  include/linux/cpuset.h | 2 ++
+> >  kernel/cgroup/cpuset.c | 7 +++++++
+> >  2 files changed, 9 insertions(+)
+> > 
+> > diff --git a/include/linux/cpuset.h b/include/linux/cpuset.h
+> > index 2ddb256187b5..051d36fec578 100644
+> > --- a/include/linux/cpuset.h
+> > +++ b/include/linux/cpuset.h
+> > @@ -18,6 +18,8 @@
+> >  #include <linux/mmu_context.h>
+> >  #include <linux/jump_label.h>
+> >  
+> > +extern bool lockdep_is_cpuset_held(void);
+> > +
+> >  #ifdef CONFIG_CPUSETS
+> >  
+> >  /*
+> > diff --git a/kernel/cgroup/cpuset.c b/kernel/cgroup/cpuset.c
+> > index 8595f1eadf23..aa1ac7bcf2ea 100644
+> > --- a/kernel/cgroup/cpuset.c
+> > +++ b/kernel/cgroup/cpuset.c
+> > @@ -279,6 +279,13 @@ void cpuset_full_unlock(void)
+> >  	cpus_read_unlock();
+> >  }
+> >  
+> > +#ifdef CONFIG_LOCKDEP
+> > +bool lockdep_is_cpuset_held(void)
+> > +{
+> > +	return lockdep_is_held(&cpuset_mutex);
+> > +}
+> > +#endif
+> > +
+> >  static DEFINE_SPINLOCK(callback_lock);
+> >  
+> >  void cpuset_callback_lock_irq(void)
+> 
+> Is the lockdep_is_cpuset_held function actually being used?
+> If CONFIG_LOCKDEP is disabled, compilation would fail with an "undefined reference to
+> lockdep_is_cpuset_held" error.
 
-Assing the IRQ number at mapping creation.
+Although counter-intuitive, this is how the lockdep_is_held() functions family
+do work.
 
-Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
----
- drivers/net/dsa/microchip/ksz_ptp.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+This allows this kind of trick:
 
-diff --git a/drivers/net/dsa/microchip/ksz_ptp.c b/drivers/net/dsa/microchip/ksz_ptp.c
-index c8bfbe5e2157323ecf29149d1907b77e689aa221..a8ad99c6ee35ff60fb56cc5770520a793c86ff66 100644
---- a/drivers/net/dsa/microchip/ksz_ptp.c
-+++ b/drivers/net/dsa/microchip/ksz_ptp.c
-@@ -1102,10 +1102,6 @@ static int ksz_ptp_msg_irq_setup(struct ksz_port *port, u8 n)
- 
- 	strscpy(ptpmsg_irq->name, name[n]);
- 
--	ptpmsg_irq->num = irq_find_mapping(port->ptpirq.domain, n);
--	if (ptpmsg_irq->num < 0)
--		return ptpmsg_irq->num;
--
- 	return request_threaded_irq(ptpmsg_irq->num, NULL,
- 				    ksz_ptp_msg_thread_fn, IRQF_ONESHOT,
- 				    ptpmsg_irq->name, ptpmsg_irq);
-@@ -1135,8 +1131,13 @@ int ksz_ptp_irq_setup(struct dsa_switch *ds, u8 p)
- 	if (!ptpirq->domain)
- 		return -ENOMEM;
- 
--	for (irq = 0; irq < ptpirq->nirqs; irq++)
--		irq_create_mapping(ptpirq->domain, irq);
-+	for (irq = 0; irq < ptpirq->nirqs; irq++) {
-+		port->ptpmsg_irq[irq].num = irq_create_mapping(ptpirq->domain, irq);
-+		if (!port->ptpmsg_irq[irq].num) {
-+			ret = -EINVAL;
-+			goto out;
-+		}
-+	}
- 
- 	ptpirq->irq_num = irq_find_mapping(port->pirq.domain, PORT_SRC_PTP_INT);
- 	if (!ptpirq->irq_num) {
+if (IS_ENABLED(CONFIG_LOCKDEP))
+   WARN_ON_ONCE(!lockdep_is_held(&some_lock))
+
+This works during the compilation because the prototype of lockdep_is_held()
+is declared. And since the IS_ENABLED() is resolved during compilation as well,
+the conditional code is wiped out and therefore not linked. As a result the
+linker doesn't even look for the definition of lockdep_is_held() and we don't
+need to define an off case that would return a wrong assumption.
+
+Thanks.
 
 -- 
-2.51.0
-
+Frederic Weisbecker
+SUSE Labs
 
