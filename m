@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-234718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1BD0C26563
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DEBFC26559
 	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 18:27:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7F8EA4E509F
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D58F23513BF
 	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 17:27:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9794F30648A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9573C306484;
 	Fri, 31 Oct 2025 17:27:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YezzmReo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a1q94A7e"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AD5E2FB0B9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ACDB2F7479;
 	Fri, 31 Oct 2025 17:27:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761931636; cv=none; b=TnT5EDmEsltEIx/8NcIBpGC7ggv42Y7vancDaU0a/z07zkb3wg65aCG0uMX4HSW1lZKeC4B8S3dHFH6JIn6V++3rnT+FIAIsSC6LIKX8EN+8NpIL5lNeNugwKNB3PGEgGQMXIBzWXcNHfaizSTeCp1UppxLs8WsLBdSmlgTWDMU=
+	t=1761931636; cv=none; b=nJrIvcRTmv3pWQNzCSEulAJwMB5IsDr9YipESArs6mK47brq9R6cKa3of09x+xm7RUTW2gam9Ty/v+B+9F6Unn66mBG8rjdVto7x4Hk08sQWgKvhX5DxTv8YPaGoQDztBG2mRwFNlsDG942VhfBn2VGI+BZMYUKX2vY/XUGlBbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1761931636; c=relaxed/simple;
-	bh=t4zIx4Z11X9zS02u+s0yDHEllOpDAKEqSMdLm4SCIRU=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=CrP9t78zJnfwHtRWBwHRG4F5MXCyhSsYZHwNAopccir1eYsrgkRU1N6E9gefZPwV5v5b/j8/gVz1CRO0q6HBuQVoyx5Axtll6f/K5d4JP5clXUzQMxxIqlu6uKGJNFdYpNuVWf8g/qanZvPyZX/jpOqedM415quX7WZG2rumTAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YezzmReo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E6458C4CEE7;
+	bh=p2mT5ghCrdyTCWnU0vH7XPeN9JbRC4F/94aiLq32Z9Y=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=kNQaQoDQtkqHW1gIV626vv1cSUmBdOZUAWkSUcymhS99c7XkuXJY9EPmwOnjOlSCFNas/zDlhIrON5mAFC2xxb5AY9V9FVQk7glxMy2V3DjKW0n/kPdYxO/bDYSUzv2E8DObhRmGRoSUICb9rYZPZpTs0cc+qM2NwMtt9foUisk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a1q94A7e; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id F38D6C4CEFD;
 	Fri, 31 Oct 2025 17:27:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1761931636;
-	bh=t4zIx4Z11X9zS02u+s0yDHEllOpDAKEqSMdLm4SCIRU=;
-	h=From:Subject:Date:To:Cc:Reply-To:From;
-	b=YezzmReoBglXbbwmuX7vtp2Yo5fWl1KttjMuHVlFK4VMneRMnUbGJrpjNwcAAJWAv
-	 wBBNW2CT8fXIxeK1SdB3sV/vmSNuC1LZ7O04Mk86aAGJHpEQ/jrqWDNUxj5oE4QiWs
-	 exT7DjIq2vEm1+p3quxHp7VZRNfl7+VX+/h/ZOiinzitSJDqSeAjcggvv11zdcJiTn
-	 xv6YMeUrySBTqXgwi892Ivh7Dvv/m0b4+v08+8AoHjzafHbhyId+B6+XsoZGyRj+ri
-	 LC77rKbh7ewjJkAEmFCj6al2UmFsQl2V8TDo1mbaiQsv7d5CH/zBN6NdDmu9UI9AjB
-	 xjNbYqGXrC5Og==
+	bh=p2mT5ghCrdyTCWnU0vH7XPeN9JbRC4F/94aiLq32Z9Y=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
+	b=a1q94A7e1tB/Ndw3YaERBAvBBHnHmwpkQz1T/cx1sKJyueluvPzr5uULV30AELkko
+	 OYMfz/tmwhjXX1x9BsRr/mX7t3aGc/uLGNv3jmE5GJc76maQs8Nh357oRzeAsRoBbv
+	 6eWDyr1snOYReKrsAI/wnr1DZqcBjRED15OZZWDTDhNp1BsYH9oVJc1oLQ49WsafGs
+	 Ydhm8lQrn/fF3SAUV0NUymlT3Knmvw4usVDIc7ZNMhi0uBbrc5Wy0uWhBIfFUcAnjt
+	 0Sjk9gV9CX35hzLSeQ6mqq/PG6yrVpXg/F/6CWiAVT06WScPNE8VjGBryECA6RF0oP
+	 3q2Gi5wfgIJGw==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1D82CCFA02;
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E39B9CCFA00;
 	Fri, 31 Oct 2025 17:27:15 +0000 (UTC)
 From: Rohan G Thomas via B4 Relay <devnull+rohan.g.thomas.altera.com@kernel.org>
-Subject: [PATCH net-next v2 0/4] net: stmmac: socfpga: Add Agilex5 platform
- support and enhancements
-Date: Sat, 01 Nov 2025 01:27:06 +0800
-Message-Id: <20251101-agilex5_ext-v2-0-a6b51b4dca4d@altera.com>
+Date: Sat, 01 Nov 2025 01:27:07 +0800
+Subject: [PATCH net-next v2 1/4] net: stmmac: socfpga: Agilex5 EMAC
+ platform configuration
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,11 +56,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAGrxBGkC/22NwQqDMBBEf0X23JRsxEp66n8UKWmy6oKNkgRJk
- fx7g+cehzfz5oBIgSnCvTkg0M6RV1+DujRgZ+MnEuxqBiVVh1JpYSZeKHcvyklY7N+u77V1NEJ
- dbIFGzqftCZ6S8LUFQyUzx7SG73mz48n/GncUUqBuEVtVze72MEuiYK52/cBQSvkBxwC0UbEAA
- AA=
-X-Change-ID: 20251029-agilex5_ext-c17bd779cdef
+Message-Id: <20251101-agilex5_ext-v2-1-a6b51b4dca4d@altera.com>
+References: <20251101-agilex5_ext-v2-0-a6b51b4dca4d@altera.com>
+In-Reply-To: <20251101-agilex5_ext-v2-0-a6b51b4dca4d@altera.com>
 To: Maxime Chevallier <maxime.chevallier@bootlin.com>, 
  Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -73,11 +71,11 @@ Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
  linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
  Rohan G Thomas <rohan.g.thomas@altera.com>
 X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1761931634; l=1421;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1761931634; l=3455;
  i=rohan.g.thomas@altera.com; s=20250815; h=from:subject:message-id;
- bh=t4zIx4Z11X9zS02u+s0yDHEllOpDAKEqSMdLm4SCIRU=;
- b=8tiYGEzN7w19aqajaofQRjkGf2F3m3eiOWWkDj28bjUqjQj6UIaO4zBm5kbVZIxDz1VNq8w2i
- dSp1UujxJ92AuHoJwtCC4A5HU1kp3nuDde1lw7H3PS28n7NfeQi3Q6x
+ bh=vntBDZwpth1lYOT1gYNvvzXdYXYWr60f8HSNHxW366k=;
+ b=HqeT8OjjuqcrdJzqlau3nGAQRSE7vEu6aZPenJXIQ6PQ2HX6N2GytKv8laI1uw9z9vSrrXAwf
+ QLHNl52JUwxAY+CrHPyW+OGjd+sKn5ppyam5qhcFD+DdH1WPKYgc3eb
 X-Developer-Key: i=rohan.g.thomas@altera.com; a=ed25519;
  pk=5yZXkXswhfUILKAQwoIn7m6uSblwgV5oppxqde4g4TY=
 X-Endpoint-Received: by B4 Relay for rohan.g.thomas@altera.com/20250815
@@ -85,41 +83,99 @@ X-Endpoint-Received: by B4 Relay for rohan.g.thomas@altera.com/20250815
 X-Original-From: Rohan G Thomas <rohan.g.thomas@altera.com>
 Reply-To: rohan.g.thomas@altera.com
 
-This patch series adds support for the Agilex5 EMAC platform to the
-dwmac-socfpga driver.
+From: Rohan G Thomas <rohan.g.thomas@altera.com>
 
-The series includes:
-   - Platform configuration for Agilex5 EMAC
-   - Enabling Time-Based Scheduling (TBS) for Tx queues 6 and 7
-   - Enabling TCP Segmentation Offload(TSO)
-   - Adding hardware-supported cross timestamping using the SMTG IP,
-     allowing precise synchronization between MAC and system time via
-     PTP_SYS_OFFSET_PRECISE.
+Agilex5 HPS EMAC uses the dwxgmac-3.10a IP, unlike previous socfpga
+platforms which use dwmac1000 IP. Due to differences in platform
+configuration, Agilex5 requires a distinct setup.
+
+Introduce a setup_plat_dat() callback in socfpga_dwmac_ops to handle
+platform-specific setup. This callback is invoked before
+stmmac_dvr_probe() to ensure the platform data is correctly
+configured. Also, implemented separate setup_plat_dat() callback for
+current socfpga platforms and Agilex5.
 
 Signed-off-by: Rohan G Thomas <rohan.g.thomas@altera.com>
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Tested-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
-Changes in v2:
-- Fixed reduntant leftover tsis irq and use_ns changes from smtg_crosststamp
-- Keep common platform config for socfpga platforms in socfpga_dwmac_probe
-- Link to v1: https://lore.kernel.org/r/20251029-agilex5_ext-v1-0-1931132d77d6@altera.com
+ .../net/ethernet/stmicro/stmmac/dwmac-socfpga.c    | 30 +++++++++++++++++++---
+ 1 file changed, 27 insertions(+), 3 deletions(-)
 
----
-Rohan G Thomas (4):
-      net: stmmac: socfpga: Agilex5 EMAC platform configuration
-      net: stmmac: socfpga: Enable TBS support for Agilex5
-      net: stmmac: socfpga: Enable TSO for Agilex5 platform
-      net: stmmac: socfpga: Add hardware supported cross-timestamp
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+index 2ff5db6d41ca08a1652d57f3eb73923b9a9558bf..5666b01723643984f21b996e7653a36f4dc22e30 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
+@@ -44,6 +44,7 @@
+ struct socfpga_dwmac;
+ struct socfpga_dwmac_ops {
+ 	int (*set_phy_mode)(struct socfpga_dwmac *dwmac_priv);
++	void (*setup_plat_dat)(struct socfpga_dwmac *dwmac_priv);
+ };
+ 
+ struct socfpga_dwmac {
+@@ -441,6 +442,23 @@ static int socfpga_dwmac_init(struct platform_device *pdev, void *bsp_priv)
+ 	return dwmac->ops->set_phy_mode(dwmac);
+ }
+ 
++static void socfpga_gen5_setup_plat_dat(struct socfpga_dwmac *dwmac)
++{
++	struct plat_stmmacenet_data *plat_dat = dwmac->plat_dat;
++
++	plat_dat->core_type = DWMAC_CORE_GMAC;
++
++	/* Rx watchdog timer in dwmac is buggy in this hw */
++	plat_dat->riwt_off = 1;
++}
++
++static void socfpga_agilex5_setup_plat_dat(struct socfpga_dwmac *dwmac)
++{
++	struct plat_stmmacenet_data *plat_dat = dwmac->plat_dat;
++
++	plat_dat->core_type = DWMAC_CORE_XGMAC;
++}
++
+ static int socfpga_dwmac_probe(struct platform_device *pdev)
+ {
+ 	struct plat_stmmacenet_data *plat_dat;
+@@ -497,25 +515,31 @@ static int socfpga_dwmac_probe(struct platform_device *pdev)
+ 	plat_dat->pcs_init = socfpga_dwmac_pcs_init;
+ 	plat_dat->pcs_exit = socfpga_dwmac_pcs_exit;
+ 	plat_dat->select_pcs = socfpga_dwmac_select_pcs;
+-	plat_dat->core_type = DWMAC_CORE_GMAC;
+ 
+-	plat_dat->riwt_off = 1;
++	ops->setup_plat_dat(dwmac);
+ 
+ 	return devm_stmmac_pltfr_probe(pdev, plat_dat, &stmmac_res);
+ }
+ 
+ static const struct socfpga_dwmac_ops socfpga_gen5_ops = {
+ 	.set_phy_mode = socfpga_gen5_set_phy_mode,
++	.setup_plat_dat = socfpga_gen5_setup_plat_dat,
+ };
+ 
+ static const struct socfpga_dwmac_ops socfpga_gen10_ops = {
+ 	.set_phy_mode = socfpga_gen10_set_phy_mode,
++	.setup_plat_dat = socfpga_gen5_setup_plat_dat,
++};
++
++static const struct socfpga_dwmac_ops socfpga_agilex5_ops = {
++	.set_phy_mode = socfpga_gen10_set_phy_mode,
++	.setup_plat_dat = socfpga_agilex5_setup_plat_dat,
+ };
+ 
+ static const struct of_device_id socfpga_dwmac_match[] = {
+ 	{ .compatible = "altr,socfpga-stmmac", .data = &socfpga_gen5_ops },
+ 	{ .compatible = "altr,socfpga-stmmac-a10-s10", .data = &socfpga_gen10_ops },
+-	{ .compatible = "altr,socfpga-stmmac-agilex5", .data = &socfpga_gen10_ops },
++	{ .compatible = "altr,socfpga-stmmac-agilex5", .data = &socfpga_agilex5_ops },
+ 	{ }
+ };
+ MODULE_DEVICE_TABLE(of, socfpga_dwmac_match);
 
- .../net/ethernet/stmicro/stmmac/dwmac-socfpga.c    | 166 ++++++++++++++++++++-
- drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h     |   5 +
- 2 files changed, 168 insertions(+), 3 deletions(-)
----
-base-commit: 0d0eb186421d0886ac466008235f6d9eedaf918e
-change-id: 20251029-agilex5_ext-c17bd779cdef
-
-Best regards,
 -- 
-Rohan G Thomas <rohan.g.thomas@altera.com>
+2.43.7
 
 
 
