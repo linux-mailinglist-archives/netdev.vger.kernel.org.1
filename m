@@ -1,73 +1,65 @@
-Return-Path: <netdev+bounces-234627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4279CC24CA6
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 12:32:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CEF4C24CC1
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 12:34:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 115754EA889
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 11:32:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 532B01A650D6
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 11:33:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 476AE3469E9;
-	Fri, 31 Oct 2025 11:32:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFB1A346E5B;
+	Fri, 31 Oct 2025 11:32:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="AvTipmG7"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="FSsGn6O0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EF6533B96F
-	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 11:32:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.165.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67814345CCC;
+	Fri, 31 Oct 2025 11:32:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761910346; cv=none; b=WxDtOT6RNc8JZTTmrtiuNtTCZgHJfTIU9St8Wsqu5vkO7RpMyeJ6c7QCtgEVfodhJl501s8Mita7tJyp1jITCG8yq583Qq/Hb1EdwX5D6VIml7TAvjhfq8yF85bdE1Jzl8vhNjZzZ0I/ocmJAnhI5bsY5K7oZ+6qZ3tRpjj8JaA=
+	t=1761910356; cv=none; b=PDx76LJYm1BXE0pPREvP0/2y5ZejTwK1nPlRB40SNzDBUGAsHpB2SJ0FvDpfbwLVNLh4EZYGLguY9yFQkXmZSaUmzN/xMZCwFElUzWphY2bcuIC0F/KQtHQfp9/I6uAvIlMrfZ5wgL5MxXFagjnMByCwaM3EUJ2PxbdHpCP/VfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761910346; c=relaxed/simple;
-	bh=sUVKHpNXcFFgncPRqyFF1NXllnmZHV3ORBnURBazKso=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=V+gQW6KXJ4Camrc0B8Ie4b+h5MquKXUggwXWejK89m7HiwY3KS45gZBZeVifjZm0Gb48hdLAML7SFNi46yFjVcI3qIeISRYaCxVPZn/3iiQ9wabD2CbDZKQsLLUgHL8aHaIOoIjlXqIMKSS4RaMhXek5D2AE+KcFVWSn/oDzuLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=AvTipmG7; arc=none smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 59VBET1o022884;
-	Fri, 31 Oct 2025 11:27:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=FgDLey3Zqi6Osn80JreSghmBPaQW7
-	A9EuAfKqF/D7oQ=; b=AvTipmG77YCjuduOB30Id9Dhjc5FE+QutREQPIxN2qPaB
-	WItENITmXryo/P0JqYex/efyLtI/b0qJJGz3zYoOItapSgemWwpqVrJlblCcvmpw
-	ECuq0sdU7wsJEd1zDubSo7zXhqttN4+jBCs/lgrD9oIANCnmS2PY+4DTiBT1NPJi
-	AEH4GJwlY0pnWoPMcTVsHevU2p2qeGq4ts3qM0neqo91S5heew5GjvFVKxBUfrtv
-	6QjJDy89DnBUMbh+MjlHfoN9pZDK4AIguSaBObt48+mKHfyvfLnKVmwREdEn2syo
-	54So1I6S3223A4V6UBN+VbpQv5b8p3hhx03y51C/A==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4a4v2gg11v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 31 Oct 2025 11:26:59 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 59V9tFw7007797;
-	Fri, 31 Oct 2025 11:26:58 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4a359wj3as-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 31 Oct 2025 11:26:58 +0000
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 59VBPvAO003458;
-	Fri, 31 Oct 2025 11:26:57 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 4a359wj39u-1;
-	Fri, 31 Oct 2025 11:26:57 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: zhuyikai1@h-partners.com, gongfan1@huawei.com, andrew+netdev@lunn.ch,
-        kuba@kernel.org, davem@davemloft.net, edumazet@google.com,
-        pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org
-Cc: alok.a.tiwarilinux@gmail.com, alok.a.tiwari@oracle.com
-Subject: [PATCH net-next] hinic3: fix misleading error message in hinic3_open_channel()
-Date: Fri, 31 Oct 2025 04:26:44 -0700
-Message-ID: <20251031112654.46187-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1761910356; c=relaxed/simple;
+	bh=mVdS29UjqWzYR1IlN5m+Wl9jK4cj+2iDhcBcstIIX6w=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VNei4mG57NzzsxZNsbIrCOTc5huUp8/5B+DceayTveqQMRWgbqD0sj5YeiISpxDt2TDG132auNmDNOmlZKKqCCSDW0q8IEYfe6Rk/9cqzBm4EpDzjDOQ0+KkSPjEPCnpQav46A2ywl9ild7UQWjh2YjX5/0qaxTT954G1kT9MBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=FSsGn6O0; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id B2251A05F6;
+	Fri, 31 Oct 2025 12:32:30 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=mail; bh=T6GAuWPvlYyAu1pNjUnBBtP7kNooiRsf2mOkJEA1f4A=; b=
+	FSsGn6O0yF92a+NQlCa8mtQtAmGZWxY8Ao9UbHI5L0SlqEv90RYYL1sb0xW6et0F
+	l97aovr90oajThJ00W7afL1BcWog9FUemcOF/o5wJsdmT1jM1rz286BaPzRflV9S
+	3mqpAGYUXga1Ijt8OziQD+PP1+jwVHAPodW0DWy7ve93XMK19NeyQauGXf54AeVW
+	GUUz4vuDdxXhAyK1sgfrv8VmRfb4aUPpClCcQTuI7dINxPjUWJJlnNx4aSPsMOJj
+	AiPQslSYLGv6VUcR6uDdulQc6Ez+YSkx3sXysyUwx+8npbDa+7qdsF0Qpfzdn4la
+	2CXoTxbFrWjklgZl8jZnz9sxnDNZGcT1nXfBNx6fxLZEq9tM2IgaqUZo3H3a6FEk
+	4xis4jOvRo50rtCXmgU5QbTn2pz5LIjpQA5QedRwjCCX3Og1i0lomEH8LZNNGdyR
+	AskQcMBFEgtdq+kzJTkyCaAmYHTMhE68VZ7at4irnZjy1aBZjL4NoViWIVdKw4TB
+	j5xiYwbzOKWKu1AHHAOmwb/JoVJdvDw4aNI2fe7efoCYH0Zkq/RlubNrd6mn+MQw
+	KR/y/K7200gJo0NOf8/Wl8g1E0Fho2jAiIwF+x2MnO42dAs1kJh+rygjZFpzh5gH
+	cOub/xu8RbKG7pVQBIPGROvQdYvGHKrMglz7XWPS3ck=
+From: Buday Csaba <buday.csaba@prolan.hu>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Philipp Zabel
+	<p.zabel@pengutronix.de>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: Buday Csaba <buday.csaba@prolan.hu>
+Subject: [PATCH net-next 0/3] net: mdio: improve reset handling of mdio devices
+Date: Fri, 31 Oct 2025 12:32:25 +0100
+Message-ID: <cover.1761909948.git.buday.csaba@prolan.hu>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,56 +67,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-10-31_03,2025-10-29_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999
- malwarescore=0 bulkscore=0 suspectscore=0 phishscore=0 spamscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2510240000 definitions=main-2510310103
-X-Proofpoint-GUID: MCY_mnQ8nwdLWaX6Dbux_nrxjekk8NJx
-X-Authority-Analysis: v=2.4 cv=afBsXBot c=1 sm=1 tr=0 ts=69049d03 b=1 cx=c_pps
- a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
- a=x6icFKpwvdMA:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8
- a=YzBAHazEskuLAWdpv40A:9 cc=ntf awl=host:12123
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMDMxMDEwMSBTYWx0ZWRfXzQlMYmyV//Q/
- FkS9UoBIgxH7yvKUMLGaw6PW7ZlGDezHLcmlVYB93gAvCqjjXXksHX4MX8VUA1+s7e6MLJITji8
- V32tomI1J4ovzmtiFQZ8YRMq+3IGLFytAwJaWwkiLWgnxrqDjprQUd41i8OPtCVunOL9NbfZdZe
- zyZzxqU+DLFo6VQA1gTwkcyn1gP23xK9AwHVW0e5WwsgFRgHP1AWB8PDxLO4xDFktcP8WaJPIF3
- XgS19JNXhO8sZ3VhYbQhdGiITFfQ9urj6xO760VtPE1yxoA1A7oTtWwzs4uhp0cI64rHYsFm9Uu
- W1rj5ezMBxAChmBbjoAMEZga/UxD2892O9Cxy5qd2w8mLPH6RloKVKlnFKnN84vhdy3kSJDvU9v
- aFqJd9HBiHiiq9NTbX6+DVp2CV+kOQk/M/3Ocnw7p5ZpIv4ZAPE=
-X-Proofpoint-ORIG-GUID: MCY_mnQ8nwdLWaX6Dbux_nrxjekk8NJx
+Content-Type: text/plain
+X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1761910350;VERSION=8001;MC=4041627775;ID=195341;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
+X-ESET-Antispam: OK
+X-EsetResult: clean, is OK
+X-EsetId: 37303A296767155F677D60
 
-The error message printed when hinic3_configure() fails incorrectly
-reports "Failed to init txrxq irq", which does not match the actual
-operation performed. The hinic3_configure() function sets up various
-device resources such as MTU and RSS parameters , not IRQ initialization.
+This patchset refactors and slightly improves the reset handling of
+`mdio_device`. 
 
-Update the log to "Failed to configure device resources" to make the
-message accurate and clearer for debugging.
+The patches were split from a larger series, dicussed previously in the
+link below.
 
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
----
-Fixes: b83bb584bc97 ("hinic3: Tx & Rx configuration")
----
- drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Link: https://lore.kernel.org/all/cover.1761732347.git.buday.csaba@prolan.hu/
 
-diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c b/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
-index 0fa3c7900225..bbf22811a029 100644
---- a/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
-+++ b/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
-@@ -304,7 +304,7 @@ static int hinic3_open_channel(struct net_device *netdev)
- 
- 	err = hinic3_configure(netdev);
- 	if (err) {
--		netdev_err(netdev, "Failed to init txrxq irq\n");
-+		netdev_err(netdev, "Failed to configure device resources\n");
- 		goto err_uninit_qps_irq;
- 	}
- 
+Buday Csaba (3):
+  net: mdio: move device reset functions to mdio_device.c
+  net: mdio: common handling of phy device reset properties
+  net: mdio: improve reset handling in mdio_device.c
+
+ drivers/net/mdio/fwnode_mdio.c |  5 ----
+ drivers/net/phy/mdio_bus.c     | 36 ++---------------------
+ drivers/net/phy/mdio_device.c  | 53 ++++++++++++++++++++++++++++++++++
+ include/linux/mdio.h           |  2 ++
+ 4 files changed, 57 insertions(+), 39 deletions(-)
+
+
+base-commit: 0d0eb186421d0886ac466008235f6d9eedaf918e
 -- 
-2.50.1
+2.39.5
+
 
 
