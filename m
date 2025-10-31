@@ -1,113 +1,119 @@
-Return-Path: <netdev+bounces-234574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10A55C2389B
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 08:23:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 492C5C238DD
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 08:32:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E816D4E477B
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 07:23:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A49673A7A53
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 07:32:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 830C0329377;
-	Fri, 31 Oct 2025 07:23:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33D47329C5B;
+	Fri, 31 Oct 2025 07:32:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nSV9TCqI"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02E8425DAFF;
-	Fri, 31 Oct 2025 07:23:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EC622F60A3
+	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 07:32:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761895418; cv=none; b=MPCKLl9aLtH3UMsa7ALS+Vaysaf8ImchW3ODRCztKwcqOLlGpfmWsodSqPYOEW8PlaWLLIEJA0+V7vT6ggFkz+9t+oZ3bVDzLUJYRb8AmRvIs9pAYtFZV4boQ+Svb2/H+DGrblVqHyx+qx5S/aiQTzWVn+HFgi9tiK2ZmDOdLj8=
+	t=1761895940; cv=none; b=qArPePyP47gRUMr519HkrSH8pJ3SGbV3psIouqu8rekJvjFSzafF0wx8rdG0iqLwvmNyxI9s1JZB2Uzo0HNF7JmsijrOkiLjl28qKWJ6D4fCal4nMy6W/zzE1h5k2A6bmhiRy098nJm/dACBTwCqVQe1gfGQuToi+2tUkG1son0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761895418; c=relaxed/simple;
-	bh=ipp8VzrDOvVxQ1hBoLStaLTuFg60IyRgnAEoxUY7aws=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IpalMkeqcAUIQFlTUSbiZvPTlBV6ZmGTYwmK4ceXzi3/MWV222ibj1HAdQbiGiD/SfosqcsCBdFxjJNFh706PbFKpxyI+KwfH/o9rOJP0h2cb9tlWfEeCmklfZOWCGnfeSHfKpgL3ZMICLeTtGlOtmyfJZXVc8vYazR3TDsiloE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from [192.168.0.100] (unknown [114.241.85.109])
-	by APP-01 (Coremail) with SMTP id qwCowAAXf2nRYwRptSe8AA--.1032S2;
-	Fri, 31 Oct 2025 15:22:57 +0800 (CST)
-Message-ID: <ee49cb12-2116-4f0d-8265-cd1c42b6037b@iscas.ac.cn>
-Date: Fri, 31 Oct 2025 15:22:56 +0800
+	s=arc-20240116; t=1761895940; c=relaxed/simple;
+	bh=BMrQhc78/tWbKmAlQyS3CQRZfigmg1PQWr4K/DHEl3A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ax+jQOdn6ucw7z1s8PVvXpkNfnX5EmFVD4/wgcou2YtWWvEt9nffk6It3dGIxLH53f2K6fBVBQr9IWPJLf2S40uOBcK32NZN278W+wXx6fjK/jhz0SBAbrtezQxqve4FXF1LSKOi7y4YFFVstapWY6npQzeibrHp3xPcMrXmooQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nSV9TCqI; arc=none smtp.client-ip=209.85.128.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-7829fc3b7deso20140477b3.3
+        for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 00:32:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761895937; x=1762500737; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BMrQhc78/tWbKmAlQyS3CQRZfigmg1PQWr4K/DHEl3A=;
+        b=nSV9TCqI+lLKZqb9Rlc8zZedS4htr3Zm6tW/f0p1+r3ewf8ntrsFhdQxWP4himYHmI
+         UbHgMSjGkCWF4KRG5NLg1U2vcjbOqrgbAj13sVLFmBqYx7FDsWMLOlDNtab/jIpMwqRE
+         jdjLLwF/5S9YZ1T5PPbnYPqhqO3x07RBHNFWLsPZtYpco0EXMMIhxXRN+Tz6LR9BWd4O
+         pzUCZUoh7VmvVziXpQffGUNW7A3qlvhd3TYyJaxb8m9qEtwUbWZCONJS+moIXjeo5SwC
+         XVFGYns02/O8S4cR/aP74C7xtNrd5MrOQTBBTAx/R8rybznKgmxigHOCsEtG6ehFdvkq
+         84IA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761895937; x=1762500737;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BMrQhc78/tWbKmAlQyS3CQRZfigmg1PQWr4K/DHEl3A=;
+        b=TYi8qk1uqT+GqNMsCYoMPXfKIYg13VSZwpAE0eI14QGGO0IKWK6VB7ia74pQ6WVl62
+         SUiWknRn2lyndehMEETrhi2mi6Nsd+pRndNQk1gRfjFmgLtfalzao5KMQn2jZFqAKyuJ
+         /BAP+GDP5EznC1DqsSrpvEy01Jl+Ku+JImqLlAk8spLlG5UW1o2wHplX+9ua+xmOvVIy
+         4XPvzWRt3pnUfn+ofBmKig3Q9due4st16zos6lVGfbdCumv7m0vJ1CxSH0dWWjWccVap
+         3lHHJBbCwoA1Cs5aJ3a3QKBmNXbxkeo8L/kpEj5JvHMYoSbc8a/NvTBYYug8/uMIsT/W
+         OSXg==
+X-Forwarded-Encrypted: i=1; AJvYcCW536y7jM5blJKWCtRtp9nIv/fVhXZC68UclXdIRF5S5F+DMUTwwoITOVtAcDRsf9FQ64gA3xA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxUxtoNtEQ0M5InZjP12vwQiaNATOBhkjQFWrQg62qz7QpTANsM
+	G8+Jy8jUwA/hCtzciXdnMvwyUVdLXOiBaSPTFjXSvI58PNAxCx1HcTI+olxuU8Eb7k//2oUUZDd
+	peH+tYZjfYKkLKiGAIdvrIX0ZORqV14o=
+X-Gm-Gg: ASbGncuT4/VGTZJKqdt9OwZebuMjRlvC0Ljen145qLLHG0R/n6PAI0kO53mo4p7w3oT
+	HBVNnLzEn6xhT94eDrjN3hDtpvlz39JusKbyZVi9fa2gpZWoTvvxeW2HbnoDCk/krED6rkv7mbG
+	0NUfw9lwQwDLNxW6FCQ/P7tAGFtr11NyXB3sNI9B4cP/tE7n6S3IPwqUJ6ZIaVi6Odl0oXes9Cf
+	9SwBctz7Vf3S2yzdmmYuO7EtzAbkHu9lPFxvOdnVMG2/Lkl4IaOA13nkyOccIAUYrJJrAt5AXs9
+	v4wRWDVcWJg=
+X-Google-Smtp-Source: AGHT+IHJQTA3KNqKyYFQiTmzgxAa+tjK8r9Su/bQ2kHLfDXiO0jTTvMOB4R2M/5y1O7Kk/f5k2x5Z4CMKas681wgGyM=
+X-Received: by 2002:a05:690c:fc8:b0:781:7ee:10b5 with SMTP id
+ 00721157ae682-786483e8ac9mr22021267b3.5.1761895937576; Fri, 31 Oct 2025
+ 00:32:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: spacemit: Implement emac_set_pauseparam properly
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Yixun Lan <dlan@gentoo.org>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Troy Mitchell <troy.mitchell@linux.spacemit.com>, netdev@vger.kernel.org,
- linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
- linux-kernel@vger.kernel.org
-References: <20251030-k1-ethernet-fix-autoneg-v1-1-baa572607ccc@iscas.ac.cn>
- <2eb5f9fc-d173-4b9e-89a3-87ad17ddd163@lunn.ch>
-Content-Language: en-US
-From: Vivian Wang <wangruikang@iscas.ac.cn>
-In-Reply-To: <2eb5f9fc-d173-4b9e-89a3-87ad17ddd163@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:qwCowAAXf2nRYwRptSe8AA--.1032S2
-X-Coremail-Antispam: 1UD129KBjvdXoWruFyxZFyUZFykCrWrCrWktFb_yoWkJFcE9F
-	yqyanrJw17Ar4UA3y3KF15Ars3C39Y9a4UArykKr1xZa4rAFWxXF1kCF1xGa4fJ3y5G3s5
-	tFWFv347Gwn7XjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbsAYjsxI4VWkKwAYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I
-	6I8E6xAIw20EY4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM2
-	8CjxkF64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0
-	cI8IcVCY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I
-	8E87Iv6xkF7I0E14v26F4UJVW0owAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
-	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
-	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7
-	MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r
-	4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF
-	67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2I
-	x0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2
-	z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnU
-	UI43ZEXa7IU56yI5UUUUU==
-X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
+References: <20251030064736.24061-1-dqfext@gmail.com> <CAKYAXd9nkQFgXPpKpOY+O_B5HRLeyiZKO5a4X5MdfjYoO_O+Aw@mail.gmail.com>
+In-Reply-To: <CAKYAXd9nkQFgXPpKpOY+O_B5HRLeyiZKO5a4X5MdfjYoO_O+Aw@mail.gmail.com>
+From: Qingfang Deng <dqfext@gmail.com>
+Date: Fri, 31 Oct 2025 15:32:06 +0800
+X-Gm-Features: AWmQ_bn7BSFll8h75cmXBIOIlKgqr5WL20vu8LJPrTdeOFLYt0KTtgFQaVW8jBU
+Message-ID: <CALW65jZQzTMv1HMB3R9cSACebVagtUsMM9iiL8zkTGmethfcPg@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: server: avoid busy polling in accept loop
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Tom Talpey <tom@talpey.com>, Ronnie Sahlberg <lsahlber@redhat.com>, Hyunchul Lee <hyc.lee@gmail.com>, 
+	linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Sasha Levin <sashal@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+Hi Namjae,
 
-On 10/31/25 05:32, Andrew Lunn wrote:
->> [...]
->>
->> -		emac_set_fc(priv, fc);
->> -	}
->> +	phy_set_asym_pause(dev->phydev, pause->rx_pause, pause->tx_pause);
-> It is hard to read what this patch is doing, but there are 3 use cases.
+On Thu, Oct 30, 2025 at 4:11=E2=80=AFPM Namjae Jeon <linkinjeon@kernel.org>=
+ wrote:
+> > Fixes: 0626e6641f6b ("cifsd: add server handler for central processing =
+and tranport layers")
+> > Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+> Applied it to #ksmbd-for-next-next.
+> Thanks!
 
-Yeah, I guess the patch doesn't look great. I'll reorganize it in the
-next version to make it clearer what the new implementation is and also
-fix it up per your other comments.
+I just found that this depends on another commit which is not in
+kernel versions earlier than v6.1:
+a7c01fa93aeb ("signal: break out of wait loops on kthread_stop()")
 
-> 1) general autoneg for link speed etc, and pause autoneg
-> 2) general autoneg for link speed etc, and forced pause
-> 3) forced link speed etc, and forced pause.
+With the current Fixes tag, this commit will be backported to v5.15
+automatically. But without said commit, kthread_stop() cannot wake up
+a blocking kernel_accept().
+Should I change the Fixes tag, or inform linux-stable not to backport
+this patch to v5.15?
 
-Thanks for the tip on the different cases. However, there's one bit I
-don't really understand: Isn't this set_pauseparam thing only for
-setting pause autoneg / force?
++Cc: Jason, Sasha, and GregKH
 
-AFAICT from my testing, forcing link speed and duplex from ethtool still
-works, so I'm not sure what I'm missing here.
-
-> I don't see all these being handled. It gets much easier to get this
-> right if you make use of phylink, since phylink handles all the
-> business logic for you.
-
-I'll look into calling phylink next version. Thanks.
-
-Vivian "dramforever" Wang
-
+Regards,
+Qingfang
 
