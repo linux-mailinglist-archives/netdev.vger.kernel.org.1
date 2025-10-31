@@ -1,124 +1,110 @@
-Return-Path: <netdev+bounces-234528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A5A8C22CD0
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 01:37:14 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id A912BC22CE5
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 01:40:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 49BAA4E201A
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 00:37:13 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2FAD334D9DE
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 00:40:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA3CC1DEFE7;
-	Fri, 31 Oct 2025 00:37:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD4D71EA7DD;
+	Fri, 31 Oct 2025 00:40:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aJ5r1ie3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VziMbjcw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9260F137923;
-	Fri, 31 Oct 2025 00:37:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9861A1E32A2
+	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 00:40:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761871028; cv=none; b=rXGmljbRoIGTb+QbMaGCZ/TxlePXh7e/B0EPx8s7F387yU+Vfq2JS78XBsPcVSuy11BS4K5xMHKLZNX8oeI3iy8R4t0/SCzqO5DvW4cafOZukgJlRLyiNr+kw1p6K+bn+TLJAX2UAFES/2rRZQ7a7bMPWUP58oHYGKw0zsMio10=
+	t=1761871240; cv=none; b=AWHsQMWyL52b8LSPXsQ97ID4k4qIvzLTUTrkW2VfCCHa/hkMNQk4HtGyR7ef+Hn26B/DqhlUjujT1Huipxss2NosCnBBoGUTSHVEEbpC0wbb+kCL4Z9pMLeS/8tPxwR+c5XO7bpml65bK+lnjPyV1KNj2spSBPpHGu1jcYNYiGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761871028; c=relaxed/simple;
-	bh=jLf1Hh7rEwj5sCd2S4sAxXRf3uxFm8dvr7AA+/qLXb8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O/NqPlkNaSxVEjM4xVDZiq5/Q0maD7Q1pAhQoCeZF2s5ZfM6VD59dGnuNP6xC+sREyW8YeNAr2MkiYtFYeF53LeM99ZvORvLq/OyixIDp2LGsuSw9e2qq+f6f46jchtTAFgQW1n3kyEU9gv6TVPvmpAGfc/R7ubbU7WBQd2lFPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aJ5r1ie3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B925FC4CEF1;
-	Fri, 31 Oct 2025 00:37:05 +0000 (UTC)
+	s=arc-20240116; t=1761871240; c=relaxed/simple;
+	bh=0vuz2VHvA5+JVcY4xy7n0t6baXokYp0CeD4KL4ApNJs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=mZTZ6m8/2dhwyOPKEP1RKNoZXHaWHkmq6V4oQhXwS2sJIHBAVNLCs/VB+JjBvF7ywFD+ZDCacm9odfoFIqgBJJ74AQ/0TBUQME/DgBBiyKYtMVh1OUb0JL5a9liW5WwgMkeHqPHYTq7nD576RzFN9c/XdLrLqrA4csqQg1Vwwz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VziMbjcw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 06D2AC4CEFD;
+	Fri, 31 Oct 2025 00:40:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761871026;
-	bh=jLf1Hh7rEwj5sCd2S4sAxXRf3uxFm8dvr7AA+/qLXb8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aJ5r1ie323hi5IWdAPIVoMekAOs+9PKprMhFwfUgXxM2Bxy0CkZhpZ3oixlDAY7Hq
-	 3Jo1VOPBuyVuulRMoK5BrAJftKZr8b+e/Y+l7cHQoNLxgkO9syJeeATgRniETncCS5
-	 tkHsTppVPVawO6rvkAqaBnvHFsa7w/GLXs24FT1tc2vTc64f+md4q6cVz3N/qoL+Ko
-	 zSwBIIoVKJ0sEMZugGDgiUn9+DG92np5GZKbTLpKADIXMqSHBPhFL1JLT9ecdc/VDE
-	 d3n98CzJWdTTgWYmp13SqMUp6Hc0rKB5iP+SZhj7WGv0Pn4kx7dziDQ95isF0DDfcB
-	 rhy35ocCcF8WA==
-Date: Thu, 30 Oct 2025 19:37:04 -0500
-From: Rob Herring <robh@kernel.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Andreas Schirm <andreas.schirm@siemens.com>,
-	Lukas Stockmann <lukas.stockmann@siemens.com>,
-	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
-	Peter Christen <peter.christen@siemens.com>,
-	Avinash Jayaraman <ajayaraman@maxlinear.com>,
-	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
-	Juraj Povazanec <jpovazanec@maxlinear.com>,
-	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
-	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
-	"Livia M. Rosu" <lrosu@maxlinear.com>,
-	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net-next v5 06/12] dt-bindings: net: dsa: lantiq,gswip:
- add support for MII delay properties
-Message-ID: <20251031003704.GA533574-robh@kernel.org>
-References: <cover.1761823194.git.daniel@makrotopia.org>
- <8025f8c5fcc31adf6c82f78e5cfaf75b0f89397c.1761823194.git.daniel@makrotopia.org>
- <20251031002924.GA516142-robh@kernel.org>
+	s=k20201202; t=1761871240;
+	bh=0vuz2VHvA5+JVcY4xy7n0t6baXokYp0CeD4KL4ApNJs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=VziMbjcwzcZD+LmVtkQZC0JYjdBxSJWCRsJRYKrUfngLzC2v1QwEbU1lTMm/yur6O
+	 NuYhjp6NzxG29b5X+elMdl8oQPJF5QbY2B4jU0HOobP32VFeUEB8iE5tkCWA4I6NRx
+	 mAp8N0V+SScBWGWJUcGVjZTV3Gh6In8WlZkHzTOY92cjhn0zGH1rUXsr5ahdebNs6Y
+	 97ekEuHz/H+qF5yHpHnsVo2JVLBEOIL5G5pjH8o+JexUcwqAGTPmWh/zhl6Dl2Mt4+
+	 YZgCr//WUIXB5eSw89/Tp4Qql92lsZtkpD79sHB9ZMxJJyoTlWOiLQ6WjMUAXh2dd1
+	 CSv9u5dYq8T7A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD753A78A6F;
+	Fri, 31 Oct 2025 00:40:17 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251031002924.GA516142-robh@kernel.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/9][pull request] Intel Wired LAN Driver Updates
+ 2025-10-29 (ice, i40e, idpf, ixgbe, igbvf)
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176187121650.4089032.16865163612180136513.git-patchwork-notify@kernel.org>
+Date: Fri, 31 Oct 2025 00:40:16 +0000
+References: <20251029231218.1277233-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20251029231218.1277233-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org
 
-On Thu, Oct 30, 2025 at 07:29:24PM -0500, Rob Herring wrote:
-> On Thu, Oct 30, 2025 at 11:28:35AM +0000, Daniel Golle wrote:
-> > Add support for standard tx-internal-delay-ps and rx-internal-delay-ps
-> > properties on port nodes to allow fine-tuning of RGMII clock delays.
-> > 
-> > The GSWIP switch hardware supports delay values in 500 picosecond
-> > increments from 0 to 3500 picoseconds, with a post-reset default of 2000
-> > picoseconds for both TX and RX delays. The driver currently sets the
-> > delay to 0 in case the PHY is setup to carry out the delay by the
-> > corresponding interface modes ("rgmii-id", "rgmii-rxid", "rgmii-txid").
-> > 
-> > This corresponds to the driver changes that allow adjusting MII delays
-> > using Device Tree properties instead of relying solely on the PHY
-> > interface mode.
-> > 
-> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> > ---
-> > v4:
-> >  * remove misleading defaults
-> > 
-> > v3:
-> >  * redefine ports node so properties are defined actually apply
-> >  * RGMII port with 2ps delay is 'rgmii-id' mode
-> > 
-> >  .../bindings/net/dsa/lantiq,gswip.yaml        | 31 +++++++++++++++++--
-> >  1 file changed, 28 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
-> > index f3154b19af78..8ccbc8942eb3 100644
-> > --- a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
-> > +++ b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
-> > @@ -6,8 +6,31 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
-> >  
-> >  title: Lantiq GSWIP Ethernet switches
-> >  
-> > -allOf:
-> > -  - $ref: dsa.yaml#/$defs/ethernet-ports
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Tony Nguyen <anthony.l.nguyen@intel.com>:
+
+On Wed, 29 Oct 2025 16:12:07 -0700 you wrote:
+> For ice:
+> Michal converts driver to utilize Page Pool and libeth APIs. Conversion
+> is based on similar changes done for iavf in order to simplify buffer
+> management, improve maintainability, and increase code reuse across
+> Intel Ethernet drivers.
 > 
-> I think you can keep this as you aren't adding custom properties.
+> Additional details:
+> https://lore.kernel.org/intel-wired-lan/20250925092253.1306476-1-michal.kubiak@intel.com/
+> 
+> [...]
 
-Nevermind, I see the next patch now...
+Here is the summary with links:
+  - [net-next,1/9] ice: remove legacy Rx and construct SKB
+    https://git.kernel.org/netdev/net-next/c/9e314a3c525c
+  - [net-next,2/9] ice: drop page splitting and recycling
+    https://git.kernel.org/netdev/net-next/c/3a4f419f7509
+  - [net-next,3/9] ice: switch to Page Pool
+    https://git.kernel.org/netdev/net-next/c/93f53db9f9dc
+  - [net-next,4/9] ice: implement configurable header split for regular Rx
+    https://git.kernel.org/netdev/net-next/c/8adfcfd6a2ee
+  - [net-next,5/9] ice: Allow 100M speed for E825C SGMII device
+    https://git.kernel.org/netdev/net-next/c/ba2807b869a1
+  - [net-next,6/9] i40e: avoid redundant VF link state updates
+    https://git.kernel.org/netdev/net-next/c/a7ae783da0b9
+  - [net-next,7/9] idpf: remove duplicate defines in IDPF_CAP_RSS
+    https://git.kernel.org/netdev/net-next/c/5d9b400e6f7e
+  - [net-next,8/9] ixgbe: fix typos in ixgbe driver comments
+    https://git.kernel.org/netdev/net-next/c/6ef670d833a8
+  - [net-next,9/9] igbvf: fix misplaced newline in VLAN add warning message
+    https://git.kernel.org/netdev/net-next/c/9157b8a88c0b
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
