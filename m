@@ -1,124 +1,218 @@
-Return-Path: <netdev+bounces-234578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5C67C239BA
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 08:49:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0EA1C239E7
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 08:55:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7239C34D0C3
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 07:49:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1B031A22F4E
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 07:56:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D455C2ECD36;
-	Fri, 31 Oct 2025 07:49:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5A283203A7;
+	Fri, 31 Oct 2025 07:55:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SxqUeRtN"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="HrnEVODp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB9F2868B0
-	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 07:49:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29422D7D2E;
+	Fri, 31 Oct 2025 07:55:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761896956; cv=none; b=ZG5ED5yQIeBbzXgewUmmiDFS0IJ4sm5wRA+fYUIcpIREUd8L1bO947C2C4nE33rnx/U2fQy/mZbidTxtXgjFiSNrPg9JtVDsEAzR1gEnSB43rBWTrZSSR0Azmk/iqvODQDufXTbZVL0ggLzzGVXwaQzcaES3ioxB38pTBxc1ZIc=
+	t=1761897337; cv=none; b=IxLRIyUinKPEkfvNYr86Z5Siirw7YEmIyQHWtvURqB+V+Z3K7j4NN0xgESy/Z5WKN6xxmUJzKgwdEFMm1bjhBNp4NFFZzUBLPr/a+LAn5jkpLbJf7F28AAycOkuaOAJl4agLzRsI1PZoznPtuT8csBVNL3cuikJI+VmjjYZcdXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761896956; c=relaxed/simple;
-	bh=mj/okHz5PHZV0wR4OqbZRN7R8+J74cRQmf1t7fmO9CM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=d9m6lx04S3JQZeL2tbTrFEAEYN18xnNdnHMcopmnUD2ycuwqH4f1fO+qQLzFfctLsBI+sFBc6yzRZmJZAXxZNQL5kOSya/M9qeMzwesZ5+uXZq8JSGCfsXxw0Ef/iE9SKP7mhm3ZDJzAb82jlD+yWne0OGPLYWoowA58NrBkIxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SxqUeRtN; arc=none smtp.client-ip=209.85.128.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-7814273415cso19059417b3.1
-        for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 00:49:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761896954; x=1762501754; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mj/okHz5PHZV0wR4OqbZRN7R8+J74cRQmf1t7fmO9CM=;
-        b=SxqUeRtNx+BaFjKkAlBbX7Mz9rBWZvOHFHBBx7DvJ5kbVTi/gEolF71Y0iXVrEy8wq
-         gfim5iF35rbhHKYutLaDI8vk26onDVBH2uUPdH80t55bHluITtWBV5PBuLppl7Tztvw6
-         8OH5GnMoTFAnMF0cI4GQoHXMWJf96mgeHxbLOxAG9QKDeE4j6sh9O5W0a3hPcEhUlbxL
-         oIi3F3Od+j3vwyg/EEvlD+EzM9wbu7myXB9DMTsN5FnyVaGQ4LbR9wHXRfJfte6Dw0Ai
-         aDzIn5lKow3KOKHsnZKOHdN5bmQi8HVNYNU1HlWxA4PYe3l9a/LfhsnH1xr8N2ytovnB
-         Sq9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761896954; x=1762501754;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mj/okHz5PHZV0wR4OqbZRN7R8+J74cRQmf1t7fmO9CM=;
-        b=e5c9e9HGum3Ov4Ou8Gpl10upP39z4raecrmaq5w6EpMBFHKnkuz9PAG9oTFHFDnNTD
-         YRM/y78CPFdWwC/Gj0vjBdhHXpcj/nlCb+ayropVFzrw6J1BULkQQvwfT1RznaM8RyJ/
-         JNtEEnPA/H4HfVFhziHKvlwAcRVXIwTf/cd8Gs78TQSoyTLkZH09xLhHBBGjXN3zjY51
-         7qUiLEkdFUj3Z0ZjRWFhilSFEMQNnaexvbI231gJ2D5N3Q9xiESdjR18mwP+RXqJRzEy
-         VrE/CZzdmTF+hdiBUNDru4/N7q2okUsNUM++wGx0Cnbln17toGiOlS31rxynA1Jria4D
-         14Tg==
-X-Forwarded-Encrypted: i=1; AJvYcCUHz1kC3M/ey/vI1hB6MDmIDQFhAY9x8I6lWp/nE/NP409J86IDWADUpdGiqi/bAEIVZ+J9ZZE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywgc+1yEC2RdXLPFpTgCEHxw3heaIAyt4SNdLboFXNhU046oJMW
-	rJLuWP2lgmpIF5NlVm9HUvDG2PHyXyDzv5M5cv4+lgr9XxUulLdpF7LR+Eyw5+dZteZ9bfdAImO
-	eDC2saLXn3+HOgS3iDW0hkEVn4nWyBJQ=
-X-Gm-Gg: ASbGncsJcDx3hjEXldKoNzUY+T+S6pvKkAuTICe0fgVuk2NGgzN2f+3ZQa2GNV6EBn8
-	uf9UdrDui5p9VoHZsjb4B2F750tSCDrbV3KvyiTZpiKqg9HIYGZ1VszAC3abKSjPP3i2OL9Oxcj
-	NMtaaMjQ7iv18risScjPB6SCDCmUfKV59nmE0SUgABB1gT0r+0XtMZmC78BbdncSEw52ao7CKni
-	5+O4Mcq3cgX7xnopZrXwf0dTFfU2sBUi+NFSBms6amqVBUxVJF+w/dWkXINh764ABxJ/PIhmnG3
-	QJlsLIscaLtcH1uIUXwvXQ==
-X-Google-Smtp-Source: AGHT+IEccNo+Ud/dOtRufb2gzRJKeSMooBpV7Zz3ch+oKF7jaIplRlzywy5u4xYHf4jy/vs0gsE5Pv+qfW9zHowBm0A=
-X-Received: by 2002:a05:690c:3603:b0:739:7377:fdc4 with SMTP id
- 00721157ae682-786484dd91dmr22017567b3.35.1761896954009; Fri, 31 Oct 2025
- 00:49:14 -0700 (PDT)
+	s=arc-20240116; t=1761897337; c=relaxed/simple;
+	bh=tRaPSB02NSM670yRYpWQLUz0VyeuspHIKjpXseASx7A=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=I42Txv8533jAozLwsB8spgVFYL1POVJL8/aMlYMKUUtRFMk8pMSQ0LB0Y2caxbCZ+GBxuPkdmfng1HA2chV0bjM1gk2QHgzCK8OJiibkmN1JziNcDrtYVqs6cm/mMzgfJFQt1kaKTQVi6z3OgV+xCW9JBYg5Vzax1b5E/t2/QLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=HrnEVODp; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1761897336; x=1793433336;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=tRaPSB02NSM670yRYpWQLUz0VyeuspHIKjpXseASx7A=;
+  b=HrnEVODpiGyj3qUEfP3RDLX9FWHGhK9FTo1RcGBJKS4JSvI9CbtEbt0F
+   i/0wqJ1+A4NvxqVocvvuw0j327vWHLssjgtsJDLkBeW1SnHwGgNfjIZqk
+   XHPFiXl8IYklyJxCy294DNiDVJAtQjjY1KYjTx96pqS797UvzNCcsbAqN
+   zstwl2Q8vCQSbF9Syghcijrl1JuZ2sI/G9zx76uyVibQiQdIUFeniJAnI
+   L6lza3H4dSzarQINkaL/7nf7esfWOAk5oMxTUgIDVDP5hF+2KYtENLJzT
+   7i3RAeWFsySsrl3+APT9q6GJhXjD8T9T1PJ4SIKGxXt/2vBe9Pt49PC0t
+   Q==;
+X-CSE-ConnectionGUID: 14ruu4AOSFGGHKcwuzeuHA==
+X-CSE-MsgGUID: WagJdeaGSMOTetzvcxJHhg==
+X-IronPort-AV: E=Sophos;i="6.19,268,1754982000"; 
+   d="scan'208";a="48511970"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2025 00:55:35 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.87.151) by
+ chn-vm-ex3.mchp-main.com (10.10.87.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.29; Fri, 31 Oct 2025 00:55:29 -0700
+Received: from localhost (10.10.85.11) by chn-vm-ex04.mchp-main.com
+ (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
+ Transport; Fri, 31 Oct 2025 00:55:29 -0700
+Date: Fri, 31 Oct 2025 08:54:11 +0100
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+CC: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net v3 1/2] net: phy: micrel: lan8842 errata
+Message-ID: <20251031075411.kcxdfonu42wj5rjh@DEN-DL-M31836.microchip.com>
+References: <20251030074941.611454-1-horatiu.vultur@microchip.com>
+ <20251030074941.611454-2-horatiu.vultur@microchip.com>
+ <aQM-9u6MQKN_t9fE@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251030064736.24061-1-dqfext@gmail.com> <CAKYAXd9nkQFgXPpKpOY+O_B5HRLeyiZKO5a4X5MdfjYoO_O+Aw@mail.gmail.com>
- <CALW65jZQzTMv1HMB3R9cSACebVagtUsMM9iiL8zkTGmethfcPg@mail.gmail.com> <2025103116-grinning-component-3aea@gregkh>
-In-Reply-To: <2025103116-grinning-component-3aea@gregkh>
-From: Qingfang Deng <dqfext@gmail.com>
-Date: Fri, 31 Oct 2025 15:49:02 +0800
-X-Gm-Features: AWmQ_bnGnl7eYzzqxU3isuAIhu5FYgWbwGA7Uh3VYsm5FYbX-qLmiqhxk1Hb_ds
-Message-ID: <CALW65jZgu2=BfSEvi5A8vG_vBKrg=XLs68UoE3F3GBOOpeJtpg@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: server: avoid busy polling in accept loop
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
-	Ronnie Sahlberg <lsahlber@redhat.com>, Hyunchul Lee <hyc.lee@gmail.com>, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	Sasha Levin <sashal@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <aQM-9u6MQKN_t9fE@shell.armlinux.org.uk>
 
-On Fri, Oct 31, 2025 at 3:44=E2=80=AFPM Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
->
-> On Fri, Oct 31, 2025 at 03:32:06PM +0800, Qingfang Deng wrote:
-> > Hi Namjae,
-> >
-> > On Thu, Oct 30, 2025 at 4:11=E2=80=AFPM Namjae Jeon <linkinjeon@kernel.=
-org> wrote:
-> > > > Fixes: 0626e6641f6b ("cifsd: add server handler for central process=
-ing and tranport layers")
-> > > > Signed-off-by: Qingfang Deng <dqfext@gmail.com>
-> > > Applied it to #ksmbd-for-next-next.
-> > > Thanks!
-> >
-> > I just found that this depends on another commit which is not in
-> > kernel versions earlier than v6.1:
-> > a7c01fa93aeb ("signal: break out of wait loops on kthread_stop()")
-> >
-> > With the current Fixes tag, this commit will be backported to v5.15
-> > automatically. But without said commit, kthread_stop() cannot wake up
-> > a blocking kernel_accept().
-> > Should I change the Fixes tag, or inform linux-stable not to backport
-> > this patch to v5.15?
->
-> Email stable@vger.kernel.org when it lands in Linus's tree to not
-> backport it that far.
+The 10/30/2025 10:33, Russell King (Oracle) wrote:
 
-Noted. Thanks!
+Hi Russell,
+
+> 
+> On Thu, Oct 30, 2025 at 08:49:40AM +0100, Horatiu Vultur wrote:
+> > +static int lan8842_erratas(struct phy_device *phydev)
+> > +{
+> > +     int ret;
+> > +
+> > +     /* Magjack center tapped ports */
+> > +     ret = lanphy_write_page_reg(phydev, LAN8814_PAGE_POWER_REGS,
+> > +                                 LAN8814_POWER_MGMT_MODE_3_ANEG_MDI,
+> > +                                 LAN8814_POWER_MGMT_VAL1);
+> > +     if (ret < 0)
+> > +             return ret;
+> > +
+> > +     ret = lanphy_write_page_reg(phydev, LAN8814_PAGE_POWER_REGS,
+> > +                                 LAN8814_POWER_MGMT_MODE_4_ANEG_MDIX,
+> > +                                 LAN8814_POWER_MGMT_VAL1);
+> > +     if (ret < 0)
+> > +             return ret;
+> > +
+> > +     ret = lanphy_write_page_reg(phydev, LAN8814_PAGE_POWER_REGS,
+> > +                                 LAN8814_POWER_MGMT_MODE_5_10BT_MDI,
+> > +                                 LAN8814_POWER_MGMT_VAL1);
+> > +     if (ret < 0)
+> > +             return ret;
+> > +
+> > +     ret = lanphy_write_page_reg(phydev, LAN8814_PAGE_POWER_REGS,
+> > +                                 LAN8814_POWER_MGMT_MODE_6_10BT_MDIX,
+> > +                                 LAN8814_POWER_MGMT_VAL1);
+> > +     if (ret < 0)
+> > +             return ret;
+> > +
+> > +     ret = lanphy_write_page_reg(phydev, LAN8814_PAGE_POWER_REGS,
+> > +                                 LAN8814_POWER_MGMT_MODE_7_100BT_TRAIN,
+> > +                                 LAN8814_POWER_MGMT_VAL2);
+> > +     if (ret < 0)
+> > +             return ret;
+> > +
+> > +     ret = lanphy_write_page_reg(phydev, LAN8814_PAGE_POWER_REGS,
+> > +                                 LAN8814_POWER_MGMT_MODE_8_100BT_MDI,
+> > +                                 LAN8814_POWER_MGMT_VAL3);
+> > +     if (ret < 0)
+> > +             return ret;
+> > +
+> > +     ret = lanphy_write_page_reg(phydev, LAN8814_PAGE_POWER_REGS,
+> > +                                 LAN8814_POWER_MGMT_MODE_9_100BT_EEE_MDI_TX,
+> > +                                 LAN8814_POWER_MGMT_VAL3);
+> > +     if (ret < 0)
+> > +             return ret;
+> > +
+> > +     ret = lanphy_write_page_reg(phydev, LAN8814_PAGE_POWER_REGS,
+> > +                                 LAN8814_POWER_MGMT_MODE_10_100BT_EEE_MDI_RX,
+> > +                                 LAN8814_POWER_MGMT_VAL4);
+> > +     if (ret < 0)
+> > +             return ret;
+> > +
+> > +     ret = lanphy_write_page_reg(phydev, LAN8814_PAGE_POWER_REGS,
+> > +                                 LAN8814_POWER_MGMT_MODE_11_100BT_MDIX,
+> > +                                 LAN8814_POWER_MGMT_VAL5);
+> > +     if (ret < 0)
+> > +             return ret;
+> > +
+> > +     ret = lanphy_write_page_reg(phydev, LAN8814_PAGE_POWER_REGS,
+> > +                                 LAN8814_POWER_MGMT_MODE_12_100BT_EEE_MDIX_TX,
+> > +                                 LAN8814_POWER_MGMT_VAL5);
+> > +     if (ret < 0)
+> > +             return ret;
+> > +
+> > +     ret = lanphy_write_page_reg(phydev, LAN8814_PAGE_POWER_REGS,
+> > +                                 LAN8814_POWER_MGMT_MODE_13_100BT_EEE_MDIX_RX,
+> > +                                 LAN8814_POWER_MGMT_VAL4);
+> > +     if (ret < 0)
+> > +             return ret;
+> > +
+> > +     return lanphy_write_page_reg(phydev, LAN8814_PAGE_POWER_REGS,
+> > +                                  LAN8814_POWER_MGMT_MODE_14_100BTX_EEE_TX_RX,
+> > +                                  LAN8814_POWER_MGMT_VAL4);
+> 
+> This is a lot of repetition.
+> 
+> Is it worth storing the errata register information in a struct, and
+> then using a loop to write these registers. Something like:
+> 
+> struct lanphy_reg_data {
+>         int page;
+>         u16 addr;
+>         u16 val;
+> ;
+> 
+> static const struct lanphy_reg_data short_centre_tap_errata[] = {
+>         ...
+> };
+> 
+> static int lanphy_write_reg_data(struct phy_device *phydev,
+>                                  const struct lanphy_reg_data *data,
+>                                  size_t num)
+> {
+>         int ret = 0;
+> 
+>         while (num--) {
+>                 ret = lanphy_write_page_reg(phydev, data->page, data->addr,
+>                                             data->val);
+>                 if (ret)
+>                         break;
+>         }
+> 
+>         return 0;
+> }
+> 
+> static int lan8842_erratas(struct phy_device *phydev)
+> {
+>         int ret;
+> 
+>         ret = lanphy_write_reg_data(phydev, short_centre_tap_errata,
+>                                     ARRAY_SIZE(short_centre_tap_errata));
+>         if (ret)
+>                 return ret;
+> 
+>         return lanphy_write_reg_data(phydev, blah_errata,
+>                                      ARRAY_SIZE(blah_errata));
+> }
+> 
+> ?
+
+That is a really good suggestion. I will do that in the next version.
+
+> 
+> --
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+
+-- 
+/Horatiu
 
