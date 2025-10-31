@@ -1,302 +1,179 @@
-Return-Path: <netdev+bounces-234649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id F36C4C252C1
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 14:06:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52507C25297
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 14:05:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CFB864F75C8
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 13:00:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DECC4262E4
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 13:05:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EB5634AB15;
-	Fri, 31 Oct 2025 13:00:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45EC33446DD;
+	Fri, 31 Oct 2025 13:05:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I622t+vo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zGWTOgvT"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B809343D72
-	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 13:00:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D7F12E6CA8
+	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 13:04:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761915618; cv=none; b=NefAs830s2k+I7vjQosQb8ob+sL6XvDYJyJ+6jz2e3gCw4BvpXON322eiHuBAaSV4oxRhclNamcQe6fbE0gqU5M5F4KY7hqIXrFoeYMoJfJLH52wvGurnxnC9126tMOsydmwZrV4ULRsQ2Nt+ZVFPqbz//FnCzMyQsEnLXv7C20=
+	t=1761915901; cv=none; b=TPLp1DocxMvXGDHF8xDVbWxLmRFUgShiLKPK4XOLYcoPkeJJ4b3mKS+vlLcyb8ZBT8h8qlBq++lDYMdQOpWdY+nabZxLZR30ZOmHonroUh2xUEGR0XnL9OtONWFDpQ2A7+aJnTo8HQK2cBinWdnjjn4SFdZpLbPULPsB0mgoEy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761915618; c=relaxed/simple;
-	bh=0gvffhtHm9TKGqAoa6OvbnQN2GBuYskUEFqtaqSKDrs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=r9fuigxpCx7QBYmLqlUW/kM0uPaOa/UfW98X3rwF3ufiNN78q04qAYdWAZeuZwohWag2GfLQ9ERBuiA8wI+fIrW6ycUJU3u6D19sfbg9Cou5+6AQ/n1yKO26FvOuheIZwODexZcp+NrRRPN5Y89RWg12KiyWmtHHzLXzT+vV4Ls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I622t+vo; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761915615;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uLDwt+NU3vvKrlrQRKfDo5aEPn3HnX2ZWzIgGku0kDc=;
-	b=I622t+votir+o6W0kijC/MB1m+syBwAS+VBTOeZVDYp0jyWxEQkh+mWRXnBcRh0Z/eyBWg
-	WqcBbBL9pny3UtX/Iif5TixJ/n/mCaVrQsk+6IoufMY2cQoOK8baExbyTc7MnGEV5EHt0o
-	bb/LFV0w25o6JNCJ1TH6KbIKfY3SWc0=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-607-qDUMAdLUOq24oc-NOEKyLQ-1; Fri,
- 31 Oct 2025 09:00:10 -0400
-X-MC-Unique: qDUMAdLUOq24oc-NOEKyLQ-1
-X-Mimecast-MFC-AGG-ID: qDUMAdLUOq24oc-NOEKyLQ_1761915606
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CB1101955F3E;
-	Fri, 31 Oct 2025 13:00:03 +0000 (UTC)
-Received: from pauld.westford.csb (unknown [10.22.80.244])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2491A1955BE3;
-	Fri, 31 Oct 2025 12:59:53 +0000 (UTC)
-Date: Fri, 31 Oct 2025 08:59:51 -0400
-From: Phil Auld <pauld@redhat.com>
-To: Frederic Weisbecker <frederic@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gabriele Monaco <gmonaco@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
-	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 13/33] cpuset: Update HK_TYPE_DOMAIN cpumask from cpuset
-Message-ID: <20251031125951.GA430420@pauld.westford.csb>
-References: <20251013203146.10162-1-frederic@kernel.org>
- <20251013203146.10162-14-frederic@kernel.org>
+	s=arc-20240116; t=1761915901; c=relaxed/simple;
+	bh=ZXkLDTr8nSCVJ26GqbMBd9kDRvIEMx/HbigcYuaDpnE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=At3QlfTsvejExOo5iBdcodRM/N1wI6TGTpRhkEeIyGOT7MDSNqEionqGB0AqJI2OOJ6wZ5ByPzany1DFKclFcd7uVebFszqyvB8anmD55/i4rQRWEEzStiFB8iKVFgQMQTnmvvLTzUiJU9V261yNsq6KD50f6fkI7RbHkIAoAgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zGWTOgvT; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4ecf03363c9so16513721cf.1
+        for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 06:04:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1761915898; x=1762520698; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kDiDynQdbM4YCkifi3qZwLvI//rX+qgG18kLYdtT/4E=;
+        b=zGWTOgvTB3D/F66yiJp5yMOyuYmT3GOWJK09pjy7HAD27axObslNoBdhL+1clNj2iE
+         no2NH/+gS2aW5AuBgoXJNVx5f7OeCaeGtaa93ET/ggb5vdTnEyu18YGIkhFPkkhcVwdV
+         5Gd+uB8RZolTTjthq8iiA9r8xfuIMbXNlRvPmP/CF5g6qDmJUNX/WY98mBwuGxe4y2Bn
+         jEZ0G6AUEeZIJTxsm+xXcrtygNWhxhsUgfUnNe8iQ5ya2LwRnpTCN2M+dk/l9+1nsJ35
+         x2BScEfgyc5PqcAA4u5Fdv3XoR9gfS3LhHtDvyCq2lobQ3aAKu7ni1bgtHeZs5p3QVzg
+         8SNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761915898; x=1762520698;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kDiDynQdbM4YCkifi3qZwLvI//rX+qgG18kLYdtT/4E=;
+        b=h2r+UPsQrmmlsG3Pu0PS6NgfPg0bSib8DtWsw5IznRUNiG5PJCsOTRljy3tNOSaA1e
+         DkZKDWtlYwOhHg0R5Y9Y9Zsy804gEZgI+RJ90aB9FBh4azXydRvCvoaeFBTnccP6w/4S
+         y5It4UTI1jodIQizp0ePEMSjZHmuG4Iv/YJZbHfCUISTospKWxXPTquxfC7DtPXuodX6
+         HfTcDHWN89Xdkz4wVlZwjyuSyAV+CrZLZmkrfIUB7ahy+IANmtI4M3zGI7a9jbIWDrVD
+         rd+dFWwioygF/0aaERtsbCcR/QlI/ATaPPZEfly3+k2KLsNSFzxncLQwbmYZ8ltQB6M/
+         KiYA==
+X-Forwarded-Encrypted: i=1; AJvYcCVvnn6i/oxJOHKcyW2Coi0qGwxv9l4OnYsXxVOyaIUr+1qgsuyMyO0H5qwj8GofD1b0amPnudY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmZjldG089YkNiKNuYSdy9S1/m+ifMOPI7p55ZsLoouW4SiQqu
+	au45irXHPo3ZBi7s4b6Yut4x+H1dI6H4sp8vbiMHNKPYg1wTWOrjGvzrbv6uM0TpxlWydfmY1P7
+	vCdNd/JXtoK+Of5v59DlQhjxwjdj3uGceK5VmrLN2
+X-Gm-Gg: ASbGncsd8bT/N3IMFpZp6Y2DDx+sDGplFpi/unoPc7UaqzvKOwW63F1gHP0rUretnAk
+	ALHHFCDOXIuCg/pUm3eOE5yYSX+qko70oXpD5A4Z5yf4EdHhWBppyX5Mpe6KwRunpsHsM4kabqS
+	b6MnaHWgWX+JcsQB4BR3AaEcjmGnvmTW1DukReovPJZhqji37lG6rj6eM5J5D5Tv7CXBgs2AXo1
+	+dsYlekwDN5JL3kKq/BVfvZm+Hyh/COzcY7d2jpM4fS69f2mQY/Y3G4AEODkeP5od/YkI8=
+X-Google-Smtp-Source: AGHT+IHegrj0d0o9bzyKTvokwzDp4oyCK2YZvXyBZt7oa/GcTr6PrpKIl05o7IhuEsdDpdFZDAMZ3HEW+TjxbJ0bK34=
+X-Received: by 2002:a05:622a:4106:b0:4eb:9d8d:2f24 with SMTP id
+ d75a77b69052e-4ed30f9c8camr40022091cf.40.1761915898124; Fri, 31 Oct 2025
+ 06:04:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251013203146.10162-14-frederic@kernel.org>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+References: <20251031-infoleak-v1-1-9f7250ee33aa@gmail.com>
+In-Reply-To: <20251031-infoleak-v1-1-9f7250ee33aa@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 31 Oct 2025 06:04:45 -0700
+X-Gm-Features: AWmQ_bnXpmkVe3zJAzdYr8G9bxgCyUuK6HP9RyRDjUsMT-RKlpN9aPLHRuGIsyc
+Message-ID: <CANn89iJL3upMfHB+DsuS8Ux06fM36dbHeaU5xof5-T+Fe80tFg@mail.gmail.com>
+Subject: Re: [PATCH] net: sched: act_ife: initialize struct tc_ife to fix
+ KMSAN kernel-infoleak
+To: Ranganath V N <vnranganath.20@gmail.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org, 
+	david.hunter.linux@gmail.com, khalid@kernel.org, 
+	syzbot+0c85cae3350b7d486aee@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Frederic,
-
-On Mon, Oct 13, 2025 at 10:31:26PM +0200 Frederic Weisbecker wrote:
-> Until now, HK_TYPE_DOMAIN used to only include boot defined isolated
-> CPUs passed through isolcpus= boot option. Users interested in also
-> knowing the runtime defined isolated CPUs through cpuset must use
-> different APIs: cpuset_cpu_is_isolated(), cpu_is_isolated(), etc...
-> 
-> There are many drawbacks to that approach:
-> 
-> 1) Most interested subsystems want to know about all isolated CPUs, not
->   just those defined on boot time.
-> 
-> 2) cpuset_cpu_is_isolated() / cpu_is_isolated() are not synchronized with
->   concurrent cpuset changes.
-> 
-> 3) Further cpuset modifications are not propagated to subsystems
-> 
-> Solve 1) and 2) and centralize all isolated CPUs within the
-> HK_TYPE_DOMAIN housekeeping cpumask.
-> 
-> Subsystems can rely on RCU to synchronize against concurrent changes.
-> 
-> The propagation mentioned in 3) will be handled in further patches.
-> 
-> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+On Fri, Oct 31, 2025 at 5:24=E2=80=AFAM Ranganath V N <vnranganath.20@gmail=
+.com> wrote:
+>
+> Fix a KMSAN kernel-infoleak detected  by the syzbot .
+>
+> [net?] KMSAN: kernel-infoleak in __skb_datagram_iter
+>
+> In tcf_ife_dump(), the variable 'opt' was partially initialized using a
+> designatied initializer. While the padding bytes are reamined
+> uninitialized. nla_put() copies the entire structure into a
+> netlink message, these uninitialized bytes leaked to userspace.
+>
+> Initialize the structure with memset before assigning its fields
+> to ensure all members and padding are cleared prior to beign copied.
+>
+> This change silences the KMSAN report and prevents potential information
+> leaks from the kernel memory.
+>
+> This fix has been tested and validated by syzbot. This patch closes the
+> bug reported at the following syzkaller link and ensures no infoleak.
+>
+> Reported-by: syzbot+0c85cae3350b7d486aee@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3D0c85cae3350b7d486aee
+> Tested-by: syzbot+0c85cae3350b7d486aee@syzkaller.appspotmail.com
+> Fixes: ef6980b6becb ("introduce IFE action")
+> Signed-off-by: Ranganath V N <vnranganath.20@gmail.com>
 > ---
->  include/linux/sched/isolation.h |  2 +
->  kernel/cgroup/cpuset.c          |  2 +
->  kernel/sched/isolation.c        | 75 ++++++++++++++++++++++++++++++---
->  kernel/sched/sched.h            |  1 +
->  4 files changed, 74 insertions(+), 6 deletions(-)
-> 
-> diff --git a/include/linux/sched/isolation.h b/include/linux/sched/isolation.h
-> index da22b038942a..94d5c835121b 100644
-> --- a/include/linux/sched/isolation.h
-> +++ b/include/linux/sched/isolation.h
-> @@ -32,6 +32,7 @@ extern const struct cpumask *housekeeping_cpumask(enum hk_type type);
->  extern bool housekeeping_enabled(enum hk_type type);
->  extern void housekeeping_affine(struct task_struct *t, enum hk_type type);
->  extern bool housekeeping_test_cpu(int cpu, enum hk_type type);
-> +extern int housekeeping_update(struct cpumask *mask, enum hk_type type);
->  extern void __init housekeeping_init(void);
->  
->  #else
-> @@ -59,6 +60,7 @@ static inline bool housekeeping_test_cpu(int cpu, enum hk_type type)
->  	return true;
->  }
->  
-> +static inline int housekeeping_update(struct cpumask *mask, enum hk_type type) { return 0; }
->  static inline void housekeeping_init(void) { }
->  #endif /* CONFIG_CPU_ISOLATION */
->  
-> diff --git a/kernel/cgroup/cpuset.c b/kernel/cgroup/cpuset.c
-> index aa1ac7bcf2ea..b04a4242f2fa 100644
-> --- a/kernel/cgroup/cpuset.c
-> +++ b/kernel/cgroup/cpuset.c
-> @@ -1403,6 +1403,8 @@ static void update_unbound_workqueue_cpumask(bool isolcpus_updated)
->  
->  	ret = workqueue_unbound_exclude_cpumask(isolated_cpus);
->  	WARN_ON_ONCE(ret < 0);
-> +	ret = housekeeping_update(isolated_cpus, HK_TYPE_DOMAIN);
-> +	WARN_ON_ONCE(ret < 0);
->  }
->  
->  /**
-> diff --git a/kernel/sched/isolation.c b/kernel/sched/isolation.c
-> index b46c20b5437f..95d69c2102f6 100644
-> --- a/kernel/sched/isolation.c
-> +++ b/kernel/sched/isolation.c
-> @@ -29,18 +29,48 @@ static struct housekeeping housekeeping;
->  
->  bool housekeeping_enabled(enum hk_type type)
->  {
-> -	return !!(housekeeping.flags & BIT(type));
-> +	return !!(READ_ONCE(housekeeping.flags) & BIT(type));
->  }
->  EXPORT_SYMBOL_GPL(housekeeping_enabled);
->  
-> +static bool housekeeping_dereference_check(enum hk_type type)
-> +{
-> +	if (IS_ENABLED(CONFIG_LOCKDEP) && type == HK_TYPE_DOMAIN) {
-> +		/* Cpuset isn't even writable yet? */
-> +		if (system_state <= SYSTEM_SCHEDULING)
-> +			return true;
-> +
-> +		/* CPU hotplug write locked, so cpuset partition can't be overwritten */
-> +		if (IS_ENABLED(CONFIG_HOTPLUG_CPU) && lockdep_is_cpus_write_held())
-> +			return true;
-> +
-> +		/* Cpuset lock held, partitions not writable */
-> +		if (IS_ENABLED(CONFIG_CPUSETS) && lockdep_is_cpuset_held())
-> +			return true;
-> +
-> +		return false;
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +static inline struct cpumask *housekeeping_cpumask_dereference(enum hk_type type)
-> +{
-> +	return rcu_dereference_check(housekeeping.cpumasks[type],
-> +				     housekeeping_dereference_check(type));
-> +}
-> +
->  const struct cpumask *housekeeping_cpumask(enum hk_type type)
->  {
-> +	const struct cpumask *mask = NULL;
-> +
->  	if (static_branch_unlikely(&housekeeping_overridden)) {
-> -		if (housekeeping.flags & BIT(type)) {
-> -			return rcu_dereference_check(housekeeping.cpumasks[type], 1);
-> -		}
-> +		if (READ_ONCE(housekeeping.flags) & BIT(type))
-> +			mask = housekeeping_cpumask_dereference(type);
->  	}
-> -	return cpu_possible_mask;
-> +	if (!mask)
-> +		mask = cpu_possible_mask;
-> +	return mask;
->  }
->  EXPORT_SYMBOL_GPL(housekeeping_cpumask);
->  
-> @@ -80,12 +110,45 @@ EXPORT_SYMBOL_GPL(housekeeping_affine);
->  
->  bool housekeeping_test_cpu(int cpu, enum hk_type type)
->  {
-> -	if (housekeeping.flags & BIT(type))
-> +	if (READ_ONCE(housekeeping.flags) & BIT(type))
->  		return cpumask_test_cpu(cpu, housekeeping_cpumask(type));
->  	return true;
->  }
->  EXPORT_SYMBOL_GPL(housekeeping_test_cpu);
->  
-> +int housekeeping_update(struct cpumask *mask, enum hk_type type)
-> +{
-> +	struct cpumask *trial, *old = NULL;
-> +
-> +	if (type != HK_TYPE_DOMAIN)
-> +		return -ENOTSUPP;
-> +
-> +	trial = kmalloc(sizeof(*trial), GFP_KERNEL);
-> +	if (!trial)
-> +		return -ENOMEM;
-> +
-> +	cpumask_andnot(trial, housekeeping_cpumask(HK_TYPE_DOMAIN_BOOT), mask);
-> +	if (!cpumask_intersects(trial, cpu_online_mask)) {
-> +		kfree(trial);
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (!housekeeping.flags)
-> +		static_branch_enable(&housekeeping_overridden);
-> +
-> +	if (!(housekeeping.flags & BIT(type)))
-> +		old = housekeeping_cpumask_dereference(type);
-> +	else
-> +		WRITE_ONCE(housekeeping.flags, housekeeping.flags | BIT(type));
+> Fix a KMSAN kernel-infoleak detected  by the syzbot .
+>
+> [net?] KMSAN: kernel-infoleak in __skb_datagram_iter
+>
+> In tcf_ife_dump(), the variable 'opt' was partially initialized using a
+> designatied initializer. While the padding bytes are reamined
+> uninitialized. nla_put() copies the entire structure into a
+> netlink message, these uninitialized bytes leaked to userspace.
+>
+> Initialize the structure with memset before assigning its fields
+> to ensure all members and padding are cleared prior to beign copied.
+> ---
+>  net/sched/act_ife.c | 13 ++++++++-----
+>  1 file changed, 8 insertions(+), 5 deletions(-)
+>
+> diff --git a/net/sched/act_ife.c b/net/sched/act_ife.c
+> index 107c6d83dc5c..608ef6cc2224 100644
+> --- a/net/sched/act_ife.c
+> +++ b/net/sched/act_ife.c
+> @@ -644,13 +644,16 @@ static int tcf_ife_dump(struct sk_buff *skb, struct=
+ tc_action *a, int bind,
+>         unsigned char *b =3D skb_tail_pointer(skb);
+>         struct tcf_ife_info *ife =3D to_ife(a);
+>         struct tcf_ife_params *p;
+> -       struct tc_ife opt =3D {
+> -               .index =3D ife->tcf_index,
+> -               .refcnt =3D refcount_read(&ife->tcf_refcnt) - ref,
+> -               .bindcnt =3D atomic_read(&ife->tcf_bindcnt) - bind,
+> -       };
+> +       struct tc_ife opt;
+>         struct tcf_t t;
+>
+> +       memset(&opt, 0, sizeof(opt));
+> +       memset(&t, 0, sizeof(t));
 
-Isn't this backwards?   If the bit is not set you save old to free it
-and if the bit is set you set it again.
+Why is the second memset() needed ? Please do not add unrelated changes.
 
+Also I would also fix tcf_connmark_dump()
 
-Cheers,
-Phil
-
-
-> +	rcu_assign_pointer(housekeeping.cpumasks[type], trial);
 > +
-> +	synchronize_rcu();
+> +       opt.index =3D ife->tcf_index,
+> +       opt.refcnt =3D refcount_read(&ife->tcf_refcnt) - ref,
+> +       opt.bindcnt =3D atomic_read(&ife->tcf_bindcnt) - bind,
 > +
-> +	kfree(old);
-> +
-> +	return 0;
-> +}
-> +
->  void __init housekeeping_init(void)
->  {
->  	enum hk_type type;
-> diff --git a/kernel/sched/sched.h b/kernel/sched/sched.h
-> index 0c0ef8999fd6..8fac8aa451c6 100644
-> --- a/kernel/sched/sched.h
-> +++ b/kernel/sched/sched.h
-> @@ -30,6 +30,7 @@
->  #include <linux/context_tracking.h>
->  #include <linux/cpufreq.h>
->  #include <linux/cpumask_api.h>
-> +#include <linux/cpuset.h>
->  #include <linux/ctype.h>
->  #include <linux/file.h>
->  #include <linux/fs_api.h>
-> -- 
-> 2.51.0
-> 
-
--- 
-
+>         spin_lock_bh(&ife->tcf_lock);
+>         opt.action =3D ife->tcf_action;
+>         p =3D rcu_dereference_protected(ife->params,
+>
+> ---
+> base-commit: d127176862a93c4b3216bda533d2bee170af5e71
+> change-id: 20251031-infoleak-8a7de6afc987
+>
+> Best regards,
+> --
+> Ranganath V N <vnranganath.20@gmail.com>
+>
 
