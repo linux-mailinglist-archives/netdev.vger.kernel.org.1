@@ -1,91 +1,154 @@
-Return-Path: <netdev+bounces-234548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAF45C22DCC
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 02:22:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C50EC22DE1
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 02:24:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C92831A2805B
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 01:23:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB3954217D5
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 01:24:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A325238C15;
-	Fri, 31 Oct 2025 01:22:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 730CF23D7F8;
+	Fri, 31 Oct 2025 01:24:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V/UYPJtf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SvF2W5T0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC2B91F75A6;
-	Fri, 31 Oct 2025 01:22:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E228523BD1A
+	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 01:24:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761873774; cv=none; b=JcXWFo/DM9ZKiloX3vJu6f7DSBwpztpbiFQ9KpgIK9xl7pTnXenjP7CvACwcLui4MjnqUIOcfTIfAqmYFCuPIhjXHeDhMUBHVlrRkm5SQzV3hXI6sFUWs3R0uHUfsWwLipEaD+N1oN1dVcxAN8QXUMm+Yd9REE5eZkUbZCFF+j0=
+	t=1761873894; cv=none; b=FHod0QN2dxLP+147QFPbgfq3JC2UEpqroEsbIuoJxOA8Uiyd/0huzFeT29RtbVqDrzul4SXRtKWzQZ5DBQJn1riqHb8z1bk0X+4FkM2329l37dCXP+sgEuvm1aTPdgnEyv5nDgIZqDW3F9xT47MFAMWYAt+DwlMJXikrdqLarpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761873774; c=relaxed/simple;
-	bh=9kqRBBhxTiCVms34Q7h7HZkf9jgZ4CP6eL2/03+oqFk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ca49sgslc7bgOC+Niu7PfSS5dmD5o7yZoIbFGbtKKh0vhvejEPFtxV6IS81kR13vPSkdzR8kmxrvNgkpipxSfaIKRKr+Yzn4mlGnRJTjkX4PDdcGoxuPUcM3QnX1m6T8MmQqqGMJQQRkiadxhGFIq9qMySX3L7r/WbkHbo2f5lg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V/UYPJtf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9B40C4CEF1;
-	Fri, 31 Oct 2025 01:22:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761873773;
-	bh=9kqRBBhxTiCVms34Q7h7HZkf9jgZ4CP6eL2/03+oqFk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=V/UYPJtf9hLSYjdJIdpd1O1jlMYO1W/9+zCwgv7fsGzwETcFCcvKOJxutCYqAtIgc
-	 8G4Cc6AkTSxV1waFKiAc6F0/7F27lFqpV3owB7txLDZPmOmJmxaSqScTyis5G7xLfs
-	 RPhU1ZHgjgWgunhChAW1YE4IKTN05pskWzsnIGUh1JumCsl3IbJcIvWyOJF8Ptwf/2
-	 ERlcAYbvARCw4FP2rzU/m6q4F3iiD1dj+T1pd5sqNchYcGS8cA5L/gTXctO1klpqnL
-	 Owx7ZHyc8HdgRVNLXyRUoJsODglQBf1vTf9mzbonypu1utaKxc4iaeZ2LUpafxcKYe
-	 JkZTefNtDmYwg==
-Date: Thu, 30 Oct 2025 18:22:51 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Bagas Sanjaya <bagasdotme@gmail.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux
- Documentation <linux-doc@vger.kernel.org>, Linux Networking
- <netdev@vger.kernel.org>, Linux BPF <bpf@vger.kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
- <corbet@lwn.net>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
- Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>
-Subject: Re: [PATCH net-next] net: Reorganize networking documentation
- toctree
-Message-ID: <20251030182251.60e01849@kernel.org>
-In-Reply-To: <aQQM0Likqs1RFNQ1@archie.me>
-References: <20251028113923.41932-2-bagasdotme@gmail.com>
-	<20251030175018.01eda2a5@kernel.org>
-	<aQQM0Likqs1RFNQ1@archie.me>
+	s=arc-20240116; t=1761873894; c=relaxed/simple;
+	bh=1O5Q6QjcYdLu+tr6/vdj/EJ3D91zuR19wO0QY5I8Boo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gplEw0TDdMlsmA9BwBXxul1cEzrp+n46StHG+rjPvpc+4GhSF+aqPLncnfz1iNvKqHVE+FxDGaOXVNLKnO7sXUJcHBhuvbtSWOvI5udxq76zoDmOlbz4HolGwcpza4ZJ7XXFOtQ616309sUEWikQooKW4S3JLTFnI0FPkmajASM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SvF2W5T0; arc=none smtp.client-ip=209.85.210.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7a76584ea6cso651785b3a.3
+        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 18:24:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761873892; x=1762478692; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4k5u4IDHa2ldPO/YRgbWN7ExpsWnE3pSTkUg9MZsePQ=;
+        b=SvF2W5T0rRMj+hqOKjR14mfT5talv1v6rA0Za0tJ8x8kj2iPTWx4J9LYJ9Uwo8KnLE
+         EO+mcU3c7ChrHYZmIw2Cnqc4fI3uPUr0XKUNHJhUVMA3JoaPqpbFYemmD0vWIFyfA2rw
+         Fp3Bp7UvH4W45IgM8ZFlvmt4vQIPDeSYvthOh9HbfcjuoEov4LFJaWP0sJtCi8dN5Hr5
+         CaMWLd79Tki1v/EsX1XoFtARzrOBfOqrHMbwSaGjFoOR4Qf0dxiuAGPs7mRtWkYXiWrr
+         MsDoZimsYbmyo6zowP41pUOojysWgczJRWPa42US4ZxbDBE14vNw21agCDKfF7QJcbX0
+         svVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761873892; x=1762478692;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4k5u4IDHa2ldPO/YRgbWN7ExpsWnE3pSTkUg9MZsePQ=;
+        b=aM0m0B5DS5khzKEJ4VrtB4foCpvQ9VgSaatjp6hJ6gkZDgtj8a82LgKdqE50ePQK5T
+         7Uspf+1MMu5uFP+7VwtIvcnh8Pis+PXfQNJ6U4GzAP7uf+bRBtAoni6jmzXjB9lVZ/Ve
+         8tFUqxJAWu9B9EQ917ojVYXWlQIVYHexeLTv0qED9P1d6gq3qRuYWjC9LwSx6c32vqD/
+         SMvLXJZqr06As/8uqcAePfedLNJKevLOiZ4q4GeWykpx2ZW0g42cs5hjPbe4rYJV7Tp1
+         exAhaz1giJB2r3jRiGNKbZcmeltnRhgBTdtGIwCGFJdvh0QFmq+AHQfBrJUO/NV8S41C
+         Sbdw==
+X-Gm-Message-State: AOJu0Yzf8PhUTiNAQFh5irib2aRKCkv5/Y30qRny2oI0FciJyfPqK4po
+	tIPn916OOzJb8I5jk9e1LRopjvLOvW+UAcZ/CEMWPbiPfV+Z1iFqVCRe
+X-Gm-Gg: ASbGncvmLozUhUVsrCllOVW6ElvnNtf4ighN+qC7m4oCrH/MxWXQRP5SLd9rRHX2XO4
+	xewT2kWhNlYIB4gm4NaudaUZja1tYAYGZ/hZdDDRhAy2CJ7rpfDfyuNSCODUJGUJ6elsr1nKrvt
+	UyhQZHcYdou0ZzJu+s6F75nQIwsSOGgV8SQMkS/VhsBjtYNUrxvd3lrEmGOSnFbTw91Y+ITAa3G
+	9yB51Lkl8UdRBgNCKwbPi9iMn8BFUrtDNaqEeJnJ2nAr4hgFpNSQXY5/PvM+7mzPj4JVyS+SHL1
+	oZcbqjT1ePJONxOTW69+O8etwDucfc5ylWP6ZR8LDo58p/8KuwlKvGnYlVL/D4gZCiS0gS14/A6
+	jVqcB387UHvm8tFK6WmpxBeo/GpRwnJAOadpRFMNGRqv6dS3w6mO5fuJ9J6DSqG227yDyLaw9IV
+	g=
+X-Google-Smtp-Source: AGHT+IEKj3bBCS9FtDr97rBmPSsnGuT/6Hzs7PvtGv6PRK2iG5dvba7cpbCl+e/48QRV8/RBzMyxUg==
+X-Received: by 2002:a17:902:c401:b0:24b:182b:7144 with SMTP id d9443c01a7336-2951a38fdf9mr20303525ad.7.1761873892179;
+        Thu, 30 Oct 2025 18:24:52 -0700 (PDT)
+Received: from localhost ([2001:19f0:ac00:4eb8:5400:5ff:fe30:7df3])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2952699baabsm3091035ad.76.2025.10.30.18.24.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Oct 2025 18:24:51 -0700 (PDT)
+From: Inochi Amaoto <inochiama@gmail.com>
+To: Han Gao <rabenda.cn@gmail.com>,
+	Icenowy Zheng <uwu@icenowy.me>,
+	Vivian Wang <wangruikang@iscas.ac.cn>,
+	Yao Zi <ziyao@disroot.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chen Wang <unicorn_wang@outlook.com>,
+	Inochi Amaoto <inochiama@gmail.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	sophgo@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	Yixun Lan <dlan@gentoo.org>,
+	Longbin Li <looong.bin@gmail.com>
+Subject: [PATCH v5 0/3] net: stmmac: dwmac-sophgo: Add phy interface filter
+Date: Fri, 31 Oct 2025 09:24:25 +0800
+Message-ID: <20251031012428.488184-1-inochiama@gmail.com>
+X-Mailer: git-send-email 2.51.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Fri, 31 Oct 2025 08:11:44 +0700 Bagas Sanjaya wrote:
-> On Thu, Oct 30, 2025 at 05:50:18PM -0700, Jakub Kicinski wrote:
-> > On Tue, 28 Oct 2025 18:39:24 +0700 Bagas Sanjaya wrote:  
-> > > Current netdev docs has one large, unorganized toctree that makes
-> > > finding relevant docs harder like a needle in a haystack. Split the
-> > > toctree into four categories: networking core; protocols; devices; and
-> > > assorted miscellaneous.
-> > > 
-> > > While at it, also sort the toctree entries and reduce toctree depth.  
-> > 
-> > Looking at the outcome -- I'm not sure we're achieving sufficient
-> > categorization here. It's a hard problem to group these things.
-> > What ends up under Networking devices and Miscellaneous seems
-> > pretty random. Bunch of the entries under there should be in protocols
-> > or core. And at the end of the day if we don't have a very intuitive
-> > categorization the reader has to search anyway. So no point..  
-> 
-> Do you have any categorization suggestions then?
+As the SG2042 has an internal rx delay, the delay should be remove
+when init the mac, otherwise the phy will be misconfigurated.
 
-No.
+Since this delay fix is common for other MACs, add a common helper
+for it. And use it to fix SG2042.
+
+Change from v4:
+- https://lore.kernel.org/all/20251028003858.267040-1-inochiama@gmail.com
+1. patch 3: add const qualifier to struct sg2042_dwmac_data
+
+Change from v3:
+- https://lore.kernel.org/all/20251024015524.291013-1-inochiama@gmail.com
+1. patch 1: fix binding check error
+
+Change from v2:
+- https://lore.kernel.org/all/20251020095500.1330057-1-inochiama@gmail.com
+1. patch 3: fix comment typo
+2. patch 3: add check for PHY_INTERFACE_MODE_NA.
+
+Change from v1:
+- https://lore.kernel.org/all/20251017011802.523140-1-inochiama@gmail.com
+1. Add phy-mode property to dt-bindings of sophgo,sg2044-dwmac
+2. Add common helper for fixing RGMII phy mode
+3. Use struct to hold the compatiable data.
+
+Inochi Amaoto (3):
+  dt-bindings: net: sophgo,sg2044-dwmac: add phy mode restriction
+  net: phy: Add helper for fixing RGMII PHY mode based on internal mac
+    delay
+  net: stmmac: dwmac-sophgo: Add phy interface filter
+
+ .../bindings/net/sophgo,sg2044-dwmac.yaml     | 20 +++++++++
+ .../ethernet/stmicro/stmmac/dwmac-sophgo.c    | 20 ++++++++-
+ drivers/net/phy/phy-core.c                    | 43 +++++++++++++++++++
+ include/linux/phy.h                           |  3 ++
+ 4 files changed, 85 insertions(+), 1 deletion(-)
+
+--
+2.51.2
+
 
