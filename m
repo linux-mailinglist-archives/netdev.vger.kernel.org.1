@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-234743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234744-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B140C26BA5
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 20:27:30 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EFC8C26B86
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 20:25:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E67D646378D
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 19:23:26 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 31AF14F6774
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 19:23:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7215930E0C3;
-	Fri, 31 Oct 2025 19:22:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 734C830E823;
+	Fri, 31 Oct 2025 19:23:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A680730B512;
-	Fri, 31 Oct 2025 19:22:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96DD02FE07B;
+	Fri, 31 Oct 2025 19:22:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761938568; cv=none; b=o27/Tt3PrGgTxTUIvhPmSjNfEpGdp6NkE3PaLBiONqsZhqLGlD18udMELcVL4Pk6MdqDSzhDeMRH6Bz8+5zFS6mr+qBlGFi6aD3NxVgTGy80GJ+cWK+N3zO6PNfu/GW2FnEl8hni5U+KLE2Lk5JorALqRrQ2GmlSWPlIs1FJiVI=
+	t=1761938584; cv=none; b=kDC23RTEFpU2pQJ1OiPghBei0GpBAQUTnw8g/SPi0B6jBAisU32a3++FIiOlA47gkgD/cVB91ilTdor9jhagtWRbA8SYj9Jgjpt2htcoOKdnMq3EHakaXczD/WI/7npd/g0jvw2GOHFrCoK1ajVorKf57wZlUvcuC37gByGcUqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761938568; c=relaxed/simple;
-	bh=wWfiTXHq6awDhQQTxdaBlcnDPrb9Bq/yoDJNHTYXHqo=;
+	s=arc-20240116; t=1761938584; c=relaxed/simple;
+	bh=0nfM9tpbFqGrJe3RGtPMgb64fymojSq1lZptKOPNkY8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KQnYTbtJDPnLWSbYElA1+tg/zIwZZkvhbo52fyME41GAq8CJRKT5P5YHrShYoWX0CrJoXsexUBFejsfx27/FzzP3Ea+NuEwyVuD5fBH3tFgV0b8C1vaCC922XBB2Gpd3e1PI+b8l65bDqoH5ky5UG/eKgbfuvQGHJ8BV2mYi10k=
+	 Content-Type:Content-Disposition:In-Reply-To; b=P+1+Awtkiua0ym8wIozTKeDwMZWSb9d6/+o0h2TujBJGUF5LPgN+q1tZ7tEvq69FfJS6Pmm18ZcGMRsF08cJ6NKqntH860xOaYyeANh734wypHJaADB/XBZyeABGwEt/VVydDPrdw+6dCXq6OFYsnR+SQzC9xlEKhnqRCi44hqo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -33,9 +33,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.98.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1vEuhu-000000005v8-2Iad;
-	Fri, 31 Oct 2025 19:22:42 +0000
-Date: Fri, 31 Oct 2025 19:22:39 +0000
+	id 1vEui6-000000005vO-3Xbr;
+	Fri, 31 Oct 2025 19:22:54 +0000
+Date: Fri, 31 Oct 2025 19:22:51 +0000
 From: Daniel Golle <daniel@makrotopia.org>
 To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -58,9 +58,9 @@ Cc: Andreas Schirm <andreas.schirm@siemens.com>,
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
 	"Livia M. Rosu" <lrosu@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: [PATCH net-next v6 10/12] dt-bindings: net: dsa: lantiq,gswip: add
- support for MaxLinear GSW1xx switches
-Message-ID: <b32a49c03c75be0a1b4666e99c25a3fc0f95d63b.1761938079.git.daniel@makrotopia.org>
+Subject: [PATCH net-next v6 11/12] net: dsa: add tagging driver for MaxLinear
+ GSW1xx switch family
+Message-ID: <724e595e0d6569d794dc1e6d821bbcbf1232c650.1761938079.git.daniel@makrotopia.org>
 References: <cover.1761938079.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -72,214 +72,244 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1761938079.git.daniel@makrotopia.org>
 
-Extend the Lantiq GSWIP device tree binding to also cover MaxLinear
-GSW1xx switches which are based on the same hardware IP but connected
-via MDIO instead of being memory-mapped.
+Add support for a new DSA tagging protocol driver for the MaxLinear
+GSW1xx switch family. The GSW1xx switches use a proprietary 8-byte
+special tag inserted between the source MAC address and the EtherType
+field to indicate the source and destination ports for frames
+traversing the CPU port.
 
-Add compatible strings for MaxLinear GSW120, GSW125, GSW140, GSW141,
-and GSW145 switches and adjust the schema to handle the different
-connection methods with conditional properties.
-
-Add MaxLinear GSW125 example showing MDIO-connected configuration.
+Implement the tag handling logic to insert the special tag on transmit
+and parse it on receive.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Reviewed-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
+Tested-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
 ---
-v6:
- * keep properties on top level and use allOf for conditional constraints
-
-v5:
- * drop maxlinear,rx-inverted from example
-
 v4:
- * drop maxlinear,rx-inverted and maxlinear,tx-inverted properties for
-   now in favor of upcoming generic properties
+ * use __be16 to access tag fields
+ * define ETH_P_MXLGSW in if_ether.h
+ * drop *_SHIFT macros, get rid of _MASK suffix, use FIELD helpers
+ * print tag using %8ph
 
-v3:
- * add maxlinear,rx-inverted and maxlinear,tx-inverted properties
+since RFC:
+ * use dsa etype header macros instead of open coding them
+ * maintain alphabetic order in Kconfig and Makefile
 
-v2:
- * remove git conflict left-overs which somehow creeped in
- * indent example with 4 spaces instead of tabs
+ MAINTAINERS                   |   3 +-
+ include/net/dsa.h             |   2 +
+ include/uapi/linux/if_ether.h |   1 +
+ net/dsa/Kconfig               |   8 +++
+ net/dsa/Makefile              |   1 +
+ net/dsa/tag_mxl-gsw1xx.c      | 116 ++++++++++++++++++++++++++++++++++
+ 6 files changed, 130 insertions(+), 1 deletion(-)
+ create mode 100644 net/dsa/tag_mxl-gsw1xx.c
 
- .../bindings/net/dsa/lantiq,gswip.yaml        | 131 +++++++++++++++++-
- 1 file changed, 126 insertions(+), 5 deletions(-)
-
-diff --git a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
-index cf01b07f7f44..8904d0b6cec5 100644
---- a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
-+++ b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
-@@ -4,7 +4,12 @@
- $id: http://devicetree.org/schemas/net/dsa/lantiq,gswip.yaml#
- $schema: http://devicetree.org/meta-schemas/core.yaml#
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 1ab7e8746299..7efaeaf6d893 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -14047,7 +14047,7 @@ F:	tools/testing/selftests/landlock/
+ K:	landlock
+ K:	LANDLOCK
  
--title: Lantiq GSWIP Ethernet switches
-+title: Lantiq GSWIP and MaxLinear GSW1xx Ethernet switches
-+
-+description:
-+  Lantiq GSWIP and MaxLinear GSW1xx switches share the same hardware IP.
-+  Lantiq switches are embedded in SoCs and accessed via memory-mapped I/O,
-+  while MaxLinear switches are standalone ICs connected via MDIO.
+-LANTIQ / INTEL Ethernet drivers
++LANTIQ / MAXLINEAR / INTEL Ethernet DSA drivers
+ M:	Hauke Mehrtens <hauke@hauke-m.de>
+ L:	netdev@vger.kernel.org
+ S:	Maintained
+@@ -14055,6 +14055,7 @@ F:	Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
+ F:	drivers/net/dsa/lantiq/*
+ F:	drivers/net/ethernet/lantiq_xrx200.c
+ F:	net/dsa/tag_gswip.c
++F:	net/dsa/tag_mxl-gsw1xx.c
  
- $ref: dsa.yaml#
+ LANTIQ MIPS ARCHITECTURE
+ M:	John Crispin <john@phrozen.org>
+diff --git a/include/net/dsa.h b/include/net/dsa.h
+index 67762fdaf3c7..2df2e2ead9a8 100644
+--- a/include/net/dsa.h
++++ b/include/net/dsa.h
+@@ -56,6 +56,7 @@ struct tc_action;
+ #define DSA_TAG_PROTO_VSC73XX_8021Q_VALUE	28
+ #define DSA_TAG_PROTO_BRCM_LEGACY_FCS_VALUE	29
+ #define DSA_TAG_PROTO_YT921X_VALUE		30
++#define DSA_TAG_PROTO_MXL_GSW1XX_VALUE		31
  
-@@ -46,9 +51,14 @@ properties:
-       - lantiq,xrx200-gswip
-       - lantiq,xrx300-gswip
-       - lantiq,xrx330-gswip
-+      - maxlinear,gsw120
-+      - maxlinear,gsw125
-+      - maxlinear,gsw140
-+      - maxlinear,gsw141
-+      - maxlinear,gsw145
+ enum dsa_tag_protocol {
+ 	DSA_TAG_PROTO_NONE		= DSA_TAG_PROTO_NONE_VALUE,
+@@ -89,6 +90,7 @@ enum dsa_tag_protocol {
+ 	DSA_TAG_PROTO_LAN937X		= DSA_TAG_PROTO_LAN937X_VALUE,
+ 	DSA_TAG_PROTO_VSC73XX_8021Q	= DSA_TAG_PROTO_VSC73XX_8021Q_VALUE,
+ 	DSA_TAG_PROTO_YT921X		= DSA_TAG_PROTO_YT921X_VALUE,
++	DSA_TAG_PROTO_MXL_GSW1XX	= DSA_TAG_PROTO_MXL_GSW1XX_VALUE,
+ };
  
-   reg:
--    minItems: 3
-+    minItems: 1
-     maxItems: 3
+ struct dsa_switch;
+diff --git a/include/uapi/linux/if_ether.h b/include/uapi/linux/if_ether.h
+index cfd200c87e5e..2c93b7b731c8 100644
+--- a/include/uapi/linux/if_ether.h
++++ b/include/uapi/linux/if_ether.h
+@@ -92,6 +92,7 @@
+ #define ETH_P_ETHERCAT	0x88A4		/* EtherCAT			*/
+ #define ETH_P_8021AD	0x88A8          /* 802.1ad Service VLAN		*/
+ #define ETH_P_802_EX1	0x88B5		/* 802.1 Local Experimental 1.  */
++#define ETH_P_MXLGSW	0x88C3		/* MaxLinear GSW DSA [ NOT AN OFFICIALLY REGISTERED ID ] */
+ #define ETH_P_PREAUTH	0x88C7		/* 802.11 Preauthentication */
+ #define ETH_P_TIPC	0x88CA		/* TIPC 			*/
+ #define ETH_P_LLDP	0x88CC		/* Link Layer Discovery Protocol */
+diff --git a/net/dsa/Kconfig b/net/dsa/Kconfig
+index 6b94028b1fcc..f86b30742122 100644
+--- a/net/dsa/Kconfig
++++ b/net/dsa/Kconfig
+@@ -104,6 +104,14 @@ config NET_DSA_TAG_MTK
+ 	  Say Y or M if you want to enable support for tagging frames for
+ 	  Mediatek switches.
  
-   reg-names:
-@@ -65,9 +75,6 @@ properties:
-       compatible:
-         const: lantiq,xrx200-mdio
- 
--    required:
--      - compatible
--
-   gphy-fw:
-     type: object
-     properties:
-@@ -123,6 +130,32 @@ required:
-   - compatible
-   - reg
- 
-+allOf:
-+  - if:
-+      properties:
-+        compatible:
-+          contains:
-+            enum:
-+              - lantiq,xrx200-gswip
-+              - lantiq,xrx300-gswip
-+              - lantiq,xrx330-gswip
-+    then:
-+      properties:
-+        reg:
-+          minItems: 3
-+          maxItems: 3
-+        mdio:
-+          required:
-+            - compatible
-+      required:
-+        - reg-names
-+    else:
-+      properties:
-+        reg:
-+          maxItems: 1
-+        reg-names: false
-+        gphy-fw: false
++config NET_DSA_TAG_MXL_GSW1XX
++	tristate "Tag driver for MaxLinear GSW1xx switches"
++	help
++	  The GSW1xx family of switches supports an 8-byte special tag which
++	  can be used on the CPU port of the switch.
++	  Say Y or M if you want to enable support for tagging frames for
++	  MaxLinear GSW1xx switches.
 +
- unevaluatedProperties: false
- 
- examples:
-@@ -132,6 +165,7 @@ examples:
-             reg = <0xe108000 0x3100>,  /* switch */
-                   <0xe10b100 0xd8>,    /* mdio */
-                   <0xe10b1d8 0x130>;   /* mii */
-+            reg-names = "switch", "mdio", "mii";
-             dsa,member = <0 0>;
- 
-             ports {
-@@ -230,3 +264,90 @@ examples:
-                     };
-             };
-     };
+ config NET_DSA_TAG_KSZ
+ 	tristate "Tag driver for Microchip 8795/937x/9477/9893 families of switches"
+ 	help
+diff --git a/net/dsa/Makefile b/net/dsa/Makefile
+index 4b011a1d5c87..42d173f5a701 100644
+--- a/net/dsa/Makefile
++++ b/net/dsa/Makefile
+@@ -28,6 +28,7 @@ obj-$(CONFIG_NET_DSA_TAG_HELLCREEK) += tag_hellcreek.o
+ obj-$(CONFIG_NET_DSA_TAG_KSZ) += tag_ksz.o
+ obj-$(CONFIG_NET_DSA_TAG_LAN9303) += tag_lan9303.o
+ obj-$(CONFIG_NET_DSA_TAG_MTK) += tag_mtk.o
++obj-$(CONFIG_NET_DSA_TAG_MXL_GSW1XX) += tag_mxl-gsw1xx.o
+ obj-$(CONFIG_NET_DSA_TAG_NONE) += tag_none.o
+ obj-$(CONFIG_NET_DSA_TAG_OCELOT) += tag_ocelot.o
+ obj-$(CONFIG_NET_DSA_TAG_OCELOT_8021Q) += tag_ocelot_8021q.o
+diff --git a/net/dsa/tag_mxl-gsw1xx.c b/net/dsa/tag_mxl-gsw1xx.c
+new file mode 100644
+index 000000000000..701a079955f2
+--- /dev/null
++++ b/net/dsa/tag_mxl-gsw1xx.c
+@@ -0,0 +1,116 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * DSA driver Special Tag support for MaxLinear GSW1xx switch chips
++ *
++ * Copyright (C) 2025 Daniel Golle <daniel@makrotopia.org>
++ * Copyright (C) 2023 - 2024 MaxLinear Inc.
++ */
 +
-+  - |
-+    #include <dt-bindings/leds/common.h>
++#include <linux/bitops.h>
++#include <linux/etherdevice.h>
++#include <linux/skbuff.h>
++#include <net/dsa.h>
 +
-+    mdio {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
++#include "tag.h"
 +
-+        switch@1f {
-+            compatible = "maxlinear,gsw125";
-+            reg = <0x1f>;
++/* To define the outgoing port and to discover the incoming port a special
++ * tag is used by the GSW1xx.
++ *
++ *       Dest MAC       Src MAC    special TAG        EtherType
++ * ...| 1 2 3 4 5 6 | 1 2 3 4 5 6 | 1 2 3 4 5 6 7 8 | 1 2 |...
++ *                                |<--------------->|
++ */
 +
-+            ports {
-+                #address-cells = <1>;
-+                #size-cells = <0>;
++#define GSW1XX_TAG_NAME		"gsw1xx"
 +
-+                port@0 {
-+                    reg = <0>;
-+                    label = "lan0";
-+                    phy-handle = <&switchphy0>;
-+                    phy-mode = "internal";
-+                };
++/* special tag header length (RX and TX) */
++#define GSW1XX_HEADER_LEN		8
 +
-+                port@1 {
-+                    reg = <1>;
-+                    label = "lan1";
-+                    phy-handle = <&switchphy1>;
-+                    phy-mode = "internal";
-+                };
++/* Word 0 = Ethertype -> 0x88C3 */
 +
-+                port@4 {
-+                    reg = <4>;
-+                    label = "wan";
-+                    phy-mode = "1000base-x";
-+                    managed = "in-band-status";
-+                };
++/* Word 1 */
++#define GSW1XX_TX_PORT_MAP		GENMASK(7, 0)
++#define GSW1XX_TX_PORT_MAP_EN		BIT(15)
++#define GSW1XX_TX_CLASS_EN		BIT(14)
++#define GSW1XX_TX_TIME_STAMP_EN		BIT(13)
++#define GSW1XX_TX_LRN_DIS		BIT(12)
++#define GSW1XX_TX_CLASS			GENMASK(11, 8)
 +
-+                port@5 {
-+                    reg = <5>;
-+                    phy-mode = "rgmii-id";
-+                    tx-internal-delay-ps = <2000>;
-+                    rx-internal-delay-ps = <2000>;
-+                    ethernet = <&eth0>;
++/* special tag in RX path header */
++/* Word 2 */
++#define GSW1XX_RX_PORT_MAP		GENMASK(15, 8)
 +
-+                    fixed-link {
-+                        speed = <1000>;
-+                        full-duplex;
-+                    };
-+                };
-+            };
++static struct sk_buff *gsw1xx_tag_xmit(struct sk_buff *skb,
++				       struct net_device *dev)
++{
++	struct dsa_port *dp = dsa_user_to_port(dev);
++	__be16 *gsw1xx_tag;
 +
-+            mdio {
-+                #address-cells = <1>;
-+                #size-cells = <0>;
++	/* provide additional space 'GSW1XX_HEADER_LEN' bytes */
++	skb_push(skb, GSW1XX_HEADER_LEN);
 +
-+                switchphy0: switchphy@0 {
-+                    reg = <0>;
++	/* add space between MAC address and Ethertype */
++	dsa_alloc_etype_header(skb, GSW1XX_HEADER_LEN);
 +
-+                    leds {
-+                        #address-cells = <1>;
-+                        #size-cells = <0>;
++	/* special tag ingress */
++	gsw1xx_tag = dsa_etype_header_pos_tx(skb);
++	gsw1xx_tag[0] = htons(ETH_P_MXLGSW);
++	gsw1xx_tag[1] = htons(GSW1XX_TX_PORT_MAP_EN | GSW1XX_TX_LRN_DIS |
++			FIELD_PREP(GSW1XX_TX_PORT_MAP, BIT(dp->index)));
 +
-+                        led@0 {
-+                            reg = <0>;
-+                            color = <LED_COLOR_ID_GREEN>;
-+                            function = LED_FUNCTION_LAN;
-+                        };
-+                    };
-+                };
++	gsw1xx_tag[2] = 0;
++	gsw1xx_tag[3] = 0;
 +
-+                switchphy1: switchphy@1 {
-+                    reg = <1>;
++	return skb;
++}
 +
-+                    leds {
-+                        #address-cells = <1>;
-+                        #size-cells = <0>;
++static struct sk_buff *gsw1xx_tag_rcv(struct sk_buff *skb,
++				      struct net_device *dev)
++{
++	int port;
++	__be16 *gsw1xx_tag;
 +
-+                        led@0 {
-+                            reg = <0>;
-+                            color = <LED_COLOR_ID_GREEN>;
-+                            function = LED_FUNCTION_LAN;
-+                        };
-+                    };
-+                };
-+            };
-+        };
-+    };
++	if (unlikely(!pskb_may_pull(skb, GSW1XX_HEADER_LEN))) {
++		dev_warn_ratelimited(&dev->dev, "Dropping packet, cannot pull SKB\n");
++		return NULL;
++	}
++
++	gsw1xx_tag = dsa_etype_header_pos_rx(skb);
++
++	if (unlikely(ntohs(gsw1xx_tag[0]) != ETH_P_MXLGSW)) {
++		dev_warn_ratelimited(&dev->dev, "Dropping packet due to invalid special tag\n");
++		dev_warn_ratelimited(&dev->dev, "Tag: %8ph\n", gsw1xx_tag);
++		return NULL;
++	}
++
++	/* Get source port information */
++	port = FIELD_GET(GSW1XX_RX_PORT_MAP, ntohs(gsw1xx_tag[1]));
++	skb->dev = dsa_conduit_find_user(dev, 0, port);
++	if (!skb->dev) {
++		dev_warn_ratelimited(&dev->dev, "Dropping packet due to invalid source port\n");
++		dev_warn_ratelimited(&dev->dev, "Tag: %8ph\n", gsw1xx_tag);
++		return NULL;
++	}
++
++	/* remove the GSW1xx special tag between MAC addresses and the current
++	 * ethertype field.
++	 */
++	skb_pull_rcsum(skb, GSW1XX_HEADER_LEN);
++	dsa_strip_etype_header(skb, GSW1XX_HEADER_LEN);
++
++	return skb;
++}
++
++static const struct dsa_device_ops gsw1xx_netdev_ops = {
++	.name			= GSW1XX_TAG_NAME,
++	.proto			= DSA_TAG_PROTO_MXL_GSW1XX,
++	.xmit			= gsw1xx_tag_xmit,
++	.rcv			= gsw1xx_tag_rcv,
++	.needed_headroom	= GSW1XX_HEADER_LEN,
++};
++
++MODULE_DESCRIPTION("DSA tag driver for MaxLinear GSW1xx 8 byte protocol");
++MODULE_LICENSE("GPL");
++MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_MXL_GSW1XX, GSW1XX_TAG_NAME);
++
++module_dsa_tag_driver(gsw1xx_netdev_ops);
 -- 
 2.51.2
 
