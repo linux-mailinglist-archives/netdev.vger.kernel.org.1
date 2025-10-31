@@ -1,155 +1,118 @@
-Return-Path: <netdev+bounces-234603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 247CEC23DF8
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 09:44:25 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8B3CC23ECB
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 09:53:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 13C5B1A631B1
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 08:43:16 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AF0B84E5771
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 08:53:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C25FE2FB63D;
-	Fri, 31 Oct 2025 08:42:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EEAD3128D4;
+	Fri, 31 Oct 2025 08:53:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sGbQVSCm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DYEKqxr2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D2E82F261F
-	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 08:42:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14882310625;
+	Fri, 31 Oct 2025 08:53:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761900138; cv=none; b=k4zybubQh1jK6I84N2PPva7hmNV2fZKB215MhxLgTBJ84cvaLsZqlbmHeCieh51qMFWI9db4VsDWOFasJPrCBMBFrfZqdtrBaHn/n64/LrACfPVp2PVjs9Nf/dY1VCBDrsFNWAqVF4CP62m2ZJo8eHk1NdTsmV6K9nyemgbwSlU=
+	t=1761900798; cv=none; b=Di9ylg654/JVFSqnGwllK2GA/5t+OOGud3bg8ijgB5PrrmWIuWqzJc/9dQNeqjxrI+6lOZDyIM2RTh6bU9Uro+ssCvB1VcNfbli0WGXPyzuWAnJJITD2dqH2IZR8h3BJNbig+Ed9ExjGPV0r40Whd/r/SFQ8Hub6dLnTXuS/pPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761900138; c=relaxed/simple;
-	bh=iebUdKZzmfa2jg23LRJHVuu3kza1F82z99YH30rDyb4=;
+	s=arc-20240116; t=1761900798; c=relaxed/simple;
+	bh=oK5nbB1LtOV7g02ZprYXgPq8GKEmIM9bcsXX+afO7Kc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aYIp2rqYj4iOFe2BmECTeV3AzK/GiUqmb1rLWAcQKT0ZiHHG0DM3dO/5uQrFAcVa3hxN6U8fj7Y0NHAoQqaEilwg/50zEeTqGGHC43keK2G1r652EJlzrSzFtBe2hhJfsA/eOwfPFd6jhdKbjvSbXOk8drqfKjgOVscPepPxpYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sGbQVSCm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E006DC4CEE7;
-	Fri, 31 Oct 2025 08:42:17 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=g1BgbiuW8l7yY2zOa8Oiag+rq/KeCuZASbLsTMUT0HyG40Qpm8xOBRAkOxL+VQ/o2aCjgFaCHs2TyzNR6I1HyYDvIjgnDrVdQOD5HjsnwZpgHRTbk7lPbsiNiBESM+HgXrFE0WS90lrR31s9Gth3bXZUjt3gVUeqFtaISjUkDnU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DYEKqxr2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11393C4CEF1;
+	Fri, 31 Oct 2025 08:53:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761900138;
-	bh=iebUdKZzmfa2jg23LRJHVuu3kza1F82z99YH30rDyb4=;
+	s=k20201202; t=1761900797;
+	bh=oK5nbB1LtOV7g02ZprYXgPq8GKEmIM9bcsXX+afO7Kc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=sGbQVSCmaZgm3pK/emkYuL6wOZwS2Ej0PMgWnCExnZ0K9MYE54merAH4WuUUE0ZQt
-	 SwIDl8uvXsAERGNcizhrF5fJfAS7YKUYgvRiq1V0FPLxVDr4UnkN6M0YPYV8IUV84N
-	 8gghXnFh2Id96xfTYBDy6BoxN7QuQrxv39X3nsOkxHdDMgusRbtBTR4G3joG3Ebf9p
-	 3fD6y4dB8bUgqPvU97RgNbSxZ8yW2drZLvfR9HWC2dsw38ZpFgIObIXgWBMBMt6Pfi
-	 oMptgDFxJxVxBnZ2J0JV17QiE/dpiSL3/2Fnc3XvNEWD7szMNXBRoOQvPpSVjtNK22
-	 JSfPHcUehH18A==
-Date: Fri, 31 Oct 2025 09:42:15 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: airoha: Add TCP LRO support
-Message-ID: <aQR2Z51Q45Zl99m_@lore-desk>
-References: <20250610-airoha-eth-lro-v1-1-3b128c407fd8@kernel.org>
- <CANn89iJsNWkWzAJbOvaBNjozuLOQBcpVo1bnvfeGq5Zm6h9e=Q@mail.gmail.com>
- <aEg1lvstEFgiZST1@lore-rh-laptop>
- <20250611173626.54f2cf58@kernel.org>
- <aEtAZq8Th7nOdakk@lore-rh-laptop>
- <20250612155721.4bb76ab1@kernel.org>
- <aFATYATliil63D5R@lore-desk>
+	b=DYEKqxr2pRl3d4ijIZ5ZZYCcw/en5aFTZ5TcxpfP/QJ/ZgAtoCyBwnXU3e4SfKfTW
+	 WIUQWa+Y0SU4tIKw68AHY4F928BIByHXV5FqmoMmT99dz6DbRvpPJozKjMgge7YxxH
+	 TjmTg8tIUZvZyr/dlja+uj+/OKCvrbuS2ANl8RXD0vOKF+goo9uuUDr52O1N6T6ciQ
+	 q/glR4+532A3FeETTACxSYqblvKYGQEfoNgo89uv/UL1TmYJyBrDHns/tDyk/7cvIq
+	 SqxnjErCtLd3Pf0aCARGpwKJ6mWGAVMfTes+Br3yGaakDaY4gK9hgAfh6tJ+pY1u7G
+	 HqtI34pitwAOA==
+Date: Fri, 31 Oct 2025 09:53:15 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: weishangjuan@eswincomputing.com
+Cc: devicetree@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com, 
+	alexandre.torgue@foss.st.com, rmk+kernel@armlinux.org.uk, yong.liang.choong@linux.intel.com, 
+	vladimir.oltean@nxp.com, prabhakar.mahadev-lad.rj@bp.renesas.com, jan.petrous@oss.nxp.com, 
+	inochiama@gmail.com, jszhang@kernel.org, 0x1207@gmail.com, boon.khai.ng@altera.com, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	robh@kernel.org, linux-arm-kernel@lists.infradead.org, ningyu@eswincomputing.com, 
+	linmin@eswincomputing.com, lizhi2@eswincomputing.com, pinkesh.vaghela@einfochips.com
+Subject: Re: [PATCH] dt-bindings: ethernet: eswin: fix yaml schema issues
+Message-ID: <20251031-elated-radical-limpet-6a0eaf@kuoka>
+References: <20251030085001.191-1-weishangjuan@eswincomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="preRBihCmKgtL7Vn"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <aFATYATliil63D5R@lore-desk>
+In-Reply-To: <20251030085001.191-1-weishangjuan@eswincomputing.com>
 
+On Thu, Oct 30, 2025 at 04:50:01PM +0800, weishangjuan@eswincomputing.com wrote:
+> From: Shangjuan Wei <weishangjuan@eswincomputing.com>
+> 
+> Due to the detection of errors in the eswin mmc module
+> regarding the eswin,hsp-sp-csr attributes in the
+> eswin,eic7700-eth.yaml file, the link is as follows:
+> https://lore.kernel.org/all/176096011380.22917.1988679321096076522.robh@kernel.org/
 
---preRBihCmKgtL7Vn
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Drop, reported already says that.
 
-> > On Thu, 12 Jun 2025 23:02:30 +0200 Lorenzo Bianconi wrote:
-> > > > I'm not Eric but FWIW 256B is not going to help much. It's best to =
-keep
-> > > > the len / truesize ratio above 50%, so with 32k buffers we're talki=
-ng
-> > > > about copying multiple frames. =20
-> > >=20
-> > > what I mean here is reallocate the skb if the true size is small (e.g=
-=2E below
-> > > 256B) in order to avoid consuming the high order page from the page_p=
-ool. Maybe
-> > > we can avoid it if reducing the page order to 2 for LRO queues provide
-> > > comparable results.
-> >=20
-> > Hm, truesize is the buffer size, right? If the driver allocated n bytes
-> > of memory for packets it sent up the stack, the truesizes of the skbs
-> > it generated must add up to approximately n bytes.
->=20
-> With 'truesize' I am referring to the real data size contained in the x-o=
-rder
-> page returned by the hw. If this size is small, I was thinking to just al=
-locate
-> a skb for it, copy the data from the x-order page into it and re-insert t=
-he
-> x-order page into the page_pool running page_pool_put_full_page().
-> Let me do some tests with order-2 page to see if the GRO can compensate t=
-he
-> reduced page size.
+Just say that this is one phandle with multiple arguments, so the syntax
+should be in the form of:
 
-Sorry for the late reply about this item.
-I carried out some comparison tests between GRO-only and GRO+LRO with order=
--2
-pages [0]. The system is using a 2.5Gbps link. The device is receiving a si=
-ngle TCP
-stream. MTU is set to 1500B.
+> Therefore, the eswin,hsp-sp-csr attributes of the eic7700-eth.yaml file
+> regarding eswin and hsp-sp-csr will be changed to the form of:
 
-- GRO only:			~1.6Gbps
-- GRO+LRO (order-2 pages):	~2.1Gbps
+> items:
+>   - items:
+>       - description: ...
+>       - description: ...
+>       - description: ...
+>       - description: ...
+> 
+> The MMC,Ethernet,and USB modules of eswin vendor have defined
+> eswin,hsp-sp-csr attribute in YAML. In order to be consistent
+> with the property description of MMC,USB, I have modified the
+> description content of eswin,hsp-sp-csr attribute in Ethernet YAML.
 
-In both cases we can't reach the line-rate. Do you think the difference can=
- justify
-the hw LRO support? Thanks in advance.
+That's redundant paragraph. Write concise messages describing the
+problem, not some background or unrelated bindings. See also submitting
+patches about preferred English form.
 
-Regards,
-Lorenzo
+> 
+> Fixes: 888bd0eca93c("dt-bindings: ethernet: eswin: Document for EIC7700 SoC")
 
-[0] the hw LRO requires contiguous memory pages to work. I reduced the size=
- to
-order-2 from order-5 (original implementation).
+Missing space, missing checkpatch.
 
->=20
-> Regards,
-> Lorenzo
->=20
-> >=20
-> > So if the HW places one aggregation session per buffer, and the buffer
-> > is 32kB -- to avoid mem use ratio < 25% you'd need to copy all sessions
-> > smaller than 8kB?
-> >=20
-> > If I'm not making sense - just ignore, I haven't looked at the rest of
-> > the driver :)
-> >=20
+Please run scripts/checkpatch.pl on the patches and fix reported
+warnings. After that, run also 'scripts/checkpatch.pl --strict' on the
+patches and (probably) fix more warnings. Some warnings can be ignored,
+especially from --strict run, but the code here looks like it needs a
+fix. Feel free to get in touch if the warning is not clear.
 
+With first paragraph and fixes tag corrected:
 
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
---preRBihCmKgtL7Vn
-Content-Type: application/pgp-signature; name=signature.asc
+Best regards,
+Krzysztof
 
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaQR2ZwAKCRA6cBh0uS2t
-rNydAQChGxrsUEw7j8qWnmWp3WjRruhrQe2yexdNUpd+gRWnVAD+JiRBjf4A5lOw
-QGVPdyJFfYlLM98zy6KQEHHtDr90cQw=
-=DjeM
------END PGP SIGNATURE-----
-
---preRBihCmKgtL7Vn--
 
