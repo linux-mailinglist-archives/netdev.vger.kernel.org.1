@@ -1,142 +1,265 @@
-Return-Path: <netdev+bounces-234644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06561C24FBC
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 13:24:58 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 653E4C24F80
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 13:21:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id DFA0A350F22
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 12:24:56 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8A77C4F33AA
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 12:21:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0A06347FD7;
-	Fri, 31 Oct 2025 12:24:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98DE2348453;
+	Fri, 31 Oct 2025 12:21:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="UkUNUh8c"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="doSn4NnO"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D2FE2E1743;
-	Fri, 31 Oct 2025 12:24:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2140347BB8
+	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 12:21:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761913474; cv=none; b=Fk9WNGtBpKbx2C/iL7jS5iegkwp8KLcdlXug7f2TqLchcCddcbzkuWv1REH3dCi6RxnSWQmkITpLzcPmUeETz2hQxCxi/byi9Qtg2cWrhUUdDRp/MZ1hXY7FN7t31swLx0+2e0FCOKg+fga1jSgo0Fj+sOUu63pfrprfQvcreOg=
+	t=1761913279; cv=none; b=Lz1CjBiSbcNu+BoY6PTus1wj2rvF+JP5XusZHJgv6yj3CFr7ux4mOqBbszNhrlcC5EDcN9eS4WnL0p8fZVsWm+wlwmA7w0IIDpkigPJ/YRMobq+VrW7WcpoNL4WlOh8R1DzxU4Nn0cdjS24OKHUa4mLIysAivzkjo/SOQ52nI0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761913474; c=relaxed/simple;
-	bh=2Nt4r/eYanNf5cDgEn1QKK+iWGBoitcY9r7UXIB3y4g=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BNbzs1bIsBwveAfKkQ0I0bPfppMussDMVO7y2RzIHOmd0weAd0CQSEg5JCwFgQKWi8cKlhlkrkZY8PdE3Rx7zMgdDaaZB7xRICexDElxj+/GdPgnjnTEtSQVnH1ZjNjLRe4PdPnGV9vQ1i9S8Agd5Cys4HqRLvZg0xMa1LC6Wfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=UkUNUh8c; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1761913473; x=1793449473;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=2Nt4r/eYanNf5cDgEn1QKK+iWGBoitcY9r7UXIB3y4g=;
-  b=UkUNUh8c9gg9KCTr5N5Lbd+2H7Zm5767R0FTk9MbCLyASOitbwIxUTku
-   pV5CrCUPPSDZxDgXfPN5izGhjz8CDp9gPd9hIy8pbRgZvYOWRrHPWIRny
-   mQIFa4pKJtYmesgvuMzv/RZohNFnQTgNe+foR5SRfs01ZPwqZEUrW0zi6
-   la4L0Hc3UmBsdckiC3qrCOPkCU8Dv6jd8MPNOQJqB7za38FQc6ixAHuOf
-   xT2MUyQxvvyjqVPzFJNH5p26blRG9t2BkpyYMUQ9M+Uv3ZOm/mKkXDACG
-   28dihNVHbsle5+0fRzmOenM3Xw6FzKh5Uoa2BMGSCX5mGmsRVojySHcRf
-   w==;
-X-CSE-ConnectionGUID: q2s9GN/sQTOoIfDSnWmHng==
-X-CSE-MsgGUID: tyuglKZiToCp+KniprnHRg==
-X-IronPort-AV: E=Sophos;i="6.19,269,1754982000"; 
-   d="scan'208";a="47883659"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2025 05:24:31 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.87.152) by
- chn-vm-ex4.mchp-main.com (10.10.87.33) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.29; Fri, 31 Oct 2025 05:23:46 -0700
-Received: from DEN-DL-M31836.microchip.com (10.10.85.11) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Fri, 31 Oct 2025 05:23:44 -0700
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
-	<horatiu.vultur@microchip.com>
-Subject: [PATCH net v4 2/2] net: phy: micrel: lan8842 errata
-Date: Fri, 31 Oct 2025 13:16:29 +0100
-Message-ID: <20251031121629.814935-3-horatiu.vultur@microchip.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20251031121629.814935-1-horatiu.vultur@microchip.com>
-References: <20251031121629.814935-1-horatiu.vultur@microchip.com>
+	s=arc-20240116; t=1761913279; c=relaxed/simple;
+	bh=dNEsyz9/fjHmgiXJALdzGhqysk9Jy/a3WOK15fNNKck=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rKnKqVgjNu5NKQr2wlIeQa3OFVcOdJ8udSPO9VjUb6yDwKOpFB8IjJZaj4K2fNSNw+apdkI3SQQbXH3cjNBfnOb6/nf1j3983FZSDyETjvb6UaNqWE7MtMYE8e8sDZvRqyqdD3vdvxaXoCzsPG1wu2LqAEhnqGQVAOZaJ+++qek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=doSn4NnO; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761913276;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sUwKOyluTKFUudeOxZ3owrromDAOtIhl6Ta/vPwuydw=;
+	b=doSn4NnOzAOrdkHkK67gq23MAS0oUkzvyF87Y4uEGBQm0D0r6WlPzC45lDqT27joww3ulR
+	0yXweVOVGv4gFpjMuCkIBIyBoB9NzIBTO2uHoEFfiXpKXWUSODyUqs2rcuIJ5ccp31YCbE
+	xX2fV0R/6Gia9hQ+4ofm3OfRm1AswHA=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-631-hMZEeTRpMHijr2dnPKMXZA-1; Fri, 31 Oct 2025 08:21:15 -0400
+X-MC-Unique: hMZEeTRpMHijr2dnPKMXZA-1
+X-Mimecast-MFC-AGG-ID: hMZEeTRpMHijr2dnPKMXZA_1761913274
+Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-6407d783ad5so664662a12.2
+        for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 05:21:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761913274; x=1762518074;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sUwKOyluTKFUudeOxZ3owrromDAOtIhl6Ta/vPwuydw=;
+        b=DmmHNl6P1Hx/TAXrPKW7LpL359gZfHShsU/0XHZM+HxNGV4yNiXUHFr6suXFXusQac
+         Q5FKP4cp/Czxe2Bw4hUcKKh44a07S7l2rEFwSP78a+NWmwkptBrXi6jm60DFV8PMcD/O
+         gXjtwFuS8Zp54wXmG5NAWE8IBD6jkjl8484Ph+4GZjnT6SJVGVD2WB+ZApvWPrsQjn6T
+         ikRSDguIjlKcjvgCUgXFIb6se76DQtMM9UYHsGgvbtprNXyjCLMgB4VPl151uWz5Djru
+         UtPL6UREAZQdIntmh4WiPF7cf3Hp9h5QVa/UMWm6CsZDpgcM1V9yfWq3feOFI4Z8hWw9
+         Fw1g==
+X-Forwarded-Encrypted: i=1; AJvYcCWu5ixo2xHDVLYW51a8fNhxZWW9VgK89IaJIw84CZOPKk8j1VjJHHOA+szYTez8UptZCMca1so=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0JRoOuXPUBdQY7NXUp313S2ZUinv3Y4cEa13nMGsi//nEgwrc
+	F6Gp3tLzCpma7FU0hKu+Wss6ScxW4yC8tDJyvuKnBch55kYvfzSSYMhDnyoG8mnkVPNZVpDrq4K
+	1sTk5fGF5Gt1CN/lRywvnCdjPLCnQIM6EQ3FNA4lEJHTAzXAVTbu8vDeUVfyYgV7tl1CtsTgz1z
+	MBrB6gMgPcdLlY3MR34Ttoqaho9GshRmr/
+X-Gm-Gg: ASbGnctdRN/t+EWD7aurr5h7n+b65idce/8y/6N0f55miEFEiEddEZPvfv9P4yifimV
+	XRaeiMuhl+miaGMUavbwq+JThJ6NHoPbPA8gNqOoZftQ0gJz7pxmfytqTdB9tDH1ofcXs+pszeY
+	HRrom00NhPn8l6zmaHSuLY4iMSX3l0svQIInIPH9VlL85IJD1npUe4Vg==
+X-Received: by 2002:a05:6402:268e:b0:63e:2d46:cc5d with SMTP id 4fb4d7f45d1cf-64076f71156mr2639092a12.7.1761913274265;
+        Fri, 31 Oct 2025 05:21:14 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE/Fg/d8n1FygAt9C8iITIr/MFTt7Px6ZvAbp5bcXhaAojwuNapTMQWGvKPz3qAk5AhCrGGK2uxWoEXbc58yYM=
+X-Received: by 2002:a05:6402:268e:b0:63e:2d46:cc5d with SMTP id
+ 4fb4d7f45d1cf-64076f71156mr2639055a12.7.1761913273764; Fri, 31 Oct 2025
+ 05:21:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+References: <20240108131039.2234044-1-Mikhail.Golubev-Ciuchea@opensynergy.com>
+ <27327622.1r3eYUQgxm@fedora.fritz.box> <aPdU93e2RQy5MHQr@fedora>
+ <28156189.1r3eYUQgxm@fedora.fritz.box> <aPeHbKES6yHkh5Rj@fedora>
+In-Reply-To: <aPeHbKES6yHkh5Rj@fedora>
+From: Matias Ezequiel Vara Larsen <mvaralar@redhat.com>
+Date: Fri, 31 Oct 2025 13:21:02 +0100
+X-Gm-Features: AWmQ_bmWfyMfD1zverJ1ufhNFgKPX2AvwLjdAsskFXlhQ-Z7R9j1OZE63m7EKMI
+Message-ID: <CAHYGQ0x9ZDZ9R3s_X7irXkQ0dCGbe7CQa_-zOcf19-QqDrapRw@mail.gmail.com>
+Subject: Re: [PATCH v5] can: virtio: Initial virtio CAN driver.
+To: Francesco Valla <francesco@valla.it>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, Paolo Abeni <pabeni@redhat.com>, 
+	Harald Mommer <harald.mommer@opensynergy.com>, 
+	Mikhail Golubev-Ciuchea <Mikhail.Golubev-Ciuchea@opensynergy.com>, 
+	Wolfgang Grandegger <wg@grandegger.com>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Damir Shaikhutdinov <Damir.Shaikhutdinov@opensynergy.com>, linux-kernel@vger.kernel.org, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	virtualization@lists.linux.dev, development@redaril.me
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add errata for lan8842. The errata document can be found here [1].
-This is fixing the module 7 ("1000BASE-T PMA EEE TX wake timer is
-non-compliant")
+On Tue, Oct 21, 2025 at 3:15=E2=80=AFPM Matias Ezequiel Vara Larsen
+<mvaralar@redhat.com> wrote:
+>
+> On Tue, Oct 21, 2025 at 02:08:35PM +0200, Francesco Valla wrote:
+> > On Tuesday, 21 October 2025 at 11:40:07 Matias Ezequiel Vara Larsen <mv=
+aralar@redhat.com> wrote:
+> > > On Mon, Oct 20, 2025 at 11:24:15PM +0200, Francesco Valla wrote:
+> > > > On Monday, 20 October 2025 at 16:56:08 Matias Ezequiel Vara Larsen =
+<mvaralar@redhat.com> wrote:
+> > > > > On Tue, Oct 14, 2025 at 06:01:07PM +0200, Francesco Valla wrote:
+> > > > > > On Tuesday, 14 October 2025 at 12:15:12 Matias Ezequiel Vara La=
+rsen <mvaralar@redhat.com> wrote:
+> > > > > > > On Thu, Sep 11, 2025 at 10:59:40PM +0200, Francesco Valla wro=
+te:
+> > > > > > > > Hello Mikhail, Harald,
+> > > > > > > >
+> > > > > > > > hoping there will be a v6 of this patch soon, a few comment=
+s:
+> > > > > > > >
+> > > > > > > > On Monday, 8 January 2024 at 14:10:35 Mikhail Golubev-Ciuch=
+ea <Mikhail.Golubev-Ciuchea@opensynergy.com> wrote:
+> > > > > > > >
+> > > > > > > > [...]
+> > > > > > > > > +
+> > > > > > > > > +/* Compare with m_can.c/m_can_echo_tx_event() */
+> > > > > > > > > +static int virtio_can_read_tx_queue(struct virtqueue *vq=
+)
+> > > > > > > > > +{
+> > > > > > > > > +       struct virtio_can_priv *can_priv =3D vq->vdev->pr=
+iv;
+> > > > > > > > > +       struct net_device *dev =3D can_priv->dev;
+> > > > > > > > > +       struct virtio_can_tx *can_tx_msg;
+> > > > > > > > > +       struct net_device_stats *stats;
+> > > > > > > > > +       unsigned long flags;
+> > > > > > > > > +       unsigned int len;
+> > > > > > > > > +       u8 result;
+> > > > > > > > > +
+> > > > > > > > > +       stats =3D &dev->stats;
+> > > > > > > > > +
+> > > > > > > > > +       /* Protect list and virtio queue operations */
+> > > > > > > > > +       spin_lock_irqsave(&can_priv->tx_lock, flags);
+> > > > > > > > > +
+> > > > > > > > > +       can_tx_msg =3D virtqueue_get_buf(vq, &len);
+> > > > > > > > > +       if (!can_tx_msg) {
+> > > > > > > > > +               spin_unlock_irqrestore(&can_priv->tx_lock=
+, flags);
+> > > > > > > > > +               return 0; /* No more data */
+> > > > > > > > > +       }
+> > > > > > > > > +
+> > > > > > > > > +       if (unlikely(len < sizeof(struct virtio_can_tx_in=
+))) {
+> > > > > > > > > +               netdev_err(dev, "TX ACK: Device sent no r=
+esult code\n");
+> > > > > > > > > +               result =3D VIRTIO_CAN_RESULT_NOT_OK; /* K=
+eep things going */
+> > > > > > > > > +       } else {
+> > > > > > > > > +               result =3D can_tx_msg->tx_in.result;
+> > > > > > > > > +       }
+> > > > > > > > > +
+> > > > > > > > > +       if (can_priv->can.state < CAN_STATE_BUS_OFF) {
+> > > > > > > > > +               /* Here also frames with result !=3D VIRT=
+IO_CAN_RESULT_OK are
+> > > > > > > > > +                * echoed. Intentional to bring a waiting=
+ process in an upper
+> > > > > > > > > +                * layer to an end.
+> > > > > > > > > +                * TODO: Any better means to indicate a p=
+roblem here?
+> > > > > > > > > +                */
+> > > > > > > > > +               if (result !=3D VIRTIO_CAN_RESULT_OK)
+> > > > > > > > > +                       netdev_warn(dev, "TX ACK: Result =
+=3D %u\n", result);
+> > > > > > > >
+> > > > > > > > Maybe an error frame reporting CAN_ERR_CRTL_UNSPEC would be=
+ better?
+> > > > > > > >
+> > > > > > > I am not sure. In xilinx_can.c, CAN_ERR_CRTL_UNSPEC is indica=
+ted during
+> > > > > > > a problem in the rx path and this is the tx path. I think the=
+ comment
+> > > > > > > refers to improving the way the driver informs this error to =
+the user
+> > > > > > > but I may be wrong.
+> > > > > > >
+> > > > > >
+> > > > > > Since we have no detail of what went wrong here, I suggested
+> > > > > > CAN_ERR_CRTL_UNSPEC as it is "unspecified error", to be coupled=
+ with a
+> > > > > > controller error with id CAN_ERR_CRTL; however, a different err=
+or might be
+> > > > > > more appropriate.
+> > > > > >
+> > > > > > For sure, at least in my experience, having a warn printed to k=
+msg is *not*
+> > > > > > enough, as the application sending the message(s) would not be =
+able to detect
+> > > > > > the error.
+> > > > > >
+> > > > > >
+> > > > > > > > For sure, counting the known errors as valid tx_packets and=
+ tx_bytes
+> > > > > > > > is misleading.
+> > > > > > > >
+> > > > > > >
+> > > > > > > I'll remove the counters below.
+> > > > > > >
+> > > > > >
+> > > > > > We don't really know what's wrong here - the packet might have =
+been sent and
+> > > > > > and then not ACK'ed, as well as any other error condition (as i=
+t happens in the
+> > > > > > reference implementation from the original authors [1]). Echoin=
+g the packet
+> > > > > > only "to bring a waiting process in an upper layer to an end" a=
+nd incrementing
+> > > > > > counters feels wrong, but maybe someone more expert than me can=
+ advise better
+> > > > > > here.
+> > > > > >
+> > > > > >
+> > > > >
+> > > > > I agree. IIUC, in case there has been a problem during transmissi=
+on, I
+> > > > > should 1) indicate this by injecting a CAN_ERR_CRTL_UNSPEC packag=
+e with
+> > > > > netif_rx() and 2) use can_free_echo_skb() and increment the tx_er=
+ror
+> > > > > stats. Is this correct?
+> > > > >
+> > > > > Matias
+> > > > >
+> > > > >
+> > > >
+> > > > That's my understanding too! stats->tx_dropped should be the right =
+value to
+> > > > increment (see for example [1]).
+> > > >
+> > > > [1] https://elixir.bootlin.com/linux/v6.17.3/source/drivers/net/can=
+/ctucanfd/ctucanfd_base.c#L1035
+> > > >
+> > >
+> > > I think the counter to increment would be stats->tx_errors in this ca=
+se ...
+> > >
+> >
+> > I don't fully agree. tx_errors is for CAN frames that got transmitted b=
+ut then
+> > lead to an error (e.g.: no ACK), while here we might be dealing with fr=
+ames
+> > that didn't even manage to reach the transmission queue [1].
+> >
+> Let's use tx_dropped then, I honestly do not have an strong opinion
+> about it. We can change that later if we are not happy.
+>
+> Matias
 
-[1] https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDocuments/Errata/LAN8842-Errata-DS80001172.pdf
+Just sent v6 in https://lore.kernel.org/all/aQJRnX7OpFRY%2F1+H@fedora/
 
-Fixes: 5a774b64cd6a ("net: phy: micrel: Add support for lan8842")
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
----
- drivers/net/phy/micrel.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index 1fa56d4c17937..6a1a424e3b30f 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -5965,6 +5965,9 @@ static int lan8842_probe(struct phy_device *phydev)
- 
- #define LAN8814_POWER_MGMT_VAL5		LAN8814_POWER_MGMT_B_C_D
- 
-+#define LAN8814_EEE_WAKE_TX_TIMER			0x0e
-+#define LAN8814_EEE_WAKE_TX_TIMER_MAX_VAL		0x1f
-+
- static const struct lanphy_reg_data short_center_tap_errata[] = {
- 	{ LAN8814_PAGE_POWER_REGS,
- 	  LAN8814_POWER_MGMT_MODE_3_ANEG_MDI,
-@@ -6004,6 +6007,12 @@ static const struct lanphy_reg_data short_center_tap_errata[] = {
- 	  LAN8814_POWER_MGMT_VAL4 },
- };
- 
-+static const struct lanphy_reg_data waketx_timer_errata[] = {
-+	{ LAN8814_PAGE_EEE,
-+	  LAN8814_EEE_WAKE_TX_TIMER,
-+	  LAN8814_EEE_WAKE_TX_TIMER_MAX_VAL },
-+};
-+
- static int lanphy_write_reg_data(struct phy_device *phydev,
- 				 const struct lanphy_reg_data *data,
- 				 size_t num)
-@@ -6022,8 +6031,15 @@ static int lanphy_write_reg_data(struct phy_device *phydev,
- 
- static int lan8842_erratas(struct phy_device *phydev)
- {
--	return lanphy_write_reg_data(phydev, short_center_tap_errata,
-+	int ret;
-+
-+	ret = lanphy_write_reg_data(phydev, short_center_tap_errata,
- 				    ARRAY_SIZE(short_center_tap_errata));
-+	if (ret)
-+		return ret;
-+
-+	return lanphy_write_reg_data(phydev, waketx_timer_errata,
-+				     ARRAY_SIZE(waketx_timer_errata));
- }
- 
- static int lan8842_config_init(struct phy_device *phydev)
--- 
-2.34.1
+Matias
 
 
