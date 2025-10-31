@@ -1,113 +1,95 @@
-Return-Path: <netdev+bounces-234668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CE07C25D67
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 16:30:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9AE5C25D9D
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 16:33:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 06B494E0639
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 15:30:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 230401A24E41
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 15:31:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93BCD2D3731;
-	Fri, 31 Oct 2025 15:30:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 285792D47F6;
+	Fri, 31 Oct 2025 15:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qc8FbJqr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hCC44dFo"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56DE22D23B1;
-	Fri, 31 Oct 2025 15:30:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE1652741CD;
+	Fri, 31 Oct 2025 15:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761924607; cv=none; b=pDZ8T5q0G5SjgWSUZinuFrAM4dYxdy3m/dq8+9L7ikqPo3TNp+VQLhlFFvX3K9cFF60yQ/Qpe9VjIpwZ2E/hMiRgrkP5MWKBjPLYem7Yq4fvzGpulD/cHF6A1f3+UnURGuB9lE0jEK8aAbcoXckJWYkxUdbFpDh3qgL88SURWA4=
+	t=1761924630; cv=none; b=VRRuhi/u1iSxMpxRzFrZPJEjIIlp152g0qLA9TX2cr7koaeJW6DHUK549N/2CAeiqKWZc4uw3tBjZqwPLLjkFuHcs9Ir44j2NJ//xTsgRyNC11eYbDBs+CK96tXYEQr6C14pFEwoXDJ7KBWVLXRRritMeCRxGv0ggCUDwrxGm5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761924607; c=relaxed/simple;
-	bh=YN9mFpyOirMJG3gxerIW77pECs9cukfzbQfkHOAQpHs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OS0qujMUWvoioKtTSzcBP1GNWdxUbHu0ZHiA1QJoT/1/Y7AKNmNsJqg1626KfzqCx+8LCT4Qe2wTnz6Vnupq8tBhQzIhX+Kjw3Tzbt2lScI99P03Q212lI5p5JrY9rHaSk5tpDqc85/4GZTjAArflud+xGayB+KTZibe6h7UnBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qc8FbJqr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63CA2C4CEE7;
-	Fri, 31 Oct 2025 15:30:06 +0000 (UTC)
+	s=arc-20240116; t=1761924630; c=relaxed/simple;
+	bh=LNdVHBNJTXvFdPyWlAGjqanLUHh7aNlbYkry29CGing=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=DC6tBlcVH2KUeBAzrl/uIje5YwOMXyYbrHoFyUQfoi6gN/JrjPNdxABtKe5atsWt2/+DBfvg3XjbnpgLPK/uoLodfEm5rYGQIt5OHHDRirE91G3FxqzoBd6WQCr2jzMMRJdh5lK7icsDR+uYpNiSYEboXm/OeXgfyCf2PvWKRxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hCC44dFo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9249AC4CEE7;
+	Fri, 31 Oct 2025 15:30:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761924606;
-	bh=YN9mFpyOirMJG3gxerIW77pECs9cukfzbQfkHOAQpHs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qc8FbJqrkdCIX64uhcGh/3sGHjyZ/kg6c299TYuVaR/EIJqJe7VvR4brCH0bIYjIm
-	 ccsiXGVZz9k3yUOR3gfrmQ4kIjoms18UgykNgu+1CPsw1KuPLyFPYP/ri0CslMVeUb
-	 vNzzDSei9y78K6SkntbzS3NuE/nOFh03zqzWcjMyZqDmbWPbmwfVj9iGHSmvPPXwPc
-	 bLnL/UODhTrwTO/5oR0zP4Ffx/OwNa3rxctvcB2Auk1OYMjRRkNvJeY9CtHVN3Bugi
-	 cKqrp5O5IQGjZsNXoECmy3q447y0cXLwfHpdovDId8J2RkKvC1IhxGiQRqQ+t06oEy
-	 OmO8wkiAp0STQ==
-Date: Fri, 31 Oct 2025 16:30:04 +0100
-From: Frederic Weisbecker <frederic@kernel.org>
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gabriele Monaco <gmonaco@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
-	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 01/33] PCI: Prepare to protect against concurrent
- isolated cpuset change
-Message-ID: <aQTV_F-p4tGjdBEq@localhost.localdomain>
-References: <20251013203146.10162-2-frederic@kernel.org>
- <20251014205313.GA906793@bhelgaas>
+	s=k20201202; t=1761924629;
+	bh=LNdVHBNJTXvFdPyWlAGjqanLUHh7aNlbYkry29CGing=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=hCC44dFo8YZHzV5qdl8JJxaxm3AiqfHDe6D6Q7kO09v2ZfT1AB2LOBWwd8dEkLuFh
+	 Ye3u4oPOBH45K9f5jq+Q+msp5+vYtdeWDlQAlNc/ccqZIDSUO+cGM8BQU2JoPZwfxX
+	 wwXs158YriRe3MSoOm8gHODJg0NuUCgt0W15niwkBhVgM8WAwtWnzDbpXgIMFqh6i8
+	 ZmPaadIRYzM3V5M+SMERSmXPxF6FjI3kfj+row9mT8UCodyL+gjyT8BWpdVQ3LcIjQ
+	 PBvXzmp3FykiZN37PCMLNOY6/YUJQkXYAb4pARACZ5YQosE+C8YIy3zaH/U+D8HKYx
+	 Ys8KDsHcpECLw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB74D3A82567;
+	Fri, 31 Oct 2025 15:30:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251014205313.GA906793@bhelgaas>
+Subject: Re: [PATCH net] Bluetooth: MGMT: Fix OOB access in
+ parse_adv_monitor_pattern()
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <176192460576.517485.15986970285103455414.git-patchwork-notify@kernel.org>
+Date: Fri, 31 Oct 2025 15:30:05 +0000
+References: <20251020151255.1807712-1-Ilia.Gavrilov@infotecs.ru>
+In-Reply-To: <20251020151255.1807712-1-Ilia.Gavrilov@infotecs.ru>
+To: Ilia Gavrilov <Ilia.Gavrilov@infotecs.ru>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org,
+ stable@vger.kernel.org
 
-Le Tue, Oct 14, 2025 at 03:53:13PM -0500, Bjorn Helgaas a écrit :
-> On Mon, Oct 13, 2025 at 10:31:14PM +0200, Frederic Weisbecker wrote:
-> > HK_TYPE_DOMAIN will soon integrate cpuset isolated partitions and
-> > therefore be made modifyable at runtime. Synchronize against the cpumask
-> > update using RCU.
-> > 
-> > The RCU locked section includes both the housekeeping CPU target
-> > election for the PCI probe work and the work enqueue.
-> > 
-> > This way the housekeeping update side will simply need to flush the
-> > pending related works after updating the housekeeping mask in order to
-> > make sure that no PCI work ever executes on an isolated CPU. This part
-> > will be handled in a subsequent patch.
+Hello:
+
+This patch was applied to bluetooth/bluetooth-next.git (master)
+by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
+
+On Mon, 20 Oct 2025 15:12:55 +0000 you wrote:
+> In the parse_adv_monitor_pattern() function, the value of
+> the 'length' variable is currently limited to HCI_MAX_EXT_AD_LENGTH(251).
+> The size of the 'value' array in the mgmt_adv_pattern structure is 31.
+> If the value of 'pattern[i].length' is set in the user space
+> and exceeds 31, the 'patterns[i].value' array can be accessed
+> out of bound when copied.
 > 
-> s/modifyable/modifiable/ (also in several other commit logs)
+> [...]
 
-Languages are hard.
+Here is the summary with links:
+  - [net] Bluetooth: MGMT: Fix OOB access in parse_adv_monitor_pattern()
+    https://git.kernel.org/bluetooth/bluetooth-next/c/e1e9d861e2f9
 
-Fixing the set, thanks!
-
+You are awesome, thank you!
 -- 
-Frederic Weisbecker
-SUSE Labs
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
