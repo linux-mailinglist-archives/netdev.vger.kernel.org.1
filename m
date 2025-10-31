@@ -1,276 +1,188 @@
-Return-Path: <netdev+bounces-234771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FC72C271AA
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 23:09:46 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6B33C271F3
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 23:27:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 92BB41B27B13
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 22:10:10 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 79E1E351724
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 22:27:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD18E329E64;
-	Fri, 31 Oct 2025 22:09:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48CD432ABEF;
+	Fri, 31 Oct 2025 22:27:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kHCIzAWY"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="eCBQhnuG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BEF126C3BE
-	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 22:09:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3DAF2E889C
+	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 22:27:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761948580; cv=none; b=dtQ2To5m7ZUSDiqhaxfBbvjbeesgbeQFEBvmQ/sjUkSCB760yEFJtYwaRAn/LSEmuThPgVVW7tTaHdtF6M7eLLWEwK5jvqR97Fl7sRY/ZsWKkER6W3rSPde9BvF83UAaEkdqDgvsdVjge9wMr401Vnq8U8VeYGUKP4lSpjXhW1o=
+	t=1761949670; cv=none; b=SYKDYKQVF98qA/0bwvPZ3rrCW+PIY4ylXTwf3rwYsh8eqsHanuiGRqbQ7n8OyDeO+9APKf/XIPVVvh1AA8Kg3JIDJyiJcphSEuANgG4zMq925EG7SCqhHt8O3R52QBajSBn20MGflmxwsBqvLFRWn7kvSb4/4QbVgWeZApgX2Ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761948580; c=relaxed/simple;
-	bh=NI24yJu8a/oIEMpzBd8OjPM56b0OSOJNISs2lLYq2/k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=K3n/JYAI/XOx97qBGWTnPYpAsk4x1njCqCH8KfSAm2BCumFKvz6VCmj3v6HyYlx5pVAurU+5gLqv20Ba2YUUyDI/Hb99WwGM0Tao0oxJcauQKHBZ6Sx+1bBPBxVdOIa4o6oJTSe/4iyj+z9qk44RCqqQNHYGdc3Th0ogK1bHCzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kHCIzAWY; arc=none smtp.client-ip=209.85.128.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-71d71bcab6fso28703537b3.0
-        for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 15:09:38 -0700 (PDT)
+	s=arc-20240116; t=1761949670; c=relaxed/simple;
+	bh=P8BdOeLeLkziClh4TYcx9Dks+BtMVmaR8E0yMh0gg48=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=ktHO3QakoVYIODlqIdKTjW8unnERWtYbBBYQNewCqVw1s1mRWIkEIA2I5bhxk6iKYSggpV/5p4eVK+CW58JwRJNJakPLqEdam/DasmwwIkAPxFq80mfeM/kybAhkltzVmzoj3blwUZQ74jSYMLkGOYN+mrWtNngN/i6PdE2KJEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=eCBQhnuG; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4ecae310df8so42084741cf.2
+        for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 15:27:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1761948578; x=1762553378; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=bytedance.com; s=google; t=1761949666; x=1762554466; darn=vger.kernel.org;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Y8/vetDDr1N9+AK1mZbstJAe26E/PoEWOtPFLT6m+AY=;
-        b=kHCIzAWYT+BinkAGCb2/hToi1e1xblFSl8IYel6hUITEv/BEOnQPpE+ECUznofzpi2
-         BYy0Rm3bN9fXFjO6emv1TiQG14he3MjaUZ8xZPTEFmlmVml4JbdkiNJ6vccT54vPY2DL
-         n5lslYqthanHltxs/Y3+M6lk/dHyh9sLrP8N0eN/EFDzTtD0YV94kpOmL1LKyU8lhrP7
-         Fd6QGnowoQCJhZ2A9sjWTN9fpqTQ72wpd/h6Ym+mygVLgWTjPYRO2e63BxJlLJL0Cn2E
-         ip1vhbpRWQG10/yztZxmRltCrxHbTRDuEaTXze/NOChqi3I8G4aR88wwgGUkqhc/4gsx
-         2cHw==
+        bh=IhH+adm3hPLIxGUF9gXdn1TePvtzXQPFSGMvNJTNtTc=;
+        b=eCBQhnuG6dEgyTNHhL1kkOJXzVkP+j7xxCCln3AHqu8Lpp1Cw1sOWriAq3sfk7O8fA
+         fkaG6e51R4YO5UsZZCHCHyOmW52SggWCzaDGOq58rcczw+tq8CkC4UcaSskH4qBwl3Fw
+         lI1clF69hMDP2XcCbc+jTkQjSEtwVoBlST7fx5n4N2sRsEEvj9/1j+CykM8MrnnUBPhP
+         JCtse5hDLu3/SIjIkVePOukIdsWdR98uva0H3velS3nqb/b0jh/qN/Zuy6U4rWPtW82v
+         cEqXOypPB9OxDfzHzzaYiUH1R1L3R5pdKWUKSWmN2FZCLg6P+lL4WJpXK9BDVVGkLQbg
+         Cw4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761948578; x=1762553378;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Y8/vetDDr1N9+AK1mZbstJAe26E/PoEWOtPFLT6m+AY=;
-        b=gCw26WsWvSGs4vcUNiTJzZ2yT4GNRXdX8XF7CvHMR2Q9hMRRVI7JHG7BJDzBN+6td7
-         D6q6ETuBfV3kCmq+JPfobdSoctzqO0DytnlBB5dgcsalTZa7a/3Dd/tx2imjDIR2B2wX
-         eTBuunVV5AcQuns+N+/e5JoAaWh/JydmNwXzUX/QW8UEkd0xhfCrorDdBcuFZK5rDqKM
-         VRP586SqujEXB1ia7HImlS+oHhIV7Au33NqXdTKbfj9olQgotLUdMKXc/Uhl5C96og++
-         c6sQRkC8VyTjxEjhOGvUd4OtRH6VlXEhVKNnTGsFsE8DnrJDn63V/GYeEV2ao61T5Y5o
-         atUg==
-X-Forwarded-Encrypted: i=1; AJvYcCXiYUBYozLuXfTiiqA4LsP3NQYDG46eC50xOnlTF8aIuX6mTnc7+deQfKQBLQPQyzWc87euSBw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwsqWoTej7TGS2KCuz7eq/tjrwQshSQnTt9pHGhPkv6F96BzKZ6
-	yXod7osv8FkWBRfCxxqp6J94fGErijWON2JtOofdUEu5tkPiuxYN/17y3DB3GmHK53Yxzb/br7j
-	4RiI+gU0RCkELHGgf8yDxNQYVXfK0Xcg=
-X-Gm-Gg: ASbGncvz2wiLNioeNyzmhq+K+DPMZdhLadJREVysr6QSY86Ail4FpSjB6RxTG+wRJ4d
-	GHXCVAn30f7xGyNDZCpyoieS+QpDYiMAo4Qyuu29j5MscY5NCAcpX90NnO2jQwV5i0ZK5uzHpWF
-	5rdbpu8lnaqmQ4z+am5NxRszsRouIHaOkI0wcVdkE+v7W5usk5+7ij5u2zfDvG7J2/A/2WFnYyF
-	mG95NycxC+e9wjZLUcohStGBU4aT9eC4DJq+o2YOoqeWneyII//MlWC/18RtbVxijQ42hQ=
-X-Google-Smtp-Source: AGHT+IFf4AYPhm4Mg9icKGfIH/ctcphuf+l/cgHKXrjRe4LFjjWZUY04+LLvfv0w79qoORycpeTXjCx+dKReOvNBIko=
-X-Received: by 2002:a05:690c:4b0d:b0:786:373f:c82b with SMTP id
- 00721157ae682-786485b03b3mr41586757b3.70.1761948577840; Fri, 31 Oct 2025
- 15:09:37 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761949666; x=1762554466;
+        h=content-transfer-encoding:subject:from:cc:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=IhH+adm3hPLIxGUF9gXdn1TePvtzXQPFSGMvNJTNtTc=;
+        b=Wq8vgdwEMdp1V2qFG15LD6S2Z+JRTgE/Hed1dRd5rvTwa/RD6+zeNTfkenPLbBO/Kp
+         gWP+gQs2HZwn1J833IM4hyuZ0yKOFFVNUhqVDQpX6exgukVUJK6F/bNlxfgNHdBXCeGQ
+         rD/ieVvkkc9WhIbbgcWDnXaeAzzYFWKb+B4U6I/7ors+q82aBT92yFYQDMeTEliJLg7/
+         sY7XtxG7MdnC9VRPN1Dgpboix87HGb9i7FpQTRLB+M9mrRIAsb+eONMFoR6Fueabr/yt
+         zJqqVk725xDA5oFH0AUOHcM1AzFGCajw5Sc3NtT0CUiq5w9S1fQScRsNn3qij1jqYF8f
+         fYFA==
+X-Gm-Message-State: AOJu0YzE7q//Vj9DbTSy33vWwxh0Kbkkk33KX7VXzGrWpJXQU19mc3M2
+	XuwC+60jxz2e3aT5xeqDP2jqQuuO8xJQytC143vQfHG7DXO99sKEAHaJuG4F+KQ47uFa+ZTj7It
+	VvxT7
+X-Gm-Gg: ASbGncsGzkozhymCi7fFmgJi/i5BsbDWSFBNrKx1JEnhiOev0uDqi50UQ7863JZrps9
+	SK/VG30seZ0mE58M2ZAHOS1fJSwQgRKmlEio23KF5dzo78DxsgVBwnMKUJJQlhIFYST319K8oQh
+	KBcaBZY3wGTm0sH3h2z2hITioSSPh3U32jP1V3O/Dctvv5WM8Lgj/Yvj+jphJ2EHP9LbYHJc12t
+	/+eD4ypdbplSbNzOj8rLpUCD6CgRF+NZLPJBqgMxkj003MS7Dx6dS+osgJ7qcp6PtmD+ryLt+qP
+	rtvM5p2qqcUzJH30J/QzRPmzAycA9w0RHKh9glBSMlaCTO2527Mym14Q1782puJQNiKmnN8RctO
+	ojR7wwqsH3CyR0GjveCVkUhlNkP2Y/RXOWWxcUgeiA7Cc0+4O//h/IJMq9c4Kg14xo/WRjOpo9l
+	7u4ThNNfeui6JsTyg5T7TIXJs/pzWjCHDbIXM=
+X-Google-Smtp-Source: AGHT+IHKSV6S/+Xj1L6SEx+w42HEjS6DpurLR9Drxnkgd3+sKS/MbstOINZac3XO8SfbgPRFbHVAvQ==
+X-Received: by 2002:a05:622a:2285:b0:4ec:462f:4416 with SMTP id d75a77b69052e-4ed30df83a9mr64384861cf.30.1761949666178;
+        Fri, 31 Oct 2025 15:27:46 -0700 (PDT)
+Received: from [10.73.214.168] ([208.184.112.130])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ed4062133dsm6888951cf.9.2025.10.31.15.27.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 31 Oct 2025 15:27:44 -0700 (PDT)
+Message-ID: <3bb18dc2-a61f-4ecc-b1a6-c45e5c12fa51@bytedance.com>
+Date: Fri, 31 Oct 2025 15:27:42 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251024212914.1474337-1-ameryhung@gmail.com> <20251024212914.1474337-3-ameryhung@gmail.com>
- <CAEf4BzYnB74djXyb08m7tJE9MGxT-iVOOBsNQO3PFGFDW=vRLA@mail.gmail.com>
-In-Reply-To: <CAEf4BzYnB74djXyb08m7tJE9MGxT-iVOOBsNQO3PFGFDW=vRLA@mail.gmail.com>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Fri, 31 Oct 2025 15:09:26 -0700
-X-Gm-Features: AWmQ_blrHrmWDni1qhAAS5MSAMMCLXyBt2N8cz9GjLyEjMjtAjjIx98vJsXeppA
-Message-ID: <CAMB2axMQnn-vp2yjnkta7VFU2vwaNcH=PwpL7LCS+u7aFdYvmA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v4 2/6] bpf: Support associating BPF program with struct_ops
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, tj@kernel.org, martin.lau@kernel.org, 
-	kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, saeedm@nvidia.com,
+ gal@nvidia.com, leonro@nvidia.com, witu@nvidia.com, parav@nvidia.com,
+ tariqt@nvidia.com, hkelam@marvell.com
+From: Zijian Zhang <zijianzhang@bytedance.com>
+Subject: [PATCH v2] net/mlx5e: Modify mlx5e_xdp_xmit sq selection
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 28, 2025 at 9:53=E2=80=AFAM Andrii Nakryiko
-<andrii.nakryiko@gmail.com> wrote:
->
-> On Fri, Oct 24, 2025 at 2:29=E2=80=AFPM Amery Hung <ameryhung@gmail.com> =
-wrote:
-> >
-> > Add a new BPF command BPF_PROG_ASSOC_STRUCT_OPS to allow associating
-> > a BPF program with a struct_ops map. This command takes a file
-> > descriptor of a struct_ops map and a BPF program and set
-> > prog->aux->st_ops_assoc to the kdata of the struct_ops map.
-> >
-> > The command does not accept a struct_ops program nor a non-struct_ops
-> > map. Programs of a struct_ops map is automatically associated with the
-> > map during map update. If a program is shared between two struct_ops
-> > maps, prog->aux->st_ops_assoc will be poisoned to indicate that the
-> > associated struct_ops is ambiguous. The pointer, once poisoned, cannot
-> > be reset since we have lost track of associated struct_ops. For other
-> > program types, the associated struct_ops map, once set, cannot be
-> > changed later. This restriction may be lifted in the future if there is
-> > a use case.
-> >
-> > A kernel helper bpf_prog_get_assoc_struct_ops() can be used to retrieve
-> > the associated struct_ops pointer. The returned pointer, if not NULL, i=
-s
-> > guaranteed to be valid and point to a fully updated struct_ops struct.
-> > For struct_ops program reused in multiple struct_ops map, the return
-> > will be NULL. The call must be paired with bpf_struct_ops_put() once th=
-e
-> > caller is done with the struct_ops.
-> >
-> > To make sure the returned pointer to be valid, the command increases th=
-e
-> > refcount of the map for every associated non-struct_ops programs. For
-> > struct_ops programs, since they do not increase the refcount of
-> > struct_ops map, bpf_prog_get_assoc_struct_ops() has to bump the refcoun=
-t
-> > of the map to prevent a map from being freed while the program runs.
-> > This can happen if a struct_ops program schedules a time callback that
-> > runs after the struct_ops map is freed.
-> >
-> > struct_ops implementers should note that the struct_ops returned may or
-> > may not be attached. The struct_ops implementer will be responsible for
-> > tracking and checking the state of the associated struct_ops map if the
-> > use case requires an attached struct_ops.
-> >
-> > Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> > ---
-> >  include/linux/bpf.h            | 16 ++++++
-> >  include/uapi/linux/bpf.h       | 17 ++++++
-> >  kernel/bpf/bpf_struct_ops.c    | 98 ++++++++++++++++++++++++++++++++++
-> >  kernel/bpf/core.c              |  3 ++
-> >  kernel/bpf/syscall.c           | 46 ++++++++++++++++
-> >  tools/include/uapi/linux/bpf.h | 17 ++++++
-> >  6 files changed, 197 insertions(+)
-> >
->
-> [...]
->
-> > @@ -1394,6 +1414,84 @@ int bpf_struct_ops_link_create(union bpf_attr *a=
-ttr)
-> >         return err;
-> >  }
-> >
-> > +int bpf_prog_assoc_struct_ops(struct bpf_prog *prog, struct bpf_map *m=
-ap)
-> > +{
-> > +       struct bpf_map *st_ops_assoc;
-> > +
-> > +       guard(mutex)(&prog->aux->st_ops_assoc_mutex);
-> > +
-> > +       st_ops_assoc =3D rcu_access_pointer(prog->aux->st_ops_assoc);
->
-> we don't have RCU lock here, can this trigger lockdep warnings due to
-> rcu_access_pointer() use?
->
-> > +
-> > +       if (st_ops_assoc && st_ops_assoc =3D=3D map)
-> > +               return 0;
-> > +
-> > +       if (st_ops_assoc) {
-> > +               if (prog->type !=3D BPF_PROG_TYPE_STRUCT_OPS)
-> > +                       return -EBUSY;
-> > +
->
-> put st_ops_assoc map (if it's not BPF_PTR_POISON already, of course),
-> otherwise we are leaking refcount
+From: Zijian Zhang <zijianzhang@bytedance.com>
 
-struct_ops programs do not take refcount on struct_ops map, so we
-shouldn't need to drop refcount here.
+When performing XDP_REDIRECT from one mlnx device to another, using
+smp_processor_id() to select the queue may go out-of-range.
 
->
-> pw-bot: cr
->
-> > +               rcu_assign_pointer(prog->aux->st_ops_assoc, BPF_PTR_POI=
-SON);
-> > +       } else {
-> > +               if (prog->type !=3D BPF_PROG_TYPE_STRUCT_OPS)
-> > +                       bpf_map_inc(map);
-> > +
-> > +               rcu_assign_pointer(prog->aux->st_ops_assoc, map);
-> > +       }
-> > +
-> > +       return 0;
-> > +}
-> > +
-> > +void bpf_prog_disassoc_struct_ops(struct bpf_prog *prog)
-> > +{
-> > +       struct bpf_map *st_ops_assoc;
-> > +
-> > +       guard(mutex)(&prog->aux->st_ops_assoc_mutex);
-> > +
-> > +       st_ops_assoc =3D rcu_access_pointer(prog->aux->st_ops_assoc);
-> > +
-> > +       if (!st_ops_assoc || st_ops_assoc =3D=3D BPF_PTR_POISON)
-> > +               return;
-> > +
-> > +       if (prog->type !=3D BPF_PROG_TYPE_STRUCT_OPS)
-> > +               bpf_map_put(st_ops_assoc);
-> > +
-> > +       RCU_INIT_POINTER(prog->aux->st_ops_assoc, NULL);
-> > +}
-> > +
-> > +/*
-> > + * Get a reference to the struct_ops struct (i.e., kdata) associated w=
-ith a
-> > + * program. Must be paired with bpf_struct_ops_put().
-> > + *
-> > + * If the returned pointer is not NULL, it must points to a valid and
-> > + * initialized struct_ops. The struct_ops may or may not be attached.
-> > + * Kernel struct_ops implementers are responsible for tracking and che=
-cking
-> > + * the state of the struct_ops if the use case requires an attached st=
-ruct_ops.
-> > + */
-> > +void *bpf_prog_get_assoc_struct_ops(const struct bpf_prog_aux *aux)
-> > +{
-> > +       struct bpf_struct_ops_map *st_map;
-> > +       struct bpf_map *map;
-> > +
-> > +       scoped_guard(rcu) {
-> > +               map =3D rcu_dereference(aux->st_ops_assoc);
-> > +               if (!map || map =3D=3D BPF_PTR_POISON)
-> > +                       return NULL;
-> > +
-> > +               map =3D bpf_map_inc_not_zero(map);
->
-> I think this is buggy. When timer callback happens, the map can be
-> long gone, and its underlying memory reused for something else. So
-> this bpf_map_inc_not_zero() can crash or just corrupt some memory. RCU
-> inside this function doesn't do much for us, it happens way too late.
->
-> It's also suboptimal that we now require callers of
-> bpf_prog_get_assoc_struct_ops() to do manual ref put.
->
-> Have you considered getting prog->aux->st_ops_assoc ref incremented
-> when scheduling async callback instead? Then we won't need all this
-> hackery and caller will just be working with borrowed map reference?
->
+Assume eth0 is redirecting a packet to eth1, eth1 is configured
+with only 8 channels, while eth0 has its RX queues pinned to
+higher-numbered CPUs (e.g. CPU 12). When a packet is received on
+such a CPU and redirected to eth1, the driver uses smp_processor_id()
+as the SQ index. Since the CPU ID is larger than the number of queues
+on eth1, the lookup (priv->channels.c[sq_num]) goes out of range and
+the redirect fails.
 
-Will change kfunc facing APIs to not expose struct_map lifecycle management=
-.
+This patch fixes the issue by mapping the CPU ID to a valid channel
+index using modulo arithmetic.
 
-> > +               if (IS_ERR(map))
-> > +                       return NULL;
-> > +       }
-> > +
-> > +       st_map =3D (struct bpf_struct_ops_map *)map;
-> > +
-> > +       if (smp_load_acquire(&st_map->kvalue.common.state) =3D=3D BPF_S=
-TRUCT_OPS_STATE_INIT) {
-> > +               bpf_map_put(map);
-> > +               return NULL;
-> > +       }
-> > +
-> > +       return &st_map->kvalue.data;
-> > +}
-> > +EXPORT_SYMBOL_GPL(bpf_prog_get_assoc_struct_ops);
-> > +
-> >  void bpf_map_struct_ops_info_fill(struct bpf_map_info *info, struct bp=
-f_map *map)
-> >  {
->
-> [...]
+     sq_num = smp_processor_id() % priv->channels.num;
+
+With this change, XDP_REDIRECT works correctly even when the source
+device uses high CPU affinities and the target device has fewer TX
+queues.
+
+v2:
+Suggested by Jakub Kicinski, I add a lock to synchronize TX when
+xdp redirects packets on the same queue.
+
+Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
+Reviewed-by: Hariprasad Kelam <hkelam@marvell.com>
+---
+  drivers/net/ethernet/mellanox/mlx5/core/en.h      | 3 +++
+  drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c  | 8 +++-----
+  drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 2 ++
+  3 files changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+index 14e3207b14e7..2281154442d9 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+@@ -516,6 +516,9 @@ struct mlx5e_xdpsq {
+  	/* control path */
+  	struct mlx5_wq_ctrl        wq_ctrl;
+  	struct mlx5e_channel      *channel;
++
++	/* synchronize simultaneous xdp_xmit on the same ring */
++	spinlock_t                 xdp_tx_lock;
+  } ____cacheline_aligned_in_smp;
+  
+  struct mlx5e_xdp_buff {
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
+index 5d51600935a6..6225734b256a 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
+@@ -855,13 +855,10 @@ int mlx5e_xdp_xmit(struct net_device *dev, int n, struct xdp_frame **frames,
+  	if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
+  		return -EINVAL;
+  
+-	sq_num = smp_processor_id();
+-
+-	if (unlikely(sq_num >= priv->channels.num))
+-		return -ENXIO;
+-
++	sq_num = smp_processor_id() % priv->channels.num;
+  	sq = priv->channels.c[sq_num]->xdpsq;
+  
++	spin_lock(&sq->xdp_tx_lock);
+  	for (i = 0; i < n; i++) {
+  		struct mlx5e_xmit_data_frags xdptxdf = {};
+  		struct xdp_frame *xdpf = frames[i];
+@@ -942,6 +939,7 @@ int mlx5e_xdp_xmit(struct net_device *dev, int n, struct xdp_frame **frames,
+  	if (flags & XDP_XMIT_FLUSH)
+  		mlx5e_xmit_xdp_doorbell(sq);
+  
++	spin_unlock(&sq->xdp_tx_lock);
+  	return nxmit;
+  }
+  
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index 9c46511e7b43..ced9eefe38aa 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -1559,6 +1559,8 @@ static int mlx5e_alloc_xdpsq(struct mlx5e_channel *c,
+  	if (err)
+  		goto err_sq_wq_destroy;
+  
++	spin_lock_init(&sq->xdp_tx_lock);
++
+  	return 0;
+  
+  err_sq_wq_destroy:
+-- 
+2.37.1 (Apple Git-137.1)
+
 
