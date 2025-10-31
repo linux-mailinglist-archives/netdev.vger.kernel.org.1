@@ -1,160 +1,138 @@
-Return-Path: <netdev+bounces-234654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C9B0C253A6
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 14:19:35 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0368C253C7
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 14:20:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA1EB3BBD99
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 13:19:33 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5D28F3516AB
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 13:20:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EBAC34B409;
-	Fri, 31 Oct 2025 13:19:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 961FD34B429;
+	Fri, 31 Oct 2025 13:20:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GLj9bMbw"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="ZWImuyJM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 623BB34D381
-	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 13:19:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15F351B142D;
+	Fri, 31 Oct 2025 13:20:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761916762; cv=none; b=tS6T2sumqOVjPKwLSAkDtIM6WGbHP4L/pBMTKjMxdiNRV4Yrx/5lAGThOJw8ZUe/T7lpCKbsIN1OXBpT7Dox9S9RRbSvrgivvH5YW9WlB5x72uR20buR6DVZRxYFfFVAgkK9DIQ5EfeTgJJkKaygSLberVGcbolqXa+HTEL8hk8=
+	t=1761916820; cv=none; b=S8UqkmMQz4jjt29aKOHu9OE/Q6sUVr4AoG6h/p2s7Z0oCO1OXbgkFuHfGhLBo96dlEDFFpJxwH9+dPRjadN19irCb0dJ0EDjx7n/OQTS/sUjUYcJgZ4W0vnjh1nfC0BceoRQ3a+8SxO2EGROpTQOlS05OYDjN3uYHQYB9OZicps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761916762; c=relaxed/simple;
-	bh=OkpMyqH9LMB5gbHNeVe9QsvLOlwbhxR1aW4ZuqBdvtM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VKut4yW86No9Io4FN/tTSW/Z8ivkZBXKgUFWI1MMnMetKg3hARAmIPzs6sbqSpJTBJ2yXV2USBz5XBjBthRLCGD8ULZkZaZkFWmEu5x0KPBX5NqNIZe37N1Z6IMPvykc63YLCE5NpLFr7PugCifhR9OAEZfPdCjNF0CIIILkH0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GLj9bMbw; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1761916760; x=1793452760;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=OkpMyqH9LMB5gbHNeVe9QsvLOlwbhxR1aW4ZuqBdvtM=;
-  b=GLj9bMbwO6dhXWGNr5Fvvc/LcI0MYSZUKsLnZVwQ1DTAVhvYjAWciAbV
-   iWni6hjtmEtPzc4r4bf6JX2MS2bMgd+Q1yM3tXEVcE2tkm8AwLiFQOZ5L
-   MJoICE/aDmZzzD3qc1QfmBiILgkZ9/vdl6TtPQ+MLBqOuQ1bLZ81Pkr61
-   8NneaI13jXlnenefkPhAi2UehUUpdP0OwsYc7y5yLQVRqFAWL8q1+grxy
-   5HIFuB7Bm+n63a4hhGmr/g875BWjclGRnDZsSU6oWXsuYFJ1p/VHyqj+u
-   WrhHzYfWqSPuw4cx1E1otcr0zfC89/OZy8q5Ls8jf+uOde/gocLm4Cmde
-   g==;
-X-CSE-ConnectionGUID: L3ca7GNkQXSMjPJ+qN6lVg==
-X-CSE-MsgGUID: 6cx4qruBQXi2/S4qgV5pXQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11598"; a="63282040"
-X-IronPort-AV: E=Sophos;i="6.19,269,1754982000"; 
-   d="scan'208";a="63282040"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2025 06:19:19 -0700
-X-CSE-ConnectionGUID: Bl+i9EzFTE+wfRK/Lq6/pQ==
-X-CSE-MsgGUID: akk5Bya7R9yaDhKS6P+3BA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,269,1754982000"; 
-   d="scan'208";a="209801248"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2025 06:19:18 -0700
-Date: Fri, 31 Oct 2025 14:17:11 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	aleksander.lobakin@intel.com, jacob.e.keller@intel.com,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: Re: [PATCH iwl-next v3] ice: use netif_get_num_default_rss_queues()
-Message-ID: <aQS216HKiUmF0tky@mev-dev.igk.intel.com>
-References: <20251030083053.2166525-1-michal.swiatkowski@linux.intel.com>
- <370cf4f0-c0a8-480a-939d-33c75961e587@molgen.mpg.de>
- <aQMxvzYqJkwNBYf0@mev-dev.igk.intel.com>
- <621665db-e881-4adc-8caa-9275a4ed7a50@intel.com>
+	s=arc-20240116; t=1761916820; c=relaxed/simple;
+	bh=DawxYnhCqvS1VLds39qbkKtQE0BqAIbIQ6H60jxljHM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GhdWeu0uNs/infHT32At1l8T0mPMGvGl1DTbFcV4dYL7eQRoQvl3a8/yA/U7X234cnCgvt3f6/VjzT8j6upTKx8TzmgE8u3pcVhkc84IsyqWNOThGhoEdupWj/9QDMYZPub/U8vewnp7L83LMY/Bt+Nm9+82NzLSuTWz04xfJR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=ZWImuyJM; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [192.168.1.19] (unknown [103.212.145.71])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 006D4201A7D2;
+	Fri, 31 Oct 2025 06:20:12 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 006D4201A7D2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1761916818;
+	bh=jnAwVyIj69/F/fVSjZqV+IT6X9/j+5+6TPTp7CUgj7A=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ZWImuyJMsrEdzFUuLTme2SU4Dt/KU4jg59orX5Ppr8PNkuptpnRvW0hpRTeBhRokh
+	 MdYiGUTInWEGFJiPHbbLBV/IOs+zsLRWECBYiy+dy2ip7hf4cgBjGmAfvimQCVI38x
+	 M3uftScXNcDyeR0tJHjHk2O1cy6s1rDrUJY/rdfg=
+Message-ID: <347c723b-d47c-49c2-9a3b-b49d967f875b@linux.microsoft.com>
+Date: Fri, 31 Oct 2025 18:50:10 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <621665db-e881-4adc-8caa-9275a4ed7a50@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] net: mana: Handle SKB if TX SGEs exceed
+ hardware limit
+To: Simon Horman <horms@kernel.org>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ longli@microsoft.com, kotaranov@microsoft.com,
+ shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+ ernis@linux.microsoft.com, dipayanroy@linux.microsoft.com,
+ shirazsaleem@microsoft.com, linux-hyperv@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-rdma@vger.kernel.org, gargaditya@microsoft.com
+References: <20251029131235.GA3903@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <aQMqLN0FRmNU3_ke@horms.kernel.org>
+Content-Language: en-US
+From: Aditya Garg <gargaditya@linux.microsoft.com>
+In-Reply-To: <aQMqLN0FRmNU3_ke@horms.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 30, 2025 at 11:39:30AM +0100, Przemek Kitszel wrote:
-> On 10/30/25 10:37, Michal Swiatkowski wrote:
-> > On Thu, Oct 30, 2025 at 10:10:32AM +0100, Paul Menzel wrote:
-> > > Dear Michal,
-> > > 
-> > > 
-> > > Thank you for your patch. For the summary, I’d add:
-> > > 
-> > > ice: Use netif_get_num_default_rss_queues() to decrease queue number
+On 30-10-2025 14:34, Simon Horman wrote:
+> On Wed, Oct 29, 2025 at 06:12:35AM -0700, Aditya Garg wrote:
+>> The MANA hardware supports a maximum of 30 scatter-gather entries (SGEs)
+>> per TX WQE. Exceeding this limit can cause TX failures.
+>> Add ndo_features_check() callback to validate SKB layout before
+>> transmission. For GSO SKBs that would exceed the hardware SGE limit, clear
+>> NETIF_F_GSO_MASK to enforce software segmentation in the stack.
+>> Add a fallback in mana_start_xmit() to linearize non-GSO SKBs that still
+>> exceed the SGE limit.
+>>
+>> Return NETDEV_TX_BUSY only for -ENOSPC from mana_gd_post_work_request(),
+>> send other errors to free_sgl_ptr to free resources and record the tx
+>> drop.
+>>
+>> Co-developed-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+>> Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+>> Signed-off-by: Aditya Garg <gargaditya@linux.microsoft.com>
 > 
-> I would instead just say:
-> ice: cap the default number of queues to 64
+> ...
 > 
-> as this is exactly what happens. Then next paragraph could be:
-> Use netif_get_num_default_rss_queues() as a better base (instead of
-> the number of CPU cores), but still cap it to 64 to avoid excess IRQs
-> assigned to PF (what would leave, in some cases, nothing for VFs).
+>> @@ -289,6 +290,21 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+>>   	cq = &apc->tx_qp[txq_idx].tx_cq;
+>>   	tx_stats = &txq->stats;
+>>   
+>> +	if (MAX_SKB_FRAGS + 2 > MAX_TX_WQE_SGL_ENTRIES &&
+>> +	    skb_shinfo(skb)->nr_frags + 2 > MAX_TX_WQE_SGL_ENTRIES) {
+>> +		/* GSO skb with Hardware SGE limit exceeded is not expected here
+>> +		 * as they are handled in mana_features_check() callback
+>> +		 */
 > 
-> sorry for such late nitpicks
-> and, see below too
+> Hi,
+> 
+> I'm curious to know if we actually need this code.
+> Are there cases where the mana_features_check() doesn't
+> handle things and the kernel will reach this line?
+> 
+>> +		if (skb_is_gso(skb))
+>> +			netdev_warn_once(ndev, "GSO enabled skb exceeds max SGE limit\n");
+>> +		if (skb_linearize(skb)) {
+>> +			netdev_warn_once(ndev, "Failed to linearize skb with nr_frags=%d and is_gso=%d\n",
+>> +					 skb_shinfo(skb)->nr_frags,
+>> +					 skb_is_gso(skb));
+>> +			goto tx_drop_count;
+>> +		}
+>> +	}
+>> +
+>>   	pkg.tx_oob.s_oob.vcq_num = cq->gdma_id;
+>>   	pkg.tx_oob.s_oob.vsq_frame = txq->vsq_frame;
+>>   
+> 
+> ...
 
-I moved away from capping to 64, now it is just call to
-netif_get_num_default_rss_queues(). Following Olek's comment, dividing
-by 2 is just fine now and looks like there is no good reasone to cap it
-more in the driver, but let's discuss it here if you have different
-opinion.
+Hi Simon,
+As it was previously discussed and agreed on with Eric, this is for 
+Non-GSO skbs which could have possibly nr_frags greater than hardware limit.
 
-> 
-> > > 
-> > > Am 30.10.25 um 09:30 schrieb Michal Swiatkowski:
-> > > > On some high-core systems (like AMD EPYC Bergamo, Intel Clearwater
-> > > > Forest) loading ice driver with default values can lead to queue/irq
-> > > > exhaustion. It will result in no additional resources for SR-IOV.
-> > > 
-> > > Could you please elaborate how to make the queue/irq exhaustion visible?
-> > > 
-> > 
-> > What do you mean? On high core system, lets say num_online_cpus()
-> > returns 288, on 8 ports card we have online 256 irqs per eqch PF (2k in
-> > total). Driver will load with the 256 queues (and irqs) on each PF.
-> > Any VFs creation command will fail due to no free irqs available.
-> 
-> this clearly means this is a -net material,
-> even if this commit will be rather unpleasant for backports to stable
->
+Quoting Eric's comment from v1 thread: 
+https://lore.kernel.org/netdev/CANn89iKwHWdUaeAsdSuZUXG-W8XwyM2oppQL9spKkex0p9-Azw@mail.gmail.com/
+"I think that for non GSO, the linearization attempt is fine.
 
-In my opinion it isn't. It is just about default values. Still in the
-described case user can call ethtool -L and lower the queues to create
-VFs without a problem.
+Note that this is extremely unlikely for non malicious users,
+and MTU being usually small (9K or less),
+the allocation will be much smaller than a GSO packet."
 
-> > (echo X > /sys/class/net/ethX/device/sriov_numvfs)
-> > 
-> > > > In most cases there is no performance reason for more than half
-> > > > num_cpus(). Limit the default value to it using generic
-> > > > netif_get_num_default_rss_queues().
-> > > > 
-> > > > Still, using ethtool the number of queues can be changed up to
-> > > > num_online_cpus(). It can be done by calling:
-> > > > $ethtool -L ethX combined $(nproc)
-> > > > 
-> > > > This change affects only the default queue amount.
-> > > 
-> > > How would you judge the regression potential, that means for people where
-> > > the defaults work good enough, and the queue number is reduced now?
-> > > 
-> > 
-> > You can take a look into commit that introduce /2 change in
-> > netif_get_num_default_rss_queues() [1]. There is a good justification
-> > for such situation. In short, heaving physical core number is just a
-> > wasting of CPU resources.
-> > 
-> > [1] https://lore.kernel.org/netdev/20220315091832.13873-1-ihuguet@redhat.com/
-> > 
-> [...]
+Regards,
+Aditya
 
