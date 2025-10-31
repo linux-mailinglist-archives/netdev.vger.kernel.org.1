@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-234738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0D4EC26B4A
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 20:22:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C91F9C26B56
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 20:22:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65FB14638AF
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 19:21:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 857C718942AC
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 19:22:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B1BF2D6E7E;
-	Fri, 31 Oct 2025 19:21:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55E95337110;
+	Fri, 31 Oct 2025 19:21:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FE72296BC2;
-	Fri, 31 Oct 2025 19:21:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1396229B18;
+	Fri, 31 Oct 2025 19:21:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761938491; cv=none; b=TMR5FjD911ajfGO2oA8YCozqYQ2Zx42QlytimpNVGcdgt5gebJWF0jbRySN4VtZF43xA1SyA41edC/vv0Cy9z+eFG34PznlL5HRHZ4ELBxxT8MhYyDeeC59o91bVHB1bkdDhgzJXA0zM4bywRf7ehgFj+YFXmSyRM1yiDurepjs=
+	t=1761938500; cv=none; b=jpcChvDx9G++SC3l2irmd3Wx8RSpFwrtEoGDocVjpyCtctVL+hOvis6xVJYTlD6gauX4jUSwzkxOVT5kNqLWwLo5eb8y3zoChRMrX2sELiXe/23G8NsfNNNNLg52esAK2wP9FbEqV/TdzoRGrV3+TYtsv04FjiAGHjFTK9WIyWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761938491; c=relaxed/simple;
-	bh=jU16HwXMLNk/Tnma01KJPXcx0f9WGbzIWrggVrEBxA0=;
+	s=arc-20240116; t=1761938500; c=relaxed/simple;
+	bh=7p6Au6FouVQsLTYdKqrLOFedyC3CUIDWOFbaCparMK8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G0VvWB11qbDtbHEMLGOOgOBYkBrS1qpLS7dmsKrKTieKtstPOfEG9KkLS+DbDcL7ilw5I8p0hdC5EM3iHiOg14+/84sJVpLoJbxPYu9LNVRO1mm5K9/DytYz0BH+8s3xtktqcgzGs/Pu1/IXCGPwrsZwQOJx8LBtd/9yW6CuVfU=
+	 Content-Type:Content-Disposition:In-Reply-To; b=CsD6wc7EYtx+56Dirr+tRAF3Tf6AmzQT+byI0QwqUxZO6h1RvvYjPZM0uSMjx2SwoQ0cucqKLUiH6H7cKgYHgb6oqhszbfpUwcRQu03KDE8etdLynTFCHadmrhdIa1ClvKCoPk5jzgZfaNjDaIrExIRSbxcVro9+JT8Ucn91ciQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -33,9 +33,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.98.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1vEugf-000000005tk-150b;
-	Fri, 31 Oct 2025 19:21:25 +0000
-Date: Fri, 31 Oct 2025 19:21:21 +0000
+	id 1vEugo-000000005tv-0IUY;
+	Fri, 31 Oct 2025 19:21:34 +0000
+Date: Fri, 31 Oct 2025 19:21:30 +0000
 From: Daniel Golle <daniel@makrotopia.org>
 To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -58,9 +58,9 @@ Cc: Andreas Schirm <andreas.schirm@siemens.com>,
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
 	"Livia M. Rosu" <lrosu@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: [PATCH net-next v6 05/12] net: dsa: lantiq_gswip: define and use
- GSWIP_TABLE_MAC_BRIDGE_VAL1_VALID
-Message-ID: <6bb433a2ba299523a07f96cd88a3e89f30de1896.1761938079.git.daniel@makrotopia.org>
+Subject: [PATCH net-next v6 06/12] dt-bindings: net: dsa: lantiq,gswip: add
+ MaxLinear RMII refclk output property
+Message-ID: <c25fdd18373a60eb566f4de85a17279f7ab5518b.1761938079.git.daniel@makrotopia.org>
 References: <cover.1761938079.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -72,49 +72,57 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1761938079.git.daniel@makrotopia.org>
 
-When adding FDB entries to the MAC bridge table on GSWIP 2.2 or later it
-is needed to set an (undocumented) bit to mark the entry as valid. If this
-bit isn't set for entries in the MAC bridge table, then those entries won't
-be considered as valid MAC addresses.
+Add support for the maxlinear,rmii-refclk-out boolean property on port
+nodes to configure the RMII reference clock to be an output rather than
+an input.
+
+This property is only applicable for ports in RMII mode and allows the
+switch to provide the reference clock for RMII-connected PHYs instead
+of requiring an external clock source.
+
+This corresponds to the driver changes that read this Device Tree
+property to configure the RMII clock direction.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Reviewed-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
 ---
-v4: keep previous behavior for GSWIP 2.1 and earlier
+v6:
+ * switch order of patches, move deviation from
+   dsa.yaml#/$defs/ethernet-ports to this patch which actually
+   needs it
 
- drivers/net/dsa/lantiq/lantiq_gswip.h        | 1 +
- drivers/net/dsa/lantiq/lantiq_gswip_common.c | 7 ++++++-
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ .../bindings/net/dsa/lantiq,gswip.yaml         | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.h b/drivers/net/dsa/lantiq/lantiq_gswip.h
-index 56de869fc472..42000954d842 100644
---- a/drivers/net/dsa/lantiq/lantiq_gswip.h
-+++ b/drivers/net/dsa/lantiq/lantiq_gswip.h
-@@ -224,6 +224,7 @@
- #define  GSWIP_TABLE_MAC_BRIDGE_KEY3_FID	GENMASK(5, 0)	/* Filtering identifier */
- #define  GSWIP_TABLE_MAC_BRIDGE_VAL0_PORT	GENMASK(7, 4)	/* Port on learned entries */
- #define  GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC	BIT(0)		/* Static, non-aging entry */
-+#define  GSWIP_TABLE_MAC_BRIDGE_VAL1_VALID	BIT(1)		/* Valid bit */
+diff --git a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
+index f3154b19af78..b494f414a3e1 100644
+--- a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
+@@ -6,8 +6,22 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
  
- #define XRX200_GPHY_FW_ALIGN	(16 * 1024)
+ title: Lantiq GSWIP Ethernet switches
  
-diff --git a/drivers/net/dsa/lantiq/lantiq_gswip_common.c b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-index 0ac87eb23bb5..ff2cdb230e2c 100644
---- a/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-+++ b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-@@ -1149,7 +1149,12 @@ static int gswip_port_fdb(struct dsa_switch *ds, int port,
- 	mac_bridge.key[2] = addr[1] | (addr[0] << 8);
- 	mac_bridge.key[3] = FIELD_PREP(GSWIP_TABLE_MAC_BRIDGE_KEY3_FID, fid);
- 	mac_bridge.val[0] = add ? BIT(port) : 0; /* port map */
--	mac_bridge.val[1] = GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC;
-+	if (GSWIP_VERSION_GE(priv, GSWIP_VERSION_2_2_ETC))
-+		mac_bridge.val[1] = add ? (GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC |
-+					   GSWIP_TABLE_MAC_BRIDGE_VAL1_VALID) : 0;
-+	else
-+		mac_bridge.val[1] = GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC;
+-allOf:
+-  - $ref: dsa.yaml#/$defs/ethernet-ports
++$ref: dsa.yaml#
 +
- 	mac_bridge.valid = add;
++patternProperties:
++  "^(ethernet-)?ports$":
++    type: object
++    patternProperties:
++      "^(ethernet-)?port@[0-6]$":
++        $ref: dsa-port.yaml#
++        unevaluatedProperties: false
++
++        properties:
++          maxlinear,rmii-refclk-out:
++            type: boolean
++            description:
++              Configure the RMII reference clock to be a clock output
++              rather than an input. Only applicable for RMII mode.
  
- 	err = gswip_pce_table_entry_write(priv, &mac_bridge);
+ maintainers:
+   - Hauke Mehrtens <hauke@hauke-m.de>
 -- 
 2.51.2
 
