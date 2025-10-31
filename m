@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-234735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21472C26B21
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 20:20:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB0F7C26B27
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 20:20:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 000844E7857
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 19:20:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 540C83B0D91
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 19:20:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B0292FE563;
-	Fri, 31 Oct 2025 19:19:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 949262FB621;
+	Fri, 31 Oct 2025 19:20:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7542C2D6401;
-	Fri, 31 Oct 2025 19:19:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 836D32EDD7E;
+	Fri, 31 Oct 2025 19:20:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761938392; cv=none; b=eQsdTW1foan7OIsllt6koub6E07hT6p8NdNyNhJH3XefsQSyAoFcyL+eF0dAP1LzXWThGe0RnCTVMqPh4c9dQ/IymiPjJ9G2MV8/ZQTLD+f0Y+y/yGpA84OEr4VTDDr8j4m+Eu5DzsjPmpiS0exJWTSClukNetkPUe4DZDkG1PI=
+	t=1761938404; cv=none; b=UAxQMz2M/lM82LxcFOu/EA6DMKB9NK8VmS/Eh+Sz4hgmy1w4Bb9HzsPpqdHAPnjGAZsuH7VMoh8bHJIoilh3qe+tQWScbQw0vJOfxRwMeZN1YxfA6aFJ0fbsLkEOrbKMVeQPxNx4qLVxNy4BhU9yGe7UVGhftHw91NqMtGsYs2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761938392; c=relaxed/simple;
-	bh=+dXeKjhCTskIj5/mPJfuhVZWmpV5Q2cJWaQwUA83bjY=;
+	s=arc-20240116; t=1761938404; c=relaxed/simple;
+	bh=ACKwPvrqLa89TV6WD8GnBZYpDJ0Cq+ouNMsLCxbr53s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FlPbK/NoHOM/wiR8/ZgLIKCFsZnwcMbYkZpfU0scmV9CT1zuEMDQAYLmusbc3+9sXlXuMQdSva04s/9ks9zHwuj6/fwIL7/wP5snoPndoNmWHQW9RDCqa17xF6Dyza3+RcN9Oj4L6gHZWwDI1KQSpmoOs+c9av3aMxz7MH2hJME=
+	 Content-Type:Content-Disposition:In-Reply-To; b=cgUp+EmYTALuLq5MfVyljOFgX66mQN5FGEOIBqzjvx2L6+vsYDIWoYxC+druGXNF2qK+1Z1kgYlCN4i4LyYzCaVo+jxhBSMajpjapygnyP8TIz5C4zS6yP5kueH1k/bADIW6mXgg4+i6nWvFSdbPmzRU/LSHTHi5P6jlsGg8h8M=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -33,9 +33,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.98.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1vEuf4-000000005rr-0EZn;
-	Fri, 31 Oct 2025 19:19:46 +0000
-Date: Fri, 31 Oct 2025 19:19:42 +0000
+	id 1vEufD-000000005sH-2Rhn;
+	Fri, 31 Oct 2025 19:19:55 +0000
+Date: Fri, 31 Oct 2025 19:19:52 +0000
 From: Daniel Golle <daniel@makrotopia.org>
 To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -58,9 +58,9 @@ Cc: Andreas Schirm <andreas.schirm@siemens.com>,
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
 	"Livia M. Rosu" <lrosu@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: [PATCH net-next v6 02/12] net: dsa: lantiq_gswip: support
- enable/disable learning
-Message-ID: <45802fef7e04359020f712b7a834ddc77a35c33f.1761938079.git.daniel@makrotopia.org>
+Subject: [PATCH net-next v6 03/12] net: dsa: lantiq_gswip: support Energy
+ Efficient Ethernet
+Message-ID: <b359eb65c46cdb0aeb1b2a7f699bd4aa623cc0fd.1761938079.git.daniel@makrotopia.org>
 References: <cover.1761938079.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -72,94 +72,113 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1761938079.git.daniel@makrotopia.org>
 
-Switch API 2.2 or later supports enabling or disabling learning on each
-port. Implement support for BR_LEARNING bridge flag and announce support
-for BR_LEARNING on GSWIP 2.2 or later.
+Introduce support for Energy Efficient Ethernet (EEE) on hardware
+version 2.2 or later.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
-v2: initialize supported flags with 0
-
- drivers/net/dsa/lantiq/lantiq_gswip.h        |  3 ++
- drivers/net/dsa/lantiq/lantiq_gswip_common.c | 43 ++++++++++++++++++++
- 2 files changed, 46 insertions(+)
+ drivers/net/dsa/lantiq/lantiq_gswip.h        |  7 +++
+ drivers/net/dsa/lantiq/lantiq_gswip_common.c | 47 ++++++++++++++++++++
+ 2 files changed, 54 insertions(+)
 
 diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.h b/drivers/net/dsa/lantiq/lantiq_gswip.h
-index d86290db19b4..fb7d2c02bde9 100644
+index fb7d2c02bde9..56de869fc472 100644
 --- a/drivers/net/dsa/lantiq/lantiq_gswip.h
 +++ b/drivers/net/dsa/lantiq/lantiq_gswip.h
-@@ -157,6 +157,9 @@
- #define  GSWIP_PCE_PCTRL_0_PSTATE_LEARNING	0x3
- #define  GSWIP_PCE_PCTRL_0_PSTATE_FORWARDING	0x7
- #define  GSWIP_PCE_PCTRL_0_PSTATE_MASK	GENMASK(2, 0)
-+/* Ethernet Switch PCE Port Control Register 3 */
-+#define GSWIP_PCE_PCTRL_3p(p)		(0x483 + ((p) * 0xA))
-+#define  GSWIP_PCE_PCTRL_3_LNDIS	BIT(15)  /* Learning Disable */
- #define GSWIP_PCE_VCTRL(p)		(0x485 + ((p) * 0xA))
- #define  GSWIP_PCE_VCTRL_UVR		BIT(0)	/* Unknown VLAN Rule */
- #define  GSWIP_PCE_VCTRL_VINR		GENMASK(2, 1) /* VLAN Ingress Tag Rule */
+@@ -2,6 +2,7 @@
+ #ifndef __LANTIQ_GSWIP_H
+ #define __LANTIQ_GSWIP_H
+ 
++#include <linux/bitfield.h>
+ #include <linux/clk.h>
+ #include <linux/mutex.h>
+ #include <linux/phylink.h>
+@@ -193,6 +194,12 @@
+ #define GSWIP_MAC_CTRL_2p(p)		(0x905 + ((p) * 0xC))
+ #define GSWIP_MAC_CTRL_2_LCHKL		BIT(2) /* Frame Length Check Long Enable */
+ #define GSWIP_MAC_CTRL_2_MLEN		BIT(3) /* Maximum Untagged Frame Lnegth */
++#define GSWIP_MAC_CTRL_4p(p)		(0x907 + ((p) * 0xC))
++#define  GSWIP_MAC_CTRL_4_LPIEN		BIT(7) /* LPI Mode Enable */
++#define  GSWIP_MAC_CTRL_4_GWAIT_MASK	GENMASK(14, 8) /* LPI Wait Time 1G */
++#define  GSWIP_MAC_CTRL_4_GWAIT(t)	u16_encode_bits((t), GSWIP_MAC_CTRL_4_GWAIT_MASK)
++#define  GSWIP_MAC_CTRL_4_WAIT_MASK	GENMASK(6, 0) /* LPI Wait Time 100M */
++#define  GSWIP_MAC_CTRL_4_WAIT(t)	u16_encode_bits((t), GSWIP_MAC_CTRL_4_WAIT_MASK)
+ 
+ /* Ethernet Switch Fetch DMA Port Control Register */
+ #define GSWIP_FDMA_PCTRLp(p)		(0xA80 + ((p) * 0x6))
 diff --git a/drivers/net/dsa/lantiq/lantiq_gswip_common.c b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-index a0e361622acb..f130bf6642a7 100644
+index f130bf6642a7..092187603dea 100644
 --- a/drivers/net/dsa/lantiq/lantiq_gswip_common.c
 +++ b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-@@ -403,6 +403,47 @@ static int gswip_add_single_port_br(struct gswip_priv *priv, int port, bool add)
- 	return 0;
+@@ -1537,6 +1537,49 @@ static int gswip_get_sset_count(struct dsa_switch *ds, int port, int sset)
+ 	return ARRAY_SIZE(gswip_rmon_cnt);
  }
  
-+static int gswip_port_set_learning(struct gswip_priv *priv, int port,
-+				   bool enable)
++static int gswip_set_mac_eee(struct dsa_switch *ds, int port,
++			     struct ethtool_keee *e)
 +{
-+	if (!GSWIP_VERSION_GE(priv, GSWIP_VERSION_2_2))
-+		return -EOPNOTSUPP;
-+
-+	/* learning disable bit */
-+	return regmap_update_bits(priv->gswip, GSWIP_PCE_PCTRL_3p(port),
-+				  GSWIP_PCE_PCTRL_3_LNDIS,
-+				  enable ? 0 : GSWIP_PCE_PCTRL_3_LNDIS);
-+}
-+
-+static int gswip_port_pre_bridge_flags(struct dsa_switch *ds, int port,
-+				       struct switchdev_brport_flags flags,
-+				       struct netlink_ext_ack *extack)
-+{
-+	struct gswip_priv *priv = ds->priv;
-+	unsigned long supported = 0;
-+
-+	if (GSWIP_VERSION_GE(priv, GSWIP_VERSION_2_2))
-+		supported |= BR_LEARNING;
-+
-+	if (flags.mask & ~supported)
++	if (e->tx_lpi_timer > 0x7f)
 +		return -EINVAL;
 +
 +	return 0;
 +}
 +
-+static int gswip_port_bridge_flags(struct dsa_switch *ds, int port,
-+				   struct switchdev_brport_flags flags,
-+				   struct netlink_ext_ack *extack)
++static void gswip_phylink_mac_disable_tx_lpi(struct phylink_config *config)
++{
++	struct dsa_port *dp = dsa_phylink_to_port(config);
++	struct gswip_priv *priv = dp->ds->priv;
++
++	regmap_clear_bits(priv->gswip, GSWIP_MAC_CTRL_4p(dp->index),
++			  GSWIP_MAC_CTRL_4_LPIEN);
++}
++
++static int gswip_phylink_mac_enable_tx_lpi(struct phylink_config *config,
++					   u32 timer, bool tx_clock_stop)
++{
++	struct dsa_port *dp = dsa_phylink_to_port(config);
++	struct gswip_priv *priv = dp->ds->priv;
++
++	return regmap_update_bits(priv->gswip, GSWIP_MAC_CTRL_4p(dp->index),
++				  GSWIP_MAC_CTRL_4_LPIEN |
++				  GSWIP_MAC_CTRL_4_GWAIT_MASK |
++				  GSWIP_MAC_CTRL_4_WAIT_MASK,
++				  GSWIP_MAC_CTRL_4_LPIEN |
++				  GSWIP_MAC_CTRL_4_GWAIT(timer) |
++				  GSWIP_MAC_CTRL_4_WAIT(timer));
++}
++
++static bool gswip_support_eee(struct dsa_switch *ds, int port)
 +{
 +	struct gswip_priv *priv = ds->priv;
 +
-+	if (flags.mask & BR_LEARNING)
-+		return gswip_port_set_learning(priv, port,
-+					       !!(flags.val & BR_LEARNING));
++	if (GSWIP_VERSION_GE(priv, GSWIP_VERSION_2_2))
++		return true;
 +
-+	return 0;
++	return false;
 +}
 +
- static int gswip_port_setup(struct dsa_switch *ds, int port)
+ static struct phylink_pcs *gswip_phylink_mac_select_pcs(struct phylink_config *config,
+ 							phy_interface_t interface)
  {
- 	struct gswip_priv *priv = ds->priv;
-@@ -1521,6 +1562,8 @@ static const struct dsa_switch_ops gswip_switch_ops = {
- 	.port_setup		= gswip_port_setup,
- 	.port_enable		= gswip_port_enable,
- 	.port_disable		= gswip_port_disable,
-+	.port_pre_bridge_flags	= gswip_port_pre_bridge_flags,
-+	.port_bridge_flags	= gswip_port_bridge_flags,
- 	.port_bridge_join	= gswip_port_bridge_join,
- 	.port_bridge_leave	= gswip_port_bridge_leave,
- 	.port_fast_age		= gswip_port_fast_age,
+@@ -1553,6 +1596,8 @@ static const struct phylink_mac_ops gswip_phylink_mac_ops = {
+ 	.mac_config		= gswip_phylink_mac_config,
+ 	.mac_link_down		= gswip_phylink_mac_link_down,
+ 	.mac_link_up		= gswip_phylink_mac_link_up,
++	.mac_disable_tx_lpi	= gswip_phylink_mac_disable_tx_lpi,
++	.mac_enable_tx_lpi	= gswip_phylink_mac_enable_tx_lpi,
+ 	.mac_select_pcs		= gswip_phylink_mac_select_pcs,
+ };
+ 
+@@ -1580,6 +1625,8 @@ static const struct dsa_switch_ops gswip_switch_ops = {
+ 	.get_strings		= gswip_get_strings,
+ 	.get_ethtool_stats	= gswip_get_ethtool_stats,
+ 	.get_sset_count		= gswip_get_sset_count,
++	.set_mac_eee		= gswip_set_mac_eee,
++	.support_eee		= gswip_support_eee,
+ };
+ 
+ void gswip_disable_switch(struct gswip_priv *priv)
 -- 
 2.51.2
 
