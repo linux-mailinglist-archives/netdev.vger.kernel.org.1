@@ -1,155 +1,155 @@
-Return-Path: <netdev+bounces-234602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1580C23DF5
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 09:43:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 247CEC23DF8
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 09:44:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E16E189EFA7
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 08:42:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 13C5B1A631B1
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 08:43:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C86E2FF171;
-	Fri, 31 Oct 2025 08:42:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C25FE2FB63D;
+	Fri, 31 Oct 2025 08:42:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fFI0lSAR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sGbQVSCm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 342612236E9;
-	Fri, 31 Oct 2025 08:42:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D2E82F261F
+	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 08:42:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761900129; cv=none; b=gUnwpaHWK1iu8UEc9ZvG6S3EPLWZQw2Wb8VaDs2IUOxqMqGFYMRHQ4ccXDT13s092FIN8fq8dC4k6/L+DpriyfI8MjWzx1csUzt9vgkuM7Vkym46fGtzsnZUJ7wKTFPlUgF0Hc+EBXuxVlPZWAFIzf1aCBcR/T9BatP4Qqzg0J4=
+	t=1761900138; cv=none; b=k4zybubQh1jK6I84N2PPva7hmNV2fZKB215MhxLgTBJ84cvaLsZqlbmHeCieh51qMFWI9db4VsDWOFasJPrCBMBFrfZqdtrBaHn/n64/LrACfPVp2PVjs9Nf/dY1VCBDrsFNWAqVF4CP62m2ZJo8eHk1NdTsmV6K9nyemgbwSlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761900129; c=relaxed/simple;
-	bh=LsmQ6z8kGwXnSdHnI7TPSjdstl879Pup1qDCMjeA4rw=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=hlCpnICt2AxT93ETEyftf+8AM8A/VKPJIKvcODvNZELjBxd3wB6pzAnlBfNT/5sDkT2w4hawnYbu0GWnPCtkt6er98LPjW8ngR9wkKn7okLBjAzX5mNhvPP6H6K6ebLfFBp18MOqlKFN0l35vOTzKPV76S5KOPahEcfn7A+sgkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fFI0lSAR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B2A0C4CEE7;
-	Fri, 31 Oct 2025 08:42:07 +0000 (UTC)
+	s=arc-20240116; t=1761900138; c=relaxed/simple;
+	bh=iebUdKZzmfa2jg23LRJHVuu3kza1F82z99YH30rDyb4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aYIp2rqYj4iOFe2BmECTeV3AzK/GiUqmb1rLWAcQKT0ZiHHG0DM3dO/5uQrFAcVa3hxN6U8fj7Y0NHAoQqaEilwg/50zEeTqGGHC43keK2G1r652EJlzrSzFtBe2hhJfsA/eOwfPFd6jhdKbjvSbXOk8drqfKjgOVscPepPxpYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sGbQVSCm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E006DC4CEE7;
+	Fri, 31 Oct 2025 08:42:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761900127;
-	bh=LsmQ6z8kGwXnSdHnI7TPSjdstl879Pup1qDCMjeA4rw=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=fFI0lSARsMuen0hxaJMWksTtXNtNWHhD4Eam+cVMPDOZbdGKroQY3oB3EBaQW7o03
-	 /VDIZ/m+x1E/rd6vu9K8uMZpBPmXeIWcrVxwbmjbjZnK6L/D8+fvlH3Zm1tI1tKR3D
-	 5cC8lM7hiqnEKPAQsGhDjazsSdPjWpN2fhhHNkkPfZHBpueAbxsj3XrSweOD6n9eC+
-	 PsGvqn9liaB0Oa4j3TP6HJCUPo8TklenswjW87iyjkw7oAXFxXygmofEoEAAimf5pA
-	 r5Btz/M0Q6ikHYpd4aj+cHQIn9jRTNXRHpMfb62w/7Cel1xpRhxtmqFV4JI3kmZbZO
-	 QPT093Tskxctg==
-Content-Type: multipart/mixed; boundary="===============4140934912037261014=="
+	s=k20201202; t=1761900138;
+	bh=iebUdKZzmfa2jg23LRJHVuu3kza1F82z99YH30rDyb4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=sGbQVSCmaZgm3pK/emkYuL6wOZwS2Ej0PMgWnCExnZ0K9MYE54merAH4WuUUE0ZQt
+	 SwIDl8uvXsAERGNcizhrF5fJfAS7YKUYgvRiq1V0FPLxVDr4UnkN6M0YPYV8IUV84N
+	 8gghXnFh2Id96xfTYBDy6BoxN7QuQrxv39X3nsOkxHdDMgusRbtBTR4G3joG3Ebf9p
+	 3fD6y4dB8bUgqPvU97RgNbSxZ8yW2drZLvfR9HWC2dsw38ZpFgIObIXgWBMBMt6Pfi
+	 oMptgDFxJxVxBnZ2J0JV17QiE/dpiSL3/2Fnc3XvNEWD7szMNXBRoOQvPpSVjtNK22
+	 JSfPHcUehH18A==
+Date: Fri, 31 Oct 2025 09:42:15 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: airoha: Add TCP LRO support
+Message-ID: <aQR2Z51Q45Zl99m_@lore-desk>
+References: <20250610-airoha-eth-lro-v1-1-3b128c407fd8@kernel.org>
+ <CANn89iJsNWkWzAJbOvaBNjozuLOQBcpVo1bnvfeGq5Zm6h9e=Q@mail.gmail.com>
+ <aEg1lvstEFgiZST1@lore-rh-laptop>
+ <20250611173626.54f2cf58@kernel.org>
+ <aEtAZq8Th7nOdakk@lore-rh-laptop>
+ <20250612155721.4bb76ab1@kernel.org>
+ <aFATYATliil63D5R@lore-desk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <8601d952a9b55c901d849b856698b2567eafcd09a9b80d144e786a9d0b037d9e@mail.kernel.org>
-In-Reply-To: <20251031-xsk-v7-9-39fe486593a3@bootlin.com>
-References: <20251031-xsk-v7-9-39fe486593a3@bootlin.com>
-Subject: Re: [PATCH bpf-next v7 09/15] selftests/bpf: test_xsk: Don't exit immediately when xsk_attach fails
-From: bot+bpf-ci@kernel.org
-To: bastien.curutchet@bootlin.com,bjorn@kernel.org,magnus.karlsson@intel.com,maciej.fijalkowski@intel.com,jonathan.lemon@gmail.com,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,martin.lau@linux.dev,eddyz87@gmail.com,song@kernel.org,yonghong.song@linux.dev,john.fastabend@gmail.com,kpsingh@kernel.org,sdf@fomichev.me,haoluo@google.com,jolsa@kernel.org,mykolal@fb.com,shuah@kernel.org,davem@davemloft.net,kuba@kernel.org,hawk@kernel.org
-Cc: thomas.petazzoni@bootlin.com,alexis.lothore@bootlin.com,netdev@vger.kernel.org,bpf@vger.kernel.org,linux-kselftest@vger.kernel.org,linux-kernel@vger.kernel.org,bastien.curutchet@bootlin.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Fri, 31 Oct 2025 08:42:07 +0000 (UTC)
-
---===============4140934912037261014==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="preRBihCmKgtL7Vn"
+Content-Disposition: inline
+In-Reply-To: <aFATYATliil63D5R@lore-desk>
 
 
-```
-commit f4ff202b333a83faed1f820153ca90a030e95808
-Author: Bastien Curutchet (eBPF Foundation) <bastien.curutchet@bootlin.com>
+--preRBihCmKgtL7Vn
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-selftests/bpf: test_xsk: Don't exit immediately when xsk_attach fails
+> > On Thu, 12 Jun 2025 23:02:30 +0200 Lorenzo Bianconi wrote:
+> > > > I'm not Eric but FWIW 256B is not going to help much. It's best to =
+keep
+> > > > the len / truesize ratio above 50%, so with 32k buffers we're talki=
+ng
+> > > > about copying multiple frames. =20
+> > >=20
+> > > what I mean here is reallocate the skb if the true size is small (e.g=
+=2E below
+> > > 256B) in order to avoid consuming the high order page from the page_p=
+ool. Maybe
+> > > we can avoid it if reducing the page order to 2 for LRO queues provide
+> > > comparable results.
+> >=20
+> > Hm, truesize is the buffer size, right? If the driver allocated n bytes
+> > of memory for packets it sent up the stack, the truesizes of the skbs
+> > it generated must add up to approximately n bytes.
+>=20
+> With 'truesize' I am referring to the real data size contained in the x-o=
+rder
+> page returned by the hw. If this size is small, I was thinking to just al=
+locate
+> a skb for it, copy the data from the x-order page into it and re-insert t=
+he
+> x-order page into the page_pool running page_pool_put_full_page().
+> Let me do some tests with order-2 page to see if the GRO can compensate t=
+he
+> reduced page size.
 
-This commit changes xsk_reattach_xdp() and xsk_attach_xdp_progs() from
-void to int return types to propagate errors instead of calling
-exit_with_error(), allowing tests to continue after attachment failures.
+Sorry for the late reply about this item.
+I carried out some comparison tests between GRO-only and GRO+LRO with order=
+-2
+pages [0]. The system is using a 2.5Gbps link. The device is receiving a si=
+ngle TCP
+stream. MTU is set to 1500B.
 
-> diff --git a/tools/testing/selftests/bpf/test_xsk.c b/tools/testing/selftests/bpf/test_xsk.c
-> index 7db1d974e..0adb6c0b9 100644
-> --- a/tools/testing/selftests/bpf/test_xsk.c
-> +++ b/tools/testing/selftests/bpf/test_xsk.c
-> @@ -1643,7 +1643,7 @@ static bool xdp_prog_changed_tx(struct test_spec *test)
->  	return ifobj->xdp_prog != test->xdp_prog_tx || ifobj->mode != test->mode;
->  }
->
-> -static void xsk_reattach_xdp(struct ifobject *ifobj, struct bpf_program *xdp_prog,
-> +static int xsk_reattach_xdp(struct ifobject *ifobj, struct bpf_program *xdp_prog,
->  			     struct bpf_map *xskmap, enum test_mode mode)
->  {
->  	int err;
-> @@ -1652,31 +1652,40 @@ static void xsk_reattach_xdp(struct ifobject *ifobj, struct bpf_program *xdp_pro
->  	err = xsk_attach_xdp_program(xdp_prog, ifobj->ifindex, mode_to_xdp_flags(mode));
->  	if (err) {
->  		ksft_print_msg("Error attaching XDP program\n");
-> -		exit_with_error(-err);
-> +		return err;
->  	}
->
->  	if (ifobj->mode != mode && (mode == TEST_MODE_DRV || mode == TEST_MODE_ZC))
->  		if (!xsk_is_in_mode(ifobj->ifindex, XDP_FLAGS_DRV_MODE)) {
->  			ksft_print_msg("ERROR: XDP prog not in DRV mode\n");
-> -			exit_with_error(EINVAL);
-> +			return -EINVAL;
->  		}
->
->  	ifobj->xdp_prog = xdp_prog;
->  	ifobj->xskmap = xskmap;
->  	ifobj->mode = mode;
-> +
-> +	return 0;
+- GRO only:			~1.6Gbps
+- GRO+LRO (order-2 pages):	~2.1Gbps
 
-Can xsk_reattach_xdp() leave the XDP program attached when the mode check
-fails?
+In both cases we can't reach the line-rate. Do you think the difference can=
+ justify
+the hw LRO support? Thanks in advance.
 
-The flow is:
-1. xsk_detach_xdp_program() removes old XDP program
-2. xsk_attach_xdp_program() attaches new program (succeeds)
-3. xsk_is_in_mode() check fails
-4. ifobj state updated to reflect new attachment
-5. Returns -EINVAL
+Regards,
+Lorenzo
 
-At this point the new XDP program is attached to the interface but the
-function returned an error. Should the newly attached program be detached
-on this error path, or should the ifobj state updates be moved after all
-checks pass?
+[0] the hw LRO requires contiguous memory pages to work. I reduced the size=
+ to
+order-2 from order-5 (original implementation).
 
->  }
->
-> -static void xsk_attach_xdp_progs(struct test_spec *test, struct ifobject *ifobj_rx,
-> +static int xsk_attach_xdp_progs(struct test_spec *test, struct ifobject *ifobj_rx,
->  				 struct ifobject *ifobj_tx)
->  {
-
-[ ... ]
-
-> @@ -1789,7 +1798,8 @@ static int testapp_validate_traffic(struct test_spec *test)
->  		}
->  	}
->
-> -	xsk_attach_xdp_progs(test, ifobj_rx, ifobj_tx);
-> +	if (xsk_attach_xdp_progs(test, ifobj_rx, ifobj_tx))
-> +		return TEST_FAILURE;
->  	return __testapp_validate_traffic(test, ifobj_rx, ifobj_tx);
->  }
+>=20
+> Regards,
+> Lorenzo
+>=20
+> >=20
+> > So if the HW places one aggregation session per buffer, and the buffer
+> > is 32kB -- to avoid mem use ratio < 25% you'd need to copy all sessions
+> > smaller than 8kB?
+> >=20
+> > If I'm not making sense - just ignore, I haven't looked at the rest of
+> > the driver :)
+> >=20
 
 
-```
 
----
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+--preRBihCmKgtL7Vn
+Content-Type: application/pgp-signature; name=signature.asc
 
-In-Reply-To-Subject: `selftests/bpf: test_xsk: Don't exit immediately when xsk_attach fails`
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/18966766839
+-----BEGIN PGP SIGNATURE-----
 
---===============4140934912037261014==--
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaQR2ZwAKCRA6cBh0uS2t
+rNydAQChGxrsUEw7j8qWnmWp3WjRruhrQe2yexdNUpd+gRWnVAD+JiRBjf4A5lOw
+QGVPdyJFfYlLM98zy6KQEHHtDr90cQw=
+=DjeM
+-----END PGP SIGNATURE-----
+
+--preRBihCmKgtL7Vn--
 
