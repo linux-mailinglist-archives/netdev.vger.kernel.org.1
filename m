@@ -1,95 +1,80 @@
-Return-Path: <netdev+bounces-234782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68C71C2733E
-	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 00:40:43 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 720A3C27347
+	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 00:42:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E243D350B26
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 23:40:42 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 36A834E506C
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 23:42:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9755A32E159;
-	Fri, 31 Oct 2025 23:40:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7D6132C95C;
+	Fri, 31 Oct 2025 23:42:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="arGhy+zw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UNtZqGvi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D39032D44A;
-	Fri, 31 Oct 2025 23:40:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A3D12566F7;
+	Fri, 31 Oct 2025 23:42:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761954033; cv=none; b=tuz+JfUPJYmOw8R9PDNAAcf0nzAQIDDMy5AsSYHemQbiZ+UVQDVhVJMAUX8E6T3oqCbF+HcuxMtZc8Idx4kqwf4jEpGMDEVZRfOsClPRVBS/Nqk78rn/3cm70+9ch4tTFjvmHMcmONOdDnwWmaypT08TYMr8unfcRKTUKf1UlaQ=
+	t=1761954130; cv=none; b=pZammAjA3Odt1YrvFW3NtnAAHPfBw6MPNY7M4mb32ZbdSfA+tWXtFNO8r7/PWdypJqg5doJ5m1oaYUS/S8x6cqZNaJKpNQ/0KgdbgwSQ92lTtBJiiWWUG1ep8XdYKBxzhfJuiiq4+avHt3RJmDEjVdgf0DvQ7cGlYDxIqrToCHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761954033; c=relaxed/simple;
-	bh=uo7HECQ3DRxvFuv+4IW4KiUNYaG6tKTxodiR/W5Ua3Q=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=OqG0tLNIGFgWKCIp+P1AZAEtMDhocgYdRibWHh+MQoMiDtInmTZ/eTajeWobsrVxV/4rVsfrSrp5foH+Wz8P130dV80bPgQYhKS7ablqUiCTcRnBquLZHTGwpBzhmXIlyiaLv5iouccTZ2V27r4L7DI3EAybwDu9mOZiOu5kH5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=arGhy+zw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C260C4CEE7;
-	Fri, 31 Oct 2025 23:40:33 +0000 (UTC)
+	s=arc-20240116; t=1761954130; c=relaxed/simple;
+	bh=eBbfPCOcUmxMSyq7wUBU6DgUuJD7akDtbLm7whVK5bg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=czQjlSNJxOnyht106hEOsPEHgYbWFRKq/+AKkv0QEX6ug03TuYWI9DC9dBh+UcO9Rsdxvm9upuNcpnxdEc5dPFVozVOsBTXxcy9Ula2fXP7ESq5BZHestbnjW3zvPzUJ+gSRVlMRUnyXrX0DAsBx67GchMF8dB/F6OWGznyy+HQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UNtZqGvi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40E5BC4CEE7;
+	Fri, 31 Oct 2025 23:42:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761954033;
-	bh=uo7HECQ3DRxvFuv+4IW4KiUNYaG6tKTxodiR/W5Ua3Q=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=arGhy+zwHubV9hiSpwM1Sa2D+w3yVOKsnuK3ua0WZ0PCBlnSbc9rhiFpn6mib7YGg
-	 e+HbZKQlo9yHP/NCRC1zMn60QDuUW1zVtOzNPzAAh95bbTKVo5EOtK2wRY18XvuEJk
-	 omcxpmqtXDdmyim4DK9n4H2xg4Q6i8C3RNVOfcgX7EhyVxOagmvBbZumeV5LB7Ec6e
-	 H7g7uStT7OxBJ+Idl+Yr9ZDskWQcfF3M8Wcu1lZRxWsCgeJHpKvLVwZ136DGbSeEmu
-	 ubEVVxaZwGAoFZxe8Xc0PBEji4Z3iovNFnx4ihbLMbAWyZfmI23Rbdz+iEmdSjk5hl
-	 zgDikQjmir6IA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 5217B3809A00;
-	Fri, 31 Oct 2025 23:40:10 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1761954130;
+	bh=eBbfPCOcUmxMSyq7wUBU6DgUuJD7akDtbLm7whVK5bg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=UNtZqGviWSQCgguqSrqb89/EyeX0uh1ToYdr04R42VP5ICtBjSMQfFDhEKt2LSSCH
+	 KSYsMekB88H8foiwiBkizKT0kA4PPrZKzLI2X+sAzvXmXN3m5i9P5mtHbw8hWVPUPp
+	 plSX0koRCcONG6AHc2gHIXBBjdhtcJcRNx9IObO9Wpk9aVdvO341ikThuHbIJ3tFZe
+	 17Asvj6FaGVTPRW6Ht8j2xTZzm3x3Co3CKbUKZNlyUNzYozY2PsKbFFqqA5ODdNKfV
+	 TQxllv6loWy3T/cr2+rg5ESelW0mzdLeUJFUXHV+olP8Tf8LtxnmkzXsKFUeNiTB92
+	 dmA5s6u4IEfXQ==
+Date: Fri, 31 Oct 2025 16:42:08 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky
+ <leon@kernel.org>, Jason Gunthorpe <jgg@ziepe.ca>, Mark Bloch
+ <mbloch@nvidia.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, "John
+ Fastabend" <john.fastabend@gmail.com>, Richard Cochran
+ <richardcochran@gmail.com>, <linux-rdma@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <bpf@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, Carolina Jubran
+ <cjubran@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>
+Subject: Re: [PATCH net-next 6/6] net/mlx5e: Convert to new hwtstamp_get/set
+ interface
+Message-ID: <20251031164208.7917f929@kernel.org>
+In-Reply-To: <1761819910-1011051-7-git-send-email-tariqt@nvidia.com>
+References: <1761819910-1011051-1-git-send-email-tariqt@nvidia.com>
+	<1761819910-1011051-7-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: dsa: tag_brcm: legacy: fix untagged rx on
- unbridged ports for bcm63xx
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176195400925.668400.9586354215719827229.git-patchwork-notify@kernel.org>
-Date: Fri, 31 Oct 2025 23:40:09 +0000
-References: <20251027194621.133301-1-jonas.gorski@gmail.com>
-In-Reply-To: <20251027194621.133301-1-jonas.gorski@gmail.com>
-To: Jonas Gorski <jonas.gorski@gmail.com>
-Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- noltari@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu, 30 Oct 2025 12:25:10 +0200 Tariq Toukan wrote:
+> -		err = mlx5e_hwstamp_config_no_ptp_rx(priv,
+> -						     config.rx_filter != HWTSTAMP_FILTER_NONE);
+> +		err = mlx5e_hwstamp_config_no_ptp_rx(
+> +			priv, config->rx_filter != HWTSTAMP_FILTER_NONE);
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 27 Oct 2025 20:46:21 +0100 you wrote:
-> The internal switch on BCM63XX SoCs will unconditionally add 802.1Q VLAN
-> tags on egress to CPU when 802.1Q mode is enabled. We do this
-> unconditionally since commit ed409f3bbaa5 ("net: dsa: b53: Configure
-> VLANs while not filtering").
-> 
-> This is fine for VLAN aware bridges, but for standalone ports and vlan
-> unaware bridges this means all packets are tagged with the default VID,
-> which is 0.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,v2] net: dsa: tag_brcm: legacy: fix untagged rx on unbridged ports for bcm63xx
-    https://git.kernel.org/netdev/net/c/3d18a84eddde
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+FWIW I think this formatting is even worse than going over 80 :(
 
