@@ -1,64 +1,66 @@
-Return-Path: <netdev+bounces-234732-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8BA1C26AC9
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 20:09:24 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6331EC26B09
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 20:19:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70A613B1D4D
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 19:09:23 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0A27334CC56
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 19:19:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F35232F6917;
-	Fri, 31 Oct 2025 19:09:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Rh4RskUx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6587A28689A;
+	Fri, 31 Oct 2025 19:19:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7F852F4A0E;
-	Fri, 31 Oct 2025 19:09:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88B0F3A1CD;
+	Fri, 31 Oct 2025 19:19:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761937760; cv=none; b=XECkXuQ0iQpuBDHeeRoDxAdZkaHgwmX5hCfhzz3nYKJ2DnRtkBO4MzKybEPC/bIMHTp8cQHuha0a9bNGxt8ExfzyEi/vFlzdxOlJAERgJRcxm3HoZV+3vICuixh5ZdQBA4rmkqZxAf3EZMXX5/Wyq2rgFRIcEgTyUBxk4ziIDaw=
+	t=1761938376; cv=none; b=XlJ5uqMBE7yrUo/LQz0nwzu+yEnHe8lAC0nxZFM7TLho874GcL5Viz43olxlnPQ3AvxEK1ytddDumjHpre5nSSwYtjCxuh7ZkdD0ZaMVzRWdX2d4PekywJq8VuPoAajZ9T/Dh1b2FPuQ2yUnVDOEX454zGOPkU7tPMn0ED2xogk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761937760; c=relaxed/simple;
-	bh=8qiCPwTgnNfDHjbq6rSc285bTMBEqC9dApMvKPkE0cE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rh8Bf0EfN5JyZ6Gdk/hUabWgXQiDQLgP06+E1cOAmMKNNgc2xlmYkNVqQZInEq2eudf7t3snkO0JEvlEfmwAFbwJ62s4YSAipolg6sCeO6/JGA8f2aCgUyuu3hG6xwcP4JKvN1UaFMdn8Ac3ra060qsMAHI79hZc2RR6OzCp1fs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Rh4RskUx; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=fZbwnF0IXrXAvskVUJyWEUURmd1EUkmYdeFz0aHKm0w=; b=Rh4RskUximfWawYaQMpIiNGE4b
-	sigRhS3iY6SvDjtSm8658JQepX0r+I62HFBmr8JRqqEjyGE/9k+3n1tNskalQwnkexpKLQstxm7f2
-	ecw66PEigqEOLQ8QXM67bDR3jyPQDi4VIJPGz66DetkJVV4OCEa7I0dpygDToOFxl1bk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vEuUa-00Ccto-Al; Fri, 31 Oct 2025 20:08:56 +0100
-Date: Fri, 31 Oct 2025 20:08:56 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Vivian Wang <wangruikang@iscas.ac.cn>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1761938376; c=relaxed/simple;
+	bh=MMU5AcGgV4uPOkzXclVkYSkqGWznq4OpShyK4bIa1oI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=dojl3E839ewcDExOpaqa+Jwy1BLXzFDtceJ0/ix+rQC9+ixmWQIrFRu0jlAj9Bz9Iw0WdRLqCSaH7oNRosb4IRSltwGJ0w2/lI/adWbHq5KQkNyDw5EsNX95pMW3qnx37S2awfu8+1HVMpPiq6YWyva0skGAKrGVXcS7nBQ1/TI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.98.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1vEueb-000000005r9-2Rgu;
+	Fri, 31 Oct 2025 19:19:17 +0000
+Date: Fri, 31 Oct 2025 19:19:10 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Yixun Lan <dlan@gentoo.org>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Troy Mitchell <troy.mitchell@linux.spacemit.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org,
-	linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2] net: spacemit: Check IFF_UP in
- emac_set_pauseparam()
-Message-ID: <f2303a61-184a-4a4b-adfe-228573dcb41c@lunn.ch>
-References: <20251101-k1-ethernet-remove-fc-v2-1-014ac3bc280e@iscas.ac.cn>
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Simon Horman <horms@kernel.org>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Andreas Schirm <andreas.schirm@siemens.com>,
+	Lukas Stockmann <lukas.stockmann@siemens.com>,
+	Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Peter Christen <peter.christen@siemens.com>,
+	Avinash Jayaraman <ajayaraman@maxlinear.com>,
+	Bing tao Xu <bxu@maxlinear.com>, Liang Xu <lxu@maxlinear.com>,
+	Juraj Povazanec <jpovazanec@maxlinear.com>,
+	"Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>,
+	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
+	"Livia M. Rosu" <lrosu@maxlinear.com>,
+	John Crispin <john@phrozen.org>
+Subject: [PATCH net-next v6 00/12] net: dsa: lantiq_gswip: Add support for
+ MaxLinear GSW1xx switch family
+Message-ID: <cover.1761938079.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,16 +69,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251101-k1-ethernet-remove-fc-v2-1-014ac3bc280e@iscas.ac.cn>
 
-> +	if (!(dev->flags & IFF_UP))
-> +		return -ENETDOWN;
-> +
+This patch series extends the existing lantiq_gswip DSA driver to support
+the MaxLinear GSW1xx family of dedicated Ethernet switch ICs. These switches
+are based on the same IP as the Lantiq/Intel GSWIP found in VR9 and xRX
+MIPS router SoCs, but are connected via MDIO instead of memory-mapped I/O.
 
-This is a lot better, but please use netif_running().
+The series includes several improvements and refactoring to prepare for the
+new hardware support.
 
-    Andrew
+The GSW1xx family includes several variants:
+ - GSW120: 4 ports, 2 PHYs, RGMII & SGMII/2500Base-X
+ - GSW125: 4 ports, 2 PHYs, RGMII & SGMII/2500Base-X, industrial temperature
+ - GSW140: 6 ports, 4 PHYs, RGMII & SGMII/2500Base-X
+ - GSW141: 6 ports, 4 PHYs, RGMII & SGMII
+ - GSW145: 6 ports, 4 PHYs, RGMII & SGMII/2500Base-X, industrial temperature
 
----
-pw-bot: cr
+Key features implemented:
+ - MDIO-based register access using regmap
+ - Support for SGMII/1000Base-X/2500Base-X SerDes interfaces
+ - Configurable RGMII delays via device tree properties
+ - Configurable RMII clock direction
+ - Energy Efficient Ethernet (EEE) support
+ - enabling/disabling learning
+
+Daniel Golle (12):
+  net: dsa: lantiq_gswip: split into common and MMIO parts
+  net: dsa: lantiq_gswip: support enable/disable learning
+  net: dsa: lantiq_gswip: support Energy Efficient Ethernet
+  net: dsa: lantiq_gswip: set link parameters also for CPU port
+  net: dsa: lantiq_gswip: define and use
+    GSWIP_TABLE_MAC_BRIDGE_VAL1_VALID
+  dt-bindings: net: dsa: lantiq,gswip: add MaxLinear RMII refclk output
+    property
+  net: dsa: lantiq_gswip: add vendor property to setup MII refclk output
+  dt-bindings: net: dsa: lantiq,gswip: add support for MII delay
+    properties
+  net: dsa: lantiq_gswip: allow adjusting MII delays
+  dt-bindings: net: dsa: lantiq,gswip: add support for MaxLinear GSW1xx
+    switches
+  net: dsa: add tagging driver for MaxLinear GSW1xx switch family
+  net: dsa: add driver for MaxLinear GSW1xx switch family
+
+ .../bindings/net/dsa/lantiq,gswip.yaml        |  167 +-
+ MAINTAINERS                                   |    3 +-
+ drivers/net/dsa/lantiq/Kconfig                |   18 +-
+ drivers/net/dsa/lantiq/Makefile               |    2 +
+ drivers/net/dsa/lantiq/lantiq_gswip.c         | 1617 +--------------
+ drivers/net/dsa/lantiq/lantiq_gswip.h         |   20 +
+ drivers/net/dsa/lantiq/lantiq_gswip_common.c  | 1737 +++++++++++++++++
+ drivers/net/dsa/lantiq/mxl-gsw1xx.c           |  733 +++++++
+ drivers/net/dsa/lantiq/mxl-gsw1xx.h           |  126 ++
+ drivers/net/dsa/lantiq/mxl-gsw1xx_pce.h       |  154 ++
+ include/net/dsa.h                             |    2 +
+ include/uapi/linux/if_ether.h                 |    1 +
+ net/dsa/Kconfig                               |    8 +
+ net/dsa/Makefile                              |    1 +
+ net/dsa/tag_mxl-gsw1xx.c                      |  116 ++
+ 15 files changed, 3104 insertions(+), 1601 deletions(-)
+ create mode 100644 drivers/net/dsa/lantiq/lantiq_gswip_common.c
+ create mode 100644 drivers/net/dsa/lantiq/mxl-gsw1xx.c
+ create mode 100644 drivers/net/dsa/lantiq/mxl-gsw1xx.h
+ create mode 100644 drivers/net/dsa/lantiq/mxl-gsw1xx_pce.h
+ create mode 100644 net/dsa/tag_mxl-gsw1xx.c
+
+-- 
+2.51.2
 
