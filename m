@@ -1,185 +1,135 @@
-Return-Path: <netdev+bounces-234671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3578AC25DDC
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 16:37:47 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03551C25E6A
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 16:52:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CB36425730
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 15:36:18 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A236C34FE80
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 15:52:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D59C92E06E6;
-	Fri, 31 Oct 2025 15:36:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCA9C2E7F1D;
+	Fri, 31 Oct 2025 15:52:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bgZioyMf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jEGNGhA5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C1732D9EE0;
-	Fri, 31 Oct 2025 15:36:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 782302E8B74
+	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 15:52:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761924966; cv=none; b=LFSgZrGfvp1rH24TGF9JnpZ1yl8O5MJDIA675l2SiE1VtA6+fHx6lCl0CApQZ489ORialwLeuYeFSB3+SW2T1JLbiS9c7U1wPORzSsW9EEZMLB25xaLeGqJHf6/OcMzD04MCTLi97zbRHZR8eqYkvB9WV7JvDASBEKe+48CO0Oc=
+	t=1761925947; cv=none; b=YNTArVEao+z16hNaHifSa9XbsJfWDd8Eqn+2grgaNQBYkBFvqs1YcnNUVgKfUWFWmI+ZSD4DPD4X+ofpnb4QrB1iDCBg1kDnmD0SxgzGmLrll8rCE3N3K9OEpGaMDbF0Nz44mKDa/f/JSwGON+SSVKFbahzbbEamsFGTg7pmCqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761924966; c=relaxed/simple;
-	bh=f2kdcTzIgflTZpNVJcpB/wXw4Pn7v3oe8LGnD3Ghpv0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lNs+RM3QtDWkDhDH5hv9rLUYC/XW9hFzBPQ9AtrF911at0jFjw7SejBJZB9DvKVPdylrsz8B9eX20ZnTNruL3al40CMVwwfSRHokNITtI66ImNEpZcaub/0g0p6E0A3Z97+Ft3o1QjhmArcO3ls8YLea/9cYd5OeMbKK1Z/tLcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bgZioyMf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E3AEC4CEE7;
-	Fri, 31 Oct 2025 15:36:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761924964;
-	bh=f2kdcTzIgflTZpNVJcpB/wXw4Pn7v3oe8LGnD3Ghpv0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bgZioyMfejcWWV0MS6C05S2LbsEdxX50diKJLFbw9ByzTss1Ijd602OkOPk5VfJ9K
-	 BRKcnvMU8FhGuOYJD6IlhqxkvqA74T7C11v39u1D+WoQbt6yJqS7412XtCYdJe0PHy
-	 Ln62jNHD5VjGRqjBBZSBa4jUMaVRdwp5bzP89/ZWKaQCzVlnK86qZsU+w4X0SXlEbI
-	 lRkg7pYEBULQLbHiEuqIewp4ucaxmKc3j/liAl9yD7UK/IyLDT6JMbpqc1UA7U21O9
-	 xfmguuXRFsOBFWFtnYsZeHmVkddUjMRhYiHjr9QoNL/wS5AGPYJo2404lc9S1uCEeI
-	 AAsxziPBgXXWA==
-Date: Fri, 31 Oct 2025 16:36:01 +0100
-From: Frederic Weisbecker <frederic@kernel.org>
-To: Valentin Schneider <vschneid@redhat.com>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gabriele Monaco <gmonaco@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>,
-	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
-	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 05/33] sched/isolation: Save boot defined domain flags
-Message-ID: <aQTXYSyPS65nhkvl@localhost.localdomain>
-References: <20251013203146.10162-1-frederic@kernel.org>
- <20251013203146.10162-6-frederic@kernel.org>
- <xhsmhecqtoc4b.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+	s=arc-20240116; t=1761925947; c=relaxed/simple;
+	bh=DTqeQPUFGhxWmvFq1yJ9JBIJPtT4dJ29vTrGDBXzgAc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Cv8REaLn74zC5kM8Um4Mz1Aye0guRvL5WAOyf2gbQudKSH9Acf4j3d7PNPk2sdhYTSQIAgDmp/oIq0N3SrTwYAqcFLlsjQ9HNmmFN9qtu43AWEF3uz2Kezi8B/y09IFgHVjHJTP8dcFiDmKcKDQMQbW/PaCMGIBNIBLR24PeN7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jEGNGhA5; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761925944;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Z5xCiEdgSHZTgTrYV1z431hwVbhyx7WNnCaxg9jd68o=;
+	b=jEGNGhA5YVxEb1rYIZPt8OCNQ4PrvdwqgkHeTPUNaYPJUVxFMgSsUKMQCEIKGivyJQSN0J
+	hYqbg63TTbgJ8ddHzkrWwBD8Blmfifl8vxc98lyZzgy1mmNW5onIFypgAMFr5n9ap2/CAT
+	gWvPb3H6j8Z0nJB2hTTlD58jdsjkTHE=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-473-JCoHdGroOvm_D0Uqh781bQ-1; Fri, 31 Oct 2025 11:52:22 -0400
+X-MC-Unique: JCoHdGroOvm_D0Uqh781bQ-1
+X-Mimecast-MFC-AGG-ID: JCoHdGroOvm_D0Uqh781bQ_1761925941
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-475dc22db7eso20631835e9.2
+        for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 08:52:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761925941; x=1762530741;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Z5xCiEdgSHZTgTrYV1z431hwVbhyx7WNnCaxg9jd68o=;
+        b=LoWGeJFNFWlJDpfvNyfBPMGcERz9/WUaDDG02MnnnVOF+ONpwc1fVOmlUTuu9pNewB
+         2cfPZQrSGLb58QgJQzIdTDkp55dBV+S8yhqf0KIM9/9US8fig8OZS1sqTtNhGhTywunE
+         ckvdzEozGwg6hkWbviYNVFbRS5G+iqGs8FPLwEYsGzJu/IYtWvX9qju6z+9ypmyZH2Wo
+         v/Hcvuek1bg1eDNpRD+EwI/yFASmNrIxPL1ra0xiJQJ/NXoXnjF4TFIhf2rBusHmmkML
+         OHwqoP6DhHuud0rDptjD0LagZFsssfjxBOBHHY+y0jaSAyH3y8sMa8ym+v2Z+DpIzr/a
+         1CIQ==
+X-Gm-Message-State: AOJu0Yw6RE+kavsWEe6AN7AeFTkrQ5y/mWpg3QemnDbVQZfHCMI+xSLR
+	0M4ohQJEMsPNMMhuhQ/0447W67e+c84Nj7mn4IhBi8nmRrZRD8RPwRjSwirYfzI12s/VpRe9Th1
+	BvsnxDH9wYBbmzeof6ax2n+EnQ+WTgMfBFTOaLLMOrlaP/W5q45rIFoZoF9Nmj7xqIJmR0Jz+2T
+	njWvq7KCwAlT2NWNKwuZMZ4ZhoeqDPThoNGDYEug==
+X-Gm-Gg: ASbGncsm42JLFWv+YvH7SHAle1feSJx2zs3d9Sr6GhoC/ry6a+IL/z9mW7fAvUkLdRO
+	6o03KwIsACm0hbhk8x2xC1rudLANwjpw3k0BHZZy7eHGCNbLGV+F7QwnZ2x+h7i71fqoqLymo+2
+	ruBrGl3Oh/X1l3ggW2VuQg2TaiVkaMYlDyZSAhqLLlU9BdcXqALs189K33bJNSygVcfV7X4XGNo
+	TRx2QN8rysfvwPwrUxbFXeTLuK01jm6nwfro/JhTFUvajTxgqiCHoI5+j7k1es/nZdYzN8cmtTL
+	QN6M+H43gvgF2RIA+OFWmwUFeju3RwlTLSqNlRMmUwp/qP1pQdaZlt51sWlfjUWZuRQXgsBDyoH
+	tuYSeh7fOtqICYIWqjSmc4Xc9VLN5+kx7yeE98Zsg
+X-Received: by 2002:a05:600c:8185:b0:475:da13:2566 with SMTP id 5b1f17b1804b1-477308a690dmr41197535e9.35.1761925941259;
+        Fri, 31 Oct 2025 08:52:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEanoHG78+nXQjyWOPkdXL+HXisIrVcrowR8akvkSnQDPibiUfR6s70OaaMqWF0WroV++HEkA==
+X-Received: by 2002:a05:600c:8185:b0:475:da13:2566 with SMTP id 5b1f17b1804b1-477308a690dmr41197215e9.35.1761925940777;
+        Fri, 31 Oct 2025 08:52:20 -0700 (PDT)
+Received: from fedora.redhat.com (bzq-79-177-147-123.red.bezeqint.net. [79.177.147.123])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4773c2ff79bsm4100635e9.6.2025.10.31.08.52.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 31 Oct 2025 08:52:20 -0700 (PDT)
+From: mheib@redhat.com
+To: netdev@vger.kernel.org
+Cc: brett.creeley@amd.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	Mohammad Heib <mheib@redhat.com>
+Subject: [PATCH net 1/2] net: ionic: add dma_wmb() before ringing TX doorbell
+Date: Fri, 31 Oct 2025 17:52:02 +0200
+Message-ID: <20251031155203.203031-1-mheib@redhat.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <xhsmhecqtoc4b.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
 
-Le Thu, Oct 23, 2025 at 05:45:40PM +0200, Valentin Schneider a écrit :
-> On 13/10/25 22:31, Frederic Weisbecker wrote:
-> > HK_TYPE_DOMAIN will soon integrate not only boot defined isolcpus= CPUs
-> > but also cpuset isolated partitions.
-> >
-> > Housekeeping still needs a way to record what was initially passed
-> > to isolcpus= in order to keep these CPUs isolated after a cpuset
-> > isolated partition is modified or destroyed while containing some of
-> > them.
-> >
-> > Create a new HK_TYPE_DOMAIN_BOOT to keep track of those.
-> >
-> > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
-> > Reviewed-by: Phil Auld <pauld@redhat.com>
-> > ---
-> >  include/linux/sched/isolation.h | 1 +
-> >  kernel/sched/isolation.c        | 5 +++--
-> >  2 files changed, 4 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/include/linux/sched/isolation.h b/include/linux/sched/isolation.h
-> > index d8501f4709b5..da22b038942a 100644
-> > --- a/include/linux/sched/isolation.h
-> > +++ b/include/linux/sched/isolation.h
-> > @@ -7,6 +7,7 @@
-> >  #include <linux/tick.h>
-> >
-> >  enum hk_type {
-> > +	HK_TYPE_DOMAIN_BOOT,
-> >       HK_TYPE_DOMAIN,
-> >       HK_TYPE_MANAGED_IRQ,
-> >       HK_TYPE_KERNEL_NOISE,
-> > diff --git a/kernel/sched/isolation.c b/kernel/sched/isolation.c
-> > index a4cf17b1fab0..8690fb705089 100644
-> > --- a/kernel/sched/isolation.c
-> > +++ b/kernel/sched/isolation.c
-> > @@ -11,6 +11,7 @@
-> >  #include "sched.h"
-> >
-> >  enum hk_flags {
-> > +	HK_FLAG_DOMAIN_BOOT	= BIT(HK_TYPE_DOMAIN_BOOT),
-> >       HK_FLAG_DOMAIN		= BIT(HK_TYPE_DOMAIN),
-> >       HK_FLAG_MANAGED_IRQ	= BIT(HK_TYPE_MANAGED_IRQ),
-> >       HK_FLAG_KERNEL_NOISE	= BIT(HK_TYPE_KERNEL_NOISE),
-> > @@ -216,7 +217,7 @@ static int __init housekeeping_isolcpus_setup(char *str)
-> >
-> >               if (!strncmp(str, "domain,", 7)) {
-> >                       str += 7;
-> > -			flags |= HK_FLAG_DOMAIN;
-> > +			flags |= HK_FLAG_DOMAIN | HK_FLAG_DOMAIN_BOOT;
-> >                       continue;
-> >               }
-> >
-> > @@ -246,7 +247,7 @@ static int __init housekeeping_isolcpus_setup(char *str)
-> >
-> >       /* Default behaviour for isolcpus without flags */
-> >       if (!flags)
-> > -		flags |= HK_FLAG_DOMAIN;
-> > +		flags |= HK_FLAG_DOMAIN | HK_FLAG_DOMAIN_BOOT;
-> 
-> I got stupidly confused by the cpumask_andnot() used later on since these
-> are housekeeping cpumasks and not isolated ones; AFAICT HK_FLAG_DOMAIN_BOOT
-> is meant to be a superset of HK_FLAG_DOMAIN - or, put in a way my brain
-> comprehends, NOT(HK_FLAG_DOMAIN) (i.e. runtime isolated cpumask) is a
-> superset of NOT(HK_FLAG_DOMAIN_BOOT) (i.e. boottime isolated cpumask),
-> thus the final shape of cpu_is_isolated() makes sense:
-> 
->   static inline bool cpu_is_isolated(int cpu)
->   {
->           return !housekeeping_test_cpu(cpu, HK_TYPE_DOMAIN);
->   }
+From: Mohammad Heib <mheib@redhat.com>
 
-Right, I get confused myself as well. I've been thinking several times about
-inverting those housekeeping masks to work instead with isolated masks. But I'm
-not sure that would make the APIs easier to use.
+The TX path currently writes descriptors and then immediately writes to
+the MMIO doorbell register to notify the NIC.  On weakly ordered
+architectures, descriptor writes may still be pending in CPU or DMA
+write buffers when the doorbell is issued, leading to the device
+fetching stale or incomplete descriptors.
 
-> Could we document that to make it a bit more explicit? Maybe something like
-> 
->   enum hk_type {
->         /* Set at boot-time via the isolcpus= cmdline argument */
->         HK_TYPE_DOMAIN_BOOT,
->         /*
->          * Updated at runtime via isolated cpusets; strict subset of
->          * HK_TYPE_DOMAIN_BOOT as it accounts for boot-time isolated CPUs.
->          */
->         HK_TYPE_DOMAIN,
->         ...
->   }
+Add a dma_wmb() in ionic_txq_post() to ensure all descriptor writes are
+visible to the device before the doorbell MMIO write.
 
-I thought I did already but obviously not. Let me fix that...
+Fixes: 0f3154e6bcb3 ("ionic: Add Tx and Rx handling")
+Signed-off-by: Mohammad Heib <mheib@redhat.com>
+---
+ drivers/net/ethernet/pensando/ionic/ionic_txrx.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Thanks.
-
+diff --git a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
+index d10b58ebf603..2e571d0a0d8a 100644
+--- a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
++++ b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
+@@ -29,6 +29,10 @@ static void ionic_tx_clean(struct ionic_queue *q,
+ 
+ static inline void ionic_txq_post(struct ionic_queue *q, bool ring_dbell)
+ {
++	/* Ensure TX descriptor writes reach memory before NIC reads them.
++	 * Prevents device from fetching stale descriptors.
++	 */
++	dma_wmb();
+ 	ionic_q_post(q, ring_dbell);
+ }
+ 
 -- 
-Frederic Weisbecker
-SUSE Labs
+2.50.1
+
 
