@@ -1,102 +1,187 @@
-Return-Path: <netdev+bounces-234620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A2C4C24BD5
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 12:15:55 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA2FDC24BE2
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 12:16:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2395B4F4012
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 11:14:51 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 00B99350B78
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 11:16:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27F013446D2;
-	Fri, 31 Oct 2025 11:13:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDDBB3451A2;
+	Fri, 31 Oct 2025 11:16:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="tgQ/MiDz"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="D2yJjIsp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011040.outbound.protection.outlook.com [52.101.52.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C9403321AE
-	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 11:13:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761909185; cv=none; b=Gk+TR8P/lXn9t1IDRVvqTk71R5vHebX4Z7RW7jGi6lpCUMB1b8YzX9SZkNWnQMDOP2mzNih8e7GtvWq3kBI4BoqgvscRr7C3VIwxUz4KTO01RXckg8gwbtnTb+OBQ9+ynkm6/6z+JO6uUvHkvw54J6eayo2xtkTC82l/gvXJ62I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761909185; c=relaxed/simple;
-	bh=/GF/36swnj3HxX2vsTvl7z6HQm3i0r5EB3YUwAA95SQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k5/Cr4tc2SHgw/vlPZgZO16m/hYYZ67a3d3XTBW/BlK4z69OumRzmgCmKS1p9hdioQaFB1QgPIbdhbNXGMgBOsKSWQwLjXa4frDyXAfMLj+A4u4NkKIxKgYu2N5MlfKkRJgGSj7pIcRQ7o0m5jY789oPa+XX6Wd0zEbCl1bxzsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=tgQ/MiDz; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b403bb7843eso461183366b.3
-        for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 04:13:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1761909182; x=1762513982; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/GF/36swnj3HxX2vsTvl7z6HQm3i0r5EB3YUwAA95SQ=;
-        b=tgQ/MiDzWN8vF4z0IMUa6f6U2ouDClkpFpORYt+0S+IcdYcSlfRmSE+4tl961QAE8I
-         ZLFEV5b+sonJNwCVMz0bs+q0FrCkRaZCklHfEZf/rbffRF72P8xoPIPLZLi/wQ4ypXqs
-         8K2Q5dQbAYmPJgxoD+ubsf1yolgt4cCBrvrrYLnzhDrq5PS9iZWcKABhVuVWXkAZ9wSi
-         /7DSQL654XP7LVxzJn3LgcWK5ji88aQBL4gFPPwOfGTd/k8a3Q3MVFg9q32RmzanGINY
-         i3CsO0PC7xP8tyZnCxhkjBLGXTiSfVN1/tWJHXLzsUhfhjmx0iv2Ncepe3eIzePb+ILK
-         oiJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761909182; x=1762513982;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/GF/36swnj3HxX2vsTvl7z6HQm3i0r5EB3YUwAA95SQ=;
-        b=WgcdFpo/3EwnZbUEpPS+TZXAftA7Bl20jgQ8O5ivIRawoAA7dyWz3DhOXB3yvwk25B
-         opL5A8Idwcj9KW0LsBT6wMCcjEoe+H84BFt+iq31CC4YLdQzidmJYYSx5Vj0C2h7NF0J
-         N+EPbNdT1KJ4xBpNON15cxfrjYIirj6YCXn7WbpWK4dOlsYQm7qr6KitOrbPfsKbpirx
-         CxFfprQZtOedl6MTcs16BilsisQ+gWRXNXaMj0VF5Qday9uJ6imq72ZzQqirhk3JBkH7
-         GRqB33ZjRUenm+C9D5w4O2eycfgQPtXhBPTK79EgInj1cf4E83P7DNSVWqUxkiIZBUX6
-         pJSw==
-X-Gm-Message-State: AOJu0YylRZlr3qX5Exe6RdFOHTXpYgOqnf4j1445jJh2w3W2SLobXZMm
-	otWjfLi6ge30Q+70Fm/YDpYgZjz5Xe46M/HrP1gmBeN47Iajd/be/84gmDMsPllG5EE=
-X-Gm-Gg: ASbGncsnElXloYasB/zHthru/XlfdRzBVn/U2VkEfLdrjYfJyeOVUc42ziR3vV6SNoK
-	+p7tNjCnWVbF/2t9XYGRroNr+ULyu1qMfPmkemVhlA2lh0RyELSvzlO2TKDjQP5W2s7d43BkOpQ
-	6+WvFFwE6NUiXhX3hzXhcoxwOI0NNeMgWDbMCFy5Z2PQdaLdO18UedM//zMqoMJqX1hg/dGRP7j
-	Mm/zUpxvTqK15loPxHc2dyFsIhCYIb9iaVQx7Xm0FdLHdU00riftUB26KYnr9JztdlcIdXgVhCE
-	Z5S2LPqGqOR78fZrQ6SIptqBWl/RLsDQCuqtlNjwQB5B5+zjZNPgAEZg3Y+8AF3Nmq1BQiwzZhk
-	gnfwSBuvxz3sQU72YzdCLG/lMvUynJPyo0sbszmj3yy9W4C/j97CncK7isLnRDA0lSARS1jwtiC
-	ArdalTiIJmBvYjgcAH1zvd9Dh+
-X-Google-Smtp-Source: AGHT+IHF0AaowGlXXnTV9muU/eRGHs3kpcT3aHx54icw1iGBrSo5gvHZWmrUEDw4u3lT2X6Kp/8q9A==
-X-Received: by 2002:a17:907:3f8b:b0:b04:5e64:d7cd with SMTP id a640c23a62f3a-b707060e439mr330499766b.46.1761909181620;
-        Fri, 31 Oct 2025 04:13:01 -0700 (PDT)
-Received: from jiri-mlt.client.nvidia.com ([85.163.81.98])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7077975d77sm151037766b.9.2025.10.31.04.13.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Oct 2025 04:13:01 -0700 (PDT)
-Date: Fri, 31 Oct 2025 12:13:00 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, Stephen Hemminger <stephen@networkplumber.org>, 
-	David Ahern <dsahern@kernel.org>, Petr Oros <poros@redhat.com>
-Subject: Re: [PATCH iproute2-next] devlink: Add support for 64bit parameters
-Message-ID: <z6xecd4wjatpzvxxtrqkphc4whr6ypha3shlovg6unl7pwntas@6iaxwgbsgz3d>
-References: <20251030194200.1006201-1-ivecera@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A95A34405D
+	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 11:16:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1761909380; cv=fail; b=KwN2s+78i1WNPC4JlQOGEv/8ELTThzrdPspy6zGHOo0QgcIHXqAfFhih1BTmR9iqtyyWpQXQKSrEG6aK6or40lr0XDrJspqlQa3Yr9XucpsehVfpKbajKQ0e5nQ2gE2P0Sxpfw9yuXfVjE7+05GRZNYa6TxD7SxJgCL3Soaeomg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1761909380; c=relaxed/simple;
+	bh=HANQBEgFCPd1aFJ9LeWIDmn0EDMfXvNBIFdndzEJZQk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nWibhN/zQOsC0LdmARtboc5mXpGrdPwVcVmkY2pQOLFiEfVpM99c/gFmoEk6iFEmRWPWwa4a3FDqh6JxdGAZtFX8o31Bt96zkeEEVPQp67gH8ZpOgh5z1k5oqldAlgpCnLIPFNa1A6G8HLMSRgm3v+Jg/z3dIFWzVI0RCZWOnOY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=D2yJjIsp; arc=fail smtp.client-ip=52.101.52.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=TmHYA6debGfvo/f6FznkFaoVZUa5aXc2NbjlqQLZOzsDdo877W40VZ9U8p4j9rXqmx8uIYYhozrHF7stXEaYw4TvUtdjP9g+FbbAmEiE2+BvMsOmLblbYc0H7ej8ec9m/JUN56qIbbYEC0qNKa1ZMNxSJtKh+SU/FvMw4JNjpgYs1HswhBBUYxosTlZccJLMBqtVNlmzqypiDH7jJ3niibmyZ0lMIFnfOy204ZmhZX0ql4vWBulrFLWceIG6RiLNq1wWR1td4ETD5kKoVFJ+juH/P/anX/hh2IRE2kjhwb7JBP4AGcqh/XRt48rFZb5Ov2lTRA0yEIToFAAuP24D8Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=uQAyYZKTgkC2fiGMZdUJUJM36YrnAOhpOnTMTumpE3A=;
+ b=NlGqN+FlTNzV1ak9kw7TgggyETGwumOd0ghgRaZczp5zpFvzUWI4pVdwvEyD4Nl9cMfIwTvrsSx6bevszTMj55FXgtJFOfLP5TTF8owW6mOPKJgoqD7q+3RcNC7NnOgK70XpEaRFltSsuBcBxAqonH1XqBMLuhPImDE8Qm7eXKYTeX5fAPcXzRBfuRGDVREwwV2GaOFwhFNajWBzUya0JNfO94bleUJRPzw6x22fTlEiVZKV//IXmomX69RcxZfrch91T1oYgzUvJ15I2wpxVn6vwYtpKPtr3/N6QX/FfiCyGnf/wrO8savCdN6Psnkq3/pYqL8s4DhJ8NscbaHzOw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uQAyYZKTgkC2fiGMZdUJUJM36YrnAOhpOnTMTumpE3A=;
+ b=D2yJjIspyITkpCphuIMxKaAq9lgvMtc+mvmlG9R0kemQfEpGi4P7OTjBOP2p4N/qdvuLeAhBwHjpyVD2sbUFYPZ5PK6H4xkxs123BZO+HswkCvVH7BOa3UGqn6UyMqwjoJOz26gIn3VNYvVSne+IN8qDkhmNDOBj+TYtGgsiiOA=
+Received: from BN9PR03CA0158.namprd03.prod.outlook.com (2603:10b6:408:f4::13)
+ by DS2PR12MB9798.namprd12.prod.outlook.com (2603:10b6:8:2b9::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.13; Fri, 31 Oct
+ 2025 11:16:15 +0000
+Received: from BN2PEPF000044A1.namprd02.prod.outlook.com
+ (2603:10b6:408:f4:cafe::24) by BN9PR03CA0158.outlook.office365.com
+ (2603:10b6:408:f4::13) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9253.19 via Frontend Transport; Fri,
+ 31 Oct 2025 11:16:15 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=satlexmb07.amd.com; pr=C
+Received: from satlexmb07.amd.com (165.204.84.17) by
+ BN2PEPF000044A1.mail.protection.outlook.com (10.167.243.152) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9275.10 via Frontend Transport; Fri, 31 Oct 2025 11:16:15 +0000
+Received: from airavat.amd.com (10.180.168.240) by satlexmb07.amd.com
+ (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Fri, 31 Oct
+ 2025 04:16:12 -0700
+From: Raju Rangoju <Raju.Rangoju@amd.com>
+To: <netdev@vger.kernel.org>
+CC: <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
+	<davem@davemloft.net>, <andrew+netdev@lunn.ch>,
+	<maxime.chevallier@bootlin.com>, <Shyam-sundar.S-k@amd.com>, Raju Rangoju
+	<Raju.Rangoju@amd.com>
+Subject: [PATCH net-next v6 0/5] amd-xgbe: introduce support for ethtool selftests
+Date: Fri, 31 Oct 2025 16:45:51 +0530
+Message-ID: <20251031111555.774425-1-Raju.Rangoju@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251030194200.1006201-1-ivecera@redhat.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
+ (10.181.42.216)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN2PEPF000044A1:EE_|DS2PR12MB9798:EE_
+X-MS-Office365-Filtering-Correlation-Id: 69ec9eb9-2871-4342-ed4f-08de186ee85e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?ktTQIavvQ4XAIXSUZ3sw2GKmbdo2OkG3w/6xGRIyDrxGY2be5bajVTyxAC0f?=
+ =?us-ascii?Q?c6O0oBPQiESBro/4NvqJeCL0XbJyxQ6bcUwtQTdk87sNL1UmNH2mjq/ow1jQ?=
+ =?us-ascii?Q?JC2q77432indnJXvZOJ0mWJU58B6jqyAurtAUJ0tGvbvZHkIAXAbCbEtmuTM?=
+ =?us-ascii?Q?uxdkZpeEdCqLf9ekP2zS3Y3EXWYPMa9vUn+RP51cXjG7ReMmEqcynmv35XJJ?=
+ =?us-ascii?Q?yhsFO/QemQlRtIaPCN98zkNZ2FTkFr7xPBa0Zaqn1AqL7TcDsNg6Y8Titnic?=
+ =?us-ascii?Q?yJnnsIyLCIXOiqHQv7IKoQ3CsJPD7Xf3N/igwIPY6wMFO5WVPPQ7yCz/2CtL?=
+ =?us-ascii?Q?i8GgIuDAm+5qYP+4MnybYeoIkfpoASql+1kTJL5+sC09O3W1FU2ucYbxH1VI?=
+ =?us-ascii?Q?rPsa2wnqsvpAqlVSyxaS6PMbydr2rBsnrqFX0sFVKHej7E06zEdXXpMWcImm?=
+ =?us-ascii?Q?g3jJUlYsViEnnN6ax0BnXfFIfq+PYJjJb9WsUVhcQgdM+WpkmPCbbyozOvSs?=
+ =?us-ascii?Q?RHNUraJn/qkTA+u7Qy2RdT39/LNGjxUfQXXFvHxkYLIi6vuKdP4X90cMKT1n?=
+ =?us-ascii?Q?KC1iNVXo6mBDYuSH/veQ5opPgW2YZlhe+xoOQHkEetGE5tSo8pIczn2Uxi8F?=
+ =?us-ascii?Q?HVnE4D22YyBxh8z90OlJKlUUqYWLScEZoH97Tlg0LWqn7Y5SEEenksgAxjms?=
+ =?us-ascii?Q?sXzsQjKiL/04ekdVpjjcx6I2PxuJezs1DVn/ZuW/8KJzSmABR4rlMOTmn/hY?=
+ =?us-ascii?Q?zT09gBeMSkNdmRsCCOjhJ0H6AaGy/KXYTapvemNNcXZkkNCcvEldijw2o/6s?=
+ =?us-ascii?Q?1YZrVTwSok0xD8TNygPUsVvcrQI0dvm8iiTmhuoqJNE2fBp+NmOINmSXVcXb?=
+ =?us-ascii?Q?ZRtiz2cEmmO5zxA5WnsbU9Ie+62f73u1A4hPB8jJoMi17dmR6i2J3jAGXVRM?=
+ =?us-ascii?Q?y88fTPm58BdrUkSOTSUAnHRDQoVqa8U1kLTpLRwk1pJ8gKKuSTGAVU+8oV0t?=
+ =?us-ascii?Q?szgy5oD7HHj1uE2wiWjMRqFQML/NtD27KzCbK6DwQP/7rTM5qm5ga35kshTP?=
+ =?us-ascii?Q?Jp+DjQW7egna2xzfMuKNvgE+wJq92qBBMulFQk2ZAZHczNGCRYZknBrf2VPE?=
+ =?us-ascii?Q?3Ernqj/d34c7E5jBJoEo+Nv4RHOn792P6mx+U3vzVN9XycvJKpxx+bGjUwLc?=
+ =?us-ascii?Q?c+K4IkwD5PYT+JOZfi/pjGLSLOc7+aoDugOXKV1iZY90E57dpWKpbU4KEHwo?=
+ =?us-ascii?Q?RIurCsgiNvyqQHa2kqDSolKIOABKpN83CcCgUBfCzUTJh58eiaOyt+pYI3ys?=
+ =?us-ascii?Q?IXC3JGRMUEPbBAKwK87/19wZstmUDXlfzOPUCE4deC5NmGDf2cNFN9zpw9x4?=
+ =?us-ascii?Q?3ICqz9wfKmGVn682xNtrRFnN/RBtbai6N+TxHK16ziTBchqUfqUOcArGrpJ6?=
+ =?us-ascii?Q?fmtV4DM1jOmK7pueB4An/aA92fBjNgebLy9MgUoSd7qtVHXBMEtjkxe4gO5t?=
+ =?us-ascii?Q?j5ud7tzHsDAMyZSQTiwknVqVbaZSQklJdea3tQ4kZs5vGdaAPhL4B+eXdDzJ?=
+ =?us-ascii?Q?F/UVhHb9IGIYCv24vdc=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2025 11:16:15.6769
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 69ec9eb9-2871-4342-ed4f-08de186ee85e
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN2PEPF000044A1.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS2PR12MB9798
 
-Thu, Oct 30, 2025 at 08:42:00PM +0100, ivecera@redhat.com wrote:
->Kernel commit c0ef144695910 ("devlink: Add support for u64 parameters")
->added support for 64bit devlink parameters, add the support for them
->also into devlink utility userspace counterpart.
->
->Cc: Jiri Pirko <jiri@resnulli.us>
->Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+This patch series introduces support for ethtool selftests, which helps
+in finding the misconfiguration of HW. Makes use of network selftest
+packet creation infrastructure.
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+Supports the following tests:
+
+ - MAC loopback selftest
+ - PHY loopback selftest
+ - Split header selftest
+ - Jubmo frame selftest
+
+Changes since v5:
+ - follow reverse x-mas tree format 
+ - fix the commit message for phy loopback selftest
+Changes since v4:
+ - remove double semicolon
+ - move the helper functions to appropriate file
+ - add inline keyword to static function in header file
+Changes since v3:
+ - add new patch to export packet creation helpers for driver use
+Changes since v2:
+ - fix build warnings for xtensa and alpha arch Changes since v1:
+ - fix build warnings for s390 arch reported by kernel test robot
+
+Raju Rangoju (5):
+  net: selftests: export packet creation helpers for driver use
+  amd-xgbe: introduce support ethtool selftest
+  amd-xgbe: add ethtool phy loopback selftest
+  amd-xgbe: add ethtool split header selftest
+  amd-xgbe: add ethtool jumbo frame selftest
+
+ drivers/net/ethernet/amd/Kconfig              |   1 +
+ drivers/net/ethernet/amd/xgbe/Makefile        |   2 +-
+ drivers/net/ethernet/amd/xgbe/xgbe-dev.c      |  19 +
+ drivers/net/ethernet/amd/xgbe/xgbe-ethtool.c  |   7 +
+ drivers/net/ethernet/amd/xgbe/xgbe-selftest.c | 346 ++++++++++++++++++
+ drivers/net/ethernet/amd/xgbe/xgbe.h          |  11 +
+ include/net/selftests.h                       |  45 +++
+ net/core/selftests.c                          |  48 +--
+ 8 files changed, 437 insertions(+), 42 deletions(-)
+ create mode 100644 drivers/net/ethernet/amd/xgbe/xgbe-selftest.c
+
+-- 
+2.34.1
+
 
