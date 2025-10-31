@@ -1,92 +1,127 @@
-Return-Path: <netdev+bounces-234751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F0E7C26D34
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 20:50:40 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id B02AAC26D85
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 20:55:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7B551A225EE
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 19:51:04 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7B7A64EC666
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 19:55:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EAB5315772;
-	Fri, 31 Oct 2025 19:50:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA7D131D736;
+	Fri, 31 Oct 2025 19:55:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tGfNznsi"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="HCs6CWvx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB0F2FDC29;
-	Fri, 31 Oct 2025 19:50:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1DFA31D378
+	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 19:54:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761940237; cv=none; b=fW/VTa6sZ3cqHXY+8VYFjCxVm+u/MUKgfgXBlz5DDim8nuMc5m1b9X184S9bzmFvs8jruF8gV2FK3ECtL88Qh0ovzVf3NT7IyI/tK42RthgI8NPbPrSPqQN6nyEdn9w49eCigfFMF7ozvMV+RikkIYGPqyoe/hETVnuDx/FvRQk=
+	t=1761940503; cv=none; b=ge+Cd7fkoqEOrm1jnvQoTZhOwkGyp0JCzjlp/LLc6hqrCp1EdoJlOZo1FJI5NySjUgf56T+T3c85d2D7/Nj0zlEExbBPico9BUkc6/z/8CzpjUe1ZhgJYJnGd8w6VOar7zJSrqYDq/+JmnaKRaRd6VGaesyrEILX5w508BbRsoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761940237; c=relaxed/simple;
-	bh=eT8QXRHOo7iIwxd5VToUWvH42mgEJKnN5q2AXWdRfVQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=iGScTFdCK0e7d1FqlP/3c9G0r7KvgRZFezsZ9IB7F1jzNTwb4RXXUtgqJFmQW7faEvvBVRHNGb5R7S9kMdpViBM03UhB9plNhEp/14NcJsByNkB2k0ueuEnaYI7skO4mALH+U3AFZ3ZdPxeT30VKCyvpR5Mb4boIEPAXIjL0Iyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tGfNznsi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66BA6C4CEE7;
-	Fri, 31 Oct 2025 19:50:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761940236;
-	bh=eT8QXRHOo7iIwxd5VToUWvH42mgEJKnN5q2AXWdRfVQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tGfNznsiNnkR5t1aUQNwc6xNU0oMW2DCU/dB9RAwQk4pvWYLqfCNuz7VTDrMRg8KB
-	 dT5YZcJ8nAxdiMkg0NXnIk27MTTWmcpU1Iy/72kAD05dnX6jUh1nVozqUfYYKWw17g
-	 0fS5XyN6Wybu8hMiFirtZXEJ+8hW1V8yAPrB1g8XMymexnpVB8Pz8PYVCN25MODKJ5
-	 8pdfIeQpPeu5V+fSBfi4mIgn4c7gmdF0UZZlM+v2dT8HfpHMYNPiZdvsEIokrvF7+4
-	 QJESOf01Z7N8GgDAyqnsrF03gHqNThCcGJWnWqb22a3ULOP1yHATl9wmh0Bfw5Qzvv
-	 fOYJS9DjSpgfw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD003809A00;
-	Fri, 31 Oct 2025 19:50:13 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1761940503; c=relaxed/simple;
+	bh=QPh7e9eiePKDS5Iu1Lnt8GQMQjYknAYedXbsFjt0hLI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MEva5RVqoc+8veinFsM92P1xgFZvByhVL1uddhwwGuode7cHYMziwvkGOGcPmO4/2W6SSl+UGg3EsAbRjUCwVVrZn2g0Jr3PJUP80VsNdKEMnxhbClucGmh1JucxbaxWqN+2qVO+IfHxnocSZivbtPBDDDHiCOcejFj1mt/n3vk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=HCs6CWvx; arc=none smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4ecae310df8so40260991cf.2
+        for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 12:54:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1761940498; x=1762545298; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IU/QqETuJdntfBWhKIOrTKQs8Zk0lk7TKDLyBHhzDZ8=;
+        b=HCs6CWvxWsN5eHCol0QFylm6MAkrdUaASBUfM02AjR/3sRKgIh8OJg1VG8aESt//8t
+         +Wi+bRE/nviI1SfX7B8gMmAJs1DMktc+Zog9vm7vorrs1rAQ053BT2XxZGcISRleoLZL
+         6MPmp5Fh8dJqbQpGecjpSLMTZnbv8HQHZ/hV8cxjK48L/VrfThTuhckXuBeKLJFeQL3d
+         SpudHeL6f6wP4F1yuuCBsDFMhvcYrf3WG2EFhbL3j3RFWMTPc75rxO9u/7xYrWQi4woz
+         lT92kcPOKWgDRKJT2//EcZUq8UcUe5qFjdVDbbZ/vqvmrSaOUsOETjmUFR8W5IlqllF8
+         A3Yg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761940498; x=1762545298;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IU/QqETuJdntfBWhKIOrTKQs8Zk0lk7TKDLyBHhzDZ8=;
+        b=l6oKYwfwes6MNZXEujNjoTY9P6KlK7BykDYSz2Q5KwsTe6GwkVIwcMGqVfINBw1kfx
+         RILY3mJ129TMcAGiiQHKj1cYUQxuBneKUKfL8XkHF8bIz4TvBjjYDkJ0ZMcKFd0MOk95
+         Mm9QYoSUJTVoN030xEcnyUb238qp4XPFqj+vDZTC+OjjTyg1UgQZ4Qx3M+usfPUIrGNF
+         3GVOz4OD3c60U1cJDBt4nKdxfMfVhyQZhZiRLMLrjc4x3nsL2PmMD3MeK3MiZ3OOEAxo
+         IGLfjf0spuLPx4p6eM9hvPaDxznxKkKFexN9JHr2nWklLAbgidwxDz+tAZvhlC5rGisO
+         kdxQ==
+X-Gm-Message-State: AOJu0Yx03P5zUULOYfHQUb4bFP74drJlp5ZdBXM0Wfl4PSZG8X4wPgBf
+	2Qr/d3Ku2cN2t1W1aSg3kYDKI5pIpdc8b85yfiD9vek2ViaxcNSKDzHyCWmauemwXwo=
+X-Gm-Gg: ASbGncvfU+GrGIx/w25gAleXkqxZUaks6uPNUYqS+xgOAJ6SlDowBgUcbKU5YNn1YMZ
+	I7KM/C2lJ5e/R5Rm1Tvp5a0z9AWGsiWKahpnDzur0spx8LL+jMyUUytaCVuL2+09jkS3Vlr510z
+	zBbuM9H8Ii2pD2rOFRJTOKQrvACXMVyg4CVeQ6zVJO9KW8SJ5D8N34BF9nf3kDC3xaSWr42I/4w
+	q0tYwZuYNtEptv+yqmZUuA5ybrBWqi87IX6OFsSEkIIdusdn7EVxB3EfrpGlQHhT+4b+Cz4KFtp
+	4bBBn7b3cOtnllFA1pJzt8ywCTgj+mn8GFP/j253piO2pMKAxIwoPjBo6FZ8DH4qqtIZEBtwxri
+	UWk8SEfW0Kt+CwnluY2mouah8hBOVbyRx8XD+Qu9C13ZwRg5vGZLvXGzq1JFYvIgMfoRbPzIItm
+	oOalqVS7RZcVQ9y+9vBxaWZ4Uv
+X-Google-Smtp-Source: AGHT+IHVhbrE3ikJBlrrfGgOOS+pKyuTjvcc1uOGzO1TVrPWUUF3dyxGkX/Bbt8JKQ8ECCcokkGkMw==
+X-Received: by 2002:a05:622a:ce:b0:4e8:a8be:5857 with SMTP id d75a77b69052e-4ed3100173amr55415401cf.55.1761940498093;
+        Fri, 31 Oct 2025 12:54:58 -0700 (PDT)
+Received: from [10.73.214.168] ([208.184.112.130])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8ac00a9997dsm164052285a.16.2025.10.31.12.54.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 31 Oct 2025 12:54:57 -0700 (PDT)
+Message-ID: <176362a7-5ad1-4639-9690-b6f375daf917@bytedance.com>
+Date: Fri, 31 Oct 2025 12:54:55 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] bluetooth 2025-10-31
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176194021251.620269.13809650718943764430.git-patchwork-notify@kernel.org>
-Date: Fri, 31 Oct 2025 19:50:12 +0000
-References: <20251031170959.590470-1-luiz.dentz@gmail.com>
-In-Reply-To: <20251031170959.590470-1-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net/mlx5e: Modify mlx5e_xdp_xmit sq selection
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, saeedm@nvidia.com,
+ gal@nvidia.com, leonro@nvidia.com, witu@nvidia.com, parav@nvidia.com,
+ tariqt@nvidia.com
+References: <e25c6c0c-1e2a-48c2-9606-5f51f36afbf0@bytedance.com>
+ <20251031114058.29d635c5@kernel.org>
+Content-Language: en-US
+From: Zijian Zhang <zijianzhang@bytedance.com>
+In-Reply-To: <20251031114058.29d635c5@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello:
 
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 31 Oct 2025 13:09:59 -0400 you wrote:
-> The following changes since commit e5763491237ffee22d9b554febc2d00669f81dee:
+On 10/31/25 11:40 AM, Jakub Kicinski wrote:
+> On Thu, 30 Oct 2025 17:42:50 -0700 Zijian Zhang wrote:
+>> When performing XDP_REDIRECT from one mlnx device to another, using
+>> smp_processor_id() to select the queue may go out-of-range.
+>>
+>> Assume eth0 is redirecting a packet to eth1, eth1 is configured
+>> with only 8 channels, while eth0 has its RX queues pinned to
+>> higher-numbered CPUs (e.g. CPU 12). When a packet is received on
+>> such a CPU and redirected to eth1, the driver uses smp_processor_id()
+>> as the SQ index. Since the CPU ID is larger than the number of queues
+>> on eth1, the lookup (priv->channels.c[sq_num]) goes out of range and
+>> the redirect fails.
+>>
+>> This patch fixes the issue by mapping the CPU ID to a valid channel
+>> index using modulo arithmetic:
+>>
+>>       sq_num = smp_processor_id() % priv->channels.num;
+>>
+>> With this change, XDP_REDIRECT works correctly even when the source
+>> device uses high CPU affinities and the target device has fewer TX
+>> queues.
 > 
->   Merge tag 'net-6.18-rc4' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-10-30 18:35:35 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-10-31
-> 
-> [...]
+> And what if you have 8 queues and CPUs 0 and 8 try to Xmit at the same
+> time? Is there any locking here?
 
-Here is the summary with links:
-  - [GIT,PULL] bluetooth 2025-10-31
-    https://git.kernel.org/netdev/net/c/284987ab6c97
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks for pointing this out, I will add a lock here.
 
