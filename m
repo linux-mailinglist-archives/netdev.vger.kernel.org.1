@@ -1,91 +1,147 @@
-Return-Path: <netdev+bounces-234543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E64BC22D5B
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 02:00:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FE02C22D8C
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 02:12:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D06744E2069
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 01:00:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE5503B2D5D
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 01:12:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54254F9D9;
-	Fri, 31 Oct 2025 01:00:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C136221FBF;
+	Fri, 31 Oct 2025 01:12:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oLBFXBVZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N0JqK4sx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BA37163;
-	Fri, 31 Oct 2025 01:00:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71D8A220F5C
+	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 01:11:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761872437; cv=none; b=FMyBG2OtbSsRKtVbXpm5D3fHuIr7ybvlgXda4OtwvEJT5EmeIOFdVBNosGkY8Lt0lVWaanz5wyL1BOei+ccRvsAECTlsj8cZpebkajLQU/TFqPH3fKARu/04op3df/I0BhSUR1dUH2lN2IWZ73dkYyc8TXVU0wAs1d15YgJNWrY=
+	t=1761873120; cv=none; b=eh14Mm4AWwBz2SwMZ3W8K/Ksx4J4PADHiNcWu05/bYSaJf0DgM2y1xwy3ek2YQ8GS/6pyOI+ZIueQrgOIkh8ymYqugS/Md4Ohw/BgEeZ3iIkNdsYM1R8lKjoN9OBv3A9U8m74+MBZEpFiRkha3fgJ3D0YTi/ipwQQeDJdsHpe98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761872437; c=relaxed/simple;
-	bh=JuTwcYslJbuCM6wBfnxm+jY1iYx4l6qb0nWnN3H+WlI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=GFWPf3r+6YSbOHd1uCaxrO2kVOzlS2qJV1wTpdPupKo0+yqYPhjYFP/FChAd2OaZo1OUzZspF0yUD1R90B5IZ/vH9sGI4ZOwmJFZZVGZ1KBJPIBt+cEPNjntMHhFDyTHfs4oNITZosIM3QJmuQcy5Am8oDfTY1ydAeUeT8419Mc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oLBFXBVZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5446C4CEFD;
-	Fri, 31 Oct 2025 01:00:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761872436;
-	bh=JuTwcYslJbuCM6wBfnxm+jY1iYx4l6qb0nWnN3H+WlI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=oLBFXBVZT+vU1z0Cpvl/kAYSAP12sXJOMcB8/t95QlDbI2LMK7P+MJK/R0+gv5HQW
-	 fOYlz1ZKhX6qv4yRuk1tIkaNVKlUcSRCDJ8KAE/d1MUagW5kUzSDRTdtYU0IEm7xoR
-	 b2Ec653BYK8EGU+GQDDLBIiaW52ElCX7UZWY/6qUI5n5VbP72aUOER7SLSRla/29h9
-	 VKDYSgpR/2Ax9SMhqZeoAjwxZApQX6vGNDbX8YU3Gmx2/mjc7IlDcrM8CXmgXZef79
-	 xxAIrUxXTU/S+2efc1E7Id3g/L0mdfjHTEMwHqr6nFYks71VkUXTNFeZmyBoZzd2+h
-	 C1JCD/WVhiDIQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D443A78A6F;
-	Fri, 31 Oct 2025 01:00:14 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1761873120; c=relaxed/simple;
+	bh=cXl4F61qk0RRWyXuv/DKPX4iPDEPSy53HnD/apHYfeY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N19hYCOtJ9RwGqDgM8HwmohqnMQhUXzQRB4Ylik8n+2iqNh3NrBQNdD3D6cG1Vsmpxxrsy9GeGRVOV8nFJkcAb8pNZXFmwSIL7BBU61YAUfSPDlSkv7NneoUvEv5VUtdXfnvYxcpcuV0cPcxYUY3LPXGj8j8oVSSC4qF57hUIaQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N0JqK4sx; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-29521af0e2cso3645425ad.2
+        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 18:11:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1761873119; x=1762477919; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=cXl4F61qk0RRWyXuv/DKPX4iPDEPSy53HnD/apHYfeY=;
+        b=N0JqK4sxa9iapIohManbfmYm1PVQZgR9zPrujT0ykBl2pP5nr4pmn5HZ4nhZDzwmmY
+         M2ujMCWz2EIiHdRIKakm9+OaztD2InRTlokh1MM8o5umhUg+3bxaDTGDfU3OElN7F7Ri
+         scCdB6J1VLob/cHlUnsEI7q5RCYmQpk1djfIqPN2gGcThhunIJrpQamUDaKTnoHTI5zI
+         +yiEvTbIYggukiQvIBjJKZ1exa/Za3A0w02TdV+VRasDFyh8ZqlazvNkt6soGRnav6w1
+         i8dD6vNpxXZG04CGJ36UhB0dSN0SdyGwdeSSO3fIRGa6mVPprNFAOoda2G8O9EeZzoc7
+         XeZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1761873119; x=1762477919;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cXl4F61qk0RRWyXuv/DKPX4iPDEPSy53HnD/apHYfeY=;
+        b=F3cZ+EMxaylvBVsNmTP10rAPiOGbOToRrpfrcYFNwIuaQuDVgSo7xbYiTGHh4vEMEa
+         PjtVYQoV6ucfnpbKIPjhbzh5lhairyUDmx8CP4ebgfuw1SVDPx4UkPA5jHrGAf5ufvfs
+         544xoFiBezxugCNz6dMP7IdTwx8bfkL/9rve2rXk60MnDqII76ZMTEsciMO8HsxLkqRh
+         QkOMG5Bvabpk1YnQYsc/9Bv/W+wn331/ViYjjt6a38SoV77KhLI1m3dX+aOy4qPMvvjA
+         FLV+lGKxelNWGYoCROIh1KGUc1S49+hGyHGZB/BTJC9s90sQMkaenGQ6pGfyNGz4c/8v
+         4EKw==
+X-Forwarded-Encrypted: i=1; AJvYcCUVwg0gyQlUdHfgqJ5xBfhANKLa1H4KPMG4S5BrrycNvvbpwuQ2N5eZlbTlYxXXFJlgTAUL0K4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxglgPnc3tF9bHi3WBojx3VHSaszmpwQeQUVHiFemV8NByrHkLp
+	D8VLiEVQwuUHWEvusvAx7xPeQ+5BIbnduTLTD64UP5QJ3DTsxXMgoHRO
+X-Gm-Gg: ASbGncsx1O3/VFhvIto+KCZqG63UbVtzAE62o/oIPko19t4kBpM8xRzxZMm2QzsKHAq
+	GRV8u5yuByY1e3nVM4p3DdHRdi7TtzBOfW8z1jA+pxDw1n2j+4U4QGZPZaEoes2d4TDNP06UmeW
+	VTVl3gGTQ6uSxObFN33cj4kuhQ3JTl9LnRKXsgC+npxzzkUZR8gtIbLTKpTmZY5bnUU961Pphq1
+	ZsxHWZ2V6U9ivXS8Iv4AgbZd8F4Fj4bqc1sf3/rmkiHsKh6p5V5G1qCcfpA6l2auPmPOUN2WxTS
+	OW+nzmTzcy339TderLWMEOtVBNWL8qW7Uli1egVHnTN0gK5FNmOSG9t+o15OQG0wo6nAw4FHS1k
+	5+tvEIbo5H0voI/KahQ9zYyCUTAGfGK7NKrK8/hraOtEt1YRCQqYSb8/fmi5h0VfGHYXnVWGoj1
+	rDtPTAlsKAkgw=
+X-Google-Smtp-Source: AGHT+IEHapc7w9Gx8yrz+L2DluxT/V1jbCrHhNPlwsrThoMBSWJpdgs28NJQRRnMQSzE2MZMqvg8vA==
+X-Received: by 2002:a17:903:3848:b0:294:df00:1886 with SMTP id d9443c01a7336-2951a45a13dmr24237915ad.39.1761873118722;
+        Thu, 30 Oct 2025 18:11:58 -0700 (PDT)
+Received: from archie.me ([210.87.74.117])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2952699baabsm2864505ad.76.2025.10.30.18.11.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Oct 2025 18:11:57 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id 49BEB4209E4A; Fri, 31 Oct 2025 08:11:44 +0700 (WIB)
+Date: Fri, 31 Oct 2025 08:11:44 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux Networking <netdev@vger.kernel.org>,
+	Linux BPF <bpf@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@fomichev.me>
+Subject: Re: [PATCH net-next] net: Reorganize networking documentation toctree
+Message-ID: <aQQM0Likqs1RFNQ1@archie.me>
+References: <20251028113923.41932-2-bagasdotme@gmail.com>
+ <20251030175018.01eda2a5@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [GIT PULL] wireless-next-2025-10-30
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176187241326.4094238.16220995772661247164.git-patchwork-notify@kernel.org>
-Date: Fri, 31 Oct 2025 01:00:13 +0000
-References: <20251030105355.13216-3-johannes@sipsolutions.net>
-In-Reply-To: <20251030105355.13216-3-johannes@sipsolutions.net>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
-
-Hello:
-
-This pull request was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 30 Oct 2025 11:53:26 +0100 you wrote:
-> Hi,
-> 
-> And for -next, nothing really interesting right now,
-> I expect I'll get a lot more content from the drivers
-> still in the future.
-> 
-> Please pull and let us know if there's any problem.
-> 
-> [...]
-
-Here is the summary with links:
-  - [GIT,PULL] wireless-next-2025-10-30
-    https://git.kernel.org/netdev/net-next/c/1659b441b6db
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="V/o7SHKPHcLe3ZGP"
+Content-Disposition: inline
+In-Reply-To: <20251030175018.01eda2a5@kernel.org>
 
 
+--V/o7SHKPHcLe3ZGP
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, Oct 30, 2025 at 05:50:18PM -0700, Jakub Kicinski wrote:
+> On Tue, 28 Oct 2025 18:39:24 +0700 Bagas Sanjaya wrote:
+> > Current netdev docs has one large, unorganized toctree that makes
+> > finding relevant docs harder like a needle in a haystack. Split the
+> > toctree into four categories: networking core; protocols; devices; and
+> > assorted miscellaneous.
+> >=20
+> > While at it, also sort the toctree entries and reduce toctree depth.
+>=20
+> Looking at the outcome -- I'm not sure we're achieving sufficient
+> categorization here. It's a hard problem to group these things.
+> What ends up under Networking devices and Miscellaneous seems
+> pretty random. Bunch of the entries under there should be in protocols
+> or core. And at the end of the day if we don't have a very intuitive
+> categorization the reader has to search anyway. So no point..
+
+Do you have any categorization suggestions then?
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--V/o7SHKPHcLe3ZGP
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaQQMywAKCRD2uYlJVVFO
+o1U1AQDRwRJPDWDhOoEN0cxpUZAwGPbIiXFoXycOD6tM+zcaFgEA0zj7VgXNOtyM
+KSulyuqTMQWLPt+319v8+73/8wrNxw4=
+=Slfl
+-----END PGP SIGNATURE-----
+
+--V/o7SHKPHcLe3ZGP--
 
