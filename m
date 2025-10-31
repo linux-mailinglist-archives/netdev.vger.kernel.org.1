@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-234700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7490DC261CC
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 17:29:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CCB1C26366
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 17:50:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 23B704F7C2A
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 16:21:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76BF73B8F72
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 16:27:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A336A220698;
-	Fri, 31 Oct 2025 16:21:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1087283C89;
+	Fri, 31 Oct 2025 16:27:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="okGIWs0d"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ZMxzuSO2"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 154E41C5D44;
-	Fri, 31 Oct 2025 16:21:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D9E6280CFC;
+	Fri, 31 Oct 2025 16:27:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761927711; cv=none; b=S6e3vQSBahi+aKg4i5M7y8AYZiibEE9WFSLLHd5HhmfNK0oxRxp5kKjfhveyQJLtHTryxoOgHig4fF2E08QQ/jO3oHeGIIfzbtXarPebOFwdk62riYtWhvYMujNNAYGLmxzcb13c1NHtohShn36Yx6vNzz/C9BqTL0R3EOY6Wjo=
+	t=1761928073; cv=none; b=MDXu+WwW32voQKzr224kND+Nu6oYdEVvvx2FVbtoLBTBGAWF4vEjWX0yMBHqVv2S2RRWTPjW/hePbu3OSz43P20T8ufjZjTgKqSW6si0BHSmGT/m8VTpPBYUl0zwZFHH0xtKZg/6j87apI8NR0d1merPq8QcTaF9Un8VlEllGLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761927711; c=relaxed/simple;
-	bh=A1OJuNy89ReYWRyHUw9vxGZ2tkUrpbPHpld8uz9ZjbU=;
+	s=arc-20240116; t=1761928073; c=relaxed/simple;
+	bh=yK/wrhpQd79WHSEk+o7jrmxNAwAD6NeTN53aKKvV7+U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y4oggxrgovetSdBMxRJBfAYxCSKz7FhLm19ebIhWgW3qlKb1eXo6+dk5l91+21oEH4z3gCaK4Yr8Y1EPuKIedj7krG9ZDAQ9tEWGJym4ycPcClZQUFh8NiKBmtHOGvyzvCnx2dX58s+bNzPLpDnrynVEtbCxG4YAjTT3T7yLWS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=okGIWs0d; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=KyHggghYN04Z2/oV4I3oYfVXGmjvldTD8GaMBxPPsaGnE4QAIyQwsuDHR+VbzMm3uhKZL/FjzgB3z9YXzLki9c5o+xvTx0zmNqzLGdFpnVuiEhtVc2FO6zDjMYY1PNQZqX187SNpa7GXvEXEwFwhc7CtDQ2qTHrU3g1wmlHHiTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ZMxzuSO2; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,40 +36,28 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Fq379oOiqAtrnZ+bkfMKSoTJYOqJ/R3/WeAnEYH+Yms=; b=okGIWs0d0rRBVlo4THIcI4Yndw
-	CiHGWSGVQamirayhs3edW5StzRgTkwolWHI8YN1SRf0J0EmlNpv7HywE02ZQZsZDSy4h9FCEsIb67
-	ytMp1vXS2uywm9SUp1JvUd+Yy0nOwcq2/Zni6w5eE9tcv1olf1PIEdMweCCZJhIU37fc=;
+	bh=rZ5u2OHM4W5d6szB9Bv+CCsJsD0TGOZIN3GnPAec3+w=; b=ZMxzuSO2ccdhIWm5zO17X7N0hj
+	fZG2XJboLYQpg6I+YlP6jenLMIfuyR8mRymm+D9sMhI9qdXT+fcbaCETx8Gn9C/DwDBQmMEEEIwSt
+	HQ1M8dijbElQpMZYfMWHEFQnkvMeijVCekyGVbwxPf6QYmsBQbEMBGhhkuLM5nHSHpMo=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vErsW-00Cc9X-R6; Fri, 31 Oct 2025 17:21:28 +0100
-Date: Fri, 31 Oct 2025 17:21:28 +0100
+	id 1vEryN-00CcCA-65; Fri, 31 Oct 2025 17:27:31 +0100
+Date: Fri, 31 Oct 2025 17:27:31 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Inochi Amaoto <inochiama@gmail.com>
-Cc: Han Gao <rabenda.cn@gmail.com>, Icenowy Zheng <uwu@icenowy.me>,
-	Vivian Wang <wangruikang@iscas.ac.cn>, Yao Zi <ziyao@disroot.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+To: Vivian Wang <wangruikang@iscas.ac.cn>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Chen Wang <unicorn_wang@outlook.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	sophgo@lists.linux.dev, linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, Yixun Lan <dlan@gentoo.org>,
-	Longbin Li <looong.bin@gmail.com>
-Subject: Re: [PATCH v5 3/3] net: stmmac: dwmac-sophgo: Add phy interface
- filter
-Message-ID: <651ae46b-8ca2-476a-8545-4c26c4e10f99@lunn.ch>
-References: <20251031012428.488184-1-inochiama@gmail.com>
- <20251031012428.488184-4-inochiama@gmail.com>
+	Yixun Lan <dlan@gentoo.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Troy Mitchell <troy.mitchell@linux.spacemit.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>, netdev@vger.kernel.org,
+	linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: spacemit: Remove broken flow control support
+Message-ID: <dce4340d-a272-4b86-a7fa-71e6286f798b@lunn.ch>
+References: <20251031-k1-ethernet-remove-fc-v1-1-1ae3f1d6508c@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,17 +66,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251031012428.488184-4-inochiama@gmail.com>
+In-Reply-To: <20251031-k1-ethernet-remove-fc-v1-1-1ae3f1d6508c@iscas.ac.cn>
 
-On Fri, Oct 31, 2025 at 09:24:28AM +0800, Inochi Amaoto wrote:
-> As the SG2042 has an internal rx delay, the delay should be removed
-> when initializing the mac, otherwise the phy will be misconfigurated.
+On Fri, Oct 31, 2025 at 04:21:53PM +0800, Vivian Wang wrote:
+> Currently, emac_set_pauseparam() will oops if userspace calls it while
+> the interface is not up. The reason is that if the interface is not up,
+> phydev may be NULL, but is still accessed in emac_set_fc() and
+> emac_set_fc_autoneg().
 > 
-> Fixes: 543009e2d4cd ("net: stmmac: dwmac-sophgo: Add support for Sophgo SG2042 SoC")
-> Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
-> Tested-by: Han Gao <rabenda.cn@gmail.com>
+> Since the existing flow control implementation is somewhat broken in
+> general (for example, it doesn't handle autonegotiation properly),
+> remove it for now to fix the more urgent oops problem. A better
+> implementation will be sent in future patches.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Fixes for net/stable should be minimal. Please fix the opps, by
+returning -ENETDOWN and leave the broken implementation in place. You
+can then fix it up in net-next, were we allow more invasive changes.
 
     Andrew
+
+---
+pw-bot: cr
 
