@@ -1,140 +1,94 @@
-Return-Path: <netdev+bounces-234777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFC79C272D7
-	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 00:26:20 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13756C272E6
+	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 00:30:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 675FD42395C
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 23:26:19 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 98D8A3509F5
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 23:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2244432ABFE;
-	Fri, 31 Oct 2025 23:26:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8CD92BE636;
+	Fri, 31 Oct 2025 23:30:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tn/HqSez"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EUgTMFaU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC9652FE589;
-	Fri, 31 Oct 2025 23:26:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A464218787A
+	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 23:30:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761953175; cv=none; b=nAUu7eDBPejhg6i1fXWw4/DR7cwfepOwE9Z5Ie7bYWJmZJt2/pNPg7ULXDQYUUF9WgfPH2e8gs9pF5KeYrHAMwysaPyDGluHHfwLNoDk8dk0TiCY59FHqI4ZZYZWren8vCJRsEbMwgnwrCzmk9kvZzJtbmBvs1wK0GvJUyvVWfQ=
+	t=1761953433; cv=none; b=HmM0i/UMrX5h1qKQDfZD6XfRm0Z+1AZ5FG3rirQAw33AHv7QaFvxp4lHDdXzHL5h/XwIzQy35MGg00Bw7SLGmRk53/DYfREUem6IekYgwxiNODYAFc1Iz5ZR7H68uee9rh54RtYU51V3Jln5bIOXKG5DK+RNBOZza5C7rthWn5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761953175; c=relaxed/simple;
-	bh=ZqYwds0sADNzMvSeVgW+LyUJYBSkAX/vctdG2rH2Xyg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DjffOgl4LyDwJe+wZcrUrJEqJNAyOKkhm8zQxmnsNa9NH9FT7kJRBVB5KKv9QiQv7BehYM7m3zMD0K7waWL2ZzC1vjH4enfHS22sDj19k5u/5/MNJcis3EkzkBS/37JbGi7JXisgga5QLi3CgKD6521bq1n7fBzlZ8rTmb0+Ul0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tn/HqSez; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 540E4C4CEE7;
-	Fri, 31 Oct 2025 23:26:12 +0000 (UTC)
+	s=arc-20240116; t=1761953433; c=relaxed/simple;
+	bh=Wd3lwyCWNgLr5SKG/ZyhU44xTPQlON4M3PZn3ywB5HQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=n0Ez5vNlaKF6bwHFFXMu8NSZTmPkZ/l+8WJgJSL9WS7o1AR8FDWykH6n0wx6JrY/qB9OkgfZerplMnEX3HyEFMFwmHswfuitTcihPwVdH/QWPF8nXSHXk0DsMH0JvzIz8BW0GAUI0MOf7IPWjtPvTbQztyB3B8AKBwDFZT3VX4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EUgTMFaU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B2CDC4CEE7;
+	Fri, 31 Oct 2025 23:30:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761953173;
-	bh=ZqYwds0sADNzMvSeVgW+LyUJYBSkAX/vctdG2rH2Xyg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Tn/HqSezV0K0CMxaqCJwynVF+/f3ZFf4ysKGofSN+ILlPcSdB4+8pSQXWIB8Pg3R+
-	 7dtcmHtKOCONHLp61Cb6NYnpkOd0F+lora2zDFyONiGN2PAX3XgPPOQ2TRhk/fZj1y
-	 zVq3N2lDYQK9UKRYAlMHNdZq+x73jTLYsfCkFyrk5oqC7e00ZKfLvztexrlD1IyXwI
-	 HRDSaUIrcMmfWY7ZYk4vCpww0LsShsUPDaZMZrRRiFKGg2R0oNX58x9f24mpLgG/le
-	 dibLsikaZekaiwuti0vWHT2qp1Vwt/FCgnaZQB75I+G0Vvxq4JjcGcx3o97uTMfOw0
-	 V67NjHeDm0j7g==
-Date: Fri, 31 Oct 2025 16:26:11 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Aditya Garg <gargaditya@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, longli@microsoft.com,
- kotaranov@microsoft.com, horms@kernel.org,
- shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
- ernis@linux.microsoft.com, dipayanroy@linux.microsoft.com,
- shirazsaleem@microsoft.com, linux-hyperv@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, gargaditya@microsoft.com
-Subject: Re: [PATCH net-next v2] net: mana: Handle SKB if TX SGEs exceed
- hardware limit
-Message-ID: <20251031162611.2a981fdf@kernel.org>
-In-Reply-To: <20251029131235.GA3903@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20251029131235.GA3903@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	s=k20201202; t=1761953433;
+	bh=Wd3lwyCWNgLr5SKG/ZyhU44xTPQlON4M3PZn3ywB5HQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=EUgTMFaUUT2XsJHCMpl7YxUF9dbCs+PA6++Y1yhetbepqlbNdBYBHYqiPfb/OHDZt
+	 Qyna5jInJkmr0PXlJsWCQREljDqoq0OLcrRNgdSGSao36aNy1qiCPXDNK8CKdCHYBn
+	 pLAGX1TOt+38qgrzevLvntTTGjoLunyP2I5Dn+dy4Ep2oeN4V2qNL1jK4P9tPwatMp
+	 TWJUp1pCs/yG6Jd1DqXjhKFftwtwr7q3Z77ygVf4OxE/3K8vMUJRlYWMLi2ekRR81N
+	 lO10diNyVPXSrP1phvvKRkyRfRKlYKubOWiWGoZgGtRluIpZOUirUTFkgDfaTSkgVv
+	 p4gTFjdUR9PmQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD4D3809A00;
+	Fri, 31 Oct 2025 23:30:10 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/2] gve: Fix NULL dereferencing with PTP clock
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176195340950.666625.9872917114678524497.git-patchwork-notify@kernel.org>
+Date: Fri, 31 Oct 2025 23:30:09 +0000
+References: <20251029184555.3852952-1-joshwash@google.com>
+In-Reply-To: <20251029184555.3852952-1-joshwash@google.com>
+To: Joshua Washington <joshwash@google.com>
+Cc: netdev@vger.kernel.org, thostet@google.com, richardcochran@gmail.com
 
-On Wed, 29 Oct 2025 06:12:35 -0700 Aditya Garg wrote:
-> @@ -289,6 +290,21 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
->  	cq = &apc->tx_qp[txq_idx].tx_cq;
->  	tx_stats = &txq->stats;
->  
-> +	if (MAX_SKB_FRAGS + 2 > MAX_TX_WQE_SGL_ENTRIES &&
-> +	    skb_shinfo(skb)->nr_frags + 2 > MAX_TX_WQE_SGL_ENTRIES) {
-> +		/* GSO skb with Hardware SGE limit exceeded is not expected here
-> +		 * as they are handled in mana_features_check() callback
-> +		 */
-> +		if (skb_is_gso(skb))
-> +			netdev_warn_once(ndev, "GSO enabled skb exceeds max SGE limit\n");
+Hello:
 
-This could be the same question Simon asked but why do you think you
-need this line? Sure you need to linearize non-GSO but why do you care
-to warn specifically about GSO?! Looks like defensive programming or
-testing leftover..
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> +		if (skb_linearize(skb)) {
-> +			netdev_warn_once(ndev, "Failed to linearize skb with nr_frags=%d and is_gso=%d\n",
-> +					 skb_shinfo(skb)->nr_frags,
-> +					 skb_is_gso(skb));
+On Wed, 29 Oct 2025 11:45:38 -0700 you wrote:
+> From: Tim Hostetler <thostet@google.com>
+> 
+> This patch series fixes NULL dereferences that are possible with gve's
+> PTP clock due to not stubbing certain ptp_clock_info callbacks.
+> 
+> Tim Hostetler (2):
+>   gve: Implement gettimex64 with -EOPNOTSUPP
+>   gve: Implement settime64 with -EOPNOTSUPP
+> 
+> [...]
 
-.. in practice including is_gso() here as you do is probably enough for
-debug
+Here is the summary with links:
+  - [net,1/2] gve: Implement gettimex64 with -EOPNOTSUPP
+    https://git.kernel.org/netdev/net/c/6ab753b5d8e5
+  - [net,2/2] gve: Implement settime64 with -EOPNOTSUPP
+    https://git.kernel.org/netdev/net/c/329d050bbe63
 
-> +			goto tx_drop_count;
-> +		}
-> +	}
-> +
->  	pkg.tx_oob.s_oob.vcq_num = cq->gdma_id;
->  	pkg.tx_oob.s_oob.vsq_frame = txq->vsq_frame;
->  
-> @@ -402,8 +418,6 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
->  		}
->  	}
->  
-> -	WARN_ON_ONCE(pkg.wqe_req.num_sge > MAX_TX_WQE_SGL_ENTRIES);
-> -
->  	if (pkg.wqe_req.num_sge <= ARRAY_SIZE(pkg.sgl_array)) {
->  		pkg.wqe_req.sgl = pkg.sgl_array;
->  	} else {
-> @@ -438,9 +452,13 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
->  
->  	if (err) {
->  		(void)skb_dequeue_tail(&txq->pending_skbs);
-> +		mana_unmap_skb(skb, apc);
->  		netdev_warn(ndev, "Failed to post TX OOB: %d\n", err);
-
-You have a print right here and in the callee. This condition must
-(almost) never happen in practice. It's likely fine to just drop
-the packet.
-
-Either way -- this should be a separate patch.
-
-> -		err = NETDEV_TX_BUSY;
-> -		goto tx_busy;
-> +		if (err == -ENOSPC) {
-> +			err = NETDEV_TX_BUSY;
-> +			goto tx_busy;
-> +		}
-> +		goto free_sgl_ptr;
->  	}
->  
->  	err = NETDEV_TX_OK;
-> @@ -478,6 +496,25 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
->  	return NETDEV_TX_OK;
->  }
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
