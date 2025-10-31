@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-234624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC996C24C0A
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 12:18:54 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6435C24BF8
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 12:17:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CEB044E57D3
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 11:17:30 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 29F6C350CC5
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 11:17:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7CD93321AE;
-	Fri, 31 Oct 2025 11:17:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94455345CA3;
+	Fri, 31 Oct 2025 11:17:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="OJo/DgSf"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="NXiZlOvM"
 X-Original-To: netdev@vger.kernel.org
-Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010006.outbound.protection.outlook.com [52.101.85.6])
+Received: from CH4PR04CU002.outbound.protection.outlook.com (mail-northcentralusazon11013017.outbound.protection.outlook.com [40.107.201.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA65306B1A
-	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 11:17:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 188CE3451CD
+	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 11:17:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.201.17
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761909447; cv=fail; b=Id5PpiZgQgtzSSgHnekq2rfMe4wkEe47EYPPnuD+pKaSjMAvL/L5Rjr6uPiBuHQGPhEU01OroZocZFc1ROE65KejwvjsvtKbK85j/sZxsNkqcKkKRXyPdkKe5Fftecoj9ugFGB0A5yL1NAgMZFDmZBdgPFZln35AJ0wFDt/q4xU=
+	t=1761909460; cv=fail; b=EAS4q1oEPd3L9EKVTlMpj7xfeopIjZSqjtJXwVU1Ym7c1fQRkK7aGigTm6IeOH69MoNPr2naAvsay2uEknSyXYtbU/s9+OKwcR4oweuBrNSLOzkVKM6TLxFGAQwNfjw6vBMVCIwHDyeo/n+jchtAowFzPgxQc7IqO9O2exmQlDs=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761909447; c=relaxed/simple;
-	bh=4RgsySyHI5nNM0ogJLBrWOhfeK7BnEEvEG3rXKJORus=;
+	s=arc-20240116; t=1761909460; c=relaxed/simple;
+	bh=V22JsLLhMoZMpblHzDLktyDkMVSJCiYns/rNTGtInEA=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=B6Zd1EyWSUgpgKDYy4bO7HTziAtVeZpzEaS/pFiEpyGy40Fw8KETTxK00+TXILkEH1fBadHVOr6/kjws7x1gtkcMwR4k48t8BcSi6fK7nrnAru8a8r8l412LDUYMrWVTgJxTXqMF5kF57B8G102JiMQUKI7cmUBjRCIr/ucEqVs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=OJo/DgSf; arc=fail smtp.client-ip=52.101.85.6
+	 MIME-Version:Content-Type; b=TFgV+Kzr2XXz9RG/V/sPUF6bYn01t11F/AtXiNN+Ursw7GtZryordSwELdWGKL4cm59WjZq2I+Kky/KDhnsiKxe1spikofNrDp+8O/XCdnuT2EPalHT8gnAa3wSITw5nJTvTsjUc/sxlDciKmIyI7jqiwgrUnnnDdFCKsIgveF4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=NXiZlOvM; arc=fail smtp.client-ip=40.107.201.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=r9JU2jx0leEjwLqGpVd3Cpq9/Y9WLHnJ6j8YADO3hHQLSGWaEhio1sr9GYQJ10SKGvKYi+kQ/88psIiGlVLRAqO8ESUz0urdn56PfeHh2W0yZd9Z9+bM1GwXI0IMql9LidOKpZZBB8v398LLyqrQXCee2kcaaqh3MEEBfQwr9LyQhZ2yuOCnc9F1ZAPhgxjyWPBOi+1XmkKJkdkIe2mtU7OFR2nvcTbVg5d+q7hxT6hLVt55s7FcYYOWcFbdTbzA8b66YW4/3yWL6+70X3n3wI8/K7qZyqnchpoGLQexoT/2eLNBwqRnkjZuahM0qMlRaJ7f8OKPEkQTL96p9oCb/Q==
+ b=tcMYbpslV0bZ93K5f8tBAIB/1Q+vImJkjyFNw24cp+RdTfkdi7Kon59EjJKcYIee5LKQX65S2m11XK37JfWzVAHDcWtWD5jstXYAFtINV2hD6wBK/nkNLCJcyO/c6jQpVkYxrg80DQ1ScLZVwTkSMr7HaECWOU55UWD7hGBiR8aFX84UTA3SYJeekfbPH5ciN06MXj4MIXGqRU/klBAcwlIeoXNy2O53p8Caf6O8DuP3uMjI1eXvC/S0ujLPMctorT0VzxlBFv/fxrVwdQO53/5O5+Qmc/a1TWb3O7bJ0NUuPCaa728+Wezx07jovL4tnMg+xnZS2plgFHFkXCoYVQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JjE56UQev528o81jMqowTeaKFOR6xJVWrla+SusLWfA=;
- b=zMyh79RviOxt7AIpi2d8TBaeU0FOeo3lPMUtDT/nCu7nNqw2io/fFhJ3rYTqy8xQ9Zx2Mu1y4hJ6agzi4zLTdmxO3lyuYcJ7TT4xp1TloytwhPShe2moRacvQTfaRXEXxUfuzoDAslEGYsf4CHva1I9CE+7ebR0JrBuuc2Fn01xOYoAj/xsZcZ4LDhrahi7fKKCsufqDKAPQdDktGZaSyGENWbh1lBkjoPnEwn2uIt5MNkU5BF3SmEyp3RW2bgOpxo5GeefmGDC/YFO1NfHq5a4tM1XX1NSkBQSKN7T+REun487oOgmjyjBPa//Poml0ZyGJ8X5A0+yQ/gqAFYX7ow==
+ bh=pfiTk1xWCwE6ADPXurePF3ZGUh3FOZR0S7JOFPGr1yU=;
+ b=YaCptKkK7Cc8Tzt0WhW7SZDBVYRYd9mqRwVxazHVvBdy/JRPjYY4oLVa1Y7BbD+X+1KWTLx3t3mFF4CWX33I910ijJo/4Kb29ga6Q1YjW5A1W6Lwl3Fb8espxGNk7zvrYlwq3d3za7Ey8mwG+6kHyyOxzRRip7hpkzIDftE/K9csIYo3ZkDdHsgsKIMhu31lHOS/r5+FudJzQwQN1lpVsKAj7vB29r+sGbdtFiEIYJk/Jkdf1WbWeUc30+ncnaeCM0mLtE717e2mdYSkuI+edXN4VIJg0Rr/AejrFHWljD6pwm2NOcUG1CdMRkAXWQ29wpyLleZfOS7nmHDMdqsU3Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JjE56UQev528o81jMqowTeaKFOR6xJVWrla+SusLWfA=;
- b=OJo/DgSf+sDt0VXtQSQAD2uB+H8SQh7kMCzpgMK8d2h0QOMdPDvJhXvenSKHW4FaxBCqt5SCLjQTZeaZNi/j+dbNDx+CUFV7nRKjCT7P2H6If1G7L5bHkPtvcPtZo83JEjwc4AZZRnnDqO8SwfdRCX75oWS6maOx9UAMN/GIeQo=
-Received: from BN9PR03CA0087.namprd03.prod.outlook.com (2603:10b6:408:fc::32)
- by MW4PR12MB7481.namprd12.prod.outlook.com (2603:10b6:303:212::12) with
+ bh=pfiTk1xWCwE6ADPXurePF3ZGUh3FOZR0S7JOFPGr1yU=;
+ b=NXiZlOvMravDmW4GSmF132OfZd2d4EiY0JJNWXaAL/bQ6GToifk3Iy82BbJdgjPyaLN9ma3S4lDa6JUJwGgT1obGcbMKijMERasw4yY6uC+2j921K6By0od0tjektD6e1nd0ZEXD8HYZr6Bf2zsN2Ein3Q7tB1X5CFgmVgpNegc=
+Received: from BN9PR03CA0080.namprd03.prod.outlook.com (2603:10b6:408:fc::25)
+ by CH1PPF711010B62.namprd12.prod.outlook.com (2603:10b6:61f:fc00::614) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.15; Fri, 31 Oct
- 2025 11:17:23 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.13; Fri, 31 Oct
+ 2025 11:17:33 +0000
 Received: from BN2PEPF0000449E.namprd02.prod.outlook.com
- (2603:10b6:408:fc:cafe::22) by BN9PR03CA0087.outlook.office365.com
- (2603:10b6:408:fc::32) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9253.18 via Frontend Transport; Fri,
- 31 Oct 2025 11:17:23 +0000
+ (2603:10b6:408:fc:cafe::9c) by BN9PR03CA0080.outlook.office365.com
+ (2603:10b6:408:fc::25) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9275.14 via Frontend Transport; Fri,
+ 31 Oct 2025 11:17:33 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -65,20 +65,20 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from satlexmb07.amd.com (165.204.84.17) by
  BN2PEPF0000449E.mail.protection.outlook.com (10.167.243.149) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9275.10 via Frontend Transport; Fri, 31 Oct 2025 11:17:23 +0000
+ 15.20.9275.10 via Frontend Transport; Fri, 31 Oct 2025 11:17:33 +0000
 Received: from airavat.amd.com (10.180.168.240) by satlexmb07.amd.com
  (10.181.42.216) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Fri, 31 Oct
- 2025 04:17:20 -0700
+ 2025 04:17:30 -0700
 From: Raju Rangoju <Raju.Rangoju@amd.com>
 To: <netdev@vger.kernel.org>
 CC: <pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
 	<davem@davemloft.net>, <andrew+netdev@lunn.ch>,
 	<maxime.chevallier@bootlin.com>, <Shyam-sundar.S-k@amd.com>, Raju Rangoju
 	<Raju.Rangoju@amd.com>
-Subject: [PATCH net-next v6 4/5] amd-xgbe: add ethtool split header selftest
-Date: Fri, 31 Oct 2025 16:45:57 +0530
-Message-ID: <20251031111555.774425-4-Raju.Rangoju@amd.com>
+Subject: [PATCH net-next v6 5/5] amd-xgbe: add ethtool jumbo frame selftest
+Date: Fri, 31 Oct 2025 16:45:59 +0530
+Message-ID: <20251031111555.774425-5-Raju.Rangoju@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251031111555.774425-1-Raju.Rangoju@amd.com>
 References: <20251031111555.774425-1-Raju.Rangoju@amd.com>
@@ -94,162 +94,118 @@ X-ClientProxiedBy: satlexmb07.amd.com (10.181.42.216) To satlexmb07.amd.com
  (10.181.42.216)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN2PEPF0000449E:EE_|MW4PR12MB7481:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6b386eac-3504-4013-6b25-08de186f1087
+X-MS-TrafficTypeDiagnostic: BN2PEPF0000449E:EE_|CH1PPF711010B62:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0f6fa911-99f9-4590-7187-08de186f16a4
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|1800799024|36860700013;
+	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?ZG/f2TQXppNsNN1Zn8ckEwXKY5zNq7QTGKvb6cQxus48mQfFsEfeufmzcqnr?=
- =?us-ascii?Q?kGghdi5BcZLS15Ll37KzpK5r0HehB0T6/ym16daS/sprpbz56rFDkAlJWoWu?=
- =?us-ascii?Q?EXAacdhojZEPTsqcNDxn4ZyfpQrlpCWlWDLU1u+h+ijHjikF8oj/PgUBNOiH?=
- =?us-ascii?Q?wX9ZhoqVdegLwiEC96afbP4S1NXeVcalTFFlNA+l8FOtAewm6vLd39wPKDVe?=
- =?us-ascii?Q?N48KgMgdEb1Lm5KE9gpOnak2j2YU0viZig9GpB4gBPsOXgl5Rg/mxt2zTGcP?=
- =?us-ascii?Q?ZvJ291EqF+bNWuOMr3jk827LgfhuNwUinhdSq4s0rdoc/zieCfwCUHSDeB0O?=
- =?us-ascii?Q?oBhHmHeWA8il9A8crEemi+R/ewS1bNGw2QFhYIQOjOeNMokj//GU5DdWKCXs?=
- =?us-ascii?Q?vgK4D5HCOeGoWnbbZginpHKjpyBCaQMSI4xLJ23+zL/fTnJJZJ9EwRxiywjo?=
- =?us-ascii?Q?qg4X+/+sVuvp/Uu8ljxDowVHSRCLw9ycj+UCm7G1aig49vKcyo0JNWInv6Mx?=
- =?us-ascii?Q?EAF6elO40GWj2kaqpciwK2ZVfPkg4Ser7noui4bAixOjzXfWawVAAoj2mv6q?=
- =?us-ascii?Q?j/FECtmOYc5JE286R7jeCjftUYHHy1dixuPwb4pWuUICTj33ndHWbXcXaGjk?=
- =?us-ascii?Q?0eDLSJ0tHkMPu4zpaR8lC1NuVqBXqZQ9ChjTZWkbTlexwY5xgztcjD8Gmpzr?=
- =?us-ascii?Q?kd7gwwEFDURPVzff7fIaPwS+YJ5RtU4lwKkgBjQolHuEZOjF/8PImzSA/AGj?=
- =?us-ascii?Q?qHuRKFqoiQZNy3DiM10UwC5xcSevuuZy4W3LxoixCN/Am3WgpZtTW2mAF9T5?=
- =?us-ascii?Q?DMEazaqnEGSMWznBa4b0x9ABiin9req0gf03jFx98JgbX3IhZh/Q2Pz3Xngv?=
- =?us-ascii?Q?FnoYeHjYema6+KwjV6MCjBdOhlTS8HDwjC1MlsEPg0SrQu/8fLa9afcDHQEw?=
- =?us-ascii?Q?Ah5Iedn7cxG46x6Lxb/zaTJWpEdQ4wqKnSxa++WPJhKmuBiLvVUMFzsFPUR8?=
- =?us-ascii?Q?yZ9egG9LAYw1Gpa2CTd42tE+VYWq3lOVjNLw3COOVKsmLUx9txy+HUjRNl/n?=
- =?us-ascii?Q?CQtLLon2yhAT6F7YvilkYrjUayIZTckfCGyeQ73pKwqlJQmQaQUnr1d7xfrQ?=
- =?us-ascii?Q?A6XbYlHaLYwXIRkkhXbZ/oVGVoDxeTc6djdsoyz4h9rYNNYSUqdf0StIlCml?=
- =?us-ascii?Q?YbXRys37WEufxPiJR4z77A001rysRaA2uhjCDeyn9s1NZrU8WUz+kKWGuls1?=
- =?us-ascii?Q?/qYK1bjiSCJXVHyUNlN5bLszr6vGEVrs2TxTNOXAfnktFyPDI5oSd+4H1LPx?=
- =?us-ascii?Q?1q+Zy5IqM2JpUrMGL5/4na7R5VUNvLyS30W1bIVog/Qgd8gNtzMbo8wIbydS?=
- =?us-ascii?Q?m/WyvPiO7t4MY9z1T4UtPdsYUCUrfCGbAV+1G/rExQPUROlN4hxrpkt8QNhc?=
- =?us-ascii?Q?PvnHDACFXqRyHibd0jBlFTUVWW1HvtIVT/YOdMIe3pTy42twTLXL85GVX+7b?=
- =?us-ascii?Q?/jG5ylJ310SgWmZZ41HzVfcqsGvHodsUDtgIVXdLIHhBDJ1XTYFHC8dEdTxn?=
- =?us-ascii?Q?YnAk/Q+9EwbtQwn+xLI=3D?=
+	=?us-ascii?Q?UeUoJAvJt3zc/S8nHEesixS9Nhv0tNcKlPmYud+1b+llMzofcoDITwV8qxjr?=
+ =?us-ascii?Q?yvSDUJcEV90SuwaV2J24fBx0Kd3CAwhCIx6oKDjPHeRFwmFcrKHiqYJWihS+?=
+ =?us-ascii?Q?Be23sWGPgk9xGLSig7Djdrda/qKkI/BZshi0CKcSALFRL1NOFXRo74k5TMOM?=
+ =?us-ascii?Q?hYv0AMpAEX0oGlQiQlQjLet5CDlx11yarB8vh7IPNumv+RnfYzGGXr+u8xrq?=
+ =?us-ascii?Q?MPeLHfzSy6p4B3V3CPqfKDlGDT33/STlsT5TN2ZITC4m5OdXG4T3u3t+A+hT?=
+ =?us-ascii?Q?7/qxyFEDAvaSmJ1r9vkYJmjs+YFiu+utr1RMC/6We9RGhIkno/Sy+ltGcLNg?=
+ =?us-ascii?Q?JTS4nKECmSaeFDcn8jLtfi+SoF02n5tBgkMrz9K7BqLR/zO78cXppYCENCzW?=
+ =?us-ascii?Q?ZmYUPHa1cwtc9T//3umWLPuVNY+fTUuTL2rM0BF/LaV+nszDOTBGrDapo03B?=
+ =?us-ascii?Q?Tu7RgWVVGQqe4x9BFgAx5uX1sjrt7cjNvcLqByZYQ0Iqbf3pl4HjREpU5Hob?=
+ =?us-ascii?Q?bmGZVjqRIOfWtkXY+j+kKc8XhgJrg7j2LbG4OhDVHSyxyRjU4aWyIrfhGPOc?=
+ =?us-ascii?Q?LqoQHL5SfSCniqaYy88HXGmKJw+ygCWe8LQf4Fa3zPIaplv2d6/0fbORwWFL?=
+ =?us-ascii?Q?v9anOjFMkug7+BrJAU+u6c6+PBVj7fInWhldNtNOZLGByTEVU+QmyNzVN2sc?=
+ =?us-ascii?Q?Xc/LdVoIaSf3qOY8LnZpT+Mvw+X/P9JSfydRynmBey/nNnQCdLvml7IoRrQm?=
+ =?us-ascii?Q?v1fuJnTcnKaF3jJWK2TJoJ1d1Bk6vkcp25vmBXNErxo3if9195pQ+kg2rb7D?=
+ =?us-ascii?Q?nWv/Ybhf1lahvJDn0PD2Ma6ESrExYurXkJNZ+wSrzxVYwXk5SlAoz60t9Iib?=
+ =?us-ascii?Q?5es2aNvnmAbhdftvQyrNvgbXmZivRUQbqWwON+CxscjjZLXY3oxztum32FUP?=
+ =?us-ascii?Q?r8859sxPe22ma0l7pCNdbyMT01DSVqTrMMMBB7KsmTm3/NOL72t1SBsJOrqg?=
+ =?us-ascii?Q?mdZFuxkN+Is2gUzIYcB3QnX9puv9QsY9xK2t1hsedM7Fq1PloCSQpfM6leDL?=
+ =?us-ascii?Q?Z67kAR+8fQ9xQInlQJ55JI5mqHVYeiXwoNg6b6dEhj2h+WVWShQeVEro20m3?=
+ =?us-ascii?Q?0RQDs1KuIk3gjq3YvrafexRExXWNnHPJyK9yq95uqM3fIG4nsBreyFIZL4Vh?=
+ =?us-ascii?Q?SIUXI3RZA6UMMgEu3C7PK+5gEOv2Hx8yj1iqf8lqbVWAqu5zN6qIXCfkwWcK?=
+ =?us-ascii?Q?9sHnZytCOCW/lVUzD/CxAum19vyDk69PXCyJRPab9PTFry0B36A6+abzlnGc?=
+ =?us-ascii?Q?QOFsAv0gJ9L9jtkV1oLEVIKrl8WZDOMcNnt+Gc0hm0Lh+ttu6j99E54++s16?=
+ =?us-ascii?Q?pWgxPtX9Qk3hXgVEtNC2Vs8Qnb7m2KEl5C/L321V4a4bPgLZvpNUGvYLr4tu?=
+ =?us-ascii?Q?mMVCIr2fqBMMYfVwyTAhh20QvwLTsDim4bGChockKvkl2fpiVPA4QBg/Q0vJ?=
+ =?us-ascii?Q?yGqt5WKVZYE7xu+8kee7rYRWEvHBltLmJlzVj23zD8r0WX6w45QEJMJSsbdV?=
+ =?us-ascii?Q?GmHBM11zh1xlUobDSKI=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:satlexmb07.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2025 11:17:23.0507
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2025 11:17:33.3070
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6b386eac-3504-4013-6b25-08de186f1087
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0f6fa911-99f9-4590-7187-08de186f16a4
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[satlexmb07.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	BN2PEPF0000449E.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7481
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH1PPF711010B62
 
-Adds support for ethtool split header selftest. Performs
-UDP and TCP check to ensure split header selft test works
-for both packet types.
+Adds support for jumbo frame selftest. Works only for
+mtu size greater than 1500.
 
 Signed-off-by: Raju Rangoju <Raju.Rangoju@amd.com>
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
- drivers/net/ethernet/amd/xgbe/xgbe-dev.c      |  2 +
- drivers/net/ethernet/amd/xgbe/xgbe-selftest.c | 46 +++++++++++++++++++
- drivers/net/ethernet/amd/xgbe/xgbe.h          |  1 +
- 3 files changed, 49 insertions(+)
+Changes since v4:
+ - remove double semicolon
 
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
-index ffc7d83522c7..b646ae575e6a 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe-dev.c
-@@ -211,6 +211,7 @@ static void xgbe_config_sph_mode(struct xgbe_prv_data *pdata)
- 	}
- 
- 	XGMAC_IOWRITE_BITS(pdata, MAC_RCR, HDSMS, XGBE_SPH_HDSMS_SIZE);
-+	pdata->sph = true;
- }
- 
- static void xgbe_disable_sph_mode(struct xgbe_prv_data *pdata)
-@@ -223,6 +224,7 @@ static void xgbe_disable_sph_mode(struct xgbe_prv_data *pdata)
- 
- 		XGMAC_DMA_IOWRITE_BITS(pdata->channel[i], DMA_CH_CR, SPH, 0);
- 	}
-+	pdata->sph = false;
- }
- 
- static int xgbe_write_rss_reg(struct xgbe_prv_data *pdata, unsigned int type,
+ drivers/net/ethernet/amd/xgbe/xgbe-selftest.c | 23 +++++++++++++++++++
+ 1 file changed, 23 insertions(+)
+
 diff --git a/drivers/net/ethernet/amd/xgbe/xgbe-selftest.c b/drivers/net/ethernet/amd/xgbe/xgbe-selftest.c
-index 23b9d568a861..15c51e96bcdf 100644
+index 15c51e96bcdf..55e5e467facd 100644
 --- a/drivers/net/ethernet/amd/xgbe/xgbe-selftest.c
 +++ b/drivers/net/ethernet/amd/xgbe/xgbe-selftest.c
-@@ -173,6 +173,48 @@ static int xgbe_test_phy_loopback(struct xgbe_prv_data *pdata)
- 	return ret;
- }
+@@ -42,11 +42,19 @@ static int xgbe_test_loopback_validate(struct sk_buff *skb,
+ 	struct tcphdr *th;
+ 	struct udphdr *uh;
+ 	struct iphdr *ih;
++	int eat;
  
-+static int xgbe_test_sph(struct xgbe_prv_data *pdata)
-+{
-+	struct net_packet_attrs attr = {};
-+	unsigned long cnt_end, cnt_start;
-+	int ret;
-+
-+	cnt_start = pdata->ext_stats.rx_split_header_packets;
-+
-+	if (!pdata->sph) {
-+		netdev_err(pdata->netdev, "Split Header not enabled\n");
-+		return -EOPNOTSUPP;
+ 	skb = skb_unshare(skb, GFP_ATOMIC);
+ 	if (!skb)
+ 		goto out;
+ 
++	eat = (skb->tail + skb->data_len) - skb->end;
++	if (eat > 0 && skb_shared(skb)) {
++		skb = skb_share_check(skb, GFP_ATOMIC);
++		if (!skb)
++			goto out;
 +	}
 +
-+	/* UDP test */
-+	attr.dst = pdata->netdev->dev_addr;
-+	attr.tcp = false;
-+
-+	ret = __xgbe_test_loopback(pdata, &attr);
-+	if (ret)
-+		return ret;
-+
-+	cnt_end = pdata->ext_stats.rx_split_header_packets;
-+	if (cnt_end <= cnt_start)
-+		return -EINVAL;
-+
-+	/* TCP test */
-+	cnt_start = cnt_end;
+ 	if (skb_linearize(skb))
+ 		goto out;
+ 
+@@ -215,6 +223,17 @@ static int xgbe_test_sph(struct xgbe_prv_data *pdata)
+ 	return 0;
+ }
+ 
++static int xgbe_test_jumbo(struct xgbe_prv_data *pdata)
++{
++	struct net_packet_attrs attr = {};
++	int size = pdata->rx_buf_size;
 +
 +	attr.dst = pdata->netdev->dev_addr;
-+	attr.tcp = true;
++	attr.max_size = size - ETH_FCS_LEN;
 +
-+	ret = __xgbe_test_loopback(pdata, &attr);
-+	if (ret)
-+		return ret;
-+
-+	cnt_end = pdata->ext_stats.rx_split_header_packets;
-+	if (cnt_end <= cnt_start)
-+		return -EINVAL;
-+
-+	return 0;
++	return __xgbe_test_loopback(pdata, &attr);
 +}
 +
  static const struct xgbe_test xgbe_selftests[] = {
  	{
  		.name = "MAC Loopback   ",
-@@ -182,6 +224,10 @@ static const struct xgbe_test xgbe_selftests[] = {
- 		.name = "PHY Loopback   ",
- 		.lb = XGBE_LOOPBACK_NONE,
- 		.fn = xgbe_test_phy_loopback,
+@@ -228,6 +247,10 @@ static const struct xgbe_test xgbe_selftests[] = {
+ 		.name = "Split Header   ",
+ 		.lb = XGBE_LOOPBACK_PHY,
+ 		.fn = xgbe_test_sph,
 +	}, {
-+		.name = "Split Header   ",
++		.name = "Jumbo Frame    ",
 +		.lb = XGBE_LOOPBACK_PHY,
-+		.fn = xgbe_test_sph,
++		.fn = xgbe_test_jumbo,
  	},
  };
  
-diff --git a/drivers/net/ethernet/amd/xgbe/xgbe.h b/drivers/net/ethernet/amd/xgbe/xgbe.h
-index dc03082c59aa..03ef0f548483 100644
---- a/drivers/net/ethernet/amd/xgbe/xgbe.h
-+++ b/drivers/net/ethernet/amd/xgbe/xgbe.h
-@@ -1246,6 +1246,7 @@ struct xgbe_prv_data {
- 	int rx_adapt_retries;
- 	bool rx_adapt_done;
- 	bool mode_set;
-+	bool sph;
- };
- 
- /* Function prototypes*/
 -- 
 2.34.1
 
