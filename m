@@ -1,187 +1,280 @@
-Return-Path: <netdev+bounces-234571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 171ACC23513
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 07:06:20 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAD08C236DA
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 07:47:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28FDE408515
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 06:06:18 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 4EB7C34D690
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 06:47:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E10242E7160;
-	Fri, 31 Oct 2025 06:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FoAGExTF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BDA12EC57B;
+	Fri, 31 Oct 2025 06:47:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B3042E5429
-	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 06:06:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01141238C2F;
+	Fri, 31 Oct 2025 06:46:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.243.244.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761890775; cv=none; b=W7O/26BzFTOHHsU005KJPzkTkJdlnedMNqplMoOwlpykIDNMDvziMJ8Cm/7luStFeGuTDQWOXow2oJyx8uabTvfWf+jZX4OcmvmWaIabHieGcmZh7mIOUTJ4788qP7pjLGU3wk5KQtgLCi7PpK7sY3Nco5zw5xyCSFGSWaZPBuU=
+	t=1761893222; cv=none; b=uq1Zwov0nvuYmHVzV6dQ6ZP2w4DQLp7AmdWrlxh3oJYxZy5MlDJaaOZ6xCRxO/0sxAgZGhmnNjINuZoqQMdfXSEyyaGRPREBIzgHd9MTy9BZRWvttHlZSFkvkndwNSo1gyZj9xb3i0biscgdxo9PyLVoXVlKz1IV2Ru270lAIYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761890775; c=relaxed/simple;
-	bh=uzKsr8p0ZgM+SLgICEjgau4Cc9/3BVPso+PqdA0y7L8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B9vH/kLDWg8BqQrsJKD+5EOxieqlBdhrqhH24B/+YjUfYjwqwT/y6AMJVJPEDS2IPfWNH4cFyF4IOgyMMI1U8JHwu2pbE7zEM5p127AhWWRRTV1ZpwhF2Fdvu4jeQwsaYAKhf5fwSRTNo3QFhBwRNsCvDftu4j3wQ9OrfRHnh7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FoAGExTF; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1761890773;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=+bCrk/NYYmYlKBsMjf6Y0gKt7P2+73Hm3s9fxJ/Q+sk=;
-	b=FoAGExTF79kTZ/cca5BoXsCs3OUqZD6LQQnhZL1T2yKWxhb+mboPu6R/VlG00+R4RSfDii
-	unBC9PZDUMZ4Tlz0PAfyq+zSPeOc9nAi3X4pM58m4M9Ol/wz9p/jRkbXcCTgeCXVGYnXiC
-	XS49UR2hEy2dBDRI3tpadUsnVzJBd8o=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-618-7ClablYyO1OVe2uC7hp5hQ-1; Fri,
- 31 Oct 2025 02:06:09 -0400
-X-MC-Unique: 7ClablYyO1OVe2uC7hp5hQ-1
-X-Mimecast-MFC-AGG-ID: 7ClablYyO1OVe2uC7hp5hQ_1761890768
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 79D581953958;
-	Fri, 31 Oct 2025 06:06:07 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.72.120.6])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 96EE21955BE3;
-	Fri, 31 Oct 2025 06:05:55 +0000 (UTC)
-From: Jason Wang <jasowang@redhat.com>
-To: mst@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: virtualization@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH net V2] virtio_net: fix alignment for virtio_net_hdr_v1_hash
-Date: Fri, 31 Oct 2025 14:05:51 +0800
-Message-ID: <20251031060551.126-1-jasowang@redhat.com>
+	s=arc-20240116; t=1761893222; c=relaxed/simple;
+	bh=JZ4d4kYh8rfhRKOmG05eahnty61ao/DjaXEzL0J39VE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TskgaPVQJsUCUuHXplTXXLo5eukzUN6/Q7Wkl7H7QqPVPsZEkVxtSyvpZ9hLtQbI00b+JikGCQ9r5etgDgA4AVRoE3uzfS/kUMkVb5aXHKnLdOQ1mcVfG/U7REJOiDvSqXLK5YMgJ8zFJwpCYXnQOj1EYgo4xBq+LVuMpAXgCsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=linux.starfivetech.com; spf=none smtp.mailfrom=linux.starfivetech.com; arc=none smtp.client-ip=54.243.244.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=linux.starfivetech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.starfivetech.com
+X-QQ-mid: esmtpgz13t1761893210tf21d82f4
+X-QQ-Originating-IP: R90kadoSj/Lu9jhXDo3EOBK+P2zoChp7ZYtBXxB6TvQ=
+Received: from [192.168.125.98] ( [113.104.140.154])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 31 Oct 2025 14:46:46 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 1332421492275545379
+Message-ID: <99841AD0EE6A35D4+4a6afacb-4d1c-4727-9a75-134190350aca@linux.starfivetech.com>
+Date: Fri, 31 Oct 2025 14:46:46 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] dt-bindings: Remove extra blank lines
+To: "Rob Herring (Arm)" <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Stephen Boyd <sboyd@kernel.org>,
+ David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Thomas Zimmermann <tzimmermann@suse.de>,
+ Andrzej Hajda <andrzej.hajda@intel.com>, Robert Foss <rfoss@kernel.org>,
+ Vinod Koul <vkoul@kernel.org>, Moritz Fischer <mdf@kernel.org>,
+ Xu Yilun <yilun.xu@intel.com>, Bartosz Golaszewski <brgl@bgdev.pl>,
+ Guenter Roeck <linux@roeck-us.net>, Andi Shyti <andi.shyti@kernel.org>,
+ Jonathan Cameron <jic23@kernel.org>,
+ Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+ Georgi Djakov <djakov@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Joerg Roedel <joro@8bytes.org>, Jassi Brar <jassisinghbrar@gmail.com>,
+ Mauro Carvalho Chehab <mchehab@kernel.org>, Lee Jones <lee@kernel.org>,
+ Miquel Raynal <miquel.raynal@bootlin.com>,
+ Richard Weinberger <richard@nod.at>, Vignesh Raghavendra <vigneshr@ti.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+ Manivannan Sadhasivam <mani@kernel.org>, Bjorn Helgaas
+ <bhelgaas@google.com>, Kishon Vijay Abraham I <kishon@kernel.org>,
+ Sebastian Reichel <sre@kernel.org>, =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?=
+ <ukleinek@kernel.org>, Mark Brown <broonie@kernel.org>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>,
+ Philipp Zabel <p.zabel@pengutronix.de>, Olivia Mackall <olivia@selenic.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ Daniel Lezcano <daniel.lezcano@linaro.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-clk@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linux-fbdev@vger.kernel.org, dmaengine@vger.kernel.org,
+ linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-hwmon@vger.kernel.org, linux-i2c@vger.kernel.org,
+ linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
+ linux-pm@vger.kernel.org, iommu@lists.linux.dev,
+ linux-media@vger.kernel.org, linux-mtd@lists.infradead.org,
+ netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+ linux-pci@vger.kernel.org, linux-phy@lists.infradead.org,
+ linux-pwm@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+ linux-crypto@vger.kernel.org, linux-sound@vger.kernel.org,
+ linux-usb@vger.kernel.org
+References: <20251023143957.2899600-1-robh@kernel.org>
+Content-Language: en-US
+From: Hal Feng <hal.feng@linux.starfivetech.com>
+In-Reply-To: <20251023143957.2899600-1-robh@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpgz:linux.starfivetech.com:qybglogicsvrgz:qybglogicsvrgz5a-1
+X-QQ-XMAILINFO: OXV5Clc+9wUNMha98fyhsJ9fYHhPR6licQKZE9QKvLaYdJH05c3/jMdo
+	t1zEuZz6yoP4kE4PsT4O7GS31TYuk4U5zQv84lqP40Ins5iyRxFusFsY1CPVJ8MZbIIC2kM
+	3iX+CSTeqePRj7lESMUGrtGI5xDxnEOZknXdtdQdLI+EnyseMDgcG1J+nnEGzdqlF6VM70C
+	Zd6hXQ9NYaBr95+DhGRmTINNntgYoyTqO5EIAY2tT4Us4c02HwXHJQeX6esG9wHXD/6PE+6
+	fkyYNMvflwWQcIvFnSxC0Lc2wHhiayC7k9ehO5YQHzM2Hsk86Vg2P0AZdpjhy1ggB0mw7nf
+	3zMfyOMAnqUDN15S8zfGsbk9RLrFbLW7txuGqyRwUWXre5gGL3fiH4xFPrBxCGwUR8vRJi9
+	pWr1UosPhh4spXLQtGx4RMXMGN/+pe21cT7mVYnq9pCIP4zXlHwPsxwm7gtyW9J1XBMk9xz
+	2E8SOPE4Y95KfPA6NlKoZOp+/KecsNDOOBIgXDnNAXnuRB0UbD0HnEbTTidl0X4WmimGqZt
+	OhZA8XC8qkivUeoH7e9pxDHVtLjXzmJDlQllu8maKt64i12OOVpQXM+81q0KgDpXZW/8K6z
+	ssCfxrg4K/aPbEpyL07sBVlHbJzyBUwltEqKnR5GwuFD1412AE24sSBOp9vouoA+lGNJkIk
+	fCziUFmhD6bZCS1M5f3QH1rGW14BWcM5zq1lWVY8se2UOFCtwenZvhZ0HRW3u3wUdb3G/AD
+	bMvaGAMfA2ZDZmXrBlE8wBnYCUrRNfGfrNowHJTktwBbAytQCz22VEWfHnuRqcEIqD//9Nf
+	lKkiNXJNpafll9bQg1rd098Yw718lE4sEaTdLITVoyiEjeBFD7iCC7abM4WN49kmh5OVWsL
+	kVzNsLnjHQ+O3ZO64KddXLXloL3LpByIV99gAOXLivP/ylOf9qkmJTwAcYTvYrteHrpSizY
+	Ovi85/99AoQotG/SBsdUfGRTP44UsyLAEhVw=
+X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
+X-QQ-RECHKSPAM: 0
 
-From: "Michael S. Tsirkin" <mst@redhat.com>
+On 10/23/2025 10:37 PM, Rob Herring (Arm) wrote:
+> Generally at most 1 blank line is the standard style for DT schema
+> files. Remove the few cases with more than 1 so that the yamllint check
+> for this can be enabled.
+> 
+> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> ---
+>  Documentation/devicetree/bindings/.yamllint                  | 2 +-
+>  Documentation/devicetree/bindings/arm/psci.yaml              | 1 -
+>  .../bindings/clock/allwinner,sun4i-a10-gates-clk.yaml        | 1 -
+>  .../devicetree/bindings/clock/renesas,cpg-mssr.yaml          | 1 -
+>  .../devicetree/bindings/clock/xlnx,clocking-wizard.yaml      | 1 -
+>  .../display/allwinner,sun4i-a10-display-frontend.yaml        | 1 -
+>  .../devicetree/bindings/display/allwinner,sun6i-a31-drc.yaml | 1 -
+>  .../bindings/display/allwinner,sun8i-a83t-dw-hdmi.yaml       | 1 -
+>  .../devicetree/bindings/display/amlogic,meson-vpu.yaml       | 1 -
+>  .../devicetree/bindings/display/bridge/adi,adv7511.yaml      | 1 -
+>  .../devicetree/bindings/display/bridge/lvds-codec.yaml       | 1 -
+>  .../devicetree/bindings/display/bridge/toshiba,tc358767.yaml | 1 -
+>  .../devicetree/bindings/display/ilitek,ili9486.yaml          | 1 -
+>  Documentation/devicetree/bindings/display/msm/gpu.yaml       | 1 -
+>  .../devicetree/bindings/display/panel/panel-timing.yaml      | 1 -
+>  .../devicetree/bindings/display/panel/tpo,tpg110.yaml        | 1 -
+>  .../devicetree/bindings/display/rockchip/rockchip,dw-dp.yaml | 1 -
+>  .../devicetree/bindings/display/simple-framebuffer.yaml      | 1 -
+>  .../devicetree/bindings/dma/snps,dma-spear1340.yaml          | 1 -
+>  Documentation/devicetree/bindings/dma/stericsson,dma40.yaml  | 1 -
+>  .../devicetree/bindings/dma/stm32/st,stm32-dma.yaml          | 1 -
+>  Documentation/devicetree/bindings/edac/apm,xgene-edac.yaml   | 1 -
+>  .../devicetree/bindings/firmware/qemu,fw-cfg-mmio.yaml       | 1 -
+>  Documentation/devicetree/bindings/fpga/fpga-region.yaml      | 5 -----
+>  .../devicetree/bindings/gpio/brcm,xgs-iproc-gpio.yaml        | 1 -
+>  .../devicetree/bindings/gpio/fairchild,74hc595.yaml          | 1 -
+>  Documentation/devicetree/bindings/hwmon/adi,ltc2947.yaml     | 1 -
+>  Documentation/devicetree/bindings/hwmon/adi,max31827.yaml    | 1 -
+>  Documentation/devicetree/bindings/hwmon/national,lm90.yaml   | 1 -
+>  Documentation/devicetree/bindings/hwmon/ti,tmp513.yaml       | 1 -
+>  Documentation/devicetree/bindings/hwmon/ti,tps23861.yaml     | 1 -
+>  Documentation/devicetree/bindings/i2c/i2c-mux-gpmux.yaml     | 1 -
+>  .../devicetree/bindings/i2c/realtek,rtl9301-i2c.yaml         | 1 -
+>  Documentation/devicetree/bindings/i2c/tsd,mule-i2c-mux.yaml  | 2 --
+>  Documentation/devicetree/bindings/iio/adc/adi,ad7380.yaml    | 1 -
+>  Documentation/devicetree/bindings/iio/adc/adi,ad7606.yaml    | 1 -
+>  Documentation/devicetree/bindings/iio/adc/adi,ad7949.yaml    | 1 -
+>  Documentation/devicetree/bindings/iio/adc/adi,ade9000.yaml   | 1 -
+>  .../devicetree/bindings/iio/adc/cosmic,10001-adc.yaml        | 1 -
+>  Documentation/devicetree/bindings/iio/adc/st,stm32-adc.yaml  | 1 -
+>  .../devicetree/bindings/iio/adc/x-powers,axp209-adc.yaml     | 1 -
+>  .../devicetree/bindings/iio/afe/voltage-divider.yaml         | 1 -
+>  .../devicetree/bindings/iio/frequency/adi,admv4420.yaml      | 1 -
+>  .../devicetree/bindings/iio/pressure/murata,zpa2326.yaml     | 1 -
+>  .../devicetree/bindings/iio/proximity/semtech,sx9324.yaml    | 1 -
+>  .../devicetree/bindings/iio/temperature/adi,ltc2983.yaml     | 1 -
+>  Documentation/devicetree/bindings/input/ti,drv266x.yaml      | 1 -
+>  .../devicetree/bindings/interconnect/qcom,rpmh.yaml          | 1 -
+>  .../devicetree/bindings/interrupt-controller/arm,gic-v3.yaml | 1 -
+>  .../bindings/interrupt-controller/aspeed,ast2700-intc.yaml   | 1 -
+>  .../bindings/interrupt-controller/fsl,vf610-mscm-ir.yaml     | 1 -
+>  .../bindings/interrupt-controller/loongson,liointc.yaml      | 1 -
+>  .../bindings/interrupt-controller/mediatek,mtk-cirq.yaml     | 1 -
+>  .../bindings/interrupt-controller/mscc,ocelot-icpu-intr.yaml | 1 -
+>  Documentation/devicetree/bindings/iommu/arm,smmu.yaml        | 4 ----
+>  Documentation/devicetree/bindings/mailbox/arm,mhu.yaml       | 1 -
+>  Documentation/devicetree/bindings/mailbox/arm,mhuv2.yaml     | 1 -
+>  Documentation/devicetree/bindings/mailbox/mtk,adsp-mbox.yaml | 1 -
+>  Documentation/devicetree/bindings/media/amphion,vpu.yaml     | 1 -
+>  Documentation/devicetree/bindings/media/i2c/adi,adv7604.yaml | 2 --
+>  .../devicetree/bindings/media/i2c/techwell,tw9900.yaml       | 1 -
+>  Documentation/devicetree/bindings/media/nxp,imx8-jpeg.yaml   | 1 -
+>  .../devicetree/bindings/media/qcom,sc8280xp-camss.yaml       | 1 -
+>  .../bindings/media/samsung,exynos4212-fimc-is.yaml           | 1 -
+>  .../devicetree/bindings/media/samsung,s5pv210-jpeg.yaml      | 1 -
+>  Documentation/devicetree/bindings/media/st,stm32-dma2d.yaml  | 1 -
+>  .../devicetree/bindings/media/video-interface-devices.yaml   | 4 ----
+>  .../memory-controllers/qcom,ebi2-peripheral-props.yaml       | 1 -
+>  Documentation/devicetree/bindings/mfd/stericsson,ab8500.yaml | 1 -
+>  .../devicetree/bindings/mtd/amlogic,meson-nand.yaml          | 1 -
+>  .../devicetree/bindings/mtd/marvell,nand-controller.yaml     | 1 -
+>  Documentation/devicetree/bindings/mux/mux-controller.yaml    | 1 -
+>  .../devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml   | 2 --
+>  Documentation/devicetree/bindings/net/brcm,bcmgenet.yaml     | 1 -
+>  .../devicetree/bindings/net/brcm,mdio-mux-iproc.yaml         | 1 -
+>  .../devicetree/bindings/net/cortina,gemini-ethernet.yaml     | 1 -
+>  Documentation/devicetree/bindings/net/fsl,gianfar.yaml       | 2 --
+>  .../devicetree/bindings/net/mdio-mux-multiplexer.yaml        | 1 -
+>  Documentation/devicetree/bindings/net/qcom,ipa.yaml          | 1 -
+>  Documentation/devicetree/bindings/net/ti,cpsw-switch.yaml    | 1 -
+>  .../devicetree/bindings/net/wireless/ti,wlcore.yaml          | 1 -
+>  .../devicetree/bindings/pci/altr,pcie-root-port.yaml         | 1 -
+>  Documentation/devicetree/bindings/pci/loongson.yaml          | 1 -
+>  Documentation/devicetree/bindings/pci/rockchip-dw-pcie.yaml  | 1 -
+>  .../devicetree/bindings/pci/starfive,jh7110-pcie.yaml        | 1 -
+>  Documentation/devicetree/bindings/pci/versatile.yaml         | 1 -
+>  .../bindings/phy/qcom,sc8280xp-qmp-usb3-uni-phy.yaml         | 1 -
+>  .../devicetree/bindings/pinctrl/brcm,bcm21664-pinctrl.yaml   | 1 -
+>  .../devicetree/bindings/pinctrl/fsl,imx9-pinctrl.yaml        | 1 -
+>  .../devicetree/bindings/pinctrl/qcom,qcs404-pinctrl.yaml     | 1 -
+>  .../bindings/pinctrl/qcom,sm6115-lpass-lpi-pinctrl.yaml      | 1 -
+>  .../devicetree/bindings/pinctrl/qcom,sm6125-tlmm.yaml        | 1 -
+>  .../devicetree/bindings/pinctrl/renesas,rza1-ports.yaml      | 3 ---
+>  .../devicetree/bindings/pinctrl/starfive,jh7100-pinctrl.yaml | 1 -
+>  .../devicetree/bindings/power/supply/mt6360_charger.yaml     | 1 -
+>  .../bindings/power/supply/stericsson,ab8500-charger.yaml     | 1 -
+>  .../devicetree/bindings/pwm/allwinner,sun4i-a10-pwm.yaml     | 1 -
+>  .../bindings/regulator/richtek,rt6245-regulator.yaml         | 1 -
+>  .../devicetree/bindings/remoteproc/ti,k3-r5f-rproc.yaml      | 2 --
+>  Documentation/devicetree/bindings/reset/ti,sci-reset.yaml    | 1 -
+>  .../bindings/rng/inside-secure,safexcel-eip76.yaml           | 2 --
+>  .../devicetree/bindings/soc/fsl/cpm_qe/fsl,qe-muram.yaml     | 1 -
+>  .../devicetree/bindings/soc/mediatek/mediatek,mutex.yaml     | 1 -
+>  .../bindings/soc/microchip/atmel,at91rm9200-tcb.yaml         | 1 -
+>  Documentation/devicetree/bindings/soc/rockchip/grf.yaml      | 1 -
+>  Documentation/devicetree/bindings/soc/ti/ti,pruss.yaml       | 3 ---
+>  Documentation/devicetree/bindings/sound/adi,adau1372.yaml    | 1 -
+>  Documentation/devicetree/bindings/sound/adi,adau7118.yaml    | 1 -
+>  .../devicetree/bindings/sound/rockchip,i2s-tdm.yaml          | 1 -
+>  .../devicetree/bindings/sound/rockchip,rk3328-codec.yaml     | 2 +-
+>  Documentation/devicetree/bindings/sound/samsung,tm2.yaml     | 1 -
+>  .../devicetree/bindings/sound/ti,tlv320dac3100.yaml          | 1 -
+>  Documentation/devicetree/bindings/sound/wlf,wm8903.yaml      | 1 -
+>  .../devicetree/bindings/timer/nvidia,tegra-timer.yaml        | 1 -
+>  .../devicetree/bindings/timer/nvidia,tegra186-timer.yaml     | 1 -
+>  Documentation/devicetree/bindings/usb/qcom,pmic-typec.yaml   | 1 -
+>  116 files changed, 2 insertions(+), 136 deletions(-)
+> 
 
-Changing alignment of header would mean it's no longer safe to cast a
-2 byte aligned pointer between formats. Use two 16 bit fields to make
-it 2 byte aligned as previously.
+...
 
-This fixes the performance regression since
-commit ("virtio_net: enable gso over UDP tunnel support.") as it uses
-virtio_net_hdr_v1_hash_tunnel which embeds
-virtio_net_hdr_v1_hash. Pktgen in guest + XDP_DROP on TAP + vhost_net
-shows the TX PPS is recovered from 2.4Mpps to 4.45Mpps.
+> diff --git a/Documentation/devicetree/bindings/pci/starfive,jh7110-pcie.yaml b/Documentation/devicetree/bindings/pci/starfive,jh7110-pcie.yaml
+> index 5f432452c815..33c80626e8ec 100644
+> --- a/Documentation/devicetree/bindings/pci/starfive,jh7110-pcie.yaml
+> +++ b/Documentation/devicetree/bindings/pci/starfive,jh7110-pcie.yaml
+> @@ -16,7 +16,6 @@ properties:
+>    compatible:
+>      const: starfive,jh7110-pcie
+>  
+> -
+>    reg:
+>      maxItems: 2
+>  
 
-Fixes: 56a06bd40fab ("virtio_net: enable gso over UDP tunnel support.")
-Cc: stable@vger.kernel.org
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
-Changes since V1:
-- Fix build issues of virtio_net_hdr_tnl_from_skb()
----
- drivers/net/virtio_net.c        | 15 +++++++++++++--
- include/linux/virtio_net.h      |  3 ++-
- include/uapi/linux/virtio_net.h |  3 ++-
- 3 files changed, 17 insertions(+), 4 deletions(-)
+...
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 8e8a179aaa49..e6e650bc3bc3 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -2539,6 +2539,13 @@ static struct sk_buff *receive_mergeable(struct net_device *dev,
- 	return NULL;
- }
- 
-+static inline u32
-+virtio_net_hash_value(const struct virtio_net_hdr_v1_hash *hdr_hash)
-+{
-+	return __le16_to_cpu(hdr_hash->hash_value_lo) |
-+		(__le16_to_cpu(hdr_hash->hash_value_hi) << 16);
-+}
-+
- static void virtio_skb_set_hash(const struct virtio_net_hdr_v1_hash *hdr_hash,
- 				struct sk_buff *skb)
- {
-@@ -2565,7 +2572,7 @@ static void virtio_skb_set_hash(const struct virtio_net_hdr_v1_hash *hdr_hash,
- 	default:
- 		rss_hash_type = PKT_HASH_TYPE_NONE;
- 	}
--	skb_set_hash(skb, __le32_to_cpu(hdr_hash->hash_value), rss_hash_type);
-+	skb_set_hash(skb, virtio_net_hash_value(hdr_hash), rss_hash_type);
- }
- 
- static void virtnet_receive_done(struct virtnet_info *vi, struct receive_queue *rq,
-@@ -3311,6 +3318,10 @@ static int xmit_skb(struct send_queue *sq, struct sk_buff *skb, bool orphan)
- 
- 	pr_debug("%s: xmit %p %pM\n", vi->dev->name, skb, dest);
- 
-+	/* Make sure it's safe to cast between formats */
-+	BUILD_BUG_ON(__alignof__(*hdr) != __alignof__(hdr->hash_hdr));
-+	BUILD_BUG_ON(__alignof__(*hdr) != __alignof__(hdr->hash_hdr.hdr));
-+
- 	can_push = vi->any_header_sg &&
- 		!((unsigned long)skb->data & (__alignof__(*hdr) - 1)) &&
- 		!skb_header_cloned(skb) && skb_headroom(skb) >= hdr_len;
-@@ -6750,7 +6761,7 @@ static int virtnet_xdp_rx_hash(const struct xdp_md *_ctx, u32 *hash,
- 		hash_report = VIRTIO_NET_HASH_REPORT_NONE;
- 
- 	*rss_type = virtnet_xdp_rss_type[hash_report];
--	*hash = __le32_to_cpu(hdr_hash->hash_value);
-+	*hash = virtio_net_hash_value(hdr_hash);
- 	return 0;
- }
- 
-diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
-index 4d1780848d0e..b673c31569f3 100644
---- a/include/linux/virtio_net.h
-+++ b/include/linux/virtio_net.h
-@@ -401,7 +401,8 @@ virtio_net_hdr_tnl_from_skb(const struct sk_buff *skb,
- 	if (!tnl_hdr_negotiated)
- 		return -EINVAL;
- 
--        vhdr->hash_hdr.hash_value = 0;
-+	vhdr->hash_hdr.hash_value_lo = 0;
-+	vhdr->hash_hdr.hash_value_hi = 0;
-         vhdr->hash_hdr.hash_report = 0;
-         vhdr->hash_hdr.padding = 0;
- 
-diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
-index 8bf27ab8bcb4..1db45b01532b 100644
---- a/include/uapi/linux/virtio_net.h
-+++ b/include/uapi/linux/virtio_net.h
-@@ -193,7 +193,8 @@ struct virtio_net_hdr_v1 {
- 
- struct virtio_net_hdr_v1_hash {
- 	struct virtio_net_hdr_v1 hdr;
--	__le32 hash_value;
-+	__le16 hash_value_lo;
-+	__le16 hash_value_hi;
- #define VIRTIO_NET_HASH_REPORT_NONE            0
- #define VIRTIO_NET_HASH_REPORT_IPv4            1
- #define VIRTIO_NET_HASH_REPORT_TCPv4           2
--- 
-2.31.1
+> diff --git a/Documentation/devicetree/bindings/pinctrl/starfive,jh7100-pinctrl.yaml b/Documentation/devicetree/bindings/pinctrl/starfive,jh7100-pinctrl.yaml
+> index f3258f2fd3a4..3f14eab01c54 100644
+> --- a/Documentation/devicetree/bindings/pinctrl/starfive,jh7100-pinctrl.yaml
+> +++ b/Documentation/devicetree/bindings/pinctrl/starfive,jh7100-pinctrl.yaml
+> @@ -32,7 +32,6 @@ description: |
+>      | | |     |   |   |          -------
+>      UART0     UART1 --
+>  
+> -
+>    The big MUX in the diagram only has 7 different ways of mapping peripherals
+>    on the left to pins on the right. StarFive calls the 7 configurations "signal
+>    groups".
 
+Reviewed-by: Hal Feng <hal.feng@starfivetech.com>
+
+Best regards,
+Hal
 
