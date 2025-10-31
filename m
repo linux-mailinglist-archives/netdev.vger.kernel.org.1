@@ -1,207 +1,185 @@
-Return-Path: <netdev+bounces-234670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D7C2C25DD9
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 16:37:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3578AC25DDC
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 16:37:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5EE58423DCC
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 15:35:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CB36425730
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 15:36:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2EDA2DECB9;
-	Fri, 31 Oct 2025 15:35:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D59C92E06E6;
+	Fri, 31 Oct 2025 15:36:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="jvvuLBX6";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="CSaLgj5u";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="N1VBlHlW";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="C3ibAOSu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bgZioyMf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D24812D3A75
-	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 15:35:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C1732D9EE0;
+	Fri, 31 Oct 2025 15:36:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761924941; cv=none; b=ieZmaX2JrzzzNY/AMyVEcBMNnjhtC/CmCvtX8QHUWy+npb6/tZ85n1cbE/yqxIknCGyG2yHWlvQmilGsB+cgKzl0zyRMadXYlkQR/GzYpw+nmHgDaysns+xCqeKvpaKaXXEKMMAwxMhx5DPDrrXc+Jd+v6+j4Byr4CJ3OrQfLAU=
+	t=1761924966; cv=none; b=LFSgZrGfvp1rH24TGF9JnpZ1yl8O5MJDIA675l2SiE1VtA6+fHx6lCl0CApQZ489ORialwLeuYeFSB3+SW2T1JLbiS9c7U1wPORzSsW9EEZMLB25xaLeGqJHf6/OcMzD04MCTLi97zbRHZR8eqYkvB9WV7JvDASBEKe+48CO0Oc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761924941; c=relaxed/simple;
-	bh=u1H8y8Vd7BNxaixOkx1N50pHvue9IBSpzBkkFlBBc7k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JuDnieOE1RDuDxWe95zkuYEIRgQHo7a+3ffS2C+2qWUDgLv6McEIwabQ0EL+0Rm5rSsiVFbmBvvG8DFppdiU2iQgih9Of8ZTKuvKevHlckS5QLqKO0eBSFoNiHPQ76kGYiDhLcthJBXmWlV3rmhd4av/+0It1VrcD259RmfYpSQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=jvvuLBX6; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=CSaLgj5u; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=N1VBlHlW; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=C3ibAOSu; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id EAFFD22060;
-	Fri, 31 Oct 2025 15:35:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1761924938; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cTrayXkWBQ243Fr06I9R6N8F/Dz2fVCExTzhLcSW7QA=;
-	b=jvvuLBX6eRZdWnDxZUWCLDdwDqCQxJPndp0Js5OViRrYAsZXgJYFQgSYsvXUFmNuj+0n0x
-	Q+sIPjS8dN4Sid6iNm3HqhQNVsI5EB5MFdMvQqOhYCtKb5u0clrJj6TLT9CluOghoKHJGt
-	iVQRwIG8q5wdeYfSSN177UKJEP5a88g=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1761924938;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cTrayXkWBQ243Fr06I9R6N8F/Dz2fVCExTzhLcSW7QA=;
-	b=CSaLgj5uB8ub8e3FaH0J8twmCDxYJoejo1OmiZBQDlZhn567tL9cApOsAODybbc30je3Ld
-	Dv02ulfmJqe4WzCw==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1761924937; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cTrayXkWBQ243Fr06I9R6N8F/Dz2fVCExTzhLcSW7QA=;
-	b=N1VBlHlWxGpseLfy8E7f7YYKtHURzfK4Be2EB539ih///9PoZp+V/WvmdhebUx8r746z2h
-	NavdJ/iMupKJcxLHVs90DW1lvqlQzT4R5DDV3avDnDG4a++7Y5gWNMo/VfY4t4TAyQCKvG
-	PwIJunSb5PP5KyrTDkUcgoYeTg//6y4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1761924937;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cTrayXkWBQ243Fr06I9R6N8F/Dz2fVCExTzhLcSW7QA=;
-	b=C3ibAOSuwE0e3RVd590Zly7JfAteqpmrYBGX/qBahRWUX+DcZQvqN2ttiM/l3iF4t7zhyf
-	kYh2gK8WTJUUkjAw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5946413393;
-	Fri, 31 Oct 2025 15:35:37 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id Oiw2DknXBGn+SwAAD6G6ig
-	(envelope-from <svarbanov@suse.de>); Fri, 31 Oct 2025 15:35:37 +0000
-Message-ID: <eef9a83f-6103-4ab2-927c-921dd9a6a5b3@suse.de>
-Date: Fri, 31 Oct 2025 17:35:32 +0200
+	s=arc-20240116; t=1761924966; c=relaxed/simple;
+	bh=f2kdcTzIgflTZpNVJcpB/wXw4Pn7v3oe8LGnD3Ghpv0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lNs+RM3QtDWkDhDH5hv9rLUYC/XW9hFzBPQ9AtrF911at0jFjw7SejBJZB9DvKVPdylrsz8B9eX20ZnTNruL3al40CMVwwfSRHokNITtI66ImNEpZcaub/0g0p6E0A3Z97+Ft3o1QjhmArcO3ls8YLea/9cYd5OeMbKK1Z/tLcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bgZioyMf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E3AEC4CEE7;
+	Fri, 31 Oct 2025 15:36:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761924964;
+	bh=f2kdcTzIgflTZpNVJcpB/wXw4Pn7v3oe8LGnD3Ghpv0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bgZioyMfejcWWV0MS6C05S2LbsEdxX50diKJLFbw9ByzTss1Ijd602OkOPk5VfJ9K
+	 BRKcnvMU8FhGuOYJD6IlhqxkvqA74T7C11v39u1D+WoQbt6yJqS7412XtCYdJe0PHy
+	 Ln62jNHD5VjGRqjBBZSBa4jUMaVRdwp5bzP89/ZWKaQCzVlnK86qZsU+w4X0SXlEbI
+	 lRkg7pYEBULQLbHiEuqIewp4ucaxmKc3j/liAl9yD7UK/IyLDT6JMbpqc1UA7U21O9
+	 xfmguuXRFsOBFWFtnYsZeHmVkddUjMRhYiHjr9QoNL/wS5AGPYJo2404lc9S1uCEeI
+	 AAsxziPBgXXWA==
+Date: Fri, 31 Oct 2025 16:36:01 +0100
+From: Frederic Weisbecker <frederic@kernel.org>
+To: Valentin Schneider <vschneid@redhat.com>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
+	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+	linux-mm@kvack.org, linux-pci@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 05/33] sched/isolation: Save boot defined domain flags
+Message-ID: <aQTXYSyPS65nhkvl@localhost.localdomain>
+References: <20251013203146.10162-1-frederic@kernel.org>
+ <20251013203146.10162-6-frederic@kernel.org>
+ <xhsmhecqtoc4b.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/5] dd ethernet support for RPi5
-To: Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
- Stanimir Varbanov <svarbanov@suse.de>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-rpi-kernel@lists.infradead.org,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Florian Fainelli <florian.fainelli@broadcom.com>,
- Andrea della Porta <andrea.porta@suse.com>,
- Nicolas Ferre <nicolas.ferre@microchip.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, Phil Elwell
- <phil@raspberrypi.com>, Jonathan Bell <jonathan@raspberrypi.com>,
- Dave Stevenson <dave.stevenson@raspberrypi.com>
-References: <20250822093440.53941-1-svarbanov@suse.de>
- <20251031114518.GA17287@pendragon.ideasonboard.com>
-Content-Language: en-US
-From: Stanimir Varbanov <svarbanov@suse.de>
-In-Reply-To: <20251031114518.GA17287@pendragon.ideasonboard.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	TAGGED_RCPT(0.00)[dt,netdev];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[23];
-	ARC_NA(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	URIBL_BLOCKED(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:mid];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:mid,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Flag: NO
-X-Spam-Score: -2.80
-X-Spam-Level: 
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <xhsmhecqtoc4b.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
 
-Hi Laurent,
+Le Thu, Oct 23, 2025 at 05:45:40PM +0200, Valentin Schneider a écrit :
+> On 13/10/25 22:31, Frederic Weisbecker wrote:
+> > HK_TYPE_DOMAIN will soon integrate not only boot defined isolcpus= CPUs
+> > but also cpuset isolated partitions.
+> >
+> > Housekeeping still needs a way to record what was initially passed
+> > to isolcpus= in order to keep these CPUs isolated after a cpuset
+> > isolated partition is modified or destroyed while containing some of
+> > them.
+> >
+> > Create a new HK_TYPE_DOMAIN_BOOT to keep track of those.
+> >
+> > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> > Reviewed-by: Phil Auld <pauld@redhat.com>
+> > ---
+> >  include/linux/sched/isolation.h | 1 +
+> >  kernel/sched/isolation.c        | 5 +++--
+> >  2 files changed, 4 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/include/linux/sched/isolation.h b/include/linux/sched/isolation.h
+> > index d8501f4709b5..da22b038942a 100644
+> > --- a/include/linux/sched/isolation.h
+> > +++ b/include/linux/sched/isolation.h
+> > @@ -7,6 +7,7 @@
+> >  #include <linux/tick.h>
+> >
+> >  enum hk_type {
+> > +	HK_TYPE_DOMAIN_BOOT,
+> >       HK_TYPE_DOMAIN,
+> >       HK_TYPE_MANAGED_IRQ,
+> >       HK_TYPE_KERNEL_NOISE,
+> > diff --git a/kernel/sched/isolation.c b/kernel/sched/isolation.c
+> > index a4cf17b1fab0..8690fb705089 100644
+> > --- a/kernel/sched/isolation.c
+> > +++ b/kernel/sched/isolation.c
+> > @@ -11,6 +11,7 @@
+> >  #include "sched.h"
+> >
+> >  enum hk_flags {
+> > +	HK_FLAG_DOMAIN_BOOT	= BIT(HK_TYPE_DOMAIN_BOOT),
+> >       HK_FLAG_DOMAIN		= BIT(HK_TYPE_DOMAIN),
+> >       HK_FLAG_MANAGED_IRQ	= BIT(HK_TYPE_MANAGED_IRQ),
+> >       HK_FLAG_KERNEL_NOISE	= BIT(HK_TYPE_KERNEL_NOISE),
+> > @@ -216,7 +217,7 @@ static int __init housekeeping_isolcpus_setup(char *str)
+> >
+> >               if (!strncmp(str, "domain,", 7)) {
+> >                       str += 7;
+> > -			flags |= HK_FLAG_DOMAIN;
+> > +			flags |= HK_FLAG_DOMAIN | HK_FLAG_DOMAIN_BOOT;
+> >                       continue;
+> >               }
+> >
+> > @@ -246,7 +247,7 @@ static int __init housekeeping_isolcpus_setup(char *str)
+> >
+> >       /* Default behaviour for isolcpus without flags */
+> >       if (!flags)
+> > -		flags |= HK_FLAG_DOMAIN;
+> > +		flags |= HK_FLAG_DOMAIN | HK_FLAG_DOMAIN_BOOT;
+> 
+> I got stupidly confused by the cpumask_andnot() used later on since these
+> are housekeeping cpumasks and not isolated ones; AFAICT HK_FLAG_DOMAIN_BOOT
+> is meant to be a superset of HK_FLAG_DOMAIN - or, put in a way my brain
+> comprehends, NOT(HK_FLAG_DOMAIN) (i.e. runtime isolated cpumask) is a
+> superset of NOT(HK_FLAG_DOMAIN_BOOT) (i.e. boottime isolated cpumask),
+> thus the final shape of cpu_is_isolated() makes sense:
+> 
+>   static inline bool cpu_is_isolated(int cpu)
+>   {
+>           return !housekeeping_test_cpu(cpu, HK_TYPE_DOMAIN);
+>   }
 
-On 10/31/25 1:45 PM, Laurent Pinchart wrote:
-> Hi Stan,
-> 
-> On Fri, Aug 22, 2025 at 12:34:35PM +0300, Stanimir Varbanov wrote:
->> Hello,
->>
->> Changes in v2:
->>  - In 1/5 updates according to review comments (Nicolas)
->>  - In 1/5 added Fixes tag (Nicolas)
->>  - Added Reviewed-by and Acked-by tags.
->>
->> v1 can found at [1].
->>
->> Comments are welcome!
-> 
-> I'm very happy to see support for Raspberry Pi 5 progressing fast
-> upstream.
-> 
-> I've tested the latest mainline kernel (v6.18-rc3) that includes this
-> series (except for 1/5 that is replaced by
-> https://lore.kernel.org/all/20250820-macb-fixes-v4-0-23c399429164@bootlin.com/
-> as far as I understand). The ethernet controller is successfully
-> detected, and so is the PHY. Link status seems to work fine too, but
-> data doesn't seem to go through when the kernel tries to get a DHCP
-> address (for NFS root). Here's the end of the kernel log (with the
-> messages related to the USB controller stripped out):
-> 
-> [    0.896779] rp1_pci 0002:01:00.0: assign IRQ: got 27
-> [    0.896809] rp1_pci 0002:01:00.0: enabling device (0000 -> 0002)
-> [    0.896840] rp1_pci 0002:01:00.0: enabling bus mastering
-> [    0.931874] macb 1f00100000.ethernet: invalid hw address, using random
-> [    0.944448] macb 1f00100000.ethernet eth0: Cadence GEM rev 0x00070109 at 0x1f00100000 irq 95 (da:2e:6d:9d:52:a4)
-> [    0.989067] macb 1f00100000.ethernet eth0: PHY [1f00100000.ethernet-ffffffff:01] driver [Broadcom BCM54210E] (irq=POLL)
-> [    0.989272] macb 1f00100000.ethernet eth0: configuring for phy/rgmii-id link mode
-> [    0.991271] macb 1f00100000.ethernet: gem-ptp-timer ptp clock registered.
-> [    4.039490] macb 1f00100000.ethernet eth0: Link is Up - 1Gbps/Full - flow control tx
-> [    4.062589] Sending DHCP requests .....
-> [   40.902771] macb 1f00100000.ethernet eth0: Link is Down
-> [   43.975334] macb 1f00100000.ethernet eth0: Link is Up - 1Gbps/Full - flow control tx
-> 
-> I've tried porting patches to drivers/net/phy/broadcom.c from the
-> Raspberry Pi kernel to specifically support the BCM54213PE PHY (which is
-> otherwise identified as a BCM54210E), but they didn't seem to help.
-> 
-> What's the status of ethernet support on the Pi 5, is it supposed to
-> work upstream, or are there pieces still missing ?
-> 
+Right, I get confused myself as well. I've been thinking several times about
+inverting those housekeeping masks to work instead with isolated masks. But I'm
+not sure that would make the APIs easier to use.
 
-We have this [1] patch queued up, could you give it a try please.
+> Could we document that to make it a bit more explicit? Maybe something like
+> 
+>   enum hk_type {
+>         /* Set at boot-time via the isolcpus= cmdline argument */
+>         HK_TYPE_DOMAIN_BOOT,
+>         /*
+>          * Updated at runtime via isolated cpusets; strict subset of
+>          * HK_TYPE_DOMAIN_BOOT as it accounts for boot-time isolated CPUs.
+>          */
+>         HK_TYPE_DOMAIN,
+>         ...
+>   }
 
-[1] https://www.spinics.net/lists/kernel/msg5889475.html
+I thought I did already but obviously not. Let me fix that...
 
+Thanks.
 
-
+-- 
+Frederic Weisbecker
+SUSE Labs
 
