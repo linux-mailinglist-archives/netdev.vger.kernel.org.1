@@ -1,145 +1,102 @@
-Return-Path: <netdev+bounces-234531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D69BBC22CF4
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 01:43:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6976FC22CFA
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 01:46:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0DF231A205AC
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 00:43:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B3473B8178
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 00:46:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C54381EBA19;
-	Fri, 31 Oct 2025 00:42:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D680170A37;
+	Fri, 31 Oct 2025 00:46:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="D3nEJglw"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Y0Q2Wgia"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7EDF288D0
-	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 00:42:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB6752AD13
+	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 00:46:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761871377; cv=none; b=atG1xnwafSmiVCXNlXLwOF6nj9H2GrqsX99YGq4fVpjk5cZMcB7gYl5T2hKjjllBHitxL+mimWLdfrs4dl/0KMAR1gK+dDjA33AJgR5CT5+RbhrbdC2HtsDNcPpdwcd7lNnYM5uVkqp4yj9z9wgFEs4s243tDXiYERachGPpfWM=
+	t=1761871588; cv=none; b=VjfXuAx/mR309BGkYVunSMPs3rzQVe+buPfg2zI+W+HdprpfhZslCebdwvFgJ9I016PtsG3aZVNtAr+mUjn2TeLhx5CO3cIRy2S0TRJZX/qk6744uigkha7kQOtaX8MEthnYZE/lm1vXTpIj0ZvYSPQxmVK/tU7fCDxRROgHRss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761871377; c=relaxed/simple;
-	bh=rSxFHkZmPgWQoZ7won3MlelbPJirEj1hGm28ZuyoWSA=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=Woy9CIVSFOYtzFVRF5J+mYBKYkk92R1rFEkwbG0x50XFemWaure1y8jMMqnUmwdIG10PQKAmeKjdhGuzzVzyQxE5uwg0ObI6l6R+yVKkaH2mWbbNcCR8S8DcTN9mVgxiP1icwxNPXxIOwSq05TDLeKvjwojjCXFrWzcUCLHZQxk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=D3nEJglw; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-88033f09ffeso1851576d6.1
-        for <netdev@vger.kernel.org>; Thu, 30 Oct 2025 17:42:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1761871374; x=1762476174; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mm8/Czgf2rsoqnvO84EJe6VKSESDEey9Y9C/B8Bf+lg=;
-        b=D3nEJglwyR07RQHOAehDFqRiVTkIrHXqHn/NUvmXzQ2g8IE9h114UMtj7CmQy69vU5
-         VumRLE47hBU+h6Pryd6fVllBIh4QL+X60bWBcoHXm3lVOgNtpHKB2eE/QviPu61shvvb
-         yjekiDFkhYuBNYKgz54RQ0X2+B2IauP8kRlu7sd4y17zn3Kom334us3QJJHuPczYD/qY
-         ZNcFC9i+kWIVyjd32odsf9Ni4u2IK9fHnWNQS1xWjlmRqMuMX2rPMWDD8e19WT5HCx6Y
-         KMVbdGBwwasp34bXyGsO9AoY0WYIBa9b7KE4Yg5U+SlbpXanuknWBHW98QJE3Pnq8SuI
-         53xA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761871374; x=1762476174;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=mm8/Czgf2rsoqnvO84EJe6VKSESDEey9Y9C/B8Bf+lg=;
-        b=RhN8RkLHM9sYBhVKBpgZcUD2ZLgHXzTGQyxQp3S1yOa4IrsNvtVFLxfJExX8FXZaRQ
-         lEfYXe8FZS9hRpgd+w5tlwQnbhh2IB8nQXy99u2hlHjMQ+Z/GfTeop6T0WnIcAYEYea3
-         zmFYgABPU8oVFi4sjKzHc4La/8rKet9sIgqAtHL9jx4XLfboB9sOvYvMMoPGPXu045vl
-         psGfijnTMz7JeSHL7JZQ2G9N5nksMGZL2hY1hc7BdXp/0oJXc/JAkr/MHXWEAZfwV+ON
-         nL6vXJeErqa22o+sDwaXjAeO2RUyqGkCtOv849S96I0M3QQ7kWBOHfN74Btgut+rYIST
-         FFKg==
-X-Gm-Message-State: AOJu0YyOHL/KI4ZVsfqBMoasm289gaz/FnWkUtNFCphnIJf3hivbM1BK
-	J/fpyCSL61K4BxXuuycUBMycDDkAqmorBxj4tLRzRB0taWk+mwB9fRQduSt/rb6C3puh1p0QggG
-	zrFtk
-X-Gm-Gg: ASbGncsp+5rQQCkOhjGyooZETN8/oNTV5wpCplN3piLizDZ3W3Y6CPDTygTaTQJ9znZ
-	CZTZQ2qGnNomWZwFNOkwaJV4QNZbP8ijTk3ZITQfnf8xQNvYlrJgMJPOUc2qg3Ia1/FRFU0TBbR
-	UQB+w+XjzvIh2IFRkrlJ4XJp+VbwZasDGXnD+ODWGVnYak8b6CFd5pKz/sdDToDb+dcNgVn53Xg
-	xiWQKCrtsP0oJcweY5xzggV/bb06KxfylzCtfVOi7P74+c+PJFgo7gFdQpUvVR8ilaxITwt5sNK
-	s5npksn6rQPAt2Rl8b4NJitSWOT+163r/Crb0TNPnYOjqF9Ly+rZONf7R6AOSsjzP/TaqrS6WnI
-	2xLrH5uQPRJuSiqDGlw5bltsA7Hks7GEBBiHHlBZRW+pF+II/klw6R6mfr+oa6ZXNinNQvr1ylQ
-	AX0RHhA64OZchDWYnQbVZnbFMTh5U8hFtl
-X-Google-Smtp-Source: AGHT+IH22X+673BG3kC+m0RrfvfVBuB6TIMHcwVcFpuDLjKPoInidbys+e5WZ3TTVEDaJysos1xCTA==
-X-Received: by 2002:a05:6214:5004:b0:87f:9e72:4722 with SMTP id 6a1803df08f44-8802f49cec7mr19010996d6.46.1761871374202;
-        Thu, 30 Oct 2025 17:42:54 -0700 (PDT)
-Received: from [10.73.214.168] ([72.29.204.230])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-88036359265sm1624856d6.54.2025.10.30.17.42.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Oct 2025 17:42:53 -0700 (PDT)
-Message-ID: <e25c6c0c-1e2a-48c2-9606-5f51f36afbf0@bytedance.com>
-Date: Thu, 30 Oct 2025 17:42:50 -0700
+	s=arc-20240116; t=1761871588; c=relaxed/simple;
+	bh=omgPPChYsPLF76LKT9QxPTW4WfpM3kWJ1y0NHZ1ZdB4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DPHaKMsylO2juANbiwvN85ZAddmm6nPDV9HG6uOw1sBviNEwvMlIt6/2vDrCwlNHMsLksumGVoFl4458ecDOySQS9J9ePBSFW2NUPiu/9k7qSvPM/lomlYBLm1QInxmYHRw24jjjjgCdAvjpz4hedkrOKPUh6ypvzYTF3leY7Uw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Y0Q2Wgia; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1761871583;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=m8YGS2ySmkbY6H6MGCzUlZeNWLAE5gNYIvcEQl4fPK8=;
+	b=Y0Q2WgiaKvxjefukVyBjSu/seielsrFiL2apyzJflIYdClgfF2T/NMsD6xwE68wueW1P4j
+	R6X9HkCvazs/k0Hk5T6Ds3UsRPBQfn35GK/NeWHnqVUD7eca8jkTgUXyXbSr/nOENzCmP8
+	Q7U1yUarEPOWXL919ypsaaNs9KUSEtE=
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+To: Sudarsana Kalluru <skalluru@marvell.com>,
+	Manish Chopra <manishc@marvell.com>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Richard Cochran <richardcochran@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Simon Horman <horms@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next 0/7] convert drivers to use ndo_hwtstamp callbacks part 3
+Date: Fri, 31 Oct 2025 00:46:00 +0000
+Message-ID: <20251031004607.1983544-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, saeedm@nvidia.com,
- gal@nvidia.com, leonro@nvidia.com, witu@nvidia.com, parav@nvidia.com,
- tariqt@nvidia.com
-From: Zijian Zhang <zijianzhang@bytedance.com>
-Subject: [PATCH net-next] net/mlx5e: Modify mlx5e_xdp_xmit sq selection
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-From: Zijian Zhang <zijianzhang@bytedance.com>
+This patchset converts the rest of ethernet drivers to use ndo callbacks
+instead ioctl to configure and report time stamping. The drivers in part
+3 originally implemented only SIOCSHWTSTAMP command, but converted to
+also provide configuration back to users.
 
-When performing XDP_REDIRECT from one mlnx device to another, using
-smp_processor_id() to select the queue may go out-of-range.
+Vadim Fedorenko (7):
+  bnx2x: convert to use ndo_hwtstamp callbacks
+  net: liquidio: convert to use ndo_hwtstamp callbacks
+  net: liquidio_vf: convert to use ndo_hwtstamp callbacks
+  net: octeon: mgmt: convert to use ndo_hwtstamp callbacks
+  net: thunderx: convert to use ndo_hwtstamp callbacks
+  net: pch_gbe: convert to use ndo_hwtstamp callbacks
+  qede: convert to use ndo_hwtstamp callbacks
 
-Assume eth0 is redirecting a packet to eth1, eth1 is configured
-with only 8 channels, while eth0 has its RX queues pinned to
-higher-numbered CPUs (e.g. CPU 12). When a packet is received on
-such a CPU and redirected to eth1, the driver uses smp_processor_id()
-as the SQ index. Since the CPU ID is larger than the number of queues
-on eth1, the lookup (priv->channels.c[sq_num]) goes out of range and
-the redirect fails.
+ .../net/ethernet/broadcom/bnx2x/bnx2x_main.c  | 53 +++++++++-------
+ .../net/ethernet/cavium/liquidio/lio_main.c   | 50 ++++++---------
+ .../ethernet/cavium/liquidio/lio_vf_main.c    | 48 ++++++--------
+ .../net/ethernet/cavium/octeon/octeon_mgmt.c  | 62 ++++++++++---------
+ .../net/ethernet/cavium/thunder/nicvf_main.c  | 45 ++++++++------
+ .../ethernet/oki-semi/pch_gbe/pch_gbe_main.c  | 40 +++++++-----
+ drivers/net/ethernet/qlogic/qede/qede_main.c  | 22 +------
+ drivers/net/ethernet/qlogic/qede/qede_ptp.c   | 47 +++++++++-----
+ drivers/net/ethernet/qlogic/qede/qede_ptp.h   |  6 +-
+ 9 files changed, 191 insertions(+), 182 deletions(-)
 
-This patch fixes the issue by mapping the CPU ID to a valid channel
-index using modulo arithmetic:
-
-     sq_num = smp_processor_id() % priv->channels.num;
-
-With this change, XDP_REDIRECT works correctly even when the source
-device uses high CPU affinities and the target device has fewer TX
-queues.
-
-Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
----
-  drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c | 6 +-----
-  1 file changed, 1 insertion(+), 5 deletions(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c 
-b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-index 5d51600935a6..61394257c65f 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-@@ -855,11 +855,7 @@ int mlx5e_xdp_xmit(struct net_device *dev, int n, 
-struct xdp_frame **frames,
-  	if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
-  		return -EINVAL;
-
--	sq_num = smp_processor_id();
--
--	if (unlikely(sq_num >= priv->channels.num))
--		return -ENXIO;
--
-+	sq_num = smp_processor_id() % priv->channels.num;
-  	sq = priv->channels.c[sq_num]->xdpsq;
-
-  	for (i = 0; i < n; i++) {
 -- 
-2.20.1
+2.47.3
 
 
