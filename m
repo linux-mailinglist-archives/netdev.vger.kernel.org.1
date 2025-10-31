@@ -1,214 +1,120 @@
-Return-Path: <netdev+bounces-234896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA5DDC28F5E
-	for <lists+netdev@lfdr.de>; Sun, 02 Nov 2025 14:02:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87EF4C28FFB
+	for <lists+netdev@lfdr.de>; Sun, 02 Nov 2025 14:55:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83B5A3AAEE5
-	for <lists+netdev@lfdr.de>; Sun,  2 Nov 2025 13:02:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93ECA3A98A7
+	for <lists+netdev@lfdr.de>; Sun,  2 Nov 2025 13:55:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10B79219E8;
-	Sun,  2 Nov 2025 13:02:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kKpBsPci"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CAB61EA7D2;
+	Sun,  2 Nov 2025 13:55:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2717963CF
-	for <netdev@vger.kernel.org>; Sun,  2 Nov 2025 13:02:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD0EF1F460B
+	for <netdev@vger.kernel.org>; Sun,  2 Nov 2025 13:55:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762088572; cv=none; b=L7Me37U0VbNjIpuvZ1hebA3nj4QXVsRt5jWFQKVnbOoS3OgqpJ28QpUB6Gu2CYxPIQclQ/CJjwYAEunDSPY2RwoSs2pjYmOPBupBX8+TgTR54CmOobxDRwXYPi7Vj4EjkByd2Ms99vjkQVrZE7aojhPCt+g4SwuP8LmFD4S6Fjs=
+	t=1762091728; cv=none; b=k0brkrCNLqz1odhVsRljUMv1p9cHD2+iUcMEGrL0xebCvbW3wVgRYkcpDWmd0101fKLZi5ZIZYmIKI9Tlr0btDeGamYu3aoUfhV3oMnz4MFXIl7GzRaHOF8P+iqdISSBYlHZ8QlYqF1RsFrXlfsfJkkl8gNB2wwGy3y7Kf4S7I8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762088572; c=relaxed/simple;
-	bh=vHtRHt1aeqlb+Q6VqJpLFPdHouXsD44LIjl6xjDRAVc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Am2J4t8nB0IKURv5a+vWZo4Aeikz+nQZ488Qo/tku8KnkCcmqbDdEp6At8pa/KgTTyQPPbcb9rfSHGhmFRv9VOMH9ZFYyKDADZzCzsCO/6MhtlfvPmvTA98Y7o8RkLpAxmYOiIyP9gyoEGPwhuLuQ3jtWPRxeJpPeNUv6n3Dw0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kKpBsPci; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-3ecde0be34eso2849729f8f.1
-        for <netdev@vger.kernel.org>; Sun, 02 Nov 2025 05:02:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762088568; x=1762693368; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HD72NHftHXVw+tLTNBDM4x2/4TZWtcG7mkQZCrIMNLo=;
-        b=kKpBsPci5HzRDRPx+aAG+9qY11gS47kOUuu0xCp6Ip+WbxHO1zXPnRbHJviIRROiV9
-         hvab+CvGUlv4FJtikWub9h/rQIR/mU2JyCi56zi3tWfSkvWTkOIQx3fJDJYX6o5GjNDM
-         W0qdfMQOgdrIhzTkwOlrHOQiCBLxZ8tv6QFqxF14Cz425jk9U/WqKYcxSwaRoE69o0pF
-         1BumJSVAhFGEJTimDzcwDkZCwMWgIF0EDWrOZKQOTna2lX54Ihp9KMH1sbhCMbVHjzzU
-         vyed52RLSKZb6aHL21IJLrMOC6DM/746L/iom0W54keopCZrlTmYbwb28oOjx8qiM1ey
-         Cq5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762088568; x=1762693368;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HD72NHftHXVw+tLTNBDM4x2/4TZWtcG7mkQZCrIMNLo=;
-        b=Y/gpxeoK/OUrWrGqeRoltu0EDZI1/ihT57LEpLbO7oqXiHyyriHJQ4Jt4R5MlSWBhu
-         ae70hQi0uZnBgVx5Tu/zIF4NwOiTOFj4X40FUqt4Zlu01cGp6W9e6tq4jjlCka3x/sQ8
-         4r94W0yN/pfpcxDIfcOOR36orQPshOZ7MWTmKtwr0Bq+WmENNz6o+Bc5wOBfZC3/5ys+
-         M3306K0HkEizonVc3ABgwUbNFepQSChQI2eaFeifAsEJHlpF5jBmSfYT/sh5vOqgXNsj
-         acXksToUVWmKowIwLN36goQmnYZ2t4nZ+HtIyu77Ltax6DZGTESA/sQ5wIahl1gQ2SHw
-         +AUw==
-X-Forwarded-Encrypted: i=1; AJvYcCV+VZwO+55w6CCw74346u81DIOO29qPBMV24gv/Zm3Ajx7jo9pdiAYQ2L4foiK09+FaC1+SdOg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx01MaoPNf/o0y2s7HJOI+25MitzxawmfONYrrs8V6B3gDZ8irv
-	rBLznBbMOqmnRDZVqoWTdI0Yib4HwdOMR2sLeGGUA8WppDs6dZJIPKho
-X-Gm-Gg: ASbGnctrKXk07dHrFsDRyEbtqJcl6//jS9GdjtT+po++a+H7IN06Y/V8NTdkgeELbs6
-	NsKF47nFmgeedHAHxljUCRBuRcrNjTtadiw0t3xjfz6QD+8mVidCA6QLeSea02LsoxWGlfZ0PS5
-	ddFS+iK8MPO+aajtsiQKnn3LLM0zqaBc/oXMBxSdndcL+MtScBHBdvfnCtUEtAjqUhliNHU1Alk
-	7Y3hckp1gvCwjEwKEqAlHwqxJDP07k7ateBJ7Rg2Jt8daJ24MxpXFZy7N5QcGugTI420KMWadFN
-	h1JGit45guKWWnR45th8p5o659SDYqXSG6ZIrLJJeNvFQUFlmyykE0bhEbwKN6WIaGpSg8AnXB9
-	Bne46apjYPa5NBDaKGSBgU8dykMJAvO117Y3BaoZQAmKkM+g0uEzAygNOnYvywh5o+OeiNgiw8O
-	kHosoLGiRADDaFvDxa701TU/wb+sHU8NuOrZd2rm2Jark=
-X-Google-Smtp-Source: AGHT+IFx99j6MA6bT6IJoV6WMQC+CHozQ6CCVzhSdu/MzzBdxZex0pghDWW3pisvjT+EfIJBclR88g==
-X-Received: by 2002:a05:6000:2882:b0:429:c6ba:d94e with SMTP id ffacd0b85a97d-429c6bada73mr4188459f8f.12.1762088568077;
-        Sun, 02 Nov 2025 05:02:48 -0800 (PST)
-Received: from [10.221.203.8] ([165.85.126.46])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47744ff700esm24474605e9.2.2025.11.02.05.02.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 02 Nov 2025 05:02:47 -0800 (PST)
-Message-ID: <44f69955-b566-4fb1-904d-f551046ff2d4@gmail.com>
-Date: Sun, 2 Nov 2025 15:02:45 +0200
+	s=arc-20240116; t=1762091728; c=relaxed/simple;
+	bh=M2IisSCTvrkgv5ctIyTrkxVp3NrBj65m8a0MhyuYjpU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Lr4u0jd+6Vus0yU9XwrxOKiiEXKV16WSaX1wWJysuOuPBnI/jIcMzv1Fst6nIP6Xp8oU/1NfDxm7jgQko1Pnz+6r3RJeYhvnEjBK+4rVachfLqQkxDBVW26t+31l9fPVKRB6Rw42pvV+7cUWtq9c1vuvugJTVRDUVHWxU1wRm6M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vFYXv-0007Xl-0u; Sun, 02 Nov 2025 14:55:03 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vFYXt-006ha3-0A;
+	Sun, 02 Nov 2025 14:55:01 +0100
+Received: from pengutronix.de (unknown [IPv6:2a01:4f8:1c1c:29e9:22:41ff:fe00:1400])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id C5D33494550;
+	Fri, 31 Oct 2025 12:19:54 +0000 (UTC)
+Date: Fri, 31 Oct 2025 13:19:51 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Vincent Mailhol <mailhol@kernel.org>, 
+	Stefan =?utf-8?B?TcOkdGpl?= <stefan.maetje@esd.eu>, socketcan@esd.eu, Manivannan Sadhasivam <mani@kernel.org>, 
+	Thomas Kopp <thomas.kopp@microchip.com>, Oliver Hartkopp <socketcan@hartkopp.net>, 
+	Jimmy Assarsson <extja@kvaser.com>, Axel Forsman <axfo@kvaser.com>, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	Vladimir Oltean <vladimir.oltean@nxp.com>, Kory Maincent <kory.maincent@bootlin.com>, 
+	Jacob Keller <jacob.e.keller@intel.com>
+Subject: Re: [PATCH net-next 0/3] convert can drivers to use ndo_hwtstamp
+ callbacks
+Message-ID: <20251031-fierce-laughing-hummingbird-208a89-mkl@pengutronix.de>
+References: <20251029231620.1135640-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] net/mlx5e: Modify mlx5e_xdp_xmit sq selection
-To: Zijian Zhang <zijianzhang@bytedance.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, saeedm@nvidia.com,
- gal@nvidia.com, leonro@nvidia.com, witu@nvidia.com, parav@nvidia.com,
- tariqt@nvidia.com, hkelam@marvell.com,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- Jesse Brandeburg <jbrandeburg@cloudflare.com>,
- Alexander Duyck <alexander.duyck@gmail.com>,
- Salil Mehta <salil.mehta@huawei.com>
-References: <20251031231038.1092673-1-zijianzhang@bytedance.com>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20251031231038.1092673-1-zijianzhang@bytedance.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="uok4emd47n6jmrxq"
+Content-Disposition: inline
+In-Reply-To: <20251029231620.1135640-1-vadim.fedorenko@linux.dev>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
 
+--uok4emd47n6jmrxq
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net-next 0/3] convert can drivers to use ndo_hwtstamp
+ callbacks
+MIME-Version: 1.0
 
-On 01/11/2025 1:10, Zijian Zhang wrote:
-> When performing XDP_REDIRECT from one mlnx device to another, using
-> smp_processor_id() to select the queue may go out-of-range.
-> 
-> Assume eth0 is redirecting a packet to eth1, eth1 is configured
-> with only 8 channels, while eth0 has its RX queues pinned to
-> higher-numbered CPUs (e.g. CPU 12). When a packet is received on
-> such a CPU and redirected to eth1, the driver uses smp_processor_id()
-> as the SQ index. Since the CPU ID is larger than the number of queues
-> on eth1, the lookup (priv->channels.c[sq_num]) goes out of range and
-> the redirect fails.
-> 
-> This patch fixes the issue by mapping the CPU ID to a valid channel
-> index using modulo arithmetic.
-> 
->      sq_num = smp_processor_id() % priv->channels.num;
-> 
-> With this change, XDP_REDIRECT works correctly even when the source
-> device uses high CPU affinities and the target device has fewer TX
-> queues.
-> 
+On 29.10.2025 23:16:17, Vadim Fedorenko wrote:
+> The patchset converts generic ioctl implementation into a pair of
+> ndo_hwtstamp_get/ndo_hwtstamp_set generic callbacks and replaces
+> callbacks in drivers.
 
-++
+applied to linux-can-next
 
-This was indeed an open issue in XDP_REDIRECT. It was discussed in 
-multiple ML threads and conferences, with Jesper and friends, including 
-in https://netdevconf.info/0x15/session.html?XDP-General-Workshop.
+Thanks,
+Marc
 
-I am not aware of a clear conclusion, seems that things were left for 
-the vendor drivers to decide.
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
 
-Current code keeps things super fast. But I understand the limitation, 
-especially on moderns systems with a large number of cpus.
+--uok4emd47n6jmrxq
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> v2:
-> Suggested by Jakub Kicinski, I add a lock to synchronize TX when
-> xdp redirects packets on the same queue.
-> 
-> Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
-> Reviewed-by: Hariprasad Kelam <hkelam@marvell.com>
-> ---
->   drivers/net/ethernet/mellanox/mlx5/core/en.h      | 3 +++
->   drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c  | 8 +++-----
->   drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 2 ++
->   3 files changed, 8 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-> index 14e3207b14e7..2281154442d9 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-> @@ -516,6 +516,9 @@ struct mlx5e_xdpsq {
->   	/* control path */
->   	struct mlx5_wq_ctrl        wq_ctrl;
->   	struct mlx5e_channel      *channel;
-> +
-> +	/* synchronize simultaneous xdp_xmit on the same ring */
-> +	spinlock_t                 xdp_tx_lock;
->   } ____cacheline_aligned_in_smp;
->   
->   struct mlx5e_xdp_buff {
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-> index 5d51600935a6..6225734b256a 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-> @@ -855,13 +855,10 @@ int mlx5e_xdp_xmit(struct net_device *dev, int n, struct xdp_frame **frames,
->   	if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
->   		return -EINVAL;
->   
-> -	sq_num = smp_processor_id();
-> -
-> -	if (unlikely(sq_num >= priv->channels.num))
-> -		return -ENXIO;
-> -
-> +	sq_num = smp_processor_id() % priv->channels.num;
+-----BEGIN PGP SIGNATURE-----
 
-Modulo is a costly operation.
-A while loop with subtraction would likely converge faster.
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmkEqWQACgkQDHRl3/mQ
+kZyKaAf/dkrC1Ni82GV4fZJYaXVJXi6U1naARUVYLKAvPCoVAem6NU/tGcrd79G1
+gMKlMmStFT/lai3orSbSLvrgFqpFbwOBJ7BtbMJMhGabU8/DJAS+QdsoSw3ADLNN
+6ontAErIFaHHQn55gM3lQhoYvy8D4gMDEGOaPcvkFPx8tglI5BJllKfOjjQ8+eXb
+kpbw1rNmui+yHLWe4YE8MsCrZ4ZpZmjOZB2YuBBF+m39JvCmo60/DyVwciT3tEhK
+2KLh8mX7T9nMSwOTA+QiI3Hvin8QhcZYV9V5WEyZ2Q7xlMlPmK6U1ITxoX7SuuSP
+On7+XGNvkJ1pUsuAHXPj/Z+8/PTTfQ==
+=jOya
+-----END PGP SIGNATURE-----
 
->   	sq = priv->channels.c[sq_num]->xdpsq;
->   
-> +	spin_lock(&sq->xdp_tx_lock);
->   	for (i = 0; i < n; i++) {
->   		struct mlx5e_xmit_data_frags xdptxdf = {};
->   		struct xdp_frame *xdpf = frames[i];
-> @@ -942,6 +939,7 @@ int mlx5e_xdp_xmit(struct net_device *dev, int n, struct xdp_frame **frames,
->   	if (flags & XDP_XMIT_FLUSH)
->   		mlx5e_xmit_xdp_doorbell(sq);
->   
-> +	spin_unlock(&sq->xdp_tx_lock);
->   	return nxmit;
->   }
->   
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> index 9c46511e7b43..ced9eefe38aa 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> @@ -1559,6 +1559,8 @@ static int mlx5e_alloc_xdpsq(struct mlx5e_channel *c,
->   	if (err)
->   		goto err_sq_wq_destroy;
->   
-> +	spin_lock_init(&sq->xdp_tx_lock);
-> +
->   	return 0;
->   
->   err_sq_wq_destroy:
-
+--uok4emd47n6jmrxq--
 
