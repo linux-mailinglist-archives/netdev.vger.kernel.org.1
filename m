@@ -1,45 +1,47 @@
-Return-Path: <netdev+bounces-234532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6976FC22CFA
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 01:46:33 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1C85C22CFD
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 01:46:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B3473B8178
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 00:46:32 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id ABB1B4E3BAF
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 00:46:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D680170A37;
-	Fri, 31 Oct 2025 00:46:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5666B1DE4CD;
+	Fri, 31 Oct 2025 00:46:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Y0Q2Wgia"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="H0SqZF7a"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB6752AD13
-	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 00:46:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 028D714F9FB
+	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 00:46:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761871588; cv=none; b=VjfXuAx/mR309BGkYVunSMPs3rzQVe+buPfg2zI+W+HdprpfhZslCebdwvFgJ9I016PtsG3aZVNtAr+mUjn2TeLhx5CO3cIRy2S0TRJZX/qk6744uigkha7kQOtaX8MEthnYZE/lm1vXTpIj0ZvYSPQxmVK/tU7fCDxRROgHRss=
+	t=1761871589; cv=none; b=ZQVqlEZ8Sg67WeNXyRH19LDAZ3ZqmbEzdszfYGBwwrpVpMblu5D66y654iLKHvbOedD8xtKsnSH8l0wzvkIyjLjIgUsHRVMuiAoppCQAoCFUS8he3a6RTOdVtFylxjIpEwo/0a8wp1+C+CzukEARwKsivvI/WZVcmpi5Nr5pb48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761871588; c=relaxed/simple;
-	bh=omgPPChYsPLF76LKT9QxPTW4WfpM3kWJ1y0NHZ1ZdB4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DPHaKMsylO2juANbiwvN85ZAddmm6nPDV9HG6uOw1sBviNEwvMlIt6/2vDrCwlNHMsLksumGVoFl4458ecDOySQS9J9ePBSFW2NUPiu/9k7qSvPM/lomlYBLm1QInxmYHRw24jjjjgCdAvjpz4hedkrOKPUh6ypvzYTF3leY7Uw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Y0Q2Wgia; arc=none smtp.client-ip=91.218.175.185
+	s=arc-20240116; t=1761871589; c=relaxed/simple;
+	bh=yRsj2a3NcHy0JtJFRHd2k+wWTntMY1lMgd88flAcQRI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=OjM8U4juOMzDHBSgEim81MNj4aJQZleTUZVM9b19SRGJ5hLB0saGF7L35dv0euguvOP9O31JNWCl4P2VXmkCd2h3kUWO1OFlxukc4x7ypWYAP38IexSwpjKOoZkq72LeIunme/SuP9t89ZJhhgdOoXDEyWcmsW+n46vWhLZBdp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=H0SqZF7a; arc=none smtp.client-ip=91.218.175.183
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761871583;
+	t=1761871584;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=m8YGS2ySmkbY6H6MGCzUlZeNWLAE5gNYIvcEQl4fPK8=;
-	b=Y0Q2WgiaKvxjefukVyBjSu/seielsrFiL2apyzJflIYdClgfF2T/NMsD6xwE68wueW1P4j
-	R6X9HkCvazs/k0Hk5T6Ds3UsRPBQfn35GK/NeWHnqVUD7eca8jkTgUXyXbSr/nOENzCmP8
-	Q7U1yUarEPOWXL919ypsaaNs9KUSEtE=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=si8JuesykwNTQ75BJSJ2CS/pdGFJ5+vu/w1dHHvpjM0=;
+	b=H0SqZF7aQSSuQecQEqG1MaZhWIctlVe4UinWV3RMRyRmHgcQAkieVT3BVeP7i9HsIJqGGs
+	d/HJKY6PCeyHURCJfKmM/ftyo0z6fCCCzeX2Fic26pwDrZ74yNv0gBYZ+KXHge7e4QEtXt
+	w1HnTmbVpvrkdOSypNXwVYlV1Bnt1t8=
 From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 To: Sudarsana Kalluru <skalluru@marvell.com>,
 	Manish Chopra <manishc@marvell.com>,
@@ -59,9 +61,11 @@ Cc: Richard Cochran <richardcochran@gmail.com>,
 	Kory Maincent <kory.maincent@bootlin.com>,
 	linux-arm-kernel@lists.infradead.org,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next 0/7] convert drivers to use ndo_hwtstamp callbacks part 3
-Date: Fri, 31 Oct 2025 00:46:00 +0000
-Message-ID: <20251031004607.1983544-1-vadim.fedorenko@linux.dev>
+Subject: [PATCH net-next 1/7] bnx2x: convert to use ndo_hwtstamp callbacks
+Date: Fri, 31 Oct 2025 00:46:01 +0000
+Message-ID: <20251031004607.1983544-2-vadim.fedorenko@linux.dev>
+In-Reply-To: <20251031004607.1983544-1-vadim.fedorenko@linux.dev>
+References: <20251031004607.1983544-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,31 +75,113 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-This patchset converts the rest of ethernet drivers to use ndo callbacks
-instead ioctl to configure and report time stamping. The drivers in part
-3 originally implemented only SIOCSHWTSTAMP command, but converted to
-also provide configuration back to users.
+The driver implemented SIOCSHWTSTAMP ioctl command only, but at the same
+time it has configuration stored in a private structure. Implement both
+ndo_hwtstamp_set and ndo_hwtstamp_get callback using stored info.
 
-Vadim Fedorenko (7):
-  bnx2x: convert to use ndo_hwtstamp callbacks
-  net: liquidio: convert to use ndo_hwtstamp callbacks
-  net: liquidio_vf: convert to use ndo_hwtstamp callbacks
-  net: octeon: mgmt: convert to use ndo_hwtstamp callbacks
-  net: thunderx: convert to use ndo_hwtstamp callbacks
-  net: pch_gbe: convert to use ndo_hwtstamp callbacks
-  qede: convert to use ndo_hwtstamp callbacks
+Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+---
+ .../net/ethernet/broadcom/bnx2x/bnx2x_main.c  | 53 +++++++++++--------
+ 1 file changed, 31 insertions(+), 22 deletions(-)
 
- .../net/ethernet/broadcom/bnx2x/bnx2x_main.c  | 53 +++++++++-------
- .../net/ethernet/cavium/liquidio/lio_main.c   | 50 ++++++---------
- .../ethernet/cavium/liquidio/lio_vf_main.c    | 48 ++++++--------
- .../net/ethernet/cavium/octeon/octeon_mgmt.c  | 62 ++++++++++---------
- .../net/ethernet/cavium/thunder/nicvf_main.c  | 45 ++++++++------
- .../ethernet/oki-semi/pch_gbe/pch_gbe_main.c  | 40 +++++++-----
- drivers/net/ethernet/qlogic/qede/qede_main.c  | 22 +------
- drivers/net/ethernet/qlogic/qede/qede_ptp.c   | 47 +++++++++-----
- drivers/net/ethernet/qlogic/qede/qede_ptp.h   |  6 +-
- 9 files changed, 191 insertions(+), 182 deletions(-)
-
+diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
+index f0f05d7315ac..289b1f6b42d0 100644
+--- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
++++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
+@@ -308,8 +308,11 @@ static int bnx2x_set_storm_rx_mode(struct bnx2x *bp);
+ /****************************************************************************
+ * General service functions
+ ****************************************************************************/
+-
+-static int bnx2x_hwtstamp_ioctl(struct bnx2x *bp, struct ifreq *ifr);
++static int bnx2x_hwtstamp_set(struct net_device *dev,
++			      struct kernel_hwtstamp_config *config,
++			      struct netlink_ext_ack *extack);
++static int bnx2x_hwtstamp_get(struct net_device *dev,
++			      struct kernel_hwtstamp_config *config);
+ 
+ static void __storm_memset_dma_mapping(struct bnx2x *bp,
+ 				       u32 addr, dma_addr_t mapping)
+@@ -12813,14 +12816,9 @@ static int bnx2x_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
+ 	if (!netif_running(dev))
+ 		return -EAGAIN;
+ 
+-	switch (cmd) {
+-	case SIOCSHWTSTAMP:
+-		return bnx2x_hwtstamp_ioctl(bp, ifr);
+-	default:
+-		DP(NETIF_MSG_LINK, "ioctl: phy id 0x%x, reg 0x%x, val_in 0x%x\n",
+-		   mdio->phy_id, mdio->reg_num, mdio->val_in);
+-		return mdio_mii_ioctl(&bp->mdio, mdio, cmd);
+-	}
++	DP(NETIF_MSG_LINK, "ioctl: phy id 0x%x, reg 0x%x, val_in 0x%x\n",
++	   mdio->phy_id, mdio->reg_num, mdio->val_in);
++	return mdio_mii_ioctl(&bp->mdio, mdio, cmd);
+ }
+ 
+ static int bnx2x_validate_addr(struct net_device *dev)
+@@ -13036,6 +13034,8 @@ static const struct net_device_ops bnx2x_netdev_ops = {
+ 	.ndo_get_phys_port_id	= bnx2x_get_phys_port_id,
+ 	.ndo_set_vf_link_state	= bnx2x_set_vf_link_state,
+ 	.ndo_features_check	= bnx2x_features_check,
++	.ndo_hwtstamp_get	= bnx2x_hwtstamp_get,
++	.ndo_hwtstamp_set	= bnx2x_hwtstamp_set,
+ };
+ 
+ static int bnx2x_init_dev(struct bnx2x *bp, struct pci_dev *pdev,
+@@ -15350,31 +15350,40 @@ int bnx2x_configure_ptp_filters(struct bnx2x *bp)
+ 	return 0;
+ }
+ 
+-static int bnx2x_hwtstamp_ioctl(struct bnx2x *bp, struct ifreq *ifr)
++static int bnx2x_hwtstamp_set(struct net_device *dev,
++			      struct kernel_hwtstamp_config *config,
++			      struct netlink_ext_ack *extack)
+ {
+-	struct hwtstamp_config config;
++	struct bnx2x *bp = netdev_priv(dev);
+ 	int rc;
+ 
+-	DP(BNX2X_MSG_PTP, "HWTSTAMP IOCTL called\n");
+-
+-	if (copy_from_user(&config, ifr->ifr_data, sizeof(config)))
+-		return -EFAULT;
++	DP(BNX2X_MSG_PTP, "HWTSTAMP SET called\n");
+ 
+ 	DP(BNX2X_MSG_PTP, "Requested tx_type: %d, requested rx_filters = %d\n",
+-	   config.tx_type, config.rx_filter);
++	   config->tx_type, config->rx_filter);
+ 
+ 	bp->hwtstamp_ioctl_called = true;
+-	bp->tx_type = config.tx_type;
+-	bp->rx_filter = config.rx_filter;
++	bp->tx_type = config->tx_type;
++	bp->rx_filter = config->rx_filter;
+ 
+ 	rc = bnx2x_configure_ptp_filters(bp);
+ 	if (rc)
+ 		return rc;
+ 
+-	config.rx_filter = bp->rx_filter;
++	config->rx_filter = bp->rx_filter;
++
++	return 0;
++}
+ 
+-	return copy_to_user(ifr->ifr_data, &config, sizeof(config)) ?
+-		-EFAULT : 0;
++static int bnx2x_hwtstamp_get(struct net_device *dev,
++			      struct kernel_hwtstamp_config *config)
++{
++	struct bnx2x *bp = netdev_priv(dev);
++
++	config->rx_filter = bp->rx_filter;
++	config->tx_type = bp->tx_type;
++
++	return 0;
+ }
+ 
+ /* Configures HW for PTP */
 -- 
 2.47.3
 
