@@ -1,56 +1,57 @@
-Return-Path: <netdev+bounces-234677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 653F9C2602F
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 17:09:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A711C260DD
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 17:16:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1229E351780
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 16:09:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03FE2188E6A0
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 16:09:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92EA42F619F;
-	Fri, 31 Oct 2025 16:05:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1F6A2F7475;
+	Fri, 31 Oct 2025 16:05:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MZfkb0Wc"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="bek9I4ye"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFC3A2F6184;
-	Fri, 31 Oct 2025 16:05:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDA8B2F60A1
+	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 16:05:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761926749; cv=none; b=uxjlBFFixiUGtzqhXnsKvyR9TWG7XWwNZSSmGivsHSbszD1Qj5TqXrCu8s4m2iKQU5vLiB/ICCQESDit4RsS5odsBqpA5o9fPYzBcBgBqwXCkd+YS/ekUQQVdaT8KVn6VydzdX8HmCn+TYs4uUqlhy/iSw8+JwT4g86R+0MbEW0=
+	t=1761926750; cv=none; b=Cd97cUQiUjj2Odal3X+QIu6Dc7jBtOaT3kbiuaWXsGtfgDFrpG6vkDkE6UHH2/mEnRCzdXk7QyWqPf6cJZTryYhLKgz+bo+aKeEPLC8HuRLgH1v6AoFzgtI5vXrn91VL5KPfw5/69FNFEK7dlirCwKjeysohNQoNshuxxDMkKzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761926749; c=relaxed/simple;
-	bh=LEr3x9tuS8yTEFBK3IKGOXgNrYsYHrFbpXnESMfGzLI=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ph4XM2+kjhwEpD0u9bo8Z7LnFbvZvRfI3iBJypArqNsqhtMCV2C/YpeObDOzY0pdFtu7JYkZf61JBRgKE0f00PDkWvYGjgKetXnIT0VxLGBtf4zQSLWKlNwdMDLA3q+V7OUSo+ZWp65MuU4+IklwrDNmfwNTWhr7f7TFHIgVVQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MZfkb0Wc; arc=none smtp.client-ip=185.246.85.4
+	s=arc-20240116; t=1761926750; c=relaxed/simple;
+	bh=3d1DuZvw7GhJQXpyQHyp6TlWMnFB6JacNbOWw4apjd4=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=CPtQaJ1pYmRsU87mVq6bwSXoGWwVTxIOsOHNq0Sy7w+kcTKtzXORll2E5Kx/ac98d9+43KXnGdI18eSGdvJFi3VbJ/r908W2tIizYSzbQYYDmswuHL+cbLoQjdWKEcXfg4wHus3e1FL2ger+OuXAUOWNL5JrbWduITkeHPI6pfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=bek9I4ye; arc=none smtp.client-ip=185.246.84.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 075564E41442;
-	Fri, 31 Oct 2025 16:05:45 +0000 (UTC)
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 4C30F1A17AA;
+	Fri, 31 Oct 2025 16:05:46 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id C0CF060704;
-	Fri, 31 Oct 2025 16:05:44 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2657911818067;
-	Fri, 31 Oct 2025 17:05:38 +0100 (CET)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 208B860704;
+	Fri, 31 Oct 2025 16:05:46 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2F1381181806A;
+	Fri, 31 Oct 2025 17:05:44 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1761926743; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding; bh=OPazbeDRT0Q5f0epnk2G/F59cesXNh/6rt5ipUikWIo=;
-	b=MZfkb0WcNcDhX9hcGZEqghVJpZ5lzSbRMMJP3pGdqVFh4ditWCfqFsT+hvHirogN/kouNG
-	fC97ZueUOAVpM99gB9v/1RFYcOhJDhg4rONTvOpNTyUutEHjkh+8FizOfvWcjRN19k5Zgl
-	TFat2KiRIEUtYpH8b5rAPMffp0O/HdEUQ1T4dpbt0Mre7X8ZAFGeuThxPzBdQfyYEK4FXC
-	/2K2X0TpIV1EEe8qkI/nDWJHmx5r3d6BWW4UbtjtM5ZWxZIvmlRY1YjrqpQt6A3f/ztLzb
-	EVnB9Yk2W/Sdu/C53t2/QJMQY+vLsiTWSZ3u+hxV5PMxlyBKUWlzlLpBd42IJw==
+	t=1761926745; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=QEtK9IwqBQGH9Hqj1vjCH38ZZQWDdIg1bt9DARfiyGU=;
+	b=bek9I4ye8XrgktPI+be1SY1Gv6X8TIGjIAnNhDRVaSs/YT3JULnaRG/i7o16HSsbyRs5og
+	OLbcx4IXiE75VYukU8PVkyaPluSVjee+U72SMAmZUke+6BTc+RWKQ42W3F9ZWIv2CqDvld
+	lO/uVRo+VFQ0hU5bZzODhQSahulTm+F5rI/kmzoWbl/YuFMSh5YMEesIr7+Ml6aI0IwntK
+	gsy4V9P3wBauiKMOF8SQJrG3uWCTFZlGPYGJb5rEK7n5kmegwXcQy/j8JzU9veYIgYbUTo
+	e4NQM9ELwQk3HGAzpkxNV/Hl+HKVNE1cuevkYVx4aEFou/3etDtWrrpnhbtNvg==
 From: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-Subject: [PATCH net 0/3] net: dsa: microchip: Fix resource releases in
- error path
-Date: Fri, 31 Oct 2025 17:05:37 +0100
-Message-Id: <20251031-ksz-fix-v1-0-7e46de999ed1@bootlin.com>
+Date: Fri, 31 Oct 2025 17:05:38 +0100
+Subject: [PATCH net 1/3] net: dsa: microchip: Fix checks on
+ irq_find_mapping()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,10 +60,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAFHeBGkC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
- vPSU3UzU4B8JSMDI1NDA2ND3eziKt20zArdlCRjE9OUNHMzY9M0JaDqgqJUoDDYpGilvNQSpdj
- aWgDbBj6aXgAAAA==
-X-Change-ID: 20251031-ksz-fix-db345df7635f
+Message-Id: <20251031-ksz-fix-v1-1-7e46de999ed1@bootlin.com>
+References: <20251031-ksz-fix-v1-0-7e46de999ed1@bootlin.com>
+In-Reply-To: <20251031-ksz-fix-v1-0-7e46de999ed1@bootlin.com>
 To: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com, 
  Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -76,32 +76,63 @@ Cc: Pascal Eberhard <pascal.eberhard@se.com>,
 X-Mailer: b4 0.14.2
 X-Last-TLS-Session-Version: TLSv1.3
 
-Hi all,
+irq_find_mapping() returns a positive IRQ number or 0 if no IRQ is found
+but it never returns a negative value. However, on each
+irq_find_mapping() call, we verify that the returned value isn't
+negative.
 
-I worked on adding PTP support for the KSZ8463. While doing so, I ran
-into a few bugs in the resource release process that occur when things go
-wrong arount IRQ initialization.
-
-This small series fixes those bugs.
-
-The next series, which will add the PTP support, depend on this one.
+Fix the irq_find_mapping() checks to enter error paths when 0 is
+returned. Return -EINVAL in such cases.
 
 Signed-off-by: Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
 ---
-Bastien Curutchet (Schneider Electric) (3):
-      net: dsa: microchip: Fix checks on irq_find_mapping()
-      net: dsa: microchip: Ensure a ksz_irq is initialized before freeing it
-      net: dsa: microchip: Immediately assing IRQ numbers
+ drivers/net/dsa/microchip/ksz_common.c | 8 ++++----
+ drivers/net/dsa/microchip/ksz_ptp.c    | 4 ++--
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
- drivers/net/dsa/microchip/ksz_common.c | 14 ++++++++------
- drivers/net/dsa/microchip/ksz_ptp.c    | 17 +++++++++--------
- 2 files changed, 17 insertions(+), 14 deletions(-)
----
-base-commit: cd2f741f5aec1043b707070e7ea024e646262277
-change-id: 20251031-ksz-fix-db345df7635f
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index a962055bfdbd8fbfc135b2dec73c222a213985c4..3a4516d32aa5f99109853ed400e64f8f7e2d8016 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -2583,8 +2583,8 @@ static int ksz_irq_phy_setup(struct ksz_device *dev)
+ 
+ 			irq = irq_find_mapping(dev->ports[port].pirq.domain,
+ 					       PORT_SRC_PHY_INT);
+-			if (irq < 0) {
+-				ret = irq;
++			if (!irq) {
++				ret = -EINVAL;
+ 				goto out;
+ 			}
+ 			ds->user_mii_bus->irq[phy] = irq;
+@@ -2948,8 +2948,8 @@ static int ksz_pirq_setup(struct ksz_device *dev, u8 p)
+ 	snprintf(pirq->name, sizeof(pirq->name), "port_irq-%d", p);
+ 
+ 	pirq->irq_num = irq_find_mapping(dev->girq.domain, p);
+-	if (pirq->irq_num < 0)
+-		return pirq->irq_num;
++	if (!pirq->irq_num)
++		return -EINVAL;
+ 
+ 	return ksz_irq_common_setup(dev, pirq);
+ }
+diff --git a/drivers/net/dsa/microchip/ksz_ptp.c b/drivers/net/dsa/microchip/ksz_ptp.c
+index 35fc21b1ee48a47daa278573bfe8749c7b42c731..c8bfbe5e2157323ecf29149d1907b77e689aa221 100644
+--- a/drivers/net/dsa/microchip/ksz_ptp.c
++++ b/drivers/net/dsa/microchip/ksz_ptp.c
+@@ -1139,8 +1139,8 @@ int ksz_ptp_irq_setup(struct dsa_switch *ds, u8 p)
+ 		irq_create_mapping(ptpirq->domain, irq);
+ 
+ 	ptpirq->irq_num = irq_find_mapping(port->pirq.domain, PORT_SRC_PTP_INT);
+-	if (ptpirq->irq_num < 0) {
+-		ret = ptpirq->irq_num;
++	if (!ptpirq->irq_num) {
++		ret = -EINVAL;
+ 		goto out;
+ 	}
+ 
 
-Best regards,
 -- 
-Bastien Curutchet (Schneider Electric) <bastien.curutchet@bootlin.com>
+2.51.0
 
 
