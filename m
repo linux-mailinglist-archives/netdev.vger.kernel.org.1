@@ -1,113 +1,146 @@
-Return-Path: <netdev+bounces-234634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A6FDC24D15
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 12:43:38 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F72CC24D30
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 12:45:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E4773AE350
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 11:43:37 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 545E54EEF04
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 11:45:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE33B346A1B;
-	Fri, 31 Oct 2025 11:43:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7F122236E1;
+	Fri, 31 Oct 2025 11:45:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dGblSvdG"
+	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="XIfLDkUs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2207E2405E7
-	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 11:43:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C2FE17C9E;
+	Fri, 31 Oct 2025 11:45:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761911014; cv=none; b=J7cVcDgD3clMtlikWjA+L08LSZjFdKPy4XTeZlFekEqz7/eAnEm/TTS6PYo6bDp4c4tIaoV0TX3Rx8v0603EnSj4I9OyRamjohS1nUiuVvPe0MlGM7yRpC5DThBGqNqDI83j8mM6tPmJ+y4w0tzdkcVTy7Zg0gKjhqL9CYbk//E=
+	t=1761911139; cv=none; b=ekiZl8JOxgggi988EFuPOuDzXz/cS1e+CCzDTECvu33XHSTt5XSd0nEJVCO5mZGqtXJSbLzIq02xpB9RYKvqSvkyhzABRHY1W45gdklYP6PCs7l88Xnt2rvwOPOqOAg18LaPvwAihL/pi7R0AsSqZiXs3vIKm2HXxJNMVwDc3i0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761911014; c=relaxed/simple;
-	bh=k0pT21Suqty5kqcNkS8z/yAUh7rDNHOHITor2PsYU0o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RWVAOjhlJw46m2nVG6nE0uRHYnjUfBiCgFAnAd/vRHa7K1fHb0aT2JJfoqk3nrdaE1b2LrcGCej08ybpdDUp+DCpYg7o5mIPHZjz6RnCTV6/ABQqUCkN69ra0CUuwkvCAGSIY3tuDf0GA0SGBCA34HJvtruTA0hZ4Oebcv8gt7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dGblSvdG; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4ecf0336b61so20621351cf.0
-        for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 04:43:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761911012; x=1762515812; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=k0pT21Suqty5kqcNkS8z/yAUh7rDNHOHITor2PsYU0o=;
-        b=dGblSvdGkpvfyVKTVnA5bnHMrg3ACU+c58ko/vcwXNzJtzbEOhqVgmua9WiEZn5HrO
-         wdBZgu+Dh47PwPN6p3dzC8RW4+t7l2SeaSavICm1SfhJgHxwu7bVvX09TGTWQhzy7neo
-         mV2d0pOhtvWgCBG23l30ID9SuG85AcJIhSFrUcHbXC/7NKYe+w/Yc9qAPsC9d1OEs4W0
-         lKqhrC5qO9SI24JFkPLN8lvsGZZZ3W4B02MdwbqXAB8RoigFsGlVMt510wM/P8LmqmBe
-         M/rfipCFpeY10oUJzFyRDKgzCZPcvTaLkbyP21+FGwgnZg88uxdFmg0RiRmZdhWKcMNd
-         sDuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761911012; x=1762515812;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=k0pT21Suqty5kqcNkS8z/yAUh7rDNHOHITor2PsYU0o=;
-        b=bF7nshk7fVXx9ZmMglML0u4xneDLbBdHSYKLv9OxeykY0htAI60fKAdKzs5GdnvoMz
-         9nLxBlBBFLLReCInaVcJODIdNuGPfWZ//bg+LsHT6tZAeTp+YqJJu+IStpTZnM4Iln/c
-         ++1aZ7mShTDu517OvcbLrq818DPyjHtfX9otycRX7ZgE8jERh0yKLRhLdfOK4Fs9ZUJG
-         YlotdQuKAGDDoSn83NYobt/enyIhlWv+LoMWn3qEz1/MbhZA9Kfarmb1LNGLUkrBNiGp
-         sFWinHH1474hathtE5RDDMVFQJj7ZC5TNATw4i8oQ38Zb1xbGBpz0k0B9vVK2wWadJ7D
-         B8gg==
-X-Gm-Message-State: AOJu0YxCFMhZRX+LFqDVMO0dg6oa/X++6tl1+x3s8keXWpp5mjdXw/DM
-	DzZupnlFJLW/paBs20Lp2I+oznPOHzJd7NCeHZG5EI7kcdHWXk5Uymb8JpzxJRDpAADWuRbPx/H
-	X29zqUJW3Bik4O/sNHw7J6iMflxgt3oKm6ydtqSCV
-X-Gm-Gg: ASbGnct2wr6KIyHMBsckLsGkmXGDa+f3Z4zyiKLtUYB6KElRZ2PNJRn2p/Yse3BeEJU
-	k4S/xAyTQb3dlhiPXsDUN+wIxPZIS8XuYdrrXQwppjh3HdgbgcuGd7cL/xp2A8jSSWxwhfb6QCW
-	L9OOcvNrLpJ8dgdi6UiBc761+cNNDN93U3T/lIrktj/pXTFauRv65DQ0vMmPzPy4qfWUtzUjL0c
-	TiTaiHzoOc4IaqbWUaAbvKO+dFouKLPPVdwHF1rgE/dIJKftC3yZLmAiv0k50A/RUbaSXU=
-X-Google-Smtp-Source: AGHT+IFqoco0hzxAVFJzQW9vvGOxtKNFjwqUfq6YEZCPkqLEXs5pzducXdEoOItsXHrnpiPGl3E0ulPY9KO1h+rwozs=
-X-Received: by 2002:ac8:5ccf:0:b0:4e8:92ff:753 with SMTP id
- d75a77b69052e-4ed30f57539mr41715721cf.24.1761911011648; Fri, 31 Oct 2025
- 04:43:31 -0700 (PDT)
+	s=arc-20240116; t=1761911139; c=relaxed/simple;
+	bh=R6yONYYYsqby242jh6TH+ABfAPUopUW31yFooS58XAk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t/Z3uHWWC2EH5ZpW3xRui9Xw/+GVC5UPAmizuOTYrURAiyDr1yX4jTqYEaZPCggzthxbxu1+KbjUTo2LDEzrntwwfc7CUPBitgwS9iyaABdIxeavB0tKIPIENKf23H3zFP4Jz7UCzUV1w3Eyoc/qhQ8ISyL79pa6uVxoI2mA3WE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=XIfLDkUs; arc=none smtp.client-ip=213.167.242.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ideasonboard.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
+Received: from pendragon.ideasonboard.com (unknown [193.209.96.36])
+	by perceval.ideasonboard.com (Postfix) with UTF8SMTPSA id DC9FE15D2;
+	Fri, 31 Oct 2025 12:43:41 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
+	s=mail; t=1761911022;
+	bh=R6yONYYYsqby242jh6TH+ABfAPUopUW31yFooS58XAk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XIfLDkUs0wkpgMMux9UqqDbnkm3yB/emjfS2nTgpYyjivkfBfEhUlVkxOdphP5JnS
+	 AV0EwrKekY63YdHMRBuY98sFA/lxs00uwZgWT4lOCGm/v7RU5/MNXFHn5CxdLjrwhk
+	 DA3kg5kliVvmH6PoqK/0Y6i8/O1yo1nq0CFGAHQA=
+Date: Fri, 31 Oct 2025 13:45:18 +0200
+From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+To: Stanimir Varbanov <svarbanov@suse.de>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-rpi-kernel@lists.infradead.org,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrea della Porta <andrea.porta@suse.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Phil Elwell <phil@raspberrypi.com>,
+	Jonathan Bell <jonathan@raspberrypi.com>,
+	Dave Stevenson <dave.stevenson@raspberrypi.com>
+Subject: Re: [PATCH v2 0/5] dd ethernet support for RPi5
+Message-ID: <20251031114518.GA17287@pendragon.ideasonboard.com>
+References: <20250822093440.53941-1-svarbanov@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <E3B93E31-3C03-4DAF-A9ED-69523A82E583@akamai.com>
-In-Reply-To: <E3B93E31-3C03-4DAF-A9ED-69523A82E583@akamai.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 31 Oct 2025 04:43:19 -0700
-X-Gm-Features: AWmQ_bmmZBWAMIeb4sFAXi3iiVp0dUi9MjSBNHnxdOgRQ2LAEqP1A9RlP2D3bb8
-Message-ID: <CANn89iJQ_Hx_T7N6LPr2Qt-_O2KZ3GPgWFtywJBvjjTQvGwy2Q@mail.gmail.com>
-Subject: Re: skb_attempt_defer_free and reference counting
-To: "Hudson, Nick" <nhudson@akamai.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250822093440.53941-1-svarbanov@suse.de>
 
-On Fri, Oct 31, 2025 at 4:04=E2=80=AFAM Hudson, Nick <nhudson@akamai.com> w=
-rote:
->
-> Hi,
->
-> I=E2=80=99ve been looking at using skb_attempt_defer_free and had a quest=
-ion about the skb reference counting.
->
-> The existing reference release for any skb handed to skb_attempt_defer_fr=
-ee is done in skb_defer_free_flush (via napi_consume_skb). However, it seem=
-s to me that calling skb_attempt_defer_free on the same skb to drop the mul=
-tiple references is problematic as, if the defer_list isn=E2=80=99t service=
-d between the calls, the list gets corrupted. That is, the skb can=E2=80=99=
-t appear on the list twice.
->
-> Would it be possible to move the reference count drop into skb_attempt_de=
-fer_free and only add the skb to the list on last reference drop?
+Hi Stan,
 
-We do not plan using this helper for arbitrary skbs, but ones fully
-owned by TCP and UDP receive paths.
+On Fri, Aug 22, 2025 at 12:34:35PM +0300, Stanimir Varbanov wrote:
+> Hello,
+> 
+> Changes in v2:
+>  - In 1/5 updates according to review comments (Nicolas)
+>  - In 1/5 added Fixes tag (Nicolas)
+>  - Added Reviewed-by and Acked-by tags.
+> 
+> v1 can found at [1].
+> 
+> Comments are welcome!
 
-skb_share_check() must have been called before reaching them.
+I'm very happy to see support for Raspberry Pi 5 progressing fast
+upstream.
 
-In any case using skb->next could be problematic with shared skb.
+I've tested the latest mainline kernel (v6.18-rc3) that includes this
+series (except for 1/5 that is replaced by
+https://lore.kernel.org/all/20250820-macb-fixes-v4-0-23c399429164@bootlin.com/
+as far as I understand). The ethernet controller is successfully
+detected, and so is the PHY. Link status seems to work fine too, but
+data doesn't seem to go through when the kernel tries to get a DHCP
+address (for NFS root). Here's the end of the kernel log (with the
+messages related to the USB controller stripped out):
+
+[    0.896779] rp1_pci 0002:01:00.0: assign IRQ: got 27
+[    0.896809] rp1_pci 0002:01:00.0: enabling device (0000 -> 0002)
+[    0.896840] rp1_pci 0002:01:00.0: enabling bus mastering
+[    0.931874] macb 1f00100000.ethernet: invalid hw address, using random
+[    0.944448] macb 1f00100000.ethernet eth0: Cadence GEM rev 0x00070109 at 0x1f00100000 irq 95 (da:2e:6d:9d:52:a4)
+[    0.989067] macb 1f00100000.ethernet eth0: PHY [1f00100000.ethernet-ffffffff:01] driver [Broadcom BCM54210E] (irq=POLL)
+[    0.989272] macb 1f00100000.ethernet eth0: configuring for phy/rgmii-id link mode
+[    0.991271] macb 1f00100000.ethernet: gem-ptp-timer ptp clock registered.
+[    4.039490] macb 1f00100000.ethernet eth0: Link is Up - 1Gbps/Full - flow control tx
+[    4.062589] Sending DHCP requests .....
+[   40.902771] macb 1f00100000.ethernet eth0: Link is Down
+[   43.975334] macb 1f00100000.ethernet eth0: Link is Up - 1Gbps/Full - flow control tx
+
+I've tried porting patches to drivers/net/phy/broadcom.c from the
+Raspberry Pi kernel to specifically support the BCM54213PE PHY (which is
+otherwise identified as a BCM54210E), but they didn't seem to help.
+
+What's the status of ethernet support on the Pi 5, is it supposed to
+work upstream, or are there pieces still missing ?
+
+> [1] www.spinics.net/lists/netdev/msg1115266.html
+> 
+> Dave Stevenson (2):
+>   dt-bindings: net: cdns,macb: Add compatible for Raspberry Pi RP1
+>   net: cadence: macb: Add support for Raspberry Pi RP1 ethernet
+>     controller
+> 
+> Stanimir Varbanov (3):
+>   net: cadence: macb: Set upper 32bits of DMA ring buffer
+>   arm64: dts: rp1: Add ethernet DT node
+>   arm64: dts: broadcom: Enable RP1 ethernet for Raspberry Pi 5
+> 
+>  .../devicetree/bindings/net/cdns,macb.yaml     |  1 +
+>  .../boot/dts/broadcom/bcm2712-rpi-5-b.dts      | 18 ++++++++++++++++++
+>  arch/arm64/boot/dts/broadcom/rp1-common.dtsi   | 16 ++++++++++++++++
+>  drivers/net/ethernet/cadence/macb_main.c       | 18 +++++++++++++++++-
+>  4 files changed, 52 insertions(+), 1 deletion(-)
+
+-- 
+Regards,
+
+Laurent Pinchart
 
