@@ -1,85 +1,107 @@
-Return-Path: <netdev+bounces-234784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EA65C2737A
-	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 00:50:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73ACCC27392
+	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 00:50:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACBD33B7F5A
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 23:50:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 685D44267DB
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 23:50:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 083A332ED41;
-	Fri, 31 Oct 2025 23:50:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDE1332ED57;
+	Fri, 31 Oct 2025 23:50:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a6WdUmFB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sRQsEKHw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA51D17A2F0;
-	Fri, 31 Oct 2025 23:50:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0AA44C9D;
+	Fri, 31 Oct 2025 23:50:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761954600; cv=none; b=hYAmJli/dGJMCTz60tPd77XHflY38G3GyXT03pvQ6mc+jwo1S/J7/Np/rqfeGF8SrMkzWdpV9WlOzgOuiZn+3n4QBkcRJbfDChxZkQ5Gjc9dh3XHu/4B79v9mSDG7Q5ha/HUHE+564w7wuCz8dhvmofXs2llta3VYAR1pCAEIRg=
+	t=1761954638; cv=none; b=lHQG/KstPjcXkih082BvK9jZt/mCclJNMr3On7uYT8RVy7F/abrC1r+WEXKZL083CW+h9IJCgMYM/4qpLXYIs6ZQIQJfSvozivXiCBAhCO0skYI835H74MOWEE04ZMRcWzXPuVTnctoEHA4/W+mzDuXwJZeUKNGi0rac3alNbMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761954600; c=relaxed/simple;
-	bh=nZX5tS1tXPuRCqWFG9SL8xYo5+hc5KgXS1X0YbBBRss=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FN9gZcgD6mGtZ9VUKfdH02T2jguLR5ipE6a0SPu6SSOwk5nsiHq0Nlwh0lA9wO7fA42EIB1xx3er/1kZhEAPUSNRCZLmH3VTC9tcf8/dH86LLFN/EQY1xqhXaoOiZCrSc/2h33lOJKqxPwhSLeY4Ia7pVIAPrV36zCMMDLHrGl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a6WdUmFB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AEADC4CEE7;
-	Fri, 31 Oct 2025 23:49:59 +0000 (UTC)
+	s=arc-20240116; t=1761954638; c=relaxed/simple;
+	bh=E4ANsDklI69G4GmDh97A+wqQnXZMth6S72LU97OyxkQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=oU7E7VowX4SU3VzDkpnimAPx+0fr5VOM3H1NcxvA+5OUm/CvAzfkJAclHFll0xP3vNbfV4WXvFAhBo8b0Fw4A1VhSzcZkb0GygewB3rqotclQE+v8L2VoyPejr9MCpXfE6c+pRyBFLDzxrHiEHgMoNYqiRATi8EgfBDG2rOOY/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sRQsEKHw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40F00C4CEE7;
+	Fri, 31 Oct 2025 23:50:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761954600;
-	bh=nZX5tS1tXPuRCqWFG9SL8xYo5+hc5KgXS1X0YbBBRss=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=a6WdUmFBFKmM+JCCebjFrJuP1xMmII6iRm5IkJNoy+adEsXtj0qPDpA2qlxhsJHJj
-	 cHoXbDj9fX34mwRDxdvmKS1+S9kvoIf0PnjqppdoQZLmgOsVmW4iDZaUla7hSINST6
-	 037T5d+PjPBYt+ua+AecXcPmDLuqKsPiLxmHi3SP5T7KwjoILe1TDRUgVxBv8plVHd
-	 xCdde+QdHm0B9nlkOC7Yb0mCWwABgvnbex7S956Gv1gDX6PPB9UKaOIJ43j66d+u+v
-	 EkyHENe1rgYyXTeUYhOQa5hnVjxjKVngVL8YkRkTtVtPnKrIm9progavEgqtlWU4kQ
-	 lZhJh6PeQ/lBw==
-Date: Fri, 31 Oct 2025 16:49:58 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Raag Jadav <raag.jadav@intel.com>, Pablo Neira Ayuso
- <pablo@netfilter.org>, linux-kernel@vger.kernel.org,
- linux-perf-users@vger.kernel.org, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, netdev@vger.kernel.org, Peter Zijlstra
- <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>, Arnaldo Carvalho de
- Melo <acme@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Mark Rutland
- <mark.rutland@arm.com>, Alexander Shishkin
- <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>, Ian
- Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>,
- Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>,
- Phil Sutter <phil@nwl.cc>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next v1 1/1] treewide: Rename ERR_PTR_PCPU() -->
- PCPU_ERR_PTR()
-Message-ID: <20251031164958.29f75595@kernel.org>
-In-Reply-To: <20251030083632.3315128-1-andriy.shevchenko@linux.intel.com>
-References: <20251030083632.3315128-1-andriy.shevchenko@linux.intel.com>
+	s=k20201202; t=1761954638;
+	bh=E4ANsDklI69G4GmDh97A+wqQnXZMth6S72LU97OyxkQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=sRQsEKHwz+POAiuE3NyG6rJZqm1Jp0koKMQdeC2EJtnFMLgxXAcSGixmbuYA7nvuh
+	 SrO2cvGVpTjf4t2FzVz4ojYaODXddxoR8ZeACGPKeyf3m19JNAqYhrWh8AS/WFlNcb
+	 gCiL/Y9HohyOsbq9NI0js2/tZZxmKC2um/H1wtnb6z+SVgb++u/NKCGnWCOG52qxow
+	 VsQ9GKueyE2OF72lELRbVfiQKk41COCY/Lip2ZwbSLQjmFNYc5fUAY4Xa1w5t2Q4ID
+	 m51ahJN5shdDSDNAfJ7+hjp0gTxwePtRxfjtTGcUG1yS8LYpem1+BKfZARST4ZQDkv
+	 U9WVskT+E7D4A==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7153E3809A00;
+	Fri, 31 Oct 2025 23:50:15 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/6] Convert mlx5e and IPoIB to
+ ndo_hwtstamp_get/set
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176195461427.670867.6904790068647704613.git-patchwork-notify@kernel.org>
+Date: Fri, 31 Oct 2025 23:50:14 +0000
+References: <1761819910-1011051-1-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <1761819910-1011051-1-git-send-email-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
+ leon@kernel.org, jgg@ziepe.ca, mbloch@nvidia.com, ast@kernel.org,
+ daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+ richardcochran@gmail.com, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ gal@nvidia.com, cjubran@nvidia.com, cratiu@nvidia.com
 
-On Thu, 30 Oct 2025 09:35:53 +0100 Andy Shevchenko wrote:
-> Make the namespace of specific ERR_PTR() macro leading the thing.
-> This is already done for IOMEM_ERR_PTR(). Follow the same pattern
-> in PCPU_ERR_PTR().
+Hello:
 
-TBH I find the current naming to be typical. _PCPU() is the "flavor" of
-the API. Same as we usually append _rcu() to functions which expect
-to operate under RCU. All error pointer helpers end with _PCPU().
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-I don't feel strongly so fine if anyone else wants to apply this.
-But I will not :)
+On Thu, 30 Oct 2025 12:25:04 +0200 you wrote:
+> Hi,
+> 
+> This series by Carolina migrates mlx5e and IPoIB to the
+> ndo_hwtstamp_get/set interface and removes legacy hardware timestamp
+> ioctl handling.  While doing so, it also cleans up naming and removes
+> redundant code.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,1/6] net/mlx5e: Remove redundant tstamp pointer from channel structures
+    https://git.kernel.org/netdev/net-next/c/7ea4376b3972
+  - [net-next,2/6] net/mlx5e: Remove unnecessary tstamp local variable in mlx5i_complete_rx_cqe
+    https://git.kernel.org/netdev/net-next/c/bf791659743b
+  - [net-next,3/6] net/mlx5e: Rename hwstamp functions to hwtstamp
+    https://git.kernel.org/netdev/net-next/c/fee182371a59
+  - [net-next,4/6] net/mlx5e: Rename timestamp fields to hwtstamp_config
+    https://git.kernel.org/netdev/net-next/c/91baaf96f5d0
+  - [net-next,5/6] IB/IPoIB: Add support for hwtstamp get/set ndos
+    https://git.kernel.org/netdev/net-next/c/250da3c8fe81
+  - [net-next,6/6] net/mlx5e: Convert to new hwtstamp_get/set interface
+    https://git.kernel.org/netdev/net-next/c/1c7fe48a9015
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
