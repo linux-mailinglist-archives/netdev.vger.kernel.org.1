@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-234691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 750C0C2618C
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 17:25:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59614C2610E
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 17:19:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C3E4467E8C
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 16:12:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 263881B21484
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 16:11:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5174D263C8C;
-	Fri, 31 Oct 2025 16:07:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44B5431282A;
+	Fri, 31 Oct 2025 16:07:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="Znn9uAyB"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="r2hwQcPn"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40D2E28314E;
-	Fri, 31 Oct 2025 16:07:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC79F2FBE0A;
+	Fri, 31 Oct 2025 16:07:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761926849; cv=none; b=pyeSri+OnhY3jHE/i/iRF7mQ4CjsMdMyPKiW1aup3mqkVQtw3TeP1+5xPYPhFJfLXoYn7tKVsMsN9JhcM6fkwWzcVorv9mlPPhWAU9X9z/JLaQ39zBvaBcnWnWNdglAwOeCmbr7lP/CF/9IE4F2KXcFvKew165QKRHgVV8OszFs=
+	t=1761926848; cv=none; b=MFG3te0UYH81dpS9+T+zajaeWegt/pXJsspjhdFfWwLXmHLXGNyIZ9zuLtPsUmfDf+V8oIm2BgvSG96yrtTKcKsnr2YeYcyBFwIJ2lDuIfbaItaph396/pcjj/ZrMCxNuBVPbHz0hEhu9aGDssYG3Iz2nR7nHrGGZfZNMB3rrn4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761926849; c=relaxed/simple;
-	bh=YP/7Az468O3K9xv25TYnGVQmzRYsWPioltt1rTnsRhQ=;
+	s=arc-20240116; t=1761926848; c=relaxed/simple;
+	bh=Qg64MJjBEEWYMlr4/omGhrF4j5gB4P52bN2CbFfv5NU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fIZ4g6/nyR8VOfZtTcwpJD4RgzbKVoZwDtALklMxHFe91ZYWasIq2eurQ1E6wkiW/Yv41D1Tac0LQYIN+WjQw2QqVYi9ulVABanm2sU5XlpMLj4Xa0lFxjbprWTSeuIFmXazUaB3wXfA9kEJAWMSU09VQKYy0HE59wQ3Fz+z5fk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=Znn9uAyB; arc=none smtp.client-ip=193.104.135.124
+	 MIME-Version:Content-Type; b=KSTZEqfhVwKkersBthe54gq0JbwKITLMn73R66/AFGTgjpu14XXDvh//mh5p4oVlUKbVSaXYhxZ6JkFPEglUTeDMqJo3cwnWW3luYXVdNY93BeEC0XRU2XjyBVKLADoB4xbE7ptjFMsTZ1/Fbtdpy7RJaDbRLt54r7mWmVBWCzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=r2hwQcPn; arc=none smtp.client-ip=193.104.135.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
 	s=202008; t=1761926832;
-	bh=YP/7Az468O3K9xv25TYnGVQmzRYsWPioltt1rTnsRhQ=;
+	bh=Qg64MJjBEEWYMlr4/omGhrF4j5gB4P52bN2CbFfv5NU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Znn9uAyBEEw1yjQRjQ2/2gxm06TplVmAsDIJx7RJN0g1LVodQeSPTBTiq35G0BBfF
-	 SgiQfBa2XgXnT31AKI+Fy8HYuTreEuksDR8dlG2y8yXzWZjQ+Fi7QiWgPoygaCbyE1
-	 dVNKpj/usLmKI1aBA3jDaSthQEvOib6Kbb6N7apFqjSEH7PaZij0isLCwnYEz/Mw7U
-	 OV8MdlzN9mK+AeFOAtlZ71I/L4UUfHvZH4P2aTV82iVoe1YvKgrcwf6TJGlcxWANhL
-	 +xg6qOV6U+WMynZ4y4hFfMtpEUqMuUA14BDItPhjYL3Uyj3OWUi8wqhdd+TqJI9UWg
-	 OUFal7ELAo3HA==
+	b=r2hwQcPnbnBDtvmkIz0UB65tvdaa+v5RbOP89iHAYtD/a/6TzWhjDYk6aUYlOqALH
+	 hAJhfQggLpe8XagteMqoQNeynHvNOHZPJmoQt5lnb6SKuADMLJgqaQDG22jRlumfEn
+	 ZwVeIw7Bq69+mN+0FcZiIXRMcxhUaZmUFuwBUWBzfu1l5ZFHDvmvAu4Oe0Zuda29Zk
+	 /GJhKzIvvNZJac1K9Y7Qi91cWq0OpQE+t6dQkB/t2XuPqF3yWH9tnHxvSOGtfXMQnH
+	 NLT1t6YUW3WaQMJok/bYC9DPYquAKqUtU53lKCpbSyvxeQjoDNCFfoY6363htj3/mE
+	 lJQMdIBNjzANA==
 Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 58CE46012A;
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 5347760127;
 	Fri, 31 Oct 2025 16:07:12 +0000 (UTC)
 Received: by x201s (Postfix, from userid 1000)
-	id 5FFDB205085; Fri, 31 Oct 2025 16:05:46 +0000 (UTC)
+	id 34388205372; Fri, 31 Oct 2025 16:05:47 +0000 (UTC)
 From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
 To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -60,9 +60,9 @@ Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
 	wireguard@lists.zx2c4.com,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 09/11] wireguard: netlink: convert to split ops
-Date: Fri, 31 Oct 2025 16:05:35 +0000
-Message-ID: <20251031160539.1701943-10-ast@fiberby.net>
+Subject: [PATCH net-next v2 10/11] wireguard: netlink: rename netlink handlers
+Date: Fri, 31 Oct 2025 16:05:36 +0000
+Message-ID: <20251031160539.1701943-11-ast@fiberby.net>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251031160539.1701943-1-ast@fiberby.net>
 References: <20251031160539.1701943-1-ast@fiberby.net>
@@ -75,66 +75,80 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This patch converts wireguard from using legacy struct genl_ops
-to struct genl_split_ops, by applying the same transformation
-as genl_cmd_full_to_split() would otherwise do at runtime.
+Rename netlink handlers to use the naming expected by ynl-gen.
 
-WGDEVICE_A_MAX is swapped for WGDEVICE_A_PEERS, while they are
-currently equivalent, then .maxattr should be the maximum attribute
-that a given command supports, which might not be WGDEVICE_A_MAX.
-
-This is an incremental step towards adopting netlink policy code
-generated by ynl-gen, ensuring that the code and spec is aligned.
+This is an incremental step towards adopting netlink command
+definitions generated by ynl-gen.
 
 This is a trivial patch with no behavioural changes intended.
 
 Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
 ---
- drivers/net/wireguard/netlink.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+ drivers/net/wireguard/netlink.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
 diff --git a/drivers/net/wireguard/netlink.c b/drivers/net/wireguard/netlink.c
-index f9bed135000f..7fecc25bd781 100644
+index 7fecc25bd781..ff1549fe55e2 100644
 --- a/drivers/net/wireguard/netlink.c
 +++ b/drivers/net/wireguard/netlink.c
-@@ -616,28 +616,30 @@ static int wg_set_device(struct sk_buff *skb, struct genl_info *info)
+@@ -199,7 +199,7 @@ get_peer(struct wg_peer *peer, struct sk_buff *skb, struct dump_ctx *ctx)
+ 	return -EMSGSIZE;
+ }
+ 
+-static int wg_get_device_start(struct netlink_callback *cb)
++static int wireguard_nl_get_device_start(struct netlink_callback *cb)
+ {
+ 	struct wg_device *wg;
+ 
+@@ -210,7 +210,8 @@ static int wg_get_device_start(struct netlink_callback *cb)
+ 	return 0;
+ }
+ 
+-static int wg_get_device_dump(struct sk_buff *skb, struct netlink_callback *cb)
++static int wireguard_nl_get_device_dumpit(struct sk_buff *skb,
++					  struct netlink_callback *cb)
+ {
+ 	struct wg_peer *peer, *next_peer_cursor;
+ 	struct dump_ctx *ctx = DUMP_CTX(cb);
+@@ -304,7 +305,7 @@ static int wg_get_device_dump(struct sk_buff *skb, struct netlink_callback *cb)
+ 	 */
+ }
+ 
+-static int wg_get_device_done(struct netlink_callback *cb)
++static int wireguard_nl_get_device_done(struct netlink_callback *cb)
+ {
+ 	struct dump_ctx *ctx = DUMP_CTX(cb);
+ 
+@@ -502,7 +503,8 @@ static int set_peer(struct wg_device *wg, struct nlattr **attrs)
  	return ret;
  }
  
--static const struct genl_ops genl_ops[] = {
-+static const struct genl_split_ops wireguard_nl_ops[] = {
+-static int wg_set_device(struct sk_buff *skb, struct genl_info *info)
++static int wireguard_nl_set_device_doit(struct sk_buff *skb,
++					struct genl_info *info)
+ {
+ 	struct wg_device *wg = lookup_interface(info->attrs, skb);
+ 	u32 flags = 0;
+@@ -619,15 +621,15 @@ static int wg_set_device(struct sk_buff *skb, struct genl_info *info)
+ static const struct genl_split_ops wireguard_nl_ops[] = {
  	{
  		.cmd = WG_CMD_GET_DEVICE,
- 		.start = wg_get_device_start,
- 		.dumpit = wg_get_device_dump,
- 		.done = wg_get_device_done,
--		.flags = GENL_UNS_ADMIN_PERM
-+		.policy = device_policy,
-+		.maxattr = WGDEVICE_A_PEERS,
-+		.flags = GENL_UNS_ADMIN_PERM | GENL_CMD_CAP_DUMP,
+-		.start = wg_get_device_start,
+-		.dumpit = wg_get_device_dump,
+-		.done = wg_get_device_done,
++		.start = wireguard_nl_get_device_start,
++		.dumpit = wireguard_nl_get_device_dumpit,
++		.done = wireguard_nl_get_device_done,
+ 		.policy = device_policy,
+ 		.maxattr = WGDEVICE_A_PEERS,
+ 		.flags = GENL_UNS_ADMIN_PERM | GENL_CMD_CAP_DUMP,
  	}, {
  		.cmd = WG_CMD_SET_DEVICE,
- 		.doit = wg_set_device,
--		.flags = GENL_UNS_ADMIN_PERM
-+		.policy = device_policy,
-+		.maxattr = WGDEVICE_A_PEERS,
-+		.flags = GENL_UNS_ADMIN_PERM | GENL_CMD_CAP_DO,
- 	}
- };
- 
- static struct genl_family genl_family __ro_after_init = {
--	.ops = genl_ops,
--	.n_ops = ARRAY_SIZE(genl_ops),
-+	.split_ops = wireguard_nl_ops,
-+	.n_split_ops = ARRAY_SIZE(wireguard_nl_ops),
- 	.name = WG_GENL_NAME,
- 	.version = WG_GENL_VERSION,
--	.maxattr = WGDEVICE_A_MAX,
- 	.module = THIS_MODULE,
--	.policy = device_policy,
- 	.netnsok = true
- };
- 
+-		.doit = wg_set_device,
++		.doit = wireguard_nl_set_device_doit,
+ 		.policy = device_policy,
+ 		.maxattr = WGDEVICE_A_PEERS,
+ 		.flags = GENL_UNS_ADMIN_PERM | GENL_CMD_CAP_DO,
 -- 
 2.51.0
 
