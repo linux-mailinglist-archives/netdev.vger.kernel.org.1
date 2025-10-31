@@ -1,139 +1,350 @@
-Return-Path: <netdev+bounces-234640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AC5CC24F8C
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 13:22:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 275C7C24FC8
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 13:25:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3AD83B9530
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 12:21:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC3DA1B204B9
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 12:24:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 800CE2E1743;
-	Fri, 31 Oct 2025 12:21:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51EB0330D2E;
+	Fri, 31 Oct 2025 12:23:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3yJa5+kd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HFM7mXUe"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F12D2DC78A
-	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 12:21:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F712C21DF;
+	Fri, 31 Oct 2025 12:23:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761913310; cv=none; b=lUI5KbpwoWCM/FvT327l64U4nik9qf1UGNtekpHDNWxIQ+SPnhqN5GSoLe/ZY7txmR28O9qZtWrQJwdM51w3oz+jLMVZJAa7ufsOC+teRhtOCZ4oLHC9NzfkS1sbSxG7Ysc0zuo/3s31w4w4TNkfspCIKXPePrG+ayUebaFHyKk=
+	t=1761913425; cv=none; b=R1fZS7/qOGdKXXBYxw4csSDXmsuRxT9mMBzYlAnosrfrE34UfMc4xhtpYD4cYRKv3CIvqHus2oy4U2qdbDPtexLIgSmmqef+hVFMhEshU2N4wc68h/u4XAmZKK/8/I5dPQq6ipz5LTJ9cOuE9tcxfx5rySEYIZgcrNvmZdwtWkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761913310; c=relaxed/simple;
-	bh=Zko9juVkvIIh48a/bM+zG5jLocb+/N896GHA2aLmShQ=;
+	s=arc-20240116; t=1761913425; c=relaxed/simple;
+	bh=teAVH4fG3LreoMxTD8/5S+pv4bUIKIPakzAxChdahXI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M08f+VqAZKuRCXMW3c3+dJeEmbdlADqzSz1Hr6bw7nL73KmhXUxaMIlH+hOYWVG29lMFD5dKXvLRKNsuDzZ3kBG0UVyC4e9Tb0JXPGkolc1xSFh6ulUbsLdNQfaT8t3Gbf4CggN6ggJSQ30B64+LljJKLt6oTAHLDUMwnK1SLWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=3yJa5+kd; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=0aQxS3qZPtArJu1pqBZJOeWmjkfSHxjHJp7/EyCwfGU=; b=3yJa5+kdw0UcZZpDIctbxnhBpR
-	7Fl3FHHy4PBZNO3GIQTq6FAME4qZiHlKca+BrI33kpwVjlevsiwFEx2nON/SF/q8IM+vmwQDCObfQ
-	omJyv/vv+eJdpM9I9FuKv3f9xh+LHa7v0cLWWffGIbJEBYEHRh+vJ9pmlu2oFAklMFEA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vEo8A-00Cazd-KI; Fri, 31 Oct 2025 13:21:22 +0100
-Date: Fri, 31 Oct 2025 13:21:22 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Yi Cong <cong.yi@linux.dev>
-Cc: Frank.Sae@motor-comm.com, davem@davemloft.net, hkallweit1@gmail.com,
-	kuba@kernel.org, linux@armlinux.org.uk, netdev@vger.kernel.org,
-	yicong@kylinos.cn
-Subject: Re: [PATCH net-next 1/2] net: phy: motorcomm: correct the default rx
- delay config for the rgmii
-Message-ID: <ccbf01a4-71e7-446f-b13b-5c090d5a621e@lunn.ch>
-References: <5b97f70c-45c3-41c2-ba7b-d383864f0003@lunn.ch>
- <20251031022700.492740-1-cong.yi@linux.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=PcZ3tYyyJ9I/mtpM2nXVASDXwfeNUoiToalZRG62uOM5b5avb3XhtaA/IFuJS0tJIh9oypr97cxZjzQ94nlrDEBGzwL0FBRS30HMqqY/pGSlfEfyFUjjO/rW3q4waUSao9PlK3cF5u4GmI6etwYLu4fiZvFX0HSCSNsWPII/g84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HFM7mXUe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 555E8C4CEE7;
+	Fri, 31 Oct 2025 12:23:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1761913424;
+	bh=teAVH4fG3LreoMxTD8/5S+pv4bUIKIPakzAxChdahXI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HFM7mXUel+Kg91fRCmNz2uzMM3LiMooa3p/kalel14loykQ7inJ7k7oBfBMwMhdwk
+	 OthiTCzv+9rAug31/oaq0wrzAvIpBz018xh3iPD7CrxW7CJa6+RR4iLwUfP62UPoro
+	 Gj1t1XNlIp5eqAfrPc/XM5inFN2Z2RyO6YlK5LiskH2PHFsyc/wsz9Jm1mi0okIZi3
+	 KuV/+dbpKIFHzPOKRgTQqQsZPpB4+BXSPOMmD2PNhaqHjdxCY/cEHPWdT6nBMw6P27
+	 jRpZCQ614sSLTW20WhMwd9IwyB4VQQt3fVYyjZCDi5IajLJjSqoT6UZ6H3/MAEVIxA
+	 0mcI+8emRhmuw==
+Date: Fri, 31 Oct 2025 13:23:33 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Miklos Szeredi <miklos@szeredi.hu>, 
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, Chuck Lever <chuck.lever@oracle.com>, 
+	Alexander Aring <alex.aring@gmail.com>, Trond Myklebust <trondmy@kernel.org>, 
+	Anna Schumaker <anna@kernel.org>, Steve French <sfrench@samba.org>, 
+	Paulo Alcantara <pc@manguebit.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
+	Bharath SM <bharathsm@microsoft.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
+	David Howells <dhowells@redhat.com>, Tyler Hicks <code@tyhicks.com>, NeilBrown <neil@brown.name>, 
+	Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
+	Amir Goldstein <amir73il@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
+	Carlos Maiolino <cem@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, 
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, netfs@lists.linux.dev, 
+	ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org, linux-xfs@vger.kernel.org, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v3 03/13] vfs: allow mkdir to wait for delegation break
+ on parent
+Message-ID: <20251031-bildung-erdig-b18b71db0520@brauner>
+References: <20251021-dir-deleg-ro-v3-0-a08b1cde9f4c@kernel.org>
+ <20251021-dir-deleg-ro-v3-3-a08b1cde9f4c@kernel.org>
+ <20251029-zeltlager-auspuff-0e3070d1a9c3@brauner>
+ <77e357c346ac9dce543fea9c22168f4a53dded5d.camel@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251031022700.492740-1-cong.yi@linux.dev>
+In-Reply-To: <77e357c346ac9dce543fea9c22168f4a53dded5d.camel@kernel.org>
 
-> > However, in general, Linux should not rely on the BIOS, Linux should
-> > correctly configure the hardware, and in this case, it is trivial to
-> > do, since it is already all implemented.
+On Wed, Oct 29, 2025 at 09:37:22AM -0400, Jeff Layton wrote:
+> On Wed, 2025-10-29 at 14:04 +0100, Christian Brauner wrote:
+> > On Tue, Oct 21, 2025 at 11:25:38AM -0400, Jeff Layton wrote:
+> > > In order to add directory delegation support, we need to break
+> > > delegations on the parent whenever there is going to be a change in the
+> > > directory.
+> > > 
+> > > Add a new delegated_inode parameter to vfs_mkdir. All of the existing
+> > > callers set that to NULL for now, except for do_mkdirat which will
+> > > properly block until the lease is gone.
+> > > 
+> > > Reviewed-by: Jan Kara <jack@suse.cz>
+> > > Reviewed-by: NeilBrown <neil@brown.name>
+> > > Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> > > ---
+> > >  drivers/base/devtmpfs.c  |  2 +-
+> > >  fs/cachefiles/namei.c    |  2 +-
+> > >  fs/ecryptfs/inode.c      |  2 +-
+> > >  fs/init.c                |  2 +-
+> > >  fs/namei.c               | 24 ++++++++++++++++++------
+> > >  fs/nfsd/nfs4recover.c    |  2 +-
+> > >  fs/nfsd/vfs.c            |  2 +-
+> > >  fs/overlayfs/overlayfs.h |  2 +-
+> > >  fs/smb/server/vfs.c      |  2 +-
+> > >  fs/xfs/scrub/orphanage.c |  2 +-
+> > >  include/linux/fs.h       |  2 +-
+> > >  11 files changed, 28 insertions(+), 16 deletions(-)
+> > > 
+> > > diff --git a/drivers/base/devtmpfs.c b/drivers/base/devtmpfs.c
+> > > index 9d4e46ad8352257a6a65d85526ebdbf9bf2d4b19..0e79621cb0f79870003b867ca384199171ded4e0 100644
+> > > --- a/drivers/base/devtmpfs.c
+> > > +++ b/drivers/base/devtmpfs.c
+> > > @@ -180,7 +180,7 @@ static int dev_mkdir(const char *name, umode_t mode)
+> > >  	if (IS_ERR(dentry))
+> > >  		return PTR_ERR(dentry);
+> > >  
+> > > -	dentry = vfs_mkdir(&nop_mnt_idmap, d_inode(path.dentry), dentry, mode);
+> > > +	dentry = vfs_mkdir(&nop_mnt_idmap, d_inode(path.dentry), dentry, mode, NULL);
+> > >  	if (!IS_ERR(dentry))
+> > >  		/* mark as kernel-created inode */
+> > >  		d_inode(dentry)->i_private = &thread;
+> > > diff --git a/fs/cachefiles/namei.c b/fs/cachefiles/namei.c
+> > > index d1edb2ac38376c4f9d2a18026450bb3c774f7824..50c0f9c76d1fd4c05db90d7d0d1bad574523ead0 100644
+> > > --- a/fs/cachefiles/namei.c
+> > > +++ b/fs/cachefiles/namei.c
+> > > @@ -130,7 +130,7 @@ struct dentry *cachefiles_get_directory(struct cachefiles_cache *cache,
+> > >  			goto mkdir_error;
+> > >  		ret = cachefiles_inject_write_error();
+> > >  		if (ret == 0)
+> > > -			subdir = vfs_mkdir(&nop_mnt_idmap, d_inode(dir), subdir, 0700);
+> > > +			subdir = vfs_mkdir(&nop_mnt_idmap, d_inode(dir), subdir, 0700, NULL);
+> > >  		else
+> > >  			subdir = ERR_PTR(ret);
+> > >  		if (IS_ERR(subdir)) {
+> > > diff --git a/fs/ecryptfs/inode.c b/fs/ecryptfs/inode.c
+> > > index ed1394da8d6bd7065f2a074378331f13fcda17f9..35830b3144f8f71374a78b3e7463b864f4fc216e 100644
+> > > --- a/fs/ecryptfs/inode.c
+> > > +++ b/fs/ecryptfs/inode.c
+> > > @@ -508,7 +508,7 @@ static struct dentry *ecryptfs_mkdir(struct mnt_idmap *idmap, struct inode *dir,
+> > >  		goto out;
+> > >  
+> > >  	lower_dentry = vfs_mkdir(&nop_mnt_idmap, lower_dir,
+> > > -				 lower_dentry, mode);
+> > > +				 lower_dentry, mode, NULL);
+> > >  	rc = PTR_ERR(lower_dentry);
+> > >  	if (IS_ERR(lower_dentry))
+> > >  		goto out;
+> > > diff --git a/fs/init.c b/fs/init.c
+> > > index 07f592ccdba868509d0f3aaf9936d8d890fdbec5..895f8a09a71acfd03e11164e3b441a7d4e2de146 100644
+> > > --- a/fs/init.c
+> > > +++ b/fs/init.c
+> > > @@ -233,7 +233,7 @@ int __init init_mkdir(const char *pathname, umode_t mode)
+> > >  	error = security_path_mkdir(&path, dentry, mode);
+> > >  	if (!error) {
+> > >  		dentry = vfs_mkdir(mnt_idmap(path.mnt), path.dentry->d_inode,
+> > > -				  dentry, mode);
+> > > +				  dentry, mode, NULL);
+> > >  		if (IS_ERR(dentry))
+> > >  			error = PTR_ERR(dentry);
+> > >  	}
+> > > diff --git a/fs/namei.c b/fs/namei.c
+> > > index 6e61e0215b34134b1690f864e2719e3f82cf71a8..86cf6eca1f485361c6732974e4103cf5ea721539 100644
+> > > --- a/fs/namei.c
+> > > +++ b/fs/namei.c
+> > > @@ -4407,10 +4407,11 @@ SYSCALL_DEFINE3(mknod, const char __user *, filename, umode_t, mode, unsigned, d
+> > >  
+> > >  /**
+> > >   * vfs_mkdir - create directory returning correct dentry if possible
+> > > - * @idmap:	idmap of the mount the inode was found from
+> > > - * @dir:	inode of the parent directory
+> > > - * @dentry:	dentry of the child directory
+> > > - * @mode:	mode of the child directory
+> > > + * @idmap:		idmap of the mount the inode was found from
+> > > + * @dir:		inode of the parent directory
+> > > + * @dentry:		dentry of the child directory
+> > > + * @mode:		mode of the child directory
+> > > + * @delegated_inode:	returns parent inode, if the inode is delegated.
+> > 
+> > I wonder if it would be feasible and potentially elegant if delegated
+> > inodes were returned as separate type like struct delegated_inode
+> > similar to the vfsuid_t just a struct wrapper around the inode itself.
+> > The advantage is that it's not possible to accidently abuse this thing
+> > as we're passing that stuff around to try_break_deleg() and so on.
+> > 
 > 
-> The phy-mode is read by the MAC from ACPI. The same MAC paired with
-> different PHYs, or different vendors using the same MAC+PHY combination
-> but with varying motherboard designs, may result in differences here
-> (I've encountered both rgmii-id and rgmii-rxid).
-
-There are two basic PCB designs. The PCB provides the 2ns delay by
-using extra long clock lines. If that is the case, DT says 'rgmii'.
-If the PCB does not have extra long clock lines, the MAC/PHY pair
-needs to provide the delays, so DT says 'rgmii-id'. Very few designs
-have the PCB add delays, so 95% of boards use 'rgmii-id'. There is one
-board i know of which has one extra long clock line, one not, so it
-uses rgmii-rxid, or maybe rgmii-txid in DT. I don't remember which.
-
-If you are doing an ACPI binding the same should apply.
-
-> Returning to the current patch: changing the default value to match the
-> datasheet will not affect any phy-mode directly. This is because the delay value
-> is first obtained, and then its application is determined based on the phy-mode:
-> ```
-> static int ytphy_rgmii_clk_delay_config(struct phy_device *phydev)
-> {
-> 	...
-> 	/* get rx/tx delay value */
-> 	rx_reg = ytphy_get_delay_reg_value(phydev, "rx-internal-delay-ps",
-> 					   ytphy_rgmii_delays, tb_size,
-> 					   &rxc_dly_en,
-> 					   YT8521_RC1R_RGMII_0_000_NS);
-> 	tx_reg = ytphy_get_delay_reg_value(phydev, "tx-internal-delay-ps",
-> 					   ytphy_rgmii_delays, tb_size, NULL,
-> 					   YT8521_RC1R_RGMII_NONLINEAR_0_750_NS);
+> I have a patch that does exactly that:
 > 
-> 	/* Set it based on different phy-mode */
-> 	switch (phydev->interface) {
-> 	case PHY_INTERFACE_MODE_RGMII:
-> 		rxc_dly_en = 0;
-> 		break;
-> 	case PHY_INTERFACE_MODE_RGMII_RXID:
-> 		val |= FIELD_PREP(YT8521_RC1R_RX_DELAY_MASK, rx_reg);
-> 		break;
-> 	case PHY_INTERFACE_MODE_RGMII_TXID:
-> 		rxc_dly_en = 0;
-> 		val |= FIELD_PREP(YT8521_RC1R_GE_TX_DELAY_MASK, tx_reg);
-> 		break;
-> 	case PHY_INTERFACE_MODE_RGMII_ID:
-> 		val |= FIELD_PREP(YT8521_RC1R_RX_DELAY_MASK, rx_reg) |
-> 		       FIELD_PREP(YT8521_RC1R_GE_TX_DELAY_MASK, tx_reg);
-> 		break;
-> 	default: /* do not support other modes */
-> 		return -EOPNOTSUPP;
-> 	}
+> https://lore.kernel.org/linux-nfs/20250924-dir-deleg-v3-15-9f3af8bc5c40@kernel.org/
 
-Now think about what PHY_INTERFACE_MODE_RGMII_ID means. It means, the
-PCB does not add the 2ns delays. The MAC/PHY combination must add the
-delays, and when the MAC has called phy_connect(), it has passed
-PHY_INTERFACE_MODE_RGMII_ID, asking the PHY to add the 2ns delay. It
-can add a range of delays, but the default is 1.95ns, which is the
-closest it can get to the 2ns defined in the RGMII standard.
+I love it!
 
-If the PHY actually added 0ns delay, the board is broken, because it
-is missing the delays. The default is correct and there are shipping
-boards making use of it.
+> 
+> I didn't submit it here since it wasn't strictly required for this
+> patchset. If we get around to implementing CB_NOTIFY support however,
+> it will be since we'll need to pass back other information than just
+> the inode.
+> 
+> I could move that into this series if you prefer. If we do that though,
+> then it might also be cleaner to take the previous patch in the series
+> that cleans up __break_lease() arguments:
+> 
+> https://lore.kernel.org/linux-nfs/20250924-dir-deleg-v3-14-9f3af8bc5c40@kernel.org/
 
-Any issues you are having are because you are not using the APIs
-correctly. If the PCB is adding the delays, use 'rgmii' in DT. If the
-MAC is adding delays, which we do not recommend, pass
-PHY_INTERFACE_MODE_RGMII to the PHY. This is all explained in one of
-the links i gave you.
+If you have a wholesome story to tell then by all means tell it all.
+Don't GRRM us with half a tale.  IOW, it's fine to have a large patch
+series. If it's well split-up then it's great. Al or I apparently can't
+get a series out the door that's under 20 patches so you get the same
+leeway. :)
 
-   Andrew
+> 
+> Let me know what you'd prefer.
+> 
+> > >   *
+> > >   * Create a directory.
+> > >   *
+> > > @@ -4427,7 +4428,8 @@ SYSCALL_DEFINE3(mknod, const char __user *, filename, umode_t, mode, unsigned, d
+> > >   * In case of an error the dentry is dput() and an ERR_PTR() is returned.
+> > >   */
+> > >  struct dentry *vfs_mkdir(struct mnt_idmap *idmap, struct inode *dir,
+> > > -			 struct dentry *dentry, umode_t mode)
+> > > +			 struct dentry *dentry, umode_t mode,
+> > > +			 struct inode **delegated_inode)
+> > >  {
+> > >  	int error;
+> > >  	unsigned max_links = dir->i_sb->s_max_links;
+> > > @@ -4450,6 +4452,10 @@ struct dentry *vfs_mkdir(struct mnt_idmap *idmap, struct inode *dir,
+> > >  	if (max_links && dir->i_nlink >= max_links)
+> > >  		goto err;
+> > >  
+> > > +	error = try_break_deleg(dir, delegated_inode);
+> > > +	if (error)
+> > > +		goto err;
+> > > +
+> > >  	de = dir->i_op->mkdir(idmap, dir, dentry, mode);
+> > >  	error = PTR_ERR(de);
+> > >  	if (IS_ERR(de))
+> > > @@ -4473,6 +4479,7 @@ int do_mkdirat(int dfd, struct filename *name, umode_t mode)
+> > >  	struct path path;
+> > >  	int error;
+> > >  	unsigned int lookup_flags = LOOKUP_DIRECTORY;
+> > > +	struct inode *delegated_inode = NULL;
+> > >  
+> > >  retry:
+> > >  	dentry = filename_create(dfd, name, &path, lookup_flags);
+> > > @@ -4484,11 +4491,16 @@ int do_mkdirat(int dfd, struct filename *name, umode_t mode)
+> > >  			mode_strip_umask(path.dentry->d_inode, mode));
+> > >  	if (!error) {
+> > >  		dentry = vfs_mkdir(mnt_idmap(path.mnt), path.dentry->d_inode,
+> > > -				  dentry, mode);
+> > > +				   dentry, mode, &delegated_inode);
+> > >  		if (IS_ERR(dentry))
+> > >  			error = PTR_ERR(dentry);
+> > >  	}
+> > >  	end_creating_path(&path, dentry);
+> > > +	if (delegated_inode) {
+> > > +		error = break_deleg_wait(&delegated_inode);
+> > > +		if (!error)
+> > > +			goto retry;
+> > > +	}
+> > >  	if (retry_estale(error, lookup_flags)) {
+> > >  		lookup_flags |= LOOKUP_REVAL;
+> > >  		goto retry;
+> > > diff --git a/fs/nfsd/nfs4recover.c b/fs/nfsd/nfs4recover.c
+> > > index b1005abcb9035b2cf743200808a251b00af7e3f4..423dd102b51198ea7c447be2b9a0a5020c950dba 100644
+> > > --- a/fs/nfsd/nfs4recover.c
+> > > +++ b/fs/nfsd/nfs4recover.c
+> > > @@ -202,7 +202,7 @@ nfsd4_create_clid_dir(struct nfs4_client *clp)
+> > >  		 * as well be forgiving and just succeed silently.
+> > >  		 */
+> > >  		goto out_put;
+> > > -	dentry = vfs_mkdir(&nop_mnt_idmap, d_inode(dir), dentry, S_IRWXU);
+> > > +	dentry = vfs_mkdir(&nop_mnt_idmap, d_inode(dir), dentry, 0700, NULL);
+> > >  	if (IS_ERR(dentry))
+> > >  		status = PTR_ERR(dentry);
+> > >  out_put:
+> > > diff --git a/fs/nfsd/vfs.c b/fs/nfsd/vfs.c
+> > > index 8b2dc7a88aab015d1e39da0dd4e6daf7e276aabe..5f24af289d509bea54a324b8851fa06de6050353 100644
+> > > --- a/fs/nfsd/vfs.c
+> > > +++ b/fs/nfsd/vfs.c
+> > > @@ -1645,7 +1645,7 @@ nfsd_create_locked(struct svc_rqst *rqstp, struct svc_fh *fhp,
+> > >  			nfsd_check_ignore_resizing(iap);
+> > >  		break;
+> > >  	case S_IFDIR:
+> > > -		dchild = vfs_mkdir(&nop_mnt_idmap, dirp, dchild, iap->ia_mode);
+> > > +		dchild = vfs_mkdir(&nop_mnt_idmap, dirp, dchild, iap->ia_mode, NULL);
+> > >  		if (IS_ERR(dchild)) {
+> > >  			host_err = PTR_ERR(dchild);
+> > >  		} else if (d_is_negative(dchild)) {
+> > > diff --git a/fs/overlayfs/overlayfs.h b/fs/overlayfs/overlayfs.h
+> > > index c8fd5951fc5ece1ae6b3e2a0801ca15f9faf7d72..0f65f9a5d54d4786b39e4f4f30f416d5b9016e70 100644
+> > > --- a/fs/overlayfs/overlayfs.h
+> > > +++ b/fs/overlayfs/overlayfs.h
+> > > @@ -248,7 +248,7 @@ static inline struct dentry *ovl_do_mkdir(struct ovl_fs *ofs,
+> > >  {
+> > >  	struct dentry *ret;
+> > >  
+> > > -	ret = vfs_mkdir(ovl_upper_mnt_idmap(ofs), dir, dentry, mode);
+> > > +	ret = vfs_mkdir(ovl_upper_mnt_idmap(ofs), dir, dentry, mode, NULL);
+> > >  	pr_debug("mkdir(%pd2, 0%o) = %i\n", dentry, mode, PTR_ERR_OR_ZERO(ret));
+> > >  	return ret;
+> > >  }
+> > > diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
+> > > index 891ed2dc2b7351a5cb14a2241d71095ffdd03f08..3d2190f26623b23ea79c63410905a3c3ad684048 100644
+> > > --- a/fs/smb/server/vfs.c
+> > > +++ b/fs/smb/server/vfs.c
+> > > @@ -230,7 +230,7 @@ int ksmbd_vfs_mkdir(struct ksmbd_work *work, const char *name, umode_t mode)
+> > >  	idmap = mnt_idmap(path.mnt);
+> > >  	mode |= S_IFDIR;
+> > >  	d = dentry;
+> > > -	dentry = vfs_mkdir(idmap, d_inode(path.dentry), dentry, mode);
+> > > +	dentry = vfs_mkdir(idmap, d_inode(path.dentry), dentry, mode, NULL);
+> > >  	if (IS_ERR(dentry))
+> > >  		err = PTR_ERR(dentry);
+> > >  	else if (d_is_negative(dentry))
+> > > diff --git a/fs/xfs/scrub/orphanage.c b/fs/xfs/scrub/orphanage.c
+> > > index 9c12cb8442311ca26b169e4d1567939ae44a5be0..91c9d07b97f306f57aebb9b69ba564b0c2cb8c17 100644
+> > > --- a/fs/xfs/scrub/orphanage.c
+> > > +++ b/fs/xfs/scrub/orphanage.c
+> > > @@ -167,7 +167,7 @@ xrep_orphanage_create(
+> > >  	 */
+> > >  	if (d_really_is_negative(orphanage_dentry)) {
+> > >  		orphanage_dentry = vfs_mkdir(&nop_mnt_idmap, root_inode,
+> > > -					     orphanage_dentry, 0750);
+> > > +					     orphanage_dentry, 0750, NULL);
+> > >  		error = PTR_ERR(orphanage_dentry);
+> > >  		if (IS_ERR(orphanage_dentry))
+> > >  			goto out_unlock_root;
+> > > diff --git a/include/linux/fs.h b/include/linux/fs.h
+> > > index c895146c1444be36e0a779df55622cc38c9419ff..1040df3792794cd353b86558b41618294e25b8a6 100644
+> > > --- a/include/linux/fs.h
+> > > +++ b/include/linux/fs.h
+> > > @@ -2113,7 +2113,7 @@ bool inode_owner_or_capable(struct mnt_idmap *idmap,
+> > >  int vfs_create(struct mnt_idmap *, struct inode *,
+> > >  	       struct dentry *, umode_t, bool);
+> > >  struct dentry *vfs_mkdir(struct mnt_idmap *, struct inode *,
+> > > -			 struct dentry *, umode_t);
+> > > +			 struct dentry *, umode_t, struct inode **);
+> > >  int vfs_mknod(struct mnt_idmap *, struct inode *, struct dentry *,
+> > >                umode_t, dev_t);
+> > >  int vfs_symlink(struct mnt_idmap *, struct inode *,
+> > > 
+> > > -- 
+> > > 2.51.0
+> > > 
+> 
+> -- 
+> Jeff Layton <jlayton@kernel.org>
 
