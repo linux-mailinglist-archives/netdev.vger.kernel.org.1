@@ -1,107 +1,118 @@
-Return-Path: <netdev+bounces-234785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73ACCC27392
-	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 00:50:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C4A5C27395
+	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 00:51:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 685D44267DB
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 23:50:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B76D91B27250
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 23:51:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDE1332ED57;
-	Fri, 31 Oct 2025 23:50:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 177CC32ED58;
+	Fri, 31 Oct 2025 23:50:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sRQsEKHw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nCdsl7UJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0AA44C9D;
-	Fri, 31 Oct 2025 23:50:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E72C832ED44
+	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 23:50:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761954638; cv=none; b=lHQG/KstPjcXkih082BvK9jZt/mCclJNMr3On7uYT8RVy7F/abrC1r+WEXKZL083CW+h9IJCgMYM/4qpLXYIs6ZQIQJfSvozivXiCBAhCO0skYI835H74MOWEE04ZMRcWzXPuVTnctoEHA4/W+mzDuXwJZeUKNGi0rac3alNbMY=
+	t=1761954654; cv=none; b=QpLitvVlFj8odKy/MnT5hiRz/mnABM6+6mfSHD3GgQmaTzA6SDKZdujMevhjv6mRUt6wLX1aqToKHocp2XOuldMvz1SJ+3+5CuzHGCzHolphxj7rhTaPm62y0QjioLjQ6JnZVXGFPx85nLuRIXGuNfDZrP/DB4b9vhn82WWWBV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761954638; c=relaxed/simple;
-	bh=E4ANsDklI69G4GmDh97A+wqQnXZMth6S72LU97OyxkQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=oU7E7VowX4SU3VzDkpnimAPx+0fr5VOM3H1NcxvA+5OUm/CvAzfkJAclHFll0xP3vNbfV4WXvFAhBo8b0Fw4A1VhSzcZkb0GygewB3rqotclQE+v8L2VoyPejr9MCpXfE6c+pRyBFLDzxrHiEHgMoNYqiRATi8EgfBDG2rOOY/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sRQsEKHw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40F00C4CEE7;
-	Fri, 31 Oct 2025 23:50:38 +0000 (UTC)
+	s=arc-20240116; t=1761954654; c=relaxed/simple;
+	bh=vpvm7wOdtrB3Ns8GW+amqnU7ULxpYLWKGAm34Amb4T0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ND4at8BS6H2kq+8idVsY5gFl8n3v8/iq5PVnKn2rkt8q6/J3WuyI0aF8gS/0iyl5OVJ951E0Y9iEa6o2CZOR2KUJvW0u9RQ37s/36gUZ/3wg8hh1jke8/1JbcOS74HNDX9xn/TlNK7WiFForDfBlP6LZamd046jntUXspdAwH5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nCdsl7UJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0F86C4AF09
+	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 23:50:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761954638;
-	bh=E4ANsDklI69G4GmDh97A+wqQnXZMth6S72LU97OyxkQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=sRQsEKHwz+POAiuE3NyG6rJZqm1Jp0koKMQdeC2EJtnFMLgxXAcSGixmbuYA7nvuh
-	 SrO2cvGVpTjf4t2FzVz4ojYaODXddxoR8ZeACGPKeyf3m19JNAqYhrWh8AS/WFlNcb
-	 gCiL/Y9HohyOsbq9NI0js2/tZZxmKC2um/H1wtnb6z+SVgb++u/NKCGnWCOG52qxow
-	 VsQ9GKueyE2OF72lELRbVfiQKk41COCY/Lip2ZwbSLQjmFNYc5fUAY4Xa1w5t2Q4ID
-	 m51ahJN5shdDSDNAfJ7+hjp0gTxwePtRxfjtTGcUG1yS8LYpem1+BKfZARST4ZQDkv
-	 U9WVskT+E7D4A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7153E3809A00;
-	Fri, 31 Oct 2025 23:50:15 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1761954653;
+	bh=vpvm7wOdtrB3Ns8GW+amqnU7ULxpYLWKGAm34Amb4T0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=nCdsl7UJpLskZO67zKjdkVugtZEur3BWgNp9mub2G4iiB83QHMcNN72wFva6dX4SI
+	 YjSIZquKKAMWlcNum97jMhrIaADzvD/rfVNn2i9UixTspTn4VsRFsHYEOAnzKfBgQI
+	 tTlPWWjZBQ18qIIBWw4m6G39sKfIl+J3AKtJEx2/8rKyYmthb/aqtqRINWMc7qt052
+	 1UMeENKUvRqavAd0Y+RGMgtvAXFvSK/CuS6eggNH8jZddwhTQ3BNjtf38iJAmX0Q7N
+	 84zYNXZo1mxUXvCj3bU1BeAFyKCOeIGrKX9K9EPAaaU/6c5b0VB9hgjaYEHsyBNi2J
+	 7yJymZj2tziUA==
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-640741cdda7so3033783a12.2
+        for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 16:50:53 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWhISwRrY9vP5N26W5CNRCjFa6yXitA654hDDTdJv+eue09DA7E4SRSUBUAly856DQaCVO+OO4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWTQPtYemra+CLZ7I+zXfcTuMBbPO2Tx7usPdq/lHcBYm8WqoF
+	wtjJ16DT7HutMdP0yJAHVCBuJK47Q1Gic0hX+MJZSXokthBtlyW2mRUu0uF4rcfYLtfOVZItth/
+	cSFE5e2rrhWda8bo8jiaAXsW7UOaaxO4=
+X-Google-Smtp-Source: AGHT+IFYOngRr162Y43f2hE7ormKcaP4Mblz6ZPfEkfVpLgAUzvuR4AnuPYlcQQNTLsH0+ZVIi9NNkQ11nuI7J5go9w=
+X-Received: by 2002:a05:6402:1e88:b0:63c:1170:656a with SMTP id
+ 4fb4d7f45d1cf-64077041b61mr3590736a12.37.1761954652229; Fri, 31 Oct 2025
+ 16:50:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/6] Convert mlx5e and IPoIB to
- ndo_hwtstamp_get/set
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176195461427.670867.6904790068647704613.git-patchwork-notify@kernel.org>
-Date: Fri, 31 Oct 2025 23:50:14 +0000
-References: <1761819910-1011051-1-git-send-email-tariqt@nvidia.com>
-In-Reply-To: <1761819910-1011051-1-git-send-email-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
- leon@kernel.org, jgg@ziepe.ca, mbloch@nvidia.com, ast@kernel.org,
- daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
- richardcochran@gmail.com, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
- gal@nvidia.com, cjubran@nvidia.com, cratiu@nvidia.com
+References: <20251030064736.24061-1-dqfext@gmail.com> <CAKYAXd9nkQFgXPpKpOY+O_B5HRLeyiZKO5a4X5MdfjYoO_O+Aw@mail.gmail.com>
+ <CALW65jZQzTMv1HMB3R9cSACebVagtUsMM9iiL8zkTGmethfcPg@mail.gmail.com>
+ <2025103116-grinning-component-3aea@gregkh> <CALW65jZgu2=BfSEvi5A8vG_vBKrg=XLs68UoE3F3GBOOpeJtpg@mail.gmail.com>
+In-Reply-To: <CALW65jZgu2=BfSEvi5A8vG_vBKrg=XLs68UoE3F3GBOOpeJtpg@mail.gmail.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Sat, 1 Nov 2025 08:50:40 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd8gbpoQXCsEuaKsoZpsw2ZR5GkT4scLoBSLCkScH6Xvow@mail.gmail.com>
+X-Gm-Features: AWmQ_bn2HoAc3qCopFzNNtsX8TZzJNQBiOPs9s_azg1kgzYotbe35jPoxbA5UI0
+Message-ID: <CAKYAXd8gbpoQXCsEuaKsoZpsw2ZR5GkT4scLoBSLCkScH6Xvow@mail.gmail.com>
+Subject: Re: [PATCH] ksmbd: server: avoid busy polling in accept loop
+To: Qingfang Deng <dqfext@gmail.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Steve French <smfrench@gmail.com>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
+	Ronnie Sahlberg <lsahlber@redhat.com>, Hyunchul Lee <hyc.lee@gmail.com>, linux-cifs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	Sasha Levin <sashal@kernel.org>, "Jason A. Donenfeld" <Jason@zx2c4.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Fri, Oct 31, 2025 at 4:49=E2=80=AFPM Qingfang Deng <dqfext@gmail.com> wr=
+ote:
+>
+> On Fri, Oct 31, 2025 at 3:44=E2=80=AFPM Greg Kroah-Hartman
+> <gregkh@linuxfoundation.org> wrote:
+> >
+> > On Fri, Oct 31, 2025 at 03:32:06PM +0800, Qingfang Deng wrote:
+> > > Hi Namjae,
+> > >
+> > > On Thu, Oct 30, 2025 at 4:11=E2=80=AFPM Namjae Jeon <linkinjeon@kerne=
+l.org> wrote:
+> > > > > Fixes: 0626e6641f6b ("cifsd: add server handler for central proce=
+ssing and tranport layers")
+> > > > > Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+> > > > Applied it to #ksmbd-for-next-next.
+> > > > Thanks!
+> > >
+> > > I just found that this depends on another commit which is not in
+> > > kernel versions earlier than v6.1:
+> > > a7c01fa93aeb ("signal: break out of wait loops on kthread_stop()")
+> > >
+> > > With the current Fixes tag, this commit will be backported to v5.15
+> > > automatically. But without said commit, kthread_stop() cannot wake up
+> > > a blocking kernel_accept().
+> > > Should I change the Fixes tag, or inform linux-stable not to backport
+> > > this patch to v5.15?
+> >
+> > Email stable@vger.kernel.org when it lands in Linus's tree to not
+> > backport it that far.
+>
+> Noted. Thanks!
+I think it would be better to use the stable tag + kernel version tag
+instead of the fixes tag.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Cc: stable@vger.kernel.org # v6.1+
 
-On Thu, 30 Oct 2025 12:25:04 +0200 you wrote:
-> Hi,
-> 
-> This series by Carolina migrates mlx5e and IPoIB to the
-> ndo_hwtstamp_get/set interface and removes legacy hardware timestamp
-> ioctl handling.  While doing so, it also cleans up naming and removes
-> redundant code.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,1/6] net/mlx5e: Remove redundant tstamp pointer from channel structures
-    https://git.kernel.org/netdev/net-next/c/7ea4376b3972
-  - [net-next,2/6] net/mlx5e: Remove unnecessary tstamp local variable in mlx5i_complete_rx_cqe
-    https://git.kernel.org/netdev/net-next/c/bf791659743b
-  - [net-next,3/6] net/mlx5e: Rename hwstamp functions to hwtstamp
-    https://git.kernel.org/netdev/net-next/c/fee182371a59
-  - [net-next,4/6] net/mlx5e: Rename timestamp fields to hwtstamp_config
-    https://git.kernel.org/netdev/net-next/c/91baaf96f5d0
-  - [net-next,5/6] IB/IPoIB: Add support for hwtstamp get/set ndos
-    https://git.kernel.org/netdev/net-next/c/250da3c8fe81
-  - [net-next,6/6] net/mlx5e: Convert to new hwtstamp_get/set interface
-    https://git.kernel.org/netdev/net-next/c/1c7fe48a9015
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Also, I don't think this patch necessarily needs to be merged into the
+stable kernels.
+Thanks.
 
