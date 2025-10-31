@@ -1,90 +1,187 @@
-Return-Path: <netdev+bounces-234570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5075EC234B9
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 06:39:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 171ACC23513
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 07:06:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EFF5F34B805
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 05:39:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28FDE408515
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 06:06:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9264F2D248E;
-	Fri, 31 Oct 2025 05:39:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E10242E7160;
+	Fri, 31 Oct 2025 06:06:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FoAGExTF"
 X-Original-To: netdev@vger.kernel.org
-Received: from bmailout3.hostsharing.net (bmailout3.hostsharing.net [176.9.242.62])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E25B2D060B
-	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 05:39:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=176.9.242.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B3042E5429
+	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 06:06:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761889144; cv=none; b=flvrDC6I8UAOk9V+tEAX0k/TO/stnGJECKPuOq2J0028PcHnXHbf90kx/X+stj4T/uoRS6yBOEkRfVUSplGn4O5lZParV/fKKn/R5MVADrIbjvwIWeCK1QSeMGehPG1fK2XgTsq8rvup7ZjKHXAK2fRbpBIT8LW1z8CTPlD96U8=
+	t=1761890775; cv=none; b=W7O/26BzFTOHHsU005KJPzkTkJdlnedMNqplMoOwlpykIDNMDvziMJ8Cm/7luStFeGuTDQWOXow2oJyx8uabTvfWf+jZX4OcmvmWaIabHieGcmZh7mIOUTJ4788qP7pjLGU3wk5KQtgLCi7PpK7sY3Nco5zw5xyCSFGSWaZPBuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761889144; c=relaxed/simple;
-	bh=9B4PxnWoGNaVpGuDpPXyKPVllYYYGF3TeYjrkV2rP/o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gEl0z1flfNTVb0vXxhnNLLy3jrUBoCphx1FsnIDE8zpM1alDvu7oEhU5cfYh3yx1P6NIA2RlcmWnrLwxgVv3GnBObwnzIFQWZvZ2vBPNoB37ERIAHi6DwHU3u+XhGJNzgDWViSRNjDL6pc7E743szpynvRRoK9kNhmFz88yTX5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=176.9.242.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	s=arc-20240116; t=1761890775; c=relaxed/simple;
+	bh=uzKsr8p0ZgM+SLgICEjgau4Cc9/3BVPso+PqdA0y7L8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B9vH/kLDWg8BqQrsJKD+5EOxieqlBdhrqhH24B/+YjUfYjwqwT/y6AMJVJPEDS2IPfWNH4cFyF4IOgyMMI1U8JHwu2pbE7zEM5p127AhWWRRTV1ZpwhF2Fdvu4jeQwsaYAKhf5fwSRTNo3QFhBwRNsCvDftu4j3wQ9OrfRHnh7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FoAGExTF; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1761890773;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+bCrk/NYYmYlKBsMjf6Y0gKt7P2+73Hm3s9fxJ/Q+sk=;
+	b=FoAGExTF79kTZ/cca5BoXsCs3OUqZD6LQQnhZL1T2yKWxhb+mboPu6R/VlG00+R4RSfDii
+	unBC9PZDUMZ4Tlz0PAfyq+zSPeOc9nAi3X4pM58m4M9Ol/wz9p/jRkbXcCTgeCXVGYnXiC
+	XS49UR2hEy2dBDRI3tpadUsnVzJBd8o=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-618-7ClablYyO1OVe2uC7hp5hQ-1; Fri,
+ 31 Oct 2025 02:06:09 -0400
+X-MC-Unique: 7ClablYyO1OVe2uC7hp5hQ-1
+X-Mimecast-MFC-AGG-ID: 7ClablYyO1OVe2uC7hp5hQ_1761890768
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout3.hostsharing.net (Postfix) with ESMTPS id 0C2912C0009F;
-	Fri, 31 Oct 2025 06:38:57 +0100 (CET)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id C5D9E5B97; Fri, 31 Oct 2025 06:38:57 +0100 (CET)
-Date: Fri, 31 Oct 2025 06:38:57 +0100
-From: Lukas Wunner <lukas@wunner.de>
-To: Rodrigo Vivi <rodrigo.vivi@intel.com>
-Cc: dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
-	Dave Airlie <airlied@gmail.com>,
-	Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-	Simona Vetter <simona.vetter@ffwll.ch>,
-	Hawking Zhang <Hawking.Zhang@amd.com>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	Zack McKevitt <zachary.mckevitt@oss.qualcomm.com>,
-	Aravind Iddamsetty <aravind.iddamsetty@linux.intel.com>,
-	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: DRM_RAS for CPER Error logging?!
-Message-ID: <aQRLccLXfgfoWaIP@wunner.de>
-References: <20250929214415.326414-4-rodrigo.vivi@intel.com>
- <aQEVy1qjaDCwL_cc@intel.com>
- <aQN6dqFdrXxLKWlI@intel.com>
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 79D581953958;
+	Fri, 31 Oct 2025 06:06:07 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.72.120.6])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 96EE21955BE3;
+	Fri, 31 Oct 2025 06:05:55 +0000 (UTC)
+From: Jason Wang <jasowang@redhat.com>
+To: mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: virtualization@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH net V2] virtio_net: fix alignment for virtio_net_hdr_v1_hash
+Date: Fri, 31 Oct 2025 14:05:51 +0800
+Message-ID: <20251031060551.126-1-jasowang@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aQN6dqFdrXxLKWlI@intel.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Thu, Oct 30, 2025 at 10:47:18AM -0400, Rodrigo Vivi wrote:
-> On Tue, Oct 28, 2025 at 03:13:15PM -0400, Rodrigo Vivi wrote:
-> > On Mon, Sep 29, 2025 at 05:44:12PM -0400, Rodrigo Vivi wrote:
-> > 
-> > Hey Dave, Sima, AMD folks, Qualcomm folks,
-> 
-> + Netlink list and maintainers to get some feedback on the netlink usage
-> proposed here.
-> 
-> Specially to check if there's any concern with CPER blob going through
-> netlink or if there's any size limitation or concern.
+From: "Michael S. Tsirkin" <mst@redhat.com>
 
-How large are those blobs?  If the netlink message exceeds PAGE_SIZE
-because of the CPER blob, a workaround might be to attach it to the
-skb as fragments with skb_add_rx_frag().
+Changing alignment of header would mean it's no longer safe to cast a
+2 byte aligned pointer between formats. Use two 16 bit fields to make
+it 2 byte aligned as previously.
 
-Thanks,
+This fixes the performance regression since
+commit ("virtio_net: enable gso over UDP tunnel support.") as it uses
+virtio_net_hdr_v1_hash_tunnel which embeds
+virtio_net_hdr_v1_hash. Pktgen in guest + XDP_DROP on TAP + vhost_net
+shows the TX PPS is recovered from 2.4Mpps to 4.45Mpps.
 
-Lukas
+Fixes: 56a06bd40fab ("virtio_net: enable gso over UDP tunnel support.")
+Cc: stable@vger.kernel.org
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+Changes since V1:
+- Fix build issues of virtio_net_hdr_tnl_from_skb()
+---
+ drivers/net/virtio_net.c        | 15 +++++++++++++--
+ include/linux/virtio_net.h      |  3 ++-
+ include/uapi/linux/virtio_net.h |  3 ++-
+ 3 files changed, 17 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index 8e8a179aaa49..e6e650bc3bc3 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -2539,6 +2539,13 @@ static struct sk_buff *receive_mergeable(struct net_device *dev,
+ 	return NULL;
+ }
+ 
++static inline u32
++virtio_net_hash_value(const struct virtio_net_hdr_v1_hash *hdr_hash)
++{
++	return __le16_to_cpu(hdr_hash->hash_value_lo) |
++		(__le16_to_cpu(hdr_hash->hash_value_hi) << 16);
++}
++
+ static void virtio_skb_set_hash(const struct virtio_net_hdr_v1_hash *hdr_hash,
+ 				struct sk_buff *skb)
+ {
+@@ -2565,7 +2572,7 @@ static void virtio_skb_set_hash(const struct virtio_net_hdr_v1_hash *hdr_hash,
+ 	default:
+ 		rss_hash_type = PKT_HASH_TYPE_NONE;
+ 	}
+-	skb_set_hash(skb, __le32_to_cpu(hdr_hash->hash_value), rss_hash_type);
++	skb_set_hash(skb, virtio_net_hash_value(hdr_hash), rss_hash_type);
+ }
+ 
+ static void virtnet_receive_done(struct virtnet_info *vi, struct receive_queue *rq,
+@@ -3311,6 +3318,10 @@ static int xmit_skb(struct send_queue *sq, struct sk_buff *skb, bool orphan)
+ 
+ 	pr_debug("%s: xmit %p %pM\n", vi->dev->name, skb, dest);
+ 
++	/* Make sure it's safe to cast between formats */
++	BUILD_BUG_ON(__alignof__(*hdr) != __alignof__(hdr->hash_hdr));
++	BUILD_BUG_ON(__alignof__(*hdr) != __alignof__(hdr->hash_hdr.hdr));
++
+ 	can_push = vi->any_header_sg &&
+ 		!((unsigned long)skb->data & (__alignof__(*hdr) - 1)) &&
+ 		!skb_header_cloned(skb) && skb_headroom(skb) >= hdr_len;
+@@ -6750,7 +6761,7 @@ static int virtnet_xdp_rx_hash(const struct xdp_md *_ctx, u32 *hash,
+ 		hash_report = VIRTIO_NET_HASH_REPORT_NONE;
+ 
+ 	*rss_type = virtnet_xdp_rss_type[hash_report];
+-	*hash = __le32_to_cpu(hdr_hash->hash_value);
++	*hash = virtio_net_hash_value(hdr_hash);
+ 	return 0;
+ }
+ 
+diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
+index 4d1780848d0e..b673c31569f3 100644
+--- a/include/linux/virtio_net.h
++++ b/include/linux/virtio_net.h
+@@ -401,7 +401,8 @@ virtio_net_hdr_tnl_from_skb(const struct sk_buff *skb,
+ 	if (!tnl_hdr_negotiated)
+ 		return -EINVAL;
+ 
+-        vhdr->hash_hdr.hash_value = 0;
++	vhdr->hash_hdr.hash_value_lo = 0;
++	vhdr->hash_hdr.hash_value_hi = 0;
+         vhdr->hash_hdr.hash_report = 0;
+         vhdr->hash_hdr.padding = 0;
+ 
+diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
+index 8bf27ab8bcb4..1db45b01532b 100644
+--- a/include/uapi/linux/virtio_net.h
++++ b/include/uapi/linux/virtio_net.h
+@@ -193,7 +193,8 @@ struct virtio_net_hdr_v1 {
+ 
+ struct virtio_net_hdr_v1_hash {
+ 	struct virtio_net_hdr_v1 hdr;
+-	__le32 hash_value;
++	__le16 hash_value_lo;
++	__le16 hash_value_hi;
+ #define VIRTIO_NET_HASH_REPORT_NONE            0
+ #define VIRTIO_NET_HASH_REPORT_IPv4            1
+ #define VIRTIO_NET_HASH_REPORT_TCPv4           2
+-- 
+2.31.1
+
 
