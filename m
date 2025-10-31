@@ -1,47 +1,39 @@
-Return-Path: <netdev+bounces-234655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0368C253C7
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 14:20:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 887CEC2544E
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 14:29:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5D28F3516AB
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 13:20:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A4CE3BDDB4
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 13:29:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 961FD34B429;
-	Fri, 31 Oct 2025 13:20:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="ZWImuyJM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0A1134B411;
+	Fri, 31 Oct 2025 13:29:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15F351B142D;
-	Fri, 31 Oct 2025 13:20:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 232D7D2FB;
+	Fri, 31 Oct 2025 13:29:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761916820; cv=none; b=S8UqkmMQz4jjt29aKOHu9OE/Q6sUVr4AoG6h/p2s7Z0oCO1OXbgkFuHfGhLBo96dlEDFFpJxwH9+dPRjadN19irCb0dJ0EDjx7n/OQTS/sUjUYcJgZ4W0vnjh1nfC0BceoRQ3a+8SxO2EGROpTQOlS05OYDjN3uYHQYB9OZicps=
+	t=1761917391; cv=none; b=CqZHO6n4m3K4+srhvZIk1r2zVszUg4poPNtmJvJe54PIvWVfz2d4RGisJhzC1cZpgvsXf+Z6g3iSiQn27QAW9Gi4PTkI2QoQ8+Jk4avRnUehZD1HD34hQ3etavgiMJSt1TBZ/fjaJbyh0d7JG7Jg47nfC5OSu/K7N69KyRv4hsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761916820; c=relaxed/simple;
-	bh=DawxYnhCqvS1VLds39qbkKtQE0BqAIbIQ6H60jxljHM=;
+	s=arc-20240116; t=1761917391; c=relaxed/simple;
+	bh=2+PgWQ9PdjBLHdFl7BQ8/dlijtSQu9Lg/oJLV5+43iY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GhdWeu0uNs/infHT32At1l8T0mPMGvGl1DTbFcV4dYL7eQRoQvl3a8/yA/U7X234cnCgvt3f6/VjzT8j6upTKx8TzmgE8u3pcVhkc84IsyqWNOThGhoEdupWj/9QDMYZPub/U8vewnp7L83LMY/Bt+Nm9+82NzLSuTWz04xfJR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=ZWImuyJM; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from [192.168.1.19] (unknown [103.212.145.71])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 006D4201A7D2;
-	Fri, 31 Oct 2025 06:20:12 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 006D4201A7D2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1761916818;
-	bh=jnAwVyIj69/F/fVSjZqV+IT6X9/j+5+6TPTp7CUgj7A=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ZWImuyJMsrEdzFUuLTme2SU4Dt/KU4jg59orX5Ppr8PNkuptpnRvW0hpRTeBhRokh
-	 MdYiGUTInWEGFJiPHbbLBV/IOs+zsLRWECBYiy+dy2ip7hf4cgBjGmAfvimQCVI38x
-	 M3uftScXNcDyeR0tJHjHk2O1cy6s1rDrUJY/rdfg=
-Message-ID: <347c723b-d47c-49c2-9a3b-b49d967f875b@linux.microsoft.com>
-Date: Fri, 31 Oct 2025 18:50:10 +0530
+	 In-Reply-To:Content-Type; b=neZxDqnNTRCqh1zGXNhZGeUphdTZCZAsIrjAm0OFcW+2ZzHd6z2PFlJvcecqIlNJIcXXPlpUapmP/ySe9bX1QYdvjFtUoO5ymctkUigWPC+NwVbqYs2PQY8Blc8q//GvC7eeSDfS+WtimDVtRnBOZBJHfi5otTQq1v0Hsl/vFKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from [192.168.0.109] (unknown [114.241.85.109])
+	by APP-01 (Coremail) with SMTP id qwCowAAXfWe0uQRpJJbBAA--.7539S2;
+	Fri, 31 Oct 2025 21:29:24 +0800 (CST)
+Message-ID: <729fc508-0682-41b0-8582-b1388f31e08d@iscas.ac.cn>
+Date: Fri, 31 Oct 2025 21:29:23 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,90 +41,94 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] net: mana: Handle SKB if TX SGEs exceed
- hardware limit
-To: Simon Horman <horms@kernel.org>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- longli@microsoft.com, kotaranov@microsoft.com,
- shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
- ernis@linux.microsoft.com, dipayanroy@linux.microsoft.com,
- shirazsaleem@microsoft.com, linux-hyperv@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-rdma@vger.kernel.org, gargaditya@microsoft.com
-References: <20251029131235.GA3903@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <aQMqLN0FRmNU3_ke@horms.kernel.org>
+Subject: Re: [PATCH net] net: spacemit: Implement emac_set_pauseparam properly
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Yixun Lan <dlan@gentoo.org>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Troy Mitchell <troy.mitchell@linux.spacemit.com>, netdev@vger.kernel.org,
+ linux-riscv@lists.infradead.org, spacemit@lists.linux.dev,
+ linux-kernel@vger.kernel.org
+References: <20251030-k1-ethernet-fix-autoneg-v1-1-baa572607ccc@iscas.ac.cn>
+ <2eb5f9fc-d173-4b9e-89a3-87ad17ddd163@lunn.ch>
+ <ee49cb12-2116-4f0d-8265-cd1c42b6037b@iscas.ac.cn>
+ <c180925d-68fe-4af1-aa4f-57fb2cd1e9ca@lunn.ch>
 Content-Language: en-US
-From: Aditya Garg <gargaditya@linux.microsoft.com>
-In-Reply-To: <aQMqLN0FRmNU3_ke@horms.kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Vivian Wang <wangruikang@iscas.ac.cn>
+In-Reply-To: <c180925d-68fe-4af1-aa4f-57fb2cd1e9ca@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:qwCowAAXfWe0uQRpJJbBAA--.7539S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7ZFW7Xr13Zw15KF43CFW5GFg_yoW8ur1rpa
+	yaga4vyF1jyr1vyFZ7Zr47Xa4j9395JrsxCFyrKw18Xrn8XFyrCr9rKF47C39xWw1kJr4Y
+	9ws5XF93ArsrAaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvmb7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I2
+	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xII
+	jxv20xvEc7CjxVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwV
+	C2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
+	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7
+	MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r
+	4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF
+	67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2I
+	x0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2
+	z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnU
+	UI43ZEXa7IU56yI5UUUUU==
+X-CM-SenderInfo: pzdqw2pxlnt03j6l2u1dvotugofq/
 
-On 30-10-2025 14:34, Simon Horman wrote:
-> On Wed, Oct 29, 2025 at 06:12:35AM -0700, Aditya Garg wrote:
->> The MANA hardware supports a maximum of 30 scatter-gather entries (SGEs)
->> per TX WQE. Exceeding this limit can cause TX failures.
->> Add ndo_features_check() callback to validate SKB layout before
->> transmission. For GSO SKBs that would exceed the hardware SGE limit, clear
->> NETIF_F_GSO_MASK to enforce software segmentation in the stack.
->> Add a fallback in mana_start_xmit() to linearize non-GSO SKBs that still
->> exceed the SGE limit.
+On 10/31/25 20:43, Andrew Lunn wrote:
+> On Fri, Oct 31, 2025 at 03:22:56PM +0800, Vivian Wang wrote:
+>> On 10/31/25 05:32, Andrew Lunn wrote:
+>>>> [...]
+>>>>
+>>>> -		emac_set_fc(priv, fc);
+>>>> -	}
+>>>> +	phy_set_asym_pause(dev->phydev, pause->rx_pause, pause->tx_pause);
+>>> It is hard to read what this patch is doing, but there are 3 use cases.
+>> Yeah, I guess the patch doesn't look great. I'll reorganize it in the
+>> next version to make it clearer what the new implementation is and also
+>> fix it up per your other comments.
 >>
->> Return NETDEV_TX_BUSY only for -ENOSPC from mana_gd_post_work_request(),
->> send other errors to free_sgl_ptr to free resources and record the tx
->> drop.
->>
->> Co-developed-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
->> Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
->> Signed-off-by: Aditya Garg <gargaditya@linux.microsoft.com>
-> 
-> ...
-> 
->> @@ -289,6 +290,21 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
->>   	cq = &apc->tx_qp[txq_idx].tx_cq;
->>   	tx_stats = &txq->stats;
->>   
->> +	if (MAX_SKB_FRAGS + 2 > MAX_TX_WQE_SGL_ENTRIES &&
->> +	    skb_shinfo(skb)->nr_frags + 2 > MAX_TX_WQE_SGL_ENTRIES) {
->> +		/* GSO skb with Hardware SGE limit exceeded is not expected here
->> +		 * as they are handled in mana_features_check() callback
->> +		 */
-> 
-> Hi,
-> 
-> I'm curious to know if we actually need this code.
-> Are there cases where the mana_features_check() doesn't
-> handle things and the kernel will reach this line?
-> 
->> +		if (skb_is_gso(skb))
->> +			netdev_warn_once(ndev, "GSO enabled skb exceeds max SGE limit\n");
->> +		if (skb_linearize(skb)) {
->> +			netdev_warn_once(ndev, "Failed to linearize skb with nr_frags=%d and is_gso=%d\n",
->> +					 skb_shinfo(skb)->nr_frags,
->> +					 skb_is_gso(skb));
->> +			goto tx_drop_count;
->> +		}
->> +	}
->> +
->>   	pkg.tx_oob.s_oob.vcq_num = cq->gdma_id;
->>   	pkg.tx_oob.s_oob.vsq_frame = txq->vsq_frame;
->>   
-> 
-> ...
+>>> 1) general autoneg for link speed etc, and pause autoneg
+>>> 2) general autoneg for link speed etc, and forced pause
+>>> 3) forced link speed etc, and forced pause.
+>> Thanks for the tip on the different cases. However, there's one bit I
+>> don't really understand: Isn't this set_pauseparam thing only for
+>> setting pause autoneg / force?
+> Nope. You need to think about how it interacts with generic autoneg.
+>
+>        ethtool -A|--pause devname [autoneg on|off] [rx on|off] [tx on|off]
+>
+>        ethtool -s devname [speed N] [lanes N] [duplex half|full]
+>               [port tp|aui|bnc|mii] [mdix auto|on|off] [autoneg on|off]
+>
+> These autoneg are different things. -s is about generic autoneg,
+> speed, duplex, etc. However pause can also be negotiated, or not,
+> using -A.
+>
+> You can only autoneg pause if you are doing generic autoneg. So there
+> are three combinations you need to handle.
 
-Hi Simon,
-As it was previously discussed and agreed on with Eric, this is for 
-Non-GSO skbs which could have possibly nr_frags greater than hardware limit.
+Oh, that is what I had missed. I hadn't understood this part before. Thanks.
 
-Quoting Eric's comment from v1 thread: 
-https://lore.kernel.org/netdev/CANn89iKwHWdUaeAsdSuZUXG-W8XwyM2oppQL9spKkex0p9-Azw@mail.gmail.com/
-"I think that for non GSO, the linearization attempt is fine.
+> With pause autoneg off, you can set registers in the MAC immediately,
+> but you need to be careful not to overwrite the values when generic
+> autoneg completes and the adjust_link callback is called.
+>
+> If you have pause autoneg on, you have to wait for the adjust_link
+> callback to be called with the results of the negotiation, including
+> pause.
+>
+> phylink hides all this logic. There is a link_up callback, which tells
+> you how to program the hardware. You just do it, no logic needed.
 
-Note that this is extremely unlikely for non malicious users,
-and MTU being usually small (9K or less),
-the allocation will be much smaller than a GSO packet."
+This makes sense. I'll look into using phylink.
 
-Regards,
-Aditya
+Thanks,
+Vivian "dramforever" Wang
+
 
