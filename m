@@ -1,179 +1,129 @@
-Return-Path: <netdev+bounces-234651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52507C25297
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 14:05:11 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 238CCC25330
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 14:11:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DECC4262E4
-	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 13:05:04 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DC6D64F9903
+	for <lists+netdev@lfdr.de>; Fri, 31 Oct 2025 13:05:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45EC33446DD;
-	Fri, 31 Oct 2025 13:05:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3908834B1B3;
+	Fri, 31 Oct 2025 13:05:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zGWTOgvT"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WKUuAA8u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D7F12E6CA8
-	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 13:04:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CF6E3446DD
+	for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 13:05:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761915901; cv=none; b=TPLp1DocxMvXGDHF8xDVbWxLmRFUgShiLKPK4XOLYcoPkeJJ4b3mKS+vlLcyb8ZBT8h8qlBq++lDYMdQOpWdY+nabZxLZR30ZOmHonroUh2xUEGR0XnL9OtONWFDpQ2A7+aJnTo8HQK2cBinWdnjjn4SFdZpLbPULPsB0mgoEy8=
+	t=1761915908; cv=none; b=gLgflhqQUgAJLhdVY+/+k80mS4T8BrZqHI7ceBDzZRRfccWoDNxkJiAANdwOkiZUrCqsh6EW0sUnjVXhynqzxZOVnZMu3SifPbZizjRVHyAElrkkLU0I45TLPRdUF/vy3QWuzXOlkoEVAXOKVZ/suMutuswiywzjbKNDN+wm6gQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761915901; c=relaxed/simple;
-	bh=ZXkLDTr8nSCVJ26GqbMBd9kDRvIEMx/HbigcYuaDpnE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=At3QlfTsvejExOo5iBdcodRM/N1wI6TGTpRhkEeIyGOT7MDSNqEionqGB0AqJI2OOJ6wZ5ByPzany1DFKclFcd7uVebFszqyvB8anmD55/i4rQRWEEzStiFB8iKVFgQMQTnmvvLTzUiJU9V261yNsq6KD50f6fkI7RbHkIAoAgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zGWTOgvT; arc=none smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4ecf03363c9so16513721cf.1
-        for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 06:04:59 -0700 (PDT)
+	s=arc-20240116; t=1761915908; c=relaxed/simple;
+	bh=ohLTL0SvpZNw1YyqDgj7e+a1xa9YzqNdtbvCbNOK1Y4=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=h9WU1G9DfbuKixeJs6FIPlcuA9EjAvXG27ujzbJ2y/No6QBV+qkbQTuY1MiJ0i2XV4t8leII8xmzp/j21bzVcrfcT8xivBG2AeQMo2+DwTMkQI7xJ/uF6C0Htqhr3CYaoS5qHWNoqhVRQuG1cJX97HHzifNk0XtsU4nHZyh9Osk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=WKUuAA8u; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-471191ac79dso24719035e9.3
+        for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 06:05:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1761915898; x=1762520698; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kDiDynQdbM4YCkifi3qZwLvI//rX+qgG18kLYdtT/4E=;
-        b=zGWTOgvTB3D/F66yiJp5yMOyuYmT3GOWJK09pjy7HAD27axObslNoBdhL+1clNj2iE
-         no2NH/+gS2aW5AuBgoXJNVx5f7OeCaeGtaa93ET/ggb5vdTnEyu18YGIkhFPkkhcVwdV
-         5Gd+uB8RZolTTjthq8iiA9r8xfuIMbXNlRvPmP/CF5g6qDmJUNX/WY98mBwuGxe4y2Bn
-         jEZ0G6AUEeZIJTxsm+xXcrtygNWhxhsUgfUnNe8iQ5ya2LwRnpTCN2M+dk/l9+1nsJ35
-         x2BScEfgyc5PqcAA4u5Fdv3XoR9gfS3LhHtDvyCq2lobQ3aAKu7ni1bgtHeZs5p3QVzg
-         8SNg==
+        d=linaro.org; s=google; t=1761915905; x=1762520705; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+w8jqf2lCxSEA+gKuomLF8ByPnOiEIRxtEHIBbMby5M=;
+        b=WKUuAA8udu4w586zlyk6R83XVRBVK+QbQAx10NwNt6RXYxYb/rEHdS6kcQLMkhG1pv
+         9ST5l8+qPAVXWBA9LM/L6FzfRAi59AwCAdYofww4RJwxavGQanzqPztneObNQdaDHaXV
+         HpXv1x7zBi8oiF+74ID3GU1cySw0/PllMzxNhhy7QP1bvwX/qyrziX5gJaDdZrRQ8wdo
+         4adrxPwtiCqtcwCAZuOQiKPr3wdDcdciJ1m3cqASQA18cSTGmHgPLr0ON7tC3MXQ7bzC
+         ygiH3gQgRC6yVWDCbdAMGfB/YKmj90Gn76+AtJ7qUCBmlo2qDGFyJC+1f0s2ccN/q/Xs
+         sj0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761915898; x=1762520698;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kDiDynQdbM4YCkifi3qZwLvI//rX+qgG18kLYdtT/4E=;
-        b=h2r+UPsQrmmlsG3Pu0PS6NgfPg0bSib8DtWsw5IznRUNiG5PJCsOTRljy3tNOSaA1e
-         DkZKDWtlYwOhHg0R5Y9Y9Zsy804gEZgI+RJ90aB9FBh4azXydRvCvoaeFBTnccP6w/4S
-         y5It4UTI1jodIQizp0ePEMSjZHmuG4Iv/YJZbHfCUISTospKWxXPTquxfC7DtPXuodX6
-         HfTcDHWN89Xdkz4wVlZwjyuSyAV+CrZLZmkrfIUB7ahy+IANmtI4M3zGI7a9jbIWDrVD
-         rd+dFWwioygF/0aaERtsbCcR/QlI/ATaPPZEfly3+k2KLsNSFzxncLQwbmYZ8ltQB6M/
-         KiYA==
-X-Forwarded-Encrypted: i=1; AJvYcCVvnn6i/oxJOHKcyW2Coi0qGwxv9l4OnYsXxVOyaIUr+1qgsuyMyO0H5qwj8GofD1b0amPnudY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxmZjldG089YkNiKNuYSdy9S1/m+ifMOPI7p55ZsLoouW4SiQqu
-	au45irXHPo3ZBi7s4b6Yut4x+H1dI6H4sp8vbiMHNKPYg1wTWOrjGvzrbv6uM0TpxlWydfmY1P7
-	vCdNd/JXtoK+Of5v59DlQhjxwjdj3uGceK5VmrLN2
-X-Gm-Gg: ASbGncsd8bT/N3IMFpZp6Y2DDx+sDGplFpi/unoPc7UaqzvKOwW63F1gHP0rUretnAk
-	ALHHFCDOXIuCg/pUm3eOE5yYSX+qko70oXpD5A4Z5yf4EdHhWBppyX5Mpe6KwRunpsHsM4kabqS
-	b6MnaHWgWX+JcsQB4BR3AaEcjmGnvmTW1DukReovPJZhqji37lG6rj6eM5J5D5Tv7CXBgs2AXo1
-	+dsYlekwDN5JL3kKq/BVfvZm+Hyh/COzcY7d2jpM4fS69f2mQY/Y3G4AEODkeP5od/YkI8=
-X-Google-Smtp-Source: AGHT+IHegrj0d0o9bzyKTvokwzDp4oyCK2YZvXyBZt7oa/GcTr6PrpKIl05o7IhuEsdDpdFZDAMZ3HEW+TjxbJ0bK34=
-X-Received: by 2002:a05:622a:4106:b0:4eb:9d8d:2f24 with SMTP id
- d75a77b69052e-4ed30f9c8camr40022091cf.40.1761915898124; Fri, 31 Oct 2025
- 06:04:58 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1761915905; x=1762520705;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+w8jqf2lCxSEA+gKuomLF8ByPnOiEIRxtEHIBbMby5M=;
+        b=veNtL2d0Laosb6sP+ea3CGOegV0e0Ap4OUo5H1m5Kxu+RbHLd31m+LRV3AywW57il8
+         p/glQK7+PJmBtVD7d8GdMuzKXeAROs4BwWHqSART9BDatHTWHAGvWNAUvnuE4XVOobih
+         y7xj3DjX5TSNsyzaP5Et7YLAB6zGYvvetdjofJpZNqqvfpakvDdDaQwgE1kAnf20GuMB
+         isvmIPy0JtURK5AwFJN+yg4Sd3gBzpNUytpO3dBFaX/ok0rXaFvNSOgFkQaWYL9GlbIK
+         82oBkHx/7Z2/odVyBnC4MIlfL2LpEyip0Y6YR0x5IxD927sW67cLPfIGpj2OHpFv/8JU
+         Zd9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXxIDb28pci5zjlnfLC3c6/LFe/Wx960aoIfoSHjSAoxkUZRQ+9hGrCdqrTJMax3/snDG/xHy0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8kDdH9D3uTp6fPAWjy3m0WUHkmvW75FPC9FBpeR5ow34X5oVG
+	Vvar89CjUpe9nIV2IyamN5IxMCCQh83ykEe8lwKHc6lLw/YCUlfNOFD12E7ry5N7MQA=
+X-Gm-Gg: ASbGncske57P9E9xYhlKCG7E9cakhJF29B5JGYtsrB5O/8G5B/trhan/87W952h/mZ6
+	QKJR0bc3K8AvbIOgnaopveZQaDlkwjJNV3p+/+JqkmiqOeJCX7amB0E0OtVbrV/fbn4ZCrSHT1y
+	6AL/sL1tCp4AH4bhLDAIGJ1MsDVIGt0koSdxGXdT5JRS5oRqqpL2EPSV1+1sJXqExkvkWCDM9o5
+	bDZ2i1O2uUeJLIx1Xt1JCa7taqQr+o3nWYb0e8npiSYGwlt1RkAraMnlGjSKRRNH5tYbOHkClOq
+	JfLPnsi0h1OWZBXxGY36txDr7Wcr2oQtjs3psqnevVOd+1tMxaOu6pHUTmMccVp3N5jGaA1s01q
+	uiE/DDAh8ZiVMHNYvgJ64sTwTFU0ZZhHMtF4HN8ERr1wKMi2rpzFTGrq9+UVd/qj5j/VreBfGVB
+	GxMGjPo/cnnUjF88+n
+X-Google-Smtp-Source: AGHT+IEJtNSHRo+8kbxShLrSYoJ1sltDyk37yajDo7sugoAhpxuanGQrpoVYtZmOoClzTAqz2jv3ug==
+X-Received: by 2002:a05:600c:a44:b0:477:df3:1453 with SMTP id 5b1f17b1804b1-477308cd816mr35529135e9.28.1761915904754;
+        Fri, 31 Oct 2025 06:05:04 -0700 (PDT)
+Received: from localhost ([196.207.164.177])
+        by smtp.gmail.com with UTF8SMTPSA id ffacd0b85a97d-429c1406a45sm3485008f8f.47.2025.10.31.06.05.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 31 Oct 2025 06:05:04 -0700 (PDT)
+Date: Fri, 31 Oct 2025 16:05:01 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Tristram Ha <tristram.ha@microchip.com>,
+	Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
+Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+	Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH net] net: dsa: microchip: Fix a link check in
+ ksz9477_pcs_read()
+Message-ID: <aQSz_euUg0Ja8ZaH@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251031-infoleak-v1-1-9f7250ee33aa@gmail.com>
-In-Reply-To: <20251031-infoleak-v1-1-9f7250ee33aa@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 31 Oct 2025 06:04:45 -0700
-X-Gm-Features: AWmQ_bnXpmkVe3zJAzdYr8G9bxgCyUuK6HP9RyRDjUsMT-RKlpN9aPLHRuGIsyc
-Message-ID: <CANn89iJL3upMfHB+DsuS8Ux06fM36dbHeaU5xof5-T+Fe80tFg@mail.gmail.com>
-Subject: Re: [PATCH] net: sched: act_ife: initialize struct tc_ife to fix
- KMSAN kernel-infoleak
-To: Ranganath V N <vnranganath.20@gmail.com>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org, 
-	david.hunter.linux@gmail.com, khalid@kernel.org, 
-	syzbot+0c85cae3350b7d486aee@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
 
-On Fri, Oct 31, 2025 at 5:24=E2=80=AFAM Ranganath V N <vnranganath.20@gmail=
-.com> wrote:
->
-> Fix a KMSAN kernel-infoleak detected  by the syzbot .
->
-> [net?] KMSAN: kernel-infoleak in __skb_datagram_iter
->
-> In tcf_ife_dump(), the variable 'opt' was partially initialized using a
-> designatied initializer. While the padding bytes are reamined
-> uninitialized. nla_put() copies the entire structure into a
-> netlink message, these uninitialized bytes leaked to userspace.
->
-> Initialize the structure with memset before assigning its fields
-> to ensure all members and padding are cleared prior to beign copied.
->
-> This change silences the KMSAN report and prevents potential information
-> leaks from the kernel memory.
->
-> This fix has been tested and validated by syzbot. This patch closes the
-> bug reported at the following syzkaller link and ensures no infoleak.
->
-> Reported-by: syzbot+0c85cae3350b7d486aee@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3D0c85cae3350b7d486aee
-> Tested-by: syzbot+0c85cae3350b7d486aee@syzkaller.appspotmail.com
-> Fixes: ef6980b6becb ("introduce IFE action")
-> Signed-off-by: Ranganath V N <vnranganath.20@gmail.com>
-> ---
-> Fix a KMSAN kernel-infoleak detected  by the syzbot .
->
-> [net?] KMSAN: kernel-infoleak in __skb_datagram_iter
->
-> In tcf_ife_dump(), the variable 'opt' was partially initialized using a
-> designatied initializer. While the padding bytes are reamined
-> uninitialized. nla_put() copies the entire structure into a
-> netlink message, these uninitialized bytes leaked to userspace.
->
-> Initialize the structure with memset before assigning its fields
-> to ensure all members and padding are cleared prior to beign copied.
-> ---
->  net/sched/act_ife.c | 13 ++++++++-----
->  1 file changed, 8 insertions(+), 5 deletions(-)
->
-> diff --git a/net/sched/act_ife.c b/net/sched/act_ife.c
-> index 107c6d83dc5c..608ef6cc2224 100644
-> --- a/net/sched/act_ife.c
-> +++ b/net/sched/act_ife.c
-> @@ -644,13 +644,16 @@ static int tcf_ife_dump(struct sk_buff *skb, struct=
- tc_action *a, int bind,
->         unsigned char *b =3D skb_tail_pointer(skb);
->         struct tcf_ife_info *ife =3D to_ife(a);
->         struct tcf_ife_params *p;
-> -       struct tc_ife opt =3D {
-> -               .index =3D ife->tcf_index,
-> -               .refcnt =3D refcount_read(&ife->tcf_refcnt) - ref,
-> -               .bindcnt =3D atomic_read(&ife->tcf_bindcnt) - bind,
-> -       };
-> +       struct tc_ife opt;
->         struct tcf_t t;
->
-> +       memset(&opt, 0, sizeof(opt));
-> +       memset(&t, 0, sizeof(t));
+The BMSR_LSTATUS define is 0x4 but the "p->phydev.link" variable
+is a 1 bit bitfield in a u32.  Since 4 doesn't fit in 0-1 range
+it means that ".link" is always set to false.  Add a !! to fix
+this.
 
-Why is the second memset() needed ? Please do not add unrelated changes.
+Fixes: e8c35bfce4c1 ("net: dsa: microchip: Add SGMII port support to KSZ9477 switch")
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+---
+This is from a new static checker warning Harshit and I wrote.  Untested.
 
-Also I would also fix tcf_connmark_dump()
+ drivers/net/dsa/microchip/ksz9477.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> +
-> +       opt.index =3D ife->tcf_index,
-> +       opt.refcnt =3D refcount_read(&ife->tcf_refcnt) - ref,
-> +       opt.bindcnt =3D atomic_read(&ife->tcf_bindcnt) - bind,
-> +
->         spin_lock_bh(&ife->tcf_lock);
->         opt.action =3D ife->tcf_action;
->         p =3D rcu_dereference_protected(ife->params,
->
-> ---
-> base-commit: d127176862a93c4b3216bda533d2bee170af5e71
-> change-id: 20251031-infoleak-8a7de6afc987
->
-> Best regards,
-> --
-> Ranganath V N <vnranganath.20@gmail.com>
->
+diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
+index d747ea1c41a7..cf67d6377719 100644
+--- a/drivers/net/dsa/microchip/ksz9477.c
++++ b/drivers/net/dsa/microchip/ksz9477.c
+@@ -244,7 +244,7 @@ static int ksz9477_pcs_read(struct mii_bus *bus, int phy, int mmd, int reg)
+ 				p->phydev.link = 0;
+ 			}
+ 		} else if (reg == MII_BMSR) {
+-			p->phydev.link = (val & BMSR_LSTATUS);
++			p->phydev.link = !!(val & BMSR_LSTATUS);
+ 		}
+ 	}
+ 
+-- 
+2.51.0
+
 
