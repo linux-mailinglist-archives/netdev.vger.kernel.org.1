@@ -1,110 +1,79 @@
-Return-Path: <netdev+bounces-234790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31529C273D4
-	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 01:00:34 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10716C273E9
+	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 01:05:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D68484E25EB
-	for <lists+netdev@lfdr.de>; Sat,  1 Nov 2025 00:00:32 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B30AA4E1991
+	for <lists+netdev@lfdr.de>; Sat,  1 Nov 2025 00:05:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39C32DF72;
-	Sat,  1 Nov 2025 00:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75BE89460;
+	Sat,  1 Nov 2025 00:05:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DlPuYkCb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U8zNrg05"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F8C034D3B4;
-	Sat,  1 Nov 2025 00:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48119635;
+	Sat,  1 Nov 2025 00:05:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761955231; cv=none; b=BvyliyEhB1uc8DOWtldWMNExdvUe2U2+bgOAGLtGBr2K/K1Ja9I2rRRIUCvKLgovVYudhe51SbeaeUfijekS9rECxl190JKhqWVWmp6V/KZOm9XKJtzGPbsnQX/XCCYLMzKN8N/bq+X52Bmw3Waa7KoLeb3AfKAATpQNHHJau5U=
+	t=1761955522; cv=none; b=mrFVqGAMZCZOlNaP8VfMpshUrozianqJ7Wf95wvb4j2rDl0ptXYmhD68qjX+cKsL+3z0iVg5gBYKdJ2UuvtULETarm2+ssC34Qw/j61SWs2bDxIXGgiKjoD1kRD/P1MgVa+HVgZPpPSR4zN1ptICv8XMqroiXlEEMylkI2vFtnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761955231; c=relaxed/simple;
-	bh=yk3VPIdVlbmUTYp0UAYa5Xrpps2+T2/IAQpUgIigqeA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=WS8CyZ9hZ31oF/VkSJamOBOiaAY6InRRFP0ZD90XJjm2CzPmuyxxcou88KqeOWXvT71Z8HJmlIYu7hOi1SRT8F66FyLQW8lk5OJJakAPggG58AS+uoDHdFEya4rfZNjels+cU5j2k5yDVqgAQZXNz41no5xB8RNAxRdkPCml3cI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DlPuYkCb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 794E6C4CEE7;
-	Sat,  1 Nov 2025 00:00:30 +0000 (UTC)
+	s=arc-20240116; t=1761955522; c=relaxed/simple;
+	bh=fE+D5VHaBMCyso+4WPiJDK8Yfqjxkb3GgzV/RQzuLZY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Z7fFrhABSvKsntFv8bBcSygLt+Q3ajNV5V7NjkGl2X2VkAl1ut5Qka9AEAErXlar4xL0zNwr6eUHIkdt2oeM2izAxUcYKfKIF1Zr6342hgPvDYjxhY2cDEMGY8XMN2wKrpKTqDO2zutMzDgGZsAvX1bY3nebqc25sWL+jYO+xXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U8zNrg05; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E7C5C4CEE7;
+	Sat,  1 Nov 2025 00:05:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761955230;
-	bh=yk3VPIdVlbmUTYp0UAYa5Xrpps2+T2/IAQpUgIigqeA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=DlPuYkCbIncnNePeguGMl9kzj+u6izK/5C0oaLQGiBK3DL2/xB0bwRL/KxOd334xB
-	 J2UoCVHBO26eF4h/Jf2MZWvGCjFYXJSM+GUow2OQSZIE/GDRgeCsA8f5/6btYStaWg
-	 eb93Mb0E+6IwAd1GhU2QUVLcutfsjkcz8sWmFJtsgyyUdbz5qQCiSqLus9gyt+6y5M
-	 DhsZIU0UiChHvN4+O9Zgrj7bPXbupDgBQV1MK1GXBzsRKthyxYE/rd3akpy5p1bWCq
-	 RBP5ckng562+aGygmINndgCrKwXS6xHRkKCYCakn7MeuROJiekrAHdoXX85q4SRrIt
-	 WKUx6mk4iYIhA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE0153809A00;
-	Sat,  1 Nov 2025 00:00:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1761955521;
+	bh=fE+D5VHaBMCyso+4WPiJDK8Yfqjxkb3GgzV/RQzuLZY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=U8zNrg05CpI9dSyR/5aCQfzJtZjteo0RCZMs+Hu7x7KptXgqIYHQKCaghTLfricev
+	 TPEHgDoCg/ezZOKeDUsAru0qAjTKDL0n2PwSL41aTYVhDZVolW1DasiZLcj2yKX4pm
+	 H+LlCriQfX8BmihG14MHJvMHYfyRih3NVBX6q3AgdyAedfvwR+TvU6THWYKtl6fPRu
+	 /JDGO7vMIit6209QeXGvd20LuL51XaAZvNxKqlPNbPf52VgvdeGaKWNmqOE8p1FsVe
+	 ATH/3KpTkL0AXnLJGo9xVyCYU2qGMODJcnF5pRt1B20d1Mf57kb8gA5XH6MrI83j8e
+	 IM5CVagA9Uc1Q==
+Date: Fri, 31 Oct 2025 17:05:20 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kees Cook <kees@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, "Gustavo A. R. Silva"
+ <gustavo@embeddedor.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Simon Horman <horms@kernel.org>, Kuniyuki Iwashima
+ <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ linux-hardening@vger.kernel.org
+Subject: Re: [net-next PATCH v4 1/7] net: Convert proto_ops bind() callbacks
+ to use sockaddr_unsized
+Message-ID: <20251031170520.0b8486cf@kernel.org>
+In-Reply-To: <20251029214428.2467496-1-kees@kernel.org>
+References: <20251029214355.work.602-kees@kernel.org>
+	<20251029214428.2467496-1-kees@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net: stmmac: qcom-ethqos: remove MAC_CTRL_REG
- modification
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176195520650.673072.17303889570192464247.git-patchwork-notify@kernel.org>
-Date: Sat, 01 Nov 2025 00:00:06 +0000
-References: <E1vEPlg-0000000CFHY-282A@rmk-PC.armlinux.org.uk>
-In-Reply-To: <E1vEPlg-0000000CFHY-282A@rmk-PC.armlinux.org.uk>
-To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-arm-msm@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- mcoquelin.stm32@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com,
- vkoul@kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Wed, 29 Oct 2025 14:43:58 -0700 Kees Cook wrote:
+> Update all struct proto_ops bind() callback function prototypes from
+> "struct sockaddr *" to "struct sockaddr_unsized *" to avoid lying to the
+> compiler about object sizes. Calls into struct proto handlers gain casts
+> that will be removed in the struct proto conversion patch.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 30 Oct 2025 10:20:32 +0000 you wrote:
-> When operating in "SGMII" mode (Cisco SGMII or 2500BASE-X), qcom-ethqos
-> modifies the MAC control register in its ethqos_configure_sgmii()
-> function, which is only called from one path:
-> 
-> stmmac_mac_link_up()
-> +- reads MAC_CTRL_REG
-> +- masks out priv->hw->link.speed_mask
-> +- sets bits according to speed (2500, 1000, 100, 10) from priv->hw.link.speed*
-> +- ethqos_fix_mac_speed()
-> |  +- qcom_ethqos_set_sgmii_loopback(false)
-> |  +- ethqos_update_link_clk(speed)
-> |  `- ethqos_configure(speed)
-> |     `- ethqos_configure_sgmii(speed)
-> |        +- reads MAC_CTRL_REG,
-> |        +- configures PS/FES bits according to speed
-> |        `- writes MAC_CTRL_REG as the last operation
-> +- sets duplex bit(s)
-> +- stmmac_mac_flow_ctrl()
-> +- writes MAC_CTRL_REG if changed from original read
-> ...
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v2] net: stmmac: qcom-ethqos: remove MAC_CTRL_REG modification
-    https://git.kernel.org/netdev/net-next/c/9b443e58a896
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+I fail to spot whether the new type is defined :)
+Or is the new type not defined at all?
+If it is probably best to have that as a separate patch.
 
