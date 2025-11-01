@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-234815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36C63C275F8
-	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 03:25:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B3BFC275FE
+	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 03:25:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1A3C3BF312
-	for <lists+netdev@lfdr.de>; Sat,  1 Nov 2025 02:24:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D0974247A1
+	for <lists+netdev@lfdr.de>; Sat,  1 Nov 2025 02:25:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B898E2580CF;
-	Sat,  1 Nov 2025 02:24:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 398FB255F5E;
+	Sat,  1 Nov 2025 02:24:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="JeErkIUo"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="QTHANDRW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
+Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4738D255F5E
-	for <netdev@vger.kernel.org>; Sat,  1 Nov 2025 02:24:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9986257851
+	for <netdev@vger.kernel.org>; Sat,  1 Nov 2025 02:24:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761963894; cv=none; b=Thcwvy0foRpI1eTl/ciP0rWh6gkl2zT74SEiEftPR+EPllGdJ9P+Yrr8lYY03BRVS8Vwg5fTq99H2g3T+3pQ8OxySLi1xGwQnXwEfKglpTnN+jlKZrOQq9pdp2SoGLaDjRnv2V1nrO52gxFoV0D7KXk9FleymI4YHZNm+Sv8koY=
+	t=1761963896; cv=none; b=FFu6ZNuHxoevVTvfMK20/Z0ifDti1DHSXw/4x0ia4wGAZrIEjgk8BD5MKl7xK5k5OZ5rbj6CAWeLPSYbolyKdRL4/q+zz6NvV/KmeI6GK+9uP+5gduaRjWBGurpJXJbs3NHzaayCPLcY7M7lK2JRnxt6VEJ+AotBHEhS0X1xGeA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761963894; c=relaxed/simple;
-	bh=xkWb51wZhdI6JeTasbmp1AYz/2oYTUJNL1sr6HgNKYU=;
+	s=arc-20240116; t=1761963896; c=relaxed/simple;
+	bh=b5yo7g3MZU1FijxRkUhNS/q6XXJNwXad+y5lAYbqm3Y=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r5GvOBT2t+bALWkFQ4UDowz7/fdAYgeDYsdWXcbAeAhPMBaAjDjyVrqDACXtu1KjZC2gBYZt9y2vHxcTkAZFXK2pp/5HszWRjNytwco8uIbUbqpm41CVHrobB6Db1KmPkkr14lKNTERbb7bj2yAMWnCbxtxWPVETuimTMWXzGUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=JeErkIUo; arc=none smtp.client-ip=209.85.161.42
+	 MIME-Version; b=WUDx/W5v0V8njUiu20R76d8rqyl7oBUkvemvHAud3fCbF5MlOtp54XECcQzDgbvcTSUtRFLp/mWsYzkJwXcW0BrO5TVa8iyYTIn1hbfQNMKfIA9Cb+A6NII7KD+B6JhY+LZlQufYfq8Y4OlT+FT4abgkcimLLU9z0Jepip3LBcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=QTHANDRW; arc=none smtp.client-ip=209.85.167.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-654eb78f721so1408526eaf.1
-        for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 19:24:53 -0700 (PDT)
+Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-44f783add60so1620678b6e.2
+        for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 19:24:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1761963892; x=1762568692; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1761963894; x=1762568694; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kY7QaowISP25l5b8w9Vhc566fdS0rn2/ms8LvGaxMMw=;
-        b=JeErkIUouTRVdaI7aeSMf5arDNjzwS7o18/em/NdpLwe3B1eOEfXubB3w2rBvyvclP
-         9SbQ3VVbVCfSvhPNCpB0hvoXpUVi+70jyZx8243V8Cgc6HvxCzAligUcyN+S9uIkIezp
-         Er4RJWXyv9tfXJxR07Pth7RdiVBrhrGLim/GaV9CTTNX2A05h2oZT3R6J8L4j33O7Wxf
-         WqI+917vrTRRLe8dEZFbnL255b2odXf2bmmR8V43ePk9Dfy5WQHFxU8PeeNthlah+F6V
-         aQbjAuAnd2OcVawGITBwFxBXow1GH+J5+57hGzS+GANdTFQiEwNiMDGkQj8pdMxfGBCS
-         JaBQ==
+        bh=rMtSUVt3oTxs4d8Yt4wZTEMxA2A6WcjkTSoUILrkV8c=;
+        b=QTHANDRW2sNLFuuot7DkLuBz7ojrlt6xEsVKBG7HNKWdfXbEYVjcJUoxa/jIyp+NGI
+         Zai9Vwp2TRG4C286PG0CxRBUmd1MfrC4eZ0dKqYtYwCZqbH6N58hTp5ny9L/AC1G2R0F
+         N0ikg1NzI3oRf5JEV91UF4eIQox2NUi3DgI+/4AmK6TP8u8XDLWMXdP9vIKoyyALqelI
+         upJmyQcIOAXYmRzF3Xm+vc0GPSnftGY5d1scVLlgpkiBLxzJgdiRPwcyJ1Fkeh9OXmOB
+         RxtOWyXEO6S3rM71vm3OY6yFrfWGHs+bBe0UvwOkR09KLUqyCBaSQPh798V9+4FiTWBs
+         zv5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761963892; x=1762568692;
+        d=1e100.net; s=20230601; t=1761963894; x=1762568694;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kY7QaowISP25l5b8w9Vhc566fdS0rn2/ms8LvGaxMMw=;
-        b=PXy59G7t3iC9gjhlbJkeV9cFrmoHbMybll+gSdfkjRSjGOVnnRop04zdJtW0S6Xv3T
-         e5Uo68XSOtQQzabd4BmiKyiYQpfdY2PjUg0hTXu66wM+nJOB6ENmV2EvcyA1pOW1sjd9
-         ckvNRQJHyPlMUiQZNX19rp44ZAOJRAuX7OJ8IvwpE51QXId+Ig54Y/wAfPtxCEgkl+Gd
-         y8cQEMMfza80vHesr6DfMCq+4+K3neETRGmLFVkZyMc6zu6Rb1gAWZfj3awz4fv71d6u
-         8Kol/c8aGf5dpsqmcWuyzsGM65BO5lf/C+MZ5IdVVAAPpObt0atRWTElnypOaWidjWIZ
-         vntQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV69XPdkqaA7o7iwk/wEvf6SsO4vc991izTUB6PK5XJLCGyfK1wLJeSRYHrdykqaKMUjB4CFM0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXRYIoItIzstXpDWcnXbrUCwyjncXuzVCDTvxLz7GS3cA3SR4u
-	t5qIKEPgRflvHAsPOtNfjSj5X38xGsjXFIo59zBAeHesfx1fsQXETNDZ9/NerbfAelc=
-X-Gm-Gg: ASbGncs4eneK4avvUBJVcs95Bx8sNBYD9w1q9+X2qW9Xt5Wv85H013HFXyDeB1HQQg+
-	b/1jhE+mII92cpqbwny5PbW3ZgiMfQQPdCq4uUfgPWBZeMAQzMjvhkr/JqFbvcb5BkEXJ0GkoyT
-	rmhHx+q9uM4V2cvb3qUvZy0eiLe/1SrOnjmbU8Ay2W50cd9uWPrqzGmS8A/rgLLxtVhf7e1TFYi
-	wwsDcii5FsQ6ZMKzfEN9GRGrn65wFM42rY5MQCKMi2xvooukpjJz7Mbr2E1iAFmk+0krK+NFaEP
-	M6g97gkMAzNytKtK4Opp2oYMVMuv/A4o2aX41xBm2H+a1yfRzFFEaVC6ThCM1fAy4T0wRm5AuAc
-	2AbvKdpLGmFt+dz/BZeWnmxUQfhytDVRVWcXf4vMHqZ8wWidRe+ubVW0xG6hOez8mWukQtT/kUN
-	pmQhQoBmmUHa1v6NTUaBQ=
-X-Google-Smtp-Source: AGHT+IGlKWC6ftwE7m8rkAsyefLb4U8rEQufxKZE+McP1J5SjpdT8G5RP6YHw63K3xteAHPXJuAW7Q==
-X-Received: by 2002:a05:6820:2918:b0:654:ea04:53ff with SMTP id 006d021491bc7-6568a3ee8ddmr2515711eaf.2.1761963892406;
-        Fri, 31 Oct 2025 19:24:52 -0700 (PDT)
-Received: from localhost ([2a03:2880:12ff:70::])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-6568cfb4913sm898840eaf.12.2025.10.31.19.24.51
+        bh=rMtSUVt3oTxs4d8Yt4wZTEMxA2A6WcjkTSoUILrkV8c=;
+        b=f98a6+ZXPXi7upe9RdRCBwBH1Otwoy+2kbW/ff84OBcyqTmrbeKZOsrysbliKa6V/8
+         pozldBKxKFpn7KthQ62Q8ghIQX+VFhwbqmeKtDBPTGcN1dPd5l6rZ2/regJjsPK9+QVj
+         4bUXykIAIoS2NpW5t93E3Sc3sIlcTp7JQm5/ZO/sGPcXAY0zACKE3eJCyLk5GBm8k0a5
+         4N6H15j68IdxKn+W+I+rX9j4dTYacoEWM0jVun/dLhLgMOGHgnr84dWdV9NuIqpwE+ok
+         r2/j7nDdjUe/Tj0rJ6w3hx3i/6wMcgNkloI/Rfcz5PSQzIwwaJ6jJ7UiEJrcdPn/ni0u
+         xGEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWV8etW4arU4VCNTt9AhjX1CJABg48BjTG2XN/x47u42XknB0lhhDGjrD1H8sxoJWrmFB1fErw=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy8NRUPNisle6JM/EXYqLaopqCnkZgx81eNZeoxQv+t8GmV2/w2
+	kmzauAue5XZ8Mb7t3U9E3FfdSR72tBbaBG9z/Rg86gPrMIumZoEgVuV5EbaX5E2zYIc=
+X-Gm-Gg: ASbGncur8CvcSsHCLGWm3qao+g3PjwgOsPv8ocV4fSKOLDXoBruibvOTwEZ9UBTgEyr
+	D5pwBjQezkuCuLuJ9moGzCRIdFsC81Dkee9R6Tihb9olCFerUxgDMpH7TRLAQg1/pBKjsL5K2jO
+	VjdR6SElk5nVjQrb8lUa0fIg0MNXrOE5alQxcXYOuxEf7rI6BL15NjEIWq/Gm4zObbvQsPsmEZE
+	cwoFyrwL3xPruaSzwzevMkFrhFJJWQ9lJiIbQof7ovZmuHeuQKQdqnEaj6JwuDsDa6hhI3eu4CK
+	pBHkqzt7FFAFD5nEOwHiCWb+oB8fSOze6ehRSyCyl5Od17A0qYgdbGNfv9Z4ZRA5ot7jfLOZpnT
+	LPkZSYEU77dFoKYGeel9pg1yX4aqlVjJcIXrfSduD0WOf1xHjv6j6eG5pdLKeSVS+B2PCAajW6N
+	gMolhNDAB+izyAc4jmekk=
+X-Google-Smtp-Source: AGHT+IFZuGg22ixwVqdlXJEvkn+nh1eIMRzgR50YHgoqPtaBQRHCnOKhXy2/NXZYs/uhgBqjQUJOuw==
+X-Received: by 2002:a05:6808:508e:b0:44f:9513:3dc0 with SMTP id 5614622812f47-44f960413a0mr2643162b6e.61.1761963893682;
+        Fri, 31 Oct 2025 19:24:53 -0700 (PDT)
+Received: from localhost ([2a03:2880:12ff:73::])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7c699d9f305sm1023372a34.22.2025.10.31.19.24.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Oct 2025 19:24:52 -0700 (PDT)
+        Fri, 31 Oct 2025 19:24:53 -0700 (PDT)
 From: David Wei <dw@davidwei.uk>
 To: io-uring@vger.kernel.org,
 	netdev@vger.kernel.org
@@ -84,9 +84,9 @@ Cc: Jens Axboe <axboe@kernel.dk>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>
-Subject: [PATCH v3 1/2] net: export netdev_get_by_index_lock()
-Date: Fri, 31 Oct 2025 19:24:48 -0700
-Message-ID: <20251101022449.1112313-2-dw@davidwei.uk>
+Subject: [PATCH v3 2/2] net: io_uring/zcrx: call netdev_queue_get_dma_dev() under instance lock
+Date: Fri, 31 Oct 2025 19:24:49 -0700
+Message-ID: <20251101022449.1112313-3-dw@davidwei.uk>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251101022449.1112313-1-dw@davidwei.uk>
 References: <20251101022449.1112313-1-dw@davidwei.uk>
@@ -98,39 +98,71 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Need to call netdev_get_by_index_lock() from io_uring/zcrx.c, but it is
-currently private to net. Export the function in linux/netdevice.h.
+netdev ops must be called under instance lock or rtnl_lock, but
+io_register_zcrx_ifq() isn't doing this for netdev_queue_get_dma_dev().
+Fix this by taking the instance lock using netdev_get_by_index_lock().
 
+Extended the instance lock section to include attaching a memory
+provider. Could not move io_zcrx_create_area() outside, since the dmabuf
+codepath IORING_ZCRX_AREA_DMABUF requires ifq->dev.
+
+Fixes: 59b8b32ac8d4 ("io_uring/zcrx: add support for custom DMA devices")
 Signed-off-by: David Wei <dw@davidwei.uk>
 ---
- include/linux/netdevice.h | 1 +
- net/core/dev.h            | 1 -
- 2 files changed, 1 insertion(+), 1 deletion(-)
+ io_uring/zcrx.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index d1a687444b27..77c46a2823ec 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -3401,6 +3401,7 @@ struct net_device *dev_get_by_index(struct net *net, int ifindex);
- struct net_device *__dev_get_by_index(struct net *net, int ifindex);
- struct net_device *netdev_get_by_index(struct net *net, int ifindex,
- 				       netdevice_tracker *tracker, gfp_t gfp);
-+struct net_device *netdev_get_by_index_lock(struct net *net, int ifindex);
- struct net_device *netdev_get_by_name(struct net *net, const char *name,
- 				      netdevice_tracker *tracker, gfp_t gfp);
- struct net_device *netdev_get_by_flags_rcu(struct net *net, netdevice_tracker *tracker,
-diff --git a/net/core/dev.h b/net/core/dev.h
-index 900880e8b5b4..df8a90fe89f8 100644
---- a/net/core/dev.h
-+++ b/net/core/dev.h
-@@ -29,7 +29,6 @@ struct napi_struct *
- netdev_napi_by_id_lock(struct net *net, unsigned int napi_id);
- struct net_device *dev_get_by_napi_id(unsigned int napi_id);
+diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
+index a816f5902091..4ffa336d677c 100644
+--- a/io_uring/zcrx.c
++++ b/io_uring/zcrx.c
+@@ -599,29 +599,30 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
+ 	if (ret)
+ 		goto err;
  
--struct net_device *netdev_get_by_index_lock(struct net *net, int ifindex);
- struct net_device *__netdev_put_lock(struct net_device *dev, struct net *net);
- struct net_device *
- netdev_xa_find_lock(struct net *net, struct net_device *dev,
+-	ifq->netdev = netdev_get_by_index(current->nsproxy->net_ns, reg.if_idx,
+-					  &ifq->netdev_tracker, GFP_KERNEL);
++	ifq->netdev = netdev_get_by_index_lock(current->nsproxy->net_ns, reg.if_idx);
+ 	if (!ifq->netdev) {
+ 		ret = -ENODEV;
+ 		goto err;
+ 	}
++	netdev_hold(ifq->netdev, &ifq->netdev_tracker, GFP_KERNEL);
+ 
+ 	ifq->dev = netdev_queue_get_dma_dev(ifq->netdev, reg.if_rxq);
+ 	if (!ifq->dev) {
+ 		ret = -EOPNOTSUPP;
+-		goto err;
++		goto netdev_put_unlock;
+ 	}
+ 	get_device(ifq->dev);
+ 
+ 	ret = io_zcrx_create_area(ifq, &area);
+ 	if (ret)
+-		goto err;
++		goto netdev_put_unlock;
+ 
+ 	mp_param.mp_ops = &io_uring_pp_zc_ops;
+ 	mp_param.mp_priv = ifq;
+-	ret = net_mp_open_rxq(ifq->netdev, reg.if_rxq, &mp_param);
++	ret = __net_mp_open_rxq(ifq->netdev, reg.if_rxq, &mp_param, NULL);
+ 	if (ret)
+-		goto err;
++		goto netdev_put_unlock;
++	netdev_unlock(ifq->netdev);
+ 	ifq->if_rxq = reg.if_rxq;
+ 
+ 	reg.zcrx_id = id;
+@@ -640,6 +641,9 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
+ 		goto err;
+ 	}
+ 	return 0;
++netdev_put_unlock:
++	netdev_put(ifq->netdev, &ifq->netdev_tracker);
++	netdev_unlock(ifq->netdev);
+ err:
+ 	scoped_guard(mutex, &ctx->mmap_lock)
+ 		xa_erase(&ctx->zcrx_ctxs, id);
 -- 
 2.47.3
 
