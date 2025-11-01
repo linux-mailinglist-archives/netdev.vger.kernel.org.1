@@ -1,122 +1,134 @@
-Return-Path: <netdev+bounces-234870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E25DC28581
-	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 19:35:46 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1303FC285C3
+	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 19:56:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C277F4E0F80
-	for <lists+netdev@lfdr.de>; Sat,  1 Nov 2025 18:35:44 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 924CD34953B
+	for <lists+netdev@lfdr.de>; Sat,  1 Nov 2025 18:56:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B16327EFEE;
-	Sat,  1 Nov 2025 18:35:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 863512FD1B7;
+	Sat,  1 Nov 2025 18:56:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WCW4y7dR"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Jymu7hBN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65386B652
-	for <netdev@vger.kernel.org>; Sat,  1 Nov 2025 18:35:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C5C52FD677;
+	Sat,  1 Nov 2025 18:56:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762022142; cv=none; b=sCxXVuOYiKZ4H5xbtH4KBI593enSbbKfOCa9BrkBNxGDADAyp2aKNV4VfBGLjqa/t52txzMu4VevcNAZlHN0oKQUVW8Zf20VUCFAIA4F1Gcjgw73l1OXCWvKYSDbxXMZcp1cI1CSwYI59gwBSe9kEX80SSoiTCXg273HlC2oufc=
+	t=1762023390; cv=none; b=prrtxwmGvolEX1ttTD2tD1MYY+JLyHUVYMS1/gMAYAkd+LWgXnFR5F2Asjl9jLBhLGjzRIk/Bw9BAdwYbiCT3XMZzR/D/kV4vCvPjqTM66XNuuPaHYYhd/MoOMSVYJ2jiPrI8tp/mjwx5s4b1KJznvUS6tvSYUlOEFMLYpDF6RQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762022142; c=relaxed/simple;
-	bh=4sUqxa80eDuptdCLV+9yUlpRXQVSwLs4Gf5XQWScT+g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=S+mxWBqQuSMjgJFjKmKEZcUFZvc9jHuOd2KJBsNzlkrsBjZ7joeDA1imlLwnLVx3hyIYWibQafFM+qp6qsorvbsPpe0B/RzdksaY06zrdZ2eHZa8l+SvJ7BptxYYuchnZadfFrQ4VdD0Ct5BY1a9WPk5vgX0Iu9lWZKXWPkuADQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WCW4y7dR; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4770c34ca8eso26467885e9.0
-        for <netdev@vger.kernel.org>; Sat, 01 Nov 2025 11:35:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762022139; x=1762626939; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=lFcBnQWmGxUHkWuOHMhhl9sQofbkx4ng+ZfaT543MNM=;
-        b=WCW4y7dRv2fMFk5KQolOvjP45emeJn8LXvKQUkBbPyl2W882te1oSPRPpLnxC3qXqX
-         waU7vZ2g1Nx98CMpO72FHFDoVeY2GYOr47wUSXzSAr3ouhY1smGZhx2SJl47oWtKxFXD
-         /wCPLw5Lha9Ucs4OKFHJ44RJewakowUuVt/W+pkyObPjyd3XQquuPlzB3KmLu6fG0pqt
-         /eUfwrLtguJKDARBbewCVujxAnOBfAZEEZjqhEpRRtp2mkdlfqtuaheCYqm4UFtl8Mef
-         Sv6PollxLXtLTtITTl6cAqe9PyX/cOq69j47v9s6rCwWeaRfDbRj28Uv99uljRTkvLOC
-         QcGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762022139; x=1762626939;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lFcBnQWmGxUHkWuOHMhhl9sQofbkx4ng+ZfaT543MNM=;
-        b=geHnGLXnBhEPP3voy65/Ov2gwYfR8+bevSqtG1oA1DZ2z9YtzfK3EiUMQSIvYLP9to
-         lcMdfAa6bzNF5K5Mh4nkITrtAU/Z/Qht0Tm9pRNokQPDPvy2Le3aJgwBKapmhLHw6HPW
-         IczrgLMKWtkx5X5Add47YFUevTKT9HTKHdIEFRXjwfkjC8jls4eItGRArKLO7uN8naxX
-         3EgCHWrre2VZGwI4Llj/2MDKhObJkRzZ0jDc37ESy9L+FlXLWxxnTl3rV/HKjLxs+6YG
-         cdPH0aDbvX9PDaoqMr/vxqt/+Y3+2UFqrt/CHHx6BSlMOTjgHZahnc99kGeeGA+US2V+
-         qKVw==
-X-Forwarded-Encrypted: i=1; AJvYcCUmcgNl3XVC+rbx1hr1CNHoYkk8erUilygtDYmCxl0djyH9ZbUDy2GuQ+sXXbzkqjO8+ShKHKs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwU/RdPNstZVrwsC16+WWqGGOLiYBzG4TuP9Y4z8chAD7KpQeLl
-	wrYE3aHgjSEJv1wxQ/eoDgoJ9sB+1f2D9gz5bEev2gRd0ZxRzWUV734SWY2SAdZk
-X-Gm-Gg: ASbGncvv45x0UIKclnMSVx87Ug+RGNcqeqDS8WH3wpAeEIswkxcJAtjEtpmX42NnvST
-	/Ot1YULnVZ+5F1H1bjjIjtl7To/oBYeyz6J4CZPamzNj2FFyouVipW/K0DL3/6V/TTEiodNXUT2
-	9wvtA99S3QQJGQEBSxHiT4kyZTTZ/aqkSDW6gqwAR+OyXYfDZ2n8cCVuS2K/ygK0cn1c8lUq2wp
-	OyD8jv5XEmBnT4MHXsn6dONERxyzmUfIKiOujm1zJ5x8LRE7BJV/O7j+z4qmPQ8GyonIGlo5O/B
-	TJzie/M7YsEGCdA1nmnc3E3GVbXy7T8yMdsbWZ0z93OJEioWSkME8ky5PI4b3pFoqRCf1ZUM7ry
-	GZTJNa/MP6KY31+l80qPLEQRTjrNloEltdmTNQz9KMZOUCoGOgCYTWw8onvIuHqRqKsJbgXqd/3
-	fW00GsICg+MQ==
-X-Google-Smtp-Source: AGHT+IEv2HySmX9ZH4mesehdWb7wgnujM5Ajti5lbRw0Mrtv6PqNuhJysmW3Q3uyqD2pSUVf7SrbXA==
-X-Received: by 2002:a05:600c:45d3:b0:475:dde5:d91b with SMTP id 5b1f17b1804b1-47730813642mr73186695e9.17.1762022138469;
-        Sat, 01 Nov 2025 11:35:38 -0700 (PDT)
-Received: from localhost ([87.254.0.133])
-        by smtp.gmail.com with UTF8SMTPSA id 5b1f17b1804b1-4773c4a812csm68881265e9.6.2025.11.01.11.35.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 01 Nov 2025 11:35:38 -0700 (PDT)
-From: Colin Ian King <colin.i.king@gmail.com>
-To: David Yang <mmyangfl@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH][next] net: dsa: yt921x: Fix spelling mistake "stucked" -> "stuck"
-Date: Sat,  1 Nov 2025 18:34:46 +0000
-Message-ID: <20251101183446.32134-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.51.0
+	s=arc-20240116; t=1762023390; c=relaxed/simple;
+	bh=YigTw67cglsLpViZ/Okqy474ew4KBKQ6k5eBmEwkqZg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WS+92z08G9RziKbyDSmgWg+Jq39qBGIN/LnJU6Ndx5W6vfNc8JgvfFdSc3pMgYaqWP9JFP/j2g2rGl79uFO5cgFI/cqrVwmyz+Buodn3fusjBrRGNzQDNBVeudAeS1ZbqOqbI4GSbk6bBXJcFMzK76kXADgeeGve6JJOelyV408=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Jymu7hBN; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=IwPweGT8fgKILjcq4Sa1wHAoIlkTe2YX4D0a/ia0Kuc=; b=Jymu7hBNuumDCpQbLwkwa7nR1b
+	G4YSRYEbdtvS6fENPzQEaroDa7G0aqk5ZPfka4azXb5CrvyLsSjeHsjQoZHo0cJVkXjxo5yT6wkjh
+	jQEBjLyEYBI38Enf5xJDJTs3/JgaAM77yFodxpYAOhhjW5+u/xeuDP5pAe5RPTFXriaAEFcnsugrQ
+	/cAllV7Jw8uXO1gHsjb+c5poDw9nwHYrGHINoBY4XErQdRt9XtmxoZXFDG9OXMe2HGhimD9iYBGda
+	Mdtfn9a6xJdr7zPV+0j34iBjCy5aa+hMEg0RbMGYHfkfIwaPi9MdSsFsL8sokbLh8EhQfUJ+gjai9
+	0FWyR7Zw==;
+Received: from [50.53.43.113] (helo=[192.168.254.34])
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vFGm1-000000081YO-0xqc;
+	Sat, 01 Nov 2025 18:56:25 +0000
+Message-ID: <d5db214c-8216-4f6a-a64c-8a636f194202@infradead.org>
+Date: Sat, 1 Nov 2025 11:56:23 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 5/8] Documentation: xfrm_sync: Trim excess
+ section heading characters
+To: Bagas Sanjaya <bagasdotme@gmail.com>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Documentation <linux-doc@vger.kernel.org>,
+ Linux Networking <netdev@vger.kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Steffen Klassert <steffen.klassert@secunet.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>
+References: <20251101094744.46932-1-bagasdotme@gmail.com>
+ <20251101094744.46932-6-bagasdotme@gmail.com>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20251101094744.46932-6-bagasdotme@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-There is a spelling mistake in a dev_err message. Fix it.
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
----
- drivers/net/dsa/yt921x.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/dsa/yt921x.c b/drivers/net/dsa/yt921x.c
-index ab762ffc4661..944988e29127 100644
---- a/drivers/net/dsa/yt921x.c
-+++ b/drivers/net/dsa/yt921x.c
-@@ -1131,7 +1131,7 @@ static int yt921x_fdb_wait(struct yt921x_priv *priv, u32 *valp)
- 	res = yt921x_reg_wait(priv, YT921X_FDB_RESULT, YT921X_FDB_RESULT_DONE,
- 			      &val);
- 	if (res) {
--		dev_err(dev, "FDB probably stucked\n");
-+		dev_err(dev, "FDB probably stuck\n");
- 		return res;
- 	}
- 
+On 11/1/25 2:47 AM, Bagas Sanjaya wrote:
+> The first section "Message Structure" has excess underline, while the
+> second and third one ("TLVS reflect the different parameters" and
+> "Default configurations for the parameters") have trailing colon. Trim
+> them.
+> 
+> Suggested-by: Randy Dunlap <rdunlap@infradead.org>
+> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+
+Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
+Tested-by: Randy Dunlap <rdunlap@infradead.org>
+
+
+> ---
+>  Documentation/networking/xfrm_sync.rst | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/Documentation/networking/xfrm_sync.rst b/Documentation/networking/xfrm_sync.rst
+> index c811c3edfa571a..de4da4707037ea 100644
+> --- a/Documentation/networking/xfrm_sync.rst
+> +++ b/Documentation/networking/xfrm_sync.rst
+> @@ -36,7 +36,7 @@ is not driven by packet arrival.
+>  - the replay sequence for both inbound and outbound
+>  
+>  1) Message Structure
+> -----------------------
+> +--------------------
+>  
+>  nlmsghdr:aevent_id:optional-TLVs.
+>  
+> @@ -83,8 +83,8 @@ when going from kernel to user space)
+>  A program needs to subscribe to multicast group XFRMNLGRP_AEVENTS
+>  to get notified of these events.
+>  
+> -2) TLVS reflect the different parameters:
+> ------------------------------------------
+> +2) TLVS reflect the different parameters
+> +----------------------------------------
+>  
+>  a) byte value (XFRMA_LTIME_VAL)
+>  
+> @@ -106,8 +106,8 @@ d) expiry timer (XFRMA_ETIMER_THRESH)
+>     This is a timer value in milliseconds which is used as the nagle
+>     value to rate limit the events.
+>  
+> -3) Default configurations for the parameters:
+> ----------------------------------------------
+> +3) Default configurations for the parameters
+> +--------------------------------------------
+>  
+>  By default these events should be turned off unless there is
+>  at least one listener registered to listen to the multicast
+
 -- 
-2.51.0
-
+~Randy
 
