@@ -1,139 +1,86 @@
-Return-Path: <netdev+bounces-234879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77078C2887F
-	for <lists+netdev@lfdr.de>; Sun, 02 Nov 2025 00:15:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0E66C2889E
+	for <lists+netdev@lfdr.de>; Sun, 02 Nov 2025 00:46:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 57F974E160A
-	for <lists+netdev@lfdr.de>; Sat,  1 Nov 2025 23:15:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F00B3BA821
+	for <lists+netdev@lfdr.de>; Sat,  1 Nov 2025 23:46:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ADCE1A255C;
-	Sat,  1 Nov 2025 23:15:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D7332749D5;
+	Sat,  1 Nov 2025 23:46:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b="NUOMw3Jx"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RHuSWSc3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76313128819
-	for <netdev@vger.kernel.org>; Sat,  1 Nov 2025 23:15:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9B30B652
+	for <netdev@vger.kernel.org>; Sat,  1 Nov 2025 23:46:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762038949; cv=none; b=kolKlWPuBtpWh1RMkfp2aAXUFp6bz10syoKRZdCGCB3SOBZM0fTgFlrOrPcaFJnkbb4wMcSEQevi5eHTXvni/0pPDA44XYE3uYJdNBV0bjY++iMoBOAcsHAZ0OFEbZLdb5uBYXHjq1qvs81AoXitN7aiNM3LDFv57tVcvWmxAkI=
+	t=1762040766; cv=none; b=jLIlG5/yOAqlZnW+08ZupUWO4FOHBcLfEsI5dk/Hw5qjIz/A5QIvng/ZSaIha9cVz/oR+YdbartX0UbqWaOz+pBg88zcujHsntSuDAeUoZejSsUGrTo+YDHXSWxcwQdOpEs9lhL8XXtrlbI9NNgW2yN6J2EnYiS3cErj546AY70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762038949; c=relaxed/simple;
-	bh=Urv6xl2QC2Nr1jas6iAymt3YBW0ooOA1yXGE2hUmT8M=;
+	s=arc-20240116; t=1762040766; c=relaxed/simple;
+	bh=Yvs2o/RonLEgsoi6EVRu+y7OQbcWjLrx+Ri55ASa2MU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pz7TDUX5VcPPPm/Lb+Aj0QKT9RLWUVkwtYOJzTemRRfFpYfDhbY2VV6xXcO5393C63TVnKtgBZ6tG8WJfqe9/Vx4bCDIu4W2nEAuzapfkNm4apLV2G4VxBQ5MdWQCMVNK78NYXCboxnIgGsRQSBz6AiA3pHIsJdRuyPBFMSGdA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org; spf=pass smtp.mailfrom=mailbox.org; dkim=pass (2048-bit key) header.d=mailbox.org header.i=@mailbox.org header.b=NUOMw3Jx; arc=none smtp.client-ip=80.241.56.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mailbox.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mailbox.org
-Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:b231:465::202])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4czYcB5j9qz9tTf;
-	Sun,  2 Nov 2025 00:15:38 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailbox.org; s=mail20150812;
-	t=1762038938;
+	 In-Reply-To:Content-Type; b=DqXg5kbJTu2MmyUJrnxqRtoriEdmdtYsg7WmXV22BHt/VcRv4U9Fz5lKesWg/PcGjRMObHjxVeN50if228a03hKGlxhub7Hd7aO/SduHSFOluUC6uKhkPXriztnQOhmnc+m78GTLljELbYSpokvEsSD9hFdGLgzSVizYk0nFuDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RHuSWSc3; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <aef3b850-5f38-4c28-a018-3b0006dc2f08@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1762040749;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=YI02przyFsx6fdwSVdTew+4GJQghTOlFjByupIarirM=;
-	b=NUOMw3Jx3bLATFI6aHlAojIB+ahMPFAess+Ym1NRYRCjk9p3wCY8XQcwdWJU3wHW0hsTnq
-	1yEv8StKr/0wj2qQsYf4UcX9EMxILAYUm8X78JIt5AUyhg8MpaiKEZOOHMZTZZE4s48lgJ
-	aVgeq35LnyVbWfx0lvUtnDKA9WRCtiZSIEZb/tw3XhKkNAnSZqicRUIN03IG9avqWquPih
-	afi5pOLGKnI6LqSkVz/RQBixq/YzTtqL9Zm62He/BS9jYwqu0eik15teDBn4mRSlK/Ommu
-	DeevQXAXUt50MO5k9iIBTETrEQB/gULmBMLSFzHHXUaR+33yzDy3KY8i9kr1ew==
-Message-ID: <c97cf296-f947-40d5-a4bc-6c30c2ba753b@mailbox.org>
-Date: Sun, 2 Nov 2025 00:15:35 +0100
+	bh=Gp05nF2bm7DxwtWiDo5A01YXCWCugMy1BJspzvJrD7o=;
+	b=RHuSWSc3m+5sY89Fw3fLMpdHc0mm0+AoDWOOawhKS5Smp17/gJv42O+T2xnVGmwmgFf+Ku
+	gPYf91XMYKQFQHNRU+bxGX0/42Y1h4cEytPJhtejeq1U5k4N5af+h5brbBK+7+PVmU4bqE
+	4HXlKy31O8ZOojePPyx+wG7YW4qxEuo=
+Date: Sat, 1 Nov 2025 23:45:00 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [net-next,PATCH] net: dsa: microchip: Do not count RX/TX Bytes
- and discards on KSZ87xx
-To: vtpieter@gmail.com, tristram.ha@microchip.com
-Cc: Arun.Ramadoss@microchip.com, UNGLinuxDriver@microchip.com,
- Woojung.Huh@microchip.com, andrew@lunn.ch, edumazet@google.com,
- kuba@kernel.org, netdev@vger.kernel.org, olteanv@gmail.com, pabeni@redhat.com
-References: <DM3PR11MB8736FCDDE21054AC6ACCEA44EC28A@DM3PR11MB8736.namprd11.prod.outlook.com>
- <20250813070321.1608086-1-vtpieter@gmail.com>
+Subject: Re: [PATCH] ptp: ocp: Add newline to sysfs attribute output
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Zhongqiu Han <zhongqiu.han@oss.qualcomm.com>, richardcochran@gmail.com,
+ jonathan.lemon@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20251030124519.1828058-1-zhongqiu.han@oss.qualcomm.com>
+ <20251031165903.4b94aa66@kernel.org>
 Content-Language: en-US
-From: Marek Vasut <marek.vasut@mailbox.org>
-In-Reply-To: <20250813070321.1608086-1-vtpieter@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20251031165903.4b94aa66@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-MBO-RS-META: 18iwt1ttmnqbs8yn7bbojcrb7cd6c94i
-X-MBO-RS-ID: 1c4256709c1da1ba9e4
+X-Migadu-Flow: FLOW_OUT
 
-On 8/13/25 9:03 AM, vtpieter@gmail.com wrote:
->>>> Actually that many rx_discards may be a problem I need to find out.
->>>>
->>>> I think you are confused about how those MIB counters are read from
->>>> KSZ8795.  They are not using the code in ksz9477.c but in ksz8.c.
->>>
->>> See [1] TABLE 4-26: PORT MIB COUNTER INDIRECT MEMORY OFFSETS (CONTINUED)
->>> , page 108 at the very end . Notice the table ends at 0x1F
->>> TxMultipleCollision .
->>>
->>> See [2] TABLE 5-6: MIB COUNTERS (CONTINUED) , page 219 at the end of the
->>> table . Notice the table contains four extra entries , 0x80 RxByteCnt ,
->>> 0x81 TxByteCnt , 0x82 RxDropPackets , 0x83 TXDropPackets .
->>>
->>> These entries are present on KSZ9477 and missing on KSZ8795 .
->>>
->>> This is what this patch attempts to address.
->>
->> As I said KSZ8795 MIB counters are not using the code in ksz9477.c and
->> their last counter locations are not the same as KSZ9477.  KSZ9477 uses
->> ksz9477_r_mib_pkt while KSZ8795 uses ksz8795_r_mib_pkt.  The other
->> KSZ8895 and KSZ8863 switches uses ksz8863_r_mib_pkt.
->>
->> The 0x80 and such registers are not used in KSZ8795.  Its registers start
->> at 0x100, 0x101, ...
->>
->> They are in table 4-28.
->   
-> Just wanted to chip in that for me, with a KSZ8794, the iproute2
-> statistics work as expected as well after commit 0d3edc90c4a0 ("net:
-> dsa: microchip: fix KSZ87xx family structure wrt the datasheet"). I'm
-> on a 6.12 kernel and I see the following:
-I'm sorry for my late reply, and yes, I got the versions mixed up.
+On 31/10/2025 23:59, Jakub Kicinski wrote:
+> On Thu, 30 Oct 2025 20:45:19 +0800 Zhongqiu Han wrote:
+>> Append a newline character to the sysfs_emit() output in ptp_ocp_tty_show.
+>> This aligns with common kernel conventions and improves readability for
+>> userspace tools that expect newline-terminated values.
+> 
+> Vadim? Is the backward compat here a concern?
 
-The problem is still present in 6.6.115 , it is fixed in 6.12.y :
+Well, unfortunately, this patch breaks software we use:
 
-I can confirm 0d3edc90c4a0 ("net: dsa: microchip: fix KSZ87xx family 
-structure wrt the datasheet") fixes the problem, thank you for that!
+openat(AT_FDCWD, "/dev/ttyS4\n", O_RDWR|O_NONBLOCK) = -1 ENOENT (No such 
+file or directory)
+newfstatat(AT_FDCWD, "/etc/localtime", {st_mode=S_IFREG|0644, 
+st_size=114, ...}, 0) = 0
+write(2, "23:40:33 \33[31mERROR\33[0m ", 2423:40:33 ERROR ) = 24
+write(2, "Could not open sa5x device\n", 27Could not open sa5x device
 
-It would be good to backport this to 6.6.y LTS I think ?
-
-The issue looks like this:
-
-v6.11# cat /proc/net/dev
-Inter-|   Receive                                                |  Transmit
-  face |bytes    packets errs drop fifo frame compressed multicast|bytes 
-    packets errs drop fifo colls carrier compressed
-   eth0: 14818693   10334    0    0    0     0          0         0 
-335961    2859    0    0    0     0       0          0
-   lan1: 18446744073709510320   10324 14786075 14786075    0     0 
-    0     10323 18446744073709540220    2849 342812    0 342812     0 
-    0          0
-
-v6.12.56# cat /proc/net/dev
-Inter-|   Receive                                                |  Transmit
-  face |bytes    packets errs drop fifo frame compressed multicast|bytes 
-    packets errs drop fifo colls carrier compressed
-   eth0: 14707237   10296    0    0    0     0          0         0 
-340493    2889    0    0    0     0       0          0
-   lan1: 14632865   10281    0    0    0     0          0         0 
-335126    2875    0    0    0     0       0          0
-
-Thank you for your help !
+So it looks like uAPI change, which is already used...
 
