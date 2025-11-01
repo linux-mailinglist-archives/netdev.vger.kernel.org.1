@@ -1,168 +1,268 @@
-Return-Path: <netdev+bounces-234874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD7C4C2860B
-	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 20:20:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 80B5DC28620
+	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 20:21:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9D4714E15B3
-	for <lists+netdev@lfdr.de>; Sat,  1 Nov 2025 19:20:46 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8F32E4EBFCB
+	for <lists+netdev@lfdr.de>; Sat,  1 Nov 2025 19:21:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA4722FD7C3;
-	Sat,  1 Nov 2025 19:20:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 624163002DA;
+	Sat,  1 Nov 2025 19:20:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="2yNm860m"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="4Q3V8++I";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Y7sVe5FL"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02C551DF258;
-	Sat,  1 Nov 2025 19:20:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 334E82FF678;
+	Sat,  1 Nov 2025 19:20:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762024843; cv=none; b=H8m3D+67IWD3vj4EYGS/Xpkj57sCRtuWKtiOrNO0HBzYAKpTXyIfIMlPO68y/wmFXt2nRDlUay6qBEjnbETSDWAEPmOWGb2BM3h4tWV0XqciG0QWMU/HaJ5xadnMugpBJ/0pxKMOZgci76Yvxr+AnPi823n0kVn+XoZ4feToj8A=
+	t=1762024856; cv=none; b=iSJUMkL32R+/094n8OO7KA5i+hQPGUW7rNVxSJaspJA+lovf/uMDSzAgdAUA4tLZSj1cRO1R0bXhY4sB92Y6uRdRJqICCyrC0slcKe3FEsUzTyicJOwA1dAxZMwfOZDbD5XNoXIFyTS2m84+38TB3uu5eHBRoF1Z2SHOOFBhpSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762024843; c=relaxed/simple;
-	bh=EbBplVH/jp/WQDFITyHV/kOjC8DhNug4NV/9A+tLHUA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=PUtGA9ZcTPfWderzG/If2hiJxQ3364adZSCpLxmKrKzdHMnHxBFTdUMIAupLdr3AYp9Q36igyp7XrRsc/mvHza4skOiM2cGzG52un58ItnUq4K5T+6LLwQqQfT0lfCX3Iob+gn3yE905nvroihUkV1SVNaqOWbJE7cI+5HIIMhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=2yNm860m; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=UiYKIoB/RAwW7vaxisQKhlQflM4KDYIBpvhlC5sFr+8=; b=2yNm860mEjlSCQMKTz9g5yEwrG
-	KrigR+w7TZkiKZmpgQmIOfZmaoPIb3QEQEtZFz5WCs4pWW32KasygahkwqKvtl7jLZMuz1iO8OIht
-	X2YycorV0foi8nPskaD1T4K6bvNF0xyY5mzG1XFQvqjBLT+ldWO+gSGtLym29t2PbBW6Yp1zPKk6x
-	wRueWh1q3flOdOSHwNtqwSDwOu6lnSraypfORWVgOP7dpeyh6oF852FCmz2lc0Hv4PNyliCaKd+wd
-	KWcu0Hb7yIxNz0OhlYMW+TmL47pzEAoQpeueU+n3OOFHQoIjuTjFnttxRBwRSUyJWM40Zy/5l3f7/
-	oRfnGobQ==;
-Received: from [50.53.43.113] (helo=bombadil.infradead.org)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vFH9T-000000082cw-065k;
-	Sat, 01 Nov 2025 19:20:39 +0000
-From: Randy Dunlap <rdunlap@infradead.org>
-To: netdev@vger.kernel.org
-Cc: Randy Dunlap <rdunlap@infradead.org>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Phil Sutter <phil@nwl.cc>,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH net-next] netfilter: nf_tables: improve UAPI kernel-doc comments
-Date: Sat,  1 Nov 2025 12:20:38 -0700
-Message-ID: <20251101192038.2005374-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.51.1
+	s=arc-20240116; t=1762024856; c=relaxed/simple;
+	bh=KHDhI+OMbYsFp6vu64Dav6dGQ4hKGh0ZnHirB5dDyjg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ccPqIIH4+Rig4vsSRMC7Er+Vsv6ZwUbh/3ZaKN8hsGr0Sgxp0Mi9B37f81LZBReNwCAwaScb+akdD3ByyzqDEw8cbzCVICI+9B+EZhozQE0Mb9VudEgGvX87rhFCBAkAR6mrmu4mSXs+kwjOhTCQKiNbfbtSllT9HlNooibv92Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=4Q3V8++I; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Y7sVe5FL; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1762024852;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zhGK+60JgBD3s2NPs/WG00WWgCrD3JAI9aGx3Giow6U=;
+	b=4Q3V8++IhPzdnCkY/fLpB838bS06LVS94OomrBx0h8qStWpHMqKWCW7j3ayeDgp5U0Lo/o
+	F+eq5PBK+kBuHixm5ic5qF0dA/DUmZ1MrUNzAo7FttEZuPrAzN9Bzo8DxZM1Me6JgPXR42
+	bd7fUT2D+vvzoQ8rYAboiMu1rOqt4/bM+p0UPIVOd13XLnr2+1lXWXq6dN8HEyX63uQvDG
+	YMGO6RzlzV2FncmPvQhB/oqPIK2uK0CKd+qE61wRVtsn0LfBbEhnqql3O3cjOpXguhyt9e
+	L7TETIY2pp3GHotPjDUBWjvuikX2V/O9q40/uAEYspHz64dZunswmNCX7hLAtQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1762024852;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zhGK+60JgBD3s2NPs/WG00WWgCrD3JAI9aGx3Giow6U=;
+	b=Y7sVe5FL9smASbvnWfH1rQIQ1Cxz51UnrlRZ8UUXPH2YhpFaoGbhA2mwjMjxokyAuxFRtd
+	t2+fvCz4NdQZAqDA==
+To: Christian Brauner <brauner@kernel.org>, linux-fsdevel@vger.kernel.org,
+ Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>
+Cc: Jann Horn <jannh@google.com>, Mike Yuan <me@yhndnzj.com>, Zbigniew
+ =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering
+ <mzxreary@0pointer.de>, Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa
+ Sarai <cyphar@cyphar.com>, Amir Goldstein <amir73il@gmail.com>, Tejun Heo
+ <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, Alexander Viro
+ <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
+ linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
+ bpf@vger.kernel.org, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, netdev@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
+ Christian Brauner <brauner@kernel.org>
+Subject: Re: [PATCH v4 18/72] nstree: add unified namespace list
+In-Reply-To: <20251029-work-namespace-nstree-listns-v4-18-2e6f823ebdc0@kernel.org>
+References: <20251029-work-namespace-nstree-listns-v4-0-2e6f823ebdc0@kernel.org>
+ <20251029-work-namespace-nstree-listns-v4-18-2e6f823ebdc0@kernel.org>
+Date: Sat, 01 Nov 2025 20:20:50 +0100
+Message-ID: <87ecqhy2y5.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-In include/uapi/linux/netfilter/nf_tables.h,
-correct the kernel-doc comments for mistyped enum names and enum values to
-avoid these kernel-doc warnings and improve the documentation:
+Christian!
 
-nf_tables.h:896: warning: Enum value 'NFT_EXTHDR_OP_TCPOPT' not described
- in enum 'nft_exthdr_op'
-nf_tables.h:896: warning: Excess enum value 'NFT_EXTHDR_OP_TCP' description
- in 'nft_exthdr_op'
+On Wed, Oct 29 2025 at 13:20, Christian Brauner wrote:
+> --- a/kernel/time/namespace.c
+> +++ b/kernel/time/namespace.c
+> @@ -488,6 +488,7 @@ struct time_namespace init_time_ns = {
+>  	.ns.ns_owner = LIST_HEAD_INIT(init_time_ns.ns.ns_owner),
+>  	.frozen_offsets	= true,
+>  	.ns.ns_list_node = LIST_HEAD_INIT(init_time_ns.ns.ns_list_node),
+> +	.ns.ns_unified_list_node = LIST_HEAD_INIT(init_time_ns.ns.ns_unified_list_node),
 
-nf_tables.h:1210: warning: expecting prototype for enum
- nft_flow_attributes. Prototype was for enum nft_offload_attributes instead
+Sorry that I did not catch that earlier, but
 
-nf_tables.h:1428: warning: expecting prototype for enum nft_reject_code.
- Prototype was for enum nft_reject_inet_code instead
+  1) this screws up the proper tabular struct initializer
 
-(add beginning '@' to each enum value description:)
-nf_tables.h:1493: warning: Enum value 'NFTA_TPROXY_FAMILY' not described
- in enum 'nft_tproxy_attributes'
-nf_tables.h:1493: warning: Enum value 'NFTA_TPROXY_REG_ADDR' not described
- in enum 'nft_tproxy_attributes'
-nf_tables.h:1493: warning: Enum value 'NFTA_TPROXY_REG_PORT' not described
- in enum 'nft_tproxy_attributes'
+  2) the churn of touching every compile time struct each time you add a
+     new field and add the same stupid initialization to each of them
+     can be avoided, when you do something like the uncompiled below.
+     You get the idea.
 
-nf_tables.h:1796: warning: expecting prototype for enum
- nft_device_attributes. Prototype was for enum
- nft_devices_attributes instead
+Thanks,
 
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+        tglx
 ---
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
-Cc: Florian Westphal <fw@strlen.de>
-Cc: Phil Sutter <phil@nwl.cc>
-Cc: netfilter-devel@vger.kernel.org
-Cc: coreteam@netfilter.org
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>
----
- include/uapi/linux/netfilter/nf_tables.h |   14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ fs/namespace.c            |    9 +--------
+ include/linux/ns_common.h |   12 ++++++++++++
+ init/version-timestamp.c  |    9 +--------
+ ipc/msgutil.c             |    9 +--------
+ kernel/pid.c              |    8 +-------
+ kernel/time/namespace.c   |    9 +--------
+ kernel/user.c             |    9 +--------
+ 7 files changed, 18 insertions(+), 47 deletions(-)
 
---- linux-next-20251031.orig/include/uapi/linux/netfilter/nf_tables.h
-+++ linux-next-20251031/include/uapi/linux/netfilter/nf_tables.h
-@@ -881,7 +881,7 @@ enum nft_exthdr_flags {
-  * enum nft_exthdr_op - nf_tables match options
-  *
-  * @NFT_EXTHDR_OP_IPV6: match against ipv6 extension headers
-- * @NFT_EXTHDR_OP_TCP: match against tcp options
-+ * @NFT_EXTHDR_OP_TCPOPT: match against tcp options
-  * @NFT_EXTHDR_OP_IPV4: match against ipv4 options
-  * @NFT_EXTHDR_OP_SCTP: match against sctp chunks
-  * @NFT_EXTHDR_OP_DCCP: match against dccp otions
-@@ -1200,7 +1200,7 @@ enum nft_ct_attributes {
- #define NFTA_CT_MAX		(__NFTA_CT_MAX - 1)
+--- a/fs/namespace.c
++++ b/fs/namespace.c
+@@ -5985,19 +5985,12 @@ SYSCALL_DEFINE4(listmount, const struct
+ }
  
- /**
-- * enum nft_flow_attributes - ct offload expression attributes
-+ * enum nft_offload_attributes - ct offload expression attributes
-  * @NFTA_FLOW_TABLE_NAME: flow table name (NLA_STRING)
-  */
- enum nft_offload_attributes {
-@@ -1410,7 +1410,7 @@ enum nft_reject_types {
+ struct mnt_namespace init_mnt_ns = {
+-	.ns.inum	= ns_init_inum(&init_mnt_ns),
++	.ns		= NS_COMMON_INIT(init_mnt_ns, 1, 1),
+ 	.ns.ops		= &mntns_operations,
+ 	.user_ns	= &init_user_ns,
+-	.ns.__ns_ref	= REFCOUNT_INIT(1),
+-	.ns.__ns_ref_active = ATOMIC_INIT(1),
+-	.ns.ns_type	= ns_common_type(&init_mnt_ns),
+ 	.passive	= REFCOUNT_INIT(1),
+ 	.mounts		= RB_ROOT,
+ 	.poll		= __WAIT_QUEUE_HEAD_INITIALIZER(init_mnt_ns.poll),
+-	.ns.ns_list_node = LIST_HEAD_INIT(init_mnt_ns.ns.ns_list_node),
+-	.ns.ns_unified_list_node = LIST_HEAD_INIT(init_mnt_ns.ns.ns_unified_list_node),
+-	.ns.ns_owner_entry = LIST_HEAD_INIT(init_mnt_ns.ns.ns_owner_entry),
+-	.ns.ns_owner = LIST_HEAD_INIT(init_mnt_ns.ns.ns_owner),
  };
  
- /**
-- * enum nft_reject_code - Generic reject codes for IPv4/IPv6
-+ * enum nft_reject_inet_code - Generic reject codes for IPv4/IPv6
-  *
-  * @NFT_REJECT_ICMPX_NO_ROUTE: no route to host / network unreachable
-  * @NFT_REJECT_ICMPX_PORT_UNREACH: port unreachable
-@@ -1480,9 +1480,9 @@ enum nft_nat_attributes {
- /**
-  * enum nft_tproxy_attributes - nf_tables tproxy expression netlink attributes
-  *
-- * NFTA_TPROXY_FAMILY: Target address family (NLA_U32: nft_registers)
-- * NFTA_TPROXY_REG_ADDR: Target address register (NLA_U32: nft_registers)
-- * NFTA_TPROXY_REG_PORT: Target port register (NLA_U32: nft_registers)
-+ * @NFTA_TPROXY_FAMILY: Target address family (NLA_U32: nft_registers)
-+ * @NFTA_TPROXY_REG_ADDR: Target address register (NLA_U32: nft_registers)
-+ * @NFTA_TPROXY_REG_PORT: Target port register (NLA_U32: nft_registers)
-  */
- enum nft_tproxy_attributes {
- 	NFTA_TPROXY_UNSPEC,
-@@ -1783,7 +1783,7 @@ enum nft_synproxy_attributes {
- #define NFTA_SYNPROXY_MAX (__NFTA_SYNPROXY_MAX - 1)
+ static void __init init_mount_tree(void)
+--- a/include/linux/ns_common.h
++++ b/include/linux/ns_common.h
+@@ -129,6 +129,18 @@ struct ns_common {
+ 	};
+ };
  
- /**
-- * enum nft_device_attributes - nf_tables device netlink attributes
-+ * enum nft_devices_attributes - nf_tables device netlink attributes
-  *
-  * @NFTA_DEVICE_NAME: name of this device (NLA_STRING)
-  * @NFTA_DEVICE_PREFIX: device name prefix, a simple wildcard (NLA_STRING)
++#define NS_COMMON_INIT(nsname, refs, active)						\
++{											\
++	.ns_type		= ns_common_type(&nsname),				\
++	.inum			= ns_init_inum(&nsname),				\
++	.__ns_ref		= REFCOUNT_INIT(refs),					\
++	.__ns_ref_active	= ATOMIC_INIT(active),					\
++	.ns_list_node		= LIST_HEAD_INIT(nsname.ns.ns_list_node),		\
++	.ns_unified_list_node	= LIST_HEAD_INIT(nsname.ns.ns_unified_list_node),	\
++	.ns_owner_entry		= LIST_HEAD_INIT(nsname.ns.ns_owner_entry),		\
++	.ns_owner		= LIST_HEAD_INIT(nsname.ns.ns_owner),			\
++}
++
+ int __ns_common_init(struct ns_common *ns, u32 ns_type, const struct proc_ns_operations *ops, int inum);
+ void __ns_common_free(struct ns_common *ns);
+ 
+--- a/init/version-timestamp.c
++++ b/init/version-timestamp.c
+@@ -8,9 +8,7 @@
+ #include <linux/utsname.h>
+ 
+ struct uts_namespace init_uts_ns = {
+-	.ns.ns_type = ns_common_type(&init_uts_ns),
+-	.ns.__ns_ref = REFCOUNT_INIT(2),
+-	.ns.__ns_ref_active = ATOMIC_INIT(1),
++	.ns = NS_COMMON_INIT(init_uts_ns, 2, 1),
+ 	.name = {
+ 		.sysname	= UTS_SYSNAME,
+ 		.nodename	= UTS_NODENAME,
+@@ -20,11 +18,6 @@ struct uts_namespace init_uts_ns = {
+ 		.domainname	= UTS_DOMAINNAME,
+ 	},
+ 	.user_ns = &init_user_ns,
+-	.ns.inum = ns_init_inum(&init_uts_ns),
+-	.ns.ns_list_node = LIST_HEAD_INIT(init_uts_ns.ns.ns_list_node),
+-	.ns.ns_unified_list_node = LIST_HEAD_INIT(init_uts_ns.ns.ns_unified_list_node),
+-	.ns.ns_owner_entry = LIST_HEAD_INIT(init_uts_ns.ns.ns_owner_entry),
+-	.ns.ns_owner = LIST_HEAD_INIT(init_uts_ns.ns.ns_owner),
+ #ifdef CONFIG_UTS_NS
+ 	.ns.ops = &utsns_operations,
+ #endif
+--- a/ipc/msgutil.c
++++ b/ipc/msgutil.c
+@@ -27,18 +27,11 @@ DEFINE_SPINLOCK(mq_lock);
+  * and not CONFIG_IPC_NS.
+  */
+ struct ipc_namespace init_ipc_ns = {
+-	.ns.__ns_ref = REFCOUNT_INIT(1),
+-	.ns.__ns_ref_active = ATOMIC_INIT(1),
++	.ns = NS_COMMON_INIT(init_ipc_ns, 1, 1),
+ 	.user_ns = &init_user_ns,
+-	.ns.inum = ns_init_inum(&init_ipc_ns),
+-	.ns.ns_list_node = LIST_HEAD_INIT(init_ipc_ns.ns.ns_list_node),
+-	.ns.ns_unified_list_node = LIST_HEAD_INIT(init_ipc_ns.ns.ns_unified_list_node),
+-	.ns.ns_owner_entry = LIST_HEAD_INIT(init_ipc_ns.ns.ns_owner_entry),
+-	.ns.ns_owner = LIST_HEAD_INIT(init_ipc_ns.ns.ns_owner),
+ #ifdef CONFIG_IPC_NS
+ 	.ns.ops = &ipcns_operations,
+ #endif
+-	.ns.ns_type = ns_common_type(&init_ipc_ns),
+ };
+ 
+ struct msg_msgseg {
+--- a/kernel/pid.c
++++ b/kernel/pid.c
+@@ -71,18 +71,12 @@ static int pid_max_max = PID_MAX_LIMIT;
+  * the scheme scales to up to 4 million PIDs, runtime.
+  */
+ struct pid_namespace init_pid_ns = {
+-	.ns.__ns_ref = REFCOUNT_INIT(2),
+-	.ns.__ns_ref_active = ATOMIC_INIT(1),
++	.ns = NS_COMMON_INIT(init_pid_ns, 2, 1),
+ 	.idr = IDR_INIT(init_pid_ns.idr),
+ 	.pid_allocated = PIDNS_ADDING,
+ 	.level = 0,
+ 	.child_reaper = &init_task,
+ 	.user_ns = &init_user_ns,
+-	.ns.inum = ns_init_inum(&init_pid_ns),
+-	.ns.ns_list_node = LIST_HEAD_INIT(init_pid_ns.ns.ns_list_node),
+-	.ns.ns_unified_list_node = LIST_HEAD_INIT(init_pid_ns.ns.ns_unified_list_node),
+-	.ns.ns_owner_entry = LIST_HEAD_INIT(init_pid_ns.ns.ns_owner_entry),
+-	.ns.ns_owner = LIST_HEAD_INIT(init_pid_ns.ns.ns_owner),
+ #ifdef CONFIG_PID_NS
+ 	.ns.ops = &pidns_operations,
+ #endif
+--- a/kernel/time/namespace.c
++++ b/kernel/time/namespace.c
+@@ -478,17 +478,10 @@ const struct proc_ns_operations timens_f
+ };
+ 
+ struct time_namespace init_time_ns = {
+-	.ns.ns_type	= ns_common_type(&init_time_ns),
+-	.ns.__ns_ref	= REFCOUNT_INIT(3),
+-	.ns.__ns_ref_active = ATOMIC_INIT(1),
++	.ns		= NS_COMMON_INIT(init_time_ns, 3, 1),
+ 	.user_ns	= &init_user_ns,
+-	.ns.inum	= ns_init_inum(&init_time_ns),
+ 	.ns.ops		= &timens_operations,
+-	.ns.ns_owner_entry = LIST_HEAD_INIT(init_time_ns.ns.ns_owner_entry),
+-	.ns.ns_owner = LIST_HEAD_INIT(init_time_ns.ns.ns_owner),
+ 	.frozen_offsets	= true,
+-	.ns.ns_list_node = LIST_HEAD_INIT(init_time_ns.ns.ns_list_node),
+-	.ns.ns_unified_list_node = LIST_HEAD_INIT(init_time_ns.ns.ns_unified_list_node),
+ };
+ 
+ void __init time_ns_init(void)
+--- a/kernel/user.c
++++ b/kernel/user.c
+@@ -65,16 +65,9 @@ struct user_namespace init_user_ns = {
+ 			.nr_extents = 1,
+ 		},
+ 	},
+-	.ns.ns_type = ns_common_type(&init_user_ns),
+-	.ns.__ns_ref = REFCOUNT_INIT(3),
+-	.ns.__ns_ref_active = ATOMIC_INIT(1),
++	.ns = NS_COMMON_INIT(init_user_ns, 3, 1),
+ 	.owner = GLOBAL_ROOT_UID,
+ 	.group = GLOBAL_ROOT_GID,
+-	.ns.inum = ns_init_inum(&init_user_ns),
+-	.ns.ns_list_node = LIST_HEAD_INIT(init_user_ns.ns.ns_list_node),
+-	.ns.ns_unified_list_node = LIST_HEAD_INIT(init_user_ns.ns.ns_unified_list_node),
+-	.ns.ns_owner_entry = LIST_HEAD_INIT(init_user_ns.ns.ns_owner_entry),
+-	.ns.ns_owner = LIST_HEAD_INIT(init_user_ns.ns.ns_owner),
+ #ifdef CONFIG_USER_NS
+ 	.ns.ops = &userns_operations,
+ #endif
 
