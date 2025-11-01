@@ -1,67 +1,76 @@
-Return-Path: <netdev+bounces-234811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40679C27578
-	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 02:41:08 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 514BBC275A9
+	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 02:48:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56911407D67
-	for <lists+netdev@lfdr.de>; Sat,  1 Nov 2025 01:40:51 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B3DAF34A90A
+	for <lists+netdev@lfdr.de>; Sat,  1 Nov 2025 01:48:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06EA2261B8C;
-	Sat,  1 Nov 2025 01:40:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56DAA218AAB;
+	Sat,  1 Nov 2025 01:48:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="VIiZF4z7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbguseast3.qq.com (smtpbguseast3.qq.com [54.243.244.52])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DA0C1FF1A1;
-	Sat,  1 Nov 2025 01:39:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.243.244.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 675A9224F3;
+	Sat,  1 Nov 2025 01:48:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761961200; cv=none; b=MksDLxMfSwtb+WkqkCvVp3qJDjNVZ+mmC1r3AVi+N8G8AZtSXdZpv91Q+7PhsnoHuTkzNxKc184CKVgj2u8ZXQOhyY5QWZv2Dy0WWSLvqWE65pGXGs9WG7YAVD0Fymfv0h5MP0xQstZhmsKqOzqDb4dmD+xtMn8OS7in4XQjo74=
+	t=1761961694; cv=none; b=QC0po0OA5CUGwEYOVHyuTdrBFUyjIgrM5kbDzy13hN0KU61YITwUEqRCTv2yVkhKC6N6RI7fIpncBS8/rj3LXY7WhcDHtotbF4w9to1tEDF+WH/HsTSEsNmX2jCkW0SOIEDJ6CBHWWxDYz/mq5rDWNNQcd0FCkN+IN0OjsiLGSo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761961200; c=relaxed/simple;
-	bh=CBbZ/ROGmSxNHzMKWjbM4ozWyO4GnZ4Ou7vZiCVv6Lo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=I3tfDAPV692UCzF4eSGMbUidT4/UR76GBXbKrB2mrG0yXH3zxFQdEO8Opk1S+3LgwT5CeBklzc8cmlABQg0UR3BwnhY2gegMnws66czyL3Lu36nE8o+7VmcTKpEo7GOHJ94J2H4Jbo9IXoSUCY+U/kfHe3nfnF2LjJr1Ec9Upho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com; spf=pass smtp.mailfrom=mucse.com; arc=none smtp.client-ip=54.243.244.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mucse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mucse.com
-X-QQ-mid: zesmtpsz9t1761961159tfa9c7820
-X-QQ-Originating-IP: DmIGOKHEiOtdXK585+Ifq8245STw+hNQVyA1mmuYcJM=
-Received: from localhost.localdomain ( [203.174.112.180])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Sat, 01 Nov 2025 09:39:17 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 14165145623999627508
-EX-QQ-RecipientCnt: 17
-From: Dong Yibo <dong100@mucse.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	corbet@lwn.net,
-	andrew+netdev@lunn.ch,
-	danishanwar@ti.com,
-	vadim.fedorenko@linux.dev,
-	geert+renesas@glider.be,
-	mpe@ellerman.id.au,
-	lorenzo@kernel.org,
-	lukas.bulwahn@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	dong100@mucse.com
-Subject: [PATCH net-next v17 5/5] net: rnpgbe: Add register_netdev
-Date: Sat,  1 Nov 2025 09:38:49 +0800
-Message-Id: <20251101013849.120565-6-dong100@mucse.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20251101013849.120565-1-dong100@mucse.com>
-References: <20251101013849.120565-1-dong100@mucse.com>
+	s=arc-20240116; t=1761961694; c=relaxed/simple;
+	bh=sDhgG8UNTXAchLzz3Jd6nUl2T2M++jiZBsh9nQk3bTI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nTxIkPEqWD858GIByHsDqJVCKMF2qOih0BBBwQdzJoLBBvqBHqR7TusVq2C6PQR9c9BTuqq3huDRJMk71MIToOnhw4jIqcYWcanj/W4VzjCqHiqbGp51K33XCpkuL71Y/4rCgTYnUgaxMq2foWYZld+RgPAgzFXNCoqG5chjbjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=VIiZF4z7; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1761961693; x=1793497693;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=sDhgG8UNTXAchLzz3Jd6nUl2T2M++jiZBsh9nQk3bTI=;
+  b=VIiZF4z7tiiNTHJ0yfAs005FxHZeiRTxhWZpqCYRhSlzU0nkY7lwKJNQ
+   1qpD0zQQIkCi36/aszHmDC9xHYkQkmOwDovqHQoejnZ+SgWsiDn9NiPXX
+   Jb/iLxyteeCo/znwezdi8k5ZnUDGjlItbvT1r5ZNwN24NTIwOOxz5fpYb
+   Tw5swidp8+K8U/zlYy1AjO8Lx2cTvuvZvxU/xZH+dHtvFNFZ0wg4wMlOZ
+   nUiEUdNmnOPYTRslCcB9ogHAmdLxlpJPWPeLhGnB+DZwCeVH735c/iMm2
+   yET/4MYp8T8pfZDiAIFaP3cxIFoY+0mmQmwOX8TfowBwRCrwNvcgVZ2yy
+   g==;
+X-CSE-ConnectionGUID: YVDUQMDIRpC22NuqNUfoEw==
+X-CSE-MsgGUID: VfID1uMLSuOE/eFp9LozUA==
+X-IronPort-AV: E=Sophos;i="6.19,270,1754982000"; 
+   d="scan'208";a="279917492"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2025 18:48:12 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
+ chn-vm-ex1.mchp-main.com (10.10.87.30) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.29; Fri, 31 Oct 2025 18:47:41 -0700
+Received: from pop-os.microchip.com (10.10.85.11) by chn-vm-ex02.mchp-main.com
+ (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
+ Transport; Fri, 31 Oct 2025 18:47:40 -0700
+From: <Tristram.Ha@microchip.com>
+To: Woojung Huh <woojung.huh@microchip.com>, Arun Ramadoss
+	<arun.ramadoss@microchip.com>, Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean
+	<olteanv@gmail.com>
+CC: Oleksij Rempel <linux@rempel-privat.de>,
+	=?UTF-8?q?=C5=81ukasz=20Majewski?= <lukma@nabladev.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<UNGLinuxDriver@microchip.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Tristram Ha <tristram.ha@microchip.com>
+Subject: [PATCH net] net: dsa: microchip: Fix reserved multicast address table programming
+Date: Fri, 31 Oct 2025 18:48:03 -0700
+Message-ID: <20251101014803.49842-1-Tristram.Ha@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,386 +78,214 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpsz:mucse.com:qybglogicsvrgz:qybglogicsvrgz3a-1
-X-QQ-XMAILINFO: NBZ5vkiDZf+QIXIurRQ5Nppivwp09rpQqPkX2r6pfYtN5/P+AsMVQjVQ
-	1mvAweWTpG0/cngJGfc4T73pox/9ij3IIV2oyQbP65imlwlqqpui33202cOiIAT2JqmjJ92
-	NIfg3Kq1/UCzapzO7uZAuswCLRmsj7gE1ScBHj61vmRZOkjRgVlnjxM/0wThwfgti7kZ4rL
-	uvbdcEOFgVvruSlLYEXxjBpx2kaWUNL6jRqKspNIyQzUxZ2Gwqp7oZAIjtpUoixvNMa/K4A
-	bk8wK6ljAkzgqP4MnttQCNMmNcB4Ae0Y6lDDrReELmo07SkxJV2FD8vk05AiFkctJt7ZBxI
-	mgXeCYZ+irHC3/YNUcnLRchiux6Lmm5gBvBE6J3s/BbYB9tl3iIJkxkoZThN7NYytvjce0f
-	TKYJh5T9APmpO5lzslkBygPnAH5MTzHqvsm4idjx7DmPW/WSpK8jVZRFmip1Wg0CL8mS9Il
-	Kb5Se6AgYUIwRzkqtdRvLhfPTJRt6cyHcVn7l833YbpdyDaOyb+m48HBBX0YFlT6Pf5YFft
-	oBhwNAs1FGMwR++uSv3GQYl19Z3uWcoqSyWOdGGWX5BFYa1QpcQ37H0Bj0uuTBIKcj2zjzc
-	KkUGf3pjPgVE544gTQlxiBAwZzB6Cr/I0yQLuIvzsriynlY56Y1McOcAqvCFj4pcP4umqWs
-	9Wb27qpCGzxxvb8LDP8bzDJVX7zDGuSlFw1ZpYKbvaWxthzfbgCZRMh+qaHrdHLoVMybuBo
-	ZKp0X6iSx2GWI/Hy+kC4Zoc9R1j8r/cc8VoVJlFGAnHZwdfddHTO3OmGnHOhfJP08mGiD0Z
-	kM6HWbRNISS3Zmn3lRJ1gCAqS0nj67X1i89t1M16/jHwJEVrQ7qNXNLje+WhqWEEp1WrwAN
-	kmN+qKmcUpWVU6thxP8S9bRvbnrda/n37b4tAa0E+KcLh9p3YqkYiN4/kfPGTdZObsHUqzl
-	u0K7NgOhgbvTs4VlFskNd/FaoTvi5A89Nbbjw5KjJEBIZHAAdMTWi6k2bimr012ygp1qeG3
-	Wrb0qHw5MzdP/BXDQI/7AoWXzvBv++zO7N9WsiOA==
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain
 
-Complete the network device (netdev) registration flow for Mucse Gbe
-Ethernet chips, including:
-1. Hardware state initialization:
-   - Send powerup notification to firmware (via echo_fw_status)
-   - Sync with firmware
-   - Reset hardware
-2. MAC address handling:
-   - Retrieve permanent MAC from firmware (via mucse_mbx_get_macaddr)
-   - Fallback to random valid MAC (eth_random_addr) if not valid mac
-     from Fw
+From: Tristram Ha <tristram.ha@microchip.com>
 
-Signed-off-by: Dong Yibo <dong100@mucse.com>
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+KSZ9477/KSZ9897 and LAN937X families of switches use a reserved multicast
+address table for some specific forwarding with some multicast addresses,
+like the one used in STP.  The hardware assumes the host port is the last
+port in KSZ9897 family and port 5 in LAN937X family.  Most of the time
+this assumption is correct but not in other cases like KSZ9477.
+Originally the function just setups the first entry, but the others still
+need update, especially for one common multicast address that is used by
+PTP operation.
+
+LAN937x also uses different register bits when accessing the reserved
+table.
+
+Fixes: 457c182af597 ("net: dsa: microchip: generic access to ksz9477 static and reserved table")
+Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
 ---
- drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h    |  22 ++++
- .../net/ethernet/mucse/rnpgbe/rnpgbe_chip.c   |  73 +++++++++++
- drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h |   2 +
- .../net/ethernet/mucse/rnpgbe/rnpgbe_main.c   | 119 +++++++++++++++++-
- 4 files changed, 214 insertions(+), 2 deletions(-)
+ drivers/net/dsa/microchip/ksz9477.c     | 103 ++++++++++++++++++++----
+ drivers/net/dsa/microchip/ksz9477_reg.h |   3 +-
+ drivers/net/dsa/microchip/ksz_common.c  |   4 +
+ drivers/net/dsa/microchip/ksz_common.h  |   2 +
+ 4 files changed, 96 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-index 37bd9278beaa..5b024f9f7e17 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe.h
-@@ -26,18 +26,37 @@ struct mucse_mbx_info {
- 	u32 fwpf_ctrl_base;
- };
- 
-+/* Enum for firmware notification modes,
-+ * more modes (e.g., portup, link_report) will be added in future
-+ **/
-+enum {
-+	mucse_fw_powerup,
-+};
-+
- struct mucse_hw {
- 	void __iomem *hw_addr;
-+	struct pci_dev *pdev;
- 	struct mucse_mbx_info mbx;
-+	int port;
- 	u8 pfvfnum;
- };
- 
-+struct mucse_stats {
-+	u64 tx_dropped;
-+};
-+
- struct mucse {
- 	struct net_device *netdev;
- 	struct pci_dev *pdev;
- 	struct mucse_hw hw;
-+	struct mucse_stats stats;
- };
- 
-+int rnpgbe_get_permanent_mac(struct mucse_hw *hw, u8 *perm_addr);
-+int rnpgbe_reset_hw(struct mucse_hw *hw);
-+int rnpgbe_send_notify(struct mucse_hw *hw,
-+		       bool enable,
-+		       int mode);
- int rnpgbe_init_hw(struct mucse_hw *hw, int board_type);
- 
- /* Device IDs */
-@@ -46,4 +65,7 @@ int rnpgbe_init_hw(struct mucse_hw *hw, int board_type);
- #define RNPGBE_DEVICE_ID_N500_DUAL_PORT   0x8318
- #define RNPGBE_DEVICE_ID_N210             0x8208
- #define RNPGBE_DEVICE_ID_N210L            0x820a
-+
-+#define mucse_hw_wr32(hw, reg, val) \
-+	writel((val), (hw)->hw_addr + (reg))
- #endif /* _RNPGBE_H */
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-index 5739db98f12a..ebc7b3750157 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_chip.c
-@@ -1,11 +1,82 @@
- // SPDX-License-Identifier: GPL-2.0
- /* Copyright(c) 2020 - 2025 Mucse Corporation. */
- 
-+#include <linux/pci.h>
- #include <linux/errno.h>
-+#include <linux/etherdevice.h>
- 
- #include "rnpgbe.h"
- #include "rnpgbe_hw.h"
- #include "rnpgbe_mbx.h"
-+#include "rnpgbe_mbx_fw.h"
-+
-+/**
-+ * rnpgbe_get_permanent_mac - Get permanent mac
-+ * @hw: hw information structure
-+ * @perm_addr: pointer to store perm_addr
-+ *
-+ * rnpgbe_get_permanent_mac tries to get mac from hw
-+ *
-+ * Return: 0 on success, negative errno on failure
-+ **/
-+int rnpgbe_get_permanent_mac(struct mucse_hw *hw, u8 *perm_addr)
-+{
-+	struct device *dev = &hw->pdev->dev;
-+	int err;
-+
-+	err = mucse_mbx_get_macaddr(hw, hw->pfvfnum, perm_addr, hw->port);
-+	if (err) {
-+		dev_err(dev, "Failed to get MAC from FW %d\n", err);
-+		return err;
-+	}
-+
-+	if (!is_valid_ether_addr(perm_addr)) {
-+		dev_err(dev, "Failed to get valid MAC from FW\n");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+/**
-+ * rnpgbe_reset_hw - Do a hardware reset
-+ * @hw: hw information structure
-+ *
-+ * rnpgbe_reset_hw calls fw to do a hardware
-+ * reset, and cleans some regs to default.
-+ *
-+ * Return: 0 on success, negative errno on failure
-+ **/
-+int rnpgbe_reset_hw(struct mucse_hw *hw)
-+{
-+	mucse_hw_wr32(hw, RNPGBE_DMA_AXI_EN, 0);
-+	return mucse_mbx_reset_hw(hw);
-+}
-+
-+/**
-+ * rnpgbe_send_notify - Echo fw status
-+ * @hw: hw information structure
-+ * @enable: true or false status
-+ * @mode: status mode
-+ *
-+ * Return: 0 on success, negative errno on failure
-+ **/
-+int rnpgbe_send_notify(struct mucse_hw *hw,
-+		       bool enable,
-+		       int mode)
-+{
-+	int err;
-+	/* Keep switch struct to support more modes in the future */
-+	switch (mode) {
-+	case mucse_fw_powerup:
-+		err = mucse_mbx_powerup(hw, enable);
-+		break;
-+	default:
-+		err = -EINVAL;
-+	}
-+
-+	return err;
-+}
- 
- /**
-  * rnpgbe_init_n500 - Setup n500 hw info
-@@ -50,6 +121,8 @@ int rnpgbe_init_hw(struct mucse_hw *hw, int board_type)
- {
- 	struct mucse_mbx_info *mbx = &hw->mbx;
- 
-+	hw->port = 0;
-+
- 	mbx->pf2fw_mbx_ctrl = MUCSE_GBE_PFFW_MBX_CTRL_OFFSET;
- 	mbx->fwpf_mbx_mask = MUCSE_GBE_FWPF_MBX_MASK_OFFSET;
- 
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
-index 268f572936aa..e77e6bc3d3e3 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_hw.h
-@@ -11,5 +11,7 @@
- #define MUCSE_N210_FWPF_CTRL_BASE      0x29400
- #define MUCSE_N210_FWPF_SHM_BASE       0x2d900
- 
-+#define RNPGBE_DMA_AXI_EN              0x0010
-+
- #define RNPGBE_MAX_QUEUES 8
- #endif /* _RNPGBE_HW_H */
-diff --git a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
-index d8aaac79ff4b..316f941629d4 100644
---- a/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
-+++ b/drivers/net/ethernet/mucse/rnpgbe/rnpgbe_main.c
-@@ -7,6 +7,7 @@
- 
- #include "rnpgbe.h"
- #include "rnpgbe_hw.h"
-+#include "rnpgbe_mbx_fw.h"
- 
- static const char rnpgbe_driver_name[] = "rnpgbe";
- 
-@@ -24,6 +25,58 @@ static struct pci_device_id rnpgbe_pci_tbl[] = {
- 	{0, },
- };
- 
-+/**
-+ * rnpgbe_open - Called when a network interface is made active
-+ * @netdev: network interface device structure
-+ *
-+ * The open entry point is called when a network interface is made
-+ * active by the system (IFF_UP).
-+ *
-+ * Return: 0
-+ **/
-+static int rnpgbe_open(struct net_device *netdev)
-+{
-+	return 0;
-+}
-+
-+/**
-+ * rnpgbe_close - Disables a network interface
-+ * @netdev: network interface device structure
-+ *
-+ * The close entry point is called when an interface is de-activated
-+ * by the OS.
-+ *
-+ * Return: 0, this is not allowed to fail
-+ **/
-+static int rnpgbe_close(struct net_device *netdev)
-+{
-+	return 0;
-+}
-+
-+/**
-+ * rnpgbe_xmit_frame - Send a skb to driver
-+ * @skb: skb structure to be sent
-+ * @netdev: network interface device structure
-+ *
-+ * Return: NETDEV_TX_OK
-+ **/
-+static netdev_tx_t rnpgbe_xmit_frame(struct sk_buff *skb,
-+				     struct net_device *netdev)
-+{
-+	struct mucse *mucse = netdev_priv(netdev);
-+
-+	dev_kfree_skb_any(skb);
-+	mucse->stats.tx_dropped++;
-+
-+	return NETDEV_TX_OK;
-+}
-+
-+static const struct net_device_ops rnpgbe_netdev_ops = {
-+	.ndo_open       = rnpgbe_open,
-+	.ndo_stop       = rnpgbe_close,
-+	.ndo_start_xmit = rnpgbe_xmit_frame,
-+};
-+
- /**
-  * rnpgbe_add_adapter - Add netdev for this pci_dev
-  * @pdev: PCI device information structure
-@@ -39,10 +92,11 @@ static int rnpgbe_add_adapter(struct pci_dev *pdev,
- 			      int board_type)
- {
- 	struct net_device *netdev;
-+	u8 perm_addr[ETH_ALEN];
- 	void __iomem *hw_addr;
- 	struct mucse *mucse;
- 	struct mucse_hw *hw;
--	int err;
-+	int err, err_notify;
- 
- 	netdev = alloc_etherdev_mq(sizeof(struct mucse), RNPGBE_MAX_QUEUES);
- 	if (!netdev)
-@@ -64,14 +118,67 @@ static int rnpgbe_add_adapter(struct pci_dev *pdev,
+diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
+index d747ea1c41a7..9b6731de52a7 100644
+--- a/drivers/net/dsa/microchip/ksz9477.c
++++ b/drivers/net/dsa/microchip/ksz9477.c
+@@ -1355,8 +1355,12 @@ void ksz9477_config_cpu_port(struct dsa_switch *ds)
  	}
- 
- 	hw->hw_addr = hw_addr;
-+	hw->pdev = pdev;
-+
- 	err = rnpgbe_init_hw(hw, board_type);
- 	if (err) {
- 		dev_err(&pdev->dev, "Init hw err %d\n", err);
- 		goto err_free_net;
- 	}
-+	/* Step 1: Send power-up notification to firmware (no response expected)
-+	 * This informs firmware to initialize hardware power state, but
-+	 * firmware only acknowledges receipt without returning data. Must be
-+	 * done before synchronization as firmware may be in low-power idle
-+	 * state initially.
-+	 */
-+	err_notify = rnpgbe_send_notify(hw, true, mucse_fw_powerup);
-+	if (err_notify) {
-+		dev_warn(&pdev->dev, "Send powerup to hw failed %d\n",
-+			 err_notify);
-+		dev_warn(&pdev->dev, "Maybe low performance\n");
-+	}
-+	/* Step 2: Synchronize mailbox communication with firmware (requires
-+	 * response) After power-up, confirm firmware is ready to process
-+	 * requests with responses. This ensures subsequent request/response
-+	 * interactions work reliably.
-+	 */
-+	err = mucse_mbx_sync_fw(hw);
-+	if (err) {
-+		dev_err(&pdev->dev, "Sync fw failed! %d\n", err);
-+		goto err_powerdown;
-+	}
- 
--	return 0;
-+	netdev->netdev_ops = &rnpgbe_netdev_ops;
-+	err = rnpgbe_reset_hw(hw);
-+	if (err) {
-+		dev_err(&pdev->dev, "Hw reset failed %d\n", err);
-+		goto err_powerdown;
-+	}
-+
-+	err = rnpgbe_get_permanent_mac(hw, perm_addr);
-+	if (!err) {
-+		eth_hw_addr_set(netdev, perm_addr);
-+	} else if (err == -EINVAL) {
-+		dev_warn(&pdev->dev, "Using random MAC\n");
-+		eth_hw_addr_random(netdev);
-+	} else if (err) {
-+		dev_err(&pdev->dev, "get perm_addr failed %d\n", err);
-+		goto err_powerdown;
-+	}
-+
-+	err = register_netdev(netdev);
-+	if (err)
-+		goto err_powerdown;
- 
-+	return 0;
-+err_powerdown:
-+	/* notify powerdown only powerup ok */
-+	if (!err_notify) {
-+		err_notify = rnpgbe_send_notify(hw, false, mucse_fw_powerup);
-+		if (err_notify)
-+			dev_warn(&pdev->dev, "Send powerdown to hw failed %d\n",
-+				 err_notify);
-+	}
- err_free_net:
- 	free_netdev(netdev);
- 	return err;
-@@ -138,11 +245,17 @@ static int rnpgbe_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- static void rnpgbe_rm_adapter(struct pci_dev *pdev)
- {
- 	struct mucse *mucse = pci_get_drvdata(pdev);
-+	struct mucse_hw *hw = &mucse->hw;
- 	struct net_device *netdev;
-+	int err;
- 
- 	if (!mucse)
- 		return;
- 	netdev = mucse->netdev;
-+	unregister_netdev(netdev);
-+	err = rnpgbe_send_notify(hw, false, mucse_fw_powerup);
-+	if (err)
-+		dev_warn(&pdev->dev, "Send powerdown to hw failed %d\n", err);
- 	free_netdev(netdev);
  }
  
-@@ -173,6 +286,8 @@ static void rnpgbe_dev_shutdown(struct pci_dev *pdev)
++static u8 reserved_mcast_map[8] = { 0, 1, 3, 16, 32, 33, 2, 17 };
++
+ int ksz9477_enable_stp_addr(struct ksz_device *dev)
+ {
++	u8 all_ports = (1 << dev->info->port_cnt) - 1;
++	u8 i, def_port, ports, update;
+ 	const u32 *masks;
+ 	u32 data;
+ 	int ret;
+@@ -1366,23 +1370,94 @@ int ksz9477_enable_stp_addr(struct ksz_device *dev)
+ 	/* Enable Reserved multicast table */
+ 	ksz_cfg(dev, REG_SW_LUE_CTRL_0, SW_RESV_MCAST_ENABLE, true);
  
- 	rtnl_lock();
- 	netif_device_detach(netdev);
-+	if (netif_running(netdev))
-+		rnpgbe_close(netdev);
- 	rtnl_unlock();
- 	pci_disable_device(pdev);
- }
+-	/* Set the Override bit for forwarding BPDU packet to CPU */
+-	ret = ksz_write32(dev, REG_SW_ALU_VAL_B,
+-			  ALU_V_OVERRIDE | BIT(dev->cpu_port));
+-	if (ret < 0)
+-		return ret;
++	/* The reserved multicast address table has 8 entries.  Each entry has
++	 * a default value of which port to forward.  It is assumed the host
++	 * port is the last port in most of the switches, but that is not the
++	 * case for KSZ9477 or maybe KSZ9897.  For LAN937X family the default
++	 * port is port 5, the first RGMII port.  It is okay for LAN9370, a
++	 * 5-port switch, but may not be correct for the other 8-port
++	 * versions.  It is necessary to update the whole table to forward to
++	 * the right ports.
++	 * Furthermore PTP messages can use a reserved multicast address and
++	 * the host will not receive them if this table is not correct.
++	 */
++	def_port = BIT(dev->info->port_cnt - 1);
++	if (is_lan937x(dev))
++		def_port = BIT(4);
++	for (i = 0; i < 8; i++) {
++		data = reserved_mcast_map[i] <<
++			dev->info->shifts[ALU_STAT_INDEX];
++		data |= ALU_STAT_START |
++			masks[ALU_STAT_DIRECT] |
++			masks[ALU_RESV_MCAST_ADDR] |
++			masks[ALU_STAT_READ];
++		ret = ksz_write32(dev, REG_SW_ALU_STAT_CTRL__4, data);
++		if (ret < 0)
++			return ret;
+ 
+-	data = ALU_STAT_START | ALU_RESV_MCAST_ADDR | masks[ALU_STAT_WRITE];
++		/* wait to be finished */
++		ret = ksz9477_wait_alu_sta_ready(dev);
++		if (ret < 0)
++			return ret;
+ 
+-	ret = ksz_write32(dev, REG_SW_ALU_STAT_CTRL__4, data);
+-	if (ret < 0)
+-		return ret;
++		ret = ksz_read32(dev, REG_SW_ALU_VAL_B, &data);
++		if (ret < 0)
++			return ret;
+ 
+-	/* wait to be finished */
+-	ret = ksz9477_wait_alu_sta_ready(dev);
+-	if (ret < 0) {
+-		dev_err(dev->dev, "Failed to update Reserved Multicast table\n");
+-		return ret;
++		ports = data & dev->port_mask;
++		if (ports == def_port) {
++			/* Change the host port. */
++			update = BIT(dev->cpu_port);
++
++			/* The host port is correct so no need to update the
++			 * the whole table but the first entry still needs to
++			 * set the Override bit for STP.
++			 */
++			if (update == def_port && i == 0)
++				ports = 0;
++		} else if (ports == 0) {
++			/* No change to entry. */
++			update = 0;
++		} else if (ports == (all_ports & ~def_port)) {
++			/* This entry does not forward to host port.  But if
++			 * the host needs to process protocols like MVRP and
++			 * MMRP the host port needs to be set.
++			 */
++			update = ports & ~BIT(dev->cpu_port);
++			update |= def_port;
++		} else {
++			/* No change to entry. */
++			update = ports;
++		}
++		if (update != ports) {
++			data &= ~dev->port_mask;
++			data |= update;
++			/* Set Override bit for STP in the first entry. */
++			if (i == 0)
++				data |= ALU_V_OVERRIDE;
++			ret = ksz_write32(dev, REG_SW_ALU_VAL_B, data);
++			if (ret < 0)
++				return ret;
++
++			data = reserved_mcast_map[i] <<
++			       dev->info->shifts[ALU_STAT_INDEX];
++			data |= ALU_STAT_START |
++				masks[ALU_STAT_DIRECT] |
++				masks[ALU_RESV_MCAST_ADDR] |
++				masks[ALU_STAT_WRITE];
++			ret = ksz_write32(dev, REG_SW_ALU_STAT_CTRL__4, data);
++			if (ret < 0)
++				return ret;
++
++			/* wait to be finished */
++			ret = ksz9477_wait_alu_sta_ready(dev);
++			if (ret < 0)
++				return ret;
++
++			/* No need to check the whole table. */
++			if (i == 0 && !ports)
++				break;
++		}
+ 	}
+ 
+ 	return 0;
+diff --git a/drivers/net/dsa/microchip/ksz9477_reg.h b/drivers/net/dsa/microchip/ksz9477_reg.h
+index ff579920078e..61ea11e3338e 100644
+--- a/drivers/net/dsa/microchip/ksz9477_reg.h
++++ b/drivers/net/dsa/microchip/ksz9477_reg.h
+@@ -2,7 +2,7 @@
+ /*
+  * Microchip KSZ9477 register definitions
+  *
+- * Copyright (C) 2017-2024 Microchip Technology Inc.
++ * Copyright (C) 2017-2025 Microchip Technology Inc.
+  */
+ 
+ #ifndef __KSZ9477_REGS_H
+@@ -397,7 +397,6 @@
+ 
+ #define ALU_RESV_MCAST_INDEX_M		(BIT(6) - 1)
+ #define ALU_STAT_START			BIT(7)
+-#define ALU_RESV_MCAST_ADDR		BIT(1)
+ 
+ #define REG_SW_ALU_VAL_A		0x0420
+ 
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index a962055bfdbd..933ae8dc6337 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -808,6 +808,8 @@ static const u16 ksz9477_regs[] = {
+ static const u32 ksz9477_masks[] = {
+ 	[ALU_STAT_WRITE]		= 0,
+ 	[ALU_STAT_READ]			= 1,
++	[ALU_STAT_DIRECT]		= 0,
++	[ALU_RESV_MCAST_ADDR]		= BIT(1),
+ 	[P_MII_TX_FLOW_CTRL]		= BIT(5),
+ 	[P_MII_RX_FLOW_CTRL]		= BIT(3),
+ };
+@@ -835,6 +837,8 @@ static const u8 ksz9477_xmii_ctrl1[] = {
+ static const u32 lan937x_masks[] = {
+ 	[ALU_STAT_WRITE]		= 1,
+ 	[ALU_STAT_READ]			= 2,
++	[ALU_STAT_DIRECT]		= BIT(3),
++	[ALU_RESV_MCAST_ADDR]		= BIT(2),
+ 	[P_MII_TX_FLOW_CTRL]		= BIT(5),
+ 	[P_MII_RX_FLOW_CTRL]		= BIT(3),
+ };
+diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
+index a1eb39771bb9..c65188cd3c0a 100644
+--- a/drivers/net/dsa/microchip/ksz_common.h
++++ b/drivers/net/dsa/microchip/ksz_common.h
+@@ -294,6 +294,8 @@ enum ksz_masks {
+ 	DYNAMIC_MAC_TABLE_TIMESTAMP,
+ 	ALU_STAT_WRITE,
+ 	ALU_STAT_READ,
++	ALU_STAT_DIRECT,
++	ALU_RESV_MCAST_ADDR,
+ 	P_MII_TX_FLOW_CTRL,
+ 	P_MII_RX_FLOW_CTRL,
+ };
 -- 
-2.25.1
+2.34.1
 
 
