@@ -1,268 +1,184 @@
-Return-Path: <netdev+bounces-234876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80B5DC28620
-	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 20:21:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 274D7C28614
+	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 20:21:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8F32E4EBFCB
-	for <lists+netdev@lfdr.de>; Sat,  1 Nov 2025 19:21:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B742188D80B
+	for <lists+netdev@lfdr.de>; Sat,  1 Nov 2025 19:21:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 624163002DA;
-	Sat,  1 Nov 2025 19:20:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E19E32FF158;
+	Sat,  1 Nov 2025 19:20:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="4Q3V8++I";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Y7sVe5FL"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="3blte1rY"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 334E82FF678;
-	Sat,  1 Nov 2025 19:20:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4910C224B0E;
+	Sat,  1 Nov 2025 19:20:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762024856; cv=none; b=iSJUMkL32R+/094n8OO7KA5i+hQPGUW7rNVxSJaspJA+lovf/uMDSzAgdAUA4tLZSj1cRO1R0bXhY4sB92Y6uRdRJqICCyrC0slcKe3FEsUzTyicJOwA1dAxZMwfOZDbD5XNoXIFyTS2m84+38TB3uu5eHBRoF1Z2SHOOFBhpSA=
+	t=1762024853; cv=none; b=hIJguFe3RFA7afggKQrF2x1N7rX2QK9z2Szt5B81mEbnQHK2q2g1rgN7xykkZkFsp2CNpn/tbv98nUqxi97DG1b2x/Gi/F/MM+CqgPe1rELyjsyYdPSGTh8oRHobJ7IOHMDOYN90YnktpdBM3JOM47OfF8ynZpi/ol/jJYq7/DI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762024856; c=relaxed/simple;
-	bh=KHDhI+OMbYsFp6vu64Dav6dGQ4hKGh0ZnHirB5dDyjg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ccPqIIH4+Rig4vsSRMC7Er+Vsv6ZwUbh/3ZaKN8hsGr0Sgxp0Mi9B37f81LZBReNwCAwaScb+akdD3ByyzqDEw8cbzCVICI+9B+EZhozQE0Mb9VudEgGvX87rhFCBAkAR6mrmu4mSXs+kwjOhTCQKiNbfbtSllT9HlNooibv92Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=4Q3V8++I; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Y7sVe5FL; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1762024852;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zhGK+60JgBD3s2NPs/WG00WWgCrD3JAI9aGx3Giow6U=;
-	b=4Q3V8++IhPzdnCkY/fLpB838bS06LVS94OomrBx0h8qStWpHMqKWCW7j3ayeDgp5U0Lo/o
-	F+eq5PBK+kBuHixm5ic5qF0dA/DUmZ1MrUNzAo7FttEZuPrAzN9Bzo8DxZM1Me6JgPXR42
-	bd7fUT2D+vvzoQ8rYAboiMu1rOqt4/bM+p0UPIVOd13XLnr2+1lXWXq6dN8HEyX63uQvDG
-	YMGO6RzlzV2FncmPvQhB/oqPIK2uK0CKd+qE61wRVtsn0LfBbEhnqql3O3cjOpXguhyt9e
-	L7TETIY2pp3GHotPjDUBWjvuikX2V/O9q40/uAEYspHz64dZunswmNCX7hLAtQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1762024852;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zhGK+60JgBD3s2NPs/WG00WWgCrD3JAI9aGx3Giow6U=;
-	b=Y7sVe5FL9smASbvnWfH1rQIQ1Cxz51UnrlRZ8UUXPH2YhpFaoGbhA2mwjMjxokyAuxFRtd
-	t2+fvCz4NdQZAqDA==
-To: Christian Brauner <brauner@kernel.org>, linux-fsdevel@vger.kernel.org,
- Josef Bacik <josef@toxicpanda.com>, Jeff Layton <jlayton@kernel.org>
-Cc: Jann Horn <jannh@google.com>, Mike Yuan <me@yhndnzj.com>, Zbigniew
- =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering
- <mzxreary@0pointer.de>, Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa
- Sarai <cyphar@cyphar.com>, Amir Goldstein <amir73il@gmail.com>, Tejun Heo
- <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, Alexander Viro
- <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
- linux-kernel@vger.kernel.org, cgroups@vger.kernel.org,
- bpf@vger.kernel.org, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, netdev@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
- Christian Brauner <brauner@kernel.org>
-Subject: Re: [PATCH v4 18/72] nstree: add unified namespace list
-In-Reply-To: <20251029-work-namespace-nstree-listns-v4-18-2e6f823ebdc0@kernel.org>
-References: <20251029-work-namespace-nstree-listns-v4-0-2e6f823ebdc0@kernel.org>
- <20251029-work-namespace-nstree-listns-v4-18-2e6f823ebdc0@kernel.org>
-Date: Sat, 01 Nov 2025 20:20:50 +0100
-Message-ID: <87ecqhy2y5.ffs@tglx>
+	s=arc-20240116; t=1762024853; c=relaxed/simple;
+	bh=h/7ztJhsHHwM7UUklubihOZTlg4nSub+i35nPpb7WHc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eLn4mYzyHEt04mtBDmB3FKhcpJ7Ku8NGr6h5lG8K1ytDm1WGBxSzy8hmqs5wfUJCIm9FmsP45lJjejz/SBfje49CMTCNvAMcjlw8eGQXmP6ZGNb8JfZ4CB2UG/mWhDEe/Vqn/xBDpfu5qiwm2viZh1uk6jHmZ5VAlxMwYT17vfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=3blte1rY; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=cGBa5E1G4e07EFAi0qmqvH28awe0hfD/7FyaOtTujCk=; b=3blte1rYKWzPVofy4Dxpix+A5I
+	vLHjviNY1IP7t5L+74CrwCX6610bDBKEBOQYdKG65dqeDbae/D2q93hi3AtHz1796jhNanvze5nmy
+	mEdfk9PH0Y3OMIcv+NW3Xjd7/Ra3JPhsNaa0vC7t+8cHifPbV0trUNLI2N8A7OIO66UB1GkIKr2Eb
+	QZDUUKkdPDwGM0fvbAowzah38zM1WPr3BK4nl+e9t6nQfK/tmdA9WOmzwUDu+0n19D2jpOLapr9Rf
+	O0p1QPasbXUZPm9SIwbPACb8qm3EM6TCcGUDltYmE0F3y2LZxRhj8difeSMTR02kNh+2mRmoKgBHC
+	qRRiWIyg==;
+Received: from [50.53.43.113] (helo=bombadil.infradead.org)
+	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
+	id 1vFH9f-000000082dD-1hMe;
+	Sat, 01 Nov 2025 19:20:51 +0000
+From: Randy Dunlap <rdunlap@infradead.org>
+To: netdev@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH net-next] netfilter: ip6t_srh: fix UAPI kernel-doc comments format
+Date: Sat,  1 Nov 2025 12:20:50 -0700
+Message-ID: <20251101192050.2007178-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-Christian!
+Fix the kernel-doc format for struct members to be "@member" instead of
+"@ member" to avoid kernel-doc warnings.
 
-On Wed, Oct 29 2025 at 13:20, Christian Brauner wrote:
-> --- a/kernel/time/namespace.c
-> +++ b/kernel/time/namespace.c
-> @@ -488,6 +488,7 @@ struct time_namespace init_time_ns = {
->  	.ns.ns_owner = LIST_HEAD_INIT(init_time_ns.ns.ns_owner),
->  	.frozen_offsets	= true,
->  	.ns.ns_list_node = LIST_HEAD_INIT(init_time_ns.ns.ns_list_node),
-> +	.ns.ns_unified_list_node = LIST_HEAD_INIT(init_time_ns.ns.ns_unified_list_node),
+Warning: ip6t_srh.h:60 struct member 'next_hdr' not described in 'ip6t_srh'
+Warning: ip6t_srh.h:60 struct member 'hdr_len' not described in 'ip6t_srh'
+Warning: ip6t_srh.h:60 struct member 'segs_left' not described
+ in 'ip6t_srh'
+Warning: ip6t_srh.h:60 struct member 'last_entry' not described
+ in 'ip6t_srh'
+Warning: ip6t_srh.h:60 struct member 'tag' not described in 'ip6t_srh'
+Warning: ip6t_srh.h:60 struct member 'mt_flags' not described in 'ip6t_srh'
+Warning: ip6t_srh.h:60 struct member 'mt_invflags' not described
+ in 'ip6t_srh'
+Warning: ip6t_srh.h:93 struct member 'next_hdr' not described
+ in 'ip6t_srh1'
+Warning: ip6t_srh.h:93 struct member 'hdr_len' not described in 'ip6t_srh1'
+Warning: ip6t_srh.h:93 struct member 'segs_left' not described
+ in 'ip6t_srh1'
+Warning: ip6t_srh.h:93 struct member 'last_entry' not described
+ in 'ip6t_srh1'
+Warning: ip6t_srh.h:93 struct member 'tag' not described in 'ip6t_srh1'
+Warning: ip6t_srh.h:93 struct member 'psid_addr' not described
+ in 'ip6t_srh1'
+Warning: ip6t_srh.h:93 struct member 'nsid_addr' not described
+ in 'ip6t_srh1'
+Warning: ip6t_srh.h:93 struct member 'lsid_addr' not described
+ in 'ip6t_srh1'
+Warning: ip6t_srh.h:93 struct member 'psid_msk' not described
+ in 'ip6t_srh1'
+Warning: ip6t_srh.h:93 struct member 'nsid_msk' not described
+ in 'ip6t_srh1'
+Warning: ip6t_srh.h:93 struct member 'lsid_msk' not described
+ in 'ip6t_srh1'
+Warning: ip6t_srh.h:93 struct member 'mt_flags' not described
+ in 'ip6t_srh1'
+Warning: ip6t_srh.h:93 struct member 'mt_invflags' not described
+ in 'ip6t_srh1'
 
-Sorry that I did not catch that earlier, but
-
-  1) this screws up the proper tabular struct initializer
-
-  2) the churn of touching every compile time struct each time you add a
-     new field and add the same stupid initialization to each of them
-     can be avoided, when you do something like the uncompiled below.
-     You get the idea.
-
-Thanks,
-
-        tglx
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
 ---
- fs/namespace.c            |    9 +--------
- include/linux/ns_common.h |   12 ++++++++++++
- init/version-timestamp.c  |    9 +--------
- ipc/msgutil.c             |    9 +--------
- kernel/pid.c              |    8 +-------
- kernel/time/namespace.c   |    9 +--------
- kernel/user.c             |    9 +--------
- 7 files changed, 18 insertions(+), 47 deletions(-)
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
+Cc: Florian Westphal <fw@strlen.de>
+Cc: Phil Sutter <phil@nwl.cc>
+Cc: netfilter-devel@vger.kernel.org
+Cc: coreteam@netfilter.org
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>
+---
+ include/uapi/linux/netfilter_ipv6/ip6t_srh.h |   40 ++++++++---------
+ 1 file changed, 20 insertions(+), 20 deletions(-)
 
---- a/fs/namespace.c
-+++ b/fs/namespace.c
-@@ -5985,19 +5985,12 @@ SYSCALL_DEFINE4(listmount, const struct
- }
+--- linux-next-20251031.orig/include/uapi/linux/netfilter_ipv6/ip6t_srh.h
++++ linux-next-20251031/include/uapi/linux/netfilter_ipv6/ip6t_srh.h
+@@ -41,13 +41,13 @@
  
- struct mnt_namespace init_mnt_ns = {
--	.ns.inum	= ns_init_inum(&init_mnt_ns),
-+	.ns		= NS_COMMON_INIT(init_mnt_ns, 1, 1),
- 	.ns.ops		= &mntns_operations,
- 	.user_ns	= &init_user_ns,
--	.ns.__ns_ref	= REFCOUNT_INIT(1),
--	.ns.__ns_ref_active = ATOMIC_INIT(1),
--	.ns.ns_type	= ns_common_type(&init_mnt_ns),
- 	.passive	= REFCOUNT_INIT(1),
- 	.mounts		= RB_ROOT,
- 	.poll		= __WAIT_QUEUE_HEAD_INITIALIZER(init_mnt_ns.poll),
--	.ns.ns_list_node = LIST_HEAD_INIT(init_mnt_ns.ns.ns_list_node),
--	.ns.ns_unified_list_node = LIST_HEAD_INIT(init_mnt_ns.ns.ns_unified_list_node),
--	.ns.ns_owner_entry = LIST_HEAD_INIT(init_mnt_ns.ns.ns_owner_entry),
--	.ns.ns_owner = LIST_HEAD_INIT(init_mnt_ns.ns.ns_owner),
- };
- 
- static void __init init_mount_tree(void)
---- a/include/linux/ns_common.h
-+++ b/include/linux/ns_common.h
-@@ -129,6 +129,18 @@ struct ns_common {
- 	};
- };
- 
-+#define NS_COMMON_INIT(nsname, refs, active)						\
-+{											\
-+	.ns_type		= ns_common_type(&nsname),				\
-+	.inum			= ns_init_inum(&nsname),				\
-+	.__ns_ref		= REFCOUNT_INIT(refs),					\
-+	.__ns_ref_active	= ATOMIC_INIT(active),					\
-+	.ns_list_node		= LIST_HEAD_INIT(nsname.ns.ns_list_node),		\
-+	.ns_unified_list_node	= LIST_HEAD_INIT(nsname.ns.ns_unified_list_node),	\
-+	.ns_owner_entry		= LIST_HEAD_INIT(nsname.ns.ns_owner_entry),		\
-+	.ns_owner		= LIST_HEAD_INIT(nsname.ns.ns_owner),			\
-+}
-+
- int __ns_common_init(struct ns_common *ns, u32 ns_type, const struct proc_ns_operations *ops, int inum);
- void __ns_common_free(struct ns_common *ns);
- 
---- a/init/version-timestamp.c
-+++ b/init/version-timestamp.c
-@@ -8,9 +8,7 @@
- #include <linux/utsname.h>
- 
- struct uts_namespace init_uts_ns = {
--	.ns.ns_type = ns_common_type(&init_uts_ns),
--	.ns.__ns_ref = REFCOUNT_INIT(2),
--	.ns.__ns_ref_active = ATOMIC_INIT(1),
-+	.ns = NS_COMMON_INIT(init_uts_ns, 2, 1),
- 	.name = {
- 		.sysname	= UTS_SYSNAME,
- 		.nodename	= UTS_NODENAME,
-@@ -20,11 +18,6 @@ struct uts_namespace init_uts_ns = {
- 		.domainname	= UTS_DOMAINNAME,
- 	},
- 	.user_ns = &init_user_ns,
--	.ns.inum = ns_init_inum(&init_uts_ns),
--	.ns.ns_list_node = LIST_HEAD_INIT(init_uts_ns.ns.ns_list_node),
--	.ns.ns_unified_list_node = LIST_HEAD_INIT(init_uts_ns.ns.ns_unified_list_node),
--	.ns.ns_owner_entry = LIST_HEAD_INIT(init_uts_ns.ns.ns_owner_entry),
--	.ns.ns_owner = LIST_HEAD_INIT(init_uts_ns.ns.ns_owner),
- #ifdef CONFIG_UTS_NS
- 	.ns.ops = &utsns_operations,
- #endif
---- a/ipc/msgutil.c
-+++ b/ipc/msgutil.c
-@@ -27,18 +27,11 @@ DEFINE_SPINLOCK(mq_lock);
-  * and not CONFIG_IPC_NS.
+ /**
+  *      struct ip6t_srh - SRH match options
+- *      @ next_hdr: Next header field of SRH
+- *      @ hdr_len: Extension header length field of SRH
+- *      @ segs_left: Segments left field of SRH
+- *      @ last_entry: Last entry field of SRH
+- *      @ tag: Tag field of SRH
+- *      @ mt_flags: match options
+- *      @ mt_invflags: Invert the sense of match options
++ *      @next_hdr: Next header field of SRH
++ *      @hdr_len: Extension header length field of SRH
++ *      @segs_left: Segments left field of SRH
++ *      @last_entry: Last entry field of SRH
++ *      @tag: Tag field of SRH
++ *      @mt_flags: match options
++ *      @mt_invflags: Invert the sense of match options
   */
- struct ipc_namespace init_ipc_ns = {
--	.ns.__ns_ref = REFCOUNT_INIT(1),
--	.ns.__ns_ref_active = ATOMIC_INIT(1),
-+	.ns = NS_COMMON_INIT(init_ipc_ns, 1, 1),
- 	.user_ns = &init_user_ns,
--	.ns.inum = ns_init_inum(&init_ipc_ns),
--	.ns.ns_list_node = LIST_HEAD_INIT(init_ipc_ns.ns.ns_list_node),
--	.ns.ns_unified_list_node = LIST_HEAD_INIT(init_ipc_ns.ns.ns_unified_list_node),
--	.ns.ns_owner_entry = LIST_HEAD_INIT(init_ipc_ns.ns.ns_owner_entry),
--	.ns.ns_owner = LIST_HEAD_INIT(init_ipc_ns.ns.ns_owner),
- #ifdef CONFIG_IPC_NS
- 	.ns.ops = &ipcns_operations,
- #endif
--	.ns.ns_type = ns_common_type(&init_ipc_ns),
- };
  
- struct msg_msgseg {
---- a/kernel/pid.c
-+++ b/kernel/pid.c
-@@ -71,18 +71,12 @@ static int pid_max_max = PID_MAX_LIMIT;
-  * the scheme scales to up to 4 million PIDs, runtime.
+ struct ip6t_srh {
+@@ -62,19 +62,19 @@ struct ip6t_srh {
+ 
+ /**
+  *      struct ip6t_srh1 - SRH match options (revision 1)
+- *      @ next_hdr: Next header field of SRH
+- *      @ hdr_len: Extension header length field of SRH
+- *      @ segs_left: Segments left field of SRH
+- *      @ last_entry: Last entry field of SRH
+- *      @ tag: Tag field of SRH
+- *      @ psid_addr: Address of previous SID in SRH SID list
+- *      @ nsid_addr: Address of NEXT SID in SRH SID list
+- *      @ lsid_addr: Address of LAST SID in SRH SID list
+- *      @ psid_msk: Mask of previous SID in SRH SID list
+- *      @ nsid_msk: Mask of next SID in SRH SID list
+- *      @ lsid_msk: MAsk of last SID in SRH SID list
+- *      @ mt_flags: match options
+- *      @ mt_invflags: Invert the sense of match options
++ *      @next_hdr: Next header field of SRH
++ *      @hdr_len: Extension header length field of SRH
++ *      @segs_left: Segments left field of SRH
++ *      @last_entry: Last entry field of SRH
++ *      @tag: Tag field of SRH
++ *      @psid_addr: Address of previous SID in SRH SID list
++ *      @nsid_addr: Address of NEXT SID in SRH SID list
++ *      @lsid_addr: Address of LAST SID in SRH SID list
++ *      @psid_msk: Mask of previous SID in SRH SID list
++ *      @nsid_msk: Mask of next SID in SRH SID list
++ *      @lsid_msk: MAsk of last SID in SRH SID list
++ *      @mt_flags: match options
++ *      @mt_invflags: Invert the sense of match options
   */
- struct pid_namespace init_pid_ns = {
--	.ns.__ns_ref = REFCOUNT_INIT(2),
--	.ns.__ns_ref_active = ATOMIC_INIT(1),
-+	.ns = NS_COMMON_INIT(init_pid_ns, 2, 1),
- 	.idr = IDR_INIT(init_pid_ns.idr),
- 	.pid_allocated = PIDNS_ADDING,
- 	.level = 0,
- 	.child_reaper = &init_task,
- 	.user_ns = &init_user_ns,
--	.ns.inum = ns_init_inum(&init_pid_ns),
--	.ns.ns_list_node = LIST_HEAD_INIT(init_pid_ns.ns.ns_list_node),
--	.ns.ns_unified_list_node = LIST_HEAD_INIT(init_pid_ns.ns.ns_unified_list_node),
--	.ns.ns_owner_entry = LIST_HEAD_INIT(init_pid_ns.ns.ns_owner_entry),
--	.ns.ns_owner = LIST_HEAD_INIT(init_pid_ns.ns.ns_owner),
- #ifdef CONFIG_PID_NS
- 	.ns.ops = &pidns_operations,
- #endif
---- a/kernel/time/namespace.c
-+++ b/kernel/time/namespace.c
-@@ -478,17 +478,10 @@ const struct proc_ns_operations timens_f
- };
  
- struct time_namespace init_time_ns = {
--	.ns.ns_type	= ns_common_type(&init_time_ns),
--	.ns.__ns_ref	= REFCOUNT_INIT(3),
--	.ns.__ns_ref_active = ATOMIC_INIT(1),
-+	.ns		= NS_COMMON_INIT(init_time_ns, 3, 1),
- 	.user_ns	= &init_user_ns,
--	.ns.inum	= ns_init_inum(&init_time_ns),
- 	.ns.ops		= &timens_operations,
--	.ns.ns_owner_entry = LIST_HEAD_INIT(init_time_ns.ns.ns_owner_entry),
--	.ns.ns_owner = LIST_HEAD_INIT(init_time_ns.ns.ns_owner),
- 	.frozen_offsets	= true,
--	.ns.ns_list_node = LIST_HEAD_INIT(init_time_ns.ns.ns_list_node),
--	.ns.ns_unified_list_node = LIST_HEAD_INIT(init_time_ns.ns.ns_unified_list_node),
- };
- 
- void __init time_ns_init(void)
---- a/kernel/user.c
-+++ b/kernel/user.c
-@@ -65,16 +65,9 @@ struct user_namespace init_user_ns = {
- 			.nr_extents = 1,
- 		},
- 	},
--	.ns.ns_type = ns_common_type(&init_user_ns),
--	.ns.__ns_ref = REFCOUNT_INIT(3),
--	.ns.__ns_ref_active = ATOMIC_INIT(1),
-+	.ns = NS_COMMON_INIT(init_user_ns, 3, 1),
- 	.owner = GLOBAL_ROOT_UID,
- 	.group = GLOBAL_ROOT_GID,
--	.ns.inum = ns_init_inum(&init_user_ns),
--	.ns.ns_list_node = LIST_HEAD_INIT(init_user_ns.ns.ns_list_node),
--	.ns.ns_unified_list_node = LIST_HEAD_INIT(init_user_ns.ns.ns_unified_list_node),
--	.ns.ns_owner_entry = LIST_HEAD_INIT(init_user_ns.ns.ns_owner_entry),
--	.ns.ns_owner = LIST_HEAD_INIT(init_user_ns.ns.ns_owner),
- #ifdef CONFIG_USER_NS
- 	.ns.ops = &userns_operations,
- #endif
+ struct ip6t_srh1 {
 
