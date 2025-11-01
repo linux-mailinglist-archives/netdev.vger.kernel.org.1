@@ -1,169 +1,162 @@
-Return-Path: <netdev+bounces-234816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B3BFC275FE
-	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 03:25:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BA08BC27662
+	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 04:12:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D0974247A1
-	for <lists+netdev@lfdr.de>; Sat,  1 Nov 2025 02:25:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CE703ABF23
+	for <lists+netdev@lfdr.de>; Sat,  1 Nov 2025 03:12:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 398FB255F5E;
-	Sat,  1 Nov 2025 02:24:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="QTHANDRW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A0FE2580EC;
+	Sat,  1 Nov 2025 03:12:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
+Received: from mail-io1-f80.google.com (mail-io1-f80.google.com [209.85.166.80])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9986257851
-	for <netdev@vger.kernel.org>; Sat,  1 Nov 2025 02:24:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7803220296C
+	for <netdev@vger.kernel.org>; Sat,  1 Nov 2025 03:12:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.80
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761963896; cv=none; b=FFu6ZNuHxoevVTvfMK20/Z0ifDti1DHSXw/4x0ia4wGAZrIEjgk8BD5MKl7xK5k5OZ5rbj6CAWeLPSYbolyKdRL4/q+zz6NvV/KmeI6GK+9uP+5gduaRjWBGurpJXJbs3NHzaayCPLcY7M7lK2JRnxt6VEJ+AotBHEhS0X1xGeA=
+	t=1761966753; cv=none; b=dNUuZMe8vNYbwXiffkGw7cPXCtgmsubegJcpaYME9pvgwustSLIomAHrKFDBe8IBKgUia/RJJeDQHp59fLEScfciaBfSpnJQlLv0ImylqGDnMetGwK9/G1fC5oQJTG7+R7lTM8T3fE5YeQfuYUTzQVihYVQda1C0x1Amdo0JJRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761963896; c=relaxed/simple;
-	bh=b5yo7g3MZU1FijxRkUhNS/q6XXJNwXad+y5lAYbqm3Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WUDx/W5v0V8njUiu20R76d8rqyl7oBUkvemvHAud3fCbF5MlOtp54XECcQzDgbvcTSUtRFLp/mWsYzkJwXcW0BrO5TVa8iyYTIn1hbfQNMKfIA9Cb+A6NII7KD+B6JhY+LZlQufYfq8Y4OlT+FT4abgkcimLLU9z0Jepip3LBcA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=QTHANDRW; arc=none smtp.client-ip=209.85.167.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-44f783add60so1620678b6e.2
-        for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 19:24:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1761963894; x=1762568694; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rMtSUVt3oTxs4d8Yt4wZTEMxA2A6WcjkTSoUILrkV8c=;
-        b=QTHANDRW2sNLFuuot7DkLuBz7ojrlt6xEsVKBG7HNKWdfXbEYVjcJUoxa/jIyp+NGI
-         Zai9Vwp2TRG4C286PG0CxRBUmd1MfrC4eZ0dKqYtYwCZqbH6N58hTp5ny9L/AC1G2R0F
-         N0ikg1NzI3oRf5JEV91UF4eIQox2NUi3DgI+/4AmK6TP8u8XDLWMXdP9vIKoyyALqelI
-         upJmyQcIOAXYmRzF3Xm+vc0GPSnftGY5d1scVLlgpkiBLxzJgdiRPwcyJ1Fkeh9OXmOB
-         RxtOWyXEO6S3rM71vm3OY6yFrfWGHs+bBe0UvwOkR09KLUqyCBaSQPh798V9+4FiTWBs
-         zv5g==
+	s=arc-20240116; t=1761966753; c=relaxed/simple;
+	bh=1nJzeRaMWwh80JChzmBrDut1RAfItrUcuVoWyS9W8BI=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=HyVWNSb5yjzdOp5Aun5YYpnvMROP9NclVNVUx7aolgcaPUFsul1Y0pTi6hNWZo2LlarZOxVlDhtWqUYem8wd/XVL0AJSpKw8CUiIN0icsiOy4wyyEU//hw1ku96HlLjMqif2wwBgBZRzQ/RMPUVs1LMEspZyQI5wDBY7ShiKGsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.80
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f80.google.com with SMTP id ca18e2360f4ac-94389ae547cso279034039f.2
+        for <netdev@vger.kernel.org>; Fri, 31 Oct 2025 20:12:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1761963894; x=1762568694;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rMtSUVt3oTxs4d8Yt4wZTEMxA2A6WcjkTSoUILrkV8c=;
-        b=f98a6+ZXPXi7upe9RdRCBwBH1Otwoy+2kbW/ff84OBcyqTmrbeKZOsrysbliKa6V/8
-         pozldBKxKFpn7KthQ62Q8ghIQX+VFhwbqmeKtDBPTGcN1dPd5l6rZ2/regJjsPK9+QVj
-         4bUXykIAIoS2NpW5t93E3Sc3sIlcTp7JQm5/ZO/sGPcXAY0zACKE3eJCyLk5GBm8k0a5
-         4N6H15j68IdxKn+W+I+rX9j4dTYacoEWM0jVun/dLhLgMOGHgnr84dWdV9NuIqpwE+ok
-         r2/j7nDdjUe/Tj0rJ6w3hx3i/6wMcgNkloI/Rfcz5PSQzIwwaJ6jJ7UiEJrcdPn/ni0u
-         xGEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWV8etW4arU4VCNTt9AhjX1CJABg48BjTG2XN/x47u42XknB0lhhDGjrD1H8sxoJWrmFB1fErw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy8NRUPNisle6JM/EXYqLaopqCnkZgx81eNZeoxQv+t8GmV2/w2
-	kmzauAue5XZ8Mb7t3U9E3FfdSR72tBbaBG9z/Rg86gPrMIumZoEgVuV5EbaX5E2zYIc=
-X-Gm-Gg: ASbGncur8CvcSsHCLGWm3qao+g3PjwgOsPv8ocV4fSKOLDXoBruibvOTwEZ9UBTgEyr
-	D5pwBjQezkuCuLuJ9moGzCRIdFsC81Dkee9R6Tihb9olCFerUxgDMpH7TRLAQg1/pBKjsL5K2jO
-	VjdR6SElk5nVjQrb8lUa0fIg0MNXrOE5alQxcXYOuxEf7rI6BL15NjEIWq/Gm4zObbvQsPsmEZE
-	cwoFyrwL3xPruaSzwzevMkFrhFJJWQ9lJiIbQof7ovZmuHeuQKQdqnEaj6JwuDsDa6hhI3eu4CK
-	pBHkqzt7FFAFD5nEOwHiCWb+oB8fSOze6ehRSyCyl5Od17A0qYgdbGNfv9Z4ZRA5ot7jfLOZpnT
-	LPkZSYEU77dFoKYGeel9pg1yX4aqlVjJcIXrfSduD0WOf1xHjv6j6eG5pdLKeSVS+B2PCAajW6N
-	gMolhNDAB+izyAc4jmekk=
-X-Google-Smtp-Source: AGHT+IFZuGg22ixwVqdlXJEvkn+nh1eIMRzgR50YHgoqPtaBQRHCnOKhXy2/NXZYs/uhgBqjQUJOuw==
-X-Received: by 2002:a05:6808:508e:b0:44f:9513:3dc0 with SMTP id 5614622812f47-44f960413a0mr2643162b6e.61.1761963893682;
-        Fri, 31 Oct 2025 19:24:53 -0700 (PDT)
-Received: from localhost ([2a03:2880:12ff:73::])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-7c699d9f305sm1023372a34.22.2025.10.31.19.24.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Oct 2025 19:24:53 -0700 (PDT)
-From: David Wei <dw@davidwei.uk>
-To: io-uring@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH v3 2/2] net: io_uring/zcrx: call netdev_queue_get_dma_dev() under instance lock
-Date: Fri, 31 Oct 2025 19:24:49 -0700
-Message-ID: <20251101022449.1112313-3-dw@davidwei.uk>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251101022449.1112313-1-dw@davidwei.uk>
-References: <20251101022449.1112313-1-dw@davidwei.uk>
+        d=1e100.net; s=20230601; t=1761966750; x=1762571550;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Nl4e23YNqS4a7oAFSjJzU/Fyw1wJYae3i9pNM46KVAQ=;
+        b=Qz0AxV4qYnLv2QJgLc9qPaRST9dKS7hkcXd/5Scqoft6o96Q0vO4iZURHPxBhxK0wT
+         wFsrPKt5tcFkuw1SqPdaNB401B/VffjpuV18CchNC4CnwpYAWB+nYrVZho4XMzMp25sA
+         J9iP+Pl3igkwdxmtHeNhyRcZHP1R2/TdIQrqR72y+uc0X+ldoJuGE0FEXPULaBRvX4/w
+         mdrKHQYTs7H7sc5/ulYeEjpiIk6EygrZUA8yGPI4jDOgxPzpzkCxXGf9sE6HOmT9sKxj
+         MVWEWOe7qVnBLGlFs0m3loeVwr3NYp5ExSSEWGjz+ymqNN01n0BfKmPsPNDtGP5DImA0
+         cQ2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCW/IsnYAXNRq4ebdKeLDkFdvo7noLw3KPkI3ijBJgtd0EP813bpCVJVGW8xXdnU5MW0TA/tzFA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwMerPdDRICrdyThujc053vfZWqLYV5PTOPRVtVGcnXGprJiqx9
+	KC1VSAA9EOSkAsIlQvQhi3SkS8C9qWb1htZt384vtqoTEhSQreQZZbqGveJbrTM2mNwjIn0jmyZ
+	cEdjnIV/gSLMpJuDuiTqPdDU90ndbQrIJU3Og2quE2Uxr2s+HsacM8/ffTsY=
+X-Google-Smtp-Source: AGHT+IGU9iu+ivCWDkfgQvQKDWX2CZ+qpkUm7qlePBwEIbdYdZA9JhcDVKqMu9RL2kdzvV76yqGo/riCLF1afnUzzVFv2/wklNNG
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:2501:b0:430:d5b8:6160 with SMTP id
+ e9e14a558f8ab-4330d1e6f32mr100382805ab.29.1761966750612; Fri, 31 Oct 2025
+ 20:12:30 -0700 (PDT)
+Date: Fri, 31 Oct 2025 20:12:30 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69057a9e.050a0220.e9cb8.001f.GAE@google.com>
+Subject: [syzbot] [wireless?] WARNING in rfkill_fop_open
+From: syzbot <syzbot+1254ea61f6f4969c9ef4@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-netdev ops must be called under instance lock or rtnl_lock, but
-io_register_zcrx_ifq() isn't doing this for netdev_queue_get_dma_dev().
-Fix this by taking the instance lock using netdev_get_by_index_lock().
+Hello,
 
-Extended the instance lock section to include attaching a memory
-provider. Could not move io_zcrx_create_area() outside, since the dmabuf
-codepath IORING_ZCRX_AREA_DMABUF requires ifq->dev.
+syzbot found the following issue on:
 
-Fixes: 59b8b32ac8d4 ("io_uring/zcrx: add support for custom DMA devices")
-Signed-off-by: David Wei <dw@davidwei.uk>
+HEAD commit:    fd57572253bc Merge tag 'sched_ext-for-6.18-rc3-fixes' of g..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=14140704580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=41ad820f608cb833
+dashboard link: https://syzkaller.appspot.com/bug?extid=1254ea61f6f4969c9ef4
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/c72764dfac75/disk-fd575722.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/c0f65b3e3b85/vmlinux-fd575722.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/53a0e239c3e5/bzImage-fd575722.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+1254ea61f6f4969c9ef4@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+rtmutex deadlock detected
+WARNING: CPU: 1 PID: 13303 at kernel/locking/rtmutex.c:1674 rt_mutex_handle_deadlock+0x28/0xb0 kernel/locking/rtmutex.c:1674
+Modules linked in:
+CPU: 1 UID: 0 PID: 13303 Comm: syz.5.857 Not tainted syzkaller #0 PREEMPT_{RT,(full)} 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
+RIP: 0010:rt_mutex_handle_deadlock+0x28/0xb0 kernel/locking/rtmutex.c:1674
+Code: 90 90 41 57 41 56 41 55 41 54 53 83 ff dd 0f 85 8c 00 00 00 48 89 f7 e8 a6 3c 01 00 90 48 c7 c7 e0 18 eb 8a e8 39 7f c0 f6 90 <0f> 0b 90 90 4c 8d 3d 00 00 00 00 65 48 8b 1c 25 08 40 a2 91 4c 8d
+RSP: 0018:ffffc9000543f490 EFLAGS: 00010246
+RAX: 3180a59543ab4000 RBX: ffffc9000543f520 RCX: ffff888057f79e00
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: ffffc9000543f628 R08: 0000000000000000 R09: 0000000000000000
+R10: dffffc0000000000 R11: ffffed101712487b R12: 1ffff92000a87ea0
+R13: ffffffff8ac280a9 R14: ffffffff8eb42480 R15: dffffc0000000000
+FS:  00007f6af12ee6c0(0000) GS:ffff888126efc000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f6af12edf98 CR3: 000000003d872000 CR4: 00000000003526f0
+Call Trace:
+ <TASK>
+ __rt_mutex_slowlock kernel/locking/rtmutex.c:1734 [inline]
+ __rt_mutex_slowlock_locked kernel/locking/rtmutex.c:1760 [inline]
+ rt_mutex_slowlock+0x692/0x6e0 kernel/locking/rtmutex.c:1800
+ __rt_mutex_lock kernel/locking/rtmutex.c:1815 [inline]
+ __mutex_lock_common kernel/locking/rtmutex_api.c:536 [inline]
+ mutex_lock_nested+0x16a/0x1d0 kernel/locking/rtmutex_api.c:547
+ rfkill_fop_open+0x138/0x820 net/rfkill/core.c:1178
+ misc_open+0x2de/0x350 drivers/char/misc.c:163
+ chrdev_open+0x4cf/0x5e0 fs/char_dev.c:414
+ do_dentry_open+0x9b1/0x1350 fs/open.c:965
+ vfs_open+0x3b/0x350 fs/open.c:1097
+ do_open fs/namei.c:3975 [inline]
+ path_openat+0x2ef1/0x3840 fs/namei.c:4134
+ do_filp_open+0x1fa/0x410 fs/namei.c:4161
+ do_sys_openat2+0x121/0x1c0 fs/open.c:1437
+ do_sys_open fs/open.c:1452 [inline]
+ __do_sys_openat fs/open.c:1468 [inline]
+ __se_sys_openat fs/open.c:1463 [inline]
+ __x64_sys_openat+0x138/0x170 fs/open.c:1463
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f6af308efc9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f6af12ee038 EFLAGS: 00000246 ORIG_RAX: 0000000000000101
+RAX: ffffffffffffffda RBX: 00007f6af32e5fa0 RCX: 00007f6af308efc9
+RDX: 0000000000000801 RSI: 0000200000000040 RDI: ffffffffffffff9c
+RBP: 00007f6af3111f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f6af32e6038 R14: 00007f6af32e5fa0 R15: 00007ffeabd8a878
+ </TASK>
+
+
 ---
- io_uring/zcrx.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
-index a816f5902091..4ffa336d677c 100644
---- a/io_uring/zcrx.c
-+++ b/io_uring/zcrx.c
-@@ -599,29 +599,30 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
- 	if (ret)
- 		goto err;
- 
--	ifq->netdev = netdev_get_by_index(current->nsproxy->net_ns, reg.if_idx,
--					  &ifq->netdev_tracker, GFP_KERNEL);
-+	ifq->netdev = netdev_get_by_index_lock(current->nsproxy->net_ns, reg.if_idx);
- 	if (!ifq->netdev) {
- 		ret = -ENODEV;
- 		goto err;
- 	}
-+	netdev_hold(ifq->netdev, &ifq->netdev_tracker, GFP_KERNEL);
- 
- 	ifq->dev = netdev_queue_get_dma_dev(ifq->netdev, reg.if_rxq);
- 	if (!ifq->dev) {
- 		ret = -EOPNOTSUPP;
--		goto err;
-+		goto netdev_put_unlock;
- 	}
- 	get_device(ifq->dev);
- 
- 	ret = io_zcrx_create_area(ifq, &area);
- 	if (ret)
--		goto err;
-+		goto netdev_put_unlock;
- 
- 	mp_param.mp_ops = &io_uring_pp_zc_ops;
- 	mp_param.mp_priv = ifq;
--	ret = net_mp_open_rxq(ifq->netdev, reg.if_rxq, &mp_param);
-+	ret = __net_mp_open_rxq(ifq->netdev, reg.if_rxq, &mp_param, NULL);
- 	if (ret)
--		goto err;
-+		goto netdev_put_unlock;
-+	netdev_unlock(ifq->netdev);
- 	ifq->if_rxq = reg.if_rxq;
- 
- 	reg.zcrx_id = id;
-@@ -640,6 +641,9 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
- 		goto err;
- 	}
- 	return 0;
-+netdev_put_unlock:
-+	netdev_put(ifq->netdev, &ifq->netdev_tracker);
-+	netdev_unlock(ifq->netdev);
- err:
- 	scoped_guard(mutex, &ctx->mmap_lock)
- 		xa_erase(&ctx->zcrx_ctxs, id);
--- 
-2.47.3
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
