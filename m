@@ -1,78 +1,104 @@
-Return-Path: <netdev+bounces-234833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C48A5C27C98
-	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 12:19:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AB52C27DF9
+	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 13:27:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AA3664E22BB
-	for <lists+netdev@lfdr.de>; Sat,  1 Nov 2025 11:19:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44B4D3A6166
+	for <lists+netdev@lfdr.de>; Sat,  1 Nov 2025 12:27:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BC6F26ED58;
-	Sat,  1 Nov 2025 11:19:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F38A62F6193;
+	Sat,  1 Nov 2025 12:27:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cpjTaGHY"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="qjbeLNVi"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+Received: from mx1.secunet.com (mx1.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A61D51D5CF2
-	for <netdev@vger.kernel.org>; Sat,  1 Nov 2025 11:19:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E27582F2608
+	for <netdev@vger.kernel.org>; Sat,  1 Nov 2025 12:27:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761995948; cv=none; b=pyMBC0dXeyD6bTh+tQyeCbkclFxA5OZ+Sc2pt4uwhYRN4/To1wDx9F7EPl+HNVS4ZOajGUotvSCDeYwkIQhr1LaGGfZuan60KgI4OS7w+zUxas77s490SFX51HSViz/yCCcix2JrtczhvscJDNrT9pvrEAzl9EJZm5zFeDiPoQM=
+	t=1762000023; cv=none; b=KHVohGX16nQMNBovYkjtRTjQvlMw72Nx2LCuY4TabB1vUK5vHrBDzTfl7vCjhODejRmd4HwrV9HhkaaHtpEkCFTnPKd5RfwMCRzI2HVv0J/nhK7Uw+/fQdVAfQEkrqMlRNaJ+1bjPrzEHKn3nx5lzIG02QrdjLUmOuxI3HzMWJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761995948; c=relaxed/simple;
-	bh=Le3ojftnvwAMSHGtZ12ti6v3tbFc6aZVtoSsbrZK5Sg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UB172jrU+B+73TrXCeU6EEbTkDWFBMF6oxKmL1DI4efRWwbCVtIfFmBZBWRp0SCIDN8wWxcAS5kbKzjB3/qLfsSqw8ZHa50TOq7tW9QMf9krHLxZ5Nnhjd0rkARECMCPwXPJjVYV7TOhTSQtOGp5U4rNARKonYILYB0b6vvsST4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cpjTaGHY; arc=none smtp.client-ip=91.218.175.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <9193e49a-b7e8-4a45-ab30-c7308f8e9d75@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1761995941;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ybok/k/EaCYbs1jQUTE3ffytqk49cuVoxPSAGtQzHbQ=;
-	b=cpjTaGHY7o2jQE5u/jerXx9XdI2PXlkTRisB8iKajAYMm0GwGn0yOoY8R5DNR6zACa0Zka
-	UqGye6yTsmhpENccIdneKZZVPgPR+iHVY6oWOZvQhasHgex4lqYLLCQEiFhXFooN6a3m3K
-	HbD49XO+sOgUa11l1DQG4XXc3taP5Wo=
-Date: Sat, 1 Nov 2025 11:18:59 +0000
+	s=arc-20240116; t=1762000023; c=relaxed/simple;
+	bh=Etxn1jKut8luil+fb2sCY2jg53AMjlPXBkfbCeRiofA=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rNCqKOrGmuAF9F/O1NGr+BRQR7rdplQwi/Rqq0kT9EowLCkBbFK+R/0ScuEYEPBCHYZ7lQWor0XgsjUgOaL8K0mFcZ8+ZZUtayxCjZBmPrnDuK59swzF4QlX6t0f8TKmCrkMUJ/e90mmOAvZ9Oi0PaghyPjFJfcayCDVtaOmsus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=qjbeLNVi; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by mx1.secunet.com (Postfix) with ESMTP id AD5B320754;
+	Sat,  1 Nov 2025 13:26:52 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from mx1.secunet.com ([127.0.0.1])
+ by localhost (mx1.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id OhVQeTevsJMJ; Sat,  1 Nov 2025 13:26:51 +0100 (CET)
+Received: from EXCH-01.secunet.de (unknown [10.32.0.231])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.secunet.com (Postfix) with ESMTPS id BEDD720704;
+	Sat,  1 Nov 2025 13:26:51 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.secunet.com BEDD720704
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1762000011;
+	bh=GxdQtgLz3QT6n5vA/el0q2FQGC5dD+ouuKJHsDgjcho=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=qjbeLNViEe5rvfVjnSd7m6NGMFpuEjcGpHlCd2gBn2/RuWS7X7FpgmWHXWDoLvzqw
+	 0yNNXowrDqtUC+oLmYJc0SGuJ3dJme3AO5u5761KrtysmrU7HOsisSnOuVh1y7/+EY
+	 pA5t+bVlKr0dUkndxIjkZJxWhg5Ch1jVDLUBCzHoRSkcfd8/fJTGkw59sOcPdMw5g8
+	 Fomn12ZUlp1lIXRGTmY5nTqJM5mBwiZbeRMLqHPPial6zL3MMMBZP168qj28eDapNY
+	 urvDDSt3n+1qMlAb42BBzf+94KAlcyy48ADVhbL++Q3BASaDW3ZrMv/Jp71HmFXZ3G
+	 /kxUPZJM27vKg==
+Received: from secunet.com (10.182.7.193) by EXCH-01.secunet.de (10.32.0.171)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.2.2562.17; Sat, 1 Nov
+ 2025 13:26:51 +0100
+Received: (nullmailer pid 3043879 invoked by uid 1000);
+	Sat, 01 Nov 2025 12:26:50 -0000
+Date: Sat, 1 Nov 2025 13:26:50 +0100
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>, Paul Wouters <paul@nohats.ca>,
+	Andreas Steffen <andreas.steffen@strongswan.org>, Tobias Brunner
+	<tobias@strongswan.org>, Antony Antony <antony@phenome.org>, Tuomo Soini
+	<tis@foobar.fi>, "David S. Miller" <davem@davemloft.net>, Florian Westphal
+	<fw@strlen.de>, Sabrina Dubroca <sd@queasysnail.net>
+CC: <netdev@vger.kernel.org>, <devel@linux-ipsec.org>
+Subject: Re: [PATCH v2 ipsec-next] pfkey: Deprecate pfkey
+Message-ID: <aQX8ipi5E7nccmJU@secunet.com>
+References: <aQBitXM2fxLb82Eq@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] ptp: ocp: Add newline to sysfs attribute output
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Zhongqiu Han <zhongqiu.han@oss.qualcomm.com>, richardcochran@gmail.com,
- jonathan.lemon@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20251030124519.1828058-1-zhongqiu.han@oss.qualcomm.com>
- <20251031165903.4b94aa66@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20251031165903.4b94aa66@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <aQBitXM2fxLb82Eq@secunet.com>
+X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+ EXCH-01.secunet.de (10.32.0.171)
 
-On 31/10/2025 23:59, Jakub Kicinski wrote:
-> On Thu, 30 Oct 2025 20:45:19 +0800 Zhongqiu Han wrote:
->> Append a newline character to the sysfs_emit() output in ptp_ocp_tty_show.
->> This aligns with common kernel conventions and improves readability for
->> userspace tools that expect newline-terminated values.
+On Tue, Oct 28, 2025 at 07:29:09AM +0100, Steffen Klassert wrote:
+> The pfkey user configuration interface was replaced by the netlink
+> user configuration interface more than a decade ago. In between
+> all maintained IKE implementations moved to the netlink interface.
+> So let config NET_KEY default to no in Kconfig. The pfkey code
+> will be removed in a second step.
 > 
-> Vadim? Is the backward compat here a concern?
+> Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+> Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
+> Acked-by: Antony Antony <antony.antony@secunet.com>
+> Acked-by: Tobias Brunner <tobias@strongswan.org>
+> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+> Acked-by: Tuomo Soini <tis@foobar.fi>
+> Acked-by: Paul Wouters <paul@nohats.ca>
 
-I'm checking our software now, hopefully it will not break, but I need a
-bit of time to be sure
+This is now applied to ipsec-next,
+
+thanks everyone!
 
