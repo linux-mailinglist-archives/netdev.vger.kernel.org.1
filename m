@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-234838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC843C27E1A
-	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 13:35:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A85CC27E1D
+	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 13:35:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00C2B3BF8EE
-	for <lists+netdev@lfdr.de>; Sat,  1 Nov 2025 12:35:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94BA83BFE47
+	for <lists+netdev@lfdr.de>; Sat,  1 Nov 2025 12:35:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8DFF2BDC05;
-	Sat,  1 Nov 2025 12:35:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 525C125C818;
+	Sat,  1 Nov 2025 12:35:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KI8oYo/Q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ued7h9x5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 639942E2DDA
-	for <netdev@vger.kernel.org>; Sat,  1 Nov 2025 12:35:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEF7B258CDF
+	for <netdev@vger.kernel.org>; Sat,  1 Nov 2025 12:35:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762000501; cv=none; b=FgAKm1ukNOfoF0aA9oamn5l4PoTxMZ/n3mtzDzPmDjGk+NB8FLqSKgjAHukf5JLpXBtFn7yS8eqjhg7yv+vHO8eJ84P6VnPzPq+4B5JqM4lALe33CWZ5NFL6ZcQWn00ceWL1T2/LpP8yEBM13YmXokspLT25HhgO3sZPrxuCtpY=
+	t=1762000508; cv=none; b=UdYamrv7b4HTnt7vgK7w/1MCEvoNwag11qx89vKg7ZVQ/HMU91tZ1UG4yV8Mld6hg5Jy1GNQ0l7a7/MOUlhNlIoaMDj6oRQF26pmeNqEzSD60EZjGyrBcbnJZIAA6NCxd1GeHFS4zSQf4Rpu+II7ifdBZbWJJf2uXmWVHGyfb/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762000501; c=relaxed/simple;
-	bh=chT7ZuJdmZz2+odZdjWBl1QPwpZX5AyyiSBmBy+TRRQ=;
+	s=arc-20240116; t=1762000508; c=relaxed/simple;
+	bh=5lljvy+eeKPbsrR97UeOzg7UMYKoHcYzDLWKuAQGdYE=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=RjCipBG67ZBci7VR5zSdLdsWkWpz6Rx2GhMArkA9cqptvvYOU4SttdRe7AnHOsOpxCz+9jMl0khEY0GXTu46lWbZLv5s5/cao35Kb6cQ1w3Os2CdvO4w5Fwu1Q6A2u5Ca2djsCONDNRQVTRsAOCvZARszV/dWBMnEw97UAtmPMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KI8oYo/Q; arc=none smtp.client-ip=209.85.216.54
+	 In-Reply-To:To:Cc; b=Yg/hT52gGh+g2n1mo7qxh9HEPuj75TiqsIIdaV501woPJBJp0F0Jmb66Gk6m0LaZcSByCsxoQOdimaGl38Iu11c7IgvcGL6VhTYuzfyKVjMKZ6eFxqCjXsOlabyQ6Bt/1n+hFVZxX376ibnvvKjlJbeR+Zwtw9IIlq2WgUK2RzE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ued7h9x5; arc=none smtp.client-ip=209.85.215.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-3404904539dso525633a91.2
-        for <netdev@vger.kernel.org>; Sat, 01 Nov 2025 05:35:00 -0700 (PDT)
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-b8b33cdf470so263913a12.0
+        for <netdev@vger.kernel.org>; Sat, 01 Nov 2025 05:35:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762000500; x=1762605300; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1762000504; x=1762605304; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=qDRT+NEI4paVe6C3WZWM0dixLtLFOOKY3SXggLATTdE=;
-        b=KI8oYo/QLWsn+hDSKqleoz+sPr2vstS6qoomYQ+B1wEKKSJdPW1/wDogvSchBMoC13
-         r0RFnrEPBHln01PTB2S1KJasxAQgJqmpEB56be1AoQDIwGxyk7jUGA7eHd6Wn3a0N4Eq
-         evh/k7Wz6wPyYWTZhdfFZ59PT1DtKRdcdJ+1JYuLsRZWdf2lnRXw6PxTSXqlf2Qda5EZ
-         OC2OsLkjslWHtS0ruJOitXNNKwcGSiUK507MSomOu5ytfK43J2oh7eba+wAdVGwP8ADB
-         LjXPzv1RmpiWuK7fvmbbt/TRXIzbSv5qZ7Jwh32+kDpOjbcNS3rV4AeUQFkfGgGsXP8+
-         trAg==
+        bh=9iow4Uh3JbPUWEJRhV4H6RzrlPY1bk6TBjtSGGBlaN4=;
+        b=Ued7h9x5vp0OfEsZWuXKwb9qcb5oLIHTWDDn4AxY+qZkmycD2q3m44JV4+7frRu/UA
+         wYyq0oLtY1dNqRwF2SOVVvcruV0ARLln9kOuRJuxiMVSqViyXG5kt5DEDTWR9Psji40A
+         g6SlYcW/pWt46sl8AHfdbG2IYlzJcuXhm/rb5mwjV/9uIajQD/xSRbanNOnQwsHc+X+q
+         /d1FSnKge3SyE6LJnqbPdWY2o5vc1RAFvWex38Vy08ujVzdqtKrQo2HzrYvbmqClZlQ9
+         Z21Yf/Sn+CGkHMZ2iucHUZ2VdqGQ33dZTk0/seAtBGPYHvSPaIOKvn6iI4D1+C5BLnKz
+         FIWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762000500; x=1762605300;
+        d=1e100.net; s=20230601; t=1762000504; x=1762605304;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qDRT+NEI4paVe6C3WZWM0dixLtLFOOKY3SXggLATTdE=;
-        b=uK3o9xBzxHDb2K+/OLMGQEi0Sy+jxCQ6zOnfNtqGI7qr6jf4zQcEY/4FXAbnoREohn
-         HYLXGnLcjIOlM4lnbpZJtS6pEQvWOCr/Y4VY7oPV1pL60GCXLXBU7aXx25fXqeX6Vqjx
-         YjZx3KkDEvye/KV96ARaK93qhKoaIX+h1iAHg2mtsDV4pyImFltvw7Nqd4rWZ1PS1MP0
-         Fbi5Hrn+5oglBpri/tEbbpgFusUTq5JiF5DYe7g01aBPONsJVkhth94AltuKUNhq5bXB
-         nPOfJAVMsIuWTYkene/4sE2vS+p3xoIxelg9CTfgdCyFbhMSce7dzda6RuTzWyA23ZBz
-         WvYA==
-X-Gm-Message-State: AOJu0YwHAmddG4LD5p+b1w7wyRAT4WIRiVPuW/+TRzTCLV0+Q6GdC33M
-	OaJzUf0+hpN4j55+M5F90rKzyE6Bx7zCPS/cgzq+BZCvPthczgVawFcj
-X-Gm-Gg: ASbGncvxfPv283r1UgnTLNOC0srrJ+mnUaB4zJiVFZvFmH0va7iANM4El3+SXgoo5XV
-	I28EBjWLOgAXBZKt5M5WJ9IPRWvynG6Ig+Gf70Nm0U60L0imqV0/OChBhIGbXV1KYHj5bli/VUv
-	P2ydbenqntupbKGh1P4TsV4aEKTghsGEIBJcra4PXgHUSc1vgesAX23CWpori2XIPDSlyMxRKdN
-	K/PAXcFsuoEt6l+Qczhvx80UO1Od9q2BYsJHinlvtKey5V/+U3+XPrduNvurw7C8zKm6BzpODw3
-	Dw9L6VHkd6KZfIo+oT8P2nax3I+x5ceaksaVLfT/DfV5fWv2vzkDkXYe59zZ5/5En0iRyVCJCxE
-	rzIYmYSY2NuCa09C9sk9dqTgPvXZvLw1uCuWi89ekV4OPO8rtbqe8RIk8M7Cq8G+iymgSUKbHd6
-	UqB+xYVvFeyu+XlgBRIkLCA5jWWytSPUeEfZ1pG0DE
-X-Google-Smtp-Source: AGHT+IEIpXxPwq5sEDlkOcaHuDBQuKRHH2343dqIJklYh5KJcqhNIUb8e5LlvsFd0ntOyTjMFiZdcQ==
-X-Received: by 2002:a17:90b:180e:b0:332:3ffe:4be5 with SMTP id 98e67ed59e1d1-340830b422fmr4786530a91.7.1762000499628;
-        Sat, 01 Nov 2025 05:34:59 -0700 (PDT)
+        bh=9iow4Uh3JbPUWEJRhV4H6RzrlPY1bk6TBjtSGGBlaN4=;
+        b=X8qhX4Cnak+TlQcT4fwn7vO5NHSCftuPc39L8ut30ssd8Q7hYaCld4Htklo7hoUXDA
+         kEIaCidNB4g7t9juh/nbS+fTnA+g1FT44m5R9q74Ni8Aa0SonxP7bO0BpXjeZwBGJdmm
+         /r6JSCxFrGEABjHnGlNZFIPO3fszz+rNOfgTiX/CUhcCU6M1cQ2VRo9jtZIhFjGMU5Dn
+         aJNngCqPDOIjOOLyJn8/i/sCg+/I+Q5kvYPyK2upkMqtXU2ibT0zHcM4lj4iL9zK9DwY
+         LUw3UZDvJlw1l6PDdgNVHV1FqLer/bkfbRVsyamDK7hfNjw0N6liakATwhxZmLMd8y6m
+         q6uw==
+X-Gm-Message-State: AOJu0YxLqnvuTcC2TuqYTWxrmcacWsupolpsroELJkzuzAw7yd5OejmJ
+	Evf01j1a/5/kSRrxIxrQtlCJ44X9jrVvw7D+1IBtHjG41UZJWUJfWGon
+X-Gm-Gg: ASbGncsxRgKPmaM7RvsuHgCeXiyLbZlyoiWGF4PWFTTEfW+ZC/iHjgoF0EE3aR9SKNx
+	mVLFAcJVuSVeBpA9CiSNO0WncTjIhp9ynLdHnAAvMle3YtThW6sIuSjg38nHOvlnkw/ElRIvEci
+	sXfrmzbXaTX9Eqkp76UoRW5nGrMQy7BAGOj9vEFb8PXE6paLjzdNTPqJ7tJg0h+GA8qV23EWnoU
+	fA+oj4K3jESJyVVVHbPuKVf14TblV/QPyBWmDbN57tCsJ9pwgufyDZn23vW/ErR9jHfnR8E5G4P
+	XUdX5kzlaM4GfFNu9pJJjl5qc2Cez317Q1N5LlgHFUsVEvi+XCL+n+K3jhZV+bTyzRTlIgc0oXV
+	gYCOt9n3hACOZ8CsKyRoYfODyIvrMq4c53J/wzJuzMRA70h8TbuPTm8lkJlM7h1uXAyJXOguqHO
+	lpgir6jnYrREuKce6STDXoTDV6M7VHSZyJgz1CiQ9u
+X-Google-Smtp-Source: AGHT+IGaymgUrpOcvB4JBLFSPVUyGWWS9X0AS3vOHetSYGMoN5nDwO4YcwN9LuZvJ9JYCEcykcWlKg==
+X-Received: by 2002:aa7:88cd:0:b0:7a5:396d:76d3 with SMTP id d2e1a72fcca58-7a7797c005bmr3975673b3a.4.1762000503825;
+        Sat, 01 Nov 2025 05:35:03 -0700 (PDT)
 Received: from [127.0.1.1] ([2406:7400:10c:9fcf:a95f:918:2618:d2cf])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a7db86f0fesm5214017b3a.60.2025.11.01.05.34.55
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a7db86f0fesm5214017b3a.60.2025.11.01.05.34.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 01 Nov 2025 05:34:59 -0700 (PDT)
+        Sat, 01 Nov 2025 05:35:03 -0700 (PDT)
 From: Ranganath V N <vnranganath.20@gmail.com>
-Date: Sat, 01 Nov 2025 18:04:47 +0530
-Subject: [PATCH v2 1/2] net: sched: act_ife: initialize struct tc_ife to
- fix KMSAN kernel-infoleak
+Date: Sat, 01 Nov 2025 18:04:48 +0530
+Subject: [PATCH v2 2/2] net: sched: act_connmark: zero initialize the
+ struct to avoid KMSAN
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,7 +85,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251101-infoleak-v2-1-01a501d41c09@gmail.com>
+Message-Id: <20251101-infoleak-v2-2-01a501d41c09@gmail.com>
 References: <20251101-infoleak-v2-0-01a501d41c09@gmail.com>
 In-Reply-To: <20251101-infoleak-v2-0-01a501d41c09@gmail.com>
 To: Jamal Hadi Salim <jhs@mojatatu.com>, 
@@ -95,69 +95,48 @@ To: Jamal Hadi Salim <jhs@mojatatu.com>,
  Simon Horman <horms@kernel.org>
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
  skhan@linuxfoundation.org, david.hunter.linux@gmail.com, khalid@kernel.org, 
- Ranganath V N <vnranganath.20@gmail.com>, 
- syzbot+0c85cae3350b7d486aee@syzkaller.appspotmail.com
+ Ranganath V N <vnranganath.20@gmail.com>
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1762000490; l=2056;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1762000490; l=1124;
  i=vnranganath.20@gmail.com; s=20250816; h=from:subject:message-id;
- bh=chT7ZuJdmZz2+odZdjWBl1QPwpZX5AyyiSBmBy+TRRQ=;
- b=QhYz129puv3oVszl5c9tMRyDFQV70rx+6GTRyuQ2lTGOmSohCfnYhkr7dhtyfXGznRR41o9n/
- ydrxrEdNIyCBMzus9PmjGIv2Da7KLzDO3m1QO4QL6o08Ea53pyn97Pe
+ bh=5lljvy+eeKPbsrR97UeOzg7UMYKoHcYzDLWKuAQGdYE=;
+ b=bNfAU7fFhFu8TXmm6LrwvsK/5elG10436Ao1RifFc2YEB/o84xMwIUoUqeEcARWUBz37FRUsC
+ SgI8FmaDr2wBYAcMsXO0YTdp3BUjZOLvpN3TozwQf8vw5mi/iZdNnGH
 X-Developer-Key: i=vnranganath.20@gmail.com; a=ed25519;
  pk=7mxHFYWOcIJ5Ls8etzgLkcB0M8/hxmOh8pH6Mce5Z1A=
 
-Fix a KMSAN kernel-infoleak detected  by the syzbot .
+zero initialize the struct to avoid the infoleak to the userspace.
 
-[net?] KMSAN: kernel-infoleak in __skb_datagram_iter
-
-In tcf_ife_dump(), the variable 'opt' was partially initialized using a
-designatied initializer. While the padding bytes are reamined
-uninitialized. nla_put() copies the entire structure into a
-netlink message, these uninitialized bytes leaked to userspace.
-
-Initialize the structure with memset before assigning its fields
-to ensure all members and padding are cleared prior to beign copied.
-
-This change silences the KMSAN report and prevents potential information
-leaks from the kernel memory.
-
-This fix has been tested and validated by syzbot. This patch closes the
-bug reported at the following syzkaller link and ensures no infoleak.
-
-Reported-by: syzbot+0c85cae3350b7d486aee@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=0c85cae3350b7d486aee
-Tested-by: syzbot+0c85cae3350b7d486aee@syzkaller.appspotmail.com
-Fixes: ef6980b6becb ("introduce IFE action")
 Signed-off-by: Ranganath V N <vnranganath.20@gmail.com>
 ---
- net/sched/act_ife.c | 12 +++++++-----
+ net/sched/act_connmark.c | 12 +++++++-----
  1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/net/sched/act_ife.c b/net/sched/act_ife.c
-index 107c6d83dc5c..7c6975632fc2 100644
---- a/net/sched/act_ife.c
-+++ b/net/sched/act_ife.c
-@@ -644,13 +644,15 @@ static int tcf_ife_dump(struct sk_buff *skb, struct tc_action *a, int bind,
+diff --git a/net/sched/act_connmark.c b/net/sched/act_connmark.c
+index 3e89927d7116..cf3cdfaaa34b 100644
+--- a/net/sched/act_connmark.c
++++ b/net/sched/act_connmark.c
+@@ -195,13 +195,15 @@ static inline int tcf_connmark_dump(struct sk_buff *skb, struct tc_action *a,
+ 	const struct tcf_connmark_info *ci = to_connmark(a);
  	unsigned char *b = skb_tail_pointer(skb);
- 	struct tcf_ife_info *ife = to_ife(a);
- 	struct tcf_ife_params *p;
--	struct tc_ife opt = {
--		.index = ife->tcf_index,
--		.refcnt = refcount_read(&ife->tcf_refcnt) - ref,
--		.bindcnt = atomic_read(&ife->tcf_bindcnt) - bind,
+ 	const struct tcf_connmark_parms *parms;
+-	struct tc_connmark opt = {
+-		.index   = ci->tcf_index,
+-		.refcnt  = refcount_read(&ci->tcf_refcnt) - ref,
+-		.bindcnt = atomic_read(&ci->tcf_bindcnt) - bind,
 -	};
-+	struct tc_ife opt;
++	struct tc_connmark opt;
  	struct tcf_t t;
  
 +	memset(&opt, 0, sizeof(opt));
 +
-+	opt.index = ife->tcf_index,
-+	opt.refcnt = refcount_read(&ife->tcf_refcnt) - ref,
-+	opt.bindcnt = atomic_read(&ife->tcf_bindcnt) - bind,
++	opt.index   = ci->tcf_index,
++	opt.refcnt  = refcount_read(&ci->tcf_refcnt) - ref,
++	opt.bindcnt = atomic_read(&ci->tcf_bindcnt) - bind,
 +
- 	spin_lock_bh(&ife->tcf_lock);
- 	opt.action = ife->tcf_action;
- 	p = rcu_dereference_protected(ife->params,
+ 	rcu_read_lock();
+ 	parms = rcu_dereference(ci->parms);
+ 
 
 -- 
 2.43.0
