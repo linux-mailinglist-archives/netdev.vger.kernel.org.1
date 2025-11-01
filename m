@@ -1,105 +1,77 @@
-Return-Path: <netdev+bounces-234801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 287DEC274FE
-	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 01:50:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EFF4C2750A
+	for <lists+netdev@lfdr.de>; Sat, 01 Nov 2025 01:54:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 109C14E51EB
-	for <lists+netdev@lfdr.de>; Sat,  1 Nov 2025 00:50:53 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2F76D4E1036
+	for <lists+netdev@lfdr.de>; Sat,  1 Nov 2025 00:54:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89DF9219313;
-	Sat,  1 Nov 2025 00:50:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 736F120A5EA;
+	Sat,  1 Nov 2025 00:54:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CT/gqRHY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M1k9rlyg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C662214A9B;
-	Sat,  1 Nov 2025 00:50:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AC0D15E5BB;
+	Sat,  1 Nov 2025 00:54:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1761958235; cv=none; b=U+oOI999VfwN7KMwip6xOkE9VmwtyR5hAPRhHIIeyvQEWqzyzq6lMPnP25T4we/lsi8PNC/wKVzahMGowY/CMoVh98Qt9iPzOiQBOBocbtGjPra3fK42d4JiHf2E0+0O+qsdhhZT9MoqEeNUUOy+JUj59SGBVUZTjKTETrUbaF8=
+	t=1761958488; cv=none; b=Y1BquLeIsopTJq9/Pipj3zhQhQSeul5Tnpqt6F+cV1vV9OlGbefZ/bPPrXpQlXnBj3NtE49n1biZVGX8R3FnY+vYidp80SAl5doNfq+zxTN1Tx+pxRE403XNL7afbhFuOZN/pq98BAlNvk2DFp2Qr/Lkg/1F3G78dvmGXSvC8J0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1761958235; c=relaxed/simple;
-	bh=mxnF0wr4BqX8APrMyeKsRyrXXgrLHbvMSo0RkdsUCqA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jztqWvu05KzCz+T2JXow28ds3Mh2OHM/thJbYmVZB506GyUN5jWymk2y1QAs9e0UZKpCzRDPM+3OVU7i6UTg29vrKSEvW7h2wFhA1a+as7r9fU8HnWtSdxY19/x1m+MbTczfUs4SV7YrONYGIi/U1guPMB4b3uwfUOY37jE7Ud0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CT/gqRHY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D8E6C4CEE7;
-	Sat,  1 Nov 2025 00:50:35 +0000 (UTC)
+	s=arc-20240116; t=1761958488; c=relaxed/simple;
+	bh=Eo5T+ScCv4hBpdgIgzhuXEDLTwYWGx5IuWl7TxgQP/4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=O6uEJnsdfMMQ61dKkAzv+Abe6dZikXLqlqYfnnTwbHTXlL1m8mWRD75rxTnhr2RCQTCFLjrVmSOoO+H1TfUWg8MIoTkTOUcG7Sg0Lt6RCtN9vs14PF+bsg0REexPxVGaFPfMdLF06pqxZyqbMWEItC84YfkH/QRptvLCOlDLl6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M1k9rlyg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72753C4CEE7;
+	Sat,  1 Nov 2025 00:54:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1761958235;
-	bh=mxnF0wr4BqX8APrMyeKsRyrXXgrLHbvMSo0RkdsUCqA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=CT/gqRHY16P9OmBQQCuRNSNQyCPLbwL4JdHo2g6VHaw+eAd+o5lJNYmw2Yx2wPyqp
-	 iheMQkaEYW+qnulq2WvNpP1kCmvQmiCyQVIcxsEbiti6aknrEZxwStZMiVPY7NYKxa
-	 /iO6I/SnZ1ofN1aH2r83FgqRCCsZ8GIfTyQYxElqnEwOM/8Uk3yQSuRgQqFe4azfhe
-	 nre+SZtaTr/PyRzxwMEp/RdIOgg0a/BZPwMO5tt4tgathiRYzbC13+1GHGUtn1b5D+
-	 aQtebHgwC4hRyy0/q9jHkN3GIYSQyHffZhBCcnYHnV5zawLJl7tazmVjCqPmSxQsOq
-	 OvXj1Qi7cCUeg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F303809A00;
-	Sat,  1 Nov 2025 00:50:12 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1761958487;
+	bh=Eo5T+ScCv4hBpdgIgzhuXEDLTwYWGx5IuWl7TxgQP/4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=M1k9rlygTMElVgSJxGl1zjYAwkZHvPEzwI3KNPMTiZcN3Q/+uTKa4BYIh30y+7o0x
+	 0sXOulMsPRLgWdIKbuFYeDtZLIZlCWZVcdqnTPdxEbaqJQOStr3m5jvpA38gX/dWO0
+	 /cASAb4HPftOQi8II3FgM4bYaPlrnHYQkosfZkqc3ACRIOHALrAGbM+vSGx69pZXp2
+	 VKcqFWil6+WQ6l344DeJ6cGAyqI8mZxZ0M3giChOyotTBJWHwytOo6cwZkrESdj/eF
+	 MQkyqSCP1iG2lYTb9wxvmOKXKh31mfaD36chnmxjJJgublyJpdZISewpXd0EI6ACJx
+	 M+FfTU6tAKjMQ==
+Date: Fri, 31 Oct 2025 17:54:46 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Gustavo Luiz Duarte <gustavold@gmail.com>
+Cc: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Matthew Wood
+ <thepacketgeek@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] netconsole: Acquire su_mutex before navigating
+ configs hierarchy
+Message-ID: <20251031175446.24e280fa@kernel.org>
+In-Reply-To: <20251029-netconsole-fix-warn-v1-1-0d0dd4622f48@gmail.com>
+References: <20251029-netconsole-fix-warn-v1-1-0d0dd4622f48@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] selftests: netdevsim: Fix ethtool-coalesce.sh fail
- by
- installing ethtool-common.sh
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176195821124.682052.16276710639901642661.git-patchwork-notify@kernel.org>
-Date: Sat, 01 Nov 2025 00:50:11 +0000
-References: <20251030040340.3258110-1-wangliang74@huawei.com>
-In-Reply-To: <20251030040340.3258110-1-wangliang74@huawei.com>
-To: Wang Liang <wangliang74@huawei.com>
-Cc: kuba@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, shuah@kernel.org,
- acardace@redhat.com, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, yuehaibing@huawei.com,
- zhangchangzhong@huawei.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Wed, 29 Oct 2025 13:50:24 -0700 Gustavo Luiz Duarte wrote:
+> There is a race between operations that iterate over the userdata
+> cg_children list and concurrent add/remove of userdata items through
+> configfs. The update_userdata() function iterates over the
+> nt->userdata_group.cg_children list, and count_extradata_entries() also
+> iterates over this same list to count nodes.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 30 Oct 2025 12:03:40 +0800 you wrote:
-> The script "ethtool-common.sh" is not installed in INSTALL_PATH, and
-> triggers some errors when I try to run the test
-> 'drivers/net/netdevsim/ethtool-coalesce.sh':
-> 
->   TAP version 13
->   1..1
->   # timeout set to 600
->   # selftests: drivers/net/netdevsim: ethtool-coalesce.sh
->   # ./ethtool-coalesce.sh: line 4: ethtool-common.sh: No such file or directory
->   # ./ethtool-coalesce.sh: line 25: make_netdev: command not found
->   # ethtool: bad command line argument(s)
->   # ./ethtool-coalesce.sh: line 124: check: command not found
->   # ./ethtool-coalesce.sh: line 126: [: -eq: unary operator expected
->   # FAILED /0 checks
->   not ok 1 selftests: drivers/net/netdevsim: ethtool-coalesce.sh # exit=1
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,v2] selftests: netdevsim: Fix ethtool-coalesce.sh fail by installing ethtool-common.sh
-    https://git.kernel.org/netdev/net/c/d01f8136d46b
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Teaching syzbot how to create a netconsole would probably go a long way
+towards catching these sort of issues. Looks like right now syzbot has
+coverage only for the paths that don't need a target:
+https://syzkaller.appspot.com/upstream/coverage?period=month
 
