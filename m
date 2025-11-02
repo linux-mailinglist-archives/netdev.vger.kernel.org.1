@@ -1,202 +1,319 @@
-Return-Path: <netdev+bounces-234897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BA11C28F64
-	for <lists+netdev@lfdr.de>; Sun, 02 Nov 2025 14:09:44 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C66CDC28F6E
+	for <lists+netdev@lfdr.de>; Sun, 02 Nov 2025 14:18:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D1473B1126
-	for <lists+netdev@lfdr.de>; Sun,  2 Nov 2025 13:09:42 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9FB704E17EB
+	for <lists+netdev@lfdr.de>; Sun,  2 Nov 2025 13:18:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD6EC12CDBE;
-	Sun,  2 Nov 2025 13:09:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA2AA26290;
+	Sun,  2 Nov 2025 13:18:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="n3b+A++T"
+	dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b="dtWCXxHM"
 X-Original-To: netdev@vger.kernel.org
-Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010065.outbound.protection.outlook.com [52.101.46.65])
+Received: from mx.nabladev.com (mx.nabladev.com [178.251.229.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 181711DDDD
-	for <netdev@vger.kernel.org>; Sun,  2 Nov 2025 13:09:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.65
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762088980; cv=fail; b=nFvgWeugd9YPZV1gd47sTk/pMTgn8AOmmfwlgT73CgN5v9/uKFvsjeTXIRfVcHOnIia4MqalSIsnK4z38cvzbvKNT60cfKQzsOVFNqVAWS6/QT4KgItouXd12QAmoUHUIRmIa2GSrMIjUAIZiwCm/+G2WP8lUcPPdZ1XAL9NZYc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762088980; c=relaxed/simple;
-	bh=JxTg4L2CsHOlGz67yD3e7JHa7TSJE2avkIhWinfo7hY=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=RLYQn6EFVV63NnhokaxiW7jprGuwvFmOYhpsxMJ8iW8bkTD143Co130ldePDzkAzGG6bHchEsuUdgCI/3hatwiKo7Q8SXvKER6y97uddpMfIgd+6ppVX9bjELRjWbf8j0QTTqD6bYblmd/xj6POKcWSCYnBCCaNJAOI4FtgSZZs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=n3b+A++T; arc=fail smtp.client-ip=52.101.46.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=utgbnZ61SIw7gdI/mP4yAPwR38lliCmqtCzK83gHvoGZA6EiiPchXZM0C2phCggi+U3hQ6t32csqX0fiq3viPRpjxxRE4jogpFebRyMaS29TB3i2Z1qAdV5rffpfUdW5Qt1+gNha316bE8VL5sGR6EUhMKRCyfaRow6iVhCyv8njaodgGZLiRmKepy0gF2odZfsHrV7vWjfa62rmCbyGlxBfVd03Lyy8/FxQ4aeGLytI1B8qLaIkPuc0g3S3GL7wkNepDqjOmHCWCTV80szcqI6FF8bB1zsz6OShvCPeUXaTy68u1p+FxWty5CNV/HOXzGL5+7FZJh/rY8rnUaUaTQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=r3PZLRYitLt+AN2G5LuzM5h/NNLr230ipEpFcaFAkrg=;
- b=euk8wt/MyknrzijfY8LDUpbcVozWewb0q3pSuzqM4Q7vvjcI9CGJokr73q5jKzeOel5gKbYqxxApLQFO/OlvjFpXVKd6tcfDBoRjGaKqo4G6v2Jo7vnNlPKcdKriq8z5aWSj/NHp+xZgrMZu7jQ1cS7xy05HSax24AmxqEpxcwC+dKXIXffQue+EZovMmGhzfnobusdPlo+kSUt215c7wKNnF9r8RMMhP4QqpJvebhygZm3Nbk0Sd2lF59BtB/aw90TOElbsAy8tje/JBASC1zw9QoV74T97DuOJcfEjwLzUBBfB3Jh2F661EcsFbE5ERCDzjIfqnsIjSmkJ7vp+Sg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=r3PZLRYitLt+AN2G5LuzM5h/NNLr230ipEpFcaFAkrg=;
- b=n3b+A++T4073vAePSbO4zbmSCamLyfHdMIpIWZRKswEgPEC0bA/ofd8BtYDegN6UNVlQo4OAMF/WzMWErcdIrJaXdFTikdiYpWLpUE2yTRMhKCVn6eazTo52d1Z6u8kaLy6cGWs7JenF86bM6eODhIj8AP014F1TL3AAZbh2TO+VoGCcO7qHpJ/3PoBWkdosRfGVCTxydMleXzjMQJxzIWkMCxHTJIjsOqMm+/H5lfjm0Kwvc/p08jWdsCEXDapfWWmdgPUUjOf2oqA1vw/0EpoXyYOgnYoSGZI2gv4ivowXqDb5Alh1Ot73QseMbsxDU0dN1jb+0B2Tbgkp2WNkiw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB7500.namprd12.prod.outlook.com (2603:10b6:610:148::17)
- by PH8PR12MB6794.namprd12.prod.outlook.com (2603:10b6:510:1c5::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.13; Sun, 2 Nov
- 2025 13:09:34 +0000
-Received: from CH3PR12MB7500.namprd12.prod.outlook.com
- ([fe80::7470:5626:d269:2bf2]) by CH3PR12MB7500.namprd12.prod.outlook.com
- ([fe80::7470:5626:d269:2bf2%4]) with mapi id 15.20.9275.015; Sun, 2 Nov 2025
- 13:09:33 +0000
-Message-ID: <742b1cd3-5935-44dd-bc3d-5744b56aa861@nvidia.com>
-Date: Sun, 2 Nov 2025 15:09:28 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/1] net/mlx5: query_mcia_reg fail logging at debug
- severity
-To: Matthew W Carlis <mattc@purestorage.com>
-Cc: adailey@purestorage.com, ashishk@purestorage.com, kuba@kernel.org,
- mbloch@nvidia.com, msaggi@purestorage.com, netdev@vger.kernel.org,
- saeedm@nvidia.com, tariqt@nvidia.com
-References: <8a7ecc3f-32c8-42fb-b814-9bb12d53e29b@nvidia.com>
- <20251030200942.38659-1-mattc@purestorage.com>
-From: Gal Pressman <gal@nvidia.com>
-Content-Language: en-US
-In-Reply-To: <20251030200942.38659-1-mattc@purestorage.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: TL0P290CA0013.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:5::20) To CH3PR12MB7500.namprd12.prod.outlook.com
- (2603:10b6:610:148::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15180A48;
+	Sun,  2 Nov 2025 13:18:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.251.229.89
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762089493; cv=none; b=iPSkDFliS8R1zAlyEyPCukCWeMRNRioS0z9TKaxm0M1iSeipT988l1O6koX5TDccub6iRVOYXYO0YPJKVRPk9DP+gYdodwVcRwxVq6HCLKtzkmMvPAuEfMauOVZa5Z/gy/inCLajy9No2McyRLk01tzetzRM+8px9+9YvG3ZPAo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762089493; c=relaxed/simple;
+	bh=oEj27hV8sDLRqVeFudzep4sflcLR2vKeiDQrnPPvIiQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Rps8TvTjE+RYjbI1KEX+iUaygX0uVMO5T0qVt376tVPFpcQvDRuHgrtRTZRO6K8Uh9ZpxrLtp0lp2VVi5kzKnvCbtaf4/EZ6eHseLP+pNtbgEKMvmrnBw+gQYsNuOvx/HEPx5sVazs7pHevbMyrr1wtoYzBb2iqoxlAk4HUpdRo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com; spf=pass smtp.mailfrom=nabladev.com; dkim=pass (2048-bit key) header.d=nabladev.com header.i=@nabladev.com header.b=dtWCXxHM; arc=none smtp.client-ip=178.251.229.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nabladev.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nabladev.com
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7EBDF103371;
+	Sun,  2 Nov 2025 14:18:05 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nabladev.com;
+	s=dkim; t=1762089488;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=d+3XPH4Px7IGAB7ZLN1/Ts7/+liOZBJ5fa+oaD0eqHk=;
+	b=dtWCXxHMT32D/Ep/1AYqJD/k5n6MIZkwjB8hXYmLNDk/k+/Opn/fnoGLJikRcAYJHngaWR
+	GBCKiDKGrYj6nf08UERwS9JasM2HFgRVoXxq565HPzm3GSXcirLk/R8k3OaTA01xkO/2CP
+	D5ZK/ZPtxrEjOFbY92GeNjBSDZlsT9oF0gSuD+UgfqolJYt74FjexqLMDruKR4p9pIGPZA
+	TTWhqHfZvIsJ02cA61+HRaZ1cQDt4WfTgsOK5aTpp3ek9gAMl9Qhmbkn2ytxX/iGbpObdf
+	iIE4+Jdbtx+WoA1SzkOdpZ9/izmxygncLaVYlt/bc4nbNsSUZLz5nKLIWFGMJQ==
+Date: Sun, 2 Nov 2025 14:18:01 +0100
+From: =?UTF-8?B?xYF1a2Fzeg==?= Majewski <lukma@nabladev.com>
+To: <Tristram.Ha@microchip.com>
+Cc: Woojung Huh <woojung.huh@microchip.com>, Arun Ramadoss
+ <arun.ramadoss@microchip.com>, Andrew Lunn <andrew@lunn.ch>, Vladimir
+ Oltean <olteanv@gmail.com>, Oleksij Rempel <linux@rempel-privat.de>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ <UNGLinuxDriver@microchip.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] net: dsa: microchip: Fix reserved multicast address
+ table programming
+Message-ID: <20251102141801.63dc212c@wsk>
+In-Reply-To: <20251101014803.49842-1-Tristram.Ha@microchip.com>
+References: <20251101014803.49842-1-Tristram.Ha@microchip.com>
+Organization: Nabla
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB7500:EE_|PH8PR12MB6794:EE_
-X-MS-Office365-Filtering-Correlation-Id: e61884cc-506f-4899-969e-08de1a1110fa
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Y0JqMXZvY2tLUHV3NFNMcnpadE5RYkRZb3dmT25BU3pOMGV3WmJKWW93WE1j?=
- =?utf-8?B?cWdNN2FjWTdFblpDTEZWbEtId1BSU1lwaHlEbWlScXRXeWxWYkRwVDhqeitM?=
- =?utf-8?B?VlZUaElaL0tVcDk4N1NIMXVQSDQwU25oemZnYnlZS0RmaTdKL05RVzdBZFA2?=
- =?utf-8?B?bU44WjdsZjlFN2NadDhLSHF6MzVvbVVhQWZ1RVZjditRRnRmVGJtNmpyT0tq?=
- =?utf-8?B?ZVA5OVc4dGhQS09zclhIMTNWWUk3QTdycHd2ZE1DV2U5YjVTYUZSSVBZZ1pY?=
- =?utf-8?B?R0tzVk9DQjlrcHdTSXkreVE2a2NLZHFLRHovcUkyUzB1ZGpObWRQRENwYmU0?=
- =?utf-8?B?blExVHVhLzQyWGg3dmc2cmg5K0s3cGV1bEFXdWRwUy9Pb1hnUXM3dTlqZllZ?=
- =?utf-8?B?bFhxQS9zYURSREZtb2IxYTFBUXU1SFpQVktBaU92MlRhWS9XbTMycHlQbEcx?=
- =?utf-8?B?QXM2SGFQTVJ0Q25sa015TFJHUmtuUVRBc2dJczFxRTZ4cjhzQ3JsQjlWWEdD?=
- =?utf-8?B?WlNZeW9iTGVZTFNzcmIxOEt5QUdHOGhNbEdVM0Vsak5aVHRlSWt5ald1cmZo?=
- =?utf-8?B?Q3dRcXFkZnVZZCtSNHZndFVtcTUzWGM5VXNwcFV5N1ZpdG01a0d1dmovTGJP?=
- =?utf-8?B?K0JSWGgySmxNVVBFYTE5diswektZVVFUNFg1N1ByOUZseDUxbVhmdUpsSVBP?=
- =?utf-8?B?UXBGeTlySUhYUkFHUUtHWGhlUHlLSmdIVkxHbk1sREhBRlRFdWpHWDhOeHZo?=
- =?utf-8?B?RVk5R1NvcDlHQUgycjVlK3o4S1o0U1JWQkxFemJkWHd6WS96dGd2QVl6L2ZN?=
- =?utf-8?B?WUNkM00rS0RzMEw2MVFneTZlNmpSb1hCZUkxU1ZmUyt1WEY0YytQZE1wMkx3?=
- =?utf-8?B?QlNncEppdktxRFc3MVlRYXhuVS9qazd0dHhHSjZpZmhZZ3BsRk02MGhBTUlE?=
- =?utf-8?B?alFkTW9iMHREMlRZTS9ZNisvWTRzMUNlUlNzb2JIQkVuc1JIaUdyeDY5WEt4?=
- =?utf-8?B?OERzdC9LT1NESDNVTlEyRlRBaEVkUVBNRTg0WWhRbzlLM0dPUGNtMWxvRVNB?=
- =?utf-8?B?dTJrZ0lmamM4a0J0TGJMMVpaU0xIcndDSDUvTTFLYmJZTVhNRHhIWFczRlF1?=
- =?utf-8?B?RVdWU3hHaDJiTnppc1pVT0NaMnQ0NHAvakEzY1dIeGJhdW13MGl0UXNPMUlr?=
- =?utf-8?B?U2ZVOU1sNG5QYk4wT1o2aEFQMjJrR0RvUjY4OVVLT0pVeTNkaHJMWUozN1Z2?=
- =?utf-8?B?NkVZZTNQSWRxTnJhSmVJVHhPdE5sVkVrY1gxbjArbjF5bTlBbkwwODFmaVcy?=
- =?utf-8?B?M1VBbnZ3Y0ZHYUdXS1huSklXTlZxRzhoU2Y1NUFiSkJKQXFxTXRXQjNaMTlu?=
- =?utf-8?B?QVM4MnBXZmtMK1BEVU8xQklQOGlVRlY0UzUvNHRBKzhCQWdMQW1LZHlqaUd2?=
- =?utf-8?B?YW94VEFNd1JzODZ0ZUM1WGhlY2NhY29Xd3YwU0h2bk5QaHh5THBNVTBrdnEv?=
- =?utf-8?B?YUpkdUV1SWlSaVlyTUJUdFRTTzBYd2dYaUYrQkNVOVhTR05mQnh3MXhnVmxo?=
- =?utf-8?B?TEFKWkhDV0FacmliaFBlMVB6WE5PaERRTG84Ui8yWXlLMXBsc2p4VHZ5bFFC?=
- =?utf-8?B?c01xdmMyVC9xNlJYZjl6ejVwVEVJYlhrZWZMd1dwdTNKYm1kVXRMc3dRREZD?=
- =?utf-8?B?a2VUbGh2R0Fza2tmNGExY3c1czZsb2FYenU4Nm9FbUtHUmtlQUxSSGY1VVFZ?=
- =?utf-8?B?cFZQQXhYaU9xdWpZRTc2K3U3RlpSVXRLRGQ4RWpaQ2I2OUhGdXBCSjhhOXZy?=
- =?utf-8?B?S0VrUkhaakt2bFZlNzZ1TlhxOTdERHB5cmRyS0MzQ1dkcEpSTUNxMmMvakhn?=
- =?utf-8?B?ek5BbXpSMXg5cFc3SmdCYUU4UWJPSUpPcEE2aC92dERnVEd0NDNsUEgzcjNU?=
- =?utf-8?Q?EjNGYgvfjH8IEVEN5KDy9o7gICXkBQnW?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7500.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?N1U1SFd5S3Y2SSs0SlRPSVdvcDF0ZDZ0NXdlWHBYck5RZDUybTQ0ZnVESEZ3?=
- =?utf-8?B?a1gvQW9KNlVHcVp0MHlCN2M2UHY2RlBLT3c2SUVUaGh3MUZMQ2hEVDdtcVlk?=
- =?utf-8?B?RUxrSGRURDFhRzhkMXlxemZUdjcwSXFTUDYwb1llc0FLQ2pBcTVETHlBUU04?=
- =?utf-8?B?QkhoNkJaNFVQZ2tHU3dkekNMRGp2eVVwdnArd080VXhXeGdiaHZHNGxYRkdp?=
- =?utf-8?B?MVQ2T3NwL3Z4NS95WGFRbkJIZ0ttK1pidjVLcGtzZWdXeEs3Zkw5dy80K2dk?=
- =?utf-8?B?M0NOSzMvL1VhMjdZaSs1S3hvTFFlVVhpZzJhcWdtTm9YeXVhQ201NHhQM2E4?=
- =?utf-8?B?cmFQQTMvWjJJa0VUL0Q5OUZvTUdPWnA5TzhldmR5eWlkYmJCTUlvajdSbkVy?=
- =?utf-8?B?Z3RPbGljVE1XYkdFSDZzNHlZeHRkVXVNYXBvVjRwd1gwdm1SaE82Y2w3dnVG?=
- =?utf-8?B?cVJSVnljK0VWRXFTWmxxeVIwTW5xSUdEYWsySENCOE1HeUo4TTJ2ZnlKODNn?=
- =?utf-8?B?eUJwSmNPRWhCRkQ2dVhQNlBubGlXU1pZdVNKYUc0dy9ucytIQlFSS2xCRGNT?=
- =?utf-8?B?N2tyMnQ2cXlteDlVcVFsV1pIeXdHR3c2RGFpdGh0T0V4aVVXVUZxNThCWCsv?=
- =?utf-8?B?bkEya0dSNm9MR0F1TEI2NTZEbXk4T0dsTU5xZWhRN1pOcnFLRGZldVBlYTNj?=
- =?utf-8?B?RXh5SzdlVjZpSFZ0NXZ3Y0krV0owOWNKd0I4MmsrZFhLSlFQckJUaHUrREI2?=
- =?utf-8?B?TzdQbzFWeHI1NjF3aXlCbGdnRlhSWkJybkZNWmlKM3J1UktHUkxGK1VPUjRS?=
- =?utf-8?B?QWxJSmJKTXFCOEVmTTRBdkwvb0dkMVhuSXJJaisrdmtFZjhOZkpkQ1Z5MmhO?=
- =?utf-8?B?RDhTSFZNMHpVNUtDT01JaHJGZHVWOVNyYjVwN2ozQmV4eEt1RWJpT2RTOFNp?=
- =?utf-8?B?aGhIbVFuOHJuMUJJekI2UmtmSHdLYTM5V2NENkxqakJ0bHl2amxtUWxTbk95?=
- =?utf-8?B?c1dEOWkwSy9lZ2hNd0pUWDczOEJBZVJ3ZDhNaUxGalIrY3RCVlBWdTVWNm9n?=
- =?utf-8?B?UTJIM0JyZkw0RnlZaWtjRjljN1o0NXovTVBhK0djTXVsaEQ3L29PajFHV0sr?=
- =?utf-8?B?emZ4Wk1hWndSdng1MVRhNUtPSGx5VzBjaC9vTzBNQUVXOCtQYXFEcERiQUVF?=
- =?utf-8?B?WWU5M1NFY3Z4WmsvK29xSldaMDFvT2JwWHJ4a2VvZkd6TDJ6ZDRYWGxJSlV2?=
- =?utf-8?B?Yjd1bEpSZ1FVYjZWQjhibHpSd1JtdTRnSFFMRUplTEVlajZ6Q2x1Rm1wOHZQ?=
- =?utf-8?B?YXZQWU1POUd3eTJCWjA5T2JvSjVQbHoyZ2s0UEN0QVVuL0hQK2N0UmdMTjAw?=
- =?utf-8?B?dGw4UlEwSmRha2VEWm5nWTVCN0pzL1VMYThRNlJkYXNtS0dURUE4SmhpaVZu?=
- =?utf-8?B?bjJ4MVFnR1pjeDJqelZrZWNqQ2FSQ292Y0pvb3pUZ2dpeXN3dFJBaEgweGFE?=
- =?utf-8?B?bjg5cldJNnRKR2psYXB2bE9ycGtCM0RMRDArK0h4a3JUWnZOZW9FWE55Z3Rh?=
- =?utf-8?B?TWprd0d5aHVCcmtXSVdWV2IvVHMrZ0FiQlVvUXhwckVvY0hNUUpaMmNRdUk3?=
- =?utf-8?B?WWcyU2h1WGIxdnFPaWVuSmQ0RGFyVDRXUHdJS0JYUWE5bnVZazV4Q2J2YTVJ?=
- =?utf-8?B?QTVjYXlXaWNuL21LcEU2MThvSk9ISGFjeFZlclpqVEhYSm4vRE0ya2xkaE12?=
- =?utf-8?B?a3pKUG5VcXZkYjNyV1FkZW1ZZ01neks3cVhqd0VlU1doQU5iMjNXSVllRUx0?=
- =?utf-8?B?MlU0MGxGWTJKTllzRGpLc2E4YWFOOWhzemlidGlBSHBLOFowbHEyNTJQVEE4?=
- =?utf-8?B?TTV0U2dsUFVmcFNyZTkrNkZCY3JYN2lmcU1USmVGaG5haDVkb1poUENjVWU1?=
- =?utf-8?B?anJCQ1IvKzkxaTg1RVFMRUlOTUtUaFVHaCtQSjllOVdRckt6NzhVbjZSa2Ev?=
- =?utf-8?B?Q2NjMTB0aVdOekdDY1Fpc0paRldPNVkvZHJpcGhzSG4yZWp6cVNTU3IxaC91?=
- =?utf-8?B?Z21PVU56YXVFTDU2QnBCMXlrK1V0clQyMFpsVVRvdzdkZFl2N1NUNzVjc0dv?=
- =?utf-8?Q?h1pxV8h58X3pa1FjJLHgAF0PL?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e61884cc-506f-4899-969e-08de1a1110fa
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7500.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Nov 2025 13:09:33.7942
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 155ocmrKLeQc05td7SQ4wH0piJO7atbv2Slejxy7x2vp1s0r+qVqi+seEmKRHx4l
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6794
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
-On 30/10/2025 22:09, Matthew W Carlis wrote:
-> On Thu, 30 Oct 2025 16:48:54, Gal Pressman wrote:
->> I asked before, maybe these automatic tools that keep querying the
->> module continue to do so because of the success return code, and that
->> will be resolved soon?
-> 
-> I went and ran the command on a port with no module and agree that it does
-> return zero. 
-> 
-> It doesn't solve the problem for me... Part of the reason automation will
-> periodically run the command is for inventory purposes. We want to roughly
-> know when a module was installed or removed. Then, as far as I can tell the
-> only way to know if a module is installed is by running this command which
-> has the consequence of generating log spam when there is not a module installed.
-> 
->> Changing the log level makes things more difficult, as most production
->> servers will not enable the debug print, and the logs would be harder to
->> analyze.
-> 
-> I care less about the logging level... I suspect it should be info or dbg, but
-> we just don't want log lines generated when we're trying to figure out if some
-> module is installed.
+Hi Tristram,
 
-I have an idea on how to make the situation better, will hopefully have
-something soon.
+> From: Tristram Ha <tristram.ha@microchip.com>
+>=20
+> KSZ9477/KSZ9897 and LAN937X families of switches use a reserved
+> multicast address table for some specific forwarding with some
+> multicast addresses, like the one used in STP.  The hardware assumes
+> the host port is the last port in KSZ9897 family and port 5 in
+> LAN937X family.  Most of the time this assumption is correct but not
+> in other cases like KSZ9477. Originally the function just setups the
+> first entry, but the others still need update, especially for one
+> common multicast address that is used by PTP operation.
+>=20
+> LAN937x also uses different register bits when accessing the reserved
+> table.
+>=20
+> Fixes: 457c182af597 ("net: dsa: microchip: generic access to ksz9477
+> static and reserved table") Signed-off-by: Tristram Ha
+> <tristram.ha@microchip.com> ---
+>  drivers/net/dsa/microchip/ksz9477.c     | 103
+> ++++++++++++++++++++---- drivers/net/dsa/microchip/ksz9477_reg.h |
+> 3 +- drivers/net/dsa/microchip/ksz_common.c  |   4 +
+>  drivers/net/dsa/microchip/ksz_common.h  |   2 +
+>  4 files changed, 96 insertions(+), 16 deletions(-)
+>=20
+> diff --git a/drivers/net/dsa/microchip/ksz9477.c
+> b/drivers/net/dsa/microchip/ksz9477.c index
+> d747ea1c41a7..9b6731de52a7 100644 ---
+> a/drivers/net/dsa/microchip/ksz9477.c +++
+> b/drivers/net/dsa/microchip/ksz9477.c @@ -1355,8 +1355,12 @@ void
+> ksz9477_config_cpu_port(struct dsa_switch *ds) }
+>  }
+> =20
+> +static u8 reserved_mcast_map[8] =3D { 0, 1, 3, 16, 32, 33, 2, 17 };
+> +
+>  int ksz9477_enable_stp_addr(struct ksz_device *dev)
+>  {
+> +	u8 all_ports =3D (1 << dev->info->port_cnt) - 1;
+> +	u8 i, def_port, ports, update;
+>  	const u32 *masks;
+>  	u32 data;
+>  	int ret;
+> @@ -1366,23 +1370,94 @@ int ksz9477_enable_stp_addr(struct ksz_device
+> *dev) /* Enable Reserved multicast table */
+>  	ksz_cfg(dev, REG_SW_LUE_CTRL_0, SW_RESV_MCAST_ENABLE, true);
+> =20
+> -	/* Set the Override bit for forwarding BPDU packet to CPU */
+> -	ret =3D ksz_write32(dev, REG_SW_ALU_VAL_B,
+> -			  ALU_V_OVERRIDE | BIT(dev->cpu_port));
+> -	if (ret < 0)
+> -		return ret;
+> +	/* The reserved multicast address table has 8 entries.  Each
+> entry has
+> +	 * a default value of which port to forward.  It is assumed
+> the host
+> +	 * port is the last port in most of the switches, but that
+> is not the
+> +	 * case for KSZ9477 or maybe KSZ9897.  For LAN937X family
+> the default
+> +	 * port is port 5, the first RGMII port.  It is okay for
+> LAN9370, a
+> +	 * 5-port switch, but may not be correct for the other 8-port
+> +	 * versions.  It is necessary to update the whole table to
+> forward to
+> +	 * the right ports.
+> +	 * Furthermore PTP messages can use a reserved multicast
+> address and
+> +	 * the host will not receive them if this table is not
+> correct.
+> +	 */
+> +	def_port =3D BIT(dev->info->port_cnt - 1);
+> +	if (is_lan937x(dev))
+> +		def_port =3D BIT(4);
+> +	for (i =3D 0; i < 8; i++) {
+> +		data =3D reserved_mcast_map[i] <<
+> +			dev->info->shifts[ALU_STAT_INDEX];
+> +		data |=3D ALU_STAT_START |
+> +			masks[ALU_STAT_DIRECT] |
+> +			masks[ALU_RESV_MCAST_ADDR] |
+> +			masks[ALU_STAT_READ];
+> +		ret =3D ksz_write32(dev, REG_SW_ALU_STAT_CTRL__4,
+> data);
+> +		if (ret < 0)
+> +			return ret;
+> =20
+> -	data =3D ALU_STAT_START | ALU_RESV_MCAST_ADDR |
+> masks[ALU_STAT_WRITE];
+> +		/* wait to be finished */
+> +		ret =3D ksz9477_wait_alu_sta_ready(dev);
+> +		if (ret < 0)
+> +			return ret;
+> =20
+> -	ret =3D ksz_write32(dev, REG_SW_ALU_STAT_CTRL__4, data);
+> -	if (ret < 0)
+> -		return ret;
+> +		ret =3D ksz_read32(dev, REG_SW_ALU_VAL_B, &data);
+> +		if (ret < 0)
+> +			return ret;
+> =20
+> -	/* wait to be finished */
+> -	ret =3D ksz9477_wait_alu_sta_ready(dev);
+> -	if (ret < 0) {
+> -		dev_err(dev->dev, "Failed to update Reserved
+> Multicast table\n");
+> -		return ret;
+> +		ports =3D data & dev->port_mask;
+> +		if (ports =3D=3D def_port) {
+> +			/* Change the host port. */
+> +			update =3D BIT(dev->cpu_port);
+> +
+> +			/* The host port is correct so no need to
+> update the
+> +			 * the whole table but the first entry still
+> needs to
+> +			 * set the Override bit for STP.
+> +			 */
+> +			if (update =3D=3D def_port && i =3D=3D 0)
+> +				ports =3D 0;
+> +		} else if (ports =3D=3D 0) {
+> +			/* No change to entry. */
+> +			update =3D 0;
+> +		} else if (ports =3D=3D (all_ports & ~def_port)) {
+> +			/* This entry does not forward to host port.
+>  But if
+> +			 * the host needs to process protocols like
+> MVRP and
+> +			 * MMRP the host port needs to be set.
+> +			 */
+> +			update =3D ports & ~BIT(dev->cpu_port);
+> +			update |=3D def_port;
+> +		} else {
+> +			/* No change to entry. */
+> +			update =3D ports;
+> +		}
+> +		if (update !=3D ports) {
+> +			data &=3D ~dev->port_mask;
+> +			data |=3D update;
+> +			/* Set Override bit for STP in the first
+> entry. */
+> +			if (i =3D=3D 0)
+> +				data |=3D ALU_V_OVERRIDE;
+> +			ret =3D ksz_write32(dev, REG_SW_ALU_VAL_B,
+> data);
+> +			if (ret < 0)
+> +				return ret;
+> +
+> +			data =3D reserved_mcast_map[i] <<
+> +			       dev->info->shifts[ALU_STAT_INDEX];
+> +			data |=3D ALU_STAT_START |
+> +				masks[ALU_STAT_DIRECT] |
+> +				masks[ALU_RESV_MCAST_ADDR] |
+> +				masks[ALU_STAT_WRITE];
+> +			ret =3D ksz_write32(dev,
+> REG_SW_ALU_STAT_CTRL__4, data);
+> +			if (ret < 0)
+> +				return ret;
+> +
+> +			/* wait to be finished */
+> +			ret =3D ksz9477_wait_alu_sta_ready(dev);
+> +			if (ret < 0)
+> +				return ret;
+> +
+> +			/* No need to check the whole table. */
+> +			if (i =3D=3D 0 && !ports)
+> +				break;
+> +		}
+>  	}
+> =20
+>  	return 0;
+> diff --git a/drivers/net/dsa/microchip/ksz9477_reg.h
+> b/drivers/net/dsa/microchip/ksz9477_reg.h index
+> ff579920078e..61ea11e3338e 100644 ---
+> a/drivers/net/dsa/microchip/ksz9477_reg.h +++
+> b/drivers/net/dsa/microchip/ksz9477_reg.h @@ -2,7 +2,7 @@
+>  /*
+>   * Microchip KSZ9477 register definitions
+>   *
+> - * Copyright (C) 2017-2024 Microchip Technology Inc.
+> + * Copyright (C) 2017-2025 Microchip Technology Inc.
+>   */
+> =20
+>  #ifndef __KSZ9477_REGS_H
+> @@ -397,7 +397,6 @@
+> =20
+>  #define ALU_RESV_MCAST_INDEX_M		(BIT(6) - 1)
+>  #define ALU_STAT_START			BIT(7)
+> -#define ALU_RESV_MCAST_ADDR		BIT(1)
+> =20
+>  #define REG_SW_ALU_VAL_A		0x0420
+> =20
+> diff --git a/drivers/net/dsa/microchip/ksz_common.c
+> b/drivers/net/dsa/microchip/ksz_common.c index
+> a962055bfdbd..933ae8dc6337 100644 ---
+> a/drivers/net/dsa/microchip/ksz_common.c +++
+> b/drivers/net/dsa/microchip/ksz_common.c @@ -808,6 +808,8 @@ static
+> const u16 ksz9477_regs[] =3D { static const u32 ksz9477_masks[] =3D {
+>  	[ALU_STAT_WRITE]		=3D 0,
+>  	[ALU_STAT_READ]			=3D 1,
+> +	[ALU_STAT_DIRECT]		=3D 0,
+> +	[ALU_RESV_MCAST_ADDR]		=3D BIT(1),
+>  	[P_MII_TX_FLOW_CTRL]		=3D BIT(5),
+>  	[P_MII_RX_FLOW_CTRL]		=3D BIT(3),
+>  };
+> @@ -835,6 +837,8 @@ static const u8 ksz9477_xmii_ctrl1[] =3D {
+>  static const u32 lan937x_masks[] =3D {
+>  	[ALU_STAT_WRITE]		=3D 1,
+>  	[ALU_STAT_READ]			=3D 2,
+> +	[ALU_STAT_DIRECT]		=3D BIT(3),
+> +	[ALU_RESV_MCAST_ADDR]		=3D BIT(2),
+>  	[P_MII_TX_FLOW_CTRL]		=3D BIT(5),
+>  	[P_MII_RX_FLOW_CTRL]		=3D BIT(3),
+>  };
+> diff --git a/drivers/net/dsa/microchip/ksz_common.h
+> b/drivers/net/dsa/microchip/ksz_common.h index
+> a1eb39771bb9..c65188cd3c0a 100644 ---
+> a/drivers/net/dsa/microchip/ksz_common.h +++
+> b/drivers/net/dsa/microchip/ksz_common.h @@ -294,6 +294,8 @@ enum
+> ksz_masks { DYNAMIC_MAC_TABLE_TIMESTAMP,
+>  	ALU_STAT_WRITE,
+>  	ALU_STAT_READ,
+> +	ALU_STAT_DIRECT,
+> +	ALU_RESV_MCAST_ADDR,
+>  	P_MII_TX_FLOW_CTRL,
+>  	P_MII_RX_FLOW_CTRL,
+>  };
+
+Thank you for the patch.
+
+Now I'm able to synchronize device connected to KSZ9477 (port6 host
+port).
+I've applied and tested this patch on v6.6. LTS kernel (and hopefully
+it can be backported to LTS kernels as well).
+
+Tested-by: =C5=81ukasz Majewski <lukma@nabladev.com>
+
+--=20
+Best regards,
+
+Lukasz Majewski
+
+--
+Nabla Software Engineering GmbH
+HRB 40522 Augsburg
+Phone: +49 821 45592596
+E-Mail: office@nabladev.com
+Geschftsfhrer : Stefano Babic
 
