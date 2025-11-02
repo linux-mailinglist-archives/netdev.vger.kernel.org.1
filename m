@@ -1,96 +1,96 @@
-Return-Path: <netdev+bounces-234905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234906-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3822AC291BC
-	for <lists+netdev@lfdr.de>; Sun, 02 Nov 2025 17:15:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 116A4C291C6
+	for <lists+netdev@lfdr.de>; Sun, 02 Nov 2025 17:18:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8DB9B347781
-	for <lists+netdev@lfdr.de>; Sun,  2 Nov 2025 16:15:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75CFE3AF308
+	for <lists+netdev@lfdr.de>; Sun,  2 Nov 2025 16:18:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AEB71C4A20;
-	Sun,  2 Nov 2025 16:15:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F6AF23C4FA;
+	Sun,  2 Nov 2025 16:18:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Jlf+iMAh"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="GwPJGHjm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f99.google.com (mail-pj1-f99.google.com [209.85.216.99])
+Received: from mail-il1-f225.google.com (mail-il1-f225.google.com [209.85.166.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5F5F8405C
-	for <netdev@vger.kernel.org>; Sun,  2 Nov 2025 16:15:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE33C239E97
+	for <netdev@vger.kernel.org>; Sun,  2 Nov 2025 16:18:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762100153; cv=none; b=gDXqM9e8ojGIlHXOLKRvU8NQ+3CDfwHS7GLfv5TnTNtGLwihyX8jm46QgWWc5CVgstfQyNkw+Y4NvXO9m3QAMxiH91XhQz3HVzB46YQg8L18jt5z9J9KpgSfBlOXHt5O8LkuaLnohwMHMaHs+6Y8nhSH643muMLBd7rpU6DRIBQ=
+	t=1762100299; cv=none; b=lJiN5CE7nHb7J44XLYRIvXfoSPmzTFFHGs0mySRK2dyJd2WkyJklOEHpJMKZicubbhSxFcsePAa2IbU/h3cawlcwcBVhZiZYrUBqUMQSLcrlPsSXT9SP/oXfk3Dp5aYKNHAnMFYta/KJPE3pRBWUIbxhYVf71yLvbXfMi7HuXVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762100153; c=relaxed/simple;
-	bh=Js+HbjVMxuG/sMlxV2M2pVXUI7MWwejp/2QFZAhXhxE=;
+	s=arc-20240116; t=1762100299; c=relaxed/simple;
+	bh=mop2BC+wrHVPArDalW2M4eYt5/DRCdy/JgA4ZHJjVq4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VNWSJoDPa1d5aiaby/tMC4qB+o6svonFxDTIrK0+eTjX5oI/uVh5e+UdFAonNynEiI48hA26cE/CKhTvzp1zPhCQ2eyOX+269I24I+DQ2S2N56n+6Vg1KtDRGKuFz/2iJc9K8sRh5944F/V+X/fjz5i25EqN0FjM/52uAolYT5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Jlf+iMAh; arc=none smtp.client-ip=209.85.216.99
+	 In-Reply-To:Content-Type; b=PgyB5XJDHLibQStTH1Xg/PNWZzpYUW5KJHDA/NDEXGHvLriEIg7kpeuz9RytkAdhb+HQ4BgsEOvzpAhC+NcbWXwMLEpO4vF9wFKJX8jbzTOzLCZjEs1tN5pWGw+PqZoyy5k2jerosdw2c54csm1JQ9HPEHZy6nztpnHHFgg4PKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=GwPJGHjm; arc=none smtp.client-ip=209.85.166.225
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pj1-f99.google.com with SMTP id 98e67ed59e1d1-33292adb180so4080058a91.3
-        for <netdev@vger.kernel.org>; Sun, 02 Nov 2025 08:15:51 -0800 (PST)
+Received: by mail-il1-f225.google.com with SMTP id e9e14a558f8ab-4331d3eea61so16068945ab.2
+        for <netdev@vger.kernel.org>; Sun, 02 Nov 2025 08:18:17 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762100151; x=1762704951;
+        d=1e100.net; s=20230601; t=1762100297; x=1762705097;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:dkim-signature:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qPD7JpL9+HSnLwUj7wrXGanSQ2vbBMEr+pV52clH7sk=;
-        b=nTDAIWLsWoZrl+DOPOlIUjWBJvdvCvS950hDhtp/KtG16O0c4fO9mn5XQdbssePQwP
-         mTKi2O1F9ALPbGWJaX+PXGST9E1H1rExxG5loov601B9Tj0pEMqbdkNV+f1Bckq55vEG
-         2RmNQa5963AY0xr2Z1380yktTyVZq0LosrO3q4tjaL1tKr5gBTocyVs+roY3c4cGVA2F
-         JTQjDBPVm0AkMFipANbS4OW2LJKRsrOZzZOgmrr1GqsCDPatoxkr3aDkqxjgYZq2vwhx
-         94epEarTQnV2eZpvig9v19xx6aL0MVEslH89pZqxOl7Zw6uMcAqBg1wiz+UB8V2uOoHz
-         fT5g==
-X-Forwarded-Encrypted: i=1; AJvYcCVRgYCVmXgF+BiBgl+wSrVhNXgp5Ps65nsV3x2b3QalUeCRIXiQd/aa7gPHX3Kl7LORwCy580Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOaMp+i6eupc4BRx0v7zpuu0bvjnNU9b7+r+jJYO8pOi4R+0FA
-	4/z8+B+Xyooj0dcrpKeIseUA6oBAe2F0Cwxg52HNBxnh1g8yu8pNvbMgqayoWqm78l6s/J2XbD9
-	od8m5AwDy0YMInF/SW5DouKzGL7EmWfMrcrqMGZM2nNJGuUOc/6tREV60NOzZ19PXx1sd3zIPPy
-	UJH+o/2rBP8lt8ZnGnvnIZbm2AWHu+1xbaQnx+Its0YmVsGrQLfrB7ssZ1VYSPNu5Ho3RR6nTon
-	sDE21BSG78XhDBs
-X-Gm-Gg: ASbGncvuop1wnhzJwWK0l9eMogUivrjhxHL1e7C/ASPxjik3GFjus0neyPjaiIGt5E1
-	qesgSfa8EiRvDeHEW0rjKxUr/ElS5fXVHN34I3kZgYF5w53wYwVztqpxAmyWDSHj/x/r9KY+mU6
-	FCMSO6eknJAs90NInvmIiMMwwx7F21Hw9TecMLi60/DppLBll7RM9uz+odC8r6JiNr6IH7iexAh
-	4v+ZoGURNJbfnNl88FvdkBX7CcgSwzKc/J1bsm2dtNEg631KHUP/RhjRbQ+ASvQs1ouHm/USJWk
-	agYe3aUgHPboGrse0Oa+DB1yAXdszz9xtuVK9RM/ExMtIQmAnMzxfC7qgU4pljLu8D7a5DXLymO
-	G6fjBL71tDDt+HcskHNc6n/IWH6fvltYiRrfgy+0SmvbJ+skzH14dVN0gjyTsLqkUGuzfW8x0i5
-	t6qQVTyFyRxDCVexRNX8JhUu9fbkg8qCn5cmd3wTY=
-X-Google-Smtp-Source: AGHT+IEbgqkZGAfuBPSXkXXnGCmGY7/uUJYq/N81HsvCMo8WEWE1jTNz2IJm8awUbfrSqKQ6fK+3mS6LDrhp
-X-Received: by 2002:a17:90b:2cc6:b0:33f:eca0:47ae with SMTP id 98e67ed59e1d1-3408308843cmr12049591a91.28.1762100150819;
-        Sun, 02 Nov 2025 08:15:50 -0800 (PST)
+        bh=ho65E2n5x3XgaKJCvo6/fje/UMhphKqUxyW0xTuWSls=;
+        b=L2OEYxO81X1KkymRMTkqwP5r+NuHJAsuHDAPtyeTfCcB/biPjAnyugZh/BY94MgUXA
+         JsdZKN8qELwzTyUtv32UkFSPclEzSTcCMq4H5N+WqHl7RV2r9u9GviPnfLIEKEOEnbqT
+         RZoNQycSf+D6ZMbjyn28e3gOrbEIktISpEiiMPYIVdBjdADMU4o5VjQSd6JSpKVz5j1D
+         R6LyvtvAKADaofTPJ8shwjYmdTOWuudLJYJNgrm0/ixz+Kf+SNGWpBdcnFXjHdhHPZvF
+         IlL1QRHJYVu9eb2tQwqoRW/s941xGmx3YPwNjt+ByoLOadYyv8QkWC0kO1Yzw9ANGwiO
+         UQjg==
+X-Forwarded-Encrypted: i=1; AJvYcCWcc/ZU0fgA0FWt2IyeKequxaLljB36nin5+NBLIC5DG42N/S+LyyPU480JyW5fBQ0vG99ybbA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwRiSTvqYHf+u7KImwNhua4gBOALnZ2z4GBN8Vq8UoukAbFLHXi
+	+nmg4yGnFLal9cyGTgOFkwQey/JANwvd21MsbicPew6NlbhJUzQ1lX1Dzi2zozcBMIn29wtw0nF
+	UlqBeIgNaVgQ7NXGV/ymf89OzlbKaTXRr0yq48ytQhKXy/QnMIcxWKVvB3sajwIEXx+iD30Wcjz
+	Bv4FAFQigDI4vYnPriXzaLFQTYCZZcODnLs1mUyF+zlOHBKolZkogBGddwpYbSx5J1El2nzUAgg
+	pbBczKejD7qGZeA
+X-Gm-Gg: ASbGncsGir1wsCqmrdlZt6CRLp6V6ko75ZHL0FjozlKq3inZwe5RSMdajdaElhD+J4g
+	b/k2XHR5qh8sQCAqF2iMdJGXAagzgO3kXB95kR6i0qOl/FNmh1+j3mftZtVljfWVMfHtZmhukoZ
+	WnBb3MjH9kOfAVbaZGlkCGo3z2cNGm+2I/tXR0TdsVU7AQ++vwoHiNtq1Uj6cfkbg4TGoZaIk74
+	khJdSe45eEETu6sMzK3l4I4e2goyxWXRKjv7vYbEdd19Ckur/ApvvR68Jrv02GH/KyuL5s1Ajxb
+	pY+AavrnfIoMhBaWOHGDlLwMES1ejDiiB7kVQ2pMo2SiuADCwW4hKkdIhe+jQhHXUj4XjJShrgT
+	lzX9VByRyNU0+W2uDq1pMS3rxpQiV/ckenkGcQEkEaEREz9XayRKV91ve4BTE+tYqeboBum+RER
+	Ya+ZYBI+2FJuN0Ktn5ZUO1J+4fGB4m7N53r5aPYIE=
+X-Google-Smtp-Source: AGHT+IEYqGqYx8R/TYeKgtn+BKFfwpyQAwsOFdPmo359De/tzWpduGxEhKU+kaUd79u25WMzeo65G7sQylqi
+X-Received: by 2002:a92:ca0f:0:b0:433:2d7e:3084 with SMTP id e9e14a558f8ab-4332d7e3605mr16773615ab.26.1762100296946;
+        Sun, 02 Nov 2025 08:18:16 -0800 (PST)
 Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-14.dlp.protect.broadcom.com. [144.49.247.14])
-        by smtp-relay.gmail.com with ESMTPS id 41be03b00d2f7-b93bda5b561sm464386a12.13.2025.11.02.08.15.50
+        by smtp-relay.gmail.com with ESMTPS id e9e14a558f8ab-43322fd746esm3722705ab.22.2025.11.02.08.18.15
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 02 Nov 2025 08:15:50 -0800 (PST)
+        Sun, 02 Nov 2025 08:18:16 -0800 (PST)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-286a252bfbfso90972015ad.3
-        for <netdev@vger.kernel.org>; Sun, 02 Nov 2025 08:15:49 -0800 (PST)
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2952cb6f51bso56761925ad.2
+        for <netdev@vger.kernel.org>; Sun, 02 Nov 2025 08:18:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1762100149; x=1762704949; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1762100294; x=1762705094; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=qPD7JpL9+HSnLwUj7wrXGanSQ2vbBMEr+pV52clH7sk=;
-        b=Jlf+iMAh8r+XN+GOuQ5UJt0/ccxNCQT86/NDahopy9TcArq+I0r+d7fzb9riRGK6UY
-         bpD5DhRMxNQriMrWJgM54U2Dg0qat3leNkSRtIJh2gSz9LrQpDt0C1w+U7xBi5uX09ol
-         WPDLj8ipxUiJokCH2vSOXDumuOZleBg627GZo=
-X-Forwarded-Encrypted: i=1; AJvYcCVzePdkvRtNZ8TwM3Di4Sdir4M0gvTHtr0iMNmAZBVV4DhXTEGfjM2lb794gmn2FN4GyFFkXAo=@vger.kernel.org
-X-Received: by 2002:a17:902:da82:b0:295:3ad7:9485 with SMTP id d9443c01a7336-2953ad7955amr87084905ad.14.1762100149050;
-        Sun, 02 Nov 2025 08:15:49 -0800 (PST)
-X-Received: by 2002:a17:902:da82:b0:295:3ad7:9485 with SMTP id d9443c01a7336-2953ad7955amr87084665ad.14.1762100148664;
-        Sun, 02 Nov 2025 08:15:48 -0800 (PST)
+        bh=ho65E2n5x3XgaKJCvo6/fje/UMhphKqUxyW0xTuWSls=;
+        b=GwPJGHjmyfAChAeow/Bk8zlbTPhEI6Qmwt+gYIC4VZKDlCSIXx0mmu9KbQwPOf7qXt
+         87MXEpcsPQtrCguqDi+381rBusCMvspLSV0l+7Ry/+jQ5Xo4eoS0XwIKuYs8l8F2ssur
+         4fIPkiy5QeBittbkVhSQtc4RHQ8GhiAo3yWpk=
+X-Forwarded-Encrypted: i=1; AJvYcCXLCUFf0COfhFgnDEJYgqhc1aasCiC0V35W4pj+iWxBqaJtBjKLakaUcwGq/u77G7My7QGLvQA=@vger.kernel.org
+X-Received: by 2002:a17:903:2447:b0:295:7806:1d7b with SMTP id d9443c01a7336-29578062657mr40932775ad.45.1762100294715;
+        Sun, 02 Nov 2025 08:18:14 -0800 (PST)
+X-Received: by 2002:a17:903:2447:b0:295:7806:1d7b with SMTP id d9443c01a7336-29578062657mr40932525ad.45.1762100294348;
+        Sun, 02 Nov 2025 08:18:14 -0800 (PST)
 Received: from ?IPV6:2600:8802:b00:ba1:a836:3070:f827:ce5b? ([2600:8802:b00:ba1:a836:3070:f827:ce5b])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2958dd23059sm26988335ad.47.2025.11.02.08.15.46
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-295688c68f0sm44959255ad.41.2025.11.02.08.18.12
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 02 Nov 2025 08:15:47 -0800 (PST)
-Message-ID: <f2828be4-b31d-4fcb-a132-d6991b0c1780@broadcom.com>
-Date: Sun, 2 Nov 2025 08:15:46 -0800
+        Sun, 02 Nov 2025 08:18:13 -0800 (PST)
+Message-ID: <dacb3ce4-7a54-4b4d-9385-0d466d159c77@broadcom.com>
+Date: Sun, 2 Nov 2025 08:18:12 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,8 +98,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 2/3] net: dsa: b53: stop reading ARL entries if search
- is done
+Subject: Re: [PATCH net 3/3] net: dsa: b53: properly bound ARL searches for <
+ 4 ARL bin chips
 To: Jonas Gorski <jonas.gorski@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
  Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
  <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
@@ -108,7 +108,7 @@ To: Jonas Gorski <jonas.gorski@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
 Cc: Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org
 References: <20251102100758.28352-1-jonas.gorski@gmail.com>
- <20251102100758.28352-3-jonas.gorski@gmail.com>
+ <20251102100758.28352-4-jonas.gorski@gmail.com>
 Content-Language: en-US
 From: Florian Fainelli <florian.fainelli@broadcom.com>
 Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
@@ -143,7 +143,7 @@ Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
  MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
  7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
  95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20251102100758.28352-3-jonas.gorski@gmail.com>
+In-Reply-To: <20251102100758.28352-4-jonas.gorski@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
@@ -151,23 +151,15 @@ X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
 
 On 11/2/2025 2:07 AM, Jonas Gorski wrote:
-> The switch clears the ARL_SRCH_STDN bit when the search is done, i.e. it
-> finished traversing the ARL table.
+> When iterating over the ARL table we stop at max ARL entries / 2, but
+> this is only valid if the chip actually returns 2 results at once. For
+> chips with only one result register we will stop before reaching the end
+> of the table if it is more than half full.
 > 
-> This means that there will be no valid result, so we should not attempt
-> to read and process any further entries.
+> Fix this by only dividing the maximum results by two if we have a chip
+> with more than one result register (i.e. those with 4 ARL bins).
 > 
-> We only ever check the validity of the entries for 4 ARL bin chips, and
-> only after having passed the first entry to the b53_fdb_copy().
-> 
-> This means that we always pass an invalid entry at the end to the
-> b53_fdb_copy(). b53_fdb_copy() does check the validity though before
-> passing on the entry, so it never gets passed on.
-> 
-> On < 4 ARL bin chips, we will even continue reading invalid entries
-> until we reach the result limit.
-> 
-> Fixes: 1da6df85c6fb ("net: dsa: b53: Implement ARL add/del/dump operations")
+> Fixes: cd169d799bee ("net: dsa: b53: Bound check ARL searches")
 > Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
 
 Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
