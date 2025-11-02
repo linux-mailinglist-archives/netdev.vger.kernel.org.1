@@ -1,138 +1,203 @@
-Return-Path: <netdev+bounces-234882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1321CC288E4
-	for <lists+netdev@lfdr.de>; Sun, 02 Nov 2025 01:31:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E582C289F4
+	for <lists+netdev@lfdr.de>; Sun, 02 Nov 2025 06:46:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A681F3B7D4B
-	for <lists+netdev@lfdr.de>; Sun,  2 Nov 2025 00:31:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C87383B8909
+	for <lists+netdev@lfdr.de>; Sun,  2 Nov 2025 05:46:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 645F012CDBE;
-	Sun,  2 Nov 2025 00:31:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6859B2505AF;
+	Sun,  2 Nov 2025 05:46:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="hb4LFYO8"
+	dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b="racG1avF"
 X-Original-To: netdev@vger.kernel.org
-Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32E8629A2;
-	Sun,  2 Nov 2025 00:30:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
+Received: from azure-sdnproxy.icoremail.net (azure-sdnproxy.icoremail.net [52.229.205.26])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6D933AC15;
+	Sun,  2 Nov 2025 05:46:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.229.205.26
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762043461; cv=none; b=SuU3aPGVr4VjOyS+pz7Zx+02xp/lpw1lyc99DCEnBfV/K6Ub/2gdnZ0aTffQaoLcJTE0DTyOxgAHUesuiJVlPHc5SRv3aXQW2qY8XCwbDC+AHCQ7jWpPTOB7QzV+MlaABMcXwITwJiuFAXvPjr4sLvh2IEifPcExBLctiGMbKKc=
+	t=1762062374; cv=none; b=FFmGiyTWU6Dpc2boT0WzThJ3khWGFt1N8iqin1bky6KriCuqy3VFUaEBs9+PoFZr7cRzCRUGebz95FMzbJTUHxv82rhzldVmBiJPRG9aqnczLcryui+HV7tWjnsmzi+Xw2GKnHnwmmN1u/Bdx5jNY6rDqDM04LWlQLydIpQZpm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762043461; c=relaxed/simple;
-	bh=svWNgZCtOjso/oW4IU8AjB0f/EKUwcTrDzXQT6w5yd4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lG2XPJpG5GnsrVo4/qWriXGMC4M/UcqqwseJbEV4btd2JOu2zQRP0VjqYU8tULY1MDRO+t7xFWItGP9WCCQWDp2j2Q4rZTYKLq4DKlxZHj4BMkFYufKfaoM0BgF9CTcdM9fVwGT6Y4nsqegfLpB64yGMQ2yfd28+I8Vc/iw4ttM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=hb4LFYO8; arc=none smtp.client-ip=213.167.242.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ideasonboard.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
-Received: from pendragon.ideasonboard.com (82-203-160-149.bb.dnainternet.fi [82.203.160.149])
-	by perceval.ideasonboard.com (Postfix) with UTF8SMTPSA id 2C6711118;
-	Sun,  2 Nov 2025 01:29:04 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
-	s=mail; t=1762043344;
-	bh=svWNgZCtOjso/oW4IU8AjB0f/EKUwcTrDzXQT6w5yd4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hb4LFYO8jCYLvGpe7YVbC2qXUNIoNFojN2fIQmy0cKSJ0HPrZ5+ixKw1oNxT1SwIC
-	 v4Ss/TyZEkKnD4VeEs24LF3pUENpRzDcasVRh31FFk+VhhmiS/7r9TAu247UgBrJ4i
-	 vDPQcMVVJhYC3xNMRXVbsIw6ay3v+jXJLXGSZ/aA=
-Date: Sun, 2 Nov 2025 02:30:42 +0200
-From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-To: Stanimir Varbanov <svarbanov@suse.de>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-rpi-kernel@lists.infradead.org,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Andrea della Porta <andrea.porta@suse.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Phil Elwell <phil@raspberrypi.com>,
-	Jonathan Bell <jonathan@raspberrypi.com>,
-	Dave Stevenson <dave.stevenson@raspberrypi.com>
-Subject: Re: [PATCH v2 0/5] dd ethernet support for RPi5
-Message-ID: <20251102003042.GJ797@pendragon.ideasonboard.com>
-References: <20250822093440.53941-1-svarbanov@suse.de>
- <20251031114518.GA17287@pendragon.ideasonboard.com>
- <eef9a83f-6103-4ab2-927c-921dd9a6a5b3@suse.de>
+	s=arc-20240116; t=1762062374; c=relaxed/simple;
+	bh=daat7R8xq6WK19JnkdNaKb1Ss5KWbqJ9ZIemeuq71BE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sxoSadLxS30jTCvsQxkgoMzcGY9RAKpvH0xCkLVbdo1CRmcBd1y0gA0iqyHKcv7iPuD8zBoOH5X+yuEXABTzgN3bTj4GLcooOMFkrejdzEMAwVez9ifYPlDfJduDbBCh0xylafaSEZnUrVdupjDVFMvED0Zmu6f6Z9ZBtc1hfBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=racG1avF; arc=none smtp.client-ip=52.229.205.26
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mails.tsinghua.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
+	Date:Message-Id:MIME-Version:Content-Transfer-Encoding; bh=H6lPk
+	TPqXuPoT+a08uI3jvE4cRGosn0mKlnPqrfFbgk=; b=racG1avFBTKvtLtXgscv+
+	EWUxh7Tvy3gazh4Tj36IMMWK/JlT+R6gpTv42JIlRj2NR6UDoaoxyiuJ7Z874Vp8
+	WMgoopJ89ivfF6uZQiOtYvTv90xGI1YfM4eA5tVGBonM/Prl7C4v0gx1dEmj3Ldr
+	YOsc0cOj6MqzMFd8Tb98bU=
+Received: from estar-Super-Server.. (unknown [103.233.162.254])
+	by web2 (Coremail) with SMTP id yQQGZQDXvwoD8AZpXsWvBA--.9738S2;
+	Sun, 02 Nov 2025 13:45:53 +0800 (CST)
+From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+To: netdev@vger.kernel.org
+Cc: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH v3 RESEND] net/dccp: validate Reset/Close/CloseReq in DCCP_REQUESTING
+Date: Sun,  2 Nov 2025 13:45:24 +0800
+Message-Id: <20251102054524.3972849-1-zhaoyz24@mails.tsinghua.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <eef9a83f-6103-4ab2-927c-921dd9a6a5b3@suse.de>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:yQQGZQDXvwoD8AZpXsWvBA--.9738S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxXF13uFWruF4DZrWDJF43KFg_yoWrtF47pF
+	yxKrWYkr1DJryxtFnayw4DXr15Cr48ArWfGr9FqrWUZ3WDXFyfZrZxKr4jvry5CFZ3C342
+	93y2qFZ5Cr47Ja7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvq14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAac4AC62xK8xCEY4vEwIxC4wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
+	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IE
+	rcIFxwCY02Avz4vE14v_GrWl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr
+	1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE
+	14v26r1Y6r17MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7
+	IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E
+	87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0x
+	ZFpf9x0JUfuciUUUUU=
+X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAQIOAWkF6ffKZwAAsT
 
-On Fri, Oct 31, 2025 at 05:35:32PM +0200, Stanimir Varbanov wrote:
-> On 10/31/25 1:45 PM, Laurent Pinchart wrote:
-> > On Fri, Aug 22, 2025 at 12:34:35PM +0300, Stanimir Varbanov wrote:
-> >> Hello,
-> >>
-> >> Changes in v2:
-> >>  - In 1/5 updates according to review comments (Nicolas)
-> >>  - In 1/5 added Fixes tag (Nicolas)
-> >>  - Added Reviewed-by and Acked-by tags.
-> >>
-> >> v1 can found at [1].
-> >>
-> >> Comments are welcome!
-> > 
-> > I'm very happy to see support for Raspberry Pi 5 progressing fast
-> > upstream.
-> > 
-> > I've tested the latest mainline kernel (v6.18-rc3) that includes this
-> > series (except for 1/5 that is replaced by
-> > https://lore.kernel.org/all/20250820-macb-fixes-v4-0-23c399429164@bootlin.com/
-> > as far as I understand). The ethernet controller is successfully
-> > detected, and so is the PHY. Link status seems to work fine too, but
-> > data doesn't seem to go through when the kernel tries to get a DHCP
-> > address (for NFS root). Here's the end of the kernel log (with the
-> > messages related to the USB controller stripped out):
-> > 
-> > [    0.896779] rp1_pci 0002:01:00.0: assign IRQ: got 27
-> > [    0.896809] rp1_pci 0002:01:00.0: enabling device (0000 -> 0002)
-> > [    0.896840] rp1_pci 0002:01:00.0: enabling bus mastering
-> > [    0.931874] macb 1f00100000.ethernet: invalid hw address, using random
-> > [    0.944448] macb 1f00100000.ethernet eth0: Cadence GEM rev 0x00070109 at 0x1f00100000 irq 95 (da:2e:6d:9d:52:a4)
-> > [    0.989067] macb 1f00100000.ethernet eth0: PHY [1f00100000.ethernet-ffffffff:01] driver [Broadcom BCM54210E] (irq=POLL)
-> > [    0.989272] macb 1f00100000.ethernet eth0: configuring for phy/rgmii-id link mode
-> > [    0.991271] macb 1f00100000.ethernet: gem-ptp-timer ptp clock registered.
-> > [    4.039490] macb 1f00100000.ethernet eth0: Link is Up - 1Gbps/Full - flow control tx
-> > [    4.062589] Sending DHCP requests .....
-> > [   40.902771] macb 1f00100000.ethernet eth0: Link is Down
-> > [   43.975334] macb 1f00100000.ethernet eth0: Link is Up - 1Gbps/Full - flow control tx
-> > 
-> > I've tried porting patches to drivers/net/phy/broadcom.c from the
-> > Raspberry Pi kernel to specifically support the BCM54213PE PHY (which is
-> > otherwise identified as a BCM54210E), but they didn't seem to help.
-> > 
-> > What's the status of ethernet support on the Pi 5, is it supposed to
-> > work upstream, or are there pieces still missing ?
-> 
-> We have this [1] patch queued up, could you give it a try please.
-> 
-> [1] https://www.spinics.net/lists/kernel/msg5889475.html
+Dear maintainers of Linux kernel, this is a resend version of the patch
+with a clarified commit message based on the previous feedback
+<CAL+tcoCJf8gHNW9O6B5qX+kM7W6zeVPYqbqji2kMqnDNuGWZww@mail.gmail.com>.
+We haven't received any reply yet, so we resend it again. The code change
+is the same; only the description is improved to better explain the issue,
+ impact and rationale. Thanks for your time and review.
 
-It fixes the issue, thank you ! I've sent a patch to add an ethernet0
-alias (https://lore.kernel.org/all/20251102002901.467-1-laurent.pinchart@ideasonboard.com),
-with that I get working ethernet with a stable MAC address.
+DCCP sockets in DCCP_REQUESTING state do not check the sequence number
+or acknowledgment number for incoming Reset, CloseReq, and Close packets.
 
+As a result, an attacker can send a spoofed Reset packet while the client
+is in the requesting state. The client will accept the packet without any
+verification before receiving the reply from server and immediately close
+the connection, causing a denial of service (DoS) attack. The vulnerability
+makes the attacker able to drop the pending connection for a specific 5-tuple.
+Moreover, an off-path attacker with modestly higher outbound bandwidth can
+continually inject forged control packets to the victim client and prevent
+connection establishment to a given destination port on a server, causing
+a port-level DoS.
+
+This patch moves the processing of Reset, Close, and CloseReq packets into
+dccp_rcv_request_sent_state_process() and validates the ack number before
+accepting them.
+
+This patch should be applied to stable versions *only* before Linux 6.16,
+since DCCP implementation is removed in Linux 6.16.
+
+Affected versions include:
+- 3.1-3.19
+- 4.0-4.20
+- 5.0-5.19
+- 6.0-6.15
+
+We tested it on Ubuntu 24.04 LTS (Linux 6.8) and it worked as expected.
+
+Fixes: c0c2015056d7b ("dccp: Clean up slow-path input processing")
+Signed-off-by: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
+Cc: stable@vger.kernel.org
+---
+ net/dccp/input.c | 54 ++++++++++++++++++++++++++++--------------------
+ 1 file changed, 32 insertions(+), 22 deletions(-)
+
+diff --git a/net/dccp/input.c b/net/dccp/input.c
+index 2cbb757a8..0b1ffb044 100644
+--- a/net/dccp/input.c
++++ b/net/dccp/input.c
+@@ -397,21 +397,22 @@ static int dccp_rcv_request_sent_state_process(struct sock *sk,
+ 	 *	     / * Response processing continues in Step 10; Reset
+ 	 *		processing continues in Step 9 * /
+ 	*/
++	struct dccp_sock *dp = dccp_sk(sk);
++
++	if (!between48(DCCP_SKB_CB(skb)->dccpd_ack_seq,
++				dp->dccps_awl, dp->dccps_awh)) {
++		dccp_pr_debug("invalid ackno: S.AWL=%llu, "
++					"P.ackno=%llu, S.AWH=%llu\n",
++					(unsigned long long)dp->dccps_awl,
++			(unsigned long long)DCCP_SKB_CB(skb)->dccpd_ack_seq,
++					(unsigned long long)dp->dccps_awh);
++		goto out_invalid_packet;
++	}
++
+ 	if (dh->dccph_type == DCCP_PKT_RESPONSE) {
+ 		const struct inet_connection_sock *icsk = inet_csk(sk);
+-		struct dccp_sock *dp = dccp_sk(sk);
+-		long tstamp = dccp_timestamp();
+-
+-		if (!between48(DCCP_SKB_CB(skb)->dccpd_ack_seq,
+-			       dp->dccps_awl, dp->dccps_awh)) {
+-			dccp_pr_debug("invalid ackno: S.AWL=%llu, "
+-				      "P.ackno=%llu, S.AWH=%llu\n",
+-				      (unsigned long long)dp->dccps_awl,
+-			   (unsigned long long)DCCP_SKB_CB(skb)->dccpd_ack_seq,
+-				      (unsigned long long)dp->dccps_awh);
+-			goto out_invalid_packet;
+-		}
+ 
++		long tstamp = dccp_timestamp();
+ 		/*
+ 		 * If option processing (Step 8) failed, return 1 here so that
+ 		 * dccp_v4_do_rcv() sends a Reset. The Reset code depends on
+@@ -496,6 +497,13 @@ static int dccp_rcv_request_sent_state_process(struct sock *sk,
+ 		}
+ 		dccp_send_ack(sk);
+ 		return -1;
++	} else if (dh->dccph_type == DCCP_PKT_RESET) {
++		dccp_rcv_reset(sk, skb);
++		return 0;
++	} else if (dh->dccph_type == DCCP_PKT_CLOSEREQ) {
++		return dccp_rcv_closereq(sk, skb);
++	} else if (dh->dccph_type == DCCP_PKT_CLOSE) {
++		return dccp_rcv_close(sk, skb);
+ 	}
+ 
+ out_invalid_packet:
+@@ -658,17 +666,19 @@ int dccp_rcv_state_process(struct sock *sk, struct sk_buff *skb,
+ 	 *		Set TIMEWAIT timer
+ 	 *		Drop packet and return
+ 	 */
+-	if (dh->dccph_type == DCCP_PKT_RESET) {
+-		dccp_rcv_reset(sk, skb);
+-		return 0;
+-	} else if (dh->dccph_type == DCCP_PKT_CLOSEREQ) {	/* Step 13 */
+-		if (dccp_rcv_closereq(sk, skb))
+-			return 0;
+-		goto discard;
+-	} else if (dh->dccph_type == DCCP_PKT_CLOSE) {		/* Step 14 */
+-		if (dccp_rcv_close(sk, skb))
++	if (sk->sk_state != DCCP_REQUESTING) {
++		if (dh->dccph_type == DCCP_PKT_RESET) {
++			dccp_rcv_reset(sk, skb);
+ 			return 0;
+-		goto discard;
++		} else if (dh->dccph_type == DCCP_PKT_CLOSEREQ) {	/* Step 13 */
++			if (dccp_rcv_closereq(sk, skb))
++				return 0;
++			goto discard;
++		} else if (dh->dccph_type == DCCP_PKT_CLOSE) {		/* Step 14 */
++			if (dccp_rcv_close(sk, skb))
++				return 0;
++			goto discard;
++		}
+ 	}
+ 
+ 	switch (sk->sk_state) {
 -- 
-Regards,
+2.34.1
 
-Laurent Pinchart
 
