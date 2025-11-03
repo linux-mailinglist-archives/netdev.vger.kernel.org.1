@@ -1,262 +1,330 @@
-Return-Path: <netdev+bounces-235017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1995C2B4B3
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 12:22:54 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00889C2B51B
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 12:27:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FD6918938D4
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 11:22:55 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1FE474F58F7
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 11:24:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3733830215F;
-	Mon,  3 Nov 2025 11:22:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 255F43019B8;
+	Mon,  3 Nov 2025 11:24:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tKubhfGZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MI7uEHm3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E05DC30171A;
-	Mon,  3 Nov 2025 11:22:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762168927; cv=none; b=NaRA4DFgxX4g/lDOe6NV898xJ9TcSyyR34i1dR86Wj1QeTiSbodfOzcWMqpFPRGcmsv3v3lPPtVTT979h8nwe8YOJj2HwkVajlnER4icm4O1QNs3SJk5UavCNejEmXUuT4YiUgRlJVd++VMPhj7KHivLOI1/3o6wGWF+Dj5EjxA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762168927; c=relaxed/simple;
-	bh=zZlF5mFS0f/Oq95hrQaLrWEgcxubppt7A+bJPXZk8eE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jmPsyzbDY/7IJXhm1k+75I7CwI6JRH52HF2v53ZVeCvMYMYDZxQKYR1AHZBVSWtVuN1PXU0VHAGOB4auMhDRbUmN3K7hczWVmKzvXNx6+oF7AvusCfmN34pydvsTJEtdvTm0wZzdumwR0SiK82G3jH6o+wUdXUT7H9US2HWNtls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tKubhfGZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDD38C4CEE7;
-	Mon,  3 Nov 2025 11:22:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762168926;
-	bh=zZlF5mFS0f/Oq95hrQaLrWEgcxubppt7A+bJPXZk8eE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tKubhfGZ1E3MStl1BRbOzd2Q8vO1r0ckcnlGtZNrHz/RNHeEjLwXnDvVXIV0c6TYz
-	 KNKPv8aObnAuFGp3Z55H2JmW2+92bW4vRZjS6IyEegkcbwMNRWtRu2UToQNkZtro3m
-	 g5ozgD6/Jbdhk/RN4XxvUAr9UjaLb5OhQbBUBf8tfJcg4LetahlzKygwN78VAKG3bY
-	 uLgDEg203RIUt31Ie/o7VV8TTHy94ZLqBWKZZl73KTARp2BEgaa5nygNPr90jeKk+F
-	 KHH2mNubBAoPfyxFwy7RZ6a4g/BnE+ssGrAYUXuaYea164SPMWY5wjkLX/RGhBvut8
-	 5GzQycJcNdYWg==
-Date: Mon, 3 Nov 2025 12:21:59 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: linux-fsdevel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>, 
-	Jeff Layton <jlayton@kernel.org>, Jann Horn <jannh@google.com>, Mike Yuan <me@yhndnzj.com>, 
-	Zbigniew =?utf-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, Lennart Poettering <mzxreary@0pointer.de>, 
-	Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
-	Amir Goldstein <amir73il@gmail.com>, Tejun Heo <tj@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, linux-kernel@vger.kernel.org, 
-	cgroups@vger.kernel.org, bpf@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH v4 18/72] nstree: add unified namespace list
-Message-ID: <20251103-morsch-kunst-e8d040981325@brauner>
-References: <20251029-work-namespace-nstree-listns-v4-0-2e6f823ebdc0@kernel.org>
- <20251029-work-namespace-nstree-listns-v4-18-2e6f823ebdc0@kernel.org>
- <87ecqhy2y5.ffs@tglx>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43F742FF678
+	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 11:24:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762169079; cv=fail; b=tNGT5PIP+lhq35lzOgEVy/84fQeOeZKFXAbMq/JhQU6HhKsHMq1sHJ0PLbbH+89c+TAW5zy6sy3SkvuTX3InCjke86Rk4kAsTbEDjW7hc7LgQzXO0vAfkVI2WTlAfIoZu550EB8q7wX2c2nQlFwTKs/CAQa/oxrgOAjVeJk9gWw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762169079; c=relaxed/simple;
+	bh=TTUJUe5BEzevA9pYM6LS65qkYNMCAoTCN9B5LMhUojM=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=A+fuTpt8leFJtIbnAWSRb7hHFo1REo4/Ey4f09Jjv4ctjNdTBI0fWxzZDJlIjdfy5hwL87QpL5FlsvnD4BzrW+/VgQF/+/q2UKxTvpVcKgfn+U6V/DSYdFqJuiaWBUb91+32cThJRkztu5fJiT8Eu+QvxlZFKQoBb/+7qttnyLI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MI7uEHm3; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1762169077; x=1793705077;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=TTUJUe5BEzevA9pYM6LS65qkYNMCAoTCN9B5LMhUojM=;
+  b=MI7uEHm3ihhy0LExkmyl6vD+2ANmuNRtjqBVbehHvVUNPxtb4l3q1SRP
+   9wO9aDWJVR6qxT3kZQAsX6+q26WeChtpFwkb+H+rVPv6wZLGPzRr1lPyP
+   1JRBVmfLUhw1F+z5raxy3lX76X3Xogkr3f2317ttzIgsig3Glisd/ROls
+   yzznrcIFPXhgC7dWHeLswfrgcNcqrfiCCOKEh8mkQivaBQdmh+se2TVyQ
+   yCJoVKyKgC1NS/IcP9xDGjlVMkt1rFUEdtzUsLrr+OtUfJR7z2V1j32tt
+   +AJCw/axjYJHc3P0jp6mOAwiXB2mtaa5hKMhVNq1uePVE5Q6ZlQy2061C
+   g==;
+X-CSE-ConnectionGUID: 5FDcHu++R0aqImwBIEZiYg==
+X-CSE-MsgGUID: TzclG2IWTrWQDnsmHjjPoQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11601"; a="74532451"
+X-IronPort-AV: E=Sophos;i="6.19,276,1754982000"; 
+   d="scan'208";a="74532451"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 03:24:10 -0800
+X-CSE-ConnectionGUID: kZcbXyVVSQOdQc0DpRoW/Q==
+X-CSE-MsgGUID: db8krbrMRm6Wq4wwSF0Dwg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,276,1754982000"; 
+   d="scan'208";a="186134031"
+Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
+  by orviesa010.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 03:24:10 -0800
+Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Mon, 3 Nov 2025 03:24:09 -0800
+Received: from fmsedg901.ED.cps.intel.com (10.1.192.143) by
+ FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Mon, 3 Nov 2025 03:24:09 -0800
+Received: from DM5PR21CU001.outbound.protection.outlook.com (52.101.62.43) by
+ edgegateway.intel.com (192.55.55.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Mon, 3 Nov 2025 03:24:09 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=HpQDtOBinlEMNPpS0EeFcSSVyj5uheey4dHbGCn4mnerfs3FymRLEzX7BH1BRwriXT9SotBbuC1SaBBLxjUmyPePWfgHHBW5et11GteflDMii5h2b+9hewSLhXGyJtisOXocBU7Bb667TAmvZpo5LRqL4E8m6ticySuvRa0MHNVDkW8qhISE44/wGr+yZud6cGJPQF1Kno1PGdwZBju2Z9LKtoqxh/q+VLrePyulCjoXoD50TrOuXM4iNLeTtLVHpTv69MQCXuSsT7vcNxDVJJMApoiRMHKKzCiPEVSWsnweX1YPuMeSVVg8b6bOo8iFjPq268Wfuc2E1UFBoW1wfA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qk7X/zAMt4L2mQln/iCjeGbwQ7d1d7Tg7Ny8r646Pc8=;
+ b=Q0EYo8ltFrdJhg0GiNyRluuiFUUB/ThmwPMgZ4vFyem313UDaaLaRmS6TW3O5XRIpq5lT5VTL88y3h3GXYDf5LTLZNKWzrzQ3ubTS4zmH64aFG+lZKFxp6B4qm/Bdp68hbsNYJMHw6paEkADHKXtbwCbSIBuJ2PI7uz7omMrEgCJMomM9VcwemJLopRu2M5ouOcme9GT7Zy7+drR8urbr5VfuLqGn0hYONmIL4RaAqgqBnT4V//SNzKkX2ZOKVc7PgO/RI2+bpRtLgHcqU+bBeZ2hNHTXTZJO/lVOcHzNYAXa0L3icPA+8FnUcRldVI+TNt2IMk/YUxgzImeHnyIUw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by LV8PR11MB8724.namprd11.prod.outlook.com (2603:10b6:408:1fd::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.16; Mon, 3 Nov
+ 2025 11:24:07 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.9275.015; Mon, 3 Nov 2025
+ 11:24:07 +0000
+Message-ID: <eaa98c4b-392a-4070-8670-7d29558da20b@intel.com>
+Date: Mon, 3 Nov 2025 12:24:02 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [External] : Re: [PATCH net-next] iavf: clarify
+ VLAN add/delete log messages and lower log level
+To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>, ALOK TIWARI
+	<alok.a.tiwari@oracle.com>
+CC: "alok.a.tiwarilinux@gmail.com" <alok.a.tiwarilinux@gmail.com>, "Lobakin,
+ Aleksander" <aleksander.lobakin@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "andrew+netdev@lunn.ch"
+	<andrew+netdev@lunn.ch>, "kuba@kernel.org" <kuba@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"horms@kernel.org" <horms@kernel.org>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+References: <20251103090344.452909-2-alok.a.tiwari@oracle.com>
+ <05a823d2-231d-47de-89fa-9648e47cbfa5@intel.com>
+ <ce91f141-102c-434d-a8c4-1d8e7ab5181d@oracle.com>
+ <IA3PR11MB8986A6E0A4954131F3ECCE3BE5C7A@IA3PR11MB8986.namprd11.prod.outlook.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <IA3PR11MB8986A6E0A4954131F3ECCE3BE5C7A@IA3PR11MB8986.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: DUZPR01CA0292.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:4b7::14) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87ecqhy2y5.ffs@tglx>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|LV8PR11MB8724:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2db018d5-b1ac-40e6-3938-08de1acb807a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?R1FWQUJ2M2pDZ2ZNZUM2RnQ2a2JLT2VpNEdYcGF5Yi9pcXdsSm8rU3l0bERJ?=
+ =?utf-8?B?c0haYjZXU3BrelBJQ2RjYVZuMjE1V1l6c3k1WXVFWFEwY1dtMWhCKzByZEsw?=
+ =?utf-8?B?QWZFUWY3VFgycEFwN2pENldsZnpUZ2JybG9xRjlVR2RZKzlpSkFPUnV0VGpU?=
+ =?utf-8?B?ZzVUdUNtZjFWN3prRkJSZXVXQVdlZXJZU0tJZW0vcVR4OHBCZk9sZms4eDY5?=
+ =?utf-8?B?cEtIQ3VBN0tNR1IrRFl2RjV3MUpXS0Y5ODlCUDB5TjV3aVZ0N1FRSGlCUGpz?=
+ =?utf-8?B?Z3FkYisrOWxTeVM0Z3VqYXNiWkU0eWcwbEsyQmZWaCtMMEIwa1ZON1pPZEtV?=
+ =?utf-8?B?aW9HdzE1MUN4QWNMaEdtYkVKUG5OTDVmWU52M1VBaHBtYXJsS3c0bllxTS9O?=
+ =?utf-8?B?VjdJdW1VTWQvVGVUaFdiWXBmN0dIeGwzdE5HMnEwVnBPeWw1Z1JyQ3V1TmFt?=
+ =?utf-8?B?ZHFpL29SR2xRb3hiY253YmFxckZmMENQRWE3QytCdU1FYW5EaTMvZGMrcDFn?=
+ =?utf-8?B?emhXZytUamFXL3ZKbTZJdnpRSG56QzFra282Vm8xMG5qS28zbllMdFl4Qnk3?=
+ =?utf-8?B?NHFKdm1wYWorYzdDZjc2YWw5RnZ2M0Q3M0tFTHgvdGZLV2ZaVGREZGtoZXpG?=
+ =?utf-8?B?M2dJbmZWWlZUZlpaMEJiVS9veHp6VnBHV25iSnVCZTI2TlZudi9OWlZiUTc0?=
+ =?utf-8?B?R1hHeG93TGFqRVFabmphZmx5R2xaNWp3UnM3L2hkMXJoeVE4Y09CbC9IZGZy?=
+ =?utf-8?B?S0FEWUlXQ2szZ2xMTkpFRGFsdnc1eThvS3NVVTdEbkJ2Tlp2QndPVGdzZXQ3?=
+ =?utf-8?B?TWUvcEtZZEtxb0RETmlFYlFPb2tRVG1sMEMrZ0RVNGVIVXJUY05yb0VSV0lw?=
+ =?utf-8?B?bUVOWnZ5aFVqRkdNQ3F3RExkTU1raUVvSllLZW9WbnF5Y004b0dhYmdTZndC?=
+ =?utf-8?B?Q05uNTB3N29iNTFmL2xPanZLSzlQSEl0MWN6cVVrajRuWk5ORFZZWGpGVmlT?=
+ =?utf-8?B?U3QxZ29pNWJ4bHp6dXJxeVJOVGhaQ1lnZUFWZHFLOWM0V0hjRmxrcmxpWVRE?=
+ =?utf-8?B?d1I2TEUybXBpNlRXWDJaWHhlaVYyTVRudTRGM1YvcFlnK3B1eGU1cENtb05N?=
+ =?utf-8?B?SW9hZEttcDhIU3VWRGdXNUtXR2lRZXlEb2p0eUZVbmprV0JXMS8wVWxNcm9X?=
+ =?utf-8?B?K3VvYVY5YXVib0dTN0IvYmJtMURJMmtMWnkxd1lJSEVwZjFmR0krMFF6cGZI?=
+ =?utf-8?B?dzA2R2ZBblkwREtjUDcvclVpR2lhNmppWGdlZ25kWkxTVFZ6cVQrR1l6dTFR?=
+ =?utf-8?B?d2k0UWdxRjJnZSt4ajRsUWhEcHluSkw2RkR5ZVJFUFFKQ2J5dHJqYjMzUXFr?=
+ =?utf-8?B?V3dHQmY0enRBTkZXTllwNm5kVEg1YUlWOUcvVVBFdzJ6WEF2SG5SQUp4UUN3?=
+ =?utf-8?B?MkR5aXZuTkNoNitoWjB4OEVPSFZrTHk4MTUrU1dBSjlVVllramFVNUo3Q2FT?=
+ =?utf-8?B?M0tCQjB4QlJ5aEN4MHhkbFBMSk9tSDFTc09pYVIvRHFsMEQ2Yk5JcU1zVkJF?=
+ =?utf-8?B?OXNIK1llckFFUXdUbENuejBVVVc0NWJOck9KQ1RiWVQ2WmVUK3prdHVpaFdP?=
+ =?utf-8?B?VDd6bTVBRGJxRDlyVm9LaUNuU0xzZW9QdjdERW9FZlI1UlVwYzBvcmJyNEZ2?=
+ =?utf-8?B?cFFTNXdETlcxaVUzMW5OeE1NOXFvZUZwa3ZNZmRHSnJUcS9UWEhZMzFPTmJP?=
+ =?utf-8?B?VktSd3Q1bFpRcWhTQVhFeUEyUUtmUk8yaDhxM1IvaEg5RFgvVjYzL29oWTVp?=
+ =?utf-8?B?VFh4WldsbWJTRnpCbEVnanErSmV6WUZXUFZDcXdNUHdxd0ZOV2lEakwxcmNm?=
+ =?utf-8?B?UVQ0amhNVEovRlFsNGpSK2F0T012MXQ4bmFhd3BlVzlmNkE9PQ==?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MGd4V2xpMXpkSTl3RDRrQUNGZCtuY1BvWGdMMXVmbVFGMnVScGZoc01oZ3V0?=
+ =?utf-8?B?Rmlhby9Rb1FrY0NHUWhuMFIrdGF6VHNGUTZYMWo4ZzlmbUVDWVBCM2RFU01j?=
+ =?utf-8?B?NXg2cks3czdoQ0t3QjRaOUxFdUFVNnc1bDZJcVN2MitMR0VoajV0Z2sxdW9p?=
+ =?utf-8?B?clN6NVhoMFo3ME5FSUNDSFc5K25UL05qR0lPTFpGbTVpNzRGYWFESkpjNi8r?=
+ =?utf-8?B?NXIyd1dOOFpoZ3NPaVFZb2hPalBWSzFzNkVrOC9QYlhxeUtlMzFqWDY3bzBW?=
+ =?utf-8?B?TlZpdzhCcHRNQlFPQjFwWm5yRlBSSXhETXd2ZXZNQk8rZ0VuQWlmbC9NRFhq?=
+ =?utf-8?B?OWN2dVpJeGIzVFpqWFFVWFd0aW9ZU29pS2hnNDlabk9TT3BJOWVZS3pHYlJs?=
+ =?utf-8?B?Z0svZEp2MDJ2QU5SN3E3dlVLTzc5eEp1dnNzb29CUWFoNEpKZ0dUSXpna25W?=
+ =?utf-8?B?cVVrdGJ4UDlmTU42Syt6R0NmTFJ4VWdNUXRoZDlWcUdtdXlqRmw2VGsveGxL?=
+ =?utf-8?B?MURMTlB4Vk5QRUxTd25vakhST000SWFoSm1QQk4rZVA1Skt0MGV3aXJmNDVH?=
+ =?utf-8?B?VlZaQ2l6eDB6bml5Q2NwRFJIUUd5UHh0WmU5NGk1U2lNNEd3V3BBcWxrdFhT?=
+ =?utf-8?B?N1RlK1pKVGp1RGlpbVBLbXNMcmtvQUNHMWU4QS8rQXJvT21ENEtJaGxUU21a?=
+ =?utf-8?B?SWFXdDltZExCMHE1M0t4OUowYlA4M2RDemY2c0tzZXZ3T0xiT3YraGViQytu?=
+ =?utf-8?B?L0luYXFxZWZaWWM0WTA0V3p3SnFQUEpJVExoVnNnUDl2M1BaNmdJaGZzcmUx?=
+ =?utf-8?B?T05xWVQrcnI0bytXT2hZMjRFTXVDOEovWG5sQzBETnZ3a0RnYTkxajZLZ05W?=
+ =?utf-8?B?YUZuV1RhVGJQZy83dTREUTBlWjhsL0ZZMmZ4anNqTlBFZmhHMTY5dnJNRXFN?=
+ =?utf-8?B?c3RjaDlwZVNZWm0yYTR3UHN0eWF0VEhBYlFEVXRhUlhNOEQyenpOcERodmsw?=
+ =?utf-8?B?TzA3YWYwL0w2L3dIaDUyYklLQjdrWU9mL0FlYi8vWTcxdlpuVTNBR1FZbG9R?=
+ =?utf-8?B?VnJYbWFiRkd1bEZ3OGNsVTJoZHIreU1jSnFPRldpcUtyNCtUVkxoOXMrUHQr?=
+ =?utf-8?B?MDRhdmhmRDFFcmVVeERpYXpMN1FCY1ZYR3pNYjF4UXpPRWZRbjNhMG53NXlZ?=
+ =?utf-8?B?bzc3RGFDRmcyK3NEMWtBU1NKWVZlOUNzbDZVemIzdWpjZHBIbVVhMHFCWlE4?=
+ =?utf-8?B?VStPbFZubzFNMFZEbk43NWxSVW9QYnZqbW5WMWkyRmNPbG9ETmh0blVidExR?=
+ =?utf-8?B?eUgvZkxqQWJyREEvS01pN2JxbHh6V1pnaEYxMnNiei9mZ29zMjFUZ3B3emhs?=
+ =?utf-8?B?QmlqYmx2cXdwUk11TkFyRDNWdGJRVTVHYngvOEJNYVp1OEJRSFRnbGVlTmN3?=
+ =?utf-8?B?NkhsZDdSc29IUVd4VktKek5lUklVcmZWVy9qV3RVSHEyUVRzYUpIN05GQURC?=
+ =?utf-8?B?cW9kWkE1dW9NMGgzT0kwdmQ1TUNZQUFrTHRWVUpBdytWc2wyejJqVUhGUWpT?=
+ =?utf-8?B?L3dxL0tNbVEvYzhhV0szWkJrM0xxOHBlZ2FEVGlXSDhieG1uYTNyeThwZkdk?=
+ =?utf-8?B?V1RLMW9hU2Q4T2ltOXRBdng4M1ZubzNDOUxpN3AraHBrQVN3dk5FVVRTQzRr?=
+ =?utf-8?B?ZzRheVVuZFpLTW1xZm5WMHdPUVNsR1phVVZuSlUwZUpsZGRvNm5GdDFoOTFp?=
+ =?utf-8?B?bzgvekNPaE96NHM3TEp4M2RnUkllcWQwZm9WWmtsNEdVQ3FKRTBzU3FZMmpV?=
+ =?utf-8?B?eVF3d3l1NE9XeGExdW9xWWd5NW5IRTdrUzI1ZUdsWGF4RU9BanVSNVZ5eDFB?=
+ =?utf-8?B?Q1ozcWV0dkpvdmNjek0wKzdnbE5oR0dWd3ZIeE9pU1BNS25lMjRlendwUk9a?=
+ =?utf-8?B?UGZKTnFxWWpFNm9JbEFLYXVYdkRQSiswS2JHSTlseWQxc2dPRTBZZ2poS0Mx?=
+ =?utf-8?B?a1YrZ1FsMEhyYnRka0VJY2p2Y25vWitvNGkzNVMvaEpCZXIxWkNhaWpscXBR?=
+ =?utf-8?B?Y3dHZXR0YUFKeWRsNzU1eXRrV0NFYW9QNXVRU1ZxV29uM1k1amZRWk9HZ3Q1?=
+ =?utf-8?B?c05yaGNvaHdOMTNudVlUMEt0bjRjeEt4R1FObDNYYk1ZcmR4WHYxS0VYejdU?=
+ =?utf-8?B?b1E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2db018d5-b1ac-40e6-3938-08de1acb807a
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Nov 2025 11:24:07.1189
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: uPUmYSzo1ApUDVez0mJXMe9nURMuMuL/ILYSH87VQtQ3UAqmhXir3cHkQrUjXZn5RV9l5rgM4plr+mfrA5hWLeNXk1Ag99v9OhwPytTOcko=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR11MB8724
+X-OriginatorOrg: intel.com
 
-On Sat, Nov 01, 2025 at 08:20:50PM +0100, Thomas Gleixner wrote:
-> Christian!
+On 11/3/25 11:30, Loktionov, Aleksandr wrote:
 > 
-> On Wed, Oct 29 2025 at 13:20, Christian Brauner wrote:
-> > --- a/kernel/time/namespace.c
-> > +++ b/kernel/time/namespace.c
-> > @@ -488,6 +488,7 @@ struct time_namespace init_time_ns = {
-> >  	.ns.ns_owner = LIST_HEAD_INIT(init_time_ns.ns.ns_owner),
-> >  	.frozen_offsets	= true,
-> >  	.ns.ns_list_node = LIST_HEAD_INIT(init_time_ns.ns.ns_list_node),
-> > +	.ns.ns_unified_list_node = LIST_HEAD_INIT(init_time_ns.ns.ns_unified_list_node),
 > 
-> Sorry that I did not catch that earlier, but
+>> -----Original Message-----
+>> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+>> Of ALOK TIWARI
+>> Sent: Monday, November 3, 2025 11:17 AM
+>> To: Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>
+>> Cc: alok.a.tiwarilinux@gmail.com; Lobakin, Aleksander
+>> <aleksander.lobakin@intel.com>; Nguyen, Anthony L
+>> <anthony.l.nguyen@intel.com>; andrew+netdev@lunn.ch; kuba@kernel.org;
+>> davem@davemloft.net; edumazet@google.com; pabeni@redhat.com;
+>> horms@kernel.org; intel-wired-lan@lists.osuosl.org;
+>> netdev@vger.kernel.org
+>> Subject: Re: [Intel-wired-lan] [External] : Re: [PATCH net-next] iavf:
+>> clarify VLAN add/delete log messages and lower log level
+>>
+>>
+>>
+>> On 11/3/2025 2:57 PM, Przemek Kitszel wrote:
+>>> On 11/3/25 10:03, Alok Tiwari wrote:
+>>>> The current dev_warn messages for too many VLAN changes are
+>> confusing
+>>>> and one place incorrectly reference "add" instead of "delete" VLANs
+>>>> due to copy-paste errors.
+>>>>
+>>>> - Use dev_info instead of dev_warn to lower the log level.
+>>>> - Rephrase the message to: "Too many VLAN [add|delete] changes
+>>>> requested,
+>>>>     splitting into multiple messages to PF".
+>>>>
+>>>> Suggested-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+>>>> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+>>>
+>>> thank you!
+>>> just two minor nits, but the messages are good already, so:
+>>> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+>>>
+>>>> ---
+>>>> https://urldefense.com/v3/__https://lore.kernel.org/all/47f8c95c-
+>>>> bac4-471f-8e58-9155c6e58cb5@intel.com/__;!!ACWV5N9M2RV99hQ!
+>>>> MulRvlOtC3JAON-O816_nR2P2geYBHDIx86XOr_i1afc9gjSrXfpcVwFmP6uM0p1-
+>>>> kFN64zBSLjwS3XvTDQ6nJ5R2hyIaQ$ ---
+>>>>    drivers/net/ethernet/intel/iavf/iavf_virtchnl.c | 12 ++++++++----
+>>>>    1 file changed, 8 insertions(+), 4 deletions(-)
+>>>>
+>>>> diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/
+>>>> drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+>>>> index 34a422a4a29c..3593c0b45cf7 100644
+>>>> --- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+>>>> +++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+>>>> @@ -793,7 +793,8 @@ void iavf_add_vlans(struct iavf_adapter
+>> *adapter)
+>>>>            len = virtchnl_struct_size(vvfl, vlan_id, count);
+>>>>            if (len > IAVF_MAX_AQ_BUF_SIZE) {
+>>>> -            dev_warn(&adapter->pdev->dev, "Too many add VLAN
+>> changes
+>>>> in one request\n");
+>>>> +            dev_info(&adapter->pdev->dev, "Too many VLAN add
+>> changes
+>>>> requested,\n"
+>>>> +                "splitting into multiple messages to PF\n");
+>>>
+>>> perhaps it is too much bikeshedding for such a change, sorry, but I
+>>> would rather remove the newline in the middle
+>>>
+>>> nit: another thing that I would consider is to differentiate the
+>>> messages (v1/v2 or A/B, or whatever) for different protocol versions
+>>
+>>
+>> Thanks Przemek for the feedback.
+>>
+>> I initially had the message on a single line, but checkpatch.pl
+>> reported: "WARNING: quoted string split across lines"
+>>
+>> To avoid that warning, I added the "\n" and split the message.
+>> I can drop the newline and suppress the warning if the maintainer
+>> community prefers.
+>> I just wanted to stay consistent with checkpatch recommendations.
+>>
+>> good point, I can adjust the wording and add version tags (v1/v2) now
+>> The messages currently look like this:
+>>
+>> dev_info(&adapter->pdev->dev, "vvfl Too many VLAN add changes
+>> requested, "
+>>            "splitting into multiple messages to PF\n");
+>>
+>> dev_info(&adapter->pdev->dev, "vvfl_v2 Too many VLAN add changes
+>> requested, "
+>>            "splitting into multiple messages to PF\n");
+>>
+>> Thanks,
+>> Alok
 > 
->   1) this screws up the proper tabular struct initializer
-> 
->   2) the churn of touching every compile time struct each time you add a
->      new field and add the same stupid initialization to each of them
->      can be avoided, when you do something like the uncompiled below.
->      You get the idea.
-> 
-> Thanks,
+> Thanks for clarifying, Alok.
+> checkpatch.pl warnings about split strings are advisory, not mandatory. For log messages, kernel style generally prefers a single, readable line rather than introducing "\n" just to silence that warning. Multi-line messages make grepping harder and are rarely needed for short text.
+> So please keep the message on one line, even if that means ignoring the checkpatch warning.
 
-Nice! I'm stealing that and I'll slap a Suggested-by for you on it.
-Thanks!
+there most important rule is
+"do not break (split) user visible messages", and checkpatch is aware of
+that. Only then is "do not go too far with characters in given line".
 
 > 
->         tglx
-> ---
->  fs/namespace.c            |    9 +--------
->  include/linux/ns_common.h |   12 ++++++++++++
->  init/version-timestamp.c  |    9 +--------
->  ipc/msgutil.c             |    9 +--------
->  kernel/pid.c              |    8 +-------
->  kernel/time/namespace.c   |    9 +--------
->  kernel/user.c             |    9 +--------
->  7 files changed, 18 insertions(+), 47 deletions(-)
+> Something like:
+> dev_info(&adapter->pdev->dev,
+>           "vvfl Too many VLAN add requests; splitting into multiple messages to PF\n");
 > 
-> --- a/fs/namespace.c
-> +++ b/fs/namespace.c
-> @@ -5985,19 +5985,12 @@ SYSCALL_DEFINE4(listmount, const struct
->  }
->  
->  struct mnt_namespace init_mnt_ns = {
-> -	.ns.inum	= ns_init_inum(&init_mnt_ns),
-> +	.ns		= NS_COMMON_INIT(init_mnt_ns, 1, 1),
->  	.ns.ops		= &mntns_operations,
->  	.user_ns	= &init_user_ns,
-> -	.ns.__ns_ref	= REFCOUNT_INIT(1),
-> -	.ns.__ns_ref_active = ATOMIC_INIT(1),
-> -	.ns.ns_type	= ns_common_type(&init_mnt_ns),
->  	.passive	= REFCOUNT_INIT(1),
->  	.mounts		= RB_ROOT,
->  	.poll		= __WAIT_QUEUE_HEAD_INITIALIZER(init_mnt_ns.poll),
-> -	.ns.ns_list_node = LIST_HEAD_INIT(init_mnt_ns.ns.ns_list_node),
-> -	.ns.ns_unified_list_node = LIST_HEAD_INIT(init_mnt_ns.ns.ns_unified_list_node),
-> -	.ns.ns_owner_entry = LIST_HEAD_INIT(init_mnt_ns.ns.ns_owner_entry),
-> -	.ns.ns_owner = LIST_HEAD_INIT(init_mnt_ns.ns.ns_owner),
->  };
->  
->  static void __init init_mount_tree(void)
-> --- a/include/linux/ns_common.h
-> +++ b/include/linux/ns_common.h
-> @@ -129,6 +129,18 @@ struct ns_common {
->  	};
->  };
->  
-> +#define NS_COMMON_INIT(nsname, refs, active)						\
-> +{											\
-> +	.ns_type		= ns_common_type(&nsname),				\
-> +	.inum			= ns_init_inum(&nsname),				\
-> +	.__ns_ref		= REFCOUNT_INIT(refs),					\
-> +	.__ns_ref_active	= ATOMIC_INIT(active),					\
-> +	.ns_list_node		= LIST_HEAD_INIT(nsname.ns.ns_list_node),		\
-> +	.ns_unified_list_node	= LIST_HEAD_INIT(nsname.ns.ns_unified_list_node),	\
-> +	.ns_owner_entry		= LIST_HEAD_INIT(nsname.ns.ns_owner_entry),		\
-> +	.ns_owner		= LIST_HEAD_INIT(nsname.ns.ns_owner),			\
-> +}
-> +
->  int __ns_common_init(struct ns_common *ns, u32 ns_type, const struct proc_ns_operations *ops, int inum);
->  void __ns_common_free(struct ns_common *ns);
->  
-> --- a/init/version-timestamp.c
-> +++ b/init/version-timestamp.c
-> @@ -8,9 +8,7 @@
->  #include <linux/utsname.h>
->  
->  struct uts_namespace init_uts_ns = {
-> -	.ns.ns_type = ns_common_type(&init_uts_ns),
-> -	.ns.__ns_ref = REFCOUNT_INIT(2),
-> -	.ns.__ns_ref_active = ATOMIC_INIT(1),
-> +	.ns = NS_COMMON_INIT(init_uts_ns, 2, 1),
->  	.name = {
->  		.sysname	= UTS_SYSNAME,
->  		.nodename	= UTS_NODENAME,
-> @@ -20,11 +18,6 @@ struct uts_namespace init_uts_ns = {
->  		.domainname	= UTS_DOMAINNAME,
->  	},
->  	.user_ns = &init_user_ns,
-> -	.ns.inum = ns_init_inum(&init_uts_ns),
-> -	.ns.ns_list_node = LIST_HEAD_INIT(init_uts_ns.ns.ns_list_node),
-> -	.ns.ns_unified_list_node = LIST_HEAD_INIT(init_uts_ns.ns.ns_unified_list_node),
-> -	.ns.ns_owner_entry = LIST_HEAD_INIT(init_uts_ns.ns.ns_owner_entry),
-> -	.ns.ns_owner = LIST_HEAD_INIT(init_uts_ns.ns.ns_owner),
->  #ifdef CONFIG_UTS_NS
->  	.ns.ops = &utsns_operations,
->  #endif
-> --- a/ipc/msgutil.c
-> +++ b/ipc/msgutil.c
-> @@ -27,18 +27,11 @@ DEFINE_SPINLOCK(mq_lock);
->   * and not CONFIG_IPC_NS.
->   */
->  struct ipc_namespace init_ipc_ns = {
-> -	.ns.__ns_ref = REFCOUNT_INIT(1),
-> -	.ns.__ns_ref_active = ATOMIC_INIT(1),
-> +	.ns = NS_COMMON_INIT(init_ipc_ns, 1, 1),
->  	.user_ns = &init_user_ns,
-> -	.ns.inum = ns_init_inum(&init_ipc_ns),
-> -	.ns.ns_list_node = LIST_HEAD_INIT(init_ipc_ns.ns.ns_list_node),
-> -	.ns.ns_unified_list_node = LIST_HEAD_INIT(init_ipc_ns.ns.ns_unified_list_node),
-> -	.ns.ns_owner_entry = LIST_HEAD_INIT(init_ipc_ns.ns.ns_owner_entry),
-> -	.ns.ns_owner = LIST_HEAD_INIT(init_ipc_ns.ns.ns_owner),
->  #ifdef CONFIG_IPC_NS
->  	.ns.ops = &ipcns_operations,
->  #endif
-> -	.ns.ns_type = ns_common_type(&init_ipc_ns),
->  };
->  
->  struct msg_msgseg {
-> --- a/kernel/pid.c
-> +++ b/kernel/pid.c
-> @@ -71,18 +71,12 @@ static int pid_max_max = PID_MAX_LIMIT;
->   * the scheme scales to up to 4 million PIDs, runtime.
->   */
->  struct pid_namespace init_pid_ns = {
-> -	.ns.__ns_ref = REFCOUNT_INIT(2),
-> -	.ns.__ns_ref_active = ATOMIC_INIT(1),
-> +	.ns = NS_COMMON_INIT(init_pid_ns, 2, 1),
->  	.idr = IDR_INIT(init_pid_ns.idr),
->  	.pid_allocated = PIDNS_ADDING,
->  	.level = 0,
->  	.child_reaper = &init_task,
->  	.user_ns = &init_user_ns,
-> -	.ns.inum = ns_init_inum(&init_pid_ns),
-> -	.ns.ns_list_node = LIST_HEAD_INIT(init_pid_ns.ns.ns_list_node),
-> -	.ns.ns_unified_list_node = LIST_HEAD_INIT(init_pid_ns.ns.ns_unified_list_node),
-> -	.ns.ns_owner_entry = LIST_HEAD_INIT(init_pid_ns.ns.ns_owner_entry),
-> -	.ns.ns_owner = LIST_HEAD_INIT(init_pid_ns.ns.ns_owner),
->  #ifdef CONFIG_PID_NS
->  	.ns.ops = &pidns_operations,
->  #endif
-> --- a/kernel/time/namespace.c
-> +++ b/kernel/time/namespace.c
-> @@ -478,17 +478,10 @@ const struct proc_ns_operations timens_f
->  };
->  
->  struct time_namespace init_time_ns = {
-> -	.ns.ns_type	= ns_common_type(&init_time_ns),
-> -	.ns.__ns_ref	= REFCOUNT_INIT(3),
-> -	.ns.__ns_ref_active = ATOMIC_INIT(1),
-> +	.ns		= NS_COMMON_INIT(init_time_ns, 3, 1),
->  	.user_ns	= &init_user_ns,
-> -	.ns.inum	= ns_init_inum(&init_time_ns),
->  	.ns.ops		= &timens_operations,
-> -	.ns.ns_owner_entry = LIST_HEAD_INIT(init_time_ns.ns.ns_owner_entry),
-> -	.ns.ns_owner = LIST_HEAD_INIT(init_time_ns.ns.ns_owner),
->  	.frozen_offsets	= true,
-> -	.ns.ns_list_node = LIST_HEAD_INIT(init_time_ns.ns.ns_list_node),
-> -	.ns.ns_unified_list_node = LIST_HEAD_INIT(init_time_ns.ns.ns_unified_list_node),
->  };
->  
->  void __init time_ns_init(void)
-> --- a/kernel/user.c
-> +++ b/kernel/user.c
-> @@ -65,16 +65,9 @@ struct user_namespace init_user_ns = {
->  			.nr_extents = 1,
->  		},
->  	},
-> -	.ns.ns_type = ns_common_type(&init_user_ns),
-> -	.ns.__ns_ref = REFCOUNT_INIT(3),
-> -	.ns.__ns_ref_active = ATOMIC_INIT(1),
-> +	.ns = NS_COMMON_INIT(init_user_ns, 3, 1),
->  	.owner = GLOBAL_ROOT_UID,
->  	.group = GLOBAL_ROOT_GID,
-> -	.ns.inum = ns_init_inum(&init_user_ns),
-> -	.ns.ns_list_node = LIST_HEAD_INIT(init_user_ns.ns.ns_list_node),
-> -	.ns.ns_unified_list_node = LIST_HEAD_INIT(init_user_ns.ns.ns_unified_list_node),
-> -	.ns.ns_owner_entry = LIST_HEAD_INIT(init_user_ns.ns.ns_owner_entry),
-> -	.ns.ns_owner = LIST_HEAD_INIT(init_user_ns.ns.ns_owner),
->  #ifdef CONFIG_USER_NS
->  	.ns.ops = &userns_operations,
->  #endif
+> Same for the delete case. Dropping the comma for a semicolon improves clarity.
+> Adding version tags (v2) and adjusting wording as you suggested sounds good.
+> Thank you.
+> 
+> Alex
+
 
