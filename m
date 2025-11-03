@@ -1,270 +1,227 @@
-Return-Path: <netdev+bounces-235052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F174C2B94A
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 13:14:05 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 691D6C2B96F
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 13:17:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4892188DEEF
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 12:14:29 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B28224E13C4
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 12:16:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2265307ADD;
-	Mon,  3 Nov 2025 12:14:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03232305E04;
+	Mon,  3 Nov 2025 12:16:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gTlJv5jk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Rq5Ch6lQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D17C1DE3B5
-	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 12:13:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762172041; cv=none; b=cFj6FDDvnRRmHX7G/klCE0cwZDPL62xS1KKeMYFdb0kZl84BIvxxLzLZqyRTpsTgP94n7vsMYgD/EO1FP7xHYN65/XWsnUH10fWvG6in5/KbiejlF3On6J4OaJWpcjZ4lTt7eLusRk2M/Xnxtk4hsvsGce8orjyt7xyQNAlDFf0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762172041; c=relaxed/simple;
-	bh=94R+AypRncUPftDElkOk+ULlHwRR1wl4lcQdo4G8YQM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TZWGs3eADlOVDXxfTVtGkphx5NvwgCbd4wMv2crV/fnsLhvZqcBDcnXr05puU4xzLWk8Zhj6AKfeGWfdKVONIHTq6lIkyY+j1f+1jGpTYGjrrW7CaEXjJJEeZ52IraaLjEQKtClwK/JMSSU5j1o74W3nITtjgtzuXyDNCz5rvTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gTlJv5jk; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-47103531eeeso2993575e9.1
-        for <netdev@vger.kernel.org>; Mon, 03 Nov 2025 04:13:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762172038; x=1762776838; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HvThRY4eNfW5Inji/W0VKFrAjmGKVWgkAa2RGmz2+O0=;
-        b=gTlJv5jkcxbWQ9JQFj16xBE88yC03haKjq/vuTxX+U+9qurlHO7DHFYU7y9t+00WM/
-         q0zOeLKUvlJnScb5GqFxxz0cf0z6DXYTTUSafiSZ++YzQV/+XCYb+R50wg5dWCIy9Zhf
-         PmbreiprM4F9RpBySjZTE4HpzHxKT9/iZ03Cti2xTOoUUedUzHr+tn1WS92T58j15nij
-         iBtYU3QAJDaUO69HRR7Ht0F8lrH1fdpg5nK8jj7jre7LwfR89T6p/NbZSlTrY01PQoof
-         aVWt/RAG91QP0XsVUNKB/jWtQTTRw4JVbdMJmenXKt9QcZUO5OD7NzN1iHeuhYB/+khZ
-         4NaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762172038; x=1762776838;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HvThRY4eNfW5Inji/W0VKFrAjmGKVWgkAa2RGmz2+O0=;
-        b=gW8hGHLrBQNGEesY06Ehj2SNq/7blxIuQt+/NY92bbrGWcbPfl7GIXdAm2b3NqPcf9
-         yi0mY1Cw1eaEqVqlebkXcLAlb4RZbV9pxCyqzD6Kz58eVexzvGqGwgxIzVxiX02OlTdF
-         3rg+/UAoRdIvdEBBLHFXJ+2FSEsXD1X3/9HvbeUquRFMvtTqWDwI7GX+yrOZ9B9mF55c
-         Y6fSpspqRYor9kocq5aD39itkzy1JbdzmZN2T6IMyedZ0SPhdzvCxp9d5VuQKJ/62Omh
-         w2m9rg2uZNqAX84RFDNgqzXRYALrS+JOIFbetZZ2xB8O7g+zCiRNnjDMIcxJ0AYaAuO9
-         bkdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWyCBp3VWgWSaswvUg1UlNipHjj5jl9qZkXfeY3VdV/o/KW2au893g0FQRumBv8RI+7y+mKcuY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yye+I+mZv9RwEK4ricBgC+EWpdWvNLM82lA6O4gRUmm/f2Pxf66
-	IfzIwvEkmn6HE4KP8w9xsUq2gYSJl9An1QaCjOzFZHVcPDrV278LUDpm
-X-Gm-Gg: ASbGncvffX+GcQAsls3dKAiswSo53KxqxEO3uD8/HfZkmcui+PG0cOK4mEBlovZBFE4
-	lFYDh42WMmNMb5SNe+I4xcl0RdFje2KGtyIpLAtF9uqvFQfs4Fd4LDGHrDj5sOWisok5pD+GC1l
-	9Iq5lS0BNrQVCs/QgsK5SYDoVa9zjk8EBOBGcW2AjjMj6uDu1wreHurDNSbgpot+KuRTCcWOWiw
-	tFK8rEffy/Sx5w3lPPQbOUmOqp7DHV2aHiS53go1VGTWH6bRMZZJ1sozVe9hXYoNZQUsAr0wKbx
-	h3qVjuofu1f4L5aE7dO78HLaTA5upodTAp1BjThGwYo65rp4MSfLyAKP7ErRAc8OZP5G9QY03G3
-	WDv0y+FnoLkULvrFlqgP9xucLIWetPsh6c3lt9joBwLc5DwV6wCS+LNfzt0JYo6Yk1+f129LE71
-	vDWdg=
-X-Google-Smtp-Source: AGHT+IGQt2Q95D+Meobm86HVWwUHLHSku+aRz/VeZME+I3ZAsJ3m+6wdDTCQZ+nPhU3uPW8S3WqRpQ==
-X-Received: by 2002:a05:600c:19c6:b0:477:10c4:b52 with SMTP id 5b1f17b1804b1-4773090238fmr57140915e9.8.1762172037406;
-        Mon, 03 Nov 2025 04:13:57 -0800 (PST)
-Received: from skbuf ([2a02:2f04:d406:ee00:7144:c922:dc8a:113d])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4773c23b8d9sm173739975e9.0.2025.11.03.04.13.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Nov 2025 04:13:56 -0800 (PST)
-Date: Mon, 3 Nov 2025 14:13:53 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Alexis =?utf-8?Q?Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Boon Khai Ng <boon.khai.ng@altera.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Furong Xu <0x1207@gmail.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Yu-Chun Lin <eleanor15x@gmail.com>
-Subject: Re: [PATCH net-next 0/3] net: stmmac: phylink PCS conversion part 3
- (dodgy stuff)
-Message-ID: <20251103121353.dbnalfub5mzwad62@skbuf>
-References: <aQHc6SowbWsIA1A5@shell.armlinux.org.uk>
- <aQNmM5+cptKllTS8@oss.qualcomm.com>
- <aQOB_yCzCmAVM34V@shell.armlinux.org.uk>
- <aQOCpG_gjJlnm0A1@shell.armlinux.org.uk>
- <aQhusPX0Hw9ZuLNR@oss.qualcomm.com>
- <aQh7Zj10C7QcDoqn@shell.armlinux.org.uk>
- <aQiBjYNtJks2/mrw@oss.qualcomm.com>
- <20251103104820.3fcksk27j34zu6cg@skbuf>
- <aQiP46tKUHGwmiTo@oss.qualcomm.com>
- <aQiVWydDsRaMz8ua@shell.armlinux.org.uk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58FF978F2F;
+	Mon,  3 Nov 2025 12:16:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762172183; cv=fail; b=lZdhwTT8Heb20gWTwFdKf08/kRxiheWC9O4Bjs6uNHoyHHGq8p6PEPSDHPIJJI7GjqLqXH/qZwVvCqvhcMnQRc2JTIxGQnEVx84LVUl2JXESPGrV97ZY3dXExv7w1JyOY1txXYo9J3LI/wQmiJctv1njzVCbiW03ZjwkNo+YCP4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762172183; c=relaxed/simple;
+	bh=0r/TOXUWyKw63IjJ47P7ze1c64pFQxd9uaE30FH1Z58=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=rkHauEsF3E9Yy3KZ0i2ZJtxrx/547xR+Bv1PJYsu857Sv2PXPlc6WYiMG2QzYDYFr2yyitIJE0We2Vky1gAsQSGC7T/mZ8W3+Ch3PSouRzR4cZ15hB7eQjuLZlVZHOehhwldBiv7iKejpFxWNxdTVwZTLHpdBdI2Yv90CMhkZtM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Rq5Ch6lQ; arc=fail smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1762172182; x=1793708182;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=0r/TOXUWyKw63IjJ47P7ze1c64pFQxd9uaE30FH1Z58=;
+  b=Rq5Ch6lQOVGVnzbc+I4ld7g+zHy1AKg0L3BvSwV+Xr8baasAomoGzqfX
+   ftuK5qwT4VDNKha4EdqxUChrXUjyUrwfBQ8oZpK/lLSoTpOOtHteg6MHZ
+   P1N9GSzuGbmwWytV6R3bnaNS+NWp60Ff2HO8tqOCO/K5rFrGqWWFJ/yWg
+   bNlkNLbdTlpt544DHoqcg31gBRelDRxsSl6YRbxGw4zr46ASqiAQzX2OQ
+   nprMZRu7BSHhIBxV7npwpxxerqTMZh8BRcCh70PbkZ6g5ZwI9m3jDDhkz
+   zhz+Wg5IdCfRwu63YwM3royA89oBP5KdneI4YwFyAR3nlIgC5/1Edpbrx
+   g==;
+X-CSE-ConnectionGUID: C9ilgez0R9WdDpDECqEoEA==
+X-CSE-MsgGUID: RIFOYMz+RHC6cUiUXGyvlA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11601"; a="89707271"
+X-IronPort-AV: E=Sophos;i="6.19,276,1754982000"; 
+   d="scan'208";a="89707271"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 04:16:21 -0800
+X-CSE-ConnectionGUID: 9bxOnmgyRqOKdP2OARzUmA==
+X-CSE-MsgGUID: /A+2Wf0vSc2EHQEQUbpufw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,276,1754982000"; 
+   d="scan'208";a="217678340"
+Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
+  by fmviesa001.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 04:16:21 -0800
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Mon, 3 Nov 2025 04:16:21 -0800
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Mon, 3 Nov 2025 04:16:21 -0800
+Received: from PH8PR06CU001.outbound.protection.outlook.com (40.107.209.40) by
+ edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Mon, 3 Nov 2025 04:16:20 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=UhI3SFvsvvKRLoldWZhC47PBwg0dhogWnGnalZUgdrsmuv2+j745nJ1E++7RnX0797lnu5eWhZFbpbfKdvbuQvs4kKtYglag3Xj2rWm0zzidTjR3V0NUW++vIWJNeEv6zfsC6mEHtC6nX+Kg2jzBj+dtqMQLPLCDsmP0UBNkQRcS/MB6cb3CvVKtRHL0sm8yUjqHBX0awpHX6PJEMnVw2NVn4yj+cPJmWASKuobsalveN0r1bN6Oy7x8QxRx5AjMgVGTmANoeKXhw9WTmvkKjPDO4Sa++KX19CpFomruiRfFIXv6FhTiU0VAuM58054r05sZrES5D94hA678so5QPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=e0LKKijwLepWf+3vYmb2MdlCG1xp88hHiJto0x0lE4o=;
+ b=QyxKUOH7vcCPvR9uGSKjwXOn+693WE2hCimvL6fGqPMJ7sIE7iZe4YZPRR6D7MXX+MMj7p1QyDG8/vcimGc3Msf8UsFaTflFNC8THFYdYjAY9S8RADwBg38JWzIx45QBFAzWJEBh1Oe2WVd0/3Hm3qBWHhvyRV/4waktc+rdebkV4SjgXiXgq21UujuueDtEoQyqols9sXZWIOvslK1RzXkRT1tFpJx8Q7Y5D1nraCF6aYRrFX6BdD4qc1kXFrzZKd3ta/9CK1G/pGQRu4+wqJNkz+ehU4ZTwI1Ww2XtEC6ktYiCc7dSIrAuCjbG8LCcpVMBah9J64quUibUO8iTCA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
+ IA1PR11MB6348.namprd11.prod.outlook.com (2603:10b6:208:3af::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.16; Mon, 3 Nov
+ 2025 12:16:18 +0000
+Received: from DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
+ ([fe80::d19:56fe:5841:77ca%4]) with mapi id 15.20.9275.013; Mon, 3 Nov 2025
+ 12:16:18 +0000
+Date: Mon, 3 Nov 2025 13:16:06 +0100
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <bpf@vger.kernel.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
+	<hawk@kernel.org>, <netdev@vger.kernel.org>, <magnus.karlsson@intel.com>,
+	<aleksander.lobakin@intel.com>, <ilias.apalodimas@linaro.org>,
+	<toke@redhat.com>, <lorenzo@kernel.org>,
+	<syzbot+ff145014d6b0ce64a173@syzkaller.appspotmail.com>, Ihor Solodrai
+	<ihor.solodrai@linux.dev>, Octavian Purdila <tavip@google.com>
+Subject: Re: [PATCH v5 bpf 1/2] xdp: introduce xdp_convert_skb_to_buff()
+Message-ID: <aQidBn22H1UVxST5@boxer>
+References: <20251029221315.2694841-1-maciej.fijalkowski@intel.com>
+ <20251029221315.2694841-2-maciej.fijalkowski@intel.com>
+ <20251029165020.26b5dd90@kernel.org>
+ <aQNWlB5UL+rK8ZE5@boxer>
+ <20251030082519.5db297f3@kernel.org>
+ <aQPJCvBgR3d7lY+g@boxer>
+ <20251030190511.62575480@kernel.org>
+ <aQSfgQ9+Jc8dkdhg@boxer>
+ <20251031114952.37d1cb1f@kernel.org>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20251031114952.37d1cb1f@kernel.org>
+X-ClientProxiedBy: BE1P281CA0185.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:8d::8) To DM4PR11MB6117.namprd11.prod.outlook.com
+ (2603:10b6:8:b3::19)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="56qp7pmq6cw7fsz2"
-Content-Disposition: inline
-In-Reply-To: <aQiVWydDsRaMz8ua@shell.armlinux.org.uk>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|IA1PR11MB6348:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6f6b9f6f-9294-4721-e042-08de1ad2cad3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?Lw3Wl0fWBEp9nYyYmoq78eVj3NXW2A1nMo7mpmAVz3XLOI5ik9qFcPmNrLgm?=
+ =?us-ascii?Q?cRx42VD105mz/5tUzjzMIQeqdX5rHj32nyCfVj0X/98C4/tymG9d4YqJ7lrM?=
+ =?us-ascii?Q?ferqMVTpi5hfDf3u7UMxU16z6AfcEHPWp0fohxasuSjrWrJlrl+u2XD7CGbX?=
+ =?us-ascii?Q?yT3cf8E4/ZWkjqncNOlQmxcH9xbX26MMwn2Rs0pSU8LayjfQ8WEVE8BK4CRD?=
+ =?us-ascii?Q?bVERdbFNY9Mzsb2cPMNiYm3RkAcXZgLK6D1+2fJrgEMIwI1PZ4j5dR4GcV6p?=
+ =?us-ascii?Q?lDZMW2OOCRBSl9Tfa3vHojom2jNu5/aJyCn3/kkZwqukbFZTteWQEbSWDI1n?=
+ =?us-ascii?Q?cImKm8IrkgEXFYak2sFohNkPmgJD10w9F7PoBGoqIK1kUzJaW4x/oJexbWzB?=
+ =?us-ascii?Q?3JfxTWgKrONpoKwj0rm+uybUwA50HDcq1MPcqlnNnhBZ+viT5EdyBKAnD+CS?=
+ =?us-ascii?Q?8voOoUzYIS2lzXvNmxbOstBNAdA8SgKYY84Vn8zFWMmz0+GwaxTVXzyVLQYH?=
+ =?us-ascii?Q?MiJ40rwKlHA1LgH2hUQmYBjup+tBKdNmEq7/V2dE+uKRd+3oWmBydkwxDleF?=
+ =?us-ascii?Q?LYLu3fjFupAGKq258E9CSBmX6hqFEmvZK+DbvrLvV+y26fOD3hjltAKTmDRy?=
+ =?us-ascii?Q?5iG6xOd0nTqFbF0hXJOlwgLzZsuqPNC9aTIsSElLIGZlLxgtPxbp/whTIG73?=
+ =?us-ascii?Q?cpuhoVlCEI2Bn7Q9W4EGDpmEaUzI/oRUQUaKknqqokAPncX+EYwbJ8n5Q6Nh?=
+ =?us-ascii?Q?0wXUvZTZhMvTWiTl7zN6k/1ZH7P+ghzEDisG9+Al0dZd5q31KAISW9coTq3k?=
+ =?us-ascii?Q?nvX+RjKGgp4NlRMyJsFtONP62JxbMtIvY2mHhQ9JEMZfqx+dufcPKnOgr29w?=
+ =?us-ascii?Q?fOB1pIgE21PEus6lLv5T0wdJnu7gXT4tazym1y+NxaJ8S+yl6kRTaUSI2scQ?=
+ =?us-ascii?Q?wgUXFGycAbg6Wc27V7t0kOgkDuwg+lE/U/TV36kEMyM6CrggLHY7Wfql87Xo?=
+ =?us-ascii?Q?tUdyu5qNhuIqI3uhvZM7NDmyD36HKpXkRuxhGKpyevNb8SA3gvL9xfRsLmZX?=
+ =?us-ascii?Q?q4VO4SznSkJLKE787Zh99HrFx2vqpQXwH7n5yd+11SaNPu9Qdc2ut/IKJpZD?=
+ =?us-ascii?Q?az4EadCQAv5snQClw4BkYb1L0m6yXPjH85LikRzgf9Pv+att28GY2qI7ZJBO?=
+ =?us-ascii?Q?0w4ivSTwRKKF8tLqx7RW50uakeubRhs4eqGkmbUBnLuBDDXVKhmWafZlyqPU?=
+ =?us-ascii?Q?5wtMHGv3gopUKEJsjCdNa8ISEGdp5oXR06PjQ0dtuD0AwA9HuPRcpLyZBUYP?=
+ =?us-ascii?Q?QpduAi8A/2V8Cm2nPFqoSH/Oi/J+Yis2ob2r9itcgFwPpQuSPYfzLYqz3h4k?=
+ =?us-ascii?Q?EhgLkd4dG3FsFyFn3+oBXHwF3F8xONbLiOrHCr4aE/h7jtES6v01ksZ5o3SH?=
+ =?us-ascii?Q?c+MmGlx+Ci6J77wRCE76Np5aOwCqPUNO?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?aR/5ZGDXPgfdEms72QuTac35BAF4IX6L/AotASRW7+3RmWYyP+VPG/yWUcOm?=
+ =?us-ascii?Q?fl7p4zlvoMpDms5zM50aal/7YODXjJbA6L8wVSAks/mFLOTDc0ExxOv1yTd+?=
+ =?us-ascii?Q?RYgjeITEefWkeQFCmS0PAhbLp9Y1an5Avm/FF1iFY7FnaiWqaTXdw7jsOP7V?=
+ =?us-ascii?Q?S7KtYAb528DxWMsVW01fc7l8O+FxcLM5/CnPPpBNUmnEKR4jeCFYRUskHlSi?=
+ =?us-ascii?Q?b+MWe+irNN4wyD2jW+ak3FfxJKKLLRuX4mvXTo30NrHQ6gBhSQxsSQY6oN/t?=
+ =?us-ascii?Q?2bNrgAsucUNRpJP3wyhEcQpu5mWRcDpFfgfgiecyNbTk5t7wOTon8BCrBijl?=
+ =?us-ascii?Q?4rSmMVjGOtfhs93B1jMTrBYwzAspiOKdH0Cyna1G8RUy4cDHlCraExYw0eif?=
+ =?us-ascii?Q?aqU62NU3AeJ2JXFAuFsgomupttCgko2bII0uPjMAaJaXjwlgvwejaVAK4Bjv?=
+ =?us-ascii?Q?1vtNmsEZuCkZL2Ex4ZocKUeAudaHyzTmteJhf0ztaRk6Luuzm/2Cvb/IWRlE?=
+ =?us-ascii?Q?O3DwLvBvJw4S8zTb1x3f8r5fKg3fzlqwcKaCtEOVpctHPNNj5Q9KqCu6TPEr?=
+ =?us-ascii?Q?T+VajgYXwRNNmAj9A+LggdD8XpGqjL11KyOutRRV6Ua0vcU45mWyG30LOV/m?=
+ =?us-ascii?Q?eRMGn2cn/z4Xg2jSa4v+eAnT2FNLzl5QMObWJoPQp7zGN+nphlYChHdXMvxZ?=
+ =?us-ascii?Q?r6xGRNJ3zMIlm0SWyariywIdqRMTzuLQmvyvz8ImcIdYS3th9SwH9EvfCUPa?=
+ =?us-ascii?Q?qQhBfiQ4FrAjALd3PthNvQ7R0uMyc9kySZAnXYMUZD8jrZunzWOonVSHHtYy?=
+ =?us-ascii?Q?I0mHcaedlOD/qXDdbMPobnUREAoXWaRXnxtntuHLIokhKoJOg9qulcRRzped?=
+ =?us-ascii?Q?c/R+kogXxLTqFb5MlRsOwYhS01CijnJG9vfx6znO7k8SlgsXUIbsBhMnXbcG?=
+ =?us-ascii?Q?i1kvdIkBByLjqtFzPlhjSjhBBSuMK5zK5mQGP0gZJFaEAtXcUtMNTlyqTUEL?=
+ =?us-ascii?Q?TWH+CWCkqgIvsQjyebX61z4IgldCwGgZMSCgzlElAf1qtDLMiWqGpLowvwUA?=
+ =?us-ascii?Q?ep/kdoG3s3aGTPl4Ytp7ywTKtJqtb0BvXFI2T5NQJzpkO9cLlpqtdR0nRple?=
+ =?us-ascii?Q?ZSVnmI+i7Nx424tKEQYuKlZD4YuhALHeXIbiEGFvcxzKVpOF1HZFlGUgcthw?=
+ =?us-ascii?Q?8zwCu7Jr2KcRctspXZ3EXRIRgBRh0wKWoulcb0GXdExWf7C4QebFcmAAwAc8?=
+ =?us-ascii?Q?Qcfgvkog5wOZM9AWUaoj70/m08YvxaC9KCMOg7NF4NDSCD7QEs1roJjxhTxS?=
+ =?us-ascii?Q?7kLQii4HVYNUYXKlJ5cwIzNEb8Iu1uTCdmn3IdBV46ztDwD+YN9L7pk/IUFS?=
+ =?us-ascii?Q?QgQCn52FqgvItw7pR4jOhDjUi1K370O7sn13l25JV1bFppuJAtVnXzMz3ySA?=
+ =?us-ascii?Q?2Hxdg77b/VNi+diIHcNFVJhE1Ovd8RYVSDFtO0uK0gNBEoDxZmnWnuYuQ0Tc?=
+ =?us-ascii?Q?XQ1JrazJrguIW7ci+WcYJweU0VptCmTjFSBn+B0Bb0lkHqseEbWHGIQNvBRd?=
+ =?us-ascii?Q?4GzxyvL4PqBNSIvz8DNedCQIe2VZTTZLBDPQFdTMl4DEPMCv+6L6SV/JJ58/?=
+ =?us-ascii?Q?GA=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6f6b9f6f-9294-4721-e042-08de1ad2cad3
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Nov 2025 12:16:18.3030
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: g0LgKSyhhE/vaiL4HXyufcpWMww7i/MV2nxXwGIoWr8OuXi/139V6hf9mRJB1OcjTkfA3TElAy1ST2JzY8Jve2aHH+W8K8I6liwRNQMaA48=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6348
+X-OriginatorOrg: intel.com
 
-
---56qp7pmq6cw7fsz2
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Mon, Nov 03, 2025 at 11:43:23AM +0000, Russell King (Oracle) wrote:
-> On Mon, Nov 03, 2025 at 04:50:03PM +0530, Mohd Ayaan Anwar wrote:
-> > On Mon, Nov 03, 2025 at 12:48:20PM +0200, Vladimir Oltean wrote:
+On Fri, Oct 31, 2025 at 11:49:52AM -0700, Jakub Kicinski wrote:
+> On Fri, 31 Oct 2025 12:37:37 +0100 Maciej Fijalkowski wrote:
+> > > > would be fine for you? Plus AI reviewer has kicked me in the nuts on veth
+> > > > patch so have to send v6 anyways.  
 > > > 
-> > > As Russell partially pointed out, there are several assumptions in the
-> > > Aquantia PHY driver and in phylink, three of them being that:
-> > > - rate matching is only supported for PHY_INTERFACE_MODE_10GBASER and
-> > >   PHY_INTERFACE_MODE_2500BASEX (thus not PHY_INTERFACE_MODE_SGMII)
-> > > - if phy_get_rate_matching() returns RATE_MATCH_NONE for an interface,
-> > >   pl->phy_state.rate_matching will also be RATE_MATCH_NONE when using
-> > >   that interface
-> > > - if rate matching is used, the PHY is configured to use it for all
-> > >   media speeds <= phylink_interface_max_speed(link_state.interface)
-> > > 
-> > > Those assumptions are not validated very well against the ground truth
-> > > from the PHY provisioning, so the next step would be for us to see that
-> > > directly.
-> > > 
-> > > Please turn this print from aqr_gen2_read_global_syscfg() into something
-> > > visible in dmesg, i.e. by replacing phydev_dbg() with phydev_info():
-> > > 
-> > > 		phydev_dbg(phydev,
-> > > 			   "Media speed %d uses host interface %s with %s\n",
-> > > 			   syscfg->speed, phy_modes(syscfg->interface),
-> > > 			   syscfg->rate_adapt == AQR_RATE_ADAPT_NONE ? "no rate adaptation" :
-> > > 			   syscfg->rate_adapt == AQR_RATE_ADAPT_PAUSE ? "rate adaptation through flow control" :
-> > > 			   syscfg->rate_adapt == AQR_RATE_ADAPT_USX ? "rate adaptation through symbol replication" :
-> > > 			   "unrecognized rate adaptation type");
+> > > The veth side unfortunately needs more work than Mr Robot points out.
+> > > For some reason veth tries to turn skb into an xdp_frame..  
 > > 
-> > Thanks. Looks like rate adaptation is only provisioned for 10M, which
-> > matches my observation where phylink passes the exact speeds for
-> > 100/1000/2500 but 1000 for 10M.
+> > That is beyond the scope of the fix that I started doing as you're
+> > undermining overall XDP support in veth, IMHO.
+> > 
+> > I can follow up on this on some undefined future but right now I will
+> > have to switch to some other work.
+> > 
+> > If you disagree and insist on addressing skb->xdp_frame in veth within
+> > this patchset then I'm sorry but I will have to postpone my activities
+> > here.
 > 
-> Hmm, I wonder what the PHY is doing for that then. stmmac will be
-> programmed to read the Cisco SGMII in-band control word, and use
-> that to determine whether symbol replication for slower speeds is
-> being used.
-> 
-> If AQR115C is indicating 10M in the in-band control word, but is
-> actually operating the link at 1G speed, things are not going to
-> work, and I would say the PHY is broken to be doing that. The point
-> of the SGMII in-band control word is to tell the MAC about the
-> required symbol replication on the link for transmitting the slower
-> data rates over the link.
-> 
-> stmmac unfortunately doesn't give access to the raw Cisco SGMII
-> in-band control word. However, reading register 0xf8 bits 31:16 for
-> dwmac4, or register 0xd8 bits 15:0 for dwmac1000 will give this
-> information. In that bitfield, bits 2:1 give the speed. 2 = 1G,
-> 1 = 100M, 0 = 10M.
+> Yeah, I understand. A lot of the skb<>XDP integration is a steaming
+> pile IMO, as mentioned elsewhere. I'd like to keep the core clean
+> tho, so if there's some corner cases in veth after your changes
+> I'll live. But I'm worried that the bugs in veth will make you
+> want to preserve the conditional in xdp_convert_skb_to_buff() :(
 
-It might be Linux who is forcing the AQR115C into the nonsensical
-behaviour of advertising 10M in the SGMII control word while
-simultanously forcing the PHY MII to operate at 1G with flow control
-for the 10M media speed.
-
-We don't control the latter, but we do control the former:
-aqr_gen2_config_inband(), if given modes == LINK_INBAND_ENABLE, will
-enable in-band for all media speeds that use PHY_INTERFACE_MODE_SGMII.
-Regardless of how the PHY was provisioned for each media speed, and
-especially regardless of rate matching settings, this function will
-uniformly set the same in-band enabled/disabled setting for all media
-speeds using the same host interface.
-
-If dwmac_integrated_pcs_inband_caps(), as per Russell's patch 1/3,
-reports LINK_INBAND_ENABLE | LINK_INBAND_DISABLE, and if
-aqr_gen2_inband_caps() also reports LINK_INBAND_ENABLE | LINK_INBAND_DISABLE,
-then we're giving phylink_pcs_neg_mode() all the tools it needs to shoot
-itself in the foot, and select LINK_INBAND_ENABLE.
-
-The judgement call in the Aquantia PHY driver was mine, as documented in
-commit 5d59109d47c0 ("net: phy: aquantia: report and configure in-band
-autoneg capabilities"). The idea being that the configuration would have
-been unsupportable anyway given the question that the framework asks:
-"does the PHY use in-band for SGMII, or does it not?"
-
-Assuming the configuration at 10Mbps wasn't always broken, there's only
-one way to know how it was supposed to work: more dumping of the initial
-provisioning, prior to our modification in aqr_gen2_config_inband().
-Ayaan, please re-print the same info with this new untested patch applied.
-I am going to assume that in-band autoneg isn't enabled in the unmodified
-provisioning, at least for 10M.
-
-Russell's request for the integrated PCS status is also a good parallel
-confirmation that yes, we've entered a mode where the PHY advertises
-SGMII replication at 10M.
-
---56qp7pmq6cw7fsz2
-Content-Type: text/x-diff; charset=us-ascii
-Content-Disposition: attachment;
-	filename="0001-net-phy-aquantia-add-inband-setting-to-the-aqr_gen2_.patch"
-
-From b91162e5dae8e20b477999c4f2fcdb98c219d663 Mon Sep 17 00:00:00 2001
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-Date: Mon, 3 Nov 2025 14:03:55 +0200
-Subject: [PATCH] net: phy: aquantia: add inband setting to the
- aqr_gen2_read_global_syscfg() print
-
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
----
- drivers/net/phy/aquantia/aquantia_main.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy/aquantia/aquantia_main.c
-index 41f3676c7f1e..f06b7b51bb7d 100644
---- a/drivers/net/phy/aquantia/aquantia_main.c
-+++ b/drivers/net/phy/aquantia/aquantia_main.c
-@@ -839,6 +839,7 @@ static int aqr_gen2_read_global_syscfg(struct phy_device *phydev)
- 
- 	for (i = 0; i < AQR_NUM_GLOBAL_CFG; i++) {
- 		struct aqr_global_syscfg *syscfg = &priv->global_cfg[i];
-+		bool inband;
- 
- 		syscfg->speed = aqr_global_cfg_regs[i].speed;
- 
-@@ -849,6 +850,7 @@ static int aqr_gen2_read_global_syscfg(struct phy_device *phydev)
- 
- 		serdes_mode = FIELD_GET(VEND1_GLOBAL_CFG_SERDES_MODE, val);
- 		rate_adapt = FIELD_GET(VEND1_GLOBAL_CFG_RATE_ADAPT, val);
-+		inband = FIELD_GET(VEND1_GLOBAL_CFG_AUTONEG_ENA, val);
- 
- 		switch (serdes_mode) {
- 		case VEND1_GLOBAL_CFG_SERDES_MODE_XFI:
-@@ -896,12 +898,13 @@ static int aqr_gen2_read_global_syscfg(struct phy_device *phydev)
- 		}
- 
- 		phydev_dbg(phydev,
--			   "Media speed %d uses host interface %s with %s\n",
-+			   "Media speed %d uses host interface %s with %s, inband %s\n",
- 			   syscfg->speed, phy_modes(syscfg->interface),
- 			   syscfg->rate_adapt == AQR_RATE_ADAPT_NONE ? "no rate adaptation" :
- 			   syscfg->rate_adapt == AQR_RATE_ADAPT_PAUSE ? "rate adaptation through flow control" :
- 			   syscfg->rate_adapt == AQR_RATE_ADAPT_USX ? "rate adaptation through symbol replication" :
--			   "unrecognized rate adaptation type");
-+			   "unrecognized rate adaptation type",
-+			   str_enabled_disabled(inband));
- 	}
- 
- 	return 0;
--- 
-2.43.0
-
-
---56qp7pmq6cw7fsz2--
+Probably the conditional would cover these corner cases, but I am not
+insisting on it. skb_pp_cow_data() is called under certain circumstances
+in veth but I have never seen a case on my side where it was skipped,
+mostly because of headroom size being too small.
 
