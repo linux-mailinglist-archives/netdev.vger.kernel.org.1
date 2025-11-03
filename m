@@ -1,110 +1,163 @@
-Return-Path: <netdev+bounces-234954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECC60C2A1A8
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 06:55:20 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29F2EC2A1D8
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 06:58:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6129B188E575
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 05:55:45 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 282F64ECCDE
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 05:57:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5869E28C871;
-	Mon,  3 Nov 2025 05:55:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E304B28D830;
+	Mon,  3 Nov 2025 05:56:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="s/88iQW+"
 X-Original-To: netdev@vger.kernel.org
-Received: from ssh247.corpemail.net (ssh247.corpemail.net [210.51.61.247])
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63BD8285CAE;
-	Mon,  3 Nov 2025 05:55:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.51.61.247
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED2D828C871;
+	Mon,  3 Nov 2025 05:56:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762149316; cv=none; b=S/Rtj+0mm8sFW/L9uCeEzGwcGwWARAdMMlxMGyk+y7nHtKMgHa1oEUiLYg7ny8IF6rlMKpL1tCPUB5LZKiuM+F00Wilmzf7i/NgAjxT7CuRo99nKpNqVSFXko8x1D7tBX1YBbELw6u8x9DpK+ZhJ4MxzS1s2ERuUf+yLCG1jfhk=
+	t=1762149415; cv=none; b=q86Q2oldahZxPkwT2M6bRqFrLDnOG1TUtC6qFzXNgWxl8mg5AvID+u79nI4y2IuMMIC5r6mGvr9pZIhMMkXt1cJVk/6ot916qmxvKA3TLqJIejSiJhtahh+X8topf82ml8D4zC7c7Vg4VqZLR+NWf3/y+FIkszsZn06w9StU+8s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762149316; c=relaxed/simple;
-	bh=liBptfnPgamIoOT6mYW47OYRRBbzhoA8cwUTZwhASIA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=I76T2bprANukuEqdYvq4tYGzgyXVYm5vSkZqbJkd/8QzLQqszbkl1U/dyxD4y/uWKO5QyHXVGNKgFqQCE0dz8BN/XnMaRW5af13BGoXAmAJ8qDNCZcjYlp39eoNI575akvvuLH+Qm2/QhGKS1/HJ7ZZCWbFiO1MH5dpQnSVQxIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com; spf=pass smtp.mailfrom=inspur.com; arc=none smtp.client-ip=210.51.61.247
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inspur.com
-Received: from Jtjnmail201614.home.langchao.com
-        by ssh247.corpemail.net ((D)) with ASMTP (SSL) id 202511031355070850;
-        Mon, 03 Nov 2025 13:55:07 +0800
-Received: from jtjnmailAR01.home.langchao.com (10.100.2.42) by
- Jtjnmail201614.home.langchao.com (10.100.2.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Mon, 3 Nov 2025 13:55:06 +0800
-Received: from inspur.com (10.100.2.107) by jtjnmailAR01.home.langchao.com
- (10.100.2.42) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
- Transport; Mon, 3 Nov 2025 13:55:06 +0800
-Received: from localhost.localdomain.com (unknown [10.94.13.117])
-	by app3 (Coremail) with SMTP id awJkCsDww_q6Qwhpt7gJAA--.15221S4;
-	Mon, 03 Nov 2025 13:55:06 +0800 (CST)
-From: Chu Guangqing <chuguangqing@inspur.com>
-To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Chu Guangqing
-	<chuguangqing@inspur.com>
-Subject: [PATCH] veth: Fix a typo error in veth
-Date: Mon, 3 Nov 2025 13:53:51 +0800
-Message-ID: <20251103055351.3150-1-chuguangqing@inspur.com>
-X-Mailer: git-send-email 2.43.7
+	s=arc-20240116; t=1762149415; c=relaxed/simple;
+	bh=UMPaZUWzV3Sm6RTTcZV+IfJzOzax8Ccpxq+TavsawBQ=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=VB6Ux3zdPivD9dZoMd6KuPl/JEBgyPnPC3j3Sh1aDvvNCKJ+g/eueUFyD292e68NNtK5LcuYPEl+SJ9jyY0se3IKVavnyrK7YSHeLSrASybHk/RyXNdtES0rxDk/+Wpe7wwxy9GcOCWPDOiuwkeTghcsELBG3w9HMEWxfjQfnlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=s/88iQW+; arc=none smtp.client-ip=115.124.30.113
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1762149409; h=Message-ID:Subject:Date:From:To;
+	bh=Wf5UamBtc1C2iB7hfBSedWXwlFsIRhKJbTDCZQ1GFNQ=;
+	b=s/88iQW+/Ol68Cbcq5mxlTeIt+MudLEXEbUbZp1PfzBL1nk92NpRGz5c1prUOpM2fY62NiPnr1+OWk+nffUKimxL6JaqSb8j5xsP2BZGdsqtrGax+5Mkg9rUq/hDWw2v+5bKqOLPjFZY4Q1iX9rY8+JoDP8a7Fqoq+Wyh4IX0Ic=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WrXoEDB_1762149408 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 03 Nov 2025 13:56:48 +0800
+Message-ID: <1762149401.6256416-7-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net v7] virtio-net: fix received length check in big packets
+Date: Mon, 3 Nov 2025 13:56:41 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Bui Quang Minh <minhquangbui99@gmail.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Gavin Li <gavinl@nvidia.com>,
+ Gavi Teitz <gavi@nvidia.com>,
+ Parav Pandit <parav@nvidia.com>,
+ virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org,
+ Bui Quang Minh <minhquangbui99@gmail.com>,
+ stable@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20251030144438.7582-1-minhquangbui99@gmail.com>
+In-Reply-To: <20251030144438.7582-1-minhquangbui99@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: awJkCsDww_q6Qwhpt7gJAA--.15221S4
-X-Coremail-Antispam: 1UD129KBjvdXoWrGrWfWw1xJF4furW5tryrJFb_yoWxWrX_CF
-	W7WayxXr4YgFy7Kw4Y9r47AryYqw15WF4kCFZag3ya9ayUZF15Kry8ur1DJr1DurW7Ar1D
-	Zr1ftr1DZ347KjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbcAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_GcCE
-	3s1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s
-	1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0
-	cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8Jw
-	ACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_JF0_
-	Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxV
-	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI
-	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
-	4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI
-	42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUr2-eDUUUU
-X-CM-SenderInfo: 5fkxw35dqj1xlqj6x0hvsx2hhfrp/
-X-CM-DELIVERINFO: =?B?QJfRO5RRTeOiUs3aOqHZ50hzsfHKF9Ds6CbXmDm38RucXu3DYXJR7Zlh9zE0nt/Iac
-	D+KbPV6ldG4k/ymFRhMsIeRH0J30b0MeiTb5cNH1w8ExGKCubaJNOkF2TflhkJRMm3MhDV
-	m8yehC3jkbPFRTb8kU8=
-Content-Type: text/plain
-tUid: 202511031355076141a1b02f6d96e57b66e2194516eb9d
-X-Abuse-Reports-To: service@corp-email.com
-Abuse-Reports-To: service@corp-email.com
-X-Complaints-To: service@corp-email.com
-X-Report-Abuse-To: service@corp-email.com
 
-Fix a spellling error for resources
+On Thu, 30 Oct 2025 21:44:38 +0700, Bui Quang Minh <minhquangbui99@gmail.com> wrote:
+> Since commit 4959aebba8c0 ("virtio-net: use mtu size as buffer length
+> for big packets"), when guest gso is off, the allocated size for big
+> packets is not MAX_SKB_FRAGS * PAGE_SIZE anymore but depends on
+> negotiated MTU. The number of allocated frags for big packets is stored
+> in vi->big_packets_num_skbfrags.
+>
+> Because the host announced buffer length can be malicious (e.g. the host
+> vhost_net driver's get_rx_bufs is modified to announce incorrect
+> length), we need a check in virtio_net receive path. Currently, the
+> check is not adapted to the new change which can lead to NULL page
+> pointer dereference in the below while loop when receiving length that
+> is larger than the allocated one.
+>
+> This commit fixes the received length check corresponding to the new
+> change.
+>
+> Fixes: 4959aebba8c0 ("virtio-net: use mtu size as buffer length for big packets")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Bui Quang Minh <minhquangbui99@gmail.com>
 
-Signed-off-by: Chu Guangqing <chuguangqing@inspur.com>
----
- drivers/net/veth.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 
-diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-index a3046142cb8e..87a63c4bee77 100644
---- a/drivers/net/veth.c
-+++ b/drivers/net/veth.c
-@@ -1323,7 +1323,7 @@ static int veth_set_channels(struct net_device *dev,
- 		if (peer)
- 			netif_carrier_off(peer);
- 
--		/* try to allocate new resurces, as needed*/
-+		/* try to allocate new resources, as needed*/
- 		err = veth_enable_range_safe(dev, old_rx_count, new_rx_count);
- 		if (err)
- 			goto out;
--- 
-2.43.7
-
+> ---
+> Changes in v7:
+> - Fix typos
+> - Link to v6: https://lore.kernel.org/netdev/20251028143116.4532-1-minhquangbui99@gmail.com/
+> Changes in v6:
+> - Fix the length check
+> - Link to v5: https://lore.kernel.org/netdev/20251024150649.22906-1-minhquangbui99@gmail.com/
+> Changes in v5:
+> - Move the length check to receive_big
+> - Link to v4: https://lore.kernel.org/netdev/20251022160623.51191-1-minhquangbui99@gmail.com/
+> Changes in v4:
+> - Remove unrelated changes, add more comments
+> - Link to v3: https://lore.kernel.org/netdev/20251021154534.53045-1-minhquangbui99@gmail.com/
+> Changes in v3:
+> - Convert BUG_ON to WARN_ON_ONCE
+> - Link to v2: https://lore.kernel.org/netdev/20250708144206.95091-1-minhquangbui99@gmail.com/
+> Changes in v2:
+> - Remove incorrect give_pages call
+> - Link to v1: https://lore.kernel.org/netdev/20250706141150.25344-1-minhquangbui99@gmail.com/
+> ---
+>  drivers/net/virtio_net.c | 25 ++++++++++++-------------
+>  1 file changed, 12 insertions(+), 13 deletions(-)
+>
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index a757cbcab87f..421b9aa190a0 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -910,17 +910,6 @@ static struct sk_buff *page_to_skb(struct virtnet_info *vi,
+>  		goto ok;
+>  	}
+>
+> -	/*
+> -	 * Verify that we can indeed put this data into a skb.
+> -	 * This is here to handle cases when the device erroneously
+> -	 * tries to receive more than is possible. This is usually
+> -	 * the case of a broken device.
+> -	 */
+> -	if (unlikely(len > MAX_SKB_FRAGS * PAGE_SIZE)) {
+> -		net_dbg_ratelimited("%s: too much data\n", skb->dev->name);
+> -		dev_kfree_skb(skb);
+> -		return NULL;
+> -	}
+>  	BUG_ON(offset >= PAGE_SIZE);
+>  	while (len) {
+>  		unsigned int frag_size = min((unsigned)PAGE_SIZE - offset, len);
+> @@ -2107,9 +2096,19 @@ static struct sk_buff *receive_big(struct net_device *dev,
+>  				   struct virtnet_rq_stats *stats)
+>  {
+>  	struct page *page = buf;
+> -	struct sk_buff *skb =
+> -		page_to_skb(vi, rq, page, 0, len, PAGE_SIZE, 0);
+> +	struct sk_buff *skb;
+> +
+> +	/* Make sure that len does not exceed the size allocated in
+> +	 * add_recvbuf_big.
+> +	 */
+> +	if (unlikely(len > (vi->big_packets_num_skbfrags + 1) * PAGE_SIZE)) {
+> +		pr_debug("%s: rx error: len %u exceeds allocated size %lu\n",
+> +			 dev->name, len,
+> +			 (vi->big_packets_num_skbfrags + 1) * PAGE_SIZE);
+> +		goto err;
+> +	}
+>
+> +	skb = page_to_skb(vi, rq, page, 0, len, PAGE_SIZE, 0);
+>  	u64_stats_add(&stats->bytes, len - vi->hdr_len);
+>  	if (unlikely(!skb))
+>  		goto err;
+> --
+> 2.43.0
+>
 
