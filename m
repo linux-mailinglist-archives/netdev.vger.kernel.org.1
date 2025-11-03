@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-235215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADB0CC2D8ED
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 19:03:18 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD85DC2D92F
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 19:04:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E7051898B6E
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 78C5B4F41FB
 	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 18:03:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DF22271451;
-	Mon,  3 Nov 2025 18:02:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A97BD3164CA;
+	Mon,  3 Nov 2025 18:02:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b9Npa9gu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n+BFTnIn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A481F5423;
-	Mon,  3 Nov 2025 18:02:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F49231D758;
+	Mon,  3 Nov 2025 18:02:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762192970; cv=none; b=hYm/wK1QNJmFSE83wFOtPiwvdyUOqGPavWLtVKPEP/bSI3EHulpDBcxDdpxYC9vyPMfkhO2RruxGIilpCrEk0ZOuRGUAP2egwyPX5PNYbxeedZuz1pIoRsp74fVTxO/XDmWCeBX20jQv08fICer2qNXIqacezj9KxUceU9qjTQY=
+	t=1762192976; cv=none; b=SmIwfciGh5gXE7804CaRz9hOyQkAMlLs5jJd+yBvHPxriBvGyPoIoNbKFrouItdmMNktjg/uvAsrJk89D0DMnvVhI22zf3ATBzgxGLQ7wQZarevtFjF/eKIwL+KfsgYO55m6GYQThG6Y5wUXdIIBIZgG8w8Y/I2HjnZC8iejve4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762192970; c=relaxed/simple;
-	bh=MWYbq8OHmL6A4bvD+zQP/2PU0TiqJFlKMzgfi1rxnK4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DD1IOA2IkFxDObhP6I37YQugyWCvH2wAjbWQsjMhYI00f3gBY0FRZ62gYeQYsb+nxIAwGYRWn5YUsjwjNmySoswNv7aD94F4+I3DQaQIJQhtCppa+5PU12Ro0HsGlr/FaLAqTldqD2jtRaC/r/oPJ+YZYC7/Ypy5EvwuitSLRH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b9Npa9gu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C396C116C6;
-	Mon,  3 Nov 2025 18:02:48 +0000 (UTC)
+	s=arc-20240116; t=1762192976; c=relaxed/simple;
+	bh=1ACGgZFpWtwXge4QClLOxJUBjQtEGHahQBEj+n93TOY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=snpGIE9ILN+H+xsWohY0heFj3e1uWkM/hqmDaMj5tuLIF6lQgGviZNs8kuTgmKFaw4ggqJyTnYVLdVq8KS4WY+vovYOBPvUSznSpMYk3Wb8N8GkHSxf2J2/ixkJlCtc09lGMz0kE5Vzlz2pIn9l4qYm70kotd2MoqrcVufZH3lI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n+BFTnIn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DEF7C4CEE7;
+	Mon,  3 Nov 2025 18:02:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762192969;
-	bh=MWYbq8OHmL6A4bvD+zQP/2PU0TiqJFlKMzgfi1rxnK4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=b9Npa9guD0xIaLdDh9mQF9oF04Bq/hI7bYzJBrk+1Jw1SIk2OCU4Jkbvmh2qlO+3a
-	 hrD64t5UW8/BsZXW2shZY9iWhKQ0cPxXYMJkjy/MZyTs37uqh65H0Nfm8/Wh5+R7xO
-	 Pw0riImXXnIXtzP8kvaoMUbMvvVkhKRJAG3L+CcXV9uP8EH0A7Cf3erZYZ+WqTVi2i
-	 Vs/iBIxPQQfjbR5aL2NzbhqcjxvaSe+StPr9/Ry/o/IAB8enO+G+MgOyXMvP9ZzRHZ
-	 7LNnFHT4HzxK7G35Xm8mJ71yCgPzvqQ88jMnWAHni2BpfhxQcrfeekt7iZOnA5KM7i
-	 R3uuUEp9bymLQ==
+	s=k20201202; t=1762192976;
+	bh=1ACGgZFpWtwXge4QClLOxJUBjQtEGHahQBEj+n93TOY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=n+BFTnInuetONOQPbI3A0Kns7/YQosgD/AY/aY9g747U0t+O/pd5fvL9oOWeRMRn/
+	 qcMNlEMESl0MfCTts3fRD70hioGC1wbBUjLQiaB02PhCQxftzYWJduXJ0GGdUlfVoz
+	 OEKKxUFi4+PylNZD0oqdHPLhGFM5HA5QQFop2DkhVTgjZrSvjw6t6ncmuCvTJmG1RS
+	 zP0ife6NUyxE5uw5W20uAlHVD1/4SqYryg95Ns6cTu0pC9rpi6CicFr5dqQyQ56E/h
+	 v6XH8hTYC1oeKnnOlBWqNRz624hRaLSuUWKXdHz3UABxE7WSRxJCpjsTh1pRrlBGdH
+	 QGOOC1Wy+9bnA==
 From: Sasha Levin <sashal@kernel.org>
 To: patches@lists.linux.dev,
 	stable@vger.kernel.org
@@ -52,11 +53,15 @@ Cc: Shahar Shitrit <shshitrit@nvidia.com>,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
+	alexandre.f.demers@gmail.com,
+	kuniyu@google.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.17-5.10] net: tls: Cancel RX async resync request on rcd_delta overflow
-Date: Mon,  3 Nov 2025 13:02:14 -0500
-Message-ID: <20251103180246.4097432-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.17-6.12] net: tls: Change async resync helpers argument
+Date: Mon,  3 Nov 2025 13:02:17 -0500
+Message-ID: <20251103180246.4097432-4-sashal@kernel.org>
 X-Mailer: git-send-email 2.51.0
+In-Reply-To: <20251103180246.4097432-1-sashal@kernel.org>
+References: <20251103180246.4097432-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,221 +76,275 @@ Content-Transfer-Encoding: 8bit
 
 From: Shahar Shitrit <shshitrit@nvidia.com>
 
-[ Upstream commit c15d5c62ab313c19121f10e25d4fec852bd1c40c ]
+[ Upstream commit 34892cfec0c2d96787c4be7bda0d5f18d7dacf85 ]
 
-When a netdev issues a RX async resync request for a TLS connection,
-the TLS module handles it by logging record headers and attempting to
-match them to the tcp_sn provided by the device. If a match is found,
-the TLS module approves the tcp_sn for resynchronization.
+Update tls_offload_rx_resync_async_request_start() and
+tls_offload_rx_resync_async_request_end() to get a struct
+tls_offload_resync_async parameter directly, rather than
+extracting it from struct sock.
 
-While waiting for a device response, the TLS module also increments
-rcd_delta each time a new TLS record is received, tracking the distance
-from the original resync request.
-
-However, if the device response is delayed or fails (e.g due to
-unstable connection and device getting out of tracking, hardware
-errors, resource exhaustion etc.), the TLS module keeps logging and
-incrementing, which can lead to a WARN() when rcd_delta exceeds the
-threshold.
-
-To address this, introduce tls_offload_rx_resync_async_request_cancel()
-to explicitly cancel resync requests when a device response failure is
-detected. Call this helper also as a final safeguard when rcd_delta
-crosses its threshold, as reaching this point implies that earlier
-cancellation did not occur.
+This change aligns the function signatures with the upcoming
+tls_offload_rx_resync_async_request_cancel() helper, which
+will be introduced in a subsequent patch.
 
 Signed-off-by: Shahar Shitrit <shshitrit@nvidia.com>
 Reviewed-by: Sabrina Dubroca <sd@queasysnail.net>
 Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-Link: https://patch.msgid.link/1761508983-937977-3-git-send-email-tariqt@nvidia.com
+Link: https://patch.msgid.link/1761508983-937977-2-git-send-email-tariqt@nvidia.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
 
 LLM Generated explanations, may be completely bogus:
 
-Based on my semantic analysis of the kernel repository, here is my
-comprehensive assessment:
+## Analysis Result: YES (as part of series)
 
-## **VERDICT: YES**
+**Backport Status: YES** - But only as a dependency for the complete bug
+fix series.
 
-This commit should be backported to stable kernel trees.
+### Comprehensive Analysis
 
-## **Detailed Analysis**
+#### 1. Semantic Code Analysis Performed
 
-### **1. Semantic Code Analysis Tools Used**
+**Tools Used:**
+- `mcp__semcode__find_function`: Located both modified functions in
+  include/net/tls.h:454-463
+- `mcp__semcode__find_callers`: Identified impact scope - only 2 call
+  sites total
+- `mcp__semcode__find_type`: Examined struct tls_offload_resync_async
+  structure
+- `git log` and `git show`: Traced patch series context and dependencies
 
-I used the following semantic analysis tools to examine this commit:
+**Key Findings:**
 
-- **mcp__semcode__find_function**: Located `tls_device_rx_resync_async`,
-  `tls_device_rx_resync_new_rec`, and
-  `tls_offload_rx_resync_async_request_start`
-- **mcp__semcode__find_type**: Examined `struct
-  tls_offload_resync_async` structure
-- **mcp__semcode__find_callers**: Traced the call graph upward from
-  affected functions
-- **mcp__semcode__find_callchain**: Built complete call chain from user
-  space to the bug location
-- **Git tools**: Analyzed commit history, dependencies, and related
-  fixes
+1. **Function Signatures Changed:**
+   - `tls_offload_rx_resync_async_request_start()` -
+     include/net/tls.h:454
+   - `tls_offload_rx_resync_async_request_end()` - include/net/tls.h:466
+   - Both are static inline helpers with very limited scope
 
-### **2. Impact Analysis Results**
+2. **Impact Scope (via mcp__semcode__find_callers):**
+   - `tls_offload_rx_resync_async_request_start()` → 1 caller:
+     `resync_update_sn()` in
+     drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c:482
+   - `tls_offload_rx_resync_async_request_end()` → 1 caller:
+     `mlx5e_ktls_handle_get_psv_completion()` in
+     drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c:423
+   - **Total impact: 2 call sites, both in mlx5 kTLS driver**
 
-**Call Chain Discovery** (from user-space to bug):
-```
-User recvmsg() syscall
-  → tls_sw_recvmsg (net/tls/tls_sw.c:2031)
-    → tls_strp_read_sock (net/tls/tls_strp.c:514)
-      → tls_rx_msg_size (net/tls/tls_sw.c:2441)
-        → tls_device_rx_resync_new_rec (net/tls/tls_device.c:767)
-          → tls_device_rx_resync_async (net/tls/tls_device.c:712) ←
-**BUG HERE**
-```
+3. **Structural Analysis:**
+   - struct tls_offload_resync_async: Simple structure with atomic64_t
+     and counters
+   - No complex dependencies or architectural changes
 
-**User-Space Exposure**: This is **100% user-space triggerable**. Any
-application receiving TLS data with hardware offload enabled can hit
-this code path.
+#### 2. Code Change Analysis
 
-**Affected Hardware**: Only Mellanox/NVIDIA mlx5 NICs currently use
-async TLS resync (found via semantic search:
-`drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c`)
-
-### **3. Bug Description**
-
-**Current behavior (without patch)**:
-At line net/tls/tls_device.c:726-727:
+**What Changed:**
 ```c
-if (WARN_ON_ONCE(resync_async->rcd_delta == USHRT_MAX))
-    return false;
-```
+// OLD API:
+tls_offload_rx_resync_async_request_start(struct sock *sk, __be32 seq,
+u16 len)
+{
+    struct tls_context *tls_ctx = tls_get_ctx(sk);
+    struct tls_offload_context_rx *rx_ctx = tls_offload_ctx_rx(tls_ctx);
+    // Use rx_ctx->resync_async
+}
 
-When `rcd_delta` reaches 65535 (USHRT_MAX):
-- WARN() fires, polluting kernel logs
-- Function returns false, BUT doesn't cancel the resync request
-- `resync_async->req` remains set (still "active")
-- Every subsequent TLS record continues processing in async mode
-- Results in continuous WARN() spam and wasted CPU cycles
-
-**Fixed behavior (with patch)**:
-```c
-if (WARN_ON_ONCE(resync_async->rcd_delta == USHRT_MAX)) {
-    tls_offload_rx_resync_async_request_cancel(resync_async);  // ← NEW
-    return false;
+// NEW API:
+tls_offload_rx_resync_async_request_start(struct
+tls_offload_resync_async *resync_async,
+                                          __be32 seq, u16 len)
+{
+    // Use resync_async directly
 }
 ```
 
-The new helper properly cancels the resync by setting
-`atomic64_set(&resync_async->req, 0)`, preventing further async
-processing.
+**Behavioral Impact:** NONE - This is pure refactoring. The same
+`resync_async` pointer is now passed directly instead of being extracted
+from `sk`. The actual operations performed are identical.
 
-### **4. Triggering Conditions**
+#### 3. Patch Series Context Discovery
 
-The bug triggers in real-world scenarios:
-- Packet drops/reordering in the network
-- Device hardware errors
-- Device resource exhaustion
-- Unstable network connections
-- Device losing track of TLS record state
+This commit is **part 1 of a 3-commit series**:
 
-After device fails to respond, the kernel continues logging every TLS
-record header and incrementing `rcd_delta` until overflow occurs (65,535
-TLS records ≈ realistic in high-throughput scenarios).
+**Commit 1 (34892cfec0c2d - THIS COMMIT):** "net: tls: Change async
+resync helpers argument"
+- Preparatory refactoring
+- Changes function signatures to accept `resync_async` directly
+- Link: https://patch.msgid.link/1761508983-937977-**2**-git-send-email-
+  tariqt@nvidia.com
+- **No functional changes**
 
-### **5. Code Change Scope**
+**Commit 2 (c15d5c62ab313):** "net: tls: Cancel RX async resync request
+on rcd_delta overflow"
+- Introduces `tls_offload_rx_resync_async_request_cancel()` helper
+- This is the function mentioned in commit 1's message as "upcoming"
+- Addresses WARN() triggered when rcd_delta exceeds threshold
+- Link: https://patch.msgid.link/1761508983-937977-**3**-git-send-email-
+  tariqt@nvidia.com
 
-**Minimal and contained**:
-- Adds 6-line helper function
-  `tls_offload_rx_resync_async_request_cancel()`
-- Modifies 2 lines at overflow check (adds braces + function call)
-- Total: +9 lines, -1 line
-- Files: `include/net/tls.h`, `net/tls/tls_device.c`
+**Commit 3 (426e9da3b2840):** "net/mlx5e: kTLS, Cancel RX async resync
+request in error flows"
+- **Contains "Fixes: 0419d8c9d8f8" tag** - indicates this fixes a real
+  bug
+- Uses the new cancel function to fix error handling
+- Prevents WARN() when device fails to respond or delays response
+- Link: https://patch.msgid.link/1761508983-937977-**4**-git-send-email-
+  tariqt@nvidia.com
 
-### **6. Dependency Analysis**
+#### 4. Bug Description from Series
 
-**Critical**: This commit is a **stable dependency** for commit
-426e9da3b284 ("net/mlx5e: kTLS, Cancel RX async resync request in error
-flows"), which:
-- Has explicit `Fixes: 0419d8c9d8f8` tag (kTLS RX resync support from
-  ~2019)
-- Uses the new `tls_offload_rx_resync_async_request_cancel()` helper
-- Addresses the root cause in the mlx5 driver
+**The Bug Being Fixed:**
+When a TLS device loses track of records and requests async resync, but
+then fails to respond (due to packet drops, hardware errors, resource
+exhaustion, etc.), the software keeps incrementing `rcd_delta` without
+bounds, eventually triggering a WARN().
 
-Without this commit, the mlx5 fix cannot be applied.
+**Impact:** Affects mlx5 hardware TLS offload users who experience
+network issues or hardware problems.
 
-### **7. Backport Status**
+#### 5. Evidence of Existing Backport
 
-Already being backported:
-- cd4ff87174242: Backport with "Stable-dep-of: 426e9da3b284" tag
-- 689074947f008: Another stable backport
-- Shows active stable tree maintenance
+Found commit `1a0dc2d7707a1` which shows:
+```
+[ Upstream commit 34892cfec0c2d96787c4be7bda0d5f18d7dacf85 ]
+...
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+```
 
-### **8. Stable Tree Compliance**
+This proves the stable tree maintainers have **already decided to
+backport this commit**.
 
-✅ **Fixes important bug**: Prevents kernel log spam and CPU waste
-✅ **No new features**: Pure bug fix
-✅ **No architectural changes**: Adds one helper function
-✅ **Minimal regression risk**: Only 10 lines, affects rare code path
-✅ **Confined to subsystem**: TLS offload only
-✅ **Dependency for other fixes**: Required by mlx5 driver fix
-✅ **Well-reviewed**: Reviewed-by Sabrina Dubroca (TLS subsystem expert)
-✅ **Hardware vendor submission**: NVIDIA engineers with hardware
-knowledge
+#### 6. Stable Tree Compliance Assessment
 
-### **9. Risk Assessment**
+**Against stable rules (if standalone):**
+- ❌ Not a bug fix itself
+- ❌ No "Cc: stable@vger.kernel.org" tag
+- ❌ No "Fixes:" tag
+- ❌ Preparatory refactoring for future work
+- ❌ Changes API signatures
 
-**Very low risk**:
-- Change only affects TLS hardware offload users (small subset)
-- Only triggers at overflow condition (previously broken anyway)
-- No modification to hot path - only error handling
-- Well-tested by NVIDIA (hardware vendor)
-- Already merged in mainline v6.18-rc4
-- Being actively backported to other stable trees
+**For stable rules (as part of series):**
+- ✅ Required dependency for bug fix (commit 3)
+- ✅ Small, contained change (2 call sites)
+- ✅ No behavioral changes (pure refactoring)
+- ✅ Enables proper fix for WARN() trigger
+- ✅ The bug affects real users with mlx5 hardware
 
-### **Conclusion**
+#### 7. Recommendation Rationale
 
-This is a textbook example of an ideal stable backport candidate: small,
-focused, fixes real user-visible issues, has dependencies, low risk, and
-already has stable tree activity. The semantic analysis confirms user-
-space can trigger this bug through normal TLS operations with hardware
-offload enabled.
+**YES - This commit should be backported, BUT:**
 
- include/net/tls.h    | 6 ++++++
- net/tls/tls_device.c | 4 +++-
- 2 files changed, 9 insertions(+), 1 deletion(-)
+1. **Only as part of the complete 3-commit series** - Backporting this
+   alone is pointless since it's purely preparatory.
 
+2. **The actual bug fix (commit 3) justifies the series** - It has a
+   Fixes: tag and addresses a real issue where hardware TLS offload can
+   trigger kernel WARN()s.
+
+3. **Low risk profile:**
+   - Very limited scope (2 call sites in one driver)
+   - No behavioral changes
+   - Required for the bug fix to apply cleanly
+
+4. **Already accepted by stable maintainers** - The presence of the
+   backported version signed by Sasha Levin confirms this is appropriate
+   for stable trees.
+
+**Conclusion:** This commit meets the criteria for backporting **as a
+dependency** for a legitimate bug fix, not as a standalone change. The
+stable kernel rules allow preparatory commits when they're necessary for
+applying important bug fixes, which is exactly this case.
+
+ .../mellanox/mlx5/core/en_accel/ktls_rx.c     |  9 ++++++--
+ include/net/tls.h                             | 21 +++++++------------
+ 2 files changed, 15 insertions(+), 15 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c
+index 65ccb33edafb7..c0089c704c0cc 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c
+@@ -425,12 +425,14 @@ void mlx5e_ktls_handle_get_psv_completion(struct mlx5e_icosq_wqe_info *wi,
+ {
+ 	struct mlx5e_ktls_rx_resync_buf *buf = wi->tls_get_params.buf;
+ 	struct mlx5e_ktls_offload_context_rx *priv_rx;
++	struct tls_offload_context_rx *rx_ctx;
+ 	u8 tracker_state, auth_state, *ctx;
+ 	struct device *dev;
+ 	u32 hw_seq;
+ 
+ 	priv_rx = buf->priv_rx;
+ 	dev = mlx5_core_dma_dev(sq->channel->mdev);
++	rx_ctx = tls_offload_ctx_rx(tls_get_ctx(priv_rx->sk));
+ 	if (unlikely(test_bit(MLX5E_PRIV_RX_FLAG_DELETING, priv_rx->flags)))
+ 		goto out;
+ 
+@@ -447,7 +449,8 @@ void mlx5e_ktls_handle_get_psv_completion(struct mlx5e_icosq_wqe_info *wi,
+ 	}
+ 
+ 	hw_seq = MLX5_GET(tls_progress_params, ctx, hw_resync_tcp_sn);
+-	tls_offload_rx_resync_async_request_end(priv_rx->sk, cpu_to_be32(hw_seq));
++	tls_offload_rx_resync_async_request_end(rx_ctx->resync_async,
++						cpu_to_be32(hw_seq));
+ 	priv_rx->rq_stats->tls_resync_req_end++;
+ out:
+ 	mlx5e_ktls_priv_rx_put(priv_rx);
+@@ -482,6 +485,7 @@ static bool resync_queue_get_psv(struct sock *sk)
+ static void resync_update_sn(struct mlx5e_rq *rq, struct sk_buff *skb)
+ {
+ 	struct ethhdr *eth = (struct ethhdr *)(skb->data);
++	struct tls_offload_resync_async *resync_async;
+ 	struct net_device *netdev = rq->netdev;
+ 	struct net *net = dev_net(netdev);
+ 	struct sock *sk = NULL;
+@@ -528,7 +532,8 @@ static void resync_update_sn(struct mlx5e_rq *rq, struct sk_buff *skb)
+ 
+ 	seq = th->seq;
+ 	datalen = skb->len - depth;
+-	tls_offload_rx_resync_async_request_start(sk, seq, datalen);
++	resync_async = tls_offload_ctx_rx(tls_get_ctx(sk))->resync_async;
++	tls_offload_rx_resync_async_request_start(resync_async, seq, datalen);
+ 	rq->stats->tls_resync_req_start++;
+ 
+ unref:
 diff --git a/include/net/tls.h b/include/net/tls.h
-index b90f3b675c3c4..c7bcdb3afad75 100644
+index 857340338b694..b90f3b675c3c4 100644
 --- a/include/net/tls.h
 +++ b/include/net/tls.h
-@@ -467,6 +467,12 @@ tls_offload_rx_resync_async_request_end(struct tls_offload_resync_async *resync_
- 	atomic64_set(&resync_async->req, ((u64)ntohl(seq) << 32) | RESYNC_REQ);
+@@ -451,25 +451,20 @@ static inline void tls_offload_rx_resync_request(struct sock *sk, __be32 seq)
+ 
+ /* Log all TLS record header TCP sequences in [seq, seq+len] */
+ static inline void
+-tls_offload_rx_resync_async_request_start(struct sock *sk, __be32 seq, u16 len)
++tls_offload_rx_resync_async_request_start(struct tls_offload_resync_async *resync_async,
++					  __be32 seq, u16 len)
+ {
+-	struct tls_context *tls_ctx = tls_get_ctx(sk);
+-	struct tls_offload_context_rx *rx_ctx = tls_offload_ctx_rx(tls_ctx);
+-
+-	atomic64_set(&rx_ctx->resync_async->req, ((u64)ntohl(seq) << 32) |
++	atomic64_set(&resync_async->req, ((u64)ntohl(seq) << 32) |
+ 		     ((u64)len << 16) | RESYNC_REQ | RESYNC_REQ_ASYNC);
+-	rx_ctx->resync_async->loglen = 0;
+-	rx_ctx->resync_async->rcd_delta = 0;
++	resync_async->loglen = 0;
++	resync_async->rcd_delta = 0;
  }
  
-+static inline void
-+tls_offload_rx_resync_async_request_cancel(struct tls_offload_resync_async *resync_async)
-+{
-+	atomic64_set(&resync_async->req, 0);
-+}
-+
  static inline void
- tls_offload_rx_resync_set_type(struct sock *sk, enum tls_offload_sync_type type)
+-tls_offload_rx_resync_async_request_end(struct sock *sk, __be32 seq)
++tls_offload_rx_resync_async_request_end(struct tls_offload_resync_async *resync_async,
++					__be32 seq)
  {
-diff --git a/net/tls/tls_device.c b/net/tls/tls_device.c
-index a82fdcf199690..bb14d9b467f28 100644
---- a/net/tls/tls_device.c
-+++ b/net/tls/tls_device.c
-@@ -723,8 +723,10 @@ tls_device_rx_resync_async(struct tls_offload_resync_async *resync_async,
- 		/* shouldn't get to wraparound:
- 		 * too long in async stage, something bad happened
- 		 */
--		if (WARN_ON_ONCE(resync_async->rcd_delta == USHRT_MAX))
-+		if (WARN_ON_ONCE(resync_async->rcd_delta == USHRT_MAX)) {
-+			tls_offload_rx_resync_async_request_cancel(resync_async);
- 			return false;
-+		}
+-	struct tls_context *tls_ctx = tls_get_ctx(sk);
+-	struct tls_offload_context_rx *rx_ctx = tls_offload_ctx_rx(tls_ctx);
+-
+-	atomic64_set(&rx_ctx->resync_async->req,
+-		     ((u64)ntohl(seq) << 32) | RESYNC_REQ);
++	atomic64_set(&resync_async->req, ((u64)ntohl(seq) << 32) | RESYNC_REQ);
+ }
  
- 		/* asynchronous stage: log all headers seq such that
- 		 * req_seq <= seq <= end_seq, and wait for real resync request
+ static inline void
 -- 
 2.51.0
 
