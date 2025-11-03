@@ -1,286 +1,178 @@
-Return-Path: <netdev+bounces-235100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9257C2BF98
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 14:09:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AE27C2C001
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 14:12:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0903F4F7936
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 12:59:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D9AB3A66AA
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 13:04:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F5AC319860;
-	Mon,  3 Nov 2025 12:53:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08DF13043C7;
+	Mon,  3 Nov 2025 13:04:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UZy46lcd"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="Q3ErgN6d";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="UPrUUgYo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB2DF316900;
-	Mon,  3 Nov 2025 12:53:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F86630CDB6
+	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 13:04:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762174426; cv=none; b=t4Bo9JmaBogps6Kff72DjzvbiXl9kepFmUhalNs57JNKw+JTgXe8KOVG+WicAOPNlG5/Wr73KbvVwazwsuEPpJ3+unHjry1amqc3HRDr+pw20YygnNm9ZbAY9KrmAvhZiTzIeclIIu2wzygNvO4sNXYX9avL1JPq0xeBST8yZN0=
+	t=1762175067; cv=none; b=BhPpffZ34JWPloBgeN5MAGeqO+rHhlFyamzzQvi3eIij2fX3nYO850sgHssu4kO5jUGWqbmmit74rkOFEIsTHQEI/t94bAauglCC6y6o6DIgKUcAl744e90caTrgTP6xC8q1hv1BdVwBJlPfARRxbaa2xnzhF0VDyFmjGSxyoKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762174426; c=relaxed/simple;
-	bh=8uFhmfmnSTsd3LwYNioQRWlGjzSH6flkvXdmZ7xJmTo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=EbsEUkDF2UWRLq76QZq2IUIpLp/r0e0/Jd49uncc3NQ0d8/ldb+CBZgejQQ1aigxm7aZZMIbltepfeHpTkLeXZxqX4yzypemScabHMG34+Y6bqObMkBr8xJ7D3rKZ1efbgC7fTc+mwIJoC8gStjH6n/RjF+OtUhbIU2S29yz1xU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UZy46lcd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 55065C4CEFD;
-	Mon,  3 Nov 2025 12:53:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762174425;
-	bh=8uFhmfmnSTsd3LwYNioQRWlGjzSH6flkvXdmZ7xJmTo=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=UZy46lcdxkdwdD7k/LcTRSceh8zX3S3g9dEPASZINosJ0wq4VudvTign/zucCqkhO
-	 U/HumBS/ogNj0UAHdCoLb9SWwMDbvJiUqJ8hO/g+9Jl33NZ8GpH2NTc7ceqGdQoyPL
-	 BPnu3Vo2PbaZM+NhGNbw+pmP9m7Se+cKjl60VcJj3pVNEIroOY2e/vxdaRbxo2QCOJ
-	 svPO6nesEO007JYL9lchSAERwiMnJ1IrXaDZbqweDgnH60fyvX2q2RTIdJoz7WnpuL
-	 ocjZA5DIerFY00vxv4cwzrHI24HTV5WG+WPYwPB+Z3UDfFj4N3/nwKY+h+rBiy7m3/
-	 8VMAOXSqRHDbA==
-From: Jeff Layton <jlayton@kernel.org>
-Date: Mon, 03 Nov 2025 07:52:44 -0500
-Subject: [PATCH v4 16/17] nfsd: wire up GET_DIR_DELEGATION handling
+	s=arc-20240116; t=1762175067; c=relaxed/simple;
+	bh=3c54EP5IAkw52tZkzmTqv588mC9yLN+3CNs3RYEHqZ0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YsZxAwgOTaMvM+hXOM8KbR+1hxbaol5Lcq7m2GrRS7n1Yrth/wMEBjNepAzR+3W6yV5+sJ/dDjKxLBYUlBJ8KFb4+HxTp6yEiyjbOBr3bkYLdqFWTuo4qCmBQ54ATtiFwNiYXPjpTH4LHsn63GE19I2zGYjVJ6cMybubU15UZbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=Q3ErgN6d; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=UPrUUgYo; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5A368YC12269733
+	for <netdev@vger.kernel.org>; Mon, 3 Nov 2025 13:04:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	jT/a3Ji9mpcq0m1ZyxECMgjBQ2CkfXVS5sNckHRxbyI=; b=Q3ErgN6dm6gSmcE3
+	m+ljPGqdES1WAQJSF6rn7b5WWD47JUj3MX28fHyWKitTt66k0OvjK4cYQPgYQuyR
+	NMalKe3qYa+8uiS5ZkUXC8bVF+9JXWweC5l0/R5fk+qU6j0/Ga71x+4AFj58nxMQ
+	f3S2Bq1zeWONE/NgyG1qiSAoVD6Zqs1skK+cNy1mU7YqTjcpivSCLAvUR4HUGTRn
+	fk87hqBGukyQdHhnJdq1HHum91uHL9EXxI00bftl2k6zUE1UfVt1hp0qyt1lMNG/
+	L3gnuy6L7PSrTngDe2RpjiQYhcUAOp4FFrpE7XJTtd1M5FrWDuvven662KbToB64
+	GIREKw==
+Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4a6pv796ay-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Mon, 03 Nov 2025 13:04:24 +0000 (GMT)
+Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-2956a694b47so18452665ad.1
+        for <netdev@vger.kernel.org>; Mon, 03 Nov 2025 05:04:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1762175063; x=1762779863; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jT/a3Ji9mpcq0m1ZyxECMgjBQ2CkfXVS5sNckHRxbyI=;
+        b=UPrUUgYorSB2v1pvBAEb8m8F0DaSx/DXUoopclc7RhZ/+wm0X0RO1YZMQNBvfCnb1i
+         wXa+cwWP/d1Tvq0t8WLgOacPziqj2CLRto+ygI+sNeRqkGfVpH/qbl44K6G3pxnlUo5V
+         lyEAxXn3xi5P6s4VV0QWj4UMkvTJ05mEKaB5a0LoYUkK3kCfverbQc0yfLU/2gnwGJqr
+         RiMIJ3wccHEz75wOw7uwfjA9BBGU1Nx++DjK8+lPsMJY6XMacirqAD2Pvu4pl2mZ5TKd
+         +M+XnEIN/sKySje8lrSVdP1G+RYrvo3YH0kuZhgIoSamconGVKBpYMok0dpI9ug3bv8y
+         1rwQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762175063; x=1762779863;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jT/a3Ji9mpcq0m1ZyxECMgjBQ2CkfXVS5sNckHRxbyI=;
+        b=a94KtdJOLAnlhLfLMO7pbbqq75n/OASfWNbY2NVGIBRnHVyLhlc8bAPubudYkASTY7
+         pFTjPtGDYWLCABC5gFdW6gFCBWdH8rGi68/7oO4QUIYeeIKps9ClQfBAFtDCdQJL6cxF
+         XlXxtUmomLW/egoHekFk6GnlxGxYhcVF+KhojkspOS+Yjj352jAQebAkMZJO4LKhaeNa
+         8OFWLd7o/5O2ugutryQsOC8gofXyjbnOL++VfZPBwRssYvWpLvtFRsAcMVelPovpdfdI
+         QFN1huViJiXivt/TKKF5TVYqWCkhb+73UJom0Dh1yZLZ+Z/l7Jd4NTpFYHY8rXRDCZRr
+         4ClA==
+X-Forwarded-Encrypted: i=1; AJvYcCXqH/5V7NCRM8KKPj0qvuWxVaf4pNfOT3W3JTYE/Plk82Xev4v5ZJmuFEVLKcKLeelnmvaD+h0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHRsC3VGaGHzYyIDG+oYU6HSLwkLkItJMEAtBmptGu03Kq+y1q
+	Xs+9XE8cO7laKHwHy2FLBEsYB3x4Vz/06sSj777o4oPlYCPqIxK20qgtiVvS7hK5zB1wji3umF/
+	f+gbfNDtlthjXpYnd+LRSWEgieMJ5Zrv04FU6f7hdsqYDsNyqA7dchXbGCa0=
+X-Gm-Gg: ASbGncvobaNzdXcViCJHvib8447jp9iBv8bBlq4kvY7WEmCWfgZi+NZdgxcHFFIZSIF
+	8wH+BDyxa7f6TlZx811dVZAJpsdxH6VPO4MK2U3e8G4/GdhkvKOtUSsMcPfh5MuUCURSWbUqJXL
+	MZot3+FA+laYL1J3hGG41LW5T/L5SK6sGBYYPjFzS9CJrhn9gilDq118HY1SRAQN5TMmpLeD7un
+	qouO7KITgvhsm3heu8AYjuGykPGL8nWYVaXdaNVgOLrap2yzE9AMDiyzRqZTr23+BXGSyFWbvYr
+	rijRkzXDhahUtcqs8WqLJsKMFf3pI/NLPKOsSr9l6g0mlmWOfsFo2MDq0eNdXVsDHtKZ3yLGTR3
+	7HcjzMcFlDQJ33Ys6vQHGP/Y99et6dX1PeHi0XBScbNbvZin6KZJH9XNHNvL75w3MYYc4Bg==
+X-Received: by 2002:a17:902:ec86:b0:295:b46f:a6c2 with SMTP id d9443c01a7336-295b46fa745mr36867505ad.37.1762175063157;
+        Mon, 03 Nov 2025 05:04:23 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEz0jwlEN2SbqhNT4mzZ63FJUWWpupWmg4sZ2wmy+yOiJPvDDb2lPEamXhnh338ITlESy3nqg==
+X-Received: by 2002:a17:902:ec86:b0:295:b46f:a6c2 with SMTP id d9443c01a7336-295b46fa745mr36867135ad.37.1762175062590;
+        Mon, 03 Nov 2025 05:04:22 -0800 (PST)
+Received: from [10.133.33.69] (tpe-colo-wan-fw-bordernet.qualcomm.com. [103.229.16.4])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-295268cb73dsm119737495ad.44.2025.11.03.05.04.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Nov 2025 05:04:22 -0800 (PST)
+Message-ID: <49b46127-f74e-47ac-aa4a-e5a5bb013e41@oss.qualcomm.com>
+Date: Mon, 3 Nov 2025 21:04:17 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] ptp: ocp: Add newline to sysfs attribute output
+To: Jakub Kicinski <kuba@kernel.org>,
+        Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: richardcochran@gmail.com, jonathan.lemon@gmail.com, andrew+netdev@lunn.ch,
+        davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        zhongqiu.han@oss.qualcomm.com
+References: <20251030124519.1828058-1-zhongqiu.han@oss.qualcomm.com>
+ <20251031165903.4b94aa66@kernel.org>
+ <aef3b850-5f38-4c28-a018-3b0006dc2f08@linux.dev>
+ <20251102160028.42a56bfb@kernel.org>
+Content-Language: en-US
+From: Zhongqiu Han <zhongqiu.han@oss.qualcomm.com>
+In-Reply-To: <20251102160028.42a56bfb@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251103-dir-deleg-ro-v4-16-961b67adee89@kernel.org>
-References: <20251103-dir-deleg-ro-v4-0-961b67adee89@kernel.org>
-In-Reply-To: <20251103-dir-deleg-ro-v4-0-961b67adee89@kernel.org>
-To: Miklos Szeredi <miklos@szeredi.hu>, 
- Alexander Viro <viro@zeniv.linux.org.uk>, 
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
- Chuck Lever <chuck.lever@oracle.com>, 
- Alexander Aring <alex.aring@gmail.com>, 
- Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
- Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
- Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
- Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
- Bharath SM <bharathsm@microsoft.com>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
- David Howells <dhowells@redhat.com>, Tyler Hicks <code@tyhicks.com>, 
- NeilBrown <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>, 
- Dai Ngo <Dai.Ngo@oracle.com>, Amir Goldstein <amir73il@gmail.com>, 
- Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>, 
- Sergey Senozhatsky <senozhatsky@chromium.org>, 
- Carlos Maiolino <cem@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
- samba-technical@lists.samba.org, netfs@lists.linux.dev, 
- ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org, 
- linux-xfs@vger.kernel.org, netdev@vger.kernel.org, 
- Jeff Layton <jlayton@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5577; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=8uFhmfmnSTsd3LwYNioQRWlGjzSH6flkvXdmZ7xJmTo=;
- b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBpCKWfuwFT2jEz8HsBpKAxWSpBqIDGBnPTtbdUR
- TefQwcfJUiJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaQilnwAKCRAADmhBGVaC
- FQblEAC1N4C5LWOgklJgo3ot9s4EGU4EZzaVsg1uSo1fQyE41EdTxffLfjU0Mo54CyLSD2CyjCo
- m94VupgYqRs+L04sCL0oC9qBh83+5VaHycbjcNa/sikzRU5Pe72iyBZR7xYtPvuLtyHZG3J84W2
- Jm0J0QQ1vJW7aD5PbDpmoPASR8LETzr3C1NZ4YdcpQCkb86/YSBRlsnospRJWG5zTSDUf48bw+F
- J/qtiqQgVj7Dhp4r673icKUWEmjp0C2D8UDwbHFo41FWeBM9SsABprwFNfQI3OyFZdvsCoKGLfa
- 8SpvDo7scukAdm0YhZtTolDqdyxiYu7FvCbkquRlkzTRNn9U2jYke/4ntIJOTKXHGCb5xf+IAod
- MiuBd2h+IsKFYAgo8HkEOMH5jJHCrXF33E2CyWulWiE1dGPUmGGarFPg2wPxN1zokh851CGNmpC
- zhIMjcy15rjMfmYet6UodM/bG1lZ089cj1x5MiaV+N3a1nAzW6XkOONj+KrSul5Fsl4JV/+Pdae
- dI0hrXO1pSl4I2sUkeHBo2UtBjqUnzEKRijCc89toa2MPnM4zvON2SV6f3uUU4XVncvMZwieDZE
- wK5VDB+OerbT5mXhiSGRv681eW6Mm6ImtoeZdL8alkvXJHVPIjDD6uw+8TYxTQM34UBm/VOioQX
- /TD/1O2IKWZX56g==
-X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
- fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
+X-Proofpoint-GUID: oshfaEcYr9sKsvDHxONJuEE4cgvhi81v
+X-Authority-Analysis: v=2.4 cv=A7dh/qWG c=1 sm=1 tr=0 ts=6908a858 cx=c_pps
+ a=IZJwPbhc+fLeJZngyXXI0A==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=8BO9zW7oIjHPe6O9FGIA:9 a=QEXdDO2ut3YA:10
+ a=uG9DUKGECoFWVXl0Dc02:22
+X-Proofpoint-ORIG-GUID: oshfaEcYr9sKsvDHxONJuEE4cgvhi81v
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTAzMDExOCBTYWx0ZWRfX4o0CQl/nBx5m
+ Sg0bU+8HYymJ8IqhRv4XLozWEGxVVxwbB5eW6aMqG7bFXVhXlTNYKOR+nludYa81gRZiQWqF4Vz
+ TzRSxPsPF8PNpqs2gvZN4uxtJUjo12KWeruccoaKxRs+OIJQWLnzbj2FKaMrSPR+75jV8vkkAoZ
+ bCn7GklSuCeuB56yNpJgfTbyeXc8jXgiLod31WqZd20L9Xc9asir40/i54AgYtrwac8plWPbr6d
+ dYWHxvKqOiuGa2BDV2opiC/6Gwze/ytYHSL9qY89GoLOqZsEgdOWdjJFWplWKMtVVuQM0Pp7dHR
+ 1L54CPkdc+DbEfF+CG57LezeQ6pCNwoPw2ms/JpmYjBE/ZOgeaRechCKn9lmCXFb+k0/bMI1pAe
+ hM0JfpGIy62/X4Zub9P4sdJxxpj0Bg==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-03_02,2025-11-03_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 malwarescore=0 priorityscore=1501 bulkscore=0 lowpriorityscore=0
+ clxscore=1015 impostorscore=0 spamscore=0 adultscore=0 suspectscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2511030118
 
-Add a new routine for acquiring a read delegation on a directory. These
-are recallable-only delegations with no support for CB_NOTIFY. That will
-be added in a later phase.
+On 11/3/2025 8:00 AM, Jakub Kicinski wrote:
+> On Sat, 1 Nov 2025 23:45:00 +0000 Vadim Fedorenko wrote:
+>> On 31/10/2025 23:59, Jakub Kicinski wrote:
+>>> On Thu, 30 Oct 2025 20:45:19 +0800 Zhongqiu Han wrote:
+>>>> Append a newline character to the sysfs_emit() output in ptp_ocp_tty_show.
+>>>> This aligns with common kernel conventions and improves readability for
+>>>> userspace tools that expect newline-terminated values.
+>>>
+>>> Vadim? Is the backward compat here a concern?
+>>
+>> Well, unfortunately, this patch breaks software we use:
+>>
+>> openat(AT_FDCWD, "/dev/ttyS4\n", O_RDWR|O_NONBLOCK) = -1 ENOENT (No such
+>> file or directory)
+>> newfstatat(AT_FDCWD, "/etc/localtime", {st_mode=S_IFREG|0644,
+>> st_size=114, ...}, 0) = 0
+>> write(2, "23:40:33 \33[31mERROR\33[0m ", 2423:40:33 ERROR ) = 24
+>> write(2, "Could not open sa5x device\n", 27Could not open sa5x device
+>>
+>> So it looks like uAPI change, which is already used...
+>>
+> 
+> Zhongqiu Han please consider sending a patch to add a comment above
+> the unfortunate emit() explaining that we can't change it now.
+> I get the feeling that otherwise this "fix" may resurface.
 
-Since the same CB_RECALL/DELEGRETURN infrastructure is used for regular
-and directory delegations, a normal nfs4_delegation is used to represent
-a directory delegation.
+Hi Jakub,
+Sure, will send the comment patch. Thanks
 
-Reviewed-by: NeilBrown <neil@brown.name>
-Reviewed-by: Chuck Lever <chuck.lever@oracle.com>
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
----
- fs/nfsd/nfs4proc.c  |  22 +++++++++++-
- fs/nfsd/nfs4state.c | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/nfsd/state.h     |   5 +++
- 3 files changed, 126 insertions(+), 1 deletion(-)
-
-diff --git a/fs/nfsd/nfs4proc.c b/fs/nfsd/nfs4proc.c
-index e466cf52d7d7e1a78c3a469613a85ab3546d6d17..517968dddf4a33651313658d300f9f929f83c5af 100644
---- a/fs/nfsd/nfs4proc.c
-+++ b/fs/nfsd/nfs4proc.c
-@@ -2341,6 +2341,13 @@ nfsd4_get_dir_delegation(struct svc_rqst *rqstp,
- 			 union nfsd4_op_u *u)
- {
- 	struct nfsd4_get_dir_delegation *gdd = &u->get_dir_delegation;
-+	struct nfs4_delegation *dd;
-+	struct nfsd_file *nf;
-+	__be32 status;
-+
-+	status = nfsd_file_acquire_dir(rqstp, &cstate->current_fh, &nf);
-+	if (status != nfs_ok)
-+		return status;
- 
- 	/*
- 	 * RFC 8881, section 18.39.3 says:
-@@ -2354,7 +2361,20 @@ nfsd4_get_dir_delegation(struct svc_rqst *rqstp,
- 	 * return NFS4_OK with a non-fatal status of GDD4_UNAVAIL in this
- 	 * situation.
- 	 */
--	gdd->gddrnf_status = GDD4_UNAVAIL;
-+	dd = nfsd_get_dir_deleg(cstate, gdd, nf);
-+	nfsd_file_put(nf);
-+	if (IS_ERR(dd)) {
-+		int err = PTR_ERR(dd);
-+
-+		if (err != -EAGAIN)
-+			return nfserrno(err);
-+		gdd->gddrnf_status = GDD4_UNAVAIL;
-+		return nfs_ok;
-+	}
-+
-+	gdd->gddrnf_status = GDD4_OK;
-+	memcpy(&gdd->gddr_stateid, &dd->dl_stid.sc_stateid, sizeof(gdd->gddr_stateid));
-+	nfs4_put_stid(&dd->dl_stid);
- 	return nfs_ok;
- }
- 
-diff --git a/fs/nfsd/nfs4state.c b/fs/nfsd/nfs4state.c
-index da66798023aba4c36c38208cec7333db237e46e0..8f8c9385101e15b64883eabec71775f26b14f890 100644
---- a/fs/nfsd/nfs4state.c
-+++ b/fs/nfsd/nfs4state.c
-@@ -9347,3 +9347,103 @@ nfsd4_deleg_getattr_conflict(struct svc_rqst *rqstp, struct dentry *dentry,
- 	nfs4_put_stid(&dp->dl_stid);
- 	return status;
- }
-+
-+/**
-+ * nfsd_get_dir_deleg - attempt to get a directory delegation
-+ * @cstate: compound state
-+ * @gdd: GET_DIR_DELEGATION arg/resp structure
-+ * @nf: nfsd_file opened on the directory
-+ *
-+ * Given a GET_DIR_DELEGATION request @gdd, attempt to acquire a delegation
-+ * on the directory to which @nf refers. Note that this does not set up any
-+ * sort of async notifications for the delegation.
-+ */
-+struct nfs4_delegation *
-+nfsd_get_dir_deleg(struct nfsd4_compound_state *cstate,
-+		   struct nfsd4_get_dir_delegation *gdd,
-+		   struct nfsd_file *nf)
-+{
-+	struct nfs4_client *clp = cstate->clp;
-+	struct nfs4_delegation *dp;
-+	struct file_lease *fl;
-+	struct nfs4_file *fp, *rfp;
-+	int status = 0;
-+
-+	fp = nfsd4_alloc_file();
-+	if (!fp)
-+		return ERR_PTR(-ENOMEM);
-+
-+	nfsd4_file_init(&cstate->current_fh, fp);
-+
-+	rfp = nfsd4_file_hash_insert(fp, &cstate->current_fh);
-+	if (unlikely(!rfp)) {
-+		put_nfs4_file(fp);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	if (rfp != fp) {
-+		put_nfs4_file(fp);
-+		fp = rfp;
-+	}
-+
-+	/* if this client already has one, return that it's unavailable */
-+	spin_lock(&state_lock);
-+	spin_lock(&fp->fi_lock);
-+	/* existing delegation? */
-+	if (nfs4_delegation_exists(clp, fp)) {
-+		status = -EAGAIN;
-+	} else if (!fp->fi_deleg_file) {
-+		fp->fi_deleg_file = nfsd_file_get(nf);
-+		fp->fi_delegees = 1;
-+	} else {
-+		++fp->fi_delegees;
-+	}
-+	spin_unlock(&fp->fi_lock);
-+	spin_unlock(&state_lock);
-+
-+	if (status) {
-+		put_nfs4_file(fp);
-+		return ERR_PTR(status);
-+	}
-+
-+	/* Try to set up the lease */
-+	status = -ENOMEM;
-+	dp = alloc_init_deleg(clp, fp, NULL, NFS4_OPEN_DELEGATE_READ);
-+	if (!dp)
-+		goto out_delegees;
-+
-+	fl = nfs4_alloc_init_lease(dp);
-+	if (!fl)
-+		goto out_put_stid;
-+
-+	status = kernel_setlease(nf->nf_file,
-+				 fl->c.flc_type, &fl, NULL);
-+	if (fl)
-+		locks_free_lease(fl);
-+	if (status)
-+		goto out_put_stid;
-+
-+	/*
-+	 * Now, try to hash it. This can fail if we race another nfsd task
-+	 * trying to set a delegation on the same file. If that happens,
-+	 * then just say UNAVAIL.
-+	 */
-+	spin_lock(&state_lock);
-+	spin_lock(&clp->cl_lock);
-+	spin_lock(&fp->fi_lock);
-+	status = hash_delegation_locked(dp, fp);
-+	spin_unlock(&fp->fi_lock);
-+	spin_unlock(&clp->cl_lock);
-+	spin_unlock(&state_lock);
-+
-+	if (!status)
-+		return dp;
-+
-+	/* Something failed. Drop the lease and clean up the stid */
-+	kernel_setlease(fp->fi_deleg_file->nf_file, F_UNLCK, NULL, (void **)&dp);
-+out_put_stid:
-+	nfs4_put_stid(&dp->dl_stid);
-+out_delegees:
-+	put_deleg_file(fp);
-+	return ERR_PTR(status);
-+}
-diff --git a/fs/nfsd/state.h b/fs/nfsd/state.h
-index 1e736f4024263ffa9c93bcc9ec48f44566a8cc77..b052c1effdc5356487c610db9728df8ecfe851d4 100644
---- a/fs/nfsd/state.h
-+++ b/fs/nfsd/state.h
-@@ -867,4 +867,9 @@ static inline bool try_to_expire_client(struct nfs4_client *clp)
- 
- extern __be32 nfsd4_deleg_getattr_conflict(struct svc_rqst *rqstp,
- 		struct dentry *dentry, struct nfs4_delegation **pdp);
-+
-+struct nfsd4_get_dir_delegation;
-+struct nfs4_delegation *nfsd_get_dir_deleg(struct nfsd4_compound_state *cstate,
-+						struct nfsd4_get_dir_delegation *gdd,
-+						struct nfsd_file *nf);
- #endif   /* NFSD4_STATE_H */
 
 -- 
-2.51.1
-
+Thx and BRs,
+Zhongqiu Han
 
