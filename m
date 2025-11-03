@@ -1,139 +1,374 @@
-Return-Path: <netdev+bounces-235238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7865BC2E19D
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 22:10:00 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3368C2E2EA
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 22:48:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3B7E1895077
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 21:10:24 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D480A4E12FE
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 21:48:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDD1D2C2366;
-	Mon,  3 Nov 2025 21:09:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ABD228C871;
+	Mon,  3 Nov 2025 21:48:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gjOt4Kzy"
+	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="xVK/ufIr";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="zKhe/MCZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from fhigh-a5-smtp.messagingengine.com (fhigh-a5-smtp.messagingengine.com [103.168.172.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2743E2C21E6
-	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 21:09:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41BF726A0BD
+	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 21:48:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762204194; cv=none; b=tWMg07PwHNO4xQD6zPYJbZAtmjMylMeyjeHZFfBBUE3N5pgCOzCz+PCsPsUnV6/eXDQ7FfQIQFTxPlyDfdgqeln4TPB3aV4nyWX09YJpn5Blk4EKt63x0oJ8FILP8LY2Vh8RuqHcUADC38xinTTZEcFpOtWWLwoIWNFqKgtq3Ak=
+	t=1762206515; cv=none; b=mDBqf/lZzIDdQ9a2nc+9cz+plJ0fwFwg5M1CF++0w41+JG+WPBpcJyDgkRLtXWy5VT1/U3+r++fIA9p4Piy49dOhvBDEp5+j87qXY0KKnk+8yknHswp3LBGkG1nqE7UcnN+x74eH5FT85Rjs7mLnPggO6SkEy7ytoB32HTswSa8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762204194; c=relaxed/simple;
-	bh=nHyUw7CH5fqHOkzGJzjMZOpnhWd4lMtXz+aZjNJ3p9c=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Knqq48V/cFD1vuoByKRcs/31ZDAWrOLxfEzd4Eufdmiu3TV+ReEY7a+41qWAJgjRZ6EH70gvhTNiK9vaT7LSb7DY9+FDVq0/2EPd1Yhxe0gxjcz5XfUQVBsA6FUfhyNokJBSTG1ZZ+Da6u3Iyx0UbDOPnqqYE0g/qODlpopeOq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gjOt4Kzy; arc=none smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762204193; x=1793740193;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=nHyUw7CH5fqHOkzGJzjMZOpnhWd4lMtXz+aZjNJ3p9c=;
-  b=gjOt4KzyHe2Beyfc7buCr7QM2Y1jezf+6EXWftg+QA0572kMkgdjuZID
-   92J2rezN+wwCtaTwCdhFzLvi3gbg/NJaab5QX6zJqdSvz9u+kcUEjEbG/
-   OYrWUpUKzOz6dkPSkjMMfTg/VmBZU9MXpJjypYd1eRIIG79Wz83QrzH7o
-   M8Bk9qnoZXQF3dMd18zMMQFz1SO1yRM5fQibgXM58vuAiYe07fyDMKeK8
-   nFMbnaK8kt3wsStVCi9KPlB8VB5LLzA9dLzdmrMsp83HZg+fIqSbGoQLS
-   40amYB/iMKdbFNDl+MdACNaByjHltJYPhb0Vlkz2RaRcFCou2sRLfpZOZ
-   g==;
-X-CSE-ConnectionGUID: JDeFYkX+TDuxDN8aN6R1tw==
-X-CSE-MsgGUID: eno+jUsRRBKx5BI3foh1pQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11602"; a="63987731"
-X-IronPort-AV: E=Sophos;i="6.19,277,1754982000"; 
-   d="scan'208";a="63987731"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 13:09:52 -0800
-X-CSE-ConnectionGUID: +DecENeHQMqgOLLCvjIoHA==
-X-CSE-MsgGUID: lAAtYi4yT/mi97Y2uTqotg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,277,1754982000"; 
-   d="scan'208";a="187121168"
-Received: from dcskidmo-m40.jf.intel.com ([10.166.241.14])
-  by orviesa008.jf.intel.com with ESMTP; 03 Nov 2025 13:09:53 -0800
-From: Joshua Hay <joshua.a.hay@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Joshua Hay <joshua.a.hay@intel.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Madhu Chittim <madhu.chittim@intel.com>
-Subject: [Intel-wired-lan][PATCH iwl-net] idpf: cap maximum Rx buffer size
-Date: Mon,  3 Nov 2025 13:20:36 -0800
-Message-Id: <20251103212036.2788093-1-joshua.a.hay@intel.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1762206515; c=relaxed/simple;
+	bh=BvFk0FKJieBk1C9PGF8BWWzjNbqWL+OVJ+H/EIa8xCQ=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=KPUP1mBs/0o6EFU/M4D5SqnftqA9cEifbmWPJRO+qLNxLNc/f9EBG7wPveUYVLJk3RvRI+zEtmEg7QqgQ4w5nU5CZxFK/HG68sWIHEPUSDoBpB5VchJ+7QJ2G55KwtCE09Ss+rZoEjoyItFIMYJcKWT8oXHJzVmdJV4GwMc0kPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=xVK/ufIr; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=zKhe/MCZ; arc=none smtp.client-ip=103.168.172.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
+Received: from phl-compute-02.internal (phl-compute-02.internal [10.202.2.42])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 56E2214001B2;
+	Mon,  3 Nov 2025 16:48:31 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-02.internal (MEProxy); Mon, 03 Nov 2025 16:48:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
+	 h=cc:cc:content-id:content-transfer-encoding:content-type
+	:content-type:date:date:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to; s=fm1; t=1762206511; x=1762292911; bh=S7jy5RbJrSURdr8lYGtHd
+	NcOBbDCC0JnRHUqpcJJiOc=; b=xVK/ufIr+bX4lN2CRq6bOpkjLoAYgYQB1dKqy
+	wwld9eEVaa0NXRu8EnzyXMNf3zbh94wNgD+9bPm036zNfK+MxMMPAM23RBh5Ohl6
+	0+6YzuFGPF3TO5SM1gvWWyIZIgvfWlf3HmvJcYxIY8kKC06alxTBFA7ZhCVI3OxI
+	SnsY2ruWUSm9YA8jwuk+0l1dfhvLniG4w1dzFafbQEeO3qA+pFgfUJmMbdl+KV1y
+	af8YomwVlw7zYBclQxwjdcu5BieP8eyZ5JeEZfiVSVQAyhU9uSS94vs1o+zBAgss
+	QXZ/FrlzetCOFxCJgWpekM81UZQv1SjrgD8UhLwnF0yN29DoQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-id
+	:content-transfer-encoding:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1762206511; x=1762292911; bh=S7jy5RbJrSURdr8lYGtHdNcOBbDCC0JnRHU
+	qpcJJiOc=; b=zKhe/MCZ70nnST9Z4zNEeTlVEdE4MFgbFZiN1iWomZhpDV/9hpT
+	Weoxfh9iz+Ps/8iEt3XtJDc89x16/NOZK94Isl1SxPsg8Ommaxl8CI2TK0LlRiF5
+	3S8STeUjXUehIcoguNPatVAU/oZkbkQDAh4NumGplfSexgOExWy4Hzat25lXU8m0
+	4exKBPxNo6faeXDne8BFaCn0mQIZ/WJ47t8TgOFSXYpQKvrbs6Udb80OXGAX0e/m
+	W20nk8E9L6KXyfxALwcIb4m0+tccN3GMtyJuRW7SWkJ3dSimYw2BK5kxQU/QS//e
+	RlhQSNlJu/ibcO6Kbcei3ZH1eHcMuzKTrxQ==
+X-ME-Sender: <xms:LiMJadGoezlsKHwBZneMC26u8UjtAk4kfcF7CyncJeGaO1-oKMexbQ>
+    <xme:LiMJaai3cDRzmf0D06hqHpqaouZCzDRhT-sNR4r7PmDB3GKt18wF5R8R6UrrhuHCk
+    SEYw171WrRwY8iIgoLNrJTb6xD2dyA-G61Cw71GVvsK4eFrL1nYAqY>
+X-ME-Received: <xmr:LiMJaavkWSGFNyWYkT8hiCz3lNiC3mj9DkSp1BSlfyNenLnNzAlbhWbw80xcibW0HpZNrO0>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddujeelvdehucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhephffvvefujghfofggtgfgfffksehtqhertdertddvnecuhfhrohhmpeflrgihucgg
+    ohhssghurhhghhcuoehjvhesjhhvohhssghurhhghhdrnhgvtheqnecuggftrfgrthhtvg
+    hrnhepueffvedvvdefudejfeeuudfgtdfgudettdevfeeileffhffghfdtjeekhfeitdek
+    necuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiiigvpedtne
+    curfgrrhgrmhepmhgrihhlfhhrohhmpehjvhesjhhvohhssghurhhghhdrnhgvthdpnhgs
+    pghrtghpthhtohepuddupdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehtohhngh
+    hhrghosegsrghmrghitghlohhuugdrtghomhdprhgtphhtthhopehrrgiiohhrsegslhgr
+    tghkfigrlhhlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnh
+    gvthdprhgtphhtthhopehlihhuhhgrnhhgsghinhesghhmrghilhdrtghomhdprhgtphht
+    thhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohephhhorhhmsh
+    eskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdp
+    rhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtoh
+    eptghorhgsvghtsehlfihnrdhnvght
+X-ME-Proxy: <xmx:LiMJaduE1HByoObogZ-NsUeR4B3LDOknPUGam4JVl2Kwtgw2uuiIRA>
+    <xmx:LiMJafGWC1XjsZWtkdhuaQ6IoYWR11C0wNhk8EVN3XbYY_SpnUy6wA>
+    <xmx:LiMJaYOdnLqt_aogcsDx7tujdOfb4Pdfctz_ZzjC_kd7nTU7yPdNtg>
+    <xmx:LiMJaeLdwcifUSGAXmDoJLKrWAb_65E6___5-82zDcEjK9iQUuDOWg>
+    <xmx:LyMJaQtFQpwZCqCQ6iA442xutwIvUSIIVlqVqL159PEQNf9o-ongBqEl>
+Feedback-ID: i53714940:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 3 Nov 2025 16:48:29 -0500 (EST)
+Received: by vermin.localdomain (Postfix, from userid 1000)
+	id 76FCD1C04DD; Mon,  3 Nov 2025 13:48:26 -0800 (PST)
+Received: from vermin (localhost [127.0.0.1])
+	by vermin.localdomain (Postfix) with ESMTP id 743A81C01BD;
+	Mon,  3 Nov 2025 22:48:26 +0100 (CET)
+From: Jay Vosburgh <jv@jvosburgh.net>
+To: Tonghao Zhang <tonghao@bamaicloud.com>
+cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+    Jonathan Corbet <corbet@lwn.net>,
+    Andrew Lunn <andrew+netdev@lunn.ch>,
+    Nikolay Aleksandrov <razor@blackwall.org>,
+    Hangbin Liu <liuhangbin@gmail.com>
+Subject: Re: [PATCH v2] net: bonding: use atomic instead of rtnl_mutex, to make sure peer notify updated
+In-reply-to: <20251028034547.78830-1-tonghao@bamaicloud.com>
+References: <20251028034547.78830-1-tonghao@bamaicloud.com>
+Comments: In-reply-to Tonghao Zhang <tonghao@bamaicloud.com>
+   message dated "Tue, 28 Oct 2025 11:45:47 +0800."
+X-Mailer: MH-E 8.6+git; nmh 1.7+dev; Emacs 29.0.50
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <253221.1762206506.1@vermin>
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 03 Nov 2025 22:48:26 +0100
+Message-ID: <253222.1762206506@vermin>
 
-The HW only supports a maximum Rx buffer size of 16K-128. On systems
-using large pages, the libeth logic can configure the buffer size to be
-larger than this. The upper bound is PAGE_SIZE while the lower bound is
-MTU rounded up to the nearest power of 2. For example, ARM systems with
-a 64K page size and an mtu of 9000 will set the Rx buffer size to 16K,
-which will cause the config Rx queues message to fail.
+Tonghao Zhang <tonghao@bamaicloud.com> wrote:
 
-Initialize the bufq/fill queue buf_len field to the maximum supported
-size. This will trigger the libeth logic to cap the maximum Rx buffer
-size by reducing the upper bound.
+>Using atomic to protect the send_peer_notif instead of rtnl_mutex.
+>This approach allows safe updates in both interrupt and process
+>contexts, while avoiding code complexity.
+>
+>In lacp mode, the rtnl might be locked, preventing ad_cond_set_peer_notif=
+()
+>from acquiring the lock and updating send_peer_notif. This patch addresse=
+s
+>the issue by using a atomic. Since updating send_peer_notif does not
+>require high real-time performance, such atomic updates are acceptable.
+>
+>After coverting the rtnl lock for send_peer_notif to atomic, in bond_mii_=
+monitor(),
+>we should check the should_notify_peers (rtnllock required) instead of
+>send_peer_notif. By the way, to avoid peer notify event loss, we check
+>again whether to send peer notify, such as active-backup mode failover.
+>
+>Cc: Jay Vosburgh <jv@jvosburgh.net>
+>Cc: "David S. Miller" <davem@davemloft.net>
+>Cc: Eric Dumazet <edumazet@google.com>
+>Cc: Jakub Kicinski <kuba@kernel.org>
+>Cc: Paolo Abeni <pabeni@redhat.com>
+>Cc: Simon Horman <horms@kernel.org>
+>Cc: Jonathan Corbet <corbet@lwn.net>
+>Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+>Cc: Nikolay Aleksandrov <razor@blackwall.org>
+>Cc: Hangbin Liu <liuhangbin@gmail.com>
+>Suggested-by: Jay Vosburgh <jv@jvosburgh.net>
+>Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
+>---
+>v2:
+>- refine the codes
+>- check bond_should_notify_peers again in bond_mii_monitor(), to avoid
+>  event loss. =
 
-Fixes: 74d1412ac8f37 ("idpf: use libeth Rx buffer management for payload buffer")
-Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
-Acked-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
+>- v1 https://patchwork.kernel.org/project/netdevbpf/patch/20251026095614.=
+48833-1-tonghao@bamaicloud.com/
+>---
+> drivers/net/bonding/bond_3ad.c  |  7 ++---
+> drivers/net/bonding/bond_main.c | 46 ++++++++++++++++-----------------
+> include/net/bonding.h           |  9 ++++++-
+> 3 files changed, 32 insertions(+), 30 deletions(-)
+>
+>diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3a=
+d.c
+>index 49717b7b82a2..05c573e45450 100644
+>--- a/drivers/net/bonding/bond_3ad.c
+>+++ b/drivers/net/bonding/bond_3ad.c
+>@@ -999,11 +999,8 @@ static void ad_cond_set_peer_notif(struct port *port=
+)
+> {
+> 	struct bonding *bond =3D port->slave->bond;
+> =
+
+>-	if (bond->params.broadcast_neighbor && rtnl_trylock()) {
+>-		bond->send_peer_notif =3D bond->params.num_peer_notif *
+>-			max(1, bond->params.peer_notif_delay);
+>-		rtnl_unlock();
+>-	}
+>+	if (bond->params.broadcast_neighbor)
+>+		bond_peer_notify_reset(bond);
+> }
+> =
+
+> /**
+>diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_m=
+ain.c
+>index 8e592f37c28b..ae90221838d4 100644
+>--- a/drivers/net/bonding/bond_main.c
+>+++ b/drivers/net/bonding/bond_main.c
+>@@ -1167,10 +1167,11 @@ static bool bond_should_notify_peers(struct bondi=
+ng *bond)
+> {
+> 	struct bond_up_slave *usable;
+> 	struct slave *slave =3D NULL;
+>+	int send_peer_notif;
+> =
+
+>-	if (!bond->send_peer_notif ||
+>-	    bond->send_peer_notif %
+>-	    max(1, bond->params.peer_notif_delay) !=3D 0 ||
+>+	send_peer_notif =3D atomic_read(&bond->send_peer_notif);
+>+	if (!send_peer_notif ||
+>+	    send_peer_notif % max(1, bond->params.peer_notif_delay) !=3D 0 ||
+> 	    !netif_carrier_ok(bond->dev))
+> 		return false;
+> =
+
+>@@ -1270,8 +1271,6 @@ void bond_change_active_slave(struct bonding *bond,=
+ struct slave *new_active)
+> 						      BOND_SLAVE_NOTIFY_NOW);
+> =
+
+> 		if (new_active) {
+>-			bool should_notify_peers =3D false;
+>-
+> 			bond_set_slave_active_flags(new_active,
+> 						    BOND_SLAVE_NOTIFY_NOW);
+> =
+
+>@@ -1280,19 +1279,17 @@ void bond_change_active_slave(struct bonding *bon=
+d, struct slave *new_active)
+> 						      old_active);
+> =
+
+> 			if (netif_running(bond->dev)) {
+>-				bond->send_peer_notif =3D
+>-					bond->params.num_peer_notif *
+>-					max(1, bond->params.peer_notif_delay);
+>-				should_notify_peers =3D
+>-					bond_should_notify_peers(bond);
+>+				bond_peer_notify_reset(bond);
+>+
+>+				if (bond_should_notify_peers(bond)) {
+>+					atomic_dec(&bond->send_peer_notif);
+>+					call_netdevice_notifiers(
+>+							NETDEV_NOTIFY_PEERS,
+>+							bond->dev);
+>+				}
+> 			}
+> =
+
+> 			call_netdevice_notifiers(NETDEV_BONDING_FAILOVER, bond->dev);
+>-			if (should_notify_peers) {
+>-				bond->send_peer_notif--;
+>-				call_netdevice_notifiers(NETDEV_NOTIFY_PEERS,
+>-							 bond->dev);
+>-			}
+> 		}
+> 	}
+> =
+
+>@@ -2801,7 +2798,7 @@ static void bond_mii_monitor(struct work_struct *wo=
+rk)
+> =
+
+> 	rcu_read_unlock();
+> =
+
+>-	if (commit || bond->send_peer_notif) {
+>+	if (commit || should_notify_peers) {
+> 		/* Race avoidance with bond_close cancel of workqueue */
+> 		if (!rtnl_trylock()) {
+> 			delay =3D 1;
+>@@ -2816,16 +2813,15 @@ static void bond_mii_monitor(struct work_struct *=
+work)
+> 			bond_miimon_commit(bond);
+> 		}
+> =
+
+>-		if (bond->send_peer_notif) {
+>-			bond->send_peer_notif--;
+>-			if (should_notify_peers)
+>-				call_netdevice_notifiers(NETDEV_NOTIFY_PEERS,
+>-							 bond->dev);
+>-		}
+>+		/* check again to avoid send_peer_notif has been changed. */
+>+		if (bond_should_notify_peers(bond))
+>+			call_netdevice_notifiers(NETDEV_NOTIFY_PEERS, bond->dev);
+
+	Is the risk here that user space may have set send_peer_notify
+to zero?
+
+> =
+
+> 		rtnl_unlock();	/* might sleep, hold no other locks */
+> 	}
+> =
+
+>+	atomic_dec_if_positive(&bond->send_peer_notif);
+>+
+
+	Also, it's a bit subtle, but I think this has to be outside of
+the if block, or peer_notif_delay may be unreliable.  I'm not sure it
+needs a comment, but could you confirm that's why this line is where it
+is?
+
+	-J
+
+> re_arm:
+> 	if (bond->params.miimon)
+> 		queue_delayed_work(bond->wq, &bond->mii_work, delay);
+>@@ -3773,7 +3769,7 @@ static void bond_activebackup_arp_mon(struct bondin=
+g *bond)
+> 			return;
+> =
+
+> 		if (should_notify_peers) {
+>-			bond->send_peer_notif--;
+>+			atomic_dec(&bond->send_peer_notif);
+> 			call_netdevice_notifiers(NETDEV_NOTIFY_PEERS,
+> 						 bond->dev);
+> 		}
+>@@ -4267,6 +4263,8 @@ static int bond_open(struct net_device *bond_dev)
+> 			queue_delayed_work(bond->wq, &bond->alb_work, 0);
+> 	}
+> =
+
+>+	atomic_set(&bond->send_peer_notif, 0);
+>+
+> 	if (bond->params.miimon)  /* link check interval, in milliseconds. */
+> 		queue_delayed_work(bond->wq, &bond->mii_work, 0);
+> =
+
+>@@ -4300,7 +4298,7 @@ static int bond_close(struct net_device *bond_dev)
+> 	struct slave *slave;
+> =
+
+> 	bond_work_cancel_all(bond);
+>-	bond->send_peer_notif =3D 0;
+>+	atomic_set(&bond->send_peer_notif, 0);
+> 	if (bond_is_lb(bond))
+> 		bond_alb_deinitialize(bond);
+> 	bond->recv_probe =3D NULL;
+>diff --git a/include/net/bonding.h b/include/net/bonding.h
+>index 49edc7da0586..afdfcb5bfaf0 100644
+>--- a/include/net/bonding.h
+>+++ b/include/net/bonding.h
+>@@ -236,7 +236,7 @@ struct bonding {
+> 	 */
+> 	spinlock_t mode_lock;
+> 	spinlock_t stats_lock;
+>-	u32	 send_peer_notif;
+>+	atomic_t send_peer_notif;
+> 	u8       igmp_retrans;
+> #ifdef CONFIG_PROC_FS
+> 	struct   proc_dir_entry *proc_entry;
+>@@ -814,4 +814,11 @@ static inline netdev_tx_t bond_tx_drop(struct net_de=
+vice *dev, struct sk_buff *s
+> 	return NET_XMIT_DROP;
+> }
+> =
+
+>+static inline void bond_peer_notify_reset(struct bonding *bond)
+>+{
+>+	atomic_set(&bond->send_peer_notif,
+>+		bond->params.num_peer_notif *
+>+		max(1, bond->params.peer_notif_delay));
+>+}
+>+
+> #endif /* _NET_BONDING_H */
+>-- =
+
+>2.34.1
+>
+
 ---
- drivers/net/ethernet/intel/idpf/idpf_txrx.c | 8 +++++---
- drivers/net/ethernet/intel/idpf/idpf_txrx.h | 1 +
- 2 files changed, 6 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index 828f7c444d30..dcdd4fef1c7a 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -695,9 +695,10 @@ static int idpf_rx_buf_alloc_singleq(struct idpf_rx_queue *rxq)
- static int idpf_rx_bufs_init_singleq(struct idpf_rx_queue *rxq)
- {
- 	struct libeth_fq fq = {
--		.count	= rxq->desc_count,
--		.type	= LIBETH_FQE_MTU,
--		.nid	= idpf_q_vector_to_mem(rxq->q_vector),
-+		.count		= rxq->desc_count,
-+		.type		= LIBETH_FQE_MTU,
-+		.buf_len	= IDPF_RX_MAX_BUF_SZ,
-+		.nid		= idpf_q_vector_to_mem(rxq->q_vector),
- 	};
- 	int ret;
- 
-@@ -754,6 +755,7 @@ static int idpf_rx_bufs_init(struct idpf_buf_queue *bufq,
- 		.truesize	= bufq->truesize,
- 		.count		= bufq->desc_count,
- 		.type		= type,
-+		.buf_len	= IDPF_RX_MAX_BUF_SZ,
- 		.hsplit		= idpf_queue_has(HSPLIT_EN, bufq),
- 		.xdp		= idpf_xdp_enabled(bufq->q_vector->vport),
- 		.nid		= idpf_q_vector_to_mem(bufq->q_vector),
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-index 75b977094741..a1255099656f 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-@@ -101,6 +101,7 @@ do {								\
- 		idx = 0;					\
- } while (0)
- 
-+#define IDPF_RX_MAX_BUF_SZ			(16384 - 128)
- #define IDPF_RX_BUF_STRIDE			32
- #define IDPF_RX_BUF_POST_STRIDE			16
- #define IDPF_LOW_WATERMARK			64
--- 
-2.39.2
-
+	-Jay Vosburgh, jv@jvosburgh.net
 
