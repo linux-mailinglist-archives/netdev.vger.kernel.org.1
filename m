@@ -1,174 +1,123 @@
-Return-Path: <netdev+bounces-234974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24DADC2A716
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 08:57:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A5DBC2A869
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 09:18:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8ECE51892840
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 07:56:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A82763A3F14
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 08:14:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA2D92C17A1;
-	Mon,  3 Nov 2025 07:55:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E493E2D4807;
+	Mon,  3 Nov 2025 08:14:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o4oU+Ryh"
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="oNyzKVTn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E0FF299A94;
-	Mon,  3 Nov 2025 07:55:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD3D828DF07;
+	Mon,  3 Nov 2025 08:13:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762156536; cv=none; b=rf6HKt0pySXHHskjSf+CoOwq8NNCVNzsLjWy933vyPHmKI7UwCxwB0xoMGdqs/ecMKKWbX25BGzCx/Piage5Nm5vghgpbPsXZqp19NOgzXFXvEPO2PtzrfSjezqmGhy+Q1mdo6LoQoOP3afUQiQjHgPCi00ZIFpYByMAUJG4P/E=
+	t=1762157643; cv=none; b=DfFUf6j4PvxzFDzCWWgF4zQau/cnmnTsaDWFJ/1Rk/+TJgCLLq1CY/+9Q2R33J2zFD94jGL60bzgQFJrK+s9xhnmeGIwGCIblmOfd8fvGDhxK5asl6xgswlDfj+Wt7KJLgizfLOBAIRDIVYlkNDLZys3SuMAhSHesK1vmUtvAUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762156536; c=relaxed/simple;
-	bh=YNPixSJYA3JDbHsT5BALFX8BA9BKMpCbGHtdSmu4c+Y=;
-	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
-	 Subject:From:To:Cc:Date; b=MJCTyfOrX5MrPS5up5n5MJk1iuoI6KoJJrjNdWho6BdrlviIHlkvzyriTOYKUszIUtWoNS6PUrDvBLUuxBBs0bU5mf27JtcAAfny0qUMFDBoukCnwcp46IvoS4f54aA/OKoJXFqlHQb/mNdUjHRSS6Tx9TK0+ZfPAMTtPqfvUCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o4oU+Ryh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86465C4CEE7;
-	Mon,  3 Nov 2025 07:55:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762156536;
-	bh=YNPixSJYA3JDbHsT5BALFX8BA9BKMpCbGHtdSmu4c+Y=;
-	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
-	b=o4oU+RyhmIlMbUWlFLmmyQwX32IqXC5AIbMAZseu2CDO3GoHTXudUbw+I/yEpIu77
-	 UjvK2LZDEBk0xVmaaVnq3zJMsx+bMumeyRKMeg9bi5c3vlaOh7xtPd1vXWw/+4dHg+
-	 mY30cdJj2lSezVOXtRYguoKt8s4t2UAcKGZSvkXs7SDXaZ35xTX8VhTV7qWYQ7LI+d
-	 sN8v8JCDgLepVlN4vCsZ3/gTj2hPcO3tjN2R7xNeb9ZPEQuYHRp8upNyDtPegMY8a6
-	 OXeKOTL1hDLenbuVkz2i/mOeN+fKBJ9dAjgqlvZF7sfqv3BYpOm+dfnkrTAbjlAb32
-	 DplqTnvwc2rpA==
-Content-Type: multipart/mixed; boundary="===============7388337055491605420=="
+	s=arc-20240116; t=1762157643; c=relaxed/simple;
+	bh=54n85ZwyayArP7yhougQewaTm0CQee0hnxz3GHcV5Cg=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PqfEUKf4mxuLuyYMB/uN0MXmuGJSpI+WCtB6dayKio5HD0jxqIR+9+xD4fl8MVatdH6f4LpzllnnNazt4ETeEwJfay2z5+F6EjwAPL6hHQrx24BasDd3010kEcVc6lpYblFN8nuu4UKZY3lU2cXkmCDKu4cAAYHYkS5ejcqvSgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=oNyzKVTn; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id E81CAA0A96;
+	Mon,  3 Nov 2025 09:13:50 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=mail; bh=gw0/qyfr1zOYI5nSB/iu
+	m7AsYKgJjol2bq0uNTSmVDo=; b=oNyzKVTndUf6k4MmwLMb9UdLqY3qOueDGlmA
+	iAX37ynu3OZJab5CFUdMPhwsfkpXkXbOjUWCqOFZRVsDfvAACCTdhC4c5FXS09Gj
+	h+gVgxj0c5y8iMPFrdD9GJyil/+V+BQYRcsBdq9x8C0QVztbhRbbbvycZV0ygGpF
+	y16UXT+suwjmftg3ItVDXLGsFWltnMf9+8N5QcL5/ABlTZj0FMUFaXGMPIRh/MDS
+	QV8fDzZNdljuujhy9SC6e4HbMe80m/d0LFj4pciU8/eqRKKogSROnL4DA8eHLYw7
+	renehLdWFzvyccBD2W1aPSJpaNKibGC0R4WEuvXw91STG9yc3U1sMfPhZt51vf5u
+	y1Zt0m26ZehAt9KvrJxhwHNi0l04kvrxMw+xuIzUUad5rhOUrCo0Hux+pWC8rKjr
+	ZBI2VONAzieF66uKbgf/TXqeKLJbpw9uyW8fa4OiqPIpayZoUrpeoeQSU7s9k4aV
+	/cY6dGL4O/eS2sb4ZwbQt9N42wJ7iwJ5QCClzGwgzAMNK9SEAenCj3/wZOVI0ZKN
+	3KQ2mg57r4htDM1Kevb0yTmcf8XjsQy1MAYunu+ekjvdTPiOSAh6yGanBl1+GKFM
+	RokppcrenaqVqyGcg2xpgbr6gg9P0oQ3VaztgLLWZFjhe8Z34TkcGaLkwwNc/hdV
+	iL5MD00=
+From: Buday Csaba <buday.csaba@prolan.hu>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>,
+	<netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: Buday Csaba <buday.csaba@prolan.hu>
+Subject: [PATCH v2 1/1] dt-bindings: net: ethernet-phy: clarify when compatible must specify PHY ID
+Date: Mon, 3 Nov 2025 09:13:42 +0100
+Message-ID: <64c52d1a726944a68a308355433e8ef0f82c4240.1762157515.git.buday.csaba@prolan.hu>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <b8613028fb2f7f69e2fa5e658bd2840c790935d4.1761898321.git.buday.csaba@prolan.hu>
+References: <b8613028fb2f7f69e2fa5e658bd2840c790935d4.1761898321.git.buday.csaba@prolan.hu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <5866d0686028b734879265d8a47af12347e262a26ce86b0ab452b5d2a185d457@mail.kernel.org>
-In-Reply-To: <20251103073124.43077-3-alibuda@linux.alibaba.com>
-References: <20251103073124.43077-3-alibuda@linux.alibaba.com>
-Subject: Re: [PATCH bpf-next v4 2/3] net/smc: bpf: Introduce generic hook for handshake flow
-From: bot+bpf-ci@kernel.org
-To: alibuda@linux.alibaba.com,ast@kernel.org,daniel@iogearbox.net,andrii@kernel.org,martin.lau@linux.dev,pabeni@redhat.com,song@kernel.org,sdf@google.com,haoluo@google.com,yhs@fb.com,edumazet@google.com,john.fastabend@gmail.com,kpsingh@kernel.org,jolsa@kernel.org,mjambigi@linux.ibm.com,wenjia@linux.ibm.com,wintera@linux.ibm.com,dust.li@linux.alibaba.com,tonylu@linux.alibaba.com,guwen@linux.alibaba.com
-Cc: bpf@vger.kernel.org,davem@davemloft.net,kuba@kernel.org,netdev@vger.kernel.org,sidraya@linux.ibm.com,jaka@linux.ibm.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
-Date: Mon,  3 Nov 2025 07:55:35 +0000 (UTC)
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1762157629;VERSION=8001;MC=2379286761;ID=111644;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
+X-ESET-Antispam: OK
+X-EsetResult: clean, is OK
+X-EsetId: 37303A2998FD515F66756A
 
---===============7388337055491605420==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Change PHY ID description in ethernet-phy.yaml to clarify that a
+PHY ID is required (may -> must) when the PHY requires special
+initialization sequence.
 
+Link: https://lore.kernel.org/netdev/20251026212026.GA2959311-robh@kernel.org/
+Link: https://lore.kernel.org/netdev/aQIZvDt5gooZSTcp@debianbuilder/
 
-```
-commit b661eee197ec1c841de9195f171863daef37de34
-Author: D. Wythe <alibuda@linux.alibaba.com>
-
-net/smc: bpf: Introduce generic hook for handshake flow
-
-This patch introduces a BPF struct_ops mechanism that allows eBPF
-programs to control SMC protocol handshake decisions at runtime based on
-connection properties like IP addresses and ports.
-
-> diff --git a/net/smc/smc_sysctl.c b/net/smc/smc_sysctl.c
-> index 2fab6456f..918516734 100644
-> --- a/net/smc/smc_sysctl.c
-> +++ b/net/smc/smc_sysctl.c
-
-[ ... ]
-
-> +#if IS_ENABLED(CONFIG_SMC_HS_CTRL_BPF)
-> +static int smc_net_replace_smc_hs_ctrl(struct net *net, const char *name)
-> +{
-> +	struct smc_hs_ctrl *ctrl = NULL;
-> +
-> +	rcu_read_lock();
-> +	/* null or empty name ask to clear current ctrl */
-> +	if (name && name[0]) {
-> +		ctrl = smc_hs_ctrl_find_by_name(name);
-> +		if (!ctrl) {
-> +			rcu_read_unlock();
-> +			return -EINVAL;
-> +		}
-> +		/* no change, just return */
-> +		if (ctrl == rcu_dereference(net->smc.hs_ctrl)) {
-> +			rcu_read_unlock();
-> +			return 0;
-> +		}
-> +		if (!bpf_try_module_get(ctrl, ctrl->owner)) {
-> +			rcu_read_unlock();
-> +			return -EBUSY;
-> +		}
-> +	}
-> +	/* xhcg old ctrl with the new one atomically */
-> +	ctrl = unrcu_pointer(xchg(&net->smc.hs_ctrl, RCU_INITIALIZER(ctrl)));
-> +	/* release old ctrl */
-> +	if (ctrl)
-> +		bpf_module_put(ctrl, ctrl->owner);
-> +
-> +	rcu_read_unlock();
-> +	return 0;
-> +}
-
-Can concurrent sysctl writes race in smc_net_replace_smc_hs_ctrl? If
-two threads both write the same ctrl name to the hs_ctrl sysctl:
-
-Thread A: finds ctrl, bpf_try_module_get(ctrl) succeeds (refcount++)
-Thread B: finds ctrl, bpf_try_module_get(ctrl) succeeds (refcount++)
-Thread A: xchg(&net->smc.hs_ctrl, ctrl) returns old_ctrl
-Thread B: xchg(&net->smc.hs_ctrl, ctrl) returns ctrl (from Thread A)
-Thread A: bpf_module_put(old_ctrl)
-Thread B: bpf_module_put(ctrl)  <- drops ref on ctrl still in use
-
-This leaves ctrl with one less reference than needed while it's assigned
-to net->smc.hs_ctrl, and old_ctrl leaks a reference. The xchg is atomic
-but the overall get-xchg-put sequence is not. Would a mutex around the
-entire operation resolve this?
-
-> +
-> +static int proc_smc_hs_ctrl(const struct ctl_table *ctl, int write,
-> +			    void *buffer, size_t *lenp, loff_t *ppos)
-> +{
-> +	struct net *net = container_of(ctl->data, struct net, smc.hs_ctrl);
-> +	char val[SMC_HS_CTRL_NAME_MAX];
-> +	const struct ctl_table tbl = {
-> +		.data = val,
-> +		.maxlen = SMC_HS_CTRL_NAME_MAX,
-> +	};
-> +	struct smc_hs_ctrl *ctrl;
-> +	int ret;
-> +
-> +	rcu_read_lock();
-> +	ctrl = rcu_dereference(net->smc.hs_ctrl);
-> +	if (ctrl)
-> +		memcpy(val, ctrl->name, sizeof(ctrl->name));
-> +	else
-> +		val[0] = '\0';
-> +	rcu_read_unlock();
-> +
-> +	ret = proc_dostring(&tbl, write, buffer, lenp, ppos);
-> +	if (ret)
-> +		return ret;
-> +
-> +	if (write)
-> +		ret = smc_net_replace_smc_hs_ctrl(net, val);
-> +	return ret;
-> +}
-
-[ ... ]
-
-
-```
-
+Signed-off-by: Buday Csaba <buday.csaba@prolan.hu>
 ---
-AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
-See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+V1 -> V2: Changed wording on maintainer request.
+---
+ .../devicetree/bindings/net/ethernet-phy.yaml          | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-In-Reply-To-Subject: `net/smc: bpf: Introduce generic hook for handshake flow`
-CI run summary: https://github.com/kernel-patches/bpf/actions/runs/19027307093
+diff --git a/Documentation/devicetree/bindings/net/ethernet-phy.yaml b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+index 2ec2d9fda..bb4c49fc5 100644
+--- a/Documentation/devicetree/bindings/net/ethernet-phy.yaml
++++ b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+@@ -35,9 +35,13 @@ properties:
+         description: PHYs that implement IEEE802.3 clause 45
+       - pattern: "^ethernet-phy-id[a-f0-9]{4}\\.[a-f0-9]{4}$"
+         description:
+-          If the PHY reports an incorrect ID (or none at all) then the
+-          compatible list may contain an entry with the correct PHY ID
+-          in the above form.
++          PHYs contain identification registers. These will be read to
++          identify the PHY. If the PHY reports an incorrect ID, or the
++          PHY requires a specific initialization sequence (like a
++          particular order of clocks, resets, power supplies), in
++          order to be able to read the ID registers, then the
++          compatible list must contain an entry with the correct PHY
++          ID in the above form.
+           The first group of digits is the 16 bit Phy Identifier 1
+           register, this is the chip vendor OUI bits 3:18. The
+           second group of digits is the Phy Identifier 2 register,
 
---===============7388337055491605420==--
+base-commit: 0d0eb186421d0886ac466008235f6d9eedaf918e
+-- 
+2.39.5
+
+
 
