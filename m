@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-235065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9530C2BA95
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 13:27:58 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39184C2BA1D
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 13:22:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4794F4F64E7
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 12:22:18 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B12FC3490BF
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 12:22:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5835D30CD9E;
-	Mon,  3 Nov 2025 12:20:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35E3630F7FC;
+	Mon,  3 Nov 2025 12:20:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87B3930CDA3;
-	Mon,  3 Nov 2025 12:20:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62F1430F523;
+	Mon,  3 Nov 2025 12:20:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762172416; cv=none; b=cH0kEYyvPN0MlBJkllsErjeBBc5n8f/gLKt21/nQr1YI+NVCF4ise9R3Hu0L0NNkoTv7aLytyTFFRoPa3zGlteZZkh9fd8In/EIQmORgUxYLujfI+qKZJUceRuUSuCwoqCGlRGat2EwF3NTRZJ5HaraBP0BWAneGFO0iUk9JOqc=
+	t=1762172422; cv=none; b=KnyUR6X36ZXfu69hKQToB0gqdg8x6LzdRAuKyBjTjo/s3PjHk4kqygava17n7S11zEmMEDRvT0DWwr04K6ByyEMwMcvedvqsq+MtjUCZlY6nErwS8cQ3fZ0gE7VGs5kLFIZ2glQC+h7ve8xskjn68zgxoAx3K7Ovelxf7stgyqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762172416; c=relaxed/simple;
-	bh=vNeq+nKrC2+Jpm2WRcDHKStekDU8b+BpNHI+lLm4b1A=;
+	s=arc-20240116; t=1762172422; c=relaxed/simple;
+	bh=YUNW5+++ZBrA5vRoYxg0c6f5k4xNmL/y6B5rl6Z4FSY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dJspk3uclEYzVSFGsPun/a2kFZZEZCrWB1LHMYPSnFmTjxo7MZPFgd4ICHu0hmRnl0uM+CKrYT4Cl4tQoyr3csZHpsq3swKb0B6yWVR+ETHvIMwks4OvE+HUxG9kskxzhuBwkUPP46/z9SD5rAk4IogQ9XtbfzM2CPjKA2dK88M=
+	 Content-Type:Content-Disposition:In-Reply-To; b=AvLVAJH7zoXCiAj3qGsg5DYZeNfIndCJMqL0elO6oVfw+9ZoBsCMhnC4YBji/raExkwQQp56v6NdODcDWgnZ6W9b85A3vzvvzTQUP6KWXh1YSubN74Pm7sM5DrcaQexzIb9pXQvQ9mA+ZakH++GjPGjJ4UsQwtBW9TMcQh8XYEQ=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -33,9 +33,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.98.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1vFtXd-000000000qv-0bhR;
-	Mon, 03 Nov 2025 12:20:09 +0000
-Date: Mon, 3 Nov 2025 12:20:05 +0000
+	id 1vFtXk-000000000rJ-0JeP;
+	Mon, 03 Nov 2025 12:20:16 +0000
+Date: Mon, 3 Nov 2025 12:20:12 +0000
 From: Daniel Golle <daniel@makrotopia.org>
 To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -58,9 +58,9 @@ Cc: Andreas Schirm <andreas.schirm@siemens.com>,
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
 	"Livia M. Rosu" <lrosu@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: [PATCH net-next v7 09/12] net: dsa: lantiq_gswip: allow adjusting
- MII delays
-Message-ID: <37203e831cff87dc46e5ef9e8cbd68fb8689773d.1762170107.git.daniel@makrotopia.org>
+Subject: [PATCH net-next v7 10/12] dt-bindings: net: dsa: lantiq,gswip: add
+ support for MaxLinear GSW1xx switches
+Message-ID: <fc96f1dedb2b418a63e69960356dde7f6eb86424.1762170107.git.daniel@makrotopia.org>
 References: <cover.1762170107.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -72,169 +72,210 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1762170107.git.daniel@makrotopia.org>
 
-Currently the MII clk vs. data delay is configured based on the PHY
-interface mode.
+Extend the Lantiq GSWIP device tree binding to also cover MaxLinear
+GSW1xx switches which are based on the same hardware IP but connected
+via MDIO instead of being memory-mapped.
 
-In addition to that add support for setting up MII delays using the
-standard Device Tree properties 'tx-internal-delay-ps' and
-'rx-internal-delay-ps', using the values determined by the PHY interface
-mode as default to maintain backward compatibility with legacy device
-trees.
+Add compatible strings for MaxLinear GSW120, GSW125, GSW140, GSW141,
+and GSW145 switches and adjust the schema to handle the different
+connection methods with conditional properties.
+
+Add MaxLinear GSW125 example showing MDIO-connected configuration.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 ---
-v7: no changes
+v7:
+ * drop the addition of 'reg-names' to the list of required properties
+   and also don't add it to the existing example
 
-v6: no changes
+v6:
+ * keep properties on top level and use allOf for conditional constraints
 
-v5: no changes
+v5:
+ * drop maxlinear,rx-inverted from example
 
-v4: rework to use legacy codepath as fallback
+v4:
+ * drop maxlinear,rx-inverted and maxlinear,tx-inverted properties for
+   now in favor of upcoming generic properties
 
-v3: no changes
+v3:
+ * add maxlinear,rx-inverted and maxlinear,tx-inverted properties
 
-v2: no changes
+v2:
+ * remove git conflict left-overs which somehow creeped in
+ * indent example with 4 spaces instead of tabs
 
 since RFC: no changes
 
- drivers/net/dsa/lantiq/lantiq_gswip.h        |  4 +
- drivers/net/dsa/lantiq/lantiq_gswip_common.c | 94 ++++++++++++--------
- 2 files changed, 60 insertions(+), 38 deletions(-)
+ .../bindings/net/dsa/lantiq,gswip.yaml        | 128 +++++++++++++++++-
+ 1 file changed, 123 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.h b/drivers/net/dsa/lantiq/lantiq_gswip.h
-index 42000954d842..0c32ec85e127 100644
---- a/drivers/net/dsa/lantiq/lantiq_gswip.h
-+++ b/drivers/net/dsa/lantiq/lantiq_gswip.h
-@@ -82,6 +82,10 @@
- #define GSWIP_MII_PCDU5			0x05
- #define  GSWIP_MII_PCDU_TXDLY_MASK	GENMASK(2, 0)
- #define  GSWIP_MII_PCDU_RXDLY_MASK	GENMASK(9, 7)
-+#define  GSWIP_MII_PCDU_TXDLY(x)	u16_encode_bits(((x) / 500), GSWIP_MII_PCDU_TXDLY_MASK)
-+#define  GSWIP_MII_PCDU_RXDLY(x)	u16_encode_bits(((x) / 500), GSWIP_MII_PCDU_RXDLY_MASK)
-+#define GSWIP_MII_PCDU_RXDLY_DEFAULT	2000 /* picoseconds */
-+#define GSWIP_MII_PCDU_TXDLY_DEFAULT	2000 /* picoseconds */
+diff --git a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
+index 929f6f8e4534..205b683849a5 100644
+--- a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
+@@ -4,7 +4,12 @@
+ $id: http://devicetree.org/schemas/net/dsa/lantiq,gswip.yaml#
+ $schema: http://devicetree.org/meta-schemas/core.yaml#
  
- /* GSWIP Core Registers */
- #define GSWIP_SWRES			0x000
-diff --git a/drivers/net/dsa/lantiq/lantiq_gswip_common.c b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-index 7b3debd45b91..122ccea4057b 100644
---- a/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-+++ b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-@@ -130,30 +130,6 @@ static void gswip_mii_mask_cfg(struct gswip_priv *priv, u32 mask, u32 set,
- 			  set);
- }
+-title: Lantiq GSWIP Ethernet switches
++title: Lantiq GSWIP and MaxLinear GSW1xx Ethernet switches
++
++description:
++  Lantiq GSWIP and MaxLinear GSW1xx switches share the same hardware IP.
++  Lantiq switches are embedded in SoCs and accessed via memory-mapped I/O,
++  while MaxLinear switches are standalone ICs connected via MDIO.
  
--static void gswip_mii_mask_pcdu(struct gswip_priv *priv, u32 mask, u32 set,
--				int port)
--{
--	int reg_port;
+ $ref: dsa.yaml#
+ 
+@@ -17,9 +22,14 @@ properties:
+       - lantiq,xrx200-gswip
+       - lantiq,xrx300-gswip
+       - lantiq,xrx330-gswip
++      - maxlinear,gsw120
++      - maxlinear,gsw125
++      - maxlinear,gsw140
++      - maxlinear,gsw141
++      - maxlinear,gsw145
+ 
+   reg:
+-    minItems: 3
++    minItems: 1
+     maxItems: 3
+ 
+   reg-names:
+@@ -36,9 +46,6 @@ properties:
+       compatible:
+         const: lantiq,xrx200-mdio
+ 
+-    required:
+-      - compatible
 -
--	/* MII_PCDU register only exists for MII ports */
--	if (!(priv->hw_info->mii_ports & BIT(port)))
--		return;
--
--	reg_port = port + priv->hw_info->mii_port_reg_offset;
--
--	switch (reg_port) {
--	case 0:
--		regmap_write_bits(priv->mii, GSWIP_MII_PCDU0, mask, set);
--		break;
--	case 1:
--		regmap_write_bits(priv->mii, GSWIP_MII_PCDU1, mask, set);
--		break;
--	case 5:
--		regmap_write_bits(priv->mii, GSWIP_MII_PCDU5, mask, set);
--		break;
--	}
--}
--
- static int gswip_mdio_poll(struct gswip_priv *priv)
- {
- 	u32 ctrl;
-@@ -622,6 +598,61 @@ static int gswip_port_vlan_filtering(struct dsa_switch *ds, int port,
- 	return 0;
- }
+   gphy-fw:
+     type: object
+     properties:
+@@ -123,6 +130,30 @@ required:
+   - compatible
+   - reg
  
-+static void gswip_mii_delay_setup(struct gswip_priv *priv, struct dsa_port *dp,
-+				  phy_interface_t interface)
-+{
-+	u32 tx_delay = GSWIP_MII_PCDU_TXDLY_DEFAULT;
-+	u32 rx_delay = GSWIP_MII_PCDU_RXDLY_DEFAULT;
-+	struct device_node *port_dn = dp->dn;
-+	u16 mii_pcdu_reg;
++allOf:
++  - if:
++      properties:
++        compatible:
++          contains:
++            enum:
++              - lantiq,xrx200-gswip
++              - lantiq,xrx300-gswip
++              - lantiq,xrx330-gswip
++    then:
++      properties:
++        reg:
++          minItems: 3
++          maxItems: 3
++        mdio:
++          required:
++            - compatible
++    else:
++      properties:
++        reg:
++          maxItems: 1
++        reg-names: false
++        gphy-fw: false
 +
-+	/* As MII_PCDU registers only exist for MII ports, silently return
-+	 * unless the port is an MII port
-+	 */
-+	if (!(priv->hw_info->mii_ports & BIT(dp->index)))
-+		return;
-+
-+	switch (dp->index + priv->hw_info->mii_port_reg_offset) {
-+	case 0:
-+		mii_pcdu_reg = GSWIP_MII_PCDU0;
-+		break;
-+	case 1:
-+		mii_pcdu_reg = GSWIP_MII_PCDU1;
-+		break;
-+	case 5:
-+		mii_pcdu_reg = GSWIP_MII_PCDU5;
-+		break;
-+	default:
-+		return;
-+	}
-+
-+	/* legacy code to set default delays according to the interface mode */
-+	switch (interface) {
-+	case PHY_INTERFACE_MODE_RGMII_ID:
-+		tx_delay = 0;
-+		rx_delay = 0;
-+		break;
-+	case PHY_INTERFACE_MODE_RGMII_RXID:
-+		rx_delay = 0;
-+		break;
-+	case PHY_INTERFACE_MODE_RGMII_TXID:
-+		tx_delay = 0;
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	/* allow settings delays using device tree properties */
-+	of_property_read_u32(port_dn, "rx-internal-delay-ps", &rx_delay);
-+	of_property_read_u32(port_dn, "tx-internal-delay-ps", &tx_delay);
-+
-+	regmap_write_bits(priv->mii, mii_pcdu_reg,
-+			  GSWIP_MII_PCDU_TXDLY_MASK |
-+			  GSWIP_MII_PCDU_RXDLY_MASK,
-+			  GSWIP_MII_PCDU_TXDLY(tx_delay) |
-+			  GSWIP_MII_PCDU_RXDLY(rx_delay));
-+}
-+
- static int gswip_setup(struct dsa_switch *ds)
- {
- 	unsigned int cpu_ports = dsa_cpu_ports(ds);
-@@ -1425,20 +1456,7 @@ static void gswip_phylink_mac_config(struct phylink_config *config,
- 			   GSWIP_MII_CFG_RGMII_IBS | GSWIP_MII_CFG_LDCLKDIS,
- 			   miicfg, port);
+ unevaluatedProperties: false
  
--	switch (state->interface) {
--	case PHY_INTERFACE_MODE_RGMII_ID:
--		gswip_mii_mask_pcdu(priv, GSWIP_MII_PCDU_TXDLY_MASK |
--					  GSWIP_MII_PCDU_RXDLY_MASK, 0, port);
--		break;
--	case PHY_INTERFACE_MODE_RGMII_RXID:
--		gswip_mii_mask_pcdu(priv, GSWIP_MII_PCDU_RXDLY_MASK, 0, port);
--		break;
--	case PHY_INTERFACE_MODE_RGMII_TXID:
--		gswip_mii_mask_pcdu(priv, GSWIP_MII_PCDU_TXDLY_MASK, 0, port);
--		break;
--	default:
--		break;
--	}
-+	gswip_mii_delay_setup(priv, dp, state->interface);
- }
- 
- static void gswip_phylink_mac_link_down(struct phylink_config *config,
+ examples:
+@@ -230,3 +261,90 @@ examples:
+                     };
+             };
+     };
++
++  - |
++    #include <dt-bindings/leds/common.h>
++
++    mdio {
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        switch@1f {
++            compatible = "maxlinear,gsw125";
++            reg = <0x1f>;
++
++            ports {
++                #address-cells = <1>;
++                #size-cells = <0>;
++
++                port@0 {
++                    reg = <0>;
++                    label = "lan0";
++                    phy-handle = <&switchphy0>;
++                    phy-mode = "internal";
++                };
++
++                port@1 {
++                    reg = <1>;
++                    label = "lan1";
++                    phy-handle = <&switchphy1>;
++                    phy-mode = "internal";
++                };
++
++                port@4 {
++                    reg = <4>;
++                    label = "wan";
++                    phy-mode = "1000base-x";
++                    managed = "in-band-status";
++                };
++
++                port@5 {
++                    reg = <5>;
++                    phy-mode = "rgmii-id";
++                    tx-internal-delay-ps = <2000>;
++                    rx-internal-delay-ps = <2000>;
++                    ethernet = <&eth0>;
++
++                    fixed-link {
++                        speed = <1000>;
++                        full-duplex;
++                    };
++                };
++            };
++
++            mdio {
++                #address-cells = <1>;
++                #size-cells = <0>;
++
++                switchphy0: switchphy@0 {
++                    reg = <0>;
++
++                    leds {
++                        #address-cells = <1>;
++                        #size-cells = <0>;
++
++                        led@0 {
++                            reg = <0>;
++                            color = <LED_COLOR_ID_GREEN>;
++                            function = LED_FUNCTION_LAN;
++                        };
++                    };
++                };
++
++                switchphy1: switchphy@1 {
++                    reg = <1>;
++
++                    leds {
++                        #address-cells = <1>;
++                        #size-cells = <0>;
++
++                        led@0 {
++                            reg = <0>;
++                            color = <LED_COLOR_ID_GREEN>;
++                            function = LED_FUNCTION_LAN;
++                        };
++                    };
++                };
++            };
++        };
++    };
 -- 
 2.51.2
 
