@@ -1,320 +1,171 @@
-Return-Path: <netdev+bounces-235146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D77AC2C9BE
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 16:13:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D7C3C2CF40
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 17:01:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 129C8345463
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 15:13:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACAF55624B0
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 15:13:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4121A3019BD;
-	Mon,  3 Nov 2025 15:00:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD06E317701;
+	Mon,  3 Nov 2025 15:01:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Og9SLFO3"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="1hT9t5A3";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="zlaq5SCo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from fhigh-b5-smtp.messagingengine.com (fhigh-b5-smtp.messagingengine.com [202.12.124.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B6C7261B96;
-	Mon,  3 Nov 2025 15:00:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762182049; cv=fail; b=B7Kj2pLu5B2w267cGw22lm/DDeEM7lqO31idNtES88N3Gw7I0OWKcLan0h8iYkYZFEZ3LAFpsKD4Sxo9KJwb5HZHg7nSo5SzYOhviBAqen2NsfL7ifA1R8O56gqIdN0rvhGV9lc15KaqhhReln09lXs0FWOMLcwXR5X1HTeuPms=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762182049; c=relaxed/simple;
-	bh=nwNmE3FUc1JjeePY1c9qK31aORXo3/bT7ljUYW5zjiA=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Vrqd/Ig6NnwqiIdxBAZDADSA4KCgJDjhMXC8H/2j1xnOUuORnfyLd62z3w9K0uAOmVDYXI8jC4w+knqIIe30SphyRg8NWm9KWCBtJUvdhURwx8mz40ltOmUN6ymFp5w9A6v0p85uh/cduMS0Jv+5lCdHQfrR60DpaYLlVxmAfcQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Og9SLFO3; arc=fail smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762182048; x=1793718048;
-  h=date:from:to:cc:subject:message-id:references:
-   content-transfer-encoding:in-reply-to:mime-version;
-  bh=nwNmE3FUc1JjeePY1c9qK31aORXo3/bT7ljUYW5zjiA=;
-  b=Og9SLFO3GIony5537xxNiFz2yYImkf6SypgXK0M2AmOZbIXxbXeiqNDE
-   r1BL8bB7XgTdr6ohaUy7mNb6rqN4niMRCtYkCz3eCHAqEcyHFarn/8zLL
-   7jMhGhQmXhDymeoTEBJNeha4QKJbf4CSFVBw2VhbbL2G701qxZLvSVUcv
-   8jjBMWOfplrDxrJ7GQgyntE6m+OWO1d/Y3z+X8hmkN3VXHCYxGC90isBp
-   i9ex4CSMmoo4BEzZcSWSgbKq4UaczzCFjtTUm+06Rqsro/9xLoHqssiW/
-   Kt6lGXI/ngO4rZkuythcRS11WlRvAIrPVsVEoUFajJryCOHYUtps5ZJ4d
-   w==;
-X-CSE-ConnectionGUID: PEH+tf08QzG7xehnL4hiWA==
-X-CSE-MsgGUID: T8LLnV0EQRe5+6NmNNvjtw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11602"; a="74548786"
-X-IronPort-AV: E=Sophos;i="6.19,276,1754982000"; 
-   d="scan'208";a="74548786"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 07:00:47 -0800
-X-CSE-ConnectionGUID: NpEtZ5iZTkmalP93TbMiwQ==
-X-CSE-MsgGUID: pMZuarOtR1irwuxZOK0B9g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,276,1754982000"; 
-   d="scan'208";a="224134336"
-Received: from orsmsx902.amr.corp.intel.com ([10.22.229.24])
-  by orviesa001.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 07:00:46 -0800
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Mon, 3 Nov 2025 07:00:45 -0800
-Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Mon, 3 Nov 2025 07:00:45 -0800
-Received: from DM1PR04CU001.outbound.protection.outlook.com (52.101.61.4) by
- edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Mon, 3 Nov 2025 07:00:45 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Te16el0Z1TDI8FRuhydGSFnm9ZrUMTthPE6bHPXEgNx48eLaE/qj3T67vEcliOweeukGxiQ3W6JYchv+qSOJm7I8uwUs1gwtTwvoE8KNhEK4U0uptmxcOOATQgxCGXczAQgBg1+C8xk70KrcrkPmXOilTWan11SiHhj8d3DS8XNVLLiF+x3iPaZkS1WuZ4if+L93c6xfgc0Cq6ffT/PyafaxNpeia+G+9+MUFReE0lRI0gkcHRzbVz9AEvuEbSGoXtptKHuCU6TvpxkVwoyQtwa0rYz4NPjVlDidzmKce5CeFvDdFPU/v9z6qIJjcG7meiJ/lBwOA33sdS5BUxj3nA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yrS6ky+WrSFPQ84WXQq1huvY2G4F0sM5I+rSoOsIJIc=;
- b=VLGef12ZPp2lFhnX7YA2K2Nr5e2ZuYvtpimBq4H0Sce8JUrXB8uuxeuKK/icLPe0CxRCineKxFsz4tZ5+FsN02mG+0TL8cwH/g6cxjzPnDBGkMqnlfQlS11wKtKfsO+czMsMgch6HKcTxrFqWqvUtRiGIgGudpXKYowTccB+ZUS9NUXc+eUZMW3psGyjUTvYfQb7IoKKdjrdRdIuCce4mMja21Qpi378gJtizj0krfM1WBRnhQGjscxmGpg+8NwX8QF+YXstMNSOe4IrIcS4ATZGRGmNyputgSzLA1vlU0Kk3KlYPynLlettQQNvBcsxZYAZwhazju8arorAAky8zA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- CYXPR11MB8730.namprd11.prod.outlook.com (2603:10b6:930:e3::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9275.16; Mon, 3 Nov 2025 15:00:38 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca%4]) with mapi id 15.20.9275.013; Mon, 3 Nov 2025
- 15:00:37 +0000
-Date: Mon, 3 Nov 2025 16:00:29 +0100
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <bjorn@kernel.org>, <magnus.karlsson@intel.com>,
-	<jonathan.lemon@gmail.com>, <sdf@fomichev.me>, <ast@kernel.org>,
-	<daniel@iogearbox.net>, <hawk@kernel.org>, <john.fastabend@gmail.com>,
-	<joe@dama.to>, <willemdebruijn.kernel@gmail.com>, <fmancera@suse.de>,
-	<csmate@nop.hu>, <bpf@vger.kernel.org>, <netdev@vger.kernel.org>, Jason Xing
-	<kernelxing@tencent.com>
-Subject: Re: [PATCH RFC net-next 2/2] xsk: introduce a cached cq to
- temporarily store descriptor addrs
-Message-ID: <aQjDjaQzv+Y4U6NL@boxer>
-References: <20251031093230.82386-1-kerneljasonxing@gmail.com>
- <20251031093230.82386-3-kerneljasonxing@gmail.com>
- <aQTBajODN3Nnskta@boxer>
- <CAL+tcoDGiYogC=xiD7=K6HBk7UaOWKCFX8jGC=civLDjsBb3fA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAL+tcoDGiYogC=xiD7=K6HBk7UaOWKCFX8jGC=civLDjsBb3fA@mail.gmail.com>
-X-ClientProxiedBy: VI1PR06CA0126.eurprd06.prod.outlook.com
- (2603:10a6:803:a0::19) To DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB4427FD68;
+	Mon,  3 Nov 2025 15:01:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.156
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762182070; cv=none; b=Y9PY6jlHKpXq70YLSXzZiIBhrcA08874QrDDAk8Wz1vM7WCsA2oId1hrTocJOQvgZkYkYiQI53rr1CqW1vEujdU3oAyNu92hvJzQrpmhPjpw5SsGWUDLlRl33DqxE6RwmOzgIpZAzBAzz7iEVco9kiSJCo06zoeQA6EJrNnnZ8Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762182070; c=relaxed/simple;
+	bh=Fa2A1KQHl0Ok5OmCFsWDeoz3FriRH/Ae+vmGgtQZjC4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YZ+H9S6LzvtJDOdal9OXNl30kVLBfrZ5a27Xqp8SDTHA4I/JgwXRwFWnuXG+i0QQaXe0NT+y7u8o24Czi7S36PWoAhZVEOyiTeINCxzbX4vbrinC1d5thGlFPF6lBSy4vaLEY6Gchsq+nn+/zBWHbjtv/SS+TciAspHudJAESUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=1hT9t5A3; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=zlaq5SCo; arc=none smtp.client-ip=202.12.124.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 232E57A0009;
+	Mon,  3 Nov 2025 10:01:04 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-04.internal (MEProxy); Mon, 03 Nov 2025 10:01:04 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1762182063; x=
+	1762268463; bh=fOxVgiixhmAbuujQPmcHI1Sf2R/F0nB3JienkE+5nAI=; b=1
+	hT9t5A3qJK96SQR/9+7MAfJPSMx+MHD4rGqV0qOfx6e84JMKkr9OuV0G2ZAO2qnv
+	kdFCBPxjcnyASgQvxjIQkp5Z4NVC6OF2JkbhQ4pv8z++kZ9TE7YjHj+VjIwxvbx8
+	ZvsBf7r1YlPQHA5MQbs4uLEzRsLp+RkGTZhBq5R+7YEI4V2Wov1X8bj3iJuy4Sdo
+	ccxwZxPGSXx41XFVj4AD84uHDMam3CNmisZnvib/EUYMsZ1KylVtFIroi1foXnSy
+	zMrban7bc7vnIgPsQ3Z0CNBoc32gD1Aua6JGFcSEwMwO5crbnmx8e8PBxzAU7YJA
+	yjkQekhh/2YV+yYVt5NSw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1762182063; x=1762268463; bh=fOxVgiixhmAbuujQPmcHI1Sf2R/F0nB3Jie
+	nkE+5nAI=; b=zlaq5SCoi14NK0mj0XOVba/jyhe5entm0MxsfYCv2WBZq9jbKRO
+	2q6WMWPsHrNj1UYrXZErDmO+Pbhe3eJwnYdGT76l2PdGjrejjw5qDtpCzKhy1CBy
+	Z/yjj1pTn9OPASdXOtl6+r2YjrexiF7dYaIUfgk3dWFgyPR+hLadSBbuNsTuhQH4
+	NRwShZO12Br6mKER71jh/awjqR1vZ/gMGFQMNaP/deN5seg6LYgDnduLvQ2jLcof
+	NvGLrwlrOmWkF/Sp8GtoD/4cCvMqxbfz5OIlwJieMePh9JHw08B6qoutlbPFk/yh
+	MK5ojQTART1B53EBgMHTV0T5FTFZN72Kn2g==
+X-ME-Sender: <xms:r8MIaSdw1blZIIgwYmqasHUovTs_AZ3zpb0lWb5CpypDcRZD8vH24g>
+    <xme:r8MIaY4WQiZAqgsly30XyB2bxiptVKz4T_ukHzAqmAigThk016y0PxZ7MblgoDSgS
+    QRYQNbi5VhcfnNUeix8MZIOMLJ-tvqY7rea6UqyDaT9Xs70_1adDg>
+X-ME-Received: <xmr:r8MIaXYRPRNBws8mlDnEJPUwqIoYyTxYlQN5Q49QsP20eyRJ6i9qPTmI4Gip>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddujeekgeegucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
+    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
+    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
+    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
+    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedufedpmhho
+    uggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtg
+    hpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopeifrghnghhlihgr
+    nhhgjeegsehhuhgrfigvihdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlh
+    hofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdp
+    rhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepshhhuh
+    grhheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdho
+    rhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:r8MIaaFmPhmH1MAYFp_fF5rN-G6pyKe2Q2U834QSV_ZGf6jqgVa-Gg>
+    <xmx:r8MIaSmmqdEo7Cbg5j381ZKQNbxHYAriXT-i9ryEgglJTb5K-jP2Og>
+    <xmx:r8MIafDc0JynqmYo5QiD5mfrDClmJrE9tHb9Sqcb--Si8iuHVkQzuw>
+    <xmx:r8MIaUA6GFi5TcCopkQJ_pI-NlBkr7dcRrpH4E0xGHbyM99bYlK__w>
+    <xmx:r8MIaazGBeIh4ADPJ7t9QsrtRJ7yojCJHWQb3IMpfvOH6QVi434BB4B7>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 3 Nov 2025 10:01:02 -0500 (EST)
+Date: Mon, 3 Nov 2025 16:01:00 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Jakub Kicinski <kuba@kernel.org>, Wang Liang <wangliang74@huawei.com>,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	shuah@kernel.org, horms@kernel.org, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	yuehaibing@huawei.com, zhangchangzhong@huawei.com
+Subject: Re: [PATCH net] selftests: netdevsim: Fix ethtool-features.sh fail
+Message-ID: <aQjDrMH34QVz6e1E@krikkit>
+References: <20251030032203.442961-1-wangliang74@huawei.com>
+ <aQPxN5lQui5j8nK8@krikkit>
+ <20251030170217.43e544ad@kernel.org>
+ <aQiANPQU9ZEa0zCo@krikkit>
+ <e014c4c5-105a-43cb-9411-ec139af2b2a1@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|CYXPR11MB8730:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1acf36c1-d0da-4725-a6b2-08de1ae9bf95
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|1800799024|366016|376014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?bWkvWXFpK2ZuUndiazRUVEtEYUpHN09jd1hBLy9NTHdBWVNEeUd6YmRDSExG?=
- =?utf-8?B?cmhIUzMzaTVHbU5CbnpFMVJDYUZ2R3VOTGV5cnVxN1hQa1RlUTZsL0dSODBK?=
- =?utf-8?B?VW0zMUNyYi80T3cvQm9RVTRzeFlxUFk4c1VXeTVxUWhENnNwVEIxTXJmZFBG?=
- =?utf-8?B?ZTRjS0oxZVVMZWNwcDZuUDVxRTU3R3A3ZzFpZ1Z6SWJueStrZlhWazdubGNK?=
- =?utf-8?B?Z1Z4RjRhazhrekxuZTF5L01ta0pQUGZZK01QbHhjQmczMUNuR0dDSFJ2a3FR?=
- =?utf-8?B?SnRDU2MzR2hnNzJHbVN2MlFITHZhTW9IL2FQWWp2RForWW5aUlFpR0ZZS1JL?=
- =?utf-8?B?ajhNUHJ1SnUwMWZYSWp6TUhBYXVVQjlNZGtmbXUvaUluWTRpQitpUWRKYUlr?=
- =?utf-8?B?eDMyYkwyY1hVZjM0VXVSejZ5RENXMXNkakkvSEpDRnhtdTRhQkhZdnZNZW1j?=
- =?utf-8?B?MVJNZjFUcWFaTzNpQ2JEa2NyRkV4QjdWOUZ5NDdmMGw5OCt4WmxEZkh1K213?=
- =?utf-8?B?ZVZzdkhPSEpaMUxiSXJDYy81VGxkZkZHcEs5aGhZV2RvUi9FY1AvTDlIZ2pU?=
- =?utf-8?B?c1VMYStEM3RSVUtwQUNBOGVRSTF2WFdkakQ2bkZLUVJoNWpGWmhDTW5zQW9j?=
- =?utf-8?B?cjdzTWdramVKZW4xZSthSXZyR3YwMXkxNE43dUh4YWYycVNwNVVwYmFoU0lW?=
- =?utf-8?B?YmhlUlFoMjloZ1ROd0hSdXJPN2k1clNUUU16TkNFRTdoajZ4WW05M0c2dW42?=
- =?utf-8?B?clZlVTE0MW9kWEhWRnBDWkdvMXdSZTZpUzZZdHQxMG1pTVIyVE04dHl5S01Y?=
- =?utf-8?B?TWlZbWlTeXpkYXhSMUV6Z1llbi9Va2w3RTd0SERGMDJBOUxlZWVVdjF6c1Z5?=
- =?utf-8?B?aG5ieFE0WXVPeHJsNWNlL0dZcW00VFJuLzFnT0U2TDhnZUU5SFExdGxyTXRx?=
- =?utf-8?B?WDVWZ242OXdsMm5JVFVuN2pxbmlxeVd1N21GWlVYS01CcWw3ZkExVnFnRmNU?=
- =?utf-8?B?UEh3T1ByVWlKYmdtYUh0VWsrcElWa1F1Q240dS9zUFY4bEkxamVSVU1qRERw?=
- =?utf-8?B?aGNLaExkeW1uT2xmNGZBZnZvWmpVQjRISDhreUNEN3ZkMkVLRW5MYTMxYVhx?=
- =?utf-8?B?bGtzOUsxZklucXgvb2JjOTFmRTh4THRmVWVhd01kMC9ya3EvMTNxQjBMZEZT?=
- =?utf-8?B?ZnVkYy9yUmZNZ0ZJZlU0TDYzbEM5ck1TV25XTFR1eFRhQWl2aDBTUmtrcWxS?=
- =?utf-8?B?RFczcFdVNVpUekRSeVJiWm9GTVV4OVgyU0Y0aWoybldONTZBaXcrUlY0VjMv?=
- =?utf-8?B?MldkZUgxZzhRRjMxanZiSHFZcnRuY21qNXNIZTB5RVhJMTE4amgva0dianVZ?=
- =?utf-8?B?OFZkekhGZ002bkNVL0xCaTdyUHEvMytQOWNRSTh1bHB0S3NGZElRS2Y2NnN5?=
- =?utf-8?B?SzFrRG5xa29KRXd1a0R0RUpKUjhMd3g4bk5EQkxLMlAzeFNEQWY1Y3JGN3Ry?=
- =?utf-8?B?U2ZwVUtwVnI0REJpYi9CdzhmZzJoUkpWU011QllkUzNoOU12SlNzUGszTjlq?=
- =?utf-8?B?QU90RkJwSm9IU1pnV1N2bEIrVjRta1V0cjdHYzYvZ0h3ZzNEcDYrTk9sdC9w?=
- =?utf-8?B?cUhDWTNhZ290T2dLVnE5ekgzbUkvT255bzJrYjV5VDV6Q1UzSUdOUWVRNkJM?=
- =?utf-8?B?QUFIdmhSWE9YOWJPZ2Y3U0xjM2UzMzdNOVI3MEZvWG9zejV4YXBLRTJ4UlB3?=
- =?utf-8?B?c3VhdE9wb3UrVTIzdDRuZHpzMllmUGw5UXJEUndIem5XcE9Xd2dUNHB1YVAx?=
- =?utf-8?B?dG90aFdKcjU2WFVHTjJoMDFaanBCTi9xYzljakNmS2ZOS1VTYS9lOEY3elRk?=
- =?utf-8?B?ZjlhcHp6K2dhOTlQdnNYcmlaT3djVFVNUGZlT0d1aFRUem81ODlid1BONEQ2?=
- =?utf-8?B?OTNkYXRzcHNZWVRVUG0vTnplMDZ2Nk9BVnIwWnlNbkh4WjNtbmZod2hESkZL?=
- =?utf-8?B?aS9EemJpbVpnPT0=?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(1800799024)(366016)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Q2QwZUpoSXZFQnZRbVg2c3BPYkR4UTU1VnlEQytBQVRLWENKWlNzbWxWTldI?=
- =?utf-8?B?MWYwcHZicGZLZkQ5SVJXWlU4Q1NLaEtGLzQzZDduaGZxUG9RTmVxN0dRRThq?=
- =?utf-8?B?bXhjRmZreTRzRXZmUjNKNEtXVUpaSmdQczE4dTl3cFJxZUszeFlwWTJnVmwy?=
- =?utf-8?B?eUpKRHVadHJxS0p2YUhEeTUramhPT21tVG94cnJDbHhPc0FtcThXdyt3a3F3?=
- =?utf-8?B?NUsvZXhCS0ZyVm1ZWDRsWWhrbGlFNXBjOVRINEdsdXhkTGtCZ29vNHU3cFk3?=
- =?utf-8?B?WnNJNWFuY3poUHgxNXdiK01pb1dYcWd5WXcrZXZwL3lDMTRFRzBOT3BubURk?=
- =?utf-8?B?N2dUek5Qa2xTb1daVzYvcDcycXVaOVlpSWlINHd1OVBZd1FHOHVxbW9KN2hZ?=
- =?utf-8?B?aTJEN0VSMWRJV3Bkak82VUkvcmc4NHVLUjQ4YmRraUdWU04zZ21BeFJaRmda?=
- =?utf-8?B?cWE1MzNhVkJIREFTZ1grZDQ4VUtHdVlBMTBKK0JXYkFsSm9LQWFEdWNBL1M2?=
- =?utf-8?B?SFFwRVFndnFnbHZITGwxTkhaVUNETVJpUDBUU1RsRkdYNGZrREJiWEVOSDQy?=
- =?utf-8?B?QzRjUjZKVE9CUW5RaUpwdkRVODBjY3JBUVdhRjNVUUVZYWJIdHdSV0FoamxB?=
- =?utf-8?B?YzFaM08vdCs3UDMxNDhEL3FDOC8wUFBRcGFqSU1JalpXZHg1OUVKenM3ekJ5?=
- =?utf-8?B?REhJTHdJYjU5aW9DTW14bnhnV2NPVUNvUlBJeEhFc0cvR3IxdFVZcVl6K2ZY?=
- =?utf-8?B?WGowU2w4ZjdDY1ZuamtoOVd3MXBvREx3NzlOc09SemVsMkxFK2lJKzJTWjhr?=
- =?utf-8?B?YnNrZCtTWW1ka0tlZ3BOb1kyWTJ1ODU2S1kxSy8zNm4wSDFEbFFNWjMrczV0?=
- =?utf-8?B?RnYxOTJDQkdrYm9ES0d2L1FaQW9aV2xHQ3l6MFhoRnNzaWczYjQybU1qNWdu?=
- =?utf-8?B?U1lSVjJnNkQwVFlzNHZHRWdvYW5MU3hFV244OGVVbWJUcVhEU0JkUkd3Z0ox?=
- =?utf-8?B?WkZ6d3paT1I5YWM0SDM4RFVOR2FBc2FqMmN5emFXV2J0eEpQdEZyem5TYlQ4?=
- =?utf-8?B?QmJITXorV2VnNC9EZk55Vkl6L2NiQWtqQk9tbHVCRGJXcWcrN251ZjVLRlpF?=
- =?utf-8?B?YnBGeUlyYnFRUkxpZ3d1R1FtcVBLNjl6RTNnWDdiRXpPd1pOajlPQVZOWHpx?=
- =?utf-8?B?YlY3aTlmdm0vU0M5N0NXb2Vkd1M3a3FPUVRPa0d6dEF2U0M5OFVjTE4ybnc1?=
- =?utf-8?B?eW5MTDl0cTR4djBDQjJUeCtLcC9sQmVkOXpOTVMzQTVYQThpbUlJeThlcjcy?=
- =?utf-8?B?cWV4ZFdXZDhlcmFYMFoxSkZ5eDA2blFPNU5IaXNsUjBYMFY1by9CQlpkclVS?=
- =?utf-8?B?NUVWQnpvaG5GRmJzbDkrOGtKVnI0UWVBL1FvT3NTRnpQRlVqcFJwWXhXYmlZ?=
- =?utf-8?B?NzEveDB5SE9ld3NIWlNBUENQVEhCODV4b09UdEtsUWJUNjRUOXhRQThmMENS?=
- =?utf-8?B?V2toQUxjMDVZaGtzcXB0U3o5RDBQZGQwRG5VUG1mMDVwN2Y5QmlyTnU5dUpz?=
- =?utf-8?B?RXltQ0tOSEgxSVhTeERyOGthRW1Rek1QY21HRzdqZ1ozS2xtWWxJYURxeGFO?=
- =?utf-8?B?QXZsQkRRRUJxRkJCKzcwZ2d5MFYvb0hIY1g3QjhRUmUrTkxGeFMxMnJWMlk4?=
- =?utf-8?B?RStFKzFwV2FrNnVEajAwTkZmNnQ0aWVWcVFCR2owc2xOMGN0SkVNWDREK01q?=
- =?utf-8?B?WmZZQ2kvM2lEYVFvbG5Hcy9GNCtjSmo4bTdYYVBDd3ZJalE3cVFBVWNwSStI?=
- =?utf-8?B?TWJnSVZBWENOZEJTY0YxVkZpZVlVZURoUHdqMWZlOWtleVdZWTZqenFheldz?=
- =?utf-8?B?RWRtYmpYOGlkbldBU2VaOHdVSFEzNjBDNmVyNHRKTmhZSGI3UWtIM2JzSWtV?=
- =?utf-8?B?ejh4cjJDcFQyNnNsMUU2anRaYUxRVWkyK3dIOEJXWUZ5YUt3M2VXK05Uclcx?=
- =?utf-8?B?UFlZbFRtVkYrWEZUa2dqV04vUE9XRXZydHhTRmp6dncvNG9FdnBxdmhIcVcy?=
- =?utf-8?B?M1pXeEwxS0RUZEs2bnJtNEJ4cWUwMWJBbkszMHlIMzZlM1c4MVY3TGF3ekpG?=
- =?utf-8?B?R3ljclN2cHBVL2pieFlXSi9mNEtaN3FKNFpqeWJITVNsWmsrU3BtRGM4V1hp?=
- =?utf-8?B?OEE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1acf36c1-d0da-4725-a6b2-08de1ae9bf95
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Nov 2025 15:00:37.8305
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1Oh+Kci8b4Og4vDVBoWGok+zoDe4tO9OrV6iZf2XG4ZXMhuCtb5xnZqFv5HvryJ5s3G5edKIVKiNXAyuKKFLLCjKqcaJfWbMD87Gnpgpk1A=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR11MB8730
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <e014c4c5-105a-43cb-9411-ec139af2b2a1@lunn.ch>
 
-On Sat, Nov 01, 2025 at 07:59:36AM +0800, Jason Xing wrote:
-> On Fri, Oct 31, 2025 at 10:02 PM Maciej Fijalkowski
-> <maciej.fijalkowski@intel.com> wrote:
-> >
-> > On Fri, Oct 31, 2025 at 05:32:30PM +0800, Jason Xing wrote:
-> > > From: Jason Xing <kernelxing@tencent.com>
-> > >
-> > > Before the commit 30f241fcf52a ("xsk: Fix immature cq descriptor
-> > > production"), there is one issue[1] which causes the wrong publish
-> > > of descriptors in race condidtion. The above commit fixes the issue
-> > > but adds more memory operations in the xmit hot path and interrupt
-> > > context, which can cause side effect in performance.
-> > >
-> > > This patch tries to propose a new solution to fix the problem
-> > > without manipulating the allocation and deallocation of memory. One
-> > > of the key points is that I borrowed the idea from the above commit
-> > > that postpones updating the ring->descs in xsk_destruct_skb()
-> > > instead of in __xsk_generic_xmit().
-> > >
-> > > The core logics are as show below:
-> > > 1. allocate a new local queue. Only its cached_prod member is used.
-> > > 2. write the descriptors into the local queue in the xmit path. And
-> > >    record the cached_prod as @start_addr that reflects the
-> > >    start position of this queue so that later the skb can easily
-> > >    find where its addrs are written in the destruction phase.
-> > > 3. initialize the upper 24 bits of destructor_arg to store @start_addr
-> > >    in xsk_skb_init_misc().
-> > > 4. Initialize the lower 8 bits of destructor_arg to store how many
-> > >    descriptors the skb owns in xsk_update_num_desc().
-> > > 5. write the desc addr(s) from the @start_addr from the cached cq
-> > >    one by one into the real cq in xsk_destruct_skb(). In turn sync
-> > >    the global state of the cq.
-> > >
-> > > The format of destructor_arg is designed as:
-> > >  ------------------------ --------
-> > > |       start_addr       |  num   |
-> > >  ------------------------ --------
-> > > Using upper 24 bits is enough to keep the temporary descriptors. And
-> > > it's also enough to use lower 8 bits to show the number of descriptors
-> > > that one skb owns.
-> > >
-> > > [1]: https://lore.kernel.org/all/20250530095957.43248-1-e.kubanski@partner.samsung.com/
-> > >
-> > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > > ---
-> > > I posted the series as an RFC because I'd like to hear more opinions on
-> > > the current rought approach so that the fix[2] can be avoided and
-> > > mitigate the impact of performance. This patch might have bugs because
-> > > I decided to spend more time on it after we come to an agreement. Please
-> > > review the overall concepts. Thanks!
-> > >
-> > > Maciej, could you share with me the way you tested jumbo frame? I used
-> > > ./xdpsock -i enp2s0f1 -t -q 1 -S -s 9728 but the xdpsock utilizes the
-> > > nic more than 90%, which means I cannot see the performance impact.
+2025-11-03, 14:36:00 +0100, Andrew Lunn wrote:
+> On Mon, Nov 03, 2025 at 11:13:08AM +0100, Sabrina Dubroca wrote:
+> > 2025-10-30, 17:02:17 -0700, Jakub Kicinski wrote:
+> > > On Fri, 31 Oct 2025 00:13:59 +0100 Sabrina Dubroca wrote:
+> > > > >  set -o pipefail
+> > > > >  
+> > > > > +if ! ethtool --json -k $NSIM_NETDEV > /dev/null 2>&1; then  
+> > > > 
+> > > > I guess it's improving the situation, but I've got a system with an
+> > > > ethtool that accepts the --json argument, but silently ignores it for
+> > > >  -k (ie `ethtool --json -k $DEV` succeeds but doesn't produce a json
+> > > > output), which will still cause the test to fail later.
+> > > 
+> > > And --json was added to -k in Jan 2022, that's pretty long ago.
+> > > I'm not sure we need this aspect of the patch at all..
+> > 
+> > Ok.  Then maybe a silly idea: for the tests that currently have some
+> > form of "$TOOL is too old" check, do we want to remove those after a
+> > while? If so, how long after the feature was introduced in $TOOL?
 > 
-> Could you provide the command you used? Thanks :)
-> 
-> > >
-> > > [2]:https://lore.kernel.org/all/20251030140355.4059-1-fmancera@suse.de/
-> > > ---
-> > >  include/net/xdp_sock.h      |   1 +
-> > >  include/net/xsk_buff_pool.h |   1 +
-> > >  net/xdp/xsk.c               | 104 ++++++++++++++++++++++++++++--------
-> > >  net/xdp/xsk_buff_pool.c     |   1 +
-> > >  4 files changed, 84 insertions(+), 23 deletions(-)
-> >
-> > (...)
-> >
-> > > diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
-> > > index aa9788f20d0d..6e170107dec7 100644
-> > > --- a/net/xdp/xsk_buff_pool.c
-> > > +++ b/net/xdp/xsk_buff_pool.c
-> > > @@ -99,6 +99,7 @@ struct xsk_buff_pool *xp_create_and_assign_umem(struct xdp_sock *xs,
-> > >
-> > >       pool->fq = xs->fq_tmp;
-> > >       pool->cq = xs->cq_tmp;
-> > > +     pool->cached_cq = xs->cached_cq;
-> >
-> > Jason,
-> >
-> > pool can be shared between multiple sockets that bind to same <netdev,qid>
-> > tuple. I believe here you're opening up for the very same issue Eryk
-> > initially reported.
-> 
-> Actually it shouldn't happen because the cached_cq is more of the
-> temporary array that helps the skb store its start position. The
-> cached_prod of cached_cq can only be increased, not decreased. In the
-> skb destruction phase, only those skbs that go to the end of life need
-> to sync its desc from cached_cq to cq. For some skbs that are released
-> before the tx completion, we don't need to clear its record in
-> cached_cq at all and cq remains untouched.
-> 
-> To put it in a simple way, the patch you proposed uses kmem_cached*
-> helpers to store the addr and write the addr into cq at the end of
-> lifecycle while the current patch uses a pre-allocated memory to
-> store. So it avoids the allocation and deallocation.
-> 
-> Unless I'm missing something important. If so, I'm still convinced
-> this temporary queue can solve the problem since essentially it's a
-> better substitute for kmem cache to retain high performance.
+> Another option is to turn them into a hard fail, after X years.
 
-I need a bit more time on this, probably I'll respond tomorrow.
+If the "skip if too old" check is removed, the test will fail when run
+with old tools (because whatever feature is needed will not be
+supported, so somewhere in the middle of test execution there will be
+a failure - but the developer will have to figure out "tool too old"
+from some random command failing).
 
+"check version + hard fail" makes it clear, but the (minor) benefit of
+simply dropping the check is removing a few unneeded lines.
+
+> My
+> guess is, tests which get skipped because the test tools are too old
+> frequently get ignored. Tests which fail are more likely to be looked
+> at, and the tools updated.
 > 
-> Thanks,
-> Jason
+> Another idea is have a dedicated test which simply tests the versions
+> of all the tools. And it should only pass if the installed tools are
+> sufficiently new that all test can pass. If you have tools which are
+> in the grey zone between too old to cause skips, but not old enough to
+> cause fails, you then just have one failing test you need to turn a
+> blind eye to.
+
+That's assumming people run all the tests every time. Is that really
+the case, or do people often run the 2-5 tests that cover the area
+they care about? For example it doesn't make much sense to run nexthop
+and TC tests for a macsec patch (and the other way around). If my
+iproute is too old to run some nexthop or TC tests, I can still run
+the tests I really need for my patch.
+
+But maybe if the tests are run as "run everything" (rather than
+manually running a few of them), ensuring all the needed tools are
+recent enough makes sense.
+
+-- 
+Sabrina
 
