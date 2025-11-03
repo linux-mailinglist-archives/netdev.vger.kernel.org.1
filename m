@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-235203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 023ADC2D62F
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 18:13:19 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D11FCC2D680
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 18:15:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9584E426D2D
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 17:04:38 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 919D54EB04E
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 17:13:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C56B431D378;
-	Mon,  3 Nov 2025 17:02:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B0EA31A547;
+	Mon,  3 Nov 2025 17:13:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="D4ikYTJu"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="IKWwfVo0"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4998931AF2D
-	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 17:02:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F3B4316196
+	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 17:13:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762189366; cv=none; b=Roz67/GaLmmD2BCQ2obxnOpCNeTF6HSvspC4sOS9g3sSNnjYD/EZ//XThb4lAoGRab5wLJcV/3vPOhQLsDnptBYKGwUdNRlFdDmSPna/QHiXyESyFJgsYLGq4KiKPj9FHooxxZ3if/2ycHjG7VHhrq4RHxf9cqfVGJQdkXGEkok=
+	t=1762190011; cv=none; b=pvFviLLSHTlZR/8vlfrTIN2ORyqQLftDxIeR1SjuWF29iZJ3tqux/9Mbv0RmcvLmk+N5zeVe7+8MbvODZGNNEFfCf4br88W5pBYt3Mq7mg/pxdXmnml7cbT9MUz0Ee8/oUFPMvhf+VHTSTvPo5v69PjHH/ZCW6x829DcVnGrQ2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762189366; c=relaxed/simple;
-	bh=xwsJ4KqPB/jhg3e2UyR1yThUSQVrft7/ZDf66DGRU2s=;
+	s=arc-20240116; t=1762190011; c=relaxed/simple;
+	bh=fsmHOcmwq3xZNRDzXEyU+IsRTzpCmRB6li48PMVRPjk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QFqy4u81v8DyMnG4VeT/8N397HOj3g4PsZ3bDUULuJJg8rhTuYg54lErBOeynC1iDymtxGYDTjCCsEp9WxoU+K8UtofgXTDswRX6/EIRmX1EDEjCXClQGnfse83saYKi+Xv1BU3ZYz+vCMWMYvC+SxeGXptHUthO4nUJfkmm/nM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=D4ikYTJu; arc=none smtp.client-ip=78.32.30.218
+	 Content-Type:Content-Disposition:In-Reply-To; b=K97pjDs8Y4HTbIc08a5fHpZ3Nw9aBiuQnClBsnjiGtSaqDB3VxtEFb0ihLTw6YVRMNP86PCYSvdrA+wNxR0OOQ6QAhu0vziHvPrIF+eped8DP2M3cR65gWE2tTy6CQDDxm+DcQ8HhbEus4+CH3TjbLABEajE4gWeHvPCVNfX67E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=IKWwfVo0; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,27 +37,26 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
 	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
 	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=0OEHWe0aEX4CL8pwp76r7di9HP/R/Jl+wwruwqA9LqA=; b=D4ikYTJuLxfvbADYfspsJJ1+PR
-	G9TIv5Edt/r6/WaJZAMklqrf4uQXnTFghnVtt5e2pEK6hkTK/ovT48QofuyuapGxPChHIdI+l7cAZ
-	gPOrF+mElZpbbQ+EvQIPyWkznOrtQKCO+Smfppm2l51XddJEf1qgnAEPWOPhMYtCLXNL0d/3Senen
-	UfeLWqnJdFJiV3OCNGv7Gx6uF/nkB58jMALhMUDGIl3CGihzMnKJorDdmXOy7EjSquQEOFZRyzSvO
-	7zGAhvP8v5iroVagEKr3iVVtuL68nTw6ENsDAAWUL52866vN9a1vYHVGMNjrUG5zhFBacsisMbZ33
-	+AwD+DZQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37810)
+	bh=3g1k5z9QZtVKxfebNO7l/sUZbduhdBqPx9U8LzUB+3E=; b=IKWwfVo0k+dg5F4B80R3fzFVbn
+	kpz8WtfyA5VLECRpnJA9r38WQi7lV0806FM+FWzeQ6BGIIcXylwwqOvbqWiuEalI51eWVV/vcVFGX
+	itpTGm1hzGt+Io4ZJ9hveg3qGkuLRB6Msq6KvYvG/eIs9RZ0UYcq0xeW84b3V1xl8ZoGS90GkMvYK
+	Yb/Pijl9Tbd7MdVuhigsjqYIu7LA5rdWE9Zl6Dsp085dM8oNq20HoKg9BAhV7YL0Yh7YE58lrSCgM
+	HhMvzKZkMrCd+/cQacDJWajyNw3D6gOGrCi0umj9ZJ1vKvg3xr/u1UTQorIAm2Uegl9jvLtS6nSSa
+	38ciuVRg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43392)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <linux@armlinux.org.uk>)
-	id 1vFxwj-0000000019y-3eQA;
-	Mon, 03 Nov 2025 17:02:21 +0000
+	id 1vFy7E-000000001BH-2sTw;
+	Mon, 03 Nov 2025 17:13:12 +0000
 Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
 	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vFxwf-000000003wv-0J3T;
-	Mon, 03 Nov 2025 17:02:17 +0000
-Date: Mon, 3 Nov 2025 17:02:16 +0000
+	id 1vFy7B-000000003xw-1GdJ;
+	Mon, 03 Nov 2025 17:13:09 +0000
+Date: Mon, 3 Nov 2025 17:13:09 +0000
 From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
-	Andrew Lunn <andrew@lunn.ch>,
+To: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
+Cc: Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
 	Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Alexis =?iso-8859-1?Q?Lothor=E9?= <alexis.lothore@bootlin.com>,
@@ -77,7 +76,7 @@ Cc: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
 	Yu-Chun Lin <eleanor15x@gmail.com>
 Subject: Re: [PATCH net-next 0/3] net: stmmac: phylink PCS conversion part 3
  (dodgy stuff)
-Message-ID: <aQjgGBGY4T6xbjWr@shell.armlinux.org.uk>
+Message-ID: <aQjipW51FwQyw9rc@shell.armlinux.org.uk>
 References: <aQNmM5+cptKllTS8@oss.qualcomm.com>
  <aQOB_yCzCmAVM34V@shell.armlinux.org.uk>
  <aQOCpG_gjJlnm0A1@shell.armlinux.org.uk>
@@ -87,7 +86,7 @@ References: <aQNmM5+cptKllTS8@oss.qualcomm.com>
  <20251103104820.3fcksk27j34zu6cg@skbuf>
  <aQiP46tKUHGwmiTo@oss.qualcomm.com>
  <aQiVWydDsRaMz8ua@shell.armlinux.org.uk>
- <20251103121353.dbnalfub5mzwad62@skbuf>
+ <aQidX6SPDbOQ5WKU@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,81 +95,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251103121353.dbnalfub5mzwad62@skbuf>
+In-Reply-To: <aQidX6SPDbOQ5WKU@oss.qualcomm.com>
 Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, Nov 03, 2025 at 02:13:53PM +0200, Vladimir Oltean wrote:
+On Mon, Nov 03, 2025 at 05:47:35PM +0530, Mohd Ayaan Anwar wrote:
+> On Mon, Nov 03, 2025 at 11:43:23AM +0000, Russell King (Oracle) wrote:
+> > On Mon, Nov 03, 2025 at 04:50:03PM +0530, Mohd Ayaan Anwar wrote:
+> > > On Mon, Nov 03, 2025 at 12:48:20PM +0200, Vladimir Oltean wrote:
+> > > > 
+> > > > As Russell partially pointed out, there are several assumptions in the
+> > > > Aquantia PHY driver and in phylink, three of them being that:
+> > > > - rate matching is only supported for PHY_INTERFACE_MODE_10GBASER and
+> > > >   PHY_INTERFACE_MODE_2500BASEX (thus not PHY_INTERFACE_MODE_SGMII)
+> > > > - if phy_get_rate_matching() returns RATE_MATCH_NONE for an interface,
+> > > >   pl->phy_state.rate_matching will also be RATE_MATCH_NONE when using
+> > > >   that interface
+> > > > - if rate matching is used, the PHY is configured to use it for all
+> > > >   media speeds <= phylink_interface_max_speed(link_state.interface)
+> > > > 
+> > > > Those assumptions are not validated very well against the ground truth
+> > > > from the PHY provisioning, so the next step would be for us to see that
+> > > > directly.
+> > > > 
+> > > > Please turn this print from aqr_gen2_read_global_syscfg() into something
+> > > > visible in dmesg, i.e. by replacing phydev_dbg() with phydev_info():
+> > > > 
+> > > > 		phydev_dbg(phydev,
+> > > > 			   "Media speed %d uses host interface %s with %s\n",
+> > > > 			   syscfg->speed, phy_modes(syscfg->interface),
+> > > > 			   syscfg->rate_adapt == AQR_RATE_ADAPT_NONE ? "no rate adaptation" :
+> > > > 			   syscfg->rate_adapt == AQR_RATE_ADAPT_PAUSE ? "rate adaptation through flow control" :
+> > > > 			   syscfg->rate_adapt == AQR_RATE_ADAPT_USX ? "rate adaptation through symbol replication" :
+> > > > 			   "unrecognized rate adaptation type");
+> > > 
+> > > Thanks. Looks like rate adaptation is only provisioned for 10M, which
+> > > matches my observation where phylink passes the exact speeds for
+> > > 100/1000/2500 but 1000 for 10M.
+> > 
+> > Hmm, I wonder what the PHY is doing for that then. stmmac will be
+> > programmed to read the Cisco SGMII in-band control word, and use
+> > that to determine whether symbol replication for slower speeds is
+> > being used.
+> > 
+> > If AQR115C is indicating 10M in the in-band control word, but is
+> > actually operating the link at 1G speed, things are not going to
+> > work, and I would say the PHY is broken to be doing that. The point
+> > of the SGMII in-band control word is to tell the MAC about the
+> > required symbol replication on the link for transmitting the slower
+> > data rates over the link.
+> > 
 > > stmmac unfortunately doesn't give access to the raw Cisco SGMII
 > > in-band control word. However, reading register 0xf8 bits 31:16 for
 > > dwmac4, or register 0xd8 bits 15:0 for dwmac1000 will give this
 > > information. In that bitfield, bits 2:1 give the speed. 2 = 1G,
 > > 1 = 100M, 0 = 10M.
+> > 
 > 
-> It might be Linux who is forcing the AQR115C into the nonsensical
-> behaviour of advertising 10M in the SGMII control word while
-> simultanously forcing the PHY MII to operate at 1G with flow control
-> for the 10M media speed.
+> This is dwmac4 and I got the following values with devmem at different
+> link speeds:
+> 1. 10M:		0x00080000  => Bit 2:1 = 0
+> 2. 100M:	0x000A0000  => Bit 2:1 = 1
+> 3. 1G: 		0x000D0000  => Bit 2:1 = 2
 
-There's another factor in play here: the dwmac-qcom-ethqos glue driver
-forces the configuration of the stmmac integrated PCS irrespective of
-what phylink wants (whether or not patch 1 is being used.) That is,
-for 1G, 100M and 10M, the SGMII in-band control word must be sent by
-the PHY, and it must accurately indicate the symbol replication via
-the speed bits. If this is not the case, then the stmmac PCS block will
-not behave correctly.
+So this suggests it's sending the in-band configuration word, and it
+indicates the negotiated speed. If the PHY really is using "rate
+adaption" as in "making the packet look like 1G and using pause frames
+to pace the transmitter" then that means symbol replication won't be
+used by the PHY on the SGMII link. However, stmmac's PCS will be
+using symbol replication, because the PHY is telling it to.
 
-So, if the PHY says in the SGMII configuration word that its operating
-at 10M, but is internally rate-adapting to 1G and sending the packet
-with no symbol replication, that is outside what the stmmac PCS block
-will cope with.
-
-> We don't control the latter, but we do control the former:
-> aqr_gen2_config_inband(), if given modes == LINK_INBAND_ENABLE, will
-> enable in-band for all media speeds that use PHY_INTERFACE_MODE_SGMII.
-> Regardless of how the PHY was provisioned for each media speed, and
-> especially regardless of rate matching settings, this function will
-> uniformly set the same in-band enabled/disabled setting for all media
-> speeds using the same host interface.
-> 
-> If dwmac_integrated_pcs_inband_caps(), as per Russell's patch 1/3,
-> reports LINK_INBAND_ENABLE | LINK_INBAND_DISABLE, and if
-> aqr_gen2_inband_caps() also reports LINK_INBAND_ENABLE | LINK_INBAND_DISABLE,
-> then we're giving phylink_pcs_neg_mode() all the tools it needs to shoot
-> itself in the foot, and select LINK_INBAND_ENABLE.
-> 
-> The judgement call in the Aquantia PHY driver was mine, as documented in
-> commit 5d59109d47c0 ("net: phy: aquantia: report and configure in-band
-> autoneg capabilities"). The idea being that the configuration would have
-> been unsupportable anyway given the question that the framework asks:
-> "does the PHY use in-band for SGMII, or does it not?"
-
-From the kernel messages provided, the PCS is reporting no
-capabilities, but as you say, the PHY is reporting
-LINK_INBAND_ENABLE | LINK_INBAND_DISABLE. The mode that phylink is
-using is "phy/outband/sgmii" - so what _should_ be no in-band
-signalling. However, note what I said above - for 1G, 100M and 10M,
-qcom-ethqos does this:
-
-	ethqos_pcs_set_inband(priv, true);
-
-in its fix_mac_speed() hook, which translates to:
-
-	stmmac_pcs_ctrl_ane(priv, true, 0);
-
-which eventually gets through to:
-
-	dwmac_ctrl_ane(priv, offset, true, false);
-
-This sets GMAC_AN_CTRL_ANE | GMAC_AN_CTRL_RAN but not
-GMAC_AN_CTRL_SGMRAL. This means "autoneg enable" "restart autoneg" and
-!SGMRAL means that the SGMII rate adaption block operates according to
-the link speed received from the PHY.
-
-At this point, I'm not sure whether I should just rip out the
-stmmac_pcs_ctrl_ane() stuff from dwmac-qcom-ethqos.c - I've been
-operating on the assumption that this is working code. Maybe that's
-a false assumption, and its been broken since a818bd12538c ("net:
-stmmac: dwmac-qcom-ethqos: Add support for 2.5G SGMII").
+This suggests that having rate adaption enabled in the AQR115C PHY
+and using SGMII with in-band is broken, and I can't think of any
+PCS that would work with such a configuration.
 
 -- 
 RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
