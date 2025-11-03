@@ -1,337 +1,178 @@
-Return-Path: <netdev+bounces-235202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0A36C2D5AB
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 18:07:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 023ADC2D62F
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 18:13:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E018189D568
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 17:04:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9584E426D2D
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 17:04:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 257E131AF2E;
-	Mon,  3 Nov 2025 17:01:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C56B431D378;
+	Mon,  3 Nov 2025 17:02:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mt29xTQ7"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="D4ikYTJu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 668A631A7FF
-	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 17:01:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4998931AF2D
+	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 17:02:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762189280; cv=none; b=XH+l4I8MGHemNj3G2QzTxg/1vRZ9bqUPJonj/b8WJ+HpSowzFsXD11hqhQfe2IXyAfQGBbthTMz+vsNLngcDVoCGNwrekQgr2Ygk9kdpQfQsCaYIjUHdxvF0r/k1HduLHdpFUKCMs7PaAteEGHgEN8st4Oa3Nygf07nciqIvEjI=
+	t=1762189366; cv=none; b=Roz67/GaLmmD2BCQ2obxnOpCNeTF6HSvspC4sOS9g3sSNnjYD/EZ//XThb4lAoGRab5wLJcV/3vPOhQLsDnptBYKGwUdNRlFdDmSPna/QHiXyESyFJgsYLGq4KiKPj9FHooxxZ3if/2ycHjG7VHhrq4RHxf9cqfVGJQdkXGEkok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762189280; c=relaxed/simple;
-	bh=guPjdmCGXhPUKlg9Vu9NZFHsa5yb4XApcuZtThu19YA=;
-	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kY0JS8SphlGl8/sCVKloaSHK5tLQC/1cMmb7ABJR73GfvMAqIh+xOkMELnRjZkC172hLicaguhHUfpdJfz/p6Rn6/o16CxlWy+55/rQbPRUgvK5gFT2Q9zctlZ7X9z5x/+uayzl4UtXy5yfHRnrmwsclesveTSyzLQMvz6ZmnKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mt29xTQ7; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7a9fb6fccabso1295626b3a.0
-        for <netdev@vger.kernel.org>; Mon, 03 Nov 2025 09:01:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762189277; x=1762794077; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:message-id:date:cc:to:from:subject:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=QcRc4djTGXtDuYMTYB2U7oRTf8eZPtHUt1m6xxGkuJM=;
-        b=Mt29xTQ7dO/pX8k91Kf2gUMVtPPqWStn3cROvC68jP2Gja0QvcZd05PhdXUAJVZ5Bo
-         GK53o52S6q8IO+r4o7v73QZ84C+sIQ9NkmCefW3rTm6XiE995ozzoUBBZoleBOuAEcvX
-         5KoXiLp3/l29CDIgXdK35QFf+8cwmL6zEli5RfemTlbbZ3O3yNosOfka5DrRcyf7IZR8
-         Fc1TU4ZAGGobdIZHaOSMssLWRAoXoqYs5HpLzSpgLme7PdXuJMx+IJUf/ZMwHrnWjhbw
-         JEa9XLfcqiReIMgj880n7Bd+x/LMoYozcNuGk0b1+bB/bglm2/Lay4NydRHDBA6EKWCh
-         Htvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762189277; x=1762794077;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:message-id:date:cc:to:from:subject:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QcRc4djTGXtDuYMTYB2U7oRTf8eZPtHUt1m6xxGkuJM=;
-        b=p/rS7pbExD1o4CRibDDKGvIev0Hq0IELkZpNA4XXjGkmP92kS/lw53w0QYP+2F7/r4
-         SUQ5oa9nYvKoMYdwo82eXFw3eMCikf6DDEg+jUppXGKiUYDCaO2YXULKvkLNOOpEBsBq
-         MNaRzpiJLzH9K0Gz234nU83WHV6vmho8FFTJA2dB20N1FWi/7+SP2r2daV0DK6aeH5W8
-         C9k52++extYrROR86jpTixS8NN6DzA+p+74v1hHxwHQ0iXTCbUT7vOz/PsTeQNeBBKXW
-         OuK/WVRUP+PKSyX2XIF95dAtUrDJaxY5dMH0uvvg7PjJBgb73uebC4FPNZkNdSOsX/Fj
-         9Gjw==
-X-Gm-Message-State: AOJu0YwNb/BK2AeS0314kqml5OH/O76wMsBOSD+3azxAwVfON4q2ecO1
-	9N2TmxdhSGwKdghS40YF45eEujbcP4TT0FEP6MOIi+F88p/ExFMoGaWRDJ5jYg==
-X-Gm-Gg: ASbGncudNazsjSa5iU/Dfd7fdGEaIOd+3Egsviy3KA8kgHlj6NeOnSLi3rsIzEXOgZH
-	If6n+UfkvLMLEa/CvPhAo+Xa6DjFqcfzGsanFSkknYs35Q5XCn1kZz25uZsCrWMYb344zft2GBE
-	KiegxIYG6L8Kfjpx2SmrsbyI7yKmTKHEGWRyLpOhmbn5FTBGkheOPrPpnXpT3KtvEIVQCBkUkd+
-	bDFRxFvOmpBWLP4m9/rbASibRLUkB0PU+crjsRS+FM7wkruqh6g+q8XKJM1aVpB4+nbb9SgYQ88
-	RpFqBZQLnIuu26udS+i7xKghrY7cnxLZ/E2lVqEH+KUKblwk4H5zfOftdEY1v7p6VXSDzyXUZO6
-	F/JxW/9XHvLbnfCqeF90gPgiEb/4TTAWzZTdaZz0fp/F8ar0SE1efyu8ihDNy8NGxMnTagASgP2
-	ddI82ufR998MYv9t+XncxYS29zndunr/RARA==
-X-Google-Smtp-Source: AGHT+IFdRQs7bHLh1E5GT7QAnWszys0fTMB9CbEufcgQwcyAxVmKIEujggJxTUyflBXBdYRKNA2OIg==
-X-Received: by 2002:a05:6a20:3d07:b0:334:a9ff:ca32 with SMTP id adf61e73a8af0-348c9f671cemr16753279637.2.1762189275979;
-        Mon, 03 Nov 2025 09:01:15 -0800 (PST)
-Received: from ahduyck-xeon-server.home.arpa ([2605:59c8:829:4c00:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-b93be4f8d1esm10879177a12.26.2025.11.03.09.01.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Nov 2025 09:01:15 -0800 (PST)
-Subject: [net-next PATCH v2 11/11] fbnic: Replace use of internal PCS w/
- Designware XPCS
-From: Alexander Duyck <alexander.duyck@gmail.com>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org, kernel-team@meta.com, andrew+netdev@lunn.ch,
- hkallweit1@gmail.com, linux@armlinux.org.uk, pabeni@redhat.com,
- davem@davemloft.net
-Date: Mon, 03 Nov 2025 09:01:14 -0800
-Message-ID: 
- <176218927450.2759873.3311899705462681552.stgit@ahduyck-xeon-server.home.arpa>
-In-Reply-To: 
- <176218882404.2759873.8174527156326754449.stgit@ahduyck-xeon-server.home.arpa>
-References: 
- <176218882404.2759873.8174527156326754449.stgit@ahduyck-xeon-server.home.arpa>
-User-Agent: StGit/1.5
+	s=arc-20240116; t=1762189366; c=relaxed/simple;
+	bh=xwsJ4KqPB/jhg3e2UyR1yThUSQVrft7/ZDf66DGRU2s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QFqy4u81v8DyMnG4VeT/8N397HOj3g4PsZ3bDUULuJJg8rhTuYg54lErBOeynC1iDymtxGYDTjCCsEp9WxoU+K8UtofgXTDswRX6/EIRmX1EDEjCXClQGnfse83saYKi+Xv1BU3ZYz+vCMWMYvC+SxeGXptHUthO4nUJfkmm/nM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=D4ikYTJu; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=0OEHWe0aEX4CL8pwp76r7di9HP/R/Jl+wwruwqA9LqA=; b=D4ikYTJuLxfvbADYfspsJJ1+PR
+	G9TIv5Edt/r6/WaJZAMklqrf4uQXnTFghnVtt5e2pEK6hkTK/ovT48QofuyuapGxPChHIdI+l7cAZ
+	gPOrF+mElZpbbQ+EvQIPyWkznOrtQKCO+Smfppm2l51XddJEf1qgnAEPWOPhMYtCLXNL0d/3Senen
+	UfeLWqnJdFJiV3OCNGv7Gx6uF/nkB58jMALhMUDGIl3CGihzMnKJorDdmXOy7EjSquQEOFZRyzSvO
+	7zGAhvP8v5iroVagEKr3iVVtuL68nTw6ENsDAAWUL52866vN9a1vYHVGMNjrUG5zhFBacsisMbZ33
+	+AwD+DZQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37810)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vFxwj-0000000019y-3eQA;
+	Mon, 03 Nov 2025 17:02:21 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vFxwf-000000003wv-0J3T;
+	Mon, 03 Nov 2025 17:02:17 +0000
+Date: Mon, 3 Nov 2025 17:02:16 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Alexis =?iso-8859-1?Q?Lothor=E9?= <alexis.lothore@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Boon Khai Ng <boon.khai.ng@altera.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Furong Xu <0x1207@gmail.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	Yu-Chun Lin <eleanor15x@gmail.com>
+Subject: Re: [PATCH net-next 0/3] net: stmmac: phylink PCS conversion part 3
+ (dodgy stuff)
+Message-ID: <aQjgGBGY4T6xbjWr@shell.armlinux.org.uk>
+References: <aQNmM5+cptKllTS8@oss.qualcomm.com>
+ <aQOB_yCzCmAVM34V@shell.armlinux.org.uk>
+ <aQOCpG_gjJlnm0A1@shell.armlinux.org.uk>
+ <aQhusPX0Hw9ZuLNR@oss.qualcomm.com>
+ <aQh7Zj10C7QcDoqn@shell.armlinux.org.uk>
+ <aQiBjYNtJks2/mrw@oss.qualcomm.com>
+ <20251103104820.3fcksk27j34zu6cg@skbuf>
+ <aQiP46tKUHGwmiTo@oss.qualcomm.com>
+ <aQiVWydDsRaMz8ua@shell.armlinux.org.uk>
+ <20251103121353.dbnalfub5mzwad62@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251103121353.dbnalfub5mzwad62@skbuf>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: Alexander Duyck <alexanderduyck@fb.com>
+On Mon, Nov 03, 2025 at 02:13:53PM +0200, Vladimir Oltean wrote:
+> > stmmac unfortunately doesn't give access to the raw Cisco SGMII
+> > in-band control word. However, reading register 0xf8 bits 31:16 for
+> > dwmac4, or register 0xd8 bits 15:0 for dwmac1000 will give this
+> > information. In that bitfield, bits 2:1 give the speed. 2 = 1G,
+> > 1 = 100M, 0 = 10M.
+> 
+> It might be Linux who is forcing the AQR115C into the nonsensical
+> behaviour of advertising 10M in the SGMII control word while
+> simultanously forcing the PHY MII to operate at 1G with flow control
+> for the 10M media speed.
 
-As we have exposed the PCS registers via the SWMII we can now start looking
-at connecting the XPCS driver to those registers and let it mange the PCS
-instead of us doing it directly from the fbnic driver.
+There's another factor in play here: the dwmac-qcom-ethqos glue driver
+forces the configuration of the stmmac integrated PCS irrespective of
+what phylink wants (whether or not patch 1 is being used.) That is,
+for 1G, 100M and 10M, the SGMII in-band control word must be sent by
+the PHY, and it must accurately indicate the symbol replication via
+the speed bits. If this is not the case, then the stmmac PCS block will
+not behave correctly.
 
-For now this just gets us the ability to detect link. The hop is in the
-future to add some of the vendor specific registers to being enabling XPCS
-configuration of the interface.
+So, if the PHY says in the SGMII configuration word that its operating
+at 10M, but is internally rate-adapting to 1G and sending the packet
+with no symbol replication, that is outside what the stmmac PCS block
+will cope with.
 
-Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
----
- drivers/net/ethernet/meta/Kconfig               |    1 
- drivers/net/ethernet/meta/fbnic/fbnic_netdev.c  |    7 --
- drivers/net/ethernet/meta/fbnic/fbnic_netdev.h  |    5 +
- drivers/net/ethernet/meta/fbnic/fbnic_phylink.c |  101 +++++++++++------------
- 4 files changed, 53 insertions(+), 61 deletions(-)
+> We don't control the latter, but we do control the former:
+> aqr_gen2_config_inband(), if given modes == LINK_INBAND_ENABLE, will
+> enable in-band for all media speeds that use PHY_INTERFACE_MODE_SGMII.
+> Regardless of how the PHY was provisioned for each media speed, and
+> especially regardless of rate matching settings, this function will
+> uniformly set the same in-band enabled/disabled setting for all media
+> speeds using the same host interface.
+> 
+> If dwmac_integrated_pcs_inband_caps(), as per Russell's patch 1/3,
+> reports LINK_INBAND_ENABLE | LINK_INBAND_DISABLE, and if
+> aqr_gen2_inband_caps() also reports LINK_INBAND_ENABLE | LINK_INBAND_DISABLE,
+> then we're giving phylink_pcs_neg_mode() all the tools it needs to shoot
+> itself in the foot, and select LINK_INBAND_ENABLE.
+> 
+> The judgement call in the Aquantia PHY driver was mine, as documented in
+> commit 5d59109d47c0 ("net: phy: aquantia: report and configure in-band
+> autoneg capabilities"). The idea being that the configuration would have
+> been unsupportable anyway given the question that the framework asks:
+> "does the PHY use in-band for SGMII, or does it not?"
 
-diff --git a/drivers/net/ethernet/meta/Kconfig b/drivers/net/ethernet/meta/Kconfig
-index 23676b530a83..adb8ae29167a 100644
---- a/drivers/net/ethernet/meta/Kconfig
-+++ b/drivers/net/ethernet/meta/Kconfig
-@@ -27,6 +27,7 @@ config FBNIC
- 	select FBNIC_PHY
- 	select NET_DEVLINK
- 	select PAGE_POOL
-+	select PCS_XPCS
- 	select PHYLINK
- 	select PLDMFW
- 	help
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-index 51cf88b62927..949901f51638 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-@@ -713,10 +713,7 @@ void fbnic_reset_queues(struct fbnic_net *fbn,
-  **/
- void fbnic_netdev_free(struct fbnic_dev *fbd)
- {
--	struct fbnic_net *fbn = netdev_priv(fbd->netdev);
--
--	if (fbn->phylink)
--		phylink_destroy(fbn->phylink);
-+	fbnic_phylink_destroy(fbd->netdev);
- 
- 	free_netdev(fbd->netdev);
- 	fbd->netdev = NULL;
-@@ -818,7 +815,7 @@ struct net_device *fbnic_netdev_alloc(struct fbnic_dev *fbd)
- 
- 	netif_tx_stop_all_queues(netdev);
- 
--	if (fbnic_phylink_init(netdev)) {
-+	if (fbnic_phylink_create(netdev)) {
- 		fbnic_netdev_free(fbd);
- 		return NULL;
- 	}
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-index f8807f6e443d..8ac0e0c8ddf5 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-@@ -44,7 +44,7 @@ struct fbnic_net {
- 
- 	struct phylink *phylink;
- 	struct phylink_config phylink_config;
--	struct phylink_pcs phylink_pcs;
-+	struct phylink_pcs *pcs;
- 
- 	u8 aui;
- 	u8 fec;
-@@ -106,7 +106,8 @@ int fbnic_phylink_ethtool_ksettings_get(struct net_device *netdev,
- 					struct ethtool_link_ksettings *cmd);
- int fbnic_phylink_get_fecparam(struct net_device *netdev,
- 			       struct ethtool_fecparam *fecparam);
--int fbnic_phylink_init(struct net_device *netdev);
-+int fbnic_phylink_create(struct net_device *netdev);
-+void fbnic_phylink_destroy(struct net_device *netdev);
- int fbnic_phylink_connect(struct fbnic_net *fbn);
- void fbnic_phylink_pmd_training_complete_notify(struct fbnic_net *fbn);
- bool fbnic_check_split_frames(struct bpf_prog *prog,
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-index 59ee2fb32f91..28cd11e111e4 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-@@ -1,6 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0
- /* Copyright (c) Meta Platforms, Inc. and affiliates. */
- 
-+#include <linux/pcs/pcs-xpcs.h>
- #include <linux/phy.h>
- #include <linux/phylink.h>
- 
-@@ -101,55 +102,6 @@ int fbnic_phylink_get_fecparam(struct net_device *netdev,
- 	return 0;
- }
- 
--static struct fbnic_net *
--fbnic_pcs_to_net(struct phylink_pcs *pcs)
--{
--	return container_of(pcs, struct fbnic_net, phylink_pcs);
--}
--
--static void
--fbnic_phylink_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
--			    struct phylink_link_state *state)
--{
--	struct fbnic_net *fbn = fbnic_pcs_to_net(pcs);
--	struct fbnic_dev *fbd = fbn->fbd;
--
--	switch (fbn->aui) {
--	case FBNIC_AUI_25GAUI:
--		state->speed = SPEED_25000;
--		break;
--	case FBNIC_AUI_LAUI2:
--	case FBNIC_AUI_50GAUI1:
--		state->speed = SPEED_50000;
--		break;
--	case FBNIC_AUI_100GAUI2:
--		state->speed = SPEED_100000;
--		break;
--	default:
--		state->link = 0;
--		return;
--	}
--
--	state->duplex = DUPLEX_FULL;
--
--	state->link = !!(rd32(fbd, FBNIC_PCS(MDIO_STAT1, 0)) &
--			 MDIO_STAT1_LSTATUS);
--}
--
--static int
--fbnic_phylink_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
--			 phy_interface_t interface,
--			 const unsigned long *advertising,
--			 bool permit_pause_to_mac)
--{
--	return 0;
--}
--
--static const struct phylink_pcs_ops fbnic_phylink_pcs_ops = {
--	.pcs_config = fbnic_phylink_pcs_config,
--	.pcs_get_state = fbnic_phylink_pcs_get_state,
--};
--
- static struct phylink_pcs *
- fbnic_phylink_mac_select_pcs(struct phylink_config *config,
- 			     phy_interface_t interface)
-@@ -157,7 +109,7 @@ fbnic_phylink_mac_select_pcs(struct phylink_config *config,
- 	struct net_device *netdev = to_net_dev(config->dev);
- 	struct fbnic_net *fbn = netdev_priv(netdev);
- 
--	return &fbn->phylink_pcs;
-+	return fbn->pcs;
- }
- 
- static int
-@@ -226,16 +178,35 @@ static const struct phylink_mac_ops fbnic_phylink_mac_ops = {
- 	.mac_link_up = fbnic_phylink_mac_link_up,
- };
- 
--int fbnic_phylink_init(struct net_device *netdev)
-+/**
-+ * fbnic_phylink_create - Phylink device creation
-+ * @netdev: Network Device struct to attach phylink device
-+ *
-+ * Initialize and attach a phylink instance to the device. The phylink
-+ * device will make use of the netdev struct to track carrier and will
-+ * eventually be used to expose the current state of the MAC and PCS
-+ * setup.
-+ *
-+ * Return: 0 on success, negative on failure
-+ **/
-+int fbnic_phylink_create(struct net_device *netdev)
- {
- 	struct fbnic_net *fbn = netdev_priv(netdev);
- 	struct fbnic_dev *fbd = fbn->fbd;
-+	struct phylink_pcs *pcs;
- 	struct phylink *phylink;
-+	int err;
- 
--	fbn->phylink_pcs.ops = &fbnic_phylink_pcs_ops;
-+	pcs = xpcs_create_pcs_mdiodev(fbd->mdio_bus, 0);
-+	if (IS_ERR(pcs)) {
-+		err = PTR_ERR(pcs);
-+		dev_err(fbd->dev, "Failed to create PCS device: %d\n", err);
-+		return err;
-+	}
- 
- 	fbn->phylink_config.dev = &netdev->dev;
- 	fbn->phylink_config.type = PHYLINK_NETDEV;
-+
- 	fbn->phylink_config.mac_capabilities = MAC_SYM_PAUSE | MAC_ASYM_PAUSE |
- 					       MAC_25000FD | MAC_50000FD |
- 					       MAC_100000FD;
-@@ -255,10 +226,16 @@ int fbnic_phylink_init(struct net_device *netdev)
- 	phylink = phylink_create(&fbn->phylink_config, NULL,
- 				 fbnic_phylink_select_interface(fbn->aui),
- 				 &fbnic_phylink_mac_ops);
--	if (IS_ERR(phylink))
--		return PTR_ERR(phylink);
-+	if (IS_ERR(phylink)) {
-+		err = PTR_ERR(phylink);
-+		dev_err(netdev->dev.parent,
-+			"Failed to create Phylink interface, err: %d\n", err);
-+		xpcs_destroy_pcs(pcs);
-+		return err;
-+	}
- 
- 	fbn->phylink = phylink;
-+	fbn->pcs = pcs;
- 
- 	return 0;
- }
-@@ -296,6 +273,22 @@ int fbnic_phylink_connect(struct fbnic_net *fbn)
- 	return err;
- }
- 
-+/**
-+ * fbnic_phylink_destroy - Teardown phylink related interfaces
-+ * @netdev: Network Device struct containing phylink device
-+ *
-+ * Detach and free resources related to phylink interface.
-+ **/
-+void fbnic_phylink_destroy(struct net_device *netdev)
-+{
-+	struct fbnic_net *fbn = netdev_priv(netdev);
-+
-+	if (fbn->phylink)
-+		phylink_destroy(fbn->phylink);
-+	if (fbn->pcs)
-+		xpcs_destroy_pcs(fbn->pcs);
-+}
-+
- /**
-  * fbnic_phylink_pmd_training_complete_notify - PMD training complete notifier
-  * @fbn: FBNIC Netdev private data struct phylink device attached to
+From the kernel messages provided, the PCS is reporting no
+capabilities, but as you say, the PHY is reporting
+LINK_INBAND_ENABLE | LINK_INBAND_DISABLE. The mode that phylink is
+using is "phy/outband/sgmii" - so what _should_ be no in-band
+signalling. However, note what I said above - for 1G, 100M and 10M,
+qcom-ethqos does this:
 
+	ethqos_pcs_set_inband(priv, true);
 
+in its fix_mac_speed() hook, which translates to:
+
+	stmmac_pcs_ctrl_ane(priv, true, 0);
+
+which eventually gets through to:
+
+	dwmac_ctrl_ane(priv, offset, true, false);
+
+This sets GMAC_AN_CTRL_ANE | GMAC_AN_CTRL_RAN but not
+GMAC_AN_CTRL_SGMRAL. This means "autoneg enable" "restart autoneg" and
+!SGMRAL means that the SGMII rate adaption block operates according to
+the link speed received from the PHY.
+
+At this point, I'm not sure whether I should just rip out the
+stmmac_pcs_ctrl_ane() stuff from dwmac-qcom-ethqos.c - I've been
+operating on the assumption that this is working code. Maybe that's
+a false assumption, and its been broken since a818bd12538c ("net:
+stmmac: dwmac-qcom-ethqos: Add support for 2.5G SGMII").
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
