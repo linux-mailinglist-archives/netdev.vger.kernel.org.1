@@ -1,188 +1,135 @@
-Return-Path: <netdev+bounces-235036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF4E8C2B6B6
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 12:37:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBBFFC2B469
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 12:19:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B30CF3BA6B9
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 11:34:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 709EE1893CA7
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 11:19:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7715E3054E6;
-	Mon,  3 Nov 2025 11:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="FxDwCxq/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72A9630215B;
+	Mon,  3 Nov 2025 11:19:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from server.couthit.com (server.couthit.com [162.240.164.96])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97A4C3054CE;
-	Mon,  3 Nov 2025 11:30:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08F152FF66D;
+	Mon,  3 Nov 2025 11:18:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762169408; cv=none; b=dE3HKoRDKDX210XAh0I+MkoYuIP5zL91NKBBqthcd8QfzVv/IquGDe2xXOksPxTiboekSVBwu+D6kF9QpK8q9BsFdtGaxyGFwqmYcCyhQCu2lbvlZA6ky16RlueZCHVK4YBIXDD6NR8y3SNs+VZMgqrM3pHKmQFO7DiPyGYjAQc=
+	t=1762168743; cv=none; b=Dzx6OihTa+zMvYS5QfCaRQrruCUsrCvU04p9TjgEgmHo7qeQFHg5qKZAV6MmfwtJrTVAnvmfA1bYV17m/7Z+IlP3QyeN7iS0q/Y/LAKzIOIcmcuOjWy4M8Co7cdTDSFDE79nZpSTHqKXkGuqkekGirDlypxcwJifwzQELEe5LGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762169408; c=relaxed/simple;
-	bh=hjqkskP7rEKOpC0HAWlWuk9UR+qmbWyNfX49a8doCqI=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=k6sOHmnm56FI/KaHJ7AwvvZpCxU0T7i3D/N+3gMOclWXghx0CdfVt4hCWt4v65IzIKy5NGs/pxXLhmjryWHYHq/tOE2IGhcpQcIjblS+t8CqcsILa7fPmeeqzcNUSkqa6RwKuhOpBpZqeFbbKp4xPABzCF5Hdsa6p8JnoEHhwVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=FxDwCxq/; arc=none smtp.client-ip=162.240.164.96
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
-	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
-	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=pO1e3BxesOLdXFEMiUspsLON2Xgnazr0oTkpXmKAlXc=; b=FxDwCxq/M161NLrVbAViDNd8lQ
-	2j9qnONIOgOVEimJgVCyJbB1vse1/oEIP5AWFuE8ZycmGTQw5B43b+PGAVsOJTcMZhO23oEaAQwhZ
-	k07V3tshvT8pQyDdkaOK7DGSCC7BQSEKgS9XrV0qfsmK4kYhEHWUP7IjUZOsQgRPQ/GXIM7Byw5BI
-	E8HbXLvPLRo/5kL7E8yF1TgK5rxEinLcwa9uyCQbo4NZSTyz6ALv4Y2jxvBTUpU1OCcN1UhKgFzF2
-	QGfZ+czSAR4V2yBFWm1SQi/OhpdII0jhWNByO0kmu90W8OyifHI4y2PMLfwRoO27ULhPOBSi2b8Ip
-	iqAADrxg==;
-Received: from [122.175.9.182] (port=20643 helo=zimbra.couthit.local)
-	by server.couthit.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.1)
-	(envelope-from <parvathi@couthit.com>)
-	id 1vFsQO-00000006Pzf-2Y0s;
-	Mon, 03 Nov 2025 06:08:37 -0500
-Received: from zimbra.couthit.local (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTPS id 7A72F1784032;
-	Mon,  3 Nov 2025 16:38:31 +0530 (IST)
-Received: from localhost (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTP id 65CF21781F6A;
-	Mon,  3 Nov 2025 16:38:31 +0530 (IST)
-Received: from zimbra.couthit.local ([127.0.0.1])
-	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id hg8Tri1-CFlx; Mon,  3 Nov 2025 16:38:31 +0530 (IST)
-Received: from zimbra.couthit.local (zimbra [10.10.10.103])
-	by zimbra.couthit.local (Postfix) with ESMTP id 3EC801781698;
-	Mon,  3 Nov 2025 16:38:31 +0530 (IST)
-Date: Mon, 3 Nov 2025 16:38:31 +0530 (IST)
-From: Parvathi Pudi <parvathi@couthit.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: tony <tony@atomide.com>, robh <robh@kernel.org>, 
-	krzk+dt <krzk+dt@kernel.org>, conor+dt <conor+dt@kernel.org>, 
-	richardcochran <richardcochran@gmail.com>, 
-	linux-omap <linux-omap@vger.kernel.org>, 
-	devicetree <devicetree@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	netdev <netdev@vger.kernel.org>, danishanwar <danishanwar@ti.com>, 
-	pratheesh <pratheesh@ti.com>, Prajith Jayarajan <prajith@ti.com>, 
-	Vignesh Raghavendra <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
-	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
-	krishna <krishna@couthit.com>, mohan <mohan@couthit.com>, 
-	pmohan <pmohan@couthit.com>, basharath <basharath@couthit.com>, 
-	afd <afd@ti.com>, m-karicheri2 <m-karicheri2@ti.com>
-Message-ID: <1460283559.152037.1762168111145.JavaMail.zimbra@couthit.local>
-In-Reply-To: <1064878067.81811.1760534965853.JavaMail.zimbra@couthit.local>
-References: <20251013125401.1435486-1-parvathi@couthit.com> <20251013125401.1435486-2-parvathi@couthit.com> <8cfc5ece-6c2e-48d9-a65c-3edbcc9edc39@lunn.ch> <1064878067.81811.1760534965853.JavaMail.zimbra@couthit.local>
-Subject: Re: [PATCH 1/2] arm: dts: ti: Adds device tree nodes for PRU Cores,
- IEP and eCAP modules of PRU-ICSS2 Instance.
+	s=arc-20240116; t=1762168743; c=relaxed/simple;
+	bh=fNrIgV1o+9irXV/ZRLy8p0aur9okmV7+4DLYLSB7u8k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h5VdqUX+OlHCtolLYtyPxoIhekoWZRIgUb0aU8cxi326m3jR9duzte9n3mavPYxLbd8TKL1Ug0uqN1Zj3fzG6zYxNvHkc6jsQNkUjhzjM7mB75qRRd0GrnD4s9V9kT/ow7MVUBpnwCWezrlu5UEQmnaCE/JGwQYB6AwNjfBBmRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from DESKTOP-L0HPE2S (unknown [124.16.141.245])
+	by APP-05 (Coremail) with SMTP id zQCowAC3JfSWjwhpZ7I6AQ--.23373S2;
+	Mon, 03 Nov 2025 19:18:47 +0800 (CST)
+From: Haotian Zhang <vulab@iscas.ac.cn>
+To: Herve Codina <herve.codina@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Haotian Zhang <vulab@iscas.ac.cn>
+Subject: [PATCH] net: wan: framer: pef2256: Fix missing mfd_remove_devices() call
+Date: Mon,  3 Nov 2025 19:18:44 +0800
+Message-ID: <20251103111844.271-1-vulab@iscas.ac.cn>
+X-Mailer: git-send-email 2.50.1.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - GC141 (Mac)/8.8.15_GA_3968)
-Thread-Topic: Adds device tree nodes for PRU Cores, IEP and eCAP modules of PRU-ICSS2 Instance.
-Thread-Index: E3LIn1f4mOg6FaK5tJjNCk6cQUoE5cdujhE/
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - server.couthit.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - couthit.com
-X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: smtp@couthit.com
-X-Authenticated-Sender: server.couthit.com: smtp@couthit.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQCowAC3JfSWjwhpZ7I6AQ--.23373S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7uw1xJrW8urW7tw1UAF4UCFg_yoW8ZFyrpw
+	43Aa909ry5Jw48W34xZ3Z5uFy5Awn7K3W0grWxu3s3ur98AFWUW348ZFy2yw45GrWxta13
+	JFWxJF1rCF98JaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkl14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r1I6r4UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr
+	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v26r1q
+	6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI
+	0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y
+	0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxV
+	WUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1l
+	IxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUb8hL5UUUU
+	U==
+X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiBwkPA2kISHP2FwAAs5
 
-Hi,
+The driver calls mfd_add_devices() but fails to call mfd_remove_devices()
+in error paths after successful MFD device registration and in the remove
+function. This leads to resource leaks where MFD child devices are not
+properly unregistered.
 
->>> +				interrupt-names = "rx", "emac_ptp_tx",
->>> +								"hsr_ptp_tx";
->> 
->> Something looks wrong with the indentation here. The same happens in
->> at least one other place.
->> 
-> 
-> we will correct the indentation of the interrupt-names property to properly
-> align the continuation line as shown below.
-> 
-> interrupt-names = "rx", "emac_ptp_tx",
->                  "hsr_ptp_tx";
-> 
-> We will make sure to address this in all the applicable places and include
-> this fix in the next version.
-> 
-> 
->>> +&pruss2_mdio {
->>> +	status = "okay";
->>> +	pruss2_eth0_phy: ethernet-phy@0 {
->>> +		reg = <0>;
->>> +		interrupt-parent = <&gpio3>;
->>> +		interrupts = <30 IRQ_TYPE_EDGE_FALLING>;
->>> +	};
->>> +
->>> +	pruss2_eth1_phy: ethernet-phy@1 {
->>> +		reg = <1>;
->>> +		interrupt-parent = <&gpio3>;
->>> +		interrupts = <31 IRQ_TYPE_EDGE_FALLING>;
->>> +	};
->> 
->> 
->> PHY interrupts are 99% level, not edge, because they represent an
->> interrupt controller in the PHY, and you need to clear all the
->> interrupts in the controller before it deasserts the interrupt pin.
->> 
->>    Andrew
-> 
-> 
-> Sure, we will check and come back with more details on this.
-> 
-> 
+Add mfd_remove_devices() call in the error path after mfd_add_devices()
+succeeds, and add the missing mfd_remove_devices() call in pef2256_remove()
+to properly clean up MFD devices.
 
-We have reviewed and analysed the code, and confirmed that level
-low can be used for the PHY interrupt, which seems to be a better
-option than using the edge falling.
+Fixes: c96e976d9a05 ("net: wan: framer: Add support for the Lantiq PEF2256 framer")
+Signed-off-by: Haotian Zhang <vulab@iscas.ac.cn>
+---
+ drivers/net/wan/framer/pef2256/pef2256.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-As shown below, the current interrupt configuration reflects a
-level-triggered setup:
-
-root@am57xx-evm:~# cat /proc/interrupts
-           CPU0       CPU1    
-163:          2          0 48057000.gpio  30 Level     4b2b2400.mdio:00
-164:          2          0 48057000.gpio  31 Level     4b2b2400.mdio:01
-
-We can see the IRQ has been changed to Level and the count is incremented
-for every link event.
-
-We will update the interrupt type to IRQ_TYPE_LEVEL_LOW as shown below and
-share the next version.
-
-+&pruss2_mdio {
-+       status = "okay";
-+       pruss2_eth0_phy: ethernet-phy@0 {
-+               reg = <0>;
-+               interrupt-parent = <&gpio3>;
-+               interrupts = <30 IRQ_TYPE_LEVEL_LOW>;
-+       };
+diff --git a/drivers/net/wan/framer/pef2256/pef2256.c b/drivers/net/wan/framer/pef2256/pef2256.c
+index 1e4c8e85d598..d43fbf9bb27d 100644
+--- a/drivers/net/wan/framer/pef2256/pef2256.c
++++ b/drivers/net/wan/framer/pef2256/pef2256.c
+@@ -821,27 +821,34 @@ static int pef2256_probe(struct platform_device *pdev)
+ 
+ 	ret = pef2256_setup_e1(pef2256);
+ 	if (ret)
+-		return ret;
++		goto err_mfd_remove;
+ 
+ 	framer_provider = devm_framer_provider_of_register(pef2256->dev,
+ 							   framer_provider_simple_of_xlate);
+-	if (IS_ERR(framer_provider))
+-		return PTR_ERR(framer_provider);
++	if (IS_ERR(framer_provider)) {
++		ret = PTR_ERR(framer_provider);
++		goto err_mfd_remove;
++	}
+ 
+ 	/* Add audio devices */
+ 	ret = pef2256_add_audio_devices(pef2256);
+ 	if (ret < 0) {
+ 		dev_err(pef2256->dev, "add audio devices failed (%d)\n", ret);
+-		return ret;
++		goto err_mfd_remove;
+ 	}
+ 
+ 	return 0;
 +
-+       pruss2_eth1_phy: ethernet-phy@1 {
-+               reg = <1>;
-+               interrupt-parent = <&gpio3>;
-+               interrupts = <31 IRQ_TYPE_LEVEL_LOW>;
-+       };
-+};
++err_mfd_remove:
++	mfd_remove_devices(pef2256->dev);
++	return ret;
+ }
+ 
+ static void pef2256_remove(struct platform_device *pdev)
+ {
+ 	struct pef2256 *pef2256 = platform_get_drvdata(pdev);
+ 
++	mfd_remove_devices(pef2256->dev);
+ 	/* Disable interrupts */
+ 	pef2256_write8(pef2256, PEF2256_IMR0, 0xff);
+ 	pef2256_write8(pef2256, PEF2256_IMR1, 0xff);
+-- 
+2.50.1.windows.1
 
-
-Thanks and Regards,
-Parvathi.
 
