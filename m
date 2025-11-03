@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-235060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2A90C2BA35
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 13:23:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 995F2C2B9F3
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 13:21:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5118D4E648E
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 12:20:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B13BA3A3EF9
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 12:21:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7D0930DEA0;
-	Mon,  3 Nov 2025 12:19:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEBBE30B53D;
+	Mon,  3 Nov 2025 12:19:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1402030B521;
-	Mon,  3 Nov 2025 12:19:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 215CD307ADD;
+	Mon,  3 Nov 2025 12:19:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762172360; cv=none; b=fkdHHTlHQEkqSu/fA/ONEbr2clU0M86ZM3WukGYs0DQ52VwengK1amkeyoQDblFO3hrDRRDSGDgThLJxySzUJK8WGPSIHtok6bSh0gwOQ+bM2itzRmyuSYqAMJnQggfyfJ22181iUDhoqrfOVuDE1rylb/eSxg4CBgATkBKcv/c=
+	t=1762172375; cv=none; b=koKwwao69qkpf4IPI0x45e3Un2Mv0QFrjdhQp/WYpy7R5loO1i+FIkzrGoDNP71PeFw52COsU6/6X1iF5KkUYgoPTrjLM6ZoBuXasl5emsZh2b7P2iNnKdXwzpv7joc3V++/Fa2OCHVNqIwkFqPJENP3dPzRWBhL29wjowJ2UuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762172360; c=relaxed/simple;
-	bh=bFbT36IhSM2DLBDdtzHyTKyDgEpDz3AOrzen7/3kBjc=;
+	s=arc-20240116; t=1762172375; c=relaxed/simple;
+	bh=shvKjEiZj6B9Z8Q7QY7IJzT5Xt0z95+WO4QtV5UQ8FY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pZop9dfN6dfVw2BhHbxYHC/Dgu6qNkIuJIk0/4v2VvxlFXA2KNFCGlcCQDFfyfN3BsjH2cOQvzjvbEz+pM9mj/udrtQbbOYD2Yuf0jq17fGjs7+oyGLBYuKLczfH15+wmu3xlvdqaPweRrbXBxTa4y3BRPV799rqXfqB+imKMVg=
+	 Content-Type:Content-Disposition:In-Reply-To; b=tiCgOkWd76apQD5o5H32kPlDEGMG2hXnz7y7G4rWjrTyoWEoIGi5jOEzDMmOTbLPR2iQfFn7zjoFZwQTkeViFrcyJc8d64J4BeYIt0rARDeYialGggOjIAR9LIPkV1w40xDXR3QE+VKhbmWwJTqOnRvQhl6iK/pW4k0XekRcMFw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
@@ -33,9 +33,9 @@ Received: from local
 	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
 	 (Exim 4.98.2)
 	(envelope-from <daniel@makrotopia.org>)
-	id 1vFtWj-000000000on-3ySR;
-	Mon, 03 Nov 2025 12:19:14 +0000
-Date: Mon, 3 Nov 2025 12:19:10 +0000
+	id 1vFtWy-000000000pc-20NR;
+	Mon, 03 Nov 2025 12:19:28 +0000
+Date: Mon, 3 Nov 2025 12:19:25 +0000
 From: Daniel Golle <daniel@makrotopia.org>
 To: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
 	Vladimir Oltean <olteanv@gmail.com>,
@@ -58,9 +58,9 @@ Cc: Andreas Schirm <andreas.schirm@siemens.com>,
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>,
 	"Livia M. Rosu" <lrosu@maxlinear.com>,
 	John Crispin <john@phrozen.org>
-Subject: [PATCH net-next v7 04/12] net: dsa: lantiq_gswip: set link
- parameters also for CPU port
-Message-ID: <07c6b8d3a12296123be5e5938b454fc620f819e6.1762170107.git.daniel@makrotopia.org>
+Subject: [PATCH net-next v7 05/12] net: dsa: lantiq_gswip: define and use
+ GSWIP_TABLE_MAC_BRIDGE_VAL1_VALID
+Message-ID: <e02fe0d946c98920bc55b5f389a8f56382aae7df.1762170107.git.daniel@makrotopia.org>
 References: <cover.1762170107.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -72,20 +72,12 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1762170107.git.daniel@makrotopia.org>
 
-On standalone switch ICs the link parameters of the CPU port need to
-be setup just like user ports. The destinction in the driver to not
-carry out link parameter setup for the CPU port does make sense for
-in-SoC switches on which the CPU port is internally connected to the
-SoC's Ethernet MAC.
-Set link parameters also for the CPU port unless it is an internal
-interface. Note that the internal TP PHYs anyway cannot be used as
-CPU ports, hence it doesn't matter that they are now also covered by
-that condition.
+When adding FDB entries to the MAC bridge table on GSWIP 2.2 or later it
+is needed to set an (undocumented) bit to mark the entry as valid. If this
+bit isn't set for entries in the MAC bridge table, then those entries won't
+be considered as valid MAC addresses.
 
 Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-Reviewed-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
-Tested-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 ---
 v7: no changes
 
@@ -93,7 +85,8 @@ v6: no changes
 
 v5: no changes
 
-v4: improve commit message
+v4: keep previous behavior for GSWIP 2.1 and earlier, this was clarified
+    by MaxLinear engineers
 
 v3: no changes
 
@@ -101,22 +94,40 @@ v2: no changes
 
 since RFC: no changes
 
- drivers/net/dsa/lantiq/lantiq_gswip_common.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/dsa/lantiq/lantiq_gswip.h        | 1 +
+ drivers/net/dsa/lantiq/lantiq_gswip_common.c | 7 ++++++-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/net/dsa/lantiq/lantiq_gswip.h b/drivers/net/dsa/lantiq/lantiq_gswip.h
+index 56de869fc472..42000954d842 100644
+--- a/drivers/net/dsa/lantiq/lantiq_gswip.h
++++ b/drivers/net/dsa/lantiq/lantiq_gswip.h
+@@ -224,6 +224,7 @@
+ #define  GSWIP_TABLE_MAC_BRIDGE_KEY3_FID	GENMASK(5, 0)	/* Filtering identifier */
+ #define  GSWIP_TABLE_MAC_BRIDGE_VAL0_PORT	GENMASK(7, 4)	/* Port on learned entries */
+ #define  GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC	BIT(0)		/* Static, non-aging entry */
++#define  GSWIP_TABLE_MAC_BRIDGE_VAL1_VALID	BIT(1)		/* Valid bit */
+ 
+ #define XRX200_GPHY_FW_ALIGN	(16 * 1024)
+ 
 diff --git a/drivers/net/dsa/lantiq/lantiq_gswip_common.c b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-index 092187603dea..0ac87eb23bb5 100644
+index 0ac87eb23bb5..fdfc265b4c73 100644
 --- a/drivers/net/dsa/lantiq/lantiq_gswip_common.c
 +++ b/drivers/net/dsa/lantiq/lantiq_gswip_common.c
-@@ -1459,7 +1459,7 @@ static void gswip_phylink_mac_link_up(struct phylink_config *config,
- 	struct gswip_priv *priv = dp->ds->priv;
- 	int port = dp->index;
+@@ -1149,7 +1149,12 @@ static int gswip_port_fdb(struct dsa_switch *ds, int port,
+ 	mac_bridge.key[2] = addr[1] | (addr[0] << 8);
+ 	mac_bridge.key[3] = FIELD_PREP(GSWIP_TABLE_MAC_BRIDGE_KEY3_FID, fid);
+ 	mac_bridge.val[0] = add ? BIT(port) : 0; /* port map */
+-	mac_bridge.val[1] = GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC;
++	if (GSWIP_VERSION_GE(priv, GSWIP_VERSION_2_2_ETC))
++		mac_bridge.val[1] = add ? (GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC |
++					   GSWIP_TABLE_MAC_BRIDGE_VAL1_VALID) : 0;
++	else
++		mac_bridge.val[1] = GSWIP_TABLE_MAC_BRIDGE_VAL1_STATIC;
++
+ 	mac_bridge.valid = add;
  
--	if (!dsa_port_is_cpu(dp)) {
-+	if (!dsa_port_is_cpu(dp) || interface != PHY_INTERFACE_MODE_INTERNAL) {
- 		gswip_port_set_link(priv, port, true);
- 		gswip_port_set_speed(priv, port, speed, interface);
- 		gswip_port_set_duplex(priv, port, duplex);
+ 	err = gswip_pce_table_entry_write(priv, &mac_bridge);
 -- 
 2.51.2
 
