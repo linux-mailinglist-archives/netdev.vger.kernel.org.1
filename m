@@ -1,254 +1,350 @@
-Return-Path: <netdev+bounces-235127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BC3FC2C760
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 15:47:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 18D7DC2C8BC
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 16:03:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 195803A53EA
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 14:43:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87A223ABDB6
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 14:57:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B75328489B;
-	Mon,  3 Nov 2025 14:43:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51AA33148B9;
+	Mon,  3 Nov 2025 14:47:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lVJ7Q7Lv"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="L522km2c";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="BU+9zmGR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 056A62836B1;
-	Mon,  3 Nov 2025 14:43:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762180984; cv=fail; b=FF6CDnxupaYNc03FNyRWspaJoJZ+KyHtqKhIXfTZIipBtsWuyirv/uWHrmcpOkuznyAmAlPyvM5F0JEXNpSZrOwEUT6Eu5qd+Rp8sb61laYOfZBDhuU6axhbHdumaciP7+aic98H/ax5CPnmXJNLOZunupmhqbFfGhslM5V+nHE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762180984; c=relaxed/simple;
-	bh=/wExhf7cdY/E1QWIT6SsK5jRTGvkcHBXNdacC72qx6c=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=OaS/oFeB2TocoLCuYOnsho3lJxqmnzjTPY8KbmuQlevjiE1cdJ+YW5pByXRju67Hj7SA7MUr9dDwD0yqZPZgAG+ky2vCiVb/swUs9wyyRt2GhgRB/UO+55ziMU6quKM/d5DidLRf0nF4U46jitqPPh6K6C/bB5mPpj3x07i/Osk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lVJ7Q7Lv; arc=fail smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762180983; x=1793716983;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=/wExhf7cdY/E1QWIT6SsK5jRTGvkcHBXNdacC72qx6c=;
-  b=lVJ7Q7LvXp4xSXezqadDXPw5TB6xzk1712JbAhW1GvDruWct85xHI+Zi
-   GBKQbYt2EyfiTM4AhlVNC+X8BG/QJdKpRHZ6ukgC1LJXqRNqMmnxt00lB
-   qEEvNKf6nMMcK0ENZaBv7gGU4yzqz9312dj64pWtEgi+Qe2WP8+3PLWqw
-   RmiS/MoOHGhFBO4s2YSWS6AZBRIDtbCUty9Cv2gkIOo4wCrLEvMpivgii
-   hKN0xz6zLwCSf45MGQ5ZeIgQfAbQddtWK5Mg0wz1zDhZrArUj3w9Xu8F8
-   1zjyahXFDWg38nltEGhG+eauV25RYmdpkVHzr02Hq42U8UXXzdQbZies7
-   Q==;
-X-CSE-ConnectionGUID: 9em5MH8GTa2qgpeC1W5jBA==
-X-CSE-MsgGUID: 7zAt5EFzQbyciOfdr5U+ng==
-X-IronPort-AV: E=McAfee;i="6800,10657,11602"; a="64407606"
-X-IronPort-AV: E=Sophos;i="6.19,276,1754982000"; 
-   d="scan'208";a="64407606"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 06:43:02 -0800
-X-CSE-ConnectionGUID: 6XITRiKnSqOo2cc8u1YtOQ==
-X-CSE-MsgGUID: lr/hOKYWS5eF7zMcelb+KA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,276,1754982000"; 
-   d="scan'208";a="217520319"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by orviesa002.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2025 06:43:01 -0800
-Received: from ORSMSX902.amr.corp.intel.com (10.22.229.24) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Mon, 3 Nov 2025 06:43:01 -0800
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX902.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Mon, 3 Nov 2025 06:43:01 -0800
-Received: from PH8PR06CU001.outbound.protection.outlook.com (40.107.209.48) by
- edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Mon, 3 Nov 2025 06:43:00 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ec5HRUNSwB20n2R+UzJ4aNo5sAMekaUoiGJWMBRiKLTNGlgdexdaBRIKHBGgeOLYuKuGB1TQtR1c7ytTbqG5LwSbFiNYZRiacXNTjhe58TH4B3rqJUq/qAPV7J+Nf+GMkcO1UO+ubG9hQkRifkt0PBW85cE1nFCgonpibLdvf7to8gkwImJa/NiPyt5DhhqyoMwldNeN8TX3OgwHTQSC6uBh5B2t0nsyDotbnt8kdomtqnST+KfYpld7NpdAweQgu0gTUaJrKuUphHYpDuqO1wjNgbpHdQVBbZRV1qE7eaZfg26JzC/NiJ2CkE5FgBAiuqXMzE5YvXgUeYlXvcKBCg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4gP2rl6iJE8qfxDMa9EgD18/Dj+c/vzhoU/J3ywpxGU=;
- b=wYOEdIsyzdXgic6/ODh6ed3zpIjAOxsBE1qadz7ut2y0lSOUimg7DMWwS10O22P0LjtPzcKtbJr03XmOAQ20sLaUP+v36kwLiBVleGEgBf5Qchwd5ttkqBpjKOAqYNzAilTI6UsE6TnEFaH2XDPR2FjNbdXWWABrNHtGESma85pCNFPZJptK5C3oLmYhYeqYfxJqTT1ibBYogLGSRo5ojtiPkVftUIGigl1UFplo2wDwVYc4LTnz+ENvwn16Evl2PcuwsvQZOLkrm1d50hf+IPHZYI6L3GXOMwUgnljvJk/3Ebvy2RH8mloUDreYKXla36im6Jj+su+r4tnD/bC9ZA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- IA4PR11MB9395.namprd11.prod.outlook.com (2603:10b6:208:55f::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.15; Mon, 3 Nov
- 2025 14:42:58 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca%4]) with mapi id 15.20.9275.013; Mon, 3 Nov 2025
- 14:42:57 +0000
-Date: Mon, 3 Nov 2025 15:42:45 +0100
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <bjorn@kernel.org>, <magnus.karlsson@intel.com>,
-	<jonathan.lemon@gmail.com>, <sdf@fomichev.me>, <ast@kernel.org>,
-	<daniel@iogearbox.net>, <hawk@kernel.org>, <john.fastabend@gmail.com>,
-	<horms@kernel.org>, <andrew+netdev@lunn.ch>, <bpf@vger.kernel.org>,
-	<netdev@vger.kernel.org>, Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next v2 1/2] xsk: do not enable/disable irq when
- grabbing/releasing xsk_tx_list_lock
-Message-ID: <aQi/ZbAoVwBX9VCi@boxer>
-References: <20251030000646.18859-1-kerneljasonxing@gmail.com>
- <20251030000646.18859-2-kerneljasonxing@gmail.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20251030000646.18859-2-kerneljasonxing@gmail.com>
-X-ClientProxiedBy: BE1P281CA0419.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:83::16) To DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49FDF3148B3
+	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 14:47:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762181253; cv=none; b=oYNkJFhsvZijS7aek3ez9x5hHskgr+acnVE8vj6hs7HrY92Bo63gTqjwiiSi5AnEI1EtcNYBtrVIzxYMcLEsy7ICoYn1ZFtMgUeYJA5a1sl46mboX227WAYpj6gelld5Uj0pS30F9NbwxF8fIyKtoTcxLNAtektITuyeKU638DM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762181253; c=relaxed/simple;
+	bh=1hd5EpfEdqiUeQroDVfYks6fn4WoZ4+prGiNWKovJzg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=niDScBnvpWU/0nWQt+SfSK11PlTwJlb/BaXuUfJjU7Q+GtB34B8kXxyaVP42Hs4Ro0w1djOs0BWOq2Jyy53oqW2/X4MZXGMqk9IzRf7O9hipMoMrdL4G9M2W+INNkeiZy1QL/TQKHYt+7P7TwPvMZawSe0PebRGicPorOfEq1wY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=L522km2c; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=BU+9zmGR; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5A3AIVCV2755773
+	for <netdev@vger.kernel.org>; Mon, 3 Nov 2025 14:47:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=t+itrSyYO+VIvGLI0ZHP7w/t
+	itkZWVL2wlVW+eve/BU=; b=L522km2c2+iezrYolQfIEQKB7dzoVdBpOUxZGbwD
+	zlsXUbVQ5yQQ5sKAaM8Zq/vAAPEEQ7uJfyGk6hkFKzAApDx0iak2MgYxqcTjwGB0
+	urYRJ4cby3GnShAnJ5F5HGlScJ7RnSk9FOOhjIDtw/F5cUFxuUkV4LZxLRe6G//3
+	asSwKspaf43v5BGTasYyVnpJKBxg+zOGqr7C5apF3sH5GmRWQXg+YZXHG5igol+C
+	ghU+71HJkObjR1Q70744S6BU+tMEgnu+GoDwjumx7ecq33b1rcCblacKPPbmmuVL
+	AxXOlecVQKTs+bzuiAObShmKIDniL5Vsay4lzjGQVB7ohQ==
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com [209.85.215.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4a6th9rnpw-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Mon, 03 Nov 2025 14:47:30 +0000 (GMT)
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-b9b9e8b0812so2243555a12.0
+        for <netdev@vger.kernel.org>; Mon, 03 Nov 2025 06:47:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1762181250; x=1762786050; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=t+itrSyYO+VIvGLI0ZHP7w/titkZWVL2wlVW+eve/BU=;
+        b=BU+9zmGRWW0WT+4+FIAJxGH/xcCoL173Peix+wxXtrUJM7Ss2ris+J54uSFKrUe6m1
+         OgcLHzrPg/v7a8icCG58cSaGD0vn/XCJjxfuolhe1JLfGVv6Q/J3v2PycrpCU4LrulW5
+         uVYMdi+PpOLoRB3Xco3nuzyVwGwQtJn91UdYPh3QTceU5JS0b9S8TAAzc61uTEMyuPkd
+         QSkvtp4D9jwqNr6o61/No4NOLzdnFwET2pGUlkA1+dU8IbXXuasOG1URVgYmm4Cb6SPf
+         v0rfKrQ2c24nC4qqumKk8aTBR4lPFNRnZ7MA5IyCvOhOWiP2CK6sB+ZSs9c9DurbIMgZ
+         WynQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762181250; x=1762786050;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=t+itrSyYO+VIvGLI0ZHP7w/titkZWVL2wlVW+eve/BU=;
+        b=xHNpVQ2ndJOtK02Lg79D624qq3pjCLjGhlWhVOwfx8G7Ir2dIANio9C20nZzZvDyFC
+         QnYHLlQ+kmYZACikgjjKhlM2EjCClx0HzBkzq1tbuTR6Ns66TGzTQOdd7jhDOOTYK14y
+         AWkAy3KFV2ByOG+kOYaUrxIy+P98MSva3zKc0g+V3nfXg6QiX2C5N4iZH3XX1f0Fzv+A
+         vgTu9iqa+olcMF/6xcAzUYXz2Bxh1dZj1DIxkEV2Cnb8sAlMsLsQvYVxDnKW7CuwYKuC
+         R5stsl07TfDOnPww9V+2d9TJUtGfaNqoQ5OCIlCa8TfQzRflXiT5o7txiKh8ie+pE0Wk
+         C8rg==
+X-Forwarded-Encrypted: i=1; AJvYcCXa+oAr8tYq1p7ZnuWFpKYiuIovIeUaCX9tvLSr5N3/U2NrNVZfqXAzhDrrEmVYNlsr42LNAJ4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJKdgpX9CmE5wDinP4ztKms6JKSXtXV4yk+NVlKn30JrecKDVS
+	+De91EmXO4gh9kT70YroyPxS0k2fAgZoUCvit/hhtxblgdlZHlF1Vd1BF+RzPl2fPK0ZJZAKQ67
+	ySFgAvaruXWW8WEPLV2nDfJUo1BrqUepY2TuQe/B+R86MwL0/VghdRtbI0ys=
+X-Gm-Gg: ASbGncuz6lSb0QpUWtKQYFpdD0yaorF8u1waaOljEMLfx+MRy8FlTz7e7hgHEzzncdJ
+	S7j5mR5xjxylYCTnh66DENL+1mq1w/IMpdsfxh2JS3OXNig73Wduyh0A66iTlfYLViRXCEbpMV4
+	JS4VGGOZitZexfRm09CmlD/9KKBD2CVsm3OaxfB9j67qIAepjoPPTlf6zSdnsEfBxiJvNXXtiRk
+	LBsb5b0lajAuDN17SWSz+AdpRToYJvLKxYv6nPcME+xKWEXnRwR0wXqxCsl/U5gvsBm3TUJvZYf
+	wPurteijP+91lE5V5leyQ1SY5kBHds4G+cht6qn911CB3L/0QwQLM5aOaIikRnR6EBU0xQkyZST
+	mT2DlvUF2m18g
+X-Received: by 2002:a17:902:ec89:b0:265:47:a7bd with SMTP id d9443c01a7336-2951a390601mr145597105ad.4.1762181249587;
+        Mon, 03 Nov 2025 06:47:29 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE+wPyTqTTn2BtjnZCi7zVqSmwEwlcCURWpSI4e7r+UwEdUK2siu1cWW/W0oIfwt/nQiM0MvQ==
+X-Received: by 2002:a17:902:ec89:b0:265:47:a7bd with SMTP id d9443c01a7336-2951a390601mr145596525ad.4.1762181248883;
+        Mon, 03 Nov 2025 06:47:28 -0800 (PST)
+Received: from oss.qualcomm.com ([202.46.23.25])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2952699c9dbsm125010705ad.84.2025.11.03.06.47.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Nov 2025 06:47:28 -0800 (PST)
+Date: Mon, 3 Nov 2025 20:17:20 +0530
+From: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+        Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Alexis =?iso-8859-1?Q?Lothor=E9?= <alexis.lothore@bootlin.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        Boon Khai Ng <boon.khai.ng@altera.com>,
+        Daniel Machon <daniel.machon@microchip.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Furong Xu <0x1207@gmail.com>,
+        Jacob Keller <jacob.e.keller@intel.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
+        linux-arm-kernel@lists.infradead.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        Maxime Chevallier <maxime.chevallier@bootlin.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+        Yu-Chun Lin <eleanor15x@gmail.com>
+Subject: Re: [PATCH net-next 0/3] net: stmmac: phylink PCS conversion part 3
+ (dodgy stuff)
+Message-ID: <aQjAeCNGA2cjNXy6@oss.qualcomm.com>
+References: <aQNmM5+cptKllTS8@oss.qualcomm.com>
+ <aQOB_yCzCmAVM34V@shell.armlinux.org.uk>
+ <aQOCpG_gjJlnm0A1@shell.armlinux.org.uk>
+ <aQhusPX0Hw9ZuLNR@oss.qualcomm.com>
+ <aQh7Zj10C7QcDoqn@shell.armlinux.org.uk>
+ <aQiBjYNtJks2/mrw@oss.qualcomm.com>
+ <20251103104820.3fcksk27j34zu6cg@skbuf>
+ <aQiP46tKUHGwmiTo@oss.qualcomm.com>
+ <aQiVWydDsRaMz8ua@shell.armlinux.org.uk>
+ <20251103121353.dbnalfub5mzwad62@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|IA4PR11MB9395:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2223b29b-205a-4094-2dc3-08de1ae747a5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?huUYPdgMVZ86kphp74RWSgV0/bCLWTWKAbTaGUrdZdHPlmjxIp4ASrEhBGOg?=
- =?us-ascii?Q?9bhIkny1GfvQrc/CQhew0OJn/Yp9/mvl2D+ErCv9EGZe9kBMUOGUGZX8Huzl?=
- =?us-ascii?Q?eS/WFFbMtGsPLrnbMQbg8MO/2QIlYdjUBavGy/3lTuv28+DUrkaFMuiMPcRg?=
- =?us-ascii?Q?poGbpUfjevdhLeLChcUOL7GPAYxHOwoue//UayTvFCsyA21eNzntoNFhhOnk?=
- =?us-ascii?Q?8Z0qsHKgZh2p/AJhqzOZJFZccQ0XcDKP5a24KNEhnoHX1DJZ9u4sxCFpAwSI?=
- =?us-ascii?Q?Fma+J1K2GG7/vPM4wF7zzCKetyuPgATJ7Cy8sIIuEHk+y8GZuzgQRu9jrh22?=
- =?us-ascii?Q?qG+biliv4xWnQjdppimkkjMan2cOMn55AJMaSvMtCfJkHhci5SRptSv1B+ZW?=
- =?us-ascii?Q?Fp+zTaScF8fzXbgC3gSmiABM4ouyMLqhPvAZ8MFYgCH1Pn8zFtEKTBGZWKD4?=
- =?us-ascii?Q?/7wGHDJjw45BtqA7g3u7QNt/WWo22xnnbXypc8kx4ADfw75FASHdfedVvDgn?=
- =?us-ascii?Q?oJSxBLVi6XpRT732coLpo6ae/FN4wlNDZz52kmdkgADMNNfjWWkQu39lHf86?=
- =?us-ascii?Q?rxkSFq5y3hOy3RKlVp0/Tfzeq3hNUSRXc//ys7KxWyu/55Vs4bz65GTGoC8u?=
- =?us-ascii?Q?x0HzwguQns9T7cAcnd9naSDSlJWOOMp0AiPVRrBpj7Y0a1+aJDA9VaTkul0X?=
- =?us-ascii?Q?Pk3i0CuWop+6XrBrVrqDx2XPSSTzzOJHFCYNv5SqAKUqeTNGiflSrS4tXawp?=
- =?us-ascii?Q?7TDc9XLt7TlOeQuLCK/p8B3rAYKs6/aGhvmFWfezk+/IQ+hT8CXssFdjG0Yz?=
- =?us-ascii?Q?809rxlue6yX2SGBFhKsqBsN4GsKZMHfZ1x1ZNNKODWHWZ7vXd6/Hm10ScW50?=
- =?us-ascii?Q?F5cMaHTxeTZzJLhS55MJ5lhUlC7DFx4sBx/ecSY6rwwPqTJ/NJ24aSoSrfTg?=
- =?us-ascii?Q?HMJzAVQobMtwH8QgCXbxVPPnzqF+9yUqVFqc+nu2ihQYGBWiL+bQ4kBFInXF?=
- =?us-ascii?Q?oCulq33ilFGv1g6sJz6gL8Lv1ewgvhpWD4JF3fgmRP+LIl8Q3BVCxvmOw6Td?=
- =?us-ascii?Q?DwZ8JojThtl46kGDXRmKV1PkqlZMRe942VLuvgwXMRzzGRVGqTqhNpBLU3vc?=
- =?us-ascii?Q?pysUlIIuy07rO9p5XeERmR3/x4kYvz+CVDEEEK4D4vpkvP8+BXg/tFRyGuEP?=
- =?us-ascii?Q?+zm/Gir9es8kJcuIn3Tt43A9sP71MJjM0caAT8ETnB06qt13KZ7e+86i9DlL?=
- =?us-ascii?Q?rjQ3kZH8GYpIofakOr4HZOXEVJrMRgrey5s8y9jE9MBCmNFQAQb2PV5Ny6D8?=
- =?us-ascii?Q?g0tCsFzkRt96SZEInP0LLVxRMZr+r4s7Setji3Yam8W7X8djXqAvkeJ+30/U?=
- =?us-ascii?Q?U611TbK33UotpvMowq+Uf+TyhpIAsuAte0kNj290d0xN10VBv9coavuFpwd9?=
- =?us-ascii?Q?W0Uy8GilKdoM6QK+Q9PMPWPl12+EN0Jx?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?AQRP4A9FQOQSn2UkPckvc8vN90jZPQjXAbJACgAL9ozYlatc+uHuMW/YNj02?=
- =?us-ascii?Q?5+0mTvdQoacMS0iAYUxKi3O0mBUvY8hci8gZbISU7n0Uv32XTtoiCQ1rwULF?=
- =?us-ascii?Q?/OpnbRGvmoy7201ThiW9o/SKGY8011emjreneDiSZe+HMLoev7gzV53QiEDQ?=
- =?us-ascii?Q?b7J1zSj4lw2ffqBYUY4K1m/nQ8ICSMghKPC7E8BlAIPjUFdEPZjllNMFMCbs?=
- =?us-ascii?Q?NhbsHfaEiOpxaLNjVIhAV0a30BnDRP7FqHnX31Cu3aiJPGz+sLoyVmkmCgMC?=
- =?us-ascii?Q?pKkBIHJ1F68gBaRBpQdahxD2tX9KnlvdhSDQxHjtiFNYD7vAvmwbITZO/rsu?=
- =?us-ascii?Q?1zcqjUYcjLbhF2LjDkkigOE+PkXCBmBtmqKM4lpsV/5jROFzmO75gdpzPCD5?=
- =?us-ascii?Q?WMjy/KS2S1IdgI9DT7RzJUf9+h0qg2PEsvD/pfAGZ2VpEEQSs/fRcIhCbpei?=
- =?us-ascii?Q?pj9GQs8bV7fUmamDd7eXX8hD6DsYnYh7Lal6uLRL2ikzrxQm6j5Kt04gmlre?=
- =?us-ascii?Q?ASCwND8MqerR1jm7qS6flDB41elGNl+yJI9qr1lzfKpmJE6QzUP9z4fruQNR?=
- =?us-ascii?Q?zBVkXaDe8kxudjs/BcoAav7BUo55drc0MizL2AsMZbfeXWzK/4yWEL2bKOro?=
- =?us-ascii?Q?SdHUcq8/LMpEiIIfGhCJnBSbOxWKUlZSC20YwU8Hr16qAmvurIdTTIGpsDTm?=
- =?us-ascii?Q?k+J3RdLqQoPjfGZXcVmOW0HzoVd8i+YFbjxKeGIZXMST0HCiONy3amDCN3rJ?=
- =?us-ascii?Q?VZ1XOYleHqHQtb/vuJqK44tiUUK3bo8U0ucjFQBQYMhkzNIDchtEPbORMViT?=
- =?us-ascii?Q?3+ltNk2GWCtDxia0CBYDepDMtqXdpCpjcKYw7WaHuQxyQCOKKRbGAiwNPOjW?=
- =?us-ascii?Q?B8i9x89BDFW8RYyxh1dZP/tEGv0i3EzAsRUU00w4IbsSb+4TGMQDpaEeGfPk?=
- =?us-ascii?Q?u3qOpLd3MfbWx7KI/1WZftSNiSExJiK/ailJD749GJbvvMVR9a9viSHLCa1A?=
- =?us-ascii?Q?TQVGya+jRy6xYeGUz+z8SerHApligKAYQAYjUKCcm5Or4WxmafIaMuphcXZ/?=
- =?us-ascii?Q?3DVPT2ylnD2U6FgOSkSdYWNtFWjNazqGzMKFpkZhIFp2o5GXcCtxT9Z7ipFS?=
- =?us-ascii?Q?xF1nIybYkklCTW0VAsT0snCRd4eVv6NCI8lp+J9CcaR1ogU/IBn3fbFrBAjj?=
- =?us-ascii?Q?g5S/nh1dajRAw4XWwDmKD7b+uoePRvxM5AecYLA39UenzTdt9SP4pYCWVdiX?=
- =?us-ascii?Q?hwomL3gtVYOwCuFanxLU9TzIDtJwPDOLgXmDx5JjENPxZSv06OlOXhGg/3W6?=
- =?us-ascii?Q?vQ4LMKFxy+UWGY2jp42JYb9OZ0nzY0bq6Zi/xS8KJkwSvAzZIX/W05c4BVAb?=
- =?us-ascii?Q?a8XcEY2oBLyT+7af90YMc1cryR9VbogesAXuTtQzw+05Tbsi/2GAfnrpgDRc?=
- =?us-ascii?Q?mkBagXJu/T4IOxdoigRi/72Jl9C1MVbbgCI+ATVm3jYCN4uzfztLT6V5VE9u?=
- =?us-ascii?Q?M6LT5sYrL+wg6MslJMz5smxxHH0VyS4LOy78jsTTICSq9CINIfnKOvv4kQOI?=
- =?us-ascii?Q?im+mQjciNSKDTj+BjbOHzs03Xud7rDNf5UFxjTUtjiol+9wSgPIb7DtXCySe?=
- =?us-ascii?Q?ZA=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2223b29b-205a-4094-2dc3-08de1ae747a5
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Nov 2025 14:42:57.7282
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: XnnHOnWEf51sOI/SqZqgjfOiUX46W3MgEG67y7r3lwyvoEr1PxcnX6DACWEIjxBD5gj/Ebgx1ZxC8UmDRyOm+xQw/jKADVyO+XIDr+hs4d0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA4PR11MB9395
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251103121353.dbnalfub5mzwad62@skbuf>
+X-Proofpoint-GUID: dT9C_AnCt_b8f_ubZGnCEkspJLUCwgj6
+X-Authority-Analysis: v=2.4 cv=ea8wvrEH c=1 sm=1 tr=0 ts=6908c082 cx=c_pps
+ a=Qgeoaf8Lrialg5Z894R3/Q==:117 a=ZePRamnt/+rB5gQjfz0u9A==:17
+ a=kj9zAlcOel0A:10 a=6UeiqGixMTsA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=8AirrxEcAAAA:8 a=h6mluUUUhvrYO4b4W1oA:9
+ a=CjuIK1q_8ugA:10 a=x9snwWr2DeNwDh03kgHS:22 a=ST-jHhOKWsTCqRlWije3:22
+X-Proofpoint-ORIG-GUID: dT9C_AnCt_b8f_ubZGnCEkspJLUCwgj6
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTAzMDEzNCBTYWx0ZWRfX/GWv2ZAYn+dh
+ eb1oG8NpulBsnRwO8G+UizW4fNMg4EYTbX/QvSm6Nn47auoi2yZjxD7qDiXRnHXqid+4g8RybDp
+ gc5ynQnQW8WMHV99BpVb08flD1iGnho6nY1fgQqgBIlpmniSTLXzj38VfoZtdVmn0SifYjZPDFC
+ EeLG2neJ1yW3P5r7Ve5JI5eLthJImaki4IATyYBG5krnK/tfkWBLLZuxI5zd0Dj2D30qof544sm
+ P0/lwQphsV7nXrWsQtl+IizOQGuSUoN7/+he0KIfVmQmZ7+uD04NBs+L+6QIMVzQIMdHCgE7F7B
+ 5UBHxT2c4rZzXU4wK6B8el688gpsLm5MCqDwQ4Vx1UzaaMPKcWL7HBaVQje5MG1349tI0G1Ximv
+ 79CCElWzf6hhGoKbidAsC90Abj8P/A==
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-03_02,2025-11-03_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 impostorscore=0 suspectscore=0 lowpriorityscore=0 bulkscore=0
+ adultscore=0 spamscore=0 priorityscore=1501 phishscore=0 clxscore=1015
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2511030134
 
-On Thu, Oct 30, 2025 at 08:06:45AM +0800, Jason Xing wrote:
-> From: Jason Xing <kernelxing@tencent.com>
+On Mon, Nov 03, 2025 at 02:13:53PM +0200, Vladimir Oltean wrote:
+> On Mon, Nov 03, 2025 at 11:43:23AM +0000, Russell King (Oracle) wrote:
+> > On Mon, Nov 03, 2025 at 04:50:03PM +0530, Mohd Ayaan Anwar wrote:
+> > > On Mon, Nov 03, 2025 at 12:48:20PM +0200, Vladimir Oltean wrote:
+> > > > 
+> > > > As Russell partially pointed out, there are several assumptions in the
+> > > > Aquantia PHY driver and in phylink, three of them being that:
+> > > > - rate matching is only supported for PHY_INTERFACE_MODE_10GBASER and
+> > > >   PHY_INTERFACE_MODE_2500BASEX (thus not PHY_INTERFACE_MODE_SGMII)
+> > > > - if phy_get_rate_matching() returns RATE_MATCH_NONE for an interface,
+> > > >   pl->phy_state.rate_matching will also be RATE_MATCH_NONE when using
+> > > >   that interface
+> > > > - if rate matching is used, the PHY is configured to use it for all
+> > > >   media speeds <= phylink_interface_max_speed(link_state.interface)
+> > > > 
+> > > > Those assumptions are not validated very well against the ground truth
+> > > > from the PHY provisioning, so the next step would be for us to see that
+> > > > directly.
+> > > > 
+> > > > Please turn this print from aqr_gen2_read_global_syscfg() into something
+> > > > visible in dmesg, i.e. by replacing phydev_dbg() with phydev_info():
+> > > > 
+> > > > 		phydev_dbg(phydev,
+> > > > 			   "Media speed %d uses host interface %s with %s\n",
+> > > > 			   syscfg->speed, phy_modes(syscfg->interface),
+> > > > 			   syscfg->rate_adapt == AQR_RATE_ADAPT_NONE ? "no rate adaptation" :
+> > > > 			   syscfg->rate_adapt == AQR_RATE_ADAPT_PAUSE ? "rate adaptation through flow control" :
+> > > > 			   syscfg->rate_adapt == AQR_RATE_ADAPT_USX ? "rate adaptation through symbol replication" :
+> > > > 			   "unrecognized rate adaptation type");
+> > > 
+> > > Thanks. Looks like rate adaptation is only provisioned for 10M, which
+> > > matches my observation where phylink passes the exact speeds for
+> > > 100/1000/2500 but 1000 for 10M.
+> > 
+> > Hmm, I wonder what the PHY is doing for that then. stmmac will be
+> > programmed to read the Cisco SGMII in-band control word, and use
+> > that to determine whether symbol replication for slower speeds is
+> > being used.
+> > 
+> > If AQR115C is indicating 10M in the in-band control word, but is
+> > actually operating the link at 1G speed, things are not going to
+> > work, and I would say the PHY is broken to be doing that. The point
+> > of the SGMII in-band control word is to tell the MAC about the
+> > required symbol replication on the link for transmitting the slower
+> > data rates over the link.
+> > 
+> > stmmac unfortunately doesn't give access to the raw Cisco SGMII
+> > in-band control word. However, reading register 0xf8 bits 31:16 for
+> > dwmac4, or register 0xd8 bits 15:0 for dwmac1000 will give this
+> > information. In that bitfield, bits 2:1 give the speed. 2 = 1G,
+> > 1 = 100M, 0 = 10M.
 > 
-> The commit ac98d8aab61b ("xsk: wire upp Tx zero-copy functions")
-> originally introducing this lock put the deletion process in the
-> sk_destruct which can run in irq context obviously, so the
-> xxx_irqsave()/xxx_irqrestore() pair was used. But later another
-> commit 541d7fdd7694 ("xsk: proper AF_XDP socket teardown ordering")
-> moved the deletion into xsk_release() that only happens in process
-> context. It means that since this commit, it doesn't necessarily
-> need that pair.
+> It might be Linux who is forcing the AQR115C into the nonsensical
+> behaviour of advertising 10M in the SGMII control word while
+> simultanously forcing the PHY MII to operate at 1G with flow control
+> for the 10M media speed.
 > 
-> Now, there are two places that use this xsk_tx_list_lock and only
-> run in the process context. So avoid manipulating the irq then.
+> We don't control the latter, but we do control the former:
+> aqr_gen2_config_inband(), if given modes == LINK_INBAND_ENABLE, will
+> enable in-band for all media speeds that use PHY_INTERFACE_MODE_SGMII.
+> Regardless of how the PHY was provisioned for each media speed, and
+> especially regardless of rate matching settings, this function will
+> uniformly set the same in-band enabled/disabled setting for all media
+> speeds using the same host interface.
 > 
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> If dwmac_integrated_pcs_inband_caps(), as per Russell's patch 1/3,
+> reports LINK_INBAND_ENABLE | LINK_INBAND_DISABLE, and if
+> aqr_gen2_inband_caps() also reports LINK_INBAND_ENABLE | LINK_INBAND_DISABLE,
+> then we're giving phylink_pcs_neg_mode() all the tools it needs to shoot
+> itself in the foot, and select LINK_INBAND_ENABLE.
+> 
+> The judgement call in the Aquantia PHY driver was mine, as documented in
+> commit 5d59109d47c0 ("net: phy: aquantia: report and configure in-band
+> autoneg capabilities"). The idea being that the configuration would have
+> been unsupportable anyway given the question that the framework asks:
+> "does the PHY use in-band for SGMII, or does it not?"
+> 
+> Assuming the configuration at 10Mbps wasn't always broken, there's only
+> one way to know how it was supposed to work: more dumping of the initial
+> provisioning, prior to our modification in aqr_gen2_config_inband().
+> Ayaan, please re-print the same info with this new untested patch applied.
+> I am going to assume that in-band autoneg isn't enabled in the unmodified
+> provisioning, at least for 10M.
+> 
+> Russell's request for the integrated PCS status is also a good parallel
+> confirmation that yes, we've entered a mode where the PHY advertises
+> SGMII replication at 10M.
 
-Acked-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-
+> From b91162e5dae8e20b477999c4f2fcdb98c219d663 Mon Sep 17 00:00:00 2001
+> From: Vladimir Oltean <vladimir.oltean@nxp.com>
+> Date: Mon, 3 Nov 2025 14:03:55 +0200
+> Subject: [PATCH] net: phy: aquantia: add inband setting to the
+>  aqr_gen2_read_global_syscfg() print
+> 
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 > ---
->  net/xdp/xsk_buff_pool.c | 12 ++++--------
->  1 file changed, 4 insertions(+), 8 deletions(-)
+>  drivers/net/phy/aquantia/aquantia_main.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
 > 
-> diff --git a/net/xdp/xsk_buff_pool.c b/net/xdp/xsk_buff_pool.c
-> index aa9788f20d0d..309075050b2a 100644
-> --- a/net/xdp/xsk_buff_pool.c
-> +++ b/net/xdp/xsk_buff_pool.c
-> @@ -12,26 +12,22 @@
+> diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy/aquantia/aquantia_main.c
+> index 41f3676c7f1e..f06b7b51bb7d 100644
+> --- a/drivers/net/phy/aquantia/aquantia_main.c
+> +++ b/drivers/net/phy/aquantia/aquantia_main.c
+> @@ -839,6 +839,7 @@ static int aqr_gen2_read_global_syscfg(struct phy_device *phydev)
 >  
->  void xp_add_xsk(struct xsk_buff_pool *pool, struct xdp_sock *xs)
->  {
-> -	unsigned long flags;
-> -
->  	if (!xs->tx)
->  		return;
+>  	for (i = 0; i < AQR_NUM_GLOBAL_CFG; i++) {
+>  		struct aqr_global_syscfg *syscfg = &priv->global_cfg[i];
+> +		bool inband;
 >  
-> -	spin_lock_irqsave(&pool->xsk_tx_list_lock, flags);
-> +	spin_lock(&pool->xsk_tx_list_lock);
->  	list_add_rcu(&xs->tx_list, &pool->xsk_tx_list);
-> -	spin_unlock_irqrestore(&pool->xsk_tx_list_lock, flags);
-> +	spin_unlock(&pool->xsk_tx_list_lock);
->  }
+>  		syscfg->speed = aqr_global_cfg_regs[i].speed;
 >  
->  void xp_del_xsk(struct xsk_buff_pool *pool, struct xdp_sock *xs)
->  {
-> -	unsigned long flags;
-> -
->  	if (!xs->tx)
->  		return;
+> @@ -849,6 +850,7 @@ static int aqr_gen2_read_global_syscfg(struct phy_device *phydev)
 >  
-> -	spin_lock_irqsave(&pool->xsk_tx_list_lock, flags);
-> +	spin_lock(&pool->xsk_tx_list_lock);
->  	list_del_rcu(&xs->tx_list);
-> -	spin_unlock_irqrestore(&pool->xsk_tx_list_lock, flags);
-> +	spin_unlock(&pool->xsk_tx_list_lock);
->  }
+>  		serdes_mode = FIELD_GET(VEND1_GLOBAL_CFG_SERDES_MODE, val);
+>  		rate_adapt = FIELD_GET(VEND1_GLOBAL_CFG_RATE_ADAPT, val);
+> +		inband = FIELD_GET(VEND1_GLOBAL_CFG_AUTONEG_ENA, val);
 >  
->  void xp_destroy(struct xsk_buff_pool *pool)
+>  		switch (serdes_mode) {
+>  		case VEND1_GLOBAL_CFG_SERDES_MODE_XFI:
+> @@ -896,12 +898,13 @@ static int aqr_gen2_read_global_syscfg(struct phy_device *phydev)
+>  		}
+>  
+>  		phydev_dbg(phydev,
+> -			   "Media speed %d uses host interface %s with %s\n",
+> +			   "Media speed %d uses host interface %s with %s, inband %s\n",
+>  			   syscfg->speed, phy_modes(syscfg->interface),
+>  			   syscfg->rate_adapt == AQR_RATE_ADAPT_NONE ? "no rate adaptation" :
+>  			   syscfg->rate_adapt == AQR_RATE_ADAPT_PAUSE ? "rate adaptation through flow control" :
+>  			   syscfg->rate_adapt == AQR_RATE_ADAPT_USX ? "rate adaptation through symbol replication" :
+> -			   "unrecognized rate adaptation type");
+> +			   "unrecognized rate adaptation type",
+> +			   str_enabled_disabled(inband));
+>  	}
+>  
+>  	return 0;
 > -- 
-> 2.41.3
+> 2.43.0
 > 
+
+Here are the logs when I boot up with a 10M link:
+
+[   10.743044] Aquantia AQR115C stmmac-0:08: Media speed 10 uses host interface sgmii with rate adaptation through flow control, inband enabled
+[   10.757965] Aquantia AQR115C stmmac-0:08: Media speed 100 uses host interface sgmii with no rate adaptation, inband enabled
+[   10.769857] Aquantia AQR115C stmmac-0:08: Media speed 1000 uses host interface sgmii with no rate adaptation, inband enabled
+[   10.781840] Aquantia AQR115C stmmac-0:08: Media speed 2500 uses host interface 2500base-x with no rate adaptation, inband disabled
+[   10.794346] Aquantia AQR115C stmmac-0:08: Media speed 5000 uses host interface 10gbase-r with rate adaptation through flow control, inband disabled
+[   10.808358] Aquantia AQR115C stmmac-0:08: Media speed 10000 uses host interface 10gbase-r with no rate adaptation, inband disabled
+[   10.827242] qcom-ethqos 23040000.ethernet eth1: PHY stmmac-0:08 uses interfaces 4,23,27, validating 23
+[   10.836812] qcom-ethqos 23040000.ethernet eth1:  interface 23 (2500base-x) rate match pause supports 0-7,9,13-14,47
+[   10.836817] qcom-ethqos 23040000.ethernet eth1: PHY [stmmac-0:08] driver [Aquantia AQR115C] (irq=318)
+[   10.836819] qcom-ethqos 23040000.ethernet eth1: phy: 2500base-x setting supported 0000000,00000000,00008000,000062ff advertising 0000000,00000000,00008000,000062ff
+[   10.851865] qcom-ethqos 23040000.ethernet eth1: Enabling Safety Features
+[   10.882611] qcom-ethqos 23040000.ethernet eth1: IEEE 1588-2008 Advanced Timestamp supported
+[   10.895207] qcom-ethqos 23040000.ethernet eth1: registered PTP clock
+[   10.902334] qcom-ethqos 23040000.ethernet eth1: configuring for phy/2500base-x link mode
+[   10.910654] qcom-ethqos 23040000.ethernet eth1: major config, requested phy/2500base-x
+[   10.918790] qcom-ethqos 23040000.ethernet eth1: has pcs = true
+[   10.924787] qcom-ethqos 23040000.ethernet eth1: interface 2500base-x inband modes: pcs=01 phy=00
+[   10.933809] qcom-ethqos 23040000.ethernet eth1: major config, active phy/outband/2500base-x
+[   10.942388] qcom-ethqos 23040000.ethernet eth1: phylink_mac_config: mode=phy/2500base-x/none adv=0000000,00000000,00000000,00000000 pause=00
+[   10.966344] qcom-ethqos 23040000.ethernet eth1: phy link down 2500base-x/Unknown/Unknown/none/off/nolpi
+[   12.819779] qcom-ethqos 23040000.ethernet eth1: phy link up sgmii/10Mbps/Half/pause/off/nolpi
+[   12.825947] stmmac_pcs: Link Down
+[   12.829539] qcom-ethqos 23040000.ethernet eth1: major config, requested phy/sgmii
+[   12.831998] stmmac_pcs: Link Down
+[   12.839683] qcom-ethqos 23040000.ethernet eth1: has pcs = true
+[   12.843123] stmmac_pcs: Link Down
+[   12.849121] qcom-ethqos 23040000.ethernet eth1: interface sgmii inband modes: pcs=03 phy=03
+[   12.852546] stmmac_pcs: Link Down
+[   12.861109] qcom-ethqos 23040000.ethernet eth1: major config, active phy/outband/sgmii
+[   12.864535] stmmac_pcs: Link Down
+[   12.872724] qcom-ethqos 23040000.ethernet eth1: phylink_mac_config: mode=phy/sgmii/pause adv=0000000,00000000,00000000,00000000 pause=00
+[   12.876094] stmmac_pcs: Link Down
+[   12.891394] qcom-ethqos 23040000.ethernet eth1: ethqos_configure_sgmii : Speed = 1000
+[   12.892094] stmmac_pcs: Link Down
+[   12.900109] dwmac: PCS configuration changed from phylink by glue, please report: 0x00040000 -> 0x00041200
+[   12.903555] stmmac_pcs: Link Up
+[   12.913473] qcom-ethqos 23040000.ethernet eth1: Link is Up - 10Mbps/Half - flow control off
+[   12.916679] stmmac_pcs: Link Down
+[   12.928659] stmmac_pcs: ANE process completed
+[   12.933133] stmmac_pcs: Link Up
+
+Although unrelated, I found it weird that the link comes up in half
+duplex mode for 10M. To enable full duplex, I have to manually do it via
+ethtool. I will try to connect a different link partner tomorrow, just
+to rule out any issues on the other end.
+
+	Ayaan
+
 
