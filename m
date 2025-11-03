@@ -1,82 +1,140 @@
-Return-Path: <netdev+bounces-235224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235225-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 987A3C2DC5A
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 19:59:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F0EC5C2DD00
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 20:13:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 567C23BBCA6
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 18:59:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1ACD53ABCAB
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 19:13:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E316931D73F;
-	Mon,  3 Nov 2025 18:59:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63D6C280017;
+	Mon,  3 Nov 2025 19:13:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="OvyYtt9S"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="ASdMn6Zf"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1280931D392
-	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 18:59:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B06F5347C3
+	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 19:13:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762196378; cv=none; b=quQvmxKGjDZnmgnorc45Q1L1qy2A9oEFFmf998XAN3KT3aXFG7j1HAnOy8CcpDWZjpMmApSe/h3IF2JadtmjCx5kesMn2hqmU1LufWwphGDGSbW1cj1UCYch5d+N8FNOQS+fszrrSTq6+kT8t/ktq/cZT4CZ+au+Y480RrsTSjY=
+	t=1762197193; cv=none; b=gK2+es8hWx4OL0o6ruvvBCviP8CRupIE8hZzfbX6rXZ68TUyAwIx0lVyDEws2MBbw2q3H/YMSOqY3Mc6hbg/+zQRnX9tHF5fbdsuS4CuXdqvTAIyauX6l9bE1qJBB9i26Klk1IkN8i5GIUOwRdOXQf+MhYNMaHkuARC5f8UvFUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762196378; c=relaxed/simple;
-	bh=yfMSt3J3pEvw7IlLe0z2DcFR+2yxDUQf6QS0x4J59z4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HXhTHB6pQcSRnuYAKQW/lJgiUkZ0Gkz/zI0lLd6nWfY/QRiRASqD95R8zV6W+rfzC7S2CEcx7ggsgiFm7U2AwdxgiZD0FlhCDuYsW9ErMI/kIhI+zhs1CaO9fk1yYKnxIBYhauiP7FG+It/QzZ5pk24TwlP2VdvNPc5iyrSfDiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=OvyYtt9S; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=w5NM7xK46dcVQasHZbN7gcnKaDk/kkBxjUULcDw6NAM=; b=OvyYtt9Sk4DQJET4OarK1L+lbX
-	qkEs9dM6Nm51FC5qDMHjeoxBAUv9hc51ABrWrJKcqwaA9X8K5upVhxjyOJtjxJNAG6qWVNWI8AxiK
-	dAO7QpNbnTK1W/lXv/KCF8oaP/fShnigAj6nat/4ZAC3p5IzeEkoHV7ReltU5fqEQMeQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vFzm7-00Codi-Up; Mon, 03 Nov 2025 19:59:31 +0100
-Date: Mon, 3 Nov 2025 19:59:31 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, kernel-team@meta.com,
-	andrew+netdev@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	pabeni@redhat.com, davem@davemloft.net
-Subject: Re: [net-next PATCH v2 09/11] fbnic: Add SW shim for MDIO interface
- to PMA/PMD and PCS
-Message-ID: <2fabbe4a-754d-40bb-ba10-48ef79df875c@lunn.ch>
-References: <176218882404.2759873.8174527156326754449.stgit@ahduyck-xeon-server.home.arpa>
- <176218926115.2759873.9672365918256502904.stgit@ahduyck-xeon-server.home.arpa>
+	s=arc-20240116; t=1762197193; c=relaxed/simple;
+	bh=3ZtYHtCAihPxQ1JWS/Addd0djROHkcheIbjC0Ioz5EY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=d2nIRc/IkSKVslrgS6g9In1D5OQ2kPeSzbXav/bNJuvExQml03es+e9DO9ThDeDsYJAHxA1XssZ0FnuoUkNvX12TG/PhZ8GdU75mzdkFaahVgfGkKWW2LTtp1cucLh6FT/rikmZNIEE2io6dXlDdLPPf3Awsuz3l9E+mu6EBbLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=ASdMn6Zf; arc=none smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4ed3d00c359so33884161cf.1
+        for <netdev@vger.kernel.org>; Mon, 03 Nov 2025 11:13:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1762197187; x=1762801987; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NI3drFTaeHe8ZSmMttUrOTtIfWgohaM87lOKGhYRASE=;
+        b=ASdMn6ZfLaMienom1oc91e4OF4aFsl8shJxnIBVDQOZeKRiuNRCi9uBaYVUqtZqTQj
+         N2gtQzLJmMi4E6DvgZmWAEZROhij1m+X7dBynRgmq5AC3Wglm4b5I86HsUL3U7c31c2x
+         Vh8w7YAnMRpXLIbhTmhPp9zNe1Lu3m0EjMml2pq/qDQCiQHn9Du+XDNbQSpcn8pD8LW0
+         UdAQ74KHpM2kwKnf9xG6ALw9/sqW6KYjKCv5uRQzMXdIDuNExYOtRC8BuGb/P0koZnLw
+         db7A7XesxJ00vMUjMHgVmWNdIGNze6m3Bn2IZ6HY65w6Fzplz2fmLPkliJSC15/VU63j
+         GREw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762197187; x=1762801987;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NI3drFTaeHe8ZSmMttUrOTtIfWgohaM87lOKGhYRASE=;
+        b=owPP3EOeKZ2NQAmFPQcXfSXTSOtO6Utu9OK/0tSMEIMwdaI8MDTWWyNfelbDDRHWZf
+         RXnV1+diWzAuL+4QRdgtsGiLcHgGe51GqfsD/1RTnn2TfecQNaSh6PmzsAEP9CYJ9pGH
+         r0Sab0iy+BLXjujuiivfg8yZmPRLwXCE1NPUZ8cl7O7OcOCUlWtZ5j6gE3LRJQT2sTEq
+         ATDrQExmpl7lwBHlPZ0GWQzyw9nHx4KNZ8gdN6nM7Qp7uCdoTSzZhcxpko5aVwkLQOh8
+         SmMfml903YRZgqrpWdTKA8RcAqHcx+WdZQQWzfjdthzc2Ga2QR0EG3GPjWI+/mZAd8iz
+         GtJg==
+X-Gm-Message-State: AOJu0YyKkR9XVKOV6AwMXXi2aTQgXZ2aJhmNCk5ywBBwnSZjK9IvmIHd
+	MsQpo+xUkbqh201OTWY+tP+dcsqfBNyMpSMK5XMv+BpyrVXlAB9fl2ZxXP79Vk6IvyM=
+X-Gm-Gg: ASbGncvP2XwsvDsXzYcWScNrEAkvFpp4lI5A45jOriOzz865gqP8HiZiJTmAfv5vryj
+	PIVoG8VAEZ5NH78TTvdjocwUidqiwmqLaM0D66+k+NSXGDmhyGwVHoJs1Ca0NoG6h62fJ+PPXvV
+	2f8VLv6ysy/gp/6LI+ywWNSVu2kHNO5dWDadw0l3bjjlMVGY7c/gtoxbdVvm0bEHRBMtmb2opAl
+	soS4G+x7B0hVYZo7p6TLUpv9qIqbFMm1UnnB7hahWZpBaNsR7XJL7uIQF8zCUfdimkDQLx88TEC
+	EiHEaonr3xWdBrMDxS43fvozLZEDKuvr+VIq9lgReVUoS06vKqXU5VWjAWYTYqRnXiG5hpgn1UV
+	qCFEekjpkG/772Yd2nEZsbJt/vZGc0/8BpkhoiFLRV9QREprb/Svx9J7qtTB2AOLBjJcCwILC2R
+	dJ3ixASjrPDGrRjF3+jr5Z4Mitqyfc8XNxZw==
+X-Google-Smtp-Source: AGHT+IF2nyLarSsIifrXOkYX7bOWXN1AGHlVMsXNv1/jxbKObEmYEq+u79FK/g3f0n7sNVojbQYiXQ==
+X-Received: by 2002:ac8:5742:0:b0:4b7:ad20:9393 with SMTP id d75a77b69052e-4ed60c6a67dmr8668351cf.4.1762197187180;
+        Mon, 03 Nov 2025 11:13:07 -0800 (PST)
+Received: from [10.200.176.43] ([130.44.212.152])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ed5fc396a4sm3675991cf.33.2025.11.03.11.13.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Nov 2025 11:13:06 -0800 (PST)
+Message-ID: <474c1f71-3a5c-4fe5-a01e-80f2ba95fd7e@bytedance.com>
+Date: Mon, 3 Nov 2025 11:13:03 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <176218926115.2759873.9672365918256502904.stgit@ahduyck-xeon-server.home.arpa>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] net/mlx5e: Modify mlx5e_xdp_xmit sq selection
+To: Alexander Duyck <alexander.duyck@gmail.com>,
+ Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, andrew+netdev@lunn.ch,
+ saeedm@nvidia.com, gal@nvidia.com, leonro@nvidia.com, witu@nvidia.com,
+ parav@nvidia.com, tariqt@nvidia.com, hkelam@marvell.com,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ Lorenzo Bianconi <lorenzo@kernel.org>,
+ Jesse Brandeburg <jbrandeburg@cloudflare.com>,
+ Salil Mehta <salil.mehta@huawei.com>
+References: <20251031231038.1092673-1-zijianzhang@bytedance.com>
+ <44f69955-b566-4fb1-904d-f551046ff2d4@gmail.com>
+ <CAKgT0UdJX3T6UcmtbeYLRCNLtnF_=1Dx3RGwHSc_-Awk+cHwow@mail.gmail.com>
+Content-Language: en-US
+From: Zijian Zhang <zijianzhang@bytedance.com>
+In-Reply-To: <CAKgT0UdJX3T6UcmtbeYLRCNLtnF_=1Dx3RGwHSc_-Awk+cHwow@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-> The interface will consist of 2 PHYs each consisting of a PMA/PMD and a PCS
-> located at addresses 0 and 1.
+Thanks for the info and explanation, that makes a lot of sense :)
+Modulo here is too costly.
 
-I'm missing a bit of architecture here.
+On 11/2/25 4:13 PM, Alexander Duyck wrote:
+> On Sun, Nov 2, 2025 at 5:02 AM Tariq Toukan <ttoukan.linux@gmail.com> wrote:
+>> On 01/11/2025 1:10, Zijian Zhang wrote:
+> 
+> ...
+> 
+>>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
+>>> index 5d51600935a6..6225734b256a 100644
+>>> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
+>>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
+>>> @@ -855,13 +855,10 @@ int mlx5e_xdp_xmit(struct net_device *dev, int n, struct xdp_frame **frames,
+>>>        if (unlikely(flags & ~XDP_XMIT_FLAGS_MASK))
+>>>                return -EINVAL;
+>>>
+>>> -     sq_num = smp_processor_id();
+>>> -
+>>> -     if (unlikely(sq_num >= priv->channels.num))
+>>> -             return -ENXIO;
+>>> -
+>>> +     sq_num = smp_processor_id() % priv->channels.num;
+>>
+>> Modulo is a costly operation.
+>> A while loop with subtraction would likely converge faster.
+> 
+> I agree. The modulo is optimizing for the worst exception case, and
+> heavily penalizing the case where it does nothing. A while loop in
+> most cases will likely just be a test and short jump which would be
+> two or three cycles whereas this would cost you somewhere in the 10s
+> of cycles for most processors as I recall.
 
-At least for speeds up to 10G, we have the MAC enumerate what it can
-do, the PCS enumerates its capabilities, and we read the EERPOM of the
-SFP to find out what it supports. From that, we can figure out the
-subset of link modes which are supported, and configure the MAC and
-PCS as required.
-
-What information is missing from this picture that requires the
-PMA/PMD to be represented? And how is this going to work when we do
-have access to the SFPs EERPOM?
-
-       Andrew
 
