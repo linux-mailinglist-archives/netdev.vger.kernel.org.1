@@ -1,118 +1,123 @@
-Return-Path: <netdev+bounces-235076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 418CBC2BCFD
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 13:48:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33379C2BD36
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 13:50:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 131414F710C
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 12:42:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 128FE3BDFC4
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 12:46:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5CC830FF24;
-	Mon,  3 Nov 2025 12:40:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5011530CDA8;
+	Mon,  3 Nov 2025 12:44:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="judhg8dw"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RmGgkokm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B3D130E852;
-	Mon,  3 Nov 2025 12:40:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F70130C355;
+	Mon,  3 Nov 2025 12:44:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762173608; cv=none; b=bsZkR4hiGLwxuUMh8uWDqQm8dzxg17k+GaKPAxe28O9qIcvyGBkAULg164fqMQ49B/I45mk5hvvH7pB5Hcw78Rq4ZqGtA1et3KkV8ruKH5ip6SgKizePUxZFOxf/CznTQ0iyxGcvS59Hmo+57zfLDFNHtK5qPKTNA2WDzs4cd7g=
+	t=1762173877; cv=none; b=vC+NkPXEFKSVpxYOANV6ZpfZJWWuOesRqqeC199+Si6bUJk+4Dv74CLXZcbBbcpffAgblm8XBailjmLSuMxlzSoEEbrdhph/78FTy+LgONt7DkrV/LW1Ygwq84eE/OK1LtUuSdzsd5lVy+vxRcAkaO3C27dllV/VViRQoL022C4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762173608; c=relaxed/simple;
-	bh=cXS6YqDu1aAIoihYJMx0C5S/EGTY2veO/eUmFpn3vYo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RhYhLB8K0CM92npeaYgs+VO0nfCAFaCgHtz6q59WD+m0ZGL9oUdw+6scNl2dYg7sdz99JhiyMHg1KhhMuhvytgVS9ratYFeXTSPE/084YsDU12jNZKHNIGR8+UXcgisX+tcZABRNgBdEfOi+2Vy9pdSm/kk9LKgykSH1GeRVKEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=judhg8dw; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 89A20C0D7AA;
-	Mon,  3 Nov 2025 12:39:42 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 4B44A60709;
-	Mon,  3 Nov 2025 12:40:03 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 65ED610B5005A;
-	Mon,  3 Nov 2025 13:39:59 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1762173602; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=6bd3qOFo0naZsfmsk+yctKY223PmdCGeaBNloBYRnoI=;
-	b=judhg8dwpBVzZwyMOx3oTg5uonu02y6mYMN3DlwAHPwOByOhxNgydk3PAScGHcIhYzROW7
-	alVO1Gkl2+bGCE+VqxZuCmotW6or1UJlDlqHhNUNWf3JTS4F4uLrUuxtFqiPp/q4LC/LEG
-	VKbx4WdQRskg5u2g2ejrzdesNvINKQkl6lIDlUSJ2VRE1O0mrKUtpj8fYfis6FaiIdBV6f
-	PXF/NViwhj1SZB6n2EAy/+daxfnQhKwu4IZIn9OXr9a2FduUrjuC1zwASj282zMFMAe741
-	DT0StxNgi2qABNGo6w9Xkm39VeaScVERhvx1UZuKcfP+DOs0sSbtQaB+wDTUnQ==
-Date: Mon, 3 Nov 2025 13:39:58 +0100
-From: Herve Codina <herve.codina@bootlin.com>
-To: Haotian Zhang <vulab@iscas.ac.cn>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, thomas.petazzoni@bootlin.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] net: wan: framer: pef2256: Switch to
- devm_mfd_add_devices()
-Message-ID: <20251103133958.7c9d5003@bootlin.com>
-In-Reply-To: <20251103123741.721-1-vulab@iscas.ac.cn>
-References: <20251103111844.271-1-vulab@iscas.ac.cn>
-	<20251103123741.721-1-vulab@iscas.ac.cn>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1762173877; c=relaxed/simple;
+	bh=vT6PArFNlD9ATQBYI/ysNDAumFVMhzxz9dljQq1FEo4=;
+	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
+	 In-Reply-To:References; b=iEhJ+82k/b/stCXxING6/9DgNbowrG/ZR/P9mlVBQIKo+v0/dhYn0fR03Im7vev3nDT4IIfF1fA1b2JjpSVMYUDBSZESMS9JXr6hCiO4iHOmLWsy3vmTcAkV25r0bNRbD1OhHZ5yu72m44HSBrXbloPc/OMScxQr66vqQLug5b8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RmGgkokm; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1762173862;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HCESdiFfePQnHxAf5Hjx+NZwOKZOc1DIfGTWc/CkQFI=;
+	b=RmGgkokmZWSo8UB9yGc4Wq07j7MdQpgB0b3cW0rSbLfwQyuO9LTYotTkkJPN3r4augRIlF
+	l7yY27AMCqp6lE9/YHUWl6UdnxZg/JOhepCTkF7MTPAISgKfqjWtkrarP+kHNzCwFXBDP/
+	MJigcA7V0TLszG04FEJ92ouXtktg/jA=
+Date: Mon, 03 Nov 2025 12:44:15 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
+Message-ID: <3ddd7d72644ebd5826caa244cad6a6491410c00a@linux.dev>
+TLS-Required: No
+Subject: Re: [PATCH net v3 1/3] net,mptcp: fix proto fallback detection with
+ BPF sockmap
+To: "Paolo Abeni" <pabeni@redhat.com>, mptcp@lists.linux.dev
+Cc: stable@vger.kernel.org, "Jakub Sitnicki" <jakub@cloudflare.com>, "John
+ Fastabend" <john.fastabend@gmail.com>, "Eric Dumazet"
+ <edumazet@google.com>, "Kuniyuki Iwashima" <kuniyu@google.com>, "Willem
+ de Bruijn" <willemb@google.com>, "David S. Miller" <davem@davemloft.net>,
+ "Jakub Kicinski" <kuba@kernel.org>, "Simon Horman" <horms@kernel.org>,
+ "Matthieu Baerts" <matttbe@kernel.org>, "Mat Martineau"
+ <martineau@kernel.org>, "Geliang Tang" <geliang@kernel.org>, "Andrii
+ Nakryiko" <andrii@kernel.org>, "Eduard Zingerman" <eddyz87@gmail.com>,
+ "Alexei Starovoitov" <ast@kernel.org>, "Daniel Borkmann"
+ <daniel@iogearbox.net>, "Martin KaFai Lau" <martin.lau@linux.dev>, "Song
+ Liu" <song@kernel.org>, "Yonghong Song" <yonghong.song@linux.dev>, "KP
+ Singh" <kpsingh@kernel.org>, "Stanislav Fomichev" <sdf@fomichev.me>, "Hao
+ Luo" <haoluo@google.com>, "Jiri Olsa" <jolsa@kernel.org>, "Shuah Khan"
+ <shuah@kernel.org>, "Florian Westphal" <fw@strlen.de>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
+In-Reply-To: <c10939d2-437e-47fb-81e9-05723442c935@redhat.com>
+References: <20251023125450.105859-1-jiayuan.chen@linux.dev>
+ <20251023125450.105859-2-jiayuan.chen@linux.dev>
+ <c10939d2-437e-47fb-81e9-05723442c935@redhat.com>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Haotian,
+October 28, 2025 at 19:30, "Paolo Abeni" <pabeni@redhat.com mailto:pabeni=
+@redhat.com?to=3D%22Paolo%20Abeni%22%20%3Cpabeni%40redhat.com%3E > wrote:
 
-On Mon,  3 Nov 2025 20:37:41 +0800
-Haotian Zhang <vulab@iscas.ac.cn> wrote:
 
-> The driver calls mfd_add_devices() but fails to call mfd_remove_devices()
-> in error paths after successful MFD device registration and in the remove
-> function. This leads to resource leaks where MFD child devices are not
-> properly unregistered.
-> 
-> Replace mfd_add_devices with devm_mfd_add_devices to automatically
-> manage the device resources.
-> 
-> Fixes: c96e976d9a05 ("net: wan: framer: Add support for the Lantiq PEF2256 framer")
-> Suggested-by: Herve Codina<herve.codina@bootlin.com>
-> Signed-off-by: Haotian Zhang <vulab@iscas.ac.cn>
-> ---
-> Changes in v2:
->   - Use devm_mfd_add_devices() instead of manual cleanup
-> ---
->  drivers/net/wan/framer/pef2256/pef2256.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/wan/framer/pef2256/pef2256.c b/drivers/net/wan/framer/pef2256/pef2256.c
-> index 1e4c8e85d598..4f4433560964 100644
-> --- a/drivers/net/wan/framer/pef2256/pef2256.c
-> +++ b/drivers/net/wan/framer/pef2256/pef2256.c
-> @@ -812,7 +812,7 @@ static int pef2256_probe(struct platform_device *pdev)
->  
->  	platform_set_drvdata(pdev, pef2256);
->  
-> -	ret = mfd_add_devices(pef2256->dev, 0, pef2256_devs,
-> +	ret = devm_mfd_add_devices(pef2256->dev, 0, pef2256_devs,
->  			      ARRAY_SIZE(pef2256_devs), NULL, 0, NULL);
->  	if (ret) {
->  		dev_err(pef2256->dev, "add devices failed (%d)\n", ret);
+>=20
+>=20On 10/23/25 2:54 PM, Jiayuan Chen wrote:
+>=20
+>=20>=20
+>=20> When the server has MPTCP enabled but receives a non-MP-capable req=
+uest
+> >  from a client, it calls mptcp_fallback_tcp_ops().
+> >=20=20
+>=20>  Since non-MPTCP connections are allowed to use sockmap, which repl=
+aces
+> >  sk->sk_prot, using sk->sk_prot to determine the IP version in
+> >  mptcp_fallback_tcp_ops() becomes unreliable. This can lead to assign=
+ing
+> >  incorrect ops to sk->sk_socket->ops.
+> >=20
+>=20I don't see how sockmap could modify the to-be-accepted socket sk_pro=
+t
+> before mptcp_fallback_tcp_ops(), as such call happens before the fd is
+> installed, and AFAICS sockmap can only fetch sockets via fds.
+>=20
+>=20Is this patch needed?
 
-Thanks for your update.
+"mptcp_fallback_tcp_ops" is only called during the accept process. Howeve=
+r,
+before that, for an already established TCP socket, its sk_prot is replac=
+ed via the following path:
+tcp_rcv_state_process()
+  tcp_init_transfer(BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB)
+    call bpf prog
+        bpf_sock_map_update(sk)
+           tcp_bpf_update_proto()
 
-Acked-by: Herve Codina <herve.codina@bootlin.com>
+However, after discussing with Matthieu, we've concluded that this patch =
+is indeed no
+longer necessary, as we have a simpler way to intercept the operation."
 
-Best regards,
-Hervé
+Thanks~
 
