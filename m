@@ -1,291 +1,132 @@
-Return-Path: <netdev+bounces-234943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8438DC29F14
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 04:20:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 796DCC29F26
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 04:23:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED74A188B8F5
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 03:21:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3777C3AD2BA
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 03:23:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCF712741B3;
-	Mon,  3 Nov 2025 03:20:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="H/xz4Wzt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 975D028725C;
+	Mon,  3 Nov 2025 03:23:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+Received: from ssh247.corpemail.net (ssh247.corpemail.net [210.51.61.247])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ABEC9460
-	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 03:20:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E300DFC0A;
+	Mon,  3 Nov 2025 03:23:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.51.61.247
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762140042; cv=none; b=CURxsp7AIUcmbKVTic8HbA8UVEzUp8p9ojdgVtOSGBbOuM336vHzKu/MkKPLqComWr5Aape6YWgWAlOZOmIceJitZGJ7+/WQJ6q5QMLhGdygBUt+m9fyWs2DP/f7Tw3beZ1SZntyZj+FAamJm/MPxxl7/Nb17SYB88NT2TSkur4=
+	t=1762140198; cv=none; b=ak8pERw5yvMH2PCypMubPZNU+F6EhOvnpXJVmujzHgzJk6rxtW0M8cxPbsvA42dKr8JPqYnbGGVdV8OCd0NR0QbVni1yuIkR1AIUMt2PcVu4vOh2BpqKMgdT1WT5T15j/sWDMOk+SNU1uay0yYf3/T8wLT9+m4QVvU8nWcQ9uFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762140042; c=relaxed/simple;
-	bh=4c/A7NNNK9QoaDFxZg6r47GxUbHOmq/oakDwXzHp40A=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=G7eUN7y32kCYI4ygviLYi2577zBCIrPRpAF7hijXOF9wnFy7DzII5Wy8c91GDze+qLazMo7RHAnm1N1ESHu0TsUkbuxWLC+cZTaWgyuZZ7Ecjz1jdK5netVS4HWZiMRhostV17lePUgZPTaYGMx4gjTq2hysBR+a6YgK2KnJc0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=H/xz4Wzt; arc=none smtp.client-ip=115.124.30.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1762140032; h=Message-ID:Subject:Date:From:To;
-	bh=XR3m05PCYe26NaEo7gSokKWSdIdeXNLE2m41pVXWW1E=;
-	b=H/xz4Wzt1N36Hf6zP57XJXWMupPJ2P2P7E2ptmHneh0W6YGiB1RlWQcj8PqeVy2J/sx+5EC4qXNMjOjZCYx7WwZYJj27PE/WFILPg6AfdvVvPfq9faufYQeBFt3tPgXB7ur2NLxrT3lSfxdViNkJcDtJc2mkCefrEM+7p7fN2hA=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WrVn7AG_1762140031 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 03 Nov 2025 11:20:31 +0800
-Message-ID: <1762140025.5593016-6-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v6 09/12] virtio_net: Implement IPv4 ethtool flow rules
-Date: Mon, 3 Nov 2025 11:20:25 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Daniel Jurgens <danielj@nvidia.com>
-Cc: <virtualization@lists.linux.dev>,
- <parav@nvidia.com>,
- <shshitrit@nvidia.com>,
- <yohadt@nvidia.com>,
- <xuanzhuo@linux.alibaba.com>,
- <eperezma@redhat.com>,
- <shameerali.kolothum.thodi@huawei.com>,
- <jgg@ziepe.ca>,
- <kevin.tian@intel.com>,
- <kuba@kernel.org>,
- <andrew+netdev@lunn.ch>,
- <edumazet@google.com>,
- Daniel Jurgens <danielj@nvidia.com>,
- <netdev@vger.kernel.org>,
- <mst@redhat.com>,
- <jasowang@redhat.com>,
- <alex.williamson@redhat.com>,
- <pabeni@redhat.com>
-References: <20251027173957.2334-1-danielj@nvidia.com>
- <20251027173957.2334-10-danielj@nvidia.com>
-In-Reply-To: <20251027173957.2334-10-danielj@nvidia.com>
+	s=arc-20240116; t=1762140198; c=relaxed/simple;
+	bh=L3Yi5m3V2NmuEx0GBprEZsZTrq6iFPcF9pmkAubbsi0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uBufwwr4MPXR3bMVFDElyYdTA0FuuVz7lHPkKHHQ8eQybtsT4+tboxIT34fDGimOBVUEroSC1IUmVs0MzY+MyDn6PsyCg6k2fM6ua/hsrb5PLQUeQ6pxxQPdXI5nK0wX37F+UrTUA/B/oFWbOZFY5jOv3eyvCQGIcZuBeu2LuvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com; spf=pass smtp.mailfrom=inspur.com; arc=none smtp.client-ip=210.51.61.247
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inspur.com
+Received: from Jtjnmail201615.home.langchao.com
+        by ssh247.corpemail.net ((D)) with ASMTP (SSL) id 202511031123089213;
+        Mon, 03 Nov 2025 11:23:08 +0800
+Received: from jtjnmailAR01.home.langchao.com (10.100.2.42) by
+ Jtjnmail201615.home.langchao.com (10.100.2.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.58; Mon, 3 Nov 2025 11:23:06 +0800
+Received: from inspur.com (10.100.2.107) by jtjnmailAR01.home.langchao.com
+ (10.100.2.42) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
+ Transport; Mon, 3 Nov 2025 11:23:06 +0800
+Received: from localhost.localdomain.com (unknown [10.94.13.117])
+	by app3 (Coremail) with SMTP id awJkCsDw3fgXIAhpPa8JAA--.11940S4;
+	Mon, 03 Nov 2025 11:23:06 +0800 (CST)
+From: Chu Guangqing <chuguangqing@inspur.com>
+To: <jgross@suse.com>, <sstabellini@kernel.org>,
+	<oleksandr_tyshchenko@epam.com>, <andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <xen-devel@lists.xenproject.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Chu Guangqing <chuguangqing@inspur.com>
+Subject: [PATCH] xen/netfront: Comment Correction: Fix Spelling Error and Description of Queue Quantity Rules
+Date: Mon, 3 Nov 2025 11:22:12 +0800
+Message-ID: <20251103032212.2462-1-chuguangqing@inspur.com>
+X-Mailer: git-send-email 2.43.7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: awJkCsDw3fgXIAhpPa8JAA--.11940S4
+X-Coremail-Antispam: 1UD129KBjvJXoW7KFWfGw4fZr1DGFy3Xr4UCFg_yoW8Xw1Dpr
+	ZxWwsIvwn5XanFy3Wvy3WxurW5Xa18GFyDWrWfu3y3Xws8ZFyjqry3KFW5Xr18Jr4kGa1Y
+	yF4jqF9ruwn0v3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUU9j14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26rxl
+	6s0DM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
+	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
+	n2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
+	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+	17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
+	IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4l
+	IxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvf
+	C2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
+X-CM-SenderInfo: 5fkxw35dqj1xlqj6x0hvsx2hhfrp/
+X-CM-DELIVERINFO: =?B?WZlWr5RRTeOiUs3aOqHZ50hzsfHKF9Ds6CbXmDm38RucXu3DYXJR7Zlh9zE0nt/Iac
+	D+Kd7qCoyzVvXU23E45gA/UozU+vTWs0UaMZjN3SDVnrRYOZ4d5fZaq5YsE8h+Y6TFhwys
+	rNxsp/VnNVvUSEPN9bo=
+Content-Type: text/plain
+tUid: 20251103112308691f091018264b888eb3e7c243b9f925
+X-Abuse-Reports-To: service@corp-email.com
+Abuse-Reports-To: service@corp-email.com
+X-Complaints-To: service@corp-email.com
+X-Report-Abuse-To: service@corp-email.com
 
-On Mon, 27 Oct 2025 12:39:54 -0500, Daniel Jurgens <danielj@nvidia.com> wrote:
-> Add support for IP_USER type rules from ethtool.
->
-> Example:
-> $ ethtool -U ens9 flow-type ip4 src-ip 192.168.51.101 action -1
-> Added rule with ID 1
->
-> The example rule will drop packets with the source IP specified.
->
-> Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
-> Reviewed-by: Parav Pandit <parav@nvidia.com>
-> Reviewed-by: Shahar Shitrit <shshitrit@nvidia.com>
+The original comments contained spelling errors and incomplete logical
+descriptions, which could easily lead to misunderstandings of the code
+logic. The specific modifications are as follows:
 
-Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Correct the spelling error by changing "inut max" to "but not exceed the
+maximum limit";
 
-> ---
-> v4:
->     - Fixed bug in protocol check of parse_ip4
->     - (u8 *) to (void *) casting.
->     - Alignment issues.
-> ---
->  drivers/net/virtio_net.c | 122 ++++++++++++++++++++++++++++++++++++---
->  1 file changed, 115 insertions(+), 7 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index d94ac72fc02c..79313627e1a5 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -6884,6 +6884,34 @@ static bool validate_eth_mask(const struct virtnet_ff *ff,
->  	return true;
->  }
->
-> +static bool validate_ip4_mask(const struct virtnet_ff *ff,
-> +			      const struct virtio_net_ff_selector *sel,
-> +			      const struct virtio_net_ff_selector *sel_cap)
-> +{
-> +	bool partial_mask = !!(sel_cap->flags & VIRTIO_NET_FF_MASK_F_PARTIAL_MASK);
-> +	struct iphdr *cap, *mask;
-> +
-> +	cap = (struct iphdr *)&sel_cap->mask;
-> +	mask = (struct iphdr *)&sel->mask;
-> +
-> +	if (mask->saddr &&
-> +	    !check_mask_vs_cap(&mask->saddr, &cap->saddr,
-> +			       sizeof(__be32), partial_mask))
-> +		return false;
-> +
-> +	if (mask->daddr &&
-> +	    !check_mask_vs_cap(&mask->daddr, &cap->daddr,
-> +			       sizeof(__be32), partial_mask))
-> +		return false;
-> +
-> +	if (mask->protocol &&
-> +	    !check_mask_vs_cap(&mask->protocol, &cap->protocol,
-> +			       sizeof(u8), partial_mask))
-> +		return false;
-> +
-> +	return true;
-> +}
-> +
->  static bool validate_mask(const struct virtnet_ff *ff,
->  			  const struct virtio_net_ff_selector *sel)
->  {
-> @@ -6895,11 +6923,36 @@ static bool validate_mask(const struct virtnet_ff *ff,
->  	switch (sel->type) {
->  	case VIRTIO_NET_FF_MASK_TYPE_ETH:
->  		return validate_eth_mask(ff, sel, sel_cap);
-> +
-> +	case VIRTIO_NET_FF_MASK_TYPE_IPV4:
-> +		return validate_ip4_mask(ff, sel, sel_cap);
->  	}
->
->  	return false;
->  }
->
-> +static void parse_ip4(struct iphdr *mask, struct iphdr *key,
-> +		      const struct ethtool_rx_flow_spec *fs)
-> +{
-> +	const struct ethtool_usrip4_spec *l3_mask = &fs->m_u.usr_ip4_spec;
-> +	const struct ethtool_usrip4_spec *l3_val  = &fs->h_u.usr_ip4_spec;
-> +
-> +	mask->saddr = l3_mask->ip4src;
-> +	mask->daddr = l3_mask->ip4dst;
-> +	key->saddr = l3_val->ip4src;
-> +	key->daddr = l3_val->ip4dst;
-> +
-> +	if (l3_mask->proto) {
-> +		mask->protocol = l3_mask->proto;
-> +		key->protocol = l3_val->proto;
-> +	}
-> +}
-> +
-> +static bool has_ipv4(u32 flow_type)
-> +{
-> +	return flow_type == IP_USER_FLOW;
-> +}
-> +
->  static int setup_classifier(struct virtnet_ff *ff,
->  			    struct virtnet_classifier **c)
->  {
-> @@ -7034,6 +7087,7 @@ static bool supported_flow_type(const struct ethtool_rx_flow_spec *fs)
->  {
->  	switch (fs->flow_type) {
->  	case ETHER_FLOW:
-> +	case IP_USER_FLOW:
->  		return true;
->  	}
->
-> @@ -7062,11 +7116,23 @@ static int validate_flow_input(struct virtnet_ff *ff,
->  }
->
->  static void calculate_flow_sizes(struct ethtool_rx_flow_spec *fs,
-> -				 size_t *key_size, size_t *classifier_size,
-> -				 int *num_hdrs)
-> +				size_t *key_size, size_t *classifier_size,
-> +				int *num_hdrs)
->  {
-> +	size_t size = sizeof(struct ethhdr);
-> +
->  	*num_hdrs = 1;
->  	*key_size = sizeof(struct ethhdr);
-> +
-> +	if (fs->flow_type == ETHER_FLOW)
-> +		goto done;
-> +
-> +	++(*num_hdrs);
-> +	if (has_ipv4(fs->flow_type))
-> +		size += sizeof(struct iphdr);
-> +
-> +done:
-> +	*key_size = size;
->  	/*
->  	 * The classifier size is the size of the classifier header, a selector
->  	 * header for each type of header in the match criteria, and each header
-> @@ -7078,8 +7144,9 @@ static void calculate_flow_sizes(struct ethtool_rx_flow_spec *fs,
->  }
->
->  static void setup_eth_hdr_key_mask(struct virtio_net_ff_selector *selector,
-> -				   u8 *key,
-> -				   const struct ethtool_rx_flow_spec *fs)
-> +				  u8 *key,
-> +				  const struct ethtool_rx_flow_spec *fs,
-> +				  int num_hdrs)
->  {
->  	struct ethhdr *eth_m = (struct ethhdr *)&selector->mask;
->  	struct ethhdr *eth_k = (struct ethhdr *)key;
-> @@ -7087,8 +7154,33 @@ static void setup_eth_hdr_key_mask(struct virtio_net_ff_selector *selector,
->  	selector->type = VIRTIO_NET_FF_MASK_TYPE_ETH;
->  	selector->length = sizeof(struct ethhdr);
->
-> -	memcpy(eth_m, &fs->m_u.ether_spec, sizeof(*eth_m));
-> -	memcpy(eth_k, &fs->h_u.ether_spec, sizeof(*eth_k));
-> +	if (num_hdrs > 1) {
-> +		eth_m->h_proto = cpu_to_be16(0xffff);
-> +		eth_k->h_proto = cpu_to_be16(ETH_P_IP);
-> +	} else {
-> +		memcpy(eth_m, &fs->m_u.ether_spec, sizeof(*eth_m));
-> +		memcpy(eth_k, &fs->h_u.ether_spec, sizeof(*eth_k));
-> +	}
-> +}
-> +
-> +static int setup_ip_key_mask(struct virtio_net_ff_selector *selector,
-> +			     u8 *key,
-> +			     const struct ethtool_rx_flow_spec *fs)
-> +{
-> +	struct iphdr *v4_m = (struct iphdr *)&selector->mask;
-> +	struct iphdr *v4_k = (struct iphdr *)key;
-> +
-> +	selector->type = VIRTIO_NET_FF_MASK_TYPE_IPV4;
-> +	selector->length = sizeof(struct iphdr);
-> +
-> +	if (fs->h_u.usr_ip4_spec.l4_4_bytes ||
-> +	    fs->h_u.usr_ip4_spec.tos ||
-> +	    fs->h_u.usr_ip4_spec.ip_ver != ETH_RX_NFC_IP4)
-> +		return -EOPNOTSUPP;
-> +
-> +	parse_ip4(v4_m, v4_k, fs);
-> +
-> +	return 0;
->  }
->
->  static int
-> @@ -7110,6 +7202,13 @@ validate_classifier_selectors(struct virtnet_ff *ff,
->  	return 0;
->  }
->
-> +static
-> +struct virtio_net_ff_selector *next_selector(struct virtio_net_ff_selector *sel)
-> +{
-> +	return (void *)sel + sizeof(struct virtio_net_ff_selector) +
-> +		sel->length;
-> +}
-> +
->  static int build_and_insert(struct virtnet_ff *ff,
->  			    struct virtnet_ethtool_rule *eth_rule)
->  {
-> @@ -7147,8 +7246,17 @@ static int build_and_insert(struct virtnet_ff *ff,
->  	classifier->count = num_hdrs;
->  	selector = (void *)&classifier->selectors[0];
->
-> -	setup_eth_hdr_key_mask(selector, key, fs);
-> +	setup_eth_hdr_key_mask(selector, key, fs, num_hdrs);
-> +	if (num_hdrs == 1)
-> +		goto validate;
-> +
-> +	selector = next_selector(selector);
-> +
-> +	err = setup_ip_key_mask(selector, key + sizeof(struct ethhdr), fs);
-> +	if (err)
-> +		goto err_classifier;
->
-> +validate:
->  	err = validate_classifier_selectors(ff, classifier, num_hdrs);
->  	if (err)
->  		goto err_key;
-> --
-> 2.50.1
->
+Add the note "If the user has not specified a value, the default maximum
+limit is 8" to clarify the default value logic;
+
+Improve the coherence of the statement to make the queue quantity rules
+clearer.
+
+After the modification, the comments can accurately reflect the code
+behavior of "taking the smaller value between the number of CPUs and the
+default maximum limit of 8 for the number of queues", enhancing code
+maintainability.
+
+Signed-off-by: Chu Guangqing <chuguangqing@inspur.com>
+---
+ drivers/net/xen-netfront.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/xen-netfront.c b/drivers/net/xen-netfront.c
+index a11a0e949400..7c2220366623 100644
+--- a/drivers/net/xen-netfront.c
++++ b/drivers/net/xen-netfront.c
+@@ -2696,8 +2696,9 @@ static int __init netif_init(void)
+ 
+ 	pr_info("Initialising Xen virtual ethernet driver\n");
+ 
+-	/* Allow as many queues as there are CPUs inut max. 8 if user has not
+-	 * specified a value.
++	/* Allow the number of queues to match the number of CPUs, but not exceed
++	 * the maximum limit. If the user has not specified a value, the default
++	 * maximum limit is 8.
+ 	 */
+ 	if (xennet_max_queues == 0)
+ 		xennet_max_queues = min_t(unsigned int, MAX_QUEUES_DEFAULT,
+-- 
+2.43.7
+
 
