@@ -1,61 +1,73 @@
-Return-Path: <netdev+bounces-234958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FC75C2A3C4
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 07:58:47 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF141C2A56C
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 08:32:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C8AAC4E2C97
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 06:58:45 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 602654E62E5
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 07:31:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF007288502;
-	Mon,  3 Nov 2025 06:58:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 666682BDC05;
+	Mon,  3 Nov 2025 07:31:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="WBa9ENdC"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="sjuYXLdV"
 X-Original-To: netdev@vger.kernel.org
-Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
+Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8C8A235BE2;
-	Mon,  3 Nov 2025 06:58:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A7B1239E9E;
+	Mon,  3 Nov 2025 07:31:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762153122; cv=none; b=aeboBuusGAFt9W0MvrYqVj+rUV3yQm67d0XkKnxxznfXpTzdkw8F2GWup6w/o5FREn9kL1vtQQVgr/Hgwzr3AZS5gWy5LteJDkG1ZkuAYJZI1lhaiUH9JAzSF/UIwtv4UpigjFzboUWdhfNRKTvomcsuUpU1KED4/ydJ0u45NZU=
+	t=1762155096; cv=none; b=gjK8PZeLT1vXUdFphth07oONkFqdGqJCd7Ot3ZB6M9cittgqGKJ8phyo3o+I9+pmrYHEsf9Aqhvyh8DETDYYQ1KKXBJ/IUlAxV6Ij1Vg5QecshmWr4tGA8qZXf+ZqJIuzrF6a8pMsIQZa5dBDvfAOWhhcuuqR3mFzZLCDly2vEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762153122; c=relaxed/simple;
-	bh=UaWei8lA5myvGhZlKdywonEmJPyUfL8lNDin+Txy330=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YlxEZE6vbbYGhoIcJF+QnhkK8xL6mCL9WbECXh4aXsmlFOdWnAG9eUqwPcbSGGSmyLo5ctThmJgz7yZs/rLolmXxT5+ej7yN3M0pIrrxPark6FfPx9F6EgQo9+v/xfGOX9VCsRgBmtAAAB2Mg8e3Ck7zgFugzqHv8OOIDCvwQP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=WBa9ENdC; arc=none smtp.client-ip=113.46.200.221
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
-	c=relaxed/relaxed; q=dns/txt;
-	h=From;
-	bh=yZVwZ3hFajFtTCfA4Oy9TngkmWmo1DVbMQCOxbEbPSk=;
-	b=WBa9ENdCIusVS7Yn6PIdeLql7uY2GCW1aL0lcj1jm9rO+nbSQYlQVUaux0oob72av2hbwUS+Z
-	CT9zAXozdi+9Icfm9EkN1LtD3JQFJ7OlHgRffRJolmd1FINddxWmvEFP9wVUarwLTpvq48SDg0X
-	hrpo6puIIXkGpRf1u9HdbA4=
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4d0Mny5S3LzRhTT;
-	Mon,  3 Nov 2025 14:56:54 +0800 (CST)
-Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
-	by mail.maildlp.com (Postfix) with ESMTPS id 343AE1402C1;
-	Mon,  3 Nov 2025 14:58:28 +0800 (CST)
-Received: from huawei.com (10.50.85.128) by dggpemf500002.china.huawei.com
- (7.185.36.57) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 3 Nov
- 2025 14:58:27 +0800
-From: Yue Haibing <yuehaibing@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <horms@kernel.org>, <almasrymina@google.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<yuehaibing@huawei.com>
-Subject: [PATCH net-next] net: devmem: Remove unused declaration net_devmem_bind_tx_release()
-Date: Mon, 3 Nov 2025 15:20:46 +0800
-Message-ID: <20251103072046.1670574-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1762155096; c=relaxed/simple;
+	bh=ZP7AA0ahRlhm4Hx75iAtFSsJOWFmzTjQ044NKyY8Bfc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=deOUXrCQjv1muTVSGMaFftJvp4qKR3MUdaBKP1R7PmASrkDvEcckDe/pFJfrd7sQ0UrThEE5b1VD60+n27QBm08185Ny1XaIbdNSuI+OftDOfCB3ur0+h6C9ymz9XzPMSaawNPCRPh69B13NvyMT4vopL0HY47N0TasNgbW9/+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=sjuYXLdV; arc=none smtp.client-ip=115.124.30.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1762155089; h=From:To:Subject:Date:Message-ID:MIME-Version;
+	bh=3DUQOGvFHJrtYMg8jyEBoidokiXLIiXoZ9MXe7DqfE8=;
+	b=sjuYXLdVagm50xmC0Gj4AMBUXpynGpcZ5s1on7B7+VIvuBtX2cK6HEh7Ucr3aHTpdEst7f023580A/cTexxxFeO/abkDRzlJpprHLi6YCyxK2U6TVqrIXPx41xZ5jyLxQRbuANRa/ury0p2ZcEi5IMfAe0k/oxOMG8ptQpNS/IA=
+Received: from j66a10360.sqa.eu95.tbsite.net(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WrYjrw5_1762155084 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 03 Nov 2025 15:31:28 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+To: ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	pabeni@redhat.com,
+	song@kernel.org,
+	sdf@google.com,
+	haoluo@google.com,
+	yhs@fb.com,
+	edumazet@google.com,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	jolsa@kernel.org,
+	mjambigi@linux.ibm.com,
+	wenjia@linux.ibm.com,
+	wintera@linux.ibm.com,
+	dust.li@linux.alibaba.com,
+	tonylu@linux.alibaba.com,
+	guwen@linux.alibaba.com
+Cc: bpf@vger.kernel.org,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	sidraya@linux.ibm.com,
+	jaka@linux.ibm.com
+Subject: [PATCH bpf-next v4 0/3] net/smc: Introduce smc_hs_ctrl
+Date: Mon,  3 Nov 2025 15:31:21 +0800
+Message-ID: <20251103073124.43077-1-alibuda@linux.alibaba.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,31 +75,78 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
- dggpemf500002.china.huawei.com (7.185.36.57)
 
-Commit bd61848900bf ("net: devmem: Implement TX path") declared this
-but never implemented it.
+This patch aims to introduce BPF injection capabilities for SMC and
+includes a self-test to ensure code stability.
 
-Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
----
- net/core/devmem.h | 1 -
- 1 file changed, 1 deletion(-)
+Since the SMC protocol isn't ideal for every situation, especially
+short-lived ones, most applications can't guarantee the absence of
+such scenarios. Consequently, applications may need specific strategies
+to decide whether to use SMC. For example, an application might limit SMC
+usage to certain IP addresses or ports.
 
-diff --git a/net/core/devmem.h b/net/core/devmem.h
-index 101150d761af..0b43a648cd2e 100644
---- a/net/core/devmem.h
-+++ b/net/core/devmem.h
-@@ -94,7 +94,6 @@ void net_devmem_unbind_dmabuf(struct net_devmem_dmabuf_binding *binding);
- int net_devmem_bind_dmabuf_to_queue(struct net_device *dev, u32 rxq_idx,
- 				    struct net_devmem_dmabuf_binding *binding,
- 				    struct netlink_ext_ack *extack);
--void net_devmem_bind_tx_release(struct sock *sk);
- 
- static inline struct dmabuf_genpool_chunk_owner *
- net_devmem_iov_to_chunk_owner(const struct net_iov *niov)
+To maintain the principle of transparent replacement, we want applications
+to remain unaffected even if they need specific SMC strategies. In other
+words, they should not require recompilation of their code.
+
+Additionally, we need to ensure the scalability of strategy implementation.
+While using socket options or sysctl might be straightforward, it could
+complicate future expansions.
+
+Fortunately, BPF addresses these concerns effectively. Users can write
+their own strategies in eBPF to determine whether to use SMC, and they can
+easily modify those strategies in the future.
+
+This is a rework of the series from [1]. Changes since [1] are limited to
+the SMC parts:
+
+1. Rename smc_ops to smc_hs_ctrl and change interface name.
+2. Squash SMC patches, removing standalone non-BPF hook capability.
+3. Fix typos
+
+[1]: https://lore.kernel.org/bpf/20250123015942.94810-1-alibuda@linux.alibaba.com/#t
+
+v2 -> v1:
+  - Removed the fixes patch, which have already been merged on current branch.
+  - Fixed compilation warning of smc_call_hsbpf() when CONFIG_SMC_HS_CTRL_BPF
+    is not enabled.
+  - Changed the default value of CONFIG_SMC_HS_CTRL_BPF to Y.
+  - Fix typo and renamed some variables
+
+v3 -> v2:
+  - Removed the libbpf patch, which have already been merged on current branch.
+  - Fixed sparse warning of smc_call_hsbpf() and xchg().
+
+v4 -> v3:
+   - Rebased on latest bpf-next, updated SMC loopback config from SMC_LO to DIBS_LO
+     per upstream changes.
+
+D. Wythe (3):
+  bpf: export necessary symbols for modules with struct_ops
+  net/smc: bpf: Introduce generic hook for handshake flow
+  bpf/selftests: add selftest for bpf_smc_hs_ctrl
+
+ include/net/netns/smc.h                       |   3 +
+ include/net/smc.h                             |  53 +++
+ kernel/bpf/bpf_struct_ops.c                   |   2 +
+ kernel/bpf/syscall.c                          |   1 +
+ net/ipv4/tcp_output.c                         |  36 +-
+ net/smc/Kconfig                               |  10 +
+ net/smc/Makefile                              |   1 +
+ net/smc/af_smc.c                              |   9 +
+ net/smc/smc_hs_bpf.c                          | 137 ++++++
+ net/smc/smc_hs_bpf.h                          |  31 ++
+ net/smc/smc_sysctl.c                          |  91 ++++
+ tools/testing/selftests/bpf/config            |   5 +
+ .../selftests/bpf/prog_tests/test_bpf_smc.c   | 396 ++++++++++++++++++
+ tools/testing/selftests/bpf/progs/bpf_smc.c   | 117 ++++++
+ 14 files changed, 878 insertions(+), 14 deletions(-)
+ create mode 100644 net/smc/smc_hs_bpf.c
+ create mode 100644 net/smc/smc_hs_bpf.h
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/test_bpf_smc.c
+ create mode 100644 tools/testing/selftests/bpf/progs/bpf_smc.c
+
 -- 
-2.34.1
+2.45.0
 
 
