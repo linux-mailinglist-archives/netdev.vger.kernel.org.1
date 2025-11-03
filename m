@@ -1,181 +1,151 @@
-Return-Path: <netdev+bounces-234928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E62FFC29DD4
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 03:32:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EF0BC29DF5
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 03:38:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45D8D188CD17
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 02:32:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 688CE3AC4D7
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 02:38:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 862D4283FC5;
-	Mon,  3 Nov 2025 02:32:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F21F0285C98;
+	Mon,  3 Nov 2025 02:37:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13D73283686;
-	Mon,  3 Nov 2025 02:32:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42AF614B953;
+	Mon,  3 Nov 2025 02:37:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762137132; cv=none; b=JjPCYp879mOJoeWeGQMEGycS9jjniL/EndR2IAXaLj6Eb6f1FdIC+JZQyLJLKvvWk4KxJs+MlqvPcT+BzyG/QJpfmI2sL2ImjkZ2xeKXhCfl9v2rQiNpmbGnk2/RPiIlgCkk3zMPaw4bJF7sUd4CTUBbqMfksms4DzbyJLFeKW4=
+	t=1762137477; cv=none; b=d4n02TiufXR0oewzJZ8XsLvwq4uhPhU8tE+h8f23L4CMKVxOW0fsVwxMPrB23m/AI0M6JrQtEtgWuHb6ry6MQ4Yuc0jh3Exnm8nDQ5TpXW8jnTS906boZLU8AIeIoBuwFuclt9wHHoM+KykoCHHjllS3P27L6t4razpzE9dXoSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762137132; c=relaxed/simple;
-	bh=VnBBYLunQzYKbo73WqVJBPX3RlrHr7fLVQ0+GI0Sv3k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hPYHbmph26An2xqHiP0jPOaY20HCW4OuOIZKpCmSZYfWHGBf/qART2A29z3TVWC+gkrLcDLJ2KICZ67Ri5xLR04paNbTFWNyyLPwUttOSh6tyfr7pYYopeKFVhuZ645aUQM/S19SYnjplLY16/vhrCtoFgwmhqka4kGv5/Jcz1s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=none smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4d0FwL2HNCzKHMVY;
-	Mon,  3 Nov 2025 10:32:02 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 032E71A18D1;
-	Mon,  3 Nov 2025 10:32:06 +0800 (CST)
-Received: from [10.67.111.176] (unknown [10.67.111.176])
-	by APP1 (Coremail) with SMTP id cCh0CgDHN0slFAhpPKf4CQ--.38631S2;
-	Mon, 03 Nov 2025 10:32:05 +0800 (CST)
-Message-ID: <400165fe-18d5-4a78-b4bd-4e5b55de0c04@huaweicloud.com>
-Date: Mon, 3 Nov 2025 10:32:04 +0800
+	s=arc-20240116; t=1762137477; c=relaxed/simple;
+	bh=ukUqwcz+sBycHhzxiy3W2SxXQ9SQb3q3ms/hTRSiMeY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZOdxAbP6yoC5QAILvxIDwXDrgZIR2XFNkUz7yIVyzDrDqNw9vmxrFfYDl/fMqGplNjTvPi9bZzpkwKp4GNdtjlh9RIxFLtyl5m9JGQgc+xVwyPj5amrm8FzT1MFT697OIOPIgPAaAJVR6jE2c3BwzbZqBiMhERdeTbLruPuNiLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 0f923836b85e11f0a38c85956e01ac42-20251103
+X-CTIC-Tags:
+	HR_CC_AS_FROM, HR_CC_COUNT, HR_CC_DOMAIN_COUNT, HR_CC_NAME, HR_CTE_8B
+	HR_CTT_MISS, HR_DATE_H, HR_DATE_WKD, HR_DATE_ZONE, HR_FROM_NAME
+	HR_SJ_DIGIT_LEN, HR_SJ_LANG, HR_SJ_LEN, HR_SJ_LETTER, HR_SJ_NOR_SYM
+	HR_SJ_PHRASE, HR_SJ_PHRASE_LEN, HR_SJ_WS, HR_TO_COUNT, HR_TO_DOMAIN_COUNT
+	HR_TO_NAME, IP_TRUSTED, SRC_TRUSTED, DN_TRUSTED, SA_EXISTED
+	SN_EXISTED, SPF_NOPASS, DKIM_NOPASS, DMARC_NOPASS
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.3.6,REQID:70b6d226-dd85-46cd-9c65-14e7c3b71550,IP:15,U
+	RL:0,TC:0,Content:-5,EDM:0,RT:0,SF:-30,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:-20
+X-CID-INFO: VERSION:1.3.6,REQID:70b6d226-dd85-46cd-9c65-14e7c3b71550,IP:15,URL
+	:0,TC:0,Content:-5,EDM:0,RT:0,SF:-30,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-20
+X-CID-META: VersionHash:a9d874c,CLOUDID:e02db1f34bb1bcb1bddb34349392fd38,BulkI
+	D:2511031037396H4RK8JP,BulkQuantity:0,Recheck:0,SF:10|38|66|78|102|850,TC:
+	nil,Content:0|15|50,EDM:-3,IP:-2,URL:99|1,File:nil,RT:nil,Bulk:nil,QS:nil,
+	BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 2,SSN|SDN
+X-CID-BAS: 2,SSN|SDN,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULS
+X-CID-RHF: D41D8CD98F00B204E9800998ECF8427E
+X-UUID: 0f923836b85e11f0a38c85956e01ac42-20251103
+X-User: hehuiwen@kylinos.cn
+Received: from localhost.localdomain [(116.128.244.171)] by mailgw.kylinos.cn
+	(envelope-from <hehuiwen@kylinos.cn>)
+	(Generic MTA with TLSv1.3 TLS_AES_256_GCM_SHA384 256/256)
+	with ESMTP id 1359740398; Mon, 03 Nov 2025 10:37:37 +0800
+From: Huiwen He <hehuiwen@kylinos.cn>
+To: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Xin Long <lucien.xin@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-sctp@vger.kernel.org (open list:SCTP PROTOCOL),
+	netdev@vger.kernel.org (open list:NETWORKING [GENERAL]),
+	linux-kernel@vger.kernel.org (open list)
+Cc: Huiwen He <hehuiwen@kylinos.cn>
+Subject: [PATCH v2] sctp: make sctp_transport_init() void
+Date: Mon,  3 Nov 2025 10:36:19 +0800
+Message-Id: <20251103023619.1025622-1-hehuiwen@kylinos.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 11/33] cpuset: Provide lockdep check for cpuset lock held
-To: Frederic Weisbecker <frederic@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?=
- <mkoutny@suse.com>, Andrew Morton <akpm@linux-foundation.org>,
- Bjorn Helgaas <bhelgaas@google.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Danilo Krummrich
- <dakr@kernel.org>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Gabriele Monaco <gmonaco@redhat.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
- Lai Jiangshan <jiangshanlai@gmail.com>,
- Marco Crivellari <marco.crivellari@suse.com>, Michal Hocko
- <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
- Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
- Phil Auld <pauld@redhat.com>, "Rafael J . Wysocki" <rafael@kernel.org>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>, Simon Horman <horms@kernel.org>,
- Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
- Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
- linux-mm@kvack.org, linux-pci@vger.kernel.org, netdev@vger.kernel.org
-References: <20251013203146.10162-1-frederic@kernel.org>
- <20251013203146.10162-12-frederic@kernel.org>
- <b94f6159-a280-4890-a02a-f19ff808de5b@huaweicloud.com>
- <aQTe6X5XXSp8_3z5@localhost.localdomain>
-Content-Language: en-US
-From: Chen Ridong <chenridong@huaweicloud.com>
-In-Reply-To: <aQTe6X5XXSp8_3z5@localhost.localdomain>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgDHN0slFAhpPKf4CQ--.38631S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7tryxCw1kAF1UJrWfKw4DJwb_yoW5Jr1rpF
-	yDKFyrCF4rZr4UuFy2qw17uF1vqw4kWF1UGFn5tr18XasFvFn2vF1v9r1Ygr1F9rs7Gw40
-	vF17Wa9I9FWqyrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvFb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxkF7I0En4kS
-	14v26rWY6Fy7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
-	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWrXVW8
-	Jr1lIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7
-	CjxVAFwI0_Cr0_Gr1UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AK
-	xVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvj
-	xUsPfHUUUUU
-X-CM-SenderInfo: hfkh02xlgr0w46kxt4xhlfz01xgou0bp/
 
+sctp_transport_init() is static and never returns NULL. It is only
+called by sctp_transport_new(), so change it to void and remove the
+redundant return value check.
 
+Signed-off-by: Huiwen He <hehuiwen@kylinos.cn>
+---
+Changes in v2:
+- Remove the 'fail' label and its path as suggested by Xin Long.
+- Link to v1: https://lore.kernel.org/all/20251101163656.585550-1-hehuiwen@kylinos.cn
 
-On 2025/11/1 0:08, Frederic Weisbecker wrote:
-> Le Tue, Oct 14, 2025 at 09:29:25PM +0800, Chen Ridong a écrit :
->>
->>
->> On 2025/10/14 4:31, Frederic Weisbecker wrote:
->>> cpuset modifies partitions, including isolated, while holding the cpuset
->>> mutex.
->>>
->>> This means that holding the cpuset mutex is safe to synchronize against
->>> housekeeping cpumask changes.
->>>
->>> Provide a lockdep check to validate that.
->>>
->>> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
->>> ---
->>>  include/linux/cpuset.h | 2 ++
->>>  kernel/cgroup/cpuset.c | 7 +++++++
->>>  2 files changed, 9 insertions(+)
->>>
->>> diff --git a/include/linux/cpuset.h b/include/linux/cpuset.h
->>> index 2ddb256187b5..051d36fec578 100644
->>> --- a/include/linux/cpuset.h
->>> +++ b/include/linux/cpuset.h
->>> @@ -18,6 +18,8 @@
->>>  #include <linux/mmu_context.h>
->>>  #include <linux/jump_label.h>
->>>  
->>> +extern bool lockdep_is_cpuset_held(void);
->>> +
->>>  #ifdef CONFIG_CPUSETS
->>>  
->>>  /*
->>> diff --git a/kernel/cgroup/cpuset.c b/kernel/cgroup/cpuset.c
->>> index 8595f1eadf23..aa1ac7bcf2ea 100644
->>> --- a/kernel/cgroup/cpuset.c
->>> +++ b/kernel/cgroup/cpuset.c
->>> @@ -279,6 +279,13 @@ void cpuset_full_unlock(void)
->>>  	cpus_read_unlock();
->>>  }
->>>  
->>> +#ifdef CONFIG_LOCKDEP
->>> +bool lockdep_is_cpuset_held(void)
->>> +{
->>> +	return lockdep_is_held(&cpuset_mutex);
->>> +}
->>> +#endif
->>> +
->>>  static DEFINE_SPINLOCK(callback_lock);
->>>  
->>>  void cpuset_callback_lock_irq(void)
->>
->> Is the lockdep_is_cpuset_held function actually being used?
->> If CONFIG_LOCKDEP is disabled, compilation would fail with an "undefined reference to
->> lockdep_is_cpuset_held" error.
-> 
-> Although counter-intuitive, this is how the lockdep_is_held() functions family
-> do work.
-> 
-> This allows this kind of trick:
-> 
-> if (IS_ENABLED(CONFIG_LOCKDEP))
->    WARN_ON_ONCE(!lockdep_is_held(&some_lock))
-> 
-> This works during the compilation because the prototype of lockdep_is_held()
-> is declared. And since the IS_ENABLED() is resolved during compilation as well,
-> the conditional code is wiped out and therefore not linked. As a result the
-> linker doesn't even look for the definition of lockdep_is_held() and we don't
-> need to define an off case that would return a wrong assumption.
-> 
-> Thanks.
-> 
+ net/sctp/transport.c | 21 ++++++---------------
+ 1 file changed, 6 insertions(+), 15 deletions(-)
 
-Thank you for your explanation
-
+diff --git a/net/sctp/transport.c b/net/sctp/transport.c
+index 4d258a6e8033..0d48c61fe6ad 100644
+--- a/net/sctp/transport.c
++++ b/net/sctp/transport.c
+@@ -37,10 +37,10 @@
+ /* 1st Level Abstractions.  */
+ 
+ /* Initialize a new transport from provided memory.  */
+-static struct sctp_transport *sctp_transport_init(struct net *net,
+-						  struct sctp_transport *peer,
+-						  const union sctp_addr *addr,
+-						  gfp_t gfp)
++static void sctp_transport_init(struct net *net,
++				struct sctp_transport *peer,
++				const union sctp_addr *addr,
++				gfp_t gfp)
+ {
+ 	/* Copy in the address.  */
+ 	peer->af_specific = sctp_get_af_specific(addr->sa.sa_family);
+@@ -83,8 +83,6 @@ static struct sctp_transport *sctp_transport_init(struct net *net,
+ 	get_random_bytes(&peer->hb_nonce, sizeof(peer->hb_nonce));
+ 
+ 	refcount_set(&peer->refcnt, 1);
+-
+-	return peer;
+ }
+ 
+ /* Allocate and initialize a new transport.  */
+@@ -96,20 +94,13 @@ struct sctp_transport *sctp_transport_new(struct net *net,
+ 
+ 	transport = kzalloc(sizeof(*transport), gfp);
+ 	if (!transport)
+-		goto fail;
++		return NULL;
+ 
+-	if (!sctp_transport_init(net, transport, addr, gfp))
+-		goto fail_init;
++	sctp_transport_init(net, transport, addr, gfp);
+ 
+ 	SCTP_DBG_OBJCNT_INC(transport);
+ 
+ 	return transport;
+-
+-fail_init:
+-	kfree(transport);
+-
+-fail:
+-	return NULL;
+ }
+ 
+ /* This transport is no longer needed.  Free up if possible, or
 -- 
-Best regards,
-Ridong
+2.25.1
 
 
