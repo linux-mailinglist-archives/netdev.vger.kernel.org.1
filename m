@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-234979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88F9AC2A936
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 09:31:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 216A5C2A998
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 09:42:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B6F93A4612
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 08:28:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CA293A2002
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 08:41:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17E4C2DCBF4;
-	Mon,  3 Nov 2025 08:28:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E73BB2E228D;
+	Mon,  3 Nov 2025 08:41:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="J0Vw0PQV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gbPSugoH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 787FE53363;
-	Mon,  3 Nov 2025 08:28:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 318FC2E1C4E
+	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 08:41:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762158522; cv=none; b=J/Ux7HLJUFxALfeAFJ9itZ6N2KNaKSu323qow5/RU4jwBWNpcWh5ioDfy2Rw7tLaG4UcFmxfkg44euj+/CnJaXulSMjiLMhQ0h37K+5htsHCPrKn0u2lX363Jmj5g72zVvZpaswmbdOnyiP0MR7odE9lwY6bthC9ADOHT/i7fSk=
+	t=1762159305; cv=none; b=SrhdrvgMSMoJNyEOPZY6D+SRUr1ek0d0kwU3KxzYy+RONlIIgwaY/0ZNAw9tYwjGubxLvkrgrBzLMXAh/1aSaXJ2bt5jsH3uuCKxHvc399wZ+RLsXEh3csPuIOhNJ9ujY4/yEg+b36GHZc0LUgxt3l9x2Q1OJjYs+uXvROoNsJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762158522; c=relaxed/simple;
-	bh=eS7KrlMq6jo/GsXOFtImqbS4/OQyOCDYwKWHLlIHG7E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y9YmD9hHKgpl6EDhKJhiIGCG8/jPm6xHfwdHAQV+M8xCEQrxAWkTsBGEi8k+bBUgoZGJ1pUxLWrGYw990OGtO8XABvQMxV+8YIO2O8nmIpSkvcYXTrCo7Gy9AeXxkkWeNZ/zHnX6zO0YnRfFOONsp+Q/UEUla+ma2fUGrDUd980=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=J0Vw0PQV; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5A2JFURo028252;
-	Mon, 3 Nov 2025 08:28:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=TmjDXj
-	wR+nEddG/eZ6E1vM2d76S1OyWZE5K7xsFZokU=; b=J0Vw0PQViec67xL6kzKonQ
-	CignmYL8cuWyh3ZHZbe/Gy9r3epPtK00GhHk5piYzJq1y6l00GHmQqdn7cXENXAz
-	BVbGENVjL9PnRMgLbmqgq/DnbWG3myGobOYwgDYtKrbJXz3IdpIN1Be1sE4nKZtu
-	KqQrDGrI+OuOTzjiB6rSjmI7+Lq5gJnCIIvF72rhTz9oyLlgD1PPNMAt2OBV6mj6
-	U3apa4q8+McpgbGCt/XYP60aAtk5ADjq4T+sMT246bH5yd85VZ/J/t6nHrNhJfx5
-	R22vtDeXs7EfknPA/lOxNZ30sy8o2u6vOU6Al7NwWgHkUbNOvQ1zYqF68ieWhy4A
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a59q8nn0s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Nov 2025 08:28:28 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5A38SS3M012984;
-	Mon, 3 Nov 2025 08:28:28 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a59q8nn0p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Nov 2025 08:28:27 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5A37TrId009831;
-	Mon, 3 Nov 2025 08:28:26 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4a5x1k4jma-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 03 Nov 2025 08:28:26 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5A38SMP649218022
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 3 Nov 2025 08:28:22 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A0F422004B;
-	Mon,  3 Nov 2025 08:28:22 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5F90320043;
-	Mon,  3 Nov 2025 08:28:22 +0000 (GMT)
-Received: from [9.152.210.132] (unknown [9.152.210.132])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  3 Nov 2025 08:28:22 +0000 (GMT)
-Message-ID: <95bd9c85-8241-4040-bbd0-bcac3ffc78f7@linux.ibm.com>
-Date: Mon, 3 Nov 2025 09:28:22 +0100
+	s=arc-20240116; t=1762159305; c=relaxed/simple;
+	bh=S54nXXo/aFrvMC7QiuJUF89PwUrNEP2rWkjH7sjr3UQ=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=ndeX+RfdTY1VvhscJBj+6N6ruZE4acefbyEtG9SnfNgK6EnOh11mwSvaF4t7AdygFib8TnSqEAeNsRYMHbLzsitjX3ArwjJ0aRvI7gqaJ3cHR6p4PHbF6v7Zm5xvWSt1t7BOqilR7wPZB1o8had10jCuZCL2lpnAvgvvOT3QXgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gbPSugoH; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-794e300e20dso4094250b3a.1
+        for <netdev@vger.kernel.org>; Mon, 03 Nov 2025 00:41:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762159303; x=1762764103; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=9IlYd8PBv158GdcOw6rn4rqU0pymAVgCcTAXsADiI14=;
+        b=gbPSugoHdSCeMmpTd+jHuI8rJyR8vNuPTK6wYW4DH1RiQYNUFx0/znQpX9bAChVbWF
+         roXpw9EHzdff6UPY0GqhwLYxeBDygVt5PxXv1sZGikscpiLXmEdllwUQfSbxMeJ8nhf4
+         6xa1CuGihra5zD+fuLEsdespU1jubzery4pgCIECTg7B064Oj6Y3vme8s/GmcxBj5CSU
+         hVcQ1CcHO7VckrHXDDTfkGdqgoOq8hxU/QNsmUuXSp56J+XbIS3kTn7N/LQSgSHTSo5U
+         d/GlF4nXVeGxkRxTx6GrkT+mNhs1Gn6WkWNPMFS1/DxoMaAkbjae10h5ORkj0D1043Hb
+         zSUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762159303; x=1762764103;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9IlYd8PBv158GdcOw6rn4rqU0pymAVgCcTAXsADiI14=;
+        b=o/MIo5TyT+ZDZQfILgeD3g4tEFLxCyNRPoNTQGYAxvvD+rKamZpU/smsFDiasoZ82P
+         SYIbmbO7TW7rxGzR/w87rr8XeE7XXEv5BwWwLtgOfdd6U+6MYVzycV90niDpphh17Xnp
+         tJKRexKDA94octjXOpFI1i0Rr33wruLzcKElNrGHQrSiKPtdkLIUBBQ0UuwhyapFmMn6
+         rxs+UHSxx5utN9wqPcfrPsqL8zWk4G9Ba4I5oacJmLZK5YpgbyEJYbvjVk5bzIKigGpF
+         Nxf6Nv0TsAtGLdlrZAjRNVVagXOQPogR3aeSDCRzOBe2YS3s3eGl6Z9Zi6IRGxvDpBb8
+         sIIA==
+X-Forwarded-Encrypted: i=1; AJvYcCXVuMQxuwk18AvGTKn/8Gzdm3cdZ2HvhbNU/Cd9cth4XCdDbxSpGKPV+OF2QlAHRtKJT/2T+QY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymB5vD9GpfPRmMHv9gJEJb+vWBsxaYsgE1Z//LdzU/8pJ7aCWK
+	lDxGti3GQAcF9ZoZjVMK1n3gwYHsDdfxdEOJDuS60x5zZT5bN4RR5Rnm
+X-Gm-Gg: ASbGncst3UXVkKAghkdCWpW56aOFy+9RNIpX1eXZpmLLwsMAv52nWhvZNI3/MIUZ2Zk
+	Abj/RpOM95nuIR7c5siqCgrZTDt3Y4D3t0S9jdMSxHtMXTohOQvAymoXdwKZGQD93Ke3xUtDRZ3
+	eGjTE6JStvvggUleN2HR0k5jiA5Su7UlHfJV2RYB7HK9EfgqtsEfsIdTEqKStNVOPoFJK3HdzPv
+	eIOVFYh/PY0QyiaNGczXf0LOKKP8l7/rzExdiV+AqTIqClTShDncFcjEuy2+wWd636cYYZu68hT
+	DktWIi8FeiZhXplvisoan04e/4WZ08b9tjbrpwm/4VqsStIHLKB1NAKFjoWPoLaCDt0yoACKYK5
+	C32ioLmD6I+wvIpGawfJ9vdMjwZz+PE4zqD+qRsHAVxGmRHZjUjdADA9OVlgLbsekfQDwWec60G
+	GvBV6alLNnMcPl5E+y9Nc57Uag/7rNCRp12WT89A5Z+Tqwd0YqKHUTJVN+/mHPY6CPWeoQ+MfHU
+	eheR0MBFMQ=
+X-Google-Smtp-Source: AGHT+IHVqhieNuVGLPgUB+hpjN6Vf9ZUu7T1hKfxCCQidwT8I97GOgul3IVD0bS7e1uzQqBSFCZNtw==
+X-Received: by 2002:a17:902:d4ce:b0:295:6b98:6d65 with SMTP id d9443c01a7336-2956b986f84mr76085715ad.22.1762159303320;
+        Mon, 03 Nov 2025 00:41:43 -0800 (PST)
+Received: from [192.168.99.24] (i218-47-167-230.s42.a013.ap.plala.or.jp. [218.47.167.230])
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-2952689f15csm110200325ad.29.2025.11.03.00.41.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Nov 2025 00:41:42 -0800 (PST)
+Message-ID: <8b70ba1d-323b-4e76-be7f-9df45b8f53d5@gmail.com>
+Date: Mon, 3 Nov 2025 17:41:37 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,75 +84,108 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/smc: fix mismatch between CLC header and proposal
- extensions
-To: "D. Wythe" <alibuda@linux.alibaba.com>, mjambigi@linux.ibm.com,
-        wenjia@linux.ibm.com, dust.li@linux.alibaba.com,
-        tonylu@linux.alibaba.com, guwen@linux.alibaba.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
-        pabeni@redhat.com, edumazet@google.com, sidraya@linux.ibm.com,
-        jaka@linux.ibm.com
-References: <20251031031828.111364-1-alibuda@linux.alibaba.com>
+From: Toshiaki Makita <toshiaki.makita1@gmail.com>
+Subject: Re: [PATCH net V2 2/2] veth: more robust handing of race to avoid txq
+ getting stuck
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: Eric Dumazet <eric.dumazet@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, ihor.solodrai@linux.dev,
+ "Michael S. Tsirkin" <mst@redhat.com>, makita.toshiaki@lab.ntt.co.jp,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kernel-team@cloudflare.com,
+ netdev@vger.kernel.org, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
+ <toke@toke.dk>
+References: <176159549627.5396.15971398227283515867.stgit@firesoul>
+ <176159553930.5396.4492315010562655785.stgit@firesoul>
+ <aacc9c56-bea9-44eb-90fd-726d41b418dd@gmail.com>
+ <27e74aeb-89f5-4547-8ecc-232570e2644c@kernel.org>
+ <4aa74767-082c-4407-8677-70508eb53a5d@gmail.com>
+ <e3abd249-f348-4504-b1d9-4b5cd3df5822@kernel.org>
 Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <20251031031828.111364-1-alibuda@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <e3abd249-f348-4504-b1d9-4b5cd3df5822@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=StmdKfO0 c=1 sm=1 tr=0 ts=690867ac cx=c_pps
- a=3Bg1Hr4SwmMryq2xdFQyZA==:117 a=3Bg1Hr4SwmMryq2xdFQyZA==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=gmV_aJJbElOwqUTrwFQA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
- a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-ORIG-GUID: DdUd5zz7N1UApgn1B4dBUjwhjixTIswZ
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTAxMDAxOCBTYWx0ZWRfX6TtwDzpP1ttX
- iJbdKr0Vjhi+kghB4sNNl5ClAC13llATV+QMaSNj/XcUA9IHmABTRSIm0KMBn4L79SZn+x0wHFB
- LBWjWP94N7Kkeis3hvv+NWNJfOGbRkGDxxdm7Q1ZhcEhhtuQ6k555f0dme9g2g/F5mAE+KVDH1u
- kQ8BVIhNyq3k5/sIDKpls4NNXixZkvGFgpMYUwNCBzAB2ebptrofSguPVQVihFbNYqJZ7Ft/Hd/
- uPiiak7RnuSNtUwQyqD6tdzGGNak5mv249yOwxegCQaCwsmzXQZtolm+Pz6V2stbrCF5xSHqwZ5
- HrrYIu6IuKVY3Yhb1POOFCucSSF/P0Bx+a8GzDnTWZGJya5Uho3+Y2B1tHIyX+C66nEFk1u71yp
- 5eTco38mTotQDSNOtpa1tLirIQ8YfQ==
-X-Proofpoint-GUID: hkI_LvqfU-gGO66Imq9UIf0mGczWjBTB
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-02_02,2025-10-29_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 suspectscore=0 phishscore=0 impostorscore=0 priorityscore=1501
- malwarescore=0 clxscore=1015 adultscore=0 bulkscore=0 lowpriorityscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511010018
 
-
-
-On 31.10.25 04:18, D. Wythe wrote:
-> The current CLC proposal message construction uses a mix of
-> `ini->smc_type_v1/v2` and `pclc_base->hdr.typev1/v2` to decide whether
-> to include optional extensions (IPv6 prefix extension for v1, and v2
-> extension). This leads to a critical inconsistency: when
-> `smc_clc_prfx_set()` fails - for example, in IPv6-only environments with
-> only link-local addresses, or when the local IP address and the outgoing
-> interface’s network address are not in the same subnet.
+On 2025/10/31 4:06, Jesper Dangaard Brouer wrote:
+> On 29/10/2025 16.00, Toshiaki Makita wrote:
+>> On 2025/10/29 19:33, Jesper Dangaard Brouer wrote:
+>>> On 28/10/2025 15.56, Toshiaki Makita wrote:
+>>>> On 2025/10/28 5:05, Jesper Dangaard Brouer wrote:
+>>>>> (3) Finally, the NAPI completion check in veth_poll() is updated. If NAPI is
+>>>>> about to complete (napi_complete_done), it now also checks if the peer TXQ
+>>>>> is stopped. If the ring is empty but the peer TXQ is stopped, NAPI will
+>>>>> reschedule itself. This prevents a new race where the producer stops the
+>>>>> queue just as the consumer is finishing its poll, ensuring the wakeup is not 
+>>>>> missed.
+>>>> ...
+>>>>
+>>>>> @@ -986,7 +979,8 @@ static int veth_poll(struct napi_struct *napi, int budget)
+>>>>>       if (done < budget && napi_complete_done(napi, done)) {
+>>>>>           /* Write rx_notify_masked before reading ptr_ring */
+>>>>>           smp_store_mb(rq->rx_notify_masked, false);
+>>>>> -        if (unlikely(!__ptr_ring_empty(&rq->xdp_ring))) {
+>>>>> +        if (unlikely(!__ptr_ring_empty(&rq->xdp_ring) ||
+>>>>> +                 (peer_txq && netif_tx_queue_stopped(peer_txq)))) {
+>>>>
+>>>> Not sure if this is necessary.
+>>>
+>>> How sure are you that this isn't necessary?
+>>>
+>>>>  From commitlog, your intention seems to be making sure to wake up the queue,
+>>>> but you wake up the queue immediately after this hunk in the same function,
+>>>> so isn't it guaranteed without scheduling another napi?
+>>>>
+>>>
+>>> The above code catches the case, where the ptr_ring is empty and the
+>>> tx_queue is stopped.  It feels wrong not to reach in this case, but you
+>>> *might* be right that it isn't strictly necessary, because below code
+>>> will also call netif_tx_wake_queue() which *should* have a SKB stored
+>>> that will *indirectly* trigger a restart of the NAPI.
+>>
+>> I'm a bit confused.
+>> Wrt (3), what you want is waking up the queue, right?
+>> Or, what you want is actually NAPI reschedule itself?
 > 
-> As a result, the proposal message is assembled using the stale
-> `ini->smc_type_v1` value—causing the IPv6 prefix extension to be
-> included even though the header indicates v1 is not supported.
-> The peer then receives a malformed CLC proposal where the header type
-> does not match the payload, and immediately resets the connection.
+> I want NAPI to reschedule itself, the queue it woken up later close to
+> the exit of the function.  Maybe it is unnecessary to for NAPI to
+> reschedule itself here... and that is what you are objecting to?
 > 
-> Fix this by consistently using `pclc_base->hdr.typev1` and
-> `pclc_base->hdr.typev2`—the authoritative fields that reflect the
-> actual capabilities advertised in the CLC header—when deciding whether
-> to include optional extensions, as required by the SMC-R v2
-> specification ("V1 IP Subnet Extension and V2 Extension only present if
-> applicable").
+>> My understanding was the former (wake up the queue).
+>> If it's correct, (3) seems not necessary because you have already woken up the 
+>> queue in the same function.
+>>
+>> First NAPI
+>>   veth_poll()
+>>     // ptr_ring_empty() and queue_stopped()
+>>    __napi_schedule() ... schedule second NAPI
+>>    netif_tx_wake_queue() ... wake up the queue if queue_stopped()
+>>
+>> Second NAPI
+>>   veth_poll()
+>>    netif_tx_wake_queue() ... this is what you want,
+>>                              but the queue has been woken up in the first NAPI
+>>                              What's the point?
+>>
+> 
+> So, yes I agree that there is a potential for restarting NAPI one time
+> too many.  But only *potential* because if NAPI is already/still running
+> then the producer will not actually start NAPI.
+> 
+> I guess this is a kind of optimization, to avoid the time it takes to
+> restart NAPI. When we see that TXQ is stopped and ptr_ring is empty,
+> then we know that a packet will be sitting in the qdisc requeue queue,
+> and netif_tx_wake_queue() will very soon fill "produce" a packet into
+> ptr_ring (via calling ndo_start_xmit/veth_xmit).
 
+In some cases it may be an optimization but not in every case because it can 
+prematurely start NAPI before tx side fills packets?
 
-Just thinking out loud:
-It seems to me that the 'ini' structure exists once per socket and is used
-to pass information between many functions involved with the handshake.
-Did you consider updating ini->smc_type_v1/v2 when `smc_clc_prfx_set()` fails,
-and using ini as the authoritative source?
-With your patch, it seems to me `ini->smc_type_v1` still contains a stale value,
-which may lead to issues in other places or future code.
+> As this is a fixes patch I can drop this optimization. It seems both
+> Paolo and you thinks this isn't necessary.
+
+I think it's better to drop (3) as a fix.
+
+Toshiaki Makita
+
 
