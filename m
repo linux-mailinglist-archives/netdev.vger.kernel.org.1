@@ -1,132 +1,208 @@
-Return-Path: <netdev+bounces-234945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 796DCC29F26
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 04:23:23 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 097C7C29F20
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 04:22:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3777C3AD2BA
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 03:23:22 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B235A347DCB
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 03:22:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 975D028725C;
-	Mon,  3 Nov 2025 03:23:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48D41285CAE;
+	Mon,  3 Nov 2025 03:22:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="EU44aYuJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from ssh247.corpemail.net (ssh247.corpemail.net [210.51.61.247])
+Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E300DFC0A;
-	Mon,  3 Nov 2025 03:23:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.51.61.247
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A5373B2BA
+	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 03:22:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762140198; cv=none; b=ak8pERw5yvMH2PCypMubPZNU+F6EhOvnpXJVmujzHgzJk6rxtW0M8cxPbsvA42dKr8JPqYnbGGVdV8OCd0NR0QbVni1yuIkR1AIUMt2PcVu4vOh2BpqKMgdT1WT5T15j/sWDMOk+SNU1uay0yYf3/T8wLT9+m4QVvU8nWcQ9uFY=
+	t=1762140161; cv=none; b=VDps8SaawDIOqziTiQCk2I7cIUTjnYFMMc3Hr8bzEsIvUaHIjOe1tvk/W2r4jS0rb7yeM9n6YcGZzZyH6+WBbv5Zqc1osBs77wF92ZzbuAqfeFlMfl9x9hPSsJXshqylQEfbuZdjnJdbi5czTZfZ6kkgYqoXokI+fQ9Y1NZm0YM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762140198; c=relaxed/simple;
-	bh=L3Yi5m3V2NmuEx0GBprEZsZTrq6iFPcF9pmkAubbsi0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uBufwwr4MPXR3bMVFDElyYdTA0FuuVz7lHPkKHHQ8eQybtsT4+tboxIT34fDGimOBVUEroSC1IUmVs0MzY+MyDn6PsyCg6k2fM6ua/hsrb5PLQUeQ6pxxQPdXI5nK0wX37F+UrTUA/B/oFWbOZFY5jOv3eyvCQGIcZuBeu2LuvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com; spf=pass smtp.mailfrom=inspur.com; arc=none smtp.client-ip=210.51.61.247
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inspur.com
-Received: from Jtjnmail201615.home.langchao.com
-        by ssh247.corpemail.net ((D)) with ASMTP (SSL) id 202511031123089213;
-        Mon, 03 Nov 2025 11:23:08 +0800
-Received: from jtjnmailAR01.home.langchao.com (10.100.2.42) by
- Jtjnmail201615.home.langchao.com (10.100.2.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Mon, 3 Nov 2025 11:23:06 +0800
-Received: from inspur.com (10.100.2.107) by jtjnmailAR01.home.langchao.com
- (10.100.2.42) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
- Transport; Mon, 3 Nov 2025 11:23:06 +0800
-Received: from localhost.localdomain.com (unknown [10.94.13.117])
-	by app3 (Coremail) with SMTP id awJkCsDw3fgXIAhpPa8JAA--.11940S4;
-	Mon, 03 Nov 2025 11:23:06 +0800 (CST)
-From: Chu Guangqing <chuguangqing@inspur.com>
-To: <jgross@suse.com>, <sstabellini@kernel.org>,
-	<oleksandr_tyshchenko@epam.com>, <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <xen-devel@lists.xenproject.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Chu Guangqing <chuguangqing@inspur.com>
-Subject: [PATCH] xen/netfront: Comment Correction: Fix Spelling Error and Description of Queue Quantity Rules
-Date: Mon, 3 Nov 2025 11:22:12 +0800
-Message-ID: <20251103032212.2462-1-chuguangqing@inspur.com>
-X-Mailer: git-send-email 2.43.7
+	s=arc-20240116; t=1762140161; c=relaxed/simple;
+	bh=sQbM1Usji7obZ4f7BiPWXDsuUHJYnmu/tNCvVzOW76I=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=gVKxP6Gvzz7ZV9QtVb8EJQA+0JXOixH1vGF6LHzAbeK7W2Z8nNWkiosKktwo4ue/+17hKnFnC0ZbXWm2HP7D8Gb2Q6wDHrL5Pmovk62bbJErZSZI63VcRPNDvNfAOWex1iKNqGAB/ApjYNeCJJ0dXQDpZxZ/Y37uht1pVh/tnpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=EU44aYuJ; arc=none smtp.client-ip=115.124.30.113
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1762140151; h=Message-ID:Subject:Date:From:To;
+	bh=XUPRiHrtMviqg9/C9XvShbkr/rv4ccn+d9IC2suGa4E=;
+	b=EU44aYuJYfHE5a0FjPbEQo+5v3Pm2mmwTbViFqYzABLLs/igHtGM7qiAQUCjrfyWhtc76IdNUC8mw9BUDPCK63RqBy7uzJK0OaeL9jIMTq5xSMBTy7o8uOf04WsTebZlk6+sFpmaXLYl/Kk8QTFCpM/7E0Ma5qgVkdKIFzs7sho=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WrVmmfD_1762140150 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 03 Nov 2025 11:22:30 +0800
+Message-ID: <1762140143.4049902-7-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v6 08/12] virtio_net: Use existing classifier if possible
+Date: Mon, 3 Nov 2025 11:22:23 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Daniel Jurgens <danielj@nvidia.com>
+Cc: <virtualization@lists.linux.dev>,
+ <parav@nvidia.com>,
+ <shshitrit@nvidia.com>,
+ <yohadt@nvidia.com>,
+ <xuanzhuo@linux.alibaba.com>,
+ <eperezma@redhat.com>,
+ <shameerali.kolothum.thodi@huawei.com>,
+ <jgg@ziepe.ca>,
+ <kevin.tian@intel.com>,
+ <kuba@kernel.org>,
+ <andrew+netdev@lunn.ch>,
+ <edumazet@google.com>,
+ Daniel Jurgens <danielj@nvidia.com>,
+ <netdev@vger.kernel.org>,
+ <mst@redhat.com>,
+ <jasowang@redhat.com>,
+ <alex.williamson@redhat.com>,
+ <pabeni@redhat.com>
+References: <20251027173957.2334-1-danielj@nvidia.com>
+ <20251027173957.2334-9-danielj@nvidia.com>
+In-Reply-To: <20251027173957.2334-9-danielj@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: awJkCsDw3fgXIAhpPa8JAA--.11940S4
-X-Coremail-Antispam: 1UD129KBjvJXoW7KFWfGw4fZr1DGFy3Xr4UCFg_yoW8Xw1Dpr
-	ZxWwsIvwn5XanFy3Wvy3WxurW5Xa18GFyDWrWfu3y3Xws8ZFyjqry3KFW5Xr18Jr4kGa1Y
-	yF4jqF9ruwn0v3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9j14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26rxl
-	6s0DM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
-	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
-	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
-	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
-	n2IY04v7MxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
-	AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
-	17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
-	IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4l
-	IxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvf
-	C2KfnxnUUI43ZEXa7VUbGQ6JUUUUU==
-X-CM-SenderInfo: 5fkxw35dqj1xlqj6x0hvsx2hhfrp/
-X-CM-DELIVERINFO: =?B?WZlWr5RRTeOiUs3aOqHZ50hzsfHKF9Ds6CbXmDm38RucXu3DYXJR7Zlh9zE0nt/Iac
-	D+Kd7qCoyzVvXU23E45gA/UozU+vTWs0UaMZjN3SDVnrRYOZ4d5fZaq5YsE8h+Y6TFhwys
-	rNxsp/VnNVvUSEPN9bo=
-Content-Type: text/plain
-tUid: 20251103112308691f091018264b888eb3e7c243b9f925
-X-Abuse-Reports-To: service@corp-email.com
-Abuse-Reports-To: service@corp-email.com
-X-Complaints-To: service@corp-email.com
-X-Report-Abuse-To: service@corp-email.com
 
-The original comments contained spelling errors and incomplete logical
-descriptions, which could easily lead to misunderstandings of the code
-logic. The specific modifications are as follows:
+On Mon, 27 Oct 2025 12:39:53 -0500, Daniel Jurgens <danielj@nvidia.com> wrote:
+> Classifiers can be used by more than one rule. If there is an existing
+> classifier, use it instead of creating a new one.
+>
+> Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
+> Reviewed-by: Parav Pandit <parav@nvidia.com>
+> Reviewed-by: Shahar Shitrit <shshitrit@nvidia.com>
 
-Correct the spelling error by changing "inut max" to "but not exceed the
-maximum limit";
+Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 
-Add the note "If the user has not specified a value, the default maximum
-limit is 8" to clarify the default value logic;
-
-Improve the coherence of the statement to make the queue quantity rules
-clearer.
-
-After the modification, the comments can accurately reflect the code
-behavior of "taking the smaller value between the number of CPUs and the
-default maximum limit of 8 for the number of queues", enhancing code
-maintainability.
-
-Signed-off-by: Chu Guangqing <chuguangqing@inspur.com>
----
- drivers/net/xen-netfront.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/xen-netfront.c b/drivers/net/xen-netfront.c
-index a11a0e949400..7c2220366623 100644
---- a/drivers/net/xen-netfront.c
-+++ b/drivers/net/xen-netfront.c
-@@ -2696,8 +2696,9 @@ static int __init netif_init(void)
- 
- 	pr_info("Initialising Xen virtual ethernet driver\n");
- 
--	/* Allow as many queues as there are CPUs inut max. 8 if user has not
--	 * specified a value.
-+	/* Allow the number of queues to match the number of CPUs, but not exceed
-+	 * the maximum limit. If the user has not specified a value, the default
-+	 * maximum limit is 8.
- 	 */
- 	if (xennet_max_queues == 0)
- 		xennet_max_queues = min_t(unsigned int, MAX_QUEUES_DEFAULT,
--- 
-2.43.7
-
+> ---
+> v4:
+>     - Fixed typo in commit message
+>     - for (int -> for (
+> ---
+>  drivers/net/virtio_net.c | 42 +++++++++++++++++++++++++++-------------
+>  1 file changed, 29 insertions(+), 13 deletions(-)
+>
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 73194b51c318..d94ac72fc02c 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -6806,6 +6806,7 @@ struct virtnet_ethtool_rule {
+>  /* The classifier struct must be the last field in this struct */
+>  struct virtnet_classifier {
+>  	size_t size;
+> +	refcount_t refcount;
+>  	u32 id;
+>  	struct virtio_net_resource_obj_ff_classifier classifier;
+>  };
+> @@ -6899,11 +6900,24 @@ static bool validate_mask(const struct virtnet_ff *ff,
+>  	return false;
+>  }
+>
+> -static int setup_classifier(struct virtnet_ff *ff, struct virtnet_classifier *c)
+> +static int setup_classifier(struct virtnet_ff *ff,
+> +			    struct virtnet_classifier **c)
+>  {
+> +	struct virtnet_classifier *tmp;
+> +	unsigned long i;
+>  	int err;
+>
+> -	err = xa_alloc(&ff->classifiers, &c->id, c,
+> +	xa_for_each(&ff->classifiers, i, tmp) {
+> +		if ((*c)->size == tmp->size &&
+> +		    !memcmp(&tmp->classifier, &(*c)->classifier, tmp->size)) {
+> +			refcount_inc(&tmp->refcount);
+> +			kfree(*c);
+> +			*c = tmp;
+> +			goto out;
+> +		}
+> +	}
+> +
+> +	err = xa_alloc(&ff->classifiers, &(*c)->id, *c,
+>  		       XA_LIMIT(0, le32_to_cpu(ff->ff_caps->classifiers_limit) - 1),
+>  		       GFP_KERNEL);
+>  	if (err)
+> @@ -6911,29 +6925,30 @@ static int setup_classifier(struct virtnet_ff *ff, struct virtnet_classifier *c)
+>
+>  	err = virtio_admin_obj_create(ff->vdev,
+>  				      VIRTIO_NET_RESOURCE_OBJ_FF_CLASSIFIER,
+> -				      c->id,
+> +				      (*c)->id,
+>  				      VIRTIO_ADMIN_GROUP_TYPE_SELF,
+>  				      0,
+> -				      &c->classifier,
+> -				      c->size);
+> +				      &(*c)->classifier,
+> +				      (*c)->size);
+>  	if (err)
+>  		goto err_xarray;
+>
+> +	refcount_set(&(*c)->refcount, 1);
+> +out:
+>  	return 0;
+>
+>  err_xarray:
+> -	xa_erase(&ff->classifiers, c->id);
+> +	xa_erase(&ff->classifiers, (*c)->id);
+>
+>  	return err;
+>  }
+>
+> -static void destroy_classifier(struct virtnet_ff *ff,
+> -			       u32 classifier_id)
+> +static void try_destroy_classifier(struct virtnet_ff *ff, u32 classifier_id)
+>  {
+>  	struct virtnet_classifier *c;
+>
+>  	c = xa_load(&ff->classifiers, classifier_id);
+> -	if (c) {
+> +	if (c && refcount_dec_and_test(&c->refcount)) {
+>  		virtio_admin_obj_destroy(ff->vdev,
+>  					 VIRTIO_NET_RESOURCE_OBJ_FF_CLASSIFIER,
+>  					 c->id,
+> @@ -6957,7 +6972,7 @@ static void destroy_ethtool_rule(struct virtnet_ff *ff,
+>  				 0);
+>
+>  	xa_erase(&ff->ethtool.rules, eth_rule->flow_spec.location);
+> -	destroy_classifier(ff, eth_rule->classifier_id);
+> +	try_destroy_classifier(ff, eth_rule->classifier_id);
+>  	kfree(eth_rule);
+>  }
+>
+> @@ -7082,8 +7097,9 @@ validate_classifier_selectors(struct virtnet_ff *ff,
+>  			      int num_hdrs)
+>  {
+>  	struct virtio_net_ff_selector *selector = (void *)classifier->selectors;
+> +	int i;
+>
+> -	for (int i = 0; i < num_hdrs; i++) {
+> +	for (i = 0; i < num_hdrs; i++) {
+>  		if (!validate_mask(ff, selector))
+>  			return -EINVAL;
+>
+> @@ -7137,14 +7153,14 @@ static int build_and_insert(struct virtnet_ff *ff,
+>  	if (err)
+>  		goto err_key;
+>
+> -	err = setup_classifier(ff, c);
+> +	err = setup_classifier(ff, &c);
+>  	if (err)
+>  		goto err_classifier;
+>
+>  	err = insert_rule(ff, eth_rule, c->id, key, key_size);
+>  	if (err) {
+>  		/* destroy_classifier will free the classifier */
+> -		destroy_classifier(ff, c->id);
+> +		try_destroy_classifier(ff, c->id);
+>  		goto err_key;
+>  	}
+>
+> --
+> 2.50.1
+>
 
