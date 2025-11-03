@@ -1,93 +1,254 @@
-Return-Path: <netdev+bounces-235106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id C737DC2C0CB
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 14:23:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB0D2C2C119
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 14:26:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B630F4E32E6
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 13:19:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 366863AFF55
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 13:19:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2288A229B12;
-	Mon,  3 Nov 2025 13:19:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85B8B22B8B0;
+	Mon,  3 Nov 2025 13:19:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="A94DluXu"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="KM5j5n0l"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C2292248B4;
-	Mon,  3 Nov 2025 13:19:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3489822A4E5
+	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 13:19:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762175956; cv=none; b=RWL1HyAmek3qXOZBaGsfvcIXmTADqieowl2Q5VJ3ut80xrkkPzAM9V2Uhs4FmP4ZU2pdu+LUi1/E52Dhi7OK/PPETCVfBa543cbJqVSHmSxxmWuLO7Mmw4nIt8fbeYJ4jntBzqcvlFUJ+1opw7tvrAIDAU8PBwnM9pRfR2dpdK0=
+	t=1762175983; cv=none; b=qnFvlPd8jBcXKIJpMgpcb+LoHLnpb1EJLeyvX2HD/Vu4I4VhseR7/aI1Q17qC8rzLnPtxKUXtzjAhEoQ0pJu81Mm/3/oCBdYz7KLTwZlZwxwmFOyb4WVVnNHc0OszK/mn2LbjA0xaNAC61Rq3RPas29PEAbJkbup+12dI1Ec4HY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762175956; c=relaxed/simple;
-	bh=MgsvOCYdGrKHVHF8qLHEX9CrTPApSK4T8/EU6opZtic=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SjNeO/Q4TfJ7q6oEkXvJ1Xpo4ksEG5+eb7ufouo8TMmv3WKE5CJPA+EisFrV+jrSaGgVH0xqUvA3fWk7zmKoDsjkFbyeDcrjx93Jn4Bm2APmdf6xvEX0fzmiMZzOJppr4UryyCYlLdTXigy16fwoVQaR61c/eV7pyCynbbhSrUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=A94DluXu; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=U2vPZtG6pTMf2RXO8sZfzEz/4QzpCuVNN4jCYQL/TRY=; b=A94DluXuIWFxl5JkOYTkd76nYv
-	qKT3TiGoDtgD0mC0N28ueW5N9bOtynh/EbQytpUHPVqa+38sb2X0J8mFVpFb8U6haYt8Sd8/bOP66
-	OSIMKxmYVPWPVwQrXDiUL5KRYcTSIj4yaVfNX8uHS1B4kt5t2ROglqvuXYOWb4P/M+7Y=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vFuSb-00CmYS-RF; Mon, 03 Nov 2025 14:19:01 +0100
-Date: Mon, 3 Nov 2025 14:19:01 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Buday Csaba <buday.csaba@prolan.hu>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/1] dt-bindings: net: ethernet-phy: clarify when
- compatible must specify PHY ID
-Message-ID: <a16259c4-b27b-4260-b99c-aed888b99f13@lunn.ch>
-References: <b8613028fb2f7f69e2fa5e658bd2840c790935d4.1761898321.git.buday.csaba@prolan.hu>
- <64c52d1a726944a68a308355433e8ef0f82c4240.1762157515.git.buday.csaba@prolan.hu>
+	s=arc-20240116; t=1762175983; c=relaxed/simple;
+	bh=bA8/Ajh6uh2bGBEg0MDAJdWIsZY3P3htNjZpMFVCD1c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nCKQKI96X+kdetkULM9aDtSbTEpn1xBDRK6ZqYJXlzcLg9VU2xBiKa/zqgP83iHv2gnAI9MhhC+0hBPWtsGrliegrawDlDDILXfIJrVDd0Dinbqv16xszJ2MASb2VTT50xr5PXrrE6Hax2BZ3Y7WukIbG8oak7Lu6h9yISt/jrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=KM5j5n0l; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-427007b1fe5so3283792f8f.1
+        for <netdev@vger.kernel.org>; Mon, 03 Nov 2025 05:19:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1762175978; x=1762780778; darn=vger.kernel.org;
+        h=in-reply-to:autocrypt:from:content-language:references:cc:to
+         :subject:user-agent:mime-version:date:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=bA8/Ajh6uh2bGBEg0MDAJdWIsZY3P3htNjZpMFVCD1c=;
+        b=KM5j5n0l06OsD7xFEDo0xaqSe96T/+8cu9mPw8/ePSPCFVV2i3jMMUrYdKcJeYODRW
+         bogLRG2AP5T+d5AuIdnAKfoDZ3vX4qYYjzYEFAHAmFr5ww087bsRaK0yTgTnKjplHa1h
+         1HcXZ71jNILtkeypshyR/ZxyGM+ycxjSdkPnlivABN4MkFo8vYuhpckUmwKTZcJnfqQ8
+         b/hbL2M2BR/kEhpgGuPCoRbRLfvPjqmQkp5pmuf49LOqxW24LHJzG+gG7WL43Jcd2paM
+         Oc3kKp6Uh7Z+SYd47B+edDIaHZxVGWv76xEdKhmfTJlQeP3nNnhHpTkHY25tFCqd3lcC
+         YZfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762175978; x=1762780778;
+        h=in-reply-to:autocrypt:from:content-language:references:cc:to
+         :subject:user-agent:mime-version:date:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bA8/Ajh6uh2bGBEg0MDAJdWIsZY3P3htNjZpMFVCD1c=;
+        b=nPoS7zwuugpslX1/pSynkq0Y8QsGOKH9MuNt0JLRz9PM+jaqNyqXlWr005Gjn+D/dv
+         pA30W/kikPvyfqjODkQkeSiUS0cJaFF6sPosUNG6IFSVCpcCyzBnEv7fbuD0bOC3yojH
+         UQC0U3MSYFg7omsDnotkkZ7tzm2EIHcfB4uIG7Y+gRV6kUMAhw9Unz8SFwKRYc26sQ6C
+         P9/561mbfe8r7PkLdHWWFKaRvyP9Hmjaqw7RugO7OkrK9FJM0OxRBbMyKEf0EP3xv68s
+         /fxc5f4EkQ9tw6m64FvQwt/CzRTNKD7EF50FB28g8lQO7g29t3DucgKRlJf/dYBHigu+
+         IaGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU9rcccLIJAZAbQYUJoKGjcC8pZXGSlkvLhQWX0qqktndFjWRm5DIV+giMUCg+meT+LMk557TY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmZ70WC0uVAeZ+1isYdx+f3Ouf5dQSK+tyhL2aE3QUcFxuOF8J
+	MmnzuJff8skB3LdYeyzEeY/MCYVfgGZv+VJosBw81BS1+bGRh5hf78RnafM72EXtd7M=
+X-Gm-Gg: ASbGnctwq5XmJbLHL5KDhUZY6ZCU2itWioVTSQyzUmZPzAKRAHhPapC0qu2CHMT2UIP
+	WBek8J3obYRCjOYowN9Z5LNphGu2zyLyTIukUmrKzNg+meTzTDu2qqOLPwImmyihAZjgvKuA/ge
+	59fk4gFWzE+KqOvryodGxRZYGib6hWunK5lJXsWCCoDICeyugNxYHoeFY2AElIS1zBPKKUr+kAx
+	XrTDy+8Y4sBdQa61WkifYqYRLQL3m98wBq2oAJOQR2g6QwlAuyArI8P4JtOWQE3GGa4hFcAWLJK
+	+2AeBp016NRVaQhZLtfxabnm2N07PGfT0kDPvLxOJU8OL1q0nGjekd5heNH1rtYCt/D4tZU9UL7
+	BCuC82KI8Wq6dzqV8nNQYCTzEqcuwudr+QudJgUoOVPQWlpeKK48f9NC8f91vClD7WGuKVn1XrH
+	znK3ekfRlf9rLFhHjSNDa6AZg0bC7ksZjcAAOONrY762GB/fGTzN4ELTgsX6AqfvtWDBL62cTB5
+	+Bh/Wjt8Vfso87oIL6WC6W+nePxThR2CpI5EVwFnCzSGmR8vw==
+X-Google-Smtp-Source: AGHT+IGuau3eW5WC1R93VPLVN8+9E4SrZfXJSujtRWGSeFzlyOBkUt+8IC7TUpXakZNqQ8ep+AjxzA==
+X-Received: by 2002:a05:6000:250e:b0:429:cba7:f773 with SMTP id ffacd0b85a97d-429cba7f9cdmr5274216f8f.19.1762175978291;
+        Mon, 03 Nov 2025 05:19:38 -0800 (PST)
+Received: from ?IPV6:2003:e5:870e:1500:7795:3e8a:56c1:ae53? (p200300e5870e150077953e8a56c1ae53.dip0.t-ipconnect.de. [2003:e5:870e:1500:7795:3e8a:56c1:ae53])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429c13f1d4csm19950490f8f.39.2025.11.03.05.19.37
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Nov 2025 05:19:37 -0800 (PST)
+Message-ID: <209fa1c0-f6f2-4594-a2ae-7733ff651761@suse.com>
+Date: Mon, 3 Nov 2025 14:19:36 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <64c52d1a726944a68a308355433e8ef0f82c4240.1762157515.git.buday.csaba@prolan.hu>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] xen/netfront: Comment Correction: Fix Spelling Error and
+ Description of Queue Quantity Rules
+To: Chu Guangqing <chuguangqing@inspur.com>, sstabellini@kernel.org,
+ oleksandr_tyshchenko@epam.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: xen-devel@lists.xenproject.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20251103032212.2462-1-chuguangqing@inspur.com>
+Content-Language: en-US
+From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
+Autocrypt: addr=jgross@suse.com; keydata=
+ xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOB
+ ycWxw3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJve
+ dYm8Of8Zd621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJ
+ NwQpd369y9bfIhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvx
+ XP3FAp2pkW0xqG7/377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEB
+ AAHNH0p1ZXJnZW4gR3Jvc3MgPGpncm9zc0BzdXNlLmNvbT7CwHkEEwECACMFAlOMcK8CGwMH
+ CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRCw3p3WKL8TL8eZB/9G0juS/kDY9LhEXseh
+ mE9U+iA1VsLhgDqVbsOtZ/S14LRFHczNd/Lqkn7souCSoyWsBs3/wO+OjPvxf7m+Ef+sMtr0
+ G5lCWEWa9wa0IXx5HRPW/ScL+e4AVUbL7rurYMfwCzco+7TfjhMEOkC+va5gzi1KrErgNRHH
+ kg3PhlnRY0Udyqx++UYkAsN4TQuEhNN32MvN0Np3WlBJOgKcuXpIElmMM5f1BBzJSKBkW0Jc
+ Wy3h2Wy912vHKpPV/Xv7ZwVJ27v7KcuZcErtptDevAljxJtE7aJG6WiBzm+v9EswyWxwMCIO
+ RoVBYuiocc51872tRGywc03xaQydB+9R7BHPzsBNBFOMcBYBCADLMfoA44MwGOB9YT1V4KCy
+ vAfd7E0BTfaAurbG+Olacciz3yd09QOmejFZC6AnoykydyvTFLAWYcSCdISMr88COmmCbJzn
+ sHAogjexXiif6ANUUlHpjxlHCCcELmZUzomNDnEOTxZFeWMTFF9Rf2k2F0Tl4E5kmsNGgtSa
+ aMO0rNZoOEiD/7UfPP3dfh8JCQ1VtUUsQtT1sxos8Eb/HmriJhnaTZ7Hp3jtgTVkV0ybpgFg
+ w6WMaRkrBh17mV0z2ajjmabB7SJxcouSkR0hcpNl4oM74d2/VqoW4BxxxOD1FcNCObCELfIS
+ auZx+XT6s+CE7Qi/c44ibBMR7hyjdzWbABEBAAHCwF8EGAECAAkFAlOMcBYCGwwACgkQsN6d
+ 1ii/Ey9D+Af/WFr3q+bg/8v5tCknCtn92d5lyYTBNt7xgWzDZX8G6/pngzKyWfedArllp0Pn
+ fgIXtMNV+3t8Li1Tg843EXkP7+2+CQ98MB8XvvPLYAfW8nNDV85TyVgWlldNcgdv7nn1Sq8g
+ HwB2BHdIAkYce3hEoDQXt/mKlgEGsLpzJcnLKimtPXQQy9TxUaLBe9PInPd+Ohix0XOlY+Uk
+ QFEx50Ki3rSDl2Zt2tnkNYKUCvTJq7jvOlaPd6d/W0tZqpyy7KVay+K4aMobDsodB3dvEAs6
+ ScCnh03dDAFgIq5nsB11j3KPKdVoPlfucX2c7kGNH+LUMbzqV6beIENfNexkOfxHfw==
+In-Reply-To: <20251103032212.2462-1-chuguangqing@inspur.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------krGRhE0Upii4b9WMJ7Y2jJMT"
 
-On Mon, Nov 03, 2025 at 09:13:42AM +0100, Buday Csaba wrote:
-> Change PHY ID description in ethernet-phy.yaml to clarify that a
-> PHY ID is required (may -> must) when the PHY requires special
-> initialization sequence.
-> 
-> Link: https://lore.kernel.org/netdev/20251026212026.GA2959311-robh@kernel.org/
-> Link: https://lore.kernel.org/netdev/aQIZvDt5gooZSTcp@debianbuilder/
-> 
-> Signed-off-by: Buday Csaba <buday.csaba@prolan.hu>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------krGRhE0Upii4b9WMJ7Y2jJMT
+Content-Type: multipart/mixed; boundary="------------naDhrqYeiAtCem5LDmy8CsV5";
+ protected-headers="v1"
+From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
+To: Chu Guangqing <chuguangqing@inspur.com>, sstabellini@kernel.org,
+ oleksandr_tyshchenko@epam.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: xen-devel@lists.xenproject.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Message-ID: <209fa1c0-f6f2-4594-a2ae-7733ff651761@suse.com>
+Subject: Re: [PATCH] xen/netfront: Comment Correction: Fix Spelling Error and
+ Description of Queue Quantity Rules
+References: <20251103032212.2462-1-chuguangqing@inspur.com>
+In-Reply-To: <20251103032212.2462-1-chuguangqing@inspur.com>
 
-Please always start a new thread for each version of a patch. The CI
-probably just sees this as a comment made to the previous version, and
-so has probably not tested it.
+--------------naDhrqYeiAtCem5LDmy8CsV5
+Content-Type: multipart/mixed; boundary="------------511r0QUbJCNKJQeyEXdlbmGB"
 
-Given that you have only changed some DT binding text, it is however
-likely safe.
+--------------511r0QUbJCNKJQeyEXdlbmGB
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+T24gMDMuMTEuMjUgMDQ6MjIsIENodSBHdWFuZ3Fpbmcgd3JvdGU6DQo+IFRoZSBvcmlnaW5h
+bCBjb21tZW50cyBjb250YWluZWQgc3BlbGxpbmcgZXJyb3JzIGFuZCBpbmNvbXBsZXRlIGxv
+Z2ljYWwNCj4gZGVzY3JpcHRpb25zLCB3aGljaCBjb3VsZCBlYXNpbHkgbGVhZCB0byBtaXN1
+bmRlcnN0YW5kaW5ncyBvZiB0aGUgY29kZQ0KPiBsb2dpYy4gVGhlIHNwZWNpZmljIG1vZGlm
+aWNhdGlvbnMgYXJlIGFzIGZvbGxvd3M6DQo+IA0KPiBDb3JyZWN0IHRoZSBzcGVsbGluZyBl
+cnJvciBieSBjaGFuZ2luZyAiaW51dCBtYXgiIHRvICJidXQgbm90IGV4Y2VlZCB0aGUNCj4g
+bWF4aW11bSBsaW1pdCI7DQo+IA0KPiBBZGQgdGhlIG5vdGUgIklmIHRoZSB1c2VyIGhhcyBu
+b3Qgc3BlY2lmaWVkIGEgdmFsdWUsIHRoZSBkZWZhdWx0IG1heGltdW0NCj4gbGltaXQgaXMg
+OCIgdG8gY2xhcmlmeSB0aGUgZGVmYXVsdCB2YWx1ZSBsb2dpYzsNCj4gDQo+IEltcHJvdmUg
+dGhlIGNvaGVyZW5jZSBvZiB0aGUgc3RhdGVtZW50IHRvIG1ha2UgdGhlIHF1ZXVlIHF1YW50
+aXR5IHJ1bGVzDQo+IGNsZWFyZXIuDQo+IA0KPiBBZnRlciB0aGUgbW9kaWZpY2F0aW9uLCB0
+aGUgY29tbWVudHMgY2FuIGFjY3VyYXRlbHkgcmVmbGVjdCB0aGUgY29kZQ0KPiBiZWhhdmlv
+ciBvZiAidGFraW5nIHRoZSBzbWFsbGVyIHZhbHVlIGJldHdlZW4gdGhlIG51bWJlciBvZiBD
+UFVzIGFuZCB0aGUNCj4gZGVmYXVsdCBtYXhpbXVtIGxpbWl0IG9mIDggZm9yIHRoZSBudW1i
+ZXIgb2YgcXVldWVzIiwgZW5oYW5jaW5nIGNvZGUNCj4gbWFpbnRhaW5hYmlsaXR5Lg0KPiAN
+Cj4gU2lnbmVkLW9mZi1ieTogQ2h1IEd1YW5ncWluZyA8Y2h1Z3VhbmdxaW5nQGluc3B1ci5j
+b20+DQoNClJldmlld2VkLWJ5OiBKdWVyZ2VuIEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+DQoN
+Cg0KSnVlcmdlbg0K
+--------------511r0QUbJCNKJQeyEXdlbmGB
+Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
 
-    Andrew
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+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
+kt+z4drzFUyEjLM1vVvIMjkUoJs=3D
+=3DeeAB
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------511r0QUbJCNKJQeyEXdlbmGB--
+
+--------------naDhrqYeiAtCem5LDmy8CsV5--
+
+--------------krGRhE0Upii4b9WMJ7Y2jJMT
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmkIq+gFAwAAAAAACgkQsN6d1ii/Ey8s
+eAgAkP4SIOJZjYUHdJZGVfcnpP2nPq9QC4Mmoc4h1n/QG7L4/XS5bNW2HMwSTg/aM3iK/vOxeala
+l2Gup8+fOMHcnEOHtIuTYHioM66qLsm764hr5ro0LY077J/GED9SgUveUlCuCJDGpt5ZG2bYHVbL
+Gh4GyoH30+yJTJGWi+YUUJb9EnRar7H24jUCC0xK9dRaHRaCnZJGYS+Kns3xgjbi8KQMrDCdyj+U
+z38TYJ+VT0UoL/G6PzUCBrw92gJNlwqs18XwPRKLWdrmLQ8W7UPnXFr6Jwk96YwEf/3MDqonIvPh
+R2DrVz9RXX7Imv2t1/+lFDb9fiMHvDgHnMnCntthyQ==
+=gdmH
+-----END PGP SIGNATURE-----
+
+--------------krGRhE0Upii4b9WMJ7Y2jJMT--
 
