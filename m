@@ -1,195 +1,137 @@
-Return-Path: <netdev+bounces-235217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D784C2D929
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 19:04:53 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2B17C2DA72
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 19:21:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B82318996A9
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 18:04:41 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3D540348354
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 18:21:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B099B320CBA;
-	Mon,  3 Nov 2025 18:03:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B14528B7EA;
+	Mon,  3 Nov 2025 18:21:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fAcFz9NK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g5Nh+0Zd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86EAC199230;
-	Mon,  3 Nov 2025 18:03:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA38C2877FA
+	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 18:21:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762192996; cv=none; b=CSYU3jUIUgH/s9z8/KEBFaK7cWKWmfWo9ZevKYNChGOKxD5/WpSwyUJoPV3WcVIBacHZ1Do/wKGPRMsGjNFJfPqquJDMM1QP/r/uiUOOUzMyse1jIC1qq8jKqivq0tKaESCDs04R5xV9aE4Y68H/tUkRoyRI9E8GTsWtCzGBy+I=
+	t=1762194092; cv=none; b=j/NQNXmQFjb7VfxMfls51iOQZH/x4AdQ/CYrD815XjJs1H/OrbK0ccssuHMUjG8E5E5ni4yuOsQAkQZcnblfSvTuGpdV5xuQ66qyYtoLn9WRzWy27dIGUzvevqGrdqKBo+Do8UqUZQKopr8q07GTocJuvISVlmTkXLWLqY+mCIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762192996; c=relaxed/simple;
-	bh=9q0LlLf/dRUDFwF8f8synzTkHZ77cem5WHNmuYp4NYE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eyavP6O9Qlnmp/HanD4VTz4n5tZSpgTNY2oTSIti06ECsRomwU22wFqga/L5IH7SeiekTrQij5kHI3bhFDzY4c03ciS5lCcVNbfoc4cBDhTt0O1VsI/cNtJhY4fwu//pFAKK3Qrqaxlo9ddSMicYruMNC/7UaZ2Zj5L2ynP5yhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fAcFz9NK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3ABF0C116C6;
-	Mon,  3 Nov 2025 18:03:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762192996;
-	bh=9q0LlLf/dRUDFwF8f8synzTkHZ77cem5WHNmuYp4NYE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=fAcFz9NKPrFHEFmXnDWPRconr+BoaDkslwhZTHwGdVPjM+fROVoua3A7Qt6BA6IYV
-	 8ln/eT1IArETuzu+jIFZwxl2JFO0BrvIyBXXGiUwF83MTWAui0yjK9KCTMCg+6OCFV
-	 w30Wnh0Omhx2tDHg8kCLfsmC1dGkwgGsjHJYolhSsxY90msLQwFaY+7dDSDqnnsklS
-	 JmV4p3UT6ZrXiEK4W1jYMWFgkpSz3UC8xB2LGSsfRNjnkJ5XMNwZzOEyI8S26PCcbZ
-	 jDZ5+vcrxcEjIZypv/FguRRADcnFTX1BAOejUoEtPtZcRDIVxQOQiHl+Tzo3caul2V
-	 P9w9ULEPu6yWQ==
-From: Sasha Levin <sashal@kernel.org>
-To: patches@lists.linux.dev,
-	stable@vger.kernel.org
-Cc: Po-Hsu Lin <po-hsu.lin@canonical.com>,
-	Edoardo Canepa <edoardo.canepa@canonical.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Sasha Levin <sashal@kernel.org>,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.17-5.15] selftests: net: use BASH for bareudp testing
-Date: Mon,  3 Nov 2025 13:02:28 -0500
-Message-ID: <20251103180246.4097432-15-sashal@kernel.org>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251103180246.4097432-1-sashal@kernel.org>
-References: <20251103180246.4097432-1-sashal@kernel.org>
+	s=arc-20240116; t=1762194092; c=relaxed/simple;
+	bh=0SQNynA8VddDnpz9ZxzD00wZ9dZv8gbMqYchXkBE2Pw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eTER+42hJiRmkH27NtwN3JmTHDrk5EPGbXO3I7HNXjekmyCD4x7imLA5tHTYKYJEK0QIfRHj9Y40/kze07k3pzuNdfAcwc6wcOKw1um65Q6OEGadeHSNkP2zkP0EgaFswRutRvIMMd1O2sfltUArWLyt5fRuMavC2BrPkqfYe74=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g5Nh+0Zd; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-475dab5a5acso21830275e9.0
+        for <netdev@vger.kernel.org>; Mon, 03 Nov 2025 10:21:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762194089; x=1762798889; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7OQ2QHegR2fAtkFp3wMKAgGG3nOhcvP9QDUj8F3JZwA=;
+        b=g5Nh+0ZdxBxmVpBLINSvbgOEYPpjUgiUytLUMl+jbj3mfBxosf9qNOSaWNXXyxwpDm
+         TqLZZyKmtKb44dCgy8l7Jgmi+Lh5c71jZDAenskImWCQvhYtV+bu5YHUEbjvIdusP/mA
+         y0gaCjwhROHiRthhNUVNKqyckYzVxq/0pdVHsmaL28vAMjh/7rHT4rmWMgZdLBct6/Zz
+         2BT4lIXbFrxt+DsnSMefbnLnKBBiuOqU+/yqD8UdjPI/H5tcTYwn6QAjV84YzpqRcl8w
+         hKQ5kZKIxs1RQcMpy8SpR9G1SndTc7jiVuTU0zpbA+jkgg9GVpNcosIcpwsViTfbmtFb
+         N39g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762194089; x=1762798889;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7OQ2QHegR2fAtkFp3wMKAgGG3nOhcvP9QDUj8F3JZwA=;
+        b=DJzNq5kfGVFmEgvgQ/xcebCm4+pE4dOBPfx303juTnM5/443ZJIGYNra968CkHKUN7
+         qOcYgvgAnc07W+ImFClJ18tthGwgRF4nPq+pgSL5mWMSMnRDPY/8zz8lxKIq/L4o9P82
+         JOQF3Xmyr6Flbsvh7495qICx555qW1CJChXzgaROH2gU8KS17n+qxECyF+ySpLD1Qxht
+         KZmApKl2ofT0ow73UBsR+TupEJFGm35U8Fi2bWnJb8SxefXZT7FUpVLR/umZZx+KbD5T
+         +9cUzuwPfyYKUol3Osa9d8MkP6EUjc8VwoYbAtqkjQj4ztg/C8+xePlTromO4c0OByMI
+         vw7w==
+X-Forwarded-Encrypted: i=1; AJvYcCVDEsqGl8MjPr8BCqJSYYDFV9DUNwGvswAZ+xWUCjxT2fj6FHwoseDAi983dqGxe8KosBbB+nE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSnzSVAl+nzn4pmkiJLASdZi8ha/eHOQxOsHHlwZ/O48HMvSs5
+	SA23jyweLP3Ec3PBObV5q1TC/hoG5pZnIMaJlIv/INSIUE4+AQcsqHVBELb0Dw==
+X-Gm-Gg: ASbGncss3eU8+578umNFoiNhdWjRALFE4Rnc1nVqoklA41bDFBbQktbHGvsZK9Q6qYL
+	u8aE0D12lAQYGo5MdILMwKgoD6w2MzZez12ZR5r6x5gnCJxQlLqYQFD4WrQXFynW/dZ0N+0pw0V
+	3NI+VYntDRtg/U+2VZvKlp+lQJkAqhNrkO8fgmb8iFDSmeek6VmZWmb6jTYK4VfqSKShpvPwLT+
+	Hyp5GALT7PPeeX5OY8jjP0YOs+hBYwJ9LT7HMyE69cX2ekR8qBrPpsrgtEHbCN8NNZuw128bMCo
+	/b/C4c7eGP/5qAZ/v26OEDtCf1ycyOXSWK6AzZ09fKlJ5JB9wCzT8x55vbe6VdQg2ccmdTtdAnT
+	yrBufBitrjY2ffQRr4ZyDt4USSsB9Nxw7P3ejFaYehFKZGQ1yG5IEQPJ3mXfZxRg7E4LCnxibAz
+	xc6TRc4GktWbACAvTBv2xyInddemFCFdRr4ygQXcsUlpFxqyNefe0=
+X-Google-Smtp-Source: AGHT+IFtQ1A7biFNab2XYzWjm9i5l+ofr+kW0gooTMlXiDRNgoId/5yjZJdKEWEKHKVqFEx7G1gmmQ==
+X-Received: by 2002:a05:600c:a02:b0:471:13dd:baef with SMTP id 5b1f17b1804b1-47730871f67mr100828445e9.26.1762194088703;
+        Mon, 03 Nov 2025 10:21:28 -0800 (PST)
+Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429dc1f9c8esm76775f8f.33.2025.11.03.10.21.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Nov 2025 10:21:27 -0800 (PST)
+Message-ID: <7805c473-448a-430c-a53b-a42e8d2c24bf@gmail.com>
+Date: Mon, 3 Nov 2025 18:21:26 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.17.7
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/2] net: io_uring/zcrx: call
+ netdev_queue_get_dma_dev() under instance lock
+To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+References: <20251101022449.1112313-1-dw@davidwei.uk>
+ <20251101022449.1112313-3-dw@davidwei.uk>
+ <c374df85-23ec-4324-b966-9f2b3a74489a@gmail.com>
+ <c8d945a3-4b12-4c04-9c68-4c5ad6173af5@davidwei.uk>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <c8d945a3-4b12-4c04-9c68-4c5ad6173af5@davidwei.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-From: Po-Hsu Lin <po-hsu.lin@canonical.com>
+On 11/3/25 17:47, David Wei wrote:
+> On 2025-11-03 05:51, Pavel Begunkov wrote:
+>> On 11/1/25 02:24, David Wei wrote:
+>>> netdev ops must be called under instance lock or rtnl_lock, but
+>>> io_register_zcrx_ifq() isn't doing this for netdev_queue_get_dma_dev().
+>>> Fix this by taking the instance lock using netdev_get_by_index_lock().
+>>>
+>>> Extended the instance lock section to include attaching a memory
+>>> provider. Could not move io_zcrx_create_area() outside, since the dmabuf
+>>> codepath IORING_ZCRX_AREA_DMABUF requires ifq->dev.
+>>
+>> It's probably fine for now, but this nested waiting feels
+>> uncomfortable considering that it could be waiting for other
+>> devices to finish IO via dmabuf fences.
+>>
+> 
+> Only the dmabuf path requires ifq->dev in io_zcrx_create_area(); I could
+> split this into two and then unlock netdev instance lock between holding
+> a ref and calling net_mp_open_rxq().
+> 
+> So the new ordering would be:
+> 
+>    1. io_zcrx_create_area() for !IORING_ZCRX_AREA_DMABUF
+>    2. netdev_get_by_index_lock(), hold netdev ref, unlock netdev
+>    3. io_zcrx_create_area() for IORING_ZCRX_AREA_DMABUF
+>    4. net_mp_open_rxq()
 
-[ Upstream commit 9311e9540a8b406d9f028aa87fb072a3819d4c82 ]
+To avoid dragging it on, can you do it as a follow up please? And
+it's better to avoid splitting on IORING_ZCRX_AREA_DMABUF, either it
+works for both or it doesn't at all.
 
-In bareudp.sh, this script uses /bin/sh and it will load another lib.sh
-BASH script at the very beginning.
-
-But on some operating systems like Ubuntu, /bin/sh is actually pointed to
-DASH, thus it will try to run BASH commands with DASH and consequently
-leads to syntax issues:
-  # ./bareudp.sh: 4: ./lib.sh: Bad substitution
-  # ./bareudp.sh: 5: ./lib.sh: source: not found
-  # ./bareudp.sh: 24: ./lib.sh: Syntax error: "(" unexpected
-
-Fix this by explicitly using BASH for bareudp.sh. This fixes test
-execution failures on systems where /bin/sh is not BASH.
-
-Reported-by: Edoardo Canepa <edoardo.canepa@canonical.com>
-Link: https://bugs.launchpad.net/bugs/2129812
-Signed-off-by: Po-Hsu Lin <po-hsu.lin@canonical.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Link: https://patch.msgid.link/20251027095710.2036108-2-po-hsu.lin@canonical.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
-
-LLM Generated explanations, may be completely bogus:
-
-Based on my analysis of the commit and examination of the Linux kernel
-repository, here is my determination:
-
-## **Backport Status: YES**
-
-### Evidence and Analysis:
-
-#### 1. **Code Change Analysis**
-The commit makes a single-line change to
-`tools/testing/selftests/net/bareudp.sh`:
-- Changes shebang from `#!/bin/sh` to `#!/bin/bash`
-
-I examined both files:
-- **bareudp.sh:1** currently has `#!/bin/sh` but sources lib.sh on line
-  109
-- **lib.sh:1** has `#!/bin/bash` and uses BASH-specific features:
-  - Line 4: `${BASH_SOURCE[0]}` - BASH-specific variable
-  - Line 5: `source` command (POSIX uses `.`)
-  - Line 24+: Array syntax (`NS_LIST=()`)
-
-#### 2. **Repository Investigation Findings**
-
-I discovered this commit **has already been backported** to stable:
-- **Original commit**: `9311e9540a8b4` (mainline)
-- **Backport commit**: `e171733806283` (linux-autosel-6.17, signed by
-  Sasha Levin)
-
-```bash
-$ git show e171733806283 --stat
-commit e1717338062838ac0054457d3dcbec14b56529ae
-Author: Po-Hsu Lin <po-hsu.lin@canonical.com>
-Date:   Mon Oct 27 17:57:10 2025 +0800
-
-    selftests: net: use BASH for bareudp testing
-
-    [ Upstream commit 9311e9540a8b406d9f028aa87fb072a3819d4c82 ]
-    ...
-    Signed-off-by: Sasha Levin <sashal@kernel.org>
-```
-
-#### 3. **Impact Scope**
-- Bareudp.sh is the **only** script sourcing lib.sh with `#!/bin/sh`
-  (all others use `#!/bin/bash`)
-- Out of ~109 net selftests, 97 use bash, only 12 use sh
-- This fix ensures consistency across the selftest infrastructure
-
-#### 4. **Why This Should Be Backported**
-
-**符合 Stable Tree 标准:**
-- ✅ **Fixes a real bug**: Test execution failures on Ubuntu/Debian
-  systems where /bin/sh → DASH
-- ✅ **Obviously correct**: One-line change, zero risk
-- ✅ **Small and contained**: Single line modification
-- ✅ **No side effects**: Only affects test execution, not kernel runtime
-- ✅ **Improves test infrastructure**: Allows CI/CD systems to properly
-  validate stable kernels
-
-**Practical Benefits:**
-- Enables proper testing of the bareudp driver on stable kernels
-- Fixes false negatives in test results on Debian-based distributions
-- Zero risk of kernel regression (test-only change)
-- Already proven safe by existing backport
-
-#### 5. **Why Semantic Tools Not Used**
-The semantic code analysis tools (mcp__semcode__*) are designed for C
-code analysis. This commit modifies a shell script in the testing
-infrastructure, not kernel C code. The analysis was conducted using:
-- Direct file inspection (Read tool)
-- Git history analysis (Bash/git commands)
-- Pattern matching across test scripts
-
-### Conclusion
-This commit **should definitively be backported** to stable kernel
-trees. The fact that it has already been successfully backported by the
-stable kernel maintainer (Sasha Levin) to linux-autosel-6.17 provides
-strong empirical evidence of its suitability for stable backporting.
-
- tools/testing/selftests/net/bareudp.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/net/bareudp.sh b/tools/testing/selftests/net/bareudp.sh
-index 4046131e78882..d9e5b967f8151 100755
---- a/tools/testing/selftests/net/bareudp.sh
-+++ b/tools/testing/selftests/net/bareudp.sh
-@@ -1,4 +1,4 @@
--#!/bin/sh
-+#!/bin/bash
- # SPDX-License-Identifier: GPL-2.0
- 
- # Test various bareudp tunnel configurations.
 -- 
-2.51.0
+Pavel Begunkov
 
 
