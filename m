@@ -1,220 +1,193 @@
-Return-Path: <netdev+bounces-235108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01525C2C0F8
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 14:25:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A61CEC2C1B3
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 14:34:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D0101885904
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 13:26:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C6273A9A53
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 13:29:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47F6630BF58;
-	Mon,  3 Nov 2025 13:24:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T8KZqbv6"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2595826ED5F;
+	Mon,  3 Nov 2025 13:29:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3877A26F2BD
-	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 13:24:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6570926F2AD
+	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 13:29:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762176270; cv=none; b=lJOQUAD0SBMeXXKD+uCAA6v8JTqfpoNFFi2oJZpJoyMr7THK4vD+R1Gle0n8fIikY91JAE6ZZAHG9hN+y3Fgk/H7+qBhatnFIwvAe2cjXvOnpT2k6imqxk34mh1Y7LWtdjOxOuVfpBWhClnLfR/nP+5B30XvurlKKaopWi5asMQ=
+	t=1762176575; cv=none; b=AWfsYdrN3Aj6eWcafUaBeDgGePDUUVbKef3GYw+XUb8ric3ofXCc0xnmUc9TNd+SDZmLXeKx/I6o48JzpwZTzBu6iboaccnX8LFXpH3Xm47aJxR4SBO/JmJLgzb7eU9liFmnK57+SgsIvNRntWxA5zqyuElHnAvXR0bNrrzRbW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762176270; c=relaxed/simple;
-	bh=O+dRAgI4LPfuYan1hqt3Wh5X/J4xUpMgYGmJUgN4GBk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a/LyZnT7Seh2XPIiWV+0gbCMVmZxIZpMJqrDVEcnlh/x50AfbLhoaH87dqEHhMQe0Fd6Dndzke9baIhcL5FB6l+ExllHDm6Zpe76GK34Z62FJbdSksRfuf5gZ7s85ezw31Wu/HXy2TU8QTiERlVfdV2NNqI7KLhsfY039ISDvcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T8KZqbv6; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b3c2db014easo919979566b.0
-        for <netdev@vger.kernel.org>; Mon, 03 Nov 2025 05:24:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762176265; x=1762781065; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0S6+1dUVKvqII667r+XW9/GENl1vb5Sqoomw0mlu3RI=;
-        b=T8KZqbv6kO/2xrWzX5n2788COipO+Tnz7F384SIxaywjLymb/lsfPxOUz0GOomqB4m
-         tSNiR+3flO68a9EtT4yaCs81ULEj8LfOSo8v3ZU97wAF7FdFSJhOJv2ZeicIbfs6vvRl
-         1gGjjqDGtjMsAY2i9JFTxfgqyW942vF6Q2vzk65RMl3u/HohDHs+eH1IoKambzK6Rwo0
-         /2xTzljrwr5o3ouIWwJ8c92Yk6WGQLDij67OP/z+7tBvBMrLdiEPRX4izLkduDzW/+qd
-         HoG9zb4rHzUKP+pIRspQJTBFjtz/T4jk9Y2st713BaUCRGI8wudxyrwpsYCmR3hy/3EE
-         pTWQ==
+	s=arc-20240116; t=1762176575; c=relaxed/simple;
+	bh=nL4Enrsj6XIoiKW42Qd2q2iyP/xMDQnjnqR1eEr95U0=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=jD+ekWw63+hr2Y9ZY99tpLb4a0w8MAGBtyINNBeyWAXVEiwBIeh6oZP7CXLyowtoGvR2fhWhm7yRCbyhIFIGv9UMIhl4xxW8DCmXXeaOm2+D2OFrdW4sg1ZFjAPp418kL3LFUMIZLO3wyqdkrMbETSGSaCWKdEEqZ3PxPoQIKPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-433299e5160so11056535ab.3
+        for <netdev@vger.kernel.org>; Mon, 03 Nov 2025 05:29:33 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762176265; x=1762781065;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0S6+1dUVKvqII667r+XW9/GENl1vb5Sqoomw0mlu3RI=;
-        b=jS1FZLmr6GhKf/Z1i1Nn/fMvnymcoPsiF6Nn/EAsYa/gI5kF+8WyKgI3jKb/A1ZoMT
-         GBQXhdzFVNJ7AOrepHQPUMgfAandHZS8WAniE3Ql1vaJFaHR+/QGa/eo+Xe3ORnOD/Xy
-         LBjXNNt6XIEwrEMPsD5FuAfnuSTAjeQtmWMginw3KTZXpzKSWKoFM5iiNlACKjIqkj3m
-         yMrUSEW7clMoRnJ7nZGiCDVjuvkkkNBNokb8KCJ6uanXiBkwBg2pxPBhiaFovZLNPW1w
-         pNVs6ja55dDNnpSytMnRsxra6y27v86pdyOALtT7XDjENbfUAarJXcmRkH1rDHsG1/eP
-         FRDw==
-X-Forwarded-Encrypted: i=1; AJvYcCWS1y+0HAKyJLdweIiiIYOyBULByFYSCg0RoOEwr6J7vPfRZwnGC4OikXr5k6pK5xLg5vnifC4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyk0JDnIIbK/vOsSefe8otqMojNKNr1puIA9hgXWzxc/rr+FNBd
-	P1hsVyHMDWrLjqGPwIRbuR4uCV4f5mxKypC6znIvEcMfJ5+TJqJ7pIr2tZFuS0vozXO0TssA5Ny
-	+Z0HUf+kCu6hgZh3YcNjBm0G89dJ52hY=
-X-Gm-Gg: ASbGncsoSC4sjjeQdMPqfQSGs2CH9xjQPyW9EQJ5kqdSaFXgEXbZD7aotpQ+N/ovBrG
-	+y/LUNf7x0y/AOMiRTIvH3n9NaUIxNGvd0Hd+l4crs7Rf+B1bv9FcFPGKF6HbWHk9RHkEUWHZtP
-	2/uoAvyNGCPjgGnDDRMz0TlaBJqbfYxTDFClJComhofBk1yZ9hsSSwNR+no6hWjpAzxsg/c7xYs
-	KzuHGGN6OSC2R7SgjQ+kYhQYmjHzsniDjW73I/KMgcQhmkOkZJ6g8joTqqc8Zj2QmIIugUvgbt2
-	lXe3Q/VRGnuaUQ0iE1A2LYkV3sPLTw==
-X-Google-Smtp-Source: AGHT+IELl7DuDv5uo3bD6NZ9q582bvS2bDMma/TtRpWZCxPhIVAv9e4H0npG+fdCye/re4SlhiT2Qy0S3M2gjGw90Ag=
-X-Received: by 2002:a17:907:ea7:b0:b6d:2d0b:1ec2 with SMTP id
- a640c23a62f3a-b70708315e8mr1272156366b.54.1762176265161; Mon, 03 Nov 2025
- 05:24:25 -0800 (PST)
+        d=1e100.net; s=20230601; t=1762176572; x=1762781372;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zqiq2pFuvImBAREJJUY/vzISXNjcGWyY/zRuQ8Cth60=;
+        b=hVfV87bzaAqZSpKGCTp9NnW+SJ8Qr9AT0OHLI3OQQVxAar4JgmYDWz4f/JPhfhZQL5
+         P9P8hi7vlpqEjxyzJk//yVsFtxJnlRZJbuYZ1zQUCoj03UzuzdFW9V9JmFY3708fpVnQ
+         td3FMKLx8lsfdT/D2nEkxnYK0Yl+lS7Q2gGUbMX7ES/ngEHIRNULpiRx4jMSGkE1uiDK
+         3DTQGcIyF3gkzfmmMwlQemm4XV5L93uCsOjALpeMY/maPlrR2Hr1nm3iYUQBj4zykaXi
+         sS7G0l4hraRtyfGwTOIkk5PBLmG0kicAvIW69s3DSSCziufseMB3YApYHL6XVaIrp/pI
+         qESg==
+X-Forwarded-Encrypted: i=1; AJvYcCXcdJajSfIwkdvy1Swx8xlmeZtLPffT+ifL7jT97uPd08oen8pweeQt8uEoS5OPaj9FUtha668=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz1Bqvt1fbV9QEkvg/kJbLeqHdNO1vFyIyDNLaB24YQIcvhkx6i
+	FIZQg95wJNSotUGnLSy3neY0Z6BKtty3GTr72mE79KPdrAQ7Sw181SUtob6iskZY3f8AA+9pCjo
+	T7bKfvEdGm8QL9cnTLQrPYdVZL/ZfBSY45g+yT3z/GT6EHv+zYzfgVxHK/oY=
+X-Google-Smtp-Source: AGHT+IG2Ta/xKw8mDF5MxXL7PEC6/jFhZNveCmW39DdpHE5LxYHjnbYRJV+pvxt3Ezx7ctafIAhYUOIW/+FgPpy50X692sVjQbLY
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251103-work-creds-guards-simple-v1-0-a3e156839e7f@kernel.org> <20251103-work-creds-guards-simple-v1-4-a3e156839e7f@kernel.org>
-In-Reply-To: <20251103-work-creds-guards-simple-v1-4-a3e156839e7f@kernel.org>
-From: Amir Goldstein <amir73il@gmail.com>
-Date: Mon, 3 Nov 2025 14:24:13 +0100
-X-Gm-Features: AWmQ_blW2akq-ipD0fIUUOxTn8zmugUgDmTC0C57BdhrsmFigJmfJvym14MPro0
-Message-ID: <CAOQ4uxhW2FiVe6XjQDT_aXhzJDyT5yuna9CVaWOLyzU1J99hFg@mail.gmail.com>
-Subject: Re: [PATCH 04/16] backing-file: use credential guards for writes
-To: Christian Brauner <brauner@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-aio@kvack.org, 
-	linux-unionfs@vger.kernel.org, linux-erofs@lists.ozlabs.org, 
-	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
-	samba-technical@lists.samba.org, cgroups@vger.kernel.org, 
-	netdev@vger.kernel.org
+X-Received: by 2002:a05:6e02:1a28:b0:430:c17c:5082 with SMTP id
+ e9e14a558f8ab-4330d125b63mr172004405ab.6.1762176572541; Mon, 03 Nov 2025
+ 05:29:32 -0800 (PST)
+Date: Mon, 03 Nov 2025 05:29:32 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6908ae3c.050a0220.29fc44.004b.GAE@google.com>
+Subject: [syzbot] [net?] possible deadlock in __netdev_update_features (2)
+From: syzbot <syzbot+f900128d760321f31225@syzkaller.appspotmail.com>
+To: andrew@lunn.ch, davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 3, 2025 at 12:30=E2=80=AFPM Christian Brauner <brauner@kernel.o=
-rg> wrote:
->
-> Use credential guards for scoped credential override with automatic
-> restoration on scope exit.
->
-> Signed-off-by: Christian Brauner <brauner@kernel.org>
-> ---
->  fs/backing-file.c | 74 +++++++++++++++++++++++++++++--------------------=
-------
->  1 file changed, 39 insertions(+), 35 deletions(-)
->
-> diff --git a/fs/backing-file.c b/fs/backing-file.c
-> index 4cb7276e7ead..9bea737d5bef 100644
-> --- a/fs/backing-file.c
-> +++ b/fs/backing-file.c
-> @@ -210,11 +210,47 @@ ssize_t backing_file_read_iter(struct file *file, s=
-truct iov_iter *iter,
->  }
->  EXPORT_SYMBOL_GPL(backing_file_read_iter);
->
-> +static int do_backing_file_write_iter(struct file *file, struct iov_iter=
- *iter,
-> +                                     struct kiocb *iocb, int flags,
-> +                                     void (*end_write)(struct kiocb *, s=
-size_t))
-> +{
-> +       struct backing_aio *aio;
-> +       int ret;
-> +
-> +       if (is_sync_kiocb(iocb)) {
-> +               rwf_t rwf =3D iocb_to_rw_flags(flags);
-> +
-> +               ret =3D vfs_iter_write(file, iter, &iocb->ki_pos, rwf);
-> +               if (end_write)
-> +                       end_write(iocb, ret);
-> +               return ret;
-> +       }
-> +
-> +       ret =3D backing_aio_init_wq(iocb);
-> +       if (ret)
-> +               return ret;
-> +
-> +       aio =3D kmem_cache_zalloc(backing_aio_cachep, GFP_KERNEL);
-> +       if (!aio)
-> +               return -ENOMEM;
-> +
-> +       aio->orig_iocb =3D iocb;
-> +       aio->end_write =3D end_write;
-> +       kiocb_clone(&aio->iocb, iocb, get_file(file));
-> +       aio->iocb.ki_flags =3D flags;
-> +       aio->iocb.ki_complete =3D backing_aio_queue_completion;
-> +       refcount_set(&aio->ref, 2);
-> +       ret =3D vfs_iocb_iter_write(file, &aio->iocb, iter);
-> +       backing_aio_put(aio);
-> +       if (ret !=3D -EIOCBQUEUED)
-> +               backing_aio_cleanup(aio, ret);
-> +       return ret;
-> +}
-> +
->  ssize_t backing_file_write_iter(struct file *file, struct iov_iter *iter=
-,
->                                 struct kiocb *iocb, int flags,
->                                 struct backing_file_ctx *ctx)
->  {
-> -       const struct cred *old_cred;
->         ssize_t ret;
->
->         if (WARN_ON_ONCE(!(file->f_mode & FMODE_BACKING)))
-> @@ -237,40 +273,8 @@ ssize_t backing_file_write_iter(struct file *file, s=
-truct iov_iter *iter,
->          */
->         flags &=3D ~IOCB_DIO_CALLER_COMP;
->
-> -       old_cred =3D override_creds(ctx->cred);
-> -       if (is_sync_kiocb(iocb)) {
-> -               rwf_t rwf =3D iocb_to_rw_flags(flags);
-> -
-> -               ret =3D vfs_iter_write(file, iter, &iocb->ki_pos, rwf);
-> -               if (ctx->end_write)
-> -                       ctx->end_write(iocb, ret);
-> -       } else {
-> -               struct backing_aio *aio;
-> -
-> -               ret =3D backing_aio_init_wq(iocb);
-> -               if (ret)
-> -                       goto out;
-> -
-> -               ret =3D -ENOMEM;
-> -               aio =3D kmem_cache_zalloc(backing_aio_cachep, GFP_KERNEL)=
-;
-> -               if (!aio)
-> -                       goto out;
-> -
-> -               aio->orig_iocb =3D iocb;
-> -               aio->end_write =3D ctx->end_write;
-> -               kiocb_clone(&aio->iocb, iocb, get_file(file));
-> -               aio->iocb.ki_flags =3D flags;
-> -               aio->iocb.ki_complete =3D backing_aio_queue_completion;
-> -               refcount_set(&aio->ref, 2);
-> -               ret =3D vfs_iocb_iter_write(file, &aio->iocb, iter);
-> -               backing_aio_put(aio);
-> -               if (ret !=3D -EIOCBQUEUED)
-> -                       backing_aio_cleanup(aio, ret);
-> -       }
-> -out:
-> -       revert_creds(old_cred);
-> -
-> -       return ret;
-> +       with_creds(ctx->cred);
-> +       return do_backing_file_write_iter(file, iter, iocb, flags, ctx->e=
-nd_write);
->  }
+Hello,
 
-Pointing out the obvious that do_backing_file_write_iter() feels
-unnecessary here.
+syzbot found the following issue on:
 
-But I am fine with keeping it for symmetry with
-do_backing_file_read_iter() and in case we will want to call the sync
-end_write() callback outside of creds override context as we do in the
-read case.
+HEAD commit:    6146a0f1dfae Linux 6.18-rc4
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=17b18012580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e46b8a1c645465a9
+dashboard link: https://syzkaller.appspot.com/bug?extid=f900128d760321f31225
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
 
-Thanks,
-Amir.
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/c84c238d0311/disk-6146a0f1.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/9ce2b6a4b897/vmlinux-6146a0f1.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/3e9c6bea4a10/bzImage-6146a0f1.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+f900128d760321f31225@syzkaller.appspotmail.com
+
+============================================
+WARNING: possible recursive locking detected
+syzkaller #0 Not tainted
+--------------------------------------------
+syz.1.3525/19446 is trying to acquire lock:
+ffff888070d30d38 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2765 [inline]
+ffff888070d30d38 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: netdev_lock_ops include/net/netdev_lock.h:42 [inline]
+ffff888070d30d38 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: netdev_sync_lower_features net/core/dev.c:10737 [inline]
+ffff888070d30d38 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: __netdev_update_features+0xcb1/0x1be0 net/core/dev.c:10907
+
+but task is already holding lock:
+ffff888070d30d38 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2765 [inline]
+ffff888070d30d38 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: netdev_lock_ops include/net/netdev_lock.h:42 [inline]
+ffff888070d30d38 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: __dev_ethtool net/ethtool/ioctl.c:3285 [inline]
+ffff888070d30d38 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: dev_ethtool+0x716/0x19c0 net/ethtool/ioctl.c:3554
+and the lock comparison function returns 0:
+
+other info that might help us debug this:
+ Possible unsafe locking scenario:
+
+       CPU0
+       ----
+  lock(&dev_instance_lock_key#20);
+  lock(&dev_instance_lock_key#20);
+
+ *** DEADLOCK ***
+
+ May be due to missing lock nesting notation
+
+2 locks held by syz.1.3525/19446:
+ #0: ffffffff8f2cb648 (rtnl_mutex){+.+.}-{4:4}, at: dev_ethtool+0x1d0/0x19c0 net/ethtool/ioctl.c:3553
+ #1: ffff888070d30d38 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: netdev_lock include/linux/netdevice.h:2765 [inline]
+ #1: ffff888070d30d38 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: netdev_lock_ops include/net/netdev_lock.h:42 [inline]
+ #1: ffff888070d30d38 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: __dev_ethtool net/ethtool/ioctl.c:3285 [inline]
+ #1: ffff888070d30d38 (&dev_instance_lock_key#20){+.+.}-{4:4}, at: dev_ethtool+0x716/0x19c0 net/ethtool/ioctl.c:3554
+
+stack backtrace:
+CPU: 0 UID: 0 PID: 19446 Comm: syz.1.3525 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
+Call Trace:
+ <TASK>
+ dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
+ print_deadlock_bug+0x28b/0x2a0 kernel/locking/lockdep.c:3041
+ check_deadlock kernel/locking/lockdep.c:3093 [inline]
+ validate_chain+0x1a3f/0x2140 kernel/locking/lockdep.c:3895
+ __lock_acquire+0xab9/0xd20 kernel/locking/lockdep.c:5237
+ lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
+ __mutex_lock_common kernel/locking/mutex.c:598 [inline]
+ __mutex_lock+0x187/0x1350 kernel/locking/mutex.c:760
+ netdev_lock include/linux/netdevice.h:2765 [inline]
+ netdev_lock_ops include/net/netdev_lock.h:42 [inline]
+ netdev_sync_lower_features net/core/dev.c:10737 [inline]
+ __netdev_update_features+0xcb1/0x1be0 net/core/dev.c:10907
+ netdev_change_features+0x72/0xd0 net/core/dev.c:10981
+ bond_compute_features+0x615/0x680 drivers/net/bonding/bond_main.c:1559
+ bond_slave_netdev_event drivers/net/bonding/bond_main.c:4030 [inline]
+ bond_netdev_event+0x72e/0xe80 drivers/net/bonding/bond_main.c:4075
+ notifier_call_chain+0x1b6/0x3e0 kernel/notifier.c:85
+ call_netdevice_notifiers_extack net/core/dev.c:2267 [inline]
+ call_netdevice_notifiers net/core/dev.c:2281 [inline]
+ netdev_features_change+0x85/0xc0 net/core/dev.c:1570
+ __dev_ethtool net/ethtool/ioctl.c:3521 [inline]
+ dev_ethtool+0x1541/0x19c0 net/ethtool/ioctl.c:3554
+ dev_ioctl+0x392/0x1150 net/core/dev_ioctl.c:773
+ sock_do_ioctl+0x22c/0x300 net/socket.c:1268
+ sock_ioctl+0x576/0x790 net/socket.c:1375
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl+0xfc/0x170 fs/ioctl.c:583
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fc1a3f8efc9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fc1a4e6f038 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007fc1a41e5fa0 RCX: 00007fc1a3f8efc9
+RDX: 0000200000000000 RSI: 0000000000008946 RDI: 0000000000000004
+RBP: 00007fc1a4011f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fc1a41e6038 R14: 00007fc1a41e5fa0 R15: 00007fc1a430fa28
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
