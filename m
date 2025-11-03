@@ -1,125 +1,143 @@
-Return-Path: <netdev+bounces-234991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13112C2AD78
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 10:48:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29BC6C2ADD7
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 10:53:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB8EC3B15EC
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 09:48:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A24518920AB
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 09:53:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D414D2EF66E;
-	Mon,  3 Nov 2025 09:48:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27FC52FAC0C;
+	Mon,  3 Nov 2025 09:53:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="Ri413WmE";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="K4t0bIfW"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="f0o0aiuS"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE4982EFD9C
-	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 09:48:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09F772FA0D3
+	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 09:53:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762163327; cv=none; b=AnhrO4oMRlpTaixKXTTmjMLynhkFgzggUgPW6wk1zRoZFYGTI/Xr/ADS+67vvsor+GP4qm3vggEdwBj+P+kB3R5pzy33Qjyniep17bq3lziPnciJcEmuTgwzDjWz6xFijmQMe2INzV6Y6RD8tXu+cUG1oRuHZ1+Zi5zIi+ap7wk=
+	t=1762163595; cv=none; b=gxHvsqM1Md5YW03iR2TOuu46KzG7he3H6YGdroWE6nh4b0hlK/Txbl4ZjJXA2vBev7ylBSxq8jh0wFZLTxvllUiSnHCgIIUFH1Epjx24SJFzjgt8rlhyQPyiugIyNc8PMsa5Mfwo8vnY+2pIIQEBVtG5jadIZUT5fXLk++wz4NM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762163327; c=relaxed/simple;
-	bh=zm00mBKzh6yr1bPyguW0ZhNzawn6mKn/TcJu8P9YQg8=;
+	s=arc-20240116; t=1762163595; c=relaxed/simple;
+	bh=2DLKMMDYDIwBWCZ+Hdh2QTXQ4OqfNeLj4JVT1oL8bdM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=igvqdtIHbyKygbx8/btYt5dZ7QUbu1DpgxHMbM26HVAPEeRhheYHUZtY76RGdTW3TpVQ6GCGXRehWLTw+ucGA2OdFYK8i01NqaaMBjV+8NJUSWbcS1qczwO8Zs20aCLRYxp8vsul387Kcd+Ejy1v27STwmghX4Ab9iwQ6NPbgyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=Ri413WmE; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=K4t0bIfW; arc=none smtp.client-ip=103.168.172.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-12.internal (phl-compute-12.internal [10.202.2.52])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id C5C62140015F;
-	Mon,  3 Nov 2025 04:48:43 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-12.internal (MEProxy); Mon, 03 Nov 2025 04:48:43 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1762163323; x=
-	1762249723; bh=8oVSbxL8/Vl46OPdbAdFkjiGGou6Oh572MSQXitvA4A=; b=R
-	i413WmEAQorC9lg5+yo2tWvz5aLWv/fiwOPwwi2MHBGHMsxu1h1N4V8xn4FtkbXF
-	SakMh7EqYvlz+LEj4J8UouH94y3PrqAoj+yghbtEbpNl0m3HDTPl37gDD2XpSCHB
-	d9HRLE8e0Z+KLCEywi/K1tQoPCv6pHRYMEIz/zPX0RRni6cyIS4y8lDz3gIYfREc
-	W9GcPZBkT0v71ThoknB3fIRLqzIZrx8uSIgfF37wGPNNieIgSyFXCcBaFQYzO8rA
-	jq3OBm70zLMvrn0wIiFMsN7QF2s72fODH7PYn9BrrUYAWv4ZE84oOhE7McsLrjFD
-	q63u4Jl2/vG+zC5oE3s1A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1762163323; x=1762249723; bh=8oVSbxL8/Vl46OPdbAdFkjiGGou6Oh572MS
-	QXitvA4A=; b=K4t0bIfWISoCTA4t1a0ruZ8P8apjVIsT2NG7SOAUHAxLOKHiYae
-	CQQbbtdoFG5/HB98l01fq244ZMCbYIhfgKjNOA+M3sazU8/QTm2q9IMnQKvomkcb
-	rAr+b1Vtx6oI2ZA0p8km7cv3fah6tQu3xZaC6JySH02C/8SpyCjwRqZSZYDLNPTR
-	T1xJuDVgkp52Zc4GFm5eCJir2Dj6ZLJhxj4pWSjBJaQzA9DcABfYgCPG5jXFfJLv
-	oEw8wKwNH1/aDpk1VTqnKds5/P2I2IH6LL3OyzS9I7IjAiKnmycvQsISD6zO2AtF
-	f8dR0jQrn4ItWwEbzB+5j2/Em1sScnJiToQ==
-X-ME-Sender: <xms:e3oIaTMs0driaLIYLAZDuSnn06cJcYr-RBrsT_Q-984Mv3QRIWVvyQ>
-    <xme:e3oIaU9k-HRA7dmnhNJkC9Fj9Kp2_f56wQ6KDhElUyeyd3QRyyBOvS9kxUkuXS0wG
-    t3MdhkFW_7L5IUv8v38LHSxwUs2JAQrcBEsrQORfn7OssxMBIvOEKmB>
-X-ME-Received: <xmr:e3oIaXS9n2AKk4zNav4Eb8-UBvvlyH2mzEWhR3a1rLdXbEpMKu65Y7-HWEI2>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddujeejkeduucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopeegpdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopegushgrhhgvrhhnsehkvghrnhgvlhdrohhrgh
-    dprhgtphhtthhopehsthgvphhhvghnsehnvghtfihorhhkphhluhhmsggvrhdrohhrghdp
-    rhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtth
-    hopehsthgvfhhfvghnrdhklhgrshhsvghrthesshgvtghunhgvthdrtghomh
-X-ME-Proxy: <xmx:e3oIaWnwScBSC1fCd-_Z481gUIZTBlBN-y7805XxOHG5jOr2oKIZrA>
-    <xmx:e3oIaXTohqnGH6NM5-On8ATnvoCCn8zYcnrqDFVw-o7hAxisHhoLyA>
-    <xmx:e3oIaUN_z5RFBlUetzBApsLPmUwMfUamsMpVxz_-LjK2OStr1PpPNA>
-    <xmx:e3oIaQV1XrweOWBWezh45ccblddbYd1qZjjY1vq3c4mFBbTLt1RMzw>
-    <xmx:e3oIaQ-O_JaKr337AnlQbSRMmw5v_YgvBNlRHKvvW6ShTCkexzJi38NR>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 3 Nov 2025 04:48:42 -0500 (EST)
-Date: Mon, 3 Nov 2025 10:48:41 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: David Ahern <dsahern@kernel.org>
-Cc: Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org,
-	Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [PATCH iproute2-next] ip-xfrm: add pcpu-num support
-Message-ID: <aQh6ed8g8CUjPG4o@krikkit>
-References: <2623d62913de4f0e5e1d6a8b8cbcab4a9508c324.1761735750.git.sd@queasysnail.net>
- <20251030090615.28552eeb@phoenix>
- <aQP6Ev_21Z45JuG9@krikkit>
- <bfdd7558-31d8-4d83-8532-40f2371dfe34@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=cyjka5qOLH9HEO7o7Bhjl88/0inA/03uuDy0nn70hXLWE+PDl/ukaXu1LFkufAj9N2qXHhgx+r9kxxkdlWGEUMxyUKd0WZW/dl57DpSyg3sgef4Ms+fV93Nw1MOGmgje4wj2c/4IWWFFsYHCmpKrWqTqooKkVETegrutZpdnfTk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=f0o0aiuS; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=cMx/pBIc7baCIIFWi7F4x4oW//4oX2tqQgVeFsSMo44=; b=f0o0aiuSsPBELTITSHiT3sl/9F
+	ShJW0uMV84XXqKe4DehAuu+wJzWgWhk7SWRFBP0A3rg76j4tuP6h7DgXL0+ao8kzDoUgxYVP9f6Kc
+	obDUjGatfPJ1zHDrnwLuMjQItLa0XRvgJA7U6JQUvhQOxBJrNlVx+BUnb1P2aCM/gCPr1AoxGSa66
+	8PdsRaHvNHOSdMpeDAUBDQLXtn/S4vzKPFVAAqLAFUHLmRDPbotH8s7FhKPmJvB/3tSOuAcsNPI6N
+	2ZN0iLv6qwulY6mTM2Jj7MX5w5PmW4UoxJzDR0g9qtgzz3KvfxFLOGdYj8MU/t4KYfb4CuUlJxV4v
+	Z04rEpow==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54432)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vFrEz-000000000Tv-17fT;
+	Mon, 03 Nov 2025 09:52:45 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vFrEs-000000003hg-47Cx;
+	Mon, 03 Nov 2025 09:52:39 +0000
+Date: Mon, 3 Nov 2025 09:52:38 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Alexis =?iso-8859-1?Q?Lothor=E9?= <alexis.lothore@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Boon Khai Ng <boon.khai.ng@altera.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Furong Xu <0x1207@gmail.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Yu-Chun Lin <eleanor15x@gmail.com>
+Subject: Re: [PATCH net-next 0/3] net: stmmac: phylink PCS conversion part 3
+ (dodgy stuff)
+Message-ID: <aQh7Zj10C7QcDoqn@shell.armlinux.org.uk>
+References: <aP03aQLADMg-J_4W@shell.armlinux.org.uk>
+ <aQExx0zXT5SvFxAk@oss.qualcomm.com>
+ <aQHc6SowbWsIA1A5@shell.armlinux.org.uk>
+ <aQNmM5+cptKllTS8@oss.qualcomm.com>
+ <aQOB_yCzCmAVM34V@shell.armlinux.org.uk>
+ <aQOCpG_gjJlnm0A1@shell.armlinux.org.uk>
+ <aQhusPX0Hw9ZuLNR@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <bfdd7558-31d8-4d83-8532-40f2371dfe34@kernel.org>
+In-Reply-To: <aQhusPX0Hw9ZuLNR@oss.qualcomm.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-2025-10-30, 19:32:10 -0600, David Ahern wrote:
-> On 10/30/25 5:51 PM, Sabrina Dubroca wrote:
-> > With the netlink specs project, it's also maybe less attractive?
-> > (netlink spec for ipsec is also on my todo list and I've given
-> > it a look, ipxfrm conversion is probably easier)
+On Mon, Nov 03, 2025 at 02:28:24PM +0530, Mohd Ayaan Anwar wrote:
+> On Thu, Oct 30, 2025 at 03:22:12PM +0000, Russell King (Oracle) wrote:
+> > On Thu, Oct 30, 2025 at 03:19:27PM +0000, Russell King (Oracle) wrote:
+> > > > 
+> > > > This is probably fine since Bit(9) is self-clearing and its value just
+> > > > after this is 0x00041000.
+> > > 
+> > > Yes, and bit 9 doesn't need to be set at all. SGMII isn't "negotiation"
+> > > but the PHY says to the MAC "this is how I'm operating" and the MAC says
+> > > "okay". Nothing more.
+> > > 
+> > > I'm afraid the presence of snps,ps-speed, this disrupts the test.
+> > 
+> > Note also that testing a 10M link, 100M, 1G and finally 100M again in
+> > that order would also be interesting given my question about the RGMII
+> > register changes that configure_sgmii does.
 > > 
 > 
-> That is an interesting question. I guess it depends on the long term
-> expectations for the tooling. There is a lot to like about the specs.
-> Does Red Hat include the commands in recent RHEL releases? ie., do we
-> know of it gaining traction in the more "popular" OS releases?
+> Despite several attempts, I couldn't get 10M to work. There is a link-up
+> but the data path is broken. I checked the net-next tip and it's broken
+> there as well.
+> 
+> Oddly enough, configure_sgmii is called with its speed argument set to
+> 1000:
+> [   12.305488] qcom-ethqos 23040000.ethernet eth0: phy link up sgmii/10Mbps/Half/pause/off/nolpi
+> [   12.315233] qcom-ethqos 23040000.ethernet eth0: major config, requested phy/sgmii
+> [   12.322965] qcom-ethqos 23040000.ethernet eth0: interface sgmii inband modes: pcs=00 phy=03
+> [   12.331586] qcom-ethqos 23040000.ethernet eth0: major config, active phy/outband/sgmii
+> [   12.339738] qcom-ethqos 23040000.ethernet eth0: phylink_mac_config: mode=phy/sgmii/pause adv=0000000,00000000,00000000,00000000 pause=00
+> [   12.355113] qcom-ethqos 23040000.ethernet eth0: ethqos_configure_sgmii : Speed = 1000
+> [   12.363196] qcom-ethqos 23040000.ethernet eth0: Link is Up - 10Mbps/Half - flow control off
 
-Yes, it's present in the latest RHEL release and recent Fedoras.
-(no idea what Debian and Ubuntu do)
+If you have "rate matching" enabled (signified by "pause" in the mode=
+part of phylink_mac_config), then the MAC gets told the maximum speed for
+the PHY interface, which for Cisco SGMII is 1G. This is intentional to
+support PHYs that _really_ do use rate matching. Your PHY isn't using it,
+and rate matching for SGMII is pointless.
+
+Please re-run testing with phy-mode = "sgmii" which you've tested
+before without your rate-matching patch to the PHY driver, so the
+system knows the _correct_ parameters for these speeds.
 
 -- 
-Sabrina
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
