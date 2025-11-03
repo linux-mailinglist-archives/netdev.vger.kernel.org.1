@@ -1,125 +1,146 @@
-Return-Path: <netdev+bounces-235078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FFCDC2BD45
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 13:51:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3501DC2BD2A
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 13:50:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 477F13A765D
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 12:46:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C35871897213
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 12:49:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17CF630C379;
-	Mon,  3 Nov 2025 12:45:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F9E7302142;
+	Mon,  3 Nov 2025 12:48:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vPmF0CSo"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="2tFdT9lH"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta0.migadu.com (out-173.mta0.migadu.com [91.218.175.173])
+Received: from server.couthit.com (server.couthit.com [162.240.164.96])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5721130171A
-	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 12:45:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D6A2D8360;
+	Mon,  3 Nov 2025 12:48:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762173946; cv=none; b=tTWBXvYVO3UgACWWhyOsOC8rq8hepEZfk/N3ZEv8RmAIM7TQ8pakOLy1dMAWQWfiKOOhDQO97oJuwljrxON8Wx/HgrO6scaRBBs6kEepRIh+YG2X0GzpeXZ/AwfOXpY8T0PzM6bbXdbDcC7uA7rhgKUPwU00PCvgUH4RXggH/+k=
+	t=1762174131; cv=none; b=Iytb0X4vytTuF9wegRsiIkRQaIeF1fQpM+YXwfP5C8OKxN7EnpUdiGoLR6Z2AyESeQQjWpPq8vC5flPE84gHsRPlAb7r22LTtSuUXxbcVfHf/1c3+zln7WKVgxHgdwIJfxEEVKLxC54+3xK3YiAoJFtfJ89avLR6wJSRdseA1EA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762173946; c=relaxed/simple;
-	bh=PXv1z36/be6/4aY9ewYt8RoZMabXtTyrqmzZIbYsjrg=;
-	h=MIME-Version:Date:Content-Type:From:Message-ID:Subject:To:Cc:
-	 In-Reply-To:References; b=I7EmUqbt4zsMmUxg8Wnv0U6Wi/KKDHF4vVkVinLeODL95Mnj4BmvyO6u0LNmOKGcns4wTFPazTSuOIHI58lQPUz82qUdZc4v/BFOwO2BsjGbVycyX5zQfGv/k0MsaFncUAA2o7H2xohr0eQvVy8tVzdA7DrXwLMiyQUZ9ZhbthE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vPmF0CSo; arc=none smtp.client-ip=91.218.175.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+	s=arc-20240116; t=1762174131; c=relaxed/simple;
+	bh=IdboKY1PXrAGO4syzkQNEAjYzB+o+QEgylf92LdeBrI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kQf4TmDUtUAATcqBUnzY0AUNDBt6gSKuugOQ0j62ze9RhRuuqQqAsaCO1CCwjMXJWUY0uXSTKA5RonB85XBgxs41uEapgwGusYXasRgmjiOxLhfJLBM4Q26VEqrMnWgNy/XID4vnQGAolRvVJ9MWL74FWy/c8OpjhBUv3CWrRmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=2tFdT9lH; arc=none smtp.client-ip=162.240.164.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject
+	:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=Nxcpn3Hue00ov8/8RT06Ws2hq4Ob1LXYSYCqOo+CjUY=; b=2tFdT9lHy2ok+cgcrmkWs3jB8F
+	jE4Isj+ka+TpLW+yweBh8xOAqS5epzOkHAjveR/lVHYI0CzFbZanZefWzhgPgxGccIbTDx1aJPk5n
+	fmvTkmnRgD9aMVq8iVwx1+ARgZxor6BBVv3EO+cxvVrFqDILmToIcB78KbREbzjc8+Uf5CBFTLxyX
+	rCru5wc6S2BasR6gc62cHpdY/rgfjjKBElgAzF5OAVO5MeXtkVFWdDGZGlzWxPRtqrHTjAM58JAdI
+	aMUIWPGQr/+O5Z8mBtEKV90/bQFulmJ57FH51a0wDtGUQKKL4/7HJB4hXFaqzgds6fCeKqTmWmced
+	5O1Ds9cQ==;
+Received: from [122.175.9.182] (port=21157 helo=cypher.couthit.local)
+	by server.couthit.com with esmtpa (Exim 4.98.1)
+	(envelope-from <parvathi@couthit.com>)
+	id 1vFtzK-00000006SBs-1h7P;
+	Mon, 03 Nov 2025 07:48:46 -0500
+From: Parvathi Pudi <parvathi@couthit.com>
+To: nm@ti.com,
+	vigneshr@ti.com,
+	tony@atomide.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	richardcochran@gmail.com
+Cc: linux-omap@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	andrew@lunn.ch,
+	danishanwar@ti.com,
+	pratheesh@ti.com,
+	j-rameshbabu@ti.com,
+	praneeth@ti.com,
+	srk@ti.com,
+	rogerq@ti.com,
+	krishna@couthit.com,
+	mohan@couthit.com,
+	pmohan@couthit.com,
+	basharath@couthit.com,
+	parvathi@couthit.com
+Subject: [PATCH v2 0/2] Add support for ICSSM Ethernet on AM57x, AM437x, and AM335x
+Date: Mon,  3 Nov 2025 18:17:22 +0530
+Message-ID: <20251103124820.1679167-1-parvathi@couthit.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1762173932;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1BZfPsf1uykEsk+GOZr7evhjaMa7D7ZzUYhWF9AmfpY=;
-	b=vPmF0CSob2yFKuI+FJqd06xxfooXyeA+NbfplTK9R97Dz+z4wtnUJcjGrjjIFv/PFY3/x4
-	1g4cGTwE/H/xndi4RmDpIdrXZtl6N5zdHsQYML0E6jkTvTMEFixJC+0jrgQZWOlweA4gwF
-	4RTX2ZHzgNFnGJjCn/PqUSq9rhXF1qw=
-Date: Mon, 03 Nov 2025 12:45:29 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: "Jiayuan Chen" <jiayuan.chen@linux.dev>
-Message-ID: <43899f2857ba10fbcc90f9d273bb09dadd7229ec@linux.dev>
-TLS-Required: No
-Subject: Re: [PATCH net v3 1/3] net,mptcp: fix proto fallback detection with
- BPF sockmap
-To: "Paolo Abeni" <pabeni@redhat.com>, mptcp@lists.linux.dev
-Cc: stable@vger.kernel.org, "Jakub Sitnicki" <jakub@cloudflare.com>, "John
- Fastabend" <john.fastabend@gmail.com>, "Eric Dumazet"
- <edumazet@google.com>, "Kuniyuki Iwashima" <kuniyu@google.com>, "Willem
- de Bruijn" <willemb@google.com>, "David S. Miller" <davem@davemloft.net>,
- "Jakub Kicinski" <kuba@kernel.org>, "Simon Horman" <horms@kernel.org>,
- "Matthieu Baerts" <matttbe@kernel.org>, "Mat Martineau"
- <martineau@kernel.org>, "Geliang Tang" <geliang@kernel.org>, "Andrii
- Nakryiko" <andrii@kernel.org>, "Eduard Zingerman" <eddyz87@gmail.com>,
- "Alexei Starovoitov" <ast@kernel.org>, "Daniel Borkmann"
- <daniel@iogearbox.net>, "Martin KaFai Lau" <martin.lau@linux.dev>, "Song
- Liu" <song@kernel.org>, "Yonghong Song" <yonghong.song@linux.dev>, "KP
- Singh" <kpsingh@kernel.org>, "Stanislav Fomichev" <sdf@fomichev.me>, "Hao
- Luo" <haoluo@google.com>, "Jiri Olsa" <jolsa@kernel.org>, "Shuah Khan"
- <shuah@kernel.org>, "Florian Westphal" <fw@strlen.de>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
-In-Reply-To: <7dfda5bb-665c-4068-acd4-795972da63e8@redhat.com>
-References: <20251023125450.105859-1-jiayuan.chen@linux.dev>
- <20251023125450.105859-2-jiayuan.chen@linux.dev>
- <c10939d2-437e-47fb-81e9-05723442c935@redhat.com>
- <7dfda5bb-665c-4068-acd4-795972da63e8@redhat.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.couthit.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: parvathi@couthit.com
+X-Authenticated-Sender: server.couthit.com: parvathi@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-October 28, 2025 at 19:47, "Paolo Abeni" <pabeni@redhat.com mailto:pabeni=
-@redhat.com?to=3D%22Paolo%20Abeni%22%20%3Cpabeni%40redhat.com%3E > wrote:
+Hi,
 
+This series adds support for ICSSM Ethernet on Texas Instruments AM57x,
+AM437x and AM335x platforms.
 
->=20
->=20On 10/28/25 12:30 PM, Paolo Abeni wrote:
->=20
->=20>=20
->=20> On 10/23/25 2:54 PM, Jiayuan Chen wrote:
-> >=20
->=20> >=20
->=20> > When the server has MPTCP enabled but receives a non-MP-capable r=
-equest
-> > >  from a client, it calls mptcp_fallback_tcp_ops().
-> > >=20
->=20> >  Since non-MPTCP connections are allowed to use sockmap, which re=
-places
-> > >  sk->sk_prot, using sk->sk_prot to determine the IP version in
-> > >  mptcp_fallback_tcp_ops() becomes unreliable. This can lead to assi=
-gning
-> > >  incorrect ops to sk->sk_socket->ops.
-> > >=20
->=20>=20=20
->=20>  I don't see how sockmap could modify the to-be-accepted socket sk_=
-prot
-> >  before mptcp_fallback_tcp_ops(), as such call happens before the fd =
-is
-> >  installed, and AFAICS sockmap can only fetch sockets via fds.
-> >=20=20
->=20>  Is this patch needed?
-> >=20
->=20Matttbe explained off-list the details of how that could happen. I th=
-ink
-> the commit message here must be more verbose to explain clearly the
-> whys, even to those non proficient in sockmap like me.
->=20
->=20Thanks,
->=20
->=20Paolo
->
+The AM57x and AM437x IDKs support two PRU-ICSS instances, each consisting
+of two PRU cores, with each PRU-ICSS instance capable of handling two
+Ethernet ports. For the AM57x platforms, the PRU-ICSS2 node has been added
+to the am57xx-idk-common.dtsi, while for the AM437x platform, the PRU-ICSS1
+node has been added to the am437x-idk-evm.dts.
 
-Thanks, I will add more details into commit message :).
+The AM335x ICE features a single PRU-ICSS instance. A new device tree source
+file, am335x-icev2-prueth.dts, has been introduced to define the PRU-ICSS node
+for the AM335x platform.
+
+This is v2 of the patch series [v1]. It addresses comments made on [v1].
+This series is based on the latest next-20251103 linux-next.
+
+Changes from v1 to v2 :
+
+*) Addressed Andrew Lunn's comment on patch 1 of the series.
+*) Addressed MD Danish Anwar comment on patch 1 of the series.
+*) Rebased the series on latest linux-next.
+
+[v1] https://lore.kernel.org/all/20251013125401.1435486-1-parvathi@couthit.com/
+
+Thanks and Regards,
+Parvathi.
+
+Roger Quadros (2):
+  arm: dts: ti: Adds device tree nodes for PRU Cores, IEP and eCAP
+    modules of PRU-ICSS2 Instance.
+  arm: dts: ti: Adds support for AM335x and AM437x
+
+ arch/arm/boot/dts/ti/omap/Makefile            |   1 +
+ .../boot/dts/ti/omap/am335x-icev2-prueth.dts  | 533 ++++++++++++++++++
+ arch/arm/boot/dts/ti/omap/am33xx-l4.dtsi      |  11 +
+ arch/arm/boot/dts/ti/omap/am4372.dtsi         |  11 +
+ arch/arm/boot/dts/ti/omap/am437x-idk-evm.dts  | 137 ++++-
+ arch/arm/boot/dts/ti/omap/am57-pruss.dtsi     |  11 +
+ arch/arm/boot/dts/ti/omap/am571x-idk.dts      |   8 +-
+ arch/arm/boot/dts/ti/omap/am572x-idk.dts      |  10 +-
+ arch/arm/boot/dts/ti/omap/am574x-idk.dts      |  10 +-
+ .../boot/dts/ti/omap/am57xx-idk-common.dtsi   |  61 ++
+ 10 files changed, 783 insertions(+), 10 deletions(-)
+ create mode 100644 arch/arm/boot/dts/ti/omap/am335x-icev2-prueth.dts
+
+-- 
+2.43.0
+
 
