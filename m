@@ -1,88 +1,88 @@
-Return-Path: <netdev+bounces-235196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCA34C2D620
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 18:12:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DF0DEC2D611
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 18:11:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E2DE424923
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 17:02:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14BD6424CA0
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 17:02:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAD5631D727;
-	Mon,  3 Nov 2025 17:00:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1663F321F51;
+	Mon,  3 Nov 2025 17:00:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eHgEpyj3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uq/IQPUV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2571A320A34
-	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 17:00:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24E82322522
+	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 17:00:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762189238; cv=none; b=biQS660RLp4YvxouEQAKbM0v4cQzWpOhybXfbQsRfZ2NK4y3o0RL7M37FMl1z9BR535OgZX++RQXZNa8oMABykgrrpD1jHWTcFws2H76rO4Wn/TNcvH3m4Jh8SFxBoPq0dblrditodkxw5tVgvLjPQP0qdPVS/8M/krH277ecqQ=
+	t=1762189245; cv=none; b=NiO7dNBPKx11IKUjltQ4YfOSV4pXtMwjUxKZmJt/GqUOObiNIfpImcFylcGY1rsNMxv1WytbqwpWTMQXJlnqtWQKdupeP4zvAAQl+9hYywdgx790kpTC5ES8hZSx4AEMmkGlAfcmApRyXP3YqCUSNHkAzmIDoy/gD6bylAW2wmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762189238; c=relaxed/simple;
-	bh=PGzGzCF6UxgVNASQaBT/GaWXHMATUl3Sj4fnjhgEKuQ=;
+	s=arc-20240116; t=1762189245; c=relaxed/simple;
+	bh=646ZlTGJec+c4mMOS9NaFbC3q6ZhS5JORiJKQHy2jS0=;
 	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CUZ476PsabEPnKsYMT8fifjnqBMc116/4luwhKTozYBAtqBnf4TXybZYMG6ghhVZosmrYb5QYlbpZk1OIGBSr3HQKmLJ/sVCp+VysBzjM9dsgdqLplZaJoLMGK5ellk1ugxRX83U9YH5IBRblYyrvkjRalWR6JrjTn6EiKjV6iA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eHgEpyj3; arc=none smtp.client-ip=209.85.210.175
+	 MIME-Version:Content-Type; b=CiDlo7wu187Adzkas7Ma3exJ61oSbc0JpU0A1l9rU0LO8LndIjevs8AIHUv22cWQf+q8k96jE+Lu4TVJ6YOEygM0kjhajPEYMJzOG0Jl/dd3YrMh8V0MylOQYkxK7h/pY8FuIEhvgnGkprhrHYMutCLsfidltevkWlsRFz+p79U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Uq/IQPUV; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7aad4823079so1263490b3a.0
-        for <netdev@vger.kernel.org>; Mon, 03 Nov 2025 09:00:37 -0800 (PST)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-294fb21b160so32544405ad.1
+        for <netdev@vger.kernel.org>; Mon, 03 Nov 2025 09:00:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762189236; x=1762794036; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1762189243; x=1762794043; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=IUcb65gV3RVt7XYkCK3R6y1Rp5+wDyyVvZHmT9s6+hw=;
-        b=eHgEpyj3IVE1f+j8Oq8h7b++TmyInd1/OQshDBS8vZXye87g5RpOX+hFO9bdR9I5m7
-         C/Fj0hECitrlzWodixNoNhxq/1CBS+5AGX3V/DoR4vM5E2Ya5jhBV259vt42T8Elg9Aj
-         UxAMOFX1HlMAGHBCMk6aYeR5VxgUzvvgbrgD68a30htvIbNQX8XEu1OYA0qoL31pgNdI
-         cZgHTARa/2OiUFb7xDeMbbMUmW5TJU+1bCLtk0nbT7jOqqpZCUT3mi11UIhMpH1WEpuL
-         1RJBS4YX94RZnrHnhlcC94Pm9cvgraYfj5+qyyT63Hlxxc5iiudMUFF8EeeAzQfg6gVL
-         c2IQ==
+        bh=ckLU6xWUzuud+l0EZTiA4DFH3yIgyMcuuXufc5PsnyA=;
+        b=Uq/IQPUVdbjl5l/SnYbf2RD7IUbxcndN+rcvlpuBu67cRpsgc5Wvi/qLuXVpCGGqBQ
+         3JxPpoJPsT3XL80iXsgb8j59eIxRvJKPmPyxuBXF/Rdq0gaZMbNLFbbU2SYlsnwZhuAP
+         4rbKYBfgMauNOmQYusqX8XXZMe+MHRjV2SVbbvdOgmcYzcFGUSidj4KpNNRPREo94m0t
+         KIWK+J5qOB8CT5igCuNcvy9A0DlWPBVOJKf72mhzXNVtBNhica04uEaZjfvkj2HENy/3
+         V50BcExEEOWRiQU4HW5mSxxQ4mwgOdRYGXWN7y2veJGsJOCgvGoK8vwk5G8k1E3JroBy
+         5Tuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762189236; x=1762794036;
+        d=1e100.net; s=20230601; t=1762189243; x=1762794043;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=IUcb65gV3RVt7XYkCK3R6y1Rp5+wDyyVvZHmT9s6+hw=;
-        b=oN0p+PohLOp6mS0LIbDM3A3LzyQx00lkBsIP03OOzpF/aByJ7ka2K3A2120dWgmq3F
-         OuJeXhrLM4HgxYJEllUOCpKhuPCSZWLiFCsPRNKWogvwe//bXow+54hyN5L42ONwL8K7
-         A3vqDX3A7QAy3eEB+m4t/2IULVqByWnvHoJtU4UgA0NZdMUtyHR7HvZT5FlfoLT1qXye
-         7vTV7vn8DI4AXYAC1GBZ5jV73vzzAfj9Ry4Y6UcFyZRPek79ySZrypBlKDDaNs32vcRK
-         UJoPDv6G64xfBm3k+fQ9CED+N+OF2b8He+mOs7i8ZjtO/VEpF/XY8SlF+u5KZiUMAgmi
-         8ICg==
-X-Gm-Message-State: AOJu0Yw5M2sdHHcROuTAyocslUHh8MjyvI0lFqF8ElnHPtvZ0/6Wgdq3
-	BlfI/rkLJNFmSVYi+EzXjPeHEo39JqD/C42R5HClU0bGpcl59/M13kt3wZcg6A==
-X-Gm-Gg: ASbGncuCPdecZBs8JH+zrgmnRqDbHFct9KaQFC7GF4cE+AJZEgJHN5CdM0G6W0UjC3W
-	cufy4R35VjQmHPBXZjCwacXghkknb7WIz0jObSK3GuCEF+kee5bYY9W4+lOa2aN4crkhNQlXIqC
-	k9IfpUdEb6g+C/6QwSyn1btLfpw25rPCk3yNjKl+sje91GA49oPNDs6WMPaD+wmKmTmOqQkLhIt
-	fi6AGB8wVvp+g+20DRjHh4RodUkVJEhbr+qP4M5feFuWo6W+o+0NRmpAmqrtHGAeNKfVHB3h3tZ
-	VRvWxbs3mIMJj0QkKKv1zObWvxpd0s9+cMs48Y5iRmIZf5Ws2zG4lUGeyWy59w3JoitFosHdpyb
-	qtRiGcFwcjRLGBbSo6o64geQ1FFAy93iRHiItQoFNbQZhB3v++eraWjY/N3yEMVuzzVGZk6ZcsB
-	hdqROS+VtJN/B8CDMpndNlTq5Jsg314FgG1w==
-X-Google-Smtp-Source: AGHT+IHjGlW6/nf7G6Um6NEYP2S0sCzId2VpIkIC+v+O+LayUcMhsPG+KnZ802j55WH+fbij4mAJgg==
-X-Received: by 2002:a05:6a00:28cb:b0:7aa:4b8:179 with SMTP id d2e1a72fcca58-7aa04b80436mr5478755b3a.1.1762189235867;
-        Mon, 03 Nov 2025 09:00:35 -0800 (PST)
+        bh=ckLU6xWUzuud+l0EZTiA4DFH3yIgyMcuuXufc5PsnyA=;
+        b=mKZBqKlg8uTjZOffgBA9ACCWPV5cGwaqc/tF1H3vfXh8xLye4jolbWnMES0c47ibLQ
+         Qk6OWPj9FQla7UvvPR/SpxHhxCprWNrn9U5Okxp6jnG8+2ftfRekcMrzJWIkZXOIKO0h
+         GA0eJHUu3BiLZXAi8hgxdHIKUuM1j8zx57BQwSXAk2k+NSIA5qKCWJYo1lWlfniwj0Ve
+         jsvKIS8Yv1ssin6YCmQJJLPrCTQj4hqJtfW5NYAVyTvwk1YLQMBnwefdIEJwdlv18FXx
+         sqz6y4/mOv7lzKLsbJ5M34BGoAmAI2nZjCMGog/abX7Gg053tCJ0YPHAV+1AvKxXhsHj
+         05kg==
+X-Gm-Message-State: AOJu0YyRr7q4oeghdc2zwctlY8e8LhOwaT4TzpgKZlT8XdkohVnD+Fla
+	lFhBXPysb//XiPjfO5LrefeVN0PQrA0v7arQIrg23aYQqI9O8b3xk8WvpUt6kg==
+X-Gm-Gg: ASbGncssQWzgFAKhC4BVyRqkXECSw7SwSrVKiql1jD3VmjHmX6hiG9qan/ptrWZjarb
+	iwEnLKFn1Jd/V2kvcbgheuws4F+6eRF0Fpd7Oqh5z/xbzU7+MowJX/Rpblj9YL4S/AxsCjBCUnv
+	DPjVdO0i8TbtI/e7ADulHTVPC8dIY9UepG4BtYFT1jUIbOcEH8Wpdu62hDBItyqMdLM3B+fx5i3
+	cVs3bZ+asLv6I2GjgR7nLAs0JcAJEIu9PrY1yYX36caN7eImLw7jnIET3v3gKJrf9utI/6NnQas
+	RvRitYQIDavMEdOyvR3Kk3Yq0Nn+sGLZYBOFkceEM3M7oiWV1qk3Odkv4IoCb7C/o81JaE51W04
+	2HoPmrxy8qNQVSK+3cFmqRvGh6bkGqJFL3geXCZDiV65sFQuT1PWAF88FCJ1MIiPMOXOxJVEGwO
+	uwkjkXzke8R7r4Tl5f3QveWR7aJR3lm1z9lw==
+X-Google-Smtp-Source: AGHT+IEvE+DKZracKKXNv2t0/fJ4N3mUj3DuB7XOdUlltXO4+thd9FghKn5nNx6zLHZVO5O7mJoWcg==
+X-Received: by 2002:a17:903:2282:b0:295:5132:1aa5 with SMTP id d9443c01a7336-295513221e2mr137269225ad.55.1762189242569;
+        Mon, 03 Nov 2025 09:00:42 -0800 (PST)
 Received: from ahduyck-xeon-server.home.arpa ([2605:59c8:829:4c00:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7a7db09f362sm11766661b3a.38.2025.11.03.09.00.34
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2952699b603sm127782445ad.79.2025.11.03.09.00.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Nov 2025 09:00:35 -0800 (PST)
-Subject: [net-next PATCH v2 05/11] net: phy: Add fbnic specific PHY driver
- fbnic_phy
+        Mon, 03 Nov 2025 09:00:42 -0800 (PST)
+Subject: [net-next PATCH v2 06/11] fbnic: Rename PCS IRQ to MAC IRQ as it is
+ actually a MAC interrupt
 From: Alexander Duyck <alexander.duyck@gmail.com>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org, kernel-team@meta.com, andrew+netdev@lunn.ch,
  hkallweit1@gmail.com, linux@armlinux.org.uk, pabeni@redhat.com,
  davem@davemloft.net
-Date: Mon, 03 Nov 2025 09:00:34 -0800
+Date: Mon, 03 Nov 2025 09:00:41 -0800
 Message-ID: 
- <176218923429.2759873.17230953529492488834.stgit@ahduyck-xeon-server.home.arpa>
+ <176218924103.2759873.8687328716983200406.stgit@ahduyck-xeon-server.home.arpa>
 In-Reply-To: 
  <176218882404.2759873.8174527156326754449.stgit@ahduyck-xeon-server.home.arpa>
 References: 
@@ -99,128 +99,263 @@ Content-Transfer-Encoding: 7bit
 
 From: Alexander Duyck <alexanderduyck@fb.com>
 
-With this change we are effectively adding a stub PHY driver for the fbnic
-driver to enable it to report link state of the PMA/PMD separately from the
-PCS. This is needed as the firmware will be performing link training when
-the link is first detected and this will in turn cause the PCS to link flap
-if we don't add a delay to the PMD link up process to allow for this.
+Throughout several spots in the code I had called out the IRQ as being
+related to the PCS. However the actual IRQ is a part of the MAC and it is
+just exposing PCS data. To more accurately reflect the owner of the calls
+this change makes it so that we rename the functions and values that are
+taking in the interrupt value and processing it to reflect that it is a MAC
+call and not a PCS one.
 
-With this change we are able to identify the device based on the PMA/PMD
-and PCS pair being used. The logic is mostly in place to just handle the
-link detection and report the correct speed for the link.
-
-This patch is using the gen10g_config_aneg stub to skip doing any
-configuration for now. Eventually this will likely be replaced as we
-actually start adding configuration bits to the driver.
+This change is mostly motivated by the fact that we will be moving the
+handling of this interrupt from being PCS focused to being more PMA/PMD
+focused as this will drive the phydev driver that I am adding instead of
+driving the PCS directly.
 
 Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
 ---
- MAINTAINERS                 |    1 +
- drivers/net/phy/Kconfig     |    6 +++++
- drivers/net/phy/Makefile    |    1 +
- drivers/net/phy/fbnic_phy.c |   52 +++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 60 insertions(+)
- create mode 100644 drivers/net/phy/fbnic_phy.c
+ drivers/net/ethernet/meta/fbnic/fbnic.h         |    6 ++--
+ drivers/net/ethernet/meta/fbnic/fbnic_irq.c     |   32 ++++++++++++-----------
+ drivers/net/ethernet/meta/fbnic/fbnic_mac.c     |   14 +++++-----
+ drivers/net/ethernet/meta/fbnic/fbnic_mac.h     |    8 +++---
+ drivers/net/ethernet/meta/fbnic/fbnic_netdev.c  |    4 +--
+ drivers/net/ethernet/meta/fbnic/fbnic_phylink.c |    2 +
+ 6 files changed, 33 insertions(+), 33 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 1ab7e8746299..ce18b92f3157 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -16712,6 +16712,7 @@ R:	kernel-team@meta.com
- S:	Maintained
- F:	Documentation/networking/device_drivers/ethernet/meta/
- F:	drivers/net/ethernet/meta/
-+F:	drivers/net/phy/fbnic_phy.c
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic.h b/drivers/net/ethernet/meta/fbnic/fbnic.h
+index b03e5a3d5144..98929add5f21 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic.h
+@@ -34,7 +34,7 @@ struct fbnic_dev {
+ 	u32 __iomem *uc_addr4;
+ 	const struct fbnic_mac *mac;
+ 	unsigned int fw_msix_vector;
+-	unsigned int pcs_msix_vector;
++	unsigned int mac_msix_vector;
+ 	unsigned short num_irqs;
  
- METHODE UDPU SUPPORT
- M:	Robert Marko <robert.marko@sartura.hr>
-diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-index 98700d069191..16d943bbb883 100644
---- a/drivers/net/phy/Kconfig
-+++ b/drivers/net/phy/Kconfig
-@@ -230,6 +230,12 @@ config DAVICOM_PHY
- 	help
- 	  Currently supports dm9161e and dm9131
+ 	struct {
+@@ -175,8 +175,8 @@ void fbnic_fw_free_mbx(struct fbnic_dev *fbd);
+ void fbnic_hwmon_register(struct fbnic_dev *fbd);
+ void fbnic_hwmon_unregister(struct fbnic_dev *fbd);
  
-+config FBNIC_PHY
-+	tristate "FBNIC PHY"
-+	help
-+	  Supports the Meta Platforms 25G/50G/100G Ethernet PHY included in
-+	  fbnic network driver.
-+
- config ICPLUS_PHY
- 	tristate "ICPlus PHYs"
- 	help
-diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
-index 76e0db40f879..29b47d9d0425 100644
---- a/drivers/net/phy/Makefile
-+++ b/drivers/net/phy/Makefile
-@@ -59,6 +59,7 @@ obj-$(CONFIG_DP83869_PHY)	+= dp83869.o
- obj-$(CONFIG_DP83TC811_PHY)	+= dp83tc811.o
- obj-$(CONFIG_DP83TD510_PHY)	+= dp83td510.o
- obj-$(CONFIG_DP83TG720_PHY)	+= dp83tg720.o
-+obj-$(CONFIG_FBNIC_PHY)		+= fbnic_phy.o
- obj-$(CONFIG_FIXED_PHY)		+= fixed_phy.o
- obj-$(CONFIG_ICPLUS_PHY)	+= icplus.o
- obj-$(CONFIG_INTEL_XWAY_PHY)	+= intel-xway.o
-diff --git a/drivers/net/phy/fbnic_phy.c b/drivers/net/phy/fbnic_phy.c
-new file mode 100644
-index 000000000000..5b9be27aec32
---- /dev/null
-+++ b/drivers/net/phy/fbnic_phy.c
-@@ -0,0 +1,52 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) Meta Platforms, Inc. and affiliates. */
-+
-+#include <linux/ethtool.h>
-+#include <linux/kernel.h>
-+#include <linux/mdio.h>
-+#include <linux/module.h>
-+#include <linux/pcs/pcs-xpcs.h>
-+#include <linux/phylink.h>
-+
-+MODULE_DESCRIPTION("Meta Platforms FBNIC PHY driver");
-+MODULE_LICENSE("GPL");
-+
-+static int fbnic_phy_match_phy_device(struct phy_device *phydev,
-+				      const struct phy_driver *phydrv)
-+{
-+	u32 *device_ids = phydev->c45_ids.device_ids;
-+
-+	return device_ids[MDIO_MMD_PMAPMD] == MP_FBNIC_XPCS_PMA_100G_ID &&
-+	       device_ids[MDIO_MMD_PCS] == DW_XPCS_ID;
-+}
-+
-+static int fbnic_phy_get_features(struct phy_device *phydev)
-+{
-+	phylink_set(phydev->supported, 100000baseCR2_Full);
-+	phylink_set(phydev->supported, 50000baseCR_Full);
-+	phylink_set(phydev->supported, 50000baseCR2_Full);
-+	phylink_set(phydev->supported, 25000baseCR_Full);
-+
-+	return 0;
-+}
-+
-+static struct phy_driver fbnic_phy_driver[] = {
-+{
-+	.phy_id			= MP_FBNIC_XPCS_PMA_100G_ID,
-+	.phy_id_mask		= 0xffffffff,
-+	.name			= "Meta Platforms FBNIC PHY Driver",
-+	.match_phy_device	= fbnic_phy_match_phy_device,
-+	.get_features		= fbnic_phy_get_features,
-+	.read_status		= genphy_c45_read_status,
-+	.config_aneg		= gen10g_config_aneg,
-+},
-+};
-+
-+module_phy_driver(fbnic_phy_driver);
-+
-+static const struct mdio_device_id __maybe_unused fbnic_phy_tbl[] = {
-+	{ MP_FBNIC_XPCS_PMA_100G_ID, 0xffffffff },
-+	{ }
-+};
-+
-+MODULE_DEVICE_TABLE(mdio, fbnic_phy_tbl);
+-int fbnic_pcs_request_irq(struct fbnic_dev *fbd);
+-void fbnic_pcs_free_irq(struct fbnic_dev *fbd);
++int fbnic_mac_request_irq(struct fbnic_dev *fbd);
++void fbnic_mac_free_irq(struct fbnic_dev *fbd);
+ 
+ void fbnic_napi_name_irqs(struct fbnic_dev *fbd);
+ int fbnic_napi_request_irq(struct fbnic_dev *fbd,
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_irq.c b/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
+index 1c88a2bf3a7a..145a33e231e7 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
+@@ -118,12 +118,12 @@ void fbnic_fw_free_mbx(struct fbnic_dev *fbd)
+ 	fbd->fw_msix_vector = 0;
+ }
+ 
+-static irqreturn_t fbnic_pcs_msix_intr(int __always_unused irq, void *data)
++static irqreturn_t fbnic_mac_msix_intr(int __always_unused irq, void *data)
+ {
+ 	struct fbnic_dev *fbd = data;
+ 	struct fbnic_net *fbn;
+ 
+-	if (fbd->mac->pcs_get_link_event(fbd) == FBNIC_LINK_EVENT_NONE) {
++	if (fbd->mac->get_link_event(fbd) == FBNIC_LINK_EVENT_NONE) {
+ 		fbnic_wr32(fbd, FBNIC_INTR_MASK_CLEAR(0),
+ 			   1u << FBNIC_PCS_MSIX_ENTRY);
+ 		return IRQ_HANDLED;
+@@ -131,26 +131,26 @@ static irqreturn_t fbnic_pcs_msix_intr(int __always_unused irq, void *data)
+ 
+ 	fbn = netdev_priv(fbd->netdev);
+ 
+-	phylink_pcs_change(&fbn->phylink_pcs, false);
++	phylink_mac_change(fbn->phylink, false);
+ 
+ 	return IRQ_HANDLED;
+ }
+ 
+ /**
+- * fbnic_pcs_request_irq - Configure the PCS to enable it to advertise link
++ * fbnic_mac_request_irq - Configure the MAC to enable it to advertise link
+  * @fbd: Pointer to device to initialize
+  *
+- * This function provides basic bringup for the MAC/PCS IRQ. For now the IRQ
++ * This function provides basic bringup for the MAC/PHY IRQ. For now the IRQ
+  * will remain disabled until we start the MAC/PCS/PHY logic via phylink.
+  *
+  * Return: non-zero on failure.
+  **/
+-int fbnic_pcs_request_irq(struct fbnic_dev *fbd)
++int fbnic_mac_request_irq(struct fbnic_dev *fbd)
+ {
+ 	struct pci_dev *pdev = to_pci_dev(fbd->dev);
+ 	int vector, err;
+ 
+-	WARN_ON(fbd->pcs_msix_vector);
++	WARN_ON(fbd->mac_msix_vector);
+ 
+ 	vector = pci_irq_vector(pdev, FBNIC_PCS_MSIX_ENTRY);
+ 	if (vector < 0)
+@@ -159,7 +159,7 @@ int fbnic_pcs_request_irq(struct fbnic_dev *fbd)
+ 	/* Request the IRQ for PCS link vector.
+ 	 * Map PCS cause to it, and unmask it
+ 	 */
+-	err = request_irq(vector, &fbnic_pcs_msix_intr, 0,
++	err = request_irq(vector, &fbnic_mac_msix_intr, 0,
+ 			  fbd->netdev->name, fbd);
+ 	if (err)
+ 		return err;
+@@ -168,22 +168,22 @@ int fbnic_pcs_request_irq(struct fbnic_dev *fbd)
+ 	fbnic_wr32(fbd, FBNIC_INTR_MSIX_CTRL(FBNIC_INTR_MSIX_CTRL_PCS_IDX),
+ 		   FBNIC_PCS_MSIX_ENTRY | FBNIC_INTR_MSIX_CTRL_ENABLE);
+ 
+-	fbd->pcs_msix_vector = vector;
++	fbd->mac_msix_vector = vector;
+ 
+ 	return 0;
+ }
+ 
+ /**
+- * fbnic_pcs_free_irq - Teardown the PCS IRQ to prepare for stopping
++ * fbnic_mac_free_irq - Teardown the MAC IRQ to prepare for stopping
+  * @fbd: Pointer to device that is stopping
+  *
+- * This function undoes the work done in fbnic_pcs_request_irq and prepares
++ * This function undoes the work done in fbnic_mac_request_irq and prepares
+  * the device to no longer receive traffic on the host interface.
+  **/
+-void fbnic_pcs_free_irq(struct fbnic_dev *fbd)
++void fbnic_mac_free_irq(struct fbnic_dev *fbd)
+ {
+ 	/* Vector has already been freed */
+-	if (!fbd->pcs_msix_vector)
++	if (!fbd->mac_msix_vector)
+ 		return;
+ 
+ 	/* Disable interrupt */
+@@ -192,14 +192,14 @@ void fbnic_pcs_free_irq(struct fbnic_dev *fbd)
+ 	fbnic_wrfl(fbd);
+ 
+ 	/* Synchronize IRQ to prevent race that would unmask vector */
+-	synchronize_irq(fbd->pcs_msix_vector);
++	synchronize_irq(fbd->mac_msix_vector);
+ 
+ 	/* Mask the vector */
+ 	fbnic_wr32(fbd, FBNIC_INTR_MASK_SET(0), 1u << FBNIC_PCS_MSIX_ENTRY);
+ 
+ 	/* Free the vector */
+-	free_irq(fbd->pcs_msix_vector, fbd);
+-	fbd->pcs_msix_vector = 0;
++	free_irq(fbd->mac_msix_vector, fbd);
++	fbd->mac_msix_vector = 0;
+ }
+ 
+ void fbnic_synchronize_irq(struct fbnic_dev *fbd, int nr)
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
+index 2a84bd1d7e26..28a2e1fd3760 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
+@@ -434,14 +434,14 @@ static void fbnic_mac_tx_pause_config(struct fbnic_dev *fbd, bool tx_pause)
+ 	wr32(fbd, FBNIC_RXB_PAUSE_DROP_CTRL, rxb_pause_ctrl);
+ }
+ 
+-static int fbnic_pcs_get_link_event_asic(struct fbnic_dev *fbd)
++static int fbnic_mac_get_link_event(struct fbnic_dev *fbd)
+ {
+-	u32 pcs_intr_mask = rd32(fbd, FBNIC_SIG_PCS_INTR_STS);
++	u32 intr_mask = rd32(fbd, FBNIC_SIG_PCS_INTR_STS);
+ 
+-	if (pcs_intr_mask & FBNIC_SIG_PCS_INTR_LINK_DOWN)
++	if (intr_mask & FBNIC_SIG_PCS_INTR_LINK_DOWN)
+ 		return FBNIC_LINK_EVENT_DOWN;
+ 
+-	return (pcs_intr_mask & FBNIC_SIG_PCS_INTR_LINK_UP) ?
++	return (intr_mask & FBNIC_SIG_PCS_INTR_LINK_UP) ?
+ 	       FBNIC_LINK_EVENT_UP : FBNIC_LINK_EVENT_NONE;
+ }
+ 
+@@ -521,7 +521,7 @@ static bool fbnic_mac_get_pcs_link_status(struct fbnic_dev *fbd)
+ 	return !lane_mask;
+ }
+ 
+-static bool fbnic_pcs_get_link_asic(struct fbnic_dev *fbd)
++static bool fbnic_mac_get_link(struct fbnic_dev *fbd)
+ {
+ 	bool link;
+ 
+@@ -869,8 +869,8 @@ static const struct fbnic_mac fbnic_mac_asic = {
+ 	.init_regs = fbnic_mac_init_regs,
+ 	.pcs_enable = fbnic_pcs_enable_asic,
+ 	.pcs_disable = fbnic_pcs_disable_asic,
+-	.pcs_get_link = fbnic_pcs_get_link_asic,
+-	.pcs_get_link_event = fbnic_pcs_get_link_event_asic,
++	.get_link = fbnic_mac_get_link,
++	.get_link_event = fbnic_mac_get_link_event,
+ 	.get_fec_stats = fbnic_mac_get_fec_stats,
+ 	.get_pcs_stats = fbnic_mac_get_pcs_stats,
+ 	.get_eth_mac_stats = fbnic_mac_get_eth_mac_stats,
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mac.h b/drivers/net/ethernet/meta/fbnic/fbnic_mac.h
+index ede5ff0dae22..414c170abcba 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_mac.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_mac.h
+@@ -59,9 +59,9 @@ enum fbnic_sensor_id {
+  *	Configure and enable PCS to enable link if not already enabled
+  * void (*pcs_disable)(struct fbnic_dev *fbd);
+  *	Shutdown the link if we are the only consumer of it.
+- * bool (*pcs_get_link)(struct fbnic_dev *fbd);
++ * bool (*get_link)(struct fbnic_dev *fbd);
+  *	Check PCS link status
+- * int (*pcs_get_link_event)(struct fbnic_dev *fbd)
++ * int (*get_link_event)(struct fbnic_dev *fbd)
+  *	Get the current link event status, reports true if link has
+  *	changed to either FBNIC_LINK_EVENT_DOWN or FBNIC_LINK_EVENT_UP
+  *
+@@ -76,8 +76,8 @@ struct fbnic_mac {
+ 
+ 	int (*pcs_enable)(struct fbnic_dev *fbd);
+ 	void (*pcs_disable)(struct fbnic_dev *fbd);
+-	bool (*pcs_get_link)(struct fbnic_dev *fbd);
+-	int (*pcs_get_link_event)(struct fbnic_dev *fbd);
++	bool (*get_link)(struct fbnic_dev *fbd);
++	int (*get_link_event)(struct fbnic_dev *fbd);
+ 
+ 	void (*get_fec_stats)(struct fbnic_dev *fbd, bool reset,
+ 			      struct fbnic_fec_stats *fec_stats);
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+index e95be0e7bd9e..2d5ae89b4a15 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+@@ -44,7 +44,7 @@ int __fbnic_open(struct fbnic_net *fbn)
+ 	if (err)
+ 		goto time_stop;
+ 
+-	err = fbnic_pcs_request_irq(fbd);
++	err = fbnic_mac_request_irq(fbd);
+ 	if (err)
+ 		goto time_stop;
+ 
+@@ -89,7 +89,7 @@ static int fbnic_stop(struct net_device *netdev)
+ 	phylink_suspend(fbn->phylink, fbnic_bmc_present(fbn->fbd));
+ 
+ 	fbnic_down(fbn);
+-	fbnic_pcs_free_irq(fbn->fbd);
++	fbnic_mac_free_irq(fbn->fbd);
+ 
+ 	fbnic_time_stop(fbn);
+ 	fbnic_fw_xmit_ownership_msg(fbn->fbd, false);
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
+index 7ce3fdd25282..3c0bd435ee28 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
+@@ -132,7 +132,7 @@ fbnic_phylink_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
+ 
+ 	state->duplex = DUPLEX_FULL;
+ 
+-	state->link = fbd->mac->pcs_get_link(fbd);
++	state->link = fbd->mac->get_link(fbd);
+ }
+ 
+ static int
 
 
 
