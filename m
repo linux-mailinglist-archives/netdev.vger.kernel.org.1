@@ -1,246 +1,114 @@
-Return-Path: <netdev+bounces-235174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A78DC2CE90
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 16:53:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CCBFC2D075
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 17:15:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 66F573466A3
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 15:53:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA2473B036C
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 15:56:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1670B3148B2;
-	Mon,  3 Nov 2025 15:53:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45DD130B528;
+	Mon,  3 Nov 2025 15:56:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YoDaWuqj"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="2PushBVw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6A8C304969;
-	Mon,  3 Nov 2025 15:53:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4312F313E1E
+	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 15:56:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762185210; cv=none; b=RyMCt4XGH7gY+vmvb5JXtlBj3C8n6SikIJMQnv5yLVBB2A8xz2x94y5MpPLmZYdyKjdci3529hmQsb8QN9RQuKra7OEy9OcQMGeFeO4AWTXXkdJsMR9EyMsK74T+ZuLZvt+ugf1ga1RYDjlypDt1qezuK3mB1aFakwRP3S4aiLQ=
+	t=1762185380; cv=none; b=i48NoY/gSkn/llUgq8Nau14tqVm4PoLCJIcGJFTdhm9XFibBnZ6Ac2sm0jp7CJFU48wYKEMWvTjI3OFnyzupToz16NZlinJV5quKoxfFiRYgXQ2CdBPq8X0eualTHkz/3u/BpsakyzqY3ZPBiMl0H7Bl/zaH7MqB6Upa/Vs0Zf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762185210; c=relaxed/simple;
-	bh=zlD987IYcgv0Lcs/dP07a3fW5+8vkcfzEITDz9joQpc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=M9miuUIma+U8GUeYjLKq9+gS3QRKFpCFm40KWRuap5Qi3mwzsY0r20rkA+1pkrDJOprBpu241HdVuTUIEsM/My9DwO+Vq8G/0C6EonGmyLmOMtdMk5bud6XAdM5iD6rVghzA6+BhnykKCaOJBtO3gr236vsCPULaLOmoopaQDOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YoDaWuqj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8436DC4CEE7;
-	Mon,  3 Nov 2025 15:53:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762185209;
-	bh=zlD987IYcgv0Lcs/dP07a3fW5+8vkcfzEITDz9joQpc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=YoDaWuqjSCLvmDCn+FWGs6npsxuTUyH4xdREcv27YJEPaSCucdcntn3hrejxFpaZP
-	 SX9LJeCxDB8Xa46q93MGSLZ0Y3AI8BXFS/Xm5b2ZoMEGfe+bsz7T2nwU0nSjq7o0dS
-	 snP23C15CTTMJC2cHsHTiAI3UV52OCK+Ba9Kvjip8EEbMDTHHNZmbJYWlKgxU8L8RV
-	 qXY7uTV37A0qKrOXI0Vlw1i6s9PcjWDchiGhd911vmR9NbVJffgETkzggpaZkpQu3W
-	 G+HIslil2WzmvbyfTUsflNNlXUPGn6C2ggAybWRLaFemFbXJ9L3MwXJyUOmLpe5N50
-	 dza56b75pm/Ag==
-Message-ID: <99bcc333-c451-4409-ae23-1ca3b38950fa@kernel.org>
-Date: Mon, 3 Nov 2025 16:53:18 +0100
+	s=arc-20240116; t=1762185380; c=relaxed/simple;
+	bh=gGXLHaF7e4fny82kAFdlsB4agfRdVFNgMNI/7GgMq5k=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=W+Y6ciwhnBXoZFJlfHEouETp+g45tG1KyJ/YSaEQd9sb9b4wbNGYpF8Sz1Q94AIhrKWbB98Zwr64MvPXpl17XjRzLUR5rRdVvUOXA8HnAy5cTimmCBIoXr5pSJyHkMRVHbiMWsyYU49YbgAgob43lRwsNf6VLF1XxkM272REl9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=2PushBVw; arc=none smtp.client-ip=209.85.166.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-93e7c7c3d0bso464872539f.2
+        for <netdev@vger.kernel.org>; Mon, 03 Nov 2025 07:56:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1762185377; x=1762790177; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f9YDgAdU/uso0toOOWUSOOo+jH+xe/ikxmfGNGHyhpM=;
+        b=2PushBVwbiEzifHC4nhDTf0jBKThaqjXPk045GxaUqihGRB2HjJ/sEILezLLGEGJln
+         Nx4bYoPhaWSFUJ9cRUtj2wUSTXzK+9Yg41cKg9666DKVRH2BGe9g0sL9w2sZtF+ubDtB
+         fxdnJ7hBubyrMQzKQLDv9j0kO7t3gg4Sd43xmRX0T4s/UQDNLp3UitJg4yJFgpTW71s/
+         d1Q9prhfXYcnKHF4EXX1Pm2ispZovU5Q34vSOaPOWtj8gDcc1tD8EHoWsLdh/ii8ViT2
+         tXQTUHU8xJ3oIJXBgsikgm3wDy/ZhlnZqogxhfC3V2gbT23a/VK497pMRoX4FhAFDUxb
+         1a5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762185377; x=1762790177;
+        h=content-transfer-encoding:mime-version:date:message-id:subject
+         :references:in-reply-to:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f9YDgAdU/uso0toOOWUSOOo+jH+xe/ikxmfGNGHyhpM=;
+        b=Qa0zhviQDDSP3O2m6M5woHDv8wBWK1ZKn8vkwk6Ee1FyonqgSF2lbogkMBBXF3qT8a
+         YNOa10iqWIl75pKc2lBxwR8Y+0qWya9etT8degUjCv5C59uQHV+qd3mV90QSeDPfIf47
+         dsjQ55BsZPLePJ/0rTmlCBYX0GyO4lsAfC/IC3mAwK1PwklIYfqhiG1MSFwacC7mtLUS
+         MAT7TwJoZUk8yRQNP04c+531FYNyA1pv3YIPVpkeVofNg59G7xMm5vFNdW4NX+M9NSbu
+         JuKzKzuDSJN7he5ImEOfRt9yWFuBdkVHNFcj6U8QLAeMjUJcm103YkAdQfizYwlLbrL2
+         K75w==
+X-Gm-Message-State: AOJu0YwRlh1dGo1AJsZEqF0K46RWAJQTsap+7KMNSviWV/NeA5OrCYV6
+	z09dL09DBlKO1rDMQZIaWo6Y6qFOfjRusg0GI9GDbdsn4PJHkdDnZp8avByr+jdRo0S5/u1xmAZ
+	Ts/HN
+X-Gm-Gg: ASbGncvhNd1Nr+L03ZZ+Ul6pNw95TqYDtNcYj+aP+DVlfj/7zCzNL6wzpmlSsy2bVlT
+	XznDmL8M/SUXbdhpu/eALHQdnCrZsvUurvDnOITsq5dBa8mCqlg+7Aea2LomKhikLXqmbE3HufD
+	W/Wd72zZT1QCD2eerRH3wGOjT4dPrId1h29Th5jQx0V5BnVb3ZabVHaZgzobJEUexoXBJ4DiQ3e
+	LDoU8M72KtLyt6lj+//v1hcd4beJYf+dcrmbq1ndBfWTiVgzDnpTeyOssONcIp1whXwIpXq8tHx
+	cfZN8+Ttg424VL+Y4JsVuydYDjesGGJr1q2zdCIkqBli0+KFJZyS+GXA1IPmB/siHq5sKbnVLrS
+	edSl8OL3H+M+CSvtm813zCpc0AR0kVqWem+Nw4egbB0oiq4iN5bhVBlrYiyDpJl8IPZw=
+X-Google-Smtp-Source: AGHT+IGuFezsZMUJsTlRkPOuNfi4qef3irAedHsLZ3STySgCBrNbNoyGoUVxI8tg7r8d+lcYKpJNSg==
+X-Received: by 2002:a05:6e02:b4d:b0:433:3115:fdab with SMTP id e9e14a558f8ab-4333115ff66mr40807895ab.19.1762185377383;
+        Mon, 03 Nov 2025 07:56:17 -0800 (PST)
+Received: from [127.0.0.1] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-5b7226b9d53sm277148173.46.2025.11.03.07.56.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Nov 2025 07:56:16 -0800 (PST)
+From: Jens Axboe <axboe@kernel.dk>
+To: io-uring@vger.kernel.org, Pavel Begunkov <asml.silence@gmail.com>
+Cc: netdev@vger.kernel.org
+In-Reply-To: <60717dd76d7c38fe750c288a831e5d3a7379a70c.1762164871.git.asml.silence@gmail.com>
+References: <60717dd76d7c38fe750c288a831e5d3a7379a70c.1762164871.git.asml.silence@gmail.com>
+Subject: Re: [PATCH for-6.18] io_uring/zcrx: remove sync refill uapi
+Message-Id: <176218537597.11358.6534904317135875615.b4-ty@kernel.dk>
+Date: Mon, 03 Nov 2025 08:56:15 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net v3 0/3] mptcp: Fix conflicts between MPTCP and sockmap
-Content-Language: en-GB, fr-BE
-To: Jiayuan Chen <jiayuan.chen@linux.dev>, mptcp@lists.linux.dev
-Cc: John Fastabend <john.fastabend@gmail.com>,
- Jakub Sitnicki <jakub@cloudflare.com>, Eric Dumazet <edumazet@google.com>,
- Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Willem de Bruijn <willemb@google.com>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Mat Martineau <martineau@kernel.org>,
- Geliang Tang <geliang@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
- Florian Westphal <fw@strlen.de>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20251023125450.105859-1-jiayuan.chen@linux.dev>
- <14b565a1-0c2a-420d-ab2a-dc8a46dbf33c@kernel.org>
- <319c419455b73deb312b53d99c30217f6b606208@linux.dev>
- <bc5831bb-cfa3-4327-b129-30ca5d17b45e@kernel.org>
- <55049e76c1e86825ff963c381ef01e38cfc08b10@linux.dev>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <55049e76c1e86825ff963c381ef01e38cfc08b10@linux.dev>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Mailer: b4 0.14.3
 
-Hi Jiayuan,
 
-On 03/11/2025 13:34, Jiayuan Chen wrote:
-> October 29, 2025 at 1:26 AM, "Matthieu Baerts" <matttbe@kernel.org mailto:matttbe@kernel.org?to=%22Matthieu%20Baerts%22%20%3Cmatttbe%40kernel.org%3E > wrote:
->> On 24/10/2025 06:13, Jiayuan Chen wrote:
-
-(...)
-
->>> The current implementation rejects MPTCP because I previously attempted to
->>>  add sockmap support for MPTCP, but it required implementing many interfaces
->>>  and would take considerable time.
->>>  
->>>  So for now, I'm proposing this as a fix to resolve the immediate issue.
->>>  Subsequently, we can continue working on fully integrating MPTCP with sockmap.
->>>
->> It makes sense to start with the fix for stable, then the implementation
->> later. I think the implementation should not be that complex: it is just
->> that it has to be done at MPTCP level, not TCP. sockmap supports
->> different protocol, and it doesn't seem to be TCP specific, so that
->> should be feasible.
+On Mon, 03 Nov 2025 13:53:13 +0000, Pavel Begunkov wrote:
+> There is a better way to handle the problem IORING_REGISTER_ZCRX_REFILL
+> solves. The uapi can also be slightly adjusted to accommodate future
+> extensions. Remove the feature for now, it'll be reworked for the next
+> release.
 > 
-> I agree with that. From a userspace perspective, we can't really manipulate subflow
-> TCP directly, and I also think it's correct to handle this at the MPTCP layer.
 > 
-> But I didn't quite get your point about "it has to be done at MPTCP level." Currently,
-> BPF provides 'sockops' capability, which invokes BPF programs in the protocol stack.
-> The input parameter sk for the BPF program is actually a TCP sk (subflow).
-> 
-> Many helper functions (like sockmap) have no choice but to care about whether it's MPTCP
-> or not.
 
-I see. Maybe new MPTCP equivalent hooks will be needed then?
+Applied, thanks!
 
-(...)
+[1/1] io_uring/zcrx: remove sync refill uapi
+      commit: 819630bd6f86ac8998c7df9deddb6cee50e9e22d
 
->>>> A more important question: what will typically happen in your case if
->>>>  you receive an MPTCP request and sockmap is then not supported? Will the
->>>>  connection be rejected or stay in a strange state because the userspace
->>>>  will not expect that? In these cases, would it not be better to disallow
->>>>  sockmap usage while the MPTCP support is not available? The userspace
->>>>  would then get an error from the beginning that the protocol is not
->>>>  supported, and should then not create an MPTCP socket in this case for
->>>>  the moment, no?
->>>>
->>>>  I can understand that the switch from TCP to MPTCP was probably done
->>>>  globally, and this transition should be as seamless as possible, but it
->>>>  should not cause a regression with MPTCP requests. An alternative could
->>>>  be to force a fallback to TCP when sockmap is used, even when an MPTCP
->>>>  request is received, but not sure if it is practical to do, and might be
->>>>  strange from the user point of view.
->>>>
->>>  
->>>  Actually, I understand this not as an MPTCP regression, but as a sockmap
->>>  regression.
->>>  
->>>  Let me explain how users typically use sockmap:
->>>  
->>>  Users typically create multiple sockets on a host and program using BPF+sockmap
->>>  to enable fast data redirection. This involves intercepting data sent or received
->>>  by one socket and redirecting it to the send or receive queue of another socket.
->>>  
->>>  This requires explicit user programming. The goal is that when multiple microservices
->>>  on one host need to communicate, they can bypass most of the network stack and avoid
->>>  data copies between user and kernel space.
->>>  
->>>  However, when an MPTCP request occurs, this redirection flow fails.
->>>
->> This part bothers me a bit. Does it mean that when the userspace creates
->> a TCP listening socket (IPPROTO_TCP), MPTCP requests will be accepted,
->> but MPTCP will not be used ; but when an MPTCP socket is used instead,
->> MPTCP requests will be rejected?
-> 
-> "when the userspace creates a TCP listening socket (IPPROTO_TCP), MPTCP requests will be accepted,
-> but MPTCP will not be used"
-> --- Yes, that's essentially the logic behind MPTCP fallback, right? In this case, it should work
-> fine with sockmap as well. That's exactly what this patch aims to achieve.
-
-That's an MPTCP fallback to TCP for the client side here: the client
-requests to use MPTCP, but the server doesn't support it. In this case,
-MPTCP options will be ignored, and a "plain" TCP SYN+ACK will be sent
-back to the client. In this case, the server using sockmap doesn't
-handle MPTCP, because it created an IPPROTO_TCP.
-
-In other words, the situation you had before GO 1.24, right?
-
-> "but when an MPTCP socket is used instead, MPTCP requests will be rejected?"
-> --- Exactly. Currently, because sockmap operates directly on the subflow sk, it breaks the MPTCP
-> connection. The purpose of this patch is to explicitly return an error when users try to replace
-> certain handlers of the subflow sk.
-
-I don't think a message at that point is that useful. Ideally, the
-userspace should get an error or a notice when setting sockmap up. But I
-understand sockmap are not really attached to listening sockets, and it
-doesn't seem possible to block sockmap at setup time because it is going
-to be used with "accept()ed" connection created from an MPTCP listening
-socket.
-
-So I guess we will still need patch 1/3 (with a better commit message),
-and patch 2/3 should be restricted to remove psock_update_sk_prot for
-MPTCP subflows.
-
-> This way, users at least get a clear error message instead of just experiencing a mysterious connection
-> failure.
-> 
->> If yes, it might be clearer not to allow sockmap on connections created
->> from MPTCP sockets. But when looking at sockmap and what's happening
->> when a TCP socket is created following a "plain TCP" request, we would
->> need specific MPTCP code to catch that in sockmap...
-> 
-> I know what you're concerned about, and I also don't want to add any MPTCP-specific checks on the
-> sockmap or BPF side :).
-> 
-> I will try to set psock_update_sk_prot to NULL first.
-
-Thanks!
-
-Cheers,
-Matt
+Best regards,
 -- 
-Sponsored by the NGI0 Core fund.
+Jens Axboe
+
+
 
 
