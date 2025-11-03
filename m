@@ -1,174 +1,94 @@
-Return-Path: <netdev+bounces-235265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40FE2C2E655
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 00:26:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82124C2E65E
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 00:28:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1E1594E10D8
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 23:26:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DA173A6516
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 23:28:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A24FC2FC89C;
-	Mon,  3 Nov 2025 23:26:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aaZpRgO7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77C712FDC4B;
+	Mon,  3 Nov 2025 23:28:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AF272C11CB
-	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 23:26:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 033752F692D
+	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 23:28:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762212413; cv=none; b=FrDnX5Mn6tkVu0xPEbNo6W6cMm5+9tsyciZm4VBvLbXXvalYOFjAyBZrzyZrSsc3QQSzuxAXukN30VeK9Olf+oNSOZmhajC9uvC3NcCmqkIBjAsaoH1gwzl1ZZad/2yv5yqXMJmKSpz05Fr4gIxcZy8kSPOP/n8RLFRrhyIeD2U=
+	t=1762212485; cv=none; b=eYxbo90+IE6ruhO7pSAyyRt8Vt61ps/nOo71/zUVostu//qnNyo4pxn3F+Db/Zt/JXVGZEOf4YQiksaSak1dsRkCuqpzqWstAapMdOwDToc2SWudi4tLItg+TlQGTuK/XXxaQGM2S5L/lD2iuzzQIn9+6q5nh3BcSgDgMMFen9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762212413; c=relaxed/simple;
-	bh=2HcRl+AUUNPTADPQiQNaUf5DmXSD5QbDI8DNpa9myjw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=i2PBqif+UFELu3DOMnOv4uApMlwrgt7TVGqbdLwhvWbcINQjQlLmPYL2+Ly0IFjDmVQbqDuDxjJYD8KB/Bgy/M9iOd+esvhQvns6dTN9mW90fKSruA6U1c0mrT2PPHcRIm2cvvR50buCrIeJHHu+eoVjCj/7ki+ZZwQw61MWJoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aaZpRgO7; arc=none smtp.client-ip=209.85.166.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-433258101ceso18923005ab.1
-        for <netdev@vger.kernel.org>; Mon, 03 Nov 2025 15:26:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762212411; x=1762817211; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y7HIfct8/HpEvf2IuhNdVp4Z2eFKKL3FAierXwcqD2o=;
-        b=aaZpRgO7cT6d81DDbVVLNogDTkd59ZWazm5K29+u1YH/krwNQMdzOR1HInSI9qBMt9
-         MvMqt3ow0Eg0xXsELAPSzrgJeG0g+GlF2CFNIvI7oZfY071UD9QtG7eV0VixgV900oMy
-         7tNnZyo4A1IVY9L9vOwjK4aTxvoT3LjG4ngj+r3OI+eaK+4NQyteEWay8zYmwsMBlNVj
-         lOgHJe1G8I5ic2REc85x7ykYElTvA8nlO5ttaA5XycSOtBp4t7qcP3+Mr3L5MWKy9ymg
-         ke2dFip/uDFa8fS2Ps7/DJthbsSvPvkJMs8+UHmklpsFJ6AG1d2hjIKobs55mhTnf3WC
-         ujqw==
+	s=arc-20240116; t=1762212485; c=relaxed/simple;
+	bh=e+hUtLgnUk9Xelyamxzo8aAh92PTX/nGJkqBbHiuw1I=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=e+xftdqUA+If0U1S50zi54WB7zoDW8o3ZLSO+1DXfF3UojNER7K18tg6h5whxBJQDDPf1J0ra058eugNN2va+KA05gHE/X3shOdoXBcWwre6kECpiJbROaD3K7RP3Guqih+cWJfoqOv3QY8fU32NdFDWDuGWUXY8cLu2w357gbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-948409cc397so187714839f.1
+        for <netdev@vger.kernel.org>; Mon, 03 Nov 2025 15:28:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762212411; x=1762817211;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Y7HIfct8/HpEvf2IuhNdVp4Z2eFKKL3FAierXwcqD2o=;
-        b=OB+ECcg4yYTtvg9Vqo5kKak3wabHol2vgnKItbOA9VSi6+cDQcS8M6cad0XC4HfXch
-         fm5GYwzhqHn6+aKfILv60jilKTKRJ07N0ZrZwmEooiTkeTMSyPALnYJ7abXoV1BJa+zJ
-         F+/Ruu1RXoFlsatirxfWygdk+iw35oHHgsf1QIkEAkzMPDa/YMVDDAjaWcb+6NeVxVb9
-         U+XgQXcEM1UXVWSE/zZft5HnCfjyJmbDSHrM41EM+ioKQNMBM5mbSVUFXqH0yUt2xLGG
-         VGWlURJpt/P1FcIHenoZps+EOLRPpV2yzOORoSaxeTQw6k7hnufJG+z9eLRUe52wfAaG
-         MRCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVDAk9u4kcPzQVwqKsaRffR8b+17vGNl+3YTU0GG0L3Dj40GZzIga5N9EEMEgvLe82lY7VyG1U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmGkx6FOLbomUD3Byxf3sucrgIDC/jwwWTFWGAi6z6P0Lo+Zss
-	eH9ReZulUqGQsizgEXk7wbceKzVAY+RnJYtnUj0ZtcHH0LdPcWDqS6rXquMkiCwyzFU9JjYgS/W
-	qAzaS2ksmNoRCZ0BUCWTHZWyG/OX5oSA=
-X-Gm-Gg: ASbGnctMs6/a7ojJEmLHJEpPvOtW6MTg7nnpslxnSB2+B48oU9Aheo5lbrmXgGUYTrp
-	cZozSS2rgKpKcYwkopLfDcBRjNDleItFUIf9yL/BnnMY1ShDvxZFM90TWKOz2OQN1N5MXTFv0l/
-	dQ7U3au7PhLi16MNnVxCOURV3vjq8t3KClw/A1/vFUMgMkap90upg30D23H9yp4akfDBsfLwIpa
-	7n1HAWIGJ1kgTVmqgN66c1qXpz5oNBCw8pMQzHkXeoV+EDhA++KK95HTRDP4b9sZtslI3EnfA==
-X-Google-Smtp-Source: AGHT+IFgDdSPeMwWNo/N5tqJEPbjhTUVEBZiQsXzkOfNXUji3qvPg7ylnisoTb13G+AXl8IMUYAXe0pwmpE8JqSZOBg=
-X-Received: by 2002:a05:6e02:1524:b0:433:3102:b107 with SMTP id
- e9e14a558f8ab-4333102b578mr60244835ab.5.1762212411099; Mon, 03 Nov 2025
- 15:26:51 -0800 (PST)
+        d=1e100.net; s=20230601; t=1762212483; x=1762817283;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RAZCNdGP6oa4/13Oj7L2uGoPdWBFOF+p2dxE9OH7Xts=;
+        b=HBMkVhePEE9pxGnx0KwZE7vE3y+1MwnXwAP/N6Ss/Hd7xKLblGd893skEY/4N1AHq0
+         pGLWs3IV11RbhhXKwMHmDSwXw97DMGm64Zrsfz2cp6z2SQvcBLBA+0H9D1KPIM6lXPrR
+         751g318eCUPz53wsRxrl4zAg6ismLWzfpwtYjxM+s6WEByrWQfDa47Naa9p/Gzcr7+dy
+         DEAyAlmmEbejbTtfxsJzA0hL+tjbuFNj9uZtyaKPTG9L/5eV1LEwqbJh4/WukjB9eJEF
+         y2rznj0puuR/x+ni98YqYxq6oUNFsFef0Ajxdhc8tW3uX8R8a5X22tuhWKXSMqgP4qxO
+         VGqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU470Us4rTs0ESnFSLQw5tJ37V0dRhgRJMDa8k/U8XAfqKaBRuY3ulYsYCiXeGMAhEtCJ2NygM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGATlOdm+mzwoaxg8jMbU5sULvqaaO8ylOlgjm6WxqW0Y4qiNP
+	GBWS43u/X/13iY8vj911mYPP/gKnIXhz+obIQGA2vugLED6s1OgyX0YDZSoBEyzsbLSf+n0eZrm
+	ZAFSldyUPInmPwQ+3LvSOKUoH97hM6ebxgY3rdhD9873vLbSsCFnhKxHWSGM=
+X-Google-Smtp-Source: AGHT+IGdfjUbagDO/4+FziCnHEUyeuf6B9If+BZc4kuwQIqb9ahoHL7XKeHxACMKk70wvvZhdDmGpPBqt1bgpW8kLip3yqMw4Sgc
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251030000646.18859-1-kerneljasonxing@gmail.com>
- <20251030000646.18859-3-kerneljasonxing@gmail.com> <aQjDDJsGIAI5YHBL@boxer>
-In-Reply-To: <aQjDDJsGIAI5YHBL@boxer>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 4 Nov 2025 07:26:14 +0800
-X-Gm-Features: AWmQ_bnPk4jKKtljON0RlrLgyCVIMv8791yxEbigSYJfuxnc4RHAvD-hc2N8gtc
-Message-ID: <CAL+tcoCx23rAbzFTh=78mdC_7a_D-XLvi8yvZkc9Sbj74MANcw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 2/2] xsk: use a smaller new lock for shared
- pool case
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, bjorn@kernel.org, magnus.karlsson@intel.com, 
-	jonathan.lemon@gmail.com, sdf@fomichev.me, ast@kernel.org, 
-	daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com, 
-	horms@kernel.org, andrew+netdev@lunn.ch, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+X-Received: by 2002:a6b:ed15:0:b0:945:9e9c:721 with SMTP id
+ ca18e2360f4ac-9485929af5emr165838339f.3.1762212483202; Mon, 03 Nov 2025
+ 15:28:03 -0800 (PST)
+Date: Mon, 03 Nov 2025 15:28:03 -0800
+In-Reply-To: <00000000000062a2960621a49519@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <69093a83.050a0220.98a6.0096.GAE@google.com>
+Subject: Re: [syzbot] [wireless?] WARNING in ieee80211_rx_list (3)
+From: syzbot <syzbot+b4aa2b672b18f1d4dc5f@syzkaller.appspotmail.com>
+To: acsjakub@amazon.de, davem@davemloft.net, edumazet@google.com, 
+	ffmancera@riseup.net, horms@kernel.org, johannes@sipsolutions.net, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	liuhangbin@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 3, 2025 at 10:58=E2=80=AFPM Maciej Fijalkowski
-<maciej.fijalkowski@intel.com> wrote:
->
-> On Thu, Oct 30, 2025 at 08:06:46AM +0800, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > - Split cq_lock into two smaller locks: cq_prod_lock and
-> >   cq_cached_prod_lock
-> > - Avoid disabling/enabling interrupts in the hot xmit path
-> >
-> > In either xsk_cq_cancel_locked() or xsk_cq_reserve_locked() function,
-> > the race condition is only between multiple xsks sharing the same
-> > pool. They are all in the process context rather than interrupt context=
-,
-> > so now the small lock named cq_cached_prod_lock can be used without
-> > handling interrupts.
-> >
-> > While cq_cached_prod_lock ensures the exclusive modification of
-> > @cached_prod, cq_prod_lock in xsk_cq_submit_addr_locked() only cares
-> > about @producer and corresponding @desc. Both of them don't necessarily
-> > be consistent with @cached_prod protected by cq_cached_prod_lock.
-> > That's the reason why the previous big lock can be split into two
-> > smaller ones. Please note that SPSC rule is all about the global state
-> > of producer and consumer that can affect both layers instead of local
-> > or cached ones.
-> >
-> > Frequently disabling and enabling interrupt are very time consuming
-> > in some cases, especially in a per-descriptor granularity, which now
-> > can be avoided after this optimization, even when the pool is shared by
-> > multiple xsks.
-> >
-> > With this patch, the performance number[1] could go from 1,872,565 pps
-> > to 1,961,009 pps. It's a minor rise of around 5%.
-> >
-> > [1]: taskset -c 1 ./xdpsock -i enp2s0f1 -q 0 -t -S -s 64
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> >  include/net/xsk_buff_pool.h | 13 +++++++++----
-> >  net/xdp/xsk.c               | 15 ++++++---------
-> >  net/xdp/xsk_buff_pool.c     |  3 ++-
-> >  3 files changed, 17 insertions(+), 14 deletions(-)
-> >
-> > diff --git a/include/net/xsk_buff_pool.h b/include/net/xsk_buff_pool.h
-> > index cac56e6b0869..92a2358c6ce3 100644
-> > --- a/include/net/xsk_buff_pool.h
-> > +++ b/include/net/xsk_buff_pool.h
-> > @@ -85,11 +85,16 @@ struct xsk_buff_pool {
-> >       bool unaligned;
-> >       bool tx_sw_csum;
-> >       void *addrs;
-> > -     /* Mutual exclusion of the completion ring in the SKB mode. Two c=
-ases to protect:
-> > -      * NAPI TX thread and sendmsg error paths in the SKB destructor c=
-allback and when
-> > -      * sockets share a single cq when the same netdev and queue id is=
- shared.
-> > +     /* Mutual exclusion of the completion ring in the SKB mode.
-> > +      * Protect: NAPI TX thread and sendmsg error paths in the SKB
-> > +      * destructor callback.
-> >        */
-> > -     spinlock_t cq_lock;
-> > +     spinlock_t cq_prod_lock;
-> > +     /* Mutual exclusion of the completion ring in the SKB mode.
-> > +      * Protect: when sockets share a single cq when the same netdev
-> > +      * and queue id is shared.
-> > +      */
-> > +     spinlock_t cq_cached_prod_lock;
->
-> Nice that existing hole is utilized here.
->
-> Acked-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+syzbot suspects this issue was fixed by commit:
 
-Thanks for the review :)
+commit d67ca09ca39f9605459959004b28c56899e3bca3
+Author: Hangbin Liu <liuhangbin@gmail.com>
+Date:   Tue Sep 2 06:55:58 2025 +0000
 
-Thanks,
-Jason
+    hsr: use netdev_master_upper_dev_link() when linking lower ports
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=153bebcd980000
+start commit:   b66e19dcf684 Merge branch 'mctp-add-mctp-over-usb-hardware..
+git tree:       net-next
+kernel config:  https://syzkaller.appspot.com/x/.config?x=cc73f5c6f9d29d57
+dashboard link: https://syzkaller.appspot.com/bug?extid=b4aa2b672b18f1d4dc5f
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=104ccdb0580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=164d7498580000
+
+If the result looks correct, please mark the issue as fixed by replying with:
+
+#syz fix: hsr: use netdev_master_upper_dev_link() when linking lower ports
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
