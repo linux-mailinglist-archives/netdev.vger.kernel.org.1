@@ -1,64 +1,85 @@
-Return-Path: <netdev+bounces-235005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A260FC2B21B
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 11:48:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3104BC2B22D
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 11:50:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 512634E4869
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 10:47:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 517C43B62C0
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 10:48:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 828F521CC55;
-	Mon,  3 Nov 2025 10:47:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A6902FABF8;
+	Mon,  3 Nov 2025 10:48:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ZD7a9bk8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cevsnj/E"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 667F91DE3A4
-	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 10:47:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88DB11DE3A4
+	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 10:48:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762166868; cv=none; b=UZpkfUYrFQmm+0VHkXwYk64GOXg/ECtBPFFvDFmnfNrrLLY/tKA78Jv8z/DTZlJLVVMwcIYZ91M22USNgr10mUOEW3GVZRIEnNTKj0zesjhJKHiTnA9BIUcam0DRWo+vEa279XDav110T73MV/4iBGxGFh71Ts0nRUzxuj5LnLU=
+	t=1762166908; cv=none; b=eGDG1bXIyDo5QO9CwAphoGPz8UJ031W7R9WeJ6Fkn1SQvWslK/DagWrW+1k534tSW/XYr1bLVaMjckm/RKMXbbPHrIREXDVSEgq39LKro6cuF3UUL/eDKNuImgni0BZvuntiYHzKpPP6CVJiZ3ZTDHMWGx8+Ip3q7lqj0hpb1+w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762166868; c=relaxed/simple;
-	bh=Khk5Yf6QTG63w7rLe9vD8Yv9u7p8ZjUq/GiQigyCUCM=;
+	s=arc-20240116; t=1762166908; c=relaxed/simple;
+	bh=zR8m1qbQRz9XWrZGV54/95RKZ4jTNlcX/unLFNHmNNE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UmWdrn141Ogtgyx07tDo9zWExuwV9F8DJgXkNpHVT7vB5YtT6LsBiyB13nNwh0CWWudSFY1ieKn7lZhcya+o4KOZP32keSbh7fXuJ7391nXiQAIDlh8ZlmOsm6afYQcW334M/VF/marFF5mWsjmfvN2ySrqxviLF7DNRfd8vex0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ZD7a9bk8; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=SfoQUh36QE7h8qt3hF9rnB1Y0l49JXwFNS9QZ6PhD74=; b=ZD7a9bk8YePsQT1gCLHkpemXYH
-	jhhr//2fwcanBJEPfFnIzR9Kj5qNOUYwkH/a2hZUUeo9NW1VBzJeZBdCOSQJg1LuxKtAWVpqNl7wU
-	aUrLae87cb5hpCzJf7bIRkrKc+vIbuclKrSXn0N4OdXXbNGTDAeg7RjZTptf4kBAyfmHpK22Dwuf6
-	SaplTqH3s6g/mBJxCDzqVf5asyAAGEH4ta90oPgzCzczsoOCtn0G9WlKvLC+3cA52CrK9c2KBR9hE
-	JNMLsgrK3LBJKihiVC0FBn8OlXBiB36aFp/3i4YCquBgToxfch366UNf5WzynDG+TPyOCB7NTnYvU
-	ixOPMqZA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42202)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vFs5z-000000000a9-1PlG;
-	Mon, 03 Nov 2025 10:47:31 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vFs5v-000000003jm-0uly;
-	Mon, 03 Nov 2025 10:47:27 +0000
-Date: Mon, 3 Nov 2025 10:47:27 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=PWWnWyXLgmeC/quwRhoN2qGRuMdyOu28CeBXfwE3/Kc7jb0hgWj7kcbXDsGoz69d7dc/dp00I3kkY9ELTaagHME11xqPhKSXk7q7VUTbPHBpF+n/33UDKbRmTWjju/laQnIPhSsYwerhKNqCoGxt9tjs8dJNI3XnIKBtRKxBuNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cevsnj/E; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-429c5e0f94eso264508f8f.3
+        for <netdev@vger.kernel.org>; Mon, 03 Nov 2025 02:48:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762166905; x=1762771705; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oT9RtigCr8SXNb36gcbFehyubQYXLfyyxsU6nQOAO4g=;
+        b=cevsnj/EdSPO9L3UbZrw2I13Au0WlIFeF9z2oB1XPjmWhmeVpjxUxgKtJU0HZtYX1T
+         35v207nVg1QrRIovKozQOBS/AEw5fDTW3dCPBTpAKQyV06L8ZC0uZqAsOirqg5PT0Kea
+         CkI553nz5eaP1XDafm7VXdodLajMRCH7whP9tvYiEAxFCbpXyYATQ+0eKZeeKps1B0D3
+         MwZ5CN0krG+OjgOOWNeqHXqUxOsG6Tabmm3HG0308yeGYsnEE+PBGzilsdy2aG71Oulx
+         BzXVUCNiT+vDFGemmuw81Qn2TkCrTZn3smwpejnHbxulCyI2xzLtUAOk42cIxi5VoDBH
+         w6fw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762166905; x=1762771705;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oT9RtigCr8SXNb36gcbFehyubQYXLfyyxsU6nQOAO4g=;
+        b=mtkWgpuxca10M/gLXlnS7j8jh1hzm9Cz/ka2eFS8sEgeWuoRMDgcZqEJxl3pzWtO0v
+         y+L/I3wNfK3AIZt3oJqBXaBRwUiTKLiNyvEER6BajO3jKpMAUe26NPRNYnYhWT6OB4J3
+         /vzNsYzyyvr5l6ECbW7Bj4HcLaveQlQyfBalOvEZrrM/ceDXo8wh9PPqM8eD7PV09s6t
+         IEtHYDZ1/zQGzN+PnaIj/ovtIQMM/PFMSGR9mTmb8LrhPuKYlY9O9f0AvX0Fs8cm8OoV
+         4nv4/p2oWD6ZZGNn9nTFoHiF28XRvbZKXbtY1uu0cdNMD5ihcywgeDlf/UrQ/OZEwpPD
+         VD9A==
+X-Forwarded-Encrypted: i=1; AJvYcCUTFm2RukNkHWL5TQtlVngB7hUNz5VzKssT85yw5vOgWkTmo1fsrL2MUvL8W4WEVREgkzRfKAE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGKqiC1pNL0roBTXRg+6tsgObqZXjz+V/u9SsOBEMQRc7+K9H3
+	qbh9lfZHuagf9aPN3vSKGOVqTu9RDXvgUu2J6CmHO+JgzdpEa10hRNqL
+X-Gm-Gg: ASbGnctXnO3HoLcbhEzv+5tpGVAIpQgOmH7KsxhbrwF0clhqzgY44CE2J7RHnnfeLgZ
+	q+7IZRFD3u8FfF5mJB6nauWiYH7JNkzc/qztI23xR4oBXT0PI0dl9XpZHubWum8h+nbjUym+5Ch
+	ABw13JyXYN32D09M02KOgw5IOlbRyZiDH2GgxeQB8h9nRfHNmuvu/pV/GWOsJO9q1838ycj0jYi
+	Hic2L639yMz1QRAS/hhGo6PnihMtFSGJxvAOWaIgXAwfI7iTTPBioCTiSANcUKGWj78tMUc6w4H
+	55FbGU3ptByhlJ5bPkRufdR+9seMUvoSfV6I1tCqmO8qZko50/Srt0Oz8xpDtjVKvHsSx/Bk6VF
+	D6JPccCDbY7MPptCTcUe65+Qp/IC6BaLkFSp9Iw8dHWzLMwd6/79lS32M72Psd1ndtWxT
+X-Google-Smtp-Source: AGHT+IFDkHIlGH+UICeedNY8tuFUMLJ68lqu5VoPcOTjTIWj9r93aVIljpR0UjzUe74VKQmlKp+fEQ==
+X-Received: by 2002:a5d:5f50:0:b0:429:b4ce:c692 with SMTP id ffacd0b85a97d-429bd6a77bcmr5661427f8f.7.1762166904243;
+        Mon, 03 Nov 2025 02:48:24 -0800 (PST)
+Received: from skbuf ([2a02:2f04:d406:ee00:7144:c922:dc8a:113d])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429d12e1173sm7767173f8f.42.2025.11.03.02.48.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Nov 2025 02:48:23 -0800 (PST)
+Date: Mon, 3 Nov 2025 12:48:20 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
 To: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
 	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Alexis =?iso-8859-1?Q?Lothor=E9?= <alexis.lothore@bootlin.com>,
+	Alexis =?utf-8?Q?Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	Boon Khai Ng <boon.khai.ng@altera.com>,
 	Daniel Machon <daniel.machon@microchip.com>,
@@ -72,11 +93,10 @@ Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Vladimir Oltean <olteanv@gmail.com>,
 	Yu-Chun Lin <eleanor15x@gmail.com>
 Subject: Re: [PATCH net-next 0/3] net: stmmac: phylink PCS conversion part 3
  (dodgy stuff)
-Message-ID: <aQiIP0_sQmdwrzu2@shell.armlinux.org.uk>
+Message-ID: <20251103104820.3fcksk27j34zu6cg@skbuf>
 References: <aP03aQLADMg-J_4W@shell.armlinux.org.uk>
  <aQExx0zXT5SvFxAk@oss.qualcomm.com>
  <aQHc6SowbWsIA1A5@shell.armlinux.org.uk>
@@ -95,40 +115,85 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <aQiBjYNtJks2/mrw@oss.qualcomm.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
 On Mon, Nov 03, 2025 at 03:48:53PM +0530, Mohd Ayaan Anwar wrote:
+> On Mon, Nov 03, 2025 at 09:52:38AM +0000, Russell King (Oracle) wrote:
+> > On Mon, Nov 03, 2025 at 02:28:24PM +0530, Mohd Ayaan Anwar wrote:
+> > > On Thu, Oct 30, 2025 at 03:22:12PM +0000, Russell King (Oracle) wrote:
+> > > > On Thu, Oct 30, 2025 at 03:19:27PM +0000, Russell King (Oracle) wrote:
+> > > > > > 
+> > > > > > This is probably fine since Bit(9) is self-clearing and its value just
+> > > > > > after this is 0x00041000.
+> > > > > 
+> > > > > Yes, and bit 9 doesn't need to be set at all. SGMII isn't "negotiation"
+> > > > > but the PHY says to the MAC "this is how I'm operating" and the MAC says
+> > > > > "okay". Nothing more.
+> > > > > 
+> > > > > I'm afraid the presence of snps,ps-speed, this disrupts the test.
+> > > > 
+> > > > Note also that testing a 10M link, 100M, 1G and finally 100M again in
+> > > > that order would also be interesting given my question about the RGMII
+> > > > register changes that configure_sgmii does.
+> > > > 
+> > > 
+> > > Despite several attempts, I couldn't get 10M to work. There is a link-up
+> > > but the data path is broken. I checked the net-next tip and it's broken
+> > > there as well.
+> > > 
+> > > Oddly enough, configure_sgmii is called with its speed argument set to
+> > > 1000:
+> > > [   12.305488] qcom-ethqos 23040000.ethernet eth0: phy link up sgmii/10Mbps/Half/pause/off/nolpi
+> > > [   12.315233] qcom-ethqos 23040000.ethernet eth0: major config, requested phy/sgmii
+> > > [   12.322965] qcom-ethqos 23040000.ethernet eth0: interface sgmii inband modes: pcs=00 phy=03
+> > > [   12.331586] qcom-ethqos 23040000.ethernet eth0: major config, active phy/outband/sgmii
+> > > [   12.339738] qcom-ethqos 23040000.ethernet eth0: phylink_mac_config: mode=phy/sgmii/pause adv=0000000,00000000,00000000,00000000 pause=00
+> > > [   12.355113] qcom-ethqos 23040000.ethernet eth0: ethqos_configure_sgmii : Speed = 1000
+> > > [   12.363196] qcom-ethqos 23040000.ethernet eth0: Link is Up - 10Mbps/Half - flow control off
+> > 
+> > If you have "rate matching" enabled (signified by "pause" in the mode=
+> > part of phylink_mac_config), then the MAC gets told the maximum speed for
+> > the PHY interface, which for Cisco SGMII is 1G. This is intentional to
+> > support PHYs that _really_ do use rate matching. Your PHY isn't using it,
+> > and rate matching for SGMII is pointless.
+> > 
+> > Please re-run testing with phy-mode = "sgmii" which you've tested
+> > before without your rate-matching patch to the PHY driver, so the
+> > system knows the _correct_ parameters for these speeds.
+> > 
+> Sorry, I forgot to mention that all the recent testing is being done on
+> QCS9100 Ride R3 which has the AQR115C PHY.
+> 
 > My rate-matching patch was for IQ8 which has the QCA808X PHY. I am
 > putting its testing on hold until we sort everything out on QCS9100
 > first.
 > 
 > So, for AQR115C, what should be the way forward? It has support for rate
 > matching. For 10M should I remove its .get_rate_matching callback?
+> 
+> 	Ayaan
 
-Yes, AQR115C has support for rate matching, but it depends how the
-firmware is configured. Different firmwares for this PHY default to
-different settings for this.
+As Russell partially pointed out, there are several assumptions in the
+Aquantia PHY driver and in phylink, three of them being that:
+- rate matching is only supported for PHY_INTERFACE_MODE_10GBASER and
+  PHY_INTERFACE_MODE_2500BASEX (thus not PHY_INTERFACE_MODE_SGMII)
+- if phy_get_rate_matching() returns RATE_MATCH_NONE for an interface,
+  pl->phy_state.rate_matching will also be RATE_MATCH_NONE when using
+  that interface
+- if rate matching is used, the PHY is configured to use it for all
+  media speeds <= phylink_interface_max_speed(link_state.interface)
 
-Some operate at a fixed speed on the host interface and do rate
-matching. Others don't. The registers in the PHY can be reprogrammed
-to change this behaviour and the PHY reset to change the provisioned
-firmware's behaviour, but mainline doesn't have that code.
+Those assumptions are not validated very well against the ground truth
+from the PHY provisioning, so the next step would be for us to see that
+directly.
 
-If you enable debugging in drivers/net/phy/aquantia/aquantia_main.c,
-then aqr_gen2_read_global_syscfg() will print its configuration for
-each speed via:
+Please turn this print from aqr_gen2_read_global_syscfg() into something
+visible in dmesg, i.e. by replacing phydev_dbg() with phydev_info():
 
-	"Media speed %d uses host interface %s with %s\n"
-
-messages. Unfortunately, aqr_gen2_get_rate_matching() does not take
-account of this configuration, and just assumes they're all the
-same (reporting rate adaption for 2500BASE-X and 10GBASE-R interfaces.)
-
-One thing occurs to me is maybe your PHY firmware is provisioned for
-rate adaption with the 2500BASE-X interface for 1G and 100M speeds,
-but for 10M, it's using SGMII. The above messages will tell us.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+		phydev_dbg(phydev,
+			   "Media speed %d uses host interface %s with %s\n",
+			   syscfg->speed, phy_modes(syscfg->interface),
+			   syscfg->rate_adapt == AQR_RATE_ADAPT_NONE ? "no rate adaptation" :
+			   syscfg->rate_adapt == AQR_RATE_ADAPT_PAUSE ? "rate adaptation through flow control" :
+			   syscfg->rate_adapt == AQR_RATE_ADAPT_USX ? "rate adaptation through symbol replication" :
+			   "unrecognized rate adaptation type");
 
