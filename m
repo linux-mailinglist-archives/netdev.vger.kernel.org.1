@@ -1,75 +1,65 @@
-Return-Path: <netdev+bounces-235011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1389CC2B251
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 11:51:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11041C2B349
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 12:00:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C5FA14F2962
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 10:50:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A5A73A7050
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 11:00:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A22A330170F;
-	Mon,  3 Nov 2025 10:49:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40B86301032;
+	Mon,  3 Nov 2025 11:00:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="XZemZQeV"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="HuJ3Ukg2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from canpmsgout03.his.huawei.com (canpmsgout03.his.huawei.com [113.46.200.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A398630147F;
-	Mon,  3 Nov 2025 10:49:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D933B30146D
+	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 11:00:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762166984; cv=none; b=jhB6/M3p07w8Ks0OjaXY9JhM8a1V3wBjt7AFDUSQFS8Ea3+2EH9y+gfFkD7B2K0Rjz60dgF17CAczwUIEWwpLCL9JlUyyLuq06+Uuv2ibZXF3AirrRKM0xu3UNu5U34yw0FrZLd6qxUmcQnmCvfJ5NCnd+M2z7Ye8eoxKUr1qXQ=
+	t=1762167617; cv=none; b=AKl8KNbyaxPiV5WSIBxMu8hEsXhLG8/mEaz0PLsiuEg7ECus/uL/Be+VaGUy6s2grgwAsjoJn4OPTDe9lU0mdUNGiqDaGHzBUzb7PaTYbhOOIgIVMak68HbdKG3Shh/SlvCBJYOF+CgNRRJemc9h+gi3jxTB1e2RuzBZVpJpF+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762166984; c=relaxed/simple;
-	bh=c9t+E3pawcbLcU0pARfnzXYmRo4V+2g7Cp66AAjOSmE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LUBMR6Kmk8EzzZkd3ho8zhSTX8bk8N6/BXSP3ORLKriCj9JS2VlQmEGJ5sLU1NfyU6KB6aDvv9i74/7p6mpidfCvr+v11ewzoMPnnhbjOyVPFRio4KsnL9Aec7uN9ZnFnSR7HjGI19R8xsQi8Xt6CA4gsm0owDU1QsWLHMRdVjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=XZemZQeV; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 3D6DAC0D7AA;
-	Mon,  3 Nov 2025 10:49:20 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 09F2B60628;
-	Mon,  3 Nov 2025 10:49:41 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id D1F4210B50078;
-	Mon,  3 Nov 2025 11:49:38 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1762166980; h=from:subject:date:message-id:to:cc:mime-version:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=8TPCTtZANNTp/VYFJqCDjc/4NduN0XXsteAOjwzluOs=;
-	b=XZemZQeVyfmAD5Ol4lpacCnPomlQc5PGvGZtuF5hUmBD5HgGbMC/ffi/WPb3uMtmymsdCk
-	+m/waRSCjN4WjF3vo0EmkX5HfPT9XCDA96d8HjbZU56WWtrfJ1Us1YdYQE8NUQn6YkKj+e
-	QlWCvRndzfhnEXQVl10nYLKOPpDVo39S7ikz6LXwyqv+kbDysyGoRPJzOfqaowH5DgNsc+
-	SAHrOwrZfHRokQ+bMw88vpYOCLUnvOsv9YXSS0mj8jwpi4T3+XwyRECA0FmaPgEUwPDZlY
-	H3b27k5JroclJafsHX6JyZqL5t80gytpIjR0t9gxt8+hUSbO8Ec7iaHnRf00mw==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Simon Horman <horms@kernel.org>,
-	Boon Khai Ng <boon.khai.ng@altera.com>,
-	=?UTF-8?q?Alexis=20Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Andrew Lunn <andrew@lunn.ch>
-Subject: [PATCH net-next v2 4/4] net: altera-tse: Init PCS and phylink before registering netdev
-Date: Mon,  3 Nov 2025 11:49:27 +0100
-Message-ID: <20251103104928.58461-5-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20251103104928.58461-1-maxime.chevallier@bootlin.com>
-References: <20251103104928.58461-1-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1762167617; c=relaxed/simple;
+	bh=26oGhMZAJyNHpFLdz9ki9jli2smy2hqkireoxhuIGU8=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=noNuQacg7RRcYPJkZVo++c5wLUOXqTO8QBcq4O/ElXwhKApSyHHEJqJRjXVTbVijTFtFTPRZmQrnd7sh8De/9ETmVRgWJHyfrUszsDDOECiUwG/m+P8CUhDQSYm43UhuWOoHGwNF4DSFaYu0A0c84OyZmuNAIxtotizxPl9E9ZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=HuJ3Ukg2; arc=none smtp.client-ip=113.46.200.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=k3raHiXWg0zqo7N0tTXtJ8Dlr7ndBSw8IaKZRUm67h8=;
+	b=HuJ3Ukg2NILzX2GCCOsAjtqBj8dIaT9NBMut5XQSfFFxjz7TZDOcRhKcv6v9gOHsH9lXV3pRq
+	Cm6dSN3Tv/4tQFwTIlihlmtazam3JxCICeK9Fh8JPnhVmb6cZSjzgj25esm9KmyQnNkWAUCYYik
+	B7xQXH3xVZGpfGepgpUBeF0=
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by canpmsgout03.his.huawei.com (SkyGuard) with ESMTPS id 4d0T8z0YnxzpStg;
+	Mon,  3 Nov 2025 18:58:43 +0800 (CST)
+Received: from kwepemf100013.china.huawei.com (unknown [7.202.181.12])
+	by mail.maildlp.com (Postfix) with ESMTPS id 6796914020C;
+	Mon,  3 Nov 2025 19:00:10 +0800 (CST)
+Received: from DESKTOP-62GVMTR.china.huawei.com (10.174.188.120) by
+ kwepemf100013.china.huawei.com (7.202.181.12) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 3 Nov 2025 19:00:07 +0800
+From: Fan Gong <gongfan1@huawei.com>
+To: <alok.a.tiwari@oracle.com>
+CC: <alok.a.tiwarilinux@gmail.com>, <andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>, <edumazet@google.com>, <gongfan1@huawei.com>,
+	<horms@kernel.org>, <kuba@kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <zhuyikai1@h-partners.com>
+Subject: Re: [PATCH net-next] hinic3: fix misleading error message in hinic3_open_channel()
+Date: Mon, 3 Nov 2025 19:00:03 +0800
+Message-ID: <20251103110003.835-1-gongfan1@huawei.com>
+X-Mailer: git-send-email 2.51.0.windows.1
+In-Reply-To: <20251031112654.46187-1-alok.a.tiwari@oracle.com>
+References: <20251031112654.46187-1-alok.a.tiwari@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,84 +67,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100002.china.huawei.com (7.221.188.206) To
+ kwepemf100013.china.huawei.com (7.202.181.12)
 
-register_netdev() must be done only once all resources are ready, as
-they may be used in .ndo_open() immediately upon registration.
+On 10/31/2025 7:26 PM, Alok Tiwari wrote:
+> The error message printed when hinic3_configure() fails incorrectly
+> reports "Failed to init txrxq irq", which does not match the actual
+> operation performed. The hinic3_configure() function sets up various
+> device resources such as MTU and RSS parameters , not IRQ initialization.
+>
+> Update the log to "Failed to configure device resources" to make the
+> message accurate and clearer for debugging.
+>
+> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+> ---
+> Fixes: b83bb584bc97 ("hinic3: Tx & Rx configuration")
+> ---
+>  drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c b/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
+> index 0fa3c7900225..bbf22811a029 100644
+> --- a/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
+> +++ b/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
+> @@ -304,7 +304,7 @@ static int hinic3_open_channel(struct net_device *netdev)
+>  
+>  	err = hinic3_configure(netdev);
+>  	if (err) {
+> -		netdev_err(netdev, "Failed to init txrxq irq\n");
+> +		netdev_err(netdev, "Failed to configure device resources\n");
+>  		goto err_uninit_qps_irq;
+>  	}
+>  
 
-Move the lynx PCS and phylink initialisation before registerng the
-netdevice. We also remove the call to netif_carrier_off(), as phylink
-takes care of that.
+Thanks for your change.
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
- drivers/net/ethernet/altera/altera_tse_main.c | 40 +++++++++----------
- 1 file changed, 20 insertions(+), 20 deletions(-)
-
-diff --git a/drivers/net/ethernet/altera/altera_tse_main.c b/drivers/net/ethernet/altera/altera_tse_main.c
-index 003df8970998..ca55c5fd11df 100644
---- a/drivers/net/ethernet/altera/altera_tse_main.c
-+++ b/drivers/net/ethernet/altera/altera_tse_main.c
-@@ -1386,24 +1386,6 @@ static int altera_tse_probe(struct platform_device *pdev)
- 	spin_lock_init(&priv->tx_lock);
- 	spin_lock_init(&priv->rxdma_irq_lock);
- 
--	netif_carrier_off(ndev);
--	ret = register_netdev(ndev);
--	if (ret) {
--		dev_err(&pdev->dev, "failed to register TSE net device\n");
--		goto err_register_netdev;
--	}
--
--	revision = ioread32(&priv->mac_dev->megacore_revision);
--
--	if (revision < 0xd00 || revision > 0xe00)
--		netdev_warn(ndev, "TSE revision %x\n", revision);
--
--	if (netif_msg_probe(priv))
--		dev_info(&pdev->dev, "Altera TSE MAC version %d.%d at 0x%08lx irq %d/%d\n",
--			 (revision >> 8) & 0xff, revision & 0xff,
--			 (unsigned long) control_port->start, priv->rx_irq,
--			 priv->tx_irq);
--
- 	snprintf(mrc.name, MII_BUS_ID_SIZE, "%s-pcs-mii", dev_name(&pdev->dev));
- 	pcs_bus = devm_mdio_regmap_register(&pdev->dev, &mrc);
- 	if (IS_ERR(pcs_bus)) {
-@@ -1441,12 +1423,30 @@ static int altera_tse_probe(struct platform_device *pdev)
- 		goto err_init_phylink;
- 	}
- 
-+	ret = register_netdev(ndev);
-+	if (ret) {
-+		dev_err(&pdev->dev, "failed to register TSE net device\n");
-+		goto err_register_netdev;
-+	}
-+
-+	revision = ioread32(&priv->mac_dev->megacore_revision);
-+
-+	if (revision < 0xd00 || revision > 0xe00)
-+		netdev_warn(ndev, "TSE revision %x\n", revision);
-+
-+	if (netif_msg_probe(priv))
-+		dev_info(&pdev->dev, "Altera TSE MAC version %d.%d at 0x%08lx irq %d/%d\n",
-+			 (revision >> 8) & 0xff, revision & 0xff,
-+			 (unsigned long)control_port->start, priv->rx_irq,
-+			 priv->tx_irq);
-+
- 	return 0;
-+
-+err_register_netdev:
-+	phylink_destroy(priv->phylink);
- err_init_phylink:
- 	lynx_pcs_destroy(priv->pcs);
- err_init_pcs:
--	unregister_netdev(ndev);
--err_register_netdev:
- 	netif_napi_del(&priv->napi);
- 	altera_tse_mdio_destroy(ndev);
- err_free_netdev:
--- 
-2.49.0
-
+Reviewed-by: Fan Gong <gongfan1@huawei.com>
 
