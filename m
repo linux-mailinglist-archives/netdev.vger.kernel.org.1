@@ -1,138 +1,116 @@
-Return-Path: <netdev+bounces-235219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACAFFC2DADD
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 19:30:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 000CAC2DB85
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 19:45:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A53721882883
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 18:30:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40AA53A66D2
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 18:45:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AC8A313273;
-	Mon,  3 Nov 2025 18:29:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EF6D31B131;
+	Mon,  3 Nov 2025 18:45:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="ukNjzSjM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OKd7buNi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3E0C302776
-	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 18:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6111313E0F
+	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 18:45:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762194575; cv=none; b=N51x2W6T28cqXMcPoW2d6deCPHX/SHyhbLenjuk2uuP0f63n82bspUonPfXPbJGLO+P219WTnlboLN5OmpFxGaGKchVh6xX/INY0uOFR/DY5dVJULKpOSQjHwFJDKaokS7MpIoVMvBTZaN7Hw6RDveIheu9w1hvIMsYHqcdll7M=
+	t=1762195522; cv=none; b=Wgq43/q5mIzxL9+f35R+TFPIvKtn3BJeEyu8Aaeohgt51SfZQL7uulFUd9F/91MgOihROz6hTKIQ73WQ+NLFkAGx4RQdIaS2c87znQNyXV5iU0I/tLdyJZAdVvltiOQ58ae2l7vxlEOhim6AbKRuXBD2d8vXtA3b4N9qBAn9KUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762194575; c=relaxed/simple;
-	bh=wmAoFKWLR75h67tOzpzFWAsENGf3eJMEMC/hDrfVXjU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mzleMIJ+KkTQqpNlDDlbvd0YXnN/nSyBYvpkswVtZxBHyfdmr8VGCpzpio6ei9AgD8VoaynLkHnILBnS7hDQon059yVVgeEE0kYCWam4IRvUzztANFimgbTTpD8FVbrdFMqIySolWt1jqA0tkc9F01rk8d0JTsrv7UgwVdCvipw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=ukNjzSjM; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-29568d93e87so15701375ad.2
-        for <netdev@vger.kernel.org>; Mon, 03 Nov 2025 10:29:33 -0800 (PST)
+	s=arc-20240116; t=1762195522; c=relaxed/simple;
+	bh=prOLPjRhNwhjqEXp1NsT05g66lCbw/24/gxyd8v1xBI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QTt6gyc+YfFD14IZSsi5Ty0nxozxga62+4waVyhrg9QiyfUS5a80SgkscmUt58I35xM6MXkCnNTqtxdP/MIMkn4y5pWdQTZV+SrsOVYL7ZSK8mS9uGGVTEratUJzXxuKUirklK8acsXCrA9vV2P2RvZk2s1p2aLFvc8S+sPdzn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OKd7buNi; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-429c82bf86bso2241307f8f.1
+        for <netdev@vger.kernel.org>; Mon, 03 Nov 2025 10:45:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1762194573; x=1762799373; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=PitSUlDm1go9vcuGwrxc/qigK0RG9QByQoNdiaE+6vo=;
-        b=ukNjzSjMp8FXrdxXksyuuuTwyVobQBLBdIuqVY4PVD8hRIiSVhxXtfN/rGbg5mPauc
-         9+QgzcYCiScNDOeciF5E10LcP9P6z5lluX3sNpf7cpWE3ev+JQHMSwgRPOEU0hHejdvX
-         MpaQoLYHZwJFtGldxlQRPCI798l9eL1n6tarvNCTsV5S+r2qx75ay5OWHQ3L5IZ0fKPr
-         B2jJKUi/4ii6lDq0m3IaPAmcE7Jtjeg/RZTK1TOghh6Js0bolulbvcRCnxyYUUUR7Bvj
-         3kvFM7HiIaikqcmr8FeG822uDwNnIqM7PD4lwC/4nR15qxTKt/eSaMDStw+4iEut4K7T
-         YicQ==
+        d=gmail.com; s=20230601; t=1762195519; x=1762800319; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Km0NgyANyt85YBiufjQpkK6GzKroUj0XdZqe77+JqE4=;
+        b=OKd7buNislQUxDUHo/kNFRl5hXAGvJEalpSBzJpebvOqggvrN52grnflI+m/AE7Ksx
+         dgLjVWSSKEusJoI+GAqbzCwScs+wej9NebnkLwtEgVSd97DHvaCZocvsjp5jPnyuOceD
+         2y1PX1yvDEcggNexyF5vFPWyxCBgrDrgsf1oB7p/WFqER4r6MWa/SDh1K7rw7eL+C+Bk
+         aTcSBcENxEk+VnEoYjrk+mkY3ZeFmXaGUjoWu7nIdJePdP5HBobIpphOKM5BA3dATPbT
+         +vHanwuJZQ8oBeVC1udeNGuGZqz85mNKy4Aqx9BSg8kxHOqzb+JCujsPk6CNc1ve+FnP
+         fhWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762194573; x=1762799373;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PitSUlDm1go9vcuGwrxc/qigK0RG9QByQoNdiaE+6vo=;
-        b=cYAjGsstuh1ZLI9WW/KN31iRRhRYMhgGDgOSIJcS4VwqVmev/ksC8HmMugIIuQ57VN
-         IeMNQ8fBERfat+BGbtD4MyDequDzUqjO+P/+ADkAMcwwspVbggFg+hGPRFJ/1qaJBRDR
-         VjwlGh5NSQQza/iUalemn89au2hD+6J6E9K3J8LpOgZN6kkLUPqnG2D8bj97iEszKGLB
-         J3Ok0StFDsMj5z8wdGeA9Pv+Nvdf+9T9pasG6+EVhcRaTPhtu4OPUuz9g0xXOgtZyAZT
-         L8Ia7YSos5rhRw9xXAx9D3T6cmIKagDzZPpCma7qH3SPE/kDTEejewcZBXbtip+JdcOi
-         HisQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWoTGZrkvZ9hZ0rkyIUCOrkErrrn/IF/KE/4KfNyu1mTw45zay300uSSkGbgrk8xd6oAaaUgWw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywk8ecEoGMKAh8EkTcxPQtRJGcmVew0k5nCDIdaXAWxm80EWxxT
-	0KX2GvZKiFOTQWRonqzUv25er0586J6S7UJ9UIlKIkK+Y0P/wjGGIpsh+L8SWXb4UC8=
-X-Gm-Gg: ASbGnctvsiSsSj5D9H8qLKqfL1ZBZcuket6XNGpBBZue20KMF+w8wKeUXIzaYj5f70p
-	94e/9AGHzGc7v08W8kp7/wT8kk9f67yBdcN9vzHLA2cvM3rLttvY22C63lg2Ks0Mw761QPLPV0W
-	OdmEXIsOBuLJ3JjOnLljmO+3ib9ColkbbQAzigOx6WxwH+4dKU3ThfmGlZnQrCr6sWUOlyJ22UL
-	tgzwENrUQwXKtMLRbSj3oOzFflQASpCTwPjlt3RO23PZm41ihJUw4ADkrp3LOmOVG3+LM0H2gnT
-	Grz3JwWecou2Z3iWuXvWqFGFpxXeAW9fMHIuA6aMF0BaEi19lizosBpsP1f+kOuCoHa8yJSRJlC
-	R46AzdLpny733zE98KjCGcBmcfnPQvjJ8VEtqlV7oz9US1O0IweIP/ihopDgSew9f82uJBKiCZU
-	SUF2CipLPZwCqN+7yDFRiL+/S9rGzTOIJDHPpNR52hnznTxMx+sQ==
-X-Google-Smtp-Source: AGHT+IGW2nkRcJ3o/X5DXan+YDTZlhzqN1S6emKnORTiA21dPoo0N/2D2LoJeQBefEjC3aZZYzoH/g==
-X-Received: by 2002:a17:902:c40f:b0:295:a1a5:baee with SMTP id d9443c01a7336-295a1a5c06cmr51543855ad.4.1762194572902;
-        Mon, 03 Nov 2025 10:29:32 -0800 (PST)
-Received: from [192.168.86.109] ([136.27.45.11])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2952699c9dbsm130124765ad.84.2025.11.03.10.29.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Nov 2025 10:29:32 -0800 (PST)
-Message-ID: <1f708620-303f-4466-b248-3490a8e9e424@davidwei.uk>
-Date: Mon, 3 Nov 2025 10:29:31 -0800
+        d=1e100.net; s=20230601; t=1762195519; x=1762800319;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Km0NgyANyt85YBiufjQpkK6GzKroUj0XdZqe77+JqE4=;
+        b=Ojrk17E5ThXrWtViCBQczwm3qI//umm7tDsD49Wurv+M/V1mYdY31Ow+IB6LvhUihQ
+         zghetEEcy7z9ZRubXKFLEMuT5qCJ6Uq0iBjW7Gb3rH0n4Q7f6cWl4HGf1YnNnY5MdwAB
+         0NaKWsKOh2elNxjg2r1eL2E4G++yfhzQBBAWj/NOLS+LzbuXFL3aiemwd3eaeZf17iDQ
+         uhkraAkQ8LQWcM+iNM2YT2GOsz6V8pH7qio/Yf92w0AheOzZcgXvojBZXeXjh4usVS3g
+         DMwWYXeCLEUWve8JNf/EE7Ii/+D6m08UEhgokdL+xFaa2mqAkJ1PV9BbBh/xNGV8hT15
+         g/Uw==
+X-Gm-Message-State: AOJu0YxTEfBRiffHUjIynN183lT24HzUSksk8vOrYeCGkUp136+szlg4
+	pD6r2tTXLfZvNbatJRr5FGrCal+jVVHoyU1cNT3X4BHKeTSw2PzwPK74EKXcl0PbiAvIfB534NP
+	q3voFl77Sciwab9IehMvJ39ecaxJWi4A=
+X-Gm-Gg: ASbGncvoPClcYe9FMpW+W01eXtzWfY5xlx0BbOEbt1elg007rzUUW/62w8UkA8m8t37
+	UqtiIoeM6O1EaMqU8FgxZpp4xVZM9uCVC6n1GfkkT10xPvr8BRkeaViMEVeVyF+OnNUhNnkMJ5Q
+	y3jcVtbIQ8oSq0nkqFXXgCxODsnYbnAUQW1BPaFMqW9VuUBaVIs8sNRKy25FQstMDXO/Ke6X8nF
+	ia5XU8cdwW+nTFflQK40zTmY6JkxSEK3J8LhuPp9jXB4a7s0WIyiGXoZmW77iYdjqpTDSY=
+X-Google-Smtp-Source: AGHT+IEvk+zA0geR2qDyjqC3oQlfMJhvVNIV8FOrMfMM4VmOXelHtHvhLNFBLy3zcYrNjal1D7MOu/Ls7XdvvT9zqUc=
+X-Received: by 2002:a05:6000:1a8e:b0:425:7e38:a09e with SMTP id
+ ffacd0b85a97d-429bd6886e6mr11209655f8f.2.1762195518862; Mon, 03 Nov 2025
+ 10:45:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/2] net: io_uring/zcrx: call
- netdev_queue_get_dma_dev() under instance lock
-To: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-References: <20251101022449.1112313-1-dw@davidwei.uk>
- <20251101022449.1112313-3-dw@davidwei.uk>
- <c374df85-23ec-4324-b966-9f2b3a74489a@gmail.com>
- <c8d945a3-4b12-4c04-9c68-4c5ad6173af5@davidwei.uk>
- <7805c473-448a-430c-a53b-a42e8d2c24bf@gmail.com>
-Content-Language: en-US
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <7805c473-448a-430c-a53b-a42e8d2c24bf@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <176218882404.2759873.8174527156326754449.stgit@ahduyck-xeon-server.home.arpa>
+ <176218925451.2759873.6130399808139758934.stgit@ahduyck-xeon-server.home.arpa>
+ <aQjrQIl-Yo6G_kGv@shell.armlinux.org.uk>
+In-Reply-To: <aQjrQIl-Yo6G_kGv@shell.armlinux.org.uk>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Mon, 3 Nov 2025 10:44:41 -0800
+X-Gm-Features: AWmQ_bkEKPJLSrlwheMdrw28zG-Xjm2W32l5UryeNuK65luhnXgr93wr1XunmCk
+Message-ID: <CAKgT0Udv7q-fENNAwGToaVZDiaH1GE9kQhe9HqrPGZnXfFC7bQ@mail.gmail.com>
+Subject: Re: [net-next PATCH v2 08/11] fbnic: Cleanup handling for link down
+ event statistics
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, kernel-team@meta.com, 
+	andrew+netdev@lunn.ch, hkallweit1@gmail.com, pabeni@redhat.com, 
+	davem@davemloft.net
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2025-11-03 10:21, Pavel Begunkov wrote:
-> On 11/3/25 17:47, David Wei wrote:
->> On 2025-11-03 05:51, Pavel Begunkov wrote:
->>> On 11/1/25 02:24, David Wei wrote:
->>>> netdev ops must be called under instance lock or rtnl_lock, but
->>>> io_register_zcrx_ifq() isn't doing this for netdev_queue_get_dma_dev().
->>>> Fix this by taking the instance lock using netdev_get_by_index_lock().
->>>>
->>>> Extended the instance lock section to include attaching a memory
->>>> provider. Could not move io_zcrx_create_area() outside, since the dmabuf
->>>> codepath IORING_ZCRX_AREA_DMABUF requires ifq->dev.
->>>
->>> It's probably fine for now, but this nested waiting feels
->>> uncomfortable considering that it could be waiting for other
->>> devices to finish IO via dmabuf fences.
->>>
->>
->> Only the dmabuf path requires ifq->dev in io_zcrx_create_area(); I could
->> split this into two and then unlock netdev instance lock between holding
->> a ref and calling net_mp_open_rxq().
->>
->> So the new ordering would be:
->>
->>    1. io_zcrx_create_area() for !IORING_ZCRX_AREA_DMABUF
->>    2. netdev_get_by_index_lock(), hold netdev ref, unlock netdev
->>    3. io_zcrx_create_area() for IORING_ZCRX_AREA_DMABUF
->>    4. net_mp_open_rxq()
-> 
-> To avoid dragging it on, can you do it as a follow up please? And
-> it's better to avoid splitting on IORING_ZCRX_AREA_DMABUF, either it
-> works for both or it doesn't at all.
-> 
+On Mon, Nov 3, 2025 at 9:49=E2=80=AFAM Russell King (Oracle)
+<linux@armlinux.org.uk> wrote:
+>
+> On Mon, Nov 03, 2025 at 09:00:54AM -0800, Alexander Duyck wrote:
+> > @@ -86,10 +86,10 @@ static int fbnic_stop(struct net_device *netdev)
+> >  {
+> >       struct fbnic_net *fbn =3D netdev_priv(netdev);
+> >
+> > +     fbnic_mac_free_irq(fbn->fbd);
+> >       phylink_suspend(fbn->phylink, fbnic_bmc_present(fbn->fbd));
+> >
+> >       fbnic_down(fbn);
+> > -     fbnic_mac_free_irq(fbn->fbd);
+>
+> This change makes no sense to me, and doesn't seem to be described in
+> the commit message.
 
-Of course, follow ups are always my preference.
+It was mostly about just disabling the IRQ before we tear down the
+link in the non-BMC case. Otherwise we run the risk of an interrupt
+firing to indicate that the link is down and incrementing the
+link_down_event counter when we do an ifconfig down and the link was
+intended to be torn down.
 
