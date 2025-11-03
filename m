@@ -1,101 +1,96 @@
-Return-Path: <netdev+bounces-235111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35BEAC2C35A
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 14:45:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FA3BC2C384
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 14:46:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 66CC74F6331
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 13:38:45 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CC82E4E87EF
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 13:40:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53E9E2FFF91;
-	Mon,  3 Nov 2025 13:36:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="H3R8xKzP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BC55305046;
+	Mon,  3 Nov 2025 13:39:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B91F126C3BE;
-	Mon,  3 Nov 2025 13:36:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA93230DED4;
+	Mon,  3 Nov 2025 13:39:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.181.97.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762176972; cv=none; b=tkv51i8ulP1tG5suBwHZ5kQhCN7tasqBDafolNmpIiD+ZFo6luNSJkLFJYaIsS3q24cuhK2PEoDr1SZRO1pRM6sxljj0pABbHSJy/Cg7C8XXm2qn+yT2IiaO4AiEoP20L/qAD1Dmy9X5BP9+3MleB7rIWj/TViv5saJOUwVBlvs=
+	t=1762177198; cv=none; b=qfVgpZ0vn/PpBlG8+mDk2O/AFwXpNr9KumtLqWcMQ3UDExH+JF2YL5hXOKPjxI9rH4pQjNBvxqKD3n/MliHLEYkuqwqmijZBj+YCV8xXPeB7/SDLnXHAnlhsEZVJyDWenAobt0GcB1zaHGjYeEwsAOFYbU7oEL2TtFvBFD5IUII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762176972; c=relaxed/simple;
-	bh=hh4fQWQud1e+BB+JyZ3vB+KHwKuyZC0k6VLYceJN+9Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L/yj7j4+75NdEBoubTH8EefFqfDTlSbd96i62H3ToYaa5MQ/VLN229ln2wr5R9yjt9c5/1SOAEChqblFR24gbn3oikGJBHr6nykxeOUlRvI1XV6P7nIMIbdV9nu158A6eWoubNMveOlQarJA9tw3b4DwmumoHFm90BmQhNJrnU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=H3R8xKzP; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Zh9B4vB/7KSaXnJ8zZXyTQPM87A3PE1sYsd73K993Ks=; b=H3R8xKzPPH2KeZx3glli8KbhWw
-	Heg3m3N4/sh1hsd1oLCxREijpiXDcQ/Ljbk2XeUpI8QyYpOXQCy/skmsqxExZMLopP9CFbB+zmPol
-	Cxls+aFokjr0r5mH3DgLqzEaGuKnT0PbFIZAAPD6g2yPhYU1wJLpm86nYCDbXoeQADM0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vFuj2-00Cmdm-Gw; Mon, 03 Nov 2025 14:36:00 +0100
-Date: Mon, 3 Nov 2025 14:36:00 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: Jakub Kicinski <kuba@kernel.org>, Wang Liang <wangliang74@huawei.com>,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	shuah@kernel.org, horms@kernel.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	yuehaibing@huawei.com, zhangchangzhong@huawei.com
-Subject: Re: [PATCH net] selftests: netdevsim: Fix ethtool-features.sh fail
-Message-ID: <e014c4c5-105a-43cb-9411-ec139af2b2a1@lunn.ch>
-References: <20251030032203.442961-1-wangliang74@huawei.com>
- <aQPxN5lQui5j8nK8@krikkit>
- <20251030170217.43e544ad@kernel.org>
- <aQiANPQU9ZEa0zCo@krikkit>
+	s=arc-20240116; t=1762177198; c=relaxed/simple;
+	bh=vZQQeXvsMwwdNR+QwClddEdli/wv3INn7ueWC38q2kI=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=CVMmhnaKuyrdy7swb3bakztKGbnuY5aCLxNnj6eGB2LvmmghwSVDLP5TN4Q20QF+5pK+sqevrceoZugBohk4YvTbiATjrV6Lwt6zTJTSGqYstfKoT5n+b/i4Lsy8gfJ+zawOCk5JDtKczRZKInVXLAIyRVHGKiEeToIT0eCH8FU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp; arc=none smtp.client-ip=202.181.97.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=I-love.SAKURA.ne.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=I-love.SAKURA.ne.jp
+Received: from www262.sakura.ne.jp (localhost [127.0.0.1])
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 5A3Ddluc028933;
+	Mon, 3 Nov 2025 22:39:47 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from [192.168.1.10] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+	(authenticated bits=0)
+	by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 5A3DdlFB028930
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+	Mon, 3 Nov 2025 22:39:47 +0900 (JST)
+	(envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <8b470fda-515e-4ca8-89d4-3dcd7088f58b@I-love.SAKURA.ne.jp>
+Date: Mon, 3 Nov 2025 22:39:45 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aQiANPQU9ZEa0zCo@krikkit>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Subject: unregister_netdevice: waiting for lo to become free. Usage count =
+ 6659
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Virus-Status: clean
+X-Anti-Virus-Server: fsav403.rs.sakura.ne.jp
 
-On Mon, Nov 03, 2025 at 11:13:08AM +0100, Sabrina Dubroca wrote:
-> 2025-10-30, 17:02:17 -0700, Jakub Kicinski wrote:
-> > On Fri, 31 Oct 2025 00:13:59 +0100 Sabrina Dubroca wrote:
-> > > >  set -o pipefail
-> > > >  
-> > > > +if ! ethtool --json -k $NSIM_NETDEV > /dev/null 2>&1; then  
-> > > 
-> > > I guess it's improving the situation, but I've got a system with an
-> > > ethtool that accepts the --json argument, but silently ignores it for
-> > >  -k (ie `ethtool --json -k $DEV` succeeds but doesn't produce a json
-> > > output), which will still cause the test to fail later.
-> > 
-> > And --json was added to -k in Jan 2022, that's pretty long ago.
-> > I'm not sure we need this aspect of the patch at all..
-> 
-> Ok.  Then maybe a silly idea: for the tests that currently have some
-> form of "$TOOL is too old" check, do we want to remove those after a
-> while? If so, how long after the feature was introduced in $TOOL?
+Hello.
 
-Another option is to turn them into a hard fail, after X years. My
-guess is, tests which get skipped because the test tools are too old
-frequently get ignored. Tests which fail are more likely to be looked
-at, and the tools updated.
+A syzbot report at 2025/11/03 12:00 in
+https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84 showed
+a huge refcount leak. The kernel commit is v6.18-rc4 of linux.git tree.
+When is this refcount supposed to be released?
 
-Another idea is have a dedicated test which simply tests the versions
-of all the tools. And it should only pass if the installed tools are
-sufficiently new that all test can pass. If you have tools which are
-in the grey zone between too old to cause skips, but not old enough to
-cause fails, you then just have one failing test you need to turn a
-blind eye to.
-
-	Andrew
+unregister_netdevice: waiting for lo to become free. Usage count = 6659
+ref_tracker: netdev@ffff88805f84a618 has 6658/6658 users at
+     __netdev_tracker_alloc include/linux/netdevice.h:4375 [inline]
+     netdev_hold include/linux/netdevice.h:4404 [inline]
+     dst_init+0xda/0x580 net/core/dst.c:52
+     dst_alloc+0xbb/0x1a0 net/core/dst.c:93
+     rt_dst_alloc+0x35/0x3a0 net/ipv4/route.c:1646
+     ip_route_input_slow+0x16cb/0x3fa0 net/ipv4/route.c:2424
+     ip_route_input_rcu net/ipv4/route.c:2538 [inline]
+     ip_route_input_noref+0x120/0x2e0 net/ipv4/route.c:2549
+     ip_rcv_finish_core+0x46f/0x2290 net/ipv4/ip_input.c:368
+     ip_list_rcv_finish+0x1b8/0x780 net/ipv4/ip_input.c:619
+     ip_sublist_rcv net/ipv4/ip_input.c:644 [inline]
+     ip_list_rcv+0x335/0x450 net/ipv4/ip_input.c:678
+     __netif_receive_skb_list_ptype net/core/dev.c:6122 [inline]
+     __netif_receive_skb_list_core+0x752/0x950 net/core/dev.c:6169
+     __netif_receive_skb_list net/core/dev.c:6221 [inline]
+     netif_receive_skb_list_internal+0x75f/0xdc0 net/core/dev.c:6312
+     netif_receive_skb_list net/core/dev.c:6364 [inline]
+     netif_receive_skb_list+0x4d/0x4b0 net/core/dev.c:6354
+     xdp_recv_frames net/bpf/test_run.c:269 [inline]
+     xdp_test_run_batch.constprop.0+0x146b/0x1ad0 net/bpf/test_run.c:350
+     bpf_test_run_xdp_live+0x365/0x770 net/bpf/test_run.c:379
+     bpf_prog_test_run_xdp+0xd38/0x1660 net/bpf/test_run.c:1320
+     bpf_prog_test_run kernel/bpf/syscall.c:4688 [inline]
+     __sys_bpf+0x1035/0x4980 kernel/bpf/syscall.c:6167
+     __do_sys_bpf kernel/bpf/syscall.c:6259 [inline]
+     __se_sys_bpf kernel/bpf/syscall.c:6257 [inline]
+     __ia32_sys_bpf+0x76/0xe0 kernel/bpf/syscall.c:6257
 
