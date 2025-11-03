@@ -1,149 +1,154 @@
-Return-Path: <netdev+bounces-235038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235039-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAC65C2B7AC
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 12:45:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1974C2B7C1
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 12:46:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 218A53A7A44
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 11:43:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F0F33AAAFD
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 11:43:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEBF0303A2E;
-	Mon,  3 Nov 2025 11:43:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F491303A15;
+	Mon,  3 Nov 2025 11:43:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="CAC0wr58"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="LDxM83/r"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C558303A13;
-	Mon,  3 Nov 2025 11:43:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77B562EC09A
+	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 11:43:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762170207; cv=none; b=jaMnkzCIpVs4IJy1n2kjdfmHtg50LLuFYZC39+uovmZx/JCFpOaGFdLbryifPATm2e96h+depIzrF4AdQYEfd8W2fC1RFx2WWIpx3/CgF7jCh5vBsoHkZt9GHmdOYnkxwEMvUG9m5au6K0TGZfUpyn1+xlkzPqwwi9tqjDgL0VQ=
+	t=1762170227; cv=none; b=WpHnKRFNUzf0/vkeezkQq2xCCVu6zw1ipQ0p7Pb90Hn/ZCP0XhGB/9N6VrB8FlE51ExOmKrLz/F5Xp0UUDvCMjI02ZxZWwj2RsmzawshSJUPdjCExKAKvu1Vk8Hdt7ypd9zSfybs8+MXawwz7FZNslXU58fWrfFcZkX/LwNPmZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762170207; c=relaxed/simple;
-	bh=WC+IlFx59Kg7tN31UkLDaE+SqlheI6tgR12CJZRleTc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CC1ZzMlJLRE5MxhTw9b9wBuY8xAulYLTyD9xGOMjpYPmdcoaKOlzavguIKgb44UjjH9R7b0pk/iKF49YSI3Zdv+4mC1IXsR16wsltebhScReald7sNoJ+EWzCndKKTPaifU36IKWjm4Bzy9uZjRzhdMuNo7jaJ1g7M3B1HjX7ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=CAC0wr58; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id A31BEC0D7AA;
-	Mon,  3 Nov 2025 11:43:01 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 5F48260628;
-	Mon,  3 Nov 2025 11:43:22 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9D08F10B500C5;
-	Mon,  3 Nov 2025 12:43:17 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1762170201; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=r8CA+vdYfhYepnKUhOERQCJShsp4s/lW0pNczBAWdSg=;
-	b=CAC0wr58URPaBSd9FY9zqhAcElpRWn9kXxq1d02X/sHJRoXYTtMd2IKLh/OnKa/HtJwMxC
-	RxQIESj2rIAoCPH1EsxrAzH27FmSlaK4DR9ykqIndBURYcY7C3Aq91hMLh1rKwgfMns4S1
-	lj+1f1l1lekKSWlwPL9Js7STbvY/3lCN5cvLQSiZ3iHiiLh/80FAnFxCD5yY4wE6y8vJ/w
-	glYEnzIxSvukOoJ7o9+XmPQUJu0X+PB5wLVUAajDAybDAeAkKIgPB3ahykBEMYVRW5G3sf
-	Twd3wAQe2GjKuFKrvTjqrUe4UAC4Oc76hXC78Ndke8syQAJhIYWh4bKrmXBiyQ==
-Date: Mon, 3 Nov 2025 12:43:16 +0100
-From: Herve Codina <herve.codina@bootlin.com>
-To: Haotian Zhang <vulab@iscas.ac.cn>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: wan: framer: pef2256: Fix missing
- mfd_remove_devices() call
-Message-ID: <20251103124316.1557e070@bootlin.com>
-In-Reply-To: <20251103111844.271-1-vulab@iscas.ac.cn>
-References: <20251103111844.271-1-vulab@iscas.ac.cn>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.1 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1762170227; c=relaxed/simple;
+	bh=gXqfqo3oWjRF2VoSu32i9LBFsBfKRPfma24sW5oY/Bk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jlidA/Sz/nJCZ8Z/u8bAamJHfGPm9iWj0HpJdp29+KKY065QMXnFDYSziBRV5IOiSapBNizV7u9sgfMoCP5jm7kPggvbXZlwnVboIhFsCN2jNbbZqut0T9xIhL5D55wBNWhKiXl5938Q50WdDEbvZg8wqXU+5eCysgDtxZzqoU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=LDxM83/r; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=BXuMJWywnmqLRFVSrlO0g4wLfEyDjnCQbBY2E7xN+7w=; b=LDxM83/rO3g7Z31rdahnjmiy62
+	3ZSi9SC6X7XnsfCTlJ4CCf83JJFgU3bYHdp8475HXM3tI/29f1nEoD7jSUOM2dXdHldLjK+WA8TVa
+	27XcJ9cSvK8+/paflZggp9LdelNUEfw5T9OpQf8iqHILFL7gHqR3amaXVSHHOfelpJ63Rm7E/KcQy
+	h5mIITItmiZPBiVoItNcpG99R+MuylVz5bvro+znkJzkeQwWUafDoILRuBuTuhZTX39JbHpPCsbVz
+	lL96cRh2cA9Y2cLBgsde4hfRxFdYpcOI/dgzMA6CnSs0ky5if7qx4cKIZ3tCLHURJ/ygmojo03qwY
+	ymf4JXsw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50598)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vFsy8-000000000eF-3CVg;
+	Mon, 03 Nov 2025 11:43:28 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vFsy3-000000003m0-3BBY;
+	Mon, 03 Nov 2025 11:43:23 +0000
+Date: Mon, 3 Nov 2025 11:43:23 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
+Cc: Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Alexis =?iso-8859-1?Q?Lothor=E9?= <alexis.lothore@bootlin.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Boon Khai Ng <boon.khai.ng@altera.com>,
+	Daniel Machon <daniel.machon@microchip.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Furong Xu <0x1207@gmail.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	Yu-Chun Lin <eleanor15x@gmail.com>
+Subject: Re: [PATCH net-next 0/3] net: stmmac: phylink PCS conversion part 3
+ (dodgy stuff)
+Message-ID: <aQiVWydDsRaMz8ua@shell.armlinux.org.uk>
+References: <aQExx0zXT5SvFxAk@oss.qualcomm.com>
+ <aQHc6SowbWsIA1A5@shell.armlinux.org.uk>
+ <aQNmM5+cptKllTS8@oss.qualcomm.com>
+ <aQOB_yCzCmAVM34V@shell.armlinux.org.uk>
+ <aQOCpG_gjJlnm0A1@shell.armlinux.org.uk>
+ <aQhusPX0Hw9ZuLNR@oss.qualcomm.com>
+ <aQh7Zj10C7QcDoqn@shell.armlinux.org.uk>
+ <aQiBjYNtJks2/mrw@oss.qualcomm.com>
+ <20251103104820.3fcksk27j34zu6cg@skbuf>
+ <aQiP46tKUHGwmiTo@oss.qualcomm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aQiP46tKUHGwmiTo@oss.qualcomm.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hi Haotian,
-
-On Mon,  3 Nov 2025 19:18:44 +0800
-Haotian Zhang <vulab@iscas.ac.cn> wrote:
-
-> The driver calls mfd_add_devices() but fails to call mfd_remove_devices()
-> in error paths after successful MFD device registration and in the remove
-> function. This leads to resource leaks where MFD child devices are not
-> properly unregistered.
+On Mon, Nov 03, 2025 at 04:50:03PM +0530, Mohd Ayaan Anwar wrote:
+> On Mon, Nov 03, 2025 at 12:48:20PM +0200, Vladimir Oltean wrote:
+> > 
+> > As Russell partially pointed out, there are several assumptions in the
+> > Aquantia PHY driver and in phylink, three of them being that:
+> > - rate matching is only supported for PHY_INTERFACE_MODE_10GBASER and
+> >   PHY_INTERFACE_MODE_2500BASEX (thus not PHY_INTERFACE_MODE_SGMII)
+> > - if phy_get_rate_matching() returns RATE_MATCH_NONE for an interface,
+> >   pl->phy_state.rate_matching will also be RATE_MATCH_NONE when using
+> >   that interface
+> > - if rate matching is used, the PHY is configured to use it for all
+> >   media speeds <= phylink_interface_max_speed(link_state.interface)
+> > 
+> > Those assumptions are not validated very well against the ground truth
+> > from the PHY provisioning, so the next step would be for us to see that
+> > directly.
+> > 
+> > Please turn this print from aqr_gen2_read_global_syscfg() into something
+> > visible in dmesg, i.e. by replacing phydev_dbg() with phydev_info():
+> > 
+> > 		phydev_dbg(phydev,
+> > 			   "Media speed %d uses host interface %s with %s\n",
+> > 			   syscfg->speed, phy_modes(syscfg->interface),
+> > 			   syscfg->rate_adapt == AQR_RATE_ADAPT_NONE ? "no rate adaptation" :
+> > 			   syscfg->rate_adapt == AQR_RATE_ADAPT_PAUSE ? "rate adaptation through flow control" :
+> > 			   syscfg->rate_adapt == AQR_RATE_ADAPT_USX ? "rate adaptation through symbol replication" :
+> > 			   "unrecognized rate adaptation type");
 > 
-> Add mfd_remove_devices() call in the error path after mfd_add_devices()
-> succeeds, and add the missing mfd_remove_devices() call in pef2256_remove()
-> to properly clean up MFD devices.
-> 
-> Fixes: c96e976d9a05 ("net: wan: framer: Add support for the Lantiq PEF2256 framer")
-> Signed-off-by: Haotian Zhang <vulab@iscas.ac.cn>
-> ---
->  drivers/net/wan/framer/pef2256/pef2256.c | 15 +++++++++++----
->  1 file changed, 11 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/net/wan/framer/pef2256/pef2256.c b/drivers/net/wan/framer/pef2256/pef2256.c
-> index 1e4c8e85d598..d43fbf9bb27d 100644
-> --- a/drivers/net/wan/framer/pef2256/pef2256.c
-> +++ b/drivers/net/wan/framer/pef2256/pef2256.c
-> @@ -821,27 +821,34 @@ static int pef2256_probe(struct platform_device *pdev)
->  
->  	ret = pef2256_setup_e1(pef2256);
->  	if (ret)
-> -		return ret;
-> +		goto err_mfd_remove;
->  
->  	framer_provider = devm_framer_provider_of_register(pef2256->dev,
->  							   framer_provider_simple_of_xlate);
-> -	if (IS_ERR(framer_provider))
-> -		return PTR_ERR(framer_provider);
-> +	if (IS_ERR(framer_provider)) {
-> +		ret = PTR_ERR(framer_provider);
-> +		goto err_mfd_remove;
-> +	}
->  
->  	/* Add audio devices */
->  	ret = pef2256_add_audio_devices(pef2256);
->  	if (ret < 0) {
->  		dev_err(pef2256->dev, "add audio devices failed (%d)\n", ret);
-> -		return ret;
-> +		goto err_mfd_remove;
->  	}
->  
->  	return 0;
-> +
-> +err_mfd_remove:
-> +	mfd_remove_devices(pef2256->dev);
-> +	return ret;
->  }
->  
->  static void pef2256_remove(struct platform_device *pdev)
->  {
->  	struct pef2256 *pef2256 = platform_get_drvdata(pdev);
->  
-> +	mfd_remove_devices(pef2256->dev);
->  	/* Disable interrupts */
->  	pef2256_write8(pef2256, PEF2256_IMR0, 0xff);
->  	pef2256_write8(pef2256, PEF2256_IMR1, 0xff);
+> Thanks. Looks like rate adaptation is only provisioned for 10M, which
+> matches my observation where phylink passes the exact speeds for
+> 100/1000/2500 but 1000 for 10M.
 
-Thanks for the patch.
+Hmm, I wonder what the PHY is doing for that then. stmmac will be
+programmed to read the Cisco SGMII in-band control word, and use
+that to determine whether symbol replication for slower speeds is
+being used.
 
-Instead of calling mfd_remove_devices() in the error path and the remove()
-function, can you replace the mfd_add_devices() call by the device managed
-variant devm_mfd_add_devices()?
+If AQR115C is indicating 10M in the in-band control word, but is
+actually operating the link at 1G speed, things are not going to
+work, and I would say the PHY is broken to be doing that. The point
+of the SGMII in-band control word is to tell the MAC about the
+required symbol replication on the link for transmitting the slower
+data rates over the link.
 
-The device managed variant will handle the removal.
+stmmac unfortunately doesn't give access to the raw Cisco SGMII
+in-band control word. However, reading register 0xf8 bits 31:16 for
+dwmac4, or register 0xd8 bits 15:0 for dwmac1000 will give this
+information. In that bitfield, bits 2:1 give the speed. 2 = 1G,
+1 = 100M, 0 = 10M.
 
-Best regards,
-Hervé
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
