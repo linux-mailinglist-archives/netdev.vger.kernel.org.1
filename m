@@ -1,254 +1,220 @@
-Return-Path: <netdev+bounces-235107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB0D2C2C119
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 14:26:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01525C2C0F8
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 14:25:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 366863AFF55
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 13:19:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D0101885904
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 13:26:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85B8B22B8B0;
-	Mon,  3 Nov 2025 13:19:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47F6630BF58;
+	Mon,  3 Nov 2025 13:24:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="KM5j5n0l"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T8KZqbv6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3489822A4E5
-	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 13:19:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3877A26F2BD
+	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 13:24:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762175983; cv=none; b=qnFvlPd8jBcXKIJpMgpcb+LoHLnpb1EJLeyvX2HD/Vu4I4VhseR7/aI1Q17qC8rzLnPtxKUXtzjAhEoQ0pJu81Mm/3/oCBdYz7KLTwZlZwxwmFOyb4WVVnNHc0OszK/mn2LbjA0xaNAC61Rq3RPas29PEAbJkbup+12dI1Ec4HY=
+	t=1762176270; cv=none; b=lJOQUAD0SBMeXXKD+uCAA6v8JTqfpoNFFi2oJZpJoyMr7THK4vD+R1Gle0n8fIikY91JAE6ZZAHG9hN+y3Fgk/H7+qBhatnFIwvAe2cjXvOnpT2k6imqxk34mh1Y7LWtdjOxOuVfpBWhClnLfR/nP+5B30XvurlKKaopWi5asMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762175983; c=relaxed/simple;
-	bh=bA8/Ajh6uh2bGBEg0MDAJdWIsZY3P3htNjZpMFVCD1c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nCKQKI96X+kdetkULM9aDtSbTEpn1xBDRK6ZqYJXlzcLg9VU2xBiKa/zqgP83iHv2gnAI9MhhC+0hBPWtsGrliegrawDlDDILXfIJrVDd0Dinbqv16xszJ2MASb2VTT50xr5PXrrE6Hax2BZ3Y7WukIbG8oak7Lu6h9yISt/jrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=KM5j5n0l; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-427007b1fe5so3283792f8f.1
-        for <netdev@vger.kernel.org>; Mon, 03 Nov 2025 05:19:39 -0800 (PST)
+	s=arc-20240116; t=1762176270; c=relaxed/simple;
+	bh=O+dRAgI4LPfuYan1hqt3Wh5X/J4xUpMgYGmJUgN4GBk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=a/LyZnT7Seh2XPIiWV+0gbCMVmZxIZpMJqrDVEcnlh/x50AfbLhoaH87dqEHhMQe0Fd6Dndzke9baIhcL5FB6l+ExllHDm6Zpe76GK34Z62FJbdSksRfuf5gZ7s85ezw31Wu/HXy2TU8QTiERlVfdV2NNqI7KLhsfY039ISDvcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T8KZqbv6; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b3c2db014easo919979566b.0
+        for <netdev@vger.kernel.org>; Mon, 03 Nov 2025 05:24:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1762175978; x=1762780778; darn=vger.kernel.org;
-        h=in-reply-to:autocrypt:from:content-language:references:cc:to
-         :subject:user-agent:mime-version:date:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=bA8/Ajh6uh2bGBEg0MDAJdWIsZY3P3htNjZpMFVCD1c=;
-        b=KM5j5n0l06OsD7xFEDo0xaqSe96T/+8cu9mPw8/ePSPCFVV2i3jMMUrYdKcJeYODRW
-         bogLRG2AP5T+d5AuIdnAKfoDZ3vX4qYYjzYEFAHAmFr5ww087bsRaK0yTgTnKjplHa1h
-         1HcXZ71jNILtkeypshyR/ZxyGM+ycxjSdkPnlivABN4MkFo8vYuhpckUmwKTZcJnfqQ8
-         b/hbL2M2BR/kEhpgGuPCoRbRLfvPjqmQkp5pmuf49LOqxW24LHJzG+gG7WL43Jcd2paM
-         Oc3kKp6Uh7Z+SYd47B+edDIaHZxVGWv76xEdKhmfTJlQeP3nNnhHpTkHY25tFCqd3lcC
-         YZfg==
+        d=gmail.com; s=20230601; t=1762176265; x=1762781065; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0S6+1dUVKvqII667r+XW9/GENl1vb5Sqoomw0mlu3RI=;
+        b=T8KZqbv6kO/2xrWzX5n2788COipO+Tnz7F384SIxaywjLymb/lsfPxOUz0GOomqB4m
+         tSNiR+3flO68a9EtT4yaCs81ULEj8LfOSo8v3ZU97wAF7FdFSJhOJv2ZeicIbfs6vvRl
+         1gGjjqDGtjMsAY2i9JFTxfgqyW942vF6Q2vzk65RMl3u/HohDHs+eH1IoKambzK6Rwo0
+         /2xTzljrwr5o3ouIWwJ8c92Yk6WGQLDij67OP/z+7tBvBMrLdiEPRX4izLkduDzW/+qd
+         HoG9zb4rHzUKP+pIRspQJTBFjtz/T4jk9Y2st713BaUCRGI8wudxyrwpsYCmR3hy/3EE
+         pTWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762175978; x=1762780778;
-        h=in-reply-to:autocrypt:from:content-language:references:cc:to
-         :subject:user-agent:mime-version:date:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bA8/Ajh6uh2bGBEg0MDAJdWIsZY3P3htNjZpMFVCD1c=;
-        b=nPoS7zwuugpslX1/pSynkq0Y8QsGOKH9MuNt0JLRz9PM+jaqNyqXlWr005Gjn+D/dv
-         pA30W/kikPvyfqjODkQkeSiUS0cJaFF6sPosUNG6IFSVCpcCyzBnEv7fbuD0bOC3yojH
-         UQC0U3MSYFg7omsDnotkkZ7tzm2EIHcfB4uIG7Y+gRV6kUMAhw9Unz8SFwKRYc26sQ6C
-         P9/561mbfe8r7PkLdHWWFKaRvyP9Hmjaqw7RugO7OkrK9FJM0OxRBbMyKEf0EP3xv68s
-         /fxc5f4EkQ9tw6m64FvQwt/CzRTNKD7EF50FB28g8lQO7g29t3DucgKRlJf/dYBHigu+
-         IaGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU9rcccLIJAZAbQYUJoKGjcC8pZXGSlkvLhQWX0qqktndFjWRm5DIV+giMUCg+meT+LMk557TY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmZ70WC0uVAeZ+1isYdx+f3Ouf5dQSK+tyhL2aE3QUcFxuOF8J
-	MmnzuJff8skB3LdYeyzEeY/MCYVfgGZv+VJosBw81BS1+bGRh5hf78RnafM72EXtd7M=
-X-Gm-Gg: ASbGnctwq5XmJbLHL5KDhUZY6ZCU2itWioVTSQyzUmZPzAKRAHhPapC0qu2CHMT2UIP
-	WBek8J3obYRCjOYowN9Z5LNphGu2zyLyTIukUmrKzNg+meTzTDu2qqOLPwImmyihAZjgvKuA/ge
-	59fk4gFWzE+KqOvryodGxRZYGib6hWunK5lJXsWCCoDICeyugNxYHoeFY2AElIS1zBPKKUr+kAx
-	XrTDy+8Y4sBdQa61WkifYqYRLQL3m98wBq2oAJOQR2g6QwlAuyArI8P4JtOWQE3GGa4hFcAWLJK
-	+2AeBp016NRVaQhZLtfxabnm2N07PGfT0kDPvLxOJU8OL1q0nGjekd5heNH1rtYCt/D4tZU9UL7
-	BCuC82KI8Wq6dzqV8nNQYCTzEqcuwudr+QudJgUoOVPQWlpeKK48f9NC8f91vClD7WGuKVn1XrH
-	znK3ekfRlf9rLFhHjSNDa6AZg0bC7ksZjcAAOONrY762GB/fGTzN4ELTgsX6AqfvtWDBL62cTB5
-	+Bh/Wjt8Vfso87oIL6WC6W+nePxThR2CpI5EVwFnCzSGmR8vw==
-X-Google-Smtp-Source: AGHT+IGuau3eW5WC1R93VPLVN8+9E4SrZfXJSujtRWGSeFzlyOBkUt+8IC7TUpXakZNqQ8ep+AjxzA==
-X-Received: by 2002:a05:6000:250e:b0:429:cba7:f773 with SMTP id ffacd0b85a97d-429cba7f9cdmr5274216f8f.19.1762175978291;
-        Mon, 03 Nov 2025 05:19:38 -0800 (PST)
-Received: from ?IPV6:2003:e5:870e:1500:7795:3e8a:56c1:ae53? (p200300e5870e150077953e8a56c1ae53.dip0.t-ipconnect.de. [2003:e5:870e:1500:7795:3e8a:56c1:ae53])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429c13f1d4csm19950490f8f.39.2025.11.03.05.19.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Nov 2025 05:19:37 -0800 (PST)
-Message-ID: <209fa1c0-f6f2-4594-a2ae-7733ff651761@suse.com>
-Date: Mon, 3 Nov 2025 14:19:36 +0100
+        d=1e100.net; s=20230601; t=1762176265; x=1762781065;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0S6+1dUVKvqII667r+XW9/GENl1vb5Sqoomw0mlu3RI=;
+        b=jS1FZLmr6GhKf/Z1i1Nn/fMvnymcoPsiF6Nn/EAsYa/gI5kF+8WyKgI3jKb/A1ZoMT
+         GBQXhdzFVNJ7AOrepHQPUMgfAandHZS8WAniE3Ql1vaJFaHR+/QGa/eo+Xe3ORnOD/Xy
+         LBjXNNt6XIEwrEMPsD5FuAfnuSTAjeQtmWMginw3KTZXpzKSWKoFM5iiNlACKjIqkj3m
+         yMrUSEW7clMoRnJ7nZGiCDVjuvkkkNBNokb8KCJ6uanXiBkwBg2pxPBhiaFovZLNPW1w
+         pNVs6ja55dDNnpSytMnRsxra6y27v86pdyOALtT7XDjENbfUAarJXcmRkH1rDHsG1/eP
+         FRDw==
+X-Forwarded-Encrypted: i=1; AJvYcCWS1y+0HAKyJLdweIiiIYOyBULByFYSCg0RoOEwr6J7vPfRZwnGC4OikXr5k6pK5xLg5vnifC4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyk0JDnIIbK/vOsSefe8otqMojNKNr1puIA9hgXWzxc/rr+FNBd
+	P1hsVyHMDWrLjqGPwIRbuR4uCV4f5mxKypC6znIvEcMfJ5+TJqJ7pIr2tZFuS0vozXO0TssA5Ny
+	+Z0HUf+kCu6hgZh3YcNjBm0G89dJ52hY=
+X-Gm-Gg: ASbGncsoSC4sjjeQdMPqfQSGs2CH9xjQPyW9EQJ5kqdSaFXgEXbZD7aotpQ+N/ovBrG
+	+y/LUNf7x0y/AOMiRTIvH3n9NaUIxNGvd0Hd+l4crs7Rf+B1bv9FcFPGKF6HbWHk9RHkEUWHZtP
+	2/uoAvyNGCPjgGnDDRMz0TlaBJqbfYxTDFClJComhofBk1yZ9hsSSwNR+no6hWjpAzxsg/c7xYs
+	KzuHGGN6OSC2R7SgjQ+kYhQYmjHzsniDjW73I/KMgcQhmkOkZJ6g8joTqqc8Zj2QmIIugUvgbt2
+	lXe3Q/VRGnuaUQ0iE1A2LYkV3sPLTw==
+X-Google-Smtp-Source: AGHT+IELl7DuDv5uo3bD6NZ9q582bvS2bDMma/TtRpWZCxPhIVAv9e4H0npG+fdCye/re4SlhiT2Qy0S3M2gjGw90Ag=
+X-Received: by 2002:a17:907:ea7:b0:b6d:2d0b:1ec2 with SMTP id
+ a640c23a62f3a-b70708315e8mr1272156366b.54.1762176265161; Mon, 03 Nov 2025
+ 05:24:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] xen/netfront: Comment Correction: Fix Spelling Error and
- Description of Queue Quantity Rules
-To: Chu Guangqing <chuguangqing@inspur.com>, sstabellini@kernel.org,
- oleksandr_tyshchenko@epam.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: xen-devel@lists.xenproject.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20251103032212.2462-1-chuguangqing@inspur.com>
-Content-Language: en-US
-From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-Autocrypt: addr=jgross@suse.com; keydata=
- xsBNBFOMcBYBCACgGjqjoGvbEouQZw/ToiBg9W98AlM2QHV+iNHsEs7kxWhKMjrioyspZKOB
- ycWxw3ie3j9uvg9EOB3aN4xiTv4qbnGiTr3oJhkB1gsb6ToJQZ8uxGq2kaV2KL9650I1SJve
- dYm8Of8Zd621lSmoKOwlNClALZNew72NjJLEzTalU1OdT7/i1TXkH09XSSI8mEQ/ouNcMvIJ
- NwQpd369y9bfIhWUiVXEK7MlRgUG6MvIj6Y3Am/BBLUVbDa4+gmzDC9ezlZkTZG2t14zWPvx
- XP3FAp2pkW0xqG7/377qptDmrk42GlSKN4z76ELnLxussxc7I2hx18NUcbP8+uty4bMxABEB
- AAHNH0p1ZXJnZW4gR3Jvc3MgPGpncm9zc0BzdXNlLmNvbT7CwHkEEwECACMFAlOMcK8CGwMH
- CwkIBwMCAQYVCAIJCgsEFgIDAQIeAQIXgAAKCRCw3p3WKL8TL8eZB/9G0juS/kDY9LhEXseh
- mE9U+iA1VsLhgDqVbsOtZ/S14LRFHczNd/Lqkn7souCSoyWsBs3/wO+OjPvxf7m+Ef+sMtr0
- G5lCWEWa9wa0IXx5HRPW/ScL+e4AVUbL7rurYMfwCzco+7TfjhMEOkC+va5gzi1KrErgNRHH
- kg3PhlnRY0Udyqx++UYkAsN4TQuEhNN32MvN0Np3WlBJOgKcuXpIElmMM5f1BBzJSKBkW0Jc
- Wy3h2Wy912vHKpPV/Xv7ZwVJ27v7KcuZcErtptDevAljxJtE7aJG6WiBzm+v9EswyWxwMCIO
- RoVBYuiocc51872tRGywc03xaQydB+9R7BHPzsBNBFOMcBYBCADLMfoA44MwGOB9YT1V4KCy
- vAfd7E0BTfaAurbG+Olacciz3yd09QOmejFZC6AnoykydyvTFLAWYcSCdISMr88COmmCbJzn
- sHAogjexXiif6ANUUlHpjxlHCCcELmZUzomNDnEOTxZFeWMTFF9Rf2k2F0Tl4E5kmsNGgtSa
- aMO0rNZoOEiD/7UfPP3dfh8JCQ1VtUUsQtT1sxos8Eb/HmriJhnaTZ7Hp3jtgTVkV0ybpgFg
- w6WMaRkrBh17mV0z2ajjmabB7SJxcouSkR0hcpNl4oM74d2/VqoW4BxxxOD1FcNCObCELfIS
- auZx+XT6s+CE7Qi/c44ibBMR7hyjdzWbABEBAAHCwF8EGAECAAkFAlOMcBYCGwwACgkQsN6d
- 1ii/Ey9D+Af/WFr3q+bg/8v5tCknCtn92d5lyYTBNt7xgWzDZX8G6/pngzKyWfedArllp0Pn
- fgIXtMNV+3t8Li1Tg843EXkP7+2+CQ98MB8XvvPLYAfW8nNDV85TyVgWlldNcgdv7nn1Sq8g
- HwB2BHdIAkYce3hEoDQXt/mKlgEGsLpzJcnLKimtPXQQy9TxUaLBe9PInPd+Ohix0XOlY+Uk
- QFEx50Ki3rSDl2Zt2tnkNYKUCvTJq7jvOlaPd6d/W0tZqpyy7KVay+K4aMobDsodB3dvEAs6
- ScCnh03dDAFgIq5nsB11j3KPKdVoPlfucX2c7kGNH+LUMbzqV6beIENfNexkOfxHfw==
-In-Reply-To: <20251103032212.2462-1-chuguangqing@inspur.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------krGRhE0Upii4b9WMJ7Y2jJMT"
-
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------krGRhE0Upii4b9WMJ7Y2jJMT
-Content-Type: multipart/mixed; boundary="------------naDhrqYeiAtCem5LDmy8CsV5";
- protected-headers="v1"
-From: =?UTF-8?B?SsO8cmdlbiBHcm/Dnw==?= <jgross@suse.com>
-To: Chu Guangqing <chuguangqing@inspur.com>, sstabellini@kernel.org,
- oleksandr_tyshchenko@epam.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: xen-devel@lists.xenproject.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Message-ID: <209fa1c0-f6f2-4594-a2ae-7733ff651761@suse.com>
-Subject: Re: [PATCH] xen/netfront: Comment Correction: Fix Spelling Error and
- Description of Queue Quantity Rules
-References: <20251103032212.2462-1-chuguangqing@inspur.com>
-In-Reply-To: <20251103032212.2462-1-chuguangqing@inspur.com>
-
---------------naDhrqYeiAtCem5LDmy8CsV5
-Content-Type: multipart/mixed; boundary="------------511r0QUbJCNKJQeyEXdlbmGB"
-
---------------511r0QUbJCNKJQeyEXdlbmGB
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
-
-T24gMDMuMTEuMjUgMDQ6MjIsIENodSBHdWFuZ3Fpbmcgd3JvdGU6DQo+IFRoZSBvcmlnaW5h
-bCBjb21tZW50cyBjb250YWluZWQgc3BlbGxpbmcgZXJyb3JzIGFuZCBpbmNvbXBsZXRlIGxv
-Z2ljYWwNCj4gZGVzY3JpcHRpb25zLCB3aGljaCBjb3VsZCBlYXNpbHkgbGVhZCB0byBtaXN1
-bmRlcnN0YW5kaW5ncyBvZiB0aGUgY29kZQ0KPiBsb2dpYy4gVGhlIHNwZWNpZmljIG1vZGlm
-aWNhdGlvbnMgYXJlIGFzIGZvbGxvd3M6DQo+IA0KPiBDb3JyZWN0IHRoZSBzcGVsbGluZyBl
-cnJvciBieSBjaGFuZ2luZyAiaW51dCBtYXgiIHRvICJidXQgbm90IGV4Y2VlZCB0aGUNCj4g
-bWF4aW11bSBsaW1pdCI7DQo+IA0KPiBBZGQgdGhlIG5vdGUgIklmIHRoZSB1c2VyIGhhcyBu
-b3Qgc3BlY2lmaWVkIGEgdmFsdWUsIHRoZSBkZWZhdWx0IG1heGltdW0NCj4gbGltaXQgaXMg
-OCIgdG8gY2xhcmlmeSB0aGUgZGVmYXVsdCB2YWx1ZSBsb2dpYzsNCj4gDQo+IEltcHJvdmUg
-dGhlIGNvaGVyZW5jZSBvZiB0aGUgc3RhdGVtZW50IHRvIG1ha2UgdGhlIHF1ZXVlIHF1YW50
-aXR5IHJ1bGVzDQo+IGNsZWFyZXIuDQo+IA0KPiBBZnRlciB0aGUgbW9kaWZpY2F0aW9uLCB0
-aGUgY29tbWVudHMgY2FuIGFjY3VyYXRlbHkgcmVmbGVjdCB0aGUgY29kZQ0KPiBiZWhhdmlv
-ciBvZiAidGFraW5nIHRoZSBzbWFsbGVyIHZhbHVlIGJldHdlZW4gdGhlIG51bWJlciBvZiBD
-UFVzIGFuZCB0aGUNCj4gZGVmYXVsdCBtYXhpbXVtIGxpbWl0IG9mIDggZm9yIHRoZSBudW1i
-ZXIgb2YgcXVldWVzIiwgZW5oYW5jaW5nIGNvZGUNCj4gbWFpbnRhaW5hYmlsaXR5Lg0KPiAN
-Cj4gU2lnbmVkLW9mZi1ieTogQ2h1IEd1YW5ncWluZyA8Y2h1Z3VhbmdxaW5nQGluc3B1ci5j
-b20+DQoNClJldmlld2VkLWJ5OiBKdWVyZ2VuIEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+DQoN
-Cg0KSnVlcmdlbg0K
---------------511r0QUbJCNKJQeyEXdlbmGB
-Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
-Content-Description: OpenPGP public key
+References: <20251103-work-creds-guards-simple-v1-0-a3e156839e7f@kernel.org> <20251103-work-creds-guards-simple-v1-4-a3e156839e7f@kernel.org>
+In-Reply-To: <20251103-work-creds-guards-simple-v1-4-a3e156839e7f@kernel.org>
+From: Amir Goldstein <amir73il@gmail.com>
+Date: Mon, 3 Nov 2025 14:24:13 +0100
+X-Gm-Features: AWmQ_blW2akq-ipD0fIUUOxTn8zmugUgDmTC0C57BdhrsmFigJmfJvym14MPro0
+Message-ID: <CAOQ4uxhW2FiVe6XjQDT_aXhzJDyT5yuna9CVaWOLyzU1J99hFg@mail.gmail.com>
+Subject: Re: [PATCH 04/16] backing-file: use credential guards for writes
+To: Christian Brauner <brauner@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-fsdevel@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-aio@kvack.org, 
+	linux-unionfs@vger.kernel.org, linux-erofs@lists.ozlabs.org, 
+	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
+	samba-technical@lists.samba.org, cgroups@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
------BEGIN PGP PUBLIC KEY BLOCK-----
+On Mon, Nov 3, 2025 at 12:30=E2=80=AFPM Christian Brauner <brauner@kernel.o=
+rg> wrote:
+>
+> Use credential guards for scoped credential override with automatic
+> restoration on scope exit.
+>
+> Signed-off-by: Christian Brauner <brauner@kernel.org>
+> ---
+>  fs/backing-file.c | 74 +++++++++++++++++++++++++++++--------------------=
+------
+>  1 file changed, 39 insertions(+), 35 deletions(-)
+>
+> diff --git a/fs/backing-file.c b/fs/backing-file.c
+> index 4cb7276e7ead..9bea737d5bef 100644
+> --- a/fs/backing-file.c
+> +++ b/fs/backing-file.c
+> @@ -210,11 +210,47 @@ ssize_t backing_file_read_iter(struct file *file, s=
+truct iov_iter *iter,
+>  }
+>  EXPORT_SYMBOL_GPL(backing_file_read_iter);
+>
+> +static int do_backing_file_write_iter(struct file *file, struct iov_iter=
+ *iter,
+> +                                     struct kiocb *iocb, int flags,
+> +                                     void (*end_write)(struct kiocb *, s=
+size_t))
+> +{
+> +       struct backing_aio *aio;
+> +       int ret;
+> +
+> +       if (is_sync_kiocb(iocb)) {
+> +               rwf_t rwf =3D iocb_to_rw_flags(flags);
+> +
+> +               ret =3D vfs_iter_write(file, iter, &iocb->ki_pos, rwf);
+> +               if (end_write)
+> +                       end_write(iocb, ret);
+> +               return ret;
+> +       }
+> +
+> +       ret =3D backing_aio_init_wq(iocb);
+> +       if (ret)
+> +               return ret;
+> +
+> +       aio =3D kmem_cache_zalloc(backing_aio_cachep, GFP_KERNEL);
+> +       if (!aio)
+> +               return -ENOMEM;
+> +
+> +       aio->orig_iocb =3D iocb;
+> +       aio->end_write =3D end_write;
+> +       kiocb_clone(&aio->iocb, iocb, get_file(file));
+> +       aio->iocb.ki_flags =3D flags;
+> +       aio->iocb.ki_complete =3D backing_aio_queue_completion;
+> +       refcount_set(&aio->ref, 2);
+> +       ret =3D vfs_iocb_iter_write(file, &aio->iocb, iter);
+> +       backing_aio_put(aio);
+> +       if (ret !=3D -EIOCBQUEUED)
+> +               backing_aio_cleanup(aio, ret);
+> +       return ret;
+> +}
+> +
+>  ssize_t backing_file_write_iter(struct file *file, struct iov_iter *iter=
+,
+>                                 struct kiocb *iocb, int flags,
+>                                 struct backing_file_ctx *ctx)
+>  {
+> -       const struct cred *old_cred;
+>         ssize_t ret;
+>
+>         if (WARN_ON_ONCE(!(file->f_mode & FMODE_BACKING)))
+> @@ -237,40 +273,8 @@ ssize_t backing_file_write_iter(struct file *file, s=
+truct iov_iter *iter,
+>          */
+>         flags &=3D ~IOCB_DIO_CALLER_COMP;
+>
+> -       old_cred =3D override_creds(ctx->cred);
+> -       if (is_sync_kiocb(iocb)) {
+> -               rwf_t rwf =3D iocb_to_rw_flags(flags);
+> -
+> -               ret =3D vfs_iter_write(file, iter, &iocb->ki_pos, rwf);
+> -               if (ctx->end_write)
+> -                       ctx->end_write(iocb, ret);
+> -       } else {
+> -               struct backing_aio *aio;
+> -
+> -               ret =3D backing_aio_init_wq(iocb);
+> -               if (ret)
+> -                       goto out;
+> -
+> -               ret =3D -ENOMEM;
+> -               aio =3D kmem_cache_zalloc(backing_aio_cachep, GFP_KERNEL)=
+;
+> -               if (!aio)
+> -                       goto out;
+> -
+> -               aio->orig_iocb =3D iocb;
+> -               aio->end_write =3D ctx->end_write;
+> -               kiocb_clone(&aio->iocb, iocb, get_file(file));
+> -               aio->iocb.ki_flags =3D flags;
+> -               aio->iocb.ki_complete =3D backing_aio_queue_completion;
+> -               refcount_set(&aio->ref, 2);
+> -               ret =3D vfs_iocb_iter_write(file, &aio->iocb, iter);
+> -               backing_aio_put(aio);
+> -               if (ret !=3D -EIOCBQUEUED)
+> -                       backing_aio_cleanup(aio, ret);
+> -       }
+> -out:
+> -       revert_creds(old_cred);
+> -
+> -       return ret;
+> +       with_creds(ctx->cred);
+> +       return do_backing_file_write_iter(file, iter, iocb, flags, ctx->e=
+nd_write);
+>  }
 
-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
-kt+z4drzFUyEjLM1vVvIMjkUoJs=3D
-=3DeeAB
------END PGP PUBLIC KEY BLOCK-----
+Pointing out the obvious that do_backing_file_write_iter() feels
+unnecessary here.
 
---------------511r0QUbJCNKJQeyEXdlbmGB--
+But I am fine with keeping it for symmetry with
+do_backing_file_read_iter() and in case we will want to call the sync
+end_write() callback outside of creds override context as we do in the
+read case.
 
---------------naDhrqYeiAtCem5LDmy8CsV5--
-
---------------krGRhE0Upii4b9WMJ7Y2jJMT
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmkIq+gFAwAAAAAACgkQsN6d1ii/Ey8s
-eAgAkP4SIOJZjYUHdJZGVfcnpP2nPq9QC4Mmoc4h1n/QG7L4/XS5bNW2HMwSTg/aM3iK/vOxeala
-l2Gup8+fOMHcnEOHtIuTYHioM66qLsm764hr5ro0LY077J/GED9SgUveUlCuCJDGpt5ZG2bYHVbL
-Gh4GyoH30+yJTJGWi+YUUJb9EnRar7H24jUCC0xK9dRaHRaCnZJGYS+Kns3xgjbi8KQMrDCdyj+U
-z38TYJ+VT0UoL/G6PzUCBrw92gJNlwqs18XwPRKLWdrmLQ8W7UPnXFr6Jwk96YwEf/3MDqonIvPh
-R2DrVz9RXX7Imv2t1/+lFDb9fiMHvDgHnMnCntthyQ==
-=gdmH
------END PGP SIGNATURE-----
-
---------------krGRhE0Upii4b9WMJ7Y2jJMT--
+Thanks,
+Amir.
 
