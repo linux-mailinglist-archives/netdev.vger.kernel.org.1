@@ -1,171 +1,106 @@
-Return-Path: <netdev+bounces-235147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D7C3C2CF40
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 17:01:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 98B7AC2CB73
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 16:28:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACAF55624B0
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 15:13:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E86C13BF288
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 15:17:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD06E317701;
-	Mon,  3 Nov 2025 15:01:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C5B3319845;
+	Mon,  3 Nov 2025 15:10:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="1hT9t5A3";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="zlaq5SCo"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Grc8S/mP"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b5-smtp.messagingengine.com (fhigh-b5-smtp.messagingengine.com [202.12.124.156])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB4427FD68;
-	Mon,  3 Nov 2025 15:01:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01FE430C610
+	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 15:10:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762182070; cv=none; b=Y9PY6jlHKpXq70YLSXzZiIBhrcA08874QrDDAk8Wz1vM7WCsA2oId1hrTocJOQvgZkYkYiQI53rr1CqW1vEujdU3oAyNu92hvJzQrpmhPjpw5SsGWUDLlRl33DqxE6RwmOzgIpZAzBAzz7iEVco9kiSJCo06zoeQA6EJrNnnZ8Y=
+	t=1762182624; cv=none; b=kxHZJFiW4SZlGYAPjH7P2MGnsP5X2+xLqiVYoYJw/FxGkREQ37AxROnYt1l1PAVxf8/BYU6pb3IoerJHpMY+J5p0xu3kaWfKlMdaUj8eR8aZ6d+99jEHF9LTtPbofvoLupU/UdKb+aJsSn88zOG9Vxr/aqEdASUd0J9jELb/O4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762182070; c=relaxed/simple;
-	bh=Fa2A1KQHl0Ok5OmCFsWDeoz3FriRH/Ae+vmGgtQZjC4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YZ+H9S6LzvtJDOdal9OXNl30kVLBfrZ5a27Xqp8SDTHA4I/JgwXRwFWnuXG+i0QQaXe0NT+y7u8o24Czi7S36PWoAhZVEOyiTeINCxzbX4vbrinC1d5thGlFPF6lBSy4vaLEY6Gchsq+nn+/zBWHbjtv/SS+TciAspHudJAESUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=1hT9t5A3; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=zlaq5SCo; arc=none smtp.client-ip=202.12.124.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 232E57A0009;
-	Mon,  3 Nov 2025 10:01:04 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Mon, 03 Nov 2025 10:01:04 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1762182063; x=
-	1762268463; bh=fOxVgiixhmAbuujQPmcHI1Sf2R/F0nB3JienkE+5nAI=; b=1
-	hT9t5A3qJK96SQR/9+7MAfJPSMx+MHD4rGqV0qOfx6e84JMKkr9OuV0G2ZAO2qnv
-	kdFCBPxjcnyASgQvxjIQkp5Z4NVC6OF2JkbhQ4pv8z++kZ9TE7YjHj+VjIwxvbx8
-	ZvsBf7r1YlPQHA5MQbs4uLEzRsLp+RkGTZhBq5R+7YEI4V2Wov1X8bj3iJuy4Sdo
-	ccxwZxPGSXx41XFVj4AD84uHDMam3CNmisZnvib/EUYMsZ1KylVtFIroi1foXnSy
-	zMrban7bc7vnIgPsQ3Z0CNBoc32gD1Aua6JGFcSEwMwO5crbnmx8e8PBxzAU7YJA
-	yjkQekhh/2YV+yYVt5NSw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1762182063; x=1762268463; bh=fOxVgiixhmAbuujQPmcHI1Sf2R/F0nB3Jie
-	nkE+5nAI=; b=zlaq5SCoi14NK0mj0XOVba/jyhe5entm0MxsfYCv2WBZq9jbKRO
-	2q6WMWPsHrNj1UYrXZErDmO+Pbhe3eJwnYdGT76l2PdGjrejjw5qDtpCzKhy1CBy
-	Z/yjj1pTn9OPASdXOtl6+r2YjrexiF7dYaIUfgk3dWFgyPR+hLadSBbuNsTuhQH4
-	NRwShZO12Br6mKER71jh/awjqR1vZ/gMGFQMNaP/deN5seg6LYgDnduLvQ2jLcof
-	NvGLrwlrOmWkF/Sp8GtoD/4cCvMqxbfz5OIlwJieMePh9JHw08B6qoutlbPFk/yh
-	MK5ojQTART1B53EBgMHTV0T5FTFZN72Kn2g==
-X-ME-Sender: <xms:r8MIaSdw1blZIIgwYmqasHUovTs_AZ3zpb0lWb5CpypDcRZD8vH24g>
-    <xme:r8MIaY4WQiZAqgsly30XyB2bxiptVKz4T_ukHzAqmAigThk016y0PxZ7MblgoDSgS
-    QRYQNbi5VhcfnNUeix8MZIOMLJ-tvqY7rea6UqyDaT9Xs70_1adDg>
-X-ME-Received: <xmr:r8MIaXYRPRNBws8mlDnEJPUwqIoYyTxYlQN5Q49QsP20eyRJ6i9qPTmI4Gip>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddujeekgeegucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggujgesthdtredttddtjeenucfhrhhomhepufgrsghrihhn
-    rgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrghilhdrnhgvtheqnecuggftrf
-    grthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfekgeetheegheeifffguedvueff
-    fefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomh
-    epshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedufedpmhho
-    uggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtg
-    hpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopeifrghnghhlihgr
-    nhhgjeegsehhuhgrfigvihdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlh
-    hofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdp
-    rhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepshhhuh
-    grhheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdho
-    rhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:r8MIaaFmPhmH1MAYFp_fF5rN-G6pyKe2Q2U834QSV_ZGf6jqgVa-Gg>
-    <xmx:r8MIaSmmqdEo7Cbg5j381ZKQNbxHYAriXT-i9ryEgglJTb5K-jP2Og>
-    <xmx:r8MIafDc0JynqmYo5QiD5mfrDClmJrE9tHb9Sqcb--Si8iuHVkQzuw>
-    <xmx:r8MIaUA6GFi5TcCopkQJ_pI-NlBkr7dcRrpH4E0xGHbyM99bYlK__w>
-    <xmx:r8MIaazGBeIh4ADPJ7t9QsrtRJ7yojCJHWQb3IMpfvOH6QVi434BB4B7>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 3 Nov 2025 10:01:02 -0500 (EST)
-Date: Mon, 3 Nov 2025 16:01:00 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jakub Kicinski <kuba@kernel.org>, Wang Liang <wangliang74@huawei.com>,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	shuah@kernel.org, horms@kernel.org, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	yuehaibing@huawei.com, zhangchangzhong@huawei.com
-Subject: Re: [PATCH net] selftests: netdevsim: Fix ethtool-features.sh fail
-Message-ID: <aQjDrMH34QVz6e1E@krikkit>
-References: <20251030032203.442961-1-wangliang74@huawei.com>
- <aQPxN5lQui5j8nK8@krikkit>
- <20251030170217.43e544ad@kernel.org>
- <aQiANPQU9ZEa0zCo@krikkit>
- <e014c4c5-105a-43cb-9411-ec139af2b2a1@lunn.ch>
+	s=arc-20240116; t=1762182624; c=relaxed/simple;
+	bh=1+HR+uyX2c6BnO5Xdy7ynJ5LcZS7WDt5sMz0zU+chvk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KjdCLTLM/dzHeDm1oQTl1rDHFMzyuoxJJQxRosjcbNgBrJ2vgFW1eNOWyhBJUZVJOXhMfLOIu4P8HQT3+tqyLF1EZeJ5gtttZP9Psb7ekTJ68TbDI3pw39DYQK0kKWAQSmUAZmkB5xel4smmpavK9lKBJtc7Hwg60EePOB5Wzmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Grc8S/mP; arc=none smtp.client-ip=91.218.175.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1762182619;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ijlTAHCPm96ALlj8X4uVVG+e1GRe0utTeH8fkvrs9R4=;
+	b=Grc8S/mPFoo6wpRAYoRKJTL7DUbHAIXZxjkJ7xC3OFUXcplja4ZFzoE7QtIRIDJTmYm5eD
+	YFQNVluRKo9KLWxZRWW2+bcnvM5/vj6yXKvbkAWK1soSfjYH6mu2ArFNVcCRO8ErNC3+Ls
+	ozLuNki345RKzK6wZLfX/7JT7E05eno=
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+To: Manish Chopra <manishc@marvell.com>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Richard Cochran <richardcochran@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Simon Horman <horms@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next v2 0/7] convert drivers to use ndo_hwtstamp callbacks part 3
+Date: Mon,  3 Nov 2025 15:09:45 +0000
+Message-ID: <20251103150952.3538205-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <e014c4c5-105a-43cb-9411-ec139af2b2a1@lunn.ch>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-2025-11-03, 14:36:00 +0100, Andrew Lunn wrote:
-> On Mon, Nov 03, 2025 at 11:13:08AM +0100, Sabrina Dubroca wrote:
-> > 2025-10-30, 17:02:17 -0700, Jakub Kicinski wrote:
-> > > On Fri, 31 Oct 2025 00:13:59 +0100 Sabrina Dubroca wrote:
-> > > > >  set -o pipefail
-> > > > >  
-> > > > > +if ! ethtool --json -k $NSIM_NETDEV > /dev/null 2>&1; then  
-> > > > 
-> > > > I guess it's improving the situation, but I've got a system with an
-> > > > ethtool that accepts the --json argument, but silently ignores it for
-> > > >  -k (ie `ethtool --json -k $DEV` succeeds but doesn't produce a json
-> > > > output), which will still cause the test to fail later.
-> > > 
-> > > And --json was added to -k in Jan 2022, that's pretty long ago.
-> > > I'm not sure we need this aspect of the patch at all..
-> > 
-> > Ok.  Then maybe a silly idea: for the tests that currently have some
-> > form of "$TOOL is too old" check, do we want to remove those after a
-> > while? If so, how long after the feature was introduced in $TOOL?
-> 
-> Another option is to turn them into a hard fail, after X years.
+This patchset converts the rest of ethernet drivers to use ndo callbacks
+instead ioctl to configure and report time stamping. The drivers in part
+3 originally implemented only SIOCSHWTSTAMP command, but converted to
+also provide configuration back to users.
 
-If the "skip if too old" check is removed, the test will fail when run
-with old tools (because whatever feature is needed will not be
-supported, so somewhere in the middle of test execution there will be
-a failure - but the developer will have to figure out "tool too old"
-from some random command failing).
+v1 -> v2:
+- avoid changing logic in phc_gbe driver for HWTSTAMP_FILTER_PTP_V1_L4_SYNC
+  case
+- nit fixing in patch 4 wording
+- collect review tags
 
-"check version + hard fail" makes it clear, but the (minor) benefit of
-simply dropping the check is removing a few unneeded lines.
+Vadim Fedorenko (7):
+  bnx2x: convert to use ndo_hwtstamp callbacks
+  net: liquidio: convert to use ndo_hwtstamp callbacks
+  net: liquidio_vf: convert to use ndo_hwtstamp callbacks
+  net: octeon: mgmt: convert to use ndo_hwtstamp callbacks
+  net: thunderx: convert to use ndo_hwtstamp callbacks
+  net: pch_gbe: convert to use ndo_hwtstamp callbacks
+  qede: convert to use ndo_hwtstamp callbacks
 
-> My
-> guess is, tests which get skipped because the test tools are too old
-> frequently get ignored. Tests which fail are more likely to be looked
-> at, and the tools updated.
-> 
-> Another idea is have a dedicated test which simply tests the versions
-> of all the tools. And it should only pass if the installed tools are
-> sufficiently new that all test can pass. If you have tools which are
-> in the grey zone between too old to cause skips, but not old enough to
-> cause fails, you then just have one failing test you need to turn a
-> blind eye to.
-
-That's assumming people run all the tests every time. Is that really
-the case, or do people often run the 2-5 tests that cover the area
-they care about? For example it doesn't make much sense to run nexthop
-and TC tests for a macsec patch (and the other way around). If my
-iproute is too old to run some nexthop or TC tests, I can still run
-the tests I really need for my patch.
-
-But maybe if the tests are run as "run everything" (rather than
-manually running a few of them), ensuring all the needed tools are
-recent enough makes sense.
+ .../net/ethernet/broadcom/bnx2x/bnx2x_main.c  | 53 +++++++++-------
+ .../net/ethernet/cavium/liquidio/lio_main.c   | 50 ++++++---------
+ .../ethernet/cavium/liquidio/lio_vf_main.c    | 48 ++++++--------
+ .../net/ethernet/cavium/octeon/octeon_mgmt.c  | 62 ++++++++++---------
+ .../net/ethernet/cavium/thunder/nicvf_main.c  | 45 ++++++++------
+ .../ethernet/oki-semi/pch_gbe/pch_gbe_main.c  | 38 +++++++-----
+ drivers/net/ethernet/qlogic/qede/qede_main.c  | 22 +------
+ drivers/net/ethernet/qlogic/qede/qede_ptp.c   | 47 +++++++++-----
+ drivers/net/ethernet/qlogic/qede/qede_ptp.h   |  6 +-
+ 9 files changed, 190 insertions(+), 181 deletions(-)
 
 -- 
-Sabrina
+2.47.3
 
