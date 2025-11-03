@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-234977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B53C7C2A8C1
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 09:23:33 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50715C2A901
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 09:26:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5C253346712
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 08:23:33 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A133C4E2FB9
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 08:26:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E06832DC33B;
-	Mon,  3 Nov 2025 08:23:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09D642DC348;
+	Mon,  3 Nov 2025 08:26:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tjU589i6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IwsDDPhK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5A102D9EF3;
-	Mon,  3 Nov 2025 08:23:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE0E02C15B7;
+	Mon,  3 Nov 2025 08:26:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762158211; cv=none; b=No+nuFcWtF8jHC4zZsZHEx4+eLyqJXCxHhHZjBq0UkOmgltMHHWFPJft+EgDZiY6G0iINnaH7e6bQt6MEq7/iQZ1UaK7EmUNJ6qhMu7rEOYJJkngGd5rynNUGDChQAkn1vl7POfjuhu8+lMQzIU68eXGBbS8/5ADnCV2PQB0CPI=
+	t=1762158383; cv=none; b=gC1Eu4xYCuWR5QojIYAmgy7nOcwKzW/tlrJqMGaopunMZI8pG0qF1Fbi94wQK9yn+9TpMsm1Frw/m4aBzC7yqmtFchg0aARV2yNxgj7xsIh3fT7R6QYG8LxjBiLr8DwXG03tbQv7hI4yoSCHeQ31vwIq9lW+HBobxOOazePynqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762158211; c=relaxed/simple;
-	bh=hbEkMfhTE5CQphEJf2mmVqxhPtwuAEPllQjgAdAoN48=;
+	s=arc-20240116; t=1762158383; c=relaxed/simple;
+	bh=0OchX97w3a0X/5UQeN5/1r679Y592gYdY3Idulg7QYs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WHKHUOpUbE5WmtOh1K1ALUD/DzOAz58las4XwqO6RvEXZjUDY9sNMUkxShY8XBqHirBfGaDumqdbFGRbpZIWtXQP91G0PfT1HFwBNPHJOXb9Rb4JPsoecOSj0JhCPVbdyiLoTcetJ0c2Rf/W56CEGELG0g6pG4W1mXuzmrv0n34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tjU589i6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B98BDC4CEE7;
-	Mon,  3 Nov 2025 08:23:30 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=QcNlGG9SWNg1gPad2Y06B7ZVzq8c5SNIp1yl6am1/FfdKDtRtTPxduwiHH5wOtt70DFKDYkWvQ4wT+D4z0QerICFglaTCW9V8TGelfyTusQdf2tOTR/Q3IgKGfzST5pXpOiahgdEOqD4Gn6s8a1it2Q4fOdltgFek+mS+W1mlWY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IwsDDPhK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FFAFC116D0;
+	Mon,  3 Nov 2025 08:26:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762158211;
-	bh=hbEkMfhTE5CQphEJf2mmVqxhPtwuAEPllQjgAdAoN48=;
+	s=k20201202; t=1762158383;
+	bh=0OchX97w3a0X/5UQeN5/1r679Y592gYdY3Idulg7QYs=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tjU589i6UUgkyoNhkHaLWcls2GlCJtwcMh20FuZO2vjdks7jF3XgsHTA4aazeK2Ma
-	 6vUngPX9V1EZ9dVbTfRICMabdNXPLiagCuHFpu1WfcJfAP/200PsVIleHdt/OYhZzc
-	 2TmptyKd9cImvSo1/f0uLByz/s4rjCYaGNo0jpEIkX8JOoG65CfZU/6GT+xJIbZ6vE
-	 SlJeeHG5DBi9dyYqHv9BGwmpfLfqyY6JTPXUJ1brmEyGLoiUSe6UU4XtoKVUBgLwGu
-	 SpJ87dGuehTDlA6ma6KVXag9oUvGvnbdLpRkHXlmFwpGrzrAemPD8eKWnlWr79f9y7
-	 1qCS75YLrAicg==
-Date: Mon, 3 Nov 2025 09:23:29 +0100
+	b=IwsDDPhK8ivmDj3dCIehIPp2Q5xZfNrrZeCMlk/2JNYzmjxXB8eAVr0U5dtAz3qbg
+	 gWMugib39EbE/ozdODVU02IZkgPRbNki47P6fQy0gb+uezAsoqm0+8ebNwiK1DEh1X
+	 CNIEw3r1qDSjUYauR8Sc8F/7t53Y1oMW9wXIQQFscAxLAq4/u72BFZSPjehZyP9033
+	 yKdsvvl9zBhXrUaeJPA/Q3ika5Gb0N5C/bpJYrYHqi5Tyq7v5QuYzw/qbfJ1S8FlZd
+	 PFnQEfW1+ekp4Jv9OaZVS+f9aV0aesUv6Hl1zN3vhE9Xv8Qcy6e+s3Yp8UR1yhVvIF
+	 pmyVZZ0vO3pBg==
+Date: Mon, 3 Nov 2025 09:26:21 +0100
 From: Krzysztof Kozlowski <krzk@kernel.org>
 To: Daniel Golle <daniel@makrotopia.org>
 Cc: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>, 
@@ -57,11 +57,11 @@ Cc: Hauke Mehrtens <hauke@hauke-m.de>, Andrew Lunn <andrew@lunn.ch>,
 	Juraj Povazanec <jpovazanec@maxlinear.com>, "Fanni (Fang-Yi) Chan" <fchan@maxlinear.com>, 
 	"Benny (Ying-Tsan) Weng" <yweng@maxlinear.com>, "Livia M. Rosu" <lrosu@maxlinear.com>, 
 	John Crispin <john@phrozen.org>
-Subject: Re: [PATCH net-next v6 08/12] dt-bindings: net: dsa: lantiq,gswip:
- add support for MII delay properties
-Message-ID: <20251103-rousing-auburn-barracuda-d8491f@kuoka>
+Subject: Re: [PATCH net-next v6 10/12] dt-bindings: net: dsa: lantiq,gswip:
+ add support for MaxLinear GSW1xx switches
+Message-ID: <20251103-wonderful-resilient-snake-7d2e9e@kuoka>
 References: <cover.1761938079.git.daniel@makrotopia.org>
- <3c8dc0bab72de05ce5b5a7960b6596009287fa8e.1761938079.git.daniel@makrotopia.org>
+ <b32a49c03c75be0a1b4666e99c25a3fc0f95d63b.1761938079.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,26 +70,120 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <3c8dc0bab72de05ce5b5a7960b6596009287fa8e.1761938079.git.daniel@makrotopia.org>
+In-Reply-To: <b32a49c03c75be0a1b4666e99c25a3fc0f95d63b.1761938079.git.daniel@makrotopia.org>
 
-On Fri, Oct 31, 2025 at 07:22:09PM +0000, Daniel Golle wrote:
-> Add support for standard tx-internal-delay-ps and rx-internal-delay-ps
-> properties on port nodes to allow fine-tuning of RGMII clock delays.
+On Fri, Oct 31, 2025 at 07:22:39PM +0000, Daniel Golle wrote:
+> Extend the Lantiq GSWIP device tree binding to also cover MaxLinear
+> GSW1xx switches which are based on the same hardware IP but connected
+> via MDIO instead of being memory-mapped.
 > 
-> The GSWIP switch hardware supports delay values in 500 picosecond
-> increments from 0 to 3500 picoseconds, with a post-reset default of 2000
-> picoseconds for both TX and RX delays. The driver currently sets the
-> delay to 0 in case the PHY is setup to carry out the delay by the
-> corresponding interface modes ("rgmii-id", "rgmii-rxid", "rgmii-txid").
+> Add compatible strings for MaxLinear GSW120, GSW125, GSW140, GSW141,
+> and GSW145 switches and adjust the schema to handle the different
+> connection methods with conditional properties.
 > 
-> This corresponds to the driver changes that allow adjusting MII delays
-> using Device Tree properties instead of relying solely on the PHY
-> interface mode.
+> Add MaxLinear GSW125 example showing MDIO-connected configuration.
 > 
 > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
 > ---
+> v6:
+>  * keep properties on top level and use allOf for conditional constraints
+> 
+> v5:
+>  * drop maxlinear,rx-inverted from example
+> 
+> v4:
+>  * drop maxlinear,rx-inverted and maxlinear,tx-inverted properties for
+>    now in favor of upcoming generic properties
+> 
+> v3:
+>  * add maxlinear,rx-inverted and maxlinear,tx-inverted properties
+> 
+> v2:
+>  * remove git conflict left-overs which somehow creeped in
+>  * indent example with 4 spaces instead of tabs
+> 
+>  .../bindings/net/dsa/lantiq,gswip.yaml        | 131 +++++++++++++++++-
+>  1 file changed, 126 insertions(+), 5 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
+> index cf01b07f7f44..8904d0b6cec5 100644
+> --- a/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
+> +++ b/Documentation/devicetree/bindings/net/dsa/lantiq,gswip.yaml
+> @@ -4,7 +4,12 @@
+>  $id: http://devicetree.org/schemas/net/dsa/lantiq,gswip.yaml#
+>  $schema: http://devicetree.org/meta-schemas/core.yaml#
+>  
+> -title: Lantiq GSWIP Ethernet switches
+> +title: Lantiq GSWIP and MaxLinear GSW1xx Ethernet switches
+> +
+> +description:
+> +  Lantiq GSWIP and MaxLinear GSW1xx switches share the same hardware IP.
+> +  Lantiq switches are embedded in SoCs and accessed via memory-mapped I/O,
+> +  while MaxLinear switches are standalone ICs connected via MDIO.
+>  
+>  $ref: dsa.yaml#
+>  
+> @@ -46,9 +51,14 @@ properties:
+>        - lantiq,xrx200-gswip
+>        - lantiq,xrx300-gswip
+>        - lantiq,xrx330-gswip
+> +      - maxlinear,gsw120
+> +      - maxlinear,gsw125
+> +      - maxlinear,gsw140
+> +      - maxlinear,gsw141
+> +      - maxlinear,gsw145
+>  
+>    reg:
+> -    minItems: 3
+> +    minItems: 1
+>      maxItems: 3
+>  
+>    reg-names:
+> @@ -65,9 +75,6 @@ properties:
+>        compatible:
+>          const: lantiq,xrx200-mdio
+>  
+> -    required:
+> -      - compatible
+> -
+>    gphy-fw:
+>      type: object
+>      properties:
+> @@ -123,6 +130,32 @@ required:
+>    - compatible
+>    - reg
+>  
+> +allOf:
+> +  - if:
+> +      properties:
+> +        compatible:
+> +          contains:
+> +            enum:
+> +              - lantiq,xrx200-gswip
+> +              - lantiq,xrx300-gswip
+> +              - lantiq,xrx330-gswip
+> +    then:
+> +      properties:
+> +        reg:
+> +          minItems: 3
+> +          maxItems: 3
+> +        mdio:
+> +          required:
+> +            - compatible
+> +      required:
+> +        - reg-names
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+This wasn't before and is a change in existing binding. You need a
+separate patch with its own explanation.
+
+> +    else:
+> +      properties:
+> +        reg:
+> +          maxItems: 1
+> +        reg-names: false
+> +        gphy-fw: false
+> +
+>  unevaluatedProperties: false
 
 Best regards,
 Krzysztof
