@@ -1,143 +1,152 @@
-Return-Path: <netdev+bounces-234992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29BC6C2ADD7
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 10:53:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00EF6C2AE55
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 11:01:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A24518920AB
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 09:53:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4F3B3A84DC
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 09:59:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27FC52FAC0C;
-	Mon,  3 Nov 2025 09:53:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 773D52FABED;
+	Mon,  3 Nov 2025 09:59:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="f0o0aiuS"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="VaE0XOGs";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ZBsvVHQU"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09F772FA0D3
-	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 09:53:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 609468405C;
+	Mon,  3 Nov 2025 09:59:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762163595; cv=none; b=gxHvsqM1Md5YW03iR2TOuu46KzG7he3H6YGdroWE6nh4b0hlK/Txbl4ZjJXA2vBev7ylBSxq8jh0wFZLTxvllUiSnHCgIIUFH1Epjx24SJFzjgt8rlhyQPyiugIyNc8PMsa5Mfwo8vnY+2pIIQEBVtG5jadIZUT5fXLk++wz4NM=
+	t=1762163978; cv=none; b=nUaMPrgsmV2+t2UYFtqVZOeBmJ+75hfS0ECo8Jm7aB9HQf3+eqfmua+NE5goUwmzIz2bi2WOXHo8QuGz4S/40ClWo8rXDEBjoUMQOp/IqSKqhsO4phXFBzOkDliscws1PAZYh+2bM1g1Sxk61wutcG26TSYBO6I+bKxgYe0VyYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762163595; c=relaxed/simple;
-	bh=2DLKMMDYDIwBWCZ+Hdh2QTXQ4OqfNeLj4JVT1oL8bdM=;
+	s=arc-20240116; t=1762163978; c=relaxed/simple;
+	bh=/185EXukW1YoAfSt0R/ts2WEh9FI/8+19d9aNbAhETw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cyjka5qOLH9HEO7o7Bhjl88/0inA/03uuDy0nn70hXLWE+PDl/ukaXu1LFkufAj9N2qXHhgx+r9kxxkdlWGEUMxyUKd0WZW/dl57DpSyg3sgef4Ms+fV93Nw1MOGmgje4wj2c/4IWWFFsYHCmpKrWqTqooKkVETegrutZpdnfTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=f0o0aiuS; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=cMx/pBIc7baCIIFWi7F4x4oW//4oX2tqQgVeFsSMo44=; b=f0o0aiuSsPBELTITSHiT3sl/9F
-	ShJW0uMV84XXqKe4DehAuu+wJzWgWhk7SWRFBP0A3rg76j4tuP6h7DgXL0+ao8kzDoUgxYVP9f6Kc
-	obDUjGatfPJ1zHDrnwLuMjQItLa0XRvgJA7U6JQUvhQOxBJrNlVx+BUnb1P2aCM/gCPr1AoxGSa66
-	8PdsRaHvNHOSdMpeDAUBDQLXtn/S4vzKPFVAAqLAFUHLmRDPbotH8s7FhKPmJvB/3tSOuAcsNPI6N
-	2ZN0iLv6qwulY6mTM2Jj7MX5w5PmW4UoxJzDR0g9qtgzz3KvfxFLOGdYj8MU/t4KYfb4CuUlJxV4v
-	Z04rEpow==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54432)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vFrEz-000000000Tv-17fT;
-	Mon, 03 Nov 2025 09:52:45 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vFrEs-000000003hg-47Cx;
-	Mon, 03 Nov 2025 09:52:39 +0000
-Date: Mon, 3 Nov 2025 09:52:38 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Alexis =?iso-8859-1?Q?Lothor=E9?= <alexis.lothore@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Boon Khai Ng <boon.khai.ng@altera.com>,
-	Daniel Machon <daniel.machon@microchip.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Furong Xu <0x1207@gmail.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Yu-Chun Lin <eleanor15x@gmail.com>
-Subject: Re: [PATCH net-next 0/3] net: stmmac: phylink PCS conversion part 3
- (dodgy stuff)
-Message-ID: <aQh7Zj10C7QcDoqn@shell.armlinux.org.uk>
-References: <aP03aQLADMg-J_4W@shell.armlinux.org.uk>
- <aQExx0zXT5SvFxAk@oss.qualcomm.com>
- <aQHc6SowbWsIA1A5@shell.armlinux.org.uk>
- <aQNmM5+cptKllTS8@oss.qualcomm.com>
- <aQOB_yCzCmAVM34V@shell.armlinux.org.uk>
- <aQOCpG_gjJlnm0A1@shell.armlinux.org.uk>
- <aQhusPX0Hw9ZuLNR@oss.qualcomm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=HKgE0HRfQ1CMdnnflhONxsmI3GaTlWoS/Uao2dWVSrzBKnbC/Q8PcNg3n7RgOs0DHv8Kl04DBs3tZyK9Upj3EvpSUbVMbDtoXLg+AXXWNz0dafX7uBnizMemz7nZNESl0gMQ81b4bY12FPuLvceq+CuX/xoMtRc87ZPLh+esJAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=VaE0XOGs; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ZBsvVHQU; arc=none smtp.client-ip=103.168.172.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-07.internal (phl-compute-07.internal [10.202.2.47])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 4682B140016D;
+	Mon,  3 Nov 2025 04:59:34 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-07.internal (MEProxy); Mon, 03 Nov 2025 04:59:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-transfer-encoding:content-type:content-type
+	:date:date:from:from:in-reply-to:in-reply-to:message-id
+	:mime-version:references:reply-to:subject:subject:to:to; s=fm1;
+	 t=1762163974; x=1762250374; bh=EoRTOUiqNo2cvNRwLXJuVMPRCrEn4Z9F
+	qfz67AyZ8ys=; b=VaE0XOGsLoPWkUQZjnRbVu+9vhSJ8yT4THye/iIuq0x7Vg3H
+	XhYDeztRK3nqC/50GT4fABUZ+dSrb0WwPYUfeRaSqPnj3uz2AUvLyQXtisgrlksj
+	zF0K9deND+YrDLIOJLRsXZQB++vGiaOULFkxERKZoUK3ZAI3wKj7fN4S08rEl8es
+	USJdjGP3mvkw0gs+yNrbQbA1uhBSna0yikX6o5UrXyOdzc2j7Q3E7/yhGWDwDIYr
+	Txhhqt2XXXWA7kFns4LJYEbCf6Z81lilIVIqvo8gem2zntgQvbnAgknmZQirAB1x
+	sQrDjGfZ0mR9NVKbFYUsURwoZDfvTxFx4N08eQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762163974; x=
+	1762250374; bh=EoRTOUiqNo2cvNRwLXJuVMPRCrEn4Z9Fqfz67AyZ8ys=; b=Z
+	BsvVHQUMinQkRNXclXAjr75SpWgGB+RpPVy1E9pDEnqfbsQ13o5i0xmPao7+biMP
+	jLW9OaLTe0kIhWsTdnlKym7n5uQUQQz3hqDklEOY6LgShGdgv6NIzseZ/IpPZlLq
+	nSdDreW2OVW528uvx8FZzf9mgCqkOJi+NLiYsAFSyP8+3Tir2HlAMkznD9dc2hwP
+	dJQC/JSG27RmaZ7F3Ka3Iis+MAJV0q3g2XVCEKoBLneKxkqRXtaa4H+0pURz0uzG
+	yb9TvWVVBFj7hiu/BJxxSFBxEYLhzU05Ab2ZCbk351Aq8WesjWyYhXwGPXNtSvX2
+	RGPzsUpS0tg+PHDjZwf8Q==
+X-ME-Sender: <xms:BX0IaZLarJa_RiorcFZp3ZxY9zsxqdj1SVhj_KQJ03rIiaAqhgE64A>
+    <xme:BX0IaSoffggrfVvhlb5ry4ajsOWlX4ns1Mv1ptnq6zopYQ14xH_CTVX9aQFVfB_cN
+    kKx5T31DBmSNQ-OmIStXyS-TdOFThFZdqBZU5aIhZA29MqOFKZGug>
+X-ME-Received: <xmr:BX0IaUX0MLIL5_-EFcstSWxjb5c91s5FUxGa2DEX90D2jO8l792AHjNX3bFS>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddujeejkeefucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefurggsrhhi
+    nhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtf
+    frrghtthgvrhhnpeevuddvtdevheetkedvieeugeehieevjeekteefgfeffeefjefgvdef
+    tdelueefgeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuih
+    iivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhl
+    rdhnvghtpdhnsggprhgtphhtthhopedufedpmhhouggvpehsmhhtphhouhhtpdhrtghpth
+    htohepfigrnhhglhhirghnghejgeeshhhurgifvghirdgtohhmpdhrtghpthhtohepkhhu
+    sggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthh
+    dprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohep
+    vgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrh
+    gvughhrghtrdgtohhmpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrdhorhhgpdhr
+    tghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvg
+    hvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:BX0Iaf1MYafNoAC3fvlsl6zPNNxdQLgWqPVV0le4FCyimamSlaxfEA>
+    <xmx:BX0IaTRdVT-zS-E7bKmstT2DhOnkhyTNuXKmPgJUMICYrbNOYDCKOA>
+    <xmx:BX0IaTTvb8zvKIqNajaTD7INixABmx9dYmvz0kWu0Wv7LgySfbcYdA>
+    <xmx:BX0IaUXQn9aZtP0TSyYNvrkLzwNBVM-c9mcXZGa1nSIxWwF_ErQgHA>
+    <xmx:Bn0IaYf64TuLWHc3xIjnfXwfeVZ32b-k6jdwU7zmtBv1_NkeGkN-dYE3>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 3 Nov 2025 04:59:33 -0500 (EST)
+Date: Mon, 3 Nov 2025 10:59:31 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Wang Liang <wangliang74@huawei.com>
+Cc: kuba@kernel.org, andrew@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, shuah@kernel.org,
+	horms@kernel.org, netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+	yuehaibing@huawei.com, zhangchangzhong@huawei.com
+Subject: Re: [PATCH net] selftests: netdevsim: Fix ethtool-features.sh fail
+Message-ID: <aQh9A647mJzBeBI_@krikkit>
+References: <20251030032203.442961-1-wangliang74@huawei.com>
+ <aQPxN5lQui5j8nK8@krikkit>
+ <2ea387c7-cd15-44cc-8789-af3fbe0460a3@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <aQhusPX0Hw9ZuLNR@oss.qualcomm.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2ea387c7-cd15-44cc-8789-af3fbe0460a3@huawei.com>
 
-On Mon, Nov 03, 2025 at 02:28:24PM +0530, Mohd Ayaan Anwar wrote:
-> On Thu, Oct 30, 2025 at 03:22:12PM +0000, Russell King (Oracle) wrote:
-> > On Thu, Oct 30, 2025 at 03:19:27PM +0000, Russell King (Oracle) wrote:
-> > > > 
-> > > > This is probably fine since Bit(9) is self-clearing and its value just
-> > > > after this is 0x00041000.
-> > > 
-> > > Yes, and bit 9 doesn't need to be set at all. SGMII isn't "negotiation"
-> > > but the PHY says to the MAC "this is how I'm operating" and the MAC says
-> > > "okay". Nothing more.
-> > > 
-> > > I'm afraid the presence of snps,ps-speed, this disrupts the test.
-> > 
-> > Note also that testing a 10M link, 100M, 1G and finally 100M again in
-> > that order would also be interesting given my question about the RGMII
-> > register changes that configure_sgmii does.
-> > 
+2025-11-03, 16:58:42 +0800, Wang Liang wrote:
 > 
-> Despite several attempts, I couldn't get 10M to work. There is a link-up
-> but the data path is broken. I checked the net-next tip and it's broken
-> there as well.
+> 在 2025/10/31 7:13, Sabrina Dubroca 写道:
+> > 2025-10-30, 11:22:03 +0800, Wang Liang wrote:
+> > > This patch adds executable permission to script 'ethtool-features.sh', and
+> > > check 'ethtool --json -k' support.
+> > Those are two separate things, probably should be two separate patches.
 > 
-> Oddly enough, configure_sgmii is called with its speed argument set to
-> 1000:
-> [   12.305488] qcom-ethqos 23040000.ethernet eth0: phy link up sgmii/10Mbps/Half/pause/off/nolpi
-> [   12.315233] qcom-ethqos 23040000.ethernet eth0: major config, requested phy/sgmii
-> [   12.322965] qcom-ethqos 23040000.ethernet eth0: interface sgmii inband modes: pcs=00 phy=03
-> [   12.331586] qcom-ethqos 23040000.ethernet eth0: major config, active phy/outband/sgmii
-> [   12.339738] qcom-ethqos 23040000.ethernet eth0: phylink_mac_config: mode=phy/sgmii/pause adv=0000000,00000000,00000000,00000000 pause=00
-> [   12.355113] qcom-ethqos 23040000.ethernet eth0: ethqos_configure_sgmii : Speed = 1000
-> [   12.363196] qcom-ethqos 23040000.ethernet eth0: Link is Up - 10Mbps/Half - flow control off
+> 
+> Ok, I will extract the executable permission change to a new patch.
+> 
+> > 
+> > [...]
+> > > @@ -7,6 +7,11 @@ NSIM_NETDEV=$(make_netdev)
+> > >   set -o pipefail
+> > > +if ! ethtool --json -k $NSIM_NETDEV > /dev/null 2>&1; then
+> > I guess it's improving the situation, but I've got a system with an
+> > ethtool that accepts the --json argument, but silently ignores it for
+> >   -k (ie `ethtool --json -k $DEV` succeeds but doesn't produce a json
+> > output), which will still cause the test to fail later.
+> 
+> 
+> That is indeed a bit strange.
+> 
+> I'm not sure the best way to handle this situation now. Maybe update ethtool
+> instead of checking the output is not a bad method.
 
-If you have "rate matching" enabled (signified by "pause" in the mode=
-part of phylink_mac_config), then the MAC gets told the maximum speed for
-the PHY interface, which for Cisco SGMII is 1G. This is intentional to
-support PHYs that _really_ do use rate matching. Your PHY isn't using it,
-and rate matching for SGMII is pointless.
+That's what Jakub was suggesting in his answer [1]. ethtool has
+supported json output for -k for almost 4 years, running upstream
+selftests with a version of ethtool older than that doesn't really
+make sense, so only the "permission change" patch is really needed.
 
-Please re-run testing with phy-mode = "sgmii" which you've tested
-before without your rate-matching patch to the PHY driver, so the
-system knows the _correct_ parameters for these speeds.
+[1] https://lore.kernel.org/netdev/20251030170217.43e544ad@kernel.org/
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Sabrina
 
