@@ -1,55 +1,61 @@
-Return-Path: <netdev+bounces-234957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-234958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49E95C2A349
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 07:39:43 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FC75C2A3C4
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 07:58:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF39D3B1AA4
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 06:38:38 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C8AAC4E2C97
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 06:58:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83664296BC2;
-	Mon,  3 Nov 2025 06:38:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF007288502;
+	Mon,  3 Nov 2025 06:58:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="WBa9ENdC"
 X-Original-To: netdev@vger.kernel.org
-Received: from ssh247.corpemail.net (ssh247.corpemail.net [210.51.61.247])
+Received: from canpmsgout06.his.huawei.com (canpmsgout06.his.huawei.com [113.46.200.221])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68BAA296BBD;
-	Mon,  3 Nov 2025 06:38:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.51.61.247
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8C8A235BE2;
+	Mon,  3 Nov 2025 06:58:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=113.46.200.221
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762151914; cv=none; b=s7HwiPItwcKZd+jPEmRLg3f9UU0/jx3kLSbDJrgTc1Qh6k85Yh5l4Iu5HUkrGpWULYyn5OKTT8SJicMy7z9eNzwjjNuBfEAokcW9Kzl4BpbzQgvDXfU2A81eYzcEuhJ+P5kuPhrkIG+pGUtAjP16Cnp2PJmlmOgPhhZM4KgMO5g=
+	t=1762153122; cv=none; b=aeboBuusGAFt9W0MvrYqVj+rUV3yQm67d0XkKnxxznfXpTzdkw8F2GWup6w/o5FREn9kL1vtQQVgr/Hgwzr3AZS5gWy5LteJDkG1ZkuAYJZI1lhaiUH9JAzSF/UIwtv4UpigjFzboUWdhfNRKTvomcsuUpU1KED4/ydJ0u45NZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762151914; c=relaxed/simple;
-	bh=mqtTEHnfdDj7ufOnIaA3taPobJloaDUr/In/jZdqmZQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=B3kpoePP96JcF3TGSCLT6A0gdAcfZk9YX54oeIcFTyMStRVVao43JIfqMfsXHjSRLP2pYG4XEB0C4lbZ9Lm/WoQNxbBxSNglVT/mNjwv2/22XdLOnuSg7mlBO/YaO/q79QLLra7nhCt68Pb7hPpmGluWGnprmZwdnimQlRP6NJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com; spf=pass smtp.mailfrom=inspur.com; arc=none smtp.client-ip=210.51.61.247
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inspur.com
-Received: from Jtjnmail201616.home.langchao.com
-        by ssh247.corpemail.net ((D)) with ASMTP (SSL) id 202511031438248582;
-        Mon, 03 Nov 2025 14:38:24 +0800
-Received: from jtjnmailAR01.home.langchao.com (10.100.2.42) by
- Jtjnmail201616.home.langchao.com (10.100.2.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Mon, 3 Nov 2025 14:38:23 +0800
-Received: from inspur.com (10.100.2.107) by jtjnmailAR01.home.langchao.com
- (10.100.2.42) with Microsoft SMTP Server id 15.1.2507.58 via Frontend
- Transport; Mon, 3 Nov 2025 14:38:23 +0800
-Received: from localhost.com (unknown [10.94.13.117])
-	by app3 (Coremail) with SMTP id awJkCsDwEPneTQhpgL0JAA--.13964S4;
-	Mon, 03 Nov 2025 14:38:22 +0800 (CST)
-From: Chu Guangqing <chuguangqing@inspur.com>
-To: <"mst@redhat.comjasowang@redhat.comxuanzhuo@linux.alibaba.comeperezma@redhat.comandrew+netdev@lunn.chdavem@davemloft.netedumazet@google.comkuba@kernel.orgpabeni"@redhat.com>
-CC: <xuanzhuo@linux.alibaba.com>, <eperezma@redhat.com>,
-	<virtualization@lists.linux.dev>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Chu Guangqing <chuguangqing@inspur.com>
-Subject: [PATCH] virtio_net: Fix a typo error in virtio_net
-Date: Mon, 3 Nov 2025 14:36:33 +0800
-Message-ID: <20251103063633.4295-1-chuguangqing@inspur.com>
-X-Mailer: git-send-email 2.43.7
+	s=arc-20240116; t=1762153122; c=relaxed/simple;
+	bh=UaWei8lA5myvGhZlKdywonEmJPyUfL8lNDin+Txy330=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YlxEZE6vbbYGhoIcJF+QnhkK8xL6mCL9WbECXh4aXsmlFOdWnAG9eUqwPcbSGGSmyLo5ctThmJgz7yZs/rLolmXxT5+ej7yN3M0pIrrxPark6FfPx9F6EgQo9+v/xfGOX9VCsRgBmtAAAB2Mg8e3Ck7zgFugzqHv8OOIDCvwQP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=WBa9ENdC; arc=none smtp.client-ip=113.46.200.221
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=yZVwZ3hFajFtTCfA4Oy9TngkmWmo1DVbMQCOxbEbPSk=;
+	b=WBa9ENdCIusVS7Yn6PIdeLql7uY2GCW1aL0lcj1jm9rO+nbSQYlQVUaux0oob72av2hbwUS+Z
+	CT9zAXozdi+9Icfm9EkN1LtD3JQFJ7OlHgRffRJolmd1FINddxWmvEFP9wVUarwLTpvq48SDg0X
+	hrpo6puIIXkGpRf1u9HdbA4=
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by canpmsgout06.his.huawei.com (SkyGuard) with ESMTPS id 4d0Mny5S3LzRhTT;
+	Mon,  3 Nov 2025 14:56:54 +0800 (CST)
+Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
+	by mail.maildlp.com (Postfix) with ESMTPS id 343AE1402C1;
+	Mon,  3 Nov 2025 14:58:28 +0800 (CST)
+Received: from huawei.com (10.50.85.128) by dggpemf500002.china.huawei.com
+ (7.185.36.57) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Mon, 3 Nov
+ 2025 14:58:27 +0800
+From: Yue Haibing <yuehaibing@huawei.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <horms@kernel.org>, <almasrymina@google.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<yuehaibing@huawei.com>
+Subject: [PATCH net-next] net: devmem: Remove unused declaration net_devmem_bind_tx_release()
+Date: Mon, 3 Nov 2025 15:20:46 +0800
+Message-ID: <20251103072046.1670574-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,55 +63,31 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: awJkCsDwEPneTQhpgL0JAA--.13964S4
-X-Coremail-Antispam: 1UD129KBjvdXoWrKw4DZw45uw1fAr48GryDWrg_yoWfurc_uw
-	1UZr43tws5Kr4Y9ay5Cw4rAFW5Ka1kWF4kGF9xK3ySkF98uF13WF9FvFyDGFZrX39Fyr1r
-	GFsxGFn8A34fZjkaLaAFLSUrUUUUbb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbVkFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
-	A2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_GcCE
-	3s1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s
-	1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0
-	cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8Jw
-	ACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_Jw0_
-	GFylc7CjxVAKzI0EY4vE52x082I5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r
-	1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CE
-	b7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0x
-	vE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAI
-	cVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2Kf
-	nxnUUI43ZEXa7VUjHmh7UUUUU==
-X-CM-SenderInfo: 5fkxw35dqj1xlqj6x0hvsx2hhfrp/
-X-CM-DELIVERINFO: =?B?DKTVVJRRTeOiUs3aOqHZ50hzsfHKF9Ds6CbXmDm38RucXu3DYXJR7Zlh9zE0nt/Iac
-	D+KWEkofU1bJvebEtZkuG4YLrU+vTWs0UaMZjN3SDVnrRYNjwvvyPu2AsqKRdyaiTde6PO
-	b7yM2pVqj+AYQqHbEW8=
 Content-Type: text/plain
-tUid: 202511031438248c7be716b006c143bcb8f91c6232ec2c
-X-Abuse-Reports-To: service@corp-email.com
-Abuse-Reports-To: service@corp-email.com
-X-Complaints-To: service@corp-email.com
-X-Report-Abuse-To: service@corp-email.com
+X-ClientProxiedBy: kwepems500002.china.huawei.com (7.221.188.17) To
+ dggpemf500002.china.huawei.com (7.185.36.57)
 
-Fix the spelling error of "separate".
+Commit bd61848900bf ("net: devmem: Implement TX path") declared this
+but never implemented it.
 
-Signed-off-by: Chu Guangqing <chuguangqing@inspur.com>
+Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
 ---
- drivers/net/virtio_net.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/core/devmem.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 8e8a179aaa49..1e6f5e650f11 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -3760,7 +3760,7 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
- 	 * (2) no user configuration.
- 	 *
- 	 * During rss command processing, device updates queue_pairs using rss.max_tx_vq. That is,
--	 * the device updates queue_pairs together with rss, so we can skip the sperate queue_pairs
-+	 * the device updates queue_pairs together with rss, so we can skip the separate queue_pairs
- 	 * update (VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET below) and return directly.
- 	 */
- 	if (vi->has_rss && !netif_is_rxfh_configured(dev)) {
+diff --git a/net/core/devmem.h b/net/core/devmem.h
+index 101150d761af..0b43a648cd2e 100644
+--- a/net/core/devmem.h
++++ b/net/core/devmem.h
+@@ -94,7 +94,6 @@ void net_devmem_unbind_dmabuf(struct net_devmem_dmabuf_binding *binding);
+ int net_devmem_bind_dmabuf_to_queue(struct net_device *dev, u32 rxq_idx,
+ 				    struct net_devmem_dmabuf_binding *binding,
+ 				    struct netlink_ext_ack *extack);
+-void net_devmem_bind_tx_release(struct sock *sk);
+ 
+ static inline struct dmabuf_genpool_chunk_owner *
+ net_devmem_iov_to_chunk_owner(const struct net_iov *niov)
 -- 
-2.43.7
+2.34.1
 
 
