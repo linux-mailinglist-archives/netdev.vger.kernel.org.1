@@ -1,197 +1,90 @@
-Return-Path: <netdev+bounces-235220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0BCDC2DB5E
-	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 19:41:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CD0BC2D84C
+	for <lists+netdev@lfdr.de>; Mon, 03 Nov 2025 18:45:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 186B01895DFF
-	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 18:41:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 758B33B3D62
+	for <lists+netdev@lfdr.de>; Mon,  3 Nov 2025 17:42:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2B6131A7F2;
-	Mon,  3 Nov 2025 18:40:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEEC9200113;
+	Mon,  3 Nov 2025 17:42:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=email-od.com header.i=@email-od.com header.b="PY2/rmOD"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="rsey/Sbd"
 X-Original-To: netdev@vger.kernel.org
-Received: from s1-ba86.socketlabs.email-od.com (s1-ba86.socketlabs.email-od.com [142.0.186.134])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB547302776
-	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 18:40:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=142.0.186.134
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11C2C314D20
+	for <netdev@vger.kernel.org>; Mon,  3 Nov 2025 17:42:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762195256; cv=none; b=CDAMNTonnc8VeLh01LwJRT7X6UWyoqPzziESjkmgsARDtyb9I2/8uwgTBupwvwZSrlZNmtqIxNaIWJQozB4FrEoT4hs4ssj8WszxzEBKhUaiXpJcQv6P2qzMVtzj1uKBlE4Wa3e041KjpDv5kYLVclekM2zQZ1znFirwg2XbL1o=
+	t=1762191771; cv=none; b=SnvvNVYN7zH+TrrjMy49HDQZRW5rCBgBLL/06oH6svbifM3Pw5upJ0WWkd2+YNHhIJWrvY7Iw2T4WL8q0PtsLIMWWZejeSXoulN9s74tEzd6pkvwsTJU58Y2YEeiJ1uavtgYWqhgG2JppiS0bSTAnzbjS5j/4WAQCOrS1cZdUZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762195256; c=relaxed/simple;
-	bh=glFgkj7MjXsOiAWpn6J+km/RtrCJX6sZXCrhNI2Du3c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Y5ySZYYPaetxpEbs63lRVD6yl+2Z/IzPQxfhwj5kjQfnW7Nd4Q5/Vn8sgQgKo8sc/logYG7X7oY1dMB7F0rPXkhQo0OOdt9e7xoLdco8tTsH4tHdgPYKAMStB8DzitVKTPIQ2kPyolJedhOPrzkTXf6+mvI+hNxcFwPY7qVHPyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nalramli.com; spf=pass smtp.mailfrom=email-od.com; dkim=pass (1024-bit key) header.d=email-od.com header.i=@email-od.com header.b=PY2/rmOD; arc=none smtp.client-ip=142.0.186.134
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nalramli.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=email-od.com
-DKIM-Signature: v=1; a=rsa-sha256; d=email-od.com;i=@email-od.com;s=dkim;
-	c=relaxed/relaxed; q=dns/txt; t=1762195255; x=1764787255;
-	h=content-transfer-encoding:content-type:in-reply-to:from:content-language:references:cc:to:subject:mime-version:date:message-id:x-thread-info:subject:to:from:cc:reply-to;
-	bh=U8h7PzoUbT1+X5pM4fvxo+Qt4T0+vhHtCUCRzU9q0Ek=;
-	b=PY2/rmODxjzn5JQu36i2QyKLRXk7RqNlmtGIj9toer9hpPufOT3gq7+nSIyIb4mthHij0UHmMUc0zQfn4hE9KFFpHQYvhWxKLIF3RJQ95F96SOq21DFiaCEU86sbBXWYldkbuX0WGQouUzJSyFjVABQqIvFBwiNr6ozIw4UOIO0=
-X-Thread-Info: NDUwNC4xMi44MTkwOTAwMDIyNGRjZDAubmV0ZGV2PXZnZXIua2VybmVsLm9yZw==
-x-xsSpam: eyJTY29yZSI6MCwiRGV0YWlscyI6IltdIn0=
-Received: from [192.168.0.212] (d4-50-191-215.clv.wideopenwest.com [50.4.215.191])
-	by nalramli.com (Postfix) with ESMTPSA id 5F8E12CE0005;
-	Mon,  3 Nov 2025 12:40:14 -0500 (EST)
-Message-ID: <6c83089b-3e0d-4c72-80a9-8049cff1dd57@nalramli.com>
-Date: Mon, 3 Nov 2025 12:40:14 -0500
+	s=arc-20240116; t=1762191771; c=relaxed/simple;
+	bh=N5no8eLsccSFkdr0v8WSmeYYmoSC0nA9Vc4fmPHrtos=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p9JpyMZoO+vQSv9aE2SZRQ4nia3qEVWJ2JXNnqrFP0awjr92zfRt7Uos1XhzQsq3b96FRa+d3yXXfpqUIKNinl3Lt+ncKzsltxF7IFH96jr7zpJgR+y1A1uJlcPm2PG34zojPDZ3xNIIsDhKytrT4R/RmWH8Cd+4n8YoELEcUwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=rsey/Sbd; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=GacqkKeVA83J2F7z/hqWmJ1ugX1qsFrCMSsZwQbcp2Q=; b=rsey/SbdHqOoVC6FCvCMR3dVuW
+	iopm9uLbF2V9HFmN4LqVGPeDqUWDuBE5nmZkqLm5A50C92WY/q40TnyOOc/pt3ynWf5hB27LXjw/S
+	pKxW5h/W/WxQMM45/qNv/rBz4AQm2UEnGWzlxanCIw0GLBNIjxxa/HhnFnkwcsxjKa46tkZwYgh32
+	D3friYkdbz/kU/1udqQ7QvNse+crhLU+CczUcqpLGxUCUxr9Dy4/rYrgXzeYPWtsABGzg2aH0UK+8
+	8tXGCi1sGhCkHQEDvR6RGX2vMyXAxpNrDdfFD8JyfSaBeyTzUFLgGbN00jEl7VGvJ/Z0T0zo6EOGI
+	1WyleYmA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38012)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vFyZo-000000001EN-3Ddd;
+	Mon, 03 Nov 2025 17:42:44 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vFyZm-000000003zD-2iYv;
+	Mon, 03 Nov 2025 17:42:42 +0000
+Date: Mon, 3 Nov 2025 17:42:42 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, kernel-team@meta.com,
+	andrew+netdev@lunn.ch, hkallweit1@gmail.com, pabeni@redhat.com,
+	davem@davemloft.net
+Subject: Re: [net-next PATCH v2 02/11] net: phy: Add support for 25G, 50G,
+ and 100G interfaces to xpcs driver
+Message-ID: <aQjpkpqpF2SgZkkx@shell.armlinux.org.uk>
+References: <176218882404.2759873.8174527156326754449.stgit@ahduyck-xeon-server.home.arpa>
+ <176218920872.2759873.3935936327928788544.stgit@ahduyck-xeon-server.home.arpa>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC ixgbe 1/2] ixgbe: Implement support for ndo_xdp_xmit in skb
- mode
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
- hawk@kernel.org, john.fastabend@gmail.com, lishujin@kuaishou.com,
- xingwanli@kuaishou.com, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- team-kernel@fastly.com, khubert@fastly.com, nalramli@fastly.com
-References: <20251009192831.3333763-1-dev@nalramli.com>
- <20251009192831.3333763-2-dev@nalramli.com> <aQjahdk/fl6EBcso@boxer>
-Content-Language: en-US
-From: "Nabil S. Alramli" <dev@nalramli.com>
-In-Reply-To: <aQjahdk/fl6EBcso@boxer>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <176218920872.2759873.3935936327928788544.stgit@ahduyck-xeon-server.home.arpa>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 11/3/25 11:38, Maciej Fijalkowski wrote:
-> On Thu, Oct 09, 2025 at 03:28:30PM -0400, Nabil S. Alramli wrote:
->> This commit adds support for `ndo_xdp_xmit` in skb mode in the ixgbe
->> ethernet driver, by allowing the call to continue to transmit the packets
->> using `dev_direct_xmit`.
->>
->> Previously, the driver did not support the operation in skb mode. The
->> handler `ixgbe_xdp_xmit` had the following condition:
->>
->> ```
->> 	ring = adapter->xdp_prog ? ixgbe_determine_xdp_ring(adapter) : NULL;
->> 	if (unlikely(!ring))
->> 		return -ENXIO;
->> ```
->>
->> That only works in native mode. In skb mode, `adapter->xdp_prog == NULL` so
->> the call returned an error, which prevented the ability to send packets
->> using `bpf_prog_test_run_opts` with the `BPF_F_TEST_XDP_LIVE_FRAMES` flag.
-> 
-> Hi Nabil,
-> 
-> What stops you from loading a dummy XDP program to interface? This has
-> been an approach that we follow when we want to use anything that utilizes
-> XDP resources (XDP Tx queues).
-> 
+Subject should be "net: pcs: xpcs: " to signify that it's for the
+PCS net subsystem, and the xpcs driver. Please review
 
-Hi Maciej,
+git log drivers/net/pcs/pcs-xpcs.c
 
-Thank you for your response. In one use case we have multiple XDP programs
-already loaded on an interface in SKB mode using the dispatcher, and we want
-to use bpf_prog_test_run_opts to egress packets from another XDP program. We
-want to avoid having to unload the dispatcher or be forced to use it in native
-mode. Without this patch, that does not seem possible currently, correct?
+to see the normal prefix used when modifying any particular driver.
 
->>
->> Signed-off-by: Nabil S. Alramli <dev@nalramli.com>
->> ---
->>  drivers/net/ethernet/intel/ixgbe/ixgbe.h      |  8 ++++
->>  drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 43 +++++++++++++++++--
->>  2 files changed, 47 insertions(+), 4 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
->> index e6a380d4929b..26c378853755 100644
->> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
->> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
->> @@ -846,6 +846,14 @@ struct ixgbe_ring *ixgbe_determine_xdp_ring(struct ixgbe_adapter *adapter)
->>  	return adapter->xdp_ring[index];
->>  }
->>  
->> +static inline
->> +struct ixgbe_ring *ixgbe_determine_tx_ring(struct ixgbe_adapter *adapter)
->> +{
->> +	int index = ixgbe_determine_xdp_q_idx(smp_processor_id());
->> +
->> +	return adapter->tx_ring[index];
->> +}
->> +
->>  static inline u8 ixgbe_max_rss_indices(struct ixgbe_adapter *adapter)
->>  {
->>  	switch (adapter->hw.mac.type) {
->> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
->> index 467f81239e12..fed70cbdb1b2 100644
->> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
->> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
->> @@ -10748,7 +10748,8 @@ static int ixgbe_xdp_xmit(struct net_device *dev, int n,
->>  	/* During program transitions its possible adapter->xdp_prog is assigned
->>  	 * but ring has not been configured yet. In this case simply abort xmit.
->>  	 */
->> -	ring = adapter->xdp_prog ? ixgbe_determine_xdp_ring(adapter) : NULL;
->> +	ring = adapter->xdp_prog ? ixgbe_determine_xdp_ring(adapter) :
->> +		ixgbe_determine_tx_ring(adapter);
->>  	if (unlikely(!ring))
->>  		return -ENXIO;
->>  
->> @@ -10762,9 +10763,43 @@ static int ixgbe_xdp_xmit(struct net_device *dev, int n,
->>  		struct xdp_frame *xdpf = frames[i];
->>  		int err;
->>  
->> -		err = ixgbe_xmit_xdp_ring(ring, xdpf);
->> -		if (err != IXGBE_XDP_TX)
->> -			break;
->> +		if (adapter->xdp_prog) {
->> +			err = ixgbe_xmit_xdp_ring(ring, xdpf);
->> +			if (err != IXGBE_XDP_TX)
->> +				break;
->> +		} else {
->> +			struct xdp_buff xdp = {0};
->> +			unsigned int metasize = 0;
->> +			unsigned int size = 0;
->> +			unsigned int truesize = 0;
->> +			struct sk_buff *skb = NULL;
->> +
->> +			xdp_convert_frame_to_buff(xdpf, &xdp);
->> +			size = xdp.data_end - xdp.data;
->> +			metasize = xdp.data - xdp.data_meta;
->> +			truesize = SKB_DATA_ALIGN(xdp.data_end - xdp.data_hard_start) +
->> +				   SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
->> +
->> +			skb = napi_alloc_skb(&ring->q_vector->napi, truesize);
->> +			if (likely(skb)) {
->> +				skb_reserve(skb, xdp.data - xdp.data_hard_start);
->> +				skb_put_data(skb, xdp.data, size);
->> +				build_skb_around(skb, skb->data, truesize);
->> +				if (metasize)
->> +					skb_metadata_set(skb, metasize);
->> +				skb->dev = dev;
->> +				skb->queue_mapping = ring->queue_index;
->> +
->> +				err = dev_direct_xmit(skb, ring->queue_index);
->> +				if (!dev_xmit_complete(err))
->> +					break;
->> +			} else {
->> +				break;
->> +			}
->> +
->> +			xdp_return_frame_rx_napi(xdpf);
->> +		}
->> +
->>  		nxmit++;
->>  	}
->>  
->> -- 
->> 2.43.0
->>
->>
+Thanks.
 
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
