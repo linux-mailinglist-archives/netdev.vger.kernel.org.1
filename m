@@ -1,330 +1,207 @@
-Return-Path: <netdev+bounces-235579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55E83C32B2D
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 19:45:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BE2BC32B66
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 19:56:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EC5C423935
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 18:45:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D63A3A8859
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 18:56:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09D02328B7E;
-	Tue,  4 Nov 2025 18:45:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5C6133F365;
+	Tue,  4 Nov 2025 18:56:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="T1fwWnsR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q7cG+qxu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D64791E89C
-	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 18:45:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762281936; cv=fail; b=Qz65ECDhcKD3EDqjBZC7p5NjnzvReViIfHA1CUOd4D1JSHsZByolYx9E1RRbeSuqG7/2sOKaEmIpWbL8eyrrqZrlW79xbRba+XHs4CaraErtrXweG9lI0uU6+dzoFJ8Fw/5xFZ5TDS349izrb5TQpY1jHi59iym6YziqFfP19/w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762281936; c=relaxed/simple;
-	bh=wa6atqnlMH7egWcjc20vq8+rSaXot9T+1jZfQK4dvmg=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=SFysEERPs8CNR0bOGxNIPU8suRd+ji0ARAW4rQuce38q6MynoE1rGLc2xppXMrQdFgfIKBXbfJn80sAz4vbywUeJxCVX3rxDyjYRYdjFg1EsGodTsH72C1NSrGkqEISuHCOBV+M9w+JhnxzmNIblHxIZa0Z84UErCBfSr7GRS8k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=T1fwWnsR; arc=fail smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762281935; x=1793817935;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:mime-version;
-  bh=wa6atqnlMH7egWcjc20vq8+rSaXot9T+1jZfQK4dvmg=;
-  b=T1fwWnsRDu8PI7lmm4Mzel8SJd8F2jBq01H2WjK0ovne3cfvYHmQ+Qvu
-   CP6lKjWGWWDHn8OetZ3kagUhC96xGR/dAKblNmkYSWenWAwcUNW03NUSS
-   G9IdU4gDZbKs/iVRsEHOeVrIE76C+79mWxko+OHWMvQXMq3j1m6fwU+ZP
-   AwGYZCnnCN5B/3NlvBeqSDGZ3IUszAvs13ZqN/TepL+h3eZWxUYasTBBP
-   HctyvP7z7dvNSeLvhuMqIskYciK2utPFJbD7v8vqdJOVt6nQyQkNNTteT
-   JwHvR6A45XoiTL/shT3aSk7dTiyDHHDLZbGqRlud2JF77lFaA14NQxg6I
-   g==;
-X-CSE-ConnectionGUID: RRN3u/gsThmUitIYpYSw6Q==
-X-CSE-MsgGUID: +9BFaxcoSiKK9Fy5Zdjsgg==
-X-IronPort-AV: E=McAfee;i="6800,10657,11603"; a="64536673"
-X-IronPort-AV: E=Sophos;i="6.19,279,1754982000"; 
-   d="asc'?scan'208";a="64536673"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2025 10:45:30 -0800
-X-CSE-ConnectionGUID: R8bxA9f2TUeWgnic2FJXhQ==
-X-CSE-MsgGUID: sOp/k3PxRx6utCsNqMI/Wg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,279,1754982000"; 
-   d="asc'?scan'208";a="187965881"
-Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2025 10:45:30 -0800
-Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Tue, 4 Nov 2025 10:45:29 -0800
-Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
- ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Tue, 4 Nov 2025 10:45:29 -0800
-Received: from CY7PR03CU001.outbound.protection.outlook.com (40.93.198.49) by
- edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Tue, 4 Nov 2025 10:45:29 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=R0pSD+VpvHEnKjNL7wlbomS+l7OYdhGX5QfFIEq+CiMe8eIQJj/etwBjfL7Gap9/r9Rjd6AVnLPLatYsT/zzm/foFCnS/v8u9RhnSv/GcbT9WsZPNEviLNFMXzArLvD6S4o3XwyBNmM0RCo3V1vNA/fMfQ9LNoicj3q/BU5YJnv10joXOhVA/I4wQhdUJ6245qAcXiSS9e+ROjaiLMLOvHSR961W3ozKWHX7d3db2ZMMM6VIpJShgAGxT+6PYE2JF4RZE4uBAp6Ke5qgJlAKnQS0MeizJYrItx4TJezJ3Lx3wJfqLOXZXR2LdIHwO3xOwsU9F+E6XtOvNKO1i0tnow==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=fDfNC+T9SwcgqzIVbSjz4eElMq7nFvbBBITCcIahfrU=;
- b=CYFNShd2AEaAH31/9jC2XASt3qWLyqMnT4RJ0eBYofsHy+Rrqakzx3Yux48m+bhRhwF2xuusUjd5uZEZyHz9i/WN4KPYNfh+LSuzEDUakZv47Sn+xmdTfd7zZu6Ne3RWqdrxHfvtUkqcYba0ww6XlCN8YjREKwu25Hjw3ZhPVD0ya5zh7/YPrMYVMQ32xP9p11SfCf5tAf2NxuuHoNHNKie04icXXel4DGQpINBCPtD0Mh+A9LzDw+pZME+VYVUbX51H50V9JD1Ab8owxRo0fXZ39isYH+CS/scOCoBWBYkO8wsYzLAX+VuYsmYbL3x4uvtFThj/WzHyDgLooE3NGg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by SA0PR11MB4766.namprd11.prod.outlook.com (2603:10b6:806:92::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.7; Tue, 4 Nov
- 2025 18:45:27 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::81f7:c6c0:ca43:11c3]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::81f7:c6c0:ca43:11c3%3]) with mapi id 15.20.9275.015; Tue, 4 Nov 2025
- 18:45:26 +0000
-Message-ID: <763ebb90-7c92-499a-b0ac-b16d88f67e75@intel.com>
-Date: Tue, 4 Nov 2025 10:45:23 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next 0/9] ice: properly use u64_stats API for all ring
- stats
-To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>, "Lobakin,
- Aleksander" <aleksander.lobakin@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <20251103-jk-refactor-queue-stats-v1-0-164d2ed859b6@intel.com>
- <IA3PR11MB8986AB2DBE26AD6A7E3362A2E5C4A@IA3PR11MB8986.namprd11.prod.outlook.com>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-Autocrypt: addr=jacob.e.keller@intel.com; keydata=
- xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
- J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
- qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
- CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
- UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
- MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
- apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
- cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
-In-Reply-To: <IA3PR11MB8986AB2DBE26AD6A7E3362A2E5C4A@IA3PR11MB8986.namprd11.prod.outlook.com>
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="------------GQcocUOOI0edgBFpubRSIS6g"
-X-ClientProxiedBy: MW4PR04CA0071.namprd04.prod.outlook.com
- (2603:10b6:303:6b::16) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96431DF25F
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 18:56:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762282586; cv=none; b=lF/UqXxtGTVjAT7NUpIyvbIzIJ1bDwK9ou+WXeVhdkOgCDDOQOee2hvpPB7k73T0wqlETOPNXKdaPbgNndins82xSl/WNKSBcRm8pHyIEk0tS5vf9DOTHbpr8af/ESlHZe/DDQ5/DSxUJX5U7fAmy2bCvQ5vTC2H38UkLkpwQGw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762282586; c=relaxed/simple;
+	bh=1YsclRHRX16kW+F4BUH8OrD5tzZOGvtmNO3gu7zn/jA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=I1MJhjJLrBDu5U/9Bf4x2QKtJaHr+gTpj7AB4sYHao1PSSsjD7vTDI6z2WVjZoreueEfQtb8qh5i0BTCtt8Ra2c1Un4g1t1mLxi3uXjP9Z2sstwMiCLaltM6+/GAl+oriREg/QwmveD84CiQXukl3uxdW/pGOYwxaEC8m9dUpz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q7cG+qxu; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-429bf011e6cso4404582f8f.1
+        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 10:56:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762282583; x=1762887383; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qyVxNDhzeuX7e1Hm9faErYkOpONAjmcZigzr7RrJCec=;
+        b=Q7cG+qxuTZO9/oKWznlk4GnwNt+gPg1QoN0Ax+GsQW1a5+HQastrg2vjEhxI1/6fpL
+         DecHEAzvbzUhPLHrutkj6olqaK+R/IDQqMtnyaSQTMzXo3d4nmXsxPZ9OY/kY7fQvn8y
+         ZSNP52LRIvPjqKPt916loBesIEUN+RQzYdKl9iu1qKjYgTBrFUaMX1kk/3hRI4h94+ws
+         IE+O3wFhtbZ+/4KN+xNK61IY0oqaBKj92bBgLW+Nb8KXXWM+tGSvJcmWuOAubpQYReUS
+         jO/XyoV7SZ8Gur+NBO7vfX/IAmJgfYjDfnR7wCNRRajrMGGdDZ32jtfts8pMJmNWPbq8
+         4Rgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762282583; x=1762887383;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qyVxNDhzeuX7e1Hm9faErYkOpONAjmcZigzr7RrJCec=;
+        b=a08aON0T7odec0J+4isE5e4XPk+bK+QVUFA8wwycjRQyIicckQWP0HBlDmMAaNL710
+         mSgE5LsiIm/QzBKUQXnIozFzcvG1SHaYJi/R1zM4fCGlTyEd1A7dcvwEqpmzkWNv15hx
+         QL9fJxoBDbyphz0CDs20su7ozApsJ+lH7Qzpf9Orvyj85AXajEvFlC/LPnqBf33AjjhK
+         AVESVEnJ6jU92J6AoIhk+M1TwmBnrztMLIKBT8xdaiDOB4yOC1QvEWYC2OAYfJmhu9Gi
+         0vTohlmVAT0rjTyB71aHJKWAQnQX4PGLReigCz5FiJ8vFfgePm8gsupyCTOpmSseRG3T
+         0bHg==
+X-Forwarded-Encrypted: i=1; AJvYcCWniPcAcIiE3EkFFhSn6IZJtUH1miQ/DNVJR94J/JCQx/5lHE+Gx4ah0VZt/CsbP2Vnlj615VE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlQqg8sH5PNx9nClHE+wXnR1KsklAqaWe/CQR5E8mHOBav7z1p
+	+URdOxba2N43JmkMkM4M0K7wf9I2O3dP7yQkN+2y1/hMBcD0e/rA5hjSxLAyoRh+9k0GvmqLHiP
+	h3wj/76LBkuAga/9gbxSXjYemjA1on1g=
+X-Gm-Gg: ASbGncttT6z0KSA/cPE+s8a4WMV4+y3++N6j9kjlq78OPMaBTEyCGR2VLTOloSRPHU2
+	HvQ1hKdFGSXZwGk9iHO5J4CbycH4IUTdCdu2DGxLXQRhMm95WtcLNJBbyyq7yZIOq8XZZ6P28Lf
+	ed+JgQvqcqNF9EzZ7Fu9Gk9GsL5t8Q3fP1clnKAso680Mxsvd7e65jcn9dMim7A+UBFAtl4pXpV
+	W7ZzR/dfAACW95bYfGEA9rzb4viNu9aoqt2/Q0skUA/E0YVK25krxf//wTn/+3HWEclFXAXSozX
+X-Google-Smtp-Source: AGHT+IFJOInFmzbqZmECILRroALB/RTVl7MjNKGkZgcM/wZQZhU9czd1hU9lNpogQZguKz7XWer3EishDJ+kqONidvU=
+X-Received: by 2002:a05:6000:4105:b0:3eb:4e88:585 with SMTP id
+ ffacd0b85a97d-429e3305dbcmr291156f8f.29.1762282582747; Tue, 04 Nov 2025
+ 10:56:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|SA0PR11MB4766:EE_
-X-MS-Office365-Filtering-Correlation-Id: c783a522-825d-498a-fa41-08de1bd251ff
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?eEErVlNZa1dObFNEM1JEYWF4RjBxc1FyOFFiQ09Vazhpc3dibmU0dERtb0M4?=
- =?utf-8?B?Y1JsTDdBcWFmQjBmQmJJUDQwcE5zaUZtRmNRQjRkUzVpMHZTWjMyMXFNRFE1?=
- =?utf-8?B?YXMzd2I1bDFsNmdONFZRRXJ3UUhBakcwTFc4SUJKNlVBTFRlbVFNdkx5K21h?=
- =?utf-8?B?ZFY2Uk5ENkZPRmpabFp4U0xVa2cvemdycFdkMjI2TnJKVVNiSGFndFI3VlpD?=
- =?utf-8?B?QlZ5TUNkZEF0QTFVUERuMTVROUFKYUQ4OHN3L3BjaEgvd2VvVnNMZ1BxL2dq?=
- =?utf-8?B?TkQ4Q05DRUpzLzZFR0lib082Z1MwRk5IK0EvUmhRV3RpQ1czbnFCa3I2SWVJ?=
- =?utf-8?B?amR2Y1ZheDA5SGNkR3dRVE9nSkwyVFRwOWhmSVZUYmhWNGRHQWROZkRSL2pU?=
- =?utf-8?B?clVnQldCcTZXRWRPcTVHRzFuZ0JQY2E0SnNrdW5FV29HZ0xuVlhqazNTNmdr?=
- =?utf-8?B?QWNlLzNBRW5xdDczOW5MNlNIblIwTUU4djRjdmhmR2VIKytWUldqNTFHaENl?=
- =?utf-8?B?NmdrU1hCemxjZkhXS2hkTlBPTlJISiszRkpOakNIQ3lkVjBNVGlJVFhGdzFQ?=
- =?utf-8?B?WEFBNGNuUmJGQ0lkK3k1b0FDc25KR0lZV2lTYnBBOGNnV0lNdSt0SytVSHJr?=
- =?utf-8?B?QWxnMEZ6a3QrSXEwVndCSnBSSlFCeDFkZUxwUldicDlFYWNud2dlNFNCOEwv?=
- =?utf-8?B?ZGlhS3VoQ245MGtodGdEeWNLRlZvNkQ2RVdNR3FPdjUvdXZDdHlLdytUaERG?=
- =?utf-8?B?cmt6UWI5WEhadlRBY1dwZkRMaTNmN3VaRFJnZGNXbnNUS09UMkViWCtaekY5?=
- =?utf-8?B?U083UWhBdGVFcFdGTlMzanBTYTVyZGxtbnpoRzgzZCtVV3QxSEkrd3RZZFd5?=
- =?utf-8?B?eGx0KzNLKzlXMnNVQW1EdmVUUForKzc0Mm1VV09rb1ZQQmVvTnpLUURQYTdT?=
- =?utf-8?B?YWpkSEFtVnBRSXNuUFZwdTZvREFMbTlJV0tMZE8vbzBsMmhDallvYzd3bS9w?=
- =?utf-8?B?ZDZVNGZGQitMR2YrM0E1SVhnUWJ0Q2pCUFF4eXNsTWduK3NmdE54R2hubEFW?=
- =?utf-8?B?N0hBVjRyWVJvYWNlVDN6RC9ucVJSUWI3d1hmMWVtRmZaYVg3VUhOQkJFcmlj?=
- =?utf-8?B?UWVXb1BybndWcDA5ajBmZGRONkdRNEJ6RUVVV3ZrMGg5YityV0g3cjhJYWEr?=
- =?utf-8?B?MTluUnZweEczald5dWhsbEIzaHd6R1lSNWVOaks1Um1XK0o0Yk9RdjZWRWhv?=
- =?utf-8?B?S1NkeGM0Wllud0twTVhXcWFFV1I3czJwekY4WVlFZUQ5eGpTV29jMzNPbmo0?=
- =?utf-8?B?MkRyT3lzSjA5S1lCUEd6eWtyZTdJVng4dzIvUEthSVJyU3dXYmpwcXM1VjFw?=
- =?utf-8?B?RHdXcTA2UHpNNUVweUJ5cXZiVjVXYjc1VFNmVFJhZ2s4T1Nvb01JUmlNbThK?=
- =?utf-8?B?anFQdzFvL1p0RlRoejVjT1ZkRUdnTENTYUZ0SlR2eFBtRExDdllDQWVyM1h0?=
- =?utf-8?B?aUIrc2xCN2pVUWh5MHROdCtuRDhEUDdjVVhDVGFmQ0JOZGl1YzFDSnQ3QVF3?=
- =?utf-8?B?WnhLa0NSSFE3MitNLzUwM2FmUmI2NGtoUjdrMkd2N05GUEh1KzF3TVhZWHFh?=
- =?utf-8?B?WTFSdkIyc0VsbVZuV2ZIREZNYzhxMVEyck9SbXcxdlJ5TGt4MEhlYXppWFZ4?=
- =?utf-8?B?MjhkSUlWOWFlMkhRTSt3aTdGOThGU0RaS1ZzU3FieWZBaGI5MmM5OFNlTXdn?=
- =?utf-8?B?UnNIUEhNUHM2WTZEV0YwUDZxQjRodWRENk9tRmhIMW5RY2kxY0ppMzVMWlEy?=
- =?utf-8?B?Q1JyUzdNLzE4d3ZJNWNpdFc4N0oxWUNiLzFPaytqTXNRbjZTdFQ5Y1hrZkRq?=
- =?utf-8?B?dCsrQ3JGc2FVRTYwQkh4d1Z4ajBQaVVXSjlTM3ZEVlBaNHVpTVJZa29scjht?=
- =?utf-8?Q?fGKNzqzICLg757n7yI0NeGExuWy6c8Uv?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?K2lNVkZjT1I3RmFBMGRVcEhmeEZmN3F0QzUzYUQrdjJoOGVpT2p2Q2NWLzZU?=
- =?utf-8?B?VmM2SDNLTk80VDhZTktCN0F1ZlBBR0J1K3k2SmMyWTc4MHhPS01kV0htS3Vk?=
- =?utf-8?B?TTN4bVo1RzZuMm5TRVkzMEVldTRoVlFBR0VnaU9yZi9sZFZCV0l3NnJBUkhO?=
- =?utf-8?B?bWc1endIWjJMUHJ4MHhBS0hXWUJ3U0prY0cwT2VSd2E1MXRCUlZiK2xJR3ZG?=
- =?utf-8?B?ZDNiaXZaYUZ6Y1dnOGh0M2pRd2Z0VStEOXlaR1prelJwL1FDY21jb3F2K2FT?=
- =?utf-8?B?K01VMGdlRVF2eW90c0RCSGt2RVNuMEFhb0RFY1U5MWdCM05Vd0JNL3FMSkM5?=
- =?utf-8?B?SDRRVk1URmQ3UEcwalQ2K0JFTVR2THVmTi84TzdJU2hLVjhLc01UYU5LVy9P?=
- =?utf-8?B?UVVobGJDOUVWbUl1bEFueHhVZHlCUklKWDdNdzlWOEFTRk1mcmx3RHBRVWxR?=
- =?utf-8?B?NXc4QWNKTU1pRk9xZnVMQUR5S0lYakluTU5XOWZEbjIwR0xkRmF0VmR4U3RP?=
- =?utf-8?B?Tk1vM3V0TFBQVUozMnY3cHBLRjZqMzM2QW9QV3FmdDg1YTVESVphSjVMUU1U?=
- =?utf-8?B?WGdZeUx2UGxjNzVSU2txWU1OVVNBQU5wTWV5MGcxdFdRSElqbUZTNENEZVZr?=
- =?utf-8?B?UFNicklrSmUyTnVIalhqYndVOS94bmpDM3pLT2VPVXpSS1FScTRid24rcG8x?=
- =?utf-8?B?emRSdWdvUXdlZUNwMnRKdmNYQnNya3ZzeENtVnB4SEZwbHFjM1RyUUlGaCts?=
- =?utf-8?B?WGdTd013V2h0WklBRWtJOXEvOHROVXhsMi9wUUF0ckhZSklvTVNLUUtZK2NK?=
- =?utf-8?B?MW5XSnBnNndaVi9iNXNhTXB1c0w2RFN0NHZ3QVB4cTk0a1JWd0RnQXNnalBM?=
- =?utf-8?B?cjZjQ0k1SmI4VHYrNWZQelRmRjVYNmJXWWJnNFFUNVYvSTgvREw2Mkp6Z0Fx?=
- =?utf-8?B?d251ZXc4Sk5KYTdrSkNXamdoQkJJRUR4dllOdGZJRHg1SnMrVU1RclVyMW1B?=
- =?utf-8?B?SFJCbUVMelRSTW0vNzZOS0YrMnZ5VWNhTU9wVk5zKzAxa0ZCN2xxcEJ1dWFC?=
- =?utf-8?B?QVVJSVZOOE1ZZE9LK0JRR013c2grNS8rUVA0UEEwb1diQ0RKcHR1dkozYkpB?=
- =?utf-8?B?NVZrZG54SzdQVHRQSFNrSWErS3pWQUpNV2Y3RnNnMDRZZERyWXNCU3ZXRGJm?=
- =?utf-8?B?eGg0RnJBakVrUThDMDY5bFFCa09WWTJYWllSb3NtbGZqOE03T09TZTI4RUNO?=
- =?utf-8?B?ZWp5YXdYclZHcjBkb0RVcG1aMHF1cmtINGRTZUhldEZWVjFiV21kMUd1NkJJ?=
- =?utf-8?B?MGRudVByUEZmUVZNQTNqcmVBUXZGclZrRFo3V0FUVGpGcldRZU9tQlZxMStB?=
- =?utf-8?B?RW9QWnhOQ2IxRzJmVG8xSlU4d0Jtc3hobzYvaGpvUmY0Wk5nV2MyaFl1Qnhw?=
- =?utf-8?B?LzVNZXpGVlpoV3p2OEdhK3h5UlMyN1Eyb2s1aStrTXFvSjlJbnN2WTgvTmZk?=
- =?utf-8?B?RUQvSUtyQURHa3NOeHQwN1FXczZvVkgxdStlZ1hMQ0dpUVRPbWlidFBRSXVa?=
- =?utf-8?B?bzBWL2I2WFJZWmpNM1pkWUpoWGZmaHYxeUhMcHBQNVIyYkt6bHF1emRJTTlH?=
- =?utf-8?B?cWlVR0ZLZ2ZHVjV1TDM2RCtwMDd1Y1IzenFYSjhNV1F0VGpDSWFaejIwdXZF?=
- =?utf-8?B?MXMvcjVIM2RZWlRwUmxQbFF4M3dyb0MreVRtZmthQU5wUVJVTjN2QnJrSkZQ?=
- =?utf-8?B?TGgzNHVvS1JQbDNsc0ptenVOUnRFRExCTnVQTkpraVZqMGxIazU0QXJHZWF4?=
- =?utf-8?B?TE52akwwK0ZXVk5VYndHNmREb3BVMmdXUUt4SjZPWUxSdVdVbUxzNXdOdDg3?=
- =?utf-8?B?eDBNdXRzYW5PSDUwK21qVkN0d2dyWjNFbGNucStXVnh4Wm5wMlFmcGJ4ZFdp?=
- =?utf-8?B?Zkx6NGhKdmhlNHFWRm9NdFFvSmEvT3VyR2hweHNNdUpJZ2dDa09odDZBWG0v?=
- =?utf-8?B?RGU2QTJFRDA0cjdWTk1uZW5RSWx1THNsd3EyelJZUGQrSVI1RThRZm5IeEtr?=
- =?utf-8?B?MDQ1ak1YaElRZytCYXdiSCt2TzhJbHlSZzBWdCtmTGdLUFFuWDBVR2dPK2RJ?=
- =?utf-8?B?Mnl2T0o1VTNLR0tXdktzTHFtS3hTTW9VNzRtdE9TWmJYdE1weS9oc1hwNVp2?=
- =?utf-8?B?ZlE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: c783a522-825d-498a-fa41-08de1bd251ff
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Nov 2025 18:45:26.7822
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HGGwdhE28YtawhZ4bKnTA+XwupWFRV+oCeXwygLYWdxJrIbItZuJ3/y3Z8ahMqfCMUDSrHoKwdQ+vEybg5CBnADeoR74N4HOegtkyoYsbWQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4766
-X-OriginatorOrg: intel.com
-
---------------GQcocUOOI0edgBFpubRSIS6g
-Content-Type: multipart/mixed; boundary="------------ZeTEW0pcydZZ41ouQfK19Q0y";
- protected-headers="v1"
-Message-ID: <763ebb90-7c92-499a-b0ac-b16d88f67e75@intel.com>
-Date: Tue, 4 Nov 2025 10:45:23 -0800
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next 0/9] ice: properly use u64_stats API for all ring
- stats
-To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>,
- "Lobakin, Aleksander" <aleksander.lobakin@intel.com>,
- "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
- "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>
-Cc: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <20251103-jk-refactor-queue-stats-v1-0-164d2ed859b6@intel.com>
- <IA3PR11MB8986AB2DBE26AD6A7E3362A2E5C4A@IA3PR11MB8986.namprd11.prod.outlook.com>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-Autocrypt: addr=jacob.e.keller@intel.com; keydata=
- xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
- J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
- qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
- CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
- UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
- MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
- apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
- cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
-In-Reply-To: <IA3PR11MB8986AB2DBE26AD6A7E3362A2E5C4A@IA3PR11MB8986.namprd11.prod.outlook.com>
-
---------------ZeTEW0pcydZZ41ouQfK19Q0y
-Content-Type: text/plain; charset=UTF-8
+References: <20251104104913.689439-1-dongml2@chinatelecom.cn>
+In-Reply-To: <20251104104913.689439-1-dongml2@chinatelecom.cn>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Tue, 4 Nov 2025 10:56:09 -0800
+X-Gm-Features: AWmQ_bn3-3pUzEzIlIcXVV-BIX9Cml9X2hduNwfYMH_N1D55oNwjtosZOsMwPrI
+Message-ID: <CAADnVQJTOFjXe5=01KfOnBD86YU_Vy1YGezLQum3LnhFHAD+gg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next] bpf,x86: do RSB balance for trampoline
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Eduard <eddyz87@gmail.com>, 
+	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
+	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
+	"H. Peter Anvin" <hpa@zytor.com>, jiang.biao@linux.dev, 
+	Menglong Dong <menglong.dong@linux.dev>, bpf <bpf@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
+On Tue, Nov 4, 2025 at 2:49=E2=80=AFAM Menglong Dong <menglong8.dong@gmail.=
+com> wrote:
+>
+> In origin call case, we skip the "rip" directly before we return, which
+> break the RSB, as we have twice "call", but only once "ret".
 
+RSB meaning return stack buffer?
 
-On 11/3/2025 11:27 PM, Loktionov, Aleksandr wrote:
->=20
->=20
->> -----Original Message-----
->> From: Keller, Jacob E <jacob.e.keller@intel.com>
->> Sent: Tuesday, November 4, 2025 2:07 AM
->> To: Loktionov, Aleksandr <aleksandr.loktionov@intel.com>; Lobakin,
->> Aleksander <aleksander.lobakin@intel.com>; Nguyen, Anthony L
->> <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
->> <przemyslaw.kitszel@intel.com>
->> Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Keller,
->> Jacob E <jacob.e.keller@intel.com>
->> Subject: [PATCH iwl-next 0/9] ice: properly use u64_stats API for all
->> ring stats
->>
->> The ice driver has multiple u64 values stored in the ring structures
->> for each queue used for statistics. These are accumulated in
->> ice_update_vsi_stats(). The packet and byte values are read using the
->> u64_stats API from <linux/u64_stats_sync.h>.
->>
->> Several non-standard counters are also accumulated in the same
->> function, but do not use the u64_stats API. This could result in
->> load/store tears on 32-bit architectures. Further, since commit
->> 316580b69d0a ("u64_stats:
->> provide u64_stats_t type"), the u64 stats API has had u64_stats_t and
->> access functions which convert to local64_t on 64-bit architectures.
->>
->> The ice driver doesn't use u64_stats_t and these access functions.
->> Thus even on 64-bit architectures it could read inconsistent values.
->> This series refactors the ice driver to use the updated API. Along the=
+and by "breaks RSB" you mean it makes the cpu less efficient?
+Or you mean call depth accounting that is done in sw ?
 
->> way I noticed several other issues and inconsistencies which I have
->> cleaned up, summarized below.
->>
->> *) The driver never called u64_stats_init, leaving the syncp
->> improperly
->>    initialized. Since the field is part of a kzalloc block, this only
->>    impacts 32-bit systens with CONFIG_LOCKDEP enabled.
->>
-> =E2=80=9Csystens=E2=80=9D =E2=86=92 =E2=80=9Csystems=E2=80=9D
->=20
-> Best regards, Alex
->=20
+> Do the RSB balance by pseudo a "ret". Instead of skipping the "rip", we
+> modify it to the address of a "ret" insn that we generate.
+>
+> The performance of "fexit" increases from 76M/s to 84M/s. Before this
+> optimize, the bench resulting of fexit is:
+>
+> fexit          :   76.494 =C2=B1 0.216M/s
+> fexit          :   76.319 =C2=B1 0.097M/s
+> fexit          :   70.680 =C2=B1 0.060M/s
+> fexit          :   75.509 =C2=B1 0.039M/s
+> fexit          :   76.392 =C2=B1 0.049M/s
+>
+> After this optimize:
+>
+> fexit          :   86.023 =C2=B1 0.518M/s
+> fexit          :   83.388 =C2=B1 0.021M/s
+> fexit          :   85.146 =C2=B1 0.058M/s
+> fexit          :   85.646 =C2=B1 0.136M/s
+> fexit          :   84.040 =C2=B1 0.045M/s
 
-Fixed this and the other mistakes you spotted. Thanks for the careful
-review!
+This is with or without calldepth accounting?
 
-Regards,
-Jake
+> Things become a little more complex, not sure if the benefits worth it :/
+>
+> Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
+> ---
+>  arch/x86/net/bpf_jit_comp.c | 32 +++++++++++++++++++++++++++++---
+>  1 file changed, 29 insertions(+), 3 deletions(-)
+>
+> diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
+> index d4c93d9e73e4..a9c2142a84d0 100644
+> --- a/arch/x86/net/bpf_jit_comp.c
+> +++ b/arch/x86/net/bpf_jit_comp.c
+> @@ -3185,6 +3185,7 @@ static int __arch_prepare_bpf_trampoline(struct bpf=
+_tramp_image *im, void *rw_im
+>         struct bpf_tramp_links *fmod_ret =3D &tlinks[BPF_TRAMP_MODIFY_RET=
+URN];
+>         void *orig_call =3D func_addr;
+>         u8 **branches =3D NULL;
+> +       u8 *rsb_pos;
+>         u8 *prog;
+>         bool save_ret;
+>
+> @@ -3431,17 +3432,42 @@ static int __arch_prepare_bpf_trampoline(struct b=
+pf_tramp_image *im, void *rw_im
+>                 LOAD_TRAMP_TAIL_CALL_CNT_PTR(stack_size);
+>         }
+>
+> +       if (flags & BPF_TRAMP_F_SKIP_FRAME) {
+> +               u64 ret_addr =3D (u64)(image + (prog - (u8 *)rw_image));
+> +
+> +               rsb_pos =3D prog;
+> +               /*
+> +                * reserve the room to save the return address to rax:
+> +                *   movabs rax, imm64
+> +                *
+> +                * this is used to do the RSB balance. For the SKIP_FRAME
+> +                * case, we do the "call" twice, but only have one "ret",
+> +                * which can break the RSB.
+> +                *
+> +                * Therefore, instead of skipping the "rip", we make it a=
+s
+> +                * a pseudo return: modify the "rip" in the stack to the
+> +                * second "ret" address that we build bellow.
+> +                */
+> +               emit_mov_imm64(&prog, BPF_REG_0, ret_addr >> 32, (u32)ret=
+_addr);
+> +               /* mov [rbp + 8], rax */
+> +               EMIT4(0x48, 0x89, 0x45, 0x08);
+> +       }
+> +
+>         /* restore return value of orig_call or fentry prog back into RAX=
+ */
+>         if (save_ret)
+>                 emit_ldx(&prog, BPF_DW, BPF_REG_0, BPF_REG_FP, -8);
+>
+>         emit_ldx(&prog, BPF_DW, BPF_REG_6, BPF_REG_FP, -rbx_off);
+>         EMIT1(0xC9); /* leave */
+> +       emit_return(&prog, image + (prog - (u8 *)rw_image));
+>         if (flags & BPF_TRAMP_F_SKIP_FRAME) {
+> -               /* skip our return address and return to parent */
+> -               EMIT4(0x48, 0x83, 0xC4, 8); /* add rsp, 8 */
+> +               u64 ret_addr =3D (u64)(image + (prog - (u8 *)rw_image));
+> +
+> +               /* fix the return address to second return address */
+> +               emit_mov_imm64(&rsb_pos, BPF_REG_0, ret_addr >> 32, (u32)=
+ret_addr);
 
-> ...
->=20
->> --
->> Jacob Keller <jacob.e.keller@intel.com>
->=20
+So the first "movabs rax, imm64" is not needed ?
+Why compute ret_addr there and everything ?
+I mean it could have been prog +=3D sizeof(movabs), right?
 
-
---------------ZeTEW0pcydZZ41ouQfK19Q0y--
-
---------------GQcocUOOI0edgBFpubRSIS6g
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wnsEABYIACMWIQQgQFSp1zOQVirsQx5qll0+bw8o6AUCaQpJwwUDAAAAAAAKCRBqll0+bw8o6PAf
-AQDN3XHWGop+i1tYAWIpvhjhgkxJ+fYShpm624MdjIl3cAEAxR8cee0xC3EIvSM74ITh3DEqL0Cv
-sb68w43YCb6DGQk=
-=BEtj
------END PGP SIGNATURE-----
-
---------------GQcocUOOI0edgBFpubRSIS6g--
+> +               /* this is the second(real) return */
+> +               emit_return(&prog, image + (prog - (u8 *)rw_image));
+>         }
+> -       emit_return(&prog, image + (prog - (u8 *)rw_image));
 
