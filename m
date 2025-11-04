@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-235630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4F2EC335F1
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 00:24:01 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BEE4C335F4
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 00:24:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 9201834C271
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 23:24:01 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0022B34C32F
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 23:24:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 780D92DEA61;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA3E72DF155;
 	Tue,  4 Nov 2025 23:23:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LxGBByuA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QQSLW532"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 532572DE6E1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B552DF140
 	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 23:23:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762298636; cv=none; b=L4iSuzoY2pCWKTz9id5OFIxTGhhdYng5IP6dclHnhJ2BcZZHac+23BRi+OqxyweoCkTxylth3khPU3iepoUXBNCbqmG3IazXhIAco/zXiJ7Vo39fzcctO9eqOMA+KYEatcUzdrGCSFRJzv1x8zlBlLjtuYrK/0g+q3I9B4/Zkrs=
+	t=1762298636; cv=none; b=DcmlyeK7pZgAT70XG7s+bJ+u1FDgG5fvbhNULjB3HlZYaYr+F1gk1z+DHdwdLOkdhae33Q/ujlVxweUC54H03JjmWWZ9PXkeulX0fY6OjByHrYcB0B93HAMFRNjQHmSkfLop9E4QHJsclfCEXqFL3YxvEEQQlD06af0q4W9YqTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1762298636; c=relaxed/simple;
-	bh=sOzI8Yb1Z4jNb5soTjkO/fj6rL9zn6F3kx6ZJxKCono=;
+	bh=uhSZfCMGxxQDOjyCK108mp5yBtH0e0Cycf4vNJV30+I=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=t7IkEBTEw78Bao8rgJ88D6k1p8erDmYXDHI1QHg7qPJ0QU3aL0HRRwzmysvOEjk323WnQVeGdA/Xvic5WRABPcG2w5lN2GCHmB3CQ7DzttPCNTHDDWcffzsyXWPoW4LQmFzuEEH/YvsXqP/GyBidWSWhyQc636AFHS16vAU3xFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LxGBByuA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BBD2C116B1;
-	Tue,  4 Nov 2025 23:23:55 +0000 (UTC)
+	 MIME-Version; b=IJ6vuU/ipQt7WqxWH7Ay3JIa78IXkCPv+bCQJhKwiMZZkoH5TW0aKe5tYHHzaaUvP/uV0iGEfV14gIq4oBswz+7cAm5ePHlzZBNFl4qaNhK3Pyjb3BJ3mKADoVc1DdoqTh9mh9h2UBfQRQTYGSxLy6ep4J33t94mwlUAc4dAulQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QQSLW532; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23EE1C4CEF8;
+	Tue,  4 Nov 2025 23:23:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1762298636;
-	bh=sOzI8Yb1Z4jNb5soTjkO/fj6rL9zn6F3kx6ZJxKCono=;
+	bh=uhSZfCMGxxQDOjyCK108mp5yBtH0e0Cycf4vNJV30+I=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LxGBByuA4oXvEq+bcUrJDd8NVI9axc3axttVbLC0J6BExzSB+UlYMbMUyGgkPZgXr
-	 hta57ZLNL45GRDGe1+z/10m7swIN/ehuY2LdDb6G6RD4lDrfoD3AFsHq4yMIH/nJ1m
-	 n/cpbM9vxPkrxv7Dz62G/3ggEeyNn/Q/OZXQjXFXcQU5DTHzW8EtbRIaCIF4YCNvD6
-	 CN6TWG36HwymWJXT4GeE1PPVOz0X6iHJZZOP8kbdd6VOYVgKdOiBsr42wlcsLeVo+s
-	 QmJfbs9mdbiT3IjIdapW7Y+IynPrUUlOPWaBnwNaty0EGnfPxL8CAMOjRQf8fSvzXQ
-	 +gNV41jJb784g==
+	b=QQSLW532LwTbNqqElWWPdes7537MwZXw+7WzGUqAAq8kGdBbB8PjEYgpGXXH4fRXD
+	 k3YjerKYRfJrPpQ8s5pnYeJzLETkHqPGPCKzqtEnoG3cw5YnXT7p2gkmQqBO9ZTviw
+	 j2SdB7mJ7pBNJIVSKhg6nS/IrHLAV8kdP7lXkyUwWWsxJNdqMPjkBJok6dhKGBhJup
+	 ljqUd14PxsQHFFmnGP9gXXfpVMOLaWemvYJPyxpd+SufjTDyGmOIIUAKv02VGeU5A7
+	 c4Wu2F4VxijQFKTPDGgMZfZUGskrvWR0PDJ2ENhYaqil+2mgPgeDCnwpXBj7hvdx3y
+	 DTyj+nGCcw24Q==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net,
 	donald.hunter@gmail.com
@@ -53,9 +53,9 @@ Cc: netdev@vger.kernel.org,
 	joe@dama.to,
 	jstancek@redhat.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 1/5] netlink: specs: netdev add missing stats to qstat-get
-Date: Tue,  4 Nov 2025 15:23:44 -0800
-Message-ID: <20251104232348.1954349-2-kuba@kernel.org>
+Subject: [PATCH net-next 2/5] tools: ynltool: create skeleton for the C command
+Date: Tue,  4 Nov 2025 15:23:45 -0800
+Message-ID: <20251104232348.1954349-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <20251104232348.1954349-1-kuba@kernel.org>
 References: <20251104232348.1954349-1-kuba@kernel.org>
@@ -67,47 +67,799 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add missing entries in C attribute list.
+Based on past discussions it seems like integration of YNL into
+iproute2 is unlikely. YNL itself is not great as a C library,
+since it has no backward compat (we routinely change types).
 
+Most of the operations can be performed with the generic Python
+CLI directly. There is, however, a handful of operations where
+summarization of kernel output is very useful (mostly related
+to stats: page-pool, qstat).
+
+Create a command (inspired by bpftool, I think it stood the test
+of time reasonably well) to be able to plug the subcommands into.
+
+Link: https://lore.kernel.org/1754895902-8790-1-git-send-email-ernis@linux.microsoft.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- Documentation/netlink/specs/netdev.yaml | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+ tools/net/ynl/Makefile              |   3 +-
+ tools/net/ynl/ynltool/Makefile      |  44 +++++
+ tools/net/ynl/ynltool/json_writer.h |  75 ++++++++
+ tools/net/ynl/ynltool/main.h        |  62 ++++++
+ tools/net/ynl/ynltool/json_writer.c | 288 ++++++++++++++++++++++++++++
+ tools/net/ynl/ynltool/main.c        | 240 +++++++++++++++++++++++
+ tools/net/ynl/ynltool/.gitignore    |   1 +
+ 7 files changed, 712 insertions(+), 1 deletion(-)
+ create mode 100644 tools/net/ynl/ynltool/Makefile
+ create mode 100644 tools/net/ynl/ynltool/json_writer.h
+ create mode 100644 tools/net/ynl/ynltool/main.h
+ create mode 100644 tools/net/ynl/ynltool/json_writer.c
+ create mode 100644 tools/net/ynl/ynltool/main.c
+ create mode 100644 tools/net/ynl/ynltool/.gitignore
 
-diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-index 10c412b7433f..82bf5cb2617d 100644
---- a/Documentation/netlink/specs/netdev.yaml
-+++ b/Documentation/netlink/specs/netdev.yaml
-@@ -733,6 +733,29 @@ doc: >-
-             - rx-bytes
-             - tx-packets
-             - tx-bytes
-+            - rx-alloc-fail
-+            - rx-hw-drops
-+            - rx-hw-drop-overruns
-+            - rx-csum-complete
-+            - rx-csum-unnecessary
-+            - rx-csum-none
-+            - rx-csum-bad
-+            - rx-hw-gro-packets
-+            - rx-hw-gro-bytes
-+            - rx-hw-gro-wire-packets
-+            - rx-hw-gro-wire-bytes
-+            - rx-hw-drop-ratelimits
-+            - tx-hw-drops
-+            - tx-hw-drop-errors
-+            - tx-csum-none
-+            - tx-needs-csum
-+            - tx-hw-gso-packets
-+            - tx-hw-gso-bytes
-+            - tx-hw-gso-wire-packets
-+            - tx-hw-gso-wire-bytes
-+            - tx-hw-drop-ratelimits
-+            - tx-stop
-+            - tx-wake
-     -
-       name: bind-rx
-       doc: Bind dmabuf to netdev
+diff --git a/tools/net/ynl/Makefile b/tools/net/ynl/Makefile
+index 211df5a93ad9..31ed20c0f3f8 100644
+--- a/tools/net/ynl/Makefile
++++ b/tools/net/ynl/Makefile
+@@ -12,10 +12,11 @@ endif
+ libdir  ?= $(prefix)/$(libdir_relative)
+ includedir ?= $(prefix)/include
+ 
+-SUBDIRS = lib generated samples
++SUBDIRS = lib generated samples ynltool
+ 
+ all: $(SUBDIRS) libynl.a
+ 
++ynltool: | lib generated libynl.a
+ samples: | lib generated
+ libynl.a: | lib generated
+ 	@echo -e "\tAR $@"
+diff --git a/tools/net/ynl/ynltool/Makefile b/tools/net/ynl/ynltool/Makefile
+new file mode 100644
+index 000000000000..ce27dc691ffe
+--- /dev/null
++++ b/tools/net/ynl/ynltool/Makefile
+@@ -0,0 +1,44 @@
++# SPDX-License-Identifier: GPL-2.0-only
++
++include ../Makefile.deps
++
++INSTALL	?= install
++prefix  ?= /usr
++
++CC := gcc
++CFLAGS := -Wall -Wextra -Werror -O2
++ifeq ("$(DEBUG)","1")
++  CFLAGS += -g -fsanitize=address -fsanitize=leak -static-libasan
++endif
++CFLAGS += -I../lib
++
++SRCS := $(wildcard *.c)
++OBJS := $(patsubst %.c,$(OUTPUT)%.o,$(SRCS))
++
++YNLTOOL := $(OUTPUT)ynltool
++
++include $(wildcard *.d)
++
++all: $(YNLTOOL)
++
++$(YNLTOOL): $(OBJS)
++	@echo -e "\tLINK $@"
++	@$(CC) $(CFLAGS) -o $@ $(OBJS)
++
++%.o: %.c main.h json_writer.h
++	@echo -e "\tCC $@"
++	@$(COMPILE.c) -MMD -c -o $@ $<
++
++clean:
++	rm -f *.o *.d *~
++
++distclean: clean
++	rm -f $(YNLTOOL)
++
++bindir ?= /usr/bin
++
++install: $(YNLTOOL)
++	install -m 0755 $(YNLTOOL) $(DESTDIR)$(bindir)/$(YNLTOOL)
++
++.PHONY: all clean distclean
++.DEFAULT_GOAL=all
+diff --git a/tools/net/ynl/ynltool/json_writer.h b/tools/net/ynl/ynltool/json_writer.h
+new file mode 100644
+index 000000000000..0f1e63c88f6a
+--- /dev/null
++++ b/tools/net/ynl/ynltool/json_writer.h
+@@ -0,0 +1,75 @@
++/* SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause) */
++/*
++ * Simple streaming JSON writer
++ *
++ * This takes care of the annoying bits of JSON syntax like the commas
++ * after elements
++ *
++ * Authors:	Stephen Hemminger <stephen@networkplumber.org>
++ */
++
++#ifndef _JSON_WRITER_H_
++#define _JSON_WRITER_H_
++
++#include <stdbool.h>
++#include <stdint.h>
++#include <stdarg.h>
++#include <stdio.h>
++
++/* Opaque class structure */
++typedef struct json_writer json_writer_t;
++
++/* Create a new JSON stream */
++json_writer_t *jsonw_new(FILE *f);
++/* End output to JSON stream */
++void jsonw_destroy(json_writer_t **self_p);
++
++/* Cause output to have pretty whitespace */
++void jsonw_pretty(json_writer_t *self, bool on);
++
++/* Reset separator to create new JSON */
++void jsonw_reset(json_writer_t *self);
++
++/* Add property name */
++void jsonw_name(json_writer_t *self, const char *name);
++
++/* Add value  */
++void __attribute__((format(printf, 2, 0))) jsonw_vprintf_enquote(json_writer_t *self,
++								 const char *fmt,
++								 va_list ap);
++void __attribute__((format(printf, 2, 3))) jsonw_printf(json_writer_t *self,
++							const char *fmt, ...);
++void jsonw_string(json_writer_t *self, const char *value);
++void jsonw_bool(json_writer_t *self, bool value);
++void jsonw_float(json_writer_t *self, double number);
++void jsonw_float_fmt(json_writer_t *self, const char *fmt, double num);
++void jsonw_uint(json_writer_t *self, uint64_t number);
++void jsonw_hu(json_writer_t *self, unsigned short number);
++void jsonw_int(json_writer_t *self, int64_t number);
++void jsonw_null(json_writer_t *self);
++void jsonw_lluint(json_writer_t *self, unsigned long long int num);
++
++/* Useful Combinations of name and value */
++void jsonw_string_field(json_writer_t *self, const char *prop, const char *val);
++void jsonw_bool_field(json_writer_t *self, const char *prop, bool value);
++void jsonw_float_field(json_writer_t *self, const char *prop, double num);
++void jsonw_uint_field(json_writer_t *self, const char *prop, uint64_t num);
++void jsonw_hu_field(json_writer_t *self, const char *prop, unsigned short num);
++void jsonw_int_field(json_writer_t *self, const char *prop, int64_t num);
++void jsonw_null_field(json_writer_t *self, const char *prop);
++void jsonw_lluint_field(json_writer_t *self, const char *prop,
++			unsigned long long int num);
++void jsonw_float_field_fmt(json_writer_t *self, const char *prop,
++			   const char *fmt, double val);
++
++/* Collections */
++void jsonw_start_object(json_writer_t *self);
++void jsonw_end_object(json_writer_t *self);
++
++void jsonw_start_array(json_writer_t *self);
++void jsonw_end_array(json_writer_t *self);
++
++/* Override default exception handling */
++typedef void (jsonw_err_handler_fn)(const char *);
++
++#endif /* _JSON_WRITER_H_ */
+diff --git a/tools/net/ynl/ynltool/main.h b/tools/net/ynl/ynltool/main.h
+new file mode 100644
+index 000000000000..f4a70acf2085
+--- /dev/null
++++ b/tools/net/ynl/ynltool/main.h
+@@ -0,0 +1,62 @@
++/* SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause) */
++/* Copyright (C) 2017-2018 Netronome Systems, Inc. */
++/* Copyright Meta Platforms, Inc. and affiliates */
++
++#ifndef __YNLTOOL_H
++#define __YNLTOOL_H
++
++#ifndef _GNU_SOURCE
++#define _GNU_SOURCE
++#endif
++#include <stdbool.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <errno.h>
++#include <string.h>
++
++#include "json_writer.h"
++
++#define NEXT_ARG()	({ argc--; argv++; if (argc < 0) usage(); })
++#define NEXT_ARGP()	({ (*argc)--; (*argv)++; if (*argc < 0) usage(); })
++#define BAD_ARG()	({ p_err("what is '%s'?", *argv); -1; })
++#define GET_ARG()	({ argc--; *argv++; })
++#define REQ_ARGS(cnt)							\
++	({								\
++		int _cnt = (cnt);					\
++		bool _res;						\
++									\
++		if (argc < _cnt) {					\
++			p_err("'%s' needs at least %d arguments, %d found", \
++			      argv[-1], _cnt, argc);			\
++			_res = false;					\
++		} else {						\
++			_res = true;					\
++		}							\
++		_res;							\
++	})
++
++#define HELP_SPEC_OPTIONS						\
++	"OPTIONS := { {-j|--json} [{-p|--pretty}] }"
++
++extern const char *bin_name;
++
++extern json_writer_t *json_wtr;
++extern bool json_output;
++extern bool pretty_output;
++
++void __attribute__((format(printf, 1, 2))) p_err(const char *fmt, ...);
++void __attribute__((format(printf, 1, 2))) p_info(const char *fmt, ...);
++
++bool is_prefix(const char *pfx, const char *str);
++int detect_common_prefix(const char *arg, ...);
++void usage(void) __attribute__((noreturn));
++
++struct cmd {
++	const char *cmd;
++	int (*func)(int argc, char **argv);
++};
++
++int cmd_select(const struct cmd *cmds, int argc, char **argv,
++	       int (*help)(int argc, char **argv));
++
++#endif /* __YNLTOOL_H */
+diff --git a/tools/net/ynl/ynltool/json_writer.c b/tools/net/ynl/ynltool/json_writer.c
+new file mode 100644
+index 000000000000..c8685e592cd3
+--- /dev/null
++++ b/tools/net/ynl/ynltool/json_writer.c
+@@ -0,0 +1,288 @@
++// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-2-Clause)
++/*
++ * Simple streaming JSON writer
++ *
++ * This takes care of the annoying bits of JSON syntax like the commas
++ * after elements
++ *
++ * Authors:	Stephen Hemminger <stephen@networkplumber.org>
++ */
++
++#include <stdio.h>
++#include <stdbool.h>
++#include <stdarg.h>
++#include <assert.h>
++#include <malloc.h>
++#include <inttypes.h>
++#include <stdint.h>
++
++#include "json_writer.h"
++
++struct json_writer {
++	FILE		*out;
++	unsigned	depth;
++	bool		pretty;
++	char		sep;
++};
++
++static void jsonw_indent(json_writer_t *self)
++{
++	unsigned i;
++	for (i = 0; i < self->depth; ++i)
++		fputs("    ", self->out);
++}
++
++static void jsonw_eol(json_writer_t *self)
++{
++	if (!self->pretty)
++		return;
++
++	putc('\n', self->out);
++	jsonw_indent(self);
++}
++
++static void jsonw_eor(json_writer_t *self)
++{
++	if (self->sep != '\0')
++		putc(self->sep, self->out);
++	self->sep = ',';
++}
++
++static void jsonw_puts(json_writer_t *self, const char *str)
++{
++	putc('"', self->out);
++	for (; *str; ++str)
++		switch (*str) {
++		case '\t':
++			fputs("\\t", self->out);
++			break;
++		case '\n':
++			fputs("\\n", self->out);
++			break;
++		case '\r':
++			fputs("\\r", self->out);
++			break;
++		case '\f':
++			fputs("\\f", self->out);
++			break;
++		case '\b':
++			fputs("\\b", self->out);
++			break;
++		case '\\':
++			fputs("\\\\", self->out);
++			break;
++		case '"':
++			fputs("\\\"", self->out);
++			break;
++		default:
++			putc(*str, self->out);
++		}
++	putc('"', self->out);
++}
++
++json_writer_t *jsonw_new(FILE *f)
++{
++	json_writer_t *self = malloc(sizeof(*self));
++	if (self) {
++		self->out = f;
++		self->depth = 0;
++		self->pretty = false;
++		self->sep = '\0';
++	}
++	return self;
++}
++
++void jsonw_destroy(json_writer_t **self_p)
++{
++	json_writer_t *self = *self_p;
++
++	assert(self->depth == 0);
++	fputs("\n", self->out);
++	fflush(self->out);
++	free(self);
++	*self_p = NULL;
++}
++
++void jsonw_pretty(json_writer_t *self, bool on)
++{
++	self->pretty = on;
++}
++
++void jsonw_reset(json_writer_t *self)
++{
++	assert(self->depth == 0);
++	self->sep = '\0';
++}
++
++static void jsonw_begin(json_writer_t *self, int c)
++{
++	jsonw_eor(self);
++	putc(c, self->out);
++	++self->depth;
++	self->sep = '\0';
++}
++
++static void jsonw_end(json_writer_t *self, int c)
++{
++	assert(self->depth > 0);
++
++	--self->depth;
++	if (self->sep != '\0')
++		jsonw_eol(self);
++	putc(c, self->out);
++	self->sep = ',';
++}
++
++void jsonw_name(json_writer_t *self, const char *name)
++{
++	jsonw_eor(self);
++	jsonw_eol(self);
++	self->sep = '\0';
++	jsonw_puts(self, name);
++	putc(':', self->out);
++	if (self->pretty)
++		putc(' ', self->out);
++}
++
++void jsonw_vprintf_enquote(json_writer_t *self, const char *fmt, va_list ap)
++{
++	jsonw_eor(self);
++	putc('"', self->out);
++	vfprintf(self->out, fmt, ap);
++	putc('"', self->out);
++}
++
++void jsonw_printf(json_writer_t *self, const char *fmt, ...)
++{
++	va_list ap;
++
++	va_start(ap, fmt);
++	jsonw_eor(self);
++	vfprintf(self->out, fmt, ap);
++	va_end(ap);
++}
++
++void jsonw_start_object(json_writer_t *self)
++{
++	jsonw_begin(self, '{');
++}
++
++void jsonw_end_object(json_writer_t *self)
++{
++	jsonw_end(self, '}');
++}
++
++void jsonw_start_array(json_writer_t *self)
++{
++	jsonw_begin(self, '[');
++}
++
++void jsonw_end_array(json_writer_t *self)
++{
++	jsonw_end(self, ']');
++}
++
++void jsonw_string(json_writer_t *self, const char *value)
++{
++	jsonw_eor(self);
++	jsonw_puts(self, value);
++}
++
++void jsonw_bool(json_writer_t *self, bool val)
++{
++	jsonw_printf(self, "%s", val ? "true" : "false");
++}
++
++void jsonw_null(json_writer_t *self)
++{
++	jsonw_printf(self, "null");
++}
++
++void jsonw_float_fmt(json_writer_t *self, const char *fmt, double num)
++{
++	jsonw_printf(self, fmt, num);
++}
++
++void jsonw_float(json_writer_t *self, double num)
++{
++	jsonw_printf(self, "%g", num);
++}
++
++void jsonw_hu(json_writer_t *self, unsigned short num)
++{
++	jsonw_printf(self, "%hu", num);
++}
++
++void jsonw_uint(json_writer_t *self, uint64_t num)
++{
++	jsonw_printf(self, "%"PRIu64, num);
++}
++
++void jsonw_lluint(json_writer_t *self, unsigned long long int num)
++{
++	jsonw_printf(self, "%llu", num);
++}
++
++void jsonw_int(json_writer_t *self, int64_t num)
++{
++	jsonw_printf(self, "%"PRId64, num);
++}
++
++void jsonw_string_field(json_writer_t *self, const char *prop, const char *val)
++{
++	jsonw_name(self, prop);
++	jsonw_string(self, val);
++}
++
++void jsonw_bool_field(json_writer_t *self, const char *prop, bool val)
++{
++	jsonw_name(self, prop);
++	jsonw_bool(self, val);
++}
++
++void jsonw_float_field(json_writer_t *self, const char *prop, double val)
++{
++	jsonw_name(self, prop);
++	jsonw_float(self, val);
++}
++
++void jsonw_float_field_fmt(json_writer_t *self,
++			   const char *prop,
++			   const char *fmt,
++			   double val)
++{
++	jsonw_name(self, prop);
++	jsonw_float_fmt(self, fmt, val);
++}
++
++void jsonw_uint_field(json_writer_t *self, const char *prop, uint64_t num)
++{
++	jsonw_name(self, prop);
++	jsonw_uint(self, num);
++}
++
++void jsonw_hu_field(json_writer_t *self, const char *prop, unsigned short num)
++{
++	jsonw_name(self, prop);
++	jsonw_hu(self, num);
++}
++
++void jsonw_lluint_field(json_writer_t *self,
++			const char *prop,
++			unsigned long long int num)
++{
++	jsonw_name(self, prop);
++	jsonw_lluint(self, num);
++}
++
++void jsonw_int_field(json_writer_t *self, const char *prop, int64_t num)
++{
++	jsonw_name(self, prop);
++	jsonw_int(self, num);
++}
++
++void jsonw_null_field(json_writer_t *self, const char *prop)
++{
++	jsonw_name(self, prop);
++	jsonw_null(self);
++}
+diff --git a/tools/net/ynl/ynltool/main.c b/tools/net/ynl/ynltool/main.c
+new file mode 100644
+index 000000000000..c5047fad50cf
+--- /dev/null
++++ b/tools/net/ynl/ynltool/main.c
+@@ -0,0 +1,240 @@
++// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++/* Copyright (C) 2017-2018 Netronome Systems, Inc. */
++/* Copyright Meta Platforms, Inc. and affiliates */
++
++#include <ctype.h>
++#include <errno.h>
++#include <getopt.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <stdarg.h>
++
++#include "main.h"
++
++const char *bin_name;
++static int last_argc;
++static char **last_argv;
++static int (*last_do_help)(int argc, char **argv);
++json_writer_t *json_wtr;
++bool pretty_output;
++bool json_output;
++
++static void __attribute__((noreturn)) clean_and_exit(int i)
++{
++	if (json_output)
++		jsonw_destroy(&json_wtr);
++
++	exit(i);
++}
++
++void usage(void)
++{
++	last_do_help(last_argc - 1, last_argv + 1);
++
++	clean_and_exit(-1);
++}
++
++static int do_help(int argc __attribute__((unused)),
++		   char **argv __attribute__((unused)))
++{
++	if (json_output) {
++		jsonw_null(json_wtr);
++		return 0;
++	}
++
++	fprintf(stderr,
++		"Usage: %s [OPTIONS] OBJECT { COMMAND | help }\n"
++		"       %s version\n"
++		"\n"
++		"       OBJECT := { }\n"
++		"       " HELP_SPEC_OPTIONS "\n"
++		"",
++		bin_name, bin_name);
++
++	return 0;
++}
++
++static int do_version(int argc __attribute__((unused)),
++		      char **argv __attribute__((unused)))
++{
++	if (json_output) {
++		jsonw_start_object(json_wtr);
++		jsonw_name(json_wtr, "version");
++		jsonw_printf(json_wtr, "\"0.1.0\"");
++		jsonw_end_object(json_wtr);
++	} else {
++		printf("%s v0.1.0\n", bin_name);
++	}
++	return 0;
++}
++
++static const struct cmd commands[] = {
++	{ "help",	do_help },
++	{ "version",	do_version },
++	{ 0 }
++};
++
++int cmd_select(const struct cmd *cmds, int argc, char **argv,
++	       int (*help)(int argc, char **argv))
++{
++	unsigned int i;
++
++	last_argc = argc;
++	last_argv = argv;
++	last_do_help = help;
++
++	if (argc < 1 && cmds[0].func)
++		return cmds[0].func(argc, argv);
++
++	for (i = 0; cmds[i].cmd; i++) {
++		if (is_prefix(*argv, cmds[i].cmd)) {
++			if (!cmds[i].func) {
++				p_err("command '%s' is not available", cmds[i].cmd);
++				return -1;
++			}
++			return cmds[i].func(argc - 1, argv + 1);
++		}
++	}
++
++	help(argc - 1, argv + 1);
++
++	return -1;
++}
++
++bool is_prefix(const char *pfx, const char *str)
++{
++	if (!pfx)
++		return false;
++	if (strlen(str) < strlen(pfx))
++		return false;
++
++	return !memcmp(str, pfx, strlen(pfx));
++}
++
++/* Last argument MUST be NULL pointer */
++int detect_common_prefix(const char *arg, ...)
++{
++	unsigned int count = 0;
++	const char *ref;
++	char msg[256];
++	va_list ap;
++
++	snprintf(msg, sizeof(msg), "ambiguous prefix: '%s' could be '", arg);
++	va_start(ap, arg);
++	while ((ref = va_arg(ap, const char *))) {
++		if (!is_prefix(arg, ref))
++			continue;
++		count++;
++		if (count > 1)
++			strncat(msg, "' or '", sizeof(msg) - strlen(msg) - 1);
++		strncat(msg, ref, sizeof(msg) - strlen(msg) - 1);
++	}
++	va_end(ap);
++	strncat(msg, "'", sizeof(msg) - strlen(msg) - 1);
++
++	if (count >= 2) {
++		p_err("%s", msg);
++		return -1;
++	}
++
++	return 0;
++}
++
++void p_err(const char *fmt, ...)
++{
++	va_list ap;
++
++	va_start(ap, fmt);
++	if (json_output) {
++		jsonw_start_object(json_wtr);
++		jsonw_name(json_wtr, "error");
++		jsonw_vprintf_enquote(json_wtr, fmt, ap);
++		jsonw_end_object(json_wtr);
++	} else {
++		fprintf(stderr, "Error: ");
++		vfprintf(stderr, fmt, ap);
++		fprintf(stderr, "\n");
++	}
++	va_end(ap);
++}
++
++void p_info(const char *fmt, ...)
++{
++	va_list ap;
++
++	if (json_output)
++		return;
++
++	va_start(ap, fmt);
++	vfprintf(stderr, fmt, ap);
++	fprintf(stderr, "\n");
++	va_end(ap);
++}
++
++int main(int argc, char **argv)
++{
++	static const struct option options[] = {
++		{ "json",	no_argument,	NULL,	'j' },
++		{ "help",	no_argument,	NULL,	'h' },
++		{ "pretty",	no_argument,	NULL,	'p' },
++		{ "version",	no_argument,	NULL,	'V' },
++		{ 0 }
++	};
++	bool version_requested = false;
++	int opt, ret;
++
++	setlinebuf(stdout);
++
++	last_do_help = do_help;
++	pretty_output = false;
++	json_output = false;
++	bin_name = "ynltool";
++
++	opterr = 0;
++	while ((opt = getopt_long(argc, argv, "Vhjp",
++				  options, NULL)) >= 0) {
++		switch (opt) {
++		case 'V':
++			version_requested = true;
++			break;
++		case 'h':
++			return do_help(argc, argv);
++		case 'p':
++			pretty_output = true;
++			/* fall through */
++		case 'j':
++			if (!json_output) {
++				json_wtr = jsonw_new(stdout);
++				if (!json_wtr) {
++					p_err("failed to create JSON writer");
++					return -1;
++				}
++				json_output = true;
++			}
++			jsonw_pretty(json_wtr, pretty_output);
++			break;
++		default:
++			p_err("unrecognized option '%s'", argv[optind - 1]);
++			if (json_output)
++				clean_and_exit(-1);
++			else
++				usage();
++		}
++	}
++
++	argc -= optind;
++	argv += optind;
++	if (argc < 0)
++		usage();
++
++	if (version_requested)
++		ret = do_version(argc, argv);
++	else
++		ret = cmd_select(commands, argc, argv, do_help);
++
++	if (json_output)
++		jsonw_destroy(&json_wtr);
++
++	return ret;
++}
+diff --git a/tools/net/ynl/ynltool/.gitignore b/tools/net/ynl/ynltool/.gitignore
+new file mode 100644
+index 000000000000..f38848dbb0d3
+--- /dev/null
++++ b/tools/net/ynl/ynltool/.gitignore
+@@ -0,0 +1 @@
++ynltool
 -- 
 2.51.1
 
