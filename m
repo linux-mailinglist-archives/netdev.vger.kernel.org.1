@@ -1,96 +1,100 @@
-Return-Path: <netdev+bounces-235566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 399D6C32721
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 18:51:58 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81A98C32736
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 18:54:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B81D51885ADC
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 17:52:22 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 44EBA4E72F4
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 17:52:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34980337BA4;
-	Tue,  4 Nov 2025 17:51:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA1C0335547;
+	Tue,  4 Nov 2025 17:52:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S1ua3S4l"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1OjqP5NZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B91F335566
-	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 17:51:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1FE0337B8A;
+	Tue,  4 Nov 2025 17:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762278714; cv=none; b=PzCGW4P1IKerOpde5hF6ZoINP+LwRoMFqaw7pTrnkymBhUaB+tlqYcWWzca3UgBUk2AwdyTEsDnIyZTmIfeBnu2YaX80m1OraLrPzjInbZDclEBhLHdgfdrFpFuKdPkKkIA9poqeHi9HdKdXwB/oJm44JYEydcdcPEvqNqQOxG4=
+	t=1762278767; cv=none; b=qSo5IQncRdvcNqrtdiwhmZjtt5lbcNghNkCCL8jahV2rtqJrTBIkRKXDSgghh63SG25kKGGOD/mUGW/Lfe2WVmhj4H9P4aTpXfChzu/w4XOki9+r3MA+wuHESbxUqDKqK+PHWkHXpTwYM3gndhbb/EezQiqRk4sQFBN5AD1Quf8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762278714; c=relaxed/simple;
-	bh=SignVXJt7EjJO0CGxgB0F2elFSeRJzencESXLVk36es=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pUCrUbgXuqrGCXmpNoLdRp8MtKsRVZcOFZVo0Obktui3yGmQGStnd7aeqJ3pD8d1MId+EJoGkkIzeRgzmwhgJytDBiiI9ivKjIJQA3DXQTDfogW7AWmEmPOhE5wQgGPp/ufgdSTBCinJ6oxRswzp4ViMY4+Kt5uVob6mDU0ZbGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=S1ua3S4l; arc=none smtp.client-ip=209.85.219.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-8804f1bd6a7so25366076d6.2
-        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 09:51:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762278711; x=1762883511; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SignVXJt7EjJO0CGxgB0F2elFSeRJzencESXLVk36es=;
-        b=S1ua3S4lWh2XRLl0O/KcT/FooxdnSNNlgbyn5sfsGmPSAn7p10fns89+rW3ZfXsDO5
-         Z0rHR18vqc9Fwusw4+qvA6PpmE4BdEZX50z+8V+F6gFPiBCUnwP7K5Cdsv4Iwb4/J/Am
-         zkxuTEeEoz0K3gS6BuXyOcUbpfZ355w1jvPCrIh8SPhWjTfZ72UAkHlD+qFzCDzurs41
-         tNlaE8NP12gSnUA7YtbZ8F/PwCqN4MS6LiudBdI27pKkd/3Xj11Okpk+CWVOzIP6YgPl
-         88BefRV+i6PEdISGKQGMDqsEfa81DLiLsmhc1AfnjtPNKVGSEGbg1Hrd/5i8Y0wVE2hK
-         KQYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762278711; x=1762883511;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SignVXJt7EjJO0CGxgB0F2elFSeRJzencESXLVk36es=;
-        b=SJavU/+QTIjHBB/3/DCAiXdZU0KZXLYRfcj75aVaxGJufQYu5mu1qsMQEazpP7B5Hh
-         ZecquiRjgkB6rEPt2jPUNXhHziTiFv5uRs9OyjkZxqD+FzHJP8ykTqnLFhi2Rvl9cSYF
-         mWWQp8li5oBxDTc6JrOkmIKRBqhCkpiTc+eRqU+i32Xv5n+CuICzmuQDBElgH6BkGsik
-         v34cGQ8iUN1/4gJ6NOydObcyBY783ihR30eNMkayVjXkbFjltBs4JHR2K+ywygAwnB6f
-         nzK1/Dc1tBanNgpKnf9ri0UuJ5l7J9IlCFPCGBAL6frwlS/NESywlwplLsycJeBKWYjX
-         gssg==
-X-Gm-Message-State: AOJu0YwY40PotzdAKe4GTdQ2ZUVycPRDLX+t8QV99n+ALQ9TRhE0UgN3
-	fi4FIbWnX9/gT1Z38ohn/fLS1lx5RSTtsHkz0uKEVquS5IduhX3i9yXhwxKljyReqC2OgsykS6e
-	DCpIdZns8x2PTYpTpcwK2PBTjEKnVuhTs+GKVnE/X
-X-Gm-Gg: ASbGncu0uA4Ju420ydNTZ2C5sJ1mWh32rsX7bQkm8vZh5WRN/x6KPp2rp6N3HiliVRX
-	j4XsAU1i9F/MLPB4xWV4+OktnpcIxqsmrnHnYyElZr9IF0+tznGK3EQQ0Rh235WhccKpZn8CYdh
-	1qH8h7To59r0/0TWKvl79ylijHCD5wch6orWD7B5uiRyPN0+F2ge4zTtWDgIBXe69XlQavNRRiI
-	drNjpBQ0W1biZHV1WdQYpojL1OCPgyyMBDRF7YEzwiW/bnqrbrvy6ma7RY2KINeqO6stn/T9VXn
-	QC8etH6KecOBLOga
-X-Google-Smtp-Source: AGHT+IGJ6DXrKz2yvLnEgP9UUMbLfdcv7gr66ikLdbN29Ive6p1/HWCS/tm0wxxDWfNNDt13q1sLooWR2r+YpuNeOr4=
-X-Received: by 2002:a05:6214:d4d:b0:880:48c6:ad02 with SMTP id
- 6a1803df08f44-880711cbe29mr4775436d6.52.1762278711116; Tue, 04 Nov 2025
- 09:51:51 -0800 (PST)
+	s=arc-20240116; t=1762278767; c=relaxed/simple;
+	bh=eeEAvdwBf57/36NyqhyPqX1iWLcK4lwbQbogWD8Zvm0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WFYlh8KzNkqgNBzMZSI60aBU5H4KIpVyAL1VuqQkxQO0dpsuWlMppG3cJ6X4beniMHyGOcci3RbxMeI1UfC0OZ5CkPyGtZi9X1Jx0i4tlWdVB6M9FEXHCL61JvV7jI4/gOcO8ST3u/fPpmSv5XijNy2ZM7iHxLTbV3dTOrxWVuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1OjqP5NZ; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=P5OGsJN0pDHcN5HfLEGaoDr6nQ112hZdoxHywNFHsX8=; b=1OjqP5NZ+WyET0LHDSPYVKszrB
+	orvHs/B/vpFCaVBhtqE3UXTlh64zGvBP5ucfAPOSl0BpOGxL83PMYayXmKEytPBbDSEaAjowuXJTd
+	OMH+w1yEkY0pZVZtqFQlfpla0LLGSQW+kufPNcRh4wt4nBjy9sjk0+wQ4icXPzydbVbs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vGLCz-00Cunh-Qt; Tue, 04 Nov 2025 18:52:41 +0100
+Date: Tue, 4 Nov 2025 18:52:41 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Dharanitharan R <dharanitharan725@gmail.com>
+Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+	gregkh@linuxfoundation.org,
+	syzbot+b4d5d8faea6996fd@syzkaller.appspotmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com
+Subject: Re: [PATCH] [PATCH] usb: rtl8150: Initialize buffers to fix KMSAN
+ uninit-value in rtl8150_open
+Message-ID: <ea06bbfb-d14b-4c61-8394-c536ca2a67ce@lunn.ch>
+References: <20251104162717.17785-1-dharanitharan725@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251104144824.19648-1-equinox@diac24.net> <20251104144824.19648-5-equinox@diac24.net>
-In-Reply-To: <20251104144824.19648-5-equinox@diac24.net>
-From: Lorenzo Colitti <lorenzo@google.com>
-Date: Tue, 4 Nov 2025 12:51:39 -0500
-X-Gm-Features: AWmQ_blcFWW-A8DairYvvWDiQ5hbWzgNr6wtOzfuu9L8xkfi6m7QTKOeN17III8
-Message-ID: <CAKD1Yr0UbY5+f5nnNn3-GsPi0wNRwVHOGZeFmujNJKY0VpJ3eQ@mail.gmail.com>
-Subject: Re: [RESEND PATCH net-next v2 4/4] net/ipv6: drop ip6_route_get_saddr
-To: David Lamparter <equinox@diac24.net>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	Patrick Rohr <prohr@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251104162717.17785-1-dharanitharan725@gmail.com>
 
-On Tue, Nov 4, 2025 at 9:49=E2=80=AFAM David Lamparter <equinox@diac24.net>=
- wrote:
-> It's no longer used anywhere.
+On Tue, Nov 04, 2025 at 04:27:16PM +0000, Dharanitharan R wrote:
+> KMSAN reported an uninitialized value use in rtl8150_open().
+> Initialize rx_skb->data and intr_buff before submitting URBs to
+> ensure memory is in a defined state.
+> 
+> Reported-by: syzbot+b4d5d8faea6996fd@syzkaller.appspotmail.com
+> Signed-off-by: Dharanitharan R <dharanitharan725@gmail.com>
+> ---
+>  drivers/net/usb/rtl8150.c | 21 ++++++++++++++-------
+>  1 file changed, 14 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/net/usb/rtl8150.c b/drivers/net/usb/rtl8150.c
+> index 278e6cb6f4d9..f1a868f0032e 100644
+> --- a/drivers/net/usb/rtl8150.c
+> +++ b/drivers/net/usb/rtl8150.c
+> @@ -719,14 +719,15 @@ static netdev_tx_t rtl8150_start_xmit(struct sk_buff *skb,
+>  
+>  static void set_carrier(struct net_device *netdev)
+>  {
+> -	rtl8150_t *dev = netdev_priv(netdev);
+> -	short tmp;
+> +    rtl8150_t *dev = netdev_priv(netdev);
+> +    short tmp;
 
-Reviewed-By: Lorenzo Colitti <lorenzo@google.com>
+You are messing up the whitespace here.
+
+Did you not read your own patch and notice this problem? checkpatch
+probably also complained.
+
+    Andrew
+
+---
+pw-bot: cr
 
