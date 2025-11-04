@@ -1,137 +1,165 @@
-Return-Path: <netdev+bounces-235416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C74BC302E7
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 10:10:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F5B5C30450
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 10:31:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EAE3234D287
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 09:10:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68986467EE0
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 09:20:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BA3730BF58;
-	Tue,  4 Nov 2025 09:10:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D01593128B4;
+	Tue,  4 Nov 2025 09:15:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="SETdWZYD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Te1tLShQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ECC329B8FE;
-	Tue,  4 Nov 2025 09:10:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12F132C21ED
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 09:15:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762247451; cv=none; b=HDTPOo16ouzOsRZD3RIzcl6BUbS7jKJQfAWTKpub0jHeiKy48SmDX+yglV453hswJP1oezH+l/hfnQ7PPhLwucspk8mruROk6ZhdEJTYZ8MwHxqM9RDLbJlmOaHXNVhki3Pk7eXokULukvOwdZ3uSihEyQp+Xsg2ajLMUg1x2dM=
+	t=1762247741; cv=none; b=dLKtvVahC98HS9xV38aYrPYH7bAU1Aakqv/rVJh8RI2DG13haiPT/MR03khrKtOtQvaXUz1mHGYnTZagWCuWz4Hyrfri5dFLFB94mnE535bWP1irfH3W0hzQq0gfZY3xvWaQ7d+wfVE99d/42owqNO30Np3lS5P39zMyZpLKkCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762247451; c=relaxed/simple;
-	bh=LMpQCdO4DpvAzMy+0oVJL+k1kGwvMBsIaCidJwajyks=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AmJkHrvn6QgfeLZTi8HyD9WFZW5J2/XjUrJi/AH7Xu3i55wxZuQHfR3n6w/4Mgm4OYRMnZsRofh9RUgn3ArjxyFFdCK9VnUsLyMgrBiHE56Mm/P/yqhp95OZ0yduKumZFnJn3Dwt3v+jvqQscc9uS456PHktKasG2AEDX3hI8f0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=SETdWZYD; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 64F224E414F0;
-	Tue,  4 Nov 2025 09:10:46 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 33A79606EF;
-	Tue,  4 Nov 2025 09:10:46 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A4FB410B5069D;
-	Tue,  4 Nov 2025 10:10:43 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1762247445; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=YLPevIWNzxiE5TizcrRb1gViSqpYMR7gcBGkGD5xEPw=;
-	b=SETdWZYDwG79HdPDQOgaK4ZpKVa7hYoJHZd/Nwx6oW++IuWO9MmQlogCN7P/w/vpow0mnF
-	mHcNu+LBfLIKvWh9xJaP1U1SFNtciG4xcPMSnVulmks8W3lRKUqm6tu2Q7WSeIjl1fJR2P
-	jbEtl8qOYVThT6eOJLTlmcDkwuu/1a7JhK6U1Or1wQ7GZjNnP2hyuU2gn5LPyGV77kBk9Y
-	aMzf0V2xLRE6jB3z7Bl5owg81DjU7sJu1VGMpWYyNUBHsqYkkHzkVQyRV9Ig6oWXD0VDdB
-	fXGQt87aoI6xDvuH0UjuFseT8Pn9V6Pl76/KxcGSR7pUroYd3FhUpOcXHV1eDA==
-From: Romain Gantois <romain.gantois@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 3/3] net: phy: dp83869: Support 1000Base-X SFP
-Date: Tue, 04 Nov 2025 10:10:42 +0100
-Message-ID: <4689841.LvFx2qVVIh@fw-rgant>
-In-Reply-To: <aQnA8HZjKKgibOz-@shell.armlinux.org.uk>
-References:
- <20251104-sfp-1000basex-v1-0-f461f170c74e@bootlin.com>
- <20251104-sfp-1000basex-v1-3-f461f170c74e@bootlin.com>
- <aQnA8HZjKKgibOz-@shell.armlinux.org.uk>
+	s=arc-20240116; t=1762247741; c=relaxed/simple;
+	bh=6LzZWjVJcFU98fCf8/h2lu2RvX3zaBKLQyEx9qouKxo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JPimIFqwi1HeOgtkC9go6nVb7XUqxLJoggom0ybuHkJ4IB0AgBK41KZnes/mb+hS67ztfUxhJUt1rJZFNlLWl7476O+wUy77/6fNWPlCLmdMesbEK0+3BuXE+FC+kGKKp3yJdOuhjyCKyuLiiGkRGBHCY5ny+GcyvsqZVe2iAnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Te1tLShQ; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-477563bcaacso2440675e9.1
+        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 01:15:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762247738; x=1762852538; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=I5AKn/YxRVDEYvb4oQWy0Qdk6zkNgjLRrHytCLlPapA=;
+        b=Te1tLShQOa+2OngAfqQU4v6j5ylN1ipJpYDbdWbc+DNPyTWIUBDxCqsyataybvXtSS
+         FIpjdy4dXOuD479/yYVetZqIuud5oRjEc0SUYPcreRRMkG9go6HowxfhWc0nCJB4SJ/S
+         QH7ykOnJg1sE0PTejvuvyF5Hc8b07/YxqMJrz3GLfFGNR77pgTv0Zr0LFSbAyPjvQh1W
+         TupedITI2xRxziPmW0lAOiDwNStwG+RcjZOfayvLkhkNjwh+hi4MRyVdIytvDI7IeJK5
+         9Y1T0qTCjrQ2x5GuiLK3W67FYAGAWrODWKNmKdhfHDCA8mXzKT9Mm7z+TPijomkEz4S2
+         U1YA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762247738; x=1762852538;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=I5AKn/YxRVDEYvb4oQWy0Qdk6zkNgjLRrHytCLlPapA=;
+        b=Dl/tltc1O7b1GtFrFapF/AM+/nmX5TCmpMhScI3fUGr6mn2ogi8cRpF8WFIL32ywUe
+         //nLUWJ740Z0tvKEAllmrJgP0swODOP6xcri/SScYNkO6a/Cy6oPOMS38JyXP+Yywzuw
+         TsWlFYGXV5P0lGyK+u+s3pk58sbliS6ae///9t9CXp0ClujkI5gE1fQINkLC3Xr9/V1Q
+         gU3Emgg2Z5nqyBtIugN76sUx9NXFOiY/u5Q+AaARghQ/iXI7DbJxeRzs0lPif55w/ptD
+         X4VIV5p6sJL738DhY/S2mTbV7N3sQILEf1SJorO/m5cW1qZx7qOSCmZsW+wwou0G4T1U
+         vWKw==
+X-Forwarded-Encrypted: i=1; AJvYcCWmogO7yW9/xCEuKKxg/CXax7C1NcyR+6YkIY20EAtfFtHBMH6OinK3VLo120E0/Fh8fLFmXrM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzvsuf12CYIAeBAc7pxJXDbVix29K/rv7NL4cAC2OEef9L2K6Sv
+	bImu5jk7MhQ2Fvi83JYJT+vq26WeMoU2w3bR7V3gSgCzGrLA40F0CfAc
+X-Gm-Gg: ASbGncsteV0KIIb9icJYJ5n/osqmCQF7sUCT0RQc29PXuE8E8ZxLCOwO1hDSZG1fWZ5
+	Cz0QQQ6YcFigQd6FX5qF3SHbbL7ORAnI9Gr/ZFVAbNQv6kkvikC5vp1w6QNoVyE1bcL3GV1iRmu
+	yXYllu8N52hQrYaItAtROeaeO2JmfApd2Yaap/jeTWGZ35NellpqAYLcu0ru7WJVxkEmLNepeIt
+	TJetrtwlM38cwAebPbNRS9qZW8skNuMHzaLILeRgeH7Mo91w8twq/dtYQ8Y8MITxJONSB4YnNP4
+	6UWT0UUSczi8xmV0Y/gOE3XZ36gaTsZnzqkHUmK5ksYKewao0vnWKErFr/t+4tJ1jwx79UVrle7
+	GkrpDR+u/YxAG4FNYGw0MCtRemb23czNaL9/xADwWuqCzE/D6Fd+FLE32Rh5vKZBDlpimvPR5RW
+	ICIUZP+vJy3JU8N5Fx7usPfzyJW1VkP4tefU+qyICMRfRcU7X99nTQ
+X-Google-Smtp-Source: AGHT+IE01J8SoxNA5Pd+GaPMNOkQJ+QLl955gVCc6gXNOpRKu0U4lo5w3aXmIsKuWk0ctoxNOogwzQ==
+X-Received: by 2002:a05:600c:1d20:b0:477:559a:1ca7 with SMTP id 5b1f17b1804b1-477559a1dd2mr15968465e9.39.1762247738009;
+        Tue, 04 Nov 2025 01:15:38 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477563fe1e7sm20848025e9.4.2025.11.04.01.15.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Nov 2025 01:15:37 -0800 (PST)
+Date: Tue, 4 Nov 2025 09:15:36 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Kees Cook <kees@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ "Gustavo A. R. Silva" <gustavo@embeddedor.com>, Alexei Starovoitov
+ <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, John Fastabend
+ <john.fastabend@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, Kuniyuki
+ Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ linux-hardening@vger.kernel.org
+Subject: Re: [PATCH net-next v5 1/8] net: Add struct sockaddr_unsized for
+ sockaddr of unknown length
+Message-ID: <20251104091536.29d543f2@pumpkin>
+In-Reply-To: <20251104002617.2752303-1-kees@kernel.org>
+References: <20251104002608.do.383-kees@kernel.org>
+	<20251104002617.2752303-1-kees@kernel.org>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart2387650.ElGaqSPkdT";
- micalg="pgp-sha512"; protocol="application/pgp-signature"
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
---nextPart2387650.ElGaqSPkdT
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
-From: Romain Gantois <romain.gantois@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Date: Tue, 04 Nov 2025 10:10:42 +0100
-Message-ID: <4689841.LvFx2qVVIh@fw-rgant>
-In-Reply-To: <aQnA8HZjKKgibOz-@shell.armlinux.org.uk>
-MIME-Version: 1.0
+On Mon,  3 Nov 2025 16:26:09 -0800
+Kees Cook <kees@kernel.org> wrote:
 
-On Tuesday, 4 November 2025 10:01:36 CET Russell King (Oracle) wrote:
-> On Tue, Nov 04, 2025 at 09:50:36AM +0100, Romain Gantois wrote:
-> > +static void dp83869_module_remove(void *upstream)
-> > +{
-> > +	struct phy_device *phydev = upstream;
-> > +
-> > +	phydev_info(phydev, "SFP module removed\n");
-> > +
-> > +	/* Set speed and duplex to unknown to avoid downshifting warning. */
-> > +	phydev->speed = SPEED_UNKNOWN;
-> > +	phydev->duplex = DUPLEX_UNKNOWN;
+> Add flexible sockaddr structure to support addresses longer than the
+> traditional 14-byte struct sockaddr::sa_data limitation without
+> requiring the full 128-byte sa_data of struct sockaddr_storage. This
+> allows the network APIs to pass around a pointer to an object that
+> isn't lying to the compiler about how big it is, but must be accompanied
+> by its actual size as an additional parameter.
 > 
-> Should this be done by core phylib code?
+> It's possible we may way to migrate to including the size with the
+> struct in the future, e.g.:
+> 
+> struct sockaddr_unsized {
+> 	u16 sa_data_len;
+> 	u16 sa_family;
+> 	u8  sa_data[] __counted_by(sa_data_len);
+> };
 
-I guess that enough PHY drivers do this by hand that a new phylib helper could 
-be warranted. Maybe something like phy_clear_aneg_results(), which would set 
-speed, duplex, pause and asym_pause to default values.
+I'm not sure having that example helps.
+At a quick glance it might be thought of as part of the change.
+That particular example also has all sorts of issues, so any such
+change would have to be very different.
 
-Thanks,
+	David
 
--- 
-Romain Gantois, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
---nextPart2387650.ElGaqSPkdT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEIcCsAScRrtr7W0x0KCYAIARzeA4FAmkJwxIACgkQKCYAIARz
-eA4Lgg//ZkSNIz8w17WdBe/2GkkDoBqglESJBCzjpe+Pheqlcw+QL4RECY0JIfUy
-Lz6bNYx412qsAN2LEcSbwrOBzbwLM5KXEP5jBC7jM1nn/8+Z5iILA9ccFTNbbMce
-2IQO3Ne1zZRkf4xRECPLU7rFh/kzMKOiarXTp+90dwebYEJ0s4SN/ODRXMw4T6OP
-ZeK93PZ3QKVLSyt7m8m4h/Na7NHnLcIZhefl8aRnX3j36AeHdv2WWh4+io5L7DMl
-nIch/GVH3++ah0W8RZmj6Cagd0MFzO3M0QKawHbTPsLF3U2CHY0dFJxSY0fKERrT
-MvzL3CzPKyaqQtg6mG+WnS0sFWqvQ6DiVb5gmIldwwBCJr1KIzLTxDq3UDQJize7
-nZgEHqbcdnEwQlKM3KnipbyOVodDlKjOJKEC9vMk/OjeUNVAqg8bT0RH1OdH5c7d
-aHvOxTqfY6GXeNM2xz3Sy0VYTEaedGAtfF1jdwna78ArsNj+eXFuPnAKWRwjKYI0
-D6Yxe4ZZSjAse6ujm4Yn0C34SRCYFW6jPa6GoQbfRQUhoJZgXGpRR+OapIQkjfJG
-Gyl+SWP0Scr4O3sJ/GUIh50ZRvkB2evoLeVQyhaKO2DOgh57A1Vlqg7xhZgsDWvh
-rGg0fYENiRiBlBs2inSmgd1FhhjwNlGU/FSbEsf4oZ4kQzLDMQc=
-=o8N2
------END PGP SIGNATURE-----
-
---nextPart2387650.ElGaqSPkdT--
-
-
+> 
+> Signed-off-by: Kees Cook <kees@kernel.org>
+> ---
+>  include/linux/socket.h | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
+> 
+> diff --git a/include/linux/socket.h b/include/linux/socket.h
+> index 3b262487ec06..7b1a01be29da 100644
+> --- a/include/linux/socket.h
+> +++ b/include/linux/socket.h
+> @@ -40,6 +40,23 @@ struct sockaddr {
+>  	};
+>  };
+>  
+> +/**
+> + * struct sockaddr_unsized - Unspecified size sockaddr for callbacks
+> + * @sa_family: Address family (AF_UNIX, AF_INET, AF_INET6, etc.)
+> + * @sa_data: Flexible array for address data
+> + *
+> + * This structure is designed for callback interfaces where the
+> + * total size is known via the sockaddr_len parameter. Unlike struct
+> + * sockaddr which has a fixed 14-byte sa_data limit or struct
+> + * sockaddr_storage which has a fixed 128-byte sa_data limit, this
+> + * structure can accommodate addresses of any size, but must be used
+> + * carefully.
+> + */
+> +struct sockaddr_unsized {
+> +	__kernel_sa_family_t	sa_family;	/* address family, AF_xxx */
+> +	char			sa_data[];	/* flexible address data */
+> +};
+> +
+>  struct linger {
+>  	int		l_onoff;	/* Linger active		*/
+>  	int		l_linger;	/* How long to linger for	*/
 
 
