@@ -1,216 +1,234 @@
-Return-Path: <netdev+bounces-235305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235308-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1B97C2E999
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 01:30:34 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4772C2E987
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 01:29:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5F033A831B
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 00:27:01 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id CB3A634C6B3
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 00:28:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21D8D224AE0;
-	Tue,  4 Nov 2025 00:26:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C156D1A5B9D;
+	Tue,  4 Nov 2025 00:27:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JyuNl6cS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mkWur/qE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0A3C1DF73A;
-	Tue,  4 Nov 2025 00:26:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B18E629405
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 00:27:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762215978; cv=none; b=b4ZOVrg2Z7R1NsJqD3mhLQfoDphKDYy5/IBtf728AEJ5/gYpdkGexgtHpwHxTZmhgvIBxEjASUAPYpYIk+t9/lPd2kTgAqlfVDMyjVnJWSxhVESzVH56i0D+2BGYBGXRDJVI2xKnBmX1hHmA6tEC2fqtjfA9j4vC5kws1+IzDjo=
+	t=1762216050; cv=none; b=GJD4U7aHQ/DvUfMiPFA01Fo3DD7vktgw1ma2MRoOCco3kMVMAQBvpmOFuzqvDQSDRWIrLorH2YrkdyP3QVuCuQRLIsEQvDAR2hcKneZPiE86FjrtShznj3fiJDhTfkA/3Jnza8r92bo+dF2+ciYlPcm1JFnEYS1pSSDzYzDwlWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762215978; c=relaxed/simple;
-	bh=h9qVPr5wmZiEP5RXjW8UY6IDzbdd+PZL37PTBxL5oHw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=oZyXvDaNlsraO5XNJsYhJnLy+DCwLO9S86G9FYyodSMbKtPwRTLt1Glp/kuZhs+wvXcYEcPGbxziNqlz+LmLcELCInLB9TvfedGlsoPRlbNmrJZcSaOOf/TVvUvGKmIfmHXYC9cMG9Bddxr8kJC6txU7+qEm0O5ec3HqETsP4tE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JyuNl6cS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B03BC2BCB6;
-	Tue,  4 Nov 2025 00:26:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762215978;
-	bh=h9qVPr5wmZiEP5RXjW8UY6IDzbdd+PZL37PTBxL5oHw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JyuNl6cSg4lwSpHU5FkSN7/ea9ozvoKEURGwzt/d5ExqvtrXU/Ybi+MqbgwScXnKq
-	 AWzxs9fXzHRnieQ4l+L859iAl0OcVjbGCet0Q+VxM53sVrZ2QpbvELC442cgv8vAKH
-	 nvfIskOmxq52WLvvqT6YlRchZnggu+lQks8KIUT7EHnDFJkLZ0itJkoak3UeHod1V9
-	 lFkj4k2iePbqaLy7BF+B3EyUOQJfYLR60Pk2w+aSE8o6NdInPgLgf47OKwtHDa0YCi
-	 2paYpLTiP5bPI3knnS90QgmxNU2CXKoMU2mL63iRx7KXghylgr3E4JlQe9Lcpv3OLl
-	 RQaCLK229m1PA==
-From: Kees Cook <kees@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Kees Cook <kees@kernel.org>,
-	"Gustavo A . R . Silva" <gustavo@embeddedor.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: [PATCH net-next v5 8/8] net: Convert struct sockaddr to fixed-size "sa_data[14]"
-Date: Mon,  3 Nov 2025 16:26:16 -0800
-Message-Id: <20251104002617.2752303-8-kees@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20251104002608.do.383-kees@kernel.org>
-References: <20251104002608.do.383-kees@kernel.org>
+	s=arc-20240116; t=1762216050; c=relaxed/simple;
+	bh=jFJzHcA+X8LkHNbuVmZxGh+3mvTDvWnafWb05x9a0Z4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=t3lxahdGAwVjuo4Rbr3h/2CyIFmg3IjkTVkMdXFrmr4VSWmViNrHURbWubVSuX7FFPtsqQNFWVQR10wTP0pgWEiOn1lBkPr/jjJwBOyL0PfoTR/sU0JoMJaG7V292VMWss65K+lHqV123xjUZvMSVE/UHSH4d2hUEj0kvu0qTSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mkWur/qE; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-429b72691b4so4439329f8f.3
+        for <netdev@vger.kernel.org>; Mon, 03 Nov 2025 16:27:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762216047; x=1762820847; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gQck65QFj/6B7pNqaZP0yviObfenPFAfFag69gzgWSo=;
+        b=mkWur/qERgkD/67+SiTi8r7cBzXNuICLynVJn8J3eMPRjoiv6smpYrnxSAiB3Y9ftX
+         OamsWzV20FIyZQt2+IWxPwPG+0m9eXBCg5nx48FtVIP4gjfCXhvq2ooDhkxXJDjAB8b5
+         y33w8wiFLYtrrBoZta4w2Pevsvfuius1UpM/UNPV7QHUNvWPst4jxyG3dNi5Rmlhgi1B
+         0uITt/UCdlG2gYix5q/NUJOlYGZ1caMAtcCgQCWZPUF/EJ0r7x+FGxgemJONnurCyPy2
+         wuMG4WfZT9zMy+0T8iEFlTWQ1rtgWPYTZYWb9O/5JO0arCkGxPM5b2OqTmcPwud7BeKA
+         VMhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762216047; x=1762820847;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gQck65QFj/6B7pNqaZP0yviObfenPFAfFag69gzgWSo=;
+        b=RrkDb6VF47hlKbrJ6jhCokJXaZ0GUyuUtHv+trDkpZIkee2gu3lLc+0aHjC6HlMUFQ
+         YHzu+YOcyTqOGam4cksXDHxwVlMr87ggsWTWRzU5bDgWI4sJoa8dX/sd8YGZ12Mgm2jY
+         c5cz7F/lBmFFXjnsdbKuvbg5X/Uy0RoqWsAL0sRmRQfI61A7/AyFVyGzpRmzB+scLCMu
+         RcLrRep/UEkE8zFkB0PGLxhu9rPUAWVhvIKdYQtgWbD+JHk7aJ6ZhaLn1/eH+e1iUZRv
+         FfRla7zsx/ztFzezoG0wupDqCfyqegwIBEcCYAKy7U58McYb1lC2xoOxGRfOk7uieEmF
+         QMnA==
+X-Gm-Message-State: AOJu0Yypl+oBTdTnDUeJEqx50hRGLrSrxYolWqC2iZFlsq7+OsOI6yxa
+	uMhPt85icoABNAkHzoPAx+pnZ1veIUBQ7/cV3FAfL7g5D+M4S4nhpd4zVKI3AClfc1bVdmVj6AO
+	miGs4oLSS4t4X4pVARyDclN1rYBpZu3o=
+X-Gm-Gg: ASbGncs6qrbGp9G7IoOPWAtdZYQTbetOhk4aq9ErLEvcHbDhJ74JVI/jWp8vlw366K4
+	G0DkZ75+RiNCjIoz/drsQUQH0NfdS+iNCr9e0ExU54r0SwLRPhL9wqJrx066J8b7RTsQavUKwzl
+	DXzx/HWmcgv4q3nDdb8yQo47+KPDNFGfTm9ISKEghAYwT6fJcvKutqVqSi6T0CPyj0T9YfC42cR
+	5AdQtiBY2vuyrmHI4cj/Jtgn9Ntk6rlOFShJH15CNaFh6kx8OasVrotPGopCBtvIwKtC07iAE6q
+	Negz0eEAk0Ad6/b4/g==
+X-Google-Smtp-Source: AGHT+IHINJFxI6ttSS2G3JvNxWRiYzSBSX+EpNSmkNv0tXlndOM0zYE1jkJ8RYj/QYPZduubSYa187LokIMAsEyZC+k=
+X-Received: by 2002:a05:6000:2f86:b0:429:8daa:c6b4 with SMTP id
+ ffacd0b85a97d-429bd6860d5mr10563325f8f.21.1762216046705; Mon, 03 Nov 2025
+ 16:27:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5438; i=kees@kernel.org; h=from:subject; bh=h9qVPr5wmZiEP5RXjW8UY6IDzbdd+PZL37PTBxL5oHw=; b=owGbwMvMwCVmps19z/KJym7G02pJDJmcHuoWE/Z/262s0Ch/uvvylIMXggSKmu/4vM3VatVeG yS396RPRykLgxgXg6yYIkuQnXuci8fb9nD3uYowc1iZQIYwcHEKwETObGFk6K91nKgQNsdG9DGD 1lZuDa1VbQsfzdrD1z7pm9Mc9qtbLzIydGwzuljyb+oMlaLUu43qbvWXtieyrPt42um+rMR7NbE oXgA=
-X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
-Content-Transfer-Encoding: 8bit
+References: <176218882404.2759873.8174527156326754449.stgit@ahduyck-xeon-server.home.arpa>
+ <176218926115.2759873.9672365918256502904.stgit@ahduyck-xeon-server.home.arpa>
+ <2fabbe4a-754d-40bb-ba10-48ef79df875c@lunn.ch> <CAKgT0UeiLjk=9Ogqy1NU-roz4U32HXHjVs8LqRKEdnPqYNcBjQ@mail.gmail.com>
+ <9628b972-d11f-4517-97db-a4c3c288dbfa@lunn.ch>
+In-Reply-To: <9628b972-d11f-4517-97db-a4c3c288dbfa@lunn.ch>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Mon, 3 Nov 2025 16:26:50 -0800
+X-Gm-Features: AWmQ_bmc6oR3QdpiKUXUj3w2XuCIEQHLfOQFnSzSSWYqaEiUxnhoglGbiO3prIQ
+Message-ID: <CAKgT0UcxyBCZw3TV97EAXi1KQLCX=O+=4ATzR3xyLYFySQG1Sw@mail.gmail.com>
+Subject: Re: [net-next PATCH v2 09/11] fbnic: Add SW shim for MDIO interface
+ to PMA/PMD and PCS
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, kernel-team@meta.com, 
+	andrew+netdev@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk, 
+	pabeni@redhat.com, davem@davemloft.net
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Revert struct sockaddr from flexible array to fixed 14-byte "sa_data",
-to solve over 36,000 -Wflex-array-member-not-at-end warnings, since
-struct sockaddr is embedded within many network structs.
+On Mon, Nov 3, 2025 at 1:49=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Mon, Nov 03, 2025 at 12:18:38PM -0800, Alexander Duyck wrote:
+> > On Mon, Nov 3, 2025 at 10:59=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wr=
+ote:
+> > >
+> > > > The interface will consist of 2 PHYs each consisting of a PMA/PMD a=
+nd a PCS
+> > > > located at addresses 0 and 1.
+> > >
+> > > I'm missing a bit of architecture here.
+> > >
+> > > At least for speeds up to 10G, we have the MAC enumerate what it can
+> > > do, the PCS enumerates its capabilities, and we read the EERPOM of th=
+e
+> > > SFP to find out what it supports. From that, we can figure out the
+> > > subset of link modes which are supported, and configure the MAC and
+> > > PCS as required.
+> >
+> > The hardware we have is divisible with multiple entities running it
+> > parallel. It can be used as a single instance, or multiple. With our
+> > hardware we have 2 MACs that are sharing a single QSFP connection, but
+> > the hardware can in theory have 4 MACs sharing a QSFP-DD connection.
+> > The basic limitation is that underneath each MAC we can support at
+> > most 2 lanes of traffic, so just the Base-R/R2 modes. Effectively what
+> > we would end up with is the SFP PHY having to be chained behind the
+> > internal PHY if there is one. In the case of the CR/KR setups though
+> > we are usually just running straight from point-to-point with a few
+> > meter direct attach cable or internal backplane connection.
+>
+> We need Russell to confirm, but i would expect the SFP driver will
+> enumerate the capabilities of the SFP and include all the -1, -2 and
+> -4 link modes. phylink will then call the pcs_validate, passing this
+> list of link modes. The PCS knows it only supports 1 or 2 lanes, so it
+> will remove all the -4 modes from the list. phylink will also pass the
+> list to the MAC driver, and it can remove any it does not support.
 
-With socket/proto sockaddr-based internal APIs switched to use struct
-sockaddr_unsized, there should be no more uses of struct sockaddr that
-depend on reading beyond the end of struct sockaddr::sa_data that might
-trigger bounds checking.
+In the drivers the limiting would be done based on the interface at
+the PCS level.  The way I added the 25G, 50G, and 100G features was
+based on the interface type, so that interface type would be what puts
+a limit on the number of lanes supported.
 
-Comparing an x86_64 "allyesconfig" vmlinux build before and after this
-patch showed no new "ud1" instructions from CONFIG_UBSAN_BOUNDS nor any
-new "field-spanning" memcpy CONFIG_FORTIFY_SOURCE instrumentations.
+In the actual hardware though the limiting factor is that the PMA/PMD
+is only 2 lanes. The PCS actually supports 4 lanes and is just being
+subdivided to only use 2 of them per MAC.
 
-Cc: Gustavo A. R. Silva <gustavo@embeddedor.com>
-Signed-off-by: Kees Cook <kees@kernel.org>
----
- include/linux/socket.h                         |  6 ++----
- tools/perf/trace/beauty/include/linux/socket.h |  5 +----
- net/core/dev.c                                 |  2 +-
- net/core/dev_ioctl.c                           |  2 +-
- net/ipv4/arp.c                                 |  2 +-
- net/packet/af_packet.c                         | 10 +++++-----
- 6 files changed, 11 insertions(+), 16 deletions(-)
+> It also sounds like you need to ask the firmware about
+> provisioning. Does this instance have access to 1 or 2 lanes? That
+> could be done in either the PCS or the MAC? The .validate can then
+> remove even more link modes.
 
-diff --git a/include/linux/socket.h b/include/linux/socket.h
-index 7b1a01be29da..944027f9765e 100644
---- a/include/linux/socket.h
-+++ b/include/linux/socket.h
-@@ -32,12 +32,10 @@ typedef __kernel_sa_family_t	sa_family_t;
-  *	1003.1g requires sa_family_t and that sa_data is char.
-  */
- 
-+/* Deprecated for in-kernel use. Use struct sockaddr_unsized instead. */
- struct sockaddr {
- 	sa_family_t	sa_family;	/* address family, AF_xxx	*/
--	union {
--		char sa_data_min[14];		/* Minimum 14 bytes of protocol address	*/
--		DECLARE_FLEX_ARRAY(char, sa_data);
--	};
-+	char		sa_data[14];	/* 14 bytes of protocol address	*/
- };
- 
- /**
-diff --git a/tools/perf/trace/beauty/include/linux/socket.h b/tools/perf/trace/beauty/include/linux/socket.h
-index 3b262487ec06..77d7c59f5d8b 100644
---- a/tools/perf/trace/beauty/include/linux/socket.h
-+++ b/tools/perf/trace/beauty/include/linux/socket.h
-@@ -34,10 +34,7 @@ typedef __kernel_sa_family_t	sa_family_t;
- 
- struct sockaddr {
- 	sa_family_t	sa_family;	/* address family, AF_xxx	*/
--	union {
--		char sa_data_min[14];		/* Minimum 14 bytes of protocol address	*/
--		DECLARE_FLEX_ARRAY(char, sa_data);
--	};
-+	char		sa_data[14];	/* 14 bytes of protocol address	*/
- };
- 
- struct linger {
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 8e862a48e0a6..c38405dce744 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -9936,7 +9936,7 @@ DECLARE_RWSEM(dev_addr_sem);
- /* "sa" is a true struct sockaddr with limited "sa_data" member. */
- int netif_get_mac_address(struct sockaddr *sa, struct net *net, char *dev_name)
- {
--	size_t size = sizeof(sa->sa_data_min);
-+	size_t size = sizeof(sa->sa_data);
- 	struct net_device *dev;
- 	int ret = 0;
- 
-diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
-index ad54b12d4b4c..b3ce0fb24a69 100644
---- a/net/core/dev_ioctl.c
-+++ b/net/core/dev_ioctl.c
-@@ -596,7 +596,7 @@ static int dev_ifsioc(struct net *net, struct ifreq *ifr, void __user *data,
- 		if (ifr->ifr_hwaddr.sa_family != dev->type)
- 			return -EINVAL;
- 		memcpy(dev->broadcast, ifr->ifr_hwaddr.sa_data,
--		       min(sizeof(ifr->ifr_hwaddr.sa_data_min),
-+		       min(sizeof(ifr->ifr_hwaddr.sa_data),
- 			   (size_t)dev->addr_len));
- 		netdev_lock_ops(dev);
- 		call_netdevice_notifiers(NETDEV_CHANGEADDR, dev);
-diff --git a/net/ipv4/arp.c b/net/ipv4/arp.c
-index f3bfecf8a234..7f3863daaa40 100644
---- a/net/ipv4/arp.c
-+++ b/net/ipv4/arp.c
-@@ -1189,7 +1189,7 @@ static int arp_req_get(struct net *net, struct arpreq *r)
- 
- 	read_lock_bh(&neigh->lock);
- 	memcpy(r->arp_ha.sa_data, neigh->ha,
--	       min(dev->addr_len, sizeof(r->arp_ha.sa_data_min)));
-+	       min(dev->addr_len, sizeof(r->arp_ha.sa_data)));
- 	r->arp_flags = arp_state_to_flags(neigh);
- 	read_unlock_bh(&neigh->lock);
- 
-diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-index fccad2a529cc..494d628d10a5 100644
---- a/net/packet/af_packet.c
-+++ b/net/packet/af_packet.c
-@@ -3284,7 +3284,7 @@ static int packet_bind_spkt(struct socket *sock, struct sockaddr_unsized *uaddr,
- {
- 	struct sock *sk = sock->sk;
- 	struct sockaddr *sa = (struct sockaddr *)uaddr;
--	char name[sizeof(sa->sa_data_min) + 1];
-+	char name[sizeof(sa->sa_data) + 1];
- 
- 	/*
- 	 *	Check legality
-@@ -3295,8 +3295,8 @@ static int packet_bind_spkt(struct socket *sock, struct sockaddr_unsized *uaddr,
- 	/* uaddr->sa_data comes from the userspace, it's not guaranteed to be
- 	 * zero-terminated.
- 	 */
--	memcpy(name, sa->sa_data, sizeof(sa->sa_data_min));
--	name[sizeof(sa->sa_data_min)] = 0;
-+	memcpy(name, sa->sa_data, sizeof(sa->sa_data));
-+	name[sizeof(sa->sa_data)] = 0;
- 
- 	return packet_do_bind(sk, name, 0, 0);
- }
-@@ -3581,11 +3581,11 @@ static int packet_getname_spkt(struct socket *sock, struct sockaddr *uaddr,
- 		return -EOPNOTSUPP;
- 
- 	uaddr->sa_family = AF_PACKET;
--	memset(uaddr->sa_data, 0, sizeof(uaddr->sa_data_min));
-+	memset(uaddr->sa_data, 0, sizeof(uaddr->sa_data));
- 	rcu_read_lock();
- 	dev = dev_get_by_index_rcu(sock_net(sk), READ_ONCE(pkt_sk(sk)->ifindex));
- 	if (dev)
--		strscpy(uaddr->sa_data, dev->name, sizeof(uaddr->sa_data_min));
-+		strscpy(uaddr->sa_data, dev->name, sizeof(uaddr->sa_data));
- 	rcu_read_unlock();
- 
- 	return sizeof(*uaddr);
--- 
-2.34.1
+The way the hardware is setup we always have 2 physical lanes. Where
+we need to decide on using one or two is dependent on which mode it is
+we are wanting to use in software and what our link partner supports.
+For example, on one of our test setups we just have a QSFP-DD loopback
+plug installed and we can configure for whatever we want and link up
+and talk to ourselves.
 
+That actually presents a number of challenges for us as the SFP driver
+currently doesn't understand CMIS, and again we are stuck having to
+emulate the I2C via the driver as it is hidden behind the FW
+interface. This is one of the reasons why we end up currently with the
+FW telling us what the expected link mode/AUI currently is.
+
+> > To
+> > support that we will need to have access to 2 PCS instances as the IP
+> > is divisible to support either 1 or 2 lanes through a single instance.
+>
+> Another architecture question.... Should phylink know there are two
+> PCS instances? Or should it see just one? 802.3 defines registers for
+> lanes 0-3, sometimes 0-7, sometimes 0-9, and even 0-19. So a single
+> PCS should be enough for 2 lanes, or 4 lanes.
+
+I'm thinking the driver needs to know about one, but it needs access
+to the registers for both in order to be able to configure the
+multi-lane setup. The issue is that the IP was made so that the vendor
+registers for both lanes need to be configured identical for the 2
+lane modes in order to make the device work. That is why I thought I
+would go ahead and enable both lanes for now, while only connecting
+one of them to the driver.
+
+If we had multiple MACs both of the PCS lanes could have been used in
+parallel for the 1 lane setups, however since we only have one MAC it
+ends up running both lanes. Since that was the case I thought I would
+stick to what would have likely been the layout if we had multiple
+MACs which was to expose both lanes as separate PHYs, but only map the
+device on the first one. That said, if need be I could look at just
+remapping the PCS for the second lane as a MDIO_MMD_VEND1/2. I would
+just have to relocate the RSFEC registers for the second lane and the
+PCS vendor registers to that device.
+
+> > Then underneath that is an internal PCS PMA which I plan to merge in
+> > with the PMA/PMD I am representing here as the RSFEC registers are
+> > supposed to be a part of the PMA. Again with 2 lanes supported I need
+> > to access two instances of it for the R2 modes. Then underneath that
+> > we have the PMD which is configurable on a per-lane basis.
+>
+> There is already some support for pma configuration in pcs-xpcs. See
+> pcs-xpcs-nxp.c.
+
+I was dealing with different IP from different vendors so I didn't
+want to throw the PMD code in with the PCS code. I suppose I could do
+so though if that is what you are suggesting, I would essentially just
+be up-leveling it to the PMA interface.
+
+As it stood I was considering adding an MMD 8 interface to represent
+the PMA on the PCS since that would probably be closer to what we
+actually have going on where the PCS/FEC/PMA block on top is then
+talking to the PMA/PMD which is then doing the equalization and
+training before we send the data over the Direct Attach Copper cable.
+
+I had chosen the phydev route as it already had a good way of handling
+this. I was thinking the phydev could essentially become a fractional
+QSFP bus as it will likely be some time before we could even get
+support for a standard QSFP bus and CMIS upstream.
+
+> > The issue is that the firmware is managing the PMD underneath us. As a
+> > result we don't have full control of the link. One issue we are
+> > running into is that the FW will start training when it first gets a
+> > signal and it doesn't block the signal from getting to the PCS. The
+> > PCS will see the signal and immediately report the link as "up" if the
+> > quality is good enough. This results in us suddenly seeing the link
+> > flapping for about 2-3 seconds while the training is happening. So to
+> > prevent that from happening we are adding the phydev representing the
+> > PMD to delay the link up by the needed 4 seconds to prevent the link
+> > flap noise.
+>
+> So it seems like you need to extend dw_xpcs_compat with a .get_state
+> callback. You can then have your own implementation which adds this 4
+> second delay, before chaining into xpcs_get_state() to return the true
+> state.
+
+Seems like I might need to plug something into the spot where
+xpcs_resolve_pma is called. The code as it stands now is just taking
+the interface and using that to determine the speed after checking the
+PCS for the link. I wonder if I should look at having this actually
+look at the PMA if there is one and then just determine the speed
+based on that.
 
