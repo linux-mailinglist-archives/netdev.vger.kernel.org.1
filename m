@@ -1,207 +1,206 @@
-Return-Path: <netdev+bounces-235580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BE2BC32B66
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 19:56:31 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2980C32BC1
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 20:10:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D63A3A8859
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 18:56:30 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AC32A4E1F24
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 19:10:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5C6133F365;
-	Tue,  4 Nov 2025 18:56:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC5FC32939C;
+	Tue,  4 Nov 2025 19:10:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q7cG+qxu"
+	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="Ox0bnPKG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A96431DF25F
-	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 18:56:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5E792E8B9B
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 19:10:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762282586; cv=none; b=lF/UqXxtGTVjAT7NUpIyvbIzIJ1bDwK9ou+WXeVhdkOgCDDOQOee2hvpPB7k73T0wqlETOPNXKdaPbgNndins82xSl/WNKSBcRm8pHyIEk0tS5vf9DOTHbpr8af/ESlHZe/DDQ5/DSxUJX5U7fAmy2bCvQ5vTC2H38UkLkpwQGw=
+	t=1762283414; cv=none; b=KstJ6TYq+nqUZdnJLKMgpx97kKp3lAYzobLEVQYNXiN58mO46NoCTNsLQAF27t/JkhBWgcP31GfPT69Eb18ZsTcRRcJObA+DM8QrVrbdiBBYl0gtwyiwodBlpLEcQHzbnVaUH5jFADUHywfz6E1Atlmpq27XSrL4TbZK5GpZGFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762282586; c=relaxed/simple;
-	bh=1YsclRHRX16kW+F4BUH8OrD5tzZOGvtmNO3gu7zn/jA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=I1MJhjJLrBDu5U/9Bf4x2QKtJaHr+gTpj7AB4sYHao1PSSsjD7vTDI6z2WVjZoreueEfQtb8qh5i0BTCtt8Ra2c1Un4g1t1mLxi3uXjP9Z2sstwMiCLaltM6+/GAl+oriREg/QwmveD84CiQXukl3uxdW/pGOYwxaEC8m9dUpz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q7cG+qxu; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-429bf011e6cso4404582f8f.1
-        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 10:56:24 -0800 (PST)
+	s=arc-20240116; t=1762283414; c=relaxed/simple;
+	bh=9LWKCVKfpkLorLNhfnXcCyl5zFVxqyoqSkP/ChRZHu4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rMV7NurbKs2bz+M6G4WYlx8nxTsZXngqJKy4kStdiuISFCEtFf/fjA4s2J6Qz4uqcrVDIvwBVEyv+JLNweIpuC2i1mazggmRGtvHWZrsnC2yPlrwDH/aKYqwv0keJNlhQaOKLeYQ5BDlDyix9sP95lFihL4ExDsx/ZWDpFpIpCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=Ox0bnPKG; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-640741cdda7so7658633a12.2
+        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 11:10:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762282583; x=1762887383; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qyVxNDhzeuX7e1Hm9faErYkOpONAjmcZigzr7RrJCec=;
-        b=Q7cG+qxuTZO9/oKWznlk4GnwNt+gPg1QoN0Ax+GsQW1a5+HQastrg2vjEhxI1/6fpL
-         DecHEAzvbzUhPLHrutkj6olqaK+R/IDQqMtnyaSQTMzXo3d4nmXsxPZ9OY/kY7fQvn8y
-         ZSNP52LRIvPjqKPt916loBesIEUN+RQzYdKl9iu1qKjYgTBrFUaMX1kk/3hRI4h94+ws
-         IE+O3wFhtbZ+/4KN+xNK61IY0oqaBKj92bBgLW+Nb8KXXWM+tGSvJcmWuOAubpQYReUS
-         jO/XyoV7SZ8Gur+NBO7vfX/IAmJgfYjDfnR7wCNRRajrMGGdDZ32jtfts8pMJmNWPbq8
-         4Rgw==
+        d=blackwall.org; s=google; t=1762283411; x=1762888211; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pHPzEXIUZ9pzwlZg85xxsGY9keDqq8RNI/L/RPCgfS8=;
+        b=Ox0bnPKGBxpnyVrD+/j+pdLorEiJeX+G/OhHidwX/7BDlE6kKnTpyIqv4rC9RTMBKi
+         paXZfAbg+3NJ4suxUuiWVB0DqTb74x0Vdx7NQVYBS2xLx+RxNsUb40AT9BfadRU/ox2v
+         8SKASLMKfIuXIYX40GyPA1MBuIPae8EzKZuvjL5FPZXNXbynw4iJKSZvXi/3zA6hSBab
+         AIa5WV8/VXgmUdD5B5pkITDqadTBi8GyalTeKcWESfXJrbs7c1ApH/R4l3q5EKnypmcR
+         toS7ff6t3WHdo0wEYJAvMgjNRSavRndK2frLPyyB7XyAo5Cpkk65p6IlAilabLTUYqxg
+         PXoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762282583; x=1762887383;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qyVxNDhzeuX7e1Hm9faErYkOpONAjmcZigzr7RrJCec=;
-        b=a08aON0T7odec0J+4isE5e4XPk+bK+QVUFA8wwycjRQyIicckQWP0HBlDmMAaNL710
-         mSgE5LsiIm/QzBKUQXnIozFzcvG1SHaYJi/R1zM4fCGlTyEd1A7dcvwEqpmzkWNv15hx
-         QL9fJxoBDbyphz0CDs20su7ozApsJ+lH7Qzpf9Orvyj85AXajEvFlC/LPnqBf33AjjhK
-         AVESVEnJ6jU92J6AoIhk+M1TwmBnrztMLIKBT8xdaiDOB4yOC1QvEWYC2OAYfJmhu9Gi
-         0vTohlmVAT0rjTyB71aHJKWAQnQX4PGLReigCz5FiJ8vFfgePm8gsupyCTOpmSseRG3T
-         0bHg==
-X-Forwarded-Encrypted: i=1; AJvYcCWniPcAcIiE3EkFFhSn6IZJtUH1miQ/DNVJR94J/JCQx/5lHE+Gx4ah0VZt/CsbP2Vnlj615VE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlQqg8sH5PNx9nClHE+wXnR1KsklAqaWe/CQR5E8mHOBav7z1p
-	+URdOxba2N43JmkMkM4M0K7wf9I2O3dP7yQkN+2y1/hMBcD0e/rA5hjSxLAyoRh+9k0GvmqLHiP
-	h3wj/76LBkuAga/9gbxSXjYemjA1on1g=
-X-Gm-Gg: ASbGncttT6z0KSA/cPE+s8a4WMV4+y3++N6j9kjlq78OPMaBTEyCGR2VLTOloSRPHU2
-	HvQ1hKdFGSXZwGk9iHO5J4CbycH4IUTdCdu2DGxLXQRhMm95WtcLNJBbyyq7yZIOq8XZZ6P28Lf
-	ed+JgQvqcqNF9EzZ7Fu9Gk9GsL5t8Q3fP1clnKAso680Mxsvd7e65jcn9dMim7A+UBFAtl4pXpV
-	W7ZzR/dfAACW95bYfGEA9rzb4viNu9aoqt2/Q0skUA/E0YVK25krxf//wTn/+3HWEclFXAXSozX
-X-Google-Smtp-Source: AGHT+IFJOInFmzbqZmECILRroALB/RTVl7MjNKGkZgcM/wZQZhU9czd1hU9lNpogQZguKz7XWer3EishDJ+kqONidvU=
-X-Received: by 2002:a05:6000:4105:b0:3eb:4e88:585 with SMTP id
- ffacd0b85a97d-429e3305dbcmr291156f8f.29.1762282582747; Tue, 04 Nov 2025
- 10:56:22 -0800 (PST)
+        d=1e100.net; s=20230601; t=1762283411; x=1762888211;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pHPzEXIUZ9pzwlZg85xxsGY9keDqq8RNI/L/RPCgfS8=;
+        b=GthdT/KUIqxESRYkdNEKHpdsv4TVoSmXKmGMf5g3MUIIXThnamcaVpXW0W3pPgolSH
+         rdFmn04m+rUbfh6vvAsZQ3kZ31/uOhYE1unBc3dP5Is4oRei/e578HArf5M7RB2ng2ka
+         zBmA6FXccfUSmmju1nZHRn4LCYgnlFOq0wBj1MTUp/bpscAGjx20Hb7T6xAITxawaEYE
+         DR9KymL1Y66aIVYeXI0wvMTWg8O9SYt3JaenlZBmdqk0XJ+Nq9LCdEzGYhn8BP4ZhN0g
+         IeJVjqeRjMwGayTr0AXqKkyfPmWUvFnl0vZ9o6V/5gVJqGcsaW5BR5gknR0F+w2ZFnlK
+         zZ2A==
+X-Gm-Message-State: AOJu0Yz1V6s7yVvEJB3LsqKs1vNuJWIMcBf3voUSB6CpRFFvHlQFqSlL
+	UArIeCAk0VKfWCa4syc4BtGFJp/kGiMB2DoreIpcE5PaklPbQjgPjfdd08YHRhjEEEOPwzn6DXN
+	VH7XjSqI=
+X-Gm-Gg: ASbGnctOJEiQTfpJcLryDqH2OGBaK7im8dIQF0IK9S/nZTnTe+JhKXh0QceuzrPOIl1
+	mxngL2DNJI16TAx01q8t/eLvZzRWJ2NzFAQLfjVthaVSYqa7lAD0ljp8pIs9aXqs7KRtnDzAjYP
+	3H4h521yJJtCtX5qTOJLwcYbNxnnBrmmkFy54nhuwzcddB/ldNeo6w7TW8GqJibMrd8WjEsP8vj
+	EhiOmFhqVrBn7HMGCm7YPuKlHJ5ya/9u2yc5jL9WenEU0T29E7qb2xYvqPBfiFDdAc3uxWchmMy
+	OKYW4BB0CpEC/R4/p0UHV+3zaC2vWp9y4oXp1B3k3H7T/ARhR9zBah6rl707dSlFUXjWpD4z86w
+	WNWDIZ1G2bh8YXV0kqDO26LYJSqRDoKLUPXDs4q1IkFrLwwX/id72DbZbHsSeHQPnMmaA7s9Uaw
+	gMkDXN9DGqfXGsa4u2XQbceMGdaG0CAsU7
+X-Google-Smtp-Source: AGHT+IGVSDgEL05gD1VP583K60Rshyb4V0TRe73xfvSbKrRc1EoanFAlaR1O1a/+yOYg6dakhlj2rg==
+X-Received: by 2002:a17:907:72c6:b0:b70:b4db:ae83 with SMTP id a640c23a62f3a-b7265605335mr26751966b.60.1762283410700;
+        Tue, 04 Nov 2025 11:10:10 -0800 (PST)
+Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b723d7030adsm289300666b.24.2025.11.04.11.10.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Nov 2025 11:10:10 -0800 (PST)
+Message-ID: <2252e81c-fe49-40aa-944e-4c94d5de563d@blackwall.org>
+Date: Tue, 4 Nov 2025 21:10:09 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251104104913.689439-1-dongml2@chinatelecom.cn>
-In-Reply-To: <20251104104913.689439-1-dongml2@chinatelecom.cn>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Tue, 4 Nov 2025 10:56:09 -0800
-X-Gm-Features: AWmQ_bn3-3pUzEzIlIcXVV-BIX9Cml9X2hduNwfYMH_N1D55oNwjtosZOsMwPrI
-Message-ID: <CAADnVQJTOFjXe5=01KfOnBD86YU_Vy1YGezLQum3LnhFHAD+gg@mail.gmail.com>
-Subject: Re: [PATCH bpf-next] bpf,x86: do RSB balance for trampoline
-To: Menglong Dong <menglong8.dong@gmail.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Eduard <eddyz87@gmail.com>, 
-	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
-	"H. Peter Anvin" <hpa@zytor.com>, jiang.biao@linux.dev, 
-	Menglong Dong <menglong.dong@linux.dev>, bpf <bpf@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 2/2] selftests: forwarding: bridge: add a state bypass
+ with disabled VLAN filtering test
+To: Petr Machata <petrm@nvidia.com>
+Cc: netdev@vger.kernel.org, tobias@waldekranz.com, idosch@nvidia.com,
+ kuba@kernel.org, davem@davemloft.net, bridge@lists.linux.dev,
+ pabeni@redhat.com, edumazet@google.com, horms@kernel.org
+References: <20251104120313.1306566-1-razor@blackwall.org>
+ <20251104120313.1306566-3-razor@blackwall.org> <87qzudn256.fsf@nvidia.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <87qzudn256.fsf@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 4, 2025 at 2:49=E2=80=AFAM Menglong Dong <menglong8.dong@gmail.=
-com> wrote:
->
-> In origin call case, we skip the "rip" directly before we return, which
-> break the RSB, as we have twice "call", but only once "ret".
+On 11/4/25 19:15, Petr Machata wrote:
+> 
+> Nikolay Aleksandrov <razor@blackwall.org> writes:
+> 
+>> Add a test which checks that port state bypass cannot happen if we have
+>> VLAN filtering disabled and MST enabled. Such bypass could lead to race
+>> condition when deleting a port because learning may happen after its
+>> state has been toggled to disabled while it's being deleted, leading to
+>> a use after free.
+>>
+>> Signed-off-by: Nikolay Aleksandrov <razor@blackwall.org>
+>> ---
+>>  .../net/forwarding/bridge_vlan_unaware.sh     | 35 ++++++++++++++++++-
+>>  1 file changed, 34 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/tools/testing/selftests/net/forwarding/bridge_vlan_unaware.sh b/tools/testing/selftests/net/forwarding/bridge_vlan_unaware.sh
+>> index 2b5700b61ffa..20769793310e 100755
+>> --- a/tools/testing/selftests/net/forwarding/bridge_vlan_unaware.sh
+>> +++ b/tools/testing/selftests/net/forwarding/bridge_vlan_unaware.sh
+>> @@ -1,7 +1,7 @@
+>>  #!/bin/bash
+>>  # SPDX-License-Identifier: GPL-2.0
+>>  
+>> -ALL_TESTS="ping_ipv4 ping_ipv6 learning flooding pvid_change"
+>> +ALL_TESTS="ping_ipv4 ping_ipv6 learning flooding pvid_change mst_state_no_bypass"
+> 
+> I think you'll need to adjust this test for v2, can you please change
+> the above line to the following while at it?
+> 
 
-RSB meaning return stack buffer?
+ack
 
-and by "breaks RSB" you mean it makes the cpu less efficient?
-Or you mean call depth accounting that is done in sw ?
+> ALL_TESTS="
+> 	ping_ipv4
+> 	ping_ipv6
+> 	learning
+> 	flooding
+> 	pvid_change
+> 	mst_state_no_bypass
+> "
+> 
+>>  NUM_NETIFS=4
+>>  source lib.sh
+>>  
+>> @@ -114,6 +114,39 @@ pvid_change()
+>>  	ping_ipv6 " with bridge port $swp1 PVID deleted"
+>>  }
+>>  
+>> +mst_state_no_bypass()
+>> +{
+>> +	local mac=de:ad:be:ef:13:37
+>> +
+>> +	# Test that port state isn't bypassed when MST is enabled and VLAN
+>> +	# filtering is disabled
+>> +	RET=0
+>> +
+>> +	# MST can be enabled only when there are no VLANs
+>> +	bridge vlan del vid 1 dev $swp1
+>> +	bridge vlan del vid 1 dev $swp2
+> 
+> Pretty sure these naked references will explode in the CI's shellcheck.
+> I expect they'll have to be quoted as "$swp1".
+> 
 
-> Do the RSB balance by pseudo a "ret". Instead of skipping the "rip", we
-> modify it to the address of a "ret" insn that we generate.
->
-> The performance of "fexit" increases from 76M/s to 84M/s. Before this
-> optimize, the bench resulting of fexit is:
->
-> fexit          :   76.494 =C2=B1 0.216M/s
-> fexit          :   76.319 =C2=B1 0.097M/s
-> fexit          :   70.680 =C2=B1 0.060M/s
-> fexit          :   75.509 =C2=B1 0.039M/s
-> fexit          :   76.392 =C2=B1 0.049M/s
->
-> After this optimize:
->
-> fexit          :   86.023 =C2=B1 0.518M/s
-> fexit          :   83.388 =C2=B1 0.021M/s
-> fexit          :   85.146 =C2=B1 0.058M/s
-> fexit          :   85.646 =C2=B1 0.136M/s
-> fexit          :   84.040 =C2=B1 0.045M/s
+Oh haven't written selftests in awhile, I've missed the shellcheck stuff. :)
 
-This is with or without calldepth accounting?
+>> +	bridge vlan del vid 1 dev br0 self
+>> +
+>> +	ip link set br0 type bridge mst_enabled 1
+>> +	check_err $? "Could not enable MST"
+>> +
+>> +	bridge link set dev $swp1 state disabled
+> 
+> Here as well. And more cases are below.
+> 
+> I've got this in my bash history. Might come in handy.
+> 
+>     cat files | while read file; do git show net-next/main:$file > file; shellcheck file > sc-old; git show HEAD:$file > file; shellcheck file > sc-new; echo $file; diff -u sc-old sc-new; done | less
+>
+ 
+Thanks for the hint. I'll add this to my patch review process as well.
 
-> Things become a little more complex, not sure if the benefits worth it :/
->
-> Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
-> ---
->  arch/x86/net/bpf_jit_comp.c | 32 +++++++++++++++++++++++++++++---
->  1 file changed, 29 insertions(+), 3 deletions(-)
->
-> diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
-> index d4c93d9e73e4..a9c2142a84d0 100644
-> --- a/arch/x86/net/bpf_jit_comp.c
-> +++ b/arch/x86/net/bpf_jit_comp.c
-> @@ -3185,6 +3185,7 @@ static int __arch_prepare_bpf_trampoline(struct bpf=
-_tramp_image *im, void *rw_im
->         struct bpf_tramp_links *fmod_ret =3D &tlinks[BPF_TRAMP_MODIFY_RET=
-URN];
->         void *orig_call =3D func_addr;
->         u8 **branches =3D NULL;
-> +       u8 *rsb_pos;
->         u8 *prog;
->         bool save_ret;
->
-> @@ -3431,17 +3432,42 @@ static int __arch_prepare_bpf_trampoline(struct b=
-pf_tramp_image *im, void *rw_im
->                 LOAD_TRAMP_TAIL_CALL_CNT_PTR(stack_size);
->         }
->
-> +       if (flags & BPF_TRAMP_F_SKIP_FRAME) {
-> +               u64 ret_addr =3D (u64)(image + (prog - (u8 *)rw_image));
-> +
-> +               rsb_pos =3D prog;
-> +               /*
-> +                * reserve the room to save the return address to rax:
-> +                *   movabs rax, imm64
-> +                *
-> +                * this is used to do the RSB balance. For the SKIP_FRAME
-> +                * case, we do the "call" twice, but only have one "ret",
-> +                * which can break the RSB.
-> +                *
-> +                * Therefore, instead of skipping the "rip", we make it a=
-s
-> +                * a pseudo return: modify the "rip" in the stack to the
-> +                * second "ret" address that we build bellow.
-> +                */
-> +               emit_mov_imm64(&prog, BPF_REG_0, ret_addr >> 32, (u32)ret=
-_addr);
-> +               /* mov [rbp + 8], rax */
-> +               EMIT4(0x48, 0x89, 0x45, 0x08);
-> +       }
-> +
->         /* restore return value of orig_call or fentry prog back into RAX=
- */
->         if (save_ret)
->                 emit_ldx(&prog, BPF_DW, BPF_REG_0, BPF_REG_FP, -8);
->
->         emit_ldx(&prog, BPF_DW, BPF_REG_6, BPF_REG_FP, -rbx_off);
->         EMIT1(0xC9); /* leave */
-> +       emit_return(&prog, image + (prog - (u8 *)rw_image));
->         if (flags & BPF_TRAMP_F_SKIP_FRAME) {
-> -               /* skip our return address and return to parent */
-> -               EMIT4(0x48, 0x83, 0xC4, 8); /* add rsp, 8 */
-> +               u64 ret_addr =3D (u64)(image + (prog - (u8 *)rw_image));
-> +
-> +               /* fix the return address to second return address */
-> +               emit_mov_imm64(&rsb_pos, BPF_REG_0, ret_addr >> 32, (u32)=
-ret_addr);
+Cheers,
+ Nik
 
-So the first "movabs rax, imm64" is not needed ?
-Why compute ret_addr there and everything ?
-I mean it could have been prog +=3D sizeof(movabs), right?
+>> +	check_err $? "Could not set port state"
+>> +
+>> +	$MZ $h1 -c 1 -p 64 -a $mac -t ip -q
+>> +
+>> +	bridge fdb show brport $swp1 | grep -q de:ad:be:ef:13:37
+>> +	check_fail $? "FDB entry found when it shouldn't be"
+>> +
+>> +	log_test "VLAN filtering disabled and MST enabled port state no bypass"
+>> +
+>> +	ip link set br0 type bridge mst_enabled 0
+>> +	bridge link set dev $swp1 state forwarding
+>> +	bridge vlan add vid 1 dev $swp1 pvid untagged
+>> +	bridge vlan add vid 1 dev $swp2 pvid untagged
+>> +	bridge vlan add vid 1 dev br0 self
+>> +}
+>> +
+>>  trap cleanup EXIT
+>>  
+>>  setup_prepare
+> 
 
-> +               /* this is the second(real) return */
-> +               emit_return(&prog, image + (prog - (u8 *)rw_image));
->         }
-> -       emit_return(&prog, image + (prog - (u8 *)rw_image));
 
