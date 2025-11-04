@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-235396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB72AC2FD7C
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 09:25:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18071C2FE3F
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 09:30:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5492E34D64B
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 08:25:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E31E19209EF
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 08:26:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345B7313E03;
-	Tue,  4 Nov 2025 08:19:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E1BA314D08;
+	Tue,  4 Nov 2025 08:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EX3qRrcN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F/UtMIYU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 079C8306B0D;
-	Tue,  4 Nov 2025 08:19:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1304D30F941;
+	Tue,  4 Nov 2025 08:20:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762244345; cv=none; b=H0zZrZp2/pHNiYIS0H3kMuzggPXKndThBcvPTF2LP7E5UHJu7z8snA18OWxZ6W3S6JojRw4dZW/45KNcj00Te4vR2dYW+MZWyiUT0CWQ2f7hAdkHkvzbFii6EK44yQ+AnJKve1FXl+3QaZ4MrCYdKL2SIxnAsLdXr6r4cbPzEcI=
+	t=1762244430; cv=none; b=MC2VWgR6lCotmIMOtES7b/+fz6IRoHOwaICz4a/K3IyJ27/bH6LzTlGWRjhnfgs4tk5ds6MFVwHAvsrXdmv9eMfRh1hd0uChgVFaIO0apxE9+gXV6vtfxVcX3bWsC4aryf+dNfEy+1IHrLEg4ZzNdxUyxSgSaKCnLzw6iWeml1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762244345; c=relaxed/simple;
-	bh=i4i2ZezZUkHgyxzI36i1jgZxCZSfy03Oaa0uCLjqanU=;
+	s=arc-20240116; t=1762244430; c=relaxed/simple;
+	bh=6jABtiP9twriCAafB7qhdYkC2NWk+AwMtjQZTn4C2Rc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ELzHgAwE/DTkBudC6/rMrFU4OjluVKT7q1q9QBGCGTGrEDeRCYjfQGvR7bRORyP5rJ62Hg5dgCcQaXW6Fpzo5kz48v3j0EWztp076WhKdPAlvVuDvTuoIgkdSgd5LVNvDh9ZCljuibn4d76a/QTzL9RxiwJpK/z+phuRQpterKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EX3qRrcN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 927A6C4CEF7;
-	Tue,  4 Nov 2025 08:19:03 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=qOmzuM0xq+4lYfzFbaN/2Yz5F/HU3VzyC53cQnNnanUQwI80Ljbuohnh7lyVUtMEmgoUVyH53WDdbZFNPIvX5TofvbDuSAAcrKYh+2YypUKlY1p/frKdEpMR3ym8mTSXEVwAU9bC0y2SWPJEG0iQ/VuiLVF2yIr1CjJGbtO/VHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F/UtMIYU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BB78C4CEF7;
+	Tue,  4 Nov 2025 08:20:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762244344;
-	bh=i4i2ZezZUkHgyxzI36i1jgZxCZSfy03Oaa0uCLjqanU=;
+	s=k20201202; t=1762244429;
+	bh=6jABtiP9twriCAafB7qhdYkC2NWk+AwMtjQZTn4C2Rc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EX3qRrcNsxISHXHS3gzCD3Q+b90CC4lAcftjm0w3Ite6R4rXomGsnm4tqFBqYOBbO
-	 NT29rRKutGn8d1BWvXZgSzWx3d0eHPCSjDk7iwpkP6I3hRZcYj1SSmMV1gcI4dPsMb
-	 c6hu+ZgxWlSPmfFbBJa3+qMDKfRPtD/AlDjzqa+yHRsd8j1EmMaEk9urXUYFt975k+
-	 vlSNOV9xLf5+DpkPy3nNQwce5lq7Kro2PnzI3gbusASkI3Z6aOfpw3ldRE+ittBwZQ
-	 mQoC/OQxInggfVu74SM/X/Pxt3FfzYcBUYcqCX0EAud0fx+rVJIAnQV1ihGgW7oFi2
-	 9oeKFf88+901w==
-Date: Tue, 4 Nov 2025 09:19:01 +0100
+	b=F/UtMIYUTCw7UuAF9ifUV2bMlp41aMmcBIUBJORgkZB30LLHmuz5KXhEbbzN934YZ
+	 GQhbh+pgeMaaScX3k5Osd9TsIcCBB97MDUtjBNcwPx/VGrSntzG9+96E7QGOZjzlFY
+	 bgNFFIar+xKpx2US5yb1If682qFHgNMo/EXBhKSIHVSLgHrDhTCGc/qCmo9kecprat
+	 3u4T/P2Qu0Bc83QpxNpHqVmkhIFEX+2KaHtsWYKUO/9gY2zu/iwIDLgxB9WiraWnDk
+	 xQynuOYpwwzR9HH05orJUGrVbMH7tqbDr8fiNUIbilQ7Kpy6eaoh2IkY0uge3aR2eM
+	 ErY0lNpemZBGA==
+Date: Tue, 4 Nov 2025 09:20:27 +0100
 From: Krzysztof Kozlowski <krzk@kernel.org>
 To: Jacky Chou <jacky_chou@aspeedtech.com>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -52,11 +52,9 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Andrew Jeffery <andrew@codeconstruct.com.au>, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
 	linux-aspeed@lists.ozlabs.org, taoren@meta.com
-Subject: Re: [PATCH net-next v3 1/4] dt-bindings: net: ftgmac100: Add delay
- properties for AST2600
-Message-ID: <20251104-victorious-crab-of-recreation-d10bf4@kuoka>
+Subject: Re: [PATCH net-next v3 0/4] Add AST2600 RGMII delay into ftgmac100
+Message-ID: <20251104-dangerous-auk-of-order-6afab2@kuoka>
 References: <20251103-rgmii_delay_2600-v3-0-e2af2656f7d7@aspeedtech.com>
- <20251103-rgmii_delay_2600-v3-1-e2af2656f7d7@aspeedtech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,19 +63,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251103-rgmii_delay_2600-v3-1-e2af2656f7d7@aspeedtech.com>
+In-Reply-To: <20251103-rgmii_delay_2600-v3-0-e2af2656f7d7@aspeedtech.com>
 
-On Mon, Nov 03, 2025 at 03:39:16PM +0800, Jacky Chou wrote:
-> Create the new compatibles to identify AST2600 MAC0/1 and MAC3/4.
-> Add conditional schema constraints for Aspeed AST2600 MAC controllers:
-> - For "aspeed,ast2600-mac01", require rx/tx-internal-delay-ps properties
->   with 45ps step.
-> - For "aspeed,ast2600-mac23", require rx/tx-internal-delay-ps properties
->   with 250ps step.
+On Mon, Nov 03, 2025 at 03:39:15PM +0800, Jacky Chou wrote:
+> This patch series adds support for configuring RGMII internal delays for the
+> Aspeed AST2600 FTGMAC100 Ethernet MACs. It introduces new compatible strings to
+> distinguish between MAC0/1 and MAC2/3, as their delay chains and configuration
+> units differ.
+> The device tree bindings are updated to restrict the allowed phy-mode and delay
+> properties for each MAC type. Corresponding changes are made to the device tree
+> source files and the FTGMAC100 driver to support the new delay configuration.
+> 
+> Summary of changes:
+> - dt-bindings: net: ftgmac100: Add conditional schema for AST2600 MAC0/1 and
+>   MAC2/3, restrict delay properties, and require SCU phandle.
+> - ARM: dts: aspeed-g6: Add ethernet aliases to indentify the index of
+>   MAC.
+> - ARM: dts: aspeed-ast2600-evb: Add new compatibles, scu handle and
+>   rx/tx-internal-delay-ps properties and update phy-mode for MACs.
+> - net: ftgmac100: Add driver support for configuring RGMII delay for AST2600
+>   MACs via SCU.
+> 
+> This enables precise RGMII timing configuration for AST2600-based platforms,
+> improving interoperability with various PHYs
+> 
+> ---
+> v3:
+>  - Add new item on compatible property for new compatible strings
+>  - Remove the new compatible and scu handle of MAC from aspeed-g6.dtsi
+>  - Add new compatible and scu handle to MAC node in
+>    aspeed-ast2600-evb.dts
+>  - Change all phy-mode of MACs to "rgmii-id"
+>  - Keep "aspeed,ast2600-mac" compatible in ftgmac100.c and configure the
+>    rgmii delay with "aspeed,ast2600-mac01" and "aspeed,ast2600-mac23"
+> v2:
+>  - added new compatible strings for MAC0/1 and MAC2/3
+>  - updated device tree bindings to restrict phy-mode and delay properties
+>  - refactored driver code to handle rgmii delay configuration
 
-That difference does not justify different compatibles. Basically you
-said they have same programming model, just different hardware
-characteristics, so same compatible.
+That's b4 managed change, so where are the lorelinks? Why are you
+removing them?
+
+Since you decided to drop them making it difficult for me to find
+previous revisions, I will not bother to look at background of this
+patchset to understand why you did that way and just NAK the binding.
+
+Next time, make it easy for reviewers, not intentionally difficult.
 
 Best regards,
 Krzysztof
