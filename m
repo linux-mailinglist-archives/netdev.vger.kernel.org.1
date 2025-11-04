@@ -1,109 +1,121 @@
-Return-Path: <netdev+bounces-235422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D858DC304EA
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 10:40:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88D7EC3053B
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 10:46:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F433421852
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 09:28:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E75203AB35A
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 09:37:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A2BF2BCF41;
-	Tue,  4 Nov 2025 09:28:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y/IMITft"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A336306B0D;
+	Tue,  4 Nov 2025 09:37:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from inva020.nxp.com (inva020.nxp.com [92.121.34.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6AFE2C324D
-	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 09:28:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F134E153BED
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 09:37:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762248505; cv=none; b=AZ3RfRy2k5FoBXyUAWGvrTPzX8S42sAjtJg+9t6IjOS/CsAd7GQabzh99uBNNgp/EXUos9gJbhD56m0/Nzj6WokB0vTd201BZ1GzPSY4AAYwhHEirQAq+ZmfcH9KA0dBzeJEZfpX6KtR+ndjBI50BZEwoizqO5jLyEWKcVkr6Q4=
+	t=1762249042; cv=none; b=GrocpDkFj9UXgokLUKFta71hsBpxqRi4mz7UCRqhx1qSDvPttfTWzlGnVum8eIj4uMhaidfXcwRjG+9Ku8UQQMZMzDigv1gXPIf51cPn8UkCrkUv93UziSmueCMNf33BfIeMABmujsRGHSeVTeqWXPctXW9dcWfBgBrMEPNB9d0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762248505; c=relaxed/simple;
-	bh=FHiaQB8dkhlKzijHAIxD9g1bXh6dj1dMF5lAHPTH2Ko=;
+	s=arc-20240116; t=1762249042; c=relaxed/simple;
+	bh=iRvoS7EKii9nQ3eFT/bShvE8cVFKgcD7Qj1aV7DZQCk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MrLRa9i4T1I+K5uR3ateoS+GmlCkSjJBQ4upl61xp7hz4i2SCTksmlxIArTRgjicS6UZ9LmSytRp6plODr5y7rksDnQSKcCJcWrZ2dDO5IJvT1CJHNE7EuF/NkQnf+eH9wfWC5g9xprqOc8TlDlY8p0IkgvB+Edy+OfhfkuHDao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y/IMITft; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762248502;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yQFv1OAs06HmUQpyPU8NyiNImlb6aieKdzgbQcZa9yQ=;
-	b=Y/IMITft8Q/sty4aRzsXo6mmgyxBeU0j72L8Vzf2kF3vZNmGEp0rVK3r1puqekIWVYE2Kk
-	WFqsFVw5pRUQNaEEVr0o2Wvr2Gu+8L7Y2RQUfDQCB3/6UC8ZUAw/yO6W/1EUcv7xpb/dkN
-	uglsxWD3XTv82W56iUw8PuRd3qGo1io=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-643-yc2K3xmtPd-RIzQwEh0PMw-1; Tue,
- 04 Nov 2025 04:28:17 -0500
-X-MC-Unique: yc2K3xmtPd-RIzQwEh0PMw-1
-X-Mimecast-MFC-AGG-ID: yc2K3xmtPd-RIzQwEh0PMw_1762248496
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7FC9F1956053;
-	Tue,  4 Nov 2025 09:28:16 +0000 (UTC)
-Received: from localhost (unknown [10.43.135.229])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5E49D30001A1;
-	Tue,  4 Nov 2025 09:28:14 +0000 (UTC)
-Date: Tue, 4 Nov 2025 10:28:19 +0100
-From: Miroslav Lichvar <mlichvar@redhat.com>
-To: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc: netdev@vger.kernel.org, Willem de Bruijn <willemb@google.com>
-Subject: Re: [PATCH net-next v2] wireguard: queuing: preserve napi_id on
- decapsulation
-Message-ID: <aQnHMyJYU4kuCWCf@localhost>
-References: <20251103103442.180270-1-mlichvar@redhat.com>
- <CAHmME9qcj=zHHm0-gTeSLxqwufEBFO721ciYQODTws6wTb7+Rg@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=g3TyiIQxepd7QmHrBdDVd7P99RtDNgUjc9IBC7eHZrzV+NQfSlSyN2xbO7W4bB24Vg5be3pOxgmAxwD6BXseH3ldosspLfP+KXaOeH9ap7SOBrCPANnEbhqd7BCzWGhyvTSL3CiDhH0Mg2geE7TuVMBqF6CLF+EXzhSobtClefY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; arc=none smtp.client-ip=92.121.34.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id E01321A0135;
+	Tue,  4 Nov 2025 10:37:10 +0100 (CET)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id D26211A004C;
+	Tue,  4 Nov 2025 10:37:10 +0100 (CET)
+Received: from lsv051416.swis.nl-cdc01.nxp.com (lsv051416.swis.nl-cdc01.nxp.com [10.168.48.122])
+	by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 38F12202E8;
+	Tue,  4 Nov 2025 10:37:10 +0100 (CET)
+Date: Tue, 4 Nov 2025 10:37:10 +0100
+From: Jan Petrous <jan.petrous@oss.nxp.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Fabio Estevam <festevam@gmail.com>, imx@lists.linux.dev,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>, s32@nxp.com,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Shawn Guo <shawnguo@kernel.org>
+Subject: Re: [PATCH net-next 02/11] net: stmmac: s32: move PHY_INTF_SEL_x
+ definitions out of the way
+Message-ID: <aQnJRgJqFY99kDUj@lsv051416.swis.nl-cdc01.nxp.com>
+References: <aQiWzyrXU_2hGJ4j@shell.armlinux.org.uk>
+ <E1vFt4S-0000000ChoS-2Ahi@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHmME9qcj=zHHm0-gTeSLxqwufEBFO721ciYQODTws6wTb7+Rg@mail.gmail.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+In-Reply-To: <E1vFt4S-0000000ChoS-2Ahi@rmk-PC.armlinux.org.uk>
+X-Virus-Scanned: ClamAV using ClamSMTP
 
-On Mon, Nov 03, 2025 at 05:00:19PM +0100, Jason A. Donenfeld wrote:
-> On Mon, Nov 3, 2025 at 11:34 AM Miroslav Lichvar <mlichvar@redhat.com> wrote:
-> > +       } else {
-> > +#ifdef CONFIG_NET_RX_BUSY_POLL
-> > +               skb->napi_id = napi_id;
-> > +#endif
+On Mon, Nov 03, 2025 at 11:50:00AM +0000, Russell King (Oracle) wrote:
+> S32's PHY_INTF_SEL_x definitions conflict with those for the dwmac
+> cores as they use a different bitmapping. Add a S32 prefix so that
+> they are unique.
 > 
-> It looks like io_uring has timestamping on tx, not just rx:
-> SOCKET_URING_OP_TX_TIMESTAMP -> io_uring_cmd_timestamp ->
-> io_process_timestamp_skb -> skb_get_tx_timestamp -> skb_napi_id
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
+> index ee095ac13203..2b7ad64bfdf7 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
+> @@ -24,10 +24,10 @@
+>  #define GMAC_INTF_RATE_125M	125000000	/* 125MHz */
+>  
+>  /* SoC PHY interface control register */
+> -#define PHY_INTF_SEL_MII	0x00
+> -#define PHY_INTF_SEL_SGMII	0x01
+> -#define PHY_INTF_SEL_RGMII	0x02
+> -#define PHY_INTF_SEL_RMII	0x08
+> +#define S32_PHY_INTF_SEL_MII	0x00
+> +#define S32_PHY_INTF_SEL_SGMII	0x01
+> +#define S32_PHY_INTF_SEL_RGMII	0x02
+> +#define S32_PHY_INTF_SEL_RMII	0x08
+>  
+>  struct s32_priv_data {
+>  	void __iomem *ioaddr;
+> @@ -40,7 +40,7 @@ struct s32_priv_data {
+>  
+>  static int s32_gmac_write_phy_intf_select(struct s32_priv_data *gmac)
+>  {
+> -	writel(PHY_INTF_SEL_RGMII, gmac->ctrl_sts);
+> +	writel(S32_PHY_INTF_SEL_RGMII, gmac->ctrl_sts);
+>  
+>  	dev_dbg(gmac->dev, "PHY mode set to %s\n", phy_modes(*gmac->intf_mode));
+>  
+> -- 
+> 2.47.3
+> 
 
-That doesn't seem to be reachable. skb_get_tx_timestamp() calls
-get_timestamp()->skb_napi_id() only when the SKBTX_HW_TSTAMP_NETDEV
-flag is set, which is done only by two drivers (tsnep, igc) and only
-in the RX path. Using a tx_flags field for RX is slightly confusing.
+Reviewed-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
 
-> So are you sure this should be in an `else {` block?
-
-Yes, at least for the use case with the timestamping option I'm trying
-to fix. If it was outside of the else block, it would be copying the
-sender_cpu field of the union (used by XPS). Maybe it would make sense
-to do that too, I know nothing about XPS, but in that case the value
-shouldn't be read by skb_napi_id(), which is enabled only by
-CONFIG_NET_RX_BUSY_POLL.
-
--- 
-Miroslav Lichvar
+Thanks.
+/Jan
 
 
