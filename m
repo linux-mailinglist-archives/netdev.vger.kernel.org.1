@@ -1,124 +1,167 @@
-Return-Path: <netdev+bounces-235515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 214AFC31C00
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 16:10:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06D7FC31CB4
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 16:16:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B94B18C6A02
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 15:05:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59E4A3B41D1
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 15:09:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 655AA24C669;
-	Tue,  4 Nov 2025 15:05:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D5C1B0439;
+	Tue,  4 Nov 2025 15:09:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RmVKbJdp"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="LkLRZbLY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6E0A244679
-	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 15:05:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B414EDF71
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 15:09:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762268707; cv=none; b=q+X6S71VSgRYlVPD7yO82+rrm6u/5cjEXbYkvffZtxmsi5nK8mRm1AlGqcniCWFi0lGIWiTCGi6m7cJHPqfaRqxwJhr5iVpUUfuPglN26jlVfDYMoPpkyi/cKDaI+Wu8ut3bFL8nSf+D3TXaNiktSxRQ+u7RrFaIfBsOtaj4igg=
+	t=1762268955; cv=none; b=Ci+xnd46R+fhFjG8Xxi0O9ynvYoD4CtD9PTt6TTEdBw6prYsadoOLJheTLDS2oZMOwDlpbKdH+N24mYh2uoyHbcwG26A7cCmU9ErZ/G9xdqzi+pBEmM2V+y801qa68ju1trTv12BVhp2tLOcwgb7oZFPQfrP5v8fIPt45CP2Y6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762268707; c=relaxed/simple;
-	bh=cwPu1H4ZKjGzPG+km20RpnlT5kiz4rAex8/UOBoTR2U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fKXtaG+lfojYLgFIUmQBKmI8if775tRwHoZYoIXHRb7GiPNuy9FQKULChfNe7vtS1Q1F4+rBXIIJtovT2Tmz7+NwUE2+pH7s5AdZufbAtSd3BweXEa6T5s0IQCm/9eEn7fIlEc4LcyN80nTgdQW1F6JMeNZ6aRd++260vwn+ZS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RmVKbJdp; arc=none smtp.client-ip=209.85.222.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-89e8a3fa70fso463970485a.0
-        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 07:05:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762268704; x=1762873504; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cwPu1H4ZKjGzPG+km20RpnlT5kiz4rAex8/UOBoTR2U=;
-        b=RmVKbJdp0HhYl0K4Y7Mt2NEsl9vPeBEpQx2PiLlEKoLdC0gAfcGG68HLMeZk/dKJ1H
-         I4H6su3VUhhOPp7LaUzRthDSTr0J4GHU/rUsWSbMhv/oiT8a6hL0uTvkwZUFnBpurhpA
-         j6ege8XAYUI8iwdBFQqGYAB1lWzx4DC/vQ77/K2y+xvmRJlWKUImO7IMjAyvagtqEgR8
-         NaXoF/NHTQLZhKBGNQZrJs6emY6GMJfEI3gwUO4113xfFCVEsfJKm1ruJtXL3UwFDlbT
-         tfI3YtN035hw9q6AZLN09yvC1vEqAf+9JTh8yNE/qZDRo3j3OtlcxBPvUw0/Ct3A93GX
-         tr+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762268704; x=1762873504;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cwPu1H4ZKjGzPG+km20RpnlT5kiz4rAex8/UOBoTR2U=;
-        b=rV7RPjq/7n9CW+L/01fmtgwM25T0VAppmFLzxtEv0gp9yBTRpJuK9sg58gRO8f8IV6
-         uo6iktnrfcZSqQCpaMci8QuyWBtL39unKuAQFAEqxU9dLpgkjjzsXZ+z3fMCF7Y7xguD
-         O2We8uWI92JrS3TJKP2ccV9ZTCaEUKqcNDnGEmyWDsduYHHAnfBAMqDrpFvxXlVIXVMs
-         dvI0a+u6+eHXvyQ8YQnZMJCMBc5CrYb5NZ1LRbTxKxRTm+qxFZWY6klUpdFEktaJOo/f
-         YUGBO761BXeTZix7RGO+VfxMDh8rkJ2xHa8P3OCxaIru32WBGTGXE57rvvBhXNOb0lKt
-         aGDA==
-X-Forwarded-Encrypted: i=1; AJvYcCVfqN1eOguzP1p3Q3ENf+OGMwPk5zCgYnMcy2rpdSq4FrHAfjoUenUU2LlLXcObxOU0LTpRr1o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywimq9HdrN+rvKaHpkN5irfbkCfiAxGfS6qdaYo5eDbcvYABoXg
-	S1qW7nyDzaadOVHddIsTWwBe6ub/v7Xw1tY7rJRuu6zcQtKOoqlmgEGEL+M5O8D5VbUTW05v8W+
-	wuSb1u5Bu6ygZGcXIRyk2bf/fTNnZB/zlpl5EBkCecUIGaGnXAXlpIvkbCNo=
-X-Gm-Gg: ASbGncv7wWUhUalAFbxkdWW272qiUaslaS39B4eYPTJd1CctgxX37mEIz/91A9elA0Q
-	60iV1B1S4pXe8mFSKz0drd6CGRg2NVYiK0IuDUVGK6VWbbRpigjF5weIvtCR6EAmZuS9G3m7AgN
-	dfojD/R0Px4vOzVRa5atydV9w8bnXKdoXyEj5Mumd+6b0Uypgtk/TTqQUM9qZC31UvEQnxeiVgB
-	Kmn8/n6tA4auTyh1pZ//Wg4OKKHH7xvg1pxpT9HUk0fiG1vtiNbT6Kuuwke
-X-Google-Smtp-Source: AGHT+IHSrTtiiSwZoyqLSYpCgA6kSquvnXQeGH7yjihO3hWS2cXF9MlyDir7aymiAMp2pn8urxoEpCz+a67PZV3to1M=
-X-Received: by 2002:ac8:58d5:0:b0:4e8:b980:4792 with SMTP id
- d75a77b69052e-4ed30e12cbcmr196277331cf.37.1762268703930; Tue, 04 Nov 2025
- 07:05:03 -0800 (PST)
+	s=arc-20240116; t=1762268955; c=relaxed/simple;
+	bh=Vp8CzUQPKs3QMnMcFAnhkYuhi/eLiOPfzbVZQ9805+w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aD2lgBANyH5Md21qHWmARKynJbHS0JMBXVjKfqI6ca0deCPR4mJSJrEt/sVhnyHogSNX/yiZ7KSIjiHwrZlthhwuEJS/aYfNucJWszlhAHru2HobWSdC18BDQU6pmc8u3ejkeK6FcoOx0FI6EqZmpRLCctE8hzAr4GIdJyaXiyI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=LkLRZbLY; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5A4ExYkM026294;
+	Tue, 4 Nov 2025 15:08:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=hQBwQoGzHrMQMWBFlP8/3WEktsb+1
+	DIpXJFeBQPhykw=; b=LkLRZbLYuzTXiRy8RX2LwUPIBasAfO4eScwKSkz+bt1aV
+	spwzWYCqFfLArkehautY+2VPW8f7n6KqPaQheROx9/dAG5k8KgBFlvc2Yd+IB8Tf
+	YykCUrCT2+30baREe/OVKehO5fuUpR0YPaEmuSY1pkB+/w7+RVcREEenHc1wpL56
+	V7bCmfqOmRp8zDxWBfcYAlaCHEmHITaRjGvATzq8nfwpTkl6VXZrstjVJ872tGJZ
+	WEtMqP/D5YH4ug/C2TouDbXZ+RORK29LM0Rq5WLH6Y9gwv9xB2GN0cUV3YZ4pusY
+	/f/jPZ2I2z4ZCVEGg4eAX87MNU+RvEZ9yEOsq8lAQ==
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4a7kr0r0nq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 04 Nov 2025 15:08:57 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5A4Dmh4t022014;
+	Tue, 4 Nov 2025 15:08:57 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4a58nkg7aj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 04 Nov 2025 15:08:57 +0000
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5A4F8uS0014809;
+	Tue, 4 Nov 2025 15:08:56 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 4a58nkg77r-1;
+	Tue, 04 Nov 2025 15:08:56 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: przemyslaw.kitszel@intel.com, aleksander.lobakin@intel.com,
+        anthony.l.nguyen@intel.com, andrew+netdev@lunn.ch, kuba@kernel.org,
+        davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+        horms@kernel.org, intel-wired-lan@lists.osuosl.org,
+        netdev@vger.kernel.org
+Cc: alok.a.tiwarilinux@gmail.com, alok.a.tiwari@oracle.com
+Subject: [PATCH net-next v2] iavf: clarify VLAN add/delete log messages and lower log level
+Date: Tue,  4 Nov 2025 07:08:35 -0800
+Message-ID: <20251104150849.532195-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <E3B93E31-3C03-4DAF-A9ED-69523A82E583@akamai.com>
- <CANn89iJQ_Hx_T7N6LPr2Qt-_O2KZ3GPgWFtywJBvjjTQvGwy2Q@mail.gmail.com> <aQoQ9pEKia_8Uuzi@krikkit>
-In-Reply-To: <aQoQ9pEKia_8Uuzi@krikkit>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 4 Nov 2025 07:04:52 -0800
-X-Gm-Features: AWmQ_bm00Y4lDc2gvkTLAB0jD-NSXdm47k6eRZMtTSeg9FQHqj3mihN8Xh7NFiY
-Message-ID: <CANn89iJaUgXMApeS-+Tbq4-48dOUESmpzEMW21mGkQi-0CahpA@mail.gmail.com>
-Subject: Re: skb_attempt_defer_free and reference counting
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: "Hudson, Nick" <nhudson@akamai.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-04_01,2025-11-03_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 bulkscore=0 spamscore=0
+ suspectscore=0 mlxscore=0 adultscore=0 phishscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2510240000
+ definitions=main-2511040126
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA0MDEyNCBTYWx0ZWRfX1dCixKPHWNj9
+ mMn81lHtRovp90dOQy+CqFH8NQUd6OXujDobssxY0/RYYy3UiTu7yDJ8b5HLp7gXyiE83vTNsEi
+ dTANCjxx986n70rqFUXp0m7guygmI6lyG1kIpyKqrKO/XKGxmJDcSZWnnSXCjV2ZXnBCGcyJFOG
+ MHBmhy5UVk/mxRF/B7jlrKsOBBEecWrSK16y9GIbnX+Ql65jgOyuArpV1t74PFV2/rT1AmN/WC2
+ 9le65JY6eFmBKBhhqVAGpMhopuiq8VAO8UaeRnIO70LErB/B10zq9Dq+xzFyE98KgVfDyGF2Esc
+ 4b1lsptqlYrJRV4sNnSx5FyNHVZRYAh03gwNMiBFJLuUuHM7W+K6ewexfZU9LzEEN/dSlf0vgi8
+ z4TsG0lDFGKjSNWaiPKLLOphLcjE6TZBQTQbvMAOIC1KZOaWSkU=
+X-Authority-Analysis: v=2.4 cv=Z5fh3XRA c=1 sm=1 tr=0 ts=690a1709 b=1 cx=c_pps
+ a=qoll8+KPOyaMroiJ2sR5sw==:117 a=qoll8+KPOyaMroiJ2sR5sw==:17
+ a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=QyXUC8HyAAAA:8 a=yPCof4ZbAAAA:8
+ a=aDMgItlAmnlL-JTvjQ0A:9 cc=ntf awl=host:12124
+X-Proofpoint-ORIG-GUID: bYrG44d6fm9pxrGPK0mk727xPe8vhZFt
+X-Proofpoint-GUID: bYrG44d6fm9pxrGPK0mk727xPe8vhZFt
 
-On Tue, Nov 4, 2025 at 6:43=E2=80=AFAM Sabrina Dubroca <sd@queasysnail.net>=
- wrote:
->
-> 2025-10-31, 04:43:19 -0700, Eric Dumazet wrote:
-> > On Fri, Oct 31, 2025 at 4:04=E2=80=AFAM Hudson, Nick <nhudson@akamai.co=
-m> wrote:
-> > >
-> > > Hi,
-> > >
-> > > I=E2=80=99ve been looking at using skb_attempt_defer_free and had a q=
-uestion about the skb reference counting.
-> > >
-> > > The existing reference release for any skb handed to skb_attempt_defe=
-r_free is done in skb_defer_free_flush (via napi_consume_skb). However, it =
-seems to me that calling skb_attempt_defer_free on the same skb to drop the=
- multiple references is problematic as, if the defer_list isn=E2=80=99t ser=
-viced between the calls, the list gets corrupted. That is, the skb can=E2=
-=80=99t appear on the list twice.
-> > >
-> > > Would it be possible to move the reference count drop into skb_attemp=
-t_defer_free and only add the skb to the list on last reference drop?
-> >
-> > We do not plan using this helper for arbitrary skbs, but ones fully
-> > owned by TCP and UDP receive paths.
-> >
-> > skb_share_check() must have been called before reaching them.
->
-> Do you think it's worth adding another DEBUG_NET_WARN_ON_ONCE check to
-> skb_attempt_defer_free(), to validate (and in a way, document) that
-> assumption?
+The current dev_warn messages for too many VLAN changes are confusing
+and one place incorrectly references "add" instead of "delete" VLANs
+due to copy-paste errors.
 
-Let's see first if Nick Hudson proposes a working patch, with some numbers.=
-..
+- Use dev_info instead of dev_warn to lower the log level.
+- Rephrase the message to: "[vvfl|vvfl_v2] Too many VLAN [add|delete]
+  requests; splitting into multiple messages to PF".
+
+Suggested-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+---
+v1 -> v2
+remove "\n" b/w message 
+added vvfl and vvfl_v2 prefix
+---
+ drivers/net/ethernet/intel/iavf/iavf_virtchnl.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+index 34a422a4a29c..c9495c260e6a 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
+@@ -793,7 +793,8 @@ void iavf_add_vlans(struct iavf_adapter *adapter)
+ 
+ 		len = virtchnl_struct_size(vvfl, vlan_id, count);
+ 		if (len > IAVF_MAX_AQ_BUF_SIZE) {
+-			dev_warn(&adapter->pdev->dev, "Too many add VLAN changes in one request\n");
++			dev_info(&adapter->pdev->dev,
++				 "vvfl Too many VLAN add requests; splitting into multiple messages to PF\n");
+ 			while (len > IAVF_MAX_AQ_BUF_SIZE)
+ 				len = virtchnl_struct_size(vvfl, vlan_id,
+ 							   --count);
+@@ -838,7 +839,8 @@ void iavf_add_vlans(struct iavf_adapter *adapter)
+ 
+ 		len = virtchnl_struct_size(vvfl_v2, filters, count);
+ 		if (len > IAVF_MAX_AQ_BUF_SIZE) {
+-			dev_warn(&adapter->pdev->dev, "Too many add VLAN changes in one request\n");
++			dev_info(&adapter->pdev->dev,
++				 "vvfl_v2 Too many VLAN add requests; splitting into multiple messages to PF\n");
+ 			while (len > IAVF_MAX_AQ_BUF_SIZE)
+ 				len = virtchnl_struct_size(vvfl_v2, filters,
+ 							   --count);
+@@ -941,7 +943,8 @@ void iavf_del_vlans(struct iavf_adapter *adapter)
+ 
+ 		len = virtchnl_struct_size(vvfl, vlan_id, count);
+ 		if (len > IAVF_MAX_AQ_BUF_SIZE) {
+-			dev_warn(&adapter->pdev->dev, "Too many delete VLAN changes in one request\n");
++			dev_info(&adapter->pdev->dev,
++				 "vvfl Too many VLAN delete requests; splitting into multiple messages to PF\n");
+ 			while (len > IAVF_MAX_AQ_BUF_SIZE)
+ 				len = virtchnl_struct_size(vvfl, vlan_id,
+ 							   --count);
+@@ -987,7 +990,8 @@ void iavf_del_vlans(struct iavf_adapter *adapter)
+ 
+ 		len = virtchnl_struct_size(vvfl_v2, filters, count);
+ 		if (len > IAVF_MAX_AQ_BUF_SIZE) {
+-			dev_warn(&adapter->pdev->dev, "Too many add VLAN changes in one request\n");
++			dev_info(&adapter->pdev->dev,
++				 "vvfl_v2 Too many VLAN delete requests; splitting into multiple messages to PF\n");
+ 			while (len > IAVF_MAX_AQ_BUF_SIZE)
+ 				len = virtchnl_struct_size(vvfl_v2, filters,
+ 							   --count);
+-- 
+2.50.1
+
 
