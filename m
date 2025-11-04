@@ -1,385 +1,286 @@
-Return-Path: <netdev+bounces-235310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A896C2E99C
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 01:30:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92E1FC2E9AE
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 01:31:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D852C1893836
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 00:31:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D25891899C16
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 00:31:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 991F61F5842;
-	Tue,  4 Nov 2025 00:30:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 651361F1534;
+	Tue,  4 Nov 2025 00:31:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kvY85oEv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZAVr4ate"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF8611C3BEB
-	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 00:30:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E237249E5;
+	Tue,  4 Nov 2025 00:31:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762216233; cv=none; b=mKwiJKtyYrv66s89/euxWDFe33YG8DYDzfTysOUqfIgUEYG6Ki9niarVVisIgYX4UIZJO+l4D6H0AillV2m67fZVCV3LpRECOnDM/GhSe3BU6t92ClgK3zJ5cpG/GgzeCeVn6wBeWrQch4khrudJs8JUHbXLhN/3FuDoFm4MR4o=
+	t=1762216263; cv=none; b=dhj1zS3/UffcOjfs4pSZ5nWoY6vzuhP+K7JqOrWO+tiDNdwAKFjnMEDssdtE94PuIetls2eFiuHgMEwv/4r46sD2hGTk0oiBBhx1hSAkyEIa64T++0cKki4sZyO3c/X25QHhDKZUmYmV4dm9FZso2Rn7A1BQqH27qDBCRKj8Q84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762216233; c=relaxed/simple;
-	bh=CiLhLbG/M7HwnYjSqGUrPgkG+/V5ygCbc8QsfCLg1zo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=n85zwpVVUeeRAFi3ZcQ1qN9cF3thRw/DIgoAzrCSGPQ4syDJMpLXEViiZmtTxCJoNT+1LWe6mgDGYBZYG3D0Zf8cwHZMnSbuutVT4VtBWgqkcyVvB+hXLXmb0B6J4EI/lA3Yop2kZ0n4YhhMoyacstqBGI4ORTNDLy5QxIM2abA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kvY85oEv; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2955623e6faso24791625ad.1
-        for <netdev@vger.kernel.org>; Mon, 03 Nov 2025 16:30:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762216230; x=1762821030; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AqcCRqTl/qoCqnjiqKwU9PLeLoMNE7fr5oh2+DkTABg=;
-        b=kvY85oEv9E7LDQMgG7XbiS4kjJE/8zQo8dVWfmRiohVaCopBFVcblOsD3haa5U0lkV
-         Cb/qKI1fnu7vQoCVILzabC1ZjXIzchDSANP/VznfD2ABHYxACR64uryQSBnZrE7HBs2W
-         JztfF3aQ8/Jtqv3gvWwATUohyXPBcVPXDB6blVgf82ajHG3wHIFNzTRu3QiLM+BD1pvX
-         v6HbAPRsbz6bswBusAjv7UToUWk+EjK0VqrlSjEkjmt5vTFBlqD3sgegmvXWYoAYMb6g
-         AnqfG1Au7OxQSb3ih1g9oytXWPwx3uwmaOTCW/wIlkewNdTtPXUJO0l1GHR8hqgTUe/N
-         1yeA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762216230; x=1762821030;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=AqcCRqTl/qoCqnjiqKwU9PLeLoMNE7fr5oh2+DkTABg=;
-        b=cQkKQ1LOLM1QbGFI7wXDLFQ57p7xQErtUJ+ZbtWRphjEC0NSOQSOLzqDi5YUlQngCa
-         kgWyfbeBomPC9d3M76LKuEDZtGMo7yQIFXa5uhZICsoSngT9whGqXp2y2tUVXUjfu3pS
-         PtkrmexdrltNIFoR0s4AU22BISepDkqtYrU2jTR43D2W+F6zu/Lsu77y1DMoEp5EmNbF
-         hJ7CgetUYpGH1YTPFvVEsQcQooFvkRmbuhvx/pSFfhUWOh3ukGoUkQKbygE3apkGDJ9r
-         Dp3QEGbusDqKZu6dtv9gV78dMe7Q+vknU+M62q0RTiGbKa4Ngh4zImmhESsenIIqMHEN
-         VNvg==
-X-Forwarded-Encrypted: i=1; AJvYcCVbjDo0hCmX7tH3xoWcfTNwTiZDRKN2gjshvGPAJuTqGXtHI4lWPkw2USwE6fjOW7JMl5Jdg1c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxU869mYJFaiQ4JBR2SemeIJVmz6nJUEMeAX6Y2bIgd8xnVR/If
-	8DQmDHDdi9isRyTw1bHOiLEmEEI87LwGQ80MUGZU7HyAcN7u/zhtMQbJhDY2VVyTS7jXaY1ZKFl
-	EQHy2H5h7RtgPqVD6lIjCCKPJdvR5rRvA8+osP93z
-X-Gm-Gg: ASbGncv+pbmuGuf3re+l2sdlgqWRpdmVTZ9K8uM2F+INvgZzvYeVr7rEeskCPsDzorY
-	MktDGgxLSAZRIrfZqCWYvSO2R+xj7+ndHhwUnFXNh9mJNIXEQZS3U04W1UdJsaXty2LP4TjtoN7
-	IbHyUfIbRoOvD6oAzXt3a93TVhOnyialuIzd5V5bfVYKOaTWNzh1WAuD0dSRT+RuPmtRg1ItvRi
-	VStDLurolc6lxipXlIorEQFt9AjHG3emS4tpuhIL6AYWNWz6fIepYHCj9P2eG8uQIWeirhciwy+
-	vxP55RDN5d/X5kC5JQbTiSyWUR0F
-X-Google-Smtp-Source: AGHT+IF/TuzzM6UiR2btqhhnkzThmfNLPxoe+iiZUgfG0xqcwukxfOV9+GQogXuYNA/DvvkDwAKRLlZkf1zyd7gQ6dE=
-X-Received: by 2002:a17:902:ea0b:b0:295:557e:746d with SMTP id
- d9443c01a7336-295557e7b03mr121283135ad.57.1762216229784; Mon, 03 Nov 2025
- 16:30:29 -0800 (PST)
+	s=arc-20240116; t=1762216263; c=relaxed/simple;
+	bh=88xfejga799nASCTbpCFGMhW7rDn67/YH3eH+W2hgYc=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=PosWuJZAuzWRse3YslUARe/HdZlfrWcwmDN4ZWsldPi/fYOqr+LJ/3DOam74lqYgQH1kiir+Y3p2wP3upCuMLPFhXisESr0NxQhJDpsMHr9wC9xQXtN+0pbMD4DNVoASJDg39DbpMEgiUZEkcLeTN/+7BupGnwF5erysYvdTN+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZAVr4ate; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41750C4CEE7;
+	Tue,  4 Nov 2025 00:30:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762216261;
+	bh=88xfejga799nASCTbpCFGMhW7rDn67/YH3eH+W2hgYc=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=ZAVr4ateXHY1MWFKrPF+lyeK9wtc5V7HnBrU47MkH6DemVVRzS0XrJwGj1SMpGya5
+	 wsT1AEiWdEDgLTnfcwoPiSzH66gM810E3DU/E4qekKJeJNOT+ZP29hjVwckxxrZocj
+	 LnNEOCd93uFUZnn6HhxLbBXknlejUktsipCjddxWpLIGshYkWG7DDz9N6dPZ+7NcbP
+	 5Tp/diyTIVm12n346sCHhg7UJYh3uUFGLUowSp9eA5Ud5MYhdk5Zdy1ujNJ3RrEOM8
+	 RD5Vknb4N4CfKAJlcJ90k/XYMDt1EeYm/fct1e902ovw0uukGVd3+z98nDlAk6VBG8
+	 +V2YTfjbuQN2A==
+Message-ID: <6021e64ed25c3b3e7880f17accb0f7a7b89fac0e.camel@kernel.org>
+Subject: Re: [PATCH v4 10/17] vfs: make vfs_create break delegations on
+ parent directory
+From: Jeff Layton <jlayton@kernel.org>
+To: NeilBrown <neil@brown.name>
+Cc: Miklos Szeredi <miklos@szeredi.hu>, Alexander Viro
+ <viro@zeniv.linux.org.uk>,  Christian Brauner	 <brauner@kernel.org>, Jan
+ Kara <jack@suse.cz>, Chuck Lever	 <chuck.lever@oracle.com>, Alexander Aring
+ <alex.aring@gmail.com>, Trond Myklebust <trondmy@kernel.org>, Anna
+ Schumaker <anna@kernel.org>, Steve French <sfrench@samba.org>,  Paulo
+ Alcantara	 <pc@manguebit.org>, Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Shyam Prasad N	 <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+ Bharath SM	 <bharathsm@microsoft.com>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>,  "Rafael J. Wysocki"	 <rafael@kernel.org>,
+ Danilo Krummrich <dakr@kernel.org>, David Howells	 <dhowells@redhat.com>,
+ Tyler Hicks <code@tyhicks.com>, Olga Kornievskaia	 <okorniev@redhat.com>,
+ Dai Ngo <Dai.Ngo@oracle.com>, Amir Goldstein	 <amir73il@gmail.com>, Namjae
+ Jeon <linkinjeon@kernel.org>, Steve French	 <smfrench@gmail.com>, Sergey
+ Senozhatsky <senozhatsky@chromium.org>, Carlos Maiolino <cem@kernel.org>,
+ Kuniyuki Iwashima <kuniyu@google.com>, "David S. Miller"	
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski	
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman	
+ <horms@kernel.org>, linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org, 	linux-nfs@vger.kernel.org,
+ linux-cifs@vger.kernel.org, 	samba-technical@lists.samba.org,
+ netfs@lists.linux.dev, ecryptfs@vger.kernel.org, 
+	linux-unionfs@vger.kernel.org, linux-xfs@vger.kernel.org,
+ netdev@vger.kernel.org
+Date: Mon, 03 Nov 2025 19:30:57 -0500
+In-Reply-To: <176221525113.1793333.253208063990645256@noble.neil.brown.name>
+References: <20251103-dir-deleg-ro-v4-0-961b67adee89@kernel.org>
+	, <20251103-dir-deleg-ro-v4-10-961b67adee89@kernel.org>
+	 <176221525113.1793333.253208063990645256@noble.neil.brown.name>
+Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
+ keydata=mQINBE6V0TwBEADXhJg7s8wFDwBMEvn0qyhAnzFLTOCHooMZyx7XO7dAiIhDSi7G1NPxw
+ n8jdFUQMCR/GlpozMFlSFiZXiObE7sef9rTtM68ukUyZM4pJ9l0KjQNgDJ6Fr342Htkjxu/kFV1Wv
+ egyjnSsFt7EGoDjdKqr1TS9syJYFjagYtvWk/UfHlW09X+jOh4vYtfX7iYSx/NfqV3W1D7EDi0PqV
+ T2h6v8i8YqsATFPwO4nuiTmL6I40ZofxVd+9wdRI4Db8yUNA4ZSP2nqLcLtFjClYRBoJvRWvsv4lm
+ 0OX6MYPtv76hka8lW4mnRmZqqx3UtfHX/hF/zH24Gj7A6sYKYLCU3YrI2Ogiu7/ksKcl7goQjpvtV
+ YrOOI5VGLHge0awt7bhMCTM9KAfPc+xL/ZxAMVWd3NCk5SamL2cE99UWgtvNOIYU8m6EjTLhsj8sn
+ VluJH0/RcxEeFbnSaswVChNSGa7mXJrTR22lRL6ZPjdMgS2Km90haWPRc8Wolcz07Y2se0xpGVLEQ
+ cDEsvv5IMmeMe1/qLZ6NaVkNuL3WOXvxaVT9USW1+/SGipO2IpKJjeDZfehlB/kpfF24+RrK+seQf
+ CBYyUE8QJpvTZyfUHNYldXlrjO6n5MdOempLqWpfOmcGkwnyNRBR46g/jf8KnPRwXs509yAqDB6sE
+ LZH+yWr9LQZEwARAQABtCVKZWZmIExheXRvbiA8amxheXRvbkBwb29jaGllcmVkcy5uZXQ+iQI7BB
+ MBAgAlAhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIXgAUCTpXWPAIZAQAKCRAADmhBGVaCFc65D/4
+ gBLNMHopQYgG/9RIM3kgFCCQV0pLv0hcg1cjr+bPI5f1PzJoOVi9s0wBDHwp8+vtHgYhM54yt43uI
+ 7Htij0RHFL5eFqoVT4TSfAg2qlvNemJEOY0e4daljjmZM7UtmpGs9NN0r9r50W82eb5Kw5bc/r0km
+ R/arUS2st+ecRsCnwAOj6HiURwIgfDMHGPtSkoPpu3DDp/cjcYUg3HaOJuTjtGHFH963B+f+hyQ2B
+ rQZBBE76ErgTDJ2Db9Ey0kw7VEZ4I2nnVUY9B5dE2pJFVO5HJBMp30fUGKvwaKqYCU2iAKxdmJXRI
+ ONb7dSde8LqZahuunPDMZyMA5+mkQl7kpIpR6kVDIiqmxzRuPeiMP7O2FCUlS2DnJnRVrHmCljLkZ
+ Wf7ZUA22wJpepBligemtSRSbqCyZ3B48zJ8g5B8xLEntPo/NknSJaYRvfEQqGxgk5kkNWMIMDkfQO
+ lDSXZvoxqU9wFH/9jTv1/6p8dHeGM0BsbBLMqQaqnWiVt5mG92E1zkOW69LnoozE6Le+12DsNW7Rj
+ iR5K+27MObjXEYIW7FIvNN/TQ6U1EOsdxwB8o//Yfc3p2QqPr5uS93SDDan5ehH59BnHpguTc27Xi
+ QQZ9EGiieCUx6Zh2ze3X2UW9YNzE15uKwkkuEIj60NvQRmEDfweYfOfPVOueC+iFifbQgSmVmZiBM
+ YXl0b24gPGpsYXl0b25AcmVkaGF0LmNvbT6JAjgEEwECACIFAk6V0q0CGwMGCwkIBwMCBhUIAgkKC
+ wQWAgMBAh4BAheAAAoJEAAOaEEZVoIViKUQALpvsacTMWWOd7SlPFzIYy2/fjvKlfB/Xs4YdNcf9q
+ LqF+lk2RBUHdR/dGwZpvw/OLmnZ8TryDo2zXVJNWEEUFNc7wQpl3i78r6UU/GUY/RQmOgPhs3epQC
+ 3PMJj4xFx+VuVcf/MXgDDdBUHaCTT793hyBeDbQuciARDJAW24Q1RCmjcwWIV/pgrlFa4lAXsmhoa
+ c8UPc82Ijrs6ivlTweFf16VBc4nSLX5FB3ls7S5noRhm5/Zsd4PGPgIHgCZcPgkAnU1S/A/rSqf3F
+ LpU+CbVBDvlVAnOq9gfNF+QiTlOHdZVIe4gEYAU3CUjbleywQqV02BKxPVM0C5/oVjMVx3bri75n1
+ TkBYGmqAXy9usCkHIsG5CBHmphv9MHmqMZQVsxvCzfnI5IO1+7MoloeeW/lxuyd0pU88dZsV/riHw
+ 87i2GJUJtVlMl5IGBNFpqoNUoqmvRfEMeXhy/kUX4Xc03I1coZIgmwLmCSXwx9MaCPFzV/dOOrju2
+ xjO+2sYyB5BNtxRqUEyXglpujFZqJxxau7E0eXoYgoY9gtFGsspzFkVNntamVXEWVVgzJJr/EWW0y
+ +jNd54MfPRqH+eCGuqlnNLktSAVz1MvVRY1dxUltSlDZT7P2bUoMorIPu8p7ZCg9dyX1+9T6Muc5d
+ Hxf/BBP/ir+3e8JTFQBFOiLNdFtB9KZWZmIExheXRvbiA8amxheXRvbkBzYW1iYS5vcmc+iQI4BBM
+ BAgAiBQJOldK9AhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIXgAAKCRAADmhBGVaCFWgWD/0ZRi4h
+ N9FK2BdQs9RwNnFZUr7JidAWfCrs37XrA/56olQl3ojn0fQtrP4DbTmCuh0SfMijB24psy1GnkPep
+ naQ6VRf7Dxg/Y8muZELSOtsv2CKt3/02J1BBitrkkqmHyni5fLLYYg6fub0T/8Kwo1qGPdu1hx2BQ
+ RERYtQ/S5d/T0cACdlzi6w8rs5f09hU9Tu4qV1JLKmBTgUWKN969HPRkxiojLQziHVyM/weR5Reu6
+ FZVNuVBGqBD+sfk/c98VJHjsQhYJijcsmgMb1NohAzwrBKcSGKOWJToGEO/1RkIN8tqGnYNp2G+aR
+ 685D0chgTl1WzPRM6mFG1+n2b2RR95DxumKVpwBwdLPoCkI24JkeDJ7lXSe3uFWISstFGt0HL8Eew
+ P8RuGC8s5h7Ct91HMNQTbjgA+Vi1foWUVXpEintAKgoywaIDlJfTZIl6Ew8ETN/7DLy8bXYgq0Xzh
+ aKg3CnOUuGQV5/nl4OAX/3jocT5Cz/OtAiNYj5mLPeL5z2ZszjoCAH6caqsF2oLyAnLqRgDgR+wTQ
+ T6gMhr2IRsl+cp8gPHBwQ4uZMb+X00c/Amm9VfviT+BI7B66cnC7Zv6Gvmtu2rEjWDGWPqUgccB7h
+ dMKnKDthkA227/82tYoFiFMb/NwtgGrn5n2vwJyKN6SEoygGrNt0SI84y6hEVbQlSmVmZiBMYXl0b
+ 24gPGpsYXl0b25AcHJpbWFyeWRhdGEuY29tPokCOQQTAQIAIwUCU4xmKQIbAwcLCQgHAwIBBhUIAg
+ kKCwQWAgMBAh4BAheAAAoJEAAOaEEZVoIV1H0P/j4OUTwFd7BBbpoSp695qb6HqCzWMuExsp8nZjr
+ uymMaeZbGr3OWMNEXRI1FWNHMtcMHWLP/RaDqCJil28proO+PQ/yPhsr2QqJcW4nr91tBrv/MqItu
+ AXLYlsgXqp4BxLP67bzRJ1Bd2x0bWXurpEXY//VBOLnODqThGEcL7jouwjmnRh9FTKZfBDpFRaEfD
+ FOXIfAkMKBa/c9TQwRpx2DPsl3eFWVCNuNGKeGsirLqCxUg5kWTxEorROppz9oU4HPicL6rRH22Ce
+ 6nOAON2vHvhkUuO3GbffhrcsPD4DaYup4ic+DxWm+DaSSRJ+e1yJvwi6NmQ9P9UAuLG93S2MdNNbo
+ sZ9P8k2mTOVKMc+GooI9Ve/vH8unwitwo7ORMVXhJeU6Q0X7zf3SjwDq2lBhn1DSuTsn2DbsNTiDv
+ qrAaCvbsTsw+SZRwF85eG67eAwouYk+dnKmp1q57LDKMyzysij2oDKbcBlwB/TeX16p8+LxECv51a
+ sjS9TInnipssssUDrHIvoTTXWcz7Y5wIngxDFwT8rPY3EggzLGfK5Zx2Q5S/N0FfmADmKknG/D8qG
+ IcJE574D956tiUDKN4I+/g125ORR1v7bP+OIaayAvq17RP+qcAqkxc0x8iCYVCYDouDyNvWPGRhbL
+ UO7mlBpjW9jK9e2fvZY9iw3QzIPGKtClKZWZmIExheXRvbiA8amVmZi5sYXl0b25AcHJpbWFyeWRh
+ dGEuY29tPokCOQQTAQIAIwUCU4xmUAIbAwcLCQgHAwIBBhUIAgkKCwQWAgMBAh4BAheAAAoJEAAOa
+ EEZVoIVzJoQALFCS6n/FHQS+hIzHIb56JbokhK0AFqoLVzLKzrnaeXhE5isWcVg0eoV2oTScIwUSU
+ apy94if69tnUo4Q7YNt8/6yFM6hwZAxFjOXR0ciGE3Q+Z1zi49Ox51yjGMQGxlakV9ep4sV/d5a50
+ M+LFTmYSAFp6HY23JN9PkjVJC4PUv5DYRbOZ6Y1+TfXKBAewMVqtwT1Y+LPlfmI8dbbbuUX/kKZ5d
+ dhV2736fgyfpslvJKYl0YifUOVy4D1G/oSycyHkJG78OvX4JKcf2kKzVvg7/Rnv+AueCfFQ6nGwPn
+ 0P91I7TEOC4XfZ6a1K3uTp4fPPs1Wn75X7K8lzJP/p8lme40uqwAyBjk+IA5VGd+CVRiyJTpGZwA0
+ jwSYLyXboX+Dqm9pSYzmC9+/AE7lIgpWj+3iNisp1SWtHc4pdtQ5EU2SEz8yKvDbD0lNDbv4ljI7e
+ flPsvN6vOrxz24mCliEco5DwhpaaSnzWnbAPXhQDWb/lUgs/JNk8dtwmvWnqCwRqElMLVisAbJmC0
+ BhZ/Ab4sph3EaiZfdXKhiQqSGdK4La3OTJOJYZphPdGgnkvDV9Pl1QZ0ijXQrVIy3zd6VCNaKYq7B
+ AKidn5g/2Q8oio9Tf4XfdZ9dtwcB+bwDJFgvvDYaZ5bI3ln4V3EyW5i2NfXazz/GA/I/ZtbsigCFc
+ 8ftCBKZWZmIExheXRvbiA8amxheXRvbkBrZXJuZWwub3JnPokCOAQTAQIAIgUCWe8u6AIbAwYLCQg
+ HAwIGFQgCCQoLBBYCAwECHgECF4AACgkQAA5oQRlWghUuCg/+Lb/xGxZD2Q1oJVAE37uW308UpVSD
+ 2tAMJUvFTdDbfe3zKlPDTuVsyNsALBGclPLagJ5ZTP+Vp2irAN9uwBuacBOTtmOdz4ZN2tdvNgozz
+ uxp4CHBDVzAslUi2idy+xpsp47DWPxYFIRP3M8QG/aNW052LaPc0cedYxp8+9eiVUNpxF4SiU4i9J
+ DfX/sn9XcfoVZIxMpCRE750zvJvcCUz9HojsrMQ1NFc7MFT1z3MOW2/RlzPcog7xvR5ENPH19ojRD
+ CHqumUHRry+RF0lH00clzX/W8OrQJZtoBPXv9ahka/Vp7kEulcBJr1cH5Wz/WprhsIM7U9pse1f1g
+ Yy9YbXtWctUz8uvDR7shsQxAhX3qO7DilMtuGo1v97I/Kx4gXQ52syh/w6EBny71CZrOgD6kJwPVV
+ AaM1LRC28muq91WCFhs/nzHozpbzcheyGtMUI2Ao4K6mnY+3zIuXPygZMFr9KXE6fF7HzKxKuZMJO
+ aEZCiDOq0anx6FmOzs5E6Jqdpo/mtI8beK+BE7Va6ni7YrQlnT0i3vaTVMTiCThbqsB20VrbMjlhp
+ f8lfK1XVNbRq/R7GZ9zHESlsa35ha60yd/j3pu5hT2xyy8krV8vGhHvnJ1XRMJBAB/UYb6FyC7S+m
+ QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.58.1 (3.58.1-1.fc43) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251101172230.10179-1-adelodunolaoluwa.ref@yahoo.com>
- <20251101172230.10179-1-adelodunolaoluwa@yahoo.com> <CAAVpQUDL1FB1nFYOZ6QuO+cGTqnpYNSaFtFD=YN742pyspe9ew@mail.gmail.com>
- <7a162b38-3ff8-4f97-aac3-4fe2ab50fe33@yahoo.com>
-In-Reply-To: <7a162b38-3ff8-4f97-aac3-4fe2ab50fe33@yahoo.com>
-From: Kuniyuki Iwashima <kuniyu@google.com>
-Date: Mon, 3 Nov 2025 16:30:18 -0800
-X-Gm-Features: AWmQ_bnnGa6oY3iwc-ExLoQS270SjXZ6P7Ip3gcrLKuqdfofie0b35WwSthl_lo
-Message-ID: <CAAVpQUADwghMj=SgdiZEErC5oy7RVpam4i9S2RwP19bA=Rbynw@mail.gmail.com>
-Subject: Re: [PATCH v3] selftests: af_unix: Add tests for ECONNRESET and EOF semantics
-To: Sunday Adelodun <adelodunolaoluwa@yahoo.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, horms@kernel.org, shuah@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, skhan@linuxfoundation.org, 
-	david.hunter.linux@gmail.com, linux-kernel-mentees@lists.linuxfoundation.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 3, 2025 at 4:08=E2=80=AFPM Sunday Adelodun
-<adelodunolaoluwa@yahoo.com> wrote:
->
-> On 11/2/25 08:32, Kuniyuki Iwashima wrote:
-> > On Sat, Nov 1, 2025 at 10:23=E2=80=AFAM Sunday Adelodun
-> > <adelodunolaoluwa@yahoo.com> wrote:
-> >> Add selftests to verify and document Linux=E2=80=99s intended behaviou=
-r for
-> >> UNIX domain sockets (SOCK_STREAM and SOCK_DGRAM) when a peer closes.
-> >> The tests verify that:
-> >>
-> >>   1. SOCK_STREAM returns EOF when the peer closes normally.
-> >>   2. SOCK_STREAM returns ECONNRESET if the peer closes with unread dat=
-a.
-> >>   3. SOCK_SEQPACKET returns EOF when the peer closes normally.
-> >>   4. SOCK_SEQPACKET returns ECONNRESET if the peer closes with unread =
-data.
-> >>   5. SOCK_DGRAM does not return ECONNRESET when the peer closes.
-> >>
-> >> This follows up on review feedback suggesting a selftest to clarify
-> >> Linux=E2=80=99s semantics.
-> >>
-> >> Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
-> >> Signed-off-by: Sunday Adelodun <adelodunolaoluwa@yahoo.com>
-> >> ---
-> >>   tools/testing/selftests/net/af_unix/Makefile  |   1 +
-> >>   .../selftests/net/af_unix/unix_connreset.c    | 179 ++++++++++++++++=
-++
-> >>   2 files changed, 180 insertions(+)
-> >>   create mode 100644 tools/testing/selftests/net/af_unix/unix_connrese=
-t.c
-> >>
-> >> diff --git a/tools/testing/selftests/net/af_unix/Makefile b/tools/test=
-ing/selftests/net/af_unix/Makefile
-> >> index de805cbbdf69..5826a8372451 100644
-> >> --- a/tools/testing/selftests/net/af_unix/Makefile
-> >> +++ b/tools/testing/selftests/net/af_unix/Makefile
-> >> @@ -7,6 +7,7 @@ TEST_GEN_PROGS :=3D \
-> >>          scm_pidfd \
-> >>          scm_rights \
-> >>          unix_connect \
-> >> +       unix_connreset \
-> > patchwork caught this test is not added to .gitignore.
-> > https://patchwork.kernel.org/project/netdevbpf/patch/20251101172230.101=
-79-1-adelodunolaoluwa@yahoo.com/
-> >
-> > Could you add it to this file ?
-> >
-> > tools/testing/selftests/net/.gitignore
-> Oh, thank you for this. will add it
-> >
-> >
-> >>   # end of TEST_GEN_PROGS
-> >>
-> >>   include ../../lib.mk
-> >> diff --git a/tools/testing/selftests/net/af_unix/unix_connreset.c b/to=
-ols/testing/selftests/net/af_unix/unix_connreset.c
-> >> new file mode 100644
-> >> index 000000000000..6f43435d96e2
-> >> --- /dev/null
-> >> +++ b/tools/testing/selftests/net/af_unix/unix_connreset.c
-> >> @@ -0,0 +1,179 @@
-> >> +// SPDX-License-Identifier: GPL-2.0
-> >> +/*
-> >> + * Selftest for AF_UNIX socket close and ECONNRESET behaviour.
-> >> + *
-> >> + * This test verifies:
-> >> + *  1. SOCK_STREAM returns EOF when the peer closes normally.
-> >> + *  2. SOCK_STREAM returns ECONNRESET if peer closes with unread data=
-.
-> >> + *  3. SOCK_SEQPACKET returns EOF when the peer closes normally.
-> >> + *  4. SOCK_SEQPACKET returns ECONNRESET if the peer closes with unre=
-ad data.
-> >> + *  5. SOCK_DGRAM does not return ECONNRESET when the peer closes.
-> >> + *
-> >> + * These tests document the intended Linux behaviour.
-> >> + *
-> >> + */
-> >> +
-> >> +#define _GNU_SOURCE
-> >> +#include <stdlib.h>
-> >> +#include <string.h>
-> >> +#include <fcntl.h>
-> >> +#include <unistd.h>
-> >> +#include <errno.h>
-> >> +#include <sys/socket.h>
-> >> +#include <sys/un.h>
-> >> +#include "../../kselftest_harness.h"
-> >> +
-> >> +#define SOCK_PATH "/tmp/af_unix_connreset.sock"
-> >> +
-> >> +static void remove_socket_file(void)
-> >> +{
-> >> +       unlink(SOCK_PATH);
-> >> +}
-> >> +
-> >> +FIXTURE(unix_sock)
-> >> +{
-> >> +       int server;
-> >> +       int client;
-> >> +       int child;
-> >> +};
-> >> +
-> >> +FIXTURE_VARIANT(unix_sock)
-> >> +{
-> >> +       int socket_type;
-> >> +       const char *name;
-> >> +};
-> >> +
-> >> +/* Define variants: stream and datagram */
-> > nit: outdated, maybe simply remove ?
-> oh..skipped me.
-> will do so.
-> >
-> >> +FIXTURE_VARIANT_ADD(unix_sock, stream) {
-> >> +       .socket_type =3D SOCK_STREAM,
-> >> +       .name =3D "SOCK_STREAM",
-> >> +};
-> >> +
-> >> +FIXTURE_VARIANT_ADD(unix_sock, dgram) {
-> >> +       .socket_type =3D SOCK_DGRAM,
-> >> +       .name =3D "SOCK_DGRAM",
-> >> +};
-> >> +
-> >> +FIXTURE_VARIANT_ADD(unix_sock, seqpacket) {
-> >> +       .socket_type =3D SOCK_SEQPACKET,
-> >> +       .name =3D "SOCK_SEQPACKET",
-> >> +};
-> >> +
-> >> +FIXTURE_SETUP(unix_sock)
-> >> +{
-> >> +       struct sockaddr_un addr =3D {};
-> >> +       int err;
-> >> +
-> >> +       addr.sun_family =3D AF_UNIX;
-> >> +       strcpy(addr.sun_path, SOCK_PATH);
-> >> +       remove_socket_file();
-> >> +
-> >> +       self->server =3D socket(AF_UNIX, variant->socket_type, 0);
-> >> +       ASSERT_LT(-1, self->server);
-> >> +
-> >> +       err =3D bind(self->server, (struct sockaddr *)&addr, sizeof(ad=
-dr));
-> >> +       ASSERT_EQ(0, err);
-> >> +
-> >> +       if (variant->socket_type =3D=3D SOCK_STREAM ||
-> >> +               variant->socket_type =3D=3D SOCK_SEQPACKET) {
-> > patchwork caught mis-alignment here and other places.
-> >
-> > I'm using this for emacs, and other editors will have a similar config.
-> >
-> > (setq-default c-default-style "linux")
-> >
-> > You can check if lines are aligned properly by
-> >
-> > $ git show --format=3Demail | ./scripts/checkpatch.pl
-> >
-> >
-> >> +               err =3D listen(self->server, 1);
-> >> +               ASSERT_EQ(0, err);
-> >> +
-> >> +               self->client =3D socket(AF_UNIX, variant->socket_type,=
- 0);
-> > Could you add SOCK_NONBLOCK here too ?
-> This is noted
-> >
-> >> +               ASSERT_LT(-1, self->client);
-> >> +
-> >> +               err =3D connect(self->client, (struct sockaddr *)&addr=
-, sizeof(addr));
-> >> +               ASSERT_EQ(0, err);
-> >> +
-> >> +               self->child =3D accept(self->server, NULL, NULL);
-> >> +               ASSERT_LT(-1, self->child);
-> >> +       } else {
-> >> +               /* Datagram: bind and connect only */
-> >> +               self->client =3D socket(AF_UNIX, SOCK_DGRAM | SOCK_NON=
-BLOCK, 0);
-> >> +               ASSERT_LT(-1, self->client);
-> >> +
-> >> +               err =3D connect(self->client, (struct sockaddr *)&addr=
-, sizeof(addr));
-> >> +               ASSERT_EQ(0, err);
-> >> +       }
-> >> +}
-> >> +
-> >> +FIXTURE_TEARDOWN(unix_sock)
-> >> +{
-> >> +       if (variant->socket_type =3D=3D SOCK_STREAM ||
-> >> +               variant->socket_type =3D=3D SOCK_SEQPACKET)
-> >> +               close(self->child);
-> >> +
-> >> +       close(self->client);
-> >> +       close(self->server);
-> >> +       remove_socket_file();
-> >> +}
-> >> +
-> >> +/* Test 1: peer closes normally */
-> >> +TEST_F(unix_sock, eof)
-> >> +{
-> >> +       char buf[16] =3D {};
-> >> +       ssize_t n;
-> >> +
-> >> +       /* Peer closes normally */
-> >> +       if (variant->socket_type =3D=3D SOCK_STREAM ||
-> >> +               variant->socket_type =3D=3D SOCK_SEQPACKET)
-> >> +               close(self->child);
-> >> +       else
-> >> +               close(self->server);
-> >> +
-> >> +       n =3D recv(self->client, buf, sizeof(buf), 0);
-> >> +       TH_LOG("%s: recv=3D%zd errno=3D%d (%s)", variant->name, n, err=
-no, strerror(errno));
-> > errno is undefined if not set, and same for strerror(errno).
-> >
-> > Also, if ASSERT_XXX() below fails, the same information
-> > (test case, errno) is logged.  So, TH_LOG() seems unnecessary.
-> >
-> > Maybe try modifying the condition below and see how the
-> > assertion is logged.
-> Oh..thank you. Didn't it through that way.
-> I understand.
-> I will remove the TH_LOG()'s
-> >
-> >> +       if (variant->socket_type =3D=3D SOCK_STREAM ||
-> >> +               variant->socket_type =3D=3D SOCK_SEQPACKET) {
-> >> +               ASSERT_EQ(0, n);
-> >> +       } else {
-> >> +               ASSERT_EQ(-1, n);
-> >> +               ASSERT_EQ(EAGAIN, errno);
-> >> +       }
-> >> +}
-> >> +
-> >> +/* Test 2: peer closes with unread data */
-> >> +TEST_F(unix_sock, reset_unread)
-> >> +{
-> >> +       char buf[16] =3D {};
-> >> +       ssize_t n;
-> >> +
-> >> +       /* Send data that will remain unread by client */
-> >> +       send(self->client, "hello", 5, 0);
-> >> +       close(self->child);
-> >> +
-> >> +       n =3D recv(self->client, buf, sizeof(buf), 0);
-> >> +       TH_LOG("%s: recv=3D%zd errno=3D%d (%s)", variant->name, n, err=
-no, strerror(errno));
-> >> +       if (variant->socket_type =3D=3D SOCK_STREAM ||
-> >> +               variant->socket_type =3D=3D SOCK_SEQPACKET) {
-> >> +               ASSERT_EQ(-1, n);
-> >> +               ASSERT_EQ(ECONNRESET, errno);
-> >> +       } else {
-> >> +               ASSERT_EQ(-1, n);
-> >> +               ASSERT_EQ(EAGAIN, errno);
-> >> +       }
-> >> +}
-> >> +
-> >> +/* Test 3: SOCK_DGRAM peer close */
-> >> Now Test 2 and Test 3 look identical ;)
->
-> seems so, but the only difference is:
->
-> close(self->child); is used in Test 2, while
-> close(self->server); is used in Test 3.
-> Maybe I should find a way to collapse Tests 2 and 3 (if statement might
-> work)
->
-> I am just afraid the tests to run will reduce to 6 from 9 and we will hav=
-e 6
-> cases passed as against 7 as before.
->
-> What do you think?
+On Tue, 2025-11-04 at 11:14 +1100, NeilBrown wrote:
+> On Mon, 03 Nov 2025, Jeff Layton wrote:
+> > In order to add directory delegation support, we need to break
+> > delegations on the parent whenever there is going to be a change in the
+> > directory.
+> >=20
+> > Add a delegated_inode parameter to struct createdata. Most callers just
+> > leave that as a NULL pointer, but do_mknodat() is changed to wait for a
+> > delegation break if there is one.
+> >=20
+> > Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> > ---
+> >  fs/namei.c         | 26 +++++++++++++++++---------
+> >  include/linux/fs.h |  2 +-
+> >  2 files changed, 18 insertions(+), 10 deletions(-)
+> >=20
+> > diff --git a/fs/namei.c b/fs/namei.c
+> > index fdf4e78cd041de8c564b7d1d89a46ba2aaf79d53..e8973000a312fb05ebb63a0=
+d9bd83b9a5f8f805d 100644
+> > --- a/fs/namei.c
+> > +++ b/fs/namei.c
+> > @@ -3487,6 +3487,9 @@ int vfs_create(struct createdata *args)
+> > =20
+> >  	mode =3D vfs_prepare_mode(idmap, dir, mode, S_IALLUGO, S_IFREG);
+> >  	error =3D security_inode_create(dir, dentry, mode);
+> > +	if (error)
+> > +		return error;
+> > +	error =3D try_break_deleg(dir, args->delegated_inode);
+> >  	if (error)
+> >  		return error;
+> >  	error =3D dir->i_op->create(idmap, dir, dentry, mode, args->excl);
+> > @@ -4359,6 +4362,8 @@ static int may_mknod(umode_t mode)
+> >  static int do_mknodat(int dfd, struct filename *name, umode_t mode,
+> >  		unsigned int dev)
+> >  {
+> > +	struct delegated_inode delegated_inode =3D { };
+> > +	struct createdata cargs =3D { };
+>=20
+> If we must have 'createdata', can it have a 'struct delegated_inode'
+> rather than a pointer to it?
+>=20
 
-The name of Test 2 is a bit confusing, which is not true
-for SOCK_DGRAM.  So, I'd use "if" to change which fd
-to close() depending on the socket type.
+If we do that, then we'd need some way to signal that the caller
+doesn't want to wait on the delegation break. Currently that's
+indicated by setting cargs.delegated_inode to NULL. I suppose we could
+add a bool for this or something.
 
-Also, close(self->server) does nothing for SOCK_STREAM
-and SOCK_SEQPACKET after accept().  Rather, that close()
-should have the same effect if self->child is not accept()ed.
-(In this case, Skip() for SOCK_DGRAM makes sense)
+I confess that I too am lukewarm on struct createdata. I can live with
+it, but it's not clearly a win to me either.
 
-I think covering that scenario would be nicer.
+Christian, thoughts?
 
-If interested, you can check the test coverage with this patch.
-https://lore.kernel.org/linux-kselftest/20251028024339.2028774-1-kuniyu@goo=
-gle.com/
+>=20
+> >  	struct mnt_idmap *idmap;
+> >  	struct dentry *dentry;
+> >  	struct path path;
+> > @@ -4383,18 +4388,16 @@ static int do_mknodat(int dfd, struct filename =
+*name, umode_t mode,
+> >  	switch (mode & S_IFMT) {
+> >  		case 0:
+> >  		case S_IFREG:
+> > -		{
+> > -			struct createdata args =3D { .idmap =3D idmap,
+> > -						   .dir =3D path.dentry->d_inode,
+> > -						   .dentry =3D dentry,
+> > -						   .mode =3D mode,
+> > -						   .excl =3D true };
+> > -
+> > -			error =3D vfs_create(&args);
+> > +			cargs.idmap =3D idmap,
+> > +			cargs.dir =3D path.dentry->d_inode,
+> > +			cargs.dentry =3D dentry,
+> > +			cargs.delegated_inode =3D &delegated_inode;
+> > +			cargs.mode =3D mode,
+> > +			cargs.excl =3D true,
+> > +			error =3D vfs_create(&cargs);
+> >  			if (!error)
+> >  				security_path_post_mknod(idmap, dentry);
+> >  			break;
+> > -		}
+> >  		case S_IFCHR: case S_IFBLK:
+> >  			error =3D vfs_mknod(idmap, path.dentry->d_inode,
+> >  					  dentry, mode, new_decode_dev(dev));
+> > @@ -4406,6 +4409,11 @@ static int do_mknodat(int dfd, struct filename *=
+name, umode_t mode,
+> >  	}
+> >  out2:
+> >  	end_creating_path(&path, dentry);
+> > +	if (is_delegated(&delegated_inode)) {
+> > +		error =3D break_deleg_wait(&delegated_inode);
+> > +		if (!error)
+> > +			goto retry;
+> > +	}
+> >  	if (retry_estale(error, lookup_flags)) {
+> >  		lookup_flags |=3D LOOKUP_REVAL;
+> >  		goto retry;
+> > diff --git a/include/linux/fs.h b/include/linux/fs.h
+> > index b61873767b37591aecadd147623d7dfc866bef82..cfcb20a7c4ce4b6dcec98b3=
+eccbdb5ec8bab6fa9 100644
+> > --- a/include/linux/fs.h
+> > +++ b/include/linux/fs.h
+> > @@ -2116,12 +2116,12 @@ struct createdata {
+> >  	struct mnt_idmap *idmap;	// idmap of the mount the inode was found fr=
+om
+> >  	struct inode *dir;		// inode of parent directory
+> >  	struct dentry *dentry;		// dentry of the child file
+> > +	struct delegated_inode *delegated_inode; // returns parent inode, if =
+delegated
+> >  	umode_t mode;			// mode of the child file
+> >  	bool excl;			// whether the file must not yet exist
+> >  };
+> > =20
+> >  int vfs_create(struct createdata *);
+> > -
+> >  struct dentry *vfs_mkdir(struct mnt_idmap *, struct inode *,
+> >  			 struct dentry *, umode_t, struct delegated_inode *);
+> >  int vfs_mknod(struct mnt_idmap *, struct inode *, struct dentry *,
+> >=20
+> > --=20
+> > 2.51.1
+> >=20
+> >=20
 
-Thanks!
+--=20
+Jeff Layton <jlayton@kernel.org>
 
