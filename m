@@ -1,176 +1,136 @@
-Return-Path: <netdev+bounces-235312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94D1EC2EA06
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 01:34:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB19EC2EA93
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 01:48:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5BBE1896C91
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 00:35:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3791718947A1
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 00:48:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0D5A1F7098;
-	Tue,  4 Nov 2025 00:34:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03A3E52F88;
+	Tue,  4 Nov 2025 00:48:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="ZXaqscoA";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="uIbao+gH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y46HFNvk"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-b2-smtp.messagingengine.com (flow-b2-smtp.messagingengine.com [202.12.124.137])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f50.google.com (mail-pj1-f50.google.com [209.85.216.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 051131A2C11;
-	Tue,  4 Nov 2025 00:34:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.137
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8F027456
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 00:48:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762216473; cv=none; b=lzlOV+EXsjNYiPsaLH82jB2wgfDB69HCrBzNK2JJd5irOhA0ernPHKF7molmUp6ATqrwMBg6o6Ol6YMWqMEbUEPkPrcMM25M5D3SP7HsnhDDMp/boTNZ/ygUAVW8329u0lKV3+ku1RPy+IzqzAk1rSsNsRhXKTzRNChhYloJj84=
+	t=1762217301; cv=none; b=dbQnJGbh0+XPP3cXSok/WiWX8Kwc7mIgfxrmt2CkcNelO76+2d0mBY4bMvI0R6GtXf4AMAmRvh+Z4/r+vgnbuDdiC/P0qT62ZLS1d/kUJpRJ+db5YPE+vxwwDrSYnCxX7WJCUZv7DC2YuC3t8eEKPujTYzCGWZdSIaQmI/cdbpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762216473; c=relaxed/simple;
-	bh=BGZwrpus3lHtfsbvhH4iXIFhobnmKnvjJoGJprtyb3k=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=N7ANdc6HMAfsJ5Uh4UpKDKYp+h68C5a+KtKVozcXAv+cJXm0Jb3ya38MrQbuO36Rn4g3nDwhSUpUZkuzrKooN8PUwTThbJS58DKpvoSoHNYbn8IVXXcrF4jkgAmfiDAV1VgSXm3TFQ8wjDDHloqOGb267iLLgbFHVFEhAS3RbyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=ZXaqscoA; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=uIbao+gH; arc=none smtp.client-ip=202.12.124.137
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
-Received: from phl-compute-01.internal (phl-compute-01.internal [10.202.2.41])
-	by mailflow.stl.internal (Postfix) with ESMTP id 30BE41300AAF;
-	Mon,  3 Nov 2025 19:34:30 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-01.internal (MEProxy); Mon, 03 Nov 2025 19:34:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to; s=fm3; t=
-	1762216470; x=1762223670; bh=qeQ9pSvQPAFnDOoHPFbKVWO6Cl7+FMERadY
-	NQKykv7k=; b=ZXaqscoAoWcyH5B6xlrBBs/1+Rbd43ofN8C2+S833h0k/oNrSwV
-	tAPafKpitQJp18rWNitPDWUEXYlHxhySCAmJPDB2F4lWtimOf5M6zxQw1LHwyQbi
-	boU+V3+XsmK+8yJT3a4tW/nDkdJNf2N5GLldQAQcw4fFN8KV4VxCBeS9bI4x2SJr
-	NER8eXk22/5ALkGXkrRQBGuSbFvp12ruMqe5r+Z83PiW1LUny24nlxWxc13HsQId
-	niT5mXQfHrwnzboeDYCBTQ+RnHf08JnJdKNGS24XVRxiDoxSXF6YCIBA9yfSv6lJ
-	E1zyPCY4CGtHO76G9ZIQUTgooqrpI5FilIg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762216470; x=
-	1762223670; bh=qeQ9pSvQPAFnDOoHPFbKVWO6Cl7+FMERadYNQKykv7k=; b=u
-	Ibao+gH9sPTr2bMMb8QFEzQCRAhf/D0CjSv3wC9IXrnO5K1G3KSxmRI8jQQUEgcJ
-	oWSCbYF8ejh/x6nBRUIpNP5szu0CKcUe3P7Shoua8EPrptU3c2MYR3X5j14a5dyq
-	jIz5Lls2CEVdxPMnITfhZCW6o139DpG+KcWN3W6ZzRNFEW7zDhHx1LRLk81jxYYx
-	wBKUSaLgYJgRavsvONgEcLjy88Ipj2YwVQzhcQZbcslWl0FKlIHamDwvN0YlFf3s
-	FMGx6mYrl5QDpBiwfz7Fnvf7hSc3NCkLc38qqWu0I5NHlsHKfXX/u0J9d/3dJTn4
-	8tcV9XfAWtpmeFQKrHCJA==
-X-ME-Sender: <xms:FUoJaXYKrufVPSQJF8yOL7P3S15hULdNbQHFw3Q-P9WggcvC-K8u_w>
-    <xme:FUoJaVbZ0XsaJ3UHNUfy6u6Go54wGf1pPefW6xlXguX5iaX6NOMNk5-pVE2yMVQsl
-    RB1_SsanqQtUXC7G2e_M0JJ130va4vB0Gvc-eLqZchJlxQq-Q>
-X-ME-Received: <xmr:FUoJaSNli2Bk6QH8ww3lpsxfug9luibV5gSJW-ye3CQdnk_LIKWJXHAwq9t9KkZwisurttg_OyfvPLrvL-96yEdKU-Pk3J7mWxVpX0VP8_B3>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddujeelheekucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurheptgfgggfhvfevufgjfhffkfhrsehtjeertddttdejnecuhfhrohhmpefpvghilheu
-    rhhofihnuceonhgvihhlsgesohifnhhmrghilhdrnhgvtheqnecuggftrfgrthhtvghrnh
-    epudetfefhudevhedvfeeufedvffekveekgfdtfefggfekheejgefhteeihffggfelnecu
-    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhgvihhlsg
-    esohifnhhmrghilhdrnhgvthdpnhgspghrtghpthhtohepgeefpdhmohguvgepshhmthhp
-    ohhuthdprhgtphhtthhopehvihhrohesiigvnhhivhdrlhhinhhugidrohhrghdruhhkpd
-    hrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthht
-    oheplhhinhhugidqgihfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhope
-    hlihhnuhigqdhunhhiohhnfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthht
-    oheplhhinhhugidqnhhfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhope
-    hlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthho
-    pehlihhnuhigqdhfshguvghvvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpth
-    htoheplhhinhhugidqtghifhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthht
-    ohepvggtrhihphhtfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:FUoJaaCX7ROhHlMxfULTjMpZCXgJx070-5t210jOrh2vKf1Dbsc70Q>
-    <xmx:FUoJacNlhGxAsNNP0sTE0PwH-m67-XImxsL7odxy-Iy5MH7tEpM_Wg>
-    <xmx:FUoJafyVPnRwFltBkXYn0n3f5Z_EqJ8RodWi2JrDgGA2BRx_fYEGWg>
-    <xmx:FUoJaXfJX06EVls3FZbb6OdR9ehl65ofH1qSAGck_eYJQGsDo2rIOg>
-    <xmx:FkoJad1IPwXLYRPa8uXI6XqJquLGVJAuaWDq2BDfal-cowKmcB1EugxP>
-Feedback-ID: iab3e480c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 3 Nov 2025 19:34:18 -0500 (EST)
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+	s=arc-20240116; t=1762217301; c=relaxed/simple;
+	bh=4Dpf1kT47SVRDtpn/cSznt+bTK6v0hS72U9THCinuJw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jm98cscDrCnZOjQd+Jq/cyQ8PRjH3EfbtDg76wHf+WKM0l7GmsFoZUrfZJJWSYunwWYdyCrAKnrajNB6lN4J2CN1OsR2ZvVhuZqRDYpgfPWLT79FKG9rOdbn2SUW8Ozwwk2pFkFVN+S1BRxpP2HtTAbzbaGu/qlFGkplku5iXwQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y46HFNvk; arc=none smtp.client-ip=209.85.216.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f50.google.com with SMTP id 98e67ed59e1d1-33b9dc8d517so4595722a91.0
+        for <netdev@vger.kernel.org>; Mon, 03 Nov 2025 16:48:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762217300; x=1762822100; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=K3Zyvcg6HsP3kuXtclPYWjtOPlsZtk1ijNjr2zUai2Y=;
+        b=Y46HFNvkTPBg5b97zhudNQihhbjaHqqC+xgZqT3JVSXieiwtvO0z9VjZrrRienSijr
+         nJRTvUKm+aqA9LpQbOQlEyITV8WXG59sl1/DPm1u1131nKJvUCSZDbtnQRpfREW05mkf
+         7Tzi/pFmVcRBjejo3MvQ/Uqa8EiIYGoQMM1siPuSDqvuiFKepKn7419qWYuXzxA2Jn2f
+         LuhJ11ESFNgRbNi0CeAQWZggcGRdbBuQ2nkT3/BVSaPVmSw75l01rbpUUn1KZtyMVZKM
+         93nn1S/ruTOatQVMNOEGxzrbNzyeuvsGg19RYUankThYaM1wx7H4YobIL1qpIlyEUdKO
+         k/6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762217300; x=1762822100;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=K3Zyvcg6HsP3kuXtclPYWjtOPlsZtk1ijNjr2zUai2Y=;
+        b=mOlMQCZnBPaMz+fxJa2PU7dS+IH/K5M72Pk3BS50yGDqBY2rX2qzmgsa/iaJtG2IK8
+         vuHM1Uc6aytlqpg25IHrwCQxfZSqBI9kED6g0d0MoI99llGoIYw3VVp3se1hLWWC3jAt
+         dbPa6TcTBsKxTQ4YUHFvfNU/w1TX6bASIbNjtRUGhkqqqBo1pTmj7v84XfL1Eiwlk+mw
+         VL/TuPqeZthNON2pZNvrKhk4Un84ruxiuDN9cJrKi8zhBIBZV8ZDTbqcRF2Q4BQRwgep
+         oM0xDEdQw21baeJCQCvwfTc7DxaEkpMXHusD7HIPRwf1EGvaKvCXakP0k2rNlGwkgDq5
+         0ElA==
+X-Gm-Message-State: AOJu0Yz1NTumV+3tyHjRknd3Z+r61ImLs2m54QqZnalGU1wzeh54ugIc
+	lWpsZd/S6YDXz+9VdaynobKevxohoQQgeOO29w0gswnmK7m2O0bHPUyp
+X-Gm-Gg: ASbGncuJz8e/hUkBYozPwIdjYkffUJUOroJJ18ix1MbHsmaUp1LWT5zfA83+teL9l/j
+	8sUXCFrLah+SXWytsdirqbVHYvE0POUHn7MJQpdo286BErEVc1YEGWrzKahUZEe+VcZVT+6jiIF
+	c1kB6sVIDGSG/+GEXDU64JsWK1RpNbB7F36/mL6AzLddKYvxdg6sZ3xsha9XLwOVJ/74dWnSx5D
+	ZuIM/Yc1cq2x5bmi+vEHE934REsf0vlfeJqdZ4SKq7MI0IIbaRBAupqPLnz1E3q43RJlqPbR7XZ
+	SV0kybbpMyDRJzgUm9jlz/pJPvKI3U/Y/G/4Jg7rqT76Gr8SFoYBkB6Mkq7LTzWgh0Q4F/wmfXX
+	gqLGHnsTm9kDzUQj0mBpvcjCwxt008zoRrz3tSW5vd+8oKcG/YvJ2MhMWirFguorI1DfBkMAw42
+	6GXsY2GOempgFRWVA=
+X-Google-Smtp-Source: AGHT+IFrD3Dj5D8+I2H1WbW5AULK93SPkl4SYUCS4JiL0AXyHtpWOTY9OaOZmnvJEPJswkxWa0+Zwg==
+X-Received: by 2002:a17:90b:3c06:b0:330:7ff5:2c58 with SMTP id 98e67ed59e1d1-34082fc413dmr19660243a91.7.1762217299693;
+        Mon, 03 Nov 2025 16:48:19 -0800 (PST)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34159fc0e19sm2400662a91.4.2025.11.03.16.48.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Nov 2025 16:48:19 -0800 (PST)
+Date: Tue, 4 Nov 2025 00:48:10 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jan Stancek <jstancek@redhat.com>,
+	"Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
+	=?iso-8859-1?Q?Asbj=F8rn_Sloth_T=F8nnesen?= <ast@fiberby.net>,
+	Stanislav Fomichev <sdf@fomichev.me>, Shuah Khan <shuah@kernel.org>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Guillaume Nault <gnault@redhat.com>,
+	Petr Machata <petrm@nvidia.com>, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 3/3] selftests: net: add YNL test framework
+Message-ID: <aQlNSkaJQLnd-RQM@fedora>
+References: <20251029082245.128675-1-liuhangbin@gmail.com>
+ <20251029082245.128675-4-liuhangbin@gmail.com>
+ <20251029164159.2dbc615a@kernel.org>
+ <aQL--I9z19zRJ4vo@fedora>
+ <20251030083944.722833ac@kernel.org>
+ <aQQVYU1u3CCyH8lQ@fedora>
+ <20251031112406.403d1971@kernel.org>
+ <aQg5y_Feg6YQ7Odl@fedora>
+ <20251103160527.2813b61c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: NeilBrown <neilb@ownmail.net>
-To: "Jeff Layton" <jlayton@kernel.org>
-Cc: "Miklos Szeredi" <miklos@szeredi.hu>,
- "Alexander Viro" <viro@zeniv.linux.org.uk>,
- "Christian Brauner" <brauner@kernel.org>, "Jan Kara" <jack@suse.cz>,
- "Chuck Lever" <chuck.lever@oracle.com>,
- "Alexander Aring" <alex.aring@gmail.com>,
- "Trond Myklebust" <trondmy@kernel.org>,
- "Anna Schumaker" <anna@kernel.org>, "Steve French" <sfrench@samba.org>,
- "Paulo Alcantara" <pc@manguebit.org>,
- "Ronnie Sahlberg" <ronniesahlberg@gmail.com>,
- "Shyam Prasad N" <sprasad@microsoft.com>, "Tom Talpey" <tom@talpey.com>,
- "Bharath SM" <bharathsm@microsoft.com>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- "Danilo Krummrich" <dakr@kernel.org>,
- "David Howells" <dhowells@redhat.com>, "Tyler Hicks" <code@tyhicks.com>,
- "Olga Kornievskaia" <okorniev@redhat.com>,
- "Dai Ngo" <Dai.Ngo@oracle.com>, "Amir Goldstein" <amir73il@gmail.com>,
- "Namjae Jeon" <linkinjeon@kernel.org>,
- "Steve French" <smfrench@gmail.com>,
- "Sergey Senozhatsky" <senozhatsky@chromium.org>,
- "Carlos Maiolino" <cem@kernel.org>,
- "Kuniyuki Iwashima" <kuniyu@google.com>,
- "David S. Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
- samba-technical@lists.samba.org, netfs@lists.linux.dev,
- ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org,
- linux-xfs@vger.kernel.org, netdev@vger.kernel.org,
- "Jeff Layton" <jlayton@kernel.org>
-Subject: Re: [PATCH v4 09/17] vfs: add struct createdata for passing arguments
- to vfs_create()
-In-reply-to: <176221480589.1793333.7801494824880510264@noble.neil.brown.name>
-References: <20251103-dir-deleg-ro-v4-0-961b67adee89@kernel.org>, <>,
- <20251103-dir-deleg-ro-v4-9-961b67adee89@kernel.org>,
- <176221480589.1793333.7801494824880510264@noble.neil.brown.name>
-Date: Tue, 04 Nov 2025 11:34:14 +1100
-Message-id: <176221645432.1793333.17238801449784435061@noble.neil.brown.name>
-Reply-To: NeilBrown <neil@brown.name>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251103160527.2813b61c@kernel.org>
 
-On Tue, 04 Nov 2025, NeilBrown wrote:
-> On Mon, 03 Nov 2025, Jeff Layton wrote:
-> > vfs_create() has grown an uncomfortably long argument list, and a
-> > following patch will add another. Convert it to take a new struct
-> > createdata pointer and fix up the callers to pass one in.
+On Mon, Nov 03, 2025 at 04:05:27PM -0800, Jakub Kicinski wrote:
+> On Mon, 3 Nov 2025 05:12:43 +0000 Hangbin Liu wrote:
 > > 
+> > Hmm, how should we execute the script under `tools/net/ynl`? Use the cli.py
+> > like:
+> > 
+> > ./cli.py --spec ../../../Documentation/netlink/specs/xxx.yaml
+> > 
+> > Or use the installed name `ynl`
+> > 
+> > ynl --family xxx ...
 > 
-> I know Christian asked for this and he is a Maintainer so.....
-> 
-> but I would like say that I don't think this is a win.  The argument
-> list isn't *that* long, and all the args are quite different so there is
-> little room for confusion.
-> 
-> I would be in favour of dropping the "dir" arg because it is always
->    d_inode(dentry->d_parent)
-> which is stable.
-> 
-> I would rather pass the vfsmnt rather than the idmap, then we could pass
-> "struct path", for both that and dentry, but I know Christian disagrees.
-> 
-> So if anyone really thinks the arg list is too long, I think there are
-> better solutions.  But I don't even think the length is a problem.
+> I think under tools/net we don't have the kernel selftest infra.
+> This is not great because we lose the integration benefits,
+> but it gives us the ability to.. do whatever want..
 
-Also *every* caller of vfs_create() passes ".excl = true".  So maybe we
-don't need that arg at all.
+Yep.
 
-I think that the last time false might have been passed to vfs_create()
-was before
+> 
+> I think relative paths would be fine? I believe that if you run cli
+> from its directory you can use --family and it will refer to the
+> in-tree specs automagically ?
 
-Commit ce8644fcadc5 ("lookup_open(): expand the call of vfs_create()")
+OK, let me try it.
 
-NeilBrown
+Thanks
+Hangbin
 
