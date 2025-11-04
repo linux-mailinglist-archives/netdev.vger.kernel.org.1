@@ -1,131 +1,240 @@
-Return-Path: <netdev+bounces-235480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235481-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 362A8C3143C
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 14:41:32 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B161C31427
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 14:39:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4172C4F1F4B
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 13:38:11 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8F72534B5F0
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 13:39:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF0FF32862C;
-	Tue,  4 Nov 2025 13:38:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9BE6328615;
+	Tue,  4 Nov 2025 13:39:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QDKE3zMT"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="VlCMZErw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC032F90C4
-	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 13:38:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01AE925F99B
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 13:39:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762263490; cv=none; b=UaH54E+0aL65FmFOPN6WqdwKSelKytYvDS25TAq+6Hg07ERdnSVYbMaFaTh4Fr26rjK6gkKEP+ggiVb3Mum0h/Ougn2m+1Z5IL/tReYMG5CtoGGQplKhsyOtXO3odiBnDF3wIWyk7enxb37RxpIUdhyhW85VkBY/12a/aMBxzaE=
+	t=1762263552; cv=none; b=WrAMg6VoAoLTzyLbX59EgJInX1Xxtm31l24vfVekrwC47WEjlNVC/1lUu9v8ovP8xrDkoeC94aqyhIWXgMxPAJaWifmcaSqV/o0uk22V/vhaOn5/lBpzmd6KQgXdeQt/DgnoIcwO5z2Uz3v4eX1nd6AiYC4LrZScFEBT+w+bMYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762263490; c=relaxed/simple;
-	bh=b+4MFJ1P4fD0WLQwYtySbmNZfeOBeQMdgCxN60MzNfY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ia+FZH6NettyPysVdj9DkF8TzWkvyXYNjnyH2RRkSc3yyrK1ph8LJNxVkHJhIIiQ2MCh6EsRJezTD1feEYMsII3UI+ACWKMj9Jax75Z8vkVAVIDwZbBBCkLuheD3b68hNrEED+kj4Ih2SsMmmijJfZXFsC0xCFGbYHEdQDvt94c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QDKE3zMT; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-477563e28a3so5160915e9.1
-        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 05:38:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762263484; x=1762868284; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=716JUp54HLtiXbrW2pmciFc8haFAbjAYRpxOJ1zhcr0=;
-        b=QDKE3zMTLH9+fhrItuC/xGBYWZf/l7BRYt7AmqMwZtcGOydZPu9ZGOHOd0hzSnuikn
-         0umotZByJQ61oElBEus13qYKEInjW+NOuf2d8moa23sO7WLjxh/pmWSBIGcPqhNwoGmD
-         1F3XlC/kbV8g/fGq7spGelkb9N20p0rwS/0eSqqzG16WnSMZviHVop5BxUoKdvAPXOp1
-         hfyIiC7FSIz8PmfhjLobIMy86cQMfGLdyWRfJKebz7DcKF7tc0lgWFCFSCJFRXX1HauH
-         73twDbuQR2DQgbhu7r9dl/xbvPGTaN07l7iVzhjvxag0pJ15vu/Mk3TRXc/0MiL8HyI8
-         8R3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762263484; x=1762868284;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=716JUp54HLtiXbrW2pmciFc8haFAbjAYRpxOJ1zhcr0=;
-        b=MMACpbylRqGjRbNnr9I/czXet5C4aHQ7ASWv6KiG4TGIQfRV8FQ2GhXMZa+Dk9dEPk
-         NMAQycgg/j6eDPWkMEKaf6DQHUkPlSE6qYMd+IoAsZYcqxH8tEdNpdH28hqrzHXD6nuN
-         RMc5YpguMxp7GnhsxXIlVXe1AzBQamrxWFFFeQlt44wBVl4Hux/sKxkPes6Ptnav+X39
-         Bqoi/KO8/S7Dmxu10iJFBXjlYt2WmVsFjOUQ4HpbtroOTf+fKqv6p5r8mTzlSXiebl3S
-         diKUBQ8+mS4/Ceo5/eU5L5MB2snX5Lz4OBDPim6QaYQhCWs9vM7ramuxTy5C+rligWLd
-         c7bg==
-X-Forwarded-Encrypted: i=1; AJvYcCWGCIl8EerJ2oFZ2XvxjvbpUfoB6Mcqwp7ZF568VoEBYBqQhZnt2c4f6JCMo6JdVbI3kza42Bs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCNzYoACBuHOOEUqpcQVwvHU4QhipIOf1qPIS+6dE8o+vtP1BJ
-	xFp0TAD+sGY6h8zoXWUG73RvHolrMX9UDlZai4OfcuO4tOVGFxB96kWf
-X-Gm-Gg: ASbGncu3vW5oReA3lWAiyaG9DxWhXVgZH23rRrCpAXu4L+kTEdt+ciCz14N3+02vpM7
-	URmx5mfRucf4eWiUqJNIX/Tc3ECPVxlVZJDlTYTnBwV6wjNGDmOEXkFm/LdYVKJBZEpYp8OUULR
-	jEZ6tVE5gbXus20g4nwmmFyKj4LqTIgU4hM0yY6vmQjGLTAilCtC0fGRdzR+ON6m9swOKg1/rs4
-	HuG5qVDLAWJy6MiE6BC9R9cdy0XXgKYpzHpvtsIyndmJFpTB1mfYf8ERLUBu1+OIaZUwsFzNZZ9
-	hfc9H0Pnd97maKYXzZGdq1eOg8mL6Vacl2r4tccN89qf6+Dda2ExAOjA+PbawdTuLd2WYXpGtpc
-	k+269ZA8dzCw29hWGWoo/1HDX0q+ydIbcGEpJKV6TVy7ZjZ2DMqkb6SibBitRATe3d2VRXdQoGv
-	uPkiPL1g0OZbeTtB17cdA6uzRUCzgZncQQ4C3SZgNBfCdIsOsm5fc=
-X-Google-Smtp-Source: AGHT+IGIdycrxy71HgH6Af4ITn325431vaJhiq25nsAZXoIWw1PHU3PRJFe7+cWlwbxB69ZNS54Gfg==
-X-Received: by 2002:a05:600c:282:b0:471:793:e795 with SMTP id 5b1f17b1804b1-47754b897e3mr20588295e9.0.1762263483818;
-        Tue, 04 Nov 2025 05:38:03 -0800 (PST)
-Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429dc1fdae2sm4837075f8f.41.2025.11.04.05.38.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Nov 2025 05:38:03 -0800 (PST)
-Message-ID: <e92c80f7-de26-4a06-a100-5947e6ccc739@gmail.com>
-Date: Tue, 4 Nov 2025 13:38:00 +0000
+	s=arc-20240116; t=1762263552; c=relaxed/simple;
+	bh=Z5TUtg9UvRYzNmCTzjmBRczD9vQcGnjKZ5Z3oJsnIgU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gie2BegY3OgW1anYL/tfXq2FM7Kmlubsx4tbI1y7INT87UKJIFRwRKV1KS6bzOR+m2yL5ZesuCpFcqdiOh6R77Qozer6ezpplroRrYT7EjEkiYLr9zDUAqW5iYt9nXjp4BafNFBsqLjM1il6Ucdkhs2i+ei14PPeMw5TlzHKeFQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=VlCMZErw; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 260A21A187C;
+	Tue,  4 Nov 2025 13:39:07 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id EEC4F606EF;
+	Tue,  4 Nov 2025 13:39:06 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 338D910B50B4C;
+	Tue,  4 Nov 2025 14:39:02 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1762263546; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=5j38NInPoXhubX4VCSTV77Fcr9qWRuwFzbATxMEPohM=;
+	b=VlCMZErwGtvQ+T07A8cDPkDAiKESAoZ+shruxfHG8i+ZZlrIl3d3BC1yVVrXaJGT/aGqdA
+	5qpRgAUTEhqsBZs6sSlx6ESN/iQhU/ZUMfDIgl5HO0dFgrWWZo7NdifUXFt1HDELMIQHQx
+	CHxK6Sdi8+eXhQ/hbbhdopov827bHXId++ckMrO8mypB5oqiq6As4iKkq4zRcB93n5vmcf
+	rTsu2A/iLcu1G0H/Jeq0cFMNIpu9cBCCdJxCGSmw79fob7BIqiyoNuwVE6/kpEDKCVuI+y
+	xaVLiON0gZd0D0P7AaDYsQnQAUCa5Dwf1sN0y9lQSOA2Z84XGiXzjVPukaWWvw==
+Date: Tue, 4 Nov 2025 14:39:01 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ Vladimir Oltean <vladimir.oltean@nxp.com>
+Subject: Re: [PATCH net-next v2] ti: netcp: convert to ndo_hwtstamp
+ callbacks
+Message-ID: <20251104143901.5f030fa9@kmaincent-XPS-13-7390>
+In-Reply-To: <afbddc5a-c051-4e45-9d4f-79d4543f6529@linux.dev>
+References: <20251103172902.3538392-1-vadim.fedorenko@linux.dev>
+	<20251103215240.7057f8cb@kmaincent-XPS-13-7390>
+	<afbddc5a-c051-4e45-9d4f-79d4543f6529@linux.dev>
+Organization: bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 09/12] io_uring/zcrx: reverse ifq refcount
-To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>
-References: <20251103234110.127790-1-dw@davidwei.uk>
- <20251103234110.127790-10-dw@davidwei.uk>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20251103234110.127790-10-dw@davidwei.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Last-TLS-Session-Version: TLSv1.3
 
-On 11/3/25 23:41, David Wei wrote:
-> Add two refcounts to struct io_zcrx_ifq to reverse the refcounting
-> relationship i.e. rings now reference ifqs instead. As a result of this,
+On Tue, 4 Nov 2025 12:15:32 +0000
+Vadim Fedorenko <vadim.fedorenko@linux.dev> wrote:
 
-Note, you don't need the 2nd refcount in this patch as there is
-only one io_uring using it. I hope not, but there is a chance
-we might need to backport it, which is why it's midly preferably
-to be kept separate.
+> On 03/11/2025 20:52, Kory Maincent wrote:
+> > On Mon,  3 Nov 2025 17:29:02 +0000
+> > Vadim Fedorenko <vadim.fedorenko@linux.dev> wrote:
+> >  =20
+> >> Convert TI NetCP driver to use ndo_hwtstamp_get()/ndo_hwtstamp_set()
+> >> callbacks. The logic is slightly changed, because I believe the origin=
+al
+> >> logic was not really correct. Config reading part is using the very
+> >> first module to get the configuration instead of iterating over all of
+> >> them and keep the last one as the configuration is supposed to be iden=
+tical
+> >> for all modules. HW timestamp config set path is now trying to configu=
+re
+> >> all modules, but in case of error from one module it adds extack
+> >> message. This way the configuration will be as synchronized as possibl=
+e.
+> >>
+> >> There are only 2 modules using netcp core infrastructure, and both use
+> >> the very same function to configure HW timestamping, so no actual
+> >> difference in behavior is expected.
+> >>
+> >> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+> >> ---
+> >> v1 -> v2:
+> >> - avoid changing logic and hiding errors. keep the call failing after
+> >>    the first error
+> >> --- =20
+> >=20
+> > ...
+> >  =20
+> >> +
+> >> +	for_each_module(netcp, intf_modpriv) {
+> >> +		module =3D intf_modpriv->netcp_module;
+> >> +		if (!module->hwtstamp_set)
+> >> +			continue;
+> >> +
+> >> +		err =3D module->hwtstamp_set(intf_modpriv->module_priv,
+> >> config,
+> >> +					   extack);
+> >> +		if ((err < 0) && (err !=3D -EOPNOTSUPP)) {
+> >> +			NL_SET_ERR_MSG_WEAK_MOD(extack,
+> >> +						"At least one module
+> >> failed to setup HW timestamps");
+> >> +			ret =3D err;
+> >> +			goto out; =20
+> >=20
+> > Why don't you use break. =20
+>=20
+> That's the original code, I tried to make as less changes as possible
+>=20
+> >  =20
+> >> +		}
+> >> +		if (err =3D=3D 0)
+> >> +			ret =3D err;
+> >> +	}
+> >> +
+> >> +out:
+> >> +	return (ret =3D=3D 0) ? 0 : err;
+> >> +}
+> >> + =20
+> >=20
+> > ...
+> >  =20
+> >> -static int gbe_hwtstamp_set(struct gbe_intf *gbe_intf, struct ifreq *=
+ifr)
+> >> +static int gbe_hwtstamp_set(void *intf_priv, struct kernel_hwtstamp_c=
+onfig
+> >> *cfg,
+> >> +			    struct netlink_ext_ack *extack)
+> >>   {
+> >> -	struct gbe_priv *gbe_dev =3D gbe_intf->gbe_dev;
+> >> -	struct cpts *cpts =3D gbe_dev->cpts;
+> >> -	struct hwtstamp_config cfg;
+> >> +	struct gbe_intf *gbe_intf =3D intf_priv;
+> >> +	struct gbe_priv *gbe_dev;
+> >> +	struct phy_device *phy;
+> >>  =20
+> >> -	if (!cpts)
+> >> +	gbe_dev =3D gbe_intf->gbe_dev;
+> >> +
+> >> +	if (!gbe_dev->cpts)
+> >>   		return -EOPNOTSUPP;
+> >>  =20
+> >> -	if (copy_from_user(&cfg, ifr->ifr_data, sizeof(cfg)))
+> >> -		return -EFAULT;
+> >> +	phy =3D gbe_intf->slave->phy;
+> >> +	if (phy_has_hwtstamp(phy))
+> >> +		return phy->mii_ts->hwtstamp(phy->mii_ts, cfg, extack); =20
+> >=20
+> > Sorry to come back to this but the choice of using PHY or MAC timestamp=
+ing
+> > is done in the core. Putting this here may conflict with the core.
+> > I know this driver has kind of a weird PHYs management through slave
+> > description but we shouldn't let the MAC driver call the PHY hwtstamp o=
+ps.
+> > If there is indeed an issue due to the weird development of this driver,
+> > people will write a patch specifically tackling this issue and maybe (by
+> > luck) refactoring this driver.
+> >=20
+> > Anyway, this was not in the driver before, so I think we should not make
+> > this change in this patch. =20
+>=20
+> Well, that was actually in the original code:
 
-> remove ctx->refs that an ifq holds on a ring via the page pool memory
-> provider.
+Oh indeed, sorry, I missed that.
+=20
+> static int gbe_ioctl(void *intf_priv, struct ifreq *req, int cmd)
+> {
+>          struct gbe_intf *gbe_intf =3D intf_priv;
+>          struct phy_device *phy =3D gbe_intf->slave->phy;
+>=20
+>          if (!phy_has_hwtstamp(phy)) {
+>                  switch (cmd) {
+>                  case SIOCGHWTSTAMP:
+>                          return gbe_hwtstamp_get(gbe_intf, req);
+>                  case SIOCSHWTSTAMP:
+>                          return gbe_hwtstamp_set(gbe_intf, req);
+>                  }
+>          }
+>=20
+>          if (phy)
+>                  return phy_mii_ioctl(phy, req, cmd);
+>=20
+>          return -EOPNOTSUPP;
+> }
+>=20
+> SIOCGHWTSTAMP/SIOCSHWTSTAMP were sent to gbe functions only when there
+> was no support for hwtstamps on phy layer. The original flow of the call
+> is:
+>=20
+> netcp_ndo_ioctl -> gbe_ioctl -> gbe_hwtstamp_*/phy_mii_ioctl
+>=20
+> where netcp_ndo_ioctl operating over netdev while other function
+> operating with other objects, with phy taken from gbe_intf.
+>=20
+> Checking on init part of phy devices, I found that the only phydev
+> allocated structure is stored in gbe_slave object, which is definitely
+> not accessible from the core. I haven't found any assignments to
+> net_device->phydev in neither netcp_core.c nor netcp_ethss.c.
+> Even though there are checks for some phy functions from netdev->phydev
+> in RX and TX paths, I'm not quite sure it works properly.
+>=20
+> I decided to keep the original logic here with checking phy from
+> gbe_intf->slave.
 
-Nice!
+Ok. I still think this may conflict when associated to a PHY that support
+hwtstamp, but if you keep the old logic then it is ok to me. Someone will f=
+ix
+it when the case appear. FYI you could use the phy_hwtstamp() helper
+instead of phy->mii_ts->hwtstamp(). Relevant in case of v3.
 
-> The first ref is ifq->refs, held by internal users of an ifq, namely
-> rings and the page pool memory provider associated with an ifq. This is
-> needed to keep the ifq around until the page pool is destroyed.
-> 
-> The second ref is ifq->user_refs, held by userspace facing users like
-> rings. For now, only the ring that created the ifq will have a ref, but
-> with ifq sharing added, this will include multiple rings.
-> 
-> ifq->refs will be 1 larger than ifq->user_refs, with the extra ref held
+Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
 
-Can be larger than +1 as there might be multiple page pools
-referring to it.
+Thank you!
 
-> by the page pool. Once ifq->user_refs falls to 0, the ifq is cleaned up
-> including destroying the page pool. Once the page pool is destroyed,
-> ifq->refs will fall to 0 and free the ifq.
--- 
-Pavel Begunkov
-
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
