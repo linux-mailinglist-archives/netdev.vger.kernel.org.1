@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-235632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0BA3C335F7
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 00:24:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B051C335FD
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 00:24:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7711834C36C
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 23:24:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 002294606EF
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 23:24:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D05982E090C;
-	Tue,  4 Nov 2025 23:23:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 716CC2E1C65;
+	Tue,  4 Nov 2025 23:23:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UypzBVLo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YfcqjTp6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC3932E03E6
-	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 23:23:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B81F2E11A6
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 23:23:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762298637; cv=none; b=SK+otmTVWHYPSlmUcGHjgXicA0BnrYlz3GbT3U/h8aUKGcpEscktvngvfTb+/A+tjpAEZXHOyPFwnaacqz5k3bimSSf6PIx2Yv68cUtbufX+Nqyxxvv8Z3IdoA3+LmLmRFxbInS+XgZq8yMQFgvycYrXibmMf7Enbw4+hZ0/E2s=
+	t=1762298638; cv=none; b=bIWC0nS2A0Pmv7bdviIS4AEFDXcMXkDfLV+bnjmrxHjhsiSnXgsa637LkYpfLlqQ7iEr2qzViNxveNTSuC8NaQq9Sw2n5znWuifWkys8ssuUK4Zo5UOjCT/zubABjJeJ0yRGMe6dUnO/VgKx4SQhgBxXLO+aaVO1aLzuVTDxz3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762298637; c=relaxed/simple;
-	bh=HDZe7E1p1J6cDYjk3DZjPSBiNJRUdBLqAtoxpUaz6h8=;
+	s=arc-20240116; t=1762298638; c=relaxed/simple;
+	bh=aEgwZT9UnSk1eewjyA/v7a/y7m8Efs/8A0RwfVe5tT4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=n3Z1gVE+Rm9mOhiMMfjpd7iWXsLou5ajIekRNmAH0Urzit0YsqitU7rcRqoGxTbMGrbRTfFHBwWyecaM/rSpNY9mUYmaI2n0NYNw4u5Ceo1YvWUi7ZkEaurCfHsCMiuUw+RBrTdYPiAYunbcYQHZ00uRIRchzjeUbnRgN+YKAi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UypzBVLo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6013C116B1;
-	Tue,  4 Nov 2025 23:23:56 +0000 (UTC)
+	 MIME-Version; b=D+A/hZcBkDw+9fCn8IzYUxohumMOZbDsxTlr71HMsarh+FZrTSh748auFXb1XWyd+sxeNGgto/wj7IiMMykH65eeTg/Smv+lhCDnDCQFUwMqb7wZWyH4ftxlYUukZp2fHH8E4/bwfN5HO/irI2O0QNmQasr8YNISavD+fLUGNk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YfcqjTp6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 663AAC19421;
+	Tue,  4 Nov 2025 23:23:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1762298637;
-	bh=HDZe7E1p1J6cDYjk3DZjPSBiNJRUdBLqAtoxpUaz6h8=;
+	bh=aEgwZT9UnSk1eewjyA/v7a/y7m8Efs/8A0RwfVe5tT4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UypzBVLoyoA+0nhJ12qb5wn0/5nPCzcoa7507n4Ai8EZh4J25F9vQuk8/Y8xKzfC1
-	 /kSuiiAvQ3ktElis2fgLHS5so4LSJxvOrEhGtyINTpLzaEbd/u++JY7kIqsQMN0r4Y
-	 i6HK6+49qDYSoPcCjrzzu9BQ+WcAYL9f1e1PxEmtSG5lTmEZCqAAEoaMGH78WRYC/Q
-	 E8cOOEYxShcwa3r7GGHU5WqihId/uMSACJU6r7kWwSEvj0SMdl0gzGx+j13IxhTnM6
-	 fuddvngCVNlxFCIgweXeOtFttGsQFxzNXdO8m3FQnyYFjMVXuPq7ER+Lbzv8KV+jmu
-	 nmzbOqU8MZUTg==
+	b=YfcqjTp6P1Xi4VaWc11WDrI3oorf9lob0kS/uMKfwVxjn0rwu19I9SEpDt3iTTvQj
+	 CvdJgG6uqO02sBbcus+uXE32BxPaWVB6HJcXzq0z4Fqlk//On8qkIyNUI++ihspAkB
+	 6lQACXB6YG6t8N1+ByvLHqxbP3NLZ56Fsj1vKtG/tymEW7vyywiXKwdIupyRGrrCsu
+	 /C2vmu548rxS8s5wc9s/DGWGjmSbfyzgNneRhzyPaqRgFDsa9d6c47GXOoy88NNpu1
+	 58Xcealp3JG3WOniIr4OC2WdDcNqrnoI6LCc1HQNv+Dy2lOEWVpNgTmMLJTOQS6iyh
+	 cWvL/rmT5FtUQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net,
 	donald.hunter@gmail.com
@@ -53,9 +53,9 @@ Cc: netdev@vger.kernel.org,
 	joe@dama.to,
 	jstancek@redhat.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 3/5] tools: ynltool: add page-pool stats
-Date: Tue,  4 Nov 2025 15:23:46 -0800
-Message-ID: <20251104232348.1954349-4-kuba@kernel.org>
+Subject: [PATCH net-next 4/5] tools: ynltool: add qstats support
+Date: Tue,  4 Nov 2025 15:23:47 -0800
+Message-ID: <20251104232348.1954349-5-kuba@kernel.org>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <20251104232348.1954349-1-kuba@kernel.org>
 References: <20251104232348.1954349-1-kuba@kernel.org>
@@ -67,290 +67,85 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Replace the page-pool sample with page pool support in ynltool.
+  $ ynltool qstat
+  eth0        rx-packets:       493192163        rx-bytes:   1442544543997
+              tx-packets:       745999838        tx-bytes:   4574215826482
+                 tx-stop:            7033         tx-wake:            7033
 
- # ynltool page-pool stats
-    eth0[2]	page pools: 18 (zombies: 0)
-		refs: 171456 bytes: 702283776 (refs: 0 bytes: 0)
-		recycling: 97.3% (alloc: 2679:6134966 recycle: 1250981:4719386)
- # ynltool -j page-pool stats | jq
- [
-  {
+  $ ynltool qstat show group-by queue
+  eth0  rx-0     packets:        70196880           bytes:    178633973750
+  eth0  rx-1     packets:        63623419           bytes:    197274745250
+  ...
+  eth0  tx-1     packets:        98645810           bytes:    631247647938
+                    stop:            1048            wake:            1048
+  eth0  tx-2     packets:        86775824           bytes:    563930471952
+                    stop:            1126            wake:            1126
+  ...
+
+  $ ynltool -j qstat  | jq
+  [
+   {
     "ifname": "eth0",
     "ifindex": 2,
-    "page_pools": 18,
-    "zombies": 0,
-    "live": {
-      "refs": 171456,
-      "bytes": 702283776
+    "rx": {
+      "packets": 493396439,
+      "bytes": 1443608198921
     },
-    "zombie": {
-      "refs": 0,
-      "bytes": 0
-    },
-    "recycling_pct": 97.2746,
-    "alloc": {
-      "slow": 2679,
-      "fast": 6135029
-    },
-    "recycle": {
-      "ring": 1250997,
-      "cache": 4719432
+    "tx": {
+      "packets": 746239978,
+      "bytes": 4574333772645,
+      "stop": 7072,
+      "wake": 7072
     }
-  }
- ]
-
- # ynltool page-pool stats group-by pp
- pool id: 108  dev: eth0[2]  napi: 530
-   inflight: 9472 pages 38797312 bytes
-   recycling: 95.5% (alloc: 148:208379 recycle: 45386:153842)
- pool id: 107  dev: eth0[2]  napi: 529
-   inflight: 9408 pages 38535168 bytes
-   recycling: 94.9% (alloc: 147:180178 recycle: 42251:128808)
+   }
+  ]
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- tools/net/ynl/ynltool/Makefile    |  11 +-
- tools/net/ynl/ynltool/main.h      |   3 +
- tools/net/ynl/samples/page-pool.c | 149 ----------
- tools/net/ynl/ynltool/main.c      |   3 +-
- tools/net/ynl/ynltool/page-pool.c | 461 ++++++++++++++++++++++++++++++
- 5 files changed, 474 insertions(+), 153 deletions(-)
- delete mode 100644 tools/net/ynl/samples/page-pool.c
- create mode 100644 tools/net/ynl/ynltool/page-pool.c
+ tools/net/ynl/ynltool/main.h   |   1 +
+ tools/net/ynl/ynltool/main.c   |   3 +-
+ tools/net/ynl/ynltool/qstats.c | 330 +++++++++++++++++++++++++++++++++
+ 3 files changed, 333 insertions(+), 1 deletion(-)
+ create mode 100644 tools/net/ynl/ynltool/qstats.c
 
-diff --git a/tools/net/ynl/ynltool/Makefile b/tools/net/ynl/ynltool/Makefile
-index ce27dc691ffe..1e860c63df66 100644
---- a/tools/net/ynl/ynltool/Makefile
-+++ b/tools/net/ynl/ynltool/Makefile
-@@ -10,25 +10,30 @@ CFLAGS := -Wall -Wextra -Werror -O2
- ifeq ("$(DEBUG)","1")
-   CFLAGS += -g -fsanitize=address -fsanitize=leak -static-libasan
- endif
--CFLAGS += -I../lib
-+CFLAGS += -I../lib -I../generated -I../../../include/uapi/
- 
- SRCS := $(wildcard *.c)
- OBJS := $(patsubst %.c,$(OUTPUT)%.o,$(SRCS))
- 
- YNLTOOL := $(OUTPUT)ynltool
-+LIBS := ../lib/ynl.a ../generated/netdev-user.o
- 
- include $(wildcard *.d)
- 
- all: $(YNLTOOL)
- 
--$(YNLTOOL): $(OBJS)
-+$(YNLTOOL): $(OBJS) $(LIBS)
- 	@echo -e "\tLINK $@"
--	@$(CC) $(CFLAGS) -o $@ $(OBJS)
-+	@$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS) -lmnl
- 
- %.o: %.c main.h json_writer.h
- 	@echo -e "\tCC $@"
- 	@$(COMPILE.c) -MMD -c -o $@ $<
- 
-+../generated/netdev-user.o: ../generated/netdev-user.c
-+	@echo -e "\tCC $@"
-+	@$(CC) $(filter-out -Werror -fsanitize=address -fsanitize=leak -static-libasan,$(CFLAGS)) -MMD -c -o $@ $<
-+
- clean:
- 	rm -f *.o *.d *~
- 
 diff --git a/tools/net/ynl/ynltool/main.h b/tools/net/ynl/ynltool/main.h
-index f4a70acf2085..fd05d21451a2 100644
+index fd05d21451a2..c7039f9ac55a 100644
 --- a/tools/net/ynl/ynltool/main.h
 +++ b/tools/net/ynl/ynltool/main.h
-@@ -59,4 +59,7 @@ struct cmd {
- int cmd_select(const struct cmd *cmds, int argc, char **argv,
- 	       int (*help)(int argc, char **argv));
+@@ -61,5 +61,6 @@ int cmd_select(const struct cmd *cmds, int argc, char **argv,
  
-+/* subcommands */
-+int do_page_pool(int argc, char **argv);
-+
+ /* subcommands */
+ int do_page_pool(int argc, char **argv);
++int do_qstats(int argc, char **argv);
+ 
  #endif /* __YNLTOOL_H */
-diff --git a/tools/net/ynl/samples/page-pool.c b/tools/net/ynl/samples/page-pool.c
-deleted file mode 100644
-index e5d521320fbf..000000000000
---- a/tools/net/ynl/samples/page-pool.c
-+++ /dev/null
-@@ -1,149 +0,0 @@
--// SPDX-License-Identifier: GPL-2.0
--#define _GNU_SOURCE
--
--#include <stdio.h>
--#include <string.h>
--
--#include <ynl.h>
--
--#include <net/if.h>
--
--#include "netdev-user.h"
--
--struct stat {
--	unsigned int ifc;
--
--	struct {
--		unsigned int cnt;
--		size_t refs, bytes;
--	} live[2];
--
--	size_t alloc_slow, alloc_fast, recycle_ring, recycle_cache;
--};
--
--struct stats_array {
--	unsigned int i, max;
--	struct stat *s;
--};
--
--static struct stat *find_ifc(struct stats_array *a, unsigned int ifindex)
--{
--	unsigned int i;
--
--	for (i = 0; i < a->i; i++) {
--		if (a->s[i].ifc == ifindex)
--			return &a->s[i];
--	}
--
--	a->i++;
--	if (a->i == a->max) {
--		a->max *= 2;
--		a->s = reallocarray(a->s, a->max, sizeof(*a->s));
--	}
--	a->s[i].ifc = ifindex;
--	return &a->s[i];
--}
--
--static void count(struct stat *s, unsigned int l,
--		  struct netdev_page_pool_get_rsp *pp)
--{
--	s->live[l].cnt++;
--	if (pp->_present.inflight)
--		s->live[l].refs += pp->inflight;
--	if (pp->_present.inflight_mem)
--		s->live[l].bytes += pp->inflight_mem;
--}
--
--int main(int argc, char **argv)
--{
--	struct netdev_page_pool_stats_get_list *pp_stats;
--	struct netdev_page_pool_get_list *pools;
--	struct stats_array a = {};
--	struct ynl_error yerr;
--	struct ynl_sock *ys;
--
--	ys = ynl_sock_create(&ynl_netdev_family, &yerr);
--	if (!ys) {
--		fprintf(stderr, "YNL: %s\n", yerr.msg);
--		return 1;
--	}
--
--	a.max = 128;
--	a.s = calloc(a.max, sizeof(*a.s));
--	if (!a.s)
--		goto err_close;
--
--	pools = netdev_page_pool_get_dump(ys);
--	if (!pools)
--		goto err_free;
--
--	ynl_dump_foreach(pools, pp) {
--		struct stat *s = find_ifc(&a, pp->ifindex);
--
--		count(s, 1, pp);
--		if (pp->_present.detach_time)
--			count(s, 0, pp);
--	}
--	netdev_page_pool_get_list_free(pools);
--
--	pp_stats = netdev_page_pool_stats_get_dump(ys);
--	if (!pp_stats)
--		goto err_free;
--
--	ynl_dump_foreach(pp_stats, pp) {
--		struct stat *s = find_ifc(&a, pp->info.ifindex);
--
--		if (pp->_present.alloc_fast)
--			s->alloc_fast += pp->alloc_fast;
--		if (pp->_present.alloc_refill)
--			s->alloc_fast += pp->alloc_refill;
--		if (pp->_present.alloc_slow)
--			s->alloc_slow += pp->alloc_slow;
--		if (pp->_present.recycle_ring)
--			s->recycle_ring += pp->recycle_ring;
--		if (pp->_present.recycle_cached)
--			s->recycle_cache += pp->recycle_cached;
--	}
--	netdev_page_pool_stats_get_list_free(pp_stats);
--
--	for (unsigned int i = 0; i < a.i; i++) {
--		char ifname[IF_NAMESIZE];
--		struct stat *s = &a.s[i];
--		const char *name;
--		double recycle;
--
--		if (!s->ifc) {
--			name = "<orphan>\t";
--		} else {
--			name = if_indextoname(s->ifc, ifname);
--			if (name)
--				printf("%8s", name);
--			printf("[%u]\t", s->ifc);
--		}
--
--		printf("page pools: %u (zombies: %u)\n",
--		       s->live[1].cnt, s->live[0].cnt);
--		printf("\t\trefs: %zu bytes: %zu (refs: %zu bytes: %zu)\n",
--		       s->live[1].refs, s->live[1].bytes,
--		       s->live[0].refs, s->live[0].bytes);
--
--		/* We don't know how many pages are sitting in cache and ring
--		 * so we will under-count the recycling rate a bit.
--		 */
--		recycle = (double)(s->recycle_ring + s->recycle_cache) /
--			(s->alloc_fast + s->alloc_slow) * 100;
--		printf("\t\trecycling: %.1lf%% (alloc: %zu:%zu recycle: %zu:%zu)\n",
--		       recycle, s->alloc_slow, s->alloc_fast,
--		       s->recycle_ring, s->recycle_cache);
--	}
--
--	ynl_sock_destroy(ys);
--	return 0;
--
--err_free:
--	free(a.s);
--err_close:
--	fprintf(stderr, "YNL: %s\n", ys->err.msg);
--	ynl_sock_destroy(ys);
--	return 2;
--}
 diff --git a/tools/net/ynl/ynltool/main.c b/tools/net/ynl/ynltool/main.c
-index c5047fad50cf..ba7420e2a7d5 100644
+index ba7420e2a7d5..1a69f0ae1647 100644
 --- a/tools/net/ynl/ynltool/main.c
 +++ b/tools/net/ynl/ynltool/main.c
 @@ -47,7 +47,7 @@ static int do_help(int argc __attribute__((unused)),
  		"Usage: %s [OPTIONS] OBJECT { COMMAND | help }\n"
  		"       %s version\n"
  		"\n"
--		"       OBJECT := { }\n"
-+		"       OBJECT := { page-pool }\n"
+-		"       OBJECT := { page-pool }\n"
++		"       OBJECT := { page-pool | qstats }\n"
  		"       " HELP_SPEC_OPTIONS "\n"
  		"",
  		bin_name, bin_name);
-@@ -71,6 +71,7 @@ static int do_version(int argc __attribute__((unused)),
- 
+@@ -72,6 +72,7 @@ static int do_version(int argc __attribute__((unused)),
  static const struct cmd commands[] = {
  	{ "help",	do_help },
-+	{ "page-pool",	do_page_pool },
+ 	{ "page-pool",	do_page_pool },
++	{ "qstats",	do_qstats },
  	{ "version",	do_version },
  	{ 0 }
  };
-diff --git a/tools/net/ynl/ynltool/page-pool.c b/tools/net/ynl/ynltool/page-pool.c
+diff --git a/tools/net/ynl/ynltool/qstats.c b/tools/net/ynl/ynltool/qstats.c
 new file mode 100644
-index 000000000000..4b24492abab7
+index 000000000000..fcdbb6d9a852
 --- /dev/null
-+++ b/tools/net/ynl/ynltool/page-pool.c
-@@ -0,0 +1,461 @@
++++ b/tools/net/ynl/ynltool/qstats.c
+@@ -0,0 +1,330 @@
 +// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 +
 +#include <stdio.h>
@@ -364,127 +159,98 @@ index 000000000000..4b24492abab7
 +
 +#include "main.h"
 +
-+struct pp_stat {
-+	unsigned int ifc;
++static enum netdev_qstats_scope scope; /* default - device */
 +
-+	struct {
-+		unsigned int cnt;
-+		size_t refs, bytes;
-+	} live[2];
-+
-+	size_t alloc_slow, alloc_fast, recycle_ring, recycle_cache;
-+};
-+
-+struct pp_stats_array {
-+	unsigned int i, max;
-+	struct pp_stat *s;
-+};
-+
-+static struct pp_stat *find_ifc(struct pp_stats_array *a, unsigned int ifindex)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < a->i; i++) {
-+		if (a->s[i].ifc == ifindex)
-+			return &a->s[i];
-+	}
-+
-+	a->i++;
-+	if (a->i == a->max) {
-+		a->max *= 2;
-+		a->s = reallocarray(a->s, a->max, sizeof(*a->s));
-+	}
-+	a->s[i].ifc = ifindex;
-+	return &a->s[i];
-+}
-+
-+static void count_pool(struct pp_stat *s, unsigned int l,
-+		       struct netdev_page_pool_get_rsp *pp)
-+{
-+	s->live[l].cnt++;
-+	if (pp->_present.inflight)
-+		s->live[l].refs += pp->inflight;
-+	if (pp->_present.inflight_mem)
-+		s->live[l].bytes += pp->inflight_mem;
-+}
-+
-+/* We don't know how many pages are sitting in cache and ring
-+ * so we will under-count the recycling rate a bit.
-+ */
-+static void print_json_recycling_stats(struct pp_stat *s)
-+{
-+	double recycle;
-+
-+	if (s->alloc_fast + s->alloc_slow) {
-+		recycle = (double)(s->recycle_ring + s->recycle_cache) /
-+			(s->alloc_fast + s->alloc_slow) * 100;
-+		jsonw_float_field(json_wtr, "recycling_pct", recycle);
-+	}
-+
-+	jsonw_name(json_wtr, "alloc");
-+	jsonw_start_object(json_wtr);
-+	jsonw_uint_field(json_wtr, "slow", s->alloc_slow);
-+	jsonw_uint_field(json_wtr, "fast", s->alloc_fast);
-+	jsonw_end_object(json_wtr);
-+
-+	jsonw_name(json_wtr, "recycle");
-+	jsonw_start_object(json_wtr);
-+	jsonw_uint_field(json_wtr, "ring", s->recycle_ring);
-+	jsonw_uint_field(json_wtr, "cache", s->recycle_cache);
-+	jsonw_end_object(json_wtr);
-+}
-+
-+static void print_plain_recycling_stats(struct pp_stat *s)
-+{
-+	double recycle;
-+
-+	if (s->alloc_fast + s->alloc_slow) {
-+		recycle = (double)(s->recycle_ring + s->recycle_cache) /
-+			(s->alloc_fast + s->alloc_slow) * 100;
-+		printf("recycling: %.1lf%% (alloc: %zu:%zu recycle: %zu:%zu)",
-+		       recycle, s->alloc_slow, s->alloc_fast,
-+		       s->recycle_ring, s->recycle_cache);
-+	}
-+}
-+
-+static void print_json_stats(struct pp_stats_array *a)
++static void print_json_qstats(struct netdev_qstats_get_list *qstats)
 +{
 +	jsonw_start_array(json_wtr);
 +
-+	for (unsigned int i = 0; i < a->i; i++) {
++	ynl_dump_foreach(qstats, qs) {
 +		char ifname[IF_NAMESIZE];
-+		struct pp_stat *s = &a->s[i];
 +		const char *name;
 +
 +		jsonw_start_object(json_wtr);
 +
-+		if (!s->ifc) {
-+			jsonw_string_field(json_wtr, "ifname", "<orphan>");
-+			jsonw_uint_field(json_wtr, "ifindex", 0);
-+		} else {
-+			name = if_indextoname(s->ifc, ifname);
-+			if (name)
-+				jsonw_string_field(json_wtr, "ifname", name);
-+			jsonw_uint_field(json_wtr, "ifindex", s->ifc);
++		name = if_indextoname(qs->ifindex, ifname);
++		if (name)
++			jsonw_string_field(json_wtr, "ifname", name);
++		jsonw_uint_field(json_wtr, "ifindex", qs->ifindex);
++
++		if (qs->_present.queue_type)
++			jsonw_string_field(json_wtr, "queue-type",
++					   netdev_queue_type_str(qs->queue_type));
++		if (qs->_present.queue_id)
++			jsonw_uint_field(json_wtr, "queue-id", qs->queue_id);
++
++		if (qs->_present.rx_packets || qs->_present.rx_bytes ||
++		    qs->_present.rx_alloc_fail || qs->_present.rx_hw_drops ||
++		    qs->_present.rx_csum_complete || qs->_present.rx_hw_gro_packets) {
++			jsonw_name(json_wtr, "rx");
++			jsonw_start_object(json_wtr);
++			if (qs->_present.rx_packets)
++				jsonw_uint_field(json_wtr, "packets", qs->rx_packets);
++			if (qs->_present.rx_bytes)
++				jsonw_uint_field(json_wtr, "bytes", qs->rx_bytes);
++			if (qs->_present.rx_alloc_fail)
++				jsonw_uint_field(json_wtr, "alloc-fail", qs->rx_alloc_fail);
++			if (qs->_present.rx_hw_drops)
++				jsonw_uint_field(json_wtr, "hw-drops", qs->rx_hw_drops);
++			if (qs->_present.rx_hw_drop_overruns)
++				jsonw_uint_field(json_wtr, "hw-drop-overruns", qs->rx_hw_drop_overruns);
++			if (qs->_present.rx_hw_drop_ratelimits)
++				jsonw_uint_field(json_wtr, "hw-drop-ratelimits", qs->rx_hw_drop_ratelimits);
++			if (qs->_present.rx_csum_complete)
++				jsonw_uint_field(json_wtr, "csum-complete", qs->rx_csum_complete);
++			if (qs->_present.rx_csum_unnecessary)
++				jsonw_uint_field(json_wtr, "csum-unnecessary", qs->rx_csum_unnecessary);
++			if (qs->_present.rx_csum_none)
++				jsonw_uint_field(json_wtr, "csum-none", qs->rx_csum_none);
++			if (qs->_present.rx_csum_bad)
++				jsonw_uint_field(json_wtr, "csum-bad", qs->rx_csum_bad);
++			if (qs->_present.rx_hw_gro_packets)
++				jsonw_uint_field(json_wtr, "hw-gro-packets", qs->rx_hw_gro_packets);
++			if (qs->_present.rx_hw_gro_bytes)
++				jsonw_uint_field(json_wtr, "hw-gro-bytes", qs->rx_hw_gro_bytes);
++			if (qs->_present.rx_hw_gro_wire_packets)
++				jsonw_uint_field(json_wtr, "hw-gro-wire-packets", qs->rx_hw_gro_wire_packets);
++			if (qs->_present.rx_hw_gro_wire_bytes)
++				jsonw_uint_field(json_wtr, "hw-gro-wire-bytes", qs->rx_hw_gro_wire_bytes);
++			jsonw_end_object(json_wtr);
 +		}
 +
-+		jsonw_uint_field(json_wtr, "page_pools", s->live[1].cnt);
-+		jsonw_uint_field(json_wtr, "zombies", s->live[0].cnt);
-+
-+		jsonw_name(json_wtr, "live");
-+		jsonw_start_object(json_wtr);
-+		jsonw_uint_field(json_wtr, "refs", s->live[1].refs);
-+		jsonw_uint_field(json_wtr, "bytes", s->live[1].bytes);
-+		jsonw_end_object(json_wtr);
-+
-+		jsonw_name(json_wtr, "zombie");
-+		jsonw_start_object(json_wtr);
-+		jsonw_uint_field(json_wtr, "refs", s->live[0].refs);
-+		jsonw_uint_field(json_wtr, "bytes", s->live[0].bytes);
-+		jsonw_end_object(json_wtr);
-+
-+		if (s->alloc_fast || s->alloc_slow)
-+			print_json_recycling_stats(s);
++		if (qs->_present.tx_packets || qs->_present.tx_bytes ||
++		    qs->_present.tx_hw_drops || qs->_present.tx_csum_none ||
++		    qs->_present.tx_hw_gso_packets) {
++			jsonw_name(json_wtr, "tx");
++			jsonw_start_object(json_wtr);
++			if (qs->_present.tx_packets)
++				jsonw_uint_field(json_wtr, "packets", qs->tx_packets);
++			if (qs->_present.tx_bytes)
++				jsonw_uint_field(json_wtr, "bytes", qs->tx_bytes);
++			if (qs->_present.tx_hw_drops)
++				jsonw_uint_field(json_wtr, "hw-drops", qs->tx_hw_drops);
++			if (qs->_present.tx_hw_drop_errors)
++				jsonw_uint_field(json_wtr, "hw-drop-errors", qs->tx_hw_drop_errors);
++			if (qs->_present.tx_hw_drop_ratelimits)
++				jsonw_uint_field(json_wtr, "hw-drop-ratelimits", qs->tx_hw_drop_ratelimits);
++			if (qs->_present.tx_csum_none)
++				jsonw_uint_field(json_wtr, "csum-none", qs->tx_csum_none);
++			if (qs->_present.tx_needs_csum)
++				jsonw_uint_field(json_wtr, "needs-csum", qs->tx_needs_csum);
++			if (qs->_present.tx_hw_gso_packets)
++				jsonw_uint_field(json_wtr, "hw-gso-packets", qs->tx_hw_gso_packets);
++			if (qs->_present.tx_hw_gso_bytes)
++				jsonw_uint_field(json_wtr, "hw-gso-bytes", qs->tx_hw_gso_bytes);
++			if (qs->_present.tx_hw_gso_wire_packets)
++				jsonw_uint_field(json_wtr, "hw-gso-wire-packets", qs->tx_hw_gso_wire_packets);
++			if (qs->_present.tx_hw_gso_wire_bytes)
++				jsonw_uint_field(json_wtr, "hw-gso-wire-bytes", qs->tx_hw_gso_wire_bytes);
++			if (qs->_present.tx_stop)
++				jsonw_uint_field(json_wtr, "stop", qs->tx_stop);
++			if (qs->_present.tx_wake)
++				jsonw_uint_field(json_wtr, "wake", qs->tx_wake);
++			jsonw_end_object(json_wtr);
++		}
 +
 +		jsonw_end_object(json_wtr);
 +	}
@@ -492,228 +258,146 @@ index 000000000000..4b24492abab7
 +	jsonw_end_array(json_wtr);
 +}
 +
-+static void print_plain_stats(struct pp_stats_array *a)
++static void print_one(bool present, const char *name, unsigned long long val,
++		      int *line)
 +{
-+	for (unsigned int i = 0; i < a->i; i++) {
-+		char ifname[IF_NAMESIZE];
-+		struct pp_stat *s = &a->s[i];
-+		const char *name;
++	if (!present)
++		return;
 +
-+		if (!s->ifc) {
-+			printf("<orphan>\t");
-+		} else {
-+			name = if_indextoname(s->ifc, ifname);
-+			if (name)
-+				printf("%8s", name);
-+			printf("[%u]\t", s->ifc);
-+		}
-+
-+		printf("page pools: %u (zombies: %u)\n",
-+		       s->live[1].cnt, s->live[0].cnt);
-+		printf("\t\trefs: %zu bytes: %zu (refs: %zu bytes: %zu)\n",
-+		       s->live[1].refs, s->live[1].bytes,
-+		       s->live[0].refs, s->live[0].bytes);
-+
-+		if (s->alloc_fast || s->alloc_slow) {
-+			printf("\t\t");
-+			print_plain_recycling_stats(s);
-+			printf("\n");
-+		}
-+	}
-+}
-+
-+static bool
-+find_pool_stat_in_list(struct netdev_page_pool_stats_get_list *pp_stats,
-+		       __u64 pool_id, struct pp_stat *pstat)
-+{
-+	ynl_dump_foreach(pp_stats, pp) {
-+		if (!pp->_present.info || !pp->info._present.id)
-+			continue;
-+		if (pp->info.id != pool_id)
-+			continue;
-+
-+		memset(pstat, 0, sizeof(*pstat));
-+		if (pp->_present.alloc_fast)
-+			pstat->alloc_fast = pp->alloc_fast;
-+		if (pp->_present.alloc_refill)
-+			pstat->alloc_fast += pp->alloc_refill;
-+		if (pp->_present.alloc_slow)
-+			pstat->alloc_slow = pp->alloc_slow;
-+		if (pp->_present.recycle_ring)
-+			pstat->recycle_ring = pp->recycle_ring;
-+		if (pp->_present.recycle_cached)
-+			pstat->recycle_cache = pp->recycle_cached;
-+		return true;
-+	}
-+	return false;
-+}
-+
-+static void
-+print_json_pool_list(struct netdev_page_pool_get_list *pools,
-+		     struct netdev_page_pool_stats_get_list *pp_stats,
-+		     bool zombies_only)
-+{
-+	jsonw_start_array(json_wtr);
-+
-+	ynl_dump_foreach(pools, pp) {
-+		char ifname[IF_NAMESIZE];
-+		struct pp_stat pstat;
-+		const char *name;
-+
-+		if (zombies_only && !pp->_present.detach_time)
-+			continue;
-+
-+		jsonw_start_object(json_wtr);
-+
-+		jsonw_uint_field(json_wtr, "id", pp->id);
-+
-+		if (pp->_present.ifindex) {
-+			name = if_indextoname(pp->ifindex, ifname);
-+			if (name)
-+				jsonw_string_field(json_wtr, "ifname", name);
-+			jsonw_uint_field(json_wtr, "ifindex", pp->ifindex);
-+		}
-+
-+		if (pp->_present.napi_id)
-+			jsonw_uint_field(json_wtr, "napi_id", pp->napi_id);
-+
-+		if (pp->_present.inflight)
-+			jsonw_uint_field(json_wtr, "refs", pp->inflight);
-+
-+		if (pp->_present.inflight_mem)
-+			jsonw_uint_field(json_wtr, "bytes", pp->inflight_mem);
-+
-+		if (pp->_present.detach_time)
-+			jsonw_uint_field(json_wtr, "detach_time", pp->detach_time);
-+
-+		if (pp->_present.dmabuf)
-+			jsonw_uint_field(json_wtr, "dmabuf", pp->dmabuf);
-+
-+		if (find_pool_stat_in_list(pp_stats, pp->id, &pstat) &&
-+		    (pstat.alloc_fast || pstat.alloc_slow))
-+			print_json_recycling_stats(&pstat);
-+
-+		jsonw_end_object(json_wtr);
++	if (!*line) {
++		printf("              ");
++		++(*line);
 +	}
 +
-+	jsonw_end_array(json_wtr);
-+}
++	/* Don't waste space on tx- and rx- prefix, its implied by queue type */
++	if (scope == NETDEV_QSTATS_SCOPE_QUEUE &&
++	    (name[0] == 'r' || name[0] == 't') &&
++	    name[1] == 'x' && name[2] == '-')
++		name += 3;
 +
-+static void
-+print_plain_pool_list(struct netdev_page_pool_get_list *pools,
-+		      struct netdev_page_pool_stats_get_list *pp_stats,
-+		      bool zombies_only)
-+{
-+	ynl_dump_foreach(pools, pp) {
-+		char ifname[IF_NAMESIZE];
-+		struct pp_stat pstat;
-+		const char *name;
++	printf(" %15s: %15llu", name, val);
 +
-+		if (zombies_only && !pp->_present.detach_time)
-+			continue;
-+
-+		printf("pool id: %llu", pp->id);
-+
-+		if (pp->_present.ifindex) {
-+			name = if_indextoname(pp->ifindex, ifname);
-+			if (name)
-+				printf("  dev: %s", name);
-+			printf("[%u]", pp->ifindex);
-+		}
-+
-+		if (pp->_present.napi_id)
-+			printf("  napi: %llu", pp->napi_id);
-+
++	if (++(*line) == 3) {
 +		printf("\n");
-+
-+		if (pp->_present.inflight || pp->_present.inflight_mem) {
-+			printf("  inflight:");
-+			if (pp->_present.inflight)
-+				printf(" %llu pages", pp->inflight);
-+			if (pp->_present.inflight_mem)
-+				printf(" %llu bytes", pp->inflight_mem);
-+			printf("\n");
-+		}
-+
-+		if (pp->_present.detach_time)
-+			printf("  detached: %llu\n", pp->detach_time);
-+
-+		if (pp->_present.dmabuf)
-+			printf("  dmabuf: %u\n", pp->dmabuf);
-+
-+		if (find_pool_stat_in_list(pp_stats, pp->id, &pstat) &&
-+		    (pstat.alloc_fast || pstat.alloc_slow)) {
-+			printf("  ");
-+			print_plain_recycling_stats(&pstat);
-+			printf("\n");
-+		}
++		*line = 0;
 +	}
 +}
 +
-+static void aggregate_device_stats(struct pp_stats_array *a,
-+				   struct netdev_page_pool_get_list *pools,
-+				   struct netdev_page_pool_stats_get_list *pp_stats)
++static void print_plain_qstats(struct netdev_qstats_get_list *qstats)
 +{
-+	ynl_dump_foreach(pools, pp) {
-+		struct pp_stat *s = find_ifc(a, pp->ifindex);
++	ynl_dump_foreach(qstats, qs) {
++		char ifname[IF_NAMESIZE];
++		const char *name;
++		int n;
 +
-+		count_pool(s, 1, pp);
-+		if (pp->_present.detach_time)
-+			count_pool(s, 0, pp);
-+	}
++		name = if_indextoname(qs->ifindex, ifname);
++		if (name)
++			printf("%s", name);
++		else
++			printf("ifindex:%u", qs->ifindex);
 +
-+	ynl_dump_foreach(pp_stats, pp) {
-+		struct pp_stat *s = find_ifc(a, pp->info.ifindex);
++		if (qs->_present.queue_type && qs->_present.queue_id)
++			printf("\t%s-%-3u",
++			       netdev_queue_type_str(qs->queue_type),
++			       qs->queue_id);
++		else
++			printf("\t      ");
 +
-+		if (pp->_present.alloc_fast)
-+			s->alloc_fast += pp->alloc_fast;
-+		if (pp->_present.alloc_refill)
-+			s->alloc_fast += pp->alloc_refill;
-+		if (pp->_present.alloc_slow)
-+			s->alloc_slow += pp->alloc_slow;
-+		if (pp->_present.recycle_ring)
-+			s->recycle_ring += pp->recycle_ring;
-+		if (pp->_present.recycle_cached)
-+			s->recycle_cache += pp->recycle_cached;
++		n = 1;
++
++		/* Basic counters */
++		print_one(qs->_present.rx_packets, "rx-packets", qs->rx_packets, &n);
++		print_one(qs->_present.rx_bytes, "rx-bytes", qs->rx_bytes, &n);
++		print_one(qs->_present.tx_packets, "tx-packets", qs->tx_packets, &n);
++		print_one(qs->_present.tx_bytes, "tx-bytes", qs->tx_bytes, &n);
++
++		/* RX error/drop counters */
++		print_one(qs->_present.rx_alloc_fail, "rx-alloc-fail",
++			  qs->rx_alloc_fail, &n);
++		print_one(qs->_present.rx_hw_drops, "rx-hw-drops",
++			  qs->rx_hw_drops, &n);
++		print_one(qs->_present.rx_hw_drop_overruns, "rx-hw-drop-overruns",
++			  qs->rx_hw_drop_overruns, &n);
++		print_one(qs->_present.rx_hw_drop_ratelimits, "rx-hw-drop-ratelimits",
++			  qs->rx_hw_drop_ratelimits, &n);
++
++		/* RX checksum counters */
++		print_one(qs->_present.rx_csum_complete, "rx-csum-complete",
++			  qs->rx_csum_complete, &n);
++		print_one(qs->_present.rx_csum_unnecessary, "rx-csum-unnecessary",
++			  qs->rx_csum_unnecessary, &n);
++		print_one(qs->_present.rx_csum_none, "rx-csum-none",
++			  qs->rx_csum_none, &n);
++		print_one(qs->_present.rx_csum_bad, "rx-csum-bad",
++			  qs->rx_csum_bad, &n);
++
++		/* RX GRO counters */
++		print_one(qs->_present.rx_hw_gro_packets, "rx-hw-gro-packets",
++			  qs->rx_hw_gro_packets, &n);
++		print_one(qs->_present.rx_hw_gro_bytes, "rx-hw-gro-bytes",
++			  qs->rx_hw_gro_bytes, &n);
++		print_one(qs->_present.rx_hw_gro_wire_packets, "rx-hw-gro-wire-packets",
++			  qs->rx_hw_gro_wire_packets, &n);
++		print_one(qs->_present.rx_hw_gro_wire_bytes, "rx-hw-gro-wire-bytes",
++			  qs->rx_hw_gro_wire_bytes, &n);
++
++		/* TX error/drop counters */
++		print_one(qs->_present.tx_hw_drops, "tx-hw-drops",
++			  qs->tx_hw_drops, &n);
++		print_one(qs->_present.tx_hw_drop_errors, "tx-hw-drop-errors",
++			  qs->tx_hw_drop_errors, &n);
++		print_one(qs->_present.tx_hw_drop_ratelimits, "tx-hw-drop-ratelimits",
++			  qs->tx_hw_drop_ratelimits, &n);
++
++		/* TX checksum counters */
++		print_one(qs->_present.tx_csum_none, "tx-csum-none",
++			  qs->tx_csum_none, &n);
++		print_one(qs->_present.tx_needs_csum, "tx-needs-csum",
++			  qs->tx_needs_csum, &n);
++
++		/* TX GSO counters */
++		print_one(qs->_present.tx_hw_gso_packets, "tx-hw-gso-packets",
++			  qs->tx_hw_gso_packets, &n);
++		print_one(qs->_present.tx_hw_gso_bytes, "tx-hw-gso-bytes",
++			  qs->tx_hw_gso_bytes, &n);
++		print_one(qs->_present.tx_hw_gso_wire_packets, "tx-hw-gso-wire-packets",
++			  qs->tx_hw_gso_wire_packets, &n);
++		print_one(qs->_present.tx_hw_gso_wire_bytes, "tx-hw-gso-wire-bytes",
++			  qs->tx_hw_gso_wire_bytes, &n);
++
++		/* TX queue control */
++		print_one(qs->_present.tx_stop, "tx-stop", qs->tx_stop, &n);
++		print_one(qs->_present.tx_wake, "tx-wake", qs->tx_wake, &n);
++
++		if (n)
++			printf("\n");
 +	}
 +}
 +
-+static int do_stats(int argc, char **argv)
++static int do_show(int argc, char **argv)
 +{
-+	struct netdev_page_pool_stats_get_list *pp_stats;
-+	struct netdev_page_pool_get_list *pools;
-+	enum {
-+		GROUP_BY_DEVICE,
-+		GROUP_BY_POOL,
-+	} group_by = GROUP_BY_DEVICE;
-+	bool zombies_only = false;
-+	struct pp_stats_array a = {};
++	struct netdev_qstats_get_list *qstats;
++	struct netdev_qstats_get_req *req;
 +	struct ynl_error yerr;
 +	struct ynl_sock *ys;
 +	int ret = 0;
 +
 +	/* Parse options */
 +	while (argc > 0) {
-+		if (is_prefix(*argv, "group-by")) {
++		if (is_prefix(*argv, "scope") || is_prefix(*argv, "group-by")) {
 +			NEXT_ARG();
 +
 +			if (!REQ_ARGS(1))
 +				return -1;
 +
-+			if (is_prefix(*argv, "device")) {
-+				group_by = GROUP_BY_DEVICE;
-+			} else if (is_prefix(*argv, "pp") ||
-+				   is_prefix(*argv, "page-pool") ||
-+				   is_prefix(*argv, "none")) {
-+				group_by = GROUP_BY_POOL;
++			if (is_prefix(*argv, "queue")) {
++				scope = NETDEV_QSTATS_SCOPE_QUEUE;
++			} else if (is_prefix(*argv, "device")) {
++				scope = 0;
 +			} else {
-+				p_err("invalid group-by value '%s'", *argv);
++				p_err("invalid scope value '%s'", *argv);
 +				return -1;
 +			}
-+			NEXT_ARG();
-+		} else if (is_prefix(*argv, "zombies")) {
-+			zombies_only = true;
-+			group_by = GROUP_BY_POOL;
 +			NEXT_ARG();
 +		} else {
 +			p_err("unknown option '%s'", *argv);
@@ -727,50 +411,31 @@ index 000000000000..4b24492abab7
 +		return -1;
 +	}
 +
-+	pools = netdev_page_pool_get_dump(ys);
-+	if (!pools) {
-+		p_err("failed to get page pools: %s", ys->err.msg);
++	req = netdev_qstats_get_req_alloc();
++	if (!req) {
++		p_err("failed to allocate qstats request");
 +		ret = -1;
 +		goto exit_close;
 +	}
 +
-+	pp_stats = netdev_page_pool_stats_get_dump(ys);
-+	if (!pp_stats) {
-+		p_err("failed to get page pool stats: %s", ys->err.msg);
++	if (scope)
++		netdev_qstats_get_req_set_scope(req, scope);
++
++	qstats = netdev_qstats_get_dump(ys, req);
++	netdev_qstats_get_req_free(req);
++	if (!qstats) {
++		p_err("failed to get queue stats: %s", ys->err.msg);
 +		ret = -1;
-+		goto exit_free_pp_list;
++		goto exit_close;
 +	}
 +
-+	/* If grouping by pool, print individual pools */
-+	if (group_by == GROUP_BY_POOL) {
-+		if (json_output)
-+			print_json_pool_list(pools, pp_stats, zombies_only);
-+		else
-+			print_plain_pool_list(pools, pp_stats, zombies_only);
-+	} else {
-+		/* Aggregated stats mode (group-by device) */
-+		a.max = 64;
-+		a.s = calloc(a.max, sizeof(*a.s));
-+		if (!a.s) {
-+			p_err("failed to allocate stats array");
-+			ret = -1;
-+			goto exit_free_stats_list;
-+		}
++	/* Print the stats as returned by the kernel */
++	if (json_output)
++		print_json_qstats(qstats);
++	else
++		print_plain_qstats(qstats);
 +
-+		aggregate_device_stats(&a, pools, pp_stats);
-+
-+		if (json_output)
-+			print_json_stats(&a);
-+		else
-+			print_plain_stats(&a);
-+
-+		free(a.s);
-+	}
-+
-+exit_free_stats_list:
-+	netdev_page_pool_stats_get_list_free(pp_stats);
-+exit_free_pp_list:
-+	netdev_page_pool_get_list_free(pools);
++	netdev_qstats_get_list_free(qstats);
 +exit_close:
 +	ynl_sock_destroy(ys);
 +	return ret;
@@ -785,32 +450,31 @@ index 000000000000..4b24492abab7
 +	}
 +
 +	fprintf(stderr,
-+		"Usage: %s page-pool { COMMAND | help }\n"
-+		"       %s page-pool stats [ OPTIONS ]\n"
++		"Usage: %s qstats { COMMAND | help }\n"
++		"       %s qstats [ show ] [ OPTIONS ]\n"
 +		"\n"
-+		"       OPTIONS := { group-by { device | page-pool | none } | zombies }\n"
++		"       OPTIONS := { scope queue | group-by { device | queue } }\n"
 +		"\n"
-+		"       stats                   - Display page pool statistics\n"
-+		"       stats group-by device   - Group statistics by network device (default)\n"
-+		"       stats group-by page-pool | pp | none\n"
-+		"                               - Show individual page pool details (no grouping)\n"
-+		"       stats zombies           - Show only zombie page pools (detached but with\n"
-+		"                                 pages in flight). Implies group-by page-pool.\n"
++		"       show                  - Display queue statistics (default)\n"
++		"                               Statistics are aggregated for the entire device.\n"
++		"       show scope queue      - Display per-queue statistics\n"
++		"       show group-by device  - Display device-aggregated statistics (default)\n"
++		"       show group-by queue   - Display per-queue statistics\n"
 +		"",
 +		bin_name, bin_name);
 +
 +	return 0;
 +}
 +
-+static const struct cmd page_pool_cmds[] = {
++static const struct cmd qstats_cmds[] = {
++	{ "show",	do_show },
 +	{ "help",	do_help },
-+	{ "stats",	do_stats },
 +	{ 0 }
 +};
 +
-+int do_page_pool(int argc, char **argv)
++int do_qstats(int argc, char **argv)
 +{
-+	return cmd_select(page_pool_cmds, argc, argv, do_help);
++	return cmd_select(qstats_cmds, argc, argv, do_help);
 +}
 -- 
 2.51.1
