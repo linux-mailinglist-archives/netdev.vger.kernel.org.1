@@ -1,210 +1,133 @@
-Return-Path: <netdev+bounces-235399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0259C2FDE9
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 09:29:10 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA3E4C2FEBC
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 09:34:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5162934B970
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 08:28:54 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BAED04E21A9
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 08:34:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C4BA311C3B;
-	Tue,  4 Nov 2025 08:28:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E48730498F;
+	Tue,  4 Nov 2025 08:34:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UI27BKKo"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="DCd+FqUx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FC4A30596A
-	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 08:28:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6466C236435
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 08:34:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762244893; cv=none; b=BRpTLZvu1P99wBa3e2Fyp3pNyRrnEmHEE9uDNK/o6E1fhtb6cl90eEUXKSIKjr5zNhzgkGgjQVp+XWzz/Esm9F3ajp3nHmcz2+5svPCQbPnnlDCHG775P6D67YgB50bbllgAE4cfOXZa+9f1Viifhn8+JRNTs7AEb6ESVwsX3EM=
+	t=1762245288; cv=none; b=ZojTUhweq76btjHj1w5T1Noy1A2i/fe4vVuRgHeNhoL2nyY4/fq/tuLaEFEp//8fKHeA8USIPg0YeXvW+HaD0W1AfDvDcoNGIBIKhQErsvE5IIZ+d4KUwLzSHNM/A8PX6If0iWrRN0l10Tw4GizEpirMiXpmwS2XfgFhzbIXv/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762244893; c=relaxed/simple;
-	bh=LqIk0BpxBLI5IJn6XweWFJYr1RRUDL4M/FAHdXfNl+c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ynbzf5pwcxQO0OnRoSgbC2ZEkuAuTIEciugEUrHVuzepOg2Hk0uDpJQSi/NS9m9MrwFaAfv4kQvZlU+9IjUecwh+UXUU82vat2uNtQ/+zrUT8fJGeKczQ4LD4SraKJGzPcoa4cOkIyTHkEziGq7Bxq0BCbrfrPXMS1Tgpm4cDFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UI27BKKo; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-33be037cf73so5406433a91.2
-        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 00:28:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762244891; x=1762849691; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=qFICcE+Vtbf0TwZWSrWoxdS8zOuWh2Ntsa14GnmIyDk=;
-        b=UI27BKKoSEV1WJsjVDILbG6caTpFTU2mXKtb++LnEQo17B55L4apOche09aW38MhfR
-         7RYjAUSICeIQ7nH/7ZULt6uHNfgnf9+APlqAr0cKchyRb1aWpk4+r1YSM3kUNXjYCgab
-         aOFVLCsciYWuo8U5Pt/djQlJ1igvP2UXP5TiD47HtvStMoYFWfE6+8UTYInIm8rfqJ2y
-         PFBf6ikwJ3Sx0vtCPAzmYXRoXt+c3Hhk7G4Lw+NuUiOQmZnbOOKkyibMtRR7Ahib52ta
-         XMu/YXRioCx26W3Rr+25ixo6yosaA9m2zNARFzoQYijcbY1NmyDht5roIEdA9WWmtKIE
-         zdMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762244891; x=1762849691;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qFICcE+Vtbf0TwZWSrWoxdS8zOuWh2Ntsa14GnmIyDk=;
-        b=rTIB33QfiK/HGI4u9Q3GUKjpg0kJwPNbMzjj4jP0hzamT881PB7G46OhFoesGW+GH9
-         pczVcCEAOCWe5p6c6UZBsJB6jqRnhRkjcfuHPn4M1LPLT2VZFwkxkZT4WaNei0nejHbN
-         a2PdmfNyiKdEOQETMV7gO7f9kzwZGz8lnVQSBUHKv1+JDXWOsuBHUA4dj/NfLqJ35gZM
-         IicdUVshNrtMODwbGoA8kFDSyIqKlAcRSy5qMgTJ8Cl4gTPhQWOwQrHbSwB51nBB+YwZ
-         pmUqS2N7V0dqyxZbbVUMtz4+j3PrJhMgN1Fe73RezTJcH5FPfVa1fmZojODw1qnYF01N
-         vqsA==
-X-Forwarded-Encrypted: i=1; AJvYcCUv+aRt4EOMojFrxDF8cs9v2axQdyahmxbmB27wKqd+Vuo2J35xC91uwfhVBdf+EhkLnAukN9o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YycYiHRsxxNtYY7KciKk4TL5eQu94sVSQ6yZhowDIcajE3nrgxm
-	/aylu3X4T/OlPTzNwEhs61pqw4JHinQO3t3Bdmq6TLsxl3umLC+u6ZHz
-X-Gm-Gg: ASbGncsCqul6rQ6dUZYfVSEB2ejhNoFGIRvpH+Iz/TL3Yv+uc/tstyv99C4/v0NWXdQ
-	NQKgB4qL4N01g4CjGLVYI1T37EK5L4vIan9/2IwPrujd9xnT5OW/3WEtq1hHk0t9l2A50+iJ2kQ
-	mwjekL22tHFBjkYcmD+3/HgDSvU1HFwnZOhYi9oWAJccgPegBM50ENItRYjyri12gLnlWRmog9f
-	/f3Q6JflnBFQakTCVvET4BuOUdowLKociACt70HVAeFEUWXvz1ZyG/tEFrJt/+axYY5QY76hKhK
-	RSFlsMX8xlQkG1EzKvM5UYjpbRpN2B89TTdWWomUOzBVSRZ47qz6ldzW3/OaoX8mGa8ISnzo6pQ
-	xMn3ECV+tc6WehgqOm3td34CdeXnJFMdTipO4JpiDg1cQX3nN02B0X8PgjXmuMNi+r8DN
-X-Google-Smtp-Source: AGHT+IGVUulaM8PgxdpqWXbaXLvoTSxC4FBTiFBtCJmYm4R/u5Kqq0KGBrKf+VchkH7vBPb6AjB/0w==
-X-Received: by 2002:a17:90b:1a8b:b0:339:cece:a99 with SMTP id 98e67ed59e1d1-34082fc2ca5mr19922869a91.13.1762244890765;
-        Tue, 04 Nov 2025 00:28:10 -0800 (PST)
-Received: from lgs.. ([172.81.120.170])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3415c8b78f8sm3661514a91.20.2025.11.04.00.28.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Nov 2025 00:28:10 -0800 (PST)
-From: Guangshuo Li <lgs201920130244@gmail.com>
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jeff Kirsher <jeffrey.t.kirsher@intel.com>,
-	Florian Westphal <fw@strlen.de>,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Guangshuo Li <lgs201920130244@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] e1000: fix OOB in e1000_tbi_should_accept()
-Date: Tue,  4 Nov 2025 16:28:01 +0800
-Message-ID: <20251104082801.994195-1-lgs201920130244@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1762245288; c=relaxed/simple;
+	bh=CHxw+7FmZsoqysMXyJbR5lHvF2gHjVBt5q7NIDGlf+U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PZLKVOnkHHbi0CXH8+PLqD2hu/63eInzik3gI9O/Mdp8J8BUlwmzBkxKxFO/barMworbNz/X/6A/rw47QQpza6DhHtE5m5np1ZIAkhaDlgybKRrWL+4eM0U7q3lY8rv7s/hdo2JBmi/t+ltvlojCLaqQuTmjiWZgSStYa/Mcl/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=DCd+FqUx; arc=none smtp.client-ip=185.246.84.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-02.galae.net (Postfix) with ESMTPS id 33E361A184C;
+	Tue,  4 Nov 2025 08:34:43 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 046FE606EF;
+	Tue,  4 Nov 2025 08:34:43 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 94FB810B50919;
+	Tue,  4 Nov 2025 09:34:32 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1762245281; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=R2k3S0JM3GjzlqSiHtx7uGU4oJqackuOaOdMcXWCQD4=;
+	b=DCd+FqUxRxIK4KCVyBl2bY1jDIpBnI7OcnY2/p/8CRdl0Idsdm5miT0nvhZL9+PvxW/5g4
+	uhT2R3FGkTAnueao/HshktnCuxoAsYmnJz/QIr9rsKpKRWHbD/9lwGb3brlyQyb7aNQJSt
+	6YMA05A4UmvBNktmLqQJKBPdxwrZrGQRtExXpstbIvUBv96Huj5Myjkdm3+opAabia8Uf7
+	q6GlH55zcK9qoVuUD50tEindxjboWWp7lMVIRDUeZrHEX3xj2vL8O0eLvOCV/rqiffM6KU
+	jPOeZdZ6P2OK58ZUes2loyO+XbaQ4HDYIsO8PfB7/dVQd0zJE+R1XEGXcKBQJw==
+Message-ID: <db01f926-d5bb-4317-beac-e6dcc0025a80@bootlin.com>
+Date: Tue, 4 Nov 2025 09:34:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 04/11] net: stmmac: add stmmac_get_phy_intf_sel()
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Fabio Estevam <festevam@gmail.com>, imx@lists.linux.dev,
+ Jakub Kicinski <kuba@kernel.org>, Jan Petrous <jan.petrous@oss.nxp.com>,
+ linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>, s32@nxp.com,
+ Sascha Hauer <s.hauer@pengutronix.de>, Shawn Guo <shawnguo@kernel.org>
+References: <aQiWzyrXU_2hGJ4j@shell.armlinux.org.uk>
+ <E1vFt4c-0000000Choe-3SII@rmk-PC.armlinux.org.uk>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <E1vFt4c-0000000Choe-3SII@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-In e1000_tbi_should_accept() we read the last byte of the frame via
-'data[length - 1]' to evaluate the TBI workaround. If the descriptor-
-reported length is zero or larger than the actual RX buffer size, this
-read goes out of bounds and can hit unrelated slab objects. The issue
-is observed from the NAPI receive path (e1000_clean_rx_irq):
+Hi Russell,
 
-==================================================================
-BUG: KASAN: slab-out-of-bounds in e1000_tbi_should_accept+0x610/0x790
-Read of size 1 at addr ffff888014114e54 by task sshd/363
+On 03/11/2025 12:50, Russell King (Oracle) wrote:
+> Provide a function to translate the PHY interface mode to the
+> phy_intf_sel pin configuration for dwmac1000 and dwmac4 cores that
+> support multiple interfaces. We currently handle MII, GMII, RGMII,
+> SGMII, RMII and REVMII, but not TBI, RTBI nor SMII as drivers do not
+> appear to use these three and the driver doesn't currently support
+> these.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-CPU: 0 PID: 363 Comm: sshd Not tainted 5.18.0-rc1 #1
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.12.0-59-gc9ba5276e321-prebuilt.qemu.org 04/01/2014
-Call Trace:
- <IRQ>
- dump_stack_lvl+0x5a/0x74
- print_address_description+0x7b/0x440
- print_report+0x101/0x200
- kasan_report+0xc1/0xf0
- e1000_tbi_should_accept+0x610/0x790
- e1000_clean_rx_irq+0xa8c/0x1110
- e1000_clean+0xde2/0x3c10
- __napi_poll+0x98/0x380
- net_rx_action+0x491/0xa20
- __do_softirq+0x2c9/0x61d
- do_softirq+0xd1/0x120
- </IRQ>
- <TASK>
- __local_bh_enable_ip+0xfe/0x130
- ip_finish_output2+0x7d5/0xb00
- __ip_queue_xmit+0xe24/0x1ab0
- __tcp_transmit_skb+0x1bcb/0x3340
- tcp_write_xmit+0x175d/0x6bd0
- __tcp_push_pending_frames+0x7b/0x280
- tcp_sendmsg_locked+0x2e4f/0x32d0
- tcp_sendmsg+0x24/0x40
- sock_write_iter+0x322/0x430
- vfs_write+0x56c/0xa60
- ksys_write+0xd1/0x190
- do_syscall_64+0x43/0x90
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7f511b476b10
-Code: 73 01 c3 48 8b 0d 88 d3 2b 00 f7 d8 64 89 01 48 83 c8 ff c3 66 0f 1f 44 00 00 83 3d f9 2b 2c 00 00 75 10 b8 01 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 31 c3 48 83 ec 08 e8 8e 9b 01 00 48 89 04 24
-RSP: 002b:00007ffc9211d4e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 0000000000004024 RCX: 00007f511b476b10
-RDX: 0000000000004024 RSI: 0000559a9385962c RDI: 0000000000000003
-RBP: 0000559a9383a400 R08: fffffffffffffff0 R09: 0000000000004f00
-R10: 0000000000000070 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007ffc9211d57f R14: 0000559a9347bde7 R15: 0000000000000003
- </TASK>
-Allocated by task 1:
- __kasan_krealloc+0x131/0x1c0
- krealloc+0x90/0xc0
- add_sysfs_param+0xcb/0x8a0
- kernel_add_sysfs_param+0x81/0xd4
- param_sysfs_builtin+0x138/0x1a6
- param_sysfs_init+0x57/0x5b
- do_one_initcall+0x104/0x250
- do_initcall_level+0x102/0x132
- do_initcalls+0x46/0x74
- kernel_init_freeable+0x28f/0x393
- kernel_init+0x14/0x1a0
- ret_from_fork+0x22/0x30
-The buggy address belongs to the object at ffff888014114000
- which belongs to the cache kmalloc-2k of size 2048
-The buggy address is located 1620 bytes to the right of
- 2048-byte region [ffff888014114000, ffff888014114800]
-The buggy address belongs to the physical page:
-page:ffffea0000504400 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x14110
-head:ffffea0000504400 order:3 compound_mapcount:0 compound_pincount:0
-flags: 0x100000000010200(slab|head|node=0|zone=1)
-raw: 0100000000010200 0000000000000000 dead000000000001 ffff888013442000
-raw: 0000000000000000 0000000000080008 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-==================================================================
+First, thanks for this work !
 
-This happens because the TBI check unconditionally dereferences the last
-byte without validating the reported length first:
+[...]
 
-	u8 last_byte = *(data + length - 1);
+> +int stmmac_get_phy_intf_sel(phy_interface_t interface)
+> +{
+> +	int phy_intf_sel = -EINVAL;
+> +
+> +	if (interface == PHY_INTERFACE_MODE_MII ||
+> +	    interface == PHY_INTERFACE_MODE_GMII)
+> +		phy_intf_sel = PHY_INTF_SEL_GMII_MII;
+> +	else if (phy_interface_mode_is_rgmii(interface))
+> +		phy_intf_sel = PHY_INTF_SEL_RGMII;
+> +	else if (interface == PHY_INTERFACE_MODE_SGMII)
+> +		phy_intf_sel = PHY_INTF_SEL_SGMII;
+> +	else if (interface == PHY_INTERFACE_MODE_RMII)
+> +		phy_intf_sel = PHY_INTF_SEL_RMII;
+> +	else if (interface == PHY_INTERFACE_MODE_REVMII)
+> +		phy_intf_sel = PHY_INTF_SEL_REVMII;
+> +
+> +	return phy_intf_sel;
+> +}
+> +EXPORT_SYMBOL_GPL(stmmac_get_phy_intf_sel);
 
-Fix by rejecting the frame early if the length is zero, or if it exceeds
-adapter->rx_buffer_len. This preserves the TBI workaround semantics for
-valid frames and prevents touching memory beyond the RX buffer.
+Nothng wrong with your code, this is out of curiosity.
 
-Fixes: 2037110c96d5 ("e1000: move tbi workaround code into helper function")
-Cc: stable@vger.kernel.org
-Signed-off-by: Guangshuo Li <lgs201920130244@gmail.com>
----
- drivers/net/ethernet/intel/e1000/e1000_main.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+I'm wondering how we are going to support cases like socfpga (and
+probably some other) where the PHY_INTF_SEL_xxx doesn't directly
+translate to the phy_interface, i.e.  when you have a PCS or other
+IP that serialises the MAC interface ?
 
-diff --git a/drivers/net/ethernet/intel/e1000/e1000_main.c b/drivers/net/ethernet/intel/e1000/e1000_main.c
-index 3f5feb55cfba..2d2ed5e2c3c8 100644
---- a/drivers/net/ethernet/intel/e1000/e1000_main.c
-+++ b/drivers/net/ethernet/intel/e1000/e1000_main.c
-@@ -4090,6 +4090,12 @@ static bool e1000_tbi_should_accept(struct e1000_adapter *adapter,
- 				    u8 status, u8 errors,
- 				    u32 length, const u8 *data)
- {
-+	/* Guard against OOB on data[length - 1] */
-+	if (unlikely(!length))
-+		return false;
-+	/* Upper bound: length must not exceed rx_buffer_len */
-+	if (unlikely(length > adapter->rx_buffer_len))
-+		return false;
- 	struct e1000_hw *hw = &adapter->hw;
- 	u8 last_byte = *(data + length - 1);
- 
--- 
-2.43.0
+for socfpga for example, we need to set the PHY_INTF_SEL to GMII_MII
+when we want to use SGMII / 1000BaseX, but we do set it to RGMII when
+we need to output RGMII.
 
+Do you have a plan in mind for that ? (maybe a .get_phy_intf_sel() ops ?)
+
+Maxime
 
