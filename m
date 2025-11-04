@@ -1,150 +1,166 @@
-Return-Path: <netdev+bounces-235419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38089C303DB
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 10:24:30 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FFA2C3041D
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 10:27:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1AAD1189D91B
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 09:21:52 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 617854FB30A
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 09:22:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FDF931280A;
-	Tue,  4 Nov 2025 09:17:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E129B2356D9;
+	Tue,  4 Nov 2025 09:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="1vOc/5SB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kn3KyAXG";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ov3OiwST"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 960F72BCF41
-	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 09:17:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20A07311C1E
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 09:20:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762247843; cv=none; b=LydlXl1xO25octHWOVHBXWHHm6E0Rbka5T4Wyy38O2eIrexhpplQhNfZjvzdU1u0fHuJYmF1Dv36ooXPhVOy3IfXmfGOC4RBika2HncwXItAQ2DtEnNarnPVL+E3mFC5V15T9zWWvJf8A7FPi8oEy13Cm3YSBh4Hrg+EWwATl4I=
+	t=1762248028; cv=none; b=JT9AAgagPl3f6Fs0349yMNgmNfu7ck+OfT3fBR4lkkhaumhGWGaw5afJ9zWDnmI8/CiqVPPBMDB3MVW3TzJJNyJR+dkYXgE8zG6AuN7/wKJKX//l9/OSSAzc5CnJTlL8raGD7+qoOxNY9l0w9T+nVfCxD0wyrRwjY+9+Ix/qNWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762247843; c=relaxed/simple;
-	bh=7LhwKdynE4EzxVx33/qprxmtOT23EE+OCvjjg7efrOc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sMyt2DoEvGEEXWWwcj95Q+/d61jFC8OnN5knYuvdESfcONwn6z/3/tPKwFpiQu4/FWMb/6OjUCRSIK6hJ3BX22D39rDP0Nwk8hUAyRCkseVsppuj+WCIJGIuP7dIcks62lM/HP2rmmz0cpMI00Fd0AbO+uum/82toosP3bp+FtM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=1vOc/5SB; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 007FEC0E604;
-	Tue,  4 Nov 2025 09:16:59 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id D2251606EF;
-	Tue,  4 Nov 2025 09:17:19 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 2A97610B507AE;
-	Tue,  4 Nov 2025 10:17:17 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1762247839; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 in-reply-to:references; bh=f6p2qczOAsk2xBhxzVdaFQqVrGOw0uNl+quFb7CJGCE=;
-	b=1vOc/5SBU3HnNs8p+5ZxOjpnzSJ2BFHfO0Rs09DjkHf3URfV7wyjAXllFpAxT9Ln/YEw7G
-	GIkm7kBJdfrTwrfk+bqQ5gXA8uuJYCbrdHJk9nqfSKRXxYPjheXdK+ejykBYxSyzKz0tO6
-	N63H8AGNjuytV9Th0JYcNlbItgxK4lnhUZXJvaoETBHPzD2WK9RQKoK323ZMEGjBo5dnv1
-	YJl6SHADa7MoZkFzrvJEzzrfXzprYmmpOm3835EqtzVqxrX+4gVligAdeeFDU9q7OuPlaH
-	elgSwzIGyodDI5UrJ/GPRmf7U/VaAPbz1A8FZXHYtHJArWEk5yDtA6dTsv4mUQ==
-From: Romain Gantois <romain.gantois@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 3/3] net: phy: dp83869: Support 1000Base-X SFP
-Date: Tue, 04 Nov 2025 10:17:16 +0100
-Message-ID: <1937423.tdWV9SEqCh@fw-rgant>
-In-Reply-To: <e2541569-bfee-4548-a399-af2e43c7a53a@bootlin.com>
-References:
- <20251104-sfp-1000basex-v1-0-f461f170c74e@bootlin.com>
- <4689841.LvFx2qVVIh@fw-rgant>
- <e2541569-bfee-4548-a399-af2e43c7a53a@bootlin.com>
+	s=arc-20240116; t=1762248028; c=relaxed/simple;
+	bh=pUKJPrLx0M2WMbh/ePs7QzJ4DazqZizbc++rbelECWU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sZyq1mOwujbJY9FKeu9bbX+4qmP/5RWNy+UaLKvM2CAATXxJf3Erih1uI1hfT8rY8eYwUXMnDXF3ALgNH0Dyatcl7IAgaLNEA/0Nowss53ykc0Fw3yhVul9dqGu12KvVCZvl7VoXt68iLL1ewPc6f11qQc4vx+qfeX9vrYqJ3Z8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Kn3KyAXG; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ov3OiwST; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762248026;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ltNFnYEQmixQZpMP12HbSmJnNGHT1YgJ5lkpfeO1BNA=;
+	b=Kn3KyAXGFaiS5b19tA/Xo/GcCvtAMwxEnGTsMhSrwoxeck7VslrR3/W/Zwk/D+O6Qb1Twf
+	R87s0lbVbAAPtuMp0Jld2K5UKI/m3btHhTbuQ3nKfVOkvi56NchQYV9i0zsC1UEkpZ6glt
+	NqkZWztj9hffJ2eF/rxB1UCVIHVF0M8=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-628-8Ig-PrUkNu-FDBL_YZzjSw-1; Tue, 04 Nov 2025 04:20:24 -0500
+X-MC-Unique: 8Ig-PrUkNu-FDBL_YZzjSw-1
+X-Mimecast-MFC-AGG-ID: 8Ig-PrUkNu-FDBL_YZzjSw_1762248023
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4770eded72cso19472585e9.0
+        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 01:20:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1762248023; x=1762852823; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ltNFnYEQmixQZpMP12HbSmJnNGHT1YgJ5lkpfeO1BNA=;
+        b=ov3OiwSTqzZ+PqgaPUK2pdkKejhplolMVaqodVcienexwYM1mKPACT1MA2OmPbuPy4
+         Dq/UP4yx858h06omh6Tn6IuLT1RIqTeM9Qdq2RzAoEVUvx1Ql8hWt39jmWcbRNXyR0Jo
+         2iYep/1Li+3yfLaGVo49r2RhU6s9nBmg0TSK5DdhkV5Uaxz1kWoR8uGqQD+yg72o2mJq
+         b0lS5HITU8p7suFwnVpSSquJBbVIcAYxlK1aie8QVsTzKDi1VY9DWBsTPE9dNi98dYqz
+         cnOqrit97OcJNmuJPcFfKPJCPqGtfrOPgcKhtcbOEW8E/iQhD+i/+yFFWubK5BFZeaER
+         6L/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762248023; x=1762852823;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ltNFnYEQmixQZpMP12HbSmJnNGHT1YgJ5lkpfeO1BNA=;
+        b=Ik1/SQvt6zeiytfDyX/y3FlRG3GYF9FdZtZ0qWnlcmgVIpG31gx6bSzTQDwqgeONsu
+         mNGmjjgTIY9u+grHrK+UvtKxy8iV0i4cYgXwhVhF06X+CDhVZyrWjkpImWjCXIVdwwah
+         PIpOq5AEQAMzrOhOldRdrbYdVDEpxSJApy5BwOFjhHtOLEXF/apR+8KPFnve+QNXAUuM
+         ei7cKQTHAHZEprpzMZ65ZIAomyf/ia1sYxH2S2yMfyE8wB8kmdhHlEEF29z4mgcC7yJn
+         9mCBugXHHqk6j/ttoY+n/WaC0NoMdaQDBSpPnO6e8lfuNi4nSOS1OstrnHh1oSzWn9pf
+         0hJA==
+X-Forwarded-Encrypted: i=1; AJvYcCUrSNzH+MBKgyZpVpcw8QWZpkMU9uZePFKF9J329faZ6BtdFBtnvaAoNj7Wr42wS7ROgn9Fqi8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzY740YuN6Kx+pVVOxHc23iEUC3AFpZkHblo02oZIjC5jdJXGK5
+	2y7o2q5+ho7KqBj6lvnvufZQce3T41PfEylGBsTue/NZjpsCVBkkz0fmEccz5Pf3zCQTzmlRFf7
+	P5T2CcnHjTpmdVLaDTHbdPs9+N1kcJGFunsqMCx+rPZ8EVmyJcfkNWScmgQ==
+X-Gm-Gg: ASbGncusSNHdL/1dpVlp9B3a2x7QHpTOviFiAMXeKTaDNjWqxUUT0Yv1XnBBLS1z8bc
+	XY6G6ohl5kmyzmxfB6fbVW55yIPpGgYwLXcUM4maiZw3+xmrI65hZgKaWHrd2vgMvSbvjWvOsA5
+	Lcn/tsYoaacGhdxtgHzzLieT4FJ+4qolclthKB8Ldtbohc+tqYxRa/YJAnsRSRzcAQU6Kdi8YkI
+	XziR98Rs1IEXLcaXRh+uXmXk8p7hg84K9GHwwjbWSfRdYkosR11gaSS2xFc+ZxQohskFs8/lQUC
+	Ra0mP5pm8H+L2HJu8y5L95un26cQsr/emuKt4OXxNzBv7t+fjxxnYRdRuFXeMsdY92Ggj9ix/jb
+	FGJMtwB7bxpazEAp4ABZz4dn8HD0vR3eNrxLRAscoet2D
+X-Received: by 2002:a05:600c:488a:b0:477:5639:ff66 with SMTP id 5b1f17b1804b1-477563a0172mr7272155e9.13.1762248023169;
+        Tue, 04 Nov 2025 01:20:23 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE/p/JinMYxs2wrDLzSGvdns88BAErQtC1F7WbaqV2NdVF5IW/VkWgEi7rHVWoViH0BqwGtQA==
+X-Received: by 2002:a05:600c:488a:b0:477:5639:ff66 with SMTP id 5b1f17b1804b1-477563a0172mr7271755e9.13.1762248022677;
+        Tue, 04 Nov 2025 01:20:22 -0800 (PST)
+Received: from ?IPV6:2a0d:3341:b8a2:8d10:2aab:5fa:9fa0:d7e6? ([2a0d:3341:b8a2:8d10:2aab:5fa:9fa0:d7e6])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429dc1fdef7sm3539621f8f.43.2025.11.04.01.20.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Nov 2025 01:20:22 -0800 (PST)
+Message-ID: <a0fee8ef-329d-4286-aa8f-b569b9e4ab03@redhat.com>
+Date: Tue, 4 Nov 2025 10:20:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart2242209.irdbgypaU6";
- micalg="pgp-sha512"; protocol="application/pgp-signature"
-X-Last-TLS-Session-Version: TLSv1.3
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 01/15] net: define IPPROTO_QUIC and SOL_QUIC
+ constants
+To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>,
+ quic@lists.linux.dev
+Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, Stefan Metzmacher <metze@samba.org>,
+ Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
+ Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>,
+ linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>,
+ Namjae Jeon <linkinjeon@kernel.org>, Paulo Alcantara <pc@manguebit.com>,
+ Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev,
+ Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
+ Benjamin Coddington <bcodding@redhat.com>, Steve Dickson
+ <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
+ Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>,
+ Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>,
+ Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe"
+ <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
+ illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+ Daniel Stenberg <daniel@haxx.se>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>
+References: <cover.1761748557.git.lucien.xin@gmail.com>
+ <c02ccb3edc527cbb1aa64145a679994dd149d0da.1761748557.git.lucien.xin@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <c02ccb3edc527cbb1aa64145a679994dd149d0da.1761748557.git.lucien.xin@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
---nextPart2242209.irdbgypaU6
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
-From: Romain Gantois <romain.gantois@bootlin.com>
-Date: Tue, 04 Nov 2025 10:17:16 +0100
-Message-ID: <1937423.tdWV9SEqCh@fw-rgant>
-In-Reply-To: <e2541569-bfee-4548-a399-af2e43c7a53a@bootlin.com>
-MIME-Version: 1.0
-
-On Tuesday, 4 November 2025 10:15:45 CET Maxime Chevallier wrote:
-> Hi,
+On 10/29/25 3:35 PM, Xin Long wrote:
+> This patch adds IPPROTO_QUIC and SOL_QUIC constants to the networking
+> subsystem. These definitions are essential for applications to set
+> socket options and protocol identifiers related to the QUIC protocol.
 > 
-> On 04/11/2025 10:10, Romain Gantois wrote:
-> > On Tuesday, 4 November 2025 10:01:36 CET Russell King (Oracle) wrote:
-> >> On Tue, Nov 04, 2025 at 09:50:36AM +0100, Romain Gantois wrote:
-> >>> +static void dp83869_module_remove(void *upstream)
-> >>> +{
-> >>> +	struct phy_device *phydev = upstream;
-> >>> +
-> >>> +	phydev_info(phydev, "SFP module removed\n");
-> >>> +
-> >>> +	/* Set speed and duplex to unknown to avoid downshifting warning. */
-> >>> +	phydev->speed = SPEED_UNKNOWN;
-> >>> +	phydev->duplex = DUPLEX_UNKNOWN;
-> >> 
-> >> Should this be done by core phylib code?
-> > 
-> > I guess that enough PHY drivers do this by hand that a new phylib helper
-> > could be warranted. Maybe something like phy_clear_aneg_results(), which
-> > would set speed, duplex, pause and asym_pause to default values.
+> QUIC does not possess a protocol number allocated from IANA, and like
+> IPPROTO_MPTCP, IPPROTO_QUIC is merely a value used when opening a QUIC
+> socket with:
 > 
-> Note that when phy_port eventually gets merged, we'll have a
-> common .module_remove() for PHY SFP :
+>   socket(AF_INET, SOCK_STREAM, IPPROTO_QUIC);
 > 
-> https://lore.kernel.org/netdev/20251013143146.364919-9-maxime.chevallier@boo
-> tlin.com/
+> Note we did not opt for UDP ULP for QUIC implementation due to several
+> considerations:
 > 
-> We could definitely do that here :)
+> - QUIC's connection Migration requires at least 2 UDP sockets for one
+>   QUIC connection at the same time, not to mention the multipath
+>   feature in one of its draft RFCs.
+> 
+> - In-Kernel QUIC, as a Transport Protocol, wants to provide users with
+>   the TCP or SCTP like Socket APIs, like connect()/listen()/accept()...
+>   Note that a single UDP socket might even be used for multiple QUIC
+>   connections.
+> 
+> The use of IPPROTO_QUIC type sockets over UDP tunnel will effectively
+> address these challenges and provides a more flexible and scalable
+> solution.
+> 
+> Signed-off-by: Xin Long <lucien.xin@gmail.com>
 
-That would be even better!
-
-Thanks,
-
--- 
-Romain Gantois, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
-
---nextPart2242209.irdbgypaU6
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEIcCsAScRrtr7W0x0KCYAIARzeA4FAmkJxJwACgkQKCYAIARz
-eA4yDhAAgUfW/4Rfibr+BG/sDvQPk5XVPTOQcFIMp7pmUrqi9F4i4QzaBC75wWaI
-bcjyK+clICQQ2E+moiEb864SHRXFVtyRu5egj97YA7LEeOJp6hSPggHLW1eL1idZ
-R3VsHfJzj/ShLPSvZfjFw8fVfWEAGcOJyB/8U2OOJ/Vn5DOpUyINxzs2JYaAvJ2N
-+Fj8e92YeBLtTzCS6YjhHEXOqvs0Ml9+QQDKvsNNLs5WsRZLLXsjTHr/u3Vx9C5d
-AJc/7lKcJTJu02yoNrNPuZ0m3vFAF5RPKoJhAyPb2KU2ANqM5VqJj8F7xkF97Fuz
-Djc2RaGAnIvQD4kF2zh/x6iqDVTQaetwXZmygA1HbsMG+WdUTBFHu8lIQzFYY2/9
-i+i9I0ppk3SoV1Ehr9IaDRMu4NM8XLUeoPDrJXo2KVaK1iktPgguFLnbCXSaRDVX
-EccL5JneNv0eWHIFpW3kYLreNPSqx+n+f8w46bWtCGqwJfenVqxQ7CBYry6cJkke
-suPNescqDy1ISJ8E8dTRRxsF1w1F4j9OLnQx7xPn3B4AbEfsFEYVRY+RmJG4NgcO
-3xBm6C3OI5jmwr0IMxl35cUJugOJc7s7QSaspdt6/YK6t/4TOUEOC8aZD5Z5f1rN
-rupUGeL/y1FE5ufgPeBAclkw+vTzauh63oIde2P044eJeJTRv6Y=
-=FETM
------END PGP SIGNATURE-----
-
---nextPart2242209.irdbgypaU6--
-
-
+Acked-by: Paolo Abeni <pabeni@redhat.com>
 
 
