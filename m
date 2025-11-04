@@ -1,111 +1,194 @@
-Return-Path: <netdev+bounces-235492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1520C3178E
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 15:20:14 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07443C317BE
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 15:22:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBB80188452C
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 14:17:09 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 363F9342AC5
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 14:22:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19A6E2F658D;
-	Tue,  4 Nov 2025 14:16:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fx4ECpUY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F25FB328B6D;
+	Tue,  4 Nov 2025 14:22:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1DF92AE99;
-	Tue,  4 Nov 2025 14:16:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B9182FB63A
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 14:22:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762265801; cv=none; b=UrguBIM881ZFjIymK3QF2a8JCWSYn7NfHDHf7RAIz5Qbxp++Tbl/LvyD+BAkVwzBSN78zw18U7pHaFA9u0QotHzoiMW1U7mqukN9JQezhQuhYYt+J1WcCFg6YjG3kozpXfEV/kGZpsZtwh2QpnuHhfQpgezB4liHesHIfXC+6EI=
+	t=1762266124; cv=none; b=jXB7/01hz69+S4EPsWQKJm27YMeGvmEeCiFs688eX16HrJoNCJrrWxQ8HW6TWnBEkxxgl36QJ5jNVU1rS1e9z/xgW9oLlFi/mpSvOeE4odnEhehiUjWdJwL+uuwD1MpE/JNri1NEsKVhKdXyoWB2tGR5sRftGvmY/+h2dDfkpXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762265801; c=relaxed/simple;
-	bh=LLH6LMsUoW83OgwHn4Eb7C7d3t9QxE00ZT++B0K2C6c=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:Cc:To:From:
-	 References:In-Reply-To; b=hGfAN88iBgDhUpOpWH69Pn06I3CFRjuZhZGKgLqF9kNgY/WNSDXitXDW+luTrwZh7amsqfWGhSjX+BfX96YiAoNAwy/eM5l5l1+a5suIxcPyim0wZz54x3DD82cUmi7+SjwkqycgZab/aTdMlHv8FHvrgmge/4hLmfMSOIrxmAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fx4ECpUY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CDDFC4CEF7;
-	Tue,  4 Nov 2025 14:16:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762265800;
-	bh=LLH6LMsUoW83OgwHn4Eb7C7d3t9QxE00ZT++B0K2C6c=;
-	h=Date:Subject:Cc:To:From:References:In-Reply-To:From;
-	b=Fx4ECpUYVm71v3CRagzLhvmjDKBOecwkunXFsn2pQTuEEoSEf+K4kyWXyGwQKQwf8
-	 xArw3A1/tF9hV4GZam7wbH8k3PX1vNM96gFdbw47GeS0UJovsoZZUsM6Y8x4ms9zTq
-	 fuo158aeAKMP+rxd7q8AkO1/UOM8U9eilv2FtTLJSKljszVEJ9ww18shEZt4db/lrF
-	 uQlYIRUDwb1AN3jeclvRrlrHQ6NmqL6zJgOwBnFN3ZlmQn/28lDxUXlZ9PISPpVcAK
-	 LNKyh/6UKufTc5cP2Snm6VbXvGgiYy1pGsWSuyMc7IkoEnqbv0t7nCAxBQL0oG1+dm
-	 p6sa+O7dnKqbA==
+	s=arc-20240116; t=1762266124; c=relaxed/simple;
+	bh=6jIgJlHnumjsVCvAjEKio5uU/oww1S2wY5/AvwY31AE=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
+	 Content-Type; b=f8efvq0zNo8iTU1DtNMHMg/Ru3tzHiJ7WutVPG4ZzuiBCNYDGfK2u43WPg0GmdM0hjnQ0lzIl2Im6KjYd9fDH1TFfeKRspWa/G6sX/C0edoUiKLHnwx/AEeRIGFBAeMiceVIx4TxJIoVZfmxsLwPGif8F4kGF+m02RAnPxNGk80=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-9434f5350bcso516413539f.1
+        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 06:22:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762266122; x=1762870922;
+        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xKdLwrQmemIG9kw2hdf/eFPzpoxPYGPbZwYFsHinfy0=;
+        b=d0cdE2jgSmk64p8lXo7ctQxhTWr3rG9ORXKVHUCdtiViAygwBXyWgx67JUpGy9wUSF
+         mu2S1BzrWhBcL6/2aZyqZXbURXpW+aTK+io2ikvkh20ExeAlOLw5+FuIDSy6aQrQZ39d
+         sNE0r+OpDKKVfanIEZGxZCMzD/S6WdvsQl7KHrf1XY/+KwAh7w/O0p5Su16i4rkl9jnv
+         5Y1Z7MJ6Gc6WCLE5hHh+cEeluQTu25HxEa4XAnr59Gi6pizqwn8OHijz1LmHbt2y0zLA
+         MGclGoxfDYIwPxWt79RzqqY4F/3Mnh1ovhz2Lzxf9Mr9FEAHzaVPQkTY2TEdcf8dhpr5
+         klEw==
+X-Forwarded-Encrypted: i=1; AJvYcCXSPkZa2HuXJmglivEa2LXkT8Gnb8HeUH6WOpFG6U78qveQ6K0gb0ffA6BCHAoB8a4Rpk5d+Ck=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxO9KDjZeIj28yl/NDgxnrTj2gKRA2vzhegZw3fsFhZgSlRoOaL
+	lxpxetteE2xw2d7+qwzeT6+adQVRyViBcnrIPqRm2+x3oihGuxxkFw8WoNZgcSE22t2BMdR42vi
+	54A5mUwUMVMRvPgrvxcGiXYJdtXXednT9l4VQiHmNng+5/zOHVT2PoQDSBus=
+X-Google-Smtp-Source: AGHT+IGMkA7qZdgINA/IHNHUaeFr9++EDZQ4fETaxS4a+tgyecjDBSOY1s6NYOs7jiwUj9LcBLjMa8ChOX9K+YKyAoqyABny5LgN
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Tue, 04 Nov 2025 15:16:33 +0100
-Message-Id: <DDZZ356YT8HY.S8G709WO4MD3@kernel.org>
-Subject: Re: [PATCH] firmware_loader: make RUST_FW_LOADER_ABSTRACTIONS
- select FW_LOADER
-Cc: "Luis Chamberlain" <mcgrof@kernel.org>, "Russ Weight"
- <russ.weight@linux.dev>, "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, "Alice Ryhl"
- <aliceryhl@google.com>, "David Airlie" <airlied@gmail.com>, "Simona Vetter"
- <simona@ffwll.ch>, "Andrew Lunn" <andrew@lunn.ch>, "Heiner Kallweit"
- <hkallweit1@gmail.com>, "Russell King" <linux@armlinux.org.uk>, "David S.
- Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>, "Miguel
- Ojeda" <ojeda@kernel.org>, "Alex Gaynor" <alex.gaynor@gmail.com>, "Boqun
- Feng" <boqun.feng@gmail.com>, "Gary Guo" <gary@garyguo.net>,
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, "Benno Lossin"
- <lossin@kernel.org>, "Andreas Hindborg" <a.hindborg@kernel.org>, "Trevor
- Gross" <tmgross@umich.edu>, <linux-kernel@vger.kernel.org>,
- <nouveau@lists.freedesktop.org>, <dri-devel@lists.freedesktop.org>,
- <netdev@vger.kernel.org>, <rust-for-linux@vger.kernel.org>
-To: "Alexandre Courbot" <acourbot@nvidia.com>
-From: "Danilo Krummrich" <dakr@kernel.org>
-References: <20251104-b4-select-rust-fw-v1-1-afea175dba22@nvidia.com>
-In-Reply-To: <20251104-b4-select-rust-fw-v1-1-afea175dba22@nvidia.com>
+MIME-Version: 1.0
+X-Received: by 2002:a05:6602:1515:b0:940:d833:a83d with SMTP id
+ ca18e2360f4ac-9485927e2e9mr542425939f.1.1762266122412; Tue, 04 Nov 2025
+ 06:22:02 -0800 (PST)
+Date: Tue, 04 Nov 2025 06:22:02 -0800
+In-Reply-To: <20251104111201.5eBxkOKb@linutronix.de>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <690a0c0a.050a0220.98a6.00b0.GAE@google.com>
+Subject: [syzbot ci] Re: net: gro_cells: Provide lockdep class for gro_cell's bh_lock
+From: syzbot ci <syzbot+cicbd1a39d13eaaed7@syzkaller.appspotmail.com>
+To: bigeasy@linutronix.de, clrkwllms@kernel.org, davem@davemloft.net, 
+	edumazet@google.com, gal@nvidia.com, horms@kernel.org, kuba@kernel.org, 
+	linux-rt-devel@lists.linux.dev, netdev@vger.kernel.org, pabeni@redhat.com, 
+	rostedt@goodmis.org
+Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue Nov 4, 2025 at 3:04 PM CET, Alexandre Courbot wrote:
-> I have noticed that build will fail when doing the following:
->
-> - Start with the x86 defconfig,
-> - Using nconfig, enable `CONFIG_RUST` and `CONFIG_DRM_NOVA`,
-> - Start building.
->
-> The problem is that `CONFIG_RUST_FW_LOADER_ABSTRACTIONS` remains
-> unselected, despite it being a dependency of `CONFIG_NOVA_CORE`. This
-> seems to happen because `CONFIG_DRM_NOVA` selects `CONFIG_NOVA_CORE`.
->
-> Fix this by making `CONFIG_RUST_FW_LOADER_ABSTRACTIONS` select
-> `CONFIG_FW_LOADER`, and by transition make all users of
-> `CONFIG_RUST_FW_LOADER_ABSTRACTIONS` (so far, nova-core and net/phy)
-> select it as well.
->
-> `CONFIG_FW_LOADER` is more often selected than depended on, so this
-> seems to make sense generally speaking.
->
-> Signed-off-by: Alexandre Courbot <acourbot@nvidia.com>
-> ---
-> I am not 100% percent confident that this is the proper fix, but the
-> problem is undeniable. :) I guess the alternative would be to make nova-d=
-rm
-> depend on nova-core instead of selecting it, but I suspect that the
-> `select` behavior is correct in this case - after all, firmware loading
-> does not make sense without any user.
+syzbot ci has tested the following series
 
-This patch is the correct approach.
+[v1] net: gro_cells: Provide lockdep class for gro_cell's bh_lock
+https://lore.kernel.org/all/20251104111201.5eBxkOKb@linutronix.de
+* [PATCH net] net: gro_cells: Provide lockdep class for gro_cell's bh_lock
 
-However, I think this should be three separate patches, so they can go thro=
-ugh
-different trees.
+and found the following issue:
+BUG: key ADDR has not been registered!
 
-Also, please add a Fixes: tag.
+Full report is available here:
+https://ci.syzbot.org/series/487d8c1b-77a3-45c6-af6d-8195d5c60ad7
+
+***
+
+BUG: key ADDR has not been registered!
+
+tree:      net
+URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
+base:      3d18a84eddde169d6dbf3c72cc5358b988c347d0
+arch:      amd64
+compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+config:    https://ci.syzbot.org/builds/45da8225-040a-4fda-9352-295e63030683/config
+
+gb_gbphy: registered new driver usb
+asus_wmi: ASUS WMI generic driver loaded
+gnss: GNSS driver registered with major 494
+usbcore: registered new interface driver gnss-usb
+usbcore: registered new interface driver hdm_usb
+usbcore: registered new interface driver snd-usb-audio
+usbcore: registered new interface driver snd-ua101
+usbcore: registered new interface driver snd-usb-usx2y
+usbcore: registered new interface driver snd-usb-us122l
+usbcore: registered new interface driver snd-usb-caiaq
+usbcore: registered new interface driver snd-usb-6fire
+usbcore: registered new interface driver snd-usb-hiface
+usbcore: registered new interface driver snd-bcd2000
+usbcore: registered new interface driver snd_usb_pod
+usbcore: registered new interface driver snd_usb_podhd
+usbcore: registered new interface driver snd_usb_toneport
+usbcore: registered new interface driver snd_usb_variax
+drop_monitor: Initializing network drop monitor service
+NET: Registered PF_LLC protocol family
+GACT probability on
+Mirror/redirect action on
+Simple TC action Loaded
+netem: version 1.3
+u32 classifier
+    Performance counters on
+    input device check on
+    Actions configured
+nf_conntrack_irc: failed to register helpers
+nf_conntrack_sane: failed to register helpers
+nf_conntrack_sip: failed to register helpers
+xt_time: kernel timezone is -0000
+IPVS: Registered protocols (TCP, UDP, SCTP, AH, ESP)
+IPVS: Connection hash table configured (size=4096, memory=32Kbytes)
+IPVS: ipvs loaded.
+IPVS: [rr] scheduler registered.
+IPVS: [wrr] scheduler registered.
+IPVS: [lc] scheduler registered.
+IPVS: [wlc] scheduler registered.
+IPVS: [fo] scheduler registered.
+IPVS: [ovf] scheduler registered.
+IPVS: [lblc] scheduler registered.
+IPVS: [lblcr] scheduler registered.
+IPVS: [dh] scheduler registered.
+IPVS: [sh] scheduler registered.
+IPVS: [mh] scheduler registered.
+IPVS: [sed] scheduler registered.
+IPVS: [nq] scheduler registered.
+IPVS: [twos] scheduler registered.
+IPVS: [sip] pe registered.
+ipip: IPv4 and MPLS over IPv4 tunneling driver
+BUG: key ffff88816c216e68 has not been registered!
+------------[ cut here ]------------
+DEBUG_LOCKS_WARN_ON(1)
+WARNING: CPU: 0 PID: 1 at kernel/locking/lockdep.c:4976 lockdep_init_map_type+0x241/0x380
+Modules linked in:
+CPU: 0 UID: 0 PID: 1 Comm: swapper/0 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+RIP: 0010:lockdep_init_map_type+0x241/0x380
+Code: 75 cd 90 e8 21 dc e8 02 85 c0 74 22 83 3d 2a c9 df 0d 00 75 19 90 48 c7 c7 36 2e 8f 8d 48 c7 c6 93 c8 7e 8d e8 00 dd e5 ff 90 <0f> 0b 90 90 65 48 8b 05 93 fc d0 10 48 3b 44 24 08 0f 85 14 01 00
+RSP: 0000:ffffc900000672a8 EFLAGS: 00010246
+RAX: 40a598123e634300 RBX: ffffe8fee481dde8 RCX: ffff888102688000
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000002
+RBP: 0000000000000000 R08: 0000000000000003 R09: 0000000000000004
+R10: dffffc0000000000 R11: fffffbfff1bba650 R12: 0000000000000000
+R13: 0000000000000000 R14: ffff88816c216e68 R15: ffffe8fee481dde8
+FS:  0000000000000000(0000) GS:ffff88818eb3c000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffff88823ffff000 CR3: 000000000dd38000 CR4: 00000000000006f0
+Call Trace:
+ <TASK>
+ gro_cells_init+0x26c/0x380
+ ip_tunnel_init+0xc9/0x650
+ register_netdevice+0x6bf/0x1ae0
+ __ip_tunnel_create+0x3e7/0x560
+ ip_tunnel_init_net+0x2ba/0x800
+ ops_init+0x35c/0x5c0
+ register_pernet_operations+0x336/0x800
+ register_pernet_device+0x2a/0x80
+ ipip_init+0x1d/0xd0
+ do_one_initcall+0x236/0x820
+ do_initcall_level+0x104/0x190
+ do_initcalls+0x59/0xa0
+ kernel_init_freeable+0x334/0x4b0
+ kernel_init+0x1d/0x1d0
+ ret_from_fork+0x4bc/0x870
+ ret_from_fork_asm+0x1a/0x30
+ </TASK>
+
+
+***
+
+If these findings have caused you to resend the series or submit a
+separate fix, please add the following tag to your commit message:
+  Tested-by: syzbot@syzkaller.appspotmail.com
+
+---
+This report is generated by a bot. It may contain errors.
+syzbot ci engineers can be reached at syzkaller@googlegroups.com.
 
