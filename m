@@ -1,171 +1,121 @@
-Return-Path: <netdev+bounces-235445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63228C30AB5
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 12:08:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A494EC30AF8
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 12:14:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C55704E2F84
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 11:08:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11E693A7D5B
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 11:12:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 897BF2E1C65;
-	Tue,  4 Nov 2025 11:08:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76DC82E2DDD;
+	Tue,  4 Nov 2025 11:12:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ITX4mipP"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="VGNDqEQh";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="iVIcykZX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A085191F92;
-	Tue,  4 Nov 2025 11:08:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D83892E426B
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 11:12:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762254491; cv=none; b=ZFoM6cEw2HEuAs8D0m9o5lNSqrkSpK0Cgvn1eM3JIOai52WTaxIenwi2rEAUXwvaNRkioeoXjn51+auP+kmu2I271Bg2nRyONr8l26/wA6SiJosc+iJ8gMEytgJuvIvmAzC/AkDAHZwALZYg16nUYGMYOQREm7w6Dam6YTST0zs=
+	t=1762254727; cv=none; b=HbtmBBZUjvp6aOZdvUW8A1/uvzmDy3cJo1Jb++449lLDrYJa13iab4wjgKYnpYVR0kToQJ/rqqGC9e4r1c9Y/i60YGbsyHngvpMyvIpaXVngtOoSAmwPbGziVXzuXnU2loBa6i9vSeJZU+uOammlIyRvyYWkiCwceLmTO6J+d/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762254491; c=relaxed/simple;
-	bh=LmdhoSAI9lnKK3Lr3krP6aCJTZmvPTtd9486Cgqqibo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SCgwvhaP3FV/8zs3eHTbLTiWOWuNde/mBgyyLDUCM56XcNWm+79u4h9TfT+ouHllhgrMcEluRCiZzu+HZNmaCh9fjCUCATN+FkQE8NwcF9f9a6+E1ku+nd3d9mIo9H4nCqmygY9iOE/XIsWbQGfK0pZOKuTUm0Fk/tUViEBqBU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ITX4mipP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 445D3C4CEF7;
-	Tue,  4 Nov 2025 11:08:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762254488;
-	bh=LmdhoSAI9lnKK3Lr3krP6aCJTZmvPTtd9486Cgqqibo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ITX4mipPZ76lcXAIaPNSaOq9l2dzLMiMzCY8jKUcy9ESdyLzreK17nB4zrZWFRJMA
-	 YZZL5zXT42ySFcYEnfq2/A3RTh+yCJrB2LI+LgIltjv84P10U7qfvgwF2iuptZIqyQ
-	 Co8N1BMYuGHpTpvzVQc8tdEJ8BV3T1+GKCtRAI2ABxOOrhI2Eo/2WAQmI1X/Q/M2a+
-	 5C0y6sYZ/AuE9zLTArKxMLaUHZdK8lqO1yXWcZrib2xRqtC8WifJvubLxKqWEsZsnF
-	 d1wasDV1Od59Pmz2P+TpcJhVZDOMRBR6q4/At1uipBWJf822q/+dW8OfIlNPDhtN5P
-	 nCz3XJEagyDTQ==
-Date: Tue, 4 Nov 2025 12:08:06 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
+	s=arc-20240116; t=1762254727; c=relaxed/simple;
+	bh=/YkuHa6v1dNtoE23mdpsRTScQ6ZC42fxCgxw7gY2lbk=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=rD4RNfGDZeo0j0Wu+JET1l3SGXeQIOeK9S+y4pBs+1Dk/mXbD1H1sSc3mG+8xVzDzAQa33xeQTmBf2PTMzggmGZiyv9IqVhNRvQulccxfrj5+DszJVP5dFyfFfhdvP9+2rRQzCpQys35H3sDtWaolM9RsaFBDHdLxqexu6V07Ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=VGNDqEQh; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=iVIcykZX; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Tue, 4 Nov 2025 12:12:01 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1762254723;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=GeSlkKbtcpufCLOJlTlGV4t9LhwRk+9N4J8rKH3yPSM=;
+	b=VGNDqEQhcThh4Cl+MtKeaN2cGbZ1Krt7fKgcOv27R7nYrOn6UBOOM7vIy62aUaVUw7EJgt
+	iv7Vp0Xbq98wae8mFNIlnK7mNLZvjLvPxNRXltxPgjreebE0+0lrJ5LFCbwrEnSbFF0IwR
+	ffET1/7yOxCHQD2DhIDekJGY5hjCfUaSsTPeL9DIXn7KRPQvkjeAEAwytiil0SxdHQruSx
+	NvJqujWauN47OZKxlzt52lpUnYXABLLZSvvxE7OppxrhIi6VbOwCY/VNz22q//25Z1iI/d
+	b2xWlzfNmKkNo8b/BNofNrn/2f+pK2WlEhWFOopn9zsrtySaEszTr+1aXEYLMQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1762254723;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=GeSlkKbtcpufCLOJlTlGV4t9LhwRk+9N4J8rKH3yPSM=;
+	b=iVIcykZXAbJqUCb8O5ew69FPvjZtvE1ETAQ5EblF90LFxjjB4oaNOrvPkf6sGK4gaCeMkM
+	0zcQuuCKfoYHAcBg==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: netdev@vger.kernel.org
+Cc: Eric Dumazet <edumazet@google.com>, Gal Pressman <gal@nvidia.com>,
+	linux-rt-devel@lists.linux.dev,
+	"David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Phil Sutter <phil@nwl.cc>
-Cc: Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH nf-next v8 0/3] Add IPIP flowtable SW acceleration
-Message-ID: <aQnelp8RNlMfw4nr@lore-desk>
-References: <20251023-nf-flowtable-ipip-v8-0-5d5d8595c730@kernel.org>
+	Clark Williams <clrkwllms@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>
+Subject: [PATCH net] net: gro_cells: Provide lockdep class for gro_cell's
+ bh_lock
+Message-ID: <20251104111201.5eBxkOKb@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="/hmIC4VKqnIfckr9"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251023-nf-flowtable-ipip-v8-0-5d5d8595c730@kernel.org>
 
+One GRO-cell device's NAPI callback can nest into the GRO-cell of
+another device if the underlying device is also using GRO-cell.
+This is the case for IPsec over vxlan.
+These two GRO-cells are separate devices. From lockdep's point of view
+it is the same because each device is sharing the same lock class and so
+it reports a possible deadlock assuming one device is nesting into
+itself.
 
---/hmIC4VKqnIfckr9
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Provide a lockclass for the bh_lock on for gro-cell device allowing
+lockdep to distinguish between individual devices.
 
-> Introduce SW acceleration for IPIP tunnels in the netfilter flowtable
-> infrastructure. This series introduces basic infrastructure to
-> accelerate other tunnel types (e.g. IP6IP6).
+Fixes: 25718fdcbdd2 ("net: gro_cells: Use nested-BH locking for gro_cell")
+Reported-by: Gal Pressman <gal@nvidia.com>
+Closes: https://lore.kernel.org/all/66664116-edb8-48dc-ad72-d5223696dd19@nvidia.com/
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ include/net/gro_cells.h | 1 +
+ net/core/gro_cells.c    | 1 +
+ 2 files changed, 2 insertions(+)
 
-Hi Pablo and Florian,
+diff --git a/include/net/gro_cells.h b/include/net/gro_cells.h
+index 596688b67a2a8..2453d0139c205 100644
+--- a/include/net/gro_cells.h
++++ b/include/net/gro_cells.h
+@@ -10,6 +10,7 @@ struct gro_cell;
+ 
+ struct gro_cells {
+ 	struct gro_cell __percpu	*cells;
++	struct lock_class_key		cells_bh_key;
+ };
+ 
+ int gro_cells_receive(struct gro_cells *gcells, struct sk_buff *skb);
+diff --git a/net/core/gro_cells.c b/net/core/gro_cells.c
+index fd57b845de333..a91fdc47e8096 100644
+--- a/net/core/gro_cells.c
++++ b/net/core/gro_cells.c
+@@ -88,6 +88,7 @@ int gro_cells_init(struct gro_cells *gcells, struct net_device *dev)
+ 
+ 		__skb_queue_head_init(&cell->napi_skbs);
+ 		local_lock_init(&cell->bh_lock);
++		lockdep_set_class(&cell->bh_lock, &gcells->cells_bh_key);
+ 
+ 		set_bit(NAPI_STATE_NO_BUSY_POLL, &cell->napi.state);
+ 
+-- 
+2.51.0
 
-Do you have any updates/comments about this series? Thanks in advance.
-
-Regards,
-Lorenzo
-
->=20
-> ---
-> Changes in v8:
-> - Rebase on top of the following series (not yet applied)
->   https://patchwork.ozlabs.org/project/netfilter-devel/list/?series=3D477=
-081
-> - Link to v7: https://lore.kernel.org/r/20251021-nf-flowtable-ipip-v7-0-a=
-45214896106@kernel.org
->=20
-> Changes in v7:
-> - Introduce sw acceleration for tx path of IPIP tunnels
-> - Rely on exact match during flowtable entry lookup
-> - Fix typos
-> - Link to v6: https://lore.kernel.org/r/20250818-nf-flowtable-ipip-v6-0-e=
-da90442739c@kernel.org
->=20
-> Changes in v6:
-> - Rebase on top of nf-next main branch
-> - Link to v5: https://lore.kernel.org/r/20250721-nf-flowtable-ipip-v5-0-0=
-865af9e58c6@kernel.org
->=20
-> Changes in v5:
-> - Rely on __ipv4_addr_hash() to compute the hash used as encap ID
-> - Remove unnecessary pskb_may_pull() in nf_flow_tuple_encap()
-> - Add nf_flow_ip4_ecanp_pop utility routine
-> - Link to v4: https://lore.kernel.org/r/20250718-nf-flowtable-ipip-v4-0-f=
-8bb1c18b986@kernel.org
->=20
-> Changes in v4:
-> - Use the hash value of the saddr, daddr and protocol of outer IP header =
-as
->   encapsulation id.
-> - Link to v3: https://lore.kernel.org/r/20250703-nf-flowtable-ipip-v3-0-8=
-80afd319b9f@kernel.org
->=20
-> Changes in v3:
-> - Add outer IP header sanity checks
-> - target nf-next tree instead of net-next
-> - Link to v2: https://lore.kernel.org/r/20250627-nf-flowtable-ipip-v2-0-c=
-713003ce75b@kernel.org
->=20
-> Changes in v2:
-> - Introduce IPIP flowtable selftest
-> - Link to v1: https://lore.kernel.org/r/20250623-nf-flowtable-ipip-v1-1-2=
-853596e3941@kernel.org
->=20
-> ---
-> Lorenzo Bianconi (3):
->       net: netfilter: Add IPIP flowtable rx sw acceleration
->       net: netfilter: Add IPIP flowtable tx sw acceleration
->       selftests: netfilter: nft_flowtable.sh: Add IPIP flowtable selftest
->=20
->  include/linux/netdevice.h                          |  16 +++
->  include/net/netfilter/nf_flow_table.h              |  22 ++++
->  net/ipv4/ipip.c                                    |  29 +++++
->  net/netfilter/nf_flow_table_core.c                 |   3 +
->  net/netfilter/nf_flow_table_ip.c                   | 117 +++++++++++++++=
-+++++-
->  net/netfilter/nf_flow_table_path.c                 |  86 +++++++++++++--
->  .../selftests/net/netfilter/nft_flowtable.sh       |  40 +++++++
->  7 files changed, 298 insertions(+), 15 deletions(-)
-> ---
-> base-commit: 32e4b1bf1bbfe63e52e2fff7ade0aaeb805defe3
-> change-id: 20250623-nf-flowtable-ipip-1b3d7b08d067
->=20
-> Best regards,
-> --=20
-> Lorenzo Bianconi <lorenzo@kernel.org>
->=20
-
---/hmIC4VKqnIfckr9
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaQnelgAKCRA6cBh0uS2t
-rIKNAQCBqiEOogDSti97oqbOzgwdepURLlyGeQ1wlZfifilu1AEAy6H4XEWEKEi5
-IO1DZWBhH6l1a6afqaXiTr7LF7k8nQs=
-=Mk5f
------END PGP SIGNATURE-----
-
---/hmIC4VKqnIfckr9--
 
