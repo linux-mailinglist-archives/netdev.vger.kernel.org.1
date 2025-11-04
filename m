@@ -1,121 +1,120 @@
-Return-Path: <netdev+bounces-235446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A494EC30AF8
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 12:14:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 793ACC30B02
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 12:14:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11E693A7D5B
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 11:12:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C18518C0B39
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 11:14:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76DC82E2DDD;
-	Tue,  4 Nov 2025 11:12:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1E332E54B0;
+	Tue,  4 Nov 2025 11:14:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="VGNDqEQh";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="iVIcykZX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SLfcYD2v"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D83892E426B
-	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 11:12:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D3902DECCB
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 11:14:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762254727; cv=none; b=HbtmBBZUjvp6aOZdvUW8A1/uvzmDy3cJo1Jb++449lLDrYJa13iab4wjgKYnpYVR0kToQJ/rqqGC9e4r1c9Y/i60YGbsyHngvpMyvIpaXVngtOoSAmwPbGziVXzuXnU2loBa6i9vSeJZU+uOammlIyRvyYWkiCwceLmTO6J+d/M=
+	t=1762254844; cv=none; b=XfgV5+xpntMMXXFIXLt4ZKDRprK9uaalhUk0KTooq12ChB9FH0R3N41cRSQom0HM4pjw/xeLX/7RiNk8MiF17kloU6by25APF7f/8udOTejw9mu2UOWNKzz9Po6teypedhx+oKamFmpL95gZLFmESIxmKCTZjma288BrQwReL3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762254727; c=relaxed/simple;
-	bh=/YkuHa6v1dNtoE23mdpsRTScQ6ZC42fxCgxw7gY2lbk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=rD4RNfGDZeo0j0Wu+JET1l3SGXeQIOeK9S+y4pBs+1Dk/mXbD1H1sSc3mG+8xVzDzAQa33xeQTmBf2PTMzggmGZiyv9IqVhNRvQulccxfrj5+DszJVP5dFyfFfhdvP9+2rRQzCpQys35H3sDtWaolM9RsaFBDHdLxqexu6V07Ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=VGNDqEQh; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=iVIcykZX; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Tue, 4 Nov 2025 12:12:01 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1762254723;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=GeSlkKbtcpufCLOJlTlGV4t9LhwRk+9N4J8rKH3yPSM=;
-	b=VGNDqEQhcThh4Cl+MtKeaN2cGbZ1Krt7fKgcOv27R7nYrOn6UBOOM7vIy62aUaVUw7EJgt
-	iv7Vp0Xbq98wae8mFNIlnK7mNLZvjLvPxNRXltxPgjreebE0+0lrJ5LFCbwrEnSbFF0IwR
-	ffET1/7yOxCHQD2DhIDekJGY5hjCfUaSsTPeL9DIXn7KRPQvkjeAEAwytiil0SxdHQruSx
-	NvJqujWauN47OZKxlzt52lpUnYXABLLZSvvxE7OppxrhIi6VbOwCY/VNz22q//25Z1iI/d
-	b2xWlzfNmKkNo8b/BNofNrn/2f+pK2WlEhWFOopn9zsrtySaEszTr+1aXEYLMQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1762254723;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=GeSlkKbtcpufCLOJlTlGV4t9LhwRk+9N4J8rKH3yPSM=;
-	b=iVIcykZXAbJqUCb8O5ew69FPvjZtvE1ETAQ5EblF90LFxjjB4oaNOrvPkf6sGK4gaCeMkM
-	0zcQuuCKfoYHAcBg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: netdev@vger.kernel.org
-Cc: Eric Dumazet <edumazet@google.com>, Gal Pressman <gal@nvidia.com>,
-	linux-rt-devel@lists.linux.dev,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Clark Williams <clrkwllms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH net] net: gro_cells: Provide lockdep class for gro_cell's
- bh_lock
-Message-ID: <20251104111201.5eBxkOKb@linutronix.de>
+	s=arc-20240116; t=1762254844; c=relaxed/simple;
+	bh=it/Jdp7msEglbDWxsnHvWioHPr2s2B4Ga9S1OeFv8Hs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iCFs75f9UOy0JftkTJytkytLEc9q0n81XcGFEVJeJKXZp0MCnwn5cciO8Zwsfhtf9pYy1bDuM+AZPbVx0jPfJWMEhz75ZjsIIiAPyhs1ZyMs1My3kQ4gk0hY1DZ7INFXPY8S68z5YkyKTK6CDEU7Kq9Wi0MwWTvdU67JmZvDLSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SLfcYD2v; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4ed0f3d4611so52656091cf.3
+        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 03:14:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1762254842; x=1762859642; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=it/Jdp7msEglbDWxsnHvWioHPr2s2B4Ga9S1OeFv8Hs=;
+        b=SLfcYD2vkg0LieR4vomBBxPE1i+xeqGRjyoGAJ10CbXe+0HAEXPcw2ByRSVq1MQnYc
+         OYCxrdEd6NH0hfNX7ygRTCTqe49cgHoeUup7VxwVgqhTlQO//gjRFxQ69U8t022BcQTj
+         TMNUqmx5mXiOQM3Oa+cGIAuTSKT5k3CceFKNLbTYMBFvfbN/pGU5KgkcXW+dniTx3xOQ
+         VO11GlcJM6QdqOJ5kU6Vzs04Fp7cWvU8j0fyovoVBNVHKyq/z1eR1ngkPa6m46IqnT/z
+         JF0ny/5WQp8kSvINPqnNPOy5xOAwFjSfKgN8Tu0jtaW0kTMw9QX9ovLcN/QkST3mY54Q
+         19hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762254842; x=1762859642;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=it/Jdp7msEglbDWxsnHvWioHPr2s2B4Ga9S1OeFv8Hs=;
+        b=V+8f/Ygf4NsKjJGxAgbolJNxQaBdWvcM1FbuLuFyHwJENUGEC1aOgWOv9n+RMSet8Y
+         6OMbO0WV73ZYR1KerWqR3BX7FXpmcp1D4HXoUj5oADl4lu0zTmT7E/ZuLUmRMuFFncAp
+         x1c1syamBXJGbxv69ARMUENdMHf9xjeKWe/SPhSTOxYA10MR9pyNF9/3ycBrW6v6Mcsl
+         08n/dwpyJZaAL7tq1EJCYwGO6NBS7r5Q5nd27vPxNrkps7bVC5Sj66hsOQnvYkLDAcme
+         jLCzM03hKAP+ryB1sY/fRvh2W8hPa3qOjeqytx78UF3Rccj0PCl6hlMibICOi2rHdDvk
+         e9CQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWpOVmZHGJbXGgEGqtr1RvcTPynrZ3g7PBDXzIahjeedaAhgAXFju4UDCQJ0sOjZEyNOF0uD60=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx64hpkWS2cT0SUUJBTyuqFSk1YdwT10SytvAWs1bwAakjYAGM8
+	B8Wa84F0DgAdotwEEnrMGNhuhXMC4PJLDXDNqvMfcMToRWCQT2f48vV7Nj8ax31iMTIiDRflQQj
+	CfTx9/u91WI9lAvqn9JGXX973YKIysst3iSWm9O64
+X-Gm-Gg: ASbGnct/93HOHFbsOJB08NVMNhiiiSjOR2jGUKD8szaA28dwnFfuqvfypXNOmSKkIy7
+	UOmPN9c0FHkQvRu3rbrIwYAK0gfrOLoLHvA28yJuR4LgDV51uJbUZ+Sg5Oxl6J33pIDTtqYNvVh
+	A/V4SWB+p5Xi1suizKJ5e/KR9nGieBM/ZuKTf3pDD1K+5st0BblBbUSTnQyko4jQJUUXeT/yRyy
+	cumeG7UtXgLAgBXitJIKV4LPRgJTQjHGjYju7NodAtPDB98Ckuh1gSZQhYW0aSVffecf8Y=
+X-Google-Smtp-Source: AGHT+IHAPnFeWkd76w7kkGmKF4NBtOuZVJA80CKeGkDZGgGocKZ3MAKOixHc8rhHtXRqqUfSB9bRYObMtfxy2aSQOTk=
+X-Received: by 2002:a05:622a:4f89:b0:4ed:6c4b:a6da with SMTP id
+ d75a77b69052e-4ed6c4bad82mr3491861cf.15.1762254841707; Tue, 04 Nov 2025
+ 03:14:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+References: <20251103154006.1189707-1-amorenoz@redhat.com> <87zf92nltc.fsf@toke.dk>
+In-Reply-To: <87zf92nltc.fsf@toke.dk>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 4 Nov 2025 03:13:50 -0800
+X-Gm-Features: AWmQ_bnf2UFo9kFzB64m_l0WwHYhNa_KUKadImPMRiaFA0yATSmMZ69tvLmSTYE
+Message-ID: <CANn89i+z0Ti_2m=nGs1xG_88eZHB0-cZG4pMYG+1pQNGCHzREA@mail.gmail.com>
+Subject: Re: [PATCH net-next v3] rtnetlink: honor RTEXT_FILTER_SKIP_STATS in IFLA_STATS
+To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
+Cc: Adrian Moreno <amorenoz@redhat.com>, netdev@vger.kernel.org, kuba@kernel.org, 
+	nicolas.dichtel@6wind.com, "David S. Miller" <davem@davemloft.net>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Stanislav Fomichev <sdf@fomichev.me>, Xiao Liang <shaw.leon@gmail.com>, 
+	Cong Wang <cong.wang@bytedance.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-One GRO-cell device's NAPI callback can nest into the GRO-cell of
-another device if the underlying device is also using GRO-cell.
-This is the case for IPsec over vxlan.
-These two GRO-cells are separate devices. From lockdep's point of view
-it is the same because each device is sharing the same lock class and so
-it reports a possible deadlock assuming one device is nesting into
-itself.
+On Tue, Nov 4, 2025 at 2:17=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen <to=
+ke@redhat.com> wrote:
+>
+> Adrian Moreno <amorenoz@redhat.com> writes:
+>
+> > Gathering interface statistics can be a relatively expensive operation
+> > on certain systems as it requires iterating over all the cpus.
+> >
+> > RTEXT_FILTER_SKIP_STATS was first introduced [1] to skip AF_INET6
+> > statistics from interface dumps and it was then extended [2] to
+> > also exclude IFLA_VF_INFO.
+> >
+> > The semantics of the flag does not seem to be limited to AF_INET
+> > or VF statistics and having a way to query the interface status
+> > (e.g: carrier, address) without retrieving its statistics seems
+> > reasonable. So this patch extends the use RTEXT_FILTER_SKIP_STATS
+> > to also affect IFLA_STATS.
+> >
+> > [1] https://lore.kernel.org/all/20150911204848.GC9687@oracle.com/
+> > [2] https://lore.kernel.org/all/20230611105108.122586-1-gal@nvidia.com/
+> >
+> > Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+>
+> Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
 
-Provide a lockclass for the bh_lock on for gro-cell device allowing
-lockdep to distinguish between individual devices.
-
-Fixes: 25718fdcbdd2 ("net: gro_cells: Use nested-BH locking for gro_cell")
-Reported-by: Gal Pressman <gal@nvidia.com>
-Closes: https://lore.kernel.org/all/66664116-edb8-48dc-ad72-d5223696dd19@nvidia.com/
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
----
- include/net/gro_cells.h | 1 +
- net/core/gro_cells.c    | 1 +
- 2 files changed, 2 insertions(+)
-
-diff --git a/include/net/gro_cells.h b/include/net/gro_cells.h
-index 596688b67a2a8..2453d0139c205 100644
---- a/include/net/gro_cells.h
-+++ b/include/net/gro_cells.h
-@@ -10,6 +10,7 @@ struct gro_cell;
- 
- struct gro_cells {
- 	struct gro_cell __percpu	*cells;
-+	struct lock_class_key		cells_bh_key;
- };
- 
- int gro_cells_receive(struct gro_cells *gcells, struct sk_buff *skb);
-diff --git a/net/core/gro_cells.c b/net/core/gro_cells.c
-index fd57b845de333..a91fdc47e8096 100644
---- a/net/core/gro_cells.c
-+++ b/net/core/gro_cells.c
-@@ -88,6 +88,7 @@ int gro_cells_init(struct gro_cells *gcells, struct net_device *dev)
- 
- 		__skb_queue_head_init(&cell->napi_skbs);
- 		local_lock_init(&cell->bh_lock);
-+		lockdep_set_class(&cell->bh_lock, &gcells->cells_bh_key);
- 
- 		set_bit(NAPI_STATE_NO_BUSY_POLL, &cell->napi.state);
- 
--- 
-2.51.0
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
