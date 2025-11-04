@@ -1,313 +1,171 @@
-Return-Path: <netdev+bounces-235444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25468C30A81
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 12:06:01 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63228C30AB5
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 12:08:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77A9B188E730
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 11:06:25 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C55704E2F84
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 11:08:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C81C2DAFC8;
-	Tue,  4 Nov 2025 11:05:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 897BF2E1C65;
+	Tue,  4 Nov 2025 11:08:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="apwJZ6PC";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="DtAox43Y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ITX4mipP"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CE922773C6
-	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 11:05:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A085191F92;
+	Tue,  4 Nov 2025 11:08:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762254355; cv=none; b=pk8/wR0hXsCRlOt43xoZHtXsiDneW2qrekbiRlswzP8dnataFbZQe/rTJ4vej4Gtj0A2PYNbyfLITHCYgd6MDxepIOZO2zMZ9ZC75ZK7PjHZvZE1UfSn4a5qEhyBOpjB4XBQ/I2Ju8TidSIjV3VK5YQFZGryqg8nolpoveG+PqE=
+	t=1762254491; cv=none; b=ZFoM6cEw2HEuAs8D0m9o5lNSqrkSpK0Cgvn1eM3JIOai52WTaxIenwi2rEAUXwvaNRkioeoXjn51+auP+kmu2I271Bg2nRyONr8l26/wA6SiJosc+iJ8gMEytgJuvIvmAzC/AkDAHZwALZYg16nUYGMYOQREm7w6Dam6YTST0zs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762254355; c=relaxed/simple;
-	bh=6rkuhGsUq+FMshFBuGH4UBuujI5+HFmkSrNJPWLxEDs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EkkYNdIEO7xmqB0JwX88Lv+jculyntCEG3f/uLOgOXd4kiSsyRhQ3oQVwtHfAP3G5i1JIIwm2n5coMWmFgOqPXp8njnNJiFZgcb4Q/uNopTXPwcFbgi9fMAI4H51OTyGKABMsIbvvjIW3JXod061nFthsx56iolTSAfWe8MfciI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=apwJZ6PC; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=DtAox43Y; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762254352;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OxmghJIcjc3tJC2DIG8MaqzZFBLXh5fxewma9fsdqXU=;
-	b=apwJZ6PC1qBS75zy3RvwIHRoL63GixP1t9G6QHjYgUksW8kssbSxmSa+5/Ao5v/VQ59gjT
-	x9wg7t2X3+t5j5lgWklzLATHrJJWR3L41ucOZ6b7NFBn60+MwjHtui8U+VHDSaLyxMk238
-	ZM8kYlNayewsTIr+c9FJw+UC3UZIri8=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-669-iaUCXQrvN2yLHETiTj0v4g-1; Tue, 04 Nov 2025 06:05:51 -0500
-X-MC-Unique: iaUCXQrvN2yLHETiTj0v4g-1
-X-Mimecast-MFC-AGG-ID: iaUCXQrvN2yLHETiTj0v4g_1762254350
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-429c9024a1dso1293246f8f.2
-        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 03:05:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762254350; x=1762859150; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OxmghJIcjc3tJC2DIG8MaqzZFBLXh5fxewma9fsdqXU=;
-        b=DtAox43Y5w70OHUi0G3BPXvZ2ZaEsdARx4De11HsJzrj0ZQSyFCG/kOfcy3oBEpAU4
-         L9LWUTUB5autDnsNvuvG/WsKWv4zpI+g4W19tp/9eHeOzidn4wGKiok+GxN9IRYH3WwV
-         IEpwRb2Zsa/xs0xxFfVyF/9BiwnNKLmH/RD+gO2qKWCpkfHyQGd3Uf/rHREySkg7QOMe
-         fBlLXaZg8VYQ1tv0SGJvIa13m/RTPnjiNkPclYK6USGkbRxVfVDb5eSyXmNuAhqOo1jn
-         5POK+OhAtOT3sEEwO1RZGoo3e0qpFQHaAvEZjGHfiY2aeclZfjNqnkAZ0x01XN7SjFAe
-         xrTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762254350; x=1762859150;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OxmghJIcjc3tJC2DIG8MaqzZFBLXh5fxewma9fsdqXU=;
-        b=InbsZeuNtrLFC+x+tRTfk/qMs0t4M4aXuqCkXL7hwxVPoYxgPeXjC2p1eYBGZ3t/9+
-         DjquL0wezFHgUH3ALqXJFcCIqhgNPjF7VY529oZtak2RhCc/dnJH3VLmNY+lBGgrCUlI
-         7kHTYOyqDIJhJBCMbimgWPue0pquo40nLUsRsk4WuJcBRLIaxzOdH7PDsKHbT7v0Q13p
-         bJ+Jwgidam5+dxkm6JqdBPM8XTxLnbPPV2d0yNjZMlsTLsbaVfJ5kvhKM+cwxi5wTFEt
-         UVmFpZPp7H3Su6DQcfqt5iQl3Ib/X1g6Y8s+TW9HCVYrS+MIFXvENA9u+yRu77pC+lPw
-         rAiA==
-X-Forwarded-Encrypted: i=1; AJvYcCXm6pmH0RtbTdd9UThR673ItwjzKZgVw79vhu13f4ty2Mybi2RzKGukHPuApn0TnNj/yvXrC4s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzgHcp9dvjyE7kQMXf3EtiIjywMMFXJmlnRH2ll1l5uIU4YY4Du
-	Q1S9FXqvbbvI4fAOGXLTVnXIYzEwQfJwdfF6Rlcf5djUnk+2lOypuqHdW4jIERgPwB9hjSsR1/F
-	MZua2LEkNMo6QvzbaspbkKRG8tkp+J9SUR+4YOvHrid5j5yV3qRmeDoA0QA==
-X-Gm-Gg: ASbGncu3A2BX7r+w5ZWVghNlELR9d49i7lkZcx5XV+1y+CG77YXVwBrO/bAuT3hXEqE
-	nhSy+t4Nkzg5lOdblwn0HzE6MwQPal+9/+JDefgMH6fvqodZYUQDcWRl9bITbzfyLERPfIJO8vb
-	ZwTlcDHZDekfUDfRXI5XYjWLo1uf24h8XUpjkoGw1QKJKlJxzM2x6DMbkNoA3gGMzMPAX+srxZ/
-	6HNtLPtQa1fGL+v2RsPrTn8k09WmCwRFrtBZq5aKyEC3vrGATgVMH2KH1MD2BFag+KzGP99BZjz
-	rFfhKEz5GUxD67VDYu8pSK1YitP0ba1EGWDyXFYr2XWppIS5q56PqFs6uML4EHkxY3UhbB0NuAT
-	aowx1OPFI488ejT1qnEJL1/oAv/gEs+a+rcGcDBsPR7iw
-X-Received: by 2002:a5d:584b:0:b0:429:dc4a:4094 with SMTP id ffacd0b85a97d-429dc4a41c5mr2036057f8f.30.1762254349823;
-        Tue, 04 Nov 2025 03:05:49 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFRTcLyJarL+HzJIicet1BC+SA9mI8/liFB8LEEp4cpSbdxEDl917ajaG6JsdKZcXmSqC73zQ==
-X-Received: by 2002:a5d:584b:0:b0:429:dc4a:4094 with SMTP id ffacd0b85a97d-429dc4a41c5mr2036004f8f.30.1762254349252;
-        Tue, 04 Nov 2025 03:05:49 -0800 (PST)
-Received: from ?IPV6:2a0d:3341:b8a2:8d10:2aab:5fa:9fa0:d7e6? ([2a0d:3341:b8a2:8d10:2aab:5fa:9fa0:d7e6])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429dc1f5af7sm4174267f8f.28.2025.11.04.03.05.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Nov 2025 03:05:48 -0800 (PST)
-Message-ID: <ad38f56b-5c53-408e-abcc-4b061c2097a3@redhat.com>
-Date: Tue, 4 Nov 2025 12:05:46 +0100
+	s=arc-20240116; t=1762254491; c=relaxed/simple;
+	bh=LmdhoSAI9lnKK3Lr3krP6aCJTZmvPTtd9486Cgqqibo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SCgwvhaP3FV/8zs3eHTbLTiWOWuNde/mBgyyLDUCM56XcNWm+79u4h9TfT+ouHllhgrMcEluRCiZzu+HZNmaCh9fjCUCATN+FkQE8NwcF9f9a6+E1ku+nd3d9mIo9H4nCqmygY9iOE/XIsWbQGfK0pZOKuTUm0Fk/tUViEBqBU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ITX4mipP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 445D3C4CEF7;
+	Tue,  4 Nov 2025 11:08:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762254488;
+	bh=LmdhoSAI9lnKK3Lr3krP6aCJTZmvPTtd9486Cgqqibo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ITX4mipPZ76lcXAIaPNSaOq9l2dzLMiMzCY8jKUcy9ESdyLzreK17nB4zrZWFRJMA
+	 YZZL5zXT42ySFcYEnfq2/A3RTh+yCJrB2LI+LgIltjv84P10U7qfvgwF2iuptZIqyQ
+	 Co8N1BMYuGHpTpvzVQc8tdEJ8BV3T1+GKCtRAI2ABxOOrhI2Eo/2WAQmI1X/Q/M2a+
+	 5C0y6sYZ/AuE9zLTArKxMLaUHZdK8lqO1yXWcZrib2xRqtC8WifJvubLxKqWEsZsnF
+	 d1wasDV1Od59Pmz2P+TpcJhVZDOMRBR6q4/At1uipBWJf822q/+dW8OfIlNPDhtN5P
+	 nCz3XJEagyDTQ==
+Date: Tue, 4 Nov 2025 12:08:06 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Phil Sutter <phil@nwl.cc>
+Cc: Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH nf-next v8 0/3] Add IPIP flowtable SW acceleration
+Message-ID: <aQnelp8RNlMfw4nr@lore-desk>
+References: <20251023-nf-flowtable-ipip-v8-0-5d5d8595c730@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 06/15] quic: add stream management
-To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>,
- quic@lists.linux.dev
-Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
- Simon Horman <horms@kernel.org>, Stefan Metzmacher <metze@samba.org>,
- Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
- Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>,
- linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>,
- Namjae Jeon <linkinjeon@kernel.org>, Paulo Alcantara <pc@manguebit.com>,
- Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev,
- Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
- Benjamin Coddington <bcodding@redhat.com>, Steve Dickson
- <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
- Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>,
- Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>,
- Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe"
- <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
- illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
- Daniel Stenberg <daniel@haxx.se>,
- Andy Gospodarek <andrew.gospodarek@broadcom.com>
-References: <cover.1761748557.git.lucien.xin@gmail.com>
- <6b527b669fe05f9743e37d9f584f7cd492a7649b.1761748557.git.lucien.xin@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <6b527b669fe05f9743e37d9f584f7cd492a7649b.1761748557.git.lucien.xin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-
-On 10/29/25 3:35 PM, Xin Long wrote:
-+/* Create and register new streams for sending. */
-> +static struct quic_stream *quic_stream_send_create(struct quic_stream_table *streams,
-> +						   s64 max_stream_id, u8 is_serv)
-> +{
-> +	struct quic_stream *stream = NULL;
-> +	s64 stream_id;
-> +
-> +	stream_id = streams->send.next_bidi_stream_id;
-> +	if (quic_stream_id_uni(max_stream_id))
-> +		stream_id = streams->send.next_uni_stream_id;
-> +
-> +	/* rfc9000#section-2.1: A stream ID that is used out of order results in all streams
-> +	 * of that type with lower-numbered stream IDs also being opened.
-> +	 */
-> +	while (stream_id <= max_stream_id) {
-> +		stream = kzalloc(sizeof(*stream), GFP_KERNEL_ACCOUNT);
-> +		if (!stream)
-> +			return NULL;
-> +
-> +		stream->id = stream_id;
-> +		if (quic_stream_id_uni(stream_id)) {
-> +			stream->send.max_bytes = streams->send.max_stream_data_uni;
-> +
-> +			if (streams->send.next_uni_stream_id < stream_id + QUIC_STREAM_ID_STEP)
-> +				streams->send.next_uni_stream_id = stream_id + QUIC_STREAM_ID_STEP;
-
-It's unclear to me the goal the above 2 statements. Dealing with id
-wrap-arounds? If 'streams->send.next_uni_stream_id < stream_id +
-QUIC_STREAM_ID_STEP' is not true the next quic_stream_send_create() will
-reuse the same stream_id.
-
-I moving the above in a separate helper with some comments would help.
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="/hmIC4VKqnIfckr9"
+Content-Disposition: inline
+In-Reply-To: <20251023-nf-flowtable-ipip-v8-0-5d5d8595c730@kernel.org>
 
 
-> +			streams->send.streams_uni++;
-> +
-> +			quic_stream_add(streams, stream);
-> +			stream_id += QUIC_STREAM_ID_STEP;
-> +			continue;
-> +		}
-> +
-> +		if (streams->send.next_bidi_stream_id < stream_id + QUIC_STREAM_ID_STEP)
-> +			streams->send.next_bidi_stream_id = stream_id + QUIC_STREAM_ID_STEP;
-> +		streams->send.streams_bidi++;
-> +
-> +		if (quic_stream_id_local(stream_id, is_serv)) {
-> +			stream->send.max_bytes = streams->send.max_stream_data_bidi_remote;
-> +			stream->recv.max_bytes = streams->recv.max_stream_data_bidi_local;
-> +		} else {
-> +			stream->send.max_bytes = streams->send.max_stream_data_bidi_local;
-> +			stream->recv.max_bytes = streams->recv.max_stream_data_bidi_remote;
-> +		}
-> +		stream->recv.window = stream->recv.max_bytes;
-> +
-> +		quic_stream_add(streams, stream);
-> +		stream_id += QUIC_STREAM_ID_STEP;
-> +	}
-> +	return stream;
-> +}
-> +
-> +/* Create and register new streams for receiving. */
-> +static struct quic_stream *quic_stream_recv_create(struct quic_stream_table *streams,
-> +						   s64 max_stream_id, u8 is_serv)
-> +{
-> +	struct quic_stream *stream = NULL;
-> +	s64 stream_id;
-> +
-> +	stream_id = streams->recv.next_bidi_stream_id;
-> +	if (quic_stream_id_uni(max_stream_id))
-> +		stream_id = streams->recv.next_uni_stream_id;
-> +
-> +	/* rfc9000#section-2.1: A stream ID that is used out of order results in all streams
-> +	 * of that type with lower-numbered stream IDs also being opened.
-> +	 */
-> +	while (stream_id <= max_stream_id) {
-> +		stream = kzalloc(sizeof(*stream), GFP_ATOMIC | __GFP_ACCOUNT);
-> +		if (!stream)
-> +			return NULL;
-> +
-> +		stream->id = stream_id;
-> +		if (quic_stream_id_uni(stream_id)) {
-> +			stream->recv.window = streams->recv.max_stream_data_uni;
-> +			stream->recv.max_bytes = stream->recv.window;
-> +
-> +			if (streams->recv.next_uni_stream_id < stream_id + QUIC_STREAM_ID_STEP)
-> +				streams->recv.next_uni_stream_id = stream_id + QUIC_STREAM_ID_STEP;
-> +			streams->recv.streams_uni++;
-> +
-> +			quic_stream_add(streams, stream);
-> +			stream_id += QUIC_STREAM_ID_STEP;
-> +			continue;
-> +		}
-> +
-> +		if (streams->recv.next_bidi_stream_id < stream_id + QUIC_STREAM_ID_STEP)
-> +			streams->recv.next_bidi_stream_id = stream_id + QUIC_STREAM_ID_STEP;
-> +		streams->recv.streams_bidi++;
-> +
-> +		if (quic_stream_id_local(stream_id, is_serv)) {
-> +			stream->send.max_bytes = streams->send.max_stream_data_bidi_remote;
-> +			stream->recv.max_bytes = streams->recv.max_stream_data_bidi_local;
-> +		} else {
-> +			stream->send.max_bytes = streams->send.max_stream_data_bidi_local;
-> +			stream->recv.max_bytes = streams->recv.max_stream_data_bidi_remote;
-> +		}
-> +		stream->recv.window = stream->recv.max_bytes;
-> +
-> +		quic_stream_add(streams, stream);
-> +		stream_id += QUIC_STREAM_ID_STEP;
-> +	}
-> +	return stream;
-> +}
+--/hmIC4VKqnIfckr9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The above 2 functions has a lot of code in common. I think you could
-deduplicate it by:
-- defining a named type for quic_stream_table.{send,recv}
-- define a generic quic_stream_create() helper using an additonal
-argument for the relevant table.{send,recv}
-- replace the above 2 functions with a single invocation to such helper.
+> Introduce SW acceleration for IPIP tunnels in the netfilter flowtable
+> infrastructure. This series introduces basic infrastructure to
+> accelerate other tunnel types (e.g. IP6IP6).
 
-It looks like there are more de-dup opportunity below.
+Hi Pablo and Florian,
 
-> +
-> +/* Check if a send or receive stream ID is already closed. */
-> +static bool quic_stream_id_closed(struct quic_stream_table *streams, s64 stream_id, bool send)
-> +{
-> +	if (quic_stream_id_uni(stream_id)) {
-> +		if (send)
-> +			return stream_id < streams->send.next_uni_stream_id;
-> +		return stream_id < streams->recv.next_uni_stream_id;
-> +	}
-> +	if (send)
-> +		return stream_id < streams->send.next_bidi_stream_id;
-> +	return stream_id < streams->recv.next_bidi_stream_id;
-> +}
-> +
-> +/* Check if a stream ID would exceed local (recv) or peer (send) limits. */
-> +bool quic_stream_id_exceeds(struct quic_stream_table *streams, s64 stream_id, bool send)
-> +{
-> +	u64 nstreams;
-> +
-> +	if (!send) {
-> +		if (quic_stream_id_uni(stream_id))
-> +			return stream_id > streams->recv.max_uni_stream_id;
-> +		return stream_id > streams->recv.max_bidi_stream_id;
-> +	}
-> +
-> +	if (quic_stream_id_uni(stream_id)) {
-> +		if (stream_id > streams->send.max_uni_stream_id)
-> +			return true;
-> +		stream_id -= streams->send.next_uni_stream_id;
-> +		nstreams = quic_stream_id_to_streams(stream_id);
-> +		return nstreams + streams->send.streams_uni > streams->send.max_streams_uni;
-> +	}
-> +
-> +	if (stream_id > streams->send.max_bidi_stream_id)
-> +		return true;
-> +	stream_id -= streams->send.next_bidi_stream_id;
-> +	nstreams = quic_stream_id_to_streams(stream_id);
-> +	return nstreams + streams->send.streams_bidi > streams->send.max_streams_bidi;
-> +}
-> +
-> +/* Get or create a send stream by ID. */
-> +struct quic_stream *quic_stream_send_get(struct quic_stream_table *streams, s64 stream_id,
-> +					 u32 flags, bool is_serv)
-> +{
-> +	struct quic_stream *stream;
-> +
-> +	if (!quic_stream_id_valid(stream_id, is_serv, true))
-> +		return ERR_PTR(-EINVAL);
-> +
-> +	stream = quic_stream_find(streams, stream_id);
-> +	if (stream) {
+Do you have any updates/comments about this series? Thanks in advance.
 
-You should add some comments and possibly lockdep annotation/static
-check about the expected locking for the whole stream lifecycle.
+Regards,
+Lorenzo
 
-/P
+>=20
+> ---
+> Changes in v8:
+> - Rebase on top of the following series (not yet applied)
+>   https://patchwork.ozlabs.org/project/netfilter-devel/list/?series=3D477=
+081
+> - Link to v7: https://lore.kernel.org/r/20251021-nf-flowtable-ipip-v7-0-a=
+45214896106@kernel.org
+>=20
+> Changes in v7:
+> - Introduce sw acceleration for tx path of IPIP tunnels
+> - Rely on exact match during flowtable entry lookup
+> - Fix typos
+> - Link to v6: https://lore.kernel.org/r/20250818-nf-flowtable-ipip-v6-0-e=
+da90442739c@kernel.org
+>=20
+> Changes in v6:
+> - Rebase on top of nf-next main branch
+> - Link to v5: https://lore.kernel.org/r/20250721-nf-flowtable-ipip-v5-0-0=
+865af9e58c6@kernel.org
+>=20
+> Changes in v5:
+> - Rely on __ipv4_addr_hash() to compute the hash used as encap ID
+> - Remove unnecessary pskb_may_pull() in nf_flow_tuple_encap()
+> - Add nf_flow_ip4_ecanp_pop utility routine
+> - Link to v4: https://lore.kernel.org/r/20250718-nf-flowtable-ipip-v4-0-f=
+8bb1c18b986@kernel.org
+>=20
+> Changes in v4:
+> - Use the hash value of the saddr, daddr and protocol of outer IP header =
+as
+>   encapsulation id.
+> - Link to v3: https://lore.kernel.org/r/20250703-nf-flowtable-ipip-v3-0-8=
+80afd319b9f@kernel.org
+>=20
+> Changes in v3:
+> - Add outer IP header sanity checks
+> - target nf-next tree instead of net-next
+> - Link to v2: https://lore.kernel.org/r/20250627-nf-flowtable-ipip-v2-0-c=
+713003ce75b@kernel.org
+>=20
+> Changes in v2:
+> - Introduce IPIP flowtable selftest
+> - Link to v1: https://lore.kernel.org/r/20250623-nf-flowtable-ipip-v1-1-2=
+853596e3941@kernel.org
+>=20
+> ---
+> Lorenzo Bianconi (3):
+>       net: netfilter: Add IPIP flowtable rx sw acceleration
+>       net: netfilter: Add IPIP flowtable tx sw acceleration
+>       selftests: netfilter: nft_flowtable.sh: Add IPIP flowtable selftest
+>=20
+>  include/linux/netdevice.h                          |  16 +++
+>  include/net/netfilter/nf_flow_table.h              |  22 ++++
+>  net/ipv4/ipip.c                                    |  29 +++++
+>  net/netfilter/nf_flow_table_core.c                 |   3 +
+>  net/netfilter/nf_flow_table_ip.c                   | 117 +++++++++++++++=
++++++-
+>  net/netfilter/nf_flow_table_path.c                 |  86 +++++++++++++--
+>  .../selftests/net/netfilter/nft_flowtable.sh       |  40 +++++++
+>  7 files changed, 298 insertions(+), 15 deletions(-)
+> ---
+> base-commit: 32e4b1bf1bbfe63e52e2fff7ade0aaeb805defe3
+> change-id: 20250623-nf-flowtable-ipip-1b3d7b08d067
+>=20
+> Best regards,
+> --=20
+> Lorenzo Bianconi <lorenzo@kernel.org>
+>=20
 
+--/hmIC4VKqnIfckr9
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaQnelgAKCRA6cBh0uS2t
+rIKNAQCBqiEOogDSti97oqbOzgwdepURLlyGeQ1wlZfifilu1AEAy6H4XEWEKEi5
+IO1DZWBhH6l1a6afqaXiTr7LF7k8nQs=
+=Mk5f
+-----END PGP SIGNATURE-----
+
+--/hmIC4VKqnIfckr9--
 
