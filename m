@@ -1,166 +1,124 @@
-Return-Path: <netdev+bounces-235466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60633C31125
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 13:52:21 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFD76C311B4
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 14:04:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E44B64F4C1C
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 12:51:22 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B24574E0552
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 13:04:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB9272EB841;
-	Tue,  4 Nov 2025 12:51:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dvGnXHbp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37E0A1E7C18;
+	Tue,  4 Nov 2025 13:04:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from inva020.nxp.com (inva020.nxp.com [92.121.34.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D8D5212542
-	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 12:51:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A4A434D3B5
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 13:04:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.121.34.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762260681; cv=none; b=Dl4lRPXGVYmkV9NTK13OVNmYPPG7bHk8Q+OD0i6duw+krgAu5KmmOiexGMAB//Bs1bw/oNFV9OnJEy4DoOrW0BjczRPv/PDg23AnmVzfQJ7PpO7x71YOAcE283gVHkhXLP0FhOlL02esE4eo1Qai5q8v7CiDWz1GqU9R0m/yVzM=
+	t=1762261470; cv=none; b=n+lAz+p2NRaawjrDgoW1mFkHAYh0jVSlg9S13iS0GKzPisFN1DjaFlp+ZILlclbO0fWBmZarz6DUy3lBd55VrsVMMejK6rgnCFueRau5O6v3OL082VAS7sAbkFt58JHuOLLb5SfqHPxUPwTkzpoEAo3yd05TiX/I7VJoMgHEBEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762260681; c=relaxed/simple;
-	bh=Tm7Z1rbJg1xBtYLywrxZOtnC4oE4srr+4uBIseDYWug=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ML9cZT/tQoVu+/gHTC8/TF1bgqU+wugTIfowIm0XBkHlLOu3/uCEzp2XENO/3n1NnAbyLyUbdbMk6hrEVrIewvP5+kWXI4CZuCTavdgdJKL2Hn38wyrIAhNB8673kVlLJDnD7wYDthZ8J3ibThg7MSn9SLONK0yOPjRCr5mxz3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dvGnXHbp; arc=none smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-8802b66c811so52466596d6.1
-        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 04:51:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762260679; x=1762865479; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=eNACkyQqVSo6Hmo5PjkrfufaeZZc3fNY7YlAuWMuRq0=;
-        b=dvGnXHbpBabcXnzRnM6SfnJRJdhcUrfu7DWxWACFpfYxqxVPLOHCOV250+gGlVqaCN
-         FoxYutoTSt/9t4Wzi/xkydfelXC0MWBN6itwSaSmkMFQJjM0FpT1+GkmH0IPqXW0U8lR
-         A0Y9d1t2S0vKXFrMsguWkeFGiEjvg8IHfldf0S6UZvTikVD3jCJl9eQI91vo3RFmLafZ
-         JPdDBrAtwVfVMkJrlQkhomY2RSc0gePKqxcdHf1vTUfLUINmXZHnZkgfT+cnJt9b9y5B
-         IOmCKKUhgw7V7uJ0ZVz9Fg6iS3w4jR3cOSt2O/Eybs+9pw7oO7VKwOfRjxE7swYYJv6I
-         MDfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762260679; x=1762865479;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eNACkyQqVSo6Hmo5PjkrfufaeZZc3fNY7YlAuWMuRq0=;
-        b=mbwKDVvx/46HxpWNmenwGVOFoAeWLUsI5z0A7NSumqKZUfWSe3JaJdGTu60pCQT4DS
-         NAjOQlKcIZA33NhRPKHf0wx6jxgb27GMZyYosaUswSrBcuL4JFdwxAvFv+nvwcZlg1zV
-         4Fo66dwMv9r6Hk/m25XmrBZp8K16ZdxBQANHGD4ud1hchHXDBi7NJtAQinfMoBkgW3Dp
-         opGRxoz3XJ+B5AdgSfczKwgkgf/+Xd/2YnjG36sFB3ggvHc0UqQO2nv6s7HdE3A5c4nC
-         UMRoUBQC7Bwh5vqEpWL0JIiFrJ57r7+qVhsnFRKfIQkSNPAjEgY1iBeLuIrqaAxTPnKJ
-         xeng==
-X-Forwarded-Encrypted: i=1; AJvYcCXgsT6KfS41hdMPiTgyEc28ZMhS2C+J8PQib0AGYFLMjy3T8eKkDy/zYoX3f/m3Depkb1LQK1g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YynEyOPDeK5vjMuN1NV9tQzQGYoa5ZmXRaYTzjfttWWtN9XrxBC
-	qyyf+WPwXIj80v+bZIOP1psQeTmHwrbfHyLeGSg6rVoxqi9Yefe54Q6K
-X-Gm-Gg: ASbGncvILGlE05+yV51/wDxymfJEvED26MU6QBIwXNEZk03ZtoiQZPtgGlgfZnSh3St
-	dj6x7B5+jga+c2kkJqgJy9ARX/gpYLLB5qHhb1/Z/lkliU3kiNB7SYC/L0vAoggPy4fcnj1XTe/
-	wu7DFWwBCd9qdVKyY+o7/dmHdpsR1ZAGnHSzd1ZzOn3+sY45kQ6MehYXTMRdSsd66o8UVwfGoQ2
-	S62vsGkHU42IUs+5xp+Ubcro7gLRIFrt39wJTurfU5rVn9ZebEp5LTRpkhn8JSBm5DYRUdd7P8A
-	iPrWa5V9VeWClyfq4BxEMo75+nwRyIAO2THl1oEWzgKRco4FGDcIfOqJdJK0iWj+7cv/xKBGxYl
-	tJLGEZlxBHS0QeSq8p9S9oQr5tugoGVtjr+7XiikScnG84kwr4Mlew5634fDUQljGxzHcODgfuH
-	3fPn5j3U2bnjM+Mny2imK0TBqs7tEKrYpG8xO8Ubq59MQT4h2r/cj29cY=
-X-Google-Smtp-Source: AGHT+IFm58ty03czXFexlH5hj0mLZA/g2M5F1UsdQEG3Wd5VnU77sQjl9srK3J0v7dmYKkp7SqLOlQ==
-X-Received: by 2002:a05:6214:262e:b0:880:5edf:d177 with SMTP id 6a1803df08f44-8805edfd5b5mr52809046d6.11.1762260678910;
-        Tue, 04 Nov 2025 04:51:18 -0800 (PST)
-Received: from ?IPV6:2600:4040:93b8:5f00:52dd:c164:4581:b7eb? ([2600:4040:93b8:5f00:52dd:c164:4581:b7eb])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-88060e906efsm19114706d6.45.2025.11.04.04.51.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Nov 2025 04:51:18 -0800 (PST)
-Message-ID: <6aa2f011-3ba5-4614-950d-d8f0ec62222b@gmail.com>
-Date: Tue, 4 Nov 2025 07:51:16 -0500
+	s=arc-20240116; t=1762261470; c=relaxed/simple;
+	bh=AGyEpwYEioYBmSj9xKbMDznM0ls2s0eCibPm8Q1dRP4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gyuNqxsEzOd2q16NQbAeAYktNgI05SdZ/aF0cxXpZFE8V6+9TNCm58tAXXqDtZNFKi1ubQDtQE2u7Jyz3BCnoiMqh19kYWoKIid2qoD5leAsaWnRGGMfpfq78CAEwGReyjvcPncQxp73+67pO2RU7blffffXBPGMK90G9G4eklc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; arc=none smtp.client-ip=92.121.34.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id B59C81A0A39;
+	Tue,  4 Nov 2025 14:04:25 +0100 (CET)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+	by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id A77171A09FE;
+	Tue,  4 Nov 2025 14:04:25 +0100 (CET)
+Received: from lsv051416.swis.nl-cdc01.nxp.com (lsv051416.swis.nl-cdc01.nxp.com [10.168.48.122])
+	by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 08A68202E8;
+	Tue,  4 Nov 2025 14:04:25 +0100 (CET)
+Date: Tue, 4 Nov 2025 14:04:25 +0100
+From: Jan Petrous <jan.petrous@oss.nxp.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Fabio Estevam <festevam@gmail.com>, imx@lists.linux.dev,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>, s32@nxp.com,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Shawn Guo <shawnguo@kernel.org>
+Subject: Re: [PATCH net-next 02/11] net: stmmac: s32: move PHY_INTF_SEL_x
+ definitions out of the way
+Message-ID: <aQn52d7B6HfVSS22@lsv051416.swis.nl-cdc01.nxp.com>
+References: <aQiWzyrXU_2hGJ4j@shell.armlinux.org.uk>
+ <E1vFt4S-0000000ChoS-2Ahi@rmk-PC.armlinux.org.uk>
+ <aQnJRgJqFY99kDUj@lsv051416.swis.nl-cdc01.nxp.com>
+ <aQnNjWuytebZpZyW@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 2/2] net/mlx5: implement swp_l4_csum_mode via
- devlink params
-From: Daniel Zahka <daniel.zahka@gmail.com>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Srujana Challa <schalla@marvell.com>,
- Bharat Bhushan <bbhushan2@marvell.com>,
- Herbert Xu <herbert@gondor.apana.org.au>,
- Brett Creeley <brett.creeley@amd.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Michael Chan <michael.chan@broadcom.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Sunil Goutham <sgoutham@marvell.com>, Linu Cherian <lcherian@marvell.com>,
- Geetha sowjanya <gakula@marvell.com>, Jerin Jacob <jerinj@marvell.com>,
- hariprasad <hkelam@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>,
- Tariq Toukan <tariqt@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
- Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
- Manish Chopra <manishc@marvell.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Siddharth Vadapalli <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>,
- Loic Poulain <loic.poulain@oss.qualcomm.com>,
- Sergey Ryazanov <ryazanov.s.a@gmail.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- Vladimir Oltean <olteanv@gmail.com>,
- Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
- Dave Ertman <david.m.ertman@intel.com>,
- Vlad Dumitrescu <vdumitrescu@nvidia.com>,
- "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Alexander Sverdlin <alexander.sverdlin@gmail.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
- linux-rdma@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-omap@vger.kernel.org
-References: <20251103194554.3203178-1-daniel.zahka@gmail.com>
- <20251103194554.3203178-3-daniel.zahka@gmail.com>
- <mhm4hkz52gmqok56iuiukdcz2kaowvppbqrfi3zxuq67p3otit@5fhpgu2axab2>
- <db5c46b4-cc66-48bb-aafb-40d83dd3620c@gmail.com>
-Content-Language: en-US
-In-Reply-To: <db5c46b4-cc66-48bb-aafb-40d83dd3620c@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aQnNjWuytebZpZyW@shell.armlinux.org.uk>
+X-Virus-Scanned: ClamAV using ClamSMTP
 
+On Tue, Nov 04, 2025 at 09:55:25AM +0000, Russell King (Oracle) wrote:
+> On Tue, Nov 04, 2025 at 10:37:10AM +0100, Jan Petrous wrote:
+> > On Mon, Nov 03, 2025 at 11:50:00AM +0000, Russell King (Oracle) wrote:
+> > >  /* SoC PHY interface control register */
+> > > -#define PHY_INTF_SEL_MII	0x00
+> > > -#define PHY_INTF_SEL_SGMII	0x01
+> > > -#define PHY_INTF_SEL_RGMII	0x02
+> > > -#define PHY_INTF_SEL_RMII	0x08
+> > > +#define S32_PHY_INTF_SEL_MII	0x00
+> > > +#define S32_PHY_INTF_SEL_SGMII	0x01
+> > > +#define S32_PHY_INTF_SEL_RGMII	0x02
+> > > +#define S32_PHY_INTF_SEL_RMII	0x08
+> > 
+> > Reviewed-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+> 
+> Thanks. One question: is it possible that bits 3:1 are the dwmac
+> phy_intf_sel_i inputs, and bit 0 selects an external PCS which
+> is connected to the dwmac using GMII (and thus would be set bits
+> 3:1 to zero) ?
 
+I guess so, as the S32G3 Reference Manual says regarding
+GMAC_0_CTRL_STS register bits the following:
 
-On 11/4/25 6:38 AM, Daniel Zahka wrote:
->
->
-> On 11/4/25 5:14 AM, Jiri Pirko wrote:
->> I did some research. 0/DEVICE_DEFAULT should not be ever reported back
->> from FW. It's purpose is for user to reset to default FW configuration.
->> What's the usecase for that? I think you could just avoid
->> 0/DEVICE_DEFAULT entirely, for both get and set.
->
-> I find that 0/DEVICE_DEFAULT is reported back on my device. I have 
-> observed this same behavior when using the mstconfig tool for setting 
-> the parameter too.
+[3-1] PHY_INTF_SEL: PHY Interface Select
+      Selects the PHY interface. These values are valid only
+      for PHY_MODE=0.
 
-e.g.
-$ dmesg | grep -i mlx | grep -i firmware
-[   10.165767] mlx5_core 0000:01:00.0: firmware version: 28.46.1006
+      000b - MII
+      001b - RGMII
+      100b - RMII
 
-$ ./mstconfig -d 01:00.0 -b ./mlxconfig_host.db query SWP_L4_CHECKSUM_MODE
+[0-0] PHY_MODE: Select the PHY mode.
+      Selects the PHY mode.
 
-Device #1:
-----------
+      0b - Other PHY modes (for ex. RGMII, RMII, ...)
+      1b - SGMII mode
 
-Device type:        ConnectX7
-Name:               CX71143DMC-CDAE_FB_Ax
-Description:        ConnectX-7 Ethernet adapter card; 100 GbE OCP3.0; 
-Single-port QSFP; Multi Host; 2 Host; PCIe 4.0 x16; Crypto and Secure Boot
-Device:             01:00.0
+> 
+> It's not really relevant as the driver only appears to support
+> RGMII.
 
-Configurations:                                          Next Boot
-         SWP_L4_CHECKSUM_MODE DEVICE_DEFAULT(0)
+Yes. The RGMII was the simplest way to upstream review, so
+I decided to stick on it.
+
+The SGMII support is ongoing.
+
+/Jan
+
 
