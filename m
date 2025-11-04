@@ -1,62 +1,57 @@
-Return-Path: <netdev+bounces-235377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235371-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7B41C2F864
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 07:57:56 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89B2CC2F6FE
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 07:24:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 191073B86F9
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 06:57:55 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4EB3D4E34CD
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 06:24:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84B422E974D;
-	Tue,  4 Nov 2025 06:57:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b="IdN+22Dp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 539F92882D7;
+	Tue,  4 Nov 2025 06:24:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-65-227.siemens.flowmailer.net (mta-65-227.siemens.flowmailer.net [185.136.65.227])
+Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F3C58F7D
-	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 06:57:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.65.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 171A1134AB;
+	Tue,  4 Nov 2025 06:24:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762239472; cv=none; b=X+ojbIVrHjl6mxUf/zvRnYugoxRut410pvtwrf6dss+g5x/UQrAgH4el8WdBEJxDTA9F1xjI4IPwcdnFyjl6g+CIMP830cO15EF4DGzNhaQRLcidw1tWsrJbrndQ8z1eKE0ddLAmb8SzjZ+JdFIwxaq4P3CrnooJuyBXHerr+/E=
+	t=1762237490; cv=none; b=fhoOUaREosvXoZygKE5ryc+hVvQhgk/KUt0xJQWEaYrfvMwAFONFV7iVskqN/qz21B1os/M3xnD0WM/0O+2c89/bfoazdSIdQyT3fQSadiOBaTQN4J1M1+HqWxoF8CCQBZ7EhyXhGJA1Oaj7qWGdDIPXrtWhtdDxHLqjSueKv/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762239472; c=relaxed/simple;
-	bh=H0akFcysYtoQMTq6SLErZbIYDBnSs6SR33JYqUBHGPs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ov1ee0vefTmaqd8XdX5gd/PjQwCRrcDyJCQXsRyVSGQkAkiZerdDhml2qGxxpe+9/F78HGKp5flvwm8x2lebXZzNs3t17oknpCIsj1BglGTbzwgBfB3KsSL7nwZC9nzfQzjNUmpLWX4HOaRXxCRfhGnWV2XTjNYwsDAlMRcrPxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=alexander.sverdlin@siemens.com header.b=IdN+22Dp; arc=none smtp.client-ip=185.136.65.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
-Received: by mta-65-227.siemens.flowmailer.net with ESMTPSA id 20251104061727063a1bbb99000207bb
-        for <netdev@vger.kernel.org>;
-        Tue, 04 Nov 2025 07:17:27 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
- d=siemens.com; i=alexander.sverdlin@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc;
- bh=kw0zFvKnv/CewtK+Xr1RXZdXV8kS1VzqX7ZfwO3TUrM=;
- b=IdN+22DpJWY88axdQwz0mu8PUj/V4i4pB69VdJtAzZ5VAxWJfuYo9BW8Z9Y5ZVM1GDvwQh
- sKfYs+dRda2STHlpTPto/AajshOdCBcEcUhz0rck5rnM1lDNUW59IPkVJNZ66P9rEipjosEv
- pq30S83CgZeIUanJ1kHZ4vCDkMVh26nIFcFOntlTmz7NGiVCZQECWp9H6S7w3oMjWgbCZYRa
- X3IOB7kYysx6alVzQi0qGZSK+LvpnAo9Tmp/XxI8ZhBPvFfuyF5TO5y+UypaUldu9VMSvZ4E
- vyCkd5mdPpFPuD3gTDz0GB62fjNjqpHv0d4rwW9BZQ688H5fcFqNBSaA==;
-From: "A. Sverdlin" <alexander.sverdlin@siemens.com>
+	s=arc-20240116; t=1762237490; c=relaxed/simple;
+	bh=tYpzbT/wfMGLJ4os1wVIq0G5gJ6HXjCgb3QHvkwYIbE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZyJMnoFm1tTnWeNXUe/YDRSppETTWqn9qofcFFx843ajgrP7J3t7lg/keaHpkGNnu6ejc7r1wD0LRnjs+TL5hvX0fH+4MokLeDp8KOZZKZ8OnqILjbs+F/UIp/BGaeDFtXPrYyyR74qY3gmzOWU83US2H6fv8OhnJg8cTdb6F3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.254.200.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: esmtpsz10t1762237419tde1b639e
+X-QQ-Originating-IP: +ovJgyhgyINWp1J5Qt/R08DyncU/TOt9fJW7kiU7MmM=
+Received: from w-MS-7E16.trustnetic.com ( [125.120.71.67])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 04 Nov 2025 14:23:32 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 18246504412053202586
+EX-QQ-RecipientCnt: 10
+From: Jiawen Wu <jiawenwu@trustnetic.com>
 To: netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Cc: Alexander Sverdlin <alexander.sverdlin@siemens.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] selftests: net: local_termination: Wait for interfaces to come up
-Date: Tue,  4 Nov 2025 07:17:21 +0100
-Message-ID: <20251104061723.483301-1-alexander.sverdlin@siemens.com>
+	Simon Horman <horms@kernel.org>
+Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Jiawen Wu <jiawenwu@trustnetic.com>,
+	stable@vger.kernel.org
+Subject: [PATCH net] net: libwx: fix device bus LAN ID
+Date: Tue,  4 Nov 2025 14:23:21 +0800
+Message-ID: <B60A670C1F52CB8E+20251104062321.40059-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,84 +59,79 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Flowmailer-Platform: Siemens
-Feedback-ID: 519:519-456497:519-21489:flowmailer
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
+X-QQ-XMAILINFO: N/EN6P+BmEaf/8NNAZVY+Fufyzk+Y2KQmpSYrQVSqJHr+UrSqGXRpzNC
+	gbZ98Plz2evUsn3PDsBKGL9OeTFdPgpJ7tTWhGLO1ZzKYUszErO0LT2j1RICuZQ+joL+1aH
+	6vCZ5orilEY5Zz+M7aeTfUAqnkwG059I4HJ9u1Zxn22zP0G9j3bhs7LnO7J22CUuq/LX8pT
+	zf1bGBXrul851WpHZ+KLoXU+AcqXvZtjec5dM/M5FaNZXj6zEPJKcCErWN5TPgScktieBmO
+	LJeJWsBDEistHxkvajyBdP+RTzpeTTXL/vdDqAQ7/ZzCk6St8XFSxyJJ8+VdDjFWZgGkRqN
+	oOjQbYk2cIG8l7oDLfXsW1DkZzuDmACXFJUAfx58JYlXVPhVYq6KZ8hxvJxzSuXGwMRDl3X
+	OYo2qAW40bl/u+eN6e4RazRi8nMjdANynyS2FfWYTAQ/aYuFQznTIN/vfM8tyhRkmppoUPi
+	c+ZPjZbN7pnvt7Y8ZuywmGaE4HuesEMZcf7COBZUgepeW2iJ+DI939LswAn2piyMbV30Xwt
+	lgPJm7XzEQju9Tk7dOFvpZRmI/pNaQ9QaxZxDJ2cf/n6jRGCT5bHqG4OEy4HrkF7+3fgC+Q
+	vFHVKc3o8ajgBCOLAaLOZ19SVzspErRAXhn+4gJPYpJA1OoLh5JCwWpBEPI0UkvnpI7lXLY
+	XR4vC2J6RtNFBM2JOH4rngmENnykYK7uI12oPMs2hP1l0iXcuJUqZe/Ppm6ptX4PUVnUedl
+	7qiUg38XQN3tfyN/pEOP7X3UJcazpZAndZj+PqRdQEWneY0vMUBPJxHWl4zqCGAmzGK5TZa
+	O3qj43qDhyJmzgj/eZSW8uCDmvX36EojREaEwbAVr7sucT/gyjHfrjN1TjJ1Kxdu0VjE4SH
+	ZkqWtdaf/0vlMXws7avcI5Sh3LLVTdWezTKwrqcV+/x34gy5hwHc+QRvEhn1EP6lIheE9kj
+	kHvmJHwNi6Ta0xKWqeh3YbuRp1QHy37QLYSPocE83eDNvXsRbIwZQ94+FXQIZ8+1g+dvRIn
+	5hB0i4qbXwHvqkDEkLNNvO0JgO5Sn4Cc3fnnFGFg==
+X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
+X-QQ-RECHKSPAM: 0
 
-From: Alexander Sverdlin <alexander.sverdlin@siemens.com>
+The device bus LAN ID was obtained from PCI_FUNC(), but when a PF
+port is passthrough to a virtual machine, the function number may not
+match the actual port index on the device. This could cause the driver
+to perform operations such as LAN reset on the wrong port.
 
-It seems that most of the tests prepare the interfaces once before the test
-run (setup_prepare()), rely on setup_wait() to wait for link and only then
-run the test(s).
+Fix this by reading the LAN ID from port status register.
 
-local_termination brings the physical interfaces down and up during test
-run but never wait for them to come up. If the auto-negotiation takes
-some seconds, first test packets are being lost, which leads to
-false-negative test results.
-
-Use setup_wait_dev() after corresponding simple_if_init() on physical
-interfaces to make sure auto-negotiation has been completed and test
-packets will not be lost because of the race against link establishment.
-
-The wait has to be done in each individual test because the interfaces
-have to be brough up first and only then we can wait for link (not
-individually, because they are expected to be looped in pairs).
-
-Fixes: 90b9566aa5cd3f ("selftests: forwarding: add a test for local_termination.sh")
-Signed-off-by: Alexander Sverdlin <alexander.sverdlin@siemens.com>
+Fixes: a34b3e6ed8fb ("net: txgbe: Store PCI info")
+Cc: stable@vger.kernel.org
+Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 ---
- .../selftests/net/forwarding/local_termination.sh      | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c   | 3 ++-
+ drivers/net/ethernet/wangxun/libwx/wx_type.h | 4 ++--
+ 2 files changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/tools/testing/selftests/net/forwarding/local_termination.sh b/tools/testing/selftests/net/forwarding/local_termination.sh
-index ecd34f364125c..369c8b2c1f4a2 100755
---- a/tools/testing/selftests/net/forwarding/local_termination.sh
-+++ b/tools/testing/selftests/net/forwarding/local_termination.sh
-@@ -430,6 +430,8 @@ standalone()
- 	h1_create
- 	h2_create
- 	macvlan_create $h2
-+	setup_wait_dev $h1
-+	setup_wait_dev $h2
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+index 814164459707..58b8300e3d2c 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+@@ -2480,7 +2480,8 @@ int wx_sw_init(struct wx *wx)
+ 	wx->oem_svid = pdev->subsystem_vendor;
+ 	wx->oem_ssid = pdev->subsystem_device;
+ 	wx->bus.device = PCI_SLOT(pdev->devfn);
+-	wx->bus.func = PCI_FUNC(pdev->devfn);
++	wx->bus.func = FIELD_GET(WX_CFG_PORT_ST_LANID,
++				 rd32(wx, WX_CFG_PORT_ST));
  
- 	run_test $h1 $h2 $skip_ptp $no_unicast_flt "$h2"
+ 	if (wx->oem_svid == PCI_VENDOR_ID_WANGXUN ||
+ 	    pdev->is_virtfn) {
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+index d0cbcded1dd4..b1a6ef5709a9 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+@@ -102,6 +102,8 @@
+ #define WX_CFG_PORT_CTL_DRV_LOAD     BIT(3)
+ #define WX_CFG_PORT_CTL_QINQ         BIT(2)
+ #define WX_CFG_PORT_CTL_D_VLAN       BIT(0) /* double vlan*/
++#define WX_CFG_PORT_ST               0x14404
++#define WX_CFG_PORT_ST_LANID         GENMASK(9, 8)
+ #define WX_CFG_TAG_TPID(_i)          (0x14430 + ((_i) * 4))
+ #define WX_CFG_PORT_CTL_NUM_VT_MASK  GENMASK(13, 12) /* number of TVs */
  
-@@ -448,6 +450,8 @@ test_bridge()
- 	bridge_create $vlan_filtering
- 	simple_if_init br0 $H2_IPV4/24 $H2_IPV6/64
- 	macvlan_create br0
-+	setup_wait_dev $h1
-+	setup_wait_dev $h2
+@@ -564,8 +566,6 @@ enum WX_MSCA_CMD_value {
+ #define TXD_USE_COUNT(S)     DIV_ROUND_UP((S), WX_MAX_DATA_PER_TXD)
+ #define DESC_NEEDED          (MAX_SKB_FRAGS + 4)
  
- 	run_test $h1 br0 $skip_ptp $no_unicast_flt \
- 		"vlan_filtering=$vlan_filtering bridge"
-@@ -480,6 +484,8 @@ test_vlan()
- 	h1_vlan_create
- 	h2_vlan_create
- 	macvlan_create $h2.100
-+	setup_wait_dev $h1
-+	setup_wait_dev $h2
- 
- 	run_test $h1.100 $h2.100 $skip_ptp $no_unicast_flt "VLAN upper"
- 
-@@ -505,6 +511,8 @@ vlan_over_bridged_port()
- 	h2_vlan_create
- 	bridge_create $vlan_filtering
- 	macvlan_create $h2.100
-+	setup_wait_dev $h1
-+	setup_wait_dev $h2
- 
- 	run_test $h1.100 $h2.100 $skip_ptp $no_unicast_flt \
- 		"VLAN over vlan_filtering=$vlan_filtering bridged port"
-@@ -536,6 +544,8 @@ vlan_over_bridge()
- 	simple_if_init br0
- 	vlan_create br0 100 vbr0 $H2_IPV4/24 $H2_IPV6/64
- 	macvlan_create br0.100
-+	setup_wait_dev $h1
-+	setup_wait_dev $h2
- 
- 	if [ $vlan_filtering = 1 ]; then
- 		bridge vlan add dev $h2 vid 100 master
+-#define WX_CFG_PORT_ST               0x14404
+-
+ /******************* Receive Descriptor bit definitions **********************/
+ #define WX_RXD_STAT_DD               BIT(0) /* Done */
+ #define WX_RXD_STAT_EOP              BIT(1) /* End of Packet */
 -- 
-2.51.1
+2.48.1
 
 
