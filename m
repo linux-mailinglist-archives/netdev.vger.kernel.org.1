@@ -1,136 +1,203 @@
-Return-Path: <netdev+bounces-235454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 020A6C30D9F
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 13:01:24 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17C41C30DC0
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 13:03:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95FD54605A5
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 12:01:23 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5F1B54E839F
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 12:02:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 303182BDC34;
-	Tue,  4 Nov 2025 12:01:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8905A2DA765;
+	Tue,  4 Nov 2025 12:02:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Payiagug"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iKUpoTnA";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y0elEMjD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65A791C8631
-	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 12:01:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B28D22DE200
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 12:02:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762257682; cv=none; b=laCsv6MXIFqj9ucT/apQ8bHWV8L55e9oFcm/Flc3BGdf3dTJabm1KtA4S+2GEbFHUFZdJvEKosM5grz4qB921FsNs5Yf4qLjg/+6InlzSbm7b4XqQW47mBemHVa4gPgb73JGOHCAWwapCQabcFeXEz//u6YbGxZcK/p8DeYEOgQ=
+	t=1762257729; cv=none; b=u63aSxEKxXRD4xabmTcd9OrWqOes3wCOTbUoLZapZpKBiZNTeHKAJ0Md9Ova0ZFK6+UfQiGA0lnZAbRRISwjp0gb9aETG4TXgGR7oFIqC14pAC1fziTQJrY8s0JKxqS+acb74p16mH2MMxvyYmNgUld//rgFkh3At6+q0IR7aNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762257682; c=relaxed/simple;
-	bh=iV5WlNJsexEomSTtugsmAZnwIzTY7lOv4y7cDAEP/lg=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UZsuV6+28BxSBQlWH0iHKWj/5z3A4FrwSes3hxiz4naDvWp5VTM+tzJ+SrOCSgV908XR+KkzqRkyDFCJQJ6w36/JHMxX4fhK1vjCU67W+D+I8TsMGm+7XFzeOWX9NXWSRB/KsLykZ7+PhCcErsc24ywAw3RsxQd7jPz0K8ZzBs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Payiagug; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-471191ac79dso60646315e9.3
-        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 04:01:20 -0800 (PST)
+	s=arc-20240116; t=1762257729; c=relaxed/simple;
+	bh=siDD7cjBMuaNTHwQly3VC8x+1gNlvhrCrFOU/ZhsCNM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=g8ZB/zxXccLVu9tQXPIenShd2DzIvKemZ98DCZor8sBwQf/meVVN9wsuIuZfr5yTLf7s7i43M96JThVq9osQiIQ/JIYBxO9zpq1dY6e4u/6qgxFNiL9L6KXGFY+dziCdJ8SRuscsRAfl8p2DHp6DLecyY4FtRDsSEQkjN+XRTpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iKUpoTnA; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y0elEMjD; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762257726;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ssdJLqXoynRieLG0swAQ2kxDsi5M4pN7LUYQOx6mmIg=;
+	b=iKUpoTnAVHxp2KwDPqLSvydsEtzkLge1jncSXoFil7H4ro7iwZtSyY1btoFOpGVEdcrAop
+	fk9YmysQyyetKALG9m/w063i6c7zSYrFH7XEjoRVX+I/6oTA7eIQElXmtV82GfDBiXxyER
+	AINUB2ASqL+NLBZeTdbw+RuxxJZTiIw=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-124-Ytd9aW7MMhW-GamcG7qzIw-1; Tue, 04 Nov 2025 07:02:05 -0500
+X-MC-Unique: Ytd9aW7MMhW-GamcG7qzIw-1
+X-Mimecast-MFC-AGG-ID: Ytd9aW7MMhW-GamcG7qzIw_1762257724
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4771e696e76so55013025e9.0
+        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 04:02:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762257679; x=1762862479; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Oa9c5I2G9C7etQhDShMhCrIwhIqdSNp/I0n/6rWHFZY=;
-        b=PayiagugcmK7p5vY/UnAL6wNcAL1FOwXY6iU5+p1BvqAURP4fk6tUTCX0U21OYg8nF
-         of3MxZkbCJTuQjSPlqQa2rWmV8XVMvoS0YLRc5GqnqIVtqKJuHCOpoZ7JzYhBP1yT3bZ
-         UeDHp23b62eoUuBe9W8JXnYC+AOt2b/i1BuH5OQGd+amd+aQIUgcdr6ivhrKERJfoCAT
-         ef7ivcMYPqxHuUXBs/6XyekYyKWu9dZiTPxrpRbo3qtrZmLF3+hmaDynwLtpqpPgyS1t
-         7rb0zqWH4rsEb+kW64WcGRqnZILPaJEKx07IIsGUtPXeRY1sabmTJmaLbRFMUU5LENU4
-         5KpQ==
+        d=redhat.com; s=google; t=1762257724; x=1762862524; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ssdJLqXoynRieLG0swAQ2kxDsi5M4pN7LUYQOx6mmIg=;
+        b=Y0elEMjDenT2G3KxN4nffSB9MsLujKvstr6X8WQWEQMvpc3waWEPtan7RU7T0zt0+l
+         kSpdKoT8mR08+JF7Yr9wQXHMyZJS6ec1ZPbdE1hOPhRvMJEeBYjqw3RvJOTGZlkFBZ3U
+         gUVoiWlNbCQ/apNjTTDoWuj4nKEHToM2e3Mz1LXzLq8m4jVpXXP1/tK3jfc/Bx56lzJ3
+         EfSl9H9jDhL845QIPXZYR7YpnXuKvf8fvMpqeYloh+R7hQTnlKqdRWpvQhRME01GNpsq
+         r7P9gl5cuxbHtS8z5qVQO7T6+vUJZFMEmdkb+suci1HGatTHm8yx0SMsqtSqEaZGgDjg
+         SpfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762257679; x=1762862479;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Oa9c5I2G9C7etQhDShMhCrIwhIqdSNp/I0n/6rWHFZY=;
-        b=nn07GkIOifxiY+krCcuRy6xXxetKqVcsyXl9khI7ZDd4D24lDp2Wx29I1+2fh+1W3x
-         wNxNTpJQRgyoHiRKJEVJNe1+3crLBXoPdFkgsvJ9Jv0dJ2+6qKd6rxFDk3eacT8Ghtyc
-         oz2tF07IX4/HYDWGqCU+SiQuwk8PgUjF+h+STFgjvrnEpsq4Z3HJUCGi40uZKX5Xvhnl
-         4jtIKjtHFk5O359DMlBVCqACLucHRtKtxZGLga4qCnuWREUXxvzffS+qvTCrfoOJEFh2
-         /H9eQU1RoYu0D5erUxFdI9hxRgqtR7Mr+V2u43P/cacTediWI6eT+SKACp1xQ+13TTHY
-         nbow==
-X-Forwarded-Encrypted: i=1; AJvYcCWQjmQYulpyGfz8CzPS2CJzTxB9k5uP3N3Fx/kkHKFpaQnb3QeBKwsjuNLS6CmeFpUz1ocskSs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyyp/grrLLKDYY4hAGE6HcNZzng1bec5lpYpdMi+gE3bb+9ykPD
-	xEDq6RhxeZ3kaS8dwBo8z1iQKLXL08bzth8As4GvDPe9C4Dcp1WTWeiH
-X-Gm-Gg: ASbGncuFoqGJg9y6wASssIKUWP6Pq1h1QCUDIzkqtAjXr2Edy2WYpYOYLnVdc431JMo
-	eeQ/gg38/MplnSH2tbal7ubH8v3g8c2D3ik5Af21XHoegyJAdfeE36toAEwXg4Es1z8Bg9XVApl
-	Y1lbcza9kLbRdFl9S6BURBYMKLGxn0JbxVM7RnSxQ+jPqGhhwyaVOVrkd5G7lBXv1gr2ugxvF2x
-	nlaB6KN2MQaMRr/NvR0U5b8DN1OL4iAQ8kxUUd5hLigS/yXtLCUloqXVxXb4pbJA0yTPWxBhngG
-	LiLRs9bEWkB0wXMR1N92BUJPEKYdMUU/3lZqSkQAxiNyejWa8BNrxQzgT+OG39nLIOJx0kaHOua
-	I3NOmn7DIZaa9Yli5ntHurUHQnJdS3AYFWYItOFbIqXnERsQ7H33V8aIMR7MmaYiISe8inm7V7K
-	iPfErq0Ki2LfxxY2ltNHB4HmFH6OEebyy3+XJlw/U=
-X-Google-Smtp-Source: AGHT+IFDBHRu/DzIcF0dLILa2Wl3cNodbIcp1Kz4HNLg9oeMLbDfttP6R7Efh4S7lQLyC/9TbSUV0Q==
-X-Received: by 2002:a05:6000:2005:b0:427:454:43b4 with SMTP id ffacd0b85a97d-429bd6a94cfmr14119577f8f.48.1762257678426;
-        Tue, 04 Nov 2025 04:01:18 -0800 (PST)
-Received: from Ansuel-XPS. (93-34-90-37.ip49.fastwebnet.it. [93.34.90.37])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429dc1f5bc0sm4382920f8f.29.2025.11.04.04.01.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Nov 2025 04:01:17 -0800 (PST)
-Message-ID: <6909eb0d.df0a0220.3d8529.c3fb@mx.google.com>
-X-Google-Original-Message-ID: <aQnrC2A5FEEZeM3_@Ansuel-XPS.>
-Date: Tue, 4 Nov 2025 13:01:15 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Alok Tiwari <alok.a.tiwari@oracle.com>
-Cc: hkallweit1@gmail.com, andrew@lunn.ch, kuba@kernel.org,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	horms@kernel.org, netdev@vger.kernel.org,
-	alok.a.tiwarilinux@gmail.com
-Subject: Re: [PATCH net] net: mdio: Check regmap pointer returned by
- device_node_to_regmap()
-References: <20251031161607.58581-1-alok.a.tiwari@oracle.com>
+        d=1e100.net; s=20230601; t=1762257724; x=1762862524;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ssdJLqXoynRieLG0swAQ2kxDsi5M4pN7LUYQOx6mmIg=;
+        b=JYNV6vdOgjjBJmWCv1gVpQtSbHOdelO2JhxA07p7sPEG1VjxQf4SzL8BLIdsJjTTN7
+         KNkh8qN5J7O1/Xcrm2H3yzst5Z+lsgJ3rSPTD+WZuRmQn/qeQtGtbY+ESatWf90bsCn5
+         k++Udxb00H1su+N8q+xK+S12MOSDHCw3gCoWLJiu+ICJLbQ8Zjr1Bb8+71FmTFnjVHUK
+         RqE6LajM1XcpDJ/YA+vAtLPDEiWqCW3T26FqjbdGjChAHzE6RzXTbX8xQLxHiKq8YTLK
+         674LwUDBYonYEciGFeYKwMYv8+opVReeebJ9XBShcys5BnIVPUgRP5rMLNTnFpARpaT0
+         CYJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU4rApUhqBG0CcDZ9UOYZRKyIzr/K9vm5hWL/bNSziyzLZHZ1a40tsc6VbXCFCJa3stUAiqukE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOf2W4jqZQAFmoWvpWXYxxnNkBOXB3QtF0XeR/C8Es7lGKfJUL
+	nJdT25TGvKfiCKDccHBJP8PBs9R970C916ZregJSkhNBIjZyas8SmgsQE+DTHbXGskb2OXJlcEC
+	RdUf1Ytn4vQHSK67yuX0BkmfSxjae6x6YueYepMrAJiXIAqAgTAGsfKioHg==
+X-Gm-Gg: ASbGncuoC+KBbK+/UncDmbOX3Ki7482FcNMJpiU057YIP9IgC2t3L27guvYfrX+OTyg
+	ydEWxppw4dMGlFxD1fOQ9V48Y70rira5RsD9SxZ+oKDewJ/xJAxmuurGeLLbHs4WKGGeZxwUwzf
+	hCt3QVGnSNCV1m6WWdY6p/0ziQVOuQ3phuqgE+ePIaSnFkbb5hSdL+wzjFw/IF4m2gWD/gJhojb
+	7SSmOgaF9gsNGk6f9pc61NrkWxW5NoY8d/C8otqFyVaaNByYiObBejhLFd7em0GeSxsCyuQIfR8
+	8nNXomS70LSuEMN7Erg1G3JOzUQSHNtCZB9Qhbw463QMsNcFkEQJG2LO9oXdGyp5LruU3NzSbgf
+	zNfwJLOka8sLEVG1c+jwvTPkjBfFG3e8U/emD916aCSVG
+X-Received: by 2002:a05:600c:828c:b0:476:651d:27e6 with SMTP id 5b1f17b1804b1-477308a8967mr141058065e9.36.1762257724144;
+        Tue, 04 Nov 2025 04:02:04 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEauK+mynBX5rWHPCWx1RsWJ73mWra6y4dymOB8ucAA4aBwaSotD7FEFCtCpoVpD7tQTjZ43A==
+X-Received: by 2002:a05:600c:828c:b0:476:651d:27e6 with SMTP id 5b1f17b1804b1-477308a8967mr141057435e9.36.1762257723669;
+        Tue, 04 Nov 2025 04:02:03 -0800 (PST)
+Received: from ?IPV6:2a0d:3341:b8a2:8d10:2aab:5fa:9fa0:d7e6? ([2a0d:3341:b8a2:8d10:2aab:5fa:9fa0:d7e6])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477564d83e2sm31565865e9.3.2025.11.04.04.02.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Nov 2025 04:02:03 -0800 (PST)
+Message-ID: <43ea4062-75a8-4152-bf19-2eca561036bd@redhat.com>
+Date: Tue, 4 Nov 2025 13:02:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251031161607.58581-1-alok.a.tiwari@oracle.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 09/15] quic: add congestion control
+To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>,
+ quic@lists.linux.dev
+Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, Stefan Metzmacher <metze@samba.org>,
+ Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
+ Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>,
+ linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>,
+ Namjae Jeon <linkinjeon@kernel.org>, Paulo Alcantara <pc@manguebit.com>,
+ Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev,
+ Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
+ Benjamin Coddington <bcodding@redhat.com>, Steve Dickson
+ <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
+ Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>,
+ Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>,
+ Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe"
+ <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
+ illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+ Daniel Stenberg <daniel@haxx.se>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>
+References: <cover.1761748557.git.lucien.xin@gmail.com>
+ <32c7730d3b0f6e5323d289d5bdfd01fc22d551b5.1761748557.git.lucien.xin@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <32c7730d3b0f6e5323d289d5bdfd01fc22d551b5.1761748557.git.lucien.xin@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 31, 2025 at 09:15:53AM -0700, Alok Tiwari wrote:
-> The call to device_node_to_regmap() in airoha_mdio_probe() can return
-> an ERR_PTR() if regmap initialization fails. Currently, the driver
-> stores the pointer without validation, which could lead to a crash
-> if it is later dereferenced.
-> 
-> Add an IS_ERR() check and return the corresponding error code to make
-> the probe path more robust.
-> 
-> Fixes: 67e3ba978361 ("net: mdio: Add MDIO bus controller for Airoha AN7583")
-> Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+On 10/29/25 3:35 PM, Xin Long wrote:
+> +/* Compute and update the pacing rate based on congestion window and smoothed RTT. */
+> +static void quic_cong_pace_update(struct quic_cong *cong, u32 bytes, u32 max_rate)
+> +{
+> +	u64 rate;
+> +
+> +	/* rate = N * congestion_window / smoothed_rtt */
+> +	rate = (u64)cong->window * USEC_PER_SEC * 2;
+> +	if (likely(cong->smoothed_rtt))
+> +		rate = div64_ul(rate, cong->smoothed_rtt);
+> +
+> +	WRITE_ONCE(cong->pacing_rate, min_t(u64, rate, max_rate));
+> +	pr_debug("%s: update pacing rate: %u, max rate: %u, srtt: %u\n",
+> +		 __func__, cong->pacing_rate, max_rate, cong->smoothed_rtt);
 
-Thanks for taking care. It goes against the schema but yep it's a corner
-case that should be handled.
+I think you should skip entirely the pacing_rate update when
+`smoothed_rtt == 0`
 
-> ---
->  drivers/net/mdio/mdio-airoha.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/net/mdio/mdio-airoha.c b/drivers/net/mdio/mdio-airoha.c
-> index 1dc9939c8d7d..52e7475121ea 100644
-> --- a/drivers/net/mdio/mdio-airoha.c
-> +++ b/drivers/net/mdio/mdio-airoha.c
-> @@ -219,6 +219,8 @@ static int airoha_mdio_probe(struct platform_device *pdev)
->  	priv = bus->priv;
->  	priv->base_addr = addr;
->  	priv->regmap = device_node_to_regmap(dev->parent->of_node);
-> +	if (IS_ERR(priv->regmap))
-> +		return PTR_ERR(priv->regmap);
->  
->  	priv->clk = devm_clk_get_enabled(dev, NULL);
->  	if (IS_ERR(priv->clk))
-> -- 
-> 2.50.1
-> 
+[...]> +/* rfc9002#section-5: Estimating the Round-Trip Time */
+> +void quic_cong_rtt_update(struct quic_cong *cong, u32 time, u32 ack_delay)
+> +{
+> +	u32 adjusted_rtt, rttvar_sample;
+> +
+> +	/* Ignore RTT sample if ACK delay is suspiciously large. */
+> +	if (ack_delay > cong->max_ack_delay * 2)
+> +		return;
+> +
+> +	/* rfc9002#section-5.1: latest_rtt = ack_time - send_time_of_largest_acked */
+> +	cong->latest_rtt = cong->time - time;
+> +
+> +	/* rfc9002#section-5.2: Estimating min_rtt */
+> +	if (!cong->min_rtt_valid) {
+> +		cong->min_rtt = cong->latest_rtt;
+> +		cong->min_rtt_valid = 1;
+> +	}
+> +	if (cong->min_rtt > cong->latest_rtt)
+> +		cong->min_rtt = cong->latest_rtt;
+> +
+> +	if (!cong->is_rtt_set) {
+> +		/* rfc9002#section-5.3:
+> +		 *   smoothed_rtt = latest_rtt
+> +		 *   rttvar = latest_rtt / 2
+> +		 */
+> +		cong->smoothed_rtt = cong->latest_rtt;
+> +		cong->rttvar = cong->smoothed_rtt / 2;
+> +		quic_cong_pto_update(cong);
+> +		cong->is_rtt_set = 1;
+> +		return;
+> +	}
+> +
+> +	/* rfc9002#section-5.3:
+> +	 *   adjusted_rtt = latest_rtt
+> +	 *   if (latest_rtt >= min_rtt + ack_delay):
+> +	 *     adjusted_rtt = latest_rtt - ack_delay
+> +	 *   smoothed_rtt = 7/8 * smoothed_rtt + 1/8 * adjusted_rtt
+> +	 *   rttvar_sample = abs(smoothed_rtt - adjusted_rtt)
+> +	 *   rttvar = 3/4 * rttvar + 1/4 * rttvar_sample
+> +	 */
+> +	adjusted_rtt = cong->latest_rtt;
+> +	if (cong->latest_rtt >= cong->min_rtt + ack_delay)
+> +		adjusted_rtt = cong->latest_rtt - ack_delay;
+> +
+> +	cong->smoothed_rtt = (cong->smoothed_rtt * 7 + adjusted_rtt) / 8;
 
--- 
-	Ansuel
+Out of sheer curiosity, is the compiler smart enough to use a 'srl 3'
+for the above?
+
+/P
+
 
