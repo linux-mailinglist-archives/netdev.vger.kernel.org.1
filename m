@@ -1,96 +1,100 @@
-Return-Path: <netdev+bounces-235508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55043C31AAF
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 15:59:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 165F0C31B40
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 16:04:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA44B189CAA3
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 14:58:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 440C83BB6C3
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 14:58:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E460032F75C;
-	Tue,  4 Nov 2025 14:56:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3FBA331A6C;
+	Tue,  4 Nov 2025 14:57:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=beims.me header.i=@beims.me header.b="nFRzSInh";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="INg0Fv5F"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fC0uk44p";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="aSCKeDRG"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 107B032E752;
-	Tue,  4 Nov 2025 14:56:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 239C93314DE
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 14:57:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762268219; cv=none; b=VBLB5M7qWxASLxJovvQdcyywKsWnp6cicsGL+Muw1JbmA2tyK3y5uJ6ztg/gCV37JIcL+/lBa3XqL3FZfS24E60zoOuPLyoThma+SnPu4Eao9HbmF9y4w4pDmKjYrSnD40ZXSR1r0DPiFC5alT2+2pBOEsl3ttj8DATxVl5pIJA=
+	t=1762268252; cv=none; b=OtAlPyNQ2hhgpfJMI1QNPzdU9p3M7z7YoClvVDO5JTWaozBZ0MI7UjFpT58xiRlru/K4QVSBa93I5K7KbP5iOYX1Fqga7K6TkS1ZuHAT/vQ3PaAKkkGQhBE+C3QTkGBVUBoBcAlxuC2TmpXCDfJIingxdkEdc6wwEoIPXc4YQ8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762268219; c=relaxed/simple;
-	bh=eHxg8ZsRjH/BRZAiuRt7eW0oNlsFTsrzYRWmF67yJtg=;
+	s=arc-20240116; t=1762268252; c=relaxed/simple;
+	bh=liC8Wm0AyDhrxgcEx+GniQix9bJZ8C2ogFs2WxuC8Y4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WAHqqe+eKZginhRRhWg7hbtNOwQdOV2BqVGrELuvzSpAd+yd6AqUvgeveaFddAgupPpKdTmcW7LwzXzeqR5bWwUqI9P+xxnb4GbkmwzGVOGdrtBRxNTqCVWQQEOswyVvtEKzZAmwPlj6xFTBsdqY8VV4gFjufyboteeDWlgL160=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=beims.me; spf=pass smtp.mailfrom=beims.me; dkim=pass (2048-bit key) header.d=beims.me header.i=@beims.me header.b=nFRzSInh; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=INg0Fv5F; arc=none smtp.client-ip=202.12.124.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=beims.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=beims.me
-Received: from phl-compute-07.internal (phl-compute-07.internal [10.202.2.47])
-	by mailfout.stl.internal (Postfix) with ESMTP id 717C91D003C4;
-	Tue,  4 Nov 2025 09:56:55 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-07.internal (MEProxy); Tue, 04 Nov 2025 09:56:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=beims.me; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1762268215;
-	 x=1762354615; bh=ScOHtHoNH0OZnUklGMPQKXt2S33rJYO0/8ZwF3X5VgQ=; b=
-	nFRzSInhPyp5FiUMkm4+73BQ2sx4JN7LuLUgRRwjkvS95Weh39rUIx4vJq9HaGB0
-	U8wYHU+a5fMwZNQODV2786yBjdmH212vRxjDrsb2AWtbx7uT9jMkPpsf634NZJyz
-	j3YaOWDS9fvR8WnDRWC8pm3xUbeFpslFPdhQbRcXyjkLqcR7Ua5ExsP0vtEyiG0d
-	hIEA89qEb0EtSmqEOwnlMdKByRaaUsUoaUICPmWV1v5Xn4LqwKjS9sBsCCR2YPog
-	o+BYb46beomSSQf9LlmIrPPnAzpdIm7k88XYHjWpo7P99qKmJruJaQDeERMCh+XK
-	xws7uFhxcY89HIB6UcgLjQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762268215; x=
-	1762354615; bh=ScOHtHoNH0OZnUklGMPQKXt2S33rJYO0/8ZwF3X5VgQ=; b=I
-	Ng0Fv5FLlxoLQEQbstoUPDBMUMn/02OaVxQkOTocO0uqaHHhg/sQ7KmdYi6RneyJ
-	DgbWPaztGLPPw+2NKXscUsPrsMfzwirl98yYbiMTxv/3tDl5+dwXeQjjnXzuYQqO
-	f5b7cLxsCUEBPPADU2OqH7qyncsnCUCmDc9+kdEz/1E75EByZjuY6ClMVvhouy3r
-	w5HlKyHVbcmgQtvy8mp0X/4QlYJQNmaMArpIoT9GuRKqH0Bk0IfGEB6Xfww91m2J
-	RNXvJRI8FRtp2o0maJOaDGNkA2ysNAGcKfjCXG97uQP1Ux3hylJo6Bd8iNtfIy0m
-	uXr6WLJjEfKTh1PuMmXeg==
-X-ME-Sender: <xms:NhQKaei8KvjT3Y_rEv1iEHiL4ImkOxHBPMR7vtyszwssp044HhGeuA>
-    <xme:NhQKabZeq6Yn25HMvg7avs0djhi2UUx0Er65oRPdjvDJrjE9KIklQSofpazs6B6LV
-    ENxyh0Y1bmno2kiW_o7-9rEY30ExUMJ6vV1VzUhsRJ5Yp-ICtv6LTaR>
-X-ME-Received: <xmr:NhQKaahoklQacy1o6qMdXLFaHkUn8fpBWL_dZaskzZYwoQ6eisImoB8FLDorA7t34PpE>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukedufedvucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepkfffgggfuffvvehfhfgjtgfgsehtkeertddtvdejnecuhfhrohhmpeftrghfrggv
-    lhcuuegvihhmshcuoehrrghfrggvlhessggvihhmshdrmhgvqeenucggtffrrghtthgvrh
-    hnpedutdfgjeeitddtkedthffhvdevteefgedutdefhfelueeiledviefhffefudelffen
-    ucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehrrghfrg
-    gvlhessggvihhmshdrmhgvpdhnsggprhgtphhtthhopedugedpmhhouggvpehsmhhtphho
-    uhhtpdhrtghpthhtohepghgvvghrtheslhhinhhugidqmheikehkrdhorhhgpdhrtghpth
-    htohepsggvnhdrughoohhkshestghouggvthhhihhnkhdrtghordhukhdprhgtphhtthho
-    pegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmh
-    esuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhg
-    lhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtth
-    hopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepkhhriihkodguthes
-    khgvrhhnvghlrdhorhhgpdhrtghpthhtoheptghonhhorhdoughtsehkvghrnhgvlhdroh
-    hrgh
-X-ME-Proxy: <xmx:NhQKaVaUcj4gbWGCBPLWqlGn9olVt0LpeAZZskJVgElax_sHv6pEXg>
-    <xmx:NhQKaYMMHYgJgOChfgtXupkJHipD3JLfkhU5UoRoLn9Jw6Mbi0876Q>
-    <xmx:NhQKaeYpx0suDXFA19CHwOWhptHG-tRrCH2QjWlGH0pKfXXQdETRuw>
-    <xmx:NhQKaQWApNvYfW2j9ZGT26WLoX-WxVMFrAdbM5UFGKcrLeNyXeYctA>
-    <xmx:NxQKaewaOcKDcPqsh6gftyar4iAplbMuE9EgYfyz_uuJoZJRXZ24VBn1>
-Feedback-ID: idc214666:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 4 Nov 2025 09:56:51 -0500 (EST)
-Message-ID: <b7d039b1-7554-47bb-93f4-98d2b08a5882@beims.me>
-Date: Tue, 4 Nov 2025 11:56:49 -0300
+	 In-Reply-To:Content-Type; b=FgUpXH6f2cCz0C4fUYbmIZyhnZDUxGKlM8U8qZ5+g85UVRjvjSbHPYo6eMM9eU0lN/WS/CIoLp0a5FZuqUwr6YUZA/+3s2fvRqsN6L07MeWu311c8NAtTfWEYj+X7Bv7QsvIthzpNziBhKBqrGHqLP7EfDbTtZrO19uqQVNHjFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fC0uk44p; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=aSCKeDRG; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762268249;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8+Qd7R5Cyqm4zUAEr3+3Wzhvl1Gxm8Bjv3wwIMGw7WE=;
+	b=fC0uk44poyZcGIWRL4J3x45hd4Y2SJRzBBWRi2ZD7+XEPUjczhCupAX4KaK68sSoA/agdK
+	lpy27f3KKBAgh60WRDc3I3OHu64fKjCk3aytc/p9J9hDRijvob18GSKpSAE65d/cqDXfpJ
+	iGBmKazN8+cqXnzSDVF76oChYZVFbPY=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-526-t20hNGi2OoirmX4aW58mkQ-1; Tue, 04 Nov 2025 09:57:28 -0500
+X-MC-Unique: t20hNGi2OoirmX4aW58mkQ-1
+X-Mimecast-MFC-AGG-ID: t20hNGi2OoirmX4aW58mkQ_1762268247
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-477113a50fcso46011585e9.1
+        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 06:57:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1762268247; x=1762873047; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8+Qd7R5Cyqm4zUAEr3+3Wzhvl1Gxm8Bjv3wwIMGw7WE=;
+        b=aSCKeDRGuDlLNO6aL8yVyRWr7sJEvRna5BplmeCmoMyS/hanAwTKP57KlSH8ChcMLj
+         eSgiCcGjYD7AYq469y9Jfh8zGBKCpUz+j5KhHO5Ogp3D5/CIfL4w/7YFzck2ySGYVsIE
+         38fD3urGWaVG9H4h57ezUWjIPhTVJuAuceKxrVdBoxTj400ArmVERIG/aceRxbpLd2RZ
+         8ICbL3tTkIug3gDN+U/4nONtIiYPDVQ3uz9yJKiFZgSgRvrgVYELPoINoWuZaDXsCmM4
+         3EAd5AgRMNxfCBzaaBPD3DApUmvjBFDPM9hDTEvAoe1Bpl0p40vFI6MHVGZeX1Xj5nBf
+         Deng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762268247; x=1762873047;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8+Qd7R5Cyqm4zUAEr3+3Wzhvl1Gxm8Bjv3wwIMGw7WE=;
+        b=bKTT9uV6LqyNobqh0mnGwbZmCzH7Nr2WJ+wjlLAtgMVsjzky5szoUBFC5IT+60Bnzt
+         FZR10V0oO4K7V60zEJ8/vSHhOw0jmIr2fScXX+mAFwTSudDhTXFa+0OzxBB3a71VmHJG
+         Aq05FrCGmM6Xk6LVdWgWcD26WGq/2f6uKDkElm0QpKkXTYH9jIsX23KUFLggGePHhhYQ
+         piKyeusvsJBJcQVem4854NZgLqW2VHT8TiK8Oe9kY1dl9AraKeITh0cYIod8SsVM9d8L
+         SFCzRS91Kys+A5R1ziS2i4D71Z5vUkqpqrzmWOZePhxeYAJis65+TcjubJT/TwuwDiIs
+         yVMw==
+X-Forwarded-Encrypted: i=1; AJvYcCWvGvKT6h285BH5pujt+WNpxPKg636iotdpDcu5yXMNE7xG4y7MIMquQeC7xGyrswdXSFAokE0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwTQS2ejb+dnB3x9G84+4ExRyFT0FdyswjRaqMMaiPu/H0/kLgE
+	iTR3kxr+I8FwAXrAEHzcU8GP/Caj/fnZM5HJY4qKv5RNHQ1MD3QknlhzUdw4zEvaJ99VYNI8Mpe
+	eWrxzInlYiSCm2ZgZ7zG3UnqWJtYEPER/pCQX6csTAQckLjwaA7miHD7UNQ==
+X-Gm-Gg: ASbGncvCwcVMx0vccj4Ip8qFRwMk/YnpxWhtEVC/tXxGbT5l2bdwYFA/8szCqqHX82o
+	unbnfDUa2Cnzm3Cw7a7H2yVjJBsZoV1oMRjTpTEUZZQWGRuxCheeriwupRTUNP0dbIWqInqrCTO
+	kexiN5cEzi8rnBUL/aaItZrPSDmUv+xAUOYh2d/qkPfsx5aAWNY1Q+96f19Jqz3V1tKjHl0C5CG
+	ZtFJ2G1XxJXc1WRDW7J56e9yU0XJmv8aNTIxFu7Oy45EFryn1ezKC/qvOTJjZktavDBvVR8Ny/j
+	oEgXDeNc5HilmwZ+5fJimaYLGzU32EN5Qyv6K48np+MVkUC7upfYEfHDO+ZoqFBZK5KEyieUPTp
+	AuUOqTK4ZJT09TnDK0VnQFcI4uYKZBp1maIkXt0saCZr6
+X-Received: by 2002:a05:6000:4614:b0:429:c851:69ba with SMTP id ffacd0b85a97d-429c851a81cmr11182537f8f.29.1762268247388;
+        Tue, 04 Nov 2025 06:57:27 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHuQnp6R0myrfafNWEFW+Ykg5K+hkEdLj39XlL4xzqHcxa8sv0FlMMQNmg0LWUaKKhEKQuY6g==
+X-Received: by 2002:a05:6000:4614:b0:429:c851:69ba with SMTP id ffacd0b85a97d-429c851a81cmr11182506f8f.29.1762268246982;
+        Tue, 04 Nov 2025 06:57:26 -0800 (PST)
+Received: from ?IPV6:2a0d:3341:b8a2:8d10:2aab:5fa:9fa0:d7e6? ([2a0d:3341:b8a2:8d10:2aab:5fa:9fa0:d7e6])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429dc1f5be4sm4914239f8f.31.2025.11.04.06.57.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Nov 2025 06:57:26 -0800 (PST)
+Message-ID: <0bee7457-eddc-493f-bdb9-a438347958f9@redhat.com>
+Date: Tue, 4 Nov 2025 15:57:25 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,158 +102,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] [RFC] dt-bindings: net: micrel: Convert to json-schema
-Content-Language: pt-BR
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Ben Dooks <ben.dooks@codethink.co.uk>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- Rafael Beims <rafael.beims@toradex.com>, Rob Herring <robh@kernel.org>
-References: <943cb31d01d0da3a63911326e24fbf9b328f7206.1731580776.git.geert+renesas@glider.be>
- <20241115150210.GA2680735-robh@kernel.org>
- <CAMuHMdV01hv-riCFEBD024pX6jL37C6hp7Cjjy1rtaUnrhvK3w@mail.gmail.com>
-From: Rafael Beims <rafael@beims.me>
-In-Reply-To: <CAMuHMdV01hv-riCFEBD024pX6jL37C6hp7Cjjy1rtaUnrhvK3w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v1 2/2] net/rds: Give each connection its own
+ workqueue
+To: Allison Henderson <achender@kernel.org>, netdev@vger.kernel.org
+Cc: allison.henderson@oracle.com
+References: <20251029174609.33778-1-achender@kernel.org>
+ <20251029174609.33778-3-achender@kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251029174609.33778-3-achender@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello Gert,
+On 10/29/25 6:46 PM, Allison Henderson wrote:
+> From: Allison Henderson <allison.henderson@oracle.com>
+> 
+> RDS was written to require ordered workqueues for "cp->cp_wq":
+> Work is executed in the order scheduled, one item at a time.
+> 
+> If these workqueues are shared across connections,
+> then work executed on behalf of one connection blocks work
+> scheduled for a different and unrelated connection.
+> 
+> Luckily we don't need to share these workqueues.
+> While it obviously makes sense to limit the number of
+> workers (processes) that ought to be allocated on a system,
+> a workqueue that doesn't have a rescue worker attached,
+> has a tiny footprint compared to the connection as a whole:
+> A workqueue costs ~800 bytes, while an RDS/IB connection
+> totals ~5 MBytes.
 
-On 11/18/24 07:39, Geert Uytterhoeven wrote:
-> Hi Rob,
->
-> On Fri, Nov 15, 2024 at 4:02 PM Rob Herring <robh@kernel.org> wrote:
->> On Thu, Nov 14, 2024 at 11:42:50AM +0100, Geert Uytterhoeven wrote:
->>> Convert the Micrel PHY Device Tree binding documentation to json-schema.
->>>
->>> Add a simple example.
->>>
->>> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
->>> ---
->>> Notes:
->>>    1. I specified Ben Dooks as the maintainer, as he wrote the original
->>>       bindings. Ben, are you OK with that?
->>>    2. This schema is never applied, as there is no compatible value or
->>>       select statement. Adding
->>>
->>>        select:
->>>          properties:
->>>            $nodename:
->>>              pattern: "^ethernet-phy(@[a-f0-9]+)?$"
->>>
->>>          required:
->>>            - $nodename
->>>
->>>       and changing
->>>
->>>        -unevaluatedProperties: false
->>>        +additionalProperties: true
->>>
->>>       would fix that, and is mostly harmless, except for possible
->>>       conflicts with other Ethernet PHYs having more than one clock, or
->>>       using different clock-names.
->>>       Documentation/devicetree/bindings/net/qca,ar803x.yaml has the same
->>>       issue.
->>>       Is there a proper way to handle this?  Are there other options than
->>>       mandating specific compatible values for Ethernet PHYs?
->> The proper way is simply, if you need to describe your phy in DT, it
->> needs a compatible string. MDIO phys are not special.
-> So that's gonna be a bunch of "ethernet-phy-id0022.*" values,
-> especially as the least significant nibble is the revision number...
->
->> We really need to split ethernet-phy.yaml into common properties and a
->> specific schema for the compatibles it contains so that we can change
->> 'additionalProperties: true'. That's one reason why all these properties
->> and typos didn't get flagged.
->>
->> If you don't want to retro-actively add a compatible, you can also do
->> something like this:
->>
->> select:
->>    anyOf:
->>      - required: ['micrel,led-mode']
->>      - required: ['micrel,rmii-reference-clock-select-25-mhz']
->>      - required: ['micrel,fiber-mode']
->>      - required: ['coma-mode-gpios']
->>
->> That doesn't catch every case nor if you have a typo in the property
->> names.
-> Indeed.
->
->>> --- /dev/null
->>> +++ b/Documentation/devicetree/bindings/net/micrel,phy.yaml
->>> +  micrel,rmii-reference-clock-select-25-mhz:
->>> +    description: |
->>> +      RMII Reference Clock Select bit selects 25 MHz mode
->>> +
->>> +      Setting the RMII Reference Clock Select bit enables 25 MHz rather
->>> +      than 50 MHz clock mode.
->>> +
->>> +      Note that this option in only needed for certain PHY revisions with a
->>> +      non-standard, inverted function of this configuration bit.
->>> +      Specifically, a clock reference ("rmii-ref" below) is always needed to
->>> +      actually select a mode.
->>> +
->>> +  clocks:
->>> +    maxItems: 1
->>> +
->>> +  clock-names:
->>> +    const: rmii-ref
->>> +    description: |
->>> +      supported clocks:
->>> +        - KSZ8021, KSZ8031, KSZ8081, KSZ8091: "rmii-ref": The RMII reference
->>> +          input clock. Used to determine the XI input clock.
->> Don't repeat the clock name in the description.
-> Actually I kept it on purpose, as the driver treats the "rmii-ref" clock
-> differently than any other (unnamed) clock.  Obviously I failed to
-> relay that information, so I should enhance the description ;-)
->
->>> +  coma-mode-gpios:
->>> +    description: |
->>> +      If present the given gpio will be deasserted when the PHY is probed.
->>> +
->>> +      Some PHYs have a COMA mode input pin which puts the PHY into
->>> +      isolate and power-down mode. On some boards this input is connected
->>> +      to a GPIO of the SoC.
->>> +
->>> +      Supported on the LAN8814.
->> Another reason to add compatible. You have per device properties.
-> So I have to increase my datasheet library first, to discover all
-> the PHY IDs.
->
-> Gr{oetje,eeting}s,
->
->                          Geert
+Still a workqueue per connection feels overkill. Have you considered
+moving to WQ_PERCPU for rds_wq? Why does not fit?
 
-I would like to add a new property to the micrel dt-bindings. I 
-understand that
-the conversion to json-schema has to be finished before new properties 
-are added.
+Thanks,
 
-You had this patch posted a while back, and reading the feedback, I'm 
-not sure how to proceed.
-It seems that forcing the use of compatible strings could be a bit 
-risky. At least the "micrel,led-mode"
-is used in many device-trees. If I understand the requirement correctly, 
-it means we would have to find out
-the exact PHY model that every one of these boards uses to not create a 
-breaking change.
-Other flags like "micrel,rmii-reference-clock-select-25-mhz" or 
-"coma-mode-gpios" are more contained
-and should be easier, but there would still be some risk to do this 
-change without testing on actual hardware.
-I couldn't find any use of the "micrel,fiber-mode"  flag in current 
-device trees.
-
-Did you find other issues that prevented you from moving forward with 
-this? Is my thinking correct regarding
-this, or am I missing something?
-
-I appreciate any insight you could give me on this,
-
-Rafael
+Paolo
 
 
