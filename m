@@ -1,129 +1,281 @@
-Return-Path: <netdev+bounces-235498-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235499-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 005F6C319A5
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 15:48:17 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6DBFC3199F
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 15:47:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37166188F110
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 14:43:39 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 020CE4EB5D1
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 14:45:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BA5632E159;
-	Tue,  4 Nov 2025 14:43:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B861D32ED5B;
+	Tue,  4 Nov 2025 14:45:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="DoS7/k/j";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="mc+0O2JL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ATkuPUkv";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="aR4TwQrO"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FF23325487
-	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 14:43:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E095132E74D
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 14:44:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762267390; cv=none; b=ZHAJZs7CY7dbMAqvgIGjVR4V3I++UskpWkAax/7Aq7k/Yak8K+Kev1ZeRhz8tO1v2SOQ9fw6Wn5ahfHxX11AZFI09Zd4kvOgIJShxgx7EleRFI9fyAErHICLJoKNPcVUAzd5zZT7Gbh3jkVpKJe5R31rctMANHmGKSTb5hEP2Fk=
+	t=1762267500; cv=none; b=QgNDM/3rrzbbVcfkQthDxpeWeyHdglVQWkLq2l1R04jvCoKT1iYzxok9kOzUfzKIPBFOpbHzuEpclq7J4TVbvFafDY1uCfYqN2uNQjYV9vOm+gb/DJ6VgTap5b3dL9mMaCIJnN77ga3Nw84zE/sl/yM5EugmCp+RMxUipX2qIU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762267390; c=relaxed/simple;
-	bh=jhguX79C9RY3QvJzWJC9tvIaqpB9tcuB3Ydkrhow7Og=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tyZTayXIuw/kPYAjFr+MJvXMOQWMEQW+N5DfCoqwShlXYLafpPoP/DL1ZeLnPtiJ7dyw4MePlheaJQFj0T0FKnzINJs6nEOPPe8s4NnTLEI9EsPyWmtsibmc/iDXzVXlA8o5DQ7J9JWP5LPcc7VaS0HS6mizTIoDsQmVxkB+nxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=DoS7/k/j; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=mc+0O2JL; arc=none smtp.client-ip=103.168.172.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
-	by mailfout.phl.internal (Postfix) with ESMTP id 92CE7EC021B;
-	Tue,  4 Nov 2025 09:43:05 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-11.internal (MEProxy); Tue, 04 Nov 2025 09:43:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-transfer-encoding:content-type:content-type
-	:date:date:from:from:in-reply-to:in-reply-to:message-id
-	:mime-version:references:reply-to:subject:subject:to:to; s=fm1;
-	 t=1762267385; x=1762353785; bh=TpbeBaBfW6pAOxCvGLRslUuy+5l3AuXh
-	hbUwHmHAmP8=; b=DoS7/k/jTFGCSH0vSqHWFX38Ck3Z+bz5wrToXHuqlqvzbgDP
-	bXCCAZ6VDcsmVoYiK/rb4nxEpkAWdShagV8o7E1SnMuUgbUnwjH2CVqc15bolM0N
-	YpKHXYHmUTixPQmIBZQ7yjHp7twCEX6P8+crrSrOsMhqs5w25/7noVcmvxjOJV25
-	NMAEm4S+8Zi9p9+JSX0zvMa3C2sPTke8cVL2XE6KHjms/bTGjFXkRd0qwwy3jaTE
-	w3SeoDaEugsJ0ZrpxSITBFD2b8ceXOUDttVmFUenO4M+VuQC64txl6ZYfyLDuHI/
-	el+togRF3shgNb+kPiVWDos+KFXzchml7fsBqw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762267385; x=
-	1762353785; bh=TpbeBaBfW6pAOxCvGLRslUuy+5l3AuXhhbUwHmHAmP8=; b=m
-	c+0O2JL9k4De3+J3oI8kSfbXoPUl6WHsZUV1KWwSe1DzgSPdbma7GUtjsiWduS0q
-	fp7PrsLdsoOy4xREQbT0SvspKbmj834pVHnJSyFQL9C8r0ZVl4tLkHpSu3W2zMT1
-	8I6D72L/s+OwuizFsRxvdt9eurIm3AE7tdZZSDI0Wyk8c66FAY1nnZuoFbqAlxJS
-	HBXJgCnuEgLMkdjExsdRh1iJd8i+Ch5Ozdr3F8CNMm3ItLg/3j3I00vSUc1OnalT
-	u1j1rLksDuUvQ/TKxzEMq9FqtcLisM870ASlGEXtQcIaJika4GZurypKWqfbh7Ml
-	LV7ySo3CseOt2DOoTK5fQ==
-X-ME-Sender: <xms:-RAKaUcBkRWvcYyBVn44MlP-HXSnrt0xut8JbUZOxN0DqYrsdAtDmg>
-    <xme:-RAKadpMKecN56upq9uiCEq_eIlCc_WGrDArlk1_Wxt3ouiJ1vGugktYCpESStoWX
-    6iq8piNm7ZoPFMichQmSO9WwTb07tXq7xFeEjZqN0L3HqmtOrl0uXg>
-X-ME-Received: <xmr:-RAKaS6dF6H7a9zihjdvWt9lJ0Ibo8caWl9jRKw8rO0T8csk99hvTIa95GN4>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeduvdelucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefurggsrhhi
-    nhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrdhnvghtqeenucggtf
-    frrghtthgvrhhnpefgvdegieetffefvdfguddtleegiefhgeeuheetveevgeevjeduleef
-    ffeiheelvdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhroh
-    hmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghpthhtohepfedpmhho
-    uggvpehsmhhtphhouhhtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtg
-    homhdprhgtphhtthhopehnhhhuughsohhnsegrkhgrmhgrihdrtghomhdprhgtphhtthho
-    pehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:-RAKaTrEd4GzO6fbaZxn2DlxcsLhg_zhMMEwaL7vUa3f5s-VuagPGg>
-    <xmx:-RAKaUgkJFY8lfz1eu6pVbDXyQdtW1Z449ZOWvGoDTXj_Oeh8EU8cA>
-    <xmx:-RAKadKj7RJHykGEKipKiYjMOV9lWeBUPJfSBGiErluf8uVjASoZ8A>
-    <xmx:-RAKaUB2yB_hKjrdqVX9Tin9-GB2eZgdS-Yz5DtjD2Y93g9HLAwS3g>
-    <xmx:-RAKaaIhJed2cwoeRD7isWn232wd_hcBki3RBgPfFAzFSmq19_cZp-uN>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 4 Nov 2025 09:43:04 -0500 (EST)
-Date: Tue, 4 Nov 2025 15:43:02 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "Hudson, Nick" <nhudson@akamai.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: skb_attempt_defer_free and reference counting
-Message-ID: <aQoQ9pEKia_8Uuzi@krikkit>
-References: <E3B93E31-3C03-4DAF-A9ED-69523A82E583@akamai.com>
- <CANn89iJQ_Hx_T7N6LPr2Qt-_O2KZ3GPgWFtywJBvjjTQvGwy2Q@mail.gmail.com>
+	s=arc-20240116; t=1762267500; c=relaxed/simple;
+	bh=/gUZ7NXNKW376ebhwPQM7kkgplLwpgHBzzf3jEaYi9o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dhqFD3nwL8Fb6/uKMkGobp9hF6+UfSe2PUW2dhMzu+zUYHWtmA053nRE+drJ7vv5cRxiX8FBuPPzhx/qTAqOaMkpYrTodoP0N3IYm0v5J7+lH+MqyRPDUJiArm73XrlKRADxj3jZCjNjA+W1OBgXyIS4jzVWgSNrLVV4vHi0elA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ATkuPUkv; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=aR4TwQrO; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762267497;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SFRG9IF03+gMGO6BdiROzZyf1knfO0IKnAs2JmyrLOs=;
+	b=ATkuPUkv65i9AzAmcDuK7a07SicNprWETStTxLxThxVoUIUftQ6o1QZ7jXiXfiagCATEFC
+	emPI28HCgxTjmIHAHOaXobOtrV+BQ0G5mz+8fQBnMxDHmYfNwDKzMgNuGF977g9PVMiSew
+	PsI9tGG3rUBFAmYDqW9GdkGII/kvRqk=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-126-O5c8OxlxODeXaI-4N-iM7A-1; Tue, 04 Nov 2025 09:44:56 -0500
+X-MC-Unique: O5c8OxlxODeXaI-4N-iM7A-1
+X-Mimecast-MFC-AGG-ID: O5c8OxlxODeXaI-4N-iM7A_1762267496
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-47754e6bddbso8103295e9.3
+        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 06:44:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1762267495; x=1762872295; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SFRG9IF03+gMGO6BdiROzZyf1knfO0IKnAs2JmyrLOs=;
+        b=aR4TwQrOIf17tHMPx5NT1wekAhiACtiFgfiVbMN2+9wqU3Dy2Gp5tDcohmlA+5gBDc
+         CZOpL8yoiQqoP6h4qguLrVuCuK1FCi79gciXW8FThVGFXkimXVoKLbquUlHhmtFj1R26
+         YcoCrCGvcGE3JdOCqYgpkyhd/ZuNMEkCVFToIDka2pZX7yw6WMJzdninEBikd5K33sGA
+         t8iq6lAiJ1dFcs0gZ8bm/OCZ1WEhxAmNL70hDZri0TwWkbNdp6uyo8KI+6gcz6im6f8w
+         SyADX0GFGlTmK40iJbPFCcoug+jzz3Fqh51CUzXeo+WJwtNJbRLhV/xEJJVjyE8Vzpk5
+         kNFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762267495; x=1762872295;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SFRG9IF03+gMGO6BdiROzZyf1knfO0IKnAs2JmyrLOs=;
+        b=i19ctlVWvEXP9DKC2siHrfkKp27sqY4FHydruhkcyheW2dCcTVfgolR8VgYoT3djcF
+         Do7e3I/PmIvZb8a+xEUZm8u7bw3zDgKBsLLMFqj/v8rAUI0Co6ip6fZKmSSl/o11enob
+         /ixTmX9miGzK23f384GFFV5s2mrRKw4q7uOdoaxgkl14wFBbEo3dNNiejbaDA5t8PDRO
+         Aslypni8wf5qh/y8H47J6JeZm09g7XOKNUJGM0J3eD9j4JuyepheUa/xseN/6W7J4d7/
+         mtkhCZw0ae1Zb2NN2SoC1EejJ8kThnUE2YS2hBbx+1xG8WeLym/KJWrvQlQ4tKzidOox
+         G6xg==
+X-Forwarded-Encrypted: i=1; AJvYcCWy0596DEdlYY+VYE4TC10X6lKpDSh63dQJl2iDtrCvv5tDqZXw+uNbLyNmT13bQTlIpr626x0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGo5iSfKnoIjfcJD/d2WrEMK90e3qjKai1rTULW3l6uD82QvmC
+	yaFOXiHoMYUdmn3u5yRGWvDsoMTCeGnxOuYGmHXZnhe3Pzx0cXRMviPJuMFQO9O0ZZ2Lpj2a/y3
+	A/Fx5Z2yP18Phz3dwgGxFl+KUvKvxnK0hsYs0lxojHpMBlkNhPjSHm4craQ==
+X-Gm-Gg: ASbGnculT/fMK5QGbKabbsZBBACLnjib3Nu1ggDsmaaGRcUSuea3GfFE1BAT3v4j015
+	zhTB2JOPnjhzDM+PdrN75zzOU/qonuZxIqCLkj/pRL6qei4AQBJv1AGm3KKozbG/13++yF6Ihqk
+	LuWlrv39qEUq+6IjwXAQcMra3Iohu4YC6QYf5tIcLQaKIh2QQqorfsz1R35s9I3KpTEH8QqckyK
+	uYf3/WwMQRpzb/1kzytDWGWnw1iKNLMy4iBA+uc3FNsDwOOPxPqcU08tArNzZck7dpNApIw91La
+	bCefE7OPKR/LiYOUK60tDHhwthF3oKS1juFG4Gb5v7cf8CbQTW3qZGScy3Kzfg/7i+QBFra3VJM
+	JBUs6eoFxkfwbJBcjT2cY+jR2lvRRugzhUYDTziASqQwk
+X-Received: by 2002:a05:600d:8346:b0:477:54cd:202f with SMTP id 5b1f17b1804b1-47754cd2267mr21657355e9.3.1762267495411;
+        Tue, 04 Nov 2025 06:44:55 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG6+Gw3mfCjedQ9pUcBjjf5DA+gJGiTRJ2ckAQDBQkXav+IsQw9f3hw8sBpEo9Sd27YF2Q4zQ==
+X-Received: by 2002:a05:600d:8346:b0:477:54cd:202f with SMTP id 5b1f17b1804b1-47754cd2267mr21656845e9.3.1762267494897;
+        Tue, 04 Nov 2025 06:44:54 -0800 (PST)
+Received: from ?IPV6:2a0d:3341:b8a2:8d10:2aab:5fa:9fa0:d7e6? ([2a0d:3341:b8a2:8d10:2aab:5fa:9fa0:d7e6])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4773c23b8d9sm256870135e9.0.2025.11.04.06.44.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Nov 2025 06:44:54 -0800 (PST)
+Message-ID: <6dfd2fe8-65b6-40db-b0f2-34aa0e4f3e9b@redhat.com>
+Date: Tue, 4 Nov 2025 15:44:52 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iJQ_Hx_T7N6LPr2Qt-_O2KZ3GPgWFtywJBvjjTQvGwy2Q@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 15/15] quic: add packet builder and parser
+ base
+To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>,
+ quic@lists.linux.dev
+Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, Stefan Metzmacher <metze@samba.org>,
+ Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
+ Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>,
+ linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>,
+ Namjae Jeon <linkinjeon@kernel.org>, Paulo Alcantara <pc@manguebit.com>,
+ Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev,
+ Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
+ Benjamin Coddington <bcodding@redhat.com>, Steve Dickson
+ <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
+ Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>,
+ Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>,
+ Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe"
+ <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
+ illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+ Daniel Stenberg <daniel@haxx.se>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>
+References: <cover.1761748557.git.lucien.xin@gmail.com>
+ <c9b7d644059fcd181a710ef2aff089e002133046.1761748557.git.lucien.xin@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <c9b7d644059fcd181a710ef2aff089e002133046.1761748557.git.lucien.xin@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-2025-10-31, 04:43:19 -0700, Eric Dumazet wrote:
-> On Fri, Oct 31, 2025 at 4:04 AM Hudson, Nick <nhudson@akamai.com> wrote:
-> >
-> > Hi,
-> >
-> > I’ve been looking at using skb_attempt_defer_free and had a question about the skb reference counting.
-> >
-> > The existing reference release for any skb handed to skb_attempt_defer_free is done in skb_defer_free_flush (via napi_consume_skb). However, it seems to me that calling skb_attempt_defer_free on the same skb to drop the multiple references is problematic as, if the defer_list isn’t serviced between the calls, the list gets corrupted. That is, the skb can’t appear on the list twice.
-> >
-> > Would it be possible to move the reference count drop into skb_attempt_defer_free and only add the skb to the list on last reference drop?
-> 
-> We do not plan using this helper for arbitrary skbs, but ones fully
-> owned by TCP and UDP receive paths.
-> 
-> skb_share_check() must have been called before reaching them.
+On 10/29/25 3:35 PM, Xin Long wrote:
+> +/* Process PMTU reduction event on a QUIC socket. */
+> +void quic_packet_rcv_err_pmtu(struct sock *sk)
+> +{
+> +	struct quic_path_group *paths = quic_paths(sk);
+> +	struct quic_packet *packet = quic_packet(sk);
+> +	struct quic_config *c = quic_config(sk);
+> +	u32 pathmtu, info, taglen;
+> +	struct dst_entry *dst;
+> +	bool reset_timer;
+> +
+> +	if (!ip_sk_accept_pmtu(sk))
+> +		return;
+> +
+> +	info = clamp(paths->mtu_info, QUIC_PATH_MIN_PMTU, QUIC_PATH_MAX_PMTU);
+> +	/* If PLPMTUD is not enabled, update MSS using the route and ICMP info. */
+> +	if (!c->plpmtud_probe_interval) {
+> +		if (quic_packet_route(sk) < 0)
+> +			return;
+> +
+> +		dst = __sk_dst_get(sk);
+> +		dst->ops->update_pmtu(dst, sk, NULL, info, true);
+> +		quic_packet_mss_update(sk, info - packet->hlen);
+> +		return;
+> +	}
+> +	/* PLPMTUD is enabled: adjust to smaller PMTU, subtract headers and AEAD tag.  Also
+> +	 * notify the QUIC path layer for possible state changes and probing.
+> +	 */
+> +	taglen = quic_packet_taglen(packet);
+> +	info = info - packet->hlen - taglen;
+> +	pathmtu = quic_path_pl_toobig(paths, info, &reset_timer);
+> +	if (reset_timer)
+> +		quic_timer_reset(sk, QUIC_TIMER_PMTU, c->plpmtud_probe_interval);
+> +	if (pathmtu)
+> +		quic_packet_mss_update(sk, pathmtu + taglen);
+> +}
+> +
+> +/* Handle ICMP Toobig packet and update QUIC socket path MTU. */
+> +static int quic_packet_rcv_err(struct sk_buff *skb)
+> +{
+> +	union quic_addr daddr, saddr;
+> +	struct sock *sk = NULL;
+> +	int ret = 0;
+> +	u32 info;
+> +
+> +	/* All we can do is lookup the matching QUIC socket by addresses. */
+> +	quic_get_msg_addrs(skb, &saddr, &daddr);
+> +	sk = quic_sock_lookup(skb, &daddr, &saddr, NULL);
+> +	if (!sk)
+> +		return -ENOENT;
+> +
+> +	bh_lock_sock(sk);
+> +	if (quic_is_listen(sk))
 
-Do you think it's worth adding another DEBUG_NET_WARN_ON_ONCE check to
-skb_attempt_defer_free(), to validate (and in a way, document) that
-assumption?
+The above looks race-prone. You should check the status only when
+holding the sk socket lock, i.e. if !sock_owned_by_user(sk)
 
--- 
-Sabrina
+> +		goto out;
+> +
+> +	if (quic_get_mtu_info(skb, &info))
+> +		goto out;
+
+This can be moved outside the lock.
+
+> +
+> +	ret = 1; /* Success: update socket path MTU info. */
+> +	quic_paths(sk)->mtu_info = info;
+> +	if (sock_owned_by_user(sk)) {
+> +		/* Socket is in use by userspace context.  Defer MTU processing to later via
+> +		 * tasklet.  Ensure the socket is not dropped before deferral.
+> +		 */
+> +		if (!test_and_set_bit(QUIC_MTU_REDUCED_DEFERRED, &sk->sk_tsq_flags))
+> +			sock_hold(sk);
+> +		goto out;
+> +	}
+> +	/* Otherwise, process the MTU reduction now. */
+> +	quic_packet_rcv_err_pmtu(sk);
+> +out:
+> +	bh_unlock_sock(sk);
+> +	sock_put(sk);
+> +	return ret;
+> +}
+> +
+> +#define QUIC_PACKET_BACKLOG_MAX		4096
+> +
+> +/* Queue a packet for later processing when sleeping is allowed. */
+> +static int quic_packet_backlog_schedule(struct net *net, struct sk_buff *skb)
+> +{
+> +	struct quic_skb_cb *cb = QUIC_SKB_CB(skb);
+> +	struct quic_net *qn = quic_net(net);
+> +
+> +	if (cb->backlog)
+> +		return 0;
+
+The above test is present also in the only caller of this function. It
+should be removed from there.
+
+[...]> +/* Work function to process packets in the backlog queue. */
+> +void quic_packet_backlog_work(struct work_struct *work)
+> +{
+> +	struct quic_net *qn = container_of(work, struct quic_net, work);
+> +	struct sk_buff *skb;
+> +	struct sock *sk;
+> +
+> +	skb = skb_dequeue(&qn->backlog_list);
+> +	while (skb) {
+> +		sk = quic_packet_get_listen_sock(skb);
+> +		if (!sk)
+> +			continue;
+> +
+> +		lock_sock(sk);
+
+Possibly lock_sock_fast(sk);
+
+> +		quic_packet_process(sk, skb);
+> +		release_sock(sk);
+> +		sock_put(sk);
+> +
+> +		skb = skb_dequeue(&qn->backlog_list);
+> +	}
+> +}
+
+[...]> +/* Create and transmit a new QUIC packet. */
+> +int quic_packet_create(struct sock *sk)
+Possibly rename the function accordingly to its actual action, i.e.
+quic_packet_create_xmit()
+
+[...]> @@ -291,6 +294,8 @@ static void __net_exit quic_net_exit(struct
+net *net)
+>  #ifdef CONFIG_PROC_FS
+>  	quic_net_proc_exit(net);
+>  #endif
+> +	skb_queue_purge(&qn->backlog_list);
+> +	cancel_work_sync(&qn->work);
+
+Likely: disable_work_sync()
+
+>  	quic_crypto_free(&qn->crypto);
+>  	free_percpu(qn->stat);
+>  	qn->stat = NULL;
+
+EPATCHISTOOBIG, very hard to process. Please split this one it at least
+2 (i.e. rx and tx part), even if the series will grow above 15
+
+/P
+
 
