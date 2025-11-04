@@ -1,125 +1,189 @@
-Return-Path: <netdev+bounces-235505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 966D2C31A31
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 15:53:44 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 536B2C319EA
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 15:50:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C4CE3BBE7F
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 14:51:08 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 706174EC762
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 14:48:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79B00328606;
-	Tue,  4 Nov 2025 14:51:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C38C02F6191;
+	Tue,  4 Nov 2025 14:48:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lpK9nyZm"
 X-Original-To: netdev@vger.kernel.org
-Received: from eidolon.nox.tf (eidolon.nox.tf [185.142.180.128])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA26824EF8C
-	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 14:51:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.128
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E0524679F
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 14:48:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762267864; cv=none; b=DqgYWP2kRRTwOvg4eK0+l2XyiAHi0SPz5VsszdgQVj0yJ33pkeS8AGlBBrIJOlTxu4/sZjbb+vAAMkxIDUFs7VgOyCBw+RY0m1ZlzodUl716i7g64Q1lyomaXYPM9mJPAGLj/wzA9E/nXBsAhBzU6yiTjHeg3v65+7KPwfQrNQg=
+	t=1762267706; cv=none; b=rjDc2NlGnKwA8kpmKa2cmrmGo/ZIUNpc7HsRDqMpTXtu+w0qSs5XqTM/qmoVe7H5QPGBxuOYDAEhHMdyrU65EFt1ZUU6tKpni3xLCULXLbI1nV6APSpq/cW2Z3iUWSFLCmpU8guyeevPSx3dGotxqVZzPLZAQ0F+wK4tU4Ku/0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762267864; c=relaxed/simple;
-	bh=M0ShxTYF9pyk3xt5e+Ui1p4Cj7hOyPAuU1/9ghwVx6Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hHYh1+rFG7VziUNJtZhWAJJCVlMb6or1fWYGisAjzq9kII0HJZfYA1AyjSkK7lUkgXr46EuigZmd8A/JBPrj0Up4MqXMGglDKrXHIK1RRXFJ0uuG8GcunWskrHLY/rRPHhNsofnfbBNxfqxKnlu9GapKoA+vH8f94g+BcVepJJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=diac24.net; spf=pass smtp.mailfrom=diac24.net; arc=none smtp.client-ip=185.142.180.128
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=diac24.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=diac24.net
-Received: from [2001:67c:1232:144:9c7d:e76f:d255:c66c] (helo=alea)
-	by eidolon.nox.tf with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.97.1)
-	(envelope-from <equinox@diac24.net>)
-	id 1vGILB-000000009AH-2qAI;
-	Tue, 04 Nov 2025 15:48:58 +0100
-Received: from equinox by alea with local (Exim 4.98.2)
-	(envelope-from <equinox@diac24.net>)
-	id 1vGIKn-0000000057a-1SkV;
-	Tue, 04 Nov 2025 09:48:33 -0500
-From: David Lamparter <equinox@diac24.net>
-To: netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: David Lamparter <equinox@diac24.net>,
-	Lorenzo Colitti <lorenzo@google.com>,
-	Patrick Rohr <prohr@google.com>
-Subject: [RESEND PATCH net-next v2 3/4] net/ipv6: use ipv6_fl_get_saddr in output
-Date: Tue,  4 Nov 2025 09:48:21 -0500
-Message-ID: <20251104144824.19648-4-equinox@diac24.net>
-X-Mailer: git-send-email 2.50.1
-In-Reply-To: <20251104144824.19648-1-equinox@diac24.net>
-References: <20251104144824.19648-1-equinox@diac24.net>
+	s=arc-20240116; t=1762267706; c=relaxed/simple;
+	bh=JMLaYY6hZzPARYlgwS336pFX+gMN7vDHCCMc++BjmpQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=c8bqr9XKfIQywwDtSkLmfxmJpvXHPB0fvGv960DeCnKQM9jUfS1bteMrxcwnNKYPwhl7Yl1qJxy49nJ+HxlU+8Ga/Wy3XFEMtWbQcUz2TwpfwzhaGzy03CA4SHNE9rh/sWrUa3wuMOsjOdho+cU1p9Cp+Y9yEbxQ6+lu32kYi+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lpK9nyZm; arc=none smtp.client-ip=209.85.222.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-891208f6185so520792585a.1
+        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 06:48:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762267704; x=1762872504; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TYbk9wPxk/JA4+MxrrdLZ/GfKAsrpCoWC70+eUl4rp4=;
+        b=lpK9nyZmhhKVs4MaUwGdwSTH3jpjY2avo4MDRIQ5wFbIO5Lp6laDw2X1rj5LQe5QjX
+         5+0H0RAvSiwas1GTdRFBdguxoK1vTrKbzQ568DJ4NHWmgPF8uNoG2GCBOzQDD6N86uHE
+         k5f52xGDpxZ0N6i2WVXnCR8BP5E5dB/V/IrTkcOsjeEfGAIBvYA243u+4OrTCqa8nP8/
+         toWL2tFpt4wLEgr5wwVVT5kuIPp16zavB0wD7+OLpk2t7UVal3Q00kJgm33k/HeCzmkW
+         gJ6yReeDlpcXjJ3A7UIQ3IFOcgpEYckbC0fCC/e77NJcxwwrtR5ONlGW5oc69M+D4iqQ
+         9lCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762267704; x=1762872504;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TYbk9wPxk/JA4+MxrrdLZ/GfKAsrpCoWC70+eUl4rp4=;
+        b=mgsSM2oJcdYijMe/dLa5WRpYe8Vi2ELBOE8hWNAzjEB/gACTJUjOIZ7n5DYVlLPAz2
+         Rt3XxfcWn7QhjqC9jk+9i3XXi//6m6uM305NGMGSifRzu9XWLag0oumojuQ0nE3uISkX
+         O0B3nQmkf2ph47WZOK70Aokkgri+H1+YhFGNS3CYwOi3S4wk8DR5aquMc0xLIFxQXHv7
+         dxvIHPkEt8O1EfHivtEwxFqlpoTN9vCCllupjeHjFDH3ecdzyTPGRLF+FtLzidYQeNXX
+         KQNOE34aCxShpBA0xTskUU+lCx0B3X7kaAczpEVlENCKFV4sUhmVNyVkXH0Y7qFFjtjV
+         5Bsw==
+X-Forwarded-Encrypted: i=1; AJvYcCU19P0SAMKZGO9cccXPwvDpGq1jSJF2WmqGg9UDNI/+/P4Yewk+jSPot2pUvDzY1hjBMGGOjgY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNB4g9X6WkKvPVxi+2lU6b+4NR+uAQ1AsHPeAd0Y8PR67WUTju
+	M81r3patTHBg+4KNPuUH4PrAGmx5267duFZpBffwp+Dzk5EhhJB0Mz0W
+X-Gm-Gg: ASbGncsOGErQ/tp5IBL/IwmyiV+CkLE5bJMtSz7NRQCzUD25p2nov8XQeWK4++/asc7
+	v+8jN7iOg2tBn/5Yd2ILwdJVr1PKFRsh4J3IrsH7OIcoT/MyMxOLdRUD/LZ6oXy3sWOok8czjCi
+	xzh5l/JpjarI3U/htYMvTOWlvDJMUdWfOtV+/hNWWjahLUUBma4YAoEnu5cezw/n26OmTt/QWV9
+	s1ry0c6RtIFHmBlXMigPHQoZ6jHC5D16+t+PzAbe1QqrP9cQ4depipqWYINZDV6sVFuh0wrMm6p
+	9XXKnv5iH0tQK2BY9N/uZc9d6SkSGBfNXAe5err5kmEi7XWVA6BBO+uH7dvkTIKWbUVLvMBmmGN
+	OetX6+MyMdrV5leIpFrWnoTBx44cX3PRB2GQwD5UWn51cvhm3ssuGgcCU+OHRj7ytDFR7qGywBk
+	cMCqZXsMbGMrVv8Sui4On6pQWon4IjeJ6necGNl0JDUjhE24llE+oB60+iLnEU+vKZ0w==
+X-Google-Smtp-Source: AGHT+IGmraHbZP2E2iRwXxMxNgGXM9zhZedCgpJV66vhLBH8PzAO8Dn4btILshzP2e0cEKgwNzEvBA==
+X-Received: by 2002:a05:620a:1a27:b0:886:173f:1b4c with SMTP id af79cd13be357-8ab9ba6fd3emr1982205785a.80.1762267703489;
+        Tue, 04 Nov 2025 06:48:23 -0800 (PST)
+Received: from ?IPV6:2600:4040:93b8:5f00:52dd:c164:4581:b7eb? ([2600:4040:93b8:5f00:52dd:c164:4581:b7eb])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b0f543d90csm198693785a.17.2025.11.04.06.48.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Nov 2025 06:48:23 -0800 (PST)
+Message-ID: <78db1fab-e482-4ebc-82ce-ba84b3f561e2@gmail.com>
+Date: Tue, 4 Nov 2025 09:48:21 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 2/2] net/mlx5: implement swp_l4_csum_mode via
+ devlink params
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Srujana Challa <schalla@marvell.com>,
+ Bharat Bhushan <bbhushan2@marvell.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>,
+ Brett Creeley <brett.creeley@amd.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Michael Chan <michael.chan@broadcom.com>,
+ Pavan Chebbi <pavan.chebbi@broadcom.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Sunil Goutham <sgoutham@marvell.com>, Linu Cherian <lcherian@marvell.com>,
+ Geetha sowjanya <gakula@marvell.com>, Jerin Jacob <jerinj@marvell.com>,
+ hariprasad <hkelam@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>,
+ Tariq Toukan <tariqt@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
+ Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
+ Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+ Manish Chopra <manishc@marvell.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Siddharth Vadapalli <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>,
+ Loic Poulain <loic.poulain@oss.qualcomm.com>,
+ Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ Vladimir Oltean <olteanv@gmail.com>,
+ Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+ Dave Ertman <david.m.ertman@intel.com>,
+ Vlad Dumitrescu <vdumitrescu@nvidia.com>,
+ "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Alexander Sverdlin <alexander.sverdlin@gmail.com>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+ linux-rdma@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-omap@vger.kernel.org
+References: <20251103194554.3203178-1-daniel.zahka@gmail.com>
+ <20251103194554.3203178-3-daniel.zahka@gmail.com>
+ <mhm4hkz52gmqok56iuiukdcz2kaowvppbqrfi3zxuq67p3otit@5fhpgu2axab2>
+ <db5c46b4-cc66-48bb-aafb-40d83dd3620c@gmail.com>
+ <6aa2f011-3ba5-4614-950d-d8f0ec62222b@gmail.com>
+ <p3pj3mu4mabgninwowqikegeotxgzhc4yptf7qrfhns37bnkoz@ugkbgvlkxqxb>
+Content-Language: en-US
+From: Daniel Zahka <daniel.zahka@gmail.com>
+In-Reply-To: <p3pj3mu4mabgninwowqikegeotxgzhc4yptf7qrfhns37bnkoz@ugkbgvlkxqxb>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-Flatten ip6_route_get_saddr() into ip6_dst_lookup_tail (which really
-just means handling fib6_prefsrc), and then replace ipv6_dev_get_saddr
-with ipv6_fl_get_saddr to pass down the flow information.
 
-Signed-off-by: David Lamparter <equinox@diac24.net>
----
- net/ipv6/ip6_output.c | 25 +++++++++++++++++++------
- 1 file changed, 19 insertions(+), 6 deletions(-)
 
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index f904739e99b9..28406ed5ddfb 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -1126,27 +1126,40 @@ static int ip6_dst_lookup_tail(struct net *net, const struct sock *sk,
- 	int flags = 0;
- 
- 	/* The correct way to handle this would be to do
--	 * ip6_route_get_saddr, and then ip6_route_output; however,
-+	 * ipv6_fl_get_saddr, and then ip6_route_output; however,
- 	 * the route-specific preferred source forces the
--	 * ip6_route_output call _before_ ip6_route_get_saddr.
-+	 * ip6_route_output call _before_ ipv6_fl_get_saddr.
- 	 *
- 	 * In source specific routing (no src=any default route),
- 	 * ip6_route_output will fail given src=any saddr, though, so
- 	 * that's why we try it again later.
- 	 */
- 	if (ipv6_addr_any(&fl6->saddr)) {
-+		struct net_device *l3mdev;
-+		struct net_device *dev;
- 		struct fib6_info *from;
- 		struct rt6_info *rt;
-+		bool same_vrf;
- 
- 		*dst = ip6_route_output(net, sk, fl6);
- 		rt = (*dst)->error ? NULL : dst_rt6_info(*dst);
- 
- 		rcu_read_lock();
- 		from = rt ? rcu_dereference(rt->from) : NULL;
--		err = ip6_route_get_saddr(net, from, &fl6->daddr,
--					  sk ? READ_ONCE(inet6_sk(sk)->srcprefs) : 0,
--					  fl6->flowi6_l3mdev,
--					  &fl6->saddr);
-+
-+		l3mdev = dev_get_by_index_rcu(net, fl6->flowi6_l3mdev);
-+		if (!from || !from->fib6_prefsrc.plen || l3mdev)
-+			dev = from ? fib6_info_nh_dev(from) : NULL;
-+		same_vrf = !l3mdev || l3mdev_master_dev_rcu(dev) == l3mdev;
-+		if (from && from->fib6_prefsrc.plen && same_vrf) {
-+			fl6->saddr = from->fib6_prefsrc.addr;
-+			err = 0;
-+		} else
-+			err = ipv6_fl_get_saddr(net, *dst,
-+						same_vrf ? dev : l3mdev, sk,
-+						sk ? READ_ONCE(inet6_sk(sk)->srcprefs) : 0,
-+						fl6);
-+
- 		rcu_read_unlock();
- 
- 		if (err)
--- 
-2.50.1
+On 11/4/25 9:39 AM, Jiri Pirko wrote:
+> Tue, Nov 04, 2025 at 01:51:16PM +0100, daniel.zahka@gmail.com wrote:
+>>
+>> On 11/4/25 6:38 AM, Daniel Zahka wrote:
+>>>
+>>> On 11/4/25 5:14 AM, Jiri Pirko wrote:
+>>>> I did some research. 0/DEVICE_DEFAULT should not be ever reported back
+>>>> from FW. It's purpose is for user to reset to default FW configuration.
+>>>> What's the usecase for that? I think you could just avoid
+>>>> 0/DEVICE_DEFAULT entirely, for both get and set.
+>>> I find that 0/DEVICE_DEFAULT is reported back on my device. I have
+>>> observed this same behavior when using the mstconfig tool for setting the
+>>> parameter too.
+>> e.g.
+>> $ dmesg | grep -i mlx | grep -i firmware
+>> [   10.165767] mlx5_core 0000:01:00.0: firmware version: 28.46.1006
+>>
+>> $ ./mstconfig -d 01:00.0 -b ./mlxconfig_host.db query SWP_L4_CHECKSUM_MODE
+>>
+>> Device #1:
+>> ----------
+>>
+>> Device type:        ConnectX7
+>> Name:               CX71143DMC-CDAE_FB_Ax
+>> Description:        ConnectX-7 Ethernet adapter card; 100 GbE OCP3.0;
+>> Single-port QSFP; Multi Host; 2 Host; PCIe 4.0 x16; Crypto and Secure Boot
+>> Device:             01:00.0
+>>
+>> Configurations:                                          Next Boot
+>>          SWP_L4_CHECKSUM_MODE DEVICE_DEFAULT(0)
+> This is next-boot value. You should query current (--enable_verbosity)
+> to show in param get.
+
+I am still seeing that DEVICE_DEFAULT(0) is read back:
+
+$ ./mstconfig --enable_verbosity -d 01:00.0 -b ./mlxconfig_host.db query 
+SWP_L4_CHECKSUM_MODE
+
+Device #1:
+----------
+
+Device type:        ConnectX7
+Name:               CX71143DMC-CDAE_FB_Ax
+Description:        ConnectX-7 Ethernet adapter card; 100 GbE OCP3.0; 
+Single-port QSFP; Multi Host; 2 Host; PCIe 4.0 x16; Crypto and Secure Boot
+Device:             01:00.0
+
+Configurations:                  Default             Current       Next Boot
+         SWP_L4_CHECKSUM_MODE DEVICE_DEFAULT(0) DEVICE_DEFAULT(0)    
+DEVICE_DEFAULT(0)
 
 
