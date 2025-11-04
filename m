@@ -1,281 +1,348 @@
-Return-Path: <netdev+bounces-235499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6DBFC3199F
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 15:47:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D477C31A01
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 15:51:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 020CE4EB5D1
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 14:45:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53BDB426FCF
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 14:48:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B861D32ED5B;
-	Tue,  4 Nov 2025 14:45:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ATkuPUkv";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="aR4TwQrO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AF9232D0FC;
+	Tue,  4 Nov 2025 14:48:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E095132E74D
-	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 14:44:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E05A9330B29
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 14:48:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762267500; cv=none; b=QgNDM/3rrzbbVcfkQthDxpeWeyHdglVQWkLq2l1R04jvCoKT1iYzxok9kOzUfzKIPBFOpbHzuEpclq7J4TVbvFafDY1uCfYqN2uNQjYV9vOm+gb/DJ6VgTap5b3dL9mMaCIJnN77ga3Nw84zE/sl/yM5EugmCp+RMxUipX2qIU8=
+	t=1762267715; cv=none; b=LZJyOmndQYwyBO0FjaEg5pjwIcEwyl5FXEKuh06PcB0vrlbaHS0AVRbOif/fnRZ1BMK+AWdZvlwRiHHNKJNtR/eX+sad6IOGG4uA1cKtrxEZ12+I53/w0fWE1t7Kxmg9yPz39DKHfAe0uE6YAhySfxJJaZjlOHEdK7h5CIHkciw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762267500; c=relaxed/simple;
-	bh=/gUZ7NXNKW376ebhwPQM7kkgplLwpgHBzzf3jEaYi9o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dhqFD3nwL8Fb6/uKMkGobp9hF6+UfSe2PUW2dhMzu+zUYHWtmA053nRE+drJ7vv5cRxiX8FBuPPzhx/qTAqOaMkpYrTodoP0N3IYm0v5J7+lH+MqyRPDUJiArm73XrlKRADxj3jZCjNjA+W1OBgXyIS4jzVWgSNrLVV4vHi0elA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ATkuPUkv; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=aR4TwQrO; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762267497;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SFRG9IF03+gMGO6BdiROzZyf1knfO0IKnAs2JmyrLOs=;
-	b=ATkuPUkv65i9AzAmcDuK7a07SicNprWETStTxLxThxVoUIUftQ6o1QZ7jXiXfiagCATEFC
-	emPI28HCgxTjmIHAHOaXobOtrV+BQ0G5mz+8fQBnMxDHmYfNwDKzMgNuGF977g9PVMiSew
-	PsI9tGG3rUBFAmYDqW9GdkGII/kvRqk=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-126-O5c8OxlxODeXaI-4N-iM7A-1; Tue, 04 Nov 2025 09:44:56 -0500
-X-MC-Unique: O5c8OxlxODeXaI-4N-iM7A-1
-X-Mimecast-MFC-AGG-ID: O5c8OxlxODeXaI-4N-iM7A_1762267496
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-47754e6bddbso8103295e9.3
-        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 06:44:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762267495; x=1762872295; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SFRG9IF03+gMGO6BdiROzZyf1knfO0IKnAs2JmyrLOs=;
-        b=aR4TwQrOIf17tHMPx5NT1wekAhiACtiFgfiVbMN2+9wqU3Dy2Gp5tDcohmlA+5gBDc
-         CZOpL8yoiQqoP6h4qguLrVuCuK1FCi79gciXW8FThVGFXkimXVoKLbquUlHhmtFj1R26
-         YcoCrCGvcGE3JdOCqYgpkyhd/ZuNMEkCVFToIDka2pZX7yw6WMJzdninEBikd5K33sGA
-         t8iq6lAiJ1dFcs0gZ8bm/OCZ1WEhxAmNL70hDZri0TwWkbNdp6uyo8KI+6gcz6im6f8w
-         SyADX0GFGlTmK40iJbPFCcoug+jzz3Fqh51CUzXeo+WJwtNJbRLhV/xEJJVjyE8Vzpk5
-         kNFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762267495; x=1762872295;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SFRG9IF03+gMGO6BdiROzZyf1knfO0IKnAs2JmyrLOs=;
-        b=i19ctlVWvEXP9DKC2siHrfkKp27sqY4FHydruhkcyheW2dCcTVfgolR8VgYoT3djcF
-         Do7e3I/PmIvZb8a+xEUZm8u7bw3zDgKBsLLMFqj/v8rAUI0Co6ip6fZKmSSl/o11enob
-         /ixTmX9miGzK23f384GFFV5s2mrRKw4q7uOdoaxgkl14wFBbEo3dNNiejbaDA5t8PDRO
-         Aslypni8wf5qh/y8H47J6JeZm09g7XOKNUJGM0J3eD9j4JuyepheUa/xseN/6W7J4d7/
-         mtkhCZw0ae1Zb2NN2SoC1EejJ8kThnUE2YS2hBbx+1xG8WeLym/KJWrvQlQ4tKzidOox
-         G6xg==
-X-Forwarded-Encrypted: i=1; AJvYcCWy0596DEdlYY+VYE4TC10X6lKpDSh63dQJl2iDtrCvv5tDqZXw+uNbLyNmT13bQTlIpr626x0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGo5iSfKnoIjfcJD/d2WrEMK90e3qjKai1rTULW3l6uD82QvmC
-	yaFOXiHoMYUdmn3u5yRGWvDsoMTCeGnxOuYGmHXZnhe3Pzx0cXRMviPJuMFQO9O0ZZ2Lpj2a/y3
-	A/Fx5Z2yP18Phz3dwgGxFl+KUvKvxnK0hsYs0lxojHpMBlkNhPjSHm4craQ==
-X-Gm-Gg: ASbGnculT/fMK5QGbKabbsZBBACLnjib3Nu1ggDsmaaGRcUSuea3GfFE1BAT3v4j015
-	zhTB2JOPnjhzDM+PdrN75zzOU/qonuZxIqCLkj/pRL6qei4AQBJv1AGm3KKozbG/13++yF6Ihqk
-	LuWlrv39qEUq+6IjwXAQcMra3Iohu4YC6QYf5tIcLQaKIh2QQqorfsz1R35s9I3KpTEH8QqckyK
-	uYf3/WwMQRpzb/1kzytDWGWnw1iKNLMy4iBA+uc3FNsDwOOPxPqcU08tArNzZck7dpNApIw91La
-	bCefE7OPKR/LiYOUK60tDHhwthF3oKS1juFG4Gb5v7cf8CbQTW3qZGScy3Kzfg/7i+QBFra3VJM
-	JBUs6eoFxkfwbJBcjT2cY+jR2lvRRugzhUYDTziASqQwk
-X-Received: by 2002:a05:600d:8346:b0:477:54cd:202f with SMTP id 5b1f17b1804b1-47754cd2267mr21657355e9.3.1762267495411;
-        Tue, 04 Nov 2025 06:44:55 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG6+Gw3mfCjedQ9pUcBjjf5DA+gJGiTRJ2ckAQDBQkXav+IsQw9f3hw8sBpEo9Sd27YF2Q4zQ==
-X-Received: by 2002:a05:600d:8346:b0:477:54cd:202f with SMTP id 5b1f17b1804b1-47754cd2267mr21656845e9.3.1762267494897;
-        Tue, 04 Nov 2025 06:44:54 -0800 (PST)
-Received: from ?IPV6:2a0d:3341:b8a2:8d10:2aab:5fa:9fa0:d7e6? ([2a0d:3341:b8a2:8d10:2aab:5fa:9fa0:d7e6])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4773c23b8d9sm256870135e9.0.2025.11.04.06.44.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Nov 2025 06:44:54 -0800 (PST)
-Message-ID: <6dfd2fe8-65b6-40db-b0f2-34aa0e4f3e9b@redhat.com>
-Date: Tue, 4 Nov 2025 15:44:52 +0100
+	s=arc-20240116; t=1762267715; c=relaxed/simple;
+	bh=doX3JLZS+sUy3hMCh55sr9woAe4LOITHXgCSwAS52nY=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=AszmH+xbitEvVvu+1Jb18yZr61tbGMZ/4I10RAMb/qUIbQYVZNBaIMvMd4JTugVJa2wAMoJC7oBa3+USV0SqL5SXmmAFGieblk4Xfg6SZSyDT6ASiV1xk0WO7jqCZzm1RPKhufD8r9UMG8nuoH3ulwxxSpxzJTAEorad6+Ums1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=54.92.39.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
+X-QQ-mid: zesmtpgz1t1762267697t54f1d4f7
+X-QQ-Originating-IP: N6+T5IVqLjlqbiMdXL38f31oQ+ykeXd7yIlqb+cbVtU=
+Received: from smtpclient.apple ( [183.241.14.145])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 04 Nov 2025 22:48:15 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 5340102109755934879
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 15/15] quic: add packet builder and parser
- base
-To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>,
- quic@lists.linux.dev
-Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
- Simon Horman <horms@kernel.org>, Stefan Metzmacher <metze@samba.org>,
- Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
- Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>,
- linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>,
- Namjae Jeon <linkinjeon@kernel.org>, Paulo Alcantara <pc@manguebit.com>,
- Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev,
- Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
- Benjamin Coddington <bcodding@redhat.com>, Steve Dickson
- <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
- Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>,
- Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>,
- Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe"
- <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
- illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
- Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
- Daniel Stenberg <daniel@haxx.se>,
- Andy Gospodarek <andrew.gospodarek@broadcom.com>
-References: <cover.1761748557.git.lucien.xin@gmail.com>
- <c9b7d644059fcd181a710ef2aff089e002133046.1761748557.git.lucien.xin@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <c9b7d644059fcd181a710ef2aff089e002133046.1761748557.git.lucien.xin@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
+Subject: Re: [PATCH v2] net: bonding: use atomic instead of rtnl_mutex, to
+ make sure peer notify updated
+From: Tonghao Zhang <tonghao@bamaicloud.com>
+In-Reply-To: <253222.1762206506@vermin>
+Date: Tue, 4 Nov 2025 22:48:04 +0800
+Cc: netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ Nikolay Aleksandrov <razor@blackwall.org>,
+ Hangbin Liu <liuhangbin@gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <B6F453DD-3BDA-4618-AD2A-5B317C32048A@bamaicloud.com>
+References: <20251028034547.78830-1-tonghao@bamaicloud.com>
+ <253222.1762206506@vermin>
+To: Jay Vosburgh <jv@jvosburgh.net>
+X-Mailer: Apple Mail (2.3826.700.81)
+X-QQ-SENDSIZE: 520
+Feedback-ID: zesmtpgz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz4a-0
+X-QQ-XMAILINFO: MNbA5mkmBXEJ6JEEIiOxayS33mbGZd8HvgdUtoR2af/3GhDYJLNxEuG3
+	bEaVZSJzNfCQxVqeYxwqXq1mGq3u9KTyDR/BvfD/w0rGimgY8Qo7iUwCvJ79TDyj350FheG
+	x0Uz1WSKe/krcdcplL/0NDLULwNABOeUQzhEdcsLMFbc5O72cjie9g3gVNko2E6gTtetBe1
+	Rc6HHF/CBAgF9oGT9+UcVX076hA3K4XnEmV407pGn5genPM2s3z7/hwBVWfkWzse1jWhOsG
+	5vJmKFlvANeeLwbxO9fhH7b7sP9jrIJsQi+U5xNu4x31Jd0ajM17KA3ARNeJO3iDVVlOuFX
+	WrnpTQ7wrYV4N56JqZawIkke6vvOv8Zzyapdse3viPVXlfHCd0ilLarRil8m/2TyS7b3aoy
+	CqWePDNVjFhvtr0zq+6jNUSYPrk/8AtKGVH8DrpX+zManQAfVxvyGvP31HO6SsMOHcxNA81
+	Lp4nQw2EBNBu6w6v0qIach7IhPl2z5jTHgbOGgyaKb+L6+xuZ/87XRH2PoExWnSQ/CNKJux
+	PP28wlvaBvhg1tUipmw+c5tJuxwF6VBL9KQvTwgV5OCCaneZNmHqPiQM5RRESSKif4x/4M5
+	q36LDpiyxfcJ5v9216x7CSGBNczWxrFgy+Re1L9FdawcZn3G0fS/LOUZjQSIJjvjv4sS4Nl
+	x3qi/CHOsYQEp7jJvoyLT/1LvnSa+ktrlIq3li+PEt+RhaBc9+b6NVKNz3Y5WGUYD7DgmB2
+	zKZPd7SWeFZpxpdzhDsDIhG6EFP8cA5ab1K5PPCqyK3viOYeLJwvstR4ZuHhX9ERtiXnUDF
+	0kiKHOuBmaqL+UI12FW4K2iXB+2shCpIam+5Uz87+tg9UO3WRDfggbThl96pLd1GquvC37j
+	UjiUA5yi0RrFenIjSJ1vAYcPvy7mvnDkMZ9cqsShPERgnwKgU/FyYtRMgwWqt2opMd9fVjn
+	hB+WbXxQUD3kpvt5NLbIt7kU6Kn252glzAxxivPLdI61LXH2SLKB0qxJD2uDkUijdOnuuBx
+	tzqNWw8KNG5Tl9MHtH
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+X-QQ-RECHKSPAM: 0
 
-On 10/29/25 3:35 PM, Xin Long wrote:
-> +/* Process PMTU reduction event on a QUIC socket. */
-> +void quic_packet_rcv_err_pmtu(struct sock *sk)
-> +{
-> +	struct quic_path_group *paths = quic_paths(sk);
-> +	struct quic_packet *packet = quic_packet(sk);
-> +	struct quic_config *c = quic_config(sk);
-> +	u32 pathmtu, info, taglen;
-> +	struct dst_entry *dst;
-> +	bool reset_timer;
-> +
-> +	if (!ip_sk_accept_pmtu(sk))
-> +		return;
-> +
-> +	info = clamp(paths->mtu_info, QUIC_PATH_MIN_PMTU, QUIC_PATH_MAX_PMTU);
-> +	/* If PLPMTUD is not enabled, update MSS using the route and ICMP info. */
-> +	if (!c->plpmtud_probe_interval) {
-> +		if (quic_packet_route(sk) < 0)
-> +			return;
-> +
-> +		dst = __sk_dst_get(sk);
-> +		dst->ops->update_pmtu(dst, sk, NULL, info, true);
-> +		quic_packet_mss_update(sk, info - packet->hlen);
-> +		return;
-> +	}
-> +	/* PLPMTUD is enabled: adjust to smaller PMTU, subtract headers and AEAD tag.  Also
-> +	 * notify the QUIC path layer for possible state changes and probing.
-> +	 */
-> +	taglen = quic_packet_taglen(packet);
-> +	info = info - packet->hlen - taglen;
-> +	pathmtu = quic_path_pl_toobig(paths, info, &reset_timer);
-> +	if (reset_timer)
-> +		quic_timer_reset(sk, QUIC_TIMER_PMTU, c->plpmtud_probe_interval);
-> +	if (pathmtu)
-> +		quic_packet_mss_update(sk, pathmtu + taglen);
-> +}
-> +
-> +/* Handle ICMP Toobig packet and update QUIC socket path MTU. */
-> +static int quic_packet_rcv_err(struct sk_buff *skb)
-> +{
-> +	union quic_addr daddr, saddr;
-> +	struct sock *sk = NULL;
-> +	int ret = 0;
-> +	u32 info;
-> +
-> +	/* All we can do is lookup the matching QUIC socket by addresses. */
-> +	quic_get_msg_addrs(skb, &saddr, &daddr);
-> +	sk = quic_sock_lookup(skb, &daddr, &saddr, NULL);
-> +	if (!sk)
-> +		return -ENOENT;
-> +
-> +	bh_lock_sock(sk);
-> +	if (quic_is_listen(sk))
 
-The above looks race-prone. You should check the status only when
-holding the sk socket lock, i.e. if !sock_owned_by_user(sk)
 
-> +		goto out;
-> +
-> +	if (quic_get_mtu_info(skb, &info))
-> +		goto out;
+> On Nov 4, 2025, at 05:48, Jay Vosburgh <jv@jvosburgh.net> wrote:
+>=20
+> Tonghao Zhang <tonghao@bamaicloud.com> wrote:
+>=20
+>> Using atomic to protect the send_peer_notif instead of rtnl_mutex.
+>> This approach allows safe updates in both interrupt and process
+>> contexts, while avoiding code complexity.
+>>=20
+>> In lacp mode, the rtnl might be locked, preventing =
+ad_cond_set_peer_notif()
+>> from acquiring the lock and updating send_peer_notif. This patch =
+addresses
+>> the issue by using a atomic. Since updating send_peer_notif does not
+>> require high real-time performance, such atomic updates are =
+acceptable.
+>>=20
+>> After coverting the rtnl lock for send_peer_notif to atomic, in =
+bond_mii_monitor(),
+>> we should check the should_notify_peers (rtnllock required) instead =
+of
+>> send_peer_notif. By the way, to avoid peer notify event loss, we =
+check
+>> again whether to send peer notify, such as active-backup mode =
+failover.
+>>=20
+>> Cc: Jay Vosburgh <jv@jvosburgh.net>
+>> Cc: "David S. Miller" <davem@davemloft.net>
+>> Cc: Eric Dumazet <edumazet@google.com>
+>> Cc: Jakub Kicinski <kuba@kernel.org>
+>> Cc: Paolo Abeni <pabeni@redhat.com>
+>> Cc: Simon Horman <horms@kernel.org>
+>> Cc: Jonathan Corbet <corbet@lwn.net>
+>> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+>> Cc: Nikolay Aleksandrov <razor@blackwall.org>
+>> Cc: Hangbin Liu <liuhangbin@gmail.com>
+>> Suggested-by: Jay Vosburgh <jv@jvosburgh.net>
+>> Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
+>> ---
+>> v2:
+>> - refine the codes
+>> - check bond_should_notify_peers again in bond_mii_monitor(), to =
+avoid
+>> event loss.=20
+>> - v1 =
+https://patchwork.kernel.org/project/netdevbpf/patch/20251026095614.48833-=
+1-tonghao@bamaicloud.com/
+>> ---
+>> drivers/net/bonding/bond_3ad.c  |  7 ++---
+>> drivers/net/bonding/bond_main.c | 46 =
+++++++++++++++++-----------------
+>> include/net/bonding.h           |  9 ++++++-
+>> 3 files changed, 32 insertions(+), 30 deletions(-)
+>>=20
+>> diff --git a/drivers/net/bonding/bond_3ad.c =
+b/drivers/net/bonding/bond_3ad.c
+>> index 49717b7b82a2..05c573e45450 100644
+>> --- a/drivers/net/bonding/bond_3ad.c
+>> +++ b/drivers/net/bonding/bond_3ad.c
+>> @@ -999,11 +999,8 @@ static void ad_cond_set_peer_notif(struct port =
+*port)
+>> {
+>> struct bonding *bond =3D port->slave->bond;
+>>=20
+>> - if (bond->params.broadcast_neighbor && rtnl_trylock()) {
+>> - bond->send_peer_notif =3D bond->params.num_peer_notif *
+>> - max(1, bond->params.peer_notif_delay);
+>> - rtnl_unlock();
+>> - }
+>> + if (bond->params.broadcast_neighbor)
+>> + bond_peer_notify_reset(bond);
+>> }
+>>=20
+>> /**
+>> diff --git a/drivers/net/bonding/bond_main.c =
+b/drivers/net/bonding/bond_main.c
+>> index 8e592f37c28b..ae90221838d4 100644
+>> --- a/drivers/net/bonding/bond_main.c
+>> +++ b/drivers/net/bonding/bond_main.c
+>> @@ -1167,10 +1167,11 @@ static bool bond_should_notify_peers(struct =
+bonding *bond)
+>> {
+>> struct bond_up_slave *usable;
+>> struct slave *slave =3D NULL;
+>> + int send_peer_notif;
+>>=20
+>> - if (!bond->send_peer_notif ||
+>> -     bond->send_peer_notif %
+>> -     max(1, bond->params.peer_notif_delay) !=3D 0 ||
+>> + send_peer_notif =3D atomic_read(&bond->send_peer_notif);
+>> + if (!send_peer_notif ||
+>> +     send_peer_notif % max(1, bond->params.peer_notif_delay) !=3D 0 =
+||
+>>     !netif_carrier_ok(bond->dev))
+>> return false;
+>>=20
+>> @@ -1270,8 +1271,6 @@ void bond_change_active_slave(struct bonding =
+*bond, struct slave *new_active)
+>>       BOND_SLAVE_NOTIFY_NOW);
+>>=20
+>> if (new_active) {
+>> - bool should_notify_peers =3D false;
+>> -
+>> bond_set_slave_active_flags(new_active,
+>>     BOND_SLAVE_NOTIFY_NOW);
+>>=20
+>> @@ -1280,19 +1279,17 @@ void bond_change_active_slave(struct bonding =
+*bond, struct slave *new_active)
+>>       old_active);
+>>=20
+>> if (netif_running(bond->dev)) {
+>> - bond->send_peer_notif =3D
+>> - bond->params.num_peer_notif *
+>> - max(1, bond->params.peer_notif_delay);
+>> - should_notify_peers =3D
+>> - bond_should_notify_peers(bond);
+>> + bond_peer_notify_reset(bond);
+>> +
+>> + if (bond_should_notify_peers(bond)) {
+>> + atomic_dec(&bond->send_peer_notif);
+>> + call_netdevice_notifiers(
+>> + NETDEV_NOTIFY_PEERS,
+>> + bond->dev);
+>> + }
+>> }
+>>=20
+>> call_netdevice_notifiers(NETDEV_BONDING_FAILOVER, bond->dev);
+>> - if (should_notify_peers) {
+>> - bond->send_peer_notif--;
+>> - call_netdevice_notifiers(NETDEV_NOTIFY_PEERS,
+>> -  bond->dev);
+>> - }
+>> }
+>> }
+>>=20
+>> @@ -2801,7 +2798,7 @@ static void bond_mii_monitor(struct work_struct =
+*work)
+>>=20
+>> rcu_read_unlock();
+>>=20
+>> - if (commit || bond->send_peer_notif) {
+>> + if (commit || should_notify_peers) {
+>> /* Race avoidance with bond_close cancel of workqueue */
+>> if (!rtnl_trylock()) {
+>> delay =3D 1;
+>> @@ -2816,16 +2813,15 @@ static void bond_mii_monitor(struct =
+work_struct *work)
+>> bond_miimon_commit(bond);
+>> }
+>>=20
+>> - if (bond->send_peer_notif) {
+>> - bond->send_peer_notif--;
+>> - if (should_notify_peers)
+>> - call_netdevice_notifiers(NETDEV_NOTIFY_PEERS,
+>> -  bond->dev);
+>> - }
+>> + /* check again to avoid send_peer_notif has been changed. */
+>> + if (bond_should_notify_peers(bond))
+>> + call_netdevice_notifiers(NETDEV_NOTIFY_PEERS, bond->dev);
+>=20
+> Is the risk here that user space may have set send_peer_notify
+> to zero?
+If user sapce set the bond_should_notify_peers =3D=3D 0,  =
+bond_should_notify_peers return the false. So NETDEV_NOTIFY_PEERS is =
+disalbed, there is no peer notify.
+>=20
+>=20
+>>=20
+>> rtnl_unlock(); /* might sleep, hold no other locks */
+>> }
+>>=20
+>> + atomic_dec_if_positive(&bond->send_peer_notif);
+>> +
+>=20
+> Also, it's a bit subtle, but I think this has to be outside of
+> the if block, or peer_notif_delay may be unreliable.  I'm not sure it
+> needs a comment, but could you confirm that's why this line is where =
+it
+> is?
+Yes, I will add comment in next version. That is why this line is here.
+- whether there is a commit/peer notify or not,  send_peer_notif-- in =
+each loop. Therefore should be placed outside of if block.
+- make sure send_peer_notif-- after the commit or peer notify process to =
+avoid that send_peer_notif=E2=80=94  but the rtnl_trylock failed.
+- regardless of whether send_peer_notif is set or not, =
+atomic_dec_if_positive always be expected to execute and will not be =
+less than 0.[will be comment that is safe.]
+>=20
+> -J
+>=20
+>> re_arm:
+>> if (bond->params.miimon)
+>> queue_delayed_work(bond->wq, &bond->mii_work, delay);
+>> @@ -3773,7 +3769,7 @@ static void bond_activebackup_arp_mon(struct =
+bonding *bond)
+>> return;
+>>=20
+>> if (should_notify_peers) {
+>> - bond->send_peer_notif--;
+>> + atomic_dec(&bond->send_peer_notif);
+>> call_netdevice_notifiers(NETDEV_NOTIFY_PEERS,
+>>  bond->dev);
+>> }
+>> @@ -4267,6 +4263,8 @@ static int bond_open(struct net_device =
+*bond_dev)
+>> queue_delayed_work(bond->wq, &bond->alb_work, 0);
+>> }
+>>=20
+>> + atomic_set(&bond->send_peer_notif, 0);
+>> +
+>> if (bond->params.miimon)  /* link check interval, in milliseconds. */
+>> queue_delayed_work(bond->wq, &bond->mii_work, 0);
+>>=20
+>> @@ -4300,7 +4298,7 @@ static int bond_close(struct net_device =
+*bond_dev)
+>> struct slave *slave;
+>>=20
+>> bond_work_cancel_all(bond);
+>> - bond->send_peer_notif =3D 0;
+>> + atomic_set(&bond->send_peer_notif, 0);
+>> if (bond_is_lb(bond))
+>> bond_alb_deinitialize(bond);
+>> bond->recv_probe =3D NULL;
+>> diff --git a/include/net/bonding.h b/include/net/bonding.h
+>> index 49edc7da0586..afdfcb5bfaf0 100644
+>> --- a/include/net/bonding.h
+>> +++ b/include/net/bonding.h
+>> @@ -236,7 +236,7 @@ struct bonding {
+>>  */
+>> spinlock_t mode_lock;
+>> spinlock_t stats_lock;
+>> - u32  send_peer_notif;
+>> + atomic_t send_peer_notif;
+>> u8       igmp_retrans;
+>> #ifdef CONFIG_PROC_FS
+>> struct   proc_dir_entry *proc_entry;
+>> @@ -814,4 +814,11 @@ static inline netdev_tx_t bond_tx_drop(struct =
+net_device *dev, struct sk_buff *s
+>> return NET_XMIT_DROP;
+>> }
+>>=20
+>> +static inline void bond_peer_notify_reset(struct bonding *bond)
+>> +{
+>> + atomic_set(&bond->send_peer_notif,
+>> + bond->params.num_peer_notif *
+>> + max(1, bond->params.peer_notif_delay));
+>> +}
+>> +
+>> #endif /* _NET_BONDING_H */
+>> --=20
+>> 2.34.1
+>>=20
+>=20
+> ---
+> -Jay Vosburgh, jv@jvosburgh.net
 
-This can be moved outside the lock.
-
-> +
-> +	ret = 1; /* Success: update socket path MTU info. */
-> +	quic_paths(sk)->mtu_info = info;
-> +	if (sock_owned_by_user(sk)) {
-> +		/* Socket is in use by userspace context.  Defer MTU processing to later via
-> +		 * tasklet.  Ensure the socket is not dropped before deferral.
-> +		 */
-> +		if (!test_and_set_bit(QUIC_MTU_REDUCED_DEFERRED, &sk->sk_tsq_flags))
-> +			sock_hold(sk);
-> +		goto out;
-> +	}
-> +	/* Otherwise, process the MTU reduction now. */
-> +	quic_packet_rcv_err_pmtu(sk);
-> +out:
-> +	bh_unlock_sock(sk);
-> +	sock_put(sk);
-> +	return ret;
-> +}
-> +
-> +#define QUIC_PACKET_BACKLOG_MAX		4096
-> +
-> +/* Queue a packet for later processing when sleeping is allowed. */
-> +static int quic_packet_backlog_schedule(struct net *net, struct sk_buff *skb)
-> +{
-> +	struct quic_skb_cb *cb = QUIC_SKB_CB(skb);
-> +	struct quic_net *qn = quic_net(net);
-> +
-> +	if (cb->backlog)
-> +		return 0;
-
-The above test is present also in the only caller of this function. It
-should be removed from there.
-
-[...]> +/* Work function to process packets in the backlog queue. */
-> +void quic_packet_backlog_work(struct work_struct *work)
-> +{
-> +	struct quic_net *qn = container_of(work, struct quic_net, work);
-> +	struct sk_buff *skb;
-> +	struct sock *sk;
-> +
-> +	skb = skb_dequeue(&qn->backlog_list);
-> +	while (skb) {
-> +		sk = quic_packet_get_listen_sock(skb);
-> +		if (!sk)
-> +			continue;
-> +
-> +		lock_sock(sk);
-
-Possibly lock_sock_fast(sk);
-
-> +		quic_packet_process(sk, skb);
-> +		release_sock(sk);
-> +		sock_put(sk);
-> +
-> +		skb = skb_dequeue(&qn->backlog_list);
-> +	}
-> +}
-
-[...]> +/* Create and transmit a new QUIC packet. */
-> +int quic_packet_create(struct sock *sk)
-Possibly rename the function accordingly to its actual action, i.e.
-quic_packet_create_xmit()
-
-[...]> @@ -291,6 +294,8 @@ static void __net_exit quic_net_exit(struct
-net *net)
->  #ifdef CONFIG_PROC_FS
->  	quic_net_proc_exit(net);
->  #endif
-> +	skb_queue_purge(&qn->backlog_list);
-> +	cancel_work_sync(&qn->work);
-
-Likely: disable_work_sync()
-
->  	quic_crypto_free(&qn->crypto);
->  	free_percpu(qn->stat);
->  	qn->stat = NULL;
-
-EPATCHISTOOBIG, very hard to process. Please split this one it at least
-2 (i.e. rx and tx part), even if the series will grow above 15
-
-/P
 
 
