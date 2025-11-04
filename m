@@ -1,116 +1,295 @@
-Return-Path: <netdev+bounces-235397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18071C2FE3F
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 09:30:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3031C2FE98
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 09:34:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E31E19209EF
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 08:26:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A70C8188A514
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 08:29:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E1BA314D08;
-	Tue,  4 Nov 2025 08:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DD8831195B;
+	Tue,  4 Nov 2025 08:28:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F/UtMIYU"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="fJjsZ3sd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from BYAPR05CU005.outbound.protection.outlook.com (mail-westusazon11010056.outbound.protection.outlook.com [52.101.85.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1304D30F941;
-	Tue,  4 Nov 2025 08:20:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762244430; cv=none; b=MC2VWgR6lCotmIMOtES7b/+fz6IRoHOwaICz4a/K3IyJ27/bH6LzTlGWRjhnfgs4tk5ds6MFVwHAvsrXdmv9eMfRh1hd0uChgVFaIO0apxE9+gXV6vtfxVcX3bWsC4aryf+dNfEy+1IHrLEg4ZzNdxUyxSgSaKCnLzw6iWeml1Y=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762244430; c=relaxed/simple;
-	bh=6jABtiP9twriCAafB7qhdYkC2NWk+AwMtjQZTn4C2Rc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qOmzuM0xq+4lYfzFbaN/2Yz5F/HU3VzyC53cQnNnanUQwI80Ljbuohnh7lyVUtMEmgoUVyH53WDdbZFNPIvX5TofvbDuSAAcrKYh+2YypUKlY1p/frKdEpMR3ym8mTSXEVwAU9bC0y2SWPJEG0iQ/VuiLVF2yIr1CjJGbtO/VHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F/UtMIYU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BB78C4CEF7;
-	Tue,  4 Nov 2025 08:20:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762244429;
-	bh=6jABtiP9twriCAafB7qhdYkC2NWk+AwMtjQZTn4C2Rc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=F/UtMIYUTCw7UuAF9ifUV2bMlp41aMmcBIUBJORgkZB30LLHmuz5KXhEbbzN934YZ
-	 GQhbh+pgeMaaScX3k5Osd9TsIcCBB97MDUtjBNcwPx/VGrSntzG9+96E7QGOZjzlFY
-	 bgNFFIar+xKpx2US5yb1If682qFHgNMo/EXBhKSIHVSLgHrDhTCGc/qCmo9kecprat
-	 3u4T/P2Qu0Bc83QpxNpHqVmkhIFEX+2KaHtsWYKUO/9gY2zu/iwIDLgxB9WiraWnDk
-	 xQynuOYpwwzR9HH05orJUGrVbMH7tqbDr8fiNUIbilQ7Kpy6eaoh2IkY0uge3aR2eM
-	 ErY0lNpemZBGA==
-Date: Tue, 4 Nov 2025 09:20:27 +0100
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Jacky Chou <jacky_chou@aspeedtech.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Po-Yu Chuang <ratbert@faraday-tech.com>, Joel Stanley <joel@jms.id.au>, 
-	Andrew Jeffery <andrew@codeconstruct.com.au>, netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-aspeed@lists.ozlabs.org, taoren@meta.com
-Subject: Re: [PATCH net-next v3 0/4] Add AST2600 RGMII delay into ftgmac100
-Message-ID: <20251104-dangerous-auk-of-order-6afab2@kuoka>
-References: <20251103-rgmii_delay_2600-v3-0-e2af2656f7d7@aspeedtech.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 746CC3112D3;
+	Tue,  4 Nov 2025 08:28:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.85.56
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762244892; cv=fail; b=b0dO8G2euvzrpwV7aWWW8YCFGzyNz+w6hIFH3gANe7LWM0ZmejxTT0yNlU0yC1U2VRQE6qnEJx0li8fi5uctEQ2QmYGHbFH+6z55qD1Ho1Pp3iATkeVy/OiTvPrQ/4kTt+KvMS2FnwjxraRFO38bzzSu1h+oANoQvfbtvJdWuWc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762244892; c=relaxed/simple;
+	bh=wIZ+se4XThP6oQLFaCxUk+Ynx4TTXLdV52VCm0MlYtU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=lQKUoEUVuINW3b1P8+65SG02xQKvU6hj5sHRxiRBZLW9sACr82JrDTXi3PB6veQ7bwHAM/VEw6dqdFDK+1Aku7U0WMHaMj1b4naiZegUix28Scomvu4K0xHDUxNzgwuaUqVy13s47P1A1lXq/K3rkzTAibqBCmuWrYdoWQOcsnA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=fJjsZ3sd; arc=fail smtp.client-ip=52.101.85.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=NRdyxQTjdA0Fiwagw9DEOWt8PhlWxRzbeh+cOC83QGr9aEvDBGz7lViQefxVJ0m6L4KJplY2bbw5nkal3qlphA1dMBCC4qTrJjSTqWfyKd9ryIZM2Q2xJti+qsRE8QxpokcjfT8xmKq+WxfcxD0DfPY32QkVx05wvRiR3XL6Svxisb9zU76my4PT34+3W2DNUVtXF93GNKtFPnt0qgevsIxMzqrx5GtBe6pEfZnF4Au8LTvJjzxobaCgK0sPckN9mvN4oaJVSGtVsyZldv4jcaw7pq45F1e29vfCOaNnZr+fDuQ9+zU1Ei/j4mZncn2wZArLhXOmzr22MvkF39U1IQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mHSNfBydgSeGNWmOPzpHP+vW+w/SvP4tIK28akpNLOY=;
+ b=owj1nmOJs+SWDBQ7fey1FdjckK0U5aKMsUjXW29D5C7IQyfU6LMVn+HAKMk1WY7EjpAy77XWrZnfTgiBY0kDPwBUHqZ5wzreeNVl8poAf6Wo9f3z2q+MgtOE7S3QRm2m65i0Fa6/ef+JBvlO5FfRxjMNO5LWBOjzNKpOrT4uDGxAXJYodc7Cuo99THHX1Skae92WeCQYJxZIbU7WE4qMJ3/2825i1O6Ezz5THRFe/qhmxMoBxHQK81CLwmEwIp0EJzxCuDiK/0lMV0z72c7Mk3+T6NA0FyNTTwTWXnymMIZnTIa6V7BZgDbN2aNgFLKrLU1INM84WJOfPPnrxwnexw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mHSNfBydgSeGNWmOPzpHP+vW+w/SvP4tIK28akpNLOY=;
+ b=fJjsZ3sdoUKvy51h+JFMo9EYhizXz6IsmPu8W3NAlXs/PLCrSic92PR+WZhebnWq9TcZT0kNW70RK75tLz7YwL2Cf2PM6+d6WMlYI6t6s1b2h0cVaQK+y1MPAUuMpO/0gtWLz9QXN1SKwGg0A4bLskiBHRdTe2JDh19y8ocWcTflF8yziVIs7+tmGNr4ptXS7fDNL+qn5eXfXlNadkhZ8G5svRYdp1+U9ILJPnJsLnyCgU6VHnPtp1iS/viFXaS++iQG1qU5pSoKHG8KE5/rWsnC4I2A41ToluwqUw2mRAR3tsJNhZ5vHMllP4+tRQzrpaZFSOCkq34wOq291OPnkg==
+Received: from CH0PR03CA0226.namprd03.prod.outlook.com (2603:10b6:610:e7::21)
+ by PH7PR12MB6933.namprd12.prod.outlook.com (2603:10b6:510:1b7::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.15; Tue, 4 Nov
+ 2025 08:28:06 +0000
+Received: from CH3PEPF0000000C.namprd04.prod.outlook.com
+ (2603:10b6:610:e7:cafe::b6) by CH0PR03CA0226.outlook.office365.com
+ (2603:10b6:610:e7::21) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9298.7 via Frontend Transport; Tue, 4
+ Nov 2025 08:28:05 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CH3PEPF0000000C.mail.protection.outlook.com (10.167.244.39) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9298.6 via Frontend Transport; Tue, 4 Nov 2025 08:28:05 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 4 Nov
+ 2025 00:27:52 -0800
+Received: from [10.221.224.195] (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 4 Nov
+ 2025 00:27:44 -0800
+Message-ID: <be552e0e-164b-49c0-b1ea-d35d4c64e3d9@nvidia.com>
+Date: Tue, 4 Nov 2025 10:26:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20251103-rgmii_delay_2600-v3-0-e2af2656f7d7@aspeedtech.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH mlx5-next 1/2] PCI/TPH: Expose pcie_tph_get_st_table_loc()
+To: Bjorn Helgaas <helgaas@kernel.org>
+CC: Leon Romanovsky <leon@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, "Mark
+ Bloch" <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<linux-pci@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>, Edward Srouji
+	<edwards@nvidia.com>
+References: <20251103172830.GA1811635@bhelgaas>
+Content-Language: en-US
+From: Yishai Hadas <yishaih@nvidia.com>
+In-Reply-To: <20251103172830.GA1811635@bhelgaas>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PEPF0000000C:EE_|PH7PR12MB6933:EE_
+X-MS-Office365-Filtering-Correlation-Id: f4169202-1a8f-4115-44bd-08de1b7c13e6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|82310400026|36860700013|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?QUlTc2tFcFdSdjZGQ2EyYS9oNm1iOWRlT2FGVDB6aXJHajBIYUt0WGw3Yk42?=
+ =?utf-8?B?S3hQRnZNakN5SFZrZW5OZVl3UDhQL09nTmxEQllNNFlxek1RbXptcEFGRHZj?=
+ =?utf-8?B?djhuRVEzZmNYZEpESmNWL1ZkaEhJNXFPaFkyTE5xU3hGTWhnaTdYWHV3a2VM?=
+ =?utf-8?B?RWhtTWdvZWZxUUZpUzBUVno1Q0FRZGY1amZwYkxybXlMTi83MHhiRGhNV2pk?=
+ =?utf-8?B?NUxjSUVJYU9pdllTZUcyeG81R3orMlYzY1l2TFI5ckZtVks3RnpiVElSOU9Z?=
+ =?utf-8?B?SGV3UGFIWm03SG16czQyaTZsUmZzQ2U4YTdMQjg2dTZkenhQcS9saFdWVG9C?=
+ =?utf-8?B?OWFXeUx6S1VDT2greDNhcmt2RTc2RVZQWkxTZnFVMTcyYndwbkQ5c1dGTjBq?=
+ =?utf-8?B?bUREQ0E4cXFpaHpkY3JUMnl0ZFNIa2g3S1BlTERtREp5dWN6aWx5QTkvM1I2?=
+ =?utf-8?B?MXBxK0RVb2pVOTM3MFppS3I1ZkpocnZLYTVCNjcvZ1lzeTY2VUFid24rZFFq?=
+ =?utf-8?B?ZDhvdlYrNENqVWd0UkJ1b1BFKzJqWFlRNFFDVmhiTkRkdlA0bWxRNWhwak1R?=
+ =?utf-8?B?L296WWdmZWxNVVFMMzhvN2lVUGYyblZIQ3J2aCtpbFBsQ0IzMzJnREYvS0M0?=
+ =?utf-8?B?bHJSTGkveCtyWFJ5TDUyRER2Mkx6U2czcFBMbGNXbG9vSnR6QlVueHhvRGdB?=
+ =?utf-8?B?MHQ4UUZZU25GODNZR1I4NGJqQ3pIb3hKWFV2RXdhVjBvaXJvZUdqK3ZsNmFF?=
+ =?utf-8?B?VDVtcjBWRWQ4eEp2N0FIbHhYcGNNQlBJeTVnSlRRZjY2Z2krbko2eHJ0YXU4?=
+ =?utf-8?B?U0lmeDQzSldLSWk0blZWTFZhNUtxS1htSVB3S3FIc0IvREtxTktpUXBRUTdQ?=
+ =?utf-8?B?bkhFcFRIR3RXS0ZhWThWc0VKbGJleXYvQmJrWkRkVGdMNHhGRXc0T0MwOEpX?=
+ =?utf-8?B?M0tLalNlR0p2SFV6WC9iQW9rMXNtVHRmbGhtM3RkUnhLcWNZUUZuMmJYZWYz?=
+ =?utf-8?B?K1VocXNtekpqRWwrdisxZzlMN2lsbWwvTnBBLzdlcEJmN2hBNE9idVN4eHJX?=
+ =?utf-8?B?OTVFM2ZzdnZneTllUStTemVLb2VFcmN2a1ZmWjROWk9yT3NnWksvS3FPeGNr?=
+ =?utf-8?B?N0RwSXMvU0ZjR1RHNHpaZThQSjZZR0p0Rnd5dmpIVVA2eXdvNlRoMnlLWXZ5?=
+ =?utf-8?B?RWJ1bFF5MXlhM21mYUwwbFRiYTk0NWZXRmtQVEFTQkZ6bXZ2VkZDQnhOTjdo?=
+ =?utf-8?B?M2RoWkNWLzJHWmZtNmcvZGRRQ2Z6US83NmZIQ3JNbUNHWFh2bnZOSEJvNEZu?=
+ =?utf-8?B?T0t3b29XOW41M2pNdmlGL1pORnFFSkVCMWVIaHlZdGcybkNPR0Vnb1dxeTQz?=
+ =?utf-8?B?SG9tWmdIKzlmY1QzdSs0MWUwaW9ZL05qRlNkTkg3cjhlbVZkYXRxWDd4MDBS?=
+ =?utf-8?B?N0x4SWxJZWxyaDV1K3lvQWlTLzlTbXJXNm9BUUZpekxtM3N5dGh5Y3N6ZTZv?=
+ =?utf-8?B?ZUVBaW82S1ZWNVFqNEQrd01LK1VuZ0RSd3BnL0hsUG5yNTZMcG1iVTBzMVZT?=
+ =?utf-8?B?c3dpdkJQbGpyalJlRWlnNTNZNHJqWXlyWnJ4NnlrZXFjbk51Qnp3SklFeGw4?=
+ =?utf-8?B?RVhRRXJLN1NqVXF0SDZJbHJ5dnc3SHNGTkI0UnlEWXh5dWVaWWxwSERMK3R4?=
+ =?utf-8?B?cW94VzRWQTUxMHZrY1N1ZWw2K1ZIVlJlVk5CcWN5UzIvMzhmN1hIbVVBN3l4?=
+ =?utf-8?B?NFNxVVF5ZXVndktXMVFHTVdnejNGSFRkVDY1eGlXYlZsS3JqQlhwdU1jRVp2?=
+ =?utf-8?B?K2xZSGswMW9UUlF6NWpPM0JhSVV2bVo4QUF1VnM4SGlmN01icFlCTnZOQVc4?=
+ =?utf-8?B?aCtwbWlEM01iRlhHeGM5M3BmWW9EWlpVR29VVXlPRUZrK1htY0RhS2VwaVdW?=
+ =?utf-8?B?TS9MNEhSQjgwOXFRQjlCSld3YVRWZlVReGN4UjhLVzFrczZ3OUJFaGdyOS8w?=
+ =?utf-8?B?Yzl2dmI5QkgrSUZMZHE4enVldlVsMEFacWF2NVJoRUNQU0NhbnpTRmErTmNG?=
+ =?utf-8?B?dHJ1RktOaVAvN3c4N2xJQ1ZqdnRhaVE2dk44UmpCbERKblBWN2k4ZXVjSUhG?=
+ =?utf-8?Q?j79I=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700013)(7416014)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Nov 2025 08:28:05.5293
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f4169202-1a8f-4115-44bd-08de1b7c13e6
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH3PEPF0000000C.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6933
 
-On Mon, Nov 03, 2025 at 03:39:15PM +0800, Jacky Chou wrote:
-> This patch series adds support for configuring RGMII internal delays for the
-> Aspeed AST2600 FTGMAC100 Ethernet MACs. It introduces new compatible strings to
-> distinguish between MAC0/1 and MAC2/3, as their delay chains and configuration
-> units differ.
-> The device tree bindings are updated to restrict the allowed phy-mode and delay
-> properties for each MAC type. Corresponding changes are made to the device tree
-> source files and the FTGMAC100 driver to support the new delay configuration.
+On 03/11/2025 19:28, Bjorn Helgaas wrote:
+> On Mon, Nov 03, 2025 at 06:23:26PM +0200, Yishai Hadas wrote:
+>> On 03/11/2025 17:43, Bjorn Helgaas wrote:
+>>> On Mon, Oct 27, 2025 at 11:34:01AM +0200, Leon Romanovsky wrote:
+>>>> From: Yishai Hadas <yishaih@nvidia.com>
+>>>>
+>>>> Expose pcie_tph_get_st_table_loc() to be used by drivers as will be done
+>>>> in the next patch from the series.
+>>>>
+>>>> Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
+>>>> Signed-off-by: Edward Srouji <edwards@nvidia.com>
+>>>> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+>>>> ---
+>>>>    drivers/pci/tph.c       | 7 ++++---
+>>>>    include/linux/pci-tph.h | 1 +
+>>>>    2 files changed, 5 insertions(+), 3 deletions(-)
+>>>>
+>>>> diff --git a/drivers/pci/tph.c b/drivers/pci/tph.c
+>>>> index cc64f93709a4..8f8457ec9adb 100644
+>>>> --- a/drivers/pci/tph.c
+>>>> +++ b/drivers/pci/tph.c
+>>>> @@ -155,7 +155,7 @@ static u8 get_st_modes(struct pci_dev *pdev)
+>>>>    	return reg;
+>>>>    }
+>>>> -static u32 get_st_table_loc(struct pci_dev *pdev)
+>>>> +u32 pcie_tph_get_st_table_loc(struct pci_dev *pdev)
+>>>>    {
+>>>>    	u32 reg;
+>>>> @@ -163,6 +163,7 @@ static u32 get_st_table_loc(struct pci_dev *pdev)
+>>>>    	return FIELD_GET(PCI_TPH_CAP_LOC_MASK, reg);
+>>>>    }
+>>>> +EXPORT_SYMBOL(pcie_tph_get_st_table_loc);
+>>>
+>>> OK by me, but I think we should add kernel-doc for the return value.
+>>>
+>>> With that doc added:
+>>>
+>>> Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+>>
+>> Thanks Bjorn.
+>>
+>> We may add the below hunk.
+>>
+>> Can that work for you ?
 > 
-> Summary of changes:
-> - dt-bindings: net: ftgmac100: Add conditional schema for AST2600 MAC0/1 and
->   MAC2/3, restrict delay properties, and require SCU phandle.
-> - ARM: dts: aspeed-g6: Add ethernet aliases to indentify the index of
->   MAC.
-> - ARM: dts: aspeed-ast2600-evb: Add new compatibles, scu handle and
->   rx/tx-internal-delay-ps properties and update phy-mode for MACs.
-> - net: ftgmac100: Add driver support for configuring RGMII delay for AST2600
->   MACs via SCU.
+> No, because (a) it just restates the function name and doesn't say how
+> to interpret the return value (you would need a PCIe spec to look it
+> up) and (b) kernel-doc syntax would be "Return: " (see
+> Documentation/doc-guide/kernel-doc.rst for examples).
 > 
-> This enables precise RGMII timing configuration for AST2600-based platforms,
-> improving interoperability with various PHYs
-> 
-> ---
-> v3:
->  - Add new item on compatible property for new compatible strings
->  - Remove the new compatible and scu handle of MAC from aspeed-g6.dtsi
->  - Add new compatible and scu handle to MAC node in
->    aspeed-ast2600-evb.dts
->  - Change all phy-mode of MACs to "rgmii-id"
->  - Keep "aspeed,ast2600-mac" compatible in ftgmac100.c and configure the
->    rgmii delay with "aspeed,ast2600-mac01" and "aspeed,ast2600-mac23"
-> v2:
->  - added new compatible strings for MAC0/1 and MAC2/3
->  - updated device tree bindings to restrict phy-mode and delay properties
->  - refactored driver code to handle rgmii delay configuration
 
-That's b4 managed change, so where are the lorelinks? Why are you
-removing them?
+I see.
 
-Since you decided to drop them making it difficult for me to find
-previous revisions, I will not bother to look at background of this
-patchset to understand why you did that way and just NAK the binding.
+How about adding the below as part of V1 with your Acked-by: ?
 
-Next time, make it easy for reviewers, not intentionally difficult.
+diff --git a/drivers/pci/tph.c b/drivers/pci/tph.c
+index 8f8457ec9adb..510173cc8b63 100644
+--- a/drivers/pci/tph.c
++++ b/drivers/pci/tph.c
+@@ -155,6 +155,15 @@ static u8 get_st_modes(struct pci_dev *pdev)
+         return reg;
+  }
 
-Best regards,
-Krzysztof
++/**
++ * pcie_tph_get_st_table_loc - Return the device's ST table location
++ * @pdev: PCI device to query
++ *
++ * Return:
++ * * PCI_TPH_LOC_NONE - Not present
++ * * PCI_TPH_LOC_CAP  - Located in the TPH Requester Extended Capability
++ * * PCI_TPH_LOC_MSIX - Located in the MSI-X Table
++ */
+
+Yishai
+
+>> diff --git a/drivers/pci/tph.c b/drivers/pci/tph.c
+>> index 8f8457ec9adb..385307a9a328 100644
+>> --- a/drivers/pci/tph.c
+>> +++ b/drivers/pci/tph.c
+>> @@ -155,6 +155,12 @@ static u8 get_st_modes(struct pci_dev *pdev)
+>>          return reg;
+>>   }
+>>
+>> +/**
+>> + * pcie_tph_get_st_table_loc - query the device for its ST table location
+>> + * @pdev: PCI device to query
+>> + *
+>> + * Return the location of the ST table
+>> + */
+>>   u32 pcie_tph_get_st_table_loc(struct pci_dev *pdev)
+>>   {
+>>          u32 reg;
+>>
+>> Yishai
+>>
+>>>
+>>>
+>>>>    /*
+>>>>     * Return the size of ST table. If ST table is not in TPH Requester Extended
+>>>> @@ -174,7 +175,7 @@ u16 pcie_tph_get_st_table_size(struct pci_dev *pdev)
+>>>>    	u32 loc;
+>>>>    	/* Check ST table location first */
+>>>> -	loc = get_st_table_loc(pdev);
+>>>> +	loc = pcie_tph_get_st_table_loc(pdev);
+>>>>    	/* Convert loc to match with PCI_TPH_LOC_* defined in pci_regs.h */
+>>>>    	loc = FIELD_PREP(PCI_TPH_CAP_LOC_MASK, loc);
+>>>> @@ -299,7 +300,7 @@ int pcie_tph_set_st_entry(struct pci_dev *pdev, unsigned int index, u16 tag)
+>>>>    	 */
+>>>>    	set_ctrl_reg_req_en(pdev, PCI_TPH_REQ_DISABLE);
+>>>> -	loc = get_st_table_loc(pdev);
+>>>> +	loc = pcie_tph_get_st_table_loc(pdev);
+>>>>    	/* Convert loc to match with PCI_TPH_LOC_* */
+>>>>    	loc = FIELD_PREP(PCI_TPH_CAP_LOC_MASK, loc);
+>>>> diff --git a/include/linux/pci-tph.h b/include/linux/pci-tph.h
+>>>> index 9e4e331b1603..ba28140ce670 100644
+>>>> --- a/include/linux/pci-tph.h
+>>>> +++ b/include/linux/pci-tph.h
+>>>> @@ -29,6 +29,7 @@ int pcie_tph_get_cpu_st(struct pci_dev *dev,
+>>>>    void pcie_disable_tph(struct pci_dev *pdev);
+>>>>    int pcie_enable_tph(struct pci_dev *pdev, int mode);
+>>>>    u16 pcie_tph_get_st_table_size(struct pci_dev *pdev);
+>>>> +u32 pcie_tph_get_st_table_loc(struct pci_dev *pdev);
+>>>>    #else
+>>>>    static inline int pcie_tph_set_st_entry(struct pci_dev *pdev,
+>>>>    					unsigned int index, u16 tag)
+>>>>
+>>>> -- 
+>>>> 2.51.0
+>>>>
+>>
 
 
