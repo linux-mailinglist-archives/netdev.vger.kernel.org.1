@@ -1,312 +1,138 @@
-Return-Path: <netdev+bounces-235627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5051AC335DC
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 00:21:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A27DCC335EB
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 00:23:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2DB4423505
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 23:21:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C15193BAF74
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 23:22:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 578EE2DAFD8;
-	Tue,  4 Nov 2025 23:21:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2797D2DCF50;
+	Tue,  4 Nov 2025 23:22:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MHl9/a3t"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TQhqUswO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE392D9EDA
-	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 23:21:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 952662DC339
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 23:22:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762298469; cv=none; b=eXB4uCEgorurPmTdSgk995Eka7OjyEQxNKcaGr9EDU1k/z1d75io4I9J0f0Pbd2DYt9co8YGhWQYHxR471pblHmOPxu6xzeMnjQ1NwwgNiJjXyKnqBCfq7/MM8ga/8+n5EweAermLtfFzzPDM7C9cyKUTqgGoKEtL8OWsvLVzWw=
+	t=1762298548; cv=none; b=QHULirX25lr973dJXllQugwt7utIomeF3LF/Xl1+yj2/0A9RrxyGZ7g1EMy+SD+znoSiKhDvW8F1cPIARo97T96Bb2UXehjrHkFjeIH7a4mW6IUaDjUw+YVWcOitbVW4kpnpmdAUdSZgtT8qasNumGODLqIarR7MZsMMitszXKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762298469; c=relaxed/simple;
-	bh=NgQUbqBdgVniha1kKMIKKWy96mVGzZLxjwBTU4JrDQM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qvnpcTBRXZx6IFnOMIlWuk48tYdM1zKjsrAe5xH1rvje2EI6EwsbCODiirErwqrGEjkXv6LxuTKegD02Ah2MTn0kbuiACmKa4kfzyV1nf5rkwJOV72+TsWi8zLwcGD3SGmOzejd5Xy1orGUWWEpgN0r09Jq9iZ9CIuW/kgExdjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MHl9/a3t; arc=none smtp.client-ip=209.85.216.41
+	s=arc-20240116; t=1762298548; c=relaxed/simple;
+	bh=7nfSPumsytiTRTmDQeIgSscuCD4jFGL/qPUnn97EP+I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kyQxc3lekVyYLuYQtzYqhJF0EnngIMvSHt2l2wc7fAU6whGoybk2P8O4sybyrCFo55nwKKBJazEW0IgPO+qhdeczYC8Vu1mXoZJ1OHNx9V5i49N75lKY/TYV+bad/g4g42gKq3d0JZL6rm4mRvR4R+77kyHDlJXxEl/k/xXriLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TQhqUswO; arc=none smtp.client-ip=209.85.214.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-34077439166so5411290a91.2
-        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 15:21:07 -0800 (PST)
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-29568d93e87so30888985ad.2
+        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 15:22:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762298467; x=1762903267; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o352oLldK+m217WHfsZVlsJiiTd5rrIsqpGhmKyBzFs=;
-        b=MHl9/a3t18E77crvUHqHGU8X5MD794VbOa7BTGulDSvRk6CKEnA/QG/+NeHJ72apVK
-         f5oF3LxIdigMYBqiGIZEWei7KA2S1m0rBvuEiR2r++5KAot1XPtBGA7rOmbnt1Z45M6J
-         tn3cgu6hGQgxNKzlcydId23pV4fids19kQjx9IJQV1ts9Fxov3N23sbYB9AhjlD/c+8O
-         w9BAdDAFY4Rygroz4ZqI7xPfZzzRS/ARvAqHEk0M9mR743MyjfLKEX3kdLf03cMMza0N
-         NZYOjIITw1ta+ijJU7+oeDJP8hQ74OWkGFT9mMyFdbXO08H6VICxXw7y406b6OPycxgS
-         3QJA==
+        d=gmail.com; s=20230601; t=1762298546; x=1762903346; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9B+k56MhML3w6peCidIaihxbl7v6WGNiwGQSlC8dp4w=;
+        b=TQhqUswOLONh4bjxx7HwNfiElN/2ZG8p7OVRqPwdNHkcK70wTQJPvfANk3hw8ZW3lv
+         5aUBCdmWZcBcJw/Nk4s6R/G63uIuziKjGHW3N5ro/W08VABapjGuGEXiW0TGkoQhSqy4
+         oojIdA8UPbwz5VTjdwPHNvqr44gDKFhmMvmW185KeJGf6CcO0O+/hlQ710hkZVnJv5MW
+         ZMFtkU5K9Zz4yuNZRWgSfGrsA7tEItfn0VYr4m9qCZvy/VWbv4gd0JqQTdXm5MHC4u0X
+         R6fLX17WA7RxFXqE2Nw1o7d2rqqEk+7rA0niEe5/e/L2DbT3+hUhLB6iU4yGQgR9YBWo
+         y1bQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762298467; x=1762903267;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o352oLldK+m217WHfsZVlsJiiTd5rrIsqpGhmKyBzFs=;
-        b=RsOiKmmn+7rZphASEsXZT6zuMztGRftk4vPDvRWywEBRhZF6LiU1VFijInq8s9i8sr
-         zlZMz1ZgQPPKsGKph/LoF7HLG05nabZz553er0RuQqSIGjuxeCPTs0f3KrIpp3gILZ3G
-         4tTJS9amHXfxWo18pFRyGkVkVG4LTjSy2dNl9eI1EaXQLD06D+uE2CYfcGlEa7mkemlN
-         leFhCd6bEyqMkC1NaeKU1pawf/Uabnf6eeNjb9+attHaOXxzd8vmUtOu1lH4ZpN4nAdS
-         Kix+HiDtQgHfa+tWWRHQ6cxZrqYuFFSP8gWG/KQUjELf5WILwRnyuAQxLZp3X4kkn0EH
-         Qgog==
-X-Forwarded-Encrypted: i=1; AJvYcCWhrrVl3c8AzjxGAYT4S+ELfiWUB1frHvJ6Jztio56Q3+Z+O7UFkOC8cIAnM/dpQNnDaeXfRlc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyHyTeAnL0CVFAxigfI4ZlziXxCt+TuHpd0+XWUu6N+Ts+3hw3f
-	4v8BUeiRB15UZCSxSv3Nuw6WNA5Zft0ultt0DI3wuvYObysNnjbb5J9ey2eVs55UZC7mm8rXW2K
-	nMAWO35tcwjyr1jL7bavFl1iizMfC4BY=
-X-Gm-Gg: ASbGncvVzIuZJ6mtW9VYTOpBnC7R6l0Yl/D0A1p706D2DckLuBTg6VGJYWlCdnHQHTe
-	ZH4UC0UCiQhXaZ/NsU2CkAvN6PeayuJh9l9gu6XOrfXgXNM+JKdXTcreAtqs4DQutD/HtV0NYvk
-	QCVOg6tvQbhr4jhe5kNN9KssB8itzHzfC1qt3IaWJm1sjY0BYpr7I0xmUNooc7GTt79kir5S5pX
-	pofZJEIbIAstBmayLgLz1IIMLqenB8coRvy+eo+rB348r6Se5DIMqDfQHFC03bqq88Go0EfnDzN
-X-Google-Smtp-Source: AGHT+IHVxXmQM+6ZFlmn8oeEN16S1yh+ceATZ0yp+NzsAxaCE+Hy0JsNLdI13GJq1/Y4jRdCAcxXSjhIc4JI71aVKPw=
-X-Received: by 2002:a17:90b:384a:b0:340:ad5e:cb with SMTP id
- 98e67ed59e1d1-341a6c00daamr1087424a91.8.1762298466824; Tue, 04 Nov 2025
- 15:21:06 -0800 (PST)
+        d=1e100.net; s=20230601; t=1762298546; x=1762903346;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9B+k56MhML3w6peCidIaihxbl7v6WGNiwGQSlC8dp4w=;
+        b=F2Ly1/VjnGEtMWDc7QXTdigEgotvuJLKrFfAD1m5NruugaZtUeDgR9c5PFhwC/txTC
+         A5eGqNS0TjGHnBdNyMVPBQLYHiEC5HjAcDmAt4kTPM88GwT8lYA5zG6Id3KPRBFX2KdI
+         FGSifpyihnA2BU67Kqkg1t5xslLxjf7Gm/NIWI6oMTjZAx05hNvs+f+5jbVIF0t3t0wU
+         m4+HEx1lEtzqD6F5U1WdvaWCP64e3pPSIxQ0O2w+Jh1Hjlp4CL7tLXJt3Ifs7zZzrMrf
+         uU61MlrQMXip34fK7nB4IeewkEr5rm0mHDy4FhQXHaVjTrORTDzxZJsOeTddZ6m7HbhZ
+         cdNw==
+X-Gm-Message-State: AOJu0YxoBX53+RlpzozwmYGsk7rAO5Z+ub6gDGOKW1aU3vCiYSQsJTaF
+	orEUGgHKKtUvLeriMPdJ/aj2rWcuUI1D0oQxd+Q1pOHW8/jxf6tHkxM=
+X-Gm-Gg: ASbGncvdkSkZi3eVdSFEGnW1U+Ecxc2OpR5f5fYZuetP+yT+8acDxmgI66+yjPZYsmq
+	TYpg+iTU0pqZ2kI+bMyQWDnmqF/l0IDiM5Phcv5rgC5iX+Lb1aamsaIj5cxBQrzc+8ohNhiBYrF
+	DhbeXgC3zf1lETwHguk6aWGFJqa1tSUXL4/q2teymc07KXhvVkKclLktxNmsYwbtExKZdXA6GKg
+	8WAuqr4b+YCzITuKvD2mCq4pmOmnyMtZSmwNQWbKslT26Tq71tCJnczNTNtAKZC9M3ADKdMa7FH
+	mnjCO3CMA1s0bLx155N4suEM6vVkxmMCBGwpCfwwbXyVRpa493JvU7RdHkGXt9QtBQ5pgaYupft
+	208Layb3Pu0y8Nb/8XBipYkp5fGihj6Fq+/b6Gr2S8MCsr0iR//kZ6FTgXE6xI+4MrtnZInGTfq
+	/6vMJk/+spy9LrhFzPBP57YgjqGHPLeqR0rrZ7qal5XfQQUeeN9PYcLpxs+jPeqBwPlnsoy8BiS
+	sfkw8kr9FqxHwQMxMIlnb+13UxijDSA8dCH5ImYALWnXykWTsqEH2Ra
+X-Google-Smtp-Source: AGHT+IHNP2zSm0iR5tnsW6DxXVYzXMNKSGdfZXQAgP6iuwMkLSQncO5CWHZG+W8pqjtvzK10tU+k+Q==
+X-Received: by 2002:a17:902:e805:b0:27c:56af:88ea with SMTP id d9443c01a7336-2962ae93ffbmr14100715ad.60.1762298545481;
+        Tue, 04 Nov 2025 15:22:25 -0800 (PST)
+Received: from localhost (c-76-102-12-149.hsd1.ca.comcast.net. [76.102.12.149])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-296019729f4sm39075475ad.14.2025.11.04.15.22.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Nov 2025 15:22:24 -0800 (PST)
+Date: Tue, 4 Nov 2025 15:22:24 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, kuba@kernel.org,
+	davem@davemloft.net, razor@blackwall.org, pabeni@redhat.com,
+	willemb@google.com, sdf@fomichev.me, john.fastabend@gmail.com,
+	martin.lau@kernel.org, jordan@jrife.io,
+	maciej.fijalkowski@intel.com, magnus.karlsson@intel.com,
+	dw@davidwei.uk, toke@redhat.com, yangzhenze@bytedance.com,
+	wangdongdong.6@bytedance.com
+Subject: Re: [PATCH net-next v4 00/14] netkit: Support for io_uring zero-copy
+ and AF_XDP
+Message-ID: <aQqKsGDdeYQqA91s@mini-arch>
+References: <20251031212103.310683-1-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251104172652.1746988-1-ameryhung@gmail.com> <20251104172652.1746988-4-ameryhung@gmail.com>
-In-Reply-To: <20251104172652.1746988-4-ameryhung@gmail.com>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Tue, 4 Nov 2025 15:20:52 -0800
-X-Gm-Features: AWmQ_bnFMAv4_P7-6IwjR4ypBQRRR95KM2j6PVEm5pB5mFoNANk1D0MGj2M8CJY
-Message-ID: <CAEf4BzY+1PAE94PfoE=3VQVEYHWAiJP5btkx+u+UBjaZt_k==A@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v5 3/7] bpf: Pin associated struct_ops when
- registering async callback
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, tj@kernel.org, martin.lau@kernel.org, 
-	kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20251031212103.310683-1-daniel@iogearbox.net>
 
-On Tue, Nov 4, 2025 at 9:27=E2=80=AFAM Amery Hung <ameryhung@gmail.com> wro=
-te:
->
-> Take a refcount of the associated struct_ops map to prevent the map from
-> being freed when an async callback scheduled from a struct_ops program
-> runs.
->
-> Since struct_ops programs do not take refcounts on the struct_ops map,
-> it is possible for a struct_ops map to be freed when an async callback
-> scheduled from it runs. To prevent this, take a refcount on prog->aux->
-> st_ops_assoc and save it in a newly created struct bpf_async_res for
-> every async mechanism. The reference needs to be preserved in
-> bpf_async_res since prog->aux->st_ops_assoc can be poisoned anytime
-> and reference leak could happen.
->
-> bpf_async_res will contain a async callback's BPF program and resources
-> related to the BPF program. The resources will be acquired when
-> registering a callback and released when cancelled or when the map
-> associated with the callback is freed.
->
-> Also rename drop_prog_refcnt to bpf_async_cb_reset to better reflect
-> what it now does.
->
-> Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> ---
->  kernel/bpf/helpers.c | 105 +++++++++++++++++++++++++++++--------------
->  1 file changed, 72 insertions(+), 33 deletions(-)
->
-> diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
-> index 930e132f440f..5c081cd604d5 100644
-> --- a/kernel/bpf/helpers.c
-> +++ b/kernel/bpf/helpers.c
-> @@ -1092,9 +1092,14 @@ static void *map_key_from_value(struct bpf_map *ma=
-p, void *value, u32 *arr_idx)
->         return (void *)value - round_up(map->key_size, 8);
->  }
->
-> +struct bpf_async_res {
+On 10/31, Daniel Borkmann wrote:
+> Containers use virtual netdevs to route traffic from a physical netdev
+> in the host namespace. They do not have access to the physical netdev
+> in the host and thus can't use memory providers or AF_XDP that require
+> reconfiguring/restarting queues in the physical netdev.
+> 
+> This patchset adds the concept of queue peering to virtual netdevs that
+> allow containers to use memory providers and AF_XDP at native speed.
+> These mapped queues are bound to a real queue in a physical netdev and
+> act as a proxy.
+> 
+> Memory providers and AF_XDP operations takes an ifindex and queue id,
+> so containers would pass in an ifindex for a virtual netdev and a queue
+> id of a mapped queue, which then gets proxied to the underlying real
+> queue. Peered queues are created and bound to a real queue atomically
+> through a generic ynl netdev operation.
+> 
+> We have implemented support for this concept in netkit and tested the
+> latter against Nvidia ConnectX-6 (mlx5) as well as Broadcom BCM957504
+> (bnxt_en) 100G NICs. For more details see the individual patches.
+> 
+> v3->v4:
+>  - ndo_queue_create store dst queue via arg (Nikolay)
+>  - Small nits like a spelling issue + rev xmas (Nikolay)
+>  - admin-perm flag in bind-queue spec (Jakub)
+>  - Fix potential ABBA deadlock situation in bind (Jakub, Paolo, Stan)
+>  - Add a peer dev_tracker to not reuse the sysfs one (Jakub)
+>  - New patch (12/14) to handle the underlying device going away (Jakub)
+>  - Improve commit message on queue-get (Jakub)
+>  - Do not expose phys dev info from container on queue-get (Jakub)
+>  - Add netif_put_rx_queue_peer_locked to simplify code (Stan)
+>  - Rework xsk handling to simplify the code and drop a few patches
+>  - Rebase and retested everything with mlx5 + bnxt_en
 
-"res" has a strong "result" meaning, which is a distraction here.
-Maybe "bpf_async_ctx"? And then we can use prep and put (reset?)
-terminology?
-
-> +       struct bpf_prog *prog;
-> +       struct bpf_map *st_ops_assoc;
-> +};
-> +
->  struct bpf_async_cb {
->         struct bpf_map *map;
-> -       struct bpf_prog *prog;
-> +       struct bpf_async_res res;
->         void __rcu *callback_fn;
->         void *value;
->         union {
-> @@ -1299,8 +1304,8 @@ static int __bpf_async_init(struct bpf_async_kern *=
-async, struct bpf_map *map, u
->                 break;
->         }
->         cb->map =3D map;
-> -       cb->prog =3D NULL;
->         cb->flags =3D flags;
-> +       memset(&cb->res, 0, sizeof(cb->res));
->         rcu_assign_pointer(cb->callback_fn, NULL);
->
->         WRITE_ONCE(async->cb, cb);
-> @@ -1351,11 +1356,47 @@ static const struct bpf_func_proto bpf_timer_init=
-_proto =3D {
->         .arg3_type      =3D ARG_ANYTHING,
->  };
->
-> +static void bpf_async_res_put(struct bpf_async_res *res)
-> +{
-> +       bpf_prog_put(res->prog);
-> +
-> +       if (res->st_ops_assoc)
-> +               bpf_map_put(res->st_ops_assoc);
-> +}
-> +
-> +static int bpf_async_res_get(struct bpf_async_res *res, struct bpf_prog =
-*prog)
-> +{
-> +       struct bpf_map *st_ops_assoc =3D NULL;
-> +       int err;
-> +
-> +       prog =3D bpf_prog_inc_not_zero(prog);
-> +       if (IS_ERR(prog))
-> +               return PTR_ERR(prog);
-> +
-> +       st_ops_assoc =3D READ_ONCE(prog->aux->st_ops_assoc);
-
-I think in about a month we'll forget why we inc_not_zero only for
-STRUCT_OPS programs, so I'd add comment here that non-struct_ops
-programs have explicit refcount on st_ops_assoc, so as long as we have
-that inc_not_zero(prog) above, we don't need to also bump map refcount
-
-> +       if (prog->type =3D=3D BPF_PROG_TYPE_STRUCT_OPS &&
-> +           st_ops_assoc && st_ops_assoc !=3D BPF_PTR_POISON) {
-> +               st_ops_assoc =3D bpf_map_inc_not_zero(st_ops_assoc);
-> +               if (IS_ERR(st_ops_assoc)) {
-> +                       err =3D PTR_ERR(st_ops_assoc);
-> +                       goto put_prog;
-
-nit: might be a bit premature to structure code with goto put_prog. As of n=
-ow:
-
-
-bpf_prog_put(prog);
-return PTR_ERR(st_ops_assoc);
-
-is short and sweet and good enough?
-
-> +               }
-> +       }
-> +
-> +       res->prog =3D prog;
-> +       res->st_ops_assoc =3D st_ops_assoc;
-
-question: do we want to assign BPF_PTR_POISON to res->st_ops_assoc or
-is it better to keep it as NULL in such a case? I'm not sure, just
-bringing up the possibility
-
-> +       return 0;
-> +put_prog:
-> +       bpf_prog_put(prog);
-> +       return err;
-> +}
-> +
->  static int __bpf_async_set_callback(struct bpf_async_kern *async, void *=
-callback_fn,
->                                     struct bpf_prog_aux *aux, unsigned in=
-t flags,
->                                     enum bpf_async_type type)
->  {
->         struct bpf_prog *prev, *prog =3D aux->prog;
-> +       struct bpf_async_res res;
->         struct bpf_async_cb *cb;
->         int ret =3D 0;
->
-> @@ -1376,20 +1417,18 @@ static int __bpf_async_set_callback(struct bpf_as=
-ync_kern *async, void *callback
->                 ret =3D -EPERM;
->                 goto out;
->         }
-> -       prev =3D cb->prog;
-> +       prev =3D cb->res.prog;
->         if (prev !=3D prog) {
-> -               /* Bump prog refcnt once. Every bpf_timer_set_callback()
-> +               /* Get prog and related resources once. Every bpf_timer_s=
-et_callback()
->                  * can pick different callback_fn-s within the same prog.
->                  */
-> -               prog =3D bpf_prog_inc_not_zero(prog);
-> -               if (IS_ERR(prog)) {
-> -                       ret =3D PTR_ERR(prog);
-> +               ret =3D bpf_async_res_get(&res, prog);
-> +               if (ret)
->                         goto out;
-> -               }
->                 if (prev)
-> -                       /* Drop prev prog refcnt when swapping with new p=
-rog */
-> -                       bpf_prog_put(prev);
-> -               cb->prog =3D prog;
-> +                       /* Put prev prog and related resources when swapp=
-ing with new prog */
-> +                       bpf_async_res_put(&cb->res);
-> +               cb->res =3D res;
->         }
-
-we discussed this offline, but I'll summarize here:
-
-I think we need to abstract this away as bpf_async_ctx_update(), which
-will accept a new prog pointer, and internally will deal with
-necessary ref count inc/put as necessary, depending on whether prog
-changed or not. With st_ops_assoc, prog pointer may not change, but
-the underlying st_ops_assoc might (it can go from NULL to valid
-assoc). And the implementation will be careful to leave previous async
-ctx as it was if anything goes wrong (just like existing code
-behaves).
-
->         rcu_assign_pointer(cb->callback_fn, callback_fn);
->  out:
-> @@ -1423,7 +1462,7 @@ BPF_CALL_3(bpf_timer_start, struct bpf_async_kern *=
-, timer, u64, nsecs, u64, fla
->                 return -EINVAL;
->         __bpf_spin_lock_irqsave(&timer->lock);
->         t =3D timer->timer;
-> -       if (!t || !t->cb.prog) {
-> +       if (!t || !t->cb.res.prog) {
->                 ret =3D -EINVAL;
->                 goto out;
->         }
-> @@ -1451,14 +1490,14 @@ static const struct bpf_func_proto bpf_timer_star=
-t_proto =3D {
->         .arg3_type      =3D ARG_ANYTHING,
->  };
->
-> -static void drop_prog_refcnt(struct bpf_async_cb *async)
-> +static void bpf_async_cb_reset(struct bpf_async_cb *cb)
->  {
-> -       struct bpf_prog *prog =3D async->prog;
-> +       struct bpf_prog *prog =3D cb->res.prog;
->
->         if (prog) {
-> -               bpf_prog_put(prog);
-> -               async->prog =3D NULL;
-> -               rcu_assign_pointer(async->callback_fn, NULL);
-> +               bpf_async_res_put(&cb->res);
-> +               memset(&cb->res, 0, sizeof(cb->res));
-
-shouldn't bpf_async_res_put() leave cb->res in zeroed out state? why
-extra memset(0)?
-
-> +               rcu_assign_pointer(cb->callback_fn, NULL);
->         }
->  }
->
-
-[...]
+I mostly looked at patches 1-8 and they look good to me. Will it be
+possible to put your sample runs from 13 and 14 into a selftest form? Even
+if you require real hw, that should be doable, similar to
+tools/testing/selftests/drivers/net/hw/devmem.py, right?
 
