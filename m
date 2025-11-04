@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-235342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5ED73C2EC1B
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 02:31:44 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BEB1C2ED2F
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 02:40:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDCF2189B4C0
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 01:31:49 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 280E9346A15
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 01:40:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F046122D7B0;
-	Tue,  4 Nov 2025 01:30:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87EB72264BB;
+	Tue,  4 Nov 2025 01:40:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SlriV+fl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="po5OyuyF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8E2D22B8CB;
-	Tue,  4 Nov 2025 01:30:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F89A219E8D;
+	Tue,  4 Nov 2025 01:40:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762219844; cv=none; b=a0WxkimR0PM/qlzYArlZtNbQXj2Q3XljGjFvJN6iH234uXnpMocIPs4J859+IpLhn9qRT6UffvelE/8396mc0w2twy2zuXnXe0P1L5G8bv57t82e5zEOiRYKCVf/YX7DCy/QZW6I7KQ6dyeZoPQnM0v+9m+oEr8OHmX4Bw94GIo=
+	t=1762220442; cv=none; b=VdubnsE/jql2D76c/TplvmqEwMKQW+VoRgi1VG32vnG4Sm6mDNPJEYtVMuz0gASUsBL+1/8MVxwve5BtmbgUHAZH6s1TMq8Ah7wBJ1B7pGQMZLXNoZwqOvYaODeo/AwXCbz+KS7lWu75MBJhc0Ts/MRJtHhWeSKgucvQeHchdVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762219844; c=relaxed/simple;
-	bh=3J1Rb8Iwm7Bi3wu+yp/VgP+Ys1fBv/l3I3gQyVTtQqk=;
+	s=arc-20240116; t=1762220442; c=relaxed/simple;
+	bh=VJ2F9710N8l9Zd8t0xRKF/S4f0Ehk5s7Di7kmYu+X60=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ZnLPwmxDitvXhQds+zWohHxOnl+IRveX4iBlcKuIeagxLdOPyYTol3AdYld+eT2nkk10ptcKKKUO1dyXS65/ZL1EkL4QGgvx39ZpdXQJzK2VOiNXaQchS6TVLuAX8CJcU1pDKAgf1+iJCOo0hgqU7LNRdsTrVivjthAjW66M8A0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SlriV+fl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64479C116C6;
-	Tue,  4 Nov 2025 01:30:44 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=feKaEe+OjZdhfzMLOB15hxUzkPqor3MxHlVHOHYA85iISadJ+rjhkUHY9YdtIeG4CCxzSs3mvA4kQBgB1aTljrpFPlGdsHOFFmZZYCm9E+bmHDCsPwkX7Sdb1CjlOFcL9TpII+LHF8mo55aN3zSIog5yPHs4Kn3PYCs9z2ClMNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=po5OyuyF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE63FC4CEE7;
+	Tue,  4 Nov 2025 01:40:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762219844;
-	bh=3J1Rb8Iwm7Bi3wu+yp/VgP+Ys1fBv/l3I3gQyVTtQqk=;
+	s=k20201202; t=1762220441;
+	bh=VJ2F9710N8l9Zd8t0xRKF/S4f0Ehk5s7Di7kmYu+X60=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=SlriV+fli9f1GAKr0rpGWQnr7HKdG+lsLU+/DExX0yjtJD2hHU+GVAl1WND3gfIUt
-	 dIxu8c1DEfn5hoeJvi/mR0q4EjGgWBYQfV0rod+q5f5R7rjj/rZT+qNkFQexDt1WeG
-	 500ooYtvROqcPoqu1zLyASnR8GlukNi80jXovDe4XpdDjylJJ221E500NOvH8URH9e
-	 9i8je0eSRw/XJUl/omkcVQmJQ1/vpVB+Yoh5514k1I+M3y0p0petg/Wuje6tmogDpz
-	 wbV/+Jgy0ptB8ieYrJghapD3cbA1JkOpMvwo1jbUreqGP5SIHTnuIdQeNLVG8c95jA
-	 pFqsp/Usm4JWA==
+	b=po5OyuyFGBjPDMOOGtgNqhCJ+aILDuOqrzw0f+f47ozjmWoS/3zQTiwCQ8TrUdp0o
+	 ryA1ReymuLrn+QOpFL9YkUCTXs0BC8J05DoZgbJlYxlry8FuwMP2cUx4WDtFcfw1gr
+	 HqELcKMgOSB3KvLT/YenNo6T7sdvDPydawnOjnw7nUSBRLnIJ/qEC9jSF8VomST6m0
+	 RMVanrVmrOYRx2q4vskpJD/1qjThBw3+l2v+64ymKoRTgfqyB4C012lBiP2LAjPmvA
+	 hB2iy1OtKATm7J4CihbAxToddUj8Bb6MoOp7e6V2cF5YEPD2PASsOBw4Ixp7I0l78k
+	 T2iXqdO4U71oQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAE033809A8A;
-	Tue,  4 Nov 2025 01:30:19 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D853809A8A;
+	Tue,  4 Nov 2025 01:40:17 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: phy: realtek: add interrupt support for
- RTL8221B
+Subject: Re: [PATCH net] octeontx2-pf: Fix devm_kcalloc() error checking
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176221981849.2281445.7129169862335846863.git-patchwork-notify@kernel.org>
-Date: Tue, 04 Nov 2025 01:30:18 +0000
-References: <20251102152644.1676482-1-olek2@wp.pl>
-In-Reply-To: <20251102152644.1676482-1-olek2@wp.pl>
-To: Aleksander Jan Bajkowski <olek2@wp.pl>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- michael@fossekall.de, daniel.braunwarth@kuka.com, rmk+kernel@armlinux.org.uk,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, zhaojh329@gmail.com
+ <176222041599.2285814.11616778386384057545.git-patchwork-notify@kernel.org>
+Date: Tue, 04 Nov 2025 01:40:15 +0000
+References: <aQYKkrGA12REb2sj@stanley.mountain>
+In-Reply-To: <aQYKkrGA12REb2sj@stanley.mountain>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: sumang@marvell.com, sgoutham@marvell.com, gakula@marvell.com,
+ sbhatta@marvell.com, hkelam@marvell.com, bbhushan2@marvell.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
+ hawk@kernel.org, john.fastabend@gmail.com, sdf@fomichev.me,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ kernel-janitors@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sun,  2 Nov 2025 16:26:37 +0100 you wrote:
-> From: Jianhui Zhao <zhaojh329@gmail.com>
+On Sat, 1 Nov 2025 16:26:42 +0300 you wrote:
+> The devm_kcalloc() function never return error pointers, it returns NULL
+> on failure.  Also delete the netdev_err() printk.  These allocation
+> functions already have debug output built-in some the extra error message
+> is not required.
 > 
-> This commit introduces interrupt support for RTL8221B (C45 mode).
-> Interrupts are mapped on the VEND2 page. VEND2 registers are only
-> accessible via C45 reads and cannot be accessed by C45 over C22.
-> 
-> Signed-off-by: Jianhui Zhao <zhaojh329@gmail.com>
-> [Enable only link state change interrupts]
-> Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+> Fixes: efabce290151 ("octeontx2-pf: AF_XDP zero copy receive support")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: phy: realtek: add interrupt support for RTL8221B
-    https://git.kernel.org/netdev/net-next/c/18aa36238a4d
+  - [net] octeontx2-pf: Fix devm_kcalloc() error checking
+    https://git.kernel.org/netdev/net/c/2e25935ed24d
 
 You are awesome, thank you!
 -- 
