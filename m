@@ -1,121 +1,211 @@
-Return-Path: <netdev+bounces-235546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235548-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1189DC32509
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 18:24:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 556E9C32598
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 18:31:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5E913B2A8A
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 17:24:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9250F1895537
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 17:27:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3EEB33890D;
-	Tue,  4 Nov 2025 17:23:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CC443314B8;
+	Tue,  4 Nov 2025 17:26:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ehA3ziy6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zax35KqU"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 101FA3314B8;
-	Tue,  4 Nov 2025 17:23:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD4E02D73BA
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 17:26:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762277034; cv=none; b=SctrkF/QRrkMmXRunniW09aVYNFoZZHDM1enw3R6h7awS7x2tqiFfCj4Pxrl1vBfU7uA9h1Ix4hof9nqryzR7NujGd3v10jslKzXxnq+NOmWdZ2hpFCt8DR2CMpv7ekKYFurhhjj/8H8bAKIYXOXWfOU0aDWsaJvVdDSN4KMRh8=
+	t=1762277218; cv=none; b=GkscmMznHcJtKVtj3h231Yc2qWc7IA524AnUetfi+TP0F9kEHNap/m8vkGGXhe6QV/o5WF6zpHQFfdpV3IZGybL6plZxayyIqktZNXlR3u0nUy0pvOLeokNS+Fyccgc2rX4JerrSXVUoNIv4tUA25ngUv5ddKVBhs4J1aK7iaxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762277034; c=relaxed/simple;
-	bh=pD2MQW5E9wBLde0Da2d1YqABTFktIUAkDgBpg3i3akg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hDFmF2Px/IixUH2wDe06S3ehMn2QsZb1exID0nfj2iiH3ZSDG2p4xUBxzA3UuTPovRPjvtV8nkAcoNU1u0460x9ZeArkZUqbcO3GnTHPw0v6KgzyM3KWfatGrAvKE9Qulwer02VS2COlHQ3uzBTVz6aCA7yss/cOryABOssGlNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ehA3ziy6; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=uoB88gePyn7EykNE2T4YKlK7EtZuZ8kWw0N1UXqrqGY=; b=ehA3ziy6OlYUSzUiWgGRLKiB0E
-	jH6vg56AYNS4IhQjblWh2RxaCW/QLTx4ARSYwhJzWZYSCe0RfYtu3Zf7Eo+8BzpeUCIZCchENpv7Y
-	Z8UCP0o3CX49+ZvSlH3jBi5NQuq/17YafJGRQOwthLrnQSi7m0NR+98TbJEVpl2FRdfaxvz/a72Ln
-	h7KkERJBIlkoDo6e6sYMthLPRELf6DpS46FV2gzEJosWPeAzm/0UkrprZ+XYxOWXABGyX+zV9RTZM
-	gAZuO96Dk6lo/NdFA4w+lXE9xd1T60DXpTqE8mt3tWCPY8URi89z8OqaiVapLMsBvo9CwhdAdMgkC
-	nqyVnJIg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47338)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vGKkr-000000002Sk-22Em;
-	Tue, 04 Nov 2025 17:23:37 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vGKkp-000000004vh-2pAY;
-	Tue, 04 Nov 2025 17:23:35 +0000
-Date: Tue, 4 Nov 2025 17:23:35 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Yao Zi <ziyao@disroot.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Yanteng Si <si.yanteng@linux.dev>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Philipp Stanner <phasta@kernel.org>,
-	Tiezhu Yang <yangtiezhu@loongson.cn>,
-	Qunqin Zhao <zhaoqunqin@loongson.cn>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Furong Xu <0x1207@gmail.com>,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 3/3] net: stmmac: pci: Use generic PCI
- suspend/resume routines
-Message-ID: <aQo2l-E9Z0tTJKlb@shell.armlinux.org.uk>
-References: <20251104151647.3125-1-ziyao@disroot.org>
- <20251104151647.3125-4-ziyao@disroot.org>
+	s=arc-20240116; t=1762277218; c=relaxed/simple;
+	bh=Wevo2Y4OmrLXFTmuAJOHd+4d+3TkpCLlFEfPIh3FzEw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Pcw56H0keQRr0f7KEBV9kYbTZdgan6iSCumaNUs9cY6beFBe7g598/9NT8shfVvWpglfn+TkWx8g+2BTEN5Eueiujf3mVLk291zjyGQQM3sVdcgrVKjLLoFVRXMPbfSLzBM5p6RgeATu7h5/4uZRu7L2gmazOW/QvgYUmSvnSd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zax35KqU; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-33be037cf73so5993728a91.2
+        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 09:26:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762277216; x=1762882016; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JSh4mlRZT0Y24WMccxIDboDo6bfkByxubsl31YznsC4=;
+        b=Zax35KqUsSCTmAmObdHYRkgYSP9cY6kqOEb7JSdAV7XHi6GITegAyLr1cSSbt2SfFG
+         rHBwWXhWBTwhfOs6DZRr10ZOldPXQffeQT4VGeRASWhxjxFNGIKf5jOvUGIOgVuzibgg
+         pTUhEtSoxE3hVLKGJGXY/965Z7b5+/9SA8yk09g726v/srpD11ifot9MkKO2ybRvuPRi
+         u7c8OvqmJW4oba2dRAYI13Kh5juI8ajPlJxc4px55vMem96CP4vd8Lpp944GEhHkX11l
+         MFrZLOCy7/IN1xMxDQWGqTc1WHIk5uCW6n/uVCv2VjdKVoivhdWFyVqVh5iSdjjAhvxk
+         mZ4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762277216; x=1762882016;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JSh4mlRZT0Y24WMccxIDboDo6bfkByxubsl31YznsC4=;
+        b=mdRf/ms6H0OAE0/ci5D9TdboeIWk84U6Ly4Gdg8KrgWyaavIJjwSAVZ7X62w3kSW2k
+         2cY4y5zmJ9AzfMeD3GJpDdrv2Rh0CPI5+AjJ2oqUe+AP4aLB1nkcWVclDc9QHTYZn3gl
+         2dScKIfbxPY/fvIy5zegNFqpWdbz8n8I+AwMd0D6R3QUWNyRBoS7yes4WUAFIs7gKYmk
+         ajytb79Nrr6z2HMEB8C7J94RKtP639Hz65KFBN8b8ENMcpiRYdPvN68ZwM+Xhadx32PG
+         CSVPUU8GBEu8i/YmmGzawV/PkQsE1cKM97TLtItoPVfdCyBYIm7ghDdjFqL8MreHRPag
+         hDDw==
+X-Gm-Message-State: AOJu0YwBz3v4V3rnrRVPZrU9F/u8pzEblPTxGf3Bm5cQLktKNwNJihUL
+	SPEo8NEGVhYilqCUdcIhiazrL4PXbT0ZnngMm62WwAqXliYuPxktrDcBR5SThQ==
+X-Gm-Gg: ASbGncvdL0/tT9IsQJyZlLqLjgsFQJQ6AWO8Iups1xDjQJF9/P6jrP+Vxer06ZjiJlJ
+	Mpie/dLJHcr7660mVNmbwxtKY4z0Zr5l6w3HH3RTK8CDInBS77HOtrpgnTRnlsS/txO1JdhOmLv
+	p0Hk+tSSHyUMl8Esdm+/6ggWxo0Ipj6l3Y+jbi1zrap0vYDj2Qq3z9eUq6OuFJL6UjcwEJKBe/9
+	dYQ6G7bet4AMkyNIO1qWvesml4dWiHS49LycuKvrq5rAtNtF0amUkBReaolmgnGi5exEWlONc5c
+	1XGDT52lQ/HqAOZlFUOiahJ3xoAKBkmyJieLFz9BUdVnr+ZE+hEx3x5kbHOYx39HtwruYbthPTh
+	QXxBBqqjlC2cy7N2BPSZ9NkSTFaJxE3ODIXO+O80/3kEhScHik8UxIAp9EwnQbM5QC1Q=
+X-Google-Smtp-Source: AGHT+IFw2guSVLHKtwMI2ykXFRrbGXDUlz5eJAzpQePpdyOsYuNehk5p+cRdkY2/ZbSoIywZBVXbbA==
+X-Received: by 2002:a17:903:1ce:b0:292:dca8:c140 with SMTP id d9443c01a7336-2962adb9205mr5441665ad.44.1762277215727;
+        Tue, 04 Nov 2025 09:26:55 -0800 (PST)
+Received: from localhost ([2a03:2880:ff:51::])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29601a3a80esm33281995ad.73.2025.11.04.09.26.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Nov 2025 09:26:55 -0800 (PST)
+From: Amery Hung <ameryhung@gmail.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	alexei.starovoitov@gmail.com,
+	andrii@kernel.org,
+	daniel@iogearbox.net,
+	tj@kernel.org,
+	martin.lau@kernel.org,
+	ameryhung@gmail.com,
+	kernel-team@meta.com
+Subject: [PATCH bpf-next v5 0/7] Support associating BPF programs with struct_ops
+Date: Tue,  4 Nov 2025 09:26:45 -0800
+Message-ID: <20251104172652.1746988-1-ameryhung@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251104151647.3125-4-ziyao@disroot.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 04, 2025 at 03:16:47PM +0000, Yao Zi wrote:
-> Convert STMMAC PCI glue driver to use the generic platform
-> suspend/resume routines for PCI controllers, instead of implementing its
-> own one.
-> 
-> Signed-off-by: Yao Zi <ziyao@disroot.org>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/Kconfig   |  5 +--
->  .../net/ethernet/stmicro/stmmac/stmmac_pci.c  | 36 ++-----------------
->  2 files changed, 6 insertions(+), 35 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> index 7ec7c7630c41..59aa04e71aab 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> +++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> @@ -378,8 +378,6 @@ config DWMAC_LOONGSON
->  	  This selects the LOONGSON PCI bus support for the stmmac driver,
->  	  Support for ethernet controller on Loongson-2K1000 SoC and LS7A1000 bridge.
->  
-> -endif
-> -
->  config STMMAC_PCI
->  	tristate "STMMAC PCI bus support"
->  	depends on STMMAC_ETH && PCI
+v4 -> v5
+   - Simplify the API for getting associated struct_ops and dont't
+     expose struct_ops map lifecycle management (Andrii, Alexei)
+   Link: https://lore.kernel.org/bpf/20251024212914.1474337-1-ameryhung@gmail.com/
 
-As per patch 2, this line can be removed.
+v3 -> v4
+   - Fix potential dangling pointer in timer callback. Protect
+     st_ops_assoc with RCU. The get helper now needs to be paired with
+     bpf_struct_ops_put()
+   - The command should only increase refcount once for a program
+     (Andrii)
+   - Test a struct_ops program reused in two struct_ops maps
+   - Test getting associated struct_ops in timer callback
+   Link: https://lore.kernel.org/bpf/20251017215627.722338-1-ameryhung@gmail.com/
 
-Otherwise, looks good, thanks.
+v2 -> v3
+   - Change the type of st_ops_assoc from void* (i.e., kdata) to bpf_map
+     (Andrii)
+   - Fix a bug that clears BPF_PTR_POISON when a struct_ops map is freed
+     (Andrii)
+   - Return NULL if the map is not fully initialized (Martin)
+   - Move struct_ops map refcount inc/dec into internal helpers (Martin)
+   - Add libbpf API, bpf_program__assoc_struct_ops (Andrii)
+   Link: https://lore.kernel.org/bpf/20251016204503.3203690-1-ameryhung@gmail.com/
+
+v1 -> v2
+   - Poison st_ops_assoc when reusing the program in more than one
+     struct_ops maps and add a helper to access the pointer (Andrii)
+   - Minor style and naming changes (Andrii)
+   Link: https://lore.kernel.org/bpf/20251010174953.2884682-1-ameryhung@gmail.com/
+
+---
+
+Hi,
+
+This patchset adds a new BPF command BPF_PROG_ASSOC_STRUCT_OPS to
+the bpf() syscall to allow associating a BPF program with a struct_ops.
+The command is introduced to address a emerging need from struct_ops
+users. As the number of subsystems adopting struct_ops grows, more
+users are building their struct_ops-based solution with some help from
+other BPF programs. For exmample, scx_layer uses a syscall program as
+a user space trigger to refresh layers [0]. It also uses tracing program
+to infer whether a task is using GPU and needs to be prioritized [1]. In
+these use cases, when there are multiple struct_ops instances, the
+struct_ops kfuncs called from different BPF programs, whether struct_ops
+or not needs to be able to refer to a specific one, which currently is
+not possible.
+
+The new BPF command will allow users to explicitly associate a BPF
+program with a struct_ops map. The libbpf wrapper can be called after
+loading programs and before attaching programs and struct_ops.
+
+Internally, it will set prog->aux->st_ops_assoc to the struct_ops
+map. struct_ops kfuncs can then get the associated struct_ops struct
+by calling bpf_prog_get_assoc_struct_ops() with prog->aux, which can
+be acquired from a "__prog" argument. The value of the speical
+argument will be fixed up by the verifier during verification.
+
+The command conceptually associates the implementation of BPF programs
+with struct_ops map, not the attachment. A program associated with the
+map will take a refcount of it so that st_ops_assoc always points to a
+valid struct_ops struct. struct_ops implementers can use the helper,
+bpf_prog_get_assoc_struct_ops to get the pointer. The returned
+struct_ops if not NULL is guaranteed to be valid and initialized.
+However, it is not guarantted that the struct_ops is attached. The
+struct_ops implementer still need to take stepis to track and check the
+state of the struct_ops in kdata, if the use case demand the struct_ops
+to be attached.
+
+We can also consider support associating struct_ops link with BPF
+programs, which on one hand make struct_ops implementer's job easier,
+but might complicate libbpf workflow and does not apply to legacy
+struct_ops attachment.
+
+[0] https://github.com/sched-ext/scx/blob/main/scheds/rust/scx_layered/src/bpf/main.bpf.c#L557
+[1] https://github.com/sched-ext/scx/blob/main/scheds/rust/scx_layered/src/bpf/main.bpf.c#L754
+
+---
+
+Amery Hung (7):
+  bpf: Allow verifier to fixup kernel module kfuncs
+  bpf: Support associating BPF program with struct_ops
+  bpf: Pin associated struct_ops when registering async callback
+  libbpf: Add support for associating BPF program with struct_ops
+  selftests/bpf: Test BPF_PROG_ASSOC_STRUCT_OPS command
+  selftests/bpf: Test ambiguous associated struct_ops
+  selftests/bpf: Test getting associated struct_ops in timer callback
+
+ include/linux/bpf.h                           |  16 ++
+ include/uapi/linux/bpf.h                      |  17 ++
+ kernel/bpf/bpf_struct_ops.c                   |  90 ++++++++
+ kernel/bpf/core.c                             |   3 +
+ kernel/bpf/helpers.c                          | 105 +++++++---
+ kernel/bpf/syscall.c                          |  46 +++++
+ kernel/bpf/verifier.c                         |   3 +-
+ tools/include/uapi/linux/bpf.h                |  17 ++
+ tools/lib/bpf/bpf.c                           |  19 ++
+ tools/lib/bpf/bpf.h                           |  21 ++
+ tools/lib/bpf/libbpf.c                        |  30 +++
+ tools/lib/bpf/libbpf.h                        |  16 ++
+ tools/lib/bpf/libbpf.map                      |   2 +
+ .../bpf/prog_tests/test_struct_ops_assoc.c    | 194 ++++++++++++++++++
+ .../selftests/bpf/progs/struct_ops_assoc.c    | 105 ++++++++++
+ .../bpf/progs/struct_ops_assoc_in_timer.c     |  77 +++++++
+ .../bpf/progs/struct_ops_assoc_reuse.c        |  75 +++++++
+ .../selftests/bpf/test_kmods/bpf_testmod.c    |  17 ++
+ .../bpf/test_kmods/bpf_testmod_kfunc.h        |   1 +
+ 19 files changed, 819 insertions(+), 35 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/test_struct_ops_assoc.c
+ create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_assoc.c
+ create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_assoc_in_timer.c
+ create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_assoc_reuse.c
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.47.3
+
 
