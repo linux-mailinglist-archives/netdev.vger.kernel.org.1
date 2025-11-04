@@ -1,137 +1,118 @@
-Return-Path: <netdev+bounces-235371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89B2CC2F6FE
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 07:24:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 290D0C2F7FE
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 07:51:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4EB3D4E34CD
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 06:24:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B41C0420DB1
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 06:51:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 539F92882D7;
-	Tue,  4 Nov 2025 06:24:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A90B22DCF6B;
+	Tue,  4 Nov 2025 06:50:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 171A1134AB;
-	Tue,  4 Nov 2025 06:24:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
+Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C74C42C11EC;
+	Tue,  4 Nov 2025 06:50:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762237490; cv=none; b=fhoOUaREosvXoZygKE5ryc+hVvQhgk/KUt0xJQWEaYrfvMwAFONFV7iVskqN/qz21B1os/M3xnD0WM/0O+2c89/bfoazdSIdQyT3fQSadiOBaTQN4J1M1+HqWxoF8CCQBZ7EhyXhGJA1Oaj7qWGdDIPXrtWhtdDxHLqjSueKv/8=
+	t=1762239019; cv=none; b=MQnJ7wM8qYLc+91FfHk0Gt2ZXbqmb0YnYuj3CQPmoYoLpjnE59KAwnto1YK0UDT4DhltUcuXne47LMHpqRlsPocQb62C7fRvINNUB5kZSLTHOsjh36Njoo3maKu2XDqvf4g0UUpa6jmK7hEqtLOFVHYpXiGyx4gmx/Vqa20BrB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762237490; c=relaxed/simple;
-	bh=tYpzbT/wfMGLJ4os1wVIq0G5gJ6HXjCgb3QHvkwYIbE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZyJMnoFm1tTnWeNXUe/YDRSppETTWqn9qofcFFx843ajgrP7J3t7lg/keaHpkGNnu6ejc7r1wD0LRnjs+TL5hvX0fH+4MokLeDp8KOZZKZ8OnqILjbs+F/UIp/BGaeDFtXPrYyyR74qY3gmzOWU83US2H6fv8OhnJg8cTdb6F3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.254.200.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: esmtpsz10t1762237419tde1b639e
-X-QQ-Originating-IP: +ovJgyhgyINWp1J5Qt/R08DyncU/TOt9fJW7kiU7MmM=
-Received: from w-MS-7E16.trustnetic.com ( [125.120.71.67])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 04 Nov 2025 14:23:32 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 18246504412053202586
-EX-QQ-RecipientCnt: 10
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: netdev@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Jiawen Wu <jiawenwu@trustnetic.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net] net: libwx: fix device bus LAN ID
-Date: Tue,  4 Nov 2025 14:23:21 +0800
-Message-ID: <B60A670C1F52CB8E+20251104062321.40059-1-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1762239019; c=relaxed/simple;
+	bh=3590HN+g5RX4oDq7ek2ZvmoAVN56lGJ+5FZuZi6407o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kW2XswtUPrcQN2Y1Sel8Plu9u62JxfvCHgRcVNCB50mJCy1isGYdOjhdHqVN5f7MIrHzc9/vOTjkKv4XdG8S5nejIjv+j2TjFCvj0s4edQCyAdQ7FdrV6Ykf+z66p0CJ4SdqJbfH79YOo7KorwUbMp9hmaWW164haV5HqDbeQDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
+	by localhost (Postfix) with ESMTP id 4d0zMS3Cgtz9sSm;
+	Tue,  4 Nov 2025 07:39:32 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id JVa3bC_JehNO; Tue,  4 Nov 2025 07:39:32 +0100 (CET)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4d0zMS2Q1Zz9sSj;
+	Tue,  4 Nov 2025 07:39:32 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 409D08B76C;
+	Tue,  4 Nov 2025 07:39:32 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id CzfwR0aRXjyU; Tue,  4 Nov 2025 07:39:32 +0100 (CET)
+Received: from [192.168.235.99] (unknown [192.168.235.99])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id AD5B78B763;
+	Tue,  4 Nov 2025 07:39:30 +0100 (CET)
+Message-ID: <01d89f24-8fca-4fc3-9f48-79e28b9663db@csgroup.eu>
+Date: Tue, 4 Nov 2025 07:39:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 03/10] uaccess: Add
+ masked_user_{read/write}_access_begin
+To: Thomas Gleixner <tglx@linutronix.de>,
+ Alexander Viro <viro@zeniv.linux.org.uk>,
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
+ Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+ Darren Hart <dvhart@infradead.org>, Davidlohr Bueso <dave@stgolabs.net>,
+ Andre Almeida <andrealmeid@igalia.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Eric Dumazet
+ <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Madhavan Srinivasan <maddy@linux.ibm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>
+Cc: linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org
+References: <cover.1760529207.git.christophe.leroy@csgroup.eu>
+ <a4ef0a8e1659805c60fafc8d3b073ecd08117241.1760529207.git.christophe.leroy@csgroup.eu>
+ <87bjlyyiii.ffs@tglx>
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+Content-Language: fr-FR
+In-Reply-To: <87bjlyyiii.ffs@tglx>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: esmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: N/EN6P+BmEaf/8NNAZVY+Fufyzk+Y2KQmpSYrQVSqJHr+UrSqGXRpzNC
-	gbZ98Plz2evUsn3PDsBKGL9OeTFdPgpJ7tTWhGLO1ZzKYUszErO0LT2j1RICuZQ+joL+1aH
-	6vCZ5orilEY5Zz+M7aeTfUAqnkwG059I4HJ9u1Zxn22zP0G9j3bhs7LnO7J22CUuq/LX8pT
-	zf1bGBXrul851WpHZ+KLoXU+AcqXvZtjec5dM/M5FaNZXj6zEPJKcCErWN5TPgScktieBmO
-	LJeJWsBDEistHxkvajyBdP+RTzpeTTXL/vdDqAQ7/ZzCk6St8XFSxyJJ8+VdDjFWZgGkRqN
-	oOjQbYk2cIG8l7oDLfXsW1DkZzuDmACXFJUAfx58JYlXVPhVYq6KZ8hxvJxzSuXGwMRDl3X
-	OYo2qAW40bl/u+eN6e4RazRi8nMjdANynyS2FfWYTAQ/aYuFQznTIN/vfM8tyhRkmppoUPi
-	c+ZPjZbN7pnvt7Y8ZuywmGaE4HuesEMZcf7COBZUgepeW2iJ+DI939LswAn2piyMbV30Xwt
-	lgPJm7XzEQju9Tk7dOFvpZRmI/pNaQ9QaxZxDJ2cf/n6jRGCT5bHqG4OEy4HrkF7+3fgC+Q
-	vFHVKc3o8ajgBCOLAaLOZ19SVzspErRAXhn+4gJPYpJA1OoLh5JCwWpBEPI0UkvnpI7lXLY
-	XR4vC2J6RtNFBM2JOH4rngmENnykYK7uI12oPMs2hP1l0iXcuJUqZe/Ppm6ptX4PUVnUedl
-	7qiUg38XQN3tfyN/pEOP7X3UJcazpZAndZj+PqRdQEWneY0vMUBPJxHWl4zqCGAmzGK5TZa
-	O3qj43qDhyJmzgj/eZSW8uCDmvX36EojREaEwbAVr7sucT/gyjHfrjN1TjJ1Kxdu0VjE4SH
-	ZkqWtdaf/0vlMXws7avcI5Sh3LLVTdWezTKwrqcV+/x34gy5hwHc+QRvEhn1EP6lIheE9kj
-	kHvmJHwNi6Ta0xKWqeh3YbuRp1QHy37QLYSPocE83eDNvXsRbIwZQ94+FXQIZ8+1g+dvRIn
-	5hB0i4qbXwHvqkDEkLNNvO0JgO5Sn4Cc3fnnFGFg==
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
-X-QQ-RECHKSPAM: 0
 
-The device bus LAN ID was obtained from PCI_FUNC(), but when a PF
-port is passthrough to a virtual machine, the function number may not
-match the actual port index on the device. This could cause the driver
-to perform operations such as LAN reset on the wrong port.
 
-Fix this by reading the LAN ID from port status register.
 
-Fixes: a34b3e6ed8fb ("net: txgbe: Store PCI info")
-Cc: stable@vger.kernel.org
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
----
- drivers/net/ethernet/wangxun/libwx/wx_hw.c   | 3 ++-
- drivers/net/ethernet/wangxun/libwx/wx_type.h | 4 ++--
- 2 files changed, 4 insertions(+), 3 deletions(-)
+Le 22/10/2025 à 19:05, Thomas Gleixner a écrit :
+> On Fri, Oct 17 2025 at 12:20, Christophe Leroy wrote:
+>> Allthough masked_user_access_begin() is to only be used when reading
+>> data from user at the moment, introduce masked_user_read_access_begin()
+>> and masked_user_write_access_begin() in order to match
+>> user_read_access_begin() and user_write_access_begin().
+>>
+>> That means masked_user_read_access_begin() is used when user memory is
+>> exclusively read during the window, masked_user_write_access_begin()
+>> is used when user memory is exclusively writen during the window,
+>> masked_user_access_begin() remains and is used when both reads and
+>> writes are performed during the open window. Each of them is expected
+>> to be terminated by the matching user_read_access_end(),
+>> user_write_access_end() and user_access_end().
+>>
+>> Have them default to masked_user_access_begin() when they are
+>> not defined.
+>>
+>> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+> 
+> Can we please coordinate on that vs. the scoped_access() work as this
+> nicely collides all over the place?
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-index 814164459707..58b8300e3d2c 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-@@ -2480,7 +2480,8 @@ int wx_sw_init(struct wx *wx)
- 	wx->oem_svid = pdev->subsystem_vendor;
- 	wx->oem_ssid = pdev->subsystem_device;
- 	wx->bus.device = PCI_SLOT(pdev->devfn);
--	wx->bus.func = PCI_FUNC(pdev->devfn);
-+	wx->bus.func = FIELD_GET(WX_CFG_PORT_ST_LANID,
-+				 rd32(wx, WX_CFG_PORT_ST));
- 
- 	if (wx->oem_svid == PCI_VENDOR_ID_WANGXUN ||
- 	    pdev->is_virtfn) {
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index d0cbcded1dd4..b1a6ef5709a9 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -102,6 +102,8 @@
- #define WX_CFG_PORT_CTL_DRV_LOAD     BIT(3)
- #define WX_CFG_PORT_CTL_QINQ         BIT(2)
- #define WX_CFG_PORT_CTL_D_VLAN       BIT(0) /* double vlan*/
-+#define WX_CFG_PORT_ST               0x14404
-+#define WX_CFG_PORT_ST_LANID         GENMASK(9, 8)
- #define WX_CFG_TAG_TPID(_i)          (0x14430 + ((_i) * 4))
- #define WX_CFG_PORT_CTL_NUM_VT_MASK  GENMASK(13, 12) /* number of TVs */
- 
-@@ -564,8 +566,6 @@ enum WX_MSCA_CMD_value {
- #define TXD_USE_COUNT(S)     DIV_ROUND_UP((S), WX_MAX_DATA_PER_TXD)
- #define DESC_NEEDED          (MAX_SKB_FRAGS + 4)
- 
--#define WX_CFG_PORT_ST               0x14404
--
- /******************* Receive Descriptor bit definitions **********************/
- #define WX_RXD_STAT_DD               BIT(0) /* Done */
- #define WX_RXD_STAT_EOP              BIT(1) /* End of Packet */
--- 
-2.48.1
+Sure, I will rebase on top of your series.
 
+Once it is rebased, could you take the non powerpc patches in your tree ?
+
+Thanks
+Christophe
 
