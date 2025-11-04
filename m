@@ -1,176 +1,105 @@
-Return-Path: <netdev+bounces-235576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F4106C3299E
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 19:20:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C720C329AD
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 19:21:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F3D5467076
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 18:15:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71A3E467E6E
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 18:16:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C718B34A767;
-	Tue,  4 Nov 2025 18:10:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7503233FE33;
+	Tue,  4 Nov 2025 18:11:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Og6FUUUG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HsN5RuTP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f53.google.com (mail-yx1-f53.google.com [74.125.224.53])
+Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com [209.85.128.67])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD03834A3BD
-	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 18:10:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C567329C5D
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 18:11:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762279846; cv=none; b=CofDarfBOs9UDdKqdqoXFnXxH+yRpmOy5mbeDeKH5GCmlJVWLp7TQHlGnAV3k5VYyROPYimtgQA212pizc5V0bGLz2FY4kUP4+lyWiILeNBgpcKz8DQsiqTkTJovsHagXVYDplrWonkie6p0HZepRMNAQRPEhFW5wGCa4ERhuHU=
+	t=1762279905; cv=none; b=M6p+Elngquh5pzR4Y5Sb0QWAxvnoKwAHyNMtqIqnMJoHYtNufKmvx5xfLXOW36zldihvvTCT5UzotSdmRgVd4r8vEsaeTcPOzUCNWYWAjS0juza0LzM+k4FuUrQPE1HMtcpf1mEBW7lZc7juxR75tKomjGDvbF80DRPSJJTqptQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762279846; c=relaxed/simple;
-	bh=gn+1cyCQ/07KM855F/NeAln3hHIcHTws74h6tFo6Okc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dM8ddCpacAYvDSsm/U2Vc7iq/efopECrA/rv2gAl5xMPBDyVj0jCohSMITrsNajQhmNplExKUyhgYxlbpKGhjhOwiYwD/GO3TLxWv4HcMl9m+yB5/qMyr/imY8ToAqKLygFgm5BNMiyS8blWgLX0m9AecbVHuHzPnbdysygOl3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Og6FUUUG; arc=none smtp.client-ip=74.125.224.53
+	s=arc-20240116; t=1762279905; c=relaxed/simple;
+	bh=pShB2wGmw9UVAjvo4Af9ENCGF7h74zxwzh2zJGAYYVY=;
+	h=Content-Type:From:To:Subject:Message-ID:Date:MIME-Version; b=stZHhwx/vEtHSZ/+qdHzZWBLINphbqaip+GfZ2K9dZkrWrk2jf+gGNzuW2Gh+eHJwp+KxhIDpNbenM59x/xfQD0bYsRinlXmsuAkKAdVNBaB2sgy1H77BaRltLyPthYtLMMLJ76guG6xHlo0Qg7mVFXmrtfmjTwcJ47N3LalYvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HsN5RuTP; arc=none smtp.client-ip=209.85.128.67
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f53.google.com with SMTP id 956f58d0204a3-633c1b740c5so5534799d50.3
-        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 10:10:44 -0800 (PST)
+Received: by mail-wm1-f67.google.com with SMTP id 5b1f17b1804b1-477563e28a3so799995e9.1
+        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 10:11:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762279844; x=1762884644; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=23KFcuOuxCVXm913D7qKqfrC6/WNaTrfBBTB+yzkDBg=;
-        b=Og6FUUUGMkVX2fgpRpZ3MLvoY+fyppTtg5agAeVmHO/+VNY4DtVSa5DrKITyHw6ncW
-         wmrDOXBh+ydsthbwf4n6DE314ORsE8b2cdEOneThC44c+aB+rzGNfDPfbV1kAejOAMU6
-         ODvyzd77PJJ17NIRzTK2WQYl7MB3ggSTowtksAkNeClzTjBwTzJrTNN9u3iSa2kEa63L
-         +7G1jXmehA/3p2V8uSpuzsd8a0MzN8kTIAceFrUol9zITe8rateS1WWO9kj0LqvseegT
-         yNNgOmTmGQ6dKfTZkz+NzWVXcxPvThN6IFpbTqIQWqyEbY1a1YRP+mEzX0YLl95NnJS6
-         egiA==
+        d=gmail.com; s=20230601; t=1762279901; x=1762884701; darn=vger.kernel.org;
+        h=mime-version:date:content-transfer-encoding:message-id:subject
+         :reply-to:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=pShB2wGmw9UVAjvo4Af9ENCGF7h74zxwzh2zJGAYYVY=;
+        b=HsN5RuTPuLlU8gI8xBkuYyHO42LIdRLaixZ6HO0cH0Km6Hch8ePJsrRRNj+FZXopJu
+         EMRYDFL5iSsRSkHawNfbEetr4jb0fW8y8zWGMJ88f/XMd8pnbykcxmLM44Ym4OX2AGbC
+         R+N/QUefz4jDBSZRiLdTKKVEB1RpFAprUycxR7v8Uox/Rfq9EZh9QV5XkRkKoy8HoIPs
+         Z2T90Xek4wpJU0C5RP++54spSm0r99RLc5erppSkQnR8mVYCFzE6WiKlVhgnL/nBYQxW
+         hqALv+sqCETGKxn+bpBp+LOo83Gnvc9Ejiitlny8T6myawg8xS8+4qBRN979rwZ+ci9E
+         BpnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762279844; x=1762884644;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=23KFcuOuxCVXm913D7qKqfrC6/WNaTrfBBTB+yzkDBg=;
-        b=V5Wn7qP2HeIZcG0hebn4AE/mjgHX2SFSIxw1SfBce4hyf5jvr3ESJuAzWBqJlMKgvT
-         yBgOx6S9UXMDBpeb+tlGDxE3jxntGW4ZmTB3Y6i9M6/3VsE1kJcxqL/wfJlaBB5qkXEC
-         fUTEeZfceO/FTNwtbllTgVeF8rHlIqjAl7hL8VAYJBxCym9bXW1kuhDOwTK3HaHz5adn
-         Una5OwFTu64KVmutZusIoCMKuy0dlWpZI4I2pW0hdgOROHt10x6famegiBmzNKQvlTpV
-         M1mbLi6RYqGC3s0hoMK97ZtjXYaDcb2YlLIikrleXpwLiyjDUn0LjrFDlBrXdGecu93c
-         Mdmg==
-X-Forwarded-Encrypted: i=1; AJvYcCVGIO8W8i2iTwS6Qv17BcMQ9znLSbOHYnELvfa0OFMjBAZ/hqwiRRIYJaJAWe/3kZyIew15SgQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywh9eJmz10/RT6g5TlXg4stOErnsc2bYk3iHVIwwP7DoUeUGha2
-	fKECLUpJYFjnfNk2QjGIeGKbBAOqXM6sIcnfb3rjqDKZqUBosJenIi7vfQfXJYqkEtjpXsMIrzS
-	0mJrPZNCAQdRb++VMxkX+XB6lGaZeLZ4=
-X-Gm-Gg: ASbGncuM+jPH1AyynaY4l6oBYp5luap7gFTGRBlACW6nNLDOvG96UBzVKxZqK1aEIY9
-	5aeC20IkkFR/pOokkgGnRnsXHPxDrpDczhEJvtFbX/klHTqSuehoHdNirrzeOyh4WnvUc8uV8CK
-	0shmCc8TZBnhOKqQ3FBQNuzICWtDck5nRoYZ5FF+JVMjhFiG6xE5as7W9NWDPbozvxYQ1+fkrwM
-	3XaCUrPtN6pg4d4B6z7sR1M6nCYqIrJhRJbua3uM5zSmqbkdIBwKLeI5a/1KApmcJrkJDq5TdMF
-X-Google-Smtp-Source: AGHT+IHTNpRh2KHG6Pbc5u7di/OTCMr9jG612AsDubzWqLWd8MsoVItAKkt/jwmEPvVdEYPbEPahuJtYHKvWl/RrWm4=
-X-Received: by 2002:a05:690e:1559:20b0:63f:c10e:6422 with SMTP id
- 956f58d0204a3-63fd34bb6c0mr380771d50.8.1762279843545; Tue, 04 Nov 2025
- 10:10:43 -0800 (PST)
+        d=1e100.net; s=20230601; t=1762279901; x=1762884701;
+        h=mime-version:date:content-transfer-encoding:message-id:subject
+         :reply-to:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pShB2wGmw9UVAjvo4Af9ENCGF7h74zxwzh2zJGAYYVY=;
+        b=Mk7tcvCpb6IIbKUKpobAXGpNlm25HBtGVu0aC1CBMAOXRp0E5mD9wBJY94IOvjdEB8
+         Sk5eS/H/DrRk4o+tTo0qMuf0Nfdqyu26cxWP4JduFDYa9Vy4CUW8aYh9L9p79JgMi87E
+         SBDx4vMjSIhbQCkJAT/t4cITIth/MfxfYfSWX/YWNYb7w7IhEN3C7dIxmPZzftFXxh2m
+         2yk8K/98Q6HM8rRgV3egm+yCRydtNutEiba+WW+mRJ4AsOFmmMHQWPab7Dmdq5yTrDlD
+         Hhu/US/YRYi1MCLoz+l1A+4Ljl9W2MMxQ1C/qrjFHhgGe5NyWXpUopzqaUj39ofQg45q
+         rpCA==
+X-Gm-Message-State: AOJu0Yz+xVCW2UfLfKNlC2W9A0ohHyGiKLkaq3RXxUnsqseCvhBUDcrD
+	NmxaPxsEy/KP9mhGHAiwFPr+i1D2or47Z470vJ57+7QhbdMk4VnqHQJWaE5CNje/
+X-Gm-Gg: ASbGncvIXwShqQ/2EYyAXcPLtYo3HShVANx/qlsPewFrPPkD2CVcTnPSsM75o7gJXI6
+	Sri3+/MM/hOYdeUP4aORai4PC4LmiWCehWr7Ijg79oy2hTIlSejQUnFt1iYBVZFJgBDlhImUoMv
+	u8qImyZ8vqkRcqeqwRXx8C9fJ9L9D8W3zZtBBeNMxYL9WSzbs2tHElgNCqXnVlibnzD3pBE1Aqe
+	O3RhtNhWfnbYBqB+Cr57+2S9QnyvsrvKPBFFPkCEPRKqvK1biQqwfXce4lgX7Ai/AeEwnSBqtI4
+	01TCHgdeEcdL4IyYSBaKJvNU7RyObeDSSj7KvQrrgki+mgZhqXUp8vqdbUxWD59V3dcyBI+KIM3
+	6OctvstV34HTe7vw31xSwGMq8Li+7n6vmr26IQ3CBojP1NE4TGg7fpJqzdLqF4JYDbJT6QaNjfn
+	dtzTY+WFIlskgIox6ZJPxDODI8
+X-Google-Smtp-Source: AGHT+IGl0kzk8Otu3bgwEPlHcvIQJ9mfCaDZiwOQDO6oeqHer0vYRWezga9VJDrvkdq6mZg0YznBkQ==
+X-Received: by 2002:a05:600c:490a:b0:477:115b:878d with SMTP id 5b1f17b1804b1-47754c4ff35mr25490695e9.15.1762279901095;
+        Tue, 04 Nov 2025 10:11:41 -0800 (PST)
+Received: from [127.0.0.1] ([154.80.6.21])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4775cdcc552sm2610835e9.6.2025.11.04.10.11.30
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Nov 2025 10:11:40 -0800 (PST)
+Content-Type: text/plain; charset=utf-8
+From: Carl Thomas <liam.intelservices80@gmail.com>
+To: netdev@vger.kernel.org
+Reply-To: carlthomasces@gmail.com
+Subject: Estimating & Takeoff Services
+Message-ID: <fd634288-5a60-f697-bd40-f9bd3b7da7ee@gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 04 Nov 2025 18:11:29 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251104172652.1746988-4-ameryhung@gmail.com> <6fbae8b38c532ccd1accfa75df7614f56b6a49d6b4a851b525a59b7a07f33d25@mail.kernel.org>
-In-Reply-To: <6fbae8b38c532ccd1accfa75df7614f56b6a49d6b4a851b525a59b7a07f33d25@mail.kernel.org>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Tue, 4 Nov 2025 10:10:31 -0800
-X-Gm-Features: AWmQ_bmSxUWeL0HOMYWBJwMhgEG7HyVRMl5w44JIdR-0dpIc-mlNp10AJxj4nFk
-Message-ID: <CAMB2axN+hsZ0VQHYvw-Z31EK-7wF7SVr2nOv9=e5h=wLW_cq+w@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v5 3/7] bpf: Pin associated struct_ops when
- registering async callback
-To: bot+bpf-ci@kernel.org
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, tj@kernel.org, martin.lau@kernel.org, 
-	kernel-team@meta.com, ast@kernel.org, eddyz87@gmail.com, 
-	yonghong.song@linux.dev, clm@meta.com, ihor.solodrai@linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 4, 2025 at 10:03=E2=80=AFAM <bot+bpf-ci@kernel.org> wrote:
->
-> > diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
-> > index 865b0dae3..557570479 100644
-> > --- a/kernel/bpf/helpers.c
-> > +++ b/kernel/bpf/helpers.c
->
-> [ ... ]
->
-> > +static int bpf_async_res_get(struct bpf_async_res *res, struct bpf_pro=
-g *prog)
-> > +{
-> > +     struct bpf_map *st_ops_assoc =3D NULL;
-> > +     int err;
-> > +
-> > +     prog =3D bpf_prog_inc_not_zero(prog);
-> > +     if (IS_ERR(prog))
-> > +             return PTR_ERR(prog);
-> > +
-> > +     st_ops_assoc =3D READ_ONCE(prog->aux->st_ops_assoc);
-> > +     if (prog->type =3D=3D BPF_PROG_TYPE_STRUCT_OPS &&
-> > +         st_ops_assoc && st_ops_assoc !=3D BPF_PTR_POISON) {
-> > +             st_ops_assoc =3D bpf_map_inc_not_zero(st_ops_assoc);
-> > +             if (IS_ERR(st_ops_assoc)) {
-> > +                     err =3D PTR_ERR(st_ops_assoc);
-> > +                     goto put_prog;
-> > +             }
-> > +     }
->
-> Can this race with bpf_prog_disassoc_struct_ops()? Between reading
-> st_ops_assoc and incrementing it, another thread could dissociate the
-> map:
+Hi,
 
-This is fine. struct_ops map will wait for struct_ops BPF programs to
-finish running (an RCU gp) before freeing itself. Therefore, when
-another thread is freeing the map and this thread is calling
-bpf_async_res_get(), if this thread still sees
-prog->aux->st_ops_assoc, bpf_map_inc_not_zero() will fail and stop the
-async callback from being registered.
+Are you looking to estimate your projects?
 
->
->   bpf_async_res_get():
->     READ_ONCE(prog->aux->st_ops_assoc)  // reads valid map pointer
->
->   bpf_prog_disassoc_struct_ops():
->     guard(mutex)(&prog->aux->st_ops_assoc_mutex)
->     WRITE_ONCE(prog->aux->st_ops_assoc, NULL)
->     bpf_map_put(st_ops_assoc)  // potentially frees map
->
->   bpf_async_res_get():
->     bpf_map_inc_not_zero(st_ops_assoc)  // use-after-free
->
-> The map could be freed via RCU and memory reused before
-> bpf_map_inc_not_zero() executes. Other functions that access
-> st_ops_assoc (bpf_prog_assoc_struct_ops and bpf_prog_disassoc_struct_ops)
-> hold prog->aux->st_ops_assoc_mutex. Additionally, bpf_map_inc_not_zero's
-> documentation states "map_idr_lock should have been held or the map
-> should have been protected by rcu read lock."
->
-> Should bpf_async_res_get() hold the st_ops_assoc_mutex or an RCU read
-> lock around the st_ops_assoc access?
->
-> > +
-> > +     res->prog =3D prog;
-> > +     res->st_ops_assoc =3D st_ops_assoc;
-> > +     return 0;
-> > +put_prog:
-> > +     bpf_prog_put(prog);
-> > +     return err;
-> > +}
->
-> [ ... ]
->
->
-> ---
-> AI reviewed your patch. Please fix the bug or email reply why it's not a =
-bug.
-> See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/READM=
-E.md
->
-> CI run summary: https://github.com/kernel-patches/bpf/actions/runs/190776=
-79684
+We offer construction =
+estimating services and quantity takeoffs to contractors, sub-contractors, =
+developers, architects, etc.
+
+Get accurate takeoffs at competitive rates =
+with a quick turnaround and win more bids. Thanks.
+
+Regards,
+Carl Thomas
+Marketing Executive
+City Estimating, LLC
 
