@@ -1,459 +1,186 @@
-Return-Path: <netdev+bounces-235634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3905CC335FA
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 00:24:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7480C33606
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 00:26:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B295A34BC51
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 23:24:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95F4C3ADA77
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 23:26:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA6662E2825;
-	Tue,  4 Nov 2025 23:23:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BC762DEA61;
+	Tue,  4 Nov 2025 23:26:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bOW64mFp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e2MLQOXB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F742E1F0E
-	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 23:23:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFBBC2DCF50
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 23:26:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762298638; cv=none; b=qB//segyx+soA8f0uSdWA3T9y2x/WOCoo+M5RAF3GaYbi3a39yjY+WkIl+K1o1e28xb5b507LFIToQYk2C7BgzZlnSnGkc3dyPVv5w/ccDUta8iEH5mD7bqUBmRcEaYEdHOb6GJen6H/nAOR0u87Rxrf2sRWyguRMR07d8b2kdw=
+	t=1762298783; cv=none; b=Lh7U8OnAhMjCGtUkOqmfoDzRU74/ToESREFCDCC69zfCaOVXjHhaU5oYfM2KSpBXxqjRqXsIxZ0hVXWF/1eIWGCW/kiQZk/6NGD4shmfTqLu/JwmojPCNShO5MmHPoZ5g4UxNZKRS4QoNQSNKn2w1h8FoI5mgSFwL1+BaXhctLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762298638; c=relaxed/simple;
-	bh=ac27qDfiL3DzAS1Gq7wogtyqvj7uuvxj8Qzxa+5Lxjs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QQp/OE38xO4xewftW+NsgNu9qq+VGjknLXwAjqXiG52zhqwY4+9vxgcBtgrNOsAhvPtnbaQe0Im8S7NmcwrxAF+lenXtLYjyOMZOdcqjFSpYyFR37hOpvRPeB6jgrZ58Bj94PCz3P9wAs7HiU/R1wW4Jc1173GCM5/B0nKZCX8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bOW64mFp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A9C3C4CEF7;
-	Tue,  4 Nov 2025 23:23:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762298638;
-	bh=ac27qDfiL3DzAS1Gq7wogtyqvj7uuvxj8Qzxa+5Lxjs=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bOW64mFpiXtvYcBDvFAR0lGMbAMiRqgWYkuoVEcaQsPuWkgjuRzz7DgqO0hAHm3F4
-	 +EzkFLtY120v8A9xNhsXid5DeEk46l3fmOrmBoTvUgR4wOaMCRVxE8GZVLWyQr7wvx
-	 Nfq/bqO1TVM8362unMQn1Vl6J9caZMCgT9iqqrtsTyXFLc06BMLYqPgVeNO6ZhuJY2
-	 YbvC6O+HDwsYMpgKC5oFanCmkGh7zPweOu91HP5i7KBu/pf2kR/2pV8nNQGDu6z8yq
-	 /lA8ZltbineFtrVZP/rKI6gcbqEQHkekC2Za/qW3rfamOomM8Xxy6WEUtCytjF+Mf5
-	 YlzMpdYdRUIqA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net,
-	donald.hunter@gmail.com
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	sdf@fomichev.me,
-	joe@dama.to,
-	jstancek@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 5/5] tools: ynltool: add traffic distribution balance
-Date: Tue,  4 Nov 2025 15:23:48 -0800
-Message-ID: <20251104232348.1954349-6-kuba@kernel.org>
-X-Mailer: git-send-email 2.51.1
-In-Reply-To: <20251104232348.1954349-1-kuba@kernel.org>
-References: <20251104232348.1954349-1-kuba@kernel.org>
+	s=arc-20240116; t=1762298783; c=relaxed/simple;
+	bh=kTxxj2mQfgeacg33dNTEEX/y+5Iq8awGfY1rVTjRgRM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tRY/rOdbtPO9gYi9Qge2YVRj35rI7vHtfhrT+ytS3IdKfCafut5cjLPer4P2JHrBxJ+ZDIsjAxlON13VB4aWbra/HOEW/59J4edLi+LpSnE+U9vRlP4k3GCt9ws5Fk4q2jgkBGVTn7FfpHlni6bzFNOeCcfaBeXqGYz/LSFB2k4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e2MLQOXB; arc=none smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-7869dee42cdso4794807b3.1
+        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 15:26:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762298781; x=1762903581; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PRzyYOcGI3gkLHnDNazvDtWXeIGerHIP3pO9uFGiEwo=;
+        b=e2MLQOXBJTlhedDeLpi2C6GxxvBmvt9959w3zEFvApn34Ba8Sv2xAZFgoqsHtUI+xp
+         aMCwLVSLqKTlcnSyUBCMG9XlXI9NW79n/Knfj3vikdMKDHLEKrfuZQyMC/XuVcYBNFYx
+         w8dqKB9FfYiVIT03BTwX63PwLI1sXgDfrPEgL1/W0eLofPPIGCeDxP2JtdmSz1FWfhxy
+         xEWO/Ug5/Kk08hNC7AUUQ9wFkRURzv2ExcMvSSfjIuAHlexVwJb1khNSMhMKSKjfk+xG
+         dGPmLTOp2fmKdJoMsjv3p8i/Z1dK4KlJxxeU6MfWEmghFMTMPKghPPM2KuxA0h5hSjZR
+         XjZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762298781; x=1762903581;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PRzyYOcGI3gkLHnDNazvDtWXeIGerHIP3pO9uFGiEwo=;
+        b=M1aii4BMisBR10GsAG9ED9sCLMhdBL+eDHawgey768eHN2EDyW4K9IXmD6ZBgRd0/c
+         wSY5tmRCIbAN2AFM0fEzXGniKkqrZ8XfryHFJPa2TDruv6DBcbt9BZvkC94pPxYruLby
+         yfJ2eUSAe09DgWWXEbKMLDGfIL5OC77v5kaS8XQ94ENlP9/4CKg0k+HWNbxxwzMet5LR
+         L6qi6xjBkTVFoj5PQqTWnlWLVEEtxzrTRoIVtrwcX1u0WGHb/bLsDVICDL3F9fI4daAe
+         4wx4P7uSxSMsHXrr5Yar9pR2nYbEGklJetiv0jbhqdJgkDwM8qrQrB/b5aRhaMbNxo29
+         HZ7A==
+X-Forwarded-Encrypted: i=1; AJvYcCUc/29vVyntSSqltBSGXIkg+3kPFUimFdSfnmv9//KLbuf13IqGppQTG4h15QmP/Vw44idmgIQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzeHNWOaHhjcibBfpnxBN4SexOh9yGHPkwRHRtR4ngNEnHK+P97
+	wvc0Af0H9fGDgClnlQOvqmLXZ9dv6I38D4Qnb+RpAqTJIJTmVMWB8TnoRP1wUNpW+zrVGkGDH28
+	Sl/u8J6wc5cBkS+kGX9CWY1Zg1mfsT+0=
+X-Gm-Gg: ASbGncumfPQZ1gRp4PIdeFoDN0QkywbBAZdCM9G8vDpPWwBjKPmUL5M5wqzZjEOK2fe
+	cx8atuUFLTnXE+oDRq4j1g4T/aDXzFcSoz4HYe4aRos7+YXaNqekbwwAwRc9JrW2bC+KXo01VRz
+	Jpj1Q0hPaQjs8H5S9Dgb+icKrxqH8QxEFQlxuP9s4XVOviz+KfR5QAM6Sax7dj2Ox1oWtwqhM8i
+	jc5D6NTD4VeWeTxA9Ri7uXjG0WXmT4YWyR67ghWvPo6dF+syFTJB08PlC4MmHMTX3pndmozxrNM
+X-Google-Smtp-Source: AGHT+IEgkWnT1C6QrRig9LGJdFusLhlbIws2IJvDD4+6PCQuprFldOGVT8vm1bnSEVQAFDDt8PT+jeAZ7iP9BD7/ErU=
+X-Received: by 2002:a05:690e:1206:b0:63f:aa88:5f6b with SMTP id
+ 956f58d0204a3-63fc74aebfemr3815563d50.6.1762298780593; Tue, 04 Nov 2025
+ 15:26:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20251104172652.1746988-1-ameryhung@gmail.com> <20251104172652.1746988-3-ameryhung@gmail.com>
+ <5525A04E-70F7-4E13-AB12-A6905FB3697A@meta.com>
+In-Reply-To: <5525A04E-70F7-4E13-AB12-A6905FB3697A@meta.com>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Tue, 4 Nov 2025 15:26:07 -0800
+X-Gm-Features: AWmQ_bkQCJ3pEABuJZjX9lC6281A5_Ea2-b9Orf4thPgw0VolO3x6D7XZ-MhBdE
+Message-ID: <CAMB2axPqceLCLcF4FnwhKPP6DenxSx36XP6W43wCcCv6MviTkQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v5 2/7] bpf: Support associating BPF program with struct_ops
+To: Song Liu <songliubraving@meta.com>
+Cc: "bpf@vger.kernel.org" <bpf@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"alexei.starovoitov@gmail.com" <alexei.starovoitov@gmail.com>, "andrii@kernel.org" <andrii@kernel.org>, 
+	"daniel@iogearbox.net" <daniel@iogearbox.net>, "tj@kernel.org" <tj@kernel.org>, 
+	"martin.lau@kernel.org" <martin.lau@kernel.org>, Kernel Team <kernel-team@meta.com>, 
+	"roman.gushchin@linux.dev" <roman.gushchin@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The main if not only use case for per-queue stats today is checking
-for traffic imbalance. Add simple traffic balance analysis to qstats.
+On Tue, Nov 4, 2025 at 2:00=E2=80=AFPM Song Liu <songliubraving@meta.com> w=
+rote:
+>
+>
+>
+> > On Nov 4, 2025, at 9:26=E2=80=AFAM, Amery Hung <ameryhung@gmail.com> wr=
+ote:
+> >
+> > Add a new BPF command BPF_PROG_ASSOC_STRUCT_OPS to allow associating
+> > a BPF program with a struct_ops map. This command takes a file
+> > descriptor of a struct_ops map and a BPF program and set
+> > prog->aux->st_ops_assoc to the kdata of the struct_ops map.
+> >
+> > The command does not accept a struct_ops program nor a non-struct_ops
+> > map. Programs of a struct_ops map is automatically associated with the
+> > map during map update. If a program is shared between two struct_ops
+> > maps, prog->aux->st_ops_assoc will be poisoned to indicate that the
+> > associated struct_ops is ambiguous. The pointer, once poisoned, cannot
+> > be reset since we have lost track of associated struct_ops. For other
+> > program types, the associated struct_ops map, once set, cannot be
+> > changed later. This restriction may be lifted in the future if there is
+> > a use case.
+> >
+> > A kernel helper bpf_prog_get_assoc_struct_ops() can be used to retrieve
+> > the associated struct_ops pointer. The returned pointer, if not NULL, i=
+s
+> > guaranteed to be valid and point to a fully updated struct_ops struct.
+> > For struct_ops program reused in multiple struct_ops map, the return
+> > will be NULL.
+> >
+> > To make sure the returned pointer to be valid, the command increases th=
+e
+> > refcount of the map for every associated non-struct_ops programs. For
+> > struct_ops programs, the destruction of a struct_ops map already waits =
+for
+> > its BPF programs to finish running. A later patch will further make sur=
+e
+> > the map will not be freed when an async callback schedule from struct_o=
+ps
+> > is running.
+> >
+> > struct_ops implementers should note that the struct_ops returned may or
+> > may not be attached. The struct_ops implementer will be responsible for
+> > tracking and checking the state of the associated struct_ops map if the
+> > use case requires an attached struct_ops.
+> >
+> > Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> > ---
+> > include/linux/bpf.h            | 16 ++++++
+> > include/uapi/linux/bpf.h       | 17 +++++++
+> > kernel/bpf/bpf_struct_ops.c    | 90 ++++++++++++++++++++++++++++++++++
+> > kernel/bpf/core.c              |  3 ++
+> > kernel/bpf/syscall.c           | 46 +++++++++++++++++
+> > tools/include/uapi/linux/bpf.h | 17 +++++++
+> > 6 files changed, 189 insertions(+)
+> >
+> > diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+> > index a47d67db3be5..0f71030c03e1 100644
+> > --- a/include/linux/bpf.h
+> > +++ b/include/linux/bpf.h
+> > @@ -1726,6 +1726,8 @@ struct bpf_prog_aux {
+> > struct rcu_head rcu;
+> > };
+> > struct bpf_stream stream[2];
+> > + struct mutex st_ops_assoc_mutex;
+> > + struct bpf_map *st_ops_assoc;
+> > };
+>
+> In the bpf-oom thread, we agreed (mostly agreed?) that we will allow
+> attaching a struct_ops map multiple times.
+>
+> To match this design, shall we associate a BPF program with a
+> bpf_struct_ops_link instead of bpf_map? This requires one more
+> pointer deref to get the pointer to the struct_ops map. But the
+> solution will be more future proof.
+>
+> Does this make sense?
 
- $ ynltool qstat balance
- eth0 rx 44 queues:
-  rx-packets  : cv=6.9% ns=24.2% stddev=512006493
-                min=6278921110 max=8011570575 mean=7437054644
-  rx-bytes    : cv=6.9% ns=24.1% stddev=759670503060
-                min=9326315769440 max=11884393670786 mean=11035439201354
-  ...
+I think it makes sense and can be a future work to have the ability to
+associate attachments. The command can be extended to take a link to
+struct_ops map and a link to bpf program.
 
-  $ ynltool -j qstat balance | jq
-  [
-   {
-    "ifname": "eth0",
-    "ifindex": 2,
-    "queue-type": "rx",
-    "rx-packets": {
-      "queue-count": 44,
-      "min": 6278301665,
-      "max": 8010780185,
-      "mean": 7.43635E+9,
-      "stddev": 5.12012E+8,
-      "coefficient-of-variation": 6.88525,
-      "normalized-spread": 24.249
-    },
-   ...
+For this patchset, I think firstly we should still aim for providing a
+way to associate the implementation (think of it as C++ class).
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- tools/net/ynl/ynltool/Makefile |   2 +-
- tools/net/ynl/ynltool/qstats.c | 293 ++++++++++++++++++++++++++++++++-
- 2 files changed, 293 insertions(+), 2 deletions(-)
-
-diff --git a/tools/net/ynl/ynltool/Makefile b/tools/net/ynl/ynltool/Makefile
-index 1e860c63df66..2fe520f54ebb 100644
---- a/tools/net/ynl/ynltool/Makefile
-+++ b/tools/net/ynl/ynltool/Makefile
-@@ -24,7 +24,7 @@ all: $(YNLTOOL)
- 
- $(YNLTOOL): $(OBJS) $(LIBS)
- 	@echo -e "\tLINK $@"
--	@$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS) -lmnl
-+	@$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS) -lmnl -lm
- 
- %.o: %.c main.h json_writer.h
- 	@echo -e "\tCC $@"
-diff --git a/tools/net/ynl/ynltool/qstats.c b/tools/net/ynl/ynltool/qstats.c
-index fcdbb6d9a852..31fb45709ffa 100644
---- a/tools/net/ynl/ynltool/qstats.c
-+++ b/tools/net/ynl/ynltool/qstats.c
-@@ -5,6 +5,7 @@
- #include <string.h>
- #include <errno.h>
- #include <net/if.h>
-+#include <math.h>
- 
- #include <ynl.h>
- #include "netdev-user.h"
-@@ -13,6 +14,16 @@
- 
- static enum netdev_qstats_scope scope; /* default - device */
- 
-+struct queue_balance {
-+	unsigned int ifindex;
-+	enum netdev_queue_type type;
-+	unsigned int queue_count;
-+	__u64 *rx_packets;
-+	__u64 *rx_bytes;
-+	__u64 *tx_packets;
-+	__u64 *tx_bytes;
-+};
-+
- static void print_json_qstats(struct netdev_qstats_get_list *qstats)
- {
- 	jsonw_start_array(json_wtr);
-@@ -293,6 +304,283 @@ static int do_show(int argc, char **argv)
- 	return ret;
- }
- 
-+static void compute_stats(__u64 *values, unsigned int count,
-+			  double *mean, double *stddev, __u64 *min, __u64 *max)
-+{
-+	double sum = 0.0, variance = 0.0;
-+	unsigned int i;
-+
-+	*min = ~0ULL;
-+	*max = 0;
-+
-+	if (count == 0) {
-+		*mean = 0;
-+		*stddev = 0;
-+		*min = 0;
-+		return;
-+	}
-+
-+	for (i = 0; i < count; i++) {
-+		sum += values[i];
-+		if (values[i] < *min)
-+			*min = values[i];
-+		if (values[i] > *max)
-+			*max = values[i];
-+	}
-+
-+	*mean = sum / count;
-+
-+	if (count > 1) {
-+		for (i = 0; i < count; i++) {
-+			double diff = values[i] - *mean;
-+
-+			variance += diff * diff;
-+		}
-+		*stddev = sqrt(variance / (count - 1));
-+	} else {
-+		*stddev = 0;
-+	}
-+}
-+
-+static void print_balance_stats(const char *name, enum netdev_queue_type type,
-+				__u64 *values, unsigned int count)
-+{
-+	double mean, stddev, cv, ns;
-+	__u64 min, max;
-+
-+	if ((name[0] == 'r' && type != NETDEV_QUEUE_TYPE_RX) ||
-+	    (name[0] == 't' && type != NETDEV_QUEUE_TYPE_TX))
-+		return;
-+
-+	compute_stats(values, count, &mean, &stddev, &min, &max);
-+
-+	cv = mean > 0 ? (stddev / mean) * 100.0 : 0.0;
-+	ns = min + max > 0 ? (double)2 * (max - min) / (max + min) * 100 : 0.0;
-+
-+	printf("  %-12s: cv=%.1f%% ns=%.1f%% stddev=%.0f\n",
-+	       name, cv, ns, stddev);
-+	printf("  %-12s  min=%llu max=%llu mean=%.0f\n",
-+	       "", min, max, mean);
-+}
-+
-+static void
-+print_balance_stats_json(const char *name, enum netdev_queue_type type,
-+			 __u64 *values, unsigned int count)
-+{
-+	double mean, stddev, cv, ns;
-+	__u64 min, max;
-+
-+	if ((name[0] == 'r' && type != NETDEV_QUEUE_TYPE_RX) ||
-+	    (name[0] == 't' && type != NETDEV_QUEUE_TYPE_TX))
-+		return;
-+
-+	compute_stats(values, count, &mean, &stddev, &min, &max);
-+
-+	cv = mean > 0 ? (stddev / mean) * 100.0 : 0.0;
-+	ns = min + max > 0 ? (double)2 * (max - min) / (max + min) * 100 : 0.0;
-+
-+	jsonw_name(json_wtr, name);
-+	jsonw_start_object(json_wtr);
-+	jsonw_uint_field(json_wtr, "queue-count", count);
-+	jsonw_uint_field(json_wtr, "min", min);
-+	jsonw_uint_field(json_wtr, "max", max);
-+	jsonw_float_field(json_wtr, "mean", mean);
-+	jsonw_float_field(json_wtr, "stddev", stddev);
-+	jsonw_float_field(json_wtr, "coefficient-of-variation", cv);
-+	jsonw_float_field(json_wtr, "normalized-spread", ns);
-+	jsonw_end_object(json_wtr);
-+}
-+
-+static int cmp_ifindex_type(const void *a, const void *b)
-+{
-+	const struct netdev_qstats_get_rsp *qa = a;
-+	const struct netdev_qstats_get_rsp *qb = b;
-+
-+	if (qa->ifindex != qb->ifindex)
-+		return qa->ifindex - qb->ifindex;
-+	if (qa->queue_type != qb->queue_type)
-+		return qa->queue_type - qb->queue_type;
-+	return qa->queue_id - qb->queue_id;
-+}
-+
-+static int do_balance(int argc, char **argv __attribute__((unused)))
-+{
-+	struct netdev_qstats_get_list *qstats;
-+	struct netdev_qstats_get_req *req;
-+	struct netdev_qstats_get_rsp **sorted;
-+	struct ynl_error yerr;
-+	struct ynl_sock *ys;
-+	unsigned int count = 0;
-+	unsigned int i, j;
-+	int ret = 0;
-+
-+	if (argc > 0) {
-+		p_err("balance command takes no arguments");
-+		return -1;
-+	}
-+
-+	ys = ynl_sock_create(&ynl_netdev_family, &yerr);
-+	if (!ys) {
-+		p_err("YNL: %s", yerr.msg);
-+		return -1;
-+	}
-+
-+	req = netdev_qstats_get_req_alloc();
-+	if (!req) {
-+		p_err("failed to allocate qstats request");
-+		ret = -1;
-+		goto exit_close;
-+	}
-+
-+	/* Always use queue scope for balance analysis */
-+	netdev_qstats_get_req_set_scope(req, NETDEV_QSTATS_SCOPE_QUEUE);
-+
-+	qstats = netdev_qstats_get_dump(ys, req);
-+	netdev_qstats_get_req_free(req);
-+	if (!qstats) {
-+		p_err("failed to get queue stats: %s", ys->err.msg);
-+		ret = -1;
-+		goto exit_close;
-+	}
-+
-+	/* Count and sort queues */
-+	ynl_dump_foreach(qstats, qs)
-+		count++;
-+
-+	if (count == 0) {
-+		if (json_output)
-+			jsonw_start_array(json_wtr);
-+		else
-+			printf("No queue statistics available\n");
-+		goto exit_free_qstats;
-+	}
-+
-+	sorted = calloc(count, sizeof(*sorted));
-+	if (!sorted) {
-+		p_err("failed to allocate sorted array");
-+		ret = -1;
-+		goto exit_free_qstats;
-+	}
-+
-+	i = 0;
-+	ynl_dump_foreach(qstats, qs)
-+		sorted[i++] = qs;
-+
-+	qsort(sorted, count, sizeof(*sorted), cmp_ifindex_type);
-+
-+	if (json_output)
-+		jsonw_start_array(json_wtr);
-+
-+	/* Process each device/queue-type combination */
-+	i = 0;
-+	while (i < count) {
-+		__u64 *rx_packets, *rx_bytes, *tx_packets, *tx_bytes;
-+		enum netdev_queue_type type = sorted[i]->queue_type;
-+		unsigned int ifindex = sorted[i]->ifindex;
-+		unsigned int queue_count = 0;
-+		char ifname[IF_NAMESIZE];
-+		const char *name;
-+
-+		/* Count queues for this device/type */
-+		for (j = i; j < count && sorted[j]->ifindex == ifindex &&
-+		     sorted[j]->queue_type == type; j++)
-+			queue_count++;
-+
-+		/* Skip if no packets/bytes (inactive queues) */
-+		if (!sorted[i]->_present.rx_packets &&
-+		    !sorted[i]->_present.rx_bytes &&
-+		    !sorted[i]->_present.tx_packets &&
-+		    !sorted[i]->_present.tx_bytes)
-+			goto next_ifc;
-+
-+		/* Allocate arrays for statistics */
-+		rx_packets = calloc(queue_count, sizeof(*rx_packets));
-+		rx_bytes   = calloc(queue_count, sizeof(*rx_bytes));
-+		tx_packets = calloc(queue_count, sizeof(*tx_packets));
-+		tx_bytes   = calloc(queue_count, sizeof(*tx_bytes));
-+
-+		if (!rx_packets || !rx_bytes || !tx_packets || !tx_bytes) {
-+			p_err("failed to allocate statistics arrays");
-+			free(rx_packets);
-+			free(rx_bytes);
-+			free(tx_packets);
-+			free(tx_bytes);
-+			ret = -1;
-+			goto exit_free_sorted;
-+		}
-+
-+		/* Collect statistics */
-+		for (j = 0; j < queue_count; j++) {
-+			rx_packets[j] = sorted[i + j]->_present.rx_packets ?
-+					sorted[i + j]->rx_packets : 0;
-+			rx_bytes[j] = sorted[i + j]->_present.rx_bytes ?
-+				      sorted[i + j]->rx_bytes : 0;
-+			tx_packets[j] = sorted[i + j]->_present.tx_packets ?
-+					sorted[i + j]->tx_packets : 0;
-+			tx_bytes[j] = sorted[i + j]->_present.tx_bytes ?
-+				      sorted[i + j]->tx_bytes : 0;
-+		}
-+
-+		name = if_indextoname(ifindex, ifname);
-+
-+		if (json_output) {
-+			jsonw_start_object(json_wtr);
-+			if (name)
-+				jsonw_string_field(json_wtr, "ifname", name);
-+			jsonw_uint_field(json_wtr, "ifindex", ifindex);
-+			jsonw_string_field(json_wtr, "queue-type",
-+					   netdev_queue_type_str(type));
-+
-+			print_balance_stats_json("rx-packets", type,
-+						 rx_packets, queue_count);
-+			print_balance_stats_json("rx-bytes", type,
-+						 rx_bytes, queue_count);
-+			print_balance_stats_json("tx-packets", type,
-+						 tx_packets, queue_count);
-+			print_balance_stats_json("tx-bytes", type,
-+						 tx_bytes, queue_count);
-+
-+			jsonw_end_object(json_wtr);
-+		} else {
-+			if (name)
-+				printf("%s", name);
-+			else
-+				printf("ifindex:%u", ifindex);
-+			printf(" %s %d queues:\n",
-+			       netdev_queue_type_str(type), queue_count);
-+
-+			print_balance_stats("rx-packets", type,
-+					    rx_packets, queue_count);
-+			print_balance_stats("rx-bytes", type,
-+					    rx_bytes, queue_count);
-+			print_balance_stats("tx-packets", type,
-+					    tx_packets, queue_count);
-+			print_balance_stats("tx-bytes", type,
-+					    tx_bytes, queue_count);
-+			printf("\n");
-+		}
-+
-+		free(rx_packets);
-+		free(rx_bytes);
-+		free(tx_packets);
-+		free(tx_bytes);
-+
-+next_ifc:
-+		i += queue_count;
-+	}
-+
-+	if (json_output)
-+		jsonw_end_array(json_wtr);
-+
-+exit_free_sorted:
-+	free(sorted);
-+exit_free_qstats:
-+	netdev_qstats_get_list_free(qstats);
-+exit_close:
-+	ynl_sock_destroy(ys);
-+	return ret;
-+}
-+
- static int do_help(int argc __attribute__((unused)),
- 		   char **argv __attribute__((unused)))
- {
-@@ -304,6 +592,7 @@ static int do_help(int argc __attribute__((unused)),
- 	fprintf(stderr,
- 		"Usage: %s qstats { COMMAND | help }\n"
- 		"       %s qstats [ show ] [ OPTIONS ]\n"
-+		"       %s qstats balance\n"
- 		"\n"
- 		"       OPTIONS := { scope queue | group-by { device | queue } }\n"
- 		"\n"
-@@ -312,14 +601,16 @@ static int do_help(int argc __attribute__((unused)),
- 		"       show scope queue      - Display per-queue statistics\n"
- 		"       show group-by device  - Display device-aggregated statistics (default)\n"
- 		"       show group-by queue   - Display per-queue statistics\n"
-+		"       balance               - Analyze traffic distribution balance.\n"
- 		"",
--		bin_name, bin_name);
-+		bin_name, bin_name, bin_name);
- 
- 	return 0;
- }
- 
- static const struct cmd qstats_cmds[] = {
- 	{ "show",	do_show },
-+	{ "balance",	do_balance },
- 	{ "help",	do_help },
- 	{ 0 }
- };
--- 
-2.51.1
-
+>
+> Thanks,
+> Song
+>
+>
+>
 
