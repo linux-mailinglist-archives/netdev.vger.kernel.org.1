@@ -1,81 +1,82 @@
-Return-Path: <netdev+bounces-235581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2980C32BC1
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 20:10:17 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id C31F5C32BF2
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 20:16:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AC32A4E1F24
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 19:10:16 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5C3FF4E6987
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 19:16:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC5FC32939C;
-	Tue,  4 Nov 2025 19:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E4537262B;
+	Tue,  4 Nov 2025 19:15:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="Ox0bnPKG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tted8uOH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5E792E8B9B
-	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 19:10:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B84D4C2FB
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 19:15:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762283414; cv=none; b=KstJ6TYq+nqUZdnJLKMgpx97kKp3lAYzobLEVQYNXiN58mO46NoCTNsLQAF27t/JkhBWgcP31GfPT69Eb18ZsTcRRcJObA+DM8QrVrbdiBBYl0gtwyiwodBlpLEcQHzbnVaUH5jFADUHywfz6E1Atlmpq27XSrL4TbZK5GpZGFw=
+	t=1762283758; cv=none; b=lvwOtBkVtIt0ScLcUAwAU45na0DrhRf/GBN4zUkJ+/the0+bEqeNZ8afd9i738ZEWoBPuM9LmusshlHCVOF2cxWpmUVkYY8ddi915PD19BAQ77nww0zEEkp/TbuqBOO0HGNyo0sR4zRbGRprQN3Mbgq+admcpuA76UGhNEft56I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762283414; c=relaxed/simple;
-	bh=9LWKCVKfpkLorLNhfnXcCyl5zFVxqyoqSkP/ChRZHu4=;
+	s=arc-20240116; t=1762283758; c=relaxed/simple;
+	bh=7S8+vO3ASy53c9/QMBRYjqmZUqwJy9+RRobBAyVghQ4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rMV7NurbKs2bz+M6G4WYlx8nxTsZXngqJKy4kStdiuISFCEtFf/fjA4s2J6Qz4uqcrVDIvwBVEyv+JLNweIpuC2i1mazggmRGtvHWZrsnC2yPlrwDH/aKYqwv0keJNlhQaOKLeYQ5BDlDyix9sP95lFihL4ExDsx/ZWDpFpIpCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=Ox0bnPKG; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-640741cdda7so7658633a12.2
-        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 11:10:12 -0800 (PST)
+	 In-Reply-To:Content-Type; b=B3gyHydg7SFF8fctcgwFKUqvYheM/krkSUjCLJ/AoM50wbcyNlrq/KAngT7D9ZssHgjZ8Ex3E4XEwCt+YiOOtJO8Ue0OQ4KGHcAQ3yjDZmeOpamPfqD97XCrkOed7DdWEmHgBjX6kgfEr6r+tO9crSPFq280P+yX7IT+Loxx9t4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tted8uOH; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-b5e19810703so795224866b.2
+        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 11:15:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1762283411; x=1762888211; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
+        d=gmail.com; s=20230601; t=1762283755; x=1762888555; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=pHPzEXIUZ9pzwlZg85xxsGY9keDqq8RNI/L/RPCgfS8=;
-        b=Ox0bnPKGBxpnyVrD+/j+pdLorEiJeX+G/OhHidwX/7BDlE6kKnTpyIqv4rC9RTMBKi
-         paXZfAbg+3NJ4suxUuiWVB0DqTb74x0Vdx7NQVYBS2xLx+RxNsUb40AT9BfadRU/ox2v
-         8SKASLMKfIuXIYX40GyPA1MBuIPae8EzKZuvjL5FPZXNXbynw4iJKSZvXi/3zA6hSBab
-         AIa5WV8/VXgmUdD5B5pkITDqadTBi8GyalTeKcWESfXJrbs7c1ApH/R4l3q5EKnypmcR
-         toS7ff6t3WHdo0wEYJAvMgjNRSavRndK2frLPyyB7XyAo5Cpkk65p6IlAilabLTUYqxg
-         PXoQ==
+        bh=0QMyfynSbIJu4PvSuals8RhlA+Y6TdmVDUTrRaQq4u0=;
+        b=Tted8uOHUyq8Y3gfRjdnFf8UCc9v3+0jHMdlUyTqyvldEB081s3sJAD52jD9wepwOY
+         ROP/gJfXC2DduCpLJGI5NvUKt+29w9699rlhPHF4vch7k7ccQcgT35+RBppqaQWWlqup
+         03J2mSgLNgJ7J/qypBh8cIza4yZkowpjG/Rj+3t9lPkqaZCPmbKvVnemIlirJ5KDUMMl
+         X2bLr/YH1QKErqEp8L3kSOOawCAjuwFp4nXi/n0h+dXnRm6jq3d6SEoVyZ3rxEEBFZXL
+         21VqdgSs77qylaIFwQOElpoYrPcMUl/qf5m0dym8biyBQl7sOBcL6AhMRsVGArVX+e/a
+         nKrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762283411; x=1762888211;
-        h=content-transfer-encoding:in-reply-to:from:content-language
+        d=1e100.net; s=20230601; t=1762283755; x=1762888555;
+        h=content-transfer-encoding:in-reply-to:content-language:from
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pHPzEXIUZ9pzwlZg85xxsGY9keDqq8RNI/L/RPCgfS8=;
-        b=GthdT/KUIqxESRYkdNEKHpdsv4TVoSmXKmGMf5g3MUIIXThnamcaVpXW0W3pPgolSH
-         rdFmn04m+rUbfh6vvAsZQ3kZ31/uOhYE1unBc3dP5Is4oRei/e578HArf5M7RB2ng2ka
-         zBmA6FXccfUSmmju1nZHRn4LCYgnlFOq0wBj1MTUp/bpscAGjx20Hb7T6xAITxawaEYE
-         DR9KymL1Y66aIVYeXI0wvMTWg8O9SYt3JaenlZBmdqk0XJ+Nq9LCdEzGYhn8BP4ZhN0g
-         IeJVjqeRjMwGayTr0AXqKkyfPmWUvFnl0vZ9o6V/5gVJqGcsaW5BR5gknR0F+w2ZFnlK
-         zZ2A==
-X-Gm-Message-State: AOJu0Yz1V6s7yVvEJB3LsqKs1vNuJWIMcBf3voUSB6CpRFFvHlQFqSlL
-	UArIeCAk0VKfWCa4syc4BtGFJp/kGiMB2DoreIpcE5PaklPbQjgPjfdd08YHRhjEEEOPwzn6DXN
-	VH7XjSqI=
-X-Gm-Gg: ASbGnctOJEiQTfpJcLryDqH2OGBaK7im8dIQF0IK9S/nZTnTe+JhKXh0QceuzrPOIl1
-	mxngL2DNJI16TAx01q8t/eLvZzRWJ2NzFAQLfjVthaVSYqa7lAD0ljp8pIs9aXqs7KRtnDzAjYP
-	3H4h521yJJtCtX5qTOJLwcYbNxnnBrmmkFy54nhuwzcddB/ldNeo6w7TW8GqJibMrd8WjEsP8vj
-	EhiOmFhqVrBn7HMGCm7YPuKlHJ5ya/9u2yc5jL9WenEU0T29E7qb2xYvqPBfiFDdAc3uxWchmMy
-	OKYW4BB0CpEC/R4/p0UHV+3zaC2vWp9y4oXp1B3k3H7T/ARhR9zBah6rl707dSlFUXjWpD4z86w
-	WNWDIZ1G2bh8YXV0kqDO26LYJSqRDoKLUPXDs4q1IkFrLwwX/id72DbZbHsSeHQPnMmaA7s9Uaw
-	gMkDXN9DGqfXGsa4u2XQbceMGdaG0CAsU7
-X-Google-Smtp-Source: AGHT+IGVSDgEL05gD1VP583K60Rshyb4V0TRe73xfvSbKrRc1EoanFAlaR1O1a/+yOYg6dakhlj2rg==
-X-Received: by 2002:a17:907:72c6:b0:b70:b4db:ae83 with SMTP id a640c23a62f3a-b7265605335mr26751966b.60.1762283410700;
-        Tue, 04 Nov 2025 11:10:10 -0800 (PST)
-Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b723d7030adsm289300666b.24.2025.11.04.11.10.09
+        bh=0QMyfynSbIJu4PvSuals8RhlA+Y6TdmVDUTrRaQq4u0=;
+        b=PBzyVqn0709M/HAW9NJ6RLwt676j3bRUtP7R9mmHJ1+L/PGSNRX/bvVVJYZJUGWhvQ
+         yUf4dhvmZI5qp7HlBFCNG8pCnV1OoiKIj0QJadkt4V49qXz+ZqvisMOYgbvswOq/QX8x
+         nIclVfuQg/Qdv4NsJzPj5Uq8lbxpulrrb3rI1U1zdBQgWBqdDQoS+e0AlFfIulUnoVDF
+         Cpv5xyd2PBJxBGUcUDhFBb07K29b5Gp8n7Rub3S6Yn9BrJksLabarp/SBOY/dirRWv09
+         60wSzZOgu9AG3jNl3k3RJ8iaHQCTXvY+aBSUBlNN2R0oJyhQl9qicyqzu/8Tf+rqLN3O
+         K+uw==
+X-Forwarded-Encrypted: i=1; AJvYcCVQJzXQ2t6GhLbD9n3dXmbVCFKXfYmPcgpFpMNQ8PhPpAdyU2TPPSgG7BWFFbUa1vLOkyLErVU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyz6n640Da+WNltQixv5eah/lNQ8aHBCtyzYYb5lOqlKp7CS4Jh
+	F/+jh0apAOlRq4hXb/rtJN0d1JbxOJPNHRItmhn4FvAUZposnH3fpKVJTtx3gA==
+X-Gm-Gg: ASbGncs3LgD55Gxy9ROUh6QYzQD3pPCZSq8f6UheoQArcXP8zGxXsy+SPSVvFij2k2p
+	PlN0W1WhvoEcsp2Wbargwwe7vnaV1rFqG73XnYtftU99jWckZ3A25Bya2+g9oyXiDl5frRdA6dk
+	ph3TFarv4e1qiAUetqKy371XGu/XCqSl+ViYeTcXfKdh5M4BJ1sPIFMKK7eO5sNBdO7MkBzPN/Z
+	jA/UyVL93rsMRuDAPWMXDIq/4h7MPG+S5hXBeXTMugdbU0r/P5W/ZHvnDoipvdmJK1OQxojzEnJ
+	d0v51GZpevwxvY+SAdvj6YMNiuigUfN/OOqg3kurAUQpFEFW9hIb5N6JHId1q7dLz9ZBN3iWk0R
+	KKKTby1rtIXcjk1FakkGepYAzrHHS9kQWSFFwMOhwTc8TGYMWq/0O9CZ6wSuCkPdBnFrVdIOwzw
+	L+cPx0fc6AQvNbC/bTNX71c441am06ltmv3iqW29Z8eMhS/ZQTxVzYWrV31Vn8BshGz6Ya7HbH2
+	Pr79TGrxrvoCVL31DQcUptOWwDIItPZ1hEwt9l6XskKhm5LTpBWEQ==
+X-Google-Smtp-Source: AGHT+IGKnATGAMZLZ7BfrzK+rb/mjrrF2BjsXgKd9+vxecCJZWw7vzWEChRRFBgO1QfKEyIV7kI6LA==
+X-Received: by 2002:a17:907:6d0c:b0:b3f:5049:9e81 with SMTP id a640c23a62f3a-b726554c6fbmr23752866b.47.1762283754795;
+        Tue, 04 Nov 2025 11:15:54 -0800 (PST)
+Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b723d3a336asm290222766b.7.2025.11.04.11.15.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Nov 2025 11:10:10 -0800 (PST)
-Message-ID: <2252e81c-fe49-40aa-944e-4c94d5de563d@blackwall.org>
-Date: Tue, 4 Nov 2025 21:10:09 +0200
+        Tue, 04 Nov 2025 11:15:54 -0800 (PST)
+Message-ID: <114f0b33-2c5f-4ae8-8ed8-e8bc7ef3dd2c@gmail.com>
+Date: Tue, 4 Nov 2025 20:15:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,124 +84,106 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 2/2] selftests: forwarding: bridge: add a state bypass
- with disabled VLAN filtering test
-To: Petr Machata <petrm@nvidia.com>
-Cc: netdev@vger.kernel.org, tobias@waldekranz.com, idosch@nvidia.com,
- kuba@kernel.org, davem@davemloft.net, bridge@lists.linux.dev,
- pabeni@redhat.com, edumazet@google.com, horms@kernel.org
-References: <20251104120313.1306566-1-razor@blackwall.org>
- <20251104120313.1306566-3-razor@blackwall.org> <87qzudn256.fsf@nvidia.com>
+Subject: Re: [PATCH v16 nf-next 3/3] netfilter: nft_chain_filter: Add bridge
+ double vlan and pppoe
+To: Florian Westphal <fw@strlen.de>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Phil Sutter <phil@nwl.cc>,
+ Nikolay Aleksandrov <razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
+ bridge@lists.linux.dev, netdev@vger.kernel.org
+References: <20251104145728.517197-1-ericwouds@gmail.com>
+ <20251104145728.517197-4-ericwouds@gmail.com> <aQohjDYORamn7Gya@strlen.de>
+From: Eric Woudstra <ericwouds@gmail.com>
 Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <87qzudn256.fsf@nvidia.com>
+In-Reply-To: <aQohjDYORamn7Gya@strlen.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 11/4/25 19:15, Petr Machata wrote:
-> 
-> Nikolay Aleksandrov <razor@blackwall.org> writes:
-> 
->> Add a test which checks that port state bypass cannot happen if we have
->> VLAN filtering disabled and MST enabled. Such bypass could lead to race
->> condition when deleting a port because learning may happen after its
->> state has been toggled to disabled while it's being deleted, leading to
->> a use after free.
->>
->> Signed-off-by: Nikolay Aleksandrov <razor@blackwall.org>
->> ---
->>  .../net/forwarding/bridge_vlan_unaware.sh     | 35 ++++++++++++++++++-
->>  1 file changed, 34 insertions(+), 1 deletion(-)
->>
->> diff --git a/tools/testing/selftests/net/forwarding/bridge_vlan_unaware.sh b/tools/testing/selftests/net/forwarding/bridge_vlan_unaware.sh
->> index 2b5700b61ffa..20769793310e 100755
->> --- a/tools/testing/selftests/net/forwarding/bridge_vlan_unaware.sh
->> +++ b/tools/testing/selftests/net/forwarding/bridge_vlan_unaware.sh
->> @@ -1,7 +1,7 @@
->>  #!/bin/bash
->>  # SPDX-License-Identifier: GPL-2.0
->>  
->> -ALL_TESTS="ping_ipv4 ping_ipv6 learning flooding pvid_change"
->> +ALL_TESTS="ping_ipv4 ping_ipv6 learning flooding pvid_change mst_state_no_bypass"
-> 
-> I think you'll need to adjust this test for v2, can you please change
-> the above line to the following while at it?
-> 
 
-ack
 
-> ALL_TESTS="
-> 	ping_ipv4
-> 	ping_ipv6
-> 	learning
-> 	flooding
-> 	pvid_change
-> 	mst_state_no_bypass
-> "
-> 
->>  NUM_NETIFS=4
->>  source lib.sh
->>  
->> @@ -114,6 +114,39 @@ pvid_change()
->>  	ping_ipv6 " with bridge port $swp1 PVID deleted"
->>  }
->>  
->> +mst_state_no_bypass()
->> +{
->> +	local mac=de:ad:be:ef:13:37
+On 11/4/25 4:53 PM, Florian Westphal wrote:
+> Eric Woudstra <ericwouds@gmail.com> wrote:
+>> +	switch (*proto) {
+>> +	case htons(ETH_P_PPP_SES): {
+>> +		struct ppp_hdr {
+>> +			struct pppoe_hdr hdr;
+>> +			__be16 proto;
+>> +		} *ph;
 >> +
->> +	# Test that port state isn't bypassed when MST is enabled and VLAN
->> +	# filtering is disabled
->> +	RET=0
+>> +		if (!pskb_may_pull(skb, PPPOE_SES_HLEN))
+>> +			return -1;
+>> +		ph = (struct ppp_hdr *)(skb->data);
+>> +		switch (ph->proto) {
+>> +		case htons(PPP_IP):
+>> +			*proto = htons(ETH_P_IP);
+>> +			skb_set_network_header(skb, PPPOE_SES_HLEN);
+>> +			return PPPOE_SES_HLEN;
+>> +		case htons(PPP_IPV6):
+>> +			*proto = htons(ETH_P_IPV6);
+>> +			skb_set_network_header(skb, PPPOE_SES_HLEN);
+>> +			return PPPOE_SES_HLEN;
+>> +		}
+>> +		break;
+>> +	}
+>> +	case htons(ETH_P_8021Q): {
+>> +		struct vlan_hdr *vhdr;
 >> +
->> +	# MST can be enabled only when there are no VLANs
->> +	bridge vlan del vid 1 dev $swp1
->> +	bridge vlan del vid 1 dev $swp2
-> 
-> Pretty sure these naked references will explode in the CI's shellcheck.
-> I expect they'll have to be quoted as "$swp1".
-> 
-
-Oh haven't written selftests in awhile, I've missed the shellcheck stuff. :)
-
->> +	bridge vlan del vid 1 dev br0 self
->> +
->> +	ip link set br0 type bridge mst_enabled 1
->> +	check_err $? "Could not enable MST"
->> +
->> +	bridge link set dev $swp1 state disabled
-> 
-> Here as well. And more cases are below.
-> 
-> I've got this in my bash history. Might come in handy.
-> 
->     cat files | while read file; do git show net-next/main:$file > file; shellcheck file > sc-old; git show HEAD:$file > file; shellcheck file > sc-new; echo $file; diff -u sc-old sc-new; done | less
->
- 
-Thanks for the hint. I'll add this to my patch review process as well.
-
-Cheers,
- Nik
-
->> +	check_err $? "Could not set port state"
->> +
->> +	$MZ $h1 -c 1 -p 64 -a $mac -t ip -q
->> +
->> +	bridge fdb show brport $swp1 | grep -q de:ad:be:ef:13:37
->> +	check_fail $? "FDB entry found when it shouldn't be"
->> +
->> +	log_test "VLAN filtering disabled and MST enabled port state no bypass"
->> +
->> +	ip link set br0 type bridge mst_enabled 0
->> +	bridge link set dev $swp1 state forwarding
->> +	bridge vlan add vid 1 dev $swp1 pvid untagged
->> +	bridge vlan add vid 1 dev $swp2 pvid untagged
->> +	bridge vlan add vid 1 dev br0 self
+>> +		if (!pskb_may_pull(skb, VLAN_HLEN))
+>> +			return -1;
+>> +		vhdr = (struct vlan_hdr *)(skb->data);
+>> +		*proto = vhdr->h_vlan_encapsulated_proto;
+>> +		skb_set_network_header(skb, VLAN_HLEN);
+>> +		return VLAN_HLEN;
+>> +	}
+>> +	}
+>> +	return 0;
 >> +}
 >> +
->>  trap cleanup EXIT
+>>  static unsigned int
+>>  nft_do_chain_bridge(void *priv,
+>>  		    struct sk_buff *skb,
+>>  		    const struct nf_hook_state *state)
+>>  {
+>>  	struct nft_pktinfo pkt;
+>> +	__be16 proto;
+>> +	int offset;
 >>  
->>  setup_prepare
+>> -	nft_set_pktinfo(&pkt, skb, state);
+>> +	proto = eth_hdr(skb)->h_proto;
+>>  
+>> -	switch (eth_hdr(skb)->h_proto) {
+>> +	offset = nft_set_bridge_pktinfo(&pkt, skb, state, &proto);
+>> +	if (offset < 0)
+>> +		return NF_ACCEPT;
 > 
+> 
+> Hmm.  I'm not sure, I think this should either drop them right away
+> OR pass them to do_chain without any changes (i.e. retain existing
+> behavior and have this be same as nft_set_pktinfo_unspec()).
+> 
+> but please wait until resend.
+> 
+> I hope to finish a larger set i've been working on by tomorrow.
+> Then I can give this a more thorough review (and also make a summary +
+> suggestion wrt. the bridge match semantics wrt.  vlan + pppoe etc.
+> 
+> My hunch is that your approach is pretty much the way to go
+> but I need to complete related homework to make sure I did not
+> miss/forget anything.
+
+I understand. I've send this, because from v5 to v15 it moved towards
+matching in the rule, but it all started with the fact that
+nft_flow_offload_eval() uses nft_thoff().
+
+At a bare minimum I need to address having pkt->thoff set correctly to
+implement the software bridge-fastpath.
+
+The fact that it also makes possible to match L3/L4 data in the rule is
+also nice to have.
+
+Hopefully you can take this in consideration during your review.
 
 
