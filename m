@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-235434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE51DC30778
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 11:21:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AB6CC3077E
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 11:21:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 317403AB9A0
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 10:20:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 931B23AA62D
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 10:21:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E4A93112D5;
-	Tue,  4 Nov 2025 10:20:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88C1A3161A2;
+	Tue,  4 Nov 2025 10:20:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="njF5gHm1"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="mSzNT+Ag"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF4331DC9B3;
-	Tue,  4 Nov 2025 10:20:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F7BA314A62;
+	Tue,  4 Nov 2025 10:20:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762251653; cv=none; b=mklmg2Lz9hvwZswEQHXstce+yZwansUA/a+x/4gwqRj8nDnE1K7hwfJ1VOHvCQFhlWx+6rsBTVzoyCtnPybeeFeZzLUanZ1Ecrpf4yr6/nWeL/LEJQVjM6YMzws80c61VbemexDx4GBCaPDBDgSbp66+776zAKQUhXpeAuVx2A8=
+	t=1762251655; cv=none; b=o+h9UD9x+3g3kKkkhOQEBvCr44IiTp+rXfamtA4brV4OsEFqjWwzbd/floHnDf8rJypuFWqtMai//oWcy+gt1KczxEtpKShqExbDgu3B2JjVwLep91e24FRAz1kh+COt+bijtU1NdNwHsh2ag7stjJAFulYYPN3c3O7vuaObbfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762251653; c=relaxed/simple;
-	bh=W+oDDAVkBX8+8VjKeG7txAM8ukN+kYV2hV3smQ/JGZM=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jb6xos/VSS5YxsgeOPQM8XCQmv5nUPPLplonZUvqzMTxFu8gDuvt8VP4xPtnZIzxLH2cMF9b7D3zpBbHzJeCTYN17eV+kszkLUOUeqv1zWEKdLz16TOiMtkI/oiE2WvjUrH4xk/gjgr7939j/6uHK6Of5YRab9Ug/ialW0e0Uc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=njF5gHm1; arc=none smtp.client-ip=68.232.154.123
+	s=arc-20240116; t=1762251655; c=relaxed/simple;
+	bh=A59m6WsH87WemzrxvkLBiH3gUMQmSkWhT9XCVMqntdE=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NyphieQBdhqKDLJHHjfzblWWs6EnDaceEWTPBdsvMn4kMYgsxPjCgDjJX8qv45O+C+K/XekH8PEkst90ecLQDy1MhLGVGTpgSP/1XdplCjaY8XlFu+nEuch15m8V2Yrjk/F1zkKBhuz1nHQdbSOorF698QJsjzDsFe4tSbq9ixs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=mSzNT+Ag; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1762251650; x=1793787650;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=W+oDDAVkBX8+8VjKeG7txAM8ukN+kYV2hV3smQ/JGZM=;
-  b=njF5gHm1ud+xNE9fWzz9A3XWXLbnBCxRNfR00Nz1VBGQXjh9UML0n7po
-   5uTOY/WvcVkE8bGp063zHlGQOD5jZK6E5m8t1iCSqKdmrWzkphg8MSQtS
-   y2dIYjy9+M0+zCgXW8AAisxyI0TzJ0ZYCOqdLc5lvwxNLOMZvQbh5X9rd
-   MMqORP3xfCfRY9eTRCK6LyTVNExuQPUMcgMux7Y9tNqf9bwf7ZO6Q81QF
-   FvYVHbSCSDauOMhgmsi6V6xe9LsPOQpLl1dQSVyJLZrE3oidzK1rH82l2
-   PyP9f38eTonfBrZT9fg2pR15sZELemAnwuA57k35BGdkJRtgXS2R/qZSW
+  t=1762251652; x=1793787652;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=A59m6WsH87WemzrxvkLBiH3gUMQmSkWhT9XCVMqntdE=;
+  b=mSzNT+AgBxVrhcvXGUenbUUoci4ilXdZQ7EnA/yAGkxf7VVum/Z9YtJe
+   lASJzt6V/WmZTLrVZbB2UwoRhDGaI6LchGUc/0cudqqrSle91LHe/aeFC
+   TLEm5C5Rl5L4/bw94QPV77a0pT4ItXmDmXkTGFRdIuUWMh0H2ct7LDHnj
+   9Pnw5sl+80u+nnAyUH3LCbEe/LhwPYo3/gDNKdwgBIfg1JtxmNnzqRn0L
+   SKpTmD0CdUnCRN6jdmVpjIlYhy/cQmGBKaeBr3qBmwGozBcsHsxPyNyF2
+   /zCNPrSM4OvaJSmYfa9gu9t9l9LQPgnK7pGMVjSHFC0i1NoNgqNbbcWcw
    A==;
 X-CSE-ConnectionGUID: 7WIhWbovRpGVq1y6Z5h2hQ==
-X-CSE-MsgGUID: 8J2iBr6HRGCydVsEVa/Rtw==
+X-CSE-MsgGUID: QE6THeQ8QiyK0Bjo1b/vKg==
 X-IronPort-AV: E=Sophos;i="6.19,278,1754982000"; 
-   d="scan'208";a="215997396"
+   d="scan'208";a="215997397"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Nov 2025 03:20:49 -0700
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Nov 2025 03:20:50 -0700
 Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
  chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.58; Tue, 4 Nov 2025 03:20:20 -0700
+ 15.1.2507.58; Tue, 4 Nov 2025 03:20:24 -0700
 Received: from che-ll-i17164.microchip.com (10.10.85.11) by
  chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
- 15.1.2507.58 via Frontend Transport; Tue, 4 Nov 2025 03:20:16 -0700
+ 15.1.2507.58 via Frontend Transport; Tue, 4 Nov 2025 03:20:20 -0700
 From: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
 To: <Parthiban.Veerasooran@microchip.com>, <piergiorgio.beruto@gmail.com>,
 	<andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
@@ -64,54 +65,240 @@ To: <Parthiban.Veerasooran@microchip.com>, <piergiorgio.beruto@gmail.com>,
 	<pabeni@redhat.com>
 CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Parthiban
  Veerasooran" <parthiban.veerasooran@microchip.com>
-Subject: [PATCH net-next 0/2] net: phy: microchip_t1s: Add support for LAN867x Rev.D0 PHY
-Date: Tue, 4 Nov 2025 15:50:11 +0530
-Message-ID: <20251104102013.63967-1-parthiban.veerasooran@microchip.com>
+Subject: [PATCH net-next 1/2] net: phy: phy-c45: add OATC14 10BASE-T1S PHY cable diagnostic support
+Date: Tue, 4 Nov 2025 15:50:12 +0530
+Message-ID: <20251104102013.63967-2-parthiban.veerasooran@microchip.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20251104102013.63967-1-parthiban.veerasooran@microchip.com>
+References: <20251104102013.63967-1-parthiban.veerasooran@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 
-This patch series adds Open Alliance TC14 (OATC14) 10BASE-T1S cable
-diagnostic feature support to the Linux kernel PHY subsystem and enable
-this feature for Microchip LAN867x Rev.D0 PHYs. These patches provide
-standardized cable test functionality for 10BASE-T1S Ethernet PHYs,
-allowing users to perform cable diagnostics via ethtool.
+Add support for Open Alliance TC14 (OATC14) 10BASE-T1S PHYs cable
+diagnostic feature.
 
-Patch Summary:
-1. add OATC14 10BASE-T1S PHY cable diagnostic support
-	- Implements support for the OATC14 cable diagnostic feature in
-	  Clause 45 PHYs.
-	- Adds functions to start a cable test and retrieve its status,
-	  mapping hardware results to ethtool codes.
-	- Exports these functions for use by PHY drivers.
-	- Open Alliance TC14 10BASE-T1S Advanced Diagnostic PHY Features.
-	  https://opensig.org/wp-content/uploads/2025/06/OPEN_Alliance_10BASE-T1S_Advanced_PHY_features_for-automotive_Ethernet_V2.1b.pdf
-	
-2. add cable diagnostic support for LAN867x Rev.D0
-	- Integrates the generic OATC14 cable test functions into the
-	  Microchip LAN867x Rev.D0 PHY driver.
-	- Enables ethtool cable diagnostics for this PHY, improving
-	  troubleshooting and maintenance.
+This patch implements:
+- genphy_c45_oatc14_cable_test_start() to initiate a cable test
+- genphy_c45_oatc14_cable_test_get_status() to retrieve test results
+- Helper function to map PHY cable test status to ethtool result codes
+- Function declarations and exports for use by PHY drivers
 
-Parthiban Veerasooran (2):
-  net: phy: phy-c45: add OATC14 10BASE-T1S PHY cable diagnostic support
-  net: phy: microchip_t1s:: add cable diagnostic support for LAN867x
-    Rev.D0
+This enables ethtool to report ok, open, short, and undetectable cable
+conditions on OATC14 10Base-T1S PHYs.
 
+Open Alliance TC14 10BASE-T1S Advanced Diagnostic PHY Features
+Specification ref:
+https://opensig.org/wp-content/uploads/2025/06/OPEN_Alliance_10BASE-T1S_Advanced_PHY_features_for-automotive_Ethernet_V2.1b.pdf
+
+Signed-off-by: Parthiban Veerasooran <parthiban.veerasooran@microchip.com>
+---
  drivers/net/phy/mdio-open-alliance.h |  36 ++++++++
- drivers/net/phy/microchip_t1s.c      |   3 +
  drivers/net/phy/phy-c45.c            | 122 +++++++++++++++++++++++++++
  include/linux/phy.h                  |   3 +
- 4 files changed, 164 insertions(+)
+ 3 files changed, 161 insertions(+)
 
-
-base-commit: 9e8a443401dfb15574f9cc962783500ca8c2eec2
+diff --git a/drivers/net/phy/mdio-open-alliance.h b/drivers/net/phy/mdio-open-alliance.h
+index 931e14660d75..db302ff1f39a 100644
+--- a/drivers/net/phy/mdio-open-alliance.h
++++ b/drivers/net/phy/mdio-open-alliance.h
+@@ -43,4 +43,40 @@
+ /* Version Identifiers */
+ #define OATC14_IDM		0x0a00
+ 
++/*
++ * Open Alliance TC14 (10BASE-T1S) - Advanced Diagnostic Features Registers
++ *
++ * Refer to the OPEN Alliance documentation:
++ *   https://opensig.org/automotive-ethernet-specifications/
++ *
++ * Specification:
++ *   "10BASE-T1S Advanced Diagnostic PHY Features"
++ *   https://opensig.org/wp-content/uploads/2025/06/OPEN_Alliance_10BASE-T1S_Advanced_PHY_features_for-automotive_Ethernet_V2.1b.pdf
++ */
++/* Advanced Diagnostic Features Capability Register*/
++#define MDIO_OATC14_ADFCAP		0xcc00
++#define OATC14_ADFCAP_HDD_CAPABILITY	GENMASK(10, 8)
++
++/* Harness Defect Detection Register */
++#define MDIO_OATC14_HDD			0xcc01
++#define OATC14_HDD_CONTROL		BIT(15)
++#define OATC14_HDD_READY		BIT(14)
++#define OATC14_HDD_START_CONTROL	BIT(13)
++#define OATC14_HDD_VALID		BIT(2)
++#define OATC14_HDD_SHORT_OPEN_STATUS	GENMASK(1, 0)
++
++/* Bus Short/Open Status:
++ * 0 0 - no fault; everything is ok. (Default)
++ * 0 1 - detected as an open or missing termination(s)
++ * 1 0 - detected as a short or extra termination(s)
++ * 1 1 - fault but fault type not detectable. More details can be available by
++ *       vender specific register if supported.
++ */
++enum oatc14_hdd_status {
++	OATC14_HDD_STATUS_CABLE_OK,
++	OATC14_HDD_STATUS_OPEN,
++	OATC14_HDD_STATUS_SHORT,
++	OATC14_HDD_STATUS_NOT_DETECTABLE,
++};
++
+ #endif /* __MDIO_OPEN_ALLIANCE__ */
+diff --git a/drivers/net/phy/phy-c45.c b/drivers/net/phy/phy-c45.c
+index 61670be0f095..6030023bf840 100644
+--- a/drivers/net/phy/phy-c45.c
++++ b/drivers/net/phy/phy-c45.c
+@@ -7,6 +7,7 @@
+ #include <linux/mdio.h>
+ #include <linux/mii.h>
+ #include <linux/phy.h>
++#include <linux/ethtool_netlink.h>
+ 
+ #include "mdio-open-alliance.h"
+ #include "phylib-internal.h"
+@@ -1573,3 +1574,124 @@ int genphy_c45_ethtool_set_eee(struct phy_device *phydev,
+ 	return ret;
+ }
+ EXPORT_SYMBOL(genphy_c45_ethtool_set_eee);
++
++/**
++ * oatc14_cable_test_get_result_code - Convert hardware cable test status to
++ *                                     ethtool result code.
++ * @status: The hardware-reported cable test status
++ *
++ * This helper function maps the OATC14 HDD cable test status to the
++ * corresponding ethtool cable test result code. It provides a translation
++ * between the device-specific status values and the standardized ethtool
++ * result codes.
++ *
++ * Return:
++ * * ETHTOOL_A_CABLE_RESULT_CODE_OK          - Cable is OK
++ * * ETHTOOL_A_CABLE_RESULT_CODE_OPEN        - Open circuit detected
++ * * ETHTOOL_A_CABLE_RESULT_CODE_SAME_SHORT  - Short circuit detected
++ * * ETHTOOL_A_CABLE_RESULT_CODE_UNSPEC      - Status not detectable or invalid
++ */
++static int oatc14_cable_test_get_result_code(enum oatc14_hdd_status status)
++{
++	switch (status) {
++	case OATC14_HDD_STATUS_CABLE_OK:
++		return ETHTOOL_A_CABLE_RESULT_CODE_OK;
++	case OATC14_HDD_STATUS_OPEN:
++		return ETHTOOL_A_CABLE_RESULT_CODE_OPEN;
++	case OATC14_HDD_STATUS_SHORT:
++		return ETHTOOL_A_CABLE_RESULT_CODE_SAME_SHORT;
++	case OATC14_HDD_STATUS_NOT_DETECTABLE:
++	default:
++		return ETHTOOL_A_CABLE_RESULT_CODE_UNSPEC;
++	}
++}
++
++/**
++ * genphy_c45_oatc14_cable_test_get_status - Get status of OATC14 10Base-T1S
++ *                                           PHY cable test.
++ * @phydev:   pointer to the PHY device structure
++ * @finished: pointer to a boolean set true if the test is complete
++ *
++ * Retrieves the current status of the OATC14 10Base-T1S PHY cable test.
++ * This function reads the OATC14 HDD register to determine whether the test
++ * results are valid and whether the test has finished.
++ *
++ * If the test is complete, the function reports the cable test result via
++ * the ethtool cable test interface using ethnl_cable_test_result(), and then
++ * clears the test control bit in the PHY register to reset the test state.
++ *
++ * Return: 0 on success, or a negative error code on failure (e.g. register
++ *         read/write error).
++ */
++int genphy_c45_oatc14_cable_test_get_status(struct phy_device *phydev,
++					    bool *finished)
++{
++	int ret;
++	u8 sts;
++
++	*finished = false;
++
++	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, MDIO_OATC14_HDD);
++	if (ret < 0)
++		return ret;
++
++	if (!(ret & OATC14_HDD_VALID))
++		return 0;
++
++	*finished = true;
++
++	sts = FIELD_GET(OATC14_HDD_SHORT_OPEN_STATUS, ret);
++
++	ret = ethnl_cable_test_result(phydev, ETHTOOL_A_CABLE_PAIR_A,
++				      oatc14_cable_test_get_result_code(sts));
++	if (ret)
++		return ret;
++
++	return phy_clear_bits_mmd(phydev, MDIO_MMD_VEND2,
++				  MDIO_OATC14_HDD, OATC14_HDD_CONTROL);
++}
++EXPORT_SYMBOL(genphy_c45_oatc14_cable_test_get_status);
++
++/**
++ * genphy_c45_oatc14_cable_test_start - Start a cable test on an OATC14
++ *                                      10Base-T1S PHY.
++ * @phydev: Pointer to the PHY device structure
++ *
++ * This function initiates a cable diagnostic test on a Clause 45 OATC14
++ * 10Base-T1S capable PHY device. It first reads the PHY’s advanced diagnostic
++ * capability register to check if High Definition Diagnostics (HDD) mode is
++ * supported. If the PHY does not report HDD capability, cable testing is not
++ * supported and the function returns -EOPNOTSUPP.
++ *
++ * For PHYs that support HDD, the function sets the appropriate control bits in
++ * the OATC14_HDD register to enable and start the cable diagnostic test.
++ *
++ * Return:
++ * * 0 on success
++ * * -EOPNOTSUPP if the PHY does not support HDD capability
++ * * A negative error code on I/O or register access failures
++ */
++int genphy_c45_oatc14_cable_test_start(struct phy_device *phydev)
++{
++	int ret;
++
++	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, MDIO_OATC14_ADFCAP);
++	if (ret < 0)
++		return ret;
++
++	if (!(ret & OATC14_ADFCAP_HDD_CAPABILITY))
++		return -EOPNOTSUPP;
++
++	ret = phy_set_bits_mmd(phydev, MDIO_MMD_VEND2, MDIO_OATC14_HDD,
++			       OATC14_HDD_CONTROL);
++	if (ret)
++		return ret;
++
++	ret = phy_read_mmd(phydev, MDIO_MMD_VEND2, MDIO_OATC14_HDD);
++	if (ret < 0)
++		return ret;
++
++	return phy_set_bits_mmd(phydev, MDIO_MMD_VEND2, MDIO_OATC14_HDD,
++				OATC14_HDD_START_CONTROL);
++}
++EXPORT_SYMBOL(genphy_c45_oatc14_cable_test_start);
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index e3474f03cbc1..36457879c677 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -2251,6 +2251,9 @@ int genphy_c45_ethtool_get_eee(struct phy_device *phydev,
+ int genphy_c45_ethtool_set_eee(struct phy_device *phydev,
+ 			       struct ethtool_keee *data);
+ int genphy_c45_an_config_eee_aneg(struct phy_device *phydev);
++int genphy_c45_oatc14_cable_test_start(struct phy_device *phydev);
++int genphy_c45_oatc14_cable_test_get_status(struct phy_device *phydev,
++					    bool *finished);
+ 
+ /* The gen10g_* functions are the old Clause 45 stub */
+ int gen10g_config_aneg(struct phy_device *phydev);
 -- 
 2.34.1
 
