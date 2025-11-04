@@ -1,206 +1,464 @@
-Return-Path: <netdev+bounces-235441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0637EC309B6
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 11:53:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38017C30A96
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 12:06:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 45D0C4F70C0
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 10:49:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 590A03AC772
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 11:03:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B8522DCC05;
-	Tue,  4 Nov 2025 10:49:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FD6C2E1C64;
+	Tue,  4 Nov 2025 11:03:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YGuDfNkV"
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="B9WLTH2U"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
+Received: from sonic313-19.consmr.mail.gq1.yahoo.com (sonic313-19.consmr.mail.gq1.yahoo.com [98.137.65.82])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72A092DAFC8
-	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 10:49:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64B4B2D8DA7
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 11:03:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=98.137.65.82
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762253365; cv=none; b=hY/g0vI/Ho+ykuxqs94D3uRx64IUcBkU3eO6CV/teZ/CZMtUzWUWA9yXRYP1+ae/Z1pg3Cz7PS8Qg4xxFAD8dzLt73JM85l1KgNkaWcKuz1O0lfDY+N2oRFEl0kWeXCMbG8qj8FnoQMmsDGZ+mXhv0YOH74WgY5agE+BvqAXDV4=
+	t=1762254195; cv=none; b=sBUUI9X70WxMobXU/ag4mQzqj8KB8noQOw36x+whj9e/mf+Btfd35vP8lZ76zjlLKVm6K0Tys9FMnq33LK2eQYIFiFdsdZhmW0XCWD8sCOBvTxhwKoh/cC4dIlbiwrEQ86GadUpwgK9fJnrOWRD5CI9r71kjvN5GqXzpbmbVpnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762253365; c=relaxed/simple;
-	bh=gFtzIHzH+feMWJwo3pq+PvWg1fj4+2mq/x330+5X7j8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=afUlb68x7uJFonxm2t2H4w/swIvvDQ1ntBOFz75Jnr/XlCLH1+FihCNe+KCVKZAbCWNrd42RHknQ9b+9IwhQRfO7uzpFX6HNX73y/bJyL2DlxaKJxGpwg/BNglB7ZvV9oynpWi5rMWght/eFHYkyzKvJjcenifqeTXmNADuIKVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YGuDfNkV; arc=none smtp.client-ip=209.85.214.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-26d0fbe238bso42618315ad.3
-        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 02:49:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762253363; x=1762858163; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=mcG5rrfn0eYABeDV2UUy44PLYPKH9hFPkeHvBJGBvcA=;
-        b=YGuDfNkV0XJ7aKEt+ZbGNAOHUz43yyx6DLn8Fo8O3TmtBmxQ/VOfAg7Fpuw1OMY1rU
-         ZddPgHWMprdsge3+XHvpaFezmuX2HxEMZ0Ch2FKyH9+hCDUxeSKHfBRg/OJPn/uRrF4C
-         S2ZVv6z/wgh6D3o9aSTqJ0BgNb3fPIbOgzyq3Ph69nDIKj3yCuEhLtyT9zoGXYYDkcQb
-         YsAlZrWR0ULMW3Q/YSJZ04IIpzc00Vifi/xdaZA3vUAi1wYV/dfopPqpzvwAVbMEmB2m
-         4frb3r4Mwur66S0it1Orf0peTJxcRdTDVV3iizXVbAAWgzy3OBBsTrwM0HdV8fjKCcUP
-         JCuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762253363; x=1762858163;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mcG5rrfn0eYABeDV2UUy44PLYPKH9hFPkeHvBJGBvcA=;
-        b=MWmIQCPiCNNyLk7eGoEeIxhIgkQLHfvY8LPMclZagJFCUekZVB93YTwMfPkNnIbcV+
-         Cz28uygs5FTFQcSEITArqG49DtjeO+Ebsmokzs5wX+lf7n2HjZOEqco3d3m5H181HnVU
-         oavOQDfOmEntuvgUIFHCXEHU9DxaJvyNh6mQN4LO+coHj4J0BSRZXwvP3rulgUqX36fd
-         0msqqUCJFCLKP1TfgrrazNwGxfrGKuSusrCuie6q9t77kvNuc7KkKKzKtIDkGkpNJ5JZ
-         nMC1urd89+d9ZcHqMr3VWeVTIaE5EvAw3vGjdDs4bmxogexazPQ6weRutXODQtF2RNlD
-         ZsTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWaBXZJBJiQ5lH/dWlsXmHZ4exb0iNkknkAsjQ3+5ebVUsRwrnqdeABTmziMsSHq4kKc80KT0Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRISBmXmpNqGCokzjyB997k3PYS7DwL4S4xOAw/PttpnUh4XDD
-	4ej7SiCZ2TF9NJT7iyADtlklXaBCzq+oaI2pELn4enDAe5Tzwpq/O6PA
-X-Gm-Gg: ASbGncvhFUb+4BTV8LlupG3MhKXximyEesm+fKVaiIiLOl/EZKfaX3B8Q8ZVR4OclwE
-	XwHLmo2CuE+/4cfDa48OUuw1DxUZ+PbQQCpGXzhnpljHTnA8Apw9tmCtq2wV1iGApmcmGlIs3XU
-	Q9kyxB3aqKsUaguuz54Hl6MA9s6O3eQHHFWVrVSYGukrnsNnVCofZKxOi8GEJDnuO+LJFauE0y9
-	7IbeFOxEH3oaPm2fvV/LUtuoXzkJJTzmx3rNRLMNP0RS+/cmK1iJEYPObR8bOwOHW+7TWICKF4o
-	mSEzrvFU7Mzz3PGceyM3n7GfG8BK52uZ1K1lUsm28WXDq27OHlaBMVuKnzGNQMupL6zbLfhqG0e
-	qHS3jxIO6SyIRZv7r3nQ6oWfI+xyU3M+0TkLHwWuBkclQV73YoXEV/4A91+VpNXN1nKZqe0eMF9
-	/K
-X-Google-Smtp-Source: AGHT+IG2P/n05n4+4su8LX8XiTIscuAXJnd0RPNxjz3hjGLueMGYITVK4o2vmRxxXfVfLg6HdxmH9A==
-X-Received: by 2002:a17:902:e88e:b0:295:fe33:18bb with SMTP id d9443c01a7336-295fe331993mr35292535ad.14.1762253362602;
-        Tue, 04 Nov 2025 02:49:22 -0800 (PST)
-Received: from 7950hx ([43.129.244.20])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29601a7c5b9sm22013605ad.112.2025.11.04.02.49.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Nov 2025 02:49:22 -0800 (PST)
-From: Menglong Dong <menglong8.dong@gmail.com>
-X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
-To: ast@kernel.org
-Cc: daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	eddyz87@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	tglx@linutronix.de,
-	mingo@redhat.com,
-	bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	x86@kernel.org,
-	hpa@zytor.com,
-	jiang.biao@linux.dev,
-	menglong.dong@linux.dev,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH bpf-next] bpf,x86: do RSB balance for trampoline
-Date: Tue,  4 Nov 2025 18:49:13 +0800
-Message-ID: <20251104104913.689439-1-dongml2@chinatelecom.cn>
-X-Mailer: git-send-email 2.51.2
+	s=arc-20240116; t=1762254195; c=relaxed/simple;
+	bh=/xif9iFChphzkZILfZnXqpD2LukMgwOvc6Fsw2eQ8SU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=e/+X6Ry4bKWXgEOjrZ0ZMoxzZxewchQVzssRUxOp3Y8ek/e2llEL6JjjVcls1Bt4E/9ERDFsqJSBd3EbiwjJ7NIc96zzw/nH+ph+D+3Isb+hCRDL3nvHPhxg/vhYIDmDxDEgxQ2uaV0DUaUeTYJjf+wDaOX6bFkhl8Z7IOAq2qw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=B9WLTH2U; arc=none smtp.client-ip=98.137.65.82
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1762254187; bh=gfSX9iWaIqI7Je+pA4dj54zti4xAYjuab5g4WwTgVC0=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=B9WLTH2UpLiYlPj7MlVQxPhEANKRQFmo6dToBTehS0joLA0qfaPaaquCP9SmMm0puVOUOrQE2Z4QMmTqRP2jgRppzJYh//f6O80W/Xfi086AkUwJLE6fBzEc7HKmrXrBfJ7UiZybjlarulPHEK72rayig4qN0jkXk4D+yAkx7PqWvrZBbHEOmG5VC6wQaBD83SMbF5+dzH6ZoPO+tXif09pPrxwPKbWnAgaM9yxourbN2FPvHSS1II21KHM3KzAtLsmHJL+elVeD6QFspmt5dVxiYm8wCLUoSbpGsfwvs+W3eZi6V5H/hszKPXu3fnCZ0DZZmAZu5YaElPjP+dizzA==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1762254187; bh=bL9npthnYEqegSiErFTD5GAUlmCGqpSmS+n6Y2YGpMa=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=Aefc1XceeHLiewCWHdpPaao4kELDmjuPwG94Avmks8ZXjFiuD2mJr+k6hK/OH67b00PL8fdoprSiOlKuRdguzZq98+6DA+xBUy3a8DzyP5D99YZbiQG8En5HdUJ8eBnCFsfOuH9niro1FNyWceAPR6sBy5Jh9Z2dIgoonWSqSv3coMwurpmQg0PcS6KHtwJwf9G5hdOOdjKUUV5wa49iYTEHe1m6hTkAJaHutWYxVhLsGmK9NEWvmjvYRaycQY+6If4498vvjWtJDJWQKNfHLs12nS4kOcnw+J0hjiZYeTIvvdT4bWpwhaQYJiPvblY7hOFrtmpagKQYSNpvOZnbuw==
+X-YMail-OSG: B_r1wBUVM1mfdoq4681x9KLPdbUMEqRlgjUHcEM8iZul7pZ3Q.BXMs27tDXGSlp
+ vRadj0R8wyd65_Nti1Jzv0x7HX_6U8owdUMIf5QSY5KDUnWMHSBVt4S0GR0_lHUOR99rkuHMLpt6
+ GC7uCJYSoVVn6iuBvNlDWNpxjKNRIkQrFNUsOXlVekfuH_iauKocR.zbJR14Dt62YE3D3NU.8aB_
+ in80eoRLFZCUFM0bKsFqcA3M6CJAEl6rVdRkJwjcokGvTsi64vT94Qq3gvCosT8JaLWAK6mxs76i
+ zC5.Vb.2uW9lHHEvSxSvvaw4SYs_2sCavHqB3hdMQYUyL73g2IVDDF_1jy_nFqdh95rqyXRdsq.0
+ Iag3nUOfZKtXHZ9kIISFaIzyrq9FatfZHKQK23r0wWLqq5guFrQjx7UzE1nxoFQKluD4zvEvAp3l
+ Vkaun3gV9kABI07Lx5eAIoJxrgP.EmJtVZnrKrhBmz7yNuBDNsKfiDkkpg.Wp5KRm5gYFYMLyBg3
+ WWWhkcl3xhz48uRy3cWnv8NbmJqr9Ex9cSdQpQdtA2zQumuNwbMVpShL8Lsg2NhF6EHcReZjsMsz
+ GdPtCMrg8WAO.tTFmepcW1.C39w2QIhT9IVCzzHzzzy_ncejnNDy2B3RNslAJ5R3eYRK9m9kKxND
+ c0byGsFBOZlGHdKrP.asvLBgFOdLoK9aLt7G4JUuluSqROT.Nome0CtDpSMVBYoGDP.we9Far6kv
+ WeCLNZIRqrVYrw9V5fNnDYpV_8UQ9wwXTRESu8fkLbbwQvLBgGHsVd8i6YHeCcmdJvrmSD7MUuJQ
+ WCRXzZ_L8p7wvUG8O0Lv4HTknjSoMtRB.CSW8.cnMX454uMKm5pYn_4uUw9zq102T8LME4bMH3mC
+ ZgE4pp_Ie05Uo2upT2GcB7xx9QFsBtVNgb4x1lrhNbxU0kcoGHFQ1Z8MvK.24XLyerVR3QqM25Oa
+ DmQbBmBopEUvjV3OjZtpHJRC.76By.5qShKo.f2ZxL0tvJLnASRkk8kFbLXN0XIJzdrG7l.7WXaF
+ B_7PuoEYn4s2ZQ2UOuRkUrkjGKvf2IL649UbCucmvvwJdrC9MaQK_6w6nFCjocRZedt1tw9T9jxG
+ h4JQq43SjtQ5hIU7aXtzPWr8u61NQeiM4hSoo1qyCXB9aebWYXylEBGIhGOG8bbVyprzHv_vv_.c
+ vI5hlKasJLUp8x12bcp74YOD5Eql92H_57jc6GvMwV400ccBNTfnWb5cJCztT_PnGmWQXQcbkHqw
+ Red5RAlwitVZou4r81FvuRzSHgMhxcvPXwx0rhx7xqKrUjYb2l8.HBQ1opKkqvKBadErLZthokRQ
+ Oi43RmWKfSC7RmWpfysUuCsWVZiKlYU7W5_XTxZlpo_MNVHw88VqigctZRsQd0WU.z.7xqW6eaKd
+ 1T0UFsPbuvp2RiLzYS1GDXcsro24cms.0AGYa19WoYuf1HJhIrVCT_Flyc_3r6T7Eyb820aGElOT
+ TAtbmrTgQXeOhgnH.x2pTKcYMs_xiKs2NqMFebbrZSgvlZWXonBBJMfpwBm0xPF944ckTPdTF6DA
+ df7MeiFxe4mUHgtQJ5gWg1mVY_MrKvSFi9HckgwDCWbIEQLSQQj412SjmTq5B2YmLzrpsJjA6ar2
+ p_4sHxjBaRyKCaANomNsXvD1D7qZm4tXGg9hZz2BgYhZz0JHturxwzpelJSR8suRausuVtZDKEIC
+ i0rBKuIG.0ebzDnaGxxRtQKovzX7wMNcr4oprOngPd9J9LugfJufODrcuJ6Bxfu99ioKVJeJnRMG
+ EwY9vMTkVy4.3YkIxAmCTzQfQo2jfqGk_54OVM3UdI5Yrh6JbLe0nOcpJkoo6G55Z2QMWr9ohuji
+ 0OnZmj1EgdDY6LelNKgNMTPQNP1Cug_AYtNwXi1lhqhKYSbbVxtnYKw1tLfjOc59_1xe6XCWtQcI
+ MVg.ecXvHiA6sIWeuv7227kQvhTUuTg4YmWVOk8ZaMapKLskQHEi_YL4O90klwu.I1fo2bTRxtKL
+ VxHQYxao7M5L11R44cA.yoGR6e5fLZ2sRvcd3ktUKViXV1To409SYd8V5e4UCFVNQPgz8RsVs.s.
+ m20S7RnJLevfxobmb4go5_aXAlo4LrXc84ZOKbnEzi0RDuJvt1MrHk6KGZOvGuSExOTlnjA7QRk9
+ VxsION6dIhRaMIVR1Zo9p8tT8gN0Ac_W8i5Ujo9oLQfV1jguLzf.uQjA3SX.NwA.aw7T37RiroYM
+ DrkFV1E1GMMvFt6dlVGGCQEW3jVJr8rD9SIwN9HJ04JJnsKFk7ipcK881HAlSqGNByL9SjlFEarN
+ 34_bdDFOI5jXsHkXG9ed9
+X-Sonic-MF: <adelodunolaoluwa@yahoo.com>
+X-Sonic-ID: d47ba694-bc02-4164-8250-d475ab6f442e
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic313.consmr.mail.gq1.yahoo.com with HTTP; Tue, 4 Nov 2025 11:03:07 +0000
+Received: by hermes--production-bf1-58477f5468-qn4m8 (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 4df625031725f4cf5e0592022f64b07e;
+          Tue, 04 Nov 2025 10:42:52 +0000 (UTC)
+Message-ID: <26835ada-4e3a-4f78-8705-4ed2e3d44bd8@yahoo.com>
+Date: Tue, 4 Nov 2025 11:42:47 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] selftests: af_unix: Add tests for ECONNRESET and EOF
+ semantics
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, skhan@linuxfoundation.org,
+ david.hunter.linux@gmail.com, linux-kernel-mentees@lists.linuxfoundation.org
+References: <20251101172230.10179-1-adelodunolaoluwa.ref@yahoo.com>
+ <20251101172230.10179-1-adelodunolaoluwa@yahoo.com>
+ <CAAVpQUDL1FB1nFYOZ6QuO+cGTqnpYNSaFtFD=YN742pyspe9ew@mail.gmail.com>
+ <7a162b38-3ff8-4f97-aac3-4fe2ab50fe33@yahoo.com>
+ <CAAVpQUADwghMj=SgdiZEErC5oy7RVpam4i9S2RwP19bA=Rbynw@mail.gmail.com>
+Content-Language: en-US
+From: Sunday Adelodun <adelodunolaoluwa@yahoo.com>
+In-Reply-To: <CAAVpQUADwghMj=SgdiZEErC5oy7RVpam4i9S2RwP19bA=Rbynw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Mailer: WebService/1.1.24652 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
 
-In origin call case, we skip the "rip" directly before we return, which
-break the RSB, as we have twice "call", but only once "ret".
+On 11/4/25 01:30, Kuniyuki Iwashima wrote:
+> On Mon, Nov 3, 2025 at 4:08 PM Sunday Adelodun
+> <adelodunolaoluwa@yahoo.com> wrote:
+>> On 11/2/25 08:32, Kuniyuki Iwashima wrote:
+>>> On Sat, Nov 1, 2025 at 10:23 AM Sunday Adelodun
+>>> <adelodunolaoluwa@yahoo.com> wrote:
+>>>> Add selftests to verify and document Linux’s intended behaviour for
+>>>> UNIX domain sockets (SOCK_STREAM and SOCK_DGRAM) when a peer closes.
+>>>> The tests verify that:
+>>>>
+>>>>    1. SOCK_STREAM returns EOF when the peer closes normally.
+>>>>    2. SOCK_STREAM returns ECONNRESET if the peer closes with unread data.
+>>>>    3. SOCK_SEQPACKET returns EOF when the peer closes normally.
+>>>>    4. SOCK_SEQPACKET returns ECONNRESET if the peer closes with unread data.
+>>>>    5. SOCK_DGRAM does not return ECONNRESET when the peer closes.
+>>>>
+>>>> This follows up on review feedback suggesting a selftest to clarify
+>>>> Linux’s semantics.
+>>>>
+>>>> Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
+>>>> Signed-off-by: Sunday Adelodun <adelodunolaoluwa@yahoo.com>
+>>>> ---
+>>>>    tools/testing/selftests/net/af_unix/Makefile  |   1 +
+>>>>    .../selftests/net/af_unix/unix_connreset.c    | 179 ++++++++++++++++++
+>>>>    2 files changed, 180 insertions(+)
+>>>>    create mode 100644 tools/testing/selftests/net/af_unix/unix_connreset.c
+>>>>
+>>>> diff --git a/tools/testing/selftests/net/af_unix/Makefile b/tools/testing/selftests/net/af_unix/Makefile
+>>>> index de805cbbdf69..5826a8372451 100644
+>>>> --- a/tools/testing/selftests/net/af_unix/Makefile
+>>>> +++ b/tools/testing/selftests/net/af_unix/Makefile
+>>>> @@ -7,6 +7,7 @@ TEST_GEN_PROGS := \
+>>>>           scm_pidfd \
+>>>>           scm_rights \
+>>>>           unix_connect \
+>>>> +       unix_connreset \
+>>> patchwork caught this test is not added to .gitignore.
+>>> https://patchwork.kernel.org/project/netdevbpf/patch/20251101172230.10179-1-adelodunolaoluwa@yahoo.com/
+>>>
+>>> Could you add it to this file ?
+>>>
+>>> tools/testing/selftests/net/.gitignore
+>> Oh, thank you for this. will add it
+>>>
+>>>>    # end of TEST_GEN_PROGS
+>>>>
+>>>>    include ../../lib.mk
+>>>> diff --git a/tools/testing/selftests/net/af_unix/unix_connreset.c b/tools/testing/selftests/net/af_unix/unix_connreset.c
+>>>> new file mode 100644
+>>>> index 000000000000..6f43435d96e2
+>>>> --- /dev/null
+>>>> +++ b/tools/testing/selftests/net/af_unix/unix_connreset.c
+>>>> @@ -0,0 +1,179 @@
+>>>> +// SPDX-License-Identifier: GPL-2.0
+>>>> +/*
+>>>> + * Selftest for AF_UNIX socket close and ECONNRESET behaviour.
+>>>> + *
+>>>> + * This test verifies:
+>>>> + *  1. SOCK_STREAM returns EOF when the peer closes normally.
+>>>> + *  2. SOCK_STREAM returns ECONNRESET if peer closes with unread data.
+>>>> + *  3. SOCK_SEQPACKET returns EOF when the peer closes normally.
+>>>> + *  4. SOCK_SEQPACKET returns ECONNRESET if the peer closes with unread data.
+>>>> + *  5. SOCK_DGRAM does not return ECONNRESET when the peer closes.
+>>>> + *
+>>>> + * These tests document the intended Linux behaviour.
+>>>> + *
+>>>> + */
+>>>> +
+>>>> +#define _GNU_SOURCE
+>>>> +#include <stdlib.h>
+>>>> +#include <string.h>
+>>>> +#include <fcntl.h>
+>>>> +#include <unistd.h>
+>>>> +#include <errno.h>
+>>>> +#include <sys/socket.h>
+>>>> +#include <sys/un.h>
+>>>> +#include "../../kselftest_harness.h"
+>>>> +
+>>>> +#define SOCK_PATH "/tmp/af_unix_connreset.sock"
+>>>> +
+>>>> +static void remove_socket_file(void)
+>>>> +{
+>>>> +       unlink(SOCK_PATH);
+>>>> +}
+>>>> +
+>>>> +FIXTURE(unix_sock)
+>>>> +{
+>>>> +       int server;
+>>>> +       int client;
+>>>> +       int child;
+>>>> +};
+>>>> +
+>>>> +FIXTURE_VARIANT(unix_sock)
+>>>> +{
+>>>> +       int socket_type;
+>>>> +       const char *name;
+>>>> +};
+>>>> +
+>>>> +/* Define variants: stream and datagram */
+>>> nit: outdated, maybe simply remove ?
+>> oh..skipped me.
+>> will do so.
+>>>> +FIXTURE_VARIANT_ADD(unix_sock, stream) {
+>>>> +       .socket_type = SOCK_STREAM,
+>>>> +       .name = "SOCK_STREAM",
+>>>> +};
+>>>> +
+>>>> +FIXTURE_VARIANT_ADD(unix_sock, dgram) {
+>>>> +       .socket_type = SOCK_DGRAM,
+>>>> +       .name = "SOCK_DGRAM",
+>>>> +};
+>>>> +
+>>>> +FIXTURE_VARIANT_ADD(unix_sock, seqpacket) {
+>>>> +       .socket_type = SOCK_SEQPACKET,
+>>>> +       .name = "SOCK_SEQPACKET",
+>>>> +};
+>>>> +
+>>>> +FIXTURE_SETUP(unix_sock)
+>>>> +{
+>>>> +       struct sockaddr_un addr = {};
+>>>> +       int err;
+>>>> +
+>>>> +       addr.sun_family = AF_UNIX;
+>>>> +       strcpy(addr.sun_path, SOCK_PATH);
+>>>> +       remove_socket_file();
+>>>> +
+>>>> +       self->server = socket(AF_UNIX, variant->socket_type, 0);
+>>>> +       ASSERT_LT(-1, self->server);
+>>>> +
+>>>> +       err = bind(self->server, (struct sockaddr *)&addr, sizeof(addr));
+>>>> +       ASSERT_EQ(0, err);
+>>>> +
+>>>> +       if (variant->socket_type == SOCK_STREAM ||
+>>>> +               variant->socket_type == SOCK_SEQPACKET) {
+>>> patchwork caught mis-alignment here and other places.
+>>>
+>>> I'm using this for emacs, and other editors will have a similar config.
+>>>
+>>> (setq-default c-default-style "linux")
+>>>
+>>> You can check if lines are aligned properly by
+>>>
+>>> $ git show --format=email | ./scripts/checkpatch.pl
+>>>
+>>>
+>>>> +               err = listen(self->server, 1);
+>>>> +               ASSERT_EQ(0, err);
+>>>> +
+>>>> +               self->client = socket(AF_UNIX, variant->socket_type, 0);
+>>> Could you add SOCK_NONBLOCK here too ?
+>> This is noted
+>>>> +               ASSERT_LT(-1, self->client);
+>>>> +
+>>>> +               err = connect(self->client, (struct sockaddr *)&addr, sizeof(addr));
+>>>> +               ASSERT_EQ(0, err);
+>>>> +
+>>>> +               self->child = accept(self->server, NULL, NULL);
+>>>> +               ASSERT_LT(-1, self->child);
+>>>> +       } else {
+>>>> +               /* Datagram: bind and connect only */
+>>>> +               self->client = socket(AF_UNIX, SOCK_DGRAM | SOCK_NONBLOCK, 0);
+>>>> +               ASSERT_LT(-1, self->client);
+>>>> +
+>>>> +               err = connect(self->client, (struct sockaddr *)&addr, sizeof(addr));
+>>>> +               ASSERT_EQ(0, err);
+>>>> +       }
+>>>> +}
+>>>> +
+>>>> +FIXTURE_TEARDOWN(unix_sock)
+>>>> +{
+>>>> +       if (variant->socket_type == SOCK_STREAM ||
+>>>> +               variant->socket_type == SOCK_SEQPACKET)
+>>>> +               close(self->child);
+>>>> +
+>>>> +       close(self->client);
+>>>> +       close(self->server);
+>>>> +       remove_socket_file();
+>>>> +}
+>>>> +
+>>>> +/* Test 1: peer closes normally */
+>>>> +TEST_F(unix_sock, eof)
+>>>> +{
+>>>> +       char buf[16] = {};
+>>>> +       ssize_t n;
+>>>> +
+>>>> +       /* Peer closes normally */
+>>>> +       if (variant->socket_type == SOCK_STREAM ||
+>>>> +               variant->socket_type == SOCK_SEQPACKET)
+>>>> +               close(self->child);
+>>>> +       else
+>>>> +               close(self->server);
+>>>> +
+>>>> +       n = recv(self->client, buf, sizeof(buf), 0);
+>>>> +       TH_LOG("%s: recv=%zd errno=%d (%s)", variant->name, n, errno, strerror(errno));
+>>> errno is undefined if not set, and same for strerror(errno).
+>>>
+>>> Also, if ASSERT_XXX() below fails, the same information
+>>> (test case, errno) is logged.  So, TH_LOG() seems unnecessary.
+>>>
+>>> Maybe try modifying the condition below and see how the
+>>> assertion is logged.
+>> Oh..thank you. Didn't it through that way.
+>> I understand.
+>> I will remove the TH_LOG()'s
+>>>> +       if (variant->socket_type == SOCK_STREAM ||
+>>>> +               variant->socket_type == SOCK_SEQPACKET) {
+>>>> +               ASSERT_EQ(0, n);
+>>>> +       } else {
+>>>> +               ASSERT_EQ(-1, n);
+>>>> +               ASSERT_EQ(EAGAIN, errno);
+>>>> +       }
+>>>> +}
+>>>> +
+>>>> +/* Test 2: peer closes with unread data */
+>>>> +TEST_F(unix_sock, reset_unread)
+>>>> +{
+>>>> +       char buf[16] = {};
+>>>> +       ssize_t n;
+>>>> +
+>>>> +       /* Send data that will remain unread by client */
+>>>> +       send(self->client, "hello", 5, 0);
+>>>> +       close(self->child);
+>>>> +
+>>>> +       n = recv(self->client, buf, sizeof(buf), 0);
+>>>> +       TH_LOG("%s: recv=%zd errno=%d (%s)", variant->name, n, errno, strerror(errno));
+>>>> +       if (variant->socket_type == SOCK_STREAM ||
+>>>> +               variant->socket_type == SOCK_SEQPACKET) {
+>>>> +               ASSERT_EQ(-1, n);
+>>>> +               ASSERT_EQ(ECONNRESET, errno);
+>>>> +       } else {
+>>>> +               ASSERT_EQ(-1, n);
+>>>> +               ASSERT_EQ(EAGAIN, errno);
+>>>> +       }
+>>>> +}
+>>>> +
+>>>> +/* Test 3: SOCK_DGRAM peer close */
+>>>> Now Test 2 and Test 3 look identical ;)
+>> seems so, but the only difference is:
+>>
+>> close(self->child); is used in Test 2, while
+>> close(self->server); is used in Test 3.
+>> Maybe I should find a way to collapse Tests 2 and 3 (if statement might
+>> work)
+>>
+>> I am just afraid the tests to run will reduce to 6 from 9 and we will have 6
+>> cases passed as against 7 as before.
+>>
+>> What do you think?
+> The name of Test 2 is a bit confusing, which is not true
+> for SOCK_DGRAM.  So, I'd use "if" to change which fd
+> to close() depending on the socket type.
+>
+> Also, close(self->server) does nothing for SOCK_STREAM
+> and SOCK_SEQPACKET after accept().  Rather, that close()
+> should have the same effect if self->child is not accept()ed.
+> (In this case, Skip() for SOCK_DGRAM makes sense)
+>
+> I think covering that scenario would be nicer.
+>
+> If interested, you can check the test coverage with this patch.
+> https://lore.kernel.org/linux-kselftest/20251028024339.2028774-1-kuniyu@google.com/
+>
+> Thanks!
+Thank you!
 
-Do the RSB balance by pseudo a "ret". Instead of skipping the "rip", we
-modify it to the address of a "ret" insn that we generate.
+kindly check these if any conforms to what it should be:
 
-The performance of "fexit" increases from 76M/s to 84M/s. Before this
-optimize, the bench resulting of fexit is:
+TEST_F(unix_sock, reset_unread_behavior)
+{
+         char buf[16] = {};
+         ssize_t n;
 
-fexit          :   76.494 ± 0.216M/s
-fexit          :   76.319 ± 0.097M/s
-fexit          :   70.680 ± 0.060M/s
-fexit          :   75.509 ± 0.039M/s
-fexit          :   76.392 ± 0.049M/s
+         /* Send data that will remain unread by client */
+         send(self->client, "hello", 5, 0);
 
-After this optimize:
+         if (variant->socket_type == SOCK_DGRAM) {
+                 close(self->server);
+         }
+         else {
+                 if (!self->child)
+                         SKIP(return);
 
-fexit          :   86.023 ± 0.518M/s
-fexit          :   83.388 ± 0.021M/s
-fexit          :   85.146 ± 0.058M/s
-fexit          :   85.646 ± 0.136M/s
-fexit          :   84.040 ± 0.045M/s
+                 close(self->child);
+         }
 
-Things become a little more complex, not sure if the benefits worth it :/
+         n = recv(self->client, buf, sizeof(buf), 0);
 
-Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
----
- arch/x86/net/bpf_jit_comp.c | 32 +++++++++++++++++++++++++++++---
- 1 file changed, 29 insertions(+), 3 deletions(-)
+         ASSERT_EQ(-1, n);
 
-diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
-index d4c93d9e73e4..a9c2142a84d0 100644
---- a/arch/x86/net/bpf_jit_comp.c
-+++ b/arch/x86/net/bpf_jit_comp.c
-@@ -3185,6 +3185,7 @@ static int __arch_prepare_bpf_trampoline(struct bpf_tramp_image *im, void *rw_im
- 	struct bpf_tramp_links *fmod_ret = &tlinks[BPF_TRAMP_MODIFY_RETURN];
- 	void *orig_call = func_addr;
- 	u8 **branches = NULL;
-+	u8 *rsb_pos;
- 	u8 *prog;
- 	bool save_ret;
- 
-@@ -3431,17 +3432,42 @@ static int __arch_prepare_bpf_trampoline(struct bpf_tramp_image *im, void *rw_im
- 		LOAD_TRAMP_TAIL_CALL_CNT_PTR(stack_size);
- 	}
- 
-+	if (flags & BPF_TRAMP_F_SKIP_FRAME) {
-+		u64 ret_addr = (u64)(image + (prog - (u8 *)rw_image));
-+
-+		rsb_pos = prog;
-+		/*
-+		 * reserve the room to save the return address to rax:
-+		 *   movabs rax, imm64
-+		 *
-+		 * this is used to do the RSB balance. For the SKIP_FRAME
-+		 * case, we do the "call" twice, but only have one "ret",
-+		 * which can break the RSB.
-+		 *
-+		 * Therefore, instead of skipping the "rip", we make it as
-+		 * a pseudo return: modify the "rip" in the stack to the
-+		 * second "ret" address that we build bellow.
-+		 */
-+		emit_mov_imm64(&prog, BPF_REG_0, ret_addr >> 32, (u32)ret_addr);
-+		/* mov [rbp + 8], rax */
-+		EMIT4(0x48, 0x89, 0x45, 0x08);
-+	}
-+
- 	/* restore return value of orig_call or fentry prog back into RAX */
- 	if (save_ret)
- 		emit_ldx(&prog, BPF_DW, BPF_REG_0, BPF_REG_FP, -8);
- 
- 	emit_ldx(&prog, BPF_DW, BPF_REG_6, BPF_REG_FP, -rbx_off);
- 	EMIT1(0xC9); /* leave */
-+	emit_return(&prog, image + (prog - (u8 *)rw_image));
- 	if (flags & BPF_TRAMP_F_SKIP_FRAME) {
--		/* skip our return address and return to parent */
--		EMIT4(0x48, 0x83, 0xC4, 8); /* add rsp, 8 */
-+		u64 ret_addr = (u64)(image + (prog - (u8 *)rw_image));
-+
-+		/* fix the return address to second return address */
-+		emit_mov_imm64(&rsb_pos, BPF_REG_0, ret_addr >> 32, (u32)ret_addr);
-+		/* this is the second(real) return */
-+		emit_return(&prog, image + (prog - (u8 *)rw_image));
- 	}
--	emit_return(&prog, image + (prog - (u8 *)rw_image));
- 	/* Make sure the trampoline generation logic doesn't overflow */
- 	if (WARN_ON_ONCE(prog > (u8 *)rw_image_end - BPF_INSN_SAFETY)) {
- 		ret = -EFAULT;
--- 
-2.51.2
+         if (variant->socket_type == SOCK_STREAM ||
+                 variant->socket_type == SOCK_SEQPACKET)
+                 do { ASSERT_EQ(ECONNRESET, errno); } while (0);
+         else
+                 ASSERT_EQ(EAGAIN, errno);
+}
+
+OR
+
+TEST_F(unix_sock, reset_unread_behavior)
+{
+         char buf[16] = {};
+         ssize_t n;
+
+         /* Send data that will remain unread by client */
+         send(self->client, "hello", 5, 0);
+
+         if (variant->socket_type == SOCK_DGRAM) {
+                 close(self->server);
+         }
+         else {
+                 if (self->child)
+                     close(self->child);
+                 else
+                     close(self->server);
+         }
+
+         n = recv(self->client, buf, sizeof(buf), 0);
+
+         ASSERT_EQ(-1, n);
+
+         if (variant->socket_type == SOCK_STREAM ||
+                 variant->socket_type == SOCK_SEQPACKET)
+                 do { ASSERT_EQ(ECONNRESET, errno); } while (0);
+         else
+                 ASSERT_EQ(EAGAIN, errno);
+}
+
+OR
+
+is there a better way to handle this?
+
+I ran the KCOV_OUTPUT command using the first *TEST_F above* as the Test 
+2 and got the output below:
+*$ KCOV_OUTPUT=kcov KCOV_SLOTS=8192 
+./tools/testing/selftests/net/af_unix/unix_connreset*
+TAP version 13
+1..6
+# Starting 6 tests from 3 test cases.
+#  RUN           unix_sock.stream.eof ...
+#            OK  unix_sock.stream.eof
+ok 1 unix_sock.stream.eof
+#  RUN           unix_sock.stream.reset_unread_behavior ...
+#            OK  unix_sock.stream.reset_unread_behavior
+ok 2 unix_sock.stream.reset_unread_behavior
+#  RUN           unix_sock.dgram.eof ...
+#            OK  unix_sock.dgram.eof
+ok 3 unix_sock.dgram.eof
+#  RUN           unix_sock.dgram.reset_unread_behavior ...
+#            OK  unix_sock.dgram.reset_unread_behavior
+ok 4 unix_sock.dgram.reset_unread_behavior
+#  RUN           unix_sock.seqpacket.eof ...
+#            OK  unix_sock.seqpacket.eof
+ok 5 unix_sock.seqpacket.eof
+#  RUN           unix_sock.seqpacket.reset_unread_behavior ...
+#            OK  unix_sock.seqpacket.reset_unread_behavior
+ok 6 unix_sock.seqpacket.reset_unread_behavior
+# PASSED: 6 / 6 tests passed.
+# Totals: pass:6 fail:0 xfail:0 xpass:0 skip:0 error:0
+
+Thank you once again for your continuous guidance and patience.
+It's a worthy and rewarding learning period for me.
 
 
