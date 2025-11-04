@@ -1,461 +1,379 @@
-Return-Path: <netdev+bounces-235294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1F2CC2E836
-	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 01:07:11 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4C7EC2E9D0
+	for <lists+netdev@lfdr.de>; Tue, 04 Nov 2025 01:32:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2793B3B58E5
-	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 00:07:09 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1DC094F4631
+	for <lists+netdev@lfdr.de>; Tue,  4 Nov 2025 00:29:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C1CC1DA55;
-	Tue,  4 Nov 2025 00:07:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8960C1A256E;
+	Tue,  4 Nov 2025 00:29:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b="IehWa5/X";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="jBUPRqxZ"
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="oiy0Us6x"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-b2-smtp.messagingengine.com (flow-b2-smtp.messagingengine.com [202.12.124.137])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sonic301-20.consmr.mail.gq1.yahoo.com (sonic301-20.consmr.mail.gq1.yahoo.com [98.137.64.146])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4A45DDD2;
-	Tue,  4 Nov 2025 00:07:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.137
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 861671A2C11
+	for <netdev@vger.kernel.org>; Tue,  4 Nov 2025 00:29:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=98.137.64.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762214827; cv=none; b=TM2h1eKRECsjJ6M/B2ahJmz+x77Wj+U92OJo6fYBBJGl2m37JU2PkcqUBrKjfJ4+t32KS19zX7QRhGV0BrYL7eKhqSBQqAdcI72/JFgV7IrwHOVb1X5OTCpEvg1HmgecFT6yG3gFrPbl/CmB23Qp4m8Q3ixmGyLU2xd7CGp3IUE=
+	t=1762216149; cv=none; b=nEBmvno2MMNkNsigIwAoZwyA7dDX91TnLL2KzbbQt9Sy0Bflwiflk5lPy22dPuhBv7zkwO69HbF6oNt3mVMecuS6SK8hB9cSXJIom6AGn0A6ArCeCPl2ur5KDTvpAyApPV973N6tJSMqzdR2RCCGsf1NWW9gddEVeCfW7eSJHU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762214827; c=relaxed/simple;
-	bh=hqxkjWiznuwSwInnXBYOqC3AkwUyx+wftZ51BD4uuFo=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=QlD4EpNM81tDKbJjfU1NwmHMy/IaqJIavsfjDAafdYehCZgyLHJM3g9oqP0vb/aYZWCR/AzVkbfdb5ASN0lyeA/3sM7ZrCo7vS1RJFBiInw/voVClgVPfr7qhBd2+5aCJdTKvVMh059D07XJ9C+LoRbk3YApzuHSn3K3GRSxv60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net; spf=pass smtp.mailfrom=ownmail.net; dkim=pass (2048-bit key) header.d=ownmail.net header.i=@ownmail.net header.b=IehWa5/X; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=jBUPRqxZ; arc=none smtp.client-ip=202.12.124.137
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ownmail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ownmail.net
-Received: from phl-compute-03.internal (phl-compute-03.internal [10.202.2.43])
-	by mailflow.stl.internal (Postfix) with ESMTP id C175B1300249;
-	Mon,  3 Nov 2025 19:07:01 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-03.internal (MEProxy); Mon, 03 Nov 2025 19:07:02 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ownmail.net; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to; s=fm3; t=
-	1762214821; x=1762222021; bh=94oeGAK0r88apEjJfQglOhFfZqxC4NAb3cb
-	WH+rsjBk=; b=IehWa5/XbOL02ENDC9UBzgsrZdMOoYGtHmDgM2P/imQQ9R9fU7d
-	G7WHJ9Ygism9teLz+ePIPmIwvyslQcYIApS56nVdpi3C7kCmCBMuOCtKVll2xYsI
-	JBBPnrOwFP4NicmjNC/WcBgkIgM4o0sfgl2cV9w9H5X5BuXIi9qGE31wTVrOFPiu
-	6phkqeDERF+CdA9Nbvb+Ckmsy5SbdcblHXEIItXALT3Z9bsRHhib/BkxwDyX3aXt
-	AV1fQuWLuZqQ/xpoERX+cnMw+MC0eYjuF95du39X0xEEYRsoZOiP4Kkzsi/nhBn3
-	kSX0U/HGQyhLt8MvFi613HA2L3vevJeB+Pw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762214821; x=
-	1762222021; bh=94oeGAK0r88apEjJfQglOhFfZqxC4NAb3cbWH+rsjBk=; b=j
-	BUPRqxZ2msM7yC4ocH/BlrZ+H469sJ5R5J4mWUlPL6pK+KMef2Ltx1mtBpDcgHZW
-	pDqlzOoUYhGd2vsQY8IlbcWXMqdNZNRPko+LP6Mk/bbIcqALLEy8MYmt2N8hFtuE
-	x9X9yYB26c/rrh9qAFo7sWBiccL7g6RwFR6EnE9q+dvJad2KrV5nQPC5HLnL/eLA
-	RGm54kuD+sOyup9aql7FImUForoaPsAPkrbCMAsRZtkYoAgtYKwZkEHIWB/1iJk1
-	A3ZkG5w4PvuuETOjT2R69EdsONIZVnWfhEWQgMUCZqKqv13dmR2qhFP/TS1QEhnV
-	WO5zo5edr9z9D1Z0QyhYg==
-X-ME-Sender: <xms:o0MJaaiblHFhiJ4oik5JrXdy-8CL16Y411RnEO2wDHjvlu8hzOC0pQ>
-    <xme:o0MJaaCXiI-D_PMW2jhIVQShtynvscxAhr1Kjs6yz6rciBsKErwlcv0_O9fVTQBLg
-    UbuwMaMbn3loIWH-c_0qJAC_qup_itQZriG6H9pNZxGYIANJg>
-X-ME-Received: <xmr:o0MJaaXmiIy78vA_-TLv3cOURz94IGPXczgzetAgP-7D_6U5oJob751tTaBT6q1QW16k6lNmQPnzHsUdb22HtthY1rc-1XuyAj_Ptht2BABr>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddujeelheefucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurheptgfgggfhvfevufgjfhffkfhrsehtqhertddttdejnecuhfhrohhmpefpvghilheu
-    rhhofihnuceonhgvihhlsgesohifnhhmrghilhdrnhgvtheqnecuggftrfgrthhtvghrnh
-    epleejtdefgeeukeeiteduveehudevfeffvedutefgteduhfegvdfgtdeigeeuudejnecu
-    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepnhgvihhlsg
-    esohifnhhmrghilhdrnhgvthdpnhgspghrtghpthhtohepgeefpdhmohguvgepshhmthhp
-    ohhuthdprhgtphhtthhopehvihhrohesiigvnhhivhdrlhhinhhugidrohhrghdruhhkpd
-    hrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthht
-    oheplhhinhhugidqgihfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhope
-    hlihhnuhigqdhunhhiohhnfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthht
-    oheplhhinhhugidqnhhfshesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhope
-    hlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthho
-    pehlihhnuhigqdhfshguvghvvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpth
-    htoheplhhinhhugidqtghifhhssehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthht
-    ohepvggtrhihphhtfhhssehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:o0MJafqHELEaQZJsRDNjYPG6V_Pt2G8rxtPfLSqrmlTW3OzRQH8A_w>
-    <xmx:o0MJaRWYTVcEFuaHTtTzRRdgJkGOa7CvXAnVizxb8Vof7jg9FVCaog>
-    <xmx:o0MJaeautq61wYllmpZ7JRzO6vkYr5zgzScUnDFE2wNyL7LRIEvKVw>
-    <xmx:o0MJaRmhnP2XJ4sk_h_9SNFozRkausOe_Jt-XkVpa8dJv8E1iDpuzg>
-    <xmx:pUMJaT-QCiPKUKxOskHEi_nD69_l_HyfI51gs72DNovSp8OW89kPrk8m>
-Feedback-ID: iab3e480c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 3 Nov 2025 19:06:49 -0500 (EST)
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1762216149; c=relaxed/simple;
+	bh=CSy4MCBCDgb9fcvKRUTt7pLCtBnvGK72b9vwibFXUBQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UnqQQ8kzi7zllY2VBQseh6etegcHHIxVyuqpPbS6EaIH8WP6A4UP0qc53JlnClb8Q4EU5WEp6mR43mi7qfIXtc0cEVS18Et5kzJczUoMRAtLuqx8jKl89E6HMVCGzCiL2d8O35iZV97gNe6Gvhk8dMTJbWLxg3K3moP+v/g6IKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=oiy0Us6x; arc=none smtp.client-ip=98.137.64.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1762216147; bh=oaiUcUp5Hsi9n0Ln3TIg1v2DZX1b7caGKy5J5pPVByY=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=oiy0Us6xJtfjF1P+YaDxDV2T/82q3QnDsfA78mLeHGmY0mSAEmOfXyJw9BPg110BewsYQgABrl4qAlUB1MGR6+H/ZO+6DUbFValN5sGecd66nSXFqIE7EAwZxrFtQ+NEUhhGGWjgopAnqYMTdxB7baeff7zVhS9RZ7ZdmfGb0CfYSjoJWR812GQ7xTvbFUAe2rP5WkpMp/BxD8nkA4KGQhP+wCgUGFYunxDQ3/cP8+/kSBC5TI6idXrLOhN3QZbFHNz8R3o5Y4yp7TYYxKX93fGKu4ILnySktwsZHB3roRzgSuEM2pU3MXa5RG12wbsrqXvQMhvzBAMz81L09dvuLA==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1762216147; bh=Af0WqtdKCt45GlRMD6dcWr/V1b1h4euQrEfOCibnd7D=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=J3e3jhZlmgSVYZT42RwKTrAnliYAP1NSocNKRYMj0UMj+8Fi91v+5PrRXkWGObNVCtBXQCYvRmcbNO3trYsvlnvcYeN5jjSEk9zqKlchz9G1Uja6Hp6VG3td8Kx93mOy/EO33Z1BuBcCs3TfFtm/CdL23UKQphDJxRusuNU0wnap4lLXxEu0YB7d4YE6qfboXRaF1RsPLxE3QqyJ7y+q9VMr1kZ1jZeo5qncAD5edPE58ZGYgeNzYXTOsSbnjS4KeMMpT9O3dNtAiY6sjVaZxQX+y0njS7QozhDZ3QrysDZ+McaHtDt7vQjLuCJhkbdl1ZMiGZ2TPkm5tnmELcbDUQ==
+X-YMail-OSG: WZa_aNMVM1lLuzCHRR24nt36LWjfpCEArEKZQ8O8qEWkJnjlYfyPMYFbGTigfTt
+ L7LCK6dpnNk.mgRowWwQ.FT0COj5KX54XKkeo3Hx8_5lhr24RsKulvJ_DDkqUjKL6sFE35Vvr_Jo
+ c1J6HLCmsl6Oszqy4kO42kSeoBZS4FmHxQIy1GR88YCKbJNwiK8kSFsL6Px_QqUV1dox1OrxqBJL
+ qu_jOkUC095O1JaF5YNZNxj1ry5Vnej9G0JDsqRYGwC9pnwu8TBTtUtnfjR9DjCsVVLskGnMqFE6
+ nUhc99NRA8MoiWFxPJG.T3Uds_iJ0OfSurzveSkq759JSF2R0xbtTmzE.GUsaIb1Q9Cjb027g6Xm
+ KIby9JoW83oeLLT0ixbobszxqgiQMzJoAFC77BbXwAxPiZLvJzbpy0tbOmObLJT74JpnGd9bQ476
+ KVatrcYnb8kHnz8gmXi0wI_710gJniTtPpNH1s6UGAJ4jubZJs8FKrtHp.5hyBaB6b_qMIQRQWXx
+ ryMeQYW4YmuKU0f4ktKcmUCZbhLxnyXzW.6PZgwLrCF4aeeOoy402.1GsOn_8iUDToaIxBMcyMf4
+ jPujCnmNQLi2MQjNqoFsHwxfvobhD5z9xr3wuuOatHxygnuHOx9ePATFyqp7c_y03a8ZOqfMbpLD
+ 3nV1ABfud4XEUpuop7VUafi58A0Lu6JyvD0CK_Wcwe6DCQcUENMSsLvF7LVqIZQhsR1qEwzUUtrz
+ pOn7lRpKBjKqt2EvWGklued9KbPrtikaz7W4iUtLWVoLnz8MxJH39goX6SpR.k4Ntzniplg6nluO
+ 9HN7I89jwauy2PB4.BIZxeIJMEcZmINHXOI4OQ01BQnTEWpb8e7FjvJtb7tIu88LTLjyiiC__mCl
+ dG5_pBPC7tJLkWdG8z.qjahDueHHoZ4GEYSONldNFAmSMrQ041ER0Eq0CNBn7zpCyLIGxQ5Z3G.T
+ 17NDsHLCDU4gSoyaKHZC9.DzVO1GW3QNdWVp3eDelWOEIea7ihbNl7epAtKOZ1uz577Io7BsFwQE
+ vUW_Nufl0XG_QJkMUvO5kWyolz.X86QWkUWesy_gzpld6vtnzzkFaVDPOYddfJC1_39ZVi1bnqDR
+ ElBd8WWddUgEuKFfR6_C5rNBroWIFnSItZxSTRI4XZu8t4b_daWxSWwaMk1RhfVr03wMzPpahYRP
+ 7tfEJrU6TtSNctFmr8mOFJX5TAm9.Yc_qs8KhYN7pnUVRTcU7He7tOX7hIhpdZX31EFTway7sP8E
+ cEsmeLMMARaSAGgN6ooCfjyuRNls9xV2QZBayT5X3UoNu6uG9z_4jC5GghDpypl2vLLx.x2nFX5D
+ 3jqkQPRmrT1EJ078K1jwBOXSFWAlu_qvde0SKApy6s5L.Rb.pG5URLtXbYQ51HJIi_CGks1reWjd
+ rytwRPwuQTVYqY4jfIqQE7iUSYYeYaquido8So3Yq97YXW1dAwVfRVKdVQuJFBD1_obsSi4LoZKs
+ G_RCMKYCVIQRafJ9tU9sOkYGz9bl7mNM4mMDekHqfk0aDVX16XT3G4D7K3I1kAZBo.R.txjsdAV_
+ gzZSGn_4aJiU_Iwkvc_OfC1cQ5syRg5Fx2Skrr3TGrCSGuOShPa8UA2k9VQ6rzFWumLWVdilU8ZX
+ Rp2.il.htr647R9FVmJ3GGuIFQg3iLvxEU0NIoGAkye1cIe5z_IUKQ5PJ6NQZcJcYu6O6gcN27Fr
+ C.lhlHtlVUV5fcImHOR2xv3OjUAvL6trxNAanY2tuHAQe9bhCAWlJTQ00blDUr4dSkPhQjKB5SrN
+ KR8cimfQIv1GmDYypN2YokBhe7KwA4VCnasKS9WdkQeu2yACwjGFcNmD0ypys5DpW5.6P68VndHO
+ S7WSCbRrJmmEylIKowJfmyARDe4iCF4Myavy29RBdt6t7aYSvgNxw2g_Aj1UzpyLapozOwZHT1AK
+ Mc0FgtRvK_uaBYO6YuGRHRa9wuM_ZQWq9DvMknfwdeotl5GLzIljTCusWCNtVnyxon13L57tIM6A
+ FmofW0IMal9k.RsZnT0I4UoSUxbukUp72u88EvSjlm6N._Web2S8gp3pOE4gLv6LIneTYhbUPURk
+ TTd4bxgjjz98h4nSllp7B0NqWAYdQTUrsqitmQyZdFBc48_yWuMVOqZX.uUNtpZfFfH0ht1m6P.p
+ wtXPakW_vHWLLVwFsU5c0hqGXMu_.UV4hz6ZY0m82rmJTIK.3uBoBJJIS1VAGANzdQPugU9YP0bP
+ Swz.u5XlacqXfJ.VMKU1CM6NUViuSeklB1UegmKlHpQMGEbg0UwreVvBvfJ1gG07lN1hTeKssMv2
+ hZjVsFxnBugHpWoxZ2g--
+X-Sonic-MF: <adelodunolaoluwa@yahoo.com>
+X-Sonic-ID: 116530db-d01c-4738-89fb-a7218f6444b8
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic301.consmr.mail.gq1.yahoo.com with HTTP; Tue, 4 Nov 2025 00:29:07 +0000
+Received: by hermes--production-bf1-58477f5468-2sh44 (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID cfe9c5061b0e7e39df76b5fb6784a85a;
+          Tue, 04 Nov 2025 00:08:51 +0000 (UTC)
+Message-ID: <7a162b38-3ff8-4f97-aac3-4fe2ab50fe33@yahoo.com>
+Date: Tue, 4 Nov 2025 01:08:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: NeilBrown <neilb@ownmail.net>
-To: "Jeff Layton" <jlayton@kernel.org>
-Cc: "Miklos Szeredi" <miklos@szeredi.hu>,
- "Alexander Viro" <viro@zeniv.linux.org.uk>,
- "Christian Brauner" <brauner@kernel.org>, "Jan Kara" <jack@suse.cz>,
- "Chuck Lever" <chuck.lever@oracle.com>,
- "Alexander Aring" <alex.aring@gmail.com>,
- "Trond Myklebust" <trondmy@kernel.org>,
- "Anna Schumaker" <anna@kernel.org>, "Steve French" <sfrench@samba.org>,
- "Paulo Alcantara" <pc@manguebit.org>,
- "Ronnie Sahlberg" <ronniesahlberg@gmail.com>,
- "Shyam Prasad N" <sprasad@microsoft.com>, "Tom Talpey" <tom@talpey.com>,
- "Bharath SM" <bharathsm@microsoft.com>,
- "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>,
- "Danilo Krummrich" <dakr@kernel.org>,
- "David Howells" <dhowells@redhat.com>, "Tyler Hicks" <code@tyhicks.com>,
- "Olga Kornievskaia" <okorniev@redhat.com>,
- "Dai Ngo" <Dai.Ngo@oracle.com>, "Amir Goldstein" <amir73il@gmail.com>,
- "Namjae Jeon" <linkinjeon@kernel.org>,
- "Steve French" <smfrench@gmail.com>,
- "Sergey Senozhatsky" <senozhatsky@chromium.org>,
- "Carlos Maiolino" <cem@kernel.org>,
- "Kuniyuki Iwashima" <kuniyu@google.com>,
- "David S. Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, "Simon Horman" <horms@kernel.org>,
- linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
- samba-technical@lists.samba.org, netfs@lists.linux.dev,
- ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org,
- linux-xfs@vger.kernel.org, netdev@vger.kernel.org,
- "Jeff Layton" <jlayton@kernel.org>
-Subject: Re: [PATCH v4 09/17] vfs: add struct createdata for passing arguments
- to vfs_create()
-In-reply-to: <20251103-dir-deleg-ro-v4-9-961b67adee89@kernel.org>
-References: <20251103-dir-deleg-ro-v4-0-961b67adee89@kernel.org>,
- <20251103-dir-deleg-ro-v4-9-961b67adee89@kernel.org>
-Date: Tue, 04 Nov 2025 11:06:45 +1100
-Message-id: <176221480589.1793333.7801494824880510264@noble.neil.brown.name>
-Reply-To: NeilBrown <neil@brown.name>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3] selftests: af_unix: Add tests for ECONNRESET and EOF
+ semantics
+To: Kuniyuki Iwashima <kuniyu@google.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, shuah@kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, skhan@linuxfoundation.org,
+ david.hunter.linux@gmail.com, linux-kernel-mentees@lists.linuxfoundation.org
+References: <20251101172230.10179-1-adelodunolaoluwa.ref@yahoo.com>
+ <20251101172230.10179-1-adelodunolaoluwa@yahoo.com>
+ <CAAVpQUDL1FB1nFYOZ6QuO+cGTqnpYNSaFtFD=YN742pyspe9ew@mail.gmail.com>
+Content-Language: en-US
+From: Sunday Adelodun <adelodunolaoluwa@yahoo.com>
+In-Reply-To: <CAAVpQUDL1FB1nFYOZ6QuO+cGTqnpYNSaFtFD=YN742pyspe9ew@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Mailer: WebService/1.1.24652 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
 
-On Mon, 03 Nov 2025, Jeff Layton wrote:
-> vfs_create() has grown an uncomfortably long argument list, and a
-> following patch will add another. Convert it to take a new struct
-> createdata pointer and fix up the callers to pass one in.
->=20
+On 11/2/25 08:32, Kuniyuki Iwashima wrote:
+> On Sat, Nov 1, 2025 at 10:23 AM Sunday Adelodun
+> <adelodunolaoluwa@yahoo.com> wrote:
+>> Add selftests to verify and document Linux’s intended behaviour for
+>> UNIX domain sockets (SOCK_STREAM and SOCK_DGRAM) when a peer closes.
+>> The tests verify that:
+>>
+>>   1. SOCK_STREAM returns EOF when the peer closes normally.
+>>   2. SOCK_STREAM returns ECONNRESET if the peer closes with unread data.
+>>   3. SOCK_SEQPACKET returns EOF when the peer closes normally.
+>>   4. SOCK_SEQPACKET returns ECONNRESET if the peer closes with unread data.
+>>   5. SOCK_DGRAM does not return ECONNRESET when the peer closes.
+>>
+>> This follows up on review feedback suggesting a selftest to clarify
+>> Linux’s semantics.
+>>
+>> Suggested-by: Kuniyuki Iwashima <kuniyu@google.com>
+>> Signed-off-by: Sunday Adelodun <adelodunolaoluwa@yahoo.com>
+>> ---
+>>   tools/testing/selftests/net/af_unix/Makefile  |   1 +
+>>   .../selftests/net/af_unix/unix_connreset.c    | 179 ++++++++++++++++++
+>>   2 files changed, 180 insertions(+)
+>>   create mode 100644 tools/testing/selftests/net/af_unix/unix_connreset.c
+>>
+>> diff --git a/tools/testing/selftests/net/af_unix/Makefile b/tools/testing/selftests/net/af_unix/Makefile
+>> index de805cbbdf69..5826a8372451 100644
+>> --- a/tools/testing/selftests/net/af_unix/Makefile
+>> +++ b/tools/testing/selftests/net/af_unix/Makefile
+>> @@ -7,6 +7,7 @@ TEST_GEN_PROGS := \
+>>          scm_pidfd \
+>>          scm_rights \
+>>          unix_connect \
+>> +       unix_connreset \
+> patchwork caught this test is not added to .gitignore.
+> https://patchwork.kernel.org/project/netdevbpf/patch/20251101172230.10179-1-adelodunolaoluwa@yahoo.com/
+>
+> Could you add it to this file ?
+>
+> tools/testing/selftests/net/.gitignore
+Oh, thank you for this. will add it
+>
+>
+>>   # end of TEST_GEN_PROGS
+>>
+>>   include ../../lib.mk
+>> diff --git a/tools/testing/selftests/net/af_unix/unix_connreset.c b/tools/testing/selftests/net/af_unix/unix_connreset.c
+>> new file mode 100644
+>> index 000000000000..6f43435d96e2
+>> --- /dev/null
+>> +++ b/tools/testing/selftests/net/af_unix/unix_connreset.c
+>> @@ -0,0 +1,179 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +/*
+>> + * Selftest for AF_UNIX socket close and ECONNRESET behaviour.
+>> + *
+>> + * This test verifies:
+>> + *  1. SOCK_STREAM returns EOF when the peer closes normally.
+>> + *  2. SOCK_STREAM returns ECONNRESET if peer closes with unread data.
+>> + *  3. SOCK_SEQPACKET returns EOF when the peer closes normally.
+>> + *  4. SOCK_SEQPACKET returns ECONNRESET if the peer closes with unread data.
+>> + *  5. SOCK_DGRAM does not return ECONNRESET when the peer closes.
+>> + *
+>> + * These tests document the intended Linux behaviour.
+>> + *
+>> + */
+>> +
+>> +#define _GNU_SOURCE
+>> +#include <stdlib.h>
+>> +#include <string.h>
+>> +#include <fcntl.h>
+>> +#include <unistd.h>
+>> +#include <errno.h>
+>> +#include <sys/socket.h>
+>> +#include <sys/un.h>
+>> +#include "../../kselftest_harness.h"
+>> +
+>> +#define SOCK_PATH "/tmp/af_unix_connreset.sock"
+>> +
+>> +static void remove_socket_file(void)
+>> +{
+>> +       unlink(SOCK_PATH);
+>> +}
+>> +
+>> +FIXTURE(unix_sock)
+>> +{
+>> +       int server;
+>> +       int client;
+>> +       int child;
+>> +};
+>> +
+>> +FIXTURE_VARIANT(unix_sock)
+>> +{
+>> +       int socket_type;
+>> +       const char *name;
+>> +};
+>> +
+>> +/* Define variants: stream and datagram */
+> nit: outdated, maybe simply remove ?
+oh..skipped me.
+will do so.
+>
+>> +FIXTURE_VARIANT_ADD(unix_sock, stream) {
+>> +       .socket_type = SOCK_STREAM,
+>> +       .name = "SOCK_STREAM",
+>> +};
+>> +
+>> +FIXTURE_VARIANT_ADD(unix_sock, dgram) {
+>> +       .socket_type = SOCK_DGRAM,
+>> +       .name = "SOCK_DGRAM",
+>> +};
+>> +
+>> +FIXTURE_VARIANT_ADD(unix_sock, seqpacket) {
+>> +       .socket_type = SOCK_SEQPACKET,
+>> +       .name = "SOCK_SEQPACKET",
+>> +};
+>> +
+>> +FIXTURE_SETUP(unix_sock)
+>> +{
+>> +       struct sockaddr_un addr = {};
+>> +       int err;
+>> +
+>> +       addr.sun_family = AF_UNIX;
+>> +       strcpy(addr.sun_path, SOCK_PATH);
+>> +       remove_socket_file();
+>> +
+>> +       self->server = socket(AF_UNIX, variant->socket_type, 0);
+>> +       ASSERT_LT(-1, self->server);
+>> +
+>> +       err = bind(self->server, (struct sockaddr *)&addr, sizeof(addr));
+>> +       ASSERT_EQ(0, err);
+>> +
+>> +       if (variant->socket_type == SOCK_STREAM ||
+>> +               variant->socket_type == SOCK_SEQPACKET) {
+> patchwork caught mis-alignment here and other places.
+>
+> I'm using this for emacs, and other editors will have a similar config.
+>
+> (setq-default c-default-style "linux")
+>
+> You can check if lines are aligned properly by
+>
+> $ git show --format=email | ./scripts/checkpatch.pl
+>
+>
+>> +               err = listen(self->server, 1);
+>> +               ASSERT_EQ(0, err);
+>> +
+>> +               self->client = socket(AF_UNIX, variant->socket_type, 0);
+> Could you add SOCK_NONBLOCK here too ?
+This is noted
+>
+>> +               ASSERT_LT(-1, self->client);
+>> +
+>> +               err = connect(self->client, (struct sockaddr *)&addr, sizeof(addr));
+>> +               ASSERT_EQ(0, err);
+>> +
+>> +               self->child = accept(self->server, NULL, NULL);
+>> +               ASSERT_LT(-1, self->child);
+>> +       } else {
+>> +               /* Datagram: bind and connect only */
+>> +               self->client = socket(AF_UNIX, SOCK_DGRAM | SOCK_NONBLOCK, 0);
+>> +               ASSERT_LT(-1, self->client);
+>> +
+>> +               err = connect(self->client, (struct sockaddr *)&addr, sizeof(addr));
+>> +               ASSERT_EQ(0, err);
+>> +       }
+>> +}
+>> +
+>> +FIXTURE_TEARDOWN(unix_sock)
+>> +{
+>> +       if (variant->socket_type == SOCK_STREAM ||
+>> +               variant->socket_type == SOCK_SEQPACKET)
+>> +               close(self->child);
+>> +
+>> +       close(self->client);
+>> +       close(self->server);
+>> +       remove_socket_file();
+>> +}
+>> +
+>> +/* Test 1: peer closes normally */
+>> +TEST_F(unix_sock, eof)
+>> +{
+>> +       char buf[16] = {};
+>> +       ssize_t n;
+>> +
+>> +       /* Peer closes normally */
+>> +       if (variant->socket_type == SOCK_STREAM ||
+>> +               variant->socket_type == SOCK_SEQPACKET)
+>> +               close(self->child);
+>> +       else
+>> +               close(self->server);
+>> +
+>> +       n = recv(self->client, buf, sizeof(buf), 0);
+>> +       TH_LOG("%s: recv=%zd errno=%d (%s)", variant->name, n, errno, strerror(errno));
+> errno is undefined if not set, and same for strerror(errno).
+>
+> Also, if ASSERT_XXX() below fails, the same information
+> (test case, errno) is logged.  So, TH_LOG() seems unnecessary.
+>
+> Maybe try modifying the condition below and see how the
+> assertion is logged.
+Oh..thank you. Didn't it through that way.
+I understand.
+I will remove the TH_LOG()'s
+>
+>> +       if (variant->socket_type == SOCK_STREAM ||
+>> +               variant->socket_type == SOCK_SEQPACKET) {
+>> +               ASSERT_EQ(0, n);
+>> +       } else {
+>> +               ASSERT_EQ(-1, n);
+>> +               ASSERT_EQ(EAGAIN, errno);
+>> +       }
+>> +}
+>> +
+>> +/* Test 2: peer closes with unread data */
+>> +TEST_F(unix_sock, reset_unread)
+>> +{
+>> +       char buf[16] = {};
+>> +       ssize_t n;
+>> +
+>> +       /* Send data that will remain unread by client */
+>> +       send(self->client, "hello", 5, 0);
+>> +       close(self->child);
+>> +
+>> +       n = recv(self->client, buf, sizeof(buf), 0);
+>> +       TH_LOG("%s: recv=%zd errno=%d (%s)", variant->name, n, errno, strerror(errno));
+>> +       if (variant->socket_type == SOCK_STREAM ||
+>> +               variant->socket_type == SOCK_SEQPACKET) {
+>> +               ASSERT_EQ(-1, n);
+>> +               ASSERT_EQ(ECONNRESET, errno);
+>> +       } else {
+>> +               ASSERT_EQ(-1, n);
+>> +               ASSERT_EQ(EAGAIN, errno);
+>> +       }
+>> +}
+>> +
+>> +/* Test 3: SOCK_DGRAM peer close */
+>> Now Test 2 and Test 3 look identical ;)
 
-I know Christian asked for this and he is a Maintainer so.....
+seems so, but the only difference is:
 
-but I would like say that I don't think this is a win.  The argument
-list isn't *that* long, and all the args are quite different so there is
-little room for confusion.
+close(self->child); is used in Test 2, while
+close(self->server); is used in Test 3.
+Maybe I should find a way to collapse Tests 2 and 3 (if statement might 
+work)
 
-I would be in favour of dropping the "dir" arg because it is always
-   d_inode(dentry->d_parent)
-which is stable.
+I am just afraid the tests to run will reduce to 6 from 9 and we will have 6
+cases passed as against 7 as before.
 
-I would rather pass the vfsmnt rather than the idmap, then we could pass
-"struct path", for both that and dentry, but I know Christian disagrees.
+What do you think?
 
-So if anyone really thinks the arg list is too long, I think there are
-better solutions.  But I don't even think the length is a problem.
-
-NeilBrown
-
-
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> ---
->  fs/ecryptfs/inode.c      | 11 ++++++++---
->  fs/namei.c               | 33 ++++++++++++++++++++-------------
->  fs/nfsd/nfs3proc.c       |  9 ++++++++-
->  fs/nfsd/vfs.c            | 19 ++++++++++++-------
->  fs/open.c                |  9 ++++++---
->  fs/overlayfs/overlayfs.h |  7 ++++++-
->  fs/smb/server/vfs.c      |  9 +++++++--
->  include/linux/fs.h       | 13 +++++++++++--
->  8 files changed, 78 insertions(+), 32 deletions(-)
->=20
-> diff --git a/fs/ecryptfs/inode.c b/fs/ecryptfs/inode.c
-> index 88631291b32535f623a3fbe4ea9b6ed48a306ca0..51accd166dbf515eb5221b6a39b=
-204622a6b0f7c 100644
-> --- a/fs/ecryptfs/inode.c
-> +++ b/fs/ecryptfs/inode.c
-> @@ -187,9 +187,14 @@ ecryptfs_do_create(struct inode *directory_inode,
->  	struct inode *inode;
-> =20
->  	rc =3D lock_parent(ecryptfs_dentry, &lower_dentry, &lower_dir);
-> -	if (!rc)
-> -		rc =3D vfs_create(&nop_mnt_idmap, lower_dir,
-> -				lower_dentry, mode, true);
-> +	if (!rc) {
-> +		struct createdata args =3D { .idmap =3D &nop_mnt_idmap,
-> +					   .dir =3D lower_dir,
-> +					   .dentry =3D lower_dentry,
-> +					   .mode =3D mode,
-> +					   .excl =3D true };
-> +		rc =3D vfs_create(&args);
-> +	}
->  	if (rc) {
->  		printk(KERN_ERR "%s: Failure to create dentry in lower fs; "
->  		       "rc =3D [%d]\n", __func__, rc);
-> diff --git a/fs/namei.c b/fs/namei.c
-> index f439429bdfa271ccc64c937771ef4175597feb53..fdf4e78cd041de8c564b7d1d89a=
-46ba2aaf79d53 100644
-> --- a/fs/namei.c
-> +++ b/fs/namei.c
-> @@ -3460,23 +3460,22 @@ static inline umode_t vfs_prepare_mode(struct mnt_i=
-dmap *idmap,
-> =20
->  /**
->   * vfs_create - create new file
-> - * @idmap:	idmap of the mount the inode was found from
-> - * @dir:	inode of the parent directory
-> - * @dentry:	dentry of the child file
-> - * @mode:	mode of the child file
-> - * @want_excl:	whether the file must not yet exist
-> + * @args:	struct createdata describing create to be done
->   *
->   * Create a new file.
->   *
->   * If the inode has been found through an idmapped mount the idmap of
-> - * the vfsmount must be passed through @idmap. This function will then take
-> - * care to map the inode according to @idmap before checking permissions.
-> + * the vfsmount must be passed through @args->idmap. This function will th=
-en take
-> + * care to map the inode according to @args->idmap before checking permiss=
-ions.
->   * On non-idmapped mounts or if permission checking is to be performed on =
-the
->   * raw inode simply pass @nop_mnt_idmap.
->   */
-> -int vfs_create(struct mnt_idmap *idmap, struct inode *dir,
-> -	       struct dentry *dentry, umode_t mode, bool want_excl)
-> +int vfs_create(struct createdata *args)
->  {
-> +	struct mnt_idmap *idmap =3D args->idmap;
-> +	struct inode *dir =3D args->dir;
-> +	struct dentry *dentry =3D args->dentry;
-> +	umode_t mode =3D args->mode;
->  	int error;
-> =20
->  	error =3D may_create(idmap, dir, dentry);
-> @@ -3490,7 +3489,7 @@ int vfs_create(struct mnt_idmap *idmap, struct inode =
-*dir,
->  	error =3D security_inode_create(dir, dentry, mode);
->  	if (error)
->  		return error;
-> -	error =3D dir->i_op->create(idmap, dir, dentry, mode, want_excl);
-> +	error =3D dir->i_op->create(idmap, dir, dentry, mode, args->excl);
->  	if (!error)
->  		fsnotify_create(dir, dentry);
->  	return error;
-> @@ -4382,12 +4381,20 @@ static int do_mknodat(int dfd, struct filename *nam=
-e, umode_t mode,
-> =20
->  	idmap =3D mnt_idmap(path.mnt);
->  	switch (mode & S_IFMT) {
-> -		case 0: case S_IFREG:
-> -			error =3D vfs_create(idmap, path.dentry->d_inode,
-> -					   dentry, mode, true);
-> +		case 0:
-> +		case S_IFREG:
-> +		{
-> +			struct createdata args =3D { .idmap =3D idmap,
-> +						   .dir =3D path.dentry->d_inode,
-> +						   .dentry =3D dentry,
-> +						   .mode =3D mode,
-> +						   .excl =3D true };
-> +
-> +			error =3D vfs_create(&args);
->  			if (!error)
->  				security_path_post_mknod(idmap, dentry);
->  			break;
-> +		}
->  		case S_IFCHR: case S_IFBLK:
->  			error =3D vfs_mknod(idmap, path.dentry->d_inode,
->  					  dentry, mode, new_decode_dev(dev));
-> diff --git a/fs/nfsd/nfs3proc.c b/fs/nfsd/nfs3proc.c
-> index b6d03e1ef5f7a5e8dd111b0d56c061f1e91abff7..dcd7de465e7e33d1c66ee0272c4=
-f220d55e85928 100644
-> --- a/fs/nfsd/nfs3proc.c
-> +++ b/fs/nfsd/nfs3proc.c
-> @@ -258,6 +258,7 @@ nfsd3_create_file(struct svc_rqst *rqstp, struct svc_fh=
- *fhp,
->  	struct nfsd_attrs attrs =3D {
->  		.na_iattr	=3D iap,
->  	};
-> +	struct createdata cargs =3D { };
->  	__u32 v_mtime, v_atime;
->  	struct inode *inode;
->  	__be32 status;
-> @@ -344,7 +345,13 @@ nfsd3_create_file(struct svc_rqst *rqstp, struct svc_f=
-h *fhp,
->  	status =3D fh_fill_pre_attrs(fhp);
->  	if (status !=3D nfs_ok)
->  		goto out;
-> -	host_err =3D vfs_create(&nop_mnt_idmap, inode, child, iap->ia_mode, true);
-> +
-> +	cargs.idmap =3D &nop_mnt_idmap;
-> +	cargs.dir =3D inode;
-> +	cargs.dentry =3D child;
-> +	cargs.mode =3D iap->ia_mode;
-> +	cargs.excl =3D true;
-> +	host_err =3D vfs_create(&cargs);
->  	if (host_err < 0) {
->  		status =3D nfserrno(host_err);
->  		goto out;
-> diff --git a/fs/nfsd/vfs.c b/fs/nfsd/vfs.c
-> index c400ea94ff2e837fd59719bf2c4b79ef1d064743..e4ed1952f02c0a66c64528e5945=
-3cc9b2352c18f 100644
-> --- a/fs/nfsd/vfs.c
-> +++ b/fs/nfsd/vfs.c
-> @@ -1527,11 +1527,12 @@ nfsd_create_locked(struct svc_rqst *rqstp, struct s=
-vc_fh *fhp,
->  		   struct nfsd_attrs *attrs,
->  		   int type, dev_t rdev, struct svc_fh *resfhp)
->  {
-> -	struct dentry	*dentry, *dchild;
-> -	struct inode	*dirp;
-> -	struct iattr	*iap =3D attrs->na_iattr;
-> -	__be32		err;
-> -	int		host_err =3D 0;
-> +	struct dentry		*dentry, *dchild;
-> +	struct inode		*dirp;
-> +	struct iattr		*iap =3D attrs->na_iattr;
-> +	__be32			err;
-> +	int			host_err =3D 0;
-> +	struct createdata	cargs =3D { };
-> =20
->  	dentry =3D fhp->fh_dentry;
->  	dirp =3D d_inode(dentry);
-> @@ -1552,8 +1553,12 @@ nfsd_create_locked(struct svc_rqst *rqstp, struct sv=
-c_fh *fhp,
->  	err =3D 0;
->  	switch (type) {
->  	case S_IFREG:
-> -		host_err =3D vfs_create(&nop_mnt_idmap, dirp, dchild,
-> -				      iap->ia_mode, true);
-> +		cargs.idmap =3D &nop_mnt_idmap;
-> +		cargs.dir =3D dirp;
-> +		cargs.dentry =3D dchild;
-> +		cargs.mode =3D iap->ia_mode;
-> +		cargs.excl =3D true;
-> +		host_err =3D vfs_create(&cargs);
->  		if (!host_err)
->  			nfsd_check_ignore_resizing(iap);
->  		break;
-> diff --git a/fs/open.c b/fs/open.c
-> index fdaa6f08f6f4cac5c2fefd3eafa5e430e51f3979..006cc2aeb1fbbb3db48b32db798=
-108da120f75c2 100644
-> --- a/fs/open.c
-> +++ b/fs/open.c
-> @@ -1164,6 +1164,11 @@ struct file *dentry_open_nonotify(const struct path =
-*path, int flags,
->  struct file *dentry_create(const struct path *path, int flags, umode_t mod=
-e,
->  			   const struct cred *cred)
->  {
-> +	struct createdata cargs =3D { .idmap =3D mnt_idmap(path->mnt),
-> +				    .dir =3D d_inode(path->dentry->d_parent),
-> +				    .dentry =3D path->dentry,
-> +				    .mode =3D mode,
-> +				    .excl =3D true };
->  	struct file *f;
->  	int error;
-> =20
-> @@ -1171,9 +1176,7 @@ struct file *dentry_create(const struct path *path, i=
-nt flags, umode_t mode,
->  	if (IS_ERR(f))
->  		return f;
-> =20
-> -	error =3D vfs_create(mnt_idmap(path->mnt),
-> -			   d_inode(path->dentry->d_parent),
-> -			   path->dentry, mode, true);
-> +	error =3D vfs_create(&cargs);
->  	if (!error)
->  		error =3D vfs_open(path, f);
-> =20
-> diff --git a/fs/overlayfs/overlayfs.h b/fs/overlayfs/overlayfs.h
-> index d215d7349489686b66bb66e939b27046f7d836f6..5fa939ac842ed04df8f0088233f=
-4cba4ac703c05 100644
-> --- a/fs/overlayfs/overlayfs.h
-> +++ b/fs/overlayfs/overlayfs.h
-> @@ -235,7 +235,12 @@ static inline int ovl_do_create(struct ovl_fs *ofs,
->  				struct inode *dir, struct dentry *dentry,
->  				umode_t mode)
->  {
-> -	int err =3D vfs_create(ovl_upper_mnt_idmap(ofs), dir, dentry, mode, true);
-> +	struct createdata cargs =3D { .idmap =3D ovl_upper_mnt_idmap(ofs),
-> +				    .dir =3D dir,
-> +				    .dentry =3D dentry,
-> +				    .mode =3D mode,
-> +				    .excl =3D true };
-> +	int err =3D vfs_create(&cargs);
-> =20
->  	pr_debug("create(%pd2, 0%o) =3D %i\n", dentry, mode, err);
->  	return err;
-> diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-> index c5f0f3170d586cb2dc4d416b80948c642797fb82..fbc3c34e14b870f1750b9453493=
-35afb62d89d0d 100644
-> --- a/fs/smb/server/vfs.c
-> +++ b/fs/smb/server/vfs.c
-> @@ -173,6 +173,7 @@ void ksmbd_vfs_query_maximal_access(struct mnt_idmap *i=
-dmap,
->   */
->  int ksmbd_vfs_create(struct ksmbd_work *work, const char *name, umode_t mo=
-de)
->  {
-> +	struct createdata cargs =3D { };
->  	struct path path;
->  	struct dentry *dentry;
->  	int err;
-> @@ -188,8 +189,12 @@ int ksmbd_vfs_create(struct ksmbd_work *work, const ch=
-ar *name, umode_t mode)
->  	}
-> =20
->  	mode |=3D S_IFREG;
-> -	err =3D vfs_create(mnt_idmap(path.mnt), d_inode(path.dentry),
-> -			 dentry, mode, true);
-> +	cargs.idmap =3D mnt_idmap(path.mnt);
-> +	cargs.dir =3D d_inode(path.dentry);
-> +	cargs.dentry =3D dentry;
-> +	cargs.mode =3D mode;
-> +	cargs.excl =3D true;
-> +	err =3D vfs_create(&cargs);
->  	if (!err) {
->  		ksmbd_vfs_inherit_owner(work, d_inode(path.dentry),
->  					d_inode(dentry));
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index 12873214e1c7811735ea5d2dee3d57e2a5604d8f..b61873767b37591aecadd147623=
-d7dfc866bef82 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -2111,8 +2111,17 @@ bool inode_owner_or_capable(struct mnt_idmap *idmap,
->  /*
->   * VFS helper functions..
->   */
-> -int vfs_create(struct mnt_idmap *, struct inode *,
-> -	       struct dentry *, umode_t, bool);
-> +
-> +struct createdata {
-> +	struct mnt_idmap *idmap;	// idmap of the mount the inode was found from
-> +	struct inode *dir;		// inode of parent directory
-> +	struct dentry *dentry;		// dentry of the child file
-> +	umode_t mode;			// mode of the child file
-> +	bool excl;			// whether the file must not yet exist
-> +};
-> +
-> +int vfs_create(struct createdata *);
-> +
->  struct dentry *vfs_mkdir(struct mnt_idmap *, struct inode *,
->  			 struct dentry *, umode_t, struct delegated_inode *);
->  int vfs_mknod(struct mnt_idmap *, struct inode *, struct dentry *,
->=20
-> --=20
-> 2.51.1
->=20
->=20
+>> Thanks!
+>>
+>> +TEST_F(unix_sock, dgram_reset)
+>> +{
+>> +       char buf[16] = {};
+>> +       ssize_t n;
+>> +
+>> +       send(self->client, "hello", 5, 0);
+>> +       close(self->server);
+>> +
+>> +       n = recv(self->client, buf, sizeof(buf), 0);
+>> +       TH_LOG("%s: recv=%zd errno=%d (%s)", variant->name, n, errno, strerror(errno));
+>> +       if (variant->socket_type == SOCK_STREAM ||
+>> +               variant->socket_type == SOCK_SEQPACKET) {
+>> +               ASSERT_EQ(-1, n);
+>> +               ASSERT_EQ(ECONNRESET, errno);
+>> +       } else {
+>> +               ASSERT_EQ(-1, n);
+>> +               ASSERT_EQ(EAGAIN, errno);
+>> +       }
+>> +}
+>> +
+>> +TEST_HARNESS_MAIN
+>> +
+>> --
+>> 2.43.0
+>>
 
 
