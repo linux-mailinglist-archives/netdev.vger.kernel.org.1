@@ -1,76 +1,78 @@
-Return-Path: <netdev+bounces-235742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82165C34778
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 09:29:27 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57011C3478A
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 09:30:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 74EEA18C3574
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 08:29:31 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D7B7F4F4082
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 08:29:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD32729B78E;
-	Wed,  5 Nov 2025 08:28:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 275BD2C159C;
+	Wed,  5 Nov 2025 08:29:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RSE+LN6y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EaiFqWEY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45AA229BD82
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 08:28:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CB502C0285
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 08:28:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762331334; cv=none; b=UBGD6pgC1qMGWeBB23Sp6io+wfIga2luNSSTXD6G0lYFNVhjuIh1kk6cb0VVMynEsmFd3k5ZKhcTUZ4KHzMeIM4hCK5GuFWSiV8d6W86jCzfmYK8+GuvWVRzSMOsRGvb7E4I+g/U35JDztSFAHvC7RRTmH/X68MB+sIYNj72mW0=
+	t=1762331341; cv=none; b=oaQRhQTpqd+8wvQ6K+f/LGbmxfSOlh/QdubxD4K4YiglOepA8chf5YbG3b9ECj1IFf8arvVQ7gAT45R0lZdVEK5UeIB0eJEtURv7JQBeQBl5OFA+FSRuxG7xY87J1BiHLALx0Dr+WsooK1J6SH8pg/XfWfcWLTJGBIz2zHt9At0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762331334; c=relaxed/simple;
-	bh=DlD7XZ/bzfpVlq9YilLjwMpbU1Ue9PsSHUN85MwX378=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fSE6DJaFD2ozQ4/StgHqdV2vBORe+1l43B/Y4WMevufEaxg+Ze7d/CZMT3e9Ot+13JTqMIsmIpanDxO3UQEr79SITrZmnCUsvrxGEkBfuZ06urXA8gVb0p0jLIhPnDdMICKcAnLps02tJbmrRXLJq6/kc1L9zmrf7xfg+3YtRuQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RSE+LN6y; arc=none smtp.client-ip=209.85.214.176
+	s=arc-20240116; t=1762331341; c=relaxed/simple;
+	bh=utVy6JvlKERgKujYhOgnVpCTFIWZ2va0wC2CkiqbEWs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=EWstqSqaZOwg/jZ03J1T8wAi8eDz1PWvrqsy/BNvcQ6Ud8/yeImWqK5momDpvp1jPNqbREJwwV6jt0Nqws5GQNKuEz3d/LhOnWPK8Igx9SpACB6i5NwNEP8S99uFdvrH4axJKoQayHCR4qDq9cZKkU1rrbJrUv9dAEGXVtmqhEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EaiFqWEY; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2952048eb88so70496075ad.0
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 00:28:53 -0800 (PST)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-294df925292so59230545ad.1
+        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 00:28:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762331332; x=1762936132; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vj9ztHcRJ4eUFcDTiZAvAf9WmJ9pDCq1nGAlcOW47IA=;
-        b=RSE+LN6y1PdOwj3FCCkbJvMz1mMOBOHhswFEG+uq16hO0i5AWdZnZA20stKtmmaPDc
-         P1XFjP6W5JMfAymjivetGN1Urzfe6QTxfI/jcfwnI0JA1j6Tppjl6cogGn/rGyeXy0Zm
-         /yhzWCiNc2cGfxWTbeCupYXzOS3B4SpZ10f5sxfLvrYZw41/mVPBGmbXDQlPUpxVy9vQ
-         BXzVp9bi9y1smgYRYy4PSYr3OBRAgXGhBBkbcwLK+bcUJFSj9uWyQWIguLlS/OlSMEmG
-         rbP9FWFQhcSyDHEkbBAEVcqz+H5225h5Il93WasCJiXqITyDbQI5NKTCbDTVzvngFUyR
-         NsgA==
+        d=gmail.com; s=20230601; t=1762331339; x=1762936139; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=za7hYkkLPLqSVT9uZfocsnw3yWLzRulvJUyGOCLkCKY=;
+        b=EaiFqWEY6Q/K3Sl6dC9+Q6GARbwPJsG+OvLfUMpAHQbo3HRHNHbOQAVv+tTgfPRBpK
+         JSbLV8a8m64NQKWsSVHkArJJJpUxH6yhAJpDZMmJelJPIevGpYyxJL0uoNdWjFUM8Dlr
+         mVde0aq22JjEmQTpBJxVZIzQ/ziO7vPJHUyM/sSKfX3XSa18/jAEgxeFvPkTvqk6U9Kg
+         h3TRBKnlREvE/if3d3/2J10LLgIXgZlQEqkrmco9b84Yh2vkfJpCNERk6GEfQJyb4tyi
+         4GhwS4XLGJjHX7SghG0B132MnynM5VPf2+USbBcQzyEOmo6Nv/CFK3QrMAgbeM/r/fjz
+         /kig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762331332; x=1762936132;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Vj9ztHcRJ4eUFcDTiZAvAf9WmJ9pDCq1nGAlcOW47IA=;
-        b=UgFLYCAvmYW2GTIzs3sh/VogjfjhRH5N/+HLyjvy30KbwADfwqkr8Mwmd9dGoGSOAK
-         esg0Nydrg+h2MM8Dkl9CCycmdhmqn2Jor8zEc5/Wv7wv3HMqTAS0t6xsih6IdC/YJUfq
-         LoiQ+/RjK1k8UWe/dAHmJpEXDsK3TsDAeGR4exkLCoSCWUKDjyp853aT8ZVCCzMRzKVk
-         9u5sm9K3D8YSPS1NCKUWpJ0S0rUmE2o6GkbZDIuh0uq9VQjlSStejXlZuOrAGHTxk5de
-         1wyniP/lvGGuMSIFOBdbPSayTZhr/fHEWWgUAeoP8lynLx6m7CIWcXwgdxiXMAICyGva
-         HJvw==
-X-Gm-Message-State: AOJu0YxF4KJFEuYRfSkARiK6HGDclt0k5krP2JHn/zKFfWbphfa+ALc2
-	poplJVPe1KwsmeFBMZjRASEJEKsCkZmyCUQq2beGIifV2rObAGhoWWgK+uTJnEvuYVI=
-X-Gm-Gg: ASbGncsaE2t7hArfuUCPR8whYKjwW3tU1aVGYTdg7jH44LIpIH8EfCeZzuSJe7S1ILl
-	JJwO1R5tO58vFYsfN0GYCRchp+DFFaypE75d7znPRwToSCoUKc2/iSLgaixo6XM+QaWa+XLSKec
-	YZ9J3VfZNa+28UBcTn80gFbFF6vZPPBpKeTAA0bO3hXysR7OrBqtSlLyo9Ns2TZbYf4TzYg7ql1
-	5vQmSLodmbBKsaREnPd/xJ7Uqyrg+dTnx8baqsFNx8pvmGEOrjGdZbNRD3fCpmvu6W6oku6bDwu
-	y3VP33a4RyMOJBdpJjhEU1r/FKrL/ijK7fyilolfHRhOfZnsC8pyeaS6AYT5+8KAacsnMYZhthA
-	6ufcB+dP51i07M/Favwz2pC0OgSa1lHqg7+rCHcPA+IrVjhv0f0RrcNsm7LPg3eISIDlZfIAjfJ
-	KFUjGDRxvVPMK5Hl4=
-X-Google-Smtp-Source: AGHT+IGT07MqVIWLyaGa6fJx6kFYlwVVGw+QLeCm2PdYaMDiKadI7HZJcYVwzlrRJDLUO0lj8ELndg==
-X-Received: by 2002:a17:902:ea0e:b0:295:f1f:67b with SMTP id d9443c01a7336-2962ada2efcmr37879495ad.39.1762331332208;
-        Wed, 05 Nov 2025 00:28:52 -0800 (PST)
+        d=1e100.net; s=20230601; t=1762331339; x=1762936139;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=za7hYkkLPLqSVT9uZfocsnw3yWLzRulvJUyGOCLkCKY=;
+        b=XJQVroEf8PdegLeiJCk1zuKjDuWvJy6eEIY4T74v0hiC6uqmRL2n7ywaf2sd+sqtZN
+         /ga/O4GMM9zJtibtvFfEPnR5y+/N86HpR7/ggBrkrb/YKHmDRwpgrZ85hxcxqFOgRHdT
+         UOMmRvi0USvO3z13sNdP25DwAyp0ekHxzo/ir8NiQJU27GY9bAS8J4Ag4souhWOxbwGD
+         vWdF/txVbebyTTpD32JK+XXDHzbfvkcSYBAAAcWcFRhW+11cQnrVgyyFMQyuuz0esY4O
+         8iQf6jB/gNK039lt4Sk91xie5duBgqhyXlfQt85Xga/obAmrxBK435Wc0twhv3di+TDK
+         +t4g==
+X-Gm-Message-State: AOJu0YwEng7F1rFxMUm7W5fhsnC3L9+zSjGA9kdotEQKTbTTbcVk678v
+	30MSNmekNru7LBbvey6E7Ae9K6bheWrR5R0vNJlRSmuG4Tbxpia/m/7YNU2oEG4OZ4w=
+X-Gm-Gg: ASbGncu0I89pjWXWz3di1ZPdTOjZ5DbeyszsN1Xe3EBJn8m0fzDJhlJ+GmOW+1CbE02
+	K55uPS3CidMvu/GiEZZP2eOngeglhDgTgkCrKh1iYPfZsqyid9lPx5bJG/Op/fl9gzK5HC96uRv
+	mYMjjg9LUiKjM56/7EAx7vn6bQNmaERTshVc9DQu7sf67lWim64D/DWm3CywsP38sJBt70Fuj8D
+	IUIHYWKWoHNLBmy9b0Hqce2UVpGQ9+IDeL2CiSdG0xikJ5kOesQs37RkEduynI67All0/Co4a70
+	jU1yMnIrYgDicbQOBr2dZd8BQyDhBY9V5hzrY08QlMybR0jmPmMrih19HpJTnQIUsE2hgp5ujV3
+	53PBxiqdS9mW1c49OW6uvPCtATHGXBr2L+KgEMOHscZLf1k2vFzPbxVEsP6eZzr7adgCZSNgK5j
+	JRq5Ke
+X-Google-Smtp-Source: AGHT+IHMBnAoq6eQjzAFvxshpnJPSaT2joAxTFlo6CayXufhJump0lrNoIzXGzUXxHgee7G4OZcgeg==
+X-Received: by 2002:a17:903:2ec7:b0:295:a1a5:baf7 with SMTP id d9443c01a7336-2962ad96af4mr35248945ad.37.1762331338804;
+        Wed, 05 Nov 2025 00:28:58 -0800 (PST)
 Received: from fedora ([209.132.188.88])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29601a3a0c9sm52171705ad.55.2025.11.05.00.28.46
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29601a3a0c9sm52171705ad.55.2025.11.05.00.28.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Nov 2025 00:28:51 -0800 (PST)
+        Wed, 05 Nov 2025 00:28:57 -0800 (PST)
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Donald Hunter <donald.hunter@gmail.com>,
@@ -87,10 +89,12 @@ Cc: Donald Hunter <donald.hunter@gmail.com>,
 	Guillaume Nault <gnault@redhat.com>,
 	Petr Machata <petrm@nvidia.com>,
 	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv2 net-next 0/3] Add YNL test framework and library improvements
-Date: Wed,  5 Nov 2025 08:28:38 +0000
-Message-ID: <20251105082841.165212-1-liuhangbin@gmail.com>
+Subject: [PATCHv2 net-next 1/3] tools: ynl: Add MAC address parsing support
+Date: Wed,  5 Nov 2025 08:28:39 +0000
+Message-ID: <20251105082841.165212-2-liuhangbin@gmail.com>
 X-Mailer: git-send-email 2.50.1
+In-Reply-To: <20251105082841.165212-1-liuhangbin@gmail.com>
+References: <20251105082841.165212-1-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,58 +103,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series enhances YNL tools with some functionalities and adds
-YNL test framework.
+Add missing support for parsing MAC addresses when display_hint is 'mac'
+in the YNL library. This enables YNL CLI to accept MAC address strings
+for attributes like lladdr in rt-neigh operations.
 
-Changes include:
-- Add MAC address parsing support in YNL library
-- Fix rt-rule spec consistency with other rt-* families
-- Add tests covering CLI and ethtool functionality
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+---
+ tools/net/ynl/pyynl/lib/ynl.py | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-The tests provide usage examples and regression testing for YNL tools.
-Test result:
-  # test_ynl_cli
-  PASS: YNL CLI list families
-  PASS: YNL CLI netdev operations
-  PASS: YNL CLI ethtool operations
-  PASS: YNL CLI rt-route operations
-  PASS: YNL CLI rt-addr operations
-  PASS: YNL CLI rt-link operations
-  PASS: YNL CLI rt-neigh operations
-  PASS: YNL CLI rt-rule operations
-  PASS: YNL CLI nlctrl getfamily
-  # test_ynl_ethtool
-  PASS: YNL ethtool device info
-  PASS: YNL ethtool statistics
-  PASS: YNL ethtool ring parameters (show/set)
-  PASS: YNL ethtool coalesce parameters (show/set)
-  PASS: YNL ethtool pause parameters (show/set)
-  PASS: YNL ethtool features info (show/set)
-  PASS: YNL ethtool channels info (show/set)
-  PASS: YNL ethtool time stamping
-
-v2: move test from selftest to ynl folder (Jakub Kicinski)
-v1: https://lore.kernel.org/netdev/20251029082245.128675-1-liuhangbin@gmail.com
-
-Hangbin Liu (3):
-  tools: ynl: Add MAC address parsing support
-  netlink: specs: update rt-rule src/dst attribute types to support IPv4
-    addresses
-  tools: ynl: add YNL test framework
-
- Documentation/netlink/specs/rt-rule.yaml |   6 +-
- tools/net/ynl/Makefile                   |   3 +-
- tools/net/ynl/pyynl/lib/ynl.py           |   9 +
- tools/net/ynl/tests/Makefile             |  24 ++
- tools/net/ynl/tests/config               |   6 +
- tools/net/ynl/tests/test_ynl_cli.sh      | 290 +++++++++++++++++++++++
- tools/net/ynl/tests/test_ynl_ethtool.sh  | 195 +++++++++++++++
- 7 files changed, 530 insertions(+), 3 deletions(-)
- create mode 100644 tools/net/ynl/tests/Makefile
- create mode 100644 tools/net/ynl/tests/config
- create mode 100755 tools/net/ynl/tests/test_ynl_cli.sh
- create mode 100755 tools/net/ynl/tests/test_ynl_ethtool.sh
-
+diff --git a/tools/net/ynl/pyynl/lib/ynl.py b/tools/net/ynl/pyynl/lib/ynl.py
+index 225baad3c8f8..36d36eb7e3b8 100644
+--- a/tools/net/ynl/pyynl/lib/ynl.py
++++ b/tools/net/ynl/pyynl/lib/ynl.py
+@@ -985,6 +985,15 @@ class YnlFamily(SpecFamily):
+                 raw = bytes.fromhex(string)
+             else:
+                 raw = int(string, 16)
++        elif attr_spec.display_hint == 'mac':
++            # Parse MAC address in format "00:11:22:33:44:55" or "001122334455"
++            if ':' in string:
++                mac_bytes = [int(x, 16) for x in string.split(':')]
++            else:
++                if len(string) % 2 != 0:
++                    raise Exception(f"Invalid MAC address format: {string}")
++                mac_bytes = [int(string[i:i+2], 16) for i in range(0, len(string), 2)]
++            raw = bytes(mac_bytes)
+         else:
+             raise Exception(f"Display hint '{attr_spec.display_hint}' not implemented"
+                             f" when parsing '{attr_spec['name']}'")
 -- 
 2.50.1
 
