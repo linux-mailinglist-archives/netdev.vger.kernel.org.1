@@ -1,169 +1,149 @@
-Return-Path: <netdev+bounces-235927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C61EC373A5
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 18:59:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD0B6C373B1
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 18:59:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 913194EB9D8
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 17:56:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 180711893EDE
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 18:00:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90DFE3385A6;
-	Wed,  5 Nov 2025 17:56:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B19338F26;
+	Wed,  5 Nov 2025 17:59:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cE/J2MVz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wtm5i7Ve"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB7753009DD;
-	Wed,  5 Nov 2025 17:56:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFFF0336EF7
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 17:59:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762365375; cv=none; b=VfaQ2wwVwVluabUhdPrfVMUMvU0isiuFq3XN4mYEeGTa22qc8i28C2OBkxAUcVK9cOxGkL+TiyT+a51RVDlNJkPpPiDk1SyRe1ffiSX0rbmrxiIM+tgF1X27bzbYm68a+USPFwMO2I600tl/tGa5fUrIRTvl7QFEMECyHyHAWSw=
+	t=1762365576; cv=none; b=KN/7LwOdiuR59MUw4wLHCfVgnlle1DgVplrKpuMwiXrxCljLG+4Mx6KigxdiWr2PjrEi3wWtubng4RkKqr9ttTZu9y+nMr9E6+C6/yoksYYfmSKEosXC+UL0A7mZuoXfQzzCwfvGxZdxdMRiwMGsYGSGu7gnBjdZ89EbsmCyTiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762365375; c=relaxed/simple;
-	bh=K6RtfM/ZBRJc1j2ZCmyLqGYaCeW5pCrLX+E/78w8rTQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=DxGWiDGnvleLjcWIo75/m44nChiKhEnLwKUYcsTPvYCy5PzXskNCfdZGl/rYkzggLcBpdxI2vmHMbLqtQe0Gsbk+JhKCJxO4y6YhC27kieLq/EzArKnJ99gc/eZ6HVVKFrKiknBMxa27kVO74peHyyc3rjHsgXvSEFieEm1KjD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=cE/J2MVz; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5A5929VA029163;
-	Wed, 5 Nov 2025 17:56:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=9cDY+k
-	ZTdNUIeHNAMjXz5Cd9F2eI3YGfU4lUB9KY1uE=; b=cE/J2MVzZ0DP34z8PIyipn
-	QbjXwCFtud7ilpuoIEXCKGhOI0IzZJ5k/K9XbCUi067pRco32cGTqXxIYqj/37bp
-	nIS2ZPdkusp4CtNkIFK6tusvIlXtNgH9LXD2Khe+3gGMIG3ESnT1jjcT2csYWU2b
-	c27ViRBwVYyMd5Gz3icOrXH6tkVmcYzQcS1OxjmqNYCOmIgRhnv3K1WRqB5qtFqZ
-	Mi1izP7WoU/G3i6q+1y2youQMai4OwkOxZnLOHPRklXCm9hogG9GEP/n1GAFFXgo
-	9tBOpU3Lu7371CMdsKHJSA15ZObwIPxh/+uoEfVzo6eM27rVHrGOYgBCj6CUn63Q
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a59q92y8e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 05 Nov 2025 17:56:02 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5A5Hq2Pw006009;
-	Wed, 5 Nov 2025 17:56:02 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a59q92y87-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 05 Nov 2025 17:56:02 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5A5FPKdV018738;
-	Wed, 5 Nov 2025 17:56:00 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4a5whnhf3s-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 05 Nov 2025 17:56:00 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5A5Htu5335848576
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 5 Nov 2025 17:55:56 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AE7E320040;
-	Wed,  5 Nov 2025 17:55:56 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7DC7620043;
-	Wed,  5 Nov 2025 17:55:56 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  5 Nov 2025 17:55:56 +0000 (GMT)
-From: Gerd Bayer <gbayer@linux.ibm.com>
-Date: Wed, 05 Nov 2025 18:55:14 +0100
-Subject: [PATCH RFC 2/2] ib/mlx5: Request PCIe AtomicOps enabled for all 3
- sizes
+	s=arc-20240116; t=1762365576; c=relaxed/simple;
+	bh=Nnp1wDC3H73w3jI8NtJcSVR2N83rdAhx/dtATqrWYag=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fv+wUZCB8DMtkjQApJpGVZvNLKKxjMvzqJVnNc1aGtT7bqtX+15DrKUT67ipoXGuGhrnUVmZiwVNJVoCTBTugHdaq3qhqWeg2WoX2B0rIHZH+kB/b/r/1+b2dSBWOu8CIOF/dy8c5WPqxgXX7AFQnXlQtf4uawy4tiMmfxGyrvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wtm5i7Ve; arc=none smtp.client-ip=209.85.128.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-786a822e73aso521877b3.3
+        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 09:59:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762365574; x=1762970374; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zSHtYrMJfyWXNB5+D7qGmo5liVfUAPUmYconSQ05yJA=;
+        b=Wtm5i7Vel6og71cIYNi68wga2ylq1eSG/Yhr/KPEnj+sHZCTbCPH/BDgN+LYIacV8L
+         skAnPmPwk4Eq8LfFcNj/KAz3bxnQfryS83ZS8mxM/pRUehxODb3wQhjs1uRRVXtKD9e3
+         8UNcK6mT7yf7agUTYTdUEWqrnLhOFsqKzwcsp01gtWEWpk5T3qEUz6nxByKQ0DJkpwK2
+         d+LL5dDSB8eSgK36DMExPxtwDq2/GiG2e+8hNze0WH3Iats5Xv8ipySifO952J1Uf0Fm
+         +EpbAKeOuGqhSpdNO9E7cZf1Pp7ocaGLOZzN4N6pu8letXaCjkrOYHWc/4egXZ00I1NQ
+         nabQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762365574; x=1762970374;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zSHtYrMJfyWXNB5+D7qGmo5liVfUAPUmYconSQ05yJA=;
+        b=lmTdnoNs87dCJZMwGn3h2H/gCChEJodw6ew/3BXy3lugOHlUyazJP8Le2dfeu2OE19
+         CKNeeO7QPd2Zhqf0hY3ismaJJK7xarS5S2y1pR3drREplbyRDu6xik3JKk4rAXiqi7L1
+         mLDNwuPE5zw0IO30m1hIi9IGQPom+2gl1quY4iBBQq4w+CZfQNdx85f+oW50lhUnStMR
+         8QQ7xCTAmmXJwKch3jQdnh70sL2ucU1tZVxmlFc0nVZToaMMzfTK3ZpN5SfJW+TFDd9a
+         1wj+5OkMy/gR+qhrJcIDXYzZbDzsbDQeYEx3MHqXy7zEOztiJI9aJtKQKaDfdyPVKOPW
+         16PA==
+X-Forwarded-Encrypted: i=1; AJvYcCWd1n1EtUU4rS/AzByxPU6I2t6TS7mYJMYVW6BVJIO1ag6GTEpbUC2/ygdNDm+jXQsp4gdgc+s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQ3wKJAfWbQw192b5SqplVXU8heg1JT+mlccb4hAFaeXgTa6Bo
+	E4tvuIRWX5P+OMmfM+SR/vIPOj+1I6S1CR0izPATu71UWfg1TMoHkVng
+X-Gm-Gg: ASbGnctCZotIKAvuSM7nbwWBTEDGqREtI7BQK2IYXS8CgmPtlU5SLPrj9rx+sZL/M7L
+	ilc69gVPqx507Whl4XXH58GzWnyzlM+khKqp3AKgzpmdjw6tSQWmU4FFYnZJK2s1UyKTK9mo38s
+	P+sBCIi+tio6bGFCRPyS/oItMQ9A0f4mDtRkqdOrwYCyjH8ycNrrOaE5lMo483S5M5GSNP6NUjt
+	J1TlnIQS9PMunEVqG9cOWoUsLxRg5KjEstmMMk5h10ezh9ORwcUX3M9AHIJ/8fnV8iKYVcwTVXq
+	rqKXH1fdLK+R4hnDqToQa7flEA1Ds0r94KJmRuFCcsMfW+ZQ8wmf4em+2lV2ZgBrEcLoiV9B2IR
+	WRqTK0ynvV90Lhl624vKQlroGb6NhVEtpsZhLfnAsLR0hRBWvE8Sz4ex7WKYIxwHXpoy4pB+K6q
+	S9aCRHr7mZCu61n21Wj+H6QxB5NH0Y6WEC5NbF
+X-Google-Smtp-Source: AGHT+IHHyTsN8YO880iJh6XJa9T07Q+L4vBMRDgiJVACQ1JdCPPRDqaW0LijeD633oiPcNo5B7xioA==
+X-Received: by 2002:a05:690c:fc2:b0:787:1aba:3081 with SMTP id 00721157ae682-7871aba3718mr18241127b3.58.1762365573471;
+        Wed, 05 Nov 2025 09:59:33 -0800 (PST)
+Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:59::])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-787b13b6954sm735637b3.5.2025.11.05.09.59.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Nov 2025 09:59:32 -0800 (PST)
+Date: Wed, 5 Nov 2025 09:59:31 -0800
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	David Ahern <dsahern@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>,
+	Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v6 5/6] net: devmem: document
+ SO_DEVMEM_AUTORELEASE socket option
+Message-ID: <aQuQg2bNj9NYNW6j@devvm11784.nha0.facebook.com>
+References: <20251104-scratch-bobbyeshleman-devmem-tcp-token-upstream-v6-0-ea98cf4d40b3@meta.com>
+ <20251104-scratch-bobbyeshleman-devmem-tcp-token-upstream-v6-5-ea98cf4d40b3@meta.com>
+ <aQuKi535hyWMLBX4@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251105-mlxatomics-v1-2-10c71649e08d@linux.ibm.com>
-References: <20251105-mlxatomics-v1-0-10c71649e08d@linux.ibm.com>
-In-Reply-To: <20251105-mlxatomics-v1-0-10c71649e08d@linux.ibm.com>
-To: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-        Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Jason Gunthorpe <jgg@ziepe.ca>,
-        Bjorn Helgaas <bhelgaas@google.com>
-Cc: Jay Cornwall <Jay.Cornwall@amd.com>,
-        Felix Kuehling <Felix.Kuehling@amd.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Alexander Schmidt <alexs@linux.ibm.com>, netdev@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Gerd Bayer <gbayer@linux.ibm.com>
-X-Mailer: b4 0.14.2
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=StmdKfO0 c=1 sm=1 tr=0 ts=690b8fb2 cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=VnNF1IyMAAAA:8 a=b1J1qY0uxHIh8xAgF6MA:9 a=QEXdDO2ut3YA:10
- a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-ORIG-GUID: bPfq8gigml4u1wwZ6MwcwbjcJLlFC5YA
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTAxMDAxOCBTYWx0ZWRfX/lyIkXEOze4o
- PJO0wvWndqve+AVI0Lu+l7sUxeuw4FK+TZ3XPQerO+OuiWHfApwH3BVzKwV3oUNTQ1gJShc9NQP
- MrMazETPsBMZ8cIXiCyz1bYGsUfzi8U4w4nsvS/LGwPAE8TeKMfSASLSWMQxCJxnnF2pv6gzlJK
- vrvtvJ98OxXS3DYVlNSuSzh2XnFODEIwejt6UWn6xPK0fL5boOJaGQvnC7PLOSEpp9wbK5pR54o
- icg6GQbkjtiwjeQdINZbLVX1NEPeJezus+ZYayNjb3BtMe3FEO7F8eMNc5hAU770y0vDQpWrgS/
- ykUvYXg3QQAzGYuTxJAdYjivMKR303u3Op8cxsZxQwnZBnCmPhNTrfrzJE/VE74wiK4Q0F+vJh1
- ip3Dhk3pizF/89FGPC8jME82lKBn4Q==
-X-Proofpoint-GUID: NSIOLwpGiWoW11-T5dJr66D3njdtVttl
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-05_07,2025-11-03_03,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- spamscore=0 suspectscore=0 phishscore=0 impostorscore=0 priorityscore=1501
- malwarescore=0 clxscore=1015 adultscore=0 bulkscore=0 lowpriorityscore=0
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511010018
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aQuKi535hyWMLBX4@mini-arch>
 
-Pass fully populated capability bit-mask requesting support for all 3
-sizes of AtomicOps at once when attempting to enable AtomicOps for PCI
-function.
+On Wed, Nov 05, 2025 at 09:34:03AM -0800, Stanislav Fomichev wrote:
+> On 11/04, Bobby Eshleman wrote:
+> > From: Bobby Eshleman <bobbyeshleman@meta.com>
+> > 
+> 
+> [..]
+> 
+> > +Autorelease Control
+> > +~~~~~~~~~~~~~~~~~~~
+> 
+> Have you considered an option to have this flag on the dmabuf binding
+> itself? This will let us keep everything in ynl and not add a new socket
+> option. I think also semantically, this is a property of the binding
+> and not the socket? (not sure what's gonna happen if we have
+> autorelease=on and autorelease=off sockets receiving to the same
+> dmabuf)
 
-When called individually, pci_enable_atomic_ops_to_root() may enable the
-device to send requests as soon as one size is supported. According to
-PCIe Spec 7.0 Section 6.15.3.1 support of 32-bit and 64-bit AtomicOps
-completer capabilities are tied together for root-ports. Only the
-128-bit/CAS completer capabilities is an optional feature, but still we
-might end up end up enabling AtomicOps despite 128-bit/CAS is not
-supported at the root-port.
+This was our initial instinct too and was the implementation in the
+prior version, but we opted for a socket-based property because it
+simplifies backwards compatibility with multi-binding steering rules. In
+this case, where bindings may have different autorelease settings, the
+recv path would need to error out once any binding with different
+autorelease value was detected, because the dont_need path doesn't have
+any context to know if any specific token is part of the socket's xarray
+(autorelease=on) or part of the binding->vec (autorelease=off).
 
-Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
----
- drivers/infiniband/hw/mlx5/data_direct.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+At the socket level we can just prevent the mode switch by counting
+outstanding references... to do this at the binding level, I think we
+have to revert back to the ethtool approach we experimented with earlier
+(trying to resolve steering rules to queues, and then check their
+binding->autorelease values and make sure they are consistent).
 
-diff --git a/drivers/infiniband/hw/mlx5/data_direct.c b/drivers/infiniband/hw/mlx5/data_direct.c
-index b81ac5709b56f6ac0d9f60572ce7144258fa2794..112185be53f1ccc6a797e129f24432bdc86008ae 100644
---- a/drivers/infiniband/hw/mlx5/data_direct.c
-+++ b/drivers/infiniband/hw/mlx5/data_direct.c
-@@ -179,9 +179,9 @@ static int mlx5_data_direct_probe(struct pci_dev *pdev, const struct pci_device_
- 	if (err)
- 		goto err_disable;
- 
--	if (pci_enable_atomic_ops_to_root(pdev, PCI_EXP_DEVCAP2_ATOMIC_COMP32) &&
--	    pci_enable_atomic_ops_to_root(pdev, PCI_EXP_DEVCAP2_ATOMIC_COMP64) &&
--	    pci_enable_atomic_ops_to_root(pdev, PCI_EXP_DEVCAP2_ATOMIC_COMP128))
-+	if (pci_enable_atomic_ops_to_root(pdev, PCI_EXP_DEVCAP2_ATOMIC_COMP32 |
-+						PCI_EXP_DEVCAP2_ATOMIC_COMP64 |
-+						PCI_EXP_DEVCAP2_ATOMIC_COMP128))
- 		dev_dbg(dev->device, "Enabling pci atomics failed\n");
- 
- 	err = mlx5_data_direct_vpd_get_vuid(dev);
+This should work out off the box for mixed-modes, given then outstanding
+ref rule.
 
--- 
-2.48.1
+Probably should add a test for specifically that...
 
+Best,
+Bobby
 
