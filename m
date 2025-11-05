@@ -1,307 +1,171 @@
-Return-Path: <netdev+bounces-235651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83703C33809
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 01:46:59 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDC0BC33803
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 01:46:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8316A4650F4
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 00:46:41 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 53FDF34E520
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 00:46:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9C5923AB90;
-	Wed,  5 Nov 2025 00:46:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B03C2356BE;
+	Wed,  5 Nov 2025 00:46:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="akw19Abp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="neNr4G/3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E70A12367B3
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 00:46:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F123E2248A4;
+	Wed,  5 Nov 2025 00:46:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762303595; cv=none; b=mPiQO2/ZJ4j3hhpn/C1LNz9oMbfqBpoKFuA7jGgBBEzbG+R59SoJBTMJBc9nTCWXkl3AEp+w6AKpGa1XB1/oMef/8Z5Yk1W6UpD5URIzFJflAFdlItvnTBiG058vWL0XsHool/n1cBMg6ZzJirqHYC+EzoNPcQO43GAdUveZPEo=
+	t=1762303587; cv=none; b=irwi6EDRsf5LZErQXCioq2ICiKG435tKxDh8L5kL1si05Kx1bdY2uExF7v6TbvMjy9bmEX/EUCZbjLoJprFtZ+FagFSCntY2Cd5pdLSNdqPeMec4HO6HrH6eehIak1iDowhmwXkepGV4zVtynJiEP44Id0E61eg67DZtL8gWFCY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762303595; c=relaxed/simple;
-	bh=QK7dX00M8Jg/onYsQPjhAdFQtssDUJ0UQljG+F4NwI4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B4TxQwWO+1pFiqvjb6mULUnshCFd1VDCI0NWfYGlPwWwekOtr30b5a2X+vDGMgAhh9OIi3/NEwpcOGjY1QvqhjbDvWG565lFxxIib76PywrbBdV+zMcDzcj2lnpFJdr1QfoNBvIqXuWDVTxea+UN5dSn4p/9SCOh8zb17mJdhIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=akw19Abp; arc=none smtp.client-ip=209.85.216.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-33b9dc8d517so5566927a91.0
-        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 16:46:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762303593; x=1762908393; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xXdfuXEyYCSjpACOy8ivhFG7mh9YLIGOopMLdxt74zc=;
-        b=akw19AbpzHDaXfBCRYfqUGDx8coKx6J97HywA1LD29sdhvk3TAzmK3BkXHb/1FslKu
-         q4rF6J4tyGFnVHec6iyqUbKmoVKNMUNVOtjNinztQ02Z7pdYE3Tyz9RkFOuCm65odbZ3
-         q3UKK0VRzFRTBkB4VugdduWlM60mIUcmWnVs/g3aEXn2oIG9SUWJshylpwXVe9TBi9qo
-         hrWO6TGV/0jaWc4yDVnFxXzHnY+Nq1MNWrfESd0hpIlZWW24oLHq9NvYdJCGV8Go4dTw
-         EzwnZzCT0bRbOfP7k9J3KPgV4fXEAW3Vh4m2zk9cXw46EY4Hu7SdfoeTcm9z0+9YWWIi
-         AYcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762303593; x=1762908393;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xXdfuXEyYCSjpACOy8ivhFG7mh9YLIGOopMLdxt74zc=;
-        b=BqIx1DqqKdR0ZFp1ma3QhqwR+E8T79XqchbLtPnAz8Apa+i7VXlcZavqEfgR5ku8i+
-         +j1YDTCJrrkctRIivaxPVnFvIIqOV2NdhO12z0GRC1qG5PZ9yRsFNyti1pnTxz3v6VYI
-         lBSONXcTWs3Ic2QpSOSC7LMRUWUC5wM6gMeEAs+tB5Fj9Qth0N06Kkd93yJVxAi0mBhM
-         4QxyXrEaC3ZzA0MuOqq4KOwfyPK+TBACSfw9NLjeLXcKEsACX6xlE1+PfhDjhwrfGJ2q
-         iwdkaHsgzVKa0MRuhhbzY56D54rxXEhIRlGel4nlD81Uebx2zNQd5lFVcCN8ghUlcOdJ
-         PVcw==
-X-Forwarded-Encrypted: i=1; AJvYcCXVjZ19ImtbhDZzrQwudVYn3LrX3G2/HCpSWvAMhxZQhBsf/bpvfa8ROgr3fxoTlFAJMWcUfQc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyiw7LLJzHwVyoaIrSQ14SSbqJ+dDVFHkZQAWCdLe6FuQA/Gy44
-	12ngi+n8ha2QE4d0hXaTrIW77l1ar+crzmXNJXuOz1hZ958k6N3BbFyMNI6RXIAB4ImPiSVZhUp
-	oX0kVJhb/tJGMYwCNUn01nKxxq7pAykU=
-X-Gm-Gg: ASbGncsUBkXBws20x4VY68WH56yPC/EXZw2orGnWrTcKEf/vqxmCaUzt1M2XAb2nF4S
-	aiALV+X5ji8thjtSpQP0xiJqg2k+EkbG+PmoWLa56BUUU8GVIVWlWWfB7pUEjtf2XWfsLDW7a3p
-	JBdrNo0OekL25kyn/mWwtmxry/zYAvZavetoLx/XsjkLrmnWznnpeIA0tmoSUo6UUvVr477RfNB
-	Q8CAVTc5g5A4iEBLQ80MN4xjhbOzWZ416W36N9zq6mRD7wOgKVqWq9jyafUYKQS8aZqSR6z1DUN
-X-Google-Smtp-Source: AGHT+IHqrPTO438NQAMkf/XDaqLLvBN91MM/ltPzOSvF9R3C/E74okJU9TRrQTl4J+eFhQEFIVIoxZMoj6Dwi1L5XuA=
-X-Received: by 2002:a17:90b:582e:b0:32e:6fae:ba52 with SMTP id
- 98e67ed59e1d1-341a6c1e406mr1412213a91.6.1762303593093; Tue, 04 Nov 2025
- 16:46:33 -0800 (PST)
+	s=arc-20240116; t=1762303587; c=relaxed/simple;
+	bh=G1qE+NBXsBrA+U0uG2/XGZHXF86wPuRDqBOaulVkZ1U=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tPE52t6ZetOmx08LAm8EcInD6lABa1m3/lNkQClgMf4lXbL/DfBjnitF0hl7IY37ha+U9+B6gf7C07w8HVtEji9ivAAnLiREQj5WhITzb9NUXwX1GAtb1bghkqBBUjiWJKnDv1M4iIbvV48EsICEZ+zm4TtHLt+qvB02RcPO6oI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=neNr4G/3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF8F6C4CEF7;
+	Wed,  5 Nov 2025 00:46:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762303586;
+	bh=G1qE+NBXsBrA+U0uG2/XGZHXF86wPuRDqBOaulVkZ1U=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=neNr4G/3p9hi1E2mihHt2QTBLObs9Qs8DChjrtVngtDdrdKnj6GyevpqpG3FKJmW8
+	 b2w2K6VRMr3zEjQpGGItGO/nhscg81ks+iOh/Vtb72RZ8gv635z0wlqwFPL/DdEEy2
+	 cwnKD0VBUNcAzDJVOA0A1w3N1GKsuav7hN2bY+GBUeXngX8oO8yypVDQciNOvqasHx
+	 5VAU+V9RerP4roO7PM9Y5AZqVb1yEx6LxfiM5L7R6uDWcd0pH+p69CW/nR52v37dSd
+	 tZdr81DX+yIeseTcTQ7abuLAarpU8JLjQoTyuukbNPKlcFq3djt40IbnUPHTrz04Ne
+	 q+9lXwXkfXuww==
+Date: Tue, 4 Nov 2025 16:46:25 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: I Viswanath <viswanathiyyappan@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ horms@kernel.org, sdf@fomichev.me, kuniyu@google.com, ahmed.zaki@intel.com,
+ aleksander.lobakin@intel.com, jacob.e.keller@intel.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ skhan@linuxfoundation.org, linux-kernel-mentees@lists.linux.dev,
+ david.hunter.linux@gmail.com, khalid@kernel.org
+Subject: Re: [RFC/RFT PATCH net-next v3 1/2] net: Add ndo_write_rx_config
+ and helper structs and functions:
+Message-ID: <20251104164625.5a18db43@kernel.org>
+In-Reply-To: <CAPrAcgPD0ZPNPOivpX=69qC88-AAeW+Jy=oy-6+PP8jDxzNabA@mail.gmail.com>
+References: <20251028174222.1739954-1-viswanathiyyappan@gmail.com>
+	<20251028174222.1739954-2-viswanathiyyappan@gmail.com>
+	<20251030192018.28dcd830@kernel.org>
+	<CAPrAcgPD0ZPNPOivpX=69qC88-AAeW+Jy=oy-6+PP8jDxzNabA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251104172652.1746988-1-ameryhung@gmail.com> <20251104172652.1746988-5-ameryhung@gmail.com>
- <CAEf4BzbqEsZbO4AjKn7iRQCzKVSD0db9WdG7uKXMCA_4ueFYig@mail.gmail.com> <CAMB2axNi1SRT5=SuRZJayt+az6GM63w++T6stwHEHXHfdMce_Q@mail.gmail.com>
-In-Reply-To: <CAMB2axNi1SRT5=SuRZJayt+az6GM63w++T6stwHEHXHfdMce_Q@mail.gmail.com>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Tue, 4 Nov 2025 16:46:17 -0800
-X-Gm-Features: AWmQ_bnqCa_p9Fq8mNorYc26Xaa218oJDAFar8ROmG6oXG-GVkull2R4bCd_zuU
-Message-ID: <CAEf4BzaQ=z8qG0q5UgquzPuF5LwWB2wqUHtdnL72kN2PkmK_9Q@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v5 4/7] libbpf: Add support for associating BPF
- program with struct_ops
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
-	andrii@kernel.org, daniel@iogearbox.net, tj@kernel.org, martin.lau@kernel.org, 
-	kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 4, 2025 at 3:39=E2=80=AFPM Amery Hung <ameryhung@gmail.com> wro=
-te:
->
-> On Tue, Nov 4, 2025 at 3:27=E2=80=AFPM Andrii Nakryiko
-> <andrii.nakryiko@gmail.com> wrote:
+On Tue, 4 Nov 2025 22:13:49 +0530 I Viswanath wrote:
+> On Fri, 31 Oct 2025 at 07:50, Jakub Kicinski <kuba@kernel.org> wrote:
+> > The driver you picked is relatively trivial, advanced drivers need
+> > to sync longer lists of mcast / ucast addresses. Bulk of the complexity
+> > is in keeping those lists. Simple
 > >
-> > On Tue, Nov 4, 2025 at 9:27=E2=80=AFAM Amery Hung <ameryhung@gmail.com>=
- wrote:
-> > >
-> > > Add low-level wrapper and libbpf API for BPF_PROG_ASSOC_STRUCT_OPS
-> > > command in the bpf() syscall.
-> > >
-> > > Signed-off-by: Amery Hung <ameryhung@gmail.com>
-> > > ---
-> > >  tools/lib/bpf/bpf.c      | 19 +++++++++++++++++++
-> > >  tools/lib/bpf/bpf.h      | 21 +++++++++++++++++++++
-> > >  tools/lib/bpf/libbpf.c   | 30 ++++++++++++++++++++++++++++++
-> > >  tools/lib/bpf/libbpf.h   | 16 ++++++++++++++++
-> > >  tools/lib/bpf/libbpf.map |  2 ++
-> > >  5 files changed, 88 insertions(+)
-> > >
-> > > diff --git a/tools/lib/bpf/bpf.c b/tools/lib/bpf/bpf.c
-> > > index b66f5fbfbbb2..21b57a629916 100644
-> > > --- a/tools/lib/bpf/bpf.c
-> > > +++ b/tools/lib/bpf/bpf.c
-> > > @@ -1397,3 +1397,22 @@ int bpf_prog_stream_read(int prog_fd, __u32 st=
-ream_id, void *buf, __u32 buf_len,
-> > >         err =3D sys_bpf(BPF_PROG_STREAM_READ_BY_FD, &attr, attr_sz);
-> > >         return libbpf_err_errno(err);
-> > >  }
-> > > +
-> > > +int bpf_prog_assoc_struct_ops(int prog_fd, int map_fd,
-> > > +                             struct bpf_prog_assoc_struct_ops_opts *=
-opts)
-> > > +{
-> > > +       const size_t attr_sz =3D offsetofend(union bpf_attr, prog_ass=
-oc_struct_ops);
-> > > +       union bpf_attr attr;
-> > > +       int err;
-> > > +
-> > > +       if (!OPTS_VALID(opts, bpf_prog_assoc_struct_ops_opts))
-> > > +               return libbpf_err(-EINVAL);
-> > > +
-> > > +       memset(&attr, 0, attr_sz);
-> > > +       attr.prog_assoc_struct_ops.map_fd =3D map_fd;
-> > > +       attr.prog_assoc_struct_ops.prog_fd =3D prog_fd;
-> > > +       attr.prog_assoc_struct_ops.flags =3D OPTS_GET(opts, flags, 0)=
-;
-> > > +
-> > > +       err =3D sys_bpf(BPF_PROG_ASSOC_STRUCT_OPS, &attr, attr_sz);
-> > > +       return libbpf_err_errno(err);
-> > > +}
-> > > diff --git a/tools/lib/bpf/bpf.h b/tools/lib/bpf/bpf.h
-> > > index e983a3e40d61..1f9c28d27795 100644
-> > > --- a/tools/lib/bpf/bpf.h
-> > > +++ b/tools/lib/bpf/bpf.h
-> > > @@ -733,6 +733,27 @@ struct bpf_prog_stream_read_opts {
-> > >  LIBBPF_API int bpf_prog_stream_read(int prog_fd, __u32 stream_id, vo=
-id *buf, __u32 buf_len,
-> > >                                     struct bpf_prog_stream_read_opts =
-*opts);
-> > >
-> > > +struct bpf_prog_assoc_struct_ops_opts {
-> > > +       size_t sz;
-> > > +       __u32 flags;
-> > > +       size_t :0;
-> > > +};
-> > > +#define bpf_prog_assoc_struct_ops_opts__last_field flags
-> > > +
-> > > +/**
-> > > + * @brief **bpf_prog_assoc_struct_ops** associates a BPF program wit=
-h a
-> > > + * struct_ops map.
-> > > + *
-> > > + * @param prog_fd FD for the BPF program
-> > > + * @param map_fd FD for the struct_ops map to be associated with the=
- BPF program
-> > > + * @param opts optional options, can be NULL
-> > > + *
-> > > + * @return 0 on success; negative error code, otherwise (errno is al=
-so set to
-> > > + * the error code)
-> > > + */
-> > > +LIBBPF_API int bpf_prog_assoc_struct_ops(int prog_fd, int map_fd,
-> > > +                                        struct bpf_prog_assoc_struct=
-_ops_opts *opts);
-> > > +
-> > >  #ifdef __cplusplus
-> > >  } /* extern "C" */
-> > >  #endif
-> > > diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
-> > > index fbe74686c97d..260e1feaa665 100644
-> > > --- a/tools/lib/bpf/libbpf.c
-> > > +++ b/tools/lib/bpf/libbpf.c
-> > > @@ -13891,6 +13891,36 @@ int bpf_program__set_attach_target(struct bp=
-f_program *prog,
-> > >         return 0;
-> > >  }
-> > >
-> > > +int bpf_program__assoc_struct_ops(struct bpf_program *prog, struct b=
-pf_map *map,
-> > > +                                 struct bpf_prog_assoc_struct_ops_op=
-ts *opts)
-> > > +{
-> > > +       int prog_fd;
-> > > +
-> > > +       prog_fd =3D bpf_program__fd(prog);
-> > > +       if (prog_fd < 0) {
-> > > +               pr_warn("prog '%s': can't associate BPF program witho=
-ut FD (was it loaded?)\n",
-> > > +                       prog->name);
-> > > +               return -EINVAL;
-> > > +       }
-> > > +
-> > > +       if (prog->type =3D=3D BPF_PROG_TYPE_STRUCT_OPS) {
-> > > +               pr_warn("prog '%s': can't associate struct_ops progra=
-m\n", prog->name);
-> > > +               return -EINVAL;
-> > > +       }
-> > > +
-> > > +       if (map->fd < 0) {
+> >         *rx_config = *(config_ptr);
 > >
-> > heh, this is a bug. we use create_placeholder_fd() to create fixed FDs
-> > associated with maps, and later we replace them with the real
-> > underlying BPF map kernel objects. It's all details, but the point is
-> > that this won't detect map that wasn't created. Use bpf_map__fd()
-> > instead, it handles that correctly.
->
-> I saw quite a few libbpf API doing this check (e.g., bpf_map__pin(),
-> bpf_link__update_map(), bpf_map__attach_struct_ops()). Should we also
-> fix them?
+> > assignment is not enough.  
+> 
+> Apologies, I had the wrong mental model of the snapshot.
+> 
+> From what I understand, the snapshot should look something like
+> 
+> struct netif_rx_config {
+>     char *uc_addrs; // of size uc_count * dev->addr_len
+>     char *mc_addrs; // of size mc_count * dev->addr_len
+>     int uc_count;
+>     int mc_count;
+>     bool multi_en, promisc_en, vlan_en;
+>     void *device_specific_config;
+> }
+> Correct me if I have missed anything
+> 
+> Does the following pseudocode/skeleton make sense?
+> 
+> update_config() will be called at end of set_rx_mode()
+> 
+> read_config() is execute_write_rx_config() and do_io() is
+> dev->netdev_ops->ndo_write_rx_config() named that way
+> for consistency (since read/update)
+> 
+> atomic_t cfg_in_use = ATOMIC_INIT(false);
+> atomic_t cfg_update_pending = ATOMIC_INIT(false);
+> 
+> struct netif_rx_config *active, *staged;
+> 
+> void update_config()
+> {
+>     int was_config_pending = atomic_xchg(&cfg_update_pending, false);
+> 
+>     // If prepare_config fails, it leaves staged untouched
+>     // So, we check for and apply if pending update
+>     int rc = prepare_config(&staged);
+>     if (rc && !was_config_pending)
+>         return;
+> 
+>     if (atomic_read(&cfg_in_use)) {
+>         atomic_set(&cfg_update_pending, true);
+>         return;
+>     }
+>     swap(active, staged);
+> }
+> 
+> void read_config()
+> {
+>     atomic_set(&cfg_in_use, true);
+>     do_io(active);
+>     atomic_set(&cfg_in_use, false);
+> 
+>     // To account for the edge case where update_config() is called
+>     // during the execution of read_config() and there are no subsequent
+>     // calls to update_config()
+>     if (atomic_xchg(&cfg_update_pending, false))
+>         swap(active, staged);
+> }
 
-yep, probably :)
+I wouldn't use atomic flags. IIRC ndo_set_rx_mode is called under
+netif_addr_lock_bh(), so we can reuse that lock, have update_config()
+assume ownership of the pending config and update it directly.
+And read_config() (which IIUC runs from a wq) can take that lock
+briefly, and swap which config is pending.
 
->
-> >
-> > > +               pr_warn("map '%s': can't associate BPF map without FD=
- (was it created?)\n", map->name);
-> > > +               return -EINVAL;
-> > > +       }
-> > > +
-> > > +       if (!bpf_map__is_struct_ops(map)) {
-> > > +               pr_warn("map '%s': can't associate non-struct_ops map=
-\n", map->name);
-> > > +               return -EINVAL;
-> > > +       }
-> > > +
-> > > +       return bpf_prog_assoc_struct_ops(prog_fd, map->fd, opts);
-> > > +}
-> > > +
-> > >  int parse_cpu_mask_str(const char *s, bool **mask, int *mask_sz)
-> > >  {
-> > >         int err =3D 0, n, len, start, end =3D -1;
-> > > diff --git a/tools/lib/bpf/libbpf.h b/tools/lib/bpf/libbpf.h
-> > > index 5118d0a90e24..45720b7c2aaa 100644
-> > > --- a/tools/lib/bpf/libbpf.h
-> > > +++ b/tools/lib/bpf/libbpf.h
-> > > @@ -1003,6 +1003,22 @@ LIBBPF_API int
-> > >  bpf_program__set_attach_target(struct bpf_program *prog, int attach_=
-prog_fd,
-> > >                                const char *attach_func_name);
-> > >
-> > > +struct bpf_prog_assoc_struct_ops_opts; /* defined in bpf.h */
-> > > +
-> > > +/**
-> > > + * @brief **bpf_program__assoc_struct_ops()** associates a BPF progr=
-am with a
-> > > + * struct_ops map.
-> > > + *
-> > > + * @param prog BPF program
-> > > + * @param map struct_ops map to be associated with the BPF program
-> > > + * @param opts optional options, can be NULL
-> > > + *
-> > > + * @return error code; or 0 if no error occurred.
-> >
-> > we normally specify returns like so:
-> >
-> > @return 0, on success; negative error code, otherwise
-> >
-> > keep it consistent?
->
-> Okay. Will change.
->
-> BTW. The return comment is copied from bpf_program__set_attach_target().
+> >The driver needs to know old and new entries
+> > and send ADD/DEL commands to FW. Converting virtio_net would be better,
+> > but it does one huge dump which is also not representative of most
+> > advanced NICs.  
+> 
+> We can definitely do this in prepare_config()
+> Speaking of which, How big can uc_count and mc_count be?
+> 
+> Would krealloc(buffer, uc_count * dev->addr_len, GFP_ATOMIC) be a good idea?
 
-well, we should strive for consistency :)
+Not sure about the max value but I'd think low thousands is probably 
+a good target. IOW yes, I think one linear buffer may be a concern.
+I'd think order 1 allocation may be fine tho..
 
->
-> >
-> > > + */
-> > > +LIBBPF_API int
-> > > +bpf_program__assoc_struct_ops(struct bpf_program *prog, struct bpf_m=
-ap *map,
-> > > +                             struct bpf_prog_assoc_struct_ops_opts *=
-opts);
-> > > +
-> > >  /**
-> > >   * @brief **bpf_object__find_map_by_name()** returns BPF map of
-> > >   * the given name, if it exists within the passed BPF object
-> > > diff --git a/tools/lib/bpf/libbpf.map b/tools/lib/bpf/libbpf.map
-> > > index 8ed8749907d4..84fb90a016c9 100644
-> > > --- a/tools/lib/bpf/libbpf.map
-> > > +++ b/tools/lib/bpf/libbpf.map
-> > > @@ -451,4 +451,6 @@ LIBBPF_1.7.0 {
-> > >         global:
-> > >                 bpf_map__set_exclusive_program;
-> > >                 bpf_map__exclusive_program;
-> > > +               bpf_prog_assoc_struct_ops;
-> > > +               bpf_program__assoc_struct_ops;
-> > >  } LIBBPF_1.6.0;
-> > > --
-> > > 2.47.3
-> > >
+> Well, virtio-net does kmalloc((uc_count + mc_count) * ETH_ALEN) + ...,
+> GFP_ATOMIC),
+> so this shouldn't introduce any new failures for virtio-net
+
+Right but IDK if virtio is used on systems with the same sort of scale
+as a large physical function driver..
+
+> > Let's only allocate any extra state if driver has the NDO
+> > We need to shut down sooner, some time between ndo_stop and ndo_uninit  
+> 
+> Would it make sense to move init (if ndo exists) and cleanup to
+> __dev_open and __dev_close?
+
+Yes, indeed.
 
