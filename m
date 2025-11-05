@@ -1,138 +1,296 @@
-Return-Path: <netdev+bounces-235721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73A9CC342E3
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 08:13:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 258CFC34304
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 08:15:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4428718C3952
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 07:13:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70BFF3B16F3
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 07:14:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B8131A23B9;
-	Wed,  5 Nov 2025 07:12:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11BD1246BB0;
+	Wed,  5 Nov 2025 07:14:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="e7sy115+"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="G8dt1cMj"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 819B725291B;
-	Wed,  5 Nov 2025 07:12:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A66532BFC8F
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 07:14:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762326777; cv=none; b=M37VdjoS9N87KH7HqfpX1DnLXRX5/SGGsJN84RzqbsmvrXK+HCuSWsTfxSh3U2xH/vTrv+BOQ16UTlgwXwoKnRJZvPAK2NHFbYXcFYkc8xR7dweef4ZmlPJQV8xLpA0mKc+2gfujI8wVBMLADOdOhCdOYqktsRga+FgaYGENnJM=
+	t=1762326846; cv=none; b=SW+zbsbsEmnHJM4ls+wQUCDXS3AI+oaVrYv4664owtN2EONyoq4RddahmH8mJcIjs8IU7Kx7w6ek8ALF/5yNke1aJaiRxXv4cZ1PHe2tZDbtjsJuc8DrerGhmROzK9/vKMkOwXD+Ob5m48CRMX/GlxIifD9TAQ6PvlnP7ML/BnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762326777; c=relaxed/simple;
-	bh=e6xxS2KcAuUEtj6xiPqplUbCE/tjj/nNZKvuVlT6zUo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Awd7ibX4QeBRxz+H+Py4NECrqrkqtV8AS9iKVM25oBrvndpU30/xZlhexw1If/dDM9AMTOsafmEPfjdgTmphQBwkgbYwpKOKGqgDbZKza4gjocNfWevX1LQGz/oYUXMbB0LCuantNDOrbxu4ir1h4GSTD1HMCCTT0Ni8xarQ30Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=e7sy115+; arc=none smtp.client-ip=115.124.30.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1762326765; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=tDwgROlxpHCEod2UJ8fw5P9DnURew1R9BGzDCvNPSec=;
-	b=e7sy115+Rsmmn5ij9nWNwlu0CPcJ6MGVV/CDf42SajNf0346+3W9RtCU8USO3EgWEfZSLE8bI8qhb6FjbBum3TrGEsF+5+7Vnt9tIamY4Q9IZOKh5MNiljd/mZc9WOQSz4ojt98ikgXfOfwTbPlLhJ3RJKO8W4b17WLMusvfdSw=
-Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WrkOLwv_1762326764 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 05 Nov 2025 15:12:44 +0800
-Date: Wed, 5 Nov 2025 15:12:44 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com    >
-To: Alexandra Winter <wintera@linux.ibm.com>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>, mjambigi@linux.ibm.com,
-	wenjia@linux.ibm.com, dust.li@linux.alibaba.com,
-	tonylu@linux.alibaba.com, guwen@linux.alibaba.com, kuba@kernel.org,
-	davem@davemloft.net, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
-	pabeni@redhat.com, edumazet@google.com, sidraya@linux.ibm.com,
-	jaka@linux.ibm.com
-Subject: Re: [PATCH net] net/smc: fix mismatch between CLC header and
- proposal extensions
-Message-ID: <20251105071244.GA87813@j66a10360.sqa.eu95>
-References: <20251031031828.111364-1-alibuda@linux.alibaba.com>
- <95bd9c85-8241-4040-bbd0-bcac3ffc78f7@linux.ibm.com>
- <20251104070828.GA36449@j66a10360.sqa.eu95>
- <5f415b7e-3557-4fa0-a0f9-f5643c1c7528@linux.ibm.com>
+	s=arc-20240116; t=1762326846; c=relaxed/simple;
+	bh=7lWv1Lbyp1KL6LhHGzX+dIbc3TmF9sT/YjApLREzoDc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lrU36lIEMBkm6m7v3OS7K/SFopvradD14oVOZPbif/Y5vc34+Lhu5I+zDvUBtnENiTJID+4tMO1az2WRY4G+0o2UydR3fvyI0eFzfQxyOHKQZZR2FL3lYxTUHXr5JRrDqj+3AN5kB07eqgf75MXpUd5oCYWG6+AN0SA+kRhoal8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=G8dt1cMj; arc=none smtp.client-ip=95.215.58.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1762326838;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NfK/agWz/0WkcTINCFySDbMfKDM1u8l6Zttpn4bCw/c=;
+	b=G8dt1cMj9yQ0VdniTzxzBnpH0c0iYXvq2nqFWGjbWP9PZh7a5xW564NdFfkBuR7OJmgM1O
+	rIhNwaguElgYYk5yXJ09ajYWNq2IbEMyj9qk+15h9rBmG+BAtoPOW+/meJjiWpdf/7KFQd
+	go7BXb2SLpbbglhz+ciqHe8HI0JzaIk=
+From: Menglong Dong <menglong.dong@linux.dev>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>, peterz@infradead.org
+Cc: Menglong Dong <menglong8.dong@gmail.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
+ Eduard <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ David Ahern <dsahern@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>,
+ "H. Peter Anvin" <hpa@zytor.com>, jiang.biao@linux.dev,
+ bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH bpf-next] bpf,x86: do RSB balance for trampoline
+Date: Wed, 05 Nov 2025 15:13:42 +0800
+Message-ID: <4465519.ejJDZkT8p0@7950hx>
+In-Reply-To:
+ <CAADnVQKQXcUxjJ2uYNu1nvhFYt=KhN8QYAiGXrt_YwUsjMFOuA@mail.gmail.com>
+References:
+ <20251104104913.689439-1-dongml2@chinatelecom.cn> <5029485.GXAFRqVoOG@7950hx>
+ <CAADnVQKQXcUxjJ2uYNu1nvhFYt=KhN8QYAiGXrt_YwUsjMFOuA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <5f415b7e-3557-4fa0-a0f9-f5643c1c7528@linux.ibm.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Nov 04, 2025 at 09:51:09AM +0100, Alexandra Winter wrote:
-> 
-> 
-> On 04.11.25 08:08, D. Wythe wrote:
-> > On Mon, Nov 03, 2025 at 09:28:22AM +0100, Alexandra Winter wrote:
-> >>
-> >>
-> >> On 31.10.25 04:18, D. Wythe wrote:
-> >>> The current CLC proposal message construction uses a mix of
-> >>> `ini->smc_type_v1/v2` and `pclc_base->hdr.typev1/v2` to decide whether
-> >>> to include optional extensions (IPv6 prefix extension for v1, and v2
-> >>> extension). This leads to a critical inconsistency: when
-> >>> `smc_clc_prfx_set()` fails - for example, in IPv6-only environments with
-> >>> only link-local addresses, or when the local IP address and the outgoing
-> >>> interface’s network address are not in the same subnet.
-> >>>
-> >>> As a result, the proposal message is assembled using the stale
-> >>> `ini->smc_type_v1` value—causing the IPv6 prefix extension to be
-> >>> included even though the header indicates v1 is not supported.
-> >>> The peer then receives a malformed CLC proposal where the header type
-> >>> does not match the payload, and immediately resets the connection.
-> >>>
-> >>> Fix this by consistently using `pclc_base->hdr.typev1` and
-> >>> `pclc_base->hdr.typev2`—the authoritative fields that reflect the
-> >>> actual capabilities advertised in the CLC header—when deciding whether
-> >>> to include optional extensions, as required by the SMC-R v2
-> >>> specification ("V1 IP Subnet Extension and V2 Extension only present if
-> >>> applicable").
-> >>
-> >>
-> >> Just thinking out loud:
-> >> It seems to me that the 'ini' structure exists once per socket and is used
-> >> to pass information between many functions involved with the handshake.
-> >> Did you consider updating ini->smc_type_v1/v2 when `smc_clc_prfx_set()` fails,
-> >> and using ini as the authoritative source?
-> >> With your patch, it seems to me `ini->smc_type_v1` still contains a stale value,
-> >> which may lead to issues in other places or future code.
-> > 
-> > Based on my understanding, ini->smc_type_v1/v2 represents the local
-> > device's inherent hardware capabilities. This value is a static property
-> > and, from my perspective, should remain immutable, independent of
-> > transient network conditions such as invalid IPv6 prefixes or GID
-> > mismatches. Therefore, I believe modifying this field within
-> > smc_clc_send_proposal() might not be the most appropriate approach.
-> 
-> 
-> 'ini' is allocated in __smc_connect() and in smc_listen_work().
-> So it seems to me the purpose of 'ini' is to store information about the
-> current connection, not device's inherent hardware capabilities.
-> 
-> Fields like ini->smc_type_v1/v2 and ini->smcd/r_version are adjusted in
-> multiple places during the handshake.
-> I must say that the usage of these fields is confusing and looks somehow
-> redundant to me.
-> But looking at pclc_base->hdr.typev1/v2, as yet another source of
-> information doesn't make things cleaner IMO.
->
+On 2025/11/5 10:12, Alexei Starovoitov wrote:
+> On Tue, Nov 4, 2025 at 5:30=E2=80=AFPM Menglong Dong <menglong.dong@linux=
+=2Edev> wrote:
+> >
+> > On 2025/11/5 02:56, Alexei Starovoitov wrote:
+> > > On Tue, Nov 4, 2025 at 2:49=E2=80=AFAM Menglong Dong <menglong8.dong@=
+gmail.com> wrote:
+> > > >
+> > > > In origin call case, we skip the "rip" directly before we return, w=
+hich
+> > > > break the RSB, as we have twice "call", but only once "ret".
+> > >
+> > > RSB meaning return stack buffer?
+> > >
+> > > and by "breaks RSB" you mean it makes the cpu less efficient?
+> >
+> > Yeah, I mean it makes the cpu less efficient. The RSB is used
+> > for the branch predicting, and it will push the "rip" to its hardware
+> > stack on "call", and pop it from the stack on "ret". In the origin
+> > call case, there are twice "call" but once "ret", will break its
+> > balance.
+>=20
+> Yes. I'm aware, but your "mov [rbp + 8], rax" screws it up as well,
+> since RSB has to be updated/invalidated by this store.
+> The behavior depends on the microarchitecture, of course.
+> I think:
+> add rsp, 8
+> ret
+> will only screw up the return prediction, but won't invalidate RSB.
+>=20
+> > Similar things happen in "return_to_handler" in ftrace_64.S,
+> > which has once "call", but twice "ret". And it pretend a "call"
+> > to make it balance.
+>=20
+> This makes more sense to me. Let's try that approach instead
+> of messing with the return address on stack?
 
-That’s definitely a reasonable way to look at it as well. If the community
-prefers this interpretation as more natural, I’m fully open to it.
+The way here is similar to the "return_to_handler". For the ftrace,
+the origin stack before the "ret" of the traced function is:
 
-I’d like to do some testing first, as I have concerns about
-possible side effects from directly modifying ini and if nothing
-problematic shows up, I’ll send the updated version with this change.
+    POS:
+    rip   ---> return_to_handler
 
-Best wishes,
-D. Wythe
+And the exit of the traced function will jump to return_to_handler.
+In return_to_handler, it will query the real "rip" of the traced function
+and the it call a internal function:
+
+    call .Ldo_rop
+
+And the stack now is:
+
+    POS:
+    rip   ----> the address after "call .Ldo_rop", which is a "int3"
+
+in the .Ldo_rop, it will modify the rip to the real rip to make
+it like this:
+
+    POS:
+    rip   ---> real rip
+
+And it return. Take the target function "foo" for example, the logic
+of it is:
+
+    call foo -> call ftrace_caller -> return ftrace_caller ->
+    return return_to_handler -> call Ldo_rop -> return foo
+
+As you can see, the call and return address for ".Ldo_rop" is
+also messed up. So I think it works here too. Compared with
+a messed "return address", a missed return maybe have
+better influence?
+
+And the whole logic for us is:
+
+    call foo -> call trampoline -> call origin ->
+    return origin -> return POS -> return foo
+
+=46ollowing is the partial code of return_to_handler:
+
+	/*
+	 * Jump back to the old return address. This cannot be JMP_NOSPEC rdi
+	 * since IBT would demand that contain ENDBR, which simply isn't so for
+	 * return addresses. Use a retpoline here to keep the RSB balanced.
+	 */
+	ANNOTATE_INTRA_FUNCTION_CALL
+	call .Ldo_rop
+	int3
+=2ELdo_rop:
+	mov %rdi, (%rsp)
+	ALTERNATIVE __stringify(RET), \
+		    __stringify(ANNOTATE_UNRET_SAFE; ret; int3), \
+		    X86_FEATURE_CALL_DEPTH
+
+>=20
+> > I were wandering why the overhead of fexit is much higher
+> > than fentry. I added the percup-ref-get-and-put stuff to the
+> > fentry, and the performance of it still can be 130M/s. However,
+> > the fexit only has 76M/s. And the only difference is the origin
+> > call.
+> >
+> > The RSB balancing mitigate it, but there are still gap. I
+> > suspect it's still the branch predicting things.
+>=20
+> If you have access to intel vtune profiler, check what is
+
+Let me have a study on the "intel vtune profiler" stuff :)
+
+I did a perf stat, and the branch miss increase seriously,
+and the IPC(insn per cycle) decrease seriously.
+
+> actually happening. It can show micro arch details.
+> I don't think there is an open source alternative.
+>=20
+> > > Or you mean call depth accounting that is done in sw ?
+> > >
+> > > > Do the RSB balance by pseudo a "ret". Instead of skipping the "rip"=
+, we
+> > > > modify it to the address of a "ret" insn that we generate.
+> > > >
+> > > > The performance of "fexit" increases from 76M/s to 84M/s. Before th=
+is
+> > > > optimize, the bench resulting of fexit is:
+> > > >
+> > > > fexit          :   76.494 =C2=B1 0.216M/s
+> > > > fexit          :   76.319 =C2=B1 0.097M/s
+> > > > fexit          :   70.680 =C2=B1 0.060M/s
+> > > > fexit          :   75.509 =C2=B1 0.039M/s
+> > > > fexit          :   76.392 =C2=B1 0.049M/s
+> > > >
+> > > > After this optimize:
+> > > >
+> > > > fexit          :   86.023 =C2=B1 0.518M/s
+> > > > fexit          :   83.388 =C2=B1 0.021M/s
+> > > > fexit          :   85.146 =C2=B1 0.058M/s
+> > > > fexit          :   85.646 =C2=B1 0.136M/s
+> > > > fexit          :   84.040 =C2=B1 0.045M/s
+> > >
+> > > This is with or without calldepth accounting?
+> >
+> > The CONFIG_MITIGATION_CALL_DEPTH_TRACKING is enabled, but
+> > I did the testing with "mitigations=3Doff" in the cmdline, so I guess
+> > "without"?
+>=20
+> Pls benchmark both. It sounds like call_depth_tracking
+> miscounting stuff ?
+
+Sadly, the performance decrease from 28M/s to 26M/s with
+mitigation enabled. I think the addition "ret" increase the
+overhead with "return-thunks" enabled.
+
+Things is not as simple as I thought, let me do more testing,
+and see if ftrace has similar performance decreasing.
+
+Hi, @Peter. Do you have any advice on this ting?
+
+Thanks!
+Menglong Dong
+
+>=20
+> > >
+[......]
+> >                            const u32 imm32_hi, const u32 imm32_lo)
+> > {
+> >         u64 imm64 =3D ((u64)imm32_hi << 32) | (u32)imm32_lo;
+> >         u8 *prog =3D *pprog;
+> >
+> >         if (is_uimm32(imm64)) {
+> >                 /*
+> >                  * For emitting plain u32, where sign bit must not be
+> >                  * propagated LLVM tends to load imm64 over mov32
+> >                  * directly, so save couple of bytes by just doing
+> >                  * 'mov %eax, imm32' instead.
+> >                  */
+> >                 emit_mov_imm32(&prog, false, dst_reg, imm32_lo);
+> >         } else if (is_simm32(imm64)) {
+> >                 emit_mov_imm32(&prog, true, dst_reg, imm32_lo);
+> >         } else {
+> >                 /* movabsq rax, imm64 */
+> >                 EMIT2(add_1mod(0x48, dst_reg), add_1reg(0xB8, dst_reg));
+> >                 EMIT(imm32_lo, 4);
+> >                 EMIT(imm32_hi, 4);
+>=20
+> This part could be factored out as a separate helper.
+> Then sizeof(movabsq) will be constant.
+> Note, in the verifier we do:
+> #if defined(MODULES_VADDR)
+>                         u64 addr =3D MODULES_VADDR;
+> #else
+>                         u64 addr =3D VMALLOC_START;
+> #endif
+>                         /* jit (e.g. x86_64) may emit fewer instructions
+>                          * if it learns a u32 imm is the same as a u64 im=
+m.
+>                          * Set close enough to possible prog address.
+>                          */
+>                         insn[0].imm =3D (u32)addr;
+>                         insn[1].imm =3D addr >> 32;
+>=20
+> do mitigate this issue.
+> So you could have done:
+> emit_mov_imm64(&prog, BPF_REG_0, VMALLOC_START >> 32, 0);
+>=20
+> since 'ret_addr' math is incorrect at that point anyway.
+> But prog +=3D sizeof is imo cleaner.
+
+Great! This make things much more clear. After I figure out all
+the stuff, (which I'm not sure if I'm able), I'll do this way.
+
+Thanks!
+Menglong Dong
+
+> The whole thing might not be necessary with extra call approach.
+> I suspect it should be faster than this approach.
+>=20
+
+
+
+
 
