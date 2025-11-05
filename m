@@ -1,75 +1,79 @@
-Return-Path: <netdev+bounces-235795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23A5EC35CC1
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 14:18:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A46DEC35CE2
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 14:21:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 636724F6C18
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 13:17:41 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 67CE24E76D4
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 13:21:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22D21319608;
-	Wed,  5 Nov 2025 13:17:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3326631CA7E;
+	Wed,  5 Nov 2025 13:21:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ncdGqJhk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D923195FF;
-	Wed,  5 Nov 2025 13:17:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D456531D362;
+	Wed,  5 Nov 2025 13:21:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762348655; cv=none; b=Ew4M9vqMOIdfA6gAqdzrPQfL98F+Az/dQ8hbiU0jGrrCb0mdKxu3Y6BA93kkeUJKawWc62PBfyxcYps3t5Cm1wNKW37BygcNeNI7EQeJ1/nSOjopTUshPrs6bjHPU2eZlyuSrLj5cfndqy/HRGqrRoeSZ/G4Xhs4xcE0zrvAzZk=
+	t=1762348872; cv=none; b=KUjyMcJYr1a4X4qGQDUsNbjXsD2aBUQdcGNu2mZCIaXB3x7RDPzO4lcJNrTRIRy4Qo/qYmCcwtVvfg3ULfG4exkvarKGfbX7iikqEkUUcZAUUPH/5IqCTYaquJEkKTAzJ07nbhAO7uDxAf1LPEhKmG8vdbFtHo7S2EBjay0i/uM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762348655; c=relaxed/simple;
-	bh=i24wx9gvYP107ek59FmvUJu/NTTbFUXB+uauA3zsGf0=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=J1hX21J1Ii3z7Uee1056zfmxI4NVlLpUgp6szgAnkASXE1YShiuJPyx6EVh8i0qVNFo7K5LnLwGt5vuaYhAcCraHUjtmFRI7TiQPswqqEAK3NmHChL/eUJp8EJ2fuDxMmDFlWygKuz+HgaRDXK06gXv2l45UiwBJvtoCINOaM6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CACCEC4CEFB;
-	Wed,  5 Nov 2025 13:17:33 +0000 (UTC)
-From: Leon Romanovsky <leonro@nvidia.com>
-To: netdev@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>
-Cc: Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, 
- linux-rdma@vger.kernel.org, Jason Gunthorpe <jgg@ziepe.ca>
-In-Reply-To: <20251105045127.106822-1-rdunlap@infradead.org>
-References: <20251105045127.106822-1-rdunlap@infradead.org>
-Subject: Re: [PATCH] IB/rdmavt: rdmavt_qp.h: clean up kernel-doc comments
-Message-Id: <176234864952.11762.6085508512401726797.b4-ty@nvidia.com>
-Date: Wed, 05 Nov 2025 08:17:29 -0500
+	s=arc-20240116; t=1762348872; c=relaxed/simple;
+	bh=o5m/BgT+CLLta6IIQi0NDjRSxYzIHuFhf9FXQjKJqsg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K+T5J0m2KdffKwUXuwvb7rXdpFGgSdfabYtd/DAwsgrCXH9li6IMxoq1Wb+wj0bQBu8C41JMD86Gjd+3p6/5aDlFu7P6rA8PGNUeKV0Nk/RT2HkzXigwCwEJxl4p0p1SJuORkFIuKrmrNW6wPtKjUorjmVOFUkTcIG70t+nPfuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ncdGqJhk; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=n2ftvDFaNKu3PV0gvMROlDobM/rsO8FfbTNJXo4q7oU=; b=ncdGqJhkUD86UBjzI66zO+L3UO
+	Ejf4lR5budRHvMhoQxAnpyMOTnjxReJxs0ILoouTU2WOY7Ry2YtlQc8WYina+ZNifSw7pAGZhlKZP
+	9vEELqULrcoRuXkB0WzeKVfzlNML2z1DUxwoRNtVccRJ1uR1zGCpJn/Zu0eW6Pp4mjGg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vGdRU-00D040-6l; Wed, 05 Nov 2025 14:20:52 +0100
+Date: Wed, 5 Nov 2025 14:20:52 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Chang Junzheng <guagua210311@qq.com>
+Cc: rafal@milecki.pl, bcm-kernel-feedback-list@broadcom.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: ethernet: broadcom: bgmac: add SPDX license
+ identifier
+Message-ID: <eb006531-4c4a-4dce-a3ba-aeffddf8fcad@lunn.ch>
+References: <tencent_DCA505773DEBA2EC5F3B04526C606AD6A608@qq.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.15-dev-3ae27
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <tencent_DCA505773DEBA2EC5F3B04526C606AD6A608@qq.com>
 
-
-On Tue, 04 Nov 2025 20:51:27 -0800, Randy Dunlap wrote:
-> Correct the kernel-doc comments format to avoid around 35 kernel-doc
-> warnings:
+On Wed, Nov 05, 2025 at 07:28:20PM +0800, Chang Junzheng wrote:
+> Add missing SPDX-License-Identifier tag to bgmac-bcma.c.
 > 
-> - use struct keyword to introduce struct kernel-doc comments
-> - use correct variable name for some struct members
-> - use correct function name in comments for some functions
-> - fix spelling in a few comments
-> - use a ':' instead of '-' to separate struct members from their
->   descriptions
-> - add a function name heading for rvt_div_mtu()
-> 
-> [...]
+> The license is GPL-2.0 as indicated by the existing license text
+> in the file.
 
-Applied, thanks!
+It is normal to remove such license text when adding an SPDX header.
 
-[1/1] IB/rdmavt: rdmavt_qp.h: clean up kernel-doc comments
-      https://git.kernel.org/rdma/rdma/c/a658c6fc9cc2f0
+Please also read:
 
-Best regards,
--- 
-Leon Romanovsky <leonro@nvidia.com>
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
 
+	Andrew
 
