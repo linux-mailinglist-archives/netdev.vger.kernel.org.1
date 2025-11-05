@@ -1,183 +1,186 @@
-Return-Path: <netdev+bounces-235771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B08AC3549C
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 12:05:13 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F6ADC35503
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 12:17:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 07FB234E5CE
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 11:05:13 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C5C6F4EAB5C
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 11:17:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EA4330F547;
-	Wed,  5 Nov 2025 11:05:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96CA030F95C;
+	Wed,  5 Nov 2025 11:17:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="hHOQqHd4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RFAvteAB";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qq/LViCL"
 X-Original-To: netdev@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65A4E309F08;
-	Wed,  5 Nov 2025 11:05:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B983D30DEDD
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 11:17:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762340707; cv=none; b=dpa9dScnrprIG/vIibDve3KYtCYENaYNHZ1s0OgZvatBVdWAp3Ovb+tDfWCIrFL62ZZUTFiY9JjvCd7LLhZMilcA435D2y8ue527nuHXNYVk7TuQEs1dogNDk648djDAkMYud5Kqz5EK6Gr7pJkaxChpPBj8OyJzrkaegrzD9q4=
+	t=1762341450; cv=none; b=PsoDkT+IUq4JI6B+2exA/X102Sizwf5Jg1ZiYV620OEnpvIaNqL6DPDP07QBcWqbSEGDRwJukzZH94SlSA8cNa8ZfKcm7XnHIBMOzsEJ9YNQc2KJgCcPbI5GJFUvQvVVXvImott0k9TCTBlXB3FkJh7w7XEkaq4VJ3hnQiYEfhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762340707; c=relaxed/simple;
-	bh=Fbrkx2MhU9lvTEzh05dOhsEKES26ch45OyV5zMyNgMA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pVXNod+QGrCcq8dE4RIrKZMzbcoPSeebS9CzN8HC9sXbLIVaM6j4u/N2PaFjZW4lPJuX/sT1oKZvXme1LU6DCbQoN/zexvSMsmHEpZIubThdOT8+Kz348lHIJ2MXZbgmogpYS4DQO6y7Lt3lJO4FjQ0gGPlK08ibuFbtTye9AuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=hHOQqHd4; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-Received: from [129.217.186.196] ([129.217.186.196])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPSA id 5A5B4xbN012832
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 5 Nov 2025 12:04:59 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1762340700;
-	bh=Fbrkx2MhU9lvTEzh05dOhsEKES26ch45OyV5zMyNgMA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=hHOQqHd46ywJlGrOjkw4ZGuyd/a+qflaNOEERuKc4UyJdpTNzc0JmATSFUhgd8zQZ
-	 hCFEltifg3wb18xnLufVue3ya2r9dU+N6CaxDmn8vbgiwYBNGHVmSEmteKyI3hHtTQ
-	 Wmv/FKRWXa1v4Na6wUJGfFmh3fmVU+4Sm0Bd8XUE=
-Message-ID: <c29f8763-6e0e-4601-90be-e88769d23d2a@tu-dortmund.de>
-Date: Wed, 5 Nov 2025 12:04:59 +0100
+	s=arc-20240116; t=1762341450; c=relaxed/simple;
+	bh=EIruf+q68s7Apk3JnbRaT8nDbQ4uqSCgVg4dKHFgp3M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hFDgP+C9cZgu58JU3OP+bwn9ppxO6/5ktDs7dLhVVz2MnxRnAQvUMrq2DHwwDe2Jb7KGHcLfaHEfSVLKs3EXSZSpGWlbEgTuHabAnT4nvN2AaSl+yH1dmTwLtv5nbSfq2tZ2YSNbQj29hk+KscmGjHe7JxBiFl5Ei9QB1f+seWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RFAvteAB; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qq/LViCL; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762341447;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oJvv5ndjic3rP/0jjQlvKlNTvtUhgk3xpudTBbq2U1A=;
+	b=RFAvteABn/BBV6nIkNb08rw+jdzOHbsMpoDAQAXW2L1ZgeEvjiOullAVxZfRfiOnSTrjyQ
+	C77+D2uuiZ1PDgJG9+IMi0Wt18AvCnMHLs09Mdpd2xCe2tHE4LKLFW6pDQIjvnY6IlRMnf
+	RRsD0LqqOUPGWPAkaK3ZNQ0xyzbPTZs=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-195-24A2B4i2N02ugH5GY60Umg-1; Wed, 05 Nov 2025 06:17:25 -0500
+X-MC-Unique: 24A2B4i2N02ugH5GY60Umg-1
+X-Mimecast-MFC-AGG-ID: 24A2B4i2N02ugH5GY60Umg_1762341444
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4775e3685cbso2710315e9.2
+        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 03:17:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1762341444; x=1762946244; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=oJvv5ndjic3rP/0jjQlvKlNTvtUhgk3xpudTBbq2U1A=;
+        b=Qq/LViCLXgEpV6/U0lNiB38+T1C0AH91AyA+6diE5t0rLt+LO5uloDj5+joYGYvCy0
+         pS7hjMtsA4IJXAJ9BGY6OY1D+W/odH2TJaI8nNAXxLylTw1U+y+s553GwVDh+66nKQeG
+         vvys8xUwzdPN8/nLD/7bB14GTa78MPz1hVqFfYidHa5GsYl+g6nKnGcPl/PFdabm7qUL
+         W2EwGtBYZDAytDCGDmf1aOsr4BgehqrpselKyYp0HGWLp9Yn4M9tIaQ2ce5NMrjEI+Wq
+         V7KcLqhmbiV29oGc3AFtRqBLkzPy9iSNH/0H+EqE25FwJU4QWa537G3PrhDE7VwmXGZ5
+         rVsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762341444; x=1762946244;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oJvv5ndjic3rP/0jjQlvKlNTvtUhgk3xpudTBbq2U1A=;
+        b=pcuplAe7zSs7aMkrnH9KqtVDS++eQoNdHyEIfQ+Eye8KvPeenA0tW9jmlW8oiA8jm7
+         3nCHT//RdgFfGhZuEwyeIHDT8Of+Sp7EOmYgOwPaEYKIfNFRhXTL09oT8yk/WzLySXk3
+         NENzP/Cwqh7y3qWijd1H/YxpduTo57KjFEufua98fO99Udn0pIxRnOAf0NGZZsmsxoY9
+         D1c6ASRBWVRK1OKpxmjMRS8la/fE6B34zmjn+uN0t1FjmQo6GHaTcDoQFYqpc2IJOsS2
+         a5umlQTEveID3gjShw9igkA/bgIcjdAK3WkvyS46lTbXrVF6x1dOcomhdbng9KqXel0Q
+         iDUA==
+X-Forwarded-Encrypted: i=1; AJvYcCU7jaHHYxT5nXnxCjFKYxw+EIrkz592ASJfJeoKanSQXLkL019qZOrMOfQMrfL5QED0ix0KfdQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzhn+a/yLrPO++jjymcjCXhvTp+sGxGUTSOttBDettDoCCS94+z
+	L4I40tnjm5Gh7D6kX2QFL2QZ6+FABzHPax+q8665kbh5mY+PQuzc2JYOa50lVXtPFNe5SzlNS8/
+	Twy1qIX5Ml3TDuTZD9YxXnzqFl8VsRsBNEpYOuK2Ze0Xwf5TGrDknRlJA6A==
+X-Gm-Gg: ASbGncutU1/bQ2l0nIzYOfRKagKMV+5HWcJjxGqMPpoZyliUdZEVEbQzlQhZ9np5oBz
+	GG34erjAN6Dg9rMCAmFXRgvIRksYHYSDFE0DDZ27dsIn5djbFtZdzv879M/psiwJwnT2rKUIMD6
+	w9lZbgyiGpub3rsNjIrPmwsLIDj9YTsk+7wMzCesjuD6TVsy7xbkP2chr1YUMovDBuAhYYN3cEE
+	thNTXMrD7yTAp2W3fd6TkkDbXl59eFEB85hnE9ebwpFOePF7llov2LyeltUOjprTS/UZ/yis2Mi
+	qSqBzn9ARqfO/NuObGtXmfr/COmKvxY6oS/nhDiXFAJNw0WNXokVYJ5VeJK7Q6OCTlGzMRaYlcC
+	4CNon
+X-Received: by 2002:a05:600c:1c18:b0:471:1702:f41c with SMTP id 5b1f17b1804b1-4775ce26b5bmr35419275e9.35.1762341444075;
+        Wed, 05 Nov 2025 03:17:24 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHNzHvCUGAag3+wrnkfdKLHqAtmgiZqn0Kpfqlpb4QSMfUNSwUxHezyd0VrzCOLaf/mXC1/LA==
+X-Received: by 2002:a05:600c:1c18:b0:471:1702:f41c with SMTP id 5b1f17b1804b1-4775ce26b5bmr35418935e9.35.1762341443637;
+        Wed, 05 Nov 2025 03:17:23 -0800 (PST)
+Received: from sgarzare-redhat ([78.211.197.162])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47755942772sm42323005e9.5.2025.11.05.03.17.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Nov 2025 03:17:22 -0800 (PST)
+Date: Wed, 5 Nov 2025 12:16:42 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Shuah Khan <shuah@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Bobby Eshleman <bobbyeshleman@meta.com>, 
+	Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net] selftests/vsock: avoid false-positives when checking
+ dmesg
+Message-ID: <oqglacowaadnhai4ts4pn4khaumxyoedqb5pieiwsvkqtk7cpr@ltjbthajbxyq>
+References: <20251104-vsock-vmtest-dmesg-fix-v1-1-80c8db3f5dfe@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next v1 0/1] usbnet: Add support for Byte Queue Limits
- (BQL)
-To: Daniele Palmas <dnlplm@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, oneukum@suse.com,
-        andrew+netdev@lunn.ch, davem@davemloft.net, kuba@kernel.org,
-        pabeni@redhat.com, netdev@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20251104161327.41004-1-simon.schippers@tu-dortmund.de>
- <CANn89iLLwWvbnCKKRrV2c7eo+4UduLVgZUWR=ZoZ+SPHRGf=wg@mail.gmail.com>
- <f2a363d3-40d7-4a5f-a884-ec147a167ef5@tu-dortmund.de>
- <CAGRyCJERd93kE3BsoXCVRuRAVuvubt5udcyNMuEZBTcq2r+hcw@mail.gmail.com>
-Content-Language: en-US
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-In-Reply-To: <CAGRyCJERd93kE3BsoXCVRuRAVuvubt5udcyNMuEZBTcq2r+hcw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20251104-vsock-vmtest-dmesg-fix-v1-1-80c8db3f5dfe@meta.com>
 
-On 11/5/25 11:35, Daniele Palmas wrote:
-> Hello Simon,
-> 
-> Il giorno mer 5 nov 2025 alle ore 11:40 Simon Schippers
-> <simon.schippers@tu-dortmund.de> ha scritto:
->>
->> On 11/4/25 18:02, Eric Dumazet wrote:
->>> On Tue, Nov 4, 2025 at 8:14 AM Simon Schippers
->>> <simon.schippers@tu-dortmund.de> wrote:
->>>>
->>>> During recent testing, I observed significant latency spikes when using
->>>> Quectel 5G modems under load. Investigation revealed that the issue was
->>>> caused by bufferbloat in the usbnet driver.
->>>>
->>>> In the current implementation, usbnet uses a fixed tx_qlen of:
->>>>
->>>> USB2: 60 * 1518 bytes = 91.08 KB
->>>> USB3: 60 * 5 * 1518 bytes = 454.80 KB
->>>>
->>>> Such large transmit queues can be problematic, especially for cellular
->>>> modems. For example, with a typical celluar link speed of 10 Mbit/s, a
->>>> fully occupied USB3 transmit queue results in:
->>>>
->>>> 454.80 KB / (10 Mbit/s / 8 bit/byte) = 363.84 ms
->>>>
->>>> of additional latency.
->>>
->>> Doesn't 5G need to push more packets to the driver to get good aggregation ?
->>>
->>
->> Yes, but not 455 KB for low speeds. 5G requires a queue of a few ms to
->> aggregate enough packets for a frame but not of several hundred ms as
->> calculated in my example. And yes, there are situations where 5G,
->> especially FR2 mmWave, reaches Gbit/s speeds where a big queue is
->> required. But the dynamic queue limit approach of BQL should be well
->> suited for these varying speeds.
->>
-> 
-> out of curiosity, related to the test with 5G Quectel, did you test
-> enabling aggregation through QMAP (kernel module rmnet) or simply
-> qmi_wwan raw_ip ?
-> 
-> Regards,
-> Daniele
-> 
+On Tue, Nov 04, 2025 at 01:50:50PM -0800, Bobby Eshleman wrote:
+>From: Bobby Eshleman <bobbyeshleman@meta.com>
+>
+>Sometimes VMs will have some intermittent dmesg warnings that are
+>unrelated to vsock. Change the dmesg parsing to filter on strings
+>containing 'vsock' to avoid false positive failures that are unrelated
+>to vsock. The downside is that it is possible for some vsock related
+>warnings to not contain the substring 'vsock', so those will be missed.
+>
+>Fixes: a4a65c6fe08b ("selftests/vsock: add initial vmtest.sh for vsock")
+>Reviewed-by: Simon Horman <horms@kernel.org>
+>Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+>---
+>Previously was part of the series:
+>https://lore.kernel.org/all/20251022-vsock-selftests-fixes-and-improvements-v1-0-edeb179d6463@meta.com/
+>---
+> tools/testing/selftests/vsock/vmtest.sh | 8 ++++----
+> 1 file changed, 4 insertions(+), 4 deletions(-)
+>
+>diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
+>index edacebfc1632..e1732f236d14 100755
+>--- a/tools/testing/selftests/vsock/vmtest.sh
+>+++ b/tools/testing/selftests/vsock/vmtest.sh
+>@@ -389,9 +389,9 @@ run_test() {
+> 	local rc
+>
+> 	host_oops_cnt_before=$(dmesg | grep -c -i 'Oops')
+>-	host_warn_cnt_before=$(dmesg --level=warn | wc -l)
+>+	host_warn_cnt_before=$(dmesg --level=warn | grep -c -i 'vsock')
+> 	vm_oops_cnt_before=$(vm_ssh -- dmesg | grep -c -i 'Oops')
+>-	vm_warn_cnt_before=$(vm_ssh -- dmesg --level=warn | wc -l)
+>+	vm_warn_cnt_before=$(vm_ssh -- dmesg --level=warn | grep -c -i 'vsock')
+>
+> 	name=$(echo "${1}" | awk '{ print $1 }')
+> 	eval test_"${name}"
+>@@ -403,7 +403,7 @@ run_test() {
+> 		rc=$KSFT_FAIL
+> 	fi
+>
+>-	host_warn_cnt_after=$(dmesg --level=warn | wc -l)
+>+	host_warn_cnt_after=$(dmesg --level=warn | grep -c -i vsock)
 
-Hi Daniele,
+In the previous hunk we quoted 'vsock', but here and in the next we did
+not. Can we be consistent at least in the same patch ?
 
-I simply used qmi_wwan. I actually never touched rmnet before.
-Is the aggregation through QMAP what you and Eric mean with aggregation?
-Because then I misunderstood it, because I was thinking about aggregating
-enough (and not too many) packets in the usbnet queue.
+The rest LGTM.
 
-Thanks
+Stefano
 
->>>>
->>>> To address this issue, this patch introduces support for
->>>> Byte Queue Limits (BQL) [1][2] in the usbnet driver. BQL dynamically
->>>> limits the amount of data queued in the driver, effectively reducing
->>>> latency without impacting throughput.
->>>> This implementation was successfully tested on several devices as
->>>> described in the commit.
->>>>
->>>>
->>>>
->>>> Future work
->>>>
->>>> Due to offloading, TCP often produces SKBs up to 64 KB in size.
->>>
->>> Only for rates > 500 Mbit. After BQL, we had many more improvements in
->>> the stack.
->>> https://lwn.net/Articles/564978/
->>>
->>>
->>
->> I also saw these large SKBs, for example, for my USB2 Android tethering,
->> which advertises a network speed of < 500 Mbit/s.
->> I saw these large SKBs by looking at the file:
->>
->> cat /sys/class/net/INTERFACE/queues/tx-0/byte_queue_limits/inflight
->>
->> For UDP-only traffic, inflight always maxed out at MTU size.
->>
->> Thank you for your replies!
->>
->>>> To
->>>> further decrease buffer bloat, I tried to disable TSO, GSO and LRO but it
->>>> did not have the intended effect in my tests. The only dirty workaround I
->>>> found so far was to call netif_stop_queue() whenever BQL sets
->>>> __QUEUE_STATE_STACK_XOFF. However, a proper solution to this issue would
->>>> be desirable.
->>>>
->>>> I also plan to publish a scientific paper on this topic in the near
->>>> future.
->>>>
->>>> Thanks,
->>>> Simon
->>>>
->>>> [1] https://medium.com/@tom_84912/byte-queue-limits-the-unauthorized-biography-61adc5730b83
->>>> [2] https://lwn.net/Articles/469652/
->>>>
->>>> Simon Schippers (1):
->>>>   usbnet: Add support for Byte Queue Limits (BQL)
->>>>
->>>>  drivers/net/usb/usbnet.c | 8 ++++++++
->>>>  1 file changed, 8 insertions(+)
->>>>
->>>> --
->>>> 2.43.0
->>>>
->>
+> 	if [[ ${host_warn_cnt_after} -gt ${host_warn_cnt_before} ]]; then
+> 		echo "FAIL: kernel warning detected on host" | log_host "${name}"
+> 		rc=$KSFT_FAIL
+>@@ -415,7 +415,7 @@ run_test() {
+> 		rc=$KSFT_FAIL
+> 	fi
+>
+>-	vm_warn_cnt_after=$(vm_ssh -- dmesg --level=warn | wc -l)
+>+	vm_warn_cnt_after=$(vm_ssh -- dmesg --level=warn | grep -c -i vsock)
+> 	if [[ ${vm_warn_cnt_after} -gt ${vm_warn_cnt_before} ]]; then
+> 		echo "FAIL: kernel warning detected on vm" | log_host "${name}"
+> 		rc=$KSFT_FAIL
+>
+>---
+>base-commit: 255d75ef029f33f75fcf5015052b7302486f7ad2
+>change-id: 20251104-vsock-vmtest-dmesg-fix-b2c59e1d9c38
+>
+>Best regards,
+>-- 
+>Bobby Eshleman <bobbyeshleman@meta.com>
+>
+
 
