@@ -1,124 +1,147 @@
-Return-Path: <netdev+bounces-236086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7FD3C38458
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 23:58:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77346C3846E
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 00:00:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5C1C04F3B08
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 22:57:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 778C23B4FB8
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 22:59:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A6642EDD51;
-	Wed,  5 Nov 2025 22:56:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFA852E0407;
+	Wed,  5 Nov 2025 22:59:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ByyxT8Ln"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Y2yCQMVu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E03621E097
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 22:56:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 670212D7DDE
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 22:59:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762383416; cv=none; b=ns4giklHuU+U8IMUxrPpud4Lze3VkM7+dkDCq0MeTT3bsdK9MVYyiDAzdB+VwLzeUZPTpXzE0MZ0Kbr01xSrOfTeXCg0Ni/93HkVKDl4SBTREXSOB8Xgf41vradS39WcMVorXkxzZtvuzf+IwWCJ6QMCChYxrqTj/EjhNLtBkv0=
+	t=1762383554; cv=none; b=cXxHPK/PjZH7jkd5BQa5SUtQtjKilYfzLmkjxex3l7RYBwG973F0b+RLeEAl74YqiB4o/aS0dMtnuF4mMfjihRd+A+DjMQRThlHSNEp1jSIfQigs6SHrn6srpbadwiyS9uoJVuv0WvCgq4bWIIysMZnxxysqCSpfkufKXVj7RZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762383416; c=relaxed/simple;
-	bh=FTXZ5vO74QZiowktk12TLrnqOYri08BSx/eGcuuJfys=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fhTjyaTYYBE0iJMHkr4n+/N5/8qMo/oDwrfIZpxpp2MwBxV9Yy8pQvfs0xvhsZrCZb1pJERtXqaWxxfAnWAo3cUjY21A/dIpPFNfb6j47rZHt6Wmitjh2DKEzvbK4spSjD74zpbbNInr+QXCq2gG3EzGR8GlHOnR0+KAb8vRkmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ByyxT8Ln; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-59434b28624so1308e87.1
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 14:56:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762383411; x=1762988211; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d38bnEq+1o+YEmK6XU9ce+0ywAuUlel3clbqJSBWsEI=;
-        b=ByyxT8LnU/ScdARqRGyLuooRxswKk5qWDA7/HI8soU4jR6zuj4lg8w0TaxODrb0gR+
-         gdr7khoNlIbmGO0ovayt7wlHvM9XXsT2RShbUjo+WR+7k+S67AO70J0LWcgsh1OvX0WQ
-         K15EemdRHCzbrvkPtD4Cm/oTcAjIKfVhCF8hUWaDCeePh+Hwqfo89PWBwkeeQHx+lS8u
-         BrrkgoWdxXfbYlxiVC3ADDzyhza90GTVYuDCRux2rWS1W9WGzUXs1ygjNuEjgtKbRrSh
-         Mj3GtRsv6gqCOcWlBrk2jnlqiD1J3BPLpsUkne2S2fZ6Zu9Lb90BisT+ih4mEsMzzcXt
-         bHdg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762383411; x=1762988211;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=d38bnEq+1o+YEmK6XU9ce+0ywAuUlel3clbqJSBWsEI=;
-        b=fythe1IKVN6+SiQ8SIZkf1Y7v6GW4PGG2n7ITAOmbzpWFUJoZUplcxog4HAGUwhyS1
-         8XiZIAlfrHloAn+4vVPuCs2chZh2qC78Yh0lyspXNydOjYpF/fmitRuM07xcXHqJlnNo
-         rrG7XbKDzhZepx/pbyC9yDCbxqHEbNZqz7tOtx4qYwtRJJiqSUj73jnCW+xCuGregzRu
-         kpkZcTXx/4C1vh/9L9G4NcjkJXPv5Ar894EZcFbcR3H0T+02MPlbIK8SsjlvZyz3ZcdU
-         HXzx9yFTTmKdkN+cp1Zf9dAyerPsdBdqKU6E7ZDl60CYAaZobPLQhSbMRYUlclt/0Hif
-         pxCQ==
-X-Gm-Message-State: AOJu0YwC3DJon4Zq1pJ3RfMb5q+T10Pz/IQ0W/VMtUuXc7CLwSgE3e49
-	eYRL6isBSGbJRmlDwpBYDjd3js8YTgNsheJD//ePpqtlc6yke7grxHQwvxgARQitC0qtbEezVAH
-	lKo8ABukj93rd2+ZqVLkOKTsIsmzzcwXaSgSWFVqA
-X-Gm-Gg: ASbGncs0IimGVa0VkHEDXcbt3kZe1uMMovikzYxAQYDWg0Rj5Ef6XL3mBO+nctOHW2+
-	xNuIWQ9RJF1Q2ClTksKkh5/GSyrAfeec1SYtDms0FPAV6zQj1f9wM6YM8pojEVuHpQdmg+HeY02
-	81rwZyrftflLYrm1l2P7hB2c603IPlH9YvSIgEao2m6UonO6h/ljTGgtMM5tjMKgKOP1WLT6Upc
-	kqX8OVQO90j0s3VEGTaZsPlf2SC6AEv80oO31wJ6bfYFnMubYWUSBm2MwmimWWI05H3xWZPA5Jk
-	RE8xBj8O5BNMfE0=
-X-Google-Smtp-Source: AGHT+IELG+HICsMAz5WYIIataT/mL9Fv7C1S8sUPq6saB0SfJBmqQbRUMs7vinFwj3opyitCVZtQCnjbw4I926TKdPY=
-X-Received: by 2002:a05:6512:64:b0:594:4116:8dcb with SMTP id
- 2adb3069b0e04-5944c81d104mr38713e87.3.1762383411288; Wed, 05 Nov 2025
- 14:56:51 -0800 (PST)
+	s=arc-20240116; t=1762383554; c=relaxed/simple;
+	bh=CPuuHp7pZQpd6tLnAgipCfEtZDhJg4P3Ocuzr1bEB+o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OEYco7X0avh/2LBNgirg1Nb/7NE64pabQ9F2ygZfsvePdwE1RbwucPL9lIRgzdrRgMDG6qyqh6Pp7D+6Sw7OwZlC5LD0JhEYvzBgZgAGOK6+Eq8/tt4BGf/RpiRyOuBQuNUowVFekKwG/nxDHycUxP0A/+Ypc42tVhABvH8733Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Y2yCQMVu; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <dfed97fb-4e0c-416e-b5d8-8de7b3edce69@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1762383544;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XcKXpeoIv1/TaQKBGE1ZFK7wbf9vgDzD2Za3TAGvfaM=;
+	b=Y2yCQMVuM7M3fRc4/lPNcRrfzkGEF/duGONkbpEWwV1iIhPa/iBDnGssq3oIyH4LKxh7BO
+	hp1b5OC38lLTfKRKnEzNcH9BMuxib+hMHUy1t0RBy4292BO6rwo4lxfwQ+fOTNwCRy/WEx
+	K/PzfB19hcbeTw6TI/pkB50wxsI2NjU=
+Date: Wed, 5 Nov 2025 14:58:48 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251105200801.178381-1-almasrymina@google.com> <1a07e27f-69de-4a38-884a-5ad078e7acf5@kernel.org>
-In-Reply-To: <1a07e27f-69de-4a38-884a-5ad078e7acf5@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 5 Nov 2025 14:56:39 -0800
-X-Gm-Features: AWmQ_blqlcUxGwWGO3wIa-GDL3sDQYUwtR_l1Dra-FSHUPTxILlqtmtqPNFP9n8
-Message-ID: <CAHS8izM+sPsaB7iVbNu7DEu9qH-89c_XDdMM=SpWFT3Ywq6k3g@mail.gmail.com>
-Subject: Re: [PATCH net v1 1/2] page_pool: expose max page pool ring size
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Joshua Washington <joshwash@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Simon Horman <horms@kernel.org>, 
-	Willem de Bruijn <willemb@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH bpf-next v4 2/3] net/smc: bpf: Introduce generic hook for
+ handshake flow
+To: "D. Wythe" <alibuda@linux.alibaba.com>
+Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ pabeni@redhat.com, song@kernel.org, sdf@google.com, haoluo@google.com,
+ yhs@fb.com, edumazet@google.com, john.fastabend@gmail.com,
+ kpsingh@kernel.org, jolsa@kernel.org, mjambigi@linux.ibm.com,
+ wenjia@linux.ibm.com, wintera@linux.ibm.com, dust.li@linux.alibaba.com,
+ tonylu@linux.alibaba.com, guwen@linux.alibaba.com, bpf@vger.kernel.org,
+ davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org,
+ sidraya@linux.ibm.com, jaka@linux.ibm.com
+References: <20251103073124.43077-1-alibuda@linux.alibaba.com>
+ <20251103073124.43077-3-alibuda@linux.alibaba.com>
+ <4450b847-6b31-46f2-bc2d-a8b3197d15c7@linux.dev>
+ <20251105070140.GA31761@j66a10360.sqa.eu95>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20251105070140.GA31761@j66a10360.sqa.eu95>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Nov 5, 2025 at 1:56=E2=80=AFPM Jesper Dangaard Brouer <hawk@kernel.=
-org> wrote:
-> > diff --git a/include/net/page_pool/types.h b/include/net/page_pool/type=
-s.h
-> > index 1509a536cb85..5edba3122b10 100644
-> > --- a/include/net/page_pool/types.h
-> > +++ b/include/net/page_pool/types.h
-> > @@ -58,6 +58,8 @@ struct pp_alloc_cache {
-> >       netmem_ref cache[PP_ALLOC_CACHE_SIZE];
-> >   };
-> >
-> > +#define PAGE_POOL_MAX_RING_SIZE 16384
-> > +
->
-> IIRC this was recently reduced to 16384 (from 32K), do you have a
-> use-case for higher limits?
->
 
-Yes, I noticed that. Increasing to 16384 resolved my issue, so I did
-not feel the need to revert back to 32K.
 
-We're expanding testing more and more and I may run into another issue
-that asks that I re-increase the limit (maybe with a check that it's
-indeed a ZC configuration, so no extra memory will be pinned), but for
-now I did not find a justification for that.
+On 11/4/25 11:01 PM, D. Wythe wrote:
+> On Tue, Nov 04, 2025 at 04:03:46PM -0800, Martin KaFai Lau wrote:
+>>
+>>
+>> On 11/2/25 11:31 PM, D. Wythe wrote:
+>>> +#if IS_ENABLED(CONFIG_SMC_HS_CTRL_BPF)
+>>> +#define smc_call_hsbpf(init_val, sk, func, ...) ({		\
+>>> +	typeof(init_val) __ret = (init_val);			\
+>>> +	struct smc_hs_ctrl *ctrl;				\
+>>> +	rcu_read_lock();					\
+>>> +	ctrl = rcu_dereference(sock_net(sk)->smc.hs_ctrl);	\
+>>
+>> The smc_hs_ctrl (and its ops) is called from the netns, so the
+>> bpf_struct_ops is attached to a netns. Attaching bpf_struct_ops to a
+>> netns has not been done before. More on this later.
+>>
+>>> +	if (ctrl && ctrl->func)					\
+>>> +		__ret = ctrl->func(__VA_ARGS__);		\
+>>> +
+>>> +	if (static_branch_unlikely(&tcp_have_smc) && tp->syn_smc) {
+>>> +		tp->syn_smc = !!smc_call_hsbpf(1, sk, syn_option, tp);
+>>
+>> ... so just pass tp instead of passing both sk and tp?
+>>
+>> [ ... ]
+>>
+> 
+> You're right, it is a bit redundant. However, if we merge the parameters,
+> every user of this macro will be forced to pass tp. In fact, we’re
+> already considering adding some callback functions that don’t take tp as
+> a parameter.
 
---=20
-Thanks,
-Mina
+If the struct_ops callback does not take tp, then don't pass it to the
+callback. I have a hard time to imagine why the bpf prog will not be
+interested in the tp/sk pointer though.
+
+or you meant the caller does not have tp? and where is the future caller?
+> 
+> I’ve been considering this: since smc_hs_ctrl is called from the netns,
+> maybe we should replace the sk parameter with netns directly. After all,
+> the only reason we pass sk here is to extract sock_net(sk). Doing so
+> would remove the redundancy and also keep the interface more flexible
+> for future extensions. What do you think?
+
+The net can be obtained from the tp also.
+
+Like in this patch, all the caller needs to type
+"const struct sock *sk = &tp->inet_conn.icsk_inet.sk;". I can imagine all
+the callers will have to type "sock_net((struct sock *)tp)" if passing net.
+Why not just do that in the smc_hs_ctrl instead of asking all the callers
+to type that?
+
+I meant something like this (untested):
+
+-#define smc_call_hsbpf(init_val, sk, func, ...) ({             \
++#define smc_call_hsbpf(init_val, func, tp, ...) ({             \
+	typeof(init_val) __ret = (init_val);                    \
+	struct smc_hs_ctrl *ctrl;                               \
+	rcu_read_lock();                                        \
+-	ctrl = rcu_dereference(sock_net(sk)->smc.hs_ctrl);      \
++	ctrl = rcu_dereference(sock_net((struct sock *)(tp))->smc.hs_ctrl);     \
+	if (ctrl && ctrl->func)                                 \
+-		__ret = ctrl->func(__VA_ARGS__);                \
++		__ret = ctrl->func(tp, ##__VA_ARGS__);          \
+	rcu_read_unlock();                                      \
+	__ret;                                                  \
+  })
+
+
+
 
