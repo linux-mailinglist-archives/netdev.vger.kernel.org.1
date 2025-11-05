@@ -1,106 +1,297 @@
-Return-Path: <netdev+bounces-235884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0733CC36DCE
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 18:00:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A133C36BFF
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 17:41:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77FB168704B
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 16:29:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A33A61886D1E
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 16:36:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA6FC3271E9;
-	Wed,  5 Nov 2025 16:29:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B94832E13D;
+	Wed,  5 Nov 2025 16:36:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mcB+7zNm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GXhlyXNl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A2FE31A7FF
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 16:29:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F247420B800;
+	Wed,  5 Nov 2025 16:36:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762360195; cv=none; b=Av/uGZCdyJJLDCrG2DrrkwJCH5xX8GR9el9zsqgD3wJHNTUa2o32poBvNcIKx+xj/pGSlg7SL1oaUOqxfCxoTp5ldl8An6pHmNAIFoROkqGZcm28/tpN5+NmcfTU8Q9W25ExzMS1YaASbaO773u70a89Qma5U/Sfj3wSoL2FlBw=
+	t=1762360571; cv=none; b=tyBvdNgeR7LFM7GN6vWKNr6jzFMoL5ldL7/N2OwVGn33/wVWVqJ/G0xxfmi7cR0j+gMMQfzZKSnogkBZUNKSEKae0FblC/a5vR7YgVoZ4m+s37mNKA4lB2espRYYD0R0UTWaQH7JNwey2msNWGJkhooBbhobK0IICZ/HpcJcu3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762360195; c=relaxed/simple;
-	bh=jkgNn1+4jXuwy+ixaN/rtdNFuxUuVeolHm9PhEbPJDw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=quNHJQJy1NUcTfmltxZhYMRs4AH8KHKYIeIDWVOfaixwDPZBXjTv1Tru7OYdrWN1wA6DkZtU9Pvq1rduHIq/S6CaqyJUcYHU1bwAfXgL8AS7DL2vfsD03ONJUDGE7k9otCplKnDmQLl3lo4gMQ9SnwSwVXKc49QgVCLYLwMw9Ms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mcB+7zNm; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4ed69197d32so25268101cf.3
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 08:29:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762360193; x=1762964993; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jkgNn1+4jXuwy+ixaN/rtdNFuxUuVeolHm9PhEbPJDw=;
-        b=mcB+7zNmAFbFw8VRbC/5zhE1reiZfvmRLnX/FHGT9RcKwHrB1V2sVLz/HGvA0ZI2G7
-         lDaGtoyzA2FdHLSmEGtHSQ40ewjPTOpNIU4Eg9hyWFXqUjFhQp+sKAUbWVLLFxLeQ8+l
-         Xd30Rd1UHABTEtqgrm5ACN9nQfq/m/gdHtKG9YIw2Bv8Slql1g/SEvcnz9jM530P5h7W
-         b2ulslLTr+nvLikQCxZRvbM3Ys+Z/SQ1srmDTc0FqLVrC/HbUKdf+/yb49nW748lyg6N
-         fj3+U/0pIhWcvXokkMD3es1g48bxCn0LuGRXNXYzWPBoAqCRgawExIMoqnjL4jqVT+9W
-         F4aA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762360193; x=1762964993;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jkgNn1+4jXuwy+ixaN/rtdNFuxUuVeolHm9PhEbPJDw=;
-        b=W691+5A44ZlVBCFjIjGzLiJHHP8AUFYZ98Hit6z9uUFZZE6zxL7zysWMI4NTmr060o
-         h0/EJsAXmjzdghcZyEEI0lEKMEF+xbw8SBtOGh22+skL6kN90N2HqKNVjNZsIvTU3GKh
-         U9Mxvcz8hQFyflhRtFnwEtnDizgCm2uc4jAWQGuTBBqQtGUO4YIxHZjT+9MGNAY5C5Ak
-         Fgq9ghF/qqHDBH2LvRqVuK22e110YL8dHwD5vQw4gTKHydDiC4M6VT5wEGF5hf5KiyIA
-         /9+UHFoKzvblLSKRFtIVJbXUfMtNbLgSrlkt63by33WTvbVcd8CsrlI9259I2LbeSoB3
-         QlNg==
-X-Gm-Message-State: AOJu0YxQyO9CTiYFEm8tKRO2k0aLDa0+kgoMm+F/TRYwP/BSTO9Aepw5
-	wF0BzI7g0I3firiLVjavPNMxNcL7PX1fsPMWeITmryy9dXMB+JrkSIu/EwLxI7/YCgvZeUseeEg
-	072FK0a7kFqs8WhdnqGIBuxvaq6umw+il5MKoXf0S1ZMOxUZ31TohheEn
-X-Gm-Gg: ASbGncsy5I4N6dJqT4+bsrZLSBNNCTtocvEbPs0h8adkUcBxNs/GRwrJ5fVFUp8oNEp
-	18eOVk94H+5UFt/WXS9DWj/LxnlWT3y56F1vRJryXD3O78Z2IPgPTKnYrXF5VCzHImXmARYjQTs
-	68ZUYwvfUiEgfgaa8sF5tL8e0j0luRtgpc0op6ZT3LCAziwx/6A/KJlZAsRVfdXtD0KpEDOkCXq
-	xA+awT30Jb/flDa3Fe8KJOycq1BQSUWrOv7F8Dj12RjDF72gnuBMCTLbizfsBGZJh/zx94=
-X-Google-Smtp-Source: AGHT+IEIZjVxK95nJsAKgH1Nu820ZsQt/RsaIyZg90c7rumoFU/fQN7xKpn07wzaK1Nz9W308QqU7P8ohGXGb5TtlTQ=
-X-Received: by 2002:a05:622a:1455:b0:4ed:2f02:ab15 with SMTP id
- d75a77b69052e-4ed72602641mr43913211cf.55.1762360192504; Wed, 05 Nov 2025
- 08:29:52 -0800 (PST)
+	s=arc-20240116; t=1762360571; c=relaxed/simple;
+	bh=9vbIsqFg63pp3OvaNkYbiCmQzjxoPHaONUKKneVmdNM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JqE7dbFT64esU6EetlLT1KoHKlitSFktUyBaFWJt2wr6Y414PKhknCeQ1FNSPeTdXvb3qCwUcELyO4XmeBW782vCv8scnHznd1pBCk/TNdZQpiiPRR9HKX5BRSRPHNitLENMzTXzFrYVtDJR2PN9FiMbQa7q2gySDhkptT1G7no=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GXhlyXNl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18354C116B1;
+	Wed,  5 Nov 2025 16:36:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762360570;
+	bh=9vbIsqFg63pp3OvaNkYbiCmQzjxoPHaONUKKneVmdNM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GXhlyXNl2qHtFph7OY3zRFXAz5ENfh99xMMIi1PtgRUHneUV5LPc0MuOGj4EK6VgL
+	 5WBoOjuCf8YqmTQQy7N6taZazKBN9OVc4n0N6W+/u5tPo3zeBNB4z789rD2FLFrzpt
+	 fujFTgz9qbkpa1+3EP2zfmWz3pvfqe8pIaxfGlrilf7cpfgO6svjsZ3bFcUr/BhZVQ
+	 DzB1PYm6cAA5yvG9dwGc4UicHEcB2UTG5Aj7Pl/wnN36RT6XOvTvVGb+tBRS9E45Y8
+	 ONctu0zdpm5Ce6Z/Vz1YwYyb7YXSjUnp4728aJg5WHpZdi0ViGxbniqBNxI2SFih1y
+	 S0AVwANjF63xA==
+Date: Wed, 5 Nov 2025 17:36:07 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Phil Sutter <phil@nwl.cc>, Florian Westphal <fw@strlen.de>,
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH nf-next v8 2/3] net: netfilter: Add IPIP flowtable tx sw
+ acceleration
+Message-ID: <aQt89wl7jyJcxbMJ@lore-desk>
+References: <20251023-nf-flowtable-ipip-v8-0-5d5d8595c730@kernel.org>
+ <20251023-nf-flowtable-ipip-v8-2-5d5d8595c730@kernel.org>
+ <aQqDnjv8KLtQJaOW@calendula>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251105161450.1730216-1-skorodumov.dmitry@huawei.com> <20251105161450.1730216-7-skorodumov.dmitry@huawei.com>
-In-Reply-To: <20251105161450.1730216-7-skorodumov.dmitry@huawei.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 5 Nov 2025 08:29:40 -0800
-X-Gm-Features: AWmQ_bm-inBtiHZ-i-Ji7OzkBeuhYj48CizrYi-xeimRs0Xoxc8_UArrOGxV_kU
-Message-ID: <CANn89i+iq3PVz6_maSeGJT4DxcYfP8sN0_v=DTkin+AMhV-BNA@mail.gmail.com>
-Subject: Re: [PATCH net-next 06/14] ipvlan: Support GSO for port -> ipvlan
-To: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	andrey.bokhanko@huawei.com, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="XyXETZSSq+haRcmW"
+Content-Disposition: inline
+In-Reply-To: <aQqDnjv8KLtQJaOW@calendula>
+
+
+--XyXETZSSq+haRcmW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 5, 2025 at 8:15=E2=80=AFAM Dmitry Skorodumov
-<skorodumov.dmitry@huawei.com> wrote:
->
-> If main port interface supports GSO, we need manually segment
-> the skb before forwarding it to ipvlan interface.
+> On Thu, Oct 23, 2025 at 10:50:16AM +0200, Lorenzo Bianconi wrote:
+> [...]
+> > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> > index 0355461960ce3c0db49e00a6f77f48b031a635dc..eb8058fd7139a2b54570081=
+46f979590f9f03c1d 100644
+> > --- a/include/linux/netdevice.h
+> > +++ b/include/linux/netdevice.h
+> > @@ -897,6 +897,9 @@ struct net_device_path {
+> >  			};
+> > =20
+> >  			u8	l3_proto;
+> > +			u8	tos;
+> > +			u8	ttl;
+> > +			__be16	df;
+> >  		} tun;
+> >  		struct {
+> >  			enum {
+> > diff --git a/include/net/netfilter/nf_flow_table.h b/include/net/netfil=
+ter/nf_flow_table.h
+> > index 6d00a8aa52584ad96d200683297c1b02bf1f6d4f..fe792f5a8f0528de021c273=
+82b235688532614e4 100644
+> > --- a/include/net/netfilter/nf_flow_table.h
+> > +++ b/include/net/netfilter/nf_flow_table.h
+> > @@ -119,6 +119,9 @@ struct flow_offload_tunnel {
+> >  	};
+> > =20
+> >  	u8	l3_proto;
+> > +	u8	tos;
+> > +	u8	ttl;
+> > +	__be16	df;
+>=20
+> This is now included in the hash that is used for the lookup, is it
+> intentional to include these fields here? For rx, we cannot know ttl
+> of the received packet?
 
-Why ?
+it is my mistake, I will fix that in v9. Do we really need to add tos, ttl =
+and
+df in tuple for tx and rx acceleration? If so we can move the ttl field aft=
+er
+the __hash placeholder.
 
-I think you need to explain much more than a neutral sentence,
+>=20
+> Maybe this needs to be moved after the placeholder:
+>=20
+>         struct { }                      __hash;
+>=20
+> >  };
+> > =20
+> >  struct flow_offload_tuple {
+> [...]
+> > diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_t=
+able_ip.c
+> > index 76081d5d2f71c10e0c65e906b3fb2769e3ab1466..a66ffa0c7fbe780a9f9a545=
+e42d44dfe408e7cb2 100644
+> > --- a/net/netfilter/nf_flow_table_ip.c
+> > +++ b/net/netfilter/nf_flow_table_ip.c
+> [...]
+> > @@ -533,6 +589,7 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buff =
+*skb,
+> >  	struct flow_offload *flow;
+> >  	struct neighbour *neigh;
+> >  	struct rtable *rt;
+> > +	__be32 dest;
+> >  	int ret;
+> > =20
+> >  	tuplehash =3D nf_flow_offload_lookup(&ctx, flow_table, skb);
+> > @@ -555,8 +612,9 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buff =
+*skb,
+> > =20
+> >  	dir =3D tuplehash->tuple.dir;
+> >  	flow =3D container_of(tuplehash, struct flow_offload, tuplehash[dir]);
+> > +	reply_tuple =3D &flow->tuplehash[!dir].tuple;
+>=20
+> Nit: I'd suggest 'other_tuple' instead 'reply_tuple' given this is not
+> strictly the reply tuple, just the tuple from the other direction.
 
-Also I do not see any tests, for the whole series ?
+ack, I will fix it in v9.
 
-I have not seen the cover letter.
+>=20
+> > -	if (nf_flow_encap_push(skb, &flow->tuplehash[!dir].tuple) < 0)
+> > +	if (nf_flow_encap_push(state->net, skb, reply_tuple))
+> >  		return NF_DROP;
+> > =20
+> >  	switch (tuplehash->tuple.xmit_type) {
+> > @@ -567,7 +625,9 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buff =
+*skb,
+> >  			flow_offload_teardown(flow);
+> >  			return NF_DROP;
+> >  		}
+> > -		neigh =3D ip_neigh_gw4(rt->dst.dev, rt_nexthop(rt, flow->tuplehash[!=
+dir].tuple.src_v4.s_addr));
+> > +		dest =3D reply_tuple->tun_num ? reply_tuple->tun.src_v4.s_addr
+> > +					    : reply_tuple->src_v4.s_addr;
+> > +		neigh =3D ip_neigh_gw4(rt->dst.dev, rt_nexthop(rt, dest));
+> >  		if (IS_ERR(neigh)) {
+> >  			flow_offload_teardown(flow);
+> >  			return NF_DROP;
+> > diff --git a/net/netfilter/nf_flow_table_path.c b/net/netfilter/nf_flow=
+_table_path.c
+> > index bd5e9bf1ca393ab793976ba98a027b60f84882ba..cd0be2efe97596d0947621a=
+5ea604373d5b61da8 100644
+> > --- a/net/netfilter/nf_flow_table_path.c
+> > +++ b/net/netfilter/nf_flow_table_path.c
+> > @@ -190,7 +190,43 @@ static bool nft_flowtable_find_dev(const struct ne=
+t_device *dev,
+> >  	return found;
+> >  }
+> > =20
+> > -static void nft_dev_forward_path(struct nf_flow_route *route,
+> > +static int nft_flow_tunnel_update_route(const struct nft_pktinfo *pkt,
+> > +					struct nf_flow_route *route,
+> > +					enum ip_conntrack_dir dir)
+> > +{
+> > +	struct dst_entry *tun_dst =3D NULL;
+> > +	struct flowi fl =3D {};
+> > +
+> > +	switch (nft_pf(pkt)) {
+> > +	case NFPROTO_IPV4:
+> > +		fl.u.ip4.daddr =3D route->tuple[!dir].in.tun.src_v4.s_addr;
+> > +		fl.u.ip4.saddr =3D route->tuple[!dir].in.tun.dst_v4.s_addr;
+> > +		fl.u.ip4.flowi4_iif =3D nft_in(pkt)->ifindex;
+> > +		fl.u.ip4.flowi4_dscp =3D ip4h_dscp(ip_hdr(pkt->skb));
+> > +		fl.u.ip4.flowi4_mark =3D pkt->skb->mark;
+> > +		fl.u.ip4.flowi4_flags =3D FLOWI_FLAG_ANYSRC;
+> > +		break;
+> > +	case NFPROTO_IPV6:
+> > +		fl.u.ip6.daddr =3D route->tuple[!dir].in.tun.src_v6;
+> > +		fl.u.ip6.saddr =3D route->tuple[!dir].in.tun.dst_v6;
+> > +		fl.u.ip6.flowi6_iif =3D nft_in(pkt)->ifindex;
+> > +		fl.u.ip6.flowlabel =3D ip6_flowinfo(ipv6_hdr(pkt->skb));
+> > +		fl.u.ip6.flowi6_mark =3D pkt->skb->mark;
+> > +		fl.u.ip6.flowi6_flags =3D FLOWI_FLAG_ANYSRC;
+> > +		break;
+> > +	}
+> > +
+> > +	nf_route(nft_net(pkt), &tun_dst, &fl, false, nft_pf(pkt));
+> > +	if (!tun_dst)
+> > +		return -ENOENT;
+> > +
+> > +	nft_default_forward_path(route, tun_dst, dir);
+>=20
+> This overrides the previous dst that is set on here, is this leaking
+> such dst?
 
-Also you sent the series twice today :/
+ack, right. I will fix it in v9.
+
+>=20
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static void nft_dev_forward_path(const struct nft_pktinfo *pkt,
+> > +				 struct nf_flow_route *route,
+> >  				 const struct nf_conn *ct,
+> >  				 enum ip_conntrack_dir dir,
+> >  				 struct nft_flowtable *ft)
+> > @@ -218,6 +254,12 @@ static void nft_dev_forward_path(struct nf_flow_ro=
+ute *route,
+> >  		route->tuple[!dir].in.tun.src_v6 =3D info.tun.dst_v6;
+> >  		route->tuple[!dir].in.tun.dst_v6 =3D info.tun.src_v6;
+> >  		route->tuple[!dir].in.tun.l3_proto =3D info.tun.l3_proto;
+> > +		route->tuple[!dir].in.tun.tos =3D info.tun.tos;
+> > +		route->tuple[!dir].in.tun.ttl =3D info.tun.ttl;
+> > +		route->tuple[!dir].in.tun.df =3D info.tun.df;
+> > +
+> > +		if (nft_flow_tunnel_update_route(pkt, route, dir))
+> > +			return;
+>=20
+> If tunnel route is found...
+>=20
+> >  	}
+> >
+> >  	route->tuple[!dir].in.num_encaps =3D info.num_encaps;
+>=20
+> ... num_encaps is never set?
+
+ack, I will fix it in v9.
+
+>=20
+> Would you also extend the selftest to combine IPIP with vlan? Thanks.
+
+sure, I will add it in v9.
+
+Regards,
+Lorenzo
+
+>=20
+> > @@ -274,9 +316,9 @@ int nft_flow_route(const struct nft_pktinfo *pkt, c=
+onst struct nf_conn *ct,
+> >  	nft_default_forward_path(route, other_dst, !dir);
+> > =20
+> >  	if (route->tuple[dir].xmit_type	=3D=3D FLOW_OFFLOAD_XMIT_NEIGH)
+> > -		nft_dev_forward_path(route, ct, dir, ft);
+> > +		nft_dev_forward_path(pkt, route, ct, dir, ft);
+> >  	if (route->tuple[!dir].xmit_type =3D=3D FLOW_OFFLOAD_XMIT_NEIGH)
+> > -		nft_dev_forward_path(route, ct, !dir, ft);
+> > +		nft_dev_forward_path(pkt, route, ct, !dir, ft);
+> > =20
+> >  	return 0;
+> >  }
+> >=20
+> > --=20
+> > 2.51.0
+> >=20
+
+--XyXETZSSq+haRcmW
+Content-Type: application/pgp-signature; name=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaQt89wAKCRA6cBh0uS2t
+rJnTAQD16itUuoysg/7XGBe4RN/cphM7W1SSAQsMGtVJD5IqEwD+NJQIiodh10EI
+xRJQ4rg51TlHA+HpFUggzehVlbyBdAk=
+=PJWq
+-----END PGP SIGNATURE-----
+
+--XyXETZSSq+haRcmW--
 
