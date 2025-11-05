@@ -1,176 +1,99 @@
-Return-Path: <netdev+bounces-235972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 978BEC37975
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 20:57:42 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0A64C379D2
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 21:03:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 071D91A21C0F
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 19:57:30 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4DE604F0485
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 20:02:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 423D934405D;
-	Wed,  5 Nov 2025 19:56:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64128272801;
+	Wed,  5 Nov 2025 20:02:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IFA7022b"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FJUlcpcv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B88C5344051
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 19:56:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B6CC126C02
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 20:02:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762372617; cv=none; b=HhBbQiisXhL0V0PJfiI2wO2oB9zNjlpH/CxrFOgnrJ1Pq7WhYCh42KBLVFDm3JxTkpf+dodJuoOeiMROx5DDtTSQ13sWVp0hr5u6GQyoEbqnAbz1/dK4bH7NhKEc0SbDiOdDyBqE5LgnBvwE2Wot9KrALDKE+d6r6ekUvr7EXdE=
+	t=1762372967; cv=none; b=Kme5vNRokoHPsFhjG4Ai8TpHcdwYeqD+zH6OmAvZcZlXuVLEXy61edLnPNqnOV35q5HiDHyuQYbR08tkHlxoqy87SY+j1DE7DIlK15Vz+jmGvZIhakOE9Z6jQlkEuGiHeS0SbcK5r/tu3h9KPoreGwSjBP8lkF7F72Shm17vJ18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762372617; c=relaxed/simple;
-	bh=D9tEbvqucCvXOROJVgc7K0nfkr5nvxlh9U/6ef0alic=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fxwG6KJEhFiFB5piBhWJZcKNaqPS7ZUmIF3FdeW+UPbk67F9GnS3g9FElQQWqqWQ8jwgLmaGGddF7PWGHoPjeWn+wnCyUH4ASMup00Wgz3IhXyjp5j6cUImwlIw/4AfVu3Cm7oN2d068gwUmZr3a5cavLKq5LQPjDVCcOBNAKt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IFA7022b; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-2955623e6faso2286455ad.1
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 11:56:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762372615; x=1762977415; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=WbWTgusNc6BWzyopKKK9VOQsz0h9knpbKQuEH/YbUN8=;
-        b=IFA7022bbricJSlq+ek89uPvdT6JrF3oNnk4bl0ODeSuA/atD2KpKiNoxVTP9ajya8
-         hB4gB+gRopyZBdUmtgZPHDsVRfiEamYLO9zDZ+2opZVtI8b6qE8aMEmZcr33y33no/JI
-         +okD2f/9Nb2jfLNLlOmwJ05Qb3utrod0WiDCgVvUACIQdsQ1YdUSb0pDB6HClwqfvFgF
-         a5L0+hU22lZL0C0p+dB+WUnKuf7AEKKqRQKRNZ9EDssYzpQaaMN7UYQv6TEEc+QTvdAQ
-         rOIFmQqmol3sRvVS9u9ikLJJSNeqZemPkbXGHvxAlmfbZz1F/D4p+qr0Nr6n2cA0J/6l
-         p+1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762372615; x=1762977415;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WbWTgusNc6BWzyopKKK9VOQsz0h9knpbKQuEH/YbUN8=;
-        b=Q1DtMpLPaKxPPyVuu4XDsa3rN1upvBIKU9aJacYmE0hMOROOCGmkqKKdqJ7q/cxlGD
-         YBmIApJcbbvWcwQFoC1RORWebwvFbMK0wxzq97GPJdtW+2HstI1VFZNB33965CBVHeOa
-         9HgTIzOmtGkNus+e93gdUGI80hEsThXbIjY0cdAhjecgcBN0/Fvkbs5IYgudKO2+kqi7
-         NVs9ym5yaBoevNbPqxA2Hf85oI53INDiaPJCmlzdM0PpWIi0taa+uboakuaSC+mAzhzU
-         N26VRk6ZTDyIwFTrmVAa96qwCwwyqMPUmUD0fvqV0Q48vKrcUdA74oVYZYyU4AzyPqLB
-         SEDA==
-X-Gm-Message-State: AOJu0YwGe34DiiXvOYlpcxkgQxMd2VF5x+oXEB72lTxaLXBVTRphiwNm
-	YOF31WpG6z3hCa7mp5BxySB6dla/XqEfzm/3RZiFR9GenP/iopZqhY24PZYcw6js1rI=
-X-Gm-Gg: ASbGncsFqyBXmYgLy+PwnkiMtDsrbjkAxZ4E65JG87SmqD92VIRzSMN3Jw1pqhDtuOW
-	GHV/vt7EmAHV6WbPwWFXWMrNkFdX8KppxNpm4Hg+pC68umvP4abLXblPK7xQP1UmmPgE97J9Vzf
-	8SZSxtAbjLmH4mIrG0bwf9t+NjdKfk0YnlxrCm2OGDHpTGeQS6SR0ddhiPTQXLjoGiwL+K9X5uF
-	WuOaOphFf2tuEt+CbDhFLnRmWUinHR23HHI0y/J0J5KSVQdQAx3HtroNBOFIIPVMkxuSVQPg2GL
-	pEdmJ/sZ2D5VDaOgKPrB7/wYWMlHQbiVjs4HyKT2NQ7l9NmdtVzUJKCsQOa0gLOuabR8QtevpRY
-	Qek41WXxl1RRJCc6wAFRt2w1iTTuCET3E3iz4J02ykI8mk5gouo1CkfUB+8s44zeASIN40smg4v
-	Z86JLo7/NaC0zHCjepwPJhDWGOKmpeDFLC3A==
-X-Google-Smtp-Source: AGHT+IHy57e0NBAg1bsbOb2A5Etvn+xczr00qIWP9YriyOvktiXQZ2baK8RnEWfoUhGi2UtRTc3uUQ==
-X-Received: by 2002:a17:902:e805:b0:27c:56af:88ea with SMTP id d9443c01a7336-2962ae93ffbmr52193145ad.60.1762372614774;
-        Wed, 05 Nov 2025 11:56:54 -0800 (PST)
-Received: from localhost.localdomain ([157.50.7.195])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29651ca1c86sm3464525ad.91.2025.11.05.11.56.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Nov 2025 11:56:54 -0800 (PST)
-From: Dharanitharan R <dharanitharan725@gmail.com>
-To: netdev@vger.kernel.org
-Cc: linux-usb@vger.kernel.org,
-	gregkh@linuxfoundation.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	syzbot+b4d5d8faea6996fd55e3@syzkaller.appspotmail.com,
-	Dharanitharan R <dharanitharan725@gmail.com>
-Subject: [PATCH v3] usb: rtl8150: Initialize buffers to fix KMSAN uninit-value in rtl8150_open
-Date: Wed,  5 Nov 2025 19:56:26 +0000
-Message-ID: <20251105195626.4285-1-dharanitharan725@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1762372967; c=relaxed/simple;
+	bh=1UNkHAvIkZsKBsgCcM/AKzKDGjOH+HZN3yV5TRZ9kHY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=phH0+5ijqMRx5NFaJ9PlmRWd6sXd96EwrquG0erAOZHf8SpAlC/A8EkPtyv5EwwFGFFTc8AKxtn2y2XSW59gObRAA03fL793nfbZ3wXe951H3s+l6pZB3SpVNZNYnUZDgJkJUsnr0BDYcKDtRPuySLSDV5cyE2n4aSX0g38Fiv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FJUlcpcv; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <de2f5da5-05db-4bd7-90c3-c51558e50545@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1762372953;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2gVnZSE22cVcS4rxgpdM9tTcUt8tL4gwGdnHKKtUPSY=;
+	b=FJUlcpcv9vjP5zo0RqEPDKGmnvz+b8Wcpn9xQgMLQwV7BE0ZnMyCSThhWWjkfs+lH2N12+
+	jnQC+PLDw3kZalXL+gyLaQQBjjFrevAwcwJrq/7xtiRiIM/fhSK7I1rJzN0I4lE+WT7Gpa
+	K9RBhAypCGBAemx5Gf3b1kXeUi4tYnw=
+Date: Wed, 5 Nov 2025 20:02:30 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: txgbe: remove wx_ptp_init() in device reset flow
+To: Jiawen Wu <jiawenwu@trustnetic.com>, netdev@vger.kernel.org,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Richard Cochran <richardcochran@gmail.com>, Simon Horman <horms@kernel.org>,
+ Jacob Keller <jacob.e.keller@intel.com>
+Cc: Mengyuan Lou <mengyuanlou@net-swift.com>, stable@vger.kernel.org
+References: <17A4943B0AAA971B+20251105020752.57931-1-jiawenwu@trustnetic.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <17A4943B0AAA971B+20251105020752.57931-1-jiawenwu@trustnetic.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-KMSAN reported an uninitialized value use in rtl8150_open().
-Initialize rx_skb->data and intr_buff before submitting URBs to
-ensure memory is in a defined state.
+On 05/11/2025 02:07, Jiawen Wu wrote:
+> The functions txgbe_up() and txgbe_down() are called in pairs to reset
+> hardware configurations. PTP stop function is not called in
+> txgbe_down(), so there is no need to call PTP init function in
+> txgbe_up().
+> 
 
-Changes in v3:
- - Fixed whitespace and indentation (checkpatch clean)
- - Corrected syzbot tag
- - Corrected syzbot hash and tag
+txgbe_reset() is called during txgbe_down(), and it calls
+wx_ptp_reset(), which I believe is the reason for wx_ptp_init() call
 
-Reported-by: syzbot+b4d5d8faea6996fd55e3@syzkaller.appspotmail.com
-Signed-off-by: Dharanitharan R <dharanitharan725@gmail.com>
----
- drivers/net/usb/rtl8150.c | 34 +++++++++++++++-------------------
- 1 file changed, 15 insertions(+), 19 deletions(-)
-
-diff --git a/drivers/net/usb/rtl8150.c b/drivers/net/usb/rtl8150.c
-index f1a868f0032e..a7116d03c3d3 100644
---- a/drivers/net/usb/rtl8150.c
-+++ b/drivers/net/usb/rtl8150.c
-@@ -735,33 +735,30 @@ static int rtl8150_open(struct net_device *netdev)
- 	rtl8150_t *dev = netdev_priv(netdev);
- 	int res;
- 
--	if (dev->rx_skb == NULL)
--		dev->rx_skb = pull_skb(dev);
--	if (!dev->rx_skb)
--		return -ENOMEM;
--
- 	set_registers(dev, IDR, 6, netdev->dev_addr);
- 
- 	/* Fix: initialize memory before using it (KMSAN uninit-value) */
- 	memset(dev->rx_skb->data, 0, RTL8150_MTU);
- 	memset(dev->intr_buff, 0, INTBUFSIZE);
- 
--	usb_fill_bulk_urb(dev->rx_urb, dev->udev, usb_rcvbulkpipe(dev->udev, 1),
--		      dev->rx_skb->data, RTL8150_MTU, read_bulk_callback, dev);
--	if ((res = usb_submit_urb(dev->rx_urb, GFP_KERNEL))) {
--		if (res == -ENODEV)
--			netif_device_detach(dev->netdev);
-+	usb_fill_bulk_urb(dev->rx_urb, dev->udev,
-+			  usb_rcvbulkpipe(dev->udev, 1),
-+			  dev->rx_skb->data, RTL8150_MTU,
-+			  read_bulk_callback, dev);
-+
-+	res = usb_submit_urb(dev->rx_urb, GFP_KERNEL);
-+	if (res) {
- 		dev_warn(&netdev->dev, "rx_urb submit failed: %d\n", res);
- 		return res;
- 	}
- 
--	usb_fill_int_urb(dev->intr_urb, dev->udev, usb_rcvintpipe(dev->udev, 3),
--		     dev->intr_buff, INTBUFSIZE, intr_callback,
--		     dev, dev->intr_interval);
--	if ((res = usb_submit_urb(dev->intr_urb, GFP_KERNEL))) {
--		if (res == -ENODEV)
--			netif_device_detach(dev->netdev);
--		dev_warn(&netdev->dev, "intr_urb submit failed: %d\n", res);
-+	usb_fill_int_urb(dev->intr_urb, dev->udev,
-+			 usb_rcvintpipe(dev->udev, 3),
-+			 dev->intr_buff, INTBUFSIZE,
-+			 intr_callback, dev, dev->intr_interval);
-+
-+	res = usb_submit_urb(dev->intr_urb, GFP_KERNEL);
-+	if (res) {
- 		usb_kill_urb(dev->rx_urb);
- 		return res;
- 	}
-@@ -769,8 +766,7 @@ static int rtl8150_open(struct net_device *netdev)
- 	enable_net_traffic(dev);
- 	set_carrier(netdev);
- 	netif_start_queue(netdev);
--
--	return res;
-+	return 0;
- }
- 
- static int rtl8150_close(struct net_device *netdev)
--- 
-2.43.0
+> Fixes: 06e75161b9d4 ("net: wangxun: Add support for PTP clock")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+> ---
+>   drivers/net/ethernet/wangxun/txgbe/txgbe_main.c | 1 -
+>   1 file changed, 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+> index daa761e48f9d..114d6f46139b 100644
+> --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+> +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+> @@ -297,7 +297,6 @@ void txgbe_down(struct wx *wx)
+>   void txgbe_up(struct wx *wx)
+>   {
+>   	wx_configure(wx);
+> -	wx_ptp_init(wx);
+>   	txgbe_up_complete(wx);
+>   }
+>   
 
 
