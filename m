@@ -1,149 +1,183 @@
-Return-Path: <netdev+bounces-235929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD0B6C373B1
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 18:59:44 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30863C373E9
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 19:05:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 180711893EDE
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 18:00:09 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 00BA64E7C7C
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 18:02:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B19338F26;
-	Wed,  5 Nov 2025 17:59:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wtm5i7Ve"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E1F7328B6A;
+	Wed,  5 Nov 2025 18:02:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFFF0336EF7
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 17:59:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 300A62FD7BE
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 18:02:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762365576; cv=none; b=KN/7LwOdiuR59MUw4wLHCfVgnlle1DgVplrKpuMwiXrxCljLG+4Mx6KigxdiWr2PjrEi3wWtubng4RkKqr9ttTZu9y+nMr9E6+C6/yoksYYfmSKEosXC+UL0A7mZuoXfQzzCwfvGxZdxdMRiwMGsYGSGu7gnBjdZ89EbsmCyTiM=
+	t=1762365728; cv=none; b=C6mxsD/dIioBGPLkB1xy5I5Mwv/5PC+/G8aN73xsyDvdnjPeLfPUJwSknAUt6TQRB7IHOiIe1a3MxPWX5LZ6s2wZX1Do4Nj49Fll9UElBKKMq6+CuPyhotHkiaRnZuFeABhorJ72NSi9aKrVIkQZUSOHV6CGrBHWw4f5jNByBRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762365576; c=relaxed/simple;
-	bh=Nnp1wDC3H73w3jI8NtJcSVR2N83rdAhx/dtATqrWYag=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fv+wUZCB8DMtkjQApJpGVZvNLKKxjMvzqJVnNc1aGtT7bqtX+15DrKUT67ipoXGuGhrnUVmZiwVNJVoCTBTugHdaq3qhqWeg2WoX2B0rIHZH+kB/b/r/1+b2dSBWOu8CIOF/dy8c5WPqxgXX7AFQnXlQtf4uawy4tiMmfxGyrvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wtm5i7Ve; arc=none smtp.client-ip=209.85.128.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1762365728; c=relaxed/simple;
+	bh=ZCz78oYBUNpXkKPm0a72zBISeoFnkQXycqYmx2bxyls=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=QaeRDsoP5xHIxFMRC6vPR+P983ruqj6mQLqZBWaBXppyrJj1DKRcPecVvUK6bvgZ7cxTMnFUIgJrItZW7/0A9Q6smKOlreS+XZK1qcKDYm3QQQw9FT6bkiE37hTlTmnHUwAuy93Fj590mpJy85T4bEyhhWEESqYRd+H8au0vO0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-786a822e73aso521877b3.3
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 09:59:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762365574; x=1762970374; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zSHtYrMJfyWXNB5+D7qGmo5liVfUAPUmYconSQ05yJA=;
-        b=Wtm5i7Vel6og71cIYNi68wga2ylq1eSG/Yhr/KPEnj+sHZCTbCPH/BDgN+LYIacV8L
-         skAnPmPwk4Eq8LfFcNj/KAz3bxnQfryS83ZS8mxM/pRUehxODb3wQhjs1uRRVXtKD9e3
-         8UNcK6mT7yf7agUTYTdUEWqrnLhOFsqKzwcsp01gtWEWpk5T3qEUz6nxByKQ0DJkpwK2
-         d+LL5dDSB8eSgK36DMExPxtwDq2/GiG2e+8hNze0WH3Iats5Xv8ipySifO952J1Uf0Fm
-         +EpbAKeOuGqhSpdNO9E7cZf1Pp7ocaGLOZzN4N6pu8letXaCjkrOYHWc/4egXZ00I1NQ
-         nabQ==
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-640860f97b5so82426a12.2
+        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 10:02:05 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762365574; x=1762970374;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zSHtYrMJfyWXNB5+D7qGmo5liVfUAPUmYconSQ05yJA=;
-        b=lmTdnoNs87dCJZMwGn3h2H/gCChEJodw6ew/3BXy3lugOHlUyazJP8Le2dfeu2OE19
-         CKNeeO7QPd2Zhqf0hY3ismaJJK7xarS5S2y1pR3drREplbyRDu6xik3JKk4rAXiqi7L1
-         mLDNwuPE5zw0IO30m1hIi9IGQPom+2gl1quY4iBBQq4w+CZfQNdx85f+oW50lhUnStMR
-         8QQ7xCTAmmXJwKch3jQdnh70sL2ucU1tZVxmlFc0nVZToaMMzfTK3ZpN5SfJW+TFDd9a
-         1wj+5OkMy/gR+qhrJcIDXYzZbDzsbDQeYEx3MHqXy7zEOztiJI9aJtKQKaDfdyPVKOPW
-         16PA==
-X-Forwarded-Encrypted: i=1; AJvYcCWd1n1EtUU4rS/AzByxPU6I2t6TS7mYJMYVW6BVJIO1ag6GTEpbUC2/ygdNDm+jXQsp4gdgc+s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQ3wKJAfWbQw192b5SqplVXU8heg1JT+mlccb4hAFaeXgTa6Bo
-	E4tvuIRWX5P+OMmfM+SR/vIPOj+1I6S1CR0izPATu71UWfg1TMoHkVng
-X-Gm-Gg: ASbGnctCZotIKAvuSM7nbwWBTEDGqREtI7BQK2IYXS8CgmPtlU5SLPrj9rx+sZL/M7L
-	ilc69gVPqx507Whl4XXH58GzWnyzlM+khKqp3AKgzpmdjw6tSQWmU4FFYnZJK2s1UyKTK9mo38s
-	P+sBCIi+tio6bGFCRPyS/oItMQ9A0f4mDtRkqdOrwYCyjH8ycNrrOaE5lMo483S5M5GSNP6NUjt
-	J1TlnIQS9PMunEVqG9cOWoUsLxRg5KjEstmMMk5h10ezh9ORwcUX3M9AHIJ/8fnV8iKYVcwTVXq
-	rqKXH1fdLK+R4hnDqToQa7flEA1Ds0r94KJmRuFCcsMfW+ZQ8wmf4em+2lV2ZgBrEcLoiV9B2IR
-	WRqTK0ynvV90Lhl624vKQlroGb6NhVEtpsZhLfnAsLR0hRBWvE8Sz4ex7WKYIxwHXpoy4pB+K6q
-	S9aCRHr7mZCu61n21Wj+H6QxB5NH0Y6WEC5NbF
-X-Google-Smtp-Source: AGHT+IHHyTsN8YO880iJh6XJa9T07Q+L4vBMRDgiJVACQ1JdCPPRDqaW0LijeD633oiPcNo5B7xioA==
-X-Received: by 2002:a05:690c:fc2:b0:787:1aba:3081 with SMTP id 00721157ae682-7871aba3718mr18241127b3.58.1762365573471;
-        Wed, 05 Nov 2025 09:59:33 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:59::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-787b13b6954sm735637b3.5.2025.11.05.09.59.32
+        d=1e100.net; s=20230601; t=1762365724; x=1762970524;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8fL+rSJszqIArGclI8UPsPMoZGI0pFGQxPTA6Ca2pfc=;
+        b=sejKJ0xmkdeeIrWPmUBktIhYP+MjLOoCoC8pJy8fV0G86HsgPXMEaMI1gR/Xi/bZFJ
+         Iba5RnL3n7kGqEIi49SsycJm0l3tSwQkfiS4yTErre78SGMonvI46TcG4GlrgdPS0boC
+         +vTWYwd1mQVEvgtGbKHxGeJ9o6Ph8sisyg1dwo4/+53HOO8TLDWk0FsYHVwOR+EtY/P9
+         xi/f3iwkI1NNDNW7fmX4jZfbQjr5aSoF28kbhZkz6FPJZZTPMgj5hqDzgFGkZp69j9PZ
+         cF6JMcKafI2dRS5KYIGDHGEB9AMd59P9+T3mDOeKuX3n1D3oLdWtGU9mat9PnkkDTdqV
+         1GhQ==
+X-Gm-Message-State: AOJu0Yzu8OBk30QJZqRpYNEdlC7ATGvj0cJ2fw103RW3V/qVcaxySjA0
+	qVL1+AuJBkjFCZLEGtra4SWEtpd9YyKT+SvMEaXvhtJG8htNLevy9VD7
+X-Gm-Gg: ASbGnct5ch9DxjhWVCyU1gh/KN/e3fwe8ciezjFSmiDqn5Ra0Sjtw9e/H7/YreHphox
+	SasD1/Hy9lxjxiyuwq72ZAVE8dizYkVglNVXovnPkfBtDyJOXqfKp/FCUL2LgcYvd8/TE4xTGiJ
+	SZWA73LWPHPrM2NAcp3jSxlaB9M0Xhs7P0y0cVeQr65ZXdxDSjKzuv6zmZxMVfATm5rwgQ1+UYB
+	9HCBMccDc/yNkVD/wLChynAWqDlMXjqJyk+1CC8+aVPQ2bWTS3P6/4IiBqssYy8JhjmqJXrVPKB
+	i/QSS2GSLrZjvvTvSC51kM7CGuQE4Zj/ToZlMYMfj48UliGd2JPy9Vfi4dUGURCLO1TzbXqaNvh
+	grMWKwf18gzym1EQpj3HPvlFKL45lMd+V5nVioe7fwv/Ja8MusxkKAsBhcp4aS6PcJHAHE++May
+	Ph
+X-Google-Smtp-Source: AGHT+IFPpLyxiJ2jA48b2g0b5iiljfmiE/RQHvJs3mJa9f/KokkIB16zXrB0m8NjkuecZoQyODgbrw==
+X-Received: by 2002:a05:6402:535a:10b0:634:ce70:7c5 with SMTP id 4fb4d7f45d1cf-64105a44a35mr3130066a12.17.1762365724263;
+        Wed, 05 Nov 2025 10:02:04 -0800 (PST)
+Received: from localhost ([2a03:2880:30ff:6::])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-640e6a5cb52sm5163323a12.23.2025.11.05.10.02.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Nov 2025 09:59:32 -0800 (PST)
-Date: Wed, 5 Nov 2025 09:59:31 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	David Ahern <dsahern@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>,
-	Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v6 5/6] net: devmem: document
- SO_DEVMEM_AUTORELEASE socket option
-Message-ID: <aQuQg2bNj9NYNW6j@devvm11784.nha0.facebook.com>
-References: <20251104-scratch-bobbyeshleman-devmem-tcp-token-upstream-v6-0-ea98cf4d40b3@meta.com>
- <20251104-scratch-bobbyeshleman-devmem-tcp-token-upstream-v6-5-ea98cf4d40b3@meta.com>
- <aQuKi535hyWMLBX4@mini-arch>
+        Wed, 05 Nov 2025 10:02:03 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+Date: Wed, 05 Nov 2025 10:01:12 -0800
+Subject: [PATCH net-next] tg3: extract GRXRINGS from .get_rxnfc
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aQuKi535hyWMLBX4@mini-arch>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20251105-grxrings_v1-v1-1-54c2caafa1fd@debian.org>
+X-B4-Tracking: v=1; b=H4sIAOeQC2kC/x3MUQqDMAwG4KuE/9mCEQpbryJjzDbr8hJHKlIQ7
+ y74HeA70MRVGhIdcNm16WpIxAMh/z5WJWhBIkzjFJnHGKp3V6vtvXOIUh5LfmaWXDAQ/i5f7fc
+ 2w2QLJn3D6zwvQ4XGMWcAAAA=
+X-Change-ID: 20251105-grxrings_v1-5ed8bc9c1ecd
+To: Pavan Chebbi <pavan.chebbi@broadcom.com>, 
+ Michael Chan <mchan@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ kernel-team@meta.com, Breno Leitao <leitao@debian.org>
+X-Mailer: b4 0.15-dev-dd21f
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2611; i=leitao@debian.org;
+ h=from:subject:message-id; bh=ZCz78oYBUNpXkKPm0a72zBISeoFnkQXycqYmx2bxyls=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpC5EZV0lQIj+k/s+/cJjDZ/8ZbiQgdT+6GZQ2a
+ NoH3ifxqnqJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaQuRGQAKCRA1o5Of/Hh3
+ bVLxD/9m6nj1IbDolW/OPaVVcpr988VqO/mjmauVBlca7wGDS39rBcMGMS4F4dVvMSs38Iytbg2
+ j/p5Plkh4/hbvahEEMrEvL+BsG+p4e/Lb/yj3mUqxSbqR3S69KlVFLupiaIXIo7jiFviztPl1nN
+ MHavQWpDaewKFzouWequI27zzbItCAgV6t/1YwrypBkwAvb+4cbtCQbYyDJyYrkHMYDkdXERuTq
+ B3RfWGGwleMN9SLW1egSxygRZqhfYI+EzkXRcrs4wcsM2kecd403pH5K5Z5wR5sNXg3jfxyxlsS
+ BsOtyfleXgDlJJYunsC444v6oUi2H4mYKXQkUxQsROi1V5lUdrszUjOsZ7HyZPQBgz6sb08Dy8N
+ VUAjMAsTUI+r9BWln5eZsbuUuHjn14Z7SbOK7DHbgMUEMIia5XhYOr7jyOIIA/Rm2L1Xw5RIutA
+ HU3u+lTUAKExSzhvbcfizgwzm2M0wr5FW9ZSPoAUvoI4TJC7Dhkg73uwPtLPBxEec+qvlVy+2uN
+ mMJBwv0WBzO6jyL2ocylNJfr9cn/U9WnU8a07+VbbUFuHbhN58UN92kex+ls6XhQUdU0ykXC3xl
+ zvlW6RIfE97N8Uw+kfmtE6zBbDSL4GhveadiFxXKA1TnBJalHh+iuQT2VEpjGYnn9ErpYvzCnW2
+ NRshta1ixFR+TEw==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-On Wed, Nov 05, 2025 at 09:34:03AM -0800, Stanislav Fomichev wrote:
-> On 11/04, Bobby Eshleman wrote:
-> > From: Bobby Eshleman <bobbyeshleman@meta.com>
-> > 
-> 
-> [..]
-> 
-> > +Autorelease Control
-> > +~~~~~~~~~~~~~~~~~~~
-> 
-> Have you considered an option to have this flag on the dmabuf binding
-> itself? This will let us keep everything in ynl and not add a new socket
-> option. I think also semantically, this is a property of the binding
-> and not the socket? (not sure what's gonna happen if we have
-> autorelease=on and autorelease=off sockets receiving to the same
-> dmabuf)
+Commit 84eaf4359c36 ("net: ethtool: add get_rx_ring_count callback to
+optimize RX ring queries") added specific support for GRXRINGS callback,
+simplifying .get_rxnfc.
 
-This was our initial instinct too and was the implementation in the
-prior version, but we opted for a socket-based property because it
-simplifies backwards compatibility with multi-binding steering rules. In
-this case, where bindings may have different autorelease settings, the
-recv path would need to error out once any binding with different
-autorelease value was detected, because the dont_need path doesn't have
-any context to know if any specific token is part of the socket's xarray
-(autorelease=on) or part of the binding->vec (autorelease=off).
+Remove the handling of GRXRINGS in .get_rxnfc() by moving it to the new
+.get_rx_ring_count().
 
-At the socket level we can just prevent the mode switch by counting
-outstanding references... to do this at the binding level, I think we
-have to revert back to the ethtool approach we experimented with earlier
-(trying to resolve steering rules to queues, and then check their
-binding->autorelease values and make sure they are consistent).
+Given that tg3_get_rxnfc() only handles ETHTOOL_GRXRINGS, then this
+function becomes useless now, and it is removed.
 
-This should work out off the box for mixed-modes, given then outstanding
-ref rule.
+This also fixes the behavior for devices without MSIX support.
+Previously, the function would return -EOPNOTSUPP, but now it correctly
+returns 1.
 
-Probably should add a test for specifically that...
+The functionality remains the same: return the current queue count
+if the device is running, otherwise return the minimum of online
+CPUs and TG3_RSS_MAX_NUM_QS.
 
-Best,
-Bobby
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+PS: This was compiled-tested only and NOT tested on a real hardware.
+---
+ drivers/net/ethernet/broadcom/tg3.c | 24 ++++++------------------
+ 1 file changed, 6 insertions(+), 18 deletions(-)
+
+diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
+index d78cafdb20949..fa58c3ffceb06 100644
+--- a/drivers/net/ethernet/broadcom/tg3.c
++++ b/drivers/net/ethernet/broadcom/tg3.c
+@@ -12719,29 +12719,17 @@ static int tg3_get_sset_count(struct net_device *dev, int sset)
+ 	}
+ }
+ 
+-static int tg3_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *info,
+-			 u32 *rules __always_unused)
++static u32 tg3_get_rx_ring_count(struct net_device *dev)
+ {
+ 	struct tg3 *tp = netdev_priv(dev);
+ 
+ 	if (!tg3_flag(tp, SUPPORT_MSIX))
+-		return -EOPNOTSUPP;
++		return 1;
+ 
+-	switch (info->cmd) {
+-	case ETHTOOL_GRXRINGS:
+-		if (netif_running(tp->dev))
+-			info->data = tp->rxq_cnt;
+-		else {
+-			info->data = num_online_cpus();
+-			if (info->data > TG3_RSS_MAX_NUM_QS)
+-				info->data = TG3_RSS_MAX_NUM_QS;
+-		}
++	if (netif_running(tp->dev))
++		return tp->rxq_cnt;
+ 
+-		return 0;
+-
+-	default:
+-		return -EOPNOTSUPP;
+-	}
++	return min(num_online_cpus(), TG3_RSS_MAX_NUM_QS);
+ }
+ 
+ static u32 tg3_get_rxfh_indir_size(struct net_device *dev)
+@@ -14268,7 +14256,7 @@ static const struct ethtool_ops tg3_ethtool_ops = {
+ 	.get_coalesce		= tg3_get_coalesce,
+ 	.set_coalesce		= tg3_set_coalesce,
+ 	.get_sset_count		= tg3_get_sset_count,
+-	.get_rxnfc		= tg3_get_rxnfc,
++	.get_rx_ring_count	= tg3_get_rx_ring_count,
+ 	.get_rxfh_indir_size    = tg3_get_rxfh_indir_size,
+ 	.get_rxfh		= tg3_get_rxfh,
+ 	.set_rxfh		= tg3_set_rxfh,
+
+---
+base-commit: 5d505fdf758ebf197e5e99277e7203b4aabaf367
+change-id: 20251105-grxrings_v1-5ed8bc9c1ecd
+
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
+
 
