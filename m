@@ -1,210 +1,125 @@
-Return-Path: <netdev+bounces-235921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AED1AC3734C
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 18:53:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6171FC3736C
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 18:54:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49573687F60
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 17:29:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20C57624597
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 17:34:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B061533F38D;
-	Wed,  5 Nov 2025 17:28:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B918033858E;
+	Wed,  5 Nov 2025 17:34:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uKwF4yxa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="caKRYsdt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74FE42874FF;
-	Wed,  5 Nov 2025 17:28:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BFBF3358B3
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 17:34:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762363705; cv=none; b=lhUmHhK8xPVvC/5E6+pmo8hewBZ677mgsoF1c8abUyc8KgpAnYCW5CB3VQvLQcw2AbOJ2nHFnWzhgSFGxqcL7+50bWRiLNZ07kfQRBO4JaYZyC6LSe+lrLrqnyaMoCyrwBM8q3Teafx7vmLcSttNNEfw8HqUH+mW6J2EPYd429Q=
+	t=1762364046; cv=none; b=A5Q9+TBCBCm6JCYJx387HxCYtLh6mc6FmtHBn3PxbiJztoX0mzIuvy6AezGTTWdVd6FH5xAyYUzsXydqz2ZDhAzM5XloFme3SnRbQSt9eEOSdWzvTxtQk1dAOGWrReyryXumlZBqCcmmXHMIMMeQp0I3J5bPtMmL3xZLBJoL0nY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762363705; c=relaxed/simple;
-	bh=WWE2CREpUzxVd4OeFKJZqcU5pHWBrpeeWrzbApa8odI=;
-	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LANLwoqddASX9VBMHDa/Zw3Z/ojOchimQqUU8T7pV7aCZcGgPC9WX9+nrB4LzMQKO4BFUbVSjqAxHVgddIznxXLWRmVGvdc2vNmGgZB5UEW/LLLc/cZX/758dXFYOZYA3n2Mi5lvRCgRUu0B8bdkvd5dW2DZcN35yCK3EfcLqco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uKwF4yxa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8162C4CEF5;
-	Wed,  5 Nov 2025 17:28:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762363704;
-	bh=WWE2CREpUzxVd4OeFKJZqcU5pHWBrpeeWrzbApa8odI=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=uKwF4yxaIv4QWdphUhmGifSGdXZBIih2SHH2a5iWmRJtly/l7sfYy+RQqrIDljc6X
-	 DtzEOjKsEQdYDhLm1xg5mVZ34slmu6iONSYbNl+bNJ7iOpcVbPC8UnZy1vlEH4wp8d
-	 DpACOVww4l+67On3PVkaJEkzW+8Bk9RVRrhkugFArDp3qt26GWPlC3lXO5ZNseg5M/
-	 jYIE4vcAQZbijTc3UG6+z4M4slB7M8p/RharMBF+ElW+GETuysURTRYH2KIlapGTa3
-	 DoX0TikPCRMGCWrVieRifoWZfT46N2gGW2eWH3AC0Z1wMQSlA6ElzpKd+5zdwQoObc
-	 aXrjKs4hqGWeQ==
-Subject: [PATCH net V3 2/2] veth: more robust handing of race to avoid txq
- getting stuck
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-To: netdev@vger.kernel.org,
- =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
- Eric Dumazet <eric.dumazet@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, ihor.solodrai@linux.dev,
- "Michael S. Tsirkin" <mst@redhat.com>, makita.toshiaki@lab.ntt.co.jp,
- toshiaki.makita1@gmail.com, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kernel-team@cloudflare.com
-Date: Wed, 05 Nov 2025 18:28:19 +0100
-Message-ID: <176236369968.30034.1538535221816777531.stgit@firesoul>
-In-Reply-To: <176236363962.30034.10275956147958212569.stgit@firesoul>
-References: <176236363962.30034.10275956147958212569.stgit@firesoul>
-User-Agent: StGit/1.5
+	s=arc-20240116; t=1762364046; c=relaxed/simple;
+	bh=6xrOD9swTEvrak0LhMfPK5DhY7OUNnrkGwLHcRPL30A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A4m/VdTGxq0keNxCrKjtKpDNSoJrVrKHBJyTQMVlehI32aaEgQCWOGeBDkHmzWyPsHxw6z4rWtRTr9YuOozgJvB0MOuUrPNF1DzPteSiBeB5rGm9G6rs66IADgdJ/SFTC4ggQtHNREy8dSjHday+P+hzkZffrBIMNwpgHOpoA50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=caKRYsdt; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7af6a6f20easo135887b3a.0
+        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 09:34:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762364044; x=1762968844; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=lKdKuNfm1Kcem/uHM3VQr6qkYp9rA4TSkaTwtykO5t4=;
+        b=caKRYsdtvKllX8CzsiFUc4zpvhzFGohX2iqu8C541hMlaAlV/GArvWcuIUYcNzqtFF
+         iZsHa2KgnDOjipZbTsQBxz70O3SdbGvGjErHJFacdd81mG28AvBExOrrIYqB5rnQayHn
+         Wlp+5I0CQOH51sTOzZtXst6d/KqjDDh1X2QbZ8V7+8o8slZTSt0YSBChAZC/EWTvN8Xc
+         /1bOn/adVeZxgrjzguPfyLMpPT00DAZT15nxWOuBBxWcT1Wo5M5hagVt+GO3LNGUEdqt
+         7a9vvGBNhOBjTjs742uZ0lKVPnpPTnpKMyYukgbYWlYody/AKXX+XGmmQPruLqbEEbZD
+         mgWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762364044; x=1762968844;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lKdKuNfm1Kcem/uHM3VQr6qkYp9rA4TSkaTwtykO5t4=;
+        b=NGJoaejMm86p6YBqj6QAh0dfHna1x+4jlDlifu3aJWaV1u6poeyCd7wPh8uSyJ1+Sk
+         0D6T4wtiK/N2JmNLNr6V3jUzvb+DcpDk7ejIP3/9NxRvqW9EQ+ThjWyoZDL+/3t+Wx9c
+         4T211GMSXEusmMm8ELpH0HMtXOscYJmdEyVDt8PcrKFpv8lWepEfnZ5GaaUwwQ//FRc/
+         nnWBvmqPXbtmPA4e0bS678X88y7YIvO2ehft2SdHsmWaHjctpm0AJZ1wGKe2BxhMbFT0
+         RrcAkwaXC3ddSG7oPkp/4CTNz/i7Boh3TFoUNMuzuCUe+L3V4GOVldjLBPc7K6YOHi+p
+         oE2A==
+X-Forwarded-Encrypted: i=1; AJvYcCWYXxBV5sSu+1gVqKojAkCmLI3c354U7UpTRpIZ91/5fi+rH3r70mH448gL4K+LC7dcIF2G8eY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxvZGGots4Vos//sA9QHnHLm0PT7JKlIB/mfhLE087qIn9fWksC
+	beeqSlJiWP5YcY7jRzMw5KGWvyshrN/3DSqWCoS4tscGtc0poifNzIY=
+X-Gm-Gg: ASbGncu16uDZdrCoZi2lomNR63L/10ctq6/GanlEU98Nm9j40+NIzPtpyTnBiUV1+zd
+	RJTlVSgLxkxPfx5Kmc5PDIoUzwCIiBixadxEax9GK+Q9eejoIjHHPh14phQatSqghkJEMMv1iu9
+	QrJ34OGN2mA368lKBX7yqJIK5gaRlr1uDuKVVfIhTNvh/N6+UMElM8iEaqhHy5eL8qAiscJWaA3
+	pL2cg3l7L+Oz+CwQy3xxZCV5l6oGc1e2WAJTpvaYRs9tL0u+m7VgUxRr8ovcoPraWLllVzdJ1Ow
+	UKpM7fIpSSOso9TuOyoEJFszaKUIkJuYKWXSEOJkrb7dGFeR6OzMb4319Bw1rGm8o1Kgt3XTt0c
+	RVO5rZ5Ud3vUpyegrZ1nvTIzeuN/OPI6cnf73cF/iCYVtPnl+jJvFSmRttY0lDJ5yj/5sshzJS1
+	93ms+aTS7mMXhkFeg6bXqt0TICUlXKUv41KVffYcaye2xJCrYwpT0FyaxeHpsvNAbDhHaBRCccP
+	QKwhjW/rSNUqVOH5I+L1Apzi2HNTKI10DjjeZcUvDDVFwEIAhTdEkll4XiH/cOOGcc=
+X-Google-Smtp-Source: AGHT+IGfpYym/+ciEUpgLGEk2Uo4k9tfz1NW01FXx3zpjWrnBawbwhix8S/o00+hWVYZ5LW7eOMiOw==
+X-Received: by 2002:a05:6a20:7d9e:b0:341:262f:651c with SMTP id adf61e73a8af0-34f84afbef9mr4621605637.25.1762364044019;
+        Wed, 05 Nov 2025 09:34:04 -0800 (PST)
+Received: from localhost (c-76-102-12-149.hsd1.ca.comcast.net. [76.102.12.149])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-ba1f2a8044dsm6027302a12.16.2025.11.05.09.34.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Nov 2025 09:34:03 -0800 (PST)
+Date: Wed, 5 Nov 2025 09:34:03 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Neal Cardwell <ncardwell@google.com>,
+	David Ahern <dsahern@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>,
+	Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v6 5/6] net: devmem: document
+ SO_DEVMEM_AUTORELEASE socket option
+Message-ID: <aQuKi535hyWMLBX4@mini-arch>
+References: <20251104-scratch-bobbyeshleman-devmem-tcp-token-upstream-v6-0-ea98cf4d40b3@meta.com>
+ <20251104-scratch-bobbyeshleman-devmem-tcp-token-upstream-v6-5-ea98cf4d40b3@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20251104-scratch-bobbyeshleman-devmem-tcp-token-upstream-v6-5-ea98cf4d40b3@meta.com>
 
-Commit dc82a33297fc ("veth: apply qdisc backpressure on full ptr_ring to
-reduce TX drops") introduced a race condition that can lead to a permanently
-stalled TXQ. This was observed in production on ARM64 systems (Ampere Altra
-Max).
+On 11/04, Bobby Eshleman wrote:
+> From: Bobby Eshleman <bobbyeshleman@meta.com>
+> 
 
-The race occurs in veth_xmit(). The producer observes a full ptr_ring and
-stops the queue (netif_tx_stop_queue()). The subsequent conditional logic,
-intended to re-wake the queue if the consumer had just emptied it (if
-(__ptr_ring_empty(...)) netif_tx_wake_queue()), can fail. This leads to a
-"lost wakeup" where the TXQ remains stopped (QUEUE_STATE_DRV_XOFF) and
-traffic halts.
+[..]
 
-This failure is caused by an incorrect use of the __ptr_ring_empty() API
-from the producer side. As noted in kernel comments, this check is not
-guaranteed to be correct if a consumer is operating on another CPU. The
-empty test is based on ptr_ring->consumer_head, making it reliable only for
-the consumer. Using this check from the producer side is fundamentally racy.
+> +Autorelease Control
+> +~~~~~~~~~~~~~~~~~~~
 
-This patch fixes the race by adopting the more robust logic from an earlier
-version V4 of the patchset, which always flushed the peer:
-
-(1) In veth_xmit(), the racy conditional wake-up logic and its memory barrier
-are removed. Instead, after stopping the queue, we unconditionally call
-__veth_xdp_flush(rq). This guarantees that the NAPI consumer is scheduled,
-making it solely responsible for re-waking the TXQ.
-  This handles the race where veth_poll() consumes all packets and completes
-NAPI *before* veth_xmit() on the producer side has called netif_tx_stop_queue.
-The __veth_xdp_flush(rq) will observe rx_notify_masked is false and schedule
-NAPI.
-
-(2) On the consumer side, the logic for waking the peer TXQ is moved out of
-veth_xdp_rcv() and placed at the end of the veth_poll() function. This
-placement is part of fixing the race, as the netif_tx_queue_stopped() check
-must occur after rx_notify_masked is potentially set to false during NAPI
-completion.
-  This handles the race where veth_poll() consumes all packets, but haven't
-finished (rx_notify_masked is still true). The producer veth_xmit() stops the
-TXQ and __veth_xdp_flush(rq) will observe rx_notify_masked is true, meaning
-not starting NAPI.  Then veth_poll() change rx_notify_masked to false and
-stops NAPI.  Before exiting veth_poll() will observe TXQ is stopped and wake
-it up.
-
-Fixes: dc82a33297fc ("veth: apply qdisc backpressure on full ptr_ring to reduce TX drops")
-Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
----
- drivers/net/veth.c |   40 ++++++++++++++++++++--------------------
- 1 file changed, 20 insertions(+), 20 deletions(-)
-
-diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-index 7b1a9805b270..127dab275896 100644
---- a/drivers/net/veth.c
-+++ b/drivers/net/veth.c
-@@ -392,14 +392,12 @@ static netdev_tx_t veth_xmit(struct sk_buff *skb, struct net_device *dev)
- 		}
- 		/* Restore Eth hdr pulled by dev_forward_skb/eth_type_trans */
- 		__skb_push(skb, ETH_HLEN);
--		/* Depend on prior success packets started NAPI consumer via
--		 * __veth_xdp_flush(). Cancel TXQ stop if consumer stopped,
--		 * paired with empty check in veth_poll().
--		 */
- 		netif_tx_stop_queue(txq);
--		smp_mb__after_atomic();
--		if (unlikely(__ptr_ring_empty(&rq->xdp_ring)))
--			netif_tx_wake_queue(txq);
-+		/* Makes sure NAPI peer consumer runs. Consumer is responsible
-+		 * for starting txq again, until then ndo_start_xmit (this
-+		 * function) will not be invoked by the netstack again.
-+		 */
-+		__veth_xdp_flush(rq);
- 		break;
- 	case NET_RX_DROP: /* same as NET_XMIT_DROP */
- drop:
-@@ -900,17 +898,9 @@ static int veth_xdp_rcv(struct veth_rq *rq, int budget,
- 			struct veth_xdp_tx_bq *bq,
- 			struct veth_stats *stats)
- {
--	struct veth_priv *priv = netdev_priv(rq->dev);
--	int queue_idx = rq->xdp_rxq.queue_index;
--	struct netdev_queue *peer_txq;
--	struct net_device *peer_dev;
- 	int i, done = 0, n_xdpf = 0;
- 	void *xdpf[VETH_XDP_BATCH];
- 
--	/* NAPI functions as RCU section */
--	peer_dev = rcu_dereference_check(priv->peer, rcu_read_lock_bh_held());
--	peer_txq = peer_dev ? netdev_get_tx_queue(peer_dev, queue_idx) : NULL;
--
- 	for (i = 0; i < budget; i++) {
- 		void *ptr = __ptr_ring_consume(&rq->xdp_ring);
- 
-@@ -959,11 +949,6 @@ static int veth_xdp_rcv(struct veth_rq *rq, int budget,
- 	rq->stats.vs.xdp_packets += done;
- 	u64_stats_update_end(&rq->stats.syncp);
- 
--	if (peer_txq && unlikely(netif_tx_queue_stopped(peer_txq))) {
--		txq_trans_cond_update(peer_txq);
--		netif_tx_wake_queue(peer_txq);
--	}
--
- 	return done;
- }
- 
-@@ -971,12 +956,20 @@ static int veth_poll(struct napi_struct *napi, int budget)
- {
- 	struct veth_rq *rq =
- 		container_of(napi, struct veth_rq, xdp_napi);
-+	struct veth_priv *priv = netdev_priv(rq->dev);
-+	int queue_idx = rq->xdp_rxq.queue_index;
-+	struct netdev_queue *peer_txq;
- 	struct veth_stats stats = {};
-+	struct net_device *peer_dev;
- 	struct veth_xdp_tx_bq bq;
- 	int done;
- 
- 	bq.count = 0;
- 
-+	/* NAPI functions as RCU section */
-+	peer_dev = rcu_dereference_check(priv->peer, rcu_read_lock_bh_held());
-+	peer_txq = peer_dev ? netdev_get_tx_queue(peer_dev, queue_idx) : NULL;
-+
- 	xdp_set_return_frame_no_direct();
- 	done = veth_xdp_rcv(rq, budget, &bq, &stats);
- 
-@@ -998,6 +991,13 @@ static int veth_poll(struct napi_struct *napi, int budget)
- 		veth_xdp_flush(rq, &bq);
- 	xdp_clear_return_frame_no_direct();
- 
-+	/* Release backpressure per NAPI poll */
-+	smp_rmb(); /* Paired with netif_tx_stop_queue set_bit */
-+	if (peer_txq && netif_tx_queue_stopped(peer_txq)) {
-+		txq_trans_cond_update(peer_txq);
-+		netif_tx_wake_queue(peer_txq);
-+	}
-+
- 	return done;
- }
- 
-
-
+Have you considered an option to have this flag on the dmabuf binding
+itself? This will let us keep everything in ynl and not add a new socket
+option. I think also semantically, this is a property of the binding
+and not the socket? (not sure what's gonna happen if we have
+autorelease=on and autorelease=off sockets receiving to the same
+dmabuf)
 
