@@ -1,202 +1,159 @@
-Return-Path: <netdev+bounces-235779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5CD3C35615
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 12:35:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94D43C3580B
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 12:52:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 319321A20261
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 11:35:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45C444203C6
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 11:46:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 164F2302CB7;
-	Wed,  5 Nov 2025 11:35:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jdzg+1om"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E96F230FC3A;
+	Wed,  5 Nov 2025 11:46:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from localhost.localdomain (unknown [147.136.157.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57F472F60B5
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 11:35:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E6E02DEA61;
+	Wed,  5 Nov 2025 11:46:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=147.136.157.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762342512; cv=none; b=EJoYh/T2SpI26cHP69pSqJJH4RCdIC14cvVY49qtKfhKmGFffx2MIDQ+qWCivprcneAfmhpqS9YkhguYK/7QR/fQmFSPjwHhQbOuqsQ8cqWWlvotRPOEi9vCoW5DgvfzbzILe8l+4bNGtpjl3kCoAPYDJwbxHXRkAr64WCHABrI=
+	t=1762343207; cv=none; b=tp+8GXOp+MhtJ9IptEtzG79C1mVGiHc6SPq9r/6xPReAx2OvELXOdx+ItEYNSHZkNzM8KNYu/ZErIfckHi1vI9mwRhXcIdcALgoR2ZIVOd+eLEOqI36ziCOI1UGNC9fXoUSyCM1Jm/NfTM0Eu5NYlfuAxSPTEq2Ovbi9fFYmyVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762342512; c=relaxed/simple;
-	bh=NDPmengAA3O43vQ2dEatpgskmbKE/KwZ+34jsLyahiM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=doC5ivIT7elLEG7ZKwIn9/1XowFqxQZkmJqoaKb+TSUqjQ6vB/FGaKGgFGUTWrWsy4Ao6ZfzN9aYg+W+R7plIfWtAhEvvu/E61bBLbNhOJnZNdiV2eV8kji6eL0pk8qS27qjsQvzQJZGsop9L8drrF8XP6dd81CdNmlgfTTSshE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jdzg+1om; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4e89de04d62so57750981cf.0
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 03:35:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762342509; x=1762947309; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A+W1N3GV0ISOIB1b307IaPpcps1dImR1XBpRzOuXp+w=;
-        b=jdzg+1om9LCoGLAv/JR6qBnp9Fy3mzEYdmqKz+ZyrS8p4gJL8bf5x8yujvxAKQyC8m
-         82uKcj7j34jt4j+i2b+n8NPQIZ1FajKc3KuKIRQ8Xpil68x5AGCelfhIrMyKA6rCg40O
-         oOgxrTU3ptDGta0v9fJKIY4n9d2qHH/AA3dXezSLRNSsEEnaw/kNIMe8XhkVrnVHKR9C
-         Sfui0aQ3ClthgAbjyZXrND//LmSVpzbAozIBP8a7H0+nxBkAiLQHGvGVpmKvfufNLPhi
-         vY14WoEfXKqU+W/eHtJkMpyhSqyj+6xBR48EWAlOMCNHXd0uYag1LhgOHlxi2DirnSVW
-         NeaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762342509; x=1762947309;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=A+W1N3GV0ISOIB1b307IaPpcps1dImR1XBpRzOuXp+w=;
-        b=iY+hOLfIffQ+5zutd3Ef4b2dJxFtdHF7lNriGGSeZGF4W684kSieRA7m2awlyqtseb
-         9y8nkYep5zwJVNv2nLfsviJwxqa4RkHP+w6diSYa5NJrdvNL5yTHI+noKDDFY041hQbj
-         pycl4LVyvfUJfKsZUkbrt+b0mSr4RP8ofjqCYtNrS444Y4mu/10x9NpZI6bnD3/DKQYC
-         zPu/noKM4sQmVvVPX7gf7mONRmNNLXb7siN1GxVazGTrePvT5wG7chxvSsIDwhSSjH3l
-         wt6yaQXRaQZKfqut/EnPPoDk5+q/ciytnqdbEDpSa9dRR5awbog/KTuzPRWRsbFTZlG+
-         qijQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVMbSUqEvEMCBoqPkGMbLxc3JK6lz1hcAlbTqLEr5Y1UUCs3oU/EGxQnBbSEvl5oveuRhglU4A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBrXb8LXlxNutsf888SjcLZ1qYduZAburMKPg9BkXnhmFkSGQm
-	qgKZQmdS9ry6Je/5gST92ZIsVszUMCtgOQLQ0G1Pn+NDfmtSPRwKMwpM4pIyt9O/sAFI693lgV5
-	TpA7yIPGWZIb6C8KenN4tx+ceX9GAl4Ajzq+OglUn
-X-Gm-Gg: ASbGncvspSM509SXUyGTtJMiykdM1VwPk0Yhd6odIpzPkovi+KDOvfoqAOayoyiM/Wk
-	wk4EylHrfAc9pAMswWyPrSaYkGLlNJ8bgu2j/cY2N0SQ30b0d7EIwJ5fJe3bG5pGeY3HJLZpR/N
-	+M0G93uf0YUeMm/jwVe+JAXaecvUCspzgSJoK+bMfG/CmPJxdXAwgP7QvIJR/TaxfSeMDZrRsYQ
-	D/At3elEZbOHOG9yY5onQXL3idmqVh6hCz2AyNlI2eL4ItyTm6C/JIQSkKz
-X-Google-Smtp-Source: AGHT+IGMXcCEhIJHpGo7YNeYhryMQkkc6IzLUqJAUavr5rpAuF/dXxmhxy/A4LPKy1yD7Bty4AsF95OH791uN0yuHXY=
-X-Received: by 2002:a05:622a:18a8:b0:4e8:a3ed:4c50 with SMTP id
- d75a77b69052e-4ed72357bb0mr34619601cf.24.1762342508898; Wed, 05 Nov 2025
- 03:35:08 -0800 (PST)
+	s=arc-20240116; t=1762343207; c=relaxed/simple;
+	bh=fiKRi3GH6r/B8XX9d8B5w8Dvfv11FfmscbTJItgzweg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ncgk1dDYZsFjd92gjWS4Fgm7TD0suos552uveYx63eGCiJvRGsDhkvHvkoF7sQfCwZODd9BM20BniEyEoGku62cYctOg1SA5C3aOGBFWUiU/VRMLzh/+jS4XT6VyDWiToTSx2bBxDlXohPgNGs9eXSsvV+Kr4giQaYIHAvBaTgw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.dev; spf=none smtp.mailfrom=localhost.localdomain; arc=none smtp.client-ip=147.136.157.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=localhost.localdomain
+Received: by localhost.localdomain (Postfix, from userid 1007)
+	id ABCB78B2A0B; Wed,  5 Nov 2025 19:37:59 +0800 (+08)
+From: Jiayuan Chen <jiayuan.chen@linux.dev>
+To: mptcp@lists.linux.dev
+Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	Mat Martineau <martineau@kernel.org>,
+	Geliang Tang <geliang@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Florian Westphal <fw@strlen.de>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net v4 0/3] mptcp: Fix conflicts between MPTCP and sockmap
+Date: Wed,  5 Nov 2025 19:36:06 +0800
+Message-ID: <20251105113625.148900-1-jiayuan.chen@linux.dev>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251104161327.41004-1-simon.schippers@tu-dortmund.de>
- <CANn89iLLwWvbnCKKRrV2c7eo+4UduLVgZUWR=ZoZ+SPHRGf=wg@mail.gmail.com> <f2a363d3-40d7-4a5f-a884-ec147a167ef5@tu-dortmund.de>
-In-Reply-To: <f2a363d3-40d7-4a5f-a884-ec147a167ef5@tu-dortmund.de>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 5 Nov 2025 03:34:57 -0800
-X-Gm-Features: AWmQ_bkvkKkMJFocPBsmzZgiLwCaG6r4wmjfCZGCsPkSck7oY88Q0TSSw56W1JE
-Message-ID: <CANn89i+66TqhOgcBqnbDDEdubDNHnhUyNk0XZdBdhxFrXM=fug@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 0/1] usbnet: Add support for Byte Queue Limits (BQL)
-To: Simon Schippers <simon.schippers@tu-dortmund.de>
-Cc: oneukum@suse.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
-	linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 5, 2025 at 2:40=E2=80=AFAM Simon Schippers
-<simon.schippers@tu-dortmund.de> wrote:
->
-> On 11/4/25 18:02, Eric Dumazet wrote:
-> > On Tue, Nov 4, 2025 at 8:14=E2=80=AFAM Simon Schippers
-> > <simon.schippers@tu-dortmund.de> wrote:
-> >>
-> >> During recent testing, I observed significant latency spikes when usin=
-g
-> >> Quectel 5G modems under load. Investigation revealed that the issue wa=
-s
-> >> caused by bufferbloat in the usbnet driver.
-> >>
-> >> In the current implementation, usbnet uses a fixed tx_qlen of:
-> >>
-> >> USB2: 60 * 1518 bytes =3D 91.08 KB
-> >> USB3: 60 * 5 * 1518 bytes =3D 454.80 KB
-> >>
-> >> Such large transmit queues can be problematic, especially for cellular
-> >> modems. For example, with a typical celluar link speed of 10 Mbit/s, a
-> >> fully occupied USB3 transmit queue results in:
-> >>
-> >> 454.80 KB / (10 Mbit/s / 8 bit/byte) =3D 363.84 ms
-> >>
-> >> of additional latency.
-> >
-> > Doesn't 5G need to push more packets to the driver to get good aggregat=
-ion ?
-> >
->
-> Yes, but not 455 KB for low speeds. 5G requires a queue of a few ms to
-> aggregate enough packets for a frame but not of several hundred ms as
-> calculated in my example. And yes, there are situations where 5G,
-> especially FR2 mmWave, reaches Gbit/s speeds where a big queue is
-> required. But the dynamic queue limit approach of BQL should be well
-> suited for these varying speeds.
->
-> >>
-> >> To address this issue, this patch introduces support for
-> >> Byte Queue Limits (BQL) [1][2] in the usbnet driver. BQL dynamically
-> >> limits the amount of data queued in the driver, effectively reducing
-> >> latency without impacting throughput.
-> >> This implementation was successfully tested on several devices as
-> >> described in the commit.
-> >>
-> >>
-> >>
-> >> Future work
-> >>
-> >> Due to offloading, TCP often produces SKBs up to 64 KB in size.
-> >
-> > Only for rates > 500 Mbit. After BQL, we had many more improvements in
-> > the stack.
-> > https://lwn.net/Articles/564978/
-> >
-> >
->
-> I also saw these large SKBs, for example, for my USB2 Android tethering,
-> which advertises a network speed of < 500 Mbit/s.
-> I saw these large SKBs by looking at the file:
+Overall, we encountered a warning [1] that can be triggered by running the
+selftest I provided.
 
-TCP does not sense the underlying network speed. This would be moot if
-a link is shared by one thousand flows...
-The rate is determined by CWND * MSS / RTT.
-Some congestion controls have a tendency to inflate CWND to a very big
-value, hence bufferbloat.
-One of BBR goal is to avoid bufferbloat.
+sockmap works by replacing sk_data_ready, recvmsg, sendmsg operations and
+implementing fast socket-level forwarding logic:
+1. Users can obtain file descriptors through userspace socket()/accept()
+   interfaces, then call BPF syscall to perform these replacements.
+2. Users can also use the bpf_sock_hash_update helper (in sockops programs)
+   to replace handlers when TCP connections enter ESTABLISHED state
+  (BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB/BPF_SOCK_OPS_ACTIVE_ESTABLISHED_CB)
 
-BQL is only a part of the solution.
+However, when combined with MPTCP, an issue arises: MPTCP creates subflow
+sk's and performs TCP handshakes, so the BPF program obtains subflow sk's
+and may incorrectly replace their sk_prot. We need to reject such
+operations. In patch 1, we set psock_update_sk_prot to NULL in the
+subflow's custom sk_prot.
 
-Disabling TSO/GSO is certainly not part of the solution, you can trust
-me on this.
+Additionally, if the server's listening socket has MPTCP enabled and the
+client's TCP also uses MPTCP, we should allow the combination of subflow
+and sockmap. This is because the latest Golang programs have enabled MPTCP
+for listening sockets by default [2]. For programs already using sockmap,
+upgrading Golang should not cause sockmap functionality to fail.
 
->
-> cat /sys/class/net/INTERFACE/queues/tx-0/byte_queue_limits/inflight
->
-> For UDP-only traffic, inflight always maxed out at MTU size.
->
-> Thank you for your replies!
->
-> >> To
-> >> further decrease buffer bloat, I tried to disable TSO, GSO and LRO but=
- it
-> >> did not have the intended effect in my tests. The only dirty workaroun=
-d I
-> >> found so far was to call netif_stop_queue() whenever BQL sets
-> >> __QUEUE_STATE_STACK_XOFF. However, a proper solution to this issue wou=
-ld
-> >> be desirable.
-> >>
-> >> I also plan to publish a scientific paper on this topic in the near
-> >> future.
-> >>
-> >> Thanks,
-> >> Simon
-> >>
-> >> [1] https://medium.com/@tom_84912/byte-queue-limits-the-unauthorized-b=
-iography-61adc5730b83
-> >> [2] https://lwn.net/Articles/469652/
-> >>
-> >> Simon Schippers (1):
-> >>   usbnet: Add support for Byte Queue Limits (BQL)
-> >>
-> >>  drivers/net/usb/usbnet.c | 8 ++++++++
-> >>  1 file changed, 8 insertions(+)
-> >>
-> >> --
-> >> 2.43.0
-> >>
+Patch 2 prevents the WARNING from occurring.
+
+
+[1] truncated warning:
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 388 at net/mptcp/protocol.c:68 \
+mptcp_stream_accept+0x34c/0x380
+Modules linked in:
+RIP: 0010:mptcp_stream_accept+0x34c/0x380
+RSP: 0018:ffffc90000cf3cf8 EFLAGS: 00010202
+PKRU: 55555554
+Call Trace:
+ <TASK>
+ do_accept+0xeb/0x190
+ ? __x64_sys_pselect6+0x61/0x80
+ ? _raw_spin_unlock+0x12/0x30
+ ? alloc_fd+0x11e/0x190
+ __sys_accept4+0x8c/0x100
+ __x64_sys_accept+0x1f/0x30
+ x64_sys_call+0x202f/0x20f0
+ do_syscall_64+0x72/0x9a0
+ ? switch_fpu_return+0x60/0xf0
+ ? irqentry_exit_to_user_mode+0xdb/0x1e0
+ ? irqentry_exit+0x3f/0x50
+ ? clear_bhb_loop+0x50/0xa0
+ ? clear_bhb_loop+0x50/0xa0
+ ? clear_bhb_loop+0x50/0xa0
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
+ </TASK>
+---[ end trace 0000000000000000 ]---
+
+[2]: https://go-review.googlesource.com/c/go/+/607715
+
+---
+v3 -> v4: Addressed questions from Matthieu and Paolo, explained sockmap's
+          operational mechanism, and finalized the changes
+v2 -> v3: Adopted Jakub Sitnicki's suggestions - atomic retrieval of
+          sk_family is required
+v1 -> v2: Had initial discussion with Matthieu on sockmap and MPTCP
+          technical details
+
+v3: https://lore.kernel.org/bpf/20251023125450.105859-1-jiayuan.chen@linux.dev/
+v2: https://lore.kernel.org/bpf/20251020060503.325369-1-jiayuan.chen@linux.dev/T/#t
+v1: https://lore.kernel.org/mptcp/a0a2b87119a06c5ffaa51427a0964a05534fe6f1@linux.dev/T/#t
+
+Jiayuan Chen (3):
+  mptcp: disallow MPTCP subflows from sockmap
+  net,mptcp: fix proto fallback detection with BPF
+  selftests/bpf: Add mptcp test with sockmap
+
+ net/mptcp/protocol.c                          |   6 +-
+ net/mptcp/subflow.c                           |   8 +
+ .../testing/selftests/bpf/prog_tests/mptcp.c  | 150 ++++++++++++++++++
+ .../selftests/bpf/progs/mptcp_sockmap.c       |  43 +++++
+ 4 files changed, 205 insertions(+), 2 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/progs/mptcp_sockmap.c
+
+
+base-commit: 89aec171d9d1ab168e43fcf9754b82e4c0aef9b9
+-- 
+2.43.0
+
 
