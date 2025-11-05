@@ -1,190 +1,298 @@
-Return-Path: <netdev+bounces-235837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DC6EC36725
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 16:47:01 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 152EAC3671F
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 16:47:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 356563BE6CC
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 15:34:26 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 608314FBF24
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 15:36:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 801C42641FB;
-	Wed,  5 Nov 2025 15:34:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDBC130C37C;
+	Wed,  5 Nov 2025 15:35:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="I3PZw45I"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="hsz+J6jU"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a4-smtp.messagingengine.com (fout-a4-smtp.messagingengine.com [103.168.172.147])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A418634D3A3;
-	Wed,  5 Nov 2025 15:34:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.147
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C6992641FB;
+	Wed,  5 Nov 2025 15:35:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762356849; cv=none; b=Dp4pGhXAhDKRK0qx+uCJfu5d+yrNMu72oaUoKgXF1lOBgXEG48M5BOqUwURiOADHcUadf1eseaQbindoV7vEryhaGHumSRa+07JKR6M9j07kaKk54XLk1jY0F5s/JVubhhNGT+nALuEKThWwZZxktBwV6kdJ0fRIfcbAJbwi4Ew=
+	t=1762356944; cv=none; b=GFZMNVpH91FUR6FdIMZjpZgypkQ4Z7p7Fzxh/L0lH3Lg9XSjo7tej999eaQT+lyyknS4mgeu+sxc02OEMPEpoyVgcTBYCrEWKCrS/sTQCLIUV6zV1PxPDQqMamcNI+j0yX3o+LIAHx7AEWCuZi8TW8Lnk4X9RT65ekLltKJrALg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762356849; c=relaxed/simple;
-	bh=q+pKX+WhfAfQqw04jCOiyV2QiE94kOQ3AGUO+2KwESE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=buPs0KMU+EB6RJZ728/povfSMhszcSiX5SD0vg2WyYcCmVkn49WkQX9dyId9SoMLCab29vfDwjScP/Bt6+Evp8J1WrH1Ldq2oxyLDBs2mKzgbYvNzvQomqoHVquCNJZd+rlJM71eEZspccqMI77dvGEUBFTTKuxuPA9Thqurbi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=I3PZw45I; arc=none smtp.client-ip=103.168.172.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-06.internal (phl-compute-06.internal [10.202.2.46])
-	by mailfout.phl.internal (Postfix) with ESMTP id 9FCE7EC02F2;
-	Wed,  5 Nov 2025 10:34:06 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Wed, 05 Nov 2025 10:34:06 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1762356846; x=
-	1762443246; bh=81MCj8OUaFvyq48DpTXhMDinPzHeqGz4DiYX34tUCmM=; b=I
-	3PZw45Ib2sDjlos/Hc8aftidxUXcYKgMIJRN7FOQQUZlKIrdzo9QV+9euEzullQO
-	hasGXMDkUTXak0OjcjY6QAASEQB8h1EtRwjmTgU2z8lXtkDoTMK1JYumkOWBK0N6
-	Cyc7dwauoYt7S4KGAdRh4q1Lesyb4aTHncw171Nh8qaXWStu4HVgFzBdbDgKAfu0
-	xeZj7kD34OgVWW02fMztF8CHOW/E6c0OmwBMbXKGmd2svcHBhnHtHHfrRsAkM7EH
-	Ln+2GJqqaP9YqFSWyOWBwodi1SyYP3snc6Ha+SPQc+1raLjaoqdZ5GbL7EyXPZvm
-	30EDwVtz7vfvMzGtqK3tg==
-X-ME-Sender: <xms:bm4LaR9c6LIbe3vUvU3_sexr17fvFszcV3uDmEV80gYJium8b4WFhw>
-    <xme:bm4LabuKSZfru6pjhHKNFBdBWY6rsIB07QJpTN3DyfeCPfUH0Pn7RmoHOZZgsTh7i
-    I8M2glb0jeRnVxEZb26khb58S-c2fsChOBpNUabP6JQlcizfRA>
-X-ME-Received: <xmr:bm4LaZ18GB_fwrZ3EOaIbgHTctbDMCVkHCDDza0b2lh66WC5yRWcDYX5>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeegvdejucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
-    gurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefkughoucfu
-    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
-    gvrhhnpeekgefggefhuedvgeettdegvdeuvdfhudejvddvjeetledvuedtheehleelhffh
-    udenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiug
-    hoshgthhesihguohhstghhrdhorhhgpdhnsggprhgtphhtthhopedutddpmhhouggvpehs
-    mhhtphhouhhtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprh
-    gtphhtthhopehnrghshhhuihhlihgrnhhgsehgmhgrihhlrdgtohhmpdhrtghpthhtohep
-    shhtrggslhgvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmh
-    esuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegushgrhhgvrhhnsehkvghrnhgv
-    lhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
-    epphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehhohhrmhhssehkvghr
-    nhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdroh
-    hrgh
-X-ME-Proxy: <xmx:bm4LaYQtkAYcPa6_LitcGq9lpsX4IXDXc8a-xWacdABYu5evsIalFg>
-    <xmx:bm4LaVe7ckvxyBJAXZGpmLtPStP-rzRPR6AEP7kekEmoa6gyIfMa1g>
-    <xmx:bm4LaRd01rxHakIgX0zaV4xXXZI_TB_yELZZ6LGs5WXU48QQ1VJSqA>
-    <xmx:bm4LaX1bHgJ_ol8mD0uOMaQ0bIkjTgVNETGakhfITZW9PTbKfTnwFA>
-    <xmx:bm4LaeVRQT01S7ZlW574EsGbRj2X4bPUBzwnhYbQ5s0uht22-doXWv3W>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 5 Nov 2025 10:34:05 -0500 (EST)
-Date: Wed, 5 Nov 2025 17:34:04 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: chuang <nashuiliang@gmail.com>, stable@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Networking <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net] ipv4: route: Prevent rt_bind_exception() from
- rebinding stale fnhe
-Message-ID: <aQtubP3V6tUOaEl5@shredder>
-References: <CACueBy7yNo4jq4HbiLXn0ez14w8CUTtTpPHmpSB-Ou6jhhNypA@mail.gmail.com>
- <CANn89iL9e9TZoOZ8KG66ea37bo=WztPqRPk8A9i0Ntx2KidYBw@mail.gmail.com>
+	s=arc-20240116; t=1762356944; c=relaxed/simple;
+	bh=PY/omXWxnOyxVorqQ9R+pkl09QE3Q7EjLqoiP7N+eog=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gGUBb1g69xdrHrHOjQCkMTp7UmNX/19H8/6jeP9JZlf0XiEPaN7MoKD7tV7Q5nvAmmr+4hmMw+qHFi+2Wdh6M9UUR+vFJ2cEofa5KkcoVKyyA4nbCGlV6g0Ss2DhAIOJd9hINjqFd/yBfqASk4xQO8dNLuhcZbQc49d1LXwPvW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=hsz+J6jU; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=FzmyRr2t51cLHRpA2F/afH1pib978Jz/dAaIti/iSGY=; t=1762356943; x=1763566543; 
+	b=hsz+J6jUIOVxpJ9KFoyllu8akm6f3hbnMVGX+Z3llAk5JnzEO0JKtZdOm59EKsWTCN+4WNN/+88
+	1ry9QijonMM8MLnVc/VA5Q6xEGqulkw289cQd/koxnlt6VF9Kpq7oQMx41aSGhAFZy25FpSK7EPlD
+	cMcKLEziF4WfduGf8/WmHKkHPKy+vvzCVlFbmN4aUVehMFhCzPAqnGPVJ47xMVHKsoMneHU7QfBJ2
+	gEslNEIh9idEKAHIpFNs/9byrXCASow35tTJCXj+h7DlVBTTGLXXavOE7QlVaUmRQHSye4s0mpzEN
+	t4xDyvV6PaoF3misR7X+Psw3oepaDNc3+FJg==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1vGfXw-0000000FJrD-2jDR;
+	Wed, 05 Nov 2025 16:35:40 +0100
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Subject: [GIT PULL] wireless-next-2025-11-05
+Date: Wed,  5 Nov 2025 16:34:33 +0100
+Message-ID: <20251105153537.54096-38-johannes@sipsolutions.net>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iL9e9TZoOZ8KG66ea37bo=WztPqRPk8A9i0Ntx2KidYBw@mail.gmail.com>
 
-On Wed, Nov 05, 2025 at 06:26:22AM -0800, Eric Dumazet wrote:
-> On Mon, Nov 3, 2025 at 7:09 PM chuang <nashuiliang@gmail.com> wrote:
-> >
-> > From 35dbc9abd8da820007391b707bd2c1a9c99ee67d Mon Sep 17 00:00:00 2001
-> > From: Chuang Wang <nashuiliang@gmail.com>
-> > Date: Tue, 4 Nov 2025 02:52:11 +0000
-> > Subject: [PATCH net] ipv4: route: Prevent rt_bind_exception() from rebinding
-> >  stale fnhe
-> >
-> > A race condition exists between fnhe_remove_oldest() and
-> > rt_bind_exception() where a fnhe that is scheduled for removal can be
-> > rebound to a new dst.
-> >
-> > The issue occurs when fnhe_remove_oldest() selects an fnhe (fnheX)
-> > for deletion, but before it can be flushed and freed via RCU,
-> > CPU 0 enters rt_bind_exception() and attempts to reuse the entry.
-> >
-> > CPU 0                             CPU 1
-> > __mkroute_output()
-> >   find_exception() [fnheX]
-> >                                   update_or_create_fnhe()
-> >                                     fnhe_remove_oldest() [fnheX]
-> >   rt_bind_exception() [bind dst]
-> >                                   RCU callback [fnheX freed, dst leak]
-> >
-> > If rt_bind_exception() successfully binds fnheX to a new dst, the
-> > newly bound dst will never be properly freed because fnheX will
-> > soon be released by the RCU callback, leading to a permanent
-> > reference count leak on the old dst and the device.
-> >
-> > This issue manifests as a device reference count leak and a
-> > warning in dmesg when unregistering the net device:
-> >
-> >   unregister_netdevice: waiting for ethX to become free. Usage count = N
-> >
-> > Fix this race by clearing 'oldest->fnhe_daddr' before calling
-> > fnhe_flush_routes(). Since rt_bind_exception() checks this field,
-> > setting it to zero prevents the stale fnhe from being reused and
-> > bound to a new dst just before it is freed.
-> >
-> > Cc: stable@vger.kernel.org
-> > Fixes: 67d6d681e15b ("ipv4: make exception cache less predictible")
-> 
-> I do not see how this commit added the bug you are looking at ?
+Hi,
 
-Not the author, but my understanding is that the issue is that an
-exception entry which is queued for deletion allows a dst entry to be
-bound to it. As such, nobody will ever release the reference from the
-dst entry and the associated net device.
+So more driver updates are trickling in now, with Intel
+and Atheros this time. I have a whole new NXP driver that
+isn't in here yet, but is quite likely good enough for
+next week. We'll see. :)
 
-Before 67d6d681e15b, exception entries were only queued for deletion by
-ip_del_fnhe() and it prevented dst entries from binding themselves to
-the deleted exception entry by clearing 'fnhe->fnhe_daddr' which is
-checked in rt_bind_exception(). See ee60ad219f5c7.
+Please pull and let us know if there's any problem.
 
-67d6d681e15b added another point in the code that queues exception
-entries for deletion, but without clearing 'fnhe->fnhe_daddr' first.
-Therefore, it added another instance of the bug that was fixed in
-ee60ad219f5c7.
+Thanks,
+johannes
 
-> 
-> > Signed-off-by: Chuang Wang <nashuiliang@gmail.com>
-> > ---
-> >  net/ipv4/route.c | 5 +++++
-> >  1 file changed, 5 insertions(+)
-> >
-> > diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-> > index 6d27d3610c1c..b549d6a57307 100644
-> > --- a/net/ipv4/route.c
-> > +++ b/net/ipv4/route.c
-> > @@ -607,6 +607,11 @@ static void fnhe_remove_oldest(struct
-> > fnhe_hash_bucket *hash)
-> >                         oldest_p = fnhe_p;
-> >                 }
-> >         }
-> > +
-> > +       /* Clear oldest->fnhe_daddr to prevent this fnhe from being
-> > +        * rebound with new dsts in rt_bind_exception().
-> > +        */
-> > +       oldest->fnhe_daddr = 0;
-> >         fnhe_flush_routes(oldest);
-> >         *oldest_p = oldest->fnhe_next;
-> >         kfree_rcu(oldest, rcu);
-> > --
-> 
+
+
+The following changes since commit 1a2352ad82b515035efe563f997ef8f5ca4f8080:
+
+  Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-10-31 06:46:03 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next.git tags/wireless-next-2025-11-05
+
+for you to fetch changes up to 2f6adeaf92c4ea4adf5a91b87497ba13bb057996:
+
+  Merge tag 'ath-next-20251103' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath into wireless-next (2025-11-05 16:29:11 +0100)
+
+----------------------------------------------------------------
+More changes from drivers are coming in, notably:
+ - ath10k: factory test support
+ - ath11k: TX power insertion support
+ - ath12k: BSS color change support
+ - iwlwifi: new sniffer API support
+
+----------------------------------------------------------------
+Abdun Nihaal (1):
+      wifi: ath12k: fix potential memory leak in ath12k_wow_arp_ns_offload()
+
+Aditya Kumar Singh (5):
+      wifi: ath12k: Defer vdev bring-up until CSA finalize to avoid stale beacon
+      wifi: ath11k: relocate some Tx power related functions in mac.c
+      wifi: ath11k: wrap ath11k_mac_op_get_txpower() with lock-aware internal helper
+      wifi: ath11k: add support for Tx Power insertion in RRM action frame
+      wifi: ath11k: advertise NL80211_FEATURE_TX_POWER_INSERTION
+
+Baochen Qiang (7):
+      wifi: ath11k: restore register window after global reset
+      wifi: ath12k: fix VHT MCS assignment
+      wifi: ath11k: fix VHT MCS assignment
+      wifi: ath11k: fix peer HE MCS assignment
+      wifi: ath12k: restore register window after global reset
+      wifi: ath12k: fix reusing m3 memory
+      wifi: ath12k: fix error handling in creating hardware group
+
+Dr. David Alan Gilbert (1):
+      wifi: wcn36xx: Remove unused wcn36xx_smd_update_scan_params
+
+Emmanuel Grumbach (5):
+      wifi: iwlwifi: mld: support get/set_antenna
+      wifi: iwlwifi: be more chatty when we fail to find a wifi7 device
+      wifi: iwlwifi: stop checking the firmware's error pointer
+      wifi: iwlwifi: disable EHT if the device doesn't allow it
+      wifi: iwlwifi: mld: check for NULL pointer after kmalloc
+
+Jeff Johnson (3):
+      wifi: ath11k: Remove struct wmi_bcn_send_from_host_cmd
+      wifi: ath12k: Remove struct wmi_bcn_send_from_host_cmd
+      wifi: ath11k: Correctly use "ab" macro parameter
+
+Johannes Berg (14):
+      wifi: iwlwifi: mvm: move rate conversions to utils.c
+      wifi: iwlwifi: cfg: add new device names
+      wifi: iwlwifi: tests: check listed PCI IDs have configs
+      wifi: iwlwifi: fix remaining kernel-doc warnings
+      wifi: iwlwifi: mld: update to new sniffer API
+      wifi: iwlwifi: mld: include raw PHY notification in radiotap
+      wifi: iwlwifi: fix build when mvm/mld not configured
+      wifi: iwlwifi: bump core version for BZ/SC/DR
+      wifi: iwlwifi: mvm/mld: report non-HT frames as 20 MHz
+      wifi: iwlwifi: mld: use FW_CHECK on bad ROC notification
+      wifi: iwlwifi: bump core version for BZ/SC/DR
+      wifi: iwlwifi: cfg: fix a few device names
+      Merge tag 'iwlwifi-next-2025-10-28' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next
+      Merge tag 'ath-next-20251103' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath into wireless-next
+
+Kang Yang (1):
+      wifi: ath10k: move recovery check logic into a new work
+
+Li Qiang (1):
+      wifi: iwlwifi: mld: add null check for kzalloc() in iwl_mld_send_proto_offload()
+
+Loic Poulain (1):
+      wifi: ath10k: Support for FTM TLV test commands
+
+Miri Korenblit (7):
+      wifi: iwlwifi: align the name of iwl_alive_ntf_v6 to the convention
+      wifi: iwlwifi: mld: remove support from of alive notif version 6
+      wifi: iwlwifi: mld: reschedule check_tpt_wk also not in EMLSR
+      wifi: iwlwifi: iwlmld is always used for wifi7 devices
+      wifi: iwlwifi: mvm: cleanup unsupported phy command versions
+      wifi: iwlwifi: mld: set wiphy::iftype_ext_capab dynamically
+      wifi: iwlwifi: mld: check the validity of noa_len
+
+Muna Sinada (6):
+      wifi: ath12k: generalize GI and LTF fixed rate functions
+      wifi: ath12k: add EHT rate handling to existing set rate functions
+      wifi: ath12k: Add EHT MCS/NSS rates to Peer Assoc
+      wifi: ath12k: Add EHT fixed GI/LTF
+      wifi: ath12k: add EHT rates to ath12k_mac_op_set_bitrate_mask()
+      wifi: ath12k: Set EHT fixed rates for associated STAs
+
+Nidhish A N (2):
+      wifi: iwlwifi: fw: remove support of several iwl_lari_config_change_cmd versions
+      wifi: iwlwifi: mld: Move EMLSR prints to IWL_DL_EHT
+
+Pradeep Kumar Chitrapu (1):
+      wifi: ath12k: fix TX and RX MCS rate configurations in HE mode
+
+Rameshkumar Sundaram (2):
+      wifi: ath12k: enforce vdev limit in ath12k_mac_vdev_create()
+      wifi: ath12k: unassign arvif on scan vdev create failure
+
+Sarika Sharma (3):
+      wifi: ath12k: Fix MSDU buffer types handling in RX error path
+      wifi: ath12k: track dropped MSDU buffer type packets in REO exception ring
+      wifi: ath12k: Assert base_lock is held before allocating REO update element
+
+Takashi Iwai (1):
+      wifi: ath12k: Add MODULE_FIRMWARE() entries
+
+Thiraviyam Mariyappan (1):
+      wifi: ath12k: Fix NSS value update in ext_rx_stats
+
+Wei Zhang (1):
+      wifi: ath12k: add support for BSS color change
+
+Zhongqiu Han (2):
+      wifi: ath10k: use = {} to initialize pm_qos_request instead of memset
+      wifi: ath10k: use = {} to initialize bmi_target_info instead of memset
+
+ drivers/net/wireless/ath/ath10k/core.c             |   28 +-
+ drivers/net/wireless/ath/ath10k/core.h             |    6 +-
+ drivers/net/wireless/ath/ath10k/mac.c              |    2 +-
+ drivers/net/wireless/ath/ath10k/testmode.c         |  275 +++-
+ drivers/net/wireless/ath/ath10k/testmode_i.h       |   15 +
+ drivers/net/wireless/ath/ath10k/wmi.h              |   19 +-
+ drivers/net/wireless/ath/ath11k/hal.h              |   38 +-
+ drivers/net/wireless/ath/ath11k/mac.c              |  455 ++++--
+ drivers/net/wireless/ath/ath11k/pci.c              |   20 +-
+ drivers/net/wireless/ath/ath11k/pci.h              |   18 +-
+ drivers/net/wireless/ath/ath11k/wmi.c              |   20 +-
+ drivers/net/wireless/ath/ath11k/wmi.h              |   18 +-
+ drivers/net/wireless/ath/ath12k/core.c             |   22 +-
+ drivers/net/wireless/ath/ath12k/core.h             |    3 +
+ drivers/net/wireless/ath/ath12k/debugfs.c          |    5 +-
+ drivers/net/wireless/ath/ath12k/dp_mon.c           |   19 +-
+ drivers/net/wireless/ath/ath12k/dp_rx.c            |   74 +-
+ drivers/net/wireless/ath/ath12k/hal_rx.c           |   10 +-
+ drivers/net/wireless/ath/ath12k/mac.c              |  751 +++++++--
+ drivers/net/wireless/ath/ath12k/mac.h              |   14 +-
+ drivers/net/wireless/ath/ath12k/pci.c              |   24 +-
+ drivers/net/wireless/ath/ath12k/qmi.c              |   11 +-
+ drivers/net/wireless/ath/ath12k/qmi.h              |    5 +-
+ drivers/net/wireless/ath/ath12k/wmi.c              |   86 +-
+ drivers/net/wireless/ath/ath12k/wmi.h              |   55 +-
+ drivers/net/wireless/ath/ath12k/wow.c              |    1 +
+ drivers/net/wireless/ath/wcn36xx/hal.h             |   74 -
+ drivers/net/wireless/ath/wcn36xx/smd.c             |   60 -
+ drivers/net/wireless/ath/wcn36xx/smd.h             |    1 -
+ drivers/net/wireless/intel/iwlwifi/cfg/22000.c     |    1 -
+ drivers/net/wireless/intel/iwlwifi/cfg/8000.c      |    1 -
+ drivers/net/wireless/intel/iwlwifi/cfg/9000.c      |    1 -
+ drivers/net/wireless/intel/iwlwifi/cfg/ax210.c     |    1 -
+ drivers/net/wireless/intel/iwlwifi/cfg/bz.c        |    4 +-
+ drivers/net/wireless/intel/iwlwifi/cfg/dr.c        |    3 +-
+ drivers/net/wireless/intel/iwlwifi/cfg/rf-fm.c     |    1 +
+ drivers/net/wireless/intel/iwlwifi/cfg/rf-pe.c     |    1 +
+ drivers/net/wireless/intel/iwlwifi/cfg/rf-wh.c     |   24 +
+ drivers/net/wireless/intel/iwlwifi/cfg/sc.c        |    3 +-
+ drivers/net/wireless/intel/iwlwifi/fw/acpi.h       |    1 +
+ drivers/net/wireless/intel/iwlwifi/fw/api/alive.h  |    2 +-
+ drivers/net/wireless/intel/iwlwifi/fw/api/cmdhdr.h |    4 +-
+ drivers/net/wireless/intel/iwlwifi/fw/api/coex.h   |    4 +-
+ .../net/wireless/intel/iwlwifi/fw/api/commands.h   |    2 +-
+ .../net/wireless/intel/iwlwifi/fw/api/datapath.h   |    5 +
+ .../net/wireless/intel/iwlwifi/fw/api/dbg-tlv.h    |   14 +-
+ drivers/net/wireless/intel/iwlwifi/fw/api/debug.h  |    2 +-
+ .../net/wireless/intel/iwlwifi/fw/api/location.h   |    8 +-
+ .../net/wireless/intel/iwlwifi/fw/api/nvm-reg.h    |  134 +-
+ drivers/net/wireless/intel/iwlwifi/fw/api/power.h  |    5 +-
+ drivers/net/wireless/intel/iwlwifi/fw/api/rx.h     |  286 ++++
+ drivers/net/wireless/intel/iwlwifi/fw/api/scan.h   |   78 +-
+ drivers/net/wireless/intel/iwlwifi/fw/api/sta.h    |    6 +-
+ drivers/net/wireless/intel/iwlwifi/fw/api/stats.h  |   39 +-
+ drivers/net/wireless/intel/iwlwifi/fw/api/tx.h     |    2 +-
+ drivers/net/wireless/intel/iwlwifi/fw/error-dump.h |    4 +-
+ drivers/net/wireless/intel/iwlwifi/fw/file.h       |   74 +-
+ drivers/net/wireless/intel/iwlwifi/fw/img.h        |   12 +-
+ drivers/net/wireless/intel/iwlwifi/fw/regulatory.c |   26 +-
+ drivers/net/wireless/intel/iwlwifi/fw/runtime.h    |   22 +-
+ drivers/net/wireless/intel/iwlwifi/iwl-config.h    |   11 +-
+ drivers/net/wireless/intel/iwlwifi/iwl-dbg-tlv.h   |    4 +-
+ drivers/net/wireless/intel/iwlwifi/iwl-drv.c       |   29 +-
+ drivers/net/wireless/intel/iwlwifi/iwl-drv.h       |    9 +-
+ drivers/net/wireless/intel/iwlwifi/iwl-modparams.h |    4 +-
+ drivers/net/wireless/intel/iwlwifi/iwl-nvm-parse.c |    2 +-
+ drivers/net/wireless/intel/iwlwifi/iwl-nvm-parse.h |   17 +-
+ drivers/net/wireless/intel/iwlwifi/iwl-op-mode.h   |    1 +
+ drivers/net/wireless/intel/iwlwifi/iwl-trans.h     |    6 +-
+ drivers/net/wireless/intel/iwlwifi/mld/constants.h |    2 +
+ drivers/net/wireless/intel/iwlwifi/mld/d3.c        |    4 +
+ drivers/net/wireless/intel/iwlwifi/mld/fw.c        |   14 +-
+ drivers/net/wireless/intel/iwlwifi/mld/iface.c     |   13 +
+ drivers/net/wireless/intel/iwlwifi/mld/link.c      |   16 +-
+ drivers/net/wireless/intel/iwlwifi/mld/mac80211.c  |  103 +-
+ drivers/net/wireless/intel/iwlwifi/mld/mld.c       |    1 +
+ drivers/net/wireless/intel/iwlwifi/mld/mld.h       |   25 +-
+ drivers/net/wireless/intel/iwlwifi/mld/mlo.c       |  100 +-
+ drivers/net/wireless/intel/iwlwifi/mld/notif.c     |    4 +-
+ drivers/net/wireless/intel/iwlwifi/mld/roc.c       |    4 +-
+ drivers/net/wireless/intel/iwlwifi/mld/rx.c        | 1709 +++++++++++---------
+ drivers/net/wireless/intel/iwlwifi/mld/rx.h        |    5 +-
+ drivers/net/wireless/intel/iwlwifi/mld/sta.c       |    2 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/fw.c        |   15 +-
+ .../net/wireless/intel/iwlwifi/mvm/mld-mac80211.c  |    3 -
+ drivers/net/wireless/intel/iwlwifi/mvm/mvm.h       |    5 +
+ drivers/net/wireless/intel/iwlwifi/mvm/phy-ctxt.c  |   24 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/rs.c        |  164 --
+ drivers/net/wireless/intel/iwlwifi/mvm/rs.h        |    3 -
+ drivers/net/wireless/intel/iwlwifi/mvm/rx.c        |    2 +
+ drivers/net/wireless/intel/iwlwifi/mvm/utils.c     |  164 ++
+ drivers/net/wireless/intel/iwlwifi/pcie/drv.c      |   10 +-
+ .../net/wireless/intel/iwlwifi/pcie/gen1_2/trans.c |    9 +
+ drivers/net/wireless/intel/iwlwifi/tests/devinfo.c |   29 +
+ 94 files changed, 3437 insertions(+), 1975 deletions(-)
 
