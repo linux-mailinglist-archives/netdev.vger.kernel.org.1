@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-235750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9DB9C34B93
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 10:15:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FEB5C34CD8
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 10:24:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A278C189A5FE
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 09:14:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3135561221
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 09:21:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDCD12F90EA;
-	Wed,  5 Nov 2025 09:14:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B73F6313284;
+	Wed,  5 Nov 2025 09:16:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YJDgtKPB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ea1G+Cwb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A17EA24291B;
-	Wed,  5 Nov 2025 09:14:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 891E23128C3;
+	Wed,  5 Nov 2025 09:16:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762334051; cv=none; b=mOoIMV9hpI1OfgK7UuM0dD8hucO7MbsYjWXhW02BypBM5uQ9eKfP6lnvqC1K5fNL4qbHmHb5MmTxlE9b+TMxECU0DzSFEmeJ+YZo0NUZhJHK9x9RA9EZAV8wISdFXe4bdyHUohMjabk0h9hwpx1+KdCGsauoHkloUBovyg4nIsk=
+	t=1762334219; cv=none; b=u4m1AX+q95fqfGdoIJuFg+4OQw7C1kYNjb2imqMJQy2ys3k1yE7ObS0rPw8VZv7hBIfh88+qYfSdmj0+dZioSCgCxOI4PzHXXhqWW8DCrjPaf8Owgs+8ZVawpTo8bBVLbHekB5WaOZlBMSPMP2IMXWfSmlD5p+VAY/6jGF4BCkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762334051; c=relaxed/simple;
-	bh=+IcD7Spbw17oRsINmLuhMDru7Z//3dFzIofki5+RBpg=;
+	s=arc-20240116; t=1762334219; c=relaxed/simple;
+	bh=q/m3wCulTXhTB8/LDywh9yjrxdqTuaGoDm5TZmWIuIk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OXczean+eZOcZmvb62QnVDaJ4cwaaNmf2cVz1MH9E5PE5AvtTRN1rhMAFo7CljB/JW9zlSi/i3QfGwsjPV2Ale9TO3As5R4LqIeYC7eTMZnnv/iyny0YkQ1PC8AJTZED8XP5SIDQk0hJzQW5t6RCtRIwrnP+W4qEeQ3d6yocLSk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YJDgtKPB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6AE89C4CEF8;
-	Wed,  5 Nov 2025 09:14:07 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=FlXvFpY4/TMYaxFIa93Uyp0GWwbRKoFgyxufcVIJCzE17mUueDeS09q7S73iM2yOL/t6OwGBwG4kfH8Lz7A7hTkFd+l/rxOUpzmiwBeR6k2P4vN6d52x36nrYUrgHPbagDJPfCZAlb2Kjaww8vPfEgv4745FrthwR449yfPm/qA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ea1G+Cwb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 588A1C116B1;
+	Wed,  5 Nov 2025 09:16:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762334051;
-	bh=+IcD7Spbw17oRsINmLuhMDru7Z//3dFzIofki5+RBpg=;
+	s=k20201202; t=1762334219;
+	bh=q/m3wCulTXhTB8/LDywh9yjrxdqTuaGoDm5TZmWIuIk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YJDgtKPBz3icUlyYvEpGUKaHscHOx35GSJXlsT+55IVdo9ELb2ZDPNnixY0NmfcVh
-	 +7bXBHagm+C6RGJqEz+O1IboyJMwyNvlMsaqn/iHGi5kujCnMARSJ5XWORcaTmLB4M
-	 WkEo/RHl4i3qLdBh7kzm3tQ6KXieTLocU2LScGXIP4yWmolTMCxrf4H3K4lKzIs71Z
-	 Y4vgiCZx3uRcqAnTOHrnlO/7es8Hp4O/ZbYCB3a8aWzXG1/oUGWI1DAuBN+lmsV0o1
-	 ECpXBWGRNAYsME5YRrTuDgQKk2orBlVGxXaH0DPeUR/3TRYgqz9Rdkzh5A2m3cm3/B
-	 n7IzY4JB7n8OA==
-Date: Wed, 5 Nov 2025 09:14:05 +0000
+	b=ea1G+CwbIiLDs+nYhhAmF9Ead5AYmRI6qHA/G3hzcjEkcOLeoktFY+u3ZedO1PBwy
+	 PQS+D4pe+MCyykbewq+yl0+vsTG4/zIed4dgCI/1+EFVx/MwqPB7kwkv+klrnhoUmT
+	 ZS1kK0556t01AgRszoK0KFwBHcBSccpc2FFJSPO1HFKdtiamU58NbyVyARnIHM99ac
+	 7rB/KcnlNjLhskl3W469prlkIvaAVM8UdnwTVJCPH5PI+QQx+p6Gi7NZ+NkjJ2twxB
+	 7Y0p9G3iPab5eNWy0gFLu012cVham/THP2w70RfqdAprmr4ywP3Ug15J43jJC22N2e
+	 oHFibyT7ISaJA==
+Date: Wed, 5 Nov 2025 09:16:53 +0000
 From: Simon Horman <horms@kernel.org>
 To: Fan Gong <gongfan1@huawei.com>
 Cc: Zhu Yikai <zhuyikai1@h-partners.com>, netdev@vger.kernel.org,
@@ -58,10 +58,10 @@ Cc: Zhu Yikai <zhuyikai1@h-partners.com>, netdev@vger.kernel.org,
 	Luo Yang <luoyang82@h-partners.com>,
 	Meny Yossefi <meny.yossefi@huawei.com>,
 	Gur Stavi <gur.stavi@huawei.com>
-Subject: Re: [PATCH net-next v04 3/5] hinic3: Add NIC configuration ops
-Message-ID: <aQsVXfFlZzIeSf-V@horms.kernel.org>
+Subject: Re: [PATCH net-next v04 5/5] hinic3: Add netdev register interfaces
+Message-ID: <aQsWBXonR4lwK6uo@horms.kernel.org>
 References: <cover.1761711549.git.zhuyikai1@h-partners.com>
- <79009912df8bed8ce44f6fcaf8cdbb943d6efd82.1761711549.git.zhuyikai1@h-partners.com>
+ <6c69354773fd22691da74614daa391b6451b8ebe.1761711549.git.zhuyikai1@h-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,89 +70,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <79009912df8bed8ce44f6fcaf8cdbb943d6efd82.1761711549.git.zhuyikai1@h-partners.com>
+In-Reply-To: <6c69354773fd22691da74614daa391b6451b8ebe.1761711549.git.zhuyikai1@h-partners.com>
 
-On Wed, Oct 29, 2025 at 02:16:27PM +0800, Fan Gong wrote:
+On Wed, Oct 29, 2025 at 02:16:29PM +0800, Fan Gong wrote:
 
 ...
 
-> diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c
-> index 09dae2ef610c..0efb5a843964 100644
-> --- a/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c
-> +++ b/drivers/net/ethernet/huawei/hinic3/hinic3_hw_comm.c
-> @@ -9,6 +9,36 @@
->  #include "hinic3_hwif.h"
->  #include "hinic3_mbox.h"
+> diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_main.c b/drivers/net/ethernet/huawei/hinic3/hinic3_main.c
+
+...
+
+> @@ -250,7 +319,29 @@ static void netdev_feature_init(struct net_device *netdev)
+>  	if (hinic3_test_support(nic_dev, HINIC3_NIC_F_TSO))
+>  		tso_fts |= NETIF_F_TSO | NETIF_F_TSO6;
 >  
-> +static int hinic3_get_interrupt_cfg(struct hinic3_hwdev *hwdev,
-> +				    struct hinic3_interrupt_info *info)
-> +{
-> +	struct comm_cmd_cfg_msix_ctrl_reg msix_cfg = {};
-> +	struct mgmt_msg_params msg_params = {};
-> +	int err;
+> -	netdev->features |= dft_fts | cso_fts | tso_fts;
+> +	if (hinic3_test_support(nic_dev, HINIC3_NIC_F_RX_VLAN_STRIP |
+> +				HINIC3_NIC_F_TX_VLAN_INSERT))
+> +		vlan_fts |= NETIF_F_HW_VLAN_CTAG_TX | NETIF_F_HW_VLAN_CTAG_RX;
 > +
-> +	msix_cfg.func_id = hinic3_global_func_id(hwdev);
-> +	msix_cfg.msix_index = info->msix_index;
-> +	msix_cfg.opcode = MGMT_MSG_CMD_OP_GET;
+> +	if (hinic3_test_support(nic_dev, HINIC3_NIC_F_RX_VLAN_FILTER))
+> +		vlan_fts |= NETIF_F_HW_VLAN_CTAG_FILTER;
 > +
-> +	mgmt_msg_params_init_default(&msg_params, &msix_cfg, sizeof(msix_cfg));
+> +	if (hinic3_test_support(nic_dev, HINIC3_NIC_F_VXLAN_OFFLOAD))
+> +		tso_fts |= NETIF_F_GSO_UDP_TUNNEL | NETIF_F_GSO_UDP_TUNNEL_CSUM;
 > +
-> +	err = hinic3_send_mbox_to_mgmt(hwdev, MGMT_MOD_COMM,
-> +				       COMM_CMD_CFG_MSIX_CTRL_REG, &msg_params);
-> +	if (err || msix_cfg.head.status) {
-> +		dev_err(hwdev->dev, "Failed to get interrupt config, err: %d, status: 0x%x\n",
-> +			err, msix_cfg.head.status);
-> +		return -EFAULT;
-> +	}
+> +	/* LRO is disabled by default, only set hw features */
+> +	if (hinic3_test_support(nic_dev, HINIC3_NIC_F_LRO))
+> +		hw_features |= NETIF_F_LRO;
 > +
-> +	info->lli_credit_limit = msix_cfg.lli_credit_cnt;
-> +	info->lli_timer_cfg = msix_cfg.lli_timer_cnt;
-> +	info->pending_limit = msix_cfg.pending_cnt;
-> +	info->coalesc_timer_cfg = msix_cfg.coalesce_timer_cnt;
-> +	info->resend_timer_cfg = msix_cfg.resend_timer_cnt;
+> +	netdev->features |= dft_fts | cso_fts | tso_fts | vlan_fts;
+> +	netdev->vlan_features |= dft_fts | cso_fts | tso_fts;
+> +		hw_features |= netdev->hw_features | netdev->features;
+
+nit: The line above seems to be indented too much.
+
+> +	netdev->hw_features = hw_features;
+> +	netdev->priv_flags |= IFF_UNICAST_FLT;
 > +
-> +	return 0;
-> +}
-> +
->  int hinic3_set_interrupt_cfg_direct(struct hinic3_hwdev *hwdev,
->  				    const struct hinic3_interrupt_info *info)
->  {
-> @@ -40,6 +70,30 @@ int hinic3_set_interrupt_cfg_direct(struct hinic3_hwdev *hwdev,
->  	return 0;
+> +	netdev->hw_enc_features |= dft_fts;
+> +	if (hinic3_test_support(nic_dev, HINIC3_NIC_F_VXLAN_OFFLOAD))
+> +		netdev->hw_enc_features |= cso_fts | tso_fts | NETIF_F_TSO_ECN;
 >  }
 >  
-> +int hinic3_set_interrupt_cfg(struct hinic3_hwdev *hwdev,
-> +			     struct hinic3_interrupt_info info)
-> +{
-> +	struct hinic3_interrupt_info temp_info;
-> +	int err;
-> +
-> +	temp_info.msix_index = info.msix_index;
-> +
-> +	err = hinic3_get_interrupt_cfg(hwdev, &temp_info);
-> +	if (err)
-> +		return -EINVAL;
-
-Maybe I am missing something. It seems to me thaat this error value will
-propagate up to be the return value of the probe value. And it seems to me
-that would be a bit more intuitive, and possibly lead to a better user
-experience, if the return value of hinic3_get_interrupt_cfg() was
-propagated here. And, in turn, if hinic3_get_interrupt_cfg() propagated the
-return value of hinic3_send_mbox_to_mgmt(). These values differ from
--EINVAL.
-
-> +
-> +	info.lli_credit_limit = temp_info.lli_credit_limit;
-> +	info.lli_timer_cfg = temp_info.lli_timer_cfg;
-> +
-> +	if (!info.interrupt_coalesc_set) {
-> +		info.pending_limit = temp_info.pending_limit;
-> +		info.coalesc_timer_cfg = temp_info.coalesc_timer_cfg;
-> +		info.resend_timer_cfg = temp_info.resend_timer_cfg;
-> +	}
-> +
-> +	return hinic3_set_interrupt_cfg_direct(hwdev, &info);
-> +}
+>  static int hinic3_set_default_hw_feature(struct net_device *netdev)
 
 ...
 
