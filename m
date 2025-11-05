@@ -1,165 +1,236 @@
-Return-Path: <netdev+bounces-235975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40F96C37A2C
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 21:09:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EA2FC37AE1
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 21:20:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A5EFA4F29BC
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 20:08:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3F683B0B35
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 20:20:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E404824DCED;
-	Wed,  5 Nov 2025 20:08:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8AB6346A1D;
+	Wed,  5 Nov 2025 20:19:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m8352Edw"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="HK/uDy85"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55003346A05
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 20:08:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E37DB289E06
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 20:19:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762373291; cv=none; b=tMWj3MewRIHGX8BxrXSnfemaknAVX48+YeW2FoW61MK+hj/eNtp2xQhowl9E3CShTz1Vr8kPQdennkXn0M6VffRYNqlQzdJzda6XsjZfwUyo5CJDaZC+zTm9OsEfzcxT7h+ah58J3wCjlszTMqxdjjNIU17P+xfMQzNsrcUPTqk=
+	t=1762373994; cv=none; b=AYhczGG8lpCtZxon8FPXFUe1e7KpFz5agsgkwf1GwiW8VMwjNq3nUTl8Vufep79ohxytOVpq3iDnqPMcDL9za/VfDd5bwaIw2l01vYJ5PJDybpDA4B73UKJzuL0b2WdJZD1zurg5KMQLq4EJxzXdyc1agU/0WkJ6eb5/jJ/iLv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762373291; c=relaxed/simple;
-	bh=n3os+k4QqkzkjBHpscj0Pon1HDkYiwHI5oh2gSfO3eA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=d6cPe+IvYmZd1/obYl6hOXAS2KhOSgVn6zMewXk9QrfXAf9DmRD29WGAjLQCw8WVFY0yjgj8FzKtLkp9+0UcZM7b0K5Iy84YgfCG+Q7UDhKw4Q2n1X82+bt14PPViPMvfiItcO7+HoVTrHbvN70tTvAHYatXdYExlopQoosNomE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m8352Edw; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-b9a72a43e42so134391a12.2
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 12:08:10 -0800 (PST)
+	s=arc-20240116; t=1762373994; c=relaxed/simple;
+	bh=oqLL1DtugD8nAtrKqXz62QpNO9cX3g0hubMgfsXD0SU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=guLLOM1w8pkKPJmw8oUWB+rwT4p7z5PwMboDpYbqGgtOrdtYVCkWDkEKH4EE+gsc8i61LGMO1agcIKzjRnsblQ5xma2Y9Q+ZOUZXda/TMEpMD7GKher1uybbY8y51Y0NGSjWI+Wua0NJtWAWhxzEeMlpppfwjrVZSMJVDXXmGJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=HK/uDy85; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-afcb7ae6ed0so40781866b.3
+        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 12:19:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762373289; x=1762978089; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tsYTHqHcd87Px6g2etcm588RqeZ8ybpTCrwlTD/0dmA=;
-        b=m8352EdwkyOgg9FYO9mxPhyzcd9MSHAbuT3STBxALVeIKv0dZ1XHb+Qt4tBY5zm2sy
-         El+mUKXyj/Rqr+VDmOIuRw/IAVxKJ09RuJK3IRA3wXrrOB0C8ljGV8XJqHu6xJUagnET
-         VNfCWQ6Kcfx3J1fso/xpNfqhIaY5I65v0Q54SXGJrX3D9iTinIxrmf+vCro4AVrdggue
-         EspaOU1I6GIMveX3JPmrgZ+1cFQMZnnJgexueAHKFFfxyHHsIIDW0voMqG93gfTG80w9
-         LmCIQeSjOoLLicygkEL19hPMZQ4aOU8CWUCJRAXj6eLynt8LkklrmLjGCWd9jAA38F04
-         lpKg==
+        d=cloudflare.com; s=google09082023; t=1762373990; x=1762978790; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=uFgaH8SLJr+B2SQBY1Ucx/AZqiD6CEjxSo2nJurHPNE=;
+        b=HK/uDy85B+APlWzGy4UdYzEZ04KhPbmr+7IcS1pvx4pINPavzo/w2BKk4YXFxa0+kd
+         e0aoPCyNvip72DPs6p9HM3k3khFf6WzVRJCzCtkatplhMgLDptu6dYE/hQQssS+5NEB4
+         jYWNlsPV7LaxumwDVlSDwDqk8TO8KaOfjbq2IqaWNPSSiDXFQpo3PkR7JBYhatW1KO/J
+         ZBzETLSAyDDQNDmpCGwFQqlkkzRoB3oq1vA2y2b6MovTKIaatd8ZDAfJXxs7TQ4unBG2
+         dja+W7oM3BqGcYOB6ydQanOlOYzw2k+wt8BArKEiVjKs6lIESTkoSeptIS2EiN3tiNO9
+         gl3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762373289; x=1762978089;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tsYTHqHcd87Px6g2etcm588RqeZ8ybpTCrwlTD/0dmA=;
-        b=qRw1qSv3ENXBm6kPEOIbjdWXRlbrwiMtqv8bIyrSVORQE2lCyz18DYe9/ylRwdX+QZ
-         CJwa8jVmM++hCSJMNU3P3vb0G7eMjSKW42Uu0FxEK3DcL/Eea2+fsm009Cj4PAMil6kE
-         wSqoUh0ASVTje8qfj01KijjQm+4WUWqtgOdAcO1L9+XXGo4W+XkNQPgHPL8L6yXLo+Fv
-         hS0RmrNNmwtWJdAdFEA8SsXXuAbLOzccp0+zlxmiJdn4xwT6N5YsovTYgkP98JfdIo/P
-         39xi0H1kKbiC+vAlMTZgrGeP94y0DGuOZ87w3Hy/JYuY3KnM95gBzYy9IurIF+dRN7Rq
-         zPDg==
-X-Gm-Message-State: AOJu0YzXW6UBgsBjlaDD4yTYex3kX7atse94tYtIQt8NcOjdGxKrCYW4
-	PmleMdejyXpPbVhagEVylPPd1P9hzvPrdqsk4O/FuHLbSpkVMGURz5nQCjGxexEJeue0FkuNILz
-	RbGXGTpxxkIYhNnxXUiRpN4JsoSlR7VlCLmxt73DsPnOaC1Sgl4hyU7ULYoT+fbGzQW4VjpsQ37
-	kp//msHs2bEact88LqTxMnSYjNi5SxWF7ZBC8aGEqlB093+O1lDoT9Bx6zDNqbkho=
-X-Google-Smtp-Source: AGHT+IFR7MYzatcpuTgTWfkgPeCwao/117d57DT7xFMktke+9nyy2N6IlS6Pz9VEWT8DicmLcYidcojAwE94zXXYMw==
-X-Received: from dlbvg6.prod.google.com ([2002:a05:7022:7f06:b0:119:96ef:3b41])
- (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a20:2729:b0:340:cc06:9514 with SMTP id adf61e73a8af0-34f86e0bb65mr4218111637.57.1762373289217;
- Wed, 05 Nov 2025 12:08:09 -0800 (PST)
-Date: Wed,  5 Nov 2025 20:07:58 +0000
-In-Reply-To: <20251105200801.178381-1-almasrymina@google.com>
+        d=1e100.net; s=20230601; t=1762373990; x=1762978790;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uFgaH8SLJr+B2SQBY1Ucx/AZqiD6CEjxSo2nJurHPNE=;
+        b=raMtm+oDJ/N1RtS9grb84vw6bfAhu+2Aa7/DiULSD5PhlxdugioONa/nocEnSLwU2j
+         b+eB7SDEAj2lBXhN8m49JPcGA+GhDeX2mNkKrNUyl0EVWbRY+/h51NOjzNp4hy++P/Ap
+         uvgV1fwXA8eNNN19D6iz0v/0/a8ew565ahBvDiuXqy8gfUvno/aIvcXfFdCh5flOMDN8
+         UbrRnGCFm7+xDJc6Xtcj3uNdr7AZ/W8fBpLtL2wX7a3Smgc/LLyMdk+lMSrIjof1oi8D
+         WPHp1QcjDtwKeKuB3wc4KGmk+j0WiAZSfh6LxTmr2XHDnNNajnlznzul185OVxOZj0GA
+         MCoA==
+X-Forwarded-Encrypted: i=1; AJvYcCVs1F3lSjtsv/gH2DEbHQACObjPxE5qJAPgeamvBE+DShSOpq7AnREyH26a+fDGQhPfJJEbVtc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzh7qCiYUUp/vf2j2HjenGxC5CcQ6uD6uz4BDlskoKcFeQ1oOmo
+	6PdsoArHTB67aJu/DuZNAUn30o9WYX1SGrBNwgIHQn/Krt+g4OSYzUN9EZ9/YFRvatk=
+X-Gm-Gg: ASbGncvePmjyulGvf03vNIVh6VliZ4Anewfi66eiQP7szllMmQvZ/pm5TF1YpBIXBaF
+	qSwa9k4ggfoW4+ZlMVKrBCbOrWSMFNBLPSoSAl0i863iluTklH29PWN3/Rs2MbTVPQC2GIYT9jo
+	2e/5U+4xKyKF6uggGjmKf/j2wTA74jcpR4Ahgdp4yGUDm1WEP8SqUtNWPPgzm7a1y+xOYYkGAar
+	uH/6iOK1n3WqbHv4nN5kAHDlNcCZf7eeSpun/0kTMoUPCm8Ve/cjcXybOFzFFbW3VqUDIcd2cnB
+	n7yXZYNjtuv+rutATp1ed462bjUnAZBbDZLYJTd3u9a0Hzh39yq9BoGEiIdnHzjYMDDiCcrNNo/
+	e9Guj7PneSP1ikLVpjFEDOus0p4bWDRRUyzBEFhvWxPUWBjImNqQ177CXMYnbE2pQmN3lV5z9my
+	lSn7qtbxR8Uw+AYh8qLTaWdBrMkrmXNsW2ob8XrwunAwxDeZ1dYjYOZRxN
+X-Google-Smtp-Source: AGHT+IGgKmw/nwJvQk629sp1HZOWYMtdWrcQL22UwZFNStAjV9bJUZ6ouvI3RYH2/GTnd5dORzWjnw==
+X-Received: by 2002:a17:907:7f2a:b0:b3f:f6d:1d90 with SMTP id a640c23a62f3a-b7265156577mr380008366b.11.1762373990096;
+        Wed, 05 Nov 2025 12:19:50 -0800 (PST)
+Received: from cloudflare.com (79.184.211.13.ipv4.supernova.orange.pl. [79.184.211.13])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7289334288sm46065466b.15.2025.11.05.12.19.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Nov 2025 12:19:49 -0800 (PST)
+From: Jakub Sitnicki <jakub@cloudflare.com>
+Subject: [PATCH bpf-next v4 00/16] Make TC BPF helpers preserve skb
+ metadata
+Date: Wed, 05 Nov 2025 21:19:37 +0100
+Message-Id: <20251105-skb-meta-rx-path-v4-0-5ceb08a9b37b@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251105200801.178381-1-almasrymina@google.com>
-X-Mailer: git-send-email 2.51.2.1026.g39e6a42477-goog
-Message-ID: <20251105200801.178381-2-almasrymina@google.com>
-Subject: [PATCH net v1 2/2] gve: use max allowed ring size for ZC page_pools
-From: Mina Almasry <almasrymina@google.com>
-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Mina Almasry <almasrymina@google.com>, Joshua Washington <joshwash@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, ziweixiao@google.com, 
-	Vedant Mathur <vedantmathur@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAFqxC2kC/23NzWrDMBAE4FcJOneLfmK7yinvEXLYlVa1aGIby
+ TEOxu8e4UIpxMdhmG8WkTlFzuJ0WETiKebYdyUcPw7Ctdh9M0RfstBSV9JKA/mH4M4jQpphwLE
+ F4kqSQdVgsKLMhsQhzht5ETQE6HgexbU0bcxjn57b16S2/pfV9p2dFEjw3EiJDZJydHa3/uHDD
+ RN/uv6+iZP+U5RUe4ouSrBYfQXDVPt6VzH/FF3vKKYopnGOmchW3rwp67q+AMYjB81LAQAA
+X-Change-ID: 20250903-skb-meta-rx-path-be50b3a17af9
+To: bpf@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Stanislav Fomichev <sdf@fomichev.me>, Alexei Starovoitov <ast@kernel.org>, 
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
+ KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, Arthur Fabre <arthur@arthurfabre.com>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org, 
+ kernel-team@cloudflare.com
+X-Mailer: b4 0.15-dev-07fe9
 
-NCCL workloads with NCCL_P2P_PXN_LEVEL=2 or 1 are very slow with the
-current gve devmem tcp configuration.
+Changes in v4:
+- Fix copy-paste bug in check_metadata() test helper (AI review)
+- Add "out of scope" section (at the bottom)
+- Link to v3: https://lore.kernel.org/r/20251026-skb-meta-rx-path-v3-0-37cceebb95d3@cloudflare.com
 
-Root causing showed that this particular workload results in a very
-bursty pattern of devmem allocations and frees, exhausting the page_pool
-ring buffer. This results in sock_devmem_dontneed taking up to 5ms to
-free a batch of 128 netmems, as each free does not find an available
-entry in the pp->ring, and going all the way down to the (slow) gen_pool,
-and gve_alloc_buffer running into a burst of successive allocations
-which also don't find entries in the pp->ring (not dontneed'd yet,
-presumably), each allocation taking up to 100us, slowing down the napi
-poll loop.
+Changes in v3:
+- Use the already existing BPF_STREAM_STDERR const in tests (Martin)
+- Unclone skb head on bpf_dynptr_write to skb metadata (patch 3) (Martin)
+- Swap order of patches 1 & 2 to refer to skb_postpush_data_move() in docs
+- Mention in skb_data_move() docs how to move just the metadata
+- Note in pskb_expand_head() docs to move metadata after skb_push() (Jakub)
+- Link to v2: https://lore.kernel.org/r/20251019-skb-meta-rx-path-v2-0-f9a58f3eb6d6@cloudflare.com
 
-From there, the slowness of the napi poll loop results, I suspect,
-in the rx buffers not being processed in time, and packet drops
-detected by tcpdump. The total sum of all this badness results in this
-workload running at around 0.5 GB/s, when expected perf is around 12
-GB/s.
+Changes in v2:
+- Tweak WARN_ON_ONCE check in skb_data_move() (patch 2)
+- Convert all tests to verify skb metadata in BPF (patches 9-10)
+- Add test coverage for modified BPF helpers (patches 12-15)
+- Link to RFCv1: https://lore.kernel.org/r/20250929-skb-meta-rx-path-v1-0-de700a7ab1cb@cloudflare.com
 
-This entire behavior can be avoided by increasing the pp->ring size to the
-max allowed 16384. This makes the pp able to handle the bursty
-alloc/frees of this particular workload. AFACT there should be no
-negative side effect of arbitrarily increasing the pp->ring size in this
-manner for ZC configs - the memory is prealloced and pinned by the
-memory provider anyway.
+This patch set continues our work [1] to allow BPF programs and user-space
+applications to attach multiple bytes of metadata to packets via the
+XDP/skb metadata area.
 
-Tested by running AllToAll PXN=2 workload. Before:
+The focus of this patch set it to ensure that skb metadata remains intact
+when packets pass through a chain of TC BPF programs that call helpers
+which operate on skb head.
 
-Avg bus bandwidth    : 0.434191
+Currently, several helpers that either adjust the skb->data pointer or
+reallocate skb->head do not preserve metadata at its expected location,
+that is immediately in front of the MAC header. These are:
 
-After:
+- bpf_skb_adjust_room
+- bpf_skb_change_head
+- bpf_skb_change_proto
+- bpf_skb_change_tail
+- bpf_skb_vlan_pop
+- bpf_skb_vlan_push
 
-Avg bus bandwidth    : 12.5494
+In TC BPF context, metadata must be moved whenever skb->data changes to
+keep the skb->data_meta pointer valid. I don't see any way around
+it. Creative ideas how to avoid that would be very welcome.
 
-Note that there is more we can do to optimize this path, such as bulk
-netmem dontneeds, bulk netmem pp refills, and possibly taking a page
-from the iouring zcrx playbook and replacing the gen_pool with a simpler
-fixed-size array based allocator, but this seems sufficient to fix these
-critcal workloads.
+With that in mind, we can patch the helpers in at least two different ways:
 
-With thanks to Willem and Eric for helping root cause this,
+1. Integrate metadata move into header move
 
-Cc: ziweixiao@google.com
-Fixes: 62d7f40503bc ("gve: support unreadable netmem")
-Reported-by: Vedant Mathur <vedantmathur@google.com>
-Signed-off-by: Mina Almasry <almasrymina@google.com>
+   Replace the existing memmove, which follows skb_push/pull, with a helper
+   that moves both headers and metadata in a single call. This avoids an
+   extra memmove but reduces transparency.
+
+        skb_pull(skb, len);
+-       memmove(skb->data, skb->data - len, n);
++       skb_postpull_data_move(skb, len, n);
+        skb->mac_header += len;
+
+        skb_push(skb, len)
+-       memmove(skb->data, skb->data + len, n);
++       skb_postpush_data_move(skb, len, n);
+        skb->mac_header -= len;
+
+2. Move metadata separately
+
+   Add a dedicated metadata move after the header move. This is more
+   explicit but costs an additional memmove.
+
+        skb_pull(skb, len);
+        memmove(skb->data, skb->data - len, n);
++       skb_metadata_postpull_move(skb, len);
+        skb->mac_header += len;
+
+        skb_push(skb, len)
++       skb_metadata_postpush_move(skb, len);
+        memmove(skb->data, skb->data + len, n);
+        skb->mac_header -= len;
+
+This patch set implements option (1), expecting that "you can have just one
+memmove" will be the most obvious feedback, while readability is a,
+somewhat subjective, matter of taste, which I don't claim to have ;-)
+
+The structure of the patch set is as follows:
+
+- patches 1-4 prepare ground for safe-proofing the BPF helpers
+- patches 5-9 modify the BPF helpers to preserve skb metadata
+- patches 10-11 prepare ground for metadata tests with BPF helper calls
+- patches 12-16 adapt and expand tests to cover the made changes
+
+Out of scope for this series:
+- safe-proofing tunnel & tagging devices - VLAN, GRE, ...
+  (next in line, in development preview at [2])
+- metadata access after packet foward
+  (to do after Rx path - once metadata reliably reaches sk_filter)
+
+Thanks,
+-jkbs
+
+[1] https://lore.kernel.org/all/20250814-skb-metadata-thru-dynptr-v7-0-8a39e636e0fb@cloudflare.com/
+[2] https://github.com/jsitnicki/linux/commits/skb-meta/safeproof-netdevs/
+
 ---
- drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Jakub Sitnicki (16):
+      net: Helper to move packet data and metadata after skb_push/pull
+      net: Preserve metadata on pskb_expand_head
+      bpf: Unclone skb head on bpf_dynptr_write to skb metadata
+      vlan: Make vlan_remove_tag return nothing
+      bpf: Make bpf_skb_vlan_pop helper metadata-safe
+      bpf: Make bpf_skb_vlan_push helper metadata-safe
+      bpf: Make bpf_skb_adjust_room metadata-safe
+      bpf: Make bpf_skb_change_proto helper metadata-safe
+      bpf: Make bpf_skb_change_head helper metadata-safe
+      selftests/bpf: Verify skb metadata in BPF instead of userspace
+      selftests/bpf: Dump skb metadata on verification failure
+      selftests/bpf: Expect unclone to preserve skb metadata
+      selftests/bpf: Cover skb metadata access after vlan push/pop helper
+      selftests/bpf: Cover skb metadata access after bpf_skb_adjust_room
+      selftests/bpf: Cover skb metadata access after change_head/tail helper
+      selftests/bpf: Cover skb metadata access after bpf_skb_change_proto
 
-diff --git a/drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c b/drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c
-index 0e2b703c673a..f63ffdd3b3ba 100644
---- a/drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c
-+++ b/drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c
-@@ -8,6 +8,8 @@
- #include "gve.h"
- #include "gve_utils.h"
- 
-+#include "net/netdev_queues.h"
-+
- int gve_buf_ref_cnt(struct gve_rx_buf_state_dqo *bs)
- {
- 	return page_count(bs->page_info.page) - bs->page_info.pagecnt_bias;
-@@ -263,6 +265,8 @@ struct page_pool *gve_rx_create_page_pool(struct gve_priv *priv,
- 	if (priv->header_split_enabled) {
- 		pp.flags |= PP_FLAG_ALLOW_UNREADABLE_NETMEM;
- 		pp.queue_idx = rx->q_num;
-+		if  (netif_rxq_has_unreadable_mp(priv->dev, rx->q_num))
-+			pp.pool_size = PAGE_POOL_MAX_RING_SIZE;
- 	}
- 
- 	return page_pool_create(&pp);
--- 
-2.51.2.1026.g39e6a42477-goog
+ include/linux/filter.h                             |   9 +
+ include/linux/if_vlan.h                            |  13 +-
+ include/linux/skbuff.h                             |  75 ++++
+ kernel/bpf/helpers.c                               |   6 +-
+ net/core/filter.c                                  |  34 +-
+ net/core/skbuff.c                                  |   6 +-
+ .../bpf/prog_tests/xdp_context_test_run.c          | 129 ++++---
+ tools/testing/selftests/bpf/progs/test_xdp_meta.c  | 386 +++++++++++++++------
+ 8 files changed, 475 insertions(+), 183 deletions(-)
 
 
