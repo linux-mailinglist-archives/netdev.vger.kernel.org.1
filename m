@@ -1,275 +1,156 @@
-Return-Path: <netdev+bounces-235725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA47AC34383
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 08:26:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 464CAC3438C
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 08:27:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CF7264E9C8A
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 07:26:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9ACC4466CBC
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 07:26:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E2032D061B;
-	Wed,  5 Nov 2025 07:26:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 349232D24A6;
+	Wed,  5 Nov 2025 07:26:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="em+FEdip"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IQhh/5Qe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4227C19A2A3
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 07:26:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762327586; cv=fail; b=RRU+WYbrmeyH8Nz+ehhs5VsJZyhoCFErIC3hCmtTXjxQioq9osBrLvVkHS1mkIHEiFZ+eL28eDqefKpvxNg16wZtskAa2g1f/m+r4VVFeXn4syRuWaY6hLwBN7fwilz99gp12bBv9VrTZa0rsNeIivsVAL/3sOkI3xf4boy8ue8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762327586; c=relaxed/simple;
-	bh=LLcy6DSSlaMed4bGlI6IW/momtifrOQqFMGDlmujHp4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=QsnrPmTG2kfFGqws7oP1BBiNkAp7xb6srzuGJ1blDWrrOe8x135euYcSBxTgvGe1vI0w/oHKDuTJmqYLM8/2QfLB9UqUNX4KPwYTpVrYjP5Qw+elqQ9cvqAMpAxL82cgIPW2fjwIr7YpTWhlHHNeCg/CHBzzNpqprRDVv9j9Hp8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=em+FEdip; arc=fail smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762327584; x=1793863584;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=LLcy6DSSlaMed4bGlI6IW/momtifrOQqFMGDlmujHp4=;
-  b=em+FEdip7MiEoTBfr4mmQ8c/94JenYG+voT4T1zX1eltrgaTH//KO2z4
-   oAPwxuuY6/N+Dg9TL4KawZmXPU9YVY6XiZydW7uincJd9OxBqHrKdY8ua
-   cjVhGz0Hh89DSAsS3ycD8AMUXfM8Zmh6io62QQ/r240VYQ/e3R3avYD3t
-   bLha7m94dSa8A/uGNi1iNnxbsfZ8GxOf7LAk3t3aO7nuutmo5P4ZwRk3I
-   q2dlVYTcpcDh+rStkbWGI8mhcFd4WjgzVC3lSz45oyx1LoBUWLoWCW79k
-   yDeTwo9BT8xUB1qsx/NX3vCzOtaJtWvxVsp8PVGS5ACdKT0/M1MY4PQzc
-   g==;
-X-CSE-ConnectionGUID: d5YSuhATQtqLNCtflAV75g==
-X-CSE-MsgGUID: Aj+iSLkkQhuPttEnFwzbyQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11603"; a="75114488"
-X-IronPort-AV: E=Sophos;i="6.19,281,1754982000"; 
-   d="scan'208";a="75114488"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2025 23:26:23 -0800
-X-CSE-ConnectionGUID: 03jbxCWwQtSRxxN/jqQvKQ==
-X-CSE-MsgGUID: 26Po/dJXQVKSm4HiviEDRw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,281,1754982000"; 
-   d="scan'208";a="210865137"
-Received: from fmsmsx903.amr.corp.intel.com ([10.18.126.92])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2025 23:26:23 -0800
-Received: from FMSMSX901.amr.corp.intel.com (10.18.126.90) by
- fmsmsx903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Tue, 4 Nov 2025 23:26:22 -0800
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Tue, 4 Nov 2025 23:26:22 -0800
-Received: from SN4PR0501CU005.outbound.protection.outlook.com (40.93.194.31)
- by edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Tue, 4 Nov 2025 23:26:22 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DcC8GeqIWpoLNIAk4RUTarfiOCkGMzICSIW7gV3v+5uieozavqAn2j3X0m+Fv9ngecGWRhzD/glstb6NMbMUOyTWW2gxPdS9VQM6nzsUsJj18P34u4ooimSOzEDv36osb4BCrU0BWKx9GaOpbXkZrP8aMZrFU2uKyCqBNeODcIZK11xx61LFEijTwUaq39kxw3qFpE9dumLZFmB0wGU9luVbJv7IfLblsXOCYL9T02GyrfmBKGqEMYyHga7AsahEraHR2sNDE5Svpf0wgHsPiyPzMc4SOgYZuEz3sVVKscAXg43ThbRHVvYCO63KBIsehtfZSp1sI15tWEep34H+2Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mA1GpWfTeJ1qvpCtZolTkbOB0BsEbfN4x4nQVMQbhcY=;
- b=xNGD2dz141i3sZM6mjOVl0GqU5lNGDFlq78hrjkWkBl15a/bF+5uJwdONuUG45PZW5C6Xp5K7ybWsxirEwcgDqNCDrJ9lXOxvnFtvPteBEAYiJxIcRaJK/Qpe+LoZekwM7+NQd7n4hf8T1aK56Zcf6g1wNwp943wfsBJKw+TP3pw5mt58qqb650SR5tzwlhOwWOHGv9z4zbTCgt7JnU+/WoNei5lPbfSpyNpcBwkG6Uf30Pu1u5bDDl79Nn/0l2lWwC5779ZFfGPFIJe+lJar9WRSt1QvFlGXtqeLtbOLEl1T/AHzPHKLTGubpd2eko2wXzbhFS81wcegq1HSax5NQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
- by DS0PR11MB7631.namprd11.prod.outlook.com (2603:10b6:8:14e::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.16; Wed, 5 Nov
- 2025 07:26:15 +0000
-Received: from IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::395e:7a7f:e74c:5408]) by IA3PR11MB8986.namprd11.prod.outlook.com
- ([fe80::395e:7a7f:e74c:5408%3]) with mapi id 15.20.9298.006; Wed, 5 Nov 2025
- 07:26:15 +0000
-From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
-To: "Hay, Joshua A" <joshua.a.hay@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Hay, Joshua A"
-	<joshua.a.hay@intel.com>, "Lobakin, Aleksander"
-	<aleksander.lobakin@intel.com>, "Chittim, Madhu" <madhu.chittim@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-net] idpf: cap maximum Rx buffer
- size
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-net] idpf: cap maximum Rx buffer
- size
-Thread-Index: AQHcTQY/6aGXTuQgdEuUJdLr5Rzv+LTjsNWQ
-Date: Wed, 5 Nov 2025 07:26:15 +0000
-Message-ID: <IA3PR11MB8986D09A5D53F732819D68B5E5C5A@IA3PR11MB8986.namprd11.prod.outlook.com>
-References: <20251103212036.2788093-1-joshua.a.hay@intel.com>
-In-Reply-To: <20251103212036.2788093-1-joshua.a.hay@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|DS0PR11MB7631:EE_
-x-ms-office365-filtering-correlation-id: 7bb3beb4-001e-4dbf-949d-08de1c3c9aca
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700021|7053199007;
-x-microsoft-antispam-message-info: =?us-ascii?Q?gF4khWCuPJxqMEqFvCE+utb0vfzPERVLcCSBDAqLJWUDsJG8o39UsrNNBujd?=
- =?us-ascii?Q?3NknwlESKdBacsb67NJan8ZM2JMW84J0wO2cSy4rA4+/IDxeUEAb3F9YUyiz?=
- =?us-ascii?Q?IyxIgm+/BD4QTRjuTe6owd9Wxs/Z7uewLrHBC9ffAgA17IzuSVCXmOneoLqu?=
- =?us-ascii?Q?yHZ5Qszg4zap8mTXLLuBacNHsU9aOKgEyXUavm0b/PHynEnjWNimLc/CLFY8?=
- =?us-ascii?Q?5ng47oC68imovVsP0o8c/lgl/NAAkRPtj8DU1tgOZNCjKJztrKJFMKbfl7Z5?=
- =?us-ascii?Q?ScECjhrPAJiuAgs64bCqes99MkRnZnX6sbhIIs8YKR3Jle+5Y2q+FSBAbpp1?=
- =?us-ascii?Q?vFLbK0JStf85xLtbHszu6DwzJqmROKs7qNlVdJ+lHc0zGVYuOeDytgCAbL2B?=
- =?us-ascii?Q?tauZ5tJBoQ7kp4SAVRJa/6EJ1+zXDTr4JwEFUQnco5IIrupJgOSkR5GV+gav?=
- =?us-ascii?Q?uCuSMRhG//WmNw3LKeqovTBXR373wetrfYCMCGO9frPUJ/4RxiiF9696fPdT?=
- =?us-ascii?Q?cWNFQvUc9sQBKzD4I3EIoz9CCNORH8c56UP8n+P7TyPn6f729ZjVnR5a0fUy?=
- =?us-ascii?Q?WpnjgIIYxvOo49NhDx/fQbWbQfxXw85dnppmqeY6k97coTlQX1VRuFITQ4HA?=
- =?us-ascii?Q?qAgtWI2rCxFfvugBBav0bKPIhUjov+Zqrej4xckX0hPDqCllKzfXkyIm5e/J?=
- =?us-ascii?Q?+oz33tASSRIp7cLFnohshv+jVsWJ9LKyHimCdWDz1P0ytDjdzO1EvbVrB+iL?=
- =?us-ascii?Q?lhB+7VzsmvSJIIPboVK+Zdoyemgly+f37NiiHxyNm9S5DOptH6T75wSzv5dB?=
- =?us-ascii?Q?0QxpZwdFhnQsFvKeO/icXXczgTcrF9sVlfPOZ2ueQ+SxDgV7QdrzKjM3dJDk?=
- =?us-ascii?Q?McR7LUj8+Izkhlb9RRihNwZFzaxpqDRzVepn4Qe4cl6QFaQPv11cVv7ETKTi?=
- =?us-ascii?Q?G3yOf9lXMPqyW5G5O8mgQedj+UoYcXmxB4J0RANQXqQRHMEA4ZuZm+0LIFJi?=
- =?us-ascii?Q?kenPycsMV0IAOR6iuwAtGt3AFGPIg1mQmM7nCvZArLJdFxf4GPPn8B/+6wXP?=
- =?us-ascii?Q?kfXgdeODu4jbpCilE7NrG+oLFw0hVehmJ0WipUhJCiJCD0yGRmsC/ZozCScC?=
- =?us-ascii?Q?7aQTUluKuLp5xwYWKKMrhQuC7+WTaQ/4V0F6GtmaxnlQ6D5smhSMmTPZANaQ?=
- =?us-ascii?Q?rjAP6ZCvSDD9iZEzZPUdjYjkaPPaKvtaK/r4oY2FBQgNuGteal/fUbBiBaxz?=
- =?us-ascii?Q?Zmv8vv9MHq+6vklGufX9jtRfM6VQPAQa8somuPm1wEo57zw/l87JkO+ku7iV?=
- =?us-ascii?Q?RLvWKS7m7UL+aLJiW9/KqUoYbDNDNdtPmiBOMo5dhVo5GfhM+iVsIOYo7tU7?=
- =?us-ascii?Q?p0zjs7VTapAT2T5+r6V4/JXQxAXuNoQ3jXvQc5urnPiZpOT4qTWWoo9lPPdZ?=
- =?us-ascii?Q?GIstX/jaFdYFeUdO9pe6W950S3z0RtA8nHx2BwB5i80N21lvynLKDf5QlwWf?=
- =?us-ascii?Q?suX7x3QOYtAPXNkzpfDcFkQLVz2WqBY1jmpI?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700021)(7053199007);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?CUZaAXjw8rMELZdPM81j0iZtj1pVFn1STX3f6p22p/F0/opJyxjLDA0HL1aI?=
- =?us-ascii?Q?cH91Rf/vmJ287N6QDHh20cQB3sSnWB38pDgjQ+poWiCsXuxZYkv7RLDerWMT?=
- =?us-ascii?Q?cLTgIKeoyZheMKZ0CgMuanREi4vtzPuCwYoJ/FEHQy17PTkgo94PDk0EbO77?=
- =?us-ascii?Q?Vs/0Mvt0RjwJjfhxjLnbrHLYr0H/F3qLUD05QCGXth2w3HXv1MRSxiFhKvMO?=
- =?us-ascii?Q?MbL+tgdEeG/zsBd8lX0gEoeMA1qYBhLo7MtaHXVD1ukN8Y1pFTXNAPUtKGsD?=
- =?us-ascii?Q?r7dydiFtUHkEVARdp9NBzGvZ5OkraJ7h+Hrm1nD8U8JVDatQU70qYdojR6HW?=
- =?us-ascii?Q?/cxaReZNmOsuoPFBQCrpfWk0igRROblzBLmjvQNphA4s8q8LJzmCx/BMMuov?=
- =?us-ascii?Q?ec24xApsaLFJwlKhTiQTfDZYcHPjGg0HHuNnmZEKOGciuaF3sZvqktylergj?=
- =?us-ascii?Q?Vx1l/CCJhU5oZUbG2zt6eRxzrUegrw+mmluN8NXqy5Z/fvDXV0gmOniGE5Ql?=
- =?us-ascii?Q?7Yfhsz1VyH6JDbCoUY3V6apt/hOWHuLfpbVdVYmCX+c9weP+foTTH7w6T7+w?=
- =?us-ascii?Q?VpmHLzUzwZzNEJk0LTEOmHcL4AyRKta/dBpjYPcuJd4CRxj/59Sf1TOA8BfH?=
- =?us-ascii?Q?nWh0HmAPax1hvYMtuNbASR25ahLl8xYl6Iz0Iow7+v6tLB+JVjavazr8b3Zn?=
- =?us-ascii?Q?0dtR20CMQUNq2ATkG1SP+a0Jd+tjIfoSBChZiw5Df8NGy4logzoTdVD8+ixU?=
- =?us-ascii?Q?YknG4Jgyy3fWSfzwT+wRkoH8+LWG0iC+K3FktTqSM3bX8Z1tHBLvcFxZaJ33?=
- =?us-ascii?Q?3BxrY83kSAe4KH3k84+aV4YePyzn6fo9ORqtdFvRLc4Z6CmFn91+czksQVp2?=
- =?us-ascii?Q?zsGEJeTHVze65e7yWAdnfJfyyZCo0tBHtJ0G4JLRyRUQL4erqZwtD/lpmJrr?=
- =?us-ascii?Q?e25glenejqQYs7rYW0gATDFjTMsliHElk6wEbAespKPw2RwBpkDgzH+MNI+e?=
- =?us-ascii?Q?2cZeM5//uNlvFXZUDTup2XJvzxmVXTzyAHD0ZdjzPAHgMpw9QOdJ+gL75Xw1?=
- =?us-ascii?Q?H6l8GEZ9hjq3/oOXsHY8HLri3RmetyM5ZiFcC8U4Lwz/asQeRqBumClMQFYT?=
- =?us-ascii?Q?xoDVYTUOf9bEynp02zZbim8dIwXYk37sDxHgXs7E2AqPW7LWyKpx7PTJLaur?=
- =?us-ascii?Q?1gRvTd6uZ1BmsgrK+cFgByPNqTykq1OV+HsiXc7ouHmVPsw3CuWodJxM/iYK?=
- =?us-ascii?Q?uErhl1Z3qU4f/Sx8Sc59l1pj0zDm4D8HG8OjTI1+EWEj90m8rV5iHhSWuojE?=
- =?us-ascii?Q?B+dqy8s7Q8qc4wFBMsmhro0lCbWO3Duqqsz9ndiD4L4NmFW9ztAcyvVniSDW?=
- =?us-ascii?Q?rRL67gLo1BtVYc/qzcPi1CVGVeNNcbiQ5ISkFVl4ljf5hlzIQcf8fko9GPVC?=
- =?us-ascii?Q?+HEGMY6ZtBGHH4Mmd2kvUbqUln35B9Pu8AKlAmjlvJuTIic4t64/uX/iQvqg?=
- =?us-ascii?Q?3vsGXvTykRb3AALIfbNrUrrUoF5ppwnVhXsJgkhAaM1SvpeaGTeq6EvvI05q?=
- =?us-ascii?Q?J071ENPasyNnUQFlRrVOmr5MF8WUDcDaD7kEJvWIuRAL2Y7a2dxqyX6ggdoy?=
- =?us-ascii?Q?cg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BD292D2488
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 07:26:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762327598; cv=none; b=ak4r8x6pDat2uC6R0PyO4wxPLfWXDLZ9/RcaYxNx5R6lzhI+r2E6A7n2ksrVAjuhnoePGy27POFB5VcPE6fITqsF2EViqm7q78I8tiDXP1qHLT2bJz8yrL7ZMeWXF63kz/6gKsUSxi4zM1yO+MygVfE5lUNkIXHuT3Ev402pHmI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762327598; c=relaxed/simple;
+	bh=LdTnDSxNZBXjDx7hbd4YSkNL6Ic1axoqxA3e5rGwXRQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Nikb4BpBmoUW1D7KWmm6iIIk1D1b7UI5GWvZ+fl2iehoZhkJ2QWTV34pSCA5PsontIhV64I/1tjXXd1lfWgnagj94EIY4N4dBBq6o51xigeWAZkb1qwzzE+YWZKah3Od6OrJc9otqEZ7LWNNztaL1uMRDq3NjarsJg064aLGEGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IQhh/5Qe; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-292fd52d527so64904455ad.2
+        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 23:26:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762327596; x=1762932396; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VfyM/8vqHeCTzj3QmjEypBM8G6UG0t8t1e4R4RozbuE=;
+        b=IQhh/5QeCmghP/usLtothAW0ZH36W9P6wz9pbRjJpU6H40b3mZ8PeyFdPpMI/cvm8E
+         LuBls7jO++YGC0rLIRkWd8SX9JILbcsH4f6WzXnVGbdYvA2zEe0KHrP0lg+qCR2goMww
+         FCQIGLDDPjT42RsHEnRDRp4LBccECndEyt1bQecBBWDoBBaFFbnFvMx6xD0iJYeSMnXc
+         ropLgZAH8LJtsVDsSymrj9KSeyPCbkKJ9XqdJewPCA0gEGrdQ2XaXoFvbF6urpJPSxbR
+         +W09xFo+UoKVeK6qW601QIkkeOOZikzuzQ0O4Q8h8k5NaGWn1njf6VLjSyMqR77kK0B4
+         HXuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762327596; x=1762932396;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VfyM/8vqHeCTzj3QmjEypBM8G6UG0t8t1e4R4RozbuE=;
+        b=AKULeskxzYK9pCU5b1oRtAaMEPCIFk3ERhUhtwoLws8dsGFgWEcVMDQTUnnJ2k7RfZ
+         QvsjGDh1T2OSNnjnbzle+wPOG0jVDifOhNIKf2OmemDUpiDlJ4wmp7IaqTPtIRaKFt9y
+         xqVBo5pAZuUJ4uHGNxf/GjuS9689zmqbFbE6Xl6AIzA4uSCWQH2J8PqWQpPShM2ENa4L
+         tCVJDmgZ3PuBb0WHfdxmtE/EpHz8N+1M1CkuTgk6nn998LmCXo1QZKGH2n4pokRb2XKB
+         fcoAydeoM9uyOivXYbaE83bS7RPyBA3kDR5sfmxEY0aLDIHb7RcaXeU+hr9685m780sw
+         6jCQ==
+X-Gm-Message-State: AOJu0Yzsb5u0Z9c67oQSeYo3Mxy98jfAgREqnQOq00RVdGC+AvGSsGBN
+	YtsnV+lIbd/GCCiW8atZ7rf3UfQjMTJymL8Oc6dL+HbI1WEn+e5LECQIkT8HKZ1NWKY=
+X-Gm-Gg: ASbGncsAyq+sEpPQtdMoYCxKy4pw8qeoJ1h6/fBWJLNyN6rv7FyVpfwZHm/YayxObJS
+	1Kr6sh2FvrImmGW9jl+H3G1ISsaoEccKYAKvBab5SyDS2c10l1FFdDkucad/0aEom/7QgDNIUYA
+	I3xcyG5KFpk9112261Wcb4lrZXWCUwwzycnhRDL9y6XnwpZ40LDwwv6jOBa7MHjHrrH83IxLeV7
+	LbTwJd27NW3KDOwWI32O2NrI/Ee7X0uhNXKeDJX4q2Y1lNsFTxBGLQ6UHgR6gK+fdCYxXY3OXQQ
+	R3iN88utqNIiG/Hok3LeO25fxDMF90PC5Fi8L/5atZFfykgWnCftpVg/qnAn0L4IDlAILXwo3sM
+	OgiH07bp8g3Zex0N4Ta1pia11sUsWGiBhvtkXw0ELmjKbzQ49qMumltCgIRvxDaVSOma+8+TFBX
+	4UIwi0DF+i+ywXcDE=
+X-Google-Smtp-Source: AGHT+IEOMVkwWrIGuENRWKmUQBRQUqq7cCWrETYO7qxGemtZUKXL3uWNBldA5iIsvA0q+Q16MWP1oQ==
+X-Received: by 2002:a17:902:c401:b0:295:5668:2f1d with SMTP id d9443c01a7336-2962ada6455mr31522165ad.41.1762327595676;
+        Tue, 04 Nov 2025 23:26:35 -0800 (PST)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29601998671sm50365355ad.35.2025.11.04.23.26.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Nov 2025 23:26:35 -0800 (PST)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-kselftest@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Liang Li <liali@redhat.com>
+Subject: [PATCH net] bonding: fix NULL pointer dereference in actor_port_prio setting
+Date: Wed,  5 Nov 2025 07:26:20 +0000
+Message-ID: <20251105072620.164841-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7bb3beb4-001e-4dbf-949d-08de1c3c9aca
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Nov 2025 07:26:15.3362
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: PhyVtHe58qjxBhoqyZXE4V4uztNuKz7CCRK51SkDP3aLHLvb/KWZErE9zUePxQsiCylUuv/bWO59EKgIidlCmJ0I5mkqUEgV4cOFU442n2w=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7631
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+Liang reported an issue where setting a slave’s actor_port_prio to
+predefined values such as 0, 255, or 65535 would cause a system crash.
 
+The problem occurs because in bond_opt_parse(), when the provided value
+matches a predefined table entry, the function returns that table entry,
+which does not contain slave information. Later, in
+bond_option_actor_port_prio_set(), calling bond_slave_get_rtnl() leads
+to a NULL pointer dereference.
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
-> Of Joshua Hay
-> Sent: Monday, November 3, 2025 10:21 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: netdev@vger.kernel.org; Hay, Joshua A <joshua.a.hay@intel.com>;
-> Lobakin, Aleksander <aleksander.lobakin@intel.com>; Chittim, Madhu
-> <madhu.chittim@intel.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-net] idpf: cap maximum Rx buffer
-> size
->=20
-> The HW only supports a maximum Rx buffer size of 16K-128. On systems
-> using large pages, the libeth logic can configure the buffer size to
-> be larger than this. The upper bound is PAGE_SIZE while the lower
-> bound is MTU rounded up to the nearest power of 2. For example, ARM
-> systems with a 64K page size and an mtu of 9000 will set the Rx buffer
-> size to 16K, which will cause the config Rx queues message to fail.
->=20
-> Initialize the bufq/fill queue buf_len field to the maximum supported
-> size. This will trigger the libeth logic to cap the maximum Rx buffer
-> size by reducing the upper bound.
->=20
-> Fixes: 74d1412ac8f37 ("idpf: use libeth Rx buffer management for
-> payload buffer")
-> Signed-off-by: Joshua Hay <joshua.a.hay@intel.com>
-> Acked-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
-> ---
->  drivers/net/ethernet/intel/idpf/idpf_txrx.c | 8 +++++---
-> drivers/net/ethernet/intel/idpf/idpf_txrx.h | 1 +
->  2 files changed, 6 insertions(+), 3 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-> b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-> index 828f7c444d30..dcdd4fef1c7a 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-> +++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-> @@ -695,9 +695,10 @@ static int idpf_rx_buf_alloc_singleq(struct
-> idpf_rx_queue *rxq)  static int idpf_rx_bufs_init_singleq(struct
-> idpf_rx_queue *rxq)  {
->  	struct libeth_fq fq =3D {
-> -		.count	=3D rxq->desc_count,
-> -		.type	=3D LIBETH_FQE_MTU,
-> -		.nid	=3D idpf_q_vector_to_mem(rxq->q_vector),
-> +		.count		=3D rxq->desc_count,
-> +		.type		=3D LIBETH_FQE_MTU,
-> +		.buf_len	=3D IDPF_RX_MAX_BUF_SZ,
-> +		.nid		=3D idpf_q_vector_to_mem(rxq->q_vector),
->  	};
->  	int ret;
->=20
-> @@ -754,6 +755,7 @@ static int idpf_rx_bufs_init(struct idpf_buf_queue
-> *bufq,
->  		.truesize	=3D bufq->truesize,
->  		.count		=3D bufq->desc_count,
->  		.type		=3D type,
-> +		.buf_len	=3D IDPF_RX_MAX_BUF_SZ,
->  		.hsplit		=3D idpf_queue_has(HSPLIT_EN, bufq),
->  		.xdp		=3D idpf_xdp_enabled(bufq->q_vector->vport),
->  		.nid		=3D idpf_q_vector_to_mem(bufq->q_vector),
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-> b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-> index 75b977094741..a1255099656f 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-> +++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.h
-> @@ -101,6 +101,7 @@ do {
-> 	\
->  		idx =3D 0;					\
->  } while (0)
->=20
-> +#define IDPF_RX_MAX_BUF_SZ			(16384 - 128)
->  #define IDPF_RX_BUF_STRIDE			32
->  #define IDPF_RX_BUF_POST_STRIDE			16
->  #define IDPF_LOW_WATERMARK			64
-> --
-> 2.39.2
+Since actor_port_prio is defined as a u16 and initialized to the default
+value of 255 in ad_initialize_port(), there is no need for the
+bond_actor_port_prio_tbl. Using the BOND_OPTFLAG_RAWVAL flag is sufficient.
 
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Fixes: 6b6dc81ee7e8 ("bonding: add support for per-port LACP actor priority")
+Reported-by: Liang Li <liali@redhat.com>
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+---
+
+BTW, the logic in bond_opt_parse() may also need an update after we have
+f2b3b28ce523 ("bonding: add slave_dev field for bond_opt_value"), as we
+may need range checking on slave options in future. But this should
+be another patch and not urgent as this one.
+
+---
+ drivers/net/bonding/bond_options.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
+
+diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
+index 495a87f2ea7c..384499c869b8 100644
+--- a/drivers/net/bonding/bond_options.c
++++ b/drivers/net/bonding/bond_options.c
+@@ -225,13 +225,6 @@ static const struct bond_opt_value bond_ad_actor_sys_prio_tbl[] = {
+ 	{ NULL,      -1,    0},
+ };
+ 
+-static const struct bond_opt_value bond_actor_port_prio_tbl[] = {
+-	{ "minval",  0,     BOND_VALFLAG_MIN},
+-	{ "maxval",  65535, BOND_VALFLAG_MAX},
+-	{ "default", 255,   BOND_VALFLAG_DEFAULT},
+-	{ NULL,      -1,    0},
+-};
+-
+ static const struct bond_opt_value bond_ad_user_port_key_tbl[] = {
+ 	{ "minval",  0,     BOND_VALFLAG_MIN | BOND_VALFLAG_DEFAULT},
+ 	{ "maxval",  1023,  BOND_VALFLAG_MAX},
+@@ -497,7 +490,7 @@ static const struct bond_option bond_opts[BOND_OPT_LAST] = {
+ 		.id = BOND_OPT_ACTOR_PORT_PRIO,
+ 		.name = "actor_port_prio",
+ 		.unsuppmodes = BOND_MODE_ALL_EX(BIT(BOND_MODE_8023AD)),
+-		.values = bond_actor_port_prio_tbl,
++		.flags = BOND_OPTFLAG_RAWVAL,
+ 		.set = bond_option_actor_port_prio_set,
+ 	},
+ 	[BOND_OPT_AD_ACTOR_SYSTEM] = {
+-- 
+2.50.1
+
 
