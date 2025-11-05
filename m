@@ -1,201 +1,300 @@
-Return-Path: <netdev+bounces-236057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69058C381B4
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 22:52:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92029C381FF
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 22:57:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC6D73AF835
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 21:47:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 509101A20163
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 21:57:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B4D12701CC;
-	Wed,  5 Nov 2025 21:47:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D97C2E7BA7;
+	Wed,  5 Nov 2025 21:56:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JhcXv6+U"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WDnzh0S2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA81D1FDA89;
-	Wed,  5 Nov 2025 21:47:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762379268; cv=none; b=kFbApWZ4WvMtXQ06G+ZTlEUTsJAgV9Pl+HX3ZQ6dg3uTZ3ClGTUH4WnXg9S3kKldn3iBPaTgEZJKq9PLaCgHqRAUFBy0y+W9s6hlTlWSYRqeGOoE8Qpn1OvOlkgsxxFoB7K6vHHNS0chzIzEw1bcF0TGk+kGKMmQ5n9gyWuaLoU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762379268; c=relaxed/simple;
-	bh=5xzsc/7T1gL0sCj7nOJv8DaIl+OnW9UaT5raFEotIik=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C9K0yNVyzugA/ZHWjm7dsy6UhmfEsyGWfJ8gAdsbHJcjxFCuUwavL/tZAZJzScCeUbGjFlkSlXRuIdJ/pvQ/vYmtExNWQ555qUasgdgGOFrjjotvkjleRhXtGJG1QL+BXJ+RM6lvnSJFYBcWdEeIeLqKLPirAnBnFILriSwm1YM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JhcXv6+U; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 977DA2E7623;
+	Wed,  5 Nov 2025 21:56:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762379817; cv=fail; b=HFbFkGP/uDig926rrGiAI8n5erYyEQyYWiPQGRt9DClggK9V200rd5AvGNC0lE4rfinocO/EJdrRJXxXwLbZ3+GWIuKpiyWuCZZ9p5zByj/6QJ9ydz+0EDENXfmjKh1sFE+hgp0FqJ1EyqFljONMcf5gkQO1lXhhIwb2bKwoDuU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762379817; c=relaxed/simple;
+	bh=s3nrr4Y5hfjAP9kyytY4MoGTlKzkvzhSz4k+AmprkWo=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=aC8s9juKwuEaZpLnlP3/WKQgi00tb3LexQE9hXTmxPZ7/avfAVp4khrcASfRHhUmYDah2wMtcpfBW++lxYseMF8nRfn3hoIp1ZZootm84Yz/KBWGg0SGaXIYXmD1G0Jl19Rwy69GH98LnqyGhmKIlnIpyDT/VmUyrY9BS94VLZE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WDnzh0S2; arc=fail smtp.client-ip=192.198.163.17
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762379266; x=1793915266;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=5xzsc/7T1gL0sCj7nOJv8DaIl+OnW9UaT5raFEotIik=;
-  b=JhcXv6+UssnO/P8ehWbJ3Xmof2zpuyaxXJOHMs2NVRWjT2ocCtKAErp+
-   8Lk5rx6GnPSFhLu5sFhOoRC27fZcvkOi3R7y94vJEsnhAhd/PjhkRjl+x
-   dWDc7CV0LCIED+ENdBb96mvUbm4hb+BGb6nFkFIeb+VHKXIt3UMWOrrsb
-   XfPUIli5FJlWejvsREptMCYNg/V7FrGDcABjHahG1CYMDqu1IOTpAqnDm
-   Qi3rRwFT8rmE2ViYTlv1X4jyab33LsZjegj0e8iex4jfjNBViUfqHCFPP
-   +WXwifhZp2ajnJAS8qi47ycRGUqpeL/Inubr2Wd4bHI/W8YkqsJSDBIvE
-   g==;
-X-CSE-ConnectionGUID: mnj/kTeaSjibFHm/P8dmwA==
-X-CSE-MsgGUID: Xezk5A2sR7mO0eOqmWKo1A==
-X-IronPort-AV: E=McAfee;i="6800,10657,11604"; a="75956035"
+  t=1762379815; x=1793915815;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:mime-version;
+  bh=s3nrr4Y5hfjAP9kyytY4MoGTlKzkvzhSz4k+AmprkWo=;
+  b=WDnzh0S2/lHtvGI+LmdcNFFDoA/xZYZCcNgmXMsnmza9985Vw/BeTl2u
+   zSxiQHfFTE5ofadQWlfrSepmHQYblM8l/QSk80MJfGoGscyDrhpdTik+s
+   nBl1Ql8YSx3Ksi76l4mOLYbwpOQIkQVG2aroaCtGaSdH5o7L2jokoiNP3
+   4g+ZFXuiK+C46Hv8KULQUcb2wOOG/2LVSIVWUXOM1m622JcOvdGN0k9z9
+   LV1FWBmJ9BbQliqI0BGGQuv7v89EDgiBx4B7iLTjrWMO3mZSGRC7B3fpW
+   Gwor2NkAQ98neYsjR/yvlFL4LZEeMrkb6jtu8fxXSb+wRGmPfdMppwGMI
+   A==;
+X-CSE-ConnectionGUID: zIQwMjWhReqe13duxRMIBw==
+X-CSE-MsgGUID: DcFY7ma9TXmmSbgci+ApuQ==
+X-IronPort-AV: E=McAfee;i="6800,10657,11604"; a="64422293"
 X-IronPort-AV: E=Sophos;i="6.19,282,1754982000"; 
-   d="scan'208";a="75956035"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2025 13:47:46 -0800
-X-CSE-ConnectionGUID: 7giLDUKZQjShi4WYLTI2Tw==
-X-CSE-MsgGUID: lJP7Z8i6Qzydv1uaesmqjw==
+   d="asc'?scan'208";a="64422293"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2025 13:55:37 -0800
+X-CSE-ConnectionGUID: L8O3OKI6TP6MIegO4Ti1wg==
+X-CSE-MsgGUID: RjTaSHcgSKe8a5gNj2+T9w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,282,1754982000"; 
-   d="scan'208";a="191859112"
-Received: from lkp-server02.sh.intel.com (HELO 66d7546c76b2) ([10.239.97.151])
-  by fmviesa005.fm.intel.com with ESMTP; 05 Nov 2025 13:47:38 -0800
-Received: from kbuild by 66d7546c76b2 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1vGlLX-000TA8-1m;
-	Wed, 05 Nov 2025 21:47:20 +0000
-Date: Thu, 6 Nov 2025 05:47:03 +0800
-From: kernel test robot <lkp@intel.com>
-To: Alexandre Courbot <acourbot@nvidia.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>,
-	Danilo Krummrich <dakr@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Alice Ryhl <aliceryhl@google.com>, David Airlie <airlied@gmail.com>,
-	Simona Vetter <simona@ffwll.ch>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Miguel Ojeda <ojeda@kernel.org>,
-	Alex Gaynor <alex.gaynor@gmail.com>,
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>,
-	=?iso-8859-1?Q?Bj=F6rn?= Roy Baron <bjorn3_gh@protonmail.com>,
-	Benno Lossin <lossin@kernel.org>,
-	Andreas Hindborg <a.hindborg@kernel.org>,
-	Trevor Gross <tmgross@umich.edu>,
-	FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	nouveau@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-	rust-for-linux@vger.kernel.org,
-	Alexandre Courbot <acourbot@nvidia.com>
-Subject: Re: [PATCH v2 1/3] firmware_loader: make RUST_FW_LOADER_ABSTRACTIONS
- select FW_LOADER
-Message-ID: <202511060527.knZk5HZP-lkp@intel.com>
-References: <20251105-b4-select-rust-fw-v2-1-156d9014ed3b@nvidia.com>
+   d="asc'?scan'208";a="211048005"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2025 13:55:34 -0800
+Received: from ORSMSX903.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Wed, 5 Nov 2025 13:55:33 -0800
+Received: from ORSEDG902.ED.cps.intel.com (10.7.248.12) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Wed, 5 Nov 2025 13:55:33 -0800
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (40.93.195.61)
+ by edgegateway.intel.com (134.134.137.112) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Wed, 5 Nov 2025 13:55:33 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=g2W22m/xV9k8/hZOZ6LDkOCbFw+Z6BazH71p0zMfJg+WF5Kt9n63YxnNkvRCHznE+KkTlWi9AHy49QVR3Lg04iqfrYdXK66+rRqDoGu8XoqoXz/A4okraiIFrkcuBdcdWjla2mdAZgHSAa6v7XPITygI/RNd0ILnqeUIpDPixZMySxlB2pRpUKeXQN3X36bvh3UuwKLEWtIWnuPqUeKIKzqu3ipCsYskkjPop4RV0ZztXeszj8SS3rU+gq3WHx0rQvHtSGJHOEEjiP1f5A79va6im4EffgdpeGQ9F02p7hUbv8g0HfKr6yBownv+UsgSInslPzhjX3WWVf/7L18ShA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+f3v9qs8mH9QmCUqiXaa85e7bMhbtZQs8T5+9SS3MSo=;
+ b=X9NqhNtj0Ykpyyhx5JpSgCW1jyCQIWBwU8QrSmV/K8365dBLxf3RmuAxtSnndAIcwsflRfxXUrvaCJma1kB/lhB/CmgtRp5lgq25zpBU+bfUR9G+xaeam9FEC+7WBIbBqC0TpKGA2DB4ZCpvwyJdw1EvWiT6jPTwMu4Qra2hAtoDXRWg2X2ZIudGW03lrIIKso2s60amP0klLV85i4TijX4XPu/QVP/FBUoH7uN3/YaHBECCH7JH1/5hg0BYzM83aHWFcKYm6tn8j092Cn1cfKSVkamFySoONNI5lKqPYZR/UjzfYLgbwy2LKWPuDmld+ZxHpL6PWYdf1YgBy9jd8Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by SJ1PR11MB6105.namprd11.prod.outlook.com (2603:10b6:a03:48c::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.7; Wed, 5 Nov
+ 2025 21:55:30 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3%3]) with mapi id 15.20.9275.015; Wed, 5 Nov 2025
+ 21:55:30 +0000
+Message-ID: <a5ddc43a-5354-4951-8691-1f3887743e3d@intel.com>
+Date: Wed, 5 Nov 2025 13:55:28 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] usb: rtl8150: Initialize buffers to fix KMSAN
+ uninit-value in rtl8150_open
+To: Dharanitharan R <dharanitharan725@gmail.com>, <netdev@vger.kernel.org>
+CC: <linux-usb@vger.kernel.org>, <gregkh@linuxfoundation.org>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <syzbot+b4d5d8faea6996fd@syzkaller.appspotmail.com>
+References: <20251105194705.2123-1-dharanitharan725@gmail.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+Autocrypt: addr=jacob.e.keller@intel.com; keydata=
+ xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
+ J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
+ qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
+ CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
+ UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
+ MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
+ apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
+ cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
+In-Reply-To: <20251105194705.2123-1-dharanitharan725@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="------------Si0enKNQUD1zjfq61YgWnnjd"
+X-ClientProxiedBy: MW4PR04CA0375.namprd04.prod.outlook.com
+ (2603:10b6:303:81::20) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251105-b4-select-rust-fw-v2-1-156d9014ed3b@nvidia.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|SJ1PR11MB6105:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4a29de45-972d-4057-b8a8-08de1cb6093a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?endnNnVMbEt3dTBmQ25BbFlxaEcrQ3pET3Z5b0EzQVg3eklGSEZjMjJwVUZX?=
+ =?utf-8?B?S3B3MnNtajk1Wk11Yko5NG9sYXM4dUNZdys4TUZVVDh1RzFCbU9VdU1hRCtD?=
+ =?utf-8?B?OHdjSW9EY3FBdjRsaDBZeUc4V1krYUxORi9PT3V6VFp2Q1cyR1kzQjZab2ZB?=
+ =?utf-8?B?cUlhM2tJL043MmR5cStVK0loOFViQnFCcHR1VDZuWkR1dG43bGFlOEg1b2lP?=
+ =?utf-8?B?VWdRYUsrcVFjbVRyRXc4ZWlDNWdWZC8wK3M3ZXErTmprUEhadVkwSDMra3h0?=
+ =?utf-8?B?TXJNOXRnK3FDK0ZEdVNnVmpna3lvR0VzLyttbFpwNlVQUnhNY0VRZUpyam5B?=
+ =?utf-8?B?TURqZWhJWmI0aUt5NzAzRDgxbUNnSXNnNVN2MjVSMFplYVVneFJ4WlRCZEtz?=
+ =?utf-8?B?dThlRUZReGVyQ2pDYlgyWXdJOVhJL1J5Yk8zcmo5bjc5djZiT1ZLaDR4cmJN?=
+ =?utf-8?B?ekR5VUdEWTlubW9Pa3FtS2pGQ1lkR3dTSjM3UjdyM095b1FvZHM3ZXlKRkpz?=
+ =?utf-8?B?VEFsTEVkaDVOOTVUcTVWbVozSTRCL2VrK00vU3p0MkdGYlpvQzRsRW5meTlj?=
+ =?utf-8?B?WXZpaG9mQUtjR25DM09mNFRlK1dJR2pGRVFQajVpaCs1eTdJL3psNjVMblJN?=
+ =?utf-8?B?eElyV3N6MWdUakEzbEhxRFdueG5wRnIwNnJmMjIvUHNpVnI0Ym1oSDJiclNl?=
+ =?utf-8?B?cnNIY0Vyb2MzQXRUU2ZtOTExd2wzbFFLUmFMZ05OOTJXS2c2elY2L201M2Mv?=
+ =?utf-8?B?QzJHTUYxMFR1b2dYbGtBRm04Zll3OXpmM3Y1UUZnT1pYQ1NXeW8vZFpWci96?=
+ =?utf-8?B?OFo2T1BtM2IrdWQ5dDRlOG90WXBBa1h2R3pXcFFVZDlWVm9PZGwrNEp6RTZX?=
+ =?utf-8?B?amlOL3FTVy9nSkpqSmlCdDh6cEhNOUtkZ3lNVlNzUXBLUFBhSHc3N0NpV0ky?=
+ =?utf-8?B?cjZoaXpiRW8yWCtPclRBWkd6M2t3L0wyMWdsNTFYVTVYT1F5K094WnpQRE9n?=
+ =?utf-8?B?R1ZPWE9UTWpRZ1A4aHk5YmRYckNYNXhrZkZ6dWJsWWtkeWNiNTdnTFpyOXdP?=
+ =?utf-8?B?TTI1ZU5UL2ZHa0JYVzh5SWM4cEx6Q0daUnk5RC85Y21sMHFYVFMwWE91Qmo4?=
+ =?utf-8?B?OEd0MTc1ZkFraWxpNGk2Q2pTb09acnNGQjF3MzVLRUpScGtBYW9yR3Z6UGlN?=
+ =?utf-8?B?ejFxcEUvQ3N2QlBBRUR6UjFUMEl3c1I3RDNCOUFRS25VaURtS242QmxiTGxo?=
+ =?utf-8?B?UzZsbHRUU3N0U0ozQzlxZUxJWU5TZjgweFY0ZDA4Rm9ZSlMwWDlTdFc3S1NO?=
+ =?utf-8?B?ODVMNllGY2FNMVRsMnMrVnphaHJneExQNldJUUZMempMakdsbFdNajhULzFN?=
+ =?utf-8?B?Mndma0gyeUZiK2swZVdpZllvU0QzdTNyb3hBb1prNXZzYkVjeHYvbzFXTC9i?=
+ =?utf-8?B?djdEWHlNQTA3YkhsMU5BY0R1aGtDNjN1cU0vS003YzN1aWNJeUNibnJzLzB3?=
+ =?utf-8?B?Tm5Hc0NES1hma1dQeWZUSnhQWHB5VGhIbU1EWHNJZXdkaDA1VG9qcldxWlVX?=
+ =?utf-8?B?RzVTTFNnWjg1T0txTFVwOXBVbUplYWoyU1QzU1UrVXhnc3laa2ZpbkxwUU9n?=
+ =?utf-8?B?RHZNSWs1NWcrQ0lBU3hxYnJZb1ZEaUI4SndjL29RRFZVOXVqOE1NOUxMM3Rt?=
+ =?utf-8?B?Qmt4YnNkWEs3dm9WZ004NGVRbGxWWXVZSFRGUXRaeTVrcDdvOFBzZFJMd2h2?=
+ =?utf-8?B?MEpOUGVhdDJvNG4wOHR2WUlsUjE5dXVyWXZkeGdxNFc3TlBDbnN4RG9KYnln?=
+ =?utf-8?B?anBSanViU2h3QnVkRDhYMlQ2c0xRUEFEWmxCM1lRWGZOQ1hhOXlTTjhEZDVp?=
+ =?utf-8?B?eFhUakRxVFpsdVBjQmNVQzZKZkZMaGZXVUJFclhGM1ByS0lFcG03Q3hDTEYr?=
+ =?utf-8?Q?VZgcjtdPrf5TBtAaPRUEUQFYVtHhY3lW?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QzFhdEhnODA1UElGWHFzWG4yd1NITTJ0SC9hZDBOVFVMRys0TnllZURLeFFo?=
+ =?utf-8?B?cnlMVnc2WGVZSk9NVlRkb2VXZnRKSVdpLy9tR2dYaE50U1hmbW1vSGpZTzhi?=
+ =?utf-8?B?NlNRK1JqVm13dG9KOCsyVG5xV0xsRWo5Ui9Ga1VmMGpBcHMraFJCKzQ3MHYr?=
+ =?utf-8?B?SStnMVZ4djRIdDdYVmt4c21TdUtwUjhhMFRCM0tQK0doSzFrWWVLalNkNU1I?=
+ =?utf-8?B?b1ZBV083OCtaRTFtclhFNlNQMHdSTGs3WFoxSS9IdHllK2w5TitSRnpYYWRB?=
+ =?utf-8?B?VWJpdkc0TzF2WW93djdTaHpUeWx1LzM2bzBkc3dodTRnOW5CZXh0dGtEQWVq?=
+ =?utf-8?B?ZWhpY29PcU83eXBnNTlOMUlBdkt2YW5hbERFc3hmTUhJNXZhTTV5UGFaMW90?=
+ =?utf-8?B?UHF5bnFTb1p1b0krZjJYc0dLa2M2aisxeVgrU1V6M1lJdzBEOHM3czczSmdS?=
+ =?utf-8?B?SXl4dUNTM3hvYTgwZHhRNUtwZ0RXQy9aQW1DejlJam9xZXpRa21YeDZmcnRr?=
+ =?utf-8?B?TFdKY3hLRU9Ea3V5dUh4RWxPbEtqNW90aS9QKzJWZHkvSEtoRVFBYmJKdll5?=
+ =?utf-8?B?YVRRb0RWN2VFbm5BaDlMbTVhYkY1dzNrNE1zTTdHenBLY3ZidW80MEZyUlA2?=
+ =?utf-8?B?NVhXUytpNUVpUjNIVFMzOTgvV0pJYU1lRzBuZDF5M0JTcmNQdXNrQW1kVFJM?=
+ =?utf-8?B?aU50RldNeHZtQjQwU0tXZVlHdi9XdGZvZ0U1VGFuMUlkRkk4SkMrWmwwY3Rs?=
+ =?utf-8?B?aXN3SUErQWR5cFRxem9yaUNZZjlQOHpVMmFKT255SEZIRUhnTTZXSWNyUWk1?=
+ =?utf-8?B?My9WWTA0VnZFbXhnY3Vxb3UwMS9HaGkwSzhXditqTWt0OTMxd0MzakdibXV5?=
+ =?utf-8?B?aUxjZDlIRHBjajZXY1pGemJ2bzUrUHNEckp1R1R2M2N0ZUlQMTF6L0oxSDVB?=
+ =?utf-8?B?a3g1LzA0TWV1Q2hVOW8zQWRpdFNpc0RuUCtQT2p6ZUVqcWNYMGdPVUovQnJI?=
+ =?utf-8?B?R0RROGttVGVQWmtuc3d1d2hEM0NiKy9vdTBkdTV5NnRVOWRKN2VhVktwWlRL?=
+ =?utf-8?B?MEdnUFh0WTBJYkxBRzVsdmQwQ3kzV3d1ZUQ2QVJiYlY4OHpOQ2tXR3gwQ3d2?=
+ =?utf-8?B?SlRGMEdadmt3anorYUFCZ2dZRnJEOXdnall0V0gxSjNUbFhhRmRVeXJYNE9X?=
+ =?utf-8?B?cnJNd0VOTmcweDFDMEZ5dXY3SklJWkE0c3NrQ1lLckI1SnhtS1l4ZGFsRmVN?=
+ =?utf-8?B?T1Fpb1hnR0ZCRXpldkV1b2lORTFnMkpVMkpWZ0w3UDlDcU1jQk5GTTZQRHBj?=
+ =?utf-8?B?ek5FeDhzKzdTRUttYmtxOC9JTkx3RXB5Wmk0Mis4eDdkeTNkZlJUR1lPaVQv?=
+ =?utf-8?B?VmJ3SzU0bzlEdU54MlJ6QjRMTEwzUVI1ekpZZlR4bEkzUlNTVE8rZHN4Wkx4?=
+ =?utf-8?B?bllKQVUvb0xpcEU0YzdmQmRmbkpLc2R4bDdzOFlJNXB5K2QyV3VTVnZlbHpJ?=
+ =?utf-8?B?Q3hwaE5jSTgxSmhhZGZIVndWaERoUUcwVk5BSDN3QTlOcDRKbkcyS21CUjdK?=
+ =?utf-8?B?V3duRnZ4cmhaWFZuaWJDOUpZaHNQWCt1bElsbFcxOCtQYjlnejFJT0hwVzN3?=
+ =?utf-8?B?UXYyZkZpcG5rZEwyQ095eUFwbWZNdmdKSVZhbDFJUEZVcXBhK3lFSmczR0Y2?=
+ =?utf-8?B?YjF6d3hBazNFK1A4QVB2SHFzYUZKUG9nNURTb2NldjUwL0Z0Rm9uaHl0RUVZ?=
+ =?utf-8?B?STl5eXo2dDBYb25xSDZIZ3NvSjdTeGlwN2pzWG11VGEvd0s4dlpick9GMlJG?=
+ =?utf-8?B?YndpMlJWNCtwR1hMUWdYMnJweCtvdHd6aE1EQlA2cEpaZkU3RW9BWnpzZFpI?=
+ =?utf-8?B?YStuSzFMWEdya0daR0NlN2dySnUrdThqa1dHeU95U08xSnR5Q2N0dXZUcDgy?=
+ =?utf-8?B?eXFOSFVtekZoVjNTWSs2VzBGNkg0aU1PWXc2UW5tT1UyUWF5d2lEOG9rL1BO?=
+ =?utf-8?B?cXl2ajhlenJsZFVUSUJobzFlU1Yra3NIRTM3RDBISlF1QklKdzVqQWxyK3Aw?=
+ =?utf-8?B?bzAvRTdHSEpqcG53UVI0MUt3M1gyTHdZYk8xbldwWWhqekxaS2FUaUl4ZnhT?=
+ =?utf-8?B?dzJyd1Azd1VpYndQbi9nQUxJR2t1Mnp5WDZjSUZKcFE5dVg1b052Rko3aW5W?=
+ =?utf-8?B?WkE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4a29de45-972d-4057-b8a8-08de1cb6093a
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Nov 2025 21:55:29.9152
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Q1D9kzdVunIBNFO8LcPbRa0L5HI++XpIjQ0y9MvD9fmFHoxWXu3wvjf08yjdKocu9/jmH5M6Hs2Wt4AnlmQQjfC1ViJw5IjP8DWRj1KwVM0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR11MB6105
+X-OriginatorOrg: intel.com
 
-Hi Alexandre,
+--------------Si0enKNQUD1zjfq61YgWnnjd
+Content-Type: multipart/mixed; boundary="------------uUhamN01a45tpok7B0LgN4ux";
+ protected-headers="v1"
+Message-ID: <a5ddc43a-5354-4951-8691-1f3887743e3d@intel.com>
+Date: Wed, 5 Nov 2025 13:55:28 -0800
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] usb: rtl8150: Initialize buffers to fix KMSAN
+ uninit-value in rtl8150_open
+To: Dharanitharan R <dharanitharan725@gmail.com>, netdev@vger.kernel.org
+Cc: linux-usb@vger.kernel.org, gregkh@linuxfoundation.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, syzbot+b4d5d8faea6996fd@syzkaller.appspotmail.com
+References: <20251105194705.2123-1-dharanitharan725@gmail.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+Autocrypt: addr=jacob.e.keller@intel.com; keydata=
+ xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
+ J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
+ qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
+ CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
+ UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
+ MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
+ apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
+ cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
+In-Reply-To: <20251105194705.2123-1-dharanitharan725@gmail.com>
 
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on 6553a8f168fb7941ae73d39eccac64f3a2b9b399]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Alexandre-Courbot/firmware_loader-make-RUST_FW_LOADER_ABSTRACTIONS-select-FW_LOADER/20251105-160437
-base:   6553a8f168fb7941ae73d39eccac64f3a2b9b399
-patch link:    https://lore.kernel.org/r/20251105-b4-select-rust-fw-v2-1-156d9014ed3b%40nvidia.com
-patch subject: [PATCH v2 1/3] firmware_loader: make RUST_FW_LOADER_ABSTRACTIONS select FW_LOADER
-config: x86_64-kexec (attached as .config)
-compiler: clang version 20.1.8 (https://github.com/llvm/llvm-project 87f0227cb60147a26a1eeb4fb06e3b505e9c7261)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251106/202511060527.knZk5HZP-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202511060527.knZk5HZP-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
->> drivers/base/firmware_loader/Kconfig:41: syntax error
-   drivers/base/firmware_loader/Kconfig:41: invalid statement
-   drivers/base/firmware_loader/Kconfig:42: invalid statement
-   drivers/base/firmware_loader/Kconfig:43:warning: ignoring unsupported character '.'
-   drivers/base/firmware_loader/Kconfig:43: unknown statement "This"
-   make[3]: *** [scripts/kconfig/Makefile:85: oldconfig] Error 1
-   make[2]: *** [Makefile:742: oldconfig] Error 2
-   make[1]: *** [Makefile:248: __sub-make] Error 2
-   make[1]: Target 'oldconfig' not remade because of errors.
-   make: *** [Makefile:248: __sub-make] Error 2
-   make: Target 'oldconfig' not remade because of errors.
---
->> drivers/base/firmware_loader/Kconfig:41: syntax error
-   drivers/base/firmware_loader/Kconfig:41: invalid statement
-   drivers/base/firmware_loader/Kconfig:42: invalid statement
-   drivers/base/firmware_loader/Kconfig:43:warning: ignoring unsupported character '.'
-   drivers/base/firmware_loader/Kconfig:43: unknown statement "This"
-   make[3]: *** [scripts/kconfig/Makefile:85: olddefconfig] Error 1
-   make[2]: *** [Makefile:742: olddefconfig] Error 2
-   make[1]: *** [Makefile:248: __sub-make] Error 2
-   make[1]: Target 'olddefconfig' not remade because of errors.
-   make: *** [Makefile:248: __sub-make] Error 2
-   make: Target 'olddefconfig' not remade because of errors.
+--------------uUhamN01a45tpok7B0LgN4ux
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
 
-vim +41 drivers/base/firmware_loader/Kconfig
 
-     3	
-     4	config FW_LOADER
-     5		tristate "Firmware loading facility" if EXPERT
-     6		select CRYPTO_LIB_SHA256 if FW_LOADER_DEBUG
-     7		default y
-     8		help
-     9		  This enables the firmware loading facility in the kernel. The kernel
-    10		  will first look for built-in firmware, if it has any. Next, it will
-    11		  look for the requested firmware in a series of filesystem paths:
-    12	
-    13			o firmware_class path module parameter or kernel boot param
-    14			o /lib/firmware/updates/UTS_RELEASE
-    15			o /lib/firmware/updates
-    16			o /lib/firmware/UTS_RELEASE
-    17			o /lib/firmware
-    18	
-    19		  Enabling this feature only increases your kernel image by about
-    20		  828 bytes, enable this option unless you are certain you don't
-    21		  need firmware.
-    22	
-    23		  You typically want this built-in (=y) but you can also enable this
-    24		  as a module, in which case the firmware_class module will be built.
-    25		  You also want to be sure to enable this built-in if you are going to
-    26		  enable built-in firmware (CONFIG_EXTRA_FIRMWARE).
-    27	
-    28	config FW_LOADER_DEBUG
-    29		bool "Log filenames and checksums for loaded firmware"
-    30		depends on DYNAMIC_DEBUG
-    31		depends on FW_LOADER
-    32		default FW_LOADER
-    33		help
-    34		  Select this option to use dynamic debug to log firmware filenames and
-    35		  SHA256 checksums to the kernel log for each firmware file that is
-    36		  loaded.
-    37	
-    38	config RUST_FW_LOADER_ABSTRACTIONS
-    39		bool "Rust Firmware Loader abstractions"
-    40		depends on RUST
-  > 41		select FW_LOADER=y
-    42		help
-    43		  This enables the Rust abstractions for the firmware loader API.
-    44	
+On 11/5/2025 11:47 AM, Dharanitharan R wrote:
+> diff --git a/drivers/net/usb/rtl8150.c b/drivers/net/usb/rtl8150.c
+> index f1a868f0032e..a7116d03c3d3 100644
+> --- a/drivers/net/usb/rtl8150.c
+> +++ b/drivers/net/usb/rtl8150.c
+> @@ -735,33 +735,30 @@ static int rtl8150_open(struct net_device *netdev=
+)
+>  	rtl8150_t *dev =3D netdev_priv(netdev);
+>  	int res;
+> =20
+> -	if (dev->rx_skb =3D=3D NULL)
+> -		dev->rx_skb =3D pull_skb(dev);
+> -	if (!dev->rx_skb)
+> -		return -ENOMEM;
+> -
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+None of the changes in the diff make any sense, as you remove the only
+place where rx_skb is initialized in the first place.
+
+>  	set_registers(dev, IDR, 6, netdev->dev_addr);
+> =20
+>  	/* Fix: initialize memory before using it (KMSAN uninit-value) */
+>  	memset(dev->rx_skb->data, 0, RTL8150_MTU);
+>  	memset(dev->intr_buff, 0, INTBUFSIZE);
+> =20
+
+This isn't even in the current driver code, but its shown as part of the
+diff context. Based on your commit description this is probably what
+you're trying to insert? But its obviously not a properly formatted or
+generated patch. It reeks of being generated by a bad LLM.
+
+Please don't waste reviewers time with this kind of generated nonsense.
+
+--------------uUhamN01a45tpok7B0LgN4ux--
+
+--------------Si0enKNQUD1zjfq61YgWnnjd
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wnsEABYIACMWIQQgQFSp1zOQVirsQx5qll0+bw8o6AUCaQvH0AUDAAAAAAAKCRBqll0+bw8o6EeB
+AQCEFkfWNm8WXnT1TNjS9TH7rxQBkF+zMH1K8mcCBiEAAwEA5uobAYD9rti4eIUgs6A9Ekdv5kO+
+WPjcoe5dh99x8QA=
+=cBA1
+-----END PGP SIGNATURE-----
+
+--------------Si0enKNQUD1zjfq61YgWnnjd--
 
