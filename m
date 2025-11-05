@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-236026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F8EEC37E9D
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 22:14:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D588EC37F46
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 22:20:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 465564F780F
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 21:13:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C3123BD802
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 21:13:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CEE1359F85;
-	Wed,  5 Nov 2025 21:07:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23C8035A136;
+	Wed,  5 Nov 2025 21:07:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WsnSOrQR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZS3CmXmb"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3892735971B
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 21:07:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20622359F86
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 21:07:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762376839; cv=none; b=PwQ6rsKvU5wFp8F2LujeX4/uVCcDWoq7IFn9NMomXKwWyIjzd+AJEipgY3B17FK7klkgrb/zHjcyfPronffGqKXcJ94gOqO7P6XqbSkP/D5NKyLDLl0o/Wr1Z5SV2rJWKem1oB6SuRY8iIPrtmaRmq1l3vq4Y9IHumBZilc4S9Y=
+	t=1762376842; cv=none; b=Z+LYe43/SPz8plo7210w0pvAMCnOnpq/GNgJ2spLqLlb8B1zazcfbeUnugu320iDl6QrX7s4jRLvqHB6GcUGdeFyi1+W7v1i2DQaYBcYF4VE+fEd39b2NinRkjdjjvAe5XcU1IUqU4Qbyc57QgjHiEyJzN6fYDDc51VOtpFcqVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762376839; c=relaxed/simple;
-	bh=iqxIG0ZzVgcJVaH4z2Ckbzsoowt78usB4UinxMgSWn0=;
+	s=arc-20240116; t=1762376842; c=relaxed/simple;
+	bh=Z+iNgR7A3aqU394PqDxWa/II2wAO5hBF06V7ijjqcBA=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=s9QpB10kCp1Lz4acuCn/XAKiARcUNdNqzGyD4beEA9WoaXdMYxWZF6AiJvGHE0OTtjiLpX6La0Xo+sdV7wrdohwr0sSQvfHKJzlwWTo9Om98rWy244RsPVEbFOqDqN1bpZjye3Jlx2braYZSnM+YQ9K81y0hUF5rZwZl93RN5Qw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WsnSOrQR; arc=none smtp.client-ip=198.175.65.20
+	 In-Reply-To:To:Cc; b=kpa0K1JloRkM/RnhH+J4+psT9ovtKoWBdZ1YjGWPAxkQ3kofZVI/1PEQbGBkMHY95Dt32hjf1q+92WLntjBlde78dUZG+ZZ3DIMP0YQTggebIaRwSQEOTB02sI/xMmaiH3ZloOCIpHbLJ5ss71VKo2wh7dpTvcepIzb1KF80fHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZS3CmXmb; arc=none smtp.client-ip=198.175.65.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762376838; x=1793912838;
+  t=1762376840; x=1793912840;
   h=from:date:subject:mime-version:content-transfer-encoding:
    message-id:references:in-reply-to:to:cc;
-  bh=iqxIG0ZzVgcJVaH4z2Ckbzsoowt78usB4UinxMgSWn0=;
-  b=WsnSOrQRZIZ5s22Ghdm4/nA+baK3Y2hOaE/lQ/Bdzq/5Lz3fxypchHZq
-   daQPRIqdLC3mO+D2lZLYaXyrz5jWVADQK0fck/fvRGfMcIZCjfr9g6Sey
-   uqyMpuVgkGFevxcje6Xe6S30LJ+qHBsZbm4xOEXS6Y1kmUO9jZnL9une7
-   9zFY8NSQkXeO9WM/pOlvuOI5P7TrkIHx44AGifdzVcuRxQmZ2HlD8bL2D
-   Whub3BA0bGUpFXeY0Vkgn7NpR4G+TcOx/szWiBX5Zl2rV5fFLvSa8OCzS
-   ZeIP5ieNrq9Xu4qrry2UwE9KZzMjbQRWV8xxKd9B9IJX89fvg4j7q+exI
-   w==;
-X-CSE-ConnectionGUID: yyMgZL7hQ/aDZ+kKuEBuxA==
-X-CSE-MsgGUID: hVPEj8XKSvWu+voIyY8EoQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11604"; a="64201032"
+  bh=Z+iNgR7A3aqU394PqDxWa/II2wAO5hBF06V7ijjqcBA=;
+  b=ZS3CmXmb/eNj0H5WAazrn+jFvIWf+aSMOwrFDe3WEwq8cGnUTWtd+TbK
+   4URxeK/Wy97jGrBtJ9VOE+wxgLCaiEIa9nETAwC66yCCbTD1ECd59ogAz
+   yaSiu+m2ofWEyjq/Zd3Ru/jqpCP6AKE8SRKY2z8iF/w9AejTaRk8q5R2m
+   lMFJU16ebLe1tC0hCHvhxrnHsGCtpqnEy9TtkmOrFtPt/oxgYqqQWK3Xv
+   p8y43d5pvG2uTZUbrfi6SEySQuUuEhDz4KmVpYD9LcataQo9m/URjloEE
+   bLDFJ86IjMZS7HB1lqakQ6ha5AezNU39AeBaDgi//CShHCDewCQuxsMt7
+   A==;
+X-CSE-ConnectionGUID: nd0wCEOgQE2LpeKOwV9ZSg==
+X-CSE-MsgGUID: Bb3abgY6QdavIHxvpr2Qww==
+X-IronPort-AV: E=McAfee;i="6800,10657,11604"; a="64201033"
 X-IronPort-AV: E=Sophos;i="6.19,282,1754982000"; 
-   d="scan'208";a="64201032"
+   d="scan'208";a="64201033"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
   by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2025 13:07:13 -0800
-X-CSE-ConnectionGUID: qKtUDBLQRuqwpU1PgQolPA==
-X-CSE-MsgGUID: HM/ECcWmTxSV4sivYoZHIA==
+X-CSE-ConnectionGUID: 2f7MdbgkSIeXEOef7PsfPw==
+X-CSE-MsgGUID: zomOHQBsQxCqIqhkFeWWDg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,282,1754982000"; 
-   d="scan'208";a="187513290"
+   d="scan'208";a="187513293"
 Received: from orcnseosdtjek.jf.intel.com (HELO [10.166.28.90]) ([10.166.28.90])
   by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2025 13:07:13 -0800
 From: Jacob Keller <jacob.e.keller@intel.com>
-Date: Wed, 05 Nov 2025 13:06:36 -0800
-Subject: [PATCH iwl-next v2 4/9] ice: move prev_pkt from ice_txq_stats to
- ice_tx_ring
+Date: Wed, 05 Nov 2025 13:06:37 -0800
+Subject: [PATCH iwl-next v2 5/9] ice: pass pointer to
+ ice_fetch_u64_stats_per_ring
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,7 +70,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251105-jk-refactor-queue-stats-v2-4-8652557f9572@intel.com>
+Message-Id: <20251105-jk-refactor-queue-stats-v2-5-8652557f9572@intel.com>
 References: <20251105-jk-refactor-queue-stats-v2-0-8652557f9572@intel.com>
 In-Reply-To: <20251105-jk-refactor-queue-stats-v2-0-8652557f9572@intel.com>
 To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
@@ -78,97 +78,110 @@ To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
  Tony Nguyen <anthony.l.nguyen@intel.com>, 
  Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
- Jacob Keller <jacob.e.keller@intel.com>
+ Jacob Keller <jacob.e.keller@intel.com>, 
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 X-Mailer: b4 0.15-dev-f4b34
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3185;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3937;
  i=jacob.e.keller@intel.com; h=from:subject:message-id;
- bh=iqxIG0ZzVgcJVaH4z2Ckbzsoowt78usB4UinxMgSWn0=;
- b=owGbwMvMwCWWNS3WLp9f4wXjabUkhkzuPfW9PBIP+B9+8Vh1S8rTff+l9u8p5bzRxVnGcx/EJ
- rwy7j7WUcrCIMbFICumyKLgELLyuvGEMK03znIwc1iZQIYwcHEKwESW9TAyfHgicjAx4sKjos2x
- 4cps/9arf9ERj5zzbmEXj0U/T8HKAwz/VLh+Kq54+XRnWbuE618hmy6OJ548mxzeVxWZPfq1/9s
- 6VgA=
+ bh=Z+iNgR7A3aqU394PqDxWa/II2wAO5hBF06V7ijjqcBA=;
+ b=owGbwMvMwCWWNS3WLp9f4wXjabUkhkzuPfVZPdm/upUtvv759MZr45VX3NG6jM07eDhKq7I+X
+ r3/492rjlIWBjEuBlkxRRYFh5CV140nhGm9cZaDmcPKBDKEgYtTACbS+4bhf8iM60ofHKpZItq2
+ P9hvel7ZWGX/3I2uDvuntC47Uihz+grDb/aNYipsF7X6FVlSDP/VXFF+xLV9ToJMP7uFgnvz7kX
+ zOQA=
 X-Developer-Key: i=jacob.e.keller@intel.com; a=openpgp;
  fpr=204054A9D73390562AEC431E6A965D3E6F0F28E8
 
-The prev_pkt field in ice_txq_stats is used by ice_check_for_hung_subtask
-as a way to detect potential Tx hangs due to missed interrupts.
+The ice_fetch_u64_stats_per_ring function takes a pointer to the syncp from
+the ring stats to synchronize reading of the packet stats. It also takes a
+*copy* of the ice_q_stats fields instead of a pointer to the stats. This
+completely defeats the point of using the u64_stats API. We pass the stats
+by value, so they are static at the point of reading within the
+u64_stats_fetch_retry loop.
 
-The value is based on the packet count, but its an int and not really a
-"statistic". The value is signed so that we can use -1 as a "no work
-pending" value. A following change is going to refactor the stats to all
-use the u64_stat_t type and accessor functions. Leaving prev_pkt as the
-lone int feels a bit strange.
+Simplify the function to take a pointer to the ice_ring_stats instead of
+two separate parameters. Additionally, since we never call this outside of
+ice_main.c, make it a static function.
 
-Instead, move it out of ice_txq_stats and place it in the ice_tx_ring. We
-have 8 bytes still available in the 3rd cacheline, so this move saves a
-small amount of memory. It also shouldn't impact the Tx path heavily since
-its only accessed during initialization and the hang subtask.
-
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_txrx.h | 3 ++-
- drivers/net/ethernet/intel/ice/ice_main.c | 6 +++---
- drivers/net/ethernet/intel/ice/ice_txrx.c | 2 +-
- 3 files changed, 6 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/intel/ice/ice.h      |  3 ---
+ drivers/net/ethernet/intel/ice/ice_main.c | 24 +++++++++---------------
+ 2 files changed, 9 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.h b/drivers/net/ethernet/intel/ice/ice_txrx.h
-index 5350eb832ee5..f1fe1775baed 100644
---- a/drivers/net/ethernet/intel/ice/ice_txrx.h
-+++ b/drivers/net/ethernet/intel/ice/ice_txrx.h
-@@ -138,7 +138,6 @@ struct ice_txq_stats {
- 	u64 restart_q;
- 	u64 tx_busy;
- 	u64 tx_linearize;
--	int prev_pkt; /* negative if no pending Tx descriptors */
- };
- 
- struct ice_rxq_stats {
-@@ -354,6 +353,8 @@ struct ice_tx_ring {
- 
- 	u32 txq_teid;			/* Added Tx queue TEID */
- 
-+	int prev_pkt; /* negative if no pending Tx descriptors */
-+
- #define ICE_TX_FLAGS_RING_XDP		BIT(0)
- #define ICE_TX_FLAGS_RING_VLAN_L2TAG1	BIT(1)
- #define ICE_TX_FLAGS_RING_VLAN_L2TAG2	BIT(2)
+diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+index 147aaee192a7..5c01e886e83e 100644
+--- a/drivers/net/ethernet/intel/ice/ice.h
++++ b/drivers/net/ethernet/intel/ice/ice.h
+@@ -957,9 +957,6 @@ u16 ice_get_avail_rxq_count(struct ice_pf *pf);
+ int ice_vsi_recfg_qs(struct ice_vsi *vsi, int new_rx, int new_tx, bool locked);
+ void ice_update_vsi_stats(struct ice_vsi *vsi);
+ void ice_update_pf_stats(struct ice_pf *pf);
+-void
+-ice_fetch_u64_stats_per_ring(struct u64_stats_sync *syncp,
+-			     struct ice_q_stats stats, u64 *pkts, u64 *bytes);
+ int ice_up(struct ice_vsi *vsi);
+ int ice_down(struct ice_vsi *vsi);
+ int ice_down_up(struct ice_vsi *vsi);
 diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 645a2113e8aa..df5da7b4ec62 100644
+index df5da7b4ec62..5a3bcbb5f63c 100644
 --- a/drivers/net/ethernet/intel/ice/ice_main.c
 +++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -160,7 +160,7 @@ static void ice_check_for_hang_subtask(struct ice_pf *pf)
- 			 * pending work.
- 			 */
- 			packets = ring_stats->stats.pkts & INT_MAX;
--			if (ring_stats->tx_stats.prev_pkt == packets) {
-+			if (tx_ring->prev_pkt == packets) {
- 				/* Trigger sw interrupt to revive the queue */
- 				ice_trigger_sw_intr(hw, tx_ring->q_vector);
- 				continue;
-@@ -170,8 +170,8 @@ static void ice_check_for_hang_subtask(struct ice_pf *pf)
- 			 * to ice_get_tx_pending()
- 			 */
- 			smp_rmb();
--			ring_stats->tx_stats.prev_pkt =
--			    ice_get_tx_pending(tx_ring) ? packets : -1;
-+			tx_ring->prev_pkt =
-+				ice_get_tx_pending(tx_ring) ? packets : -1;
- 		}
- 	}
+@@ -6826,25 +6826,23 @@ int ice_up(struct ice_vsi *vsi)
+ 
+ /**
+  * ice_fetch_u64_stats_per_ring - get packets and bytes stats per ring
+- * @syncp: pointer to u64_stats_sync
+- * @stats: stats that pkts and bytes count will be taken from
++ * @stats: pointer to ring stats structure
+  * @pkts: packets stats counter
+  * @bytes: bytes stats counter
+  *
+  * This function fetches stats from the ring considering the atomic operations
+  * that needs to be performed to read u64 values in 32 bit machine.
+  */
+-void
+-ice_fetch_u64_stats_per_ring(struct u64_stats_sync *syncp,
+-			     struct ice_q_stats stats, u64 *pkts, u64 *bytes)
++static void ice_fetch_u64_stats_per_ring(struct ice_ring_stats *stats,
++					 u64 *pkts, u64 *bytes)
+ {
+ 	unsigned int start;
+ 
+ 	do {
+-		start = u64_stats_fetch_begin(syncp);
+-		*pkts = stats.pkts;
+-		*bytes = stats.bytes;
+-	} while (u64_stats_fetch_retry(syncp, start));
++		start = u64_stats_fetch_begin(&stats->syncp);
++		*pkts = stats->stats.pkts;
++		*bytes = stats->stats.bytes;
++	} while (u64_stats_fetch_retry(&stats->syncp, start));
  }
-diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
-index ad76768a4232..30073ed9ca99 100644
---- a/drivers/net/ethernet/intel/ice/ice_txrx.c
-+++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
-@@ -499,7 +499,7 @@ int ice_setup_tx_ring(struct ice_tx_ring *tx_ring)
  
- 	tx_ring->next_to_use = 0;
- 	tx_ring->next_to_clean = 0;
--	tx_ring->ring_stats->tx_stats.prev_pkt = -1;
-+	tx_ring->prev_pkt = -1;
- 	return 0;
+ /**
+@@ -6868,9 +6866,7 @@ ice_update_vsi_tx_ring_stats(struct ice_vsi *vsi,
+ 		ring = READ_ONCE(rings[i]);
+ 		if (!ring || !ring->ring_stats)
+ 			continue;
+-		ice_fetch_u64_stats_per_ring(&ring->ring_stats->syncp,
+-					     ring->ring_stats->stats, &pkts,
+-					     &bytes);
++		ice_fetch_u64_stats_per_ring(ring->ring_stats, &pkts, &bytes);
+ 		vsi_stats->tx_packets += pkts;
+ 		vsi_stats->tx_bytes += bytes;
+ 		vsi->tx_restart += ring->ring_stats->tx_stats.restart_q;
+@@ -6914,9 +6910,7 @@ static void ice_update_vsi_ring_stats(struct ice_vsi *vsi)
+ 		struct ice_ring_stats *ring_stats;
  
- err:
+ 		ring_stats = ring->ring_stats;
+-		ice_fetch_u64_stats_per_ring(&ring_stats->syncp,
+-					     ring_stats->stats, &pkts,
+-					     &bytes);
++		ice_fetch_u64_stats_per_ring(ring_stats, &pkts, &bytes);
+ 		vsi_stats->rx_packets += pkts;
+ 		vsi_stats->rx_bytes += bytes;
+ 		vsi->rx_buf_failed += ring_stats->rx_stats.alloc_buf_failed;
 
 -- 
 2.51.0.rc1.197.g6d975e95c9d7
