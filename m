@@ -1,108 +1,110 @@
-Return-Path: <netdev+bounces-235950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69BCEC37586
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 19:37:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EF8AC375B3
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 19:39:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5252F188F8BE
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 18:37:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25032188E5A7
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 18:40:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3CA02836AF;
-	Wed,  5 Nov 2025 18:35:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 263D82857F1;
+	Wed,  5 Nov 2025 18:39:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="DMWnxMtC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AzaObCME"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 459B1261B8C;
-	Wed,  5 Nov 2025 18:35:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F09352836B5;
+	Wed,  5 Nov 2025 18:39:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762367736; cv=none; b=Yj+aKM5BK5i+yHYIpzB4eMOg/cz+95AazhtbO7a4pH141CpCDegLiIwav8nziC+vEPJheLj/SjNvFT51RPpak2e+0Ee+2EHByhKQIoERwj/kmj2Zdq8oXFDlpWIlr0RqG4Rx4t+/VtprpAHjX/NoklPcrZOwzrDDUIZ9DefZNvA=
+	t=1762367993; cv=none; b=u2FvasBcr6ao1W5kpwxCaa2hszfDnTTkq8R0V1urVAMUKZ0p6wOY9zCpEfoixMk6DAjd2JbyYLMlyzYXSPOMelCtfI4YNvI9vzBob0oXxMRXVH+qZ35qgAiRzWE4f3+tfIY/V3FP8QbEnSDdxbeFkeNKg+3aXSlSsMT3+Wvh7pc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762367736; c=relaxed/simple;
-	bh=vHDCXTaIfWhkhZfvI9HtlKPpn/+0+WZlcUbjNDsPP74=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UFavwzltWhpbZJeXm7HEPzSsuMesb970nQiU0gGWUzw9cEIClF9PHchQr+0YdhX5uFL4d6XvwpBmkF2tb5tTUo+d1wk0hop9qpPnR3+19q+4G/YFMBFlRtO+EhU7qq3bTvszOy7c8Ny95EmCEIr9bLO0gvgpUFdW7mFJKhsyJcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=DMWnxMtC; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=gr+fuIZVMsvAB/4PFLwSP+MU9/cNRU8q+NVEIzxyzsc=; b=DMWnxMtCsq0D0tbGXds9Jlq92p
-	6kWZFYL/VDxkTLUcWlf5Sj2o2Bs/yoUqEZ863Xf8Vg7QITqHw2GD7+fZjG1g3z8NLUI9PgkTcaSdl
-	u/J07eG9/5iviqz9saqGsvvrvioG32NJgerH5vSyX7Hgc6SLnXgw0IuotSFLcYOym8PE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vGiLy-00D1wa-KD; Wed, 05 Nov 2025 19:35:30 +0100
-Date: Wed, 5 Nov 2025 19:35:30 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Cc: Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	linux-leds@vger.kernel.org, netdev@vger.kernel.org,
-	Pavel Machek <pavel@ucw.cz>, Dan Murphy <dmurphy@ti.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-	Jacek Anaszewski <jacek.anaszewski@gmail.com>,
-	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Subject: Re: [PATCH leds v2 00/10] Add support for offloading netdev trigger
- to HW + example implementation for Turris Omnia
-Message-ID: <7be43544-20fe-4471-9fe4-1c8f82ad56ef@lunn.ch>
-References: <CA+V-a8tW9tWw=-fFHXSvYPeipd8+ADUuQj7DGuKP-xwDrdAbyQ@mail.gmail.com>
- <7d510f5f-959c-49b7-afca-c02009898ef2@lunn.ch>
- <CA+V-a8ve0eKmBWuxGgVd_8uzy0mkBm=qDq2U8V7DpXhvHTFFww@mail.gmail.com>
- <87875554-1747-4b0e-9805-aed1a4c69a82@lunn.ch>
- <CA+V-a8vv=5yRDD-fRMohTiJ=8j-1Nq-Q7iU16Opoe0PywFb6Zg@mail.gmail.com>
- <bd95b778-a062-47b1-a386-e4561ef0c8cd@lunn.ch>
- <CA+V-a8uB2WxU74mhkZ3SCpcty4T10Y3MOAf-SkodLCkp-_-AGA@mail.gmail.com>
- <CA+V-a8snRfFrZeuJ7QSt==B5vWAyTpHzdNj0Jx6oz_aaozbGYQ@mail.gmail.com>
- <b7454a3f-fac8-4789-a3ef-baf341aea8f0@lunn.ch>
- <CA+V-a8v_1u2jGVRRKQCS7ZvvjKORrHjEBdTthjAF91LYEhvYYQ@mail.gmail.com>
+	s=arc-20240116; t=1762367993; c=relaxed/simple;
+	bh=7XDa5X5lmbUNgOnKU7PfOdgy4Ch0ycidqr0WWTqABIM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mSJbFXxdeEnDFa9yAqmm1YcasgtkJtm56oiTo8s4WBwG6WW7APOBsANWGJFmWg+4wn75W1jAuUqX8IpNSG3r9AbBNrHrt0G7xOshTeMMiVx9/1mF2yg3oZM1xJ3xVr4nnQs7mNPq4V04K9SZY79aG9obyKZv1W59we0m+xLdH+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AzaObCME; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FFFAC116B1;
+	Wed,  5 Nov 2025 18:39:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762367991;
+	bh=7XDa5X5lmbUNgOnKU7PfOdgy4Ch0ycidqr0WWTqABIM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=AzaObCMEOkPNWJblHA+XSNBv8eioXE7D8HzTI2sm196GLWUIiEcS91trLrbe8+TCw
+	 mmczy+qAGnYGNXI+E91lp6PYT05/h9ksu1TUPQ2WnXPXkukQBbar6P9/4pk3Hx8jcU
+	 sppIEtathxPvwGx0gbog6vaQYLXUvB/YTjXAR1ErNg8N1a66qdefkRZjUL268+4Wor
+	 i7xdIfCDfegfOAq4nbsR2zXmjnSmjp7uAJ7+9GKfMBfDv8oJiNkVySX/y7j6Q1DJ7W
+	 O56MmI771hr6UYprL0WYfRK++tM3cuVPl+P9FVqCgZkjp7UQLFtTaeHJma12GagMAH
+	 fF1XhXlwBjk3Q==
+Message-ID: <49edb9fa-56be-4853-aced-429f5b40b4be@kernel.org>
+Date: Wed, 5 Nov 2025 19:39:46 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+V-a8v_1u2jGVRRKQCS7ZvvjKORrHjEBdTthjAF91LYEhvYYQ@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 bpf 1/2] xdp: introduce xdp_convert_skb_to_buff()
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ netdev@vger.kernel.org, magnus.karlsson@intel.com,
+ aleksander.lobakin@intel.com, ilias.apalodimas@linaro.org, toke@redhat.com,
+ lorenzo@kernel.org, syzbot+ff145014d6b0ce64a173@syzkaller.appspotmail.com,
+ Ihor Solodrai <ihor.solodrai@linux.dev>, Octavian Purdila <tavip@google.com>
+References: <20251029221315.2694841-1-maciej.fijalkowski@intel.com>
+ <20251029221315.2694841-2-maciej.fijalkowski@intel.com>
+ <20251029165020.26b5dd90@kernel.org> <aQNWlB5UL+rK8ZE5@boxer>
+ <20251030082519.5db297f3@kernel.org> <aQPJCvBgR3d7lY+g@boxer>
+ <20251030190511.62575480@kernel.org> <aQSfgQ9+Jc8dkdhg@boxer>
+ <20251031114952.37d1cb1f@kernel.org> <aQidBn22H1UVxST5@boxer>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <aQidBn22H1UVxST5@boxer>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> # ls
-> brightness  device  device_name  full_duplex  half_duplex  interval
-> link  link_10  link_100  max_brightness  offloaded  power  rx  rx_err
-> subsystem  trigger  tx  tx_err  uevent
-> 
-> As per HW manual [0] we have,
-> 0: Combine enabled (link/activity, duplex/collision).
-> 1: Disable combination (link only, duplex only).
-> 
-> # Combine DISABLED (link + duplex only)
-> echo netdev > trigger
-> echo 1 > link
-> echo 1 > full_duplex  # or half_duplex
-> echo 0 > rx
-> echo 0 > tx
-> 
-> # Combine ENABLED (link + activity + duplex + collision)
-> echo netdev > trigger
-> echo 1 > link
-> echo 1 > rx
-> echo 1 > tx
-> 
-> So to Enable/Disable LEDx combine feature we just need to write as
-> above. Is my understanding correct?
 
-Yes. The PHY driver gets passed a bitmap of each features to
-enable. Looking that those bits you need to decide on the 4 bit LED
-mode value, and the combine bit. Or return -EOPNOTSUPP.
 
-	Andrew
+On 03/11/2025 13.16, Maciej Fijalkowski wrote:
+> On Fri, Oct 31, 2025 at 11:49:52AM -0700, Jakub Kicinski wrote:
+>> On Fri, 31 Oct 2025 12:37:37 +0100 Maciej Fijalkowski wrote:
+>>>>> would be fine for you? Plus AI reviewer has kicked me in the nuts on veth
+>>>>> patch so have to send v6 anyways.
+>>>>
+>>>> The veth side unfortunately needs more work than Mr Robot points out.
+>>>> For some reason veth tries to turn skb into an xdp_frame..
+>>>
+>>> That is beyond the scope of the fix that I started doing as you're
+>>> undermining overall XDP support in veth, IMHO.
+>>>
+>>> I can follow up on this on some undefined future but right now I will
+>>> have to switch to some other work.
+>>>
+>>> If you disagree and insist on addressing skb->xdp_frame in veth within
+>>> this patchset then I'm sorry but I will have to postpone my activities
+>>> here.
+>>
+>> Yeah, I understand. A lot of the skb<>XDP integration is a steaming
+>> pile IMO, as mentioned elsewhere. I'd like to keep the core clean
+>> tho, so if there's some corner cases in veth after your changes
+>> I'll live. But I'm worried that the bugs in veth will make you
+>> want to preserve the conditional in xdp_convert_skb_to_buff() :(
+> 
+> Probably the conditional would cover these corner cases, but I am not
+> insisting on it. skb_pp_cow_data() is called under certain circumstances
+> in veth but I have never seen a case on my side where it was skipped,
+> mostly because of headroom size being too small.
+
+This reminds me that we should change/increase veth
+net_device.needed_headroom when there is an XDP prog attached.
+As you said, today all SKB will basically get mem reallocated.
+
+--Jesper
 
