@@ -1,146 +1,175 @@
-Return-Path: <netdev+bounces-235832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE62FC36390
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 16:09:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E394C363D9
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 16:11:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90B201A205F6
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 15:08:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA321188D8E7
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 15:10:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9047032E6A6;
-	Wed,  5 Nov 2025 15:08:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81692328B7F;
+	Wed,  5 Nov 2025 15:09:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PeecVev+";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="E+VhSKs5"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="zLSVH+cp"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB062221578
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 15:08:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D51B630FC00
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 15:09:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762355288; cv=none; b=fwJP4jRl1RUR75c7CXETeO91PPuKuRLIqCx2Yc1fVqj60u5sw3HwEVAiY2K9SzAKpqzGidtPu9Z0bV1HQHcsdhzQQJBks9h2Y6WriLHIDs9y2tfS8vMk4oMVppkT32onOT+MiI8FBsMI5Kznsfws32xTraPpVTEkYxHoeUP8e4Q=
+	t=1762355390; cv=none; b=YT7KSJgSHVVbGZxCPfXrZooGOfYg+dhlzg+g4f8R639rGT5h18OfqXzhTuWplg5Mlj4kDQ9pYS+pr68RMepeo8n0XmPJ7V/jCLggOdzJHgpzVFI7xKtIqJ7RUG8ZWbWTN88v8NGCH/wkZbqDzg0U6BWS8wF4DBl5PlH+MVy94QQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762355288; c=relaxed/simple;
-	bh=zddzhOg8X1nKlNluFiKuPj0/7ElZvDoM9lEwBP40PIo=;
+	s=arc-20240116; t=1762355390; c=relaxed/simple;
+	bh=pkzDDAuu5FnbyLu1BGgHTr/rHEA+02rAzTZAHJGNYkA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=S8zyHle/WinF98LCPpSQ1vMZ7UQVnAY3yVQuACRWbPhu1K0eDdEFv2OLDtNEBzHTGtKq0K4b2d8lT7go+ju/9tqDoZ6k2jZv9H8uQcPp6X2WFFYAcdoB06MR5dRR3O5+pIcDLnVlWELpU5hJQNTNtgjxcufSESPkBtUm+rGCaDs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PeecVev+; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=E+VhSKs5; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762355285;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zddzhOg8X1nKlNluFiKuPj0/7ElZvDoM9lEwBP40PIo=;
-	b=PeecVev+3s9fakJdP3mprGvod2Kw5Qd0zUzoQD5ST0EAJX2kY/qNI/NRPS/6Mx48nXXcv6
-	Nur9n98KtT4mMzDyQjeZ/zo1AwFKn5sfR+fTuJVVl3VEwU2UQf5dQDrvsDTPIKv0s4UH8l
-	sNz8QcMACGVegVviN+ubmEbD2vkjl64=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-562-QrydOSp6PRmSkDF5R_5ECA-1; Wed, 05 Nov 2025 10:08:03 -0500
-X-MC-Unique: QrydOSp6PRmSkDF5R_5ECA-1
-X-Mimecast-MFC-AGG-ID: QrydOSp6PRmSkDF5R_5ECA_1762355282
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b7270cab7eeso59028166b.1
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 07:08:03 -0800 (PST)
+	 To:Cc:Content-Type; b=rTOZZq2XFFhI3kPh7mT2f0lWb1SAGWa5YXp2gPD4tb+uZ+86D84E1vYjO9j68tXpAhZtJYRI14IP+4wh9EshKfZiNqky3v//zBUFqPbOANVj/DJb3dZ2cA9wgs2Jrxyp14gkYn8lbK9X0anzDPwcPZmpzDUriTOzhCMru4yTpn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=zLSVH+cp; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-29555415c5fso58656365ad.1
+        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 07:09:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762355282; x=1762960082; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1762355388; x=1762960188; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zddzhOg8X1nKlNluFiKuPj0/7ElZvDoM9lEwBP40PIo=;
-        b=E+VhSKs5SJh45HFSv2dfh4byTipz3JBUuXq2cmafniGyY1LOU2Y/5Hfm2O+5q6xElQ
-         MpZ8hXEgAx+hKxFiItQqf2EPRWpLqZ/KDhWPjnBl8ShEqGkyqusem0EJx+Ke0SrKROPT
-         dZaVWrN/J+oxW+dDGB/UpEvjBQ9I+GeNZIaXON4wEsVEVUbrKCtkQtQPI4jcUhvXhGJw
-         eCCOSId/EcvAbpl5TEhLVby2jDhtpub7Xd49lH9pc4D8L7IUoIlmfaGgxU055bot6ltl
-         ybDsIFwnRZdgWIzVYuKp0Ve8jQqtAp1PqyFLnvrq7cbuGA7PsmemCOhyckjgsbERpVAK
-         TQYA==
+        bh=npKJdQ/SFEjnsTgPu5T82klgRkrk6WAaS5E6NxS8cDA=;
+        b=zLSVH+cpbs1qR5NQ2o43wKSdaOVaS1VtdhnlDEjIX8/9Ajn4HwN6wKHZ6uOD+ynKqZ
+         rFTmElrFEmRgMW7OSLqFBHrgnI69SzNmrJhkAGhTk0oAvDWfl0qh+tUGsuwqzgyBkk1K
+         ZcpqZR8ls6O0FkaofhQt0cj8b9sYOWUsgrneIQe/qf1DPZKkkkv0B3rg8U8WFEWifI1x
+         hQtLuePdI1a8F1YLaQvRLqy9XsOywtP5mPyY8V4Ecyd6yH8NzgRqa3V+PAdNEr4nJu1Q
+         2AEp8oyE79PeRWYxy5fkRCZTrIMGdso9ivrUurV5lg0tdWSZDNj8xia4WY0ZIc74/UVq
+         Xusw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762355282; x=1762960082;
+        d=1e100.net; s=20230601; t=1762355388; x=1762960188;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zddzhOg8X1nKlNluFiKuPj0/7ElZvDoM9lEwBP40PIo=;
-        b=jG1MBZYzQBurYN1ps2kvXM0EklWBhgrjjhW8Ds2Q8xzSlVXKrACaWG69ibBRLkZJ2I
-         WbTETjtYycMmr5x7Sis78HhMmFiohv7TgR9WPYhKKawa4AMOUMZ8eE97E6JGl/IQLbft
-         8Unt8KPW70fDduleZx1uR6YIIGOtIXth3BOwCT4zYZm1X26Hwho541UicrsqOEGhbpwF
-         /QoDoUXbLIx0hiH0aYxXhOhfUS3Hgz7vRS3pHZ4tv9GTIF1HJupMk0oPbwzmHyUF6eUT
-         bDnb5tn1PIIo601ZmYGb/6wYTsOfqLSFx+IMhM40/aGnEeHhCx6JjDdTTtlckrtYmyHQ
-         gjeg==
-X-Forwarded-Encrypted: i=1; AJvYcCV3395tht7OjXff5otIXX6dVil7Ui29W/CYIh8xtLYevG2yWLbz4mEDPuDvqROce4L9WkwMsK8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEtmaMMo2HlpndhJhiIH34Xaj6UFq/DazjdrxjgvOb35gPz1+d
-	bzYOiqrl+gSTLItweE4czVaVFdqY2h+OW8QaFumSe55PoNPFKqm+BIwZ5MZhyUnJyRWB6BK70o1
-	fxl3m37afluyfA0cxsscQw/iCx1nfM1pLHgDdePzs9WUm7S2z2RyM3R/JXfLH5zT3jo5ZS5+e4r
-	5GbMNCExgSR93anu+2uJ/JEa9YKflwq9xr
-X-Gm-Gg: ASbGncv4cHCao0u8iMJhYK3NC6QdOPoSbagOy2/9AWnyzuxHtO54Jmi5GxqiF6Vjy5L
-	16QmhYOLWAZ2ayr0fsdTgLIcp+BuEWTKptvv5YTuvsbKOp6e3vBv/VcRMoZESckjYIx5VS19bVG
-	0iMEcSOBpZrMEOKg7JOrnhjjnDWZ27npRIUyryLtQpDraF1b0aEk7jS8b1
-X-Received: by 2002:a17:906:9c83:b0:b70:b3e8:a35e with SMTP id a640c23a62f3a-b7265568be1mr330078766b.50.1762355282295;
-        Wed, 05 Nov 2025 07:08:02 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHVOQsjYVyVVrNvkq8akL5ZkGRlDA5wjcsUyQMOyzqYmrxUAS+dfw/oU0IlQDgyfAtyrlbYChyW3M7kMF0tLDI=
-X-Received: by 2002:a17:906:9c83:b0:b70:b3e8:a35e with SMTP id
- a640c23a62f3a-b7265568be1mr330075866b.50.1762355281900; Wed, 05 Nov 2025
- 07:08:01 -0800 (PST)
+        bh=npKJdQ/SFEjnsTgPu5T82klgRkrk6WAaS5E6NxS8cDA=;
+        b=mCSRC3lx1iROt0xeNoxv67L7L5NroFtyInrBQd6yNocSWyETK0LyqQSl9rP9QQEAEG
+         5Bo5l1fN2BNvGr+RkHXP+WNMujPnjnChNywM3WOiyOqW3O7mwWJfoQ8paj1er8+6rOQF
+         CSHnMhVGfQ+7iir8imgLfMUAUERVDtFUhE6F2D1scOx+JiZTyhK0/6Deb7R5lNdgjKRz
+         Rjow65ORgLjhgepdiQ4Z9zGD13OjX4cuQvX7SHirkLpW/VuLe4SfLSNDsdNpsEM/4FnB
+         Un4k8mLdr82u4FXp3RG2fsOuWN0Jcuwe7TmcwtaN2sGZgvLF+4cnYVfoPlZrORYdhCwL
+         dcXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW3h1pm4vp6vjfYDneliV2bNpsakGWkoXWwr3gD7yORz5zgGlSP9RKVqTEfrZcZTtv8TQLFg2o=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy0LAUy4tDHvzeXJ1ifmJd3gEG43meEGTyQVqsBVcpzKTKlM3U9
+	3u9wdMABMB43NMsl+sM6x4/USbSH8HxO+jB6Ppo2KBMNVtXFXclpsHQE55KQyTiIR4u+g6s4WuH
+	NA08md5dfTMjQMI+UIIvfmTG2QMK5mDuIFzE5toY4
+X-Gm-Gg: ASbGncs3+RV2lhe+X1TbCDsP+/gKX7QPY8gMVggu8DvXSGIxA8dwaIy0lyvbKfvbPX5
+	U9ZPiz0RHlBoH8pBoWPaP+/6QzQx2pnQWvt5rtgnQZy3xRNTJwy8ltUQTkWsHr0D48FBm8UyDq7
+	EgD/nPW8jTYUZCkvAy6c0lr+l7BdaEtbj44/c5ApjA5vmAbKg9+7xUd5oofep2W8YFEJHR83Nlw
+	Xt1j0VOZIaA4L+O2veoHWIwum3nu/AXedFZrCJnQ+PBnjHKBbIy5UjJ6WLkBkesE2G3iv5CQHu1
+	jR0KPn1rxvXjK9h7YQiqOWn6/GboLrpJIp0t
+X-Google-Smtp-Source: AGHT+IES6bIx3iRmi6TnNQThdacyfXUn2MC8E/Eb3foVxURjYD3jCFL4B2OtVSRN6RcZ3uuhcllKhvneK9OOZ9vCQ9U=
+X-Received: by 2002:a17:902:e943:b0:273:ab5f:a507 with SMTP id
+ d9443c01a7336-2962ad3b1a3mr50683155ad.21.1762355388147; Wed, 05 Nov 2025
+ 07:09:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251030144438.7582-1-minhquangbui99@gmail.com>
- <1762149401.6256416-7-xuanzhuo@linux.alibaba.com> <CAPpAL=x-fVOkm=D_OeVLjWwUKThM=1FQFQBZyyBOrH30TEyZdA@mail.gmail.com>
- <CAL+tcoAnhhDn=2qDCKXf3Xnz8VTDG0HOXW8x=GSdtHUe+qipvQ@mail.gmail.com>
-In-Reply-To: <CAL+tcoAnhhDn=2qDCKXf3Xnz8VTDG0HOXW8x=GSdtHUe+qipvQ@mail.gmail.com>
-From: Lei Yang <leiyang@redhat.com>
-Date: Wed, 5 Nov 2025 23:07:25 +0800
-X-Gm-Features: AWmQ_bn6PCV_WZmKEJ3xHMkBMOhvHDcRetwwHLmBCefOcZy0CYLo96d-gGmw7e8
-Message-ID: <CAPpAL=xDpqCT9M6AWHTfNuai=3ih-452sW4g43gduiw7TptToQ@mail.gmail.com>
-Subject: Re: [PATCH net v7] virtio-net: fix received length check in big packets
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: Bui Quang Minh <minhquangbui99@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Gavin Li <gavinl@nvidia.com>, Gavi Teitz <gavi@nvidia.com>, Parav Pandit <parav@nvidia.com>, 
-	virtualization@lists.linux.dev, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org, netdev@vger.kernel.org
+References: <aQoIygv-7h4m21SG@horms.kernel.org> <20251105100403.17786-1-vnranganath.20@gmail.com>
+ <aQtKFtETfGBOPpCV@horms.kernel.org>
+In-Reply-To: <aQtKFtETfGBOPpCV@horms.kernel.org>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Wed, 5 Nov 2025 10:09:37 -0500
+X-Gm-Features: AWmQ_blU6XcDEnFl20FbnBbH6b7zO2BsFs-Y_L7D1GiklwITbV2JeRK3k2GQLkI
+Message-ID: <CAM0EoMnvjitf-+YFt-qsFHXOnZ4gW3mnXBzMT_-Z6M_XSvWbhQ@mail.gmail.com>
+Subject: Re: [PATCH v2 0/2] net: sched: act_ife: initialize struct tc_ife to
+ fix KMSAN kernel-infoleak
+To: Simon Horman <horms@kernel.org>
+Cc: Ranganath V N <vnranganath.20@gmail.com>, davem@davemloft.net, 
+	david.hunter.linux@gmail.com, edumazet@google.com, jiri@resnulli.us, 
+	khalid@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, skhan@linuxfoundation.org, 
+	syzbot+0c85cae3350b7d486aee@syzkaller.appspotmail.com, 
+	xiyou.wangcong@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 5, 2025 at 8:19=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.co=
-m> wrote:
+On Wed, Nov 5, 2025 at 7:59=E2=80=AFAM Simon Horman <horms@kernel.org> wrot=
+e:
 >
-> Hi Lei,
->
-> On Wed, Nov 5, 2025 at 12:56=E2=80=AFAM Lei Yang <leiyang@redhat.com> wro=
-te:
+> On Wed, Nov 05, 2025 at 03:33:58PM +0530, Ranganath V N wrote:
+> > On 11/4/25 19:38, Simon Horman wrote:
+> > > On Sat, Nov 01, 2025 at 06:04:46PM +0530, Ranganath V N wrote:
+> > >> Fix a KMSAN kernel-infoleak detected  by the syzbot .
+> > >>
+> > >> [net?] KMSAN: kernel-infoleak in __skb_datagram_iter
+> > >>
+> > >> In tcf_ife_dump(), the variable 'opt' was partially initialized usin=
+g a
+> > >> designatied initializer. While the padding bytes are reamined
+> > >> uninitialized. nla_put() copies the entire structure into a
+> > >> netlink message, these uninitialized bytes leaked to userspace.
+> > >>
+> > >> Initialize the structure with memset before assigning its fields
+> > >> to ensure all members and padding are cleared prior to beign copied.
+> > >
+> > > Perhaps not important, but this seems to only describe patch 1/2.
+> > >
+> > >>
+> > >> Signed-off-by: Ranganath V N <vnranganath.20@gmail.com>
+> > >
+> > > Sorry for not looking more carefully at v1.
+> > >
+> > > The presence of this padding seems pretty subtle to me.
+> > > And while I agree that your change fixes the problem described.
+> > > I wonder if it would be better to make things more obvious
+> > > by adding a 2-byte pad member to the structures involved.
 > >
-> > Tested this patch with virtio-net regression tests, everything works fi=
-ne.
+> > Thanks for the input.
+> >
+> > One question =E2=80=94 even though adding a 2-byte `pad` field silences=
+ KMSAN,
+> > would that approach be reliable across all architectures?
+> > Since the actual amount and placement of padding can vary depending on
+> > structure alignment and compiler behavior, I=E2=80=99m wondering if thi=
+s would only
+> > silence the report on certain builds rather than fixing the root cause.
+> >
+> > The current memset-based initialization explicitly clears all bytes in =
+the
+> > structure (including any compiler-inserted padding), which seems safer =
+and
+> > more consistent across architectures.
+> >
+> > Also, adding a new member =E2=80=94 even a padding field =E2=80=94 coul=
+d potentially alter
+> > the structure size or layout as seen from user space. That might
+> > unintentionally affect existing user-space expectations.
+> >
+> > Do you think relying on a manual pad field is good enough?
 >
-Hi Jason
-
-> I saw you mentioned various tests on virtio_net multiple times. Could
-> you share your tools with me, I wonder? AFAIK, the stability of such
-> benchmarks is not usually static, so I'm interested.
-
-My test cases are based on an internal test framework, so I can not
-share it with you. Thank you for your understanding :). But I think I
-can share with you my usual test scenarios: ping, file transfer
-stress, netperf stress, migrate, hotplug/unplug as regression tests.
-
-Thanks
-Lei
+> I think these are the right questions to ask.
 >
-> Thanks,
-> Jason
+> My thinking is that structures will be padded to a multiple
+> of either 4 or 8 bytes, depending on the architecture.
 >
+> And my observation is that that the unpadded length of both of the struct=
+ures
+> in question are 22 bytes. And that on x86_64 they are padded to 24 bytes.
+> Which is divisible by both 4 and 8. So I assume this will be consistent
+> for all architectures. If so, I think this would address the questions yo=
+u
+> raised.
+>
+> I do, however, agree that your current memset-based approach is safer
+> in the sense that it carries a lower risk of breaking things because
+> it has fewer assumptions (that we have thought of so far).
 
++1
+My view is lets fix the immediate leak issue with the memset, and a
+subsequent patch can add the padding if necessary.
+
+cheers,
+jamal
 
