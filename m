@@ -1,58 +1,73 @@
-Return-Path: <netdev+bounces-235796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A46DEC35CE2
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 14:21:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14F2DC35D27
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 14:26:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 67CE24E76D4
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 13:21:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C13118C0D0B
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 13:26:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3326631CA7E;
-	Wed,  5 Nov 2025 13:21:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75A69309DDD;
+	Wed,  5 Nov 2025 13:26:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ncdGqJhk"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="U/LuntPC"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D456531D362;
-	Wed,  5 Nov 2025 13:21:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D62DC2E88B3
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 13:26:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762348872; cv=none; b=KUjyMcJYr1a4X4qGQDUsNbjXsD2aBUQdcGNu2mZCIaXB3x7RDPzO4lcJNrTRIRy4Qo/qYmCcwtVvfg3ULfG4exkvarKGfbX7iikqEkUUcZAUUPH/5IqCTYaquJEkKTAzJ07nbhAO7uDxAf1LPEhKmG8vdbFtHo7S2EBjay0i/uM=
+	t=1762349179; cv=none; b=ESTTZjkwQnbMgCoG7qCnz7hAN6ioAktMiQ5GGBw+NfhtcglfFt7NDSwyuOQakAxsehcsjpETDLKj3JzQYXFwz8+Mw0CWzkF5+tyeZz54wbQ4E7mRb1QJmrAGTcvAOKk9D1SatMrMBwBvvSMGBWDyR4/Nb2vc8PgGgxCKDvimyv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762348872; c=relaxed/simple;
-	bh=o5m/BgT+CLLta6IIQi0NDjRSxYzIHuFhf9FXQjKJqsg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K+T5J0m2KdffKwUXuwvb7rXdpFGgSdfabYtd/DAwsgrCXH9li6IMxoq1Wb+wj0bQBu8C41JMD86Gjd+3p6/5aDlFu7P6rA8PGNUeKV0Nk/RT2HkzXigwCwEJxl4p0p1SJuORkFIuKrmrNW6wPtKjUorjmVOFUkTcIG70t+nPfuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ncdGqJhk; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=n2ftvDFaNKu3PV0gvMROlDobM/rsO8FfbTNJXo4q7oU=; b=ncdGqJhkUD86UBjzI66zO+L3UO
-	Ejf4lR5budRHvMhoQxAnpyMOTnjxReJxs0ILoouTU2WOY7Ry2YtlQc8WYina+ZNifSw7pAGZhlKZP
-	9vEELqULrcoRuXkB0WzeKVfzlNML2z1DUxwoRNtVccRJ1uR1zGCpJn/Zu0eW6Pp4mjGg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vGdRU-00D040-6l; Wed, 05 Nov 2025 14:20:52 +0100
-Date: Wed, 5 Nov 2025 14:20:52 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Chang Junzheng <guagua210311@qq.com>
-Cc: rafal@milecki.pl, bcm-kernel-feedback-list@broadcom.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: ethernet: broadcom: bgmac: add SPDX license
- identifier
-Message-ID: <eb006531-4c4a-4dce-a3ba-aeffddf8fcad@lunn.ch>
-References: <tencent_DCA505773DEBA2EC5F3B04526C606AD6A608@qq.com>
+	s=arc-20240116; t=1762349179; c=relaxed/simple;
+	bh=eLu29QHmf7g9WkL/kOOKfB5yFoaidXkBjqk9edcRQE8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=aZCJUWYL0JqIhdoju+EEFYDHMJrntb0QA/Hm8k+o3Fl5N8i0ejzRgfTc6o7lOqnEysQux8fjxJx4OaqgmCR1TWaTqRFNvGTMmsTm35mLFO/GCCOevrg57I1f5OdNKmmcyV5LZoaQCVSX1cbkL0GrDb7AlUgyfaQg12aqvQplqIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=U/LuntPC; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=E0ixb7GMsnOWkEi1aAM8HlFRsmoAcl10ETJQIWoehyM=; b=U/LuntPCDlWzd/OP1uqIoyWv3h
+	zP6dvfRZXh+1LP0a1VgY/FrNJhUTCE7T7trEQfyp+VBY1VIRsvVTjKA1od+cSRwZ+t8OJd8zwqo52
+	DIAGLnLCrCO5a8rSjRqs7M7c9F7WDbaFmLKJKOqqt75srKcvOzjdQGVeu7IZdn6NKc89M2RQFCbmi
+	pCBwqoUF4r9mXWntFNN/tx894hbu9BsADw59Nl75JZYDcXViBeSMENAFMyPSaU2XISfqAiNAjCw+P
+	uig9zbubG+Vn5KaOV4F3gM5NkESRHiogIDxp9ARXE1vQPh7CZDLx2eq0N4w9f6J4Yr3Rd4JHlD5JQ
+	JIykmDUg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34720)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vGdWP-000000003RK-2Ar9;
+	Wed, 05 Nov 2025 13:25:57 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vGdWM-000000005js-0lOQ;
+	Wed, 05 Nov 2025 13:25:54 +0000
+Date: Wed, 5 Nov 2025 13:25:54 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next 0/11] net: stmmac: ingenic: convert to
+ set_phy_intf_sel()
+Message-ID: <aQtQYlEY9crH0IKo@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,19 +76,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <tencent_DCA505773DEBA2EC5F3B04526C606AD6A608@qq.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Wed, Nov 05, 2025 at 07:28:20PM +0800, Chang Junzheng wrote:
-> Add missing SPDX-License-Identifier tag to bgmac-bcma.c.
-> 
-> The license is GPL-2.0 as indicated by the existing license text
-> in the file.
+Convert ingenic to use the new ->set_phy_intf_sel() method that was
+recently introduced in net-next.
 
-It is normal to remove such license text when adding an SPDX header.
+This is the largest of the conversions, as there is scope for cleanups
+along with the conversion.
 
-Please also read:
+ .../net/ethernet/stmicro/stmmac/dwmac-ingenic.c    | 169 ++++++---------------
+ 1 file changed, 47 insertions(+), 122 deletions(-)
 
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
-
-	Andrew
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
