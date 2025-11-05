@@ -1,128 +1,216 @@
-Return-Path: <netdev+bounces-235705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C171C33E06
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 04:48:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AD268C33F48
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 05:56:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24D6C189DD01
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 03:48:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 164A4189491C
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 04:56:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DC5E223DF9;
-	Wed,  5 Nov 2025 03:48:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3B3B256C84;
+	Wed,  5 Nov 2025 04:56:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="I4rmmufg"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010050.outbound.protection.outlook.com [52.101.84.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74CEC2A1BF;
-	Wed,  5 Nov 2025 03:48:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762314504; cv=none; b=PpKF/P/aAo2S3pF7COxh43X/Q69d8hqyvxFL+ZQ3GIcWW3SFcXUg4u4O75g6V8FcURFZ1iaNUwOjW/I9ZNEkkJBlYh3gWPi6L+m/baIjJf7y1YJgnKpaSTWathyE2EuNGQrzyyveRPuJoyo7waDKJI6taw/Fw6HtryQx8oZWZMo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762314504; c=relaxed/simple;
-	bh=XANd4G32AqWyVQdfBYh557uL85JORhL8u3ZtOFm0xYs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ad1lPq9ruJ8quRR2eIMksSpcyzpsiYmkbRNv+6Bv7LAK41LfRyFvRpcxFe972KhqFCQKov3io8lxMOcV5vc8eHHlUATgCMwwATTqZzve8lW0GU0r72fEsWaZWDnAAKR/hwhITd3upaktmPbcs0toWFvWvpbc9WTCXJWYGjq1PxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from DESKTOP-L0HPE2S (unknown [124.16.141.245])
-	by APP-05 (Coremail) with SMTP id zQCowAAHse_0yAppzc2TAQ--.26348S2;
-	Wed, 05 Nov 2025 11:48:05 +0800 (CST)
-From: Haotian Zhang <vulab@iscas.ac.cn>
-To: Herve Codina <herve.codina@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Haotian Zhang <vulab@iscas.ac.cn>
-Subject: [PATCH v3] net: wan: framer: pef2256: Switch to devm_mfd_add_devices()
-Date: Wed,  5 Nov 2025 11:47:16 +0800
-Message-ID: <20251105034716.662-1-vulab@iscas.ac.cn>
-X-Mailer: git-send-email 2.50.1.windows.1
-In-Reply-To: <20251103111844.271-1-vulab@iscas.ac.cn>
-References: <20251103111844.271-1-vulab@iscas.ac.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39C271DFF0;
+	Wed,  5 Nov 2025 04:56:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762318572; cv=fail; b=YTOagRIkvuLzFzTCoCiaxbS/uee9Gv+ccpURcQ0g5euBdAjXVP6O3HcgL7H82tkHdgCrKCG4NsXsaQuaZ5HOEZh1IBvtM0MUjoiVjbNgKbalCfMFpl7N/+xEcmnOD4QdIEFpMcKKhrKO39XJVkETQcsUk5KlgE5to6NsVo/JL6E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762318572; c=relaxed/simple;
+	bh=dym3C2iwkFh/C6dqPcOtke04aErUZJXGmaYPteE/Js8=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=Na1zCTyOwXGAEfjdQiQk81tC0dXtYOy/GcaQs4K+E0jgXrPSUl89LwNyaWektb7MRilY+EO5cJUDsIZ97wgEAIPNTiwW2UB1y76gDHndUbzKdScF39ySVJQNtQSvIuy8Z45uusj3jAWasDCUKxrN949MtkpGpyb98XqZfXFQt8U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=I4rmmufg; arc=fail smtp.client-ip=52.101.84.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=scoYMxcn/SSdCSXl+AwQ28tc1d04D2VqXU0q6w+0ulmN4jFHK4wEv0HX0K48HJSN0Vfqf8wkmIYDZOtPO52DqYEs0FudwqM8soU8GZl9fBfyuYzOZde5cHxt8c3c9nxiR3u8UYhNl4BWhpgUfIY5cKH6nKWbhYafX50nUtksfHGaj+7WbF69s28RvxaOIMeRvgek9hyOeUjCP9So2p9nAjfeVuguzSSwCqdH/qoBA362weqvCpHgZDqimAMaX6VgBwEEoP5rOJW0Bw1yNmsr1leTPm/Ya6yBysextLcE5oAz/2M6LEZXSx6bu/lJkV8f2/sB0VhKnmkKVX3s1VFDZg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2LvE111NBgpnQ7JtePoURKur1qOXgN9XAnRMZbnuM1A=;
+ b=Tn4vvtD/30L3VB+qkMH0JXeTRLOaynkH40lhwTp4qKK2lNmzHHbukLuODRCOpRRKaCgmbqj+WYx0mcSe179NYcIiZ7JpvEWkATThoGBl5zU2OeLi9bj0KdaMLxxIpisMB1L5Jicp96R+vY9HZmqeHz8h3o716iFR+09URDrQkU5hK1+XySRTUbMjrb+hK+L/bEzP79sE7nwZCUOVvRkcObTweKy6xB+lCDvFjRZNbsyAkJCSKCXzBT6/+gJl1zGt1D0YHUu5UEe0FQr668hyJmjBqcLcD/aZY7EWc6cK/2iBcK0xewfeiFgNCe7aB3pOQIodL12NyTK/FfbKkDW3FA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2LvE111NBgpnQ7JtePoURKur1qOXgN9XAnRMZbnuM1A=;
+ b=I4rmmufgLEA8okGCirv4yB5MEvBTD0PNxQvCrXixp7gcp3cabvXJyu1WpO6gdRuk2YAkYp1BzbaGLOW8zixG7DbJb/ifoZFM/xMkYzi7tD0TR+SUkQrROR2ywKkN6550OoqW9lNV/11qwU+mt1eICC27kwvuvsQVqbwwWqyWUywyjzKEGXR7DuVabzkirEuFYqLL6IyBouJXfK9XsO6PNIqgVP5LXjpjOnMUiVf0A9/gVGiAzKybnnepx3MwjgDRRE+KGNteIwCsK2GxFSGPYLbHnxVlVuVbbggfAjWarUTVWO6rXqvqfZ/GM3ulBMHJEOp4cJa+SNMw3t+k6hzheQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by AM9PR04MB8356.eurprd04.prod.outlook.com (2603:10a6:20b:3b4::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.16; Wed, 5 Nov
+ 2025 04:56:03 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db%4]) with mapi id 15.20.9298.006; Wed, 5 Nov 2025
+ 04:56:03 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: claudiu.manoil@nxp.com,
+	vladimir.oltean@nxp.com,
+	xiaoning.wang@nxp.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: aziz.sellami@nxp.com,
+	imx@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 net-next 0/3] net: enetc: add port MDIO support for both i.MX94 and i.MX95
+Date: Wed,  5 Nov 2025 12:33:41 +0800
+Message-Id: <20251105043344.677592-1-wei.fang@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: MA5P287CA0174.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:a01:1af::8) To PAXPR04MB8510.eurprd04.prod.outlook.com
+ (2603:10a6:102:211::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowAAHse_0yAppzc2TAQ--.26348S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7uw1xJrW3KFyxXryrurWDtwb_yoW8ZF18p3
-	47Aa90yry5Jw48K3WUZw4xWFyrX3Z2k3WxJr4UZ34a9r45XFW5t34UXF12ya1UJrWxGa17
-	XF4fKrWfCF1DX3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Cr
-	1j6rxdM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
-	6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr
-	0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v2
-	6r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrV
-	AFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCI
-	c40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267
-	AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_
-	Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfUonmRUU
-	UUU
-X-CM-SenderInfo: pyxotu46lvutnvoduhdfq/1tbiCRARA2kKtTRV4wACsd
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXPR04MB8510:EE_|AM9PR04MB8356:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7198bb64-afc6-4957-f565-08de1c279f09
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|19092799006|376014|52116014|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?gZGPJim8mAjH61n88FSs5yswHrWto5q1XbBSxPYwx6VmcY0H/b+9HyR3VvqS?=
+ =?us-ascii?Q?rx+D+c5MuvUOBrdFbFl8qsVxasVeqQHnjwIdAaWQXcfYuiq2xFzJ5Xy27tfF?=
+ =?us-ascii?Q?tXnlHQaS1vjzhBNOloydQQ2GuRDXxHr7MMnrd5+9vgkR392W6HARMFKF+TtB?=
+ =?us-ascii?Q?nNhEtN/GNgR3AJ+c1u/bV3130zxjaXgrpYL9sJVzar3WFlNhrKZdtG5Tvxb3?=
+ =?us-ascii?Q?0m7IdgrxualSjzakOx+Gl/4zAf1ThYOOnYc6xkCMsq9wn5PzpaE5/DT+8S/G?=
+ =?us-ascii?Q?gJixufamHB+9GV0uHcO0trhlTWH7LC+NXVi6epjjef6fP31hq8vqV72KiW6c?=
+ =?us-ascii?Q?2BRBwjSHeVR8ZX5XsEZP31TiWuyiFehXYY19ukczNPaU89JtR+NXHk6rmmCM?=
+ =?us-ascii?Q?kc8MP1jKHmZw1Hxh7nC03n/mOZyjKH7wJ/reTjYgIEusPxGxpHMQgIxq+i4g?=
+ =?us-ascii?Q?ODg2dDUUzVTD1PXbHSzB1sMcBp6fH7pL9LHKvVmllGqZgMcPYnBjpGioA01W?=
+ =?us-ascii?Q?GF1yF9rVmhbjOc6OLWtTds8rsVfD45rs81xsLpGjLYXAeX5+pzKF9ScHt5X+?=
+ =?us-ascii?Q?pCUuasGO2XgIseA4GlIGZ5P4fYJ37gh4bFYscOf1/MqtYpPM+rKykBvu3LuY?=
+ =?us-ascii?Q?PaIKdjJ3M0RKdXjpxpyp22LhWp6M0dKyo5DMBBZKVaV173ZLBvLfEvkH1hdp?=
+ =?us-ascii?Q?aMwPl1aPXR7b0Kskxx1OaCsoqi/hIvXUBHlXoP2OVED8uMQPwUefKFypsYZY?=
+ =?us-ascii?Q?0xj6FLuQbX9qLVrjeiK65Y/uM5hVdp87qzpFrlnwRftnmgcLs7v61ObIGpjp?=
+ =?us-ascii?Q?n4XTr8ejjAtRpLlU065kbhm/EbKuo92MbvZ5ir+i8LQjrTryXhAw3nCwfAup?=
+ =?us-ascii?Q?rSpoJtVr0mRJj+OuzbgsJwamfri6Q60BXVnsrbpxI8hJJtd56erCfpXgGrgl?=
+ =?us-ascii?Q?7SVlyY/WGuqGmAyDdsi1/pXlfpIWf1+JkQRIb9IuMbZmOU7Y5EFmyBTDbRZK?=
+ =?us-ascii?Q?zeG/5pl1dPWplAzccBzqDdeNbOfwgaFCTkkfmhBtlkiZzLT9Zc7cndd78hZt?=
+ =?us-ascii?Q?tgZUoWnrckcpBJuTSRYY5oQAzzFEvPKc1vduVLPUnJZT0JOL0cc+/pbLzKnM?=
+ =?us-ascii?Q?GxgYTfqXa8v5LNk6tSjrrh1wsBVoimOAaSdEZlyg2Hgi3ExWOXnDKVdEZa1f?=
+ =?us-ascii?Q?kA6yXnZO4Pz+eWlzeaXilfycSVpjzJNVlMD9o/W5cpnatsH6iTZx/rueMYzF?=
+ =?us-ascii?Q?nkuJrzHsCBUZElbdPz2AWGHWK2qROIt9rC0pBUnBBKqq6Sdqet/3erSMcqmO?=
+ =?us-ascii?Q?bEFmIonfxSToCNKlOyJplJ45YwuaD1rngltiSUOGBff6pBvQBS1tXTGRz8po?=
+ =?us-ascii?Q?Vpyo0/gA17jirCautPUc3rd4ZjViQTcU+jylAd+5JbWyzxJ2aJ7i+xMTmLFI?=
+ =?us-ascii?Q?flVC7pCryj5ChmdMWvIcPymWHz7SAZyDE83sqF0ticIFmgdlDV63leGTc+pm?=
+ =?us-ascii?Q?6PA+ki0a9vN/ymfpoxEhDvLBhZjWSsb5xcub?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(19092799006)(376014)(52116014)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?hKR4owLQcxTyaFBk+bZfGwYjoaz/68ns3PGtWr2K1CO+bRpfMeHnH+jsm2YB?=
+ =?us-ascii?Q?Gm0bVbklMQNZqy3RVFQGd4gtdswrcrbc7cVU/sCat9CWnmEqLDlS532+jn0Y?=
+ =?us-ascii?Q?qir4FlRr3lCXH5YhGR1JuL3jPFcI1I7zBEt+18xLsfAyb3Bg+7nHb8oegTnh?=
+ =?us-ascii?Q?ODwwcMfdIsQ2PLBXglFrBmH6grVQGzAa7TOLWlW1Xw1uG0HwUmgFfM0Si1p7?=
+ =?us-ascii?Q?yV2o+dD3FJ1+01yqMhjjwOndM4etTXNDTydw/nCPSuZwk9SkG0SVmUdCR2NH?=
+ =?us-ascii?Q?m7TxoFxojhcMw8cIa8SfNpHDBeCeeAikMJC+wp1Sg73VH6u6A59PDK3SpkZz?=
+ =?us-ascii?Q?U6UiGXjvCTgE5ZddW40fSd9tNrW6C7U8GWl/IoWpr3Qr7MYJ/6DDdJjsdd9y?=
+ =?us-ascii?Q?TxbV/UjnkuiB5Elz7RZDwFwo0/vwjKHC8W666IpfO04KatmUlHJKcNLb8GY7?=
+ =?us-ascii?Q?af/Ce+DPsY7ZRugugH2MtJkkoYuh0JoXB+5RUrrrAWVG04N/ntsBltAEmvs8?=
+ =?us-ascii?Q?pzfe5TIC94D4vlaUNS0in4BF8HOYu2ukqzSz6R6z+37mrrm+IuWpP3i0s90w?=
+ =?us-ascii?Q?GGxks9xkdcJks9dYEM+uaw29lZfBhUvHBh5gH9J5bIQpEZ+4U2FlulCilCa+?=
+ =?us-ascii?Q?vGGPP++kRw7xyG7GyejOgZkjJElb8LsxK24AXe2M2wfoR2qxpxadzduyTtD/?=
+ =?us-ascii?Q?az1G9hlYuifGeS45owbY6+t9dDbWHyrt3cR7Tf9nDMz22awKTFpqS4H82Cfz?=
+ =?us-ascii?Q?TeMHvfyNRuDwXXTnfTOWz+MkeaYrn5NqU3nzTFvU/WITRurpFsPJhg2+WUSF?=
+ =?us-ascii?Q?T2djWh9oIGmz+L4omzBlKfG2KW0Xwc+8UB+QOOL+2XZ5YqmoD9Q4klCiuQ5s?=
+ =?us-ascii?Q?pb30PJH7p7SiTqKn6cAa5qjYzeXobiIShQxrvJUGkNjmHgfiWpt97zY+pk5T?=
+ =?us-ascii?Q?Ezn/MZzg0KUdhtSWwqYOSmAdeBf7KsopMkTw7kCLQddkDwT2ZFnp+LH0g2KT?=
+ =?us-ascii?Q?BrQUPAUGTcwaoAfslOk6e0Z7oX63H0Jl66L/e+a1a0nd3+n1tGMkwFKecjdE?=
+ =?us-ascii?Q?GK0UqLg6DJn+vPEFKbp661ND7fyLorB7cfcDHNQcEmj3leawS31jm5caL+3W?=
+ =?us-ascii?Q?BMhJurzvoR7lJ9I+Wx92V0JkomvBwsQtfXSJBQ3OOcbqYpIjKdDav3oKW6m/?=
+ =?us-ascii?Q?u+IWklWXDpWKFb6fr9+cL8QIQHV+sjtxLiabj2pADu5CwL5CvOA4cbz10Hyy?=
+ =?us-ascii?Q?gRkikisf1bCZySH7mg3Rgo2E439WAyvWil4FLPetNx2saQWXmRzUiHZhlymF?=
+ =?us-ascii?Q?Oes++gCqhEwal4mFwnfrhFwR3peXctUyqSx/H4sWE0jYfKWu29sJfzRF0kol?=
+ =?us-ascii?Q?wJkwbfAy7bDPdbJlXJ0L0Tgs3I7COfr7PRftIm8UpjtgI5sBOfZrNAUItyTK?=
+ =?us-ascii?Q?W9o+LMgnWsbq6lODN9IsyWGy1S0JhvGn4/zJrrJ9xN+IoNkIVXZ+SCIHOrbI?=
+ =?us-ascii?Q?V2o4q5ho5WRZRDeiV/q24S+46M5PVHkZIkyhDf5MJ62kXdbfUhdiZ7TDhYxb?=
+ =?us-ascii?Q?l1/8eB0W2B0gCh8ViG6hP4Uo+uMPTFlsRrrRye8M?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7198bb64-afc6-4957-f565-08de1c279f09
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Nov 2025 04:56:03.3658
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 8GhpNXMZJ6O6zPJ7HvFn2r9h/VYPoSGgrrFI279RiIwFUp0yTGN80Dbah8S170YXsf+3YgHgkAyIcANTWyhKMQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8356
 
-The driver calls mfd_add_devices() but fails to call mfd_remove_devices()
-in error paths after successful MFD device registration and in the remove
-function. This leads to resource leaks where MFD child devices are not
-properly unregistered.
+From the hardware perspective, NETC IP has only one external master MDIO
+interface (eMDIO) for managing external PHYs. The EMDIO function and the
+ENETC port MDIO are all virtual ports of the eMDIO.
 
-Replace mfd_add_devices with devm_mfd_add_devices to automatically
-manage the device resources.
+The difference is that EMDIO function is a 'global port', it can access
+all the PHYs on the eMDIO, so it provides a means for different software
+modules to share a single set of MDIO signals to access their PHYs.
 
-Fixes: c96e976d9a05 ("net: wan: framer: Add support for the Lantiq PEF2256 framer")
-Suggested-by: Herve Codina <herve.codina@bootlin.com>
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Haotian Zhang <vulab@iscas.ac.cn>
+But for ENETC port MDIO, each ENETC can access its set of registers to
+initiate accesses on the MDIO and the eMDIO arbitrates between them,
+completing one access before proceeding with the next. It is required
+that each ENETC port MDIO has exclusive access and control of its PHY.
+Therefore, we need to set the external PHY address for ENETCs, so that
+its port MDIO can only access its own PHY. If the PHY address accessed
+by the port MDIO is different from the preset PHY address, the MDIO
+access will be invalid.
+
+Normally, all ENETCs use the interfaces provided by the EMDIO function
+to access their PHYs, provided that the ENETC and EMDIO are on the same
+OS. If an ENETC is assigned to a guest OS, it will not be able to use
+the interfaces provided by the EMDIO function, so it must uses its port
+MDIO to access and manage its PHY.
+
+In DTS, when the PHY node is a child node of EMDIO, ENETC will use EMDIO
+to access the PHY. If ENETC wants to use port MDIO, it only needs to add
+a mdio child node to the ENETC node.
+
+Different from the external MDIO interface, each ENETC has an internal
+MDIO interface for managing on-die PHY (PCS) if it has PCS layer. The
+internal MDIO interface is controlled by the internal MDIO registers of
+the ENETC port.
+
 ---
-Changes in v3:
-  - Also replace mfd_add_devices() with devm_mfd_add_devices()
-    in pef2256_add_audio_devices(), which was overlooked by
-    previous patch.
-Changes in v2:
-  - Use devm_mfd_add_devices() instead of manual cleanup.
+v2 changes:
+Improve the commit message.
+v1 link: https://lore.kernel.org/imx/20251030091538.581541-1-wei.fang@nxp.com/
 ---
----
- drivers/net/wan/framer/pef2256/pef2256.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/wan/framer/pef2256/pef2256.c b/drivers/net/wan/framer/pef2256/pef2256.c
-index 1e4c8e85d598..180edde177c6 100644
---- a/drivers/net/wan/framer/pef2256/pef2256.c
-+++ b/drivers/net/wan/framer/pef2256/pef2256.c
-@@ -637,7 +637,7 @@ static int pef2256_add_audio_devices(struct pef2256 *pef2256)
- 		audio_devs[i].id = i;
- 	}
- 
--	ret = mfd_add_devices(pef2256->dev, 0, audio_devs, count, NULL, 0, NULL);
-+	ret = devm_mfd_add_devices(pef2256->dev, 0, audio_devs, count, NULL, 0, NULL);
- 	kfree(audio_devs);
- 	return ret;
- }
-@@ -812,8 +812,8 @@ static int pef2256_probe(struct platform_device *pdev)
- 
- 	platform_set_drvdata(pdev, pef2256);
- 
--	ret = mfd_add_devices(pef2256->dev, 0, pef2256_devs,
--			      ARRAY_SIZE(pef2256_devs), NULL, 0, NULL);
-+	ret = devm_mfd_add_devices(pef2256->dev, 0, pef2256_devs,
-+				   ARRAY_SIZE(pef2256_devs), NULL, 0, NULL);
- 	if (ret) {
- 		dev_err(pef2256->dev, "add devices failed (%d)\n", ret);
- 		return ret;
+Aziz Sellami (1):
+  net: enetc: set external MDIO PHY address for i.MX95 ENETC
+
+Wei Fang (2):
+  net: enetc: set external MDIO PHY address for i.MX94 ENETC
+  net: enetc: add port MDIO support for ENETC v4
+
+ .../net/ethernet/freescale/enetc/enetc4_hw.h  |   6 +
+ .../freescale/enetc/enetc_pf_common.c         |  14 ++-
+ .../ethernet/freescale/enetc/netc_blk_ctrl.c  | 111 +++++++++++++++++-
+ 3 files changed, 128 insertions(+), 3 deletions(-)
+
 -- 
-2.50.1.windows.1
+2.34.1
 
 
