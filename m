@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-235870-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CA4EC36AC7
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 17:25:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44A5BC36AF4
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 17:28:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4DDD1A26AD7
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 16:17:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F8B5667BD0
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 16:16:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A021633DED5;
-	Wed,  5 Nov 2025 16:15:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A889533F38A;
+	Wed,  5 Nov 2025 16:15:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2521B33B6E7;
-	Wed,  5 Nov 2025 16:15:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39ADE33A01A;
+	Wed,  5 Nov 2025 16:15:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762359305; cv=none; b=UGRXniIXHAt/xhgiW9tFWAPXtzRPkGjXaAnFxIW9dcTL0kQWk0TQAaIIere7aucOZDs/xB3t/yCGT5zaUM/J9mFL/gzGKYXT6fbFQxY7tvlPd2rlVARJAKzNCPfl3koqno1/q5eiHxUZBAE6MSUZ3Td1/KLVG3+q1eB2t8oXrIE=
+	t=1762359306; cv=none; b=WvHNEZc+slzGvEr+N7Ij+tvjcHSnqZ8kmz5w+dA2sOhA4E6279kyAA3lbtMskF4Tok8c4Nl3Rd7ryILRdw6YlYyHKY5InwPtohFnx23ERNYr+L1cWW98Jrnkt4/7cmIhq/DdTuHj+xDyWpWis8QLlIUt9KDrJM8Yz2Xfxzlvo3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762359305; c=relaxed/simple;
-	bh=ZiWQ5REple6VKc4oiJyq/bf1THoa1NpEXakgPmYk1qc=;
+	s=arc-20240116; t=1762359306; c=relaxed/simple;
+	bh=u9YpyQlwindyhEri1ZWLiSQPKv7WiPv8mZHXYF/4aEw=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NovgehQsXShuQxpdGCt/lxjIDRJYLaPQikobZ/vbw9n5gDrZYeXvlUZJ+JbydUXJTxnbAaa6zag5ppz/1WH18UbaAih6/zQHJP5Dy+2hv9L+/w5sZwiJGVmBXeD3Riz1K86maWabulYOZMuMqE7Hv80OEqUy7rVoNag705ziDJ4=
+	 MIME-Version:Content-Type; b=cwmi7D3hD4/CGRgXlfBNvEtWJVHc36hM5pOw4HWzTN0CrC9g3I3Za/IA4LStPe/cByLeN4yCcWPTVB/UP6FvYB6zDKMNFwcXmLvaMnNkKZXJMotk5vrtZ4NDjWBXpLc+sTs7cNdzp0zTyKSTP4XaCeWoS8w2zMELgrtJaCzTckI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4d1r4v6PWdzHnH4l;
-	Thu,  6 Nov 2025 00:14:55 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4d1r0Y3jyNz6L4wl;
+	Thu,  6 Nov 2025 00:11:09 +0800 (CST)
 Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
-	by mail.maildlp.com (Postfix) with ESMTPS id 7D5541400DB;
-	Thu,  6 Nov 2025 00:15:01 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 2BFD01400D9;
+	Thu,  6 Nov 2025 00:15:02 +0800 (CST)
 Received: from huawei-ThinkCentre-M920t.huawei.com (10.123.122.223) by
  mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
@@ -45,9 +45,9 @@ CC: <andrey.bokhanko@huawei.com>, Dmitry Skorodumov
 	<skorodumov.dmitry@huawei.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
  S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
  Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 06/14] ipvlan: Support GSO for port -> ipvlan
-Date: Wed, 5 Nov 2025 19:14:42 +0300
-Message-ID: <20251105161450.1730216-7-skorodumov.dmitry@huawei.com>
+Subject: [PATCH net-next 07/14] ipvlan: Support IPv6 for learnable l2-bridge
+Date: Wed, 5 Nov 2025 19:14:43 +0300
+Message-ID: <20251105161450.1730216-8-skorodumov.dmitry@huawei.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20251105161450.1730216-1-skorodumov.dmitry@huawei.com>
 References: <20251105161450.1730216-1-skorodumov.dmitry@huawei.com>
@@ -62,90 +62,185 @@ Content-Type: text/plain
 X-ClientProxiedBy: mscpeml100003.china.huawei.com (10.199.174.67) To
  mscpeml500004.china.huawei.com (7.188.26.250)
 
-If main port interface supports GSO, we need manually segment
-the skb before forwarding it to ipvlan interface.
+To make IPv6 work with learnable l2-bridge, need to
+process the TX-path:
+* Replace Source-ll-addr in Solicitation ndisc,
+* Replace Target-ll-addr in Advertisement ndisc
+
+No need to do anything in RX-path
 
 Signed-off-by: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
 ---
- drivers/net/ipvlan/ipvlan_main.c | 51 ++++++++++++++++++++++++--------
- 1 file changed, 38 insertions(+), 13 deletions(-)
+ drivers/net/ipvlan/ipvlan_core.c | 129 +++++++++++++++++++++++++++----
+ 1 file changed, 115 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/net/ipvlan/ipvlan_main.c b/drivers/net/ipvlan/ipvlan_main.c
-index 18a69b4fb58c..ec53cc0ada3b 100644
---- a/drivers/net/ipvlan/ipvlan_main.c
-+++ b/drivers/net/ipvlan/ipvlan_main.c
+diff --git a/drivers/net/ipvlan/ipvlan_core.c b/drivers/net/ipvlan/ipvlan_core.c
+index 547016e3ca8c..659aed8fc4ff 100644
+--- a/drivers/net/ipvlan/ipvlan_core.c
++++ b/drivers/net/ipvlan/ipvlan_core.c
 @@ -4,6 +4,7 @@
  
- #include <linux/ethtool.h>
- #include <net/netdev_lock.h>
-+#include <net/gso.h>
+ #include <net/flow.h>
+ #include <net/ip.h>
++#include <net/ip6_checksum.h>
  
  #include "ipvlan.h"
  
-@@ -71,6 +72,41 @@ static int ipvlan_set_port_mode(struct ipvl_port *port, u16 nval,
- 	return err;
+@@ -769,13 +770,122 @@ static int ipvlan_xmit_mode_l3(struct sk_buff *skb, struct net_device *dev)
+ 	return ipvlan_process_outbound(skb);
  }
  
-+static int ipvlan_receive(struct ipvl_dev *ipvlan, struct sk_buff *skb)
++static void ipvlan_macnat_patch_tx_arp(struct ipvl_dev *ipvlan,
++				       struct sk_buff *skb)
 +{
-+	struct sk_buff *segs;
-+	struct sk_buff *nskb;
-+	ssize_t mac_hdr_size;
-+	int ret, len;
++	struct arphdr *arph;
++	int addr_type;
 +
-+	skb->pkt_type = PACKET_HOST;
-+	skb->protocol = eth_type_trans(skb, skb->dev);
-+	ipvlan_skb_crossing_ns(skb, ipvlan->dev);
-+	ipvlan_mark_skb(skb, ipvlan->phy_dev);
-+	if (skb_shinfo(skb)->gso_size == 0) {
-+		len = skb->len + ETH_HLEN;
-+		ret = netif_rx(skb);
-+		ipvlan_count_rx(ipvlan, len, ret == NET_RX_SUCCESS, false);
-+		return ret;
-+	}
-+
-+	mac_hdr_size = skb->network_header - skb->mac_header;
-+	__skb_push(skb, mac_hdr_size);
-+	segs = skb_gso_segment(skb, 0);
-+	dev_kfree_skb(skb);
-+	if (IS_ERR(segs))
-+		return NET_RX_DROP;
-+
-+	skb_list_walk_safe(segs, segs, nskb) {
-+		skb_mark_not_on_list(segs);
-+		__skb_pull(segs, mac_hdr_size);
-+		len = segs->len + ETH_HLEN;
-+		ret = netif_rx(segs);
-+		ipvlan_count_rx(ipvlan, len, ret == NET_RX_SUCCESS, false);
-+	}
-+	return ret;
++	arph = (struct arphdr *)ipvlan_get_L3_hdr(ipvlan->port, skb,
++						 &addr_type);
++	ether_addr_copy((u8 *)(arph + 1), ipvlan->phy_dev->dev_addr);
 +}
 +
- static int ipvlan_port_rcv(struct sk_buff *skb, struct net_device *wdev,
- 			   struct packet_type *pt, struct net_device *orig_wdev)
++#if IS_ENABLED(CONFIG_IPV6)
++
++static u8 *ipvlan_search_icmp6_ll_addr(struct sk_buff *skb, u8 icmp_option)
++{
++	/* skb is ensured to pullable for all ipv6 payload_len by caller */
++	struct ipv6hdr *ip6h = ipv6_hdr(skb);
++	struct icmp6hdr *icmph;
++	int ndsize, curr_off;
++
++	icmph = (struct icmp6hdr *)(ip6h + 1);
++	ndsize = (int)htons(ip6h->payload_len);
++	curr_off = sizeof(*icmph);
++
++	if (icmph->icmp6_type != NDISC_ROUTER_SOLICITATION)
++		curr_off += sizeof(struct in6_addr);
++
++	while ((curr_off + 2) < ndsize) {
++		u8  *data = (u8 *)icmph + curr_off;
++		u32 opt_len = data[1] << 3;
++
++		if (unlikely(opt_len == 0))
++			return NULL;
++
++		if (data[0] != icmp_option) {
++			curr_off += opt_len;
++			continue;
++		}
++
++		if (unlikely(opt_len < ETH_ALEN + 2))
++			return NULL;
++
++		if (unlikely(curr_off + opt_len > ndsize))
++			return NULL;
++
++		return data + 2;
++	}
++
++	return NULL;
++}
++
++static void ipvlan_macnat_patch_tx_ipv6(struct ipvl_dev *ipvlan,
++					struct sk_buff *skb)
++{
++	struct ipv6hdr *ip6h;
++	struct icmp6hdr *icmph;
++	u8 icmp_option;
++	u8 *lladdr;
++	u16 ndsize;
++
++	if (unlikely(!pskb_may_pull(skb, sizeof(*ip6h))))
++		return;
++
++	if (ipv6_hdr(skb)->nexthdr != NEXTHDR_ICMP)
++		return;
++
++	if (unlikely(!pskb_may_pull(skb, sizeof(*ip6h) + sizeof(*icmph))))
++		return;
++
++	ip6h = ipv6_hdr(skb);
++	icmph = (struct icmp6hdr *)(ip6h + 1);
++
++	/* Patch Source-LL for solicitation, Target-LL for advertisement */
++	if (icmph->icmp6_type == NDISC_NEIGHBOUR_SOLICITATION ||
++	    icmph->icmp6_type == NDISC_ROUTER_SOLICITATION)
++		icmp_option = ND_OPT_SOURCE_LL_ADDR;
++	else if (icmph->icmp6_type == NDISC_NEIGHBOUR_ADVERTISEMENT)
++		icmp_option = ND_OPT_TARGET_LL_ADDR;
++	else
++		return;
++
++	ndsize = (int)htons(ip6h->payload_len);
++	if (unlikely(!pskb_may_pull(skb, sizeof(*ip6h) + ndsize)))
++		return;
++
++	lladdr = ipvlan_search_icmp6_ll_addr(skb, icmp_option);
++	if (!lladdr)
++		return;
++
++	ether_addr_copy(lladdr, ipvlan->phy_dev->dev_addr);
++
++	ip6h = ipv6_hdr(skb);
++	icmph = (struct icmp6hdr *)(ip6h + 1);
++	icmph->icmp6_cksum = 0;
++	icmph->icmp6_cksum = csum_ipv6_magic(&ip6h->saddr, &ip6h->daddr,
++					     ndsize,
++					     IPPROTO_ICMPV6,
++					     csum_partial(icmph,
++							  ndsize,
++							  0));
++	skb->ip_summed = CHECKSUM_COMPLETE;
++}
++#else
++static void ipvlan_macnat_patch_tx_ipv6(struct ipvl_dev *ipvlan,
++					struct sk_buff *skb)
++{
++}
++#endif
++
+ static int ipvlan_xmit_mode_l2(struct sk_buff *skb, struct net_device *dev)
  {
-@@ -111,19 +147,8 @@ static int ipvlan_port_rcv(struct sk_buff *skb, struct net_device *wdev,
- 		goto out;
+ 	struct ipvl_dev *ipvlan;
+ 	struct ipvl_addr *addr;
+ 	struct ethhdr *eth;
+ 	bool same_mac_addr;
+-	int addr_type;
++	int addr_type = -1;
+ 	void *lyr3h;
  
- 	addr = ipvlan_addr_lookup(port, lyr3h, addr_type, true);
--	if (addr) {
--		struct ipvl_dev *ipvlan = addr->master;
--		int ret, len;
+ 	ipvlan = netdev_priv(dev);
+@@ -862,8 +972,6 @@ static int ipvlan_xmit_mode_l2(struct sk_buff *skb, struct net_device *dev)
+ 		}
+ 	} else {
+ 		/* Packet to outside on learnable. Fix source eth-addr. */
+-		struct sk_buff *orig_skb = skb;
 -
--		ipvlan_skb_crossing_ns(skb, ipvlan->dev);
--		skb->protocol = eth_type_trans(skb, skb->dev);
--		skb->pkt_type = PACKET_HOST;
--		ipvlan_mark_skb(skb, port->dev);
--		len = skb->len + ETH_HLEN;
--		ret = netif_rx(skb);
--		ipvlan_count_rx(ipvlan, len, ret == NET_RX_SUCCESS, false);
--		return NET_RX_SUCCESS;
--	}
-+	if (addr)
-+		return ipvlan_receive(addr->master, skb);
+ 		skb = skb_unshare(skb, GFP_ATOMIC);
+ 		if (!skb)
+ 			return NET_XMIT_DROP;
+@@ -872,17 +980,10 @@ static int ipvlan_xmit_mode_l2(struct sk_buff *skb, struct net_device *dev)
+ 		ether_addr_copy(skb_eth_hdr(skb)->h_source,
+ 				ipvlan->phy_dev->dev_addr);
  
- out:
- 	dev_kfree_skb(skb);
+-		/* ToDo: Handle ICMPv6 for neighbours discovery.*/
+-		if (lyr3h && addr_type == IPVL_ARP) {
+-			struct arphdr *arph;
+-			/* must reparse new skb */
+-			if (skb != orig_skb && lyr3h && addr_type == IPVL_ARP)
+-				lyr3h = ipvlan_get_L3_hdr(ipvlan->port, skb,
+-							  &addr_type);
+-			arph = (struct arphdr *)lyr3h;
+-			ether_addr_copy((u8 *)(arph + 1),
+-					ipvlan->phy_dev->dev_addr);
+-		}
++		if (addr_type == IPVL_ARP)
++			ipvlan_macnat_patch_tx_arp(ipvlan, skb);
++		else if (addr_type == IPVL_ICMPV6 || addr_type == IPVL_IPV6)
++			ipvlan_macnat_patch_tx_ipv6(ipvlan, skb);
+ 	}
+ 
+ tx_phy_dev:
 -- 
 2.25.1
 
