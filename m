@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-235803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DADF7C35D60
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 14:27:34 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41179C35D66
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 14:28:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC605620CAE
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 13:26:55 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C1B314FAA1C
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 13:27:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CAB831D75C;
-	Wed,  5 Nov 2025 13:26:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 726C831DDB6;
+	Wed,  5 Nov 2025 13:26:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ET31jTd4"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="yQC0s83X"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F649314D01
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 13:26:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A64631E11F
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 13:26:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762349213; cv=none; b=JqK/KJaxl/uFDyhtuC8E6coZ1z8WQcGon0ynjTL0C5vwIs1Jt//aGjfZeQ05K7STRQXvwWntyO8q+O8iZC76tTb3nH7G7hIGMOx2RJJyw4HG9DCmJmiyq4Wtf+Zvs0S2R8ZroBnUJnWhU0wWmQHarFMUDs2q1rYaptMBScBNhOQ=
+	t=1762349216; cv=none; b=KkJjEpaF3vpJp+sTdghuaxLStnVOuJlEgpF2bTnc1BTBbBUjBq627IlU7cHYIwck8TRwSwhHm8gfJWFKc9fgoPIOUSW/FsFs2E+uL0RNUfij2qi4kEEQIvOcbcJTE4el1a1EM4WAnPo4MQUJog7yz1+9MXsAQXC2oiXxfAQemOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762349213; c=relaxed/simple;
-	bh=8pQSWHAQB33CGmWCTLynGGF8Xalg7yuyJUt4iRyQSKA=;
+	s=arc-20240116; t=1762349216; c=relaxed/simple;
+	bh=sCjxBaqZIIHDYiVLorqGhbd2Usa2U8Wh+HgnV4JYK2M=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=NhrbfhBPfh9hWOHx6vy6MkyfUq9OaZK1BV/GWKmy0a3XqnwXocdO0BsEbahuU/cgsIXSAj8ZDsvsbifHeLZo0gf6nv6W0MbBYnBm8Ia83IuRgq6E/bDDcCM6rP6twpvUZQOVQfgA/L9EM9b9C61RbrxNKE2on/23faojty3Ru5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ET31jTd4; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=ffvkqZyeKbWWxkE5qs7CbrY3bLKabojqbhD0/Sx6rgxcQRbUVV3QFEi2BhMf04GgMZB9EEy9CZHTF9QyfkDM+5ZkTtrXZmVQqzeloAGC2QKiEZOUTtfKgN9KraB7kxsPTAkX/zoJYgg0+x1/3i0BjePog6uADMg4L0fSpvYEOFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=yQC0s83X; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,22 +37,22 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=QW/Iy/YgXaPnDYTHZN2tIGLz73bnDzACNiiCiEAutOU=; b=ET31jTd4N5HSmqPNsLSd4C/65E
-	Cc6dbXOgX6ZlG8fcsB7rH8E2ZFT8vnBvFbUpWn3KmQAUQiyAMhcwnFjryEEAiJ8CfjF6GOHoi6weK
-	yTcHRgQ2vpBvkScnTIhtfin3HmfeQt9jpqGh69H2fOMqTbXm1NXKambVLljFVv8ROBr7kvfauh4zW
-	IQyNwjbf9GGABh0pZxYn9baqdQeXbGMSD+XSirhv1iDXqqUMuRpfmpsfEZqkCGpyaPpSl9YqbUGym
-	UYA8S/6IOnWJ9JE553UA83BgvIU4zyiju0ujd1ZVIbqiXBeUM8K3Z//v2phWveknUtniVY98vg7qs
-	iypm6wRA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:45620 helo=rmk-PC.armlinux.org.uk)
+	bh=6MUkjUGs5htCVWXpvlmUC7jdUvESYY4WRqn6CV5pz6o=; b=yQC0s83XlGMD9d55zq8Avs/xb3
+	vtu6i+21l9tOhN2R4fYx8jknAtGd9LSJf+oWU+XGRZ88sf99tx69vk7noxM+GTI6GBIFoUFj1f0k6
+	cXtVRleqw/gVBvavJhleu1ZN3dxYDuqEQvvNKO6Y5vrt5ZdzjpcKcCReubVx97c7TedZ8P39fQZqQ
+	7YpZ8pdX1R3Lj14t/FiN173ZdO7Yrese5tBPLpK2zC9AgAEm9fbZ4ro/yXuo11RpqZ+TqaNsbiaIN
+	8EnP+mV2IH96GyeU+QP2W7G0SvK4xUbyVznHk7e110mw5ZSzhQPwvwLlDJNXpotfxSXgxgfBAUZI+
+	3sEuf7rg==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:45630 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1vGdX5-000000003T4-3dIQ;
-	Wed, 05 Nov 2025 13:26:40 +0000
+	id 1vGdXA-000000003TM-35aP;
+	Wed, 05 Nov 2025 13:26:44 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1vGdX4-0000000Clns-2eUh;
-	Wed, 05 Nov 2025 13:26:38 +0000
+	id 1vGdX9-0000000Clny-38K8;
+	Wed, 05 Nov 2025 13:26:43 +0000
 In-Reply-To: <aQtQYlEY9crH0IKo@shell.armlinux.org.uk>
 References: <aQtQYlEY9crH0IKo@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -68,8 +68,8 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
 	netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 06/11] net: stmmac: ingenic: use
- stmmac_get_phy_intf_sel()
+Subject: [PATCH net-next 07/11] net: stmmac: ingenic: move "MAC PHY control
+ register" debug
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,210 +79,96 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1vGdX4-0000000Clns-2eUh@rmk-PC.armlinux.org.uk>
+Message-Id: <E1vGdX9-0000000Clny-38K8@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Wed, 05 Nov 2025 13:26:38 +0000
+Date: Wed, 05 Nov 2025 13:26:43 +0000
 
-Use stmmac_get_phy_intf_sel() to decode the PHY interface mode to the
-phy_intf_sel value, validate the result against the SoC specific
-supported phy_intf_sel values, and pass into the SoC specific
-set_mode() methods, replacing the local phy_intf_sel variable. This
-provides the value for the MACPHYC_PHY_INFT_MASK field.
+Move the printing of the MAC PHY control register interface mode
+setting into ingenic_set_phy_intf_sel(), and use phy_modes() to
+print the string rather than using the enum name.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- .../ethernet/stmicro/stmmac/dwmac-ingenic.c   | 55 ++++++++++++-------
- 1 file changed, 34 insertions(+), 21 deletions(-)
+ .../ethernet/stmicro/stmmac/dwmac-ingenic.c    | 18 +++---------------
+ 1 file changed, 3 insertions(+), 15 deletions(-)
 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-index 6680f7d3a469..79735a476e86 100644
+index 79735a476e86..539513890db1 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-@@ -64,28 +64,27 @@ struct ingenic_soc_info {
- 	enum ingenic_mac_version version;
- 	u32 mask;
- 
--	int (*set_mode)(struct plat_stmmacenet_data *plat_dat);
-+	int (*set_mode)(struct plat_stmmacenet_data *plat_dat, u8 phy_intf_sel);
-+
-+	u8 valid_phy_intf_sel;
- };
- 
--static int jz4775_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
-+static int jz4775_mac_set_mode(struct plat_stmmacenet_data *plat_dat,
-+			       u8 phy_intf_sel)
- {
- 	struct ingenic_mac *mac = plat_dat->bsp_priv;
- 	unsigned int val;
--	u8 phy_intf_sel;
+@@ -77,22 +77,12 @@ static int jz4775_mac_set_mode(struct plat_stmmacenet_data *plat_dat,
  
  	switch (plat_dat->phy_interface) {
  	case PHY_INTERFACE_MODE_MII:
--		phy_intf_sel = PHY_INTF_SEL_GMII_MII;
- 		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_MII\n");
- 		break;
- 
+-		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_MII\n");
+-		break;
+-
  	case PHY_INTERFACE_MODE_GMII:
--		phy_intf_sel = PHY_INTF_SEL_GMII_MII;
- 		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_GMII\n");
- 		break;
- 
+-		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_GMII\n");
+-		break;
+-
  	case PHY_INTERFACE_MODE_RMII:
--		phy_intf_sel = PHY_INTF_SEL_RMII;
- 		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_RMII\n");
- 		break;
- 
-@@ -93,7 +92,6 @@ static int jz4775_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
+-		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_RMII\n");
+-		break;
+-
+ 	case PHY_INTERFACE_MODE_RGMII:
  	case PHY_INTERFACE_MODE_RGMII_ID:
  	case PHY_INTERFACE_MODE_RGMII_TXID:
  	case PHY_INTERFACE_MODE_RGMII_RXID:
--		phy_intf_sel = PHY_INTF_SEL_RGMII;
- 		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_RGMII\n");
+-		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_RGMII\n");
  		break;
  
-@@ -110,7 +108,8 @@ static int jz4775_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
- 	return regmap_update_bits(mac->regmap, 0, mac->soc_info->mask, val);
- }
- 
--static int x1000_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
-+static int x1000_mac_set_mode(struct plat_stmmacenet_data *plat_dat,
-+			      u8 phy_intf_sel)
- {
- 	struct ingenic_mac *mac = plat_dat->bsp_priv;
- 
-@@ -129,15 +128,14 @@ static int x1000_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
- 	return regmap_update_bits(mac->regmap, 0, mac->soc_info->mask, 0);
- }
- 
--static int x1600_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
-+static int x1600_mac_set_mode(struct plat_stmmacenet_data *plat_dat,
-+			      u8 phy_intf_sel)
- {
- 	struct ingenic_mac *mac = plat_dat->bsp_priv;
- 	unsigned int val;
--	u8 phy_intf_sel;
+ 	default:
+@@ -115,7 +105,6 @@ static int x1000_mac_set_mode(struct plat_stmmacenet_data *plat_dat,
  
  	switch (plat_dat->phy_interface) {
  	case PHY_INTERFACE_MODE_RMII:
--		phy_intf_sel = PHY_INTF_SEL_RMII;
- 		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_RMII\n");
+-		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_RMII\n");
  		break;
  
-@@ -153,16 +151,15 @@ static int x1600_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
- 	return regmap_update_bits(mac->regmap, 0, mac->soc_info->mask, val);
- }
+ 	default:
+@@ -136,7 +125,6 @@ static int x1600_mac_set_mode(struct plat_stmmacenet_data *plat_dat,
  
--static int x1830_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
-+static int x1830_mac_set_mode(struct plat_stmmacenet_data *plat_dat,
-+			      u8 phy_intf_sel)
- {
- 	struct ingenic_mac *mac = plat_dat->bsp_priv;
- 	unsigned int val;
--	u8 phy_intf_sel;
+ 	switch (plat_dat->phy_interface) {
+ 	case PHY_INTERFACE_MODE_RMII:
+-		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_RMII\n");
+ 		break;
  
+ 	default:
+@@ -160,7 +148,6 @@ static int x1830_mac_set_mode(struct plat_stmmacenet_data *plat_dat,
  	switch (plat_dat->phy_interface) {
  	case PHY_INTERFACE_MODE_RMII:
  		val = FIELD_PREP(MACPHYC_MODE_SEL_MASK, MACPHYC_MODE_SEL_RMII);
--		phy_intf_sel = PHY_INTF_SEL_RMII;
- 		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_RMII\n");
+-		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_RMII\n");
  		break;
  
-@@ -178,17 +175,16 @@ static int x1830_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
- 	return regmap_update_bits(mac->regmap, 0, mac->soc_info->mask, val);
- }
- 
--static int x2000_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
-+static int x2000_mac_set_mode(struct plat_stmmacenet_data *plat_dat,
-+			      u8 phy_intf_sel)
- {
- 	struct ingenic_mac *mac = plat_dat->bsp_priv;
- 	unsigned int val;
--	u8 phy_intf_sel;
- 
- 	switch (plat_dat->phy_interface) {
+ 	default:
+@@ -185,7 +172,6 @@ static int x2000_mac_set_mode(struct plat_stmmacenet_data *plat_dat,
  	case PHY_INTERFACE_MODE_RMII:
  		val = FIELD_PREP(MACPHYC_TX_SEL_MASK, MACPHYC_TX_SEL_ORIGIN) |
  			  FIELD_PREP(MACPHYC_RX_SEL_MASK, MACPHYC_RX_SEL_ORIGIN);
--		phy_intf_sel = PHY_INTF_SEL_RMII;
- 		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_RMII\n");
+-		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_RMII\n");
  		break;
  
-@@ -197,8 +193,6 @@ static int x2000_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
- 	case PHY_INTERFACE_MODE_RGMII_TXID:
- 	case PHY_INTERFACE_MODE_RGMII_RXID:
- 		val = 0;
--		phy_intf_sel = PHY_INTF_SEL_RGMII;
--
- 		if (mac->tx_delay == 0)
- 			val |= FIELD_PREP(MACPHYC_TX_SEL_MASK, MACPHYC_TX_SEL_ORIGIN);
- 		else
-@@ -229,10 +223,21 @@ static int x2000_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
- static int ingenic_mac_init(struct platform_device *pdev, void *bsp_priv)
- {
- 	struct ingenic_mac *mac = bsp_priv;
--	int ret;
-+	phy_interface_t interface;
-+	int phy_intf_sel, ret;
+ 	case PHY_INTERFACE_MODE_RGMII:
+@@ -205,7 +191,6 @@ static int x2000_mac_set_mode(struct plat_stmmacenet_data *plat_dat,
+ 			val |= FIELD_PREP(MACPHYC_RX_SEL_MASK, MACPHYC_RX_SEL_DELAY) |
+ 				   FIELD_PREP(MACPHYC_RX_DELAY_MASK, (mac->rx_delay + 9750) / 19500 - 1);
  
- 	if (mac->soc_info->set_mode) {
--		ret = mac->soc_info->set_mode(mac->plat_dat);
-+		interface = mac->plat_dat->phy_interface;
+-		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_RGMII\n");
+ 		break;
+ 
+ 	default:
+@@ -237,6 +222,9 @@ static int ingenic_mac_init(struct platform_device *pdev, void *bsp_priv)
+ 			return phy_intf_sel < 0 ? phy_intf_sel : -EINVAL;
+ 		}
+ 
++		dev_dbg(mac->dev, "MAC PHY control register: interface %s\n",
++			phy_modes(interface));
 +
-+		phy_intf_sel = stmmac_get_phy_intf_sel(interface);
-+		if (phy_intf_sel < 0 || phy_intf_sel >= BITS_PER_BYTE ||
-+		    ~mac->soc_info->valid_phy_intf_sel & BIT(phy_intf_sel)) {
-+			dev_err(mac->dev, "unsupported interface %s\n",
-+				phy_modes(interface));
-+			return phy_intf_sel < 0 ? phy_intf_sel : -EINVAL;
-+		}
-+
-+		ret = mac->soc_info->set_mode(mac->plat_dat, phy_intf_sel);
+ 		ret = mac->soc_info->set_mode(mac->plat_dat, phy_intf_sel);
  		if (ret)
  			return ret;
- 	}
-@@ -309,6 +314,9 @@ static struct ingenic_soc_info jz4775_soc_info = {
- 	.mask = MACPHYC_TXCLK_SEL_MASK | MACPHYC_SOFT_RST_MASK | MACPHYC_PHY_INFT_MASK,
- 
- 	.set_mode = jz4775_mac_set_mode,
-+	.valid_phy_intf_sel = BIT(PHY_INTF_SEL_GMII_MII) |
-+			      BIT(PHY_INTF_SEL_RGMII) |
-+			      BIT(PHY_INTF_SEL_RMII),
- };
- 
- static struct ingenic_soc_info x1000_soc_info = {
-@@ -316,6 +324,7 @@ static struct ingenic_soc_info x1000_soc_info = {
- 	.mask = MACPHYC_SOFT_RST_MASK,
- 
- 	.set_mode = x1000_mac_set_mode,
-+	.valid_phy_intf_sel = BIT(PHY_INTF_SEL_RMII),
- };
- 
- static struct ingenic_soc_info x1600_soc_info = {
-@@ -323,6 +332,7 @@ static struct ingenic_soc_info x1600_soc_info = {
- 	.mask = MACPHYC_SOFT_RST_MASK | MACPHYC_PHY_INFT_MASK,
- 
- 	.set_mode = x1600_mac_set_mode,
-+	.valid_phy_intf_sel = BIT(PHY_INTF_SEL_RMII),
- };
- 
- static struct ingenic_soc_info x1830_soc_info = {
-@@ -330,6 +340,7 @@ static struct ingenic_soc_info x1830_soc_info = {
- 	.mask = MACPHYC_MODE_SEL_MASK | MACPHYC_SOFT_RST_MASK | MACPHYC_PHY_INFT_MASK,
- 
- 	.set_mode = x1830_mac_set_mode,
-+	.valid_phy_intf_sel = BIT(PHY_INTF_SEL_RMII),
- };
- 
- static struct ingenic_soc_info x2000_soc_info = {
-@@ -338,6 +349,8 @@ static struct ingenic_soc_info x2000_soc_info = {
- 			MACPHYC_RX_DELAY_MASK | MACPHYC_SOFT_RST_MASK | MACPHYC_PHY_INFT_MASK,
- 
- 	.set_mode = x2000_mac_set_mode,
-+	.valid_phy_intf_sel = BIT(PHY_INTF_SEL_RGMII) |
-+			      BIT(PHY_INTF_SEL_RMII),
- };
- 
- static const struct of_device_id ingenic_mac_of_matches[] = {
 -- 
 2.47.3
 
