@@ -1,185 +1,108 @@
-Return-Path: <netdev+bounces-235879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6346C36B06
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 17:28:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EDCF9C36BF6
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 17:40:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DD8B85017C9
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 16:19:48 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0DBF0501BA8
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 16:20:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1A07332ED1;
-	Wed,  5 Nov 2025 16:16:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B727B33A021;
+	Wed,  5 Nov 2025 16:17:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OGiEhwta";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="d8aOGak9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l0hjf0Ui"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8465F32D0E3
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 16:16:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C00332EAD;
+	Wed,  5 Nov 2025 16:17:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762359398; cv=none; b=r2NoYin0AgZtfRUDdcIjzJIVrOs9rBhQkN7ghbcOuTP3l0sPpG3nZPv/m+8nE5WWLZK9sJJymBVVQLMLecdSoi5dUray1JWeCkc5cmG0yYzvqeDiWZ/oJ6yPULWb30lcNlTk+q1khVpLJdCGNQxhNl9D5PMbZHugZWDQe0jRiQU=
+	t=1762359440; cv=none; b=GIrFyVF9d5PEQVTKoghwXOuMtoWPzwYqEZ07HRoQDNJFwY9duSQtiKyRULVHu24X4GX2aoEYGuuRP1MvXTK46VlmLqzjjzEaHFA2s8uyKP4+ARkNz1n05RCQUuQWTkwosLMgMkDJqVuHCtY5rmGMdzdsrL6IqJ66ittSRKd2LOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762359398; c=relaxed/simple;
-	bh=Z7eZPun2oefAkSM3+F0++XPUVNTkIWBrwjzNYiRkZK4=;
+	s=arc-20240116; t=1762359440; c=relaxed/simple;
+	bh=m0WmoCYyOXZpK7uUlcvblqPFNrYVzKYbQ3i1eOPl5Zg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H17f6XkLFzaAt6zlzdUde1gUgfQsB6qFsmebDVWv8ioS2kR8ra5OzSv5Fz4MPDTvK6BjVuE2sxvY3bdBeK07vM0N+E7pt5YxiX0SOLKexpZuGzQpcM1CEN/aLbJL97CNWUMSzUMj0Dc6Zmdf7tAr/ZBcmbl7o0IoISrXDPD+T8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OGiEhwta; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=d8aOGak9; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762359395;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Du/r5ksOWZtDfSJI4YOsWmAPKYTxSvBd3w3sn3Syt2A=;
-	b=OGiEhwta/SVUOFStPYurh0GkafrhS9FdNMbzoBBcD36fi8J/NDiHHc6VRGdygkd4lwwAIG
-	IZMk2gRtolOwliCV8JE/1zTBjLTnwzxo/Wr4thnG71tEHK0r0DqkGqL7myB8ZfEpYisJ9a
-	zFR44943wJdmW0Q+GuEGro88qE0qXlQ=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-672-XnO6scQXNkq8Bh5WeFEPtQ-1; Wed, 05 Nov 2025 11:16:34 -0500
-X-MC-Unique: XnO6scQXNkq8Bh5WeFEPtQ-1
-X-Mimecast-MFC-AGG-ID: XnO6scQXNkq8Bh5WeFEPtQ_1762359393
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-477563e531cso21459005e9.1
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 08:16:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762359393; x=1762964193; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Du/r5ksOWZtDfSJI4YOsWmAPKYTxSvBd3w3sn3Syt2A=;
-        b=d8aOGak9u1t2OiNCqVmiW5WUQk/pefp2soSF1/PSBHpRnHYPIp6u/1kLlDmR0Ce4/B
-         GD60rr1gue63FdJ03HRwTt5GhKYBNbaNI2h8Qh/j8z8lf2taO31ubQjQQszQE3C2lpEP
-         A30K1hVwDS2P5XWilErfs6qTMxtW0GV4enyCuLqYMWlnG0zrL7stGJXGMtytfkmCq/XG
-         ilbnOPkwq9ga57gD3ozMy3xxDvSjdjG+qVpsHOEiLIqKectvQiLBidjxERsqOlhLPoAm
-         Vee7oFIc8AIgIrJHZMgBtEYMIp9W+3eRxzN6lYQjO5FFxWxae947Q3Pg0GEnSDyrjD2G
-         cVQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762359393; x=1762964193;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Du/r5ksOWZtDfSJI4YOsWmAPKYTxSvBd3w3sn3Syt2A=;
-        b=czgUAHDn6G5AmTis5d6p/drNBvlti89tgFAocD2LkRYejQCMmjS9I/Y5PPFOnoh1CQ
-         qzDM5SL8H3iusjeCYgmD/nHaoUaUJ9KgCP264qDs1hDVC1hwc7PEGN+9TG9KzUdwOLxY
-         obo4pXtbuzL/rwLxE4lLSpckRGMz3xpNvyWU57xOfKIynUFIEAi/idhCItNHM6mz9bJ9
-         QBRj4Cn3nSamfarwX0LgoPcE8Zh+fmzonXtrLcraePdITkIAjNqM9bAFhBsBRSyToyIZ
-         oddNtuH5WflMUwGcnyNx3k/LKzraYYXEJxcGa4YiczReYt4oOkUi4KpB7nOROatE1TKC
-         Gl4A==
-X-Forwarded-Encrypted: i=1; AJvYcCWj9SLuWeMtYy06uclIzn04iLoBgQHNa+ervIBqM09IVgMH00AI79Jml+zlc4wkgA3HR0RHPP0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwW4AwhLUDWoTaRBU5ClYhNeLZBwRKasZMjL1sgVhoyNggvEDJ3
-	LeV6YEJSEMynZwDSzwsVBFiU/UI9Qn2kNOirJfs7lQh2HaahOnbYeppS0OYaHyAmVK2tTQQGTwE
-	s2QRHGarDw3uFgonv6dQ0pOz2W6SmMOu2PrrjyjM2tcoU9ZaRlN3I/97kJg==
-X-Gm-Gg: ASbGncsSrvseS2mwz68oNHsGmOSCzsFpgMJsZYCJcoUhfmaDolVXIwFJd03pvxRxa3x
-	tHsrn+uiplU6gjMb5/iccASitSabrJAj9vPtIvXIAHgGZdWbGpzQwzXloWlr/4BvtXO6RoongQH
-	9ISKv4FGAaSaLe9YyN0qFFneQaodR0qIn/mrc4eL9Zo8+UfNNQi9OmaQXITSnm93dUL5HbkY8eb
-	kTbXhbSYJnoFjh57f2dIUnTToMIvKhYiZxJUp53LQ2qRTseusTSAY4pu+EaezrhmLPY31o1bJ7G
-	zKIcAVt6qD0KB3LwbMAFdIc/+LnB+BnOMHjC8IAMiFB1EGtP53WwVqJyrJoGJqVm6jeg5gIWfIF
-	oj9s=
-X-Received: by 2002:a05:600c:458d:b0:45d:f81d:eae7 with SMTP id 5b1f17b1804b1-4775ce2b680mr30986295e9.28.1762359392875;
-        Wed, 05 Nov 2025 08:16:32 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG1zaF9xjh7lShdpMKxs0x1j37UBOgMCZm7D8elWZkrx4hb3LonHqe/99De4jJ82rRpyZFkSA==
-X-Received: by 2002:a05:600c:458d:b0:45d:f81d:eae7 with SMTP id 5b1f17b1804b1-4775ce2b680mr30985775e9.28.1762359392381;
-        Wed, 05 Nov 2025 08:16:32 -0800 (PST)
-Received: from sgarzare-redhat ([78.209.227.79])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429dc1f5af7sm12313106f8f.28.2025.11.05.08.16.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Nov 2025 08:16:31 -0800 (PST)
-Date: Wed, 5 Nov 2025 17:16:29 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Shuah Khan <shuah@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Bobby Eshleman <bobbyeshleman@meta.com>, 
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net v2] selftests/vsock: avoid false-positives when
- checking dmesg
-Message-ID: <5dkiqiatpxuq3wnizyq25c4hmiztglefh5icdcxpkvmej775nn@qw4gmh2bheyf>
-References: <20251105-vsock-vmtest-dmesg-fix-v2-1-1a042a14892c@meta.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=R3Y8vJElT6nXBeOy+IIxYX8pPs6LsJlXWqIkqDPpTvNNiBCGmRZ+xCZDMZnlTTgbAPSQ2/rbO8U60cDAdn2MqLeME6ZjmqZHz6cy3kYv4xktfhkev38oZWhn1+frdJFIjl0ert1jevqIs6SS9xzzuXDUwJ+b1MzMgnvYQxF9YP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l0hjf0Ui; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EA00C4CEF5;
+	Wed,  5 Nov 2025 16:17:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762359439;
+	bh=m0WmoCYyOXZpK7uUlcvblqPFNrYVzKYbQ3i1eOPl5Zg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=l0hjf0UiodG9bvlzR0teTF7/EOA6sdH3lJdRLlau9I8A/DseQMnymKV6dDPaF700i
+	 /GM4BkXlPH1RycuSsw1W8H9JlsG+Bpucpt9ON/Yb5Lp8BhsF0xHuIPaLrfAj2uEL5x
+	 FGHRWbLzd0GHQgdJxbcv9AuCCM02jjoLln2tMRrhAU4O51K57/fzGeuubEOv9trZh9
+	 vwOscUOROGk2lS5YeTqltie7TWPT1TVeiQnqH89qkQQHLnjKNmuhBQSCx2JZFrhqQw
+	 s6AEiUIsphHx7/SDFAYdbTpJoHq3d0onR71up8dRK9b/ZyB8C1jktq8jhvlYW0LWY/
+	 sPiObTTJWLXrA==
+Date: Wed, 5 Nov 2025 17:17:17 +0100
+From: Frederic Weisbecker <frederic@kernel.org>
+To: Waiman Long <llong@redhat.com>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vlastimil Babka <vbabka@suse.cz>, Will Deacon <will@kernel.org>,
+	cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-block@vger.kernel.org, linux-mm@kvack.org,
+	linux-pci@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 14/33] sched/isolation: Flush memcg workqueues on cpuset
+ isolated partition change
+Message-ID: <aQt4jT9qqP_l_ZSF@localhost.localdomain>
+References: <20251013203146.10162-1-frederic@kernel.org>
+ <20251013203146.10162-15-frederic@kernel.org>
+ <364e084a-ef37-42ab-a2ae-5f103f1eb212@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20251105-vsock-vmtest-dmesg-fix-v2-1-1a042a14892c@meta.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <364e084a-ef37-42ab-a2ae-5f103f1eb212@redhat.com>
 
-On Wed, Nov 05, 2025 at 07:59:19AM -0800, Bobby Eshleman wrote:
->From: Bobby Eshleman <bobbyeshleman@meta.com>
->
->Sometimes VMs will have some intermittent dmesg warnings that are
->unrelated to vsock. Change the dmesg parsing to filter on strings
->containing 'vsock' to avoid false positive failures that are unrelated
->to vsock. The downside is that it is possible for some vsock related
->warnings to not contain the substring 'vsock', so those will be missed.
->
->Fixes: a4a65c6fe08b ("selftests/vsock: add initial vmtest.sh for vsock")
->Reviewed-by: Simon Horman <horms@kernel.org>
->Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
->---
->Previously was part of the series:
->https://lore.kernel.org/all/20251022-vsock-selftests-fixes-and-improvements-v1-0-edeb179d6463@meta.com/
->---
->Changes in v2:
->- use consistent quoting for vsock string
->- Link to v1: https://lore.kernel.org/r/20251104-vsock-vmtest-dmesg-fix-v1-1-80c8db3f5dfe@meta.com
->---
-> tools/testing/selftests/vsock/vmtest.sh | 8 ++++----
-> 1 file changed, 4 insertions(+), 4 deletions(-)
+Le Tue, Oct 21, 2025 at 03:16:45PM -0400, Waiman Long a écrit :
+> > @@ -5134,6 +5141,9 @@ int __init mem_cgroup_init(void)
+> >   	cpuhp_setup_state_nocalls(CPUHP_MM_MEMCQ_DEAD, "mm/memctrl:dead", NULL,
+> >   				  memcg_hotplug_cpu_dead);
+> > +	memcg_wq = alloc_workqueue("memcg", 0, 0);
+> 
+> Should we explicitly mark the memcg_wq as WQ_PERCPU even though I think
+> percpu is the default. The schedule_work_on() schedules work on the
+> system_percpu_wq.
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Good catch, percpu is the default but that behaviour is scheduled for
+deprecation. I'm adding WQ_PERCPU.
 
->
->diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
->index edacebfc1632..8ceeb8a7894f 100755
->--- a/tools/testing/selftests/vsock/vmtest.sh
->+++ b/tools/testing/selftests/vsock/vmtest.sh
->@@ -389,9 +389,9 @@ run_test() {
-> 	local rc
->
-> 	host_oops_cnt_before=$(dmesg | grep -c -i 'Oops')
->-	host_warn_cnt_before=$(dmesg --level=warn | wc -l)
->+	host_warn_cnt_before=$(dmesg --level=warn | grep -c -i 'vsock')
-> 	vm_oops_cnt_before=$(vm_ssh -- dmesg | grep -c -i 'Oops')
->-	vm_warn_cnt_before=$(vm_ssh -- dmesg --level=warn | wc -l)
->+	vm_warn_cnt_before=$(vm_ssh -- dmesg --level=warn | grep -c -i 'vsock')
->
-> 	name=$(echo "${1}" | awk '{ print $1 }')
-> 	eval test_"${name}"
->@@ -403,7 +403,7 @@ run_test() {
-> 		rc=$KSFT_FAIL
-> 	fi
->
->-	host_warn_cnt_after=$(dmesg --level=warn | wc -l)
->+	host_warn_cnt_after=$(dmesg --level=warn | grep -c -i 'vsock')
-> 	if [[ ${host_warn_cnt_after} -gt ${host_warn_cnt_before} ]]; then
-> 		echo "FAIL: kernel warning detected on host" | log_host "${name}"
-> 		rc=$KSFT_FAIL
->@@ -415,7 +415,7 @@ run_test() {
-> 		rc=$KSFT_FAIL
-> 	fi
->
->-	vm_warn_cnt_after=$(vm_ssh -- dmesg --level=warn | wc -l)
->+	vm_warn_cnt_after=$(vm_ssh -- dmesg --level=warn | grep -c -i 'vsock')
-> 	if [[ ${vm_warn_cnt_after} -gt ${vm_warn_cnt_before} ]]; then
-> 		echo "FAIL: kernel warning detected on vm" | log_host "${name}"
-> 		rc=$KSFT_FAIL
->
->---
->base-commit: 89aec171d9d1ab168e43fcf9754b82e4c0aef9b9
->change-id: 20251104-vsock-vmtest-dmesg-fix-b2c59e1d9c38
->
->Best regards,
->-- 
->Bobby Eshleman <bobbyeshleman@meta.com>
->
+Thanks!
 
+-- 
+Frederic Weisbecker
+SUSE Labs
 
