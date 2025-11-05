@@ -1,295 +1,316 @@
-Return-Path: <netdev+bounces-235793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BDBDC35C3C
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 14:08:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72149C35CBB
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 14:17:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 330474F9C3C
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 13:05:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA3B03A3F3C
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 13:17:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CE812EA730;
-	Wed,  5 Nov 2025 13:05:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4C0F3164AB;
+	Wed,  5 Nov 2025 13:17:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RDq33sq9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MMdPfoug"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 640E63168F1
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 13:05:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC10230C61E;
+	Wed,  5 Nov 2025 13:17:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762347916; cv=none; b=SpZ0Hq3WLSah12M99tuPrkhUGlWD0A6qPE73hUvZWAM0Y+pWpFNQM8eM4jHyoszJtkqmC+CiALfeOxFs235XU/T3PdRqsrLlxuC48e/jHThyimmY9DFBd1S3sxLc+prji8qbYoKw2huimv3Dp9BbUGuFFFFWHfeTGXFG8lfZrGA=
+	t=1762348641; cv=none; b=C7sOg/Ov00Hl11x1B82bomMB8N9Dp5gWScUoqKdp3ThlUNjCJqs0fASkwej1AmQ2KKr2A+3iFB9PaYRJZUxg+YlVIelSVX0tpHdpnoZlZmIOhKPonXOcfvwKVTonOde8DVMJzEynY6fOa4ifSjajeVfFUn6vhzZROcxNcw25TLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762347916; c=relaxed/simple;
-	bh=agSHEtZvPJYRIhsGzNZVezqkVYPi3pBx4ZEoqYs0PkI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m4fUjAtMejaRknYGd9vfIge1Te6ydleukuBaoUmEcVJ7RKF3nkIDqlN8sizHMUoc4eLa92Gyhq/kbO25iFEMYOX4T+WTRdgFogb9X2RJso+if7tGoyUxcCUPjMoUgtXQb7so1E7gnzM1N70vALcwpAZY0uF8QG17jsKHrjl1fww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RDq33sq9; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4ed7a7ddc27so3142911cf.2
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 05:05:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762347913; x=1762952713; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t7x+B9bPBixdtyVtYVHkU2x+LhEirUQEYUDWiZN/fOQ=;
-        b=RDq33sq9KXEiVHpcQpNfPlXv3UL8+tFVIRa2pW9YySRry32oAT+j4R8gIfk+CuBpGV
-         CmT140c/S9tjeB4s2ayQJmAUzHPjfgdPITmEXe2VFysxJsWWu4f7CVIvoWUh7uAMVGyV
-         pWMoFWV2VTmxXC/s1hifhdQEXKDtxtS6iu0TFRMiFOwfrj5z9IrCQkcRrkwl3Hri98g+
-         bIc9G/zXTAEADW9uN2wuQEA85LrAaaNq88iVdxW8LTNStWiMMaxkO3pCAtNiWkiu+AZE
-         eo/AfX8KUm5YxkyRl7KQsr2lKoG5Jre8IndnK9/x0AOQiHmCob4OrPtcHvcTk6X8+UCg
-         DTWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762347913; x=1762952713;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=t7x+B9bPBixdtyVtYVHkU2x+LhEirUQEYUDWiZN/fOQ=;
-        b=jw/0+I00XoOD7sgXTVSMvcmNGqHNfSvbJhAjMiSBEm11a/KC1eP2ZSHAjHTLFaJb0C
-         VcBHRiHvmvRH4dFYdM0ugEsGNvCiSKADISm9cVv7bqE/JaEzCTyA3i4pLJVnJlyDokrX
-         lU6vdIME9dv+MSxbeK30S5BLdHlkYAXwHte821anqh/3eHYTiTOpDsxvHlI/HOWi3iaN
-         a302AS4j/LvPMb+k1i2WGpOpBV75r0vmmQzfYXlHuhM6c76DFpjZnkY3/nTxp8RvvwbC
-         XdgbRh2YyvnDqRoqnKMAHLPVAYsR2xR2WteKshalaI8I1wNx3pnRqRJRMHQtyMcLePA7
-         oVJg==
-X-Forwarded-Encrypted: i=1; AJvYcCWExLw7AFDQ1gqNntqOzLUGy5A9bEzMTjeCnM4JMh4W317ZB0ORuZ4MCUuLPwRjx15sLqynGVY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBiozAHpdI///K2rpLc7820eFMvQUQmgzuA8yDoIqoowCd+wp9
-	BZb9YSVHTWJa4ws71aEPpBcekF4GaktQm31SiB2+gvismouOcOmbtZDtIzpcCy56FJ26SWS0rLz
-	KTPISBucWC8BaC1A8nalwtveWpRjzH4iiwrQ6m+jf
-X-Gm-Gg: ASbGncuotybKFWAy72xap7Qr5OE2MeJcMJgUPRjrVLDBo2dM7cizuotgZbP2pfNk8Td
-	7RGlXxoUX7xq74AVX8IpR1L3ttTM3lvdhqd3b7DHUL/xgwBl7Xy8J0eSeZckLciYZ7EyPOPfcW8
-	HEU+9uHN70AYRXBw2o8tqBdC0qLqQjbP+jTMn7xmefp7YVI7dvs+rRUb4kCgV6QOzhgyKlbaEOH
-	1V+RfH4tYIBZn0QlRPj4IK54b7GFJGgxrMVIVKKaUQF18dPzXgAze0A/jpK
-X-Google-Smtp-Source: AGHT+IEY+GzhSiC4kXGw1rdG3sCGpAGWlOwwjtVH4BSSwgpEY7LedrZO7sBJfomJsnspnYboqF1KcHs1fP6gBb6TJDU=
-X-Received: by 2002:a05:622a:260e:b0:4ec:f86f:9244 with SMTP id
- d75a77b69052e-4ed7236b82emr45476671cf.34.1762347912869; Wed, 05 Nov 2025
- 05:05:12 -0800 (PST)
+	s=arc-20240116; t=1762348641; c=relaxed/simple;
+	bh=bLxDqXBX8K8Vjlzjd8C7ymdM8fXtuJMsKxknQnu4/K0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LeaNjc6M4eu1qg88mXAvxhNe4xX3NzRDitCGVqh3CQpsaPhfNYZTtX4Hz5wRzT+3AiSB4O9UBqt7YtR6b1QUdF9Zj5kEb+RApzis0CzH2IIkoHmvxP3bXZcnRcHW2+9jfyrsV9DLYL2uV0tMqL2v/YKw8vSsMxKnG7in0WGxOZs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MMdPfoug; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C547CC4CEF8;
+	Wed,  5 Nov 2025 13:17:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762348641;
+	bh=bLxDqXBX8K8Vjlzjd8C7ymdM8fXtuJMsKxknQnu4/K0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MMdPfoug6TCmKIXTnbMF8GnCZFF3aqE12inf+YDun3vddfLfsQ6TiUriJCO53QccX
+	 fFA0JI55Mr6uw+l29ZUa4d6iq1r94wT/s78sMgvxUA1VEjXM8r2dXl2hyzOkgVqPwn
+	 wXU1/5YUyOgEUpYaeMte0YZbUtywZh7dL14Z9OwzQ9DC6tNjEzJ5eLtuJ7TnIaaPCQ
+	 idGc6cWGwrLtQCrANjSUivztDHnhiIc4lfc3d4gezrwOUDCmT+D2w6q9inQkQWz5nj
+	 Jam+1JawYgPoizGpd6zn0jQfgMUads+04AhT1yI4FgGvaCT4o9yWgwiMO8sbFpb+QP
+	 3ANYPof57i0Eg==
+Date: Wed, 5 Nov 2025 15:17:17 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: netdev@vger.kernel.org,
+	Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+	Jason Gunthorpe <jgg@nvidia.com>, linux-rdma@vger.kernel.org
+Subject: Re: [PATCH] IB/rdmavt: rdmavt_qp.h: clean up kernel-doc comments
+Message-ID: <20251105131717.GF16832@unreal>
+References: <20251105045127.106822-1-rdunlap@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251104161327.41004-1-simon.schippers@tu-dortmund.de>
- <20251104161327.41004-2-simon.schippers@tu-dortmund.de> <CANn89iL6MjvOc8qEQpeQJPLX0Y3X0HmqNcmgHL4RzfcijPim5w@mail.gmail.com>
- <66d22955-bb20-44cf-8ad3-743ae272fec7@tu-dortmund.de> <CANn89i+oGnt=Gpo1hZh+8uaEoK3mKLQY-gszzHWC+A2enXa7Tw@mail.gmail.com>
- <be77736d-6fde-4f48-b774-f7067a826656@tu-dortmund.de> <CANn89iJVW-_qLbUehhJNJO70PRuw1SZVQX0towgZ4K-JvsPKkw@mail.gmail.com>
- <c01c12a8-c19c-4b9f-94d1-2a106e65a074@tu-dortmund.de>
-In-Reply-To: <c01c12a8-c19c-4b9f-94d1-2a106e65a074@tu-dortmund.de>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 5 Nov 2025 05:05:01 -0800
-X-Gm-Features: AWmQ_bmczxTD_xiVfmpYzU_nFYc93glUn-Npyv14kOLlWnq67dCdCSeUuf657bM
-Message-ID: <CANn89iJpXwmvg0MOvLo8+hVAhaMTL_1_62Afk_6dG1ZEL3tORQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 1/1] usbnet: Add support for Byte Queue Limits (BQL)
-To: Simon Schippers <simon.schippers@tu-dortmund.de>
-Cc: oneukum@suse.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
-	linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251105045127.106822-1-rdunlap@infradead.org>
 
-On Wed, Nov 5, 2025 at 4:58=E2=80=AFAM Simon Schippers
-<simon.schippers@tu-dortmund.de> wrote:
->
-> On 11/5/25 13:34, Eric Dumazet wrote:
-> > On Wed, Nov 5, 2025 at 4:20=E2=80=AFAM Simon Schippers
-> > <simon.schippers@tu-dortmund.de> wrote:
-> >>
-> >> On 11/5/25 12:28, Eric Dumazet wrote:
-> >>> On Wed, Nov 5, 2025 at 2:35=E2=80=AFAM Simon Schippers
-> >>> <simon.schippers@tu-dortmund.de> wrote:
-> >>>>
-> >>>> On 11/4/25 18:00, Eric Dumazet wrote:
-> >>>>> On Tue, Nov 4, 2025 at 8:14=E2=80=AFAM Simon Schippers
-> >>>>> <simon.schippers@tu-dortmund.de> wrote:
-> >>>>>>
-> >>>>>> The usbnet driver currently relies on fixed transmit queue lengths=
-, which
-> >>>>>> can lead to bufferbloat and large latency spikes under load -
-> >>>>>> particularly with cellular modems.
-> >>>>>> This patch adds support for Byte Queue Limits (BQL) to dynamically=
- manage
-> >>>>>> the transmit queue size and reduce latency without sacrificing
-> >>>>>> throughput.
-> >>>>>>
-> >>>>>> Testing was performed on various devices using the usbnet driver f=
-or
-> >>>>>> packet transmission:
-> >>>>>>
-> >>>>>> - DELOCK 66045: USB3 to 2.5 GbE adapter (ax88179_178a)
-> >>>>>> - DELOCK 61969: USB2 to 1 GbE adapter (asix)
-> >>>>>> - Quectel RM520: 5G modem (qmi_wwan)
-> >>>>>> - USB2 Android tethering (cdc_ncm)
-> >>>>>>
-> >>>>>> No performance degradation was observed for iperf3 TCP or UDP traf=
-fic,
-> >>>>>> while latency for a prioritized ping application was significantly
-> >>>>>> reduced. For example, using the USB3 to 2.5 GbE adapter, which was=
- fully
-> >>>>>> utilized by iperf3 UDP traffic, the prioritized ping was improved =
-from
-> >>>>>> 1.6 ms to 0.6 ms. With the same setup but with a 100 Mbit/s Ethern=
-et
-> >>>>>> connection, the prioritized ping was improved from 35 ms to 5 ms.
-> >>>>>>
-> >>>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
-> >>>>>> ---
-> >>>>>>  drivers/net/usb/usbnet.c | 8 ++++++++
-> >>>>>>  1 file changed, 8 insertions(+)
-> >>>>>>
-> >>>>>> diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
-> >>>>>> index 62a85dbad31a..1994f03a78ad 100644
-> >>>>>> --- a/drivers/net/usb/usbnet.c
-> >>>>>> +++ b/drivers/net/usb/usbnet.c
-> >>>>>> @@ -831,6 +831,7 @@ int usbnet_stop(struct net_device *net)
-> >>>>>>
-> >>>>>>         clear_bit(EVENT_DEV_OPEN, &dev->flags);
-> >>>>>>         netif_stop_queue (net);
-> >>>>>> +       netdev_reset_queue(net);
-> >>>>>>
-> >>>>>>         netif_info(dev, ifdown, dev->net,
-> >>>>>>                    "stop stats: rx/tx %lu/%lu, errs %lu/%lu\n",
-> >>>>>> @@ -939,6 +940,7 @@ int usbnet_open(struct net_device *net)
-> >>>>>>         }
-> >>>>>>
-> >>>>>>         set_bit(EVENT_DEV_OPEN, &dev->flags);
-> >>>>>> +       netdev_reset_queue(net);
-> >>>>>>         netif_start_queue (net);
-> >>>>>>         netif_info(dev, ifup, dev->net,
-> >>>>>>                    "open: enable queueing (rx %d, tx %d) mtu %d %s=
- framing\n",
-> >>>>>> @@ -1500,6 +1502,7 @@ netdev_tx_t usbnet_start_xmit(struct sk_buff=
- *skb, struct net_device *net)
-> >>>>>>         case 0:
-> >>>>>>                 netif_trans_update(net);
-> >>>>>>                 __usbnet_queue_skb(&dev->txq, skb, tx_start);
-> >>>>>> +               netdev_sent_queue(net, skb->len);
-> >>>>>>                 if (dev->txq.qlen >=3D TX_QLEN (dev))
-> >>>>>>                         netif_stop_queue (net);
-> >>>>>>         }
-> >>>>>> @@ -1563,6 +1566,7 @@ static inline void usb_free_skb(struct sk_bu=
-ff *skb)
-> >>>>>>  static void usbnet_bh(struct timer_list *t)
-> >>>>>>  {
-> >>>>>>         struct usbnet           *dev =3D timer_container_of(dev, t=
-, delay);
-> >>>>>> +       unsigned int bytes_compl =3D 0, pkts_compl =3D 0;
-> >>>>>>         struct sk_buff          *skb;
-> >>>>>>         struct skb_data         *entry;
-> >>>>>>
-> >>>>>> @@ -1574,6 +1578,8 @@ static void usbnet_bh(struct timer_list *t)
-> >>>>>>                                 usb_free_skb(skb);
-> >>>>>>                         continue;
-> >>>>>>                 case tx_done:
-> >>>>>> +                       bytes_compl +=3D skb->len;
-> >>>>>> +                       pkts_compl++;
-> >>>>>>                         kfree(entry->urb->sg);
-> >>>>>>                         fallthrough;
-> >>>>>>                 case rx_cleanup:
-> >>>>>> @@ -1584,6 +1590,8 @@ static void usbnet_bh(struct timer_list *t)
-> >>>>>>                 }
-> >>>>>>         }
-> >>>>>>
-> >>>>>> +       netdev_completed_queue(dev->net, pkts_compl, bytes_compl);
-> >>>>>> +
-> >>>>>>         /* restart RX again after disabling due to high error rate=
- */
-> >>>>>>         clear_bit(EVENT_RX_KILL, &dev->flags);
-> >>>>>>
-> >>>>>
-> >>>>> I think this is racy. usbnet_bh() can run from two different contex=
-ts,
-> >>>>> at the same time (from two cpus)
-> >>>>>
-> >>>>> 1) From process context :
-> >>>>> usbnet_bh_work()
-> >>>>>
-> >>>>> 2) From a timer. (dev->delay)
-> >>>>>
-> >>>>>
-> >>>>> To use BQL, you will need to add mutual exclusion.
-> >>>>
-> >>>> Yeah, I missed that.
-> >>>>
-> >>>> I guess synchronizing with the lock of the sk_buff_head dev->done ma=
-kes
-> >>>> sense? The same locking is also done right before in skb_dequeue.
-> >>>
-> >>> Or only protect the netdev_completed_queue(dev->net, pkts_compl,
-> >>> bytes_compl) call,
-> >>> adding a specific/dedicated spinlock for this purpose.
-> >>>
-> >>> spin_lock_bh(&dev->bql_spinlock);
-> >>> netdev_completed_queue(dev->net, pkts_compl, bytes_compl);
-> >>> spin_unlock_bh(&dev->bql_spinlock);
-> >>>
-> >>> I am assuming no usbnet driver is setting dev->lltx =3D true (or plan=
- to
-> >>> in the future)
-> >>> so usbnet_start_xmit() is protected by HARD_TX_LOCK() already.
-> >>
-> >> Yes, I also want to only protect the netdev_completed_queue(dev->net,
-> >> pkts_compl, bytes_compl) call. However, I am wondering what you mean w=
-ith
-> >>
-> >> spin_lock_bh(&dev->bql_spinlock)
-> >> ...
-> >>
-> >>
-> >> Do we want to protect against usbnet_start_xmit()? Maybe I am missing
-> >> something, but other BQL implementations also do not seem to protect
-> >> against their respective ndo_start_xmit.
-> >
-> > BQL has been designed so that producer/consumer can run in //
-> >
-> > However, all producers need exclusion (typically done with HARD_TX_LOCK=
-)
-> > All consumers need exclusion (typically done because of NAPI sched bit)
-> >
-> >>
-> >>
-> >> My approach would just protect against usbnet_bh calls from another
-> >> context with the same locking as skb_dequeue():
-> >>
-> >> spin_lock_irqsave(&list->lock, flags);
-> >> netdev_completed_queue(dev->net, pkts_compl, bytes_compl);
-> >> spin_unlock_irqrestore(&list->lock, flags);
-> >
-> > I tend to prefer not masking hard irq unless really necessary.
-> >
-> > Also, reusing  a lock for different purposes makes things confusing
-> > in terms of code maintenance.
-> >
-> > usbnet is hardly performance critical, I would keep list->lock only to
-> > protect the list of skbs :)
->
-> Thanks for the clarification!
->
->
-> So in usbnet.h I will just
->
-> #include <linux/spinlock.h>
->
-> and then save the new field
->
-> spinlock_t bql_spinlock;
->
-> in struct usbnet and will then call
->
-> spin_lock_bh(&dev->bql_spinlock);
-> netdev_completed_queue(dev->net, pkts_compl, bytes_compl);
-> spin_unlock_bh(&dev->bql_spinlock);
->
-> in usbnet_bh. Am I right?
+On Tue, Nov 04, 2025 at 08:51:27PM -0800, Randy Dunlap wrote:
+> Correct the kernel-doc comments format to avoid around 35 kernel-doc
+> warnings:
+> 
+> - use struct keyword to introduce struct kernel-doc comments
+> - use correct variable name for some struct members
+> - use correct function name in comments for some functions
+> - fix spelling in a few comments
+> - use a ':' instead of '-' to separate struct members from their
+>   descriptions
+> - add a function name heading for rvt_div_mtu()
+> 
+> This leaves one struct member that is not described:
+> rdmavt_qp.h:206: warning: Function parameter or struct member 'wq'
+>  not described in 'rvt_krwq'
+> 
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> ---
+> Cc: Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>
+> Cc: Jason Gunthorpe <jgg@nvidia.com>
+> Cc: Leon Romanovsky <leonro@nvidia.com>
+> Cc: linux-rdma@vger.kernel.org
+> ---
+>  include/rdma/rdmavt_qp.h |   70 +++++++++++++++++++------------------
+>  1 file changed, 36 insertions(+), 34 deletions(-)
 
-You also need to spin_lock_init() this new lock in setup phase (usbnet_prob=
-e)
+I applied this to RDMA tree.
 
-Test/Run your code after enabling LOCKDEP in your .config
-(CONFIG_PROVE_LOCKING=3Dy)
+➜  kernel git:(wip/leon-for-next) ./scripts/get_maintainer.pl /tmp/0001-IB-rdmavt-rdmavt_qp.h-clean-up-kernel-doc-comments.patch
+Jason Gunthorpe <jgg@ziepe.ca> (maintainer:INFINIBAND SUBSYSTEM)
+Leon Romanovsky <leon@kernel.org> (maintainer:INFINIBAND SUBSYSTEM)
+linux-rdma@vger.kernel.org (open list:INFINIBAND SUBSYSTEM)
+linux-kernel@vger.kernel.org (open list)
+INFINIBAND SUBSYSTEM status: Supported
+
+Thanks
+
+> 
+> --- linux-next-20251103.orig/include/rdma/rdmavt_qp.h
+> +++ linux-next-20251103/include/rdma/rdmavt_qp.h
+> @@ -144,7 +144,7 @@
+>  #define RVT_SEND_COMPLETION_ONLY	(IB_SEND_RESERVED_START << 1)
+>  
+>  /**
+> - * rvt_ud_wr - IB UD work plus AH cache
+> + * struct rvt_ud_wr - IB UD work plus AH cache
+>   * @wr: valid IB work request
+>   * @attr: pointer to an allocated AH attribute
+>   *
+> @@ -184,10 +184,10 @@ struct rvt_swqe {
+>   * struct rvt_krwq - kernel struct receive work request
+>   * @p_lock: lock to protect producer of the kernel buffer
+>   * @head: index of next entry to fill
+> - * @c_lock:lock to protect consumer of the kernel buffer
+> + * @c_lock: lock to protect consumer of the kernel buffer
+>   * @tail: index of next entry to pull
+> - * @count: count is aproximate of total receive enteries posted
+> - * @rvt_rwqe: struct of receive work request queue entry
+> + * @count: count is approximate of total receive entries posted
+> + * @curr_wq: struct of receive work request queue entry
+>   *
+>   * This structure is used to contain the head pointer,
+>   * tail pointer and receive work queue entries for kernel
+> @@ -309,10 +309,10 @@ struct rvt_ack_entry {
+>  #define RVT_OPERATION_MAX (IB_WR_RESERVED10 + 1)
+>  
+>  /**
+> - * rvt_operation_params - op table entry
+> - * @length - the length to copy into the swqe entry
+> - * @qpt_support - a bit mask indicating QP type support
+> - * @flags - RVT_OPERATION flags (see above)
+> + * struct rvt_operation_params - op table entry
+> + * @length: the length to copy into the swqe entry
+> + * @qpt_support: a bit mask indicating QP type support
+> + * @flags: RVT_OPERATION flags (see above)
+>   *
+>   * This supports table driven post send so that
+>   * the driver can have differing an potentially
+> @@ -552,7 +552,7 @@ static inline struct rvt_rwqe *rvt_get_r
+>  
+>  /**
+>   * rvt_is_user_qp - return if this is user mode QP
+> - * @qp - the target QP
+> + * @qp: the target QP
+>   */
+>  static inline bool rvt_is_user_qp(struct rvt_qp *qp)
+>  {
+> @@ -561,7 +561,7 @@ static inline bool rvt_is_user_qp(struct
+>  
+>  /**
+>   * rvt_get_qp - get a QP reference
+> - * @qp - the QP to hold
+> + * @qp: the QP to hold
+>   */
+>  static inline void rvt_get_qp(struct rvt_qp *qp)
+>  {
+> @@ -570,7 +570,7 @@ static inline void rvt_get_qp(struct rvt
+>  
+>  /**
+>   * rvt_put_qp - release a QP reference
+> - * @qp - the QP to release
+> + * @qp: the QP to release
+>   */
+>  static inline void rvt_put_qp(struct rvt_qp *qp)
+>  {
+> @@ -580,7 +580,7 @@ static inline void rvt_put_qp(struct rvt
+>  
+>  /**
+>   * rvt_put_swqe - drop mr refs held by swqe
+> - * @wqe - the send wqe
+> + * @wqe: the send wqe
+>   *
+>   * This drops any mr references held by the swqe
+>   */
+> @@ -597,8 +597,8 @@ static inline void rvt_put_swqe(struct r
+>  
+>  /**
+>   * rvt_qp_wqe_reserve - reserve operation
+> - * @qp - the rvt qp
+> - * @wqe - the send wqe
+> + * @qp: the rvt qp
+> + * @wqe: the send wqe
+>   *
+>   * This routine used in post send to record
+>   * a wqe relative reserved operation use.
+> @@ -612,8 +612,8 @@ static inline void rvt_qp_wqe_reserve(
+>  
+>  /**
+>   * rvt_qp_wqe_unreserve - clean reserved operation
+> - * @qp - the rvt qp
+> - * @flags - send wqe flags
+> + * @qp: the rvt qp
+> + * @flags: send wqe flags
+>   *
+>   * This decrements the reserve use count.
+>   *
+> @@ -653,8 +653,8 @@ u32 rvt_restart_sge(struct rvt_sge_state
+>  
+>  /**
+>   * rvt_div_round_up_mtu - round up divide
+> - * @qp - the qp pair
+> - * @len - the length
+> + * @qp: the qp pair
+> + * @len: the length
+>   *
+>   * Perform a shift based mtu round up divide
+>   */
+> @@ -664,8 +664,9 @@ static inline u32 rvt_div_round_up_mtu(s
+>  }
+>  
+>  /**
+> - * @qp - the qp pair
+> - * @len - the length
+> + * rvt_div_mtu - shift-based divide
+> + * @qp: the qp pair
+> + * @len: the length
+>   *
+>   * Perform a shift based mtu divide
+>   */
+> @@ -676,7 +677,7 @@ static inline u32 rvt_div_mtu(struct rvt
+>  
+>  /**
+>   * rvt_timeout_to_jiffies - Convert a ULP timeout input into jiffies
+> - * @timeout - timeout input(0 - 31).
+> + * @timeout: timeout input(0 - 31).
+>   *
+>   * Return a timeout value in jiffies.
+>   */
+> @@ -690,7 +691,8 @@ static inline unsigned long rvt_timeout_
+>  
+>  /**
+>   * rvt_lookup_qpn - return the QP with the given QPN
+> - * @ibp: the ibport
+> + * @rdi: rvt device info structure
+> + * @rvp: the ibport
+>   * @qpn: the QP number to look up
+>   *
+>   * The caller must hold the rcu_read_lock(), and keep the lock until
+> @@ -716,9 +718,9 @@ static inline struct rvt_qp *rvt_lookup_
+>  }
+>  
+>  /**
+> - * rvt_mod_retry_timer - mod a retry timer
+> - * @qp - the QP
+> - * @shift - timeout shift to wait for multiple packets
+> + * rvt_mod_retry_timer_ext - mod a retry timer
+> + * @qp: the QP
+> + * @shift: timeout shift to wait for multiple packets
+>   * Modify a potentially already running retry timer
+>   */
+>  static inline void rvt_mod_retry_timer_ext(struct rvt_qp *qp, u8 shift)
+> @@ -753,7 +755,7 @@ static inline void rvt_put_qp_swqe(struc
+>  }
+>  
+>  /**
+> - * rvt_qp_sqwe_incr - increment ring index
+> + * rvt_qp_swqe_incr - increment ring index
+>   * @qp: the qp
+>   * @val: the starting value
+>   *
+> @@ -811,10 +813,10 @@ static inline void rvt_send_cq(struct rv
+>  
+>  /**
+>   * rvt_qp_complete_swqe - insert send completion
+> - * @qp - the qp
+> - * @wqe - the send wqe
+> - * @opcode - wc operation (driver dependent)
+> - * @status - completion status
+> + * @qp: the qp
+> + * @wqe: the send wqe
+> + * @opcode: wc operation (driver dependent)
+> + * @status: completion status
+>   *
+>   * Update the s_last information, and then insert a send
+>   * completion into the completion
+> @@ -891,7 +893,7 @@ void rvt_ruc_loopback(struct rvt_qp *qp)
+>  
+>  /**
+>   * struct rvt_qp_iter - the iterator for QPs
+> - * @qp - the current QP
+> + * @qp: the current QP
+>   *
+>   * This structure defines the current iterator
+>   * state for sequenced access to all QPs relative
+> @@ -913,7 +915,7 @@ struct rvt_qp_iter {
+>  
+>  /**
+>   * ib_cq_tail - Return tail index of cq buffer
+> - * @send_cq - The cq for send
+> + * @send_cq: The cq for send
+>   *
+>   * This is called in qp_iter_print to get tail
+>   * of cq buffer.
+> @@ -929,7 +931,7 @@ static inline u32 ib_cq_tail(struct ib_c
+>  
+>  /**
+>   * ib_cq_head - Return head index of cq buffer
+> - * @send_cq - The cq for send
+> + * @send_cq: The cq for send
+>   *
+>   * This is called in qp_iter_print to get head
+>   * of cq buffer.
+> @@ -945,7 +947,7 @@ static inline u32 ib_cq_head(struct ib_c
+>  
+>  /**
+>   * rvt_free_rq - free memory allocated for rvt_rq struct
+> - * @rvt_rq: request queue data structure
+> + * @rq: request queue data structure
+>   *
+>   * This function should only be called if the rvt_mmap_info()
+>   * has not succeeded.
+> 
 
