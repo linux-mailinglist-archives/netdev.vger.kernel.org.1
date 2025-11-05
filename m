@@ -1,247 +1,129 @@
-Return-Path: <netdev+bounces-235791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EC43C35BD6
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 14:00:24 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE4B1C35BEB
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 14:01:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 431204F75B4
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 12:58:51 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 48CAE4FA5DC
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 12:59:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E19F23161B5;
-	Wed,  5 Nov 2025 12:58:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E8DD3161B5;
+	Wed,  5 Nov 2025 12:59:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="X8r+4hrm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m3dNsm8S"
 X-Original-To: netdev@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 795F42F1FD2;
-	Wed,  5 Nov 2025 12:58:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66DAC30FC39;
+	Wed,  5 Nov 2025 12:59:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762347527; cv=none; b=jH0iI/RzxALhNccw94F4MqN12lpKk2KRq0D1MMi7yfOe+yP39oNyUgk9g+sBzzZC9Vh2iOirQaKRZpiZ+ebj9xp3YxyUqGEf6p2/iarbzrvshU8EAlf1ueNJ5iOpXZkyplBrf1Sh9vG4puGX2bMpjlf5M/RBkY/D2/vl3X+AuFA=
+	t=1762347547; cv=none; b=SHziaXBSu8dtbhFu0nycHDsvS938clc9gkZnuhYS5D5rN9FiQEmFT36RjakpPDad7Mt9iMsQqD8+/bORuIoXbOxo3Gfg3eTulyWqX3t57vY+3db5gErbUeBKR6XWRH5bJGU7XXB+kQWUaaj5bwC37ieUYpF3P5eF+SvLcxqt1AU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762347527; c=relaxed/simple;
-	bh=JMc0AP5EMzvMe+FQPbI0ucOETo2MjN3P040L151RHBs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bTYGRp4KqdGXhvF4G61czVMIPRT8KKLAe8h1yzq3u//uI4GT+guAu9TKz/CxcF7CE0I9JQNQguR5bKDFnUtrhqlWL9a0V/x076hKF0V+QFjtKC4tF2R18a55kHl84ZcGKGG+fR7NIm8q7gygXT0hNhW5WVjlQNoOwlJxBb4YL6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=X8r+4hrm; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-Received: from [129.217.186.196] ([129.217.186.196])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPSA id 5A5Cwcr2002636
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 5 Nov 2025 13:58:38 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1762347519;
-	bh=JMc0AP5EMzvMe+FQPbI0ucOETo2MjN3P040L151RHBs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=X8r+4hrmttuOg1GcPoHe6+Df17NkRCOQDpGH+pw+KOncs7GzhHEwCNbsfdmj7CbBj
-	 FsPP8Lw3qFDZQyFYvYnwQGNz+8z6ikoEBw5l2dBG/i0M/RCKGjRonIl4rS8rGNtA90
-	 IcYR+sWoeIowqlW+Hkibk5Cm9nzDBZF9FdFd89ng=
-Message-ID: <c01c12a8-c19c-4b9f-94d1-2a106e65a074@tu-dortmund.de>
-Date: Wed, 5 Nov 2025 13:58:38 +0100
+	s=arc-20240116; t=1762347547; c=relaxed/simple;
+	bh=XCz4zyomwz4Pm68u6obSXj/qzg4qfpMUjyEgdyQv+Qo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NLXiHU4Y9hiZ6/jLo9fgUzPXB8c66dd06f+gQE2L4zb8ccPRPkJeI873pGbRDHf9VhwfEb4xzSb3/f/EJSwnnnrI0r5kMCKDK3hWH0zi1ndR3st9MSjY89hliy8H7sVDy4ca2n25OVRTuic2wiXJPswyx1j48Nan5BvNtI/runk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m3dNsm8S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60376C4CEF8;
+	Wed,  5 Nov 2025 12:59:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762347547;
+	bh=XCz4zyomwz4Pm68u6obSXj/qzg4qfpMUjyEgdyQv+Qo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=m3dNsm8SMMD1zlF/aVuQ0M5nZi7sRqjNLChqODtRDuV04j0XJ53jIAP5pn0F9fVtU
+	 JqZUC6oqOiaJHtUDNIze6Qmiifig74NBSHTRhF5CzkGflGrE44i2p+KnnQv8fuIAeb
+	 vqM/nlpIUkb3N1AiF9rBHOFZ0aytktjc0JvgBiLsOSwHH6Wm1t9vr6bhE6jmEE8yn7
+	 ItBe+fW1K6IXIzt87A0MZh05AZOsQ1KqNknL7+4qfkEON/5iiY+Dc3EOmkMC54HFpQ
+	 toF4UmMTtvKzQ3m98slgf3+jIypK8cYCl6xoS6n3M/iZghMoikmevyfaafolw/Jg0U
+	 qYK9wD05TxNRQ==
+Date: Wed, 5 Nov 2025 12:59:02 +0000
+From: Simon Horman <horms@kernel.org>
+To: Ranganath V N <vnranganath.20@gmail.com>
+Cc: davem@davemloft.net, david.hunter.linux@gmail.com, edumazet@google.com,
+	jhs@mojatatu.com, jiri@resnulli.us, khalid@kernel.org,
+	kuba@kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, pabeni@redhat.com,
+	skhan@linuxfoundation.org,
+	syzbot+0c85cae3350b7d486aee@syzkaller.appspotmail.com,
+	xiyou.wangcong@gmail.com
+Subject: Re: [PATCH v2 0/2] net: sched: act_ife: initialize struct tc_ife to
+ fix KMSAN kernel-infoleak
+Message-ID: <aQtKFtETfGBOPpCV@horms.kernel.org>
+References: <aQoIygv-7h4m21SG@horms.kernel.org>
+ <20251105100403.17786-1-vnranganath.20@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next v1 1/1] usbnet: Add support for Byte Queue Limits
- (BQL)
-To: Eric Dumazet <edumazet@google.com>
-Cc: oneukum@suse.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-        kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-        linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20251104161327.41004-1-simon.schippers@tu-dortmund.de>
- <20251104161327.41004-2-simon.schippers@tu-dortmund.de>
- <CANn89iL6MjvOc8qEQpeQJPLX0Y3X0HmqNcmgHL4RzfcijPim5w@mail.gmail.com>
- <66d22955-bb20-44cf-8ad3-743ae272fec7@tu-dortmund.de>
- <CANn89i+oGnt=Gpo1hZh+8uaEoK3mKLQY-gszzHWC+A2enXa7Tw@mail.gmail.com>
- <be77736d-6fde-4f48-b774-f7067a826656@tu-dortmund.de>
- <CANn89iJVW-_qLbUehhJNJO70PRuw1SZVQX0towgZ4K-JvsPKkw@mail.gmail.com>
-Content-Language: en-US
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-In-Reply-To: <CANn89iJVW-_qLbUehhJNJO70PRuw1SZVQX0towgZ4K-JvsPKkw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251105100403.17786-1-vnranganath.20@gmail.com>
 
-On 11/5/25 13:34, Eric Dumazet wrote:
-> On Wed, Nov 5, 2025 at 4:20 AM Simon Schippers
-> <simon.schippers@tu-dortmund.de> wrote:
->>
->> On 11/5/25 12:28, Eric Dumazet wrote:
->>> On Wed, Nov 5, 2025 at 2:35 AM Simon Schippers
->>> <simon.schippers@tu-dortmund.de> wrote:
->>>>
->>>> On 11/4/25 18:00, Eric Dumazet wrote:
->>>>> On Tue, Nov 4, 2025 at 8:14 AM Simon Schippers
->>>>> <simon.schippers@tu-dortmund.de> wrote:
->>>>>>
->>>>>> The usbnet driver currently relies on fixed transmit queue lengths, which
->>>>>> can lead to bufferbloat and large latency spikes under load -
->>>>>> particularly with cellular modems.
->>>>>> This patch adds support for Byte Queue Limits (BQL) to dynamically manage
->>>>>> the transmit queue size and reduce latency without sacrificing
->>>>>> throughput.
->>>>>>
->>>>>> Testing was performed on various devices using the usbnet driver for
->>>>>> packet transmission:
->>>>>>
->>>>>> - DELOCK 66045: USB3 to 2.5 GbE adapter (ax88179_178a)
->>>>>> - DELOCK 61969: USB2 to 1 GbE adapter (asix)
->>>>>> - Quectel RM520: 5G modem (qmi_wwan)
->>>>>> - USB2 Android tethering (cdc_ncm)
->>>>>>
->>>>>> No performance degradation was observed for iperf3 TCP or UDP traffic,
->>>>>> while latency for a prioritized ping application was significantly
->>>>>> reduced. For example, using the USB3 to 2.5 GbE adapter, which was fully
->>>>>> utilized by iperf3 UDP traffic, the prioritized ping was improved from
->>>>>> 1.6 ms to 0.6 ms. With the same setup but with a 100 Mbit/s Ethernet
->>>>>> connection, the prioritized ping was improved from 35 ms to 5 ms.
->>>>>>
->>>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
->>>>>> ---
->>>>>>  drivers/net/usb/usbnet.c | 8 ++++++++
->>>>>>  1 file changed, 8 insertions(+)
->>>>>>
->>>>>> diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
->>>>>> index 62a85dbad31a..1994f03a78ad 100644
->>>>>> --- a/drivers/net/usb/usbnet.c
->>>>>> +++ b/drivers/net/usb/usbnet.c
->>>>>> @@ -831,6 +831,7 @@ int usbnet_stop(struct net_device *net)
->>>>>>
->>>>>>         clear_bit(EVENT_DEV_OPEN, &dev->flags);
->>>>>>         netif_stop_queue (net);
->>>>>> +       netdev_reset_queue(net);
->>>>>>
->>>>>>         netif_info(dev, ifdown, dev->net,
->>>>>>                    "stop stats: rx/tx %lu/%lu, errs %lu/%lu\n",
->>>>>> @@ -939,6 +940,7 @@ int usbnet_open(struct net_device *net)
->>>>>>         }
->>>>>>
->>>>>>         set_bit(EVENT_DEV_OPEN, &dev->flags);
->>>>>> +       netdev_reset_queue(net);
->>>>>>         netif_start_queue (net);
->>>>>>         netif_info(dev, ifup, dev->net,
->>>>>>                    "open: enable queueing (rx %d, tx %d) mtu %d %s framing\n",
->>>>>> @@ -1500,6 +1502,7 @@ netdev_tx_t usbnet_start_xmit(struct sk_buff *skb, struct net_device *net)
->>>>>>         case 0:
->>>>>>                 netif_trans_update(net);
->>>>>>                 __usbnet_queue_skb(&dev->txq, skb, tx_start);
->>>>>> +               netdev_sent_queue(net, skb->len);
->>>>>>                 if (dev->txq.qlen >= TX_QLEN (dev))
->>>>>>                         netif_stop_queue (net);
->>>>>>         }
->>>>>> @@ -1563,6 +1566,7 @@ static inline void usb_free_skb(struct sk_buff *skb)
->>>>>>  static void usbnet_bh(struct timer_list *t)
->>>>>>  {
->>>>>>         struct usbnet           *dev = timer_container_of(dev, t, delay);
->>>>>> +       unsigned int bytes_compl = 0, pkts_compl = 0;
->>>>>>         struct sk_buff          *skb;
->>>>>>         struct skb_data         *entry;
->>>>>>
->>>>>> @@ -1574,6 +1578,8 @@ static void usbnet_bh(struct timer_list *t)
->>>>>>                                 usb_free_skb(skb);
->>>>>>                         continue;
->>>>>>                 case tx_done:
->>>>>> +                       bytes_compl += skb->len;
->>>>>> +                       pkts_compl++;
->>>>>>                         kfree(entry->urb->sg);
->>>>>>                         fallthrough;
->>>>>>                 case rx_cleanup:
->>>>>> @@ -1584,6 +1590,8 @@ static void usbnet_bh(struct timer_list *t)
->>>>>>                 }
->>>>>>         }
->>>>>>
->>>>>> +       netdev_completed_queue(dev->net, pkts_compl, bytes_compl);
->>>>>> +
->>>>>>         /* restart RX again after disabling due to high error rate */
->>>>>>         clear_bit(EVENT_RX_KILL, &dev->flags);
->>>>>>
->>>>>
->>>>> I think this is racy. usbnet_bh() can run from two different contexts,
->>>>> at the same time (from two cpus)
->>>>>
->>>>> 1) From process context :
->>>>> usbnet_bh_work()
->>>>>
->>>>> 2) From a timer. (dev->delay)
->>>>>
->>>>>
->>>>> To use BQL, you will need to add mutual exclusion.
->>>>
->>>> Yeah, I missed that.
->>>>
->>>> I guess synchronizing with the lock of the sk_buff_head dev->done makes
->>>> sense? The same locking is also done right before in skb_dequeue.
->>>
->>> Or only protect the netdev_completed_queue(dev->net, pkts_compl,
->>> bytes_compl) call,
->>> adding a specific/dedicated spinlock for this purpose.
->>>
->>> spin_lock_bh(&dev->bql_spinlock);
->>> netdev_completed_queue(dev->net, pkts_compl, bytes_compl);
->>> spin_unlock_bh(&dev->bql_spinlock);
->>>
->>> I am assuming no usbnet driver is setting dev->lltx = true (or plan to
->>> in the future)
->>> so usbnet_start_xmit() is protected by HARD_TX_LOCK() already.
->>
->> Yes, I also want to only protect the netdev_completed_queue(dev->net,
->> pkts_compl, bytes_compl) call. However, I am wondering what you mean with
->>
->> spin_lock_bh(&dev->bql_spinlock)
->> ...
->>
->>
->> Do we want to protect against usbnet_start_xmit()? Maybe I am missing
->> something, but other BQL implementations also do not seem to protect
->> against their respective ndo_start_xmit.
+On Wed, Nov 05, 2025 at 03:33:58PM +0530, Ranganath V N wrote:
+> On 11/4/25 19:38, Simon Horman wrote:
+> > On Sat, Nov 01, 2025 at 06:04:46PM +0530, Ranganath V N wrote:
+> >> Fix a KMSAN kernel-infoleak detected  by the syzbot .
+> >>
+> >> [net?] KMSAN: kernel-infoleak in __skb_datagram_iter
+> >>
+> >> In tcf_ife_dump(), the variable 'opt' was partially initialized using a
+> >> designatied initializer. While the padding bytes are reamined
+> >> uninitialized. nla_put() copies the entire structure into a
+> >> netlink message, these uninitialized bytes leaked to userspace.
+> >>
+> >> Initialize the structure with memset before assigning its fields
+> >> to ensure all members and padding are cleared prior to beign copied.
+> >
+> > Perhaps not important, but this seems to only describe patch 1/2.
+> >
+> >>
+> >> Signed-off-by: Ranganath V N <vnranganath.20@gmail.com>
+> >
+> > Sorry for not looking more carefully at v1.
+> >
+> > The presence of this padding seems pretty subtle to me.
+> > And while I agree that your change fixes the problem described.
+> > I wonder if it would be better to make things more obvious
+> > by adding a 2-byte pad member to the structures involved.
 > 
-> BQL has been designed so that producer/consumer can run in //
+> Thanks for the input.
 > 
-> However, all producers need exclusion (typically done with HARD_TX_LOCK)
-> All consumers need exclusion (typically done because of NAPI sched bit)
+> One question — even though adding a 2-byte `pad` field silences KMSAN,
+> would that approach be reliable across all architectures?
+> Since the actual amount and placement of padding can vary depending on
+> structure alignment and compiler behavior, I’m wondering if this would only
+> silence the report on certain builds rather than fixing the root cause.
 > 
->>
->>
->> My approach would just protect against usbnet_bh calls from another
->> context with the same locking as skb_dequeue():
->>
->> spin_lock_irqsave(&list->lock, flags);
->> netdev_completed_queue(dev->net, pkts_compl, bytes_compl);
->> spin_unlock_irqrestore(&list->lock, flags);
+> The current memset-based initialization explicitly clears all bytes in the
+> structure (including any compiler-inserted padding), which seems safer and
+> more consistent across architectures.
 > 
-> I tend to prefer not masking hard irq unless really necessary.
+> Also, adding a new member — even a padding field — could potentially alter
+> the structure size or layout as seen from user space. That might 
+> unintentionally affect existing user-space expectations.
 > 
-> Also, reusing  a lock for different purposes makes things confusing
-> in terms of code maintenance.
-> 
-> usbnet is hardly performance critical, I would keep list->lock only to
-> protect the list of skbs :)
+> Do you think relying on a manual pad field is good enough?
 
-Thanks for the clarification!
+I think these are the right questions to ask.
 
+My thinking is that structures will be padded to a multiple
+of either 4 or 8 bytes, depending on the architecture.
 
-So in usbnet.h I will just 
+And my observation is that that the unpadded length of both of the structures
+in question are 22 bytes. And that on x86_64 they are padded to 24 bytes.
+Which is divisible by both 4 and 8. So I assume this will be consistent
+for all architectures. If so, I think this would address the questions you
+raised.
 
-#include <linux/spinlock.h>
-
-and then save the new field
-
-spinlock_t bql_spinlock;
-
-in struct usbnet and will then call
-
-spin_lock_bh(&dev->bql_spinlock);
-netdev_completed_queue(dev->net, pkts_compl, bytes_compl);
-spin_unlock_bh(&dev->bql_spinlock);
-
-in usbnet_bh. Am I right?
+I do, however, agree that your current memset-based approach is safer
+in the sense that it carries a lower risk of breaking things because
+it has fewer assumptions (that we have thought of so far).
 
