@@ -1,99 +1,94 @@
-Return-Path: <netdev+bounces-235763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74C38C35109
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 11:17:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B101C35145
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 11:24:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 220115636F2
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 10:14:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C628718C84D8
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 10:23:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 006F11BE871;
-	Wed,  5 Nov 2025 10:14:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD1F92FFDDC;
+	Wed,  5 Nov 2025 10:22:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mFyWDEqK"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="l5Yf4g9g"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB06017C220;
-	Wed,  5 Nov 2025 10:14:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 787202EC083;
+	Wed,  5 Nov 2025 10:22:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762337657; cv=none; b=JoWDHWZO8P4Fh8eg0otY15CAFn94xClmDd+nxYwJ9FLTnrMzTHm01SGM2nhtf/12rC2usSoU0hqFe6FJJvQmnt35kU0gO2txrMW3cmLHi2hu0G1WuIOHfo1dJ6pD8sqrTyouKHPFP9ZjEEuR821cleBMbqKcDqf6wdYcvf2pmrk=
+	t=1762338164; cv=none; b=R7SN0JfvtXGn9csz3yPElCd9ILMuax8p/myndfZ8JlmTFM7uc3kS5n/CGbkdfbINZ7SjkTewAcsrX7QnMQj7ZluFvpU6TQY9l7Kn8CCbteisvGUoX7kYSJn+0Kz1ZF3BOZFFs5mCwa0VE1/lHJ4O1A/VJf3cBhPRhhljzaYeP28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762337657; c=relaxed/simple;
-	bh=Okbe7o8+me/nPHM9MBYNTFsR959vwaadU/clvuSJ3Vk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iarlZ/8W9eFhGqCWiWlftKgykuT6YlTW10dTw3TVjmdunOPkCKOAr/e94e4PICHaDVNjvdxXHETkDU7w6DO/8NmA0wfo7zK4+VY2jPtT5/UfKS2oC2c2TdQiPN+/lGJDwGLHetWX0GdW3lvYrZDJ0O0G//KAataZLrz11oVN3Yk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mFyWDEqK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4F4FC4CEFB;
-	Wed,  5 Nov 2025 10:14:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762337657;
-	bh=Okbe7o8+me/nPHM9MBYNTFsR959vwaadU/clvuSJ3Vk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mFyWDEqKrRI+sa/wNzDR0UcsEfiY3Pz9GBl6hFu7iBVTL6Sf33fIK7EBGOmVRxg+D
-	 35XW2yjb1su+VuodnvjAJTjmJSEVhvRxvfgKZB29G/bL9WpkImlAasSStMM5OAZ800
-	 2kYh3U/VDj/gZx1NTjWhb1DdwdJURaulYDq1VnEt0MosRMGynhPc8Pgh6yll4vOUwF
-	 21cwFGG1/0mWdOU+2lTe8y1QWpoPiAfHQ8zvxkaT52xoQ2VxLQgRgsisXvH+O4Ir8o
-	 FqVJiNDkOAwx/Gwh2C5wI9lVWEs60rz/chgJWBcJQotwgdzMqts9orR3hWLx92pa5e
-	 SMXbxaf4znOLw==
-Date: Wed, 5 Nov 2025 10:14:12 +0000
-From: Simon Horman <horms@kernel.org>
-To: Meghana Malladi <m-malladi@ti.com>
-Cc: h-mittal1@ti.com, pabeni@redhat.com, kuba@kernel.org,
-	edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, srk@ti.com,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Roger Quadros <rogerq@kernel.org>, danishanwar@ti.com
-Subject: Re: [PATCH net v2] net: ti: icssg-prueth: Fix fdb hash size
- configuration
-Message-ID: <aQsjdAClmmKPLHWM@horms.kernel.org>
-References: <20251104104415.3110537-1-m-malladi@ti.com>
+	s=arc-20240116; t=1762338164; c=relaxed/simple;
+	bh=ItYXVK2PdUIcKip20t5lPFH0eehgUIl+xtt3Ngpl7Qc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TvchVeAXIVXD2xLM5FkfHU9fTaSmMwgskSzGCBnE1RNFgVhw3hDsfcbRGJ5qfV0r5Khhg55hc/ysaFPee5EKYOKBfhfY5oQSU3LBNMN9gMxUk7zFtVjJEQBc/IOkN4A8laP/P303QQKt1Tq0W2DfQKs9QW856zGOZqoSbqsx/0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=l5Yf4g9g; arc=none smtp.client-ip=115.124.30.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1762338153; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=wUXBxSgyHViOpb4J0afxMYP8uNQ8fKWBiLqr1WSZuQs=;
+	b=l5Yf4g9gzAfiD2cmagb0T8aL1q+wDwfxJ3GcDSWp6R2jvtWUwuHWIQZo7Z3H981DfKLT1RqSrCtKYNh4dzbNDXW5hfSWn8UFiLpjToJBNU6LViZt5EESWmO/zeT0j1q6H72A6wD31446R+/EtBAStMK/xC3CRhVoWO95JnGebAk=
+Received: from 30.50.177.113(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0Wrl49Gy_1762338144 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Wed, 05 Nov 2025 18:22:31 +0800
+Message-ID: <8a74f801-1de5-4a1d-adc7-66a91221485d@linux.alibaba.com>
+Date: Wed, 5 Nov 2025 18:22:19 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251104104415.3110537-1-m-malladi@ti.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5 1/2] ptp: introduce Alibaba CIPU PHC driver
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, xuanzhuo@linux.alibaba.com,
+ dust.li@linux.alibaba.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20251030121314.56729-1-guwen@linux.alibaba.com>
+ <20251030121314.56729-2-guwen@linux.alibaba.com>
+ <20251031165820.70353b68@kernel.org>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <20251031165820.70353b68@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 04, 2025 at 04:14:15PM +0530, Meghana Malladi wrote:
-> The ICSSG driver does the initial FDB configuration which
-> includes setting the control registers. Other run time
-> management like learning is managed by the PRU's. The default
-> FDB hash size used by the firmware is 512 slots, which is
-> currently missing in the current driver. Update the driver
-> FDB config to include FDB hash size as well.
-> 
-> Please refer trm [1] 6.4.14.12.17 section on how the FDB config
-> register gets configured. From the table 6-1404, there is a reset
-> field for FDB_HAS_SIZE which is 4, meaning 1024 slots. Currently
-> the driver is not updating this reset value from 4(1024 slots) to
-> 3(512 slots). This patch fixes this by updating the reset value
-> to 512 slots.
-> 
-> [1]: https://www.ti.com/lit/pdf/spruim2
-> Fixes: abd5576b9c57f ("net: ti: icssg-prueth: Add support for ICSSG switch firmware")
-> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
-> ---
-> 
-> v2-v1:
-> - Update the commit message and give more context w.r.t hardware
->   for the fix as suggested by Simon Horman <horms@kernel.org>
-> 
-> v1: https://lore.kernel.org/all/20251013085925.1391999-1-m-malladi@ti.com/
 
-Thanks for the updated commit message, this seems much clearer to me.
 
-Sorry for not responding to your reply to my review of v1. For some
-reason I missed it until I checked the link above a few moments ago.
+On 2025/11/1 07:58, Jakub Kicinski wrote:
+> On Thu, 30 Oct 2025 20:13:13 +0800 Wen Gu wrote:
+>> This adds a driver for Alibaba CIPU PTP clock. The CIPU, an underlying
+>> infrastructure of Alibaba Cloud, synchronizes time with atomic clocks
+>> via the network and provides microsecond or sub-microsecond precision
+>> timestamps for VMs and bare metals on cloud.
+>>
+>> User space processes, such as chrony, running in VMs or on bare metals
+>> can get the high precision time through the PTP device exposed by this
+>> driver.
+> 
+> As mentioned on previous revisions this is a pure clock device which has
+> nothing to do with networking and PTP.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+I don't quite agree that this has nothing to do with PTP.
+
+What is the difference between this CIPU PTP driver and other PTP drivers
+under drivers/ptp? such as ptp_s390, ptp_vmw, ptp_pch, and others. Most of
+these PTP drivers do not directly involve IEEE 1588 or networking as well.
+
+> There should be a separate class
+> for "hypervisor clocks", if not a common driver.
+
+'hypervisor clock' is not very accurate. CIPU PTP can be used in VM and
+bare metal scenarios, and bare metals do not need hypervisors.
+
+Regards.
 
