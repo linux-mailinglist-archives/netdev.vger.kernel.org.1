@@ -1,155 +1,97 @@
-Return-Path: <netdev+bounces-235759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4788AC35060
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 11:04:25 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DB88C3505A
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 11:04:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A576818C20F0
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 10:04:49 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EE5FD347432
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 10:04:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50E732D0602;
-	Wed,  5 Nov 2025 10:04:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC82C2BE7DD;
+	Wed,  5 Nov 2025 10:04:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S1NWNOyy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hbTbojWi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C310E2BF3E2
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 10:04:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB3926F28D;
+	Wed,  5 Nov 2025 10:04:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762337063; cv=none; b=PCHJML1cB2Orut9u2tK+vq6cks90RlptdZY4mi3fb41oCyE/rrRRhy24VE8tbxq3vRrAl12rIVHkZoeaGZAb8ggkhAvDp41CDZZeJVPSJ9kfyQuVJHb33j+T2QWx3WQJB+Z5/uTXLoIEh0kHgGp1AV+fLywesFcVHmxJFDASbOA=
+	t=1762337050; cv=none; b=KH6goyQgYXhJITCj0OxD3odNMkQ+4j007YO2aS2iVyM+ZpGXLigd+JG+vWFjzRVfJw2uH2J/MBcMXaFnpnpU/hhnlyIAzQpHfJ2eF0QMtW/zxkhzCNp1mAKqNrriMLTh7NXYTJ22NNqDVGlQkyyCfnRzScvwu/cRoZ5MCrrnRiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762337063; c=relaxed/simple;
-	bh=Le/pDoysJRWk7yuxVty2Hd5PN/rbL/2GKhj/ehO3stk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CCCiUWmvZM87vZWnMyAKGK27+SqSe9C+UfOpsK5Ra7y9O1NMfYjDA70MUoEsNO4NIwOYSlzsIM8ZT8+49dwmR8IKUT6SiurfPRn7H2dg+96pMZgYglY5CqvkhMry0kiYm0dDV85giqbf1pwriJPNxh/quIK/sfIGl4+onOmsuFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S1NWNOyy; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-295291fdde4so5618775ad.2
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 02:04:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762337061; x=1762941861; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IOm7tfsMbQ9gn+1rZ1WTdngWRmcpDgQVp1lJAR4kXBM=;
-        b=S1NWNOyy/pkMr7O4ReQ/g6oKcN1mZB0VWht2RAaMqes9nezv3aPSk9H6myph6X2nxv
-         L80FCwhidpbZCbtTYecy/QDbuT77xnmnr92gnMYGcaBRnxFGheRr+1a2KL4+BC/einqw
-         nWwQqLVEo4YZK1+9RoaJXGue4yVlqFzZxP8CoZlBVzpCeSH3OlkuAZnH8Wo+hbOHsVI7
-         OmucSrtTdlQzrJHu5axsyjX0s909Mux5xPfIy/tDFgyAGEOpSX4wmeNzApx1MpeYM3Vi
-         ojHR6wS8/Bq7fjxGEJ+kWn6QHA2X/+Tzzzz69gdlCWxV9A6YZpWOWbiLnvCC3EuZ7wyy
-         GCyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762337061; x=1762941861;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IOm7tfsMbQ9gn+1rZ1WTdngWRmcpDgQVp1lJAR4kXBM=;
-        b=ZH2kzB2djLcUH6nPeEJIRyxfYMHtDZ+7tT10w3SsxsDUiYmqmW2FnF0fmrVPqZW3et
-         Q+h+eFhUokHdLeAlkMGiXtnJwCB34oTZIZMFg90CMmILMgtTdr1LGibUGxJidk+09+mc
-         isDSlQmWFD/XKXVPixpTw1GlTGM+404ByNUcA+fLBZ8DkxrEieKpJVVgZQ82IBXPHv22
-         4ujrqzVBtXIZjODapj19iyGe0J90KXLj/Q4o//Mw1mUCs/kV4JtKh98SvFEpd52ZD25p
-         euXD7frQNNFwKhIc5GSz16NsveAj0W3MhVU1D/fyh2BVJ/VgWX+1RalXdebr9w/Vfs8t
-         +GKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVZ/87bwWi4nIHrfaQAR1IbJLUKl8Z0cc98+rt0R4Isx2ehivUMlaxNN5VBWPl4zZE1zURujHY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyxiemfNu07G5n8u3NUtwJXFKrI9u/Fj7KGOpwlLoc2WPmHk+hO
-	gJCIVfRsdB2YnKGm5jGvGwL6KhHbHMZMobtRaRb8BAO7egFNsAsI/rlEQrOPdkAp
-X-Gm-Gg: ASbGncvQqUlLE9/1mePRZ3XrqMS/TSljFoXmUERhK/+g1DuCfM7ycBJzxgLdOFPRjIX
-	BG30uqAXaNKOEG9lOS67+8YhB7tSjMCgkR/kuAcrELbDRXsqZfKeWVfl3hLcNyv5keZjrWS+dsU
-	eglPp8YxN0la7GwAH9ewEEb/uOlcxg8jGrjdhmN1WgQ6q6CgaJ2henne3br8hK6AO/Lsf7vQG4P
-	Gfpd7Nafsz8nGLCCfRLGQC/FE48PjwTV93WL7y1taH5b/EaMDahEMoFmabVKre4IHTsEaVp2BHJ
-	kEuAO7nwq4BU2OAJmkP594IZWAc+Hhu87r18eQdhhPcNpxZMdOSBZ43uYsPLxBBZlqRXpY7hJa6
-	x8btiAK+Xso0KBNVZLP3UTuYBMHLLUEaoOcS+aMqoX2FUWiKA6Hskm/bTtiIDAoHJPB2EcWkFgi
-	CgpDporzLRHhTrpDk42Tvq/Wdwa7G+o692FL9DXbF/RkbIXu1IhqR8
-X-Google-Smtp-Source: AGHT+IGk5DBNlN3hTIt/OU+KnoTcYwEyDT5lGKLbg7D04mmqvIMyiOIVgDNc3sz+2O4XNKqDHIVh+w==
-X-Received: by 2002:a17:902:d4c9:b0:295:290d:4af9 with SMTP id d9443c01a7336-2962ae976d3mr23428015ad.11.1762337060800;
-        Wed, 05 Nov 2025 02:04:20 -0800 (PST)
-Received: from ranganath.. ([2406:7400:10c:53a0:ab47:f43a:acda:ee47])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-ba1f1a19cdbsm5027590a12.2.2025.11.05.02.04.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Nov 2025 02:04:20 -0800 (PST)
-From: Ranganath V N <vnranganath.20@gmail.com>
-To: horms@kernel.org
-Cc: davem@davemloft.net,
-	david.hunter.linux@gmail.com,
-	edumazet@google.com,
-	jhs@mojatatu.com,
-	jiri@resnulli.us,
-	khalid@kernel.org,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	skhan@linuxfoundation.org,
-	syzbot+0c85cae3350b7d486aee@syzkaller.appspotmail.com,
-	vnranganath.20@gmail.com,
-	xiyou.wangcong@gmail.com
-Subject: Re: [PATCH v2 0/2] net: sched: act_ife: initialize struct tc_ife to fix KMSAN kernel-infoleak
-Date: Wed,  5 Nov 2025 15:33:58 +0530
-Message-ID: <20251105100403.17786-1-vnranganath.20@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <aQoIygv-7h4m21SG@horms.kernel.org>
-References: <aQoIygv-7h4m21SG@horms.kernel.org>
+	s=arc-20240116; t=1762337050; c=relaxed/simple;
+	bh=rBbUA2igNXZEkS24OqY0dBWwt4WuBRqYmZYorPEGYz4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ImsKxydYxeFaK4ek9vn2CkBvF/wSt4DuY7fjsCuuE/AsDSZtTKyMQ+CQOOUvCNHEEK+ymYg0nzi/b3Pm/szH9Nmt6O+mFH2qJnFTeFk2b6JXNAGmzQjr2EovsPIneGYwthvWtCDG539v4NTi0+B9E2rqtVQCwMOliYPyaz6ywCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hbTbojWi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98997C116D0;
+	Wed,  5 Nov 2025 10:04:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762337050;
+	bh=rBbUA2igNXZEkS24OqY0dBWwt4WuBRqYmZYorPEGYz4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hbTbojWiVxW9GO1kuox6/4/GFmp9VG4rJLK7trpQhKcbQbBOySeicNSKqTSOadj9g
+	 5vm6p5d14Uh6MU3HOYjVhK9HT1ontj3IiB6D5MVfJQBiDHbU7fKIQHOkxGb/cRPwUh
+	 uJrA+e7QZVXdxwzqYLn43CfdDAlmhOx4Th6Vb3pFFkITkpj+bywDplv/zidSaAOC6p
+	 xaaxL88R951KDYgd7ETNxnjEX2g7V6Tm6NRODikSqNDsNEofRuzDMNJvbgYhtgjY2c
+	 CPXBI+zYc/58zbNpGv6lYQohj+gooPQEhhR0IyLtQdL1KxCRBO2df8gPZeVXvZY4iD
+	 ZJx+6edRHxLCA==
+Date: Wed, 5 Nov 2025 10:04:05 +0000
+From: Simon Horman <horms@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>
+Subject: Re: [PATCH net V2 2/3] net/mlx5e: SHAMPO, Fix skb size check for 64K
+ pages
+Message-ID: <aQshFdIQ4uZBj7XI@horms.kernel.org>
+References: <1762238915-1027590-1-git-send-email-tariqt@nvidia.com>
+ <1762238915-1027590-3-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1762238915-1027590-3-git-send-email-tariqt@nvidia.com>
 
-On 11/4/25 19:38, Simon Horman wrote:
-> On Sat, Nov 01, 2025 at 06:04:46PM +0530, Ranganath V N wrote:
->> Fix a KMSAN kernel-infoleak detected  by the syzbot .
->>
->> [net?] KMSAN: kernel-infoleak in __skb_datagram_iter
->>
->> In tcf_ife_dump(), the variable 'opt' was partially initialized using a
->> designatied initializer. While the padding bytes are reamined
->> uninitialized. nla_put() copies the entire structure into a
->> netlink message, these uninitialized bytes leaked to userspace.
->>
->> Initialize the structure with memset before assigning its fields
->> to ensure all members and padding are cleared prior to beign copied.
->
-> Perhaps not important, but this seems to only describe patch 1/2.
->
->>
->> Signed-off-by: Ranganath V N <vnranganath.20@gmail.com>
->
-> Sorry for not looking more carefully at v1.
->
-> The presence of this padding seems pretty subtle to me.
-> And while I agree that your change fixes the problem described.
-> I wonder if it would be better to make things more obvious
-> by adding a 2-byte pad member to the structures involved.
+On Tue, Nov 04, 2025 at 08:48:34AM +0200, Tariq Toukan wrote:
+> From: Dragos Tatulea <dtatulea@nvidia.com>
+> 
+> mlx5e_hw_gro_skb_has_enough_space() uses a formula to check if there is
+> enough space in the skb frags to store more data. This formula is
+> incorrect for 64K page sizes and it triggers early GRO session
+> termination because the first fragment will blow up beyond
+> GRO_LEGACY_MAX_SIZE.
+> 
+> This patch adds a special case for page sizes >= GRO_LEGACY_MAX_SIZE
+> (64K) which uses the skb->len instead. Within this context,
+> the check is safe from fragment overflow because the hardware
+> will continuously fill the data up to the reservation size of 64K
+> and the driver will coalesce all data from the same page to the same
+> fragment. This means that the data will span one fragment or at most
+> two for such a large page size.
+> 
+> It is expected that the if statement will be optimized out as the
+> check is done with constants.
+> 
+> Fixes: 92552d3abd32 ("net/mlx5e: HW_GRO cqe handler implementation")
+> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
-Thanks for the input.
-
-One question — even though adding a 2-byte `pad` field silences KMSAN,
-would that approach be reliable across all architectures?
-Since the actual amount and placement of padding can vary depending on
-structure alignment and compiler behavior, I’m wondering if this would only
-silence the report on certain builds rather than fixing the root cause.
-
-The current memset-based initialization explicitly clears all bytes in the
-structure (including any compiler-inserted padding), which seems safer and
-more consistent across architectures.
-
-Also, adding a new member — even a padding field — could potentially alter
-the structure size or layout as seen from user space. That might 
-unintentionally affect existing user-space expectations.
-
-Do you think relying on a manual pad field is good enough?
-
-regards,  
---Ranganath
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
