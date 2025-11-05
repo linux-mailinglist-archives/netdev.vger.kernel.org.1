@@ -1,308 +1,160 @@
-Return-Path: <netdev+bounces-235827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF5CFC362E6
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 15:55:55 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C4ADC36268
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 15:49:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 373A6428714
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 14:46:50 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6D5F14F46D8
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 14:48:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 171E322258C;
-	Wed,  5 Nov 2025 14:46:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BDE4243956;
+	Wed,  5 Nov 2025 14:48:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b="SD8AtOpQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pw8CL4vh";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="CPTSRaBO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f68.google.com (mail-ej1-f68.google.com [209.85.218.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE2E923A9B3
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 14:46:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14770245008
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 14:48:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762354000; cv=none; b=HQQWU6wtwg+6nbMB06tg8jDroM7xJ3A33uijVdXDKI1EIfhjh3WkvSZB7wt2s3ALrIwoex7FjsBmAN6CcnPReMcGdyBULILYDe0mXz1HcDm/8whpjPtuioiDa6E9Us80LENqK7p/q7Q0O60ONtMdbPSy9S8o2Svm8IpD7RVUb+k=
+	t=1762354101; cv=none; b=Vu3QphPV5c7qXlQ2/fyE3MN0t3SYR2LCMkoQQ5tokkoE2OJpAhbj5BwkVUM9qgYYT/j7luYCBy2q73J7P7aqWhbkQ3yI9x75ityGciJVOksbumlonNvM6z2fLJCjv4owF4lzHrYMJOK8tITj0jj/oUr/D6miaRg/PfKJgkPv848=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762354000; c=relaxed/simple;
-	bh=2Tqjo6tPJ3bnTbDNERgrNCMZzYpINhxZgiXxehKno5E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=N9YDkvt10BWSdkDCIh44gDWB4u2YBrowITU1KTlzZzQKkTQSqoiqtz9mNjUV0fFZat3W4D7QRnxpUa8TU0B8SJVihAlkUGlZfQGiooRUS8ZeO3jkItVsqpjsHH9CvDHhHKelS7Za6mcHsQCCgeswIrl0ONIMxBpk4qh+usFXtdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall.org header.i=@blackwall.org header.b=SD8AtOpQ; arc=none smtp.client-ip=209.85.218.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f68.google.com with SMTP id a640c23a62f3a-b71397df721so566204966b.1
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 06:46:37 -0800 (PST)
+	s=arc-20240116; t=1762354101; c=relaxed/simple;
+	bh=vSOblu1TYmytU32Afj1JpSAwMW78+1eufiWSTZpAYPI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sWj2/LTXu33NViwsjcoK0+WPg/UGTj1+ODrc0kzjKTYkbK+fgaGeDXCFomvKlLW5xYuAFeeQrtpcdUuttrhjyqBc3ODjax+MExd56A0R9+TLcpbgQx6nPSoxbt5PAyIkcMLp1FV0OL/TW7i4zbWNGyj2WdTN6TCCHWMoA67NQF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Pw8CL4vh; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=CPTSRaBO; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762354099;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CALwuHsQmFBRZ9UMoQkNa65lCmf3uyfowmB88gX3QjM=;
+	b=Pw8CL4vhxwOIhJi2rr3ghGz64ojXiPgNEeKbOKf7fWJSzPVuMxYy1B1azQoRiddGs3vc8p
+	kCBIH+oqoXBV0BfaYK09E4tu4YoF1vINpKJkPxxqazk1Ki824FjD6NVmcBjJ0nBug7qNiJ
+	17EO0EyDHN6hSIakVo1w99tKyvQuRSQ=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-592-krF4U5n7PeqG8Klun3WpGA-1; Wed, 05 Nov 2025 09:48:17 -0500
+X-MC-Unique: krF4U5n7PeqG8Klun3WpGA-1
+X-Mimecast-MFC-AGG-ID: krF4U5n7PeqG8Klun3WpGA_1762354097
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-426d4f59cbcso758654f8f.1
+        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 06:48:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall.org; s=google; t=1762353996; x=1762958796; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=oYU54pVHgt9qUY7dxhWeWsjfef8BqZGVuBv23xZnwLk=;
-        b=SD8AtOpQ0/QvBXf8Y7256uieK91fDdQBMDccyq75+CuyGeR8nY1A08ZCoQWo2GyGYg
-         FFRzs2V5XCg5RPRiFEBCvu+K5/ViAmxP6rjxe7CaN5FUKeyXq8pgVCIzXb6EudRBDj53
-         hH8QYhkjHtkcR/+Z5Z3KzSuGTjUYxJTc8gMb+s4HAorbzWtDdz28ob6shHnt6pC7stoY
-         SIA7q6Op8fRxwXQ6urJRkKuUEoNRDA38gIcJEZwvACvLJTaga5l5b2Y4zJfBEDuDK7ZD
-         BXb2EISDKcgWyngrtKI6fODBcNORYAbC88zDh08K1O7Q3If2TORSKs7UNp6YonScriyA
-         K/Eg==
+        d=redhat.com; s=google; t=1762354096; x=1762958896; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=CALwuHsQmFBRZ9UMoQkNa65lCmf3uyfowmB88gX3QjM=;
+        b=CPTSRaBOc5j6ZUbN64DZl00ifkDoiAGDs/NpxASdsAUa9XdcHmTgcFEcbEP91yYAn1
+         /LIdljHx+x5qWaXFNeK28KMeRaMMn5B5vbeAgvLJXPLC9yjcLkukvVQFjpB5GDiqAeAz
+         Epac/ZvZb6C4uvEYY0YpIibb6eaC907mz767l9kUPRrjJkpd5enN+jk7Z5ket6njL41y
+         JeTs8Q7IXOY5RIPMNgRIbffpe+ysRxBSljdhNiuUqixZYu4LbOlLLdunylT334arTF+9
+         wZiQWVeAKQNvQSkeeqXJLhALWHx8IJv5ODd813wEVgOBfWJYBO/SQQedcIPA9MjPjgaq
+         udMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762353996; x=1762958796;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oYU54pVHgt9qUY7dxhWeWsjfef8BqZGVuBv23xZnwLk=;
-        b=VctXO9ffdwCy7g0hg4WrfIxesuXJ0A5JtkUfBEdtEw8JX8Iyt8ei/wweeplWxAQGMc
-         MH0B5R3/MYiQZZZvm3rI6S8xMBOlSbLS9WVrb4ur4J+yfFipLLXTX5RjrB070XMnf8kJ
-         HXwFMa6jf20r3/+qtpei1U9mES7Zn3npX7rDkLJ9xOv1DALtAWUAzG8p2PGKhwaSJCkK
-         l/R5Gl/wZdlhrd5jagsvK2NvW41z6YFKXUw1aT8iaOEpi64wjMq+jAPyfLOEKJWMfeWC
-         MvnKAGgoYUlYGKUo7zV/j3hODOs2iePlECn6b3OcL3pD+E8Gtli7QK1gmr1yxOWLd6rB
-         Bkxg==
-X-Forwarded-Encrypted: i=1; AJvYcCUWULSF3v5vhLfsU1sqkTUDHepr7wHs652qvtwkfjYwS9L+nttpOeocqvpX/k/9KdahVq3R6WE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyjs/bqG/cJW4pREEsqfvEJlVZnRfUHJS4KjCZV0b3sQ2qJseEe
-	qEE5eJmH3XXNLC6OyfUJjYgac6aHcxv/M9UNTgawgS6GQHlbzI06gYMZR/efc7ab9J0PpDSCCI1
-	sUNGz0RwhnQ==
-X-Gm-Gg: ASbGncvo8FjMZc9Vf1wTwTvUWmrRB8+GxZnBqXonDy0o9SSpnUZM4RqqUsjl8nCWtvJ
-	43kwmedMkKLeARELQbHI69EHJ79czv1D3j4LO+L/fKE3bpEJxM1ETG/zDIWfY0d1mps0yRRErZ5
-	Fut9j5awM9JXcywhuURZ8cKALSwrkyXSTBmrpicL2yq92qTU17h8jZvvCC31EbMq93canuSamBZ
-	lH+O8SdlpwYuOPqHuzNiUcIEEfe0wxLxX6rHIwC7hhgEK2tbO8fmyI2Oo9H+xeT3P9n31PxP1wD
-	zUu4csKbz0CeqzufGkbKAaB4MWs/8ZPY+2uk/l/Kjr3hdEY+vBFL9KK545t6Bn03lsk4ThWyFBA
-	wWmqlp91pUs//lc28MvH8ph6mFq+sBik85n/w8BrpHYvGzppKtnoNrscaifd+YCeTDPBQvq37K0
-	PfaWygx2gxlfnBvnpw66qqlW+dIUOQYQxDMfxWKv3sLeU=
-X-Google-Smtp-Source: AGHT+IHXvCNjw5wkjwUOOlzqSkkaUW6zZQ8HcngE3x7IOidXPHs5fM9NqVHPnCmB7jCORkGZcHSgWA==
-X-Received: by 2002:a17:907:1c0a:b0:b70:b077:b957 with SMTP id a640c23a62f3a-b726529e8a2mr328714466b.15.1762353995832;
-        Wed, 05 Nov 2025 06:46:35 -0800 (PST)
-Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b723fa038e0sm508268866b.54.2025.11.05.06.46.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Nov 2025 06:46:35 -0800 (PST)
-Message-ID: <975f3126-482a-4963-a125-d51732ddcdac@blackwall.org>
-Date: Wed, 5 Nov 2025 16:46:34 +0200
+        d=1e100.net; s=20230601; t=1762354096; x=1762958896;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CALwuHsQmFBRZ9UMoQkNa65lCmf3uyfowmB88gX3QjM=;
+        b=jWQ1eBKIsyJaSuOGwT+a6vD0b3NtHZHs3hy85TAlGK00Hvf/QxG8NawFPnFJxzQJIM
+         3T3A7bcaC4VdgqXwHNLptKZ8q/+Wu1EDlE1/zlJsXKN2SFJ/iageBAr7CenyXKS7smH8
+         hlh3M67XLIg1xgzvOjGhcURlQgGGKngzfBJo1CnkssVF7lPBAqU3zefOKReK/3QwqlHr
+         m+cKhBm3OdWmSP1GorQTUeZ45uIMK1npBrnoFqniTz4LyYaIlKHBlqKwVtZYuUJfi+x1
+         j6sSr7GR+oLXzh1OUsWip+ueT+/4gqjHKsfTxww9jd7nDv3J/g90v95HKCXYHFjNEQ13
+         yY9g==
+X-Forwarded-Encrypted: i=1; AJvYcCUQiEHBKbH3riEcncqC3z3qllfrwNhhzduu5h+vetC0yQeZWGLZNj606ZM4NPafDAXjN8tQBa4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1TI6AquR64SoiIs40mX5OIOimkXSzvgm486RvHJEGEfyVCl4r
+	zdWYzKN989wa0hZ/yQ69HY7VR5ggiGfgG2C/ToKvVHdfUkEkYo2q75YAaQLVo1q/frE8P/93wRD
+	dydz7o04pK/CmtAl6dFa4EtB73wiNKhjMkolGFV2s0oB+CCiqIq+p+yzUUw==
+X-Gm-Gg: ASbGncv0dtnjmVS0LLb/XCKdJz5yNNkQic77rNKIDg41l/1lwfzILP2QV/xgF7kE3cP
+	c1LRDKcGLwhcEfOBlS+gQmGUMO20UI3jiciY7iopaRgb9oDi1wfA3hQvv4nwB2eHCJ3Fj0lXmas
+	Y/0Dlnyl8XPCwhb4RxlT15h5IiKqoluYM9YDpYhItSFd1wrPjcgEfVhbcrx6GjB/F0xSFr/jobv
+	aZp3QBTfui4LsDYimNY8n3BIgbAdNEhTnTKDf8EHt9+IuKFGIOyKaZ19CE1NNpDscKnRxqu071h
+	uYOs2Gvspn9Wtd868zuZmm5X50W5YT3LUorRa93NVH7P8QncMYPrTRK4SFKLCx0fdxxXSI63OQo
+	=
+X-Received: by 2002:a05:6000:184e:b0:3ec:db87:ff53 with SMTP id ffacd0b85a97d-429e2d91fe1mr3951412f8f.12.1762354096638;
+        Wed, 05 Nov 2025 06:48:16 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGrOCNYKDLHdDqnsKK5PIOXbPko9O2ocFPx7Xxpk9jaY5/59QMJwT5e74pWkY0THQmdo2gCiQ==
+X-Received: by 2002:a05:6000:184e:b0:3ec:db87:ff53 with SMTP id ffacd0b85a97d-429e2d91fe1mr3951385f8f.12.1762354096174;
+        Wed, 05 Nov 2025 06:48:16 -0800 (PST)
+Received: from sgarzare-redhat ([5.77.88.64])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429dc18efb3sm12092871f8f.3.2025.11.05.06.48.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Nov 2025 06:48:14 -0800 (PST)
+Date: Wed, 5 Nov 2025 15:48:09 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Shuah Khan <shuah@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Simon Horman <horms@kernel.org>, 
+	Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v2 10/12] selftests/vsock: add 1.37 to tested
+ virtme-ng versions
+Message-ID: <csgl7tb7jxlmbkn5jqjoiraa4a5vatmd3t4fv4duue5ftukphy@tem4fwdinmti>
+References: <20251104-vsock-selftests-fixes-and-improvements-v2-0-ca2070fd1601@meta.com>
+ <20251104-vsock-selftests-fixes-and-improvements-v2-10-ca2070fd1601@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3] net: bonding: use atomic instead of
- rtnl_mutex, to make sure peer notify updated
-To: Tonghao Zhang <tonghao@bamaicloud.com>, netdev@vger.kernel.org
-Cc: Jay Vosburgh <jv@jvosburgh.net>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Hangbin Liu <liuhangbin@gmail.com>
-References: <20251105142739.41833-1-tonghao@bamaicloud.com>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20251105142739.41833-1-tonghao@bamaicloud.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20251104-vsock-selftests-fixes-and-improvements-v2-10-ca2070fd1601@meta.com>
 
-On 11/5/25 16:27, Tonghao Zhang wrote:
-> Using atomic to protect the send_peer_notif instead of rtnl_mutex.
-> This approach allows safe updates in both interrupt and process
-> contexts, while avoiding code complexity.
-> 
-> In lacp mode, the rtnl might be locked, preventing ad_cond_set_peer_notif()
-> from acquiring the lock and updating send_peer_notif. This patch addresses
-> the issue by using a atomic. Since updating send_peer_notif does not
-> require high real-time performance, such atomic updates are acceptable.
-> 
-> After coverting the rtnl lock for send_peer_notif to atomic, in bond_mii_monitor(),
-> we should check the should_notify_peers (rtnllock required) instead of
-> send_peer_notif. By the way, to avoid peer notify event loss, we check
-> again whether to send peer notify, such as active-backup mode failover.
-> 
-> Cc: Jay Vosburgh <jv@jvosburgh.net>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: Simon Horman <horms@kernel.org>
-> Cc: Jonathan Corbet <corbet@lwn.net>
-> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
-> Cc: Nikolay Aleksandrov <razor@blackwall.org>
-> Cc: Hangbin Liu <liuhangbin@gmail.com>
-> Suggested-by: Jay Vosburgh <jv@jvosburgh.net>
-> Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
-> ---
-> v3:
-> - add the comment, *_dec_if_positive is safe.
-> v2:
-> - refine the codes
-> - check bond_should_notify_peers again in bond_mii_monitor(), to avoid event loss.
-> v1:
-> - https://patchwork.kernel.org/project/netdevbpf/patch/20251026095614.48833-1-tonghao@bamaicloud.com/
-> ---
->  drivers/net/bonding/bond_3ad.c  |  7 ++---
->  drivers/net/bonding/bond_main.c | 47 ++++++++++++++++-----------------
->  include/net/bonding.h           |  9 ++++++-
->  3 files changed, 33 insertions(+), 30 deletions(-)
-> 
-> diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
-> index 49717b7b82a2..05c573e45450 100644
-> --- a/drivers/net/bonding/bond_3ad.c
-> +++ b/drivers/net/bonding/bond_3ad.c
-> @@ -999,11 +999,8 @@ static void ad_cond_set_peer_notif(struct port *port)
->  {
->  	struct bonding *bond = port->slave->bond;
->  
-> -	if (bond->params.broadcast_neighbor && rtnl_trylock()) {
-> -		bond->send_peer_notif = bond->params.num_peer_notif *
-> -			max(1, bond->params.peer_notif_delay);
-> -		rtnl_unlock();
-> -	}
-> +	if (bond->params.broadcast_neighbor)
-> +		bond_peer_notify_reset(bond);
->  }
->  
->  /**
-> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-> index 8e592f37c28b..4da92f3b129c 100644
-> --- a/drivers/net/bonding/bond_main.c
-> +++ b/drivers/net/bonding/bond_main.c
-> @@ -1167,10 +1167,11 @@ static bool bond_should_notify_peers(struct bonding *bond)
->  {
->  	struct bond_up_slave *usable;
->  	struct slave *slave = NULL;
-> +	int send_peer_notif;
->  
-> -	if (!bond->send_peer_notif ||
-> -	    bond->send_peer_notif %
-> -	    max(1, bond->params.peer_notif_delay) != 0 ||
-> +	send_peer_notif = atomic_read(&bond->send_peer_notif);
-> +	if (!send_peer_notif ||
-> +	    send_peer_notif % max(1, bond->params.peer_notif_delay) != 0 ||
->  	    !netif_carrier_ok(bond->dev))
->  		return false;
->  
-> @@ -1270,8 +1271,6 @@ void bond_change_active_slave(struct bonding *bond, struct slave *new_active)
->  						      BOND_SLAVE_NOTIFY_NOW);
->  
->  		if (new_active) {
-> -			bool should_notify_peers = false;
-> -
->  			bond_set_slave_active_flags(new_active,
->  						    BOND_SLAVE_NOTIFY_NOW);
->  
-> @@ -1280,19 +1279,17 @@ void bond_change_active_slave(struct bonding *bond, struct slave *new_active)
->  						      old_active);
->  
->  			if (netif_running(bond->dev)) {
-> -				bond->send_peer_notif =
-> -					bond->params.num_peer_notif *
-> -					max(1, bond->params.peer_notif_delay);
-> -				should_notify_peers =
-> -					bond_should_notify_peers(bond);
-> +				bond_peer_notify_reset(bond);
-> +
-> +				if (bond_should_notify_peers(bond)) {
-> +					atomic_dec(&bond->send_peer_notif);
-> +					call_netdevice_notifiers(
-> +							NETDEV_NOTIFY_PEERS,
-> +							bond->dev);
-> +				}
->  			}
->  
->  			call_netdevice_notifiers(NETDEV_BONDING_FAILOVER, bond->dev);
-> -			if (should_notify_peers) {
-> -				bond->send_peer_notif--;
-> -				call_netdevice_notifiers(NETDEV_NOTIFY_PEERS,
-> -							 bond->dev);
-> -			}
->  		}
->  	}
->  
-> @@ -2801,7 +2798,7 @@ static void bond_mii_monitor(struct work_struct *work)
->  
->  	rcu_read_unlock();
->  
-> -	if (commit || bond->send_peer_notif) {
-> +	if (commit || should_notify_peers) {
->  		/* Race avoidance with bond_close cancel of workqueue */
->  		if (!rtnl_trylock()) {
->  			delay = 1;
-> @@ -2816,16 +2813,16 @@ static void bond_mii_monitor(struct work_struct *work)
->  			bond_miimon_commit(bond);
->  		}
->  
-> -		if (bond->send_peer_notif) {
-> -			bond->send_peer_notif--;
-> -			if (should_notify_peers)
-> -				call_netdevice_notifiers(NETDEV_NOTIFY_PEERS,
-> -							 bond->dev);
-> -		}
-> +		/* check again to avoid send_peer_notif has been changed. */
-> +		if (bond_should_notify_peers(bond))
-> +			call_netdevice_notifiers(NETDEV_NOTIFY_PEERS, bond->dev);
->  
->  		rtnl_unlock();	/* might sleep, hold no other locks */
->  	}
->  
-> +	/* this's safe to *_dec_if_positive, even when peer notify disabled. */
-> +	atomic_dec_if_positive(&bond->send_peer_notif);
-> +
->  re_arm:
->  	if (bond->params.miimon)
->  		queue_delayed_work(bond->wq, &bond->mii_work, delay);
-> @@ -3773,7 +3770,7 @@ static void bond_activebackup_arp_mon(struct bonding *bond)
->  			return;
->  
->  		if (should_notify_peers) {
-> -			bond->send_peer_notif--;
-> +			atomic_dec(&bond->send_peer_notif);
+On Tue, Nov 04, 2025 at 02:39:00PM -0800, Bobby Eshleman wrote:
+>From: Bobby Eshleman <bobbyeshleman@meta.com>
+>
+>Testing with 1.37 shows all tests passing but emits the warning:
+>
+>warning: vng version 'virtme-ng 1.37' has not been tested and may not function properly.
+>	The following versions have been tested: 1.33 1.36
+>
+>This patch adds 1.37 to the virtme-ng versions to get rid of the above
+>warning.
+>
+>Reviewed-by: Simon Horman <horms@kernel.org>
+>Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+>---
+> tools/testing/selftests/vsock/vmtest.sh | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-this can run in parallel with the active slave change and they both can
-read the same send_peer_notif count and do an unconditional decrement
-even though only one of them should, should_notify_peers is read outside
-of the lock and can race with active slave change
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
->  			call_netdevice_notifiers(NETDEV_NOTIFY_PEERS,
->  						 bond->dev);
->  		}
-> @@ -4267,6 +4264,8 @@ static int bond_open(struct net_device *bond_dev)
->  			queue_delayed_work(bond->wq, &bond->alb_work, 0);
->  	}
->  
-> +	atomic_set(&bond->send_peer_notif, 0);
-> +
->  	if (bond->params.miimon)  /* link check interval, in milliseconds. */
->  		queue_delayed_work(bond->wq, &bond->mii_work, 0);
->  
-> @@ -4300,7 +4299,7 @@ static int bond_close(struct net_device *bond_dev)
->  	struct slave *slave;
->  
->  	bond_work_cancel_all(bond);
-> -	bond->send_peer_notif = 0;
-> +	atomic_set(&bond->send_peer_notif, 0);
->  	if (bond_is_lb(bond))
->  		bond_alb_deinitialize(bond);
->  	bond->recv_probe = NULL;
-> diff --git a/include/net/bonding.h b/include/net/bonding.h
-> index 49edc7da0586..afdfcb5bfaf0 100644
-> --- a/include/net/bonding.h
-> +++ b/include/net/bonding.h
-> @@ -236,7 +236,7 @@ struct bonding {
->  	 */
->  	spinlock_t mode_lock;
->  	spinlock_t stats_lock;
-> -	u32	 send_peer_notif;
-> +	atomic_t send_peer_notif;
->  	u8       igmp_retrans;
->  #ifdef CONFIG_PROC_FS
->  	struct   proc_dir_entry *proc_entry;
-> @@ -814,4 +814,11 @@ static inline netdev_tx_t bond_tx_drop(struct net_device *dev, struct sk_buff *s
->  	return NET_XMIT_DROP;
->  }
->  
-> +static inline void bond_peer_notify_reset(struct bonding *bond)
-> +{
-> +	atomic_set(&bond->send_peer_notif,
-> +		bond->params.num_peer_notif *
-> +		max(1, bond->params.peer_notif_delay));
-> +}
-> +
->  #endif /* _NET_BONDING_H */
+I'm just worried that the list will explode. Perhaps in the future we 
+should just define the minimum version that we are sure we can support 
+and the maximum that we have tested.
+
+Stefano
+
+>
+>diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
+>index 3ba9a0dfdd01..0657973b5067 100755
+>--- a/tools/testing/selftests/vsock/vmtest.sh
+>+++ b/tools/testing/selftests/vsock/vmtest.sh
+>@@ -152,7 +152,7 @@ check_vng() {
+> 	local version
+> 	local ok
+>
+>-	tested_versions=("1.33" "1.36")
+>+	tested_versions=("1.33" "1.36" "1.37")
+> 	version="$(vng --version)"
+>
+> 	ok=0
+>
+>-- 
+>2.47.3
+>
 
 
