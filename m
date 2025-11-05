@@ -1,173 +1,279 @@
-Return-Path: <netdev+bounces-235729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B091C3457E
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 08:50:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AB487C345B4
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 08:52:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E8BD1885255
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 07:47:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7D40188B07C
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 07:53:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19F702C15A6;
-	Wed,  5 Nov 2025 07:47:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28F302641C6;
+	Wed,  5 Nov 2025 07:52:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="W1de71Bz"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="kKSUZjOz"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A81628C035
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 07:47:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C2012BEFEF;
+	Wed,  5 Nov 2025 07:52:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762328824; cv=none; b=QCH2uTFbEqHH5qn9TK6hLjUNzRtVn0QOr17BEslf+o8zjkjm1W1CWu9PZoEyZUzzisVDjH4zuiP8DkKe0uVcgEc4v7OIaVCI+TrtzfgGFihZPBIlJiYOZhOPCpB6TqU0NQBR8KIz6MO84ka/fFhdRWgX30QtHUvXhk9tCj0SOT0=
+	t=1762329158; cv=none; b=JmaT82DszwMiY4mJMCfLj5j/C06SHYkNOwUezXl8//n1Zr0inLjg19NfHOXzUcPgk2YPvFu3GUIKC1TM+/VsK2U/X0Hv1EzxF5LHnXI/HOG+t2tGLIJywuWv29LKzXTvnWMsp2GfZxFiNS0j6mYQ9xsgqpdLuOeXCtadFHCyeVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762328824; c=relaxed/simple;
-	bh=veipUYVxRtTXsinc0QPd03nkK+7sJKmNn8tmCUKG17U=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XSJ1sooHCHxY+2yWDJcfFmfsFTfsq64tu8OJplyye3MChTX1/3PZT9HjUoB1tebLqcJywPOrcWDynXmPn5etjyRN3FlSAUCe4EkejYkuG56JAMudttPMfEaOMxEZu4HQjQZPVQtHljk9cqZm7yBOQc5+WQYrf0snQFEX4nR3Q/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=W1de71Bz; arc=none smtp.client-ip=91.218.175.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1762328820;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lH/Z4czBasBtE4pQuylaFhi4G581F8JDtrlt08hwbuk=;
-	b=W1de71BzP2x8bRMPInQKaijgZM27NzjGhnHI2Y5A2N2Q2kb1pwoAX+j12oQPqcCn8SlIYI
-	GyS+bAppC8NGysX7rQxjbfcl9E/ZeAC1hdQ79phmoUyDHhDNKF1qhxg3PWDb44IdaRXORk
-	kQ1H7+SwPmzxKsWh49zuLI1Bqc8gmsg=
-From: Menglong Dong <menglong.dong@linux.dev>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>, peterz@infradead.org
-Cc: Menglong Dong <menglong8.dong@gmail.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
- Eduard <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- David Ahern <dsahern@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>,
- "H. Peter Anvin" <hpa@zytor.com>, jiang.biao@linux.dev,
- bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH bpf-next] bpf,x86: do RSB balance for trampoline
-Date: Wed, 05 Nov 2025 15:46:47 +0800
-Message-ID: <1986305.taCxCBeP46@7950hx>
-In-Reply-To: <4465519.ejJDZkT8p0@7950hx>
-References:
- <20251104104913.689439-1-dongml2@chinatelecom.cn>
- <CAADnVQKQXcUxjJ2uYNu1nvhFYt=KhN8QYAiGXrt_YwUsjMFOuA@mail.gmail.com>
- <4465519.ejJDZkT8p0@7950hx>
+	s=arc-20240116; t=1762329158; c=relaxed/simple;
+	bh=AP6iw/C+qSN0VhEoNPlaRqVGq/0omuQEYyq9jskelWo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WYxSI3vqU1AAOEOs79Rm3ShiumcQhn+KyPEB97gihYhIQlrQTvzRX1jVkRoSJRe77CrwuH8FtAJnJc2nBMitcc/RiLZzdeTMeOctqAirUEdNx2qBVc3jtOzy84DEddi/Dlzay1U9eCN5aBfWhORlBUFYamjxuO1Wtd9HtU/x+/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=kKSUZjOz; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1762329156; x=1793865156;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=AP6iw/C+qSN0VhEoNPlaRqVGq/0omuQEYyq9jskelWo=;
+  b=kKSUZjOzED1TmCye/v1WFJ2CnZpO3ou1oZ1qHdRVE/R+E6ljaW9+ueuh
+   q25XXc/pAe2HHQVi2jaEIQ4ciPN/COyFjpEOoYW2US1zhXQDPFiRFNNsO
+   mLlzThOC5cqJxA5SAB/z8DpJeERAxXcDif1dx35ENbJ2+EG7BFDyGUw/H
+   OOZcjcCLA3vmPXyigUIQJNAC4/LDi/sOm64KtSAPuz6m9U+kyARbVHtDk
+   0RE/sjimYJ4HXOM1gtlQhGoH5+ZrZteh1+YUHjVQFKb36shl7hSNaV0/t
+   Pd1/JhISjrjMy1H58P89yuTia9yxJo3ZLwwjk5cHdCddGo/lM6BvGDqIn
+   A==;
+X-CSE-ConnectionGUID: vGo73ZIDT7+RbrhE2gduWw==
+X-CSE-MsgGUID: AnOy/bNYRP6oDyB9RL62Fg==
+X-IronPort-AV: E=Sophos;i="6.19,281,1754982000"; 
+   d="scan'208";a="48068506"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2025 00:52:35 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.87.72) by
+ chn-vm-ex4.mchp-main.com (10.10.87.33) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.29; Wed, 5 Nov 2025 00:52:24 -0700
+Received: from DEN-DL-M31836.microchip.com (10.10.85.11) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
+ 15.1.2507.58 via Frontend Transport; Wed, 5 Nov 2025 00:52:22 -0700
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: <UNGLinuxDriver@microchip.com>, <andrew+netdev@lunn.ch>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>
+Subject: [PATCH net] lan966x: Fix sleeping in atomic context
+Date: Wed, 5 Nov 2025 08:49:55 +0100
+Message-ID: <20251105074955.1766792-1-horatiu.vultur@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On 2025/11/5 15:13, Menglong Dong wrote:
-> On 2025/11/5 10:12, Alexei Starovoitov wrote:
-> > On Tue, Nov 4, 2025 at 5:30=E2=80=AFPM Menglong Dong <menglong.dong@lin=
-ux.dev> wrote:
-> > >
-> > > On 2025/11/5 02:56, Alexei Starovoitov wrote:
-> > > > On Tue, Nov 4, 2025 at 2:49=E2=80=AFAM Menglong Dong <menglong8.don=
-g@gmail.com> wrote:
-> > > > >
-> > > > > In origin call case, we skip the "rip" directly before we return,=
- which
-> > > > > break the RSB, as we have twice "call", but only once "ret".
-> > > >
-> > > > RSB meaning return stack buffer?
-> > > >
-> > > > and by "breaks RSB" you mean it makes the cpu less efficient?
-> > >
-> > > Yeah, I mean it makes the cpu less efficient. The RSB is used
-> > > for the branch predicting, and it will push the "rip" to its hardware
-> > > stack on "call", and pop it from the stack on "ret". In the origin
-> > > call case, there are twice "call" but once "ret", will break its
-> > > balance.
-> >=20
-> > Yes. I'm aware, but your "mov [rbp + 8], rax" screws it up as well,
-> > since RSB has to be updated/invalidated by this store.
-> > The behavior depends on the microarchitecture, of course.
-> > I think:
-> > add rsp, 8
-> > ret
-> > will only screw up the return prediction, but won't invalidate RSB.
-> >=20
-> > > Similar things happen in "return_to_handler" in ftrace_64.S,
-> > > which has once "call", but twice "ret". And it pretend a "call"
-> > > to make it balance.
-> >=20
-> > This makes more sense to me. Let's try that approach instead
-> > of messing with the return address on stack?
->=20
-> The way here is similar to the "return_to_handler". For the ftrace,
-> the origin stack before the "ret" of the traced function is:
->=20
->     POS:
->     rip   ---> return_to_handler
->=20
-> And the exit of the traced function will jump to return_to_handler.
-> In return_to_handler, it will query the real "rip" of the traced function
-> and the it call a internal function:
->=20
->     call .Ldo_rop
->=20
-> And the stack now is:
->=20
->     POS:
->     rip   ----> the address after "call .Ldo_rop", which is a "int3"
->=20
-> in the .Ldo_rop, it will modify the rip to the real rip to make
-> it like this:
->=20
->     POS:
->     rip   ---> real rip
->=20
-> And it return. Take the target function "foo" for example, the logic
-> of it is:
->=20
->     call foo -> call ftrace_caller -> return ftrace_caller ->
->     return return_to_handler -> call Ldo_rop -> return foo
->=20
-> As you can see, the call and return address for ".Ldo_rop" is
-> also messed up. So I think it works here too. Compared with
-> a messed "return address", a missed return maybe have
-> better influence?
->=20
-> And the whole logic for us is:
->=20
->     call foo -> call trampoline -> call origin ->
->     return origin -> return POS -> return foo
+The following warning was seen when we try to connect using ssh to the device.
 
-The "return POS" will miss the RSB, but the later return
-will hit it.
+BUG: sleeping function called from invalid context at kernel/locking/mutex.c:575
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 104, name: dropbear
+preempt_count: 1, expected: 0
+INFO: lockdep is turned off.
+CPU: 0 UID: 0 PID: 104 Comm: dropbear Tainted: G        W           6.18.0-rc2-00399-g6f1ab1b109b9-dirty #530 NONE
+Tainted: [W]=WARN
+Hardware name: Generic DT based system
+Call trace:
+ unwind_backtrace from show_stack+0x10/0x14
+ show_stack from dump_stack_lvl+0x7c/0xac
+ dump_stack_lvl from __might_resched+0x16c/0x2b0
+ __might_resched from __mutex_lock+0x64/0xd34
+ __mutex_lock from mutex_lock_nested+0x1c/0x24
+ mutex_lock_nested from lan966x_stats_get+0x5c/0x558
+ lan966x_stats_get from dev_get_stats+0x40/0x43c
+ dev_get_stats from dev_seq_printf_stats+0x3c/0x184
+ dev_seq_printf_stats from dev_seq_show+0x10/0x30
+ dev_seq_show from seq_read_iter+0x350/0x4ec
+ seq_read_iter from seq_read+0xfc/0x194
+ seq_read from proc_reg_read+0xac/0x100
+ proc_reg_read from vfs_read+0xb0/0x2b0
+ vfs_read from ksys_read+0x6c/0xec
+ ksys_read from ret_fast_syscall+0x0/0x1c
+Exception stack(0xf0b11fa8 to 0xf0b11ff0)
+1fa0:                   00000001 00001000 00000008 be9048d8 00001000 00000001
+1fc0: 00000001 00001000 00000008 00000003 be905920 0000001e 00000000 00000001
+1fe0: 0005404c be9048c0 00018684 b6ec2cd8
 
-The origin logic is:
+It seems that we are using a mutex in a atomic context which is wrong.
+Change the mutex with a spinlock.
 
-     call foo -> call trampoline -> call origin ->
-     return origin -> return foo
+Fixes: 12c2d0a5b8e2 ("net: lan966x: add ethtool configuration and statistics")
+Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+---
+ .../microchip/lan966x/lan966x_ethtool.c        | 18 +++++++++---------
+ .../ethernet/microchip/lan966x/lan966x_main.c  |  2 --
+ .../ethernet/microchip/lan966x/lan966x_main.h  |  4 ++--
+ .../microchip/lan966x/lan966x_vcap_impl.c      |  8 ++++----
+ 4 files changed, 15 insertions(+), 17 deletions(-)
 
-The "return foo" and all the later return will miss the RBS.
-
-Hmm......Not sure if I understand it correctly.
-
->=20
-
-
-
+diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_ethtool.c b/drivers/net/ethernet/microchip/lan966x/lan966x_ethtool.c
+index 2474dfd330f46..fe4e614052840 100644
+--- a/drivers/net/ethernet/microchip/lan966x/lan966x_ethtool.c
++++ b/drivers/net/ethernet/microchip/lan966x/lan966x_ethtool.c
+@@ -294,7 +294,7 @@ static void lan966x_stats_update(struct lan966x *lan966x)
+ {
+ 	int i, j;
+ 
+-	mutex_lock(&lan966x->stats_lock);
++	spin_lock(&lan966x->stats_lock);
+ 
+ 	for (i = 0; i < lan966x->num_phys_ports; i++) {
+ 		uint idx = i * lan966x->num_stats;
+@@ -310,7 +310,7 @@ static void lan966x_stats_update(struct lan966x *lan966x)
+ 		}
+ 	}
+ 
+-	mutex_unlock(&lan966x->stats_lock);
++	spin_unlock(&lan966x->stats_lock);
+ }
+ 
+ static int lan966x_get_sset_count(struct net_device *dev, int sset)
+@@ -365,7 +365,7 @@ static void lan966x_get_eth_mac_stats(struct net_device *dev,
+ 
+ 	idx = port->chip_port * lan966x->num_stats;
+ 
+-	mutex_lock(&lan966x->stats_lock);
++	spin_lock(&lan966x->stats_lock);
+ 
+ 	mac_stats->FramesTransmittedOK =
+ 		lan966x->stats[idx + SYS_COUNT_TX_UC] +
+@@ -416,7 +416,7 @@ static void lan966x_get_eth_mac_stats(struct net_device *dev,
+ 		lan966x->stats[idx + SYS_COUNT_RX_LONG] +
+ 		lan966x->stats[idx + SYS_COUNT_RX_PMAC_LONG];
+ 
+-	mutex_unlock(&lan966x->stats_lock);
++	spin_unlock(&lan966x->stats_lock);
+ }
+ 
+ static const struct ethtool_rmon_hist_range lan966x_rmon_ranges[] = {
+@@ -442,7 +442,7 @@ static void lan966x_get_eth_rmon_stats(struct net_device *dev,
+ 
+ 	idx = port->chip_port * lan966x->num_stats;
+ 
+-	mutex_lock(&lan966x->stats_lock);
++	spin_lock(&lan966x->stats_lock);
+ 
+ 	rmon_stats->undersize_pkts =
+ 		lan966x->stats[idx + SYS_COUNT_RX_SHORT] +
+@@ -500,7 +500,7 @@ static void lan966x_get_eth_rmon_stats(struct net_device *dev,
+ 		lan966x->stats[idx + SYS_COUNT_TX_SZ_1024_1526] +
+ 		lan966x->stats[idx + SYS_COUNT_TX_PMAC_SZ_1024_1526];
+ 
+-	mutex_unlock(&lan966x->stats_lock);
++	spin_unlock(&lan966x->stats_lock);
+ 
+ 	*ranges = lan966x_rmon_ranges;
+ }
+@@ -603,7 +603,7 @@ void lan966x_stats_get(struct net_device *dev,
+ 
+ 	idx = port->chip_port * lan966x->num_stats;
+ 
+-	mutex_lock(&lan966x->stats_lock);
++	spin_lock(&lan966x->stats_lock);
+ 
+ 	stats->rx_bytes = lan966x->stats[idx + SYS_COUNT_RX_OCT] +
+ 		lan966x->stats[idx + SYS_COUNT_RX_PMAC_OCT];
+@@ -685,7 +685,7 @@ void lan966x_stats_get(struct net_device *dev,
+ 
+ 	stats->collisions = lan966x->stats[idx + SYS_COUNT_TX_COL];
+ 
+-	mutex_unlock(&lan966x->stats_lock);
++	spin_unlock(&lan966x->stats_lock);
+ }
+ 
+ int lan966x_stats_init(struct lan966x *lan966x)
+@@ -701,7 +701,7 @@ int lan966x_stats_init(struct lan966x *lan966x)
+ 		return -ENOMEM;
+ 
+ 	/* Init stats worker */
+-	mutex_init(&lan966x->stats_lock);
++	spin_lock_init(&lan966x->stats_lock);
+ 	snprintf(queue_name, sizeof(queue_name), "%s-stats",
+ 		 dev_name(lan966x->dev));
+ 	lan966x->stats_queue = create_singlethread_workqueue(queue_name);
+diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+index 7001584f1b7a6..47752d3fde0b1 100644
+--- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
++++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.c
+@@ -1261,7 +1261,6 @@ static int lan966x_probe(struct platform_device *pdev)
+ 
+ 	cancel_delayed_work_sync(&lan966x->stats_work);
+ 	destroy_workqueue(lan966x->stats_queue);
+-	mutex_destroy(&lan966x->stats_lock);
+ 
+ 	debugfs_remove_recursive(lan966x->debugfs_root);
+ 
+@@ -1279,7 +1278,6 @@ static void lan966x_remove(struct platform_device *pdev)
+ 
+ 	cancel_delayed_work_sync(&lan966x->stats_work);
+ 	destroy_workqueue(lan966x->stats_queue);
+-	mutex_destroy(&lan966x->stats_lock);
+ 
+ 	lan966x_mac_purge_entries(lan966x);
+ 	lan966x_mdb_deinit(lan966x);
+diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_main.h b/drivers/net/ethernet/microchip/lan966x/lan966x_main.h
+index 4f75f06883693..eea286c29474f 100644
+--- a/drivers/net/ethernet/microchip/lan966x/lan966x_main.h
++++ b/drivers/net/ethernet/microchip/lan966x/lan966x_main.h
+@@ -295,8 +295,8 @@ struct lan966x {
+ 	const struct lan966x_stat_layout *stats_layout;
+ 	u32 num_stats;
+ 
+-	/* workqueue for reading stats */
+-	struct mutex stats_lock;
++	/* lock for reading stats */
++	spinlock_t stats_lock;
+ 	u64 *stats;
+ 	struct delayed_work stats_work;
+ 	struct workqueue_struct *stats_queue;
+diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_vcap_impl.c b/drivers/net/ethernet/microchip/lan966x/lan966x_vcap_impl.c
+index a1471e38d1189..2a37fc1ba4bcd 100644
+--- a/drivers/net/ethernet/microchip/lan966x/lan966x_vcap_impl.c
++++ b/drivers/net/ethernet/microchip/lan966x/lan966x_vcap_impl.c
+@@ -403,11 +403,11 @@ static void lan966x_es0_read_esdx_counter(struct lan966x *lan966x,
+ 	u32 counter;
+ 
+ 	id = id & 0xff; /* counter limit */
+-	mutex_lock(&lan966x->stats_lock);
++	spin_lock(&lan966x->stats_lock);
+ 	lan_wr(SYS_STAT_CFG_STAT_VIEW_SET(id), lan966x, SYS_STAT_CFG);
+ 	counter = lan_rd(lan966x, SYS_CNT(LAN966X_STAT_ESDX_GRN_PKTS)) +
+ 		  lan_rd(lan966x, SYS_CNT(LAN966X_STAT_ESDX_YEL_PKTS));
+-	mutex_unlock(&lan966x->stats_lock);
++	spin_unlock(&lan966x->stats_lock);
+ 	if (counter)
+ 		admin->cache.counter = counter;
+ }
+@@ -417,14 +417,14 @@ static void lan966x_es0_write_esdx_counter(struct lan966x *lan966x,
+ {
+ 	id = id & 0xff; /* counter limit */
+ 
+-	mutex_lock(&lan966x->stats_lock);
++	spin_lock(&lan966x->stats_lock);
+ 	lan_wr(SYS_STAT_CFG_STAT_VIEW_SET(id), lan966x, SYS_STAT_CFG);
+ 	lan_wr(0, lan966x, SYS_CNT(LAN966X_STAT_ESDX_GRN_BYTES));
+ 	lan_wr(admin->cache.counter, lan966x,
+ 	       SYS_CNT(LAN966X_STAT_ESDX_GRN_PKTS));
+ 	lan_wr(0, lan966x, SYS_CNT(LAN966X_STAT_ESDX_YEL_BYTES));
+ 	lan_wr(0, lan966x, SYS_CNT(LAN966X_STAT_ESDX_YEL_PKTS));
+-	mutex_unlock(&lan966x->stats_lock);
++	spin_unlock(&lan966x->stats_lock);
+ }
+ 
+ static void lan966x_vcap_cache_write(struct net_device *dev,
+-- 
+2.34.1
 
 
