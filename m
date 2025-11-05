@@ -1,295 +1,99 @@
-Return-Path: <netdev+bounces-235764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19E15C3510C
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 11:17:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 74C38C35109
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 11:17:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D04C5641E3
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 10:14:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 220115636F2
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 10:14:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F89E2FF161;
-	Wed,  5 Nov 2025 10:14:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 006F11BE871;
+	Wed,  5 Nov 2025 10:14:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XhkZN14O"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mFyWDEqK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5160C2FE59E
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 10:14:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762337660; cv=fail; b=Zyl0HG0GKFzVcYANzsn90WIGhijPoGf0Iv96UrQlLMtXqooCUfdLY42f0SOd8m5XScOQu8EM8gkMRndEKqDOQaD/r/IWOFgvjpv5fv6mNOdL5BBmoBOgVhqPyrWuIb9ghJKZl6b/ay6SxtDacyIQmRnoxCjEM1Kfr/t3Iow6Mqk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762337660; c=relaxed/simple;
-	bh=WR8O8j/iqB7AGluimRxbe1pd4NgbuPKjVp1951uy/kI=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=IX4iWNnqPtvN2u1NUy384uUaKyP/Y/TlkvqbGrVZrL1ZzK1/fOuaTu4TkgLptiScrr5iwjcrNUZfbQpo/H6YwWV+sQ8jWhZmQbw+9ROR6RR9HgSeTEDoukU3Tk/VPAIr8d+JUI+NqxNzrKCuydc4CphTIG9CjQx1Gi3be94NG/c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XhkZN14O; arc=fail smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762337659; x=1793873659;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=WR8O8j/iqB7AGluimRxbe1pd4NgbuPKjVp1951uy/kI=;
-  b=XhkZN14OHitAoL8E6ru7+no2lsUuiq+mAJ6cNjWUTSQ3RdUxGwlvbL3d
-   ABFdyavJqJ8x4PJcDcscvG334R/Vz4TVK/iQXNjRDYclcG8RQmBTX+kzr
-   0QSlJoWsKT3HsGZImBU+FsrE87psLxh4zV8AFgJwPqihYTbI7UFJuUILF
-   fGXnNaIPDk59YcQyVSv4Z5KXdSZHGpYGc1r4vWpu8uwLdmZ/3AOO7efNW
-   ueV7vLwWPvidSu9/+J0GgBqPFoL57vQSOjtOkng605a8p5Jiz1Guvlc4a
-   tggmuHq7+wJjWAGx0w2CHgSNiI5xQq3HLP6hx8nCs3BmVYeKLuNl3KCMi
-   A==;
-X-CSE-ConnectionGUID: zw+LTLW4TOaFtlxJZhvvrg==
-X-CSE-MsgGUID: KTjF4F2iShqOyn2f2nBahQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11603"; a="64548420"
-X-IronPort-AV: E=Sophos;i="6.19,281,1754982000"; 
-   d="scan'208";a="64548420"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2025 02:14:18 -0800
-X-CSE-ConnectionGUID: L9L/WOqzRL+mS1Y4NCwPEg==
-X-CSE-MsgGUID: 7A8VSyXORRapn66jgmWKAA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,281,1754982000"; 
-   d="scan'208";a="187106457"
-Received: from fmsmsx901.amr.corp.intel.com ([10.18.126.90])
-  by orviesa009.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2025 02:14:18 -0800
-Received: from FMSMSX903.amr.corp.intel.com (10.18.126.92) by
- fmsmsx901.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Wed, 5 Nov 2025 02:14:16 -0800
-Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
- FMSMSX903.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27 via Frontend Transport; Wed, 5 Nov 2025 02:14:16 -0800
-Received: from BYAPR05CU005.outbound.protection.outlook.com (52.101.85.49) by
- edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.27; Wed, 5 Nov 2025 02:14:16 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ymmkim3pVLjwT+Gz0idovPieXMZWXG98RoV9djGvIgz6qDBZud4XhSNe+2kFC0b9XFYn28WDyvbgZ1k01Iwev2j5kqCuapQxtrUOhOhJMuzXkeO1bW5bU82MD0N3q1Xn8fjLWT+irj+tAF3L3MrhGUA1yE326WcegBJBh3ftgV0C/KPtiloAGN4/Ijh+0GAg1l2aSmtgLRNcW6JD5LrKMnUVIXczoVbq4R/rqZ7DWfWc15OEGCxzwqWKEWzFdHE7FAJgttOnL44RAu6D4sX7PvaIjnl7ApJpQBiFsatzhJxYYDpY8+4B1Hl/TjW8qpj9ODIcVOjTQPdxpsoH2wcW/A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0VuwrxRb74mAWmi3imeRTTYti2YDMStzrVRHa1vR7Jw=;
- b=yOX6EYElhv06eLb2B1EFaBMxpvLmy3pPv0d/+u0UPZi2Iye1RT/9n5nFN2LuGG0AJbQVyti6ToXCfq6+ZD0lHp1uAcMjCtSmkE7xzNyX3C6Mfk1PPuEFLg4aKYMLJfEEqEnfY8r/NscqBWx06Xy19j68lOSKtTGg13ojEXS5Sg1qM2I6khoUIQQi8EYsN61UzIPjXcG51noEdhhX45Vhl4cNmSPAjeqqiiG7PPTdAtaTMYqh6PMz+/p3vSRijxBw8/mJTR43ZE6iWZueF7pYBYIyeAW/K25ntrolkEtUBrJhe64xU62G2nyQzKQdz7jDip25+8nuVekb5Hup88YsXQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by SN7PR11MB7043.namprd11.prod.outlook.com (2603:10b6:806:29a::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.16; Wed, 5 Nov
- 2025 10:14:13 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.9298.006; Wed, 5 Nov 2025
- 10:14:13 +0000
-Message-ID: <ba97ee38-a9d6-4d59-811b-055534ffbe8a@intel.com>
-Date: Wed, 5 Nov 2025 11:14:09 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next v3] ice: use netif_get_num_default_rss_queues()
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-CC: Paul Menzel <pmenzel@molgen.mpg.de>, <intel-wired-lan@lists.osuosl.org>,
-	<netdev@vger.kernel.org>, <aleksander.lobakin@intel.com>,
-	<jacob.e.keller@intel.com>, Aleksandr Loktionov
-	<aleksandr.loktionov@intel.com>
-References: <20251030083053.2166525-1-michal.swiatkowski@linux.intel.com>
- <370cf4f0-c0a8-480a-939d-33c75961e587@molgen.mpg.de>
- <aQMxvzYqJkwNBYf0@mev-dev.igk.intel.com>
- <621665db-e881-4adc-8caa-9275a4ed7a50@intel.com>
- <aQS216HKiUmF0tky@mev-dev.igk.intel.com>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Content-Language: en-US
-In-Reply-To: <aQS216HKiUmF0tky@mev-dev.igk.intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: DB9PR05CA0010.eurprd05.prod.outlook.com
- (2603:10a6:10:1da::15) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB06017C220;
+	Wed,  5 Nov 2025 10:14:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762337657; cv=none; b=JoWDHWZO8P4Fh8eg0otY15CAFn94xClmDd+nxYwJ9FLTnrMzTHm01SGM2nhtf/12rC2usSoU0hqFe6FJJvQmnt35kU0gO2txrMW3cmLHi2hu0G1WuIOHfo1dJ6pD8sqrTyouKHPFP9ZjEEuR821cleBMbqKcDqf6wdYcvf2pmrk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762337657; c=relaxed/simple;
+	bh=Okbe7o8+me/nPHM9MBYNTFsR959vwaadU/clvuSJ3Vk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iarlZ/8W9eFhGqCWiWlftKgykuT6YlTW10dTw3TVjmdunOPkCKOAr/e94e4PICHaDVNjvdxXHETkDU7w6DO/8NmA0wfo7zK4+VY2jPtT5/UfKS2oC2c2TdQiPN+/lGJDwGLHetWX0GdW3lvYrZDJ0O0G//KAataZLrz11oVN3Yk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mFyWDEqK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4F4FC4CEFB;
+	Wed,  5 Nov 2025 10:14:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762337657;
+	bh=Okbe7o8+me/nPHM9MBYNTFsR959vwaadU/clvuSJ3Vk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mFyWDEqKrRI+sa/wNzDR0UcsEfiY3Pz9GBl6hFu7iBVTL6Sf33fIK7EBGOmVRxg+D
+	 35XW2yjb1su+VuodnvjAJTjmJSEVhvRxvfgKZB29G/bL9WpkImlAasSStMM5OAZ800
+	 2kYh3U/VDj/gZx1NTjWhb1DdwdJURaulYDq1VnEt0MosRMGynhPc8Pgh6yll4vOUwF
+	 21cwFGG1/0mWdOU+2lTe8y1QWpoPiAfHQ8zvxkaT52xoQ2VxLQgRgsisXvH+O4Ir8o
+	 FqVJiNDkOAwx/Gwh2C5wI9lVWEs60rz/chgJWBcJQotwgdzMqts9orR3hWLx92pa5e
+	 SMXbxaf4znOLw==
+Date: Wed, 5 Nov 2025 10:14:12 +0000
+From: Simon Horman <horms@kernel.org>
+To: Meghana Malladi <m-malladi@ti.com>
+Cc: h-mittal1@ti.com, pabeni@redhat.com, kuba@kernel.org,
+	edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, srk@ti.com,
+	Vignesh Raghavendra <vigneshr@ti.com>,
+	Roger Quadros <rogerq@kernel.org>, danishanwar@ti.com
+Subject: Re: [PATCH net v2] net: ti: icssg-prueth: Fix fdb hash size
+ configuration
+Message-ID: <aQsjdAClmmKPLHWM@horms.kernel.org>
+References: <20251104104415.3110537-1-m-malladi@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|SN7PR11MB7043:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3930c20a-259f-4e4f-0865-08de1c5411d2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?bG9pM0NTNFByWitnVTJHNS8xWWlCUTRzSFNiUk1LYWpRR3VmbVBuYWpudkxv?=
- =?utf-8?B?aGErRlEzeGNBcHdlL0FOcEMwMmNTUWs5cXIyRjBybTZ1Tkt2NmNGTGl5QTJ3?=
- =?utf-8?B?WXQ2bitvWXV5aE5JU0JPdENaYS9Kd0pXOGRHK0pMbUcybndCUGgrS2c2MFQw?=
- =?utf-8?B?T3B3NUxrZXV6SW5tSHVsVzFNdldvLzRPTmRLdnBXVzI2ekh5VWhxTVdyRGgv?=
- =?utf-8?B?VXJsaFBFNFMrSVVkSWNsQTNpNktYYlRNN3dUdW1xbTF4cnFqeWJtcFkrUmI1?=
- =?utf-8?B?Z0R2Q2ZxYlJlM1V1Kzdvb0JuNXBXSmRLOWk3SmpQQU02KzIzRTc3d2FJVHlH?=
- =?utf-8?B?RWh2Z1J0MlFCcjdxVGVMcUxVK29wYXo5emNXU0UyL2wwWFdFL0I2L1lSY1Ur?=
- =?utf-8?B?dHdqREFGaVZHMUgvY3FGNkJza1pDc0NLZ0VkOFNydE05WkRzbXY5Z3NqVk5C?=
- =?utf-8?B?cHhtOTl2MEJDR0lLSWN6TlFyOS9EWW5sKzNpeHZnVzlmUlZBcjBaTVR2SFdm?=
- =?utf-8?B?MUV3alJKZTFZQ0VPRDdoeXJoNG40Q09lLzlDZXdxa2hxMi9nV3g3WlRhbjl0?=
- =?utf-8?B?cDQ2SGVIMGpsanNXd2p4VVZ4T3AzWUdlVHYyYUs0NWxZalprQVJvUHhLb3JL?=
- =?utf-8?B?OHo5czBqd0lFejVuSk4rcS9RQWdUbTd5MEMzK0dqMDBlQzRMQ3B3Qzg0VkZl?=
- =?utf-8?B?ZVhNMC9hQlorbVJ5UVBBbUZLNVpvdTZKSlVraTlzeWVYeS90TytSZmx4V3R0?=
- =?utf-8?B?ZE9jMjJOUDBuMHFZdHZNSTZZUWRKbzB3QnZyVmdmTXc0bXNESXRsSXEwcjZQ?=
- =?utf-8?B?ZjdnOFllWXVPNmdWSWx4UlN5VkhUdDlaZkExQUVtU04yWUpUb0ZwZjNpNmpG?=
- =?utf-8?B?b2Nnek4zckZRaktnTUphZmNXTXNvdXZrdFVmNWM3K3hNNWFmYXF6YmVOOXdi?=
- =?utf-8?B?ai9KQkFHRDFHalhCVlpuS05IYU8zb05uODYzYzJWQWNJRUpOREZHSVVnQ3Fk?=
- =?utf-8?B?YnNXbXJHdXM4YUpkdGh5bElaMEppeFlxU2tMalhWclJxSVhJMWgwaDJ0UG5r?=
- =?utf-8?B?NXovTXB3THRLcE5YU1pNUXEvaUtwNllIbjZFa3Fqb0cwMTNKZHBTVW1IUHB5?=
- =?utf-8?B?RWtuWEFIOGtpSExZakRiaUdPbzFOQWEwQjZwNi9hb3QrbFlXcHI5Z25mWnpt?=
- =?utf-8?B?NnZhd3pXME9VM0lhbFBGcmFYZGFlUGZTTEF4UHYvcXk5UDZxOU5tSXNyTGg5?=
- =?utf-8?B?VHVqaDhNZlk0SEtNaUpHcEJUOERheHptL2c1YUVjeTNVaWZGK2pjbFMyTTZk?=
- =?utf-8?B?ZXFvWitsSEpnL2IxS1hGOXNwRms1M3RtYWxhbHhMTUNRN0ttbUNZN3FhNTVs?=
- =?utf-8?B?ZStzRksvazFaSndESEo5bWRYVVVKZ1dYNGV4OFhXUXdQdlZPQ01QYVZSUmw3?=
- =?utf-8?B?ellKcGIzUS8rZ1FYZ2pCdnJVdkt1bVNKVktuR01hdklpdXlLUnUydGJPbUhh?=
- =?utf-8?B?dzQyQ2JteUNxSU1MUDJlYXlCQlNqM282Z2x6bHcrNHF6UmNCbmhEamYvcFVT?=
- =?utf-8?B?TEtqb1VRTFBkTFRkOFBqSUlOL3RlMy9ENjB4T3I2SHRtcjJTWGZEcXcrekVj?=
- =?utf-8?B?bWM0V0ltMGJHWW9FQ1pBQ3VwVGh0eThhczRxYndDa0FQREtBNEZ1N0dMWW9x?=
- =?utf-8?B?d3V4M01mZ1l2VFJ4T0lIWG5LQ0doN2Y5ZFBwUjFsZ3c4dTByZ1hSK3VQN3No?=
- =?utf-8?B?ZXA2OVVrZ2pJMGQ2SlB6bnNjYm9RVW5xaFVUZHNTWFFjSHhacndidlh0K3NX?=
- =?utf-8?B?amJWZmoxWXoveThoTEpGV3FkUTBLWWVpN3cyYXVYN3h0SDN2KzV4c0ZPYUl3?=
- =?utf-8?B?aHJ5MEZOTGczYit5M2U4ZWtCVXFIV3A4UUwrRXNmVEowM2pTL0dyS1g2eER0?=
- =?utf-8?B?dE9kM2NKTnd5aW44M05ST0lZOU1KRFRnTUVNcTlldmM5TG8rREltTWFpeGV5?=
- =?utf-8?B?ZzF3OHovZ1hRPT0=?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OERvL0JWandnQXZQd1F2bTNyU1RGR3U0Ums1cG9QSG0wUHVZUWc4RWhjajdS?=
- =?utf-8?B?cTJlVTRHcWQvWUhjeUVVaVJNYVpBUEMwR0V4dnlvWFBORGJOU3A2ejBEL3BC?=
- =?utf-8?B?MnBpZFJNdHJyaGJRajhtZHFZdm5HUnV6WEhTbHkwV2FVNm1aTzVDQTFhSmds?=
- =?utf-8?B?S2NJK0hDY2hGSTcvWXEySVBqVHpKWFRuMjdPcXlXcm9RZmpsUmdORmFYUk5l?=
- =?utf-8?B?eTVBUDZPV01seTZDLyt4VVNXK2Zad082VzArNkxOVk9PUVRQVVo4QUhoUE1v?=
- =?utf-8?B?djg1MXRmaDFmUmNQdTNzeStTcHdxWlRNcnlkQVJQWVhmOFlzL2JDd1lTZTNH?=
- =?utf-8?B?YmY0R1BWYzY2VmE4OStGSFJJMXZFZ3BBa25iSmgxdGVqQ2VXak5VMzdZek93?=
- =?utf-8?B?T3N4ckp6T3Flb1YzNDJUWEJCUU9NdkV3YnR1SGlHcG1tcGhOYlhyR0k5blE2?=
- =?utf-8?B?cnZoSldWY01Eell4RlE3QUJiNHFFcmRCeTBveWh2L1R5Umc5a2pnUnRxQmJh?=
- =?utf-8?B?THpWNUJIRFNQL1pJanBoWUhDeHBpdXJaQ0hzK0N5SFBJZFI3M1JXM2xKYXYr?=
- =?utf-8?B?dVhVKzc4MnNMNXRLcHFabnYxRXFGbVNPN0VONGZabGxHWllGQXFndjNPMTdr?=
- =?utf-8?B?YUR1OUhkWWNBaXczK3NxRjNkTUtGUkNVdTFidVQyRzlaSHQwZlJUaWkwOEkz?=
- =?utf-8?B?YllndjNKcm15enk2RHozZVpLSE02WUNIRTdYRkFFQWFhRXhDOFpxcko3Ympa?=
- =?utf-8?B?bG9lNnkvNzJYa2RKczdzMGM0dXZzNFB6SmFwL2Z0NlJlQ0RvVzlmczlVYmRm?=
- =?utf-8?B?ZS9JalJIWUNicUxsNmNyRU5wWkpnWkhpK0llY2pydDJvMnAxbjFvVHQwcGlU?=
- =?utf-8?B?cVo1clY5bU9LckRIa25YQzlsSUZ5SXZydElxTWJiKzExQWxTV1JxdytnTzRG?=
- =?utf-8?B?cXhmb0ZKTVBZUGpiOG05N1ZVOVYyYWMzTEZQZzRvM3djWngvaSt0MXptcXF5?=
- =?utf-8?B?OUVUSTU1QmtXbjZFQmdicU1rRitQUUdyMXVWVnVRRU5tUTVVZW1OeUg4VGNS?=
- =?utf-8?B?ZTlheDVHVTRVbzVjQ043Zzh2dlZhak9seWZEdDR3ZSt6MWpCKzU5dGhsamFv?=
- =?utf-8?B?bXk1cGJnUG1SSVNsNGt4S2owb0ZZcXFSOWJtYkRpSVNNdDdHZDRFMFg1UjY1?=
- =?utf-8?B?UG1aMmJBU0t6YU56MlVuMW9QNnlQUDN0UDFxVitraCtMWGErSVJuYlR3cFdP?=
- =?utf-8?B?SE90b09ycFhsc1VaaWxYK2tEMDJ2Qy8zUVlIZ2J6YXpUV3ZpdlUxSmh4Qi9j?=
- =?utf-8?B?WXFjWFhKTFFzQTZMcGt4eG41R1dwUDlXNU16bFJGcFZvT0x6ekxXbk8rREdm?=
- =?utf-8?B?M2FmVXp0VWM5U3p4bGVNeU1pcXRMYXlTczJPNDk2WEFFZnZPYzFCMzBSNDZ1?=
- =?utf-8?B?NUZGdXhOTmRuM3h5NGFoZ1FtcEJYaTdKWS93YnhWT0F0WFJQcEw3STFsKzJC?=
- =?utf-8?B?aDFibGh0MlVkcGlDUXdKU3d1K2djeGQ3UXFQaGEzSWxoblhKSFpaZjZRZ0xk?=
- =?utf-8?B?WVpIQzAvbWUwUjE3TFI1aVdaZWhDODlkTXdaaEJZTnkvWlNpQ3FCb0ovbFlB?=
- =?utf-8?B?cXEzNldkVXp6aDNOd05qb1pucnpsd2hTT08wUmJyMCtvMDRwZkJreVpmRmtn?=
- =?utf-8?B?NHZKZy9ySFE4QUhKRnlQOC93QWtkaWt2QXlZQWMySnlJUkFTZk1sTUV6T1ky?=
- =?utf-8?B?T214YlR2b3Fja0ZRSk92cWxFMGRGby9BSUtuamRNSVg3N2l3MkhueVF2MTVD?=
- =?utf-8?B?MlJXRm5LNk5PRFV5djZ1L0NSc3pycC9NaDJzZEU2QzlPcHBDZVkybkU4RERj?=
- =?utf-8?B?MzlFUEJQMzNGS3JPKzAzeWc0L04yUlh0eDIrVit3SlJQVk1TTGRmMHVyTDBJ?=
- =?utf-8?B?Uk1XSjl6aloyaEpoWk42eG5HeVloSG5IVUR4WEhBdGVhaTRuQlFlYlhwM3dv?=
- =?utf-8?B?ZDBxTmZOa0k5TUdWMnZDMWhJWEdjR3VUQkgxVStOdWxxRndpS0Mrc040OVpN?=
- =?utf-8?B?SXNDL09yV1ZlSG1PaWNNUFFLUnJiYU1ZY0d6Y2o1cU84T1gwbGRPRGVhbFNa?=
- =?utf-8?B?SXQ3TDhVRDgvTThqZmdGZ3lSN3FTcWlxQU5Pa3lXSUxaRndCNFhOWXpuUlFv?=
- =?utf-8?B?SHc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3930c20a-259f-4e4f-0865-08de1c5411d2
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Nov 2025 10:14:13.6132
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zsoy5kTeRpELuBSa3RlOql3eGPD5DF6GaWEzxiDfJsRw3IaHBX/ulo89UEdf6GS9I5DcqGCQaWOUrIAevlX7fWGcIkzk6a1qVQvGxNOPgh0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB7043
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251104104415.3110537-1-m-malladi@ti.com>
 
-On 10/31/25 14:17, Michal Swiatkowski wrote:
-> On Thu, Oct 30, 2025 at 11:39:30AM +0100, Przemek Kitszel wrote:
->> On 10/30/25 10:37, Michal Swiatkowski wrote:
->>> On Thu, Oct 30, 2025 at 10:10:32AM +0100, Paul Menzel wrote:
->>>> Dear Michal,
->>>>
->>>>
->>>> Thank you for your patch. For the summary, I’d add:
->>>>
->>>> ice: Use netif_get_num_default_rss_queues() to decrease queue number
->>
->> I would instead just say:
->> ice: cap the default number of queues to 64
->>
->> as this is exactly what happens. Then next paragraph could be:
->> Use netif_get_num_default_rss_queues() as a better base (instead of
->> the number of CPU cores), but still cap it to 64 to avoid excess IRQs
->> assigned to PF (what would leave, in some cases, nothing for VFs).
->>
->> sorry for such late nitpicks
->> and, see below too
+On Tue, Nov 04, 2025 at 04:14:15PM +0530, Meghana Malladi wrote:
+> The ICSSG driver does the initial FDB configuration which
+> includes setting the control registers. Other run time
+> management like learning is managed by the PRU's. The default
+> FDB hash size used by the firmware is 512 slots, which is
+> currently missing in the current driver. Update the driver
+> FDB config to include FDB hash size as well.
 > 
-> I moved away from capping to 64, now it is just call to
-> netif_get_num_default_rss_queues(). Following Olek's comment, dividing
-> by 2 is just fine now and looks like there is no good reasone to cap it
-> more in the driver, but let's discuss it here if you have different
-> opinion.
+> Please refer trm [1] 6.4.14.12.17 section on how the FDB config
+> register gets configured. From the table 6-1404, there is a reset
+> field for FDB_HAS_SIZE which is 4, meaning 1024 slots. Currently
+> the driver is not updating this reset value from 4(1024 slots) to
+> 3(512 slots). This patch fixes this by updating the reset value
+> to 512 slots.
+> 
+> [1]: https://www.ti.com/lit/pdf/spruim2
+> Fixes: abd5576b9c57f ("net: ti: icssg-prueth: Add support for ICSSG switch firmware")
+> Signed-off-by: Meghana Malladi <m-malladi@ti.com>
+> ---
+> 
+> v2-v1:
+> - Update the commit message and give more context w.r.t hardware
+>   for the fix as suggested by Simon Horman <horms@kernel.org>
+> 
+> v1: https://lore.kernel.org/all/20251013085925.1391999-1-m-malladi@ti.com/
 
-I see, sorry for the confusion
-with that I'm fine with the change being -next material, and commit
-message is good (not sure if perfect, but it does not need to be)
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Thanks for the updated commit message, this seems much clearer to me.
 
-> 
->>
->>>>
->>>> Am 30.10.25 um 09:30 schrieb Michal Swiatkowski:
->>>>> On some high-core systems (like AMD EPYC Bergamo, Intel Clearwater
->>>>> Forest) loading ice driver with default values can lead to queue/irq
->>>>> exhaustion. It will result in no additional resources for SR-IOV.
->>>>
->>>> Could you please elaborate how to make the queue/irq exhaustion visible?
->>>>
->>>
->>> What do you mean? On high core system, lets say num_online_cpus()
->>> returns 288, on 8 ports card we have online 256 irqs per eqch PF (2k in
->>> total). Driver will load with the 256 queues (and irqs) on each PF.
->>> Any VFs creation command will fail due to no free irqs available.
->>
->> this clearly means this is a -net material,
->> even if this commit will be rather unpleasant for backports to stable
->>
-> 
-> In my opinion it isn't. It is just about default values. Still in the
-> described case user can call ethtool -L and lower the queues to create
-> VFs without a problem.
-> 
->>> (echo X > /sys/class/net/ethX/device/sriov_numvfs)
->>>
->>>>> In most cases there is no performance reason for more than half
->>>>> num_cpus(). Limit the default value to it using generic
->>>>> netif_get_num_default_rss_queues().
->>>>>
->>>>> Still, using ethtool the number of queues can be changed up to
->>>>> num_online_cpus(). It can be done by calling:
->>>>> $ethtool -L ethX combined $(nproc)
->>>>>
->>>>> This change affects only the default queue amount.
->>>>
->>>> How would you judge the regression potential, that means for people where
->>>> the defaults work good enough, and the queue number is reduced now?
->>>>
->>>
->>> You can take a look into commit that introduce /2 change in
->>> netif_get_num_default_rss_queues() [1]. There is a good justification
->>> for such situation. In short, heaving physical core number is just a
->>> wasting of CPU resources.
->>>
->>> [1] https://lore.kernel.org/netdev/20220315091832.13873-1-ihuguet@redhat.com/
->>>
->> [...]
+Sorry for not responding to your reply to my review of v1. For some
+reason I missed it until I checked the link above a few moments ago.
 
+Reviewed-by: Simon Horman <horms@kernel.org>
 
