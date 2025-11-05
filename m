@@ -1,263 +1,152 @@
-Return-Path: <netdev+bounces-235809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD441C35D87
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 14:30:50 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 584BBC35DAB
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 14:35:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F8F23A5F07
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 13:29:17 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C61884F6EC7
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 13:32:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B2A4320393;
-	Wed,  5 Nov 2025 13:29:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E4A8320A17;
+	Wed,  5 Nov 2025 13:31:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="iLxTtYvi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZKOzkVFR"
 X-Original-To: netdev@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D91BF31DDBF;
-	Wed,  5 Nov 2025 13:29:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0809F31DDAF
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 13:31:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762349355; cv=none; b=FIkFNV8h1XCPnEZc7pjh6CE+SMq5DOIizMWeNy5hcyw8MgfwX3fgbhC7a/HaTzYqQd0CM8sCeBYh5QlUi3iJx/5HeTYfIKO27bC7phcz5ttyE2F+BZDhjMWkQhEIjj3iHTj0CNEuXQce9bp9Gz4pWEmqIAvs/6Fw7T8oIjo4gjU=
+	t=1762349517; cv=none; b=twO/MdodY+e3jhRvDbGA6LjBy8o2CdAnl76M5mZOUdvOo0IKWeZeBt73MfFAGGV4t+jzJ5bhXU7LXn5bYh+7IdQxaIkGcr9w2hoTO5sddAd8gxTE++5nPJXorNw2+NZ0JAKqht3w8c82D8LybPgF2FfnREIh5g2HJ9JNyzUYwC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762349355; c=relaxed/simple;
-	bh=SfJ/gkw4Za8gyVk5g9wXE4LGNptpUuo7yd3jtBKzOt0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=M8IQ+pZl416fLo3xn4GQsBnb+0fWPPS71YgUCKjs/8iDmOqt/9hXqU2rbhLYxabCge0L5NFRIjhjBHE4PLEuaFE2IhS/kQJ5HD31bt7DTTTFFCaJ+q+/q+aJQvJt0PoHTUsIuLAFR1P7Nn8fquXMsmGY7DLKMHX6X2arwIiJPW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=iLxTtYvi; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-Received: from [129.217.186.196] ([129.217.186.196])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPSA id 5A5DT5jV025521
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Wed, 5 Nov 2025 14:29:05 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1762349346;
-	bh=SfJ/gkw4Za8gyVk5g9wXE4LGNptpUuo7yd3jtBKzOt0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=iLxTtYviNdbBh3SORdHRFxc5QUBDRB4EF1kv7ata8qRsIJ+r4DrRE8XLTZJ0c5YyE
-	 fV5ru0xLkT9BXPtY/J2rMo0Nm6rfmQf7V59trjE17pKxXDfjI0GQ8z/Xw7+h/xSFg9
-	 moREl7J0AaZfuDvCSvxQKCd4kWXR0Qb38FORR+es=
-Message-ID: <9ebd72d0-5ae9-4844-b0be-5629c52e6df8@tu-dortmund.de>
-Date: Wed, 5 Nov 2025 14:29:05 +0100
+	s=arc-20240116; t=1762349517; c=relaxed/simple;
+	bh=MP3cL1oYebmC+ikDcuXun/rbIUAB+b6coo4qpDEgtAQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p4Otkbf8+2hnAN88Paq4LNIPPtwWE9F+kMT9RJDTgGrTtQygXUuMOvYDyjQhBMg1PMVvqSkOhfdIYQBUxOQTYDdX1J1Je9LWUxfjEpScJ24lc5F82sQ3ORCRzB9Hpg2ZA4MtkWjhGU4B0hO3UAsnPNi7uk+4mRe0MslcRyRIN9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZKOzkVFR; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7ad1cd0db3bso1586502b3a.1
+        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 05:31:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762349515; x=1762954315; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9q7NmFAvFvN7/b+XYPKzCuzMXs5E1SZ+dhFSeIfp7eA=;
+        b=ZKOzkVFRQferQLJYfz8FK7HIiOFsLQT+TiB/ghnk2mkOtNzSqpBUyHvXqQ10cajnWS
+         qJ2JnlbTV/4cG/yZaUxP0cfU6i7rxg8M+V6cYUL4R1w4GlH2d3XjD7XndNAUm8poJx2f
+         2Rgg6qM4JHgNggQfAf1s6n5tpdK6amjrJhNjvsxlXtCF42hMTN/nDRpxyNwD3+iFOI8Y
+         lyHOUt0md0KHUuSpwNp39fG4SDS6BpOAHUhyfOhn46dNJ5ZLvOmSLdHIYjkX+ef2jgN9
+         lfkRHOgOEh+Qj1I2AQVz/N5vQw0tjUSF/MUdLEcBOiSaiI+eWYAvAZj/nWzq97Mz1qUV
+         qZNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762349515; x=1762954315;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9q7NmFAvFvN7/b+XYPKzCuzMXs5E1SZ+dhFSeIfp7eA=;
+        b=q++IpU8lbm9cj65hjadz6Yjzln0O3fZnTU1dDWzrtR/6PnWIT0I/PyLM5by10+RQ5Y
+         L5pOxBfvja9pA3EBhQpmP4BLJAUYBp3Bs6S/cbzgGaEXslLUt8jq0N04DWcCHVtwzStZ
+         wcVXyOLSfQ82NZeeZz/9dEeVyhHKDYw+q25acv8qUn7SNXA4+8w3uHh839QauyhKPLuU
+         MN8iNN3zkq95ppgW2ocMZACxN/2BRnxZd5TIVTZPeHq5Ubfxwhn5rPsMVYAbQuTnAkl8
+         kz0JM6Kxc5NQd656p+/8qAms8hD83WRrfs2roIwDQzhgrHyO94ZGCpnTlc2V/Ep2LHIu
+         uj4A==
+X-Forwarded-Encrypted: i=1; AJvYcCUB/7QAMlh6GgKS4Er7ganHBpWCZoG62cTZMiuF/vtq0+TJxqO2T7MHXU+8p3P8D95aX5GiRoQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRS7x6DeYSdSRQz1ZyKnQUYnz7wkJu0TsLYPqwHa1Oh/Gk0tm8
+	HLqnh+U+WnA0xj0snlhXE99aN5Eul4V69843mSJIk7t8MCT1U+c2OSHR
+X-Gm-Gg: ASbGncsBACV2PgjuS09jWqrN066B+F3cCy13bqXGH+XC2ryivqRrs5guZA8DWsGUwo3
+	BhczoOVGMweEsn/mAUeCXF7525GaL+JREm0D3ZVwbgQ9N1jqv35/sIl0HgGYnfNl5jXe7UisGey
+	i3ZXVQFERsuShrJJVtHFXEqstMdj2h9PpwdrIqZSa3s7tMOEt9fX9UoylFOCNAi1Ucnmn6+rMxn
+	x4diS/xlWhWHx1lgICyVbLYD80rWuxRmb6E7Y838EBJGJ9SZ8fQgD5jDGBKy97/GMgRiDqUdvJp
+	nzkgBpAhjJiw29X3quYWvCcOiqVlnPw/+1QHngv5TApkoqVBMN5Wie8/XsFkYc/4D2FfEBi5asi
+	dHqqqIg6ES76f1AFJi2/qnOPjL3vTfVGBr5eTHsY4fR5dan2DpSWLqBqEYKDOkQ+qOf4BaYm5aN
+	ovA3oZP+W2ITgPBp8C/adZtXvJfAWYNWswKb5sxddyq9jBA++Z
+X-Google-Smtp-Source: AGHT+IEOr6yEZt6Lg0Vg3/B7D14110LC9/cBO37o4H78DD0sx6yTnN4rQct43XksS1O46eS9oX2C9w==
+X-Received: by 2002:a05:6a00:2e91:b0:7ad:de47:f685 with SMTP id d2e1a72fcca58-7ae1e6c6a14mr4949434b3a.17.1762349515131;
+        Wed, 05 Nov 2025 05:31:55 -0800 (PST)
+Received: from bee.. (p5332007-ipxg23901hodogaya.kanagawa.ocn.ne.jp. [180.34.120.7])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7acd382ad96sm6419447b3a.22.2025.11.05.05.31.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Nov 2025 05:31:54 -0800 (PST)
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+To: andrew@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	hkallweit1@gmail.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: linux@armlinux.org.uk,
+	netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org,
+	tmgross@umich.edu,
+	Alice Ryhl <aliceryhl@google.com>,
+	Gary Guo <gary@garyguo.net>
+Subject: [PATCH net-next v1] net: phy: qt2025: Wait until PHY becomes ready
+Date: Wed,  5 Nov 2025 22:31:26 +0900
+Message-ID: <20251105133126.3221948-1-fujita.tomonori@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next v1 1/1] usbnet: Add support for Byte Queue Limits
- (BQL)
-To: Eric Dumazet <edumazet@google.com>
-Cc: oneukum@suse.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-        kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-        linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20251104161327.41004-1-simon.schippers@tu-dortmund.de>
- <20251104161327.41004-2-simon.schippers@tu-dortmund.de>
- <CANn89iL6MjvOc8qEQpeQJPLX0Y3X0HmqNcmgHL4RzfcijPim5w@mail.gmail.com>
- <66d22955-bb20-44cf-8ad3-743ae272fec7@tu-dortmund.de>
- <CANn89i+oGnt=Gpo1hZh+8uaEoK3mKLQY-gszzHWC+A2enXa7Tw@mail.gmail.com>
- <be77736d-6fde-4f48-b774-f7067a826656@tu-dortmund.de>
- <CANn89iJVW-_qLbUehhJNJO70PRuw1SZVQX0towgZ4K-JvsPKkw@mail.gmail.com>
- <c01c12a8-c19c-4b9f-94d1-2a106e65a074@tu-dortmund.de>
- <CANn89iJpXwmvg0MOvLo8+hVAhaMTL_1_62Afk_6dG1ZEL3tORQ@mail.gmail.com>
-Content-Language: en-US
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-In-Reply-To: <CANn89iJpXwmvg0MOvLo8+hVAhaMTL_1_62Afk_6dG1ZEL3tORQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 11/5/25 14:05, Eric Dumazet wrote:
-> On Wed, Nov 5, 2025 at 4:58 AM Simon Schippers
-> <simon.schippers@tu-dortmund.de> wrote:
->>
->> On 11/5/25 13:34, Eric Dumazet wrote:
->>> On Wed, Nov 5, 2025 at 4:20 AM Simon Schippers
->>> <simon.schippers@tu-dortmund.de> wrote:
->>>>
->>>> On 11/5/25 12:28, Eric Dumazet wrote:
->>>>> On Wed, Nov 5, 2025 at 2:35 AM Simon Schippers
->>>>> <simon.schippers@tu-dortmund.de> wrote:
->>>>>>
->>>>>> On 11/4/25 18:00, Eric Dumazet wrote:
->>>>>>> On Tue, Nov 4, 2025 at 8:14 AM Simon Schippers
->>>>>>> <simon.schippers@tu-dortmund.de> wrote:
->>>>>>>>
->>>>>>>> The usbnet driver currently relies on fixed transmit queue lengths, which
->>>>>>>> can lead to bufferbloat and large latency spikes under load -
->>>>>>>> particularly with cellular modems.
->>>>>>>> This patch adds support for Byte Queue Limits (BQL) to dynamically manage
->>>>>>>> the transmit queue size and reduce latency without sacrificing
->>>>>>>> throughput.
->>>>>>>>
->>>>>>>> Testing was performed on various devices using the usbnet driver for
->>>>>>>> packet transmission:
->>>>>>>>
->>>>>>>> - DELOCK 66045: USB3 to 2.5 GbE adapter (ax88179_178a)
->>>>>>>> - DELOCK 61969: USB2 to 1 GbE adapter (asix)
->>>>>>>> - Quectel RM520: 5G modem (qmi_wwan)
->>>>>>>> - USB2 Android tethering (cdc_ncm)
->>>>>>>>
->>>>>>>> No performance degradation was observed for iperf3 TCP or UDP traffic,
->>>>>>>> while latency for a prioritized ping application was significantly
->>>>>>>> reduced. For example, using the USB3 to 2.5 GbE adapter, which was fully
->>>>>>>> utilized by iperf3 UDP traffic, the prioritized ping was improved from
->>>>>>>> 1.6 ms to 0.6 ms. With the same setup but with a 100 Mbit/s Ethernet
->>>>>>>> connection, the prioritized ping was improved from 35 ms to 5 ms.
->>>>>>>>
->>>>>>>> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
->>>>>>>> ---
->>>>>>>>  drivers/net/usb/usbnet.c | 8 ++++++++
->>>>>>>>  1 file changed, 8 insertions(+)
->>>>>>>>
->>>>>>>> diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
->>>>>>>> index 62a85dbad31a..1994f03a78ad 100644
->>>>>>>> --- a/drivers/net/usb/usbnet.c
->>>>>>>> +++ b/drivers/net/usb/usbnet.c
->>>>>>>> @@ -831,6 +831,7 @@ int usbnet_stop(struct net_device *net)
->>>>>>>>
->>>>>>>>         clear_bit(EVENT_DEV_OPEN, &dev->flags);
->>>>>>>>         netif_stop_queue (net);
->>>>>>>> +       netdev_reset_queue(net);
->>>>>>>>
->>>>>>>>         netif_info(dev, ifdown, dev->net,
->>>>>>>>                    "stop stats: rx/tx %lu/%lu, errs %lu/%lu\n",
->>>>>>>> @@ -939,6 +940,7 @@ int usbnet_open(struct net_device *net)
->>>>>>>>         }
->>>>>>>>
->>>>>>>>         set_bit(EVENT_DEV_OPEN, &dev->flags);
->>>>>>>> +       netdev_reset_queue(net);
->>>>>>>>         netif_start_queue (net);
->>>>>>>>         netif_info(dev, ifup, dev->net,
->>>>>>>>                    "open: enable queueing (rx %d, tx %d) mtu %d %s framing\n",
->>>>>>>> @@ -1500,6 +1502,7 @@ netdev_tx_t usbnet_start_xmit(struct sk_buff *skb, struct net_device *net)
->>>>>>>>         case 0:
->>>>>>>>                 netif_trans_update(net);
->>>>>>>>                 __usbnet_queue_skb(&dev->txq, skb, tx_start);
->>>>>>>> +               netdev_sent_queue(net, skb->len);
->>>>>>>>                 if (dev->txq.qlen >= TX_QLEN (dev))
->>>>>>>>                         netif_stop_queue (net);
->>>>>>>>         }
->>>>>>>> @@ -1563,6 +1566,7 @@ static inline void usb_free_skb(struct sk_buff *skb)
->>>>>>>>  static void usbnet_bh(struct timer_list *t)
->>>>>>>>  {
->>>>>>>>         struct usbnet           *dev = timer_container_of(dev, t, delay);
->>>>>>>> +       unsigned int bytes_compl = 0, pkts_compl = 0;
->>>>>>>>         struct sk_buff          *skb;
->>>>>>>>         struct skb_data         *entry;
->>>>>>>>
->>>>>>>> @@ -1574,6 +1578,8 @@ static void usbnet_bh(struct timer_list *t)
->>>>>>>>                                 usb_free_skb(skb);
->>>>>>>>                         continue;
->>>>>>>>                 case tx_done:
->>>>>>>> +                       bytes_compl += skb->len;
->>>>>>>> +                       pkts_compl++;
->>>>>>>>                         kfree(entry->urb->sg);
->>>>>>>>                         fallthrough;
->>>>>>>>                 case rx_cleanup:
->>>>>>>> @@ -1584,6 +1590,8 @@ static void usbnet_bh(struct timer_list *t)
->>>>>>>>                 }
->>>>>>>>         }
->>>>>>>>
->>>>>>>> +       netdev_completed_queue(dev->net, pkts_compl, bytes_compl);
->>>>>>>> +
->>>>>>>>         /* restart RX again after disabling due to high error rate */
->>>>>>>>         clear_bit(EVENT_RX_KILL, &dev->flags);
->>>>>>>>
->>>>>>>
->>>>>>> I think this is racy. usbnet_bh() can run from two different contexts,
->>>>>>> at the same time (from two cpus)
->>>>>>>
->>>>>>> 1) From process context :
->>>>>>> usbnet_bh_work()
->>>>>>>
->>>>>>> 2) From a timer. (dev->delay)
->>>>>>>
->>>>>>>
->>>>>>> To use BQL, you will need to add mutual exclusion.
->>>>>>
->>>>>> Yeah, I missed that.
->>>>>>
->>>>>> I guess synchronizing with the lock of the sk_buff_head dev->done makes
->>>>>> sense? The same locking is also done right before in skb_dequeue.
->>>>>
->>>>> Or only protect the netdev_completed_queue(dev->net, pkts_compl,
->>>>> bytes_compl) call,
->>>>> adding a specific/dedicated spinlock for this purpose.
->>>>>
->>>>> spin_lock_bh(&dev->bql_spinlock);
->>>>> netdev_completed_queue(dev->net, pkts_compl, bytes_compl);
->>>>> spin_unlock_bh(&dev->bql_spinlock);
->>>>>
->>>>> I am assuming no usbnet driver is setting dev->lltx = true (or plan to
->>>>> in the future)
->>>>> so usbnet_start_xmit() is protected by HARD_TX_LOCK() already.
->>>>
->>>> Yes, I also want to only protect the netdev_completed_queue(dev->net,
->>>> pkts_compl, bytes_compl) call. However, I am wondering what you mean with
->>>>
->>>> spin_lock_bh(&dev->bql_spinlock)
->>>> ...
->>>>
->>>>
->>>> Do we want to protect against usbnet_start_xmit()? Maybe I am missing
->>>> something, but other BQL implementations also do not seem to protect
->>>> against their respective ndo_start_xmit.
->>>
->>> BQL has been designed so that producer/consumer can run in //
->>>
->>> However, all producers need exclusion (typically done with HARD_TX_LOCK)
->>> All consumers need exclusion (typically done because of NAPI sched bit)
->>>
->>>>
->>>>
->>>> My approach would just protect against usbnet_bh calls from another
->>>> context with the same locking as skb_dequeue():
->>>>
->>>> spin_lock_irqsave(&list->lock, flags);
->>>> netdev_completed_queue(dev->net, pkts_compl, bytes_compl);
->>>> spin_unlock_irqrestore(&list->lock, flags);
->>>
->>> I tend to prefer not masking hard irq unless really necessary.
->>>
->>> Also, reusing  a lock for different purposes makes things confusing
->>> in terms of code maintenance.
->>>
->>> usbnet is hardly performance critical, I would keep list->lock only to
->>> protect the list of skbs :)
->>
->> Thanks for the clarification!
->>
->>
->> So in usbnet.h I will just
->>
->> #include <linux/spinlock.h>
->>
->> and then save the new field
->>
->> spinlock_t bql_spinlock;
->>
->> in struct usbnet and will then call
->>
->> spin_lock_bh(&dev->bql_spinlock);
->> netdev_completed_queue(dev->net, pkts_compl, bytes_compl);
->> spin_unlock_bh(&dev->bql_spinlock);
->>
->> in usbnet_bh. Am I right?
-> 
-> You also need to spin_lock_init() this new lock in setup phase (usbnet_probe)
-> 
+Wait until a PHY becomes ready in the probe callback by
+using read_poll_timeout function.
 
-Yes, thanks.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+Reviewed-by: Gary Guo <gary@garyguo.net>
+Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+---
 
-> Test/Run your code after enabling LOCKDEP in your .config
-> (CONFIG_PROVE_LOCKING=y)
+drivers/net/phy/qt2025.rs | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-Okay, I will test the new code :)
+diff --git a/drivers/net/phy/qt2025.rs b/drivers/net/phy/qt2025.rs
+index 0b9400dcb4c1..aaaead6512a0 100644
+--- a/drivers/net/phy/qt2025.rs
++++ b/drivers/net/phy/qt2025.rs
+@@ -12,6 +12,7 @@
+ use kernel::c_str;
+ use kernel::error::code;
+ use kernel::firmware::Firmware;
++use kernel::io::poll::read_poll_timeout;
+ use kernel::net::phy::{
+     self,
+     reg::{Mmd, C45},
+@@ -19,6 +20,7 @@
+ };
+ use kernel::prelude::*;
+ use kernel::sizes::{SZ_16K, SZ_8K};
++use kernel::time::Delta;
+ 
+ kernel::module_phy_driver! {
+     drivers: [PhyQT2025],
+@@ -93,7 +95,13 @@ fn probe(dev: &mut phy::Device) -> Result<()> {
+         // The micro-controller will start running from SRAM.
+         dev.write(C45::new(Mmd::PCS, 0xe854), 0x0040)?;
+ 
+-        // TODO: sleep here until the hw becomes ready.
++        read_poll_timeout(
++            || dev.read(C45::new(Mmd::PCS, 0xd7fd)),
++            |val| *val != 0x00 && *val != 0x10,
++            Delta::from_millis(50),
++            Delta::from_secs(3),
++        )?;
++
+         Ok(())
+     }
+ 
+
+base-commit: 89aec171d9d1ab168e43fcf9754b82e4c0aef9b9
+-- 
+2.43.0
+
 
