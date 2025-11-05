@@ -1,82 +1,81 @@
-Return-Path: <netdev+bounces-235915-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C3B9C3703C
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 18:17:34 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id C109CC37108
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 18:26:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5BA7E1A2260C
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 17:09:12 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 50055506EE9
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 17:09:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89FD933FE28;
-	Wed,  5 Nov 2025 17:07:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3C18341648;
+	Wed,  5 Nov 2025 17:07:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nk235gMz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FzW3I0El"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05B5E32936B
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 17:07:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DF01335554
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 17:07:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762362434; cv=none; b=npqip907UJiq7aCpYAPyUpfNxHgHc3IS2jhxvv+CocafAGPXZIs/ZebXGR3G1RZICXXNNotMoUt97rqfI+WEufu1SHHrwaZNJwxJtYBOef6/UwBP6PGgDLknQf/haQdBg+NtHD1AJ0zV/7HPyQaUbcMTTpNJ/Y1WX3PQfjfFBKM=
+	t=1762362435; cv=none; b=GUy6ZM+JCx2vNCLNUdYsRsY8A2NfwneIH9NHOqyiq458r/3D6ST//c3bYm+MXWykRfwj3P3bRL6mM2F7SF5BjVbm/DsAQ6UVeHy01JEKkkEmKfWb5HOTO/BwxUq7NRTl5JGQaNCJcS2a7rD2q18lpYiirI31e+PVLtoIR0L4dn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762362434; c=relaxed/simple;
-	bh=DFNz/ejJkffO4oOSwMvau6qAbhIyxUbFeMtY00HZjvw=;
+	s=arc-20240116; t=1762362435; c=relaxed/simple;
+	bh=SHevSYfAflYvIOjcPM2PiuslQ8TTF9Z0OzcTTNZ+A3o=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=eER23Unohrk/vo+msghWlP6LIkDqj65QeR2+s4f6tiQR5sBDKr4N9ZiwBLZKIg9d55fKzUssj2CoWc5RXzKLzWYz3N7e4gho4kh9UWxfQJCsBKKDX9LVWIrTaqGXu5SzQEmFoiWkPSoy3uAVgajCkVxUS3dv7yedGJEpMfdSV4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nk235gMz; arc=none smtp.client-ip=209.85.128.53
+	 In-Reply-To:To:Cc; b=E3MdqmlOe+jnV+6K1MfTIr++NiPsmp8CSTE9hifj0OLbqs2crFByJvUJ7eS5dHRuCGRD8JAuuJ+3WC+v6c0uAW/10bM+rSqcGgeZ8cKZVnGxMzucVPfGeaTn5LOinbFqtqHp7njWasNMSzl3TQU1t3wXMiwa5VYsLCJpH++zqzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FzW3I0El; arc=none smtp.client-ip=209.85.221.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-477562905f4so66955e9.0
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 09:07:11 -0800 (PST)
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-429c1b68cd3so12073f8f.1
+        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 09:07:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762362430; x=1762967230; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1762362432; x=1762967232; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=VSpTpNA8dU2VgWFE2OXhins+HfyeU+CDDzVZ8NCLtPo=;
-        b=Nk235gMzsSxCkwjjC6gJFqR0dYM+XO7iGmS7RizM4Cp2HQyKOUkMbV1ntKBuy/P5W2
-         jszk4k1qaVs6zP/O8JSHUV07oVO0wDokOlAB35RdDtzttEgw/W+UBUgFu21CVjbO+UNw
-         VJXDGIiapk29HPwwQrnFL1XIr0IEC2G1gmY/CXY5DXglPYnrAF0TgWwe5q6HFXhqGlry
-         +Q/eSZ9VI5NCBoNXTV2+ziaEj0JBAFwnoZIPtPh7WuPc99Lv99y+8vzy6qtJClb7Mb3C
-         bOIinhzUYwk77EOUiUnM0gBu/MW7Ogp9CILtbWdF5Ot/UCcpn2DhF2pWu3VzNwmAvXfN
-         3uUw==
+        bh=zDPGEALHiJj9n97uz8lWTxmttupO8bbW3KYaPlpx77g=;
+        b=FzW3I0ElRS1rVF1u6ENGSVlsZrvReJOydBvhHHJOsr3/0m3WtZ1VpQ7sC19qDCEkHN
+         FsWiRug6SUBYNjVMpzdrzy7qZjTVlYstiOl2q36+degyAcXX6FcqCp2xo/r9qjZsUNBr
+         05JSvJgOMn3yYjqFJlBtsG5+fheEh/xtoiy+JTotfcNvkcSay6Kp4LuWjXxQ/SkTT/ID
+         SeHqdzUPjgrGL/4GCsKnWMxKNwQ5atiDPC71ISR6Ipa8yOsi/6ZV/cIGr25wZcWrSaLH
+         OFir/51nrK+f1xbNl0055mZDoRyFUQ3+tYjQOwuzQimQuq2kAOai11SyqOrrmaNhR4kU
+         B2fQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762362430; x=1762967230;
+        d=1e100.net; s=20230601; t=1762362432; x=1762967232;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=VSpTpNA8dU2VgWFE2OXhins+HfyeU+CDDzVZ8NCLtPo=;
-        b=woy0q4ngrDX1DvNg8skSPVZuuOMbw/OqaIU/ACMVLH+tt00ffutc+xhtmMDfjxbdFX
-         +qjXEJAd6LrE50gfKmf7+fP0tUKvAkXtTEd1MiunBr202iwmUCJR+qdlOAEL5TTSn6Dn
-         gVugQ6J6kWy7UDoQ0u8iZhZbDjIWJaqYgfksQg+lWLUQBamRFpLoZKTvPiJZ2MXebmLd
-         jNHrrUkrW7papJWJEWbiO8JF3Mr1RJaA2dwNLVaxAHzrFagoDkWl7kMap3o4fbN2AOwd
-         cXRKDPtKUAaaFnlYQDSN6Oz+F1M8oGGNOVbax7COz8oRJPBpLWCyai4i7Iaiha03dL5w
-         TUjg==
-X-Gm-Message-State: AOJu0YwXfbh2VkxCNrBzusvDLhOi2xz8Y8tdeUfQ9qr8F7pmuq36L089
-	T67OUeTSxrXi0q1ESB3s90lYVIJVx6xSHndEK0RfOItYLOIHhx+0sdok
-X-Gm-Gg: ASbGncuNLNnCk8zBj4vKpTCcZlnK/r90mL3a36XId7ZtrlAJx7m4os8kR158hbF5ZpQ
-	oW9pblN+Srxk5Yti/yCEp6qtuct97fz0TiF4rkctXr78BYNKUVL0WPHg+gZggtsevz1AKNjII8e
-	Uxs9HIPiyHCDRCrgPIf7CX5CIYRm+copFUdBAaeerL6MSG6fxUUtwzVdf6jeZTYcGA4+mnv+upZ
-	ZVgkskU48W8Ka9TWnhUUjMIRILEdp5+tZrWd7gQAjFvSZZJ9NK0A9D6mdyZqIhCp46haf1jLe74
-	fd+R90vn/agM7zSKAVK/rH94buE/YwXNGUvT6wGRukcu+XEzfTvPzQgqctwH8LdNQkRvrcagvDf
-	XS1uG4W9W4BJaQ7ULEjGOUG2QuYGzH9XrLR9q7s0CKB5wk0c8iuAQuCrbX8vThh/J3XpITb5rAA
-	L1Ifn2J7PN/hdnBnU=
-X-Google-Smtp-Source: AGHT+IGnZ+2VvaWa5GyWqJqzkHv1KLVSFIQGStAfdtAnK0L8qP0/HIRfoQhdMFNTRaDwvqH7Ca/tkA==
-X-Received: by 2002:a05:600c:198a:b0:475:dc06:b5a8 with SMTP id 5b1f17b1804b1-4775ce24f38mr19442805e9.7.1762362429569;
-        Wed, 05 Nov 2025 09:07:09 -0800 (PST)
-Received: from localhost ([2a03:2880:31ff:48::])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429dbf53e86sm11553010f8f.0.2025.11.05.09.07.08
+        bh=zDPGEALHiJj9n97uz8lWTxmttupO8bbW3KYaPlpx77g=;
+        b=E+50MM5YZQVeGbwUbqGYHtfXZC3Ll53aEm/cIwurVNHk4+URAkXJLaq6RAD/0wxDyL
+         tw+s3LXKVeVJFxICw8hOT+BJQbSF/6i0DqTm/V5jXK34bRqX2+nWdhfXBPsVVjGZTC3O
+         Ytrr+cHt5JDnkWckAWOXlj6mEsVhmbcSwLYL8MXVI0oxKW4PcY0c5mOolreu5NNq12LO
+         TuM+jVdVuh0v4Px7pxrpKN0+RYiB0R+vV2yFs+TNbfNBMNteC3EcUVuKXSu6jKGGsHkL
+         erVoY0L6QEF0rq5clbyiVSp4kanCFHReA28H4gHsQNGY6kHuap+TZH3Xd6PFCSgXyhTD
+         mxTA==
+X-Gm-Message-State: AOJu0YxhkCcXuoHngDDf5AjApzzU/z62iLwBLbU4uFQfw82VleM3PhEO
+	8PO7W++1LkDtWRf2I2YKJ02GX5Hyi53GyE2r62X+ZT8m/Vw6GVxSLca8
+X-Gm-Gg: ASbGncvMm5xLNX7MH8t0Rold7rn2ty/A/5C7EHFZvSSQtL/JyCcuPJGOYIL/BcpzMZJ
+	EU358rFn3blz5Ox5+P/oB3gplKz/KpN+59nEzgFENvOHxG+lKe1s+SyHI1be8LydCxFjYZhzIrr
+	j6ltwoxZMHgTbjM9L4By5JYq69VH4OMSXffkuMl1NS+wZmS5zeZ7qTFEdpyVpDghSbKPIt+ORdZ
+	gHUheeIr515e5HMY4DWGUewdx0fsBhxiKH8mNLkdnNonlo4b+Rs1bcTmjOudj9b76RKpa25no4E
+	sdyg9BdhD0mwVGLHCqTVQlocq4fiApitJtinHx4Kw6Ub5Qi1rXCEkKQLbokHgVeGEjn3+UhFpp2
+	XGcP0aXr/MPqB7XTq6spombpVrS2InjUnS+ATP2rxfxwv1VxJzS8402DUqjs6Z6t/6ux0AWk/Xn
+	UTvFI=
+X-Google-Smtp-Source: AGHT+IFGFX9DslUYNk9iBEXMdGr7oaOJipOJWDtvY1Tg3EGRYJjFwA8CB5hzyW6XylUnko4CikmxTg==
+X-Received: by 2002:a05:6000:2f81:b0:426:f590:3cab with SMTP id ffacd0b85a97d-429e3275af0mr1981253f8f.0.1762362431350;
+        Wed, 05 Nov 2025 09:07:11 -0800 (PST)
+Received: from localhost ([2a03:2880:31ff:8::])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429dc1f9d33sm11871563f8f.36.2025.11.05.09.07.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Nov 2025 09:07:09 -0800 (PST)
+        Wed, 05 Nov 2025 09:07:10 -0800 (PST)
 From: Gustavo Luiz Duarte <gustavold@gmail.com>
-Date: Wed, 05 Nov 2025 09:06:45 -0800
-Subject: [PATCH net-next 3/4] netconsole: Dynamic allocation of userdata
- buffer
+Date: Wed, 05 Nov 2025 09:06:46 -0800
+Subject: [PATCH net-next 4/4] netconsole: Increase MAX_USERDATA_ITEMS
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,7 +84,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251105-netconsole_dynamic_extradata-v1-3-142890bf4936@meta.com>
+Message-Id: <20251105-netconsole_dynamic_extradata-v1-4-142890bf4936@meta.com>
 References: <20251105-netconsole_dynamic_extradata-v1-0-142890bf4936@meta.com>
 In-Reply-To: <20251105-netconsole_dynamic_extradata-v1-0-142890bf4936@meta.com>
 To: Breno Leitao <leitao@debian.org>, Andre Carvalho <asantostc@gmail.com>, 
@@ -97,187 +96,50 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-kselftest@vger.kernel.org, Gustavo Luiz Duarte <gustavold@gmail.com>
 X-Mailer: b4 0.13.0
 
-The userdata buffer in struct netconsole_target is currently statically
-allocated with a size of MAX_USERDATA_ITEMS * MAX_EXTRADATA_ENTRY_LEN
-(16 * 256 = 4096 bytes). This wastes memory when userdata entries are
-not used or when only a few entries are configured, which is common in
-typical usage scenarios. It also forces us to keep MAX_USERDATA_ITEMS
-small to limit the memory wasted.
+Increase MAX_USERDATA_ITEMS from 16 to 256 entries now that the userdata
+buffer is allocated dynamically.
 
-Change the userdata buffer from a static array to a dynamically
-allocated pointer. The buffer is now allocated on-demand in
-update_userdata() whenever userdata entries are added, modified, or
-removed via configfs. The implementation calculates the exact size
-needed for all current userdata entries, allocates a new buffer of that
-size, formats the entries into it, and atomically swaps it with the old
-buffer.
+The previous limit of 16 was necessary because the buffer was statically
+allocated for all targets. With dynamic allocation, we can support more
+entries without wasting memory on targets that don't use userdata.
 
-This approach provides several benefits:
-- Memory efficiency: Targets with no userdata use zero bytes instead of
-  4KB, and targets with userdata only allocate what they need;
-- Scalability: Makes it practical to increase MAX_USERDATA_ITEMS to a
-  much larger value without imposing a fixed memory cost on every
-  target;
-- No hot-path overhead: Allocation occurs during configuration (write to
-  configfs), not during message transmission
+This allows users to attach more metadata to their netconsole messages,
+which is useful for complex debugging and logging scenarios.
 
-If memory allocation fails during userdata update, -ENOMEM is returned
-to userspace through the configfs attribute write operation.
-
-The sysdata buffer remains statically allocated since it has a smaller
-fixed size (MAX_SYSDATA_ITEMS * MAX_EXTRADATA_ENTRY_LEN = 4 * 256 = 1024
-bytes) and its content length is less predictable.
+Also update the testcase accordingly.
 
 Signed-off-by: Gustavo Luiz Duarte <gustavold@gmail.com>
 ---
- drivers/net/netconsole.c | 87 +++++++++++++++++++++++++++++++-----------------
- 1 file changed, 56 insertions(+), 31 deletions(-)
+ drivers/net/netconsole.c                                | 2 +-
+ tools/testing/selftests/drivers/net/netcons_overflow.sh | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index e780c884db83..8a11b3ca2763 100644
+index 8a11b3ca2763..040bae29d485 100644
 --- a/drivers/net/netconsole.c
 +++ b/drivers/net/netconsole.c
-@@ -154,7 +154,7 @@ struct netconsole_target {
- #ifdef	CONFIG_NETCONSOLE_DYNAMIC
- 	struct config_group	group;
- 	struct config_group	userdata_group;
--	char			userdata[MAX_EXTRADATA_ENTRY_LEN * MAX_USERDATA_ITEMS];
-+	char			*userdata;
- 	size_t			userdata_length;
- 	char			sysdata[MAX_EXTRADATA_ENTRY_LEN * MAX_SYSDATA_ITEMS];
+@@ -50,7 +50,7 @@ MODULE_LICENSE("GPL");
+ /* The number 3 comes from userdata entry format characters (' ', '=', '\n') */
+ #define MAX_EXTRADATA_NAME_LEN		(MAX_EXTRADATA_ENTRY_LEN - \
+ 					MAX_EXTRADATA_VALUE_LEN - 3)
+-#define MAX_USERDATA_ITEMS		16
++#define MAX_USERDATA_ITEMS		256
+ #define MAX_SYSDATA_ITEMS		4
+ #define MAX_PRINT_CHUNK			1000
  
-@@ -874,45 +874,61 @@ static ssize_t userdatum_value_show(struct config_item *item, char *buf)
- 	return sysfs_emit(buf, "%s\n", &(to_userdatum(item)->value[0]));
- }
+diff --git a/tools/testing/selftests/drivers/net/netcons_overflow.sh b/tools/testing/selftests/drivers/net/netcons_overflow.sh
+index 29bad56448a2..06089643b771 100755
+--- a/tools/testing/selftests/drivers/net/netcons_overflow.sh
++++ b/tools/testing/selftests/drivers/net/netcons_overflow.sh
+@@ -15,7 +15,7 @@ SCRIPTDIR=$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")
  
--static void update_userdata(struct netconsole_target *nt)
-+static int update_userdata(struct netconsole_target *nt)
- {
-+	struct userdatum *udm_item;
-+	struct config_item *item;
- 	struct list_head *entry;
--	int child_count = 0;
-+	char *old_buf = NULL;
-+	char *new_buf = NULL;
- 	unsigned long flags;
-+	int offset = 0;
-+	int len = 0;
+ source "${SCRIPTDIR}"/lib/sh/lib_netcons.sh
+ # This is coming from netconsole code. Check for it in drivers/net/netconsole.c
+-MAX_USERDATA_ITEMS=16
++MAX_USERDATA_ITEMS=256
  
--	spin_lock_irqsave(&target_list_lock, flags);
--
--	/* Clear the current string in case the last userdatum was deleted */
--	nt->userdata_length = 0;
--	nt->userdata[0] = 0;
--
-+	/* Calculate buffer size */
- 	list_for_each(entry, &nt->userdata_group.cg_children) {
--		struct userdatum *udm_item;
--		struct config_item *item;
--
--		if (child_count >= MAX_USERDATA_ITEMS) {
--			spin_unlock_irqrestore(&target_list_lock, flags);
--			WARN_ON_ONCE(1);
--			return;
-+		item = container_of(entry, struct config_item, ci_entry);
-+		udm_item = to_userdatum(item);
-+		/* Skip userdata with no value set */
-+		if (udm_item->value[0]) {
-+			len += snprintf(NULL, 0, " %s=%s\n", item->ci_name,
-+					udm_item->value);
- 		}
--		child_count++;
-+	}
-+
-+	WARN_ON_ONCE(len > MAX_EXTRADATA_ENTRY_LEN * MAX_USERDATA_ITEMS);
-+
-+	/* Allocate new buffer */
-+	if (len) {
-+		new_buf = kmalloc(len + 1, GFP_KERNEL);
-+		if (!new_buf)
-+			return -ENOMEM;
-+	}
- 
-+	/* Write userdata to new buffer */
-+	list_for_each(entry, &nt->userdata_group.cg_children) {
- 		item = container_of(entry, struct config_item, ci_entry);
- 		udm_item = to_userdatum(item);
--
- 		/* Skip userdata with no value set */
--		if (strnlen(udm_item->value, MAX_EXTRADATA_VALUE_LEN) == 0)
--			continue;
--
--		/* This doesn't overflow userdata since it will write
--		 * one entry length (1/MAX_USERDATA_ITEMS long), entry count is
--		 * checked to not exceed MAX items with child_count above
--		 */
--		nt->userdata_length += scnprintf(&nt->userdata[nt->userdata_length],
--						 MAX_EXTRADATA_ENTRY_LEN, " %s=%s\n",
--						 item->ci_name, udm_item->value);
-+		if (udm_item->value[0]) {
-+			offset += scnprintf(&new_buf[offset], len + 1 - offset,
-+					    " %s=%s\n", item->ci_name,
-+					    udm_item->value);
-+		}
- 	}
-+
-+	WARN_ON_ONCE(offset != len);
-+
-+	/* Switch to new buffer and free old buffer */
-+	spin_lock_irqsave(&target_list_lock, flags);
-+	old_buf = nt->userdata;
-+	nt->userdata = new_buf;
-+	nt->userdata_length = len;
- 	spin_unlock_irqrestore(&target_list_lock, flags);
-+
-+	kfree(old_buf);
-+
-+	return 0;
- }
- 
- static ssize_t userdatum_value_store(struct config_item *item, const char *buf,
-@@ -935,7 +951,9 @@ static ssize_t userdatum_value_store(struct config_item *item, const char *buf,
- 
- 	ud = to_userdata(item->ci_parent);
- 	nt = userdata_to_target(ud);
--	update_userdata(nt);
-+	ret = update_userdata(nt);
-+	if (ret < 0)
-+		goto out_unlock;
- 	ret = count;
- out_unlock:
- 	mutex_unlock(&dynamic_netconsole_mutex);
-@@ -1182,7 +1200,10 @@ static struct configfs_attribute *netconsole_target_attrs[] = {
- 
- static void netconsole_target_release(struct config_item *item)
- {
--	kfree(to_target(item));
-+	struct netconsole_target *nt = to_target(item);
-+
-+	kfree(nt->userdata);
-+	kfree(nt);
- }
- 
- static struct configfs_item_operations netconsole_target_item_ops = {
-@@ -1478,7 +1499,8 @@ static void send_msg_no_fragmentation(struct netconsole_target *nt,
- #ifdef CONFIG_NETCONSOLE_DYNAMIC
- 	msg_len += scnprintf(&nt->buf[msg_len],
- 			     MAX_PRINT_CHUNK - msg_len,
--			     "%s%s", nt->userdata, nt->sysdata);
-+			     "%s%s", nt->userdata ? nt->userdata : "",
-+			     nt->sysdata);
- #endif
- 	send_udp(nt, nt->buf, msg_len);
- }
-@@ -1841,6 +1863,9 @@ static struct netconsole_target *alloc_param_target(char *target_config,
- static void free_param_target(struct netconsole_target *nt)
- {
- 	netpoll_cleanup(&nt->np);
-+#ifdef	CONFIG_NETCONSOLE_DYNAMIC
-+	kfree(nt->userdata);
-+#endif
- 	kfree(nt);
- }
- 
+ # Function to create userdata entries
+ function create_userdata_max_entries() {
 
 -- 
 2.47.3
