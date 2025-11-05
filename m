@@ -1,178 +1,201 @@
-Return-Path: <netdev+bounces-235968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAFEFC37840
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 20:40:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92B94C37846
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 20:40:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 94E2418C824E
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 19:40:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F1493B8BDA
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 19:39:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0747B342148;
-	Wed,  5 Nov 2025 19:40:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25573334C0C;
+	Wed,  5 Nov 2025 19:39:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aftX8lFz";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="bhU5gOa3"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="FEYXp7+4"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from DM5PR21CU001.outbound.protection.outlook.com (mail-centralusazon11011016.outbound.protection.outlook.com [52.101.62.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E23233FE2B
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 19:39:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762371601; cv=none; b=rnMqhMJYrICrBsbD3o96cAvR2scW7dG+0jHNwGIQjVvkALr7JvWVD56Tw6b7Vf1lQfhiQbje9jcMZg2URLm+E/CIPW1G3BaUfaJKJOztvlkpd+c1ksCFPpUOEhGSPeJ2XakW6NaHEd4U3fSOTogo+VLZxCWB1KLw4hEEsmGdkQA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762371601; c=relaxed/simple;
-	bh=+SOyxLJBOfbSw/MqBDPVxoL7LcgQEUyR14RhOCQVl6U=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=rVhTdQH6ZtbpJrpdXUErfnL7BuH9KFU93ygb+W2B1RURo0L0ySZ6gR+k7Alb/vqr5IEfS1VbHyxDCOG6hOVEJrV7FsAylc+ucQ/1cRyMUv+6Xxgmxlu/G5LyGQUZSSj5qA7O0Xlm3N/DMZukSYYp0P41Z0n0qNFirdu4bkpnl68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aftX8lFz; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=bhU5gOa3; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762371599;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7kizs9xJ2GRG/rLXAdsJnM3tvDx/8JZcjC0BTEZZ5WY=;
-	b=aftX8lFz9UJpOrwvJjkImzXtLw0nRbORi73U1W28gadrOmYhjZxCVDWL7/TpmnWVy0I3W/
-	1JnyXOrcR6tWtdvfNHqXcV2caDgvofqZPJu2B5iecJZrHY2RhnRFCzUOYZD7hactTz4xvL
-	fTEAkfY6qbZVmNlk7W2v77t2gRGgDks=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-172-AtWsY_UROWqCyhbdHBGIkw-1; Wed, 05 Nov 2025 14:39:57 -0500
-X-MC-Unique: AtWsY_UROWqCyhbdHBGIkw-1
-X-Mimecast-MFC-AGG-ID: AtWsY_UROWqCyhbdHBGIkw_1762371597
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-892637a3736so48752785a.1
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 11:39:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762371597; x=1762976397; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=7kizs9xJ2GRG/rLXAdsJnM3tvDx/8JZcjC0BTEZZ5WY=;
-        b=bhU5gOa352yz6IMZNQMetzfE9fawz8lYejcR/dsPOJRFkYjWHgw9vmAiwAPDrfVHNe
-         1SkuKfO9+wuixdu8J62kqL1yuPNN4UxT85BcWZYpR0d5mcq0muQGq7GOs9hlUDoDamn9
-         qDc8zCFQs2kW8KY1q+oIEKTtdFq2w/PfUdDP4pQKE2gJTBF9krK+GdbUpi3/mnhS0E9c
-         4bG9g8VDvW0JJvR67KQxZ4wEoWwbQfPWMP6aIb76vC2J1+no6tS5u8gwhyanuQ7TQk41
-         XtldFp/Mq83IHfqtsAD6FFGYQ6dLzZPs7AdY8DQItDo+idRaRcXQZmkTlx2fJPZR63dO
-         eX2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762371597; x=1762976397;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:subject:user-agent:mime-version:date:message-id:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7kizs9xJ2GRG/rLXAdsJnM3tvDx/8JZcjC0BTEZZ5WY=;
-        b=MTAnSkzpKxId5Z+2bm1qEjgPEiWCB5LJz4KzhEb+OQ43NckZ1aXDncyWLNikZpx2S+
-         JAgzLRVgU9sCFXDjTd1e7RKYridiI/oehEfesLfha0j1Mw4harSTVL2qZZ/+uXPk6Q8h
-         K83vJOoZugitU1lZEXi7wynV6TgrOLZoV5d32Nip4g0+TqXLwEfYi+hLPQpund+dIL7I
-         ZyBCXm1deeQdkVOtgBj5PcwE3fB3LDGRgXyPE+JNo9x60qbSriVHCrSjoycC/6ly/tC3
-         ZrefAXtw7NUpW3zJl3/wVTlNmpdpZi/K+GDIwOYtXs2fpOtExUcCPUq1sTZ8IYmLqfys
-         VwbA==
-X-Forwarded-Encrypted: i=1; AJvYcCVHVucnsSyrr2gFKOzq2hobwZ5qp5oUuf4H8iuONbJlVQmrWpXtDoBXH0BPlUnI74BomYKyYEo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDC3j6MyuJ2/WdMgi038jFqoC4gdwN9MuVjhwZfDNHhWbh4rUA
-	Bn5pZ2ueseBdNERdCVttiFiVxqJqWtccBU9dS+QC68BuU5r3Eu4AKlc2ITEFNLzHB26NI7PT5x0
-	giHTCbtfb3l68zRJwc5VGp1vF+ux5oWJMAZs7zgdsMv+MG0GULTdo2sHEmA==
-X-Gm-Gg: ASbGncssdCUKrR1WYAXKIH6i1ob7a9eqNdQaV4GBOPQKfTaugM8g7bpq1u9/5zzZizA
-	HTEq4YCxxy2JNCjZ6oqvNm3k9fythCjL7nQM8qEVvGQ3fKZBKPhMJRH0dOu6xF7yNjpqum4aNOJ
-	7Re/sBxOBLkWK7E8uva54BD3nonQfQ0kkl2bc9dP/YaBuQnjnbgQ0kBkxfYZuTl4V00ymjwYWj/
-	btAMGbfhQQrOmXnyHQUeROfGuBLerk3fcdyjzbTTFjpUqzVDvG+WVuxSeR5it0Bsn0JqJtxRogF
-	hES3PwRs0ovIvLJDUNPqM64czkInr0T/tIXk90OPPeWDJDO5IbEu4yshaMYvpfvvuPDrrDxwtwF
-	NWb61ty3SKeR8FVEoGNHjCYSSUMxZZ5gU8wEIMXMjjcTQjQ==
-X-Received: by 2002:a05:620a:460f:b0:89f:7109:185f with SMTP id af79cd13be357-8b220af7c8dmr589562185a.31.1762371597244;
-        Wed, 05 Nov 2025 11:39:57 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFd9eT2YzuyaD6xKA1zXzyy0WWTMe4/Y4jwbmI24djGe/tYf+EHmXjHRZnQzj3cSXaGnWo3FQ==
-X-Received: by 2002:a05:620a:460f:b0:89f:7109:185f with SMTP id af79cd13be357-8b220af7c8dmr589555485a.31.1762371596761;
-        Wed, 05 Nov 2025 11:39:56 -0800 (PST)
-Received: from ?IPV6:2601:188:c102:b180:1f8b:71d0:77b1:1f6e? ([2601:188:c102:b180:1f8b:71d0:77b1:1f6e])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b2355c2797sm30330485a.10.2025.11.05.11.39.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Nov 2025 11:39:55 -0800 (PST)
-From: Waiman Long <llong@redhat.com>
-X-Google-Original-From: Waiman Long <longman@redhat.com>
-Message-ID: <74c2751a-4de6-49fb-b675-dc3c7f6e0bef@redhat.com>
-Date: Wed, 5 Nov 2025 14:39:53 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2D0525EF87
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 19:39:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.62.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762371569; cv=fail; b=Dwi6ghd3uh2gFOFkBdrqIV5nfvyXW/uIH42n8WDph6jzy5rm8TxGMssHk91hemC6rrHT/7+RMm3I1d40Hfeym+uMCNBdAwG50QB5Tp8+DID+ym6iILQ+whkP964gzHCgZX65ABhcZ/5shawsAiCTHbgECAyeOtC8N1EozkVf4zw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762371569; c=relaxed/simple;
+	bh=phlgpKbbLtg9ulKV9prFRNypUp/4zGiZdLLur/9HFOU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uyZKBpeQkPgQItkvIG6aPa4dGYuNKb5gk1BQIiCdf6MsCoikz/NsX2UP+/2gn0ziooaOgM7d3bu5X6WzAIh/yVmA+lmSfyZNGRjPYOg2TcJVIJHB5GUZjO7XLfN9iR9MCAPWRfv0NgXAYensALbPFgJzEhW0TS6BKvBxqXLevLU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=FEYXp7+4; arc=fail smtp.client-ip=52.101.62.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=bGBssHwSW+hpAb65Wy9CiHSB4umOxqXoeQEwN3zZRWk2fJgav2K6vBaU4urdJbK1838uI24lMVYCD+g+rQfgXBC6qhcnbpnm8uYzrpYv9uWKho92alEby6hcYixN4gnJIuRA26uKooE6ASb1cnJl5sJJcDMRzSWXxsoct3Sy02J+gU8A/Fg7V9bCrg2l/gTRvJzjx+e0B47MIGAKtMtxIMs4jqJ0Qf+ialfaVsKnQT4kaeKcIkE3pJhrS9fZx6kgfvy1UVLnx51HP30jsPbLDoHYCt/5ydtF4mgXBc1l0JwFXpvZkkHD+Qk09VSagZ3UOdT0VQZNTcmNGpr1regrwQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZjiWeE/+0pnbcloSTKyTCud5FyJxyWBmpEOBGxr3LOY=;
+ b=u0z8TI1NqIW5iehL+0bBsqjtc2YK3edDxZHhD3K1otq+S8tBKJ6WVEvWUAByzX1utm9y4VdrhGjLmE+dm3f2WTpSUBLvl/BgGeEJrDsP3WFTqepET1CNtWFs4cno9j4GRKWefZs5/FV8l9MXK4jhDGNe/bvPA6xx6AhkYqe48GGbG0/zv77qjL24X6nQ2o0e4gViCaV/E0NMJyWdEKImuRDantveQNvVFZ/6q3pJfk54qQAzuaQzBzc/bFlyw/vpNjLwi92L2n2Jj/P/KZSm71bVyyB/QH6+obKAcHMbCT5J8MYglg88/NXiQHaJvSDcFyEWW3oy0PcbV902zkLapg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZjiWeE/+0pnbcloSTKyTCud5FyJxyWBmpEOBGxr3LOY=;
+ b=FEYXp7+4GES7JYYFIepz0eZ+55u+WU5nUJsoqPXpESa+Njrgi1iDgM7sdNdb5QH36jwpY7AdneaK1xD7Mt2bwnb2nbkKGNKWqqO/jOj0rMxSdGgiJHVyAbpS0t1zHMxt5u8IVMX9gKuLU03eVbv1+SdiGQyvGKsGyroZZfgN4RMOOmYIFWRdqVXz+u31BysnsdHfCGOu4vxG5WOXJ2vVye73ns8ZLLsxJzf6o41xp+eRvJgkzY56RG4mA5BuARL0MfYA/mNUioowuKZ3WaoRrvmFquCk0mJwnDhPb2Tu35h5G6do26La2QwAAK4+xRlFKgvWHNM7fmxTX2bdT3dZug==
+Received: from LV3P220CA0005.NAMP220.PROD.OUTLOOK.COM (2603:10b6:408:234::26)
+ by DM3PR12MB9287.namprd12.prod.outlook.com (2603:10b6:8:1ac::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9275.16; Wed, 5 Nov
+ 2025 19:39:21 +0000
+Received: from BN1PEPF00004680.namprd03.prod.outlook.com
+ (2603:10b6:408:234:cafe::51) by LV3P220CA0005.outlook.office365.com
+ (2603:10b6:408:234::26) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9298.7 via Frontend Transport; Wed, 5
+ Nov 2025 19:39:20 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ BN1PEPF00004680.mail.protection.outlook.com (10.167.243.85) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9298.6 via Frontend Transport; Wed, 5 Nov 2025 19:39:20 +0000
+Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 5 Nov
+ 2025 11:39:05 -0800
+Received: from drhqmail201.nvidia.com (10.126.190.180) by
+ drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.20; Wed, 5 Nov 2025 11:39:04 -0800
+Received: from vdi.nvidia.com (10.127.8.12) by mail.nvidia.com
+ (10.126.190.180) with Microsoft SMTP Server id 15.2.2562.20 via Frontend
+ Transport; Wed, 5 Nov 2025 11:39:02 -0800
+From: Gal Pressman <gal@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	<netdev@vger.kernel.org>
+CC: Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
+	Gal Pressman <gal@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>
+Subject: [PATCH net-next] netlink: specs: netdev: Add missing qstats counters to reply
+Date: Wed, 5 Nov 2025 21:40:10 +0200
+Message-ID: <20251105194010.688798-1-gal@nvidia.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 13/33] cpuset: Update HK_TYPE_DOMAIN cpumask from cpuset
-To: Frederic Weisbecker <frederic@kernel.org>, Waiman Long <llong@redhat.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, =?UTF-8?Q?Michal_Koutn=C3=BD?=
- <mkoutny@suse.com>, Andrew Morton <akpm@linux-foundation.org>,
- Bjorn Helgaas <bhelgaas@google.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Danilo Krummrich
- <dakr@kernel.org>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Gabriele Monaco <gmonaco@redhat.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
- Lai Jiangshan <jiangshanlai@gmail.com>,
- Marco Crivellari <marco.crivellari@suse.com>, Michal Hocko
- <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
- Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
- Phil Auld <pauld@redhat.com>, "Rafael J . Wysocki" <rafael@kernel.org>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>, Simon Horman <horms@kernel.org>,
- Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Vlastimil Babka <vbabka@suse.cz>, Will Deacon <will@kernel.org>,
- cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-block@vger.kernel.org, linux-mm@kvack.org, linux-pci@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20251013203146.10162-1-frederic@kernel.org>
- <20251013203146.10162-14-frederic@kernel.org>
- <ea2d3e0e-b1ee-4b58-a93a-b9d127258e75@redhat.com>
- <aQtxMYmwzfg2NW1O@localhost.localdomain>
-Content-Language: en-US
-In-Reply-To: <aQtxMYmwzfg2NW1O@localhost.localdomain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN1PEPF00004680:EE_|DM3PR12MB9287:EE_
+X-MS-Office365-Filtering-Correlation-Id: 308c8e79-a4f7-4dcd-e5cf-08de1ca30432
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|376014|36860700013|82310400026|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?omvNmeCi6naKP8yWbyLB6ZJ2oRfi8JnqNbuQ0sW/jcNemFNFeb4VFjG3n7Y4?=
+ =?us-ascii?Q?qNmKOGaAqC88wJcWaikRUU2sbIkjqwktlUwFhy8YwFXUu+9IXIMkLhDiHRlh?=
+ =?us-ascii?Q?ZtaX0ZAQC6tdkS9b+Pu1I5UNbTBfqDVIaHkTI/ihCNFqx84bqMB5nGO6gMOO?=
+ =?us-ascii?Q?ljqxEN1bOI+NPI7YVaOD2dew69E14HFdsLtzQV7IXFcpJJlYEiRCElWXydKO?=
+ =?us-ascii?Q?YNR4cx8jGXAE/cEMtTQ+4rpwPvhlRDw8PPk0RhM5aX7fCf7NsfhZVucNxpr+?=
+ =?us-ascii?Q?AIyEBbLMUjTmvc1DRXx1ischa3mPw75Wa0o3zOOFQkQP/G2V0cW43+qQCtZR?=
+ =?us-ascii?Q?JcJtvdis1Jw14vvrK5YvgG7H4HqaPiLuOAaysD5C60+dR1uHAgdYpuCrFCiP?=
+ =?us-ascii?Q?pgOW1Da84eB/T+R6Afp/e2k+slQk90oGf2CM6TwbKGLmyMavMTnEQ7yCWTlR?=
+ =?us-ascii?Q?rzMPhV6t6uhJF+zRKQWQZLaMUX+KQshg23iUzHdNlQzX1mKFcdQSHf3hRirD?=
+ =?us-ascii?Q?AUvJVh4fc1lYcCpECN3dGD9Yq7OhC+J6YeBZnjV/pbYLY2KUpUqV9q8dpg3Y?=
+ =?us-ascii?Q?MyYCm3Rij0xWuAzl3j6+5kEZ5LlHuNfMuQQaXndYyIEr0nW4742L1XZL37cc?=
+ =?us-ascii?Q?9f+9Q3l8qqgRFjAdexzie+L61xJ1fc4V9BeRQlxTBTzAJOwIiS1+7UPc7Jw/?=
+ =?us-ascii?Q?g0JQYIygfCvVXrBxhpgSFgp5x1v0vn6aTwSY9nQNJ6NqA6mnliaR10cxrrCs?=
+ =?us-ascii?Q?p3zQNcjlzzc6/o+5c7/1LPp/haNUubVXqlMfHX5qu1e+ZKu6VL1yihB3JIYm?=
+ =?us-ascii?Q?1WdW2qe9XkrhR2LB/4btqxHoUpXFMS3RFLy4aGGlYyO1gmzOYp3WPu2Mn71o?=
+ =?us-ascii?Q?qKu8Y2aFXMrDcq3L6IBv8sZPYwoYtWaKSgBY+7K3NPizGnzOqVYmDwlYMbeA?=
+ =?us-ascii?Q?UOHTOnbwW+KZBOyo+hJZa9LkoaJF3xDZNfjdGzaPVgmkjVSx2joMuSIgah+7?=
+ =?us-ascii?Q?wGbt5jGn7wG0MSPoW4tFWQn7y8SBiqZZOv1fNzohaDaKWaxRHhkI0yRWKqDM?=
+ =?us-ascii?Q?5Mt3SZNH+SwCikk7kU3N3B1egHnfBDAtVaQLVHeUsoMVwDwG89wvr9Na6+/B?=
+ =?us-ascii?Q?TgXrvHM+1A/3yIUNwtBB2zAp/E1oN2eiR9Ia9BNk9eftdEp6xtweraWJcQ+B?=
+ =?us-ascii?Q?riEtSAyJf6zpw8i0JVax8o5lhrqW85zdADZQbUMxyi9EoA8w/sBwctJM90VA?=
+ =?us-ascii?Q?KQAPaVO9o6NBzEfqWlxAMR5ENJ8t1uedbvsx7JUgiC09UUgOd23ywm27Ic/q?=
+ =?us-ascii?Q?+vCo23amN72XtoMbFKynbkietoytFKixxo5ISP9+stu24Y7wxGg4/VyCXByv?=
+ =?us-ascii?Q?T5fz2YsTaSyr7YHcJSROiXyFMZKbNPPxUByNHn76Rr6S5DPcaFIJ7o+9sNlO?=
+ =?us-ascii?Q?NWGU42rrK5VAXYH1pu+mgwm5Wh9zPOh9X7WXebdNhdPrKUXODwoug2XAC2+G?=
+ =?us-ascii?Q?fm4kkTFoN18frS4m2sGmzrPnqR/HkhzYiO581/zRmd+Gz0jkOMQzQdH01M0M?=
+ =?us-ascii?Q?U/nSYnDj42CdE2k1rXY=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(36860700013)(82310400026)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Nov 2025 19:39:20.7122
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 308c8e79-a4f7-4dcd-e5cf-08de1ca30432
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN1PEPF00004680.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR12MB9287
 
-On 11/5/25 10:45 AM, Frederic Weisbecker wrote:
->>> +	if (!trial)
->>> +		return -ENOMEM;
->>> +
->>> +	cpumask_andnot(trial, housekeeping_cpumask(HK_TYPE_DOMAIN_BOOT), mask);
->>> +	if (!cpumask_intersects(trial, cpu_online_mask)) {
->>> +		kfree(trial);
->>> +		return -EINVAL;
->>> +	}
->>> +
->>> +	if (!housekeeping.flags)
->>> +		static_branch_enable(&housekeeping_overridden);
->>> +
->>> +	if (!(housekeeping.flags & BIT(type)))
->>> +		old = housekeeping_cpumask_dereference(type);
->>> +	else
->>> +		WRITE_ONCE(housekeeping.flags, housekeeping.flags | BIT(type));
->>> +	rcu_assign_pointer(housekeeping.cpumasks[type], trial);
->>> +
->>> +	synchronize_rcu();
->>> +
->>> +	kfree(old);
->> If "isolcpus" boot command line option is set, old can be a pointer to the
->> boot time memblock area which isn't a pointer that can be handled by the
->> slab allocator AFAIU. I don't know the exact consequence, but it may not be
->> good. One possible solution I can think of is to make HK_TYPE_DOMAIN and
->> HK_TYPE_DOMAIN_ROOT point to the same memblock pointer and don't pass the
->> old HK_TYPE_DOMAIN pointer to kfree() if it matches HK_TYPE_DOMAIN_BOOT one.
->> Alternatively, we can just set the HK_TYPE_DOMAIN_BOOT pointer at boot and
->> make HK_TYPE_DOMAIN falls back to HK_TYPE_DOMAIN_BOOT if not set.
-> Have a look at housekeeping_init() which reallocates the memblock
-> allocated memory with kmalloc to avoid these troubles.
+Add all qstats counter attributes (HW-GRO, HW-GSO, checksum, drops,
+etc.) to the qstats-get reply specification. The kernel already sends
+these, but they were missing from the spec.
 
-Ah your previous patch of this series did that. I was thinking about the 
-existing kernel code at the time. So you can ignore that comment.
+Fixes: 92f8b1f5ca0f ("netdev: add queue stat for alloc failures")
+Fixes: 0cfe71f45f42 ("netdev: add queue stats")
+Fixes: 13c7c941e729 ("netdev: add qstat for csum complete")
+Fixes: b56035101e1c ("netdev: Add queue stats for TX stop and wake")
+Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
+Signed-off-by: Gal Pressman <gal@nvidia.com>
+---
+ Documentation/netlink/specs/netdev.yaml | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-Thanks,
-Longman
+diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
+index e00d3fa1c152..29b8290ebab5 100644
+--- a/Documentation/netlink/specs/netdev.yaml
++++ b/Documentation/netlink/specs/netdev.yaml
+@@ -732,6 +732,29 @@ operations:
+             - rx-bytes
+             - tx-packets
+             - tx-bytes
++            - rx-alloc-fail
++            - rx-hw-drops
++            - rx-hw-drop-overruns
++            - rx-csum-complete
++            - rx-csum-unnecessary
++            - rx-csum-none
++            - rx-csum-bad
++            - rx-hw-gro-packets
++            - rx-hw-gro-bytes
++            - rx-hw-gro-wire-packets
++            - rx-hw-gro-wire-bytes
++            - rx-hw-drop-ratelimits
++            - tx-hw-drops
++            - tx-hw-drop-errors
++            - tx-csum-none
++            - tx-needs-csum
++            - tx-hw-gso-packets
++            - tx-hw-gso-bytes
++            - tx-hw-gso-wire-packets
++            - tx-hw-gso-wire-bytes
++            - tx-hw-drop-ratelimits
++            - tx-stop
++            - tx-wake
+     -
+       name: bind-rx
+       doc: Bind dmabuf to netdev
+-- 
+2.40.1
 
 
