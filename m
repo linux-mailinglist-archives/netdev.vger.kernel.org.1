@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-235719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9990C341E4
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 08:01:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A095C34202
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 08:04:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64D4D189AF53
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 07:02:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD2113A39D3
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 07:04:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E1F828725C;
-	Wed,  5 Nov 2025 07:01:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7C982C21D1;
+	Wed,  5 Nov 2025 07:04:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="fTK+K2e8"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="FCNP8vhG"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFAC71E231E;
-	Wed,  5 Nov 2025 07:01:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 578D92BFC8F;
+	Wed,  5 Nov 2025 07:04:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762326108; cv=none; b=Py8RdEAzHkuuXrErzInndmV0tXHCPZ9+PiKOHyqYW6KMiZTCOXPLTsvuCKmL0GEIEb0whUlg8467PFTFBquzG6wR/2vemEiM8ItOBAN8TaYjNER3TAaQ4x+2B/3zHlHDO8oAOMBtJMRp8PQ9mrXdfYq7PvDfNNcVAU5avfxScfA=
+	t=1762326255; cv=none; b=kCVFtd6QAg+1FZhtYw/uc6LdIC/AToyvzMMxQiD2bpoAPd/SQTvxrx0qZrRWnR9lrHVyj45OjrLWGdZ4KRzpyhHuoH2so3kSVbZvG/B1ovxICg/Zq/wOVG6zRPArlb+1O3w874/UYKIZedH+Gu9WM1zuxUL6AhTi3tV6ij1RvZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762326108; c=relaxed/simple;
-	bh=zaNmRtse4opRZFdFVp2/88MUGwUrTeOwkZa8Omja2zk=;
+	s=arc-20240116; t=1762326255; c=relaxed/simple;
+	bh=Fem9xkolDQS42qh4wWt9wApy6saqu7inl82Z7/IP2CY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nFNVMGg5iwAuc4IlUzo8kW7TfssWX+jlujSWdBTVEWX2eoKauZTNcHKBvjQ/DPmaKo+/v9mrEDHiHSh3BXlnxB3U6QiEnpmlg3CB7F8eA8KS9inH+57RFeypHCmAjkgPSRwVN2bqdQtCoF4sNyRvuKAvq7co9fxoeivAxo4SISs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=fTK+K2e8; arc=none smtp.client-ip=115.124.30.97
+	 Content-Type:Content-Disposition:In-Reply-To; b=gupjTZe/PPSNnHMp/Ox/JwCcdxdKh1EjPhUuSz8i4qJMNL7KC8fqF5tGKhpGQWjYbRQTkq7/QuZJMA8BLMVXpvAPacz0sxrLLtPNb5TaVyD7x7jHpWE5URbRuV+wMGuuXhZUAlVxJaTVtN+wpP2dDO+w7uHA7pzMFplxTev6ksY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=FCNP8vhG; arc=none smtp.client-ip=115.124.30.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1762326102; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=pAFmk8zdrpmyWSoXViiXp4r+9ZTn4cw9wTDEjHSLBp8=;
-	b=fTK+K2e8+vg4V4EaNviS4f0tj2F3xRKKjJJXmkJAdluSeRda/D/LbLmIYyMF3b54URtcPnrEYcgNE0Y+xQ2gQ79igEZIUP1mGJwYhVdcxjQfwXgXQErl3O7Gz3L+XY70g4V94dQSNKXe8HvMykct+evr/bARcPiOxTkUwsk75Kk=
-Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WrkF.dW_1762326100 cluster:ay36)
+	t=1762326244; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=RtVyJOcPvAiuccZ/CktaIrpt3Nf2+6AFKpihHJLFrU4=;
+	b=FCNP8vhGOzxeGGNgemUpV5JgbGMZdp8IeUHv1QMjoE81tn+YoRUubXBBSFMthCFMb+VyK5USqIW53m38o5N4xoowisPsyfmhZLyV+vu0FM2r/0jfeDeq6JOmfEOiixaHfwvmrMmUlTgWpo3mcMZo4AmvzTSXC1VsoSbmhrFajAg=
+Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WrkOIeH_1762326242 cluster:ay36)
           by smtp.aliyun-inc.com;
-          Wed, 05 Nov 2025 15:01:40 +0800
-Date: Wed, 5 Nov 2025 15:01:40 +0800
+          Wed, 05 Nov 2025 15:04:02 +0800
+Date: Wed, 5 Nov 2025 15:04:02 +0800
 From: "D. Wythe" <alibuda@linux.alibaba.com    >
 To: Martin KaFai Lau <martin.lau@linux.dev>
 Cc: "D. Wythe" <alibuda@linux.alibaba.com>, ast@kernel.org,
@@ -51,80 +51,72 @@ Cc: "D. Wythe" <alibuda@linux.alibaba.com>, ast@kernel.org,
 	tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
 	bpf@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
 	netdev@vger.kernel.org, sidraya@linux.ibm.com, jaka@linux.ibm.com
-Subject: Re: [PATCH bpf-next v4 2/3] net/smc: bpf: Introduce generic hook for
- handshake flow
-Message-ID: <20251105070140.GA31761@j66a10360.sqa.eu95>
+Subject: Re: [PATCH bpf-next v4 3/3] bpf/selftests: add selftest for
+ bpf_smc_hs_ctrl
+Message-ID: <20251105070402.GB31761@j66a10360.sqa.eu95>
 References: <20251103073124.43077-1-alibuda@linux.alibaba.com>
- <20251103073124.43077-3-alibuda@linux.alibaba.com>
- <4450b847-6b31-46f2-bc2d-a8b3197d15c7@linux.dev>
+ <20251103073124.43077-4-alibuda@linux.alibaba.com>
+ <14bc0878-796e-415a-a319-baa609474a20@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4450b847-6b31-46f2-bc2d-a8b3197d15c7@linux.dev>
+In-Reply-To: <14bc0878-796e-415a-a319-baa609474a20@linux.dev>
 User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Tue, Nov 04, 2025 at 04:03:46PM -0800, Martin KaFai Lau wrote:
-> 
-> 
+On Tue, Nov 04, 2025 at 04:13:39PM -0800, Martin KaFai Lau wrote:
 > On 11/2/25 11:31 PM, D. Wythe wrote:
-> >+#if IS_ENABLED(CONFIG_SMC_HS_CTRL_BPF)
-> >+#define smc_call_hsbpf(init_val, sk, func, ...) ({		\
-> >+	typeof(init_val) __ret = (init_val);			\
-> >+	struct smc_hs_ctrl *ctrl;				\
-> >+	rcu_read_lock();					\
-> >+	ctrl = rcu_dereference(sock_net(sk)->smc.hs_ctrl);	\
-> 
-> The smc_hs_ctrl (and its ops) is called from the netns, so the
-> bpf_struct_ops is attached to a netns. Attaching bpf_struct_ops to a
-> netns has not been done before. More on this later.
-> 
-> >+	if (ctrl && ctrl->func)					\
-> >+		__ret = ctrl->func(__VA_ARGS__);		\
+> >+static bool setup_netns(void)
+> >+{
+> >+	test_netns = netns_new(TEST_NS, true);
+> >+	if (!ASSERT_OK_PTR(test_netns, "open net namespace"))
+> >+		goto fail_netns;
 > >+
-> >+	if (static_branch_unlikely(&tcp_have_smc) && tp->syn_smc) {
-> >+		tp->syn_smc = !!smc_call_hsbpf(1, sk, syn_option, tp);
+> >+	if (!ASSERT_OK(system("ip addr add 127.0.1.0/8 dev lo"),
 > 
-> ... so just pass tp instead of passing both sk and tp?
+> SYS(fail_ip, "ip addr add ...")
+> >+		       "add server node"))
+> >+		goto fail_ip;
+> >+
+> >+	if (!ASSERT_OK(system("ip addr add 127.0.2.0/8 dev lo"),
+> 
+> same here.
+> 
+Take it.
+> >+		       "server via risk path"))
+> >+		goto fail_ip;
+> >+
+> >+	return true;
+> >+fail_ip:
+> >+	netns_free(test_netns);
+> >+fail_netns:
+> >+	return false;
+> >+}
+> >+
+> >+static void cleanup_netns(void)
+> >+{
+> >+	netns_free(test_netns);
+> >+	remove_netns(TEST_NS);
+> 
+> remove_netns should not be needed. netns_free() should have removed it.
+Take it.
 > 
 > [ ... ]
 > 
-
-You're right, it is a bit redundant. However, if we merge the parameters,
-every user of this macro will be forced to pass tp. In fact, we’re
-already considering adding some callback functions that don’t take tp as
-a parameter.
-
-I’ve been considering this: since smc_hs_ctrl is called from the netns,
-maybe we should replace the sk parameter with netns directly. After all,
-the only reason we pass sk here is to extract sock_net(sk). Doing so
-would remove the redundancy and also keep the interface more flexible
-for future extensions. What do you think?
-
-> >+static int smc_bpf_hs_ctrl_init(struct btf *btf) { return 0; }
-> >+
-> >+static int smc_bpf_hs_ctrl_reg(void *kdata, struct bpf_link *link)
+> >+	system("sysctl -w net.smc.hs_ctrl=linkcheck");
 > 
-> More on attaching to netns. There is discussion on how to attach a
-> bpf_struct_ops to a particular cgroup in a link. I think the link
-> should be able to attach a bpf_struct_ops to a particular netns
-> also.
-> 
-> I would suggest to reject link now. Later, link support can be added
-> to attach to a particular netns. This will be the last non-link-only
-> bpf_struct_ops addition, considering the blast radius is limited on
-> smc_hs_ctrl and the smc effort was started a while ago. I could have
-> missed things here. Other experts could chime in.
-> 
-> 	if (link)
-> 		return -EOPNOTSUPP;
+> The "sysctl -w" will echo useless output to test_progs. just use
+> write_sysctl().
+>
+Take it.
+Thanks for the review, I'll address these points in the next
+version.
 
-Got it. This approach looks good to me. I’ll send out the next version
-with this change.
+Best wishes,
+D. Wythe
 
 
