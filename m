@@ -1,152 +1,187 @@
-Return-Path: <netdev+bounces-235829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id A579DC36259
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 15:49:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DECFDC36274
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 15:50:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 51C0734619C
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 14:49:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4BD6418C60B5
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 14:50:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E2D5314B74;
-	Wed,  5 Nov 2025 14:49:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C65B532C95F;
+	Wed,  5 Nov 2025 14:49:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T4y70iGw";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="lXSKymJZ"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="p1EoThEo"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85321246BB2
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 14:49:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01B3B246335
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 14:49:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762354149; cv=none; b=exLVU135WGExHjkfnWuN91NEQN4D9+Uti72OxIV62CkDckYEB70bE/IfODakeXOpsffr8TkdKbT47/bV+q2qRnLrLfg+VSmOtnoXT4px1cOudXZCHULNzF+ZuqyJZ8/G0NHxnV8lh0MBlYOVraTIU3uMNmdg08kGex1YA15BasE=
+	t=1762354194; cv=none; b=Gd6RP1YeltoWez8Uh4D65mbW02k9nfQqmZGbb4j6pW7vgq/Rk8UfAjw/LbIiWZSbb4GnHXvXVD/1FYXwisvQOdgT9BCEXubanoFXdIaHtRwHOwcAizfmPv3kk4HA0Pz1qKBJDm12A4KYNZRbBFY/+sSwQ3N3Ibb55iqcGIAUBbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762354149; c=relaxed/simple;
-	bh=YfvMW72encoRkud0wVtm/A7j2WUacp04L3fsNBayHvo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PYzdws3HLRfb91AfXWIasl5qtaWCC/gQNUocfu95reQWcLUlJ6MOLJYFLI0PVE54Pxs5KZrH1RpLAmFiaCg64uqbAVPadzogrQtuLbBjAXBihhL2iR9M/1H3kD1T2XQBgjW7SH4mni5YgpRrMpyDdvGCk5k7+y4eLmYUHtS2lV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T4y70iGw; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=lXSKymJZ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762354147;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=43sHUCklMiFn+SiCjLKJSBqe6MedMG8UZiB50DllYfo=;
-	b=T4y70iGwCcNYnAEoMHPTMmdakBZgvBt62dsOD+/QC8CwN3XiV4HOfRxHkG961/9RA7WfUf
-	VMhC7xfU9DdZSdliG1ny2KFBlfpV9KNubbGM/aF/D8G++sEfFCRcqGJX+FYk9RsDHE2K8n
-	X6ZmowgXr7DJ6z/2s8eBAcGOsmSjEzk=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-179-NyUZWkzbPRS26pgDpqB-2w-1; Wed, 05 Nov 2025 09:49:05 -0500
-X-MC-Unique: NyUZWkzbPRS26pgDpqB-2w-1
-X-Mimecast-MFC-AGG-ID: NyUZWkzbPRS26pgDpqB-2w_1762354144
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-475dabb63f2so36173195e9.3
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 06:49:05 -0800 (PST)
+	s=arc-20240116; t=1762354194; c=relaxed/simple;
+	bh=ce9SvQ9qyWk44opbKqi+f+iTxvWNyIU29ZLTLIhBMmA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AQYg4I5bjEqOkWVbeRSpHKJnJRrKvw0txdwtV7C0dy66rb06rrglL4ZnlHowAxPUFjReTAf0pqwz95e48gYZHjlacde+8fUx7qevRS/hc5I2zDQfhLM2y6FrPhJAWgLcPabzRo97+Yxsf6RDvvtZIPNY1QvgED7qaZR4WBI+M3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=p1EoThEo; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-339d7c4039aso6824173a91.0
+        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 06:49:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762354143; x=1762958943; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=43sHUCklMiFn+SiCjLKJSBqe6MedMG8UZiB50DllYfo=;
-        b=lXSKymJZLRal60Vh76tTo85Oz6Ng9PEp/SrkcphQ9kZ7PQyiuc+90rnnuzfn3ne7/I
-         W3bc+6sREp9EkKnVgWIqvLfinym7NqMG1SW5b4isQkqah6R4F3w2yarBiutxX9/aeWqw
-         M5HuZQmfSN5rwol1BkpVuUJx7F1zLe/9SmHm/prlIoQacB68rzeImmNmKdQFOtYoma7Q
-         rnhIMZYmaGD8WdlBGq5g5Qr0jIqwf9dVxhhtX08Fjtv3RRUvGaVuOOLd7nIO9gtVGYw+
-         iHtjaHQ+bxMqxSA3vR0YTMRxEovgjgwVtWuR4fzykypPbZEGxykQJhlr7NoZiHP3Nb74
-         KwDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762354143; x=1762958943;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1762354191; x=1762958991; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=43sHUCklMiFn+SiCjLKJSBqe6MedMG8UZiB50DllYfo=;
-        b=THxXYOp2kiK/7kRgH4eOrgxv5PaoVX+nh1yV0XUQ6b/MF63mwDPACbm2PUz8K6whJv
-         jHiKxqALdbrRH1pwxgvyv/SrgR23F0r+MRJiDNLKet7QWWK22kCKDVlUJ+Xvbd6TuEVp
-         EgZn5WgNompGbXWkmuSJhu9s0hePOxTvDqhCT4ErfhLK0KY0KJLx79Jm+LqmOzJvLPWC
-         84UC3qXS5Bj5zilVdBFK40mbEk5PG+cy7lfSELjDfTr6aFhH2+vrdhkxhyVKDKQrEvbk
-         yQ3GFu30fgJ7WQqKO0hLd87sXrUaOZo3tMKVps5ngkfY4k1w8oyoGtRGvgoeE2qmddZO
-         m7Mw==
-X-Forwarded-Encrypted: i=1; AJvYcCUf4pw3xBI73pVdRDaiefR+8g6aKJP3Iz5h8mJx9vQWlGOmSt2vdJyWr9nDGus0DPwWowu3k/E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxaykFh1bca0GSvSKGZdh1EANvfugW6pI/8Rv5MgNez2dHx3MZF
-	qT1o02Ye4j2bH4UOC+OOc9171WRKXJxyMHhkjBbF12PWt5EUwZh/eTG2O44MpmN8KyPh/TjoPUt
-	PLZscGsJF4T/kGrw6+8YEgY5k9xG/nlmMcYN8J2Opd/nzMzQwIc6WG7KVCrLr2hHZAA==
-X-Gm-Gg: ASbGnctlWZNW8Kr0wlRLTRFO67tPWdfwaUHYfKqW+vHs++8iSCwKH0fMqNJGTUghb/5
-	x3uvKu02Wf2OkLaJSXZBGw0Cs0C4nyCa5Z+OA3j4T+590oVLSJrs5CpJ4Sfldw3x+g5vrgtVuZu
-	2fxxEgp+ZX8ne3rITcpDhgVWDwRJEKvrZidZCwGSNqpvZMrQsZj8bsZcH/QsB/QuHrGBL4rISc4
-	plenq4MB1gsZHsSto5B/n9UDk6eJGsJvXQFMIVPVzPBS85w6x2VaDRu8mMNSrpQkMtlqaRF/0P1
-	Wlf+kNl55Egj7rhOtuxPotTcjJyM+FM9ZvKp4JV+iogcRtqshmd3dalMbm1+SWRb93Lz89lEyog
-	=
-X-Received: by 2002:a05:600c:5403:b0:477:3543:3a3b with SMTP id 5b1f17b1804b1-4775cdad69fmr30953915e9.6.1762354143240;
-        Wed, 05 Nov 2025 06:49:03 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEJCkXVCaYKB38WQ9mVlW2atyii43mXLtD2rPfe/M0bgqyi++PixdCT104cVwdbGCHZnaBsew==
-X-Received: by 2002:a05:600c:5403:b0:477:3543:3a3b with SMTP id 5b1f17b1804b1-4775cdad69fmr30953665e9.6.1762354142802;
-        Wed, 05 Nov 2025 06:49:02 -0800 (PST)
-Received: from sgarzare-redhat ([5.77.88.64])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429dc18f41bsm10751085f8f.9.2025.11.05.06.49.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Nov 2025 06:49:01 -0800 (PST)
-Date: Wed, 5 Nov 2025 15:48:58 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Shuah Khan <shuah@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Simon Horman <horms@kernel.org>, 
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v2 11/12] selftests/vsock: add vsock_loopback
- module loading
-Message-ID: <ubfxj7koxuztrlrydfpjxenu7sdydq45rnhxkpmuurjfqvyh4j@mwzsqsioqzs5>
-References: <20251104-vsock-selftests-fixes-and-improvements-v2-0-ca2070fd1601@meta.com>
- <20251104-vsock-selftests-fixes-and-improvements-v2-11-ca2070fd1601@meta.com>
+        bh=cNutFVqiZLKWladui0+0ii2bIqCpOonzQgeSmiYc86s=;
+        b=p1EoThEox4Wn2uVOexeD237fn7FJodnlSPm4wc1ZXNexCxCWrMDNRvDqk0gsQx8UhB
+         QgwpPsPlQHtFqtBXpPf27Nbp0XNAWfjzijbic/iIYz1F41aafL0ILkhdYxuAYZThJdLC
+         z39bmdJ5yeSgrS1qW6SIuEnpyMMM68Nqs/IcNqgPwQsubXI+KxnGvKUbB4LN1f8PEmJO
+         d99nnJhFfzWBJc7htcmIr00EjReIJQ9HRD1AfiTpmPqUUUCrRhctmbocccg6QHxHG1Rg
+         o+1jL3QkaOi65c//GBOADobxgxyiwQFBkty4RyU52l2CX2PhZxsgvQ0rupsB17uOnBjS
+         Rkyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762354191; x=1762958991;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cNutFVqiZLKWladui0+0ii2bIqCpOonzQgeSmiYc86s=;
+        b=WBz9QQV9iOw110eC1GnZQzkVD7pcqNTFG9zKWiWwX2MGzdRnKGN48Fi+IvCSCchbuf
+         uK3lvPM6/kWjlHWJkkWMu1byftK9TUpuZoJF8NPMLZaW2BAisoua8bwm5ipZkisskPFb
+         OoRYh0eoDSo3xjKcn6wWafuav0A1fH0XWdYUtaIBBWO94zfmpbUIjBHYflUuytPBYDIo
+         UEIQmhJWcbnpd5Va02Ev7TFHUbPZLKlrRlLSsTVoJZD4HPqz7+C6bZT2oX9cpwyci4GL
+         /5enKxaC02OaUoZR9mB4xcvHIPFB/u4fZB8twFShBiRHSekg8tVBHa39yBT0CMA26R9V
+         an+g==
+X-Forwarded-Encrypted: i=1; AJvYcCW9kJMbXBZGU9FZWzV5n0RDPNAM+ckdZ7mBUcYl2ivTadFN7ruXgof5FEU6w3QzITkjwFJ1rLc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzbIjt9uudn8ComJeRk8ZmzgOZTkWCjaPX+ZDGUKEY9KkDGh2rI
+	HCMRTBlweNwok8BLVzkRi/5PVBzn47rn1MKKV9bH+JlxUxK6LdhtMBcwSJKY+tJ24MY03BEd7fQ
+	LeK7Id5jy7ZALvzp/HhuUUI89Rrpkuz9MfBXY+AKC
+X-Gm-Gg: ASbGncs/jFLK7XT7n/CVtkiVMZJILOY45/VMUWuMSvs26geAhkDgbrJ/HIYksAeUnWU
+	pJnuJ7qDFWrayjncb/S9oBlZNlEOVqLFFuUDz+NBcIyCsy8PCRzZh8SZZ+d4KcwF+T6ftHV+V1J
+	qBy4ph7+t4ArT7cYUlvGn+EpUkdR9LrOYpQsYAWx1QrTBYnPaC5uJz16IItR6cd3sv/qPRlK0WV
+	vBxDUI00HA8013cQbySLl9Ui74q/FR5UxDC2j5+H1obdWhTxg2cZkXkxmMrTcwNlUHSMPU7wD/c
+	+Vq5icVNdcJ2yD2Lfw7JcpIwxqxJfQ4debAa
+X-Google-Smtp-Source: AGHT+IFtaXxj+UhBC1sKz5DYp6aBsx9w+5pM1lCdqSXubHqDqhUVuffwO/NgfZLrP9tExB7niohd5bBIrIHMV/2s79w=
+X-Received: by 2002:a17:90b:4a44:b0:340:f7d6:dc70 with SMTP id
+ 98e67ed59e1d1-341a6c48a73mr4638625a91.13.1762354191288; Wed, 05 Nov 2025
+ 06:49:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20251104-vsock-selftests-fixes-and-improvements-v2-11-ca2070fd1601@meta.com>
+References: <20251105022213.1981982-1-wangliang74@huawei.com>
+In-Reply-To: <20251105022213.1981982-1-wangliang74@huawei.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Wed, 5 Nov 2025 09:49:40 -0500
+X-Gm-Features: AWmQ_bnukAgyqboISWGHRoA1zxhMBYRfLodtxZAMXGQ_Mc3ncEZMCQuJDCKbiLw
+Message-ID: <CAM0EoMn-2ZzbKozqj9y=9yKJT8ANJPqO9UYoiJqFyqUoKfx8RA@mail.gmail.com>
+Subject: Re: [PATCH net] net/sched: Fix possible infinite loop in qdisc_tree_reduce_backlog()
+To: Wang Liang <wangliang74@huawei.com>
+Cc: xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	pctammela@mojatatu.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	yuehaibing@huawei.com, zhangchangzhong@huawei.com, 
+	Victor Nogueira <victor@mojatatu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 04, 2025 at 02:39:01PM -0800, Bobby Eshleman wrote:
->From: Bobby Eshleman <bobbyeshleman@meta.com>
+On Tue, Nov 4, 2025 at 9:00=E2=80=AFPM Wang Liang <wangliang74@huawei.com> =
+wrote:
 >
->Add vsock_loopback module loading to the loopback test so that vmtest.sh
->can be used for kernels built with loopback as a module.
+> A soft lockup issue was observed with following log:
 >
->This is not technically a fix as kselftest expects loopback to be
->built-in already (defined in selftests/vsock/config). This is useful
->only for using vmtest.sh outside of kselftest.
+>   watchdog: BUG: soft lockup - CPU#1 stuck for 104s! [tc:94]
+>   CPU: 1 UID: 0 PID: 94 Comm: tc Tainted: G L 6.18.0-rc4-00007-gc9cfc122f=
+037 #425 PREEMPT(voluntary)
+>   RIP: 0010:qdisc_match_from_root+0x0/0x70
+>   Call Trace:
+>    <TASK>
+>    qdisc_tree_reduce_backlog+0xec/0x110
+>    fq_change+0x2e0/0x6a0
+>    qdisc_create+0x138/0x4e0
+>    tc_modify_qdisc+0x5b9/0x9d0
+>    rtnetlink_rcv_msg+0x15a/0x400
+>    netlink_rcv_skb+0x55/0x100
+>    netlink_unicast+0x257/0x380
+>    netlink_sendmsg+0x1e2/0x420
+>    ____sys_sendmsg+0x313/0x340
+>    ___sys_sendmsg+0x82/0xd0
+>    __sys_sendmsg+0x6c/0xd0
+>    </TASK>
 >
->Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
->---
-> tools/testing/selftests/vsock/vmtest.sh | 2 ++
-> 1 file changed, 2 insertions(+)
+> The issue can be reproduced by:
+>   tc qdisc add dev eth0 root noqueue
+>   tc qdisc add dev eth0 handle ffff:0 ingress
+>   tc qdisc add dev eth0 handle ffe0:0 parent ffff:a fq
+>
+> A fq qdisc was created in __tc_modify_qdisc(), when the input parent majo=
+r
+> 'ffff' is equal to the ingress qdisc handle major and the complete parent
+> handle is not TC_H_ROOT or TC_H_INGRESS, which leads to a infinite loop i=
+n
+> qdisc_tree_reduce_backlog().
+>
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Good test case, but i dont think this is the right solution.
+That config is bogus and should never have been accepted by the kernel.
+We'll look into it..
 
->
->diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
->index 0657973b5067..cfb6b589bcba 100755
->--- a/tools/testing/selftests/vsock/vmtest.sh
->+++ b/tools/testing/selftests/vsock/vmtest.sh
->@@ -434,6 +434,8 @@ test_vm_client_host_server() {
-> test_vm_loopback() {
-> 	local port=60000 # non-forwarded local port
->
->+	vm_ssh -- modprobe vsock_loopback &> /dev/null || :
->+
-> 	if ! vm_vsock_test "server" 1 "${port}"; then
-> 		return "${KSFT_FAIL}"
-> 	fi
->
->-- 
->2.47.3
->
+cheers,
+jamal
 
+
+> The infinite loop scenario:
+>
+>   qdisc_tree_reduce_backlog
+>
+>     // init sch is fq qdisc, parent is ffff000a
+>     while ((parentid =3D sch->parent)) {
+>
+>       // query qdisc by handle ffff0000
+>       sch =3D qdisc_lookup_rcu(qdisc_dev(sch), TC_H_MAJ(parentid));
+>
+>       // return ingress qdisc, sch->parent is fffffff1
+>       if (sch =3D=3D NULL) {
+>       ...
+>     }
+>
+> Commit 2e95c4384438 ("net/sched: stop qdisc_tree_reduce_backlog on
+> TC_H_ROOT") break the loop only when parent TC_H_ROOT is reached. However=
+,
+> qdisc_lookup_rcu() will return the same qdisc when input an ingress qdisc
+> with major 'ffff'. If the parent TC_H_INGRESS is reached, also break the
+> loop.
+>
+> Fixes: 2e95c4384438 ("net/sched: stop qdisc_tree_reduce_backlog on TC_H_R=
+OOT")
+> Signed-off-by: Wang Liang <wangliang74@huawei.com>
+> ---
+>  net/sched/sch_api.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+> index 1e058b46d3e1..b4d6fe6b6812 100644
+> --- a/net/sched/sch_api.c
+> +++ b/net/sched/sch_api.c
+> @@ -784,7 +784,7 @@ void qdisc_tree_reduce_backlog(struct Qdisc *sch, int=
+ n, int len)
+>         drops =3D max_t(int, n, 0);
+>         rcu_read_lock();
+>         while ((parentid =3D sch->parent)) {
+> -               if (parentid =3D=3D TC_H_ROOT)
+> +               if (parentid =3D=3D TC_H_ROOT || parentid =3D=3D TC_H_ING=
+RESS)
+>                         break;
+>
+>                 if (sch->flags & TCQ_F_NOPARENT)
+> --
+> 2.34.1
+>
 
