@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-235977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BE8EC37AE4
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 21:20:16 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF302C37AED
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 21:20:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F36C43B6AD7
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 20:20:03 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 809DE4E3B79
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 20:20:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26045346FB3;
-	Wed,  5 Nov 2025 20:19:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AC0834889C;
+	Wed,  5 Nov 2025 20:19:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Ih1BllT5"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="av/s3W2l"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FCC73431E5
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 20:19:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A762C346A05
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 20:19:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762373995; cv=none; b=KTR8wRauoFYFFJpgJevOnBYpQkcqST2LTD87CzmOO98AvmKaNR9+13gjl9jeywrSdOSW2pCQODrSstIJ7JdkgIiDRqemam09PmnjDYs0rB2uNEiOJNkCUYvI6wtugpwKLDIsg1g2IZuphrgpuJYef5mFK3ZT2B71glwpzyGelWA=
+	t=1762373996; cv=none; b=W5+06ym4wdCR29b8IphmH6bsaTAD2uc0Zjlenf9P7/TbPTv6idXnYLWIQjHDm+g4X5OlCzN3cn4Yb8IX88CZDxf5MCJyPp7driud0t/rxuKyFpt6HdsMf0Q5nRvSObbJsS6VIxs0RInwQkysY0nCLjomCGbibxHmRtGMzVqY3Kw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762373995; c=relaxed/simple;
-	bh=+IZsv8bUzvX+j8yZwjOvjPLG0t53WwZ9DVonja+axmM=;
+	s=arc-20240116; t=1762373996; c=relaxed/simple;
+	bh=dg/CQiJ9SH+N8WLjJ8P6Yi5KMCvTXCf9lbKxGs0ohNA=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ddHc/crIIhu0XdWqotCvgZTGs8jorw4gzo3n1r3hSqyXPN0M8ILJ5E8Pzn9mNoaWoRpY2yEfFYWhgbUYNf0pG8pfmK6DrEqV2ut/wmHWbm2Y4UVpATepY46K+YGPePL48tNz93ndhmJ3H5s9zHnkL2Rzkl0/HsyE8GzxAuv6CSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=Ih1BllT5; arc=none smtp.client-ip=209.85.218.45
+	 In-Reply-To:To:Cc; b=qbl+CRHlysxbGoDavW2rAEBt5LvwdZSUqskTy7Jn4ndpz9c15h1SnJFykPMdJnU55Q49FaRPAUlSUWi9vJ7yrv4/YhdLT/5M1XNNi9RZ3BhHGCixuQ18WjyuMOc4zURkFzvhFpHnm3CiGVDVPAkS+LfGwihBuZv99Un8oje8sss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=av/s3W2l; arc=none smtp.client-ip=209.85.218.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b6d2f5c0e8eso44890066b.3
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 12:19:53 -0800 (PST)
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-b5a8184144dso29056866b.1
+        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 12:19:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1762373992; x=1762978792; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1762373993; x=1762978793; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=YSCMhlQItRnMpGfsZXReXH0rCegBE+8tz6Hg/XHfL5M=;
-        b=Ih1BllT5wLEbvT9JxJ14tIJo+8K0vq3+EGL6O5oHwgjgO9U6+U9C/djnOaTauiGVj3
-         5WxXT+iEuY/j3ggGY2UBmZG2kN8VJpDXSmQYQ009hF1NURI+dMnbuSdMT2tEY4243twV
-         3yfCNUwUakOhnVKcNEbYkwAzeaeLLAVzfoNKtzk5IRe/g7f7Ml0SK5FeQMOyM4glatsj
-         OD+ZhkYbRU3ilsneX6SvtHmWyfA2S8uvjuBfAX2VHp8OjslpXlMRZ+3zPLfpNwO6ijJX
-         h0AhB584wUDziZhLX9g+JI2O24LHRQeOq9Nnk4ZfR6MxV4tB/wK/16Uir5VOejGNaV4d
-         snEg==
+        bh=mXk2q4ALXb4iHS81FjGOoDSTFyJQhG/HclBi/7HNWrs=;
+        b=av/s3W2lai5KCsmj0nk5HAD6uvDH4kYVcxNrwxXFDhAlvAoH8tk3QB3XIURiKn/2k7
+         cljyQ5fn1FW2DVAvs0maKCoz9pCzIvTYN6Xbequ13AkQgF/gmH0UXL/KrnK/84hOPo0E
+         GCeR6f/XVIdUhwxjbkO4etVGRHW4td5ZJ+SanxRIG4BsMgIsLuZcpj0EsJCkh1l2wgDg
+         1TUL3elV32saRRZNzU+ujWhz3cNN1EvpMie5Ta43tP71NYrPiDN1tTBJIVCsVH6xsrAJ
+         TGyqYRQOoZT89nSKpR6wI5K/nmlY24lDrf+/2DdZwie7FmoD3v0875+UgW4O1RNBCFXA
+         aifw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762373992; x=1762978792;
+        d=1e100.net; s=20230601; t=1762373993; x=1762978793;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=YSCMhlQItRnMpGfsZXReXH0rCegBE+8tz6Hg/XHfL5M=;
-        b=uNl49MVuQzkPClUmg52vWFLTuO2BB1k6ilHzGLyVYgj2ZnQFaCdL1cmH0x3AUBNmlU
-         C54kQnhaEiK+RKG8jAN0/pZidWdUvqpeDcLWpmoVQUedlgNLX1QiNUnAHV2XJ9uOXsQU
-         pCKBFZh6h6NV6ha7x3hE55EG3LAsXJJ/9EM0N/Pv382xlB04/Eq9CRM7LIPk09gmjyDZ
-         UXZJX1wHkjdx6iIqetVzx2vuTDEo/A8GhDSwKbVhrzllxBGmF/kHJhD/+wQhriaZ43P7
-         zKDyJldvrihw0a0c3sIBtOpqM45aU9nWOWcq4VwtKAxz1O9F+D+nrZvcQ5t0NHa0weeF
-         /UIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWWt1MgBOFYmu+RyjdhoObWdNTuk+eNN6L3q4Mjzc3Dp8nYBRLullS+5RowzIn43Kfc2svNZ9U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxbItZ8frmS8DBiNUtIKJPBfByHp35oZBAn75c1T9FynTXCukGR
-	2VxhJblxOU2Ve8pMyYSx6vof8mw1naq41dI575ioa6Q8HFLfFk5mx/fYoKctNSzZ18Y=
-X-Gm-Gg: ASbGncu/wxHl2in7Yzt6Jb5lfs8jY/9y2htmJTusiIaVkkFZ/YT58ziHQhjQfa7IU+o
-	iaA/3oU30jrFEWfQZU5XesjnHWCbJXkWqAuGhvYHrIBJ9w1MlRd700AZKmdKHoh/UFi4SZfk86r
-	5zb4AtHcr5snigTuF1OqDHdfzp7BE/QMH2fC/aGV2n2QLOQU4LDWlBpQKxELrOBco3p1P55qTHd
-	Fx18xZgsex0Qmkv2AQGDDXgRFysfXwfuWJ5UOaSK+dLAFz99FQ3qffPZRiPCI1/MhpOc9n2qddX
-	V3RByWgQb75btLKAm1PXLJ5W8Pwrj09d7BsmgxNrOXrmA2lKZkGln3TjLRMQhExeEyGLF4pz56Z
-	NWQAmxAyiU5PaiBwC7rj4wl0ClOTuYMaljbk2K0cohNfWRuX/QDo6r9dsBmICCV63S+L6Yv1Myu
-	9ie40VgjYMsWvRWY3fY7/zMsVyDMWH7hOWQwELhHX4f0dpNA==
-X-Google-Smtp-Source: AGHT+IF07Dx5GtpeNwUcjPFYssQmnTuQ66L0fUjFMKdIx+JvJ9KtyYBgJgkLcezItt5mgTrctrPjjw==
-X-Received: by 2002:a17:907:72d1:b0:b45:b078:c52d with SMTP id a640c23a62f3a-b72654d737bmr426268666b.35.1762373991556;
-        Wed, 05 Nov 2025 12:19:51 -0800 (PST)
+        bh=mXk2q4ALXb4iHS81FjGOoDSTFyJQhG/HclBi/7HNWrs=;
+        b=BJtaJC1D/nUGspw1ny7ETll7SBCRHc0HTP/ODVQu2v3j8GYOnufTD7Uw5H5JyfwJ90
+         yDG6ETmi4ahAScR83JwlgB2psGquM23BJDS5gZ2kNPiM0P4MxgsxcsAzJt+Z7CDhmMiG
+         NKK6m2Bx7b7v5uAIT1RdjBx0m4MrRb4ugDxhRpP30f3t/5shIqR4b4qbG5OtgMya5IsM
+         Szpj1oaZoD1ZX5iyDNjFIr3U8z8eDv5b9gq9eNFkOcZj+Kl0eOvA6DR/F/nMG27vHd/r
+         8LRcBi7SdX5Pizh0YlgtPnFePKcCDnPXf1V+zvrfcyZf82NjEI1Az4DX+EP/v1rCreD3
+         o2Vg==
+X-Forwarded-Encrypted: i=1; AJvYcCXjeJI7q0PR2IiPM+isLQuJJWnvPNGeJ20lXOPonP7rZPuNNs8GDXEQx+JfYQb1EvKAl3Dv+/I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLXqJ19oHDkuNfeNMaJcOVFxdvcOAilfkvQKOD02Y2eDCu8XFF
+	jL0T2fRNqJaJPrXnwSi8akZXWcWhnIKMpzmaysxha1vjn0Dd20VPC320Nnne5TIUzRw=
+X-Gm-Gg: ASbGncvdrvIPLkx/n3AUKQuVQY6xoh+2IjnsRlEVUK9fvg9mwKH99kTyi/ujtUDa2An
+	0ZRc4lZ9dp/lbAnrZIhQQ6+ueL3d0XOFIxBKljeQ7xi+NGEI8X5insvdSw0Z7bvSRrGknTtyLRS
+	gP8HAM9WaivYFl25LVcPMPUiN1sxuDcbmAKws+wuTMuawXNvTMTKwOwIZezzKLEkcpmVZx6VCFO
+	7OFRol6NkQAqf/ZRhjyp1OyKnBAq3Evs5SKwh+amozymBze7GvSn8/V7ialNxl3gwFhlbUboYyQ
+	i8DA5fqqUqLyjBO2ruC9ghds7swPtDD1fF17jwbtI9+EknZYvOSWnS/TkZRbF++kAyhxkC2llZH
+	nFyQNh/JO85x2Ioan+R9RWC7XcQsUqaMFaRFYVSOo+bNZWj+Xy4txtUSY/uZJ8S/bKKe8L0T30P
+	zjfsOaqAyBp2kcQoydDkZgtPysVogfga4Dxq/eRrJ/SWPXWg==
+X-Google-Smtp-Source: AGHT+IF98gJttNQSkeuSC8loLs07d8+EuCjbsLOat4XOe7ckgVYMOtJqTDfgihKYv1Ij57z/OYHrNw==
+X-Received: by 2002:a17:906:dc8a:b0:b2d:830a:8c0a with SMTP id a640c23a62f3a-b72654ce7e4mr428738666b.35.1762373992959;
+        Wed, 05 Nov 2025 12:19:52 -0800 (PST)
 Received: from cloudflare.com (79.184.211.13.ipv4.supernova.orange.pl. [79.184.211.13])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7289645397sm45920066b.41.2025.11.05.12.19.50
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b728968252bsm47667566b.61.2025.11.05.12.19.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Nov 2025 12:19:51 -0800 (PST)
+        Wed, 05 Nov 2025 12:19:52 -0800 (PST)
 From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Wed, 05 Nov 2025 21:19:38 +0100
-Subject: [PATCH bpf-next v4 01/16] net: Helper to move packet data and
- metadata after skb_push/pull
+Date: Wed, 05 Nov 2025 21:19:39 +0100
+Subject: [PATCH bpf-next v4 02/16] net: Preserve metadata on
+ pskb_expand_head
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,7 +86,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251105-skb-meta-rx-path-v4-1-5ceb08a9b37b@cloudflare.com>
+Message-Id: <20251105-skb-meta-rx-path-v4-2-5ceb08a9b37b@cloudflare.com>
 References: <20251105-skb-meta-rx-path-v4-0-5ceb08a9b37b@cloudflare.com>
 In-Reply-To: <20251105-skb-meta-rx-path-v4-0-5ceb08a9b37b@cloudflare.com>
 To: bpf@vger.kernel.org
@@ -105,107 +105,41 @@ Cc: "David S. Miller" <davem@davemloft.net>,
  kernel-team@cloudflare.com
 X-Mailer: b4 0.15-dev-07fe9
 
-Lay groundwork for fixing BPF helpers available to TC(X) programs.
+pskb_expand_head() copies headroom, including skb metadata, into the newly
+allocated head, but then clears the metadata. As a result, metadata is lost
+when BPF helpers trigger an skb head reallocation.
 
-When skb_push() or skb_pull() is called in a TC(X) ingress BPF program, the
-skb metadata must be kept in front of the MAC header. Otherwise, BPF
-programs using the __sk_buff->data_meta pseudo-pointer lose access to it.
-
-Introduce a helper that moves both metadata and a specified number of
-packet data bytes together, suitable as a drop-in replacement for
-memmove().
+Let the skb metadata remain in the newly created copy of head.
 
 Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
 ---
- include/linux/skbuff.h | 75 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 75 insertions(+)
+ net/core/skbuff.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index a7cc3d1f4fd1..ff90281ddf90 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -4564,6 +4564,81 @@ static inline void skb_metadata_clear(struct sk_buff *skb)
- 	skb_metadata_set(skb, 0);
- }
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 6be01454f262..b4fa9aa2df22 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -2218,6 +2218,10 @@ EXPORT_SYMBOL(__pskb_copy_fclone);
+  *
+  *	All the pointers pointing into skb header may change and must be
+  *	reloaded after call to this function.
++ *
++ *	Note: If you skb_push() the start of the buffer after reallocating the
++ *	header, call skb_postpush_data_move() first to move the metadata out of
++ *	the way before writing to &sk_buff->data.
+  */
  
-+/**
-+ * skb_data_move - Move packet data and metadata after skb_push() or skb_pull().
-+ * @skb: packet to operate on
-+ * @len: number of bytes pushed or pulled from &sk_buff->data
-+ * @n: number of bytes to memmove() from pre-push/pull &sk_buff->data
-+ *
-+ * Moves @n bytes of packet data, can be zero, and all bytes of skb metadata.
-+ *
-+ * Assumes metadata is located immediately before &sk_buff->data prior to the
-+ * push/pull, and that sufficient headroom exists to hold it after an
-+ * skb_push(). Otherwise, metadata is cleared and a one-time warning is issued.
-+ *
-+ * Prefer skb_postpull_data_move() or skb_postpush_data_move() to calling this
-+ * helper directly.
-+ */
-+static inline void skb_data_move(struct sk_buff *skb, const int len,
-+				 const unsigned int n)
-+{
-+	const u8 meta_len = skb_metadata_len(skb);
-+	u8 *meta, *meta_end;
-+
-+	if (!len || (!n && !meta_len))
-+		return;
-+
-+	if (!meta_len)
-+		goto no_metadata;
-+
-+	meta_end = skb_metadata_end(skb);
-+	meta = meta_end - meta_len;
-+
-+	if (WARN_ON_ONCE(meta_end + len != skb->data ||
-+			 meta_len > skb_headroom(skb))) {
-+		skb_metadata_clear(skb);
-+		goto no_metadata;
-+	}
-+
-+	memmove(meta + len, meta, meta_len + n);
-+	return;
-+
-+no_metadata:
-+	memmove(skb->data, skb->data - len, n);
-+}
-+
-+/**
-+ * skb_postpull_data_move - Move packet data and metadata after skb_pull().
-+ * @skb: packet to operate on
-+ * @len: number of bytes pulled from &sk_buff->data
-+ * @n: number of bytes to memmove() from pre-pull &sk_buff->data
-+ *
-+ * See skb_data_move() for details.
-+ */
-+static inline void skb_postpull_data_move(struct sk_buff *skb,
-+					  const unsigned int len,
-+					  const unsigned int n)
-+{
-+	DEBUG_NET_WARN_ON_ONCE(len > INT_MAX);
-+	skb_data_move(skb, len, n);
-+}
-+
-+/**
-+ * skb_postpush_data_move - Move packet data and metadata after skb_push().
-+ * @skb: packet to operate on
-+ * @len: number of bytes pushed onto &sk_buff->data
-+ * @n: number of bytes to memmove() from pre-push &sk_buff->data
-+ *
-+ * See skb_data_move() for details.
-+ */
-+static inline void skb_postpush_data_move(struct sk_buff *skb,
-+					  const unsigned int len,
-+					  const unsigned int n)
-+{
-+	DEBUG_NET_WARN_ON_ONCE(len > INT_MAX);
-+	skb_data_move(skb, -len, n);
-+}
-+
- struct sk_buff *skb_clone_sk(struct sk_buff *skb);
+ int pskb_expand_head(struct sk_buff *skb, int nhead, int ntail,
+@@ -2289,8 +2293,6 @@ int pskb_expand_head(struct sk_buff *skb, int nhead, int ntail,
+ 	skb->nohdr    = 0;
+ 	atomic_set(&skb_shinfo(skb)->dataref, 1);
  
- #ifdef CONFIG_NETWORK_PHY_TIMESTAMPING
+-	skb_metadata_clear(skb);
+-
+ 	/* It is not generally safe to change skb->truesize.
+ 	 * For the moment, we really care of rx path, or
+ 	 * when skb is orphaned (not attached to a socket).
 
 -- 
 2.43.0
