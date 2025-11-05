@@ -1,110 +1,93 @@
-Return-Path: <netdev+bounces-235951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EF8AC375B3
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 19:39:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E77D5C375E9
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 19:46:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25032188E5A7
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 18:40:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DE831A21ACD
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 18:46:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 263D82857F1;
-	Wed,  5 Nov 2025 18:39:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D69D26A1B5;
+	Wed,  5 Nov 2025 18:46:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AzaObCME"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h+P8klHQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F09352836B5;
-	Wed,  5 Nov 2025 18:39:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED82D268688
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 18:46:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762367993; cv=none; b=u2FvasBcr6ao1W5kpwxCaa2hszfDnTTkq8R0V1urVAMUKZ0p6wOY9zCpEfoixMk6DAjd2JbyYLMlyzYXSPOMelCtfI4YNvI9vzBob0oXxMRXVH+qZ35qgAiRzWE4f3+tfIY/V3FP8QbEnSDdxbeFkeNKg+3aXSlSsMT3+Wvh7pc=
+	t=1762368373; cv=none; b=TpALq2pErxNsG/DD3FkRZGwOV1SsfXMXqWv4Pq98UThT/x6sKY6VOY6/ImxdmXhHq1akD7oNy5BeNwE+2bZ3AvlQd7dDhi+lHvuAcoidq/vRYpZ+FsxiU2Pgffo6+16s7aBk78gmWk9PX8iS7eT6Fv0A66r4Udgq6qfgZHHPcfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762367993; c=relaxed/simple;
-	bh=7XDa5X5lmbUNgOnKU7PfOdgy4Ch0ycidqr0WWTqABIM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mSJbFXxdeEnDFa9yAqmm1YcasgtkJtm56oiTo8s4WBwG6WW7APOBsANWGJFmWg+4wn75W1jAuUqX8IpNSG3r9AbBNrHrt0G7xOshTeMMiVx9/1mF2yg3oZM1xJ3xVr4nnQs7mNPq4V04K9SZY79aG9obyKZv1W59we0m+xLdH+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AzaObCME; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FFFAC116B1;
-	Wed,  5 Nov 2025 18:39:48 +0000 (UTC)
+	s=arc-20240116; t=1762368373; c=relaxed/simple;
+	bh=/7ve3+tQimCzMR5/qtDRaI5WhPCdOJsQTnRzqLXdSwA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=C120BRj/NwegeOGGLziipqUserJrH0ypKff/jzRXkdM7/jBkWDv+5NRMIiJKVQLPtEb9bWNP0YfTkDB/8kxZ0XLPlIheo4cgBwT0F7SjQF79+0ngkTXo8d28r/E2DLoZV8tRJA79gJOIcyM2vDk86ckbawm8OxeAnAl/O45C0Uo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h+P8klHQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C404DC116B1;
+	Wed,  5 Nov 2025 18:46:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762367991;
-	bh=7XDa5X5lmbUNgOnKU7PfOdgy4Ch0ycidqr0WWTqABIM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=AzaObCMEOkPNWJblHA+XSNBv8eioXE7D8HzTI2sm196GLWUIiEcS91trLrbe8+TCw
-	 mmczy+qAGnYGNXI+E91lp6PYT05/h9ksu1TUPQ2WnXPXkukQBbar6P9/4pk3Hx8jcU
-	 sppIEtathxPvwGx0gbog6vaQYLXUvB/YTjXAR1ErNg8N1a66qdefkRZjUL268+4Wor
-	 i7xdIfCDfegfOAq4nbsR2zXmjnSmjp7uAJ7+9GKfMBfDv8oJiNkVySX/y7j6Q1DJ7W
-	 O56MmI771hr6UYprL0WYfRK++tM3cuVPl+P9FVqCgZkjp7UQLFtTaeHJma12GagMAH
-	 fF1XhXlwBjk3Q==
-Message-ID: <49edb9fa-56be-4853-aced-429f5b40b4be@kernel.org>
-Date: Wed, 5 Nov 2025 19:39:46 +0100
+	s=k20201202; t=1762368372;
+	bh=/7ve3+tQimCzMR5/qtDRaI5WhPCdOJsQTnRzqLXdSwA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=h+P8klHQZq/i1nHmkWblnzc1Yb4JZoInNn+x9o6PpIPgOE0rR2RYzuvy29dJxWRV5
+	 nI8yHkl5fgSJHmEMcr+vHfBwITeyD6SFdBcVCWlnk2II0X1MXyqO7mrnry6VDQPmM5
+	 s3a5z0KxOxwpUoZQQKdXIwjRtL/x3tUsi/zkwABEEDKzUoHcTED/FAuGp4z/Q89pR7
+	 tJdjBN2VGmzHLbJ0s9GixUa2kRe6EQor5r3ekl6GJYO2gOmmL9zbVlCJHrX/sBcnSw
+	 jDZGmSGAYGvfz2Ydl5Z2+0WXcYRCpHFsgRPC5YJ+MnHij6/U3p6mR4XIEV73DYqugy
+	 BIFbVVmPiNr4w==
+Date: Wed, 5 Nov 2025 10:46:10 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Manish Chopra <manishc@marvell.com>, Marco Crivellari
+ <marco.crivellari@suse.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Sunil Goutham <sgoutham@marvell.com>, Richard
+ Cochran <richardcochran@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, Simon Horman <horms@kernel.org>,
+ Jacob Keller <jacob.e.keller@intel.com>, Kory Maincent
+ <kory.maincent@bootlin.com>, linux-arm-kernel@lists.infradead.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/7] bnx2x: convert to use ndo_hwtstamp
+ callbacks
+Message-ID: <20251105104610.726fb780@kernel.org>
+In-Reply-To: <f28ee997-ed08-4123-83ab-3496e88ed815@linux.dev>
+References: <20251103150952.3538205-1-vadim.fedorenko@linux.dev>
+	<20251103150952.3538205-2-vadim.fedorenko@linux.dev>
+	<20251104173737.3f655692@kernel.org>
+	<f28ee997-ed08-4123-83ab-3496e88ed815@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 bpf 1/2] xdp: introduce xdp_convert_skb_to_buff()
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
- netdev@vger.kernel.org, magnus.karlsson@intel.com,
- aleksander.lobakin@intel.com, ilias.apalodimas@linaro.org, toke@redhat.com,
- lorenzo@kernel.org, syzbot+ff145014d6b0ce64a173@syzkaller.appspotmail.com,
- Ihor Solodrai <ihor.solodrai@linux.dev>, Octavian Purdila <tavip@google.com>
-References: <20251029221315.2694841-1-maciej.fijalkowski@intel.com>
- <20251029221315.2694841-2-maciej.fijalkowski@intel.com>
- <20251029165020.26b5dd90@kernel.org> <aQNWlB5UL+rK8ZE5@boxer>
- <20251030082519.5db297f3@kernel.org> <aQPJCvBgR3d7lY+g@boxer>
- <20251030190511.62575480@kernel.org> <aQSfgQ9+Jc8dkdhg@boxer>
- <20251031114952.37d1cb1f@kernel.org> <aQidBn22H1UVxST5@boxer>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <aQidBn22H1UVxST5@boxer>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-
-
-On 03/11/2025 13.16, Maciej Fijalkowski wrote:
-> On Fri, Oct 31, 2025 at 11:49:52AM -0700, Jakub Kicinski wrote:
->> On Fri, 31 Oct 2025 12:37:37 +0100 Maciej Fijalkowski wrote:
->>>>> would be fine for you? Plus AI reviewer has kicked me in the nuts on veth
->>>>> patch so have to send v6 anyways.
->>>>
->>>> The veth side unfortunately needs more work than Mr Robot points out.
->>>> For some reason veth tries to turn skb into an xdp_frame..
->>>
->>> That is beyond the scope of the fix that I started doing as you're
->>> undermining overall XDP support in veth, IMHO.
->>>
->>> I can follow up on this on some undefined future but right now I will
->>> have to switch to some other work.
->>>
->>> If you disagree and insist on addressing skb->xdp_frame in veth within
->>> this patchset then I'm sorry but I will have to postpone my activities
->>> here.
->>
->> Yeah, I understand. A lot of the skb<>XDP integration is a steaming
->> pile IMO, as mentioned elsewhere. I'd like to keep the core clean
->> tho, so if there's some corner cases in veth after your changes
->> I'll live. But I'm worried that the bugs in veth will make you
->> want to preserve the conditional in xdp_convert_skb_to_buff() :(
+On Wed, 5 Nov 2025 13:33:08 +0000 Vadim Fedorenko wrote:
+> >>   	bp->hwtstamp_ioctl_called = true;
+> >> -	bp->tx_type = config.tx_type;
+> >> -	bp->rx_filter = config.rx_filter;
+> >> +	bp->tx_type = config->tx_type;
+> >> +	bp->rx_filter = config->rx_filter;
+> >>   
+> >>   	rc = bnx2x_configure_ptp_filters(bp);  
+> > 
+> > bnx2x_configure_ptp_filters() may return -ERANGE if settings were not applied.
+> > This may already be semi-broken but with the get in place we will make
+> > it even worse.  
 > 
-> Probably the conditional would cover these corner cases, but I am not
-> insisting on it. skb_pp_cow_data() is called under certain circumstances
-> in veth but I have never seen a case on my side where it was skipped,
-> mostly because of headroom size being too small.
+> Ah, you mean in case of -ERANGE we will still have new filter
+> configuration set in bp object? It's easy to fix, but it will be
+> some kind of change of behavior. If it's acceptable, I'm happy to send 
+> v3 of the patchset.>
 
-This reminds me that we should change/increase veth
-net_device.needed_headroom when there is an XDP prog attached.
-As you said, today all SKB will basically get mem reallocated.
-
---Jesper
+True, you can probably make the -ERANGE handling a separate patch 
+for ultimate clarity.
 
