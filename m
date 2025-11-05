@@ -1,118 +1,108 @@
-Return-Path: <netdev+bounces-235918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7567C3710E
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 18:26:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A842C3725E
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 18:42:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D7D71895D06
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 17:27:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B16A9563095
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 17:29:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D37B5331A4B;
-	Wed,  5 Nov 2025 17:26:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B35633BBD7;
+	Wed,  5 Nov 2025 17:28:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OParZvII"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FDEqUtVL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9439C3126D6;
-	Wed,  5 Nov 2025 17:26:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F38F833BBA8;
+	Wed,  5 Nov 2025 17:28:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762363600; cv=none; b=hZfyIETKURFp7Vs85oNsKv5P2V/Asuqx20MpPZ4MgN9pkKzN7Z27tcTyS5VPTbtgy/MngxzK9PKZ8QKqtjzme0tfj6PMBK51/PLyijUZUAVn7Zg6XuzMsul9vTLHFoPjLaXKvWFZrxXWHUMxRfxhQw+KNMEmZCJ9GmIbwQy/fZs=
+	t=1762363692; cv=none; b=ckf6ox51UWMWQ6vq0cShsBIkshH2ZP7aii3aHm4xZpfcbbisyMRVJyqa5zIOUCD6wimjEzjZB7f9wso2CN28Z0HoL+99VKWa4lId5C8N8Xc4qgJEkb8Jk+9qO7neabj6hMwz1Bmhui1nQgBtfPNi+YKg775m5n7fc7bareHm7jM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762363600; c=relaxed/simple;
-	bh=YFkDJLxlVgB8fCGfrzLzPiyZl67TcHqa4QAD1eCk1n4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PDqo2rI62i/T2Sntswh4zcQ1LUIgoQvTBMUCKf7ZpLZjYi0MX3aHvVT8DCW98fBVxv1TCY+jsCJ079cOZcgyfQMRsQPBOns+zN4n3YIbQxkS+5Qn5x4wcMaBadze95237GtOGgzDkSQ/yCcO/ujljKevOSmt7oTc9GOb5lEin10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OParZvII; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92223C4CEF8;
-	Wed,  5 Nov 2025 17:26:39 +0000 (UTC)
+	s=arc-20240116; t=1762363692; c=relaxed/simple;
+	bh=ERKAY8Ws1C+XCC1klXumtr0c4Gaw9L4lTI2G4NjbIgE=;
+	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=WQGjvEXHpgeGWzqIOxiNMAQsc4y0IaGcz0PlL+eeJubOe0Q2myvUB3lv1uC7MPwFoSVhq+Nxq1BZ+Q0X9UzeTFDJSRHpXDB4nsXEW0tUklj0FAk92KSokB4Gubvz+UTa62bz2B64ESAYCoxh0uyQpVGiodq33s66kSjDMAvJWe4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FDEqUtVL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D3E6C4CEF5;
+	Wed,  5 Nov 2025 17:28:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762363600;
-	bh=YFkDJLxlVgB8fCGfrzLzPiyZl67TcHqa4QAD1eCk1n4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OParZvIIPyLR/7+d2Nc6dNNHFfgvciQYcDXNfvWRUfLM3ALdZr2Qma8M0FObiSEDX
-	 4yAZaB4HMBbFQrVX9l1Nc5Mz9Akx6GYVPeFSxJauPuNjV+cvXZHiYCJny752RKPXaZ
-	 nb6HFbh2rTIqP1/GSHtyqu5D4fAirasFidCHLVTYcLZQRPj1LLeRYNMtTIBUkecGZD
-	 NUQfI4i1crcBXLrqQ3YrkVWcmSf4kYDrq048l6zq2V/zPjyDvLarmgFinhmBNoPsqB
-	 5DP9Yf37WOYWdxdZegji5DJs83/ZGNy27MtOeueRr7A8jum6leEhur43LN6wcOt6ld
-	 1Fax28SwoFeww==
-Date: Wed, 5 Nov 2025 18:26:37 +0100
-From: Frederic Weisbecker <frederic@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Danilo Krummrich <dakr@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gabriele Monaco <gmonaco@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
-	Lai Jiangshan <jiangshanlai@gmail.com>,
-	Marco Crivellari <marco.crivellari@suse.com>,
-	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
-	"Rafael J . Wysocki" <rafael@kernel.org>,
-	Roman Gushchin <roman.gushchin@linux.dev>,
-	Shakeel Butt <shakeel.butt@linux.dev>, Tejun Heo <tj@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
-	Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
-	linux-mm@kvack.org, linux-pci@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 30/33] kthread: Add API to update preferred affinity on
- kthread runtime
-Message-ID: <aQuIzQo3tDbwoytv@localhost.localdomain>
-References: <20251013203146.10162-1-frederic@kernel.org>
- <20251013203146.10162-31-frederic@kernel.org>
- <aO5Dn2AwQWn0SQKQ@horms.kernel.org>
+	s=k20201202; t=1762363691;
+	bh=ERKAY8Ws1C+XCC1klXumtr0c4Gaw9L4lTI2G4NjbIgE=;
+	h=Subject:From:To:Cc:Date:From;
+	b=FDEqUtVLgOdOiuHgM+SD/ha3/X2vwQhaWMGHaZ7i7AaCGPjKmM7/ydE42o8gBSKr1
+	 DvAXMQDkDAlf1iHhLMQR9guSpM7PDp3BH07YEAVv8oKP8CflS/qPs4xDzO98KD9Fzv
+	 QG6IWN7kK6OV28+j45w12tCz91MOCBIXXiE1dUZXMLfPBXp/sqPnfJHJr1rnL+l9RI
+	 TAjc/WwXoQ+kwG6ZdaDZUZIRSV92y+j3QvRFW5tRoCIPZIkyWgK2B0TzKjLBd/N9r9
+	 7IzdYWlL7SvJkuQlrYVLJCArO/LpSUytfOUsxGHI66DJFC1JPYm/6AKo6lVAiQA/co
+	 PrKEsNJ8JriBg==
+Subject: [PATCH net V3 0/2] veth: Fix TXQ stall race condition and add
+ recovery
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+To: netdev@vger.kernel.org,
+ =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
+ Eric Dumazet <eric.dumazet@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, ihor.solodrai@linux.dev,
+ "Michael S. Tsirkin" <mst@redhat.com>, makita.toshiaki@lab.ntt.co.jp,
+ toshiaki.makita1@gmail.com, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kernel-team@cloudflare.com
+Date: Wed, 05 Nov 2025 18:28:06 +0100
+Message-ID: <176236363962.30034.10275956147958212569.stgit@firesoul>
+User-Agent: StGit/1.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aO5Dn2AwQWn0SQKQ@horms.kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 
-Le Tue, Oct 14, 2025 at 01:35:43PM +0100, Simon Horman a écrit :
-> On Mon, Oct 13, 2025 at 10:31:43PM +0200, Frederic Weisbecker wrote:
-> 
-> ...
-> 
-> > @@ -900,6 +899,46 @@ int kthread_affine_preferred(struct task_struct *p, const struct cpumask *mask)
-> >  }
-> >  EXPORT_SYMBOL_GPL(kthread_affine_preferred);
-> >  
-> > +/**
-> > + * kthread_affine_preferred_update - update a kthread's preferred affinity
-> > + * @p: thread created by kthread_create().
-> > + * @cpumask: new mask of CPUs (might not be online, must be possible) for @k
-> > + *           to run on.
-> 
-> nit: @mask: ...
+This patchset addresses a race condition introduced in commit dc82a33297fc
+("veth: apply qdisc backpressure on full ptr_ring to reduce TX drops"). In
+production, this has been observed to cause a permanently stalled transmit
+queue (TXQ) on ARM64 (Ampere Altra Max) systems, leading to a "lost wakeup"
+scenario where the TXQ remains in the QUEUE_STATE_DRV_XOFF state and traffic
+halts.
 
-Thanks! I'm dropping the current patch anyway but...
+The root cause, which is fixed in patch 2, is a racy use of the
+__ptr_ring_empty() API from the producer side (veth_xmit). The producer
+stops the queue and then checks the ptr_ring consumer's head, but this is
+not guaranteed to be correct, when observed from the producer side,
+when the NAPI consumer on another CPU has just finished consuming.
 
-> 
-> Likewise for the documentation of kthread_affine_preferred()
-> in a subsequent patch in this series.
+This series fixes the bug and make the driver more resilient to recover.
+The patches are ordered to first add recovery mechanisms, then fix the
+underlying race.
 
-...fixing it to that patch.
+V3:
+ - Don't keep NAPI running when detecting race, because end of veth_poll will
+   see TXQ is stopped anyway and wake queue, making it responsibility of the
+   producer veth_xmit to do a "flush" that restarts NAPI.
 
--- 
-Frederic Weisbecker
-SUSE Labs
+V2: https://lore.kernel.org/all/176159549627.5396.15971398227283515867.stgit@firesoul/
+ - Drop patch that changed up/down NDOs
+ - For race fix add a smb_rmb and improve commit message reasoning for race cases
+
+V1: https://lore.kernel.org/all/176123150256.2281302.7000617032469740443.stgit@firesoul/
+
+---
+
+Jesper Dangaard Brouer (2):
+      veth: enable dev_watchdog for detecting stalled TXQs
+      veth: more robust handing of race to avoid txq getting stuck
+
+
+ drivers/net/veth.c | 50 +++++++++++++++++++++++++++++-----------------
+ 1 file changed, 32 insertions(+), 18 deletions(-)
+
+--
+
 
