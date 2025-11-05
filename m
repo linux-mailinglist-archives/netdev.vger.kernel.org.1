@@ -1,94 +1,123 @@
-Return-Path: <netdev+bounces-235995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7C98C37C25
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 21:38:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECF12C37C46
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 21:42:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A56234E15EF
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 20:37:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D8AA218C683F
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 20:42:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C76C33002CA;
-	Wed,  5 Nov 2025 20:37:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9EF1347BA9;
+	Wed,  5 Nov 2025 20:42:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="6QEOpxMo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FZCqg35Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43B442FDC42;
-	Wed,  5 Nov 2025 20:37:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E90C334C0C;
+	Wed,  5 Nov 2025 20:42:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762375032; cv=none; b=iwptXQEisDfM1DpFQqosoQTQ7GaQdlE5GWvdUYdjnfH969JxsZrFEXYPwMVse8rZ688l5T/A7Uc+2HWEP8lmXYnwDxkYhxaEzsTCUawc88P6Eh+CWqlPqFKa5wq2MCXoBt9N06SrzXG3nHRZkNd1qGqLTuBR2/sSu8T7d5HYyYA=
+	t=1762375327; cv=none; b=KDs6VXKwB3hG8/EaPPMMP5Pk8jkZ0TvehAu0j2xOI95hx+cREzHPuAnT8k795a1XHdna5Dyq5SEOkdDdXRqzXbLpZVSIJwMUGrVbcxaHJedKkHmeg9XcJsgS+6nG+B1JXbT9sLrirAlngSscuHOylXdNNhvCccB7+y0CXHWBiIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762375032; c=relaxed/simple;
-	bh=muwKqzLMJYkC5bScsgl/ewFQY2fXk4L0ZUkJmMtPU4o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pDdIxl7Px3ind5sA9XJ7mveUawUbywaPrln+2BDjSY5XbpP/JEY2MerjF4yYupqgno74umJNQZrWUHUPw+bd5NYTjNF5E/A69emERMfM91NU3df94eLMgy2z1AtfRm/Z830qdipDotoDeCCryakZjGxh8nMP5oD2nbTuc5tKFfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=6QEOpxMo; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=W6ehPsM5gg9RaSLqrceyWQW4IW17EYg8KIyTamvdBxM=; b=6QEOpxMooT6+RON7QspUZKx8d2
-	LfN01Rg14ZGSuVA3Txoqnc+Zy/mqok3PNYKobIIdnig/85EqZxUFarigqeoeGCEQAIXqQ5DgEiI1/
-	28w0sjPK38jEFK4EhhTERoZY5sJCGRB++eaxD8liqBw45cyf8or8AfqvfUKBxAe+SdP4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vGkFe-00D2Sl-UU; Wed, 05 Nov 2025 21:37:06 +0100
-Date: Wed, 5 Nov 2025 21:37:06 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Dharanitharan R <dharanitharan725@gmail.com>
-Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org,
-	gregkh@linuxfoundation.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	syzbot+b4d5d8faea6996fd55e3@syzkaller.appspotmail.com
-Subject: Re: [PATCH v3] usb: rtl8150: Initialize buffers to fix KMSAN
- uninit-value in rtl8150_open
-Message-ID: <11301ae7-ac18-4a2f-9728-28cf1ba1afdd@lunn.ch>
-References: <20251105195626.4285-1-dharanitharan725@gmail.com>
+	s=arc-20240116; t=1762375327; c=relaxed/simple;
+	bh=Im3+M6VEUShgjHFS90zF37R75xXfZRG+1vjn785jgQ0=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=WiEZ+MX60ZH6R88+N0oEnG+GZaBL2xdb17iBeNC7LvRpoQJzVL/ecam+zxqpLZWKCaQ7DLtM0RsJHjQiQWMhqlJXLyZYHVexfMQ6BJfL+dS63TmrpYcGFo6mX0nJSW1+042uT+72Fxm9ldDtQ0q0O/ONyMpqX9wHPJ8Y26RHUqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FZCqg35Y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72490C4CEF5;
+	Wed,  5 Nov 2025 20:42:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762375323;
+	bh=Im3+M6VEUShgjHFS90zF37R75xXfZRG+1vjn785jgQ0=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
+	b=FZCqg35Y7S1+biHYJX9eFhRDxC6ccF/x9qz1yaEJL35BeVph6kuF0FFDJdzmcmKSJ
+	 efUkT9cWBRhrXA6//sTPzH7S3e44ZhZ7TMAEvGSTS6Xfl2VviiUqjcl9Yqk3BXultF
+	 FPpaIF8aOEVowV50evpK06yjK+bx/09o3ruV6n6p30z6nTXlr66InWStfK4NIDUq2T
+	 WINnQN2kDMDr0/JlAom8LXm805gO7V5idTZEnQFJFo3li9P6bZWXUiz8OIYVXWnmNZ
+	 MAxSEdAs0rqCxIiE8cs2DJg4XKik77xdOeAfAnezCjVmiwaqJnCq/BcK0vjoUmHSX4
+	 B4p5Hg0uVspZw==
+Content-Type: multipart/mixed; boundary="===============8991984138108816200=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251105195626.4285-1-dharanitharan725@gmail.com>
+Message-Id: <9b3ca8c01aac5510f1ff8738b3856e5e2bbe43075333c27642eb69a6847a50ef@mail.kernel.org>
+In-Reply-To: <20251105-skb-meta-rx-path-v4-7-5ceb08a9b37b@cloudflare.com>
+References: <20251105-skb-meta-rx-path-v4-7-5ceb08a9b37b@cloudflare.com>
+Subject: Re: [PATCH bpf-next v4 07/16] bpf: Make bpf_skb_adjust_room metadata-safe
+From: bot+bpf-ci@kernel.org
+To: jakub@cloudflare.com,bpf@vger.kernel.org
+Cc: davem@davemloft.net,edumazet@google.com,kuba@kernel.org,pabeni@redhat.com,horms@kernel.org,martin.lau@linux.dev,daniel@iogearbox.net,john.fastabend@gmail.com,sdf@fomichev.me,ast@kernel.org,andrii@kernel.org,eddyz87@gmail.com,song@kernel.org,yonghong.song@linux.dev,kpsingh@kernel.org,haoluo@google.com,jolsa@kernel.org,arthur@arthurfabre.com,hawk@kernel.org,netdev@vger.kernel.org,kernel-team@cloudflare.com,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Wed,  5 Nov 2025 20:42:03 +0000 (UTC)
 
-> -	usb_fill_bulk_urb(dev->rx_urb, dev->udev, usb_rcvbulkpipe(dev->udev, 1),
-> -		      dev->rx_skb->data, RTL8150_MTU, read_bulk_callback, dev);
-> -	if ((res = usb_submit_urb(dev->rx_urb, GFP_KERNEL))) {
-> -		if (res == -ENODEV)
-> -			netif_device_detach(dev->netdev);
-> +	usb_fill_bulk_urb(dev->rx_urb, dev->udev,
-> +			  usb_rcvbulkpipe(dev->udev, 1),
-> +			  dev->rx_skb->data, RTL8150_MTU,
-> +			  read_bulk_callback, dev);
+--===============8991984138108816200==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-If im reading this correctly, the usb_fill_bulk_urb() is identical,
-you have just changed the wrapping. So this again has nothing to do
-with the issue you are trying to fix. Changes like this make it harder
-to see the real change which fixes the problem. And at the moment, i
-don't see the actual fix.
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index 96714eab9..370ddc61b 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -3260,11 +3260,11 @@ static void bpf_skb_change_protocol(struct sk_buff *skb, u16 proto)
+>
+>  static int bpf_skb_generic_push(struct sk_buff *skb, u32 off, u32 len)
+>  {
+> -	/* Caller already did skb_cow() with len as headroom,
+> +	/* Caller already did skb_cow() with meta_len+len as headroom,
+>  	 * so no need to do it here.
+>  	 */
+>  	skb_push(skb, len);
+> -	memmove(skb->data, skb->data + len, off);
+> +	skb_postpush_data_move(skb, len, off);
+>  	memset(skb->data + off, 0, len);
 
-If you want to make changes like this, please do so in a patch of its
-own which only changes the wrapping, nothing else. That is then easy
-to review.
+The comment update says callers provide meta_len+len as headroom, but
+is this true for all callers?
 
-Lots of small changes, which hopefully are obviously correct, with
-good commit messages please.
+bpf_skb_proto_4_to_6() calls skb_cow(skb, len_diff) then calls
+bpf_skb_net_hdr_push()->bpf_skb_generic_push(). Similarly,
+bpf_lwt_seg6_adjust_srh() calls skb_cow_head(skb, len) then calls
+bpf_skb_net_hdr_push()->bpf_skb_generic_push().
 
-    Andrew
+Neither accounts for meta_len in their headroom calculation. When
+skb_postpush_data_move()->skb_data_move() runs, if meta_len >
+skb_headroom(skb) after the push, the metadata gets silently cleared
+(see the WARN_ON_ONCE check in skb_data_move() at skbuff.h).
+
+Can the metadata be lost when these functions are called on skbs with
+metadata?
+
+> @@ -3496,6 +3496,7 @@ static int bpf_skb_net_grow(struct sk_buff *skb, u32 off, u32 len_diff,
+>  	u8 inner_mac_len = flags >> BPF_ADJ_ROOM_ENCAP_L2_SHIFT;
+>  	bool encap = flags & BPF_F_ADJ_ROOM_ENCAP_L3_MASK;
+>  	u16 mac_len = 0, inner_net = 0, inner_trans = 0;
+> +	const u8 meta_len = skb_metadata_len(skb);
+>  	unsigned int gso_type = SKB_GSO_DODGY;
+>  	int ret;
+>
+> @@ -3506,7 +3507,7 @@ static int bpf_skb_net_grow(struct sk_buff *skb, u32 off, u32 len_diff,
+>  			return -ENOTSUPP;
+>  	}
+>
+> -	ret = skb_cow_head(skb, len_diff);
+> +	ret = skb_cow_head(skb, meta_len + len_diff);
+>  	if (unlikely(ret < 0))
+>  		return ret;
+
 
 ---
-pw-bot: cr
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
 
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/19115341225
+
+--===============8991984138108816200==--
 
