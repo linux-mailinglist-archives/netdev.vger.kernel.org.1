@@ -1,112 +1,119 @@
-Return-Path: <netdev+bounces-236058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9ACA7C381EC
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 22:55:51 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2B80C381F9
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 22:56:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 242CD4E6997
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 21:55:46 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A30064E51FB
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 21:56:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E90B52E1EE5;
-	Wed,  5 Nov 2025 21:55:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31B0B2E7647;
+	Wed,  5 Nov 2025 21:56:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q8F5RNma"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 516302DFA40
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 21:55:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06E622E7179;
+	Wed,  5 Nov 2025 21:56:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762379738; cv=none; b=X5SdFqtaSFFZsUl+m4iyKqbU6n2GUDKI1m78KDpy+19XB0QCgO9OBmPqaLbTzb+KDXEc/dtKubRXUQYE0+dhmT92tHo9LKnV7O7QwSOxrTF3PNUr7ZHMOdk+9cKGPAG3Nb37p4OHddBn95HdbpbQjdSzt0tfSvn/rrc2yDWDd84=
+	t=1762379797; cv=none; b=hpkDN++CZWOPf/dincBcmr4yvyfiycJZvfU5TlppO4hpNfbJoTlKmMG4DFrxeOQsycnne+MSe3cgr5bUWjx+/9CFe8wPzHD9B6kV71rjTmne8y2JqA01R4yo9nKriOMgREk9JlnzxuXjDLW9qpZ7uHEZ2808MFcSnWqWWq03sYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762379738; c=relaxed/simple;
-	bh=o+upkX391+0VrLVDVlvNb0q7K6Y72v81B9HOBXgZB7M=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=PVAhavlTqusFInvQo3dEY3vEq4qwp7tVguQcUBk/4wiw9zvIwL5707IX2RWH+bYVprMTdpQqYP+d1sBT63UkAebhy300lOEin+kNZAmQJ7zlxmgq2/Sy9KS8AeI8L3Cs13iKrjUTGSdPjUiJ0QmoEbMko3lzTBqyyyBUbpHtKdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-43335646758so3715595ab.3
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 13:55:37 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762379736; x=1762984536;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CwBf7ucm3+56iKVW7EZm+Ks9LT5jYkGcEHRVcLbxAI8=;
-        b=s9PFzhyrZTmuCWQVcdtBezoQEevPGBI3KMKKgDKJyAkdpCur6/rk1n9W0Y3YZAIMnb
-         MPOtpO3Uq+d8daOlDbIWemnp2JjEHbEghgH8rNMLZqz+P6G7mEcZOrZKFjf7DfYFRNj/
-         XhPU6RaMFErRCT9FN0wJEi4Toe9mOvwu4aLw1A0gJdED3SC/NlxP5ZmdM3VPJvSXeuCd
-         U6vXywbjIF23+J0e9GucbVU2HMGNZMMg2YPbhqw/BwqIptD6X2MPPCZ7DjZuZrYFreB9
-         qI2Pz4AW8afiR6iJI39IQB6jRw62RdM529ME/UfVKBZzFvWHcFXYA5/weu9eJBjZ1VkF
-         Bapw==
-X-Forwarded-Encrypted: i=1; AJvYcCUV4atkH9zEz1bBBuIAc8GQw/VWKB13/fVHFZfBIeocUqBbskdmG8cNJXMWJVFbwqBHnrerpSU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxX5hDyjts2JAO1V2evUXOLVz0vCTM1cOkjOhx/hJVDWw+Xttcw
-	YI5zJ1s/9B4JSPFPJbHnuCur15eSVRdN2QkGec13VN6CZfXlWZ3YVdshHdClnYJyl/ru+HWT5dW
-	T4wxabqQEZA79PxvQt639p0HWv59sDehKfQ1Yk+fqOJ+l31+272mLFLLyPi8=
-X-Google-Smtp-Source: AGHT+IErvgVX2lT1VTeExtwe7VxD3tNx5nEjEm+MYjbP3l+C8+JnOOqZC+bupe05ezRup0sS7ESz+GO2T0H8DuOhhyPQ9mBXn6Id
+	s=arc-20240116; t=1762379797; c=relaxed/simple;
+	bh=oK0VR5pT9U9v/hYdiS9OdTvRIaQntX9tuDQTRkkEYZw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NsBiI7xEBdBJomlEt+2xRESrIF+4qQNoGP6bM/rZo5m0z/nYedV9A/NFmH79x8hwzZBTeXTOzsGIfEkZNEOtHDGNlrEk1BWqkSc9o7g+xAduAqDLe2dsM8y+SMJDqvsjoGFId/xSXaFYAUzJUO69hGevbIXFLbrIIsBHfjZj/RM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q8F5RNma; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3936C4CEF5;
+	Wed,  5 Nov 2025 21:56:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762379796;
+	bh=oK0VR5pT9U9v/hYdiS9OdTvRIaQntX9tuDQTRkkEYZw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Q8F5RNmacYdR/8lHBNMTMVRTOKnojMSoy+TXN5syqLQ+eY8hcgofbZ8I9kTB5klV8
+	 sppxJzYY5/OzkXkRkeiJ+9DIqIhhKVaM3F/18fwr6mBOosJK3zbpEAoPJdWMEFF3Yy
+	 flLPog5tBPAXohzjBwAoRfWHzmrSPYwCPKkY5VFze7r6sc8WzUEWw/V0Tgwv7R19Fo
+	 KGUl1+mWSCVun5QGaoymx2u3K5jkT2/J3d+9OmpnmrvIsYtV4uQI0pJep+DbGT2uuA
+	 ml+ByC6kXtM00gz/vYo3tR7fDOnrEcjaTu0k6OIXnO4FqKEjf/DHAULzgfC0YgEDy8
+	 teiAOnQmPtZ0Q==
+Message-ID: <1a07e27f-69de-4a38-884a-5ad078e7acf5@kernel.org>
+Date: Wed, 5 Nov 2025 22:56:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:b21:b0:433:2389:e0b1 with SMTP id
- e9e14a558f8ab-4334068a78emr65038635ab.0.1762379736577; Wed, 05 Nov 2025
- 13:55:36 -0800 (PST)
-Date: Wed, 05 Nov 2025 13:55:36 -0800
-In-Reply-To: <a5ddc43a-5354-4951-8691-1f3887743e3d@intel.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <690bc7d8.050a0220.baf87.0073.GAE@google.com>
-Subject: Re: [PATCH v2] usb: rtl8150: Initialize buffers to fix KMSAN
- uninit-value in rtl8150_open
-From: syzbot <syzbot@syzkaller.appspotmail.com>
-To: jacob.e.keller@intel.com
-Cc: davem@davemloft.net, dharanitharan725@gmail.com, edumazet@google.com, 
-	gregkh@linuxfoundation.org, jacob.e.keller@intel.com, kuba@kernel.org, 
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v1 1/2] page_pool: expose max page pool ring size
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: Joshua Washington <joshwash@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>
+References: <20251105200801.178381-1-almasrymina@google.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20251105200801.178381-1-almasrymina@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
->
->
-> On 11/5/2025 11:47 AM, Dharanitharan R wrote:
->> diff --git a/drivers/net/usb/rtl8150.c b/drivers/net/usb/rtl8150.c
->> index f1a868f0032e..a7116d03c3d3 100644
->> --- a/drivers/net/usb/rtl8150.c
->> +++ b/drivers/net/usb/rtl8150.c
->> @@ -735,33 +735,30 @@ static int rtl8150_open(struct net_device *netdev)
->>  	rtl8150_t *dev = netdev_priv(netdev);
->>  	int res;
->>  
->> -	if (dev->rx_skb == NULL)
->> -		dev->rx_skb = pull_skb(dev);
->> -	if (!dev->rx_skb)
->> -		return -ENOMEM;
->> -
->
-> None of the changes in the diff make any sense, as you remove the only
-> place where rx_skb is initialized in the first place.
->
->>  	set_registers(dev, IDR, 6, netdev->dev_addr);
->>  
->>  	/* Fix: initialize memory before using it (KMSAN uninit-value) */
->>  	memset(dev->rx_skb->data, 0, RTL8150_MTU);
->>  	memset(dev->intr_buff, 0, INTBUFSIZE);
->>  
->
-> This isn't even in the current driver code, but its shown as part of the
-> diff context. Based on your commit description this is probably what
-> you're trying to insert? But its obviously not a properly formatted or
-> generated patch. It reeks of being generated by a bad LLM.
->
-> Please don't waste reviewers time with this kind of generated nonsense.
 
-I see the command but can't find the corresponding bug.
-The email is sent to  syzbot+HASH@syzkaller.appspotmail.com address
-but the HASH does not correspond to any known bug.
-Please double check the address.
+
+On 05/11/2025 21.07, Mina Almasry wrote:
+> Expose this as a constant so we can reuse it in drivers.
+> 
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+> ---
+>   include/net/page_pool/types.h | 2 ++
+>   net/core/page_pool.c          | 2 +-
+>   2 files changed, 3 insertions(+), 1 deletion(-)
+
+
+Looks good to me
+
+Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
+
+> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
+> index 1509a536cb85..5edba3122b10 100644
+> --- a/include/net/page_pool/types.h
+> +++ b/include/net/page_pool/types.h
+> @@ -58,6 +58,8 @@ struct pp_alloc_cache {
+>   	netmem_ref cache[PP_ALLOC_CACHE_SIZE];
+>   };
+>   
+> +#define PAGE_POOL_MAX_RING_SIZE 16384
+> +
+
+IIRC this was recently reduced to 16384 (from 32K), do you have a
+use-case for higher limits?
+
+>   /**
+>    * struct page_pool_params - page pool parameters
+>    * @fast:	params accessed frequently on hotpath
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index 1a5edec485f1..7b2808da294f 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -211,7 +211,7 @@ static int page_pool_init(struct page_pool *pool,
+>   		return -EINVAL;
+>   
+>   	if (pool->p.pool_size)
+> -		ring_qsize = min(pool->p.pool_size, 16384);
+> +		ring_qsize = min(pool->p.pool_size, PAGE_POOL_MAX_RING_SIZE);
+>   
+>   	/* DMA direction is either DMA_FROM_DEVICE or DMA_BIDIRECTIONAL.
+>   	 * DMA_BIDIRECTIONAL is for allowing page used for DMA sending,
+> 
+> base-commit: 327c20c21d80e0d87834b392d83ae73c955ad8ff
 
 
