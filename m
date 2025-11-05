@@ -1,116 +1,146 @@
-Return-Path: <netdev+bounces-235831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 909F8C3639F
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 16:10:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE62FC36390
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 16:09:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8BED94F2797
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 15:05:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90B201A205F6
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 15:08:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1583E2C21DE;
-	Wed,  5 Nov 2025 15:05:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9047032E6A6;
+	Wed,  5 Nov 2025 15:08:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PeecVev+";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="E+VhSKs5"
 X-Original-To: netdev@vger.kernel.org
-Received: from eidolon.nox.tf (eidolon.nox.tf [185.142.180.128])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D331741C63
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 15:05:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.128
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB062221578
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 15:08:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762355140; cv=none; b=QJ6OOfRbtaQ9fiA6cC+5Di5jmrfE+f9J8rpN38xp5prR/uX+PNd5VosznE/kdzviRICupJOmyV9oSWwvK69SiQqNmwBQj1gELEzaObHVLJsrJoo1Z0HF/83INZXzm0lcwtx+ZkSKt+AdcyDo0eCkJbK0/s+SegvXCMy8OHYSaM8=
+	t=1762355288; cv=none; b=fwJP4jRl1RUR75c7CXETeO91PPuKuRLIqCx2Yc1fVqj60u5sw3HwEVAiY2K9SzAKpqzGidtPu9Z0bV1HQHcsdhzQQJBks9h2Y6WriLHIDs9y2tfS8vMk4oMVppkT32onOT+MiI8FBsMI5Kznsfws32xTraPpVTEkYxHoeUP8e4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762355140; c=relaxed/simple;
-	bh=p7RST2c1BKoj6BLgkZGksUPce9BLMIvHZgIsYfgLyag=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Gd8DACsfMBwjjJQ0uT/Vkq1hbDBUsljWsNGVXbxUvIAuXh8Fjz9N30nAIj7zCf9SSSFQw887aZ5qOgEYZaagrIMjgWENrvbIHwi6iLERJoL0bPWWedC7UM48QxNBj1CcMCRCPFH3D7FzIwjVkuMTiTt1ZWjtBzCvsruLEwSrB4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=diac24.net; spf=pass smtp.mailfrom=diac24.net; arc=none smtp.client-ip=185.142.180.128
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=diac24.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=diac24.net
-Received: from [2607:fa49:3805:f800::8fc7] (helo=alea)
-	by eidolon.nox.tf with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.97.1)
-	(envelope-from <equinox@diac24.net>)
-	id 1vGf4i-00000000epo-43o2;
-	Wed, 05 Nov 2025 16:05:29 +0100
-Received: from equinox by alea with local (Exim 4.98.2)
-	(envelope-from <equinox@diac24.net>)
-	id 1vGeur-000000002cc-2F6t;
-	Wed, 05 Nov 2025 09:55:17 -0500
-From: David Lamparter <equinox@diac24.net>
-To: netdev@vger.kernel.org
-Cc: David Lamparter <equinox@diac24.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Lorenzo Colitti <lorenzo@google.com>,
-	Patrick Rohr <prohr@google.com>,
-	=?UTF-8?q?Maciej=20=C5=BBenczykowski?= <maze@google.com>
-Subject: [PATCH net-next] net/ipv6: fix lookup for ::/0 (non-)subtree route
-Date: Wed,  5 Nov 2025 09:54:45 -0500
-Message-ID: <20251105145446.10001-1-equinox@diac24.net>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1762355288; c=relaxed/simple;
+	bh=zddzhOg8X1nKlNluFiKuPj0/7ElZvDoM9lEwBP40PIo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=S8zyHle/WinF98LCPpSQ1vMZ7UQVnAY3yVQuACRWbPhu1K0eDdEFv2OLDtNEBzHTGtKq0K4b2d8lT7go+ju/9tqDoZ6k2jZv9H8uQcPp6X2WFFYAcdoB06MR5dRR3O5+pIcDLnVlWELpU5hJQNTNtgjxcufSESPkBtUm+rGCaDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PeecVev+; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=E+VhSKs5; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762355285;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zddzhOg8X1nKlNluFiKuPj0/7ElZvDoM9lEwBP40PIo=;
+	b=PeecVev+3s9fakJdP3mprGvod2Kw5Qd0zUzoQD5ST0EAJX2kY/qNI/NRPS/6Mx48nXXcv6
+	Nur9n98KtT4mMzDyQjeZ/zo1AwFKn5sfR+fTuJVVl3VEwU2UQf5dQDrvsDTPIKv0s4UH8l
+	sNz8QcMACGVegVviN+ubmEbD2vkjl64=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-562-QrydOSp6PRmSkDF5R_5ECA-1; Wed, 05 Nov 2025 10:08:03 -0500
+X-MC-Unique: QrydOSp6PRmSkDF5R_5ECA-1
+X-Mimecast-MFC-AGG-ID: QrydOSp6PRmSkDF5R_5ECA_1762355282
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b7270cab7eeso59028166b.1
+        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 07:08:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1762355282; x=1762960082; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zddzhOg8X1nKlNluFiKuPj0/7ElZvDoM9lEwBP40PIo=;
+        b=E+VhSKs5SJh45HFSv2dfh4byTipz3JBUuXq2cmafniGyY1LOU2Y/5Hfm2O+5q6xElQ
+         MpZ8hXEgAx+hKxFiItQqf2EPRWpLqZ/KDhWPjnBl8ShEqGkyqusem0EJx+Ke0SrKROPT
+         dZaVWrN/J+oxW+dDGB/UpEvjBQ9I+GeNZIaXON4wEsVEVUbrKCtkQtQPI4jcUhvXhGJw
+         eCCOSId/EcvAbpl5TEhLVby2jDhtpub7Xd49lH9pc4D8L7IUoIlmfaGgxU055bot6ltl
+         ybDsIFwnRZdgWIzVYuKp0Ve8jQqtAp1PqyFLnvrq7cbuGA7PsmemCOhyckjgsbERpVAK
+         TQYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762355282; x=1762960082;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zddzhOg8X1nKlNluFiKuPj0/7ElZvDoM9lEwBP40PIo=;
+        b=jG1MBZYzQBurYN1ps2kvXM0EklWBhgrjjhW8Ds2Q8xzSlVXKrACaWG69ibBRLkZJ2I
+         WbTETjtYycMmr5x7Sis78HhMmFiohv7TgR9WPYhKKawa4AMOUMZ8eE97E6JGl/IQLbft
+         8Unt8KPW70fDduleZx1uR6YIIGOtIXth3BOwCT4zYZm1X26Hwho541UicrsqOEGhbpwF
+         /QoDoUXbLIx0hiH0aYxXhOhfUS3Hgz7vRS3pHZ4tv9GTIF1HJupMk0oPbwzmHyUF6eUT
+         bDnb5tn1PIIo601ZmYGb/6wYTsOfqLSFx+IMhM40/aGnEeHhCx6JjDdTTtlckrtYmyHQ
+         gjeg==
+X-Forwarded-Encrypted: i=1; AJvYcCV3395tht7OjXff5otIXX6dVil7Ui29W/CYIh8xtLYevG2yWLbz4mEDPuDvqROce4L9WkwMsK8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEtmaMMo2HlpndhJhiIH34Xaj6UFq/DazjdrxjgvOb35gPz1+d
+	bzYOiqrl+gSTLItweE4czVaVFdqY2h+OW8QaFumSe55PoNPFKqm+BIwZ5MZhyUnJyRWB6BK70o1
+	fxl3m37afluyfA0cxsscQw/iCx1nfM1pLHgDdePzs9WUm7S2z2RyM3R/JXfLH5zT3jo5ZS5+e4r
+	5GbMNCExgSR93anu+2uJ/JEa9YKflwq9xr
+X-Gm-Gg: ASbGncv4cHCao0u8iMJhYK3NC6QdOPoSbagOy2/9AWnyzuxHtO54Jmi5GxqiF6Vjy5L
+	16QmhYOLWAZ2ayr0fsdTgLIcp+BuEWTKptvv5YTuvsbKOp6e3vBv/VcRMoZESckjYIx5VS19bVG
+	0iMEcSOBpZrMEOKg7JOrnhjjnDWZ27npRIUyryLtQpDraF1b0aEk7jS8b1
+X-Received: by 2002:a17:906:9c83:b0:b70:b3e8:a35e with SMTP id a640c23a62f3a-b7265568be1mr330078766b.50.1762355282295;
+        Wed, 05 Nov 2025 07:08:02 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHVOQsjYVyVVrNvkq8akL5ZkGRlDA5wjcsUyQMOyzqYmrxUAS+dfw/oU0IlQDgyfAtyrlbYChyW3M7kMF0tLDI=
+X-Received: by 2002:a17:906:9c83:b0:b70:b3e8:a35e with SMTP id
+ a640c23a62f3a-b7265568be1mr330075866b.50.1762355281900; Wed, 05 Nov 2025
+ 07:08:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20251030144438.7582-1-minhquangbui99@gmail.com>
+ <1762149401.6256416-7-xuanzhuo@linux.alibaba.com> <CAPpAL=x-fVOkm=D_OeVLjWwUKThM=1FQFQBZyyBOrH30TEyZdA@mail.gmail.com>
+ <CAL+tcoAnhhDn=2qDCKXf3Xnz8VTDG0HOXW8x=GSdtHUe+qipvQ@mail.gmail.com>
+In-Reply-To: <CAL+tcoAnhhDn=2qDCKXf3Xnz8VTDG0HOXW8x=GSdtHUe+qipvQ@mail.gmail.com>
+From: Lei Yang <leiyang@redhat.com>
+Date: Wed, 5 Nov 2025 23:07:25 +0800
+X-Gm-Features: AWmQ_bn6PCV_WZmKEJ3xHMkBMOhvHDcRetwwHLmBCefOcZy0CYLo96d-gGmw7e8
+Message-ID: <CAPpAL=xDpqCT9M6AWHTfNuai=3ih-452sW4g43gduiw7TptToQ@mail.gmail.com>
+Subject: Re: [PATCH net v7] virtio-net: fix received length check in big packets
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Bui Quang Minh <minhquangbui99@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Gavin Li <gavinl@nvidia.com>, Gavi Teitz <gavi@nvidia.com>, Parav Pandit <parav@nvidia.com>, 
+	virtualization@lists.linux.dev, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Assume a scenario with something like the following routes:
-default via fe80::1 dev dummy0
-2001:db8:1::/48 via fe80::10 dev dummy0
-2001:db8:1::/48 from 2001:db8:1:2::/64 via fe80::12 dev dummy0
+On Wed, Nov 5, 2025 at 8:19=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.co=
+m> wrote:
+>
+> Hi Lei,
+>
+> On Wed, Nov 5, 2025 at 12:56=E2=80=AFAM Lei Yang <leiyang@redhat.com> wro=
+te:
+> >
+> > Tested this patch with virtio-net regression tests, everything works fi=
+ne.
+>
+Hi Jason
 
-Now if a lookup happens for 2001:db8:1::2345, but with a source address
-*not* covered by the third route, the expectation is to hit the second
-one.  Unfortunately, this was broken since the code, on failing the
-lookup in the subtree, didn't consider the node itself which the subtree
-is attached to, i.e. route #2 above.
+> I saw you mentioned various tests on virtio_net multiple times. Could
+> you share your tools with me, I wonder? AFAIK, the stability of such
+> benchmarks is not usually static, so I'm interested.
 
-The fix is simple, check if the subtree is attached to a node that is
-itself a valid route before backtracking to less specific destination
-prefixes.
+My test cases are based on an internal test framework, so I can not
+share it with you. Thank you for your understanding :). But I think I
+can share with you my usual test scenarios: ping, file transfer
+stress, netperf stress, migrate, hotplug/unplug as regression tests.
 
-This case is somewhat rare for several reasons.  To begin with, subtree
-routes are most commonly attached to the default destination.
-Additionally, in the rare cases where a non-default destination prefix
-is host to subtree routes, the fallback on not hitting any subtree route
-is commonly a default route (or a subtree route on that).
-
-(Note that this was working for the "::/0 from ::/0" case since the root
-node is special-cased.  The issue was discovered during RFC 6724 rule
-5.5 testing, trying to find edge cases.)
-
-Signed-off-by: David Lamparter <equinox@diac24.net>
-Cc: Lorenzo Colitti <lorenzo@google.com>
-Cc: Patrick Rohr <prohr@google.com>
-Cc: Maciej Żenczykowski <maze@google.com>
----
- net/ipv6/ip6_fib.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-index 02c16909f618..c18e9331770d 100644
---- a/net/ipv6/ip6_fib.c
-+++ b/net/ipv6/ip6_fib.c
-@@ -1650,8 +1650,11 @@ static struct fib6_node *fib6_node_lookup_1(struct fib6_node *root,
- 					struct fib6_node *sfn;
- 					sfn = fib6_node_lookup_1(subtree,
- 								 args + 1);
--					if (!sfn)
-+					if (!sfn) {
-+						if (fn->fn_flags & RTN_RTINFO)
-+							return fn;
- 						goto backtrack;
-+					}
- 					fn = sfn;
- 				}
- #endif
--- 
-2.50.1
+Thanks
+Lei
+>
+> Thanks,
+> Jason
+>
 
 
