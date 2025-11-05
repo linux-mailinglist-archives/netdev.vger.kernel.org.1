@@ -1,104 +1,157 @@
-Return-Path: <netdev+bounces-235741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C912C3473F
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 09:25:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82165C34778
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 09:29:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE8824622C2
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 08:25:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 74EEA18C3574
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 08:29:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0132E25F99B;
-	Wed,  5 Nov 2025 08:25:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD32729B78E;
+	Wed,  5 Nov 2025 08:28:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fSvnUixA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RSE+LN6y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C82F02AE89;
-	Wed,  5 Nov 2025 08:25:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45AA229BD82
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 08:28:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762331127; cv=none; b=MHfdAuWrHGBmJW/V+QLrvu/uAu0lcaI+U8wpP3+tHstgulJ6mwcLIBhMmG46FRZ4RHpPZHQw97VT3nmcwkTtukqo2OtbOu1nxxQ5tMGjWg6YXBJHic5VzvvhIvvZCxZDKdh3tkgMpvEBwJSSmghIyFsfMzK1zgyOQ/Ep4kJs74c=
+	t=1762331334; cv=none; b=UBGD6pgC1qMGWeBB23Sp6io+wfIga2luNSSTXD6G0lYFNVhjuIh1kk6cb0VVMynEsmFd3k5ZKhcTUZ4KHzMeIM4hCK5GuFWSiV8d6W86jCzfmYK8+GuvWVRzSMOsRGvb7E4I+g/U35JDztSFAHvC7RRTmH/X68MB+sIYNj72mW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762331127; c=relaxed/simple;
-	bh=GFrmdT/6vh6KitZbPk5RwLAg24STo8UOkiJxvnUUROM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WLKwDjW/eaPwiiM8dMvXOwYOmqu9x9DlRIdtYo8aQnpsE2Y1m6S6MQTe2mBTKgbNeXvu8R1CsbhERKX2xpORDFpw/vNV8QgiOo3QGepOgAFdjLex7tmp5o/xlrNZKlHY58s4OMdoIdg7ibA4i2P8ldmk8Y001bEgcQqUbmEFaF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fSvnUixA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 799CAC116B1;
-	Wed,  5 Nov 2025 08:25:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762331127;
-	bh=GFrmdT/6vh6KitZbPk5RwLAg24STo8UOkiJxvnUUROM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fSvnUixAH7/lM170v6NohX/PiUR2BPHEycruL3+BtLy8LHbjuBLZVsLQ5Y3S8xxch
-	 6yc2F0InengDSLn3VwbgtwQV46+azBAQy5eDtoQCS6IhngoqBgUphJjF+NG2kYrcOQ
-	 OH+PqfB+LBWeyAb3DZWXKvOzYY6tE7imFCcbtqpfduHtlQ10Sud0GCrei197vV8gmK
-	 SAS+7XcxQw0BdYTE8owjL7LwfvDb2bzjXM43ZsSDauC9pn5N30S5RLM5JQJq6ZwDuw
-	 b542dok4FUX/Qc1NRMJFxEFnSF2tJIzr2NmsvO/34/q2ro3lRC5ntT5oKBpZGntGXY
-	 oFYbVAAU7H4jA==
-Date: Wed, 5 Nov 2025 08:25:21 +0000
-From: Simon Horman <horms@kernel.org>
-To: Fan Gong <gongfan1@huawei.com>
-Cc: Zhu Yikai <zhuyikai1@h-partners.com>, netdev@vger.kernel.org,
+	s=arc-20240116; t=1762331334; c=relaxed/simple;
+	bh=DlD7XZ/bzfpVlq9YilLjwMpbU1Ue9PsSHUN85MwX378=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fSE6DJaFD2ozQ4/StgHqdV2vBORe+1l43B/Y4WMevufEaxg+Ze7d/CZMT3e9Ot+13JTqMIsmIpanDxO3UQEr79SITrZmnCUsvrxGEkBfuZ06urXA8gVb0p0jLIhPnDdMICKcAnLps02tJbmrRXLJq6/kc1L9zmrf7xfg+3YtRuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RSE+LN6y; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2952048eb88so70496075ad.0
+        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 00:28:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762331332; x=1762936132; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vj9ztHcRJ4eUFcDTiZAvAf9WmJ9pDCq1nGAlcOW47IA=;
+        b=RSE+LN6y1PdOwj3FCCkbJvMz1mMOBOHhswFEG+uq16hO0i5AWdZnZA20stKtmmaPDc
+         P1XFjP6W5JMfAymjivetGN1Urzfe6QTxfI/jcfwnI0JA1j6Tppjl6cogGn/rGyeXy0Zm
+         /yhzWCiNc2cGfxWTbeCupYXzOS3B4SpZ10f5sxfLvrYZw41/mVPBGmbXDQlPUpxVy9vQ
+         BXzVp9bi9y1smgYRYy4PSYr3OBRAgXGhBBkbcwLK+bcUJFSj9uWyQWIguLlS/OlSMEmG
+         rbP9FWFQhcSyDHEkbBAEVcqz+H5225h5Il93WasCJiXqITyDbQI5NKTCbDTVzvngFUyR
+         NsgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762331332; x=1762936132;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Vj9ztHcRJ4eUFcDTiZAvAf9WmJ9pDCq1nGAlcOW47IA=;
+        b=UgFLYCAvmYW2GTIzs3sh/VogjfjhRH5N/+HLyjvy30KbwADfwqkr8Mwmd9dGoGSOAK
+         esg0Nydrg+h2MM8Dkl9CCycmdhmqn2Jor8zEc5/Wv7wv3HMqTAS0t6xsih6IdC/YJUfq
+         LoiQ+/RjK1k8UWe/dAHmJpEXDsK3TsDAeGR4exkLCoSCWUKDjyp853aT8ZVCCzMRzKVk
+         9u5sm9K3D8YSPS1NCKUWpJ0S0rUmE2o6GkbZDIuh0uq9VQjlSStejXlZuOrAGHTxk5de
+         1wyniP/lvGGuMSIFOBdbPSayTZhr/fHEWWgUAeoP8lynLx6m7CIWcXwgdxiXMAICyGva
+         HJvw==
+X-Gm-Message-State: AOJu0YxF4KJFEuYRfSkARiK6HGDclt0k5krP2JHn/zKFfWbphfa+ALc2
+	poplJVPe1KwsmeFBMZjRASEJEKsCkZmyCUQq2beGIifV2rObAGhoWWgK+uTJnEvuYVI=
+X-Gm-Gg: ASbGncsaE2t7hArfuUCPR8whYKjwW3tU1aVGYTdg7jH44LIpIH8EfCeZzuSJe7S1ILl
+	JJwO1R5tO58vFYsfN0GYCRchp+DFFaypE75d7znPRwToSCoUKc2/iSLgaixo6XM+QaWa+XLSKec
+	YZ9J3VfZNa+28UBcTn80gFbFF6vZPPBpKeTAA0bO3hXysR7OrBqtSlLyo9Ns2TZbYf4TzYg7ql1
+	5vQmSLodmbBKsaREnPd/xJ7Uqyrg+dTnx8baqsFNx8pvmGEOrjGdZbNRD3fCpmvu6W6oku6bDwu
+	y3VP33a4RyMOJBdpJjhEU1r/FKrL/ijK7fyilolfHRhOfZnsC8pyeaS6AYT5+8KAacsnMYZhthA
+	6ufcB+dP51i07M/Favwz2pC0OgSa1lHqg7+rCHcPA+IrVjhv0f0RrcNsm7LPg3eISIDlZfIAjfJ
+	KFUjGDRxvVPMK5Hl4=
+X-Google-Smtp-Source: AGHT+IGT07MqVIWLyaGa6fJx6kFYlwVVGw+QLeCm2PdYaMDiKadI7HZJcYVwzlrRJDLUO0lj8ELndg==
+X-Received: by 2002:a17:902:ea0e:b0:295:f1f:67b with SMTP id d9443c01a7336-2962ada2efcmr37879495ad.39.1762331332208;
+        Wed, 05 Nov 2025 00:28:52 -0800 (PST)
+Received: from fedora ([209.132.188.88])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29601a3a0c9sm52171705ad.55.2025.11.05.00.28.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Nov 2025 00:28:51 -0800 (PST)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, Markus.Elfring@web.de,
-	pavan.chebbi@broadcom.com, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, luosifu <luosifu@huawei.com>,
-	Xin Guo <guoxin09@huawei.com>,
-	Shen Chenyang <shenchenyang1@hisilicon.com>,
-	Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
-	Shi Jing <shijing34@huawei.com>,
-	Luo Yang <luoyang82@h-partners.com>,
-	Meny Yossefi <meny.yossefi@huawei.com>,
-	Gur Stavi <gur.stavi@huawei.com>
-Subject: Re: [PATCH net-next v04 2/5] hinic3: Add PF management interfaces
-Message-ID: <aQsJ8a4XXE3HXR7A@horms.kernel.org>
-References: <cover.1761711549.git.zhuyikai1@h-partners.com>
- <2acb500c38c11b0234e8616da7c2a941c344659f.1761711549.git.zhuyikai1@h-partners.com>
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jan Stancek <jstancek@redhat.com>,
+	"Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
+	=?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Guillaume Nault <gnault@redhat.com>,
+	Petr Machata <petrm@nvidia.com>,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCHv2 net-next 0/3] Add YNL test framework and library improvements
+Date: Wed,  5 Nov 2025 08:28:38 +0000
+Message-ID: <20251105082841.165212-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2acb500c38c11b0234e8616da7c2a941c344659f.1761711549.git.zhuyikai1@h-partners.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Oct 29, 2025 at 02:16:26PM +0800, Fan Gong wrote:
+This series enhances YNL tools with some functionalities and adds
+YNL test framework.
 
-...
+Changes include:
+- Add MAC address parsing support in YNL library
+- Fix rt-rule spec consistency with other rt-* families
+- Add tests covering CLI and ethtool functionality
 
-> diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c b/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
+The tests provide usage examples and regression testing for YNL tools.
+Test result:
+  # test_ynl_cli
+  PASS: YNL CLI list families
+  PASS: YNL CLI netdev operations
+  PASS: YNL CLI ethtool operations
+  PASS: YNL CLI rt-route operations
+  PASS: YNL CLI rt-addr operations
+  PASS: YNL CLI rt-link operations
+  PASS: YNL CLI rt-neigh operations
+  PASS: YNL CLI rt-rule operations
+  PASS: YNL CLI nlctrl getfamily
+  # test_ynl_ethtool
+  PASS: YNL ethtool device info
+  PASS: YNL ethtool statistics
+  PASS: YNL ethtool ring parameters (show/set)
+  PASS: YNL ethtool coalesce parameters (show/set)
+  PASS: YNL ethtool pause parameters (show/set)
+  PASS: YNL ethtool features info (show/set)
+  PASS: YNL ethtool channels info (show/set)
+  PASS: YNL ethtool time stamping
 
-...
+v2: move test from selftest to ynl folder (Jakub Kicinski)
+v1: https://lore.kernel.org/netdev/20251029082245.128675-1-liuhangbin@gmail.com
 
-> +static void hinic3_print_link_message(struct net_device *netdev,
-> +				      bool link_status_up)
-> +{
-> +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-> +
-> +	if (nic_dev->link_status_up == link_status_up)
-> +		return;
-> +
-> +	nic_dev->link_status_up = link_status_up;
-> +
-> +	netdev_dbg(netdev, "Link is %s\n", (link_status_up ? "up" : "down"));
+Hangbin Liu (3):
+  tools: ynl: Add MAC address parsing support
+  netlink: specs: update rt-rule src/dst attribute types to support IPv4
+    addresses
+  tools: ynl: add YNL test framework
 
-Hi Fan Gong, all,
+ Documentation/netlink/specs/rt-rule.yaml |   6 +-
+ tools/net/ynl/Makefile                   |   3 +-
+ tools/net/ynl/pyynl/lib/ynl.py           |   9 +
+ tools/net/ynl/tests/Makefile             |  24 ++
+ tools/net/ynl/tests/config               |   6 +
+ tools/net/ynl/tests/test_ynl_cli.sh      | 290 +++++++++++++++++++++++
+ tools/net/ynl/tests/test_ynl_ethtool.sh  | 195 +++++++++++++++
+ 7 files changed, 530 insertions(+), 3 deletions(-)
+ create mode 100644 tools/net/ynl/tests/Makefile
+ create mode 100644 tools/net/ynl/tests/config
+ create mode 100755 tools/net/ynl/tests/test_ynl_cli.sh
+ create mode 100755 tools/net/ynl/tests/test_ynl_ethtool.sh
 
-Coccinelle suggests that str_up_down() could be used here,
-which does seem like a reasonable suggestion as it seems
-there will be a v5 anyway.
+-- 
+2.50.1
 
-> +}
-
-...
 
