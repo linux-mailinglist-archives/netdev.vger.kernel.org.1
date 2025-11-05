@@ -1,134 +1,104 @@
-Return-Path: <netdev+bounces-235740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD460C34700
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 09:20:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C912C3473F
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 09:25:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 446EC3BE595
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 08:18:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE8824622C2
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 08:25:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7BEA2566E2;
-	Wed,  5 Nov 2025 08:18:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0132E25F99B;
+	Wed,  5 Nov 2025 08:25:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mj4R6jbm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fSvnUixA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92CDA2135D7
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 08:18:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C82F02AE89;
+	Wed,  5 Nov 2025 08:25:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762330710; cv=none; b=V0tiMneGstpYH/nPlmZb23CnkdzZE8DcVdZB+/ZB5nfGBGbyc2t4EKwJVItuDL7vK1ltOeIqGsO+uY6zI3sNqW+z740xrsVIU2QLcbxC3pndzNCLHCStqOMyFAeofg4s0kTakK+1i8cXOGKn4P+7PM0eAo7vC30KoktTQCDZN8I=
+	t=1762331127; cv=none; b=MHfdAuWrHGBmJW/V+QLrvu/uAu0lcaI+U8wpP3+tHstgulJ6mwcLIBhMmG46FRZ4RHpPZHQw97VT3nmcwkTtukqo2OtbOu1nxxQ5tMGjWg6YXBJHic5VzvvhIvvZCxZDKdh3tkgMpvEBwJSSmghIyFsfMzK1zgyOQ/Ep4kJs74c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762330710; c=relaxed/simple;
-	bh=6dm2AKzAebown1VDbZeg2XcaDBZxitJGUDcB4OCfOSw=;
+	s=arc-20240116; t=1762331127; c=relaxed/simple;
+	bh=GFrmdT/6vh6KitZbPk5RwLAg24STo8UOkiJxvnUUROM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UpWIwP5gW2BmxF/7ptuh3EEG3ZsPBnK5Tob0VSLZWzUL3eWnsI+p+vOflKPj2R7Oel2j89z26RtWuxDeCiujmp8yP6pXB/DPQu2aJKQOFAvwpD4Vls7OnH6y/XeE7ouON9K/SkEyUUAsMEFMEHMTEPhr6PjtUCJ/I+F1hQLJoHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mj4R6jbm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEC00C4CEF8;
-	Wed,  5 Nov 2025 08:18:29 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=WLKwDjW/eaPwiiM8dMvXOwYOmqu9x9DlRIdtYo8aQnpsE2Y1m6S6MQTe2mBTKgbNeXvu8R1CsbhERKX2xpORDFpw/vNV8QgiOo3QGepOgAFdjLex7tmp5o/xlrNZKlHY58s4OMdoIdg7ibA4i2P8ldmk8Y001bEgcQqUbmEFaF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fSvnUixA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 799CAC116B1;
+	Wed,  5 Nov 2025 08:25:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762330710;
-	bh=6dm2AKzAebown1VDbZeg2XcaDBZxitJGUDcB4OCfOSw=;
+	s=k20201202; t=1762331127;
+	bh=GFrmdT/6vh6KitZbPk5RwLAg24STo8UOkiJxvnUUROM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Mj4R6jbmdeurLRtVZDcDkzqUdRr+Gc1azx+5dE8nELWTapqWHnFWY19NgW7t1r/QV
-	 bb9lTheuUfK/V+i7acJlOTc754Jwlw2YxSnEQGbkmWqGi1yvvrg890JUZH26GnPlfO
-	 PTaIcKPL1gtbpntu4A7bn1sE+/3+EDkt2sUDw698vwXQFx9kUtj5Nx796THHRuIAyq
-	 EMr+jX9CVzPyq6ZSJvekb52iIAPkREpXkJZd/zzTeOh41DtpnMTAEP3DPWmNc4K/Pu
-	 RSbdzcc89+v+cKZyGR08dp8RSoi7E3RJwIkM3RY66yb6V6nxu1keCW4+agmgvUXSui
-	 DnQ0AakHat1Kw==
-Date: Wed, 5 Nov 2025 09:18:27 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	b=fSvnUixAH7/lM170v6NohX/PiUR2BPHEycruL3+BtLy8LHbjuBLZVsLQ5Y3S8xxch
+	 6yc2F0InengDSLn3VwbgtwQV46+azBAQy5eDtoQCS6IhngoqBgUphJjF+NG2kYrcOQ
+	 OH+PqfB+LBWeyAb3DZWXKvOzYY6tE7imFCcbtqpfduHtlQ10Sud0GCrei197vV8gmK
+	 SAS+7XcxQw0BdYTE8owjL7LwfvDb2bzjXM43ZsSDauC9pn5N30S5RLM5JQJq6ZwDuw
+	 b542dok4FUX/Qc1NRMJFxEFnSF2tJIzr2NmsvO/34/q2ro3lRC5ntT5oKBpZGntGXY
+	 oFYbVAAU7H4jA==
+Date: Wed, 5 Nov 2025 08:25:21 +0000
+From: Simon Horman <horms@kernel.org>
+To: Fan Gong <gongfan1@huawei.com>
+Cc: Zhu Yikai <zhuyikai1@h-partners.com>, netdev@vger.kernel.org,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	Xuegang Lu <xuegang.lu@airoha.com>
-Subject: Re: [PATCH net-next 1/2] net: airoha: Add the capability to consume
- out-of-order DMA tx descriptors
-Message-ID: <aQsIUzZOJxMV5UDP@lore-desk>
-References: <20251103-airoha-tx-linked-list-v1-0-baa07982cc30@kernel.org>
- <20251103-airoha-tx-linked-list-v1-1-baa07982cc30@kernel.org>
- <20251104183028.7412aba6@kernel.org>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, Markus.Elfring@web.de,
+	pavan.chebbi@broadcom.com, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, luosifu <luosifu@huawei.com>,
+	Xin Guo <guoxin09@huawei.com>,
+	Shen Chenyang <shenchenyang1@hisilicon.com>,
+	Zhou Shuai <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>,
+	Shi Jing <shijing34@huawei.com>,
+	Luo Yang <luoyang82@h-partners.com>,
+	Meny Yossefi <meny.yossefi@huawei.com>,
+	Gur Stavi <gur.stavi@huawei.com>
+Subject: Re: [PATCH net-next v04 2/5] hinic3: Add PF management interfaces
+Message-ID: <aQsJ8a4XXE3HXR7A@horms.kernel.org>
+References: <cover.1761711549.git.zhuyikai1@h-partners.com>
+ <2acb500c38c11b0234e8616da7c2a941c344659f.1761711549.git.zhuyikai1@h-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="hS5bIEDocn2WJRXk"
-Content-Disposition: inline
-In-Reply-To: <20251104183028.7412aba6@kernel.org>
-
-
---hS5bIEDocn2WJRXk
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <2acb500c38c11b0234e8616da7c2a941c344659f.1761711549.git.zhuyikai1@h-partners.com>
 
-On Nov 04, Jakub Kicinski wrote:
-> On Mon, 03 Nov 2025 11:27:55 +0100 Lorenzo Bianconi wrote:
-> > +		__list_del_entry(&e->list);
-> > +		list_add_tail(&e->list, &tx_list);
->=20
-> list_move_tail()
+On Wed, Oct 29, 2025 at 02:16:26PM +0800, Fan Gong wrote:
 
-ack, I will fix it in v2.
+...
 
->=20
-> > +		e->skb =3D i ? NULL : skb;
-> > +		e->dma_addr =3D addr;
-> > +		e->dma_len =3D len;
-> > +
-> > +		e =3D list_first_entry(&q->tx_list, struct airoha_queue_entry,
-> > +				     list);
-> > +		index =3D e - q->entry;
-> > =20
-> >  		val =3D FIELD_PREP(QDMA_DESC_LEN_MASK, len);
-> >  		if (i < nr_frags - 1)
->=20
-> > @@ -2029,10 +2020,14 @@ static netdev_tx_t airoha_dev_xmit(struct sk_bu=
-ff *skb,
-> >  	return NETDEV_TX_OK;
-> > =20
-> >  error_unmap:
-> > -	for (i--; i >=3D 0; i--) {
-> > -		index =3D (q->head + i) % q->ndesc;
-> > -		dma_unmap_single(dev->dev.parent, q->entry[index].dma_addr,
-> > -				 q->entry[index].dma_len, DMA_TO_DEVICE);
-> > +	while (!list_empty(&tx_list)) {
-> > +		e =3D list_first_entry(&tx_list, struct airoha_queue_entry,
-> > +				     list);
-> > +		__list_del_entry(&e->list);
-> > +		dma_unmap_single(dev->dev.parent, e->dma_addr, e->dma_len,
-> > +				 DMA_TO_DEVICE);
-> > +		e->dma_addr =3D 0;
-> > +		list_add_tail(&e->list, &q->tx_list);
->=20
-> and here
+> diff --git a/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c b/drivers/net/ethernet/huawei/hinic3/hinic3_netdev_ops.c
 
-ack, I will fix it in v2.
+...
 
-Regards,
-Lorenzo
+> +static void hinic3_print_link_message(struct net_device *netdev,
+> +				      bool link_status_up)
+> +{
+> +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
+> +
+> +	if (nic_dev->link_status_up == link_status_up)
+> +		return;
+> +
+> +	nic_dev->link_status_up = link_status_up;
+> +
+> +	netdev_dbg(netdev, "Link is %s\n", (link_status_up ? "up" : "down"));
 
---hS5bIEDocn2WJRXk
-Content-Type: application/pgp-signature; name=signature.asc
+Hi Fan Gong, all,
 
------BEGIN PGP SIGNATURE-----
+Coccinelle suggests that str_up_down() could be used here,
+which does seem like a reasonable suggestion as it seems
+there will be a v5 anyway.
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCaQsIUwAKCRA6cBh0uS2t
-rPJkAP4yzuHDQ7sWyCbkzqc+ZXYnrez5YP0v+l941SBgBN0fegD/TwBE8obRX0zg
-zcgzcaEMDgJ/ETRCP9t2SZonYUps0Qk=
-=lBxi
------END PGP SIGNATURE-----
+> +}
 
---hS5bIEDocn2WJRXk--
+...
 
