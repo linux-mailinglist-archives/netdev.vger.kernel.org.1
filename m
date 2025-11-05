@@ -1,320 +1,94 @@
-Return-Path: <netdev+bounces-235781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53B9AC3563C
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 12:38:47 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60777C357D3
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 12:51:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D5BD84F06A1
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 11:38:35 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4C77D4F83B4
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 11:47:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B9743112D3;
-	Wed,  5 Nov 2025 11:38:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71DE52FE04D;
+	Wed,  5 Nov 2025 11:47:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cg86LLZm"
 X-Original-To: netdev@vger.kernel.org
-Received: from localhost.localdomain (unknown [147.136.157.0])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EFD830F80C;
-	Wed,  5 Nov 2025 11:38:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=147.136.157.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49912303C86;
+	Wed,  5 Nov 2025 11:47:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762342697; cv=none; b=WqiivJKHJPnguLsr69Sbq+D4YYmQ66RKtGfIHY6VKxoHkeAKfMisouAKoodP6m6H21yM6AU+N5QKiZzMbvK2T+94mY6vqgev1PEvI4bdj/31TQi8nNF+N9Aj8WqMDhps0TXdC6BXdAMoBMfrXorgPRKl+ZQsXw7cOsDMvwdJB5o=
+	t=1762343253; cv=none; b=lPTaKXkJ6iU+aj1OiT+tLXOcLFOr4jhvwwTIHtrTNwZHkBqutZsbFnt24YTvaRgY8c7G98XB/84Uubyp/wtHAMHma/sECsLt8AH/1X+O6/V6LAHC8sX/z3t9oa7QSckJhGcm2vO6gmDqtjVX0OgMX9fg5L8sCqIGv6yVvhYWLUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762342697; c=relaxed/simple;
-	bh=2f/nuuNSmH4tlgfIceiCvK2bsGIoefAMU9plXRiCE3Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jTUsDlShsPLuV3+FPNyucoYl5ubbv1WZ9cLiiJ9WRqtWDS/gp7fhYAFwzvB51cFTSlva5h0UJdNj5zcZ15kBLqtSyDIKoxJKhEBSTR1Ze0LuHVaDySTNv652hnX0yx06Fuj8VOrUaFJkpDluDNxlsTRuMMTMidRIeM8Ac2CBp4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.dev; spf=none smtp.mailfrom=localhost.localdomain; arc=none smtp.client-ip=147.136.157.0
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=localhost.localdomain
-Received: by localhost.localdomain (Postfix, from userid 1007)
-	id 9C4408B2A0E; Wed,  5 Nov 2025 19:38:13 +0800 (+08)
-From: Jiayuan Chen <jiayuan.chen@linux.dev>
-To: mptcp@lists.linux.dev
-Cc: Jiayuan Chen <jiayuan.chen@linux.dev>,
-	Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Florian Westphal <fw@strlen.de>,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net v4 3/3] selftests/bpf: Add mptcp test with sockmap
-Date: Wed,  5 Nov 2025 19:36:09 +0800
-Message-ID: <20251105113625.148900-4-jiayuan.chen@linux.dev>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251105113625.148900-1-jiayuan.chen@linux.dev>
-References: <20251105113625.148900-1-jiayuan.chen@linux.dev>
+	s=arc-20240116; t=1762343253; c=relaxed/simple;
+	bh=rByHzTDi8GNI4VjgdYw6keFPO0iICIg6fPIKaXxnABc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sBv7OAqipFCw/wMBSjsS6RMIZiI09VFU82CecTiUmRf/Tp74MmYrjuCL7y1MxcCfSwWUXJfbojgvYdYyYct4/B5atC494NTEt9xzsu2PoqaV9vCu+uamjVw5vvgiyiEIb/kiKwdFsR7X4qJ3xNaWMg3heKZBTmNMAJshTGhGdz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cg86LLZm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07B72C4CEF8;
+	Wed,  5 Nov 2025 11:47:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762343252;
+	bh=rByHzTDi8GNI4VjgdYw6keFPO0iICIg6fPIKaXxnABc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cg86LLZmZvaS640pryi2nqiIXgCYl+2loDa4wCmigGCPFYqxEfdcimuJQegQBKLAn
+	 JGstJyrE36Z4DWcgmjabR46+0HuqdLlqRni49TyrctQC1j4h4vpBFUJBR0FSZ0rVKA
+	 5Po69MmtyqZ9aLUudcv3EHLqYOUrGuf78Pu8h/wbMd2JJWDv/kOB9q5e04GWVidQrz
+	 VCQ8+Dg68EWSX772eUT2G/9LNmmGMPkFkh+2DCdQKikNpQFI6fr1N1PrhCeSCun97l
+	 Ro396elp4sC7nvfAmLsaTQJSPyWgw9SXl/kXx6Vy5MNioKQ2GtoXeosAXztX/pe9y7
+	 2PpLayzOKdcbA==
+Date: Wed, 5 Nov 2025 11:47:29 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: netdev@vger.kernel.org, 'Andrew Lunn' <andrew+netdev@lunn.ch>,
+	"'David S. Miller'" <davem@davemloft.net>,
+	'Eric Dumazet' <edumazet@google.com>,
+	'Jakub Kicinski' <kuba@kernel.org>,
+	'Paolo Abeni' <pabeni@redhat.com>,
+	'Mengyuan Lou' <mengyuanlou@net-swift.com>, stable@vger.kernel.org
+Subject: Re: [PATCH net] net: libwx: fix device bus LAN ID
+Message-ID: <aQs5UeY214tiuL3f@horms.kernel.org>
+References: <B60A670C1F52CB8E+20251104062321.40059-1-jiawenwu@trustnetic.com>
+ <aQsf2tTu3_FAeRic@horms.kernel.org>
+ <093901dc4e3b$b753c630$25fb5290$@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <093901dc4e3b$b753c630$25fb5290$@trustnetic.com>
 
-Add test cases to verify that when MPTCP falls back to plain TCP sockets,
-they can properly work with sockmap.
+On Wed, Nov 05, 2025 at 06:05:29PM +0800, Jiawen Wu wrote:
+> On Wed, Nov 5, 2025 5:59 PM, Simon Horman wrote:
+> > On Tue, Nov 04, 2025 at 02:23:21PM +0800, Jiawen Wu wrote:
+> > > The device bus LAN ID was obtained from PCI_FUNC(), but when a PF
+> > > port is passthrough to a virtual machine, the function number may not
+> > > match the actual port index on the device. This could cause the driver
+> > > to perform operations such as LAN reset on the wrong port.
+> > >
+> > > Fix this by reading the LAN ID from port status register.
+> > >
+> > > Fixes: a34b3e6ed8fb ("net: txgbe: Store PCI info")
+> > > Cc: stable@vger.kernel.org
+> > > Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+> > 
+> > Hi Jiawen Wu,
+> > 
+> > I am wondering if these devises also support port swapping (maybe LAN
+> > Function Select bit of FACTPS). And if so, does it need to be taken into
+> > account here?
+> 
+> Does not support yet, thanks. :)
 
-Additionally, add test cases to ensure that sockmap correctly rejects
-MPTCP sockets as expected.
+Thanks, in that case this patch looks good to me.
 
-Signed-off-by: Jiayuan Chen <jiayuan.chen@linux.dev>
----
- .../testing/selftests/bpf/prog_tests/mptcp.c  | 150 ++++++++++++++++++
- .../selftests/bpf/progs/mptcp_sockmap.c       |  43 +++++
- 2 files changed, 193 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/progs/mptcp_sockmap.c
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/mptcp.c b/tools/testing/selftests/bpf/prog_tests/mptcp.c
-index f8eb7f9d4fd2..56c556f603cc 100644
---- a/tools/testing/selftests/bpf/prog_tests/mptcp.c
-+++ b/tools/testing/selftests/bpf/prog_tests/mptcp.c
-@@ -6,11 +6,14 @@
- #include <netinet/in.h>
- #include <test_progs.h>
- #include <unistd.h>
-+#include <error.h>
- #include "cgroup_helpers.h"
- #include "network_helpers.h"
-+#include "socket_helpers.h"
- #include "mptcp_sock.skel.h"
- #include "mptcpify.skel.h"
- #include "mptcp_subflow.skel.h"
-+#include "mptcp_sockmap.skel.h"
- 
- #define NS_TEST "mptcp_ns"
- #define ADDR_1	"10.0.1.1"
-@@ -436,6 +439,151 @@ static void test_subflow(void)
- 	close(cgroup_fd);
- }
- 
-+/* Test sockmap on MPTCP server handling non-mp-capable clients. */
-+static void test_sockmap_with_mptcp_fallback(struct mptcp_sockmap *skel)
-+{
-+	int listen_fd = -1, client_fd1 = -1, client_fd2 = -1;
-+	int server_fd1 = -1, server_fd2 = -1, sent, recvd;
-+	char snd[9] = "123456789";
-+	char rcv[10];
-+
-+	/* start server with MPTCP enabled */
-+	listen_fd = start_mptcp_server(AF_INET, NULL, 0, 0);
-+	if (!ASSERT_OK_FD(listen_fd, "redirect:start_mptcp_server"))
-+		return;
-+
-+	skel->bss->trace_port = ntohs(get_socket_local_port(listen_fd));
-+	skel->bss->sk_index = 0;
-+	/* create client without MPTCP enabled */
-+	client_fd1 = connect_to_fd_opts(listen_fd, NULL);
-+	if (!ASSERT_OK_FD(client_fd1, "redirect:connect_to_fd"))
-+		goto end;
-+
-+	server_fd1 = xaccept_nonblock(listen_fd, NULL, NULL);
-+	skel->bss->sk_index = 1;
-+	client_fd2 = connect_to_fd_opts(listen_fd, NULL);
-+	if (!ASSERT_OK_FD(client_fd2, "redirect:connect_to_fd"))
-+		goto end;
-+
-+	server_fd2 = xaccept_nonblock(listen_fd, NULL, NULL);
-+	/* test normal redirect behavior: data sent by client_fd1 can be
-+	 * received by client_fd2
-+	 */
-+	skel->bss->redirect_idx = 1;
-+	sent = xsend(client_fd1, snd, sizeof(snd), 0);
-+	if (!ASSERT_EQ(sent, sizeof(snd), "redirect:xsend(client_fd1)"))
-+		goto end;
-+
-+	/* try to recv more bytes to avoid truncation check */
-+	recvd = recv_timeout(client_fd2, rcv, sizeof(rcv), MSG_DONTWAIT, 2);
-+	if (!ASSERT_EQ(recvd, sizeof(snd), "redirect:recv(client_fd2)"))
-+		goto end;
-+
-+end:
-+	if (client_fd1 > 1)
-+		close(client_fd1);
-+	if (client_fd2 > 1)
-+		close(client_fd2);
-+	if (server_fd1 > 0)
-+		close(server_fd1);
-+	if (server_fd2 > 0)
-+		close(server_fd2);
-+	close(listen_fd);
-+}
-+
-+/* Test sockmap rejection of MPTCP sockets - both server and client sides. */
-+static void test_sockmap_reject_mptcp(struct mptcp_sockmap *skel)
-+{
-+	int client_fd1 = -1, client_fd2 = -1;
-+	int listen_fd = -1, server_fd = -1;
-+	int err, zero = 0;
-+
-+	/* start server with MPTCP enabled */
-+	listen_fd = start_mptcp_server(AF_INET, NULL, 0, 0);
-+	if (!ASSERT_OK_FD(listen_fd, "start_mptcp_server"))
-+		return;
-+
-+	skel->bss->trace_port = ntohs(get_socket_local_port(listen_fd));
-+	skel->bss->sk_index = 0;
-+	/* create client with MPTCP enabled */
-+	client_fd1 = connect_to_fd(listen_fd, 0);
-+	if (!ASSERT_OK_FD(client_fd1, "connect_to_fd client_fd1"))
-+		goto end;
-+
-+	/* bpf_sock_map_update() called from sockops should reject MPTCP sk */
-+	if (!ASSERT_EQ(skel->bss->helper_ret, -EOPNOTSUPP, "should reject"))
-+		goto end;
-+
-+	/* set trace_port = -1 to stop sockops */
-+	skel->bss->trace_port = -1;
-+	client_fd2 = connect_to_fd(listen_fd, 0);
-+	if (!ASSERT_OK_FD(client_fd2, "connect_to_fd client_fd2"))
-+		goto end;
-+
-+	server_fd = xaccept_nonblock(listen_fd, NULL, NULL);
-+	err = bpf_map_update_elem(bpf_map__fd(skel->maps.sock_map),
-+				  &zero, &server_fd, BPF_NOEXIST);
-+	if (!ASSERT_EQ(err, -EOPNOTSUPP, "server should be disallowed"))
-+		goto end;
-+
-+	/* MPTCP client should also be disallowed */
-+	err = bpf_map_update_elem(bpf_map__fd(skel->maps.sock_map),
-+				  &zero, &client_fd1, BPF_NOEXIST);
-+	if (!ASSERT_EQ(err, -EOPNOTSUPP, "client should be disallowed"))
-+		goto end;
-+end:
-+	if (client_fd1 > 0)
-+		close(client_fd1);
-+	if (client_fd2 > 0)
-+		close(client_fd2);
-+	if (server_fd > 0)
-+		close(server_fd);
-+	close(listen_fd);
-+}
-+
-+static void test_mptcp_sockmap(void)
-+{
-+	struct mptcp_sockmap *skel;
-+	struct netns_obj *netns;
-+	int cgroup_fd, err;
-+
-+	cgroup_fd = test__join_cgroup("/mptcp_sockmap");
-+	if (!ASSERT_OK_FD(cgroup_fd, "join_cgroup: mptcp_sockmap"))
-+		return;
-+
-+	skel = mptcp_sockmap__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "skel_open_load: mptcp_sockmap"))
-+		goto close_cgroup;
-+
-+	skel->links.mptcp_sockmap_inject =
-+		bpf_program__attach_cgroup(skel->progs.mptcp_sockmap_inject, cgroup_fd);
-+	if (!ASSERT_OK_PTR(skel->links.mptcp_sockmap_inject, "attach sockmap"))
-+		goto skel_destroy;
-+
-+	err = bpf_prog_attach(bpf_program__fd(skel->progs.mptcp_sockmap_redirect),
-+			      bpf_map__fd(skel->maps.sock_map),
-+			      BPF_SK_SKB_STREAM_VERDICT, 0);
-+	if (!ASSERT_OK(err, "bpf_prog_attach stream verdict"))
-+		goto skel_destroy;
-+
-+	netns = netns_new(NS_TEST, true);
-+	if (!ASSERT_OK_PTR(netns, "netns_new: mptcp_sockmap"))
-+		goto skel_destroy;
-+
-+	if (endpoint_init("subflow") < 0)
-+		goto close_netns;
-+
-+	test_sockmap_with_mptcp_fallback(skel);
-+	test_sockmap_reject_mptcp(skel);
-+
-+close_netns:
-+	netns_free(netns);
-+skel_destroy:
-+	mptcp_sockmap__destroy(skel);
-+close_cgroup:
-+	close(cgroup_fd);
-+}
-+
- void test_mptcp(void)
- {
- 	if (test__start_subtest("base"))
-@@ -444,4 +592,6 @@ void test_mptcp(void)
- 		test_mptcpify();
- 	if (test__start_subtest("subflow"))
- 		test_subflow();
-+	if (test__start_subtest("sockmap"))
-+		test_mptcp_sockmap();
- }
-diff --git a/tools/testing/selftests/bpf/progs/mptcp_sockmap.c b/tools/testing/selftests/bpf/progs/mptcp_sockmap.c
-new file mode 100644
-index 000000000000..d4eef0cbadb9
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/mptcp_sockmap.c
-@@ -0,0 +1,43 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include "bpf_tracing_net.h"
-+
-+char _license[] SEC("license") = "GPL";
-+
-+int sk_index;
-+int redirect_idx;
-+int trace_port;
-+int helper_ret;
-+struct {
-+	__uint(type, BPF_MAP_TYPE_SOCKMAP);
-+	__uint(key_size, sizeof(__u32));
-+	__uint(value_size, sizeof(__u32));
-+	__uint(max_entries, 100);
-+} sock_map SEC(".maps");
-+
-+SEC("sockops")
-+int mptcp_sockmap_inject(struct bpf_sock_ops *skops)
-+{
-+	struct bpf_sock *sk;
-+
-+	/* only accept specified connection */
-+	if (skops->local_port != trace_port ||
-+	    skops->op != BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB)
-+		return 1;
-+
-+	sk = skops->sk;
-+	if (!sk)
-+		return 1;
-+
-+	/* update sk handler */
-+	helper_ret = bpf_sock_map_update(skops, &sock_map, &sk_index, BPF_NOEXIST);
-+
-+	return 1;
-+}
-+
-+SEC("sk_skb/stream_verdict")
-+int mptcp_sockmap_redirect(struct __sk_buff *skb)
-+{
-+	/* redirect skb to the sk under sock_map[redirect_idx] */
-+	return bpf_sk_redirect_map(skb, &sock_map, redirect_idx, 0);
-+}
--- 
-2.43.0
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
