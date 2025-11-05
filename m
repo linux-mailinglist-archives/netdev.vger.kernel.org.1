@@ -1,286 +1,222 @@
-Return-Path: <netdev+bounces-235905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40AA0C36EB0
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 18:06:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BB77C36F4F
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 18:10:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6B8931A24B8D
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 17:01:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 284F21A2558B
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 17:04:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D425E34DCF4;
-	Wed,  5 Nov 2025 16:55:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6B5D33A02B;
+	Wed,  5 Nov 2025 16:57:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f5Oenf/S"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XkrNSQmV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97AF934DB46;
-	Wed,  5 Nov 2025 16:55:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78C82339B47;
+	Wed,  5 Nov 2025 16:57:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762361704; cv=none; b=OPDO5NDYrGQlRK0djNyfoWL1RzdJzGJb8eFNtB4P3yxmBXROVjvJ7OyGUA5HguXBTJoI1dSVisBd+auPF0QN4T6H0JxbNZrlky5nfxGsUe1vtHxfymjY2hNjSUh35dEXvASbZIYx5d6xQ6ttOv0hTwUy/hipltHXAqNC4uyE3RM=
+	t=1762361823; cv=none; b=KI42riCZ+1kvSEJWiQlcpKxeSkjsiwgXRQ2fEFbTax+ndc+t3Tq9vkXi0Mu2lH5uLDD6ky/3djDgEB23ujS+8UZWr68dEwHLRMZKvkJG+hbRkEi+GupPynq9LxMVgPCTf0kQSPtej1yoec0884LZYdWutY2S/1ifMxgaDg37yiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762361704; c=relaxed/simple;
-	bh=8uFhmfmnSTsd3LwYNioQRWlGjzSH6flkvXdmZ7xJmTo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ORNKYIM1wbi5GGEwOOwvAgELcBH1kV6V03jbTobn5hGoHfF14iVa9Beh4vh4iHbUqXNgkl2CsR1erF4hdBcmCdKXlKmQt2AHgSqW+tnJCq8S6/nLiz5h7GYEWgzYox5apN5SC+Hhe6JGwYHtp8OhQnrSZt2Fb4DYRLrfq6uXa80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f5Oenf/S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 473F2C116B1;
-	Wed,  5 Nov 2025 16:55:01 +0000 (UTC)
+	s=arc-20240116; t=1762361823; c=relaxed/simple;
+	bh=nhM7jbKOW56d3hh/niEe2UapYbSyWoAGZQptKDlqI44=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h1hfKE5NVqdKsc4ZknTJnrLkEa4O5D5/3VygawME0wtKJojxW1IWucyeMJEDtICSvKb4zqtPZxVINLA/2eBPKGB2MsAikfy4ozndQvzrc9rM6jXtO+zuM0Ly9kaCb2XwYV76MUcG5j+GOj/v2DCjOoCVWcYNIzc3DUyyrJNeSU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XkrNSQmV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61FC2C4CEF5;
+	Wed,  5 Nov 2025 16:57:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762361704;
-	bh=8uFhmfmnSTsd3LwYNioQRWlGjzSH6flkvXdmZ7xJmTo=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=f5Oenf/SvFAFjRdyni7XQijTep2IHierotWbgMU2UbOTpksiQsROt1aF+dPbNuCH2
-	 1oUKbKzhFqYLnyn8JhgnONeFClnDzW8M9TGesb6LwYtWJuKxjsSbbs1h8WxRaWYIku
-	 FJ57ri0MQ0uxUTufrEk5zhCmAkFAQ7VmW8mldA2Yz/ApMrrQ3+dm/w0Pz4iAWkG5LJ
-	 umYmGXuujNQbIo8Zte0Td4zJfysJEylWTl2UYkVi1/93DRbi1KJjqDd9Ga6ZVgLDh6
-	 SZR74lxKruPDtv3zTQmLrs+cJRcNK2D6HFXXlPN4jtgbao5GWNEqIhb64uOsS1Te5i
-	 qsZlLrSUFn8qw==
-From: Jeff Layton <jlayton@kernel.org>
-Date: Wed, 05 Nov 2025 11:54:02 -0500
-Subject: [PATCH v5 16/17] nfsd: wire up GET_DIR_DELEGATION handling
+	s=k20201202; t=1762361823;
+	bh=nhM7jbKOW56d3hh/niEe2UapYbSyWoAGZQptKDlqI44=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XkrNSQmVRGDQ0lt4n06gp9o429LO1OThSwSo+tIIP2EJBJlS8ww/ro7sMmGiVdhrM
+	 t1rgH6uGlaXnjmVa+q0tT6T/wHZzevQNMI/p1TJa24pvFPEM/3OqPC7DF47OIz9o9m
+	 rS7nbd/l2kvzZuGV09bu3MD4TN55uh1avGCcK3xopWmiC5ZLktsFp0az7HaETHuJoY
+	 Vh1Stje19/PGgTlt9Jb499Vr+Bcz3Vt9T3rYp8qWR+6Y0CAW4VMy94J4OlikA0BiAP
+	 dy2pVF6eF1/01q9zF36JMleysXGqAX5oXg57tsMBxZrtmIJQPGP9L3s7oIbUpsJ6fD
+	 yvwf0f0RHi11g==
+Date: Wed, 5 Nov 2025 17:57:00 +0100
+From: Frederic Weisbecker <frederic@kernel.org>
+To: Waiman Long <llong@redhat.com>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vlastimil Babka <vbabka@suse.cz>, Will Deacon <will@kernel.org>,
+	cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-block@vger.kernel.org, linux-mm@kvack.org,
+	linux-pci@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 22/33] kthread: Include unbound kthreads in the managed
+ affinity list
+Message-ID: <aQuB3Oy7i6Z0SJlA@localhost.localdomain>
+References: <20251013203146.10162-1-frederic@kernel.org>
+ <20251013203146.10162-23-frederic@kernel.org>
+ <ba437129-062a-4a2f-a753-64945e9a13ff@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251105-dir-deleg-ro-v5-16-7ebc168a88ac@kernel.org>
-References: <20251105-dir-deleg-ro-v5-0-7ebc168a88ac@kernel.org>
-In-Reply-To: <20251105-dir-deleg-ro-v5-0-7ebc168a88ac@kernel.org>
-To: Miklos Szeredi <miklos@szeredi.hu>, 
- Alexander Viro <viro@zeniv.linux.org.uk>, 
- Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
- Chuck Lever <chuck.lever@oracle.com>, 
- Alexander Aring <alex.aring@gmail.com>, 
- Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
- Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
- Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
- Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
- Bharath SM <bharathsm@microsoft.com>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
- David Howells <dhowells@redhat.com>, Tyler Hicks <code@tyhicks.com>, 
- NeilBrown <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>, 
- Dai Ngo <Dai.Ngo@oracle.com>, Amir Goldstein <amir73il@gmail.com>, 
- Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>, 
- Sergey Senozhatsky <senozhatsky@chromium.org>, 
- Carlos Maiolino <cem@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
- samba-technical@lists.samba.org, netfs@lists.linux.dev, 
- ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org, 
- linux-xfs@vger.kernel.org, netdev@vger.kernel.org, 
- Jeff Layton <jlayton@kernel.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5577; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=8uFhmfmnSTsd3LwYNioQRWlGjzSH6flkvXdmZ7xJmTo=;
- b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBpC4EtKjXEEAavufgz3/17T2+K75udF1YHhM8p1
- kLLoOFSASaJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaQuBLQAKCRAADmhBGVaC
- Fb9xD/0SrANaaUs/KwJlwN9tPXS96N80QDXhAa3/aQiaUd38olFHdxjgtSPwz6fVN7C1NS/8N2M
- Y9GmCgY8SHLYhnxhx/iCJwOleWwCFWmuMdkZFV9/1gA3tOQOLBL865n/f5m+ZRStY5poVfIIILu
- QfhhswKVyGxN0uHjsPfRuudcAVBU/1eUk3RdxpE8MChbCbgBCzFmpK94I+Xy2hCSAKUPDzjLXFc
- jauSu6SmQzJhluP3AP5KxGBgsizOV/8ZwakjK+qL3eOw2E9awNueo7rijaJnKpkKsn13pZwPYRP
- NMdz0PoSm1sZDc9jsPjYjRV954z1kT5USy2LsMU5Boo6/0LopQ+Q1ohSQYIvq9t2QeQYK0O8z57
- jzSivucdoTuLJkMX1HjMQ1K0CExea8CqgWo8lz+yUWu9d+WBxkXXePCSzKXXwSjZiNymqx09lFG
- G7lHF9Eu5wiZMYrLtWkdcWEZG1H0LSJndAcF+RuyqV/icgFU1vwqvQPdgDk4WcPoYopYUXx/FhQ
- nhM83yNV3bpUQ/m46YDkW7zjaHpU3Zsm7GCpG110w2rp2Wx7fgcjX+nOwXu6AkFjJ6inHLsMpnl
- rgvcZDfAZmpEEtQ7rwDEo9e0HORqkLdmWFuD5q3hFC0gYkUis+Ww48x201kxjnMS/iWMZJ3xkaA
- yKs0Ihu73wXrnuQ==
-X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
- fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ba437129-062a-4a2f-a753-64945e9a13ff@redhat.com>
 
-Add a new routine for acquiring a read delegation on a directory. These
-are recallable-only delegations with no support for CB_NOTIFY. That will
-be added in a later phase.
+Le Tue, Oct 21, 2025 at 06:42:59PM -0400, Waiman Long a écrit :
+> 
+> On 10/13/25 4:31 PM, Frederic Weisbecker wrote:
+> > The managed affinity list currently contains only unbound kthreads that
+> > have affinity preferences. Unbound kthreads globally affine by default
+> > are outside of the list because their affinity is automatically managed
+> > by the scheduler (through the fallback housekeeping mask) and by cpuset.
+> > 
+> > However in order to preserve the preferred affinity of kthreads, cpuset
+> > will delegate the isolated partition update propagation to the
+> > housekeeping and kthread code.
+> > 
+> > Prepare for that with including all unbound kthreads in the managed
+> > affinity list.
+> > 
+> > Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> > ---
+> >   kernel/kthread.c | 59 ++++++++++++++++++++++++------------------------
+> >   1 file changed, 30 insertions(+), 29 deletions(-)
+> > 
+> > diff --git a/kernel/kthread.c b/kernel/kthread.c
+> > index c4dd967e9e9c..cba3d297f267 100644
+> > --- a/kernel/kthread.c
+> > +++ b/kernel/kthread.c
+> > @@ -365,9 +365,10 @@ static void kthread_fetch_affinity(struct kthread *kthread, struct cpumask *cpum
+> >   	if (kthread->preferred_affinity) {
+> >   		pref = kthread->preferred_affinity;
+> >   	} else {
+> > -		if (WARN_ON_ONCE(kthread->node == NUMA_NO_NODE))
+> > -			return;
+> > -		pref = cpumask_of_node(kthread->node);
+> > +		if (kthread->node == NUMA_NO_NODE)
+> > +			pref = housekeeping_cpumask(HK_TYPE_KTHREAD);
+> > +		else
+> > +			pref = cpumask_of_node(kthread->node);
+> >   	}
+> >   	cpumask_and(cpumask, pref, housekeeping_cpumask(HK_TYPE_KTHREAD));
+> > @@ -380,32 +381,29 @@ static void kthread_affine_node(void)
+> >   	struct kthread *kthread = to_kthread(current);
+> >   	cpumask_var_t affinity;
+> > -	WARN_ON_ONCE(kthread_is_per_cpu(current));
+> > +	if (WARN_ON_ONCE(kthread_is_per_cpu(current)))
+> > +		return;
+> > -	if (kthread->node == NUMA_NO_NODE) {
+> > -		housekeeping_affine(current, HK_TYPE_KTHREAD);
+> > -	} else {
+> > -		if (!zalloc_cpumask_var(&affinity, GFP_KERNEL)) {
+> > -			WARN_ON_ONCE(1);
+> > -			return;
+> > -		}
+> > -
+> > -		mutex_lock(&kthread_affinity_lock);
+> > -		WARN_ON_ONCE(!list_empty(&kthread->affinity_node));
+> > -		list_add_tail(&kthread->affinity_node, &kthread_affinity_list);
+> > -		/*
+> > -		 * The node cpumask is racy when read from kthread() but:
+> > -		 * - a racing CPU going down will either fail on the subsequent
+> > -		 *   call to set_cpus_allowed_ptr() or be migrated to housekeepers
+> > -		 *   afterwards by the scheduler.
+> > -		 * - a racing CPU going up will be handled by kthreads_online_cpu()
+> > -		 */
+> > -		kthread_fetch_affinity(kthread, affinity);
+> > -		set_cpus_allowed_ptr(current, affinity);
+> > -		mutex_unlock(&kthread_affinity_lock);
+> > -
+> > -		free_cpumask_var(affinity);
+> > +	if (!zalloc_cpumask_var(&affinity, GFP_KERNEL)) {
+> > +		WARN_ON_ONCE(1);
+> > +		return;
+> >   	}
+> > +
+> > +	mutex_lock(&kthread_affinity_lock);
+> > +	WARN_ON_ONCE(!list_empty(&kthread->affinity_node));
+> > +	list_add_tail(&kthread->affinity_node, &kthread_affinity_list);
+> > +	/*
+> > +	 * The node cpumask is racy when read from kthread() but:
+> > +	 * - a racing CPU going down will either fail on the subsequent
+> > +	 *   call to set_cpus_allowed_ptr() or be migrated to housekeepers
+> > +	 *   afterwards by the scheduler.
+> > +	 * - a racing CPU going up will be handled by kthreads_online_cpu()
+> > +	 */
+> > +	kthread_fetch_affinity(kthread, affinity);
+> > +	set_cpus_allowed_ptr(current, affinity);
+> > +	mutex_unlock(&kthread_affinity_lock);
+> > +
+> > +	free_cpumask_var(affinity);
+> >   }
+> >   static int kthread(void *_create)
+> > @@ -924,8 +922,11 @@ static int kthreads_online_cpu(unsigned int cpu)
+> >   			ret = -EINVAL;
+> >   			continue;
+> >   		}
+> > -		kthread_fetch_affinity(k, affinity);
+> > -		set_cpus_allowed_ptr(k->task, affinity);
+> > +
+> > +		if (k->preferred_affinity || k->node != NUMA_NO_NODE) {
+> > +			kthread_fetch_affinity(k, affinity);
+> > +			set_cpus_allowed_ptr(k->task, affinity);
+> > +		}
+> >   	}
+> 
+> My understanding of kthreads_online_cpu() is that hotplug won't affect the
+> affinity returned from kthread_fetch_affinity().
 
-Since the same CB_RECALL/DELEGRETURN infrastructure is used for regular
-and directory delegations, a normal nfs4_delegation is used to represent
-a directory delegation.
+It should. The onlining CPU is considered online at this point and might
+be part of the returned kthread_fetch_affinity().
 
-Reviewed-by: NeilBrown <neil@brown.name>
-Reviewed-by: Chuck Lever <chuck.lever@oracle.com>
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
----
- fs/nfsd/nfs4proc.c  |  22 +++++++++++-
- fs/nfsd/nfs4state.c | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- fs/nfsd/state.h     |   5 +++
- 3 files changed, 126 insertions(+), 1 deletion(-)
+> However, set_cpus_allowed_ptr() will mask out all the offline CPUs. So if the given
+> "cpu" to be brought online is in the returned affinity, we should call
+> set_cpus_allowed_ptr() to add this cpu into its affinity mask though the
+> current code will call it even it is not strictly necessary.
 
-diff --git a/fs/nfsd/nfs4proc.c b/fs/nfsd/nfs4proc.c
-index e466cf52d7d7e1a78c3a469613a85ab3546d6d17..517968dddf4a33651313658d300f9f929f83c5af 100644
---- a/fs/nfsd/nfs4proc.c
-+++ b/fs/nfsd/nfs4proc.c
-@@ -2341,6 +2341,13 @@ nfsd4_get_dir_delegation(struct svc_rqst *rqstp,
- 			 union nfsd4_op_u *u)
- {
- 	struct nfsd4_get_dir_delegation *gdd = &u->get_dir_delegation;
-+	struct nfs4_delegation *dd;
-+	struct nfsd_file *nf;
-+	__be32 status;
-+
-+	status = nfsd_file_acquire_dir(rqstp, &cstate->current_fh, &nf);
-+	if (status != nfs_ok)
-+		return status;
- 
- 	/*
- 	 * RFC 8881, section 18.39.3 says:
-@@ -2354,7 +2361,20 @@ nfsd4_get_dir_delegation(struct svc_rqst *rqstp,
- 	 * return NFS4_OK with a non-fatal status of GDD4_UNAVAIL in this
- 	 * situation.
- 	 */
--	gdd->gddrnf_status = GDD4_UNAVAIL;
-+	dd = nfsd_get_dir_deleg(cstate, gdd, nf);
-+	nfsd_file_put(nf);
-+	if (IS_ERR(dd)) {
-+		int err = PTR_ERR(dd);
-+
-+		if (err != -EAGAIN)
-+			return nfserrno(err);
-+		gdd->gddrnf_status = GDD4_UNAVAIL;
-+		return nfs_ok;
-+	}
-+
-+	gdd->gddrnf_status = GDD4_OK;
-+	memcpy(&gdd->gddr_stateid, &dd->dl_stid.sc_stateid, sizeof(gdd->gddr_stateid));
-+	nfs4_put_stid(&dd->dl_stid);
- 	return nfs_ok;
- }
- 
-diff --git a/fs/nfsd/nfs4state.c b/fs/nfsd/nfs4state.c
-index da66798023aba4c36c38208cec7333db237e46e0..8f8c9385101e15b64883eabec71775f26b14f890 100644
---- a/fs/nfsd/nfs4state.c
-+++ b/fs/nfsd/nfs4state.c
-@@ -9347,3 +9347,103 @@ nfsd4_deleg_getattr_conflict(struct svc_rqst *rqstp, struct dentry *dentry,
- 	nfs4_put_stid(&dp->dl_stid);
- 	return status;
- }
-+
-+/**
-+ * nfsd_get_dir_deleg - attempt to get a directory delegation
-+ * @cstate: compound state
-+ * @gdd: GET_DIR_DELEGATION arg/resp structure
-+ * @nf: nfsd_file opened on the directory
-+ *
-+ * Given a GET_DIR_DELEGATION request @gdd, attempt to acquire a delegation
-+ * on the directory to which @nf refers. Note that this does not set up any
-+ * sort of async notifications for the delegation.
-+ */
-+struct nfs4_delegation *
-+nfsd_get_dir_deleg(struct nfsd4_compound_state *cstate,
-+		   struct nfsd4_get_dir_delegation *gdd,
-+		   struct nfsd_file *nf)
-+{
-+	struct nfs4_client *clp = cstate->clp;
-+	struct nfs4_delegation *dp;
-+	struct file_lease *fl;
-+	struct nfs4_file *fp, *rfp;
-+	int status = 0;
-+
-+	fp = nfsd4_alloc_file();
-+	if (!fp)
-+		return ERR_PTR(-ENOMEM);
-+
-+	nfsd4_file_init(&cstate->current_fh, fp);
-+
-+	rfp = nfsd4_file_hash_insert(fp, &cstate->current_fh);
-+	if (unlikely(!rfp)) {
-+		put_nfs4_file(fp);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	if (rfp != fp) {
-+		put_nfs4_file(fp);
-+		fp = rfp;
-+	}
-+
-+	/* if this client already has one, return that it's unavailable */
-+	spin_lock(&state_lock);
-+	spin_lock(&fp->fi_lock);
-+	/* existing delegation? */
-+	if (nfs4_delegation_exists(clp, fp)) {
-+		status = -EAGAIN;
-+	} else if (!fp->fi_deleg_file) {
-+		fp->fi_deleg_file = nfsd_file_get(nf);
-+		fp->fi_delegees = 1;
-+	} else {
-+		++fp->fi_delegees;
-+	}
-+	spin_unlock(&fp->fi_lock);
-+	spin_unlock(&state_lock);
-+
-+	if (status) {
-+		put_nfs4_file(fp);
-+		return ERR_PTR(status);
-+	}
-+
-+	/* Try to set up the lease */
-+	status = -ENOMEM;
-+	dp = alloc_init_deleg(clp, fp, NULL, NFS4_OPEN_DELEGATE_READ);
-+	if (!dp)
-+		goto out_delegees;
-+
-+	fl = nfs4_alloc_init_lease(dp);
-+	if (!fl)
-+		goto out_put_stid;
-+
-+	status = kernel_setlease(nf->nf_file,
-+				 fl->c.flc_type, &fl, NULL);
-+	if (fl)
-+		locks_free_lease(fl);
-+	if (status)
-+		goto out_put_stid;
-+
-+	/*
-+	 * Now, try to hash it. This can fail if we race another nfsd task
-+	 * trying to set a delegation on the same file. If that happens,
-+	 * then just say UNAVAIL.
-+	 */
-+	spin_lock(&state_lock);
-+	spin_lock(&clp->cl_lock);
-+	spin_lock(&fp->fi_lock);
-+	status = hash_delegation_locked(dp, fp);
-+	spin_unlock(&fp->fi_lock);
-+	spin_unlock(&clp->cl_lock);
-+	spin_unlock(&state_lock);
-+
-+	if (!status)
-+		return dp;
-+
-+	/* Something failed. Drop the lease and clean up the stid */
-+	kernel_setlease(fp->fi_deleg_file->nf_file, F_UNLCK, NULL, (void **)&dp);
-+out_put_stid:
-+	nfs4_put_stid(&dp->dl_stid);
-+out_delegees:
-+	put_deleg_file(fp);
-+	return ERR_PTR(status);
-+}
-diff --git a/fs/nfsd/state.h b/fs/nfsd/state.h
-index 1e736f4024263ffa9c93bcc9ec48f44566a8cc77..b052c1effdc5356487c610db9728df8ecfe851d4 100644
---- a/fs/nfsd/state.h
-+++ b/fs/nfsd/state.h
-@@ -867,4 +867,9 @@ static inline bool try_to_expire_client(struct nfs4_client *clp)
- 
- extern __be32 nfsd4_deleg_getattr_conflict(struct svc_rqst *rqstp,
- 		struct dentry *dentry, struct nfs4_delegation **pdp);
-+
-+struct nfsd4_get_dir_delegation;
-+struct nfs4_delegation *nfsd_get_dir_deleg(struct nfsd4_compound_state *cstate,
-+						struct nfsd4_get_dir_delegation *gdd,
-+						struct nfsd_file *nf);
- #endif   /* NFSD4_STATE_H */
+I'm not sure I understand what you mean.
+
+> This change will not do this update to NUMA_NO_NODE kthread with no preferred_affinity,
+> is this a problem?
+
+Ah, so unbound kthreads without preferred affinity are already affine to all
+possible CPUs (or housekeeping), whether those CPUs are online or not. So we
+don't need to add newly online CPUs to them.
+
+kthreads with a preferred affinity or node are different because if none of
+their preferred CPUs are online, they must be affine to housekeeping. But as
+soon as one of their preferred CPU becomes online, they must be affine to them.
+
+Hence the different treatment. I'm adding a big comment to explain that.
+
+Thanks!
 
 -- 
-2.51.1
-
+Frederic Weisbecker
+SUSE Labs
 
