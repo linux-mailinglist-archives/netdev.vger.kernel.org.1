@@ -1,190 +1,162 @@
-Return-Path: <netdev+bounces-235937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5F79C3750B
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 19:32:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E5C37C37556
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 19:35:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 117B94E4D5F
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 18:31:59 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 529B64E99D1
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 18:34:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B9AB287267;
-	Wed,  5 Nov 2025 18:31:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5926E340A63;
+	Wed,  5 Nov 2025 18:33:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="moYvwvA2"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="qKS1dZ9R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8233F280339
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 18:31:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11030337BA6;
+	Wed,  5 Nov 2025 18:33:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762367508; cv=none; b=Q+Pl8sXJpfisaQ8ftYcdOszTp1ygu+5aIDNlE2H9Cra41yh8SgSe2XIYjzjAAxw8SOb3tNLsc6xah4OuykN3G/xqJ31SisY+ws0p4YgQChgCA3c8xDMtat86FTvJbZ1Ma8Sx1YIqIUMXabEJZMndeAiYkqmjQZfLoiPl3ukNHeM=
+	t=1762367587; cv=none; b=iwImAiGGyM3gt1mQeyvHlpqxtlSqFQ4Q118SpRNedglZHubMaRx9c9sg12idajcQExILUS+mn8rBaIztP7r9tY/vCMcLdxpL5+baVNolK8asjMCVw/3S2I4owiq7BkeqNdYkdS6vakSXx3tMDjVe9aKi0FBhiKbaUeKrBlW28Z4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762367508; c=relaxed/simple;
-	bh=cSUvPFHauqZYS/CgsZ8XBajx3T1TWYSiO6rHtLaKjfU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SFS9bnep10r4h0DD+ZNKi3etRxoJwkJuB9d9O5iIqJSXnxCSNiIqabbeshDhcqb4ZWF1peZSM9Yi4vTpVPF+I2JKCc9fL3zHNTuw2awbZLasjBzVL0UeHFtgRbwxC7Em0pTW6ph/uLOd1//eeQbYnwuhSOOqAG7NskK29lIFVYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=moYvwvA2; arc=none smtp.client-ip=74.125.224.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-63d0692136bso195808d50.1
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 10:31:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762367505; x=1762972305; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zlbREYCC7hZZFYU/7VKZMqA+QAfKisdyFnGiY5+x3Ac=;
-        b=moYvwvA27zXvENPapH0CaBNoJCOO2eyxO4MW9MSUXnxSYepCGfx5rRQ6FgVuG/lt2X
-         45x4G+Ctsj8Hd0Sg2DAqgO2m2eBINFzXrXkUfARBiR+MH1y1hthM4QYAJ+EERt2F+Z0g
-         wX/5Ev8R59JN71QtkO808CVEmEcRE+s7rVj237LHFL/lap/bLtD7Rgqgq7H/cNKNYQiR
-         rOKj0LOmWWseMg8CnEPFyxf4Q3cGbn1yxP7CEYni0kG0XWZbLLRwzHOxcenHcWPP/ry5
-         54ewXiBejpDc5AbWydwntAfQzC8b489rHVa2OhSvIoaJ4jI9xRCOGosICz6iRgRsD7+U
-         XY9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762367505; x=1762972305;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zlbREYCC7hZZFYU/7VKZMqA+QAfKisdyFnGiY5+x3Ac=;
-        b=iaYAKo+mU35I4Y4zbxvxtE2URegAAa9hY5bHf655tNcVxh8qNbl6vYln5xJa75t/PT
-         EcTStRk5h8DaH0N/0abPxk8c8ofp8eztoJIVtXu5vql+awb6IyVRbOZj+DHMKvsEOTL4
-         wQQuohVQ1AO6Rzi6cvrEV8yQCeTw29iiOGpkMfGzx00YHnZqmrM9GEN5wo6rvqObMZ65
-         rFho8PNyXsjZ9/hK66oLSa4g0AEiTW6Q5FdDwQV3OCQwqk56G/9Wrj9pVUw5VXf9olbC
-         VtKPCpWy03fA6Ybkxffqk5bXbFrJfB8TouAhn5jDeEsfRWfDN5lWAbGc1cwMcJjOTYdK
-         HXnA==
-X-Forwarded-Encrypted: i=1; AJvYcCXIM9GEOgASO/gvZhz1RFwxofrd6uC+uu+9UxHz15rfr5p6R0QR++G+09U1Se0GDzmuFkVZ9wQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzanrqBOGZjPl/sRNmPnnOVXifESHbu5TkIrQF5I9LB+IiWC+vU
-	QkJMMARVFxaxxWRPaT3TEM0D1l4DaYgLwzUkJCFl4/zJMDlP8xuMghDn8G3undOmDvOcVE9EreQ
-	Z5sjh2WZDD2uYTwgKuj91f6mpWEu1hac63PTmqQhm
-X-Gm-Gg: ASbGnctJtSLh083CpSUPHuxAgyAd4FPdPZo4IqTA/pffX+FFQX/RdetrEKuq7iuUzXK
-	TZC+ucE8JbkCCM7gEo2trvXFMrbA+VtgdXdSo6n09yPq7JnVCmIQaZwC7PaKb4SlsEN8+qqrqdp
-	xyUm+8w2uzvBDllHqQtMNVE+WNpf8QKehs1crr8ucybxmjq3zcp+GarBGjsb+eAT0xH4hLWnnuX
-	qpk3012iDPaFDmsDj7YDG1Y2Y1Z0SjxxDzpg3T7MgY8hDXwncPOSjHyd1tmihnqsjCfsFU/yyRc
-	hU+e1eqI9+qmJGEj3CD90YXb7di9SYqzuiY3
-X-Google-Smtp-Source: AGHT+IEOY8cyE6iEXUXwkiFxfgFzq5OVSEUXJFxiV5kaSFWjZNeby5wEMszhmBL8q+8wcQrvfgB84R8XK2eZFBODVvM=
-X-Received: by 2002:a53:c05a:0:10b0:636:d4ab:a507 with SMTP id
- 956f58d0204a3-63fd34ccd13mr3319244d50.16.1762367505139; Wed, 05 Nov 2025
- 10:31:45 -0800 (PST)
+	s=arc-20240116; t=1762367587; c=relaxed/simple;
+	bh=W7UfEAgp8FNiK7ND+EnFtEt2/ra17VpFbW0P/KVydoE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QP+2pu3I7rP8S7KdJCqsYAajHs03VKZiPW8+3+40M0LbaUVRSdrqRJJ97kQKQdug62uenyTd1d1aDLTbk4qjcg+48HItZLjukPa1zXikGXgxxsgno29xL7CDJV/2QxJFomx7LJmjqzWy6TPIf2SisaHvpJ5OUD/qDwedQ0nHA4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=qKS1dZ9R; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1762367571;
+	bh=W7UfEAgp8FNiK7ND+EnFtEt2/ra17VpFbW0P/KVydoE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=qKS1dZ9Rm4NBchh6eU8jAyLXN4SnlB35RJgq1OP4H89iSAq85kusv/sGki+QDqV7v
+	 OQzIAmMFcYRmPkW+Vvt47IIGq6m760/IO07LFjHltqSBl2PpkZPJVW3ItqYlardJ9l
+	 QEhArYR+gGjNNT87UB4X7b1fKequAKFZqlOhqMBIx4/OEhd7fFUl4CpPOyEcUVwAUw
+	 gFJIlTlnH++T0nNMyXre/gXzoiCG0bFvRJmMK7RMEr5WiZd+UOn1Kz65KhaXUgNFGH
+	 gB0BEFvb80dy9Ve0PdQoG+2j+C/206RTfyP/+BWCqafD9CmWyEcwTUSsGkuZha4vci
+	 QI6cuWN3xqkJA==
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 3CD5560104;
+	Wed,  5 Nov 2025 18:32:47 +0000 (UTC)
+Received: by x201s (Postfix, from userid 1000)
+	id 112F7205059; Wed, 05 Nov 2025 18:32:25 +0000 (UTC)
+From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	wireguard@lists.zx2c4.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jordan Rife <jordan@jrife.io>
+Subject: [PATCH net-next v3 00/11] wireguard: netlink: ynl conversion
+Date: Wed,  5 Nov 2025 18:32:09 +0000
+Message-ID: <20251105183223.89913-1-ast@fiberby.net>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251022182301.1005777-1-joshwash@google.com> <20251022182301.1005777-3-joshwash@google.com>
- <20251023171445.2d470bb3@kernel.org> <CAJcM6BFTb+ASBwO+5sMfLZyyO4+MhWKp3AweXMJrgis9P7ygag@mail.gmail.com>
-In-Reply-To: <CAJcM6BFTb+ASBwO+5sMfLZyyO4+MhWKp3AweXMJrgis9P7ygag@mail.gmail.com>
-From: Ankit Garg <nktgrg@google.com>
-Date: Wed, 5 Nov 2025 10:31:32 -0800
-X-Gm-Features: AWmQ_bkub-0DPZQYHW6NWgclx5Hi6PlhiC9qH2yVCOKIyjJd37QVjH-PxzZDmqc
-Message-ID: <CAJcM6BE7qg464oLOJZtVEdYjaki422fxvUWFsA_=CjOAJeqZ_g@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/3] gve: Allow ethtool to configure rx_buf_len
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Joshua Washington <joshwash@google.com>, netdev@vger.kernel.org, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Jordan Rhee <jordanrhee@google.com>, 
-	Willem de Bruijn <willemb@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Ziwei Xiao <ziweixiao@google.com>, 
-	open list <linux-kernel@vger.kernel.org>, 
-	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Oct 24, 2025 at 11:17=E2=80=AFAM Ankit Garg <nktgrg@google.com> wro=
-te:
->
-> On Thu, Oct 23, 2025 at 5:14=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
-wrote:
-> >
-> > On Wed, 22 Oct 2025 11:22:24 -0700 Joshua Washington wrote:
-> > > +     if (priv->rx_cfg.packet_buffer_size !=3D SZ_2K) {
-> > > +             netdev_warn(dev,
-> > > +                         "XDP is not supported for Rx buf len %d. Se=
-t Rx buf len to %d before using XDP.\n",
-> > > +                         priv->rx_cfg.packet_buffer_size, SZ_2K);
-> > > +             return -EOPNOTSUPP;
-> > > +     }
-> >
-> > Please plumb extack thru to here. It's inside struct netdev_bpf
-> >
->
-> Using extack just for this log will make it inconsistent with other
-> logs in this method. Would it be okay if I send a fast follow patch to
-> use exstack in this method and others?
->
-> > >       max_xdp_mtu =3D priv->rx_cfg.packet_buffer_size - sizeof(struct=
- ethhdr);
-> > >       if (priv->queue_format =3D=3D GVE_GQI_QPL_FORMAT)
-> > >               max_xdp_mtu -=3D GVE_RX_PAD;
-> > > @@ -2050,6 +2057,44 @@ bool gve_header_split_supported(const struct g=
-ve_priv *priv)
-> > >               priv->queue_format =3D=3D GVE_DQO_RDA_FORMAT && !priv->=
-xdp_prog;
-> > >  }
-> > >
-> > > +int gve_set_rx_buf_len_config(struct gve_priv *priv, u32 rx_buf_len,
-> > > +                           struct netlink_ext_ack *extack,
-> > > +                           struct gve_rx_alloc_rings_cfg *rx_alloc_c=
-fg)
-> > > +{
-> > > +     u32 old_rx_buf_len =3D rx_alloc_cfg->packet_buffer_size;
-> > > +
-> > > +     if (rx_buf_len =3D=3D old_rx_buf_len)
-> > > +             return 0;
-> > > +
-> > > +     if (!gve_is_dqo(priv)) {
-> > > +             NL_SET_ERR_MSG_MOD(extack,
-> > > +                                "Modifying Rx buf len is only suppor=
-ted with DQO format");
-> > > +             return -EOPNOTSUPP;
-> > > +     }
-> > > +
-> > > +     if (priv->xdp_prog && rx_buf_len !=3D SZ_2K) {
-> > > +             NL_SET_ERR_MSG_MOD(extack,
-> > > +                                "Rx buf len can only be 2048 when XD=
-P is on");
-> > > +             return -EINVAL;
-> > > +     }
-> > > +
-> > > +     if (rx_buf_len > priv->max_rx_buffer_size) {
-> >
-> > This check looks kinda pointless given the check right below against
-> > the exact sizes?
-> >
->
-> My intent was to code defensively against device accidently advertising
-> anything in [2k+1,4k) as max buffer size. I will remove this check.
->
+This series completes the implementation of YNL for wireguard,
+as previously announced[1].
 
-After taking another look, an additional check is still needed to
-handle scenario when device doesn't advertise support for 4k buffers.
-I reworked this check (and added a comment) in v2 which hopefully
-conveys the intent better.
+This series consist of 5 parts:
+1) Patch 01-03 - Misc. changes
+2) Patch    04 - Add YNL specification for wireguard
+3) Patch 05-07 - Transition to a generated UAPI header
+4) Patch    08 - Adds a sample program for the generated C library
+5) Patch 09-11 - Transition to generated netlink policy code
 
+The main benefit of having a YNL specification is unlocked after the
+first 2 parts, the RFC version seems to already have spawned a new
+Rust netlink binding[2] using wireguard as it's main example.
 
-> > > +             NL_SET_ERR_MSG_FMT_MOD(extack,
-> > > +                                    "Rx buf len exceeds the max supp=
-orted value of %u",
-> > > +                                    priv->max_rx_buffer_size);
-> > > +             return -EINVAL;
-> > > +     }
-> > > +
-> > > +     if (rx_buf_len !=3D SZ_2K && rx_buf_len !=3D SZ_4K) {
-> > > +             NL_SET_ERR_MSG_MOD(extack,
-> > > +                                "Rx buf len can only be 2048 or 4096=
-");
-> > > +             return -EINVAL;
-> > > +     }
-> > > +     rx_alloc_cfg->packet_buffer_size =3D rx_buf_len;
-> > > +
-> > > +     return 0;
-> > > +}
+Part 3 and 5 validates that the specification is complete and aligned,
+the generated code might have a few warts, but they don't matter too
+much, and are mostly a transitional problem[3].
+
+Part 4 is possible after part 2, but is ordered after part 3,
+as it needs to duplicate the UAPI header in tools/include.
+
+For the non-generated kernel C code the diff stat looks like this:
+
+$ git diff --stat net-next/main..wg-ynl include/ drivers/ \
+	':(exclude)*netlink_gen*'
+ drivers/net/wireguard/Makefile  |   1 +
+ drivers/net/wireguard/netlink.c |  70 +++---------
+ include/uapi/linux/wireguard.h  | 190 ++++++--------------------------
+ 3 files changed, 47 insertions(+), 214 deletions(-)
+
+[1] [PATCH net 0/4] tools: ynl-gen: misc fixes + wireguard ynl plan
+    https://lore.kernel.org/r/20250901145034.525518-1-ast@fiberby.net/
+
+[2] https://github.com/one-d-wide/netlink-bindings/
+
+[3] https://lore.kernel.org/r/20251014123201.6ecfd146@kernel.org/
+
+---
+v3:
+- Spec: Make flags-mask checks implicit (thanks Jakub).
+- Sample: Add header to Makefile.deps, and avoid copy (thanks Jakub).
+
+v2: https://lore.kernel.org/r/20251031160539.1701943-1-ast@fiberby.net/
+- Add missing forward declaration
+
+v1: https://lore.kernel.org/r/20251029205123.286115-1-ast@fiberby.net/
+- Policy arguement to nla_parse_nested() changed to NULL (thanks Johannes).
+- Added attr-cnt-name to the spec, to reduce the diff a bit.
+- Refined the doc in the spec a bit.
+- Reword commit messages a bit.
+- Reordered the patches, and reduced the series from 14 to 11 patches.
+
+RFC: https://lore.kernel.org/r/20250904-wg-ynl-rfc@fiberby.net/
+
+Asbjørn Sloth Tønnesen (11):
+  wireguard: netlink: validate nested arrays in policy
+  wireguard: netlink: use WG_KEY_LEN in policies
+  wireguard: netlink: enable strict genetlink validation
+  netlink: specs: add specification for wireguard
+  uapi: wireguard: move enum wg_cmd
+  uapi: wireguard: move flag enums
+  uapi: wireguard: generate header with ynl-gen
+  tools: ynl: add sample for wireguard
+  wireguard: netlink: convert to split ops
+  wireguard: netlink: rename netlink handlers
+  wireguard: netlink: generate netlink code
+
+ Documentation/netlink/specs/wireguard.yaml | 301 +++++++++++++++++++++
+ MAINTAINERS                                |   2 +
+ drivers/net/wireguard/Makefile             |   1 +
+ drivers/net/wireguard/netlink.c            |  70 +----
+ drivers/net/wireguard/netlink_gen.c        |  77 ++++++
+ drivers/net/wireguard/netlink_gen.h        |  29 ++
+ include/uapi/linux/wireguard.h             | 190 +++----------
+ tools/net/ynl/Makefile.deps                |   2 +
+ tools/net/ynl/samples/.gitignore           |   1 +
+ tools/net/ynl/samples/wireguard.c          | 104 +++++++
+ 10 files changed, 563 insertions(+), 214 deletions(-)
+ create mode 100644 Documentation/netlink/specs/wireguard.yaml
+ create mode 100644 drivers/net/wireguard/netlink_gen.c
+ create mode 100644 drivers/net/wireguard/netlink_gen.h
+ create mode 100644 tools/net/ynl/samples/wireguard.c
+
+-- 
+2.51.0
+
 
