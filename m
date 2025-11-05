@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-235820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B72E8C3617E
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 15:38:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3301C361BA
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 15:40:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15E823B0DDA
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 14:37:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5A1A1A22B94
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 14:40:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F20032D7F7;
-	Wed,  5 Nov 2025 14:37:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 982B332E754;
+	Wed,  5 Nov 2025 14:39:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZQg2G6Zw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BF+mmeds"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A6A1320A33;
-	Wed,  5 Nov 2025 14:37:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C99232E734;
+	Wed,  5 Nov 2025 14:39:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762353431; cv=none; b=DztR3T0pQfeSdbdRDKxyPb8N/NgS/VmXwsU70Cf0tsE8UnmMvKDx+vdmc9CZtj59iAGBdmvXWscI7SWQ69ad69JCe2hbDVfGGMRD6WuTYUScFy5Q6H4ZGfQPVFDsofVCDoJhvpyM5xk1SEQ2JAr4XNWeW8044fTtZYkYTbgPU78=
+	t=1762353592; cv=none; b=smasg+hkCc6S8NXukrgnhdaYE36SfQ0eFtQMg8iSwjb+wIJ/+JMji3BlPtj3m1psZ5pVPu4yuqrUp7YkSSg3t+GnGxnxpULyFl+k0yKXMbz5YewKtUN85QlCpK38zDVPsxUVwK6cNsxbqxENAezW1252CLLKv+HcEvbpjEE7rGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762353431; c=relaxed/simple;
-	bh=Z5SbtMpM/KuQHHw5Ea+YCo1vcyY6brvzqA7sJIGK5EI=;
+	s=arc-20240116; t=1762353592; c=relaxed/simple;
+	bh=+mv6NfioSiuInevvVRb70iVEPo0SPK5TgrVbTAcEEVw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=a1ko1o02nvGvmuxjBAaCwh5lLhyyKrBS9G28Klr5/umZxPtP/Rf0vd769sBlMHtflswvBwJDgIJTnUwN6zzE+HsnVoWtZgU4Zm9lIUbTxBGm0gBix0idig52oOu+sX7aM1sfPdmgpfZt3M0K4bqo3Hh/voQWNAsj7V8MOM3JKHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZQg2G6Zw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79221C4CEF5;
-	Wed,  5 Nov 2025 14:37:05 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=ErOxJNiiuRfh7ZTmloTgrPRDqIVU+No3aTkX22JvH++figWEPfgoGDy2awEFGWhRTYRjGSJqCnwoqL61f91Ih9tQWLCYU4dlP0eWdsNSWWMTPmqBBKnsLTD6W1SgMFj1RDQT4BK4iTnsELmogYMcI2xBuQBVIOP7gKRwnG29660=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BF+mmeds; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 582BAC4CEFB;
+	Wed,  5 Nov 2025 14:39:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762353430;
-	bh=Z5SbtMpM/KuQHHw5Ea+YCo1vcyY6brvzqA7sJIGK5EI=;
+	s=k20201202; t=1762353591;
+	bh=+mv6NfioSiuInevvVRb70iVEPo0SPK5TgrVbTAcEEVw=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ZQg2G6ZwBqsKwJRdiFkY/rYwCLGY/YnAR15qvZXZsuX4y0TDE4KR8dAsJ8J85IibG
-	 WLB2WTuVuiX6q8A8KJl/+PInySjninqSC4bIZS3GBKhEnr37ZwIA4DvDubyH3Amvi9
-	 95DIQri8tt9HcZcLouoAWZS0NXhixQx81nsXp+ErxgUfH9VEjqj8SK4HcUdMl8wb4m
-	 z+dSi5X64yhHDoQh7xFX/5g1ju2IPSsgDwTp02koedPRcUEG4DvEtULFsvqU65UKCc
-	 /oDflTneqEOewy9E0YuhiMejfBaSk101uUPyS1Ex1izb/CiN9zWJqk1XHFvKioWDuA
-	 f5csU76CxNB7A==
-Message-ID: <cc0592aa-a360-437b-bbd1-9a1dda14c132@kernel.org>
-Date: Wed, 5 Nov 2025 15:37:01 +0100
+	b=BF+mmedsn7rXygxZ+LKjynR0FAIelUrh6mynAB6b+oZDeMuHxxH+gG4Nw+DPMz3hw
+	 5xDtMMkYrGdDC7TjeM+0A18SjFEhgTfOriSOm11yiJTBvO4C7WgOboXIiWU/dyHiPn
+	 2tTjDrp9kGo8hGz9XOi1ucA0Js4JKwdzbvz9vyVKT+Hu2pf6H8vQMTLM74WvoilJXK
+	 jAIoTZdUwY8gemEk0fa5vAGJorMi+Q/slZJmvgsiRnRn0SfWBb9jZK5PpYN7d4dmcr
+	 5eJRpqdMx0irin9hO4qaCB5v8EdsOdxs5txeLQ4nl7x651VQk5fjlDd3kc0kTQeas1
+	 pGhKuodBV77xw==
+Message-ID: <291e0c4c-fdd2-44dc-abe5-a4b7fb9f34be@kernel.org>
+Date: Wed, 5 Nov 2025 15:39:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,23 +50,24 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net v4 0/3] mptcp: Fix conflicts between MPTCP and sockmap
+Subject: Re: [PATCH net v4 1/3] mptcp: disallow MPTCP subflows from sockmap
 Content-Language: en-GB, fr-BE
 To: Jiayuan Chen <jiayuan.chen@linux.dev>, mptcp@lists.linux.dev
-Cc: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
+Cc: stable@vger.kernel.org, Mat Martineau <martineau@kernel.org>,
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
  John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
  Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
  Jiri Olsa <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>,
  Florian Westphal <fw@strlen.de>, linux-kernel@vger.kernel.org,
  netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org
 References: <20251105113625.148900-1-jiayuan.chen@linux.dev>
+ <20251105113625.148900-2-jiayuan.chen@linux.dev>
 From: Matthieu Baerts <matttbe@kernel.org>
 Autocrypt: addr=matttbe@kernel.org; keydata=
  xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
@@ -112,49 +113,63 @@ Autocrypt: addr=matttbe@kernel.org; keydata=
  JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
  lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
 Organization: NGI0 Core
-In-Reply-To: <20251105113625.148900-1-jiayuan.chen@linux.dev>
+In-Reply-To: <20251105113625.148900-2-jiayuan.chen@linux.dev>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 Hi Jiayuan,
 
 On 05/11/2025 12:36, Jiayuan Chen wrote:
-> Overall, we encountered a warning [1] that can be triggered by running the
-> selftest I provided.
+> The sockmap feature allows bpf syscall from userspace using , or based
 
-Thank you for the v4!
+(is there a word missing before the ','?)
 
-> sockmap works by replacing sk_data_ready, recvmsg, sendmsg operations and
-> implementing fast socket-level forwarding logic:
-> 1. Users can obtain file descriptors through userspace socket()/accept()
->    interfaces, then call BPF syscall to perform these replacements.
-> 2. Users can also use the bpf_sock_hash_update helper (in sockops programs)
->    to replace handlers when TCP connections enter ESTABLISHED state
->   (BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB/BPF_SOCK_OPS_ACTIVE_ESTABLISHED_CB)
+> on bpf sockops, replacing the sk_prot of sockets during protocol stack
+> processing with sockmap's custom read/write interfaces.
+> '''
+> tcp_rcv_state_process()
+>   subflow_syn_recv_sock()
+>     tcp_init_transfer(BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB)
+>       bpf_skops_established       <== sockops
+>         bpf_sock_map_update(sk)   <== call bpf helper
+>           tcp_bpf_update_proto()  <== update sk_prot
+> '''
+> Consider two scenarios:
 > 
-> However, when combined with MPTCP, an issue arises: MPTCP creates subflow
-> sk's and performs TCP handshakes, so the BPF program obtains subflow sk's
-> and may incorrectly replace their sk_prot. We need to reject such
-> operations. In patch 1, we set psock_update_sk_prot to NULL in the
-> subflow's custom sk_prot.
+> 1. When the server has MPTCP enabled and the client also requests MPTCP,
+>    the sk passed to the BPF program is a subflow sk. Since subflows only
+>    handle partial data, replacing their sk_prot is meaningless and will
+>    cause traffic disruption.
+> 
+> 2. When the server has MPTCP enabled but the client sends a TCP SYN
+>    without MPTCP, subflow_syn_recv_sock() performs a fallback on the
+>    subflow, replacing the subflow sk's sk_prot with the native sk_prot.
+>    '''
+>    subflow_ulp_fallback()
+>     subflow_drop_ctx()
+>       mptcp_subflow_ops_undo_override()
+>    '''
+>    Subsequently, accept::mptcp_stream_accept::mptcp_fallback_tcp_ops()
+>    converts the subflow to plain TCP.
+> 
+> For the first case, we should prevent it from being combined with sockmap
+> by setting sk_prot->psock_update_sk_prot to NULL, which will be blocked by
+> sockmap's own flow.
+> 
+> For the second case, since subflow_syn_recv_sock() has already restored
+> sk_prot to native tcp_prot/tcpv6_prot, no further action is needed.
+> 
+> Fixes: 0b4f33def7bb ("mptcp: fix tcp fallback crash")
 
-This new version looks good to me. I have some small comments on patches
-1 and 2 that can only be addressed if a v5 is needed I think.
+It should not change anything for the backport, but for this patch, the
+Fixes tag can be older I think, e.g.
 
-I have some questions for the 3rd patch. It would be good if someone
-else with more experience with the BPF selftests can also look at it.
+Fixes: cec37a6e41aa ("mptcp: Handle MP_CAPABLE options for outgoing
+connections")
 
-> Additionally, if the server's listening socket has MPTCP enabled and the
-> client's TCP also uses MPTCP, we should allow the combination of subflow
-> and sockmap. This is because the latest Golang programs have enabled MPTCP
-> for listening sockets by default [2]. For programs already using sockmap,
-> upgrading Golang should not cause sockmap functionality to fail.
+If you need to send a v5, please use this one.
 
-Note: even if these patches here are needed to avoid stream corruption
-and other issues, in your specific case with sockmap, I think it would
-be better to set this env var until MPTCP support is added to sockmap:
-
-  GODEBUG=multipathtcp=0
+Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 Cheers,
 Matt
