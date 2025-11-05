@@ -1,198 +1,189 @@
-Return-Path: <netdev+bounces-235824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62626C362E3
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 15:55:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A02C4C362E0
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 15:55:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC66B626DCA
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 14:43:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1E34567DA5
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 14:43:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADC1B3321A2;
-	Wed,  5 Nov 2025 14:41:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10C8832E74C;
+	Wed,  5 Nov 2025 14:41:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DtyqB8e9";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="ogqs4TA4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MuzSLMAo"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDAED331A43
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 14:41:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 402C332E759
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 14:41:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762353703; cv=none; b=MNk75UZuGsUZ4s/Lifwu0c90NsaoRh0u03EVIgzqKydYcEgv4p62LXPF90wxY/KqLxH4qiBajhLUijhAuoThn2LwYJacyeNqTp+QSlwZA5xuFML3M0yqtsK+k2do5OB3KzHVGN7qt2ImP45C/JCGd5h0vwqp+NXQDRBEoCwwWDw=
+	t=1762353717; cv=none; b=VFD5jE/19Igh9OG7t6/xPzyK7nnHZStdbdkNFdz91Nm6XDlLREI1KMJ2Wp5OZkXpjcdskAdEdR++8Y3kzxIjTdHJYWSe7hCnMEvdHArTW7BpmVZLhQAm5Fx07+1yaUzy1j8JR20BQwhvuJrBl2+lmwafFsDEhm7pmICDHb8T9ms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762353703; c=relaxed/simple;
-	bh=Un+S3Mc0QD8v6wfj3eL3xXYh+ndupS7pAvsfKuhFm4A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=USAeLxzUNDQEH8EqOC7NvKTLLEQPx+TlEHeeftUIQA7SEIShieV612IYQPfsDKQPgLm3TRvRb4KY3jwh4UE9Kcc1bQThXrFZBhkxBdcjSXRVJyne+OFPZnPrUVYPPBlLgDJR4oHhaOUH3dkaj3N7JxgtZA5OMqa7fLevceTka8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DtyqB8e9; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=ogqs4TA4; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762353700;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=83D8bblxyw5BuUWQPyxb4QzkQFd3XzPLsRwrCQzA9jQ=;
-	b=DtyqB8e9NzTwOO20bYenAXHYNhrsMuhPPsL9uiqSXlzOnuApisjmoCOso6WwqXsKchZKiM
-	PFrvwegFOUcyV3M25oOIAlTwaId0TmXyG+ZbcWjVxADH7a8bb6AkyKl34M4KadrbesATqz
-	2kmR+NofX1DBO/SOVceiSf8cehCDbEQ=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-136-P5UEUi3yO06QPDGVAHSpSg-1; Wed, 05 Nov 2025 09:41:37 -0500
-X-MC-Unique: P5UEUi3yO06QPDGVAHSpSg-1
-X-Mimecast-MFC-AGG-ID: P5UEUi3yO06QPDGVAHSpSg_1762353696
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-42814749a6fso4865313f8f.2
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 06:41:37 -0800 (PST)
+	s=arc-20240116; t=1762353717; c=relaxed/simple;
+	bh=GeOcSvZVDH6px8ESZjNx84EIkhmR1UMjbzBDBnxQtGc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=El5AY4bb8kNUnP6DOWQ9WAI5vi/+QyabGdr0ji8ZJFJhwC9tc3VFmZHjt/m0Swcf2Ss2mtcESDxKMZA24bQy95vBfErOH+iKpQ0+h+K7qvapEVrfNIuYHMT2aZdC88TI6EsDw0/D4y8RDbDM+SF8KBjQnzKW0mygOf+SWnEUP34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MuzSLMAo; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4ed67a143c5so109731cf.0
+        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 06:41:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762353696; x=1762958496; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=83D8bblxyw5BuUWQPyxb4QzkQFd3XzPLsRwrCQzA9jQ=;
-        b=ogqs4TA4j3DjXybCnMBUFnNFyVmbxlBQF2CJdj7xhm/0hN1rSUywZsZpThzYYfLoYt
-         JX9xMggCkPcX/i1inK+yg6tbcJIOPbRe4H4tAcBbzL/FoH38wpg5To+etsnbJStKJ71F
-         9fhFebhgqcUGY1QUP1oRpscft+R2S+UW3ArcTFEqwzZsgQlOYxIpoS79Id2ozEUuwXcu
-         4yMAUXh2Bn9icQnmCq3LfuhQyrBEKvdhAXimAc/57jwoQ6Iw4oP4oqvIcLNL+1UZzzn/
-         Z59mwzSBYhz/wGHe2jNJRD8sDk7PAEGEW8bM7yLnuMTgFgnu6++/m/B3tuAQaBC3hsIx
-         pm6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762353696; x=1762958496;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1762353714; x=1762958514; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=83D8bblxyw5BuUWQPyxb4QzkQFd3XzPLsRwrCQzA9jQ=;
-        b=oXGYudjWuSMMqLDRqh38OkZIcXNDZHATl0VWCM8KcnTRps4t9JizM46RdqbOYZHKgs
-         jhN/xbTPQ6QP6lMzXjh1DH8Vir/KABcuj3eJYw3cZsUhgDW/+f0+8kSq+ZDm5BNN1fQc
-         lO7AaRFy7ydpzpPozXKP1m5d5xpVFktwcETq/CI5Nzb5mpI4ZAOxzhGP5d5lmggclCp5
-         YrvnRK1bGAsTV9R9+JoULXK/KfZApjSLSnIfiyr4wGdtJYHr3hf727CyCR4X2x1UR2n6
-         zfGX7o1032hhfpzZYGr3EBP5sxP0GjtMSnD4fgeWMtVJgGB8fvrfwYNUtD2zv09m4o0q
-         IAHw==
-X-Forwarded-Encrypted: i=1; AJvYcCUffCI+tPSaPvxnoZ5ueQozYbm4kJi81auyGezAnp+EqKo/CB2U84uYNwX4Smf1AGBPw2+Bv6Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzW+JbLdKXfKfI4m23ZiZgxlzJcwwhB0zOX2OgMh7WykgN6RFC9
-	sDwuGNvr40Otz/9uTcnR9izHRw+KcwAWCnHOaXUScbQ/3u7GcMHnd19uFsf84l/C1BM0gpCpg30
-	g3SS5StWR4tpGmjFJwpUqbFkgM4v4NhZF/flmPEnfTcdO5jQ+UY+Whfu8LQ==
-X-Gm-Gg: ASbGncvVGsWeDgBpB9GbcJjb0/tsuRc2qC3b+8PuWvqfBbfNCZn3muoe/t8nEZ+p3pS
-	Ri6OzlOmc4OdQCfPifSlDBY+qs3B/ayIpUhZIEHerjkx/A1KTuX3LnFeRgtbMxk/Nzb/5/xOBSF
-	wJpVOB7n8p0Ju5G4jqQ9eBwBO5IUrUcksGRDWUTK71zBSJaznvew+Z0xJ2QIWcGL+RI/AkP5hS9
-	eGvoLr/hoIj96SnJ62xLEa90MiF2BViLdnYxF9sUpf2BRy/A4nyX/v/im5cRWMR++5sFR+se9G6
-	izXsY7F6ITXBz49nZXCWk/Cunpb7BQoVnZCGUkSfMVT63LnlG2naZpskJKT8cHeJcBEwTHliImg
-	=
-X-Received: by 2002:a05:6000:615:b0:425:7cf6:5b9e with SMTP id ffacd0b85a97d-429e32c831amr3305572f8f.3.1762353696173;
-        Wed, 05 Nov 2025 06:41:36 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHdNjVd77s4VsvkrZ4AU/ubU7KMUlzm/N0GSTkO1qZtkX4KqpOh8zmlKt0hs1ExVKOK4eMg2Q==
-X-Received: by 2002:a05:6000:615:b0:425:7cf6:5b9e with SMTP id ffacd0b85a97d-429e32c831amr3305546f8f.3.1762353695682;
-        Wed, 05 Nov 2025 06:41:35 -0800 (PST)
-Received: from sgarzare-redhat ([5.77.88.64])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429dc18efb3sm12058326f8f.3.2025.11.05.06.41.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Nov 2025 06:41:34 -0800 (PST)
-Date: Wed, 5 Nov 2025 15:41:25 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Shuah Khan <shuah@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Simon Horman <horms@kernel.org>, 
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v2 07/12] selftests/vsock: add check_result()
- for pass/fail counting
-Message-ID: <fodit6zue6iwtqgk54qy6fvmegklnsgh5437h6ofopzhc77i4q@u76zkisp4wie>
-References: <20251104-vsock-selftests-fixes-and-improvements-v2-0-ca2070fd1601@meta.com>
- <20251104-vsock-selftests-fixes-and-improvements-v2-7-ca2070fd1601@meta.com>
+        bh=cQM6yr0bwy6LdwN3i0gEVsyJpTtkKwVfGgpAssodrPk=;
+        b=MuzSLMAo2/mbutllMQdrt56VuxUpURX0uJ5Qk+YuXTLx0liZuUCEolZGAoliLsXYmd
+         yN7+E8LEQKx6jMQJ7bAGTHJoRBPUDRun4//tmG2dW+NvZidUveOzF652Fu2N8Gxpn4Pg
+         G/8Bv9tuj/FYMBl/RzzUtHI/OB1IMjH8PsENgFrGrglH9mjiAa95N6aF13EDfR3Cvkr7
+         ysLSsZToswMttVdbg2V+cacLSjwGAbAIds6hAn4AAR9nNJx5W9c5Y4b+b++LKyS9OQYf
+         BuH4lGz3/hsOINd6+khsWwp41OorVYSaGsHzWcxcVYZz2tCtEjs6YiYsWdTtGCApBQ+r
+         2ZAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762353714; x=1762958514;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=cQM6yr0bwy6LdwN3i0gEVsyJpTtkKwVfGgpAssodrPk=;
+        b=qcLdAVcxCyxP/tKwMi2Q0CVy5ovos4dp2J5FlcxZFJBcv3OOQ5JHtq9NrAcGUO030b
+         TvU8k44mCr+mPhQrqWN2DRgMshn9oEL7qAl6tMkuiPuLperaOhuNC4OqO7P8fcWdJGy+
+         YEr+iRnoPGNKR1xeZC90rLgnC9RFVhvu4TKnbXtnLf9tyvJuZY2bmLhJF62kIskHvE6z
+         XTzvafWuMXfBWWR5sA+Soh6wTY8oJ2MzURWYLG0UDOB497CboSclDOUYYZKk55hd9Ye3
+         51uNg+ksnUCAg5glzCYU4ulLU0w2G+Biwpj7Kzk44E4SJXr5R1O+hMHJc+JlhC0jNdld
+         NroQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV6/F+99+xOD27lNPJHb+PoKzQ7Gkc3WMzCPwMjENhxpZiLF0Dv8oPnd1irYhssd6bCZd9oGdM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKAlhx3MUJ6YsHbRyCwMa14uwIcoAlZXIeYwcUIxfQdcx6EMcF
+	/wnDi0ZoLrpRxxIymMvImqivf/Rdd8puFJBCz1Oi5kkXXxGzybSEKexaoKEcKb6KHwb55859l9w
+	+32ikmg/EwsSxhZAEizSqN0u28pJu17TXOCaQmnYi
+X-Gm-Gg: ASbGncsiLcPYrfSap6FVBFobUJYYahEA8pAo15FGKTwZQddj9C6ZAXmHzA3LLRA0eTh
+	ygnbf/rIpDpqL7KcORiVq7ru+WUGa49a1vPe2gQ0RLEBvzCLGVTyLfUlgQ+BIxzUB5LXGrNz7Pd
+	KbOLZyX/s0/OJN+QVx67krUIBdY0rEOVU7GGrdWzqc36bSQIfgWsJfi4OiaiU/B7S8cCYDhcRmD
+	LSrj54u3ExuRAO6iGusTsvkcDweuiWrHI10u2LiV8vyNLAP0x69JWDGcAQArBHDoo80U1uP7cxf
+	rK61pD5NMw+z++HRVu6X2Q9u4dVAplThIps6Wwl2hac/hZTHzAmIrbmk2Exv
+X-Google-Smtp-Source: AGHT+IEdOXz5bK/DbSyefQ9zVm+KOiRxE8yw2YuRDLD1o6I8LPUejMZEir/2h5gIF4kHe5hp3tQYddKsf08lHTKyQ00=
+X-Received: by 2002:ac8:5887:0:b0:4e8:b4dc:4c58 with SMTP id
+ d75a77b69052e-4ed735b51bbmr7621971cf.12.1762353713731; Wed, 05 Nov 2025
+ 06:41:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20251104-vsock-selftests-fixes-and-improvements-v2-7-ca2070fd1601@meta.com>
+References: <20251105093837.711053-1-edumazet@google.com>
+In-Reply-To: <20251105093837.711053-1-edumazet@google.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Wed, 5 Nov 2025 09:41:35 -0500
+X-Gm-Features: AWmQ_bleUJcxDwK-xJkto37-G1M81SkefImVwpbTwfLQ1zB8EdHmG01dbI0zoJg
+Message-ID: <CADVnQymZ1tFnEA1Q=vtECs0=Db7zHQ8=+WCQtnhHFVbEOzjVnQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: add net.ipv4.tcp_comp_sack_rtt_percent
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 04, 2025 at 02:38:57PM -0800, Bobby Eshleman wrote:
->From: Bobby Eshleman <bobbyeshleman@meta.com>
+On Wed, Nov 5, 2025 at 4:38=E2=80=AFAM Eric Dumazet <edumazet@google.com> w=
+rote:
 >
->Add check_result() function to reuse logic for incrementing the
->pass/fail counters. This function will get used by different callers as
->we add different types of tests in future patches (namely, namespace and
->non-namespace tests will be called at different places, and re-use this
->function).
+> TCP SACK compression has been added in 2018 in commit
+> 5d9f4262b7ea ("tcp: add SACK compression").
 >
->Reviewed-by: Simon Horman <horms@kernel.org>
->Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
->---
-> tools/testing/selftests/vsock/vmtest.sh | 32 +++++++++++++++++++++-----------
-> 1 file changed, 21 insertions(+), 11 deletions(-)
+> It is working great for WAN flows (with large RTT).
+> Wifi in particular gets a significant boost _when_ ACK are suppressed.
 >
->diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
->index 940e1260de28..4ce93cef32e9 100755
->--- a/tools/testing/selftests/vsock/vmtest.sh
->+++ b/tools/testing/selftests/vsock/vmtest.sh
->@@ -78,6 +78,26 @@ die() {
-> 	exit "${KSFT_FAIL}"
-> }
+> Add a new sysctl so that we can tune the very conservative 5 % value
+> that has been used so far in this formula, so that small RTT flows
+> can benefit from this feature.
 >
->+check_result() {
->+	local rc num
->+
->+	rc=$1
->+	num=$(( cnt_total + 1 ))
-
-Can we just increment `cnt_total` here and avoid `num` at all?
-
->+
->+	if [[ ${rc} -eq $KSFT_PASS ]]; then
->+		cnt_pass=$(( cnt_pass + 1 ))
->+		echo "ok ${num} ${arg}"
-
-Where `${arg}` is assigned?
-
->+	elif [[ ${rc} -eq $KSFT_SKIP ]]; then
->+		cnt_skip=$(( cnt_skip + 1 ))
->+		echo "ok ${num} ${arg} # SKIP"
->+	elif [[ ${rc} -eq $KSFT_FAIL ]]; then
->+		cnt_fail=$(( cnt_fail + 1 ))
->+		echo "not ok ${num} ${arg} # exit=$rc"
->+	fi
->+
->+	cnt_total=$(( cnt_total + 1 ))
->+}
->+
-> vm_ssh() {
-> 	ssh -q -o UserKnownHostsFile=/dev/null -p ${SSH_HOST_PORT} 
-> 	localhost "$@"
-> 	return $?
->@@ -510,17 +530,7 @@ cnt_total=0
-> for arg in "${ARGS[@]}"; do
-> 	run_test "${arg}"
-> 	rc=$?
->-	if [[ ${rc} -eq $KSFT_PASS ]]; then
->-		cnt_pass=$(( cnt_pass + 1 ))
->-		echo "ok ${cnt_total} ${arg}"
->-	elif [[ ${rc} -eq $KSFT_SKIP ]]; then
->-		cnt_skip=$(( cnt_skip + 1 ))
->-		echo "ok ${cnt_total} ${arg} # SKIP"
->-	elif [[ ${rc} -eq $KSFT_FAIL ]]; then
->-		cnt_fail=$(( cnt_fail + 1 ))
->-		echo "not ok ${cnt_total} ${arg} # exit=$rc"
->-	fi
->-	cnt_total=$(( cnt_total + 1 ))
->+	check_result ${rc}
-
-Oh, so the arg is in this scope. mmm, can we pass it as parameter?
-
-Stefano
-
-> done
+> delay =3D min ( 5 % of RTT, 1 ms)
 >
-> terminate_pidfiles "${pidfile}"
+> This patch adds new tcp_comp_sack_rtt_percent sysctl
+> to ease experiments and tuning.
 >
->-- 
->2.47.3
+> Given that we cap the delay to 1ms (tcp_comp_sack_delay_ns sysctl),
+> set the default value to 100.
 >
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  Documentation/networking/ip-sysctl.rst | 13 +++++++++++--
+>  include/net/netns/ipv4.h               |  1 +
+>  net/ipv4/sysctl_net_ipv4.c             |  9 +++++++++
+>  net/ipv4/tcp_input.c                   | 26 ++++++++++++++++++--------
+>  net/ipv4/tcp_ipv4.c                    |  1 +
+>  5 files changed, 40 insertions(+), 10 deletions(-)
+>
+> diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/netwo=
+rking/ip-sysctl.rst
+> index 7cd35bfd39e68c5b2650eb9d0fbb76e34aed3f2b..ebc11f593305bf87e7d4ad4d5=
+0ef085b22aef7da 100644
+> --- a/Documentation/networking/ip-sysctl.rst
+> +++ b/Documentation/networking/ip-sysctl.rst
+> @@ -854,9 +854,18 @@ tcp_sack - BOOLEAN
+>
+>         Default: 1 (enabled)
+>
+> +tcp_comp_sack_rtt_percent - INTEGER
+> +       Percentage of SRTT used for the compressed SACK feature.
+> +       See tcp_comp_sack_nr, tcp_comp_sack_delay_ns, tcp_comp_sack_slack=
+_ns.
+> +
+> +       Possible values : 1 - 1000
+> +
+> +       Default : 100 %
 
+Overall the patch looks great to me, but for the default value I would
+suggest 33% rather than 100%.
+
+AFAICT, basically, in data center environments with RTT < 1ms, if
+tcp_comp_sack_rtt_percent  is 100% and we allow the data receiver to
+wait a whole SRTT before it sends an ACK, then the data sender is
+likely to have fully used up its cwnd at the point that the receiver
+finally sends the ACK at the end of the SRTT. That means that for the
+entire time that the ACK is traveling from the data receiver to the
+data sender, the data sender has no permission (from congestion
+control) to send. So the "pipe" (data sender -> data receiver network
+path) will have an idle bubble for a long time while the data sender
+is waiting for the ACK. In these cases, the system would lose
+pipelining and would end up in a "stop and wait" mode.
+
+The rationale for 33% is basically to try to facilitate pipelining,
+where there are always at least 3 ACKs and 3 GSO/TSO skbs per SRTT, so
+that the path can maintain a budget for 3 full-sized GSO/TSO skbs "in
+flight" at all times:
+
++ 1 skb in the qdisc waiting to be sent by the NIC next
++ 1 skb being sent by the NIC (being serialized by the NIC out onto the wir=
+e)
++ 1 skb being received and aggregated by the receiver machine's
+aggregation mechanism (some combination of LRO, GRO, and sack
+compression)
+
+Note that this is basically the same magic number (3) and the same
+rationales as:
+
+(a) tcp_tso_should_defer() ensuring that we defer sending data for no
+longer than cwnd/tcp_tso_win_divisor (where tcp_tso_win_divisor =3D 3),
+and
+(b) bbr_quantization_budget() ensuring that cwnd is at least 3 GSO/TSO
+skbs to maintain pipelining and full throughput at low RTTs
+
+It is also similar in spirit to your 2014 patch that limits GSO skbs
+to half the cwnd, again to help maintain pipelining:
+
+tcp: limit GSO packets to half cwnd
+d649a7a81f3b5bacb1d60abd7529894d8234a666
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?=
+id=3Dd649a7a81f3b5bacb1d60abd7529894d8234a666
+
+WDYT?
+
+neal
 
