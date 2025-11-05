@@ -1,83 +1,83 @@
-Return-Path: <netdev+bounces-235987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 855A9C37B44
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 21:25:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0586EC37B4D
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 21:26:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 106ED4F7B0A
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 20:21:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82C323AA5BD
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 20:22:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A99F034E774;
-	Wed,  5 Nov 2025 20:20:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE08834EF04;
+	Wed,  5 Nov 2025 20:20:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="eMTJLRR+"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="bqsSj9d3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59C8134DB7D
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 20:20:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE15034E761
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 20:20:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762374009; cv=none; b=cW/N0aoROTy/iCluyXGHpRDSD+tyTRJtusL8qzkJYHhBo9iOJoNgI3a8/YM4WvzahXrLOQ7JgKE/ERNiP3lXBwJEA65LhUt/f/zIRQlo7cjVc5gTepvRHzTpZ5AzQUg3jwPGW6MHE4H8mBV/MVeEWfTAB4dhWibJrUQrfH7ynCg=
+	t=1762374010; cv=none; b=oB7kRUHaUESgseMW7z403tE8RMpS+MyA0V8IdFSxdb95goeheLDed+T4BL+h/ijfI25NCPillDQCLdUK07Oj701jwSrsFbr7tbaSVYRFSh3GWaZrbid1pjw3rfyr1wAxABhAMqtYkXqP7kI051ZhY5lwbw74OgFlid/BDAOuvWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762374009; c=relaxed/simple;
-	bh=Y2LdFSioG8g7ODW7ylq50FrnsN/jGmVNxn8bY70Dfxs=;
+	s=arc-20240116; t=1762374010; c=relaxed/simple;
+	bh=oU1mObjW9Wpz+u1GfWqs3XLJ/AdgzZqeOQqym3IYvj8=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=I/S/GaTRo5P0pgQTMzXUtcU3TE+8t5vOBpFHiN5hkcni7kXB1d/DJZBbuIQM+4Jj2/SSyNdfvDb4Z46BRTTYcJHgCf2O9OT7hgmtwCuR1362fYp9rkm10ZdyNipAuGgVYD8mo1mIxfMyJIEhcfIX2T9UQt/ODKOCjgbvX1bEDUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=eMTJLRR+; arc=none smtp.client-ip=209.85.208.44
+	 In-Reply-To:To:Cc; b=AxtrTBpwMV0whOS8a4tSBZYpfFj9y/OiKWfKFojBEyLSEYpQ5oVmkRGMmmWR52s+RfgRPmC8Q0o/TIJuNjlM2kTKLcgKqRO+NLvE5Ora2y7w0AdzHG+JURbwOeauNqfVGVS6sQSdUBVvHSS7g3ivyDEx8/IstBPtmivmOc2ZOqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=bqsSj9d3; arc=none smtp.client-ip=209.85.208.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-6409e985505so276004a12.2
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 12:20:06 -0800 (PST)
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-64074f01a6eso336768a12.2
+        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 12:20:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1762374005; x=1762978805; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1762374007; x=1762978807; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=smKSa5PEnPQYiO/xTRww69R1IfUnmprG+VxEw4Hb8Ac=;
-        b=eMTJLRR+jkI/QUR5Jx15hzt07jmo4SiW8TdnB3gQ7ya6cnmTdu1oGJFTrZbtSbjCMG
-         1sxEcrTnha1qXPnQfNRj7rjIJV9X0m29jMogrhCEaz0oeanYim0EXiovHAWMy9uLO+J/
-         iU4VXemE9t0o2Lab/FGEPdNivcI9lncEM0Kx6Et6F+kndeqDzi5oE0WEM446zx3b+75z
-         aa8H4wwlf1lNCaCp8GceeZKF5IKOTcT8PhZWXT4L25jSuSoVWCmkmiFQadjFJgTaHmmi
-         g6R3T1qt4YziyL6f01MOWbEESvaqEr0iz8TBaweTcGBwYQZO0ei+BnpiU8T94qHtvsjl
-         7FOA==
+        bh=/re0zpWLz18Oa0L5sNL6vn9QSTMIu80JAEtsQnqvWNg=;
+        b=bqsSj9d3H4eJvf6X16I3j0d6vfGQlmt315dZjYOjLl5xDkhSaUdmCw9aRzIkuzW9Xj
+         ooahqXYoJKt5XSrBquRLYEMftkohfgGhAN6aWOBtuuKteWowGJU3MQ55DaHDjgxqcHY5
+         oa0YijuzT92xvmFdzrwVg2yaxhQfbJWHSKNiDZ5ZMzeuuXjQNfTHVgo0Qod0jzYm7yDT
+         BsNCzGs3zdwDxe7T6U8UkUxWAu3s857TrBilFyq5h1z6npXViosWX2+EloX/5Yx0bBdo
+         AicD/7PxIWtx6dJli526i+ntQ1tvVmn2N1P+yt5Gb33a/IAFcziLJx3cD3H5SdlRRmre
+         NlKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762374005; x=1762978805;
+        d=1e100.net; s=20230601; t=1762374007; x=1762978807;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=smKSa5PEnPQYiO/xTRww69R1IfUnmprG+VxEw4Hb8Ac=;
-        b=UrxGlEyQ1+Tv5NSDOgT05DA4jj48e6yoQ2Xbw0PqbdxblJErCHCiR9879+omwxgps1
-         znoVZnyAr/NhncJIetnjFjY2kvE1sE11wLSJT/+MX2JrerAW4e/mrhG14QSnyjEV8Taz
-         aXDHji37BAzU63sPzZBp1cWnizo/OqfimN7TgXdU3aR75WFigcZXh9AhctHwu5k2T96t
-         bvDUXoiuh8ZHH3v2yqqKz4LB4o/nxmhJlc8Vcp4u2k4oH5laIn+q6++kD7BkrRKkJrf+
-         jISEsdXOIvKGENt4S7qrJIeq5KbJhZRwk36vA6cJ9FkaO7iS/8dSUvKPbQ5mSvEb8oyP
-         /lZg==
-X-Forwarded-Encrypted: i=1; AJvYcCVutv5zTWfoOICCaoMlAEBuLNSKig0U2+LYnHb51MmGALOMCKD5udPpXaazYgHYot6K0aCQLAA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYEZdb8kcGQNI8+g7Q78uFQL6vtqAEjBEcXVeYxk/hyCRdP7r5
-	qud+ymErvNBWut/ZE+ACNoq6VeuRpjepE/JzeEv+l7zGIf5aPBSgZ6xIJITYDFjLlvU=
-X-Gm-Gg: ASbGncsbCuGZM2ezGijZv6YWI2Q6YGgaBZD4G0cICBHwQiCdGZDoAURhGsz5rixcCk9
-	2nqYGe17aF2UiLO4aQhaf2gCzLl7QFLP29pefvsa8NHL9MYpnY03ZBuaGDmjZohUsdqCZHkRO/d
-	PrnGVIaIEsrh8N0Ik8VtmXO8cQwQuELpwJzTM2JRt43vxskiCk35YG66zZRFKwTpMx54W9rBPBl
-	U8dttBDJWOapvzixv6EjHFId8IO1cHE2j0Qbfot5S+1jqT5RAw8W7qNK+9ZGUJDndCu3rkGydT8
-	8r/wTQtiFAFs5NIRSA2l+RVkJHuFettKSmaiSbdhPfM+iKEOAxySESO38V17QotxBco4frst/VR
-	W2a3vN/JT+JlU/z0+UzXmC+O6VQ/oDEE7Hv6EnggWV1dD7ugVh66oeYe6nrTfQP4GT6ZRN49T5Y
-	DR0unYFHtXNArJrfPQ1uj3aRJpRGyyThy51AJSAXeL/BmnWXGzbsjQa4Tf
-X-Google-Smtp-Source: AGHT+IFNXQINzOeV4swYoRdovmW3cf+3ri/ZC3LWiqRh2j7kLPwbPrOZR0TyAh5EZR3b9uCSKLi0kA==
-X-Received: by 2002:a05:6402:35d6:b0:63c:690d:6a46 with SMTP id 4fb4d7f45d1cf-641058d0b39mr4080673a12.13.1762374005502;
-        Wed, 05 Nov 2025 12:20:05 -0800 (PST)
+        bh=/re0zpWLz18Oa0L5sNL6vn9QSTMIu80JAEtsQnqvWNg=;
+        b=Y6T5l5w/E9sQUEtD8UtKituBOgZQVkBLcu9NErtKrtCSGFz2uqjR8OHPARn6JbRvK2
+         lFD+whtALf8OFgwn9GGVktK/sm/gvAmz5ujr17g1A7jsoCwb3+0hIVTn6kKHf0MTGAET
+         Kks0ulV64yDmOaYgDbxA58Q7Y2Qbh9xUHzXLHd6ND2JxHVpJxf4C58iCm22aUBMTF0cF
+         8e1X6FLj9qbIKSKMSp6wi9AODHLz56y+1kzy7aIIJiu977nGYiBeBuylF7ObdWMDfLdB
+         2l8iXtK/t0mxwC6PVTgIUkOCDrybEPpAKz2AErbWbWDRUMx1R27hiI6Bhj8Z4u3k49jW
+         9nEg==
+X-Forwarded-Encrypted: i=1; AJvYcCVAy4sKyqKIBx1jJmnq5AbGLvI6GvK0/b3moDvNPPd9hLHfvd2InB/PgI7UVyMvqgWT4s5TvU4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxmDaJl/6lKt5XP7XTuZG3wcLZjBVFxO1lRuMPodjQyLX3KEgcA
+	6MucrILdp4CXPQKF5oLvTrgtIxL+cgD2aczz/pfGKm3t80PIeexcrCl+i0euBZHRsOI=
+X-Gm-Gg: ASbGncvAOjRNdfiPn8gDD4K11T+v0IfPmKrkQRoYpukk6duo1UVOQTww9BJPDxC/tWY
+	533L8Yo2Wyp1i8MT0p7hQFUlHhfxeAS1J49xI/j+omgWE4k7U0WCmEaIPrQHwOM8FEXFB8zdvRy
+	tGFmwIiXZykQzBtqk6lGfHALu/rB/3KpAlvqAyZjVq+W7dFhz2LzfXWl6R18+E2xipRZywR3oye
+	oONpe+xhznh20QwkUk3xn2VJMM5f2D/ccXhGRPCx7JwU8QibnB1CdZodADnmG38rVgtfKP+Z+sR
+	B8HkO3e/dTw4JH1tAHF/Q+hHT2VzfC4TkhSmRLkUpGHFjDUTWXi1qqf/rbFEP9MKq0Jq6IQIDPa
+	67bvYPjw1q8RaOQjv6XfJcbfpf8yi9WSaCdiZpHT218UUPC+6p6cAPy6E943p47QkSlF0fuC6XL
+	NqguDhcSeMyiHAS65/N/Isd3fxFkUaX58us+VGv8Ab9/WH4g==
+X-Google-Smtp-Source: AGHT+IHoGhgjwjGQDLj55dOuR7mnyVj4Urj4qYTjGL4CXnMyUYuiiTwBw+8AIPXgwVjN3eeyOxWi2Q==
+X-Received: by 2002:a17:907:a0c9:b0:b70:ac7a:2a98 with SMTP id a640c23a62f3a-b72654183d3mr478998566b.26.1762374006858;
+        Wed, 05 Nov 2025 12:20:06 -0800 (PST)
 Received: from cloudflare.com (79.184.211.13.ipv4.supernova.orange.pl. [79.184.211.13])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6411f86e12fsm42874a12.34.2025.11.05.12.20.04
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b7289332eb4sm48151266b.1.2025.11.05.12.20.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Nov 2025 12:20:05 -0800 (PST)
+        Wed, 05 Nov 2025 12:20:06 -0800 (PST)
 From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Wed, 05 Nov 2025 21:19:48 +0100
-Subject: [PATCH bpf-next v4 11/16] selftests/bpf: Dump skb metadata on
- verification failure
+Date: Wed, 05 Nov 2025 21:19:49 +0100
+Subject: [PATCH bpf-next v4 12/16] selftests/bpf: Expect unclone to
+ preserve skb metadata
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,7 +86,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251105-skb-meta-rx-path-v4-11-5ceb08a9b37b@cloudflare.com>
+Message-Id: <20251105-skb-meta-rx-path-v4-12-5ceb08a9b37b@cloudflare.com>
 References: <20251105-skb-meta-rx-path-v4-0-5ceb08a9b37b@cloudflare.com>
 In-Reply-To: <20251105-skb-meta-rx-path-v4-0-5ceb08a9b37b@cloudflare.com>
 To: bpf@vger.kernel.org
@@ -105,135 +105,306 @@ Cc: "David S. Miller" <davem@davemloft.net>,
  kernel-team@cloudflare.com
 X-Mailer: b4 0.15-dev-07fe9
 
-Add diagnostic output when metadata verification fails to help with
-troubleshooting test failures. Introduce a check_metadata() helper that
-prints both expected and received metadata to the BPF program's stderr
-stream on mismatch. The userspace test reads and dumps this stream on
-failure.
+Since pskb_expand_head() no longer clears metadata on unclone, update tests
+for cloned packets to expect metadata to remain intact.
+
+Also simplify the clone_dynptr_kept_on_{data,meta}_slice_write tests.
+Creating an r/w dynptr slice is sufficient to trigger an unclone in the
+prologue, so remove the extraneous writes to the data/meta slice.
 
 Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
 ---
- .../bpf/prog_tests/xdp_context_test_run.c          | 24 ++++++++++++++++++---
- tools/testing/selftests/bpf/progs/test_xdp_meta.c  | 25 ++++++++++++++++++----
- 2 files changed, 42 insertions(+), 7 deletions(-)
+ .../bpf/prog_tests/xdp_context_test_run.c          |  24 ++---
+ tools/testing/selftests/bpf/progs/test_xdp_meta.c  | 118 ++++++++++++---------
+ 2 files changed, 79 insertions(+), 63 deletions(-)
 
 diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
-index 93a1fbe6a4fd..db3027564261 100644
+index db3027564261..a129c3057202 100644
 --- a/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
 +++ b/tools/testing/selftests/bpf/prog_tests/xdp_context_test_run.c
-@@ -171,6 +171,21 @@ static int write_test_packet(int tap_fd)
- 	return 0;
- }
+@@ -454,29 +454,29 @@ void test_xdp_context_tuntap(void)
+ 			    skel->progs.ing_cls_dynptr_offset_oob,
+ 			    skel->progs.ing_cls,
+ 			    &skel->bss->test_pass);
+-	if (test__start_subtest("clone_data_meta_empty_on_data_write"))
++	if (test__start_subtest("clone_data_meta_survives_data_write"))
+ 		test_tuntap_mirred(skel->progs.ing_xdp,
+-				   skel->progs.clone_data_meta_empty_on_data_write,
++				   skel->progs.clone_data_meta_survives_data_write,
+ 				   &skel->bss->test_pass);
+-	if (test__start_subtest("clone_data_meta_empty_on_meta_write"))
++	if (test__start_subtest("clone_data_meta_survives_meta_write"))
+ 		test_tuntap_mirred(skel->progs.ing_xdp,
+-				   skel->progs.clone_data_meta_empty_on_meta_write,
++				   skel->progs.clone_data_meta_survives_meta_write,
+ 				   &skel->bss->test_pass);
+-	if (test__start_subtest("clone_dynptr_empty_on_data_slice_write"))
++	if (test__start_subtest("clone_meta_dynptr_survives_data_slice_write"))
+ 		test_tuntap_mirred(skel->progs.ing_xdp,
+-				   skel->progs.clone_dynptr_empty_on_data_slice_write,
++				   skel->progs.clone_meta_dynptr_survives_data_slice_write,
+ 				   &skel->bss->test_pass);
+-	if (test__start_subtest("clone_dynptr_empty_on_meta_slice_write"))
++	if (test__start_subtest("clone_meta_dynptr_survives_meta_slice_write"))
+ 		test_tuntap_mirred(skel->progs.ing_xdp,
+-				   skel->progs.clone_dynptr_empty_on_meta_slice_write,
++				   skel->progs.clone_meta_dynptr_survives_meta_slice_write,
+ 				   &skel->bss->test_pass);
+-	if (test__start_subtest("clone_dynptr_rdonly_before_data_dynptr_write"))
++	if (test__start_subtest("clone_meta_dynptr_rw_before_data_dynptr_write"))
+ 		test_tuntap_mirred(skel->progs.ing_xdp,
+-				   skel->progs.clone_dynptr_rdonly_before_data_dynptr_write,
++				   skel->progs.clone_meta_dynptr_rw_before_data_dynptr_write,
+ 				   &skel->bss->test_pass);
+-	if (test__start_subtest("clone_dynptr_rdonly_before_meta_dynptr_write"))
++	if (test__start_subtest("clone_meta_dynptr_rw_before_meta_dynptr_write"))
+ 		test_tuntap_mirred(skel->progs.ing_xdp,
+-				   skel->progs.clone_dynptr_rdonly_before_meta_dynptr_write,
++				   skel->progs.clone_meta_dynptr_rw_before_meta_dynptr_write,
+ 				   &skel->bss->test_pass);
  
-+static void dump_err_stream(const struct bpf_program *prog)
-+{
-+	char buf[512];
-+	int ret;
-+
-+	ret = 0;
-+	do {
-+		ret = bpf_prog_stream_read(bpf_program__fd(prog),
-+					   BPF_STREAM_STDERR, buf, sizeof(buf),
-+					   NULL);
-+		if (ret > 0)
-+			fwrite(buf, sizeof(buf[0]), ret, stderr);
-+	} while (ret > 0);
-+}
-+
- void test_xdp_context_veth(void)
- {
- 	LIBBPF_OPTS(bpf_tc_hook, tc_hook, .attach_point = BPF_TC_INGRESS);
-@@ -249,7 +264,8 @@ void test_xdp_context_veth(void)
- 	if (!ASSERT_OK(ret, "send_test_packet"))
- 		goto close;
- 
--	ASSERT_TRUE(skel->bss->test_pass, "test_pass");
-+	if (!ASSERT_TRUE(skel->bss->test_pass, "test_pass"))
-+		dump_err_stream(tc_prog);
- 
- close:
- 	close_netns(nstoken);
-@@ -314,7 +330,8 @@ static void test_tuntap(struct bpf_program *xdp_prog,
- 	if (!ASSERT_OK(ret, "write_test_packet"))
- 		goto close;
- 
--	ASSERT_TRUE(*test_pass, "test_pass");
-+	if (!ASSERT_TRUE(*test_pass, "test_pass"))
-+		dump_err_stream(tc_prio_2_prog ? : tc_prio_1_prog);
- 
- close:
- 	if (tap_fd >= 0)
-@@ -385,7 +402,8 @@ static void test_tuntap_mirred(struct bpf_program *xdp_prog,
- 	if (!ASSERT_OK(ret, "write_test_packet"))
- 		goto close;
- 
--	ASSERT_TRUE(*test_pass, "test_pass");
-+	if (!ASSERT_TRUE(*test_pass, "test_pass"))
-+		dump_err_stream(tc_prog);
- 
- close:
- 	if (tap_fd >= 0)
+ 	test_xdp_meta__destroy(skel);
 diff --git a/tools/testing/selftests/bpf/progs/test_xdp_meta.c b/tools/testing/selftests/bpf/progs/test_xdp_meta.c
-index 11288b20f56c..3b137c4eed6c 100644
+index 3b137c4eed6c..a70de55c6997 100644
 --- a/tools/testing/selftests/bpf/progs/test_xdp_meta.c
 +++ b/tools/testing/selftests/bpf/progs/test_xdp_meta.c
-@@ -27,6 +27,23 @@ static const __u8 meta_want[META_SIZE] = {
- 	0x31, 0x32, 0x33, 0x34, 0x35, 0x36, 0x37, 0x38,
- };
+@@ -321,12 +321,13 @@ int ing_xdp(struct xdp_md *ctx)
+ }
  
-+static bool check_metadata(const char *file, int line, __u8 *meta_have)
-+{
-+	if (!__builtin_memcmp(meta_have, meta_want, META_SIZE))
-+		return true;
-+
-+	bpf_stream_printk(BPF_STREAM_STDERR,
-+			  "FAIL:%s:%d: metadata mismatch\n"
-+			  "  have:\n    %pI6\n    %pI6\n"
-+			  "  want:\n    %pI6\n    %pI6\n",
-+			  file, line,
-+			  &meta_have[0x00], &meta_have[0x10],
-+			  &meta_want[0x00], &meta_want[0x10]);
-+	return false;
-+}
-+
-+#define check_metadata(meta_have) check_metadata(__FILE__, __LINE__, meta_have)
-+
+ /*
+- * Check that skb->data_meta..skb->data is empty if prog writes to packet
+- * _payload_ using packet pointers. Applies only to cloned skbs.
++ * Check that, when operating on a cloned packet, skb->data_meta..skb->data is
++ * kept intact if prog writes to packet _payload_ using packet pointers.
+  */
  SEC("tc")
- int ing_cls(struct __sk_buff *ctx)
+-int clone_data_meta_empty_on_data_write(struct __sk_buff *ctx)
++int clone_data_meta_survives_data_write(struct __sk_buff *ctx)
  {
-@@ -36,7 +53,7 @@ int ing_cls(struct __sk_buff *ctx)
- 	if (meta_have + META_SIZE > data)
++	__u8 *meta_have = ctx_ptr(ctx, data_meta);
+ 	struct ethhdr *eth = ctx_ptr(ctx, data);
+ 
+ 	if (eth + 1 > ctx_ptr(ctx, data_end))
+@@ -335,8 +336,10 @@ int clone_data_meta_empty_on_data_write(struct __sk_buff *ctx)
+ 	if (eth->h_proto != 0)
  		goto out;
  
--	if (__builtin_memcmp(meta_want, meta_have, META_SIZE))
+-	/* Expect no metadata */
+-	if (ctx->data_meta != ctx->data)
++	if (meta_have + META_SIZE > eth)
++		goto out;
++
 +	if (!check_metadata(meta_have))
  		goto out;
  
- 	test_pass = true;
-@@ -54,7 +71,7 @@ int ing_cls_dynptr_read(struct __sk_buff *ctx)
+ 	/* Packet write to trigger unclone in prologue */
+@@ -348,14 +351,14 @@ int clone_data_meta_empty_on_data_write(struct __sk_buff *ctx)
+ }
+ 
+ /*
+- * Check that skb->data_meta..skb->data is empty if prog writes to packet
+- * _metadata_ using packet pointers. Applies only to cloned skbs.
++ * Check that, when operating on a cloned packet, skb->data_meta..skb->data is
++ * kept intact if prog writes to packet _metadata_ using packet pointers.
+  */
+ SEC("tc")
+-int clone_data_meta_empty_on_meta_write(struct __sk_buff *ctx)
++int clone_data_meta_survives_meta_write(struct __sk_buff *ctx)
+ {
++	__u8 *meta_have = ctx_ptr(ctx, data_meta);
+ 	struct ethhdr *eth = ctx_ptr(ctx, data);
+-	__u8 *md = ctx_ptr(ctx, data_meta);
+ 
+ 	if (eth + 1 > ctx_ptr(ctx, data_end))
+ 		goto out;
+@@ -363,25 +366,29 @@ int clone_data_meta_empty_on_meta_write(struct __sk_buff *ctx)
+ 	if (eth->h_proto != 0)
+ 		goto out;
+ 
+-	if (md + 1 > ctx_ptr(ctx, data)) {
+-		/* Expect no metadata */
+-		test_pass = true;
+-	} else {
+-		/* Metadata write to trigger unclone in prologue */
+-		*md = 42;
+-	}
++	if (meta_have + META_SIZE > eth)
++		goto out;
++
++	if (!check_metadata(meta_have))
++		goto out;
++
++	/* Metadata write to trigger unclone in prologue */
++	*meta_have = 42;
++
++	test_pass = true;
+ out:
+ 	return TC_ACT_SHOT;
+ }
+ 
+ /*
+- * Check that skb_meta dynptr is writable but empty if prog writes to packet
+- * _payload_ using a dynptr slice. Applies only to cloned skbs.
++ * Check that, when operating on a cloned packet, metadata remains intact if
++ * prog creates a r/w slice to packet _payload_.
+  */
+ SEC("tc")
+-int clone_dynptr_empty_on_data_slice_write(struct __sk_buff *ctx)
++int clone_meta_dynptr_survives_data_slice_write(struct __sk_buff *ctx)
+ {
+ 	struct bpf_dynptr data, meta;
++	__u8 meta_have[META_SIZE];
+ 	struct ethhdr *eth;
+ 
+ 	bpf_dynptr_from_skb(ctx, 0, &data);
+@@ -392,29 +399,26 @@ int clone_dynptr_empty_on_data_slice_write(struct __sk_buff *ctx)
+ 	if (eth->h_proto != 0)
+ 		goto out;
+ 
+-	/* Expect no metadata */
  	bpf_dynptr_from_skb_meta(ctx, 0, &meta);
- 	bpf_dynptr_read(meta_have, META_SIZE, &meta, 0, 0);
- 
--	if (__builtin_memcmp(meta_want, meta_have, META_SIZE))
+-	if (bpf_dynptr_is_rdonly(&meta) || bpf_dynptr_size(&meta) > 0)
++	bpf_dynptr_read(meta_have, META_SIZE, &meta, 0, 0);
 +	if (!check_metadata(meta_have))
+ 		goto out;
+ 
+-	/* Packet write to trigger unclone in prologue */
+-	eth->h_proto = 42;
+-
+ 	test_pass = true;
+ out:
+ 	return TC_ACT_SHOT;
+ }
+ 
+ /*
+- * Check that skb_meta dynptr is writable but empty if prog writes to packet
+- * _metadata_ using a dynptr slice. Applies only to cloned skbs.
++ * Check that, when operating on a cloned packet, metadata remains intact if
++ * prog creates an r/w slice to packet _metadata_.
+  */
+ SEC("tc")
+-int clone_dynptr_empty_on_meta_slice_write(struct __sk_buff *ctx)
++int clone_meta_dynptr_survives_meta_slice_write(struct __sk_buff *ctx)
+ {
+ 	struct bpf_dynptr data, meta;
+ 	const struct ethhdr *eth;
+-	__u8 *md;
++	__u8 *meta_have;
+ 
+ 	bpf_dynptr_from_skb(ctx, 0, &data);
+ 	eth = bpf_dynptr_slice(&data, 0, NULL, sizeof(*eth));
+@@ -424,16 +428,13 @@ int clone_dynptr_empty_on_meta_slice_write(struct __sk_buff *ctx)
+ 	if (eth->h_proto != 0)
+ 		goto out;
+ 
+-	/* Expect no metadata */
+ 	bpf_dynptr_from_skb_meta(ctx, 0, &meta);
+-	if (bpf_dynptr_is_rdonly(&meta) || bpf_dynptr_size(&meta) > 0)
++	meta_have = bpf_dynptr_slice_rdwr(&meta, 0, NULL, META_SIZE);
++	if (!meta_have)
+ 		goto out;
+ 
+-	/* Metadata write to trigger unclone in prologue */
+-	bpf_dynptr_from_skb_meta(ctx, 0, &meta);
+-	md = bpf_dynptr_slice_rdwr(&meta, 0, NULL, sizeof(*md));
+-	if (md)
+-		*md = 42;
++	if (!check_metadata(meta_have))
++		goto out;
+ 
+ 	test_pass = true;
+ out:
+@@ -441,14 +442,17 @@ int clone_dynptr_empty_on_meta_slice_write(struct __sk_buff *ctx)
+ }
+ 
+ /*
+- * Check that skb_meta dynptr is read-only before prog writes to packet payload
+- * using dynptr_write helper. Applies only to cloned skbs.
++ * Check that, when operating on a cloned packet, skb_meta dynptr is read-write
++ * before prog writes to packet _payload_ using dynptr_write helper and metadata
++ * remains intact before and after the write.
+  */
+ SEC("tc")
+-int clone_dynptr_rdonly_before_data_dynptr_write(struct __sk_buff *ctx)
++int clone_meta_dynptr_rw_before_data_dynptr_write(struct __sk_buff *ctx)
+ {
+ 	struct bpf_dynptr data, meta;
++	__u8 meta_have[META_SIZE];
+ 	const struct ethhdr *eth;
++	int err;
+ 
+ 	bpf_dynptr_from_skb(ctx, 0, &data);
+ 	eth = bpf_dynptr_slice(&data, 0, NULL, sizeof(*eth));
+@@ -458,17 +462,20 @@ int clone_dynptr_rdonly_before_data_dynptr_write(struct __sk_buff *ctx)
+ 	if (eth->h_proto != 0)
+ 		goto out;
+ 
+-	/* Expect read-only metadata before unclone */
++	/* Expect read-write metadata before unclone */
+ 	bpf_dynptr_from_skb_meta(ctx, 0, &meta);
+-	if (!bpf_dynptr_is_rdonly(&meta) || bpf_dynptr_size(&meta) != META_SIZE)
++	if (bpf_dynptr_is_rdonly(&meta))
++		goto out;
++
++	err = bpf_dynptr_read(meta_have, META_SIZE, &meta, 0, 0);
++	if (err || !check_metadata(meta_have))
+ 		goto out;
+ 
+ 	/* Helper write to payload will unclone the packet */
+ 	bpf_dynptr_write(&data, offsetof(struct ethhdr, h_proto), "x", 1, 0);
+ 
+-	/* Expect no metadata after unclone */
+-	bpf_dynptr_from_skb_meta(ctx, 0, &meta);
+-	if (bpf_dynptr_is_rdonly(&meta) || bpf_dynptr_size(&meta) != 0)
++	err = bpf_dynptr_read(meta_have, META_SIZE, &meta, 0, 0);
++	if (err || !check_metadata(meta_have))
  		goto out;
  
  	test_pass = true;
-@@ -92,7 +109,7 @@ int ing_cls_dynptr_slice(struct __sk_buff *ctx)
- 	if (!meta_have)
+@@ -477,14 +484,17 @@ int clone_dynptr_rdonly_before_data_dynptr_write(struct __sk_buff *ctx)
+ }
+ 
+ /*
+- * Check that skb_meta dynptr is read-only if prog writes to packet
+- * metadata using dynptr_write helper. Applies only to cloned skbs.
++ * Check that, when operating on a cloned packet, skb_meta dynptr is read-write
++ * before prog writes to packet _metadata_ using dynptr_write helper and
++ * metadata remains intact before and after the write.
+  */
+ SEC("tc")
+-int clone_dynptr_rdonly_before_meta_dynptr_write(struct __sk_buff *ctx)
++int clone_meta_dynptr_rw_before_meta_dynptr_write(struct __sk_buff *ctx)
+ {
+ 	struct bpf_dynptr data, meta;
++	__u8 meta_have[META_SIZE];
+ 	const struct ethhdr *eth;
++	int err;
+ 
+ 	bpf_dynptr_from_skb(ctx, 0, &data);
+ 	eth = bpf_dynptr_slice(&data, 0, NULL, sizeof(*eth));
+@@ -494,14 +504,20 @@ int clone_dynptr_rdonly_before_meta_dynptr_write(struct __sk_buff *ctx)
+ 	if (eth->h_proto != 0)
  		goto out;
  
--	if (__builtin_memcmp(meta_want, meta_have, META_SIZE))
-+	if (!check_metadata(meta_have))
+-	/* Expect read-only metadata */
++	/* Expect read-write metadata before unclone */
+ 	bpf_dynptr_from_skb_meta(ctx, 0, &meta);
+-	if (!bpf_dynptr_is_rdonly(&meta) || bpf_dynptr_size(&meta) != META_SIZE)
++	if (bpf_dynptr_is_rdonly(&meta))
  		goto out;
  
- 	test_pass = true;
-@@ -153,7 +170,7 @@ int ing_cls_dynptr_offset_rd(struct __sk_buff *ctx)
- 		goto out;
- 	__builtin_memcpy(dst, src, chunk_len);
- 
--	if (__builtin_memcmp(meta_want, meta_have, META_SIZE))
-+	if (!check_metadata(meta_have))
+-	/* Metadata write. Expect failure. */
+-	bpf_dynptr_from_skb_meta(ctx, 0, &meta);
+-	if (bpf_dynptr_write(&meta, 0, "x", 1, 0) != -EINVAL)
++	err = bpf_dynptr_read(meta_have, META_SIZE, &meta, 0, 0);
++	if (err || !check_metadata(meta_have))
++		goto out;
++
++	/* Helper write to metadata will unclone the packet */
++	bpf_dynptr_write(&meta, 0, &meta_have[0], 1, 0);
++
++	err = bpf_dynptr_read(meta_have, META_SIZE, &meta, 0, 0);
++	if (err || !check_metadata(meta_have))
  		goto out;
  
  	test_pass = true;
