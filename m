@@ -1,175 +1,334 @@
-Return-Path: <netdev+bounces-235833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E394C363D9
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 16:11:32 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE239C365AF
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 16:36:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA321188D8E7
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 15:10:18 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 24FD1500FFD
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 15:24:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81692328B7F;
-	Wed,  5 Nov 2025 15:09:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEE823321BC;
+	Wed,  5 Nov 2025 15:18:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="zLSVH+cp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VlA6UEYi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D51B630FC00
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 15:09:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97CAD3314BC;
+	Wed,  5 Nov 2025 15:18:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762355390; cv=none; b=YT7KSJgSHVVbGZxCPfXrZooGOfYg+dhlzg+g4f8R639rGT5h18OfqXzhTuWplg5Mlj4kDQ9pYS+pr68RMepeo8n0XmPJ7V/jCLggOdzJHgpzVFI7xKtIqJ7RUG8ZWbWTN88v8NGCH/wkZbqDzg0U6BWS8wF4DBl5PlH+MVy94QQ=
+	t=1762355888; cv=none; b=AIjKl4n+mBzgQxQviyu6ty4Wm1WTOMTYMbrEhPNb7PTRMln8BaN8Puhz0ReO2Uvw0Tzg67ylTGshm8JFzkkRtW0HXYN0xuA6C92F0hGBcKqPBsSVbtG2L8e77edcHBZsLKuPoRB9rQcH8BhfvyFiWsLqCROf9bfv1RJgNrMdRfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762355390; c=relaxed/simple;
-	bh=pkzDDAuu5FnbyLu1BGgHTr/rHEA+02rAzTZAHJGNYkA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rTOZZq2XFFhI3kPh7mT2f0lWb1SAGWa5YXp2gPD4tb+uZ+86D84E1vYjO9j68tXpAhZtJYRI14IP+4wh9EshKfZiNqky3v//zBUFqPbOANVj/DJb3dZ2cA9wgs2Jrxyp14gkYn8lbK9X0anzDPwcPZmpzDUriTOzhCMru4yTpn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=zLSVH+cp; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-29555415c5fso58656365ad.1
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 07:09:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1762355388; x=1762960188; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=npKJdQ/SFEjnsTgPu5T82klgRkrk6WAaS5E6NxS8cDA=;
-        b=zLSVH+cpbs1qR5NQ2o43wKSdaOVaS1VtdhnlDEjIX8/9Ajn4HwN6wKHZ6uOD+ynKqZ
-         rFTmElrFEmRgMW7OSLqFBHrgnI69SzNmrJhkAGhTk0oAvDWfl0qh+tUGsuwqzgyBkk1K
-         ZcpqZR8ls6O0FkaofhQt0cj8b9sYOWUsgrneIQe/qf1DPZKkkkv0B3rg8U8WFEWifI1x
-         hQtLuePdI1a8F1YLaQvRLqy9XsOywtP5mPyY8V4Ecyd6yH8NzgRqa3V+PAdNEr4nJu1Q
-         2AEp8oyE79PeRWYxy5fkRCZTrIMGdso9ivrUurV5lg0tdWSZDNj8xia4WY0ZIc74/UVq
-         Xusw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762355388; x=1762960188;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=npKJdQ/SFEjnsTgPu5T82klgRkrk6WAaS5E6NxS8cDA=;
-        b=mCSRC3lx1iROt0xeNoxv67L7L5NroFtyInrBQd6yNocSWyETK0LyqQSl9rP9QQEAEG
-         5Bo5l1fN2BNvGr+RkHXP+WNMujPnjnChNywM3WOiyOqW3O7mwWJfoQ8paj1er8+6rOQF
-         CSHnMhVGfQ+7iir8imgLfMUAUERVDtFUhE6F2D1scOx+JiZTyhK0/6Deb7R5lNdgjKRz
-         Rjow65ORgLjhgepdiQ4Z9zGD13OjX4cuQvX7SHirkLpW/VuLe4SfLSNDsdNpsEM/4FnB
-         Un4k8mLdr82u4FXp3RG2fsOuWN0Jcuwe7TmcwtaN2sGZgvLF+4cnYVfoPlZrORYdhCwL
-         dcXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW3h1pm4vp6vjfYDneliV2bNpsakGWkoXWwr3gD7yORz5zgGlSP9RKVqTEfrZcZTtv8TQLFg2o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0LAUy4tDHvzeXJ1ifmJd3gEG43meEGTyQVqsBVcpzKTKlM3U9
-	3u9wdMABMB43NMsl+sM6x4/USbSH8HxO+jB6Ppo2KBMNVtXFXclpsHQE55KQyTiIR4u+g6s4WuH
-	NA08md5dfTMjQMI+UIIvfmTG2QMK5mDuIFzE5toY4
-X-Gm-Gg: ASbGncs3+RV2lhe+X1TbCDsP+/gKX7QPY8gMVggu8DvXSGIxA8dwaIy0lyvbKfvbPX5
-	U9ZPiz0RHlBoH8pBoWPaP+/6QzQx2pnQWvt5rtgnQZy3xRNTJwy8ltUQTkWsHr0D48FBm8UyDq7
-	EgD/nPW8jTYUZCkvAy6c0lr+l7BdaEtbj44/c5ApjA5vmAbKg9+7xUd5oofep2W8YFEJHR83Nlw
-	Xt1j0VOZIaA4L+O2veoHWIwum3nu/AXedFZrCJnQ+PBnjHKBbIy5UjJ6WLkBkesE2G3iv5CQHu1
-	jR0KPn1rxvXjK9h7YQiqOWn6/GboLrpJIp0t
-X-Google-Smtp-Source: AGHT+IES6bIx3iRmi6TnNQThdacyfXUn2MC8E/Eb3foVxURjYD3jCFL4B2OtVSRN6RcZ3uuhcllKhvneK9OOZ9vCQ9U=
-X-Received: by 2002:a17:902:e943:b0:273:ab5f:a507 with SMTP id
- d9443c01a7336-2962ad3b1a3mr50683155ad.21.1762355388147; Wed, 05 Nov 2025
- 07:09:48 -0800 (PST)
+	s=arc-20240116; t=1762355888; c=relaxed/simple;
+	bh=KrTmSd/KLHnmJp6uY5VjqlnOzYc3oRuRzLcvqn1keFo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hVQBnXI3+h2Ylt+7KrwPuN7LWEL125Ix4zWjX/ZOzTxa5NoGYzkEuNemfvMeK8BVbaax4J4tK/F9RW8j/dV03uAC9E456mzB12grK2nFkv4dDaGZELrF90F2JkVCL0BUZRPZI2djs6hIay6xxkKPmQsJ9o79a/mst+5/ZyYVFvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VlA6UEYi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B230C4CEF5;
+	Wed,  5 Nov 2025 15:18:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762355888;
+	bh=KrTmSd/KLHnmJp6uY5VjqlnOzYc3oRuRzLcvqn1keFo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=VlA6UEYiwYN0luQ/4V7V5KntlUFeIZMU+NmpkL7d+M3N2iUQ1IOTeflqlF+lIm90q
+	 HiYedRgVi60NobljBr8hiMWKlKYaC0H2qpqcbgA62caHhlCZRV0lAw+K6rG/pGXCdM
+	 v2fUWpgA1cuUl7tJFOCWW5vd5SlcBeqwuZxogThAgO6JWjnfivWSGwf1FZmVbvLp51
+	 DXvXopX+g369NCQ/HianrAkrAREQeoj/7Y3X5e7jN/22+bQDoRUOUhUSyljHri7cDD
+	 BYyWmWicrYUBAv0SObOJUefhS668cWVoSkzNKG1fBJO8d3jvGpTEthtLNQuTTZy+9f
+	 X1oSJavknulag==
+Date: Wed, 5 Nov 2025 16:18:05 +0100
+From: Frederic Weisbecker <frederic@kernel.org>
+To: Chen Ridong <chenridong@huaweicloud.com>
+Cc: Waiman Long <llong@redhat.com>, LKML <linux-kernel@vger.kernel.org>,
+	Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Danilo Krummrich <dakr@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Gabriele Monaco <gmonaco@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>, Phil Auld <pauld@redhat.com>,
+	"Rafael J . Wysocki" <rafael@kernel.org>,
+	Roman Gushchin <roman.gushchin@linux.dev>,
+	Shakeel Butt <shakeel.butt@linux.dev>,
+	Simon Horman <horms@kernel.org>, Tejun Heo <tj@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vlastimil Babka <vbabka@suse.cz>, Will Deacon <will@kernel.org>,
+	cgroups@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-block@vger.kernel.org, linux-mm@kvack.org,
+	linux-pci@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 12/33] sched/isolation: Convert housekeeping cpumasks to
+ rcu pointers
+Message-ID: <aQtqrYlvMsjX91Vn@localhost.localdomain>
+References: <20251013203146.10162-1-frederic@kernel.org>
+ <20251013203146.10162-13-frederic@kernel.org>
+ <bb9a75dc-8c34-41da-b064-e31bf5fe6cb2@huaweicloud.com>
+ <510b0185-51d6-44e6-8c39-dfc4c1721e03@redhat.com>
+ <aQThLsnmqu8Lor6c@localhost.localdomain>
+ <14cd347c-42c9-4134-9c1c-1a222b553c2f@huaweicloud.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <aQoIygv-7h4m21SG@horms.kernel.org> <20251105100403.17786-1-vnranganath.20@gmail.com>
- <aQtKFtETfGBOPpCV@horms.kernel.org>
-In-Reply-To: <aQtKFtETfGBOPpCV@horms.kernel.org>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 5 Nov 2025 10:09:37 -0500
-X-Gm-Features: AWmQ_blU6XcDEnFl20FbnBbH6b7zO2BsFs-Y_L7D1GiklwITbV2JeRK3k2GQLkI
-Message-ID: <CAM0EoMnvjitf-+YFt-qsFHXOnZ4gW3mnXBzMT_-Z6M_XSvWbhQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/2] net: sched: act_ife: initialize struct tc_ife to
- fix KMSAN kernel-infoleak
-To: Simon Horman <horms@kernel.org>
-Cc: Ranganath V N <vnranganath.20@gmail.com>, davem@davemloft.net, 
-	david.hunter.linux@gmail.com, edumazet@google.com, jiri@resnulli.us, 
-	khalid@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, skhan@linuxfoundation.org, 
-	syzbot+0c85cae3350b7d486aee@syzkaller.appspotmail.com, 
-	xiyou.wangcong@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <14cd347c-42c9-4134-9c1c-1a222b553c2f@huaweicloud.com>
 
-On Wed, Nov 5, 2025 at 7:59=E2=80=AFAM Simon Horman <horms@kernel.org> wrot=
-e:
->
-> On Wed, Nov 05, 2025 at 03:33:58PM +0530, Ranganath V N wrote:
-> > On 11/4/25 19:38, Simon Horman wrote:
-> > > On Sat, Nov 01, 2025 at 06:04:46PM +0530, Ranganath V N wrote:
-> > >> Fix a KMSAN kernel-infoleak detected  by the syzbot .
-> > >>
-> > >> [net?] KMSAN: kernel-infoleak in __skb_datagram_iter
-> > >>
-> > >> In tcf_ife_dump(), the variable 'opt' was partially initialized usin=
-g a
-> > >> designatied initializer. While the padding bytes are reamined
-> > >> uninitialized. nla_put() copies the entire structure into a
-> > >> netlink message, these uninitialized bytes leaked to userspace.
-> > >>
-> > >> Initialize the structure with memset before assigning its fields
-> > >> to ensure all members and padding are cleared prior to beign copied.
-> > >
-> > > Perhaps not important, but this seems to only describe patch 1/2.
-> > >
-> > >>
-> > >> Signed-off-by: Ranganath V N <vnranganath.20@gmail.com>
-> > >
-> > > Sorry for not looking more carefully at v1.
-> > >
-> > > The presence of this padding seems pretty subtle to me.
-> > > And while I agree that your change fixes the problem described.
-> > > I wonder if it would be better to make things more obvious
-> > > by adding a 2-byte pad member to the structures involved.
-> >
-> > Thanks for the input.
-> >
-> > One question =E2=80=94 even though adding a 2-byte `pad` field silences=
- KMSAN,
-> > would that approach be reliable across all architectures?
-> > Since the actual amount and placement of padding can vary depending on
-> > structure alignment and compiler behavior, I=E2=80=99m wondering if thi=
-s would only
-> > silence the report on certain builds rather than fixing the root cause.
-> >
-> > The current memset-based initialization explicitly clears all bytes in =
-the
-> > structure (including any compiler-inserted padding), which seems safer =
-and
-> > more consistent across architectures.
-> >
-> > Also, adding a new member =E2=80=94 even a padding field =E2=80=94 coul=
-d potentially alter
-> > the structure size or layout as seen from user space. That might
-> > unintentionally affect existing user-space expectations.
-> >
-> > Do you think relying on a manual pad field is good enough?
->
-> I think these are the right questions to ask.
->
-> My thinking is that structures will be padded to a multiple
-> of either 4 or 8 bytes, depending on the architecture.
->
-> And my observation is that that the unpadded length of both of the struct=
-ures
-> in question are 22 bytes. And that on x86_64 they are padded to 24 bytes.
-> Which is divisible by both 4 and 8. So I assume this will be consistent
-> for all architectures. If so, I think this would address the questions yo=
-u
-> raised.
->
-> I do, however, agree that your current memset-based approach is safer
-> in the sense that it carries a lower risk of breaking things because
-> it has fewer assumptions (that we have thought of so far).
+Le Mon, Nov 03, 2025 at 10:22:47AM +0800, Chen Ridong a écrit :
+> 
+> 
+> On 2025/11/1 0:17, Frederic Weisbecker wrote:
+> > Le Tue, Oct 21, 2025 at 12:03:05AM -0400, Waiman Long a écrit :
+> >> On 10/20/25 9:46 PM, Chen Ridong wrote:
+> >>>
+> >>> On 2025/10/14 4:31, Frederic Weisbecker wrote:
+> >>>> HK_TYPE_DOMAIN's cpumask will soon be made modifyable by cpuset.
+> >>>> A synchronization mechanism is then needed to synchronize the updates
+> >>>> with the housekeeping cpumask readers.
+> >>>>
+> >>>> Turn the housekeeping cpumasks into RCU pointers. Once a housekeeping
+> >>>> cpumask will be modified, the update side will wait for an RCU grace
+> >>>> period and propagate the change to interested subsystem when deemed
+> >>>> necessary.
+> >>>>
+> >>>> Signed-off-by: Frederic Weisbecker <frederic@kernel.org>
+> >>>> ---
+> >>>>   kernel/sched/isolation.c | 58 +++++++++++++++++++++++++---------------
+> >>>>   kernel/sched/sched.h     |  1 +
+> >>>>   2 files changed, 37 insertions(+), 22 deletions(-)
+> >>>>
+> >>>> diff --git a/kernel/sched/isolation.c b/kernel/sched/isolation.c
+> >>>> index 8690fb705089..b46c20b5437f 100644
+> >>>> --- a/kernel/sched/isolation.c
+> >>>> +++ b/kernel/sched/isolation.c
+> >>>> @@ -21,7 +21,7 @@ DEFINE_STATIC_KEY_FALSE(housekeeping_overridden);
+> >>>>   EXPORT_SYMBOL_GPL(housekeeping_overridden);
+> >>>>   struct housekeeping {
+> >>>> -	cpumask_var_t cpumasks[HK_TYPE_MAX];
+> >>>> +	struct cpumask __rcu *cpumasks[HK_TYPE_MAX];
+> >>>>   	unsigned long flags;
+> >>>>   };
+> >>>> @@ -33,17 +33,28 @@ bool housekeeping_enabled(enum hk_type type)
+> >>>>   }
+> >>>>   EXPORT_SYMBOL_GPL(housekeeping_enabled);
+> >>>> +const struct cpumask *housekeeping_cpumask(enum hk_type type)
+> >>>> +{
+> >>>> +	if (static_branch_unlikely(&housekeeping_overridden)) {
+> >>>> +		if (housekeeping.flags & BIT(type)) {
+> >>>> +			return rcu_dereference_check(housekeeping.cpumasks[type], 1);
+> >>>> +		}
+> >>>> +	}
+> >>>> +	return cpu_possible_mask;
+> >>>> +}
+> >>>> +EXPORT_SYMBOL_GPL(housekeeping_cpumask);
+> >>>> +
+> >>>>   int housekeeping_any_cpu(enum hk_type type)
+> >>>>   {
+> >>>>   	int cpu;
+> >>>>   	if (static_branch_unlikely(&housekeeping_overridden)) {
+> >>>>   		if (housekeeping.flags & BIT(type)) {
+> >>>> -			cpu = sched_numa_find_closest(housekeeping.cpumasks[type], smp_processor_id());
+> >>>> +			cpu = sched_numa_find_closest(housekeeping_cpumask(type), smp_processor_id());
+> >>>>   			if (cpu < nr_cpu_ids)
+> >>>>   				return cpu;
+> >>>> -			cpu = cpumask_any_and_distribute(housekeeping.cpumasks[type], cpu_online_mask);
+> >>>> +			cpu = cpumask_any_and_distribute(housekeeping_cpumask(type), cpu_online_mask);
+> >>>>   			if (likely(cpu < nr_cpu_ids))
+> >>>>   				return cpu;
+> >>>>   			/*
+> >>>> @@ -59,28 +70,18 @@ int housekeeping_any_cpu(enum hk_type type)
+> >>>>   }
+> >>>>   EXPORT_SYMBOL_GPL(housekeeping_any_cpu);
+> >>>> -const struct cpumask *housekeeping_cpumask(enum hk_type type)
+> >>>> -{
+> >>>> -	if (static_branch_unlikely(&housekeeping_overridden))
+> >>>> -		if (housekeeping.flags & BIT(type))
+> >>>> -			return housekeeping.cpumasks[type];
+> >>>> -	return cpu_possible_mask;
+> >>>> -}
+> >>>> -EXPORT_SYMBOL_GPL(housekeeping_cpumask);
+> >>>> -
+> >>>>   void housekeeping_affine(struct task_struct *t, enum hk_type type)
+> >>>>   {
+> >>>>   	if (static_branch_unlikely(&housekeeping_overridden))
+> >>>>   		if (housekeeping.flags & BIT(type))
+> >>>> -			set_cpus_allowed_ptr(t, housekeeping.cpumasks[type]);
+> >>>> +			set_cpus_allowed_ptr(t, housekeeping_cpumask(type));
+> >>>>   }
+> >>>>   EXPORT_SYMBOL_GPL(housekeeping_affine);
+> >>>>   bool housekeeping_test_cpu(int cpu, enum hk_type type)
+> >>>>   {
+> >>>> -	if (static_branch_unlikely(&housekeeping_overridden))
+> >>>> -		if (housekeeping.flags & BIT(type))
+> >>>> -			return cpumask_test_cpu(cpu, housekeeping.cpumasks[type]);
+> >>>> +	if (housekeeping.flags & BIT(type))
+> >>>> +		return cpumask_test_cpu(cpu, housekeeping_cpumask(type));
+> >>>>   	return true;
+> >>>>   }
+> >>>>   EXPORT_SYMBOL_GPL(housekeeping_test_cpu);
+> >>>> @@ -96,20 +97,33 @@ void __init housekeeping_init(void)
+> >>>>   	if (housekeeping.flags & HK_FLAG_KERNEL_NOISE)
+> >>>>   		sched_tick_offload_init();
+> >>>> -
+> >>>> +	/*
+> >>>> +	 * Realloc with a proper allocator so that any cpumask update
+> >>>> +	 * can indifferently free the old version with kfree().
+> >>>> +	 */
+> >>>>   	for_each_set_bit(type, &housekeeping.flags, HK_TYPE_MAX) {
+> >>>> +		struct cpumask *omask, *nmask = kmalloc(cpumask_size(), GFP_KERNEL);
+> >>>> +
+> >>>> +		if (WARN_ON_ONCE(!nmask))
+> >>>> +			return;
+> >>>> +
+> >>>> +		omask = rcu_dereference(housekeeping.cpumasks[type]);
+> >>>> +
+> >>>>   		/* We need at least one CPU to handle housekeeping work */
+> >>>> -		WARN_ON_ONCE(cpumask_empty(housekeeping.cpumasks[type]));
+> >>>> +		WARN_ON_ONCE(cpumask_empty(omask));
+> >>>> +		cpumask_copy(nmask, omask);
+> >>>> +		RCU_INIT_POINTER(housekeeping.cpumasks[type], nmask);
+> >>>> +		memblock_free(omask, cpumask_size());
+> >>>>   	}
+> >>>>   }
+> >>>>   static void __init housekeeping_setup_type(enum hk_type type,
+> >>>>   					   cpumask_var_t housekeeping_staging)
+> >>>>   {
+> >>>> +	struct cpumask *mask = memblock_alloc_or_panic(cpumask_size(), SMP_CACHE_BYTES);
+> >>>> -	alloc_bootmem_cpumask_var(&housekeeping.cpumasks[type]);
+> >>>> -	cpumask_copy(housekeeping.cpumasks[type],
+> >>>> -		     housekeeping_staging);
+> >>>> +	cpumask_copy(mask, housekeeping_staging);
+> >>>> +	RCU_INIT_POINTER(housekeeping.cpumasks[type], mask);
+> >>>>   }
+> >>>>   static int __init housekeeping_setup(char *str, unsigned long flags)
+> >>>> @@ -162,7 +176,7 @@ static int __init housekeeping_setup(char *str, unsigned long flags)
+> >>>>   		for_each_set_bit(type, &iter_flags, HK_TYPE_MAX) {
+> >>>>   			if (!cpumask_equal(housekeeping_staging,
+> >>>> -					   housekeeping.cpumasks[type])) {
+> >>>> +					   housekeeping_cpumask(type))) {
+> >>>>   				pr_warn("Housekeeping: nohz_full= must match isolcpus=\n");
+> >>>>   				goto free_housekeeping_staging;
+> >>>>   			}
+> >>>> diff --git a/kernel/sched/sched.h b/kernel/sched/sched.h
+> >>>> index 1f5d07067f60..0c0ef8999fd6 100644
+> >>>> --- a/kernel/sched/sched.h
+> >>>> +++ b/kernel/sched/sched.h
+> >>>> @@ -42,6 +42,7 @@
+> >>>>   #include <linux/ktime_api.h>
+> >>>>   #include <linux/lockdep_api.h>
+> >>>>   #include <linux/lockdep.h>
+> >>>> +#include <linux/memblock.h>
+> >>>>   #include <linux/minmax.h>
+> >>>>   #include <linux/mm.h>
+> >>>>   #include <linux/module.h>
+> >>> A warning was detected:
+> >>>
+> >>> =============================
+> >>> WARNING: suspicious RCU usage
+> >>> 6.17.0-next-20251009-00033-g4444da88969b #808 Not tainted
+> >>> -----------------------------
+> >>> kernel/sched/isolation.c:60 suspicious rcu_dereference_check() usage!
+> >>>
+> >>> other info that might help us debug this:
+> >>>
+> >>>
+> >>> rcu_scheduler_active = 2, debug_locks = 1
+> >>> 1 lock held by swapper/0/1:
+> >>>   #0: ffff888100600ce0 (&type->i_mutex_dir_key#3){++++}-{4:4}, at: walk_compone
+> >>>
+> >>> stack backtrace:
+> >>> CPU: 3 UID: 0 PID: 1 Comm: swapper/0 Not tainted 6.17.0-next-20251009-00033-g4
+> >>> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239
+> >>> Call Trace:
+> >>>   <TASK>
+> >>>   dump_stack_lvl+0x68/0xa0
+> >>>   lockdep_rcu_suspicious+0x148/0x1b0
+> >>>   housekeeping_cpumask+0xaa/0xb0
+> >>>   housekeeping_test_cpu+0x25/0x40
+> >>>   find_get_block_common+0x41/0x3e0
+> >>>   bdev_getblk+0x28/0xa0
+> >>>   ext4_getblk+0xba/0x2d0
+> >>>   ext4_bread_batch+0x56/0x170
+> >>>   __ext4_find_entry+0x17c/0x410
+> >>>   ? lock_release+0xc6/0x290
+> >>>   ext4_lookup+0x7a/0x1d0
+> >>>   __lookup_slow+0xf9/0x1b0
+> >>>   walk_component+0xe0/0x150
+> >>>   link_path_walk+0x201/0x3e0
+> >>>   path_openat+0xb1/0xb30
+> >>>   ? stack_depot_save_flags+0x41e/0xa00
+> >>>   do_filp_open+0xbc/0x170
+> >>>   ? _raw_spin_unlock_irqrestore+0x2c/0x50
+> >>>   ? __create_object+0x59/0x80
+> >>>   ? trace_kmem_cache_alloc+0x1d/0xa0
+> >>>   ? vprintk_emit+0x2b2/0x360
+> >>>   do_open_execat+0x56/0x100
+> >>>   alloc_bprm+0x1a/0x200
+> >>>   ? __pfx_kernel_init+0x10/0x10
+> >>>   kernel_execve+0x4b/0x160
+> >>>   kernel_init+0xe5/0x1c0
+> >>>   ret_from_fork+0x185/0x1d0
+> >>>   ? __pfx_kernel_init+0x10/0x10
+> >>>   ret_from_fork_asm+0x1a/0x30
+> >>>   </TASK>
+> >>> random: crng init done
+> >>>
+> >> It is because bh_lru_install() of fs/buffer.c calls cpu_is_isolated()
+> >> without holding a rcu_read_lock. Will need to add a rcu_read_lock() there.
+> > 
+> > But this is called within bh_lru_lock() which should have either disabled
+> > IRQs or preemption off. I would expect rcu_dereference_check() to automatically
+> > verify those implied RCU read-side critical sections.
+> > 
+> > Let's see, lockdep_assert_in_rcu_reader() checks preemptible(), which is:
+> > 
+> > #define preemptible()	(preempt_count() == 0 && !irqs_disabled())
+> > 
+> > Ah but if !CONFIG_PREEMPT_COUNT:
+> > 
+> > #define preemptible()	0
+> > 
+> > Chen did you have !CONFIG_PREEMPT_COUNT ?
+> > 
+> > Probably lockdep_assert_in_rcu_reader() should be fixed accordingly and consider
+> > preemption always disabled whenever !CONFIG_PREEMPT_COUNT. Let me check that...
+> > 
+> > Thanks.
+> > 
+> 
+> I compiled with CONFIG_PREEMPT_COUNT=y and CONFIG_SMP=y.
 
-+1
-My view is lets fix the immediate leak issue with the memset, and a
-subsequent patch can add the padding if necessary.
+Oh actually I think it's my fault. This should be fixed with this:
 
-cheers,
-jamal
+diff --git a/kernel/sched/isolation.c b/kernel/sched/isolation.c
+index 95d69c2102f6..b2cb75513336 100644
+--- a/kernel/sched/isolation.c
++++ b/kernel/sched/isolation.c
+@@ -56,8 +56,8 @@ static bool housekeeping_dereference_check(enum hk_type type)
+ 
+ static inline struct cpumask *housekeeping_cpumask_dereference(enum hk_type type)
+ {
+-	return rcu_dereference_check(housekeeping.cpumasks[type],
+-				     housekeeping_dereference_check(type));
++	return rcu_dereference_all_check(housekeeping.cpumasks[type],
++					 housekeeping_dereference_check(type));
+ }
+ 
+ const struct cpumask *housekeeping_cpumask(enum hk_type type)
 
