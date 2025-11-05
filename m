@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-235871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44A5BC36AF4
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 17:28:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1315C36AC4
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 17:25:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F8B5667BD0
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 16:16:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 760831891DE9
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 16:17:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A889533F38A;
-	Wed,  5 Nov 2025 16:15:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F48A33FE14;
+	Wed,  5 Nov 2025 16:15:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39ADE33A01A;
-	Wed,  5 Nov 2025 16:15:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCCDD33C50E;
+	Wed,  5 Nov 2025 16:15:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762359306; cv=none; b=WvHNEZc+slzGvEr+N7Ij+tvjcHSnqZ8kmz5w+dA2sOhA4E6279kyAA3lbtMskF4Tok8c4Nl3Rd7ryILRdw6YlYyHKY5InwPtohFnx23ERNYr+L1cWW98Jrnkt4/7cmIhq/DdTuHj+xDyWpWis8QLlIUt9KDrJM8Yz2Xfxzlvo3E=
+	t=1762359307; cv=none; b=aJkHNHNxQdC5gG/vUubQEceNWX3tewmEUryzG8ZrCif+cS3bjzxRf20tDse5FQdQtczQN68nHAe45TbtWfEskI5uLtfHyq4DW1iIw1jRNjaMAejaKjM5Gt2xYX1lfhN7lo4pnUmARZDEopCR+NrCdF6eQWzDUDDR3K3x7cVKbwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762359306; c=relaxed/simple;
-	bh=u9YpyQlwindyhEri1ZWLiSQPKv7WiPv8mZHXYF/4aEw=;
+	s=arc-20240116; t=1762359307; c=relaxed/simple;
+	bh=nNuYNJjV4h1Jom4iGtK47z9Nbz5KXyKpFcLPdflGuCE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cwmi7D3hD4/CGRgXlfBNvEtWJVHc36hM5pOw4HWzTN0CrC9g3I3Za/IA4LStPe/cByLeN4yCcWPTVB/UP6FvYB6zDKMNFwcXmLvaMnNkKZXJMotk5vrtZ4NDjWBXpLc+sTs7cNdzp0zTyKSTP4XaCeWoS8w2zMELgrtJaCzTckI=
+	 MIME-Version:Content-Type; b=C5Et/PELwWadlEv0bIiiBrfwmrUxE3A9ddpUPW3kZmAQvvGaPLc1atuc7N7SyKDcxoqx7ZdSaxCk1mtOpqe9uFoAFVbZyQZSLf9nqdBRNlGUPN4q9IRaF2ekHQc3NKtUWsq1owJoCZHyLp5D5osM4jg0NqMt08VvnsKf8GgfiVE=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
 Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4d1r0Y3jyNz6L4wl;
-	Thu,  6 Nov 2025 00:11:09 +0800 (CST)
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4d1r4x3YFLzHnGcb;
+	Thu,  6 Nov 2025 00:14:57 +0800 (CST)
 Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2BFD01400D9;
-	Thu,  6 Nov 2025 00:15:02 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id 1C8281402F1;
+	Thu,  6 Nov 2025 00:15:03 +0800 (CST)
 Received: from huawei-ThinkCentre-M920t.huawei.com (10.123.122.223) by
  mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 5 Nov 2025 19:15:01 +0300
+ 15.2.1544.11; Wed, 5 Nov 2025 19:15:02 +0300
 From: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
 To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
 CC: <andrey.bokhanko@huawei.com>, Dmitry Skorodumov
-	<skorodumov.dmitry@huawei.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 07/14] ipvlan: Support IPv6 for learnable l2-bridge
-Date: Wed, 5 Nov 2025 19:14:43 +0300
-Message-ID: <20251105161450.1730216-8-skorodumov.dmitry@huawei.com>
+	<skorodumov.dmitry@huawei.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next 08/14] ipvlan: Make the addrs_lock be per port
+Date: Wed, 5 Nov 2025 19:14:44 +0300
+Message-ID: <20251105161450.1730216-9-skorodumov.dmitry@huawei.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20251105161450.1730216-1-skorodumov.dmitry@huawei.com>
 References: <20251105161450.1730216-1-skorodumov.dmitry@huawei.com>
@@ -62,185 +62,171 @@ Content-Type: text/plain
 X-ClientProxiedBy: mscpeml100003.china.huawei.com (10.199.174.67) To
  mscpeml500004.china.huawei.com (7.188.26.250)
 
-To make IPv6 work with learnable l2-bridge, need to
-process the TX-path:
-* Replace Source-ll-addr in Solicitation ndisc,
-* Replace Target-ll-addr in Advertisement ndisc
+Make the addrs_lock be per port, not per ipvlan dev.
 
-No need to do anything in RX-path
+This appears to be a very minor problem though.
+Since it's highly unlikely that ipvlan_add_addr() will
+be called on 2 CPU simultaneously. But nevertheless,
+this may cause:
 
+1. False-negative of ipvlan_addr_busy(): one interface
+iterated through all port->ipvlans + ipvlan->addrs
+under some ipvlan spinlock, and another added IP
+under its own lock. Though this is only possible
+for IPv6, since looks like only ipvlan_addr6_event() can be
+called without rtnl_lock.
+
+2. Race since ipvlan_ht_addr_add(port) is called under
+different ipvlan->addrs_lock locks
+
+This should not affect performance, since add/remove IP
+is a rare situation and spinlock is not locked on fast
+paths.
+
+Also, it's quite convenient to have addrs_lock on
+ipvl_port, to dynamically prevent conflict of IPs
+with addresses on main port.
+
+CC: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
 ---
- drivers/net/ipvlan/ipvlan_core.c | 129 +++++++++++++++++++++++++++----
- 1 file changed, 115 insertions(+), 14 deletions(-)
+ drivers/net/ipvlan/ipvlan.h      |  2 +-
+ drivers/net/ipvlan/ipvlan_core.c |  4 ++--
+ drivers/net/ipvlan/ipvlan_main.c | 20 ++++++++++----------
+ 3 files changed, 13 insertions(+), 13 deletions(-)
 
+diff --git a/drivers/net/ipvlan/ipvlan.h b/drivers/net/ipvlan/ipvlan.h
+index c690e313ef6b..0ab1797c6128 100644
+--- a/drivers/net/ipvlan/ipvlan.h
++++ b/drivers/net/ipvlan/ipvlan.h
+@@ -71,7 +71,6 @@ struct ipvl_dev {
+ 	DECLARE_BITMAP(mac_filters, IPVLAN_MAC_FILTER_SIZE);
+ 	netdev_features_t	sfeatures;
+ 	u32			msg_enable;
+-	spinlock_t		addrs_lock;
+ };
+ 
+ struct ipvl_addr {
+@@ -94,6 +93,7 @@ struct ipvl_port {
+ 	struct net_device	*dev;
+ 	possible_net_t		pnet;
+ 	struct hlist_head	hlhead[IPVLAN_HASH_SIZE];
++	spinlock_t		addrs_lock; /* guards hash-table and addrs */
+ 	struct list_head	ipvlans;
+ 	struct packet_type	ipvl_ptype;
+ 	u16			mode;
 diff --git a/drivers/net/ipvlan/ipvlan_core.c b/drivers/net/ipvlan/ipvlan_core.c
-index 547016e3ca8c..659aed8fc4ff 100644
+index 659aed8fc4ff..a952a257a791 100644
 --- a/drivers/net/ipvlan/ipvlan_core.c
 +++ b/drivers/net/ipvlan/ipvlan_core.c
-@@ -4,6 +4,7 @@
+@@ -476,7 +476,7 @@ static void __ipvlan_addr_learn(struct ipvl_dev *ipvlan, void *addr, bool is_v6,
+ 	struct ipvl_addr *ipvladdr, *oldest = NULL;
+ 	unsigned int naddrs = 0;
  
- #include <net/flow.h>
- #include <net/ip.h>
-+#include <net/ip6_checksum.h>
+-	spin_lock_bh(&ipvlan->addrs_lock);
++	spin_lock_bh(&ipvlan->port->addrs_lock);
  
- #include "ipvlan.h"
+ 	if (ipvlan_addr_busy(ipvlan->port, addr, is_v6))
+ 		goto out_unlock;
+@@ -499,7 +499,7 @@ static void __ipvlan_addr_learn(struct ipvl_dev *ipvlan, void *addr, bool is_v6,
+ 	ipvlan_add_addr(ipvlan, addr, is_v6, hwaddr);
  
-@@ -769,13 +770,122 @@ static int ipvlan_xmit_mode_l3(struct sk_buff *skb, struct net_device *dev)
- 	return ipvlan_process_outbound(skb);
+ out_unlock:
+-	spin_unlock_bh(&ipvlan->addrs_lock);
++	spin_unlock_bh(&ipvlan->port->addrs_lock);
+ 	if (oldest)
+ 		kfree_rcu(oldest, rcu);
+ }
+diff --git a/drivers/net/ipvlan/ipvlan_main.c b/drivers/net/ipvlan/ipvlan_main.c
+index ec53cc0ada3b..56f65ac8ecef 100644
+--- a/drivers/net/ipvlan/ipvlan_main.c
++++ b/drivers/net/ipvlan/ipvlan_main.c
+@@ -172,6 +172,7 @@ static int ipvlan_port_create(struct net_device *dev)
+ 	for (idx = 0; idx < IPVLAN_HASH_SIZE; idx++)
+ 		INIT_HLIST_HEAD(&port->hlhead[idx]);
+ 
++	spin_lock_init(&port->addrs_lock);
+ 	skb_queue_head_init(&port->backlog);
+ 	INIT_WORK(&port->wq, ipvlan_process_multicast);
+ 	ida_init(&port->ida);
+@@ -686,7 +687,6 @@ int ipvlan_link_new(struct net_device *dev, struct rtnl_newlink_params *params,
+ 	if (!tb[IFLA_MTU])
+ 		ipvlan_adjust_mtu(ipvlan, phy_dev);
+ 	INIT_LIST_HEAD(&ipvlan->addrs);
+-	spin_lock_init(&ipvlan->addrs_lock);
+ 
+ 	/* Flags are per port and latest update overrides. User has
+ 	 * to be consistent in setting it just like the mode attribute.
+@@ -770,13 +770,13 @@ static void ipvlan_addrs_forget_all(struct ipvl_dev *ipvlan)
+ {
+ 	struct ipvl_addr *addr, *next;
+ 
+-	spin_lock_bh(&ipvlan->addrs_lock);
++	spin_lock_bh(&ipvlan->port->addrs_lock);
+ 	list_for_each_entry_safe(addr, next, &ipvlan->addrs, anode) {
+ 		ipvlan_ht_addr_del(addr);
+ 		list_del_rcu(&addr->anode);
+ 		kfree_rcu(addr, rcu);
+ 	}
+-	spin_unlock_bh(&ipvlan->addrs_lock);
++	spin_unlock_bh(&ipvlan->port->addrs_lock);
  }
  
-+static void ipvlan_macnat_patch_tx_arp(struct ipvl_dev *ipvlan,
-+				       struct sk_buff *skb)
-+{
-+	struct arphdr *arph;
-+	int addr_type;
-+
-+	arph = (struct arphdr *)ipvlan_get_L3_hdr(ipvlan->port, skb,
-+						 &addr_type);
-+	ether_addr_copy((u8 *)(arph + 1), ipvlan->phy_dev->dev_addr);
-+}
-+
-+#if IS_ENABLED(CONFIG_IPV6)
-+
-+static u8 *ipvlan_search_icmp6_ll_addr(struct sk_buff *skb, u8 icmp_option)
-+{
-+	/* skb is ensured to pullable for all ipv6 payload_len by caller */
-+	struct ipv6hdr *ip6h = ipv6_hdr(skb);
-+	struct icmp6hdr *icmph;
-+	int ndsize, curr_off;
-+
-+	icmph = (struct icmp6hdr *)(ip6h + 1);
-+	ndsize = (int)htons(ip6h->payload_len);
-+	curr_off = sizeof(*icmph);
-+
-+	if (icmph->icmp6_type != NDISC_ROUTER_SOLICITATION)
-+		curr_off += sizeof(struct in6_addr);
-+
-+	while ((curr_off + 2) < ndsize) {
-+		u8  *data = (u8 *)icmph + curr_off;
-+		u32 opt_len = data[1] << 3;
-+
-+		if (unlikely(opt_len == 0))
-+			return NULL;
-+
-+		if (data[0] != icmp_option) {
-+			curr_off += opt_len;
-+			continue;
-+		}
-+
-+		if (unlikely(opt_len < ETH_ALEN + 2))
-+			return NULL;
-+
-+		if (unlikely(curr_off + opt_len > ndsize))
-+			return NULL;
-+
-+		return data + 2;
-+	}
-+
-+	return NULL;
-+}
-+
-+static void ipvlan_macnat_patch_tx_ipv6(struct ipvl_dev *ipvlan,
-+					struct sk_buff *skb)
-+{
-+	struct ipv6hdr *ip6h;
-+	struct icmp6hdr *icmph;
-+	u8 icmp_option;
-+	u8 *lladdr;
-+	u16 ndsize;
-+
-+	if (unlikely(!pskb_may_pull(skb, sizeof(*ip6h))))
-+		return;
-+
-+	if (ipv6_hdr(skb)->nexthdr != NEXTHDR_ICMP)
-+		return;
-+
-+	if (unlikely(!pskb_may_pull(skb, sizeof(*ip6h) + sizeof(*icmph))))
-+		return;
-+
-+	ip6h = ipv6_hdr(skb);
-+	icmph = (struct icmp6hdr *)(ip6h + 1);
-+
-+	/* Patch Source-LL for solicitation, Target-LL for advertisement */
-+	if (icmph->icmp6_type == NDISC_NEIGHBOUR_SOLICITATION ||
-+	    icmph->icmp6_type == NDISC_ROUTER_SOLICITATION)
-+		icmp_option = ND_OPT_SOURCE_LL_ADDR;
-+	else if (icmph->icmp6_type == NDISC_NEIGHBOUR_ADVERTISEMENT)
-+		icmp_option = ND_OPT_TARGET_LL_ADDR;
-+	else
-+		return;
-+
-+	ndsize = (int)htons(ip6h->payload_len);
-+	if (unlikely(!pskb_may_pull(skb, sizeof(*ip6h) + ndsize)))
-+		return;
-+
-+	lladdr = ipvlan_search_icmp6_ll_addr(skb, icmp_option);
-+	if (!lladdr)
-+		return;
-+
-+	ether_addr_copy(lladdr, ipvlan->phy_dev->dev_addr);
-+
-+	ip6h = ipv6_hdr(skb);
-+	icmph = (struct icmp6hdr *)(ip6h + 1);
-+	icmph->icmp6_cksum = 0;
-+	icmph->icmp6_cksum = csum_ipv6_magic(&ip6h->saddr, &ip6h->daddr,
-+					     ndsize,
-+					     IPPROTO_ICMPV6,
-+					     csum_partial(icmph,
-+							  ndsize,
-+							  0));
-+	skb->ip_summed = CHECKSUM_COMPLETE;
-+}
-+#else
-+static void ipvlan_macnat_patch_tx_ipv6(struct ipvl_dev *ipvlan,
-+					struct sk_buff *skb)
-+{
-+}
-+#endif
-+
- static int ipvlan_xmit_mode_l2(struct sk_buff *skb, struct net_device *dev)
+ void ipvlan_link_delete(struct net_device *dev, struct list_head *head)
+@@ -997,16 +997,16 @@ void ipvlan_del_addr(struct ipvl_dev *ipvlan, void *iaddr, bool is_v6)
  {
- 	struct ipvl_dev *ipvlan;
  	struct ipvl_addr *addr;
- 	struct ethhdr *eth;
- 	bool same_mac_addr;
--	int addr_type;
-+	int addr_type = -1;
- 	void *lyr3h;
  
- 	ipvlan = netdev_priv(dev);
-@@ -862,8 +972,6 @@ static int ipvlan_xmit_mode_l2(struct sk_buff *skb, struct net_device *dev)
- 		}
- 	} else {
- 		/* Packet to outside on learnable. Fix source eth-addr. */
--		struct sk_buff *orig_skb = skb;
--
- 		skb = skb_unshare(skb, GFP_ATOMIC);
- 		if (!skb)
- 			return NET_XMIT_DROP;
-@@ -872,17 +980,10 @@ static int ipvlan_xmit_mode_l2(struct sk_buff *skb, struct net_device *dev)
- 		ether_addr_copy(skb_eth_hdr(skb)->h_source,
- 				ipvlan->phy_dev->dev_addr);
- 
--		/* ToDo: Handle ICMPv6 for neighbours discovery.*/
--		if (lyr3h && addr_type == IPVL_ARP) {
--			struct arphdr *arph;
--			/* must reparse new skb */
--			if (skb != orig_skb && lyr3h && addr_type == IPVL_ARP)
--				lyr3h = ipvlan_get_L3_hdr(ipvlan->port, skb,
--							  &addr_type);
--			arph = (struct arphdr *)lyr3h;
--			ether_addr_copy((u8 *)(arph + 1),
--					ipvlan->phy_dev->dev_addr);
--		}
-+		if (addr_type == IPVL_ARP)
-+			ipvlan_macnat_patch_tx_arp(ipvlan, skb);
-+		else if (addr_type == IPVL_ICMPV6 || addr_type == IPVL_IPV6)
-+			ipvlan_macnat_patch_tx_ipv6(ipvlan, skb);
+-	spin_lock_bh(&ipvlan->addrs_lock);
++	spin_lock_bh(&ipvlan->port->addrs_lock);
+ 	addr = ipvlan_find_addr(ipvlan, iaddr, is_v6);
+ 	if (!addr) {
+-		spin_unlock_bh(&ipvlan->addrs_lock);
++		spin_unlock_bh(&ipvlan->port->addrs_lock);
+ 		return;
  	}
  
- tx_phy_dev:
+ 	ipvlan_ht_addr_del(addr);
+ 	list_del_rcu(&addr->anode);
+-	spin_unlock_bh(&ipvlan->addrs_lock);
++	spin_unlock_bh(&ipvlan->port->addrs_lock);
+ 	kfree_rcu(addr, rcu);
+ }
+ 
+@@ -1015,14 +1015,14 @@ static int ipvlan_add_addr6(struct ipvl_dev *ipvlan, struct in6_addr *ip6_addr)
+ {
+ 	int ret = -EINVAL;
+ 
+-	spin_lock_bh(&ipvlan->addrs_lock);
++	spin_lock_bh(&ipvlan->port->addrs_lock);
+ 	if (ipvlan_addr_busy(ipvlan->port, ip6_addr, true))
+ 		netif_err(ipvlan, ifup, ipvlan->dev,
+ 			  "Failed to add IPv6=%pI6c addr for %s intf\n",
+ 			  ip6_addr, ipvlan->dev->name);
+ 	else
+ 		ret = ipvlan_add_addr(ipvlan, ip6_addr, true, NULL);
+-	spin_unlock_bh(&ipvlan->addrs_lock);
++	spin_unlock_bh(&ipvlan->port->addrs_lock);
+ 	return ret;
+ }
+ 
+@@ -1086,14 +1086,14 @@ static int ipvlan_add_addr4(struct ipvl_dev *ipvlan, struct in_addr *ip4_addr)
+ {
+ 	int ret = -EINVAL;
+ 
+-	spin_lock_bh(&ipvlan->addrs_lock);
++	spin_lock_bh(&ipvlan->port->addrs_lock);
+ 	if (ipvlan_addr_busy(ipvlan->port, ip4_addr, false))
+ 		netif_err(ipvlan, ifup, ipvlan->dev,
+ 			  "Failed to add IPv4=%pI4 on %s intf.\n",
+ 			  ip4_addr, ipvlan->dev->name);
+ 	else
+ 		ret = ipvlan_add_addr(ipvlan, ip4_addr, false, NULL);
+-	spin_unlock_bh(&ipvlan->addrs_lock);
++	spin_unlock_bh(&ipvlan->port->addrs_lock);
+ 	return ret;
+ }
+ 
 -- 
 2.25.1
 
