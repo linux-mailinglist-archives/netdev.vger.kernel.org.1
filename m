@@ -1,132 +1,194 @@
-Return-Path: <netdev+bounces-235875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5CF3C36F3C
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 18:09:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47947C37165
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 18:30:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 653ED680157
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 16:17:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9824C68829E
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 16:55:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0491B342CBD;
-	Wed,  5 Nov 2025 16:15:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0E23340261;
+	Wed,  5 Nov 2025 16:54:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mXZ9ry9u"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4499233FE03;
-	Wed,  5 Nov 2025 16:15:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A51EA33FE06;
+	Wed,  5 Nov 2025 16:54:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762359309; cv=none; b=OyFnMbIyZm32HAYcAnyfNj2AESOOWNvW9oqZCzg8bPJ5d3ulCsMmApUnFjnM6VjD4N1mnJ2UaQiGHe3vVJsJs090WozSZgpzlFwmR6m1VIq41AcYIoKkIjGypKT01Kq0fR5Uo/XNPtFACgcjpE32NSWlzLPNt1mlwDPsZC//Y2Q=
+	t=1762361663; cv=none; b=gsT/RIr9r8e2RpC2vANOlrUozQZZLLFt0Amfx/+u/uRmA06B+ySCtAg+yv3t/D5vVWikqmwlIul4uw+sz82N1Z1ikxpU5PMo2C2OljW7vYPw4Qqf9wLnVRXQaeCkwX70JPXBlgqrvhvxX7A4OX42uMHmd7Wn83W2P45qCEhi/RE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762359309; c=relaxed/simple;
-	bh=xRowRGn5uURAtDUAHpfM2G+qq4YuX3cwM/LW7HARYIA=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ptJzXabEXs6veLkkEASy3TPUSd++qHImTVG3zEQU49x2px9/iY2QK68uqtY6ve6EyGIynXn9/HqCXYTDVQuU7RV/lc+26VfFTRppP/GXAI5+TuK4Hl0JJ1Z26SpZXmvp8vwP11YMBGeAbtc4MG0Ol7tIx4b0GxHShbYhuT0lmvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4d1r4z6fRbzHnGk3;
-	Thu,  6 Nov 2025 00:14:59 +0800 (CST)
-Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
-	by mail.maildlp.com (Postfix) with ESMTPS id 855AE1400DB;
-	Thu,  6 Nov 2025 00:15:05 +0800 (CST)
-Received: from huawei-ThinkCentre-M920t.huawei.com (10.123.122.223) by
- mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 5 Nov 2025 19:15:05 +0300
-From: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <andrey.bokhanko@huawei.com>, Dmitry Skorodumov
-	<skorodumov.dmitry@huawei.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 11/14] ipvlan: const-specifier for functions that use iaddr
-Date: Wed, 5 Nov 2025 19:14:47 +0300
-Message-ID: <20251105161450.1730216-12-skorodumov.dmitry@huawei.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20251105161450.1730216-1-skorodumov.dmitry@huawei.com>
-References: <20251105161450.1730216-1-skorodumov.dmitry@huawei.com>
+	s=arc-20240116; t=1762361663; c=relaxed/simple;
+	bh=GcsMrS33yeMCZHbhLsrwn2fXghDYDgJpfU5BwKmzfzs=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=kVU3Ddqkm06RKJEUSsrYaFnES5G068PBSWD3cY+UBpOkJBqSlCZhDgDuZSJb/X9GxbLHXwf/iae4W8biVd5ShoiR03F7twBc3wnMVqFG4GOpyIGBSMd3Wpn0b+L2CVcM8Z+r1UXyk2zpMJ1wxNIGZEQUgquYe35h9b2um3MI01A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mXZ9ry9u; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11480C19422;
+	Wed,  5 Nov 2025 16:54:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762361663;
+	bh=GcsMrS33yeMCZHbhLsrwn2fXghDYDgJpfU5BwKmzfzs=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=mXZ9ry9uCFohj8MJfSEi+CHA6qNy71q1klGXvWiTbQoGJQKRzbaZuqXpsB1E28chK
+	 laOslj5Pcq2S8iGLUM7xBzNoDyuzGOEkc3dIpVFGaUw50BUFHPYcfSW9ID7upBhB1+
+	 17V9QBO05hVMefueSj5gNLLm3nuKrGnndmBuhhntCnt5UNDGa1vvahTpyH36nMw+Zt
+	 S7ygyeeub3tfRTAHHhdhig9exQZIlHPZOaNdoxC1Js0xNp5YQHPvHeT5m52wqHqRHw
+	 SI8JrbthqwakOLKY2x5kBHnKq4JTSh64bOEV7OoLS5PtjB/MPfJfVs2Jo1GOHTHbho
+	 1VaPAZrRmuW7w==
+From: Jeff Layton <jlayton@kernel.org>
+Date: Wed, 05 Nov 2025 11:53:50 -0500
+Subject: [PATCH v5 04/17] filelock: push the S_ISREG check down to
+ ->setlease handlers
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: mscpeml100003.china.huawei.com (10.199.174.67) To
- mscpeml500004.china.huawei.com (7.188.26.250)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20251105-dir-deleg-ro-v5-4-7ebc168a88ac@kernel.org>
+References: <20251105-dir-deleg-ro-v5-0-7ebc168a88ac@kernel.org>
+In-Reply-To: <20251105-dir-deleg-ro-v5-0-7ebc168a88ac@kernel.org>
+To: Miklos Szeredi <miklos@szeredi.hu>, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, 
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+ Chuck Lever <chuck.lever@oracle.com>, 
+ Alexander Aring <alex.aring@gmail.com>, 
+ Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
+ Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
+ Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
+ Bharath SM <bharathsm@microsoft.com>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, Danilo Krummrich <dakr@kernel.org>, 
+ David Howells <dhowells@redhat.com>, Tyler Hicks <code@tyhicks.com>, 
+ NeilBrown <neil@brown.name>, Olga Kornievskaia <okorniev@redhat.com>, 
+ Dai Ngo <Dai.Ngo@oracle.com>, Amir Goldstein <amir73il@gmail.com>, 
+ Namjae Jeon <linkinjeon@kernel.org>, Steve French <smfrench@gmail.com>, 
+ Sergey Senozhatsky <senozhatsky@chromium.org>, 
+ Carlos Maiolino <cem@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
+ samba-technical@lists.samba.org, netfs@lists.linux.dev, 
+ ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org, 
+ linux-xfs@vger.kernel.org, netdev@vger.kernel.org, 
+ Jeff Layton <jlayton@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3489; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=GcsMrS33yeMCZHbhLsrwn2fXghDYDgJpfU5BwKmzfzs=;
+ b=owEBbQKS/ZANAwAKAQAOaEEZVoIVAcsmYgBpC4ErMfLW3WwdkEqkBaw9YAj//ntzrQ4bSHKpI
+ +WthUOzcZqJAjMEAAEKAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCaQuBKwAKCRAADmhBGVaC
+ FSEOD/sGnl4nXGxrUiH4HV74LVigfLgxBGvcCvofbPESbST6oRhyTftwB8j847ijjWuZtJiC0Bk
+ W4YzdfbjE6obkTq1+/wRiq3b45ztWVhsQo3hRi/YKm8WqRpU7GqMm0wBuCO9RX9FiGNknkZcsek
+ 6Sj8PYI4WIF9Iyt/+gmnge9iWAugQ7OcT53c+NOdKNNu6c9I0J6yu6ztOPsR44+hxJEWRRCgQav
+ hghq2Fe6ApKmD2CRWjXSFavfaMNFhcSbrLskz2WgHs8lug72m352YQaoOtku5pqTkplEG5IJR05
+ efdytOESy80DNxhmzMABrI0QD7sY/Fntq3vpDgNWGEawyyWvyEbhOw1h0B9uGzZ3rz7SDaBwTNR
+ ldj1OsoAHBLuGkFG2thkoQTDhvzdOHCj8hXG4PD2GAn43y116K44sYShVtJVQh7lMDoiEIdFAKz
+ Toz/GV6oIL/9FeBLHSrzIOd32XpGvVF2x5IloZ42SAgEdwcb2B0cTI6ELJ5tTL67vEKZD4M09A8
+ tyHsD2XCM1DE0O+WP4htcMrYqpHJC8++/P27568fvxqL327SrwPn/5KVy8JL5o4fMMpqYEZ/NK8
+ 22MTIDkdVHi6kyAzxosrAPqKP2I9oq10y3OjRTTDqJzbVd0GPtPzT1iFnJ8vg4qVPGYhnIcJmYG
+ 2fX3dKB+yWG5ceg==
+X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
+ fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-Fix functions that accept "void *iaddr" as param to have
-const-specifier.
+When nfsd starts requesting directory delegations, setlease handlers may
+see requests for leases on directories. Push the !S_ISREG check down
+into the non-trivial setlease handlers, so we can selectively enable
+them where they're supported.
 
-Signed-off-by: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
+FUSE is special: It's the only filesystem that supports atomic_open and
+allows kernel-internal leases. atomic_open is issued when the VFS
+doesn't know the state of the dentry being opened. If the file doesn't
+exist, it may be created, in which case the dir lease should be broken.
+
+The existing kernel-internal lease implementation has no provision for
+this. Ensure that we don't allow directory leases by default going
+forward by explicitly disabling them there.
+
+Reviewed-by: NeilBrown <neil@brown.name>
+Reviewed-by: Jan Kara <jack@suse.cz>
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
 ---
- drivers/net/ipvlan/ipvlan.h      | 6 +++---
- drivers/net/ipvlan/ipvlan_core.c | 2 +-
- drivers/net/ipvlan/ipvlan_main.c | 4 ++--
- 3 files changed, 6 insertions(+), 6 deletions(-)
+ fs/fuse/dir.c          | 1 +
+ fs/locks.c             | 5 +++--
+ fs/nfs/nfs4file.c      | 2 ++
+ fs/smb/client/cifsfs.c | 3 +++
+ 4 files changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ipvlan/ipvlan.h b/drivers/net/ipvlan/ipvlan.h
-index faba1308c135..be2bc2d33ddb 100644
---- a/drivers/net/ipvlan/ipvlan.h
-+++ b/drivers/net/ipvlan/ipvlan.h
-@@ -194,11 +194,11 @@ void ipvlan_multicast_enqueue(struct ipvl_port *port,
- int ipvlan_queue_xmit(struct sk_buff *skb, struct net_device *dev);
- void ipvlan_ht_addr_add(struct ipvl_dev *ipvlan, struct ipvl_addr *addr);
- int ipvlan_add_addr(struct ipvl_dev *ipvlan,
--		    void *iaddr, bool is_v6, const u8 *hwaddr);
--void ipvlan_del_addr(struct ipvl_dev *ipvlan, void *iaddr, bool is_v6);
-+		    const void *iaddr, bool is_v6, const u8 *hwaddr);
-+void ipvlan_del_addr(struct ipvl_dev *ipvlan, const void *iaddr, bool is_v6);
- struct ipvl_addr *ipvlan_find_addr(const struct ipvl_dev *ipvlan,
- 				   const void *iaddr, bool is_v6);
--bool ipvlan_addr_busy(struct ipvl_port *port, void *iaddr, bool is_v6);
-+bool ipvlan_addr_busy(struct ipvl_port *port, const void *iaddr, bool is_v6);
- void ipvlan_ht_addr_del(struct ipvl_addr *addr);
- struct ipvl_addr *ipvlan_addr_lookup(struct ipvl_port *port, void *lyr3h,
- 				     int addr_type, bool use_dest);
-diff --git a/drivers/net/ipvlan/ipvlan_core.c b/drivers/net/ipvlan/ipvlan_core.c
-index cba1378cc920..b38ce991e832 100644
---- a/drivers/net/ipvlan/ipvlan_core.c
-+++ b/drivers/net/ipvlan/ipvlan_core.c
-@@ -121,7 +121,7 @@ struct ipvl_addr *ipvlan_find_addr(const struct ipvl_dev *ipvlan,
- 	return ret;
+diff --git a/fs/fuse/dir.c b/fs/fuse/dir.c
+index ecaec0fea3a132e7cbb88121e7db7fb504d57d3c..667774cc72a1d49796f531fcb342d2e4878beb85 100644
+--- a/fs/fuse/dir.c
++++ b/fs/fuse/dir.c
+@@ -2230,6 +2230,7 @@ static const struct file_operations fuse_dir_operations = {
+ 	.fsync		= fuse_dir_fsync,
+ 	.unlocked_ioctl	= fuse_dir_ioctl,
+ 	.compat_ioctl	= fuse_dir_compat_ioctl,
++	.setlease	= simple_nosetlease,
+ };
+ 
+ static const struct inode_operations fuse_common_inode_operations = {
+diff --git a/fs/locks.c b/fs/locks.c
+index 3cdd84a0fbedc9bd1b47725a9cf963342aafbce9..f5b210a2dc34c70ac36e972436c62482bbe32ca6 100644
+--- a/fs/locks.c
++++ b/fs/locks.c
+@@ -1935,6 +1935,9 @@ static int generic_delete_lease(struct file *filp, void *owner)
+ int generic_setlease(struct file *filp, int arg, struct file_lease **flp,
+ 			void **priv)
+ {
++	if (!S_ISREG(file_inode(filp)->i_mode))
++		return -EINVAL;
++
+ 	switch (arg) {
+ 	case F_UNLCK:
+ 		return generic_delete_lease(filp, *priv);
+@@ -2024,8 +2027,6 @@ vfs_setlease(struct file *filp, int arg, struct file_lease **lease, void **priv)
+ 
+ 	if ((!vfsuid_eq_kuid(vfsuid, current_fsuid())) && !capable(CAP_LEASE))
+ 		return -EACCES;
+-	if (!S_ISREG(inode->i_mode))
+-		return -EINVAL;
+ 	error = security_file_lock(filp, arg);
+ 	if (error)
+ 		return error;
+diff --git a/fs/nfs/nfs4file.c b/fs/nfs/nfs4file.c
+index 7f43e890d3564a000dab9365048a3e17dc96395c..7317f26892c5782a39660cae87ec1afea24e36c0 100644
+--- a/fs/nfs/nfs4file.c
++++ b/fs/nfs/nfs4file.c
+@@ -431,6 +431,8 @@ void nfs42_ssc_unregister_ops(void)
+ static int nfs4_setlease(struct file *file, int arg, struct file_lease **lease,
+ 			 void **priv)
+ {
++	if (!S_ISREG(file_inode(file)->i_mode))
++		return -EINVAL;
+ 	return nfs4_proc_setlease(file, arg, lease, priv);
  }
  
--bool ipvlan_addr_busy(struct ipvl_port *port, void *iaddr, bool is_v6)
-+bool ipvlan_addr_busy(struct ipvl_port *port, const void *iaddr, bool is_v6)
- {
- 	struct ipvl_dev *ipvlan;
- 	bool ret = false;
-diff --git a/drivers/net/ipvlan/ipvlan_main.c b/drivers/net/ipvlan/ipvlan_main.c
-index 18b49f74dc35..d20fc473b4e1 100644
---- a/drivers/net/ipvlan/ipvlan_main.c
-+++ b/drivers/net/ipvlan/ipvlan_main.c
-@@ -1073,7 +1073,7 @@ static int ipvlan_device_event(struct notifier_block *unused,
- }
+diff --git a/fs/smb/client/cifsfs.c b/fs/smb/client/cifsfs.c
+index 05b1fa76e8ccf1e86f0c174593cd6e1acb84608d..03c44c1d9bb631b87a8b67aa16e481d6bb3c7d14 100644
+--- a/fs/smb/client/cifsfs.c
++++ b/fs/smb/client/cifsfs.c
+@@ -1149,6 +1149,9 @@ cifs_setlease(struct file *file, int arg, struct file_lease **lease, void **priv
+ 	struct inode *inode = file_inode(file);
+ 	struct cifsFileInfo *cfile = file->private_data;
  
- /* the caller must held the addrs lock */
--int ipvlan_add_addr(struct ipvl_dev *ipvlan, void *iaddr, bool is_v6,
-+int ipvlan_add_addr(struct ipvl_dev *ipvlan, const void *iaddr, bool is_v6,
- 		    const u8 *hwaddr)
- {
- 	struct ipvl_addr *addr;
-@@ -1107,7 +1107,7 @@ int ipvlan_add_addr(struct ipvl_dev *ipvlan, void *iaddr, bool is_v6,
- 	return 0;
- }
- 
--void ipvlan_del_addr(struct ipvl_dev *ipvlan, void *iaddr, bool is_v6)
-+void ipvlan_del_addr(struct ipvl_dev *ipvlan, const void *iaddr, bool is_v6)
- {
- 	struct ipvl_addr *addr;
- 
++	if (!S_ISREG(inode->i_mode))
++		return -EINVAL;
++
+ 	/* Check if file is oplocked if this is request for new lease */
+ 	if (arg == F_UNLCK ||
+ 	    ((arg == F_RDLCK) && CIFS_CACHE_READ(CIFS_I(inode))) ||
+
 -- 
-2.25.1
+2.51.1
 
 
