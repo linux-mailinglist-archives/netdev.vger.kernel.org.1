@@ -1,102 +1,160 @@
-Return-Path: <netdev+bounces-235692-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA5E7C33C63
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 03:30:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01056C33C6F
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 03:33:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 821E33B4B56
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 02:30:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6F5218C5CD3
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 02:32:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C00D7263B;
-	Wed,  5 Nov 2025 02:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E10421CC71;
+	Wed,  5 Nov 2025 02:32:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nIvtc6Lq"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="g7qCS6Ka"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2756514A8E
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 02:30:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 395FD1624D5;
+	Wed,  5 Nov 2025 02:32:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762309830; cv=none; b=HEIwC9LKZTk7//pLRJlEIIGS8mm/IKmh8VT8nLnF2EB/kLLafiJXEzS1npdfiMVzrPITRSYs6lP49pGNQiaEE4fHDLV/QzuoArJDQuO3JncT3Im3YPMt2cy14G6KnT925CyotQ/WZx04sbww2QObHGNigo10KsSvwxLyuR4XSnI=
+	t=1762309934; cv=none; b=BNt4vK8hNUcLoAdN+K8tNjVxTSeswa7Oqw8044npoZxTwlf5xRNzLOSbEf757d8F2a6ee7RhQKZhCbC6sHVIVtwEYeJvQaZLF4Nr+85SsJU3mpEz3YgmpB4ZFywaweOIhDc25+80v5rgAd4rzGWbBP2fn3zI8qXOvyqyadKZLxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762309830; c=relaxed/simple;
-	bh=bQOzSQvNbzdGQPklRvcil44cM6pFiQzeZeHosNNfvcc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rRmZXPl5yRI3qbYAidcDkHlHSXcxm7SWc7sFN+0mT/Mlk2o/3iEurgQaOlmqH9qZGJzBIW5pF4PkcUgBKCUDYo/J/6H+gFH0otrmXYA2rwapR/8Ao1KHXlbccYDtH/BxImXkOmmGDovCyDQ81CSmBVt5EPezPB9V4nvIum3Fk1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nIvtc6Lq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A4DAC4CEF7;
-	Wed,  5 Nov 2025 02:30:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762309829;
-	bh=bQOzSQvNbzdGQPklRvcil44cM6pFiQzeZeHosNNfvcc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nIvtc6LqIfLFYinQoIaHxlMUrq8wPRdx01P+TKN4gYUGSLW/63TYX+e1xwo52U44+
-	 dfDNz5kEdgoKvfbPeDFsLGJfiVjvr4QXhnHgz0D/TWQ+CiCA+kf/OErQwYiwS+PL/w
-	 ntLGWbf85n86vjKO6dfEwfO3Z6zVKuIrRPPLbxBh3jxjKrpc6N1UGes8yhdGA5FJjd
-	 tP0CdqbnSXckVsOT1rN7WSEvcOLdm1eWAOfmFtx+2AdJVE0tGqIqZpjYlwSbsjzZZR
-	 btMyNcbUdCJ0QCoPOvS5UMb3/k1ntcUOfO4CvPmXlLd8DUZWuHNDq1wnpjdXmQHhJf
-	 EDFzEMuK4MICw==
-Date: Tue, 4 Nov 2025 18:30:28 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, Xuegang Lu
- <xuegang.lu@airoha.com>
-Subject: Re: [PATCH net-next 1/2] net: airoha: Add the capability to consume
- out-of-order DMA tx descriptors
-Message-ID: <20251104183028.7412aba6@kernel.org>
-In-Reply-To: <20251103-airoha-tx-linked-list-v1-1-baa07982cc30@kernel.org>
-References: <20251103-airoha-tx-linked-list-v1-0-baa07982cc30@kernel.org>
-	<20251103-airoha-tx-linked-list-v1-1-baa07982cc30@kernel.org>
+	s=arc-20240116; t=1762309934; c=relaxed/simple;
+	bh=oazV4JOKBA2vqOi6rlfJo/k2juAIH9NuVotjR+Z/4LM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=GCBoGKdxzDb04wto3Gee8pWVxUoZQhwMfxHkRNEHetE/Hd13sf8XYPYgmQl8WgqwtrFheaF8YXdU8oNICCWpPBfY79xPqy27/oy2fLwznMGrT20sa6e5gn9ReFgH1NRCglz0z9qfzY8fLoHFOJY1cQLg0rFHm5yINmyR83JCIp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=g7qCS6Ka; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1762309923;
+	bh=xbpnPeTN3sNe5hwyh0I7bt+HxkzyN2NKAz4dbYCQm24=;
+	h=Date:From:To:Cc:Subject:From;
+	b=g7qCS6Kaf2/ZonCXUFVBFutQKbsQ7IJgAzrTPpG+R/2jK5D2wxGnxWh+oxtazehNv
+	 e9hnViPCyN0fpcu/O4nJK7KN9meyIjW/CKrQkDho/kNT3px3MVyNalUYR8Y/f6McXb
+	 tKANEWfkghGcZz3DBwQNPXA19ocP13JPBmhNJTcuav6lmGB2m46nVbHYTfXvzz6CvT
+	 i1TT3R0uZtx8HT2+2d/ohTuFHzGwxK7J+YKnA0/BerXYwm5BA3IVZ3exWLthmFcjKv
+	 LLT2z/rf7CPgxlxrO9g+nXh/jVKm52A57ZqTrD9eq87T9l1EpvRykkxZMpjRL3gedT
+	 CnCvcQhDq7QhQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4d1TqP0RJSz4w1j;
+	Wed, 05 Nov 2025 13:32:00 +1100 (AEDT)
+Date: Wed, 5 Nov 2025 13:31:59 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@kernel.org>,
+ "H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
+ <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>
+Cc: Arnaud Lecomte <contact@arnaud-lcm.com>, bpf <bpf@vger.kernel.org>,
+ Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the tip tree with the bpf-next tree
+Message-ID: <20251105133159.6303b1ee@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/hHbeuxLOfeh=yC3==zvTqlN";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/hHbeuxLOfeh=yC3==zvTqlN
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 03 Nov 2025 11:27:55 +0100 Lorenzo Bianconi wrote:
-> +		__list_del_entry(&e->list);
-> +		list_add_tail(&e->list, &tx_list);
+Hi all,
 
-list_move_tail()
+Today's linux-next merge of the tip tree got a conflict in:
 
-> +		e->skb = i ? NULL : skb;
-> +		e->dma_addr = addr;
-> +		e->dma_len = len;
-> +
-> +		e = list_first_entry(&q->tx_list, struct airoha_queue_entry,
-> +				     list);
-> +		index = e - q->entry;
->  
->  		val = FIELD_PREP(QDMA_DESC_LEN_MASK, len);
->  		if (i < nr_frags - 1)
+  kernel/bpf/stackmap.c
 
-> @@ -2029,10 +2020,14 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff *skb,
->  	return NETDEV_TX_OK;
->  
->  error_unmap:
-> -	for (i--; i >= 0; i--) {
-> -		index = (q->head + i) % q->ndesc;
-> -		dma_unmap_single(dev->dev.parent, q->entry[index].dma_addr,
-> -				 q->entry[index].dma_len, DMA_TO_DEVICE);
-> +	while (!list_empty(&tx_list)) {
-> +		e = list_first_entry(&tx_list, struct airoha_queue_entry,
-> +				     list);
-> +		__list_del_entry(&e->list);
-> +		dma_unmap_single(dev->dev.parent, e->dma_addr, e->dma_len,
-> +				 DMA_TO_DEVICE);
-> +		e->dma_addr = 0;
-> +		list_add_tail(&e->list, &q->tx_list);
+between commit:
 
-and here
+  e17d62fedd10 ("bpf: Refactor stack map trace depth calculation into helpe=
+r function")
+
+from the bpf-next tree and commit:
+
+  c69993ecdd4d ("perf: Support deferred user unwind")
+
+from the tip tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc kernel/bpf/stackmap.c
+index 2365541c81dd,8f1dacaf01fe..000000000000
+--- a/kernel/bpf/stackmap.c
++++ b/kernel/bpf/stackmap.c
+@@@ -333,9 -310,12 +333,9 @@@ BPF_CALL_3(bpf_get_stackid, struct pt_r
+  			       BPF_F_FAST_STACK_CMP | BPF_F_REUSE_STACKID)))
+  		return -EINVAL;
+ =20
+ -	max_depth +=3D skip;
+ -	if (max_depth > sysctl_perf_event_max_stack)
+ -		max_depth =3D sysctl_perf_event_max_stack;
+ -
+ +	max_depth =3D stack_map_calculate_max_depth(map->value_size, elem_size, =
+flags);
+  	trace =3D get_perf_callchain(regs, kernel, user, max_depth,
+- 				   false, false);
++ 				   false, false, 0);
+ =20
+  	if (unlikely(!trace))
+  		/* couldn't fetch the stack trace */
+@@@ -463,15 -446,13 +463,15 @@@ static long __bpf_get_stack(struct pt_r
+  	if (may_fault)
+  		rcu_read_lock(); /* need RCU for perf's callchain below */
+ =20
+ -	if (trace_in)
+ +	if (trace_in) {
+  		trace =3D trace_in;
+ -	else if (kernel && task)
+ +		trace->nr =3D min_t(u32, trace->nr, max_depth);
+ +	} else if (kernel && task) {
+  		trace =3D get_callchain_entry_for_task(task, max_depth);
+ -	else
+ +	} else {
+  		trace =3D get_perf_callchain(regs, kernel, user, max_depth,
+- 					   crosstask, false);
++ 					   crosstask, false, 0);
+ +	}
+ =20
+  	if (unlikely(!trace) || trace->nr < skip) {
+  		if (may_fault)
+
+--Sig_/hHbeuxLOfeh=yC3==zvTqlN
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmkKtx8ACgkQAVBC80lX
+0Gzsbgf/cj+cg7MDVkATjRrphld5ewGcoa8oh9IZs6ux/Ips33Tdnh0firBtZXb+
+ot3C8ySymjlNaZERZeFd3l13M8loMDrj9MhUDlpT5xkxmobYQ3HbA57F+ZSgI7If
+/CbyDEVuo/+8/HCP0Oq9Liosbi9/4brC1RdVJyIT81TwGFCg/Thc9PlG137kWVni
+gLPkCpNFpVrrWChXWWZGj+Rzi9w4gS6Rs4vZej2eVQhm58PB1aKC+GvbgCm4fTqA
+dNK5+iJ/jRc+/NZ7J6ZhePkS34Kw5vG6VR7nJFYK8i44oGvKTixPJCGycU2FP3DZ
+j5ppkGQQRtX6dDmkEG4EQr1D4jlwFQ==
+=ZjLt
+-----END PGP SIGNATURE-----
+
+--Sig_/hHbeuxLOfeh=yC3==zvTqlN--
 
