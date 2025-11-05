@@ -1,111 +1,116 @@
-Return-Path: <netdev+bounces-235645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 028B3C33764
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 01:20:06 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B169C3376D
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 01:20:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B98A84F1032
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 00:19:58 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3852C34E502
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 00:20:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1652423536B;
-	Wed,  5 Nov 2025 00:19:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0326224B01;
+	Wed,  5 Nov 2025 00:20:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gqNZSDw5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="INojycZy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A8B522D7B1
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 00:19:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95D72EEAB;
+	Wed,  5 Nov 2025 00:20:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762301993; cv=none; b=Nq25xSugJT8H4bPCO7PZ8OFt/7AJEcVmOD64mIzR7mR4jcVkSmH+NxFO8gyVj24a+u/+I6tV0VEmGCLGZb8PbA/kmqt03ceETm7EJA+i0f44I7enlCuNDTevVWpu2coEedwdYkGnDkID1HhBPB1RntjAe2Ii8FrsOd0oTzjZkxw=
+	t=1762302049; cv=none; b=sgRbJw9wn8IhysxE6lGtBd8JKqf3pWmrGzPrYLWi/ByHUcAbqSj1BiYeIu4tEv50KG6KDbFcl5QGSLLS/AGBiXXEoiArhKRnQ9eqlfsUbWrr8hb1d+Vv3zvAUZyKobjvDXumVBrjs4gJSMcxyYVWRRg4b8wDtlfziUw5tvcz0dc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762301993; c=relaxed/simple;
-	bh=tPNyrSglXgzbTSxAtrtNr66B4b82eAkptaHPW68Y0SY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QhKCJmGLhrPKwKkijc6x+a3b9A6UqMu5gWci2BbdmjMRjhqkPRM0Sm4HgX7X+I2UPfLdZLtw1OlYZA2wtEQxhaqkg7ltaGlpKQjH2LUtyDOupsGQSteOSslMmNZurtcmk5ILiP2HRPANvCd1fQbVPRyB1ajwsm0/7bK3Vsk+dfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gqNZSDw5; arc=none smtp.client-ip=209.85.166.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-43326c748d5so1901465ab.0
-        for <netdev@vger.kernel.org>; Tue, 04 Nov 2025 16:19:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762301990; x=1762906790; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tPNyrSglXgzbTSxAtrtNr66B4b82eAkptaHPW68Y0SY=;
-        b=gqNZSDw5FkB1z/vsgXvvAlmbYiI4DAoGsT1ZhX+eVrPJYEIyi0jvIvtBLywc352qj0
-         ZLlrO25aQ+QzYdegFTlh3akPMhyM8/Fz1lULTj87R2PHqgKtnu6HcytvVAN343QyimQj
-         HEmKG0W5JEeFp1FMBKy9xCyNwyphsCeE9d0oAejVx1nQLw3h/6qFj3NcemYNPgGVuu4f
-         kQZKFp1QjvRQvsca7rPJxFpoT+zV5Y+C5DbBeRVdgR189krev2t2YDoLqLE+CuGfLZQd
-         Vyi3w1LdzLqGVz/zcb74b7qjw57YmSoIqAf4ilT0Tbxm3MLR3IijQ2OS9+zzJRd58kgf
-         4tVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762301990; x=1762906790;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tPNyrSglXgzbTSxAtrtNr66B4b82eAkptaHPW68Y0SY=;
-        b=jI8yEPopJntT7AFJjF9ik44sc4X4gKAArTOt/N+XanXL0Or5uQG9D3Jl37JL5JAxeO
-         Rs4uLdwirAUDAX/OwZ7o+XXfaUYigOf9U9FU07nURqiE5GhtbAa/Y2WpDRocxwvYU7TI
-         Fl9WrNQs7g61SZGgLDpduBR9wb5/zoc00X88DTPXukIU54i138tIZgHgKct3xuARbXWm
-         Vz+9wNRdzHHKDLjWgLeKMYEkgeBMakDPT/yBp3ZR6vNDYzJHMrxa+3ICaTR4qA1qb+U/
-         wMPBqHJxs4MwSZzNdjUnQOZUfQGiuEKDECpJDc3Jgjj8jDNguwhSrpHNSNYKUhhxB3r0
-         Ae2A==
-X-Forwarded-Encrypted: i=1; AJvYcCUcMKiNsC4RrBqWW3hBY6KWliILwnTAT101aZVAvpLy4uoTWJRI64YonRJWjE5DB1XBCAfv208=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtGa85HSMuVIvwYCM5466K+87RibjI9ZeyrWyKZCOxhPyWPJzd
-	3VtyNU6seEmpRKOXHFYR3sR5fxNFC1VBnlmmyoqdafxr49aU1NK5itlcUeR6Eda+uO0p8M+12ba
-	A/I4sH2Ix4ujivO7CxrbVzeG1MEpuVX4=
-X-Gm-Gg: ASbGncspaSOgfyoDxOhKPDbhcJMtC9IufRSvh1BWL9WoWT6E9T6+/pompQ6qaY2U9mY
-	6COqIfUlav+l2qTH7mHEj7deLgs8q0KAVxhgpKWiu0zcqGHYYzZK0QeqA/5wx4j7f26V9DWzvL4
-	YLwXvc/TdUD9/3QCXvxmG+i3x44+DFQc2PY3AYlwYsG/sKhQIYnXP+NGcVpMOi2ZOpMZNjx7NYz
-	KiSHX1z9GuNrVUkA+dplAzqQpTeU2PCWKw0aeeDp/CA0dtck9fF9WgjLZgP4+U=
-X-Google-Smtp-Source: AGHT+IHlKDGDIG6BMqjPpmMiXRElX7CmlqHBVKFE5hB2vstBzsdvMVaGUbKSbC7UrpLHQfFggPSndMWaqnea6GXPLXI=
-X-Received: by 2002:a05:6e02:1fc6:b0:433:37e9:c1ff with SMTP id
- e9e14a558f8ab-433401a21c1mr24512685ab.9.1762301990514; Tue, 04 Nov 2025
- 16:19:50 -0800 (PST)
+	s=arc-20240116; t=1762302049; c=relaxed/simple;
+	bh=3MKFuCG76JthLJcZE3T3Op7stJ2k8Ttv8bqnfs9tWiE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=T97Rh9wrCVvt4jTugOrKVZIU6btRhSD64m0ad0XuoCamYIJ0vCjerJVRih/9DXpvhwJsKQ0WJIL1rFY0MZrohaQJEP5qqlA7JYajZUkJLOB7LP+YurUm7408fpOwDRQs5afjfioD27+FzbJennKACScLBRFHst6JS07M2fBQgMU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=INojycZy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C497C116B1;
+	Wed,  5 Nov 2025 00:20:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762302049;
+	bh=3MKFuCG76JthLJcZE3T3Op7stJ2k8Ttv8bqnfs9tWiE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=INojycZy/a78lhVsLvVbeiECZLvsgpUyNONTu4veLZSMfi2e3lJyk0lhbjUy3QZHZ
+	 NGDkYI9wKuMd+GNF8uaYyfmeV5vBqYG0eNH75xE9lfqkLTr6by2JUbcU2MxPGWLMNY
+	 wjqIqv4bXs0DnB0y1BJG5h7QYMVEH01j69TJfwp9D1CNtZ1GKdR3YLFkYEgU89DU9H
+	 3qJgmPG4RulqybvIwgtHGcVoUQR9GI0YGS1eP6mJzlwxLW39Q+Ha8g3OunNUZMxdz+
+	 mYWN4bT+tNgUNH9kDvYI8/YyHC9cMX7rIZ2X0P+YdUkW7agsF7NY7onfZo5qshndfO
+	 CmVHFirNLCsOA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33CB2380AA54;
+	Wed,  5 Nov 2025 00:20:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251030144438.7582-1-minhquangbui99@gmail.com>
- <1762149401.6256416-7-xuanzhuo@linux.alibaba.com> <CAPpAL=x-fVOkm=D_OeVLjWwUKThM=1FQFQBZyyBOrH30TEyZdA@mail.gmail.com>
-In-Reply-To: <CAPpAL=x-fVOkm=D_OeVLjWwUKThM=1FQFQBZyyBOrH30TEyZdA@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 5 Nov 2025 08:19:14 +0800
-X-Gm-Features: AWmQ_bliMV8nE85ERHZI-EI4lokvoDwiY8yl4dOnlkgckxmIlBlgt3FBCpHKufM
-Message-ID: <CAL+tcoAnhhDn=2qDCKXf3Xnz8VTDG0HOXW8x=GSdtHUe+qipvQ@mail.gmail.com>
-Subject: Re: [PATCH net v7] virtio-net: fix received length check in big packets
-To: Lei Yang <leiyang@redhat.com>
-Cc: Bui Quang Minh <minhquangbui99@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Gavin Li <gavinl@nvidia.com>, Gavi Teitz <gavi@nvidia.com>, Parav Pandit <parav@nvidia.com>, 
-	virtualization@lists.linux.dev, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 00/11] net: stmmac: multi-interface stmmac
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176230202300.3035250.17732707564655810857.git-patchwork-notify@kernel.org>
+Date: Wed, 05 Nov 2025 00:20:23 +0000
+References: <aQiWzyrXU_2hGJ4j@shell.armlinux.org.uk>
+In-Reply-To: <aQiWzyrXU_2hGJ4j@shell.armlinux.org.uk>
+To: Russell King (Oracle) <linux@armlinux.org.uk>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ festevam@gmail.com, imx@lists.linux.dev, kuba@kernel.org,
+ jan.petrous@oss.nxp.com, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com,
+ netdev@vger.kernel.org, pabeni@redhat.com, kernel@pengutronix.de,
+ s32@nxp.com, s.hauer@pengutronix.de, shawnguo@kernel.org
 
-Hi Lei,
+Hello:
 
-On Wed, Nov 5, 2025 at 12:56=E2=80=AFAM Lei Yang <leiyang@redhat.com> wrote=
-:
->
-> Tested this patch with virtio-net regression tests, everything works fine=
-.
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-I saw you mentioned various tests on virtio_net multiple times. Could
-you share your tools with me, I wonder? AFAIK, the stability of such
-benchmarks is not usually static, so I'm interested.
+On Mon, 3 Nov 2025 11:49:35 +0000 you wrote:
+> Hi,
+> 
+> This series adds a callback for platform glue to configure the stmmac
+> core interface mode depending on the PHY interface mode that is being
+> used. This is currently only called justbefore the dwmac core is reset
+> since these signals are latched on reset.
+> 
+> [...]
 
-Thanks,
-Jason
+Here is the summary with links:
+  - [net-next,01/11] net: stmmac: imx: use phylink's interface mode for set_clk_tx_rate()
+    https://git.kernel.org/netdev/net-next/c/42190a188fdb
+  - [net-next,02/11] net: stmmac: s32: move PHY_INTF_SEL_x definitions out of the way
+    https://git.kernel.org/netdev/net-next/c/d8df08b0df02
+  - [net-next,03/11] net: stmmac: add phy_intf_sel and ACTPHYIF definitions
+    https://git.kernel.org/netdev/net-next/c/38e8c0fb0fc3
+  - [net-next,04/11] net: stmmac: add stmmac_get_phy_intf_sel()
+    https://git.kernel.org/netdev/net-next/c/2f2a7b907446
+  - [net-next,05/11] net: stmmac: add support for configuring the phy_intf_sel inputs
+    https://git.kernel.org/netdev/net-next/c/15ade7dbf64f
+  - [net-next,06/11] net: stmmac: imx: convert to PHY_INTF_SEL_xxx
+    https://git.kernel.org/netdev/net-next/c/8088ca0d88f8
+  - [net-next,07/11] net: stmmac: imx: use FIELD_PREP()/FIELD_GET() for PHY_INTF_SEL_x
+    https://git.kernel.org/netdev/net-next/c/27db57875c08
+  - [net-next,08/11] net: stmmac: imx: use stmmac_get_phy_intf_sel()
+    https://git.kernel.org/netdev/net-next/c/cb09d1b9582a
+  - [net-next,09/11] net: stmmac: imx: simplify set_intf_mode() implementations
+    https://git.kernel.org/netdev/net-next/c/8fc75fe5948d
+  - [net-next,10/11] net: stmmac: imx: cleanup arguments for set_intf_mode() method
+    https://git.kernel.org/netdev/net-next/c/fb526d0c16c1
+  - [net-next,11/11] net: stmmac: imx: use ->set_phy_intf_sel()
+    https://git.kernel.org/netdev/net-next/c/da836959c78a
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
