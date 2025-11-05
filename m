@@ -1,61 +1,95 @@
-Return-Path: <netdev+bounces-235814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96D5CC36049
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 15:19:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80B5CC36088
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 15:23:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9734F4E6EE0
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 14:19:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 404753AA362
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 14:22:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E5B522D785;
-	Wed,  5 Nov 2025 14:19:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 803AF314A93;
+	Wed,  5 Nov 2025 14:21:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fIWcwzHH"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="sJHJqM6N"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5A7321CFF6;
-	Wed,  5 Nov 2025 14:19:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47FB22153D4;
+	Wed,  5 Nov 2025 14:21:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762352393; cv=none; b=VFKU7sAm32/JRQ529mxPxHCpumvoC8hIUyTnq+ExqWpSneXbw4XpezWctglVPCuaKV0l2y5+iycNDlHwRIjx3jRAQBnTrmi+96WSWDLPRZPLkEoxXoD6FWjl+FA1veKOq11rNhEw4p3W3c1iJijRVJXyfIalmJb0DpGLQKlmwTQ=
+	t=1762352518; cv=none; b=eauiiSOepnHLo4hvzdzUj0FO7IVNnedb+wivb42j8WGn6/IJRRfXhIhZb9ierR9qrLRC0aGguJ2Y0egO2T5tjAcmgx+iWq+lhSbV5L3hNqHbGcE6knym1Ujlx+VanrCUhJX8/WQ2GVMiew2ADDdaZnwXXPp5wvzBWhG8qZjOu9g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762352393; c=relaxed/simple;
-	bh=Yxpd5GlPnzRHRD85/yNv+ei8nAB9qXHt9wQG+oedP2g=;
+	s=arc-20240116; t=1762352518; c=relaxed/simple;
+	bh=SxiuZYbronbG3fykgcwb0rvkQEyMSA9GdP11JI9AsVE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L9tIIlOXJm+7SCIo0PVnAnkUbmw7LgfZsWtEnvX41sIWKVZUi5LjceWP0XCx4blkp6QnlY+5X+530PIde/RMcePsXTnsdIGNR4/vRdRSkVQ4MfLeZCzhOqq+1xojwtkiYAaKuCqcz1fN+3ICIpEnU+z3lhxQ55Aq4hD9waZalRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fIWcwzHH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4F9FC4CEF5;
-	Wed,  5 Nov 2025 14:19:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762352393;
-	bh=Yxpd5GlPnzRHRD85/yNv+ei8nAB9qXHt9wQG+oedP2g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fIWcwzHHWUP4L5zcWtIkYU3AZ0fOWWHZipMskgE9146l4qQQOm7yGumrnW6jBOOK0
-	 DZwzV+yP9dpL4vF0ycebaIReMocf4LjP/8GWtxzNJS9HXFsRwGsoPEDZ7Mz94xPSZI
-	 zZGOINNLkjEG2IINmYTvN60ompniMFj+8Hr1YSRNB26uwOZeqw7AAvTQI9p6Cdvmpo
-	 6oeDgwOLapAdxtp6ZmoOBYFk9lwOrWOfzFBSEtmwBZgOt2euXvzR/r+acLf6P7ni0s
-	 bMekGhDRmgnRdjotOuTIHZdb8wbIwwLwWPsVPP5RnFZfKk54pbFUjle26GBIcLsDHK
-	 tQs+9q5xcwMoA==
-Date: Wed, 5 Nov 2025 14:19:47 +0000
-From: Simon Horman <horms@kernel.org>
-To: Daniel Jurgens <danielj@nvidia.com>
-Cc: netdev@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
-	alex.williamson@redhat.com, pabeni@redhat.com,
-	virtualization@lists.linux.dev, parav@nvidia.com,
-	shshitrit@nvidia.com, yohadt@nvidia.com, xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com, shameerali.kolothum.thodi@huawei.com,
-	jgg@ziepe.ca, kevin.tian@intel.com, kuba@kernel.org,
-	andrew+netdev@lunn.ch, edumazet@google.com
-Subject: Re: [PATCH net-next v7 05/12] virtio_net: Query and set flow filter
- caps
-Message-ID: <aQtdA1YGpePiepXV@horms.kernel.org>
-References: <20251103225514.2185-1-danielj@nvidia.com>
- <20251103225514.2185-6-danielj@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=R+p2eNZ9tI1GVR8NW+IIw6Mwukt+8CIAAwTEM9MUCjXjLEIcIs0eDZjeI0xKcIf6YpChN5kWbXI5Xn8qxnVuJ3zfA1Al+ioR5PlIwIqXz5SD8iIGSwl9oCSS7pOHetXGpXAUguaUPgrveahyMt/I+O9+U2F3VrqkS5FPI7+gAeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=sJHJqM6N; arc=none smtp.client-ip=103.168.172.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-10.internal (phl-compute-10.internal [10.202.2.50])
+	by mailfout.phl.internal (Postfix) with ESMTP id 4E95BEC0295;
+	Wed,  5 Nov 2025 09:21:55 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-10.internal (MEProxy); Wed, 05 Nov 2025 09:21:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1762352515; x=1762438915; bh=IhCa+OykCWBTIFkdHubkKBveQj0ktKP02Y4
+	4KQl80GE=; b=sJHJqM6NmdZZvd0+Lv26aV+9S5bpEy0bGB1Sf5kWnpWRfWOWdO3
+	5ORwLbIQesxDQzGwHCSuwOLUY8u2dzXqfSWDWF1Dna5Nsn3sKjGqZA4EvEdVr0UC
+	AyiP/WQYCjwTdlHCLad0zufUR1PysWxaIbTQiZ94LirJaUUs8/m6BWb+q867H7Qq
+	siT9wFLw/0hX8+iG+JF7kVQDxnSZwIxGWqfAQbMqWWTP912PP8HbYCSFHyU4i6LR
+	DkLHEytXXPWvs1xKMQN1hClLIvcsJmvtgmideZhwzekDikXoI+XLijFrRLziFS6l
+	5I0zoLpBETqbLLPArelk6HdiOW9N5wYVq7w==
+X-ME-Sender: <xms:gl0LadT4BQxfQNKsXjaRVGiqhdZsIU73YAhYYsePfZgst33Iz0jQ8A>
+    <xme:gl0Laczhi5BNn70_gzzELkABEHwZW7EtjB7cIl6rhK0TB0PXx2KNqKWjXWRmdGbmT
+    hyWfFuid3C07jIIo4FbEa_GN3iXQwqhsP_t25ZSE6TpugLGDAw>
+X-ME-Received: <xmr:gl0LadrUPNy3pRCo98HYw7LVK6C7LhVtmz8TAN46a96BQxRKsnXhhNDB>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeegudefucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcuufgt
+    hhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrthhtvg
+    hrnhepvddufeevkeehueegfedtvdevfefgudeifeduieefgfelkeehgeelgeejjeeggefh
+    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepihguoh
+    hstghhsehiughoshgthhdrohhrghdpnhgspghrtghpthhtohepuddtpdhmohguvgepshhm
+    thhpohhuthdprhgtphhtthhopehnrghshhhuihhlihgrnhhgsehgmhgrihhlrdgtohhmpd
+    hrtghpthhtohepshhtrggslhgvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthht
+    ohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegushgrhhgvrh
+    hnsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgv
+    rdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhope
+    hprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhn
+    vghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorh
+    hg
+X-ME-Proxy: <xmx:gl0LaX2NjHQqm2TYUpl3gybeAu3o75XW50crVAnGsBPLV5hYMVAKNQ>
+    <xmx:gl0LaVxOrUXSMDMoykQCuSS3YGeV1Q9kABXascopgdZXvqcZrzs7uA>
+    <xmx:gl0LaTiLecYGBdNMrAS6g_vCc-S7c7wJJm6WkKHvfPBHa3ijKIZ5bA>
+    <xmx:gl0LaYrawpP4dbjootVBBIiFjlCvKNPRJZ8R7usnsrBWgUqKyPThYw>
+    <xmx:g10Lab4x3Av1aZitj4tWNDWssmFe_AeTbT4taPIQzSan2AuiozpDEY_A>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 5 Nov 2025 09:21:54 -0500 (EST)
+Date: Wed, 5 Nov 2025 16:21:52 +0200
+From: Ido Schimmel <idosch@idosch.org>
+To: chuang <nashuiliang@gmail.com>
+Cc: stable@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Networking <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] ipv4: route: Prevent rt_bind_exception() from
+ rebinding stale fnhe
+Message-ID: <aQtdgLFnZ7Qjsnjw@shredder>
+References: <CACueBy7yNo4jq4HbiLXn0ez14w8CUTtTpPHmpSB-Ou6jhhNypA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,156 +98,93 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251103225514.2185-6-danielj@nvidia.com>
+In-Reply-To: <CACueBy7yNo4jq4HbiLXn0ez14w8CUTtTpPHmpSB-Ou6jhhNypA@mail.gmail.com>
 
-On Mon, Nov 03, 2025 at 04:55:07PM -0600, Daniel Jurgens wrote:
+On Tue, Nov 04, 2025 at 11:09:08AM +0800, chuang wrote:
+> From 35dbc9abd8da820007391b707bd2c1a9c99ee67d Mon Sep 17 00:00:00 2001
+> From: Chuang Wang <nashuiliang@gmail.com>
+> Date: Tue, 4 Nov 2025 02:52:11 +0000
+> Subject: [PATCH net] ipv4: route: Prevent rt_bind_exception() from rebinding
+>  stale fnhe
 
-...
+I'm unable to apply the patch:
 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+$ b4 am -o - CACueBy7yNo4jq4HbiLXn0ez14w8CUTtTpPHmpSB-Ou6jhhNypA@mail.gmail.com | git am
+[...]
+Applying: ipv4: route: Prevent rt_bind_exception() from rebinding stale fnhe
+error: corrupt patch at line 10
+Patch failed at 0001 ipv4: route: Prevent rt_bind_exception() from rebinding stale fnhe
 
-...
+Did you use git send-email?
 
-> +static int virtnet_ff_init(struct virtnet_ff *ff, struct virtio_device *vdev)
-> +{
-> +	size_t ff_mask_size = sizeof(struct virtio_net_ff_cap_mask_data) +
-> +			      sizeof(struct virtio_net_ff_selector) *
-> +			      VIRTIO_NET_FF_MASK_TYPE_MAX;
-> +	struct virtio_admin_cmd_query_cap_id_result *cap_id_list;
-> +	struct virtio_net_ff_selector *sel;
-> +	size_t real_ff_mask_size;
-> +	int err;
-> +	int i;
-> +
-> +	cap_id_list = kzalloc(sizeof(*cap_id_list), GFP_KERNEL);
-> +	if (!cap_id_list)
-> +		return -ENOMEM;
-> +
-> +	err = virtio_admin_cap_id_list_query(vdev, cap_id_list);
-> +	if (err)
-> +		goto err_cap_list;
-> +
-> +	if (!(VIRTIO_CAP_IN_LIST(cap_id_list,
-> +				 VIRTIO_NET_FF_RESOURCE_CAP) &&
-> +	      VIRTIO_CAP_IN_LIST(cap_id_list,
-> +				 VIRTIO_NET_FF_SELECTOR_CAP) &&
-> +	      VIRTIO_CAP_IN_LIST(cap_id_list,
-> +				 VIRTIO_NET_FF_ACTION_CAP))) {
-> +		err = -EOPNOTSUPP;
-> +		goto err_cap_list;
-> +	}
-> +
-> +	ff->ff_caps = kzalloc(sizeof(*ff->ff_caps), GFP_KERNEL);
-> +	if (!ff->ff_caps)
+> 
+> A race condition exists between fnhe_remove_oldest() and
+> rt_bind_exception() where a fnhe that is scheduled for removal can be
+> rebound to a new dst.
+> 
+> The issue occurs when fnhe_remove_oldest() selects an fnhe (fnheX)
+> for deletion, but before it can be flushed and freed via RCU,
+> CPU 0 enters rt_bind_exception() and attempts to reuse the entry.
+> 
+> CPU 0                             CPU 1
+> __mkroute_output()
+>   find_exception() [fnheX]
+>                                   update_or_create_fnhe()
+>                                     fnhe_remove_oldest() [fnheX]
+>   rt_bind_exception() [bind dst]
+>                                   RCU callback [fnheX freed, dst leak]
+> 
+> If rt_bind_exception() successfully binds fnheX to a new dst, the
+> newly bound dst will never be properly freed because fnheX will
+> soon be released by the RCU callback, leading to a permanent
+> reference count leak on the old dst and the device.
+> 
+> This issue manifests as a device reference count leak and a
+> warning in dmesg when unregistering the net device:
+> 
+>   unregister_netdevice: waiting for ethX to become free. Usage count = N
 
-Hi Daniel,
+Can you say more about how you debugged this? It seems like a very rare
+race condition. I expect netdevice_tracker to only show that a dst entry
+took a reference on the net device, but it wouldn't show who took a
+reference on the dst entry.
 
-I think that err needs to be set to a negative error value here...
+> 
+> Fix this race by clearing 'oldest->fnhe_daddr' before calling
+> fnhe_flush_routes(). Since rt_bind_exception() checks this field,
+> setting it to zero prevents the stale fnhe from being reused and
+> bound to a new dst just before it is freed.
 
-> +		goto err_cap_list;
-> +
-> +	err = virtio_admin_cap_get(vdev,
-> +				   VIRTIO_NET_FF_RESOURCE_CAP,
-> +				   ff->ff_caps,
-> +				   sizeof(*ff->ff_caps));
-> +
-> +	if (err)
-> +		goto err_ff;
-> +
-> +	/* VIRTIO_NET_FF_MASK_TYPE start at 1 */
-> +	for (i = 1; i <= VIRTIO_NET_FF_MASK_TYPE_MAX; i++)
-> +		ff_mask_size += get_mask_size(i);
-> +
-> +	ff->ff_mask = kzalloc(ff_mask_size, GFP_KERNEL);
-> +	if (!ff->ff_mask)
-> +		goto err_ff;
-> +
-> +	err = virtio_admin_cap_get(vdev,
-> +				   VIRTIO_NET_FF_SELECTOR_CAP,
-> +				   ff->ff_mask,
-> +				   ff_mask_size);
-> +
-> +	if (err)
-> +		goto err_ff_mask;
-> +
-> +	ff->ff_actions = kzalloc(sizeof(*ff->ff_actions) +
-> +					VIRTIO_NET_FF_ACTION_MAX,
-> +					GFP_KERNEL);
-> +	if (!ff->ff_actions)
+Seems safe given that both fnhe_remove_oldest() and rt_bind_exception()
+access 'fnhe_daddr' while holding 'fnhe_lock'. Same trick was used in
+commit ee60ad219f5c ("route: set the deleted fnhe fnhe_daddr to 0 in
+ip_del_fnhe to fix a race").
 
-... and here.
-
-Flagged by Smatch.
-
-> +		goto err_ff_mask;
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: 67d6d681e15b ("ipv4: make exception cache less predictible")
+> Signed-off-by: Chuang Wang <nashuiliang@gmail.com>
+> ---
+>  net/ipv4/route.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+> index 6d27d3610c1c..b549d6a57307 100644
+> --- a/net/ipv4/route.c
+> +++ b/net/ipv4/route.c
+> @@ -607,6 +607,11 @@ static void fnhe_remove_oldest(struct
+> fnhe_hash_bucket *hash)
+>                         oldest_p = fnhe_p;
+>                 }
+>         }
 > +
-> +	err = virtio_admin_cap_get(vdev,
-> +				   VIRTIO_NET_FF_ACTION_CAP,
-> +				   ff->ff_actions,
-> +				   sizeof(*ff->ff_actions) + VIRTIO_NET_FF_ACTION_MAX);
-> +
-> +	if (err)
-> +		goto err_ff_action;
-> +
-> +	err = virtio_admin_cap_set(vdev,
-> +				   VIRTIO_NET_FF_RESOURCE_CAP,
-> +				   ff->ff_caps,
-> +				   sizeof(*ff->ff_caps));
-> +	if (err)
-> +		goto err_ff_action;
-> +
-> +	real_ff_mask_size = sizeof(struct virtio_net_ff_cap_mask_data);
-> +	sel = (void *)&ff->ff_mask->selectors[0];
-> +
-> +	for (i = 0; i < ff->ff_mask->count; i++) {
-> +		if (sel->length > MAX_SEL_LEN) {
-> +			err = -EINVAL;
-> +			goto err_ff_action;
-> +		}
-> +		real_ff_mask_size += sizeof(struct virtio_net_ff_selector) + sel->length;
-> +		sel = (void *)sel + sizeof(*sel) + sel->length;
-> +	}
-> +
-> +	if (real_ff_mask_size > ff_mask_size) {
-> +		err = -EINVAL;
-> +		goto err_ff_action;
-> +	}
-> +
-> +	err = virtio_admin_cap_set(vdev,
-> +				   VIRTIO_NET_FF_SELECTOR_CAP,
-> +				   ff->ff_mask,
-> +				   ff_mask_size);
-> +	if (err)
-> +		goto err_ff_action;
-> +
-> +	err = virtio_admin_cap_set(vdev,
-> +				   VIRTIO_NET_FF_ACTION_CAP,
-> +				   ff->ff_actions,
-> +				   sizeof(*ff->ff_actions) + VIRTIO_NET_FF_ACTION_MAX);
-> +	if (err)
-> +		goto err_ff_action;
-> +
-> +	ff->vdev = vdev;
-> +	ff->ff_supported = true;
-> +
-> +	kfree(cap_id_list);
-> +
-> +	return 0;
-> +
-> +err_ff_action:
-> +	kfree(ff->ff_actions);
-> +	ff->ff_actions = NULL;
-> +err_ff_mask:
-> +	kfree(ff->ff_mask);
-> +	ff->ff_mask = NULL;
-> +err_ff:
-> +	kfree(ff->ff_caps);
-> +	ff->ff_caps = NULL;
-> +err_cap_list:
-> +	kfree(cap_id_list);
-> +
-> +	return err;
-> +}
-
-...
+> +       /* Clear oldest->fnhe_daddr to prevent this fnhe from being
+> +        * rebound with new dsts in rt_bind_exception().
+> +        */
+> +       oldest->fnhe_daddr = 0;
+>         fnhe_flush_routes(oldest);
+>         *oldest_p = oldest->fnhe_next;
+>         kfree_rcu(oldest, rcu);
+> --
+> 
 
