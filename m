@@ -1,94 +1,110 @@
-Return-Path: <netdev+bounces-235765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B101C35145
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 11:24:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4087DC35193
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 11:29:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C628718C84D8
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 10:23:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 876813A7FF1
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 10:27:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD1F92FFDDC;
-	Wed,  5 Nov 2025 10:22:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD461301499;
+	Wed,  5 Nov 2025 10:27:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="l5Yf4g9g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PXZkYDXt"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 787202EC083;
-	Wed,  5 Nov 2025 10:22:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FD7F30100B;
+	Wed,  5 Nov 2025 10:27:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762338164; cv=none; b=R7SN0JfvtXGn9csz3yPElCd9ILMuax8p/myndfZ8JlmTFM7uc3kS5n/CGbkdfbINZ7SjkTewAcsrX7QnMQj7ZluFvpU6TQY9l7Kn8CCbteisvGUoX7kYSJn+0Kz1ZF3BOZFFs5mCwa0VE1/lHJ4O1A/VJf3cBhPRhhljzaYeP28=
+	t=1762338475; cv=none; b=r+mkKQUXAbHQuN407iwPQD1FIjcRYmTkZ9i90sZu/WNUdFWM5aDq6bru4IWAUh+g55ZjfFmVBUqolGWDpQHZkhE7uRUfo0BdLSO3ejl+z2oLO28DCnLxE34MgZzwREo6gZKsf8vU4geyCrVtDE9Sq/SJb3InL7P4tAXzq+71od8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762338164; c=relaxed/simple;
-	bh=ItYXVK2PdUIcKip20t5lPFH0eehgUIl+xtt3Ngpl7Qc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TvchVeAXIVXD2xLM5FkfHU9fTaSmMwgskSzGCBnE1RNFgVhw3hDsfcbRGJ5qfV0r5Khhg55hc/ysaFPee5EKYOKBfhfY5oQSU3LBNMN9gMxUk7zFtVjJEQBc/IOkN4A8laP/P303QQKt1Tq0W2DfQKs9QW856zGOZqoSbqsx/0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=l5Yf4g9g; arc=none smtp.client-ip=115.124.30.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1762338153; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=wUXBxSgyHViOpb4J0afxMYP8uNQ8fKWBiLqr1WSZuQs=;
-	b=l5Yf4g9gzAfiD2cmagb0T8aL1q+wDwfxJ3GcDSWp6R2jvtWUwuHWIQZo7Z3H981DfKLT1RqSrCtKYNh4dzbNDXW5hfSWn8UFiLpjToJBNU6LViZt5EESWmO/zeT0j1q6H72A6wD31446R+/EtBAStMK/xC3CRhVoWO95JnGebAk=
-Received: from 30.50.177.113(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0Wrl49Gy_1762338144 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 05 Nov 2025 18:22:31 +0800
-Message-ID: <8a74f801-1de5-4a1d-adc7-66a91221485d@linux.alibaba.com>
-Date: Wed, 5 Nov 2025 18:22:19 +0800
+	s=arc-20240116; t=1762338475; c=relaxed/simple;
+	bh=q31WPEl8Jt9/OnM8b/MAO6fymcrIH34q+vbmU3aPbzs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ain+ewAsdMDkPMi4+Drlp293I0TipYmpp3C7Iwi3/yRKl44TG6mtng3FGqLoKh2e0+uPHINqwyO8TH9wXcYKaKrVMaPktX1bDdNQp31QkVy3HSOoiNUSzo5xKYa0GDzB+N2MICzxR5PmME01GM1Tm5i8f2l4y5dCNblCiIZuWSQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PXZkYDXt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91C5AC4CEF8;
+	Wed,  5 Nov 2025 10:27:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762338475;
+	bh=q31WPEl8Jt9/OnM8b/MAO6fymcrIH34q+vbmU3aPbzs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PXZkYDXtvsQy+Pzv3J2aSV2+V4MWDiTjER5x6xBRlKx2lK8Pmu24r56zb/A7V9UJP
+	 KejKVl8EOOhLXQ1b6vSj1jyZ9cnAFlJ9qYxNBhXGBcVc/S7xpLESJ6hkJMGMdh/+yU
+	 k6ffT7PDMbf6y8AWVUwmPBmFECPY1icDYLfzictk3yvzwo1q5NS5Bi3m11GHAMuv9r
+	 TILKZAil/CIcwYYpCKT0GsIZeFDmpiweS1D6tuNmiPNlZsZU/c7rKgno31OOWILemw
+	 BDwEBmoe3tzhxKAE28EMd2xGSkCcvtyJJWAomvYEqHLbm1b228MmHSbqjA/RCJ+9Kk
+	 QXT5EgWJXddBw==
+Date: Wed, 5 Nov 2025 10:27:50 +0000
+From: Simon Horman <horms@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Saeed Mahameed <saeedm@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Gal Pressman <gal@nvidia.com>, Alex Lazar <alazar@nvidia.com>
+Subject: Re: [PATCH net] net/mlx5e: Fix return value in case of module EEPROM
+ read error
+Message-ID: <aQsmpgIU-cbbRykF@horms.kernel.org>
+References: <1762265736-1028868-1-git-send-email-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 1/2] ptp: introduce Alibaba CIPU PHC driver
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, xuanzhuo@linux.alibaba.com,
- dust.li@linux.alibaba.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20251030121314.56729-1-guwen@linux.alibaba.com>
- <20251030121314.56729-2-guwen@linux.alibaba.com>
- <20251031165820.70353b68@kernel.org>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <20251031165820.70353b68@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1762265736-1028868-1-git-send-email-tariqt@nvidia.com>
 
-
-
-On 2025/11/1 07:58, Jakub Kicinski wrote:
-> On Thu, 30 Oct 2025 20:13:13 +0800 Wen Gu wrote:
->> This adds a driver for Alibaba CIPU PTP clock. The CIPU, an underlying
->> infrastructure of Alibaba Cloud, synchronizes time with atomic clocks
->> via the network and provides microsecond or sub-microsecond precision
->> timestamps for VMs and bare metals on cloud.
->>
->> User space processes, such as chrony, running in VMs or on bare metals
->> can get the high precision time through the PTP device exposed by this
->> driver.
+On Tue, Nov 04, 2025 at 04:15:36PM +0200, Tariq Toukan wrote:
+> From: Gal Pressman <gal@nvidia.com>
 > 
-> As mentioned on previous revisions this is a pure clock device which has
-> nothing to do with networking and PTP.
+> mlx5e_get_module_eeprom_by_page() has weird error handling.
+> 
+> First, it is treating -EINVAL as a special case, but it is unclear why.
+> 
+> Second, it tries to fail "gracefully" by returning the number of bytes
+> read even in case of an error. This results in wrongly returning
+> success (0 return value) if the error occurs before any bytes were
+> read.
+> 
+> Simplify the error handling by returning an error when such occurs. This
+> also aligns with the error handling we have in mlx5e_get_module_eeprom()
+> for the old API.
+> 
+> This fixes the following case where the query fails, but userspace
+> ethtool wrongly treats it as success and dumps an output:
+> 
+>   # ethtool -m eth2
+>   netlink warning: mlx5_core: Query module eeprom by page failed, read 0 bytes, err -5
+>   netlink warning: mlx5_core: Query module eeprom by page failed, read 0 bytes, err -5
+>   Offset		Values
+>   ------		------
+>   0x0000:		00 00 00 00 05 00 04 00 00 00 00 00 05 00 05 00
+>   0x0010:		00 00 00 00 05 00 06 00 50 00 00 00 67 65 20 66
+>   0x0020:		61 69 6c 65 64 2c 20 72 65 61 64 20 30 20 62 79
+>   0x0030:		74 65 73 2c 20 65 72 72 20 2d 35 00 14 00 03 00
+>   0x0040:		08 00 01 00 03 00 00 00 08 00 02 00 1a 00 00 00
+>   0x0050:		14 00 04 00 08 00 01 00 04 00 00 00 08 00 02 00
+>   0x0060:		0e 00 00 00 14 00 05 00 08 00 01 00 05 00 00 00
+>   0x0070:		08 00 02 00 1a 00 00 00 14 00 06 00 08 00 01 00
+> 
+> Fixes: e109d2b204da ("net/mlx5: Implement get_module_eeprom_by_page()")
+> Signed-off-by: Gal Pressman <gal@nvidia.com>
+> Reviewed-by: Alex Lazar <alazar@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
 
-I don't quite agree that this has nothing to do with PTP.
+Thanks for the detailed description.
 
-What is the difference between this CIPU PTP driver and other PTP drivers
-under drivers/ptp? such as ptp_s390, ptp_vmw, ptp_pch, and others. Most of
-these PTP drivers do not directly involve IEEE 1588 or networking as well.
-
-> There should be a separate class
-> for "hypervisor clocks", if not a common driver.
-
-'hypervisor clock' is not very accurate. CIPU PTP can be used in VM and
-bare metal scenarios, and bare metals do not need hypervisors.
-
-Regards.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
