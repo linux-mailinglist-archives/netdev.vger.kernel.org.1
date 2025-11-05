@@ -1,82 +1,82 @@
-Return-Path: <netdev+bounces-235981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-235982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70B25C37B08
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 21:21:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92C4AC37B0E
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 21:22:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A460E3BDA07
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 20:20:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB3EC3B6664
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 20:20:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A746B34B662;
-	Wed,  5 Nov 2025 20:20:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2835B34B192;
+	Wed,  5 Nov 2025 20:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="UG7NYaft"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Z6fx/Zup"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAB2734B192
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 20:19:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4899334C983
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 20:20:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762374000; cv=none; b=fSXWMrSUQD7oJaotlM0bfTblyM+voRg+u7Ncdj0s4Tq2YBSeJVHC7mwEHlRAqXaifKYSq9vwWRViWDpOYlv1W72YYwnixUNYLAJu6EVzt06o6zvbxqNn7OrFNrZwPIpx8iTEH1lUlkU2597Jn3cf+mYry1a9bDV0VMb2R/fhGs4=
+	t=1762374003; cv=none; b=L8amyKbxnbcPHwZ41a8b2gUCnA1Swyry2C/DPgt76ogwcHSEs/fMP58r2pfOVAWA1t8T5tbL5Ov4+z0l0ULcU3ZMyKTgvqd0CQ0qLqsWhfOaO8ANu3qjIdugPuhSNlVUc9KT4RrL/hmO4p39TVZxBn/OQOBNQZaUWRQMclV8Rbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762374000; c=relaxed/simple;
-	bh=1I+ZsuBg0UdnoIKEEzTbkQeFlzkeHVAGD2Ztup8Ifyg=;
+	s=arc-20240116; t=1762374003; c=relaxed/simple;
+	bh=xleLnqeTmax3LL9D8FWb7af2lc6VsV84ywgJTWC3NVc=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=NOQ+xUTFhfSYjb6b2zOCLyyvxtTZtmQ5oNmHjE+xZxZCMagftdFNg4Rd16296EDjmoRF6HgdwYwevs/64upt1E+joABIp3ZBi/cyj+PWSLqHaJDsl66BHg6rbpkO/VtSUEpQk8p62hjaLvFGF/HignI+C/seippkZD2S8Cn3Zfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=UG7NYaft; arc=none smtp.client-ip=209.85.218.50
+	 In-Reply-To:To:Cc; b=YyxkAvNuuyvUgv9q+1A8A4+skcUSAQ2lHS6IjWdSodlD8lO8+iMBeykxKO1Xfbgca0Qi10Uxa4M5XJ3Y6myuzZ0YjqrMlbWWUErM03o3a8Mk8GkUNi8cl32tMFugGlBwtTNfKiOf5LUh3jgk7MgUjikG7AXFXITYsfo/qua5Qls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=Z6fx/Zup; arc=none smtp.client-ip=209.85.218.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-b472842981fso25617766b.1
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 12:19:58 -0800 (PST)
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-b5a8184144dso29071866b.1
+        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 12:20:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1762373997; x=1762978797; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1762373999; x=1762978799; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=sB4CC5zvn+S4YI0MbjpF4L6Qba6coIxIhHj/jqUzm+s=;
-        b=UG7NYaftEppXB0x8Mce0KCEX49wsd1W55Wtg3cIyAsKTJv17/Mrihd9+FU4OuYljhU
-         LXRraLbccYougGlgX7nfjOwTxa47retKOfjYPOhWLAEz7OE/zsCKpgLUhZmsGoHzz9jR
-         Yo2/6kMV1L0YAGAjUtRRT2lhcq3oCEhC9/VHuwS/zmv8a67f6s11Epm51wYNjoGZ25f6
-         rPNrwK/GDMOtk22UBY9ctp9eHbbTHSQYJvOFX0oahC0ZldOKwd1Yw699WC6dLG8D5gWX
-         F1yNzFCDHapjyxcrT+nvNzRYjkmyxzUXj60naO6s1kN7OFXKutzv8HdaWncD7CmViwui
-         zoVQ==
+        bh=isGYaQWo1V/ui7jH0r+jvXI+ZaW6MhGNSYr2vGlL7Vw=;
+        b=Z6fx/ZupTGWc5n3Qvf320i87hzdXbXTHOWScsxQH9JBHTChe8NJkaxkoCQVjA6PDkg
+         6XJnjfdwHK/u7g86oE5FQeitcMC1k3hMKA/AnK/OqL5lSIVxDs/W0Y56zq+S+I8sxdU7
+         CzMP1/OCTz3xfB+9qurJdydqmq4glqQ0ADSkbcpM/TBpfnggbUrzjbwu/1KY1VEBXRGf
+         FR/SEEwQYlvK/lxGvhOmddcW31I3chGtGDaJAKk0PTnryKpSbFzsnBLIpyMaCimKJj+Y
+         hlFsDtZPf3lRnQaXPWdiwJ7TTMQFS4yM4Le1E+aeRMQcUTVDBYxb3dse519F4w8D/3Jj
+         Sb5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762373997; x=1762978797;
+        d=1e100.net; s=20230601; t=1762373999; x=1762978799;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=sB4CC5zvn+S4YI0MbjpF4L6Qba6coIxIhHj/jqUzm+s=;
-        b=MswdtGSZmJlAz2Dcu+9iUSs2F0SWNeTdCOfg5h/Yj5ydEsiE5wARJVJlArPcwyszVJ
-         VLUywIq2MKEWCPQfUHm1NHgmHJ8Zxo+zXVFO5+kM+fx+PomwCsP+cn7RVFB+cnTqakk9
-         klWaMwjyqViLV3rUSj+P52fE6J4b/FgajYMl7y96gXNgF4f5jUIof4WgEvRhPIrp73O+
-         rED9i3Lovj5ipJobPPFHn24wtari8kXiYZTnlZnM6adb2dJkqDaCCq0fboPUHfshMF4p
-         ax19/qKrTIJlOejzpW3YPqTwu0N7S7x3btsr4CEPCQG28cs+PVox8yfSYKG7x0uG8B1v
-         ViBg==
-X-Forwarded-Encrypted: i=1; AJvYcCV2PYMZ/sNucEC5pE2H6a/5i1Ks2+92ZleE4b/YD0GJ07ca+OjVrUPPasvpPC84YEc9Anh4GWI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx8aKJ2Q8eKvxowHV/o5nWGZgaaef2ljE/WI3dk28xWeMJcdr/i
-	I2Ib9NrvB3uJPH3K6wQSUrjk1BmtfnJ2Xuy+/mwsVStbZNDwxcFUo5a1uI+XiOxkM0c=
-X-Gm-Gg: ASbGnctxx64ZPeK2flffKE/HwdSQ4aioDb0o5MivpVE0nx9MpI1+JJnZ4WpXmuBLF/r
-	/dxxMFr5YWm5p55+9fYO4QWJed5+mBnKU7OnA1PDOcWWKDkeCqzEgXLIadbqyclWUmw9JRtNwAO
-	aPdekGBIwpLvfNu48u9O/hwmGNvm/HamjW0BJsPbg+jbWXI2EaingiVssn+8zMRGnxv8QE+SxnE
-	seVI0a09EVxTiuW0AulVlw59gCAg/d/AZJMjUhX7bFTOwK09Ux++xSNQWLaYsvFCJgFtKxIPD+E
-	+ADagagPK+LYbFiKE4yyLSuIhSYw0KX3nENtUfV8SrxtsofIKKf4lvrlwyNI0PvJx+1ifccYrX9
-	44sH3NUTFlhARJfEQ5pYNEg9To6PKrJ5xAZ4O5MrniOWiSKw7MUITzmmJJdOltg21rNdB1LFZyc
-	1H192mH6jvu5QQY7YqlE8cvMciYJQDr9iRxgZ2ho3MB48GCA==
-X-Google-Smtp-Source: AGHT+IERuTRjpcS2Q2Bp2khXOxcPMKKMlVGFqCA4NZtr4Y5pJb9RY7AKeaB9zf9knEK+IeOzQTSgQw==
-X-Received: by 2002:a17:907:7e9b:b0:b72:5983:dafd with SMTP id a640c23a62f3a-b726529ed98mr432500766b.24.1762373997262;
-        Wed, 05 Nov 2025 12:19:57 -0800 (PST)
+        bh=isGYaQWo1V/ui7jH0r+jvXI+ZaW6MhGNSYr2vGlL7Vw=;
+        b=GSheIFgCA96Yf5GHRvnnHe32A262lJhFImSAoBJZ615nzFD13T+6RGyxSJ7UTFl5xc
+         nA5WnF0qKC8ErAf9J39ZAyoG+ivyJMmVPPFzHATmC9J6ApkN18OWqqxSauYnoCT4Fpi2
+         W6OLsW4XgPy2/ySFao1+DmEWybgrB9xli0ALVcH+lzEhRWQE79BYJj3Mpj2SQ7FYy/OP
+         TujRFNXd1djVM6UO4cz+aZwWw1eL/5V9r4cxtl2qGHh62NrdnXfpXHGxZAtTRIFyCj/d
+         xMvYzKKYnwVgc86IbSvtQrg80OQDxX38yfdHi17w03wAYR2PjBW00rbHPjnkCt17o5lf
+         mlnw==
+X-Forwarded-Encrypted: i=1; AJvYcCW2w+eNfGvSxMIqf0q3yuWmOwvpvsl2XF/JefFrvbLorUDJljQ6TWLFRE28CljLfo62D+PEkTk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5t1+ZMsDvL9stP4FGK3GPsbaDKaPD/MjKt/RDajOtw712IYlC
+	7Ax04YOq7fYw43FcaBuFJsx9FU0A7u8O13PqHr99wS3GPf7NRB5nwgyaEwT3l/wtkhA=
+X-Gm-Gg: ASbGncvqoBZc7rHWqoHEPkhdjfC7mreOKecI7pFU5shbJeB2asIyTjJnYUGUi7LZV/T
+	TwZmj3bYYpIbnVt9SasU0B+IKkjLKzNpzHpwg/KFG09OF0nGRLYuyhiuu8/8d9wGO+wWechTYoA
+	swt8Rz7tozgLm/zIdrfGqKS7OqgFpqks3pWiN+aChg6YH5CzsGl6VqlewHMlLQuFHzruYxZh1+T
+	1TbGwWSjSdBXGeGibpBx0+12mbeZoLjzcNdYWPufACMYrDm6Bf87Nnloqtw3jp7WxZwMfHUj29d
+	NM035n/3BRi52DdQFplW5ZHPXCRniTkNFOLoaMOWcI0ejsw43UwoQYiSPC61VsPf5EzI1h6gUcP
+	A14XsXwqz0wWyEM5kUa3oJ7w5QcdNf8xjY9MfPn7eE2yjk+Fb26Yi0Q+Le54NJAJs6VLjRX7wsD
+	3o7uo4Mz19cCGXpMbxlnaMRvtlkqwhTD4JveUvgt/pJo3HgA==
+X-Google-Smtp-Source: AGHT+IG9x0P3xs8/49geNhcLPgkmjr5oNkQw0WEE7H5YygMuVxUnV8i7AYjOsALrhy8cMyqjK3/30A==
+X-Received: by 2002:a17:907:968c:b0:b72:5983:db0a with SMTP id a640c23a62f3a-b7265297e0amr422946166b.15.1762373998635;
+        Wed, 05 Nov 2025 12:19:58 -0800 (PST)
 Received: from cloudflare.com (79.184.211.13.ipv4.supernova.orange.pl. [79.184.211.13])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b728937d305sm46188866b.24.2025.11.05.12.19.56
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b72896c8e3fsm45540666b.75.2025.11.05.12.19.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Nov 2025 12:19:56 -0800 (PST)
+        Wed, 05 Nov 2025 12:19:58 -0800 (PST)
 From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Wed, 05 Nov 2025 21:19:42 +0100
-Subject: [PATCH bpf-next v4 05/16] bpf: Make bpf_skb_vlan_pop helper
+Date: Wed, 05 Nov 2025 21:19:43 +0100
+Subject: [PATCH bpf-next v4 06/16] bpf: Make bpf_skb_vlan_push helper
  metadata-safe
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -86,7 +86,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251105-skb-meta-rx-path-v4-5-5ceb08a9b37b@cloudflare.com>
+Message-Id: <20251105-skb-meta-rx-path-v4-6-5ceb08a9b37b@cloudflare.com>
 References: <20251105-skb-meta-rx-path-v4-0-5ceb08a9b37b@cloudflare.com>
 In-Reply-To: <20251105-skb-meta-rx-path-v4-0-5ceb08a9b37b@cloudflare.com>
 To: bpf@vger.kernel.org
@@ -105,29 +105,40 @@ Cc: "David S. Miller" <davem@davemloft.net>,
  kernel-team@cloudflare.com
 X-Mailer: b4 0.15-dev-07fe9
 
-Use the metadata-aware helper to move packet bytes after skb_pull(),
+Use the metadata-aware helper to move packet bytes after skb_push(),
 ensuring metadata remains valid after calling the BPF helper.
+
+Also, take care to reserve sufficient headroom for metadata to fit.
 
 Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
 ---
- include/linux/if_vlan.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/linux/if_vlan.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/include/linux/if_vlan.h b/include/linux/if_vlan.h
-index afa5cc61a0fa..4ecc2509b0d4 100644
+index 4ecc2509b0d4..f7f34eb15e06 100644
 --- a/include/linux/if_vlan.h
 +++ b/include/linux/if_vlan.h
-@@ -738,9 +738,9 @@ static inline void vlan_remove_tag(struct sk_buff *skb, u16 *vlan_tci)
+@@ -355,16 +355,17 @@ static inline int __vlan_insert_inner_tag(struct sk_buff *skb,
+ 					  __be16 vlan_proto, u16 vlan_tci,
+ 					  unsigned int mac_len)
+ {
++	const u8 meta_len = mac_len > ETH_TLEN ? skb_metadata_len(skb) : 0;
+ 	struct vlan_ethhdr *veth;
  
- 	*vlan_tci = ntohs(vhdr->h_vlan_TCI);
+-	if (skb_cow_head(skb, VLAN_HLEN) < 0)
++	if (skb_cow_head(skb, meta_len + VLAN_HLEN) < 0)
+ 		return -ENOMEM;
  
--	memmove(skb->data + VLAN_HLEN, skb->data, 2 * ETH_ALEN);
- 	vlan_set_encap_proto(skb, vhdr);
- 	__skb_pull(skb, VLAN_HLEN);
-+	skb_postpull_data_move(skb, VLAN_HLEN, 2 * ETH_ALEN);
- }
+ 	skb_push(skb, VLAN_HLEN);
  
- /**
+ 	/* Move the mac header sans proto to the beginning of the new header. */
+ 	if (likely(mac_len > ETH_TLEN))
+-		memmove(skb->data, skb->data + VLAN_HLEN, mac_len - ETH_TLEN);
++		skb_postpush_data_move(skb, VLAN_HLEN, mac_len - ETH_TLEN);
+ 	if (skb_mac_header_was_set(skb))
+ 		skb->mac_header -= VLAN_HLEN;
+ 
 
 -- 
 2.43.0
