@@ -1,141 +1,182 @@
-Return-Path: <netdev+bounces-236062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4526C38259
-	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 23:09:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B8AAAC38280
+	for <lists+netdev@lfdr.de>; Wed, 05 Nov 2025 23:15:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BA1B84E498F
-	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 22:09:18 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 67BCF4EBA2B
+	for <lists+netdev@lfdr.de>; Wed,  5 Nov 2025 22:15:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E774F2EFDA2;
-	Wed,  5 Nov 2025 22:09:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E9DD2F12A3;
+	Wed,  5 Nov 2025 22:15:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T7wSHmT3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jLavHGc9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 403CF2EF65F
-	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 22:09:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B6D72F0C48
+	for <netdev@vger.kernel.org>; Wed,  5 Nov 2025 22:15:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762380555; cv=none; b=EaKV/P7aHik0eZW/BaTAgNqGYLg546Od5YZc+VVv1gUaZ4fBZKCg0OPzm8h/xw4T9qRf18RMV6n0hkFQNwN2kWD6iuX0sJE0p4EFthfsVkpGFDzfsFuTS+v7kgPjnWezBrhjds1KjV7XmzmAK6x0lv3iWjSq0sHs9pBU9AwbGXc=
+	t=1762380940; cv=none; b=KjzlSKJzwSq5H97yVUfxKDiFgVmGzHW+7wM52rMKoHDF60XHVwHRy2RoW1HeJz5i/lO5I/QQ6zBEJcLNJDAKW5k8AvPbtmMzm3FoZiIQKwS0Bh722EJR4ZITWSOvR+MKKXDVGUnv5QNXrDn/Y3Q+wVnrb7vacH4kzoCyMMUoOVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762380555; c=relaxed/simple;
-	bh=GMAKjpv9SsmOWyvi5TWfRg+PSBiyI2Fy+vJlR7iMmhc=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=EXEb95cD9+gzJ0OFkqQGsqtn4tIxzJ+Gf4AnKC5G578jygzCnduN+L4vcYlQpGgIF5mArTgOUWVh/vBxV2WYpTK/xFTYqhDJocvbUZyo7oYJpZP+rdl04TfVYA1z8WZeJ1FBeSFoVKXeuAYPCt2Moii4dZYuwK015tMtUzkolxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T7wSHmT3; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4775ae5684fso1490115e9.1
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 14:09:13 -0800 (PST)
+	s=arc-20240116; t=1762380940; c=relaxed/simple;
+	bh=OdLOMgZW2KFI0N/w5SzMnELwpkeuWZuR5Xrnqu6OWos=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lIhEelm6+d1ve9qTs+A6ahALyatuUoDKHiv2+piSHwqVTjRU3usHwzIhemQu3Jxe88wII6FoMVQ62KgFTFGcbpyYnjlTcQ8ysBFCoQGo/offNxbkqRay7/UpDZ0c1Ab6UAHxnRZbefahRAdWbMkSrxB/DFRpo9ip0modkVzjJVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jLavHGc9; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2959197b68eso24075ad.1
+        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 14:15:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762380552; x=1762985352; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1762380936; x=1762985736; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UYIv6xvZ38V7IZs7PIytdPm+7oS7w1p/Is01VA94ghE=;
-        b=T7wSHmT3ACMJ1Dw8OYeX4L0++F3tnS1/vwtEA5DH/+cM7p+xdSWTj6SzRUgpFL5Q0r
-         NJ9adRR0rmrghb+Vh+FkZ5j9RgwvHKyQtqJ2Pt5i3E9C6bvlraLCABhp1LjqfaVfuq+I
-         UnTDLJlY67/xxAuSbBLjSTBWOXF8xTGb4yIjGR9pu8lTj+W0vJNHYSX7YJo390BL7VyI
-         ClXGEoLRcVBEwCO24YqZ5e6Sc4sKH6QhKGY8t+PSC1J//xF8i9OufJZJhGIBujYUUD3h
-         FDhiGdigjcohez3R0wx9j3r0gNoWribgOs6RgYOGGJhczQFsCTeA7tLNYMZ5EcuPVvLD
-         7USg==
+        bh=i3lvSuLZZH1/RCKxfhUKoqbWv/FK7QWkV+OjY9CUFeE=;
+        b=jLavHGc9AmMCnGBjpx4oxnqWBbwpHgQ9cFmM/FluprsBdi07PJF7uFwu8vBXcYODPX
+         xwikDsH6USs7ZeRDbgRKLGegRXkiqV+haqj+zymAheZzeoh2A3KAmg7DsFrHk3/NuENO
+         /alYfv/lFORi/aiWMUVkHZdoscvn05PLn55A4BG0oZOg3g4e0sd83sF1Wn47gLaRabwA
+         ZhgcXFDWD9bLqER5aEZpG6D2EVBzSGVVuXaXL09C16+WbyeztA5IlfX0kJ0YxCre5gCK
+         CbTry+6vDPYF2I9rDyGJV8A9X7NPXIKSscs5slg+04VARM38l6Dh3wTWR016I+r3stgA
+         3Hjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762380552; x=1762985352;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=UYIv6xvZ38V7IZs7PIytdPm+7oS7w1p/Is01VA94ghE=;
-        b=Qpgm9zTxeaV6bt0nHzxKrqBMbR//qOs+gK7kGyayc1YJifDu74RA0RaRvPm/ObMvmY
-         qOYpPI66+b9lyzkrTD7D2GfzvAGzCJ8qRxjjjmzxsduxQPMkZbRzP216JUoRKHly8Yqp
-         C3qOtnuCGrNxwKnulHerTwtprUMEiRJ7kYQLgGJE/JYjnMbkIo6fQbXli5R7+t8SrYdw
-         +e1m/TAzp8FUdEP/ah2+rbwygH6cCoTslLbLdtqBrps98Sz4MFPOm4q9rh8KSxoibGcY
-         HD6CMVXpvms7JprEg+xIclenAQOMRns4OIPt0cff+kezogBKcflz32cuE+JG4K1tu/uz
-         HuwQ==
-X-Gm-Message-State: AOJu0YyZ8PCwylUmhz9SMWB9pGx2506/86DKg/NEnKIfAtCt4y07nLEt
-	bctJ5Or4XJI/J7YXjECzzt20Lx8D8v2bZLtkOJfmgs0fI7vZK16rciJ5
-X-Gm-Gg: ASbGnct/DvDl0FXv3FnonuFFN3UDfUkPBwwjSZ1pfPWAZGqbNdj1wAy0tQoLiqGr9qj
-	v5DqBmmyW50qsM77sY73VDyjGJfVVA2KhL0HTCvTAbiVh6O8JVlioa8enrFKVjeoNBpDmHiE3WS
-	PhZvlnlKcTe6+8cgULp8Kybaa1nzy0h0TSJD+Ws5jzqH7FY39EFQuRHUVFv/pdGKPGQNribyk6o
-	grnGjcedYomzxFXXNlSuaYbRZ9GDVp8FJrhNsoTCVw0qEx2SleuC5NuvNMrpb13YWt4qTkMAA1v
-	JmU/Yh+8k8ZPtSjdD0ss+1WtEhtpK9JHbhegikU2t9RwiLgKhLnWOxigQBjaBTpDP+T+3vURZ1E
-	vC1LOAQ1+U1KgWgsWZ8zSqxyidaoJBsvC6NUG56s3n7lwdPKz+HAVmd7gcQQMBW8pV66MkpKsGX
-	mX6HyHMzQa9gfSeFHbHJcanYZDfCadtjBbhhdszDqbizs04Snc3EEt2lQODIZd389k+CrltBgk7
-	H0tggMUuy7oAMPLQR9UULMgybYqi+kY0JRiQWRvAMY=
-X-Google-Smtp-Source: AGHT+IFrPZxupGGkdlg2zDQX1wHbev3OvJIxzDYzXudA9jVNFuIG/96EMvbmaaXRY1j4o3/3k7j2Tg==
-X-Received: by 2002:a05:600c:828a:b0:477:e66:4077 with SMTP id 5b1f17b1804b1-4775ce2bceamr42272805e9.29.1762380552284;
-        Wed, 05 Nov 2025 14:09:12 -0800 (PST)
-Received: from ?IPV6:2003:ea:8f2e:e200:8d41:e974:a931:222d? (p200300ea8f2ee2008d41e974a931222d.dip0.t-ipconnect.de. [2003:ea:8f2e:e200:8d41:e974:a931:222d])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477625eabf3sm11892905e9.16.2025.11.05.14.09.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Nov 2025 14:09:11 -0800 (PST)
-Message-ID: <9eca3d7e-fa64-4724-8fdc-f2c1a8f2ae8f@gmail.com>
-Date: Wed, 5 Nov 2025 23:09:17 +0100
+        d=1e100.net; s=20230601; t=1762380936; x=1762985736;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=i3lvSuLZZH1/RCKxfhUKoqbWv/FK7QWkV+OjY9CUFeE=;
+        b=iLYm0XrGg8iAW1HIN0QKJOQOdXm/qdhy9QTd7qPll3I3YtW0bBiii6v55aOvnNwcsP
+         UBuVkeEh4SJ5Nrk+seqTqEiJmw88NEyGQMNvaEq1Y1o3ykkyU9hqgLVGcOtvKQykQR9U
+         XQ/rfih6HpF9pVum7ThCf1QTJYc8S259/7FUa6hEZLhLcxBhztgBY6v4mUo7eM6amgn9
+         fuGkpkw2pNzMBZyQYjF3ZK2qBUUJPfeGNtTcVQZ+A3tqDnpT4reMBG3qy+3uh0EeW3qD
+         /OWdNEoqqsRrSTSHfM02pQ1RxtRmIpHCTkDu3+xOCALuuLLBV6qvF4CLogO61NFIQEdj
+         kKvg==
+X-Gm-Message-State: AOJu0YwTBrI5qdGYpJSxym7MW0A6P/NGawuTGOi7KurDpSSWSc6QjluS
+	y4J+owUwO8vQnRVMlVUI3PEhA97m+gZYJBPcfrOzbKbWr6cR+pssyG77UreABhlpLdQZnrpOuVE
+	T/o0yOqlsdXL5FaEPRfBSo4fVUtesyV8DwWwVjLIY
+X-Gm-Gg: ASbGncvDD+GWE7O2onfi7XD1W3WsRh/Wa9XOq3Pu6GwlDHXVMx+h0QsyBRAmPqK32CL
+	8vt4L+FpQlyBb4rEN9LFL7pWSg7EICk+R/GppA6ph4wal/Hg3m9MiImu0PshqZJ6ROVw+Ik0qk8
+	awBxOUj87SEq3IwNaKON93tw5gqhiRJ+cTH4P+rtOkWIDQ1bmaLDWsly6llraISxyPTZEW3osF0
+	TbVl22r9Wb5G2eELxH+SgUPcWBrBhCk83+3COqhUrF9bocreRLRMcbhYyFD7qDU6+wl0eycnkqG
+	2tHfcQyb3fcMLEpRARsWsLqPGgc=
+X-Google-Smtp-Source: AGHT+IFGwzwV2PdBnmzL8mXgRan2fERw/vTgCOurKJjFHayrcS30RBuqNtvLgGgDdlXer4FCuzFSjd5/uaLUw1FVlNs=
+X-Received: by 2002:a17:902:d505:b0:266:b8a2:f5d8 with SMTP id
+ d9443c01a7336-29655c7a119mr1520385ad.14.1762380936033; Wed, 05 Nov 2025
+ 14:15:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] net: phy: fixed_phy: shrink size of struct
- fixed_phy_status
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20251105200801.178381-1-almasrymina@google.com> <20251105200801.178381-2-almasrymina@google.com>
+In-Reply-To: <20251105200801.178381-2-almasrymina@google.com>
+From: Harshitha Ramamurthy <hramamurthy@google.com>
+Date: Wed, 5 Nov 2025 14:15:23 -0800
+X-Gm-Features: AWmQ_bljffcDvUJLZB0ZodJS92q8_Zm_EPbfpoxwapkprjEWq5txJjOAYuwgef4
+Message-ID: <CAEAWyHc4zxC2wKjbO5C8TL6B8Exm6sYQTMxdOihh0PFjFMTkrg@mail.gmail.com>
+Subject: Re: [PATCH net v1 2/2] gve: use max allowed ring size for ZC page_pools
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Joshua Washington <joshwash@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, ziweixiao@google.com, 
+	Vedant Mathur <vedantmathur@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-All three members are effectively of type bool, so make this explicit
-and shrink size of struct fixed_phy_status.
+On Wed, Nov 5, 2025 at 12:08=E2=80=AFPM Mina Almasry <almasrymina@google.co=
+m> wrote:
+>
+> NCCL workloads with NCCL_P2P_PXN_LEVEL=3D2 or 1 are very slow with the
+> current gve devmem tcp configuration.
+>
+> Root causing showed that this particular workload results in a very
+> bursty pattern of devmem allocations and frees, exhausting the page_pool
+> ring buffer. This results in sock_devmem_dontneed taking up to 5ms to
+> free a batch of 128 netmems, as each free does not find an available
+> entry in the pp->ring, and going all the way down to the (slow) gen_pool,
+> and gve_alloc_buffer running into a burst of successive allocations
+> which also don't find entries in the pp->ring (not dontneed'd yet,
+> presumably), each allocation taking up to 100us, slowing down the napi
+> poll loop.
+>
+> From there, the slowness of the napi poll loop results, I suspect,
+> in the rx buffers not being processed in time, and packet drops
+> detected by tcpdump. The total sum of all this badness results in this
+> workload running at around 0.5 GB/s, when expected perf is around 12
+> GB/s.
+>
+> This entire behavior can be avoided by increasing the pp->ring size to th=
+e
+> max allowed 16384. This makes the pp able to handle the bursty
+> alloc/frees of this particular workload. AFACT there should be no
+> negative side effect of arbitrarily increasing the pp->ring size in this
+> manner for ZC configs - the memory is prealloced and pinned by the
+> memory provider anyway.
+>
+> Tested by running AllToAll PXN=3D2 workload. Before:
+>
+> Avg bus bandwidth    : 0.434191
+>
+> After:
+>
+> Avg bus bandwidth    : 12.5494
+>
+> Note that there is more we can do to optimize this path, such as bulk
+> netmem dontneeds, bulk netmem pp refills, and possibly taking a page
+> from the iouring zcrx playbook and replacing the gen_pool with a simpler
+> fixed-size array based allocator, but this seems sufficient to fix these
+> critcal workloads.
+>
+> With thanks to Willem and Eric for helping root cause this,
+>
+> Cc: ziweixiao@google.com
+> Fixes: 62d7f40503bc ("gve: support unreadable netmem")
+> Reported-by: Vedant Mathur <vedantmathur@google.com>
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+> ---
+>  drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c b/driv=
+ers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c
+> index 0e2b703c673a..f63ffdd3b3ba 100644
+> --- a/drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c
+> +++ b/drivers/net/ethernet/google/gve/gve_buffer_mgmt_dqo.c
+> @@ -8,6 +8,8 @@
+>  #include "gve.h"
+>  #include "gve_utils.h"
+>
+> +#include "net/netdev_queues.h"
+> +
+>  int gve_buf_ref_cnt(struct gve_rx_buf_state_dqo *bs)
+>  {
+>         return page_count(bs->page_info.page) - bs->page_info.pagecnt_bia=
+s;
+> @@ -263,6 +265,8 @@ struct page_pool *gve_rx_create_page_pool(struct gve_=
+priv *priv,
+>         if (priv->header_split_enabled) {
+>                 pp.flags |=3D PP_FLAG_ALLOW_UNREADABLE_NETMEM;
+>                 pp.queue_idx =3D rx->q_num;
+> +               if  (netif_rxq_has_unreadable_mp(priv->dev, rx->q_num))
+> +                       pp.pool_size =3D PAGE_POOL_MAX_RING_SIZE;
+>         }
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/phy/fixed_phy.c | 2 +-
- include/linux/phy_fixed.h   | 6 +++---
- 2 files changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/phy/fixed_phy.c b/drivers/net/phy/fixed_phy.c
-index d498d8a9b..9bd693741 100644
---- a/drivers/net/phy/fixed_phy.c
-+++ b/drivers/net/phy/fixed_phy.c
-@@ -224,7 +224,7 @@ EXPORT_SYMBOL_GPL(fixed_phy_register);
- struct phy_device *fixed_phy_register_100fd(void)
- {
- 	static const struct fixed_phy_status status = {
--		.link	= 1,
-+		.link	= true,
- 		.speed	= SPEED_100,
- 		.duplex	= DUPLEX_FULL,
- 	};
-diff --git a/include/linux/phy_fixed.h b/include/linux/phy_fixed.h
-index 8bade9998..436bff20f 100644
---- a/include/linux/phy_fixed.h
-+++ b/include/linux/phy_fixed.h
-@@ -5,11 +5,11 @@
- #include <linux/types.h>
- 
- struct fixed_phy_status {
--	int link;
- 	int speed;
- 	int duplex;
--	int pause;
--	int asym_pause;
-+	bool link:1;
-+	bool pause:1;
-+	bool asym_pause:1;
- };
- 
- struct device_node;
--- 
-2.51.2
-
+Would it make sense to also wrap setting of the
+PP_FLAG_ALLOW_UNREADABLE_NETMEM under the
+netif_rxq_has_unreadable_mp() helper?
+>
+>         return page_pool_create(&pp);
+> --
+> 2.51.2.1026.g39e6a42477-goog
+>
 
