@@ -1,131 +1,125 @@
-Return-Path: <netdev+bounces-236466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA31DC3C949
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 17:52:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F4A0C3C925
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 17:50:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 9C6824E8B93
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 16:48:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1CC1188CA87
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 16:49:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C48152C3244;
-	Thu,  6 Nov 2025 16:48:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C78DF319608;
+	Thu,  6 Nov 2025 16:49:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n2hzfVWN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pxdy5pNV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F6DF274650
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 16:48:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 814C22D46A9
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 16:49:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762447716; cv=none; b=NPE0Ts6hfViNgAXsZsX0ZDvanCBgjvGz+o1eoqpAVPY4Vpi6FZijcLP5WgODz59vmqdajjh83wzmBBgbqdMR8n60dCrg8F8DlMCRIXzL+KwkHQ0KEsH2Hc3+qBcD7WpyNUxkdDXUtUBRD58MUYF1VvbKCCZfOJG/rp5gkIdqkN4=
+	t=1762447762; cv=none; b=pFpiqY+FHS8KwqATBkPVNfkmTXM6pUmWc0whC3croayzIhlLO3I9Zfm/pDmDdFPUj7StCaX9gFIj6tO7mAwSquKLQ3O9i1ws9jU/EXPXOUOerygsJCFITy9cE/Uq0Xk7atNZXW/VIAHczMJTOwb3vDi3HidM0XGNQa4+iDXKJWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762447716; c=relaxed/simple;
-	bh=/4FiJ6f4TJaczdM9ytFvrqq6aZ2yS1FDznxDzKEei/s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZYGi8q479SQG4tjxiw6xtHVAF6nZSWL2dAOL0zkrgxWnSeIwg2YQ13FnCEc6iJfaLb5bq58gAgWVZGf/nj3RippQ8YB2U+lwisjm/74VLOTfp2buK8tqN7VQm9yqPnwwWInJcimysv95c0A2rQp6Z7r9Ux9WugAHyAKbNjNNwys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n2hzfVWN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BE72C4CEF7;
-	Thu,  6 Nov 2025 16:48:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762447716;
-	bh=/4FiJ6f4TJaczdM9ytFvrqq6aZ2yS1FDznxDzKEei/s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=n2hzfVWNCgssw0kO7ViuyxSePza4gd1TziiqxcEy+VihxmqregtZ0f2I5UyFVRe/l
-	 BxMdDMmGR1KTotHicZSKkN2Q6DDslnC3ldcc6lRSN4fqNpmR1z3f/Fr6uQo+0By4Y5
-	 oIxKVJv+w2iOmlA4fKLSBXK6J3cVeTJesy8dS+atlvbK4iKDqksmaXeywJ5H83jG4M
-	 8q7gI5sFzH9BBXY0KGDF0Kh/+X1X8bt0cf1gPKAarT7qt1EG89aNSs7bWc1daJFQ0S
-	 SVTrnil1nerWwq9TJ7F3N+6WbRXpRZKK2Iy3Yngbnvh2M0sjIgPAo3nH/WQGRML16L
-	 3Vgtodby78kGg==
-Date: Thu, 6 Nov 2025 16:48:31 +0000
-From: Simon Horman <horms@kernel.org>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v2 11/11] net: stmmac: ingenic: use
- ->set_phy_intf_sel()
-Message-ID: <aQzRX6qHy5Yo7T5x@horms.kernel.org>
-References: <aQxinH5WWcunfP7p@shell.armlinux.org.uk>
- <E1vGvoo-0000000DWpK-47nP@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1762447762; c=relaxed/simple;
+	bh=gPC9VPLFYbjfVxBSFkmUOkcw3DGZnlisHf1J732GkLk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IwvPTa/PxSz0q9FippqPQOvLL2onFd/pDBWy1YKPo+UDOOqBHdikz3nDD8+gXoIdQXqJZaHdEpjxXKCnE40RkmhA8uY8o5x/kLtAe2VYelQI2XAB/tsLKrtlAA+YDjrPc0QrsMBzeyR2+WWHC4qBfJ68Srnfm7vvedyx7GC+CnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pxdy5pNV; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7a9c64dfa8aso990488b3a.3
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 08:49:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762447760; x=1763052560; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1qzn6+Sh35pzxbK3z/xOK777J6LI54V1OZ2Oy1H+1YU=;
+        b=Pxdy5pNVYWILmUSusu47+TjwZlsqGFBaR0IidrJzRoMtGDpXyUs+YIxMsMoiseL/bJ
+         hiL6CS6636iL8aIq4ZILae2grig0IdTbCkNWBmQ/bqlfbNjaicKYBmiedN+i+rc4hPcb
+         w6Sy5+OviusZWIDVGhnskDCyioxinh7itjziVJYHNLFEXqc3NUzcuOhYj++5QlMuPEJN
+         FOr43I1zwz8Ps6cEEh8H78mZy4JIcIpOwl/2mTrj3Rca/x8a274j9RWd8MZWkuBIOlY+
+         vGmqRf59G0gwFIpTSAeoWoiar/UXs5PZOvf3rz+duCw75SKGFoIn+wZuxA5CveXSnjl+
+         Y8fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762447760; x=1763052560;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=1qzn6+Sh35pzxbK3z/xOK777J6LI54V1OZ2Oy1H+1YU=;
+        b=C0no/+EjauC7JZx240yhAc2xe/Pah1mwn79TaJVWVq17xoF4VmxC6skIXRSfsKhuKB
+         /KoRhBCSrTfS0dqZbtyZQft0aIEqbECZowRK7JiWdJcZ860nFEPS1HQH7fOhtQYUeDP5
+         Pr3SgJvTSsqSTNW+wD/zrzURxDV9262HEGLm4j29JiX9eiaMmJOpdabiMHb8VgX6DrPu
+         J/0KUnv0OHeHOZW398eX+yzMhanCQ/2A4KdCxPkU5nA6mf7QqwOBXo0ZRn75rhWjmg6I
+         Z0oOJvyMdD1aKJKT33dstMAWdQAQ5K0X2WCnYxW0Nazx3YIvnpvRY7d0t/Cc7+NG6Rwi
+         WP5g==
+X-Gm-Message-State: AOJu0YwWTv/SV8BcX2GfnJs/nwLvdQ+nmwW+jEhOZXkJqY5pQD4NJtyb
+	m1Xr8vMLO17Eyd23AYV1sfh65bSHP8wA+6TKOTxzACDkhrdGk+VKpLLkDKA4fA9I3v+B09swCGr
+	5JXw43BVMiFdQugJpzCF7S9mveKIgFBw=
+X-Gm-Gg: ASbGncslpxHZ+8RThOoq9VKhd9BDHPPp1e2Pwwl3iQHXk5h34yudWJFyI908EqS6sce
+	KaFPLOpFIh2ZWGooXBaHr4RBrxSesASWUT6uZxv4aaYJNY9v+PiqtoxXsNUTsXO0d3Azo3tTtQm
+	AvHAkcIOmAp5PTfWOHtOXDvGzJG/TlJwvCshwdsTHLPFON8XqE3Eyk34w5Jgwb9D2AulPPi7ZqQ
+	II+C9f3gDxP5I/+sPPlAN1ZpkhnZSDoc9dr/7DpFcZb76Wr3FIwD+QPTm4m6fq+CUpsIfqm9cBM
+	uxfqqcfEKdVP3BNzJqXpbT/tFNoUYA==
+X-Google-Smtp-Source: AGHT+IF5xt57zcNq+U+HwDSwBlT/1oLe/u7UB3heYQ1Kbhs29xTrM/I6aw5xgiWPTyWZevpEl+UkTdOu25fxJ6wmzM0=
+X-Received: by 2002:a17:902:ef4f:b0:290:dd1f:3d60 with SMTP id
+ d9443c01a7336-297c04931c8mr1358545ad.51.1762447759701; Thu, 06 Nov 2025
+ 08:49:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1vGvoo-0000000DWpK-47nP@rmk-PC.armlinux.org.uk>
+References: <cover.1761748557.git.lucien.xin@gmail.com> <cc874b85134ba00f8d1d334e93633fbfa04b5a9a.1761748557.git.lucien.xin@gmail.com>
+ <3618948d-8372-4f8d-9a0e-97a059bbf6eb@redhat.com>
+In-Reply-To: <3618948d-8372-4f8d-9a0e-97a059bbf6eb@redhat.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Thu, 6 Nov 2025 11:49:08 -0500
+X-Gm-Features: AWmQ_bkulaWnvSaWsxVAziWY-nd-sBA09kWceVf7bj-CFTKpUJNHZl6a4fE2Pjg
+Message-ID: <CADvbK_f9o=_L=K+Vo_MbJk3mXFgriUUtGCSVm6GNo6hFHk5Kzw@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 13/15] quic: add timer management
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
+	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
+	Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
+	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, 
+	David Howells <dhowells@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, 
+	John Ericson <mail@johnericson.me>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
+	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 06, 2025 at 08:58:10AM +0000, Russell King (Oracle) wrote:
-> Rather than placing the phy_intf_sel() setup in the ->init() method,
-> move it to the new ->set_phy_intf_sel() method.
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
->  .../ethernet/stmicro/stmmac/dwmac-ingenic.c   | 33 +++++++------------
->  1 file changed, 11 insertions(+), 22 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-> index 41a2071262bc..957bc78d5a1e 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-> @@ -134,32 +134,21 @@ static int x2000_mac_set_mode(struct ingenic_mac *mac, u8 phy_intf_sel)
->  	return regmap_update_bits(mac->regmap, 0, mac->soc_info->mask, val);
->  }
->  
-> -static int ingenic_mac_init(struct platform_device *pdev, void *bsp_priv)
-> +static int ingenic_set_phy_intf_sel(void *bsp_priv, u8 phy_intf_sel)
->  {
->  	struct ingenic_mac *mac = bsp_priv;
-> -	phy_interface_t interface;
-> -	int phy_intf_sel, ret;
-> -
-> -	if (mac->soc_info->set_mode) {
-> -		interface = mac->plat_dat->phy_interface;
-> -
-> -		phy_intf_sel = stmmac_get_phy_intf_sel(interface);
-> -		if (phy_intf_sel < 0 || phy_intf_sel >= BITS_PER_BYTE ||
-> -		    ~mac->soc_info->valid_phy_intf_sel & BIT(phy_intf_sel)) {
-> -			dev_err(mac->dev, "unsupported interface %s\n",
-> -				phy_modes(interface));
-> -			return phy_intf_sel < 0 ? phy_intf_sel : -EINVAL;
-> -		}
->  
-> -		dev_dbg(mac->dev, "MAC PHY control register: interface %s\n",
-> -			phy_modes(interface));
-> +	if (!mac->soc_info->set_mode)
-> +		return 0;
->  
-> -		ret = mac->soc_info->set_mode(mac, phy_intf_sel);
-> -		if (ret)
-> -			return ret;
-> -	}
-> +	if (phy_intf_sel >= BITS_PER_BYTE ||
-> +	    ~mac->soc_info->valid_phy_intf_sel & BIT(phy_intf_sel))
-> +		return phy_intf_sel < 0 ? phy_intf_sel : -EINVAL;
+On Tue, Nov 4, 2025 at 7:33=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
+e:
+>
+> On 10/29/25 3:35 PM, Xin Long wrote:
+> > +void quic_timer_stop(struct sock *sk, u8 type)
+> > +{
+> > +     if (type =3D=3D QUIC_TIMER_PACE) {
+> > +             if (hrtimer_try_to_cancel(quic_timer(sk, type)) =3D=3D 1)
+> > +                     sock_put(sk);
+> > +             return;
+> > +     }
+> > +     if (timer_delete(quic_timer(sk, type)))
+>
+> timer_shutdown()
+Will update. Thanks.
 
-nit from Smatch: phy_intf_sel is unsigned and thus cannot be negative
-
-> +
-> +	dev_dbg(mac->dev, "MAC PHY control register: interface %s\n",
-> +		phy_modes(mac->plat_dat->phy_interface));
->  
-> -	return 0;
-> +	return mac->soc_info->set_mode(mac, phy_intf_sel);
->  }
-
-...
+>
+> Other than that:
+>
+> Acked-by: Paolo Abeni <pabeni@redhat.com>
+>
 
