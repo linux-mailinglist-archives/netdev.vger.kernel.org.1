@@ -1,198 +1,116 @@
-Return-Path: <netdev+bounces-236442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C843FC3C478
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 17:11:20 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02305C3C575
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 17:19:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC56C1B256B4
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 16:11:42 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 306B55004FC
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 16:12:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85C6534DB4E;
-	Thu,  6 Nov 2025 16:10:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9423A34B433;
+	Thu,  6 Nov 2025 16:10:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sT3vVzR4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jttP62vr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BE4934CFB2
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 16:10:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D264C298CA6
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 16:10:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762445402; cv=none; b=efeuu9d6/vBfBkp+yl/kWNXRpbYaHHUfmHw0IPm026U/l0TDG4ZSYLq2A/PU6wF55V6ISzGF1q/iQjGoW9DEeJYBUiRRl3k4QRDytj24vCTvQYpbvRMaBnfvF9JE9lNuXjapPgZxWMu5DaQnYuX62fwWBikSmwTHQxmvDKfBo40=
+	t=1762445438; cv=none; b=tTpYn+4IjbIwV6FhVuaTpiNy9M/9GeI45uYGULbnmm4c5CCMtHxZgLK6luouvHD7AZAgKrvT9QuaAEobIH62jxWpq9CDAzMUssjhDMYxv2Oy630JWPtRFjQZR3msZs7PCmz9BxX/6aHcmedcU04jRryH/FbXDNMPg/sP6igJE4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762445402; c=relaxed/simple;
-	bh=fKmNiMQe0ynvpStWuP0XnSHZDwq/y2qoqKQrGY3PXsE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=P+n5kqfwEyBr1XS2LLj04rrwU90KRERzCk+nHABgh8MMyppAezz4scvRrai2ZKRbLf26GzwzgAId1ueIaN+ixa/Y0HDyb23yBqzzJ4xaxKfvJZwDrjUp8+tWocVXsH3UYhUsAuwVfprLnItDxWnZX9m0Qn+QxMpseGoqVIOO7jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sT3vVzR4; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4e89c433c00so11431411cf.1
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 08:10:00 -0800 (PST)
+	s=arc-20240116; t=1762445438; c=relaxed/simple;
+	bh=QZSW/BJ/RJydAx+Ol7lrobWrMwqz1A1hUfVzW6JIwh0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tMmNNA9qnIKdXwS4kaLZztyrxfTvk65dnNC+PEDc28TDE6b6A7seB1SfF/OIRYKY4I+Hb510QzIOplr/BKjnnJOA3OxyvBV/d0zsxA+raUb+SyRreYM70Y99gITi7clyIslcRjah0xt1ZZnsJ+gSoFvAfPsjzUkOgK3S5jtnvZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jttP62vr; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-47721743fd0so5799095e9.2
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 08:10:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762445399; x=1763050199; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BWuK2l4a0qyICiQGJ5Nu+jA+2tYvhcOWjthDcbaS8Uc=;
-        b=sT3vVzR47UEiUpzCQ6Ws9CLzZld7xQo8lgINpcSj4i5hCKLmUC05n+oVbvSgKwGuSe
-         pCBnJ+pD2u6ElfXcNEqn7zrL91w1XBAo/sThZQSkjMRujm0OqVsEXb1bJi5BqK+7dOOj
-         64hMue/QAmbfVK5YrdzPYUyxSCs1HgAMshDY9BGw2SP38tv5xS0SzfBBXxEZFRhkZKww
-         6pCw6CoV7R1QAIgtxx/wvqc57KAjiFYnGmYohVAa6b1iEqnaaouyg66StAIOOqqe3tK8
-         uAfAMix+mAM/HqD1xzRAAReA2Fo+VRJBHDQ6sfKj8xZFQJRcOAPnK0Kzs9JzLOv0LLOO
-         oj9A==
+        d=gmail.com; s=20230601; t=1762445435; x=1763050235; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OpSDFcQNgt2zxWM7xhHt9aq3d7KBybR0vmck3/ABSyY=;
+        b=jttP62vrzjVqv2PyHxXR9clfxua9zlH4WlRgPb6DSRhQxir0RK4S7bQNio0axhFB4v
+         BPad0ywPNXIlS6L4JLBrxjBlhfRd97gyIYyMWLm2zQvHkPZNgTYhmZWyLNe6DMTL51Mn
+         PD196a8Dw4A9wMSyAhYAJeKBXY+fLz5Mia3tcivdgyJVv6u1763LZ2srnGUN5KtxUBlA
+         Oc6ZaXofTE+x5uWzkoHS9tanooxfHOZRbSIGYJH8kYZKN5jNG/tyOWpYwzSkBt/2xin2
+         d+FWCyrlKFny/QDVY+0gmdEpmSXun5tuh+wPaA89ITpEqEwNN40Fqoi97Mbsm9SljzC9
+         We7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762445399; x=1763050199;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BWuK2l4a0qyICiQGJ5Nu+jA+2tYvhcOWjthDcbaS8Uc=;
-        b=gZbTUKYr1LGZjtbXIsR1gTWqS0AmDWC5n/8OXwaypmK2I7KKHmQKfM6g9fBnpHRlfN
-         1QJHHUwdzfI9kD9fJpkl76kj6ZeR9YEyXdu3QLOVc5h05udY+rAlWE6pS6ECccqVlNkL
-         pO63tWZeMmAyLezWqyhiM6DHmsopMG+sbdEjmvZaRUjCpuILDT9KBxkqYaM7vHc420rd
-         wVjqjnPdF2tF2USqc6QpVghQEIwXtLULaK4fq6oFC+t6T8wh58pK/dC2Xi+j1Rrtak86
-         lPf3qPb7KNstA3hHLBwQBeeASD2SNiUly7KmZqPD1OhA9c0yvIhr17BCU8RM/2IGcXIR
-         meBg==
-X-Forwarded-Encrypted: i=1; AJvYcCVAaBXeZNjNa5COlGImnlWNOJ9GAfzM/u4nG9B2YFV8BpF4gulMtgmtSH9Lgv7rpTxBivsh/Pg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz6ZEZPvRSRrbDBGaHd1CHZS28rvaaYJWf1vB3rZoGF1gNvT8cn
-	5g/10iyujJ8cApr1OSbW6ApM9zT5wzDtdoY1dRNwYqJJxU76IrJvRiGX/f4Fu//l82fVKvuqcSu
-	risoa/WkKVJZp733tUtTO8QUveyRo+5O4A6libfOU
-X-Gm-Gg: ASbGncu54H9cdGUhbTxglKZft40DhbUAE18zYREdurdDIstblQ6f93CsAQxu1zNrVm5
-	Te3gxEzqv3eSHoRMHYPTHS9XaeU2fsuQu4SwaNYilpeXyREp18orgn65y7MdgjzULm4AM/O6AXq
-	N/unuiQ6A/tJ0C891EltM731nU0Cv01f431SxrUepLwM6GwTybos8V5jxWFiiMLhOGZ+Y5cwB55
-	KUc4+zkgLIrM6tZ1zF5dQO5C6xrP8zbGmYN9Se7Htz9aY484oXMjtHnmg5KvhDdV6Poz0M=
-X-Google-Smtp-Source: AGHT+IECy0DNJwhJeIjdbjfXkIdcPVInPFDXCcmsDy8wKkUfA3HdisJZF6w1mPhnG9bIpDieWqZbBPK7yyBDK9BynZY=
-X-Received: by 2002:a05:622a:410d:b0:4ed:680e:29d2 with SMTP id
- d75a77b69052e-4ed725e74f9mr77097231cf.44.1762445399047; Thu, 06 Nov 2025
- 08:09:59 -0800 (PST)
+        d=1e100.net; s=20230601; t=1762445435; x=1763050235;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OpSDFcQNgt2zxWM7xhHt9aq3d7KBybR0vmck3/ABSyY=;
+        b=mCi/LGPJtbr/Vd5qsIIa3ATTax7wmaT0wTReRDZYeGNd6QH4mgFrCBUvvKnx2Cyosp
+         tRGqd+kx2Tru4WhOLcJwnu2Xn5RhlkPVbAPiPqhe2rDJ2hUyilO6EqvtgIWjCxTglDpb
+         ZiVnhbFDmO/F/Bo7R3uykCjV2eSMW+Sa/vDCdhUa77NX9zF5vyTrpKXUNYDGNkDspdq2
+         CZpZIy7KanvvCBtJNFTqPA5IsJPPcvaUnhOYoG72boG5wmGae0sOHq7fdAn1oRsRaxby
+         6lkx1nLIDevAltP6M8+ESfTFDAyUOy5/qFchSiiWseVekhhQ+gpP/866AXKADFF5xjYR
+         CswA==
+X-Forwarded-Encrypted: i=1; AJvYcCXG7TYjy1ENwCuhtn5j8DmDC2Zlp4BsdgBTRWacFg3k9NiWOm5NZw84waSejfDcCd1rdF11JiU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwlB5HTOHP71vVFRCqPYPv836EG9Hw/cho2GPKe0zFnbjXn5XZu
+	Mf+7PtPAHJQ3qlIezX8/N63dLbWx7BVXdTYPOeBPyNiG1+rzPDDdHQ2d
+X-Gm-Gg: ASbGnct0nfu7cvdJZSmRCcpLvUOsXf9upX6INOon85oYcDdWdzISCK943ur7oMEWGLG
+	mceKR1052XUZdRUWCb+CsroWz3iPHStxV9wsl1zbqQXOEeIys6fnYSoe/gL9pInhoWgmU5ebFt6
+	t6sUPx0GvwvaFpkcUXc8KvSGOwPmMwzOql9ADaKZyuqcv+yoq3fFBlPOGiBFSyOOYV85+p1Y5TI
+	U+9k+MuUfq6QTb4DXqpJ1l7FsOlS9f1jlklSBe+euXn+1+xarasr220XItUkdESCqz3dFIk2J2n
+	yNqnwA7afM9AGUfskbw/sZnR84oov3bG6eJMc+i//7p6C2YxAWqwturMbYVTX4AopkADKi023na
+	vRdBcGHvowiKyUgzfVCF0DbtoOOp/L9sYuWi4V/dcqFg5W3/sLJGYhlqj7oNlyaaxLiqh1QHQBg
+	1/wYJU5tvTLqabvyZAnOz+2/t96eM9ki1C3BmSB2vEYKnj4pgUl3o=
+X-Google-Smtp-Source: AGHT+IFgbjeBxecVoVp+6vBDH7heaujGg1di/ulHuvm9TQYuO13H0aP+SVDN1qD40wa9yHHuu4qK9w==
+X-Received: by 2002:a05:600c:1d07:b0:471:803:6a26 with SMTP id 5b1f17b1804b1-4775ce265d1mr61987175e9.37.1762445434949;
+        Thu, 06 Nov 2025 08:10:34 -0800 (PST)
+Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4775ce329afsm110752595e9.16.2025.11.06.08.10.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Nov 2025 08:10:34 -0800 (PST)
+Message-ID: <358f1bb5-d0c2-491e-ad56-4c2f512debfa@gmail.com>
+Date: Thu, 6 Nov 2025 16:10:32 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251105093837.711053-1-edumazet@google.com> <0eecf17d-2606-4304-bc75-efe4c7ec73b9@kernel.org>
-In-Reply-To: <0eecf17d-2606-4304-bc75-efe4c7ec73b9@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 6 Nov 2025 08:09:48 -0800
-X-Gm-Features: AWmQ_bkl-AVBQwT-9D5XgAGRZ3AH4yIJoh6AJfNiakHIL10Q3TwtcTMLkZY_y4w
-Message-ID: <CANn89iJsqvNFgAoUfPcB==PiVeMHNBFB1uyWkF4Egs0KBW-ENg@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: add net.ipv4.tcp_comp_sack_rtt_percent
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Neal Cardwell <ncardwell@google.com>, Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 0/7] reverse ifq refcount
+To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>
+References: <20251104224458.1683606-1-dw@davidwei.uk>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20251104224458.1683606-1-dw@davidwei.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 6, 2025 at 6:57=E2=80=AFAM Jesper Dangaard Brouer <hawk@kernel.=
-org> wrote:
->
-> On 05/11/2025 10.38, Eric Dumazet wrote:
-> > TCP SACK compression has been added in 2018 in commit
-> > 5d9f4262b7ea ("tcp: add SACK compression").
-> >
-> > It is working great for WAN flows (with large RTT).
-> > Wifi in particular gets a significant boost _when_ ACK are suppressed.
-> >
-> > Add a new sysctl so that we can tune the very conservative 5 % value
-> > that has been used so far in this formula, so that small RTT flows
-> > can benefit from this feature.
-> >
-> > delay =3D min ( 5 % of RTT, 1 ms)
-> >
-> > This patch adds new tcp_comp_sack_rtt_percent sysctl
-> > to ease experiments and tuning.
-> >
-> > Given that we cap the delay to 1ms (tcp_comp_sack_delay_ns sysctl),
-> > set the default value to 100.
-> >
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > ---
-> >   Documentation/networking/ip-sysctl.rst | 13 +++++++++++--
-> >   include/net/netns/ipv4.h               |  1 +
-> >   net/ipv4/sysctl_net_ipv4.c             |  9 +++++++++
-> >   net/ipv4/tcp_input.c                   | 26 ++++++++++++++++++-------=
--
-> >   net/ipv4/tcp_ipv4.c                    |  1 +
-> >   5 files changed, 40 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/net=
-working/ip-sysctl.rst
-> > index 7cd35bfd39e68c5b2650eb9d0fbb76e34aed3f2b..ebc11f593305bf87e7d4ad4=
-d50ef085b22aef7da 100644
-> > --- a/Documentation/networking/ip-sysctl.rst
-> > +++ b/Documentation/networking/ip-sysctl.rst
-> > @@ -854,9 +854,18 @@ tcp_sack - BOOLEAN
-> >
-> >       Default: 1 (enabled)
-> >
-> > +tcp_comp_sack_rtt_percent - INTEGER
-> > +     Percentage of SRTT used for the compressed SACK feature.
-> > +     See tcp_comp_sack_nr, tcp_comp_sack_delay_ns, tcp_comp_sack_slack=
-_ns.
-> > +
-> > +     Possible values : 1 - 1000
->
-> If this is a percentage, why does it allow 1000 as max?
+On 11/4/25 22:44, David Wei wrote:
+> Reverse the refcount relationship between ifq and rings i.e. ring ctxs
+> and page pool memory providers hold refs on an ifq instead of the other
+> way around. This makes ifqs an independently refcounted object separate
+> to rings.
+> 
+> This is split out from a larger patchset [1] that adds ifq sharing. It
+> will be needed for both ifq export and import/sharing later. Split it
+> out as to make dependency management easier.
+> 
+> [1]: https://lore.kernel.org/io-uring/20251103234110.127790-1-dw@davidwei.uk/
 
-To allow a 10x max. If someone needs more in the future, we might change it=
-.
+FWIW, if 1-3 are merged I can take the rest to the mix with
+dependencies for David's work, but it should also be fine if
+all 7 go into io_uring-6.19 there shouldn't be any conflicts.
 
-> > +     /* delay =3D (rtt >> 3) * NSEC_PER_USEC * comp_sack_rtt_percent /=
- 100
-> > +      * ->
-> > +      * delay =3D rtt * 1.25 * comp_sack_rtt_percent
-> > +      */
->
-> Why explain this with shifts.  I have to use extra time to remember that
-> shift ">> 3" is the same as div "/" 8.  And that ">>" 2 is the same as
-> div "/4".  For the code, I think the compiler will convert /4 to >>2
-> anyway.  I don't feel strongly about this, so I'll let it be up to you
-> if you want to adjust this or not.
+-- 
+Pavel Begunkov
 
-Look elsewhere in TCP, we always convert rtt with (rtt >> 3), because
-it is kept scaled by 3.
-
-I personally prefer this to rtt/8, but I understand if you are from
-another team :)
-
->
->
-> > +     delay =3D (u64)(rtt + (rtt >> 2)) *
-> > +             READ_ONCE(net->ipv4.sysctl_tcp_comp_sack_rtt_percent);
-> > +
-> > +     delay =3D min(delay, READ_ONCE(net->ipv4.sysctl_tcp_comp_sack_del=
-ay_ns));
-> > +
-> >       sock_hold(sk);
-> >       hrtimer_start_range_ns(&tp->compressed_ack_timer, ns_to_ktime(del=
-ay),
-> > -                            READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_co=
-mp_sack_slack_ns),
-> > +                            READ_ONCE(net->ipv4.sysctl_tcp_comp_sack_s=
-lack_ns),
-> >                              HRTIMER_MODE_REL_PINNED_SOFT);
-> >   }
-> >
-> > diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-> > index b7526a7888cbe296c0f4ba6350772741cfe1765b..a4411cd0229cb7fc5903d20=
-6e549d0889d177937 100644
-> > --- a/net/ipv4/tcp_ipv4.c
-> > +++ b/net/ipv4/tcp_ipv4.c
-> > @@ -3596,6 +3596,7 @@ static int __net_init tcp_sk_init(struct net *net=
-)
-> >       net->ipv4.sysctl_tcp_comp_sack_delay_ns =3D NSEC_PER_MSEC;
-> >       net->ipv4.sysctl_tcp_comp_sack_slack_ns =3D 100 * NSEC_PER_USEC;
-> >       net->ipv4.sysctl_tcp_comp_sack_nr =3D 44;
-> > +     net->ipv4.sysctl_tcp_comp_sack_rtt_percent =3D 100;
-> >       net->ipv4.sysctl_tcp_backlog_ack_defer =3D 1;
-> >       net->ipv4.sysctl_tcp_fastopen =3D TFO_CLIENT_ENABLE;
-> >       net->ipv4.sysctl_tcp_fastopen_blackhole_timeout =3D 0;
->
 
