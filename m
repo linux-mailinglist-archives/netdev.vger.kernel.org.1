@@ -1,160 +1,233 @@
-Return-Path: <netdev+bounces-236186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A757DC39993
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 09:34:44 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7CC3C399AB
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 09:38:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 457D7189A703
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 08:35:09 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EF78735021D
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 08:38:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02F90308F0B;
-	Thu,  6 Nov 2025 08:34:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCACA308F2E;
+	Thu,  6 Nov 2025 08:38:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="t0EcaPUb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aaM2lrOP"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 240FE3081D4;
-	Thu,  6 Nov 2025 08:34:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02C66308F25
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 08:38:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762418079; cv=none; b=MxQES5VNvtDIbb8KNFOJnVGl1+qe3CSTna6oPFnVdRmHgLFGMn9YId2dL+G1AY8pj5UoyL5T38dxltie2DXyC/32ADHXB8FcEFoK4pmOD0Vr80xcPqUaztKhzClVzzfZsxWiM3/KTwco/Xj9aFq1Vk/7Y0gWApsbRvYNSuvcsl0=
+	t=1762418323; cv=none; b=UDbdbsqQ4QwkWrr1bSMHrdp/tbuSodRV3lxnLWgNxagBkTMAhZbPVWgvYBCwFxRPeeBAc6m0zCedOMzlE0WKHbbMsb5GkmsF0R3VHN6NByPcpPDZ7iiSEUqQWOWKyqhbcHVSY3+a8OUmlugkg/bm5iESepxWmfQlOeaM8ivR/NE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762418079; c=relaxed/simple;
-	bh=hbBC4Dtw5nNFsS1cDcTvp07ncBpOYOzdVwp+lNz0bPQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ix+scsVV+gjcTk0vx6T5uywVna0R1ZWp9tPfpWectUMl3MmrknTjBPoKl8Azo4J+X0eIU1RXfbiHNz9hfPIux/Q3hbZDWQ6tzGUiHGT2ML7Cdp3WHiqGuFuk+iT2rwrzWqg5qtHh+/D1d4mYIrlIFYLePDVJWBN5ErQHz5v/bK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=t0EcaPUb; arc=none smtp.client-ip=115.124.30.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1762418071; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=CuWNoTgesVl3E29DdVkrx/VV+XsoBjOzPqOxr72z638=;
-	b=t0EcaPUbc2uvrK7oEb8vWdaZVhIdwKL8J/+xI+P3W3WdP4BXYTvNbo+1apg/c3eZ3qEWnpJrv8WoAkOihjtRwn5B71beMSTS+lZddjXVx5zceqNvYuR4YeRcbcCSijPgwUJM/ICBYbJ5C1Jem9jqaT2bNukbZSOhIlKlCrUwRGQ=
-Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0Wroz8F3_1762418069 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 06 Nov 2025 16:34:30 +0800
-Date: Thu, 6 Nov 2025 16:34:29 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com    >
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: "D. Wythe" <alibuda@linux.alibaba.com>, ast@kernel.org,
-	daniel@iogearbox.net, andrii@kernel.org, pabeni@redhat.com,
-	song@kernel.org, sdf@google.com, haoluo@google.com, yhs@fb.com,
-	edumazet@google.com, john.fastabend@gmail.com, kpsingh@kernel.org,
-	jolsa@kernel.org, mjambigi@linux.ibm.com, wenjia@linux.ibm.com,
-	wintera@linux.ibm.com, dust.li@linux.alibaba.com,
-	tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
-	bpf@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	netdev@vger.kernel.org, sidraya@linux.ibm.com, jaka@linux.ibm.com
-Subject: Re: [PATCH bpf-next v4 2/3] net/smc: bpf: Introduce generic hook for
- handshake flow
-Message-ID: <20251106083429.GA35123@j66a10360.sqa.eu95>
-References: <20251103073124.43077-1-alibuda@linux.alibaba.com>
- <20251103073124.43077-3-alibuda@linux.alibaba.com>
- <4450b847-6b31-46f2-bc2d-a8b3197d15c7@linux.dev>
- <20251105070140.GA31761@j66a10360.sqa.eu95>
- <dfed97fb-4e0c-416e-b5d8-8de7b3edce69@linux.dev>
- <20251106023302.GA44223@j66a10360.sqa.eu95>
- <d6a53bed-b197-432c-84e5-ac324b36137e@linux.dev>
+	s=arc-20240116; t=1762418323; c=relaxed/simple;
+	bh=6x/2ReiXGNUqbmEF1+512pnU1mLdfUCAbQISuBJZ8iI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aJKrfMddNCwjiV6be4LjHlH+u6/THFZD4DbHwyg8uWjNfOOf7cGmEnHDyO+WLbFMNA3SxGpd1QWRVxfB7Y1nx0KKgKkaKQW58jCEazILm6T0aW/5I9wI7QPl6CStlz3aN12sTUIN8lyEO0jhyI0mwRt/f3RDET4l2TIF7FpJfC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aaM2lrOP; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-426f1574a14so377702f8f.3
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 00:38:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762418320; x=1763023120; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Tf22DxiJKidt7zn+YqzlU5+UFZlDZr1co6jaRkh7sD4=;
+        b=aaM2lrOPfqE0SBcsCzd0gyWpX/o5XXhtLs+oyq6hziaWBHmnyABv5cPb2gjRSkGENX
+         Ci8snao4DiXIXfXYNQidkvnjHFUBaRUIlX7zM2ftJJ5oqrU/wKt+UnBC0oe4AM9fQkhI
+         gp+IRUdmNWxYfHksoKqLse/e8kLvMMeUlpx87uDUBbXe49a9VHh/KyN3GEsjOYHn6KX+
+         g39NTU7vEAxPDjcscIsS3KlBeIHFj7ssA7smP8Be7AJvcAgoc8duqlKkxjboMd7Xl30/
+         VrcfccqrpY4kR1d5nawtciFYo0UFc7Sy7LFilfC6/5qtk6NgvcHMwP6nylK+RjpOZmKv
+         PLoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762418320; x=1763023120;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Tf22DxiJKidt7zn+YqzlU5+UFZlDZr1co6jaRkh7sD4=;
+        b=eIZml1ow+JyDYvT2U9blFMyBAJ2buuhVhV99Kypc9dhzNryaPOpX6/RKVKpYHiVQxX
+         EBgefzAzgm1NiYqPCul9m4CrC2jvmOUfzsaB+Kwsd308R5fpN5xo2Tm8Fvexm1F2y8Li
+         mB6nCl1Q3W6xsax1Oc4bu1k1Vn4bu93rZZsmIbioD9zmkAv3JKYXFASd6YjZ3Mc+HlmH
+         wMrQyTmT+WYw3BNN177fjV9bP6QHSllygm07C6bjSDKnt7kHKzJj01rBfeZul4pWHZBZ
+         9l238TzCd8OoMWifQ3wTyo3XKB4gwKqTQVFaJA4U+HQ4YOV+B8tS5GDUY+zzH9PzkW53
+         EMkw==
+X-Forwarded-Encrypted: i=1; AJvYcCWusJAn2IuBr50r9xDvlpybht39KHFlgZXjza9pmFXM+pUCiSjgGrjEf4kOMLffZp8o8W+U/VE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzn/33P2mP8lEqKjwpXw4TTj+5tLkXvkeiTrNO1XSTdVTod5PPh
+	Uayc3QpTELtuereNHE8WicYDO0Ao50nYJa4ekvMK4pQ4rcm2xn3hLtxu5ZRic4tKKIPnf7kgpvN
+	aH7eP938E/dl9m9FzUp29r1xyOHd7dlg=
+X-Gm-Gg: ASbGncu7s5cyzaSYEBxfMDq/qp4hSw/igb7EJQ7Ym9RUnMATKbjBYGgB7+4j1UBAzsk
+	jdxnvE4h9LjZIuIK4WvKW3FY0uPWwhZ2RZzOlSJNzmYFYaamPk2a+G4FbxcvNDe/xMfK6fK5EaH
+	7Z0GAIwNo8BJB1dLlRP9ea+HEXYvemp1FaMxAigrde4Hi2aeKteCBO0thjSdJNBmVpJcOkOwcMk
+	cASllMbn6jAp5OdbKnzp4GwT5onH2gyJzBWOiLA+dE6cSwdSHDoo+6KhKaT
+X-Google-Smtp-Source: AGHT+IGPURHI8ENgPvqdQX7Mov6yZoSClcZi+fUXPLz6ZWGpKNYXySUXy3i2zNqHCAeXBsyc7pP6b+3An2fvvvX/Wng=
+X-Received: by 2002:a05:6000:2f88:b0:427:5ae:eb89 with SMTP id
+ ffacd0b85a97d-429e33064aamr5149183f8f.34.1762418320048; Thu, 06 Nov 2025
+ 00:38:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <d6a53bed-b197-432c-84e5-ac324b36137e@linux.dev>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+References: <20251104161327.41004-1-simon.schippers@tu-dortmund.de>
+ <CANn89iLLwWvbnCKKRrV2c7eo+4UduLVgZUWR=ZoZ+SPHRGf=wg@mail.gmail.com>
+ <f2a363d3-40d7-4a5f-a884-ec147a167ef5@tu-dortmund.de> <CAGRyCJERd93kE3BsoXCVRuRAVuvubt5udcyNMuEZBTcq2r+hcw@mail.gmail.com>
+ <c29f8763-6e0e-4601-90be-e88769d23d2a@tu-dortmund.de>
+In-Reply-To: <c29f8763-6e0e-4601-90be-e88769d23d2a@tu-dortmund.de>
+From: Daniele Palmas <dnlplm@gmail.com>
+Date: Thu, 6 Nov 2025 09:38:26 +0100
+X-Gm-Features: AWmQ_bmwvnkfYCXkSH2o_3U8zoA1yeZsi6gyY_TwK7wXxSjK2NJJsBdDI5hCg8M
+Message-ID: <CAGRyCJE1_xQQDfu1Tk3miZX-5T-+6rarzgPGo3=K-1zsFKpr+g@mail.gmail.com>
+Subject: Re: [PATCH net-next v1 0/1] usbnet: Add support for Byte Queue Limits (BQL)
+To: Simon Schippers <simon.schippers@tu-dortmund.de>
+Cc: Eric Dumazet <edumazet@google.com>, oneukum@suse.com, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 05, 2025 at 08:16:45PM -0800, Martin KaFai Lau wrote:
-> 
-> 
-> On 11/5/25 6:33 PM, D. Wythe wrote:
-> >On Wed, Nov 05, 2025 at 02:58:48PM -0800, Martin KaFai Lau wrote:
-> >>
-> >>
-> >>On 11/4/25 11:01 PM, D. Wythe wrote:
-> >>>On Tue, Nov 04, 2025 at 04:03:46PM -0800, Martin KaFai Lau wrote:
-> >>>>
-> >>>>
-> >>>>On 11/2/25 11:31 PM, D. Wythe wrote:
-> >>>>>+#if IS_ENABLED(CONFIG_SMC_HS_CTRL_BPF)
-> >>>>>+#define smc_call_hsbpf(init_val, sk, func, ...) ({		\
-> >>>>>+	typeof(init_val) __ret = (init_val);			\
-> >>>>>+	struct smc_hs_ctrl *ctrl;				\
-> >>>>>+	rcu_read_lock();					\
-> >>>>>+	ctrl = rcu_dereference(sock_net(sk)->smc.hs_ctrl);	\
-> >>>>
-> >>>>The smc_hs_ctrl (and its ops) is called from the netns, so the
-> >>>>bpf_struct_ops is attached to a netns. Attaching bpf_struct_ops to a
-> >>>>netns has not been done before. More on this later.
-> >>>>
-> >>>>>+	if (ctrl && ctrl->func)					\
-> >>>>>+		__ret = ctrl->func(__VA_ARGS__);		\
-> >>>>>+
-> >>>>>+	if (static_branch_unlikely(&tcp_have_smc) && tp->syn_smc) {
-> >>>>>+		tp->syn_smc = !!smc_call_hsbpf(1, sk, syn_option, tp);
-> >>>>
-> >>>>... so just pass tp instead of passing both sk and tp?
-> >>>>
-> >>>>[ ... ]
-> >>>>
-> >>>
-> >>>You're right, it is a bit redundant. However, if we merge the parameters,
-> >>>every user of this macro will be forced to pass tp. In fact, we’re
-> >>>already considering adding some callback functions that don’t take tp as
-> >>>a parameter.
-> >>
-> >>If the struct_ops callback does not take tp, then don't pass it to the
-> >>callback. I have a hard time to imagine why the bpf prog will not be
-> >>interested in the tp/sk pointer though.
-> >>
-> >>or you meant the caller does not have tp? and where is the future caller?
+Hi Simon,
+
+Il giorno mer 5 nov 2025 alle ore 12:05 Simon Schippers
+<simon.schippers@tu-dortmund.de> ha scritto:
+>
+> On 11/5/25 11:35, Daniele Palmas wrote:
+> > Hello Simon,
 > >
-> >My initial concern was that certain ctrl->func callbacks might
-> >eventually need to operate on an smc_sock rather than a tcp_sock.
-> 
-> hmm...in that case, I think it first needs to understand where else
-> the smc struct_ops is planned to be called in the future. I thought
-> the smc struct_ops is something unique to the af_smc address family
-> but I suspect the future ops addition may not be the case. Can you
-> share some details on where the future callback will be? e.g. in
-> smc_{connect, sendmsg, recvmsg...} that has the smc_sock?
+> > Il giorno mer 5 nov 2025 alle ore 11:40 Simon Schippers
+> > <simon.schippers@tu-dortmund.de> ha scritto:
+> >>
+> >> On 11/4/25 18:02, Eric Dumazet wrote:
+> >>> On Tue, Nov 4, 2025 at 8:14=E2=80=AFAM Simon Schippers
+> >>> <simon.schippers@tu-dortmund.de> wrote:
+> >>>>
+> >>>> During recent testing, I observed significant latency spikes when us=
+ing
+> >>>> Quectel 5G modems under load. Investigation revealed that the issue =
+was
+> >>>> caused by bufferbloat in the usbnet driver.
+> >>>>
+> >>>> In the current implementation, usbnet uses a fixed tx_qlen of:
+> >>>>
+> >>>> USB2: 60 * 1518 bytes =3D 91.08 KB
+> >>>> USB3: 60 * 5 * 1518 bytes =3D 454.80 KB
+> >>>>
+> >>>> Such large transmit queues can be problematic, especially for cellul=
+ar
+> >>>> modems. For example, with a typical celluar link speed of 10 Mbit/s,=
+ a
+> >>>> fully occupied USB3 transmit queue results in:
+> >>>>
+> >>>> 454.80 KB / (10 Mbit/s / 8 bit/byte) =3D 363.84 ms
+> >>>>
+> >>>> of additional latency.
+> >>>
+> >>> Doesn't 5G need to push more packets to the driver to get good aggreg=
+ation ?
+> >>>
+> >>
+> >> Yes, but not 455 KB for low speeds. 5G requires a queue of a few ms to
+> >> aggregate enough packets for a frame but not of several hundred ms as
+> >> calculated in my example. And yes, there are situations where 5G,
+> >> especially FR2 mmWave, reaches Gbit/s speeds where a big queue is
+> >> required. But the dynamic queue limit approach of BQL should be well
+> >> suited for these varying speeds.
+> >>
+> >
+> > out of curiosity, related to the test with 5G Quectel, did you test
+> > enabling aggregation through QMAP (kernel module rmnet) or simply
+> > qmi_wwan raw_ip ?
+> >
+> > Regards,
+> > Daniele
+> >
+>
+> Hi Daniele,
+>
+> I simply used qmi_wwan. I actually never touched rmnet before.
+> Is the aggregation through QMAP what you and Eric mean with aggregation?
+> Because then I misunderstood it, because I was thinking about aggregating
+> enough (and not too many) packets in the usbnet queue.
+>
 
-The design scope of hs_ctrl (handshake control) is limited to
-the SMC protocol's handshake phase. This means it will not be involved
-in data transmission functions like smc_sendmsg and smc_recvmsg, Instead,
-its focus is on:
+I can't speak for Eric, but, yes, that is what I meant for
+aggregation, this is the common way those high-cat modems are used:
+it's not clear to me if the change you are proposing could have any
+impact when rmnet is used, that's why I was asking the test
+conditions.
 
-1. During the TCP three-way handshake
-2. During the SMC protocol's own handshake. (proposal -> confirm ->
-accept)
+Thanks,
+Daniele
 
-Within the SMC module, hs_ctrl's primary future call points are
-concentrated within the __smc_connect() and smc_listen_work(). These
-two functions cover the SMC protocol handshake process.
-
-And we have a plan involving private extensions to the SMC protocol.
-In the SMC protocol, different implementers can extend protocol functionality
-based on their Vendor Organizationally Unique Identifier (vendor_oui). You might
-notice that currently, the SMC implementation only has this vendor_oui field,
-but without corresponding functionality. This is highly significant for our
-applications, as many of our internal features rely on these private extensions.
-However, due to their inherent nature, these private features cannot be
-upstreamed. Therefore, BPF is the best way to implement these. Since
-these private extensions are essentially part of the SMC handshake
-process, hs_ctrl has become our first choice.
-
-Beyond that, we are also considering other minor extensions to be
-implemented via hs_ctrl. These include assisting in the selection of the
-appropriate SMC device type and making decisions regarding which RDMA
-GID to use. (also in __smc_connect() and smc_listen_work()).
-
+> Thanks
+>
+> >>>>
+> >>>> To address this issue, this patch introduces support for
+> >>>> Byte Queue Limits (BQL) [1][2] in the usbnet driver. BQL dynamically
+> >>>> limits the amount of data queued in the driver, effectively reducing
+> >>>> latency without impacting throughput.
+> >>>> This implementation was successfully tested on several devices as
+> >>>> described in the commit.
+> >>>>
+> >>>>
+> >>>>
+> >>>> Future work
+> >>>>
+> >>>> Due to offloading, TCP often produces SKBs up to 64 KB in size.
+> >>>
+> >>> Only for rates > 500 Mbit. After BQL, we had many more improvements i=
+n
+> >>> the stack.
+> >>> https://lwn.net/Articles/564978/
+> >>>
+> >>>
+> >>
+> >> I also saw these large SKBs, for example, for my USB2 Android tetherin=
+g,
+> >> which advertises a network speed of < 500 Mbit/s.
+> >> I saw these large SKBs by looking at the file:
+> >>
+> >> cat /sys/class/net/INTERFACE/queues/tx-0/byte_queue_limits/inflight
+> >>
+> >> For UDP-only traffic, inflight always maxed out at MTU size.
+> >>
+> >> Thank you for your replies!
+> >>
+> >>>> To
+> >>>> further decrease buffer bloat, I tried to disable TSO, GSO and LRO b=
+ut it
+> >>>> did not have the intended effect in my tests. The only dirty workaro=
+und I
+> >>>> found so far was to call netif_stop_queue() whenever BQL sets
+> >>>> __QUEUE_STATE_STACK_XOFF. However, a proper solution to this issue w=
+ould
+> >>>> be desirable.
+> >>>>
+> >>>> I also plan to publish a scientific paper on this topic in the near
+> >>>> future.
+> >>>>
+> >>>> Thanks,
+> >>>> Simon
+> >>>>
+> >>>> [1] https://medium.com/@tom_84912/byte-queue-limits-the-unauthorized=
+-biography-61adc5730b83
+> >>>> [2] https://lwn.net/Articles/469652/
+> >>>>
+> >>>> Simon Schippers (1):
+> >>>>   usbnet: Add support for Byte Queue Limits (BQL)
+> >>>>
+> >>>>  drivers/net/usb/usbnet.c | 8 ++++++++
+> >>>>  1 file changed, 8 insertions(+)
+> >>>>
+> >>>> --
+> >>>> 2.43.0
+> >>>>
+> >>
 
