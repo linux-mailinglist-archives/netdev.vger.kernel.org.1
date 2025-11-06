@@ -1,111 +1,96 @@
-Return-Path: <netdev+bounces-236189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0895C39AC4
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 09:55:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D36B9C39ADC
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 09:56:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF2313BBF08
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 08:55:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8AE483BBA20
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 08:56:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DA683090E6;
-	Thu,  6 Nov 2025 08:55:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DDBA3093AE;
+	Thu,  6 Nov 2025 08:56:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="r1Uri3dl"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="BLuqw6uV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2A66305044
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 08:55:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 073062FB616
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 08:56:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762419304; cv=none; b=l8phfjEh1zEanivKqF9R+cF2Am+91Yi5nXmmET0bXIfWOwLQUl9ZPEBOu/hr9R/Jghwd7dGmHnGHxN6AdvTfbI0VnDzPe6gQqZ0TzqB8EtNpes2IDHd3/+SwPVJ52Cw4tZBDpGcXq+SBQ8aM72BNNIunhAX14uWeAwkV+z96ZnI=
+	t=1762419372; cv=none; b=JsSyxNHfnZedbGTV0awnAfuOeMjI8LMzpxP1gASRB4DELoUuqstFHMb6N5wTZwb1Bv/3I8dTiAva6A/sCmym7KNFO58M6EePWHlQQhUOyv022nrJyKqXcf8sCMbB5q0Osy0zCZgT355Dov8QsadwMaZNIITuJ+svzzEg8f6KmRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762419304; c=relaxed/simple;
-	bh=GX4og614HH64NOcGuK/fdqCuh15xqzDUlwGlcxQPzpk=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=thPuM4IK/s5BdASFCN6FYfOzZruQhrngneFi6z+YOfguE6C+i815Gk8A/RrrmJiHX5Ia5NqgC8PttvSz0NnywJWk7YBgsP7l9dvhnKiUy714ylqi2SLw2I4w8iiZudw9qsXFqj7dcNAv/ioP9ztbmIhP+Ef2hfifeqgNFldfqvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=r1Uri3dl; arc=none smtp.client-ip=209.85.160.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-4ed74e6c468so8550331cf.3
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 00:55:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762419301; x=1763024101; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=sZZnSJaDq1+wBb/1aXsc82txSSUrDqCDTDcLlIoj23E=;
-        b=r1Uri3dlQNBCodKCB2yaYF77Priut+Sw05tDSmXK1ldDqetWkcqQSl2oH7AfW25eXj
-         skgLz+p2COtij9maMvPOZjX1VC6+Bk1IK3uTje4ho9ksM0dOl5qqDHGM3awOrSMnvmtY
-         FR0OZa9Uo6Es8A2u3BA/GpPd7uX6NU2C6Qp1gc4YBr5kUTCREg9uYxH+wVZxPbD1vjFX
-         GxlHkMuqMNZ2gf6Eot8bYQ1JYUHYMWJ+1dV1pwk1g5+H3TTDWfb2kArQzBm7PenK1Bwp
-         OXbRYmH+0ebYKphfL92q/ku8dhZju8fmOf4SY3S1ivsoxYjPrCqaYHABZspDSzh/nfsq
-         SIew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762419301; x=1763024101;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sZZnSJaDq1+wBb/1aXsc82txSSUrDqCDTDcLlIoj23E=;
-        b=halxSDRqbSfB6WW9RRQ34hN0ypRgnR96JvIEutzYbDB71j8oaJLzwG4+mJhOcK7LuL
-         paKaD8uw8UrR7ups/cX2dgCnxQ3COx9YU7HiSNFG5C9bNs4KWaMqelS5omNss3wM9xsw
-         UxiHKvOAxqRQGfciWC6o5sW6UkzEfD986M3fRvJjLinxJncTrKDBJdDgezq1s6cumPKJ
-         M4LH4fj+0xGZzUmxZHZs3NnrvYo5lmItRtQ7cuguvfDrWU45fe9Am2ZoOzdFBVryf6ho
-         T9jJPbiOxs7ZlRKbnNRr02sHv1FXx1fDWOggRqPXxXFjyWVh/0p+EvPTS9fQMFyKGAbP
-         5Jyg==
-X-Forwarded-Encrypted: i=1; AJvYcCXfS786vvViiGtVGaIxkVqSZq4L5DcetCZKNO4Kk0jeCAy4+oYQ7mVaIpbDoFMPvyeDuI3+CLY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLP0jH+FuUBjhNm0hp/KTo21aPCd9nqggMMcIg7fxjPciiJcDf
-	BSvLk9zM7g3EQAztvdFWKxllQ7btsZXSnZ+6uJf6mAmyR29SNCuBMBlB5tpRxF/GKdIDfLFaCI4
-	664UtVxrK57WglQ==
-X-Google-Smtp-Source: AGHT+IFLeuxl7kr0ZDshyPTP57LHR51VUod9QFAMsS51C2oXiBJcINKcw2dsxKLxwozjOqt4+8wX9SWN2uurpw==
-X-Received: from qvbnh18.prod.google.com ([2002:a05:6214:3912:b0:87c:2644:8d27])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:7dc5:0:b0:4ec:f477:60e9 with SMTP id d75a77b69052e-4ed72645113mr76834131cf.76.1762419301567;
- Thu, 06 Nov 2025 00:55:01 -0800 (PST)
-Date: Thu,  6 Nov 2025 08:55:00 +0000
+	s=arc-20240116; t=1762419372; c=relaxed/simple;
+	bh=rtNfa5atuyqx5VieRmXYmqNBLh9gi6sLYoBx/huGnwI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=o2Q9yRD+vf5Z4DkmZZsZgsVCZOAT625Zuv0PlPCYTE5tjnpxuxCBBulR9HOKM1g9B91AWcSyGbv8ckEUHtFcsO6WMjGDMvNhPoMAcva5kjcXFusgF8PZo9rpq5dccj9upulUSfF71XlG6JjA0F8oSkjA2/6jVkwHqn4NxXX9EeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=BLuqw6uV; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=lrxCokjkJ6fTXIXnxlneNHLsLi1qKTxMMtfg4QSt57I=; b=BLuqw6uV56c8CdShAuoJaVnqWA
+	sWXyMjW+IWjZz7DfX5FnUt9EEE5Y7lmq+R34mrMofiqZSem+Kg7UZTn8ZSrZgQK/MWJJXGczHxd2o
+	YWZ7bMIwfVy1br90DIegN0EfFcG3vYg1IHA+6iMhFaaTeCgaHMCBFduNQ0XZ8JoJGjobDy2CbQMh9
+	2/059E6JZE8aR48vplbta5ZrTn5ob/pMeE4F4NBCXOXwisKRV3mVp5U0zN014h9gStKi8jWRg9tnt
+	fbHx7curmhAlWegLCYye0m/gSxeaUUl6nvhJ+ayFU2zYjMdd5OIJONBNNEeHYsTVSSS7BbVFe3xP+
+	MJbS/b+A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50478)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vGvmi-000000004We-0pZS;
+	Thu, 06 Nov 2025 08:56:00 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vGvmf-000000006WQ-0BLg;
+	Thu, 06 Nov 2025 08:55:57 +0000
+Date: Thu, 6 Nov 2025 08:55:56 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next v2 00/11] net: stmmac: ingenic: convert to
+ set_phy_intf_sel()
+Message-ID: <aQxinH5WWcunfP7p@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.2.1026.g39e6a42477-goog
-Message-ID: <20251106085500.2438951-1-edumazet@google.com>
-Subject: [PATCH net-next] net: add prefetch() in skb_defer_free_flush()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-skb_defer_free_flush() is becoming more important these days.
+On Wed, Nov 05, 2025 at 01:25:54PM +0000, Russell King (Oracle) wrote:
+Convert ingenic to use the new ->set_phy_intf_sel() method that was
+recently introduced in net-next.
 
-Add a prefetch operation to reduce latency a bit on some
-platforms like AMD EPYC 7B12.
+This is the largest of the conversions, as there is scope for cleanups
+along with the conversion.
 
-On more recent cpus, a stall happens when reading skb_shinfo().
-Avoiding it will require a more elaborate strategy.
+v2: fix build warnings in patch 9 by rearranging the code
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/core/dev.c | 1 +
- 1 file changed, 1 insertion(+)
+ .../net/ethernet/stmicro/stmmac/dwmac-ingenic.c    | 165 ++++++---------------
+ 1 file changed, 45 insertions(+), 120 deletions(-)
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 537aa43edff0e4bfedb42593146cfdf7511d8c37..69515edd17bc6a157046f31b3dd343a59ae192ab 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -6782,6 +6782,7 @@ static void skb_defer_free_flush(void)
- 		free_list = llist_del_all(&sdn->defer_list);
- 
- 		llist_for_each_entry_safe(skb, next, free_list, ll_node) {
-+			prefetch(next);
- 			napi_consume_skb(skb, 1);
- 		}
- 	}
 -- 
-2.51.2.1026.g39e6a42477-goog
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
