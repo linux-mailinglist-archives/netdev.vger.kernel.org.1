@@ -1,81 +1,100 @@
-Return-Path: <netdev+bounces-236392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9895BC3BA04
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 15:15:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7759CC3BBCD
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 15:29:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 89D5F1AA569F
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 14:15:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07E5C422B62
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 14:24:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7883B3370F0;
-	Thu,  6 Nov 2025 14:14:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E509342175;
+	Thu,  6 Nov 2025 14:19:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jn4OgOPK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z1cc9OOq";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="MX8E8WqG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5D5D30EF8F
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 14:14:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84A6733F8D7
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 14:19:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762438459; cv=none; b=GraXtgXy4U1h8Efar+ruQSZ7KdcsdNbjuEZupF9bxWEFle+N9Anraa6BKRcve6JMtXIORGuje0wvSidORNHsYz1zU5hC7gcOiILiVaL+x4JzNZVKfG09LklbwqGSNFYUVOWQsThnm1Mf9xqqFnTKnFYoWhDB2AFmRbRu/F5whws=
+	t=1762438743; cv=none; b=SbkfnXMTl8qEVCxoclGog0uyr3iA+B1V/Gp9cdLVjXoaGsvd3ElJcZCBvxgJ1LFgX7uAjpClXjVOMJr2/n3SYZtCLSFNqzKuaGv+9XjkDFs+kZ7rHL473ykYLko532Hbzkxusv8d2TSFHW0GgqMEs8ongNGDWkhkwqzd0s+IBHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762438459; c=relaxed/simple;
-	bh=U/AKouqgbPl/F0fdOW+C39rwVERBZcpoopfH3BTj9CQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bBKU/RjM0KJPtpQup+gWb0FBmWHAbfHCKZm//n8X7sdMJMQJ92nJ7NsC5vyiZifhXuJdWrDn0k8DKTANhx86eObxwl6J5+V5qxMHG7l88mRwdhRN+b0DnAujWtHUJZ/v+CqkYqTOXUvUBBNiWqlAJJBrp4wXCtISB0nq1RZZXTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jn4OgOPK; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7aea19fd91cso1352979b3a.0
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 06:14:16 -0800 (PST)
+	s=arc-20240116; t=1762438743; c=relaxed/simple;
+	bh=ecXPWFAbT2zz2E6hGr3lsgOC2vwHjsIE0/qnPxMclIg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=ldQAypdzTreG0lodVScQyKAi5XLFNXUwEAcUiNY6GskOrJ6R90pBN5HhlXVh8ayGZRl3kqCBr3ZSwa/KFh3etvCwyi7e/m/kbXhz6SFZrowqdsrOhA8hoE3ae0HXYFx2+uo+2Up7X7nAB+oUCs3SQc4+WEzFaH3Ake3hmRoUD5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z1cc9OOq; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=MX8E8WqG; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762438740;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2558/5DuSGeHTSysEKVn43dBQXRVp9ibyTXm/MgXyNU=;
+	b=Z1cc9OOqo23nTkSiBS9XnJMGHjMCY1/vTmvAMXYs/zowtj+c7gkztKUO8Jzmqsf1zqHxAC
+	Hug9JlxEZ103/dgg7Jk9x/JZIKgrOUH8DwKk/lRV7qZHgTPHutR6m0ytFZA3oYveblHJmy
+	yvLI+Y4KFZquNDXHQ+5nu0fzys+nTAI=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-679-qu8DQZpUNtCCHy1pqNI6yw-1; Thu, 06 Nov 2025 09:18:59 -0500
+X-MC-Unique: qu8DQZpUNtCCHy1pqNI6yw-1
+X-Mimecast-MFC-AGG-ID: qu8DQZpUNtCCHy1pqNI6yw_1762438738
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-47106a388cfso5637555e9.0
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 06:18:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762438456; x=1763043256; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1762438738; x=1763043538; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=72EH5m1JIiQ8HjYUz65OXp9Zw63/fhkgRyPRxQjDTxo=;
-        b=Jn4OgOPKRgLDj62PXrzsFsImmbUkS5m2UTPGpXPU9NumtPGQYGnSlTZfIuTvL2XZDe
-         ElGv7aMYeFoq9+k+8qZRblvrPdX8ub/6PY3dDDBD7pqxxHOstxjtqosynbGr3yMk5OOE
-         n/YC12LEEThowyOiq6CkOoVlPpjqkyL+aIAJEU70G5VTmFb22Zvv3I8sCjRKB9F/Ykcc
-         Hqm8cc0ZoxK2coycvPmP1nM8QSNA9F7y7ymqPvBEX/mcruvLprW0inRoEgns1vvuFKoa
-         hUZ3Ubd932KKvxNi+bmSw73YKatlfx8cS040R7PQJeyRhPnG3gRhcqpW552a7jzhPSr6
-         oWYg==
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=2558/5DuSGeHTSysEKVn43dBQXRVp9ibyTXm/MgXyNU=;
+        b=MX8E8WqGP2A//cTJpXEtpNVFwQeSFR9cfCKP3ixLcaqQhj3ezDsbRJ+E1PUiK+jA3o
+         Oyt9bhYwgaIXTI8irjV40OVI0IBHK0n/SFaYq6iSouNrrgNDrRLHD+cCa+w8POzDx4cw
+         d70ZIgh1phTfn0Qorcr4Kqy9lVDHfJGFP8AbX0I9cS1tBadZfDoPo6jDgQxWQRTebLsf
+         sVBZiE2eIoMlK0SmmS91IHNHCBX1hvUM4bK6+1QJxWnG69qb+uZefR9tdVYF+DUlmykK
+         KZAe2R2etXJ06Oi0lUQ6i619ANnow7W1p1wjpVw0uyngyaJ4+Ad/+lMks3bY0mVgxnph
+         DjjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762438456; x=1763043256;
+        d=1e100.net; s=20230601; t=1762438738; x=1763043538;
         h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :references:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=72EH5m1JIiQ8HjYUz65OXp9Zw63/fhkgRyPRxQjDTxo=;
-        b=SpG+qVy6Gxli3JVU9fZWPyWt/tY7D+89AyUXjTk+3mXWt+tkW31hRl8J4PZJJUFEXi
-         vxjUcojEmEc0IFCGSekzSzowPHCNcIy8CErGzXS01MdtcN1huZjrgl7VCxjSG5h3wtBl
-         2sbeH2c9Q1lP7J8e9P4Qk3VxHdmkQvaks/u0j2BhZRCs2S0u5pPNsfhLzu7GIjhVIH88
-         7NXHpH9/wj91fLOvGDd5ZTxJhatY0R3pGPT3M9PK4Yib9RUY1fUKlbpnFL6yayXfuedb
-         I/1wZojJhZ+aRieeHvr7aDGa7/A8cNLwu2H72zzsE3mnPk8cQQPvtA7KvukIRcI8DPkn
-         LLAg==
-X-Forwarded-Encrypted: i=1; AJvYcCUERRe122XQ8oa62tJOZ0owNAmwcwifoN4EvCEEVSetbNfVDfOXZEBLuyRssXeaNLTB0IXSn/A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIx9pdd59RgoRIG99N26J9HEooPEZWc94Ns/g4xecpCQ60r25P
-	cTEkGDijRYNi0Opfmm5SNSRftQgv8tWjmYvxOylmf9Ytw+ugPTioc3Q2
-X-Gm-Gg: ASbGncuNxqIdsHQC7O4dUuoBC9k0BUFRLOalzQDVt06wYCDAtBUlzcW2nKVqbn4T7PI
-	Ta/FDJblNTHOzb2Mb8RfuoX0WavGjkmnxoDpIbj0BcaBYml0vtqrityESptF3uTGrKy3wjwslEA
-	MEMsq0kRbVv0lLSTGVmsCQTF6/bkBKftIcn4AfZKZX92vdovVKgI+gBmTKY81EfCAQ8cTu/JVSr
-	8DI/GW6WDOrULPZ0SYyqJEq44G4zrz7xueQ5LPkuXxkr2PdQY8+O3Cbs3sUzUT0jCTfNMrr2Z1K
-	IcnxK5ZdCE/2TaHgL8CjNxKWj5rHVoRcnlsXrbXt92cxgMrS9lnBBJ4R+hBehEcG1WPVDlgqowt
-	aD3JuHxGBknHBJFLpiuIQjAf97nDTe/Bj/badgtIN39HRhUbFnW5UvNJC/qgZs3ooS5ICGxRONk
-	jeoy/hwVBMBNQMeA5iExE32syauQy6qTAHYIdS1zO7hrOrX7pWG8zxUy4b0xZHJiSTkA4Wqtef
-X-Google-Smtp-Source: AGHT+IEo3lyx4SSF6ocI62uHYt7YAX7f4+Hxtin616U9H0IjwoISSx5SOupuX9cHRYryvyjl4G9V4w==
-X-Received: by 2002:a05:6a20:9186:b0:341:c4e5:f626 with SMTP id adf61e73a8af0-34f838e271dmr8901776637.7.1762438456066;
-        Thu, 06 Nov 2025 06:14:16 -0800 (PST)
-Received: from [192.168.99.24] (i218-47-167-230.s42.a013.ap.plala.or.jp. [218.47.167.230])
-        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-7af82208befsm2890508b3a.39.2025.11.06.06.14.12
+        bh=2558/5DuSGeHTSysEKVn43dBQXRVp9ibyTXm/MgXyNU=;
+        b=s6wzd1/t1GwoQ09ukcHyqgpD7SF6G4CWSXz33FMO+R0iVxEHV1PlhUr3sjFVvjBwMp
+         TSMzxEU5gpJ+w8JUfLIRmWwxUcrUcIgIJFyiVCB7GkBQ9OyFNcNif0vXwEOZQyAlpGhG
+         ODn6INFsGqVwiDuL0Ug5Ceit8u7022W/p7k9rzc7tLNuwHrM+NxEfSn8LSVr9mV19KIQ
+         V7vDWzhARnBVNfAgp4U6o4MDV77PX56VQz2/dyarKzjV5KU2dgXShbRW0ri2cGEoioAW
+         9eNFCwtgqFqvYBbbdIMsCgc+XTL/GTeA9rtccB/Id2G99NJ6Bsq1tVdObPm30s8lljT5
+         RxVA==
+X-Forwarded-Encrypted: i=1; AJvYcCVnz0vzAKBvCjzdLu5+C9ISPOjUi/wfs83L+k+y+MA+AUAlAGRzfOoHAsw3QItwYQMUc35zcgk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywz/fgKtD4L4OnizW0wf2YBGtlygvsV3nnWtzLJnJhQ4LhyF8Bj
+	rD+uRSpiQ8zea2hB66GM2PFk0Ha8GMUV5ekxBe5oiEjF8KSFzebm44bfzM7kP0rGO+iLVdG3mUz
+	hqQJNgiLOKafVb/YEGV3uz6Hnww/SE40ZJH/loMCNGOVFzcgNp9FYZ8Ld9A==
+X-Gm-Gg: ASbGncsMmBaXXnaQ4hDFN+OoO6h9NGwWiJ6tGZyproQswhcEq3d5bNl0MD9MOgaMQIL
+	+HGAjiIZAk/OSHCkGJtLpLhKNCqcLhaAS5i+4ugEwJ1tlhn6tPMZmoKB1rCjA3IREdzeyjzxYYX
+	64IhiPAYTaoo+7JYJMtLQezfWz92mkQCcVXAD5Ou4oGcvD0FGd0jlBmEupu/a8W8qUHnsWvegzn
+	aDnFDyF1POqgLgGu2vuKkWoEt1sKRc5pqixbb57fFhzJrfECqe7MVBLMwfXtGSCxVrgJTYLlFja
+	xlsFVDPz5tnhkVHK+ctgpbsWOnIt+FEuoaVcXEB7ogMO2z7s/3NWuAcQJy9MIBbalTgbZims3Ha
+	kog==
+X-Received: by 2002:a05:600c:1552:b0:475:dd8d:2f52 with SMTP id 5b1f17b1804b1-4775ce3f136mr88569335e9.32.1762438738000;
+        Thu, 06 Nov 2025 06:18:58 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFn0NuCZ5fprkStyYtobcANdwvR7UeicN84jVnofOHneho0o5wIY1CsG7J8Q2tZQ79l336p/Q==
+X-Received: by 2002:a05:600c:1552:b0:475:dd8d:2f52 with SMTP id 5b1f17b1804b1-4775ce3f136mr88568195e9.32.1762438736530;
+        Thu, 06 Nov 2025 06:18:56 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.83])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429eb403849sm5669190f8f.1.2025.11.06.06.18.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Nov 2025 06:14:15 -0800 (PST)
-Message-ID: <4abd5327-ccb7-4dbc-9b09-e98069312e2f@gmail.com>
-Date: Thu, 6 Nov 2025 23:14:11 +0900
+        Thu, 06 Nov 2025 06:18:56 -0800 (PST)
+Message-ID: <d9b8ec8a-f541-4356-8c42-e29adced59c0@redhat.com>
+Date: Thu, 6 Nov 2025 15:18:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,71 +102,108 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net V3 2/2] veth: more robust handing of race to avoid txq
- getting stuck
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Eric Dumazet <eric.dumazet@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, ihor.solodrai@linux.dev,
- "Michael S. Tsirkin" <mst@redhat.com>, makita.toshiaki@lab.ntt.co.jp,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kernel-team@cloudflare.com,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
- netdev@vger.kernel.org
-References: <176236363962.30034.10275956147958212569.stgit@firesoul>
- <176236369968.30034.1538535221816777531.stgit@firesoul>
+Subject: Re: [PATCH net-next v2] ppp: enable TX scatter-gather
+To: Qingfang Deng <dqfext@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, linux-ppp@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20251103031501.404141-1-dqfext@gmail.com>
 Content-Language: en-US
-From: Toshiaki Makita <toshiaki.makita1@gmail.com>
-In-Reply-To: <176236369968.30034.1538535221816777531.stgit@firesoul>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251103031501.404141-1-dqfext@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 2025/11/06 2:28, Jesper Dangaard Brouer wrote:
-> Commit dc82a33297fc ("veth: apply qdisc backpressure on full ptr_ring to
-> reduce TX drops") introduced a race condition that can lead to a permanently
-> stalled TXQ. This was observed in production on ARM64 systems (Ampere Altra
-> Max).
-> 
-> The race occurs in veth_xmit(). The producer observes a full ptr_ring and
-> stops the queue (netif_tx_stop_queue()). The subsequent conditional logic,
-> intended to re-wake the queue if the consumer had just emptied it (if
-> (__ptr_ring_empty(...)) netif_tx_wake_queue()), can fail. This leads to a
-> "lost wakeup" where the TXQ remains stopped (QUEUE_STATE_DRV_XOFF) and
-> traffic halts.
-> 
-> This failure is caused by an incorrect use of the __ptr_ring_empty() API
-> from the producer side. As noted in kernel comments, this check is not
-> guaranteed to be correct if a consumer is operating on another CPU. The
-> empty test is based on ptr_ring->consumer_head, making it reliable only for
-> the consumer. Using this check from the producer side is fundamentally racy.
-> 
-> This patch fixes the race by adopting the more robust logic from an earlier
-> version V4 of the patchset, which always flushed the peer:
-> 
-> (1) In veth_xmit(), the racy conditional wake-up logic and its memory barrier
-> are removed. Instead, after stopping the queue, we unconditionally call
-> __veth_xdp_flush(rq). This guarantees that the NAPI consumer is scheduled,
-> making it solely responsible for re-waking the TXQ.
->    This handles the race where veth_poll() consumes all packets and completes
-> NAPI *before* veth_xmit() on the producer side has called netif_tx_stop_queue.
-> The __veth_xdp_flush(rq) will observe rx_notify_masked is false and schedule
-> NAPI.
-> 
-> (2) On the consumer side, the logic for waking the peer TXQ is moved out of
-> veth_xdp_rcv() and placed at the end of the veth_poll() function. This
-> placement is part of fixing the race, as the netif_tx_queue_stopped() check
-> must occur after rx_notify_masked is potentially set to false during NAPI
-> completion.
->    This handles the race where veth_poll() consumes all packets, but haven't
-> finished (rx_notify_masked is still true). The producer veth_xmit() stops the
-> TXQ and __veth_xdp_flush(rq) will observe rx_notify_masked is true, meaning
-> not starting NAPI.  Then veth_poll() change rx_notify_masked to false and
-> stops NAPI.  Before exiting veth_poll() will observe TXQ is stopped and wake
-> it up.
-> 
-> Fixes: dc82a33297fc ("veth: apply qdisc backpressure on full ptr_ring to reduce TX drops")
-> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+On 11/3/25 4:15 AM, Qingfang Deng wrote:
+> When chan->direct_xmit is true, and no compressors are in use, PPP
+> prepends its header to a skb, and calls dev_queue_xmit directly. In this
+> mode the skb does not need to be linearized.
+> Enable NETIF_F_SG and NETIF_F_FRAGLIST, and add
+> ppp_update_dev_features() to conditionally disable them if a linear skb
+> is required. This is required to support PPPoE GSO.
 
-Reviewed-by: Toshiaki Makita <toshiaki.makita1@gmail.com>
+It's unclear to me why IFF_NO_QUEUE is necessary to avoid the
+linearization.
+> Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+> ---
+> v1 -> v2:
+>  Changes dev->features under the TX spinlock to avoid races.
+>  - https://lore.kernel.org/netdev/20250912095928.1532113-1-dqfext@gmail.com/
+> 
+>  drivers/net/ppp/ppp_generic.c | 30 ++++++++++++++++++++++++++++++
+>  1 file changed, 30 insertions(+)
+> 
+> diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
+> index 854e1a95d29a..389542f0af5f 100644
+> --- a/drivers/net/ppp/ppp_generic.c
+> +++ b/drivers/net/ppp/ppp_generic.c
+> @@ -498,6 +498,17 @@ static ssize_t ppp_read(struct file *file, char __user *buf,
+>  	return ret;
+>  }
+>  
+> +static void ppp_update_dev_features(struct ppp *ppp)
+> +{
+> +	struct net_device *dev = ppp->dev;
+> +
+> +	if (!(dev->priv_flags & IFF_NO_QUEUE) || ppp->xc_state ||
+> +	    ppp->flags & (SC_COMP_TCP | SC_CCP_UP))
+> +		dev->features &= ~(NETIF_F_SG | NETIF_F_FRAGLIST);
+> +	else
+> +		dev->features |= NETIF_F_SG | NETIF_F_FRAGLIST;
+> +}
+> +
+>  static bool ppp_check_packet(struct sk_buff *skb, size_t count)
+>  {
+>  	/* LCP packets must include LCP header which 4 bytes long:
+> @@ -824,6 +835,7 @@ static long ppp_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
+>  	case PPPIOCSFLAGS:
+>  		if (get_user(val, p))
+>  			break;
+> +		rtnl_lock();
+>  		ppp_lock(ppp);
+>  		cflags = ppp->flags & ~val;
+>  #ifdef CONFIG_PPP_MULTILINK
+> @@ -834,6 +846,12 @@ static long ppp_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
+>  		ppp_unlock(ppp);
+>  		if (cflags & SC_CCP_OPEN)
+>  			ppp_ccp_closed(ppp);
+> +
+> +		ppp_xmit_lock(ppp);
+> +		ppp_update_dev_features(ppp);
+> +		ppp_xmit_unlock(ppp);
+> +		netdev_update_features(ppp->dev);
+> +		rtnl_unlock();
+>  		err = 0;
+>  		break;
+>  
+> @@ -1650,6 +1668,8 @@ static void ppp_setup(struct net_device *dev)
+>  	dev->flags = IFF_POINTOPOINT | IFF_NOARP | IFF_MULTICAST;
+>  	dev->priv_destructor = ppp_dev_priv_destructor;
+>  	dev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
+> +	dev->features = NETIF_F_SG | NETIF_F_FRAGLIST;
+> +	dev->hw_features = dev->features;
+>  	netif_keep_dst(dev);
+>  }
+>  
+> @@ -3112,13 +3132,17 @@ ppp_set_compress(struct ppp *ppp, struct ppp_option_data *data)
+>  	if (data->transmit) {
+>  		state = cp->comp_alloc(ccp_option, data->length);
+>  		if (state) {
+> +			rtnl_lock();
+>  			ppp_xmit_lock(ppp);
+>  			ppp->xstate &= ~SC_COMP_RUN;
+>  			ocomp = ppp->xcomp;
+>  			ostate = ppp->xc_state;
+>  			ppp->xcomp = cp;
+>  			ppp->xc_state = state;
+> +			ppp_update_dev_features(ppp);
+>  			ppp_xmit_unlock(ppp);
+> +			netdev_update_features(ppp->dev);
+> +			rtnl_unlock();
+
+Instead of dynamically changing the features, what about always exposing
+SG and FRAGLIST and linearize the skb as need for compression's sake?
+
+/P
 
 
