@@ -1,219 +1,226 @@
-Return-Path: <netdev+bounces-236157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BEBDC38E7D
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 03:43:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B239EC38EA7
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 03:49:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32AE23B6592
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 02:41:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F68118971E0
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 02:50:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05FEE261574;
-	Thu,  6 Nov 2025 02:41:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E31301DA0E1;
+	Thu,  6 Nov 2025 02:49:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Z8WweTmX"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GAnZ93OL"
 X-Original-To: netdev@vger.kernel.org
-Received: from CO1PR03CU002.outbound.protection.outlook.com (mail-westus2azon11010065.outbound.protection.outlook.com [52.101.46.65])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E75B23EABB;
-	Thu,  6 Nov 2025 02:41:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.46.65
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762396875; cv=fail; b=gT/M3GbtGmF3d13GmbkCboQojsXWWP/XlxDxKpNZuRqBzvKUQoZAW6ehbXHM/DkN7PmWZU+TBzcaV/wOB/J4Om/bwfG7H9MaH+6x9nLOQ/dVcK0bGWAJA2CQ58K0hI4bdZ5eQ5eQdNOJ7xeN3kA7K6l65jjRvWv/Krko740oCIc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762396875; c=relaxed/simple;
-	bh=GJgURzD84RZ/ds8zqAXd09PLXQdTL45BK5+/7qAoR+8=;
-	h=From:Date:Subject:Content-Type:Message-Id:References:In-Reply-To:
-	 To:Cc:MIME-Version; b=oUGyNi6WBJ0poHkPiutHEYZzyQ0kqI6UD/cApQjtFdCQhf9Fdd951kqT87nT8nFoeHNLi8eEcWK6obJrd/+2lz6EfDlZCO8Ppjq8c61hnhim0F8JT4CiD/DmW7EYjRNiadmdytcyGzLV29BQ6TpU84Wwlv4Dh77nhGU/lo3jO70=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Z8WweTmX; arc=fail smtp.client-ip=52.101.46.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wG1EgAxMe1aZUCj9ueikG1XWc1Ny8kw9UzrTA9EJKwGrn8lRBFDmq0ZApRo9a1i4wOMYG02qRis6SVd/gEqpRzpP+B5gvH24FBrpA9QxIsaS/kYv3ySW8wyOt7pzsiih6BLKZ47zHZ5IWRSU97CDN7sla81Va5b7La9KHPaRVMo2/aIBPEgDFdM8gOr7h09f+WRijp1czis3B/nfiCTcUQHNrzJpGJOkqyJZY+kqd+Ptg1NLM7zZtv16ZjVBz7YiForcEhZt8LXoRCwu4O6+UdCgi0rp9TNUSVFMpwmRr8plh7WAnmo4fww9BgkX1Q6+sFBT0CMvLyd0feIo+p9FPQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XgpTM4UUJG9Mo1/w7ZqOqGqIm+b+j/aIs5b7qof7XUc=;
- b=LVCBiJqG2CiDt5u09m/9iVknO/vkYdR2k7B7lIp2r7W/NWmbZdvf8/rZKbm+sw2b4o2e8YXGtRkXeoPDcjrgww/2qNHgnCojGxqo7M6bur5toD4g+wRonKaGcNXqvASxBdhZ1QFI4ia7yD7B7PyON6NxTktY24Es5nvzf1YizuwRJR7BKNw33lmKRcY/ozlL66msrxo0NYK8i7lpSnUyYXhRFOXZCtnduCs8yFIVlTUq2E+JgkiWqalO/yfDEgkT7767h0+FfBb9BaJpBjML+t0R6SUjbYJCzTOGdOj2FqB9VZnhRxooWHzObecWmcHCPrUxu2SLEyxtL2LDeg84SA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XgpTM4UUJG9Mo1/w7ZqOqGqIm+b+j/aIs5b7qof7XUc=;
- b=Z8WweTmXbHeGgP/ZCh3xGSdJMDv6ztFecEvxMMyKkxmsY2RQkp4i5jWY9dQ8gn0DVi7aClBeTQUNsLsAlNj/B4nDHrrXxZ06kBr3BjHyPNgdA5wwqWxptxWEgY/YGsUupv8lNjz4DirLmgar4gke2cF4pp16X/pRf4NSEtF0cAfzMwaiCZ3PIhVZ+cfeQ6Tvt5KhIKhbmZR+BzwIQFiF1X0eyU/ergPnF3KqdLfiAe9v2PjxnAHZDVC0NtC4q4Oe0JAfvtI5ckMxMWSrBp6Zm9MIJn+KC7W/7/Nu9ZM/8UNtM1jxn4clbn+ARq5q3IMZ/eE8frPeUkzOGWXug6a0Tg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH2PR12MB3990.namprd12.prod.outlook.com (2603:10b6:610:28::18)
- by CH3PR12MB8330.namprd12.prod.outlook.com (2603:10b6:610:12c::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.8; Thu, 6 Nov
- 2025 02:41:11 +0000
-Received: from CH2PR12MB3990.namprd12.prod.outlook.com
- ([fe80::7de1:4fe5:8ead:5989]) by CH2PR12MB3990.namprd12.prod.outlook.com
- ([fe80::7de1:4fe5:8ead:5989%6]) with mapi id 15.20.9298.007; Thu, 6 Nov 2025
- 02:41:11 +0000
-From: Alexandre Courbot <acourbot@nvidia.com>
-Date: Thu, 06 Nov 2025 11:40:56 +0900
-Subject: [PATCH v3 3/3] net: phy: select RUST_FW_LOADER_ABSTRACTIONS
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251106-b4-select-rust-fw-v3-3-771172257755@nvidia.com>
-References: <20251106-b4-select-rust-fw-v3-0-771172257755@nvidia.com>
-In-Reply-To: <20251106-b4-select-rust-fw-v3-0-771172257755@nvidia.com>
-To: Luis Chamberlain <mcgrof@kernel.org>, 
- Russ Weight <russ.weight@linux.dev>, Danilo Krummrich <dakr@kernel.org>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- "Rafael J. Wysocki" <rafael@kernel.org>, Alice Ryhl <aliceryhl@google.com>, 
- David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>, 
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
- Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
- Benno Lossin <lossin@kernel.org>, Andreas Hindborg <a.hindborg@kernel.org>, 
- Trevor Gross <tmgross@umich.edu>, 
- FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: linux-kernel@vger.kernel.org, nouveau@lists.freedesktop.org, 
- dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, 
- rust-for-linux@vger.kernel.org, Alexandre Courbot <acourbot@nvidia.com>
-X-Mailer: b4 0.14.3
-X-ClientProxiedBy: TY4PR01CA0035.jpnprd01.prod.outlook.com
- (2603:1096:405:2bd::17) To CH2PR12MB3990.namprd12.prod.outlook.com
- (2603:10b6:610:28::18)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C684318EB0
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 02:49:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762397390; cv=none; b=Z08BUxzP/OVbuwr+Y9o3HDIWjuOuUqkQKsifiTfCAsjuw6lBOYD1FVCbWHwdor21QYu44jAig3uIx3/rmnrhaU1YDItYyR20Qq88SxjdhGk7uwiBafmY3kwZMCoUFa1mCZtjIAxk25x6/BHECT4eIfgGHawl3FGb0nILH3mbFRg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762397390; c=relaxed/simple;
+	bh=vQ/McxPm2JVkzOct60ti+ChfxcBIIFbFDgFc0Uds71I=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lw5W8l5k3/iQ27H674QK7kF7Mp4JfvMTh9pj3cEj5hFFqtB2VYnx0DWb7ZkHa0ta7SZqqTORcriAUikD/QVyDx6zIxZKXit5gNPTAd+cZA1nqFZDrwIS+J5vF4o7CK0wIOH1VNEy8eaWb7cm2WJs4lBEWbtOSC5D0+OEkG57rkk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GAnZ93OL; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1762397375;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jQAy4nvk0o7JePySAmT7ZNDyoiHRu9epaOJRLcJJSPw=;
+	b=GAnZ93OL2V4Z0U/GlDI37wrF/3441WtAp7+6wZ5Fl5QQq0VkgC3JGRK59fEhYFChGG4pFi
+	3cfHqf/gtINZkOaUOXhdgeOXSM3LQnpvr0HDyszmjerjBof6mhDA48mvqTj76QVlbFqQTB
+	8+vfAaAnv4yia+vcm3lPlJYG3sC3HUY=
+From: Menglong Dong <menglong.dong@linux.dev>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Peter Zijlstra <peterz@infradead.org>,
+ Menglong Dong <menglong8.dong@gmail.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
+ Eduard <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ David Ahern <dsahern@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>,
+ "H. Peter Anvin" <hpa@zytor.com>, jiang.biao@linux.dev,
+ bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>,
+ LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH bpf-next] bpf,x86: do RSB balance for trampoline
+Date: Thu, 06 Nov 2025 10:49:21 +0800
+Message-ID: <2388519.ElGaqSPkdT@7950hx>
+In-Reply-To: <5053516.31r3eYUQgx@7950hx>
+References:
+ <20251104104913.689439-1-dongml2@chinatelecom.cn>
+ <CAADnVQLX54sVi1oaHrkSiLqjJaJdm3TQjoVrgU-LZimK6iDcSA@mail.gmail.com>
+ <5053516.31r3eYUQgx@7950hx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PR12MB3990:EE_|CH3PR12MB8330:EE_
-X-MS-Office365-Filtering-Correlation-Id: 39ca58f4-51e2-468a-fb4a-08de1cddf275
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|7416014|376014|10070799003|366016|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?bWszRXZveWpRL1YrcHhER0hCMDVMTnFGQldlUWEvTDAyd3Q5YVdrbkw4Nm9J?=
- =?utf-8?B?bjB6YXZIWG9lMXNXUTZ5aXFubjlLbXB6bXMzYkxSOHJqeVFmNVRuQytOL3Zx?=
- =?utf-8?B?a3htUTMwMzZTTXZjbzlVUTZJamw4RjVpcUNtMTkvMVFqV3BySkZUckttYlVa?=
- =?utf-8?B?aDlObzdPTUpVdkJWbVB3ZFZpL2V2K05CY3FCQVZkMUtIMlVaNmpPemFHWXll?=
- =?utf-8?B?VGJmcC9Dak1IYmlvTlFsbGFubnc3TlpVQ3JXZkIrckpzNVltU3V3aEtMK3V2?=
- =?utf-8?B?dkZFdU9TMHl0QU01eDlhd1l6U3RTRnRKckU1dFBBS1F4UU9pSDFMSHdob0Jn?=
- =?utf-8?B?LzJNblhObmc1RUczYVpQYnhYOEIwWTJQK3ZiL0JoWUg4ZkN5Y0tDLzhEeEx2?=
- =?utf-8?B?aGhkUkRZSlNMcEtFZSt4UlllZFRiY1FXU1VoSGx5NFFBbjBmWGc4b21vbkdm?=
- =?utf-8?B?dzlXc0hYWUtCQ09XK3UrNUdWSlpLK2hyQUhGcm1uUit5M3ovSEtJRmh4YWkx?=
- =?utf-8?B?T2h0VEtEaklxSnZqMVV0WnA0TTlnak9ucjlPYTlQQnFJUHNwRG9GTTA5ZW03?=
- =?utf-8?B?NUJSbWhLRXBiWHE3WjhHZFZiRTE2bzJOWXYvWE9aSzd6UmY5Q3FMTFdXSGQz?=
- =?utf-8?B?cEJtbkw1TWpwRlQwS0FjNWorRzA5Z01DWW45Ym9FMktYVkhlb0FDYytleFpr?=
- =?utf-8?B?UjAraEIrVm9GREJrNmJwRXJSbjVkWG4rYUxHT3JIQng1SGVFbVNZQk1aUW83?=
- =?utf-8?B?UmNTWnhrbjlLQjNVbjhYZTFpRHl2Z3I2T3JpMFZGeklFWVd3eHhWWm91SW9K?=
- =?utf-8?B?cFhKT2RaRVAxbG8vTzgxVWZoczlFSG1LdlM3R1hrWUc2M1IzS1UySDBDMUV2?=
- =?utf-8?B?cXR2RTNjb1RhN1pIaFQ5b3VYM2xtcm1INEljWndPL1hyR1ZiUVI5eDNHMGRH?=
- =?utf-8?B?eEMvVHlpMGgzNlMxTTNKTEpZU3NqNlp1em4vaEprS3g3UlBkenFjMUtUWGxK?=
- =?utf-8?B?dUp5MVJJRDJBZjNCakFsMVUyY2dGeG1mbVZ0Vmd5MmJpOUtXaE1jZEwxY0Z5?=
- =?utf-8?B?TG5TYW1GQTJ1M05SSVZRdWpwdTlBcmxFdGREMjhxa1VvT1h0d1ZNWFNYNHdj?=
- =?utf-8?B?SlN0NWpPWnFBd0ZWTzNRdlhPTVJnOFRkdW1nZ2JaeEZVclNHNk9ITUM5eUlL?=
- =?utf-8?B?OFpLbjM1c2h3VUkwYXh4WUM4bjZGVGpyYjFuK3NJcHdEZjBkRTVBM0RibzdT?=
- =?utf-8?B?MFBGWFJIYStmWmxNMTc1ckdDaStReEROS1RXaUZaa1lCeVZsYUxZOUpjNFMr?=
- =?utf-8?B?UitFTnlWRytjRGlPOStIWG1WL0ZLQTZjSjllMm9KVXBKOExyOEZORERpd2xz?=
- =?utf-8?B?ck84VE9CQjZycVRQbi9YMU1qTmdEWTh3TTRaNjloSWhBdjcxSlNZaDZUK0dz?=
- =?utf-8?B?c0IrODJ0aTd2cXoxUXdiMnpOY0Jna1hsTy9jVnNDWWJMWEtLR2tCUzd1NGVl?=
- =?utf-8?B?TkNURDNYaHdTLzlVMS90K0FVTFdlYjFkNWNaQWdXVUZUUTU4TVpCdk9pNXdD?=
- =?utf-8?B?WFJEZ0NLSFBjVDJEbExlR1FSUEx4SlRQam1yQUxBcG5FRE55SHhyR1poaFp6?=
- =?utf-8?B?VkdRQU9VcDcwemNReUpreUV6dDlRK0QvN2FITCtmWE1DMjV3RVFtTXlFM1hQ?=
- =?utf-8?B?TW1zTW4zNjlvOWMrNHdwemlXR3RHVmZxRXR4bnRNeGJLTnladmVrMmZ0eTk3?=
- =?utf-8?B?VDA4NXBwUGpMcHhyYlVJSlFwakZ3WFZFZHJpZENNeG11UEdkaUZDTDBuZG8y?=
- =?utf-8?B?TjB1OVBxRjNPK2FpY2ZTT2JZRHRzSHVRRXArQk9nSS9kWmtLMEFkSjRmSFJQ?=
- =?utf-8?B?ejdkU2RBTXFHb2N5aXh6OEN5RlVDbDE4NlNEa1FVeDM0Y2RQSk5maWI2UHNF?=
- =?utf-8?B?Ty9kcmNyWk02cTlYVXFHS0RWaGpUeGIwWjd5SzdZYm5UUTRPa2tpS25WMHBn?=
- =?utf-8?Q?F1bYNNIVYuCYKhhdgmjyVKO52YTCZ4=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH2PR12MB3990.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(10070799003)(366016)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?dkZoUFh1b1lZSkNHUnh4MmpnRk1aL3Ewa2Myd0dRL3h4bjhVSVkxa09PaDFV?=
- =?utf-8?B?Y3UvU3JjdnF0czIrWXYzQTR6andDNjNON0w1RUttRmdFTVNkckRHU012ajgr?=
- =?utf-8?B?VXhNUlZZU0hKZHlITm56MFZOb1dUVDdrZnFMeVdUNTBQOU9ReDErQkdxWkQz?=
- =?utf-8?B?Y1ZWaVpHRHZIRHFNSllDVXFpUFVvdVIxZjdhSDBIV0ZQZmJ3dHVjT2lKUzV2?=
- =?utf-8?B?dHprMVVTUjNGMkhOaElLNWgrZk10OHloT3hUWlF1cmU2bzZzUHNpUGJFTEZU?=
- =?utf-8?B?czE5bHJuL0Z5MEhXb2VWZVI2TlNPRHNncGFiK2N1b3h0ZHA4SXB1akRlYW5O?=
- =?utf-8?B?ZmNhdWkvMFVLNGwrcHh0M0VsY25UdGNOMnYvTzF1UGpFVjJnRlhwUVd1QnlU?=
- =?utf-8?B?UmtlYngrNDZEQ3k0OFBVVFJ4dGpBam5HUDkvUnR5NGhEUmJtZDVrN0FHN2Fi?=
- =?utf-8?B?azJ1UnB0YU1FS01hZXZReXFvKzROMmMwNVlhbytqOUhLODZtVlNjZkpvTVUr?=
- =?utf-8?B?VTBMVlVLNDFzU21FWmdobFBYL0NzSjdLY2lGeHFUSjhBbkNOVkZhMVNNYmUz?=
- =?utf-8?B?cXJZNHJ6bE5WYW1Ub3hlM2hkMVJRUUpoQ0hNb2lLNzIyMGVxRVEwVlpTRUIx?=
- =?utf-8?B?NXFoQnE2dXlVeGRyTTkraVV2UThQMk9DRlFRUGJFazRNYUZSQTA4bXB1MVBM?=
- =?utf-8?B?WlpReWFmRHNObWxsMUNhNldVaE1iL0NGSXN2dnVvdFNuNjlDNi9QS2NYSlJj?=
- =?utf-8?B?NWZmUzFpWUJMOERqa0ZyR2lIMFpBcnl2WWxSdFc5WTc0WXQyL1Q4VjVldyt2?=
- =?utf-8?B?blNHUFZVeHY3Q2FZWlVPS2dFbXBHQkRlTXhBdloyd01NQlR4aUJsMHBoUGVK?=
- =?utf-8?B?TUNvb1RpLzA5MUNEcnRIQ2MrZmsxbE9JTGF5UUhnNUhiOG9KTk1wUDF2R0U2?=
- =?utf-8?B?bUtKYlMzb2xGelJMREh4OTBIRnpzRHl2UkxlWjk2dXNUMWtBOFh2UUJiY1Jh?=
- =?utf-8?B?TTJrNWxDL01wbVVaWnhjcFFyYld1VHRtc3dGZ2tPZzlNWmI1QmpjQzRVMGla?=
- =?utf-8?B?QzJtSEtrR2kxOTRjMmhMMWpVbThiMGZnMUFXeGFpUjdUeCtaelM4SEFiQ2R4?=
- =?utf-8?B?SUoxY2J0aTlEOW5VVi8zUlg0VUNac3VaRzBMU2V1YkdueFA5U2NiZmYwYmd0?=
- =?utf-8?B?bHczT1VGa2RSVUpiRDRROUx5V1BUeEcrK1Fmcm0veFpJZTBXT1d1bktMVVlu?=
- =?utf-8?B?MFlORE10bDlRU0M4RXFyakg2dnFCd1AxYXZPQTZta0R0UERnMXVRVU5rRTh6?=
- =?utf-8?B?cXdDbjRuK1JENXErKzVpSFhtN0tCanhKUlBPT2QzRk1hYlRRcm9pWGtCcG1W?=
- =?utf-8?B?MWJKREpHcG13dTN5OGVzOG1saXlmQVdGanY2M0ZjRWY4c2tNNmV5Zm1Ja0VG?=
- =?utf-8?B?N0hhWWhtYmU3WDZpYjhKWmdDY2JqSzdkWVphalptUFpJR0hCc0VFdENEckhv?=
- =?utf-8?B?UU5rNFF6WjE3VTRVTWxaamlLM3drdVAwRUJoRWF1U1pOVjdIWVlEUWlkVGsv?=
- =?utf-8?B?dnkrV3c1WnFiVGxNcU9BTC9KaTRpeWJVTWhhVUwydDFlQnNsdk1GdjI2b3lI?=
- =?utf-8?B?VDNzVnRlZ043YTJIOVpvOFBWUytkVzhjT3k0UzhRK2dtKzdwTjF0ZHNLdzlx?=
- =?utf-8?B?ZWtPZGN0dVZzeWhLR1ovRjFRK2duQkozbzFLbHZDNXRlaFRLc1FHOEFqMVVV?=
- =?utf-8?B?ZXhZclRzMDFXTTdtVVd3ZzFQR21wWTZwdU5acGR6WHJEVG5qTUc3bUw4eFJT?=
- =?utf-8?B?V1RxWG5ZRW9VbnBrL2NTd2lpKy8wbTIzRU83WllsVUZSamk0b0tPd1RKT3lB?=
- =?utf-8?B?em8zcncyMUlBcHBiVmhpYXVLQVNnSXVacndkeGlMcjNrTWtDZWoyVm91UlhZ?=
- =?utf-8?B?djBtT2pNaWJST2RQOW9DRFJLWm8rM3BUalNPd0pnTllzOUJjSkxYaFlNdnNm?=
- =?utf-8?B?VmtBeUg0bTRBY1V3QlRLR2lRaXJ1VzcrSFZNbW9iMlpRTFpiVWNhTjgyWVI2?=
- =?utf-8?B?M3NJeWx0Z0c0SGRXajFvbUhHOFg2RjBRLzNyZEJLZlpxdHI0ZzNpd0N6Z0Vj?=
- =?utf-8?B?UWF2Tm1wdFlUc1hmNWlWNDZ3dkpxcjg1SGRWdHJ2RmVsMko3NXdqL2ZjaTVp?=
- =?utf-8?Q?ColBxerLh2ysX5d6nykzb5bVbSmEsHwNZ6YdbzXS8qSP?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 39ca58f4-51e2-468a-fb4a-08de1cddf275
-X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB3990.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2025 02:41:11.7027
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: K5XBAbuoX1EfzSDr2JVeV4ewrlRIWYu5QRh0aCp6X2+bTIVLrsYiEQlEE9mLPBQa0jBGjMnug9C9iroaqBtSzA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8330
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Migadu-Flow: FLOW_OUT
 
-The use of firmware_loader is an implementations detail of the driver,
-so it should be enabled along with it. The non-Rust option FW_LOADER is
-typically selected rather than depended on, let's make the Rust
-abstraction behave the same.
+On 2025/11/6 09:40, Menglong Dong wrote:
+> On 2025/11/6 07:31, Alexei Starovoitov wrote:
+> > On Tue, Nov 4, 2025 at 11:47=E2=80=AFPM Menglong Dong <menglong.dong@li=
+nux.dev> wrote:
+> > >
+> > > On 2025/11/5 15:13, Menglong Dong wrote:
+> > > > On 2025/11/5 10:12, Alexei Starovoitov wrote:
+> > > > > On Tue, Nov 4, 2025 at 5:30=E2=80=AFPM Menglong Dong <menglong.do=
+ng@linux.dev> wrote:
+> > > > > >
+> > > > > > On 2025/11/5 02:56, Alexei Starovoitov wrote:
+> > > > > > > On Tue, Nov 4, 2025 at 2:49=E2=80=AFAM Menglong Dong <menglon=
+g8.dong@gmail.com> wrote:
+> > > > > > > >
+> > > > > > > > In origin call case, we skip the "rip" directly before we r=
+eturn, which
+> > > > > > > > break the RSB, as we have twice "call", but only once "ret".
+> > > > > > >
+> > > > > > > RSB meaning return stack buffer?
+> > > > > > >
+> > > > > > > and by "breaks RSB" you mean it makes the cpu less efficient?
+> > > > > >
+> > > > > > Yeah, I mean it makes the cpu less efficient. The RSB is used
+> > > > > > for the branch predicting, and it will push the "rip" to its ha=
+rdware
+> > > > > > stack on "call", and pop it from the stack on "ret". In the ori=
+gin
+> > > > > > call case, there are twice "call" but once "ret", will break its
+> > > > > > balance.
+> > > > >
+> > > > > Yes. I'm aware, but your "mov [rbp + 8], rax" screws it up as wel=
+l,
+> > > > > since RSB has to be updated/invalidated by this store.
+> > > > > The behavior depends on the microarchitecture, of course.
+> > > > > I think:
+> > > > > add rsp, 8
+> > > > > ret
+> > > > > will only screw up the return prediction, but won't invalidate RS=
+B.
+> > > > >
+> > > > > > Similar things happen in "return_to_handler" in ftrace_64.S,
+> > > > > > which has once "call", but twice "ret". And it pretend a "call"
+> > > > > > to make it balance.
+> > > > >
+> > > > > This makes more sense to me. Let's try that approach instead
+> > > > > of messing with the return address on stack?
+> > > >
+> > > > The way here is similar to the "return_to_handler". For the ftrace,
+> > > > the origin stack before the "ret" of the traced function is:
+> > > >
+> > > >     POS:
+> > > >     rip   ---> return_to_handler
+> > > >
+> > > > And the exit of the traced function will jump to return_to_handler.
+> > > > In return_to_handler, it will query the real "rip" of the traced fu=
+nction
+> > > > and the it call a internal function:
+> > > >
+> > > >     call .Ldo_rop
+> > > >
+> > > > And the stack now is:
+> > > >
+> > > >     POS:
+> > > >     rip   ----> the address after "call .Ldo_rop", which is a "int3"
+> > > >
+> > > > in the .Ldo_rop, it will modify the rip to the real rip to make
+> > > > it like this:
+> > > >
+> > > >     POS:
+> > > >     rip   ---> real rip
+> > > >
+> > > > And it return. Take the target function "foo" for example, the logic
+> > > > of it is:
+> > > >
+> > > >     call foo -> call ftrace_caller -> return ftrace_caller ->
+> > > >     return return_to_handler -> call Ldo_rop -> return foo
+> > > >
+> > > > As you can see, the call and return address for ".Ldo_rop" is
+> > > > also messed up. So I think it works here too. Compared with
+> > > > a messed "return address", a missed return maybe have
+> > > > better influence?
+> > > >
+> > > > And the whole logic for us is:
+> > > >
+> > > >     call foo -> call trampoline -> call origin ->
+> > > >     return origin -> return POS -> return foo
+> > >
+> > > The "return POS" will miss the RSB, but the later return
+> > > will hit it.
+> > >
+> > > The origin logic is:
+> > >
+> > >      call foo -> call trampoline -> call origin ->
+> > >      return origin -> return foo
+> > >
+> > > The "return foo" and all the later return will miss the RBS.
+> > >
+> > > Hmm......Not sure if I understand it correctly.
+> >=20
+> > Here another idea...
+> > hack tr->func.ftrace_managed =3D false temporarily
+> > and use BPF_MOD_JUMP in bpf_arch_text_poke()
+> > when installing trampoline with fexit progs.
+> > and also do:
+> > @@ -3437,10 +3437,6 @@ static int __arch_prepare_bpf_trampoline(struct
+> > bpf_tramp_image *im, void *rw_im
+> >=20
+> >         emit_ldx(&prog, BPF_DW, BPF_REG_6, BPF_REG_FP, -rbx_off);
+> >         EMIT1(0xC9); /* leave */
+> > -       if (flags & BPF_TRAMP_F_SKIP_FRAME) {
+> > -               /* skip our return address and return to parent */
+> > -               EMIT4(0x48, 0x83, 0xC4, 8); /* add rsp, 8 */
+> > -       }
+> >         emit_return(&prog, image + (prog - (u8 *)rw_image));
+> >=20
+> > Then RSB is perfectly matched without messing up the stack
+> > and/or extra calls.
+> > If it works and performance is good the next step is to
+> > teach ftrace to emit jmp or call in *_ftrace_direct()
 
-Fixes: fd3eaad826da ("net: phy: add Applied Micro QT2025 PHY driver")
-Signed-off-by: Alexandre Courbot <acourbot@nvidia.com>
----
- drivers/net/phy/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+After the modification, the performance of fexit increase from
+76M/s to 137M/s, awesome!
 
-diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-index 98700d069191..d4987fc6b26c 100644
---- a/drivers/net/phy/Kconfig
-+++ b/drivers/net/phy/Kconfig
-@@ -132,7 +132,7 @@ config ADIN1100_PHY
- config AMCC_QT2025_PHY
- 	tristate "AMCC QT2025 PHY"
- 	depends on RUST_PHYLIB_ABSTRACTIONS
--	depends on RUST_FW_LOADER_ABSTRACTIONS
-+	select RUST_FW_LOADER_ABSTRACTIONS
- 	help
- 	  Adds support for the Applied Micro Circuits Corporation QT2025 PHY.
- 
+>=20
+> Good idea. I saw the "return_to_handler" used "JMP_NOSPEC", and
+> the jmp is converted to the "fake call" to be nice to IBT in this commit:
+>=20
+> e52fc2cf3f66 ("x86/ibt,ftrace: Make function-graph play nice")
+>=20
+> It's not indirect branch in our case, but let me do more testing to
+> see if there are any unexpected effect if we use "jmp" here.
+>=20
+> Thanks!
+> Menglong Dong
+>=20
+> >=20
+>=20
+>=20
+>=20
+>=20
+>=20
+>=20
 
--- 
-2.51.2
+
+
 
 
