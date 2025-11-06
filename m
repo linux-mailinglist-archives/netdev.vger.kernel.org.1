@@ -1,400 +1,328 @@
-Return-Path: <netdev+bounces-236514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABFA3C3D7E9
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 22:27:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB0A4C3D82D
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 22:33:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3222C4E0EF9
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 21:27:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B5623AF79C
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 21:32:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC5F43064BD;
-	Thu,  6 Nov 2025 21:27:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5188F29BD82;
+	Thu,  6 Nov 2025 21:32:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="eEnrZTuC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ADhl0njy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f228.google.com (mail-il1-f228.google.com [209.85.166.228])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AFE43064A4
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 21:27:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.228
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762464433; cv=none; b=WaZAhLeD6d0fLmNr4cm9iFBKRRmHtM4zpaw4SV64RmTGMwExizTZoq9+xb8NrwDxyHJJz3nwkbdBmGmO+9ZoRPfo3g7NGwSezoEnr8UyUs9Sy7rxf8NsuhvjO0PkJh8QiCNK9WJ7eqgY3KPVxI4LeXZLV/3R1AXISDqOnARaVLQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762464433; c=relaxed/simple;
-	bh=FYSKozxsphHhSnFuMlU6acNkyuBXeYvex6fsRdvNKxw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tg2s2afPFVCpAnxLIjw2FCuFdPu66Vafw/vKu8Vi6NgS2cDK9Y3Hc9J+u6LHBAGhRYO6bQpFsVBmrj9c5wvw9UX/bTohm8SNPGZMbs3kCSzCUXR84Qa3dgX+l84euYRIq1ELSLFmfslCXmbvLQcqvxunMR3ibU5AphxloRChlFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=eEnrZTuC; arc=none smtp.client-ip=209.85.166.228
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-il1-f228.google.com with SMTP id e9e14a558f8ab-4334e884b9dso269975ab.1
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 13:27:11 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762464431; x=1763069231;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:dkim-signature:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Bq1kDHzzeUC5/5qzBKK+XJi+hezEO+Qt7PAq3T7/Vv8=;
-        b=Xp8s2LST6Eo1Od5G8TP7CScwcobDTZ8hGoLzjxwzskxQFAcHnrJec1LcAJQrlQ4TLt
-         OhurVXxlWUN4m3QyWvgRczFsUHTvbKlA67jv7m8fAfTgv5LMLYq10Y3czBeV5QQC537a
-         DPWi+PQcNuEavpvZ/rHyV0hwKTMa3YaLXfGYlBGVCebMehf7jM/XnO1seSqZaokTIuiI
-         vJKSCqNq0iMmxHz4f4/ZyQV/YMRE9c4mXllaOVPCEwbu3nkOGkjR4sVUkqjX1/2NYy9w
-         b7jiHDsecgkxAra3yn+qrA2DqTQMYfFqUrZbVXNqQUdIju//ab4AydLFO+k9GhNrIzwx
-         vAvA==
-X-Gm-Message-State: AOJu0YyQsFOGAMK8lthFueni5YEdflLe8ehpieH4VPC9d6AtaisWLGYO
-	FB4nE8zMAwkCnUwOjHJ5++Tx5xywFo+BJVE6yUlZAPE3cb7t1bPOqS5phWkMFQYGuXcyh2t7cCm
-	Ggpugu19/ZQzWiNrh5k+6lJHWZex2hE5vY59swRt8aZ21W4jrS4xNwWNutIMg3lN/DSMl84Lzdi
-	ixQ3+WwCxvKI9Ff3YajkFNx2tJSAmsZogQA5tvGl3gED47rEtaRPhizEHllKlbyNEa9U2IYoNr0
-	f/h96mK/rvMXLu0
-X-Gm-Gg: ASbGnctfTnQbtQBgWuMWq5YeM07GD4sEidJlmMmgAJ5TEkv0U3/hgjC2BGu/drc7D1J
-	rkmhnrWoNtfIP+3idH2Vl4NR3yzbRnCwfyqGll01HA1NRnHKCEk/Zji9BuBmW67YHqs7Xu1X0sI
-	lywmjSlTqSUbJdOJYOkWKT8+Bx4bx2nqqKDzl+i8//k6sEKTAOzXuU9j4S9shxlSkx6MHReENYY
-	EciiRsqo1KN3SgD+Cm5rxmzqKF5yHfG7+56X0NG3Dp/FUwXYb39YXxvbOPwMrOoxzJY1tIAz2Gi
-	nERt8h4EwbehzMaK/c2bCvCMxp2RUWoN3eQQKnQLmxj0almr1AmLnqWZ2FP47WrjpZx7cDYLjcv
-	9Z1JZnE5HhYx0bPymv+C54Z7iP9I6JQfZBCfCjtCcNFq35q2mYk1Rgx9sh/WWEFZ/wCh/ZPlBTN
-	O5Lzq+UBJuEqnmmy+RlqFAyCVJHM4iOMfSWTxDTBs=
-X-Google-Smtp-Source: AGHT+IGDfCuMjtQZXmTDoPWUblF3RycxYefwCd1bQyZeNrXplXhmeNdOBWfgHKFan5q7mWtja2s3KpYPZ8q0
-X-Received: by 2002:a05:6e02:194c:b0:433:2dd5:f573 with SMTP id e9e14a558f8ab-4335efc1fb8mr18257485ab.3.1762464431211;
-        Thu, 06 Nov 2025 13:27:11 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-12.dlp.protect.broadcom.com. [144.49.247.12])
-        by smtp-relay.gmail.com with ESMTPS id e9e14a558f8ab-4334f4cd466sm2785875ab.33.2025.11.06.13.27.10
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 06 Nov 2025 13:27:11 -0800 (PST)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-8b2359efeb3so20645785a.0
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 13:27:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1762464430; x=1763069230; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bq1kDHzzeUC5/5qzBKK+XJi+hezEO+Qt7PAq3T7/Vv8=;
-        b=eEnrZTuChap+j/p/IiY3zpxskuA7ZkTkWyKIAjedHww7AFNCUxQoav35JEziWm7MEo
-         3307a3/nQLoZE7pedUXpRKPQlZzmqzMl0drRdloiXTUNaU45mTcI0rrJcPxHAeyby4E1
-         leFdFrRu0D/YRMSrGMFujWpbwjyV37ugxEvA0=
-X-Received: by 2002:a05:620a:2905:b0:7fe:e18:d4b7 with SMTP id af79cd13be357-8b235122dbamr574932285a.13.1762464429740;
-        Thu, 06 Nov 2025 13:27:09 -0800 (PST)
-X-Received: by 2002:a05:620a:2905:b0:7fe:e18:d4b7 with SMTP id af79cd13be357-8b235122dbamr574928785a.13.1762464429253;
-        Thu, 06 Nov 2025 13:27:09 -0800 (PST)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b2355e615bsm271777385a.19.2025.11.06.13.27.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Nov 2025 13:27:06 -0800 (PST)
-Message-ID: <f5c2f410-36da-41a0-8d61-ffdd88096513@broadcom.com>
-Date: Thu, 6 Nov 2025 13:27:04 -0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C72AC283FC5
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 21:32:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762464764; cv=fail; b=L6eYH8vr0VS/qy4ok1MeY3BgzPZXqR9zMPuqrUnABrpfSS4BQiZOvevxSYwQ9tO2RrysE9CVm3w04+U0eG4BBtwEe9ndDFbAJgXYaolgj16SdP96z3ZRyut1KdayQrnUfkWxuD0HEcWS485AwmI8nqqMDAggYK+TnFqqy+oTWXM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762464764; c=relaxed/simple;
+	bh=HKIdF0BF0fJ/+Si4DKaujD2FQu2DwEYa6vCuExOHhvg=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=WigIcMpJJKue62kpe2C4H8XYN9punKNWjx+cwkOypqY5tVknulhbyMdecSPHgmmX6oA2/NZ0FxAtWiawkaQBzNs5Yb/lwfklSjs/VTO4acgZZuDmEwlYHbGnTec+RDbPBKoQcT9TO+8uEWTqWSJjCKl4tAgoNl027/tSeTZVX30=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ADhl0njy; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1762464762; x=1794000762;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:mime-version;
+  bh=HKIdF0BF0fJ/+Si4DKaujD2FQu2DwEYa6vCuExOHhvg=;
+  b=ADhl0njyGEnw90Lzau+ALR+avr0PyrjkhHddDUE/6YXpJ+kYHm74I6xS
+   uXivgIDD4qwRqYIwXis/N6Ziu2N80Q6+e2iLZgD/uViJwk+1sfcX4XdCM
+   BPSRFG3q4yKMgj9LPUXRO4y5Eod5eiciNemdfMSP7PPzGBTAQLl21QOvR
+   UDyo8h/RGcy6ElnOJ4m/dL3f8eCilRGJY6Ru2qaCnDDVabtJmeJxC71aK
+   a1AxZ/Lwm4K9GCrmYPzX7KGRZAC8jvTI3Xsu16uEFyfMwXVs3gf6N0IHx
+   2cMFj812zVXDyswdCNBxk2+m0dH5JXH8NFBzNF7+3Ix+wHJc1PH/Q/IG9
+   A==;
+X-CSE-ConnectionGUID: hTVcxF4MTYCRafAcxTqSzQ==
+X-CSE-MsgGUID: uUjeUo6fSoefcZJ8DQq9nw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11605"; a="74906350"
+X-IronPort-AV: E=Sophos;i="6.19,285,1754982000"; 
+   d="asc'?scan'208";a="74906350"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2025 13:32:42 -0800
+X-CSE-ConnectionGUID: CM/b0hlaSf+nQlwqpsHhLw==
+X-CSE-MsgGUID: 89pa5n2+QTCrBh/irS3mXQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,285,1754982000"; 
+   d="asc'?scan'208";a="188308128"
+Received: from orsmsx903.amr.corp.intel.com ([10.22.229.25])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2025 13:32:40 -0800
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX903.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Thu, 6 Nov 2025 13:32:40 -0800
+Received: from ORSEDG903.ED.cps.intel.com (10.7.248.13) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Thu, 6 Nov 2025 13:32:40 -0800
+Received: from BYAPR05CU005.outbound.protection.outlook.com (52.101.85.35) by
+ edgegateway.intel.com (134.134.137.113) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Thu, 6 Nov 2025 13:32:40 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=f47SWoCZSs7qVVhFiaOzrl+o6venU1Fe3SFWuTKd2UR1Li5HmitPC19nJs/wEhUfpFUChhZAgl4x/p3aJnAN+Mp/VABdOahPygOegTssNW+yV8vDfEPsh+gytMcVpMy//gHsgXQCuvM2qIneL3v/kcM3PjgMBHYYCge9rAGh2jtJkG6re1ieosfFKPnnRwau9rap4hruIpWOromeksV4X4kz7pghM4eUFCJ6uEF3fDLREFZmbydr3HNgkjf0jVSoRH390XYN8AXP/RnuqiwTq53FWVSZDKyD6SHRnGr1TOpfdS80DBUJar932KmrOdGb5sGNPNHAV70t8lozUsBVUw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pbu57kjMK2sYOe8TqsghUT03GZQciAZM9FsjfJBqnh4=;
+ b=ewRGts44moS/tGh7KFMlxnhl37o7HlS0s+QMJ5OWrtKdcwbuDN5OJMujwfNwRpc3ML4/pxrtcfHUkklJ9RLDBPcoS5phYm0YU6QbNbp4ZxIiYHA6GVmW6b8tuj/ujqfAIqL1+igmRp6btLOlH7/uuFJLBDAkojVbOEWpQyDgSGjCmVl2pFb+UQ0b7dA/x4JNDRQhC5IckSgYWLPzxd8VZTjekx+v9SIH1mBKzprvAH+ruJppH+OkEs8Bs+/M14aUeoAszlTjsVqGkREMY1QSxzet9FJkh4ewIhkuhGgGFhoxQOcNRKpnXIWKu5ePDimypsnTC2mXVkkkAE2bxq/qNw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by PH7PR11MB7004.namprd11.prod.outlook.com (2603:10b6:510:20b::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.8; Thu, 6 Nov
+ 2025 21:32:37 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::81f7:c6c0:ca43:11c3%3]) with mapi id 15.20.9298.010; Thu, 6 Nov 2025
+ 21:32:37 +0000
+Message-ID: <3e32abe4-5c7f-4cbf-b4de-1c136b921a95@intel.com>
+Date: Thu, 6 Nov 2025 13:32:35 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next v2 2/9] ice: use cacheline groups for ice_rx_ring
+ structure
+To: Simon Horman <horms@kernel.org>
+CC: Aleksandr Loktionov <aleksandr.loktionov@intel.com>, Alexander Lobakin
+	<aleksander.lobakin@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>
+References: <20251105-jk-refactor-queue-stats-v2-0-8652557f9572@intel.com>
+ <20251105-jk-refactor-queue-stats-v2-2-8652557f9572@intel.com>
+ <aQzZfXz9qBjr5vtB@horms.kernel.org>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+Autocrypt: addr=jacob.e.keller@intel.com; keydata=
+ xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
+ J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
+ qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
+ CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
+ UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
+ MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
+ apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
+ cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
+In-Reply-To: <aQzZfXz9qBjr5vtB@horms.kernel.org>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature";
+	boundary="------------jwYJv6zPHt0KoSZXSgi09nn6"
+X-ClientProxiedBy: MW4PR04CA0354.namprd04.prod.outlook.com
+ (2603:10b6:303:8a::29) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|PH7PR11MB7004:EE_
+X-MS-Office365-Filtering-Correlation-Id: ebc0325a-17b9-4842-3e81-08de1d7c019b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?YjBWbVRHVFNudERPWW1TaVd6NWxGRmRKRnJLL3lPRVNaeHpHR1libzZrb3JT?=
+ =?utf-8?B?dEN5VFduY2o4SHBIdlM1ZkQ3NlBVcWRjTVZJb0NBamlYb1BmbGw5cEtXbWFk?=
+ =?utf-8?B?UWRwVVBmQm9JYmNuWnZOVWJackZtd2FKN0ozWTBKN0syRjlFL3BCQlZMYmpj?=
+ =?utf-8?B?bUNPSElteHJibHJvdFFNU3cySWdPb0cxNmlwcmJQdnNqV2hrR2xCdWFRUktR?=
+ =?utf-8?B?WTBFUkV3S3A2Y0g5WW5tTU5rOVhSa2dlcFhVNGpEMUtXSmNxNGEyMlI4UHZs?=
+ =?utf-8?B?dzUzRFRvSk1UaUV2TXZvOVVyeUR0Q282allwNitXN2RKbXE4STBGWlFOZ1M5?=
+ =?utf-8?B?OWtNQ3R5Q0pROE10MVFQTE5CVks0K3hVQnUwdTExUXI3YWpSOW0yN1lCYU9m?=
+ =?utf-8?B?ZGhZMnhxUzdlWVV0QktQT2hMMVFDekg1QlVKRklCNVFlb1VvK2tPWEpHSlVm?=
+ =?utf-8?B?M0U2eTdzUHFaVnVzOEJlK0FuRWZLRjBVcWpJZ0ZmZmtnT2hhU29yc3FlVlJR?=
+ =?utf-8?B?OUZNejdCS1VvaHM1OWhMRUtxMURzTmJ6REF3R0JIb2FsQkg1RjRFWmdXNTgw?=
+ =?utf-8?B?QjdrMnlTL2swTjR1NXVCQ1pRRWFWcy9aaWFQUDdQVm1rQTIrSktaV21mQk5P?=
+ =?utf-8?B?ZnFNWWpHQm1DMkdSYW1SWWdnSFdxbTc3UXY4UGJub0RvNnRPa2pqdHgwSUMz?=
+ =?utf-8?B?NkxFUVNRQnFhNkN1ZnIrR3NmeUZkZ3dVY3UralBvL0pvR3BQOW1iTVFnZDI3?=
+ =?utf-8?B?a1JKa05qcUxVelhzdnY3T3ZMbUhhQ3V6T0hSRTRFR3pYeUx3aWJXWjhENUNQ?=
+ =?utf-8?B?MzVaN0hKakF1Mnl1N2dmdFZ2SGFCV1RwYVE3L2Yrb2QwQXFrcTl2bmxnRXRM?=
+ =?utf-8?B?K3JVelFmV3h4bjNyNXREdFR4TjlrL2V3WUU2S1hWMUhTKzVDek9ySXdWY3oy?=
+ =?utf-8?B?azNERVM0OXBneGpNMVA1b1A2RldlWnRDbnNzUFRIMWhWb0RiN2xzSFh6Nkp2?=
+ =?utf-8?B?Q2Q2YTZ5cms4ZVVFZW1TeXBOTjJvSmsxUnZoWGdlVDRrb0RyOThhN0VOdjJW?=
+ =?utf-8?B?SjgyRW9kbjBIRGVQMEp2bmoyTjQrbkhIalZvSy9Vc2tMc21jTTZPdmNlakNV?=
+ =?utf-8?B?eDZXNnJaK2o1OHZYY2RyTDNvY1RpL3N1REhTTXdpUlZ4U3lMR3BWQ3Fuc2JW?=
+ =?utf-8?B?ZU82b3dsV0xBKzlGUlQxZjE5Qlp2VnY4V3lVbjhiZGtLNzQ3eWxzbm5HS0h2?=
+ =?utf-8?B?QlViaGFNUm54ankwZyt0V1FDS0FFdW1FZlR1dWxFTEZwTTZIMVdVNTQwVDZr?=
+ =?utf-8?B?R1duSnQrRTBWbEljNktoSHdHd3lOekZTMlRNSmU4K0J3Q3ZHOExoQWdRb21s?=
+ =?utf-8?B?SVVLWHdNOWNNa3JDSUpZeUtYVDBwNDF0djNhYitpVUZieCtJTnBvTWhRblBn?=
+ =?utf-8?B?bUhDbTJtaXJKZ2VHNGlpdjE2QTdOYXArb1FEdCtQMDFvTitjVlZ0REtZRWFO?=
+ =?utf-8?B?a0tVQ0JVcWVINDVEYWZiMDZmWVhrU1U2YVQyZ1Q0eEs5MzdqUVhXdmduOGJt?=
+ =?utf-8?B?SU43NlIrcHk3ME4yNXRJRVg5Q1ZyNzd3WVVZV1EwdEFCQWViVTdJUTM5aTk0?=
+ =?utf-8?B?eFQ0UmcxZnlUU2kwTlM4MU9YR1FOaTJ1aW84SElHVzRDbXNxYWh4YVNPNGVM?=
+ =?utf-8?B?WERkWDZzN3JUMDVnWm51eGJYQUxOazlUVE0yWWNRZ0pHYXYxQStOdnNtNmZM?=
+ =?utf-8?B?VERKdDZDYm41R3E3Vm00eUxvY0JEbElUR0kwN3JFcmdsYmcvMS91NmJid2Fp?=
+ =?utf-8?B?T2xySnZ0ektyYUVPVU1VR1BJOTRYMnppT2VMY3hYbXJwRWRlcjhka0dpdFRT?=
+ =?utf-8?B?TmcrNUY2cExUTzlhd29PbFRpeVViZWIzUVlaV1N6Tm5DVUtydVhYdUl4V0Nj?=
+ =?utf-8?Q?ijQAlcyZTMdH8M06P9lGpHH7IE9HD9mU?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eWxPcmlRUXpIQ25sK1k2MHc0NGt0Nm5NckNQOXhsMkV2TVBrUnJCNG5xdjVB?=
+ =?utf-8?B?cWhLVGZSdUVhVWIvb3BhTmdHbU1rUkxpV2RKQ1VQd1BYYXdPY0o4b21nRjBs?=
+ =?utf-8?B?NXVtN3JoVmgwYnBSVmpGMkEwWm03TjlwVlZMaXBHUGJ4eFJBdWhCV2xzUkl2?=
+ =?utf-8?B?TzlLdDNzNjVobU96R0p0OFQ5dXhGM3laNDRuRS9mdWYxQWgrdUtJTHhkQU5k?=
+ =?utf-8?B?eE9SNUxQSWpxeG1Jbm5rdmNjSUhrTEM0akN1N092bytoY2dlaENMdE84T29K?=
+ =?utf-8?B?aStodEo4NC8rcXd0Qmc2VjVmUlJ3OHhqRlpjc204UEUvalFLQnlTN3dZTTFm?=
+ =?utf-8?B?a0pqUUUvSWFwR1hJRDZaOHovZXV5a3g1dFZTNWwyWU9aQ25Dbko1UndBQk5Z?=
+ =?utf-8?B?dWpqM3lZQmljVmNpY2NUSjRWa0o0T2NTSXdZYVpZemJHZHBMTDZ4bjlvZWdT?=
+ =?utf-8?B?dUd2b3BPU0doYTRrV1FDUEtaNXNKRGZieitJOThzVjE3L3VUQXpTS3g2VjNK?=
+ =?utf-8?B?M3NpVTJrUWgySWNEY0ZGZVlnVFJYc0krZUlnOUxURDBqVGJnWW1pb0dJbjM0?=
+ =?utf-8?B?eGJ5SjZpUHNRTXFCNkRLb0VBUHNXSnA2ZTI2Wld6RnkzdkdsN3NxNU41VWNF?=
+ =?utf-8?B?bjBkQmhESE12S1RQaG90aktDd3BkNEVPWlZ0S1kreTZuNXMrZDdhMWRsMjhT?=
+ =?utf-8?B?dVhnMjBya2o5M21ZeWhZTE5vbVEyVnB2TXZ3UWpCeDJyK0w1VmdWQnVzTFV1?=
+ =?utf-8?B?czczZnA4dnJhQzhid29DRjlFcWxjOXhQdllTVk5HUkt1Z2dpZWlRTkljMG9T?=
+ =?utf-8?B?STJKd09nWE5tUzNjY0hJWGhhcmdxamQ1UVBxdzAzYjVDekYzYkk1MHB4WEta?=
+ =?utf-8?B?R3hTSjRxcXQvRDBZWHFiWXQvVGlOK2hBa1dmc29HYTkrMkR1K0t0QWtsaWtB?=
+ =?utf-8?B?ZGZrWnQ2eFphRWRqdFRyV3d3bzFNZTFvL29IeWo5NEFjQjZIVDlNaXQ5Q2l0?=
+ =?utf-8?B?TzhWWFQ5enBFeHRvUmFxRmtFUEd2enFYZDJqcHVqUG5ST2VEV052Uk1GUE1q?=
+ =?utf-8?B?blB6U1FtVXRXQ3QrcEI3V0dtdk9QTUdQTHBMM2ZocERPblUyMDA5aWxNSDI2?=
+ =?utf-8?B?dEFVeG12bUJZMTQxVDUrSHN5dnZqdGJOWkF5WC9lMFVDSnRrZFJsY1FtRk9C?=
+ =?utf-8?B?TUY5RzEraTFiYm5sWk9Pby84UWdWNmNMb1hna2NFMDhHR2ttVkZqM0RYbWFZ?=
+ =?utf-8?B?ck5EUDRSTHhnZWlkZUJnM1pUWjdnbmtWRSsvV0VOMHFCUnA5R0pQOWZxWEd6?=
+ =?utf-8?B?ajk1akVsdVZaSzZPRWdTZHFENFE3NUFGcG9aMXd1Z2dNSFJ4OHptMEhRRmU2?=
+ =?utf-8?B?SWs3TExSNTc3bExLNVdwRVYvZklBSnpPVk5ZOWRKeUljQUJPb2tWWmNVSGRF?=
+ =?utf-8?B?S3NLdDVrVmVNZFVqMkhSU2ZBK3loYSsxV25tSVBUYVFDSVJUTHpGbDhROXdW?=
+ =?utf-8?B?a0YwRVNudUo5SU9Ja282akEvQk9FV3ZxMFRuaGo0NnljelhHQW1KaHhMeVlU?=
+ =?utf-8?B?a3lrTzZabkR3NnZDVVhaVWhHVWhteXc0VDltajZNaFlLT1N6Y1VDR3AxcmNN?=
+ =?utf-8?B?Q3puN3BnSlo3WEJ3cjZ2ajI5NkdaL2NyVXM3RW94cnhNNEs0TnpNb0pudHlp?=
+ =?utf-8?B?MndlQXlrd1FNdzVkQ241VG9sZ3k5Nm5SMXkyaXp2a3RDNFJDZ2hSZ2VKTzA5?=
+ =?utf-8?B?OGZ0MERZZGlpOHdjdk12QXlHK3dmaGxRZHJlaStmbXF6NGp2QXc2WnM1eU1H?=
+ =?utf-8?B?S1I2ZmNUK2RYZUczd2MxRU51TkVMVG5hWWFUUXJuRmwyeGF4U2gyZ1pjTzZU?=
+ =?utf-8?B?VHlKMWxJTGo2QzhpNGNLZVZpVVJsa1NQMHlacmJEQ3MvUHlrM3R2Um5GYXM0?=
+ =?utf-8?B?b1Y4VW9aVXN3cEpJYkFyYTlBNVVDbGNFeTRmRXlNdXBBYThrcGZXbWk0Y0Rs?=
+ =?utf-8?B?djBsdHgzL1pFL1l1WlRwSlBQaFN1NENvVzJOQ00xT3didlRlbnhRT2ZCT0FY?=
+ =?utf-8?B?ZTVaVU1YYmZPTGlJVFF5UXJ5VUYvYXZOTkNoVEdxL2k4cG5LcEpJd0VBNHJv?=
+ =?utf-8?B?b2I2YTFjUnNRUUI4YVVXMDRZaTRzQ0tFOEYvQ2hhVG1MbWszR2xmTWFZbEN0?=
+ =?utf-8?B?TWc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: ebc0325a-17b9-4842-3e81-08de1d7c019b
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2025 21:32:37.4812
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2lQrTl0PiHqyqou5FBI/pnx6k2ksfAT/KUCu85tKcOZjskiMpS2JNk6940geu9/TRFUzVBjxepVFPlMNlxPzJokEaIIzwki4T33DYjKhyII=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7004
+X-OriginatorOrg: intel.com
+
+--------------jwYJv6zPHt0KoSZXSgi09nn6
+Content-Type: multipart/mixed; boundary="------------gkRoYhSnTdvUjKQnXy0hOqsu";
+ protected-headers="v1"
+Message-ID: <3e32abe4-5c7f-4cbf-b4de-1c136b921a95@intel.com>
+Date: Thu, 6 Nov 2025 13:32:35 -0800
+MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/2] net: ethernet: Allow disabling pause on
- panic
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: netdev@vger.kernel.org, bcm-kernel-feedback-list@broadcom.com,
- Doug Berger <opendmb@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
- Antoine Tenart <atenart@kernel.org>, Yajun Deng <yajun.deng@linux.dev>,
- open list <linux-kernel@vger.kernel.org>
-References: <20251104221348.4163417-1-florian.fainelli@broadcom.com>
- <20251104221348.4163417-2-florian.fainelli@broadcom.com>
- <CAAVpQUAXPadkvRa7Rdo-_bQOpH5XRr+GST4cdv6G-be=SQ5sAQ@mail.gmail.com>
-Content-Language: en-US, fr-FR
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <CAAVpQUAXPadkvRa7Rdo-_bQOpH5XRr+GST4cdv6G-be=SQ5sAQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
+Subject: Re: [PATCH iwl-next v2 2/9] ice: use cacheline groups for ice_rx_ring
+ structure
+To: Simon Horman <horms@kernel.org>
+Cc: Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+References: <20251105-jk-refactor-queue-stats-v2-0-8652557f9572@intel.com>
+ <20251105-jk-refactor-queue-stats-v2-2-8652557f9572@intel.com>
+ <aQzZfXz9qBjr5vtB@horms.kernel.org>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+Autocrypt: addr=jacob.e.keller@intel.com; keydata=
+ xjMEaFx9ShYJKwYBBAHaRw8BAQdAE+TQsi9s60VNWijGeBIKU6hsXLwMt/JY9ni1wnsVd7nN
+ J0phY29iIEtlbGxlciA8amFjb2IuZS5rZWxsZXJAaW50ZWwuY29tPsKTBBMWCgA7FiEEIEBU
+ qdczkFYq7EMeapZdPm8PKOgFAmhcfUoCGwMFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AA
+ CgkQapZdPm8PKOiZAAEA4UV0uM2PhFAw+tlK81gP+fgRqBVYlhmMyroXadv0lH4BAIf4jLxI
+ UPEL4+zzp4ekaw8IyFz+mRMUBaS2l+cpoBUBzjgEaFx9ShIKKwYBBAGXVQEFAQEHQF386lYe
+ MPZBiQHGXwjbBWS5OMBems5rgajcBMKc4W4aAwEIB8J4BBgWCgAgFiEEIEBUqdczkFYq7EMe
+ apZdPm8PKOgFAmhcfUoCGwwACgkQapZdPm8PKOjbUQD+MsPBANqBUiNt+7w0dC73R6UcQzbg
+ cFx4Yvms6cJjeD4BAKf193xbq7W3T7r9BdfTw6HRFYDiHXgkyoc/2Q4/T+8H
+In-Reply-To: <aQzZfXz9qBjr5vtB@horms.kernel.org>
 
-On 11/4/25 14:44, Kuniyuki Iwashima wrote:
-> On Tue, Nov 4, 2025 at 2:13 PM Florian Fainelli
-> <florian.fainelli@broadcom.com> wrote:
->>
->> Development devices on a lab network might be subject to kernel panics
->> and if they have pause frame generation enabled, once the kernel panics,
->> the Ethernet controller stops being serviced. This can create a flood of
->> pause frames that certain switches are unable to handle resulting a
->> completle paralysis of the network because they broadcast to other
->> stations on that same network segment.
->>
->> To accomodate for such situation introduce a
->> /sys/class/net/<device>/disable_pause_on_panic knob which will disable
->> Ethernet pause frame generation upon kernel panic.
->>
->> Note that device driver wishing to make use of that feature need to
->> implement ethtool_ops::set_pauseparam_panic to specifically deal with
->> that atomic context.
->>
->> Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
->> ---
->>   Documentation/ABI/testing/sysfs-class-net | 16 +++++
->>   include/linux/ethtool.h                   |  3 +
->>   include/linux/netdevice.h                 |  1 +
->>   net/core/net-sysfs.c                      | 34 ++++++++++
->>   net/ethernet/Makefile                     |  3 +-
->>   net/ethernet/pause_panic.c                | 81 +++++++++++++++++++++++
->>   6 files changed, 137 insertions(+), 1 deletion(-)
->>   create mode 100644 net/ethernet/pause_panic.c
->>
->> diff --git a/Documentation/ABI/testing/sysfs-class-net b/Documentation/ABI/testing/sysfs-class-net
->> index ebf21beba846..f762ce439203 100644
->> --- a/Documentation/ABI/testing/sysfs-class-net
->> +++ b/Documentation/ABI/testing/sysfs-class-net
->> @@ -352,3 +352,19 @@ Description:
->>                  0  threaded mode disabled for this dev
->>                  1  threaded mode enabled for this dev
->>                  == ==================================
+--------------gkRoYhSnTdvUjKQnXy0hOqsu
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+
+
+On 11/6/2025 9:23 AM, Simon Horman wrote:
+>> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.h b/drivers/net/e=
+thernet/intel/ice/ice_txrx.h
+>> @@ -298,10 +302,22 @@ struct ice_rx_ring {
+>>  #define ICE_RX_FLAGS_MULTIDEV		BIT(3)
+>>  #define ICE_RX_FLAGS_RING_GCS		BIT(4)
+>>  	u8 flags;
+>> -	/* CL5 - 5th cacheline starts here */
+>> +	__cacheline_group_end_aligned(cl4);
 >> +
->> +What:          /sys/class/net/<iface>/disable_pause_on_panic
->> +Date:          Nov 2025
->> +KernelVersion: 6.20
->> +Contact:       netdev@vger.kernel.org
->> +Description:
->> +               Boolean value to control whether to disable pause frame
->> +               generation on panic. This is helpful in environments where
->> +               the link partner may incorrect respond to pause frames (e.g.:
->> +               improperly configured Ethernet switches)
->> +
->> +               Possible values:
->> +               == ==================================
->> +               0  threaded mode disabled for this dev
->> +               1  threaded mode enabled for this dev
-> 
-> nit: These lines need to be updated.
-> 
-> 
->> +               == ==================================
->> diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
->> index c2d8b4ec62eb..e014d0f2a5ac 100644
->> --- a/include/linux/ethtool.h
->> +++ b/include/linux/ethtool.h
->> @@ -956,6 +956,8 @@ struct kernel_ethtool_ts_info {
->>    * @get_pauseparam: Report pause parameters
->>    * @set_pauseparam: Set pause parameters.  Returns a negative error code
->>    *     or zero.
->> + * @set_pauseparam_panic: Set pause parameters while in a panic context. This
->> + *     call is not allowed to sleep. Returns a negative error code or zero.
->>    * @self_test: Run specified self-tests
->>    * @get_strings: Return a set of strings that describe the requested objects
->>    * @set_phys_id: Identify the physical devices, e.g. by flashing an LED
->> @@ -1170,6 +1172,7 @@ struct ethtool_ops {
->>                                    struct ethtool_pauseparam*);
->>          int     (*set_pauseparam)(struct net_device *,
->>                                    struct ethtool_pauseparam*);
->> +       void    (*set_pauseparam_panic)(struct net_device *);
->>          void    (*self_test)(struct net_device *, struct ethtool_test *, u64 *);
->>          void    (*get_strings)(struct net_device *, u32 stringset, u8 *);
->>          int     (*set_phys_id)(struct net_device *, enum ethtool_phys_id_state);
->> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
->> index e808071dbb7d..2d4b07693745 100644
->> --- a/include/linux/netdevice.h
->> +++ b/include/linux/netdevice.h
->> @@ -2441,6 +2441,7 @@ struct net_device {
->>          bool                    proto_down;
->>          bool                    irq_affinity_auto;
->>          bool                    rx_cpu_rmap_auto;
->> +       bool                    disable_pause_on_panic;
->>
->>          /* priv_flags_slow, ungrouped to save space */
->>          unsigned long           see_all_hwtstamp_requests:1;
->> diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
->> index ca878525ad7c..c01dc3e200d8 100644
->> --- a/net/core/net-sysfs.c
->> +++ b/net/core/net-sysfs.c
->> @@ -770,6 +770,39 @@ static ssize_t threaded_store(struct device *dev,
->>   }
->>   static DEVICE_ATTR_RW(threaded);
->>
->> +static ssize_t disable_pause_on_panic_show(struct device *dev,
->> +                                           struct device_attribute *attr,
->> +                                           char *buf)
+>> +	__cacheline_group_begin_aligned(cl5);
+>>  	struct xdp_rxq_info xdp_rxq;
+>> +	__cacheline_group_end_aligned(cl5);
+>>  } ____cacheline_internodealigned_in_smp;
+>> =20
+>> +static inline void ice_rx_ring_struct_check(void)
 >> +{
->> +       struct net_device *ndev = to_net_dev(dev);
->> +       ssize_t ret = -EINVAL;
->> +
->> +       rcu_read_lock();
->> +       if (dev_isalive(ndev))
->> +               ret = sysfs_emit(buf, fmt_dec, READ_ONCE(ndev->disable_pause_on_panic));
->> +       rcu_read_unlock();
->> +
->> +       return ret;
+>> +	CACHELINE_ASSERT_GROUP_SIZE(struct ice_rx_ring, cl1, 64);
+>> +	CACHELINE_ASSERT_GROUP_SIZE(struct ice_rx_ring, cl2, 64);
+>> +	CACHELINE_ASSERT_GROUP_SIZE(struct ice_rx_ring, cl3, 64);
+>> +	CACHELINE_ASSERT_GROUP_SIZE(struct ice_rx_ring, cl4, 64);
+>> +	CACHELINE_ASSERT_GROUP_SIZE(struct ice_rx_ring, cl5, 64);
+>=20
+> Hi Jacob,
+>=20
+> Unfortunately the last line results in a build failure on ARM (32-bit)
+> with allmodconfig. It seems that in that case the size of the group is
+> 128 bytes.
+>=20
+
+Hm. That's interesting. My understanding is that
+CACHELINE_ASSERT_GROUP_SIZE calculates the size without taking into
+account the padding after the last element added by the
+cacheline_group_end_aligned. Perhaps there's something in one of the
+groups that gets larger due to also being cacheline_aligned and ARM
+system having 128-byte cacheline instead of 64, and thats what results
+in the larger increase in size.
+
+Is there an easy way to cross compile for ARM so I can check the struct
+layout myself?
+
+The easy fix option would be to only enable these assertions on the x86
+platform they were designed for specifically.. But thats kind of ugly
+and I don't like it...
+
 >> +}
 >> +
->> +static int modify_disable_pause_on_panic(struct net_device *dev, unsigned long val)
->> +{
->> +       if (val != 0 && val != 1)
->> +               return -EINVAL;
-> 
-> Should we validate !ops->set_pauseparam_panic here
-> rather than disable_pause_on_device() ?
+>>  struct ice_tx_ring {
+>>  	/* CL1 - 1st cacheline starts here */
+>>  	struct ice_tx_ring *next;	/* pointer to next ring in q_vector */
+>=20
+> ...
 
-Yes we should certainly do it here to give an early warning to users 
-whether this will work or not. To keep things simple however, we would 
-still need to check set_pauseparam_panic in the panic handler, otherwise 
-we would have to construct a list of network devices that do support the 
-operation and use that.
 
-> 
-> ops = dev->ethtool_ops;
-> if (!ops || !ops->set_pauseparam_panic)
->      return -EOPNOTSUPP;
-> 
-> 
->> +
->> +       WRITE_ONCE(dev->disable_pause_on_panic, val);
->> +
->> +       return 0;
->> +}
->> +
->> +static ssize_t disable_pause_on_panic_store(struct device *dev,
->> +                                            struct device_attribute *attr,
->> +                                            const char *buf, size_t len)
->> +{
->> +       return netdev_store(dev, attr, buf, len, modify_disable_pause_on_panic);
->> +}
->> +static DEVICE_ATTR_RW(disable_pause_on_panic);
->> +
->>   static struct attribute *net_class_attrs[] __ro_after_init = {
->>          &dev_attr_netdev_group.attr,
->>          &dev_attr_type.attr,
->> @@ -800,6 +833,7 @@ static struct attribute *net_class_attrs[] __ro_after_init = {
->>          &dev_attr_carrier_up_count.attr,
->>          &dev_attr_carrier_down_count.attr,
->>          &dev_attr_threaded.attr,
->> +       &dev_attr_disable_pause_on_panic.attr,
->>          NULL,
->>   };
->>   ATTRIBUTE_GROUPS(net_class);
->> diff --git a/net/ethernet/Makefile b/net/ethernet/Makefile
->> index e03eff94e0db..9b1f3ff8695a 100644
->> --- a/net/ethernet/Makefile
->> +++ b/net/ethernet/Makefile
->> @@ -3,4 +3,5 @@
->>   # Makefile for the Linux Ethernet layer.
->>   #
->>
->> -obj-y                                  += eth.o
->> +obj-y                                  += eth.o \
->> +                                          pause_panic.o
->> diff --git a/net/ethernet/pause_panic.c b/net/ethernet/pause_panic.c
->> new file mode 100644
->> index 000000000000..8ef61eb768a0
->> --- /dev/null
->> +++ b/net/ethernet/pause_panic.c
->> @@ -0,0 +1,81 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/*
->> + * Ethernet pause disable on panic handler
->> + *
->> + * This module provides per-device control via sysfs to disable Ethernet flow
->> + * control (pause frames) on individual Ethernet devices when the kernel panics.
->> + * Each device can be configured via /sys/class/net/<device>/disable_pause_on_panic.
->> + */
->> +
->> +#include <linux/kernel.h>
->> +#include <linux/init.h>
->> +#include <linux/panic_notifier.h>
->> +#include <linux/netdevice.h>
->> +#include <linux/ethtool.h>
->> +#include <linux/notifier.h>
->> +#include <linux/if_ether.h>
->> +#include <net/net_namespace.h>
->> +
->> +/*
->> + * Disable pause/flow control on a single Ethernet device.
->> + */
->> +static void disable_pause_on_device(struct net_device *dev)
->> +{
->> +       const struct ethtool_ops *ops;
->> +
->> +       /* Only proceed if this device has the flag enabled */
->> +       if (!READ_ONCE(dev->disable_pause_on_panic))
->> +               return;
->> +
->> +       ops = dev->ethtool_ops;
->> +       if (!ops || !ops->set_pauseparam_panic)
->> +               return;
->> +
->> +       /*
->> +        * In panic context, we're in atomic context and cannot sleep.
->> +        */
->> +       ops->set_pauseparam_panic(dev);
->> +}
->> +
->> +/*
->> + * Panic notifier to disable pause frames on all Ethernet devices.
->> + * Called in atomic context during kernel panic.
->> + */
->> +static int eth_pause_panic_handler(struct notifier_block *this,
->> +                                       unsigned long event, void *ptr)
->> +{
->> +       struct net_device *dev;
->> +
->> +       /*
->> +        * Iterate over all network devices in the init namespace.
->> +        * In panic context, we cannot acquire locks that might sleep,
->> +        * so we use RCU iteration.
->> +        * Each device will check its own disable_pause_on_panic flag.
->> +        */
->> +       rcu_read_lock();
->> +       for_each_netdev_rcu(&init_net, dev) {
->> +               /* Reference count might not be available in panic */
->> +               if (!dev)
->> +                       continue;
-> 
-> This seems unnecessary unless while() + next_net_device_rcu()
-> is used instead of for_each_netdev_rcu().
-> 
-> Or are we assuming that something could overwrite NULL to
-> dev->dev_list.next and panic ?
+--------------gkRoYhSnTdvUjKQnXy0hOqsu--
 
-In panic context not much can happen by this point, so I presume we can 
-just walk the list of network devices in the init space with no specific 
-locking or protection of any sort.
+--------------jwYJv6zPHt0KoSZXSgi09nn6
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
 
-Thanks for your review!
--- 
-Florian
+-----BEGIN PGP SIGNATURE-----
+
+wnsEABYIACMWIQQgQFSp1zOQVirsQx5qll0+bw8o6AUCaQ0T8wUDAAAAAAAKCRBqll0+bw8o6E7e
+AQDR7z6Pp1piVl+6l6++a55UxwspKdNZg0YcHik6IMnyMAEAg1j5yhY3ojcvLkXP0qBxlHE3Yx25
+/sUQ62Bbvka8jAs=
+=lD2m
+-----END PGP SIGNATURE-----
+
+--------------jwYJv6zPHt0KoSZXSgi09nn6--
 
