@@ -1,81 +1,100 @@
-Return-Path: <netdev+bounces-236262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B548C3A7AD
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 12:12:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C249EC3A7A1
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 12:12:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 532424FF39A
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 11:08:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 284943A8CAA
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 11:08:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA24430BBA5;
-	Thu,  6 Nov 2025 11:08:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67D5F30C600;
+	Thu,  6 Nov 2025 11:08:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lFsaGLaa"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TSVNapcG";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="R2lq28WY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFF172E8B7D
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 11:08:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A84422E7F27
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 11:08:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762427285; cv=none; b=KPYl0+qHMVGz0/3kx+PpdLxIol/gR2rTUPRoMq6NJ032HvsVp5z+TF3Otf72SANXCl+0jDP/bARDJ8gfOf/GqcyUvAONIrfDhxhhMfVuJ1woK0+iHL6EZbBlM9PusTZw4xpYCkaIFnfq5Aqx33i5QBRBUe4eF2jz77Ouy9wZdNM=
+	t=1762427298; cv=none; b=SKGRD0ab2v0cGmupIvxEAMs3HtAcPmepWA4FkWm/HiLm3Ks6rvZ533ATf2AueptsCT3rlKGLqIpYbrFHvOMTOL4O6kBjCy/OuhAGlWOV2Us+fWYN6m5ug7T1mP0VGnDE5Uj7gDuiovI3MU3pc4//npGAdNfJtkEWI+ufQzY8EaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762427285; c=relaxed/simple;
-	bh=iflFF8uGA+JQqg5PeOnkh0xBZA/LPV6uIzaa7UsyVRQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KG+NHAqxsRMSrM5/L/YbSMqeQopZzKEjUL2teiwaLYnkhEyY91/uRC1atzTTKKryA7JbMlcHIKB+ZTX5srMH4VnxPXmFSmzT+MtSzsf7kYAQ2Ga78ZLl0WbphKtO618S7PWvAkRz+vMEbfMaIywyX1jUSXK0EV7Ii4/22M0gQAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lFsaGLaa; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-429c82bf86bso589439f8f.1
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 03:08:02 -0800 (PST)
+	s=arc-20240116; t=1762427298; c=relaxed/simple;
+	bh=AzYwnHKc/M/GnwP2HQJVj7gqwdd7tzGdSNwpt2uNAzU=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
+	 In-Reply-To:Content-Type; b=h3WaSzQhNNoW1yna6zB5VQU++EnY5bw6ASR8/qHkTgvXS83TTjovVQLxiwrZ4o9fYY7j/Pd2+ov5kByA36BEjYjQ2D5B25YyKyRsKBFKNA6IvqcsAaNyBtBaIVNnUaqTGvlVpXkLv6+tQeRXbv1IAxuZ0uuufYbw7zUdMqp8TXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TSVNapcG; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=R2lq28WY; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762427295;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mJ9H3vt04iE1iOinRpVRRRwRwQxVn8Vs66MDAfX+ERc=;
+	b=TSVNapcGDmyPB2jwD/9JSpLNhUV55SLy2LPg9wBg/9aSOSxtx5nz2Elw11i0JtSCrZZxgG
+	axpx3Dbmm3izLjQKGADFF6p00YEwGmyTCIUt73DVQbsq+j/MLx969sByH7KmOnHUv6KoPA
+	gEdBNy9Nm/ilIswpiMnfri4k1gSGRvE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-548-hmHTn8atO-Opwg_K8Fk4iQ-1; Thu, 06 Nov 2025 06:08:14 -0500
+X-MC-Unique: hmHTn8atO-Opwg_K8Fk4iQ-1
+X-Mimecast-MFC-AGG-ID: hmHTn8atO-Opwg_K8Fk4iQ_1762427293
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-427015f63faso466148f8f.0
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 03:08:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762427281; x=1763032081; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KemrrCvE16IUsPvIdPc7ZklZCJchRhA/4dXIse7pcqc=;
-        b=lFsaGLaav2Wzq+kdJsJU1Wb4wW+hsZE5/nqsyi2eb0dBlUw0xGSjTlzzn4Sa1cJnLz
-         qOyyIeD4YWjmrVzmwvu8aLSvJiCrNWiWtPu3V2gOXZd2hOq/2CFDkuqVKsyHc8xWaV+2
-         UnIEinVpCzCm1HQ4R8dAMK+BQyH5QFyCxuMW0Wu90+6fKHiCDqa85zysgdJoHRrOgGTY
-         4TuJETudPaQ70g6dro3pDcNu6mNd5AGjgpMzdSEf+ANdVpng/0xQwNfcTBWXI4fgmKma
-         Gx1wfD/x+CU3EW9C3Q90NaljRbG7J9kS+1tSE2oTZqfxywlZzb1JbKbJFTSXG8MyWUxe
-         SNhA==
+        d=redhat.com; s=google; t=1762427293; x=1763032093; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :to:from:subject:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mJ9H3vt04iE1iOinRpVRRRwRwQxVn8Vs66MDAfX+ERc=;
+        b=R2lq28WY71t81pdM6VYa4o9Q/ONByehnoGu+vkqLxavia9JYZP9JbUfv9c6eLpVqpB
+         ysLmKDK1iCq0OSGuMLU2Bk0i48BRxZNEfk7ZYP7lpNQE9d3K80xa2yFSVamRobuFGTRN
+         aqznr6kyHKuPFlJwsjfFNz/FmMGTNRfMzfbRLnx2yse6zV9RbKnMXsFfw6QlLp6Xc3O6
+         hM6zejXy1Tc2cO2dIsmnhzym5dHwrxmwDdLrX6EI0HdEhHnpy9BRR+z1s3jSrJK/yvW/
+         nWXb5mnb6TUS8bZq3N/Bui9UieTCDHjORqC1Ltb2AvPHNTRgLB4PlYaq4pibBzva0mle
+         N2JA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762427281; x=1763032081;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1762427293; x=1763032093;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :to:from:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KemrrCvE16IUsPvIdPc7ZklZCJchRhA/4dXIse7pcqc=;
-        b=w0nMuBLrN0AAHT8DcaRB+KFGWzCmOcec75FsaW1pTtliPGKraVwgIBxS6H++mD8E5n
-         IFz1N7LS2CDrVfcWcn7EdMxkW969WyQ/Y4gIWWODmHGAnGS0IFcOt8wViwCzEHq7yoKK
-         ouv1BBKZHb1Av8L0iG80LLIrX/ZWqlmXlf3w7QeMK5Fr72IbP4Fx9891jugKA5lRHhkY
-         m8DtLf4EuTSKik3n75H8EKR0ZM9qAKudwh4JhjQzL/hfhK1Fmzepch6hpYWi5TmIQCUq
-         VJVFOC1odXwUOxp50yGdPRRUmFE+7AAoW6rfUEddKzJR6usH5qhuPz5oLB6V5FwH8SD0
-         nEOw==
-X-Forwarded-Encrypted: i=1; AJvYcCVqGJeKPLotyolsB+nAwjfHDhgCp1F6BaC7P8FurIGbf0F8BM6k+lx4ZJgFGz9aHgUxzJnSxk8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwEZmnkzE4VLvwQ4Hw/WupcCf8yimmweohZsHHkz38Q72O+vnyW
-	q7bDC0vDi9r+4M/w1Gc+2gD6R+B+Zi/0gpWJP1PSUgYru89OpggOFNu7
-X-Gm-Gg: ASbGncsxwif0E3ZlCh0EIxEFGjs7xwRAXBcAY8mLK0O5V3mqzkTLnlnCFdJ8m2i6HHh
-	iWZ8XYvFKsTuXna1S+yC+NObx1KEja/CrWrutvRoK2hCzrs4xPgfvpoYXY43rl4+5IqtBtrve48
-	FKYgKQyd/BSKaxEManOiNIVmlKB/iBZHmYM2qhZ9aU4D2dwVBTQzvVaI9HOhTFkIS0xXwxtvNfp
-	eOT9jWkkAg3qqtXreuw06NIxmxWr4LWo7jWE56hyyjGK6hVXvEq2lSdg0FW3B9G0JYh7l4W228Q
-	GjBJwWtGs7XqYRC+fLNZZvnBLwCQKqsytq0pCq+bHDOwfZ/57z8KZvPReN8mCl0WDLyf1JfkVk4
-	6Bt5jme+7mSjyevI4ULOBDIVMLGAIZsYRUpewNZ62/zYr4r3TdA7gYiwu0OiFDBM/JQgF52NKoh
-	oncoiiwgYaijsJgS+oCNM71hN/Hv9YZiRx+aQ9k0SDdvrx3FOmr+Q=
-X-Google-Smtp-Source: AGHT+IG/WPvgkkz5ima282cKyz2di1ByWQE6/QNBfZEdI+atynO653MZ5MMOXdVnpoH97C2BXp1trA==
-X-Received: by 2002:a05:6000:250a:b0:426:ee44:6d9 with SMTP id ffacd0b85a97d-429e32e3595mr5318368f8f.21.1762427280858;
-        Thu, 06 Nov 2025 03:08:00 -0800 (PST)
-Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429eb403849sm4648357f8f.1.2025.11.06.03.07.59
+        bh=mJ9H3vt04iE1iOinRpVRRRwRwQxVn8Vs66MDAfX+ERc=;
+        b=nti7yEWkqLpJE6pXmevuHZ9z9h+1bk3BqmmHcBHGUmSQxzzzcEKRkCC0k5MysHdjMI
+         qK8DP08UDwqAH4YafGMhV0YoXTdxDghpPG51C8x5lOSKfq6OsZsB1BrolIqwuTfN23ok
+         w4mfXR8RRlDhamGDqVUMTs6k6XhQ8yZ/uTCmRXH4K9OxaWYSPPz9mqnvR115MgaA0yzz
+         KKVTAFm/+xNJYwQ0DvnaGGzhban6PkLKvqnnVIKAFEoC1/J/ZlUlu7dlfl3LoyiLQVwB
+         eA8DlRkVabdNlFpkHrF4JNrb0HOMLhnDwLmwgVJBwrCdGCoZNn+rRzESY95aPPGRIEOp
+         +htQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWuKvIp2vvYt+jwPLgu/zVrYhOgw4TeI/2q+k/9fu8wKJ1dKqLWuH6aI8EIH1Rx0nl0OeGRH4U=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz41J8P0Y8pGadZI2tZvlxy2w6bQNz6Ki1EZcTVq41p8Nmi2kbP
+	5ajYZ3FDXssKgl4PHrSZNWLfof2lLr8D7S6uX2VjlCMtcTql+cQal2KLjpbKbUoAJ6pi11riucK
+	XJre0SnZazNUo5/4oi7E/KqqdZFPJFaPjVEgNveFXfArImbwhFhKmH0W93Q==
+X-Gm-Gg: ASbGncuSlh6YTAOJFSDSURsTzHc8EN26FNOOa9qlRujDRZoeAGXw7wtznf9O9bGLDHU
+	xMQMTOBalCCKzdFsUDN8qaMRt7Shd9QbTT3SCor31vV7AcU8uEz7HFc/aGk4lY5UKxPC6G1cJjy
+	rdZrkm2jq306YmqJxaRLCQTDdKfnddjGDMBfQ3nwBwdaNvxvi9c+53sBr6rjuNWuaJMJZawjG7f
+	Z1LulP4+nt12Hi7nhgyVC0v09spT5O/2OT/7X5asui0KddaZiuz3q0HG3FL45tdIHGNe1ekwy+A
+	p3o10m4C4RA2jJqOvIKOW+ikfwS8Tinn3qshLqHIzDk4nyyqvSKe5X2PQM7TsJLoR6boPdsG655
+	d8w==
+X-Received: by 2002:a5d:5f87:0:b0:427:64c:daaa with SMTP id ffacd0b85a97d-429e3309a36mr5941949f8f.44.1762427293007;
+        Thu, 06 Nov 2025 03:08:13 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEd1vm77ZDhKKFmGLmtogps8up+77Qdb9bBoLD/2VxY85lZ0MG6jm4vBI/942lqkDDMsGcznA==
+X-Received: by 2002:a5d:5f87:0:b0:427:64c:daaa with SMTP id ffacd0b85a97d-429e3309a36mr5941919f8f.44.1762427292510;
+        Thu, 06 Nov 2025 03:08:12 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.83])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429eb477226sm4275998f8f.24.2025.11.06.03.08.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Nov 2025 03:08:00 -0800 (PST)
-Message-ID: <785c9d27-23e7-4ecf-ad2e-202ba506f2e0@gmail.com>
-Date: Thu, 6 Nov 2025 11:07:58 +0000
+        Thu, 06 Nov 2025 03:08:12 -0800 (PST)
+Message-ID: <8ac38ae2-74fc-45a1-88fb-4edd124ab9c3@redhat.com>
+Date: Thu, 6 Nov 2025 12:08:08 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,52 +102,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC mm v5 1/2] page_pool: check nmdesc->pp to see its usage as
- page pool for net_iov not page-backed
-To: Byungchul Park <byungchul@sk.com>, linux-mm@kvack.org,
- netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
- harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
- davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
- john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com,
- leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
- andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
- akpm@linux-foundation.org, david@redhat.com, lorenzo.stoakes@oracle.com,
- Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org, surenb@google.com,
- mhocko@suse.com, horms@kernel.org, jackmanb@google.com, hannes@cmpxchg.org,
- ziy@nvidia.com, ilias.apalodimas@linaro.org, willy@infradead.org,
- brauner@kernel.org, kas@kernel.org, yuzhao@google.com,
- usamaarif642@gmail.com, baolin.wang@linux.alibaba.com,
- almasrymina@google.com, toke@redhat.com, bpf@vger.kernel.org,
- linux-rdma@vger.kernel.org, sfr@canb.auug.org.au, dw@davidwei.uk,
- ap420073@gmail.com, dtatulea@nvidia.com
-References: <20251103075108.26437-1-byungchul@sk.com>
- <20251103075108.26437-2-byungchul@sk.com>
+Subject: Re: [PATCH v5 net-next 02/14] gro: flushing when CWR is set
+ negatively affects AccECN
+From: Paolo Abeni <pabeni@redhat.com>
+To: chia-yu.chang@nokia-bell-labs.com, edumazet@google.com, parav@nvidia.com,
+ linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org,
+ dsahern@kernel.org, kuniyu@google.com, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com,
+ kuba@kernel.org, stephen@networkplumber.org, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, davem@davemloft.net, andrew+netdev@lunn.ch,
+ donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
+ shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
+ ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
+ g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
+ mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
+ Jason_Livingood@comcast.com, vidhi_goel@apple.com
+References: <20251030143435.13003-1-chia-yu.chang@nokia-bell-labs.com>
+ <20251030143435.13003-3-chia-yu.chang@nokia-bell-labs.com>
+ <8ad4ca21-5b81-415b-b16c-6cc4b668921c@redhat.com>
 Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20251103075108.26437-2-byungchul@sk.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <8ad4ca21-5b81-415b-b16c-6cc4b668921c@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 11/3/25 07:51, Byungchul Park wrote:
-> Currently, the condition 'page->pp_magic == PP_SIGNATURE' is used to
-> determine if a page belongs to a page pool.  However, with the planned
-> removal of ->pp_magic, we will instead leverage the page_type in struct
-> page, such as PGTY_netpp, for this purpose.
+On 11/6/25 12:01 PM, Paolo Abeni wrote:
+> On 10/30/25 3:34 PM, chia-yu.chang@nokia-bell-labs.com wrote:
+>> From: Ilpo Järvinen <ij@kernel.org>
+>>
+>> As AccECN may keep CWR bit asserted due to different
+>> interpretation of the bit, flushing with GRO because of
+>> CWR may effectively disable GRO until AccECN counter
+>> field changes such that CWR-bit becomes 0.
+>>
+>> There is no harm done from not immediately forwarding the
+>> CWR'ed segment with RFC3168 ECN.
+>>
+>> Signed-off-by: Ilpo Järvinen <ij@kernel.org>
+>> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
 > 
-> That works for page-backed network memory.  However, for net_iov not
-> page-backed, the identification cannot be based on the page_type.
-> Instead, nmdesc->pp can be used to see if it belongs to a page pool, by
-> making sure nmdesc->pp is NULL otherwise.
-> 
-> For net_iov not page-backed, initialize it using nmdesc->pp = NULL in
-> net_devmem_bind_dmabuf() and using kvmalloc_array(__GFP_ZERO) in
-> io_zcrx_create_area() so that netmem_is_pp() can check if nmdesc->pp is
-> !NULL to confirm its usage as page pool.
+> Please provide a test/update the existing one to cover this case or move
+> to a later series. Possibly both :)
 
-Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
+Whoops, sorry. I'm looking at the patch in order and when I wrote the
+above I haven't seen yet patch 4/14. Please ignore.
 
--- 
-Pavel Begunkov
+/P
 
 
