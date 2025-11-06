@@ -1,100 +1,115 @@
-Return-Path: <netdev+bounces-236133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68CEFC38BD8
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 02:51:06 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A0BDC38C05
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 02:55:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id CBBB634FB1D
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 01:51:05 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BF57B4E2FF3
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 01:55:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE30623D297;
-	Thu,  6 Nov 2025 01:50:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 819AF221FC6;
+	Thu,  6 Nov 2025 01:55:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cvm36Yvv"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="JmIY1pv7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B432623B63F;
-	Thu,  6 Nov 2025 01:50:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2734A2144CF
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 01:55:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762393841; cv=none; b=KAewqAoAgKwmgQPOIJne4MrV5xRIvhaFGn3upDAT94wPYauQ2mZl2D52fSNwXV38jHnr+nsLRRdtXs6FwhTU8DArrpqBDxijjTrgsRULeaioj/wGjv4h1yPFMYVuFG+EnHS4m7Z0Z6fntW3Lx71DO8Aqk1YoSULOfnwh8WRDTkA=
+	t=1762394145; cv=none; b=KbGVCQsbE/gzWebdZ8j6sEYj15N4dCkqtKjGbBoGXkmV/k/Tapstjh6vGoM9w2SaRmt3w8re3loQUX+FSifdoo6/rnjdhQfl/PGsFtkhOHLQaOVJWgbXP5YeJkqgFllRrc3FNqjCsQ1/TyrRYZmO+i+Y9H5s6u2fB1Ms8/3ls5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762393841; c=relaxed/simple;
-	bh=lNkBiARZtn/rKskJaEUZ4Wqa4m4tkJPpwzva2NxnKBU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=f/+Em1PF+2JFR57MgHIqAK6cQ+1QwC/4VAGDIJSTfiWogZDum7nRmiw0Q1terPam2qfY1AR1COrKsxyq7V2L/h387JOLiDFjRskdtWSjkqDN68goavHKFDkq/LMKQzcWeyjaRd0EcPO8GL8k7A0S8jvvGiFb9KlH3T60OZpzfnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cvm36Yvv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37CC0C4CEF8;
-	Thu,  6 Nov 2025 01:50:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762393841;
-	bh=lNkBiARZtn/rKskJaEUZ4Wqa4m4tkJPpwzva2NxnKBU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cvm36YvvGML8N0jW9IhuxhCHYKSG9tF7bZrsc8REFl8755kA0n1fmQkoAE7UFUB+3
-	 2P0oatr6lGLbhp5uYIl3+NIh03F3q6QU6IloJCtr1gr7GwRa/cUth+DJscV4IcehyV
-	 +H+LTj1rZiPXNiY7puJP6w9Rzo5n01UKIxIa3riRS1ODbaun1gqvWqmmketA/XNiGr
-	 uN26cfL3YBh3eqRf5Z6gh1JTrZdHhx0HZ6555Q2RFDK0UOkLYcw9SzPh9Og/uTE1jK
-	 n+V0Et17j/Ni7IEP2mX3eZ0hGdQNbHRy/PRwq10TxgACfnOryJiFnybr+Rfvfw7ag6
-	 R00x1Es+m8M4A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD6A380AAF5;
-	Thu,  6 Nov 2025 01:50:15 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1762394145; c=relaxed/simple;
+	bh=0rypb6YAyNvULRWv3clzohmKlcHOWJcOAzcMHrJfum0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eviXWhcXMaPHWBFftIyhNJK43T1f7WAiZ7vw5tmFtpN6Dy99FxZloWfG7ZPezXnj+iQMWP4RScwMp0drW64wsz/KJMF40ENLcBSMdpCxcAV9sAT0zlIyTSi/8g1sQ8ZMjn3AdPvIkFIygeEYy3b7bz6kuxwD+T9YIezRXI7WG8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=JmIY1pv7; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=4ITqPQA8fRrbxRLD4xqri1t/q83422DhMqqq3jEbapI=; b=JmIY1pv7Y602Ue9TRGVE3iKkZr
+	DKbXWpfFusF2yAM32fugEYoHzHzcxqyC+23jOYx24+5PYnR197hQEHICzt3WQGW7S0WTuctCbXefr
+	2RvsZtddE+47OH/HpaMwbQLva9BqWsHiTz4zqgS8sNIQaYN78oNqvhGTp3R88WOSLIufjCtmtTjm6
+	ob+etum/3S4QYnsXf3Hx4h8NBTtUpnl6xU3iZd1V9JwHxVyP1SZMbRdUU8dlHz91NFQCxvNvQfV3g
+	NTpSwbRgkE4QJVhb5lEYenP0gQzClSIkI3R802GYHb90y8UX/AQomKuxlxi8q8Jj0rxISdK/MYwNc
+	efmGaPyw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49948)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vGpDq-000000004A9-1LiQ;
+	Thu, 06 Nov 2025 01:55:34 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vGpDn-000000006Ch-1KZs;
+	Thu, 06 Nov 2025 01:55:31 +0000
+Date: Thu, 6 Nov 2025 01:55:31 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 09/11] net: stmmac: ingenic: simplify x2000
+ mac_set_mode()
+Message-ID: <aQwAExA7bAgwNkdI@shell.armlinux.org.uk>
+References: <aQtQYlEY9crH0IKo@shell.armlinux.org.uk>
+ <E1vGdXJ-0000000CloA-3yVc@rmk-PC.armlinux.org.uk>
+ <20251105171848.550f625a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net/mlx5e: Fix return value in case of module EEPROM
- read
- error
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176239381424.3828781.3734885280355871994.git-patchwork-notify@kernel.org>
-Date: Thu, 06 Nov 2025 01:50:14 +0000
-References: <1762265736-1028868-1-git-send-email-tariqt@nvidia.com>
-In-Reply-To: <1762265736-1028868-1-git-send-email-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
- mbloch@nvidia.com, leon@kernel.org, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, gal@nvidia.com,
- alazar@nvidia.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251105171848.550f625a@kernel.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue, 4 Nov 2025 16:15:36 +0200 you wrote:
-> From: Gal Pressman <gal@nvidia.com>
+On Wed, Nov 05, 2025 at 05:18:48PM -0800, Jakub Kicinski wrote:
+> On Wed, 05 Nov 2025 13:26:53 +0000 Russell King (Oracle) wrote:
+> > As per the previous commit, we have validated that the phy_intf_sel
+> > value is one that is permissible for this SoC, so there is no need to
+> > handle invalid PHY interface modes. We can also apply the other
+> > configuration based upon the phy_intf_sel value rather than the
+> > PHY interface mode.
 > 
-> mlx5e_get_module_eeprom_by_page() has weird error handling.
+> clang sayeth:
 > 
-> First, it is treating -EINVAL as a special case, but it is unclear why.
-> 
-> Second, it tries to fail "gracefully" by returning the number of bytes
-> read even in case of an error. This results in wrongly returning
-> success (0 return value) if the error occurs before any bytes were
-> read.
-> 
-> [...]
+> drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c:128:13: warning: variable 'val' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+>   128 |         } else if (phy_intf_sel == PHY_INTF_SEL_RGMII) {
+>       |                    ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here is the summary with links:
-  - [net] net/mlx5e: Fix return value in case of module EEPROM read error
-    https://git.kernel.org/netdev/net/c/d1c94bc5b90c
+Clang can't know that phy_intf_sel will only ever be one of
+PHY_INTF_SEL_RMII or PHY_INTF_SEL_RGMII here (its already been
+validated as such by the only caller of this function.)
 
-You are awesome, thank you!
+I guess the way around this warning is to move:
+
+        val |= FIELD_PREP(MACPHYC_PHY_INFT_MASK, phy_intf_sel);
+
+up and make it a simple assignment, and make the others |=.
+
+That's the code I originally had before I attempted to minimise the
+noise in the patches. :(
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
