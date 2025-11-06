@@ -1,196 +1,162 @@
-Return-Path: <netdev+bounces-236484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CAF6C3CFA8
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 18:58:41 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79E4BC3CF93
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 18:57:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 115E63ABF51
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 17:56:44 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5CA934E155A
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 17:57:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66FE34D4C0;
-	Thu,  6 Nov 2025 17:56:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78BEF34D4CD;
+	Thu,  6 Nov 2025 17:57:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b="mPAVZlkL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IEyFYQQB"
 X-Original-To: netdev@vger.kernel.org
-Received: from unimail.uni-dortmund.de (mx1.hrz.uni-dortmund.de [129.217.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C529E34A3BC;
-	Thu,  6 Nov 2025 17:56:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.217.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7B5D347BBE
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 17:57:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762451800; cv=none; b=jOU8nT5QIs4hYOb7NMXnr4cbqthPPDVGgMlGl9DQ+cE/qAVNh6rVmrsSAu0ekn0Dc9aUnY1rPLSJ77zu6+EgItKuaYgSNWLRJ00ra/5Kr53/77SyTUvRIhdHcrF7VhzcvBBjvE4LFaEfQ/0c0OdzFygMJQzRHex0mKPVGwYBcBs=
+	t=1762451867; cv=none; b=bklJZRGTWK8coI31AEG7FlQwQPHRO5Dq+WQxv2u1DeR1zBNnT9PO/KJbPi5xYn1D/k5tFNWNebbghNhnfMZzrwtM6zdBb9ebKRMCegpHOuGt6n/SpfcVSl9q24k+L/ZNxEAuAj1yHue5sy/Q4w+4usCuUS92TdKsYQs6+24wjDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762451800; c=relaxed/simple;
-	bh=nQ57i8dH7Nm/uXtna/JxiKIX3iH6HAa/JKy4WzkSbYA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=O9/U7QSY5g3C+5lmCvbFvx5rlRLFwrYYzayaXUPkMnyG649E408zBG04jnxM8AGP9vXFP7IKgGvCi3o5ptJjnqxVHiLc8hpA/KYxNi1ZRTSUjmyeU7nNwBpTMMXE+8HRuu98/TjJDD4L4OEPvyiTVE3stUl3r5gsUTjWIL9d5cQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de; spf=pass smtp.mailfrom=tu-dortmund.de; dkim=pass (1024-bit key) header.d=tu-dortmund.de header.i=@tu-dortmund.de header.b=mPAVZlkL; arc=none smtp.client-ip=129.217.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=tu-dortmund.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-dortmund.de
-Received: from simon-Latitude-5450.. (tmo-072-112.customers.d1-online.com [80.187.72.112])
-	(authenticated bits=0)
-	by unimail.uni-dortmund.de (8.18.1.10/8.18.1.10) with ESMTPSA id 5A6HuOKm024412
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NOT);
-	Thu, 6 Nov 2025 18:56:26 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tu-dortmund.de;
-	s=unimail; t=1762451789;
-	bh=nQ57i8dH7Nm/uXtna/JxiKIX3iH6HAa/JKy4WzkSbYA=;
-	h=From:To:Cc:Subject:Date;
-	b=mPAVZlkLy9neHrsgaiPqcP4KJnzvbNPBMW7/zCUaY4cPa7nOl/4TrnykF4Yyjwl5/
-	 Xn3rLcL5zNJ9YlFkxpaE2iFxnLnXzXXYN9trzFedLByoj3cV8Ct7U6QDWN1j7L73aG
-	 ygGuWk/+/aA6+tQCQKzXVeegBz/K+P+Ry+tMpCuY=
-From: Simon Schippers <simon.schippers@tu-dortmund.de>
-To: oneukum@suse.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        dnlplm@gmail.com, netdev@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc: Simon Schippers <simon.schippers@tu-dortmund.de>
-Subject: [PATCH net-next v2] usbnet: Add support for Byte Queue Limits (BQL)
-Date: Thu,  6 Nov 2025 18:56:15 +0100
-Message-ID: <20251106175615.26948-1-simon.schippers@tu-dortmund.de>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1762451867; c=relaxed/simple;
+	bh=270dd+ce0HM/mnehwKbtl2KQehJ1X4zco4/uV6CxTd8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DeKdTK6noxjqfTIJ2l3LRi5tth/Hs5S+GgypvL/mNf7QNScyDyAeA90QOeDG1OjV9Y9JEWcBQsUEm/VDCun9M+gRwKBrBpIYZ6Oo2+ND29S9YAfoCFW86bcRKh3GFbVNaQzp+uvY3QHslp9nuGVo+XV5sTfIxsWKTLBaZ1Y5Xco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IEyFYQQB; arc=none smtp.client-ip=209.85.128.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-7866aca9e25so11567177b3.3
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 09:57:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762451865; x=1763056665; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8oIlWmrebBL+pksnC7en0DKHM2NlJESnFW4gbQhLyfg=;
+        b=IEyFYQQBH2hWWlDVa8iM53VOT5otm1fXmyQ8X7Jqd37Dx/42bARPuJoi8StJRmSPz+
+         6zLKoh+/HDAIu1zetsf0Xh44JSMpqaR3UMt5T3xSp+vceYYwTUsCL7OcPIdBpoxX/Uv/
+         aRAKTvUyGvN1H/ptb47/zHoHowofJQi/mcAX5Wu+tlIOX3B+JBMAxKbFxRbXBZ5xCF9D
+         Fk8kTpoT70g3BO7mnqfv9tKsnGhSZWj9+rOd1XiZKS01igM0yKfO4u7qx99q3Su7kAtw
+         970u8vihIHyXa/P8M87S/P477Y+MotAXnOSJLp0j9hAmj04U/IuZUNg8zDPljnALmi2o
+         DUIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762451865; x=1763056665;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=8oIlWmrebBL+pksnC7en0DKHM2NlJESnFW4gbQhLyfg=;
+        b=cvu3RnxrlErJpZwhC+7HJXPmXMgjMe70b9kurijFH2fTL1Qd3gH0w6WOSAAKaCX8as
+         RFtxlIJ2r9oMbFwLobSlZIRAEeCEJRcKv9mz80NY0ue614uglFD0pEIgIc78lYXIftT0
+         X1C4gLUf+suonmu743H1WGb1RKQYGwwm7plgv/MPBflY6ORmHTGBkDj+JSSsu86+E6aR
+         dEgs6NvrElnzlxoHCWIsPac/tGfBRjYv/MDvQwvIYsDE/9V1zVhhSwYYynvBSgHIj6Hs
+         EudHRrsEd7DJFgpa4gXtGK9mCCiOQKprEP+4glz05zW0cfFf7GDock9Mvvfe0ojGfdla
+         ix5w==
+X-Gm-Message-State: AOJu0Yyor0k3hBwNxOmFVZeHQR/kKlfgDUZpqIRXgdz52AiuoWg6IFoe
+	xw+nr709Skee+fOPdB7TKQlmlfc0KHz/D4yRkqu83i5QsQmpOZI1GlASUFSGx2jqVdrJw+wcvgV
+	zMYjKsbkhuqCb1puQzt4TqLjvvyhzrUw2n1Ea
+X-Gm-Gg: ASbGncs+PzY6oqq6foGE4XKvgb5zVg4IN+ofs756MupqEdjQ4IprUIJ/wK0yaCluvIV
+	Pv8omxqX4pKYHkyBELzNYe9//8i2YsAILesxks1sOl9CZYv9FsIuLbpENAs666pkfD7M5STimih
+	+Y+PfbvktsNKQG/N97bInXq3jsCp1k2A/11+48b2xkMNZ9wTH+vY92MhilmR9SyI2fjNMc+064c
+	95YWo5t1OyuT7Dioo+7mVs9JDi8VOAHr/+04GqFD+i1A7LwnK5G8atzoq5KbWJMb598tyYW7Uy9
+	mH0KAUQGLu8=
+X-Google-Smtp-Source: AGHT+IFGFppB+s7NJSj/RpzHJh6UYLUGVcKwMtlRmtppO9WoglW4SeUFJ9mnPzBjMb7tWwzW7pIHTFqslJvyjPa7yoA=
+X-Received: by 2002:a05:690c:4444:b0:786:896d:8825 with SMTP id
+ 00721157ae682-787c53fcc84mr984317b3.49.1762451864692; Thu, 06 Nov 2025
+ 09:57:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20251104172652.1746988-1-ameryhung@gmail.com> <20251104172652.1746988-4-ameryhung@gmail.com>
+ <0a3c4937-e4fd-49b6-a48c-88a4aa83e8a1@linux.dev>
+In-Reply-To: <0a3c4937-e4fd-49b6-a48c-88a4aa83e8a1@linux.dev>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Thu, 6 Nov 2025 09:57:31 -0800
+X-Gm-Features: AWmQ_bn9NUocY0TqNGMbHeVxMFmp_heKpPewj94SjLJ0qX0L02FSoEQ0yh2aW38
+Message-ID: <CAMB2axPayfZOZnGK83eWxYTg9k0uno_y87_0ePE_FD6V+4tnfA@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v5 3/7] bpf: Pin associated struct_ops when
+ registering async callback
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: netdev@vger.kernel.org, alexei.starovoitov@gmail.com, andrii@kernel.org, 
+	daniel@iogearbox.net, tj@kernel.org, martin.lau@kernel.org, 
+	kernel-team@meta.com, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-In the current implementation, usbnet uses a fixed tx_qlen of:
+On Wed, Nov 5, 2025 at 6:13=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.d=
+ev> wrote:
+>
+> On 11/4/25 9:26 AM, Amery Hung wrote:
+> > Take a refcount of the associated struct_ops map to prevent the map fro=
+m
+> > being freed when an async callback scheduled from a struct_ops program
+> > runs.
+> >
+> > Since struct_ops programs do not take refcounts on the struct_ops map,
+> > it is possible for a struct_ops map to be freed when an async callback
+> > scheduled from it runs. To prevent this, take a refcount on prog->aux->
+> > st_ops_assoc and save it in a newly created struct bpf_async_res for
+> > every async mechanism. The reference needs to be preserved in
+> > bpf_async_res since prog->aux->st_ops_assoc can be poisoned anytime
+> > and reference leak could happen.
+> >
+> > bpf_async_res will contain a async callback's BPF program and resources
+> > related to the BPF program. The resources will be acquired when
+> > registering a callback and released when cancelled or when the map
+> > associated with the callback is freed.
+> >
+> > Also rename drop_prog_refcnt to bpf_async_cb_reset to better reflect
+> > what it now does.
+> >
+>
+> [ ... ]
+>
+> > +static int bpf_async_res_get(struct bpf_async_res *res, struct bpf_pro=
+g *prog)
+> > +{
+> > +     struct bpf_map *st_ops_assoc =3D NULL;
+> > +     int err;
+> > +
+> > +     prog =3D bpf_prog_inc_not_zero(prog);
+> > +     if (IS_ERR(prog))
+> > +             return PTR_ERR(prog);
+> > +
+> > +     st_ops_assoc =3D READ_ONCE(prog->aux->st_ops_assoc);
+> > +     if (prog->type =3D=3D BPF_PROG_TYPE_STRUCT_OPS &&
+> > +         st_ops_assoc && st_ops_assoc !=3D BPF_PTR_POISON) {
+> > +             st_ops_assoc =3D bpf_map_inc_not_zero(st_ops_assoc);
+>
+> The READ_ONCE and inc_not_zero is an unusual combo. Should it be
+> rcu_dereference and prog->aux->st_ops_assoc should be "__rcu" tagged?
+>
 
-USB2: 60 * 1518 bytes = 91.08 KB
-USB3: 60 * 5 * 1518 bytes = 454.80 KB
+Understood the underlying struct_ops map is protected by RCU, but
+prog->aux->st_ops_assoc is not protected by RCU and can change
+anytime.
 
-Such large transmit queues can be problematic, especially for cellular
-modems. For example, with a typical celluar link speed of 10 Mbit/s, a
-fully occupied USB3 transmit queue results in:
+> If prog->aux->st_ops_assoc is protected by rcu, can the user (kfunc?)
+> uses the prog->aux->st_ops_assoc depending on the rcu grace period alone
+> without bpf_map_inc_not_zero? Does it matter if prog->aux->st_ops_assoc
+> is changed? but this patch does not seem to consider the changing case al=
+so.
+>
 
-454.80 KB / (10 Mbit/s / 8 bit/byte) = 363.84 ms
+I think bumping refcount makes bpf_prog_get_assoc_struct_ops() easier
+to use: Users do not need to worry about the lifetime of the return
+kdata, RCU, and the execution context.
 
-of additional latency.
+The main problem is that async callbacks are not running in RCU
+read-side critical section, so it will require callers of
+bpf_prog_get_assoc_struct_ops() to do rcu_read_lock{_trace}().
 
-This patch adds support for Byte Queue Limits (BQL) [1] to dynamically
-manage the transmit queue size and reduce latency without sacrificing
-throughput.
-
-Testing was performed on various devices using the usbnet driver for
-packet transmission:
-
-- DELOCK 66045: USB3 to 2.5 GbE adapter (ax88179_178a)
-- DELOCK 61969: USB2 to 1 GbE adapter (asix)
-- Quectel RM520: 5G modem (qmi_wwan)
-- USB2 Android tethering (cdc_ncm)
-
-No performance degradation was observed for iperf3 TCP or UDP traffic,
-while latency for a prioritized ping application was significantly
-reduced. For example, using the USB3 to 2.5 GbE adapter, which was fully
-utilized by iperf3 UDP traffic, the prioritized ping was improved from
-1.6 ms to 0.6 ms. With the same setup but with a 100 Mbit/s Ethernet
-connection, the prioritized ping was improved from 35 ms to 5 ms.
-
-[1] https://lwn.net/Articles/469652/
-
-Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
----
-v1 -> v2:
-Add a new spinlock to ensure netdev_completed_queue() is not executed
-concurrently by process context usbnet_bh_work() and the timer
-dev->delay.
-- https://lore.kernel.org/netdev/20251104161327.41004-1-simon.schippers@tu-dortmund.de/
-
- drivers/net/usb/usbnet.c   | 11 +++++++++++
- include/linux/usb/usbnet.h |  2 ++
- 2 files changed, 13 insertions(+)
-
-diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
-index f3087fb62f4f..3d10cf791c51 100644
---- a/drivers/net/usb/usbnet.c
-+++ b/drivers/net/usb/usbnet.c
-@@ -831,6 +831,7 @@ int usbnet_stop(struct net_device *net)
- 
- 	clear_bit(EVENT_DEV_OPEN, &dev->flags);
- 	netif_stop_queue (net);
-+	netdev_reset_queue(net);
- 
- 	netif_info(dev, ifdown, dev->net,
- 		   "stop stats: rx/tx %lu/%lu, errs %lu/%lu\n",
-@@ -939,6 +940,7 @@ int usbnet_open(struct net_device *net)
- 	}
- 
- 	set_bit(EVENT_DEV_OPEN, &dev->flags);
-+	netdev_reset_queue(net);
- 	netif_start_queue (net);
- 	netif_info(dev, ifup, dev->net,
- 		   "open: enable queueing (rx %d, tx %d) mtu %d %s framing\n",
-@@ -1500,6 +1502,7 @@ netdev_tx_t usbnet_start_xmit(struct sk_buff *skb, struct net_device *net)
- 	case 0:
- 		netif_trans_update(net);
- 		__usbnet_queue_skb(&dev->txq, skb, tx_start);
-+		netdev_sent_queue(net, skb->len);
- 		if (dev->txq.qlen >= TX_QLEN (dev))
- 			netif_stop_queue (net);
- 	}
-@@ -1563,6 +1566,7 @@ static inline void usb_free_skb(struct sk_buff *skb)
- static void usbnet_bh(struct timer_list *t)
- {
- 	struct usbnet		*dev = timer_container_of(dev, t, delay);
-+	unsigned int bytes_compl = 0, pkts_compl = 0;
- 	struct sk_buff		*skb;
- 	struct skb_data		*entry;
- 
-@@ -1574,6 +1578,8 @@ static void usbnet_bh(struct timer_list *t)
- 				usb_free_skb(skb);
- 			continue;
- 		case tx_done:
-+			bytes_compl += skb->len;
-+			pkts_compl++;
- 			kfree(entry->urb->sg);
- 			fallthrough;
- 		case rx_cleanup:
-@@ -1584,6 +1590,10 @@ static void usbnet_bh(struct timer_list *t)
- 		}
- 	}
- 
-+	spin_lock_bh(&dev->bql_spinlock);
-+	netdev_completed_queue(dev->net, pkts_compl, bytes_compl);
-+	spin_unlock_bh(&dev->bql_spinlock);
-+
- 	/* restart RX again after disabling due to high error rate */
- 	clear_bit(EVENT_RX_KILL, &dev->flags);
- 
-@@ -1755,6 +1765,7 @@ usbnet_probe(struct usb_interface *udev, const struct usb_device_id *prod)
- 	skb_queue_head_init (&dev->txq);
- 	skb_queue_head_init (&dev->done);
- 	skb_queue_head_init(&dev->rxq_pause);
-+	spin_lock_init(&dev->bql_spinlock);
- 	INIT_WORK(&dev->bh_work, usbnet_bh_work);
- 	INIT_WORK (&dev->kevent, usbnet_deferred_kevent);
- 	init_usb_anchor(&dev->deferred);
-diff --git a/include/linux/usb/usbnet.h b/include/linux/usb/usbnet.h
-index a2d54122823d..2945923a8a95 100644
---- a/include/linux/usb/usbnet.h
-+++ b/include/linux/usb/usbnet.h
-@@ -14,6 +14,7 @@
- #include <linux/skbuff.h>
- #include <linux/types.h>
- #include <linux/usb.h>
-+#include <linux/spinlock.h>
- 
- /* interface from usbnet core to each USB networking link we handle */
- struct usbnet {
-@@ -59,6 +60,7 @@ struct usbnet {
- 	struct mutex		interrupt_mutex;
- 	struct usb_anchor	deferred;
- 	struct work_struct	bh_work;
-+	spinlock_t		bql_spinlock;
- 
- 	struct work_struct	kevent;
- 	unsigned long		flags;
--- 
-2.43.0
-
+The change of st_ops_assoc indeed is missed here. st_ops_assoc can
+change from NULL to a valid kdata. Will fix this in the next respin.
 
