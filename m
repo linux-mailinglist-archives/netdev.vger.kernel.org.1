@@ -1,191 +1,139 @@
-Return-Path: <netdev+bounces-236314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E42AC3AC55
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 13:05:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2854FC3AC50
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 13:05:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 360E31AA5678
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 11:57:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 674D81AA5BDD
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 11:58:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2BAD3164CD;
-	Thu,  6 Nov 2025 11:56:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70A03319604;
+	Thu,  6 Nov 2025 11:56:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dOAX6D83"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kz9m2Xjr";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="PHLMlYjd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08E1130EF85
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 11:56:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7A7C30EF85
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 11:56:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762430181; cv=none; b=XT3NfkinEBaXgNCU4Az+JOjFG/+nuIllu8rzqkx8qs2M8ZkI07ZENwufoR+EzgsSa7DEQgzpyBtL2gBZHD02MR3PnZjum4u+EGRvkINln3ITsLEHe+sXW0t94hlne0xuBf5r2RbToBA0Z4vK4sfHUwX60BWpSiwBozWt+xdY3uE=
+	t=1762430191; cv=none; b=p6KCp1W4C9yBoAwr/KzSN8NjkWuhTEU3x1UXLgCpOFT/2zAosSobS9v8iff5GRk8HEAM5ba4VndnoXSeN2JGNwEfe/UM2agkdNQ2r9Qr1hBHb7IgWZGlWXNPgGB1WLibDvMwiNgwrD1/5UXbO8tioZIkz8W4tOkgm0lnzuvZvSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762430181; c=relaxed/simple;
-	bh=F5ah8MsnK3Z9znouBMKy+zHLSoJBwjNa27W+pmH6JFY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=LjnfLjucEKqQ7BPJfyp4JBgX03ZixwZSvcmck94Npb//SpA1lpN0XjbhDGWTdoEAFb7p6FlBWqlTzUTrqNi2wSQgqK5sYkV2AssQgnX1VNysw54HnZ7WbymzSF/PsYeCefbF/RY3REKoDRB4HnPmBNPx5i0H2v2ps6YDsI7aOao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dOAX6D83; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7afd7789ccdso431211b3a.2
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 03:56:19 -0800 (PST)
+	s=arc-20240116; t=1762430191; c=relaxed/simple;
+	bh=YeroezC/007S9WCZ1zjfYLqrdykQ/FoCz8WVrVp3klk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Uxl1JiOOgjrq+FFzAzuKuqQddYUJX3uvEQSEDICsfTqf3qaiyIvcgLsOwhiBwia96ht0Z+CSqRpj8toXOo+/QzLgyUespeOiGZaV+Vp6ved5oiX9UmdU9/MUIJc9cWJyotuiuJaxmL5a6j4t5EEuUraHv4IQObt1ySKp/DOIvL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Kz9m2Xjr; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=PHLMlYjd; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762430188;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9le/TR6EJL7OtK2G5F8XjAJfAro4XHRnCrWtY3w0ANA=;
+	b=Kz9m2Xjr1sKrbmsF7OIaIUdrHXTd6MU4xaWTJfiowSH0swnRQ35FmVOKaeFFCvqD2TYgX0
+	d2FRUzndloPqPnXv3+2rH/4Vc99YY1tt1PVCRCqCtnFs9jpuzkjLDJQ7W7uhzIT6z6dEcl
+	ohpBaCke5qoMLUQkXeCYk6F0GUbAq9I=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-547-eGibYKDzPsCs3tj1yT3oFw-1; Thu, 06 Nov 2025 06:56:27 -0500
+X-MC-Unique: eGibYKDzPsCs3tj1yT3oFw-1
+X-Mimecast-MFC-AGG-ID: eGibYKDzPsCs3tj1yT3oFw_1762430186
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-47769a0a13bso2018645e9.0
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 03:56:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762430179; x=1763034979; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=uNpcXHGc/4OOByDk3Xi+rklLjzHFy8Vk5vFGZ7I57lE=;
-        b=dOAX6D833vsJj457zNJu0vLzK6iIzbzazjs6i30oiu6LagC9kcB5mOjq6+prtGzY2x
-         ELku25DIxYDXi0vHZduZsz2tbEct4gYpppv3EAhpvTBCfE+Rt+qwuQvW7kfusC5O8T0S
-         OFcepC1TW0V4epixtjgBnPkXzgx73pt7bpwvQ0OaIQ9ixwNDcqF7b+i7l7XF/GCUflyN
-         rjVVJmrS9ImWpMK9YCfQZ55Kh4BGE3AeX2Mtl07dQ6N9SO96pXzA7WQwaxhoisJS7HiA
-         jXibqUsz/8fDQfnRahsesqH6WqR90E8J2G70IB3Y3Zter8I8MO4mvYYMdfIECKdJFhEJ
-         1Geg==
+        d=redhat.com; s=google; t=1762430186; x=1763034986; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=9le/TR6EJL7OtK2G5F8XjAJfAro4XHRnCrWtY3w0ANA=;
+        b=PHLMlYjdxUBj6bWlLwLy3L+PAqdN/yWe5NFwfbr/v7b74jWR9C0c8uRC+RGNgKtdZO
+         mDBQTBUzwU7mhVOLX9x/jgK8k9blURU6S+X82n1DRDLaosRW7m6/SLbcYfIz5ozAIk70
+         Ygtr5s6fgN5rrZM3YQlU+1r5rs8rUPlTV3xV5Ft0m4qfWQAImYfXQAtQn6YTLNdRhkkl
+         dCQy5hfiSjnrlfAII/EWMrdXAkQ7BUhQp7exFi3PlAyZ4MxG6DFTfpWK+nZe/X0ogRgw
+         3I7jgWVG6qen5ZQvtpwME8mu7+VAQ+1sK/dRNGBPRYsRnGJn1FcJJ76KWQPhEHlADMJ8
+         5OZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762430179; x=1763034979;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uNpcXHGc/4OOByDk3Xi+rklLjzHFy8Vk5vFGZ7I57lE=;
-        b=YMGmmT98p91NklRVw8oYR0yqfKBeteqiBjpGLkS+4THMVlExO6f3W/TQ+cxIy3woIY
-         nX8F7pCBjj+iTwpA/EIpxcwmYx0xGNRjSTS9XfPZllgWzN7548ABjoLSKBnz/B/nk9jA
-         HayO9Lit8Ez800QXTAPp65galcA11nY1KcHsge1/HK5SEdi6yk4NuSMBapcuCFEZYn6F
-         30XlKgezmjjiAPn+PufUVaCKouOX2FcsuGBPaqqM10wJpgBUk0JOCn2ccUCTFeiWW4/4
-         VbrB8ZrHILczNzYXn5K07K47dAPmLlhW5pHBaL9+Og9IlvOufwqQgB5sD3fhMRkrNd1Y
-         tecg==
-X-Forwarded-Encrypted: i=1; AJvYcCWFcNaw2/TFwA0rATb7jYGmoxuOX3i2tatSOJanqWq08j+brpejr0m7DaKfbA6dkZj86wUn2Qc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7kCWq3fbLtu/iyNjv8QrDa+yh1oc3zxYvzliFju4hlx7VQ8eq
-	0JIZ1i4vO/9kUSHTZR0GUyvIC/WhTaEltx6+NwA+vrg6vtHtZVnnVTPb
-X-Gm-Gg: ASbGnctDIWOwerwwbSA+XCaW2EQqPjuH+dtfy9d9cv+pz75jNzMLFpidkTUaLh6LpRa
-	oGVMm9mMzIPrjH8ilRPevEIH8E0nrAaLDV68+s2WaKzjEeRx0oUKPYMBlZX8H4kAWq4u4P/KYMS
-	rXccTxTCAmjn9fEWx+n1ke08ibtTjA1bVFaQFCL1VfsnL7av1vXGk1geJQ/ZP9NaSfnRmRD73lJ
-	J7U9RpjaFO+Xw330BQuDpkb1QCiQ9y93tCicqoyT7sNFwvFdRyywKPx8WdeqnKeTSVKOgakP5lF
-	GDXXEdiINC8gkdC7XbFw/vAlmb4Cl8IlumIfRKHe07j9JYYhUz1lu1Kj95Ex/AMamzAkIVNWoyx
-	+iSqOYCUDH/bmbqOv+tX05dMaP9dmL2m9baK0hV+56h8QtWPey0oZ9sZQcStSGZ6tzad/5E8cBS
-	ww9uF7OaR9RFA=
-X-Google-Smtp-Source: AGHT+IFZTfSSmOqsnzyenxwbnVCwSP1cwq60iDyw7m55VKi4EtHZ+78miYEWY5PRHYIS5Aaap/hNxQ==
-X-Received: by 2002:a05:6a00:230b:b0:7a2:81fe:b742 with SMTP id d2e1a72fcca58-7ae1d63f297mr9571953b3a.12.1762430179016;
-        Thu, 06 Nov 2025 03:56:19 -0800 (PST)
-Received: from aheev.home ([2401:4900:88f4:f6c4:5041:b658:601d:5d75])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7af7c4115a9sm2648580b3a.0.2025.11.06.03.56.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Nov 2025 03:56:18 -0800 (PST)
-From: Ally Heev <allyheev@gmail.com>
-Date: Thu, 06 Nov 2025 17:25:48 +0530
-Subject: [PATCH v3] net: ethernet: fix uninitialized pointers with free
- attribute
+        d=1e100.net; s=20230601; t=1762430186; x=1763034986;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9le/TR6EJL7OtK2G5F8XjAJfAro4XHRnCrWtY3w0ANA=;
+        b=QilfYaTOujpXuQE7CMkGW5HDOrQlsQjs2NABIWT6JVsrgslvDbOf0q9TrPZAcY//PY
+         UXgqW8zCfenHTTrcr74iUoH0rM2di2q9Eezl/lRi7Xh3iSxWM4pHsjPwdxTUEtKEk2s8
+         PVpibvcKTIC6oWLtWWCKw/7ystlr6e1h1x+eSni2fsfDWFyDYEk+GjkQ7qLCvqvCcJ+Q
+         orjvpwJHbFeO5mP+I7hNPzY0CrFF0vPdgcDSUTNNRWfrKS/p1cU/08UDtFRFumh2TGoX
+         snW9+WeEOwi5wXxzIvbfcuHupXe3FFIX+H3t72R5s+MYNGNEIQXxUwxf6ZlKdBRIAZ2h
+         Yu7w==
+X-Forwarded-Encrypted: i=1; AJvYcCUd6X+RpxyX6/FRTHoYCBRxO39VavhKRhnThtPwmWTxFkS5X0eDOsn7Z34UFMFqDwVnGt4i4sc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxGJY0SGA48+7m/MNiNFEInnoaqXAkDEfSXQE/tESM6brB0vJ6x
+	8lrdzf+P/4GIq0+7Q1/GFsK+8CzRdqlN6RyGcgmf/410tgR4co3Jn/vWP4nX5QKNBn5nI6NjL/M
+	m/DT/885zMHTX0huuGmXwuhJsMh/47IdRwKnORT7u0Wk/W2CutV6NMveo5w==
+X-Gm-Gg: ASbGncsJJ994Kn0dREqBSDpOXu/vetsY3s8X+q3Gq+AqG2dCkGhLyCH2zzVS9FTGL9q
+	c3PRO1DoNVaK/M6XeIXQh99jsFQVot8FTaQ7eT+g+EKXefRZI3pADNn96XZFyb3JLSKL+MVftde
+	XItLK6LbIMoOTORvEHPOq/cLjQUFpXHuq485iGCVavprfTMJXJyG3R4cGOc3pM8Csi9ORd8kAnJ
+	pS2s4yv1vVZXaijtpj0Dr6W+OucPFU017cJwWYZ+c/phvEqwSycaAOwXp9/ncRuCAMJIaimgiR3
+	fc05HtLU/4WPKHRYC0WwQimphtIBTcn4Oa4Bff9oi3vSt4Crg4WTP2FObGevPgq/79AggzuNSR9
+	mTA==
+X-Received: by 2002:a05:600c:621a:b0:471:14f5:126f with SMTP id 5b1f17b1804b1-4775ce206f3mr53397985e9.33.1762430186378;
+        Thu, 06 Nov 2025 03:56:26 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEeNjObPV82BW3NmBnsDhrNmHHpx+fbtiOXZTi7CtBgVaPdD09D56F002RyajJ9jcqH6Y5d4w==
+X-Received: by 2002:a05:600c:621a:b0:471:14f5:126f with SMTP id 5b1f17b1804b1-4775ce206f3mr53397525e9.33.1762430185911;
+        Thu, 06 Nov 2025 03:56:25 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.83])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477625eabf3sm55632995e9.16.2025.11.06.03.56.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Nov 2025 03:56:25 -0800 (PST)
+Message-ID: <4eef8fe1-b2b8-47c8-a21a-bcb4b75c3a0e@redhat.com>
+Date: Thu, 6 Nov 2025 12:56:23 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 net-next 09/14] tcp: move increment of num_retrans
+To: chia-yu.chang@nokia-bell-labs.com, edumazet@google.com, parav@nvidia.com,
+ linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org,
+ dsahern@kernel.org, kuniyu@google.com, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com,
+ kuba@kernel.org, stephen@networkplumber.org, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, davem@davemloft.net, andrew+netdev@lunn.ch,
+ donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
+ shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
+ ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
+ g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
+ mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
+ Jason_Livingood@comcast.com, vidhi_goel@apple.com
+References: <20251030143435.13003-1-chia-yu.chang@nokia-bell-labs.com>
+ <20251030143435.13003-10-chia-yu.chang@nokia-bell-labs.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251030143435.13003-10-chia-yu.chang@nokia-bell-labs.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251106-aheev-uninitialized-free-attr-net-ethernet-v3-1-ef2220f4f476@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAMOMDGkC/52NsQ6CMBRFf4V09pkWaCFO/odxaOkDXgLFlNqoh
- H+3MLHqds8dzlnYjJ5wZpdsYR4jzTS5BMUpY02vXYdANjHLeS6F4BJ0jxjh6chRID3QBy20HhF
- 0CB4cBsDQo99GZQVXWGpTtBVLwofHll577HZP3NMcJv/e21Fs71+ZKEBAq1DXpTG2kvzajZqGc
- zONbMvE/KhWP6nzpOZlbTVvpFVGHdXrun4B25jupz8BAAA=
-X-Change-ID: 20251105-aheev-uninitialized-free-attr-net-ethernet-7d106e4ab3f7
-To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
- Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- "K. Y. Srinivasan" <kys@microsoft.com>, 
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, 
- Dexuan Cui <decui@microsoft.com>
-Cc: Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org, 
- Dan Carpenter <dan.carpenter@linaro.org>, Ally Heev <allyheev@gmail.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3128; i=allyheev@gmail.com;
- h=from:subject:message-id; bh=F5ah8MsnK3Z9znouBMKy+zHLSoJBwjNa27W+pmH6JFY=;
- b=owGbwMvMwCU2zXbRFfvr1TKMp9WSGDJ5ei7Ny4nVWfJeUGdH1rezCw5x/ljgOH9Tku3f6Bfbb
- 3n5zI/b0lHKwiDGxSArpsjCKCrlp7dJakLc4aRvMHNYmUCGMHBxCsBErjxk+Gdsc+VJcu2UZ76Z
- Mq++hx007zi/87TXp1fBFSw28svXBskzMuz7vfxP6VEnIc2bpmJMT+PsuSRftbJyfHZ00HG+I+d
- Szg8A
-X-Developer-Key: i=allyheev@gmail.com; a=openpgp;
- fpr=01151A4E2EB21A905EC362F6963DA2D43FD77B1C
 
-Uninitialized pointers with `__free` attribute can cause undefined
-behavior as the memory assigned randomly to the pointer is freed
-automatically when the pointer goes out of scope.
+On 10/30/25 3:34 PM, chia-yu.chang@nokia-bell-labs.com wrote:
+> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> 
+> Before this patch, num_retrans = 0 for the first SYN/ACK and the first
+> retransmitted SYN/ACK; however, an upcoming change will need to
+> differentiate between those two conditions. 
 
-It is better to initialize and assign pointers with `__free`
-attribute in one statement to ensure proper scope-based cleanup.
+AFAICS, send_synack is invoked with a NULL dst only on retransmissions.
+Perhaps you could use that info instead? moving forward and backward a
+counter is not so nice.
 
-Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-Closes: https://lore.kernel.org/all/aPiG_F5EBQUjZqsl@stanley.mountain/
-Signed-off-by: Ally Heev <allyheev@gmail.com>
----
-Changes in v3:
-- fixed style issues
-- Link to v2: https://lore.kernel.org/r/20251106-aheev-uninitialized-free-attr-net-ethernet-v2-1-048da0c5d6b6@gmail.com
-
-Changes in v2:
-- fixed non-pointer initialization to NULL
-- NOTE: drop v1
-- Link to v1: https://lore.kernel.org/r/20251105-aheev-uninitialized-free-attr-net-ethernet-v1-1-f6ea84bbd750@gmail.com
----
- drivers/net/ethernet/intel/ice/ice_flow.c       | 5 +++--
- drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 5 +++--
- 2 files changed, 6 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_flow.c b/drivers/net/ethernet/intel/ice/ice_flow.c
-index 6d5c939dc8a515c252cd2b77d155b69fa264ee92..3590dacf3ee57879b3809d715e40bb290e40c4aa 100644
---- a/drivers/net/ethernet/intel/ice/ice_flow.c
-+++ b/drivers/net/ethernet/intel/ice/ice_flow.c
-@@ -1573,12 +1573,13 @@ ice_flow_set_parser_prof(struct ice_hw *hw, u16 dest_vsi, u16 fdir_vsi,
- 			 struct ice_parser_profile *prof, enum ice_block blk)
- {
- 	u64 id = find_first_bit(prof->ptypes, ICE_FLOW_PTYPE_MAX);
--	struct ice_flow_prof_params *params __free(kfree);
- 	u8 fv_words = hw->blk[blk].es.fvw;
- 	int status;
- 	int i, idx;
- 
--	params = kzalloc(sizeof(*params), GFP_KERNEL);
-+	struct ice_flow_prof_params *params __free(kfree) =
-+		kzalloc(sizeof(*params), GFP_KERNEL);
-+
- 	if (!params)
- 		return -ENOMEM;
- 
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-index cbb5fa30f5a0ec778c1ee30470da3ca21cc1af24..368138715cd55cd1dadc686931cdda51c7a5130d 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-@@ -1012,7 +1012,6 @@ static int idpf_send_get_caps_msg(struct idpf_adapter *adapter)
-  */
- static int idpf_send_get_lan_memory_regions(struct idpf_adapter *adapter)
- {
--	struct virtchnl2_get_lan_memory_regions *rcvd_regions __free(kfree);
- 	struct idpf_vc_xn_params xn_params = {
- 		.vc_op = VIRTCHNL2_OP_GET_LAN_MEMORY_REGIONS,
- 		.recv_buf.iov_len = IDPF_CTLQ_MAX_BUF_LEN,
-@@ -1023,7 +1022,9 @@ static int idpf_send_get_lan_memory_regions(struct idpf_adapter *adapter)
- 	ssize_t reply_sz;
- 	int err = 0;
- 
--	rcvd_regions = kzalloc(IDPF_CTLQ_MAX_BUF_LEN, GFP_KERNEL);
-+	struct virtchnl2_get_lan_memory_regions *rcvd_regions __free(kfree) =
-+		kzalloc(IDPF_CTLQ_MAX_BUF_LEN, GFP_KERNEL);
-+
- 	if (!rcvd_regions)
- 		return -ENOMEM;
- 
-
----
-base-commit: c9cfc122f03711a5124b4aafab3211cf4d35a2ac
-change-id: 20251105-aheev-uninitialized-free-attr-net-ethernet-7d106e4ab3f7
-
-Best regards,
--- 
-Ally Heev <allyheev@gmail.com>
+/P
 
 
