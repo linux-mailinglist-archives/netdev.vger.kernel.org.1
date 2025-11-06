@@ -1,233 +1,254 @@
-Return-Path: <netdev+bounces-236187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236188-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7CC3C399AB
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 09:38:47 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id B32C6C39A97
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 09:52:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id EF78735021D
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 08:38:46 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 36E6034D0B3
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 08:52:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCACA308F2E;
-	Thu,  6 Nov 2025 08:38:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 413753090C7;
+	Thu,  6 Nov 2025 08:52:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aaM2lrOP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NjrLSDwG";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="BUu5vUFQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02C66308F25
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 08:38:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F2443090CC
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 08:52:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762418323; cv=none; b=UDbdbsqQ4QwkWrr1bSMHrdp/tbuSodRV3lxnLWgNxagBkTMAhZbPVWgvYBCwFxRPeeBAc6m0zCedOMzlE0WKHbbMsb5GkmsF0R3VHN6NByPcpPDZ7iiSEUqQWOWKyqhbcHVSY3+a8OUmlugkg/bm5iESepxWmfQlOeaM8ivR/NE=
+	t=1762419129; cv=none; b=YKzg23JTb53qlmzD79D5IcXHD078cww0MJmn4i74b8O1r5G6wnho6otjstmnLf0G8oRpJBWPJUY0mMRVTymnwpVX689MtSaPe/zxW3ACfL01JIJK9pUoLHm31yFEytrXh8diN2W6TMhzJkA5+j/X6P14zWj9nFZvdYy5zUrvVUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762418323; c=relaxed/simple;
-	bh=6x/2ReiXGNUqbmEF1+512pnU1mLdfUCAbQISuBJZ8iI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aJKrfMddNCwjiV6be4LjHlH+u6/THFZD4DbHwyg8uWjNfOOf7cGmEnHDyO+WLbFMNA3SxGpd1QWRVxfB7Y1nx0KKgKkaKQW58jCEazILm6T0aW/5I9wI7QPl6CStlz3aN12sTUIN8lyEO0jhyI0mwRt/f3RDET4l2TIF7FpJfC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aaM2lrOP; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-426f1574a14so377702f8f.3
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 00:38:41 -0800 (PST)
+	s=arc-20240116; t=1762419129; c=relaxed/simple;
+	bh=l2uWDhEaQy0Z5iNX0dnyrT6a21b6LKnpGMNZZDcdtwE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DdTYZurVDblxiUhuwk7pyMzwNF+BfmirlZGSG2RwbMGcLBKjBF/kMnqYBUXwQBKRFt/nx4mjnuy+oRBRrA32s+rbecA+iRuk2c5+LvDQCSIjDwJ6gofz8tVIbxTY66hwSIuP0F5KOLNYD68qYW3mOc9OFVJMZgR9E7qM3jK+iwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NjrLSDwG; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=BUu5vUFQ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762419126;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8NanxbbpkNDlbUyOTW56q78Ac+UJfat3j75mYZLY0ZE=;
+	b=NjrLSDwGdkwHgffhe4bGbq8ItYr4Jto4fVhQKSWqsjIvn6WKVImATve+qvDWPeOfAO4fXK
+	dsVF8NMBjIQ+ZLA8SbxI+HPX87eIj+ycXEDwC/8qt61+3BSKWZNSIPX15nSD1+xGj3vnl7
+	GnKTc1EFUYjUkG+TN31h8drC435jQx8=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-183-h1HpDfD9M62K7C3SEbdc1w-1; Thu, 06 Nov 2025 03:52:04 -0500
+X-MC-Unique: h1HpDfD9M62K7C3SEbdc1w-1
+X-Mimecast-MFC-AGG-ID: h1HpDfD9M62K7C3SEbdc1w_1762419123
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-477563e531cso6627425e9.1
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 00:52:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762418320; x=1763023120; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Tf22DxiJKidt7zn+YqzlU5+UFZlDZr1co6jaRkh7sD4=;
-        b=aaM2lrOPfqE0SBcsCzd0gyWpX/o5XXhtLs+oyq6hziaWBHmnyABv5cPb2gjRSkGENX
-         Ci8snao4DiXIXfXYNQidkvnjHFUBaRUIlX7zM2ftJJ5oqrU/wKt+UnBC0oe4AM9fQkhI
-         gp+IRUdmNWxYfHksoKqLse/e8kLvMMeUlpx87uDUBbXe49a9VHh/KyN3GEsjOYHn6KX+
-         g39NTU7vEAxPDjcscIsS3KlBeIHFj7ssA7smP8Be7AJvcAgoc8duqlKkxjboMd7Xl30/
-         VrcfccqrpY4kR1d5nawtciFYo0UFc7Sy7LFilfC6/5qtk6NgvcHMwP6nylK+RjpOZmKv
-         PLoQ==
+        d=redhat.com; s=google; t=1762419123; x=1763023923; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8NanxbbpkNDlbUyOTW56q78Ac+UJfat3j75mYZLY0ZE=;
+        b=BUu5vUFQWT1Bi1J+hYsgo+Ss0WigHmXvgPxZh/KIj7Wugiyxbl6sgpsqdakBqhVlZU
+         OB88Vq9linMFuw2YyRpVrml1xZ1gOJNTvGQBqgMz38qx2NtDsZ+Z9eS4vIG+yntBf248
+         ne8pLmmakfh6+TqdiJZUGVMN9OLvqTuRLKQBXbDiysyqZPd6ZXJME6uAgPhv8ct3JJEL
+         ASFW72hY8qUdSLGvsbt7lT3Ud8TRmD9eSjJz/gqjWPKWGVNZfO3Ib7Sml+nvXbb+1Kjj
+         4Ad0DlEdGIOu+RHqD0D/f7+ZwffuGukLI3oOIfDeuByAnwV4AaeCaMJ+wEdZYUsO9sY+
+         O5IQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762418320; x=1763023120;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Tf22DxiJKidt7zn+YqzlU5+UFZlDZr1co6jaRkh7sD4=;
-        b=eIZml1ow+JyDYvT2U9blFMyBAJ2buuhVhV99Kypc9dhzNryaPOpX6/RKVKpYHiVQxX
-         EBgefzAzgm1NiYqPCul9m4CrC2jvmOUfzsaB+Kwsd308R5fpN5xo2Tm8Fvexm1F2y8Li
-         mB6nCl1Q3W6xsax1Oc4bu1k1Vn4bu93rZZsmIbioD9zmkAv3JKYXFASd6YjZ3Mc+HlmH
-         wMrQyTmT+WYw3BNN177fjV9bP6QHSllygm07C6bjSDKnt7kHKzJj01rBfeZul4pWHZBZ
-         9l238TzCd8OoMWifQ3wTyo3XKB4gwKqTQVFaJA4U+HQ4YOV+B8tS5GDUY+zzH9PzkW53
-         EMkw==
-X-Forwarded-Encrypted: i=1; AJvYcCWusJAn2IuBr50r9xDvlpybht39KHFlgZXjza9pmFXM+pUCiSjgGrjEf4kOMLffZp8o8W+U/VE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzn/33P2mP8lEqKjwpXw4TTj+5tLkXvkeiTrNO1XSTdVTod5PPh
-	Uayc3QpTELtuereNHE8WicYDO0Ao50nYJa4ekvMK4pQ4rcm2xn3hLtxu5ZRic4tKKIPnf7kgpvN
-	aH7eP938E/dl9m9FzUp29r1xyOHd7dlg=
-X-Gm-Gg: ASbGncu7s5cyzaSYEBxfMDq/qp4hSw/igb7EJQ7Ym9RUnMATKbjBYGgB7+4j1UBAzsk
-	jdxnvE4h9LjZIuIK4WvKW3FY0uPWwhZ2RZzOlSJNzmYFYaamPk2a+G4FbxcvNDe/xMfK6fK5EaH
-	7Z0GAIwNo8BJB1dLlRP9ea+HEXYvemp1FaMxAigrde4Hi2aeKteCBO0thjSdJNBmVpJcOkOwcMk
-	cASllMbn6jAp5OdbKnzp4GwT5onH2gyJzBWOiLA+dE6cSwdSHDoo+6KhKaT
-X-Google-Smtp-Source: AGHT+IGPURHI8ENgPvqdQX7Mov6yZoSClcZi+fUXPLz6ZWGpKNYXySUXy3i2zNqHCAeXBsyc7pP6b+3An2fvvvX/Wng=
-X-Received: by 2002:a05:6000:2f88:b0:427:5ae:eb89 with SMTP id
- ffacd0b85a97d-429e33064aamr5149183f8f.34.1762418320048; Thu, 06 Nov 2025
- 00:38:40 -0800 (PST)
+        d=1e100.net; s=20230601; t=1762419123; x=1763023923;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8NanxbbpkNDlbUyOTW56q78Ac+UJfat3j75mYZLY0ZE=;
+        b=cqWFmuizx9IasSG8gNeZNDeR4vb9f/zgKpptL1K3GVxFt0kt1V29IRVUxZs6iNmKTW
+         cBiTTpU3y+chfZY1SDpl2IcJ7HFaQ4qnOug004f2d2ALMwWkkR5qc48/xpFNqk6oykqA
+         +fVqrOJON+dFix3lT/JVO2VSo15Ttd0WOLv1q0PLF1tUiLy6gDDv/6tQZdeRZAUzkk2A
+         lRxPV2H41KcHEb0Ie+gwE32cVnCEzm9T+6TKQItj0XJgvZf5nCficGtxYHHhRwVj4van
+         D4jiZDfz/58Je+fQwbDkovBd/VIMonULaEFLfMp2OO3HBGbP+zfaPqmo31VeZUuIzp89
+         Pg8w==
+X-Gm-Message-State: AOJu0Yz4uJxQrZavwQ9LgtcerDYnIoB9lz9xx/vleOhGw/OFpB59ykiE
+	5Oe8S22O17lj3/BrcIN/61OsdpujhNAHlkQchElwx0ib/QwSW0PqEXJlgYzq5PF5pwOYdFl4r2O
+	vaCRfNjwVj7TH0oqbSLpnvpNCYC+nRW+umFmn8PQuekXpSAVAw/K3cYGSHA==
+X-Gm-Gg: ASbGncsl+a5g9k1+fjIulzdbZXmWOQDZjJQPeRX3MZK2cMLgHM+vxrYNIoji4F//etx
+	xGHJEYV/iiwKyu16cfmoLRqRHmSLy8TwvEdTGP7Qw9he914xChih8hd3Qrqw1LdACxHtTyE+/Zg
+	DVD59dKghiQK2zP/psrW+RuxN2g1yBU52hXcS2Zgyndwvxjz0oEu20f5QEwckET2ycJ+qpHbMqe
+	VvQF0rg1+JyOCrXRSEnArNegnFxADgUiXc5lW3nLM3HQQScanpEUwRuoNjRydaf7vVtrcAN4/Nk
+	hTldkZS+MxTBI2VMQOT+87BNXK5Q7b3APrC0/0spJOe9Gkl9nuJ3oG3HdBCza97C/TdB8OBSjXa
+	2eQ==
+X-Received: by 2002:a05:600c:3487:b0:471:115e:9605 with SMTP id 5b1f17b1804b1-4775ce3d8a1mr64704855e9.35.1762419123469;
+        Thu, 06 Nov 2025 00:52:03 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFPovKIk02f8ddjHUYyEZ+Oj38N6pOCkSx8ThIFm92RoMszw4bRUVHCaXxRkNiaePAEdRptZw==
+X-Received: by 2002:a05:600c:3487:b0:471:115e:9605 with SMTP id 5b1f17b1804b1-4775ce3d8a1mr64704515e9.35.1762419123036;
+        Thu, 06 Nov 2025 00:52:03 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.83])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429eb410ffcsm3542471f8f.15.2025.11.06.00.52.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Nov 2025 00:52:02 -0800 (PST)
+Message-ID: <24cee5fb-1710-4d1e-a1af-793fb99fc9c7@redhat.com>
+Date: Thu, 6 Nov 2025 09:51:59 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251104161327.41004-1-simon.schippers@tu-dortmund.de>
- <CANn89iLLwWvbnCKKRrV2c7eo+4UduLVgZUWR=ZoZ+SPHRGf=wg@mail.gmail.com>
- <f2a363d3-40d7-4a5f-a884-ec147a167ef5@tu-dortmund.de> <CAGRyCJERd93kE3BsoXCVRuRAVuvubt5udcyNMuEZBTcq2r+hcw@mail.gmail.com>
- <c29f8763-6e0e-4601-90be-e88769d23d2a@tu-dortmund.de>
-In-Reply-To: <c29f8763-6e0e-4601-90be-e88769d23d2a@tu-dortmund.de>
-From: Daniele Palmas <dnlplm@gmail.com>
-Date: Thu, 6 Nov 2025 09:38:26 +0100
-X-Gm-Features: AWmQ_bmwvnkfYCXkSH2o_3U8zoA1yeZsi6gyY_TwK7wXxSjK2NJJsBdDI5hCg8M
-Message-ID: <CAGRyCJE1_xQQDfu1Tk3miZX-5T-+6rarzgPGo3=K-1zsFKpr+g@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 0/1] usbnet: Add support for Byte Queue Limits (BQL)
-To: Simon Schippers <simon.schippers@tu-dortmund.de>
-Cc: Eric Dumazet <edumazet@google.com>, oneukum@suse.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 06/15] quic: add stream management
+To: Xin Long <lucien.xin@gmail.com>
+Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev,
+ davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, Stefan Metzmacher <metze@samba.org>,
+ Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>,
+ Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>,
+ linux-cifs@vger.kernel.org, Steve French <smfrench@gmail.com>,
+ Namjae Jeon <linkinjeon@kernel.org>, Paulo Alcantara <pc@manguebit.com>,
+ Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev,
+ Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
+ Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>,
+ Alexander Aring <aahringo@redhat.com>, David Howells <dhowells@redhat.com>,
+ Matthieu Baerts <matttbe@kernel.org>, John Ericson <mail@johnericson.me>,
+ Cong Wang <xiyou.wangcong@gmail.com>, "D . Wythe"
+ <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>,
+ illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
+ Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+ Daniel Stenberg <daniel@haxx.se>,
+ Andy Gospodarek <andrew.gospodarek@broadcom.com>
+References: <cover.1761748557.git.lucien.xin@gmail.com>
+ <6b527b669fe05f9743e37d9f584f7cd492a7649b.1761748557.git.lucien.xin@gmail.com>
+ <ad38f56b-5c53-408e-abcc-4b061c2097a3@redhat.com>
+ <CADvbK_c2gUNyDNYfgVrQ+Cm9rL6P_n+s0LJsrAPz0VK9FDDxyg@mail.gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <CADvbK_c2gUNyDNYfgVrQ+Cm9rL6P_n+s0LJsrAPz0VK9FDDxyg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Simon,
+On 11/6/25 2:27 AM, Xin Long wrote:
+> On Tue, Nov 4, 2025 at 6:05 AM Paolo Abeni <pabeni@redhat.com> wrote:
+>>
+>> On 10/29/25 3:35 PM, Xin Long wrote:
+>> +/* Create and register new streams for sending. */
+>>> +static struct quic_stream *quic_stream_send_create(struct quic_stream_table *streams,
+>>> +                                                s64 max_stream_id, u8 is_serv)
+>>> +{
+>>> +     struct quic_stream *stream = NULL;
+>>> +     s64 stream_id;
+>>> +
+>>> +     stream_id = streams->send.next_bidi_stream_id;
+>>> +     if (quic_stream_id_uni(max_stream_id))
+>>> +             stream_id = streams->send.next_uni_stream_id;
+>>> +
+>>> +     /* rfc9000#section-2.1: A stream ID that is used out of order results in all streams
+>>> +      * of that type with lower-numbered stream IDs also being opened.
+>>> +      */
+>>> +     while (stream_id <= max_stream_id) {
+>>> +             stream = kzalloc(sizeof(*stream), GFP_KERNEL_ACCOUNT);
+>>> +             if (!stream)
+>>> +                     return NULL;
+>>> +
+>>> +             stream->id = stream_id;
+>>> +             if (quic_stream_id_uni(stream_id)) {
+>>> +                     stream->send.max_bytes = streams->send.max_stream_data_uni;
+>>> +
+>>> +                     if (streams->send.next_uni_stream_id < stream_id + QUIC_STREAM_ID_STEP)
+>>> +                             streams->send.next_uni_stream_id = stream_id + QUIC_STREAM_ID_STEP;
+>>
+>> It's unclear to me the goal the above 2 statements. Dealing with id
+>> wrap-arounds? If 'streams->send.next_uni_stream_id < stream_id +
+>> QUIC_STREAM_ID_STEP' is not true the next quic_stream_send_create() will
+>> reuse the same stream_id.
+>>
+>> I moving the above in a separate helper with some comments would help.
+>>
+> I will add a macro for this:
+> 
+> #define quic_stream_id_next_update(limits, type, id)    \
+> do {                                                    \
+>         if ((limits)->next_##type##_stream_id < (id) +
+> QUIC_STREAM_ID_STEP)     \
+>                 (limits)->next_##type##_stream_id = (id) +
+> QUIC_STREAM_ID_STEP; \
+>         (limits)->streams_##type++;
+>          \
+> } while (0)
+> 
+> So that we can use it to update both next_uni_stream_id and next_bidi_stream_id.
 
-Il giorno mer 5 nov 2025 alle ore 12:05 Simon Schippers
-<simon.schippers@tu-dortmund.de> ha scritto:
->
-> On 11/5/25 11:35, Daniele Palmas wrote:
-> > Hello Simon,
-> >
-> > Il giorno mer 5 nov 2025 alle ore 11:40 Simon Schippers
-> > <simon.schippers@tu-dortmund.de> ha scritto:
-> >>
-> >> On 11/4/25 18:02, Eric Dumazet wrote:
-> >>> On Tue, Nov 4, 2025 at 8:14=E2=80=AFAM Simon Schippers
-> >>> <simon.schippers@tu-dortmund.de> wrote:
-> >>>>
-> >>>> During recent testing, I observed significant latency spikes when us=
-ing
-> >>>> Quectel 5G modems under load. Investigation revealed that the issue =
-was
-> >>>> caused by bufferbloat in the usbnet driver.
-> >>>>
-> >>>> In the current implementation, usbnet uses a fixed tx_qlen of:
-> >>>>
-> >>>> USB2: 60 * 1518 bytes =3D 91.08 KB
-> >>>> USB3: 60 * 5 * 1518 bytes =3D 454.80 KB
-> >>>>
-> >>>> Such large transmit queues can be problematic, especially for cellul=
-ar
-> >>>> modems. For example, with a typical celluar link speed of 10 Mbit/s,=
- a
-> >>>> fully occupied USB3 transmit queue results in:
-> >>>>
-> >>>> 454.80 KB / (10 Mbit/s / 8 bit/byte) =3D 363.84 ms
-> >>>>
-> >>>> of additional latency.
-> >>>
-> >>> Doesn't 5G need to push more packets to the driver to get good aggreg=
-ation ?
-> >>>
-> >>
-> >> Yes, but not 455 KB for low speeds. 5G requires a queue of a few ms to
-> >> aggregate enough packets for a frame but not of several hundred ms as
-> >> calculated in my example. And yes, there are situations where 5G,
-> >> especially FR2 mmWave, reaches Gbit/s speeds where a big queue is
-> >> required. But the dynamic queue limit approach of BQL should be well
-> >> suited for these varying speeds.
-> >>
-> >
-> > out of curiosity, related to the test with 5G Quectel, did you test
-> > enabling aggregation through QMAP (kernel module rmnet) or simply
-> > qmi_wwan raw_ip ?
-> >
-> > Regards,
-> > Daniele
-> >
->
-> Hi Daniele,
->
-> I simply used qmi_wwan. I actually never touched rmnet before.
-> Is the aggregation through QMAP what you and Eric mean with aggregation?
-> Because then I misunderstood it, because I was thinking about aggregating
-> enough (and not too many) packets in the usbnet queue.
->
+A function would be better tacking the next_id value as an argument.
+More importantly please document the goal here which is still unclear to me.
 
-I can't speak for Eric, but, yes, that is what I meant for
-aggregation, this is the common way those high-cat modems are used:
-it's not clear to me if the change you are proposing could have any
-impact when rmnet is used, that's why I was asking the test
-conditions.
+>> The above 2 functions has a lot of code in common. I think you could
+>> deduplicate it by:
+>> - defining a named type for quic_stream_table.{send,recv}
+>> - define a generic /() helper using an additonal
+>> argument for the relevant table.{send,recv}
+>> - replace the above 2 functions with a single invocation to such helper.
+> This is a very smart idea!
+> 
+> It will dedup not only quic_stream_recv_create(), but also
+> quic_stream_get_param() and quic_stream_set_param().
+> 
+> I will define a type named 'struct quic_stream_limits'.
+> Note that, since we must pass 'bool send' to quic_stream_create() for
+> setting the fields in a single 'stream' .
+> 
+>         if (quic_stream_id_uni(stream_id)) {
+>                 if (send) {
+>                         stream->send.max_bytes = limits->max_stream_data_uni;
+>                 } else {
+>                         stream->recv.max_bytes = limits->max_stream_data_uni;
+>                         stream->recv.window = stream->recv.max_bytes;
+>                 }
+> 
+> I'm planning not to pass additional argument of table.{send,recv},
+> but do this in quic_stream_create():
+>         struct quic_stream_limits *limits = &streams->send;
+>         gfp_t gfp = GFP_KERNEL_ACCOUNT;
+> 
+>         if (!send) {
+>                 limits = &streams->recv;
+>                 gfp = GFP_ATOMIC | __GFP_ACCOUNT;
+>         }
+> 
+>>
+>> It looks like there are more de-dup opportunity below.
+>>
+> Yes, the difference is only the variable name _uni_ and _bidi_.
+> I'm planning to de-dup them with macros like:
+> 
+> #define quic_stream_id_below_next(streams, type, id, send)        \
+>     ((send) ? ((id) < (streams)->send.next_##type##_stream_id) :    \
+>           ((id) < (streams)->recv.next_##type##_stream_id))
+> 
+> /* Check if a send or receive stream ID is already closed. */
+> static bool quic_stream_id_closed(struct quic_stream_table *streams,
+> s64 stream_id, bool send)
+> {
+>     if (quic_stream_id_uni(stream_id))
+>         return quic_stream_id_below_next(streams, uni, stream_id, send);
+>     return quic_stream_id_below_next(streams, bidi, stream_id, send);
+> }
+> 
+> #define quic_stream_id_above_max(streams, type, id)            \
+>     (((id) > (streams)->send.max_##type##_stream_id) ? true :    \
+>         (quic_stream_id_to_streams((id) -
+> (streams)->send.next_##type##_stream_id) +    \
+>             (streams)->send.streams_##type >
+> (streams)->send.max_streams_##type))
 
-Thanks,
-Daniele
+Uhmm... with "more de-dup opportunity below" I intended
+quic_stream_get_param() and quic_stream_set_param(). I would refrain
+from adding macros. I think the above idea ('struct quic_stream_limits')
+would not need that?!?
 
-> Thanks
->
-> >>>>
-> >>>> To address this issue, this patch introduces support for
-> >>>> Byte Queue Limits (BQL) [1][2] in the usbnet driver. BQL dynamically
-> >>>> limits the amount of data queued in the driver, effectively reducing
-> >>>> latency without impacting throughput.
-> >>>> This implementation was successfully tested on several devices as
-> >>>> described in the commit.
-> >>>>
-> >>>>
-> >>>>
-> >>>> Future work
-> >>>>
-> >>>> Due to offloading, TCP often produces SKBs up to 64 KB in size.
-> >>>
-> >>> Only for rates > 500 Mbit. After BQL, we had many more improvements i=
-n
-> >>> the stack.
-> >>> https://lwn.net/Articles/564978/
-> >>>
-> >>>
-> >>
-> >> I also saw these large SKBs, for example, for my USB2 Android tetherin=
-g,
-> >> which advertises a network speed of < 500 Mbit/s.
-> >> I saw these large SKBs by looking at the file:
-> >>
-> >> cat /sys/class/net/INTERFACE/queues/tx-0/byte_queue_limits/inflight
-> >>
-> >> For UDP-only traffic, inflight always maxed out at MTU size.
-> >>
-> >> Thank you for your replies!
-> >>
-> >>>> To
-> >>>> further decrease buffer bloat, I tried to disable TSO, GSO and LRO b=
-ut it
-> >>>> did not have the intended effect in my tests. The only dirty workaro=
-und I
-> >>>> found so far was to call netif_stop_queue() whenever BQL sets
-> >>>> __QUEUE_STATE_STACK_XOFF. However, a proper solution to this issue w=
-ould
-> >>>> be desirable.
-> >>>>
-> >>>> I also plan to publish a scientific paper on this topic in the near
-> >>>> future.
-> >>>>
-> >>>> Thanks,
-> >>>> Simon
-> >>>>
-> >>>> [1] https://medium.com/@tom_84912/byte-queue-limits-the-unauthorized=
--biography-61adc5730b83
-> >>>> [2] https://lwn.net/Articles/469652/
-> >>>>
-> >>>> Simon Schippers (1):
-> >>>>   usbnet: Add support for Byte Queue Limits (BQL)
-> >>>>
-> >>>>  drivers/net/usb/usbnet.c | 8 ++++++++
-> >>>>  1 file changed, 8 insertions(+)
-> >>>>
-> >>>> --
-> >>>> 2.43.0
-> >>>>
-> >>
+/P
+
 
