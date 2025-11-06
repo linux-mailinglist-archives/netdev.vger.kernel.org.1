@@ -1,61 +1,63 @@
-Return-Path: <netdev+bounces-236284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FC40C3A8EF
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 12:27:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88FD1C3A8AD
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 12:24:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81FA34237C7
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 11:21:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5BCC81A450CD
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 11:23:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF13530C61B;
-	Thu,  6 Nov 2025 11:21:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 054EB30DD29;
+	Thu,  6 Nov 2025 11:23:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="A844+6e0"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="TxVYwpXX"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0BBB2E8B91
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 11:21:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F5402E5B0E
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 11:23:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762428094; cv=none; b=M6bddKAm/NADXYP/kMbDaW5p+qpmgAw6bTygpxB2ANffLGWk0IBzxihjiX5i5mhKsvJidgJ6E73CbrLvAQQrcfDJGSeDL+HwUEfEZIPLnCCzXszRClabNJ0DMycEKhTwezZQYe4oBVzROr8orUtnPXqNjQdsEdvYLCPSZIKD0iY=
+	t=1762428201; cv=none; b=HzhHlvZV2csl7EKyNaCS4kmTB9nvDUd3lVR/XSGpSN7lY/v9JKmUMRNxnQo+JuCZdP+4Ib/mqI4daYfS+9yZa8V2qBAbqIIWzncRjncRrztlKfEQH+oXGLCmGXyEGWykDRx/KJUQA/Im1eYJT2wKmhk/1kjVGJ6uzlEeWxpzTrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762428094; c=relaxed/simple;
-	bh=MhMnHpD+Eh60yI9FeGR7C1RNAO+CGWh+yPMhfluGnLs=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=gKEi+iuanKTM3TG4HkIPgfMz2+6VOl6UYr7JQzj0oCzYIfb4fP+3ZdY6AeuX4WP10yiHDNtNt+d873j/21NyVsA01+9p/KDL7xzog1DckW6Te33sre9cwPSDWMGk+lYzU673gs+GqZxtBSmTggLxtB3IvgHLzoCir4B04sNKpXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=A844+6e0; arc=none smtp.client-ip=78.32.30.218
+	s=arc-20240116; t=1762428201; c=relaxed/simple;
+	bh=c/cWgRnk+VO8IerRHoiEIiSWyknxj+MOfwESiP8g8/c=;
+	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
+	 Content-Disposition:Content-Type:Message-Id:Date; b=fpx8ebE44r6Y0mEgjZFI9oTzKU7tEb4MuGtMWsKSx+X1VyMvU6F/KRGf4m4rAofB2F3Os6t1eACRcUcr7MbWvq2wp6VZEl+VsvI238FVVr53J6fAZ9yp1FePCqODogUoMuQcyS7HPA3wc6QZgmA/cjANV1+Iwn7C5EKU4jhAzsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=TxVYwpXX; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
-	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=2o51kKX3Zg0nj9Zi/x6rawFH6AzzpVCUPueof5Bfs3c=; b=A844+6e05ltMFBKMZI5HRVZVGa
-	RMTLYIKVezGUWrP5bWudLcWi1Oe/YJEdZLNMflmUErBhkHMYybl8bXe27+mtpG9Em+KR3L23Oos0x
-	Xa1+sUuQBri1FRwT63V5GJZl4Yl9MjXdTV03OK/LElezBwg+XIPDNg8onVHCWzhvzRZaImavCsh8q
-	xVi3q7zTcNT6Lxgn0XJ7k67HGIoLgg78l/vgf7O1mnw9GkuQkh5W2PwfhD7Xw1RZyd19PY0LigthL
-	IfCQOwiySNT1a5jxO+g5kxv6UptagpJJV5KOmS+FTlT2M0EPfIRvjdYavP9ipkZhkdLGht75H8yaZ
-	6M/5p+0Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43456)
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=X4UCwVyKzHujgFhWgXUmNylgGLEyCpXl2odXacDq9ZE=; b=TxVYwpXXabYXNoW2h/c2rAsT8P
+	cCYGxCLn0gXte1++gBcoznPEMv52vOOBn61Vtz3mfZMaQZ0/1xu4/8GKeZ/sgSQI4ULUUtOddylnZ
+	G/0qRV3O4KMvfP+LzWDzMe4Jmtiy4m1hteKBR/A5mI8WlSXF9ff1JWOCztwML8ncaY6faREjcbyb0
+	jQQBttWdKOdfpwFzCaS+Y7PA9zPN02LP3KRHAZjPq8EQiA/EmF6zCmSXWwOXnlvulr9nXU5HdDEbO
+	OzqH+WZ0qCXZ9+IsF1zF7ZcOQ1P376/OBkgG/ixnUeJaW+lp9k7zWPxsEaVVxcXl+p1fHBfJj3MPw
+	1sL0ak5A==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:44972 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vGy3R-000000004ts-3ykw;
-	Thu, 06 Nov 2025 11:21:26 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vGy3P-000000006bb-2NHW;
-	Thu, 06 Nov 2025 11:21:23 +0000
-Date: Thu, 6 Nov 2025 11:21:23 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1vGy5A-000000004uE-25o5;
+	Thu, 06 Nov 2025 11:23:12 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1vGy59-0000000DhQ1-393H;
+	Thu, 06 Nov 2025 11:23:11 +0000
+In-Reply-To: <aQyEs4DAZRWpAz32@shell.armlinux.org.uk>
+References: <aQyEs4DAZRWpAz32@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
 Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -63,29 +65,47 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Vladimir Zapolskiy <vz@mleia.com>
-Subject: [PATCH net-next 0/9] net: stmmac: lpc18xx and sti: convert to
- set_phy_intf_sel()
-Message-ID: <aQyEs4DAZRWpAz32@shell.armlinux.org.uk>
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Zapolskiy <vz@mleia.com>
+Subject: [PATCH net-next 1/9] net: stmmac: lpc18xx: convert to PHY_INTF_SEL_x
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1vGy59-0000000DhQ1-393H@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Thu, 06 Nov 2025 11:23:11 +0000
 
-This series converts lpc18xx and sti to use the new .set_phy_intf_sel()
-method.
+Use the common dwmac definitions for the PHY interface selection field.
 
- .../net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c    | 42 ++++++++++--------
- drivers/net/ethernet/stmicro/stmmac/dwmac-sti.c    | 50 ++++++++--------------
- 2 files changed, 42 insertions(+), 50 deletions(-)
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c
+index 6fffc9dfbae5..66c309a7afb3 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-lpc18xx.c
+@@ -22,8 +22,8 @@
+ /* Register defines for CREG syscon */
+ #define LPC18XX_CREG_CREG6			0x12c
+ # define LPC18XX_CREG_CREG6_ETHMODE_MASK	0x7
+-# define LPC18XX_CREG_CREG6_ETHMODE_MII		0x0
+-# define LPC18XX_CREG_CREG6_ETHMODE_RMII	0x4
++# define LPC18XX_CREG_CREG6_ETHMODE_MII		PHY_INTF_SEL_GMII_MII
++# define LPC18XX_CREG_CREG6_ETHMODE_RMII	PHY_INTF_SEL_RMII
+ 
+ static int lpc18xx_dwmac_probe(struct platform_device *pdev)
+ {
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.47.3
+
 
