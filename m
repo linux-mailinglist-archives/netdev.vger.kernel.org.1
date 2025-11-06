@@ -1,239 +1,137 @@
-Return-Path: <netdev+bounces-236487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7216C3CFCC
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 19:01:35 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79018C3D04A
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 19:06:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 655123A1C68
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 17:59:32 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CCC944FD8F9
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 18:03:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AB10343D71;
-	Thu,  6 Nov 2025 17:59:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65CD6346FB7;
+	Thu,  6 Nov 2025 18:03:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OOlJPf4Q"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="Lod9/K+I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-wr1-f99.google.com (mail-wr1-f99.google.com [209.85.221.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93F343314DB
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 17:59:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7959A27F016
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 18:03:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762451970; cv=none; b=X33UlbVZ2aFm5rv+jWE2cDBwPv4xu7JQb9vj8ghVQS53dZWdNP77JHhtHEjHYp64QTN/c0UYMmBxonC8IMYgHTuhnyALL1sg80iocifvAnPRuvgNL3mA+IaSw5B36Nyyiv/2ZOjSWudpoGeDMHxtBs8HpQEAqRT3zngbbaEaSJo=
+	t=1762452191; cv=none; b=IazmWvXPjdAKgczW01Z79zv1RdB+LPAA4/VEI/nDcAj9YDl6+u/dZZisHj+mNCBHaH/Z7M+uYnLES62/yxrDvsfMoJrRDieoEDDxoBeZp/Kz03A9llAwS2CxFNwWw0NueDI+pboezf+Wma/hV7zf6jHnlSXpC6xQpVPunW/iAmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762451970; c=relaxed/simple;
-	bh=xSVGRPx3y1VkSRnywmF7Wg5iYBXo/Kvvd1CAtmdbmVU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=cZFqBCIzTjvUEFCGei44bCF0cuYXvon5wL2lyjMccV/zzoQR3PkFMVyMHZaBAMpL2cklqN3UY+y4oekCrQ0IefHHeA3fMlPn9dk0IPsVb3ZmAuofP8gUb59Tcp2luN0EfScZDHz+u4OdElOaOKf5zBKMSOKdnYO730LiUdF2dzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OOlJPf4Q; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2956a694b47so18265255ad.1
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 09:59:28 -0800 (PST)
+	s=arc-20240116; t=1762452191; c=relaxed/simple;
+	bh=9tngFstlyz98+p0OT0UHfF/tfciRN50PQ0cPoY8teds=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OLtzW2fMq8B6JGSYBy2IqtmQokj94H5Niy63OG7Js5ZkehwaGfjpKH4EKmWPHsS0PwOdtTsKmOc1RsOf2OAePYfkww53329ufNpk3IfBwxaCSzgS69tF3WOACZ04hnabGvhAh4BkgfULKkB+E4Iw3D6Co80RV97vpX58lOdhLuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=Lod9/K+I; arc=none smtp.client-ip=209.85.221.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-wr1-f99.google.com with SMTP id ffacd0b85a97d-429c844066fso163566f8f.3
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 10:03:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762451968; x=1763056768; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vlK4zA0L4la+hUwKhdxukg4u3+leU5PJEuHeams2xYc=;
-        b=OOlJPf4Qhs7/iCq1tX6pitt3U42T4xeia/IgRT1N8YADgmlkMhhr1fXiuNX3PLRxYx
-         Qb8qTa7+eJVjyYRJrQ29sJzzWiSz9mOHKSd0wKiX+Bwl+kyuvmFVR1vyKZDpeP0hRA1t
-         nJ0MQExuD9YPjFGamcnLO0v/1sk+qnz+7P80SoHwh77lXfGO9eKnTpswb5Wlmxz/IEzA
-         pyHS2cZXOaU0P87hPfgHtDwjNN7j0T7dOB4pFlrXxq4gJUXC8E+seX1pH/aMekLLjbJd
-         KQKvQ0pw3IjOxovXnlt9vPJLukseaU5R0Bf0wCsVX73yZbn/c/j5FupTnV6gJYwvveGW
-         4oEQ==
+        d=6wind.com; s=google; t=1762452188; x=1763056988; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=BNQuIPcbM/dcwp1D2vrF0ESeEf1khgGX+lt9j3s7Iyg=;
+        b=Lod9/K+IrmcDjav/+k27vnQWveCeRYcYSJmM+JmkO0gLnaDPd13snNkFgH68QopWHi
+         fk5eyUHAvEbn0KJnP4hNCP/VLZql64CeWVXsVvOg6ZiGlLVdK6T8/oU9/J2DvFegHmPv
+         tNjliOHv3Z3Zxr/6boixLGQgJwOSvYaC8pN5TLBqiWx4XmpO4g+slpXLkAoH4JW9EZuW
+         xJ/S1CTfX5xDDalyP1xY5+BO3+qgTTAr2KCDT5NBLboe0nCt5qe+ccnyjqlVexesWlK+
+         REYa0oVlOt89nv9HoG+U5rQlSbuzGFcrP4K9Bvpd+5gvfmsrX2jeUyPN/5ueH9o0mbTo
+         cXzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762451968; x=1763056768;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vlK4zA0L4la+hUwKhdxukg4u3+leU5PJEuHeams2xYc=;
-        b=vRoMvD+w4+I6Me3tXFffpt3Q7gnjfydHrrj0D1eSUK1pN4QKVGEDfXH/dD6TBCsE9N
-         ffz4LQcdayqHwC0w59rvjIssnxU+PzuYwvn6U2rqF69DT0QhTbCu8kzVhP/TlN+PSHGt
-         TkK3d7z+Onc2Y0MB0Y2Mv5Eieo4lXRMm9JHur+tQWH2jUUuTXhVWErcf76zi0rxhFfh8
-         +pZqgAZW+xCbMnBR65sYjBkcb6+GGAmAojkEug1CTzJ/oLlOwxRia4w+9cCsInPPn+nm
-         G14qNPt7ZeXwIIEGqYHFB/gtNWfe+seCQ55w2NiJVQ277mpSSh1yCyWfP0+iwvSxpQLp
-         3hfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXM3vqboSnRqdxhfWi/wgfteSnb/GmtISadMI887PgUW7quZvUlm5n5pNnZEisNH9B6b5TJkZI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZ50CinOyou6OLlGAwJVOauucE9LiHZBngATmDUfT578St4KA6
-	fJK7Q2yGR9sXZzit7J4n0jceNDAESewKzXP/5eg8MDsiyI5IOhfWYyWLmfKKiKBEukmmPnC5CZ7
-	+rxpRQg==
-X-Google-Smtp-Source: AGHT+IHYgX3mamcW6m7/cjCmJ0bMP247Tz2g55dHDPwjBo8YXouwntVi6jG9ucj4Q3XXuB7YD3dZNuqmZSU=
-X-Received: from plqt4.prod.google.com ([2002:a17:902:a5c4:b0:290:28e2:ce54])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:e84f:b0:295:64f8:d9cd
- with SMTP id d9443c01a7336-297c03ea736mr4913255ad.15.1762451967878; Thu, 06
- Nov 2025 09:59:27 -0800 (PST)
-Date: Thu,  6 Nov 2025 17:59:17 +0000
-In-Reply-To: <690c6ca9.050a0220.1e8caa.00d2.GAE@google.com>
+        d=1e100.net; s=20230601; t=1762452188; x=1763056988;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BNQuIPcbM/dcwp1D2vrF0ESeEf1khgGX+lt9j3s7Iyg=;
+        b=RpOwAV6i0iEEkAyidETpZr5JsJHiIF9NA2zb+st/5p3g2rQ9BjjtiN+yNIrfA77wUk
+         npRBHdeKQ00LyL+qQuDoFmENmePkMmzcn4YLSqaC8l2rxNN8qgUwKvosJypb6tlltiHq
+         Pe7oTQkQ44KdEP46TAift1xcGtDskOlxBaKLuM3UtMvMX48AnINZPStOzrUQMt/q8Ly4
+         nbYozCi+t2Lx2RFYc7pzr2zWCt3yE8YmElY1Lyol6RFrl5zI77Rfy6XwtcxSe2iffZHp
+         fCjLWJfWAoOcH5492BGf/Ppf9MZAydLNtQXfFnxN5kMuD0y53PJvlzwN0GGI+ZCXo4WQ
+         A11Q==
+X-Gm-Message-State: AOJu0Yy2WDzac3d2bWD++7g/8RElt/kdss08//RftI7SP9y38LPgEP9h
+	LHGPABmc6ZgxCXildvFDbEEfAdmdl21aaovhYXMwGzUro5L5aoXDiS0+KNzRdn2pxUSN+xqWILG
+	923PPtJfMohw83FpzCVXIbrmjzD7BI7bROlBT
+X-Gm-Gg: ASbGncsUlBIvgwECjinZ4PHlyaKfnBaBwBCAGmawQ2LusReSEhGt8z/LziycB7A0V63
+	cA4uYMzC6SEqa8ZO8a5ugmsbxNdGbMxT73eTLbMcbqJSE4wIidSh+7R0wg/PAur8OZaO9kj2j4o
+	Ja6Z5WbdHFsH4sU1e0lXuD4GZeg9X0pRmpkfgvQbywsiWRczLPMZJ4PxczmS8vVuGUx4XnXPA5B
+	GJrgDzVvzmR7F10oHBk3y3g88PbN5WbsXaoizmG/VflEAr+hnJymNJSX+rEnNCkDliOrkws+FBY
+	6qFp2JdmgOeXduUeBRPv/Nvzqf/2gbX8wdWjso7gVbinylZoFLGum0BL2i1oSIlKOJYsj+VzKdT
+	nGRQ4VGetPwMvGgft3jm76Ic9Dl0+iLbuMGWtTKGozsK+9B7HuGMGSg==
+X-Google-Smtp-Source: AGHT+IHgRpYUo5LWj2h5iZet/vXYlCG6U/e2FdhuzVncF1zpa+P6sL6FtA+/PpyweuZfs+8UjGauF8LXM4kV
+X-Received: by 2002:a5d:5848:0:b0:427:401:1986 with SMTP id ffacd0b85a97d-42ae5af529bmr52391f8f.9.1762452187589;
+        Thu, 06 Nov 2025 10:03:07 -0800 (PST)
+Received: from smtpservice.6wind.com ([185.13.181.2])
+        by smtp-relay.gmail.com with ESMTP id ffacd0b85a97d-42abe62df78sm13231f8f.9.2025.11.06.10.03.07;
+        Thu, 06 Nov 2025 10:03:07 -0800 (PST)
+X-Relaying-Domain: 6wind.com
+Received: from bretzel (bretzel.dev.6wind.com [10.17.1.57])
+	by smtpservice.6wind.com (Postfix) with ESMTPS id 6590A15CE9;
+	Thu,  6 Nov 2025 19:03:07 +0100 (CET)
+Received: from dichtel by bretzel with local (Exim 4.94.2)
+	(envelope-from <nicolas.dichtel@6wind.com>)
+	id 1vH4KB-00Gg24-5E; Thu, 06 Nov 2025 19:03:07 +0100
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org,
+	Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Subject: [PATCH net] bonding: fix mii_status when slave is down
+Date: Thu,  6 Nov 2025 19:02:52 +0100
+Message-ID: <20251106180252.3974772-1-nicolas.dichtel@6wind.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <690c6ca9.050a0220.1e8caa.00d2.GAE@google.com>
-X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
-Message-ID: <20251106175926.686885-1-kuniyu@google.com>
-Subject: [syzbot ci] Re: tipc: Fix use-after-free in tipc_mon_reinit_self().
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: syzbot+cif2d6d318f7e85f0b@syzkaller.appspotmail.com
-Cc: davem@davemloft.net, edumazet@google.com, hoang.h.le@dektech.com.au, 
-	horms@kernel.org, jmaloy@redhat.com, kuba@kernel.org, kuni1840@gmail.com, 
-	kuniyu@google.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzbot@lists.linux.dev, syzbot@syzkaller.appspotmail.com, 
-	syzkaller-bugs@googlegroups.com, tipc-discussion@lists.sourceforge.net
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-From: syzbot ci <syzbot+cif2d6d318f7e85f0b@syzkaller.appspotmail.com>
-Date: Thu, 06 Nov 2025 01:38:49 -0800
-> syzbot ci has tested the following series
-> 
-> [v1] tipc: Fix use-after-free in tipc_mon_reinit_self().
-> https://lore.kernel.org/all/20251106053309.401275-1-kuniyu@google.com
-> * [PATCH v1 net] tipc: Fix use-after-free in tipc_mon_reinit_self().
-> 
-> and found the following issue:
-> possible deadlock in tipc_mon_reinit_self
-> 
-> Full report is available here:
-> https://ci.syzbot.org/series/bfabf013-65e3-4ca9-8f54-0c7eef8be01a
-> 
-> ***
-> 
-> possible deadlock in tipc_mon_reinit_self
-> 
-> tree:      net
-> URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
-> base:      3d18a84eddde169d6dbf3c72cc5358b988c347d0
-> arch:      amd64
-> compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-> config:    https://ci.syzbot.org/builds/b2774856-e331-420e-a340-5107ec4b06f9/config
-> C repro:   https://ci.syzbot.org/findings/1f0a4298-b797-4217-8d6d-15f98c0ffd38/c_repro
-> syz repro: https://ci.syzbot.org/findings/1f0a4298-b797-4217-8d6d-15f98c0ffd38/syz_repro
-> 
-> tipc: Started in network mode
-> tipc: Node identity 4, cluster identity 4711
-> tipc: Node number set to 4
-> ============================================
-> WARNING: possible recursive locking detected
-> syzkaller #0 Not tainted
-> --------------------------------------------
-> syz.0.17/5963 is trying to acquire lock:
-> ffffffff8f2cb1c8 (rtnl_mutex){+.+.}-{4:4}, at: tipc_mon_reinit_self+0x25/0x360 net/tipc/monitor.c:714
-> 
-> but task is already holding lock:
-> ffffffff8f2cb1c8 (rtnl_mutex){+.+.}-{4:4}, at: __tipc_nl_compat_doit net/tipc/netlink_compat.c:358 [inline]
-> ffffffff8f2cb1c8 (rtnl_mutex){+.+.}-{4:4}, at: tipc_nl_compat_doit+0x1fd/0x5f0 net/tipc/netlink_compat.c:393
-> 
-> other info that might help us debug this:
->  Possible unsafe locking scenario:
-> 
->        CPU0
->        ----
->   lock(rtnl_mutex);
->   lock(rtnl_mutex);
-> 
->  *** DEADLOCK ***
-> 
->  May be due to missing lock nesting notation
-> 
-> 3 locks held by syz.0.17/5963:
->  #0: ffffffff8f331050 (cb_lock){++++}-{4:4}, at: genl_rcv+0x19/0x40 net/netlink/genetlink.c:1218
->  #1: ffffffff8f330e68 (genl_mutex){+.+.}-{4:4}, at: genl_lock net/netlink/genetlink.c:35 [inline]
->  #1: ffffffff8f330e68 (genl_mutex){+.+.}-{4:4}, at: genl_op_lock net/netlink/genetlink.c:60 [inline]
->  #1: ffffffff8f330e68 (genl_mutex){+.+.}-{4:4}, at: genl_rcv_msg+0x10d/0x790 net/netlink/genetlink.c:1209
->  #2: ffffffff8f2cb1c8 (rtnl_mutex){+.+.}-{4:4}, at: __tipc_nl_compat_doit net/tipc/netlink_compat.c:358 [inline]
->  #2: ffffffff8f2cb1c8 (rtnl_mutex){+.+.}-{4:4}, at: tipc_nl_compat_doit+0x1fd/0x5f0 net/tipc/netlink_compat.c:393
-> 
-> stack backtrace:
-> CPU: 1 UID: 0 PID: 5963 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-> Call Trace:
->  <TASK>
->  dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
->  print_deadlock_bug+0x28b/0x2a0 kernel/locking/lockdep.c:3041
->  check_deadlock kernel/locking/lockdep.c:3093 [inline]
->  validate_chain+0x1a3f/0x2140 kernel/locking/lockdep.c:3895
->  __lock_acquire+0xab9/0xd20 kernel/locking/lockdep.c:5237
->  lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
->  __mutex_lock_common kernel/locking/mutex.c:598 [inline]
->  __mutex_lock+0x187/0x1350 kernel/locking/mutex.c:760
->  tipc_mon_reinit_self+0x25/0x360 net/tipc/monitor.c:714
->  tipc_net_finalize+0x115/0x190 net/tipc/net.c:140
->  tipc_net_init+0x104/0x190 net/tipc/net.c:122
->  __tipc_nl_net_set+0x3b9/0x5a0 net/tipc/net.c:263
+netif_carrier_ok() doesn't check if the slave is up. Before the below
+commit, netif_running() was also checked.
 
-I missed another path calling tipc_net_finalize under RTNL.
+Fixes: 23a6037ce76c ("bonding: Remove support for use_carrier")
+Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+---
+ drivers/net/bonding/bond_main.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-I'll change v2 this way.
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index e95e593cd12d..5abef8a3b775 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -2120,7 +2120,7 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
+ 	/* check for initial state */
+ 	new_slave->link = BOND_LINK_NOCHANGE;
+ 	if (bond->params.miimon) {
+-		if (netif_carrier_ok(slave_dev)) {
++		if (netif_running(slave_dev) && netif_carrier_ok(slave_dev)) {
+ 			if (bond->params.updelay) {
+ 				bond_set_slave_link_state(new_slave,
+ 							  BOND_LINK_BACK,
+@@ -2665,7 +2665,8 @@ static int bond_miimon_inspect(struct bonding *bond)
+ 	bond_for_each_slave_rcu(bond, slave, iter) {
+ 		bond_propose_link_state(slave, BOND_LINK_NOCHANGE);
+ 
+-		link_state = netif_carrier_ok(slave->dev);
++		link_state = netif_running(slave->dev) &&
++			     netif_carrier_ok(slave->dev);
+ 
+ 		switch (slave->link) {
+ 		case BOND_LINK_UP:
+-- 
+2.47.1
 
----8<---
-diff --git a/net/tipc/monitor.c b/net/tipc/monitor.c
-index 46c8814c3ee6..be1e51efc445 100644
---- a/net/tipc/monitor.c
-+++ b/net/tipc/monitor.c
-@@ -706,12 +706,13 @@ void tipc_mon_delete(struct net *net, int bearer_id)
- 	kfree(mon);
- }
- 
--void tipc_mon_reinit_self(struct net *net)
-+void tipc_mon_reinit_self(struct net *net, bool rtnl_held)
- {
- 	struct tipc_monitor *mon;
- 	int bearer_id;
- 
--	rtnl_lock();
-+	if (!rtnl_held)
-+		rtnl_lock();
- 
- 	for (bearer_id = 0; bearer_id < MAX_BEARERS; bearer_id++) {
- 		mon = tipc_monitor(net, bearer_id);
-@@ -723,7 +724,8 @@ void tipc_mon_reinit_self(struct net *net)
- 		write_unlock_bh(&mon->lock);
- 	}
- 
--	rtnl_unlock();
-+	if (!rtnl_held)
-+		rtnl_unlock();
- }
- 
- int tipc_nl_monitor_set_threshold(struct net *net, u32 cluster_size)
-diff --git a/net/tipc/net.c b/net/tipc/net.c
-index 0e95572e56b4..56527f6f548c 100644
---- a/net/tipc/net.c
-+++ b/net/tipc/net.c
-@@ -119,11 +119,11 @@ int tipc_net_init(struct net *net, u8 *node_id, u32 addr)
- 	if (node_id)
- 		tipc_set_node_id(net, node_id);
- 	if (addr)
--		tipc_net_finalize(net, addr);
-+		tipc_net_finalize(net, addr, true);
- 	return 0;
- }
- 
--static void tipc_net_finalize(struct net *net, u32 addr)
-+static void tipc_net_finalize(struct net *net, u32 addr, bool rtnl_held)
- {
- 	struct tipc_net *tn = tipc_net(net);
- 	struct tipc_socket_addr sk = {0, addr};
-@@ -137,7 +137,7 @@ static void tipc_net_finalize(struct net *net, u32 addr)
- 	tipc_set_node_addr(net, addr);
- 	tipc_named_reinit(net);
- 	tipc_sk_reinit(net);
--	tipc_mon_reinit_self(net);
-+	tipc_mon_reinit_self(net, rtnl_held);
- 	tipc_nametbl_publish(net, &ua, &sk, addr);
- }
- 
-@@ -145,7 +145,7 @@ void tipc_net_finalize_work(struct work_struct *work)
- {
- 	struct tipc_net *tn = container_of(work, struct tipc_net, work);
- 
--	tipc_net_finalize(tipc_link_net(tn->bcl), tn->trial_addr);
-+	tipc_net_finalize(tipc_link_net(tn->bcl), tn->trial_addr, false);
- }
- 
- void tipc_net_stop(struct net *net)
----8<---
 
