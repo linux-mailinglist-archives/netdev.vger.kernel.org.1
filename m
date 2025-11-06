@@ -1,241 +1,411 @@
-Return-Path: <netdev+bounces-236468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D89F7C3CA09
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 17:56:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6001DC3CAAC
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 18:01:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3F525500051
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 16:52:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A98BF3A9F09
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 16:54:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA187339B3B;
-	Thu,  6 Nov 2025 16:52:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81F392E5B2A;
+	Thu,  6 Nov 2025 16:54:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=garmin.com header.i=@garmin.com header.b="CHzbiIgl";
-	dkim=pass (2048-bit key) header.d=garmin.com header.i=@garmin.com header.b="tFChCYrz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cbtRwoMh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-000eb902.pphosted.com (mx0a-000eb902.pphosted.com [205.220.165.212])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC70A33B964;
-	Thu,  6 Nov 2025 16:52:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.212
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762447934; cv=fail; b=Ob2B7B+lN5YrbuhlDMmbE5+3/dPXh11i9TE741FhZfz4TurMiwJGzC8Bs1p4SPZn/7dYV2Ff5lJiRVXYtkaw4MvvGsniLVZWknVg/zkrESAtq+TvEiel8hEocjNwVgpBEq3oBv98HHMsYYOQ4b8nTGltj4bc0uGxjIUwwtiYhMw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762447934; c=relaxed/simple;
-	bh=Pva+sx+KfWGBaI3Jfge2+dABvEegIHiRUeCqnQh8PBM=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rpeKHWnywugTPq/mYXvP8UZGPCL3xZJKSiMKRDwOC1pOs4o4Iv32iZiAZ2W5S2oRESKlFs3A2a+MYj0D/USsj28wmKMQsALAsHybfO84HZJZqZxRnxTdegIgdEVqsdpKERV/d2NxVLobuZ++Zjv8Cd2EpdRh7O0xa/PgFwYYB04=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=garmin.com; spf=pass smtp.mailfrom=garmin.com; dkim=pass (2048-bit key) header.d=garmin.com header.i=@garmin.com header.b=CHzbiIgl; dkim=pass (2048-bit key) header.d=garmin.com header.i=@garmin.com header.b=tFChCYrz; arc=fail smtp.client-ip=205.220.165.212
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=garmin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=garmin.com
-Received: from pps.filterd (m0220294.ppops.net [127.0.0.1])
-	by mx0a-000eb902.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5A6CwEiR007888;
-	Thu, 6 Nov 2025 10:51:44 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garmin.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pps1; bh=kL3ZF
-	YnCJtB3foOEMJahMQ7jT3PamYdAAyG6lnAmIns=; b=CHzbiIglR9hO927N1LJlk
-	rQlUdIyc4vHD1Iki/9HYtPSAAMrXUZ/oGF32uzKC87+Ah/Ndk+paV5HpRsl6A5ZM
-	YJW5m+Zd3UyjmF9Kw2y31vnEK9d2Glfvw0qBQRxE3zEYc/+OnKJE71rTz7fjOGNz
-	CBF11NkyVCCFMk9yNVUOZSRffkb0oVlZXantdO3FziqRsh7CSywpWdbuGHOx/5/8
-	PHENnMXFpZXMinpVwuGOIoURkTDPpPfymqh5NFdLDLoGefyLCy7B0KGGXD23gtfP
-	uIkX5zmTBhPBDukjDceXkQhiWlK443bywTPfDPNdk2ZEHBRRggojBiy4gePyZ1Jc
-	Q==
-Received: from dm5pr21cu001.outbound.protection.outlook.com (mail-centralusazon11021101.outbound.protection.outlook.com [52.101.62.101])
-	by mx0a-000eb902.pphosted.com (PPS) with ESMTPS id 4a8phy9830-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 06 Nov 2025 10:51:44 -0600 (CST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=OLdUmv9gCVam3COI7b59hhDQymIYveFCHz5Pu7rGBOAayadn07sAJPe9kNR7J8muAdOCpfyFPAyjzqq6Coy4Zgzsax5ZeD+dkj4V1I0KbXVqFQBKv3CkLBkaXYOVbPsgCxo7rOJURdbaZjukFcRC4AMPMe6lOrm7n4iZf9VbqU55gdkV6klgoMqsXuKdhQwxO6AdgI5zOtWPQoBhIbW/A3LcHkXQ9Iu2n7z/yZX6b/tnf1nG8kfzLsqJX+ex8m7vHYEsKlmQfTgVfqf9U3Dkks06jaKvYhdjicCmY8gNgLZ9i0mttvJ/cXMgP/qOiZgT0JiVBODHSW+FXzJaNllMew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kL3ZFYnCJtB3foOEMJahMQ7jT3PamYdAAyG6lnAmIns=;
- b=rXHBLX+8/558vcZHbKkhz37ZM+g5w3V8G+N4Xmtxxc5ltZOrF0tgDgMMDDntjRiad1yD0qCMLNq+t6sjuX3llmSfjiT0Aa5pFPLiHMXqY/v1S14SYVamgwgOQyUnpGZQp0P+32bXXaHygR8sJ3XQXyhSq8fJ5xuhMAYZPYjgcuHQwhHr4Uqv9DJyXfcjgVVGWn7sgB8FdqbDUWsstOuS8V2zsZ6vexLH2aL7aTS2CDuAO56n7DEutbFxeC31z9RNauqSzz99rY04WDO1S8VwmunAuWAFoFthjmAtzOoic76IWSvrDuWVxzZdJ9Hq6FOHatG/VDT/w/n8Mk5ZfoZr1Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 204.77.163.244) smtp.rcpttodomain=davemloft.net smtp.mailfrom=garmin.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=garmin.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=garmin.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kL3ZFYnCJtB3foOEMJahMQ7jT3PamYdAAyG6lnAmIns=;
- b=tFChCYrzEwLgg5fghKD78CMoQN2Ir/CVdg139CrGRsXUkfaArUsU/ex4YW07NZw3f/QGyyoF8HS4swzP6U5pMKmzd+sa6O0apvYGhhVvr1AV1AzpLKHXj8ZqMsvTMN0f18nhSMb96Pnh1IHOIeAf8bMFaK1NSnOxwvH8uM3Pum+ZMvVJRB2eqfJyUURKmwumRvoipCcBwDadrFBuB3cKceQjFv83XS0ZD4ApNzuMzH28m7uCZIPj2t4rdEzf7lFXpekpnsq4F8cOM0FTosLXppLf87kw6gDWG1uYT9Rym4DF19BdD2pfTuVxNHOQAgt+zBw6944kxUIlV23FkoHtvA==
-Received: from BN0PR04CA0191.namprd04.prod.outlook.com (2603:10b6:408:e9::16)
- by PH0PR04MB7382.namprd04.prod.outlook.com (2603:10b6:510:1e::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.12; Thu, 6 Nov
- 2025 16:51:42 +0000
-Received: from BN1PEPF0000468D.namprd05.prod.outlook.com
- (2603:10b6:408:e9:cafe::33) by BN0PR04CA0191.outlook.office365.com
- (2603:10b6:408:e9::16) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9298.12 via Frontend Transport; Thu,
- 6 Nov 2025 16:51:40 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 204.77.163.244)
- smtp.mailfrom=garmin.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=garmin.com;
-Received-SPF: Pass (protection.outlook.com: domain of garmin.com designates
- 204.77.163.244 as permitted sender) receiver=protection.outlook.com;
- client-ip=204.77.163.244; helo=edgetransport.garmin.com; pr=C
-Received: from edgetransport.garmin.com (204.77.163.244) by
- BN1PEPF0000468D.mail.protection.outlook.com (10.167.243.138) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9298.6 via Frontend Transport; Thu, 6 Nov 2025 16:51:40 +0000
-Received: from KC3WPA-EXSE03.ad.garmin.com (10.65.32.86) by cv1wpa-edge3
- (10.60.4.253) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.17; Thu, 6 Nov
- 2025 10:51:38 -0600
-Received: from cv1wpa-exmb4.ad.garmin.com (10.5.144.74) by
- KC3WPA-EXSE03.ad.garmin.com (10.65.32.86) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.2562.17; Thu, 6 Nov 2025 08:51:40 -0800
-Received: from cv1wpa-exmb1.ad.garmin.com (10.5.144.71) by
- CV1WPA-EXMB4.ad.garmin.com (10.5.144.74) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.57; Thu, 6 Nov 2025 10:51:39 -0600
-Received: from ola-9gm7613-uvm.ad.garmin.com (10.5.209.17) by smtp.garmin.com
- (10.5.144.71) with Microsoft SMTP Server id 15.1.2507.57 via Frontend
- Transport; Thu, 6 Nov 2025 10:51:39 -0600
-From: Nate Karstens <nate.karstens@garmin.com>
-To: <nate.karstens@garmin.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
-        <jacob.e.keller@intel.com>, <john.fastabend@gmail.com>,
-        <kuba@kernel.org>, <linux-kernel@vger.kernel.org>, <linux@treblig.org>,
-        <mrpre@163.com>, <nate.karstens@gmail.com>, <netdev@vger.kernel.org>,
-        <pabeni@redhat.com>, <sd@queasysnail.net>, <stable@vger.kernel.org>,
-        <tom@quantonium.net>
-Subject: [PATCH net v2] strparser: Fix signed/unsigned mismatch bug
-Date: Thu, 6 Nov 2025 10:51:17 -0600
-Message-ID: <20251106165117.1774787-1-nate.karstens@garmin.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20251106163623.1772347-1-nate.karstens@garmin.com>
-References: <20251106163623.1772347-1-nate.karstens@garmin.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4906284665
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 16:54:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762448066; cv=none; b=Iv9jn1McouRA8OH9K1P/SPtdJr+KuTWYcw0RtM0nCVWBcX1joh/j4FrW04EOvgTAVEGGdcIBlxOxLEw9h3/jHRX3L+tdy7zQtqnAu3xRtV0uUtF4vSti/+WbY5UQ7nqSWeL2W6RIoc1+Pl2jdsPCE3ionESxr2s5R23tGhC6YY4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762448066; c=relaxed/simple;
+	bh=eL4JKRR803xA5+R4XTte3LoFAvYjaqYOwFqXc/EnLB8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Yhb+LBAzOopkTY/VU4fhz3QG5iq1wD7wY8yBfNNZ1ZrezthQLv3rOpQ7tWhjIj9exVjTJn9FxrT8po38f5Y2W/uuR7WBZqp/972XgZYyl0rIaYnwqHXhrWonQF9jO6uX9GHvohs0xgIbyE5wvffKrLLfCCIHvJ+3Qf5UrZsSdYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cbtRwoMh; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-3408c9a8147so1085175a91.0
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 08:54:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762448064; x=1763052864; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Hj4ooY08x927tvypPHkHnvR9G+gggkNDMLRyKh9IN9w=;
+        b=cbtRwoMh6ls8KhWqU9zmada8tdp74VHvQFjN+XO6tAGd8OTWc4xAwyg2Hc+6T+LaQp
+         nZfssjKd+u7dUXF5Cysmu82kpco+QaaaaT/aSTwr0F1LmbIRvIErS0vJRJwjvjQLqg8E
+         epLFdNibs2QiapzljfxnjQZnSmTkR74bePvSz6I6nfylmQH7kTKzC/QCv7KMDGQmy04O
+         TgJfhRrOQU02GsGnyUwCejTOmTyEE1HT0L6tI0+RBd1XhjHc0h3e4ZTsb/wKt+3rShPm
+         EQACtBo2UCup2s2mppUOhHYbaqGxgezM2dfyg3MqkbHRlxb0z8sCwmh4PUYC4AcBatqD
+         XWZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762448064; x=1763052864;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Hj4ooY08x927tvypPHkHnvR9G+gggkNDMLRyKh9IN9w=;
+        b=OY8OoNd55bMVKPX7C72deFE3T0fODJe2Zvyk7bQy0aT1nZuCMz5A5Vyd8TM1Qv6CEC
+         icxpqOKC4aK0wLw9+IEeN0JJLp0ykTKFFnPHeeIs6VxxPwdCs4NjljF83jdmjQj03Rbz
+         d5GM+RLnkazHVtLAClKho9oFxGZjQiMFnJH2wWLGh7oGXjzJlInJSaMOayrSRQ9jGkcl
+         SmAnY8NtLzUltZsEjouh2L9yOoI0QNhkyluN/exHQeJt21KdqNWhbdZJYn4d42IAt9VI
+         e9m8b6kI/ZgGgC0kjHnP89et+7AEODsJn3la+pyQPgHwVdYGebjV8VLwDgLTJCUnA9vv
+         x0IQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUebMz3P4LKsefYGrQcrifksJ37UOuG37YxmgIiCkMeSoWpoojgBvvVXVkzGXnJymJU+w/881Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyIsNTF8uv7J1CKoBNu/AHrDQBuSyTOln4BaYNMTYMi4y9t/HuG
+	2Awcr4cUpDqjtk883kgRfWYkIS0siF1F19vUD5ajfBozXE2oXfVFkpHHKO+tMrEGbS5whWmZYuc
+	PM3bJx5WdDXOtRhnwmeOb0vhGNtASWi0=
+X-Gm-Gg: ASbGncubnWW+QKOQT3DYj5kpifkxXV8rk7pLqnm9slfuC1RoFeLJ7v08/xUpDndNg75
+	aGfH/UjsvQoQD/BCocVcfRkRFo7X48/7NcNC3LXYshEmIsGabDfCmFVQXagO7X/2LvktpY4zxc/
+	CYVShsfWX79NZOE0rxwtE655My9FzHHWOXlAUOP0J1p+e0B0bWRkMcfi/bQtHWS4pvKuq0KBUXe
+	PBj/fNpUKfyWggarx/fDps3tFJLdWY51BMtsik6p4LoJAHcLlkEHfXT8Jf882mq4FyqAJrvAwJG
+	OlXvFuEPLk0=
+X-Google-Smtp-Source: AGHT+IFIPzVBshvmq+nNzeRnlDT4GwRqAB85hDl2sFlWz+a9WJHxD0jRkIgAQViSnMd2x5alVQhdxnYk5H8Kq5rwWkU=
+X-Received: by 2002:a17:90b:3bce:b0:340:f05a:3ece with SMTP id
+ 98e67ed59e1d1-3434a1ef373mr309187a91.9.1762448063907; Thu, 06 Nov 2025
+ 08:54:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20251104172652.1746988-1-ameryhung@gmail.com> <20251104172652.1746988-4-ameryhung@gmail.com>
+ <CAEf4BzY+1PAE94PfoE=3VQVEYHWAiJP5btkx+u+UBjaZt_k==A@mail.gmail.com> <CAMB2axMNzemRgxQfNLi2GrTYJdmgchSH+ND6+QaFQM2m9ygajQ@mail.gmail.com>
+In-Reply-To: <CAMB2axMNzemRgxQfNLi2GrTYJdmgchSH+ND6+QaFQM2m9ygajQ@mail.gmail.com>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Thu, 6 Nov 2025 08:54:11 -0800
+X-Gm-Features: AWmQ_bkxyzogYpJ6Y6KUmMZ1viIFLFXRtnxxoHxUyd50fIlL4ns6qEcWRy0QArI
+Message-ID: <CAEf4Bza5VjkVsms959iHr-TvXLP3cMt=DYH2UeGzFJZiG1MiJQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v5 3/7] bpf: Pin associated struct_ops when
+ registering async callback
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, alexei.starovoitov@gmail.com, 
+	andrii@kernel.org, daniel@iogearbox.net, tj@kernel.org, martin.lau@kernel.org, 
+	kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN1PEPF0000468D:EE_|PH0PR04MB7382:EE_
-X-MS-Office365-Filtering-Correlation-Id: d7bde4ec-5ee5-4e9a-2226-08de1d54c284
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|82310400026|1800799024|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?dQuhGeN7cwB47Ptywafnygj5hzFXEEk5yCkNCBVs5Jrj7eVtvgGHhiihONy4?=
- =?us-ascii?Q?CKyIg4Iu8fQC+vknLdCsmgedMu9af0dr17N55ASdoplV0IT5/RIw8Hg3A2Wk?=
- =?us-ascii?Q?caLQIPtjlQ0VCzKjzrXAnnrJ/J37PpI5p/5hIqKindGn+a0OVKbe+S4o2pgZ?=
- =?us-ascii?Q?uU7SKpc4hFFYLvostTWqyrl1vmR8a6Ms7mSbkFs1xg1iM0ACBkb3tfXnr4MA?=
- =?us-ascii?Q?4Zazsp6oE9TSkDJvr5xWkSelmao+Npb56mJlVjOXAAu6ttA41bGKbHg2C8nk?=
- =?us-ascii?Q?DXFVg+QSyu8FLhXMgcZngVcHQFr4PQjddaHDWMKU7lu2BhYGs6tEo9B2yFKR?=
- =?us-ascii?Q?BI1cvHAjvhUewQQ2lo/+6BdR21BWyQcq/itoi/gNBbBYtXhBzERvlHhp8czq?=
- =?us-ascii?Q?viPyUIlhPeyVaL8HjIphrdWNyi4MnwI0VyWhpAD5X3WeRoGRtCAq9DyXu0dX?=
- =?us-ascii?Q?5KB+jLTGBcVdL+7PGxHoqIROXJrD5GmxC8Af39grUvvOq6EUR+IUHNNeAUlR?=
- =?us-ascii?Q?6c0LJ26S4lNnbCJMKyhAPkDvSqZjpr2Ba1ERWQc/gob+lfTCX3Su/YWDcvSY?=
- =?us-ascii?Q?UgWYUiac0Sysfk3hfMPjSmcgcPXHcpL4m7yCzANmvKy9ZC3za5TNcQDRnJgA?=
- =?us-ascii?Q?kRXcveHnvf4fDTWoMplh0DEThsILlJ8zlvc5tSB4Ht9eA/6n4yoXVuMOisA9?=
- =?us-ascii?Q?IgmW5NrIbgbeZvI3EqlVmTzBl33hGk17CLRouGrbUA+x6+Hu5BuyLhmbeqJ9?=
- =?us-ascii?Q?oORmQsv6kk5AQT4F9WEhjMw5uUaC7qGrJ62h5OsiyzvKU6uXywEzxbTQ8hGu?=
- =?us-ascii?Q?Q0S8uTOUm3nGcQW1BnTQ5kQUUoOcgLiI0KcF6B5hA1hlNbwP8G1R86ylmkqX?=
- =?us-ascii?Q?OanycpuJ+kAcVaGbsQs+076raWWnRSFF3+qwvWKDZ+HKztg5Ion4X9eSm4+5?=
- =?us-ascii?Q?enn1zSLW6kbnPpVtQYhcYxXqeq28oJfuETdsW7Wsq4rX1R2t06lRkn/BCSg8?=
- =?us-ascii?Q?ECyAlwSYy6HwTQWBXa0nLQEvlPYFwe/RGiGQKawn8zgQ1LdijEGiPLsBcoSn?=
- =?us-ascii?Q?Y/A7svE7CVDjqeFcr8wz/SfKozO8TGzTb+kOyg5RDqKf5NG+UwD3dBFlqm1e?=
- =?us-ascii?Q?EE0t4Ib7Zuwzlphkc3d+sKkrZa5suSREJeySmts2tQ65c1QMtNtmMHXSwlSz?=
- =?us-ascii?Q?seI+bijqtDSlFswvtAnr6uRFJ1HL9xBTrEgXyjl2UWFIDZf9TFfbBRdelDHs?=
- =?us-ascii?Q?NK9MvaYVxqG/lUEnID7aVL4h6GLQCmXOfTuJNXzHx9pYb4DDrtB2vM/wdHSe?=
- =?us-ascii?Q?pLBhIvbmWO2DSLjU79lak/f/vDWDBoD0KotEp6+LCzfqFBcOlQ2aJOXDqGdp?=
- =?us-ascii?Q?qf9qbuT0IEfFzHP5Of3UBPnsphax2t/8hENZdXnxXSyfIYtLhqfggg2x9vNL?=
- =?us-ascii?Q?Un35QRRgNvrT/eenpmbvjP7TWlBbxBLUbWHFAgtTx27FNG6tjpDXT+MFbaAu?=
- =?us-ascii?Q?PkP29ygDxHyenGcqEXUUviCEpK78VciEeAA4pHRXhVLDHLLcvjKX4wmWIj/A?=
- =?us-ascii?Q?uyEzYop1y1NsBTQuhHY=3D?=
-X-Forefront-Antispam-Report:
-	CIP:204.77.163.244;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:edgetransport.garmin.com;PTR:extedge.garmin.com;CAT:NONE;SFS:(13230040)(7416014)(376014)(82310400026)(1800799024)(36860700013);DIR:OUT;SFP:1102;
-X-OriginatorOrg: garmin.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2025 16:51:40.9927
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d7bde4ec-5ee5-4e9a-2226-08de1d54c284
-X-MS-Exchange-CrossTenant-Id: 38d0d425-ba52-4c0a-a03e-2a65c8e82e2d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=38d0d425-ba52-4c0a-a03e-2a65c8e82e2d;Ip=[204.77.163.244];Helo=[edgetransport.garmin.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN1PEPF0000468D.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR04MB7382
-X-Proofpoint-GUID: HFauzTxStFvusK-Ah8UAgvBMTxvcWaQG
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA2MDA1MiBTYWx0ZWRfX14kr6CuIGgeg 9/aOKwCfx48Ch2665BGSxF4ovHNn+/L6tzVA7FHaomhonm5J4YIPwmYxayzJc5BM+ThOzti9tWi iFiUjU1dsIby16SDKTdj6NGE5XirjXdkQopcxaQXJT0wSUf/TrzHxWayLR9R+kq5r7vVsXR3INB
- E7otc5ex2SnutKotqEnA6HHuiJ2BMlVIETwlRW7AUKzeDhNuzDmMSv1Jsk8UFrEpXurV+gTYY6J AQrqSDYl8MiGjrhA9aK61pKF6cXhzuhX0qx3TQFbblXMBgJIFDpgmmYL9RiKt53USf8v3/06fk2 NW5WIbTcLFw0OycI2z1bkQGb/FHxGbMi1eSXdC9CcpUPnDrv+2mODHBKiR7H8ratz86fua4fefG
- RGvwCpbjW7WVijRCjncSXQsz4j62mC/3JejXqSbwAZGudQPLkX0=
-X-Authority-Analysis: v=2.4 cv=BPG+bVQG c=1 sm=1 tr=0 ts=690cd220 cx=c_pps a=vgafN4kwWYQEHO2M6PbBOA==:117 a=YA0UzX50FYCGjWi3QxTvkg==:17 a=6eWqkTHjU83fiwn7nKZWdM+Sl24=:19 a=6UeiqGixMTsA:10 a=qm69fr9Wx_0A:10 a=VkNPw1HP01LnGYTKEx00:22 a=NbHB2C0EAAAA:8
- a=VwQbUJbxAAAA:8 a=_HojjBXY4aqDAocttyMA:9 cc=ntf
-X-Proofpoint-ORIG-GUID: HFauzTxStFvusK-Ah8UAgvBMTxvcWaQG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-06_03,2025-11-06_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1015
- malwarescore=0 bulkscore=0 adultscore=0 priorityscore=1501
- lowpriorityscore=0 spamscore=0 suspectscore=0 impostorscore=0
- classifier=typeunknown authscore=0 authtc= authcc=notification
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.21.0-2510240000
- definitions=main-2511060052
 
-The `len` member of the sk_buff is an unsigned int. This is cast to
-`ssize_t` (a signed type) for the first sk_buff in the comparison,
-but not the second sk_buff. On 32-bit systems, this can result in
-an integer underflow for certain values because unsigned arithmetic
-is being used.
-
-This appears to be an oversight: if the intention was to use unsigned
-arithmetic, then the first cast would have been omitted. The change
-ensures both len values are cast to `ssize_t`.
-
-The underflow causes an issue with ktls when multiple TLS PDUs are
-included in a single TCP segment. The mainline kernel does not use
-strparser for ktls anymore, but this is still useful for other
-features that still use strparser, and for backporting.
-
-Signed-off-by: Nate Karstens <nate.karstens@garmin.com>
-Cc: stable@vger.kernel.org
-Fixes: 43a0c6751a32 ("strparser: Stream parser for messages")
----
- net/strparser/strparser.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/strparser/strparser.c b/net/strparser/strparser.c
-index 43b1f558b33d..e659fea2da70 100644
---- a/net/strparser/strparser.c
-+++ b/net/strparser/strparser.c
-@@ -238,7 +238,7 @@ static int __strp_recv(read_descriptor_t *desc, struct =
-sk_buff *orig_skb,
-                                strp_parser_err(strp, -EMSGSIZE, desc);
-                                break;
-                        } else if (len <=3D (ssize_t)head->len -
--                                         skb->len - stm->strp.offset) {
-+                                         (ssize_t)skb->len - stm->strp.off=
-set) {
-                                /* Length must be into new skb (and also
-                                 * greater than zero)
-                                 */
+On Wed, Nov 5, 2025 at 3:03=E2=80=AFPM Amery Hung <ameryhung@gmail.com> wro=
+te:
+>
+> On Tue, Nov 4, 2025 at 3:21=E2=80=AFPM Andrii Nakryiko
+> <andrii.nakryiko@gmail.com> wrote:
+> >
+> > On Tue, Nov 4, 2025 at 9:27=E2=80=AFAM Amery Hung <ameryhung@gmail.com>=
+ wrote:
+> > >
+> > > Take a refcount of the associated struct_ops map to prevent the map f=
+rom
+> > > being freed when an async callback scheduled from a struct_ops progra=
+m
+> > > runs.
+> > >
+> > > Since struct_ops programs do not take refcounts on the struct_ops map=
+,
+> > > it is possible for a struct_ops map to be freed when an async callbac=
+k
+> > > scheduled from it runs. To prevent this, take a refcount on prog->aux=
+->
+> > > st_ops_assoc and save it in a newly created struct bpf_async_res for
+> > > every async mechanism. The reference needs to be preserved in
+> > > bpf_async_res since prog->aux->st_ops_assoc can be poisoned anytime
+> > > and reference leak could happen.
+> > >
+> > > bpf_async_res will contain a async callback's BPF program and resourc=
+es
+> > > related to the BPF program. The resources will be acquired when
+> > > registering a callback and released when cancelled or when the map
+> > > associated with the callback is freed.
+> > >
+> > > Also rename drop_prog_refcnt to bpf_async_cb_reset to better reflect
+> > > what it now does.
+> > >
+> > > Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> > > ---
+> > >  kernel/bpf/helpers.c | 105 +++++++++++++++++++++++++++++------------=
 --
-2.34.1
+> > >  1 file changed, 72 insertions(+), 33 deletions(-)
+> > >
+> > > diff --git a/kernel/bpf/helpers.c b/kernel/bpf/helpers.c
+> > > index 930e132f440f..5c081cd604d5 100644
+> > > --- a/kernel/bpf/helpers.c
+> > > +++ b/kernel/bpf/helpers.c
+> > > @@ -1092,9 +1092,14 @@ static void *map_key_from_value(struct bpf_map=
+ *map, void *value, u32 *arr_idx)
+> > >         return (void *)value - round_up(map->key_size, 8);
+> > >  }
+> > >
+> > > +struct bpf_async_res {
+> >
+> > "res" has a strong "result" meaning, which is a distraction here.
+> > Maybe "bpf_async_ctx"? And then we can use prep and put (reset?)
+> > terminology?
+> >
+> > > +       struct bpf_prog *prog;
+> > > +       struct bpf_map *st_ops_assoc;
+> > > +};
+> > > +
+> > >  struct bpf_async_cb {
+> > >         struct bpf_map *map;
+> > > -       struct bpf_prog *prog;
+> > > +       struct bpf_async_res res;
+> > >         void __rcu *callback_fn;
+> > >         void *value;
+> > >         union {
+> > > @@ -1299,8 +1304,8 @@ static int __bpf_async_init(struct bpf_async_ke=
+rn *async, struct bpf_map *map, u
+> > >                 break;
+> > >         }
+> > >         cb->map =3D map;
+> > > -       cb->prog =3D NULL;
+> > >         cb->flags =3D flags;
+> > > +       memset(&cb->res, 0, sizeof(cb->res));
+> > >         rcu_assign_pointer(cb->callback_fn, NULL);
+> > >
+> > >         WRITE_ONCE(async->cb, cb);
+> > > @@ -1351,11 +1356,47 @@ static const struct bpf_func_proto bpf_timer_=
+init_proto =3D {
+> > >         .arg3_type      =3D ARG_ANYTHING,
+> > >  };
+> > >
+> > > +static void bpf_async_res_put(struct bpf_async_res *res)
+> > > +{
+> > > +       bpf_prog_put(res->prog);
+> > > +
+> > > +       if (res->st_ops_assoc)
+> > > +               bpf_map_put(res->st_ops_assoc);
+> > > +}
+> > > +
+> > > +static int bpf_async_res_get(struct bpf_async_res *res, struct bpf_p=
+rog *prog)
+> > > +{
+> > > +       struct bpf_map *st_ops_assoc =3D NULL;
+> > > +       int err;
+> > > +
+> > > +       prog =3D bpf_prog_inc_not_zero(prog);
+> > > +       if (IS_ERR(prog))
+> > > +               return PTR_ERR(prog);
+> > > +
+> > > +       st_ops_assoc =3D READ_ONCE(prog->aux->st_ops_assoc);
+> >
+> > I think in about a month we'll forget why we inc_not_zero only for
+> > STRUCT_OPS programs, so I'd add comment here that non-struct_ops
+> > programs have explicit refcount on st_ops_assoc, so as long as we have
+> > that inc_not_zero(prog) above, we don't need to also bump map refcount
+>
+> Will document this in the comment.
+>
+> >
+> > > +       if (prog->type =3D=3D BPF_PROG_TYPE_STRUCT_OPS &&
+> > > +           st_ops_assoc && st_ops_assoc !=3D BPF_PTR_POISON) {
+> > > +               st_ops_assoc =3D bpf_map_inc_not_zero(st_ops_assoc);
+> > > +               if (IS_ERR(st_ops_assoc)) {
+> > > +                       err =3D PTR_ERR(st_ops_assoc);
+> > > +                       goto put_prog;
+> >
+> > nit: might be a bit premature to structure code with goto put_prog. As =
+of now:
+> >
+> >
+> > bpf_prog_put(prog);
+> > return PTR_ERR(st_ops_assoc);
+> >
+> > is short and sweet and good enough?
+>
+> Yes. We can change it to this style once there are more fields in bpf_asy=
+nc_ctx.
+>
+> >
+> > > +               }
+> > > +       }
+> > > +
+> > > +       res->prog =3D prog;
+> > > +       res->st_ops_assoc =3D st_ops_assoc;
+> >
+> > question: do we want to assign BPF_PTR_POISON to res->st_ops_assoc or
+> > is it better to keep it as NULL in such a case? I'm not sure, just
+> > bringing up the possibility
+>
+> As this doesn't make a difference on what
+> bpf_prog_get_assoc_struct_ops() returns, I'd keep it as NULL to
+> simplify things.
+>
+> >
+> > > +       return 0;
+> > > +put_prog:
+> > > +       bpf_prog_put(prog);
+> > > +       return err;
+> > > +}
+> > > +
+> > >  static int __bpf_async_set_callback(struct bpf_async_kern *async, vo=
+id *callback_fn,
+> > >                                     struct bpf_prog_aux *aux, unsigne=
+d int flags,
+> > >                                     enum bpf_async_type type)
+> > >  {
+> > >         struct bpf_prog *prev, *prog =3D aux->prog;
+> > > +       struct bpf_async_res res;
+> > >         struct bpf_async_cb *cb;
+> > >         int ret =3D 0;
+> > >
+> > > @@ -1376,20 +1417,18 @@ static int __bpf_async_set_callback(struct bp=
+f_async_kern *async, void *callback
+> > >                 ret =3D -EPERM;
+> > >                 goto out;
+> > >         }
+> > > -       prev =3D cb->prog;
+> > > +       prev =3D cb->res.prog;
+> > >         if (prev !=3D prog) {
+> > > -               /* Bump prog refcnt once. Every bpf_timer_set_callbac=
+k()
+> > > +               /* Get prog and related resources once. Every bpf_tim=
+er_set_callback()
+> > >                  * can pick different callback_fn-s within the same p=
+rog.
+> > >                  */
+> > > -               prog =3D bpf_prog_inc_not_zero(prog);
+> > > -               if (IS_ERR(prog)) {
+> > > -                       ret =3D PTR_ERR(prog);
+> > > +               ret =3D bpf_async_res_get(&res, prog);
+> > > +               if (ret)
+> > >                         goto out;
+> > > -               }
+> > >                 if (prev)
+> > > -                       /* Drop prev prog refcnt when swapping with n=
+ew prog */
+> > > -                       bpf_prog_put(prev);
+> > > -               cb->prog =3D prog;
+> > > +                       /* Put prev prog and related resources when s=
+wapping with new prog */
+> > > +                       bpf_async_res_put(&cb->res);
+> > > +               cb->res =3D res;
+> > >         }
+> >
+> > we discussed this offline, but I'll summarize here:
+> >
+> > I think we need to abstract this away as bpf_async_ctx_update(), which
+> > will accept a new prog pointer, and internally will deal with
+> > necessary ref count inc/put as necessary, depending on whether prog
+> > changed or not. With st_ops_assoc, prog pointer may not change, but
+> > the underlying st_ops_assoc might (it can go from NULL to valid
+> > assoc). And the implementation will be careful to leave previous async
+> > ctx as it was if anything goes wrong (just like existing code
+> > behaves).
+>
+> How about three APIs like below. First we just bump refcounts
+> unconditionally with prepare(). Then, xchg the local bpf_async_ctx
+> with the one embedded in callbacks with update(), and drop refcount in
+> cleanup().
+>
 
+Do we need separate prepare and update steps? Wouldn't they always go
+together anyways?
 
-________________________________
+> This will have some overhead as there are unnecessary atomic op, but
+> can make update() much straightforward.
+>
+> static void bpf_async_ctx_cleanup(struct bpf_async_ctx *ctx)
+> {
+>         bpf_prog_put(ctx->prog);
+>
+>         if (ctx->st_ops_assoc)
+>                 bpf_map_put(ctx->st_ops_assoc);
+>
+>         memset(&ctx, 0, sizeof(*ctx));
+> }
+>
+> static int bpf_async_ctx_prepare(struct bpf_async_ctx *ctx, struct
+> bpf_prog *prog)
+> {
+>         struct bpf_map *st_ops_assoc =3D NULL;
+>         int err;
+>
+>         prog =3D bpf_prog_inc_not_zero(prog);
+>         if (IS_ERR(prog))
+>                 return PTR_ERR(prog);
+>
+>         st_ops_assoc =3D READ_ONCE(prog->aux->st_ops_assoc);
+>         if (prog->type =3D=3D BPF_PROG_TYPE_STRUCT_OPS &&
+>             st_ops_assoc && st_ops_assoc !=3D BPF_PTR_POISON) {
+>                 st_ops_assoc =3D bpf_map_inc_not_zero(st_ops_assoc);
+>                 if (IS_ERR(st_ops_assoc)) {
+>                         bpf_prog_put(prog);
+>                         return PTR_ERR(st_ops_assoc);
+>                 }
+>         }
+>
+>         ctx->prog =3D prog;
+>         ctx->st_ops_assoc =3D st_ops_assoc;
+>         return 0;
+> }
+>
+> static void bpf_async_ctx_update(struct bpf_async_ctx *ctx, struct
+> bpf_async_ctx *new)
+> {
+>         struct bpf_async_ctx old;
+>
+>         old =3D *ctx;
+>         *ctx =3D *new;
+>
+>         bpf_async_ctx_cleanup(old);
+> }
+>
+>
+> >
+> > >         rcu_assign_pointer(cb->callback_fn, callback_fn);
+> > >  out:
+> > > @@ -1423,7 +1462,7 @@ BPF_CALL_3(bpf_timer_start, struct bpf_async_ke=
+rn *, timer, u64, nsecs, u64, fla
+> > >                 return -EINVAL;
+> > >         __bpf_spin_lock_irqsave(&timer->lock);
+> > >         t =3D timer->timer;
+> > > -       if (!t || !t->cb.prog) {
+> > > +       if (!t || !t->cb.res.prog) {
+> > >                 ret =3D -EINVAL;
+> > >                 goto out;
+> > >         }
+> > > @@ -1451,14 +1490,14 @@ static const struct bpf_func_proto bpf_timer_=
+start_proto =3D {
+> > >         .arg3_type      =3D ARG_ANYTHING,
+> > >  };
+> > >
+> > > -static void drop_prog_refcnt(struct bpf_async_cb *async)
+> > > +static void bpf_async_cb_reset(struct bpf_async_cb *cb)
+> > >  {
+> > > -       struct bpf_prog *prog =3D async->prog;
+> > > +       struct bpf_prog *prog =3D cb->res.prog;
+> > >
+> > >         if (prog) {
+> > > -               bpf_prog_put(prog);
+> > > -               async->prog =3D NULL;
+> > > -               rcu_assign_pointer(async->callback_fn, NULL);
+> > > +               bpf_async_res_put(&cb->res);
+> > > +               memset(&cb->res, 0, sizeof(cb->res));
+> >
+> > shouldn't bpf_async_res_put() leave cb->res in zeroed out state? why
+> > extra memset(0)?
+>
+> Will move memset(0) into bpf_async_res_put().
 
-CONFIDENTIALITY NOTICE: This email and any attachments are for the sole use=
- of the intended recipient(s) and contain information that may be Garmin co=
-nfidential and/or Garmin legally privileged. If you have received this emai=
-l in error, please notify the sender by reply email and delete the message.=
- Any disclosure, copying, distribution or use of this communication (includ=
-ing attachments) by someone other than the intended recipient is prohibited=
-. Thank you.
+I'd rather have explicit NULL assignments for each field that needs to
+be cleared. Having "generic" memset(0) will make it easier to forget
+to clear stuff (especially if clearing involves some extra operation
+wil refcount decrement or whatnot), IMO. I'd do ctx->prog =3D NULL;
+ctx->st_ops_assoc =3D NULL.
+
+>
+> >
+> > > +               rcu_assign_pointer(cb->callback_fn, NULL);
+> > >         }
+> > >  }
+> > >
+> >
+> > [...]
 
