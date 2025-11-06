@@ -1,197 +1,116 @@
-Return-Path: <netdev+bounces-236505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14F2FC3D571
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 21:24:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64082C3D5B0
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 21:29:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A9901893A06
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 20:25:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E8D03A36F3
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 20:29:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 439D62F7AAA;
-	Thu,  6 Nov 2025 20:24:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A2D12FBE12;
+	Thu,  6 Nov 2025 20:29:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IKzIS/fF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="128Y+g/6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B213C2F7475
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 20:24:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C29E265CB2
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 20:29:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762460685; cv=none; b=bSTSEmSHv3hczgpGCAn754wAottV+iBjcTcY396yE+M52JyovzEfZceYT8YoV0umuE/Pzwn6oWECamE8tZDc5oPIMXuNHKlcoMOZ3wPJ7ZMz9hjamVUv1cUjTnPAbtb+IosryqMz1E8MOaGQ94lwnrXbUT5hg5jLaYEkUiTlBS4=
+	t=1762460984; cv=none; b=AgvZlO5ImnKvymD5MNV7JbY5iqOnKIVkOJyU5AQq+2lVU8R6nnWg0IvYSfBc4wBOrzDvcawRX/IF7OObq6gMnk01TN+ZS3R6P0gvralKCpjSBvP3XyV/Jex86CKVN4ZsL8F+y5VGuuC748UvoLIQ2D1olRJeGUPM0lmvYZC1eUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762460685; c=relaxed/simple;
-	bh=Im9QWWxJXdZqz7HeLFWXZzmI9TfaqMlaB4gqcycUoss=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HyTIYKjDufB2FSMWlNdBU0YDY3AmOUTvQK+zDYKrdnnMoPOCn0g/C4/I2oW6x6/KFYoPrtR/FnD6mYqHARcN2jNw9P4hEaq+fvjCoZQSzF7XIMmDw0aYyFhbs6tJrXKth+F16Ry3fPOMUvJJeC4VFJnSfbq6wI/pI1kKdUh5EdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IKzIS/fF; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-294fd2ca6acso259225ad.0
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 12:24:43 -0800 (PST)
+	s=arc-20240116; t=1762460984; c=relaxed/simple;
+	bh=xHP6+YI5+E27meb2Nvs1MLP5kQRIT3dxXsVv8/qZlPg=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=CEGnEZ25hJgG0Z3OH8RndWZsZRHRIAEJi0WQgOQBjAbA8HUr74o6EOHWykba59P0sg+/wpk7Lb3Z0tc1DslBmX5PCr0RBHHl395isiExDXrh5z/0a4W6v/YJvO3rU34jTSSxsBh6uC8IeBLHcpSefP4oZKcFyXOXJpyBxGhRp/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=128Y+g/6; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-7868061f373so616937b3.2
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 12:29:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762460683; x=1763065483; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z3gyUgZQhfQPtS7SLCIDf6NbyslQ68pOuETZ2b4hfpg=;
-        b=IKzIS/fFRLupOYMhAxubkYmOMf1iYd0JtSGu6N6tjdphDY2T+lfSFlleOabM79FN56
-         Xc4BiYJcoO2yRft4fhIiiYjYyeO7ZY290lVgGmyJDaSg1qEtZjZaZnKrw0R6J+lFganu
-         InG87B1W4nncZe4GN2aWhII1F7jvu5cokGXaNGDU+U6mVBmr72wWeaxgajY3uA+Qe5dg
-         irGl0Pis5EDMCeH6qatxrr9VPL9MymKX+OfYaq13RJo8IRtXPJNwr9i4mmekwj6E/hYq
-         LOZDBCz90b2Za4RhRuMFtE8A7mVpVKK9stsAJnIqwXImh1dNG81H1gHMpOGD2wR1LQwM
-         QIWA==
+        d=google.com; s=20230601; t=1762460981; x=1763065781; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Oh496VGN8DiRIV3399Qmx6Pk3hP3M7c+iwr37LpbuwY=;
+        b=128Y+g/6IYkUI7Y62f3aOyYOo2kiW+8lZtN2LPwdzxm8XxdUMnRLfEDfolLjrnM+r5
+         9xXIC6Tm0XRKELLQe10ho87RRggRKUeGVx5qs5CPr0WK/0tb9e0M47JSQlk40Xe63975
+         oSkCKN1/x+MNbFIzWv425++E6uIeFaacA+Ndb9DaS00CrPJ5T1s0xG/NU4VTkkulTK4U
+         gOShbBOU07nUiUo2wgwCp3MdkfdVhnsVNZpopg1kI/E5wZ3CqzOZHbm9r9/9ga4TEOsI
+         gjxMm6ovXSeElvOhsjom+XIuHyXN7L6ZwdS7n3OcqavHBJ+fMnYZ87YvMAMAwEOBFIn+
+         Cl6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762460683; x=1763065483;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=z3gyUgZQhfQPtS7SLCIDf6NbyslQ68pOuETZ2b4hfpg=;
-        b=nn+P7FqnYu1zshkDnj41A+3GrOCwdfwWtMWzu/jHg1eYMdavLbktoQ96ZT38XHiWn/
-         z/EiRf4MlaLlnaf8G+51s1a1MWjCdLdlSzWQFOM2jxZhzR0GdYYjzl/Im90XacP6qBfD
-         RSG1UPaKinwCJvn6Sipp+8GO5roSZINN9oUN0ornE1ne3D29lMhsxALwtBK4WDRntcA6
-         okCrljK9BCeebq9OzG/47KwGEfysCrWBi8jfHgNKzJmEJAW0iZKKdchGb9dDtc3Bd0l7
-         a4QVN5ipV9B+23PsnY0mAtJfjN2BVYxr6difLRgzYOrY7Ad5oWKfe+dmwmezqMapXHqX
-         r99Q==
-X-Gm-Message-State: AOJu0YxQPV8pKKnA92EcpkHh5EmCilUKGdJF8Td3tXIpdb2hEAmgE5MI
-	91lbECjTFYPKefAz4Rc6gAizBTbNZQmzv/9tE2Zymi/rY9MYU+SCRg6J15puDdcSpiGWGSfHjWS
-	d2koahkgJDFdSgcGFKwoqwQLFF2Ex1C8=
-X-Gm-Gg: ASbGnctaRDmCYkfy+BAyPw5IzkWYk1HZ1wxfGc06sWFctVQm1Vwf/mOURHY6eAHb2vz
-	vX8BAzcRCEbjwIFtUNl3P6onYxl+GWK3Qx2U7OnYDCCg2t4mKoLeiV3w1FmnDBx/FJIwOQBG0v/
-	nrgjMPPocluOfDhf2nppzklglYYJ1o6AHhsZeHcZE/AOCmlhMAdYyW4uiZreEY0bUr8XvFmD1s+
-	ozSIaQHmeReOADzdpifvsuLpOXDXSAh2IusPL+7PlmVZcaBAgVHoIZQMC9wu0j5i5MbFZh8C1U3
-	tvQtz84ot5n2G8+QDz3Ww5vPA07q/w==
-X-Google-Smtp-Source: AGHT+IGTWzJU0xlvlovHbYWoDH5XM24Ae1wEThKwWG8ycDKpQ4Pza4FucwMrn4xnT46tQsURsHTnLGHE4XvA3l/bTbM=
-X-Received: by 2002:a17:902:da86:b0:267:912b:2b36 with SMTP id
- d9443c01a7336-297c00de2ecmr9261995ad.23.1762460682652; Thu, 06 Nov 2025
- 12:24:42 -0800 (PST)
+        d=1e100.net; s=20230601; t=1762460981; x=1763065781;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Oh496VGN8DiRIV3399Qmx6Pk3hP3M7c+iwr37LpbuwY=;
+        b=YcuLY0iC+VJWdzOXhMrmeAh8SoRQBBgDtxABVFjCsHE0h1vjYL4+A8lPloaF5Fo6MH
+         FdpJ6b4GK3ceD4zv0w5aYtk9GMauPtvlm6wn59gJU8G9xVDZqTmh4lcaI3/JDwL6fLyE
+         hUlTbTA2r9BorRaA75vuooHTum9cSp3Mlf5OEcBAd6mz0Q9i7ZTZUmx3HENCSNTkzlmH
+         KmYYrleOZyK5l0sirpNrZACQXYYMUjdId7+FxA1A78eeTFeHibJyeYHdM+r5pgNOsKHc
+         3VBoUqY0Fro7fdHxSjVy2H/vhwhkI8FkTQ9zydVLLS9ziBhK/WAMuTa9Tcip+BnydXBl
+         Ijng==
+X-Forwarded-Encrypted: i=1; AJvYcCWAMRFkE2atfgkGvtG+wFb6ol1GJLkNw6PYO4/fvLTZlM0EEHDfC7tEhBtvpDbOmYeVkbql6W4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGG9DVXZE3aG/5YiPt/DuJi+htwOHbTZC4UId4VfMiS5sX3+o7
+	XESKJFAPuuNMRK7jBjIHO/BErmFJnc+I0zbxKgvEDdJcqdCmz7yozlklblz+8LKO427sYUapcsx
+	12dbVqrx3p98XjA==
+X-Google-Smtp-Source: AGHT+IGNxry3NxqklO9+d9cTTsbCINPR/5O0EkLLIxUk5Y7l2EdipIOduOkE5/1P0xply2yI+mGF38XluQqEwA==
+X-Received: from ywzz25.prod.google.com ([2002:a05:690c:a719:b0:781:1c9e:fc79])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:690c:7013:b0:786:8adb:8ae with SMTP id 00721157ae682-787c53cea4dmr5937677b3.44.1762460981548;
+ Thu, 06 Nov 2025 12:29:41 -0800 (PST)
+Date: Thu,  6 Nov 2025 20:29:32 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <cover.1761748557.git.lucien.xin@gmail.com> <32c7730d3b0f6e5323d289d5bdfd01fc22d551b5.1761748557.git.lucien.xin@gmail.com>
- <43ea4062-75a8-4152-bf19-2eca561036bd@redhat.com>
-In-Reply-To: <43ea4062-75a8-4152-bf19-2eca561036bd@redhat.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 6 Nov 2025 15:24:30 -0500
-X-Gm-Features: AWmQ_blGjOQ50fcZQT5EtzHNncMYn6qzWEjBf9UHnF498_0zXTgvgxEng025WXQ
-Message-ID: <CADvbK_d8WoKJkU7ACK6nzbv7hzxxkAYZ5--DPzVQHsSZbEJnuw@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 09/15] quic: add congestion control
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
-	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
-	Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, 
-	David Howells <dhowells@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, 
-	John Ericson <mail@johnericson.me>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
-	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
+Message-ID: <20251106202935.1776179-1-edumazet@google.com>
+Subject: [PATCH net-next 0/3] net: use skb_attempt_defer_free() in napi_consume_skb()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 4, 2025 at 7:02=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
->
-> On 10/29/25 3:35 PM, Xin Long wrote:
-> > +/* Compute and update the pacing rate based on congestion window and s=
-moothed RTT. */
-> > +static void quic_cong_pace_update(struct quic_cong *cong, u32 bytes, u=
-32 max_rate)
-> > +{
-> > +     u64 rate;
-> > +
-> > +     /* rate =3D N * congestion_window / smoothed_rtt */
-> > +     rate =3D (u64)cong->window * USEC_PER_SEC * 2;
-> > +     if (likely(cong->smoothed_rtt))
-> > +             rate =3D div64_ul(rate, cong->smoothed_rtt);
-> > +
-> > +     WRITE_ONCE(cong->pacing_rate, min_t(u64, rate, max_rate));
-> > +     pr_debug("%s: update pacing rate: %u, max rate: %u, srtt: %u\n",
-> > +              __func__, cong->pacing_rate, max_rate, cong->smoothed_rt=
-t);
->
-> I think you should skip entirely the pacing_rate update when
-> `smoothed_rtt =3D=3D 0`
->
-will update it.
+There is a lack of NUMA awareness and more generally lack
+of slab caches affinity on TX completion path.
 
-> [...]> +/* rfc9002#section-5: Estimating the Round-Trip Time */
-> > +void quic_cong_rtt_update(struct quic_cong *cong, u32 time, u32 ack_de=
-lay)
-> > +{
-> > +     u32 adjusted_rtt, rttvar_sample;
-> > +
-> > +     /* Ignore RTT sample if ACK delay is suspiciously large. */
-> > +     if (ack_delay > cong->max_ack_delay * 2)
-> > +             return;
-> > +
-> > +     /* rfc9002#section-5.1: latest_rtt =3D ack_time - send_time_of_la=
-rgest_acked */
-> > +     cong->latest_rtt =3D cong->time - time;
-> > +
-> > +     /* rfc9002#section-5.2: Estimating min_rtt */
-> > +     if (!cong->min_rtt_valid) {
-> > +             cong->min_rtt =3D cong->latest_rtt;
-> > +             cong->min_rtt_valid =3D 1;
-> > +     }
-> > +     if (cong->min_rtt > cong->latest_rtt)
-> > +             cong->min_rtt =3D cong->latest_rtt;
-> > +
-> > +     if (!cong->is_rtt_set) {
-> > +             /* rfc9002#section-5.3:
-> > +              *   smoothed_rtt =3D latest_rtt
-> > +              *   rttvar =3D latest_rtt / 2
-> > +              */
-> > +             cong->smoothed_rtt =3D cong->latest_rtt;
-> > +             cong->rttvar =3D cong->smoothed_rtt / 2;
-> > +             quic_cong_pto_update(cong);
-> > +             cong->is_rtt_set =3D 1;
-> > +             return;
-> > +     }
-> > +
-> > +     /* rfc9002#section-5.3:
-> > +      *   adjusted_rtt =3D latest_rtt
-> > +      *   if (latest_rtt >=3D min_rtt + ack_delay):
-> > +      *     adjusted_rtt =3D latest_rtt - ack_delay
-> > +      *   smoothed_rtt =3D 7/8 * smoothed_rtt + 1/8 * adjusted_rtt
-> > +      *   rttvar_sample =3D abs(smoothed_rtt - adjusted_rtt)
-> > +      *   rttvar =3D 3/4 * rttvar + 1/4 * rttvar_sample
-> > +      */
-> > +     adjusted_rtt =3D cong->latest_rtt;
-> > +     if (cong->latest_rtt >=3D cong->min_rtt + ack_delay)
-> > +             adjusted_rtt =3D cong->latest_rtt - ack_delay;
-> > +
-> > +     cong->smoothed_rtt =3D (cong->smoothed_rtt * 7 + adjusted_rtt) / =
-8;
->
-> Out of sheer curiosity, is the compiler smart enough to use a 'srl 3'
-> for the above?
->
-Yes.
+Modern drivers are using napi_consume_skb(), hoping to cache sk_buff
+in per-cpu caches so that they can be recycled in RX path.
 
-266 cong->smoothed_rtt =3D (cong->smoothed_rtt * 7 + adjusted_rtt) / 8;
+Only use this if the skb was allocated on the same cpu,
+otherwise use skb_attempt_defer_free() so that the skb
+is freed on the original cpu.
 
-0x593d <+77>:  mov    (%rbx),%ecx         ; ecx =3D cong->smoothed_rtt
-0x593f <+79>:  lea    (%rax,%rcx,8),%edx   ; edx =3D adjusted_rtt + (ecx * =
-8)
-0x5942 <+82>:  sub    %ecx,%edx           ; edx =3D adjusted_rtt +
-(8*ecx) - ecx =3D ecx*7 + adjusted_rtt
-0x5946 <+86>:  shr    $0x3,%edx           ; edx >>=3D 3 =E2=86=92 divide by=
- 8
-0x594d <+93>:  mov    %edx,(%rbx)         ; store result back to
-cong->smoothed_rtt
+This removes contention on SLUB spinlocks and data structures,
+and this makes sure that recycled sk_buff have correct NUMA locality.
 
-Thanks.
+After this series, I get ~50% improvement for an UDP tx workload
+on an AMD EPYC 9B45 (IDPF 200Gbit NIC with 32 TX queues).
+
+I will later refactor skb_attempt_defer_free()
+to no longer have to care of skb_shared() and skb_release_head_state().
+
+Eric Dumazet (3):
+  net: allow skb_release_head_state() to be called multiple times
+  net: fix napi_consume_skb() with alien skbs
+  net: increase skb_defer_max default to 128
+
+ Documentation/admin-guide/sysctl/net.rst |  4 ++--
+ net/core/hotdata.c                       |  2 +-
+ net/core/skbuff.c                        | 12 ++++++++----
+ 3 files changed, 11 insertions(+), 7 deletions(-)
+
+-- 
+2.51.2.1041.gc1ab5b90ca-goog
+
 
