@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-236494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id F00A3C3D3CB
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 20:28:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C93BC3D3D4
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 20:28:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F0E4C4E4A41
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 19:28:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98AE4188FFF7
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 19:29:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B857354ADD;
-	Thu,  6 Nov 2025 19:28:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77F5535580A;
+	Thu,  6 Nov 2025 19:28:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RSexhXqE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GCvW05bH"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89F3634321E
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 19:28:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D282F355041
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 19:28:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762457296; cv=none; b=NLbx0bGV3iRR3/l4brArLYuecIkdynwL7PT48wV24/BofAFGNJB/JVCq9dNlHuHtP0d/XSf2LE55Wn2I+NhRXDccxozhKGqjx27avbLuZnjYsyPeB4KyVPCv8Yn6mRExBq0vhyep5FV4ff1A+66Q+SMSJXR5TS+rFhcCp1ynQsw=
+	t=1762457298; cv=none; b=IAP4LZKcrhcADH6oCC1CwQrhDVzxYT9VjHJA/L7H0nBYG1L/PfkeqQ4Wq4L2IZa6ZTuitffx7g6EPOTvzKLcYVNNgRjhtAV19RWXVVjB+AoYpANu7CBgtAUoVdQXV+KUxDmryArD+xXcdW2N2pDf25+0xMDjO/kbvANI6eAy88k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762457296; c=relaxed/simple;
-	bh=iDX+Xjk6YPshtFGXJ/bFso821Raymie9r/DGYwcIVUY=;
+	s=arc-20240116; t=1762457298; c=relaxed/simple;
+	bh=pcL4mwaNz826zqpYk9r6miFynK/UjPiuyy50810qFLw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=baf9Azina3gdBvEu/kdusDwm7/kgmSlad45VAeWrlLmShgKkjr/KeflKHcPQV87honh+8W0TGev5y9T6Z5v2nqjKySTQgwZKpIZvWwIsILR/0uX9KlCLCPjfHw4BxRH4Sn0QUeKWQT6xM/cZ7ilvwijIcI09Q6qPOtCI7vK2j/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--joshwash.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RSexhXqE; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=f3XYrYF1VtZSDwu+ptAZVI6EeFioryi5JfTdx3HOPJ49NcpbK07KDtTZEeder6ufnSlg9T2joctmGjnfDtF9SPAKMK+MwK4ge/Wdp8qzGStsvQiu2H8oOL148O7KJWvilXbdqQdYMVwSKkunkjbn2d2cel9ht2WwVKzy1zUfZ6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--joshwash.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GCvW05bH; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--joshwash.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3407734d98bso3430a91.3
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 11:28:14 -0800 (PST)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-33da21394adso19557a91.1
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 11:28:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762457294; x=1763062094; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1762457296; x=1763062096; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eIN6Z9i91+duDdYVW8qK20gY3PDqSGvt0BSLKjqFHuw=;
-        b=RSexhXqE0fInpyvdEwGWthH0Wn8vP8La8rCLhZnmhAGOJEjpmkQ/bUc3xdowwdKr+S
-         WxTU9sISsMQMRRyfDKj4yOiyPLsDj+6P9aoXp1SfkKf/djgV7Ne9kn0IGnLdE37wt+Dc
-         K6H6jNzxys/FWUd7eohVwW8+jdVzJC5eBtdPdpF1H/PHGle7bjVmCxz9DGFs+7ZD8r2m
-         XGLaR8DWd+Mw110KD2kitRHUdz7fbEgMNgFQeIeNB7Fe7D33K7/k1y7ig5py639uMK83
-         Y24CReCgUfdqycq16sQ2DYQDk9tyLEwpyK4JKc8MKkgz47xOw+hAATedHcp4aufCNBj8
-         nW7A==
+        bh=iKgJEyI/mY8AR1xsdJxGBP2wYE2Ojj7dC3lzuPfMB5Q=;
+        b=GCvW05bHps3K0Tca2deUNoeHJJwg8ATqXCoLyOvJwtuv8zprmc+4h+s8vDkd/VQFyN
+         TYPmIcBe60XRr9HFkyHkk2tBzRkncUtOjTsSvqE2BMpI9qvc3YLPHzhX2BxkxQArnWQd
+         h0FV/uGvLHshQjDgWepPOUCwPslGvYvzljLL1E8eqwdqB763ePZmZMBXrUYPRVKoGh2k
+         MLl5b47ahBBCiWprCCuOlWeA2ULHSrreUOxXOpwDfBxI2ajlxRjgnml4W1dqPaIBLhgv
+         /jM7A1U7MKpda699DPzr5RykL9NpTyKeuE5uSZnFQimIOOlUX0gnz8+1IrbAzYjdkeVf
+         lhkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762457294; x=1763062094;
+        d=1e100.net; s=20230601; t=1762457296; x=1763062096;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eIN6Z9i91+duDdYVW8qK20gY3PDqSGvt0BSLKjqFHuw=;
-        b=eUUgmYYb1P5w6jl8U13goEX58h+SoX5JGcbsVDM7+0I6h6ZWjnc1b09aSI3v6JsuNO
-         bjE/4nZ/Bu4tMc6NE4cNTyA4Gktn9G4dw0UmOcVKq0p2AMEhWPns8imnxN2Op4IFM9uw
-         I4tKR4tU7qzEtGjVghqni82w0tnR4ZxSwIuOESRCiRqcb6ZT1pSZEcy6XO/xls+6aAX9
-         Df5zcdtwsbOw/fgNVeq3+eHTr07IoM7K1HApGD6mrmMDoMTgwOoAqusqjlPpArpP2UEJ
-         bIqXo6App86f7CL85+2NOaanF8P3t+0TNvpcUAILTc6llH6wQOMNVHeGQIUV/lTOt9dI
-         KwWw==
-X-Gm-Message-State: AOJu0YzSK5vrKtEH4moP8/nNFCx5H4YlMUDoKEoUXvCTTYJoBS83IyS8
-	kyzWCrDhsaeC+Q2/U/pKHx/S1DiZhPXFjIIKLXLMmHOPDQ0jL2z1PP9azcCi2z+Sr1OY8WQobHd
-	8wXFRKu3tJ0lvZxvMbFGw9hewxWIOBKfVZivPJaha8ARWfdP6kk1HcRL9h4GOmscRgHQeKKEKTY
-	u1XIv05F8mprQuDfO1WtgW3a+pNVTHFjWnz0i1ETh3tBch8Ck=
-X-Google-Smtp-Source: AGHT+IE40sp+DzYKQD/+xYllnXpCS8xcKrLwbzO/rBj+3SuPPrgmpHyIs5cY0wvKNyo/ls3d26o2FlPqwqdiVg==
-X-Received: from pjbfy4.prod.google.com ([2002:a17:90b:204:b0:343:4a54:8435])
+        bh=iKgJEyI/mY8AR1xsdJxGBP2wYE2Ojj7dC3lzuPfMB5Q=;
+        b=U+7hQRE0q/z3ajFFbgzhxwxq5dCKhOuryMFlMY4ja831oU+8oJWUWqYP9jSHLQ9VpO
+         iJwiGvWVzmnvuQcjBebdNwtYKsODhKkspIjy0YWBuYatw/HIwPBSMjtwLKheYHHNXR9e
+         H/WJLkG7wjHFwBdiQY1BgUSjfQFbL5/9IIp/ETG/bDfsRWdtM3C0KRyp5Q/4NQLhFG5J
+         Bzdjfgdq3GzxYgnwlQ+1+vrcpdZGSF5aZORwOqPtfnoAgqYOveB80SecBgEjRNWFhQCy
+         +Po3AF+TUHoe+1O4A/4I4LtxJkEqlUB908JESZIc0WKd4SE71nnFkYn4ZEXpH3mMA/Hd
+         Z88Q==
+X-Gm-Message-State: AOJu0Yx6yLoklXIziTdHBijk0TrTQYnfCjFypJSXbPyMi0Yeju0Xtysa
+	2sBXX9xNZ7OZnZ+L88BbxtUBIEhjqYS1X4QLGLhUIiB8DvmpeyrFJR3A9gExPS5NzSx67IN3uiP
+	VOX3iCKyyRAFo5C88890JLYQmSNiOneM571UcQxdKrkN0PmFZ6VRN5BrGbxAXqPFgqmMdrLFdDi
+	4MPKptBbP1mrYB4Io4a3IefN5Ju71uKto1DAaFdQtRTEIYXXQ=
+X-Google-Smtp-Source: AGHT+IHuoC9uSzkGJMnKST7Musb48MfIxk+yGYWyESYp6VWPanJk3sFt8EEnKt8WNeVDhpt7ClFHwkP8aV18dQ==
+X-Received: from pjvp5.prod.google.com ([2002:a17:90a:df85:b0:340:e523:10dd])
  (user=joshwash job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:50cf:b0:32e:d599:1f66 with SMTP id 98e67ed59e1d1-3434c577697mr370154a91.30.1762457293812;
- Thu, 06 Nov 2025 11:28:13 -0800 (PST)
-Date: Thu,  6 Nov 2025 11:27:43 -0800
+ 2002:a17:90b:3885:b0:340:bb64:c5e with SMTP id 98e67ed59e1d1-3434c4fa855mr370595a91.14.1762457295919;
+ Thu, 06 Nov 2025 11:28:15 -0800 (PST)
+Date: Thu,  6 Nov 2025 11:27:44 -0800
 In-Reply-To: <20251106192746.243525-1-joshwash@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251106192746.243525-1-joshwash@google.com>
 X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
-Message-ID: <20251106192746.243525-2-joshwash@google.com>
-Subject: [PATCH net-next v3 1/4] gve: Decouple header split from RX buffer length
+Message-ID: <20251106192746.243525-3-joshwash@google.com>
+Subject: [PATCH net-next v3 2/4] gve: Use extack to log xdp config
+ verification errors
 From: joshwash@google.com
 To: netdev@vger.kernel.org
 Cc: Joshua Washington <joshwash@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
@@ -86,94 +87,96 @@ Cc: Joshua Washington <joshwash@google.com>, Harshitha Ramamurthy <hramamurthy@g
 	Stanislav Fomichev <sdf@fomichev.me>, Willem de Bruijn <willemb@google.com>, 
 	Praveen Kaligineedi <pkaligineedi@google.com>, Ziwei Xiao <ziweixiao@google.com>, 
 	John Fraker <jfraker@google.com>, "Dr. David Alan Gilbert" <linux@treblig.org>, Ankit Garg <nktgrg@google.com>, 
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
-	Jordan Rhee <jordanrhee@google.com>
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
 From: Ankit Garg <nktgrg@google.com>
 
-Previously, enabling header split via `gve_set_hsplit_config` also
-implicitly changed the RX buffer length to 4K (if supported by the
-device). This coupled two settings that should be orthogonal; this patch
-removes that side effect.
+Plumb extack as it allows us to send more detailed error messages back
+and append 'gve' suffix to method name per convention.
 
-After this change, `gve_set_hsplit_config` only toggles the header
-split configuration. The RX buffer length is no longer affected and
-must be configured independently.
+NL_SET_ERR_MSG_FMT_MOD doesn't support format string longer than 80
+chars so keeping netdev warning with actual queue count details.
 
 Signed-off-by: Ankit Garg <nktgrg@google.com>
 Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
-Reviewed-by: Jordan Rhee <jordanrhee@google.com>
 Reviewed-by: Willem de Bruijn <willemb@google.com>
 Signed-off-by: Joshua Washington <joshwash@google.com>
 ---
- drivers/net/ethernet/google/gve/gve.h         |  3 ---
- drivers/net/ethernet/google/gve/gve_ethtool.c |  2 --
- drivers/net/ethernet/google/gve/gve_main.c    | 10 ----------
- 3 files changed, 15 deletions(-)
+Changes in v3:
+* Removed newline from extack messages (Jakub Kicinski)
 
-diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
-index ac325ab..872dae6 100644
---- a/drivers/net/ethernet/google/gve/gve.h
-+++ b/drivers/net/ethernet/google/gve/gve.h
-@@ -59,8 +59,6 @@
- 
- #define GVE_DEFAULT_RX_BUFFER_SIZE 2048
- 
--#define GVE_MAX_RX_BUFFER_SIZE 4096
--
- #define GVE_XDP_RX_BUFFER_SIZE_DQO 4096
- 
- #define GVE_DEFAULT_RX_BUFFER_OFFSET 2048
-@@ -1247,7 +1245,6 @@ void gve_rx_free_rings_gqi(struct gve_priv *priv,
- 			   struct gve_rx_alloc_rings_cfg *cfg);
- void gve_rx_start_ring_gqi(struct gve_priv *priv, int idx);
- void gve_rx_stop_ring_gqi(struct gve_priv *priv, int idx);
--u16 gve_get_pkt_buf_size(const struct gve_priv *priv, bool enable_hplit);
- bool gve_header_split_supported(const struct gve_priv *priv);
- int gve_set_hsplit_config(struct gve_priv *priv, u8 tcp_data_split,
- 			  struct gve_rx_alloc_rings_cfg *rx_alloc_cfg);
-diff --git a/drivers/net/ethernet/google/gve/gve_ethtool.c b/drivers/net/ethernet/google/gve/gve_ethtool.c
-index b030a84..db6fc85 100644
---- a/drivers/net/ethernet/google/gve/gve_ethtool.c
-+++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
-@@ -606,8 +606,6 @@ static int gve_set_ringparam(struct net_device *netdev,
- 	} else {
- 		/* Set ring params for the next up */
- 		priv->header_split_enabled = rx_alloc_cfg.enable_header_split;
--		priv->rx_cfg.packet_buffer_size =
--			rx_alloc_cfg.packet_buffer_size;
- 		priv->tx_desc_cnt = tx_alloc_cfg.ring_size;
- 		priv->rx_desc_cnt = rx_alloc_cfg.ring_size;
- 	}
+Changes in v2:
+* Add this patch to the series for RX buffer length management
+  (Jakub Kicinski)
+---
+ drivers/net/ethernet/google/gve/gve_main.c | 24 +++++++++++++++---------
+ 1 file changed, 15 insertions(+), 9 deletions(-)
+
 diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
-index 347391a..453e40a 100644
+index 453e40a..c1d9916 100644
 --- a/drivers/net/ethernet/google/gve/gve_main.c
 +++ b/drivers/net/ethernet/google/gve/gve_main.c
-@@ -2041,14 +2041,6 @@ static void gve_tx_timeout(struct net_device *dev, unsigned int txqueue)
- 	priv->tx_timeo_cnt++;
- }
- 
--u16 gve_get_pkt_buf_size(const struct gve_priv *priv, bool enable_hsplit)
--{
--	if (enable_hsplit && priv->max_rx_buffer_size >= GVE_MAX_RX_BUFFER_SIZE)
--		return GVE_MAX_RX_BUFFER_SIZE;
--	else
--		return GVE_DEFAULT_RX_BUFFER_SIZE;
--}
--
- /* Header split is only supported on DQ RDA queue format. If XDP is enabled,
-  * header split is not allowed.
-  */
-@@ -2080,8 +2072,6 @@ int gve_set_hsplit_config(struct gve_priv *priv, u8 tcp_data_split,
- 		return 0;
- 
- 	rx_alloc_cfg->enable_header_split = enable_hdr_split;
--	rx_alloc_cfg->packet_buffer_size =
--		gve_get_pkt_buf_size(priv, enable_hdr_split);
- 
+@@ -1707,18 +1707,21 @@ static int gve_xsk_wakeup(struct net_device *dev, u32 queue_id, u32 flags)
  	return 0;
  }
+ 
+-static int verify_xdp_configuration(struct net_device *dev)
++static int gve_verify_xdp_configuration(struct net_device *dev,
++					struct netlink_ext_ack *extack)
+ {
+ 	struct gve_priv *priv = netdev_priv(dev);
+ 	u16 max_xdp_mtu;
+ 
+ 	if (dev->features & NETIF_F_LRO) {
+-		netdev_warn(dev, "XDP is not supported when LRO is on.\n");
++		NL_SET_ERR_MSG_MOD(extack,
++				   "XDP is not supported when LRO is on.");
+ 		return -EOPNOTSUPP;
+ 	}
+ 
+ 	if (priv->header_split_enabled) {
+-		netdev_warn(dev, "XDP is not supported when header-data split is enabled.\n");
++		NL_SET_ERR_MSG_MOD(extack,
++				   "XDP is not supported when header-data split is enabled.");
+ 		return -EOPNOTSUPP;
+ 	}
+ 
+@@ -1727,17 +1730,20 @@ static int verify_xdp_configuration(struct net_device *dev)
+ 		max_xdp_mtu -= GVE_RX_PAD;
+ 
+ 	if (dev->mtu > max_xdp_mtu) {
+-		netdev_warn(dev, "XDP is not supported for mtu %d.\n",
+-			    dev->mtu);
++		NL_SET_ERR_MSG_FMT_MOD(extack,
++				       "XDP is not supported for mtu %d.",
++				       dev->mtu);
+ 		return -EOPNOTSUPP;
+ 	}
+ 
+ 	if (priv->rx_cfg.num_queues != priv->tx_cfg.num_queues ||
+ 	    (2 * priv->tx_cfg.num_queues > priv->tx_cfg.max_queues)) {
+-		netdev_warn(dev, "XDP load failed: The number of configured RX queues %d should be equal to the number of configured TX queues %d and the number of configured RX/TX queues should be less than or equal to half the maximum number of RX/TX queues %d",
+-			    priv->rx_cfg.num_queues,
+-			    priv->tx_cfg.num_queues,
++		netdev_warn(dev,
++			    "XDP load failed: The number of configured RX queues %d should be equal to the number of configured TX queues %d and the number of configured RX/TX queues should be less than or equal to half the maximum number of RX/TX queues %d.",
++			    priv->rx_cfg.num_queues, priv->tx_cfg.num_queues,
+ 			    priv->tx_cfg.max_queues);
++		NL_SET_ERR_MSG_MOD(extack,
++				   "XDP load failed: The number of configured RX queues should be equal to the number of configured TX queues and the number of configured RX/TX queues should be less than or equal to half the maximum number of RX/TX queues");
+ 		return -EINVAL;
+ 	}
+ 	return 0;
+@@ -1748,7 +1754,7 @@ static int gve_xdp(struct net_device *dev, struct netdev_bpf *xdp)
+ 	struct gve_priv *priv = netdev_priv(dev);
+ 	int err;
+ 
+-	err = verify_xdp_configuration(dev);
++	err = gve_verify_xdp_configuration(dev, xdp->extack);
+ 	if (err)
+ 		return err;
+ 	switch (xdp->command) {
 -- 
 2.51.2.997.g839fc31de9-goog
 
