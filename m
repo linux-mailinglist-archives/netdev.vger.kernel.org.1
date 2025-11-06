@@ -1,109 +1,134 @@
-Return-Path: <netdev+bounces-236261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15214C3A73E
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 12:07:30 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B548C3A7AD
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 12:12:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B1D1A345400
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 11:07:29 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 532424FF39A
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 11:08:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AAD2303CAB;
-	Thu,  6 Nov 2025 11:07:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA24430BBA5;
+	Thu,  6 Nov 2025 11:08:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rV5Pn6gn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lFsaGLaa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C435E2E7F27
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 11:07:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFF172E8B7D
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 11:08:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762427244; cv=none; b=nfAuwIFTv165FEV56r/wedz4KyeCHTL0ST6yxHeC13egPPwqiKbGC5EemJzP4D2hioeXVmO4soYJozF+Bb1c7FWHHEw6+DjWIoGZNmFZGmblbG4KYWoTNJkUbX2tYNjs7FCuqCJKledLst0E7SudX170SEwplJ7ssreKMlXxv7s=
+	t=1762427285; cv=none; b=KPYl0+qHMVGz0/3kx+PpdLxIol/gR2rTUPRoMq6NJ032HvsVp5z+TF3Otf72SANXCl+0jDP/bARDJ8gfOf/GqcyUvAONIrfDhxhhMfVuJ1woK0+iHL6EZbBlM9PusTZw4xpYCkaIFnfq5Aqx33i5QBRBUe4eF2jz77Ouy9wZdNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762427244; c=relaxed/simple;
-	bh=H0ZdH+nx0rZ/pZHZK3BneUY8rwzBPM85uI4MwicRmNo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=doPwROdwT2VtkER5Qysqx+QEZvhoD6SA+nXkUpaG0tcbE4bw1a8QaPBnoQoGJEK9XRK5WT8D61lpPpN8JIUxH7RTwI7BhvxWZK2n6PBH66kSWEE7qOgxV8FMd/hJ9Tey9m90e/CS08rCpyoRVIugcFKCCHC/5jMktzEt2qFtPGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rV5Pn6gn; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4e89c433c00so8596171cf.1
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 03:07:22 -0800 (PST)
+	s=arc-20240116; t=1762427285; c=relaxed/simple;
+	bh=iflFF8uGA+JQqg5PeOnkh0xBZA/LPV6uIzaa7UsyVRQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KG+NHAqxsRMSrM5/L/YbSMqeQopZzKEjUL2teiwaLYnkhEyY91/uRC1atzTTKKryA7JbMlcHIKB+ZTX5srMH4VnxPXmFSmzT+MtSzsf7kYAQ2Ga78ZLl0WbphKtO618S7PWvAkRz+vMEbfMaIywyX1jUSXK0EV7Ii4/22M0gQAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lFsaGLaa; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-429c82bf86bso589439f8f.1
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 03:08:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762427242; x=1763032042; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H0ZdH+nx0rZ/pZHZK3BneUY8rwzBPM85uI4MwicRmNo=;
-        b=rV5Pn6gnT4Q7LcRnxkiij/NfBeYHxoIeJFZvjPdYZUl/9A/r/UheF6pJy3tAPg/Lcq
-         33KUW+jTduemo+byS1u9gzcFcE47vluC7J4wpHj9xJN0Jf0rztnsXdUhdN0OPQMorYBv
-         dHFB6elLRqCx9DdXigCdSnwlgLlK3O/qYfZW5ajj/OC3YIsUvQ2/Zz8apKIlKcQR7x9L
-         uoNc8Kst/W1h4u9GUsXR3LPM61K5fY/U3JrxvbcFEGgTD/9ZHdaYY+LWGpVHLZb/vIem
-         VGAyqQe2QDKqZ6zwcnZpz5lRCJIq8TQ10NbpjgRyyZa6oMgloCB6sIKiy6qmUGMmgPa1
-         Lo8g==
+        d=gmail.com; s=20230601; t=1762427281; x=1763032081; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KemrrCvE16IUsPvIdPc7ZklZCJchRhA/4dXIse7pcqc=;
+        b=lFsaGLaav2Wzq+kdJsJU1Wb4wW+hsZE5/nqsyi2eb0dBlUw0xGSjTlzzn4Sa1cJnLz
+         qOyyIeD4YWjmrVzmwvu8aLSvJiCrNWiWtPu3V2gOXZd2hOq/2CFDkuqVKsyHc8xWaV+2
+         UnIEinVpCzCm1HQ4R8dAMK+BQyH5QFyCxuMW0Wu90+6fKHiCDqa85zysgdJoHRrOgGTY
+         4TuJETudPaQ70g6dro3pDcNu6mNd5AGjgpMzdSEf+ANdVpng/0xQwNfcTBWXI4fgmKma
+         Gx1wfD/x+CU3EW9C3Q90NaljRbG7J9kS+1tSE2oTZqfxywlZzb1JbKbJFTSXG8MyWUxe
+         SNhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762427242; x=1763032042;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=H0ZdH+nx0rZ/pZHZK3BneUY8rwzBPM85uI4MwicRmNo=;
-        b=JGzk9OjcVjLdD0fYa1quT1RcxJ4FmZEt3n5pJ1LZySkfDEslKhSTY/oS3x36bxbQxd
-         meAJsc55AfWUxzAsUl2DYFP1v22eub7b9kk8iGF65RusG4oXnsIt3gm8hqd4zBVRW3Of
-         +omQfjcgDeFVbjnc9fuiCs21LAy6MXUX0ysGFdSGBxO8LBoqy8LtB35gbtXG6eeQr3b+
-         LTP/8P4L+NUBmR2XCS7ETuB/frduD/o+jaYcoIMxrVsH+x8ex+mcszs9N6dMKdXMwztL
-         KPsE89fhUHBmHzDVzcSQqtlWDoFXbvXotW2dZNgBFDuuu9eRrSTwsoxRvMNWl/2U+L+J
-         pnIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX6NFxuY4LVemw8sfmsTw2HO1eqGZvSw6NExKHK6SwZ8YOTKvoad5yRvXJiVNRkMr3HKJS3PVM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YywgdNQuvSJhmLhtgzYAd11YJ6VWAhMNlDkFP9EG5t7P2KkdTeY
-	6ajJhUahhFp6Q6aJbGwbsty2UqfnaMm88f4ZcODiJKYamT1MW31r9dkvN0+swQEMpDqidi+ygby
-	kJv1sSAg5RJ6nIeQo7qGuX7CIIeAvc1xBnXpq7huc
-X-Gm-Gg: ASbGncu10JPLOCyrXuqdtM18wXk2GJ+uZKwWKDTk92N2/RRP0Ig3EGqnZNmShSXKzuO
-	616wf5XiYQhGMNUbzUV6GRg9XeEV3pUlWj8qka3wprdobVNSI3caAGRyyXiK+8wrqAQ3VfQO2IG
-	BM0e8cjBNvCJEB92QdEwcGwU4yGGFeJweJA/+/GENmE/WD7SuWfSKKcCN6TOx8SzP08s9UqSHQE
-	uL97nhAM9EREjuKN5tuP8FEUBtn1sJqfjSPZ9/5Ns2QgsFgcZIsPvxMaBhNDCtUmMkh4c0=
-X-Google-Smtp-Source: AGHT+IFsyvu6ZTz0rAtb4IsdFmSi8tGXLk/9EUNnH5UQ3mMWlgq52v7rMBO/1u5TYQrjkJOaQBFPj5cYnlhEX0kYgZ4=
-X-Received: by 2002:ac8:7d8b:0:b0:4ec:f940:4e65 with SMTP id
- d75a77b69052e-4ed725e7ba3mr63858621cf.51.1762427241397; Thu, 06 Nov 2025
- 03:07:21 -0800 (PST)
+        d=1e100.net; s=20230601; t=1762427281; x=1763032081;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KemrrCvE16IUsPvIdPc7ZklZCJchRhA/4dXIse7pcqc=;
+        b=w0nMuBLrN0AAHT8DcaRB+KFGWzCmOcec75FsaW1pTtliPGKraVwgIBxS6H++mD8E5n
+         IFz1N7LS2CDrVfcWcn7EdMxkW969WyQ/Y4gIWWODmHGAnGS0IFcOt8wViwCzEHq7yoKK
+         ouv1BBKZHb1Av8L0iG80LLIrX/ZWqlmXlf3w7QeMK5Fr72IbP4Fx9891jugKA5lRHhkY
+         m8DtLf4EuTSKik3n75H8EKR0ZM9qAKudwh4JhjQzL/hfhK1Fmzepch6hpYWi5TmIQCUq
+         VJVFOC1odXwUOxp50yGdPRRUmFE+7AAoW6rfUEddKzJR6usH5qhuPz5oLB6V5FwH8SD0
+         nEOw==
+X-Forwarded-Encrypted: i=1; AJvYcCVqGJeKPLotyolsB+nAwjfHDhgCp1F6BaC7P8FurIGbf0F8BM6k+lx4ZJgFGz9aHgUxzJnSxk8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwEZmnkzE4VLvwQ4Hw/WupcCf8yimmweohZsHHkz38Q72O+vnyW
+	q7bDC0vDi9r+4M/w1Gc+2gD6R+B+Zi/0gpWJP1PSUgYru89OpggOFNu7
+X-Gm-Gg: ASbGncsxwif0E3ZlCh0EIxEFGjs7xwRAXBcAY8mLK0O5V3mqzkTLnlnCFdJ8m2i6HHh
+	iWZ8XYvFKsTuXna1S+yC+NObx1KEja/CrWrutvRoK2hCzrs4xPgfvpoYXY43rl4+5IqtBtrve48
+	FKYgKQyd/BSKaxEManOiNIVmlKB/iBZHmYM2qhZ9aU4D2dwVBTQzvVaI9HOhTFkIS0xXwxtvNfp
+	eOT9jWkkAg3qqtXreuw06NIxmxWr4LWo7jWE56hyyjGK6hVXvEq2lSdg0FW3B9G0JYh7l4W228Q
+	GjBJwWtGs7XqYRC+fLNZZvnBLwCQKqsytq0pCq+bHDOwfZ/57z8KZvPReN8mCl0WDLyf1JfkVk4
+	6Bt5jme+7mSjyevI4ULOBDIVMLGAIZsYRUpewNZ62/zYr4r3TdA7gYiwu0OiFDBM/JQgF52NKoh
+	oncoiiwgYaijsJgS+oCNM71hN/Hv9YZiRx+aQ9k0SDdvrx3FOmr+Q=
+X-Google-Smtp-Source: AGHT+IG/WPvgkkz5ima282cKyz2di1ByWQE6/QNBfZEdI+atynO653MZ5MMOXdVnpoH97C2BXp1trA==
+X-Received: by 2002:a05:6000:250a:b0:426:ee44:6d9 with SMTP id ffacd0b85a97d-429e32e3595mr5318368f8f.21.1762427280858;
+        Thu, 06 Nov 2025 03:08:00 -0800 (PST)
+Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429eb403849sm4648357f8f.1.2025.11.06.03.07.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Nov 2025 03:08:00 -0800 (PST)
+Message-ID: <785c9d27-23e7-4ecf-ad2e-202ba506f2e0@gmail.com>
+Date: Thu, 6 Nov 2025 11:07:58 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251104161327.41004-1-simon.schippers@tu-dortmund.de>
- <20251104161327.41004-2-simon.schippers@tu-dortmund.de> <CANn89iL6MjvOc8qEQpeQJPLX0Y3X0HmqNcmgHL4RzfcijPim5w@mail.gmail.com>
- <66d22955-bb20-44cf-8ad3-743ae272fec7@tu-dortmund.de> <CANn89i+oGnt=Gpo1hZh+8uaEoK3mKLQY-gszzHWC+A2enXa7Tw@mail.gmail.com>
- <be77736d-6fde-4f48-b774-f7067a826656@tu-dortmund.de> <CANn89iJVW-_qLbUehhJNJO70PRuw1SZVQX0towgZ4K-JvsPKkw@mail.gmail.com>
- <c01c12a8-c19c-4b9f-94d1-2a106e65a074@tu-dortmund.de> <CANn89iJpXwmvg0MOvLo8+hVAhaMTL_1_62Afk_6dG1ZEL3tORQ@mail.gmail.com>
- <9ebd72d0-5ae9-4844-b0be-5629c52e6df8@tu-dortmund.de> <64a963ed-400e-4bd2-a4e3-6357f3480367@tu-dortmund.de>
- <CANn89iKt+OYAfQoZxkqO+gECRx_oAecCRTVcf1Kumtpc9u+n0w@mail.gmail.com>
-In-Reply-To: <CANn89iKt+OYAfQoZxkqO+gECRx_oAecCRTVcf1Kumtpc9u+n0w@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 6 Nov 2025 03:07:09 -0800
-X-Gm-Features: AWmQ_bm5Kc1656Fqyva8wNAL1lgqqHH7XdmS84y-uVKeorIZqI78IoRwP5JyG48
-Message-ID: <CANn89iKpsVStgFLNzx8Nv3C-qRZdY9R7_Rh1mWWxf4MN-oTAYg@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 1/1] usbnet: Add support for Byte Queue Limits (BQL)
-To: Simon Schippers <simon.schippers@tu-dortmund.de>
-Cc: oneukum@suse.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
-	linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC mm v5 1/2] page_pool: check nmdesc->pp to see its usage as
+ page pool for net_iov not page-backed
+To: Byungchul Park <byungchul@sk.com>, linux-mm@kvack.org,
+ netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
+ harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
+ davem@davemloft.net, kuba@kernel.org, hawk@kernel.org,
+ john.fastabend@gmail.com, sdf@fomichev.me, saeedm@nvidia.com,
+ leon@kernel.org, tariqt@nvidia.com, mbloch@nvidia.com,
+ andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
+ akpm@linux-foundation.org, david@redhat.com, lorenzo.stoakes@oracle.com,
+ Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org, surenb@google.com,
+ mhocko@suse.com, horms@kernel.org, jackmanb@google.com, hannes@cmpxchg.org,
+ ziy@nvidia.com, ilias.apalodimas@linaro.org, willy@infradead.org,
+ brauner@kernel.org, kas@kernel.org, yuzhao@google.com,
+ usamaarif642@gmail.com, baolin.wang@linux.alibaba.com,
+ almasrymina@google.com, toke@redhat.com, bpf@vger.kernel.org,
+ linux-rdma@vger.kernel.org, sfr@canb.auug.org.au, dw@davidwei.uk,
+ ap420073@gmail.com, dtatulea@nvidia.com
+References: <20251103075108.26437-1-byungchul@sk.com>
+ <20251103075108.26437-2-byungchul@sk.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20251103075108.26437-2-byungchul@sk.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 6, 2025 at 2:40=E2=80=AFAM Eric Dumazet <edumazet@google.com> w=
-rote:
->
-> >
-> > I compiled it with CONFIG_PROVE_LOCKING and ran iperf3 TCP tests on my
-> > USB2 to Gbit Ethernet adapter I had at hand. dmesg shows no lockdep
-> > warnings. What else should I test?
->
-> That should be fine, please send a V2
+On 11/3/25 07:51, Byungchul Park wrote:
+> Currently, the condition 'page->pp_magic == PP_SIGNATURE' is used to
+> determine if a page belongs to a page pool.  However, with the planned
+> removal of ->pp_magic, we will instead leverage the page_type in struct
+> page, such as PGTY_netpp, for this purpose.
+> 
+> That works for page-backed network memory.  However, for net_iov not
+> page-backed, the identification cannot be based on the page_type.
+> Instead, nmdesc->pp can be used to see if it belongs to a page pool, by
+> making sure nmdesc->pp is NULL otherwise.
+> 
+> For net_iov not page-backed, initialize it using nmdesc->pp = NULL in
+> net_devmem_bind_dmabuf() and using kvmalloc_array(__GFP_ZERO) in
+> io_zcrx_create_area() so that netmem_is_pp() can check if nmdesc->pp is
+> !NULL to confirm its usage as page pool.
 
-BW, no need for a cover letter when sending a single patch.
+Reviewed-by: Pavel Begunkov <asml.silence@gmail.com>
+
+-- 
+Pavel Begunkov
+
 
