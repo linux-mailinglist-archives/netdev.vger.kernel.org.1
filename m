@@ -1,98 +1,98 @@
-Return-Path: <netdev+bounces-236402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FDB1C3BDF6
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 15:52:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EF54C3BDEA
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 15:51:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 75F41502BD7
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 14:45:58 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 32203502579
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 14:45:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B54E73451B2;
-	Thu,  6 Nov 2025 14:45:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA7D0345CBD;
+	Thu,  6 Nov 2025 14:45:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="DlZ9/6P3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u4LcPUPS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAB403451CC;
-	Thu,  6 Nov 2025 14:45:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 934F73370F3
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 14:45:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762440328; cv=none; b=TNTgGXHp4vVV/ITw+FiE6+I92PBzly/TTH0kGS0Mt1TJA75OIZsiFBVQSeYvG+lubNGIq7NpIEDGeVxBK7FbwMIu63Q34+AyU5pZc+dxLLPW1rnNBl0GWEenIynREY3pZOXSNcgNeF1wlZRmh6DLDWSm4MBANHuVhi6OuLThmyM=
+	t=1762440315; cv=none; b=Y8KQvx+GMt9Y/B14rfgUkGx8MFp0e5wfmEM7ui1ZWExXjLJ4u3pI4QSwpDQrIFMPQAhgGHogfew3dTmAjCcqVPgAxZceDvAgv4Fva3rnMujmGaPc10Qlh4BXoj59+IQyEAEzVkS9mThG9DWvB48XgdhqbF+wjhBc+MYguYKR6qs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762440328; c=relaxed/simple;
-	bh=SLO8XAogt0p729SfzU22YkQQYIdKzpqYUaujwFZtnVM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kbKpAbfue9AehfeGr1yd2CkjTxboKb2ZXJbeb1oMpP2lsiNVVDXyHXowmdEtFRgFZCD49Gvpq5YXg5OZD/MPowK1V7MT0tN0WBZBRb3abkQS7yWrjkr7K5A+XQPCIyZfUDNOwuNeoXS5sg7XkPNx6l1IusIzIBxWPynAcwO5q10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=DlZ9/6P3; arc=none smtp.client-ip=45.254.49.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
-Received: from LAPTOP-N070L597.localdomain (unknown [221.228.238.82])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 28a8ce3b9;
-	Thu, 6 Nov 2025 22:45:19 +0800 (GMT+08:00)
-From: Zilin Guan <zilin@seu.edu.cn>
-To: chuck.lever@oracle.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	kernel-tls-handshake@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	jianhao.xu@seu.edu.cn,
-	Zilin Guan <zilin@seu.edu.cn>
-Subject: [PATCH] net/handshake: Fix memory leak in tls_handshake_accept()
-Date: Thu,  6 Nov 2025 14:45:11 +0000
-Message-Id: <20251106144511.3859535-1-zilin@seu.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1762440315; c=relaxed/simple;
+	bh=Q80581Prc+3nrPb4F5jxrxXb/jXURIh0xCGvL+3q5cE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PKgEC2erJKebRrTBOefoCkljRJ+0K2d4aqdBrvpJQHap/eQaeLKMWBcBPGFA8eI5ogbiqWYE6aXeoXdFbhyEPmtaMAk93+wuB3x1mY/NUV2aKnymurEdrfseeMQ/y6HbGPwIO7+GZeToPo7Qv1Uc/DGRaaBI7vdg2kbvel0Msyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u4LcPUPS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40846C4CEF7;
+	Thu,  6 Nov 2025 14:45:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762440314;
+	bh=Q80581Prc+3nrPb4F5jxrxXb/jXURIh0xCGvL+3q5cE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=u4LcPUPS9a7VUoS/wGMOOZbcXmB6Ue2Z/QXhmTU9xN76lIn6Wv4ix20xwGvlxi2vK
+	 xZSGQq5NZS081TYAc7xGcz/hj954eFUWD9BFJ0v3RIpg/cmIqQH9BkxozO0pyYeGmk
+	 ZzccXxGMuJevsdeFrvIo+CB88m5/h9oMqefwcPKAi3o67EnihhYRga8rvxs90O6TpZ
+	 7b4BGJvtcxePho0uxeyA4Bp41AfGbjS6Bj33Kub9dY63KJWxBlSb/jNgRvOoczRwvr
+	 uWovGYjgDubBhv1zsjHZjZQ5SnisFkr0UwGlqtmfnPGrI+uQxa258fRGOG4NzKy8m0
+	 som2daZobqYMw==
+Date: Thu, 6 Nov 2025 06:45:12 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jan Stancek
+ <jstancek@redhat.com>, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
+ =?UTF-8?B?QXNiasO4cm4=?= Sloth =?UTF-8?B?VMO4bm5lc2Vu?= <ast@fiberby.net>,
+ Stanislav Fomichev <sdf@fomichev.me>, Ido Schimmel <idosch@nvidia.com>,
+ Guillaume Nault <gnault@redhat.com>, Petr Machata <petrm@nvidia.com>
+Subject: Re: [PATCHv2 net-next 3/3] tools: ynl: add YNL test framework
+Message-ID: <20251106064512.086e9cb9@kernel.org>
+In-Reply-To: <aQwKmZ6vF9dWZzqa@fedora>
+References: <20251105082841.165212-1-liuhangbin@gmail.com>
+	<20251105082841.165212-4-liuhangbin@gmail.com>
+	<20251105183313.66a8637e@kernel.org>
+	<aQwKmZ6vF9dWZzqa@fedora>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a9a59a10f4403a1kunmd877133e7b53ae
-X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUtXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVkZTEkaVhkdQ0tNTBlOS04dQlYeHw5VEwETFhoSFy
-	QUDg9ZV1kYEgtZQVlJSUpVSUlDVUlIQ1VDSVlXWRYaDxIVHRRZQVlLVUtVS1VLWQY+
-DKIM-Signature: a=rsa-sha256;
-	b=DlZ9/6P39YXgRBCKj/eN1c64gHzSaYNZ98eMYYeRuIN2U04fHOJfsinKq/JtEGEqfWQYzooLP875v2rzex5eeTYjtlg2mnkGqPqHkdIXsr6+FXB63rmTgnqUlfsj+18b4U5UOEM894SuN5P08CGroqXt1iHFwipnwyclqRa955Y=; s=default; c=relaxed/relaxed; d=seu.edu.cn; v=1;
-	bh=h0YUkunlqJUAnhC/gNJ/0mAwbV93Almf7qIwemX0/vQ=;
-	h=date:mime-version:subject:message-id:from;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-In tls_handshake_accept(), a netlink message is allocated using
-genlmsg_new(). In the error handling path, genlmsg_cancel() is called
-to cancel the message construction, but the message itself is not freed.
-This leads to a memory leak.
+On Thu, 6 Nov 2025 02:40:25 +0000 Hangbin Liu wrote:
+> On Wed, Nov 05, 2025 at 06:33:13PM -0800, Jakub Kicinski wrote:
+> > On Wed,  5 Nov 2025 08:28:41 +0000 Hangbin Liu wrote:  
+> > > Add a test framework for YAML Netlink (YNL) tools, covering both CLI and
+> > > ethtool functionality. The framework includes:
+> > > 
+> > > 1) cli: family listing, netdev, ethtool, rt-* families, and nlctrl
+> > >    operations
+> > > 2) ethtool: device info, statistics, ring/coalesce/pause parameters, and
+> > >    feature gettings
+> > > 
+> > > The current YNL syntax is a bit obscure, and end users may not always know
+> > > how to use it. This test framework provides usage examples and also serves
+> > > as a regression test to catch potential breakages caused by future changes.  
+> > 
+> > And how would we run all the tests in the new directory?
+> > 
+> > Since we have two test files we need some way to run all.  
+> 
+> I didn't get your requirement. We can run them one by one in the test folder.
+> 
+>  # ./test_ynl_cli.sh
+>  # ./test_ynl_ethtool.sh
+> 
+> Do you want to use a wrapper to run the 2 tests? e.g.
+>  # ./run_all_ynl_tests.sh
 
-Fix this by calling nlmsg_free() in the error path after genlmsg_cancel()
-to release the allocated memory.
-
-Fixes: 2fd5532044a89 ("net/handshake: Add a kernel API for requesting a TLSv1.3 handshake")
-Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
----
- net/handshake/tlshd.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/net/handshake/tlshd.c b/net/handshake/tlshd.c
-index 081093dfd553..8f9532a15f43 100644
---- a/net/handshake/tlshd.c
-+++ b/net/handshake/tlshd.c
-@@ -259,6 +259,7 @@ static int tls_handshake_accept(struct handshake_req *req,
- 
- out_cancel:
- 	genlmsg_cancel(msg, hdr);
-+	nlmsg_free(msg);
- out:
- 	return ret;
- }
--- 
-2.34.1
-
+Or make run_tests, like ksft
 
