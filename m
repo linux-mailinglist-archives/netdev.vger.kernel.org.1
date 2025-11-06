@@ -1,126 +1,152 @@
-Return-Path: <netdev+bounces-236470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8FC2C3CB3F
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 18:06:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CB48C3CB78
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 18:08:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8401F3525E1
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 17:06:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 271E3188DCAA
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 17:08:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C9F134D937;
-	Thu,  6 Nov 2025 17:06:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E14B430EF96;
+	Thu,  6 Nov 2025 17:07:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="xCljxPQP";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="jusofg/7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFDDB34D917
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 17:06:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F271D18E1F;
+	Thu,  6 Nov 2025 17:07:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762448769; cv=none; b=rfO35NInTqPCL2fBB03jC8AWeUSm71ufEqm3/xrg3Y3dywz8E7nkqTklWOKpOfYO88Ezl7W/G6EY0StYs8mACsyxLtUkSkp7T8eaPaIWOFSEMsnUXyuU/FGKiKwe4UxRUufV2Q/To+Deo6/DnfDEzigN8zSTmY0s7G4ehVPMVIM=
+	t=1762448869; cv=none; b=JDGH2sXXVbQNhuIiB16cpV0vJWnIrfTob49F/X5fGAh85yUVy66aljPBeAbD/jXEMZyv6DBXSk8AHOtN2MHPluNlNRuy7ISX085spwJwXnlAbZZd1ezza6J/lo8ZH+k6P60nXgVj2RHthZ5x3/Q0+GCEMFrwfgfcCWgmQNme/MQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762448769; c=relaxed/simple;
-	bh=u9XVqLZpaWPD6eBVLxWNFs4+riQ5k6PAyZ3Iq48h8Mk=;
+	s=arc-20240116; t=1762448869; c=relaxed/simple;
+	bh=h1058CZvmcEAuS48xVbeNUx2rGhH6qDGWSw72hhAycE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gV/sYRBhFxU79KG3RVRXKDPXkXFgBVjiRAVJ/gQ8/i3yn8JvUEodY9zIpgtTyJ7yRclAiu99r7U5O3u2GJMzk/BD+14q3g5RMWK2esmApUvLE7T+FIjQZTRUBJ+Ck0le3Xa6ARer59gjxHLgJfoyg7H9i63MEx2NZ0B6UsyKZKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-640b9c7eab9so2009990a12.1
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 09:06:06 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762448765; x=1763053565;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l+WGVXXWVhyjyZGYUX+1y1Q+1FkWB5jkOhwquLJi9MY=;
-        b=MW589c9yacUzcRnXmNVJQtEZH77SNyisQf6zN843tkStghoJDw0Z4UU2iNcOL/FI7G
-         NpcBSsWw2Hd1mzkd8RZwyEvLfcoa+I0SxgfjlCgmCP6yCp/X3xUX1tqMdNdkJOXg+7ne
-         XAPLEwSYDUq3xLWR8+fhDH4wK4kBWngG3m0m6IpOTTnnuzkHcMT/N2O87HGKzyfumPwv
-         dKMxFxg5byP4dxH6zRHTUYWp9RbwrCi1oa9LIBtEG5OKb80F34vHYB5wpP1GuZyxg55n
-         E/65JFDkVvz/T85YJgG8oC5toDGx/0dV6g3rzET3DAcT/6lauVU/piP5BnMxBJIQuYOO
-         XxAg==
-X-Forwarded-Encrypted: i=1; AJvYcCXUVB5wED3m0d3qCGwcENpOZevLYcqVUiJFolJq0yRloG+MuQB5ayXdkE/AWYrKuw0Cb3DS8no=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yym1OA1qEzQa0v68KqqRJSJ1l0pxzhACS3s56BReCEp1ENW29se
-	Ub0w6TJwVDY+ORM//jXPySV1XfU7Gie19wZkHu2rIwMuStMB7ljoF0/I
-X-Gm-Gg: ASbGnctRs+tqi7TEZqPDr6hS7tSfwjccRXXj5bVHTY8GQ4H5jpdLMdFh62DJU5SamI0
-	5ADVOtNVKf97w22F8WuioQ1dEEwycl+tWfvKgGwVbk4m+pdSsT8PVihAVot370ro86N4m7f7CiJ
-	ApKoadUxDDY0hNmRkL6kZxl8CVIGCiLs0sZ+fHh9/VRJA5sq4zRiEzT0ugTgkNj5TtugEDlL2va
-	F467C8ybkHNY6aHodQwnr6HdHZuEV1zbkjunUG3iBLFZNQSpAh+sogb2lInRWkZd3TzRPHf1mIE
-	XRSYmVRIiQMWab5xQa2pf6+vg+Zcdo37NESzASB+otUMKZ6xfaVusPbyrcC7ylnPP6j7LLeyjPP
-	Slgas6SElhvivMxhU/+YaWfDsfhMY3etwZakQUyKbHVYlJ9LRvun/EJd1O0vcs4TJumoa4QhDFp
-	1z
-X-Google-Smtp-Source: AGHT+IHFnIfbtm1ZjvxdkHLl9Wb1IGZm1PL96ngnoeuGIDRz5E+nh+lXTjs6tMmUTl6jXosCKcP1gw==
-X-Received: by 2002:a17:907:7ea6:b0:b4f:e357:78f8 with SMTP id a640c23a62f3a-b726553b6b5mr760452766b.52.1762448764934;
-        Thu, 06 Nov 2025 09:06:04 -0800 (PST)
-Received: from gmail.com ([2a03:2880:30ff:3::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b72bf7231dcsm6058266b.31.2025.11.06.09.06.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Nov 2025 09:06:04 -0800 (PST)
-Date: Thu, 6 Nov 2025 09:06:01 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: Pavan Chebbi <pavan.chebbi@broadcom.com>, 
-	Michael Chan <mchan@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, kernel-team@meta.com
-Subject: Re: [PATCH net-next] tg3: extract GRXRINGS from .get_rxnfc
-Message-ID: <4abcq7mgx5soziyo55cdrubbr44xrscuqp7gmr2lys5eilxfcs@u4gy5bsoxvrt>
-References: <20251105-grxrings_v1-v1-1-54c2caafa1fd@debian.org>
- <CACKFLim7ruspmqvjr6bNRq5Z_XXVk3vVaLZOons7kMCzsEG23A@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=JDklGOmDTV5sAbigTSJnYwSxUVbaU/6OMzPkzC7BI8rJZ9w2D20n0FlaL5ZR0C4bzcr1eHVgcmPfUVATHHdlN50KAR/uspVpbAKkI6xqBqkxrVj3k6dUg8NcgZQqVFnL+m07d4GwoUUz15Tqi06ao7PFp4mfl2LcqdbmSpaJqy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=xCljxPQP; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=jusofg/7; arc=none smtp.client-ip=103.168.172.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
+	by mailfout.phl.internal (Postfix) with ESMTP id E337FEC00D3;
+	Thu,  6 Nov 2025 12:07:44 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-04.internal (MEProxy); Thu, 06 Nov 2025 12:07:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1762448864; x=
+	1762535264; bh=yl1ymtp/RyH/pP2ToBzXQ5l7JFAI5bU3TI9lUfWo91A=; b=x
+	CljxPQPmtP8HCoH/NjGaVIVMNq40uKF5CnEUWR+EitSz1d+B4/g3S8zhJfQHIWA+
+	6iU0o5ZXunwfy/84RLbKUUrsEcLujEgPZM5iZHleB74I3wOE/8LEtOvUFL+4DQHo
+	jmz4VNAORiGA71vxMZHOKQwwxSvJGqxf3Xi/9qI1U9xUpsTJUzOa8SxM5Bdl4cLe
+	k0QEvxu5dPVgk1ZvBmdjdzgIcHimaVDh8w9A0VFdIieYc76utpm2AFpNbGQoALTH
+	3XU4IVf2AdussfRLgsYAtGDggvr6Bpa/H7ykYydHdRn3+8F9/u17wlMuyCy+07wM
+	vIP014n42f9TIRKdQXXTA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1762448864; x=1762535264; bh=yl1ymtp/RyH/pP2ToBzXQ5l7JFAI5bU3TI9
+	lUfWo91A=; b=jusofg/7lKzEacMBsWUoUMmQPTeySJsx67J4JKfF3P9cCvt3C9N
+	9oELAS2tuc5FtWQ1hf2VseMKNEJOfMOBFDkN5YkhF7jIEVZiib0JB8F5cd/vbRLQ
+	MtR6dqC4DMA5gSd4bXey5rj0TaBbqpnbQLkDhStMcb2Z9idMUETKy0Npgi/tr5qt
+	GPuN5DiNxxrCMKIokfYVE+WTKyYVZeO4YmwDrUzqsVKi8Bls4dZ33bN7xUjzrssw
+	6T30dVCp7NCOE2KaDkJ4Z+rLfOPJCUHr4HfphD/emZNYr1TTJc3fZCj/iOGiMbKA
+	kwT5mNVVmgoNpAr7OiItosxw3Cflx+OrbNA==
+X-ME-Sender: <xms:3tUMaa31a3QL0xjs96vK7V1WrPyMK_4OzESfcBZfConYhKkrv1nAxQ>
+    <xme:3tUMadh710VVUnPPGcuhFHlDYJLCy-XpqayVRm0AL-jkoxLJq7ccNjRZNbshOJuyV
+    Kl3fy61_4Mjn_ow49sCUjHO90XUpYPI6nir9iDrNMoaE4V5hWp3ng>
+X-ME-Received: <xmr:3tUMaSo7BzJccg1Ktt7ED5k6kzT1nLRNgXpX0yMK3GcyVLc28ERFukfZxE-B>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeejfeegucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfhfgggtuggjsehttdertd
+    dttdejnecuhfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghs
+    hihsnhgrihhlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuieduge
+    dtfefhkeegteehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedt
+    necurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvth
+    dpnhgspghrtghpthhtohepudegpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegt
+    lhhfjedttdefkeefsehgmhgrihhlrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrh
+    hnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdp
+    rhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohephh
+    gvrhgsvghrthesghhonhguohhrrdgrphgrnhgrrdhorhhgrdgruhdprhgtphhtthhopehk
+    uhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlse
+    hvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdr
+    khgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
+X-ME-Proxy: <xmx:3tUMaYO8hRnaUS-kr4eiWQPPvyG-yj7EuVNHrDE528RBxclT3P5ROQ>
+    <xmx:3tUMaW0AvoI92bPUXANQYHOQaDGLzSX86dVHh_P8Qmz30t02b0XWOA>
+    <xmx:3tUMaep7d_1FF6Tvm79ZI186rLqoby6DhKgH9Trpoxyjo_x31gi1Sw>
+    <xmx:3tUMaYeGPYHBPH-W5IGtGo0P17-8c3vUnX7EjDtbWCnVriaAPfGNdA>
+    <xmx:4NUMaeW3MTksGZ5dmESMcOQ3Vhc0_TAFhPABpul8o8TAnWegavp2DYuK>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 6 Nov 2025 12:07:42 -0500 (EST)
+Date: Thu, 6 Nov 2025 18:07:40 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: clingfei <clf700383@gmail.com>
+Cc: horms@kernel.org, davem@davemloft.net, edumazet@google.com,
+	herbert@gondor.apana.org.au, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, steffen.klassert@secunet.com, eadavis@qq.com,
+	ssrane_b23@ee.vjti.ac.in,
+	syzbot+be97dd4da14ae88b6ba4@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [PATCHSET IPSec 0/3] net: key: Fix address family validation and
+ integer overflow in set_ipsecrequest
+Message-ID: <aQzV3KHoF4Kk6DGF@krikkit>
+References: <20251106135658.866481-1-1599101385@qq.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CACKFLim7ruspmqvjr6bNRq5Z_XXVk3vVaLZOons7kMCzsEG23A@mail.gmail.com>
+In-Reply-To: <20251106135658.866481-1-1599101385@qq.com>
 
-On Wed, Nov 05, 2025 at 11:05:34AM -0800, Michael Chan wrote:
-> The existing code to use num_online_cpus() is actually not correct.
-> This is more correct:
+2025-11-06, 21:56:55 +0800, clingfei wrote:
+> From: Cheng Lingfei <clf700383@gmail.com>
 > 
-> return min(netif_get_num_default_rss_queues(), tp->rxq_max);
+> Hi,
 > 
-> I think when netif_get_num_default_rss_queues() was used to replace
-> num_online_cpus(), tg3_get_rxnfc() was not properly converted.
+> This patchset addresses a security issue in the PF_KEYv2 implementation where
+> improper address family validation could lead to integer overflows and buffer
+> calculation errors in the set_ipsecrequest() function.
+> 
+> The core problem stems from two interrelated issues:
+> 
+> 1. The `family` parameter in set_ipsecrequest() is declared as u8 but receives
+>    a 16-bit value, causing truncation of the upper byte.
+> 
+> 2. pfkey_sockaddr_len() returns 0 for unsupported address families, but the
+>    calling code doesn't properly validate this return value before using it in
+>    size calculations, leading to potential integer overflows.
+> 
+> The patchset is structured as follows:
+> 
+> Patch 1/3: Corrects the type of the family argument from u8 to u16 to prevent
+>            truncation of 16-bit address family values.
+> 
+> Patch 2/3: Adds proper validation for the return value of pfkey_sockaddr_len()
+>            to catch unsupported address families early.
+> 
+> Patch 3/3: Enhances the error handling to ensure zero-length allocations are
+>            properly rejected and adds appropriate error returns.
+> 
+> This series fixes the original issue introduced in:
+> Fixes: 14ad6ed30a10 ("net: allow small head cache usage with large MAX_SKB_FRAGS values")
 
-I can resend the current patch with this additional patch:
+This doesn't seem right. It looks more like a mismatch between the
+size computation done before allocating the skb and the space actually
+needed, and commit 14ad6ed30a10 made the pre-existing bug more visible.
 
-Author: Breno Leitao <leitao@debian.org>
-Date:   Thu Nov 6 08:05:49 2025 -0800
-
-    tg3: Fix num of RX queues being reported by ethtool
-    
-    Using num_online_cpus() to report number of queues is actually not
-    correct, as reported by Michael[1].
-    
-    netif_get_num_default_rss_queues() was used to replace num_online_cpus()
-    in the past, but tg3 ethtool callbacks didn't get converted. Doing it
-    now.
-    
-    Link: https://lore.kernel.org/all/CACKFLim7ruspmqvjr6bNRq5Z_XXVk3vVaLZOons7kMCzsEG23A@mail.gmail.com/#t [1]
-    
-    Signed-off-by: Breno Leitao <leitao@debian.org>
-    Suggested-by: Michael Chan <michael.chan@broadcom.com>
-
-diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-index fa58c3ffceb06..5fdaee7ef9d7a 100644
---- a/drivers/net/ethernet/broadcom/tg3.c
-+++ b/drivers/net/ethernet/broadcom/tg3.c
-@@ -12729,7 +12729,7 @@ static u32 tg3_get_rx_ring_count(struct net_device *dev)
- 	if (netif_running(tp->dev))
- 		return tp->rxq_cnt;
- 
--	return min(num_online_cpus(), TG3_RSS_MAX_NUM_QS);
-+	return min((u32) netif_get_num_default_rss_queues(), tp->rxq_max);
- }
- 
- static u32 tg3_get_rxfh_indir_size(struct net_device *dev)
+-- 
+Sabrina
 
