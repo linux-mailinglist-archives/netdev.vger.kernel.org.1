@@ -1,117 +1,187 @@
-Return-Path: <netdev+bounces-236296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D19E4C3A91F
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 12:29:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2968C3ABE0
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 12:59:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6F6714E3A51
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 11:27:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 000F01AA1E5A
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 11:54:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 609C0302745;
-	Thu,  6 Nov 2025 11:27:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QIGEoVth"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E893324B32;
+	Thu,  6 Nov 2025 11:50:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5656130C36D
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 11:27:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
+Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEDBE31690D;
+	Thu,  6 Nov 2025 11:50:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762428459; cv=none; b=Tmn81m4GaEVSriuildyzKYa0hFLLCAml7iBrdTX6lu5k/ILVgxLXewSp9LBknz+IleJdFGt9TPyGsJy29X7/mjUO2FcVXGa8Yx3k5a5OjVGjxwDCUIzdvnZHO3KG2Yhtx4YN2jHF20aDlKzUEHUJGkAYBbYHn2w4daWfySgpS20=
+	t=1762429841; cv=none; b=ciogZjCB+PvRB5TBMZ1NmIAXZYpRdhImeWeKMNqi9Kuc7vg6PHiA3Je0qeE+sfTeTFuJVOw+qPpFVa70yYLLIGe5Bgazq136uKIol/kN3oB2FsmTkNoX53/vDBS2Cw3bqPuf1D1G6z++fYHEuvwQW0b2fNG5TVGPlYSGfx9J4Tc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762428459; c=relaxed/simple;
-	bh=gqFoFf46u93fEIR3f7KGfVgWFxz4ZCAlCSAL+KsGpGQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=I+jWu6bQdvuiMPiRtveiLpCF+ZUABLY2K1jJChtIf5MixlbOg7s4qRsbgkCiAryCPWq7/K85LJnQb3WR6c0KDvpoP9EkXGzblMLi+Njkk6ZSYyrJ71MIjspJplHCTbKKPKAA3h51+fEU3fxVoKxm8amp/dOYy/yOb7ICJjAXvf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QIGEoVth; arc=none smtp.client-ip=95.215.58.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <04492fd4-4808-421a-b082-a05503b1d714@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1762428445;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zCaZfTw8LVN8e158p7WTbXJgn+JFFz3khksAUsAIdCo=;
-	b=QIGEoVthivvh8bJnndu0eNjX8TXhCLP7OofGY/I2uwqtDKCkqND52Waf+0JFo1AhKuHk44
-	gNGKZhTnc/XrD07sw+UUOIFsaGMiBgIkep+LE/zEbLH9ZVkxLXliFNES+4bwKVd/LuffAE
-	xTOK8Ho9mYp3twiVE7QJcjRH1QKzGKI=
-Date: Thu, 6 Nov 2025 11:27:19 +0000
+	s=arc-20240116; t=1762429841; c=relaxed/simple;
+	bh=2jZ+xzmq5Is/HiK11WD2Oq0DGl6cQ84EV8xTG8t9Azo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KLXH8hlaH97MWY2JimdDyT5kkSFjQGrsBYzoXXakLo37xGZgfwOKt/E5UPACAixTWFvNIz/lr+CfYtDOI3psBKaLBSKgij6EddDGE3WNk87uxdaNEDDBR7tR/T/o2HNfm+l3UUlAIBFcFkKHMbmM9mz3S/t8RtrNXPn2LE349dg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub4.si.c-s.fr [172.26.127.67])
+	by localhost (Postfix) with ESMTP id 4d2KmD3Svwz9sS7;
+	Thu,  6 Nov 2025 12:32:12 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id cCTQDw47kCCS; Thu,  6 Nov 2025 12:32:12 +0100 (CET)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4d2KmD2Sndz9sRy;
+	Thu,  6 Nov 2025 12:32:12 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 3EAEC8B77E;
+	Thu,  6 Nov 2025 12:32:12 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id N6iiMNbKWsaO; Thu,  6 Nov 2025 12:32:12 +0100 (CET)
+Received: from PO20335.idsi0.si.c-s.fr (unknown [192.168.235.99])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 5EA078B773;
+	Thu,  6 Nov 2025 12:32:11 +0100 (CET)
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+To: Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>,
+	Jan Kara <jack@suse.cz>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Darren Hart <dvhart@infradead.org>,
+	Davidlohr Bueso <dave@stgolabs.net>,
+	"Andre Almeida" <andrealmeid@igalia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Kuniyuki Iwashima <kuniyu@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemb@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
+	linux-block@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH v4 00/10] powerpc: Implement masked user access
+Date: Thu,  6 Nov 2025 12:31:18 +0100
+Message-ID: <cover.1762427933.git.christophe.leroy@csgroup.eu>
+X-Mailer: git-send-email 2.49.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net] net: txgbe: remove wx_ptp_init() in device reset flow
-To: Jiawen Wu <jiawenwu@trustnetic.com>, netdev@vger.kernel.org,
- 'Andrew Lunn' <andrew+netdev@lunn.ch>,
- "'David S. Miller'" <davem@davemloft.net>,
- 'Eric Dumazet' <edumazet@google.com>, 'Jakub Kicinski' <kuba@kernel.org>,
- 'Paolo Abeni' <pabeni@redhat.com>,
- 'Richard Cochran' <richardcochran@gmail.com>,
- 'Simon Horman' <horms@kernel.org>, 'Jacob Keller' <jacob.e.keller@intel.com>
-Cc: 'Mengyuan Lou' <mengyuanlou@net-swift.com>, stable@vger.kernel.org
-References: <17A4943B0AAA971B+20251105020752.57931-1-jiawenwu@trustnetic.com>
- <de2f5da5-05db-4bd7-90c3-c51558e50545@linux.dev>
- <09a701dc4ec1$d0cc3210$72649630$@trustnetic.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <09a701dc4ec1$d0cc3210$72649630$@trustnetic.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4465; i=christophe.leroy@csgroup.eu; h=from:subject:message-id; bh=2jZ+xzmq5Is/HiK11WD2Oq0DGl6cQ84EV8xTG8t9Azo=; b=owGbwMvMwCV2d0KB2p7V54MZT6slMWTytHN/S4vin/Hzpl7wRhb5xCN8od1HtvyfJfLSOF9kp 8O0eVHMHaUsDGJcDLJiiizH/3PvmtH1JTV/6i59mDmsTCBDGLg4BWAiamcYGZ7NOrnD3taXp3nd 1gyPk5Vf7Ft5llTklwqsn7iE5yj35GSG/0Vbenl2sTbdsy5O2hbwfIanX7P+9ynZaclCBwSSnrd 8ZgYA
+X-Developer-Key: i=christophe.leroy@csgroup.eu; a=openpgp; fpr=10FFE6F8B390DE17ACC2632368A92FEB01B8DD78
+Content-Transfer-Encoding: 8bit
 
-On 06/11/2025 02:05, Jiawen Wu wrote:
-> On Thu, Nov 6, 2025 4:03 AM, Vadim Fedorenko wrote:
->> On 05/11/2025 02:07, Jiawen Wu wrote:
->>> The functions txgbe_up() and txgbe_down() are called in pairs to reset
->>> hardware configurations. PTP stop function is not called in
->>> txgbe_down(), so there is no need to call PTP init function in
->>> txgbe_up().
->>>
->>
->> txgbe_reset() is called during txgbe_down(), and it calls
->> wx_ptp_reset(), which I believe is the reason for wx_ptp_init() call
-> 
-> wx_ptp_reset() just reset the hardware bits, but does not destroy the PTP clock.
-> wx_ptp_init() should be called after wx_ptp_stop() has been called.
+This is a rebase on top of commit 6ec821f050e2 (tag: core-scoped-uaccess)
+from tip tree.
 
-wx_ptp_init()/wx_ptp_reset() recalculate shift/mul configuration based
-on link speed. link down/link up sequence may bring new link speed,
-where these values have to reconfigured, right? I kinda agree
-that full procedure of wx_ptp_init() might not be needed, but we have to
-be sure not to reuse old ptp configuration.
+Thomas, Peter, could you please take non-powerpc patches (1, 2, 3)
+in tip tree for v6.19, then Maddy will take powerpc patches (4-10)
+into powerpc-next for v6.20.
 
-> 
->>
->>> Fixes: 06e75161b9d4 ("net: wangxun: Add support for PTP clock")
->>> Cc: stable@vger.kernel.org
->>> Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
->>> ---
->>>    drivers/net/ethernet/wangxun/txgbe/txgbe_main.c | 1 -
->>>    1 file changed, 1 deletion(-)
->>>
->>> diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
->>> index daa761e48f9d..114d6f46139b 100644
->>> --- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
->>> +++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
->>> @@ -297,7 +297,6 @@ void txgbe_down(struct wx *wx)
->>>    void txgbe_up(struct wx *wx)
->>>    {
->>>    	wx_configure(wx);
->>> -	wx_ptp_init(wx);
->>>    	txgbe_up_complete(wx);
->>>    }
->>>
->   
-> 
+Masked user access avoids the address/size verification by access_ok().
+Allthough its main purpose is to skip the speculation in the
+verification of user address and size hence avoid the need of spec
+mitigation, it also has the advantage to reduce the amount of
+instructions needed so it also benefits to platforms that don't
+need speculation mitigation, especially when the size of the copy is
+not know at build time.
+
+Patches 1,2,4 are cleaning up some redundant barrier_nospec()
+introduced by commit 74e19ef0ff80 ("uaccess: Add speculation barrier
+to copy_from_user()"). To do that, a speculation barrier is added to
+copy_from_user_iter() so that the barrier in powerpc raw_copy_from_user()
+which is redundant with the one in copy_from_user() can be removed. To
+avoid impacting x86, copy_from_user_iter() is first converted to using
+masked user access.
+
+Patch 3 replaces wrong calls to masked_user_access_begin() with calls
+to masked_user_read_access_begin() and masked_user_write_access_begin()
+to match with user_read_access_end() and user_write_access_end().
+
+Patches 5,6,7 are cleaning up powerpc uaccess functions.
+
+Patches 8 and 9 prepare powerpc/32 for the necessary gap at the top
+of userspace.
+
+Last patch implements masked user access.
+
+Changes in v4:
+- Rebased on top of commit 6ec821f050e2 (tag: core-scoped-uaccess) from tip tree
+- Patch 3: Simplified as masked_user_read_access_begin() and masked_user_write_access_begin() are already there.
+- Patch 10: Simplified mask_user_address_simple() as suggested by Gabriel.
+
+Changes in v3:
+- Rebased on top of v6.18-rc1
+- Patch 3: Impact on recently modified net/core/scm.c
+- Patch 10: Rewrite mask_user_address_simple() for a smaller result on powerpc64, suggested by Gabriel
+
+Changes in v2:
+- Converted copy_from_user_iter() to using masked user access.
+- Cleaned up powerpc uaccess function to minimise code duplication
+when adding masked user access
+- Automated TASK_SIZE calculation to minimise use of BUILD_BUG_ON()
+- Tried to make some commit messages more clean based on feedback from
+version 1 of the series.
+
+Christophe Leroy (10):
+  iter: Avoid barrier_nospec() in copy_from_user_iter()
+  uaccess: Add speculation barrier to copy_from_user_iter()
+  uaccess: Use masked_user_{read/write}_access_begin when required
+  powerpc/uaccess: Move barrier_nospec() out of
+    allow_read_{from/write}_user()
+  powerpc/uaccess: Remove unused size and from parameters from
+    allow_access_user()
+  powerpc/uaccess: Remove
+    {allow/prevent}_{read/write/read_write}_{from/to/}_user()
+  powerpc/uaccess: Refactor user_{read/write/}_access_begin()
+  powerpc/32s: Fix segments setup when TASK_SIZE is not a multiple of
+    256M
+  powerpc/32: Automatically adapt TASK_SIZE based on constraints
+  powerpc/uaccess: Implement masked user access
+
+ arch/powerpc/Kconfig                          |   3 +-
+ arch/powerpc/include/asm/barrier.h            |   2 +-
+ arch/powerpc/include/asm/book3s/32/kup.h      |   3 +-
+ arch/powerpc/include/asm/book3s/32/mmu-hash.h |   5 +-
+ arch/powerpc/include/asm/book3s/32/pgtable.h  |   4 -
+ arch/powerpc/include/asm/book3s/64/kup.h      |   6 +-
+ arch/powerpc/include/asm/kup.h                |  52 +------
+ arch/powerpc/include/asm/nohash/32/kup-8xx.h  |   3 +-
+ arch/powerpc/include/asm/nohash/32/mmu-8xx.h  |   4 -
+ arch/powerpc/include/asm/nohash/kup-booke.h   |   3 +-
+ arch/powerpc/include/asm/task_size_32.h       |  28 +++-
+ arch/powerpc/include/asm/uaccess.h            | 132 +++++++++++++-----
+ arch/powerpc/kernel/asm-offsets.c             |   2 +-
+ arch/powerpc/kernel/head_book3s_32.S          |   6 +-
+ arch/powerpc/mm/book3s32/mmu.c                |   4 +-
+ arch/powerpc/mm/mem.c                         |   2 -
+ arch/powerpc/mm/nohash/8xx.c                  |   2 -
+ arch/powerpc/mm/ptdump/segment_regs.c         |   2 +-
+ lib/iov_iter.c                                |  22 ++-
+ lib/strncpy_from_user.c                       |   2 +-
+ lib/strnlen_user.c                            |   2 +-
+ net/core/scm.c                                |   2 +-
+ 22 files changed, 161 insertions(+), 130 deletions(-)
+
+-- 
+2.49.0
 
 
