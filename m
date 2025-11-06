@@ -1,199 +1,154 @@
-Return-Path: <netdev+bounces-236412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8980DC3BF77
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 16:11:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C981DC3BF5F
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 16:09:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D9346242D7
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 15:03:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F9BE18972BB
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 15:05:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A554346E40;
-	Thu,  6 Nov 2025 15:03:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8419334C24;
+	Thu,  6 Nov 2025 15:04:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="FP5outQi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HeVVNqYh";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="GF89fZyq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 671893446C4;
-	Thu,  6 Nov 2025 15:03:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EA7F1FCFEF
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 15:04:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762441415; cv=none; b=DI+PwsadwYbyRQknM+O8+sFO+Lw17tg0O6LylJvrM+5GnTBhCciWT/Uqzwph/5hEAJXPDdGz4wkFgyYgXvJDlCYSQN30saglYNSjJCe5ujQR8EDay8hFeYhLzfRvLMP1E7r2c4gblkVz8uiVmWfXcBxt/PvLECfPS+KxzTIGXS0=
+	t=1762441490; cv=none; b=uKYrEq3OSjbkhfwp8WsQOTKPtSl/PimROBiVUNC1gM4P9eeHwT7aomrnnUON8RJacaytSwomDVW/vGmMz/UJBIeXSIh+eRaKJ6attjQvPPB9YN8txCAEbYLaET1vXoYI0VB5cDtwHspauaPZg0eD1XcCMbr0M2bOMLKsYCqzdxA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762441415; c=relaxed/simple;
-	bh=c0J0R5lf0yRz6IhPcaWUy1ymKbmyPY9nGF9EVVnFmYg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=S8Fksy+JVPnp2mzkEY+nAXuPAsHS/ORlBs0UVRuts7FbxgwJTts2siEYfjwIH4qYXxb6fm+uDQE8MW60X2+tv1t5SrelwnGdPtRZeYfxNzdUgwwZfNQOBP1aexRIBs8r1aZgL+EP2ms9akE89oTH1zdzorrt6JbVzjhc8KBFFXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=FP5outQi; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5A6CCcck002496;
-	Thu, 6 Nov 2025 15:03:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=corp-2025-04-25; bh=mIu+0
-	BvpPUMYahbiUlctpgUApoi9d+74Wsa3M0aMNqE=; b=FP5outQixiRpYpbZBPKjT
-	5uv081FlLoeqJPvtUwjV/IID2YbueGwB1/SU2nQhukHz6POisl4NZbCq1TasZKjT
-	3xOrp2OlbMeukKAMc4yRHjwMEV6Iz2XJrfzQAbVSrY57TSlNT4ganAt9p38EKkh8
-	fVng/h3ImnDTS2ap9Uj2/A3Hm5r4VQnrNJH3FL1UGzV2I4NiMpFWTduKrP2JhGUI
-	ofHsfCsWMp92Uj2pqsL2d6vpUkDT6yLleb8lo5zs9NAiaUsG5DHyohnxlDT/wD0c
-	K9o+KJuHkIKEmkAJS9OKbtJ8GuriYOO8t91Vbns9vJ/VXQI1CLLbpKx2KCP01UFN
-	g==
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4a8aqwa7rh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 06 Nov 2025 15:03:17 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5A6E1PvD039714;
-	Thu, 6 Nov 2025 15:03:16 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4a58nc8mh4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 06 Nov 2025 15:03:16 +0000
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5A6ExlIX013458;
-	Thu, 6 Nov 2025 15:03:15 GMT
-Received: from oracle (dhcp-10-154-170-248.vpn.oracle.com [10.154.170.248])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 4a58nc8m6b-2;
-	Thu, 06 Nov 2025 15:03:14 +0000
-From: gregory.herrero@oracle.com
-To: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-        andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Gregory Herrero <gregory.herrero@oracle.com>
-Subject: [PATCH] i40e: validate ring_len parameter against hardware specific values.
-Date: Thu,  6 Nov 2025 16:02:47 +0100
-Message-ID: <20251106150248.721025-2-gregory.herrero@oracle.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251106150248.721025-1-gregory.herrero@oracle.com>
-References: <20251106150248.721025-1-gregory.herrero@oracle.com>
+	s=arc-20240116; t=1762441490; c=relaxed/simple;
+	bh=PQ5No5hZSmgmGqg5+iQ28DDZkSeRQR2T2rRjI0K5Vv8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=h4QaZECciqSrfKLb0wTcTPSIRMSTt/o8zetisXua8QwxBlIuIctnm0flsWV4+NB3/OrjSMfJTB0E1nD9FkqdK+dSuCEUEwrDiGFKVP4mYWjomtjTvZ8q/KZE4jpLHf9K/VWM330w4hPu58D+4DtbN8FjnTxHkx4po+8KSw29TXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HeVVNqYh; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=GF89fZyq; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762441487;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rUJRA39E1s7TgQLtsgYBhAt4MEyjWtwC5B/uGX1m8fY=;
+	b=HeVVNqYhYFWYo8/ieo3DQx/Ir5YdjxYw2uj/fzsFeiWeqdnlXkmaL0FPt1bWRxN1ubyP9t
+	BgJHj5ujchTZRR1xNYgQGVwJfJLo0NdGu5h2cGrl8BPqhpLheJc3URfqZZ0VozDICb5Cdf
+	7V9li0OSSSGzAnXlfApGACophBIZjZA=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-384-v79lLdZmPLWyMFwO_T3KLA-1; Thu, 06 Nov 2025 10:04:44 -0500
+X-MC-Unique: v79lLdZmPLWyMFwO_T3KLA-1
+X-Mimecast-MFC-AGG-ID: v79lLdZmPLWyMFwO_T3KLA_1762441483
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-47106720618so8509605e9.1
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 07:04:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1762441483; x=1763046283; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rUJRA39E1s7TgQLtsgYBhAt4MEyjWtwC5B/uGX1m8fY=;
+        b=GF89fZyqz8wq62MPiI/2MXXwuuXaF3AUsthjUx7X3ippXi+sYz/l3TnitzJvllSLFL
+         wo6fgI+SmNzMOiqq8H/C+tXDybFsZgv6s33DRwINt3OUj98bscpv1EGQEikMN01rPdHE
+         a7AuRDKhEY8ETxQTMkKIT4sU5hkcxhbfmJeT+15poRvOLFFyPbehRiXMGQALeembMuYd
+         O17lKvsNrgpN/LtlD1+YWYkw45o9DBsbtg43ac334zo6sT18jBwWEkDsFFGBVPCcexSU
+         Wzi0c2g/aEXmM3J/TBACMwvipUq79QWDlEgdppDLQWFbv2ujTQ9LcZ5ZbobqMAI0ernA
+         7AgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762441483; x=1763046283;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rUJRA39E1s7TgQLtsgYBhAt4MEyjWtwC5B/uGX1m8fY=;
+        b=ficuK9cJu3AaNjTJe9CMhNYrG4Y4HpKLJwiY1LSkwtOf5SMTS28OTnTwsRqKTa2/QM
+         Dqzh7E19grZ9hUzUn+7/LJdHNCN19zaWakqa1pTpRxwmF4tLTpdhluL/O8PruRZMDFDc
+         f3u4J1DdvPw+uN+0yIQDvTxOz9KU73HdZTUSZSw/iWN3uQ5W1Gr/4Rt1shfomuUwRw2/
+         FjiLgkQppgOeEtmisztfL2SAsTRxUTx+R9SW2MkXjw+AHjqclfVQ4F1pMcITUeM1Q8hB
+         OwtA95lUym7RlCAS0F8RMPJnI9PtFthBAnQVwc7RxaPaywrimxNeNzZkIffWDXs0mYQw
+         DHMA==
+X-Forwarded-Encrypted: i=1; AJvYcCXU2/hxJS6pH/gm5/992lYvYptpcYMg6sWNqIXlg9nUzIJYGloJIURR8O6+fJORFyxQwQUdi7Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHTA7BVtF8x5vX1/pZ74q3ZRtS17qS2E7v9wm7IgBJw5g0v3Cg
+	rxH8dEtatHWqNEgLJizZaQBrnVYkUsXbfAfj+UDJalUb1clXov1lfWqYyIxOQJmoWe2ZDlhorvU
+	sJ6A5WWvExQ46acR3nPW+04XaawdeC0ua4isEqDHPel80I8JtYsRzmnjbtQ==
+X-Gm-Gg: ASbGncvSIoNHKclKIpXRP57lKxJ5+uts4oxVrXZJyayPJb9+ssY9GfbgXEaCLoQeivo
+	D+r86GuDt6PZ1rXl7AxLmlG03CcPkiLHRVyCArn65Jut9HqqiYUfu/oC+6p0Y2HJ/w2Q4inMKtp
+	EnLiI1sb9/sA5/2NhYe/lRu3cMcqtsNIudAWv4FGqR4FHlPgayOG070aXUazjjF3lKVfayxNLFI
+	vIkhLKXM7I1BEaCIW02SVcWN6DCHhCUbFIPEv7Juo1uCVYV0yuc94aiuxMSAuJ4Wy57xfXFfM/Q
+	Sqd4HR1xBKi7HIKrqckf4iBZP5emKNAViaKGeLxXs54SSjAM9NfrkyQ8GD+SenukeXdSA/8v0K2
+	3FA==
+X-Received: by 2002:a05:600c:3b13:b0:471:115e:624b with SMTP id 5b1f17b1804b1-4775cdcf9aamr70151965e9.17.1762441482623;
+        Thu, 06 Nov 2025 07:04:42 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH6KAQ2WEctCjGzvorvUYBqoUPDrgbaWUZ++9zneDrC2B9sVjsu3rfCx5iL3l2lJ+Jpi7V+xw==
+X-Received: by 2002:a05:600c:3b13:b0:471:115e:624b with SMTP id 5b1f17b1804b1-4775cdcf9aamr70151445e9.17.1762441481919;
+        Thu, 06 Nov 2025 07:04:41 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.83])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-477640fba3esm19161105e9.6.2025.11.06.07.04.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Nov 2025 07:04:41 -0800 (PST)
+Message-ID: <fbe1bbe2-3ecb-4d9b-8571-f1da6faee98d@redhat.com>
+Date: Thu, 6 Nov 2025 16:04:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: add prefetch() in skb_defer_free_flush()
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ eric.dumazet@gmail.com
+References: <20251106085500.2438951-1-edumazet@google.com>
+ <8ef591e6-9b05-4c7b-8d75-82ced4dd2f31@redhat.com>
+ <CANn89iJwTydUJG4docxfc0soY98BU7=g-nh+ZAvRi6qD5Bt_Ow@mail.gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <CANn89iJwTydUJG4docxfc0soY98BU7=g-nh+ZAvRi6qD5Bt_Ow@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-06_03,2025-11-06_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 suspectscore=0
- mlxlogscore=999 malwarescore=0 spamscore=0 adultscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2510240000
- definitions=main-2511060119
-X-Authority-Analysis: v=2.4 cv=NajrFmD4 c=1 sm=1 tr=0 ts=690cb8b5 cx=c_pps
- a=XiAAW1AwiKB2Y8Wsi+sD2Q==:117 a=XiAAW1AwiKB2Y8Wsi+sD2Q==:17
- a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8
- a=2JYSdunga3JKcJtQgaIA:9 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-ORIG-GUID: N0Ikuwr29JWU9Bog8HWqNJfzf0tkhQBn
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA1MDEzMyBTYWx0ZWRfXz/c8ZsJHL/u/
- iYLeJOYf9bSIYfvY4EAZwr0fpKLd90wD/8xMTHGiTsVaCvAAIx1uYXPg1jC7z8K87ItyBkX3TNt
- u/vUETCWMGYh5qNK98zfoEX2lWeDgKH3wIBvYSbgQuw+a7xCJFwwvr1+EXlKFLjkhgxiRfZTGqc
- ZlvVVVPAQqxY6TlqYSe0wa0AHwZoFfUfdudmeb00ZfwopYtDesC7YJl8vpIxdEJvdVORhbUZxnJ
- ez9NIO75MyaMmEHIXb6hXAwndSmH6k+Qk3WfCP/4ZvBVEF2ImWYnut6M0BFVjD4pFR6y54es6B8
- tnFoZxML7kexbl5FWXl5mXN0aoU+GVuCtI5UhbXMjPg3azi2P6/woMu0ubxTHBQuYGseFb0qtI1
- 7HnVzOfMo4dDlwychtnIYJBnnP1kVA==
-X-Proofpoint-GUID: N0Ikuwr29JWU9Bog8HWqNJfzf0tkhQBn
 
-From: Gregory Herrero <gregory.herrero@oracle.com>
+On 11/6/25 10:13 AM, Eric Dumazet wrote:
+> On Thu, Nov 6, 2025 at 1:05 AM Paolo Abeni <pabeni@redhat.com> wrote:
+>>
+>> On 11/6/25 9:55 AM, Eric Dumazet wrote:
+>>> skb_defer_free_flush() is becoming more important these days.
+>>>
+>>> Add a prefetch operation to reduce latency a bit on some
+>>> platforms like AMD EPYC 7B12.
+>>>
+>>> On more recent cpus, a stall happens when reading skb_shinfo().
+>>> Avoiding it will require a more elaborate strategy.
+>>
+>> For my education, how do you catch such stalls? looking for specific
+>> perf events? Or just based on cycles spent in a given function/chunk of
+>> code?
+> 
+> In this case, I was focusing on a NIC driver handling both RX and TX
+> from a single cpu.
+> 
+> I am using "perf record -g -C one_of_the_hot_cpu sleep 5; perf report
+> --no-children"
+> 
+> I am working on an issue with napi_complete_skb() which has no NUMA awareness.
 
-The maximum number of descriptors supported by the hardware is hardware
-dependent and can be retrieved using i40e_get_max_num_descriptors().
-Move this function to a shared header and use it when checking for valid
-ring_len parameter rather than using hardcoded value.
-Cast info->ring_len to u32 in i40e_config_vsi_tx_queue() as it's u16 in
-struct virtchnl_txq_info.
-Also cast it in i40e_config_vsi_rx_queue() even if it's u32 in
-virtchnl_rxq_info to ease stable backport in case this changed.
+Many thanks for sharing!
+> With the following WIP series, I can push 115 Mpps UDP packets
+> (instead of 80Mpps) on IDPF.
+> I need more tests before pushing it for review, but the prefetch()
+> from skb_defer_free_flush()
+> is a no-brainer.
 
-Fixes: 55d225670def ("i40e: add validation for ring_len param")
-Signed-off-by: Gregory Herrero <gregory.herrero@oracle.com>
----
- drivers/net/ethernet/intel/i40e/i40e.h         | 18 ++++++++++++++++++
- drivers/net/ethernet/intel/i40e/i40e_ethtool.c | 12 ------------
- .../net/ethernet/intel/i40e/i40e_virtchnl_pf.c |  4 ++--
- 3 files changed, 20 insertions(+), 14 deletions(-)
+FWIW, the napi_complete_skb() makes sense to me, looking forward to it!
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
-index 801a57a925da..0e697375fcaf 100644
---- a/drivers/net/ethernet/intel/i40e/i40e.h
-+++ b/drivers/net/ethernet/intel/i40e/i40e.h
-@@ -1418,4 +1418,22 @@ static inline struct i40e_veb *i40e_pf_get_main_veb(struct i40e_pf *pf)
- 	return (pf->lan_veb != I40E_NO_VEB) ? pf->veb[pf->lan_veb] : NULL;
- }
- 
-+/**
-+ * i40e_get_max_num_descriptors - get maximum descriptors number for this hardware.
-+ * @pf: pointer to a PF
-+ *
-+ * Return: u32 value corresponding to maximum descriptors number.
-+ **/
-+static inline u32 i40e_get_max_num_descriptors(struct i40e_pf *pf)
-+{
-+	struct i40e_hw *hw = &pf->hw;
-+
-+	switch (hw->mac.type) {
-+	case I40E_MAC_XL710:
-+		return I40E_MAX_NUM_DESCRIPTORS_XL710;
-+	default:
-+		return I40E_MAX_NUM_DESCRIPTORS;
-+	}
-+}
-+
- #endif /* _I40E_H_ */
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-index 86c72596617a..61c39e881b00 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-@@ -2013,18 +2013,6 @@ static void i40e_get_drvinfo(struct net_device *netdev,
- 		drvinfo->n_priv_flags += I40E_GL_PRIV_FLAGS_STR_LEN;
- }
- 
--static u32 i40e_get_max_num_descriptors(struct i40e_pf *pf)
--{
--	struct i40e_hw *hw = &pf->hw;
--
--	switch (hw->mac.type) {
--	case I40E_MAC_XL710:
--		return I40E_MAX_NUM_DESCRIPTORS_XL710;
--	default:
--		return I40E_MAX_NUM_DESCRIPTORS;
--	}
--}
--
- static void i40e_get_ringparam(struct net_device *netdev,
- 			       struct ethtool_ringparam *ring,
- 			       struct kernel_ethtool_ringparam *kernel_ring,
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-index 081a4526a2f0..5e058159057b 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-@@ -656,7 +656,7 @@ static int i40e_config_vsi_tx_queue(struct i40e_vf *vf, u16 vsi_id,
- 
- 	/* ring_len has to be multiple of 8 */
- 	if (!IS_ALIGNED(info->ring_len, 8) ||
--	    info->ring_len > I40E_MAX_NUM_DESCRIPTORS_XL710) {
-+	    (u32)info->ring_len > i40e_get_max_num_descriptors(pf)) {
- 		ret = -EINVAL;
- 		goto error_context;
- 	}
-@@ -726,7 +726,7 @@ static int i40e_config_vsi_rx_queue(struct i40e_vf *vf, u16 vsi_id,
- 
- 	/* ring_len has to be multiple of 32 */
- 	if (!IS_ALIGNED(info->ring_len, 32) ||
--	    info->ring_len > I40E_MAX_NUM_DESCRIPTORS_XL710) {
-+	    (u32)info->ring_len > i40e_get_max_num_descriptors(pf)) {
- 		ret = -EINVAL;
- 		goto error_param;
- 	}
--- 
-2.51.0
+/P
 
 
