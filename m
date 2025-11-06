@@ -1,135 +1,99 @@
-Return-Path: <netdev+bounces-236135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56D1DC38C2F
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 02:57:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69D4AC38C7A
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 03:01:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 77C704F04BA
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 01:56:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6741E1A2069B
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 02:01:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F12522248B4;
-	Thu,  6 Nov 2025 01:56:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6022B221FC6;
+	Thu,  6 Nov 2025 02:00:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H/LN3e8i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cxSpHeax"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B5EF225390
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 01:56:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33F7442AB7;
+	Thu,  6 Nov 2025 02:00:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762394186; cv=none; b=R6AzBFfzSUVq/1Gif56WnNOBFOc+a8FzAtDB1+VWlYc+j+E2jvAk3NzXjPk7LW602YUYucRd95lC6MYYrSXn+JYn3LxVj1+/sT+yahX7IyYvNMSPAqZZTvbU+E8A1G9NMxAsSRVhdy71NoUB0KiNFCp9LZZLGl70RuJK4HZlhHc=
+	t=1762394456; cv=none; b=YUeMjL6vmHyCrknSKgYE6+tV8vuN14hB8FAO9aKu7V4+eyOxYMBOEzTR43QP4J5uVr3RiNZ5hddoLJU2FnSIiZ1CGtLKQFnr55qHuEvo9T+tvGf6QjoMLXbxQIY60coNeNl51Zeu6fxLCyRzpaVjRUruh8woXiN0kGntVl+dpD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762394186; c=relaxed/simple;
-	bh=jLw7k/KAz5FUEjGhd6v3ts9iOCpt5gHWAPtf5CRRl8k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mISn7EJNKfe+xGRkkDcdyTz2SL3Qvs3TCKXU2oQdLaK7TQmjCWPALx0KECoEEqszctA8tSH1mex4oHXONy6jDIgD3zyuTKIwFFMszkZ2y5fC0eYYb8RQzdLoihutyY+rdPMqUdg7WageytN3mILmhtOfQ3snkNV3W7CFvUCpVYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=H/LN3e8i; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4ed0c8e4dbcso132951cf.0
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 17:56:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762394184; x=1762998984; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iUatHznZUYVcukINaQffbDk6qMtXMnZNYeCcDgim0vc=;
-        b=H/LN3e8iVZU1vF8Ko6HoNITQ7O0K/zgXfrs0Wxo82wsqa+eUtEh5cE1fUl6wPJNspH
-         tF7Y2ZDBKCxgVTr1NGmiQv9jWuK6braoULKx/HeGHHWOmPRJGEQEB0Y6fVfuwEv/sjiM
-         whuoMfzIaZ5ayaAAdUvYhqIoueVIdt70xGglZisTJUwjxAE6TJInnTR+ksyy+XuTnwRz
-         V7bWWIB2nlmnbDGVtdFYhwdcQ9t4VCb6lXHUElTwRMxd+fZpmqYQ/SUJRyoAjbBAtYha
-         YVhJ/4O8ROjLvQtTGz/F0mXRMtoFkUdS53vP435+1WD4n5Ag64BNkg443NhiSspUSVEN
-         R/RA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762394184; x=1762998984;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=iUatHznZUYVcukINaQffbDk6qMtXMnZNYeCcDgim0vc=;
-        b=p/KHfGaxtby0MUiZ7+0AWClaJqGDSit6EACXCucQ8C9GLZinkiDTpba/nix1+ZmRUU
-         Xjwud3OQ2mjSPrRvaOiCzq+29wz9tAHkIxD1UgnwKuu7WxsMEhp/i/r/jDrmuZr9D5a7
-         s7Hsm13Pu4mPFBUu7MzDs6MmQgHy7uMTgqwJUm0rsgOE8uc29UZmBWFo9wKyAJ2yB4S6
-         iurSM39CS0rNpxrDKl/XxvxrJTZ8pY3791u9YtST6XrMpVCuvlaOfzKGglOreYwJ9GCG
-         AH/hpp2vAlp+QYVn0z3Un4+iYAiz46IW/xBDJSMDc0pu1l5alMYT457laOhbUUBvrRUN
-         mMig==
-X-Gm-Message-State: AOJu0YzbHm6fquTEipFYA+9KEW3m0A0Y2URT6v15hEb9LuxpVWoDUraD
-	NE2xms6UhOu8mEQnfJzTnwoOl7diOyE15mH+xirujOKsWZOeNTv7VScEIH4539fu1UKE44xDmRu
-	gO32CTTj+EVdbAts31OkYIxbT7cqO6f0FBJI4YXeQ
-X-Gm-Gg: ASbGncvxzDIdDhrmtt150CVPTtiw9zmckWz+LEYJ7m5EscAwMNMoI+XMCS8XfBYEfmv
-	/3qSV1MrVk9W055yOmtt8lEw/flRRzuqIRlvVFV1QeAC2+srIx/x4vmVkExsyC+sUxJhkuJPvhX
-	WoqwziAizU07tSEvCzL3R2NtFrnNxwzVfUw8yruIWKOT6VqRtlliWBzJcedBe5xHiUFuOLHkvJB
-	mcwJo0+yUtMf7glDzQxbZBZz0DtNi2bjdBku5vaT4a45h43uYV+9JmUpLiZ9E5uZtbwyN8CA7X5
-	UvtQhiDEmUauPtsWCGmNz98VOQqr
-X-Google-Smtp-Source: AGHT+IHibGvmFnDlfr24rRt2tIra4G1k1r3PX3TWXENAKkaEvVbOFGfGF4YxKvcB5vtfTr1sBaCrevD27B/Da7aRkrQ=
-X-Received: by 2002:a05:622a:15d0:b0:4b3:7533:c1dd with SMTP id
- d75a77b69052e-4ed82b51179mr2027741cf.1.1762394183935; Wed, 05 Nov 2025
- 17:56:23 -0800 (PST)
+	s=arc-20240116; t=1762394456; c=relaxed/simple;
+	bh=kzLtt6qwyBNSg7lFnyPPmRWw++wOlJmkZoguF9KUNpo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=iqNh6l/TA18VJPrHYoVs12ZnX7KUR8CJMguzYMWHzbvHeWIMd9gDc5RFLwb3eQJv2RK5eC1RuW3YIJADDeVcaoUGJXosbux1b6NvaWH2BvnVV4hJn7Yp3sUoyDKegst9Q4FA05Xlg8JvbN6p39w8G3Ljhl9FahTMyr7pi/dLzoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cxSpHeax; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B4545C4CEF5;
+	Thu,  6 Nov 2025 02:00:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762394455;
+	bh=kzLtt6qwyBNSg7lFnyPPmRWw++wOlJmkZoguF9KUNpo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=cxSpHeaxSVTdp+PI9qsOAM0wftYnAbpoZbYDrN0od1oiNOqLBvn+9SPxMg2JpQyWd
+	 o6a5oGr1GyLHIvUJJy5mno5iW9biBoR+BYHNPNNBVUs9AhZu/Vk+vhnEqe0RRIxxHa
+	 jn9fPjN6QBv9p9Ha2ZTLoeoJrNHan12b+m4CdrvaRxzmK6mQeY4EA+vO4mhI965yst
+	 7+opVfgcoZjNisWX06ZAptrUKkvp6FR/1P+qUYn+GQP1jnCJDd4Uy6ZQ+2Q86KYWdE
+	 n5DhMPJNujux2NhedAGI8d4RNAsqnFMWDntRE3K3zAn2T1Qr1heDLz0Cg/VfE4hFqs
+	 8BRwY5wWHBn0Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B4D380AAF5;
+	Thu,  6 Nov 2025 02:00:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251105200801.178381-1-almasrymina@google.com>
- <20251105200801.178381-2-almasrymina@google.com> <20251105171142.13095017@kernel.org>
-In-Reply-To: <20251105171142.13095017@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 5 Nov 2025 17:56:10 -0800
-X-Gm-Features: AWmQ_bmWD_sYB6gVzqw7Ayfki29RE_amHqVThrUXCC1Sw1ZxmeZGu81hIcUYDwE
-Message-ID: <CAHS8izNg63A9W5GkGVgy0_v1U6_rPgCj1zu2_5QnUKcR9eTGFg@mail.gmail.com>
-Subject: Re: [PATCH net v1 2/2] gve: use max allowed ring size for ZC page_pools
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Joshua Washington <joshwash@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, ziweixiao@google.com, 
-	Vedant Mathur <vedantmathur@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net V2 0/3] net/mlx5e: SHAMPO fixes for 64KB page size
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176239442873.3831359.7427376111702037221.git-patchwork-notify@kernel.org>
+Date: Thu, 06 Nov 2025 02:00:28 +0000
+References: <1762238915-1027590-1-git-send-email-tariqt@nvidia.com>
+In-Reply-To: <1762238915-1027590-1-git-send-email-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
+ leon@kernel.org, mbloch@nvidia.com, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, gal@nvidia.com,
+ dtatulea@nvidia.com, horms@kernel.org
 
-On Wed, Nov 5, 2025 at 5:11=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Wed,  5 Nov 2025 20:07:58 +0000 Mina Almasry wrote:
-> > NCCL workloads with NCCL_P2P_PXN_LEVEL=3D2 or 1 are very slow with the
-> > current gve devmem tcp configuration.
->
-> Hardcoding the ring size because some other attribute makes you think
-> that a specific application is running is rather unclean IMO..
->
+Hello:
 
-I did not see it this way tbh. I am thinking for devmem tcp to be as
-robust as possible to the burstiness of frag frees, we need a bit of a
-generous ring size. The specific application I'm referring to is just
-an example of how this could happen.
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-I was thinking maybe binding->dma_buf->size / net_iov_size (so that
-the ring is large enough to hold every single netmem if need be) would
-be the upper bound, but in practice increasing to the current max
-allowed was good enough, so I'm trying that.
+On Tue, 4 Nov 2025 08:48:32 +0200 you wrote:
+> Hi,
+> 
+> This series by Dragos contains fixes for HW-GRO issues found on systems
+> with 64KB page size.
+> 
+> Regards,
+> Tariq
+> 
+> [...]
 
-> Do you want me to respin the per-ring config series? Or you can take it o=
-ver.
-> IDK where the buffer size config is after recent discussion but IIUC
-> it will not drag in my config infra so it shouldn't conflict.
->
+Here is the summary with links:
+  - [net,V2,1/3] net/mlx5e: SHAMPO, Fix header mapping for 64K pages
+    https://git.kernel.org/netdev/net/c/665a7e13c220
+  - [net,V2,2/3] net/mlx5e: SHAMPO, Fix skb size check for 64K pages
+    https://git.kernel.org/netdev/net/c/bacd8d80181e
+  - [net,V2,3/3] net/mlx5e: SHAMPO, Fix header formulas for higher MTUs and 64K pages
+    https://git.kernel.org/netdev/net/c/d8a7ed9586c7
 
-You mean this one? "[RFC net-next 00/22] net: per-queue rx-buf-len
-configuration"
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-I don't see the connection between rx-buf-len and the ring size,
-unless you're thinking about some netlink-configurable way to
-configure the pp->ring size? I am hoping for something backportable
-with fixes to make this class of workloads usable.
 
---=20
-Thanks,
-Mina
 
