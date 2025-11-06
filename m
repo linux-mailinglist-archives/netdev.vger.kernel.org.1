@@ -1,136 +1,121 @@
-Return-Path: <netdev+bounces-236370-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236371-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D75C6C3B2B6
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 14:20:19 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13FD6C3B2B9
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 14:20:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FC571893AE7
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 13:13:40 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7DF7A4F3A80
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 13:14:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FEB632ABC1;
-	Thu,  6 Nov 2025 13:13:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0906F32ABCA;
+	Thu,  6 Nov 2025 13:14:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="R1S09r2G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bvdn8hxM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f52.google.com (mail-yx1-f52.google.com [74.125.224.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 456023148BE
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 13:13:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF238D531;
+	Thu,  6 Nov 2025 13:14:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762434791; cv=none; b=Hg5L/3dFE1bgNrWpxKbC5tYxswwiE6lqQ/Y2lE2QdfA8fPFl8hDzLxXCwl9g5AV37VH8btagwcqJgIsRknMjz39Jtv3IzRdW2KxRiqMDGrIW0p7MI/4ZhGElJcHk+k0/KjxC9FACMymtN6ywaHm/UG5T7129KXiEjODnZvsutuE=
+	t=1762434864; cv=none; b=jaJuumaAHhAoIe4up/6eLSwFNkMmTchDSN7wtwhwqXrD9X4VpLbi9p8U3unwZX7Lg9opbhus/700MIMj6A8EneAlPEeF4smoBuCkIpi2XPNTcvUhvyNp/RPEyPLaaZPEwcsr7QzIsPnnzTyRNee8AkvHUW1HGBwZnfU70/vX9O8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762434791; c=relaxed/simple;
-	bh=Rgg2Af4bzAMXAetO+2YUfn1QvzY5Z7jf0MbYpQj87MI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ko5gbGZTgY9pVIE9HZyhW7U2HMCWe5ey+tMg7QWZxRD6t5V/ZzQJr2v5gECG2El83Mh7hwrBnbVdjb2Gvn8SznQP4cFhl1NYSmPGJG+3Jz9ACUX4EsuuuFXHjTN/NKseVo+OseAqNCyADRhiYZpUDThwBmrN599gqRHfIh/93bc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=R1S09r2G; arc=none smtp.client-ip=74.125.224.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yx1-f52.google.com with SMTP id 956f58d0204a3-63d0692136bso932432d50.1
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 05:13:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1762434788; x=1763039588; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Pr8zIq++NWe3T42mWiyg4rbtFwpYjZBhkQARiQCCDt8=;
-        b=R1S09r2GhRQnOcd8X+O2zTWysTMpkG12lwRhTrRE72Xy5yS9RtyLyRd79dQGboQYGt
-         h7w3WZT+QEfMvbX4p+41wYD2JZbohvgydjZFfWBHor7G8jyng0xz6PaSu2di9yXyCW8e
-         WOaYNxtx9YCvZhM5MQkIaHbNMRVpYzlUhDdrDiCUXlq2upTa44tKdOepoMZiKJK9+q9W
-         rMjkYQwfgIeLORTzlm5IrHb5CLWC4d8tJIQzhJmoU+8sAGZDAXw7vAH4qp6VSXtYpZyb
-         89wsPArU7L963ank6JR1AX/oJQBbbS5q00EKo18cWTClg0rUFFJ+5hB2JMeQlurG1aH8
-         +oiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762434788; x=1763039588;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Pr8zIq++NWe3T42mWiyg4rbtFwpYjZBhkQARiQCCDt8=;
-        b=XeGRb2d9RS1W51rICUGLRQ+nQqwA7FEe69x3gn9faAPjClUTBTwCnCwf3Mtxk7j7Jq
-         tRcxh/BI+J3jyVJcdVW816vWIQaT+DlwB7YoMD+ZtocW5wecD4s4VVRcjYxOIm+3QM3X
-         h+BGJXWg+OarKw94EhYDhzL/H+VssUswPyzAVc6oWK5GLcnEOHAeXtpyKhbhCpcB8YFX
-         j8oUhTwNS8ctywnEoiDW7yLnOx3cpSZaxwAV5r/6IsRrohsqbdQDxLsmQ9V8zc2J1VDc
-         lcCVHl8Htb13qG+h2fBaFJ3jsu2jV1BcGAfVuUb0MM86IneDpLqPi8iqeeD2XEIVoCWU
-         QqZg==
-X-Gm-Message-State: AOJu0YzLN/nij8pSUOFpyVoWNmYjjRB7rJkyoAFis0QYjRccFn4QQ420
-	StCBBwFnUMfzgViB6az86SitSlORMRhcCwMslLD4dJoWoG7lHJ6DPR2SGtfY5jqQr2eDjcsLHCS
-	Qq7n/q3yIqjZZjiHWDwaRP4RMGmx7WtHjllVj5SOQsA==
-X-Gm-Gg: ASbGnctpRyhjABTdAKUb1qzdgTHF3JW1cXvt05t0Y4wYzTxFSdDZxJKU5zjfUhKAgmN
-	iH7nIwLa9ece1nO5LT9XWRxBoC7vxXFbiCJLlfW3T7bVZP5vowOqo8J5o5IIy3KzjRgogFshh60
-	+phPueXGYrjk7OSeZAU18rjNt4I6BQuf2yg4tO31EH8f3UNd6LpW+YxAelkwaGbYlCL4SJ5j+0O
-	t1ePtsz8az9gv3ayPHCvUC3xFRfAuPrQbvqDGeaYfHDcL0qBtMbWdhhZPJBGsosrJRX5XMC6Xmz
-	9OkIYfhl+5G9qMEbgac7Id9gOM02ncmBV54PU9VCCAsQgu1Dxx0h
-X-Google-Smtp-Source: AGHT+IHpA25Qw9KHp85CbOrmqi7smoI+i5HXa4iYSYr8Yl5m2jCAvh/JMAJMh3OTTZoWzQa0g2jxyJn4ENm2LDRqHa8=
-X-Received: by 2002:a53:d058:0:20b0:63f:9f4a:3ea with SMTP id
- 956f58d0204a3-63fd34cd64cmr4943589d50.19.1762434788033; Thu, 06 Nov 2025
- 05:13:08 -0800 (PST)
+	s=arc-20240116; t=1762434864; c=relaxed/simple;
+	bh=bR/+/R+baLpO5FuzBWsOS1XGaMj5gHO48nzAAZPjp9I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iNTmXnNGeH4uLEP69W9KaJzza2So1UIBohI+Xf2QZVxJnvwmLCf/hyAP7aEvOeBSl3IE/4NWv86soNWPPppofmKxpiqrld1q1Wz09aJ9rbCbQ3GpzYs8IXVyq6FTKWw7XpP1Man9fHyhqusjhThXpMaH7S+KS94XsOupjOf2Xdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bvdn8hxM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5B3CC4CEF7;
+	Thu,  6 Nov 2025 13:14:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762434864;
+	bh=bR/+/R+baLpO5FuzBWsOS1XGaMj5gHO48nzAAZPjp9I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bvdn8hxMm67rfm2smrfCSJPimMsivBNyPtDOYdJ27Jkaf1AnxDYMxFqmJKL3h4Kb6
+	 1oxEyVaZ9p9GXNqy3+ZC6GPxzBC360h8aUBfKGIk8sATn4RuVytH2frz56Gna04ykP
+	 OdNUPg9GQhFuZjwkf67PRk3C8odrlH2Rt1JVVfHe49jia6e3sKPwkTM/nLmxzH+nQj
+	 YnKeuqf5Bo3w0JUXfRzG3/CDhYPYtrPUnwW4R51EQ+gAkZFoQVUF9RK1lNDEm1z1mT
+	 oBQg3OpPK2cSfG1bEdeHXG+0QNfSHBkoge6y8MGX4SWAUw/hS4jbYq+KsvrIgsc4Q7
+	 sjtXjFed+hKRg==
+Date: Thu, 6 Nov 2025 15:14:19 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Gerd Bayer <gbayer@linux.ibm.com>
+Cc: Bjorn Helgaas <bhelgaas@google.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Jay Cornwall <Jay.Cornwall@amd.com>,
+	Felix Kuehling <Felix.Kuehling@amd.com>,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Alexander Schmidt <alexs@linux.ibm.com>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC 2/2] ib/mlx5: Request PCIe AtomicOps enabled for all
+ 3 sizes
+Message-ID: <20251106131419.GC15456@unreal>
+References: <20251105-mlxatomics-v1-0-10c71649e08d@linux.ibm.com>
+ <20251105-mlxatomics-v1-2-10c71649e08d@linux.ibm.com>
+ <20251106101917.GB15456@unreal>
+ <ec44c1ceab176c0a4c6447f966da8b7061958ffe.camel@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251105200801.178381-1-almasrymina@google.com>
-In-Reply-To: <20251105200801.178381-1-almasrymina@google.com>
-From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Date: Thu, 6 Nov 2025 15:12:30 +0200
-X-Gm-Features: AWmQ_bnjH5M9dyJZq9l8Gj4I9eAK7C21YFV07XTbiWP_NI6BQWytXh7uxg1q-mI
-Message-ID: <CAC_iWjK1bz9a_SzYsEuZmqvYDWT6h6hFwWdX2OO5aNBcjp1MFw@mail.gmail.com>
-Subject: Re: [PATCH net v1 1/2] page_pool: expose max page pool ring size
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Joshua Washington <joshwash@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Willem de Bruijn <willemb@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ec44c1ceab176c0a4c6447f966da8b7061958ffe.camel@linux.ibm.com>
 
-On Wed, 5 Nov 2025 at 22:08, Mina Almasry <almasrymina@google.com> wrote:
->
-> Expose this as a constant so we can reuse it in drivers.
->
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
-> ---
->  include/net/page_pool/types.h | 2 ++
->  net/core/page_pool.c          | 2 +-
->  2 files changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
-> index 1509a536cb85..5edba3122b10 100644
-> --- a/include/net/page_pool/types.h
-> +++ b/include/net/page_pool/types.h
-> @@ -58,6 +58,8 @@ struct pp_alloc_cache {
->         netmem_ref cache[PP_ALLOC_CACHE_SIZE];
->  };
->
-> +#define PAGE_POOL_MAX_RING_SIZE 16384
-> +
->  /**
->   * struct page_pool_params - page pool parameters
->   * @fast:      params accessed frequently on hotpath
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index 1a5edec485f1..7b2808da294f 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -211,7 +211,7 @@ static int page_pool_init(struct page_pool *pool,
->                 return -EINVAL;
->
->         if (pool->p.pool_size)
-> -               ring_qsize = min(pool->p.pool_size, 16384);
-> +               ring_qsize = min(pool->p.pool_size, PAGE_POOL_MAX_RING_SIZE);
->
->         /* DMA direction is either DMA_FROM_DEVICE or DMA_BIDIRECTIONAL.
->          * DMA_BIDIRECTIONAL is for allowing page used for DMA sending,
->
-> base-commit: 327c20c21d80e0d87834b392d83ae73c955ad8ff
-> --
-> 2.51.2.1026.g39e6a42477-goog
->
+On Thu, Nov 06, 2025 at 01:16:18PM +0100, Gerd Bayer wrote:
+> On Thu, 2025-11-06 at 12:19 +0200, Leon Romanovsky wrote:
+> > On Wed, Nov 05, 2025 at 06:55:14PM +0100, Gerd Bayer wrote:
+> > > Pass fully populated capability bit-mask requesting support for all 3
+> > > sizes of AtomicOps at once when attempting to enable AtomicOps for PCI
+> > > function.
+> > > 
+> > > When called individually, pci_enable_atomic_ops_to_root() may enable the
+> > > device to send requests as soon as one size is supported. According to
+> > > PCIe Spec 7.0 Section 6.15.3.1 support of 32-bit and 64-bit AtomicOps
+> > > completer capabilities are tied together for root-ports. Only the
+> > > 128-bit/CAS completer capabilities is an optional feature, but still we
+> > > might end up end up enabling AtomicOps despite 128-bit/CAS is not
+> > > supported at the root-port.
+> > > 
+> > > Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
+> > > ---
+> > >  drivers/infiniband/hw/mlx5/data_direct.c | 6 +++---
+> > >  1 file changed, 3 insertions(+), 3 deletions(-)
+> > > 
+> > > diff --git a/drivers/infiniband/hw/mlx5/data_direct.c b/drivers/infiniband/hw/mlx5/data_direct.c
+> > > index b81ac5709b56f6ac0d9f60572ce7144258fa2794..112185be53f1ccc6a797e129f24432bdc86008ae 100644
+> > > --- a/drivers/infiniband/hw/mlx5/data_direct.c
+> > > +++ b/drivers/infiniband/hw/mlx5/data_direct.c
+> > > @@ -179,9 +179,9 @@ static int mlx5_data_direct_probe(struct pci_dev *pdev, const struct pci_device_
+> > >  	if (err)
+> > >  		goto err_disable;
+> > >  
+> > > -	if (pci_enable_atomic_ops_to_root(pdev, PCI_EXP_DEVCAP2_ATOMIC_COMP32) &&
+> > > -	    pci_enable_atomic_ops_to_root(pdev, PCI_EXP_DEVCAP2_ATOMIC_COMP64) &&
+> > > -	    pci_enable_atomic_ops_to_root(pdev, PCI_EXP_DEVCAP2_ATOMIC_COMP128))
+> > > +	if (pci_enable_atomic_ops_to_root(pdev, PCI_EXP_DEVCAP2_ATOMIC_COMP32 |
+> > > +						PCI_EXP_DEVCAP2_ATOMIC_COMP64 |
+> > > +						PCI_EXP_DEVCAP2_ATOMIC_COMP128))
+> > 
+> > I would expect some new define which combines all together, with some
+> > comment why it exists:
+> > #define PCI_ATOMIC_COMP_v7  PCI_EXP_DEVCAP2_ATOMIC_COMP32 | PCI_EXP_DEVCAP2_ATOMIC_COMP64 | PCI_EXP_DEVCAP2_ATOMIC_COMP128
+> 
+> I see your point. I don't understand the _v7
 
-Reviewed-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+v7 - > PCI spec *v7.0*
+
+But it was just suggestion.
+
+Thanks
 
