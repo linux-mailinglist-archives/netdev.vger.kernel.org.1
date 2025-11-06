@@ -1,119 +1,91 @@
-Return-Path: <netdev+bounces-236394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB33BC3BB52
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 15:25:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C1A2C3BBD0
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 15:29:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 87A7E350AD7
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 14:25:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37D4F1A4070F
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 14:27:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 320D7342CA4;
-	Thu,  6 Nov 2025 14:19:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OWRTaCdo"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6B433C532;
+	Thu,  6 Nov 2025 14:22:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F0932C938;
-	Thu,  6 Nov 2025 14:19:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3998E33C537
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 14:22:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762438788; cv=none; b=iRKFI1s7AmPjaVEFqb9edlgVLDHAghgJmcgetrj3z0ivi6bO5rJb/YabD+EyzjYZ1pKgkHOeuohI+W+ZTL5Td8Qm8byTsDZa47ubBJldnyneAPK2e87q3AkcaH2DB5drQ/GlC3L1fWVU0c/A0XKNjZYBhYDIsfxLIDyQRr/gb48=
+	t=1762438924; cv=none; b=KWmp7DyOSZfrfgR8Jg44N7on9UjAWvK5hLbUaJ20TmgDlc+Mp0H9Au1QhrcY2Gnca9nP732Ee7+F8SE00CzPImNongx6ajdMpLezlT1RtNxrDmG3/E+AOfErPwEELqcGN4jbjrMEUjjrCa7uGRoadWFevXqeSzqP0v/cUIEr+Wc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762438788; c=relaxed/simple;
-	bh=6/ZGdnzJaXeG4LJH21ap7huLV2905EhUDReKUZnFLL8=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=ulX88GnH1oTU/7ycQHOACI2CGn//2bIysfoQ430NuEQSdbLJm4Wq0fHXPt761xdlaXNM1FbFyOZl+4iFLfJKZlwC3UIYZKU0daOrmDTW9wurKS7Uz3tTDXO0nBPSaP7c5XjZLfhVC7xN3hbMseNQIU1wrCDkHRjdgeM9yExr0Mk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OWRTaCdo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6942BC4CEFB;
-	Thu,  6 Nov 2025 14:19:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762438787;
-	bh=6/ZGdnzJaXeG4LJH21ap7huLV2905EhUDReKUZnFLL8=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=OWRTaCdo9THGQ2HFVtNpwa5bZKWlzoNE+zgTGnk/I+k7KTX6/1uqXBBTL0oqemgnt
-	 YTWIuhYdthPpYXIB1J6GLaNgcL81CbylGJwF2iYwyZXaRk3X/RRzmcQcQpKNHuehTO
-	 d7VnIO3sCONwKmRHaqinVhEZIPuMspz3lX7YKleF3yjw2BNoVBJA4lVQ+myqkGj3yR
-	 80wf3OMQOWEyDCZ7hjBqGf0jipZeva4Aete0X+TleatgeCW99wHtaRuIZ0VTWu6uoL
-	 d/I57WwPsDmmwckSeRTB3Sh47AbGkYf87Z7MKudrSjc0OciWT8LQaGQka4QpkQ91Ba
-	 ziD+FQHH9LdLA==
-Date: Thu, 06 Nov 2025 08:19:45 -0600
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=arc-20240116; t=1762438924; c=relaxed/simple;
+	bh=ZlAJ1Fxjzx2mgXOVW/VSUoL4/8qbs5U6HQhU/HeNmZs=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=RtCdXuam9uWxfQsbRsao5TwFOI95TjqSpjS5vPlUzC0c0NS0UA0tCIbJqlXThobWp8XXnN3u/XQ/yAe4auiBJE47iw8YKFvD0srkUXkpaoxxPJJwh0xlQujEV3jx8cTrENa5dwQ1/mK1AE/DiVe4F7d35ep+MlaBe3E/OgNFJYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-432f8352633so10339985ab.0
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 06:22:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762438922; x=1763043722;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/5CCGL9kmizTngSG/cTV1+QEwEMhTlcIpLgbiwj3ccg=;
+        b=lM1RFgIGt1zzIY6HAsKL4Xo3ot0+DS3ric6ABt6AZUFlstmUigsHMHrtf6yl7amTTL
+         9PG9m/pq0RNIGsk5u7nT06armnaN6GdDiLrzbaCP5R5AhvpmQhKoo9HQ94uCHX+L0+dz
+         edUd+CBkU1E/Xp1y9XnJVmtnQH2ZZpPgWian8exU8EGjaAzPGMXzqe5SHfBQRwfujHI4
+         D8/HtXZBHm1qN259bSGFidsQYrx45KtLiKg26NWiHqYL7O9Qwl/3FA6mOMc2nvgBR+jS
+         0X+9FpLvT8weSqPXmm2hOHIS34/9dDdfdQMq+My4JujEA1DAmH0VuajZKiAxLDVxLh9c
+         s4DQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXvVPro3Q03XlBd9GAtCJXV27U5t7CoP6/IPDmY23tXk448TBwF/UqsI+QBJRWsRI/kAEZiJr0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw8weVrSSczWz8df2PpPk2EW15JcFpH9fM+U/f6btmVVTFwU8Xc
+	WiamftC9RslQMYjKmYO+W6L/8ixBShg6zyW2sjd6U8yODjCW4D9c3WtXSKnMcl76bYvWNMI/F46
+	U+bIVXitt9bcqY1LQJmBHU1NTIThhMDvjSGfEgxG00damRo+ezixmUMgLWqg=
+X-Google-Smtp-Source: AGHT+IHgVANv+IIbVs6kOqE0pft4cy18BhetSi/JO+BMCVp+iwgbnce1SlJD9uESBG22bvcJ9UrYSamenc/1Z2VTXWWFFl2klIRU
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
- Nikita Yushchenko <nikita.yoush@cogentembedded.com>, 
- Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
- Richard Cochran <richardcochran@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, devicetree@vger.kernel.org, 
- Conor Dooley <conor+dt@kernel.org>, 
- Geert Uytterhoeven <geert+renesas@glider.be>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, 
- Paolo Abeni <pabeni@redhat.com>, Paul Barker <paul@pbarker.dev>, 
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
- netdev@vger.kernel.org, 
- =?utf-8?q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>, 
- Magnus Damm <magnus.damm@gmail.com>
-To: Michael Dege <michael.dege@renesas.com>
-In-Reply-To: <20251106-add_l3_routing-v1-3-dcbb8368ca54@renesas.com>
-References: <20251106-add_l3_routing-v1-0-dcbb8368ca54@renesas.com>
- <20251106-add_l3_routing-v1-3-dcbb8368ca54@renesas.com>
-Message-Id: <176243878562.3711967.3338841205330431312.robh@kernel.org>
-Subject: Re: [PATCH net-next 03/10] dt-bindings: net:
- renesas,r8a779f0-ether-switch.yaml: add optional property link-pin
+X-Received: by 2002:a05:6e02:3712:b0:430:b999:49e7 with SMTP id
+ e9e14a558f8ab-433407d4f9fmr101993465ab.27.1762438922463; Thu, 06 Nov 2025
+ 06:22:02 -0800 (PST)
+Date: Thu, 06 Nov 2025 06:22:02 -0800
+In-Reply-To: <20251106135658.866481-4-1599101385@qq.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <690caf0a.050a0220.3d0d33.0159.GAE@google.com>
+Subject: Re: [syzbot] [net?] kernel BUG in set_ipsecrequest
+From: syzbot <syzbot+be97dd4da14ae88b6ba4@syzkaller.appspotmail.com>
+To: clf700383@gmail.com, davem@davemloft.net, eadavis@qq.com, 
+	edumazet@google.com, herbert@gondor.apana.org.au, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, ssrane_b23@ee.vjti.ac.in, steffen.klassert@secunet.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
+Hello,
 
-On Thu, 06 Nov 2025 13:55:27 +0100, Michael Dege wrote:
-> Add optional ether-port property link-pin <empty>
-> 
-> Signed-off-by: Michael Dege <michael.dege@renesas.com>
-> ---
->  .../devicetree/bindings/net/renesas,r8a779f0-ether-switch.yaml         | 3 +++
->  1 file changed, 3 insertions(+)
-> 
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-My bot found errors running 'make dt_binding_check' on your patch:
+Reported-by: syzbot+be97dd4da14ae88b6ba4@syzkaller.appspotmail.com
+Tested-by: syzbot+be97dd4da14ae88b6ba4@syzkaller.appspotmail.com
 
-yamllint warnings/errors:
-./Documentation/devicetree/bindings/net/renesas,r8a779f0-ether-switch.yaml:129:1: [error] syntax error: found character '\t' that cannot start any token (syntax)
+Tested on:
 
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/renesas,r8a779f0-ether-switch.yaml: ignoring, error parsing file
-./Documentation/devicetree/bindings/net/renesas,r8a779f0-ether-switch.yaml:129:1: found character '\t' that cannot start any token
-make[2]: *** Deleting file 'Documentation/devicetree/bindings/net/renesas,r8a779f0-ether-switch.example.dts'
-Documentation/devicetree/bindings/net/renesas,r8a779f0-ether-switch.yaml:129:1: found character '\t' that cannot start any token
-make[2]: *** [Documentation/devicetree/bindings/Makefile:26: Documentation/devicetree/bindings/net/renesas,r8a779f0-ether-switch.example.dts] Error 1
-make[2]: *** Waiting for unfinished jobs....
-make[1]: *** [/builds/robherring/dt-review-ci/linux/Makefile:1547: dt_binding_check] Error 2
-make: *** [Makefile:248: __sub-make] Error 2
+commit:         b54a8e13 Merge branch 'bpf-indirect-jumps'
+git tree:       bpf-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=10dae114580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e46b8a1c645465a9
+dashboard link: https://syzkaller.appspot.com/bug?extid=be97dd4da14ae88b6ba4
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=106ae114580000
 
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20251106-add_l3_routing-v1-3-dcbb8368ca54@renesas.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+Note: testing is done by a robot and is best-effort only.
 
