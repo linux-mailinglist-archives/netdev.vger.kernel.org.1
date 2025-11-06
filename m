@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-236237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10E6EC3A0DD
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 11:06:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0098AC3A0D1
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 11:06:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E9463B82B9
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 09:58:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F01663B90E7
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 09:58:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 796012836A0;
-	Thu,  6 Nov 2025 09:58:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4582527FB0E;
+	Thu,  6 Nov 2025 09:58:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="lhRimDfJ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="unwm1zfq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8732C218845
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 09:58:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9A72DA760
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 09:58:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762423084; cv=none; b=AQRFDFCmRM/DCCkN0eSJs3DmUDNaS9UMDyh3mWR6ZWbFdSU8hkPZX7uovD2ZQNHWWljpbDwoqDYDU0zjgk4X5bAzywDS43lDYVOdvTlwnIhZRrtav+BrIw8xcttkEkQpMliN6o16ZiWxIjAwNnStIfAjdJ2NpbpE1dzgxz/upTw=
+	t=1762423123; cv=none; b=DCaJMbJtZGGawi6X0VVLybf3MacKlObile1HGB5ZfWjqWBHD3naSM8fysHWzj6LrzvKy/TsuIBUKPlpe1StuTRRKYHvVcgLm1XbbUJlSOhvEi7Jr/V9tTpPzT+fMMeupwNxsWQFLf/htFlIa6KefZ5wN2Y98gPGNsn4nLWuS00s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762423084; c=relaxed/simple;
-	bh=oYHWyXchcTSHudXm2GEDAvWj65pnZu3m/69GO/asms8=;
+	s=arc-20240116; t=1762423123; c=relaxed/simple;
+	bh=xXRi65L1iXHmMf/zF2iFn4jGxxGU/Uaz/JUq/W2Qiec=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VP7+a2ANAsjmueNM3uSNJIfBMj++hVQcColwi+b923Esi40qxLkxIqsX9OE3ARnBKNvySmAGTm0Q+kmu4FU0r829zcfqfrkdQqgLtnhLheVt8FF0fd9uzARPlN7yj+7pDlqARKZlR5M347LrqB+0ey1ELGtudaKhVwQEftXY2I0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=lhRimDfJ; arc=none smtp.client-ip=185.246.84.56
+	 In-Reply-To:Content-Type; b=H7qjT/arscQyzppc7j73SewyDGI8clio45Em41hdOr1YgfqlJvaPqSUdWD6GSDWigz6ds6/8gS4Cm73Oobkm7sD8h84vGPaFIHLf55UHDz/bTGAbhOV+LJNJraQ2nSFhP2b+BzVxpQh0fLYfVe7NGROvzUtMjjyg4iGtMFjpdJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=unwm1zfq; arc=none smtp.client-ip=185.246.85.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id EC8681A18F2;
-	Thu,  6 Nov 2025 09:58:00 +0000 (UTC)
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 0E73B4E41562;
+	Thu,  6 Nov 2025 09:58:39 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id B9C0C6068C;
-	Thu,  6 Nov 2025 09:58:00 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 78B7B11850340;
-	Thu,  6 Nov 2025 10:57:56 +0100 (CET)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id D70A76068C;
+	Thu,  6 Nov 2025 09:58:38 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 93FF611850798;
+	Thu,  6 Nov 2025 10:58:34 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1762423079; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1762423118; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=aA1Nh5vuzSHJhmK4d/Q7OkqDwftB9kBY44MgWQ5fnC0=;
-	b=lhRimDfJSU530Ra+0V83y5TFQDiqg/9/f8FnAk2IKLuWRO9dy+hm+9ADz+lW3upGtpklf7
-	oc0k9xOyZw3gaBO0/RbKvc/arSMN0GsZnCYYN3Wl9ENtNXGgQvinAWn12keNsQljLWTxZA
-	Go7AkNluOrGI4GJUTvLgOLTANpGbNoA85WTb/yhazPiDlD7B5e0SKc9PNWpj48ss/RpWnH
-	bzqZKDlSVyEJGSVq/L6kPueEPsGFjk16uJBC6HdCBL8dO1KKnSJuoIq1KnVuVSUaGxcDfS
-	6hTds9FbSa0y/flYWz0aEkjN7K1spVyR+RNtsC8O03HDCtUPstx6EybkOi3O5Q==
-Message-ID: <6ad7667a-f2be-4674-99a2-2895a82b762a@bootlin.com>
-Date: Thu, 6 Nov 2025 10:57:55 +0100
+	bh=0xPwKSiR+8qRIcjkMOf4GQBuNI5KSYXz+hCD8bwMBFQ=;
+	b=unwm1zfqRBi+OJfuCQcPAavSk8jiei0QPcox1LFunOUFkp+7zt4Mwq1DVZ3izAOMimnhSE
+	4eGDJydu1rqz3vP6wwkiS+C2zWxJWrRtDI9hNLRikhL3KwofuXk5IvB9jaREq+EZsbppAA
+	0od94fTyO7HbhZaW2En/k4QZv4crcxTzYMOU2k8wvKRqy6Q/a4jF93UBTekDnClA/VY6O7
+	mTrTJCjUDMWBX8jr2oNRmeozWPBvSu5jq5wiskBJNZTUsNROEpxZ1e+fY2TXsyhO0qasc1
+	Cy1OWOzcVvXyFi0Z4te4UeiRXwmoSL52ZyZDBv2exvyZQRO7A4PZJcIc9BDNvw==
+Message-ID: <9a6614b1-7df6-4f40-b62a-e8df9f38637c@bootlin.com>
+Date: Thu, 6 Nov 2025 10:58:34 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,9 +57,9 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 00/11] net: stmmac: ingenic: convert to
- set_phy_intf_sel()
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+Subject: Re: [PATCH net-next v2 01/11] net: stmmac: ingenic: move
+ ingenic_mac_init()
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
  Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
 Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
  Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
@@ -69,31 +69,75 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
  Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
  Paolo Abeni <pabeni@redhat.com>
 References: <aQxinH5WWcunfP7p@shell.armlinux.org.uk>
-Content-Language: en-US
+ <E1vGvnz-0000000DWoJ-3KxL@rmk-PC.armlinux.org.uk>
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-In-Reply-To: <aQxinH5WWcunfP7p@shell.armlinux.org.uk>
+Content-Language: en-US
+In-Reply-To: <E1vGvnz-0000000DWoJ-3KxL@rmk-PC.armlinux.org.uk>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Last-TLS-Session-Version: TLSv1.3
 
-Hi Russell,
 
-On 06/11/2025 09:55, Russell King (Oracle) wrote:
-> On Wed, Nov 05, 2025 at 01:25:54PM +0000, Russell King (Oracle) wrote:
-> Convert ingenic to use the new ->set_phy_intf_sel() method that was
-> recently introduced in net-next.
-> 
-> This is the largest of the conversions, as there is scope for cleanups
-> along with the conversion.
-> 
-> v2: fix build warnings in patch 9 by rearranging the code
-> 
->  .../net/ethernet/stmicro/stmmac/dwmac-ingenic.c    | 165 ++++++---------------
->  1 file changed, 45 insertions(+), 120 deletions(-)
-> 
 
-Damned, missed that V2 and started reviewing V1... I'll resend the tags
-for V2.
+On 06/11/2025 09:57, Russell King (Oracle) wrote:
+> Move ingenic_mac_init() to between variant specific set_mode()
+> implementations and ingenic_mac_probe(). No code changes.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
 Maxime
+
+> ---
+>  .../ethernet/stmicro/stmmac/dwmac-ingenic.c   | 28 +++++++++----------
+>  1 file changed, 14 insertions(+), 14 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
+> index c1670f6bae14..8d0627055799 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
+> @@ -71,20 +71,6 @@ struct ingenic_soc_info {
+>  	int (*set_mode)(struct plat_stmmacenet_data *plat_dat);
+>  };
+>  
+> -static int ingenic_mac_init(struct platform_device *pdev, void *bsp_priv)
+> -{
+> -	struct ingenic_mac *mac = bsp_priv;
+> -	int ret;
+> -
+> -	if (mac->soc_info->set_mode) {
+> -		ret = mac->soc_info->set_mode(mac->plat_dat);
+> -		if (ret)
+> -			return ret;
+> -	}
+> -
+> -	return 0;
+> -}
+> -
+>  static int jz4775_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
+>  {
+>  	struct ingenic_mac *mac = plat_dat->bsp_priv;
+> @@ -234,6 +220,20 @@ static int x2000_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
+>  	return regmap_update_bits(mac->regmap, 0, mac->soc_info->mask, val);
+>  }
+>  
+> +static int ingenic_mac_init(struct platform_device *pdev, void *bsp_priv)
+> +{
+> +	struct ingenic_mac *mac = bsp_priv;
+> +	int ret;
+> +
+> +	if (mac->soc_info->set_mode) {
+> +		ret = mac->soc_info->set_mode(mac->plat_dat);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static int ingenic_mac_probe(struct platform_device *pdev)
+>  {
+>  	struct plat_stmmacenet_data *plat_dat;
+
 
