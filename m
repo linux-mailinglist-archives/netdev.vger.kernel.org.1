@@ -1,100 +1,100 @@
-Return-Path: <netdev+bounces-236322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C112C3ADFB
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 13:24:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BC1B3C3AE10
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 13:26:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3701A4F22ED
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 12:18:54 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D391050053A
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 12:21:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2438329C54;
-	Thu,  6 Nov 2025 12:18:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C6542F12C5;
+	Thu,  6 Nov 2025 12:21:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HbHntlqi";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="VGgjJa4W"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eZa5AE1C";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="HwRLewNE"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A58431C562
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 12:18:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC7E41A5B84
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 12:21:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762431528; cv=none; b=P7rPNX7TW0sUArN89rVCjaM37J7Ruc7Fx6f5ocCrcsU/sI6fovJJnZ2tJ02SPmYnv4fgk7DMe/rq220Ymob/1K+n7189M4g1aXO87SfEdQQNnJAH0yR7WBQlhMFQb4HbcojmcqC3MvuXmOdBZPLcadnnffzupdM1TznIRvbAl2o=
+	t=1762431711; cv=none; b=cHK1eqLTkjUmLa7bZc+jPpXSzRj7Uyh4jUu1lE2r5e1G4yXUTecd1z/2elQmKs64kzEj9iwujegU0dZBgm8MqnY2hklonbJcMi74pJzQuiCuo/KN7zsbutZ82UPhEk9aSCvOTrh5dGpSgqilciKu951vb9eTqhlCo/Xq6k9jtvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762431528; c=relaxed/simple;
-	bh=uoFFD9n3hLU6Mq7kB4d0vCBxzAioEZz8yBEJ2YTctco=;
+	s=arc-20240116; t=1762431711; c=relaxed/simple;
+	bh=f6B/tbcYYNUY1cwi4BIgQgWXetzxYn720LqQVpZbrbo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=bc1K/MQHtDpD2UQjNOppKmCNiPO0TZTABBoOtZFlCF20l+eap2Ew5kI0Rr+OORjNRzjBkhs0jZokuAj/4XbaY9Tq36z5x/bDtIYc5yhgzyXzYOgzsMwaxslT2wcDlkn7UQCUD30ljrEj+rZ6TPxBlotdZlUcc3vTOrBoQ/hhBO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HbHntlqi; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=VGgjJa4W; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=C7L0ZmBoBihPz4EJdmpl00F4f1snaE8azc38kApPaNLN8kJPskc9UnTsT+jbhAvV4u9fQUJCPRvDghp0+fCqp55jVENF5FlY5lhlv6JCMSKMPq/QCgaqKYWrjLFqKv9lqSjQSRplx389eY3H9pgXttpgMDlnqhmIEbcrDfBeId0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eZa5AE1C; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=HwRLewNE; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762431525;
+	s=mimecast20190719; t=1762431709;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Xt6hYilKH7tDfneGToMjji5Pnxk9yLau0emKZyN+R0A=;
-	b=HbHntlqiVt62SX0aecfH/5uSPh1wgWwhEEOCqF1EpghGWnJwetsswW0wv74tymhWI0GkGS
-	2r5HT6skzDP0kOYcimsRszeyluElyhQwVjjOyEIJB8OBH4CUAJ1jKWd5hNEx7YCC6HquDh
-	qWk8oJI7r+s1HHZNS3KGmC2Akr8FP60=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=v1N4Cl13V8PNbOQcEwPAAvE71VJRJZSQLqVmISUC4TI=;
+	b=eZa5AE1C/cYEn3pnftu2tKCPblgDKDaAr/uXngjB7P1u8hcvrklzW+ddV3omHw44z2SCem
+	58HNaEPS/gB+8cvTGIHCX+7auxIaz0Uj/sf165FlGrB0Aj2MUrnF8KK2SRgwawHgIGX6bl
+	r1f6iwwMsbNgNXnj7Q7Q865lynuRiFs=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-522-uRep4Gx2PPWTc3OOKUkVpw-1; Thu, 06 Nov 2025 07:18:44 -0500
-X-MC-Unique: uRep4Gx2PPWTc3OOKUkVpw-1
-X-Mimecast-MFC-AGG-ID: uRep4Gx2PPWTc3OOKUkVpw_1762431523
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-47740c1442dso6826205e9.1
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 04:18:44 -0800 (PST)
+ us-mta-218-XKBgyftFMRKv6dSsOWHNeA-1; Thu, 06 Nov 2025 07:21:47 -0500
+X-MC-Unique: XKBgyftFMRKv6dSsOWHNeA-1
+X-Mimecast-MFC-AGG-ID: XKBgyftFMRKv6dSsOWHNeA_1762431707
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-40cfb98eddbso1445522f8f.0
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 04:21:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762431523; x=1763036323; darn=vger.kernel.org;
+        d=redhat.com; s=google; t=1762431707; x=1763036507; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=Xt6hYilKH7tDfneGToMjji5Pnxk9yLau0emKZyN+R0A=;
-        b=VGgjJa4WV6FXNH1haRuo7OMbf4J0XlOOUYLmkFazf38M7tol0v1D6MvEn6F9t8Gm/R
-         VC0JqUdtSQ1hi8XF1i3z/SIhQVqxbWvnsZg+ptWYreGcwNhpLOanY0h6YCtElYZUF4Lx
-         ehfLLg8c+hylcZ3mOJaibK433zLyWrhV1ZsMojakSJJ3xFQRhxOQBXHoWBNpGSo0+Lh6
-         j2oZol6MFxN09/RiMSX1kh3T7PffgYIzgVRIEAcYCLWcznEe8VoyDoqAGFd0aC+DF4ct
-         UxM0HLy15OFhl5YiYKf8WUpP1+HS1h3NgZp5THGDp7PI8EHuZ0MZ9sZF62wSuoy1YYte
-         JoBQ==
+        bh=v1N4Cl13V8PNbOQcEwPAAvE71VJRJZSQLqVmISUC4TI=;
+        b=HwRLewNEHvTqY7mk1cOBjONPVvLeUtdefBISOpQgzvn0qyupSNSPaog9I24ycLrsY9
+         zETL4tv1aefjHExTqRCRYN7svJAg/Lf+0TLlFWFJcQKv7+M8U0i1DFQdP417eW/Tyy6X
+         05WMJlb+XANCjkrlSR5nZspVfRcuHktdV9MkMnXv4EaLqLp4VnRXgnoWVNrur68Ppzun
+         kHOfdWTpJpXEbc3X+8bLzKAKSGNRqK3vuhZXkaaqK3BtY5K7Aak1XrJKws62Co5jz1h4
+         HuEpTQ4KlNnBb4Me1mhxT6jlniINN3hyeFeCmw5JQQ4I8i8I4+8aOuUhfl/JJL2zkHlS
+         aB0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762431523; x=1763036323;
+        d=1e100.net; s=20230601; t=1762431707; x=1763036507;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Xt6hYilKH7tDfneGToMjji5Pnxk9yLau0emKZyN+R0A=;
-        b=Kw0prGwss5NMuXaIrVkcQHcmkapQ95SfACpoVqCDiS8cXMEm2xVf0GZq13BMmowUm+
-         0RDM2OqWMyRwxbM7a85ozn4ZTP/vVJDRBJ8aVxBw8ikx6jpL8Gc5HCTJnpU87PlMKf4R
-         kMR4GInspxqT3A00P6txvnNiGHp+ywUkeJaBxV19OkTDxYRR4xV1+vI3qkUzmTrz6yfa
-         S1gOKFipv4BlU3XtE9rzcKcWvyio3gAPMTY60LsCYlAOWIALqd+zvhYz/ckXS36L5R7f
-         PfjIu0j1h+np0qEd4vOlp6y3eDaqQ0s6PJN4lFgGCSPvmqRhYp0MEmQICC4B5T56yPgK
-         BPJg==
-X-Forwarded-Encrypted: i=1; AJvYcCW0n8feA0YnD+AdDJjXL+XaMH9W9fhiYyVZXgr4JlhnwygV3nbJ4kUYAR8C+3HVbzDKLw+RrxQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx7EBcthVj2qVg1PN+oiuxW6YamnnQyb3enIeA4DDhTgpZ61Xay
-	ekv2pm7PrBXEUP+UKC+vlP++KzrlL+i2qgd6knsn443vQqxRbRwzMgidQqr9SRcEKboZIgfnIvJ
-	oV5FY18mGXetoPmC6Rs6eGcpwI4zd07yg6O4CavtE1VnMMkVd9MHQl+fgsg==
-X-Gm-Gg: ASbGncvIr7wV45EvZ1SdJY/avl7ivalK31Rmy0+CzBzNuq6Trhei7Yn6Ib1Eg2uDfn1
-	2rre20U4kcecjxXlH5f9gL8qVR7dIDOq+QWJUl6tYgLoPQVfcLYTHOixkTvr0z359m0Ag8tuOaj
-	efMUaRujfR2wvt3rQOA1XYUbgGdbi8eVCmG2JjNh5vOzNmZYLrv8cR0l7H1jiOBaZ024qd7y4vF
-	+lElrsf+s2183eYRptvXZRkmbjhPOUT5pXjib9qwG5DunwIKO3w8IWbxB1AXLLje19rxMNGD34T
-	muTJnd75IDOOn4Joi0ts9jOzKNP4LswG2/CMeoKOkFKJ/mtrfoFakrriS9n9s3WfJGQ9HkJEBF2
-	PsQ==
-X-Received: by 2002:a05:600c:620f:b0:477:c71:1fd3 with SMTP id 5b1f17b1804b1-4775cdf253dmr62958885e9.28.1762431522959;
-        Thu, 06 Nov 2025 04:18:42 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGg2T2KZ3KXS1p9s6HYB8H5GhOQWRao0wUciVpoj7nlzP5kx7LVUIS1TvbmMMWe0Fwec2vCYQ==
-X-Received: by 2002:a05:600c:620f:b0:477:c71:1fd3 with SMTP id 5b1f17b1804b1-4775cdf253dmr62958205e9.28.1762431522520;
-        Thu, 06 Nov 2025 04:18:42 -0800 (PST)
+        bh=v1N4Cl13V8PNbOQcEwPAAvE71VJRJZSQLqVmISUC4TI=;
+        b=hDR90wIAXKKdyaE2lJ0Zg7mcofYPWySiYaZZqt38KG9x0WcWNJuvHciJ374bDR1H2R
+         i0wLGr2MtsBaQ/Z6Ybwle5bK/hRXMqxD0sLTuSXaDWbjTa0qyAemn3tLqydixQIcEl/T
+         ZECCqg/T5vU12tfdUNyVrVcfvTt1o1rtHtX2882TK3d+Eg/DeiplvCm0/wwWzHe2cDCJ
+         Juf6Z5flGc8YT8P6CvbUwwzy/W4yGsU4a80Q/mAm/940uTGdXMg5aknvQG6T3rSJHTIJ
+         ePmRi2pOXXvIUJ26yoAOUhCSKIgerCb7nWNFC7Hj8oHDxbS85fyj8TWRjOiE6a9unp9b
+         l5iQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWouHsr94a49lZv1AQe22LI8OJA2kcu7REzp7OdGb6gVRtdH51726Q8uW6ySEAnBITVin6bd+M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEERLdOskypvDIGdgeuWK5q1yxpkj0k2nVvCJ51fxwlRD7MFCu
+	vKinqwknuqX5KuoGIOM0c/YnCHrl1wWDW4/FNYjK61pIFK1Gz6ey5Epc2vOEIjjms09D/qMvFqi
+	l9iJTCWC7aDmu5WgAnaCOpNhLoK8x2IKtmymtor2UWr4wTQ9cn24jnNIOtw==
+X-Gm-Gg: ASbGncuvvno31A5hnfMiM2R2enmbez0sqs76BSny2WyaPEK4pGPZiLAYUW84os9LKx0
+	q4jFetooA0EZlquYZPvcC1JXbXSsxUhwnum/AwSaqjjg/K2VBNClAHXYkRaeEdnu1Pv5cGvTCEr
+	aAJAO+sifqSev0mjswLXgf724tjeO7RQ9SMKQo1dgRoQCNVH2R/mD7WeiuNqFu1bWbNwbVa9jsQ
+	1KbBs0Moag4C9gJepSeL6J8EXiohw1cIBtlPIROcib7M43gzzBsW7wVAIpAUDmQe9tmF0k2YgO3
+	kKjI3sTLapor/lOiQfbwRDwFImashjzrsQpwO/trdtOl3txlP8LJkPXMkLKwG90M6LI4Eam4qup
+	W7g==
+X-Received: by 2002:a05:6000:4112:b0:429:9272:c1be with SMTP id ffacd0b85a97d-429eb151f1emr2335235f8f.8.1762431706690;
+        Thu, 06 Nov 2025 04:21:46 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGhC3gPHF44nNLz6WF4vQ+gEkHlkVJdaQMy0UYsfuedwouhI/V3U2psJ1S8t/e2gVWT4Gn96Q==
+X-Received: by 2002:a05:6000:4112:b0:429:9272:c1be with SMTP id ffacd0b85a97d-429eb151f1emr2335200f8f.8.1762431706238;
+        Thu, 06 Nov 2025 04:21:46 -0800 (PST)
 Received: from [192.168.88.32] ([212.105.155.83])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4775ce20ff3sm100590715e9.10.2025.11.06.04.18.40
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429eb40379esm4634350f8f.9.2025.11.06.04.21.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Nov 2025 04:18:42 -0800 (PST)
-Message-ID: <35a98a1e-588f-44d0-ab99-f4b4508f65cb@redhat.com>
-Date: Thu, 6 Nov 2025 13:18:39 +0100
+        Thu, 06 Nov 2025 04:21:45 -0800 (PST)
+Message-ID: <faea7f2c-f63f-4b0e-9c75-1e93fdee5811@redhat.com>
+Date: Thu, 6 Nov 2025 13:21:43 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,8 +102,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 net-next 12/14] tcp: accecn: fallback outgoing half
- link to non-AccECN
+Subject: Re: [PATCH v5 net-next 13/14] tcp: accecn: detect loss ACK w/ AccECN
+ option and add TCP_ACCECN_OPTION_PERSIST
 To: chia-yu.chang@nokia-bell-labs.com, edumazet@google.com, parav@nvidia.com,
  linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org,
  dsahern@kernel.org, kuniyu@google.com, bpf@vger.kernel.org,
@@ -117,22 +117,25 @@ To: chia-yu.chang@nokia-bell-labs.com, edumazet@google.com, parav@nvidia.com,
  mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
  Jason_Livingood@comcast.com, vidhi_goel@apple.com
 References: <20251030143435.13003-1-chia-yu.chang@nokia-bell-labs.com>
- <20251030143435.13003-13-chia-yu.chang@nokia-bell-labs.com>
+ <20251030143435.13003-14-chia-yu.chang@nokia-bell-labs.com>
 Content-Language: en-US
 From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251030143435.13003-13-chia-yu.chang@nokia-bell-labs.com>
+In-Reply-To: <20251030143435.13003-14-chia-yu.chang@nokia-bell-labs.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 10/30/25 3:34 PM, chia-yu.chang@nokia-bell-labs.com wrote:
 > From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
 > 
-> According to Section 3.2.2.1 of AccECN spec (RFC9768), if the Server
-> is in AccECN mode and in SYN-RCVD state, and if it receives a value of
-> zero on a pure ACK with SYN=0 and no SACK blocks, for the rest of the
-> connection the Server MUST NOT set ECT on outgoing packets and MUST
-> NOT respond to AccECN feedback. Nonetheless, as a Data Receiver it
-> MUST NOT disable AccECN feedback.
+> Detect spurious retransmission of a previously sent ACK carrying the
+> AccECN option after the second retransmission. Since this might be caused
+> by the middlebox dropping ACK with options it does not recognize, disable
+> the sending of the AccECN option in all subsequent ACKs. This patch
+> follows Section 3.2.3.2.2 of AccECN spec (RFC9768).
+> 
+> Also, a new AccECN option sending mode is added to tcp_ecn_option sysctl:
+> (TCP_ECN_OPTION_PERSIST), which ignores the AccECN fallback policy and
+> persistently sends AccECN option once it fits into TCP option space.
 > 
 > Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
 
