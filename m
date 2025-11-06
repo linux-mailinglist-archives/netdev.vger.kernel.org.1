@@ -1,136 +1,124 @@
-Return-Path: <netdev+bounces-236205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FACDC39BD3
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 10:06:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 90E93C39C1D
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 10:10:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 039123B0A5C
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 09:05:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F2C43ADE92
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 09:08:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 156A230ACF1;
-	Thu,  6 Nov 2025 09:05:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7978730AD1F;
+	Thu,  6 Nov 2025 09:08:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eJa0aXdK";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="EkavMKQh"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="vUuSQeML"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D691A30AAB7
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 09:05:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D22D730B502;
+	Thu,  6 Nov 2025 09:08:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762419924; cv=none; b=n/9lWpwxkEE4+6qANnLvRJyUbf1+tv5Ng/FeIlo1VmsTJnqKvqK6tBP7R7oiiJbkPaHpRhyh3cHPauVe353sL74PA20jT+euvOEAeXNlGYVE127A+nIgbRvgRfuOyC9FDV/9nI8oG8dmDj06sRL0VEOYz/jsQ2TsA09c7bn6oHw=
+	t=1762420116; cv=none; b=nwcKjV1+SmYrSPUaXIFbgWioFFgqRYn1Ga0XvrafKwHqldbS3euzXJ4w62TXxuLIzLCCYJcWjXefuR9pseNMIpf9GWIL7+L60ihMXslmAZwrywvkRpDpaFYyTDzZtQhfz7LrPoTinr2jedG+AIg7WKe7D5pQJv3lS1MTSIwRfIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762419924; c=relaxed/simple;
-	bh=hZ+GsPkKN1xnfuv8yHnCdYhnGV8I07dQkQgK+RpyRUw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LphkSJ8/nbVHXDCo55/5A0yamkPrV2Ey0rzu3EPY2ShbvSFypo9mrR3yhrIviJO8hsaJkRmn+uVKaf4wRk9EnB2jbMqBHH6SqxdCxv5q12hCPBA7CVcOH8BVcASQFJ3fDElY0o9EUqhN6l6jSYorl5sMij/aMek1yv0Fjk0HeFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eJa0aXdK; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=EkavMKQh; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762419920;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZVVWReHzjccMkJIoRCRx58qRrx3kfa4v7Yjth4dJqLs=;
-	b=eJa0aXdKSzSM/OY22rl2hlbgtZM2n88yIOrrN7kT/2Ff6JOxig0vn4p149chD+THcBSLbS
-	Hs6Uv6OCA4XRgu7No6msj27H9OldqHt6veSXx1ivOZULbpG11DmRCyF6koldGWGvLqaq7G
-	C4xxmnG2T5PTAguX1TgchxG97w8p/hU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-664-q8-24V29M_y-7kxfsq9s_Q-1; Thu, 06 Nov 2025 04:05:17 -0500
-X-MC-Unique: q8-24V29M_y-7kxfsq9s_Q-1
-X-Mimecast-MFC-AGG-ID: q8-24V29M_y-7kxfsq9s_Q_1762419916
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-47740c1442dso5001205e9.1
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 01:05:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762419916; x=1763024716; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZVVWReHzjccMkJIoRCRx58qRrx3kfa4v7Yjth4dJqLs=;
-        b=EkavMKQh3ZqL1Hti1j9E6szS2fxXyO3Yo3ffCZ+JpscXys2ZZtN437XN3l+u5cqJya
-         j9UHb3ellV4b/nLFbZ5BqEjQMwwGIEe+WVi5Ez7uQkuFLiIaEQLuihn8RCFyv0trVBf/
-         5Qg4JtOoavoC9TwWI2x4Yo0oxSgoJCWkaWKJhDtp4ARawJVV9hwBBesaOnMxSxI0wD5C
-         QyYuM0lmfmFqkAbznvfTB6KQz0hp32r9uTxtQzomB31oKIFohUh4o6WDAHTiixnR8AiN
-         +6Es3M2k3RKxlVkhqOI2KvMXbvwf5LyWZZSqrLLOWF8Csjn0juiz9MAcydDnTYZroyuT
-         5VaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762419916; x=1763024716;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZVVWReHzjccMkJIoRCRx58qRrx3kfa4v7Yjth4dJqLs=;
-        b=EImviZHzZvpES8/FiAfrKfsRWYf+hTfy9NlHGXOLkGx4En1VPk78blwCqF4DbSSbbe
-         RC7Y8pIc2UBFFI8TW6Qq+XAXPN0tVDuW68D3Ly1m3pnHpPRc/OToO5h4TX52hCHkSrAm
-         lz/iZSWiLLISP8+BtAVhKKBF/VvFgpKtX8CIFJAGbS4PzOmhvsUpWQAi0URqcY/386oM
-         VzyjPojfi5mZeogOaDmZzZg7dhi5n3rTtfLiFum5hPupCTL+pZnLp29uom3NqT09wxol
-         vGeKnPtsM4E39hVpJ1nC9YiWolw8eoMDYUA/4/1f3pPy+Hm2U2Ml+Cyen13/M/SvOcw/
-         in/A==
-X-Forwarded-Encrypted: i=1; AJvYcCVUwfc0QFJAG77fcqUyisVPw6bkK4yOl787bo4or8PkxOyGHE0oo0cOo7LB36mXbnIFtvH5aYM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGU8B/gweDRUgPl6MQNEThkpSII9XAnOWYtHzS97irJotMLP7j
-	NeR4r8f44B4X7PEqd5Dn/3dORUsrI+zRL+RQkyPPs33EZEvlieun+58c7h30vNMhdF7x11NXo+C
-	COz+LfH3V0pYinB3HvQdswyItyVDfmipDLDMwBYjKgGexkjoLXg+gQEIzNw==
-X-Gm-Gg: ASbGncsCleWja+ImhvkuFufEaL4oTm8MxYzFJcKpqNEHndbNzxCkE9vme1eXtLD1lJi
-	25ZJlKIHOa+AXBFfOEeDzTzUNeFchhZYkl+vBHkV5sgzKRvaEwh5QoVdtxPWsxXzd1HHRu1mch4
-	1dbSNaHuiCdUzwALqbuHPhHjjhdfuUv3IvRudRI+Y0+ksVABzEVleHyT2cKfQ4TeYRkTFkvekYW
-	ybVdkNwWpshi5ARv3+23OKui//VCm1bR/pkstRfxSfyGuzK113uI7lSywDRCD78K7CZkys6aHF3
-	T6LmFS6YNXS5YQ6MRzDgy9n2exq/HV5mSu/P2EuYgC++S+IPKy93LcZR/Nt0HXT84Iu8pbtZmLe
-	fWQ==
-X-Received: by 2002:a05:600c:35d1:b0:477:542a:7ed1 with SMTP id 5b1f17b1804b1-4775cde5a28mr66445055e9.19.1762419915852;
-        Thu, 06 Nov 2025 01:05:15 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFuoU0KPtmSEkjEUR2VzH3YlJ8/xQZ1jtaiohdKFeznqvN40OCPAbZhkOL6kWmnEONW+fIqRg==
-X-Received: by 2002:a05:600c:35d1:b0:477:542a:7ed1 with SMTP id 5b1f17b1804b1-4775cde5a28mr66444755e9.19.1762419915467;
-        Thu, 06 Nov 2025 01:05:15 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.155.83])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47763da0242sm11361145e9.0.2025.11.06.01.05.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Nov 2025 01:05:14 -0800 (PST)
-Message-ID: <8ef591e6-9b05-4c7b-8d75-82ced4dd2f31@redhat.com>
-Date: Thu, 6 Nov 2025 10:05:13 +0100
+	s=arc-20240116; t=1762420116; c=relaxed/simple;
+	bh=iGpmSdSo2yJmtaqehnE/3eeou3gMSExG+9UWDLALvQQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uBNM6uKx+Kss4136Rpu2n5rieFLO+r0UkA+/7Qoj/sTvfD4PS5LtQZwpQAFxldq0YNyG8gSy+FRH9tAonmJNcapF1buUMm69lr1y8vMBLszQbC+O7AbycOYI+s4OGtHqPNh9d6CPx+YKGJVJAEpihTIDS2Dgur0kzHu6hBoUiik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=vUuSQeML; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1762420114; x=1793956114;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=iGpmSdSo2yJmtaqehnE/3eeou3gMSExG+9UWDLALvQQ=;
+  b=vUuSQeMLhbBM4DMqaRN8PIcX2BQBnWEguVGXmg80lMJ5+/q82Lczu7ru
+   x+A3mO9bPtNo/Nnr2qASuVjEFLuJS2R+0bNQA6UtepOdw3q9mzFxR3QtD
+   LVScwyjJWaVvxfCLRLcFDBw3ADz7DB0s/6Njurt1ogAUgHRaC5Q5sGFRL
+   2squLG/FF1SL7lAcKlgjM8pGIBg/bXrpPOUrrW56YXGKIRMVBgHVokYn5
+   RPZQS9Lh7qmHrqVXpfjcjjqFtVBpOfFQ/vG8OHW6rAT3gFkGlrpr+jU4P
+   /SDyvKlisGct4Msa6EFUZ6VaSTB6XJeJvDRutyTGAwCt2YnLBG8vu73bB
+   A==;
+X-CSE-ConnectionGUID: CANT/SDnQx+xGnm7qABWrg==
+X-CSE-MsgGUID: nflLaY7aT0G9AuxRj3jTmw==
+X-IronPort-AV: E=Sophos;i="6.19,284,1754982000"; 
+   d="scan'208";a="55143432"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2025 02:08:33 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.87.152) by
+ chn-vm-ex1.mchp-main.com (10.10.87.30) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.2562.29; Thu, 6 Nov 2025 02:08:15 -0700
+Received: from DEN-DL-M31836.microchip.com (10.10.85.11) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
+ 15.1.2507.58 via Frontend Transport; Thu, 6 Nov 2025 02:08:13 -0700
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <Divya.Koppera@microchip.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>
+Subject: [PATCH net] net: phy: micrel: lan8814 fix reset of the QSGMII interface
+Date: Thu, 6 Nov 2025 10:06:37 +0100
+Message-ID: <20251106090637.2030625-1-horatiu.vultur@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: add prefetch() in skb_defer_free_flush()
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
- eric.dumazet@gmail.com
-References: <20251106085500.2438951-1-edumazet@google.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251106085500.2438951-1-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On 11/6/25 9:55 AM, Eric Dumazet wrote:
-> skb_defer_free_flush() is becoming more important these days.
-> 
-> Add a prefetch operation to reduce latency a bit on some
-> platforms like AMD EPYC 7B12.
-> 
-> On more recent cpus, a stall happens when reading skb_shinfo().
-> Avoiding it will require a more elaborate strategy.
+The lan8814 is a quad-phy and it is using QSGMII towards the MAC.
+The problem is that everytime when one of the ports is configured then
+the PCS is reseted for all the PHYs. Meaning that the other ports can
+loose traffic until the link is establish again.
+To fix this, do the reset one time for the entire PHY package.
 
-For my education, how do you catch such stalls? looking for specific
-perf events? Or just based on cycles spent in a given function/chunk of
-code?
+Fixes: ece19502834d ("net: phy: micrel: 1588 support for LAN8814 phy")
+Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+---
+ drivers/net/phy/micrel.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-
-Just to avoid doubts on my thoughts about this patch:
-
-Acked-by: Paolo Abeni <pabeni@redhat.com>
+diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
+index 6a1a424e3b30f..01c87c9b77020 100644
+--- a/drivers/net/phy/micrel.c
++++ b/drivers/net/phy/micrel.c
+@@ -4380,12 +4380,6 @@ static int lan8814_config_init(struct phy_device *phydev)
+ {
+ 	struct kszphy_priv *lan8814 = phydev->priv;
+ 
+-	/* Reset the PHY */
+-	lanphy_modify_page_reg(phydev, LAN8814_PAGE_COMMON_REGS,
+-			       LAN8814_QSGMII_SOFT_RESET,
+-			       LAN8814_QSGMII_SOFT_RESET_BIT,
+-			       LAN8814_QSGMII_SOFT_RESET_BIT);
+-
+ 	/* Disable ANEG with QSGMII PCS Host side */
+ 	lanphy_modify_page_reg(phydev, LAN8814_PAGE_PORT_REGS,
+ 			       LAN8814_QSGMII_PCS1G_ANEG_CONFIG,
+@@ -4471,6 +4465,12 @@ static int lan8814_probe(struct phy_device *phydev)
+ 			      addr, sizeof(struct lan8814_shared_priv));
+ 
+ 	if (phy_package_init_once(phydev)) {
++		/* Reset the PHY */
++		lanphy_modify_page_reg(phydev, LAN8814_PAGE_COMMON_REGS,
++				       LAN8814_QSGMII_SOFT_RESET,
++				       LAN8814_QSGMII_SOFT_RESET_BIT,
++				       LAN8814_QSGMII_SOFT_RESET_BIT);
++
+ 		err = lan8814_release_coma_mode(phydev);
+ 		if (err)
+ 			return err;
+-- 
+2.34.1
 
 
