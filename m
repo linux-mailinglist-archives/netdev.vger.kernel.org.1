@@ -1,128 +1,226 @@
-Return-Path: <netdev+bounces-236509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44C5AC3D5B9
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 21:30:06 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43FA2C3D634
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 21:45:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5392C4E554D
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 20:30:04 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8A1EB351677
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 20:45:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF6D22FD69A;
-	Thu,  6 Nov 2025 20:29:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DABB321C9F4;
+	Thu,  6 Nov 2025 20:45:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rU+UZwk8"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="CAX3J1Pd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EEA82FD1CE
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 20:29:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEC2B1D516C;
+	Thu,  6 Nov 2025 20:45:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762460988; cv=none; b=ghWAyNUMFMPnjhwptLTuDZgNk09HkuzesATba4Bm8l8hBV26ikbb2Z5xITvQOsrv3e9/5TPpqnvvnrVwgWCe3D+cjtphTZbwUDAcr4olxx6RsEsh0/DLSktG0Wgf41bDxVJza97bhmckZA9q7/9MgtXKsdgtXsTh+BG6ZjcTBRY=
+	t=1762461954; cv=none; b=Dcwk7UNF5t+41BsIQoTQc2MoCKpWlanUctMIH6eK5MaOe8dHqy9aKlRBICzJK/q4u7lywk2ujcEr0bmf2+pPn9lElS6Tu4Xmq4tLU0KtHn6uLtyGW+W1HxYUEqU9ZxGP11XVMIz2VqpOuRrrxQWBY+PL0fiot2QP0CEPxfDQkC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762460988; c=relaxed/simple;
-	bh=s3j0iTvihKR3dlvXzt2IjatUcZ/rcf2fJ3aHQzhA8No=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TNRjyoNBUybYka3Ey5EvZTBibpRNWT00HjxKBoia9Oofj5P9SIrPHyTzNk2bMltsQiPQ/KK/wGbZKd8YfcozKH5SRgy8REvu9itIPPT3kwUgOa3U06/abdJWdqKvow1gRUYLWvNdPlYkzRe267bzM6++M0cRFLgbPt2Dhps5cng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rU+UZwk8; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-786a0fe77d9so827927b3.1
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 12:29:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762460986; x=1763065786; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nlav3UbLPRE//9ZpsrAxh5Zr/PEntl/GCOzpL6MdjR8=;
-        b=rU+UZwk8SNFPiZ+OF8JTAQK97pgzfB+N9gXeiIbcWf+XbG16i82FBD9GwyV9dYYnzF
-         OtEU6kbS21R46WHfMKsbUEHIDVa7P5jcSQ621Kxb0i8iOxPVG50upUMOiN4HmsxEXuhl
-         h8jQf07T/SosmVF8T6mCUp8Xo9Ub8IgBH5lLs1nudM9s4JgKTbT7Jbzd2jpa0b9+DNhD
-         fMpzZG+Q5ltxLJ+qr6D3jtRQc31Pea5Wn4/StuEM/tPpQ8MC/hRIOxeZxKpXiZuLgEQN
-         chsr17Xhmk+OC5ydAkahHefV3K2dBwOBjuaUDXeIeW5rFCOJ0gSzeA5rFfwahoa5wbNj
-         eNuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762460986; x=1763065786;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nlav3UbLPRE//9ZpsrAxh5Zr/PEntl/GCOzpL6MdjR8=;
-        b=JLU8m8OqYFHGuL4Tg0xwob83zrMQoC3H6kSliZcG7jJFIWBDVuyuI8jc+mDLPG4jt9
-         d6nd/8092T3sSQRvvytSNImCODwxPABZU3Wt0S1elXgmww6B1n1qbGKk5O36HEq0DziL
-         68hfJ8Nb8l4179Mh6krk9/dYHnkfjv+7Yf+PoNugFMW/kSY2i60j8N4ba2YDlbRmcIA2
-         hi2IcHohn/8oR8xMYeswt9aCcWcF/Vs6oEK638YnU4cuYXO8m5tT6VOgz/DJBWLv/4+O
-         EB+Xw8nj6wED8rtTLwDjVN/5Y/7QfRwvMq0TmopuMoBylwmaqaq4NhBHBy2PtV+qGAUJ
-         ElTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWJjl0SINU2+E1GYqCErxUZteEAcLu4fiHlvpLzJw3Lo1heugMk9P1/ihFmDfORvCNQpDLXbvI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySYiaWzx4UqcNnW/vIwxWoFCD2e3WzPLThZviHBpHZvKMs/JcJ
-	t5nJ+2EHcyTdcf5HpdoI4WXSjTSn6zp6AeVFI0DtZtWfMZZJu8XPNX/GVmLmb6WwT9tP5nY6/N3
-	kIGZCvLps+OuVuA==
-X-Google-Smtp-Source: AGHT+IHzfA+K+zY0b6XLaqzgmJqgFL29PP+QidNNBA18T1dk2d8I6pCs2jCXMBVQ8BmFAUBFA3CUKnd7RXPPKw==
-X-Received: from yxab9-n2.prod.google.com ([2002:a05:690e:1589:20b0:63f:391b:6f24])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:690e:158e:10b0:63f:9fe6:9479 with SMTP id 956f58d0204a3-640c41bee0emr619065d50.19.1762460986294;
- Thu, 06 Nov 2025 12:29:46 -0800 (PST)
-Date: Thu,  6 Nov 2025 20:29:35 +0000
-In-Reply-To: <20251106202935.1776179-1-edumazet@google.com>
+	s=arc-20240116; t=1762461954; c=relaxed/simple;
+	bh=Xmy7dRDkdvm9ZQu6DdJB/1Iur4dRUNxZ9WIXCSto8MY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GRtiu0ajRs4ulm8Xve6BMF0/283eHXRV/AAI/aJQKvFBfmfjjsjsk5gKRlFFj+vekIVEdoV6R0ESCAKZq55dDwRNPypO1W43iqbQxs0+bkxMb1WhvmAAxwAfFLSGwgHEJi+TtBOTlN3FlnDuhZCmWkjgpUEihYY0wk8Z488hOS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=CAX3J1Pd; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=5AYqrRoYwJz/XyJvEoRwNxN1N+YQADetwp+SfH4UdUk=; b=CAX3J1Pd096lssKD0ylA10kO/a
+	7u6kBhpgX/inZlV7YVn0O6Es3sBa7Nop38PJLER60aKLJzESNkznNYjZ9Wb09MufyjaY95v+AYbT3
+	famsDQ6yGXmAu5otVLtsaQ0r7EHeQ/nN2pDZw7jPxV5qcECkUJkq1f5hmYPQo0f16D70=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vH6rG-00D9aH-Rx; Thu, 06 Nov 2025 21:45:26 +0100
+Date: Thu, 6 Nov 2025 21:45:26 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Prabhakar <prabhakar.csengg@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: Re: [PATCH net-next] net: phy: mscc: Add support for PHY LEDs on
+ VSC8541
+Message-ID: <ee6a79ae-4857-44e4-b8e9-29cdd80d828f@lunn.ch>
+References: <20251106200309.1096131-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251106202935.1776179-1-edumazet@google.com>
-X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
-Message-ID: <20251106202935.1776179-4-edumazet@google.com>
-Subject: [PATCH net-next 3/3] net: increase skb_defer_max default to 128
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251106200309.1096131-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-skb_defer_max value is very conservative, and can be increased
-to avoid too many calls to kick_defer_list_purge().
+> +static int vsc85xx_led_cntl_set_lock_unlock(struct phy_device *phydev,
+> +					    u8 led_num,
+> +					    u8 mode, bool lock)
+>  {
+>  	int rc;
+>  	u16 reg_val;
+>  
+> -	mutex_lock(&phydev->lock);
+> +	if (lock)
+> +		mutex_lock(&phydev->lock);
+>  	reg_val = phy_read(phydev, MSCC_PHY_LED_MODE_SEL);
+>  	reg_val &= ~LED_MODE_SEL_MASK(led_num);
+>  	reg_val |= LED_MODE_SEL(led_num, (u16)mode);
+>  	rc = phy_write(phydev, MSCC_PHY_LED_MODE_SEL, reg_val);
+> -	mutex_unlock(&phydev->lock);
+> +	if (lock)
+> +		mutex_unlock(&phydev->lock);
+>  
+>  	return rc;
+>  }
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+The normal way to do this is have _vsc85xx_led_cntl_set() manipulate
+the hardware, no locking. And have vsc85xx_led_cntl_set() take the
+lock, call _vsc85xx_led_cntl_set(), and then release the lock. You can
+then call _vsc85xx_led_cntl_set() if needed.
+
+> +static int vsc8541_led_combine_disable_set(struct phy_device *phydev, u8 led_num,
+> +					   bool combine_disable)
+> +{
+> +	u16 reg_val;
+> +
+> +	reg_val = phy_read(phydev, MSCC_PHY_LED_BEHAVIOR);
+
+phy_read() can return a negative value. You should not assign that to
+a u16.
+
+Also, BEHAVIOUR.
+
+> +	reg_val &= ~LED_COMBINE_DIS_MASK(led_num);
+> +	reg_val |= LED_COMBINE_DIS(led_num, combine_disable);
+> +
+> +	return phy_write(phydev, MSCC_PHY_LED_BEHAVIOR, reg_val);
+
+You can probably use phy_modify() here.
+
+> +static int vsc8541_led_hw_is_supported(struct phy_device *phydev, u8 index,
+> +				       unsigned long rules)
+> +{
+> +	struct vsc8531_private *vsc8531 = phydev->priv;
+> +	static const unsigned long supported = BIT(TRIGGER_NETDEV_LINK) |
+> +					       BIT(TRIGGER_NETDEV_LINK_1000) |
+> +					       BIT(TRIGGER_NETDEV_LINK_100) |
+> +					       BIT(TRIGGER_NETDEV_LINK_10) |
+> +					       BIT(TRIGGER_NETDEV_RX) |
+> +					       BIT(TRIGGER_NETDEV_TX);
+> +
+
+Reverse Christmas tree. The lines should be sorted, longest first,
+shortest last.
+
+> +static int vsc8541_led_hw_control_get(struct phy_device *phydev, u8 index,
+> +				      unsigned long *rules)
+> +{
+> +	struct vsc8531_private *vsc8531 = phydev->priv;
+> +	u16 reg;
+> +
+> +	if (index >= vsc8531->nleds)
+> +		return -EINVAL;
+> +
+> +	reg = phy_read(phydev, MSCC_PHY_LED_MODE_SEL) & LED_MODE_SEL_MASK(index);
+
+Another cause of u16, when int should be used. Please check all
+instances of phy_read().
+
+> +	reg >>= LED_MODE_SEL_POS(index);
+> +	switch (reg) {
+> +	case VSC8531_LINK_ACTIVITY:
+> +		*rules = BIT(TRIGGER_NETDEV_LINK) |
+> +			 BIT(TRIGGER_NETDEV_RX) |
+> +			 BIT(TRIGGER_NETDEV_TX);
+> +		break;
+> +
+> +	case VSC8531_LINK_1000_ACTIVITY:
+> +		*rules = BIT(TRIGGER_NETDEV_LINK) |
+> +			 BIT(TRIGGER_NETDEV_LINK_1000) |
+> +			 BIT(TRIGGER_NETDEV_RX) |
+> +			 BIT(TRIGGER_NETDEV_TX);
+> +		break;
+> +
+> +	case VSC8531_LINK_100_ACTIVITY:
+> +		*rules = BIT(TRIGGER_NETDEV_LINK) |
+> +			 BIT(TRIGGER_NETDEV_LINK_100) |
+> +			 BIT(TRIGGER_NETDEV_RX) |
+> +			 BIT(TRIGGER_NETDEV_TX);
+> +		break;
+> +
+> +	case VSC8531_LINK_10_ACTIVITY:
+> +		*rules = BIT(TRIGGER_NETDEV_LINK) |
+> +			 BIT(TRIGGER_NETDEV_LINK_10) |
+> +			 BIT(TRIGGER_NETDEV_RX) |
+> +			 BIT(TRIGGER_NETDEV_TX);
+> +		break;
+> +
+> +	case VSC8531_LINK_100_1000_ACTIVITY:
+> +		*rules = BIT(TRIGGER_NETDEV_LINK) |
+> +			 BIT(TRIGGER_NETDEV_LINK_100) |
+> +			 BIT(TRIGGER_NETDEV_LINK_1000) |
+> +			 BIT(TRIGGER_NETDEV_RX) |
+> +			 BIT(TRIGGER_NETDEV_TX);
+> +		break;
+> +
+> +	case VSC8531_LINK_10_1000_ACTIVITY:
+> +		*rules = BIT(TRIGGER_NETDEV_LINK) |
+> +			 BIT(TRIGGER_NETDEV_LINK_10) |
+> +			 BIT(TRIGGER_NETDEV_LINK_1000) |
+> +			 BIT(TRIGGER_NETDEV_RX) |
+> +			 BIT(TRIGGER_NETDEV_TX);
+> +		break;
+> +
+> +	case VSC8531_LINK_10_100_ACTIVITY:
+> +		*rules = BIT(TRIGGER_NETDEV_LINK) |
+> +			 BIT(TRIGGER_NETDEV_LINK_10) |
+> +			 BIT(TRIGGER_NETDEV_LINK_100) |
+> +			 BIT(TRIGGER_NETDEV_RX) |
+> +			 BIT(TRIGGER_NETDEV_TX);
+> +		break;
+> +
+> +	case VSC8531_ACTIVITY:
+> +		*rules = BIT(TRIGGER_NETDEV_LINK) |
+> +			 BIT(TRIGGER_NETDEV_RX) |
+> +			 BIT(TRIGGER_NETDEV_TX);
+> +		break;
+
+Should the combine bit be taken into account here?
+
+> @@ -2343,6 +2532,26 @@ static int vsc85xx_probe(struct phy_device *phydev)
+>  	if (!vsc8531->stats)
+>  		return -ENOMEM;
+>  
+> +	phy_id = phydev->drv->phy_id & phydev->drv->phy_id_mask;
+> +	if (phy_id == PHY_ID_VSC8541) {
+
+The VSC8541 has its own probe function, vsc8514_probe(). Why is this
+needed?
+
+    Andrew
+
 ---
- Documentation/admin-guide/sysctl/net.rst | 4 ++--
- net/core/hotdata.c                       | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/Documentation/admin-guide/sysctl/net.rst b/Documentation/admin-guide/sysctl/net.rst
-index 991773dcb9cfe57f64bffabc018549b712aed9b0..369a738a68193e897d880eeb2c5a22cd90833938 100644
---- a/Documentation/admin-guide/sysctl/net.rst
-+++ b/Documentation/admin-guide/sysctl/net.rst
-@@ -355,9 +355,9 @@ skb_defer_max
- -------------
- 
- Max size (in skbs) of the per-cpu list of skbs being freed
--by the cpu which allocated them. Used by TCP stack so far.
-+by the cpu which allocated them.
- 
--Default: 64
-+Default: 128
- 
- optmem_max
- ----------
-diff --git a/net/core/hotdata.c b/net/core/hotdata.c
-index 95d0a4df10069e4529fb9e5b58e8391574085cf1..dddd5c287cf08ba75aec1cc546fd1bc48c0f7b26 100644
---- a/net/core/hotdata.c
-+++ b/net/core/hotdata.c
-@@ -20,7 +20,7 @@ struct net_hotdata net_hotdata __cacheline_aligned = {
- 	.dev_tx_weight = 64,
- 	.dev_rx_weight = 64,
- 	.sysctl_max_skb_frags = MAX_SKB_FRAGS,
--	.sysctl_skb_defer_max = 64,
-+	.sysctl_skb_defer_max = 128,
- 	.sysctl_mem_pcpu_rsv = SK_MEMORY_PCPU_RESERVE
- };
- EXPORT_SYMBOL(net_hotdata);
--- 
-2.51.2.1041.gc1ab5b90ca-goog
-
+pw-bot: cr
 
