@@ -1,227 +1,157 @@
-Return-Path: <netdev+bounces-236161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6A35C38EF6
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 04:01:17 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 217EAC390EA
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 05:08:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 593A61A227AE
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 03:01:42 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7991B4EF5DF
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 04:08:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBEC21EA84;
-	Thu,  6 Nov 2025 03:01:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4898D1FC8;
+	Thu,  6 Nov 2025 04:08:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="G4MZBgd6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zp3KM2kt";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="KMzsAObW"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C208149C6F
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 03:01:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEDFB18EAB
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 04:08:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762398073; cv=none; b=tAwGygf3o1TjWO5tvhMimHQ2ng3z2ld8bSXfwV8PhTfRxMnIXNzkc3OJpZ5ImI02N4aknCieEq2N3DgkePsOLF/S6hyCdjXNXHrbPdJvFk7HSXa8nsA33E4uDXweohE6su14upJ16W0exxOk7Gn8J5gBNbEnRJHMoyQfnFlNtdU=
+	t=1762402094; cv=none; b=MOvJbWHlculhfjIP++O4A1WgM8s6bEBtrdGOIhbk62PpKzMNskJ2m4NJG4wdqOOY/H6i0JvzR1qMB+71eZMs/kRPdvDFQDPENX7lOZIOvx23wHFb/DCwsW0ftP0MGEChXY7Ikhn+5bmCcfT2/naDwL8oCzogMdw7hBoew+62ba8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762398073; c=relaxed/simple;
-	bh=Ar8t7AM7dt01VgA6369kRtmJu6RPlazED4nqbFfwfLo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Xw2YOwczFDs2U0urGOQoagNbpR0WV+lGBNBJAcc6yqxva3XteFh6VAyMnBuuRVdPgf9YRSoVjU/Px04oQ0BQYOEZKLsD3JjPinqGF6sB6ZIYmWCtktZ82XaloJXJiilTFhPZKDdwm2hezAMAlZdEhUlXOeoe4hUp69vZDfTJDD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=G4MZBgd6; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1762398069;
+	s=arc-20240116; t=1762402094; c=relaxed/simple;
+	bh=/clFG5PxzG9CFjAwwukXLsQUq87vBTuWgGXa+2pm7nA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Zh5pLIIuLZIYLtPsUz6QQwW03TS4fD3msb0nEO8/XBa74VEMY9okjyihO14D1r0ArkmdXErcB6+BrzBlSwx2HT36uaNJl9B+Z9F6N5f3A2HWKPb1qXt+3x/8uzo8KN1TP7JyyISXjsLcz7Yb8EsjXwimuhC4XYCy846gGZ4xvPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Zp3KM2kt; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=KMzsAObW; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762402091;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=JpkLmNEYC6E/tP/leGwnP6EjvE6U47KxTKs7Ft7K77g=;
-	b=G4MZBgd6DYLPubGKnIQd7l9UtQlH3uR9Pwv95AIkg39rSnDq0Jzk23FVgoddtTQvqqJe56
-	64pYv1GPsdMIkDG3adcxm/KRjviwQjVjLTTuIu5oqq8Vf8ULjpKO+GIjLN/HaUQMeoIqhh
-	g/2rh1Lap8r4aJJ9AHHIF4MVV/zHrl8=
-From: Menglong Dong <menglong.dong@linux.dev>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Peter Zijlstra <peterz@infradead.org>,
- Menglong Dong <menglong8.dong@gmail.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
- Eduard <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- David Ahern <dsahern@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>,
- "H. Peter Anvin" <hpa@zytor.com>, jiang.biao@linux.dev,
- bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH bpf-next] bpf,x86: do RSB balance for trampoline
-Date: Thu, 06 Nov 2025 11:00:53 +0800
-Message-ID: <2243066.irdbgypaU6@7950hx>
-In-Reply-To:
- <CAADnVQ+tUO_BJV8w1aPLiY50p7F+uk0GCWFgH0k5zLQBqAif1g@mail.gmail.com>
-References:
- <20251104104913.689439-1-dongml2@chinatelecom.cn> <2388519.ElGaqSPkdT@7950hx>
- <CAADnVQ+tUO_BJV8w1aPLiY50p7F+uk0GCWFgH0k5zLQBqAif1g@mail.gmail.com>
+	bh=4ErEHllqGXQa1rX1HuSUsA/o+LeE0c0+S+I56A0yD3w=;
+	b=Zp3KM2ktUbUJ3hKNTqu256D4N8G2OO4JpcNKiOGQN9xqL/on2fWCj5cl3CksnGkcZgzpLE
+	rWpj71Xmjusur9nOT9VaOk8oe4j94XCb5jtIb/t5pjLU601h77nQB67aXk6SBKNqlmWiag
+	SiUia33ZrxvBHJSYVnLkecHygMw68uY=
+Received: from mail-vs1-f72.google.com (mail-vs1-f72.google.com
+ [209.85.217.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-9-XlyjL-M8PIO42sqRAsxKeg-1; Wed, 05 Nov 2025 23:08:10 -0500
+X-MC-Unique: XlyjL-M8PIO42sqRAsxKeg-1
+X-Mimecast-MFC-AGG-ID: XlyjL-M8PIO42sqRAsxKeg_1762402089
+Received: by mail-vs1-f72.google.com with SMTP id ada2fe7eead31-5dd89f3557bso272704137.2
+        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 20:08:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1762402089; x=1763006889; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4ErEHllqGXQa1rX1HuSUsA/o+LeE0c0+S+I56A0yD3w=;
+        b=KMzsAObWQud9G/XsYwNv47KrnUbUPlLJMo1nHm+NI+f+cLImuclMnL5ZLGSqyckc9A
+         8XKbZWz1gKgiyuS16XDibbwpAD5GLZhyUIS9P1VQtVNocx8uIYv+AE2ed8wIJZCmGkLI
+         p2zRb2KihZYpJtS2jByiYNuBuS/ZzYCKeMcyPzlIYwe8aMlATKa5UKrs+rC5wEhJx401
+         gQSiZZN3gBKMvLmnj/5Z44AoJAURPkvdsp5ebJk8nfE/DXFRfdn4GQFidLSJRXXR+Ko/
+         lNOBzq6604bbfj6XdfQs/C4Ki0q7V/SYms/+FnJyOr5K8ESz8I/XNYY90jftjyrhA35A
+         Q3qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762402089; x=1763006889;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4ErEHllqGXQa1rX1HuSUsA/o+LeE0c0+S+I56A0yD3w=;
+        b=AR5BvNmL2RAMxVOErSKMM+cyJNJpPxfhiXZs+94Iow3D8LGhtIv6S8uH6Ihk7+HIRB
+         Ce7elWbNF0zXOwWyZYenKr5rkZk2NCX2NMAuvEVjLd2M9jpJHPxDTgAHYAjKwFjMrK0X
+         9TtXyAQLCRPiekvbQ+TVEt6PZiOGQaOr0zGUjJR9nKJzZ2g7BB7SrCrPndW6ZEyT4qSU
+         vMWIjYUFWJuHuMRvUIdGJ/spXIDbuPzrbhbiBy9uJqrUYd4tdp2cQo+KmVrzHgmFuTp8
+         d7rd5NKme2j6OmqZvJ1Jtz+7ZgK320DodRZnPCSVQzSPQcWFP2lpAwgwbN+/qGZns8rn
+         D+LQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXwYwTYI7cQw2DOwFgbxPNM1qXTXesFQwGaXRpZvh98VCQFiVNFIXMtRQs/1L2lnx3sJZtUMYQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YztXk5RlzOMNF/E5+2o+u/LSoAOs6PWD/EZcVh0tKOKQsKVA/pa
+	Tgn/5XpZpGL+uqQGYvEZh+qFk2QcxbKg9/yrf3KM5B9zxGPsdWWrnvSl6Hjv7oAbEunjS3rrtlo
+	aa2xRV9drLgwYodJdPLnkIcl/v3svDt3JpUx0Gwe0j+blQcAp6n3J+uZpxYtM2LLyj/XBDyPQm6
+	xaFKOPC0c9BpwLS4RxpzUZe9tEHOv0M/Ag
+X-Gm-Gg: ASbGncvuT5JmsQdb9cqsCSRgM6XvdKchbtUM50j6SWA6epY4BIy1U66E8jwiGYihBJ+
+	p7C89zdiJtAWi01Jg8w4xOD/sNIYXa0VPpm+Vjj8Fn5u6C5223lkCNHmASCjuzDgsO2/4EpCR2V
+	TnKaxIY95FcSbro1OxV9YcZP564pMkh/R0Ka5Wx6fvctfA3H2sEJ5ihPJY
+X-Received: by 2002:a05:6102:2ac2:b0:5db:ca19:f02f with SMTP id ada2fe7eead31-5dd88ef0787mr2077863137.9.1762402089471;
+        Wed, 05 Nov 2025 20:08:09 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGsGQZaJVQOEVAkyZ4GeLriyj8SNnSrORtKtMKUrl76u33NNLwRG6BIbywMULZtgOZQKt+9Amf1gB0m2UWnG7g=
+X-Received: by 2002:a05:6102:2ac2:b0:5db:ca19:f02f with SMTP id
+ ada2fe7eead31-5dd88ef0787mr2077859137.9.1762402089047; Wed, 05 Nov 2025
+ 20:08:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20251105080151.1115698-1-lulu@redhat.com>
+In-Reply-To: <20251105080151.1115698-1-lulu@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 6 Nov 2025 12:07:55 +0800
+X-Gm-Features: AWmQ_blkjcF91oRQFm8CV6EBB0pbTNMJW4V9b4A10CbddPExXzNM8-bAP5bZeBQ
+Message-ID: <CACGkMEvriYoN2XZLmB0KcJmH4hVT3iYj3QV_ypfgHSQNwv296w@mail.gmail.com>
+Subject: Re: [PATCH 1/2] vdpa/mlx5: update mlx_features with driver state check
+To: Cindy Lu <lulu@redhat.com>
+Cc: dtatulea@nvidia.com, mst@redhat.com, netdev@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-Migadu-Flow: FLOW_OUT
 
-On 2025/11/6 10:56, Alexei Starovoitov wrote:
-> On Wed, Nov 5, 2025 at 6:49=E2=80=AFPM Menglong Dong <menglong.dong@linux=
-=2Edev> wrote:
-> >
-> > On 2025/11/6 09:40, Menglong Dong wrote:
-> > > On 2025/11/6 07:31, Alexei Starovoitov wrote:
-> > > > On Tue, Nov 4, 2025 at 11:47=E2=80=AFPM Menglong Dong <menglong.don=
-g@linux.dev> wrote:
-> > > > >
-> > > > > On 2025/11/5 15:13, Menglong Dong wrote:
-> > > > > > On 2025/11/5 10:12, Alexei Starovoitov wrote:
-> > > > > > > On Tue, Nov 4, 2025 at 5:30=E2=80=AFPM Menglong Dong <menglon=
-g.dong@linux.dev> wrote:
-> > > > > > > >
-> > > > > > > > On 2025/11/5 02:56, Alexei Starovoitov wrote:
-> > > > > > > > > On Tue, Nov 4, 2025 at 2:49=E2=80=AFAM Menglong Dong <men=
-glong8.dong@gmail.com> wrote:
-> > > > > > > > > >
-> > > > > > > > > > In origin call case, we skip the "rip" directly before =
-we return, which
-> > > > > > > > > > break the RSB, as we have twice "call", but only once "=
-ret".
-> > > > > > > > >
-> > > > > > > > > RSB meaning return stack buffer?
-> > > > > > > > >
-> > > > > > > > > and by "breaks RSB" you mean it makes the cpu less effici=
-ent?
-> > > > > > > >
-> > > > > > > > Yeah, I mean it makes the cpu less efficient. The RSB is us=
-ed
-> > > > > > > > for the branch predicting, and it will push the "rip" to it=
-s hardware
-> > > > > > > > stack on "call", and pop it from the stack on "ret". In the=
- origin
-> > > > > > > > call case, there are twice "call" but once "ret", will brea=
-k its
-> > > > > > > > balance.
-> > > > > > >
-> > > > > > > Yes. I'm aware, but your "mov [rbp + 8], rax" screws it up as=
- well,
-> > > > > > > since RSB has to be updated/invalidated by this store.
-> > > > > > > The behavior depends on the microarchitecture, of course.
-> > > > > > > I think:
-> > > > > > > add rsp, 8
-> > > > > > > ret
-> > > > > > > will only screw up the return prediction, but won't invalidat=
-e RSB.
-> > > > > > >
-> > > > > > > > Similar things happen in "return_to_handler" in ftrace_64.S,
-> > > > > > > > which has once "call", but twice "ret". And it pretend a "c=
-all"
-> > > > > > > > to make it balance.
-> > > > > > >
-> > > > > > > This makes more sense to me. Let's try that approach instead
-> > > > > > > of messing with the return address on stack?
-> > > > > >
-> > > > > > The way here is similar to the "return_to_handler". For the ftr=
-ace,
-> > > > > > the origin stack before the "ret" of the traced function is:
-> > > > > >
-> > > > > >     POS:
-> > > > > >     rip   ---> return_to_handler
-> > > > > >
-> > > > > > And the exit of the traced function will jump to return_to_hand=
-ler.
-> > > > > > In return_to_handler, it will query the real "rip" of the trace=
-d function
-> > > > > > and the it call a internal function:
-> > > > > >
-> > > > > >     call .Ldo_rop
-> > > > > >
-> > > > > > And the stack now is:
-> > > > > >
-> > > > > >     POS:
-> > > > > >     rip   ----> the address after "call .Ldo_rop", which is a "=
-int3"
-> > > > > >
-> > > > > > in the .Ldo_rop, it will modify the rip to the real rip to make
-> > > > > > it like this:
-> > > > > >
-> > > > > >     POS:
-> > > > > >     rip   ---> real rip
-> > > > > >
-> > > > > > And it return. Take the target function "foo" for example, the =
-logic
-> > > > > > of it is:
-> > > > > >
-> > > > > >     call foo -> call ftrace_caller -> return ftrace_caller ->
-> > > > > >     return return_to_handler -> call Ldo_rop -> return foo
-> > > > > >
-> > > > > > As you can see, the call and return address for ".Ldo_rop" is
-> > > > > > also messed up. So I think it works here too. Compared with
-> > > > > > a messed "return address", a missed return maybe have
-> > > > > > better influence?
-> > > > > >
-> > > > > > And the whole logic for us is:
-> > > > > >
-> > > > > >     call foo -> call trampoline -> call origin ->
-> > > > > >     return origin -> return POS -> return foo
-> > > > >
-> > > > > The "return POS" will miss the RSB, but the later return
-> > > > > will hit it.
-> > > > >
-> > > > > The origin logic is:
-> > > > >
-> > > > >      call foo -> call trampoline -> call origin ->
-> > > > >      return origin -> return foo
-> > > > >
-> > > > > The "return foo" and all the later return will miss the RBS.
-> > > > >
-> > > > > Hmm......Not sure if I understand it correctly.
-> > > >
-> > > > Here another idea...
-> > > > hack tr->func.ftrace_managed =3D false temporarily
-> > > > and use BPF_MOD_JUMP in bpf_arch_text_poke()
-> > > > when installing trampoline with fexit progs.
-> > > > and also do:
-> > > > @@ -3437,10 +3437,6 @@ static int __arch_prepare_bpf_trampoline(str=
-uct
-> > > > bpf_tramp_image *im, void *rw_im
-> > > >
-> > > >         emit_ldx(&prog, BPF_DW, BPF_REG_6, BPF_REG_FP, -rbx_off);
-> > > >         EMIT1(0xC9); /* leave */
-> > > > -       if (flags & BPF_TRAMP_F_SKIP_FRAME) {
-> > > > -               /* skip our return address and return to parent */
-> > > > -               EMIT4(0x48, 0x83, 0xC4, 8); /* add rsp, 8 */
-> > > > -       }
-> > > >         emit_return(&prog, image + (prog - (u8 *)rw_image));
-> > > >
-> > > > Then RSB is perfectly matched without messing up the stack
-> > > > and/or extra calls.
-> > > > If it works and performance is good the next step is to
-> > > > teach ftrace to emit jmp or call in *_ftrace_direct()
-> >
-> > After the modification, the performance of fexit increase from
-> > 76M/s to 137M/s, awesome!
->=20
-> Nice! much better than double 'ret' :)
-> _ftrace_direct() next?
+On Wed, Nov 5, 2025 at 4:02=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
+>
+> Add logic in mlx5_vdpa_set_attr() to ensure the VIRTIO_NET_F_MAC
+> feature bit is properly set only when the device is not yet in
+> the DRIVER_OK (running) state.
+>
+> This makes the MAC address visible in the output of:
+>
+>  vdpa dev config show -jp
+>
+> when the device is created without an initial MAC address.
+>
+> Signed-off-by: Cindy Lu <lulu@redhat.com>
+> ---
+>  drivers/vdpa/mlx5/net/mlx5_vnet.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/ml=
+x5_vnet.c
+> index 82034efb74fc..e38aa3a335fc 100644
+> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> @@ -4057,6 +4057,12 @@ static int mlx5_vdpa_set_attr(struct vdpa_mgmt_dev=
+ *v_mdev, struct vdpa_device *
+>         ndev =3D to_mlx5_vdpa_ndev(mvdev);
+>         mdev =3D mvdev->mdev;
+>         config =3D &ndev->config;
+> +       if (!(ndev->mvdev.status & VIRTIO_CONFIG_S_DRIVER_OK)) {
+> +               ndev->mvdev.mlx_features |=3D BIT_ULL(VIRTIO_NET_F_MAC);
+> +       } else {
+> +               mlx5_vdpa_warn(mvdev, "device running, skip updating MAC\=
+n");
+> +               return err;
+> +       }
 
-Yeah, I'll do these stuff with _ftrace_direct().
+I don't get the logic here, mgmt risk themselve for such races or what
+would happen if we don't do this?
 
->=20
+Thanks
 
-
-
+>
+>         down_write(&ndev->reslock);
+>         if (add_config->mask & (1 << VDPA_ATTR_DEV_NET_CFG_MACADDR)) {
+> --
+> 2.45.0
+>
 
 
