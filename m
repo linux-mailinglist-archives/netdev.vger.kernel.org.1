@@ -1,137 +1,175 @@
-Return-Path: <netdev+bounces-236478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2D56C3CD44
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 18:28:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DAF4C3CD6B
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 18:29:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8B624268E5
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 17:22:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1EB0062381C
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 17:23:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EE9834EEEA;
-	Thu,  6 Nov 2025 17:22:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D192A34F265;
+	Thu,  6 Nov 2025 17:23:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ecr6jJ0W"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hy85GsKu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0053134EEFA
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 17:22:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE7C6246327
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 17:23:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762449736; cv=none; b=ghTzB87IQA615zMUb6/pLIVC5VBEemsKmxtoeYfz2seeT8kHrrN+E++PH8jTQvT61PES6HwoRd570hyy1ThK0n5itSuqC0yQL8kPDYtyxQiiavw9YmAGet6OnRn9tjn0+cMO0B0zj6U3YplFAi5gu9TnNun0o8Msyy1OgMKWaFE=
+	t=1762449794; cv=none; b=JI+XEIubi/OMCMDxbYnayEV7ZBwilEjO4Yo9qslPkbwzSq9m1hsEsil6q2rIeb5mkx6CMw3cokcvxEVEvfib3KGrrokgg5QYlWIR5OgEIjR/hh00JYVwb8mmQ1PzqokFYMfAKKI2HE2qDMJyDp7+t/QlfqUM52nFNKg2LsAOegw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762449736; c=relaxed/simple;
-	bh=NH2hfHppCjrZFVx6eqpdpt03wHQYT9rQOCs3FER3WSU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bSckT8EAk0kxBYAz/8WvO1lkLJA+AYtKY6wwPpZ/6Pxs5aM3DL3s4GFJ54BDs6lUKUtnprR/oA0eh6IoNuZI7SPVJRz5fpZWE/Octp9/b53/dpYhO3sE1y4rsylNkhCxM29f7Rg00GEAh7z15qMdSJA/A+aShM6a5n28w0vMwZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ecr6jJ0W; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-781ea2cee3fso1215921b3a.0
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 09:22:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762449734; x=1763054534; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ROsaoNagz4I7/dBZaDxwLj1TocAA02sCxxRugnpAtAU=;
-        b=Ecr6jJ0W8ehZnjxendHBhQJfsVHKkFWKenIdwRgdz9sZSpKHp3m4xt0oaBey0du3GV
-         o3m0440tVDT6tSEIlss0vsm95n9+DZ/bFOBMU1uQmmdEJ6ud9FXTifvYHplJ2lZfCDix
-         BpxPGuWBKtCbAqZUoLJxHlucKwcl0zZf5naYzWEJ1adFu+NcJz3qUVTuOzZYamAGtbuX
-         ANAdJKUloY/hwG4cwvlmVj53JopAth0/1Zp6/yUSnUlOcZ0D3gknYSVUl1HewPYiMxsl
-         0A9hA/lCe0+6S0sAgVZ+G4PgelRxvADX+Lm0tX939d1gHdwfsWwMXjga3xVO5sHeapi0
-         y9Tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762449734; x=1763054534;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ROsaoNagz4I7/dBZaDxwLj1TocAA02sCxxRugnpAtAU=;
-        b=u4knL0BK7Xq4MrrtW9pKTo2pwWTd8x3huS8QTrfGOCZxLgXhmcMEx+KN1hoqvdDAO9
-         MSR0m3OI3vykORgb13Qal8ea13SN6JnkT1eg3mXMrf8nBFlRxNCcyACr3BS3KtQUcPPD
-         7Gi+UL70K90akkFzmcAuF/KTqUT4F9WmKc+Eiotk5qAP6EB+dktZqric4wK+FK74xM9W
-         PwGAqkrHe5hPPqcpIMJOggVHgGZbE8S52+by8TT8dKzxc0Jgz0uEsJ0WH5eUwl6LQ1jd
-         jkIDMFRc09teCZtw9WcEwQIiCCZHCc5lV6PFS9v6hy84xwTW+MU+ww5jDHrDHvAn+yV6
-         UpLg==
-X-Gm-Message-State: AOJu0Yzf5O1qaplwaaubDJ8Ij6XAx5X6QbjjoboH1YKMs88LlI8jnj18
-	HdqdQd9M2J+aExtpIEBRTWZcfZmfZUDocJUPRVcVnk9eD//oJXvtGpOsu7aDMLSCS1o/kM6LaZP
-	CKRyN9W3jdUTlINTdpRwmf+mHdvojw5Y=
-X-Gm-Gg: ASbGncuEbZBvlDrP6AGoxgxE+leWj48AgHhNFrTVBNuCVxHWZG66tGFh5aoWXYa/9Nz
-	aT8454rMtEefcRn1K0PwiNri6SLMxWzvej9eEq7z/RJc7Pesvrimyxgjk4ZXmZIeeDBmaOEE662
-	j0yTer5JulfJGyp++w+ZRCiBnrkSQRHp7XsyqqyEUMx0oFormjk7TftZ9xfc2RgXjJHC3Z/+Tlr
-	JAX4AE7WKrYtp9/60SAxX+Jlq9GqP9m7I5HCwxuLlLflIID6dgD/efeg/zvDt+Gbksv0z+nxthC
-	BYAhfRmqHa70qw22PxM=
-X-Google-Smtp-Source: AGHT+IGhY0NYTXXkTu0P4tB4nC9X5IQVYEkg7KbXM/lxcc2ajgsNtrlqaMsuOSOOG/NPcl8ekPlhnRj1iJwQaZFqVyY=
-X-Received: by 2002:a17:90b:2b44:b0:340:6f9c:b25b with SMTP id
- 98e67ed59e1d1-341a6c4d3f4mr11082353a91.11.1762449734034; Thu, 06 Nov 2025
- 09:22:14 -0800 (PST)
+	s=arc-20240116; t=1762449794; c=relaxed/simple;
+	bh=RpA4CYjdxqrS8CyxWrH8ayWrFSEs59iSDbxr7qWQJl8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TsVF7oVbqRWRhKBXFKjlbJy+YNTBULWzhrCYJI/t35XQ+ZTyXryGlZXw1y7aBKNQUsAEhLSp0qb5yjR/c+P/Jr+HjiGdBZ7tsWE8KefXwm6kvOAkeEZGKrSD8M/E7Ba4cRui/kmt1PhU/YTnH3kWovqTuo2jVw6yCZc1B0MgImY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hy85GsKu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98F8AC4CEF7;
+	Thu,  6 Nov 2025 17:23:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762449793;
+	bh=RpA4CYjdxqrS8CyxWrH8ayWrFSEs59iSDbxr7qWQJl8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Hy85GsKuC/xxzL3BgesxJos6PjSC9nhY9Ubsi/mrCurst2igc6+yxKMSMpW8ZrlIR
+	 jjI4xwmLxoisV4zNukOJLtZrXwGjx7IVAqeYih03iQk4wLWeNceYgVTWT2tHEj9m8X
+	 Zpf4iusQSjLfSlhjQF2aMg2YZ+kepYAjYe/G6CZXPHaouE3fIy7OkYa5e7s00gtqA1
+	 N4O83w+u2+HHJGrhr51CuchOPIDHzG4mAq1Y8VVNdBDFA/j/iW4vO6yUkxyJ9tIpTH
+	 QXrSQSRwb4afJilKqGUQ8kDFv9wJMO4/eYaQLaYA9DyS7Mpv/R9PgeeJdWGIYx8g9k
+	 KD2LQO9hI321g==
+Date: Thu, 6 Nov 2025 17:23:09 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-next v2 2/9] ice: use cacheline groups for
+ ice_rx_ring structure
+Message-ID: <aQzZfXz9qBjr5vtB@horms.kernel.org>
+References: <20251105-jk-refactor-queue-stats-v2-0-8652557f9572@intel.com>
+ <20251105-jk-refactor-queue-stats-v2-2-8652557f9572@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1761748557.git.lucien.xin@gmail.com> <56e8d1efe9c7d5db33b0c425bc4c1276a251923d.1761748557.git.lucien.xin@gmail.com>
- <989d3df8-52cf-41db-bb4c-44950a34ce89@redhat.com>
-In-Reply-To: <989d3df8-52cf-41db-bb4c-44950a34ce89@redhat.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 6 Nov 2025 12:22:02 -0500
-X-Gm-Features: AWmQ_blXBOK6Lm7J_4Le7zJYv7Rj5XNuyVIMzzqJ7AFvKAnEANk67rWLYRhV00Y
-Message-ID: <CADvbK_eGPuueR7XL80eagkrAeJraKBMiTVrhiFb_wnTD+N7qVw@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 14/15] quic: add frame encoder and decoder base
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
-	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
-	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
-	Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
-	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
-	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, 
-	David Howells <dhowells@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, 
-	John Ericson <mail@johnericson.me>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
-	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251105-jk-refactor-queue-stats-v2-2-8652557f9572@intel.com>
 
-On Tue, Nov 4, 2025 at 7:47=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
->
-> On 10/29/25 3:35 PM, Xin Long wrote:
-> > +static void quic_frame_free(struct quic_frame *frame)
-> > +{
-> > +     struct quic_frame_frag *frag, *next;
-> > +
-> > +     if (!frame->type && frame->skb) { /* RX path frame with skb. */
->
-> Are RX path frame with !skb expected/possible? such frames will be
-> 'misinterpreted' as TX ones, specifically will do `kfree(frame->data)`
-> which in turn could be a bad thing.
->
-Yes, when generating and delivering an event to userspace, it
-keeps the frame content into frame->data, instead of frame->skb.
+On Wed, Nov 05, 2025 at 01:06:34PM -0800, Jacob Keller wrote:
+> The ice ring structure was reorganized back by commit 65124bbf980c ("ice:
+> Reorganize tx_buf and ring structs"), and later split into a separate
+> ice_rx_ring structure by commit e72bba21355d ("ice: split ice_ring onto
+> Tx/Rx separate structs")
+> 
+> The ice_rx_ring structure has comments left over from this prior
+> reorganization indicating which fields belong to which cachelines.
+> Unfortunately, these comments are not all accurate. The intended layout is
+> for x86_64 systems with a 64-byte cache.
+> 
+>  * Cacheline 1 spans from the start of the struct to the end of the rx_fqes
+>    and xdp_buf union. The comments correctly match this.
+> 
+>  * Cacheline 2 spans from hdr_fqes to the end of hdr_truesize, but the
+>    comment indicates it should end xdp and xsk union.
+> 
+>  * Cacheline 3 spans from the truesize field to the xsk_pool, but the
+>    comment wants this to be from the pkt_ctx down to the rcu head field.
+> 
+>  * Cacheline 4 spans from the rx_hdr_len down to the flags field, but the
+>    comment indicates that it starts back at the ice_channel structure
+>    pointer.
+> 
+>  * Cacheline 5 is indicated to cover the xdp_rxq. Because this field is
+>    aligned to 64 bytes, this is actually true. However, there is a large 45
+>    byte gap at the end of cacheline 4.
+> 
+> The use of comments to indicate cachelines is poor design. In practice,
+> comments like this quickly become outdated as developers add or remove
+> fields, or as other sub-structures change layout and size unexpectedly.
+> 
+> The ice_rx_ring structure *is* 5 cachelines (320 bytes), but ends up having
+> quite a lot of empty space at the end just before xdp_rxq.
+> 
+> Replace the comments with __cacheline_group_(begin|end)_aligned()
+> annotations. These macros enforce alignment to the start of cachelines, and
+> enforce padding between groups, thus guaranteeing that a following group
+> cannot be part of the same cacheline.
+> 
+> Doing this changes the layout by effectively spreading the padding at the
+> tail of cacheline 4 between groups to ensure that the relevant fields are
+> kept as separate cachelines on x86_64 systems. For systems with the
+> expected cache line size of 64 bytes, the structure size does not change.
+> For systems with a larger SMB_CACHE_BYTES size, the structure *will*
+> increase in size a fair bit, however we'll now guarantee that each group is
+> in a separate cacheline. This has an advantage that updates to fields in
+> one group won't trigger cacheline eviction of the other groups. This comes
+> at the expense of extra memory footprint for the rings.
+> 
+> If fields get re-arranged, added, or removed, the alignment and padding
+> ensure the relevant fields are kept on separate cache lines. This could
+> result in unexpected changes in the structure size due to padding to keep
+> cachelines separate.
+> 
+> To catch such changes during early development, add build time compiler
+> assertions that check the size of each group to ensure it doesn't exceed 64
+> bytes, the expected cache line size. The assertion checks that the size of
+> the group excluding any padding at the end is less than the provided size
+> of 64 bytes. This type of check will behave the same even on architectures
+> with larger cache sizes. The primary aim is to produce a warning if
+> developers add fields into a cacheline group which exceeds the size of the
+> expected 64 byte groupings.
+> 
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_txrx.h | 26 +++++++++++++++++++++-----
+>  drivers/net/ethernet/intel/ice/ice_main.c |  2 ++
+>  2 files changed, 23 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.h b/drivers/net/ethernet/intel/ice/ice_txrx.h
 
-There's no need check !frame->type for RX path,  and I will change it to:
+...
 
-        if (frame->skb) { /* For stream/crypto/dgram frames on RX. */
-                kfree_skb(frame->skb);
-                goto out;
-        }
+> @@ -298,10 +302,22 @@ struct ice_rx_ring {
+>  #define ICE_RX_FLAGS_MULTIDEV		BIT(3)
+>  #define ICE_RX_FLAGS_RING_GCS		BIT(4)
+>  	u8 flags;
+> -	/* CL5 - 5th cacheline starts here */
+> +	__cacheline_group_end_aligned(cl4);
+> +
+> +	__cacheline_group_begin_aligned(cl5);
+>  	struct xdp_rxq_info xdp_rxq;
+> +	__cacheline_group_end_aligned(cl5);
+>  } ____cacheline_internodealigned_in_smp;
+>  
+> +static inline void ice_rx_ring_struct_check(void)
+> +{
+> +	CACHELINE_ASSERT_GROUP_SIZE(struct ice_rx_ring, cl1, 64);
+> +	CACHELINE_ASSERT_GROUP_SIZE(struct ice_rx_ring, cl2, 64);
+> +	CACHELINE_ASSERT_GROUP_SIZE(struct ice_rx_ring, cl3, 64);
+> +	CACHELINE_ASSERT_GROUP_SIZE(struct ice_rx_ring, cl4, 64);
+> +	CACHELINE_ASSERT_GROUP_SIZE(struct ice_rx_ring, cl5, 64);
 
-if skb is set, it will go kfree_skb(frame->skb), instead of kfree(frame->da=
-ta).
-Because if frame->skb is set, it only needs to do kfree_skb(frame->skb).
+Hi Jacob,
 
-Thanks.
-> Possibly add a WARN on such scenario?
->
-> /P
->
+Unfortunately the last line results in a build failure on ARM (32-bit)
+with allmodconfig. It seems that in that case the size of the group is
+128 bytes.
+
+> +}
+> +
+>  struct ice_tx_ring {
+>  	/* CL1 - 1st cacheline starts here */
+>  	struct ice_tx_ring *next;	/* pointer to next ring in q_vector */
+
+...
 
