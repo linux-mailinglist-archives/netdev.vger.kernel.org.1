@@ -1,152 +1,79 @@
-Return-Path: <netdev+bounces-236471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CB48C3CB78
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 18:08:41 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB841C3CC66
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 18:18:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 271E3188DCAA
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 17:08:19 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5886C4F06C1
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 17:14:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E14B430EF96;
-	Thu,  6 Nov 2025 17:07:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8221A3431E6;
+	Thu,  6 Nov 2025 17:14:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="xCljxPQP";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="jusofg/7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c84W3GkV"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a3-smtp.messagingengine.com (fout-a3-smtp.messagingengine.com [103.168.172.146])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F271D18E1F;
-	Thu,  6 Nov 2025 17:07:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.146
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C6442E7F22;
+	Thu,  6 Nov 2025 17:14:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762448869; cv=none; b=JDGH2sXXVbQNhuIiB16cpV0vJWnIrfTob49F/X5fGAh85yUVy66aljPBeAbD/jXEMZyv6DBXSk8AHOtN2MHPluNlNRuy7ISX085spwJwXnlAbZZd1ezza6J/lo8ZH+k6P60nXgVj2RHthZ5x3/Q0+GCEMFrwfgfcCWgmQNme/MQ=
+	t=1762449256; cv=none; b=WNkd83OScKNQc7N3M67wxhXrFLW1jTMXxCAiKvBLfoWxh1TVQZ5R4Vp6RAuPeUMoKLWnrJefT8GjkCV3w6aKYYsz88LoAyvN0GqMy2aaso+NAEtlY06V//5gV8ZjK+nUU0by7GWnfn0SprMoJWlTlHIW1EHtJibxZZddlgWyuJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762448869; c=relaxed/simple;
-	bh=h1058CZvmcEAuS48xVbeNUx2rGhH6qDGWSw72hhAycE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JDklGOmDTV5sAbigTSJnYwSxUVbaU/6OMzPkzC7BI8rJZ9w2D20n0FlaL5ZR0C4bzcr1eHVgcmPfUVATHHdlN50KAR/uspVpbAKkI6xqBqkxrVj3k6dUg8NcgZQqVFnL+m07d4GwoUUz15Tqi06ao7PFp4mfl2LcqdbmSpaJqy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=xCljxPQP; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=jusofg/7; arc=none smtp.client-ip=103.168.172.146
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-04.internal (phl-compute-04.internal [10.202.2.44])
-	by mailfout.phl.internal (Postfix) with ESMTP id E337FEC00D3;
-	Thu,  6 Nov 2025 12:07:44 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Thu, 06 Nov 2025 12:07:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1762448864; x=
-	1762535264; bh=yl1ymtp/RyH/pP2ToBzXQ5l7JFAI5bU3TI9lUfWo91A=; b=x
-	CljxPQPmtP8HCoH/NjGaVIVMNq40uKF5CnEUWR+EitSz1d+B4/g3S8zhJfQHIWA+
-	6iU0o5ZXunwfy/84RLbKUUrsEcLujEgPZM5iZHleB74I3wOE/8LEtOvUFL+4DQHo
-	jmz4VNAORiGA71vxMZHOKQwwxSvJGqxf3Xi/9qI1U9xUpsTJUzOa8SxM5Bdl4cLe
-	k0QEvxu5dPVgk1ZvBmdjdzgIcHimaVDh8w9A0VFdIieYc76utpm2AFpNbGQoALTH
-	3XU4IVf2AdussfRLgsYAtGDggvr6Bpa/H7ykYydHdRn3+8F9/u17wlMuyCy+07wM
-	vIP014n42f9TIRKdQXXTA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1762448864; x=1762535264; bh=yl1ymtp/RyH/pP2ToBzXQ5l7JFAI5bU3TI9
-	lUfWo91A=; b=jusofg/7lKzEacMBsWUoUMmQPTeySJsx67J4JKfF3P9cCvt3C9N
-	9oELAS2tuc5FtWQ1hf2VseMKNEJOfMOBFDkN5YkhF7jIEVZiib0JB8F5cd/vbRLQ
-	MtR6dqC4DMA5gSd4bXey5rj0TaBbqpnbQLkDhStMcb2Z9idMUETKy0Npgi/tr5qt
-	GPuN5DiNxxrCMKIokfYVE+WTKyYVZeO4YmwDrUzqsVKi8Bls4dZ33bN7xUjzrssw
-	6T30dVCp7NCOE2KaDkJ4Z+rLfOPJCUHr4HfphD/emZNYr1TTJc3fZCj/iOGiMbKA
-	kwT5mNVVmgoNpAr7OiItosxw3Cflx+OrbNA==
-X-ME-Sender: <xms:3tUMaa31a3QL0xjs96vK7V1WrPyMK_4OzESfcBZfConYhKkrv1nAxQ>
-    <xme:3tUMadh710VVUnPPGcuhFHlDYJLCy-XpqayVRm0AL-jkoxLJq7ccNjRZNbshOJuyV
-    Kl3fy61_4Mjn_ow49sCUjHO90XUpYPI6nir9iDrNMoaE4V5hWp3ng>
-X-ME-Received: <xmr:3tUMaSo7BzJccg1Ktt7ED5k6kzT1nLRNgXpX0yMK3GcyVLc28ERFukfZxE-B>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeejfeegucetufdoteggodetrf
-    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
-    rghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfhfgggtuggjsehttdertd
-    dttdejnecuhfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghs
-    hihsnhgrihhlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuieduge
-    dtfefhkeegteehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedt
-    necurfgrrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvth
-    dpnhgspghrtghpthhtohepudegpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegt
-    lhhfjedttdefkeefsehgmhgrihhlrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrh
-    hnvghlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdp
-    rhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohephh
-    gvrhgsvghrthesghhonhguohhrrdgrphgrnhgrrdhorhhgrdgruhdprhgtphhtthhopehk
-    uhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlse
-    hvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdr
-    khgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomh
-X-ME-Proxy: <xmx:3tUMaYO8hRnaUS-kr4eiWQPPvyG-yj7EuVNHrDE528RBxclT3P5ROQ>
-    <xmx:3tUMaW0AvoI92bPUXANQYHOQaDGLzSX86dVHh_P8Qmz30t02b0XWOA>
-    <xmx:3tUMaep7d_1FF6Tvm79ZI186rLqoby6DhKgH9Trpoxyjo_x31gi1Sw>
-    <xmx:3tUMaYeGPYHBPH-W5IGtGo0P17-8c3vUnX7EjDtbWCnVriaAPfGNdA>
-    <xmx:4NUMaeW3MTksGZ5dmESMcOQ3Vhc0_TAFhPABpul8o8TAnWegavp2DYuK>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 6 Nov 2025 12:07:42 -0500 (EST)
-Date: Thu, 6 Nov 2025 18:07:40 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: clingfei <clf700383@gmail.com>
-Cc: horms@kernel.org, davem@davemloft.net, edumazet@google.com,
-	herbert@gondor.apana.org.au, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, steffen.klassert@secunet.com, eadavis@qq.com,
-	ssrane_b23@ee.vjti.ac.in,
-	syzbot+be97dd4da14ae88b6ba4@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [PATCHSET IPSec 0/3] net: key: Fix address family validation and
- integer overflow in set_ipsecrequest
-Message-ID: <aQzV3KHoF4Kk6DGF@krikkit>
-References: <20251106135658.866481-1-1599101385@qq.com>
+	s=arc-20240116; t=1762449256; c=relaxed/simple;
+	bh=EqB7RdqWp9d1/ZPOg8KzZ+wKzAyj/zzi7GOHdzU1J5g=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=jI4xRvPkeMhGSrF8NGNwqMNqFgzb4LofU55lpgWIN+Fwjl8wa9x/rOLuiQoV1+HAsEDAWBUW3LhCH/eDOR8qvuZ42SYM73XzPPTq3O95972FmGuVFiQXD+ZQGH7W2YB/hpoc+uCG+BX7KH9bYq3+Uqxp4cWOyRdCko7jcqZK3fE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c84W3GkV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3313C116B1;
+	Thu,  6 Nov 2025 17:14:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762449254;
+	bh=EqB7RdqWp9d1/ZPOg8KzZ+wKzAyj/zzi7GOHdzU1J5g=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=c84W3GkVsdv1X5HNtl2JVh0RXv6i7sA1RWjgqMMFMVcRjsBHPbnQ6nTsCn+tInj3H
+	 ux8RH4tiQyfLFjTGCamQRbCuGuIFwxlJhoRHTCS0k7lfXHW8Nr3RVmu87H5sGvLepa
+	 UPmhaNFWm7Pen456kRg70U+6OqLpFo2C+Hz+U9XVzeoUyPG0agpv7BtkR/En0huL9O
+	 gHbf6AWxjwQTA6EBZy2MpaED7m76iH2AiMcDU0ka8wbZ6YuEjwjz497bRSVb3d78C6
+	 K+3qD1YRKtxsOoBD4AlEmT5IdXQIX3/7B43Gei403iSJSfx7yJDfl8GPDVnl1hMCw6
+	 vAzzIukh+WRDA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF8139EF956;
+	Thu,  6 Nov 2025 17:13:48 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v6.18-rc5
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20251106163413.4144149-1-kuba@kernel.org>
+References: <20251106163413.4144149-1-kuba@kernel.org>
+X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20251106163413.4144149-1-kuba@kernel.org>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.18-rc5
+X-PR-Tracked-Commit-Id: 3534e03e0ec2e00908765549828a69df5ebefb91
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: c2c2ccfd4ba72718266a56f3ecc34c989cb5b7a0
+Message-Id: <176244922759.295084.13837638295083326105.pr-tracker-bot@kernel.org>
+Date: Thu, 06 Nov 2025 17:13:47 +0000
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20251106135658.866481-1-1599101385@qq.com>
 
-2025-11-06, 21:56:55 +0800, clingfei wrote:
-> From: Cheng Lingfei <clf700383@gmail.com>
-> 
-> Hi,
-> 
-> This patchset addresses a security issue in the PF_KEYv2 implementation where
-> improper address family validation could lead to integer overflows and buffer
-> calculation errors in the set_ipsecrequest() function.
-> 
-> The core problem stems from two interrelated issues:
-> 
-> 1. The `family` parameter in set_ipsecrequest() is declared as u8 but receives
->    a 16-bit value, causing truncation of the upper byte.
-> 
-> 2. pfkey_sockaddr_len() returns 0 for unsupported address families, but the
->    calling code doesn't properly validate this return value before using it in
->    size calculations, leading to potential integer overflows.
-> 
-> The patchset is structured as follows:
-> 
-> Patch 1/3: Corrects the type of the family argument from u8 to u16 to prevent
->            truncation of 16-bit address family values.
-> 
-> Patch 2/3: Adds proper validation for the return value of pfkey_sockaddr_len()
->            to catch unsupported address families early.
-> 
-> Patch 3/3: Enhances the error handling to ensure zero-length allocations are
->            properly rejected and adds appropriate error returns.
-> 
-> This series fixes the original issue introduced in:
-> Fixes: 14ad6ed30a10 ("net: allow small head cache usage with large MAX_SKB_FRAGS values")
+The pull request you sent on Thu,  6 Nov 2025 08:34:13 -0800:
 
-This doesn't seem right. It looks more like a mismatch between the
-size computation done before allocating the skb and the space actually
-needed, and commit 14ad6ed30a10 made the pre-existing bug more visible.
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.18-rc5
+
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/c2c2ccfd4ba72718266a56f3ecc34c989cb5b7a0
+
+Thank you!
 
 -- 
-Sabrina
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
