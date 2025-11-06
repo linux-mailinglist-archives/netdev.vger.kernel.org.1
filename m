@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-236236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3E14C39F09
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 10:56:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10E6EC3A0DD
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 11:06:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3700D3508B2
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 09:56:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E9463B82B9
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 09:58:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0CD02773E9;
-	Thu,  6 Nov 2025 09:55:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 796012836A0;
+	Thu,  6 Nov 2025 09:58:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="d2gQPmMG"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="lhRimDfJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88DE62BCF4C
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 09:54:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8732C218845
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 09:58:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762422901; cv=none; b=L67aja05hFaOx2gpHqtkERbuIm4L1mG7+2AMHRHNYrhCo2cXdx10nrW9chEAYD9rK0pFfEEwZfICDAHInGn/YVSr2i3wu3Wk+8nHhpMrV7lhJskOCuLEFWQdVMG/z6ZWXXQK9DH4hz4LD4ja7zTKX38dzpTRLUvUqMvq0D2OKdg=
+	t=1762423084; cv=none; b=AQRFDFCmRM/DCCkN0eSJs3DmUDNaS9UMDyh3mWR6ZWbFdSU8hkPZX7uovD2ZQNHWWljpbDwoqDYDU0zjgk4X5bAzywDS43lDYVOdvTlwnIhZRrtav+BrIw8xcttkEkQpMliN6o16ZiWxIjAwNnStIfAjdJ2NpbpE1dzgxz/upTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762422901; c=relaxed/simple;
-	bh=Ccimx7/gBtZBnPjYGqJd9Ab7Gzg6z4S7dA7va5bp6Ok=;
+	s=arc-20240116; t=1762423084; c=relaxed/simple;
+	bh=oYHWyXchcTSHudXm2GEDAvWj65pnZu3m/69GO/asms8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JZ5uWJ8xZFcoDjMr2+FVsvQT5pazhyemax7LSREsrTUzF0kyt7zPP3VNX2cRMG/ZogyDnhZTvz3oQvCRFAZZQl5sBJ8ZtT+PD6TZ7LB9/Pxd5Hs+NELEqRzlqX7GE+xv+1elHCIhgHjuGU7wvpyKIA7bAlsaKuJYMjZ/V3Irm6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=d2gQPmMG; arc=none smtp.client-ip=185.246.85.4
+	 In-Reply-To:Content-Type; b=VP7+a2ANAsjmueNM3uSNJIfBMj++hVQcColwi+b923Esi40qxLkxIqsX9OE3ARnBKNvySmAGTm0Q+kmu4FU0r829zcfqfrkdQqgLtnhLheVt8FF0fd9uzARPlN7yj+7pDlqARKZlR5M347LrqB+0ey1ELGtudaKhVwQEftXY2I0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=lhRimDfJ; arc=none smtp.client-ip=185.246.84.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id ECEDC4E41565;
-	Thu,  6 Nov 2025 09:54:57 +0000 (UTC)
+	by smtpout-02.galae.net (Postfix) with ESMTPS id EC8681A18F2;
+	Thu,  6 Nov 2025 09:58:00 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id C2B846068C;
-	Thu,  6 Nov 2025 09:54:57 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 43E0F1185079C;
-	Thu,  6 Nov 2025 10:54:54 +0100 (CET)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id B9C0C6068C;
+	Thu,  6 Nov 2025 09:58:00 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 78B7B11850340;
+	Thu,  6 Nov 2025 10:57:56 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1762422897; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1762423079; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=FrcOD5sbaLQhgaJbJk2u/Y7BgfpdsyAdHw2MCmL21kg=;
-	b=d2gQPmMG3j4C5s25yEFtLxAq3qod1TH1QefQCQp9/YXG+HBpGWkqYcmn0hbqbOU9hufria
-	VhPh5hVrIFiPLJmT8hAmP4xrNK6DF4QWBC2aqX445pj7lVit9Ady3Gz/CT+4NR2LikwZ8r
-	SiExLFQ9x+oHAA2sREZH+VbQeD9iHjN0/heSv6f5njhZEoFh0u3b4lThNxR4GEprg5oHqc
-	QYJsdzbdlEomIVLXQfOa2i6s97v/rUpU/3VNfrcE55PdhWagzhZXNaYCRoWB8zhBNiFuuX
-	AuhlTuLXo0D+np0TAqpZj4s4D12mrRoRm0T15GvES7QdwguX2Y8RxJKPX6c7Rw==
-Message-ID: <69024fdf-9c3e-468d-bd9c-0af3522ef314@bootlin.com>
-Date: Thu, 6 Nov 2025 10:54:54 +0100
+	bh=aA1Nh5vuzSHJhmK4d/Q7OkqDwftB9kBY44MgWQ5fnC0=;
+	b=lhRimDfJSU530Ra+0V83y5TFQDiqg/9/f8FnAk2IKLuWRO9dy+hm+9ADz+lW3upGtpklf7
+	oc0k9xOyZw3gaBO0/RbKvc/arSMN0GsZnCYYN3Wl9ENtNXGgQvinAWn12keNsQljLWTxZA
+	Go7AkNluOrGI4GJUTvLgOLTANpGbNoA85WTb/yhazPiDlD7B5e0SKc9PNWpj48ss/RpWnH
+	bzqZKDlSVyEJGSVq/L6kPueEPsGFjk16uJBC6HdCBL8dO1KKnSJuoIq1KnVuVSUaGxcDfS
+	6hTds9FbSa0y/flYWz0aEkjN7K1spVyR+RNtsC8O03HDCtUPstx6EybkOi3O5Q==
+Message-ID: <6ad7667a-f2be-4674-99a2-2895a82b762a@bootlin.com>
+Date: Thu, 6 Nov 2025 10:57:55 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,9 +57,9 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 04/11] net: stmmac: ingenic: use PHY_INTF_SEL_x
- directly
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+Subject: Re: [PATCH net-next v2 00/11] net: stmmac: ingenic: convert to
+ set_phy_intf_sel()
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
  Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
 Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
  Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
@@ -68,112 +68,32 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
  linux-stm32@st-md-mailman.stormreply.com,
  Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
  Paolo Abeni <pabeni@redhat.com>
-References: <aQtQYlEY9crH0IKo@shell.armlinux.org.uk>
- <E1vGdWu-0000000Clng-1c42@rmk-PC.armlinux.org.uk>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+References: <aQxinH5WWcunfP7p@shell.armlinux.org.uk>
 Content-Language: en-US
-In-Reply-To: <E1vGdWu-0000000Clng-1c42@rmk-PC.armlinux.org.uk>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+In-Reply-To: <aQxinH5WWcunfP7p@shell.armlinux.org.uk>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Last-TLS-Session-Version: TLSv1.3
 
+Hi Russell,
 
-
-On 05/11/2025 14:26, Russell King (Oracle) wrote:
-> Use the PHY_INTF_SEL_x values directly in each of the mac_set_mode
-> methods rather than the driver private MACPHYC_PHY_INFT_x definitions.
-> Remove the MACPHYC_PHY_INFT_x definitions.
+On 06/11/2025 09:55, Russell King (Oracle) wrote:
+> On Wed, Nov 05, 2025 at 01:25:54PM +0000, Russell King (Oracle) wrote:
+> Convert ingenic to use the new ->set_phy_intf_sel() method that was
+> recently introduced in net-next.
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> This is the largest of the conversions, as there is scope for cleanups
+> along with the conversion.
+> 
+> v2: fix build warnings in patch 9 by rearranging the code
+> 
+>  .../net/ethernet/stmicro/stmmac/dwmac-ingenic.c    | 165 ++++++---------------
+>  1 file changed, 45 insertions(+), 120 deletions(-)
+> 
 
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Damned, missed that V2 and started reviewing V1... I'll resend the tags
+for V2.
 
 Maxime
-
-> ---
->  .../ethernet/stmicro/stmmac/dwmac-ingenic.c   | 20 ++++++++-----------
->  1 file changed, 8 insertions(+), 12 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-> index 5de2bd984d34..b56d7ada1939 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-> @@ -35,10 +35,6 @@
->  #define MACPHYC_RX_DELAY_MASK		GENMASK(10, 4)
->  #define MACPHYC_SOFT_RST_MASK		GENMASK(3, 3)
->  #define MACPHYC_PHY_INFT_MASK		GENMASK(2, 0)
-> -#define MACPHYC_PHY_INFT_RMII		PHY_INTF_SEL_RMII
-> -#define MACPHYC_PHY_INFT_RGMII		PHY_INTF_SEL_RGMII
-> -#define MACPHYC_PHY_INFT_GMII		PHY_INTF_SEL_GMII_MII
-> -#define MACPHYC_PHY_INFT_MII		PHY_INTF_SEL_GMII_MII
->  
->  #define MACPHYC_TX_DELAY_PS_MAX		2496
->  #define MACPHYC_TX_DELAY_PS_MIN		20
-> @@ -78,17 +74,17 @@ static int jz4775_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
->  
->  	switch (plat_dat->phy_interface) {
->  	case PHY_INTERFACE_MODE_MII:
-> -		val = FIELD_PREP(MACPHYC_PHY_INFT_MASK, MACPHYC_PHY_INFT_MII);
-> +		val = FIELD_PREP(MACPHYC_PHY_INFT_MASK, PHY_INTF_SEL_GMII_MII);
->  		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_MII\n");
->  		break;
->  
->  	case PHY_INTERFACE_MODE_GMII:
-> -		val = FIELD_PREP(MACPHYC_PHY_INFT_MASK, MACPHYC_PHY_INFT_GMII);
-> +		val = FIELD_PREP(MACPHYC_PHY_INFT_MASK, PHY_INTF_SEL_GMII_MII);
->  		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_GMII\n");
->  		break;
->  
->  	case PHY_INTERFACE_MODE_RMII:
-> -		val = FIELD_PREP(MACPHYC_PHY_INFT_MASK, MACPHYC_PHY_INFT_RMII);
-> +		val = FIELD_PREP(MACPHYC_PHY_INFT_MASK, PHY_INTF_SEL_RMII);
->  		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_RMII\n");
->  		break;
->  
-> @@ -96,7 +92,7 @@ static int jz4775_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
->  	case PHY_INTERFACE_MODE_RGMII_ID:
->  	case PHY_INTERFACE_MODE_RGMII_TXID:
->  	case PHY_INTERFACE_MODE_RGMII_RXID:
-> -		val = FIELD_PREP(MACPHYC_PHY_INFT_MASK, MACPHYC_PHY_INFT_RGMII);
-> +		val = FIELD_PREP(MACPHYC_PHY_INFT_MASK, PHY_INTF_SEL_RGMII);
->  		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_RGMII\n");
->  		break;
->  
-> @@ -138,7 +134,7 @@ static int x1600_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
->  
->  	switch (plat_dat->phy_interface) {
->  	case PHY_INTERFACE_MODE_RMII:
-> -		val = FIELD_PREP(MACPHYC_PHY_INFT_MASK, MACPHYC_PHY_INFT_RMII);
-> +		val = FIELD_PREP(MACPHYC_PHY_INFT_MASK, PHY_INTF_SEL_RMII);
->  		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_RMII\n");
->  		break;
->  
-> @@ -160,7 +156,7 @@ static int x1830_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
->  	switch (plat_dat->phy_interface) {
->  	case PHY_INTERFACE_MODE_RMII:
->  		val = FIELD_PREP(MACPHYC_MODE_SEL_MASK, MACPHYC_MODE_SEL_RMII) |
-> -			  FIELD_PREP(MACPHYC_PHY_INFT_MASK, MACPHYC_PHY_INFT_RMII);
-> +			  FIELD_PREP(MACPHYC_PHY_INFT_MASK, PHY_INTF_SEL_RMII);
->  		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_RMII\n");
->  		break;
->  
-> @@ -183,7 +179,7 @@ static int x2000_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
->  	case PHY_INTERFACE_MODE_RMII:
->  		val = FIELD_PREP(MACPHYC_TX_SEL_MASK, MACPHYC_TX_SEL_ORIGIN) |
->  			  FIELD_PREP(MACPHYC_RX_SEL_MASK, MACPHYC_RX_SEL_ORIGIN) |
-> -			  FIELD_PREP(MACPHYC_PHY_INFT_MASK, MACPHYC_PHY_INFT_RMII);
-> +			  FIELD_PREP(MACPHYC_PHY_INFT_MASK, PHY_INTF_SEL_RMII);
->  		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_RMII\n");
->  		break;
->  
-> @@ -191,7 +187,7 @@ static int x2000_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
->  	case PHY_INTERFACE_MODE_RGMII_ID:
->  	case PHY_INTERFACE_MODE_RGMII_TXID:
->  	case PHY_INTERFACE_MODE_RGMII_RXID:
-> -		val = FIELD_PREP(MACPHYC_PHY_INFT_MASK, MACPHYC_PHY_INFT_RGMII);
-> +		val = FIELD_PREP(MACPHYC_PHY_INFT_MASK, PHY_INTF_SEL_RGMII);
->  
->  		if (mac->tx_delay == 0)
->  			val |= FIELD_PREP(MACPHYC_TX_SEL_MASK, MACPHYC_TX_SEL_ORIGIN);
-
 
