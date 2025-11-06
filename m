@@ -1,185 +1,113 @@
-Return-Path: <netdev+bounces-236367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D59C4C3B20A
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 14:14:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87BADC3B28C
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 14:19:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D2848507011
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 13:04:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 672295608F3
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 13:05:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 783D2345CCA;
-	Thu,  6 Nov 2025 12:56:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 880D430EF8B;
+	Thu,  6 Nov 2025 13:01:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="g/zGGMgR"
 X-Original-To: netdev@vger.kernel.org
-Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4892E338590;
-	Thu,  6 Nov 2025 12:56:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.172
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E6E5322533;
+	Thu,  6 Nov 2025 13:01:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762433803; cv=none; b=AUgb1MQnOFAdoXtVHpakFp9iXqAJllIseZS0jw+VP03uCxC0/VFfbBgme8lkrE1AUnc4gZH3R3mJc7AoybzPZJxMzedHOBdlN2bgriUtakIJXG1lFG0B2on/Zb/Y1UmelntN77092SLzwuDILdLKjfLQFhgWi9SztEVv5wxRj48=
+	t=1762434064; cv=none; b=Iz9hJz6tthN0U4O1UZ22Z5lcs0/wk2bImkaXmr+bQjxAVk/bqhXLTzt2Y7qeXR71m5oez90ryPpn8RjS/JD4ZfErTpcHmfDINlwF3kEwcy4/XBhrgqjuoN1CyECr4M5VX2HcOJHNmkd7gOqGQFou/WxQPfCEdF8S4CkDGY/cH04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762433803; c=relaxed/simple;
-	bh=kO1Ui7xjSKskPdQ11rpXlp4ByoWUj7DJ86m5TCPomAs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=rv6wyXvvlCTHtIvtFeNnthmlvxyD0FxRi4417yNktdU8JpiqFFQnSZlyTGLCB0heU4HVuu0cEXlJQZPYTUx1BOp+TgXEG+L/pbPQxGF7o8WuTTapSN6BsNTN8QmTCfSCDYJTreHC0yDgPdqiXDHOC/xVs91TVEfIWTO0RFSCiqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com; spf=pass smtp.mailfrom=renesas.com; arc=none smtp.client-ip=210.160.252.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=renesas.com
-X-CSE-ConnectionGUID: 8CobPaMpQ96Q5otWza+blA==
-X-CSE-MsgGUID: JZ/WS85zS1eC1DJE0jk3qg==
-Received: from unknown (HELO relmlir5.idc.renesas.com) ([10.200.68.151])
-  by relmlie6.idc.renesas.com with ESMTP; 06 Nov 2025 21:56:40 +0900
-Received: from [127.0.1.1] (unknown [10.226.78.121])
-	by relmlir5.idc.renesas.com (Postfix) with ESMTP id F1ECB4006DE3;
-	Thu,  6 Nov 2025 21:56:34 +0900 (JST)
-From: Michael Dege <michael.dege@renesas.com>
-Date: Thu, 06 Nov 2025 13:55:34 +0100
-Subject: [PATCH net-next 10/10] net: renesas: rswitch: update error
- handling of probe
+	s=arc-20240116; t=1762434064; c=relaxed/simple;
+	bh=sIdmkOlklbdUeXbbmmQ8uH8kjWwUsCKYxEVwZZSgns4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cMSSuLq3hXA5nrO1nJLFO4N78UpXlY7wrU6VnOhhthwY1D7EF1Yr1nXY06Qg57MEExnEFIkVLuvr5Sf2jXwBTAqgrpeW9RBULyu++8iEWRX17ARmnwf1zOpbThlxx8dYqeGesetxVTD6PTRD0m1mXyg0NUqKH+Bq+oKJxlzJXts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=g/zGGMgR; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from [192.168.1.19] (unknown [103.212.145.25])
+	by linux.microsoft.com (Postfix) with ESMTPSA id 5E8062120391;
+	Thu,  6 Nov 2025 05:00:54 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5E8062120391
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1762434060;
+	bh=oJDH7+GUsgWHDbJLdKnF0OjdtOyo5nb2QP3ep2Mj55o=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=g/zGGMgRW91Cq6o9e1mqsHmhNchjKquvwz6daoqWK6clliedPglJgHiUU1FS5xO3U
+	 XKbQACxg/MZxdqZ+kffxcfj09wmZV8IEdCVFLD03CsDpzRweGT4BbmRXc+8ENOrVM7
+	 9k3oJBybiUeJJ2CLFBVpR6DEGxpl5SOVezhdba18=
+Message-ID: <bb692420-25f9-4d6e-a68b-dd83c8f4be10@linux.microsoft.com>
+Date: Thu, 6 Nov 2025 18:30:50 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] net: mana: Handle SKB if TX SGEs exceed
+ hardware limit
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, longli@microsoft.com,
+ kotaranov@microsoft.com, horms@kernel.org, shradhagupta@linux.microsoft.com,
+ ssengar@linux.microsoft.com, ernis@linux.microsoft.com,
+ dipayanroy@linux.microsoft.com, shirazsaleem@microsoft.com,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ gargaditya@microsoft.com
+References: <20251029131235.GA3903@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <20251031162611.2a981fdf@kernel.org>
+ <82bcd959-571e-42ce-b341-cbfa19f9f86d@linux.microsoft.com>
+ <20251105161754.4b9a1363@kernel.org>
+Content-Language: en-US
+From: Aditya Garg <gargaditya@linux.microsoft.com>
+In-Reply-To: <20251105161754.4b9a1363@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251106-add_l3_routing-v1-10-dcbb8368ca54@renesas.com>
-References: <20251106-add_l3_routing-v1-0-dcbb8368ca54@renesas.com>
-In-Reply-To: <20251106-add_l3_routing-v1-0-dcbb8368ca54@renesas.com>
-To: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Richard Cochran <richardcochran@gmail.com>, 
- =?utf-8?q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>, 
- Paul Barker <paul@pbarker.dev>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, 
- Geert Uytterhoeven <geert+renesas@glider.be>, 
- Magnus Damm <magnus.damm@gmail.com>
-Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
- linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, 
- Nikita Yushchenko <nikita.yoush@cogentembedded.com>, 
- Christophe JAILLET <christophe.jaillet@wanadoo.fr>, 
- Michael Dege <michael.dege@renesas.com>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1762433735; l=2934;
- i=michael.dege@renesas.com; s=20251023; h=from:subject:message-id;
- bh=KDH1JsZOXiQbxgTynfSlueti3VJdmkeZOnA1SQPwfw8=;
- b=H7uMs2BdzpKAtkELEmI9qu3bDHo98ng8Cmdl3Ti/xcOvYA7xTJwSc74SKSEbTKenFBJg5Kbpj
- RiBjiu09uQbDJVrA7RHJp841tNR9uKJA5hUOl2fuvqCojSRE4DUCH55
-X-Developer-Key: i=michael.dege@renesas.com; a=ed25519;
- pk=gu1rwIcCrAxNMv2I8fIfiQvt51xzZwnQy4Ua/DscQt8=
 
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+On 06-11-2025 05:47, Jakub Kicinski wrote:
+> On Wed, 5 Nov 2025 22:10:23 +0530 Aditya Garg wrote:
+>>>>    	if (err) {
+>>>>    		(void)skb_dequeue_tail(&txq->pending_skbs);
+>>>> +		mana_unmap_skb(skb, apc);
+>>>>    		netdev_warn(ndev, "Failed to post TX OOB: %d\n", err);
+>>>
+>>> You have a print right here and in the callee. This condition must
+>>> (almost) never happen in practice. It's likely fine to just drop
+>>> the packet.
+>>
+>> The logs placed in callee doesn't covers all the failure scenarios,
+>> hence I feel to have this log here with proper status. Maybe I can
+>> remove the log in the callee?
+> 
+> I think my point was that since there are logs (per packet!) when the
+> condition is hit -- if it did in fact hit with any noticeable frequency
+> your users would have complained. So handling the condition gracefully
+> and returning BUSY is likely just unnecessary complexity in practice.
+> 
 
-Update error handling of probe function.
+In this, we are returning tx_busy when the error reason is -ENOSPC, for 
+all other errors, skb is dropped.
+Is it okay requeue only for -ENOSPC cases or should we drop the skb?
 
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Signed-off-by: Michael Dege <michael.dege@renesas.com>
----
- drivers/net/ethernet/renesas/rswitch_main.c | 63 ++++++++++++++++-------------
- 1 file changed, 34 insertions(+), 29 deletions(-)
+> The logs themselves I don't care all that much about. Sure, having two
+> lines for one error is a bit unclean.
+>   
+>>> Either way -- this should be a separate patch.
+>>>    
+>> Are you suggesting a separate patch altogether or two patch in the same
+>> series?
+> 
+> The changes feel related enough to make them a series, but either way
+> is fine.
 
-diff --git a/drivers/net/ethernet/renesas/rswitch_main.c b/drivers/net/ethernet/renesas/rswitch_main.c
-index 8d56ef037a8d..1d8f141a25d3 100644
---- a/drivers/net/ethernet/renesas/rswitch_main.c
-+++ b/drivers/net/ethernet/renesas/rswitch_main.c
-@@ -2231,6 +2231,30 @@ static const struct soc_device_attribute rswitch_soc_no_speed_change[]  = {
- 	{ /* Sentinel */ }
- };
- 
-+static void rswitch_deinit(struct rswitch_private *priv)
-+{
-+	unsigned int i;
-+
-+	rswitch_gwca_hw_deinit(priv);
-+	rcar_gen4_ptp_unregister(priv->ptp_priv);
-+
-+	rswitch_for_each_enabled_port(priv, i) {
-+		struct rswitch_device *rdev = priv->rdev[i];
-+
-+		unregister_netdev(rdev->ndev);
-+		rswitch_ether_port_deinit_one(rdev);
-+		phy_exit(priv->rdev[i]->serdes);
-+	}
-+
-+	for (i = 0; i < RSWITCH_NUM_PORTS; i++)
-+		rswitch_device_free(priv, i);
-+
-+	rswitch_gwca_ts_queue_free(priv);
-+	rswitch_gwca_linkfix_free(priv);
-+
-+	rswitch_clock_disable(priv);
-+}
-+
- static int renesas_eth_sw_probe(struct platform_device *pdev)
- {
- 	const struct soc_device_attribute *attr;
-@@ -2294,11 +2318,8 @@ static int renesas_eth_sw_probe(struct platform_device *pdev)
- 	pm_runtime_get_sync(&pdev->dev);
- 
- 	ret = rswitch_init(priv);
--	if (ret < 0) {
--		pm_runtime_put(&pdev->dev);
--		pm_runtime_disable(&pdev->dev);
--		return ret;
--	}
-+	if (ret < 0)
-+		goto err_disable_pm_runtime;
- 
- 	if (list_empty(&priv->port_list))
- 		dev_warn(&pdev->dev, "could not initialize any ports\n");
-@@ -2306,36 +2327,20 @@ static int renesas_eth_sw_probe(struct platform_device *pdev)
- 	ret = rswitch_register_notifiers();
- 	if (ret) {
- 		dev_err(&pdev->dev, "could not register notifiers\n");
--		return ret;
-+		goto err_deinit_rswitch;
- 	}
- 
- 	device_set_wakeup_capable(&pdev->dev, 1);
- 
--	return ret;
--}
--
--static void rswitch_deinit(struct rswitch_private *priv)
--{
--	unsigned int i;
--
--	rswitch_gwca_hw_deinit(priv);
--	rcar_gen4_ptp_unregister(priv->ptp_priv);
--
--	rswitch_for_each_enabled_port(priv, i) {
--		struct rswitch_device *rdev = priv->rdev[i];
--
--		unregister_netdev(rdev->ndev);
--		rswitch_ether_port_deinit_one(rdev);
--		phy_exit(priv->rdev[i]->serdes);
--	}
--
--	for (i = 0; i < RSWITCH_NUM_PORTS; i++)
--		rswitch_device_free(priv, i);
-+	return 0;
- 
--	rswitch_gwca_ts_queue_free(priv);
--	rswitch_gwca_linkfix_free(priv);
-+err_deinit_rswitch:
-+	rswitch_deinit(priv);
-+err_disable_pm_runtime:
-+	pm_runtime_put(&pdev->dev);
-+	pm_runtime_disable(&pdev->dev);
- 
--	rswitch_clock_disable(priv);
-+	return ret;
- }
- 
- static void renesas_eth_sw_remove(struct platform_device *pdev)
-
--- 
-2.43.0
+Regards,
+Aditya
 
 
