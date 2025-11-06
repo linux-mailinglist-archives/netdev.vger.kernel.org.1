@@ -1,186 +1,125 @@
-Return-Path: <netdev+bounces-236525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 503F8C3D9E6
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 23:34:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0EBDC3DA10
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 23:37:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C395B1888116
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 22:34:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2CDB3A7D70
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 22:37:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70A1F30DED7;
-	Thu,  6 Nov 2025 22:34:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74AB93FBA7;
+	Thu,  6 Nov 2025 22:37:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mj6m02xe"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HkvJPRbc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C966C2FBDFA
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 22:34:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07EB62F6919
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 22:37:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762468465; cv=none; b=H5O9br+nHyZ7lt/y7XQ7M4pOiP7rt7KTsg4i1hJHBA2rwB+0veVfyVd1HhKUT+lWeeaT3KILZVjOuIYYWmmSzL/mmdHrJ+3y172X1gx3+hKZ/cCfVV+QS7lQbc8CnxLU/zrY1+9ODmXhFJ/DWYQquEpb6VQlEKGiFJquKe8YVvc=
+	t=1762468646; cv=none; b=PQaNuGnPPSKIjT2WA+qx3kBbhyg52WYRBABPsvFSz+SlWjHXZPclb2mUnLd/e3OXjX0EgwdenMpVWogtC8DnnP/btnADwdRykhq5kxYb1/YlOfUdHVra/qSAKkQZDkq5wUObNzNEOWBBobvYF5gnTRpG6fVSgC+qvnHAs1B5CW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762468465; c=relaxed/simple;
-	bh=kyqti1pS/iu7iHuIrRG7HhYXvuqmPftlCcRpvSx1U6I=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=GCVej5xufFlr97gBe45vRpZJbMI62BA4HpPBCjhG1fBk4UkmTb5vcF4cpSeECZe06Mpb41b3RJwO4ryDircF48vnDlIeHZwoXGgLQs0ONmQNRR+A+ekV3pPI9AaZiHb+cABlGRpTyvPkml9+Alo49IZLHsOGpU68dNy8Apvt4AA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mj6m02xe; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1762468646; c=relaxed/simple;
+	bh=Zq1qKA7EZccEUyWoFMZOaVBIr6IqNptziO3p9QoDC3c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WumU5W1Ioe+tjPaQ6UGCEnKUnB5dEDCwU74yxXA2zX9LJfJo0p7sYcju/ze9eltI4M6hISBZRattgVbvMjF4KGcodjSO513Iv0nFXETzVdCnAq8skyzUwINkvnrBpyVxAokeSKGuQiOxUpl4iKkeHzBqdK2PRRaq5QDBSA+m+EI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HkvJPRbc; arc=none smtp.client-ip=209.85.215.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-340299cc2ecso175421a91.1
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 14:34:23 -0800 (PST)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-b8c0c0cdd61so108509a12.2
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 14:37:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762468463; x=1763073263; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=wZSGjMt1Kw8fTsX45N5jWnuu8usaMSJDnzmOrQObllg=;
-        b=mj6m02xeppZJeFLKXno33EmBTrlqkCvy62Fl6u2A4ufP9McN6RQl2mPoR+ARMxunhr
-         BuvyBFedePEYbcpYTY8+jbYuFDNnhrybuyg7T3GWa7gspsI6+QKVKc3xvLWThvT5uAgu
-         nEJR54f0h1sSQ6REU97AlLUsAe+lHaBI9yVC9QSbLu+f0e+6rew2TOaA66FJKKq80/vT
-         nr27jo0FzYpQd6SEwlWxqkI2DKLUgMLR5LDl3arjXOq7gPWURPx5Rk9yHjCIQT1TDKyb
-         FW8N0I1dkoVVmOZEsgEA5LCSfHaHNT9ns7OjrOLPa59OVWM1zVyzp8x0FDliNWhGLCcO
-         xSXw==
+        d=google.com; s=20230601; t=1762468644; x=1763073444; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Wqh/7rFu75Tw9K3uiwtNgsD2r+BPLCM0k5HVbPy8hps=;
+        b=HkvJPRbcP5L3oqMJ70mQZmqkzykZhrx3uH6V78Ml9eTkSiru1iLiIES9IpMT77iq6k
+         VE7mJ90E+ygznNcImKm9JpVLRs1BR26PkDo+XJ3rdZOqJx7O5FCbMa/rQ+5gFaBzs61x
+         GRcb0Nb/nue0NL7/VFu8oNAkzbflkhdjeDtfLvrwsNfVpaU3+eOO3w1ltK3YvdE7ln3+
+         Rof3xQqP9H5ElxYQ7YeHeCnY/31ZdSQ308tWvrYTTK5zaxMZ9ImcSudiovlos6Y8Xp7i
+         aInisRYCTvhUMJre8Rw2l3/mAVS53fLqvaMusrowFSPvk3mScWQc+CUo7N5RnZNExeRL
+         cGIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762468463; x=1763073263;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wZSGjMt1Kw8fTsX45N5jWnuu8usaMSJDnzmOrQObllg=;
-        b=CNu9lCZ/PaS0FW/qXSpWZWn8z36PDRe54mLeXWef0F9UooIh2h2Iy1+0IkxuAfpw01
-         qOMRTQoUyMamefOqelIdWGJL0oIdZQa0gSzX5J2sP+C7kgQFsSzqbLXNiFVUnKzuZcTF
-         /ghXw5R4d5L/W9ll6rKS/q4dzCUAaoryn8s+Sp09VEkm4BIbP1rYxx+/plbxNy0EKgwN
-         0sksVPxYqZ/zeQ2qJNX2RstalNhUEk8kstpsiReHEtWJV3JTlhGH1QRv28S62gNn6ltG
-         TZ0pdC37l3JAelIXUvjyBVviQJ0OwubYfOg1bR2h9QPjLi7KKEccb6yI2om8X8+BrpxH
-         Pmfg==
-X-Forwarded-Encrypted: i=1; AJvYcCXlpRKk862r3wI7t8dFRwbw6fvlck8PippY8u0Jok/jSbI9I8b9BRbMuvAJatJvURC3F89LzGY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwoF4s+U03HfXYkLu7QKQBj9DMLWrbNhhDuCYTYU2gSTmaJKRyP
-	rwckjrns6PZOvIpWsszQdJbHO9HjqIhmdjcabcq9k/ITgD8xmIxbKBdAaV9j0mKaVjmaGLB+7LL
-	YaAjNwA==
-X-Google-Smtp-Source: AGHT+IELFjqiOhYzJtQPJi83GurzhMZjUszfoBRWsW9ystcLY03Me8W0XbtwPWs3W8rSDmDZ3b3wJD+ztbE=
-X-Received: from pjtv11.prod.google.com ([2002:a17:90a:c90b:b0:341:4c7:aacc])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:4d8a:b0:32e:72bd:6d5a
- with SMTP id 98e67ed59e1d1-3434a19fcc1mr1662189a91.1.1762468463051; Thu, 06
- Nov 2025 14:34:23 -0800 (PST)
-Date: Thu,  6 Nov 2025 22:34:06 +0000
+        d=1e100.net; s=20230601; t=1762468644; x=1763073444;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Wqh/7rFu75Tw9K3uiwtNgsD2r+BPLCM0k5HVbPy8hps=;
+        b=Uk5zSVYg/gIoEPqBXVzMeRi2BeMwNOvJLwURcRzEypRWaKjkvbuHUKCzPfSEaRUJg+
+         Ju2MgQR4b1EidsJZPmOvyHlydsJNzOwYF1jIfyHoVh2dnPn/vL8495SQtg/hRp33ke6k
+         80bcVS2bINJvk6OwxLqNFYt/nEoujtpfTs41glF5V52R5+IoyZa8GNbDxkOkQdi67Eaf
+         YEFQm2DMPh6lCO9rmvJMGAO/holnCIe71v9aRXy+tUtAKQ1W4OkOX+A0CQXrEgxdj3ea
+         Xqpy2u9vUTJsOfObDa+a36RbPzLR2DPbdfLyrmja1iHN0R+yXXAmUzcZF0G+cgJUNPvU
+         yojQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWR1biJHSP58oJwg6Ab6ALla2HCaWVDJhVctjV37vj4+FCTS6BxP+d8ujtPku0HvnbqSUNRt38=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz4vP2eq8Nd1xHi45j9GoZ346sLIHbBVVwA/ziunsYWbh4vG/Qh
+	VFKZwmYzwb1o3UpXYrIc58IpfrYoB7RqUxjhtsmDhjSW3GfRnygeqiIJmdFZ6oFtjV6pCE4y+Uq
+	Q4lBPJyfeaEZV5MOQ4p8dcKtfYPYZOqpq1dsqUYH3
+X-Gm-Gg: ASbGnctLuqnn2gK8xLCjj5OcdNnpbLltPuBHpUc82vdQfeg47ArCrvYEw5XMUukZisO
+	OEKIX+6g+IOkjOSIi8bwEkS6Z/CTQxq5PDFrxW/85lQgyykD2+0rMDDLkinIReNR5m0uYk5Ci88
+	UpY+S8s0g24LYOSpyfxhOzSdc4OxxMm9bTN0Wt19xqi3gIWgSMDN7HGnwmq9508Ycpa5JDq2Om6
+	x6qRu9aCSCEt4jFlHT088MzDCKRg09/us1kv3CPIcERmR4CuixzZtaOGFd8AReMjBYgoYfM3utV
+	Pxo28LnAfSiisNhLrA==
+X-Google-Smtp-Source: AGHT+IFmTgBghJ4Z63fdzU76btJu2WQ9IXUf7TvnuoUNE4+PNenxcDLQl4UARxupttHUWsPvt3LaA2/eg6SDP3jnrxo=
+X-Received: by 2002:a17:902:da48:b0:27d:6f49:febc with SMTP id
+ d9443c01a7336-297c038c617mr14658455ad.1.1762468644160; Thu, 06 Nov 2025
+ 14:37:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
-Message-ID: <20251106223418.1455510-1-kuniyu@google.com>
-Subject: [PATCH v1 net-next] sctp: Don't inherit do_auto_asconf in sctp_clone_sock().
+MIME-Version: 1.0
+References: <690c6ca9.050a0220.1e8caa.00d2.GAE@google.com> <20251106175926.686885-1-kuniyu@google.com>
+ <20251106143004.55f4f3fc@kernel.org>
+In-Reply-To: <20251106143004.55f4f3fc@kernel.org>
 From: Kuniyuki Iwashima <kuniyu@google.com>
-To: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Xin Long <lucien.xin@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, linux-sctp@vger.kernel.org, 
-	syzbot+ba535cb417f106327741@syzkaller.appspotmail.com
+Date: Thu, 6 Nov 2025 14:37:10 -0800
+X-Gm-Features: AWmQ_bksc9oUawq3yqH36NtmDo0ccenJFt0JFKuoavuRugfDXyvaxpAeV7_fcSs
+Message-ID: <CAAVpQUBkFxS6Dm28n7uDoO+x63npwZWb925+Gs3UHz-gAZo7yQ@mail.gmail.com>
+Subject: Re: [syzbot ci] Re: tipc: Fix use-after-free in tipc_mon_reinit_self().
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: syzbot+cif2d6d318f7e85f0b@syzkaller.appspotmail.com, davem@davemloft.net, 
+	edumazet@google.com, hoang.h.le@dektech.com.au, horms@kernel.org, 
+	jmaloy@redhat.com, kuni1840@gmail.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzbot@lists.linux.dev, syzbot@syzkaller.appspotmail.com, 
+	syzkaller-bugs@googlegroups.com, tipc-discussion@lists.sourceforge.net
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-syzbot reported list_del(&sp->auto_asconf_list) corruption
-in sctp_destroy_sock().
+On Thu, Nov 6, 2025 at 2:30=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> On Thu,  6 Nov 2025 17:59:17 +0000 Kuniyuki Iwashima wrote:
+> > -void tipc_mon_reinit_self(struct net *net)
+> > +void tipc_mon_reinit_self(struct net *net, bool rtnl_held)
+> >  {
+> >       struct tipc_monitor *mon;
+> >       int bearer_id;
+> >
+> > -     rtnl_lock();
+> > +     if (!rtnl_held)
+> > +             rtnl_lock();
+>
+> I haven't looked closely but for the record conditional locking
+> is generally considered to be poor code design. Extract the body
+> into a __tipc_mon_reinit_self() helper and call that when lock
+> is already held? And:
+>
+> void tipc_mon_reinit_self(struct net *net)
+> {
+>         rtnl_lock();
+>         __tipc_mon_reinit_self(net);
+>         rtnl_unlock();
+> }
 
-The repro calls setsockopt(SCTP_AUTO_ASCONF, 1) to a SCTP
-listener, calls accept(), and close()s the child socket.
+That's much cleaner, I'll use this.
 
-setsockopt(SCTP_AUTO_ASCONF, 1) sets sp->do_auto_asconf
-to 1 and links sp->auto_asconf_list to a per-netns list.
-
-Both fields are placed after sp->pd_lobby in struct sctp_sock,
-and sctp_copy_descendant() did not copy the fields before the
-cited commit.
-
-Also, sctp_clone_sock() did not set them explicitly.
-
-In addition, sctp_auto_asconf_init() is called from
-sctp_sock_migrate(), but it initialises the fields only
-conditionally.
-
-The two fields relied on __GFP_ZERO added in sk_alloc(),
-but sk_clone() does not use it.
-
-Let's clear newsp->do_auto_asconf in sctp_clone_sock().
-
-[0]:
-list_del corruption. prev->next should be ffff8880799e9148, but was ffff8880799e8808. (prev=ffff88803347d9f8)
-kernel BUG at lib/list_debug.c:64!
-Oops: invalid opcode: 0000 [#1] SMP KASAN PTI
-CPU: 0 UID: 0 PID: 6008 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full)
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
-RIP: 0010:__list_del_entry_valid_or_report+0x15a/0x190 lib/list_debug.c:62
-Code: e8 7b 26 71 fd 43 80 3c 2c 00 74 08 4c 89 ff e8 7c ee 92 fd 49 8b 17 48 c7 c7 80 0a bf 8b 48 89 de 4c 89 f9 e8 07 c6 94 fc 90 <0f> 0b 4c 89 f7 e8 4c 26 71 fd 43 80 3c 2c 00 74 08 4c 89 ff e8 4d
-RSP: 0018:ffffc90003067ad8 EFLAGS: 00010246
-RAX: 000000000000006d RBX: ffff8880799e9148 RCX: b056988859ee6e00
-RDX: 0000000000000000 RSI: 0000000000000202 RDI: 0000000000000000
-RBP: dffffc0000000000 R08: ffffc90003067807 R09: 1ffff9200060cf00
-R10: dffffc0000000000 R11: fffff5200060cf01 R12: 1ffff1100668fb3f
-R13: dffffc0000000000 R14: ffff88803347d9f8 R15: ffff88803347d9f8
-FS:  00005555823e5500(0000) GS:ffff88812613e000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000200000000480 CR3: 00000000741ce000 CR4: 00000000003526f0
-Call Trace:
- <TASK>
- __list_del_entry_valid include/linux/list.h:132 [inline]
- __list_del_entry include/linux/list.h:223 [inline]
- list_del include/linux/list.h:237 [inline]
- sctp_destroy_sock+0xb4/0x370 net/sctp/socket.c:5163
- sk_common_release+0x75/0x310 net/core/sock.c:3961
- sctp_close+0x77e/0x900 net/sctp/socket.c:1550
- inet_release+0x144/0x190 net/ipv4/af_inet.c:437
- __sock_release net/socket.c:662 [inline]
- sock_close+0xc3/0x240 net/socket.c:1455
- __fput+0x44c/0xa70 fs/file_table.c:468
- task_work_run+0x1d4/0x260 kernel/task_work.c:227
- resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
- exit_to_user_mode_loop+0xe9/0x130 kernel/entry/common.c:43
- exit_to_user_mode_prepare include/linux/irq-entry-common.h:225 [inline]
- syscall_exit_to_user_mode_work include/linux/entry-common.h:175 [inline]
- syscall_exit_to_user_mode include/linux/entry-common.h:210 [inline]
- do_syscall_64+0x2bd/0xfa0 arch/x86/entry/syscall_64.c:100
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Fixes: 16942cf4d3e3 ("sctp: Use sk_clone() in sctp_accept().")
-Reported-by: syzbot+ba535cb417f106327741@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/690d2185.a70a0220.22f260.000e.GAE@google.com/
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- include/net/sctp/structs.h | 4 ----
- net/sctp/socket.c          | 1 +
- 2 files changed, 1 insertion(+), 4 deletions(-)
-
-diff --git a/include/net/sctp/structs.h b/include/net/sctp/structs.h
-index 5900196d65fd..affee44bd38e 100644
---- a/include/net/sctp/structs.h
-+++ b/include/net/sctp/structs.h
-@@ -228,10 +228,6 @@ struct sctp_sock {
- 
- 	atomic_t pd_mode;
- 
--	/* Fields after this point will be skipped on copies, like on accept
--	 * and peeloff operations
--	 */
--
- 	/* Receive to here while partial delivery is in effect. */
- 	struct sk_buff_head pd_lobby;
- 
-diff --git a/net/sctp/socket.c b/net/sctp/socket.c
-index 38d2932acebf..d808096f5ab1 100644
---- a/net/sctp/socket.c
-+++ b/net/sctp/socket.c
-@@ -4885,6 +4885,7 @@ static struct sock *sctp_clone_sock(struct sock *sk,
- 	}
- #endif
- 
-+	newsp->do_auto_asconf = 0;
- 	skb_queue_head_init(&newsp->pd_lobby);
- 
- 	newsp->ep = sctp_endpoint_new(newsk, GFP_KERNEL);
--- 
-2.51.2.1041.gc1ab5b90ca-goog
-
+Thanks, Jakub!
 
