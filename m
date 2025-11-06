@@ -1,250 +1,314 @@
-Return-Path: <netdev+bounces-236173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 382A6C39325
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 07:01:14 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF901C39549
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 08:06:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id AA53A34DBDE
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 06:01:13 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C2A104E1C37
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 07:06:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 483262D978B;
-	Thu,  6 Nov 2025 06:01:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="h01DhykP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6A90284686;
+	Thu,  6 Nov 2025 07:06:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f97.google.com (mail-io1-f97.google.com [209.85.166.97])
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B72A21917CD
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 06:01:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08C6B27B4FB
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 07:06:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762408868; cv=none; b=UHnXEACW7m0eRNeTp/M3bIXPzjqwB5tLlvGTUpiYmC0UMyLaCWEVjvFCONwSz4ebdVLArZoFz3WQvnLOmS7ozolDaLRuDv3vNLNZUQJ/77SGejb6VbPE8hI01x5ppccooBts4r2Wtm9YW/M3x6k1DF9woAWly/1Y2+FCZW35leI=
+	t=1762412788; cv=none; b=ehvNH6UjOq8KiVA8FnsIeCli889LLFC8Av+Tyy26ybuEaWOZFRbq88rUJkBVYmbFbPjTfHoJbAqoswRY1zUH7cTjgpswph5arPkBI0aIbGRXgmm4eeGLS0ZTJoL+/ZIN9vN51/VNNuJITmHXaJ4ERlFXtaurj0eZWkl/nXSRpXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762408868; c=relaxed/simple;
-	bh=lCNNVwI0SG8GlOPmPhtF5DGxcz3NtsYVOoGxojD1XOs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jnrkvmlaTF40E0ohxnLqprENn12NbEj/rRU5fTfH6lxUv0mBepb/IKyJ09LEajUypHZ5oK2TYkpz861defBFoQp927KPzSj3EtK1lWymUI1lFXh+a++J6DG9A7z/ZM3PabtM4wsHk0pa3fbQWnsZ0VexUH/zLBP7n6WgbROPQ24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=h01DhykP; arc=none smtp.client-ip=209.85.166.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-io1-f97.google.com with SMTP id ca18e2360f4ac-94880a46f3fso3529239f.2
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 22:01:06 -0800 (PST)
+	s=arc-20240116; t=1762412788; c=relaxed/simple;
+	bh=Vsck3KVS79t9iyBWAKXa9PBwAc6LKWW5IM6f2vwD49s=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=k8LdKc4d+1i0zahlrMeLAjOeaijytYFj1B3rvjK5JPI7H9oAxG6s3EHRABeaDUQf8klEPh8fmkqIc6+niuMBvxOr90RZQwWX+L6aYklLGg6qIuYhNh6yJgc6CrdJh/y3nQtDDCMf4xBRl9mZ2zuGuklCsseqbOMJwyX4dyjyHBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-43333f50556so2016185ab.1
+        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 23:06:26 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762408866; x=1763013666;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:dkim-signature:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=rBDrfVCPV9UDuaCd3lbJ5pszosQLoNSpLpTTcdGZR84=;
-        b=Yf1vzuLT6orHVA5vP+vg+/AGNl9i8okQD/ziwuc7071TNvCtxw6aK6ZBTXD2sTDpkG
-         4T1X01kF0pGsUVr9+kH7b8ZU46cN1Y5kVULidKOs1bo660/74GJvTo8PSCEs0CbrvXGn
-         cjz3irlrUl8rNoQiZz1ddDITO2dTqaZ9abKXXUWLmsVL07F+lU6PR+6fuwdYVHpqJZRK
-         8mGZ+bdpZ7WnG4Lfw0C1ZDqjQiUfq8tqXvtJ/Uczvap9uk2wjr2ib11J8DjA5a0B+Tzx
-         HH3LPXAGxp2ozOcf55x4Cxx0P65RPMOdbwxM2oOVcISrt68hPpmnXSFH15QZ8fQPcNgP
-         Ca3Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUPI6EAN+zhzApX+GAM/8QkWDYV3vPcfS5tjKTWQNPaDeuDYY5niX29tH5E6kLm7vwsl14W+hw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxD31RoK5+JfU1ioPTmWK71UlxlH8MApB7kcbBRMOR5CPrelbK
-	jegA8lncoS0A2nfvs+sJCDEJGQ2NaOgaSS0ZZ4RSTZE+x1NhMyxPAhqdtr+anGNpezw4rKAzjs7
-	BevirqdIFwM1ceZtUI/j/s+CyHPYD4IGJLtbJElXs9iigzsO5nycwQ/Cn0MlHvupiO3Gp2WFQtn
-	a73BJCBnK48KH4SyZQ9ytMMTlggb4Ahkh9353LXxNYoLOxdWgx6jRXF0QvOS77jDZg9IsM353N4
-	HQW4PK9T0I=
-X-Gm-Gg: ASbGncsSZ4MnWVs/JQAMdWa2kogtdmwgpsWfS4pSn4kKjWfKO23iTszj5fgrpJXk4dR
-	xht+1siKxjpAwtMd0vQsVU3jTJBo33m3tv0y9hswWkIcgdZJr4gA9A3YQat3TI1mHYEpA9DCdeR
-	+eNSrXtdSgJNiSEmh8oRlsfz2FQt4Ws3tMYuNGWBy7DB3o2Irakcgu7Sz7A9pjwJ5AE8X60RIpA
-	mySs3keG+WQMxhZWZxInJypdAIIVs3ZpABwlLjErujZ/6m07BwgkXOowIhx9hL/5XGK7KtCx0Yg
-	zmJMxRd0azczrCqj/DuC6CcE7zNOjEfyf3Vwm6QFzrmbLjiZ4eEqs1y2ljSh0X7bJhMLit4XrV5
-	dOXdyw79LZMFOLWMzo9Up6UC0y0GUnMyyXC+YqYSoOwW2pX37XcWmIrt8ah4oi4eyb0wVfISDbn
-	Qy3p3yhVWeWnxJ2hPz3MhFOYc0Bpvy9p4Vig==
-X-Google-Smtp-Source: AGHT+IEcjEPhbSDoJ/COLR/XT0gPNrSbVoyqfA9eVFZhUC+eAsN5PYVGJT85PJr69J/BONwq8mahjYGbBfkb
-X-Received: by 2002:a05:6e02:3c82:b0:433:2844:111e with SMTP id e9e14a558f8ab-4334079a241mr89305805ab.14.1762408865614;
-        Wed, 05 Nov 2025 22:01:05 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-11.dlp.protect.broadcom.com. [144.49.247.11])
-        by smtp-relay.gmail.com with ESMTPS id e9e14a558f8ab-4334f4cf4bfsm1188185ab.34.2025.11.05.22.01.04
-        for <netdev@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 05 Nov 2025 22:01:05 -0800 (PST)
-X-Relaying-Domain: broadcom.com
-X-CFilter-Loop: Reflected
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-b72761ab959so153485166b.0
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 22:01:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1762408863; x=1763013663; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=rBDrfVCPV9UDuaCd3lbJ5pszosQLoNSpLpTTcdGZR84=;
-        b=h01DhykPXby2e8KOf7RzIgVa7mGHTX6CmrJIpsdrON1I9JIMpeccmITRCvsXPXfJCn
-         OXOHod+bMB4MUj60QeV0gZ27RdA0RKfB8Fji0W3nI7VAT1uF1AzwZjiIS60H0NXGSCo4
-         jBjvrn6XCDZZ88h24N2NMe688op0rsKycK7oo=
-X-Forwarded-Encrypted: i=1; AJvYcCXMojAtf3JbhZcI1SCgTINP8Bkavi9BbrxlAef04HP1Vh1fewK2lBDLTVDNVW/sKgRlsttPeDA=@vger.kernel.org
-X-Received: by 2002:a17:907:72d6:b0:b70:47e8:9eec with SMTP id a640c23a62f3a-b726515dcbcmr671878566b.12.1762408862868;
-        Wed, 05 Nov 2025 22:01:02 -0800 (PST)
-X-Received: by 2002:a17:907:72d6:b0:b70:47e8:9eec with SMTP id
- a640c23a62f3a-b726515dcbcmr671876366b.12.1762408862419; Wed, 05 Nov 2025
- 22:01:02 -0800 (PST)
+        d=1e100.net; s=20230601; t=1762412786; x=1763017586;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PHGI1fIvq5g4LUo0l+Mvua/E9YykyS2a0n+xCruQvDo=;
+        b=geKQJTRKAfwR9VdxTSJBbXEljRdn8gP0nOU9oPSTXlbn/Md7GrIj8Z2ljlP+CaCgKs
+         SkWccKqktsqJrTCIo824dmKDknfZvPkrFTZbYiG6ohu8Kin+LeuUE3q/2IPxAn544TIh
+         pww3QTxeI99y+8VfCt19dztNdw9fimyRs/ga8TXI1nT0RVotVSwg8OfbNuA5+t/+M4EW
+         4oUVHMdAuOUxEyKPqsbVLKll+bgJMY/LKFuMGsB7+7Hwce8YC1SB22C5ptOsLCfLlop+
+         iHwG8snUK10vzXJfu0axuPoJTPx3FzMX+3ZSpbO1nqIShm1sj8xp7R/bq7ckt8nx2XcQ
+         A70g==
+X-Forwarded-Encrypted: i=1; AJvYcCVt0mNkHRAVGACtWsXkFuMZKIU9uLbD1z1nRMyOOMWksUMeHGTSmsX2J/R4UCHL9Df9CPy8xf4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlCGWZuuEaKLUurWwaIOCn/sTUqy51xwpEbYif6IsELyI/yms7
+	rJ97+WBCgGJWBebJGdyMryqWmQtkmHsF2jfqX++yIWi5HeH+weT7ra8TMkxMrtR71JV3PIatjx/
+	Ck0KGYOI6mKyLHGydewfYhNnOeAqOQUVZexdeB1c8UNI8PQuh5vqd/v8ee18=
+X-Google-Smtp-Source: AGHT+IEtLYA4a8D4q653L6XpdJakCkkDFF5JUVAdgzAl1r6TN+xd/0xGAlCuV7tFyHS/r2CKE+ekR0AUbPacvzqGZpQjspU0we4Q
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251105-grxrings_v1-v1-1-54c2caafa1fd@debian.org>
- <CACKFLim7ruspmqvjr6bNRq5Z_XXVk3vVaLZOons7kMCzsEG23A@mail.gmail.com> <20251105170145.461c8f11@kernel.org>
-In-Reply-To: <20251105170145.461c8f11@kernel.org>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Wed, 5 Nov 2025 22:00:50 -0800
-X-Gm-Features: AWmQ_bkdbX4PBkxmfmDwcd8kg-addj9GoQ_2T0ts66VM8exsDHcl-JIUl1Co6CI
-Message-ID: <CACKFLi=W3ra-sQyAAwekJc6u9aGZ1vV2g44EUF1XYyhCDbBmZw@mail.gmail.com>
-Subject: Re: [PATCH net-next] tg3: extract GRXRINGS from .get_rxnfc
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Breno Leitao <leitao@debian.org>, Pavan Chebbi <pavan.chebbi@broadcom.com>, 
-	Michael Chan <mchan@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kernel-team@meta.com
-X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000004096260642e6ca97"
-
---0000000000004096260642e6ca97
+X-Received: by 2002:a05:6e02:3d84:b0:433:209d:feee with SMTP id
+ e9e14a558f8ab-433407a1353mr105670735ab.13.1762412786137; Wed, 05 Nov 2025
+ 23:06:26 -0800 (PST)
+Date: Wed, 05 Nov 2025 23:06:26 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <690c48f2.050a0220.baf87.0080.GAE@google.com>
+Subject: [syzbot] [net?] KASAN: slab-use-after-free Read in qfq_reset_qdisc (2)
+From: syzbot <syzbot+ec7176504e5bcc33ca4e@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com, xiyou.wangcong@gmail.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 5, 2025 at 5:01=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Wed, 5 Nov 2025 11:05:34 -0800 Michael Chan wrote:
-> > The existing code to use num_online_cpus() is actually not correct.
-> > This is more correct:
-> >
-> > return min(netif_get_num_default_rss_queues(), tp->rxq_max);
-> >
-> > I think when netif_get_num_default_rss_queues() was used to replace
-> > num_online_cpus(), tg3_get_rxnfc() was not properly converted.
->
-> All true, but perhaps we want to do that change as a follow up?
-> Someone may show up later insisting that fewer queues cases
-> a regression for their workload..
+Hello,
 
-Sure, we can fix this separately.  This returned value here when
-!netif_running() really won't change the ring count when it becomes
-netif_running().  tg3_open() will call tg3_enable_msix() which will
-set it to netif_get_num_default_rss_queues() regardless of what value
-we return here.  IOW, fixing it should not cause any change in the
-number of default rings.
+syzbot found the following issue on:
 
-Anyway,
-Reviewed-by: Michael Chan <michael.chan@broadcom.com>
+HEAD commit:    143937ca51cc arm64, mm: avoid always making PTE dirty in p..
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
+console output: https://syzkaller.appspot.com/x/log.txt?x=15939b04580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=158bd6857eb7a550
+dashboard link: https://syzkaller.appspot.com/bug?extid=ec7176504e5bcc33ca4e
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+userspace arch: arm64
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11763734580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17b9e3e2580000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/a6ff641e43d2/disk-143937ca.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/22d9e0afd13f/vmlinux-143937ca.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/3ab2dee8c9ca/Image-143937ca.gz.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+ec7176504e5bcc33ca4e@syzkaller.appspotmail.com
+
+ do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
+ el0_svc+0x5c/0x254 arch/arm64/kernel/entry-common.c:746
+ el0t_64_sync_handler+0x84/0x12c arch/arm64/kernel/entry-common.c:765
+ el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:596
+==================================================================
+BUG: KASAN: slab-use-after-free in qfq_reset_qdisc+0xcc/0x208 net/sched/sch_qfq.c:1484
+Read of size 8 at addr ffff0000ca2bfe50 by task syz.0.17/6716
+
+CPU: 0 UID: 0 PID: 6716 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/30/2025
+Call trace:
+ show_stack+0x2c/0x3c arch/arm64/kernel/stacktrace.c:499 (C)
+ __dump_stack+0x30/0x40 lib/dump_stack.c:94
+ dump_stack_lvl+0xd8/0x12c lib/dump_stack.c:120
+ print_address_description+0xa8/0x238 mm/kasan/report.c:378
+ print_report+0x68/0x84 mm/kasan/report.c:482
+ kasan_report+0xb0/0x110 mm/kasan/report.c:595
+ __asan_report_load8_noabort+0x20/0x2c mm/kasan/report_generic.c:381
+ qfq_reset_qdisc+0xcc/0x208 net/sched/sch_qfq.c:1484
+ qdisc_reset+0x128/0x598 net/sched/sch_generic.c:1038
+ __qdisc_destroy+0x134/0x4bc net/sched/sch_generic.c:1077
+ qdisc_put net/sched/sch_generic.c:1109 [inline]
+ dev_shutdown+0x35c/0x47c net/sched/sch_generic.c:1497
+ unregister_netdevice_many_notify+0xbb8/0x1de0 net/core/dev.c:12242
+ unregister_netdevice_many net/core/dev.c:12317 [inline]
+ unregister_netdevice_queue+0x2b4/0x300 net/core/dev.c:12161
+ unregister_netdevice include/linux/netdevice.h:3389 [inline]
+ __tun_detach+0x5d4/0x1304 drivers/net/tun.c:621
+ tun_detach drivers/net/tun.c:637 [inline]
+ tun_chr_close+0x118/0x1f8 drivers/net/tun.c:3436
+ __fput+0x340/0x75c fs/file_table.c:468
+ ____fput+0x20/0x58 fs/file_table.c:496
+ task_work_run+0x1dc/0x260 kernel/task_work.c:227
+ resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
+ exit_to_user_mode_loop+0xfc/0x178 kernel/entry/common.c:43
+ exit_to_user_mode_prepare include/linux/irq-entry-common.h:225 [inline]
+ arm64_exit_to_user_mode arch/arm64/kernel/entry-common.c:103 [inline]
+ el0_svc+0x170/0x254 arch/arm64/kernel/entry-common.c:747
+ el0t_64_sync_handler+0x84/0x12c arch/arm64/kernel/entry-common.c:765
+ el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:596
+
+Allocated by task 6716:
+ kasan_save_stack mm/kasan/common.c:56 [inline]
+ kasan_save_track+0x40/0x78 mm/kasan/common.c:77
+ kasan_save_alloc_info+0x44/0x54 mm/kasan/generic.c:573
+ poison_kmalloc_redzone mm/kasan/common.c:400 [inline]
+ __kasan_kmalloc+0x9c/0xb4 mm/kasan/common.c:417
+ kasan_kmalloc include/linux/kasan.h:262 [inline]
+ __kmalloc_cache_noprof+0x3a4/0x65c mm/slub.c:5748
+ kmalloc_noprof include/linux/slab.h:957 [inline]
+ kzalloc_noprof include/linux/slab.h:1094 [inline]
+ qfq_change_class+0x498/0xbe8 net/sched/sch_qfq.c:479
+ __tc_ctl_tclass net/sched/sch_api.c:2274 [inline]
+ tc_ctl_tclass+0x988/0x10b0 net/sched/sch_api.c:2304
+ rtnetlink_rcv_msg+0x624/0x97c net/core/rtnetlink.c:6963
+ netlink_rcv_skb+0x220/0x3fc net/netlink/af_netlink.c:2552
+ rtnetlink_rcv+0x28/0x38 net/core/rtnetlink.c:6981
+ netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+ netlink_unicast+0x694/0x8c4 net/netlink/af_netlink.c:1346
+ netlink_sendmsg+0x648/0x930 net/netlink/af_netlink.c:1896
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0x490/0x7b8 net/socket.c:2630
+ ___sys_sendmsg+0x204/0x278 net/socket.c:2684
+ __sys_sendmsg net/socket.c:2716 [inline]
+ __do_sys_sendmsg net/socket.c:2721 [inline]
+ __se_sys_sendmsg net/socket.c:2719 [inline]
+ __arm64_sys_sendmsg+0x184/0x238 net/socket.c:2719
+ __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+ invoke_syscall+0x98/0x254 arch/arm64/kernel/syscall.c:49
+ el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:132
+ do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
+ el0_svc+0x5c/0x254 arch/arm64/kernel/entry-common.c:746
+ el0t_64_sync_handler+0x84/0x12c arch/arm64/kernel/entry-common.c:765
+ el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:596
+
+Freed by task 6716:
+ kasan_save_stack mm/kasan/common.c:56 [inline]
+ kasan_save_track+0x40/0x78 mm/kasan/common.c:77
+ __kasan_save_free_info+0x58/0x70 mm/kasan/generic.c:587
+ kasan_save_free_info mm/kasan/kasan.h:406 [inline]
+ poison_slab_object mm/kasan/common.c:252 [inline]
+ __kasan_slab_free+0x74/0xa4 mm/kasan/common.c:284
+ kasan_slab_free include/linux/kasan.h:234 [inline]
+ slab_free_hook mm/slub.c:2523 [inline]
+ slab_free mm/slub.c:6611 [inline]
+ kfree+0x184/0x600 mm/slub.c:6818
+ qfq_change_class+0x92c/0xbe8 net/sched/sch_qfq.c:533
+ __tc_ctl_tclass net/sched/sch_api.c:2274 [inline]
+ tc_ctl_tclass+0x988/0x10b0 net/sched/sch_api.c:2304
+ rtnetlink_rcv_msg+0x624/0x97c net/core/rtnetlink.c:6963
+ netlink_rcv_skb+0x220/0x3fc net/netlink/af_netlink.c:2552
+ rtnetlink_rcv+0x28/0x38 net/core/rtnetlink.c:6981
+ netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
+ netlink_unicast+0x694/0x8c4 net/netlink/af_netlink.c:1346
+ netlink_sendmsg+0x648/0x930 net/netlink/af_netlink.c:1896
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ ____sys_sendmsg+0x490/0x7b8 net/socket.c:2630
+ ___sys_sendmsg+0x204/0x278 net/socket.c:2684
+ __sys_sendmsg net/socket.c:2716 [inline]
+ __do_sys_sendmsg net/socket.c:2721 [inline]
+ __se_sys_sendmsg net/socket.c:2719 [inline]
+ __arm64_sys_sendmsg+0x184/0x238 net/socket.c:2719
+ __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
+ invoke_syscall+0x98/0x254 arch/arm64/kernel/syscall.c:49
+ el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:132
+ do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
+ el0_svc+0x5c/0x254 arch/arm64/kernel/entry-common.c:746
+ el0t_64_sync_handler+0x84/0x12c arch/arm64/kernel/entry-common.c:765
+ el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:596
+
+The buggy address belongs to the object at ffff0000ca2bfe00
+ which belongs to the cache kmalloc-128 of size 128
+The buggy address is located 80 bytes inside of
+ freed 128-byte region [ffff0000ca2bfe00, ffff0000ca2bfe80)
+
+The buggy address belongs to the physical page:
+page: refcount:0 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x10a2bf
+flags: 0x5ffc00000000000(node=0|zone=2|lastcpupid=0x7ff)
+page_type: f5(slab)
+raw: 05ffc00000000000 ffff0000c0001a00 dead000000000122 0000000000000000
+raw: 0000000000000000 0000000080100010 00000000f5000000 0000000000000000
+page dumped because: kasan: bad access detected
+
+Memory state around the buggy address:
+ ffff0000ca2bfd00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 fc
+ ffff0000ca2bfd80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>ffff0000ca2bfe00: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                                 ^
+ ffff0000ca2bfe80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff0000ca2bff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 fc fc fc
+==================================================================
+Unable to handle kernel paging request at virtual address 006a007b60000350
+Mem abort info:
+  ESR = 0x0000000096000004
+  EC = 0x25: DABT (current EL), IL = 32 bits
+  SET = 0, FnV = 0
+  EA = 0, S1PTW = 0
+  FSC = 0x04: level 0 translation fault
+Data abort info:
+  ISV = 0, ISS = 0x00000004, ISS2 = 0x00000000
+  CM = 0, WnR = 0, TnD = 0, TagAccess = 0
+  GCS = 0, Overlay = 0, DirtyBit = 0, Xs = 0
+[006a007b60000350] address between user and kernel address ranges
+Internal error: Oops: 0000000096000004 [#1]  SMP
+Modules linked in:
+CPU: 0 UID: 0 PID: 6716 Comm: syz.0.17 Tainted: G    B               syzkaller #0 PREEMPT 
+Tainted: [B]=BAD_PAGE
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/30/2025
+pstate: 83400005 (Nzcv daif +PAN -UAO +TCO +DIT -SSBS BTYPE=--)
+pc : qfq_reset_qdisc+0xbc/0x208 net/sched/sch_qfq.c:1484
+lr : qfq_reset_qdisc+0x158/0x208 net/sched/sch_qfq.c:1483
+sp : ffff8000a5b577c0
+x29: ffff8000a5b577d0 x28: 0000000000000000 x27: 1fffe0001a92d05a
+x26: 006a807b60000350 x25: dfff800000000000 x24: 0000000000000000
+x23: 035403db00001a84 x22: 035403db00001a34 x21: ffff0000d49682d0
+x20: ffff0000d49682d8 x19: ffff0000d4968000 x18: 1fffe000337db690
+x17: 3d3d3d3d3d3d3d3d x16: ffff800082de9540 x15: 0000000000000001
+x14: 1ffff0001250b1b8 x13: 0000000000000000 x12: 0000000000000000
+x11: ffff70001250b1b9 x10: 0000000000ff0100 x9 : 0000000000000000
+x8 : ffff0000c9320000 x7 : 0000000000000001 x6 : ffff8000805638d4
+x5 : 0000000000000000 x4 : 0000000000000000 x3 : ffff80008936af34
+x2 : 0000000000000000 x1 : 0000000000000008 x0 : 0000000000000000
+Call trace:
+ qfq_reset_qdisc+0xbc/0x208 net/sched/sch_qfq.c:1484 (P)
+ qdisc_reset+0x128/0x598 net/sched/sch_generic.c:1038
+ __qdisc_destroy+0x134/0x4bc net/sched/sch_generic.c:1077
+ qdisc_put net/sched/sch_generic.c:1109 [inline]
+ dev_shutdown+0x35c/0x47c net/sched/sch_generic.c:1497
+ unregister_netdevice_many_notify+0xbb8/0x1de0 net/core/dev.c:12242
+ unregister_netdevice_many net/core/dev.c:12317 [inline]
+ unregister_netdevice_queue+0x2b4/0x300 net/core/dev.c:12161
+ unregister_netdevice include/linux/netdevice.h:3389 [inline]
+ __tun_detach+0x5d4/0x1304 drivers/net/tun.c:621
+ tun_detach drivers/net/tun.c:637 [inline]
+ tun_chr_close+0x118/0x1f8 drivers/net/tun.c:3436
+ __fput+0x340/0x75c fs/file_table.c:468
+ ____fput+0x20/0x58 fs/file_table.c:496
+ task_work_run+0x1dc/0x260 kernel/task_work.c:227
+ resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
+ exit_to_user_mode_loop+0xfc/0x178 kernel/entry/common.c:43
+ exit_to_user_mode_prepare include/linux/irq-entry-common.h:225 [inline]
+ arm64_exit_to_user_mode arch/arm64/kernel/entry-common.c:103 [inline]
+ el0_svc+0x170/0x254 arch/arm64/kernel/entry-common.c:747
+ el0t_64_sync_handler+0x84/0x12c arch/arm64/kernel/entry-common.c:765
+ el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:596
+Code: d1002116 b4000656 910142d7 d343fefa (38796b48) 
+---[ end trace 0000000000000000 ]---
+----------------
+Code disassembly (best guess):
+   0:	d1002116 	sub	x22, x8, #0x8
+   4:	b4000656 	cbz	x22, 0xcc
+   8:	910142d7 	add	x23, x22, #0x50
+   c:	d343fefa 	lsr	x26, x23, #3
+* 10:	38796b48 	ldrb	w8, [x26, x25] <-- trapping instruction
 
 
->
-> The sensitivity to default queue count was why we didn't change most
-> of the drivers when netif_get_num_default_rss_queues() got reworked
-> to a more sane default than 8.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
---0000000000004096260642e6ca97
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-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
-DPVtLUtep/P3evQuAtTQRaKedjamBcUpJ7qUhBuv/Z07LlLIlB/vfNSPWe1V+njTezc8m3VfvNEC
-qEpXasPSfDgfcuUhcPR+7++oUDaTt9iqGFOjwiURxx08pL6ogSuiT41O4Xu7msabnUE6RY0O0xR5
-5UGwbpC1QSmnBq7TAy8oQg/nNw4vowEh3S2lmjdHCOdR270Ygd7jet8WQKa5ia4ZK4QdkS8+5uLt
-rMMRyM3QurndiZZJBipjPvEWJR/+jod8867f3n0CAwEAAaOCAd0wggHZMA4GA1UdDwEB/wQEAwIF
-oDAMBgNVHRMBAf8EAjAAMIGTBggrBgEFBQcBAQSBhjCBgzBGBggrBgEFBQcwAoY6aHR0cDovL3Nl
-Y3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyNnNtaW1lY2EyMDIzLmNydDA5BggrBgEF
-BQcwAYYtaHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyNnNtaW1lY2EyMDIzMGUGA1Ud
-IAReMFwwCQYHZ4EMAQUDAzALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgoDAjA0MDIGCCsGAQUFBwIB
-FiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzBBBgNVHR8EOjA4MDagNKAy
-hjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWltZWNhMjAyMy5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBQAKTaeXHq6D68tUC3boCOFGLCgkjAdBgNVHQ4EFgQUJbO/Fi7RhZHYmATVQf6NlAH2
-qUcwDQYJKoZIhvcNAQELBQADggIBABcLQEF8mPE9o6GHJd52vmHFsKsf8vRmdMEouFxrW+GhXXzg
-2/AqqhXeeFZki82D6/5VAPkeVcgDeGZ43Bv89GHnjh/Vv0iCUGHgClZezpWdKCAXkn698xoh1+Wx
-K/c/SHMqGWfBSVm1ygKAWkmzJLF/rd4vUE0pjvZVBpNSVkjXgc80dTZcs7OvoFnt14UgvjuYe+Ia
-H/ux6819kbi0Tmmj5LwSZW8GXw3zcPmAyEYc0ZDCZk9QckL5yPzMlTAsy0Q+NMVpJ8onLj/mHgTk
-Ev8zt1OUE8MlXZj2+wgVY+az2T8rGmqRU2iOzRlJnc86qVwuwjL9AA9v4R13Yt8zYyA7jL0NiBNP
-WaOSajKBB5Z/4ZVtcvOMILD1+G+CVZX7GUWERT9NRXw/SyIEMU59lFbuvy4zxe3+RbOleCgp3pze
-q8HE2p9rkOJT3MkCNLxe+ij4RytIvPQXACsZeLdfTDUnjeXCDDJ9KugVhuqMelAZc4NissPz8FOn
-2NK++r5/QamlFqYRhsFxSBIvhkh2Q/hD3/zy4j17Yf/FUje5uyg03FblSBOk2WYpRpXEuCpyn5pb
-bYVIzfhQJgwGfO+L8BAeZIFjO1QL3s/zzn+RBlTl4wdDzh8L9eS+QEDhMcSsqb4fFRDbsoVuRjpx
-R5MunSUzk4GcmmM19m7oHhPGeKwIMYICVzCCAlMCAQEwYjBSMQswCQYDVQQGEwJCRTEZMBcGA1UE
-ChMQR2xvYmFsU2lnbiBudi1zYTEoMCYGA1UEAxMfR2xvYmFsU2lnbiBHQ0MgUjYgU01JTUUgQ0Eg
-MjAyMwIMZh03KTi4m/vsqWZxMA0GCWCGSAFlAwQCAQUAoIHHMC8GCSqGSIb3DQEJBDEiBCAvg2yw
-NQ9LMNBEqewi18pouaYV4/uQWY97+TiCuqzzAzAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwG
-CSqGSIb3DQEJBTEPFw0yNTExMDYwNjAxMDNaMFwGCSqGSIb3DQEJDzFPME0wCwYJYIZIAWUDBAEq
-MAsGCWCGSAFlAwQBFjALBglghkgBZQMEAQIwCgYIKoZIhvcNAwcwCwYJKoZIhvcNAQEHMAsGCWCG
-SAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBfalTabN6jdtL5wG/swAuetF86bDxS0Ef3AVDwebQ0
-5fEjLDHwdjEtE8yBRy/XsQtPtMhyzw0ZqvfusjkpudEZIqGeEmlj1r2/25Nj8MxKMI3G2pbX29+c
-Kj6zEslMkP879qJ+42AOOx0rXcsa9y8pes6zRPX+3p4pJw9WzVhfztfdHXV2eibtiXoBdxLdk9W/
-C0dlH4E/leAJ6crXev77Euze3PdHXIZ8Tc4KIe/P/GTFi6un/H1d6tFJxXsio5BQuttSRejljOb3
-pH8Y7R16htJnmiA/d0/sQKiB6r/QYx9RsLRwSzGKX8G3F0iw4knA68CUhtG/3Wqkxr66xuZi
---0000000000004096260642e6ca97--
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
