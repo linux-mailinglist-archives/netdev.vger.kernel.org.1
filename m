@@ -1,192 +1,265 @@
-Return-Path: <netdev+bounces-236214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E23EC39D73
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 10:38:55 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F547C39E2B
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 10:47:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 087E04E1437
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 09:38:54 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E9CEC4FD82F
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 09:45:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D1A72D9EE0;
-	Thu,  6 Nov 2025 09:38:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9291B219A8A;
+	Thu,  6 Nov 2025 09:45:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F344286D55
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 09:38:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A96227510B
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 09:45:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762421932; cv=none; b=De0NBBZYnWLe6xl8jn2BKfKHXxD2lrRP5No8ZM3JPjEz0t0O/skBjwpH8fXUpymGRzEuVg1yXVDXfBaLkwZaFxQA87Ia5BT4ol8jrWHA3lR1z+e66MqL3a4CgHQNmj4v7toueHk4M6qLRR8Rzzfd5QQXW+TyikUSMuaH38rxEC0=
+	t=1762422333; cv=none; b=jSUkw5jWeofkDenfxzSIDaFnSkqPapusEgiuuTQBcrQA3Xl5XUK6tQuvAT/JXqvaeFVfZJHVoCHBpZkzFhoVIZ3+nXh+zX1F7JD1WgivihpzNQj6bPI9d0N4AURlRi+U7Ir+XoHiPAH8vs7RV24lvo4i+AjPc3IpSsUgGhqbTLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762421932; c=relaxed/simple;
-	bh=DtghamWpAqJB0XWQ7CTqHFHj1cr0WF4rtk3lIQlCrqQ=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=GXaFgtA+D/m6zbXESqxF1vVNWMp6O/F3dMOqaNIIwKUbZ9lCmOts4cPLh046couwwRe/ivxDDsXvFRN4yxdraFZdenm5kyvE1d6dznNf4vk1GRbXAGfsR1KolkeSBMk2mZIsHXZhh+DhpJQXctJiYgF7tE5dl6RB3vNL1Zh8l2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+	s=arc-20240116; t=1762422333; c=relaxed/simple;
+	bh=T1JG3gRzFohCXeutxQ1/hQSof93zQqaQskwwtXst5fI=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=k6QSithpy0FYtW8t/5qMfyLV0tXSo9BgiG28Duun2OHfHRJn7DSL3IVahcF6OY4bZpRdJOJuGSGEMK98iVz7wwAln40nBiWY4+hGbW5w5y1KLRH+NKjy7V1WPDwRNb2p2X702TOp5pH+vaYVadFByb7SMvQyexd6ByHSvWsAS3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-43359f10d91so880475ab.2
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 01:38:50 -0800 (PST)
+Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-8870219dce3so15881739f.0
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 01:45:31 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762421929; x=1763026729;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
+        d=1e100.net; s=20230601; t=1762422330; x=1763027130;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4XCdKUDePwC5bK3gnta/IB7CyT1KUfoGo6riGX180/U=;
-        b=frd4QOpHRwUMzN48bIYjPyIf0GLTuzegk08TIvJbJe2PiE/3x4CNmvO8gnFVV0ib4H
-         spEGhdHcbI+0ppfQ+sg2yhr9Aaz6fsj39kRLqWTc3YDnCwKXOmjPFBp/anzlUAFoMOGU
-         R7NWEvLBLwRs7/6yED9zj16dDbyxqmp+f3GbNreYQzYAryzfPrVdLR50vbP2CI1o5llA
-         xrS222RZSpTNRZZOChRM7ptg+FOEeqp+iYLJ4t6Mwu3uSd/zYSs/zR5K88zdER+t4wNC
-         NCgYXu2s6P5xgy1b1k14AlVVXdyDTQxuev2i/d9jgu2ozzGSBlRdZp6N+MCv+uPkvelU
-         r4jw==
-X-Forwarded-Encrypted: i=1; AJvYcCUEgko8D/MduaqSShquiKEJjfGfXexDwYw3oe5VNnlhBaVM8sDodQNhJUMRsuZ7pvuEEM1ss+M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXtuQFXOENLRgsCZw/3YBRmq+ABabnKLBolHZgJcZyYDWt1d++
-	iljCwZzzZ/K7S6JifeG6JpHZKXp5S32qWruGCnAbDwI6/goWyZSdC4EEEDr/8L6zzVqDPriXTlA
-	p0L6urSUU7P+yN4PwpJledUP0Io6DLgzmmaNKsHLp28wjW6k5wyFRtfuoe8Q=
-X-Google-Smtp-Source: AGHT+IH9osoLtWiCfH/NNOXjcc2ah3tFcq/2eWNZvEHN1P6kE0z6RiQNUsqnqRukosCs2D1Akiz5WhECLDbLEokeBK9MQKL3dDs5
+        bh=ZTcgL6H5oY5FCjggOzmzN/zMv4D73ZQd/MUlTuqioEA=;
+        b=aWsj42tc6Ssw8O2xkYEWbZtsabXkYzLMlYWGZ5lQJ5G5yWWGS5plYsqFPwGtEstGqN
+         CmBj/sItnUNT5ECHibht0ToWh8hPrl3kw5V1l9pEF1cOpB8uOApeZJH4h92GJf3NDALD
+         n4CGqukxE295PsfKFiu8MJMvd1utbZovBJuo8xHDjND2eXzNSqe78R91SLbZUBMYp1LP
+         JsKkmj6tMH6fhpCQ/6MEJB+6dGJDi15KaXUX4xfroIcK+61a5p4SCf+GQrN0cte1LW1U
+         O/pb/InXZ43IQtPF5CynaTHKxhYitXx4DkTCGTzHRY7J7VipREqs4axt5Woi2dQ58Asb
+         zN1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWu3mNLCZd5aSJc2/RKcP84sZArM0HYPnMB5tS18L2QlnVkaCqrPt1NKmWuMaABLFYxB4+4qZA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YygrpQ6MzLBwFPIu+EcgobSDYylZBqzl2EAAyMQjx9ezTWDI208
+	xG6si3gQ9SFJ/Qtxgf7yRypRkYry7LWTySw2XtKLyVxv2J9uonB2zZlIV0T/k7207jngwB1fecA
+	IWh+V5fuQGya7oN23l0e86OhgXkX6BATfcSobML79MKoSPdrLQbcFGvon2ZQ=
+X-Google-Smtp-Source: AGHT+IG0cB2j9bryLBdBpOtLE59pe4+E5rx7ZQ1JMEg73jOxwVU5mtzuatZQPVVXpnM3zAoO92cxRI9GgLGlEkV958n2FokGzRRi
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1aab:b0:433:206d:5333 with SMTP id
- e9e14a558f8ab-43340800e28mr91240385ab.30.1762421929495; Thu, 06 Nov 2025
- 01:38:49 -0800 (PST)
-Date: Thu, 06 Nov 2025 01:38:49 -0800
-In-Reply-To: <20251106053309.401275-1-kuniyu@google.com>
+X-Received: by 2002:a05:6602:6b08:b0:943:5c83:d68e with SMTP id
+ ca18e2360f4ac-94869cb498bmr905272739f.1.1762422330444; Thu, 06 Nov 2025
+ 01:45:30 -0800 (PST)
+Date: Thu, 06 Nov 2025 01:45:30 -0800
+In-Reply-To: <685d4c2a.a00a0220.2e5631.028c.GAE@google.com>
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <690c6ca9.050a0220.1e8caa.00d2.GAE@google.com>
-Subject: [syzbot ci] Re: tipc: Fix use-after-free in tipc_mon_reinit_self().
-From: syzbot ci <syzbot+cif2d6d318f7e85f0b@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, hoang.h.le@dektech.com.au, 
-	horms@kernel.org, jmaloy@redhat.com, kuba@kernel.org, kuni1840@gmail.com, 
-	kuniyu@google.com, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzbot@syzkaller.appspotmail.com, tipc-discussion@lists.sourceforge.net
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+Message-ID: <690c6e3a.050a0220.3d0d33.0123.GAE@google.com>
+Subject: Re: [syzbot] [hams?] possible deadlock in nr_rt_ioctl (2)
+From: syzbot <syzbot+14afda08dc3484d5db82@syzkaller.appspotmail.com>
+To: davem@davemloft.net, eadavis@qq.com, edumazet@google.com, hdanton@sina.com, 
+	horms@kernel.org, kuba@kernel.org, linux-hams@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 
-syzbot ci has tested the following series
+syzbot has found a reproducer for the following issue on:
 
-[v1] tipc: Fix use-after-free in tipc_mon_reinit_self().
-https://lore.kernel.org/all/20251106053309.401275-1-kuniyu@google.com
-* [PATCH v1 net] tipc: Fix use-after-free in tipc_mon_reinit_self().
+HEAD commit:    dc77806cf3b4 Merge tag 'rust-fixes-6.18' of git://git.kern..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=14c0e114580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=609c87dcb0628493
+dashboard link: https://syzkaller.appspot.com/bug?extid=14afda08dc3484d5db82
+compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17feb812580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15fb5812580000
 
-and found the following issue:
-possible deadlock in tipc_mon_reinit_self
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/d900f083ada3/non_bootable_disk-dc77806c.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/eef2d5e8c3fb/vmlinux-dc77806c.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/e6323f5f18c6/bzImage-dc77806c.xz
 
-Full report is available here:
-https://ci.syzbot.org/series/bfabf013-65e3-4ca9-8f54-0c7eef8be01a
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+14afda08dc3484d5db82@syzkaller.appspotmail.com
 
-***
-
-possible deadlock in tipc_mon_reinit_self
-
-tree:      net
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net.git
-base:      3d18a84eddde169d6dbf3c72cc5358b988c347d0
-arch:      amd64
-compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-config:    https://ci.syzbot.org/builds/b2774856-e331-420e-a340-5107ec4b06f9/config
-C repro:   https://ci.syzbot.org/findings/1f0a4298-b797-4217-8d6d-15f98c0ffd38/c_repro
-syz repro: https://ci.syzbot.org/findings/1f0a4298-b797-4217-8d6d-15f98c0ffd38/syz_repro
-
-tipc: Started in network mode
-tipc: Node identity 4, cluster identity 4711
-tipc: Node number set to 4
-============================================
-WARNING: possible recursive locking detected
+bond0: (slave rose0): Error: Device is in use and cannot be enslaved
+======================================================
+WARNING: possible circular locking dependency detected
 syzkaller #0 Not tainted
---------------------------------------------
-syz.0.17/5963 is trying to acquire lock:
-ffffffff8f2cb1c8 (rtnl_mutex){+.+.}-{4:4}, at: tipc_mon_reinit_self+0x25/0x360 net/tipc/monitor.c:714
+------------------------------------------------------
+syz.0.18/6086 is trying to acquire lock:
+ffffffff9033ef98 (nr_neigh_list_lock){+...}-{3:3}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
+ffffffff9033ef98 (nr_neigh_list_lock){+...}-{3:3}, at: nr_remove_neigh net/netrom/nr_route.c:307 [inline]
+ffffffff9033ef98 (nr_neigh_list_lock){+...}-{3:3}, at: nr_del_node net/netrom/nr_route.c:342 [inline]
+ffffffff9033ef98 (nr_neigh_list_lock){+...}-{3:3}, at: nr_rt_ioctl+0x2007/0x29b0 net/netrom/nr_route.c:678
 
 but task is already holding lock:
-ffffffff8f2cb1c8 (rtnl_mutex){+.+.}-{4:4}, at: __tipc_nl_compat_doit net/tipc/netlink_compat.c:358 [inline]
-ffffffff8f2cb1c8 (rtnl_mutex){+.+.}-{4:4}, at: tipc_nl_compat_doit+0x1fd/0x5f0 net/tipc/netlink_compat.c:393
+ffff88802acfc870 (&nr_node->node_lock){+...}-{3:3}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
+ffff88802acfc870 (&nr_node->node_lock){+...}-{3:3}, at: nr_node_lock include/net/netrom.h:152 [inline]
+ffff88802acfc870 (&nr_node->node_lock){+...}-{3:3}, at: nr_del_node net/netrom/nr_route.c:335 [inline]
+ffff88802acfc870 (&nr_node->node_lock){+...}-{3:3}, at: nr_rt_ioctl+0x29d/0x29b0 net/netrom/nr_route.c:678
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #2 (&nr_node->node_lock){+...}-{3:3}:
+       __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+       _raw_spin_lock_bh+0x33/0x40 kernel/locking/spinlock.c:178
+       spin_lock_bh include/linux/spinlock.h:356 [inline]
+       nr_node_lock include/net/netrom.h:152 [inline]
+       nr_del_node net/netrom/nr_route.c:335 [inline]
+       nr_rt_ioctl+0x29d/0x29b0 net/netrom/nr_route.c:678
+       nr_ioctl+0x19a/0x2d0 net/netrom/af_netrom.c:1254
+       sock_do_ioctl+0x118/0x280 net/socket.c:1254
+       sock_ioctl+0x227/0x6b0 net/socket.c:1375
+       vfs_ioctl fs/ioctl.c:51 [inline]
+       __do_sys_ioctl fs/ioctl.c:597 [inline]
+       __se_sys_ioctl fs/ioctl.c:583 [inline]
+       __x64_sys_ioctl+0x18e/0x210 fs/ioctl.c:583
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #1 (nr_node_list_lock){+...}-{3:3}:
+       __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+       _raw_spin_lock_bh+0x33/0x40 kernel/locking/spinlock.c:178
+       spin_lock_bh include/linux/spinlock.h:356 [inline]
+       nr_rt_device_down+0xd3/0x810 net/netrom/nr_route.c:517
+       nr_device_event+0x126/0x170 net/netrom/af_netrom.c:126
+       notifier_call_chain+0xbc/0x410 kernel/notifier.c:85
+       call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:2229
+       call_netdevice_notifiers_extack net/core/dev.c:2267 [inline]
+       call_netdevice_notifiers net/core/dev.c:2281 [inline]
+       netif_close_many+0x319/0x630 net/core/dev.c:1784
+       netif_close net/core/dev.c:1797 [inline]
+       netif_close+0x17f/0x230 net/core/dev.c:1791
+       dev_close+0xaa/0x240 net/core/dev_api.c:220
+       bpq_device_event+0x6a9/0x910 drivers/net/hamradio/bpqether.c:528
+       notifier_call_chain+0xbc/0x410 kernel/notifier.c:85
+       call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:2229
+       call_netdevice_notifiers_extack net/core/dev.c:2267 [inline]
+       call_netdevice_notifiers net/core/dev.c:2281 [inline]
+       netif_close_many+0x319/0x630 net/core/dev.c:1784
+       netif_close net/core/dev.c:1797 [inline]
+       netif_close+0x17f/0x230 net/core/dev.c:1791
+       dev_close+0xaa/0x240 net/core/dev_api.c:220
+       bond_setup_by_slave drivers/net/bonding/bond_main.c:1567 [inline]
+       bond_enslave+0x1e42/0x5de0 drivers/net/bonding/bond_main.c:1972
+       bond_do_ioctl+0x601/0x6c0 drivers/net/bonding/bond_main.c:4615
+       dev_siocbond net/core/dev_ioctl.c:516 [inline]
+       dev_ifsioc+0xe9c/0x1f70 net/core/dev_ioctl.c:666
+       dev_ioctl+0x223/0x10e0 net/core/dev_ioctl.c:838
+       sock_do_ioctl+0x19d/0x280 net/socket.c:1268
+       sock_ioctl+0x227/0x6b0 net/socket.c:1375
+       vfs_ioctl fs/ioctl.c:51 [inline]
+       __do_sys_ioctl fs/ioctl.c:597 [inline]
+       __se_sys_ioctl fs/ioctl.c:583 [inline]
+       __x64_sys_ioctl+0x18e/0x210 fs/ioctl.c:583
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #0 (nr_neigh_list_lock){+...}-{3:3}:
+       check_prev_add kernel/locking/lockdep.c:3165 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3284 [inline]
+       validate_chain kernel/locking/lockdep.c:3908 [inline]
+       __lock_acquire+0x126f/0x1c90 kernel/locking/lockdep.c:5237
+       lock_acquire kernel/locking/lockdep.c:5868 [inline]
+       lock_acquire+0x179/0x350 kernel/locking/lockdep.c:5825
+       __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+       _raw_spin_lock_bh+0x33/0x40 kernel/locking/spinlock.c:178
+       spin_lock_bh include/linux/spinlock.h:356 [inline]
+       nr_remove_neigh net/netrom/nr_route.c:307 [inline]
+       nr_del_node net/netrom/nr_route.c:342 [inline]
+       nr_rt_ioctl+0x2007/0x29b0 net/netrom/nr_route.c:678
+       nr_ioctl+0x19a/0x2d0 net/netrom/af_netrom.c:1254
+       sock_do_ioctl+0x118/0x280 net/socket.c:1254
+       sock_ioctl+0x227/0x6b0 net/socket.c:1375
+       vfs_ioctl fs/ioctl.c:51 [inline]
+       __do_sys_ioctl fs/ioctl.c:597 [inline]
+       __se_sys_ioctl fs/ioctl.c:583 [inline]
+       __x64_sys_ioctl+0x18e/0x210 fs/ioctl.c:583
+       do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+       do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
 other info that might help us debug this:
+
+Chain exists of:
+  nr_neigh_list_lock --> nr_node_list_lock --> &nr_node->node_lock
+
  Possible unsafe locking scenario:
 
-       CPU0
-       ----
-  lock(rtnl_mutex);
-  lock(rtnl_mutex);
+       CPU0                    CPU1
+       ----                    ----
+  lock(&nr_node->node_lock);
+                               lock(nr_node_list_lock);
+                               lock(&nr_node->node_lock);
+  lock(nr_neigh_list_lock);
 
  *** DEADLOCK ***
 
- May be due to missing lock nesting notation
-
-3 locks held by syz.0.17/5963:
- #0: ffffffff8f331050 (cb_lock){++++}-{4:4}, at: genl_rcv+0x19/0x40 net/netlink/genetlink.c:1218
- #1: ffffffff8f330e68 (genl_mutex){+.+.}-{4:4}, at: genl_lock net/netlink/genetlink.c:35 [inline]
- #1: ffffffff8f330e68 (genl_mutex){+.+.}-{4:4}, at: genl_op_lock net/netlink/genetlink.c:60 [inline]
- #1: ffffffff8f330e68 (genl_mutex){+.+.}-{4:4}, at: genl_rcv_msg+0x10d/0x790 net/netlink/genetlink.c:1209
- #2: ffffffff8f2cb1c8 (rtnl_mutex){+.+.}-{4:4}, at: __tipc_nl_compat_doit net/tipc/netlink_compat.c:358 [inline]
- #2: ffffffff8f2cb1c8 (rtnl_mutex){+.+.}-{4:4}, at: tipc_nl_compat_doit+0x1fd/0x5f0 net/tipc/netlink_compat.c:393
+2 locks held by syz.0.18/6086:
+ #0: ffffffff9033eff8 (nr_node_list_lock){+...}-{3:3}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
+ #0: ffffffff9033eff8 (nr_node_list_lock){+...}-{3:3}, at: nr_del_node net/netrom/nr_route.c:334 [inline]
+ #0: ffffffff9033eff8 (nr_node_list_lock){+...}-{3:3}, at: nr_rt_ioctl+0x221/0x29b0 net/netrom/nr_route.c:678
+ #1: ffff88802acfc870 (&nr_node->node_lock){+...}-{3:3}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
+ #1: ffff88802acfc870 (&nr_node->node_lock){+...}-{3:3}, at: nr_node_lock include/net/netrom.h:152 [inline]
+ #1: ffff88802acfc870 (&nr_node->node_lock){+...}-{3:3}, at: nr_del_node net/netrom/nr_route.c:335 [inline]
+ #1: ffff88802acfc870 (&nr_node->node_lock){+...}-{3:3}, at: nr_rt_ioctl+0x29d/0x29b0 net/netrom/nr_route.c:678
 
 stack backtrace:
-CPU: 1 UID: 0 PID: 5963 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
+CPU: 3 UID: 0 PID: 6086 Comm: syz.0.18 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
 Call Trace:
  <TASK>
- dump_stack_lvl+0x189/0x250 lib/dump_stack.c:120
- print_deadlock_bug+0x28b/0x2a0 kernel/locking/lockdep.c:3041
- check_deadlock kernel/locking/lockdep.c:3093 [inline]
- validate_chain+0x1a3f/0x2140 kernel/locking/lockdep.c:3895
- __lock_acquire+0xab9/0xd20 kernel/locking/lockdep.c:5237
- lock_acquire+0x120/0x360 kernel/locking/lockdep.c:5868
- __mutex_lock_common kernel/locking/mutex.c:598 [inline]
- __mutex_lock+0x187/0x1350 kernel/locking/mutex.c:760
- tipc_mon_reinit_self+0x25/0x360 net/tipc/monitor.c:714
- tipc_net_finalize+0x115/0x190 net/tipc/net.c:140
- tipc_net_init+0x104/0x190 net/tipc/net.c:122
- __tipc_nl_net_set+0x3b9/0x5a0 net/tipc/net.c:263
- __tipc_nl_compat_doit net/tipc/netlink_compat.c:371 [inline]
- tipc_nl_compat_doit+0x3bc/0x5f0 net/tipc/netlink_compat.c:393
- tipc_nl_compat_handle net/tipc/netlink_compat.c:-1 [inline]
- tipc_nl_compat_recv+0x83c/0xbe0 net/tipc/netlink_compat.c:1321
- genl_family_rcv_msg_doit+0x215/0x300 net/netlink/genetlink.c:1115
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0x60e/0x790 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x208/0x470 net/netlink/af_netlink.c:2552
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
- netlink_unicast_kernel net/netlink/af_netlink.c:1320 [inline]
- netlink_unicast+0x82f/0x9e0 net/netlink/af_netlink.c:1346
- netlink_sendmsg+0x805/0xb30 net/netlink/af_netlink.c:1896
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg+0x21c/0x270 net/socket.c:742
- ____sys_sendmsg+0x505/0x830 net/socket.c:2630
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2684
- __sys_sendmsg net/socket.c:2716 [inline]
- __do_sys_sendmsg net/socket.c:2721 [inline]
- __se_sys_sendmsg net/socket.c:2719 [inline]
- __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2719
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
+ print_circular_bug+0x275/0x350 kernel/locking/lockdep.c:2043
+ check_noncircular+0x14c/0x170 kernel/locking/lockdep.c:2175
+ check_prev_add kernel/locking/lockdep.c:3165 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3284 [inline]
+ validate_chain kernel/locking/lockdep.c:3908 [inline]
+ __lock_acquire+0x126f/0x1c90 kernel/locking/lockdep.c:5237
+ lock_acquire kernel/locking/lockdep.c:5868 [inline]
+ lock_acquire+0x179/0x350 kernel/locking/lockdep.c:5825
+ __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+ _raw_spin_lock_bh+0x33/0x40 kernel/locking/spinlock.c:178
+ spin_lock_bh include/linux/spinlock.h:356 [inline]
+ nr_remove_neigh net/netrom/nr_route.c:307 [inline]
+ nr_del_node net/netrom/nr_route.c:342 [inline]
+ nr_rt_ioctl+0x2007/0x29b0 net/netrom/nr_route.c:678
+ nr_ioctl+0x19a/0x2d0 net/netrom/af_netrom.c:1254
+ sock_do_ioctl+0x118/0x280 net/socket.c:1254
+ sock_ioctl+0x227/0x6b0 net/socket.c:1375
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:597 [inline]
+ __se_sys_ioctl fs/ioctl.c:583 [inline]
+ __x64_sys_ioctl+0x18e/0x210 fs/ioctl.c:583
  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7f13d8b8efc9
+RIP: 0033:0x7f5a58b8f6c9
 Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fff77cccbf8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f13d8de5fa0 RCX: 00007f13d8b8efc9
-RDX: 0000000000000000 RSI: 00002000000001c0 RDI: 0000000000000003
-RBP: 00007f13d8c11f91 R08: 0000000000000000 R09: 0000000000000000
+RSP: 002b:00007fff0134ba58 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f5a58de5fa0 RCX: 00007f5a58b8f6c9
+RDX: 0000200000000680 RSI: 000000000000890c RDI: 000000000000000a
+RBP: 00007f5a58c11f91 R08: 0000000000000000 R09: 0000000000000000
 R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007f13d8de5fa0 R14: 00007f13d8de5fa0 R15: 0000000000000003
+R13: 00007f5a58de5fa0 R14: 00007f5a58de5fa0 R15: 0000000000000003
  </TASK>
 
 
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
 ---
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
