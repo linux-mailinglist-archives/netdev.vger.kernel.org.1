@@ -1,240 +1,286 @@
-Return-Path: <netdev+bounces-236406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82655C3BEF0
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 16:02:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DF07C3BF1D
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 16:04:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA4BF1884589
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 14:57:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 772573BFF7B
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 14:57:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87A5BEACE;
-	Thu,  6 Nov 2025 14:57:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C86AA2F3C2A;
+	Thu,  6 Nov 2025 14:57:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uFI9yH65"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EDnZxEWX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FB79303CA8
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 14:57:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762441028; cv=none; b=Fc3fbfPDpVSYl7DuxCZMdUK3SkBkojxV06H8+GMvJIQ9dzoZi++QjesrwpVXy5wTFAhNzI24JfbQTlj5AiEPrDCNs/qj1YvTDD5jKt9k18vwl8DZThUgiwbW8X79jhXacbJNOqCNMl1/2bt7C7RpEbrBzgQuYjbB3og/NjV8PvI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762441028; c=relaxed/simple;
-	bh=epY9yCwjum0Gz0P+Spesm56f/Fc1oNQHj3RX42pw+mE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=e56aae3sO9D5OIEIR/JNjGtzYllAwou0LqwROMFQl2or16udHnsMOnRhhZKec8o97qEULpz594bN5NrgDVykamk3wSoO8QFS5gx+qicYNnfqnOD3HMrumNUAXE+2p8fAKpro32RP1cuWCWObulro/4H2AssdvLa3AH1sbzP6CcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uFI9yH65; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFBF4C116C6;
-	Thu,  6 Nov 2025 14:57:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762441024;
-	bh=epY9yCwjum0Gz0P+Spesm56f/Fc1oNQHj3RX42pw+mE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=uFI9yH65oN3oTj6YqMZxeC20tcUHyQcxcP8u0nhC4Ntl+gMcjZUfJan1WOk3tfJZg
-	 p4bz+On/PYcYihEZov+89wC6FPDZio5xJNVAGdeXXm2KPYXwK+wMlT0OpmVEZdua7a
-	 1V3yc8mlEgsJHV7AHzqD0L7SmfYBZmmQETgz0HrW4D7cmQli3WqYImw3aKk3lxwtJq
-	 Yfntc6NvvDTgBTf/LvW2Y1VmklJZ6L2NIUVChIxoxe/Nf3X/+aokmYeue/+skXcz3f
-	 BvwEBgR2WUUt4vfWySFGW99WReQ8me43Z78RZV46d6PQlTkwKKejM8A03KSZ6s4woZ
-	 Pgcewuoq/jykg==
-Message-ID: <0eecf17d-2606-4304-bc75-efe4c7ec73b9@kernel.org>
-Date: Thu, 6 Nov 2025 15:56:59 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0734321256C
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 14:57:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762441060; cv=fail; b=qnCdC/Q73T2Lor5OmAE/bMrznPZadyckmKlvwaqyVdLlBZCaQfrKmoKIvEfSPyVOgclOtN1anie/t0TexFSoP1rTs0PCcNiR5hZL+r3Bphv0u3DGNIuR5XIWS1SmTv1x/Oo8IDGZhm6coIgR37vauE9vbMtSvpCEjW0zMNjrJFM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762441060; c=relaxed/simple;
+	bh=8QfDjFUXMFxMOE8BMn1EPXWXfhm0yFEWfKg80WkU72g=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=iy/vhTmAYyzTaLcRF+UyoA+5NcGbccDSR9ab7D76AAQ6gapOJofkzr49qcTlgmO713YOqzkQjCDIX70GtJcyG/y1V9klojUklCATh8YX68MEjsG+AqejqQc4leirXEf3BDDaK7waQ3q3ocwGnD1eRHftgDwh0QXhjyFGTpZqqvw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EDnZxEWX; arc=fail smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1762441059; x=1793977059;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=8QfDjFUXMFxMOE8BMn1EPXWXfhm0yFEWfKg80WkU72g=;
+  b=EDnZxEWXvDK9io8AeWHpAP/3KgL8d1kYo7xwq7J8LsPqTFX+RWEoNl7H
+   GsocEMdpETWohRua9G7oiDCxxVkW6dMjiVkPN5/E0olNeBOzmOg1u5fA8
+   UCcSh5iPeuUPynsQng/QbKwguWNpZBoCC16q4hjsLJ05PmIW45yEkfarG
+   vStvQdDvOzNdvHFCbW4DLfCNT/RGr0DX3CUX+tmdm1I1rZyZxsxYkFIX8
+   mSnTjD0LKJUzwbuTq2Hgm6DlyRKCMFFjLuUUqmkv3yDRXNVrY2/w1vAol
+   pQnVUFE89TABNME1ZXcclpUURCb/8kXReVA7gFC1vtfoNcCBgG5Za8HsI
+   Q==;
+X-CSE-ConnectionGUID: HFaqId1NSAi71t6gKf9HmQ==
+X-CSE-MsgGUID: 7rEIALF/R4i+/iAxwrp2pw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11604"; a="52145524"
+X-IronPort-AV: E=Sophos;i="6.19,284,1754982000"; 
+   d="scan'208";a="52145524"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2025 06:57:38 -0800
+X-CSE-ConnectionGUID: nhT9bIN6RTeRkinaJ4KLiw==
+X-CSE-MsgGUID: ddnD7DHJTPexEZa3ljNk1g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,284,1754982000"; 
+   d="scan'208";a="188493673"
+Received: from fmsmsx902.amr.corp.intel.com ([10.18.126.91])
+  by fmviesa010.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2025 06:57:38 -0800
+Received: from FMSMSX902.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Thu, 6 Nov 2025 06:57:37 -0800
+Received: from fmsedg902.ED.cps.intel.com (10.1.192.144) by
+ FMSMSX902.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Thu, 6 Nov 2025 06:57:37 -0800
+Received: from PH0PR06CU001.outbound.protection.outlook.com (40.107.208.12) by
+ edgegateway.intel.com (192.55.55.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Thu, 6 Nov 2025 06:57:37 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=CdQek6HnDXMciqqNuUHOyapxThxPDpJ/voWnl6I7EtSGxtRNcp6VGTK/xPOYL3X9w7WbpzgqK/GuxGXNN+xvH3iC87CK7x7eCumQf+nP+iuLQqwq2718z4a0WwbNRbbF+C8ADvo1ob8oJ5NWVzx1YTzsJyDUuHpjQi1v0K8dn31sIfSAPJtKlZlrdQbzt1atNn90OGTYP6WWc9ecywZYRx9oXCoqckTpSL2BtS6S6iXg86CaGnFnzwckVZjNypDY0nT9ELSj79johyCokpHnEF8EbItfrSKTccN1iGnmBYQHJ/EPnPlJugT9JbTvv7dPaQPkxPmjg62Dlf2pMxRgxg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8QfDjFUXMFxMOE8BMn1EPXWXfhm0yFEWfKg80WkU72g=;
+ b=Rw6PfjGIn+4XfKTO3Au+62lECrnpVEjpSCvONDz+yKK1nCYfTQlGpUGpkcq9sz+Kh3ZQ/3YBppLoCCYyift3eNqZ+ARh8dXOFELvzvB0RgGbglxC0YoS946jfJ2VBrwB6zAAsOPM4vaeIZo6DOE3ftxQ3B7WTiaVaO8WRJ27xSLU5nXGKkOV4wtKvRz/jK8qjMvW4w8gpgV2k6Y7osauaVtvos4qzGv4LWKJoFFC7EG7Ik3e/nCwFX1TCycNRkiafdfE4R8+cg7NTZqvlvXt1IEao80EM8GQqWUEJjH0PLDZ5dhIqZx4v17w9AvsCIDtJhFYxLUg4MMdu06UwvYXGQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com (2603:10b6:208:577::21)
+ by IA4PR11MB9156.namprd11.prod.outlook.com (2603:10b6:208:562::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.12; Thu, 6 Nov
+ 2025 14:57:35 +0000
+Received: from IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408]) by IA3PR11MB8986.namprd11.prod.outlook.com
+ ([fe80::395e:7a7f:e74c:5408%3]) with mapi id 15.20.9298.010; Thu, 6 Nov 2025
+ 14:57:35 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: "Keller, Jacob E" <jacob.e.keller@intel.com>, "Lobakin, Aleksander"
+	<aleksander.lobakin@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+	<przemyslaw.kitszel@intel.com>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: RE: [PATCH iwl-next v2 3/9] ice: use cacheline groups for ice_tx_ring
+ structure
+Thread-Topic: [PATCH iwl-next v2 3/9] ice: use cacheline groups for
+ ice_tx_ring structure
+Thread-Index: AQHcTpgw5OKUOKKZPUWfo1GYhySPo7TlvhIA
+Date: Thu, 6 Nov 2025 14:57:35 +0000
+Message-ID: <IA3PR11MB89866EC061D27E161769CB63E5C2A@IA3PR11MB8986.namprd11.prod.outlook.com>
+References: <20251105-jk-refactor-queue-stats-v2-0-8652557f9572@intel.com>
+ <20251105-jk-refactor-queue-stats-v2-3-8652557f9572@intel.com>
+In-Reply-To: <20251105-jk-refactor-queue-stats-v2-3-8652557f9572@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: IA3PR11MB8986:EE_|IA4PR11MB9156:EE_
+x-ms-office365-filtering-correlation-id: 15668f92-fd4a-493a-42fd-08de1d44d267
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700021|7053199007;
+x-microsoft-antispam-message-info: =?utf-8?B?ODdiblM3ZURpTE00RTMzdGQ5OUM3QlJ5eUc0Z3ZzOTM2a1lOMkxYcENtZVVW?=
+ =?utf-8?B?T2ZDYjA5ZHZiZUpleFZ5aTdIV0FwVEhWY0dSSEpVVFZKelRCc2hNRVNZNXhl?=
+ =?utf-8?B?QW8zTGNkYXBzK3lpUThURVRNWDZCeG4rWDA1alpPNEcxQU1UOTdaNFl2NGFE?=
+ =?utf-8?B?K2hKa3VYQ29mUXB5LzM5aS80Q2JVVG1Yc1VkeXdRbnpRdWtGUTI2bTZmMURj?=
+ =?utf-8?B?R1I5NEt5WnBpcnd3OFpqQ1Erek4vWHVEZXdLd3VESzkvZmV5NjlPY0VNdUUr?=
+ =?utf-8?B?UGdzOVBEclVZQXZaaW1XSVFTUmJya0FwOGo1ekFuWnQ4dmpzejhnOERFbXV3?=
+ =?utf-8?B?OWJsczQyWEp5bjd3ZHJpUHlwRC8wNW9iOTQzMHc4MmxDbEdDMnRuV0dCRGU1?=
+ =?utf-8?B?UWN0aVBiVWpRaWNyT2NudkYvR2V4YXBxdGJKS3FSc01jQ2tvNmxkd0xIVCtD?=
+ =?utf-8?B?QkpOclFKM3R4N2hTWEJpU2NodXpTbjJSZ1VNd0ZaQ3BQU0JDTHg1Y3B0ZzVy?=
+ =?utf-8?B?WjVKd1FudWNVaTBNM3JqaDBrNng4alN4bWdaODRRMVdjU1BaczJnN3YybjF6?=
+ =?utf-8?B?RkNKdGhBdGV6V0M1TlM2eElZdUdMa1RVTnN5a1Njb1ljeS9DZDZoYzBKRmlM?=
+ =?utf-8?B?VnJ6UGh1emFjR2E0dUc2ZTIwblk2Z1RFVWZ4b24xOEM1TFBRVjkxampTSS9j?=
+ =?utf-8?B?QVg5YTN1aThhS0QxemthTlZURGlhQmgzeTFTcEtnZ2FheVpJRnNuOGx0TDFB?=
+ =?utf-8?B?TjFGUWtJQlhTRUgrc29FSFNJUWRReDNjcTV3VHBpTFlFb2V1R2loazBRM2RG?=
+ =?utf-8?B?eHF1NlNMVU94cE9wc0JIb2xES1k5NTM4L3NMY0VNR1R6MDVzTEhTN2JYdU5E?=
+ =?utf-8?B?djBzNzJOQWE2U3AvOWxOa3pTNTMrdC9vZDJPeTNSbnZjYVhFVTJUaDBIdFJ2?=
+ =?utf-8?B?ZHJBNkdoR09iVkpsczkyU0txYjBlM21oalA0QW9Fb0JKRzJWQ1p1ZmdMR25m?=
+ =?utf-8?B?bVdma0J5a29IdEhiYkp6VzllbTJDbjQxSzAvN3plTjRSQmpqaVBlMXBDRHZH?=
+ =?utf-8?B?d1loUEZqZG5rSGhUOVlNalBEZk4rclJNemdXZUxEbUIwMUl6NFdKa3Z3MFgw?=
+ =?utf-8?B?bk9mOU1YREFtMFRjcm1hNkQxSDhIdXp2OEhJYlF1anFJQUt5YjN6cVNiREs2?=
+ =?utf-8?B?dzFEdFdFc0IvdVFCM0hCWDQ1dlZzYVJ4TGRMaElJaEltWTd6Q3E2RjczVmtk?=
+ =?utf-8?B?ZDlJM2RPankzNmlRQWYwOTVTcjlSYmJ2TCs1bE9UQWhYcG1JRFJlb0hHK0ww?=
+ =?utf-8?B?TjhseVJYSHFzZ3RpczBobGdYejYvaDExVFpqVVFPbzRSQXNFRys4a21JelM4?=
+ =?utf-8?B?Ry9jQ3RHeElQTk9rcm9vVUR1aENaMURuS1ZJT1J1Vm5oaTI3TWhDNWl5RmVh?=
+ =?utf-8?B?Tjh5bmhSM0U5cEVUTGtON3g4SHgzczBPNUxIV1F1MUJPci8wbFNTTCsrYzli?=
+ =?utf-8?B?MlVKT21Td1FidWNiajduSUgvcno0elZmdXNwdlNoUUtjUXEvcTJXT2o3U05Q?=
+ =?utf-8?B?djhSamkvcHBJcWl1RVh1T3pIalN2bmZXbE9IUjZ2NmloWEdya2g2VWJXa0w2?=
+ =?utf-8?B?azFycFVhNTh4RHdaQlR0T1ZEeWVlRk5RU0xFMlAwc2NWcE51WHpDSWVrb0pw?=
+ =?utf-8?B?ajQyQ1g0UlRDKzZCV2tDU1pQQXNQeDFpSTVBTm8zblEwaGVpbFRvOGloTHRz?=
+ =?utf-8?B?RlBSeTk4Rmdsa0hhMGFRdUJGTUJFaTk3K3llZTFYYkplZWZXaUFRbHpPVzMz?=
+ =?utf-8?B?Qm1qQ0JPY1FzMUQ4YSs2d1BCdVJwNkxmVkwxM1ZGNnlGdnhpMkQ3Y0ZtTlpZ?=
+ =?utf-8?B?eHI2NzhXZWhhV0Nkd2xTaXFyTXpINWFGbllKc1ZvaDVUM052KzlJM1VnTmQ3?=
+ =?utf-8?B?ZTlXY1Jla0RubEM5elRQbE83THJPSlZjRDdyWlhYWk80TDhiT1ljM1lhc2hz?=
+ =?utf-8?B?V2lsMW13TVZXcmhOMVJTN2ZEanpNaGFEbWlCVkExaHRkS3BXYXNSbjZ5cTdK?=
+ =?utf-8?Q?WAWxTg?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA3PR11MB8986.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700021)(7053199007);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?N2NydGsxeS8yMXdyenQyS3NnZ2p3bXRJRjdYSUNqbXdtZmxkbHlWcWJ6Wjli?=
+ =?utf-8?B?UzNMRDJraVRVa1FPN3lPQ0pCSElrSUZPT0dMbnF0a2hXVy9IR0ZlNTZUbnV2?=
+ =?utf-8?B?RzByejZKa2d5cnJPbldld0JXVjU5T25EaUM2a0NvbDRlWDV5ZFVkLytLb20x?=
+ =?utf-8?B?OUd6NnRkdlVhWmNFWEJRemFYcHhLL3dpeGhyQk9YdUJPdXVmWWljb2hPZGFk?=
+ =?utf-8?B?bW5nRWZ2TTdoTG4rZUI3TE04Y0lkc3pXbTQraEl0Ti81WEdRb2xwTzZwNFJo?=
+ =?utf-8?B?RjA0c3NhY28zTlcveUFpbFpDK2NRcUtvdHVTOTdZc0pJc3oyYjBoem1HSUJh?=
+ =?utf-8?B?eGtYN3lIcFJobUovdHdpY2tBVVlEK0FqSFRFZmMzUWJxWWZDU0hUR2VSZnda?=
+ =?utf-8?B?TTgxcURKU0pmVnZXeHE2UmpaNDhBQy80RHNJL05VWnRzTTE5WFlEbGp3dmhu?=
+ =?utf-8?B?R0plSEcrcUxtOTZxd2F6eUhReXE1blNwNlRVR0JKOWJ6Zm56WjFEa1FodjRL?=
+ =?utf-8?B?RDRXNitEYjVaWkFEVWZsWW4wYUdRV2VTOFJyd1NyZ3NUSG5DME0raW1JTXE2?=
+ =?utf-8?B?bkxEWms3UjY2OVZOTWl5djU1UnptTkxCZDRTeENibmJBdkFHN1pxMVJDeG5Y?=
+ =?utf-8?B?U1JMTU5qanFCekJKZjk2VWZmODlzYnhzNFE0SDYvcGdxTXNiU0xIdERHTTBo?=
+ =?utf-8?B?V2U1SHVRZ1A4eFg5YTI0b1RTT01RMHRmemRmMFhNeEtHYTdpbi9PM1kxOWNX?=
+ =?utf-8?B?Q0pLRGRicmx2c2dRU3ZxSnkyM1hOcEF3Z0ZzTStmMXd1NllLbFl4eTVieXJE?=
+ =?utf-8?B?UTlaMU1KbGc3eTBXd2hjQmxXaFZpalM1OXY5MmY5eGZEZ29KVEFuU0tpcWxj?=
+ =?utf-8?B?YzRubDcwZGd3dVZJdGlPL2xUY2FZd25tZ3BrNno4MzRYc2RKZmdIZ2tPbG5C?=
+ =?utf-8?B?WG85WVdPYUczWDQrTnQzU1VRV2QwRnlpMm1UZG45NWtleXBqMHZtZlFQR0Qv?=
+ =?utf-8?B?STI5dzRXWTZudHBrNjNlWXlmWCtIZUJncHhEeUFBYmR4RHd5QnQyV3ZsSXhq?=
+ =?utf-8?B?Y1pMdkNhYWZyMHRnaWxIeWgvZEdOaFpIQ09vb3FVU2Zkb1o3NU5mRm5Qek5B?=
+ =?utf-8?B?aEp4YmRaQkVMNmtCOFlnWmhZeDl6Uyt5aVdUQkU2YkRGR2psM2RFNzJiOWJ0?=
+ =?utf-8?B?QzhVRzNyS0ZFVVdZM0hWY0dZcGp1Q09ycTg5bi9wdUxFa2ROTXNuMHVYVmY4?=
+ =?utf-8?B?WDhZRjllZm9UVy9ZTGM0Qm9nenVSbk4xUE4zdEFqWTRjUHZRK3A3OTR1NVpR?=
+ =?utf-8?B?QzZkdGl2d1ZMT3l2bXBxaFEzanF2TVZlWVRacHgwTjBicS83THA5eXdUbWVq?=
+ =?utf-8?B?SkkzdWwzK2tBUGRFYVBQMFdwVW5nL1lFMFpqMmpvaVozVTdkZmVhZWduV2lE?=
+ =?utf-8?B?eVNtMU9pUDdEY29uR2dEeFdMbmVISC9FYzJvb0RWYmtabThXaGs1eHEzL2N2?=
+ =?utf-8?B?UnFOMEFTSXcvUFhhWTZkQlVhTzEyamFxb3J0WDFKQXpQTEdNVFlpNzFtZk0r?=
+ =?utf-8?B?WnpuRWdXYzc3eHhOMDc3bnp2S3hwamkwdFhtNEdHd2RybkZJYzRkU3Q5MkNw?=
+ =?utf-8?B?SDlKWjNBS0VkRDFNWmwyMDZkU0pQUVByZTB3WGxEL28yWDYyTkFwQ0RKWU53?=
+ =?utf-8?B?bG9rVjRnQ1ViWVQ5UWtkTFQvVjdMUWVqTGNCQzNaakl3Z0RHNXEwUDN5cUtB?=
+ =?utf-8?B?bkw0R2dsOFBsdkpHejlvaGlzdFdwcDdtNjBFVjNlT3RObXcrRGRvNFhwYUha?=
+ =?utf-8?B?R3NVd2VVL2gwTHFOZUpQY0VIQk80a3pJbk1ySzVpUzA3alFEZWR3RzlFNkJ0?=
+ =?utf-8?B?dm5OWC9HQnN1Q3Y2VTh2UmZvVTRMMVAxVEZSWE5rYXhONXE2TlJ1OVhKaEtN?=
+ =?utf-8?B?MTZ0Y0xkeDIzL3MvbGtkTXhoaE1aYTRlZnEwdTVYeXNDdkh1NWNlK0N0alFh?=
+ =?utf-8?B?T1N6NWQrY2RpODBNQlQzRWNOaXlTcnJudHJtbmZxNjhScmFoWS9ubXVCVW9M?=
+ =?utf-8?B?UkdRK25VWjdCL3VyRWE0Ukpuam1QYTR0cDFKcEppaUpYd24ybHRIWG1ubXM1?=
+ =?utf-8?B?Z1ZQQmMxOTBtWmJuVXVIditKckRIVmRObGdVdkNaTElQK2xudkVVVm5lWVF5?=
+ =?utf-8?B?SEE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] tcp: add net.ipv4.tcp_comp_sack_rtt_percent
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>,
- Kuniyuki Iwashima <kuniyu@google.com>, netdev@vger.kernel.org,
- eric.dumazet@gmail.com
-References: <20251105093837.711053-1-edumazet@google.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20251105093837.711053-1-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: IA3PR11MB8986.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 15668f92-fd4a-493a-42fd-08de1d44d267
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Nov 2025 14:57:35.7533
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 36+EFsHvdmbQt6hCd55vPsHHJ8Mi+6dXJLRg25ifJF0K/OmmSZP6pQOd4lSCisPu3FyfYbLTD4Nn3IzKfNUd8dy2G9sHTMRsIdHniAkx10s=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA4PR11MB9156
+X-OriginatorOrg: intel.com
 
-On 05/11/2025 10.38, Eric Dumazet wrote:
-> TCP SACK compression has been added in 2018 in commit
-> 5d9f4262b7ea ("tcp: add SACK compression").
-> 
-> It is working great for WAN flows (with large RTT).
-> Wifi in particular gets a significant boost _when_ ACK are suppressed.
-> 
-> Add a new sysctl so that we can tune the very conservative 5 % value
-> that has been used so far in this formula, so that small RTT flows
-> can benefit from this feature.
-> 
-> delay = min ( 5 % of RTT, 1 ms)
-> 
-> This patch adds new tcp_comp_sack_rtt_percent sysctl
-> to ease experiments and tuning.
-> 
-> Given that we cap the delay to 1ms (tcp_comp_sack_delay_ns sysctl),
-> set the default value to 100.
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
->   Documentation/networking/ip-sysctl.rst | 13 +++++++++++--
->   include/net/netns/ipv4.h               |  1 +
->   net/ipv4/sysctl_net_ipv4.c             |  9 +++++++++
->   net/ipv4/tcp_input.c                   | 26 ++++++++++++++++++--------
->   net/ipv4/tcp_ipv4.c                    |  1 +
->   5 files changed, 40 insertions(+), 10 deletions(-)
-> 
-> diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
-> index 7cd35bfd39e68c5b2650eb9d0fbb76e34aed3f2b..ebc11f593305bf87e7d4ad4d50ef085b22aef7da 100644
-> --- a/Documentation/networking/ip-sysctl.rst
-> +++ b/Documentation/networking/ip-sysctl.rst
-> @@ -854,9 +854,18 @@ tcp_sack - BOOLEAN
->   
->   	Default: 1 (enabled)
->   
-> +tcp_comp_sack_rtt_percent - INTEGER
-> +	Percentage of SRTT used for the compressed SACK feature.
-> +	See tcp_comp_sack_nr, tcp_comp_sack_delay_ns, tcp_comp_sack_slack_ns.
-> +
-> +	Possible values : 1 - 1000
-
-If this is a percentage, why does it allow 1000 as max?
-
-> +	Default : 100 %
-> +
->   tcp_comp_sack_delay_ns - LONG INTEGER
-> -	TCP tries to reduce number of SACK sent, using a timer
-> -	based on 5% of SRTT, capped by this sysctl, in nano seconds.
-> +	TCP tries to reduce number of SACK sent, using a timer based
-> +	on tcp_comp_sack_rtt_percent of SRTT, capped by this sysctl
-> +	in nano seconds.
->   	The default is 1ms, based on TSO autosizing period.
->   
->   	Default : 1,000,000 ns (1 ms)
-> diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
-> index 0e96c90e56c6d987a16598ef885c403d5c3eae52..de9d36acc8e22d3203120d8015b3d172e85de121 100644
-> --- a/include/net/netns/ipv4.h
-> +++ b/include/net/netns/ipv4.h
-> @@ -221,6 +221,7 @@ struct netns_ipv4 {
->   	int sysctl_tcp_pacing_ss_ratio;
->   	int sysctl_tcp_pacing_ca_ratio;
->   	unsigned int sysctl_tcp_child_ehash_entries;
-> +	int sysctl_tcp_comp_sack_rtt_percent;
->   	unsigned long sysctl_tcp_comp_sack_delay_ns;
->   	unsigned long sysctl_tcp_comp_sack_slack_ns;
->   	int sysctl_max_syn_backlog;
-> diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
-> index 0c7c8f9041cbf4aa4e51dcebd607aa5d8ac80dcd..35367f8e2da32f2c7de5a06164f5e47c8929c8f1 100644
-> --- a/net/ipv4/sysctl_net_ipv4.c
-> +++ b/net/ipv4/sysctl_net_ipv4.c
-> @@ -1451,6 +1451,15 @@ static struct ctl_table ipv4_net_table[] = {
->   		.mode		= 0644,
->   		.proc_handler	= proc_doulongvec_minmax,
->   	},
-> +	{
-> +		.procname	= "tcp_comp_sack_rtt_percent",
-> +		.data		= &init_net.ipv4.sysctl_tcp_comp_sack_rtt_percent,
-> +		.maxlen		= sizeof(int),
-> +		.mode		= 0644,
-> +		.proc_handler	= proc_dointvec_minmax,
-> +		.extra1		= SYSCTL_ONE,
-> +		.extra2		= SYSCTL_ONE_THOUSAND,
-> +	},
->   	{
->   		.procname	= "tcp_comp_sack_slack_ns",
->   		.data		= &init_net.ipv4.sysctl_tcp_comp_sack_slack_ns,
-> diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-> index 6db1d4c36a88bfa64b48388ee95e4e9218d9a9fd..d4ee74da018ee97209bed3402688f5e18759866b 100644
-> --- a/net/ipv4/tcp_input.c
-> +++ b/net/ipv4/tcp_input.c
-> @@ -5893,7 +5893,9 @@ static inline void tcp_data_snd_check(struct sock *sk)
->   static void __tcp_ack_snd_check(struct sock *sk, int ofo_possible)
->   {
->   	struct tcp_sock *tp = tcp_sk(sk);
-> -	unsigned long rtt, delay;
-> +	struct net *net = sock_net(sk);
-> +	unsigned long rtt;
-> +	u64 delay;
->   
->   	    /* More than one full frame received... */
->   	if (((tp->rcv_nxt - tp->rcv_wup) > inet_csk(sk)->icsk_ack.rcv_mss &&
-> @@ -5912,7 +5914,7 @@ static void __tcp_ack_snd_check(struct sock *sk, int ofo_possible)
->   		 * Defer the ack until tcp_release_cb().
->   		 */
->   		if (sock_owned_by_user_nocheck(sk) &&
-> -		    READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_backlog_ack_defer)) {
-> +		    READ_ONCE(net->ipv4.sysctl_tcp_backlog_ack_defer)) {
->   			set_bit(TCP_ACK_DEFERRED, &sk->sk_tsq_flags);
->   			return;
->   		}
-> @@ -5927,7 +5929,7 @@ static void __tcp_ack_snd_check(struct sock *sk, int ofo_possible)
->   	}
->   
->   	if (!tcp_is_sack(tp) ||
-> -	    tp->compressed_ack >= READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_comp_sack_nr))
-> +	    tp->compressed_ack >= READ_ONCE(net->ipv4.sysctl_tcp_comp_sack_nr))
->   		goto send_now;
->   
->   	if (tp->compressed_ack_rcv_nxt != tp->rcv_nxt) {
-> @@ -5942,18 +5944,26 @@ static void __tcp_ack_snd_check(struct sock *sk, int ofo_possible)
->   	if (hrtimer_is_queued(&tp->compressed_ack_timer))
->   		return;
->   
-> -	/* compress ack timer : 5 % of rtt, but no more than tcp_comp_sack_delay_ns */
-> +	/* compress ack timer : comp_sack_rtt_percent of rtt,
-> +	 * but no more than tcp_comp_sack_delay_ns.
-> +	 */
->   
->   	rtt = tp->rcv_rtt_est.rtt_us;
->   	if (tp->srtt_us && tp->srtt_us < rtt)
->   		rtt = tp->srtt_us;
->   
-> -	delay = min_t(unsigned long,
-> -		      READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_comp_sack_delay_ns),
-> -		      rtt * (NSEC_PER_USEC >> 3)/20);
-> +	/* delay = (rtt >> 3) * NSEC_PER_USEC * comp_sack_rtt_percent / 100
-> +	 * ->
-> +	 * delay = rtt * 1.25 * comp_sack_rtt_percent
-> +	 */
-
-Why explain this with shifts.  I have to use extra time to remember that
-shift ">> 3" is the same as div "/" 8.  And that ">>" 2 is the same as
-div "/4".  For the code, I think the compiler will convert /4 to >>2
-anyway.  I don't feel strongly about this, so I'll let it be up to you
-if you want to adjust this or not.
-
-
-> +	delay = (u64)(rtt + (rtt >> 2)) *
-> +		READ_ONCE(net->ipv4.sysctl_tcp_comp_sack_rtt_percent);
-> +
-> +	delay = min(delay, READ_ONCE(net->ipv4.sysctl_tcp_comp_sack_delay_ns));
-> +
->   	sock_hold(sk);
->   	hrtimer_start_range_ns(&tp->compressed_ack_timer, ns_to_ktime(delay),
-> -			       READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_comp_sack_slack_ns),
-> +			       READ_ONCE(net->ipv4.sysctl_tcp_comp_sack_slack_ns),
->   			       HRTIMER_MODE_REL_PINNED_SOFT);
->   }
->   
-> diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-> index b7526a7888cbe296c0f4ba6350772741cfe1765b..a4411cd0229cb7fc5903d206e549d0889d177937 100644
-> --- a/net/ipv4/tcp_ipv4.c
-> +++ b/net/ipv4/tcp_ipv4.c
-> @@ -3596,6 +3596,7 @@ static int __net_init tcp_sk_init(struct net *net)
->   	net->ipv4.sysctl_tcp_comp_sack_delay_ns = NSEC_PER_MSEC;
->   	net->ipv4.sysctl_tcp_comp_sack_slack_ns = 100 * NSEC_PER_USEC;
->   	net->ipv4.sysctl_tcp_comp_sack_nr = 44;
-> +	net->ipv4.sysctl_tcp_comp_sack_rtt_percent = 100;
->   	net->ipv4.sysctl_tcp_backlog_ack_defer = 1;
->   	net->ipv4.sysctl_tcp_fastopen = TFO_CLIENT_ENABLE;
->   	net->ipv4.sysctl_tcp_fastopen_blackhole_timeout = 0;
-
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogS2VsbGVyLCBKYWNvYiBF
+IDxqYWNvYi5lLmtlbGxlckBpbnRlbC5jb20+DQo+IFNlbnQ6IFdlZG5lc2RheSwgTm92ZW1iZXIg
+NSwgMjAyNSAxMDowNyBQTQ0KPiBUbzogTG9rdGlvbm92LCBBbGVrc2FuZHIgPGFsZWtzYW5kci5s
+b2t0aW9ub3ZAaW50ZWwuY29tPjsgTG9iYWtpbiwNCj4gQWxla3NhbmRlciA8YWxla3NhbmRlci5s
+b2Jha2luQGludGVsLmNvbT47IE5ndXllbiwgQW50aG9ueSBMDQo+IDxhbnRob255Lmwubmd1eWVu
+QGludGVsLmNvbT47IEtpdHN6ZWwsIFByemVteXNsYXcNCj4gPHByemVteXNsYXcua2l0c3plbEBp
+bnRlbC5jb20+DQo+IENjOiBpbnRlbC13aXJlZC1sYW5AbGlzdHMub3N1b3NsLm9yZzsgbmV0ZGV2
+QHZnZXIua2VybmVsLm9yZzsgS2VsbGVyLA0KPiBKYWNvYiBFIDxqYWNvYi5lLmtlbGxlckBpbnRl
+bC5jb20+DQo+IFN1YmplY3Q6IFtQQVRDSCBpd2wtbmV4dCB2MiAzLzldIGljZTogdXNlIGNhY2hl
+bGluZSBncm91cHMgZm9yDQo+IGljZV90eF9yaW5nIHN0cnVjdHVyZQ0KPiANCj4gVGhlIGljZSBy
+aW5nIHN0cnVjdHVyZSB3YXMgcmVvcmdhbml6ZWQgYnkgY29tbWl0IDY1MTI0YmJmOTgwYyAoImlj
+ZToNCj4gUmVvcmdhbml6ZSB0eF9idWYgYW5kIHJpbmcgc3RydWN0cyIpLCBhbmQgbGF0ZXIgc3Bs
+aXQgaW50byBhIHNlcGFyYXRlDQo+IGljZV90eF9yaW5nIHN0cnVjdHVyZSBieSBjb21taXQgZTcy
+YmJhMjEzNTVkICgiaWNlOiBzcGxpdCBpY2VfcmluZw0KPiBvbnRvIFR4L1J4IHNlcGFyYXRlIHN0
+cnVjdHMiKS4NCj4gDQo+IFRoZSBpY2VfdHhfcmluZyBzdHJ1Y3R1cmUgaGFzIGNvbW1lbnRzIGxl
+ZnQgb3ZlciBmcm9tIHRoaXMNCj4gcmVvcmdhbml6YXRpb24gYW5kIHNwbGl0IGluZGljYXRpbmcg
+d2hpY2ggZmllbGRzIGFyZSBzdXBwb3NlZCB0bw0KPiBiZWxvbmcgdG8gd2hpY2ggY2FjaGVsaW5l
+cy4gVW5mb3J0dW5hdGVseSwgdGhlc2UgY29tbWVudHMgYXJlIGFsbW9zdA0KPiBjb21wbGV0ZWx5
+IGluY29ycmVjdC4NCj4gDQo+ICAqIENhY2hlbGluZSAxIHNwYW5zIGZyb20gdGhlIHN0YXJ0IG9m
+IHRoZSBzdHJ1Y3R1cmUgdG8gdGhlIHZzaQ0KPiBwb2ludGVyLg0KPiAgICBUaGlzIGNhY2hlbGlu
+ZSBpcyBjb3JyZWN0LCBhbmQgYXBwZWFycyB0byBiZSB0aGUgb25seSBvbmUgdGhhdCBpcy4NCj4g
+DQo+ICAqIENhY2hlbGluZSAyIHNwYW5zIGZyb20gdGhlIERNQSBhZGRyZXNzIGRvd24gdG8gdGhl
+IHhwc19zdGF0ZSBmaWVsZC4NCj4gVGhlDQo+ICAgIGNvbW1lbnRzIGluZGljYXRlIGl0IHNob3Vs
+ZCBlbmQgYXQgdGhlIHJjdSBoZWFkIGZpZWxkLg0KPiANCj4gICogQ2FjaGVsaW5lIDMgc3BhbnMg
+ZnJvbSB0aGUgaWNlX2NoYW5uZWwgcG9pbnRlciB0byB0aGUgZW5kIG9mIHRoZQ0KPiBzdHJ1Y3Qs
+DQo+ICAgIGFuZCBjb21wbGV0ZWx5IGNvbnRhaW5zIHdoYXQgaXMgbWFya2VkIGFzIGEgc2VwYXJh
+dGUgNHRoIGNhY2hlbGluZS4NCj4gDQo+IFRoZSB1c2Ugb2Ygc3VjaCBjb21tZW50cyB0byBpbmRp
+Y2F0ZSBjYWNoZSBsaW5lcyBpcyBlcnJvciBwcm9uZS4gSXQgaXMNCj4gZXh0cmVtZWx5IGxpa2Vs
+eSB0aGF0IHRoZSBjb21tZW50cyB3aWxsIGJlY29tZSBvdXQgb2YgZGF0ZSB3aXRoIGZ1dHVyZQ0K
+PiByZWZhY3RvcnMuIEluc3RlYWQsIHVzZSBfX2NhY2hlbGluZV9ncm91cF8oYmVnaW58ZW5kKV9h
+bGlnbmVkKCkgd2hpY2gNCj4gaXMgbW9yZSBleHBsaWNpdC4gSXQgZ3VhcmFudGVlcyB0aGF0IG1l
+bWJlcnMgYmV0d2VlbiB0aGUgY2FjaGVsaW5lDQo+IGdyb3VwcyB3aWxsIGJlIGluIGRpc3RpbmN0
+IGNhY2hlIGxpbmVzIHRocm91Z2ggdGhlIHVzZSBvZiBwYWRkaW5nLiBJdA0KPiBhZGRpdGlvbmFs
+bHkgZW5hYmxlcyBjb21waWxlIHRpbWUgYXNzZXJ0aW9ucyB0byBoZWxwIHByZXZlbnQgbmV3DQo+
+IGZpZWxkcyBmcm9tIGRyYXN0aWNhbGx5IHJlLWFycmFuZ2luZyB0aGUgY2FjaGUgbGluZXMuDQo+
+IA0KPiBUaGVyZSBhcmUgdHdvIG1haW4gaXNzdWVzIGlmIHdlIGp1c3QgcmVwbGFjZSB0aGUgZXhp
+c3RpbmcgY29tbWVudHMNCj4gd2l0aCBjYWNoZSBsaW5lIGdyb3VwIG1hcmtlcnMuIEZpcnN0LCB0
+aGUgc3BpbmxvY2tfdCB0eF9sb2NrIGZpZWxkIGlzDQo+IDI0IGJ5dGVzIG9uIG1vc3Qga2VybmVs
+cywgYnV0IGlzIDY0IGJ5dGVzIG9uIENPTkZJR19ERUJVR19MT0NLX0FMTE9DDQo+IGtlcm5lbHMu
+DQo+IElkZWFsbHkgd2Ugd2FudCB0byBwbGFjZSB0aGlzIGZpZWxkIGF0IHRoZSBzdGFydCBvZiBh
+IGNhY2hlbGluZSBzbw0KPiB0aGF0IG90aGVyIGZpZWxkcyBpbiB0aGUgZ3JvdXAgZG9uJ3QgZ2V0
+IHNwbGl0IGFjcm9zcyBzdWNoIGEgZGVidWcNCj4ga2VybmVsLiBXaGlsZSBvcHRpbWl6aW5nIHN1
+Y2ggYSBkZWJ1ZyBrZXJuZWwgaXMgbm90IGEgcHJpb3JpdHksIGRvaW5nDQo+IHRoaXMgbWFrZXMg
+dGhlIGFzc2VydGlvbnMgYXJvdW5kIHRoZSBjYWNoZWxpbmUgYSBiaXQgZWFzaWVyIHRvDQo+IHVu
+ZGVyc3RhbmQuDQo+IA0KPiBSZW1vdmUgdGhlIG91dC1vZi1kYXRlIGNhY2hlbGluZSBjb21tZW50
+cywgYW5kIGFkZCBfX2NhY2hlbGluZV9ncm91cA0KPiBhbm5vdGF0aW9ucy4gVGhlc2UgYXJlIHNl
+dCB0byBtYXRjaCB0aGUgZXhpc3RpbmcgbGF5b3V0IGluc3RlYWQgb2YNCj4gbWF0Y2hpbmcgdGhl
+IG9yaWdpbmFsIGNvbW1lbnRzLiBUaGUgb25seSBjaGFuZ2UgdG8gbGF5b3V0IGlzIHRvIHJlLQ0K
+PiBvcmRlciB0aGUgdHhfbG9jayB0byBiZSB0aGUgc3RhcnQgb2YgY2FjaGVsaW5lIDMsIGFuZCBt
+b3ZlIHR4cV90ZWlkIHRvDQo+IGF2b2lkIGEgNC1ieXRlIGdhcCBpbiB0aGUgbGF5b3V0Lg0KPiAN
+Cj4gSWRlYWxseSwgd2Ugc2hvdWxkIHByb2ZpbGUgdGhlIFR4IGhvdCBwYXRoIGFuZCBmaWd1cmUg
+b3V0IHdoaWNoIGZpZWxkcw0KPiBnbyB0b2dldGhlciBhbmQgcmUtYXJyYW5nZSB0aGUgY2FjaGVs
+aW5lIGdyb3VwcywgcG9zc2libHkgYWxvbmcNCj4gInJlYWRfbW9zdGx5IiwgInJlYWR3cml0ZSIg
+YW5kICJjb2xkIiBncm91cGluZ3Mgc2ltaWxhciB0byB0aGUgaWRwZg0KPiBkcml2ZXIuIFRoaXMg
+aGFzIGJlZW4gbGVmdCBhcyBhbiBleGVyY2lzZSBmb3IgYSBsYXRlciBpbXByb3ZlbWVudC4NCj4g
+DQo+IEZpbmFsbHksIGFkZCBhbm5vdGF0aW9ucyB3aGljaCBjaGVjayB0aGUgY2FjaGVsaW5lIHNp
+emVzLiBGb3INCj4gY2FjaGVsaW5lIDMsIHdlIGVuZm9yY2UgdGhhdCB0eF9sb2NrIGlzIGluIHRo
+aXMgY2FjaGVsaW5lIGdyb3VwLCBhbmQNCj4gY2hlY2sgdGhlIHNpemUgYmFzZWQgb24gd2hldGhl
+ciBvciBub3QgdGhlIENPTkZJR19ERUJVR19MT0NLX0FMTE9DIGlzDQo+IGVuYWJsZWQuIFNpbWls
+YXIgdG8gdGhlIFJ4IGFubm90YXRpb25zLCB0aGVzZSBjaGVjayB0aGF0IHRoZSBzaXplIG9mDQo+
+IGVhY2ggY2FjaGVsaW5lIGdyb3VwIChleGNsdWRpbmcgcGFkZGluZykgaXMgbm8gZ3JlYXRlciB0
+aGFuIDY0IGJ5dGVzLg0KPiBUaGlzIGlzIHByaW1hcmlseSBpbnRlbmRlZCB0byBwcm9kdWNlIGNv
+bXBpbGVyIGZhaWx1cmVzIGlmIGRldmVsb3BlcnMNCj4gYWRkIG9yIHJlLWFycmFuZ2UgZmllbGRz
+IHN1Y2ggdGhhdCBjYWNoZWxpbmUgZ3JvdXBzIGV4Y2VlZCB0aGUNCj4gZXhwZWN0ZWQgNjQgYnl0
+ZSBzaXplcyBvbiB4ODZfNjQgc3lzdGVtcy4NCj4gQmVjYXVzZSB0aGUgYXNzZXJ0aW9ucyBjaGVj
+ayB0aGUgc2l6ZSBleGNsdWRpbmcgYW55IHBhZGRpbmcsIHRoZXkNCj4gc2hvdWxkIGJlaGF2ZSB0
+aGUgc2FtZSBldmVuIG9uIHN5c3RlbXMgd2l0aCBsYXJnZXIgTDEgY2FjaGVsaW5lIHNpemVzLg0K
+PiANCj4gU2lnbmVkLW9mZi1ieTogSmFjb2IgS2VsbGVyIDxqYWNvYi5lLmtlbGxlckBpbnRlbC5j
+b20+DQo+IC0tLQ0KDQouLi4NCiANCj4gLS0NCj4gMi41MS4wLnJjMS4xOTcuZzZkOTc1ZTk1Yzlk
+Nw0KDQpSZXZpZXdlZC1ieTogQWxla3NhbmRyIExva3Rpb25vdiA8YWxla3NhbmRyLmxva3Rpb25v
+dkBpbnRlbC5jb20+DQo=
 
