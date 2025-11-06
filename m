@@ -1,324 +1,134 @@
-Return-Path: <netdev+bounces-236417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87453C3C024
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 16:21:27 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EBA2C3BFAB
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 16:15:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1B7D3A7C07
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 15:14:20 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 497E4350CB7
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 15:15:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C01A346796;
-	Thu,  6 Nov 2025 15:14:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D72A5757EA;
+	Thu,  6 Nov 2025 15:15:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NGcOGbCW"
+	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="Qkhvh0vr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D18430BF60
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 15:14:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFC791DE2A7
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 15:15:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762442057; cv=none; b=iRAz8bSmNj9CdIxjW6RHmdlppXhznQISAl/sUt2eaMNe/VZgse0x8Qw8WkiPLw2fd0z/duEnH4guwy3OfbyZcU2+kBGDkkfyPnn2RcOORNXbCBg+1QDZ4/Ar6EyYiaOnJrrmUxZJQb2ChwTMCWjhW+nfjdHdEExvJJGiLmzV5io=
+	t=1762442136; cv=none; b=c1PWWbaFwEiV6hPoe+mZcYcl/LYF+GQ71pSxhiu2EfMCemHXimWmakh7O8ssXqhlN5FK26H2dnNzzv9yRXZIul11blrThN/xOARR3Ci+sgNVu7fcD12qxYHl421NbMQ7Wx21+2kZZgJRRlv2C330WaVU0V1x+Yl6pnUW5pMZOZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762442057; c=relaxed/simple;
-	bh=o/UkQ5u97qWom/i/3OHl5FeeE6MKR73YOXiRcmWk9Qs=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=rVGKxKCi788DMBreYLOwK5mC0gbMVqwsLN9pU5ioizmOe0ZF6l7xHlwO6y+vombilXypgh47wXckeRl29Iwp338dib3l/40FQma6Co2KxpDmxMQviZq5v/XZifneoZ9B1blzHQGqZUnw+lrZymQM3xYpPHL45iy1yrUhE0h9bu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=NGcOGbCW; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-b7277324054so168084066b.0
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 07:14:11 -0800 (PST)
+	s=arc-20240116; t=1762442136; c=relaxed/simple;
+	bh=YCH1EG3tt6Ke2Oavsj6zZ3dcJOSXiNwQWjtiAGf99k0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=B0oIgrW+hMCPk80Y3eY0XHOuXlkjN/yR8w3gwGyGF4C8/DZoP9npZ4ed96mhAoFW/r8IUV5ntikeJh8G+9KCP4YDQewZd3o4EUCoZ/FIJsIe8xSyHRttlqJVRxT3yFWpYiKT7kWBoZrbk8fwo/YVbRmHZIhz3tudvTG8yVAej6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=googlemail.com; dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b=Qkhvh0vr; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=googlemail.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-640b9c7eab9so1769188a12.1
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 07:15:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1762442049; x=1763046849; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HagtsVyWDiv+KcI6/p888WZFkgTtFN1dnDWNBUt/rhk=;
-        b=NGcOGbCWAq4Ba2UiaThxpaNzT080TN3ddisyR5LITdBLrXD9XiMY43AZNSfWzxrelT
-         c7xbUFzdhM33RA/LeoR/HUCZf70DgxSInUi/aJFYjPZI2LLX52iHNFhXtuWOwA3xssrh
-         BfMlaR9MPcecmPalE/bnF9Lcnx4vK1Z0kY5knc7eiiG9LbkPoWTtLNSyc5s3BS0HJdFP
-         iFxTV21nLF/2NJCskOeOyAAknYFWWMgkGTY90HYh+eTQ1zyo5H3NH8FjjF65Bk/4cFNQ
-         /NzRtSSnBTrZo/sA67oODxvuInrqNHzp5jOwiVCxXlyplfAeYNgl2Dw3T6nRzoze/4i0
-         WJOg==
+        d=googlemail.com; s=20230601; t=1762442133; x=1763046933; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=xxC9fYFDy9HPyk/qMyaqjf34tGPt2OGl5fMO+3uhfEU=;
+        b=Qkhvh0vrllXO3d7WnVuU9lUmYobGtyFMjZcdmEJFCG2fd/CKhOe+dSI/y4aKNl/QmF
+         lrWpccAshveGDcCsPlGuMtGrajRrgtysVqDkI2134Geihwt9ZueUM4+Y3lEwLaeRe8zG
+         OxSABcLsxyME5Gnb0opBpkEwULoU4j6U5KHEpXUrJni8/N7qNIjhDtXhT0cqc2uVaubl
+         Oh2KA0xPRKzGVMbAYDG7BwAxKiAmsS8/AgIjJCcXBEthEUI8oK3ITxwWsFaxD9xYEj6c
+         wrM/Lcygnt6jxgQ3pyVGoANlbG0gsMrIio5rnHeTmZiAPJGaQBd08YQxN6O5YDTjDbz0
+         mNMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762442049; x=1763046849;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HagtsVyWDiv+KcI6/p888WZFkgTtFN1dnDWNBUt/rhk=;
-        b=bWl4sOnJMnp20QPfhv5zKSH4W7gcxZNkESYcuFHymVY7C+O0RhT0Gwawpo2jdniXl/
-         dXbUbHYc2/1hstutFGCLFVgDHpR20K5ttNm8QrtriigB3s5BKSOMK8Py8TcLGaL0x5RE
-         96iccmWBHQm1mYqrl3gtLdN39rKPED+nDk22Cu6zrOekenNH2H99aLj+Yx9ZPUCxHx0A
-         lMxKoVArGCHu/VKIZROr2ejWqangjNnkmrqw7bqK3FiWCufCq0yDOk88ySarsSCCfXTZ
-         OF0jzKoyK4eOVpIJQosYllmxvMDXufPRh8pexzHSy8WDHs/q1emE6wpZ1n2/TM9y4f0Z
-         NxWg==
-X-Forwarded-Encrypted: i=1; AJvYcCW/B5TIfrNDvbZB8ETfhy77mHjYIJn6UId11Vp12Ya2qZZuNqjdoVBJ0mdndTwg5ic6zyf56F8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz1pYlKIoRfvAidehzwUcWqAcZQKUQJBb34/JioHdSplSjsYTYi
-	PlDB71jDDow78A0wy3wcitv/MS6Px1Dl1p6loSzBJLRd+hl2Cj2w+Ek7avU6HXh8qoc=
-X-Gm-Gg: ASbGncskts0gwrnsr87eiLZ3YUMF95smcsetZiRpFAXGUmUkMjDa5K6+dMa/eQj/NYY
-	NhEav2uyJnct2mv4BttuVRT8lpjTv5S1OBi1w8Ki1EN2eOJz+0i+E4/J2XVbQfIKqdxdzmAoQjy
-	CwmsfSNKGMkUXrG9abyBeOCL5TIuOJS7yqcNQck8O0wHvSXik+1JDH2GODSUhz3sj4piEylN+ve
-	6osHpJHNaJr/0F7a121z1qaff6imSceWikNw6mlWRdtJmEGJcwL6qLSopJfKLBx5Xhe/2XdXu0I
-	yFkKn7esi3NXWomecCYF0eQ0ynzeiRDLuEm8M4qk+Hbmy1v/5zru7kmDF+GV+tHPaCI0W43BLIw
-	pzYd7KBakX2KonRryp1gSUwsux/FXVaJEW0QPNp0vaB2gQd60l8Q9v775d7Pg72v3ErjNrh94oU
-	bRQAEGuZc16y9z
-X-Google-Smtp-Source: AGHT+IEsuIUvNLnPlwFN3+VmgnXrhObFfu4Be6ixdY6AL/4JqrPb9LdcBRAwep5DRtttB+5TfdujaQ==
-X-Received: by 2002:a17:907:3fa6:b0:b04:67f3:890f with SMTP id a640c23a62f3a-b72654d3d36mr658748866b.33.1762442049245;
-        Thu, 06 Nov 2025 07:14:09 -0800 (PST)
-Received: from localhost ([87.213.113.147])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b728937fb6bsm243589266b.23.2025.11.06.07.14.08
+        d=1e100.net; s=20230601; t=1762442133; x=1763046933;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xxC9fYFDy9HPyk/qMyaqjf34tGPt2OGl5fMO+3uhfEU=;
+        b=iQm2U8/d/JKZBpDHY4M4Zvva/dyUJjP7js5/i+i8VVL1IkhvZPIh6FwgT7Q01m+SYw
+         zMIPvIpQD1o28VIM8ePyqqmo989IKQqA0oS6XocMQUmOHwipUx3snc7NEB4QLgYfDX+d
+         xpumtqEtDNonYeDecJn+LN4C9yLG9Lk96r2QGfl3Gx+NbfeUli5PxXH2wErR6oMVOCBj
+         SgXEBcdS2OiP/03ClHC1T2hl6VyT4tNFQbm8Asz4fa/Q4IvW1iRzzz+SDTcZHLXpwaBt
+         JdVwmIakYh5AYmCuuEbTO9YR0pvcfFO3+39GFiggC46oIVkv5/xTuGDAYLYzAzHpktRw
+         Cung==
+X-Forwarded-Encrypted: i=1; AJvYcCWDzz4FMCqZaIO3QhgiAVBWfi/mPI495OCHjdbgZv13/ywjkjErSfAzOVZcaJYCN0OnLhkfxbM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyWWJ8lIjS7ULAni3BDHAlRGDytXfPZ3sUhPaRnu0ZzWB/RD9+g
+	a249msnCvFW0+oAvTqBZEALBX/JRD/e3jChLT/ApRSG0bbImYmxe6RLV
+X-Gm-Gg: ASbGncs79rLeUdA0Y4ZAy4GsazK7ZscUYmwPS5C9pWuB9bE9kYGAMBc+3AVi2WB2CjM
+	NUkAOVGRZoOEMzmDHqBlJyjUlodLHTG8mL33UtoIVzk/NLSTTOzGHu5k0vUEuukjBRnArEksLHr
+	6ve++mANMMpskW9TJjaq223T0MQk8UsUgImHoWU8j1bEyuj3RGistwVgjvCuZkbpbtSMVRw45WN
+	Z1keC0nw7njwkjuJL2d2uYWEfclfdGW7P0yQFOejnk7dRsvbbrm/fT2CZVXkMc4xQdR5B1jRJUo
+	QMKoGVi61Fwp1UwiSRkTNDxcXyUghxinAiv7Ga121dc7Lkn22gnuQnDuBKviJQ7sRxOQ5qk0jut
+	vscaWm7SvseAd2aKETIMeM7BKI1qlpNvZQ7LpupEpdWGCbzQJwxAFgQYaPp86EF3hRPG+Qo3Zcz
+	MuqUaq51IJcRPvJwPnU1C6oTlxg5ijh5b0ZHumZVkhKUeGPpAfqE3eas3R6BOasQQ=
+X-Google-Smtp-Source: AGHT+IEtDUMQY5HbJRJaUWD2C2rmPOt9GG6lcJ2SU4+nYohRujdB98Ocz8yMiCx6o+ye58Yh34/q5Q==
+X-Received: by 2002:a17:907:930e:b0:b72:a30a:e8ea with SMTP id a640c23a62f3a-b72a30aebe4mr237427466b.57.1762442133091;
+        Thu, 06 Nov 2025 07:15:33 -0800 (PST)
+Received: from tycho (p200300c1c7266600ba8584fffebf2b17.dip0.t-ipconnect.de. [2003:c1:c726:6600:ba85:84ff:febf:2b17])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b72896c6f95sm234012566b.64.2025.11.06.07.15.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Nov 2025 07:14:08 -0800 (PST)
-Date: Thu, 6 Nov 2025 18:14:07 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev, Bobby Eshleman <bobbyeshleman@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	David Ahern <dsahern@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Mina Almasry <almasrymina@google.com>
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v6 3/6] net: devmem: prepare for autorelease rx
- token management
-Message-ID: <4aa34dd6-f5ea-40cf-8004-bbde053dc143@suswa.mountain>
+        Thu, 06 Nov 2025 07:15:32 -0800 (PST)
+Sender: Zahari Doychev <zahari.doychev@googlemail.com>
+From: Zahari Doychev <zahari.doychev@linux.com>
+To: donald.hunter@gmail.com,
+	kuba@kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	jacob.e.keller@intel.com,
+	ast@fiberby.net,
+	matttbe@kernel.org,
+	netdev@vger.kernel.org,
+	jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	johannes@sipsolutions.net,
+	zahari.doychev@linux.com
+Subject: [PATCH v2 0/3] ynl: Fix tc filters with actions
+Date: Thu,  6 Nov 2025 16:15:26 +0100
+Message-ID: <20251106151529.453026-1-zahari.doychev@linux.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251104-scratch-bobbyeshleman-devmem-tcp-token-upstream-v6-3-ea98cf4d40b3@meta.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Bobby,
+The first patch in this series introduces an example tool that
+creates, shows and deletes flower filter with two VLAN actions.
+The subsequent patches address various issues to ensure the tool
+operates as intended.
 
-kernel test robot noticed the following build warnings:
+---
+v2:
+- extend the sampe tool to show and delete the filter
+- drop fix for ynl_attr_put_str as already fixed by:
+  Link: https://lore.kernel.org/netdev/20251024132438.351290-1-poros@redhat.com/
+- make indexed-arrays to start from index 1.
+  Link: https://lore.kernel.org/netdev/20251022182701.250897-1-ast@fiberby.net/
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Bobby-Eshleman/net-devmem-rename-tx_vec-to-vec-in-dmabuf-binding/20251105-092703
-base:   255d75ef029f33f75fcf5015052b7302486f7ad2
-patch link:    https://lore.kernel.org/r/20251104-scratch-bobbyeshleman-devmem-tcp-token-upstream-v6-3-ea98cf4d40b3%40meta.com
-patch subject: [PATCH net-next v6 3/6] net: devmem: prepare for autorelease rx token management
-config: nios2-randconfig-r071-20251105 (https://download.01.org/0day-ci/archive/20251106/202511060352.2kPPX3xE-lkp@intel.com/config)
-compiler: nios2-linux-gcc (GCC) 8.5.0
+v1: https://lore.kernel.org/netdev/20251018151737.365485-1-zahari.doychev@linux.com/
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-| Closes: https://lore.kernel.org/r/202511060352.2kPPX3xE-lkp@intel.com/
+Zahari Doychev (3):
+  ynl: samples: add tc filter example
+  tools: ynl: call nested attribute free function for indexed arrays
+  tools: ynl: ignore index 0 for indexed-arrays
 
-New smatch warnings:
-net/ipv4/tcp.c:2626 tcp_recvmsg_dmabuf() error: uninitialized symbol 'refs'.
-
-vim +/refs +2626 net/ipv4/tcp.c
-
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2485  static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2486  			      unsigned int offset, struct msghdr *msg,
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2487  			      int remaining_len)
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2488  {
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2489  	struct net_devmem_dmabuf_binding *binding = NULL;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2490  	struct dmabuf_cmsg dmabuf_cmsg = { 0 };
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2491  	struct tcp_xa_pool tcp_xa_pool;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2492  	unsigned int start;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2493  	int i, copy, n;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2494  	int sent = 0;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2495  	int err = 0;
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2496  	int refs;
-
-refs needs to be initialized to zero.  Best practice is to use
-CONFIG_INIT_STACK_ALL_PATTERN for testing.
-
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2497  
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2498  	tcp_xa_pool.max = 0;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2499  	tcp_xa_pool.idx = 0;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2500  	do {
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2501  		start = skb_headlen(skb);
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2502  
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2503  		if (skb_frags_readable(skb)) {
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2504  			err = -ENODEV;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2505  			goto out;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2506  		}
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2507  
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2508  		/* Copy header. */
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2509  		copy = start - offset;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2510  		if (copy > 0) {
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2511  			copy = min(copy, remaining_len);
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2512  
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2513  			n = copy_to_iter(skb->data + offset, copy,
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2514  					 &msg->msg_iter);
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2515  			if (n != copy) {
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2516  				err = -EFAULT;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2517  				goto out;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2518  			}
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2519  
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2520  			offset += copy;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2521  			remaining_len -= copy;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2522  
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2523  			/* First a dmabuf_cmsg for # bytes copied to user
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2524  			 * buffer.
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2525  			 */
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2526  			memset(&dmabuf_cmsg, 0, sizeof(dmabuf_cmsg));
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2527  			dmabuf_cmsg.frag_size = copy;
-18912c520674ec Stanislav Fomichev 2025-02-24  2528  			err = put_cmsg_notrunc(msg, SOL_SOCKET,
-18912c520674ec Stanislav Fomichev 2025-02-24  2529  					       SO_DEVMEM_LINEAR,
-18912c520674ec Stanislav Fomichev 2025-02-24  2530  					       sizeof(dmabuf_cmsg),
-18912c520674ec Stanislav Fomichev 2025-02-24  2531  					       &dmabuf_cmsg);
-18912c520674ec Stanislav Fomichev 2025-02-24  2532  			if (err)
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2533  				goto out;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2534  
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2535  			sent += copy;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2536  
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2537  			if (remaining_len == 0)
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2538  				goto out;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2539  		}
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2540  
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2541  		/* after that, send information of dmabuf pages through a
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2542  		 * sequence of cmsg
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2543  		 */
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2544  		for (i = 0; i < skb_shinfo(skb)->nr_frags; i++) {
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2545  			skb_frag_t *frag = &skb_shinfo(skb)->frags[i];
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2546  			struct net_iov *niov;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2547  			u64 frag_offset;
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2548  			u32 token;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2549  			int end;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2550  
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2551  			/* !skb_frags_readable() should indicate that ALL the
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2552  			 * frags in this skb are dmabuf net_iovs. We're checking
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2553  			 * for that flag above, but also check individual frags
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2554  			 * here. If the tcp stack is not setting
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2555  			 * skb_frags_readable() correctly, we still don't want
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2556  			 * to crash here.
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2557  			 */
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2558  			if (!skb_frag_net_iov(frag)) {
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2559  				net_err_ratelimited("Found non-dmabuf skb with net_iov");
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2560  				err = -ENODEV;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2561  				goto out;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2562  			}
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2563  
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2564  			niov = skb_frag_net_iov(frag);
-69e39537b66232 Pavel Begunkov     2025-02-04  2565  			if (!net_is_devmem_iov(niov)) {
-69e39537b66232 Pavel Begunkov     2025-02-04  2566  				err = -ENODEV;
-69e39537b66232 Pavel Begunkov     2025-02-04  2567  				goto out;
-69e39537b66232 Pavel Begunkov     2025-02-04  2568  			}
-69e39537b66232 Pavel Begunkov     2025-02-04  2569  
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2570  			end = start + skb_frag_size(frag);
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2571  			copy = end - offset;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2572  
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2573  			if (copy > 0) {
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2574  				copy = min(copy, remaining_len);
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2575  
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2576  				frag_offset = net_iov_virtual_addr(niov) +
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2577  					      skb_frag_off(frag) + offset -
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2578  					      start;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2579  				dmabuf_cmsg.frag_offset = frag_offset;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2580  				dmabuf_cmsg.frag_size = copy;
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2581  
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2582  				binding = net_devmem_iov_binding(niov);
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2583  
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2584  				if (!sk->sk_devmem_info.binding)
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2585  					sk->sk_devmem_info.binding = binding;
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2586  
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2587  				if (sk->sk_devmem_info.binding != binding) {
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2588  					err = -EFAULT;
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2589  					goto out;
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2590  				}
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2591  
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2592  				if (sk->sk_devmem_info.autorelease) {
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2593  					err = tcp_xa_pool_refill(sk, &tcp_xa_pool,
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2594  								 skb_shinfo(skb)->nr_frags - i);
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2595  					if (err)
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2596  						goto out;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2597  
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2598  					dmabuf_cmsg.frag_token =
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2599  						tcp_xa_pool.tokens[tcp_xa_pool.idx];
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2600  				} else {
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2601  					token = net_iov_virtual_addr(niov) >> PAGE_SHIFT;
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2602  					dmabuf_cmsg.frag_token = token;
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2603  				}
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2604  
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2605  
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2606  				/* Will perform the exchange later */
-297d389e9e5bd4 Pavel Begunkov     2025-02-04  2607  				dmabuf_cmsg.dmabuf_id = net_devmem_iov_binding_id(niov);
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2608  
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2609  				offset += copy;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2610  				remaining_len -= copy;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2611  
-18912c520674ec Stanislav Fomichev 2025-02-24  2612  				err = put_cmsg_notrunc(msg, SOL_SOCKET,
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2613  						       SO_DEVMEM_DMABUF,
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2614  						       sizeof(dmabuf_cmsg),
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2615  						       &dmabuf_cmsg);
-18912c520674ec Stanislav Fomichev 2025-02-24  2616  				if (err)
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2617  					goto out;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2618  
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2619  				if (sk->sk_devmem_info.autorelease) {
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2620  					atomic_long_inc(&niov->pp_ref_count);
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2621  					tcp_xa_pool.netmems[tcp_xa_pool.idx++] =
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2622  						skb_frag_netmem(frag);
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2623  				} else {
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2624  					if (atomic_inc_return(&niov->uref) == 1)
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2625  						atomic_long_inc(&niov->pp_ref_count);
-45aa39492cf4dd Bobby Eshleman     2025-11-04 @2626  					refs++;
-                                                                                        ^^^^^^
-
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2627  				}
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2628  
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2629  				sent += copy;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2630  
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2631  				if (remaining_len == 0)
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2632  					goto out;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2633  			}
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2634  			start = end;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2635  		}
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2636  
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2637  		tcp_xa_pool_commit(sk, &tcp_xa_pool);
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2638  
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2639  		if (!remaining_len)
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2640  			goto out;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2641  
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2642  		/* if remaining_len is not satisfied yet, we need to go to the
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2643  		 * next frag in the frag_list to satisfy remaining_len.
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2644  		 */
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2645  		skb = skb_shinfo(skb)->frag_list ?: skb->next;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2646  
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2647  		offset = offset - start;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2648  	} while (skb);
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2649  
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2650  	if (remaining_len) {
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2651  		err = -EFAULT;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2652  		goto out;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2653  	}
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2654  
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2655  out:
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2656  	tcp_xa_pool_commit(sk, &tcp_xa_pool);
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2657  
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2658  	if (!sent)
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2659  		sent = err;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2660  
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2661  	if (refs > 0)
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2662  		atomic_add(refs, &sk->sk_devmem_info.outstanding_urefs);
-45aa39492cf4dd Bobby Eshleman     2025-11-04  2663  
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2664  	return sent;
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2665  }
-8f0b3cc9a4c102 Mina Almasry       2024-09-10  2666  
+ Documentation/netlink/specs/tc.yaml   |   8 +
+ tools/net/ynl/Makefile.deps           |   1 +
+ tools/net/ynl/pyynl/ynl_gen_c.py      |  14 +-
+ tools/net/ynl/samples/.gitignore      |   1 +
+ tools/net/ynl/samples/tc-filter-add.c | 308 ++++++++++++++++++++++++++
+ 5 files changed, 331 insertions(+), 1 deletion(-)
+ create mode 100644 tools/net/ynl/samples/tc-filter-add.c
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
-
+2.51.0
 
