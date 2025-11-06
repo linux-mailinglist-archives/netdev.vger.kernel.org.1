@@ -1,339 +1,259 @@
-Return-Path: <netdev+bounces-236168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49ABCC391B1
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 05:37:18 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BA3FC39274
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 06:25:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE5FA3B631C
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 04:37:16 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 0E4334E3388
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 05:25:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AACFF2C1596;
-	Thu,  6 Nov 2025 04:37:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8FBE2D541B;
+	Thu,  6 Nov 2025 05:25:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="IaSWzjtd"
+	dkim=pass (2048-bit key) header.d=aspeedtech.com header.i=@aspeedtech.com header.b="P0IFWugs"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFD2428695;
-	Thu,  6 Nov 2025 04:37:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762403831; cv=none; b=K21aoKSwROrOoIaCUWbOj2lzYW1BUnnRrXjYdyg0BMC4jcoQGNE0x497adyQMksf3hugKZYSdAC2KbpNXGkocePXHMvuYkYici1asBOQUzmBUBbZukLSGcIvpNFt1PgH8Amo5STGtM3IxZszP5SlllOA0eDSDhM9N9mcw9w6WGI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762403831; c=relaxed/simple;
-	bh=r+YxB4Vo0TXJHROyireCe/rGrj78N33CfoSXBHnAdU8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EMWPnIpwq7QufHkC11scPvJalM3baRtC6aVUJJX3oxSCLglfMRrpxqkaPG9al2ZGx/ajgumGHkzTFpwC/zkXyxu789d2qat9zoBK8LNeIxUlBoLhgzrdZIBQbcwHvwJ+cp77UnHdkeqOOzntDQBcU8408M2Yrl/we/8TxCFFoMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=IaSWzjtd; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1204)
-	id 66150211E335; Wed,  5 Nov 2025 20:37:03 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 66150211E335
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1762403823;
-	bh=WvWOPGCfAQhFnGXyL6CtQeVAoRIJIpIZGv9//L4/okc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IaSWzjtdi22KdCMH/lDPY7tZJpqK7w/aLXH6T8ddPOKcTvfaIKwEyKwbWSvk0tlmg
-	 4LbrarCkT/jcX/UdEvs5MhxhDIEmKt9qvrGD1iA1n6YKyaDVLPwD4XVlu1/Dc4Eakf
-	 kpNLyLzC5oQQKXBcz8GFK+Jans0tLl/TtzNdFtBs=
-Date: Wed, 5 Nov 2025 20:37:03 -0800
-From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, longli@microsoft.com,
-	kotaranov@microsoft.com, horms@kernel.org,
-	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
-	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
-	dipayanroy@microsoft.com
-Subject: Re: [PATCH net-next v2] net: mana: Implement ndo_tx_timeout and
- serialize queue resets per port.
-Message-ID: <20251106043703.GA1096@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20251027201351.GA8995@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <20251029182233.59aea2d3@kernel.org>
+Received: from TYPPR03CU001.outbound.protection.outlook.com (mail-japaneastazon11022074.outbound.protection.outlook.com [52.101.126.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DBF11F03D9;
+	Thu,  6 Nov 2025 05:25:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.126.74
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762406755; cv=fail; b=BacM33wbQa5560KURokSGDtdVzV9kp1Ff1rC5qvV90hb7mQFsxhzVIsMD3V0a53UgoDg6/DH+KNWevQ0/yXd+gM66+N/brBqrqODR9ak3UaJv7RzrKChUY9zuUm2W8Fys+WWvv0Hs0XMSlEmqYanjB/bkiZSO5rVQTtw3hFQcz0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762406755; c=relaxed/simple;
+	bh=izebTBtMP4WCdYxyYBUHwEAXybLSvjjxkC5EHGCLm9M=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=rMM8R21B1AR3RjCN81BBygvgxHiUcEVaG6dPv5ncihSgc5xUA7Uw5y0ONVrOIa3AAimACSa9PqTrL9s5NkLVGyBwSr3sdOm9i9P8KZyblfKuLCZHcSvVEzuck3/S/uIK7TWR+MYwEmrj8E9wiUxBzI3A4fdgtkaC23zuRFJiBEU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; dkim=pass (2048-bit key) header.d=aspeedtech.com header.i=@aspeedtech.com header.b=P0IFWugs; arc=fail smtp.client-ip=52.101.126.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=AtI9xFS4Bz2KdQ6Joxozb8ddfagu0YPQbLYsw1Aixp802ytgZwu1PY9U9DLB7djsgglZa4usp4YYDODCH1TXM86+2rjQ8S6C2YjRTqXumAbaPcGo9cF5+egSntLLYX4ggcZAaJxDHPiDH+f1Fea+PkzRNerudwPzKeHyM/TkYP40yXPuPVxYewpCDajoZUKDkZAAEi8pA8CjFnphgIwAa/r1JOHoHvJoo5d/p302kUpm+G8rX7viIH5D5dMS2txJ7fY9i6jLqysCPaanbiyMZ9g5GHg2SsL13gNyYnZQTpmQ+kr7FrIAths/C5oNoFmBl9pFuDtirZ7kyDl8tforqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jc0hgzNsCUrlypGoz6xaylxgITXf8AZbeIzxe8ltDBQ=;
+ b=ayJgBYLrt6TOPAzznFmjr0OyDyaV2OTVtUwV29ebrtB43d4cnqcJHkcIMXtHqJY6iqYC+wk6ONIE3WHMdVzodsQkWQPW9/t64zkxKRfm+fBUbJEv2DdoQYHbwk/WRVg5mXGkZUQlzcjjaCqqLjUOsyhShQy46LVU1kwHOGbZRV74w86fJKDMoOyx4iemtVCDF0fCK5efMZOZjnw3LvgELpfr9K9xm2eEwYo497QyIL2aKnj6FVC5tyW0ydA6cuq+tVT47mhKVW5GERcmzrrUlBcPMCPjT9MrJXSOmc3Ocw/o2jBKI1921TYFYWgE1Si+U+wy9pLNVSFO7N3XfBCxqg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=aspeedtech.com; dmarc=pass action=none
+ header.from=aspeedtech.com; dkim=pass header.d=aspeedtech.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aspeedtech.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jc0hgzNsCUrlypGoz6xaylxgITXf8AZbeIzxe8ltDBQ=;
+ b=P0IFWugsHMvQ/F94AUwONFBkMp4xdmT3jEFXRauzxpmQSnbKtKEm1vUN+wob3GmA5ir2UWN1y6YZlqvDWz3XV8kcScF9kjycameX3jcGKL91bo90/Ilw8cEXkPqfR/yYsHKFj26h1duWuI/+z9DlwMNVeziX4KxN66QHZzwcKhKiWVQZXTS4GOn7Nb1O8CntFO7MK11JbRb1FNxAFkjGOT/8Nb31z2d/QmAcmawh0R+uH2gCCHPmEicHvQvDsLSffeF19jmCRhDLAHEe1pEHq4z/3HFKSotI20rW/pwy0DRx/YWJBRuiMmLJxJQTA37qmF9A529oBb98xgi6298QqQ==
+Received: from SEYPR06MB5134.apcprd06.prod.outlook.com (2603:1096:101:5a::12)
+ by SEYPR06MB5208.apcprd06.prod.outlook.com (2603:1096:101:88::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.8; Thu, 6 Nov
+ 2025 05:25:49 +0000
+Received: from SEYPR06MB5134.apcprd06.prod.outlook.com
+ ([fe80::6b58:6014:be6e:2f28]) by SEYPR06MB5134.apcprd06.prod.outlook.com
+ ([fe80::6b58:6014:be6e:2f28%6]) with mapi id 15.20.9298.007; Thu, 6 Nov 2025
+ 05:25:49 +0000
+From: Jacky Chou <jacky_chou@aspeedtech.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>, Po-Yu Chuang <ratbert@faraday-tech.com>, Joel Stanley
+	<joel@jms.id.au>, Andrew Jeffery <andrew@codeconstruct.com.au>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-aspeed@lists.ozlabs.org"
+	<linux-aspeed@lists.ozlabs.org>, "taoren@meta.com" <taoren@meta.com>
+Subject: [PATCH net-next v3 1/4] dt-bindings: net: ftgmac100: Add delay
+ properties for AST2600
+Thread-Topic: [PATCH net-next v3 1/4] dt-bindings: net: ftgmac100: Add delay
+ properties for AST2600
+Thread-Index: AQHcTJUB+TmCwKSgIEaeQsrh+oaRd7ThzyYAgAAnFuCAAJHDAIACl+pQ
+Date: Thu, 6 Nov 2025 05:25:48 +0000
+Message-ID:
+ <SEYPR06MB5134524038F2FFEA3009AA209DC2A@SEYPR06MB5134.apcprd06.prod.outlook.com>
+References: <20251103-rgmii_delay_2600-v3-0-e2af2656f7d7@aspeedtech.com>
+ <20251103-rgmii_delay_2600-v3-1-e2af2656f7d7@aspeedtech.com>
+ <2424e7e9-8eef-43f4-88aa-054413ca63fe@lunn.ch>
+ <SEYPR06MB5134AB242733717317AAEDEA9DC4A@SEYPR06MB5134.apcprd06.prod.outlook.com>
+ <d7b08607-73a3-4f6b-ab8b-3eb4ff8b8647@lunn.ch>
+In-Reply-To: <d7b08607-73a3-4f6b-ab8b-3eb4ff8b8647@lunn.ch>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=aspeedtech.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SEYPR06MB5134:EE_|SEYPR06MB5208:EE_
+x-ms-office365-filtering-correlation-id: 9f2de97b-bb93-4ffb-ff89-08de1cf4f1d2
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|1800799024|7416014|376014|38070700021;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?Km1iDnzQryRl05lw2FF6gZaq9BhQUzYIQj1Q2pX6cBprxFuxFIF2CMG9ztE4?=
+ =?us-ascii?Q?g9AxtVBak4Hccigeki+YYCJnxmcn+hkQXZagmYikShEypIIp0QDCovw88wY5?=
+ =?us-ascii?Q?nq4qwhXr8qRGr263FeXyKolFDzHlshDiZjdKhqidt5tmaHm2T6okd3Wd2R7K?=
+ =?us-ascii?Q?RZPaHFui86Sa1HyBP/mM97ASpJDli4M2C+pE7ydbz/dvGyM5eG7jzwYNffnl?=
+ =?us-ascii?Q?Q/8fwY/Us53AIzNi2rAJWeKkey4TdXGJsl1ADbRQ+PmO8vhJKJdnVZ/Iovon?=
+ =?us-ascii?Q?BRnUQUzng3LzpG/YzXuom/YUoGLmqN2qBOK/pW0eCaNgXoo0Ez9z1yRC/hFr?=
+ =?us-ascii?Q?6C8qTTMjbrgslj9T8f32E0CplY0zbbGuuh4DMy3ZPhsQuRozMTekbv7mVnqN?=
+ =?us-ascii?Q?VSYHbcztbC2HU6atOCsVqIVzzWGdS6V1xrjOV++0zXzhGCLzdUVC/6vXeXrQ?=
+ =?us-ascii?Q?FLOZxXjhHwi5l0nhvKrXBF80ciVI8fkgi9xErBISekAYDtmvpfRuGgmYrApa?=
+ =?us-ascii?Q?vWIKolcAZKSKzTCHHAUKvHVbbc7sUbXF25KIJdm005/LS61+Bn9UYAYxpqWO?=
+ =?us-ascii?Q?cnGolYV139mC0wTSD5XDzRH0/Z5TkG8yXG+0TMB6MauKD/w6md659HrckXln?=
+ =?us-ascii?Q?3//BXHMl2V0BnZ3mHstUUmGAvgC+/NTibO2bc+B2HzjDlZxKTfQAmvae+ylH?=
+ =?us-ascii?Q?QxderDFMqiqjsioxM64+ns6R9u1c//Pz83YnLAVXcS1w1aTlgTJMcVz5wsEO?=
+ =?us-ascii?Q?GYgX/LNK8XuMmHKPU5ULHorxjupAWMCE6UM99KXci2wHB1DC1G7VOT0c8CCh?=
+ =?us-ascii?Q?aQx2w/8b/kq+mqn4V8/OYYt1Y1Gx31PmWDaZFSV6y2HKKKEHiihVM5nlWTnU?=
+ =?us-ascii?Q?ZRR7lYCAD0LR3os8x4/FOxHOy9w583Ksc+UEjNLyVCvZTVE/5EB6DkJAS2jf?=
+ =?us-ascii?Q?jviWXvGbcw4wgz9Uv+DaOhP4WJIDhAQmgYaMh14P9S1liXWI0qe1uztLIiy3?=
+ =?us-ascii?Q?gtIPEhmjkBCBQbLQ/9P55+5g5NygUli2E2ErHf2CAvvTrLiVIzo7BcaTcV8N?=
+ =?us-ascii?Q?AsdqbQgyGZoCHsYjnPich5w9btX0Va64+J7+OujZRslyqtbUnrRPmf7F669x?=
+ =?us-ascii?Q?4VrbhVntv/wJbCfQuyNfC/CupC309RU/ZioTaXMoTV9Q4pVrhHtwiKPYKg/y?=
+ =?us-ascii?Q?J0l2Emj8ArRi1P1ec44l5YWiy8Skq7hAwiiJgbcBopTOyMsqcCSDfarpN/eK?=
+ =?us-ascii?Q?LUb6Zp7pGxJX44jXEBauCMYIU8A0erl6mZqBMpJsBcJdG5iwgvDJt1Se2ONF?=
+ =?us-ascii?Q?R676puA3T9x5b92FO22e90Cs1xeDhWt8UqlQcL9j0uAE8qQ0hb/SJIf5Hx1K?=
+ =?us-ascii?Q?Kt3Rs4rYEuMJwSpsLfATYs/94uOmBsg9DEx/Mo3MbrR/4jjom6fnf3KcCVfC?=
+ =?us-ascii?Q?Y8vgZksD4S8hYi1SMjycKugMKgH06RkbU9rGN8aTeDNGnZ6rbCLJs7njspow?=
+ =?us-ascii?Q?tTPeX4ey1At8aWCWVHhLfAoYVMp6p4/b6ELB?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SEYPR06MB5134.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(38070700021);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?+jml/Y2nxQY0AH/H2i9ARJtW+uJjGiocDBRXiCXd93IjmNEJ1KBbRf/wrSsQ?=
+ =?us-ascii?Q?nCaiwbWO3R9ZRxio/CFU8RMPce7ZSprG6YgYD2RWcIDEgLIykQHhqScV1f2L?=
+ =?us-ascii?Q?Kt2nzUR/n/NS+Cl5uObgfyYy7F4TjiMM9PZdEK4JQCr6yZ7zvXz2LziUFJHc?=
+ =?us-ascii?Q?JcpULEkOaSPm5huArWemjh7d/nVoATBJbVK5nemqlYVQHWMb/YlbI3E7Lljm?=
+ =?us-ascii?Q?3CXkUMmClAws17TI2r4QeGYJ4h+dqsdcOWepjayCSgJk/yweTsde23JjcGTt?=
+ =?us-ascii?Q?naTEH9bBlbg06CQxnPNo8pqCTuI0Xp17leTXw3VbYkqjUgLrbJ+qRwvCobuR?=
+ =?us-ascii?Q?r8y0b6goEVSgWIKRvy7Pipa93xtJAPD6WEXN2f8RarXOt8Pc/KrfoJCdBkdu?=
+ =?us-ascii?Q?D3sDhiYHJoFuSOGnbQxt+3HvJlF8oceJaxWMCW43A1k51j5c6mq3GH89wGON?=
+ =?us-ascii?Q?WabdDrJBPfdck7ABFUgpj/8Z8/5DyyTIPfdTZpq4uPTfsT9JzrjwNCrjvP4/?=
+ =?us-ascii?Q?0+hSMn+SKbWGeDY5F8ooGYAOhAMcDOjMF9+161Ocwq/Qmkh9D17iM3ipqLyR?=
+ =?us-ascii?Q?V8LUzaKf1R68WlsYif9KHDyeFt5J9m/cA4w+EZed3QnViqcZIzcbCHfy4V0t?=
+ =?us-ascii?Q?L7vxJLP7ab+9DCskCwLLmXyrCo5XP9oSquELNI+4ochMx0x88n8y6P6ufBSv?=
+ =?us-ascii?Q?sJP07EecdbgDnEIXn0F8oLKn3NI+Vx/kWYMyBVV5mLxS4ZeVrEEq+s6Ti7fX?=
+ =?us-ascii?Q?+yyI6YadEnHxiTp77xa0fmmXeltgU9obGtIb9VpTbENvLV69iC6FYlrtUcRH?=
+ =?us-ascii?Q?F8OSmE/lB+h/3q5O5OcuuWeVDsVTag5+rdz1pM2u5nVvv/SbnODKzhcTetw1?=
+ =?us-ascii?Q?uI2uJph6ELaQUH8NrDrf3CLEN9OiS5f8l0kkS0uQ9bJHZrTNmm49AcGww4xD?=
+ =?us-ascii?Q?7LYAlEFad16iNcoOYujZQ/XYoL1K22tWWp0yGG2KCffcKmdVZziP0B0br8Q1?=
+ =?us-ascii?Q?qtfYT/lEj0jMhB4vkbP+kCAzfUmuDKb720W29GT5JAEKSjBke5gCS9EPNdDb?=
+ =?us-ascii?Q?wXUtA7g7XR/Nbsz7BZV7y44doFDzC7DPKSQ3O9TDlBGOQG/9G2wgUFCXpSZi?=
+ =?us-ascii?Q?rtFN2FZpClylABKP/hWLbSNQHT/69ZIxmK6FBrSfeRUgr0DTWgyZ0L529bA0?=
+ =?us-ascii?Q?cRp4VtTUnpWEd7hXcaNErlH/7oX4fmmnsQwr6C1c638cc0e0ZpGDlJ5ig50m?=
+ =?us-ascii?Q?zdG2qO/ITmZ/i8aLFInZin/P1aQaC7tBOz/Mw12ui7T0eO9EqTw2JInQkDFP?=
+ =?us-ascii?Q?7kec1VUcsPwQMHk098aoWZBSwVUattXMuoxCNn7sM2Xc+I1UIrXMRi784/Sb?=
+ =?us-ascii?Q?TDkChcD+Xm6+/TfmMeLUXmQniyUxjlPP62+nXjCLuR6vnMXJjN0LNWPfrcr0?=
+ =?us-ascii?Q?7ddsSxTulo4LjrJQt93mThfxEanH6WGHQ+QAzwaqahtHQ0i8oIeRft17rS+c?=
+ =?us-ascii?Q?/mCIcCsWrsrpu/V+dJAaqVCqdm3Ft/CYEhD8klNeU/kgOb3b2n8GpeKt/BIY?=
+ =?us-ascii?Q?StR9VC9TiN7jpFMJ6CloFSvB3oerloHIJ+6j+cC3?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251029182233.59aea2d3@kernel.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+X-OriginatorOrg: aspeedtech.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SEYPR06MB5134.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9f2de97b-bb93-4ffb-ff89-08de1cf4f1d2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Nov 2025 05:25:48.7597
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43d4aa98-e35b-4575-8939-080e90d5a249
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: /JOrobkDSc7CbfZU6yAu8MDx168r5/OiW+6UdAV8Z86nMc3pkwC5yfEFwR3cI7d2tLPyr3czwWxU/OyD57xlU88Qd9ZabgPqdyFvG+X2l1w=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEYPR06MB5208
 
-On Wed, Oct 29, 2025 at 06:22:33PM -0700, Jakub Kicinski wrote:
-> On Mon, 27 Oct 2025 13:13:51 -0700 Dipayaan Roy wrote:
-> > Implement .ndo_tx_timeout for MANA so any stalled TX queue can be detected
-> > and a device-controlled port reset for all queues can be scheduled to a
-> > ordered workqueue. The reset for all queues on stall detection is
-> > recomended by hardware team.
-> > 
-> > The change introduces a single ordered workqueue
-> > ("mana_per_port_queue_reset_wq") with WQ_UNBOUND | WQ_MEM_RECLAIM and
-> > queues exactly one work_struct per port onto it. This achieves:
-> > 
-> >   * Global FIFO across all port reset requests (alloc_ordered_workqueue).
-> 
-> Why does this matter?
-> 
-As per HW team,it should be processing only one port reset at any point
-of time, so we need the serialization.
+> > > > +  - if:
+> > > > +      properties:
+> > > > +        compatible:
+> > > > +          contains:
+> > > > +            const: aspeed,ast2600-mac01
+> > > > +    then:
+> > > > +      properties:
+> > > > +        rx-internal-delay-ps:
+> > > > +          minimum: 0
+> > > > +          maximum: 1395
+> > > > +          multipleOf: 45
+> > >
+> > > I would add a default: 0
+> > >
+> >
+> > Agreed.
+> > I will add it in next version.
+> >
+> > > > +        tx-internal-delay-ps:
+> > > > +          minimum: 0
+> > > > +          maximum: 1395
+> > > > +          multipleOf: 45
+> > >
+> > > and also here.
+> > >
+> >
+> > Agreed.
+> >
+> > > > +      required:
+> > > > +        - scu
+> > > > +        - rx-internal-delay-ps
+> > > > +        - tx-internal-delay-ps
+> > >
+> > > and then these are not required, but optional.
+> > >
+> >
+> > Configure the tx/rx delay in the scu register.
+> > At least, the scu handle must be required.
+>=20
+> Sorry, i was unclear. By says 'and then', i was trying to chain it to the=
+ previous
+> comment, that the delays should default to 0. With defaults set,
+> rx-internal-delay-ps and tx-internal-delay-ps become optional. I agree sc=
+u is
+> required.
+>=20
+> > Here I have one question.
+> > In v3 patches series, if the ftgmac driver cannot find one of
+> > tx-internal-delay-ps and rx-internal-delay-ps, it will return error in
+> > probe stage.
+> > If here is optional, does it means that just add warning and not
+> > return error when lack one of them and use the default to configure?
+> > Or not configure tx/rx delay just return success in probe stage?
+>=20
+> Once you add the default statement, it is clear what delay should be adde=
+d if
+> they property is not listed, 0. No warning is needed.
+>=20
+> What you should find in the end is that most boards just set the new
+> compatible and 'rgmii-id', and need nothing else. Only badly designed boa=
+rds
+> tend to need tx-internal-delay-ps and rx-internal-delay-ps.
+>=20
 
-> >   * Natural per-port de-duplication: the same work_struct cannot be
-> >     queued twice while pending/running.
-> 
-> That's true for all work_structs even without a separate wq.
->
-Right, (verbose, will remove). 
-> >   * Avoids hogging a per-CPU kworker for long, may-sleep reset paths
-> >     (WQ_UNBOUND).
-> 
-> ?
-> 
-> >   * Guarantees forward progress during memory pressure
-> >     (WQ_MEM_RECLAIM rescuer).
-> 
-> ? meaning? What scenario are you preventing?
-> 
-I was trying to explain the usage/benefit of these flags, but seems verbose here.
-I will rephrase the better in v3.
+Thanks for the clarification and detailed explanation.
 
-> > Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-> > Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-> > ---
-> > Changes in v2:
-> >   - Fixed cosmetic changes.
-> > ---
-> >  drivers/net/ethernet/microsoft/mana/mana_en.c | 82 +++++++++++++++++++
-> >  include/net/mana/gdma.h                       |  6 +-
-> >  include/net/mana/mana.h                       | 15 ++++
-> >  3 files changed, 102 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> > index f4fc86f20213..05b7046ae3b5 100644
-> > --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-> > +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> > @@ -258,6 +258,45 @@ static int mana_get_gso_hs(struct sk_buff *skb)
-> >  	return gso_hs;
-> >  }
-> >  
-> > +static void mana_per_port_queue_reset_work_handler(struct work_struct *work)
-> > +{
-> > +	struct mana_queue_reset_work *reset_queue_work =
-> > +			container_of(work, struct mana_queue_reset_work, work);
-> > +	struct mana_port_context *apc = reset_queue_work->apc;
-> > +	struct net_device *ndev = apc->ndev;
-> > +	struct mana_context *ac = apc->ac;
-> > +	int err;
-> > +
-> > +	if (!rtnl_trylock()) {
-> 
-> Use disable_work_sync() in the remove path and you won't have to do 
-> the retry dance, right?
-> 
-Looks like we might end up the same issue with both cancel_work_sync and
-disable_work_sync(), unless the call to them is made out of rtnl_lock/unlock
-in mana_remove? If thats the right approach we can drop rtnl_trylock here and
-have only rtnl_lock().
+In the next version, I'll mark "aspeed,ast2600-mac" as deprecated and conti=
+nue=20
+using "aspeed,ast2600-mac01" and "aspeed,ast2600-mac23".
+I'll also add the default delay values for tx/rx-internal-delay-ps.
 
-> > +		/* Someone else holds RTNL, requeue and exit. */
-> > +		queue_work(ac->per_port_queue_reset_wq,
-> > +			   &apc->queue_reset_work.work);
-> > +		return;
-> > +	}
-> 
-> > +static void mana_tx_timeout(struct net_device *netdev, unsigned int txqueue)
-> > +{
-> > +	struct mana_port_context *apc = netdev_priv(netdev);
-> > +	struct mana_context *ac = apc->ac;
-> > +	struct gdma_context *gc = ac->gdma_dev->gdma_context;
-> > +
-> > +	netdev_warn(netdev, "%s(): called on txq: %u\n", __func__, txqueue);
-> 
-> I believe that core already prints this sort of thing, please don't
-> duplicate.
-> 
-Ok, will address it in v3.
+In the driver, if those properties are missing, it will use the default val=
+ues for configuration.
+Additionally, I'll treat aspeed-ast2600-evb.dts as a new board using the ne=
+w
+compatible and 'rgmii-id'.
 
-> > +	/* Already in service, hence tx queue reset is not required.*/
-> > +	if (gc->in_service)
-> > +		return;
-> > +
-> > +	/* Note: If there are pending queue reset work for this port(apc),
-> > +	 * subsequent request queued up from here are ignored. This is because
-> > +	 * we are using the same work instance per port(apc).
-> > +	 */
-> > +	queue_work(ac->per_port_queue_reset_wq, &apc->queue_reset_work.work);
-> > +}
-> > +
-> >  static int mana_shaper_set(struct net_shaper_binding *binding,
-> >  			   const struct net_shaper *shaper,
-> >  			   struct netlink_ext_ack *extack)
-> > @@ -844,7 +902,9 @@ static const struct net_device_ops mana_devops = {
-> >  	.ndo_bpf		= mana_bpf,
-> >  	.ndo_xdp_xmit		= mana_xdp_xmit,
-> >  	.ndo_change_mtu		= mana_change_mtu,
-> > +	.ndo_tx_timeout     = mana_tx_timeout,
-> 
-> other ndos were aligned with tabs you're using spaces
->
-Ok, will address it in v3.
+Thanks again for your helpful feedback.
 
-> >  	.net_shaper_ops         = &mana_shaper_ops,
-> > +
-> >  };
-> >  
-> >  static void mana_cleanup_port_context(struct mana_port_context *apc)
-> > @@ -3218,6 +3278,7 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
-> >  	ndev->min_mtu = ETH_MIN_MTU;
-> >  	ndev->needed_headroom = MANA_HEADROOM;
-> >  	ndev->dev_port = port_idx;
-> > +	ndev->watchdog_timeo = MANA_TXQ_TIMEOUT;
-> 
-> why you need a define for this is unclear. You can use 15 * HZ here
-> directly 
->
-Ok, will address it in v3.
+Thanks,
+Jacky
 
-> >  	SET_NETDEV_DEV(ndev, gc->dev);
-> >  
-> >  	netif_set_tso_max_size(ndev, GSO_MAX_SIZE);
-> > @@ -3255,6 +3316,11 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
-> >  
-> >  	debugfs_create_u32("current_speed", 0400, apc->mana_port_debugfs, &apc->speed);
-> >  
-> > +	/* Initialize the per port queue reset work.*/
-> > +	apc->queue_reset_work.apc = apc;
-> > +	INIT_WORK(&apc->queue_reset_work.work,
-> > +		  mana_per_port_queue_reset_work_handler);
-> > +
-> >  	return 0;
-> >  
-> >  free_indir:
-> > @@ -3456,6 +3522,15 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
-> >  	if (ac->num_ports > MAX_PORTS_IN_MANA_DEV)
-> >  		ac->num_ports = MAX_PORTS_IN_MANA_DEV;
-> >  
-> > +	ac->per_port_queue_reset_wq =
-> > +			alloc_ordered_workqueue("mana_per_port_queue_reset_wq",
-> > +						WQ_UNBOUND | WQ_MEM_RECLAIM);
-> > +	if (!ac->per_port_queue_reset_wq) {
-> > +		dev_err(dev, "Failed to allocate per port queue reset workqueue\n");
-> > +		err = -ENOMEM;
-> > +		goto out;
-> > +	}
-> > +
-> >  	if (!resuming) {
-> >  		for (i = 0; i < ac->num_ports; i++) {
-> >  			err = mana_probe_port(ac, i, &ac->ports[i]);
-> > @@ -3528,6 +3603,8 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
-> >  		 */
-> >  		rtnl_lock();
-> >  
-> > +		cancel_work_sync(&apc->queue_reset_work.work);
-> > +
-> >  		err = mana_detach(ndev, false);
-> >  		if (err)
-> >  			netdev_err(ndev, "Failed to detach vPort %d: %d\n",
-> > @@ -3547,6 +3624,11 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
-> >  		free_netdev(ndev);
-> >  	}
-> >  
-> > +	if (ac->per_port_queue_reset_wq) {
-> > +		destroy_workqueue(ac->per_port_queue_reset_wq);
-> > +		ac->per_port_queue_reset_wq = NULL;
-> > +	}
-> > +
-> >  	mana_destroy_eq(ac);
-> >  out:
-> >  	mana_gd_deregister_device(gd);
-> > diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-> > index 57df78cfbf82..1f8c536ba3be 100644
-> > --- a/include/net/mana/gdma.h
-> > +++ b/include/net/mana/gdma.h
-> > @@ -591,6 +591,9 @@ enum {
-> >  /* Driver can self reset on FPGA Reconfig EQE notification */
-> >  #define GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE BIT(17)
-> >  
-> > +/* Driver detects stalled send queues and recovers them */
-> > +#define GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY BIT(18)
-> > +
-> >  #define GDMA_DRV_CAP_FLAGS1 \
-> >  	(GDMA_DRV_CAP_FLAG_1_EQ_SHARING_MULTI_VPORT | \
-> >  	 GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX | \
-> > @@ -599,7 +602,8 @@ enum {
-> >  	 GDMA_DRV_CAP_FLAG_1_DEV_LIST_HOLES_SUP | \
-> >  	 GDMA_DRV_CAP_FLAG_1_DYNAMIC_IRQ_ALLOC_SUPPORT | \
-> >  	 GDMA_DRV_CAP_FLAG_1_SELF_RESET_ON_EQE | \
-> > -	 GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE)
-> > +	 GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE | \
-> > +	 GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY)
-> >  
-> >  #define GDMA_DRV_CAP_FLAGS2 0
-> >  
-> > diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-> > index 0921485565c0..e0b44ae2226a 100644
-> > --- a/include/net/mana/mana.h
-> > +++ b/include/net/mana/mana.h
-> > @@ -67,6 +67,11 @@ enum TRI_STATE {
-> >  
-> >  #define MANA_RX_FRAG_ALIGNMENT 64
-> >  
-> > +/* Timeout value for Txq stall detection & recovery used by ndo_tx_timeout.
-> > + * The value is chosen after considering fpga re-config scenarios.
-> > + */
-> > +#define MANA_TXQ_TIMEOUT (15 * HZ)
-> > +
-> >  struct mana_stats_rx {
-> >  	u64 packets;
-> >  	u64 bytes;
-> > @@ -475,13 +480,23 @@ struct mana_context {
-> >  
-> >  	struct mana_eq *eqs;
-> >  	struct dentry *mana_eqs_debugfs;
-> > +	struct workqueue_struct *per_port_queue_reset_wq;
-> >  
-> >  	struct net_device *ports[MAX_PORTS_IN_MANA_DEV];
-> >  };
-> >  
-> > +struct mana_queue_reset_work {
-> > +
-> 
-> nit spurious empty line
->
-Ok, will address it in v3. 
-> > +	/* Work structure */
-> > +	struct work_struct work;
-> > +	/* Pointer to the port context */
-> > +	struct mana_port_context *apc;
-> 
-> This struct is placed in apc, unclear why you need a backpointer
-> instead of using container_of()
->
-Right, I will address this in v3. 
-> > +};
-> > +
-> >  struct mana_port_context {
-> >  	struct mana_context *ac;
-> >  	struct net_device *ndev;
-> > +	struct mana_queue_reset_work queue_reset_work;
-> >  
-> >  	u8 mac_addr[ETH_ALEN];
-> >  
-> 
-> -- 
-> pw-bot: cr
-
-
-Thank you for the review comments.
-I will work on addressing them in the v3.
-
-Regards
-Dipayaan Roy
 
