@@ -1,96 +1,120 @@
-Return-Path: <netdev+bounces-236542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F578C3DB9C
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 00:01:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF10CC3DCE6
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 00:23:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33FBF188DA6D
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 23:01:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FD993B3AEE
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 23:23:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FC98339B34;
-	Thu,  6 Nov 2025 23:00:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E77DE357A2C;
+	Thu,  6 Nov 2025 23:21:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k5hMLTgB"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="3G1DDF1J"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78753286D72;
-	Thu,  6 Nov 2025 23:00:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46C1B35773B
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 23:21:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762470038; cv=none; b=o3Mmrq3WNHknSfNFY6ezMG9x0GLcUbJ8Zl2/KA+QsgULV/fR+JOTRU+wsVbfcdITNDKgCcYO38OWefa1zZVnVSE7X3FpHo2gYJPmzRssFBTmjM7/xv+/d20twW5imb/VcOuodife7QEHpIYS5VSPRkrJhuSuIHdQoNWnu7iCZ/k=
+	t=1762471294; cv=none; b=PkSFyx+TZIuZNHRHibGQrkOMRytY4FN7xCGlV2zUV7BJ958AqOW1fNhWeFPtyQLtOg7iyUIuVeE75GlWJFiV9bx79w+nCeBvHitEfoBkB9RfJ7BptlDfR7Efu1DIXYjGcMtvKXtOsg1750CuYlLq2J1aCdldz1/ZQfuE0cHXB3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762470038; c=relaxed/simple;
-	bh=nH9ur9o0wv0KcJtvkc2LZ2t1XfruLtSbEK8aE6o+8Io=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Xfa3X0zwV3RadSRBYHUpJ58R0SA06ACPOD4aWZYoWg000wtxGJlT0Ux5nyu0n1Jt0eEWVeimUdm8KtLesme+Xou8YlGFIU44Y45eC0QbCfZiLW8gtD6xYGmiBUTMwzW0Ev17i7iPQ5cY5GR9XZP3N3+BYoQ9OeBcAYL5UJJz4xk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k5hMLTgB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF8C0C4CEF7;
-	Thu,  6 Nov 2025 23:00:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762470038;
-	bh=nH9ur9o0wv0KcJtvkc2LZ2t1XfruLtSbEK8aE6o+8Io=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=k5hMLTgBEv28F7a1A6RBD/CrX/9w9tEOv5hUvFLOG7gmurjH8aIxdJJ3RvCfmt7xw
-	 uAN4QNTwbRtX50OvPsCq2Sl5jM9bCQRksCe34BFXYevhYFnFDtkalYj5tND1jyfAVj
-	 maQB0kaLHPGHzOvj7ZaRxsD/sWl5nQr0wdLnJ33DHmZ+PfqHTPiV38845Ibo9K6Liz
-	 KVsfY6DjAq1BgmUQRReDmzA6QvGQfV0un9iNjOSxaHymODhikvjGL1MqqB8tXhDTQk
-	 rc5P3EdRv+VMNQAArTJ6+hFqIJX2kl2Urw7Ec1HAyre1HDE1JPa6ctixSk9LdBYRzN
-	 7XaCCLYwyN2eQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB00039EF96E;
-	Thu,  6 Nov 2025 23:00:11 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1762471294; c=relaxed/simple;
+	bh=Bssuky49KgzsBbl93nxGJPM72qehHS0AHF2yOa7tEJo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Plbscm+YHABKZ8TDCTi/lSXlb+qgMSSPkozOLrstkjNW7Czs/wMFjsWRE5xJ2S6UdQ5783AxzneUDo4LlLCAWFrWPTSCXAVjgpLBPg8s5ArzL4SI80F55QC6zl0bAxQdLv1wryDDo+1z9uVX1Ce5aPyQ/xZefBqUIajXfsYK8UI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=3G1DDF1J; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4ed82e82f0fso1559021cf.1
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 15:21:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1762471291; x=1763076091; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=jgqQMv8vC1wnvm8jLlkIn4alZVszPP8l8LlzETRj8QA=;
+        b=3G1DDF1JFmZfPkbOQeJ8B96axX0JFB/PgZsEhVJ6kEVsVq9Pux5msW2qh79rORZhwq
+         NkVo2fiUmLhZEk2C5FOe1qB4a9l8JkQIMxL5gx2HEoLgD3IW7WrkluhnDdFhC659EW3K
+         ZnTJzsXzc0ZUT75fyqtWOkVmVZWq8YxED3XRH0D/wi5ivOCu4cHI9xLHeDC4VJGALncy
+         Bq2MRqXA7A9GEjafBmSjRe7lVNmjDJqKXM9WYY9dKvTI5+9B0m7StRN/2vLE83bmE4LG
+         1fqcwoWXczip1F3eKYr6NWC/rKipoCRbBgOQKeub7cyosIqyC66Z1WRG5DBMV++BIetg
+         fFpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762471291; x=1763076091;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jgqQMv8vC1wnvm8jLlkIn4alZVszPP8l8LlzETRj8QA=;
+        b=fDfu7XMcH40o9kizFY4OHbTeHwzcKamYUsbjo5IBpBoyLIoigs2jrnMklSoRJJ6UXn
+         +9tQJ7Vy6wo3OZNnuWaqB2q9MktRRuBeQoA4YPkbpjjhTcmegV4TtVRm5MZhQDPe6wVe
+         CODoy49au9r/GCX3YHx92PnnKXYkkHBZKaRz2QLmhn6fm3Ac4NCLO0UxcJngtmYV9QBA
+         OwhdBo6GGzXyEybxyx4OVzNcCx/dsw9KSs27jwT2jPftUwXKAtr/UQX450rd7IQpOR1K
+         wGLkZXbzzgfZWLL9tFDuDKCuBvvHf+k6pDZsa+3wWhV4tWHBwiciS+7Md5yuX26FX1q3
+         0UoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXar3B6wFgbtReTaloSsOxEZiDCqZbAc/uE0M5uswh6kJIdQMgd6r6X5Ru3YmGD9x0dtJ9juvs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxG8KUAVsGjwFF5s9oVcSdgGZdyLSarGg5GE2QD5WzIESRub+/K
+	O9RkvcV6YslvpTE/uHzPs7wYlPUSXJ9U/fXJfBHBE3uA03mLG50KimiV634khaRbXqs=
+X-Gm-Gg: ASbGncv6jkHWWKQfyBrIcFXHeuIVw2wAdV8F56F8QNrr+O7YykcO+Z+PIlm+Hw5aWki
+	8oH5gzprvFjEKfkhg3Xvog0piUcCIyBIWKS0BBqGjWh61SyWJZ29WUg8pyUmt2XY2wNNCtc3tnZ
+	2tz1I4Fi1SyCOfer2Lp2t8nCpH924fc1PUAJHPd461/UcLew+aWZtyVCOq4BNoiba7cLqg+7Aow
+	ucOHeWsxs5C8LLAplqH/IcR0WkkrlICKgOiwc12FKNtYEXhmXxn20u7LXZZk7ZYYAM5GYjjNN+4
+	JNRbwbavlj2DwtBUzvhRHMZF/r5ZsEYqQSxVGBNjo1UqfDQYgemOCLbgrw5qWSc+HKBYXQnzrZ+
+	36OhbSblSdz+0xz4ZV5IdtknFNqJhzRaHSkI3YTmJFK5q16jaXTrJvVJxUGBAy7jzr6Jh4akq
+X-Google-Smtp-Source: AGHT+IFs8nv2iSTBNiLQbQjkP0+tXreSWwWDjWUWICeAfSmO4PhPgvjHoBW7ZL7oOwk5O9rhFRsK0g==
+X-Received: by 2002:a05:622a:2d5:b0:4e8:ae80:3e68 with SMTP id d75a77b69052e-4ed9496461fmr14560731cf.22.1762471290999;
+        Thu, 06 Nov 2025 15:21:30 -0800 (PST)
+Received: from [10.0.0.167] ([216.235.231.34])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ed813f7333sm27047761cf.36.2025.11.06.15.21.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Nov 2025 15:21:30 -0800 (PST)
+Message-ID: <c39297cf-daab-43e0-82c7-3210d570e427@kernel.dk>
+Date: Thu, 6 Nov 2025 16:21:29 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v1] net: phy: qt2025: Wait until PHY becomes
- ready
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176247001049.381420.14772714609952681580.git-patchwork-notify@kernel.org>
-Date: Thu, 06 Nov 2025 23:00:10 +0000
-References: <20251105133126.3221948-1-fujita.tomonori@gmail.com>
-In-Reply-To: <20251105133126.3221948-1-fujita.tomonori@gmail.com>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: andrew@lunn.ch, davem@davemloft.net, edumazet@google.com,
- hkallweit1@gmail.com, kuba@kernel.org, pabeni@redhat.com,
- linux@armlinux.org.uk, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, tmgross@umich.edu, aliceryhl@google.com,
- gary@garyguo.net
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 0/7] reverse ifq refcount
+To: Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>,
+ io-uring@vger.kernel.org, netdev@vger.kernel.org
+References: <20251104224458.1683606-1-dw@davidwei.uk>
+ <358f1bb5-d0c2-491e-ad56-4c2f512debfa@gmail.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <358f1bb5-d0c2-491e-ad56-4c2f512debfa@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed,  5 Nov 2025 22:31:26 +0900 you wrote:
-> Wait until a PHY becomes ready in the probe callback by
-> using read_poll_timeout function.
+On 11/6/25 9:10 AM, Pavel Begunkov wrote:
+> On 11/4/25 22:44, David Wei wrote:
+>> Reverse the refcount relationship between ifq and rings i.e. ring ctxs
+>> and page pool memory providers hold refs on an ifq instead of the other
+>> way around. This makes ifqs an independently refcounted object separate
+>> to rings.
+>>
+>> This is split out from a larger patchset [1] that adds ifq sharing. It
+>> will be needed for both ifq export and import/sharing later. Split it
+>> out as to make dependency management easier.
+>>
+>> [1]: https://lore.kernel.org/io-uring/20251103234110.127790-1-dw@davidwei.uk/
 > 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
-> Reviewed-by: Gary Guo <gary@garyguo.net>
-> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-> 
-> [...]
+> FWIW, if 1-3 are merged I can take the rest to the mix with
+> dependencies for David's work, but it should also be fine if
+> all 7 go into io_uring-6.19 there shouldn't be any conflicts.
 
-Here is the summary with links:
-  - [net-next,v1] net: phy: qt2025: Wait until PHY becomes ready
-    https://git.kernel.org/netdev/net-next/c/8a25a2e34157
+Let's just stuff them into for-6.19/io_uring and avoid the extra
+roundtrip.
 
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Jens Axboe
 
 
