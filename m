@@ -1,81 +1,122 @@
-Return-Path: <netdev+bounces-236528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA584C3DAAA
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 23:46:06 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8092C3DAE0
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 23:50:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71B17188AB55
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 22:46:31 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 752F94E5CEC
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 22:50:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 270B529346F;
-	Thu,  6 Nov 2025 22:46:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C838833CEA1;
+	Thu,  6 Nov 2025 22:50:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mKOVOFGU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dqOa0gIg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F22712248B4;
-	Thu,  6 Nov 2025 22:46:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BF7827CCEE;
+	Thu,  6 Nov 2025 22:50:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762469165; cv=none; b=OsICUPiBDkoevwpeUpLJYyNhTcb9HbsLL/L23Vqejk/QMjU7UAZ5w7h/75GqeNcGHYrm6EtSBLkXyPj2JBENCOkpNIPv5IVl2PB5866h0jnIdF5Etm4q7j93GMmDcdxX7kJ9LVOhDQN+ywHunzxibfoMDc9HRCkItAT1LiRw6Jg=
+	t=1762469453; cv=none; b=CwVew4ch1aOnVJra9eAyzsbzk248W8ahygVxF9dJrf5UTgojCp76Nyld6X69RkbgKxMd0fq29fNr+mYgXGCpDDhDnx/xmNBptAT0rgPt34ZaE++MuuK8s2YvQpzaZH2gtVKmmWsErkzfdhHUCS5kyn4rQxzjUwHIeZSDYMCDVNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762469165; c=relaxed/simple;
-	bh=vRhGOEcSzhWTgzIoNVdNU8Fkl/OJll56puzq1hpG7zU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aNColPOXoOnQjMrqm+YrtWHFwU3y8anpRBIUx0oAy6akOY30CBDUkqrg/Vpxatr3pyX5dngY3010hLkgEDOK0Z2QwGOivnU8wz5P2irCMHt+CazmIVVSgf/kX+OKn2TPoaaeO2JXXeT0Pv/A7TPZriSH9drArBAU7tnosAX8HaU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mKOVOFGU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4EEE0C4CEFB;
-	Thu,  6 Nov 2025 22:46:04 +0000 (UTC)
+	s=arc-20240116; t=1762469453; c=relaxed/simple;
+	bh=WzRrllIQtbo+UJwad6wYd5Ami7Uha4tPFk5HLA8MubA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=rkHPRAH9wvHtjF+vB7gpPsB/rxowRiwIv3nUBo/KcLkrD+y9RYi2UJmlw6g0PefcRBE2fbT8BAITTVfiRuF+CnSIYZd+4V8IhNJyvHukuILrBaaoUKwHwiEcdirz7HFA/bTmiIfRS36VWRi6y3t3lKxSLCbcnt2eQjxwRyLW3Y4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dqOa0gIg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7209EC4CEF7;
+	Thu,  6 Nov 2025 22:50:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762469164;
-	bh=vRhGOEcSzhWTgzIoNVdNU8Fkl/OJll56puzq1hpG7zU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mKOVOFGUZ3hMcVu1O/dC+STgEOM3EJSBVprA0UQ8RyAIDRuRvIrFldR3rM8O5Ojlv
-	 JVK4dWQt+2LwCRO2neaeOtqv9jaTbaaCJoR4JqMhZTfA6wewgRl5UINLdXlXtSO8lD
-	 ZU7REAAPZVgJMMP8dyXXSWUTDKVrc+x5TfLuDe53TWuwIo+3da+PSznp4igHL+r4b+
-	 pnPKsJWMoBvkDyd8QddDJ4mSzI1ebGT6vf82yCgdt7ypGECmTs/QFE5S0+mRhgIy7d
-	 rB54IJaiFQTzrmfC7MjPkHi6y78Ze0McsfQSllofblpwDaAehLSae5YS4nM7sPz67X
-	 pQhZBBRVhL0Zw==
-Date: Thu, 6 Nov 2025 14:46:03 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Buday Csaba <buday.csaba@prolan.hu>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Philipp Zabel <p.zabel@pengutronix.de>,
- <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 3/3] net: mdio: improve reset handling in
- mdio_device.c
-Message-ID: <20251106144603.39053c81@kernel.org>
-In-Reply-To: <11b197641e5498cab3e43f8983120fcabe06257e.1761909948.git.buday.csaba@prolan.hu>
-References: <cover.1761909948.git.buday.csaba@prolan.hu>
-	<11b197641e5498cab3e43f8983120fcabe06257e.1761909948.git.buday.csaba@prolan.hu>
+	s=k20201202; t=1762469453;
+	bh=WzRrllIQtbo+UJwad6wYd5Ami7Uha4tPFk5HLA8MubA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=dqOa0gIg6Mx/iP6+eMqN2y4hYLXmgbA+I4ChYOU7CYDJJxra3ykstpEKtVRhO62uW
+	 7DUIXPoqQ8hVGE0SZ+tba83MIeUACNhJrzFIN2ooV1II3rWipJUBgnbT8w21Pw0lZR
+	 +87yAYvnvpwlGxS4S/kxS15k7A7QTqfHQVfzWPqJlYtf8U295yh5c0PTScMgXHQKtn
+	 2Q4yMX0kiSqWdJ3G1J3j42m8z28S60sRsiuqaeHPm+9F63qVpE3xFCuMvDwjWq7sbL
+	 qE1rLtbShTvryBFvJbWCFRY0aGWpwgOFXDNSyZmtxzTFGDArB9YjT0t8tBoImPmBMu
+	 eipWvqnFme6XA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70FBA39EF96E;
+	Thu,  6 Nov 2025 22:50:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v7 00/12] net: dsa: lantiq_gswip: Add support for
+ MaxLinear GSW1xx switch family
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176246942627.378775.17231043041165490395.git-patchwork-notify@kernel.org>
+Date: Thu, 06 Nov 2025 22:50:26 +0000
+References: <cover.1762170107.git.daniel@makrotopia.org>
+In-Reply-To: <cover.1762170107.git.daniel@makrotopia.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: hauke@hauke-m.de, andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, horms@kernel.org,
+ linux@armlinux.org.uk, netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, andreas.schirm@siemens.com,
+ lukas.stockmann@siemens.com, alexander.sverdlin@siemens.com,
+ peter.christen@siemens.com, ajayaraman@maxlinear.com, bxu@maxlinear.com,
+ lxu@maxlinear.com, jpovazanec@maxlinear.com, fchan@maxlinear.com,
+ yweng@maxlinear.com, lrosu@maxlinear.com, john@phrozen.org
 
-On Fri, 31 Oct 2025 12:32:28 +0100 Buday Csaba wrote:
->  	reset = reset_control_get_optional_exclusive(&mdiodev->dev, "phy");
-> -	if (IS_ERR(reset))
-> +	if (IS_ERR(reset)) {
-> +		gpiod_put(mdiodev->reset_gpio);
-> +		mdiodev->reset_gpio = NULL;
->  		return PTR_ERR(reset);
-> +	}
+Hello:
 
-We usually consider all sort of leaks as real fixes.
-Let's fix this in mdiobus_register_device() in net/main first?
-Then do the refactoring once net merges into net-next (every Thu)?
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 3 Nov 2025 12:16:57 +0000 you wrote:
+> This patch series extends the existing lantiq_gswip DSA driver to
+> support the MaxLinear GSW1xx family of dedicated Ethernet switch ICs.
+> These switches are based on the same IP as the Lantiq/Intel GSWIP found
+> in VR9 and xRX MIPS router SoCs which are currently supported by the
+> lantiq_gswip driver, but they are dedicated ICs connected via MDIO
+> rather than built-in components of a SoC accessible via memory-mapped
+> I/O.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v7,01/12] net: dsa: lantiq_gswip: split into common and MMIO parts
+    https://git.kernel.org/netdev/net-next/c/322a1e6f3d68
+  - [net-next,v7,02/12] net: dsa: lantiq_gswip: support enable/disable learning
+    https://git.kernel.org/netdev/net-next/c/a7d4b05f9d74
+  - [net-next,v7,03/12] net: dsa: lantiq_gswip: support Energy Efficient Ethernet
+    https://git.kernel.org/netdev/net-next/c/9ec1fc0bf2b0
+  - [net-next,v7,04/12] net: dsa: lantiq_gswip: set link parameters also for CPU port
+    https://git.kernel.org/netdev/net-next/c/3e5ef3b1709a
+  - [net-next,v7,05/12] net: dsa: lantiq_gswip: define and use GSWIP_TABLE_MAC_BRIDGE_VAL1_VALID
+    https://git.kernel.org/netdev/net-next/c/0c56a98560c1
+  - [net-next,v7,06/12] dt-bindings: net: dsa: lantiq,gswip: add MaxLinear RMII refclk output property
+    https://git.kernel.org/netdev/net-next/c/e836824116b5
+  - [net-next,v7,07/12] net: dsa: lantiq_gswip: add vendor property to setup MII refclk output
+    https://git.kernel.org/netdev/net-next/c/319fd7e9d446
+  - [net-next,v7,08/12] dt-bindings: net: dsa: lantiq,gswip: add support for MII delay properties
+    https://git.kernel.org/netdev/net-next/c/bea0c1778611
+  - [net-next,v7,09/12] net: dsa: lantiq_gswip: allow adjusting MII delays
+    https://git.kernel.org/netdev/net-next/c/cdef8e47b638
+  - [net-next,v7,10/12] dt-bindings: net: dsa: lantiq,gswip: add support for MaxLinear GSW1xx switches
+    https://git.kernel.org/netdev/net-next/c/e1bb4b36a7ae
+  - [net-next,v7,11/12] net: dsa: add tagging driver for MaxLinear GSW1xx switch family
+    https://git.kernel.org/netdev/net-next/c/c6230446b1a6
+  - [net-next,v7,12/12] net: dsa: add driver for MaxLinear GSW1xx switch family
+    https://git.kernel.org/netdev/net-next/c/22335939ec90
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
