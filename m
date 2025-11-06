@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-236238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0098AC3A0D1
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 11:06:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D47DC39F81
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 10:59:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F01663B90E7
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 09:58:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E09B118858A7
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 09:59:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4582527FB0E;
-	Thu,  6 Nov 2025 09:58:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B5032DE200;
+	Thu,  6 Nov 2025 09:59:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="unwm1zfq"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="SWxt0HHg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9A72DA760
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 09:58:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8232D6E64
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 09:59:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762423123; cv=none; b=DCaJMbJtZGGawi6X0VVLybf3MacKlObile1HGB5ZfWjqWBHD3naSM8fysHWzj6LrzvKy/TsuIBUKPlpe1StuTRRKYHvVcgLm1XbbUJlSOhvEi7Jr/V9tTpPzT+fMMeupwNxsWQFLf/htFlIa6KefZ5wN2Y98gPGNsn4nLWuS00s=
+	t=1762423170; cv=none; b=DqhOyz80dfWwYjjkS1BLaiirCZiSnlhHtMMx82X56AhegEVNgAdlLPPMtEXZgvgPp3LnD8gepiVJS1zZ8OF3m27BpJpozFMUi6urIjFT1mIyxFSKIgG1ySYwOlgD8VB6JRChN5+i06eJIZboKCTcmfxp9E9DjJqyUMJ3Y0ga6LE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762423123; c=relaxed/simple;
-	bh=xXRi65L1iXHmMf/zF2iFn4jGxxGU/Uaz/JUq/W2Qiec=;
+	s=arc-20240116; t=1762423170; c=relaxed/simple;
+	bh=M7KoYUSvmP9vmPAfKlpFPWflu3zyoOr//XRy2DLsslI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H7qjT/arscQyzppc7j73SewyDGI8clio45Em41hdOr1YgfqlJvaPqSUdWD6GSDWigz6ds6/8gS4Cm73Oobkm7sD8h84vGPaFIHLf55UHDz/bTGAbhOV+LJNJraQ2nSFhP2b+BzVxpQh0fLYfVe7NGROvzUtMjjyg4iGtMFjpdJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=unwm1zfq; arc=none smtp.client-ip=185.246.85.4
+	 In-Reply-To:Content-Type; b=AARbxrohhl9aydB1JNq8bOA5aFLO55PYU4/3AyHerGuW3hlYJ8Tuli6qCpfaSMXNG7KId91DwBBPd5WRaerbaj9XVFUXNBXkWmWM+8CNlg8asbgOcS9A0+HHSA57U7uXSQo9Y2YI6rSl5AqPrrQJnPimHnLDyEcfkeCxx9lZBLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=SWxt0HHg; arc=none smtp.client-ip=185.246.85.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 0E73B4E41562;
-	Thu,  6 Nov 2025 09:58:39 +0000 (UTC)
+	by smtpout-03.galae.net (Postfix) with ESMTPS id E62944E41562;
+	Thu,  6 Nov 2025 09:59:26 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id D70A76068C;
-	Thu,  6 Nov 2025 09:58:38 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 93FF611850798;
-	Thu,  6 Nov 2025 10:58:34 +0100 (CET)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id B5AAF6068C;
+	Thu,  6 Nov 2025 09:59:26 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id C06C91185083F;
+	Thu,  6 Nov 2025 10:59:23 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1762423118; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1762423165; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=0xPwKSiR+8qRIcjkMOf4GQBuNI5KSYXz+hCD8bwMBFQ=;
-	b=unwm1zfqRBi+OJfuCQcPAavSk8jiei0QPcox1LFunOUFkp+7zt4Mwq1DVZ3izAOMimnhSE
-	4eGDJydu1rqz3vP6wwkiS+C2zWxJWrRtDI9hNLRikhL3KwofuXk5IvB9jaREq+EZsbppAA
-	0od94fTyO7HbhZaW2En/k4QZv4crcxTzYMOU2k8wvKRqy6Q/a4jF93UBTekDnClA/VY6O7
-	mTrTJCjUDMWBX8jr2oNRmeozWPBvSu5jq5wiskBJNZTUsNROEpxZ1e+fY2TXsyhO0qasc1
-	Cy1OWOzcVvXyFi0Z4te4UeiRXwmoSL52ZyZDBv2exvyZQRO7A4PZJcIc9BDNvw==
-Message-ID: <9a6614b1-7df6-4f40-b62a-e8df9f38637c@bootlin.com>
-Date: Thu, 6 Nov 2025 10:58:34 +0100
+	bh=HRB6WKG1GPAIoa2JCrM8EfDN42soLkOAEM4gs/5hgPg=;
+	b=SWxt0HHgJMXX3psveFa7aHtJ33bkAHk1fJrd2IyRd6ucLNrA1xrw/5+qj2rBbGql9yscu2
+	bEEIDl1P0oMdo9gAukmXZbwJ/2t15M++E8AndRjF5wRO6UJ/Ouz2SPbIMdEmuS0fSQJmHj
+	7Z4TIoMBzylDMHzN2la+EoU4DY71e4EvZ4NubYmUKKmwVhzZP14iA8JBKwDQXMfz1U0NvI
+	IsBzmSvSFHWAstX52MN/Sk8Wb113kahpVW4Lag/RmOIDAW8HZsu5XFp/SwtglPotDidOhM
+	SUAIt52Dmxh4qDYDJPTlwSxkp01Aqai/D5dmJ/Lch5sUI8rj0CWcNLp0uW8Tkg==
+Message-ID: <1c1a272c-3e5b-4e79-9b06-5dfb830293eb@bootlin.com>
+Date: Thu, 6 Nov 2025 10:59:23 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,8 +57,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 01/11] net: stmmac: ingenic: move
- ingenic_mac_init()
+Subject: Re: [PATCH net-next v2 02/11] net: stmmac: ingenic: simplify jz4775
+ mac_set_mode()
 To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
  Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
 Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
@@ -69,10 +69,10 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
  Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
  Paolo Abeni <pabeni@redhat.com>
 References: <aQxinH5WWcunfP7p@shell.armlinux.org.uk>
- <E1vGvnz-0000000DWoJ-3KxL@rmk-PC.armlinux.org.uk>
+ <E1vGvo4-0000000DWoP-3nd4@rmk-PC.armlinux.org.uk>
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 Content-Language: en-US
-In-Reply-To: <E1vGvnz-0000000DWoJ-3KxL@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1vGvo4-0000000DWoP-3nd4@rmk-PC.armlinux.org.uk>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Last-TLS-Session-Version: TLSv1.3
@@ -80,8 +80,8 @@ X-Last-TLS-Session-Version: TLSv1.3
 
 
 On 06/11/2025 09:57, Russell King (Oracle) wrote:
-> Move ingenic_mac_init() to between variant specific set_mode()
-> implementations and ingenic_mac_probe(). No code changes.
+> All paths configure the transmit clock as an input. Move this out of
+> the switch() statement to simplify the code.
 > 
 > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
@@ -90,54 +90,55 @@ Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 Maxime
 
 > ---
->  .../ethernet/stmicro/stmmac/dwmac-ingenic.c   | 28 +++++++++----------
->  1 file changed, 14 insertions(+), 14 deletions(-)
+>  .../net/ethernet/stmicro/stmmac/dwmac-ingenic.c    | 14 ++++++--------
+>  1 file changed, 6 insertions(+), 8 deletions(-)
 > 
 > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-> index c1670f6bae14..8d0627055799 100644
+> index 8d0627055799..c6c82f277f62 100644
 > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
 > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-> @@ -71,20 +71,6 @@ struct ingenic_soc_info {
->  	int (*set_mode)(struct plat_stmmacenet_data *plat_dat);
->  };
+> @@ -78,20 +78,17 @@ static int jz4775_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
 >  
-> -static int ingenic_mac_init(struct platform_device *pdev, void *bsp_priv)
-> -{
-> -	struct ingenic_mac *mac = bsp_priv;
-> -	int ret;
-> -
-> -	if (mac->soc_info->set_mode) {
-> -		ret = mac->soc_info->set_mode(mac->plat_dat);
-> -		if (ret)
-> -			return ret;
-> -	}
-> -
-> -	return 0;
-> -}
-> -
->  static int jz4775_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
->  {
->  	struct ingenic_mac *mac = plat_dat->bsp_priv;
-> @@ -234,6 +220,20 @@ static int x2000_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
+>  	switch (plat_dat->phy_interface) {
+>  	case PHY_INTERFACE_MODE_MII:
+> -		val = FIELD_PREP(MACPHYC_TXCLK_SEL_MASK, MACPHYC_TXCLK_SEL_INPUT) |
+> -			  FIELD_PREP(MACPHYC_PHY_INFT_MASK, MACPHYC_PHY_INFT_MII);
+> +		val = FIELD_PREP(MACPHYC_PHY_INFT_MASK, MACPHYC_PHY_INFT_MII);
+>  		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_MII\n");
+>  		break;
+>  
+>  	case PHY_INTERFACE_MODE_GMII:
+> -		val = FIELD_PREP(MACPHYC_TXCLK_SEL_MASK, MACPHYC_TXCLK_SEL_INPUT) |
+> -			  FIELD_PREP(MACPHYC_PHY_INFT_MASK, MACPHYC_PHY_INFT_GMII);
+> +		val = FIELD_PREP(MACPHYC_PHY_INFT_MASK, MACPHYC_PHY_INFT_GMII);
+>  		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_GMII\n");
+>  		break;
+>  
+>  	case PHY_INTERFACE_MODE_RMII:
+> -		val = FIELD_PREP(MACPHYC_TXCLK_SEL_MASK, MACPHYC_TXCLK_SEL_INPUT) |
+> -			  FIELD_PREP(MACPHYC_PHY_INFT_MASK, MACPHYC_PHY_INFT_RMII);
+> +		val = FIELD_PREP(MACPHYC_PHY_INFT_MASK, MACPHYC_PHY_INFT_RMII);
+>  		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_RMII\n");
+>  		break;
+>  
+> @@ -99,8 +96,7 @@ static int jz4775_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
+>  	case PHY_INTERFACE_MODE_RGMII_ID:
+>  	case PHY_INTERFACE_MODE_RGMII_TXID:
+>  	case PHY_INTERFACE_MODE_RGMII_RXID:
+> -		val = FIELD_PREP(MACPHYC_TXCLK_SEL_MASK, MACPHYC_TXCLK_SEL_INPUT) |
+> -			  FIELD_PREP(MACPHYC_PHY_INFT_MASK, MACPHYC_PHY_INFT_RGMII);
+> +		val = FIELD_PREP(MACPHYC_PHY_INFT_MASK, MACPHYC_PHY_INFT_RGMII);
+>  		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_RGMII\n");
+>  		break;
+>  
+> @@ -110,6 +106,8 @@ static int jz4775_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
+>  		return -EINVAL;
+>  	}
+>  
+> +	val |= FIELD_PREP(MACPHYC_TXCLK_SEL_MASK, MACPHYC_TXCLK_SEL_INPUT);
+> +
+>  	/* Update MAC PHY control register */
 >  	return regmap_update_bits(mac->regmap, 0, mac->soc_info->mask, val);
 >  }
->  
-> +static int ingenic_mac_init(struct platform_device *pdev, void *bsp_priv)
-> +{
-> +	struct ingenic_mac *mac = bsp_priv;
-> +	int ret;
-> +
-> +	if (mac->soc_info->set_mode) {
-> +		ret = mac->soc_info->set_mode(mac->plat_dat);
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
->  static int ingenic_mac_probe(struct platform_device *pdev)
->  {
->  	struct plat_stmmacenet_data *plat_dat;
 
 
