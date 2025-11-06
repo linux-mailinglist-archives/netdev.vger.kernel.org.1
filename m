@@ -1,119 +1,101 @@
-Return-Path: <netdev+bounces-236255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4BDDC3A4E6
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 11:38:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 772F2C3A53A
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 11:45:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2C1424E3CC7
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 10:35:41 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 01D5E4EDE22
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 10:41:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 663312C0F6E;
-	Thu,  6 Nov 2025 10:35:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4C632DC784;
+	Thu,  6 Nov 2025 10:41:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="La2lMt1p"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J7fSLwVg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E6A8F7D
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 10:35:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AA0A28640B
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 10:41:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762425339; cv=none; b=ZpJoFQtudpEO5St38hUAbxiVyr9OVJjywHXFLRopdwMGcM+2KZQisdpMSYo+i3W+up9wRQwlij3bdDJfdzXJqBQbznJJcOR1Rjj7pj0MU6CwXXvYYGj0jPUnlhA+/v9RbGqUwGw0taWq7TUi5mRwioqqLI/sW7hy8Ri5ytvOvTs=
+	t=1762425666; cv=none; b=FMzYh2ing+nIoZ9sglvnMuh31Gc4YdDeqD881HemYMufHggmCbI+9f55JUEkF53YUKWBDf/ZDy+3ssGv9YRngCcozRYSKLggAd0ZOLPskqC18+BX+4zXplkqYu9lEJpsDe3UPdmpL/VmUd1TaKJ60VtH5c68X3ZQUy3uoSi6NeY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762425339; c=relaxed/simple;
-	bh=V0sVq7jTEaKW/w9hGkQC4lWNAskLw6EbFTuwyaZK6Rg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hs/8bfKmgUYGLNosa+3Kj3WCyMS0RjEU2LHDM9ymKjF2ypkzg8CmaYQJmTosvx7Uia0hwy+JwyepnV2/dHLYrCw8BcFs01Y9H3GToMZ/UaRkVvZCupfRgey72pQ1G2unyPtXPCLYe61/+MXIPAFvyccFqspv+njgZ4ZQ8CpZ340=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=La2lMt1p; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 03E8F4E4156F;
-	Thu,  6 Nov 2025 10:35:35 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id CDD4F6068C;
-	Thu,  6 Nov 2025 10:35:34 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 988AA11850A7B;
-	Thu,  6 Nov 2025 11:35:30 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1762425334; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=QiGYWWa5Rp57nAs3YvpKkmsJ3R0ZczKe27XnYzkP11E=;
-	b=La2lMt1p6x8Hb9C4Zb4UsCRLtRjgSDQHG9SACtaJZuGR23DTZhxooUqS9qjaVzHyC7jOaX
-	suv+nt5QbHKOuV/VUnyBeSYA5k0qUp4NPOc2C1KCKAsUGA6qs6HUCQUaCIb4UqABCOKywe
-	0kQeR+bC75XuNIhEjn5YEIL9eJx2+6Ee+sik2osTtpfd/ieJfXpySlTRNNd3bvT+hQQ+cn
-	QV1WqssONxwiGELNS4B73AVTErYGREFXWE3JHli3VQSE3N/tChz06EzHuvYD7up65CExoM
-	V6icAliw9KsXZIi65dH80n45Ol2jByhS8t9HOJRIsIbmJS0s7UdEhtG0KuK4Ig==
-Message-ID: <88e8b9c9-16b5-4f8e-a2ea-3ce14555c731@bootlin.com>
-Date: Thu, 6 Nov 2025 11:35:29 +0100
+	s=arc-20240116; t=1762425666; c=relaxed/simple;
+	bh=6gEsH+luGD0b4Sn5LNm8FkmN4nubeyVKxdIlp8HfmLs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=M2aQ0+vG6aqeb2foFBXsPy5DTJtNYpJDyMaqdGESiCElZl1oZS0mXvsafcBmUXoOJYlptpPWT6g57d37oYUXP3Pv9QmoogtabDI5gB6XFZUjDzTozNJ9tc7Pll+ZSH+o6yQI87tTb3QSiywBt3Od+0n8lWYF34/hzkoO1YqJgok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J7fSLwVg; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4ed7024c8c5so6713281cf.3
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 02:41:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1762425664; x=1763030464; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=6gEsH+luGD0b4Sn5LNm8FkmN4nubeyVKxdIlp8HfmLs=;
+        b=J7fSLwVgcdgqNighfhszmyiy3U8XC0YvVbqf5ZWdr9JC8W9GpGuouG4G8Gv6S5T9M/
+         lOlAIRVAV8ottwME7cHUU8dx/Cui9iUxJI/HxH92ZnACfxOLRCdBgA+CJpXUj8b1yOmZ
+         WLWlK2RTbJsMf7Vc2oTmxiJoF8Q7DOjztlduWu+PqsxrUunEKRWnTZ3j777fjNtfaE2Z
+         aJucj5MprMG+su/b7HPZX1DLB4ewhexVCaFC8pOSfrowwi+lqFN5EaoGk0BHnADyw+d8
+         RLLiDW33SJ2tElW/LSzHeDYBDZlKClSqKYNkbldQvFD891XRWHMijGTvYKUb7z1wRkI1
+         Df0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762425664; x=1763030464;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6gEsH+luGD0b4Sn5LNm8FkmN4nubeyVKxdIlp8HfmLs=;
+        b=XPsef3TXoZZVPw4bJr8uGrOtO6hhFdmCtzAW8EnQU8+TXctdVyKvGvn0ZCyBfCtkZn
+         LUB+CrRWAy6P6BYbUkXSaKKeu5pkk1uBIdx3DosjkADFCZ7481gAmb9blEhhCGHggGSA
+         N2HEYJlW299FLshOZgbzvt2yy7PD6zOjOziRO0AEBTlJ9Mz7yYw0HADocU+dOVhQH0aC
+         5ULMoGycrbov2CbXjJtCXEVLGMW1s85iQ5/q0VP/sbKSoCR044VE20POmTKL8iJgH6uO
+         Rk4EDcI9SX9MZg8YA6Yp4DBxWj6CYpKyVm5XBNtCGhEp+DMSxkE8vMiknUn2NxiglDD+
+         v7HQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX2JGyK0xzL+MDNAnkJ5AGUqpWChyf/m60tgZd+qN8TfnA0HqxmLnS2FrMezcs/zDfxmsdyTVc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHI4Zbrn1PLJ9Tls3yVNcIR2SLV+RQEt9i+tRFIdW0SmfWCrFW
+	mZ/9QrWA1enoXN8EWOjElIGUAmGW1v/x80FzfzXsc5ETgm3F5Bi5rDAMg8rPvZXK/KHFrwcnnP0
+	E99hd6G/rdqG9gRXCCd33Qa6H4X+QNBXNS8RuuPhe
+X-Gm-Gg: ASbGncvGtQ4nMczmiPoJgsbFqL6dFLcZkz7AD3KBv2eYcdNnpr8RjM2yaLx73ez2nIG
+	mjIn4xZ46s/Id6YHblKV/seVOi5qIV170NEbjxchFDrlaR+AiY9G4UdoIGgPspNpygmNKhdWocd
+	uJH3Bu1z+RyBzj46LMvhzl/QI/iJhwBh0dPS5PhoqkeS/7BSI9ICcXEwEHPaCA8P8f7SYURyIdY
+	1eauI4vigT/cKwSx/JkWNG1mqRgPJK8BUIjEu19Dhi0hlVJu+C8GeY6VrEZGW5o9VcR35Q=
+X-Google-Smtp-Source: AGHT+IGw4QTWrNAeDwKQA3mseTWaldl/aBYFiJzlYb7bl8eG84BmiMGOLAD768QMPwKw9sPjZXv4X2Sk2G4u9UmgwGU=
+X-Received: by 2002:ac8:7d82:0:b0:4ec:f09a:4faa with SMTP id
+ d75a77b69052e-4ed7234f780mr76123641cf.19.1762425663934; Thu, 06 Nov 2025
+ 02:41:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 00/11] net: stmmac: ingenic: convert to
- set_phy_intf_sel()
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>
-References: <aQxinH5WWcunfP7p@shell.armlinux.org.uk>
- <6ad7667a-f2be-4674-99a2-2895a82b762a@bootlin.com>
- <aQx3Brj6t48O6wPg@shell.armlinux.org.uk>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <aQx3Brj6t48O6wPg@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+References: <20251104161327.41004-1-simon.schippers@tu-dortmund.de>
+ <20251104161327.41004-2-simon.schippers@tu-dortmund.de> <CANn89iL6MjvOc8qEQpeQJPLX0Y3X0HmqNcmgHL4RzfcijPim5w@mail.gmail.com>
+ <66d22955-bb20-44cf-8ad3-743ae272fec7@tu-dortmund.de> <CANn89i+oGnt=Gpo1hZh+8uaEoK3mKLQY-gszzHWC+A2enXa7Tw@mail.gmail.com>
+ <be77736d-6fde-4f48-b774-f7067a826656@tu-dortmund.de> <CANn89iJVW-_qLbUehhJNJO70PRuw1SZVQX0towgZ4K-JvsPKkw@mail.gmail.com>
+ <c01c12a8-c19c-4b9f-94d1-2a106e65a074@tu-dortmund.de> <CANn89iJpXwmvg0MOvLo8+hVAhaMTL_1_62Afk_6dG1ZEL3tORQ@mail.gmail.com>
+ <9ebd72d0-5ae9-4844-b0be-5629c52e6df8@tu-dortmund.de> <64a963ed-400e-4bd2-a4e3-6357f3480367@tu-dortmund.de>
+In-Reply-To: <64a963ed-400e-4bd2-a4e3-6357f3480367@tu-dortmund.de>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 6 Nov 2025 02:40:52 -0800
+X-Gm-Features: AWmQ_blmcXmxEskv0hK08fp1Pm62Xthwvodkvx571QVJ7EF0DaCgwYh2halYhmA
+Message-ID: <CANn89iKt+OYAfQoZxkqO+gECRx_oAecCRTVcf1Kumtpc9u+n0w@mail.gmail.com>
+Subject: Re: [PATCH net-next v1 1/1] usbnet: Add support for Byte Queue Limits (BQL)
+To: Simon Schippers <simon.schippers@tu-dortmund.de>
+Cc: oneukum@suse.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org, 
+	linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
->>> Convert ingenic to use the new ->set_phy_intf_sel() method that was
->>> recently introduced in net-next.
->>>
->>> This is the largest of the conversions, as there is scope for cleanups
->>> along with the conversion.
->>>
->>> v2: fix build warnings in patch 9 by rearranging the code
->>>
->>>  .../net/ethernet/stmicro/stmmac/dwmac-ingenic.c    | 165 ++++++---------------
->>>  1 file changed, 45 insertions(+), 120 deletions(-)
->>>
->>
->> Damned, missed that V2 and started reviewing V1... I'll resend the tags
->> for V2.
-> 
-> Yes, Jakub reported build warnings on patch 9 last night, followed by
-> the kernel build bot reporting the same thing. The dangers of not
-> building with W=1, but then W=1 is noisy which makes spotting new
-> warnings difficult.
-> 
+>
+> I compiled it with CONFIG_PROVE_LOCKING and ran iperf3 TCP tests on my
+> USB2 to Gbit Ethernet adapter I had at hand. dmesg shows no lockdep
+> warnings. What else should I test?
 
-I had the same issue, I have recently started using the nipa infra locally for
-that, which comes with a way to compare the number of warnings before/after for
-each patch to help sift through these :
-
-https://github.com/linux-netdev/nipa
-
-The setup was actually way easier than I would've thought, and testing
-a series boils down to running :
-
-cd $nipa
-./ingest_mdir.py --mdir /tmp/my-series/ --tree $linux
-
-it still takes a while to run on my workstation though, but at least it
-doubles as a nice way to heat-up my living room with all the compiling
-going on :)
-
-Maxime
+That should be fine, please send a V2
 
