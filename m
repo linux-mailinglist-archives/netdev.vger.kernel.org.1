@@ -1,114 +1,151 @@
-Return-Path: <netdev+bounces-236250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39BC8C3A3C0
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 11:27:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4B15C3A3F9
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 11:29:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C39542332D
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 10:19:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 489B5424AE4
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 10:20:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 300E626B08F;
-	Thu,  6 Nov 2025 10:19:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 518BF26B08F;
+	Thu,  6 Nov 2025 10:20:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eRZyuhTz"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Jq/9kXCP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00A1B24A066;
-	Thu,  6 Nov 2025 10:19:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD9B52475D0
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 10:20:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762424363; cv=none; b=aIAyuDRixMGpghu7z6+OY2+dfq5YlR4Zg1RC+KjT6gTUNeuYAaPYv+Dq90CbDCHsvg/yF5n/KTV25L+BHdkzLSURwGFXPZD4VdWFMTpH7gTzvLqGkR1gLzN9Yqylu8TOSjQ9/iXaqFigRV2V1d7VEH034OuIU1Z+Uoiey1wjhzU=
+	t=1762424412; cv=none; b=VdIOFyAk6eIqUTInN25X3OiFJQ3zfhQ9+zMoB166pp2s7Dk2y/4phYoa8v5WX1BiTvl+dj9/DXAHUbQQx7c7fFe2F6ErlRlz1Y76E8SlIcKaWtuBsheqQHsuu8VvfMRe292MVpDTGZrFjj9U5dfx1wqgRS+jqIHcoAgH5BPO1FE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762424363; c=relaxed/simple;
-	bh=hs/A+N+htIsKKvVU/+NDMC5chb5uIaWj8bHWDdptfYE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=orO2arU3YUp+FeBuT9tZKBfny8tFZygT8pb5bh8tK4eZlKwjquvjzlzqOT500q8FtqXq5kB+LW1yPMS+GDENpFjyeeQLBs/i5LnKs3YJAClCEq5VJnT9eXgvCTqVeSwcbcfS93BSDerrPcNXtOG31yXO30RUdd5FRhQTxK/JB7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eRZyuhTz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1BC5C4CEFB;
-	Thu,  6 Nov 2025 10:19:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762424362;
-	bh=hs/A+N+htIsKKvVU/+NDMC5chb5uIaWj8bHWDdptfYE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=eRZyuhTz7mHE8pK88VtwEAirygTFJiB8B5RM40tRKUgk+Iadxln4YxmNWnDPmS6bQ
-	 z9ySCW/wVXL+oOt+eTfuIrbpP2bDarCyvQXuSNdlyHHscKKFMx1WzTFqwM1XBTc6ye
-	 Bc6WUttxyt+3hKDtkrU8mNUZ74K6mJOTgXl++Wn3sgfa/HCqPA8jNkeSnQz9Xy16fq
-	 vpGsUtHIzLo17RFoHdlGEz1+YQ0I7GethLXXU82acXpodT2U6SedZozXbcR0SD3VbT
-	 FlE27Ham7pNomQUZkMVl2xfRQ6/EvNOsnKGmUCyO9k9CxgtARRR0QxraS53DMDhVWa
-	 ELeDUnIZGiYZQ==
-Date: Thu, 6 Nov 2025 12:19:17 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Gerd Bayer <gbayer@linux.ibm.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
-	Mark Bloch <mbloch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Bjorn Helgaas <bhelgaas@google.com>,
-	Jay Cornwall <Jay.Cornwall@amd.com>,
-	Felix Kuehling <Felix.Kuehling@amd.com>,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Alexander Schmidt <alexs@linux.ibm.com>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC 2/2] ib/mlx5: Request PCIe AtomicOps enabled for all
- 3 sizes
-Message-ID: <20251106101917.GB15456@unreal>
-References: <20251105-mlxatomics-v1-0-10c71649e08d@linux.ibm.com>
- <20251105-mlxatomics-v1-2-10c71649e08d@linux.ibm.com>
+	s=arc-20240116; t=1762424412; c=relaxed/simple;
+	bh=0rHrSD+l5C0EvX1vmP8pxxAC24rNV1eAzZt5bwshbD4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VpTjQJw5Cjvuo7pHmv+dkozFmK/KSOc93uZjbBuy4GWvuDMRfX3wF4qwKzQoTiMmTLdU8QYmFBAp1o2O9pJeGhNHtyDY2JAL2nF0Gxi3DVQIq1Fjtnk2zo7yRP8Eb/G/qztwzpFbJLA2eAJeH4rqeRQZCWwtnOe+OKyQS1m4cXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Jq/9kXCP; arc=none smtp.client-ip=185.171.202.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-04.galae.net (Postfix) with ESMTPS id DB52AC0FA83;
+	Thu,  6 Nov 2025 10:19:46 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id D80676068C;
+	Thu,  6 Nov 2025 10:20:07 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id DDB3A11850A23;
+	Thu,  6 Nov 2025 11:20:03 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1762424406; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=MrtELhIyCno0rfrMQS1AC+bze17pExz4ltwZ19FC44U=;
+	b=Jq/9kXCPQZi2LzDTzoftGVWN7+cckHIqtyzVMRR+OGRvHKd9ng3fc1Ww4RwZWNYgL3/iEO
+	1SHMwYqYyR+eFMuTAVJ/diFehwENPQCVuDAXOXGmKRj6WD2pcjv0TqnEEd+6feojc2cHyI
+	Wc9UiBrCIEjvzBi5zwdB6O373RN7mTK77/y223e7olYEQjrciaf8zqWz94AFvakX6tQKXn
+	kRPLRgHoO0wcsraSP9zWQjOOL+KIc8xUXUcjqtPN5JTLzZXfpaVCvEdNSXOnIKHy1Ss/UQ
+	C4PLgJrZgIbXH12G321STQlM8+0iVrlFs+oCo6jXVHvxcJBFo+p+4c9BSzIvgQ==
+Message-ID: <168cefb5-4a44-4836-8e55-c9c76e99f2aa@bootlin.com>
+Date: Thu, 6 Nov 2025 11:20:03 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251105-mlxatomics-v1-2-10c71649e08d@linux.ibm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 09/11] net: stmmac: ingenic: simplify x2000
+ mac_set_mode()
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>
+References: <aQxinH5WWcunfP7p@shell.armlinux.org.uk>
+ <E1vGvoe-0000000DWp8-37LQ@rmk-PC.armlinux.org.uk>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <E1vGvoe-0000000DWp8-37LQ@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Wed, Nov 05, 2025 at 06:55:14PM +0100, Gerd Bayer wrote:
-> Pass fully populated capability bit-mask requesting support for all 3
-> sizes of AtomicOps at once when attempting to enable AtomicOps for PCI
-> function.
+
+
+On 06/11/2025 09:58, Russell King (Oracle) wrote:
+> As per the previous commit, we have validated that the phy_intf_sel
+> value is one that is permissible for this SoC, so there is no need to
+> handle invalid PHY interface modes. We can also apply the other
+> configuration based upon the phy_intf_sel value rather than the
+> PHY interface mode.
 > 
-> When called individually, pci_enable_atomic_ops_to_root() may enable the
-> device to send requests as soon as one size is supported. According to
-> PCIe Spec 7.0 Section 6.15.3.1 support of 32-bit and 64-bit AtomicOps
-> completer capabilities are tied together for root-ports. Only the
-> 128-bit/CAS completer capabilities is an optional feature, but still we
-> might end up end up enabling AtomicOps despite 128-bit/CAS is not
-> supported at the root-port.
-> 
-> Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+
+Maxime
+
 > ---
->  drivers/infiniband/hw/mlx5/data_direct.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  .../ethernet/stmicro/stmmac/dwmac-ingenic.c   | 28 +++++--------------
+>  1 file changed, 7 insertions(+), 21 deletions(-)
 > 
-> diff --git a/drivers/infiniband/hw/mlx5/data_direct.c b/drivers/infiniband/hw/mlx5/data_direct.c
-> index b81ac5709b56f6ac0d9f60572ce7144258fa2794..112185be53f1ccc6a797e129f24432bdc86008ae 100644
-> --- a/drivers/infiniband/hw/mlx5/data_direct.c
-> +++ b/drivers/infiniband/hw/mlx5/data_direct.c
-> @@ -179,9 +179,9 @@ static int mlx5_data_direct_probe(struct pci_dev *pdev, const struct pci_device_
->  	if (err)
->  		goto err_disable;
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
+> index 7b2576fbb1e1..eb5744e0b9ea 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
+> @@ -122,39 +122,25 @@ static int x2000_mac_set_mode(struct plat_stmmacenet_data *plat_dat,
+>  	struct ingenic_mac *mac = plat_dat->bsp_priv;
+>  	unsigned int val;
 >  
-> -	if (pci_enable_atomic_ops_to_root(pdev, PCI_EXP_DEVCAP2_ATOMIC_COMP32) &&
-> -	    pci_enable_atomic_ops_to_root(pdev, PCI_EXP_DEVCAP2_ATOMIC_COMP64) &&
-> -	    pci_enable_atomic_ops_to_root(pdev, PCI_EXP_DEVCAP2_ATOMIC_COMP128))
-> +	if (pci_enable_atomic_ops_to_root(pdev, PCI_EXP_DEVCAP2_ATOMIC_COMP32 |
-> +						PCI_EXP_DEVCAP2_ATOMIC_COMP64 |
-> +						PCI_EXP_DEVCAP2_ATOMIC_COMP128))
+> -	switch (plat_dat->phy_interface) {
+> -	case PHY_INTERFACE_MODE_RMII:
+> -		val = FIELD_PREP(MACPHYC_TX_SEL_MASK, MACPHYC_TX_SEL_ORIGIN) |
+> -			  FIELD_PREP(MACPHYC_RX_SEL_MASK, MACPHYC_RX_SEL_ORIGIN);
+> -		break;
+> -
+> -	case PHY_INTERFACE_MODE_RGMII:
+> -	case PHY_INTERFACE_MODE_RGMII_ID:
+> -	case PHY_INTERFACE_MODE_RGMII_TXID:
+> -	case PHY_INTERFACE_MODE_RGMII_RXID:
+> -		val = 0;
+> +	val = FIELD_PREP(MACPHYC_PHY_INFT_MASK, phy_intf_sel);
+> +
+> +	if (phy_intf_sel == PHY_INTF_SEL_RMII) {
+> +		val |= FIELD_PREP(MACPHYC_TX_SEL_MASK, MACPHYC_TX_SEL_ORIGIN) |
+> +		       FIELD_PREP(MACPHYC_RX_SEL_MASK, MACPHYC_RX_SEL_ORIGIN);
+> +	} else if (phy_intf_sel == PHY_INTF_SEL_RGMII) {
+>  		if (mac->tx_delay == 0)
+>  			val |= FIELD_PREP(MACPHYC_TX_SEL_MASK, MACPHYC_TX_SEL_ORIGIN);
+>  		else
+>  			val |= FIELD_PREP(MACPHYC_TX_SEL_MASK, MACPHYC_TX_SEL_DELAY) |
+> -				   FIELD_PREP(MACPHYC_TX_DELAY_MASK, (mac->tx_delay + 9750) / 19500 - 1);
+> +			       FIELD_PREP(MACPHYC_TX_DELAY_MASK, (mac->tx_delay + 9750) / 19500 - 1);
+>  
+>  		if (mac->rx_delay == 0)
+>  			val |= FIELD_PREP(MACPHYC_RX_SEL_MASK, MACPHYC_RX_SEL_ORIGIN);
+>  		else
+>  			val |= FIELD_PREP(MACPHYC_RX_SEL_MASK, MACPHYC_RX_SEL_DELAY) |
+>  				   FIELD_PREP(MACPHYC_RX_DELAY_MASK, (mac->rx_delay + 9750) / 19500 - 1);
+> -
+> -		break;
+> -
+> -	default:
+> -		dev_err(mac->dev, "Unsupported interface %s\n",
+> -			phy_modes(plat_dat->phy_interface));
+> -		return -EINVAL;
+>  	}
+>  
+> -	val |= FIELD_PREP(MACPHYC_PHY_INFT_MASK, phy_intf_sel);
+> -
+>  	/* Update MAC PHY control register */
+>  	return regmap_update_bits(mac->regmap, 0, mac->soc_info->mask, val);
+>  }
 
-I would expect some new define which combines all together, with some
-comment why it exists:
-#define PCI_ATOMIC_COMP_v7  PCI_EXP_DEVCAP2_ATOMIC_COMP32 | PCI_EXP_DEVCAP2_ATOMIC_COMP64 | PCI_EXP_DEVCAP2_ATOMIC_COMP128
-
-Anyway the change looks right to me.
-
-Thanks,
-Acked-by: Leon Romanovsky <leon@kernel.org>
 
