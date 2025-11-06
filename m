@@ -1,91 +1,101 @@
-Return-Path: <netdev+bounces-236094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D192C3871A
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 01:13:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 00694C38736
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 01:18:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 36E334E03B6
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 00:13:24 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id ADF2C4E6B93
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 00:18:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A37DE6FBF;
-	Thu,  6 Nov 2025 00:13:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC22D146593;
+	Thu,  6 Nov 2025 00:17:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mQVj4e1C"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="txxNrIn9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78CA7CA52;
-	Thu,  6 Nov 2025 00:13:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7650C11713;
+	Thu,  6 Nov 2025 00:17:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762388001; cv=none; b=RQa7uZpvp031+oJgU60f74muXgCuije9Z+bpVw9oQvsFhNqoKPrewfWFuGBl9NZLJfoZgmlJXWqc6KfvK/CKEb/kqF2AH2xjtspItvGwqiLcFZhk6CAM/AEnQbGWTkwv3EwxTq7kF7jLTvipWklA12yuOfNY06aKM427u6poGVg=
+	t=1762388276; cv=none; b=TDvD8eIlweuAU0kdcebSdxJ1WET4/cfjisSeZEsLKf/Ut0r7EonLDQ9NV63BJ8VXEgx9XhkjnCOFV+nhRYfH952M0/kTO+M1RK63dj6Kj1gZLavDx0UskpG/yOOpSZgi0Wezh1AbzMP/JZFR2jShWNMKGzOP9aiH55OtQ/dxokE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762388001; c=relaxed/simple;
-	bh=ObVdtDfNvDGCloet95db6zbqxebwnJkzexi+flUko8k=;
+	s=arc-20240116; t=1762388276; c=relaxed/simple;
+	bh=GVz+TVoRh+RjWKgd1xdbBvSkK6ruOqrTXrULqH739jY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RmTiGrjlW5MIVLiyMcJ63qaEaixAA1y/p1aEGcgqPaeuaZTKe3HOZPevLRzh6a5Bwq174yFtOT1wJ7BH1IVbNLAUV08PO3c0S/p1kVmgm7vLcEGrtgkh6P9GRrO59SZDTuugbt4CbDckHw8xphMqG94cWgQ509i71zNL43M20Lg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mQVj4e1C; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59DD2C4CEF5;
-	Thu,  6 Nov 2025 00:13:20 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ECgvNIRv/MANTEdTZ29dlRqChJIHQ79Ec+cKXI9q0uWjrVnSSSZkhRO7/GBgM//jGOw1NNqY00sljJeGguVF6Wva60OuE0i2hbN//eys+RkbZf9hR7JZo8pn9QSQpAXXZsC2sVceZuA5y0GzeREbDF7+vMFhgWtY2f1Egy3o110=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=txxNrIn9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28746C4CEF5;
+	Thu,  6 Nov 2025 00:17:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762388001;
-	bh=ObVdtDfNvDGCloet95db6zbqxebwnJkzexi+flUko8k=;
+	s=k20201202; t=1762388276;
+	bh=GVz+TVoRh+RjWKgd1xdbBvSkK6ruOqrTXrULqH739jY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mQVj4e1CqHXE2KrtPx53ZQeScBDwV1Rf5YU9Fc/O9vVeMgIAa63r31XSygd6giq67
-	 Zc5A+f+pVh5SCF27BbWhobTDXU4ItXU1PEgPGDN+9UucBVxkogOttfueFkUKWTeXgc
-	 j6ay7C7XRbx+HRZou+6M2WqinlDAPDvjQ7C13zWlmmOqLj/q1n6YAYGQl07q5hKMxO
-	 QD84xz+Vufyh3rozCclUbbpdVtIhT/3BITTlCFCYRTkobnvPPkRtyuPuZ21azoyAtG
-	 GERrt5Yf3O5ddNnRLf0h9QOwyitqUnFNlKRR25ldBDVRRHJCxlCCtlHOP3pS3m0IJs
-	 nrff2hvLUMoXg==
-Date: Wed, 5 Nov 2025 16:13:19 -0800
+	b=txxNrIn90M/a5q/AZXy6vsUneD21zc4Nryy5OMeU1JH94vrA2MHX+DJkUXTFPWu6x
+	 FHIMUxv70o48VAr+lkiH0R5AOQm8ecBiyLbRpNTI2vYo5NrKvMoDLzJT5aY+2x8YV7
+	 fh61ewGWMAkRqe76wR/auwZr6USnYiDqOTu3hudCQ7yy/EPjX+XcUIW83CC3xuTQLs
+	 BBT06OSz3uaDlQ76wabhcOZk9HGU+fjLm6AgXZT+vf0kNayy1i/shUYU2WgvPhFFqo
+	 n3RgYBRg9fAwz50m9HChfiCOUdNdMLevmNhgW245kz2dLc9Jl9PXlHA9Cz9iL/UHbh
+	 yxK+8+4OEg6Zw==
+Date: Wed, 5 Nov 2025 16:17:54 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jan Stancek
- <jstancek@redhat.com>, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
- =?UTF-8?B?QXNiasO4cm4=?= Sloth =?UTF-8?B?VMO4bm5lc2Vu?= <ast@fiberby.net>,
- Stanislav Fomichev <sdf@fomichev.me>, Shuah Khan <shuah@kernel.org>, Ido
- Schimmel <idosch@nvidia.com>, Guillaume Nault <gnault@redhat.com>, Petr
- Machata <petrm@nvidia.com>, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next 2/3] netlink: specs: update rt-rule src/dst
- attribute types to support IPv4 addresses
-Message-ID: <20251105161319.0591f96e@kernel.org>
-In-Reply-To: <aQsDA7ufLlIwSf1h@fedora>
-References: <20251029082245.128675-1-liuhangbin@gmail.com>
-	<20251029082245.128675-3-liuhangbin@gmail.com>
-	<20251029163742.3d96c18d@kernel.org>
-	<aQnG8IYsY3oyYekf@fedora>
-	<20251104164804.540a9b8d@kernel.org>
-	<aQsDA7ufLlIwSf1h@fedora>
+To: Aditya Garg <gargaditya@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, longli@microsoft.com,
+ kotaranov@microsoft.com, horms@kernel.org,
+ shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+ ernis@linux.microsoft.com, dipayanroy@linux.microsoft.com,
+ shirazsaleem@microsoft.com, linux-hyperv@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-rdma@vger.kernel.org, gargaditya@microsoft.com
+Subject: Re: [PATCH net-next v2] net: mana: Handle SKB if TX SGEs exceed
+ hardware limit
+Message-ID: <20251105161754.4b9a1363@kernel.org>
+In-Reply-To: <82bcd959-571e-42ce-b341-cbfa19f9f86d@linux.microsoft.com>
+References: <20251029131235.GA3903@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	<20251031162611.2a981fdf@kernel.org>
+	<82bcd959-571e-42ce-b341-cbfa19f9f86d@linux.microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, 5 Nov 2025 07:55:47 +0000 Hangbin Liu wrote:
-> > > I just realize that most of the address/src/dst in rt-addr/route are
-> > > dual stack. The same with FRA_DST. We can't simply change binary to u=
-32.
-> > > So can we keep this u32 -> binary change? =20
-> >=20
-> > Ah, should have looked at more context..
-> > Yes, and in that case without the display-hint? =20
->=20
-> The display-hint is required; otherwise, the displayed src and dst fields
-> appear as binary data, and setting the rule=E2=80=99s src/dst values also=
- fails. I
-> haven=E2=80=99t checked the code yet, but with
->   - display-hint: ipv4
-> the IPv6 addresses are also displayed correctly :)
+On Wed, 5 Nov 2025 22:10:23 +0530 Aditya Garg wrote:
+> >>   	if (err) {
+> >>   		(void)skb_dequeue_tail(&txq->pending_skbs);
+> >> +		mana_unmap_skb(skb, apc);
+> >>   		netdev_warn(ndev, "Failed to post TX OOB: %d\n", err);  
+> > 
+> > You have a print right here and in the callee. This condition must
+> > (almost) never happen in practice. It's likely fine to just drop
+> > the packet.
+>
+> The logs placed in callee doesn't covers all the failure scenarios,   
+> hence I feel to have this log here with proper status. Maybe I can 
+> remove the log in the callee?
 
-Heh, we should have called the hint "ip" in that case :)
+I think my point was that since there are logs (per packet!) when the
+condition is hit -- if it did in fact hit with any noticeable frequency
+your users would have complained. So handling the condition gracefully
+and returning BUSY is likely just unnecessary complexity in practice.
+
+The logs themselves I don't care all that much about. Sure, having two
+lines for one error is a bit unclean.
+ 
+> > Either way -- this should be a separate patch.
+> >   
+> Are you suggesting a separate patch altogether or two patch in the same 
+> series?
+
+The changes feel related enough to make them a series, but either way
+is fine.
 
