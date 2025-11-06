@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-236109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 546C5C387D5
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 01:34:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63C99C387D2
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 01:34:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB1163ACE68
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 00:34:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE3871A235DB
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 00:34:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95D4A1ACEAF;
-	Thu,  6 Nov 2025 00:34:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1297D52F88;
+	Thu,  6 Nov 2025 00:34:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="00wxX25D"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GP2FqKR6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 159242EB10
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 00:34:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D4471459FA
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 00:34:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762389252; cv=none; b=po6q1OV/zUdl8AlhTAfXcjZXAH7w8TlEjGH9m790eY0rvOrgG6oqGVvXzMWOKK1lfHN4dxWkx5C/0zW6xMCk96hEP0QjN1uSt8Nmwel5c//PZcHueOPHYyZY6kEhKA+Zoen9EsO5+2TaOWeaRRllDmbehZ07pKlxfo/sqHb4A+8=
+	t=1762389254; cv=none; b=mYGshlxR9qeXAp1KzBEfn6MWccACiAxkrF8OxPr9TYpEHqTd8/u+uGywr5ScrOjwL0MDohe5jDRD2CKFNIJ5P9avvYI3twA1sOI5YDWZo85hQ8OPKJbMQJMi2s7lBIO4QwKnBkvLfvt2lMUsf9gIbw7o9yXoSFwY4GtI14ilKn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762389252; c=relaxed/simple;
-	bh=RgcaJnRXKEXlRjRPS3srNqd30tRW8kLdM/j/ebcJpNU=;
+	s=arc-20240116; t=1762389254; c=relaxed/simple;
+	bh=XTO68GlrFkON0OmGvOFQEPQdavjBjqSH8Wop8IzkOGY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=LCUF2h8iWNV0yVbgtBsmpDZVDDW20+3H8dNHsHIdjqcWuHZkZ3L7NCzZaYHpQbKR1p164G2dBIkA4RvRYLlQJsj417hM5q8+auPM3iLLSzqEj1oGlHhV/PwlfG7Ft5ftiIBBZf6lyQwO4wMnREAl07SwAADopUG2RSPpbGPFtOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=00wxX25D; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=glsRyYALWscydzshU3Z5iGTtLbqKSppos0NlMq/3gbJc/bQXR0X5iElhHpzdK8+mXj9PTVbc61E39acIY2sWIFJFw8nfe75qGEorEwsIy2rFG52+hjwQ4vZw0YIAfR3Mm+9xWnK318UMSyfGhl9IMHCdNStc5tu2cTVQuRviAcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GP2FqKR6; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-ba265ee0e34so312778a12.2
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 16:34:10 -0800 (PST)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-295592eb5dbso5468965ad.0
+        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 16:34:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762389250; x=1762994050; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1762389252; x=1762994052; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LVeb1iyrZmoOn78cOUzlwyvZtMfZHRIL2LpJvJBI5jg=;
-        b=00wxX25DL2xvGBNhDCWaZzrI3mEFrWuGxDDGIiafIH2hdi6Wj6EQBmqjxtNvmV38VD
-         LG0WJyZs5io6CAOxR73tUHiA0jhapNLks3tnDjb37Fi/cGBsWH4PTs2rfBbyZQJoOXQs
-         Mesc3EEtBU1F8jhknPW1wumbxfOOTis4X7a5ryeU9M0kQ8nf+vBwOP1m05KMtHCv8zf5
-         gDuLtLfAn10hJ5/tQGhv29YUz567XH8o10d9hzX6nInSbxFBwCnhx0ocLwQc6LJD60j4
-         CbbQeOqfXXAY3POw1Pq1r4PIfxkieCSyWtDFLjKDtAFnTwf9biO05roxRHiQ78E1o7zJ
-         sLUQ==
+        bh=biLzSdvmDYMvEzCvThKUYn2d/xtylO8ah+54M4aXcnk=;
+        b=GP2FqKR6Nc7rbU3sFqXev7bS9v3SXPVfVPFLDVtEFlnyrg6QKMrOBWQ8GGoAOEL7ZS
+         T7xIuZmxoHAbSQK56WWxEqfNiqHPmnbVUgqImL5T32iz99LIi6V6SBNEV6OfxInxWPqU
+         F6cDHQ2oGH/bTno6B5MeYFFSiJj6JTpcCzEgMAIbrTlcnnpSKP7A9TMpwtbuA8MuxzQ/
+         yZntr/YKkoZUy0+lAnZzLVTVy4LXMw8yco3vdglAbHtqrrMNn1I0JOkZHZu4K2AsH2nF
+         npeP+JCy9kDAqOREaB+X7RO8zjoaEGip/JpTFDa0ZzaIWTdJOt/4nJn8f3vgTopBOOl9
+         S2ZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762389250; x=1762994050;
+        d=1e100.net; s=20230601; t=1762389252; x=1762994052;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LVeb1iyrZmoOn78cOUzlwyvZtMfZHRIL2LpJvJBI5jg=;
-        b=ZunjthFmLerxYRyRnQAGu9i4iGzxxehxHKzKKn0R9h4m5rsViEv1mXWDzD9NPPUiWW
-         FBr2VKRs6JcEu3MIcoi0foZhxrvEoebpsHnZa7k6bG/FeK5vNDIkUfYEKK58yF4Dhe5T
-         SyEKfptMZ34laNs2EU00rRg/85uuaSias0XqL2NAqv7CYOV+Vd/4wlk8/NBJt5vI6gmU
-         p5rJkzqYqIWHFCvAhk6yXW6YCLXSovQLaRdpAykw4b3YI7G8d2jcTcYtKRVGVpLSF9ER
-         6HRya/eMrU9dk7yN16dsvnv37D2OEP7ukk71see3XNPPdNRlfzNZCHrsbxn+jLYneF4R
-         VrxA==
-X-Forwarded-Encrypted: i=1; AJvYcCUkk34/O0mL0GdEDNU+rNN4SW3Sh4juhYglR6Mi0uS7FUPha4NiSg7fM9DbGVyPduvxbm+Q+Io=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPbP92VXmZqE4F6aFdlIZ77z6BoEogz5Yb+4bul7g3Xu91g/SK
-	bS6uv/uqtfe5QpcpQJkEyRUhsxu0gj8xIaBkocqP/u+QzdxbxqdpJsIEyEGYbNPfYWxP+WQvQms
-	PQGQrew==
-X-Google-Smtp-Source: AGHT+IFcxl+kjHOGS/nBXCN0NLe4u/87K6BJXliGaCRn80SWPlg5pVaX5IEoE/dYZUJQiQ95jLOFyEkscPY=
-X-Received: from pjbqe1.prod.google.com ([2002:a17:90b:4f81:b0:33b:dce0:c8ba])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a05:6a20:7348:b0:34f:2070:89d5
- with SMTP id adf61e73a8af0-34f837ed94fmr6558876637.11.1762389250212; Wed, 05
- Nov 2025 16:34:10 -0800 (PST)
-Date: Thu,  6 Nov 2025 00:32:42 +0000
+        bh=biLzSdvmDYMvEzCvThKUYn2d/xtylO8ah+54M4aXcnk=;
+        b=w4vIM404pTf+D/85QWf4rzw4+IqfBRmrN1nP0m8s6v5zTH8tYGOnxXUU9l66VypiC6
+         kB9cFj3HGgyuu44hk7PYTAkH539oWLybFiKg8jMlN4QY66gKFjvVQmE8ObN+djg086Be
+         mqyj8St3L2/5Re+eAm1NZCS+a3RAnolcfQsl3RrHN8r5GsSCx5HB6Ta//KzsGS9YRXTD
+         M2gmWjkbEi7kZwqrWHVrwTXR0amJBL10YP4duf1V0XDVikw3HZDt0T//9BlAUOJOic8s
+         LRIdFraunosZg2R5gl3MDVcxX96rstINB2OTAwHGW4xvcfMo837RKJetw3i3WpiacuEh
+         vr1A==
+X-Forwarded-Encrypted: i=1; AJvYcCW1PhwWCVzIui7N+G2I6XuCuCvNRTnyWy6Dpgn9iedCY1nVVlX9u2GFQhxrGf+p9Hj9dRgRbaY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxa9QcHDzivO4FI7WLTW1p9UBZeGomSpmyRCtbCSLsex5Opr2XA
+	9MPat/k1WiQpCIEJhmNETtrT9XXEahtQz0WGirkOtow2liCvr4EBh2+7ku2u1t3IN9mZTNFGRMJ
+	2OZzfRg==
+X-Google-Smtp-Source: AGHT+IH5FHyyly2fIZD80mDb2Cfo7OPwJ1/drOTAD+uMFvcN0kKMoIhGYdz3/nvbXDcSWzRuL61OX8h05tk=
+X-Received: from plei1.prod.google.com ([2002:a17:902:e481:b0:26a:23c7:68d3])
+ (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:ce0a:b0:295:5dbe:f629
+ with SMTP id d9443c01a7336-2962ad069acmr55580445ad.8.1762389251824; Wed, 05
+ Nov 2025 16:34:11 -0800 (PST)
+Date: Thu,  6 Nov 2025 00:32:43 +0000
 In-Reply-To: <20251106003357.273403-1-kuniyu@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251106003357.273403-1-kuniyu@google.com>
 X-Mailer: git-send-email 2.51.2.1026.g39e6a42477-goog
-Message-ID: <20251106003357.273403-4-kuniyu@google.com>
-Subject: [PATCH v1 net-next 3/6] tcp: Remove redundant init for req->num_timeout.
+Message-ID: <20251106003357.273403-5-kuniyu@google.com>
+Subject: [PATCH v1 net-next 4/6] tcp: Remove timeout arg from reqsk_timeout().
 From: Kuniyuki Iwashima <kuniyu@google.com>
 To: Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, 
 	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
@@ -83,55 +83,94 @@ Cc: Simon Horman <horms@kernel.org>, Yuchung Cheng <ycheng@google.com>,
 	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Commit 5903123f662e ("tcp: Use BPF timeout setting for SYN ACK
-RTO") introduced req->timeout and initialised it in 3 places:
+reqsk_timeout() is always called with @timeout being TCP_RTO_MAX.
 
-  1. reqsk_alloc() sets 0
-  2. inet_reqsk_alloc() sets TCP_TIMEOUT_INIT
-  3. tcp_conn_request() sets tcp_timeout_init()
+Let's remove the arg.
 
-1. has been always redundant as 2. overwrites it immediately.
-
-2. was necessary for TFO SYN+ACK but is no longer needed after
-commit 8ea731d4c2ce ("tcp: Make SYN ACK RTO tunable by BPF
-programs with TFO").
-
-3. was moved to reqsk_queue_hash_req() in the previous patch.
-
-Now, we always initialise req->timeout just before scheduling
-the SYN+ACK timer:
-
-  * For non-TFO SYN+ACK : reqsk_queue_hash_req()
-  * For TFO SYN+ACK     : tcp_fastopen_create_child()
-
-Let's remove the redundant initialisation of req->timeout in
-reqsk_alloc() and inet_reqsk_alloc().
+As a prep for the next patch, reqsk_timeout() is moved to tcp.h
+and renamed to tcp_reqsk_timeout().
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 ---
- net/ipv4/inet_connection_sock.c | 2 --
- 1 file changed, 2 deletions(-)
+ include/net/inet_connection_sock.h | 8 --------
+ include/net/tcp.h                  | 7 +++++++
+ net/ipv4/inet_connection_sock.c    | 2 +-
+ net/ipv4/tcp_minisocks.c           | 5 +++--
+ 4 files changed, 11 insertions(+), 11 deletions(-)
 
+diff --git a/include/net/inet_connection_sock.h b/include/net/inet_connection_sock.h
+index 90a99a2fc804..fd40af2221b9 100644
+--- a/include/net/inet_connection_sock.h
++++ b/include/net/inet_connection_sock.h
+@@ -290,14 +290,6 @@ static inline int inet_csk_reqsk_queue_is_full(const struct sock *sk)
+ bool inet_csk_reqsk_queue_drop(struct sock *sk, struct request_sock *req);
+ void inet_csk_reqsk_queue_drop_and_put(struct sock *sk, struct request_sock *req);
+ 
+-static inline unsigned long
+-reqsk_timeout(struct request_sock *req, unsigned long max_timeout)
+-{
+-	u64 timeout = (u64)req->timeout << req->num_timeout;
+-
+-	return (unsigned long)min_t(u64, timeout, max_timeout);
+-}
+-
+ void inet_csk_destroy_sock(struct sock *sk);
+ void inet_csk_prepare_for_destroy_sock(struct sock *sk);
+ void inet_csk_prepare_forced_close(struct sock *sk);
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index 4fd6d8d1230d..b538fff1a061 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -841,6 +841,13 @@ static inline u32 __tcp_set_rto(const struct tcp_sock *tp)
+ 	return usecs_to_jiffies((tp->srtt_us >> 3) + tp->rttvar_us);
+ }
+ 
++static inline unsigned long tcp_reqsk_timeout(struct request_sock *req)
++{
++	u64 timeout = (u64)req->timeout << req->num_timeout;
++
++	return (unsigned long)min_t(u64, timeout, TCP_RTO_MAX);
++}
++
+ u32 tcp_delack_max(const struct sock *sk);
+ 
+ /* Compute the actual rto_min value */
 diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
-index d9c674403eb0..2bfe7af51bbb 100644
+index 2bfe7af51bbb..b4eae731c9ba 100644
 --- a/net/ipv4/inet_connection_sock.c
 +++ b/net/ipv4/inet_connection_sock.c
-@@ -885,7 +885,6 @@ reqsk_alloc_noprof(const struct request_sock_ops *ops, struct sock *sk_listener,
- 	sk_tx_queue_clear(req_to_sk(req));
- 	req->saved_syn = NULL;
- 	req->syncookie = 0;
--	req->timeout = 0;
- 	req->num_timeout = 0;
- 	req->num_retrans = 0;
- 	req->sk = NULL;
-@@ -913,7 +912,6 @@ struct request_sock *inet_reqsk_alloc(const struct request_sock_ops *ops,
- 		ireq->ireq_state = TCP_NEW_SYN_RECV;
- 		write_pnet(&ireq->ireq_net, sock_net(sk_listener));
- 		ireq->ireq_family = sk_listener->sk_family;
--		req->timeout = TCP_TIMEOUT_INIT;
- 	}
+@@ -1105,7 +1105,7 @@ static void reqsk_timer_handler(struct timer_list *t)
+ 	     inet_rsk(req)->acked)) {
+ 		if (req->num_timeout++ == 0)
+ 			atomic_dec(&queue->young);
+-		mod_timer(&req->rsk_timer, jiffies + reqsk_timeout(req, TCP_RTO_MAX));
++		mod_timer(&req->rsk_timer, jiffies + tcp_reqsk_timeout(req));
  
- 	return req;
+ 		if (!nreq)
+ 			return;
+diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+index ded2cf1f6006..d8f4d813e8dd 100644
+--- a/net/ipv4/tcp_minisocks.c
++++ b/net/ipv4/tcp_minisocks.c
+@@ -714,7 +714,8 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
+ 			 * it can be estimated (approximately)
+ 			 * from another data.
+ 			 */
+-			tmp_opt.ts_recent_stamp = ktime_get_seconds() - reqsk_timeout(req, TCP_RTO_MAX) / HZ;
++			tmp_opt.ts_recent_stamp = ktime_get_seconds() -
++				tcp_reqsk_timeout(req) / HZ;
+ 			paws_reject = tcp_paws_reject(&tmp_opt, th->rst);
+ 		}
+ 	}
+@@ -753,7 +754,7 @@ struct sock *tcp_check_req(struct sock *sk, struct sk_buff *skb,
+ 		    !tcp_rtx_synack(sk, req)) {
+ 			unsigned long expires = jiffies;
+ 
+-			expires += reqsk_timeout(req, TCP_RTO_MAX);
++			expires += tcp_reqsk_timeout(req);
+ 			if (!fastopen)
+ 				mod_timer_pending(&req->rsk_timer, expires);
+ 			else
 -- 
 2.51.2.1026.g39e6a42477-goog
 
