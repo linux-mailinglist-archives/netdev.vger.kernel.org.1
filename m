@@ -1,176 +1,113 @@
-Return-Path: <netdev+bounces-236252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C66B5C3A408
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 11:29:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB382C3A40E
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 11:29:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E6E43AF9FA
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 10:22:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29BA31A45FE9
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 10:23:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AFF82C159C;
-	Thu,  6 Nov 2025 10:22:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64FD628726E;
+	Thu,  6 Nov 2025 10:23:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ZQS17aoU"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="0iLpV6p5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C078326B08F
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 10:22:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4974C26B08F
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 10:23:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762424578; cv=none; b=UpF96t9odfOy/Vnv53pntJc+GiAX3lk0k+31JNrezXoiGg8Apb/TSY04vdeL2Fb9fwGRx0iYuGKJszGxlh+E7wlBpGRWfQzKepzowgiULyRZKhcX2XwtCsN0hY2xGLTox1RVT2dwOdFuEs9HOZzs2JaKjTGfTrxZA5ZtlsFNrDE=
+	t=1762424597; cv=none; b=TrNN19h2jyH0RTSTzdABzy7ccpODpZiIB99xFKH81Uo+qBp1RQMO0zip0auFuXhmaATxqIJhvNlPIVLyxWmdvHFUW+CMsmfa7DGfmYWNyVuNNgUCu4S0NQGXNBfqgB7F1XvNFtwbJ8HMPtKSKvWER6hOUXsd6s2kzyUf7eWZdIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762424578; c=relaxed/simple;
-	bh=Mq/f8KUYq/PtXXnC8i8yXVFV382/oiOIyxWYTozAt5E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rpnKEarXNoLCMsL0p7ox4DyarQCoXzCvC2P7YvIwLF/HJzg5nBAEPiaOAlAfnZrOOK7q9oSfxqe5X3Ft+KmRbk2/VW6DSoLSIgAJJpPsHmWRaEw4XV0OIbzHFXAkt89ZzytU5brym8hbDaDoCo11c2lavNPv8pFJUyJ2FnYW5Fo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ZQS17aoU; arc=none smtp.client-ip=185.171.202.116
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 18353C0FA88;
-	Thu,  6 Nov 2025 10:22:34 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 254486068C;
-	Thu,  6 Nov 2025 10:22:55 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 8707311850A2F;
-	Thu,  6 Nov 2025 11:22:52 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1762424574; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=t5fJe9feAElneP/yta870eC//hgCpWA6xE5I2Oa5k7I=;
-	b=ZQS17aoUlaouBr/Th7AG4xsr2oqMcu/GinPQqFkQmC3wjFGHIPu30a52ty9p2Q4qew1evE
-	0uHxqGq5FRHTS2Gp6/WiT2uZXCPao8yiAmCEAFaWwqXbOD+H63m+VHZ9J12guey1poraFU
-	W4SGyNZCJZzAmfuLAw4yUJCi3oSF0NcvWuYiBCjddbgoAT7P+ZLTv9ju4/PpqTApV8vppS
-	OIspgVcfO0sFkL7CQlJRpohcS5djOzfo1lEhD1G+Y+UeSKJ9tI/V2bHUobpbe4fvTNKtMb
-	l4NzZLq1bux1UE+pIbKvBrSpY6Z0aQs93ay8JMeyoX+CiJz5bRyW2JwP1ltIPQ==
-Message-ID: <898f6533-2b6a-47d8-8102-1e89e1769c3e@bootlin.com>
-Date: Thu, 6 Nov 2025 11:22:52 +0100
+	s=arc-20240116; t=1762424597; c=relaxed/simple;
+	bh=YCPg4RQWIrFb8aEDc9A3mzb5NF2Jxzc84gKviRkTpr4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Co/O8sShSwSjSYj8FyW/dsevgT/QekuzvL5unLM1OfU7YcgqTMq0TKvpN/o+kcJzuftDudYgxcBwiv+RsXsZCv+N64XbNAZynPywQ6q5cAY6Na70YUF7/fNbVH1nfLUzQDP3zOo2vbLSm62kbhM4nq4x2IIYrPEL3SNJzcLrtok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=0iLpV6p5; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=OMLwGIoNYOp5BTjdjZEw24Nsm4q49zJb/gk4akyApJw=; b=0iLpV6p5k1d8XZXOo/2wtp0gck
+	ILbjL960etTl/6BeAYcs/QMyVWExZWDAeMF+oAHtNoYiCOzpV5QEOK4xqvkNFufxXQLqyzGbQBefM
+	RMMUgqcuHBZILrfmsDw4z2NejnvVU8Hm2SpjN5ogRVj7gLLFUL2K2PAffbccV3OjkNb2m18CB79uP
+	FvsNUheSqT9dqIqb9Fh7EFTQB6NFTndHHzvyonYwYhVF9TCkkiuD+LsYjMhlZRojbmghmFQcT0Ovd
+	ddYUd8ebcYjWLWluaPZO6Z3gdr6TwOZwoNfT6l56QjcsOeGh0yBA8Zxiph5QFPw4PZGaHrUspZwtC
+	/wDPW3Dg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60346)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vGx8z-000000004nS-3qZ9;
+	Thu, 06 Nov 2025 10:23:05 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vGx8w-000000006ZU-32os;
+	Thu, 06 Nov 2025 10:23:02 +0000
+Date: Thu, 6 Nov 2025 10:23:02 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v2 00/11] net: stmmac: ingenic: convert to
+ set_phy_intf_sel()
+Message-ID: <aQx3Brj6t48O6wPg@shell.armlinux.org.uk>
+References: <aQxinH5WWcunfP7p@shell.armlinux.org.uk>
+ <6ad7667a-f2be-4674-99a2-2895a82b762a@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 10/11] net: stmmac: ingenic: pass ingenic_mac
- struct rather than plat_dat
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>
-References: <aQxinH5WWcunfP7p@shell.armlinux.org.uk>
- <E1vGvoj-0000000DWpE-3b5C@rmk-PC.armlinux.org.uk>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <E1vGvoj-0000000DWpE-3b5C@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6ad7667a-f2be-4674-99a2-2895a82b762a@bootlin.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-
-
-On 06/11/2025 09:58, Russell King (Oracle) wrote:
-> It no longer makes sense to pass a pointer to struct
-> plat_stmmacenet_data when calling the set_mode() methods to only use it
-> to get a pointer to the ingenic_mac structure that we already had in
-> the caller. Simplify this by passing the struct ingenic_mac pointer.
+On Thu, Nov 06, 2025 at 10:57:55AM +0100, Maxime Chevallier wrote:
+> Hi Russell,
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-
-Maxime
-
-> ---
->  .../ethernet/stmicro/stmmac/dwmac-ingenic.c   | 25 ++++++-------------
->  1 file changed, 7 insertions(+), 18 deletions(-)
+> On 06/11/2025 09:55, Russell King (Oracle) wrote:
+> > On Wed, Nov 05, 2025 at 01:25:54PM +0000, Russell King (Oracle) wrote:
+> > Convert ingenic to use the new ->set_phy_intf_sel() method that was
+> > recently introduced in net-next.
+> > 
+> > This is the largest of the conversions, as there is scope for cleanups
+> > along with the conversion.
+> > 
+> > v2: fix build warnings in patch 9 by rearranging the code
+> > 
+> >  .../net/ethernet/stmicro/stmmac/dwmac-ingenic.c    | 165 ++++++---------------
+> >  1 file changed, 45 insertions(+), 120 deletions(-)
+> > 
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-> index eb5744e0b9ea..41a2071262bc 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-> @@ -64,15 +64,13 @@ struct ingenic_soc_info {
->  	enum ingenic_mac_version version;
->  	u32 mask;
->  
-> -	int (*set_mode)(struct plat_stmmacenet_data *plat_dat, u8 phy_intf_sel);
-> +	int (*set_mode)(struct ingenic_mac *mac, u8 phy_intf_sel);
->  
->  	u8 valid_phy_intf_sel;
->  };
->  
-> -static int jz4775_mac_set_mode(struct plat_stmmacenet_data *plat_dat,
-> -			       u8 phy_intf_sel)
-> +static int jz4775_mac_set_mode(struct ingenic_mac *mac, u8 phy_intf_sel)
->  {
-> -	struct ingenic_mac *mac = plat_dat->bsp_priv;
->  	unsigned int val;
->  
->  	val = FIELD_PREP(MACPHYC_PHY_INFT_MASK, phy_intf_sel) |
-> @@ -82,19 +80,14 @@ static int jz4775_mac_set_mode(struct plat_stmmacenet_data *plat_dat,
->  	return regmap_update_bits(mac->regmap, 0, mac->soc_info->mask, val);
->  }
->  
-> -static int x1000_mac_set_mode(struct plat_stmmacenet_data *plat_dat,
-> -			      u8 phy_intf_sel)
-> +static int x1000_mac_set_mode(struct ingenic_mac *mac, u8 phy_intf_sel)
->  {
-> -	struct ingenic_mac *mac = plat_dat->bsp_priv;
-> -
->  	/* Update MAC PHY control register */
->  	return regmap_update_bits(mac->regmap, 0, mac->soc_info->mask, 0);
->  }
->  
-> -static int x1600_mac_set_mode(struct plat_stmmacenet_data *plat_dat,
-> -			      u8 phy_intf_sel)
-> +static int x1600_mac_set_mode(struct ingenic_mac *mac, u8 phy_intf_sel)
->  {
-> -	struct ingenic_mac *mac = plat_dat->bsp_priv;
->  	unsigned int val;
->  
->  	val = FIELD_PREP(MACPHYC_PHY_INFT_MASK, phy_intf_sel);
-> @@ -103,10 +96,8 @@ static int x1600_mac_set_mode(struct plat_stmmacenet_data *plat_dat,
->  	return regmap_update_bits(mac->regmap, 0, mac->soc_info->mask, val);
->  }
->  
-> -static int x1830_mac_set_mode(struct plat_stmmacenet_data *plat_dat,
-> -			      u8 phy_intf_sel)
-> +static int x1830_mac_set_mode(struct ingenic_mac *mac, u8 phy_intf_sel)
->  {
-> -	struct ingenic_mac *mac = plat_dat->bsp_priv;
->  	unsigned int val;
->  
->  	val = FIELD_PREP(MACPHYC_MODE_SEL_MASK, MACPHYC_MODE_SEL_RMII) |
-> @@ -116,10 +107,8 @@ static int x1830_mac_set_mode(struct plat_stmmacenet_data *plat_dat,
->  	return regmap_update_bits(mac->regmap, 0, mac->soc_info->mask, val);
->  }
->  
-> -static int x2000_mac_set_mode(struct plat_stmmacenet_data *plat_dat,
-> -			      u8 phy_intf_sel)
-> +static int x2000_mac_set_mode(struct ingenic_mac *mac, u8 phy_intf_sel)
->  {
-> -	struct ingenic_mac *mac = plat_dat->bsp_priv;
->  	unsigned int val;
->  
->  	val = FIELD_PREP(MACPHYC_PHY_INFT_MASK, phy_intf_sel);
-> @@ -165,7 +154,7 @@ static int ingenic_mac_init(struct platform_device *pdev, void *bsp_priv)
->  		dev_dbg(mac->dev, "MAC PHY control register: interface %s\n",
->  			phy_modes(interface));
->  
-> -		ret = mac->soc_info->set_mode(mac->plat_dat, phy_intf_sel);
-> +		ret = mac->soc_info->set_mode(mac, phy_intf_sel);
->  		if (ret)
->  			return ret;
->  	}
+> Damned, missed that V2 and started reviewing V1... I'll resend the tags
+> for V2.
 
+Yes, Jakub reported build warnings on patch 9 last night, followed by
+the kernel build bot reporting the same thing. The dangers of not
+building with W=1, but then W=1 is noisy which makes spotting new
+warnings difficult.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
