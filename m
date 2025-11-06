@@ -1,422 +1,197 @@
-Return-Path: <netdev+bounces-236504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11B0FC3D51B
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 21:03:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14F2FC3D571
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 21:24:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7EA271890B35
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 20:04:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A9901893A06
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 20:25:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A76FC34D913;
-	Thu,  6 Nov 2025 20:03:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 439D62F7AAA;
+	Thu,  6 Nov 2025 20:24:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NPUeQ6Lj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IKzIS/fF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6A4D34574D
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 20:03:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B213C2F7475
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 20:24:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762459410; cv=none; b=fkDzDLh6sDZTQpl/CxZNOqIfUZIXhW7Jctc6BvfQe7SBTUcBEDhUe4BUxp3KJ8a+T6ZP7gGQXktPoW2+c0rSv6GHzI8N4OcgBYjbrNcVK4f7b9n9JjC1R4PT8hAruVWPTxa4KScs6bGjdvu1omCWoiYbRn4poaoMulZQTe3zx6Y=
+	t=1762460685; cv=none; b=bSTSEmSHv3hczgpGCAn754wAottV+iBjcTcY396yE+M52JyovzEfZceYT8YoV0umuE/Pzwn6oWECamE8tZDc5oPIMXuNHKlcoMOZ3wPJ7ZMz9hjamVUv1cUjTnPAbtb+IosryqMz1E8MOaGQ94lwnrXbUT5hg5jLaYEkUiTlBS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762459410; c=relaxed/simple;
-	bh=d5XB6lXi+SqfD7FMBczFovauT0tkT3Zo89Lydc4vel4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=n0bIoMEgDziaVMdXmseRgVHMm8oJRsbuEVD/B9m+k0wZL96mE/iDYN8X4PQy7er9uLcHle4jHHy0N2YIUlM7nlC17yrWBYJoQo2t1+7l6CVX8joYYbFht9m1ygAPJuKVspSbqvZVyzQ58qf8cQhz2ZIxyml08cbW0/I1piAt/bI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NPUeQ6Lj; arc=none smtp.client-ip=209.85.210.170
+	s=arc-20240116; t=1762460685; c=relaxed/simple;
+	bh=Im9QWWxJXdZqz7HeLFWXZzmI9TfaqMlaB4gqcycUoss=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HyTIYKjDufB2FSMWlNdBU0YDY3AmOUTvQK+zDYKrdnnMoPOCn0g/C4/I2oW6x6/KFYoPrtR/FnD6mYqHARcN2jNw9P4hEaq+fvjCoZQSzF7XIMmDw0aYyFhbs6tJrXKth+F16Ry3fPOMUvJJeC4VFJnSfbq6wI/pI1kKdUh5EdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IKzIS/fF; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-781ea2cee3fso37229b3a.0
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 12:03:28 -0800 (PST)
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-294fd2ca6acso259225ad.0
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 12:24:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762459408; x=1763064208; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ib31VxAF5IlM6SIObcVU8XyhJIAvv4GQL1AJev9y2TI=;
-        b=NPUeQ6LjchlUGFfFA27PRq2PjWlmenTvh/hKkzTPlCdgt+y9vyNZTR9ur9czSJluAk
-         KjfsxNbY+LlfxiEYuFuRnSvy2h7XKSxC31zYIF9aNC2wDxwfIKtcUQHFZpM87GyPlWVJ
-         SIBJ27dcC+wFEBf7axrUxh/R/0k6iFwSXjkTBrsERorG02g+Bsk7PIbaNWbQIPCt1zsZ
-         17rBG3iE5Vo5gank913d8cMYP/dTLyVBvi/HiBv/1ObpZeMeGIjCkzM8yia6v4BYsVBj
-         ZVTOL9OUnmxYqoQ0T385Lz4lxq/Qan8NcCMmig/iq5/3q6idvW8/TaSD0gvPrnsZP/wy
-         jVGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762459408; x=1763064208;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1762460683; x=1763065483; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ib31VxAF5IlM6SIObcVU8XyhJIAvv4GQL1AJev9y2TI=;
-        b=hTGPY3e1z3IJe14BgQFE3ViDsWkUCfz9ZlnMwVu4buYbq1g6QmCWyqzfG2O75pEESa
-         ujAVbZojsb2xbF4V88vlydyKtdDl89HLyaaS+ahCT6OwoGuSr/70uDUGVD4mMCv37E0H
-         3MQt2Nk6be9RmXakdyNtOz0XRC67h51L0Fmf4mY5lPQpe0GWsjQDNv9CX9tWQySggEny
-         EZVNhpdbcncZnw91BspPNqaAqE8gFznsztyXN9AKqKrgwb24rkfzI01+9AhH8vGmUx3o
-         tKjBTiwEfB12tRIm3jXYDzmznGDA4bgAZoFWdXdFrhdfj5Kt4ffB4mvt82pfa8coKAxj
-         gy1g==
-X-Gm-Message-State: AOJu0YywoCCjQTVpNzC5/lCALAqkrm+WGzbPcM26uT7ZJD0Kw1nfZ8BD
-	v1ILA3aUEDnmsFnzy82zDAWrbIO5za3Jq7oVFWIH2XQEWpZbClUbDJo2
-X-Gm-Gg: ASbGnctESp/qf0kQf+tGJG3jwD84Ic7m1bgrVc240fa1WdNAeUuoKblYA7xTArbGMOc
-	tWImYdili91SVfC2uQFOn2a3PcOg2NWFL4oA0jAPEaqjdXznOKIsv7+4+iwfh7jTDXyCYKIDK4D
-	gRW+93KxdAJj2AHmV5l55Hlr8tHBk01C0CavtS6mDNv4G3dIacee7gE0DqB+kh8UW6bh7ZwQhlL
-	fcv+Pmh6FIQB34Fb6dF0j50dNdXZ94QlJygrKrSyoBPJ46a+f16ozOqVNSgJeW64TIuWBRlgdyA
-	sx13gvs/npRFqWHtfRWlEgkMBCsTO7jvGT/Sj96N58iquhX/m5t/DKJ2bwzVyLD8n3UUn8K2KJB
-	wi3lxkKJtg0ldsZ3CkdMpnHX1+rOOgGo4kbXuy93MugFoQUDta35alomLobQK5uDrEFRU1vMxcP
-	k43H3SsxDOU4iBOE7Q9wZwUAJFPXUSV88D
-X-Google-Smtp-Source: AGHT+IEAyHzkTRkADJLdNmwr0EjaV8PsIqtOruX2xP2Xhx7l7trbwf4bACqzu+hOl3JwuNDTRlMk3Q==
-X-Received: by 2002:a05:6a00:3d4f:b0:7ac:6c3e:e918 with SMTP id d2e1a72fcca58-7b0bbb0a58fmr926453b3a.11.1762459407863;
-        Thu, 06 Nov 2025 12:03:27 -0800 (PST)
-Received: from iku.. ([2401:4900:1c07:5fe8:c1fb:f9bb:4f6d:dc88])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b0ccb5c674sm360930b3a.59.2025.11.06.12.03.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Nov 2025 12:03:26 -0800 (PST)
-From: Prabhakar <prabhakar.csengg@gmail.com>
-X-Google-Original-From: Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	Prabhakar <prabhakar.csengg@gmail.com>,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: [PATCH net-next] net: phy: mscc: Add support for PHY LEDs on VSC8541
-Date: Thu,  6 Nov 2025 20:03:09 +0000
-Message-ID: <20251106200309.1096131-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-X-Mailer: git-send-email 2.43.0
+        bh=z3gyUgZQhfQPtS7SLCIDf6NbyslQ68pOuETZ2b4hfpg=;
+        b=IKzIS/fFRLupOYMhAxubkYmOMf1iYd0JtSGu6N6tjdphDY2T+lfSFlleOabM79FN56
+         Xc4BiYJcoO2yRft4fhIiiYjYyeO7ZY290lVgGmyJDaSg1qEtZjZaZnKrw0R6J+lFganu
+         InG87B1W4nncZe4GN2aWhII1F7jvu5cokGXaNGDU+U6mVBmr72wWeaxgajY3uA+Qe5dg
+         irGl0Pis5EDMCeH6qatxrr9VPL9MymKX+OfYaq13RJo8IRtXPJNwr9i4mmekwj6E/hYq
+         LOZDBCz90b2Za4RhRuMFtE8A7mVpVKK9stsAJnIqwXImh1dNG81H1gHMpOGD2wR1LQwM
+         QIWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762460683; x=1763065483;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=z3gyUgZQhfQPtS7SLCIDf6NbyslQ68pOuETZ2b4hfpg=;
+        b=nn+P7FqnYu1zshkDnj41A+3GrOCwdfwWtMWzu/jHg1eYMdavLbktoQ96ZT38XHiWn/
+         z/EiRf4MlaLlnaf8G+51s1a1MWjCdLdlSzWQFOM2jxZhzR0GdYYjzl/Im90XacP6qBfD
+         RSG1UPaKinwCJvn6Sipp+8GO5roSZINN9oUN0ornE1ne3D29lMhsxALwtBK4WDRntcA6
+         okCrljK9BCeebq9OzG/47KwGEfysCrWBi8jfHgNKzJmEJAW0iZKKdchGb9dDtc3Bd0l7
+         a4QVN5ipV9B+23PsnY0mAtJfjN2BVYxr6difLRgzYOrY7Ad5oWKfe+dmwmezqMapXHqX
+         r99Q==
+X-Gm-Message-State: AOJu0YxQPV8pKKnA92EcpkHh5EmCilUKGdJF8Td3tXIpdb2hEAmgE5MI
+	91lbECjTFYPKefAz4Rc6gAizBTbNZQmzv/9tE2Zymi/rY9MYU+SCRg6J15puDdcSpiGWGSfHjWS
+	d2koahkgJDFdSgcGFKwoqwQLFF2Ex1C8=
+X-Gm-Gg: ASbGnctaRDmCYkfy+BAyPw5IzkWYk1HZ1wxfGc06sWFctVQm1Vwf/mOURHY6eAHb2vz
+	vX8BAzcRCEbjwIFtUNl3P6onYxl+GWK3Qx2U7OnYDCCg2t4mKoLeiV3w1FmnDBx/FJIwOQBG0v/
+	nrgjMPPocluOfDhf2nppzklglYYJ1o6AHhsZeHcZE/AOCmlhMAdYyW4uiZreEY0bUr8XvFmD1s+
+	ozSIaQHmeReOADzdpifvsuLpOXDXSAh2IusPL+7PlmVZcaBAgVHoIZQMC9wu0j5i5MbFZh8C1U3
+	tvQtz84ot5n2G8+QDz3Ww5vPA07q/w==
+X-Google-Smtp-Source: AGHT+IGTWzJU0xlvlovHbYWoDH5XM24Ae1wEThKwWG8ycDKpQ4Pza4FucwMrn4xnT46tQsURsHTnLGHE4XvA3l/bTbM=
+X-Received: by 2002:a17:902:da86:b0:267:912b:2b36 with SMTP id
+ d9443c01a7336-297c00de2ecmr9261995ad.23.1762460682652; Thu, 06 Nov 2025
+ 12:24:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <cover.1761748557.git.lucien.xin@gmail.com> <32c7730d3b0f6e5323d289d5bdfd01fc22d551b5.1761748557.git.lucien.xin@gmail.com>
+ <43ea4062-75a8-4152-bf19-2eca561036bd@redhat.com>
+In-Reply-To: <43ea4062-75a8-4152-bf19-2eca561036bd@redhat.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Thu, 6 Nov 2025 15:24:30 -0500
+X-Gm-Features: AWmQ_blGjOQ50fcZQT5EtzHNncMYn6qzWEjBf9UHnF498_0zXTgvgxEng025WXQ
+Message-ID: <CADvbK_d8WoKJkU7ACK6nzbv7hzxxkAYZ5--DPzVQHsSZbEJnuw@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 09/15] quic: add congestion control
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: network dev <netdev@vger.kernel.org>, quic@lists.linux.dev, davem@davemloft.net, 
+	kuba@kernel.org, Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Metzmacher <metze@samba.org>, Moritz Buhl <mbuhl@openbsd.org>, Tyler Fanelli <tfanelli@redhat.com>, 
+	Pengtao He <hepengtao@xiaomi.com>, Thomas Dreibholz <dreibh@simula.no>, linux-cifs@vger.kernel.org, 
+	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Paulo Alcantara <pc@manguebit.com>, Tom Talpey <tom@talpey.com>, kernel-tls-handshake@lists.linux.dev, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Steve Dickson <steved@redhat.com>, Hannes Reinecke <hare@suse.de>, Alexander Aring <aahringo@redhat.com>, 
+	David Howells <dhowells@redhat.com>, Matthieu Baerts <matttbe@kernel.org>, 
+	John Ericson <mail@johnericson.me>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	"D . Wythe" <alibuda@linux.alibaba.com>, Jason Baron <jbaron@akamai.com>, 
+	illiliti <illiliti@protonmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, Daniel Stenberg <daniel@haxx.se>, 
+	Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+On Tue, Nov 4, 2025 at 7:02=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
+e:
+>
+> On 10/29/25 3:35 PM, Xin Long wrote:
+> > +/* Compute and update the pacing rate based on congestion window and s=
+moothed RTT. */
+> > +static void quic_cong_pace_update(struct quic_cong *cong, u32 bytes, u=
+32 max_rate)
+> > +{
+> > +     u64 rate;
+> > +
+> > +     /* rate =3D N * congestion_window / smoothed_rtt */
+> > +     rate =3D (u64)cong->window * USEC_PER_SEC * 2;
+> > +     if (likely(cong->smoothed_rtt))
+> > +             rate =3D div64_ul(rate, cong->smoothed_rtt);
+> > +
+> > +     WRITE_ONCE(cong->pacing_rate, min_t(u64, rate, max_rate));
+> > +     pr_debug("%s: update pacing rate: %u, max rate: %u, srtt: %u\n",
+> > +              __func__, cong->pacing_rate, max_rate, cong->smoothed_rt=
+t);
+>
+> I think you should skip entirely the pacing_rate update when
+> `smoothed_rtt =3D=3D 0`
+>
+will update it.
 
-Add a minimal LED controller implementation supporting common use cases
-with the 'netdev' trigger.
+> [...]> +/* rfc9002#section-5: Estimating the Round-Trip Time */
+> > +void quic_cong_rtt_update(struct quic_cong *cong, u32 time, u32 ack_de=
+lay)
+> > +{
+> > +     u32 adjusted_rtt, rttvar_sample;
+> > +
+> > +     /* Ignore RTT sample if ACK delay is suspiciously large. */
+> > +     if (ack_delay > cong->max_ack_delay * 2)
+> > +             return;
+> > +
+> > +     /* rfc9002#section-5.1: latest_rtt =3D ack_time - send_time_of_la=
+rgest_acked */
+> > +     cong->latest_rtt =3D cong->time - time;
+> > +
+> > +     /* rfc9002#section-5.2: Estimating min_rtt */
+> > +     if (!cong->min_rtt_valid) {
+> > +             cong->min_rtt =3D cong->latest_rtt;
+> > +             cong->min_rtt_valid =3D 1;
+> > +     }
+> > +     if (cong->min_rtt > cong->latest_rtt)
+> > +             cong->min_rtt =3D cong->latest_rtt;
+> > +
+> > +     if (!cong->is_rtt_set) {
+> > +             /* rfc9002#section-5.3:
+> > +              *   smoothed_rtt =3D latest_rtt
+> > +              *   rttvar =3D latest_rtt / 2
+> > +              */
+> > +             cong->smoothed_rtt =3D cong->latest_rtt;
+> > +             cong->rttvar =3D cong->smoothed_rtt / 2;
+> > +             quic_cong_pto_update(cong);
+> > +             cong->is_rtt_set =3D 1;
+> > +             return;
+> > +     }
+> > +
+> > +     /* rfc9002#section-5.3:
+> > +      *   adjusted_rtt =3D latest_rtt
+> > +      *   if (latest_rtt >=3D min_rtt + ack_delay):
+> > +      *     adjusted_rtt =3D latest_rtt - ack_delay
+> > +      *   smoothed_rtt =3D 7/8 * smoothed_rtt + 1/8 * adjusted_rtt
+> > +      *   rttvar_sample =3D abs(smoothed_rtt - adjusted_rtt)
+> > +      *   rttvar =3D 3/4 * rttvar + 1/4 * rttvar_sample
+> > +      */
+> > +     adjusted_rtt =3D cong->latest_rtt;
+> > +     if (cong->latest_rtt >=3D cong->min_rtt + ack_delay)
+> > +             adjusted_rtt =3D cong->latest_rtt - ack_delay;
+> > +
+> > +     cong->smoothed_rtt =3D (cong->smoothed_rtt * 7 + adjusted_rtt) / =
+8;
+>
+> Out of sheer curiosity, is the compiler smart enough to use a 'srl 3'
+> for the above?
+>
+Yes.
 
-The driver now defaults to VSC8531_LINK_ACTIVITY at initialization and
-allows users to configure LED behavior through the LED subsystem. Support
-for controlling LED behavior is also added.
+266 cong->smoothed_rtt =3D (cong->smoothed_rtt * 7 + adjusted_rtt) / 8;
 
-The LED Behavior (register 30) bits [0:1] control the combine feature:
-0: Combine enabled (link/activity, duplex/collision)
-1: Combine disabled (link only, duplex only)
+0x593d <+77>:  mov    (%rbx),%ecx         ; ecx =3D cong->smoothed_rtt
+0x593f <+79>:  lea    (%rax,%rcx,8),%edx   ; edx =3D adjusted_rtt + (ecx * =
+8)
+0x5942 <+82>:  sub    %ecx,%edx           ; edx =3D adjusted_rtt +
+(8*ecx) - ecx =3D ecx*7 + adjusted_rtt
+0x5946 <+86>:  shr    $0x3,%edx           ; edx >>=3D 3 =E2=86=92 divide by=
+ 8
+0x594d <+93>:  mov    %edx,(%rbx)         ; store result back to
+cong->smoothed_rtt
 
-This feature is now managed based on the RX/TX rules. If both RX and TX
-are disabled, the combine feature is turned off; otherwise, it remains
-enabled.
-
-Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
----
- drivers/net/phy/mscc/mscc.h      |   4 +
- drivers/net/phy/mscc/mscc_main.c | 223 ++++++++++++++++++++++++++++++-
- 2 files changed, 222 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/phy/mscc/mscc.h b/drivers/net/phy/mscc/mscc.h
-index 2eef5956b9cc..65c9d7bd9315 100644
---- a/drivers/net/phy/mscc/mscc.h
-+++ b/drivers/net/phy/mscc/mscc.h
-@@ -85,6 +85,10 @@ enum rgmii_clock_delay {
- #define LED_MODE_SEL_MASK(x)		  (GENMASK(3, 0) << LED_MODE_SEL_POS(x))
- #define LED_MODE_SEL(x, mode)		  (((mode) << LED_MODE_SEL_POS(x)) & LED_MODE_SEL_MASK(x))
- 
-+#define MSCC_PHY_LED_BEHAVIOR		  30
-+#define LED_COMBINE_DIS_MASK(x)		  BIT(x)
-+#define LED_COMBINE_DIS(x, dis)		  (((dis) ? 1 : 0) << (x))
-+
- #define MSCC_EXT_PAGE_CSR_CNTL_17	  17
- #define MSCC_EXT_PAGE_CSR_CNTL_18	  18
- 
-diff --git a/drivers/net/phy/mscc/mscc_main.c b/drivers/net/phy/mscc/mscc_main.c
-index 8678ebf89cca..0c4e368527b5 100644
---- a/drivers/net/phy/mscc/mscc_main.c
-+++ b/drivers/net/phy/mscc/mscc_main.c
-@@ -173,23 +173,43 @@ static void vsc85xx_get_stats(struct phy_device *phydev,
- 		data[i] = vsc85xx_get_stat(phydev, i);
- }
- 
--static int vsc85xx_led_cntl_set(struct phy_device *phydev,
--				u8 led_num,
--				u8 mode)
-+static int vsc85xx_led_cntl_set_lock_unlock(struct phy_device *phydev,
-+					    u8 led_num,
-+					    u8 mode, bool lock)
- {
- 	int rc;
- 	u16 reg_val;
- 
--	mutex_lock(&phydev->lock);
-+	if (lock)
-+		mutex_lock(&phydev->lock);
- 	reg_val = phy_read(phydev, MSCC_PHY_LED_MODE_SEL);
- 	reg_val &= ~LED_MODE_SEL_MASK(led_num);
- 	reg_val |= LED_MODE_SEL(led_num, (u16)mode);
- 	rc = phy_write(phydev, MSCC_PHY_LED_MODE_SEL, reg_val);
--	mutex_unlock(&phydev->lock);
-+	if (lock)
-+		mutex_unlock(&phydev->lock);
- 
- 	return rc;
- }
- 
-+static int vsc85xx_led_cntl_set(struct phy_device *phydev, u8 led_num,
-+				u8 mode)
-+{
-+	return vsc85xx_led_cntl_set_lock_unlock(phydev, led_num, mode, true);
-+}
-+
-+static int vsc8541_led_combine_disable_set(struct phy_device *phydev, u8 led_num,
-+					   bool combine_disable)
-+{
-+	u16 reg_val;
-+
-+	reg_val = phy_read(phydev, MSCC_PHY_LED_BEHAVIOR);
-+	reg_val &= ~LED_COMBINE_DIS_MASK(led_num);
-+	reg_val |= LED_COMBINE_DIS(led_num, combine_disable);
-+
-+	return phy_write(phydev, MSCC_PHY_LED_BEHAVIOR, reg_val);
-+}
-+
- static int vsc85xx_mdix_get(struct phy_device *phydev, u8 *mdix)
- {
- 	u16 reg_val;
-@@ -2218,6 +2238,174 @@ static int vsc85xx_config_inband(struct phy_device *phydev, unsigned int modes)
- 				reg_val);
- }
- 
-+static int vsc8541_led_brightness_set(struct phy_device *phydev,
-+				      u8 index, enum led_brightness value)
-+{
-+	struct vsc8531_private *vsc8531 = phydev->priv;
-+
-+	if (index >= vsc8531->nleds)
-+		return -EINVAL;
-+
-+	return vsc85xx_led_cntl_set_lock_unlock(phydev, index, value == LED_OFF ?
-+				    VSC8531_FORCE_LED_OFF : VSC8531_FORCE_LED_ON, false);
-+}
-+
-+static int vsc8541_led_hw_is_supported(struct phy_device *phydev, u8 index,
-+				       unsigned long rules)
-+{
-+	struct vsc8531_private *vsc8531 = phydev->priv;
-+	static const unsigned long supported = BIT(TRIGGER_NETDEV_LINK) |
-+					       BIT(TRIGGER_NETDEV_LINK_1000) |
-+					       BIT(TRIGGER_NETDEV_LINK_100) |
-+					       BIT(TRIGGER_NETDEV_LINK_10) |
-+					       BIT(TRIGGER_NETDEV_RX) |
-+					       BIT(TRIGGER_NETDEV_TX);
-+
-+	if (index >= vsc8531->nleds)
-+		return -EINVAL;
-+
-+	if (rules & ~supported)
-+		return -EOPNOTSUPP;
-+
-+	return 0;
-+}
-+
-+static int vsc8541_led_hw_control_get(struct phy_device *phydev, u8 index,
-+				      unsigned long *rules)
-+{
-+	struct vsc8531_private *vsc8531 = phydev->priv;
-+	u16 reg;
-+
-+	if (index >= vsc8531->nleds)
-+		return -EINVAL;
-+
-+	reg = phy_read(phydev, MSCC_PHY_LED_MODE_SEL) & LED_MODE_SEL_MASK(index);
-+	reg >>= LED_MODE_SEL_POS(index);
-+	switch (reg) {
-+	case VSC8531_LINK_ACTIVITY:
-+		*rules = BIT(TRIGGER_NETDEV_LINK) |
-+			 BIT(TRIGGER_NETDEV_RX) |
-+			 BIT(TRIGGER_NETDEV_TX);
-+		break;
-+
-+	case VSC8531_LINK_1000_ACTIVITY:
-+		*rules = BIT(TRIGGER_NETDEV_LINK) |
-+			 BIT(TRIGGER_NETDEV_LINK_1000) |
-+			 BIT(TRIGGER_NETDEV_RX) |
-+			 BIT(TRIGGER_NETDEV_TX);
-+		break;
-+
-+	case VSC8531_LINK_100_ACTIVITY:
-+		*rules = BIT(TRIGGER_NETDEV_LINK) |
-+			 BIT(TRIGGER_NETDEV_LINK_100) |
-+			 BIT(TRIGGER_NETDEV_RX) |
-+			 BIT(TRIGGER_NETDEV_TX);
-+		break;
-+
-+	case VSC8531_LINK_10_ACTIVITY:
-+		*rules = BIT(TRIGGER_NETDEV_LINK) |
-+			 BIT(TRIGGER_NETDEV_LINK_10) |
-+			 BIT(TRIGGER_NETDEV_RX) |
-+			 BIT(TRIGGER_NETDEV_TX);
-+		break;
-+
-+	case VSC8531_LINK_100_1000_ACTIVITY:
-+		*rules = BIT(TRIGGER_NETDEV_LINK) |
-+			 BIT(TRIGGER_NETDEV_LINK_100) |
-+			 BIT(TRIGGER_NETDEV_LINK_1000) |
-+			 BIT(TRIGGER_NETDEV_RX) |
-+			 BIT(TRIGGER_NETDEV_TX);
-+		break;
-+
-+	case VSC8531_LINK_10_1000_ACTIVITY:
-+		*rules = BIT(TRIGGER_NETDEV_LINK) |
-+			 BIT(TRIGGER_NETDEV_LINK_10) |
-+			 BIT(TRIGGER_NETDEV_LINK_1000) |
-+			 BIT(TRIGGER_NETDEV_RX) |
-+			 BIT(TRIGGER_NETDEV_TX);
-+		break;
-+
-+	case VSC8531_LINK_10_100_ACTIVITY:
-+		*rules = BIT(TRIGGER_NETDEV_LINK) |
-+			 BIT(TRIGGER_NETDEV_LINK_10) |
-+			 BIT(TRIGGER_NETDEV_LINK_100) |
-+			 BIT(TRIGGER_NETDEV_RX) |
-+			 BIT(TRIGGER_NETDEV_TX);
-+		break;
-+
-+	case VSC8531_ACTIVITY:
-+		*rules = BIT(TRIGGER_NETDEV_LINK) |
-+			 BIT(TRIGGER_NETDEV_RX) |
-+			 BIT(TRIGGER_NETDEV_TX);
-+		break;
-+
-+	default:
-+		*rules = 0;
-+		break;
-+	}
-+
-+	return 0;
-+}
-+
-+static int vsc8541_led_hw_control_set(struct phy_device *phydev, u8 index,
-+				      unsigned long rules)
-+{
-+	struct vsc8531_private *vsc8531 = phydev->priv;
-+	bool combine_disable = false;
-+	u16 mode = VSC8531_LINK_ACTIVITY;
-+	bool has_rx, has_tx;
-+	int ret;
-+
-+	if (index >= vsc8531->nleds)
-+		return -EINVAL;
-+
-+	if (rules & BIT(TRIGGER_NETDEV_LINK))
-+		mode = VSC8531_LINK_ACTIVITY;
-+
-+	if (rules & BIT(TRIGGER_NETDEV_LINK_10))
-+		mode = VSC8531_LINK_10_ACTIVITY;
-+
-+	if (rules & BIT(TRIGGER_NETDEV_LINK_100))
-+		mode = VSC8531_LINK_100_ACTIVITY;
-+
-+	if (rules & BIT(TRIGGER_NETDEV_LINK_1000))
-+		mode = VSC8531_LINK_1000_ACTIVITY;
-+
-+	if (rules & BIT(TRIGGER_NETDEV_LINK_100) &&
-+	    rules & BIT(TRIGGER_NETDEV_LINK_1000))
-+		mode = VSC8531_LINK_100_1000_ACTIVITY;
-+
-+	if (rules & BIT(TRIGGER_NETDEV_LINK_10) &&
-+	    rules & BIT(TRIGGER_NETDEV_LINK_1000))
-+		mode = VSC8531_LINK_10_1000_ACTIVITY;
-+
-+	if (rules & BIT(TRIGGER_NETDEV_LINK_10) &&
-+	    rules & BIT(TRIGGER_NETDEV_LINK_100))
-+		mode = VSC8531_LINK_10_100_ACTIVITY;
-+
-+	/*
-+	 * The VSC8541 PHY provides an option to control LED behavior. By
-+	 * default, the LEDx combine function is enabled, meaning the LED
-+	 * will be on when there is link/activity or duplex/collision. If
-+	 * the combine function is disabled, the LED will be on only for
-+	 * link or duplex.
-+	 *
-+	 * To control this behavior, we check the selected rules. If both
-+	 * RX and TX activity are not selected, the LED combine function
-+	 * is disabled; otherwise, it remains enabled.
-+	 */
-+	has_rx = !!(rules & BIT(TRIGGER_NETDEV_RX));
-+	has_tx = !!(rules & BIT(TRIGGER_NETDEV_TX));
-+	if (!has_rx && !has_tx)
-+		combine_disable = true;
-+
-+	ret = vsc8541_led_combine_disable_set(phydev, index, combine_disable);
-+	if (ret < 0)
-+		return ret;
-+
-+	return vsc85xx_led_cntl_set_lock_unlock(phydev, index, mode, false);
-+}
-+
- static int vsc8514_probe(struct phy_device *phydev)
- {
- 	struct vsc8531_private *vsc8531;
-@@ -2322,6 +2510,7 @@ static int vsc85xx_probe(struct phy_device *phydev)
- 	int rate_magic;
- 	u32 default_mode[2] = {VSC8531_LINK_1000_ACTIVITY,
- 	   VSC8531_LINK_100_ACTIVITY};
-+	int phy_id;
- 
- 	rate_magic = vsc85xx_edge_rate_magic_get(phydev);
- 	if (rate_magic < 0)
-@@ -2343,6 +2532,26 @@ static int vsc85xx_probe(struct phy_device *phydev)
- 	if (!vsc8531->stats)
- 		return -ENOMEM;
- 
-+	phy_id = phydev->drv->phy_id & phydev->drv->phy_id_mask;
-+	if (phy_id == PHY_ID_VSC8541) {
-+		struct device_node *np;
-+
-+		/*
-+		 * Check for LED configuration in device tree if available
-+		 * or fall back to default `vsc8531,led-x-mode` DT properties.
-+		 */
-+		np = of_get_child_by_name(phydev->mdio.dev.of_node, "leds");
-+		if (np) {
-+			of_node_put(np);
-+
-+			/* default to link activity */
-+			for (unsigned int i = 0; i < vsc8531->nleds; i++)
-+				vsc8531->leds_mode[i] = VSC8531_LINK_ACTIVITY;
-+
-+			return 0;
-+		}
-+	}
-+
- 	return vsc85xx_dt_led_modes_get(phydev, default_mode);
- }
- 
-@@ -2548,6 +2757,10 @@ static struct phy_driver vsc85xx_driver[] = {
- 	.get_sset_count = &vsc85xx_get_sset_count,
- 	.get_strings    = &vsc85xx_get_strings,
- 	.get_stats      = &vsc85xx_get_stats,
-+	.led_brightness_set = vsc8541_led_brightness_set,
-+	.led_hw_is_supported = vsc8541_led_hw_is_supported,
-+	.led_hw_control_get = vsc8541_led_hw_control_get,
-+	.led_hw_control_set = vsc8541_led_hw_control_set,
- },
- {
- 	.phy_id		= PHY_ID_VSC8552,
--- 
-2.43.0
-
+Thanks.
 
