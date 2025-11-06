@@ -1,125 +1,153 @@
-Return-Path: <netdev+bounces-236297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3C01C3AB05
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 12:50:19 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B4EAC3AA4B
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 12:42:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43FDA5622E1
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 11:38:03 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6CA745001A2
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 11:39:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27FCC30F7E0;
-	Thu,  6 Nov 2025 11:37:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6CFD3090CD;
+	Thu,  6 Nov 2025 11:38:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SILAAAiD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SNBRTV7C";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="CkXxIvsQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9335C21ABD0
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 11:37:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 064422F3635
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 11:38:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762429060; cv=none; b=Y7KSl2cCT1Wzz/JY/6CmjqBMT/0+bfp/b8L0CfEuWdq/GjhdUZrhSrsML+9QCM7ZeTt45jLwic5po07tZ2GpycH1UXk4M9GHw3kkwDQRSJ7DeAEFdGFntlTAqOjNrrcIyOU7N3IiPXaSAH6/jzuVuajSpuN2lxUfvhJcD0MnOzk=
+	t=1762429134; cv=none; b=ozPgpyKCR6Uzbggn3MXqHRIkRXz7gc9+FEAQYIY0CjlJNqgFuuq6MVfHSmGK3TbA6I7GcEagTEke2YoA1c/BHYCRTvhsUScQcycxIqg68pivmBkva0EGf4gzCuvd9z24lAY4O9+Q4zFmtgpfnilAS7JWQXdR04FOGJEZwz6FcKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762429060; c=relaxed/simple;
-	bh=ialkjfXPUU6X8FC+SzJ3KVgS8vsqr4ixyFVj95i+7Cs=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=AFw2hEg5B9ptH92Bi1eZRkl855AOpR6kPH4JZPC/sfHF46nZlANxrvK4xRESv/ntz1lM8d10tEY6Qojz4yy9ZrCW/YYTbUWj7qT0ZXih9tzWCaDCzEIEWfYXsiUHyF2Bh8PFruLEiP9je2bQwv1os1NN7iYNo8Wpd4z+JQEvMII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SILAAAiD; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-793021f348fso744119b3a.1
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 03:37:38 -0800 (PST)
+	s=arc-20240116; t=1762429134; c=relaxed/simple;
+	bh=1im8cEsSwPU3z1wUcIFZMYr3Hf80GzC/cfDI1HoTkEk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LHYdOm6kNVD6i6v7d4kv96NtQE9dlThHD9+z0JwYMOzb2SaaheNJOnhnW6xLCCeICYl9zWOGwc0uY+PFaJmZfz74IeByTlFEGOqJoZeAd0LP0t1yZhiiFjF+F5u+oPzy/rWVXip027in3MqeLdgSRwPA8T5oyX4ssemdg1VQxqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SNBRTV7C; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=CkXxIvsQ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762429132;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qsR7dUNbKYyGm3G2Ypb+Ygd27jeSq0CETiTbO/x2Dv8=;
+	b=SNBRTV7Ceum6BIanmmbDHOlNoaUjHzIKV4FZHS8lRR2jq7CwOCzV/BXCsr16QxXDbOVl89
+	7Xn48I4IepYJlDgUVfJJtg9dSg4dNhJhw9VSnX9MA8MO/yg4etHwSjG4/cz7c3sWspAeNa
+	aMtLnM5asj29ymVPUse1JZfCYE6Es/0=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-505-OV2-z8ajOzqVjLuvcoGohQ-1; Thu, 06 Nov 2025 06:38:50 -0500
+X-MC-Unique: OV2-z8ajOzqVjLuvcoGohQ-1
+X-Mimecast-MFC-AGG-ID: OV2-z8ajOzqVjLuvcoGohQ_1762429129
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-429e31f5ea1so520913f8f.2
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 03:38:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762429058; x=1763033858; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=hjvib5l1jl7c+bMGrAcG+xXz8naE9IfiWdK2rk+q+nw=;
-        b=SILAAAiD+95xMYc54QFUI6fvZAdTk06zkyBQ2wIUcrPya65Z3mNG2TTpDwP5/UNK//
-         P/2RJKa92xrEFGSLaxi2WxEEDXpnxCVU2vmgrL2E48rEALOgu3reC0J7NV63KKZIJOcK
-         Q/fWZI94mR8LZRJIWf2a9+6cSlcc90hVfpv/pBJ5x+VT5uKT5ieQfhtaAjsZMRRUy/vB
-         h9GIc08m7gZyxoRC/78Mwjy+x/CXfbkAenbBMaiqua//DJEGNOZKFuGXgTI0F5Mz1roJ
-         kmhkGMTtJ24egsIeNGFNTKc3rjFqbL44si/EhWr/g639ZTg4RwAKjs1EBqeLDKjF/Akk
-         MM6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762429058; x=1763033858;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+        d=redhat.com; s=google; t=1762429129; x=1763033929; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=hjvib5l1jl7c+bMGrAcG+xXz8naE9IfiWdK2rk+q+nw=;
-        b=VExv2fK5iA/Ppe6zSwt4ku96Za7dd3k0Nrkd9Frb9iPRXXN8AcEpDz+kBakJSMFP52
-         u75l/d8oEmSJNEujiN+7k4AMSKHbAStQEII7cJgtexYKO3pK6KzY530hN2cka9hPCa+E
-         YAd2gDzjE85d0MU0QT9ZE3qHJlAhALPYx+9Y0l+v+rwXufY7Y+XLQD7jG8hp0mqTHI2c
-         ZSii0Wwzn6aeDhWRJE3KExlaISSB+Tlqb81k9iLPce6LDhpPnn1PlEfqEjoiqRvYET4o
-         Yy8IJcbxG4oYFffy5fS3UVaHGYxMst1BYwKlSBTdp9hd2zosEDB+hdFtHSq/LzSEs32f
-         kXOA==
-X-Forwarded-Encrypted: i=1; AJvYcCWlGBEzOX4cky+o0MfK24csYiXi/LGZlqNAwzWrvzFOt+RL/SoJT/mtgmUUEX8AwjFalX9TsWs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzIrc5lmawdrjIFivAGLOVgGU6ZqYRasdMbl+pVrxBOBtmxZ/YZ
-	5ODNxmomEtJvGf7Sw7gKmLm4tngr3iqV3mfac8d426IqYGSUtdt1uoEm
-X-Gm-Gg: ASbGncvqmxbkmxd7enLvcPioIauNNQlD3+H19WYn4pQ3kZzTxGybO9n0jnJpUEjXgdc
-	VSmC06W8PWYUiEh0x+b15w64LgDZfFdvAf18myqGpUIo874i9xiB63WQQwXyzPpbuZfE5k+DtE5
-	0eSWlhlPjskvE8EfDN4kCwZNOseNKcn1VJdBgulxGwWsOJDJSRBKO6ysAzvrYQPUHvt1GM1NHEI
-	HG9HghjA0AR2Sztfhgan3bTPJANZMEXsBbu2ym8D6o7d3ouLvhuI2NGofXkOzYAJOzLTWeaj1SW
-	dY6HwrJ2Lsu/Uy161bzbh2joiBpLVbrBj47V74qvsZWqyP+rrrBhw2/+vSe4FHlR1mB+th4HNDu
-	mxT/w9gZ1dHt6Gew9JB2ZO77OW1ctFms5U2TUhiFDBK3Y0ByMysZQVX/hu/Bzhj8866uLIWyWOv
-	IWiIOkHjNYdNLq2u3m44uxS3/xjSdcjnFYSODVnZs1nE2MB/Ar
-X-Google-Smtp-Source: AGHT+IE49q3UoW4OFpWbNglvInQNVRlN+yhDQFQFunxA5RskR8zFPZ2d8CXgzPfWY0cjgsF/X3MOtg==
-X-Received: by 2002:a05:6a00:4601:b0:7a2:74e5:a4a4 with SMTP id d2e1a72fcca58-7ae1eda0949mr8034636b3a.19.1762429057535;
-        Thu, 06 Nov 2025 03:37:37 -0800 (PST)
-Received: from ?IPv6:2401:4900:88f4:f6c4:5041:b658:601d:5d75? ([2401:4900:88f4:f6c4:5041:b658:601d:5d75])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7af826f9520sm2452518b3a.56.2025.11.06.03.37.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Nov 2025 03:37:37 -0800 (PST)
-Message-ID: <f3c89a9182387cd0df012726fc30841aae8d330d.camel@gmail.com>
-Subject: Re: [Intel-wired-lan] [PATCH v2] net: ethernet: fix uninitialized
- pointers with free attr
-From: ally heev <allyheev@gmail.com>
-To: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>, "Nguyen, Anthony
- L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
- <przemyslaw.kitszel@intel.com>,  Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet	
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni	
- <pabeni@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang	
- <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, "Cui, Dexuan"	
- <decui@microsoft.com>
-Cc: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>, 
- "netdev@vger.kernel.org"
-	 <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	 <linux-kernel@vger.kernel.org>, "linux-hyperv@vger.kernel.org"
-	 <linux-hyperv@vger.kernel.org>, Dan Carpenter <dan.carpenter@linaro.org>
-Date: Thu, 06 Nov 2025 17:07:29 +0530
-In-Reply-To: <DS4PPF7551E6552E6053CC02144D0987191E5C2A@DS4PPF7551E6552.namprd11.prod.outlook.com>
-References: 
-	<20251106-aheev-uninitialized-free-attr-net-ethernet-v2-1-048da0c5d6b6@gmail.com>
-	 <DS4PPF7551E6552E6053CC02144D0987191E5C2A@DS4PPF7551E6552.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.56.1-1+deb13u1 
+        bh=qsR7dUNbKYyGm3G2Ypb+Ygd27jeSq0CETiTbO/x2Dv8=;
+        b=CkXxIvsQ9x5e8EpPuwTJUCKNVCnZ2f0k0CWy/W+XEw78HvukKVA5U1U+Vu2WTT1awY
+         4PyuuIaPZ57C/0apYFhcBfuOwlglqMbXHaEg5ydS5plXaa8X1U9Enus1QQshy/OZ8WA4
+         80LfMFXFnkXVq1MJAGVQ4xkoghAXY8Sh3R1Nb0gV3Y566s9cYLaBwUW00z6MMqvNr4Lq
+         IMa04RUxTWVhyM5O82G0uQYS18SbVaNLntkj3YCh0LUi6jnhOheaaaj1aO7oEeDjkwH/
+         37hxIxYQ8/4Mzcb6EZMb3+v3LKv8KU57Cf/C7HU1Q/PIsuMK15rp2prP2YvW7yiRJiLF
+         TaCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762429129; x=1763033929;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qsR7dUNbKYyGm3G2Ypb+Ygd27jeSq0CETiTbO/x2Dv8=;
+        b=T6l/GcI9WK8hdgxYHNa8Qcd1FNV2w0Fb0hjleqBqiwaUK0Jid7C5DP/JCKMIdrGiG/
+         Mt/o6akuCz/gtNW8zoJx1QTIwnhyNlpoIZ21q8b8PeBtohO/wtMeHUOgnWF8PZYVNPM3
+         bYXmw3Ut2/Mcepb82g8EnKRhy6AgwdXrIgfNO057Jz4F+E6QyaKZ0c/3NlWTLSERAvcL
+         a8jrr3Gbe0wxV90iIJ9BfcvkbXp0WdsU/LsaafEZYeAjvR/XmzH5peXOywoA8RkC+pRG
+         Kw/dfzG7CnUIeX6dvyIPY1chYpHox2dn4DqLF7Rz5GvY4WvSGgvwh0Hhf6+ODMmGFUqp
+         auug==
+X-Forwarded-Encrypted: i=1; AJvYcCWQ3sQvHpF7e7oe/TC8W2pzmOV9ef43aArZZANg2bpqF6Y9cxYLxjTaAodsAup6jx1cbkWhppg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YywwNWk9iR48/Uzgtqc0ARaqmXtbGL0QS22Tmmn6CgxYrIaRVzb
+	PpI4qusKdYBfT2mlvl7t9ZbNfmzulOFdTYs6NyUX3yrJdLI2EYNRDFGNpaGNA3SDcNOrQOjXdyZ
+	v93R7a5fsdM0288a6N6fJjF53PnPYMkBM7/xfZMR5zDd4j5N7X4dKVRNYJA==
+X-Gm-Gg: ASbGncuouutaayXAvxm46AH5BLhydGaCP2Q+oPzkpM0BsfW60OtcXU87dxxcO9+ktEj
+	UhCiREP/5RcUx5g7FfbATOxPDo23NR1xXGcHI6m0TjPb29/i8/0g5wlNjdBjbbsiZQ+jw6ziwZJ
+	EJJSzd3kFcqInoyL51qNLC7dB/H/ngMPTrVkPOXoObg4qmaWOmj2KU65w+hUcNJZTKjBMSGkoLa
+	I9SznLFq//hGmkbALHpYa83NKOc2uW8+38dCITQXAs/7YslaIvSSI1/M65nJgeUzoHO3Pv4ex39
+	+9N9HH+FavIWKolk4Z1l92KTP8VQn+7Vr+OCMeCQFD+XEZdTFjcKi6tjKgTJmoArSxKwnAy94DL
+	y7g==
+X-Received: by 2002:a05:600c:3551:b0:475:dd59:d8da with SMTP id 5b1f17b1804b1-4775ce2b673mr68256845e9.40.1762429129531;
+        Thu, 06 Nov 2025 03:38:49 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE7kUvneRaqEvt7Kh1+lSjkJl0uXf/wS14yYzwd3nHIQHFp+DgBSlRyvRM7xPYT467KsqDWCg==
+X-Received: by 2002:a05:600c:3551:b0:475:dd59:d8da with SMTP id 5b1f17b1804b1-4775ce2b673mr68256395e9.40.1762429129057;
+        Thu, 06 Nov 2025 03:38:49 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.83])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47764152a13sm13759115e9.13.2025.11.06.03.38.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Nov 2025 03:38:48 -0800 (PST)
+Message-ID: <bc1ebcd0-c42c-4b59-a37a-13ee214e90a6@redhat.com>
+Date: Thu, 6 Nov 2025 12:38:46 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 net-next 05/14] tcp: L4S ECT(1) identifier and
+ NEEDS_ACCECN for CC modules
+To: chia-yu.chang@nokia-bell-labs.com, edumazet@google.com, parav@nvidia.com,
+ linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org,
+ dsahern@kernel.org, kuniyu@google.com, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com,
+ kuba@kernel.org, stephen@networkplumber.org, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, davem@davemloft.net, andrew+netdev@lunn.ch,
+ donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
+ shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
+ ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
+ g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
+ mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
+ Jason_Livingood@comcast.com, vidhi_goel@apple.com
+Cc: Olivier Tilmans <olivier.tilmans@nokia.com>
+References: <20251030143435.13003-1-chia-yu.chang@nokia-bell-labs.com>
+ <20251030143435.13003-6-chia-yu.chang@nokia-bell-labs.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251030143435.13003-6-chia-yu.chang@nokia-bell-labs.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, 2025-11-06 at 10:18 +0000, Loktionov, Aleksandr wrote:
-[..]
-> Code style:
-> The new declaration + initializer is good, but please ensure both hunks s=
-tay within ~80 columns in drivers/net/*.
-> Wrapping like this is fine:
->=20
-> struct ice_flow_prof_params *params __free(kfree) =3D
->         kzalloc(sizeof(*params), GFP_KERNEL);
+On 10/30/25 3:34 PM, chia-yu.chang@nokia-bell-labs.com wrote:
+> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> index 7f5df7a71f62..d475f80b2248 100644
+> --- a/net/ipv4/tcp_output.c
+> +++ b/net/ipv4/tcp_output.c
+> @@ -328,12 +328,17 @@ static void tcp_ecn_send(struct sock *sk, struct sk_buff *skb,
+>  			 struct tcphdr *th, int tcp_header_len)
+>  {
+>  	struct tcp_sock *tp = tcp_sk(sk);
+> +	bool ecn_ect_1;
+>  
+>  	if (!tcp_ecn_mode_any(tp))
+>  		return;
+>  
+> +	ecn_ect_1 = tp->ecn_flags & TCP_ECN_ECT_1;
+> +	if (ecn_ect_1 && !tcp_accecn_ace_fail_recv(tp))
+> +		__INET_ECN_xmit(sk, true);
 
-I ran checkpatch with `$max_line_length` set to 80. It didn't throw any err=
-ors/warnings
+I'm possibly lost, but I can't find ecn_flags TCP_ECN_ECT_1 bit being
+set here or elsewhere in this series.
 
-Regards,
-Ally
+Also why isn't this chunk under `if (tcp_ecn_mode_accecn(tp))` ?
+
+/P
 
 
