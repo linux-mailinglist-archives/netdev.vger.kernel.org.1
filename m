@@ -1,141 +1,177 @@
-Return-Path: <netdev+bounces-236233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D0EDC39F66
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 10:59:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 412C0C39FA5
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 11:00:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2F3D450127E
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 09:54:29 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CD9415020C8
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 09:55:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 972B430C62A;
-	Thu,  6 Nov 2025 09:51:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6D4430FC3A;
+	Thu,  6 Nov 2025 09:53:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="IkUon86Z"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="ntt1owRe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
+Received: from server.couthit.com (server.couthit.com [162.240.164.96])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D19B32BD587
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 09:51:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAB6D308F32;
+	Thu,  6 Nov 2025 09:53:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.164.96
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762422680; cv=none; b=W1pnB+LN09a4z8Fx8AwBdXQAONIlBsyd21FNe93zKit91liewf5xJzcUGhttdAOUokLCxnoIsaW5riB1F/deUV36eiSD2epkNfXjsT+jJKgz2y7DRbGWxqsJIE6p6+PU9pQpTHfXgMEJrxQYkJpDq0SIhpqxzYJQwidzQ7eG1dE=
+	t=1762422809; cv=none; b=owxxGtCbHZWtFt9rWhmqWeXCpS/v1+q2kx+UiC8Dp/11G0IbnvnN3zQPfzipSUPpGkVfmYEqFNFjyFQ/XZaDDGDy6k5//2lhpiNavcusz5CjZAfVwxJS7Wx0XgP27u3CXhnrz3gyQG69XCmzIGhxfXHr1MO1EmEaLOnELljsnxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762422680; c=relaxed/simple;
-	bh=qONlvSBo66YvzCUw7N/K/Ey1Qxf0ayALs3tPgjByocI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q3ALCftOG0jMs5jBelHpZIGYtZvwmTTmFT+hfcPGSbYxGIn6vlJONh7eRBKlaiRkWb0c45P9D+Hh7E3UZFEfsiZNVjikIUs+DPCNq051MotZypiPFjdKhotn2JUpzO9uBuJl2QEZaqJ9In19XhLrYR5ZDFxSNLESSn4WVAmJBvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=IkUon86Z; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id 5A5FC1A18F0;
-	Thu,  6 Nov 2025 09:51:17 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 2FF176068C;
-	Thu,  6 Nov 2025 09:51:17 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 110B1118507AC;
-	Thu,  6 Nov 2025 10:51:13 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1762422676; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=Rp655FzXH2A2y43WF7aasYvRN2DWp9+Yw7ifAbM4T4s=;
-	b=IkUon86Z+RDlE597yLWPPOBguIwZMMLqkyH88Ax/Ro3PxgqGFe/LUJOlH6HdPmxmcyTu2C
-	88xrMwWPQFUseuhkje88DLxczeeLfhkOY7YW9ae25Is+DAPDnr5Rj3zXRdAvY02j/Sriet
-	GUZHgvJdOzmZh7NatnBqg2xAbmBPf6mUfeS2z5bsa6R9UeehNEBXdoUzotmtOW1iZS0hp9
-	5Z66CG461rwL53FJqKqocwYlxU/FcoXc3L7Dhl5XHKqP5zvFoEFJPtioCANfNYnFVqVEDH
-	oI0DkpodK2DI5k7+nQsB+xfPWQrfjwt3tu7ZZJDJvMB1b2l9l739qRrKDz4K6w==
-Message-ID: <0a7f90b1-3962-440f-ab18-ef6542b92af0@bootlin.com>
-Date: Thu, 6 Nov 2025 10:51:13 +0100
+	s=arc-20240116; t=1762422809; c=relaxed/simple;
+	bh=YWZ/f/Xm1TThWex2nsBM4B/s0uZIWCj3VSnqdGUIuPE=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=KPzvV7XB76TNfAhp2S1TnssylU3xbFqA6wLBasTXQzqKENrNVns5JU0Odp/+i9V/+SqF3+EpyOfsMl/PRbKJvj2bVQrDsBMgtuRLGFzO0TnnaWM+dmN98Epjij7KW0/RxHJgO/bsm8CGj40eaVdJ4qUXIQUlDnhN4ZncPZ7x1Kc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=ntt1owRe; arc=none smtp.client-ip=162.240.164.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
+	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=YoDsD4YThrjSbuELnltLiWQ+YOjpC6WcOh7YxtTv6HI=; b=ntt1owReZ0Id+/bbRkYL2hQKN/
+	GCkLpH3eoYe4hZkvVPXLouQ3qdp9fSNo3I6ARHXMZSmSJjAq2YAyhnfg3cYXeu+gfwhtA/V27C8Sl
+	hW70eO3R1KzDM+tbs1vFZuTS2r4AT+GhG/O9FF9WmQqOxmiAZgFxrOoPb5DvRgtUiU9mS6wwym0Gb
+	bsxOCiEy03/u4aw+c+AsU7736S4iJYXCg4/ahfBAczBCZomFDQABwCmM49ujyyMTc9psEYSNF391H
+	E0xeCYOFHWKwRbpkwXdIYwyLF+1P9Nz0v2wnShMY3HWassnIJQBCB5rnc/iKmPFKutB4Pxma4Wu9K
+	dW73DJSA==;
+Received: from [122.175.9.182] (port=23110 helo=zimbra.couthit.local)
+	by server.couthit.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.1)
+	(envelope-from <parvathi@couthit.com>)
+	id 1vGwgA-00000009M01-3hpK;
+	Thu, 06 Nov 2025 04:53:19 -0500
+Received: from zimbra.couthit.local (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTPS id 021821781F3C;
+	Thu,  6 Nov 2025 15:23:15 +0530 (IST)
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTP id DB99B1784032;
+	Thu,  6 Nov 2025 15:23:14 +0530 (IST)
+Received: from zimbra.couthit.local ([127.0.0.1])
+	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id Q6H1Vmypm5ww; Thu,  6 Nov 2025 15:23:14 +0530 (IST)
+Received: from zimbra.couthit.local (zimbra [10.10.10.103])
+	by zimbra.couthit.local (Postfix) with ESMTP id 8EDF01781F3C;
+	Thu,  6 Nov 2025 15:23:14 +0530 (IST)
+Date: Thu, 6 Nov 2025 15:23:14 +0530 (IST)
+From: Parvathi Pudi <parvathi@couthit.com>
+To: afd <afd@ti.com>
+Cc: nm <nm@ti.com>, Vignesh Raghavendra <vigneshr@ti.com>, 
+	tony <tony@atomide.com>, robh <robh@kernel.org>, 
+	krzk+dt <krzk+dt@kernel.org>, conor+dt <conor+dt@kernel.org>, 
+	richardcochran <richardcochran@gmail.com>, 
+	linux-omap <linux-omap@vger.kernel.org>, 
+	devicetree <devicetree@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	netdev <netdev@vger.kernel.org>, Andrew Lunn <andrew@lunn.ch>, 
+	danishanwar <danishanwar@ti.com>, pratheesh <pratheesh@ti.com>, 
+	j-rameshbabu <j-rameshbabu@ti.com>, praneeth <praneeth@ti.com>, 
+	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
+	krishna <krishna@couthit.com>, mohan <mohan@couthit.com>, 
+	pmohan <pmohan@couthit.com>, basharath <basharath@couthit.com>, 
+	m-karicheri2 <m-karicheri2@ti.com>, parvathi <parvathi@couthit.com>
+Message-ID: <444398864.187812.1762422794296.JavaMail.zimbra@couthit.local>
+In-Reply-To: <89858ed0-58fd-4056-b8af-065c92885a10@ti.com>
+References: <20251103124820.1679167-1-parvathi@couthit.com> <20251103124820.1679167-3-parvathi@couthit.com> <89858ed0-58fd-4056-b8af-065c92885a10@ti.com>
+Subject: Re: [PATCH v2 2/2] arm: dts: ti: Adds support for AM335x and AM437x
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 02/11] net: stmmac: ingenic: simplify jz4775
- mac_set_mode()
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
- linux-stm32@st-md-mailman.stormreply.com,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>
-References: <aQtQYlEY9crH0IKo@shell.armlinux.org.uk>
- <E1vGdWk-0000000ClnU-0cVZ@rmk-PC.armlinux.org.uk>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <E1vGdWk-0000000ClnU-0cVZ@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - GC138 (Linux)/8.8.15_GA_3968)
+Thread-Topic: Adds support for AM335x and AM437x
+Thread-Index: 5iKEgrqd+6T7XN5cqv4nZpstY2kVHg==
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.couthit.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.couthit.com: authenticated_id: smtp@couthit.com
+X-Authenticated-Sender: server.couthit.com: smtp@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
+Hi,
 
-On 05/11/2025 14:26, Russell King (Oracle) wrote:
-> All paths configure the transmit clock as an input. Move this out of
-> the switch() statement to simplify the code.
+> On 11/3/25 6:47 AM, Parvathi Pudi wrote:
+>> From: Roger Quadros <rogerq@ti.com>
+>> 
+>> PRU-ICSS instance consists of two PRU cores along with various
+>> peripherals such as the Interrupt Controller (PRU_INTC), the Industrial
+>> Ethernet Peripheral(IEP), the Real Time Media Independent Interface
+>> controller (MII_RT), and the Enhanced Capture (eCAP) event module.
+>> 
+>> The TI Sitara AM335x ICE-V2 consists of single PRU-ICSS instance,
+>> This patch adds the new device tree source file in-order to use
+>> PRU-ICSS instance, along with makefile changes to add the new DTS
+>> file for PRUSS.
+>> 
+>> The TI Sitara AM437x series of devices consists of 2 PRU-ICSS instances
+>> (PRU-ICSS0 and PRU-ICSS1). This patch adds the device tree nodes for the
+>> PRU-ICSS1 instance to support DUAL-MAC mode of operation. Support for
+>> Ethernet over PRU is available only for ICSS1 instance.
+>> 
+>> am33xx-l4.dtsi, am4372.dtsi - Adds IEP and eCAP peripheral as child nodes
+>> of the PRUSS subsystem node.
+>> 
+>> am335x-icev2-prueth.dts, am437x-idk-evm.dts - Adds PRU-ICSS
+>> instance node along with PRU eth port information and corresponding
+>> port configuration. It includes interrupt mapping for packet reception,
+>> HW timestamp collection, and PRU Ethernet ports in MII mode,
+>> 
+>> GPIO configuration, boot strapping along with delay configuration for
+>> individual PRU Ethernet port and other required nodes.
+>> 
+>> Signed-off-by: Roger Quadros <rogerq@ti.com>
+>> Signed-off-by: Andrew F. Davis <afd@ti.com>
+>> Signed-off-by: Murali Karicheri <m-karicheri2@ti.com>
+>> Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
+>> Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
+>> ---
+>>   arch/arm/boot/dts/ti/omap/Makefile            |   1 +
+>>   .../boot/dts/ti/omap/am335x-icev2-prueth.dts  | 533 ++++++++++++++++++
+>>   arch/arm/boot/dts/ti/omap/am33xx-l4.dtsi      |  11 +
+>>   arch/arm/boot/dts/ti/omap/am4372.dtsi         |  11 +
+>>   arch/arm/boot/dts/ti/omap/am437x-idk-evm.dts  | 137 ++++-
+>>   5 files changed, 692 insertions(+), 1 deletion(-)
+>>   create mode 100644 arch/arm/boot/dts/ti/omap/am335x-icev2-prueth.dts
+>> 
+>> diff --git a/arch/arm/boot/dts/ti/omap/Makefile
+>> b/arch/arm/boot/dts/ti/omap/Makefile
+>> index 1aef60eef671..d06dd31d0bb6 100644
+>> --- a/arch/arm/boot/dts/ti/omap/Makefile
+>> +++ b/arch/arm/boot/dts/ti/omap/Makefile
+>> @@ -100,6 +100,7 @@ dtb-$(CONFIG_SOC_AM33XX) += \
+>>   	am335x-evmsk.dtb \
+>>   	am335x-guardian.dtb \
+>>   	am335x-icev2.dtb \
+>> +	am335x-icev2-prueth.dtb \
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-
-Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-
-> ---
->  .../net/ethernet/stmicro/stmmac/dwmac-ingenic.c    | 14 ++++++--------
->  1 file changed, 6 insertions(+), 8 deletions(-)
+> This new DTB looks to be almost identical to the regular am335x-icev2.dtb, to
+> add an optional node to an existing board use DT overlay, do not clone the
+> whole board DT just to add a node. Maybe that is how we hacked around this
+> in our evil vendor tree back in 2018 but do not take our old hacks and push
+> them upstream as-is.
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-> index 8d0627055799..c6c82f277f62 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
-> @@ -78,20 +78,17 @@ static int jz4775_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
->  
->  	switch (plat_dat->phy_interface) {
->  	case PHY_INTERFACE_MODE_MII:
-> -		val = FIELD_PREP(MACPHYC_TXCLK_SEL_MASK, MACPHYC_TXCLK_SEL_INPUT) |
-> -			  FIELD_PREP(MACPHYC_PHY_INFT_MASK, MACPHYC_PHY_INFT_MII);
-> +		val = FIELD_PREP(MACPHYC_PHY_INFT_MASK, MACPHYC_PHY_INFT_MII);
->  		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_MII\n");
->  		break;
->  
->  	case PHY_INTERFACE_MODE_GMII:
-> -		val = FIELD_PREP(MACPHYC_TXCLK_SEL_MASK, MACPHYC_TXCLK_SEL_INPUT) |
-> -			  FIELD_PREP(MACPHYC_PHY_INFT_MASK, MACPHYC_PHY_INFT_GMII);
-> +		val = FIELD_PREP(MACPHYC_PHY_INFT_MASK, MACPHYC_PHY_INFT_GMII);
->  		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_GMII\n");
->  		break;
->  
->  	case PHY_INTERFACE_MODE_RMII:
-> -		val = FIELD_PREP(MACPHYC_TXCLK_SEL_MASK, MACPHYC_TXCLK_SEL_INPUT) |
-> -			  FIELD_PREP(MACPHYC_PHY_INFT_MASK, MACPHYC_PHY_INFT_RMII);
-> +		val = FIELD_PREP(MACPHYC_PHY_INFT_MASK, MACPHYC_PHY_INFT_RMII);
->  		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_RMII\n");
->  		break;
->  
-> @@ -99,8 +96,7 @@ static int jz4775_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
->  	case PHY_INTERFACE_MODE_RGMII_ID:
->  	case PHY_INTERFACE_MODE_RGMII_TXID:
->  	case PHY_INTERFACE_MODE_RGMII_RXID:
-> -		val = FIELD_PREP(MACPHYC_TXCLK_SEL_MASK, MACPHYC_TXCLK_SEL_INPUT) |
-> -			  FIELD_PREP(MACPHYC_PHY_INFT_MASK, MACPHYC_PHY_INFT_RGMII);
-> +		val = FIELD_PREP(MACPHYC_PHY_INFT_MASK, MACPHYC_PHY_INFT_RGMII);
->  		dev_dbg(mac->dev, "MAC PHY Control Register: PHY_INTERFACE_MODE_RGMII\n");
->  		break;
->  
-> @@ -110,6 +106,8 @@ static int jz4775_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
->  		return -EINVAL;
->  	}
->  
-> +	val |= FIELD_PREP(MACPHYC_TXCLK_SEL_MASK, MACPHYC_TXCLK_SEL_INPUT);
-> +
->  	/* Update MAC PHY control register */
->  	return regmap_update_bits(mac->regmap, 0, mac->soc_info->mask, val);
->  }
+> Andrew
+> 
 
+Understood. We will review this redundancy and revert back with an update.
+
+
+Thanks and Regards,
+Parvathi.
 
