@@ -1,254 +1,142 @@
-Return-Path: <netdev+bounces-236231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6E55C39F27
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 10:57:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80025C39EEE
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 10:55:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 64A064FE37B
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 09:53:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF4E31A425A2
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 09:53:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A2BF315D22;
-	Thu,  6 Nov 2025 09:48:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19B6E2E4258;
+	Thu,  6 Nov 2025 09:50:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="B7tA4I0o"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="L1a3WepO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EBF130DD1B
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 09:48:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FED314E2E2
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 09:50:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762422534; cv=none; b=eJ3WqFuD9BYGzyMS0sQU3Qfk0CuojwK3mrNxg+hzaz5dYOSh3CM3h2+LasfC7rbxeyoH0pPg5fMSOy7cgpLUY40eCA/3jLfG4tiV2/Hk/taX5OMwwaJPWnB4Da00Pt4l140zb8Drh4ryUE3YriYi6WIJVLTXw4ZZ51t++1IBMT0=
+	t=1762422604; cv=none; b=Zw0WmUTcxoBtmtZZrNf1gPoMz2gsK1rY2pWvoOXm2yUUtZKQyxFfQ8L/LmyhK5cJrOuohdBcg1Dcm2khE7WD9417iCFalmEba+Zo/S/lPKlBpZajQkWDpEVrCPUWuj8Ft1bjdkyUw4DdBsvSJ2j2wUteHE7DeBrVIKYdE6SGV6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762422534; c=relaxed/simple;
-	bh=0TshHz+EiuE1RsepmtbV/hUUf1mlLhmCPf6WETyCxFY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Dr79vDxdM3Inf+4liLSaMgb3iARfVCSqOmsZh9Vst6RLHpyNWrHeq4K8aaLva9OpBWb3n4efo1g3gNhIA8Int2UKtnc3wim8mSxEpK6KFLMC6lvIFwigPpDSxNZibx7T4dbdskPid5f+h9WB+mRET9lGy3Bsbv5yNPsUgi8sDTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=B7tA4I0o; arc=none smtp.client-ip=185.171.202.116
+	s=arc-20240116; t=1762422604; c=relaxed/simple;
+	bh=Z4OgPtaDhkNm3Omg7+xAcWwcme6n538Igbs+UiMoS9w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HNajongzbVgSD7QktvcD5Qg0q+YXa5WfGDN0Lb8I2WNmCW2i2+kJiIUdmqCO04cVXkWc9cnPYigWp7n4eVa+fLA2JQnaQ3C1N+wBL390nVJbscc2LdA5EPIKWeTbHYhAO6DcZUAx4mFhVnm/+1HHnxseqdhAlYm/crk/o04BOUQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=L1a3WepO; arc=none smtp.client-ip=185.171.202.116
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id E1CAFC0FA85;
-	Thu,  6 Nov 2025 09:48:29 +0000 (UTC)
+	by smtpout-04.galae.net (Postfix) with ESMTPS id CC160C0FA85;
+	Thu,  6 Nov 2025 09:49:39 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id EE6D96068C;
-	Thu,  6 Nov 2025 09:48:50 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id ABE3511850800;
-	Thu,  6 Nov 2025 10:48:46 +0100 (CET)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id D256D6068C;
+	Thu,  6 Nov 2025 09:50:00 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 74FAF1185082B;
+	Thu,  6 Nov 2025 10:49:56 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1762422529; h=from:subject:date:message-id:to:cc:mime-version:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=jXByP2VXvi7xorCjd6MQXASkkO7cHIH34AYFhLenOkA=;
-	b=B7tA4I0ot6CTTbc9IIhHgtbyyULTHrMJNPKUlFfLhJCiG4wU/t4fzSgPRsGTkENxRTrqOT
-	dLrVtyAmIT3TkwRViy3ogZ+Fsjecte6viJ8HRRQ0SvnplZeyWLetQ3cmEU6YIu4/ztOYY7
-	viz8rUuGfIQgPp9Sc+fhEPdOa4KUN/Sq1JIAYe8g3kw2na+QjpuBxziPmdxqmL4jKua2bu
-	8jCri4TTZwW5u9+nMxVaCQF6V+BoFVtybVJUPcLyEcBIjkbeVchmrYjSFs74E0yuoESPE8
-	GDJDfPJzBHtZ7NTXn8iGskvJ/Pvao0a+zSHqiH31DVYW2CRNqbZXXcmFP3kuBw==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	mwojtas@chromium.org,
-	Antoine Tenart <atenart@kernel.org>,
-	devicetree@vger.kernel.org,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: [PATCH net-next v15 15/15] Documentation: networking: Document the phy_port infrastructure
-Date: Thu,  6 Nov 2025 10:47:40 +0100
-Message-ID: <20251106094742.2104099-16-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.49.0
-In-Reply-To: <20251106094742.2104099-1-maxime.chevallier@bootlin.com>
-References: <20251106094742.2104099-1-maxime.chevallier@bootlin.com>
+	t=1762422600; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=mm64gM8EXxiCL6h3Shnl5SuMXJZ/nOwqbkGzDPWYn9E=;
+	b=L1a3WepOX0khJ/Ur85az6tTXBpWZEK6J3cxK9BR4VanbsnRCJAPCgMjbP9n1/cQAqS9W/y
+	80NmkjLcdsCoDMu3nR4a2wIJXck4IgFqHKldChNWb8dq4vQGYb6KXAjOLzUIki1xazaQvu
+	5CRQeViz8SsJILlwtGKgWP+0CYKkOp3K7cL9BtJiE1joAtQUKdnj0bZK6e3qvfYXe5lwRT
+	ic2C2OTTNCUcYZU/MHwD2IC1EGDbdN7UYu/OivteDmiujRxBszMrGplq/wQxRIMU3atPo0
+	h3/JvgD9im0KBT3bqnum8wMp5G617rq5Rmi82aByxxrZYMeef8Sh8SyRi7V1GQ==
+Message-ID: <a51db9ea-a6e9-476d-915a-2aa532fa3392@bootlin.com>
+Date: Thu, 6 Nov 2025 10:49:56 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 01/11] net: stmmac: ingenic: move
+ ingenic_mac_init()
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>
+References: <aQtQYlEY9crH0IKo@shell.armlinux.org.uk>
+ <E1vGdWf-0000000ClnO-03pS@rmk-PC.armlinux.org.uk>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <E1vGdWf-0000000ClnO-03pS@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 X-Last-TLS-Session-Version: TLSv1.3
 
-This documentation aims at describing the main goal of the phy_port
-infrastructure.
 
-Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
- Documentation/networking/index.rst    |   1 +
- Documentation/networking/phy-port.rst | 111 ++++++++++++++++++++++++++
- MAINTAINERS                           |   1 +
- 3 files changed, 113 insertions(+)
- create mode 100644 Documentation/networking/phy-port.rst
+On 05/11/2025 14:26, Russell King (Oracle) wrote:
+> Move ingenic_mac_init() to between variant specific set_mode()
+> implementations and ingenic_mac_probe(). No code changes.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-diff --git a/Documentation/networking/index.rst b/Documentation/networking/index.rst
-index c775cababc8c..915c27977756 100644
---- a/Documentation/networking/index.rst
-+++ b/Documentation/networking/index.rst
-@@ -96,6 +96,7 @@ Contents:
-    packet_mmap
-    phonet
-    phy-link-topology
-+   phy-port
-    pktgen
-    plip
-    ppp_generic
-diff --git a/Documentation/networking/phy-port.rst b/Documentation/networking/phy-port.rst
-new file mode 100644
-index 000000000000..ff844ace607e
---- /dev/null
-+++ b/Documentation/networking/phy-port.rst
-@@ -0,0 +1,111 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+.. _phy_port:
-+
-+=================
-+Ethernet ports
-+=================
-+
-+This document is a basic description of the phy_port infrastructure,
-+introduced to represent physical interfaces of Ethernet devices.
-+
-+Without phy_port, we already have quite a lot of information about what the
-+media-facing interface of a NIC can do and looks like, through the
-+:c:type:`struct ethtool_link_ksettings <ethtool_link_ksettings>` attributes,
-+which includes :
-+
-+ - What the NIC can do through the :c:member:`supported` field
-+ - What the Link Partner advertises through :c:member:`lp_advertising`
-+ - Which features we're advertising through :c:member:`advertising`
-+
-+We also have info about the number of pairs and the PORT type. These settings
-+are built by aggregating together information reported by various devices that
-+are sitting on the link :
-+
-+  - The NIC itself, through the :c:member:`get_link_ksettings` callback
-+  - Precise information from the MAC and PCS by using phylink in the MAC driver
-+  - Information reported by the PHY device
-+  - Information reported by an SFP module (which can itself include a PHY)
-+
-+This model however starts showing its limitations when we consider devices that
-+have more than one media interface. In such a case, only information about the
-+actively used interface is reported, and it's not possible to know what the
-+other interfaces can do. In fact, we have very few information about whether or
-+not there are any other media interfaces.
-+
-+The goal of the phy_port representation is to provide a way of representing a
-+physical interface of a NIC, regardless of what is driving the port (NIC through
-+a firmware, SFP module, Ethernet PHY).
-+
-+Multi-port interfaces examples
-+==============================
-+
-+Several cases of multi-interface NICs have been observed so far :
-+
-+Internal MII Mux::
-+
-+  +------------------+
-+  | SoC              |
-+  |          +-----+ |           +-----+
-+  | +-----+  |     |-------------| PHY |
-+  | | MAC |--| Mux | |   +-----+ +-----+
-+  | +-----+  |     |-----| SFP |
-+  |          +-----+ |   +-----+
-+  +------------------+
-+
-+Internal Mux with internal PHY::
-+
-+  +------------------------+
-+  | SoC                    |
-+  |          +-----+ +-----+
-+  | +-----+  |     |-| PHY |
-+  | | MAC |--| Mux | +-----+   +-----+
-+  | +-----+  |     |-----------| SFP |
-+  |          +-----+       |   +-----+
-+  +------------------------+
-+
-+External Mux::
-+
-+  +---------+
-+  | SoC     |  +-----+  +-----+
-+  |         |  |     |--| PHY |
-+  | +-----+ |  |     |  +-----+
-+  | | MAC |----| Mux |  +-----+
-+  | +-----+ |  |     |--| PHY |
-+  |         |  +-----+  +-----+
-+  |         |     |
-+  |    GPIO-------+
-+  +---------+
-+
-+Double-port PHY::
-+
-+  +---------+
-+  | SoC     | +-----+
-+  |         | |     |--- RJ45
-+  | +-----+ | |     |
-+  | | MAC |---| PHY |   +-----+
-+  | +-----+ | |     |---| SFP |
-+  +---------+ +-----+   +-----+
-+
-+phy_port aims at providing a path to support all the above topologies, by
-+representing the media interfaces in a way that's agnostic to what's driving
-+the interface. the struct phy_port object has its own set of callback ops, and
-+will eventually be able to report its own ksettings::
-+
-+             _____      +------+
-+            (     )-----| Port |
-+ +-----+   (       )    +------+
-+ | MAC |--(   ???   )
-+ +-----+   (       )    +------+
-+            (_____)-----| Port |
-+                        +------+
-+
-+Next steps
-+==========
-+
-+As of writing this documentation, only ports controlled by PHY devices are
-+supported. The next steps will be to add the Netlink API to expose these
-+to userspace and add support for raw ports (controlled by some firmware, and directly
-+managed by the NIC driver).
-+
-+Another parallel task is the introduction of a MII muxing framework to allow the
-+control of non-PHY driver multi-port setups.
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 37b13001efc7..53c6aac16e0e 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -9280,6 +9280,7 @@ F:	Documentation/devicetree/bindings/net/ethernet-connector.yaml
- F:	Documentation/devicetree/bindings/net/ethernet-phy.yaml
- F:	Documentation/devicetree/bindings/net/mdio*
- F:	Documentation/devicetree/bindings/net/qca,ar803x.yaml
-+F:	Documentation/networking/phy-port.rst
- F:	Documentation/networking/phy.rst
- F:	drivers/net/mdio/
- F:	drivers/net/mdio/acpi_mdio.c
--- 
-2.49.0
+Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+
+Maxime
+
+> ---
+>  .../ethernet/stmicro/stmmac/dwmac-ingenic.c   | 28 +++++++++----------
+>  1 file changed, 14 insertions(+), 14 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
+> index c1670f6bae14..8d0627055799 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-ingenic.c
+> @@ -71,20 +71,6 @@ struct ingenic_soc_info {
+>  	int (*set_mode)(struct plat_stmmacenet_data *plat_dat);
+>  };
+>  
+> -static int ingenic_mac_init(struct platform_device *pdev, void *bsp_priv)
+> -{
+> -	struct ingenic_mac *mac = bsp_priv;
+> -	int ret;
+> -
+> -	if (mac->soc_info->set_mode) {
+> -		ret = mac->soc_info->set_mode(mac->plat_dat);
+> -		if (ret)
+> -			return ret;
+> -	}
+> -
+> -	return 0;
+> -}
+> -
+>  static int jz4775_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
+>  {
+>  	struct ingenic_mac *mac = plat_dat->bsp_priv;
+> @@ -234,6 +220,20 @@ static int x2000_mac_set_mode(struct plat_stmmacenet_data *plat_dat)
+>  	return regmap_update_bits(mac->regmap, 0, mac->soc_info->mask, val);
+>  }
+>  
+> +static int ingenic_mac_init(struct platform_device *pdev, void *bsp_priv)
+> +{
+> +	struct ingenic_mac *mac = bsp_priv;
+> +	int ret;
+> +
+> +	if (mac->soc_info->set_mode) {
+> +		ret = mac->soc_info->set_mode(mac->plat_dat);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+>  static int ingenic_mac_probe(struct platform_device *pdev)
+>  {
+>  	struct plat_stmmacenet_data *plat_dat;
 
 
