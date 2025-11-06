@@ -1,105 +1,153 @@
-Return-Path: <netdev+bounces-236391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06321C3B95B
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 15:10:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9895BC3BA04
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 15:15:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9933D188A440
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 14:11:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 89D5F1AA569F
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 14:15:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE4C4333452;
-	Thu,  6 Nov 2025 14:10:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7883B3370F0;
+	Thu,  6 Nov 2025 14:14:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o4lExP0L"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jn4OgOPK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C738D7494
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 14:10:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5D5D30EF8F
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 14:14:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762438241; cv=none; b=fO/d+HCl4sNEsP6sm3bk0SDVFWjAgTiQw1l8+FE1lx257oPDUVyjA/mk0DvwhLVDKCq3/MVZl58Hth8bDpXwcDSTRBRpXgelbhbS6RsyNzTGtdNhWckM1d6LB5NkXckfiED81oMHfsjoVBEpWkXP/ayXu2xdhz/4SHtYa1RDTF4=
+	t=1762438459; cv=none; b=GraXtgXy4U1h8Efar+ruQSZ7KdcsdNbjuEZupF9bxWEFle+N9Anraa6BKRcve6JMtXIORGuje0wvSidORNHsYz1zU5hC7gcOiILiVaL+x4JzNZVKfG09LklbwqGSNFYUVOWQsThnm1Mf9xqqFnTKnFYoWhDB2AFmRbRu/F5whws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762438241; c=relaxed/simple;
-	bh=vO3HAZ7KyM8UA/AH+8L6Qo0caR5ru4pTX6o9OvDLDO0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=C50IKu0+wKV0WYZVvR/AJytHXzYj+kfsPnlBWQtZ7BZXEyxDZ1FlvF7ztd9wE4V/LlxqlPfaVmzbk7D+VPmCui8u3196jc3zSn4x1rrLxpxskZOfcorPkQ3fkampCABfhbW9pf2hBJzEAD+L21CgrqBjdFwLHECQYV/SEexUFdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o4lExP0L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E04AC4CEF7;
-	Thu,  6 Nov 2025 14:10:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762438241;
-	bh=vO3HAZ7KyM8UA/AH+8L6Qo0caR5ru4pTX6o9OvDLDO0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=o4lExP0LsGebc+Nq5150dfMrrBzN8MUHzRBpKlQahgrMbFUmrocUtU9UWFJvH3T+G
-	 Vipiw2YPQvY6IZ14dtf+5H2X5fW1JKvs3RXNoNQEoMcMWNUzHFSOdUhVVsME7nyyBL
-	 tdlXws8wgHYfnInKZ4FQIk9oHbMY1EcLtp8kPRAtnzErOClIo3o4dD/rHcznM27H5A
-	 L0Pm6jbaxeUE/zTmSZfOPqdmRt76uTNbjYIxvQTL6iD8sWqou4fezI7czawoPpIJsS
-	 IkCRNYZlgm5XZr4zcHUbaRPLpztXWrYEl75ZSO98jbfdZDA6LfH14tb9/vCSetBfBX
-	 OeM5NYW7XvPoQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F0A39D0C9B;
-	Thu,  6 Nov 2025 14:10:15 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1762438459; c=relaxed/simple;
+	bh=U/AKouqgbPl/F0fdOW+C39rwVERBZcpoopfH3BTj9CQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bBKU/RjM0KJPtpQup+gWb0FBmWHAbfHCKZm//n8X7sdMJMQJ92nJ7NsC5vyiZifhXuJdWrDn0k8DKTANhx86eObxwl6J5+V5qxMHG7l88mRwdhRN+b0DnAujWtHUJZ/v+CqkYqTOXUvUBBNiWqlAJJBrp4wXCtISB0nq1RZZXTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jn4OgOPK; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7aea19fd91cso1352979b3a.0
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 06:14:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762438456; x=1763043256; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=72EH5m1JIiQ8HjYUz65OXp9Zw63/fhkgRyPRxQjDTxo=;
+        b=Jn4OgOPKRgLDj62PXrzsFsImmbUkS5m2UTPGpXPU9NumtPGQYGnSlTZfIuTvL2XZDe
+         ElGv7aMYeFoq9+k+8qZRblvrPdX8ub/6PY3dDDBD7pqxxHOstxjtqosynbGr3yMk5OOE
+         n/YC12LEEThowyOiq6CkOoVlPpjqkyL+aIAJEU70G5VTmFb22Zvv3I8sCjRKB9F/Ykcc
+         Hqm8cc0ZoxK2coycvPmP1nM8QSNA9F7y7ymqPvBEX/mcruvLprW0inRoEgns1vvuFKoa
+         hUZ3Ubd932KKvxNi+bmSw73YKatlfx8cS040R7PQJeyRhPnG3gRhcqpW552a7jzhPSr6
+         oWYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762438456; x=1763043256;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=72EH5m1JIiQ8HjYUz65OXp9Zw63/fhkgRyPRxQjDTxo=;
+        b=SpG+qVy6Gxli3JVU9fZWPyWt/tY7D+89AyUXjTk+3mXWt+tkW31hRl8J4PZJJUFEXi
+         vxjUcojEmEc0IFCGSekzSzowPHCNcIy8CErGzXS01MdtcN1huZjrgl7VCxjSG5h3wtBl
+         2sbeH2c9Q1lP7J8e9P4Qk3VxHdmkQvaks/u0j2BhZRCs2S0u5pPNsfhLzu7GIjhVIH88
+         7NXHpH9/wj91fLOvGDd5ZTxJhatY0R3pGPT3M9PK4Yib9RUY1fUKlbpnFL6yayXfuedb
+         I/1wZojJhZ+aRieeHvr7aDGa7/A8cNLwu2H72zzsE3mnPk8cQQPvtA7KvukIRcI8DPkn
+         LLAg==
+X-Forwarded-Encrypted: i=1; AJvYcCUERRe122XQ8oa62tJOZ0owNAmwcwifoN4EvCEEVSetbNfVDfOXZEBLuyRssXeaNLTB0IXSn/A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyIx9pdd59RgoRIG99N26J9HEooPEZWc94Ns/g4xecpCQ60r25P
+	cTEkGDijRYNi0Opfmm5SNSRftQgv8tWjmYvxOylmf9Ytw+ugPTioc3Q2
+X-Gm-Gg: ASbGncuNxqIdsHQC7O4dUuoBC9k0BUFRLOalzQDVt06wYCDAtBUlzcW2nKVqbn4T7PI
+	Ta/FDJblNTHOzb2Mb8RfuoX0WavGjkmnxoDpIbj0BcaBYml0vtqrityESptF3uTGrKy3wjwslEA
+	MEMsq0kRbVv0lLSTGVmsCQTF6/bkBKftIcn4AfZKZX92vdovVKgI+gBmTKY81EfCAQ8cTu/JVSr
+	8DI/GW6WDOrULPZ0SYyqJEq44G4zrz7xueQ5LPkuXxkr2PdQY8+O3Cbs3sUzUT0jCTfNMrr2Z1K
+	IcnxK5ZdCE/2TaHgL8CjNxKWj5rHVoRcnlsXrbXt92cxgMrS9lnBBJ4R+hBehEcG1WPVDlgqowt
+	aD3JuHxGBknHBJFLpiuIQjAf97nDTe/Bj/badgtIN39HRhUbFnW5UvNJC/qgZs3ooS5ICGxRONk
+	jeoy/hwVBMBNQMeA5iExE32syauQy6qTAHYIdS1zO7hrOrX7pWG8zxUy4b0xZHJiSTkA4Wqtef
+X-Google-Smtp-Source: AGHT+IEo3lyx4SSF6ocI62uHYt7YAX7f4+Hxtin616U9H0IjwoISSx5SOupuX9cHRYryvyjl4G9V4w==
+X-Received: by 2002:a05:6a20:9186:b0:341:c4e5:f626 with SMTP id adf61e73a8af0-34f838e271dmr8901776637.7.1762438456066;
+        Thu, 06 Nov 2025 06:14:16 -0800 (PST)
+Received: from [192.168.99.24] (i218-47-167-230.s42.a013.ap.plala.or.jp. [218.47.167.230])
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-7af82208befsm2890508b3a.39.2025.11.06.06.14.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Nov 2025 06:14:15 -0800 (PST)
+Message-ID: <4abd5327-ccb7-4dbc-9b09-e98069312e2f@gmail.com>
+Date: Thu, 6 Nov 2025 23:14:11 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v6 0/5] amd-xgbe: introduce support for ethtool
- selftests
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176243821425.221682.16699614837258122691.git-patchwork-notify@kernel.org>
-Date: Thu, 06 Nov 2025 14:10:14 +0000
-References: <20251031111555.774425-1-Raju.Rangoju@amd.com>
-In-Reply-To: <20251031111555.774425-1-Raju.Rangoju@amd.com>
-To: Raju Rangoju <Raju.Rangoju@amd.com>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
- edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch,
- maxime.chevallier@bootlin.com, Shyam-sundar.S-k@amd.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net V3 2/2] veth: more robust handing of race to avoid txq
+ getting stuck
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: Eric Dumazet <eric.dumazet@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, ihor.solodrai@linux.dev,
+ "Michael S. Tsirkin" <mst@redhat.com>, makita.toshiaki@lab.ntt.co.jp,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kernel-team@cloudflare.com,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
+ netdev@vger.kernel.org
+References: <176236363962.30034.10275956147958212569.stgit@firesoul>
+ <176236369968.30034.1538535221816777531.stgit@firesoul>
+Content-Language: en-US
+From: Toshiaki Makita <toshiaki.makita1@gmail.com>
+In-Reply-To: <176236369968.30034.1538535221816777531.stgit@firesoul>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri, 31 Oct 2025 16:45:51 +0530 you wrote:
-> This patch series introduces support for ethtool selftests, which helps
-> in finding the misconfiguration of HW. Makes use of network selftest
-> packet creation infrastructure.
+On 2025/11/06 2:28, Jesper Dangaard Brouer wrote:
+> Commit dc82a33297fc ("veth: apply qdisc backpressure on full ptr_ring to
+> reduce TX drops") introduced a race condition that can lead to a permanently
+> stalled TXQ. This was observed in production on ARM64 systems (Ampere Altra
+> Max).
 > 
-> Supports the following tests:
+> The race occurs in veth_xmit(). The producer observes a full ptr_ring and
+> stops the queue (netif_tx_stop_queue()). The subsequent conditional logic,
+> intended to re-wake the queue if the consumer had just emptied it (if
+> (__ptr_ring_empty(...)) netif_tx_wake_queue()), can fail. This leads to a
+> "lost wakeup" where the TXQ remains stopped (QUEUE_STATE_DRV_XOFF) and
+> traffic halts.
 > 
->  - MAC loopback selftest
->  - PHY loopback selftest
->  - Split header selftest
->  - Jubmo frame selftest
+> This failure is caused by an incorrect use of the __ptr_ring_empty() API
+> from the producer side. As noted in kernel comments, this check is not
+> guaranteed to be correct if a consumer is operating on another CPU. The
+> empty test is based on ptr_ring->consumer_head, making it reliable only for
+> the consumer. Using this check from the producer side is fundamentally racy.
 > 
-> [...]
+> This patch fixes the race by adopting the more robust logic from an earlier
+> version V4 of the patchset, which always flushed the peer:
+> 
+> (1) In veth_xmit(), the racy conditional wake-up logic and its memory barrier
+> are removed. Instead, after stopping the queue, we unconditionally call
+> __veth_xdp_flush(rq). This guarantees that the NAPI consumer is scheduled,
+> making it solely responsible for re-waking the TXQ.
+>    This handles the race where veth_poll() consumes all packets and completes
+> NAPI *before* veth_xmit() on the producer side has called netif_tx_stop_queue.
+> The __veth_xdp_flush(rq) will observe rx_notify_masked is false and schedule
+> NAPI.
+> 
+> (2) On the consumer side, the logic for waking the peer TXQ is moved out of
+> veth_xdp_rcv() and placed at the end of the veth_poll() function. This
+> placement is part of fixing the race, as the netif_tx_queue_stopped() check
+> must occur after rx_notify_masked is potentially set to false during NAPI
+> completion.
+>    This handles the race where veth_poll() consumes all packets, but haven't
+> finished (rx_notify_masked is still true). The producer veth_xmit() stops the
+> TXQ and __veth_xdp_flush(rq) will observe rx_notify_masked is true, meaning
+> not starting NAPI.  Then veth_poll() change rx_notify_masked to false and
+> stops NAPI.  Before exiting veth_poll() will observe TXQ is stopped and wake
+> it up.
+> 
+> Fixes: dc82a33297fc ("veth: apply qdisc backpressure on full ptr_ring to reduce TX drops")
+> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
 
-Here is the summary with links:
-  - [net-next,v6,2/5] amd-xgbe: introduce support ethtool selftest
-    https://git.kernel.org/netdev/net-next/c/862a64c83faf
-  - [net-next,v6,3/5] amd-xgbe: add ethtool phy loopback selftest
-    https://git.kernel.org/netdev/net-next/c/42b06fcc878d
-  - [net-next,v6,4/5] amd-xgbe: add ethtool split header selftest
-    https://git.kernel.org/netdev/net-next/c/d7735c6bb231
-  - [net-next,v6,5/5] amd-xgbe: add ethtool jumbo frame selftest
-    https://git.kernel.org/netdev/net-next/c/9c11b6b1abcd
-  - [net-next,v6,1/5] net: selftests: export packet creation helpers for driver use
-    https://git.kernel.org/netdev/net-next/c/6b47af35a6dd
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Reviewed-by: Toshiaki Makita <toshiaki.makita1@gmail.com>
 
 
