@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-236267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E34BC3A78F
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 12:11:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5A50C3A7DD
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 12:15:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA28E1A4758C
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 11:11:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 642BD421B6D
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 11:11:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38E002E36F4;
-	Thu,  6 Nov 2025 11:11:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ABF130CD89;
+	Thu,  6 Nov 2025 11:11:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="WObZZ6Lh"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="dOtegr+0"
 X-Original-To: netdev@vger.kernel.org
 Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11010061.outbound.protection.outlook.com [52.101.84.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E452EDD5F
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 11:11:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 606B72E973A
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 11:11:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.84.61
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762427479; cv=fail; b=Xq8ZiYekTqfKs0NsWAOVWcQH7mTMSjqjMNfgytsq/VLhBBzjB4qWrqUeED9+9hoxcGl5alSvcMqXJTpq+TRc3ashiaoIpbrCPDrqUcpKtrFkrSB1QcSMBieZUgAToOY1Vf9fsFjZcfEbf6kw06Wg64RQ+bN3R38762/z6mKYiP4=
+	t=1762427481; cv=fail; b=GvwV3qrhjDHZJdbcNyiYNAfKFuh4GXrNx/ZMJqsGroGgldSnm5uijFe+y+0LBJm2Bnmb4QlLCr5pIpGStGBccOl6lSOaQnnY75bAHwJ6YlgeWSgio9wf7YVE6EfjRXlRm5PCVSqaujZ4YdExoXdRgpxDDaNXvps9NthISxDakBo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762427479; c=relaxed/simple;
-	bh=D1O0qng4j4x8xfd505QGHlbUTC5I92apbKQUZfcwfG8=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=ONxqf1P2IH7Yg6P5sKyMJhyM5z6oj/TpGgtDZYK3OPUdTDpX8lHMUqLYXC0L2ND4wzR4cO0bZfAjy4pDnJQT9aTXEjK7OLgviLTjxaOmUhh2nf8lmr++QmIaevbia1VudRvysKv1jAXwAuN50q5YR5fJJDt6MzoDiHMPyFKl5vU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=WObZZ6Lh; arc=fail smtp.client-ip=52.101.84.61
+	s=arc-20240116; t=1762427481; c=relaxed/simple;
+	bh=9f7euKtrvVarRlZ8LS0q83r8qIwaNoSV+TWJGO5eIOE=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ZtDl3i30+pwMGKOXBtrnS0z8lDP9OWKinNU9pJPo3UubT8hKW+o+bL4sGDlOdNLR9Ua9+vOQSYiARA2FKPf0yxxo0WcBVli7jaR6F+vjRp1obqJU9oTHGNGJj91lYAF13uzvxXS3dkmxae19Ek5IqD/qDCyLWqGoaEfqxBHiLpA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=dOtegr+0; arc=fail smtp.client-ip=52.101.84.61
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=QXbYDhxy0BZK5dFrrVlt/ChItWCEmOZuiu8yzf2lbS5N6YAMRnyD7mKxHr9sjQ9KY1GEXUV7ZA7BvC5pk5MlJ1F9DhVcxiziwjMR/kAFPJnjPtdP49Hl/Ml0AXfLAjUxeKb/ctUE9kbXB36a+HtPPDJ7TmrPjHoc4H5g0bI8s08Wq9HJtd+Tv/VmmvZkYcEwnUFzHpT0GsWxDbqrg22TS+3sVuA4FShDjdTj5IyG0vOzqYfgU9iaepgPIJX0VGcDPXFC9HkxMwhf97GlWwOOkC7nqikB0CvmP4Jyq/IomjbY+68dreuVtFZvRvXCVqlpXrz+5M+M1RmX1h6gC2ktjw==
+ b=mXjV3K0U7k1UevaqsFBhWWUee6sBKji0+lnttDksoY8nk/9GnTzXiu+dzFy7Jc1Ooopu4gwC9UXT+sLEb49d/8uF9voZGjj8ybsy//TPKoikvB+M0v6eUBZ43NE3neYZWOWYMfyK6Nbodrc6qExbL7aaMS+4JQ8in6UYzBigdyMoPk8WtmorMa5ZIcTQc3ZgFDRNcRwjlns/luIw2iNteHuZdLJffkj9SkvrQy5AleoWvlrGDTW8ZQ4s8J8NcMVf33skKZ2MT1r+IyRCgQ6tJHV8WnwWAKP0HdBXbE2bh8S3eL5WTnDxnmVmdX4FCsI3Y8/0QQKFZVpMYdzbTg13TA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cwmfGmuX/4efPXsrKge8MU2lP8FUvFamgJYDUcAUfhw=;
- b=KEYDTO7oLxebBsyF2giY89AyA98wErQuwMC3U9Pb5BZqQqfGdhbE4O0LO2XPq9UFkZrlJfzXG26vUkHqNO6o2Yft1EysTUVbixa0ZbYqUkY7xkmz65dgCyxHyLIwIGUb1dW/Ub+R5B9PLL37GzduUXl+PTTiw1uyvCe7bh6dkyvXTSVovpFbdA7yrcim5uiIDvjznB29wKCRUzhQyL1ch8I2IO5oM8NR3jlTidAE0qGC6aLsaAFFh1pRDIhWcmoIP2H3p6sRfDZ7q9kTUkC+YOs20h1MRHTan5tJ+hKFluEJGFK6W3nvy+PR3ltqtwUO4rLJuCPrxRfY19pxlu68MQ==
+ bh=2QhrJ/yDQ6e33zzpW4tgHd4/ABRPzgz7RUlzu96Qs7g=;
+ b=i60XhzcJ+a5W1ifhKYsOov9p8XR5ryQXPPzM+vs88AK6Yu+bkYNvBMy7ocjJdmfx4cL2KZm3uKwKKkYYU33pETbHUASgJiJt+ZJ4PXdwD5RW+9VU/F1n9iHbkhBBxfFGVKxK1y0wtij/qqAci7Bmz0HnTgpXFBkFxldHgjvTcDJOWUyradZAfSA8kI0ED5MnLAb5uIbSK9r9XR80drR6+pRGhcf5LCfZIH0CFl+PpbKF/TSqlI+95a6Lbe5xKMfUq8APn0aRSge1EfepTNH03XO5iyVwAdB5Xyj9io2V5fMTyjpu+98QSA0yEdzP0AhgGmySSjqFkcfdTLTQGQIaOQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cwmfGmuX/4efPXsrKge8MU2lP8FUvFamgJYDUcAUfhw=;
- b=WObZZ6Lhnl/kUWPhHyb8oBWxcGiA1eiDqyLEgowUpGYXBN4+gWLnKbkKHnOkVX9LUquVgugYs1jMUH+wrQGMPllsJMlEUsIBZ+LE+VuxIp31Np1M8iF07OtaI0RgpCS+zR4cLlU7DoBuNtDaH7CaJ2i3VHo7DZHr5A2LzqvF/7NRYkFdaO7ePyfTTK88ZRK4+71Gcbr/INkVPK5QnEAF9TATz+REfPO5YVsxNaosA50s+F/ckCN3iK0qp//+Vzb5YY860XMWizxAr8PsklzTgm4Im6iI9nqJAsRam/x+Gb0GBRaxmVBxUlNYs+HVDlGWRsE9S2RKrmDuZFx0yCuzQQ==
+ bh=2QhrJ/yDQ6e33zzpW4tgHd4/ABRPzgz7RUlzu96Qs7g=;
+ b=dOtegr+0oWjYPli9MSVrSsflErth2yWURKrCxLx91f2hpYPf69asyh7ML9oi0h0/rakJ+JX+Y4QdENLiNBPqLmILRcter2XejU2RNJLdFxM0hAj41+laLW0D6t5CYy3kbt2qo/O1YRjGpwOSOePPG5JYd1UMAPD86g/J+p5kAbRl1oIXdI2I1Ji2aKmsp4ztNHH5SZPkZAjX3KRT02jenmjcuCWTeg1CfjS4h+lEP/sth9E4o7L4HCZt7LK9GOdcokcZ9hl0Vi2WBjrKzuSiytRpjsSPvDSc5rbwETGb/0NivQnc0PpGrbON2Q1DOZ9TkghBkCJL1GsZE9atIEiW1w==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nxp.com;
 Received: from PA4PR04MB7790.eurprd04.prod.outlook.com (2603:10a6:102:cc::8)
  by AM7PR04MB6872.eurprd04.prod.outlook.com (2603:10a6:20b:106::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.12; Thu, 6 Nov
- 2025 11:11:14 +0000
+ 2025 11:11:15 +0000
 Received: from PA4PR04MB7790.eurprd04.prod.outlook.com
  ([fe80::6861:40f7:98b3:c2bc]) by PA4PR04MB7790.eurprd04.prod.outlook.com
  ([fe80::6861:40f7:98b3:c2bc%4]) with mapi id 15.20.9298.010; Thu, 6 Nov 2025
- 11:11:13 +0000
+ 11:11:15 +0000
 From: Vladimir Oltean <vladimir.oltean@nxp.com>
 To: netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew@lunn.ch>,
@@ -67,10 +68,12 @@ Cc: Andrew Lunn <andrew@lunn.ch>,
 	Marek Vasut <marex@denx.de>,
 	Wei Fang <wei.fang@nxp.com>,
 	Clark Wang <xiaoning.wang@nxp.com>
-Subject: [PATCH net-next 0/3] Disable CLKOUT on RTL8211F(D)(I)-VD-CG
-Date: Thu,  6 Nov 2025 13:10:00 +0200
-Message-Id: <20251106111003.37023-1-vladimir.oltean@nxp.com>
+Subject: [PATCH net-next 1/3] net: phy: realtek: eliminate priv->phycr2 variable
+Date: Thu,  6 Nov 2025 13:10:01 +0200
+Message-Id: <20251106111003.37023-2-vladimir.oltean@nxp.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20251106111003.37023-1-vladimir.oltean@nxp.com>
+References: <20251106111003.37023-1-vladimir.oltean@nxp.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-ClientProxiedBy: AS4P250CA0007.EURP250.PROD.OUTLOOK.COM
@@ -84,106 +87,165 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: PA4PR04MB7790:EE_|AM7PR04MB6872:EE_
-X-MS-Office365-Filtering-Correlation-Id: a172d8d2-1ff0-411e-0388-08de1d2532d4
+X-MS-Office365-Filtering-Correlation-Id: 2b2e86ef-e4db-453e-0638-08de1d253388
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
 	BCL:0;ARA:13230040|52116014|376014|366016|19092799006|1800799024|10070799003;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?P77P1hO0lMX5d1RrYc4wM+XLwyS3XxgRW3+J+Z63aWA3nqeWgp7MNwUyVbR7?=
- =?us-ascii?Q?Yx2kw9EcTyE8dAcoN8peTj0epkMssaVOuzJ2yn/xSfP2f8gRVNktHcIccihR?=
- =?us-ascii?Q?ncGpwD30ceed9jTYSCKqykBplw0Zl06RQfL5d4mpKFZjoHkuGCBU6AUfZznI?=
- =?us-ascii?Q?V/ftXY7ukgfxU1op+KYYHsooqZ1yIoll35tFVBuiDEjoNyj2eKy0WZt/qm4r?=
- =?us-ascii?Q?e+R0o3Ce8M8iPCsXjrNEVEJO/0JehUOiFjFwie7L3y70BdVtkVhUG63XhHsL?=
- =?us-ascii?Q?mvI2Sk00GtZaHsGAfN5x6J2Fi3+FCHr4vOH/nEusq8ZKW3gII1TbFUcRAmH3?=
- =?us-ascii?Q?FR7FdGCdSIC3D8IXeFmTep0UJXEkmigMCOCMyhGW/Cs5X4ERN5D+tHSb+VjQ?=
- =?us-ascii?Q?CL0ulqSn88LhKfikvmhbDcZkWkSlqVtNkvdURar+QCEPW7xxcTr53EL9YqK9?=
- =?us-ascii?Q?qoe1ShTxvNvmgH2XKigvd7bG7pS6df3P2FK7epflWqPvZBxig9FKdyXCoOUI?=
- =?us-ascii?Q?VNdXIolWRf1QIRisrscX11Dj6BHCvcyJq/7FZkhOnljiZApIROwqBMa2sBoN?=
- =?us-ascii?Q?IOs920076gEObs+AmGroYDtcTaAT7tUMSCos+JhiijK1NeQPF3ut65lTH3YS?=
- =?us-ascii?Q?wgQYOyFYJwS66i9Veb8pg0urrb6G+p+JPa0HFly/RNP3SWPuR+H/YDkP7axT?=
- =?us-ascii?Q?cSe0yuUEtJYVN2UxmZJnckh0FaG6pFZddqfwbuj2N+iZuuQEoFyiJh68LW0Z?=
- =?us-ascii?Q?f07yUJjmdBwhFhMe4Djx7GRj+oZnU0wKjdl+3j4vk9/5NCuWdaaTfk3/Cc8X?=
- =?us-ascii?Q?AGaWI1+M3e9dgIWgS4i9f6T6IXa1SuzbfcZCC9zPjmRnrKor7M1gMfksXiMq?=
- =?us-ascii?Q?1A/YHNYiVVv8bSEoe6mOPD44G7p5xtybZHqH11vHUmDpHH1B+wwYablDNR9I?=
- =?us-ascii?Q?LWxEtEXotyK2f1RAOb7Yv+qAsN+7DJSeus1zJ4pZALeX1ez+0p8mWac0x4SU?=
- =?us-ascii?Q?BtMCYyWINCP5b/XaZYEA3t65ni4C1CU3VPguQu4SLTcvstWwDXE1GZ52MiK8?=
- =?us-ascii?Q?deycCmnTc1tLLQQ7UXf02jlPNc0mZrDt61s9ykWK4bDLEGNRYD8fktu2iyjW?=
- =?us-ascii?Q?FUFrqdWniolDfoqVJJwkHBaVUa7STWDUtSYbN6GrO9lql94HLUS5n5JUIjeH?=
- =?us-ascii?Q?2hR2mlFVVos1UwTlSxFV8Ms6FY8DD0U2zwUo/qgI3bY2ttBYP7t6uQfSmRUf?=
- =?us-ascii?Q?ECqFP4Trljy14f8ci+YLhSv9xGG5JNptQaKPn98UakphYBAohmxziTKWo/9W?=
- =?us-ascii?Q?SsZqjH3kvk4dPqzbBqt2ozE6IGijW7rTXEkvMAVAmZU2+0EsggNlLij8lLQE?=
- =?us-ascii?Q?FtceQkY4Hli5aRpm5lJwsm1rV2MKp0p4m+/VLaln356l+E5tob1s76cHYoFv?=
- =?us-ascii?Q?JVQOJLxYNNYzsmlm9vV/qrUVxuOmmxyi?=
+	=?us-ascii?Q?Vp1NprLIjz/zl6w0YZzVI3pBuHJI7QR73ul5k3WBBKK+7BurTGk28qUkj9hR?=
+ =?us-ascii?Q?dH/ZUVQMAgcPt28jzZ7jFe71dnKt3nKMQzxMQy8PvTM3Rhvd6vAfcpOzk5Sx?=
+ =?us-ascii?Q?20YAsJVdQ2LCN2PYKfbxo0x9xx2qyF7Tew8EJmQEeRVaeIsr3LUyQjwITUvR?=
+ =?us-ascii?Q?F8/oc2xPbiKaAsoru2QPPcacPbvo35nuaxVg1256IC79viebrw2aJjH8a627?=
+ =?us-ascii?Q?QHZk9i1Qz9RqKAa0IDIxGTzqFyXqOXbhieb1ybrSSM6C09KfJWvpF/Y7YisI?=
+ =?us-ascii?Q?HTIg/rnG2FTaTjRp4vCGg5/XghT4AZdWQJ7S3l5NZs6W6Vm4NJTn8+KBcFY+?=
+ =?us-ascii?Q?RtzlED1NiFlPyF1YcnBrfr3oR+5zfW5DMrbLJNz3hm2Fw0u/IGOAbYc7Y4JR?=
+ =?us-ascii?Q?5ni3x4f8K7QGFrVivvyUaRJoCVFfc8RrfkSGXur9C7q+bKYF2ZHAiCY+xSzN?=
+ =?us-ascii?Q?nbj66hreCzxvxyoEGCba0/iEA/iClUXnX8L1Cwaaq/3tXEAnb4HQDiZl6jEA?=
+ =?us-ascii?Q?aKxF5HgcDliV0TQzgldYE15JnlNUrHXDy7gFTjA4U+NFjy2b9gn24OrrVzcM?=
+ =?us-ascii?Q?goNJ1T2q3Y3vYBJxl5tsHpm8DUnJYjoJg6oYI2qXW15IKUoLKhqK6TL/YLIu?=
+ =?us-ascii?Q?hSxSuMOzwFjGQtHCzmUajKb6c7jdYT4AinwjfOWG6D4g9VWRLJE/D/qwQBKL?=
+ =?us-ascii?Q?VT2yPU8k2/qmZ/OTsba52RAZPc/bPyMpQb4rdUVsUgywPiwvwZm0bKY/bpbM?=
+ =?us-ascii?Q?5X2IzM0ZHtSmChQIAuyxS5v8h+6di7G+IJ6DLgCiUfTLBB8pHjMYchCRI8fN?=
+ =?us-ascii?Q?/L0elziUyHdMmx5Ef+m0IWOIsbjdaNlcS+H+OOEivIc+y7UO5897xYJ2oc7q?=
+ =?us-ascii?Q?v3SXa8ZY6ToPHz2kOhxrfDgPwdgHiIE7QYX5gPSH4FwqaqJLfOmP2j20M57S?=
+ =?us-ascii?Q?v0amliXSpw+8XIfXafZUCjD+BWo5+O4MB/lQq9AiTD+9e2m17L3cqvJZ7jZ+?=
+ =?us-ascii?Q?LS+JZDaeTH1Ah1GP5/lCYnUWq0gCCFw0G7NlkAjJfUGF8Ap5Xqnvb0ziur7y?=
+ =?us-ascii?Q?ZdkubcD+WOQJ8BeMkOrBCcUx7RLLL6zRajFaR7aMnu8MyypOOIFDWUHsXUFw?=
+ =?us-ascii?Q?m6RVL18LLD19zEOSE5Vejg1vu0oCaG5Z0evkIIncqjAcL74K52Ir9Vg1rLNc?=
+ =?us-ascii?Q?pbHlJ3eZLsaqLBqkABZNJtQIOtWJAYHfgwXsYYDK6+PZED5Dtee+HzvWlvw3?=
+ =?us-ascii?Q?7MV2a2POHoxwilGWvUT//95syqsVeki6SrgElgl+SZEKnpMA2Gi8nEUeZcOG?=
+ =?us-ascii?Q?fXHiLsB08Mxoo5b0hZHqv9lAcsmHqv1hYCbCEoQTdl/jJlnYwOLTIHPPFYXe?=
+ =?us-ascii?Q?lHXHv0ObI/6NSVGWHiO9UFbUoN4XQPgwGemjzK5DlaOwamv1P0PheaJjQr+e?=
+ =?us-ascii?Q?kCbwYu/8EAYWjxUTdbokAwxSsnw9atBq?=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR04MB7790.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(376014)(366016)(19092799006)(1800799024)(10070799003);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?ev+RF1idy18p50U+YTUjD1kVaUkoTtdndSYuVUj4TZMLE6NjPxatpLC+kzkg?=
- =?us-ascii?Q?tYwiLQbp+wm1lHALQlFgzE+F4If1L0SL7joU8mCBrzCuz88zsmHdgQUTx1LK?=
- =?us-ascii?Q?uAGJzgLcJ8nZv7uFfvIpHhP2WKK5HdmgrLXSd4UrnvLwEWXUAhGbAJGvJo0A?=
- =?us-ascii?Q?Zy8ISBW5riyLw44lSfoNNYZWB3PDi4KF+bGpdhiErjUoLIJyohnCg4e9n6wL?=
- =?us-ascii?Q?maH/wlYDX5jw/QPVuiGUCcZW2aXauS3SK/IcRQffWmdz5nr1Bs9gwXIj+SlL?=
- =?us-ascii?Q?uokPrfnUBEq8BzucW/+97zP82fZhvk+/UzmuGrDyEIZJ850SW8x7i0K6Il6h?=
- =?us-ascii?Q?J8f2kzgm+yo2xofQ4mHi2YekXD/GglqWVejxqzdHPFK0S7sxxpMOMiw4x66S?=
- =?us-ascii?Q?7yc66mi/CLHojfkjC/CQ5ptkv6owTvVjGMmZIUtZNbHGtvTJNpHZ1t8uYto2?=
- =?us-ascii?Q?d6rGFN47G6uDE4O6t/k2tjI0GljdSofEATdT2ZV6ZP6Ki/u5rt5kwkL6VIM8?=
- =?us-ascii?Q?TVY9yWAI/3A/kRfhJ0t7IwBpkmNW0fxthDIsNjo28dvJCmnHWliuMf/R64OE?=
- =?us-ascii?Q?OHRyaNu5rLH0gRBWVtJNW4B2Xlpd1swFl9xQ8hNv1+4ps/BtgLum6o3GSlKe?=
- =?us-ascii?Q?qRT6AlIGiAwVZE1odZ7oIqiSf9EQKZKEyeEbUA6ykNfJelEd/ZXgsEVhoneF?=
- =?us-ascii?Q?kSw9wQpMPjiOua1dH6w+McooN3xw3+g3Kz7ohM6JC6vP4XzLJxl78M1TLODX?=
- =?us-ascii?Q?+Ppw5yqozrx17ivobJVT4k21BjJXly1sb/DMUfIBHXUZpyyAryCC0f2oP08D?=
- =?us-ascii?Q?ptU5HVPpdNzhjeKYDettGVt8yreBzVhYYUvEXfbXVqlH8z+9++7TTSSRe/W0?=
- =?us-ascii?Q?WFG4JQAOxFP+u7AyMCwR9hZDL2x/lI64gWm/ML8MZgZKR2C31qbYfxHSLuW2?=
- =?us-ascii?Q?awESth8TgYE9pawb3QGvPBBTv/Vmfa3sqp+3/FhbvlHIHWq1XFzyuWZ+3SYp?=
- =?us-ascii?Q?XgB2nUnLbFxpCPD9uomoghiY5qC6TI42B+2jPo+jCSbcpRLwyIyD00n/PsH7?=
- =?us-ascii?Q?qetIB9F1C3PYx/DC00yCnJis/wWf06HXB9mFEKcopAFVol8fizLfDHS/+r/p?=
- =?us-ascii?Q?FobNk0fxij3Q55BCDoBkx0+wkkcuJZ8Ad5PyjOSgJUhXcJF+Ugfu/ZUnt84f?=
- =?us-ascii?Q?9PM9iExtL/lMWHoE/NpRkrJRVTVapbfRKiasygo68rJ93ZP5L6H6YDOER+Vd?=
- =?us-ascii?Q?lWaJNmdr/19OgIgcwGVkWT/vymzlIYhedf3Qry0rcSAowvgePBsFKKL3G2jf?=
- =?us-ascii?Q?gZ9J4tV2R+lwqUrVLEjK4tYUPI6DyepEo/iqV2Mqh93I/CR95Qo2HRgWhwl7?=
- =?us-ascii?Q?4cZVjemn2PG0ejFK8opoY6dL8Tpe9ccmuQmL0NtiqxjzqZJA21e93Yce10f8?=
- =?us-ascii?Q?QNBgcEtmG0cgZ/W54J0y28rgX7YFljCCLUn84mRXx1Cdm2T6HzE8gVW6iQqC?=
- =?us-ascii?Q?Yvm+KCBKkan0PsjAqTAl3stGC8PYHeT+TsH2+ab9pIPCocNFwEUId35pxdq0?=
- =?us-ascii?Q?B7EtLLmfkFlpRkZ19BsOe/p9tSqI94+SrXJVEvuP54nE+7Jz1R1uuU5CsQ0J?=
- =?us-ascii?Q?KuL6iRDATvSjzLFNjQRzdgI=3D?=
+	=?us-ascii?Q?9w3wz1LrrnMFV4gmjqbA58VM2qFGpEHgR3hxxF81BX+VcXWMuExcPddRBXds?=
+ =?us-ascii?Q?qWCLX1Bl23weoOGPDchZPk4fR8ERoOHvEm1lIwARYz0DaC1fjBOzbKjm2HVF?=
+ =?us-ascii?Q?EAPtOyDQBL/1r8/BTIYkh3sEKfshL9HD289N/rN/0bbUNWbrI9ydjg0lblul?=
+ =?us-ascii?Q?Ci4GLAqy4iSncT4eGPbjWmZxQmaPLp8PAsipEuIQzErize2YK5KHHLxbxmld?=
+ =?us-ascii?Q?j+AECDH5+DgKcS+KA1AHgKCU8AtJsPHTDEQBQwJPIvp0R9uoO92RDuj9RRGD?=
+ =?us-ascii?Q?uNAhdEmJ5wr45aXAD9OsqpbvAePoU0raasFedcjteq4nWVXnxup7K5ocrNHq?=
+ =?us-ascii?Q?6qsgH3QVHrTEBBPPSov0o7sdACG2E8FZMlsomocNzEdkabkKNdcP3SH7raOr?=
+ =?us-ascii?Q?OC5lR7YK+eG6eD4tzJ2xhQUgObbODu09yXndbx9luQmXVJ8b7mJTXbTN28wd?=
+ =?us-ascii?Q?guFlsixIKFfIPxpV4DCq4muQovow3Q1kaHva3GIYy+lFndn5lGB6PHQk1dsJ?=
+ =?us-ascii?Q?fftrB48cy6spM1ksLpEbHSnl497YCsuUXczEVg5ftws0e4xrDAvtNkdH1W4P?=
+ =?us-ascii?Q?TkRmthPciOOAAGCdzTkzoT0awr5epx3nbHMZ3Br8yaJ25TB+vQzPwge/WLVn?=
+ =?us-ascii?Q?FJ4wnFii8PJ1npfIgU8yTZE3oY0LrGAJJCIB20/pNCJRsJ1LYfCi+HjRgpHM?=
+ =?us-ascii?Q?K/H0/ZkghQ7KbUMoGn0lx8mzhd6nGJJ43AiW5VraDsLiRif72hnooVrojl38?=
+ =?us-ascii?Q?Ovf1oRU59Z/E5aXQZroUM2p+3bQq2Tzs19ii2wSx0FhQ6ZL9PnHmdm77RDei?=
+ =?us-ascii?Q?a1iA6wNMKs0QAQXOXiQhoz6qsMHvAO2vR7nBe04Mv97sxdkRE/EFmBAjQPna?=
+ =?us-ascii?Q?t8BgN3Une0e+yXI3JgFjBT+t72S2pYVvqeKdIWe8NebaRU7YWmMVGdqU8e0p?=
+ =?us-ascii?Q?cu8x9k/pBsj5+0SF/semCWczVWA3CJb3KDI0ArIbWhJGlGFIoSBlJmrrTIy6?=
+ =?us-ascii?Q?U0DbiN/+4EbDBM9HUAP+UbmTYbUYrwdY8CDqwZaK9krFjtScRTrI13gWDf4U?=
+ =?us-ascii?Q?NBtGvSVswQ2YFJP7FT0HmLoibbPvmtzUd7SrqSD2BBfyC+rPECHnVKOux1Up?=
+ =?us-ascii?Q?JoKdkasOe7wXUXNgi/mtZmHHSvw5Z7CJrF6XbRS6NnpE5PRSufms/UqpBeBG?=
+ =?us-ascii?Q?6XVYe/vCG00ELKo+nR0yH2FtKJ3Uf3ed/6l2K0lJB0TM+xAHJnqjU6P/eyId?=
+ =?us-ascii?Q?iab0jVyUBt3qwm3xRyhnoD6ONZ93ABZQZykbcbUczqV+Vu4fGmu0bYwS0WK5?=
+ =?us-ascii?Q?rpT+9hIhwfrn7X6evt7b7Gz+U2dTjX7t7mHfolWlrsoasZLzdv9n9EX2ITby?=
+ =?us-ascii?Q?Y0ihURWT/Li+zC5LHF3elWpuudSdHU/5Bg1V3Hzifx9u9E23JDLHL0TK+1yJ?=
+ =?us-ascii?Q?DRMOC/uCicR1QtJvzF6WcFvN4jiJgrnIejX+MwPqpxy5VMQMWGniwXq9aGDB?=
+ =?us-ascii?Q?/nylLoliAo8qrNnCTsu+Iu2Rn+fnlw1CEJgIW4z7Owoe7Zq2u9sntUV3xZPQ?=
+ =?us-ascii?Q?7jH2vyjbfYC1wf/XywawBpko3WuHJ7CTwTUKKrF99Iwp2lWaXgB8kvIgEkPs?=
+ =?us-ascii?Q?2SyGLpBKAF6QPOUvHiadzp0=3D?=
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a172d8d2-1ff0-411e-0388-08de1d2532d4
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2b2e86ef-e4db-453e-0638-08de1d253388
 X-MS-Exchange-CrossTenant-AuthSource: PA4PR04MB7790.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2025 11:11:13.9226
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2025 11:11:15.0760
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: imgxyFBlQg8vOmWpmLVh9UEe8qTDelv1Wed4DJpDGCOQbWWMAyfcfbB71SDiJtxDJlG29rZ6ExKGysOCv/YJ/w==
+X-MS-Exchange-CrossTenant-UserPrincipalName: LN8tuXQNTQCCsZbL+Ccwrtbb2YizKTo6epw27bPFCCqZns/sETi3aZiWaZWFb4NGgxP6u4o1MvT/0L5t7NvXNQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR04MB6872
 
-The Realtek RTL8211F(D)(I)-VD-CG is similar to other RTL8211F models in
-that the CLKOUT signal can be turned off - a feature requested to reduce
-EMI, and implemented via "realtek,clkout-disable" as documented in
-Documentation/devicetree/bindings/net/realtek,rtl82xx.yaml.
+The RTL8211F(D)(I)-VD-CG PHY also has support for disabling the CLKOUT,
+and we'd like to introduce the "realtek,clkout-disable" property for
+that.
 
-It is also dissimilar to said PHY models because it has no PHYCR2
-register, and disabling CLKOUT is done through some other register.
+But it isn't done through the PHYCR2 register, and it becomes awkward to
+have the driver pretend that it is. So just replace the machine-level
+"u16 phycr2" variable with a logical "bool disable_clk_out", which
+scales better to the other PHY as well.
 
-The strategy adopted in this 3-patch series is to make the PHY driver
-not think in terms of "priv->has_phycr2" and "priv->phycr2", but of more
-high-level features ("priv->disable_clk_out") while maintaining behaviour.
-Then, the logic is extended for the new PHY.
+The change is a complete functional equivalent. Before, if the device
+tree property was absent, priv->phycr2 would contain the RTL8211F_CLKOUT_EN
+bit as read from hardware. Now, we don't save priv->phycr2, but we just
+don't call phy_modify_paged() on it. Also, we can simply call
+phy_modify_paged() with the "set" argument to 0.
 
-Very loosely based on previous work from Clark Wang, who took a
-different approach, to pretend that the RTL8211FVD_CLKOUT_REG is
-actually this PHY's PHYCR2.
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+---
+ drivers/net/phy/realtek/realtek_main.c | 31 ++++++++++++++------------
+ 1 file changed, 17 insertions(+), 14 deletions(-)
 
-Vladimir Oltean (3):
-  net: phy: realtek: eliminate priv->phycr2 variable
-  net: phy: realtek: eliminate has_phycr2 variable
-  net: phy: realtek: allow CLKOUT to be disabled on RTL8211F(D)(I)-VD-CG
-
- drivers/net/phy/realtek/realtek_main.c | 60 ++++++++++++++++----------
- 1 file changed, 37 insertions(+), 23 deletions(-)
-
+diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
+index 417f9a88aab6..45b53660018a 100644
+--- a/drivers/net/phy/realtek/realtek_main.c
++++ b/drivers/net/phy/realtek/realtek_main.c
+@@ -194,8 +194,8 @@ MODULE_LICENSE("GPL");
+ 
+ struct rtl821x_priv {
+ 	u16 phycr1;
+-	u16 phycr2;
+ 	bool has_phycr2;
++	bool disable_clk_out;
+ 	struct clk *clk;
+ 	/* rtl8211f */
+ 	u16 iner;
+@@ -266,15 +266,8 @@ static int rtl821x_probe(struct phy_device *phydev)
+ 		priv->phycr1 |= RTL8211F_ALDPS_PLL_OFF | RTL8211F_ALDPS_ENABLE | RTL8211F_ALDPS_XTAL_OFF;
+ 
+ 	priv->has_phycr2 = !(phy_id == RTL_8211FVD_PHYID);
+-	if (priv->has_phycr2) {
+-		ret = phy_read_paged(phydev, RTL8211F_PHYCR_PAGE, RTL8211F_PHYCR2);
+-		if (ret < 0)
+-			return ret;
+-
+-		priv->phycr2 = ret & RTL8211F_CLKOUT_EN;
+-		if (of_property_read_bool(dev->of_node, "realtek,clkout-disable"))
+-			priv->phycr2 &= ~RTL8211F_CLKOUT_EN;
+-	}
++	priv->disable_clk_out = of_property_read_bool(dev->of_node,
++						      "realtek,clkout-disable");
+ 
+ 	phydev->priv = priv;
+ 
+@@ -587,6 +580,18 @@ static int rtl8211c_config_init(struct phy_device *phydev)
+ 			    CTL1000_ENABLE_MASTER | CTL1000_AS_MASTER);
+ }
+ 
++static int rtl8211f_disable_clk_out(struct phy_device *phydev)
++{
++	struct rtl821x_priv *priv = phydev->priv;
++
++	/* The value is preserved if the device tree property is absent */
++	if (!priv->disable_clk_out)
++		return 0;
++
++	return phy_modify_paged(phydev, RTL8211F_PHYCR_PAGE,
++				RTL8211F_PHYCR2, RTL8211F_CLKOUT_EN, 0);
++}
++
+ static int rtl8211f_config_init(struct phy_device *phydev)
+ {
+ 	struct rtl821x_priv *priv = phydev->priv;
+@@ -669,10 +674,8 @@ static int rtl8211f_config_init(struct phy_device *phydev)
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = phy_modify_paged(phydev, RTL8211F_PHYCR_PAGE,
+-			       RTL8211F_PHYCR2, RTL8211F_CLKOUT_EN,
+-			       priv->phycr2);
+-	if (ret < 0) {
++	ret = rtl8211f_disable_clk_out(phydev);
++	if (ret) {
+ 		dev_err(dev, "clkout configuration failed: %pe\n",
+ 			ERR_PTR(ret));
+ 		return ret;
 -- 
 2.34.1
 
