@@ -1,112 +1,90 @@
-Return-Path: <netdev+bounces-236146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90C89C38D84
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 03:19:43 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7948EC38D9C
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 03:22:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32432188B3BC
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 02:18:22 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D5A124E87C4
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 02:21:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A06D81CAA6C;
-	Thu,  6 Nov 2025 02:17:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A08C42253EE;
+	Thu,  6 Nov 2025 02:21:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VNAKcMxG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UuJYDjvP"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF0629A1
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 02:17:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 781061DE8BF;
+	Thu,  6 Nov 2025 02:21:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762395473; cv=none; b=tb8tGyjBh/uI0odMS3dxrL5tMQThGvwsM4pT7lK36fA3OdnNhhIioEQ7qTCYR//8iaeubDM5oFuGjqa9B3NpOVPfS3Ya9yOrBtW4+Kbku8L+kfu3769vtxUb56jjF2ZD3hVIQo2W896rxvc6pd3+sg3urnNk29qmlpqPidPo4oQ=
+	t=1762395679; cv=none; b=aepecTZ3o+Ftxx9aOVoL3QJyjJ5fx7TtYnrJ0VKtzEu3nSMjHBsHfkER80Hf9zT6g3TVHnP/WSjw6qa6mmuoqgxO+mkIsONdrvmWcJ9LCpFlIkn+OoGD9K9NwcVMbHbQ4Ddm2v6pkVrryemPbNfjnmf+ImAZbjL3Mu0GNPBIWQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762395473; c=relaxed/simple;
-	bh=FCgKQ56mjn5dTIHZPT8pNgwH5Em4CSqunkdpm0PLda4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jYEuH+tFXGUzGPlUcyvVBEzI9EPohVzrLr/Bn+/LwK7lYIbEygyWBapKiKX/q+sUvgR3Hr0J2KfZjo3LkNgPXVGFjr80MN9k8zQuXpZIOW+qU63OZxRFDljT//wQUlArC8uDxga6qRTT7/foIcIGrCJVAJH3nI5diIqlIOV8XQo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VNAKcMxG; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <24956178-c806-4bf1-8442-73ceda725b8c@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1762395469;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GIUCjU75fFXHLmA9m2LCnW9ToYG068qlHCH3j6DpAz0=;
-	b=VNAKcMxG3+HSx77TEywwRmzGjtGAnAVAphnLlA/CH0y7q/w92ZgUh3ehsA2z0q3uquoqKk
-	7VnTJnuaBqTbEShG3o+LODbhGaJBDTC99qpZSx1h7mA/pfKG2r7MumooQXyaDH2SFmd7+E
-	Cau6aad1chCgRNML6snXaSuYTEZtts0=
-Date: Wed, 5 Nov 2025 18:17:44 -0800
+	s=arc-20240116; t=1762395679; c=relaxed/simple;
+	bh=4uaLy9RCWxllw4thiPZjA0It3BNE0h5qniqxb3hpyXU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=L25NqoZz9Fz+136T2eHAWb333kiE6+4sReMM7tiI5X4XuZjFhNTQ5gFqtHB7aK9GIGKkscefUx+NcS2HD2ADQNQm9q6qaK7CrJCHnlyi1QUYW/KTUT1M5cFvqFLhzLg++bVCCvvRrg4iHU6rk1LwHPP421GA6PinlGb+uuW2sSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UuJYDjvP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01C98C4CEF5;
+	Thu,  6 Nov 2025 02:21:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762395679;
+	bh=4uaLy9RCWxllw4thiPZjA0It3BNE0h5qniqxb3hpyXU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=UuJYDjvPM89N92LD9MsVMJH3WTndKbqxpGg79YlMwrt1DcdJIJ/097Ou9jSjR9Uxl
+	 xp88jF+klbp+7deXP3Avavb+rKJAEvPtT1W7DtqSisHth7EjQ1tvRbyty58LEKEA/V
+	 XNw3217OVhPC71h4TC/70+hrmwbSEt/HW88ZwrSDvtCF0uHbbnfrh/AwdPgRQ396jt
+	 XpAvscD5opKW0MydJq/o/PgKXwxEM+CQk9jt1Dq5/lUqnSJI8d4/skIHq9N+pcGdcJ
+	 F4HkLrkeXqBfUPxkKh8tI/Vl91Y3WSvRNzpZSTs32xFSR/E8n1v/Ix5irW/GvN/YbT
+	 HSYszilIA1gvw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70B3C380AAF9;
+	Thu,  6 Nov 2025 02:20:53 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v5 2/7] bpf: Support associating BPF program with
- struct_ops
-To: Amery Hung <ameryhung@gmail.com>
-Cc: netdev@vger.kernel.org, alexei.starovoitov@gmail.com, andrii@kernel.org,
- daniel@iogearbox.net, tj@kernel.org, martin.lau@kernel.org,
- kernel-team@meta.com, bpf@vger.kernel.org
-References: <20251104172652.1746988-1-ameryhung@gmail.com>
- <20251104172652.1746988-3-ameryhung@gmail.com>
- <3d44b770-6fca-4b8d-a650-2680a977d2b7@linux.dev>
- <CAMB2axP7z6xWs_YuLDEKi1ciz0QE9b507nDf5FcydNjWq8MogA@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <CAMB2axP7z6xWs_YuLDEKi1ciz0QE9b507nDf5FcydNjWq8MogA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Subject: Re: [GIT PULL] wireless-next-2025-11-05
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176239565225.3838891.6822561815529214615.git-patchwork-notify@kernel.org>
+Date: Thu, 06 Nov 2025 02:20:52 +0000
+References: <20251105153537.54096-38-johannes@sipsolutions.net>
+In-Reply-To: <20251105153537.54096-38-johannes@sipsolutions.net>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
 
+Hello:
 
+This pull request was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On 11/5/25 5:01 PM, Amery Hung wrote:
-> On Wed, Nov 5, 2025 at 4:57 PM Martin KaFai Lau <martin.lau@linux.dev> wrote:
->>
->>
->>
->> On 11/4/25 9:26 AM, Amery Hung wrote:
->>> +void *bpf_prog_get_assoc_struct_ops(const struct bpf_prog_aux *aux)
->>> +{
->>> +     struct bpf_map *st_ops_assoc = READ_ONCE(aux->st_ops_assoc);
->>> +     struct bpf_struct_ops_map *st_map;
->>> +
->>> +     if (!st_ops_assoc || st_ops_assoc == BPF_PTR_POISON)
->>> +             return NULL;
->>> +
->>> +     st_map = (struct bpf_struct_ops_map *)st_ops_assoc;
->>> +
->>> +     if (smp_load_acquire(&st_map->kvalue.common.state) == BPF_STRUCT_OPS_STATE_INIT) {
->>> +             bpf_map_put(st_ops_assoc);
->>
->> hmm... why bpf_map_put is needed?
->>
+On Wed,  5 Nov 2025 16:34:33 +0100 you wrote:
+> Hi,
 > 
-> AI also caught this. This is not needed. I overlooked it when changing
-> from v4, where bpf_prog_get_assoc_struct_ops() used to first bump the
-> refcount.
-
-ah. My bad for the noise. Fixed my mail client. Somehow only that one 
-email got filtered.
-
+> So more driver updates are trickling in now, with Intel
+> and Atheros this time. I have a whole new NXP driver that
+> isn't in here yet, but is quite likely good enough for
+> next week. We'll see. :)
 > 
->> Should the state be checked only once during assoc time instead of
->> checking it every time bpf_prog_get_assoc_struct_ops is called?
->>
->>> +             return NULL;
->>> +     }
->>> +
->>> +     return &st_map->kvalue.data;
->>> +}
->>
+> [...]
+
+Here is the summary with links:
+  - [GIT,PULL] wireless-next-2025-11-05
+    https://git.kernel.org/netdev/net-next/c/9b73cdad5889
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
