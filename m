@@ -1,79 +1,78 @@
-Return-Path: <netdev+bounces-236386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0022C3B7F9
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 14:58:26 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7BCCC3B80B
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 14:58:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A0A01A4482A
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 13:58:45 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7376734C80A
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 13:58:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BC5D334C09;
-	Thu,  6 Nov 2025 13:58:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D36F9337BA7;
+	Thu,  6 Nov 2025 13:58:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EzRc3ES1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d+SFgT1J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
+Received: from mail-pj1-f68.google.com (mail-pj1-f68.google.com [209.85.216.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF51E2010EE
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 13:58:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 369CC2010EE
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 13:58:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.68
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762437491; cv=none; b=QLP2Fq/B/Js5+w7okWcvz5AyPYkXMGh5/YxiyjkKDshTPHR1oNYLC6wlJ2MSvs/nsjzmpJoshpcAw2ORL78qCje2iYjFtOxLn7qVOzmTFCG9X+gAaBZ4iNNW/qth7hFwgCSQEKdBfIPOd/gEfBVeIBeex9F+xzPVmddrCsQPoRI=
+	t=1762437497; cv=none; b=pRN6K4BDlt+eeD4J+emK8DwCr7/DxQUBOCK31kxMkQ3qFAyIOaiCZRXM3Cjeoxvpg/7Rag1FAAmuPM/C2ET88Im7VY2yaE/wco8R0dHnBnkyAb4R29yWVgx/39qzJzWsc7ezEoS1mx38D9eNhGNOMUlfyjxpHXm23WXKHUzKUW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762437491; c=relaxed/simple;
-	bh=xm32/PUt7XgP0AJBnuwZMLyFiMHFhdYO5mBVoIGW22o=;
+	s=arc-20240116; t=1762437497; c=relaxed/simple;
+	bh=DrHGCtHv53QjsxNbuUABBFBxBL0tWPAnkEs2nHbZ6kE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=iMnH9mcUy2VO/tPih+YCEGbK4T+iZC/+A7y925nMCWWyGrqrImCqlmuWjtO1cbMDYIueqCOw8qSAuI4XyWIPdoffqjwOfmSPxYBKcjY0O2dScW6HZdH5A00rHLfpzIB2D7dW9PISRWsc/TGtUxMAmEyOs9t9DAbz75xgHcorNJs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EzRc3ES1; arc=none smtp.client-ip=209.85.214.196
+	 MIME-Version; b=ZHkuRHS42L1+ZoULZPxx9P0H4NyzzY1S4NST9Sf2KvO/9p7qcddoQNjwPPa5/c9T18UFJcPJaS6eBWR6knqZ/moQQE7PUFMH69zBiT1NKkWlDU/S8b8RLxX+EGvOcNRkgUY19ZNrFyRj7Utn06Mi8vNN4N2grPEyXzOdKw7OAcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d+SFgT1J; arc=none smtp.client-ip=209.85.216.68
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-29301049db3so1324275ad.0
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 05:58:09 -0800 (PST)
+Received: by mail-pj1-f68.google.com with SMTP id 98e67ed59e1d1-34159ccb610so103571a91.2
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 05:58:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762437489; x=1763042289; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1762437495; x=1763042295; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CJ2p4fKScptUntxDD4RknqhZ7LLlOjfrAorczf3l+6o=;
-        b=EzRc3ES19SnWtvBn3KY8R6QK9rMxorvrsGWx/ZYYk5jdN2p37orAm1nMdf3gpYuRNC
-         Tu+1/6lj73UwjxXTvCS8XdJULyde/XJPn72v9WlteOgnxzc6ZKziasd9mqFZp0edQQTv
-         WHCnGrYNQZFGfcRwiDMgzSy1pXDlRDQArE6QSeHy40t7tdxZ/6RdZ4THQBWGCbvVy1Al
-         itr88cNCncPgrtBnz4QTPmescf8DnpIulKvUgzuDU6WwsfnZ2MTy3dKRFInr1wAXn4gj
-         CW+R+8XpBPzvVEEXuQl1TVgh/ognw0HKPlIMa0srefcQNcktzXNmMDZuJhlVxTAzOWpm
-         Sfig==
+        bh=ro150xIMSRVQ4ZLxxqwU1iOGZU/wuTJeStzvIhnMN34=;
+        b=d+SFgT1JpEjz+wBDVU0mC++YICGN5EveFN67TEtxAOFwKIv53jrumrj4vJwA679HwZ
+         TIdfd1Hf6FPGVuL6Y0Hhz6rb+v6gVptJ2g25Oc2zLgYwbaqpfCEatqEWr+kPP69ZWR8V
+         oMLlWJvAUZO67pkCgBOp7h7z1Y6pC+US48rqC3qqnm2E96tWq5VJOIOjAB+OI/ATp9rj
+         a3Bw74RwqdR1WEnN0Kf+e/yNRUDVWgT7CKUlRB+1SjAUxfQ8+o0lJHOg7TMCMaDWbwKF
+         0eCVCm8q0BCgm9a9x/InYGGvqAdD2/v9yAl5mZ7ztT28plE4j87vae6vsNINUPV3HWNo
+         qpuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762437489; x=1763042289;
+        d=1e100.net; s=20230601; t=1762437495; x=1763042295;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CJ2p4fKScptUntxDD4RknqhZ7LLlOjfrAorczf3l+6o=;
-        b=NjNHR8WEaFcxZq6EPo6CMiY+horPq5Ajm9r71Qx+g6gYJwbAPDQ7mBpzJ5+lPVhVgK
-         bApDdmLYjivChT1cstvNQ5b4TvXK2hUkeXjb8+ovQ6QSVtNbk5QSPDOfDd3O62dwzv4k
-         20svIpAhzsdbtskzQq2ZPTHguVPl5lUNMK1NT+2I92g+mdEi61EoztkFxpAnx3+u8DdY
-         b+E8Lh5r8slaBImINH1Y7LOhKbzWdzI+/Cs6prN3NqwF/kJfpKRuJzVl73IDaZ3pe9gF
-         G3kfljJK2RnH68G7jNLXo5a0uJSkN0T3KUZUiL3qV1Je3wh5Y/ZuQMftuixWqcKpELa5
-         Vo2A==
-X-Forwarded-Encrypted: i=1; AJvYcCVYgIjYpwHRAy0slVHu4LE6ohwneDKxj/KBKeTlv7LxTl4hqDxEUUMJYEpuo3AMTkGPV6x8/bI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFie2WpE/1z80jApQLmmMFrdy7q0lQv304GGSO8cuIRavckvNg
-	KhRzJnXr4XWNfsdbfNvUF5ZV8UwpP4RPHFoOLq6vJcfWmcvTQEx+Pcum
-X-Gm-Gg: ASbGncuWEwgLYXDgUh3YNbPC+Iu+BhR8wEn0xCJP399w33JUYtRRwTdin+TcZrhewqA
-	pCWgZ8T7BKJafpWSp3RSDdKxvOjdipZ/DyBfGc0ALEnnZtnWk5FZ1j3aw8t3wyJDs64LhJYo4zz
-	i7TORKM6jl1qg7UPX2O7nz+OIPIl4qaO0xb19M0iXRtRrB20d5RWMLDVAeMvgEeoHgrxK4YvXgY
-	vkXM1Yvcapy6XhbUjQItjvCjPpvqULwDXlEQTL6evBb6bpc2Q/Vi8JsiC7hO2kOyfAENyWob6tL
-	oel21ZPmDExRah3gOskzniTiDf53jukbV1SV3X17+hSAnt4VEdOnYkUkiHWexUEzR0Ng7jaXD2u
-	b5hpVJsUaCp6lXT4qBv4TnB7qwtx3uz4i2u5TdugYt57zdZShwa+iqIWvNgyrlapDsYO+N33807
-	Q=
-X-Google-Smtp-Source: AGHT+IEqMgZ7opDOUpiaQ/1pkphHXH5yXYJ0l9b+0/N5P7cyoOtDV0gJB9a3rdSrbl3cPEiiU+wihw==
-X-Received: by 2002:a17:902:c402:b0:295:4d64:3c88 with SMTP id d9443c01a7336-2962ae532b4mr53521975ad.7.1762437488720;
-        Thu, 06 Nov 2025 05:58:08 -0800 (PST)
+        bh=ro150xIMSRVQ4ZLxxqwU1iOGZU/wuTJeStzvIhnMN34=;
+        b=FfnERlXyX78kXotwyBoNeNkcxwVVY0F7tUcT6JoytkmcmsTAQWd6vABHUNhfIeIr3p
+         JgXsMUdpUekIx4ZwLblJSG1ONjqOiYKU6Pq5KsMU4BWnOdehQU4jYUPHjZZaggzr9AUx
+         rUMvedEkL3MM57vaPmv9SDG0fhUkYdCcOTZ7cvLuGWbrqBfepT53gPaB9zkNOfjwZtxa
+         upCwYHivjrcz32y7NChGjqibPceyH767Xe2aa9TsY+nWK0hSSkGzBnoDtasR6I+ktsGt
+         7xNe8eif/dfmoRiCTCCNpm7GGxSZx4hMN6GzjCaK12PuAgx1KVcLXE3Xs1stuKKJTBs4
+         /UrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXs7RApgwylcPlXbGhvm+Kh6OdeZwFIYB2w9G4sHu8QB0OoS/8ptXhATBSvuNOwY/39WY2mIts=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx/9C4CuSmSf7QqLDW7Hh7xJ59QD83EnDArfZrzJrr3lCskAt7V
+	K0eWDyo/ekQKXaRL9G5bZi9g1AEifAWlULNIxYhw8bdQ2LWx38GwVmvu
+X-Gm-Gg: ASbGncsnIih/HgbmhZ/ed51bX6qGIHiIK/A21Fl4z2SO/Yvs207dOSBIf7qGnpLi00c
+	3q/gICGcuV2ZnCdLHJ5ScbHcSHkKD2PGV+EYl4YP3pPXEpoiCop535rV9qJ3J6yPFw0tXQyoMnD
+	lQKIoSVlC5TuwdfS41d2k0popj8VO+APw97rg+sstjxTCpMDrVI3DqXophkLuYdY483yj/mpNk0
+	K6MsTFeBDQJu38ONBZvtXm2ucbtPZXJe1Nxw7uREdqrbaG3Z0rozuD+vgDNyfCFmpm1ydEWxV/Z
+	Cwy8kcQ2LMFtILOeeZY2Mu/rXmYvcIVz9sIiKwl+b6WASQ3Rfw7L3DYe81OmTyHDGWq7CZp4mAZ
+	rAOWyFaHR+k88S4CfOKGw+VwXpHKhsnJ8nO5Bt6jzSdSyS6Fqt3tynS54Ucjpz2gM
+X-Google-Smtp-Source: AGHT+IE4mUBuAxvxNOx8gzgkLs6eu5qTa8sJ0yTqgn0Map+lM4vZ+s3iiD82zXnyQVCGqYbKWG6o1w==
+X-Received: by 2002:a17:90b:4a8a:b0:340:29cb:d3e8 with SMTP id 98e67ed59e1d1-341a6b0da84mr4647095a91.0.1762437495322;
+        Thu, 06 Nov 2025 05:58:15 -0800 (PST)
 Received: from user.. ([58.206.232.74])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-341a68bf37bsm6439593a91.7.2025.11.06.05.58.05
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-341a68bf37bsm6439593a91.7.2025.11.06.05.58.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Nov 2025 05:58:08 -0800 (PST)
+        Thu, 06 Nov 2025 05:58:14 -0800 (PST)
 From: clingfei <clf700383@gmail.com>
 X-Google-Original-From: clingfei <1599101385@qq.com>
 To: horms@kernel.org
@@ -90,9 +89,9 @@ Cc: davem@davemloft.net,
 	syzbot+be97dd4da14ae88b6ba4@syzkaller.appspotmail.com,
 	syzkaller-bugs@googlegroups.com,
 	clf700383@gmail.com
-Subject: [PATCH 1/3] fix integer overflow in set_ipsecrequest
-Date: Thu,  6 Nov 2025 21:56:56 +0800
-Message-Id: <20251106135658.866481-2-1599101385@qq.com>
+Subject: [PATCH 2/3] key: No support for family zero
+Date: Thu,  6 Nov 2025 21:56:57 +0800
+Message-Id: <20251106135658.866481-3-1599101385@qq.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251106135658.866481-1-1599101385@qq.com>
 References: <20251106135658.866481-1-1599101385@qq.com>
@@ -104,35 +103,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: clingfei <clf700383@gmail.com>
+From: Edward Adam Davis <eadavis@qq.com>
 
-syzbot reported a kernel BUG in set_ipsecrequest() due to an skb_over_panic.
+When setting the extended skb data for sadb_x_ipsecrequest, the requested
+extended data size exceeds the allocated skb data length, triggering the
+reported bug.
 
-The mp->new_family and mp->old_family is u16, while set_ipsecrequest receives
-family as uint8_t,  causing a integer overflow and the later size_req calculation
-error, which exceeds the size used in alloc_skb, and ultimately triggered the
-kernel bug in skb_put.
+Because family only supports AF_INET and AF_INET6, other values will cause
+pfkey_sockaddr_fill() to fail, which in turn causes set_ipsecrequest() to
+fail.
 
+Therefore, a workaround is available here: using a family value of 0 to
+resolve the issue of excessively large extended data length.
+
+syzbot reported:
+kernel BUG at net/core/skbuff.c:212!
+Call Trace:
+ skb_over_panic net/core/skbuff.c:217 [inline]
+ skb_put+0x159/0x210 net/core/skbuff.c:2583
+ skb_put_zero include/linux/skbuff.h:2788 [inline]
+ set_ipsecrequest+0x73/0x680 net/key/af_key.c:3532
+
+Fixes: 08de61beab8a ("[PFKEYV2]: Extension for dynamic update of endpoint address(es)")
 Reported-by: syzbot+be97dd4da14ae88b6ba4@syzkaller.appspotmail.com
 Closes: https://syzkaller.appspot.com/bug?extid=be97dd4da14ae88b6ba4
-Signed-off-by: Cheng Lingfei <clf700383@gmail.com>
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
 ---
- net/key/af_key.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/key/af_key.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/net/key/af_key.c b/net/key/af_key.c
-index 2ebde0352245..aa4bd29f27ea 100644
+index aa4bd29f27ea..cfda15a5aa4d 100644
 --- a/net/key/af_key.c
 +++ b/net/key/af_key.c
-@@ -3518,7 +3518,7 @@ static int set_sadb_kmaddress(struct sk_buff *skb, const struct xfrm_kmaddress *
+@@ -3526,6 +3526,9 @@ static int set_ipsecrequest(struct sk_buff *skb,
+ 	int socklen = pfkey_sockaddr_len(family);
+ 	int size_req;
  
- static int set_ipsecrequest(struct sk_buff *skb,
- 			    uint8_t proto, uint8_t mode, int level,
--			    uint32_t reqid, uint8_t family,
-+			    u32 reqid, uint16_t family,
- 			    const xfrm_address_t *src, const xfrm_address_t *dst)
- {
- 	struct sadb_x_ipsecrequest *rq;
++	if (!family)
++		return -EINVAL;
++
+ 	size_req = sizeof(struct sadb_x_ipsecrequest) +
+ 		   pfkey_sockaddr_pair_size(family);
+ 
 -- 
 2.34.1
 
