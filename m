@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-236387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7BCCC3B80B
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 14:58:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FF41C3B81D
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 14:59:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 7376734C80A
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 13:58:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A126D1A42267
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 13:59:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D36F9337BA7;
-	Thu,  6 Nov 2025 13:58:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBD5F335BBB;
+	Thu,  6 Nov 2025 13:58:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d+SFgT1J"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O+nzBUd6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f68.google.com (mail-pj1-f68.google.com [209.85.216.68])
+Received: from mail-pj1-f66.google.com (mail-pj1-f66.google.com [209.85.216.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 369CC2010EE
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 13:58:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16D53043A1
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 13:58:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762437497; cv=none; b=pRN6K4BDlt+eeD4J+emK8DwCr7/DxQUBOCK31kxMkQ3qFAyIOaiCZRXM3Cjeoxvpg/7Rag1FAAmuPM/C2ET88Im7VY2yaE/wco8R0dHnBnkyAb4R29yWVgx/39qzJzWsc7ezEoS1mx38D9eNhGNOMUlfyjxpHXm23WXKHUzKUW8=
+	t=1762437508; cv=none; b=RYzijwRGWpgK5N31NW6MD/dS84oEPR1J7nYz1iFQZ059lgmQsaT7DE6nuyJsNa91lpm7LKOmTUpnUILOUob9HE8XOU0y6Yr4/wTVOVC2hWcFIQaW2YJQrhoCsIdMgwNO6EtP7UsTXbuIxCeu9mut99ScJxe9G7oUSlso2+OIW10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762437497; c=relaxed/simple;
-	bh=DrHGCtHv53QjsxNbuUABBFBxBL0tWPAnkEs2nHbZ6kE=;
+	s=arc-20240116; t=1762437508; c=relaxed/simple;
+	bh=zrM2PCMHTJ+hS4n00Wujxh07B+51gM7047RGagXqk+I=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZHkuRHS42L1+ZoULZPxx9P0H4NyzzY1S4NST9Sf2KvO/9p7qcddoQNjwPPa5/c9T18UFJcPJaS6eBWR6knqZ/moQQE7PUFMH69zBiT1NKkWlDU/S8b8RLxX+EGvOcNRkgUY19ZNrFyRj7Utn06Mi8vNN4N2grPEyXzOdKw7OAcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d+SFgT1J; arc=none smtp.client-ip=209.85.216.68
+	 MIME-Version; b=OjKc2bVapFmOXR398XoDy+E5xFNrd5vYSw2F7c9C4w88kheRrs/pRjvSceaHQFMcKZA45wOZzOhvuKw60U27a5oWsOroV6cYTLmqmdSMpFgNUynpuzrIb42utJFB+ZRyPB+lolTQ00SIobUQud+N20bAOZdWv3hdh54CTVeNSzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O+nzBUd6; arc=none smtp.client-ip=209.85.216.66
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f68.google.com with SMTP id 98e67ed59e1d1-34159ccb610so103571a91.2
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 05:58:15 -0800 (PST)
+Received: by mail-pj1-f66.google.com with SMTP id 98e67ed59e1d1-3307e8979f2so191787a91.2
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 05:58:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762437495; x=1763042295; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1762437505; x=1763042305; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ro150xIMSRVQ4ZLxxqwU1iOGZU/wuTJeStzvIhnMN34=;
-        b=d+SFgT1JpEjz+wBDVU0mC++YICGN5EveFN67TEtxAOFwKIv53jrumrj4vJwA679HwZ
-         TIdfd1Hf6FPGVuL6Y0Hhz6rb+v6gVptJ2g25Oc2zLgYwbaqpfCEatqEWr+kPP69ZWR8V
-         oMLlWJvAUZO67pkCgBOp7h7z1Y6pC+US48rqC3qqnm2E96tWq5VJOIOjAB+OI/ATp9rj
-         a3Bw74RwqdR1WEnN0Kf+e/yNRUDVWgT7CKUlRB+1SjAUxfQ8+o0lJHOg7TMCMaDWbwKF
-         0eCVCm8q0BCgm9a9x/InYGGvqAdD2/v9yAl5mZ7ztT28plE4j87vae6vsNINUPV3HWNo
-         qpuw==
+        bh=95xsXqtqpxl4DVLujugvMY+qm/mCPkORVkUJK+NXUMI=;
+        b=O+nzBUd6+r9GxAqI32uBqtQmyEBhnQE3u+EoZ0D/4Wd/HXpWS5t4UorVeRlex5VW8p
+         oJWb6qhWSczZzyJvaCkeso4buVy/8erhpvVZXKJkWrH2Ltozq5LC9L0Ye73Y+K3xO6Zb
+         7NMUs/oktERoFqSIcqHpDIUDZ+THVPIQmNG3IY6hf8RPfHZh6quHEfzGQdTy5gcSBMic
+         GBIkTsONaVYyzXGqG6vEWBVPRLIjHRsCFyh3BHP4s5WCU2BxWWBOzdSDox+jNOdhM6Zs
+         sLlNtywhbnKofX4yOupyZRwEqtONIHYr5SnZIW5rSlmo7HspSgj8+1z9M8TsHBQKa64O
+         kbhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762437495; x=1763042295;
+        d=1e100.net; s=20230601; t=1762437505; x=1763042305;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ro150xIMSRVQ4ZLxxqwU1iOGZU/wuTJeStzvIhnMN34=;
-        b=FfnERlXyX78kXotwyBoNeNkcxwVVY0F7tUcT6JoytkmcmsTAQWd6vABHUNhfIeIr3p
-         JgXsMUdpUekIx4ZwLblJSG1ONjqOiYKU6Pq5KsMU4BWnOdehQU4jYUPHjZZaggzr9AUx
-         rUMvedEkL3MM57vaPmv9SDG0fhUkYdCcOTZ7cvLuGWbrqBfepT53gPaB9zkNOfjwZtxa
-         upCwYHivjrcz32y7NChGjqibPceyH767Xe2aa9TsY+nWK0hSSkGzBnoDtasR6I+ktsGt
-         7xNe8eif/dfmoRiCTCCNpm7GGxSZx4hMN6GzjCaK12PuAgx1KVcLXE3Xs1stuKKJTBs4
-         /UrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXs7RApgwylcPlXbGhvm+Kh6OdeZwFIYB2w9G4sHu8QB0OoS/8ptXhATBSvuNOwY/39WY2mIts=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/9C4CuSmSf7QqLDW7Hh7xJ59QD83EnDArfZrzJrr3lCskAt7V
-	K0eWDyo/ekQKXaRL9G5bZi9g1AEifAWlULNIxYhw8bdQ2LWx38GwVmvu
-X-Gm-Gg: ASbGncsnIih/HgbmhZ/ed51bX6qGIHiIK/A21Fl4z2SO/Yvs207dOSBIf7qGnpLi00c
-	3q/gICGcuV2ZnCdLHJ5ScbHcSHkKD2PGV+EYl4YP3pPXEpoiCop535rV9qJ3J6yPFw0tXQyoMnD
-	lQKIoSVlC5TuwdfS41d2k0popj8VO+APw97rg+sstjxTCpMDrVI3DqXophkLuYdY483yj/mpNk0
-	K6MsTFeBDQJu38ONBZvtXm2ucbtPZXJe1Nxw7uREdqrbaG3Z0rozuD+vgDNyfCFmpm1ydEWxV/Z
-	Cwy8kcQ2LMFtILOeeZY2Mu/rXmYvcIVz9sIiKwl+b6WASQ3Rfw7L3DYe81OmTyHDGWq7CZp4mAZ
-	rAOWyFaHR+k88S4CfOKGw+VwXpHKhsnJ8nO5Bt6jzSdSyS6Fqt3tynS54Ucjpz2gM
-X-Google-Smtp-Source: AGHT+IE4mUBuAxvxNOx8gzgkLs6eu5qTa8sJ0yTqgn0Map+lM4vZ+s3iiD82zXnyQVCGqYbKWG6o1w==
-X-Received: by 2002:a17:90b:4a8a:b0:340:29cb:d3e8 with SMTP id 98e67ed59e1d1-341a6b0da84mr4647095a91.0.1762437495322;
-        Thu, 06 Nov 2025 05:58:15 -0800 (PST)
+        bh=95xsXqtqpxl4DVLujugvMY+qm/mCPkORVkUJK+NXUMI=;
+        b=Gvb/RQljsgQ4dOpdEkFsE+TXAPTOIMZaxU1Gem9StDLhB0FmXgetmhTzSyaLnrNbnu
+         gR+IdVhdsr6n2UQOKDDGfXyl0fiWWC/4oLRrjZd53k6Bt/zaVjnyVCCgxolVTbjj+26g
+         F8klXMfgLfo0eKEoCnT6mZViwon/LGmzN8oVS8LJXJUnELTGaHod5rrAKmYNOdSJi2zJ
+         VRHVTFAn8kbTpRd40ll+49UUeh1J2Dg839/YVASOBFr0RJDzWnEZzkAolB5+Bv0jNRP6
+         XPnLRIYcAbhwW6N2dlqs+NL8XFhpEbXJcNjnHNbABuVoqBtmLPPOcq/zWZcfm4VC9WzY
+         K/eQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVu0Ruq7zhCTunz23vj2AfMpDbAnOulDOjKoue7OV8rCxUtFH5aEGfuW50Ix/faFm5v93iEVhA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfqOcE1AjhIxpfootrUXKfqiL5nYIBc4LGsUaBigp9M9CubiMz
+	sBTD3oG/GNgyWUDJsWGrKeP4sfQ0w0dzsuITvW+MVGyCgjCO1sY6ba8m
+X-Gm-Gg: ASbGncvyUB7EcTNKHglFUd4j441iG5xsvwHvtp64zt4QD9g2S+e25SIzW67yxmHTINW
+	SSf38JdsIuM4i+KFFC0XicyyYh8H8oV8j3NMVkvM9D1BV+eHOvNtTW30k0/yH1qAWakJq/UPApL
+	s2wIcxpHu7w/RtwY4x2moqsw7JLUJitHLDi1vWLQxs3cHrc4M3NKyY+Dozz1oayRxqbSoxwzsuG
+	gKT4IxZfmJiX4LM4iq42O+Lpq0ndd3kd+d9EqKlOzpOAR4ntohI1hYhTkoaFO9Z/WReVwZhT/Kt
+	E+Gzh0K31Q3Mdlpl3k85as7GxMNynVOYDxMg5aY96Haz7J71+PNSGgIBZAnTVG15NJG8v4grTCQ
+	C7ldIfhPXGh/czZSGSMIG3pZqVJkeJKuOeFqdWOv79d4TWea7ViTciUB1uoOfsVAn
+X-Google-Smtp-Source: AGHT+IGIBN1A6WXIAp5cV5s9HGkIYojkGlgq6bso3e+lR+1LOUXP0gknbBO0nEL/1V/95+m6CD5B4Q==
+X-Received: by 2002:a17:90b:4c4f:b0:340:b8f2:24f6 with SMTP id 98e67ed59e1d1-341cf343082mr2159229a91.2.1762437505042;
+        Thu, 06 Nov 2025 05:58:25 -0800 (PST)
 Received: from user.. ([58.206.232.74])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-341a68bf37bsm6439593a91.7.2025.11.06.05.58.12
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-341a68bf37bsm6439593a91.7.2025.11.06.05.58.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Nov 2025 05:58:14 -0800 (PST)
+        Thu, 06 Nov 2025 05:58:24 -0800 (PST)
 From: clingfei <clf700383@gmail.com>
 X-Google-Original-From: clingfei <1599101385@qq.com>
 To: horms@kernel.org
@@ -89,9 +89,9 @@ Cc: davem@davemloft.net,
 	syzbot+be97dd4da14ae88b6ba4@syzkaller.appspotmail.com,
 	syzkaller-bugs@googlegroups.com,
 	clf700383@gmail.com
-Subject: [PATCH 2/3] key: No support for family zero
-Date: Thu,  6 Nov 2025 21:56:57 +0800
-Message-Id: <20251106135658.866481-3-1599101385@qq.com>
+Subject: [PATCH 3/3] net: key: Validate address family in set_ipsecrequest()
+Date: Thu,  6 Nov 2025 21:56:58 +0800
+Message-Id: <20251106135658.866481-4-1599101385@qq.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20251106135658.866481-1-1599101385@qq.com>
 References: <20251106135658.866481-1-1599101385@qq.com>
@@ -103,49 +103,75 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Edward Adam Davis <eadavis@qq.com>
+From: SHAURYA RANE <ssrane_b23@ee.vjti.ac.in>
 
-When setting the extended skb data for sadb_x_ipsecrequest, the requested
-extended data size exceeds the allocated skb data length, triggering the
-reported bug.
+Hi syzbot,
 
-Because family only supports AF_INET and AF_INET6, other values will cause
-pfkey_sockaddr_fill() to fail, which in turn causes set_ipsecrequest() to
-fail.
+Please test the following patch.
 
-Therefore, a workaround is available here: using a family value of 0 to
-resolve the issue of excessively large extended data length.
+#syz test: git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
 
-syzbot reported:
-kernel BUG at net/core/skbuff.c:212!
-Call Trace:
- skb_over_panic net/core/skbuff.c:217 [inline]
- skb_put+0x159/0x210 net/core/skbuff.c:2583
- skb_put_zero include/linux/skbuff.h:2788 [inline]
- set_ipsecrequest+0x73/0x680 net/key/af_key.c:3532
+Thanks,
+Shaurya Rane
 
-Fixes: 08de61beab8a ("[PFKEYV2]: Extension for dynamic update of endpoint address(es)")
+From 123c5ac9ba261681b58a6217409c94722fde4249 Mon Sep 17 00:00:00 2001
+From: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
+Date: Sun, 19 Oct 2025 23:18:30 +0530
+Subject: [PATCH] net: key: Validate address family in set_ipsecrequest()
+
+syzbot reported a kernel BUG in set_ipsecrequest() due to an
+skb_over_panic when processing XFRM_MSG_MIGRATE messages.
+
+The root cause is that set_ipsecrequest() does not validate the
+address family parameter before using it to calculate buffer sizes.
+When an unsupported family value (such as 0) is passed,
+pfkey_sockaddr_len() returns 0, leading to incorrect size calculations.
+
+In pfkey_send_migrate(), the buffer size is calculated based on
+pfkey_sockaddr_pair_size(), which uses pfkey_sockaddr_len(). When
+family=0, this returns 0, so only sizeof(struct sadb_x_ipsecrequest)
+(16 bytes) is allocated per entry. However, set_ipsecrequest() is
+called multiple times in a loop (once for old_family, once for
+new_family, for each migration bundle), repeatedly calling skb_put_zero()
+with 16 bytes each time.
+
+This causes the tail pointer to exceed the end pointer of the skb,
+triggering skb_over_panic:
+  tail: 0x188 (392 bytes)
+  end:  0x180 (384 bytes)
+
+Fix this by validating that pfkey_sockaddr_len() returns a non-zero
+value before proceeding with buffer operations. This ensures proper
+size calculations and prevents buffer overflow. Checking socklen
+instead of just family==0 provides comprehensive validation for all
+unsupported address families.
+
 Reported-by: syzbot+be97dd4da14ae88b6ba4@syzkaller.appspotmail.com
 Closes: https://syzkaller.appspot.com/bug?extid=be97dd4da14ae88b6ba4
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+Fixes: 08de61beab8a ("[PFKEYV2]: Extension for dynamic update of
+endpoint address(es)")
+Signed-off-by: Shaurya Rane <ssrane_b23@ee.vjti.ac.in>
 ---
- net/key/af_key.c | 3 +++
- 1 file changed, 3 insertions(+)
+ net/key/af_key.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/net/key/af_key.c b/net/key/af_key.c
-index aa4bd29f27ea..cfda15a5aa4d 100644
+index cfda15a5aa4d..93c20a31e03d 100644
 --- a/net/key/af_key.c
 +++ b/net/key/af_key.c
-@@ -3526,6 +3526,9 @@ static int set_ipsecrequest(struct sk_buff *skb,
- 	int socklen = pfkey_sockaddr_len(family);
- 	int size_req;
+@@ -3529,7 +3529,11 @@ static int set_ipsecrequest(struct sk_buff *skb,
+ 	if (!family)
+ 		return -EINVAL;
  
-+	if (!family)
-+		return -EINVAL;
+-	size_req = sizeof(struct sadb_x_ipsecrequest) +
++    /* Reject invalid/unsupported address families */
++    if (!socklen)
++        return -EINVAL;
 +
- 	size_req = sizeof(struct sadb_x_ipsecrequest) +
++    size_req = sizeof(struct sadb_x_ipsecrequest) +
  		   pfkey_sockaddr_pair_size(family);
  
+ 	rq = skb_put_zero(skb, size_req);
 -- 
 2.34.1
 
