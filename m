@@ -1,116 +1,162 @@
-Return-Path: <netdev+bounces-236148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF8C7C38DA5
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 03:23:50 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77A07C38DFF
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 03:33:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A425D4E6438
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 02:22:15 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E32C94E24B0
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 02:33:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D9E2253EE;
-	Thu,  6 Nov 2025 02:22:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41C171F92E;
+	Thu,  6 Nov 2025 02:33:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m5Aaifbm"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Pi6y3z/O"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC9C1DE3CB;
-	Thu,  6 Nov 2025 02:22:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B72038F54;
+	Thu,  6 Nov 2025 02:33:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762395733; cv=none; b=dV/Irkeqo7ZN8yuBWtPWZbgri6Gm58u5Lcnk8JrEOOCCjds4Mv8iq+lwq8TblH3ZxjNIWAxIuR7rRulcQSWg18nzUg62HQGs5anTg3ZX1LbIXJ7RB120P288Os5GZwKmad48KujAMo1gQ66Q5gaNKw24jVnCu99N8fCDtKc0M+A=
+	t=1762396395; cv=none; b=DFDFK8KP04kr/Xr2MnPmXPORGZOFv339TTPmwEthUnk8Rn9ByHi7sb758cJHX5FlcQUSegXVaGGb26l974iR7UwMYCBcMygywaWdSHmyEHoLqXnHyyofBMj7WGiH5E914KsSOX7tLhyj9Vu1t0j+AhHIp7KoTaRO84ZN8zfEePo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762395733; c=relaxed/simple;
-	bh=ls5bGnGavMV1AN7Di2/vdZqY0U56gOr4tI5eY5v7XTs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FR6/ukIwWreF99GsHhR7TKVySgHCISNxXhElEjCl3f1y/2/FabhBSglqbRUkBcBoCD1WAn0bsRRKFkyhnhvxnlqOsqRrh45ZvupBAj9IN9/1glk2lYncz4MCr0l58yjOwtAUe/DW8S0YyCvzEQMvJRY3897yC/AMoIVJQyKlw04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m5Aaifbm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC17DC4CEF8;
-	Thu,  6 Nov 2025 02:22:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762395731;
-	bh=ls5bGnGavMV1AN7Di2/vdZqY0U56gOr4tI5eY5v7XTs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=m5AaifbmD43HDScHcgMZ+TLConzAlVBy6X6cjKcbtiLKG3QBAExI7kN/jMPs/e7oY
-	 +cY8GXF2uhMNAzuqgDp9e1KKviG2A52ZGIjdtJgLJJw2xqu85NNW1/k0rZyteaLava
-	 YmTT3vwqt9qQKydT/42vZZH0YWCGVdr3wmTq8rpxaNuOC7rvTJN3atmHSMZGml89k9
-	 TlcAYzckIhp+K9a2lKeP76NSw6D7yv0rFrV7+2xdzSu7JfCTx6Ys65m74/JClmxH5q
-	 RL/D9ABeZGKJ+b99WBPZVhJy8tyliW+vdjFGL6shm9vyhnvtIrFB33wt0U7rfwZQQy
-	 EVNtGjBSg3sjQ==
-Date: Wed, 5 Nov 2025 18:22:10 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Joshua Washington
- <joshwash@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>, Ilias
- Apalodimas <ilias.apalodimas@linaro.org>, Simon Horman <horms@kernel.org>,
- Willem de Bruijn <willemb@google.com>, ziweixiao@google.com, Vedant Mathur
- <vedantmathur@google.com>
-Subject: Re: [PATCH net v1 2/2] gve: use max allowed ring size for ZC
- page_pools
-Message-ID: <20251105182210.7630c19e@kernel.org>
-In-Reply-To: <CAHS8izNg63A9W5GkGVgy0_v1U6_rPgCj1zu2_5QnUKcR9eTGFg@mail.gmail.com>
-References: <20251105200801.178381-1-almasrymina@google.com>
-	<20251105200801.178381-2-almasrymina@google.com>
-	<20251105171142.13095017@kernel.org>
-	<CAHS8izNg63A9W5GkGVgy0_v1U6_rPgCj1zu2_5QnUKcR9eTGFg@mail.gmail.com>
+	s=arc-20240116; t=1762396395; c=relaxed/simple;
+	bh=6QCHulsPjkwv23mm5p9pInM4t/KIzWqHph6bKhJA+/A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=udxPArtHSnM5Av3kPcBbmY8Q5T0OwQHJQV+FsA0gqhnMfn/6x0jnsRAMnAJBIoAXfQgVRaGGZZoFOvf8+C4YY2NlDa+3TQR8uqsB8wGOZblC7nNxo9h/cS7oSR8f4l/JsmbiAyZNVJpDSqQLRHkCSFT4RVZNQAKFbeZo/DD4FyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Pi6y3z/O; arc=none smtp.client-ip=115.124.30.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1762396384; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=+2A9MuuqsDuWi1HYvLUVx6lOu3Rr0Oj3EUDLerzUFRo=;
+	b=Pi6y3z/OwpdKOA+4oBEOaxYvPCpk99ztG/NxAQvR5S/b9T51c6SH5oTaHCZbj05hs/wKosmONlnD9SLTv/d2KVwfJ8etqbSKBdXtS44YyffI5I63/2Zl7/SWBoFrhjSu94A+nkw5yyzoDl4O/RPPK03iamqNDlygAhL+pU/xvHQ=
+Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WrnbUO8_1762396382 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 06 Nov 2025 10:33:02 +0800
+Date: Thu, 6 Nov 2025 10:33:02 +0800
+From: "D. Wythe" <alibuda@linux.alibaba.com    >
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: "D. Wythe" <alibuda@linux.alibaba.com>, ast@kernel.org,
+	daniel@iogearbox.net, andrii@kernel.org, pabeni@redhat.com,
+	song@kernel.org, sdf@google.com, haoluo@google.com, yhs@fb.com,
+	edumazet@google.com, john.fastabend@gmail.com, kpsingh@kernel.org,
+	jolsa@kernel.org, mjambigi@linux.ibm.com, wenjia@linux.ibm.com,
+	wintera@linux.ibm.com, dust.li@linux.alibaba.com,
+	tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
+	bpf@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	netdev@vger.kernel.org, sidraya@linux.ibm.com, jaka@linux.ibm.com
+Subject: Re: [PATCH bpf-next v4 2/3] net/smc: bpf: Introduce generic hook for
+ handshake flow
+Message-ID: <20251106023302.GA44223@j66a10360.sqa.eu95>
+References: <20251103073124.43077-1-alibuda@linux.alibaba.com>
+ <20251103073124.43077-3-alibuda@linux.alibaba.com>
+ <4450b847-6b31-46f2-bc2d-a8b3197d15c7@linux.dev>
+ <20251105070140.GA31761@j66a10360.sqa.eu95>
+ <dfed97fb-4e0c-416e-b5d8-8de7b3edce69@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <dfed97fb-4e0c-416e-b5d8-8de7b3edce69@linux.dev>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Wed, 5 Nov 2025 17:56:10 -0800 Mina Almasry wrote:
-> On Wed, Nov 5, 2025 at 5:11=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
-rote:
-> > On Wed,  5 Nov 2025 20:07:58 +0000 Mina Almasry wrote: =20
-> > > NCCL workloads with NCCL_P2P_PXN_LEVEL=3D2 or 1 are very slow with the
-> > > current gve devmem tcp configuration. =20
+On Wed, Nov 05, 2025 at 02:58:48PM -0800, Martin KaFai Lau wrote:
+> 
+> 
+> On 11/4/25 11:01 PM, D. Wythe wrote:
+> >On Tue, Nov 04, 2025 at 04:03:46PM -0800, Martin KaFai Lau wrote:
+> >>
+> >>
+> >>On 11/2/25 11:31 PM, D. Wythe wrote:
+> >>>+#if IS_ENABLED(CONFIG_SMC_HS_CTRL_BPF)
+> >>>+#define smc_call_hsbpf(init_val, sk, func, ...) ({		\
+> >>>+	typeof(init_val) __ret = (init_val);			\
+> >>>+	struct smc_hs_ctrl *ctrl;				\
+> >>>+	rcu_read_lock();					\
+> >>>+	ctrl = rcu_dereference(sock_net(sk)->smc.hs_ctrl);	\
+> >>
+> >>The smc_hs_ctrl (and its ops) is called from the netns, so the
+> >>bpf_struct_ops is attached to a netns. Attaching bpf_struct_ops to a
+> >>netns has not been done before. More on this later.
+> >>
+> >>>+	if (ctrl && ctrl->func)					\
+> >>>+		__ret = ctrl->func(__VA_ARGS__);		\
+> >>>+
+> >>>+	if (static_branch_unlikely(&tcp_have_smc) && tp->syn_smc) {
+> >>>+		tp->syn_smc = !!smc_call_hsbpf(1, sk, syn_option, tp);
+> >>
+> >>... so just pass tp instead of passing both sk and tp?
+> >>
+> >>[ ... ]
+> >>
 > >
-> > Hardcoding the ring size because some other attribute makes you think
-> > that a specific application is running is rather unclean IMO..
->=20
-> I did not see it this way tbh. I am thinking for devmem tcp to be as
-> robust as possible to the burstiness of frag frees, we need a bit of a
-> generous ring size. The specific application I'm referring to is just
-> an example of how this could happen.
->=20
-> I was thinking maybe binding->dma_buf->size / net_iov_size (so that
-> the ring is large enough to hold every single netmem if need be) would
-> be the upper bound, but in practice increasing to the current max
-> allowed was good enough, so I'm trying that.
+> >You're right, it is a bit redundant. However, if we merge the parameters,
+> >every user of this macro will be forced to pass tp. In fact, we’re
+> >already considering adding some callback functions that don’t take tp as
+> >a parameter.
+> 
+> If the struct_ops callback does not take tp, then don't pass it to the
+> callback. I have a hard time to imagine why the bpf prog will not be
+> interested in the tp/sk pointer though.
+> 
+> or you meant the caller does not have tp? and where is the future caller?
 
-Increasing cache sizes to the max seems very hacky at best.
-The underlying implementation uses genpool and doesn't even
-bother to do batching.
+My initial concern was that certain ctrl->func callbacks might
+eventually need to operate on an smc_sock rather than a tcp_sock.
+Crucially, we cannot always derive the owning smc_sock from a given
+tcp_sock (at least not with the current design). Therefore, a macro
+unconditionally passing tp (a tcp_sock pointer) would be unable to
+handle future scenarios requiring operation on an smc_sock. This could
+create an awkward situation with an unconditional tp argument.
 
-> > Do you want me to respin the per-ring config series? Or you can take it=
- over.
-> > IDK where the buffer size config is after recent discussion but IIUC
-> > it will not drag in my config infra so it shouldn't conflict.
->=20
-> You mean this one? "[RFC net-next 00/22] net: per-queue rx-buf-len
-> configuration"
->=20
-> I don't see the connection between rx-buf-len and the ring size,
-> unless you're thinking about some netlink-configurable way to
-> configure the pp->ring size?
+However, considering the current situation, I believe the proposed
+approach is workable. And for future cases where smc_sock-specific
+callbacks become necessary, we can certainly introduce a new, dedicated
+macro at that point to address it. Therefore, I'm happy to proceed with
+your suggested change.
 
-The latter. We usually have the opposite problem - drivers configure
-the cache way too large for any practical production needs and waste
-memory.
-
-> I am hoping for something backportable with fixes to make this class
-> of workloads usable.
-
-Oh, let's be clear, no way this is getting a fixes tag :/
+> >
+> >I’ve been considering this: since smc_hs_ctrl is called from the netns,
+> >maybe we should replace the sk parameter with netns directly. After all,
+> >the only reason we pass sk here is to extract sock_net(sk). Doing so
+> >would remove the redundancy and also keep the interface more flexible
+> >for future extensions. What do you think?
+> 
+> The net can be obtained from the tp also.
+> 
+> Like in this patch, all the caller needs to type
+> "const struct sock *sk = &tp->inet_conn.icsk_inet.sk;". I can imagine all
+> the callers will have to type "sock_net((struct sock *)tp)" if passing net.
+> Why not just do that in the smc_hs_ctrl instead of asking all the callers
+> to type that?
+> 
+> I meant something like this (untested):
+> 
+> -#define smc_call_hsbpf(init_val, sk, func, ...) ({             \
+> +#define smc_call_hsbpf(init_val, func, tp, ...) ({             \
+> 	typeof(init_val) __ret = (init_val);                    \
+> 	struct smc_hs_ctrl *ctrl;                               \
+> 	rcu_read_lock();                                        \
+> -	ctrl = rcu_dereference(sock_net(sk)->smc.hs_ctrl);      \
+> +	ctrl = rcu_dereference(sock_net((struct sock *)(tp))->smc.hs_ctrl);     \
+> 	if (ctrl && ctrl->func)                                 \
+> -		__ret = ctrl->func(__VA_ARGS__);                \
+> +		__ret = ctrl->func(tp, ##__VA_ARGS__);          \
+> 	rcu_read_unlock();                                      \
+> 	__ret;                                                  \
+>  })
+> 
+>
+Take it. I’ll send the updated version with this change.
 
