@@ -1,68 +1,92 @@
-Return-Path: <netdev+bounces-236139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4575C38D1D
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 03:11:04 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 805F6C38D14
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 03:10:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3A5C1A2562A
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 02:10:30 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2CA7B34FE0C
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 02:10:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D714A22E3E9;
-	Thu,  6 Nov 2025 02:08:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 394FC222584;
+	Thu,  6 Nov 2025 02:10:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mLNhkCq0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U3dt2/sh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF6A01DF27D;
-	Thu,  6 Nov 2025 02:08:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 110C421CC58;
+	Thu,  6 Nov 2025 02:10:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762394933; cv=none; b=LlKwYEbxLfBoaFsttsv3hPEwzUPjKRHiscX8ZGdHV5DcE0e4X1VPEN1amr88CnGWcd2dSMU7TLxgZPRY/rRKUWKngD364c+FbCDwRSloQwSqn2flE6bHG25wu5uFhHexKL7vIuKr6mE27J6ZGnBcOJbk8EoXgeFxVPr32vZKJ70=
+	t=1762395036; cv=none; b=KA+xLCONulr8sICyKtDUSdjvFDUXzxAtxjIBhwllDMbgvtqIkuGxR1QPfxMe0474huUgIQ2iQpWQWFTLEJuz/Hy3N8wGLBpXmsB+CMY4gMw0XhpKTPJ9h4sILw0VHpjJ9ECSLFRIoVNEYiKF+/JpuFlHDkGJQJ1NLOTKJjZOUG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762394933; c=relaxed/simple;
-	bh=EFsIVucnCshi7DYoItyeoSF5V7CL2EmZQLG2jOeOy5Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m7EDWvJpquqDC1SikNR2EJ6o+HS3pqZXEMMnGdgXe77HChGOoOdV427f7n+G/KmTITXCyonvfet5esJhmYSVprVKY4HtiXdw6ybAXOakZIALPiAZ2+s35k4aaPo9lIxPKUxpBMNF3cqEMPKu0NSs7SHOswBjebPERDA7Q0GpvSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mLNhkCq0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5674C4CEF8;
-	Thu,  6 Nov 2025 02:08:52 +0000 (UTC)
+	s=arc-20240116; t=1762395036; c=relaxed/simple;
+	bh=8NMnlGeu5P7aXBqXZ6R3aSnpd/pSss82sG9jkVLxDrU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=BL307P1aT60xh4oHw2cr2LokbpKqUVoagCrbV7b/A/y7kSQcdm/oF+nvy6L/5bdr5O2c+lK2wCDGmDvPqGY2r2KJ1QPx4cF3a1sLA0RQw3SVTH3x/FSqXaI46LyKGSSlnM6chUKVsvX959b6VFzb7Z9QDVLJywlz2pe76WpDvq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U3dt2/sh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78122C4CEF5;
+	Thu,  6 Nov 2025 02:10:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762394933;
-	bh=EFsIVucnCshi7DYoItyeoSF5V7CL2EmZQLG2jOeOy5Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mLNhkCq08uPuN8kX89qyxBWb68kOiquhEkf/rsS1gwaFRK6H/9iBAUvP113mb8DGK
-	 oN6bUhZBO+tNxOwrJ0iWTuaS/N7aGdBEgJ0js6DtmTSvoVkuTsrGU/tg2V+/P3sVSL
-	 oKNVaC4DL29kVIGum3jelRvufuqEztv7Br7Gf8lNFTXHK3m55Pur33QrhxU1ppqTxm
-	 6w8zECpl+4FGM5CRY7JlNnPlHl3TFR5vCVnnzjvjYoDgpyqf5SigtIbsaRN7+/URVF
-	 WVQPHJEJJnOFG1s0/vj7nWFUZJRny78mTtIOeaPO+8eJbXdJM1pp3ZsoV9h/wVuzRo
-	 Nx7UHA+jcKoTQ==
-Date: Wed, 5 Nov 2025 18:08:52 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
-Subject: Re: [GIT PULL] wireless-2025-11-05
-Message-ID: <20251105180852.420d2691@kernel.org>
-In-Reply-To: <20251105152827.53254-3-johannes@sipsolutions.net>
-References: <20251105152827.53254-3-johannes@sipsolutions.net>
+	s=k20201202; t=1762395035;
+	bh=8NMnlGeu5P7aXBqXZ6R3aSnpd/pSss82sG9jkVLxDrU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=U3dt2/sh3hsJwAkBDnLmxL6IZmMPR0WviqbpUKW0x1vZkctmK9nu05VEyFqwc2OvO
+	 OHpdF6WNMtHJdW95brtKU4QjbXy3wWiYeMSbq8fg4KTjV+i3Xi/k/pyW8HhyKnxuoL
+	 Vc9xOQtEi0xRruTnpTj07d6NN0eZWGOhfIKRtwIomGQmHTP+z15KEl22TkuAn38l5W
+	 oUPrc7VdP0E/w6KUlo4N+ryu+VftxJ51vfqQYsDAI0SKOgtvuuD20ZzVUBVOrKEeWT
+	 qABz6cNMAQmwA26MiL9VNofioKSJ7+Y6TO+gvYSCQGR6UXw4IRTvZ/J2Foe3+kWIv7
+	 AO3M1oYG1fydQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF18380AAF5;
+	Thu,  6 Nov 2025 02:10:09 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: libwx: fix device bus LAN ID
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176239500875.3834029.13790801882949409610.git-patchwork-notify@kernel.org>
+Date: Thu, 06 Nov 2025 02:10:08 +0000
+References: <B60A670C1F52CB8E+20251104062321.40059-1-jiawenwu@trustnetic.com>
+In-Reply-To: <B60A670C1F52CB8E+20251104062321.40059-1-jiawenwu@trustnetic.com>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ mengyuanlou@net-swift.com, stable@vger.kernel.org
 
-On Wed,  5 Nov 2025 16:27:39 +0100 Johannes Berg wrote:
-> We also have that netlink socket matching
-> issue more generally, so will have to fix that in
-> other places as well.
+Hello:
 
-FWIW we added genl_sk_priv_get() to avoid having to jump thru all 
-the hoops when socket is destroyed.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue,  4 Nov 2025 14:23:21 +0800 you wrote:
+> The device bus LAN ID was obtained from PCI_FUNC(), but when a PF
+> port is passthrough to a virtual machine, the function number may not
+> match the actual port index on the device. This could cause the driver
+> to perform operations such as LAN reset on the wrong port.
+> 
+> Fix this by reading the LAN ID from port status register.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] net: libwx: fix device bus LAN ID
+    https://git.kernel.org/netdev/net/c/a04ea57aae37
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
