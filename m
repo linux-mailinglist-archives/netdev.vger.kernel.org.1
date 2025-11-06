@@ -1,226 +1,138 @@
-Return-Path: <netdev+bounces-236510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43FA2C3D634
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 21:45:59 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCE27C3D6F1
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 21:56:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8A1EB351677
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 20:45:58 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D8E194E252A
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 20:56:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DABB321C9F4;
-	Thu,  6 Nov 2025 20:45:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58F3C2FD7B9;
+	Thu,  6 Nov 2025 20:56:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="CAX3J1Pd"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="TmI5SPPT"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEC2B1D516C;
-	Thu,  6 Nov 2025 20:45:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D7F62FBE1C
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 20:56:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762461954; cv=none; b=Dcwk7UNF5t+41BsIQoTQc2MoCKpWlanUctMIH6eK5MaOe8dHqy9aKlRBICzJK/q4u7lywk2ujcEr0bmf2+pPn9lElS6Tu4Xmq4tLU0KtHn6uLtyGW+W1HxYUEqU9ZxGP11XVMIz2VqpOuRrrxQWBY+PL0fiot2QP0CEPxfDQkC4=
+	t=1762462595; cv=none; b=O1UCE7bjqm6BnBrva1TaVeUCe9C+SeYtyMMWMguhiYVmIcF51m4t2zFxaxRBQv5wBd/BvTP/cN01hK0smHPykYn2YOFycXl/DjPYWkS2nXbNMPsmaahUaX9EsLgXCj84mw3K1TWVJwYUlEJJd/YYZRmVtQZ4c2iKPgMHhU7A+CM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762461954; c=relaxed/simple;
-	bh=Xmy7dRDkdvm9ZQu6DdJB/1Iur4dRUNxZ9WIXCSto8MY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GRtiu0ajRs4ulm8Xve6BMF0/283eHXRV/AAI/aJQKvFBfmfjjsjsk5gKRlFFj+vekIVEdoV6R0ESCAKZq55dDwRNPypO1W43iqbQxs0+bkxMb1WhvmAAxwAfFLSGwgHEJi+TtBOTlN3FlnDuhZCmWkjgpUEihYY0wk8Z488hOS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=CAX3J1Pd; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=5AYqrRoYwJz/XyJvEoRwNxN1N+YQADetwp+SfH4UdUk=; b=CAX3J1Pd096lssKD0ylA10kO/a
-	7u6kBhpgX/inZlV7YVn0O6Es3sBa7Nop38PJLER60aKLJzESNkznNYjZ9Wb09MufyjaY95v+AYbT3
-	famsDQ6yGXmAu5otVLtsaQ0r7EHeQ/nN2pDZw7jPxV5qcECkUJkq1f5hmYPQo0f16D70=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vH6rG-00D9aH-Rx; Thu, 06 Nov 2025 21:45:26 +0100
-Date: Thu, 6 Nov 2025 21:45:26 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Prabhakar <prabhakar.csengg@gmail.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: Re: [PATCH net-next] net: phy: mscc: Add support for PHY LEDs on
- VSC8541
-Message-ID: <ee6a79ae-4857-44e4-b8e9-29cdd80d828f@lunn.ch>
-References: <20251106200309.1096131-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+	s=arc-20240116; t=1762462595; c=relaxed/simple;
+	bh=gMQRGS+SVO2vzWuCmGVEhwaKIbNBPIet3g2zgJw9+eY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fUul4yqaSI7/5A9sryvD5/5FZKqzsUEbtkSHHFg3omvNX/MMiJSJLZCqDk2Vm65s46Hnq9nhFDfaDzfv/GPiayWlrMtq4EwuuE3Xj7l0SY+NDtT8aP1Vz1cJZtKBNKTdeFzhI21q5spCV5Z/MkyP6PMAFTgxr2oVYB7PedQqWTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=TmI5SPPT; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-78af3fe5b17so57257b3a.2
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 12:56:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1762462593; x=1763067393; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=h2ElzyRzn0v6hWuArud5/e2HaWvEtDNww/kv3MdDcSY=;
+        b=TmI5SPPTMD6C8K/uS3Jqmaj5aylbZFuBS9sWnrYfbdLvUSxXTMZpaEMLiWwXmeHpV1
+         +1BB30X7RoDtsGeE/uPHww81ZjcExRioSzcO3Ml7UTkXBPGVUIctAxZEPRYTQSPx0sn1
+         DpAxWFlJLygtCRYpR526OQ9RiA9sC/YagZpHKMoGJAPjIw4AtnBXV9kthvLFz9Se5fZ9
+         XIB3+hyf39ECr/axeZZD8+e8+6YuYMEzS2mPxLszoHISrLKiAtCW5top17CfgSpsdsWr
+         itruDQ1s72mO7J32zp+BSH6Bc20sj77RcWsbggQDa+M7mdCNB854+EHDiPmUizjO8J9T
+         PKIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762462593; x=1763067393;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h2ElzyRzn0v6hWuArud5/e2HaWvEtDNww/kv3MdDcSY=;
+        b=VDEMTMDnPLPmvsnrIv9szN9f2mVKaiQ7fG15pmw3aMxPasWOR8kv9g4n0Uz6yJiWCr
+         DeIuPmGtgs3GC0yyVIAIyQFvQNc9KdBAtk46DvOW6b2+A0HayfVnlzkflJiT/XYzveOF
+         O5tpvT/VvmDgAt6EJfWNT9XEPnuMxx9ehXC+BXITqwWe3L56i3j7G1OpYNOlChEClzjc
+         BEOun1pDv7MbT5WXSPO7xX+IgQ4VY/2cFAGNIy0YLgI1C4Enq0riZFILEkCSFzssmCt8
+         acg0ynlMIPtCosrMXWwgNpVZe82qCtg5I1kP2NAt2Du9hMANXnATp6AhhzNeg9bNFnLF
+         UO7Q==
+X-Gm-Message-State: AOJu0YyOAOR+rc/PGqjwrKUx71SnDAK00o2vneprG4Ntlnfgeyr5WnZN
+	4LW7ukyojJ5v7/GVGKaPaloUNjsoWVQdpU8Uzbn6rCylh0NVz14tdDboQaOPVxfJNw==
+X-Gm-Gg: ASbGncu9lFEGD5NQhVkf64QPjdwyBTfhxQEohH6CYf5BGCKPGeuhDsQoHJQDguYF1Qp
+	iNef+7zPhCXrSIp7ta7PtHBGzf+ux8mqJo4WcPgZeKUxu1QGVaHJKNOeEfOb4HXg/lwPIPHmx9/
+	wP1QHaiAfVXjiePTvn3yvwpOk92cZOWlasmebT1QC31zR7AKA4Za5RQiK4LDtrjQfpDdlTxnF9w
+	ZUCcL+sx3lCNU91/mZ6K9KgnZBZ3w7yZzG+7/7nI52ksi9FipE72hsimbtbwOZO5JM+cPz5VNDO
+	L7VdWo+IpgivRbm3BUF10ZBkfh9fLvWwL4ZZaPd1K+/I1fFEPasAH+Z+9UPKCZ1lDOeBsFO+2Yz
+	6M9oh7S8SK1KMJo7d79iCf6FOEcZ2lPi83aLSybSs0uejYSOU9lQHvdkqiassv/LFUg4XqUk3a8
+	Uq1V5b6UAkFZI7lsumPw==
+X-Google-Smtp-Source: AGHT+IHHp6C7UFUAgPnX40glg739Y1jd2XmO+rYUlvuYf58IqghAwt6xdbMgJEwKDokGrSx856CutA==
+X-Received: by 2002:a05:6a20:6a13:b0:34f:a16f:15a6 with SMTP id adf61e73a8af0-3522ad7858dmr1364041637.57.1762462592770;
+        Thu, 06 Nov 2025 12:56:32 -0800 (PST)
+Received: from exu-caveira.tail33bf8.ts.net ([2804:14d:5c54:4efb::1c9d])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b0c953cf79sm490735b3a.3.2025.11.06.12.56.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Nov 2025 12:56:32 -0800 (PST)
+From: Victor Nogueira <victor@mojatatu.com>
+To: jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	wangliang74@huawei.com,
+	pctammela@mojatatu.ai
+Subject: [PATCH net 1/2] net/sched: Abort __tc_modify_qdisc if parent is a clsact/ingress qdisc
+Date: Thu,  6 Nov 2025 17:56:20 -0300
+Message-ID: <20251106205621.3307639-1-victor@mojatatu.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251106200309.1096131-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+Content-Transfer-Encoding: 8bit
 
-> +static int vsc85xx_led_cntl_set_lock_unlock(struct phy_device *phydev,
-> +					    u8 led_num,
-> +					    u8 mode, bool lock)
->  {
->  	int rc;
->  	u16 reg_val;
->  
-> -	mutex_lock(&phydev->lock);
-> +	if (lock)
-> +		mutex_lock(&phydev->lock);
->  	reg_val = phy_read(phydev, MSCC_PHY_LED_MODE_SEL);
->  	reg_val &= ~LED_MODE_SEL_MASK(led_num);
->  	reg_val |= LED_MODE_SEL(led_num, (u16)mode);
->  	rc = phy_write(phydev, MSCC_PHY_LED_MODE_SEL, reg_val);
-> -	mutex_unlock(&phydev->lock);
-> +	if (lock)
-> +		mutex_unlock(&phydev->lock);
->  
->  	return rc;
->  }
+Wang reported an illegal configuration [1] where the user attempts to add a
+child qdisc to the ingress qdisc as follows:
 
-The normal way to do this is have _vsc85xx_led_cntl_set() manipulate
-the hardware, no locking. And have vsc85xx_led_cntl_set() take the
-lock, call _vsc85xx_led_cntl_set(), and then release the lock. You can
-then call _vsc85xx_led_cntl_set() if needed.
+tc qdisc add dev eth0 handle ffff:0 ingress
+tc qdisc add dev eth0 handle ffe0:0 parent ffff:a fq
 
-> +static int vsc8541_led_combine_disable_set(struct phy_device *phydev, u8 led_num,
-> +					   bool combine_disable)
-> +{
-> +	u16 reg_val;
-> +
-> +	reg_val = phy_read(phydev, MSCC_PHY_LED_BEHAVIOR);
+To solve this, we reject any configuration attempt to add a child qdisc to
+ingress or clsact.
 
-phy_read() can return a negative value. You should not assign that to
-a u16.
+[1] https://lore.kernel.org/netdev/20251105022213.1981982-1-wangliang74@huawei.com/
 
-Also, BEHAVIOUR.
-
-> +	reg_val &= ~LED_COMBINE_DIS_MASK(led_num);
-> +	reg_val |= LED_COMBINE_DIS(led_num, combine_disable);
-> +
-> +	return phy_write(phydev, MSCC_PHY_LED_BEHAVIOR, reg_val);
-
-You can probably use phy_modify() here.
-
-> +static int vsc8541_led_hw_is_supported(struct phy_device *phydev, u8 index,
-> +				       unsigned long rules)
-> +{
-> +	struct vsc8531_private *vsc8531 = phydev->priv;
-> +	static const unsigned long supported = BIT(TRIGGER_NETDEV_LINK) |
-> +					       BIT(TRIGGER_NETDEV_LINK_1000) |
-> +					       BIT(TRIGGER_NETDEV_LINK_100) |
-> +					       BIT(TRIGGER_NETDEV_LINK_10) |
-> +					       BIT(TRIGGER_NETDEV_RX) |
-> +					       BIT(TRIGGER_NETDEV_TX);
-> +
-
-Reverse Christmas tree. The lines should be sorted, longest first,
-shortest last.
-
-> +static int vsc8541_led_hw_control_get(struct phy_device *phydev, u8 index,
-> +				      unsigned long *rules)
-> +{
-> +	struct vsc8531_private *vsc8531 = phydev->priv;
-> +	u16 reg;
-> +
-> +	if (index >= vsc8531->nleds)
-> +		return -EINVAL;
-> +
-> +	reg = phy_read(phydev, MSCC_PHY_LED_MODE_SEL) & LED_MODE_SEL_MASK(index);
-
-Another cause of u16, when int should be used. Please check all
-instances of phy_read().
-
-> +	reg >>= LED_MODE_SEL_POS(index);
-> +	switch (reg) {
-> +	case VSC8531_LINK_ACTIVITY:
-> +		*rules = BIT(TRIGGER_NETDEV_LINK) |
-> +			 BIT(TRIGGER_NETDEV_RX) |
-> +			 BIT(TRIGGER_NETDEV_TX);
-> +		break;
-> +
-> +	case VSC8531_LINK_1000_ACTIVITY:
-> +		*rules = BIT(TRIGGER_NETDEV_LINK) |
-> +			 BIT(TRIGGER_NETDEV_LINK_1000) |
-> +			 BIT(TRIGGER_NETDEV_RX) |
-> +			 BIT(TRIGGER_NETDEV_TX);
-> +		break;
-> +
-> +	case VSC8531_LINK_100_ACTIVITY:
-> +		*rules = BIT(TRIGGER_NETDEV_LINK) |
-> +			 BIT(TRIGGER_NETDEV_LINK_100) |
-> +			 BIT(TRIGGER_NETDEV_RX) |
-> +			 BIT(TRIGGER_NETDEV_TX);
-> +		break;
-> +
-> +	case VSC8531_LINK_10_ACTIVITY:
-> +		*rules = BIT(TRIGGER_NETDEV_LINK) |
-> +			 BIT(TRIGGER_NETDEV_LINK_10) |
-> +			 BIT(TRIGGER_NETDEV_RX) |
-> +			 BIT(TRIGGER_NETDEV_TX);
-> +		break;
-> +
-> +	case VSC8531_LINK_100_1000_ACTIVITY:
-> +		*rules = BIT(TRIGGER_NETDEV_LINK) |
-> +			 BIT(TRIGGER_NETDEV_LINK_100) |
-> +			 BIT(TRIGGER_NETDEV_LINK_1000) |
-> +			 BIT(TRIGGER_NETDEV_RX) |
-> +			 BIT(TRIGGER_NETDEV_TX);
-> +		break;
-> +
-> +	case VSC8531_LINK_10_1000_ACTIVITY:
-> +		*rules = BIT(TRIGGER_NETDEV_LINK) |
-> +			 BIT(TRIGGER_NETDEV_LINK_10) |
-> +			 BIT(TRIGGER_NETDEV_LINK_1000) |
-> +			 BIT(TRIGGER_NETDEV_RX) |
-> +			 BIT(TRIGGER_NETDEV_TX);
-> +		break;
-> +
-> +	case VSC8531_LINK_10_100_ACTIVITY:
-> +		*rules = BIT(TRIGGER_NETDEV_LINK) |
-> +			 BIT(TRIGGER_NETDEV_LINK_10) |
-> +			 BIT(TRIGGER_NETDEV_LINK_100) |
-> +			 BIT(TRIGGER_NETDEV_RX) |
-> +			 BIT(TRIGGER_NETDEV_TX);
-> +		break;
-> +
-> +	case VSC8531_ACTIVITY:
-> +		*rules = BIT(TRIGGER_NETDEV_LINK) |
-> +			 BIT(TRIGGER_NETDEV_RX) |
-> +			 BIT(TRIGGER_NETDEV_TX);
-> +		break;
-
-Should the combine bit be taken into account here?
-
-> @@ -2343,6 +2532,26 @@ static int vsc85xx_probe(struct phy_device *phydev)
->  	if (!vsc8531->stats)
->  		return -ENOMEM;
->  
-> +	phy_id = phydev->drv->phy_id & phydev->drv->phy_id_mask;
-> +	if (phy_id == PHY_ID_VSC8541) {
-
-The VSC8541 has its own probe function, vsc8514_probe(). Why is this
-needed?
-
-    Andrew
-
+Fixes: 5e50da01d0ce ("[NET_SCHED]: Fix endless loops (part 2): "simple" qdiscs")
+Reported-by: Wang Liang <wangliang74@huawei.com>
+Closes: https://lore.kernel.org/netdev/20251105022213.1981982-1-wangliang74@huawei.com/
+Reviewed-by: Pedro Tammela <pctammela@mojatatu.ai>
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Signed-off-by: Victor Nogueira <victor@mojatatu.com>
 ---
-pw-bot: cr
+ net/sched/sch_api.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/net/sched/sch_api.c b/net/sched/sch_api.c
+index 1e058b46d3e1..f56b18c8aebf 100644
+--- a/net/sched/sch_api.c
++++ b/net/sched/sch_api.c
+@@ -1599,6 +1599,11 @@ static int __tc_modify_qdisc(struct sk_buff *skb, struct nlmsghdr *n,
+ 					NL_SET_ERR_MSG(extack, "Failed to find specified qdisc");
+ 					return -ENOENT;
+ 				}
++				if (p->flags & TCQ_F_INGRESS) {
++					NL_SET_ERR_MSG(extack,
++						       "Cannot add children to ingress/clsact qdisc");
++					return -EOPNOTSUPP;
++				}
+ 				q = qdisc_leaf(p, clid, extack);
+ 				if (IS_ERR(q))
+ 					return PTR_ERR(q);
+-- 
+2.51.0
+
 
