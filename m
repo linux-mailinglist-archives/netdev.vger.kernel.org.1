@@ -1,151 +1,159 @@
-Return-Path: <netdev+bounces-236263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C249EC3A7A1
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 12:12:20 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48AC7C3A760
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 12:08:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 284943A8CAA
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 11:08:30 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D4D52350D96
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 11:08:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67D5F30C600;
-	Thu,  6 Nov 2025 11:08:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TSVNapcG";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="R2lq28WY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D27C30C601;
+	Thu,  6 Nov 2025 11:08:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A84422E7F27
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 11:08:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 455881DF27D
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 11:08:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762427298; cv=none; b=SKGRD0ab2v0cGmupIvxEAMs3HtAcPmepWA4FkWm/HiLm3Ks6rvZ533ATf2AueptsCT3rlKGLqIpYbrFHvOMTOL4O6kBjCy/OuhAGlWOV2Us+fWYN6m5ug7T1mP0VGnDE5Uj7gDuiovI3MU3pc4//npGAdNfJtkEWI+ufQzY8EaY=
+	t=1762427312; cv=none; b=NwOGBGVdd8BX7uKXNsFS2+RFjYoa1ufoLOyJg+qUf91DHOeOeXslMIbqRI7mJ8JezAzv56bd2/YugTlo5nIYWW+BsBvfa//aIYn08R+umG692JTv/Q6xKWZ+yFYMXneaq2b+rU2l4gHWsOPhVecadvyUKRSdwJwAsMo6lmYHY4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762427298; c=relaxed/simple;
-	bh=AzYwnHKc/M/GnwP2HQJVj7gqwdd7tzGdSNwpt2uNAzU=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
-	 In-Reply-To:Content-Type; b=h3WaSzQhNNoW1yna6zB5VQU++EnY5bw6ASR8/qHkTgvXS83TTjovVQLxiwrZ4o9fYY7j/Pd2+ov5kByA36BEjYjQ2D5B25YyKyRsKBFKNA6IvqcsAaNyBtBaIVNnUaqTGvlVpXkLv6+tQeRXbv1IAxuZ0uuufYbw7zUdMqp8TXI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TSVNapcG; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=R2lq28WY; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762427295;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mJ9H3vt04iE1iOinRpVRRRwRwQxVn8Vs66MDAfX+ERc=;
-	b=TSVNapcGDmyPB2jwD/9JSpLNhUV55SLy2LPg9wBg/9aSOSxtx5nz2Elw11i0JtSCrZZxgG
-	axpx3Dbmm3izLjQKGADFF6p00YEwGmyTCIUt73DVQbsq+j/MLx969sByH7KmOnHUv6KoPA
-	gEdBNy9Nm/ilIswpiMnfri4k1gSGRvE=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-548-hmHTn8atO-Opwg_K8Fk4iQ-1; Thu, 06 Nov 2025 06:08:14 -0500
-X-MC-Unique: hmHTn8atO-Opwg_K8Fk4iQ-1
-X-Mimecast-MFC-AGG-ID: hmHTn8atO-Opwg_K8Fk4iQ_1762427293
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-427015f63faso466148f8f.0
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 03:08:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762427293; x=1763032093; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :to:from:subject:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mJ9H3vt04iE1iOinRpVRRRwRwQxVn8Vs66MDAfX+ERc=;
-        b=R2lq28WY71t81pdM6VYa4o9Q/ONByehnoGu+vkqLxavia9JYZP9JbUfv9c6eLpVqpB
-         ysLmKDK1iCq0OSGuMLU2Bk0i48BRxZNEfk7ZYP7lpNQE9d3K80xa2yFSVamRobuFGTRN
-         aqznr6kyHKuPFlJwsjfFNz/FmMGTNRfMzfbRLnx2yse6zV9RbKnMXsFfw6QlLp6Xc3O6
-         hM6zejXy1Tc2cO2dIsmnhzym5dHwrxmwDdLrX6EI0HdEhHnpy9BRR+z1s3jSrJK/yvW/
-         nWXb5mnb6TUS8bZq3N/Bui9UieTCDHjORqC1Ltb2AvPHNTRgLB4PlYaq4pibBzva0mle
-         N2JA==
+	s=arc-20240116; t=1762427312; c=relaxed/simple;
+	bh=1/8gfgj/VfoBPSX6YkhXgToj4pYCH2gIKZl+fzyz2Yo=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=rpSuMS5b5WCT6RBOh1vbAdoDWu7uIf5R+X15+ef08v6Lh/eMRDJoy49B3a9OOaaYtTCH6pvmJE4ZtpHn1gKrUXYBx9fz4Ck5nf0GuMQ9IOs60/FP3296G6sYzatNvU54LOO+LgR9VqAFGqm02yGtZo3Jb0HtaBv0gtcr6Ktn+HQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-433154d39abso8061545ab.0
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 03:08:31 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762427293; x=1763032093;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :to:from:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mJ9H3vt04iE1iOinRpVRRRwRwQxVn8Vs66MDAfX+ERc=;
-        b=nti7yEWkqLpJE6pXmevuHZ9z9h+1bk3BqmmHcBHGUmSQxzzzcEKRkCC0k5MysHdjMI
-         qK8DP08UDwqAH4YafGMhV0YoXTdxDghpPG51C8x5lOSKfq6OsZsB1BrolIqwuTfN23ok
-         w4mfXR8RRlDhamGDqVUMTs6k6XhQ8yZ/uTCmRXH4K9OxaWYSPPz9mqnvR115MgaA0yzz
-         KKVTAFm/+xNJYwQ0DvnaGGzhban6PkLKvqnnVIKAFEoC1/J/ZlUlu7dlfl3LoyiLQVwB
-         eA8DlRkVabdNlFpkHrF4JNrb0HOMLhnDwLmwgVJBwrCdGCoZNn+rRzESY95aPPGRIEOp
-         +htQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWuKvIp2vvYt+jwPLgu/zVrYhOgw4TeI/2q+k/9fu8wKJ1dKqLWuH6aI8EIH1Rx0nl0OeGRH4U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz41J8P0Y8pGadZI2tZvlxy2w6bQNz6Ki1EZcTVq41p8Nmi2kbP
-	5ajYZ3FDXssKgl4PHrSZNWLfof2lLr8D7S6uX2VjlCMtcTql+cQal2KLjpbKbUoAJ6pi11riucK
-	XJre0SnZazNUo5/4oi7E/KqqdZFPJFaPjVEgNveFXfArImbwhFhKmH0W93Q==
-X-Gm-Gg: ASbGncuSlh6YTAOJFSDSURsTzHc8EN26FNOOa9qlRujDRZoeAGXw7wtznf9O9bGLDHU
-	xMQMTOBalCCKzdFsUDN8qaMRt7Shd9QbTT3SCor31vV7AcU8uEz7HFc/aGk4lY5UKxPC6G1cJjy
-	rdZrkm2jq306YmqJxaRLCQTDdKfnddjGDMBfQ3nwBwdaNvxvi9c+53sBr6rjuNWuaJMJZawjG7f
-	Z1LulP4+nt12Hi7nhgyVC0v09spT5O/2OT/7X5asui0KddaZiuz3q0HG3FL45tdIHGNe1ekwy+A
-	p3o10m4C4RA2jJqOvIKOW+ikfwS8Tinn3qshLqHIzDk4nyyqvSKe5X2PQM7TsJLoR6boPdsG655
-	d8w==
-X-Received: by 2002:a5d:5f87:0:b0:427:64c:daaa with SMTP id ffacd0b85a97d-429e3309a36mr5941949f8f.44.1762427293007;
-        Thu, 06 Nov 2025 03:08:13 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEd1vm77ZDhKKFmGLmtogps8up+77Qdb9bBoLD/2VxY85lZ0MG6jm4vBI/942lqkDDMsGcznA==
-X-Received: by 2002:a5d:5f87:0:b0:427:64c:daaa with SMTP id ffacd0b85a97d-429e3309a36mr5941919f8f.44.1762427292510;
-        Thu, 06 Nov 2025 03:08:12 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.155.83])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-429eb477226sm4275998f8f.24.2025.11.06.03.08.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Nov 2025 03:08:12 -0800 (PST)
-Message-ID: <8ac38ae2-74fc-45a1-88fb-4edd124ab9c3@redhat.com>
-Date: Thu, 6 Nov 2025 12:08:08 +0100
+        d=1e100.net; s=20230601; t=1762427310; x=1763032110;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xt9I9ECQYklwP1K0IfUhucTf4beK1df9htAhtxikHzc=;
+        b=rwC0w9WYMPxZh79wblWIw9k6UUYgVb8aaBnp8YvSa16lnZie6iXXaBwRvbyIyHcTdQ
+         pL8x1xQ1rTuTgauWeCr6dbjyJkAvY6DvuLFGodd8XZja1epApVeFueGcujh3ltoVMZLR
+         TBuOuOgPjmWLEfM9DyG79pj2bR9l8MBXDuz0fb52PG2ghbljygqsTbr71PgriP989LdC
+         ptlcMVmpQtcShV1wVLNeM1YaYbH/qdatS5LqQTa+Du3OF/DanVzcMohLDTza8kgUYLoB
+         MviQRp16nqI4AZK2RH/F6x4mllaEN3C773DlYwL0LtT4TI+5BWyyrzn6dsqWQzi1SY/i
+         EFEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU/P6sLZm63t2/PgK2WVXtN68mv2p83mAdiBjW7ppnB8alqnAqA2xzkYnC8e9hwJuNhSb/+WKc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQn4gmk5vLF7CY4G/Jsci87Lf03TTf8YfNvXi/v8ddkSydw8RJ
+	v8GAsxDbh45hgA0loioBEM18UGFyNg6kTEBZzY0tdYMibvZ+NEGiO7wi9foaf0GbbnIm5KAp+ZN
+	UBhiYmnvNRD98Wlp1PjPmILjwmA7qpRvsavglNOhO9GbxHtX1NiC2Vb1XaSc=
+X-Google-Smtp-Source: AGHT+IF0sgKhdjOK3t2OgeZSgNWC4Te4epR7iggYWJe3cHd31IWq6GRJfNeHXBa9mJTtHXtXf4B/qofx02wjuRfEWCs+GDBx61eM
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 net-next 02/14] gro: flushing when CWR is set
- negatively affects AccECN
-From: Paolo Abeni <pabeni@redhat.com>
-To: chia-yu.chang@nokia-bell-labs.com, edumazet@google.com, parav@nvidia.com,
- linux-doc@vger.kernel.org, corbet@lwn.net, horms@kernel.org,
- dsahern@kernel.org, kuniyu@google.com, bpf@vger.kernel.org,
- netdev@vger.kernel.org, dave.taht@gmail.com, jhs@mojatatu.com,
- kuba@kernel.org, stephen@networkplumber.org, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, davem@davemloft.net, andrew+netdev@lunn.ch,
- donald.hunter@gmail.com, ast@fiberby.net, liuhangbin@gmail.com,
- shuah@kernel.org, linux-kselftest@vger.kernel.org, ij@kernel.org,
- ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com,
- g.white@cablelabs.com, ingemar.s.johansson@ericsson.com,
- mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at,
- Jason_Livingood@comcast.com, vidhi_goel@apple.com
-References: <20251030143435.13003-1-chia-yu.chang@nokia-bell-labs.com>
- <20251030143435.13003-3-chia-yu.chang@nokia-bell-labs.com>
- <8ad4ca21-5b81-415b-b16c-6cc4b668921c@redhat.com>
-Content-Language: en-US
-In-Reply-To: <8ad4ca21-5b81-415b-b16c-6cc4b668921c@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:4815:b0:433:5c92:4de6 with SMTP id
+ e9e14a558f8ab-4335c924f25mr2230005ab.19.1762427310364; Thu, 06 Nov 2025
+ 03:08:30 -0800 (PST)
+Date: Thu, 06 Nov 2025 03:08:30 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <690c81ae.050a0220.3d0d33.014e.GAE@google.com>
+Subject: [syzbot] [sctp?] UBSAN: shift-out-of-bounds in sctp_transport_update_rto
+ (2)
+From: syzbot <syzbot+f8c46c8b2b7f6e076e99@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-sctp@vger.kernel.org, 
+	lucien.xin@gmail.com, marcelo.leitner@gmail.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 11/6/25 12:01 PM, Paolo Abeni wrote:
-> On 10/30/25 3:34 PM, chia-yu.chang@nokia-bell-labs.com wrote:
->> From: Ilpo Järvinen <ij@kernel.org>
->>
->> As AccECN may keep CWR bit asserted due to different
->> interpretation of the bit, flushing with GRO because of
->> CWR may effectively disable GRO until AccECN counter
->> field changes such that CWR-bit becomes 0.
->>
->> There is no harm done from not immediately forwarding the
->> CWR'ed segment with RFC3168 ECN.
->>
->> Signed-off-by: Ilpo Järvinen <ij@kernel.org>
->> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-> 
-> Please provide a test/update the existing one to cover this case or move
-> to a later series. Possibly both :)
+Hello,
 
-Whoops, sorry. I'm looking at the patch in order and when I wrote the
-above I haven't seen yet patch 4/14. Please ignore.
+syzbot found the following issue on:
 
-/P
+HEAD commit:    c9cfc122f037 Merge tag 'for-6.18-rc4-tag' of git://git.ker..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=17d72114580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=19d831c6d0386a9c
+dashboard link: https://syzkaller.appspot.com/bug?extid=f8c46c8b2b7f6e076e99
+compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/c1699c8b52f1/disk-c9cfc122.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/a1af4e539151/vmlinux-c9cfc122.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/771c6be9d72b/bzImage-c9cfc122.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+f8c46c8b2b7f6e076e99@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+UBSAN: shift-out-of-bounds in net/sctp/transport.c:509:41
+shift exponent 64 is too large for 32-bit type 'unsigned int'
+CPU: 0 UID: 0 PID: 16704 Comm: syz.2.2320 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x16c/0x1f0 lib/dump_stack.c:120
+ ubsan_epilogue lib/ubsan.c:233 [inline]
+ __ubsan_handle_shift_out_of_bounds+0x27f/0x420 lib/ubsan.c:494
+ sctp_transport_update_rto.cold+0x1c/0x34b net/sctp/transport.c:509
+ sctp_check_transmitted+0x11c4/0x1c30 net/sctp/outqueue.c:1502
+ sctp_outq_sack+0x4ef/0x1b20 net/sctp/outqueue.c:1338
+ sctp_cmd_process_sack net/sctp/sm_sideeffect.c:840 [inline]
+ sctp_cmd_interpreter net/sctp/sm_sideeffect.c:1372 [inline]
+ sctp_side_effects net/sctp/sm_sideeffect.c:1204 [inline]
+ sctp_do_sm+0x36df/0x5c80 net/sctp/sm_sideeffect.c:1175
+ sctp_assoc_bh_rcv+0x392/0x6f0 net/sctp/associola.c:1034
+ sctp_inq_push+0x1db/0x270 net/sctp/inqueue.c:88
+ sctp_backlog_rcv+0x169/0x590 net/sctp/input.c:331
+ sk_backlog_rcv include/net/sock.h:1158 [inline]
+ __release_sock+0x3a9/0x450 net/core/sock.c:3180
+ release_sock+0x5a/0x220 net/core/sock.c:3735
+ sctp_sendmsg+0xeb9/0x1e00 net/sctp/socket.c:2036
+ inet_sendmsg+0x11c/0x140 net/ipv4/af_inet.c:853
+ sock_sendmsg_nosec net/socket.c:727 [inline]
+ __sock_sendmsg net/socket.c:742 [inline]
+ sock_write_iter+0x509/0x610 net/socket.c:1195
+ new_sync_write fs/read_write.c:593 [inline]
+ vfs_write+0x7d3/0x11d0 fs/read_write.c:686
+ ksys_write+0x1f8/0x250 fs/read_write.c:738
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f3e92f8f6c9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f3e93e34038 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 00007f3e931e6090 RCX: 00007f3e92f8f6c9
+RDX: 000000000000fdef RSI: 0000000000000000 RDI: 0000000000000003
+RBP: 00007f3e93011f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007f3e931e6128 R14: 00007f3e931e6090 R15: 00007ffc44d78078
+ </TASK>
+---[ end trace ]---
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
