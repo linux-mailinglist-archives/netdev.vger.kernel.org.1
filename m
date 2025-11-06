@@ -1,132 +1,186 @@
-Return-Path: <netdev+bounces-236433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A9D6C3C325
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 16:57:26 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89445C3C334
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 16:57:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B28B9188AB11
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 15:57:18 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E07054EE420
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 15:57:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04ABF34402B;
-	Thu,  6 Nov 2025 15:56:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="frUZZgOk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CDA733F370;
+	Thu,  6 Nov 2025 15:56:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D7233FE33
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 15:56:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E4E833C503
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 15:56:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762444600; cv=none; b=dp8U3ILZv5MruMSUi0FTXXCkDL1yZITvRJr85JEuDOjCxfTjN6GB8h4MkQNd2W6sQnmP9ATHUAQqQyK5Cj6vMU681qIC/YFY8LNvWbqdbII9g+ngGvpPAKs1F9f9udFPvjUbHbonuE1/FavvGopuHEcmnt8bpsvmjvaFUm4SXbM=
+	t=1762444619; cv=none; b=QFvL0983qjNHaAT3HyKP6b/p1ywB3a5/cOG6HU3k5+YsQ+DE9IvripYpRYxUFSN3MH+F7gKunn+RMLVb58p2KJuAEzzxNS2dRxObQIIDUjOFiqoyeKtDJZwxC95rVpfhByF5ar89YfetUP/IIjSOKYJ47fgCwvYiIF3gMWUhuRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762444600; c=relaxed/simple;
-	bh=g8AiCJd4Rj9tTeUeL23ATTkGx3PrApL+7L6hu7WWpoQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Vz/aQhJFFr/GNR8qsWPzdx9Mjsp9GMiR7GkZepdmORNPONFlKBaGZzwdT35Jwor5NN/tOSRiVPQ1U0doivbWdZBuMp76g1ue5tWSYN6yCcqIHhXs2HAOYcL6+qPdiEULxOIT7zihTdyIrbUgBDrnRq0j+AvMlziLK29yh7CuqPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=frUZZgOk; arc=none smtp.client-ip=209.85.160.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4ed65fa5e50so5777171cf.0
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 07:56:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762444598; x=1763049398; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cQlLDOZhUGamhqd3pMIsaftaQsZqtWwuBy/4wJVp4cg=;
-        b=frUZZgOk0zqHgq5YjIV+PYbVIM6+6FKzxZ1Yb3Bu2o/X+OS7eCyGPk4eoN7pQZiGvW
-         4zvQukqASsoa0f5di2T9OBesm+xPVY12GDOHAGqyrbchbxRvB77AftCEQPJVtyVo+xGt
-         gLu5PpYXo2bXY1SAHvQDJcrgLFDATrNnodTVUiK4HdrhFcBIlh7fXHjTJM7PGmeysi8j
-         Ul+1J85vVFQ1wuQJz2MLV26vOWzejZs5Rx0ctgtbHTB/jkbztgk3TCKdqhqkAAoIsOKz
-         Y9FPA/Y7fLyCllFuODy2kdlpcYZVn+ELCtUAidg1ZySqgTl6mGxhLoLBzeFltVSIghrC
-         do4g==
+	s=arc-20240116; t=1762444619; c=relaxed/simple;
+	bh=rOrZ/4A04kwhL0ic9QR0izswFHe9Y3mAQqCArP6A188=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=JMlIW5s9bSup0dXco54O00114m4dGVoLtATW6Tp+/b1TuRl59F7Ctesr2wc8DFNNTM0l+qPSL9a5N3VwVP4gj7+YHKcrJ7dkbDBevDP0t0SgYQHk5LFLyNDvP910vgHXMXpA83jt8sljdMdqt2/uD3z8IDsYB+9fXAThLn4Vn9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-b727f330dd2so189554266b.2
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 07:56:57 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762444598; x=1763049398;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cQlLDOZhUGamhqd3pMIsaftaQsZqtWwuBy/4wJVp4cg=;
-        b=HIzEv791tFSoocKq0Oe0roiMXkFwqCJJMDKyInlmJkySkYsjX7QohNj70yj/sU3+Sg
-         IkOuuuuzBJyCo9UM04BAHS1I0nl+g3aGZhqM/64L3yltTEgmcCa6GenVBlxO2z53WPow
-         SaN06VOyZjOCs6pLwlmt0BUWvQPOQ+IdJyT52LgYxQEkKARefa2f9+t244YT8ocITIae
-         Z7qUXT20Xd2cO8XhOUGo6zWEeGkSlB5FybahZw//4ZdB0Uc3zcR6Edomcc+w6Ay4b44L
-         7BkAbXAHsyqxVaL9S2CQF+jEV4iXWTXO2VE9WeVuYEOZgLz4N0i1xLYGpKSqV5J91xXJ
-         Ffcw==
-X-Gm-Message-State: AOJu0YzdfneGgSYRUg4vV7V9nRUB+yNJb1sgMmISEbb4etAIcCG0Cd3v
-	A6gPg2QEoZY59EcZHxCcx06KX7zz2Tblo9OaYex95cFQtoGrygaqWKnPpnavkWqg80F5DqYAAPJ
-	3/bAXPeVClpqbgY/BNPQVf6pVi2P8SnVxtvphGZ3v
-X-Gm-Gg: ASbGncsau9z3zCd/v0osNPgseuCokcYBsQweZ8T97R5/ISY0wkhOWr8EitiL6QxtZhu
-	hbqFU8tqbVHvFvZupYh2nIWDYBtSrMDD66myFb8PE1/PfsSf9YdgXCwKxYN6cjdFlMAjYvNao/O
-	Y0v0PdHz8uVzVGDwj+4y1sc3+UMpLmqwnQNLzViGmUnnEu58yFoSJigcnQ2HcgdW2HQyBVwZ2Tg
-	VL4R+Ns042dpNZkpR8Bi1dJIhEHthMpdodrC41Uw7Gm8jPLhaV7KB2cz9Z9TvMqqAxwQpwShTNk
-	7bKPUw==
-X-Google-Smtp-Source: AGHT+IEDLiI0USlA6fWy7LXOe/FGCyS4xbZAtGDW6hpAUv6II51smQOaRiksVrgxmmMZQlDyNd16tiLeCvJWicKtn/o=
-X-Received: by 2002:a05:622a:180f:b0:4ed:20f4:15fd with SMTP id
- d75a77b69052e-4ed7265194amr84326701cf.81.1762444597688; Thu, 06 Nov 2025
- 07:56:37 -0800 (PST)
+        d=1e100.net; s=20230601; t=1762444616; x=1763049416;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+PmoYhmQszxefHjhkpT3KQeYOeoKqB+UgwTp/bM0o7s=;
+        b=IkGf5//bP8Jz20954FBW2Yl6H439XjaVV9S1psLrwEF0RNzQp8+oxdx4i/IuLaMyhh
+         oo5JWQZ7kUzofHMTMwfd4xEeNRTKrg3GvAB8n0Mnz2t81BF+blmqD2W6rUEqfoG+eH0u
+         egMRMC7ULv15TBTk0ut2YxZxgbSjeNBPj/MeTZLUjc0XifHliS3gD12oBvz8/3N62fq6
+         wK2MO90lRFPE3h5Uj2KfESGsi3pr1EqoJ78fTAQhgb3eOyvVOV2bEanzAA+QYTDrJim/
+         AQrWjTC8gscSRDGJPl56OQTV0t8J2VlN2IuNI8uVYuocA/zhiFkXpPyJT4jORHKk577d
+         hspg==
+X-Forwarded-Encrypted: i=1; AJvYcCXFoHpuz2345XspiDJPP9qvm11C7JENK/oLMt066KGQGim/pXrIBND3khtjZbIR4hmxhy3+SQ4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7aJN44K1r9kWleIPUL+lZoJlvBHtUJimAlezWGU4nU6xtql+V
+	gJiK95fcnN+bcoNSIdLo88ohFFI7Dn2B40Iy27wpOsriYdHltNwufGvA
+X-Gm-Gg: ASbGncuB+0TqInKqONrDNAEGUaBew1Ml0Oy5zI1IpmSRltBWAd+HBvkdhp+kJkIP7jW
+	k8TTkOP7jS73jRPQdmkg4CsimO1CB1nNB4qbUPwpqOpbsyb1vO2tqJshg7/xANAYG2GaPC/ZlIy
+	pgc6WDhybzBpN0+toYTH6pBYkXSsiBUV4XUKtz6VuCdhynHIvIUs5shnTypaRmi2UtNaiIzzEQ9
+	JhpEnz3nUfPnxHK7RwFXdtYF2EIML8vLiv9ZSCllwMpzDw9f7xZhJhiJ/xO0mFRehjlBwIzDE/o
+	ebj4gvslltOKp5Gl2GdBvcm9ljy4TMlZyip+MffhEuLkt+ZZCJnIkGMDWynpM5rUNEa2UuQ4vlm
+	ZyrcCGTmgM9GWchYB/33mPehKs2Pa1dDQvZ1A1WyhKulQyaJTaXzK5nv4q0eGVNl3Z/o=
+X-Google-Smtp-Source: AGHT+IGtUCnY/0gL5xUXSuNGqI8E7ELQM5g8O42ZsyJXJ0jZ2YG8OSfxqQDMKV4oFHPUZ8QwMLmBOw==
+X-Received: by 2002:a17:907:1c0a:b0:b28:b057:3958 with SMTP id a640c23a62f3a-b726554c3d8mr890156866b.48.1762444615548;
+        Thu, 06 Nov 2025 07:56:55 -0800 (PST)
+Received: from localhost ([2a03:2880:30ff:73::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b72a2824c2asm132004266b.34.2025.11.06.07.56.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Nov 2025 07:56:55 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net v9 0/4] net: netpoll: fix memory leak and add
+ comprehensive selftests
+Date: Thu, 06 Nov 2025 07:56:46 -0800
+Message-Id: <20251106-netconsole_torture-v9-0-f73cd147c13c@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251105161450.1730216-1-skorodumov.dmitry@huawei.com>
- <20251105161450.1730216-7-skorodumov.dmitry@huawei.com> <CANn89i+iq3PVz6_maSeGJT4DxcYfP8sN0_v=DTkin+AMhV-BNA@mail.gmail.com>
- <dfad18c7-0721-486a-bd6e-75107bb54920@huawei.com> <bd0da59d-153f-4930-851a-68117dbcc2de@huawei.com>
-In-Reply-To: <bd0da59d-153f-4930-851a-68117dbcc2de@huawei.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 6 Nov 2025 07:56:26 -0800
-X-Gm-Features: AWmQ_bkf1ZUvgOuppHfnD41rLgZ8c-GgzZsFLM8wiRXDADFT697UgcSJHOFdUeY
-Message-ID: <CANn89iKioXqA3vdKdpL9iZYVU0qOPGCKxYiStc=WNWQ3+ARP_w@mail.gmail.com>
-Subject: Re: [PATCH net-next 06/14] ipvlan: Support GSO for port -> ipvlan
-To: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	andrey.bokhanko@huawei.com, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAD/FDGkC/33RTWrDMBAF4KsYrTNl9C951XuUUiR5lAiKHWTXt
+ ATfvcSL1sVO1wPfPN67sZFqoZG1zY1VmstYhp61jT81LF1CfyYoHWsbJlBo9CigpykN/Ti809s
+ 01OmjErichMwYUvCenRp2rZTL54q+sJ4m9npq2KWM01C/1kczX0//mTMHDiiTQWO0d+SfO4ol9
+ E9DPa/eLLaGOjQEIGhrNXW6S9KYnSG3hj40JCA4q5PNFDvJ94baGNweGgoQMOgoo8uOJ9oZemu
+ 4Q0MDgrUkNGFQFPc5zI/B8UGn5t6HkjFrkU1Ue8NuDXloWEAIwYucEhkR9ru4X4M/2MXdcwjnl
+ EISOeAfY1mWb/1CxiSWAgAA
+X-Change-ID: 20250902-netconsole_torture-8fc23f0aca99
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>, Simon Horman <horms@kernel.org>, 
+ david decotigny <decot@googlers.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, asantostc@gmail.com, efault@gmx.de, 
+ calvin@wbinvd.org, kernel-team@meta.com, calvin@wbinvd.org, 
+ jv@jvosburgh.net, Breno Leitao <leitao@debian.org>, stable@vger.kernel.org
+X-Mailer: b4 0.15-dev-dd21f
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3370; i=leitao@debian.org;
+ h=from:subject:message-id; bh=rOrZ/4A04kwhL0ic9QR0izswFHe9Y3mAQqCArP6A188=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpDMVFwKvvzkebqNy/kZS1nG85335bRbP4s/Pu5
+ IU2Ck7/bKmJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaQzFRQAKCRA1o5Of/Hh3
+ bQSgEACQ1IzCyzKXtsX1G1SQIUxRdM5w4WuZXB37xspJkRXQoQTcPBeg+oSGeBu94hWm4DByKnB
+ nb+1MdF3FXpbqlybrKyL6i28j2T3EhcB+G7rDdaAQ3uINsgGqElQRcPOA+Sn8ufuor2Qt899iBA
+ MSsgTzJUzJ+OA3gIci+ub104ujlJCRszUiI9n3uQtZp2Me0hbVyXe+EOpFMOzLB0vwHRWiP/eqT
+ JnZnyC9/3mIradwD7dLP7Its2eqC0s8siUnnjUItzeHJ3lFwJl2bp2cYTplZKA6GurnBzSujtOR
+ At0z69SADJ5seIywWNs7bOsKKmSq9snvcl6HXsWICe7zIMFrG1FPzIMek3O4N48gayrk9ZTcOPJ
+ jOOLgSsxA2sPvLKQaqiiSYOV7I2ethrpy9aap6zasMyGy7axv6wJfJ1TQRYWST1xbun1xv0fxlH
+ tsfrzxoIMfRoLTfjla7pad1iy9US+u81V2N0QdMNTdfb0GX6uhlDdR4BNON/mzS7T8JWogV4ZwP
+ 56L6JB+ygDB3AzaIDOm6FTuH8opSklHolK5oIfvjPFd1MZ1GzkzF3VaJ+tN9aI884cl1yup9rVM
+ pDry9PYPHFeRggKwwL5zgbOXTotyepzEznTjh6yGgIEuhrMpSeeRctXHtfyJ9wtQ5xP3RcZT17F
+ GY8ZdsemENBPBJw==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-On Thu, Nov 6, 2025 at 7:41=E2=80=AFAM Dmitry Skorodumov
-<skorodumov.dmitry@huawei.com> wrote:
->
->
-> On 05.11.2025 19:58, Dmitry Skorodumov wrote:
-> > On 05.11.2025 19:29, Eric Dumazet wrote:
-> >> On Wed, Nov 5, 2025 at 8:15=E2=80=AFAM Dmitry Skorodumov
-> >> <skorodumov.dmitry@huawei.com> wrote:
-> >>> If main port interface supports GSO, we need manually segment
-> >>> the skb before forwarding it to ipvlan interface.
-> >> Why ?
->
-> Hm, really, this patch is not needed at all. tap_handle_frame() already d=
-oes everything needed. Looks like I had another trouble and this patch was =
-an attempt to fix it.
->
-> >> Also I do not see any tests, for the whole series ?
-> > Ok, If modules like this have some kind of unit-tests, I should study i=
-t and provide it. I haven't seen this as a common practice for most of the =
-modules here. So far all testing is made manually (likely this should be de=
-scribed anyway)
->
-> I see that currently there is no any tests for this ipvlan module (may be=
- I missed something).. Do you have any ideas about tests? I'm a bit  confus=
-ed at the moment: designing tests from scratch - this might be a bit tricky=
-.
->
-> Or it is enough just describe test-cases I checked manually (in some of t=
-he patches of the series)?
+Fix a memory leak in netpoll and introduce netconsole selftests that
+expose the issue when running with kmemleak detection enabled.
 
-I have some hard time to figure out why you are changing ipvlan, with
-some features that seem quite unrelated.
+This patchset includes a selftest for netpoll with multiple concurrent
+users (netconsole + bonding), which simulates the scenario from test[1]
+that originally demonstrated the issue allegedly fixed by commit
+efa95b01da18 ("netpoll: fix use after free") - a commit that is now
+being reverted.
 
-ipvlan is heavily used by Google, I am quite reluctant to see a huge
-chunk of changes that I do not understand, without spending hours on
-it.
+Sending this to "net" branch because this is a fix, and the selftest
+might help with the backports validation.
 
-The MAC-NAT keyword seems more related to a bridge.
+Link: https://lore.kernel.org/lkml/96b940137a50e5c387687bb4f57de8b0435a653f.1404857349.git.decot@googlers.com/ [1]
+
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+Changes in v9:
+- Reordered the config entries in tools/testing/selftests/drivers/net/bonding/config (NIPA)
+- Link to v8: https://lore.kernel.org/r/20251104-netconsole_torture-v8-0-5288440e2fa0@debian.org
+
+Changes in v8:
+- Sending it again, now that commit 1a8fed52f7be1 ("netdevsim: set the
+  carrier when the device goes up") has landed in net
+- Created one namespace for TX and one for RX (Paolo)
+- Used additional helpers to create and delete netdevsim (Paolo)
+- Link to v7: https://lore.kernel.org/r/20251003-netconsole_torture-v7-0-aa92fcce62a9@debian.org
+
+Changes in v7:
+- Rebased on top of `net`
+- Link to v6: https://lore.kernel.org/r/20251002-netconsole_torture-v6-0-543bf52f6b46@debian.org
+
+Changes in v6:
+- Expand the tests even more and some small fixups
+- Moved the test to bonding selftests
+- Link to v5: https://lore.kernel.org/r/20250918-netconsole_torture-v5-0-77e25e0a4eb6@debian.org
+
+Changes in v5:
+- Set CONFIG_BONDING=m in selftests/drivers/net/config.
+- Link to v4: https://lore.kernel.org/r/20250917-netconsole_torture-v4-0-0a5b3b8f81ce@debian.org
+
+Changes in v4:
+- Added an additional selftest to test multiple netpoll users in
+  parallel
+- Link to v3: https://lore.kernel.org/r/20250905-netconsole_torture-v3-0-875c7febd316@debian.org
+
+Changes in v3:
+- This patchset is a merge of the fix and the selftest together as
+  recommended by Jakub.
+
+Changes in v2:
+- Reuse the netconsole creation from lib_netcons.sh. Thus, refactoring
+  the create_dynamic_target() (Jakub)
+- Move the "wait" to after all the messages has been sent.
+- Link to v1: https://lore.kernel.org/r/20250902-netconsole_torture-v1-1-03c6066598e9@debian.org
+
+---
+Breno Leitao (4):
+      net: netpoll: fix incorrect refcount handling causing incorrect cleanup
+      selftest: netcons: refactor target creation
+      selftest: netcons: create a torture test
+      selftest: netcons: add test for netconsole over bonded interfaces
+
+ net/core/netpoll.c                                 |   7 +-
+ tools/testing/selftests/drivers/net/Makefile       |   1 +
+ .../testing/selftests/drivers/net/bonding/Makefile |   2 +
+ tools/testing/selftests/drivers/net/bonding/config |   4 +
+ .../drivers/net/bonding/netcons_over_bonding.sh    | 361 +++++++++++++++++++++
+ .../selftests/drivers/net/lib/sh/lib_netcons.sh    |  82 ++++-
+ .../selftests/drivers/net/netcons_torture.sh       | 130 ++++++++
+ 7 files changed, 569 insertions(+), 18 deletions(-)
+---
+base-commit: 7d1988a943850c584e8e2e4bcc7a3b5275024072
+change-id: 20250902-netconsole_torture-8fc23f0aca99
+
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
+
 
