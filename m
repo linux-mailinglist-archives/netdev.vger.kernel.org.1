@@ -1,188 +1,137 @@
-Return-Path: <netdev+bounces-236112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3324BC387DB
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 01:34:33 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5C17C387EA
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 01:36:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EC311A22B9C
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 00:34:57 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CB3024EA8BA
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 00:35:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24D461C5D6A;
-	Thu,  6 Nov 2025 00:34:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 900FC198E91;
+	Thu,  6 Nov 2025 00:35:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nkaS/49/"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="GPM717ar"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93915145FE0
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 00:34:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D151552F88;
+	Thu,  6 Nov 2025 00:35:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762389257; cv=none; b=OFDN9vc7shut2Zj0Ytck2zUsOvrg13MmoYGL4pz3N4kmafR6wWq8+t3WQLu6tvEHsKs90+e3SNT6L88Vd5izg/IigpPbDo4fWON0CsjgR+NnYzSHrKs74VpRvSHaPjMyru/pGk7SaqqI9rjsRCnUQYCu068267s2w3iiTiLVvgc=
+	t=1762389333; cv=none; b=WjWes5IiYNYMNeY80bwzLcVkT3sA/VzSw/GtT0yj20n0OysLqZvLrhPEsJO/9+fQQc6kIXn8c17OSrNLHjspfM9e3KZJeyue0C0zk4KLdmwLuXrbXr8ri+hxBjXQQeGWxU7H5tVO8QQaa9MURWGUuF4jQD13ANwEz6GucYzi56s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762389257; c=relaxed/simple;
-	bh=vxMSjLQjHAMEeI9eavqe+6FTysDe3bXZWoP9ZV3shos=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=iPVQ19iyzLus6Gq/N831Q5mAFZh99g5crNjmtK3z1+08N0EwKpvfGrg+eKlBWSeg/tjxYHwco7VGQQK6eB2mXdGvQW0VJOc5vmtaSmH7+XfaidUwxafrTlRO4vx8M6rB230wR+WipC5iyCY3RS/+br9QpnQKmdmdSoY720uYegQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nkaS/49/; arc=none smtp.client-ip=209.85.214.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--kuniyu.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-2956cdcdc17so4128925ad.3
-        for <netdev@vger.kernel.org>; Wed, 05 Nov 2025 16:34:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762389255; x=1762994055; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oxmeKdPQ2cjBQkdR5yq8OCb/AUfj+1Kg0sfWugkgDy8=;
-        b=nkaS/49/NYj4e3z4iQIzq/xa7tZQUk1QZmIRQW+Kf/00zL+K2ICJmkk57nUyOJYwks
-         9/B/Bv4EOAiORIg6HRsAb6aK3BSk5FwXlOXFzJ5mXVvVxE4Wd6PYz0p4C589X/WpoXya
-         uw2LlXVAv2JZ1YOG4q+REcl4VqcWP699rX7U23YZn2KA4FS+1LTy7PryVsOEzH+LuaJo
-         Jy8FPbYRgxxnSF32KeJc6QT30ag8VsCEMMmk8dGml9C29BzfyN/vQ9EllimX8lXRamNx
-         mWZChwfP0zQj5Kl0WS7PFeDv7rP2m25DnJXbv4HRd1pKdrJRhwoywTZCmyxpb+3dAirY
-         VpQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762389255; x=1762994055;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oxmeKdPQ2cjBQkdR5yq8OCb/AUfj+1Kg0sfWugkgDy8=;
-        b=dOYSUxrQTKFNh1JeoFxeMNNpWNNaGU10syFK0mhJg90PkulO3m9IgQySsR48hxMdn9
-         WvZhmKYaohCvXqRuub4PQ3V2Q32i17aLZ+L3veSaMpWYXWpW0MiDD5IffU8Zr+XVaG58
-         WYBaBpy4TPZ+5yzfd9aAnn6KfV33Rw2+MmuCM5tOFe4jZsi9rUmpuljFOZwG9hPbevuB
-         merdaRxnTbMUE64upIHvCcH1nsKltgBi+POPvHy0EPY7nzj17DM4Y/uJI9CUIZ2ggqdL
-         HyZB4ZnXJr+NgUH6sPGQEeuNUEGyogd0DROX0cvOK8o4jYgXAgNEeewZ45Tl6lowZX6T
-         0yVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXkKoy6h2cJeWrradNv+K9Gsew6vVAD1S4lMT7KNBMJN72sGSm+GLj0gUPu0I7LAaswmhnddvU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDNbWFVfiSfyIggkq8+QWutawtA8dfC7YBerOaWsDaNB6g3qEs
-	s2x1NkQAawr6JmivkodTmxb9dLwW37lCfa45r8fFRJpJjI9RnNWG80qrSsrh4ODVqraLMhiXnVY
-	Vwnf+3g==
-X-Google-Smtp-Source: AGHT+IEsL405Krj/gf8lXUp8njG4ulVBwo+aOzzZERht67uTcUnuIpoN3E97Fm8MZdzVYXMitu9UPto9OjA=
-X-Received: from plbm10.prod.google.com ([2002:a17:902:d18a:b0:267:dbc3:f98d])
- (user=kuniyu job=prod-delivery.src-stubby-dispatcher) by 2002:a17:903:1aed:b0:275:81ca:2c5
- with SMTP id d9443c01a7336-2962adedfd0mr67292395ad.59.1762389254952; Wed, 05
- Nov 2025 16:34:14 -0800 (PST)
-Date: Thu,  6 Nov 2025 00:32:45 +0000
-In-Reply-To: <20251106003357.273403-1-kuniyu@google.com>
+	s=arc-20240116; t=1762389333; c=relaxed/simple;
+	bh=KVpDWxWF/dm4zgKhhVqhqvrQM0bzaukrblkcGtaAFao=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=n6wHWwu7hlrxxxxq9iFwMq5msXdPM6U0ltC2r0J6naY1L4Fp7lso31a5qwmWjtP8L8RV03gD1KNBqvf1eJzcfWCjaF/MJvFk1A3B07C3L9bL1Hu8RAN97nn+OnusHRsH7JQLgzpSrENN/otN34eo3AOT6/JdyBT6UnIuoRK4cyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=GPM717ar; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=202503; t=1762389321;
+	bh=DhZc1sa9BxLzaAumTCpTVerftcgyskXVgkIQbbKjSwo=;
+	h=Date:From:To:Cc:Subject:From;
+	b=GPM717arSqZpALFFg48dOXn2o7iCenJu+l5lbrrZ8dS4L4Ev9XXo2G2PohJksW5Cw
+	 BcPXolPguJ5oqUmntlCKni0Lsr35JzSOL8rK4g/SNr/n1TFZ041x0hDtbZjNlRJpAz
+	 o9ZCFLo1JBjIrLp3ycsEP4Dc+/34B6FD6Rwvu62Daka9E5M9DIjxvD1i8z5cETv9zI
+	 cP7UQwDsHoX2QhAGTS6GktbaBqd+XtymVmyHnKaOcL6RyN6mWlERaUOiO2yO45COMy
+	 f65J42Xj7Y+aD0rJ5dPwjS3qtZ2aCIGKZCkFnxBsNCSYltBqxhIAN0yWljY+aCJpIl
+	 TJPDAl+L5P2MA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange secp256r1 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4d23BK1LS2z4w23;
+	Thu, 06 Nov 2025 11:35:20 +1100 (AEDT)
+Date: Thu, 6 Nov 2025 11:35:19 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
+ <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>
+Cc: Mykyta Yatsenko <yatsenko@meta.com>, bpf <bpf@vger.kernel.org>,
+ Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the bpf-next tree with the bpf tree
+Message-ID: <20251106113519.544d147d@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20251106003357.273403-1-kuniyu@google.com>
-X-Mailer: git-send-email 2.51.2.1026.g39e6a42477-goog
-Message-ID: <20251106003357.273403-7-kuniyu@google.com>
-Subject: [PATCH v1 net-next 6/6] selftest: packetdrill: Add max RTO test for SYN+ACK.
-From: Kuniyuki Iwashima <kuniyu@google.com>
-To: Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, 
-	"David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Yuchung Cheng <ycheng@google.com>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/0lwr1YLBOt+uFngh7Rx_hSQ";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-This script sets net.ipv4.tcp_rto_max_ms to 1000 and checks
-if SYN+ACK RTO is capped at 1s for TFO and non-TFO.
+--Sig_/0lwr1YLBOt+uFngh7Rx_hSQ
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Without the previous patch, the max RTO is applied to TFO
-SYN+ACK only, and non-TFO SYN+ACK RTO increases exponentially.
+Hi all,
 
-  # selftests: net/packetdrill: tcp_rto_synack_rto_max.pkt
-  # TAP version 13
-  # 1..2
-  # tcp_rto_synack_rto_max.pkt:46: error handling packet: timing error:
-     expected outbound packet at 5.091936 sec but happened at 6.107826 sec; tolerance 0.127974 sec
-  # script packet:  5.091936 S. 0:0(0) ack 1 <mss 1460,nop,nop,sackOK>
-  # actual packet:  6.107826 S. 0:0(0) ack 1 win 65535 <mss 1460,nop,nop,sackOK>
-  # not ok 1 ipv4
-  # tcp_rto_synack_rto_max.pkt:46: error handling packet: timing error:
-     expected outbound packet at 5.075901 sec but happened at 6.091841 sec; tolerance 0.127976 sec
-  # script packet:  5.075901 S. 0:0(0) ack 1 <mss 1460,nop,nop,sackOK>
-  # actual packet:  6.091841 S. 0:0(0) ack 1 win 65535 <mss 1460,nop,nop,sackOK>
-  # not ok 2 ipv6
-  # # Totals: pass:0 fail:2 xfail:0 xpass:0 skip:0 error:0
-  not ok 49 selftests: net/packetdrill: tcp_rto_synack_rto_max.pkt # exit=1
+Today's linux-next merge of the bpf-next tree got a conflict in:
 
-With the previous patch, all SYN+ACKs are retransmitted
-after 1s.
+  kernel/bpf/helpers.c
 
-  # selftests: net/packetdrill: tcp_rto_synack_rto_max.pkt
-  # TAP version 13
-  # 1..2
-  # ok 1 ipv4
-  # ok 2 ipv6
-  # # Totals: pass:2 fail:0 xfail:0 xpass:0 skip:0 error:0
-  ok 49 selftests: net/packetdrill: tcp_rto_synack_rto_max.pkt
+between commits:
 
-Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
----
- .../packetdrill/tcp_rto_synack_rto_max.pkt    | 54 +++++++++++++++++++
- 1 file changed, 54 insertions(+)
- create mode 100644 tools/testing/selftests/net/packetdrill/tcp_rto_synack_rto_max.pkt
+  ea0714d61dea ("bpf:add _impl suffix for bpf_task_work_schedule* kfuncs")
+  137cc92ffe2e ("bpf: add _impl suffix for bpf_stream_vprintk() kfunc")
 
-diff --git a/tools/testing/selftests/net/packetdrill/tcp_rto_synack_rto_max.pkt b/tools/testing/selftests/net/packetdrill/tcp_rto_synack_rto_max.pkt
-new file mode 100644
-index 000000000000..47550df124ce
---- /dev/null
-+++ b/tools/testing/selftests/net/packetdrill/tcp_rto_synack_rto_max.pkt
-@@ -0,0 +1,54 @@
-+// SPDX-License-Identifier: GPL-2.0
-+//
-+// Test SYN+ACK RTX with 1s RTO.
-+//
-+`./defaults.sh
-+ ./set_sysctls.py /proc/sys/net/ipv4/tcp_rto_max_ms=1000`
-+
-+//
-+// Test 1: TFO SYN+ACK
-+//
-+    0 socket(..., SOCK_STREAM|SOCK_NONBLOCK, IPPROTO_TCP) = 3
-+   +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) = 0
-+   +0 bind(3, ..., ...) = 0
-+   +0 listen(3, 1) = 0
-+   +0 setsockopt(3, SOL_TCP, TCP_FASTOPEN, [1], 4) = 0
-+
-+   +0 < S 0:10(10) win 1000 <mss 1460,sackOK,nop,nop,FO TFO_COOKIE,nop,nop>
-+   +0 > S. 0:0(0) ack 11 <mss 1460,nop,nop,sackOK>
-+
-+// RTO must be capped to 1s
-+   +1 > S. 0:0(0) ack 11 <mss 1460,nop,nop,sackOK>
-+   +1 > S. 0:0(0) ack 11 <mss 1460,nop,nop,sackOK>
-+   +1 > S. 0:0(0) ack 11 <mss 1460,nop,nop,sackOK>
-+
-+   +0 < . 11:11(0) ack 1 win 1000 <mss 1460,nop,nop,sackOK>
-+   +0 accept(3, ..., ...) = 4
-+   +0 %{ assert (tcpi_options & TCPI_OPT_SYN_DATA) != 0, tcpi_options }%
-+
-+   +0 close(4) = 0
-+   +0 close(3) = 0
-+
-+
-+//
-+// Test 2: non-TFO SYN+ACK
-+//
-+   +0 socket(..., SOCK_STREAM|SOCK_NONBLOCK, IPPROTO_TCP) = 3
-+   +0 setsockopt(3, SOL_SOCKET, SO_REUSEADDR, [1], 4) = 0
-+   +0 bind(3, ..., ...) = 0
-+   +0 listen(3, 1) = 0
-+
-+   +0 < S 0:0(0) win 1000 <mss 1460,sackOK,nop,nop>
-+   +0 > S. 0:0(0) ack 1 <mss 1460,nop,nop,sackOK>
-+
-+// RTO must be capped to 1s
-+   +1 > S. 0:0(0) ack 1 <mss 1460,nop,nop,sackOK>
-+   +1 > S. 0:0(0) ack 1 <mss 1460,nop,nop,sackOK>
-+   +1 > S. 0:0(0) ack 1 <mss 1460,nop,nop,sackOK>
-+
-+   +0 < . 1:1(0) ack 1 win 1000 <mss 1460,nop,nop,sackOK>
-+   +0 accept(3, ..., ...) = 4
-+   +0 %{ assert (tcpi_options & TCPI_OPT_SYN_DATA) == 0, tcpi_options }%
-+
-+   +0 close(4) = 0
-+   +0 close(3) = 0
--- 
-2.51.2.1026.g39e6a42477-goog
+from the bpf tree and commit:
 
+  8d8771dc03e4 ("bpf: add plumbing for file-backed dynptr")
+
+from the bpf-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc kernel/bpf/helpers.c
+index e4007fea4909,865b0dae38d1..000000000000
+--- a/kernel/bpf/helpers.c
++++ b/kernel/bpf/helpers.c
+@@@ -4380,9 -4531,11 +4535,11 @@@ BTF_ID_FLAGS(func, bpf_strncasestr)
+  #if defined(CONFIG_BPF_LSM) && defined(CONFIG_CGROUPS)
+  BTF_ID_FLAGS(func, bpf_cgroup_read_xattr, KF_RCU)
+  #endif
+ -BTF_ID_FLAGS(func, bpf_stream_vprintk, KF_TRUSTED_ARGS)
+ -BTF_ID_FLAGS(func, bpf_task_work_schedule_signal, KF_TRUSTED_ARGS)
+ -BTF_ID_FLAGS(func, bpf_task_work_schedule_resume, KF_TRUSTED_ARGS)
+ +BTF_ID_FLAGS(func, bpf_stream_vprintk_impl, KF_TRUSTED_ARGS)
+ +BTF_ID_FLAGS(func, bpf_task_work_schedule_signal_impl, KF_TRUSTED_ARGS)
+ +BTF_ID_FLAGS(func, bpf_task_work_schedule_resume_impl, KF_TRUSTED_ARGS)
++ BTF_ID_FLAGS(func, bpf_dynptr_from_file, KF_TRUSTED_ARGS)
++ BTF_ID_FLAGS(func, bpf_dynptr_file_discard)
+  BTF_KFUNCS_END(common_btf_ids)
+ =20
+  static const struct btf_kfunc_id_set common_kfunc_set =3D {
+
+--Sig_/0lwr1YLBOt+uFngh7Rx_hSQ
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmkL7UcACgkQAVBC80lX
+0GwSjgf+IwWpUtTU/H/MvvQmDHmtqqSSj9OqIhYdw8pBSr2gWW4BHJyTu+XUSthB
+oq5ixveT/j4idfg4HSSAHY6eQiYG7l0XarnlEtgO1y+ttPldVEhPlWkLSWn+nLRo
+A8tzUHAXID5z4OLmTV2CzdE4jzdjCO00I73+zg2R7YJMLsMGHwNThFar5hlN4ush
+veYwA7b0xnHg2x8aTJ0cU6WOrPl8i73d6EPd5CQtA0yoVASXhfIKWpyjk0WEJ+BM
+7OL4TjfW1w5k2tp92r3RjAOcoHOAuk4Vj5uUOPTfi0NuRgslOx9CsADvCyaVGuiz
+RQngF4UhCZBJMSs/PJxLiLgdXQJCug==
+=/jW5
+-----END PGP SIGNATURE-----
+
+--Sig_/0lwr1YLBOt+uFngh7Rx_hSQ--
 
