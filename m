@@ -1,91 +1,96 @@
-Return-Path: <netdev+bounces-236396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C1A2C3BBD0
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 15:29:26 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A717C3BBE2
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 15:30:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37D4F1A4070F
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 14:27:23 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 05F8F350DF6
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 14:30:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6B433C532;
-	Thu,  6 Nov 2025 14:22:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 304E52E7F1A;
+	Thu,  6 Nov 2025 14:30:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EfkzXxgC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3998E33C537
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 14:22:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0728E21D3CA;
+	Thu,  6 Nov 2025 14:30:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762438924; cv=none; b=KWmp7DyOSZfrfgR8Jg44N7on9UjAWvK5hLbUaJ20TmgDlc+Mp0H9Au1QhrcY2Gnca9nP732Ee7+F8SE00CzPImNongx6ajdMpLezlT1RtNxrDmG3/E+AOfErPwEELqcGN4jbjrMEUjjrCa7uGRoadWFevXqeSzqP0v/cUIEr+Wc=
+	t=1762439435; cv=none; b=HnMXa1GBl2sXJaspl6cFuiTtyiUqUHeq51mZkixz8wmwyfj830xGJGEBcxyudmREXSdbFFewCuqLAIQNN5tNmvyU4CEn5UIfuqBs3KOtrZidNee/aFPLqDJOzYEksFgM+gHaIZOv+xwdm7eF/gDzaJb79K1RJicLVBe5kIsy1tw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762438924; c=relaxed/simple;
-	bh=ZlAJ1Fxjzx2mgXOVW/VSUoL4/8qbs5U6HQhU/HeNmZs=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=RtCdXuam9uWxfQsbRsao5TwFOI95TjqSpjS5vPlUzC0c0NS0UA0tCIbJqlXThobWp8XXnN3u/XQ/yAe4auiBJE47iw8YKFvD0srkUXkpaoxxPJJwh0xlQujEV3jx8cTrENa5dwQ1/mK1AE/DiVe4F7d35ep+MlaBe3E/OgNFJYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-432f8352633so10339985ab.0
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 06:22:03 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762438922; x=1763043722;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/5CCGL9kmizTngSG/cTV1+QEwEMhTlcIpLgbiwj3ccg=;
-        b=lM1RFgIGt1zzIY6HAsKL4Xo3ot0+DS3ric6ABt6AZUFlstmUigsHMHrtf6yl7amTTL
-         9PG9m/pq0RNIGsk5u7nT06armnaN6GdDiLrzbaCP5R5AhvpmQhKoo9HQ94uCHX+L0+dz
-         edUd+CBkU1E/Xp1y9XnJVmtnQH2ZZpPgWian8exU8EGjaAzPGMXzqe5SHfBQRwfujHI4
-         D8/HtXZBHm1qN259bSGFidsQYrx45KtLiKg26NWiHqYL7O9Qwl/3FA6mOMc2nvgBR+jS
-         0X+9FpLvT8weSqPXmm2hOHIS34/9dDdfdQMq+My4JujEA1DAmH0VuajZKiAxLDVxLh9c
-         s4DQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXvVPro3Q03XlBd9GAtCJXV27U5t7CoP6/IPDmY23tXk448TBwF/UqsI+QBJRWsRI/kAEZiJr0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw8weVrSSczWz8df2PpPk2EW15JcFpH9fM+U/f6btmVVTFwU8Xc
-	WiamftC9RslQMYjKmYO+W6L/8ixBShg6zyW2sjd6U8yODjCW4D9c3WtXSKnMcl76bYvWNMI/F46
-	U+bIVXitt9bcqY1LQJmBHU1NTIThhMDvjSGfEgxG00damRo+ezixmUMgLWqg=
-X-Google-Smtp-Source: AGHT+IHgVANv+IIbVs6kOqE0pft4cy18BhetSi/JO+BMCVp+iwgbnce1SlJD9uESBG22bvcJ9UrYSamenc/1Z2VTXWWFFl2klIRU
+	s=arc-20240116; t=1762439435; c=relaxed/simple;
+	bh=DvRREBRYuDOCESnDpJAgcuJWRTjoxTzA8EmUaYHusb0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=pyLHXNly1SsdPvia80qFrAgzX9CeOgTCgKhUqBqRr7WHjLxnNsMmaMDvE83wEAnaKqoDlNBWLn5Te4uCCXjWHwYJ9vRnuBi3K52bU1vN5Oois4Dk5eLGy9RP9OCENVnRPrkkx7ivX5MRMgWfBq+0jUHOrj/DM9xttaIHNuXuypI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EfkzXxgC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AF6EC4CEF7;
+	Thu,  6 Nov 2025 14:30:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762439433;
+	bh=DvRREBRYuDOCESnDpJAgcuJWRTjoxTzA8EmUaYHusb0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=EfkzXxgCTZQxuvlu4uE9zlyAxLqgG8E0OrKc3+Nq7q/Yb4BpnzLqTUBc9yZu5hUoa
+	 HTyQe2CDBVJFX1wCnisVMabPVg8R6gc9PLFNgRIZuRgAj+BfbVmD2aANqSmGgWzXdi
+	 WshsSYX7FZarvZPTkQ2gam8AxQQfypScg7rboigXaP4hd2uNtkwmWfKTN2lbmPD2HA
+	 yDrMSVmwLJb8e3MXtGuBZaEJ58gCuewnQKI/ZBvrwGcuyF29sBdGDr2guikQdiTXvE
+	 ZmmFJMp5k2VqPWLmManvk+qzSjnkOcjx5apZ7sXe8Otao5ziusjPiAamn6I2lZIXS6
+	 m5No1ewbPY+FA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF0D39D6549;
+	Thu,  6 Nov 2025 14:30:07 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3712:b0:430:b999:49e7 with SMTP id
- e9e14a558f8ab-433407d4f9fmr101993465ab.27.1762438922463; Thu, 06 Nov 2025
- 06:22:02 -0800 (PST)
-Date: Thu, 06 Nov 2025 06:22:02 -0800
-In-Reply-To: <20251106135658.866481-4-1599101385@qq.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <690caf0a.050a0220.3d0d33.0159.GAE@google.com>
-Subject: Re: [syzbot] [net?] kernel BUG in set_ipsecrequest
-From: syzbot <syzbot+be97dd4da14ae88b6ba4@syzkaller.appspotmail.com>
-To: clf700383@gmail.com, davem@davemloft.net, eadavis@qq.com, 
-	edumazet@google.com, herbert@gondor.apana.org.au, horms@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, ssrane_b23@ee.vjti.ac.in, steffen.klassert@secunet.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] s390/ctcm: Use info level for handshake
+ UC_RCRESET
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176243940650.230375.7618185802650828717.git-patchwork-notify@kernel.org>
+Date: Thu, 06 Nov 2025 14:30:06 +0000
+References: <20251103101652.2349855-1-aswin@linux.ibm.com>
+In-Reply-To: <20251103101652.2349855-1-aswin@linux.ibm.com>
+To: Aswin Karuvally <aswin@linux.ibm.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
+ linux-s390@vger.kernel.org, hca@linux.ibm.com, gor@linux.ibm.com,
+ agordeev@linux.ibm.com, wintera@linux.ibm.com, borntraeger@linux.ibm.com,
+ svens@linux.ibm.com, horms@kernel.org
 
-Hello,
+Hello:
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Reported-by: syzbot+be97dd4da14ae88b6ba4@syzkaller.appspotmail.com
-Tested-by: syzbot+be97dd4da14ae88b6ba4@syzkaller.appspotmail.com
+On Mon,  3 Nov 2025 11:16:52 +0100 you wrote:
+> CTC adapter throws CTC_EVENT_UC_RCRESET (Unit check remote reset event)
+> during initial handshake, if the peer is not ready yet. This causes the
+> ctcm driver to re-attempt the handshake.
+> 
+> As it is normal for the event to occur during initialization, use info
+> instead of warn level in kernel log and NOTICE instead of ERROR level
+> in s390 debug feature. Also reword the log message for clarity.
+> 
+> [...]
 
-Tested on:
+Here is the summary with links:
+  - [net-next] s390/ctcm: Use info level for handshake UC_RCRESET
+    https://git.kernel.org/netdev/net-next/c/0cc4b8461591
 
-commit:         b54a8e13 Merge branch 'bpf-indirect-jumps'
-git tree:       bpf-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=10dae114580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e46b8a1c645465a9
-dashboard link: https://syzkaller.appspot.com/bug?extid=be97dd4da14ae88b6ba4
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=106ae114580000
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Note: testing is done by a robot and is best-effort only.
+
 
