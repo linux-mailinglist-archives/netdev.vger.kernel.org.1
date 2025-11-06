@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-236517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85CF9C3D847
-	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 22:37:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62BD2C3D84A
+	for <lists+netdev@lfdr.de>; Thu, 06 Nov 2025 22:37:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 270D5188E294
-	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 21:38:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E24D3AE28C
+	for <lists+netdev@lfdr.de>; Thu,  6 Nov 2025 21:37:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B597F305078;
-	Thu,  6 Nov 2025 21:37:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AF69306B0A;
+	Thu,  6 Nov 2025 21:37:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="TcTyIM5n"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Le+aHs8f"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66D91302760
-	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 21:37:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A15226541
+	for <netdev@vger.kernel.org>; Thu,  6 Nov 2025 21:37:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762465062; cv=none; b=ZHorwYhLEPlF0G1VRBO7F4h+Q6X1e5ck3osh0z1F2UYtWYkE/1TOpDyqI7I+vv/TwofH9F09xnSzqBXYSZ2fgeJil1oSbBmlJMiqc++sRJVNmVcTwj73DY63cZInBdYKe8d4ichzdXYQT5oBLQXamcfwmOjhLIGJO8Z8OE04XCk=
+	t=1762465063; cv=none; b=l5jmHudUVxeTRgRlW294bZ0ZmE3T+7FuCtrJBRZ/FQkrXQ8KA/BZyfj+mcWmnn7krLtETB2Vn+Di20wVgcAxvmvb2B6rHw2UD30GCFPusgguPTVaqUI1xk+TlvyFr36RKeXZw+sr1Lq3OhQ28XljFKr0Si0zDIw4EpXJMXGRL0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762465062; c=relaxed/simple;
-	bh=YX19L2tS4d0X1ULGHfNYM59IANhicIG5342Gwf3Tk1w=;
+	s=arc-20240116; t=1762465063; c=relaxed/simple;
+	bh=o8ubVAlnm3Duak1nzbVxyg8UQatHHFi0XCQFSIAXp1Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tNp2xk/O50ExpjXRSATjPj/0YJt312wfnzRzLcLZlQaxsJudhIy0ZdbCIQvJ8nXnwxKkLVM+JAWHy9PP2NvlzlctY7H3nxc7ryZo7lXacjFdDFyCj6or/VovCJk5kPaiIEPPKwAofVpvxqlyrk1akFXS2qXNmG4t5SIPwSUtLCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=TcTyIM5n; arc=none smtp.client-ip=95.215.58.170
+	 MIME-Version; b=AORFpbdQAEmTUFE4KrsnnSYebkbsC2oY1V4dENeoHwHVJt9xu9CzoPfnCbwrXcCBbNA6oQ328o5FWTVqK21rIQJvhPLiRzTjegaYlwDyoK5crTRyaDmejgYeED0/xtqbDKYKRuqk57vjgeQpNmDhxgvT2VXFBNEEwJBQGjnF7Lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Le+aHs8f; arc=none smtp.client-ip=95.215.58.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1762465056;
+	t=1762465057;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=BNigygw3EZ8VVzkMsbNNBs9qoN2sr2CCi39O5jEg2Kk=;
-	b=TcTyIM5nIKMhhqvMjjR8IOhO7aoR0YyIWqZ1BRvQy87+3DMYxRAagt64tku39BdujhelaE
-	sML5C/MZlPidV6GLuyP/wkGyR/wcGM1chyjtmZIbQiblTCi0DljgGWTaxCLKU1UTfsSoWO
-	tHNj4nWJacNtBQDb3IIVSD+FQCbLleU=
+	bh=QkJ5PXPgzceRmzoOX4XEOc+R6LcnUSWTTFLqYxZCIkw=;
+	b=Le+aHs8fGB+aC3EfrRaHTFV3toEDXNmnN2CIcPOl+12tdGcN9gE6JE2N/Tdj2gAdXRV/+Q
+	bDBeWV45odM0v0MPMHCixLA84SWoHFh70eYB1ytSBHsvvJVC6nsExL9nYCQmVsBPBRLq8+
+	kdNK3KpnYwvQuFtsv9Fl96T1qwAP1W4=
 From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 To: Manish Chopra <manishc@marvell.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -55,9 +55,9 @@ Cc: Richard Cochran <richardcochran@gmail.com>,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	Kory Maincent <kory.maincent@bootlin.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next v2 1/2] bnx2x: convert to use ndo_hwtstamp callbacks
-Date: Thu,  6 Nov 2025 21:37:16 +0000
-Message-ID: <20251106213717.3543174-2-vadim.fedorenko@linux.dev>
+Subject: [PATCH net-next v2 2/2] qede: convert to use ndo_hwtstamp callbacks
+Date: Thu,  6 Nov 2025 21:37:17 +0000
+Message-ID: <20251106213717.3543174-3-vadim.fedorenko@linux.dev>
 In-Reply-To: <20251106213717.3543174-1-vadim.fedorenko@linux.dev>
 References: <20251106213717.3543174-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
@@ -69,100 +69,137 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-The driver implemented SIOCSHWTSTAMP ioctl command only, but at the same
-time it has configuration stored in a private structure. Implement both
-ndo_hwtstamp_set and ndo_hwtstamp_get callback using stored info.
-ndo_hwtstamp_set callback implements a check for unsupported 1-step
-timestamping. The same check is removed from bnx2x_configure_ptp_filters
-function as it's not needed anymore. Another call site of
-bnx2x_configure_ptp_filters has hwtstamp_ioctl_called guard.
+The driver implemented SIOCSHWTSTAMP ioctl cmd only, but it stores
+configuration in private structure, so it can be reported back to users.
+Implement both ndo_hwtstamp_set and ndo_hwtstamp_set callbacks.
+ndo_hwtstamp_set implements a check of unsupported 1-step timestamping
+and qede_ptp_cfg_filters() becomes void as it cannot fail anymore.
 
 Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
 Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 ---
- .../net/ethernet/broadcom/bnx2x/bnx2x_main.c  | 73 ++++++++++++-------
- 1 file changed, 46 insertions(+), 27 deletions(-)
+ drivers/net/ethernet/qlogic/qede/qede_main.c | 22 +------
+ drivers/net/ethernet/qlogic/qede/qede_ptp.c  | 69 ++++++++++++--------
+ drivers/net/ethernet/qlogic/qede/qede_ptp.h  |  6 +-
+ 3 files changed, 47 insertions(+), 50 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-index f0f05d7315ac..94dba7db4b6a 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-@@ -308,8 +308,11 @@ static int bnx2x_set_storm_rx_mode(struct bnx2x *bp);
- /****************************************************************************
- * General service functions
- ****************************************************************************/
+diff --git a/drivers/net/ethernet/qlogic/qede/qede_main.c b/drivers/net/ethernet/qlogic/qede/qede_main.c
+index b5d744d2586f..66ab1b9d65a1 100644
+--- a/drivers/net/ethernet/qlogic/qede/qede_main.c
++++ b/drivers/net/ethernet/qlogic/qede/qede_main.c
+@@ -506,25 +506,6 @@ static int qede_set_vf_trust(struct net_device *dev, int vfidx, bool setting)
+ }
+ #endif
+ 
+-static int qede_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
+-{
+-	struct qede_dev *edev = netdev_priv(dev);
 -
--static int bnx2x_hwtstamp_ioctl(struct bnx2x *bp, struct ifreq *ifr);
-+static int bnx2x_hwtstamp_set(struct net_device *dev,
-+			      struct kernel_hwtstamp_config *config,
-+			      struct netlink_ext_ack *extack);
-+static int bnx2x_hwtstamp_get(struct net_device *dev,
-+			      struct kernel_hwtstamp_config *config);
- 
- static void __storm_memset_dma_mapping(struct bnx2x *bp,
- 				       u32 addr, dma_addr_t mapping)
-@@ -12813,14 +12816,9 @@ static int bnx2x_ioctl(struct net_device *dev, struct ifreq *ifr, int cmd)
- 	if (!netif_running(dev))
- 		return -EAGAIN;
- 
+-	if (!netif_running(dev))
+-		return -EAGAIN;
+-
 -	switch (cmd) {
 -	case SIOCSHWTSTAMP:
--		return bnx2x_hwtstamp_ioctl(bp, ifr);
+-		return qede_ptp_hw_ts(edev, ifr);
 -	default:
--		DP(NETIF_MSG_LINK, "ioctl: phy id 0x%x, reg 0x%x, val_in 0x%x\n",
--		   mdio->phy_id, mdio->reg_num, mdio->val_in);
--		return mdio_mii_ioctl(&bp->mdio, mdio, cmd);
+-		DP_VERBOSE(edev, QED_MSG_DEBUG,
+-			   "default IOCTL cmd 0x%x\n", cmd);
+-		return -EOPNOTSUPP;
 -	}
-+	DP(NETIF_MSG_LINK, "ioctl: phy id 0x%x, reg 0x%x, val_in 0x%x\n",
-+	   mdio->phy_id, mdio->reg_num, mdio->val_in);
-+	return mdio_mii_ioctl(&bp->mdio, mdio, cmd);
- }
- 
- static int bnx2x_validate_addr(struct net_device *dev)
-@@ -13036,6 +13034,8 @@ static const struct net_device_ops bnx2x_netdev_ops = {
- 	.ndo_get_phys_port_id	= bnx2x_get_phys_port_id,
- 	.ndo_set_vf_link_state	= bnx2x_set_vf_link_state,
- 	.ndo_features_check	= bnx2x_features_check,
-+	.ndo_hwtstamp_get	= bnx2x_hwtstamp_get,
-+	.ndo_hwtstamp_set	= bnx2x_hwtstamp_set,
+-
+-	return 0;
+-}
+-
+ static void qede_fp_sb_dump(struct qede_dev *edev, struct qede_fastpath *fp)
+ {
+ 	char *p_sb = (char *)fp->sb_info->sb_virt;
+@@ -717,7 +698,6 @@ static const struct net_device_ops qede_netdev_ops = {
+ 	.ndo_set_mac_address	= qede_set_mac_addr,
+ 	.ndo_validate_addr	= eth_validate_addr,
+ 	.ndo_change_mtu		= qede_change_mtu,
+-	.ndo_eth_ioctl		= qede_ioctl,
+ 	.ndo_tx_timeout		= qede_tx_timeout,
+ #ifdef CONFIG_QED_SRIOV
+ 	.ndo_set_vf_mac		= qede_set_vf_mac,
+@@ -742,6 +722,8 @@ static const struct net_device_ops qede_netdev_ops = {
+ #endif
+ 	.ndo_xdp_xmit		= qede_xdp_transmit,
+ 	.ndo_setup_tc		= qede_setup_tc_offload,
++	.ndo_hwtstamp_get	= qede_hwtstamp_get,
++	.ndo_hwtstamp_set	= qede_hwtstamp_set,
  };
  
- static int bnx2x_init_dev(struct bnx2x *bp, struct pci_dev *pdev,
-@@ -15285,10 +15285,8 @@ int bnx2x_configure_ptp_filters(struct bnx2x *bp)
- 		REG_WR(bp, param, BNX2X_PTP_TX_ON_PARAM_MASK);
- 		REG_WR(bp, rule, BNX2X_PTP_TX_ON_RULE_MASK);
- 		break;
--	case HWTSTAMP_TX_ONESTEP_SYNC:
--	case HWTSTAMP_TX_ONESTEP_P2P:
--		BNX2X_ERR("One-step timestamping is not supported\n");
--		return -ERANGE;
-+	default:
-+		break;
- 	}
- 
- 	param = port ? NIG_REG_P1_LLH_PTP_PARAM_MASK :
-@@ -15350,31 +15348,52 @@ int bnx2x_configure_ptp_filters(struct bnx2x *bp)
- 	return 0;
+ static const struct net_device_ops qede_netdev_vf_ops = {
+diff --git a/drivers/net/ethernet/qlogic/qede/qede_ptp.c b/drivers/net/ethernet/qlogic/qede/qede_ptp.c
+index a38f1e72c62b..a122e0da88f3 100644
+--- a/drivers/net/ethernet/qlogic/qede/qede_ptp.c
++++ b/drivers/net/ethernet/qlogic/qede/qede_ptp.c
+@@ -199,18 +199,15 @@ static u64 qede_ptp_read_cc(struct cyclecounter *cc)
+ 	return phc_cycles;
  }
  
--static int bnx2x_hwtstamp_ioctl(struct bnx2x *bp, struct ifreq *ifr)
-+static int bnx2x_hwtstamp_set(struct net_device *dev,
-+			      struct kernel_hwtstamp_config *config,
-+			      struct netlink_ext_ack *extack)
+-static int qede_ptp_cfg_filters(struct qede_dev *edev)
++static void qede_ptp_cfg_filters(struct qede_dev *edev)
+ {
+ 	enum qed_ptp_hwtstamp_tx_type tx_type = QED_PTP_HWTSTAMP_TX_ON;
+ 	enum qed_ptp_filter_type rx_filter = QED_PTP_FILTER_NONE;
+ 	struct qede_ptp *ptp = edev->ptp;
+ 
+-	if (!ptp)
+-		return -EIO;
+-
+ 	if (!ptp->hw_ts_ioctl_called) {
+ 		DP_INFO(edev, "TS IOCTL not called\n");
+-		return 0;
++		return;
+ 	}
+ 
+ 	switch (ptp->tx_type) {
+@@ -223,11 +220,6 @@ static int qede_ptp_cfg_filters(struct qede_dev *edev)
+ 		clear_bit(QEDE_FLAGS_TX_TIMESTAMPING_EN, &edev->flags);
+ 		tx_type = QED_PTP_HWTSTAMP_TX_OFF;
+ 		break;
+-
+-	case HWTSTAMP_TX_ONESTEP_SYNC:
+-	case HWTSTAMP_TX_ONESTEP_P2P:
+-		DP_ERR(edev, "One-step timestamping is not supported\n");
+-		return -ERANGE;
+ 	}
+ 
+ 	spin_lock_bh(&ptp->lock);
+@@ -286,39 +278,58 @@ static int qede_ptp_cfg_filters(struct qede_dev *edev)
+ 	ptp->ops->cfg_filters(edev->cdev, rx_filter, tx_type);
+ 
+ 	spin_unlock_bh(&ptp->lock);
+-
+-	return 0;
+ }
+ 
+-int qede_ptp_hw_ts(struct qede_dev *edev, struct ifreq *ifr)
++int qede_hwtstamp_set(struct net_device *netdev,
++		      struct kernel_hwtstamp_config *config,
++		      struct netlink_ext_ack *extack)
  {
 -	struct hwtstamp_config config;
-+	struct bnx2x *bp = netdev_priv(dev);
- 	int rc;
++	struct qede_dev *edev = netdev_priv(netdev);
+ 	struct qede_ptp *ptp;
+-	int rc;
  
--	DP(BNX2X_MSG_PTP, "HWTSTAMP IOCTL called\n");
+ 	ptp = edev->ptp;
+-	if (!ptp)
++	if (!ptp) {
++		NL_SET_ERR_MSG_MOD(extack, "HW timestamping is not supported");
+ 		return -EIO;
 -
 -	if (copy_from_user(&config, ifr->ifr_data, sizeof(config)))
 -		return -EFAULT;
-+	DP(BNX2X_MSG_PTP, "HWTSTAMP SET called\n");
++	}
  
- 	DP(BNX2X_MSG_PTP, "Requested tx_type: %d, requested rx_filters = %d\n",
--	   config.tx_type, config.rx_filter);
-+	   config->tx_type, config->rx_filter);
+ 	DP_VERBOSE(edev, QED_MSG_DEBUG,
+-		   "HWTSTAMP IOCTL: Requested tx_type = %d, requested rx_filters = %d\n",
+-		   config.tx_type, config.rx_filter);
++		   "HWTSTAMP SET: Requested tx_type = %d, requested rx_filters = %d\n",
++		   config->tx_type, config->rx_filter);
 +
 +	switch (config->tx_type) {
 +	case HWTSTAMP_TX_ONESTEP_SYNC:
@@ -170,43 +207,61 @@ index f0f05d7315ac..94dba7db4b6a 100644
 +		NL_SET_ERR_MSG_MOD(extack,
 +				   "One-step timestamping is not supported");
 +		return -ERANGE;
-+	default:
-+		break;
 +	}
  
- 	bp->hwtstamp_ioctl_called = true;
--	bp->tx_type = config.tx_type;
--	bp->rx_filter = config.rx_filter;
-+	bp->tx_type = config->tx_type;
-+	bp->rx_filter = config->rx_filter;
+ 	ptp->hw_ts_ioctl_called = 1;
+-	ptp->tx_type = config.tx_type;
+-	ptp->rx_filter = config.rx_filter;
++	ptp->tx_type = config->tx_type;
++	ptp->rx_filter = config->rx_filter;
  
- 	rc = bnx2x_configure_ptp_filters(bp);
+-	rc = qede_ptp_cfg_filters(edev);
 -	if (rc)
-+	if (rc) {
-+		NL_SET_ERR_MSG_MOD(extack, "HW configuration failure");
- 		return rc;
-+	}
+-		return rc;
++	qede_ptp_cfg_filters(edev);
 +
-+	config->rx_filter = bp->rx_filter;
- 
--	config.rx_filter = bp->rx_filter;
++	config->rx_filter = ptp->rx_filter;
++
 +	return 0;
 +}
  
--	return copy_to_user(ifr->ifr_data, &config, sizeof(config)) ?
--		-EFAULT : 0;
-+static int bnx2x_hwtstamp_get(struct net_device *dev,
-+			      struct kernel_hwtstamp_config *config)
+-	config.rx_filter = ptp->rx_filter;
++int qede_hwtstamp_get(struct net_device *netdev,
++		      struct kernel_hwtstamp_config *config)
 +{
-+	struct bnx2x *bp = netdev_priv(dev);
++	struct qede_dev *edev = netdev_priv(netdev);
++	struct qede_ptp *ptp;
+ 
+-	return copy_to_user(ifr->ifr_data, &config,
+-			    sizeof(config)) ? -EFAULT : 0;
++	ptp = edev->ptp;
++	if (!ptp)
++		return -EIO;
 +
-+	config->rx_filter = bp->rx_filter;
-+	config->tx_type = bp->tx_type;
++	config->tx_type = ptp->tx_type;
++	config->rx_filter = ptp->rx_filter;
 +
 +	return 0;
  }
  
- /* Configures HW for PTP */
+ int qede_ptp_get_ts_info(struct qede_dev *edev, struct kernel_ethtool_ts_info *info)
+diff --git a/drivers/net/ethernet/qlogic/qede/qede_ptp.h b/drivers/net/ethernet/qlogic/qede/qede_ptp.h
+index adafc894797e..88f168395812 100644
+--- a/drivers/net/ethernet/qlogic/qede/qede_ptp.h
++++ b/drivers/net/ethernet/qlogic/qede/qede_ptp.h
+@@ -14,7 +14,11 @@
+ 
+ void qede_ptp_rx_ts(struct qede_dev *edev, struct sk_buff *skb);
+ void qede_ptp_tx_ts(struct qede_dev *edev, struct sk_buff *skb);
+-int qede_ptp_hw_ts(struct qede_dev *edev, struct ifreq *req);
++int qede_hwtstamp_get(struct net_device *netdev,
++		      struct kernel_hwtstamp_config *config);
++int qede_hwtstamp_set(struct net_device *netdev,
++		      struct kernel_hwtstamp_config *config,
++		      struct netlink_ext_ack *extack);
+ void qede_ptp_disable(struct qede_dev *edev);
+ int qede_ptp_enable(struct qede_dev *edev);
+ int qede_ptp_get_ts_info(struct qede_dev *edev, struct kernel_ethtool_ts_info *ts);
 -- 
 2.47.3
 
