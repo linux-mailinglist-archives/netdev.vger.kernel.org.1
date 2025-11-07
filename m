@@ -1,205 +1,194 @@
-Return-Path: <netdev+bounces-236892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CE9EC4192A
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 21:20:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AD25C41999
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 21:43:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 071E03AFC94
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 20:20:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21E7A1894253
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 20:44:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 603CA2D3EDC;
-	Fri,  7 Nov 2025 20:20:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CF58305E27;
+	Fri,  7 Nov 2025 20:43:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="cBMC4zbr";
-	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="WJxUZbi4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P/EUxcwY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f43.google.com (mail-yx1-f43.google.com [74.125.224.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98ADF18E1F
-	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 20:20:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E20D4238178
+	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 20:43:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762546811; cv=none; b=t3Ebcx7d0AItCJd6zEnKYIi73udg4yauJrOnmEbpB7kAaDyKpnalWU/9QQ0qKi52qZvpPtmXF9PQjYBw/Mi4aQkkxxnstJ6o2e497PZfZxW+GEbRCBDPmtYfl5ffZLJtARXmX1VxMZLvD7BoBBJa4BK8uxMRQeZcmKrnkNh8T9U=
+	t=1762548231; cv=none; b=csH+ztJANfnfHkiQtYKCWYG7SAnaG9B+9SIpHV+uAGCtAfkqqbE1ie0cF+eePvjocoWofQvhs/EJECqTSCOJvWsjt5S42w4Ooano2IxQotxToyYMsYInRqWF7Pr03J5HegPfhZ8MLnjITZFmz3sMjS3PAHaL2y4TUYoWjIZPtuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762546811; c=relaxed/simple;
-	bh=mwg5t2qFuKb3CBJdAVY62UXJrqH3P6gsN7NgMRAFKBE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cPwQ9hPVH6aPY51l5vHzTzYNfU4bz4FXUZocsMNarNa4Bm9K6eOIRaozOrGPNGaiwgXRW8ea7TCeE2AG1f4naWN2QfnSEOJ/aVmeAQi4qyFfYOk8F8fS7nlyvh8pIuvu7p3WEFIAmJolchbUFL8eKnT3DOx4EFFYGnmC/TEAVcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=cBMC4zbr; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=WJxUZbi4; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5A7DSIu53291959
-	for <netdev@vger.kernel.org>; Fri, 7 Nov 2025 20:20:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	nRbsNOo6UJxtICpkZwkcsd0QvQyPYGLyJjw+iQFDDn8=; b=cBMC4zbrMT0si0ET
-	yOXMUgL84VbkcX2xEYJ4v9v6sezYn+KehDPExpU9xBIIw1Mh0kzfi/67TWs8yylt
-	GZBLInXuBeJPed5lUsMhy0SmMSrCN+m/5zWwC6FqYLAoZHw696P0TA0NzLxaBsKb
-	xttqbTWQYdjOcKb9CJSxPbymaB+PV6pQc5jj9pFdoac1UHeWPEhfu/5Ec+Yfk20c
-	VsJZgYXCCWN1WUlJ81Zprohqolu3IzeqBIgOY1pjXCjikT05z6UIpQUYGs/dj57+
-	fTjfpZmLh0LbV2FK5EfPrX6yR143wGrYDHzVHXLDo3EBOZNF9GWJd6YWT3UMRT32
-	NpKtTw==
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4a9hpbh4j5-1
-	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 20:20:08 +0000 (GMT)
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2956cdcdc17so11760845ad.3
-        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 12:20:08 -0800 (PST)
+	s=arc-20240116; t=1762548231; c=relaxed/simple;
+	bh=qFvHlFClaLB3SpilbePUPYNZu398dyd+SrzdKJ5UzVw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Zf9yNOVbqii/sqkLPi1vue9hjurURdqLTBfKiCjqQxz5Cz2/i5DTq0timBnpUQJcKnpdagkimz90Ahz2QOjxoQlqAo02KOyk7dywfnLEZ2X1jA7uXgSpEG5FxlhH5lr3p5iDVeBHXHZR03dTcje/f0YCHeS7aX1ymQYMSrVz9Rk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P/EUxcwY; arc=none smtp.client-ip=74.125.224.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yx1-f43.google.com with SMTP id 956f58d0204a3-640c9c85255so1247350d50.3
+        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 12:43:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=oss.qualcomm.com; s=google; t=1762546807; x=1763151607; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nRbsNOo6UJxtICpkZwkcsd0QvQyPYGLyJjw+iQFDDn8=;
-        b=WJxUZbi4sZwA6uQlJOq2RN4YRHvcOL4xqRuyaf4w6nkzC7NqttlqX7Ex0QX28RiBmK
-         7eqMsUM3VfEh8Z5+3jc9RiLF4XZ1SQibqhPtSY2RgzdvDflYtBBvqgbtuevHyfCJjK7H
-         r79RcHH20i4uc+k5L4R9GL95tl/VDVjXt9T5ANU0TaTsziE4I7dr8AGVOz6I7MzgHzJA
-         iYViYJQmgH/YVi/df4+hnOPoNGR9OEnUq2WJr3wiRB/BWhaYz1IlVDi2MBjW3Mn6wnMD
-         UDwxci6OF9Ac5IbEpj2kMGklmgIhPjYRfAIr/2ckhbL0rAH8NdaMU9O5bXlALnrS+9N6
-         WOOQ==
+        d=gmail.com; s=20230601; t=1762548229; x=1763153029; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hiMcVVi9rEIv/j5eQ05ENk15pvqtAPzV3c3AT9Vw3fI=;
+        b=P/EUxcwYNFj3smgfH3m7jnXYnCZVlsnr615JUTpLxM9QGQ9uvSNW7Sz1H0G1GzNRum
+         0b2Q2DdYwbZAWRB8JrzzPWGOe75JjYFaWKtLvhcZMnDwuGZfwO5a+HSUb29rHO9bNjIQ
+         t9yG0sgt8IZSRy+mX1ZBnuBfzQwU9AYZ2QdEo+kNntSGTfmNeRUwSnUFLxtkqsXA94El
+         +ON80Ojrdp7CgimyWwUcD2ItF2PEmV8aui1pWFqKR47Qn43a0M+oxK/rzLgQfaeDE0tA
+         ib+oA12Ytw3XRDYp6HffpyYxODXX8Zrh699RkXPXErP6KN6J4trQZkJRkOaLbvtbM6IH
+         ZVYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762546807; x=1763151607;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nRbsNOo6UJxtICpkZwkcsd0QvQyPYGLyJjw+iQFDDn8=;
-        b=FqJ4qPz2A8TyxxKAScM6JEyRwi2x4xUHQ3cZVLDLdiCGcgGR3BjK5KO+a6otJuCcSw
-         dvx3lM5VN/Pp9V3MqyJ9iwNrFLsdq1bveeV/FCl19hXXkisVUwzSo0vph4eA+e1yTmMJ
-         giPEno4pFdLKUR3vYkOlQ21daMqjiEebmP2wHeqsnvphm/bDIbpmL6wZg7n4X07iKXv6
-         qtQnWFc9r9Sr5SyajYSf1wxKLOqJAPw5Xz6HSUECu5EVl9WfPzt0WTePEoIrEhjOOEWf
-         SCGiidJ5/qsMn3Y397LvzAKoJZWHSjUIIwU2KA3kma2tDR4692i4KDh1f9VLlh7liCO+
-         K/1A==
-X-Forwarded-Encrypted: i=1; AJvYcCUskVEoHeMVpec0Dv/4bMHMZb7M+MvpfjRfqrkO5PAvdzwDJ/rCNecfjCYuiWg9zuxVaYcXVmo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJm+UWPLfGC9kclGJuPltVwk5yvx2PYezYcyfow2C9Ga0Tqdo8
-	PSuymjdb4HymEGL/en11+oErdy2zWbhhbpSRkCB1p+Yp0YM/cF3ICnWNucecflZnK9mHV8McMv+
-	jlR2WHmttRLRaEHsRVqjscbXUw1FVnACc1dpBTi0HNmw7dtpF6FSoVPc2yok=
-X-Gm-Gg: ASbGnctppPIFT8xKW8Ehi9l7xnkNTzKw4sfAV1M/D/gr/c4rU2rWGKMSPXBd2mb6EUy
-	Puj9YZ7SSKwoNY7X0J9jx+0B13cPPlvsRjIzIbqv4dzv7G5Wi3B/J1frAXd1JxFd2xEpsq3FYeP
-	BvsfswP3zhPO3BI7xe592XKquoCxxy0ON3My8zqV6FCa+UJZ4Tf0uUP9Ymv5tbojAOOAwdGt89u
-	kdFmljMa155MRZJ6js4eoNZdyin2bVp/5DMH2oPuNdSjSWnGC1xqVGMsscalzyK/Cz769zgxv0p
-	kyZYzwfiSVSI7O4gmfP0/H3erV33mWsWaVAxAuubnshCk8LlXdixiVs3NE2CE9W86iPDycawwki
-	5OLXh7oKWyMn4XWsBhlQxGvTYpRP+9ODfR8CLVemdac8Z8tHu23Xn+ADWq06ciA==
-X-Received: by 2002:a17:902:fc4f:b0:295:595c:d002 with SMTP id d9443c01a7336-297e5643d62mr4435205ad.15.1762546807187;
-        Fri, 07 Nov 2025 12:20:07 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGjlIBWO8KYF6P/PNB+fj/0Z6Jmz8mLVHUG89yR435QivYEb+MO8cT71+Q6lnS/aYFc+tGslw==
-X-Received: by 2002:a17:902:fc4f:b0:295:595c:d002 with SMTP id d9443c01a7336-297e5643d62mr4434865ad.15.1762546806655;
-        Fri, 07 Nov 2025 12:20:06 -0800 (PST)
-Received: from [10.226.49.150] (i-global254.qualcomm.com. [199.106.103.254])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29651c701e9sm68086695ad.52.2025.11.07.12.20.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Nov 2025 12:20:06 -0800 (PST)
-Message-ID: <7820644f-078a-4578-a444-5cc4b6844489@oss.qualcomm.com>
-Date: Fri, 7 Nov 2025 13:20:03 -0700
+        d=1e100.net; s=20230601; t=1762548229; x=1763153029;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hiMcVVi9rEIv/j5eQ05ENk15pvqtAPzV3c3AT9Vw3fI=;
+        b=w/dOS3Svx69tpSzomUQoPxLOXD59pr4c3c/4VQFxzHK9Mxnp3VXNg37l1JSb9uzheZ
+         ZitMUYXa9tsm4yzgrR27KpmSOjZwI3pY/23YSvtoFeoMci3vgtaNbye03iOpD2fiEGnE
+         A+UN5tmh0MTKrygTaBwdRFhpRuR9KLdjRKNKRwAmXxtQPXCcXpFcwLhQCYwsmrWOaxdB
+         pFno+qLtoHb9ZIavS1GQvXgRftZuOP8T8VDG2HUYGN5UYoAiYR5xzFPT/yKFw6g1TOVq
+         8GkBle68W6Gae39wmU6/4+zpaVUPocT/ltwC4ehP+rYzQGkffth3p8y1OZ7eijNdcwUg
+         8hAA==
+X-Gm-Message-State: AOJu0YwI2QX3PKnoBKrqvrq/Jqq1rEz2hLAxeEnWtJq4JNvs6fpZSKmc
+	/yAV5vRTc6uoM9HAVWzFtV8NeiuRwHZiGHUHygfEcIzCMJ4hP1VXxTcP
+X-Gm-Gg: ASbGncvLx9XLf6aEM96oYVPrAFDJqchCYB5m3OwNv3EjJNut8uRs6PPIsA7M1oe5W2U
+	9Y7xML5fORQwGPioduEco3/ElCch+vVjY/U9QsrVY/Okw+/LoPEXdXmywtxvnNqf9WEZ4dQBC7t
+	BrvrWvn2xuqP49n0ploZyZHuW3hPnYiJLinM1t81thMSef84NnTQlMFWO7E8l1Ps2abVcSrpN1R
+	B5LG5BL0er+T+TMEiGHwQbQjwHNzutxfJXwmy8N66hevl1bA1OCHG074rapk5idBzi+BVRW6Dsi
+	miWB7thmDipv7ouYHWRhQEAui4VJiCYnNTrk5SfL9+m2Hu/vpvjBugr+tMyqC68PvyrNU/dulvi
+	I1gUiNu/kLKis9xbOPeIWrozRVRSK9mLCHat57ivFoFNxOCeqW88FF3Lgz4AnuUSHmSlpdgjpsY
+	XHM7vpFbr8YzjBgR5pItY=
+X-Google-Smtp-Source: AGHT+IFI8VG0P0n7qrm0zcp7SSN4eaMEgytqB19PsfLf5CxPVrAGvs9YLrEVD7m3nAlBeq12jFghtw==
+X-Received: by 2002:a05:690e:160f:b0:63f:a4d7:b523 with SMTP id 956f58d0204a3-640d45527c6mr354482d50.28.1762548228918;
+        Fri, 07 Nov 2025 12:43:48 -0800 (PST)
+Received: from localhost ([2a03:2880:25ff:b::])
+        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-640b5d81427sm2087281d50.18.2025.11.07.12.43.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Nov 2025 12:43:48 -0800 (PST)
+From: Daniel Zahka <daniel.zahka@gmail.com>
+To: Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Srujana Challa <schalla@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Brett Creeley <brett.creeley@amd.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Linu Cherian <lcherian@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Jerin Jacob <jerinj@marvell.com>,
+	hariprasad <hkelam@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Mark Bloch <mbloch@nvidia.com>,
+	Ido Schimmel <idosch@nvidia.com>,
+	Petr Machata <petrm@nvidia.com>,
+	Manish Chopra <manishc@marvell.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Roger Quadros <rogerq@kernel.org>,
+	Loic Poulain <loic.poulain@oss.qualcomm.com>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Dave Ertman <david.m.ertman@intel.com>,
+	Vlad Dumitrescu <vdumitrescu@nvidia.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Alexander Sverdlin <alexander.sverdlin@gmail.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	linux-rdma@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-omap@vger.kernel.org
+Subject: [PATCH net-next v3 0/2] devlink: net/mlx5: implement swp_l4_csum_mode via devlink params
+Date: Fri,  7 Nov 2025 12:43:44 -0800
+Message-ID: <20251107204347.4060542-1-daniel.zahka@gmail.com>
+X-Mailer: git-send-email 2.47.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/2] Introduce DRM_RAS using generic netlink for RAS
-To: Rodrigo Vivi <rodrigo.vivi@intel.com>, netdev@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
-        Hawking Zhang <Hawking.Zhang@amd.com>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Lukas Wunner <lukas@wunner.de>, Dave Airlie <airlied@gmail.com>,
-        Simona Vetter <simona.vetter@ffwll.ch>,
-        Aravind Iddamsetty <aravind.iddamsetty@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>
-References: <20250929214415.326414-4-rodrigo.vivi@intel.com>
- <c8caad3b-d7b9-4e0c-8d90-5b2bc576cabf@oss.qualcomm.com>
- <aQylrqUCRkkUYzQl@intel.com>
-Content-Language: en-US
-From: Zack McKevitt <zachary.mckevitt@oss.qualcomm.com>
-In-Reply-To: <aQylrqUCRkkUYzQl@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA3MDE2NyBTYWx0ZWRfX929tG+gG0VNY
- eeg1bUrmAgh9VxaUq0SsPZf2cw9EaWovgOoRJeq4SyMgHSJ2sPWSLZFHok6pTRo10wquZVP7kfx
- TCDBcUSyRc89PgfYQJUAivn/ZOYW0ltCIrvZMm2FyW+bA8wOOb4zC28nVplF+tng0+sXjwwp+Oq
- x6Zd77HSFu16KRxzgdMKyyYWC/YxibzBQat1SPaBOdtGZ18wz6XLAJTiRtkna322S9o1X4TZGqq
- DMNedMohu0AIrJ7U9NkXp1xzzGWho3RGJY5qciyzUihhqCGLBYTTiVJzhsuJOCRlArYTRlRkPKt
- gpfc840iV2Q7fi/ETwzG7D+ybZD4UUBBoobEfwUaPHG1NmGk/bAdNLJue56hJ/JTPShEd6lFbbT
- w11i3w+scLAoO2fK0wrIPOnlJUhC5A==
-X-Proofpoint-GUID: i2pVgDByM9rBF-9IHtAhoo4dETY2h1Qk
-X-Proofpoint-ORIG-GUID: i2pVgDByM9rBF-9IHtAhoo4dETY2h1Qk
-X-Authority-Analysis: v=2.4 cv=GZcaXAXL c=1 sm=1 tr=0 ts=690e5478 cx=c_pps
- a=JL+w9abYAAE89/QcEU+0QA==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=s4-Qcg_JpJYA:10
- a=VkNPw1HP01LnGYTKEx00:22 a=PTgRNUtVYmAdSUgUj-UA:9 a=QEXdDO2ut3YA:10
- a=324X-CrmTo6CU4MGRt3R:22
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-07_06,2025-11-06_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 suspectscore=0 phishscore=0 lowpriorityscore=0 impostorscore=0
- clxscore=1011 spamscore=0 adultscore=0 malwarescore=0 priorityscore=1501
- classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
- reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2511070167
+Content-Transfer-Encoding: 8bit
 
+This series contains two patches. The first is a pure refactor that
+passes through the extack to devlink_param::get() implementations. The
+second introduces a permanent devlink param to the mlx5 driver for
+controlling tx csum behavior.
 
+Enabling extack for devlink_param::get() allows drivers to provide
+more information in cases when reading parameters from hardware can
+result in errors or unexpected values.
 
-On 11/6/2025 6:42 AM, Rodrigo Vivi wrote:
->>
->>> Also, it is worth to mention that we have a in-tree pyynl/cli.py tool that entirely
->>> exercises this new API, hence I hope this can be the reference code for the uAPI
->>> usage, while we continue with the plan of introducing IGT tests and tools for this
->>> and adjusting the internal vendor tools to open with open source developments and
->>> changing them to support these flows.
->>
->> I think it would be nice to see some accompanying userspace code that makes
->> use of this implementation to have as a reference if at all possible.
-> 
-> We have some folks working on the userspace tools, but I just realized that
-> perhaps we don't even need that and we could perhaps only using the
-> kernel-tools/ynl as official drm-ras consumer?
-> 
-> $ sudo ynl --family drm_ras --dump list-nodes
-> [{'device-name': '00:02.0',
->    'node-id': 0,
->    'node-name': 'non-fatal',
->    'node-type': 'error-counter'},
->   {'device-name': '00:02.0',
->    'node-id': 1,
->    'node-name': 'correctable',
->   'node-type': 'error-counter'}]
-> 
-> thoughts?
-> 
+The mlx5 swp_l4_csum_mode devlink param is necessary for initializing
+PSP on CX7 NICs.
 
-I think this is probably ok for demonstrating this patch's 
-functionality, but some userspace code would be helpful as a reference 
-for applications that might want to integrate this directly instead of 
-relying on CLI tools.
+CHANGES:
+v3:
+  - fix warnings about undocumented param in intel ice driver
+v2: https://lore.kernel.org/netdev/20251103194554.3203178-1-daniel.zahka@gmail.com/
+  - fix indentation issue in new mlx5.rst entry
+  - use extack in mlx5_nv_param_devlink_swp_l4_csum_mode_get()
+  - introduce extack patch.
+v1: https://lore.kernel.org/netdev/20251022190932.1073898-1-daniel.zahka@gmail.com/
 
->>
->> As a side note, I will be on vacation for a couple of weeks as of this
->> weekend and my response time will be affected.
-> 
-> Thank you,
-> Please let me know if you have further thoughts here, or if you see any blocker
-> or an ack to move forward with this path.
-> 
-> Thanks,
-> Rodrigo.
-> 
+Daniel Zahka (2):
+  devlink: pass extack through to devlink_param::get()
+  net/mlx5: implement swp_l4_csum_mode via devlink params
 
-No further thoughts on the patch contents, I think it looks good. I see 
-that Jakub posted some TODOs while I was away, so I assume there will be 
-another iteration that I will take a look at if/when that comes in.
+ Documentation/networking/devlink/mlx5.rst     |   9 +
+ .../marvell/octeontx2/otx2_cpt_devlink.c      |   6 +-
+ drivers/net/ethernet/amd/pds_core/core.h      |   3 +-
+ drivers/net/ethernet/amd/pds_core/devlink.c   |   3 +-
+ .../net/ethernet/broadcom/bnxt/bnxt_devlink.c |   6 +-
+ .../net/ethernet/intel/ice/devlink/devlink.c  |  14 +-
+ .../marvell/octeontx2/af/rvu_devlink.c        |  15 +-
+ .../marvell/octeontx2/nic/otx2_devlink.c      |   6 +-
+ drivers/net/ethernet/mellanox/mlx4/main.c     |   6 +-
+ .../net/ethernet/mellanox/mlx5/core/devlink.h |   3 +-
+ .../net/ethernet/mellanox/mlx5/core/eswitch.c |   3 +-
+ .../mellanox/mlx5/core/eswitch_offloads.c     |   3 +-
+ .../net/ethernet/mellanox/mlx5/core/fs_core.c |   3 +-
+ .../ethernet/mellanox/mlx5/core/fw_reset.c    |   3 +-
+ .../mellanox/mlx5/core/lib/nv_param.c         | 170 +++++++++++++++++-
+ .../mellanox/mlxsw/spectrum_acl_tcam.c        |   3 +-
+ .../ethernet/netronome/nfp/devlink_param.c    |   3 +-
+ drivers/net/ethernet/qlogic/qed/qed_devlink.c |   3 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |   3 +-
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c      |   3 +-
+ drivers/net/ethernet/ti/cpsw_new.c            |   6 +-
+ drivers/net/wwan/iosm/iosm_ipc_devlink.c      |   3 +-
+ include/net/devlink.h                         |   3 +-
+ include/net/dsa.h                             |   3 +-
+ net/devlink/param.c                           |  19 +-
+ net/dsa/devlink.c                             |   3 +-
+ 26 files changed, 259 insertions(+), 46 deletions(-)
 
->>
->> Thanks,
->>
->> Zack
+-- 
+2.47.3
+
 
