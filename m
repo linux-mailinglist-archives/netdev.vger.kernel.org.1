@@ -1,133 +1,129 @@
-Return-Path: <netdev+bounces-236806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99A96C40427
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 15:10:40 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06EB1C40495
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 15:19:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 319994E20DF
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 14:10:39 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 57B104F0009
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 14:19:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22913328601;
-	Fri,  7 Nov 2025 14:10:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE1812F39D6;
+	Fri,  7 Nov 2025 14:19:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Jd05a5Y0"
+	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="JsJOYrVi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f54.google.com (mail-yx1-f54.google.com [74.125.224.54])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AA31322C98
-	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 14:10:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1453527C842
+	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 14:19:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762524636; cv=none; b=SQIjJhxrLCW/JscWCiXPhoLDIhe3Eqq8MsuA01x4IR5ZOKcSWKY4wnnby+08EC2Fbv3VR6wDoQ0xmWsmuwC9z3Tg0w2/5ONST7fJLLHNtD5b/ls3Esxh42LqkLOspsvkSHRQzoxVtXyxtgTVsEHlMiBjdYWUBaXktBz01G9IGSQ=
+	t=1762525190; cv=none; b=czOiSM7kiXEywRIuwUDoD4tSeJ0XlIij8yCJ1+zWyLKUk3mEanLTY2N/y+PXttZ0k27C93iL1ayWwYDNw2sppiQBqnItqVVcyk7DamMVI3GdhLW5WAQoB4H5mbdvill1Am6LlNO4wRoEEXe4kjlQwJO/5rSU/m9PC3INclFh8qM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762524636; c=relaxed/simple;
-	bh=+cZzo8xco90BPe5zTjWVIqWQKXNXcQ8nK2fbETbWVGA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QrFsAgx8r9fAG81KEHtgHZsJME8fwQmXWN/W4bJDLPenXQ43rlWCCbxyRqQyEN18WMifxHwoINUbwnSBsNv/9fR/tog9kNh0HcDzuxIuPKXl4Y3uzQJVGB4Nxke6nbLt9jaOnwYVSRPUdkSIgEBGkbRAdwZHjLk8iJYOgHPxU6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Jd05a5Y0; arc=none smtp.client-ip=74.125.224.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yx1-f54.google.com with SMTP id 956f58d0204a3-640c9c85255so660711d50.3
-        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 06:10:34 -0800 (PST)
+	s=arc-20240116; t=1762525190; c=relaxed/simple;
+	bh=G+GK50091GF8zGY4pW7Yj4+0UiXOAijvF2+COuJTEIM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Gch8uHZszUK0Rej/UHLxnj5gsHW7QwUCC01rb9wZb1CpkWswhpi40iGHk8h7aqylihEHAN8+PXbsfckTh1azgX7ZK8iQC/XRHzfBf2gOdwCI94yFMoaO4Gdl7n2eEZVSWWtM2Mx7Z25erbIR802m39LL020NllTmR4xhLV48OTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=JsJOYrVi; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-63b9da57cecso1406573a12.0
+        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 06:19:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762524633; x=1763129433; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+cZzo8xco90BPe5zTjWVIqWQKXNXcQ8nK2fbETbWVGA=;
-        b=Jd05a5Y0VSWEg6+WhsNNNP8SP5sWGXlREIoQ7QL1YSRh5n+xYDYKhN3VVUF5PMauNv
-         k1oFQ4XdybJJ816WPMB9wp7ZUPFavSRX9FvwVWWlnnjzf8spk9fKGrSbfOpG51a7JYKF
-         JMpQOLl2JhJsh1qCk18sPyzOQBYZ3r135FGyQ8UNNCm2WGWYNy0sLx/uSC7sF3TMmpaJ
-         kdDNfQClpuTYwY2H8E+M3n9CfevAXenBf6j91ng0IYu8050N2PJuSKiSSAkjhtZ0pNs+
-         4FLdX11mJsMvMSMlOG/nOE9MYyShq60mBDf4ArZr1eLwyOWJw5UexKAaLmIXZWMCF56m
-         k+oQ==
+        d=sartura.hr; s=sartura; t=1762525186; x=1763129986; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RndfiI2tvXOM+1ZP6efdxoHZT1tlHUVs/LDHnVUxmno=;
+        b=JsJOYrVi+O5hlOYCxiKYE0j/AAhfw1oLixuQpyuILl2e8DeGA0g2Id25fkO65IzILH
+         +ysf4Ib84x42WBiztXhRe3TBdp2nuInRxHXu/zQIFOZ4LxGv5esfljUIvz0r/BsoMFtH
+         tSgWareDOPEjesV/9TqEEGSBHXSOstQEKCKwvq2XDTm0mBHtmmiIwApPxrP8e+nLVtGE
+         mZo+3Wi04c0l9Txt0sXBYArl1ROfGnI9hZStc2Ln6md2gx+znXm/qBWKGAXBsHtQqY2l
+         51XYHMvP8kHtRk7uo6oNikqFKKOpLTASu/lVht5LA06zdFENdqctNGm69xR5yAvy7stj
+         xARA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762524633; x=1763129433;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=+cZzo8xco90BPe5zTjWVIqWQKXNXcQ8nK2fbETbWVGA=;
-        b=wmywrzkNX1tST7cbSSJe5G23nfB1K+38Qpas8dWZQnTdVvZewjVQgKfQxRR2h01aYD
-         H0/9a6QgvfJzeOY5gMwYbTallVzhpE4vRQO6qLtMU8Ovz4idcwuGTAsgkidKzGMHDLhe
-         sDqoj+4Xga9q73wHg66WAUCdRtYm1yZIq3Y4+yMAgetV8WJxcwyuSIv3CMZbL2Megc+9
-         nhWkkz386zzR7JaNKqr1PCEGaQlaNUzy1I80FPM2ZHOGmvxPqQfIIUxC6iv0RGb8ndjO
-         qlZop6QoMtOg+Ia1ZbBJyFAjd9uYuPWjirbgq6QxhJrig7romBlajbfdK5ovo13hM4S5
-         YPEA==
-X-Forwarded-Encrypted: i=1; AJvYcCV/4MprE/9LnTQr4wXSNQX2SJ3BKnciqX5lZ99fridDbE/HJ9vVLSl7pFM+BAlrkhAxXzLlj/w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzjGJiamculClZhODKXOxvw8Wkh9d3pxUK1QIiYgnntlPnV9Njy
-	pU9zdaqFwNEbXrKHa77Uf+SoabDrExG5YB4zFWdfVAb/2m/f3H7mht4DE+UiZ31qbnB98Kb3YJQ
-	ypT+eT5Zxnc9p8W++9fwpJwpQ6SkneUCC1to8tfPlrgjDFxWrSUUoIoVd
-X-Gm-Gg: ASbGncsylNgJDnvDaPBw1yzmLYFS+Ky69dacUIFtagcOYOErk06u3ntv1z6fM74zbiL
-	ta2mISxgE2X/B05ApuVSddWVP3uPqu/efTUjbe66pvY7+V59LWBRAJDhU3N4hmupwwxwNZbIyD7
-	XIGqvFfp7iVmiyzDMz68ksA+LzH04IrGqJEMO+Ap+X6XuEjkpIUmMDfxba/9q6jSSf0PKFD8KG4
-	gjdIRusuypvnVwEaSuMDXUg2v80gzJvweoP5IInuD8X/LztPS39IR6DTwWp2uG9YwQRdS4=
-X-Google-Smtp-Source: AGHT+IF4MNPjtjkI0HykYzQ/N+DjSl09Uwih8EXv3NQX/RBzR++OlV/O2BGN0tPhSnQ92UawBVQW3Cb0VrPm4WrY5A8=
-X-Received: by 2002:a05:690e:2557:b0:63f:a48d:b7ce with SMTP id
- 956f58d0204a3-640c41c6a29mr2059410d50.27.1762524633098; Fri, 07 Nov 2025
- 06:10:33 -0800 (PST)
+        d=1e100.net; s=20230601; t=1762525186; x=1763129986;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RndfiI2tvXOM+1ZP6efdxoHZT1tlHUVs/LDHnVUxmno=;
+        b=enZ7SoBEa/b7O9tAFza7sN/thsUOxub4GDAV7FyrWXajhdS4eqs7yTqOlmXhS76jsr
+         Qnd5t46FPYjm9yccqpRAK7o0iFmuv30sb98JaDgD5hd3HpKLe1w8tjhY5JyACo0UIIHd
+         r4JH/MB3HYB038t7SUCRujSa2xkrGjZa4gD1aHlRUKfnDpNhVS0CtZ/SgOcj2MiaH79T
+         Y8TPi+BCMhQFo0aYcyNvwfQnlxh34bIQx9tXA5atsr4Pl+iQLUBtoyxKKD3j6wyw4VIy
+         73huJqbpJwMoLf9j6cdjprAP2ex04bB72uYjMtKd9e3A8qazBVS4bqqVxFxZDHZfjKrA
+         2sUw==
+X-Forwarded-Encrypted: i=1; AJvYcCUOzmaGj2WYXPsuM4y3f824qpE6EHIimEl0dKYo4Y6rra0Yb6/AW5NU4ENAAeI8ot37Jy6zO4U=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyAIDTju96qpxkdFusz2FDxeFcKDk0gcaYao2039I76W4Yuy417
+	yPMm3bpakKe0QIHRN+WusmspXNQEGZyZtUkSYQo3ztlxeeL/SwwTnjQEtUR/93B2xwI=
+X-Gm-Gg: ASbGncuY2aO1zpcoqNoSKZikLNqqjwe20AXGSfBkWpwupdQVhgl7yT8zssNYS9c8Oiw
+	AIu3JDWJXeq/YMEjdsBtdnRouY6qkU2GEfJ04XN0Exei8C/ZexhcPD7YiviiDctHDF4JKLnD+UP
+	72Jmf7a5tLZKZrxMN8PvMdGMN93tF/sthU6y3ydIr+GjWhaMian8Y2t6Hi4Bp188QNWdsoKgXJR
+	aDTpcVJepoX0WB1MPdp4B9hdB85L2Lg6Lk3MhuHw7rvGwpoB6hWcu9gP+85L9H/2gpE2y3Pw8CO
+	HEPjTRURkY7yEJ5OjW9UMV1tQEmfA9Zbh7p5RMjuQpS4jPCa4anu7K5ZguJtiT564hqyuX8OTGl
+	74ZbnKwaXLIcjj3lmmBEeSRw0P6VsVwGRg+KK3x+UWNiQylg0bXM/sBpf3+g5XcULQIUYJ3wAc+
+	VWsef1++i4q7q9Th7m8G32DhslsCVsN8EPgQcn3g==
+X-Google-Smtp-Source: AGHT+IHvcVjtU3i+l/XfslQjy66bL0j3tv+P0XVI6VzvvCI0MjbHHb2f1vtJQa8ltGMFapgBfUjvYw==
+X-Received: by 2002:a05:6402:21cb:b0:640:7f9c:e90c with SMTP id 4fb4d7f45d1cf-6413f06de7emr3189084a12.27.1762525186212;
+        Fri, 07 Nov 2025 06:19:46 -0800 (PST)
+Received: from fedora (cpe-94-253-164-190.zg.cable.xnet.hr. [94.253.164.190])
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-6411f7139bdsm4245121a12.4.2025.11.07.06.19.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Nov 2025 06:19:45 -0800 (PST)
+From: Robert Marko <robert.marko@sartura.hr>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	Steen.Hegelund@microchip.com,
+	daniel.machon@microchip.com,
+	UNGLinuxDriver@microchip.com,
+	netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: luka.perkov@sartura.hr,
+	Robert Marko <robert.marko@sartura.hr>
+Subject: [PATCH net-next] net: sparx5/lan969x: populate netdev of_node
+Date: Fri,  7 Nov 2025 15:18:59 +0100
+Message-ID: <20251107141936.1085679-1-robert.marko@sartura.hr>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251106175615.26948-1-simon.schippers@tu-dortmund.de>
-In-Reply-To: <20251106175615.26948-1-simon.schippers@tu-dortmund.de>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 7 Nov 2025 06:10:21 -0800
-X-Gm-Features: AWmQ_blZgftDNHs4-HzNXdI8nrjDZ7hGHov3wbswer-i55xUXiO1FMu9wnhdIiA
-Message-ID: <CANn89i+Cc=y_Powx5aWC9fkASsMpuDZsL5TxDxEQiHmSjj4khw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] usbnet: Add support for Byte Queue Limits (BQL)
-To: Simon Schippers <simon.schippers@tu-dortmund.de>
-Cc: oneukum@suse.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	kuba@kernel.org, pabeni@redhat.com, dnlplm@gmail.com, netdev@vger.kernel.org, 
-	linux-usb@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 6, 2025 at 9:56=E2=80=AFAM Simon Schippers
-<simon.schippers@tu-dortmund.de> wrote:
->
-> In the current implementation, usbnet uses a fixed tx_qlen of:
->
-> USB2: 60 * 1518 bytes =3D 91.08 KB
-> USB3: 60 * 5 * 1518 bytes =3D 454.80 KB
->
-> Such large transmit queues can be problematic, especially for cellular
-> modems. For example, with a typical celluar link speed of 10 Mbit/s, a
-> fully occupied USB3 transmit queue results in:
->
-> 454.80 KB / (10 Mbit/s / 8 bit/byte) =3D 363.84 ms
->
-> of additional latency.
->
-> This patch adds support for Byte Queue Limits (BQL) [1] to dynamically
-> manage the transmit queue size and reduce latency without sacrificing
-> throughput.
->
-> Testing was performed on various devices using the usbnet driver for
-> packet transmission:
->
-> - DELOCK 66045: USB3 to 2.5 GbE adapter (ax88179_178a)
-> - DELOCK 61969: USB2 to 1 GbE adapter (asix)
-> - Quectel RM520: 5G modem (qmi_wwan)
-> - USB2 Android tethering (cdc_ncm)
->
-> No performance degradation was observed for iperf3 TCP or UDP traffic,
-> while latency for a prioritized ping application was significantly
-> reduced. For example, using the USB3 to 2.5 GbE adapter, which was fully
-> utilized by iperf3 UDP traffic, the prioritized ping was improved from
-> 1.6 ms to 0.6 ms. With the same setup but with a 100 Mbit/s Ethernet
-> connection, the prioritized ping was improved from 35 ms to 5 ms.
->
-> [1] https://lwn.net/Articles/469652/
->
-> Signed-off-by: Simon Schippers <simon.schippers@tu-dortmund.de>
-> ---
+Populate of_node for the port netdevs, to make the individual ports
+of_nodes available in sysfs.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Robert Marko <robert.marko@sartura.hr>
+---
+ drivers/net/ethernet/microchip/sparx5/sparx5_netdev.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_netdev.c b/drivers/net/ethernet/microchip/sparx5/sparx5_netdev.c
+index 1d34af78166a..284596f1da04 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_netdev.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_netdev.c
+@@ -300,7 +300,11 @@ int sparx5_register_netdevs(struct sparx5 *sparx5)
+ 
+ 	for (portno = 0; portno < sparx5->data->consts->n_ports; portno++)
+ 		if (sparx5->ports[portno]) {
+-			err = register_netdev(sparx5->ports[portno]->ndev);
++			struct net_device *port_ndev = sparx5->ports[portno]->ndev;
++
++			port_ndev->dev.of_node = sparx5->ports[portno]->of_node;
++
++			err = register_netdev(port_ndev);
+ 			if (err) {
+ 				dev_err(sparx5->dev,
+ 					"port: %02u: netdev registration failed\n",
+-- 
+2.51.1
+
 
