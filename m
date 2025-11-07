@@ -1,43 +1,44 @@
-Return-Path: <netdev+bounces-236638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFB3EC3E8A0
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 06:47:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A3A6C3E8A6
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 06:47:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 95FDA4E1F78
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 05:47:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 585943A6241
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 05:47:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1EF121FF33;
-	Fri,  7 Nov 2025 05:46:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D284221710;
+	Fri,  7 Nov 2025 05:47:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="KTVB6bjV"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="GbKHXheY"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D86F5EACE
-	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 05:46:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CC20EACE
+	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 05:47:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762494418; cv=none; b=mB2uiVQcVrlQNxzm4cTqChltn0RACbKFZgZf13KcExSjF8u+CbWgXGPauZYtkwSUUhGHXO9zJwYMSxt6ije9KZQezD6+NiDNDPp9ph36+ekO8JMLDMcX9GlDeFUV/El6WAIW8ujuZmT20QAxu7oojZjJ8g4hWvbh2314rPoHuv0=
+	t=1762494424; cv=none; b=eVll/qplczd1GjgoFNMudgljmjDTwC+Kib79SW08hLBHGzhtTCawHPhO1DqpUrMrZ3cX8a7QkE1zbBsm9XP0Q6CkSHA/+V6mjqLBn0lH2hb8QA3dVbvk0sE07rvt6sdtYOuy/7+EbfHZGNw3mwo9lZ59LoDXe0VXGgSKDXInrp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762494418; c=relaxed/simple;
-	bh=pQugrGbUHtWwDp+R7+1fDPpICuPAgV7AHZYUWAJuWkc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BK3BXkoag/wy2TPe2/phWB8vj4MC9WFRo6KUlADhHQYjNTllhzn8FkmHSU+/2azuwCg5spxv9osSzbWfcVrp4hQSY3NrwH/64k/DT/IQ6/LnQCuvm4HXZV1Z8xfmLol9XJZOx5a7cAwBS9k9uigs0ch/Pz3KHNCdbqlrpPZE1bI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=KTVB6bjV; arc=none smtp.client-ip=115.124.30.100
+	s=arc-20240116; t=1762494424; c=relaxed/simple;
+	bh=UVwF5c5/5aLnixVeEdQIEP6N3n0g2uu4js70h1Z5VsU=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=AeEqfI2cq603QusCUYZ0Y0R6ZpJsrvDBVOYnwFcWaMGbYHLs28fxVM/QTZrj7I4AnbYGQ0/MYoietaKALSOhEKCOV/FeyrppKoATC4XK37nQQQVUn1tIBazzb3xBahVlelSofwQiPuloa8pzRUKWpPltj19FbEiP1b1HvlXqv04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=GbKHXheY; arc=none smtp.client-ip=115.124.30.131
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1762494411; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=YXspx0AoNQEsBjGMB1KIhFNrvSWlAD2gDdYsB/4l6bE=;
-	b=KTVB6bjVT538rZ2WT3gprhha2xT3WqZmT3Vh+jO26BDqziYF4QLfWWNXiZrRXwYPXkpTinJ7Ybz6kKpopZ69xNNLTmQivu5LYh6tJFSq29RrdgiGxVGHyvBy/KJScVg2y3DheWqKe78v767o6rHLB4b3jEWc+7UjCNSDHPWat/M=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WrrpQ3i_1762494410 cluster:ay36)
+	t=1762494412; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=3GxTjgMmKTGI/Sw494+bmpLa1UyPiHRe1SWwTU6sg44=;
+	b=GbKHXheYVeadSW/rbtd7wIEmOwD78pwJjcK0O81/c78ptni5jQVuYcDJ7TYpw2HSBA9/mmZCy7ThdLsJb2fdiZMeeru8FbIXtofscd04U1JtJUEtYJrOZyFuRFuEHgL15jNfkZYi/7RSpzhhnMv2k0fTauCqWlEGgbawvvoXdE0=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Wrroghx_1762494410 cluster:ay36)
           by smtp.aliyun-inc.com;
-          Fri, 07 Nov 2025 13:46:50 +0800
+          Fri, 07 Nov 2025 13:46:51 +0800
 From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 To: netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -55,10 +56,12 @@ Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	Vivian Wang <wangruikang@iscas.ac.cn>,
 	Troy Mitchell <troy.mitchell@linux.spacemit.com>,
 	Dust Li <dust.li@linux.alibaba.com>
-Subject: [PATCH net-next v11 0/5] eea: Add basic driver framework for Alibaba Elastic Ethernet Adaptor
-Date: Fri,  7 Nov 2025 13:46:45 +0800
-Message-Id: <20251107054650.11532-1-xuanzhuo@linux.alibaba.com>
+Subject: [PATCH net-next v11 1/5] eea: introduce PCI framework
+Date: Fri,  7 Nov 2025 13:46:46 +0800
+Message-Id: <20251107054650.11532-2-xuanzhuo@linux.alibaba.com>
 X-Mailer: git-send-email 2.32.0.3.g01195cf9f
+In-Reply-To: <20251107054650.11532-1-xuanzhuo@linux.alibaba.com>
+References: <20251107054650.11532-1-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,88 +71,580 @@ MIME-Version: 1.0
 X-Git-Hash: 1f966a3f38ba
 Content-Transfer-Encoding: 8bit
 
-Add a driver framework for EEA that will be available in the future.
+Add basic driver framework for the Alibaba Elastic Ethernet Adapter(EEA).
 
-This driver is currently quite minimal, implementing only fundamental
-core functionalities. Key features include: I/O queue management via
-adminq, basic PCI-layer operations, and essential RX/TX data
-communication capabilities. It also supports the creation,
-initialization, and management of network devices (netdev). Furthermore,
-the ring structures for both I/O queues and adminq have been abstracted
-into a simple, unified, and reusable library implementation,
-facilitating future extension and maintenance.
+This commit implements the EEA PCI probe functionality.
 
-v11:
-    1. remove auto clean __free(kfree)
-    2. some tiny fixes
-
-v10:
-    1. name the jump labels after the target @Jakub
-    2. rm __GFP_ZERO from dma_alloc_coherent @Jakub
-v9:
-    1. some fixes for ethtool from http://lore.kernel.org/all/20251027183754.52fe2a2c@kernel.org
-v8: 1. rename eea_net_tmp to eea_net_init_ctx
-    2. rm code that allocs memory to destroy queues
-    3. some other minor changes
-v7: 1. remove the irrelative code from ethtool commit
-    2. build every commits with W12
-v6: Split the big one commit to five commits
-v5: Thanks for the comments from Kalesh Anakkur Purayil, ALOK TIWARI
-v4: Thanks for the comments from Troy Mitchell, Przemek Kitszel, Andrew Lunn, Kalesh Anakkur Purayil
-v3: Thanks for the comments from Paolo Abenchi
-v2: Thanks for the comments from Simon Horman and Andrew Lunn
-v1: Thanks for the comments from Simon Horman and Andrew Lunn
-
-
-
-
-
-
-Xuan Zhuo (5):
-  eea: introduce PCI framework
-  eea: introduce ring and descriptor structures
-  eea: probe the netdevice and create adminq
-  eea: create/destroy rx,tx queues for netdevice open and stop
-  eea: introduce ethtool support
-
- MAINTAINERS                                   |   8 +
- drivers/net/ethernet/Kconfig                  |   1 +
- drivers/net/ethernet/Makefile                 |   1 +
- drivers/net/ethernet/alibaba/Kconfig          |  29 +
- drivers/net/ethernet/alibaba/Makefile         |   5 +
- drivers/net/ethernet/alibaba/eea/Makefile     |   9 +
- drivers/net/ethernet/alibaba/eea/eea_adminq.c | 421 ++++++++++
- drivers/net/ethernet/alibaba/eea/eea_adminq.h |  70 ++
- drivers/net/ethernet/alibaba/eea/eea_desc.h   | 156 ++++
- .../net/ethernet/alibaba/eea/eea_ethtool.c    | 276 ++++++
- .../net/ethernet/alibaba/eea/eea_ethtool.h    |  50 ++
- drivers/net/ethernet/alibaba/eea/eea_net.c    | 577 +++++++++++++
- drivers/net/ethernet/alibaba/eea/eea_net.h    | 196 +++++
- drivers/net/ethernet/alibaba/eea/eea_pci.c    | 589 +++++++++++++
- drivers/net/ethernet/alibaba/eea/eea_pci.h    |  67 ++
- drivers/net/ethernet/alibaba/eea/eea_ring.c   | 260 ++++++
- drivers/net/ethernet/alibaba/eea/eea_ring.h   |  91 ++
- drivers/net/ethernet/alibaba/eea/eea_rx.c     | 787 ++++++++++++++++++
- drivers/net/ethernet/alibaba/eea/eea_tx.c     | 402 +++++++++
- 19 files changed, 3995 insertions(+)
+Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+Reviewed-by: Philo Lu <lulie@linux.alibaba.com>
+Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+---
+ MAINTAINERS                                |   8 +
+ drivers/net/ethernet/Kconfig               |   1 +
+ drivers/net/ethernet/Makefile              |   1 +
+ drivers/net/ethernet/alibaba/Kconfig       |  29 ++
+ drivers/net/ethernet/alibaba/Makefile      |   5 +
+ drivers/net/ethernet/alibaba/eea/Makefile  |   3 +
+ drivers/net/ethernet/alibaba/eea/eea_pci.c | 389 +++++++++++++++++++++
+ drivers/net/ethernet/alibaba/eea/eea_pci.h |  50 +++
+ 8 files changed, 486 insertions(+)
  create mode 100644 drivers/net/ethernet/alibaba/Kconfig
  create mode 100644 drivers/net/ethernet/alibaba/Makefile
  create mode 100644 drivers/net/ethernet/alibaba/eea/Makefile
- create mode 100644 drivers/net/ethernet/alibaba/eea/eea_adminq.c
- create mode 100644 drivers/net/ethernet/alibaba/eea/eea_adminq.h
- create mode 100644 drivers/net/ethernet/alibaba/eea/eea_desc.h
- create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.c
- create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.h
- create mode 100644 drivers/net/ethernet/alibaba/eea/eea_net.c
- create mode 100644 drivers/net/ethernet/alibaba/eea/eea_net.h
  create mode 100644 drivers/net/ethernet/alibaba/eea/eea_pci.c
  create mode 100644 drivers/net/ethernet/alibaba/eea/eea_pci.h
- create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ring.c
- create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ring.h
- create mode 100644 drivers/net/ethernet/alibaba/eea/eea_rx.c
- create mode 100644 drivers/net/ethernet/alibaba/eea/eea_tx.c
 
---
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 03d748e8e768..2a1b667c31a9 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -789,6 +789,14 @@ S:	Maintained
+ F:	Documentation/i2c/busses/i2c-ali1563.rst
+ F:	drivers/i2c/busses/i2c-ali1563.c
+ 
++ALIBABA ELASTIC ETHERNET ADAPTER DRIVER
++M:	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
++M:	Wen Gu <guwen@linux.alibaba.com>
++R:	Philo Lu <lulie@linux.alibaba.com>
++L:	netdev@vger.kernel.org
++S:	Maintained
++F:	drivers/net/ethernet/alibaba/eea
++
+ ALIBABA ELASTIC RDMA DRIVER
+ M:	Cheng Xu <chengyou@linux.alibaba.com>
+ M:	Kai Shen <kaishen@linux.alibaba.com>
+diff --git a/drivers/net/ethernet/Kconfig b/drivers/net/ethernet/Kconfig
+index aead145dd91d..307c68a4fd53 100644
+--- a/drivers/net/ethernet/Kconfig
++++ b/drivers/net/ethernet/Kconfig
+@@ -22,6 +22,7 @@ source "drivers/net/ethernet/aeroflex/Kconfig"
+ source "drivers/net/ethernet/agere/Kconfig"
+ source "drivers/net/ethernet/airoha/Kconfig"
+ source "drivers/net/ethernet/alacritech/Kconfig"
++source "drivers/net/ethernet/alibaba/Kconfig"
+ source "drivers/net/ethernet/allwinner/Kconfig"
+ source "drivers/net/ethernet/alteon/Kconfig"
+ source "drivers/net/ethernet/altera/Kconfig"
+diff --git a/drivers/net/ethernet/Makefile b/drivers/net/ethernet/Makefile
+index 998dd628b202..358d88613cf4 100644
+--- a/drivers/net/ethernet/Makefile
++++ b/drivers/net/ethernet/Makefile
+@@ -12,6 +12,7 @@ obj-$(CONFIG_NET_VENDOR_ADI) += adi/
+ obj-$(CONFIG_NET_VENDOR_AGERE) += agere/
+ obj-$(CONFIG_NET_VENDOR_AIROHA) += airoha/
+ obj-$(CONFIG_NET_VENDOR_ALACRITECH) += alacritech/
++obj-$(CONFIG_NET_VENDOR_ALIBABA) += alibaba/
+ obj-$(CONFIG_NET_VENDOR_ALLWINNER) += allwinner/
+ obj-$(CONFIG_NET_VENDOR_ALTEON) += alteon/
+ obj-$(CONFIG_ALTERA_TSE) += altera/
+diff --git a/drivers/net/ethernet/alibaba/Kconfig b/drivers/net/ethernet/alibaba/Kconfig
+new file mode 100644
+index 000000000000..820a9a7aa1f1
+--- /dev/null
++++ b/drivers/net/ethernet/alibaba/Kconfig
+@@ -0,0 +1,29 @@
++#
++# Alibaba network device configuration
++#
++
++config NET_VENDOR_ALIBABA
++	bool "Alibaba Devices"
++	default y
++	help
++	  If you have a network (Ethernet) device belonging to this class, say Y.
++
++	  Note that the answer to this question doesn't directly affect the
++	  kernel: saying N will just cause the configurator to skip all
++	  the questions about Alibaba devices. If you say Y, you will be asked
++	  for your specific device in the following questions.
++
++if NET_VENDOR_ALIBABA
++
++config EEA
++	tristate "Alibaba Elastic Ethernet Adapter support"
++	depends on PCI_MSI
++	depends on 64BIT
++	select PAGE_POOL
++	default m
++	help
++	  This driver supports Alibaba Elastic Ethernet Adapter"
++
++	  To compile this driver as a module, choose M here.
++
++endif #NET_VENDOR_ALIBABA
+diff --git a/drivers/net/ethernet/alibaba/Makefile b/drivers/net/ethernet/alibaba/Makefile
+new file mode 100644
+index 000000000000..7980525cb086
+--- /dev/null
++++ b/drivers/net/ethernet/alibaba/Makefile
+@@ -0,0 +1,5 @@
++#
++# Makefile for the Alibaba network device drivers.
++#
++
++obj-$(CONFIG_EEA) += eea/
+diff --git a/drivers/net/ethernet/alibaba/eea/Makefile b/drivers/net/ethernet/alibaba/eea/Makefile
+new file mode 100644
+index 000000000000..cf2acf1733fd
+--- /dev/null
++++ b/drivers/net/ethernet/alibaba/eea/Makefile
+@@ -0,0 +1,3 @@
++
++obj-$(CONFIG_EEA) += eea.o
++eea-y := eea_pci.o
+diff --git a/drivers/net/ethernet/alibaba/eea/eea_pci.c b/drivers/net/ethernet/alibaba/eea/eea_pci.c
+new file mode 100644
+index 000000000000..9accc6218ed9
+--- /dev/null
++++ b/drivers/net/ethernet/alibaba/eea/eea_pci.c
+@@ -0,0 +1,389 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Driver for Alibaba Elastic Ethernet Adapter.
++ *
++ * Copyright (C) 2025 Alibaba Inc.
++ */
++
++#include <linux/io-64-nonatomic-lo-hi.h>
++#include <linux/iopoll.h>
++
++#include "eea_pci.h"
++
++#define EEA_PCI_DB_OFFSET 4096
++
++struct eea_pci_cfg {
++	__le32 reserve0;
++	__le32 reserve1;
++	__le32 drv_f_idx;
++	__le32 drv_f;
++
++#define EEA_S_OK           BIT(2)
++#define EEA_S_FEATURE_DONE BIT(3)
++#define EEA_S_FAILED       BIT(7)
++	u8   device_status;
++	u8   reserved[7];
++
++	__le32 rx_num_max;
++	__le32 tx_num_max;
++	__le32 db_blk_size;
++
++	/* admin queue cfg */
++	__le16 aq_size;
++	__le16 aq_msix_vector;
++	__le32 aq_db_off;
++
++	__le32 aq_sq_addr;
++	__le32 aq_sq_addr_hi;
++	__le32 aq_cq_addr;
++	__le32 aq_cq_addr_hi;
++
++	__le64 hw_ts;
++};
++
++struct eea_pci_device {
++	struct eea_device edev;
++	struct pci_dev *pci_dev;
++
++	u32 msix_vec_n;
++
++	void __iomem *reg;
++	void __iomem *db_base;
++
++	char ha_irq_name[32];
++	u8 reset_pos;
++};
++
++#define cfg_pointer(reg, item) \
++	((void __iomem *)((reg) + offsetof(struct eea_pci_cfg, item)))
++
++#define cfg_write8(reg, item, val) iowrite8(val, cfg_pointer(reg, item))
++#define cfg_write32(reg, item, val) iowrite32(val, cfg_pointer(reg, item))
++
++#define cfg_read8(reg, item) ioread8(cfg_pointer(reg, item))
++#define cfg_read32(reg, item) ioread32(cfg_pointer(reg, item))
++#define cfg_readq(reg, item) readq(cfg_pointer(reg, item))
++
++const char *eea_pci_name(struct eea_device *edev)
++{
++	return pci_name(edev->ep_dev->pci_dev);
++}
++
++int eea_pci_domain_nr(struct eea_device *edev)
++{
++	return pci_domain_nr(edev->ep_dev->pci_dev->bus);
++}
++
++u16 eea_pci_dev_id(struct eea_device *edev)
++{
++	return pci_dev_id(edev->ep_dev->pci_dev);
++}
++
++static void eea_pci_io_set_status(struct eea_device *edev, u8 status)
++{
++	struct eea_pci_device *ep_dev = edev->ep_dev;
++
++	cfg_write8(ep_dev->reg, device_status, status);
++}
++
++static u8 eea_pci_io_get_status(struct eea_device *edev)
++{
++	struct eea_pci_device *ep_dev = edev->ep_dev;
++
++	return cfg_read8(ep_dev->reg, device_status);
++}
++
++static void eea_add_status(struct eea_device *dev, u32 status)
++{
++	eea_pci_io_set_status(dev, eea_pci_io_get_status(dev) | status);
++}
++
++#define EEA_RESET_TIMEOUT_US (1000 * 1000 * 1000)
++
++int eea_device_reset(struct eea_device *edev)
++{
++	struct eea_pci_device *ep_dev = edev->ep_dev;
++	int i, err;
++	u8 val;
++
++	eea_pci_io_set_status(edev, 0);
++
++	while (eea_pci_io_get_status(edev))
++		msleep(20);
++
++	err = read_poll_timeout(cfg_read8, val, !val, 20, EEA_RESET_TIMEOUT_US,
++				false, ep_dev->reg, device_status);
++
++	if (err)
++		return -EBUSY;
++
++	for (i = 0; i < ep_dev->msix_vec_n; ++i)
++		synchronize_irq(pci_irq_vector(ep_dev->pci_dev, i));
++
++	return 0;
++}
++
++void eea_device_ready(struct eea_device *dev)
++{
++	u8 status = eea_pci_io_get_status(dev);
++
++	WARN_ON(status & EEA_S_OK);
++
++	eea_pci_io_set_status(dev, status | EEA_S_OK);
++}
++
++static int eea_negotiate(struct eea_device *edev)
++{
++	struct eea_pci_device *ep_dev;
++	u32 status;
++
++	ep_dev = edev->ep_dev;
++
++	edev->features = 0;
++
++	cfg_write32(ep_dev->reg, drv_f_idx, 0);
++	cfg_write32(ep_dev->reg, drv_f, (u32)edev->features);
++	cfg_write32(ep_dev->reg, drv_f_idx, 1);
++	cfg_write32(ep_dev->reg, drv_f, edev->features >> 32);
++
++	eea_add_status(edev, EEA_S_FEATURE_DONE);
++	status = eea_pci_io_get_status(edev);
++	if (!(status & EEA_S_FEATURE_DONE))
++		return -ENODEV;
++
++	return 0;
++}
++
++static void eea_pci_release_resource(struct eea_pci_device *ep_dev)
++{
++	struct pci_dev *pci_dev = ep_dev->pci_dev;
++
++	if (ep_dev->reg) {
++		pci_iounmap(pci_dev, ep_dev->reg);
++		ep_dev->reg = NULL;
++	}
++
++	if (ep_dev->msix_vec_n) {
++		ep_dev->msix_vec_n = 0;
++		pci_free_irq_vectors(ep_dev->pci_dev);
++	}
++
++	pci_release_regions(pci_dev);
++	pci_disable_device(pci_dev);
++}
++
++static int eea_pci_setup(struct pci_dev *pci_dev, struct eea_pci_device *ep_dev)
++{
++	int err, n;
++
++	ep_dev->pci_dev = pci_dev;
++
++	err = pci_enable_device(pci_dev);
++	if (err)
++		return err;
++
++	err = pci_request_regions(pci_dev, "EEA");
++	if (err)
++		goto err_disable_dev;
++
++	pci_set_master(pci_dev);
++
++	err = dma_set_mask_and_coherent(&pci_dev->dev, DMA_BIT_MASK(64));
++	if (err) {
++		dev_warn(&pci_dev->dev, "Failed to enable 64-bit DMA.\n");
++		goto err_release_regions;
++	}
++
++	ep_dev->reg = pci_iomap(pci_dev, 0, 0);
++	if (!ep_dev->reg) {
++		dev_err(&pci_dev->dev, "Failed to map pci bar!\n");
++		err = -ENOMEM;
++		goto err_release_regions;
++	}
++
++	ep_dev->edev.rx_num = cfg_read32(ep_dev->reg, rx_num_max);
++	ep_dev->edev.tx_num = cfg_read32(ep_dev->reg, tx_num_max);
++
++	/* 2: adminq, error handle*/
++	n = ep_dev->edev.rx_num + ep_dev->edev.tx_num + 2;
++	err = pci_alloc_irq_vectors(ep_dev->pci_dev, n, n, PCI_IRQ_MSIX);
++	if (err < 0)
++		goto err_unmap_reg;
++
++	ep_dev->msix_vec_n = n;
++
++	ep_dev->db_base = ep_dev->reg + EEA_PCI_DB_OFFSET;
++	ep_dev->edev.db_blk_size = cfg_read32(ep_dev->reg, db_blk_size);
++
++	return 0;
++
++err_unmap_reg:
++	pci_iounmap(pci_dev, ep_dev->reg);
++	ep_dev->reg = NULL;
++
++err_release_regions:
++	pci_release_regions(pci_dev);
++
++err_disable_dev:
++	pci_disable_device(pci_dev);
++
++	return err;
++}
++
++void __iomem *eea_pci_db_addr(struct eea_device *edev, u32 off)
++{
++	return edev->ep_dev->db_base + off;
++}
++
++u64 eea_pci_device_ts(struct eea_device *edev)
++{
++	struct eea_pci_device *ep_dev = edev->ep_dev;
++
++	return cfg_readq(ep_dev->reg, hw_ts);
++}
++
++static int eea_init_device(struct eea_device *edev)
++{
++	int err;
++
++	err = eea_device_reset(edev);
++	if (err)
++		return err;
++
++	eea_pci_io_set_status(edev, BIT(0) | BIT(1));
++
++	err = eea_negotiate(edev);
++	if (err)
++		goto err;
++
++	/* do net device probe ... */
++
++	return 0;
++err:
++	eea_add_status(edev, EEA_S_FAILED);
++	return err;
++}
++
++static int __eea_pci_probe(struct pci_dev *pci_dev,
++			   struct eea_pci_device *ep_dev)
++{
++	int err;
++
++	pci_set_drvdata(pci_dev, ep_dev);
++
++	err = eea_pci_setup(pci_dev, ep_dev);
++	if (err)
++		return err;
++
++	err = eea_init_device(&ep_dev->edev);
++	if (err)
++		goto err_pci_rel;
++
++	return 0;
++
++err_pci_rel:
++	eea_pci_release_resource(ep_dev);
++	return err;
++}
++
++static void __eea_pci_remove(struct pci_dev *pci_dev, bool flush_ha_work)
++{
++	struct eea_pci_device *ep_dev = pci_get_drvdata(pci_dev);
++	struct device *dev = get_device(&ep_dev->pci_dev->dev);
++
++	pci_disable_sriov(pci_dev);
++
++	eea_pci_release_resource(ep_dev);
++
++	put_device(dev);
++}
++
++static int eea_pci_probe(struct pci_dev *pci_dev,
++			 const struct pci_device_id *id)
++{
++	struct eea_pci_device *ep_dev;
++	struct eea_device *edev;
++	int err;
++
++	ep_dev = kzalloc(sizeof(*ep_dev), GFP_KERNEL);
++	if (!ep_dev)
++		return -ENOMEM;
++
++	edev = &ep_dev->edev;
++
++	edev->ep_dev = ep_dev;
++	edev->dma_dev = &pci_dev->dev;
++
++	ep_dev->pci_dev = pci_dev;
++
++	err = __eea_pci_probe(pci_dev, ep_dev);
++	if (err)
++		kfree(ep_dev);
++
++	return err;
++}
++
++static void eea_pci_remove(struct pci_dev *pci_dev)
++{
++	struct eea_pci_device *ep_dev = pci_get_drvdata(pci_dev);
++
++	__eea_pci_remove(pci_dev, true);
++
++	kfree(ep_dev);
++}
++
++static int eea_pci_sriov_configure(struct pci_dev *pci_dev, int num_vfs)
++{
++	struct eea_pci_device *ep_dev = pci_get_drvdata(pci_dev);
++	struct eea_device *edev = &ep_dev->edev;
++	int ret;
++
++	if (!(eea_pci_io_get_status(edev) & EEA_S_OK))
++		return -EBUSY;
++
++	if (pci_vfs_assigned(pci_dev))
++		return -EPERM;
++
++	if (num_vfs == 0) {
++		pci_disable_sriov(pci_dev);
++		return 0;
++	}
++
++	ret = pci_enable_sriov(pci_dev, num_vfs);
++	if (ret < 0)
++		return ret;
++
++	return num_vfs;
++}
++
++static const struct pci_device_id eea_pci_id_table[] = {
++	{ PCI_DEVICE(PCI_VENDOR_ID_ALIBABA, 0x500B) },
++	{ 0 }
++};
++
++MODULE_DEVICE_TABLE(pci, eea_pci_id_table);
++
++static struct pci_driver eea_pci_driver = {
++	.name            = "eea",
++	.id_table        = eea_pci_id_table,
++	.probe           = eea_pci_probe,
++	.remove          = eea_pci_remove,
++	.sriov_configure = eea_pci_sriov_configure,
++};
++
++static __init int eea_pci_init(void)
++{
++	return pci_register_driver(&eea_pci_driver);
++}
++
++static __exit void eea_pci_exit(void)
++{
++	pci_unregister_driver(&eea_pci_driver);
++}
++
++module_init(eea_pci_init);
++module_exit(eea_pci_exit);
++
++MODULE_DESCRIPTION("Driver for Alibaba Elastic Ethernet Adapter");
++MODULE_AUTHOR("Xuan Zhuo <xuanzhuo@linux.alibaba.com>");
++MODULE_LICENSE("GPL");
+diff --git a/drivers/net/ethernet/alibaba/eea/eea_pci.h b/drivers/net/ethernet/alibaba/eea/eea_pci.h
+new file mode 100644
+index 000000000000..126704a207d5
+--- /dev/null
++++ b/drivers/net/ethernet/alibaba/eea/eea_pci.h
+@@ -0,0 +1,50 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * Driver for Alibaba Elastic Ethernet Adapter.
++ *
++ * Copyright (C) 2025 Alibaba Inc.
++ */
++
++#ifndef __EEA_PCI_H__
++#define __EEA_PCI_H__
++
++#include <linux/pci.h>
++
++struct eea_pci_cap {
++	__u8 cap_vndr;
++	__u8 cap_next;
++	__u8 cap_len;
++	__u8 cfg_type;
++};
++
++struct eea_pci_reset_reg {
++	struct eea_pci_cap cap;
++	__le16 driver;
++	__le16 device;
++};
++
++struct eea_pci_device;
++
++struct eea_device {
++	struct eea_pci_device *ep_dev;
++	struct device         *dma_dev;
++	struct eea_net        *enet;
++
++	u64 features;
++
++	u32 rx_num;
++	u32 tx_num;
++	u32 db_blk_size;
++};
++
++const char *eea_pci_name(struct eea_device *edev);
++int eea_pci_domain_nr(struct eea_device *edev);
++u16 eea_pci_dev_id(struct eea_device *edev);
++
++int eea_device_reset(struct eea_device *dev);
++void eea_device_ready(struct eea_device *dev);
++
++u64 eea_pci_device_ts(struct eea_device *edev);
++
++void __iomem *eea_pci_db_addr(struct eea_device *edev, u32 off);
++#endif
+-- 
 2.32.0.3.g01195cf9f
 
 
