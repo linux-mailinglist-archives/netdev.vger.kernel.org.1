@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-236863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4671CC40DDE
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 17:26:44 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 758B7C40DF6
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 17:27:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE4273AE631
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 16:23:20 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1662B4F9BDA
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 16:23:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86E982857FA;
-	Fri,  7 Nov 2025 16:23:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 107F227877D;
+	Fri,  7 Nov 2025 16:23:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MnMAStUs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O5x4awTF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 634FF2848AF
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0EC428642B
 	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 16:23:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762532589; cv=none; b=SNh0NGXOrmgayPsnLQlQHu7q0ZcLk8PChQIE+WsKPRqMI+pVp9GcMoNU4mlt24G3JI0aO1Q4TbKUh94Bl8fXCoquD3FdMTHALpO+GcTyuXxB8qFqZffaVs1WvxLk5w8t/LT3aJtXmbOEnZuMCPkXWr/p3BMvOEBR7bxRywdXuTQ=
+	t=1762532590; cv=none; b=a8jL1SDR25k5hIEedQ+Feyhnm08g1HRIgxPuVgqW3pxLxcs+fYJKOebDwG4F2thb0HAHhjFtKryWxeJoh7kWNS5OYroXiOFj0RleJV0N56IteccGnqCJ0xDLTgGdjYXmgpyA8MHluUl3etK0qchzGUiPiqd1ixbQUWGPLP4PdpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762532589; c=relaxed/simple;
-	bh=+qOxixlBSd86CxlW+3JAp+Lecxrg81teBuenFPISaHg=;
+	s=arc-20240116; t=1762532590; c=relaxed/simple;
+	bh=DBBHjr5iCha1jloB/uOduMSKLFD5Uk141BaWsi/prmU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jZSYMLDkEi4waS7fULz89lfjgrTV/YDBhMZYqqYT3Wod7P24Vi4ovwmJQe/xfORsIeL1Y5dgJGc5LdCSSRiXQQP3HnA06Knxty2qLUIcl12F11XEsKgWzP3Lqj17inl4oUGbQj9DeWr12eiowsIwUb9gW29qfAuSbhygEQ6yXAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MnMAStUs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F1BFC116B1;
-	Fri,  7 Nov 2025 16:23:08 +0000 (UTC)
+	 MIME-Version; b=uDYVQN4wEbIh2MuuMjuiLUgz8JSiabqtOebA+Ju6KlAdshAgf8uAxT5oDSaxLRiDoHhPuDu4ZRnmr8dpnsnRhkRcv7BY0+/FnfrZF/0mcm0lgrsrkj02Sg32d5nGLUCyu9oiIsEuJBu/VyOxoRasPEVQz/CRNzzdwvM15g9T6Pk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O5x4awTF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B3A6C4CEF5;
+	Fri,  7 Nov 2025 16:23:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762532588;
-	bh=+qOxixlBSd86CxlW+3JAp+Lecxrg81teBuenFPISaHg=;
+	s=k20201202; t=1762532589;
+	bh=DBBHjr5iCha1jloB/uOduMSKLFD5Uk141BaWsi/prmU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=MnMAStUswvhe0Cm7Lw2+v4cHgT+BMWdUXIgOj8FL/a7xYHJqXDEEAWoLCZfIY6TJ6
-	 MKIy+XbECdspF/T5Rg8Pz3VEGDpBMTRecEOFF6DlJZ0pYLxHkYW1JqfPtKd2sB0kn1
-	 QQcjs5D7pVlbi2KNCS76F5yFC5WferyVWxyKdTjn3qw/6jJf5G6qkRRn79fBbBbtuB
-	 wqW4Cin63wUiuYKj4P3lg19HNyspSgjWIsR5O2LboMoYproaZKWQ37/guiPlptl5Hs
-	 6eGjVBNOUymE5yQIv+73F+FWUncvJRUQVKj36nRxRYN1VCCpWWnR5kVkf/GICmrhRW
-	 obkkAJDj9TxaA==
+	b=O5x4awTFTdh2RmfnFVaIHzRGgwaWHLmbsIsuHhaA3AXMghZFN/yWtlfzD0em8nFUZ
+	 lVYD3I1lzXzjTbY0X/vFuuLcBqXrDNQjctS2GfCnhGomBHnjgWyMjdnpNs+d0pX4t+
+	 fBDvnu+YQ3q7A9qrEs6WrM7yidE4M19VPxyXbWYe5dCzV+1CtjxY2dnxecgPPcUpQ2
+	 YIpvDBE1emQEa+1YPL134LiahmcYhl7ZsV5ihYxjE4y5LNoFvQTMpFU+8u35gjAPdF
+	 dirCdt5wy1oSe3sUQUtNrC/Nr8GZsqt2/I4l4PEB7vbws/vszPK8aqSbLo5qCaKxlE
+	 9+c+X9mjM8FAA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net,
 	donald.hunter@gmail.com
@@ -53,9 +53,9 @@ Cc: netdev@vger.kernel.org,
 	joe@dama.to,
 	jstancek@redhat.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 3/4] tools: ynltool: add qstats support
-Date: Fri,  7 Nov 2025 08:22:26 -0800
-Message-ID: <20251107162227.980672-4-kuba@kernel.org>
+Subject: [PATCH net-next v2 4/4] tools: ynltool: add traffic distribution balance
+Date: Fri,  7 Nov 2025 08:22:27 -0800
+Message-ID: <20251107162227.980672-5-kuba@kernel.org>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <20251107162227.980672-1-kuba@kernel.org>
 References: <20251107162227.980672-1-kuba@kernel.org>
@@ -67,342 +67,199 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-  $ ynltool qstat
-  eth0        rx-packets:       493192163        rx-bytes:   1442544543997
-              tx-packets:       745999838        tx-bytes:   4574215826482
-                 tx-stop:            7033         tx-wake:            7033
+The main if not only use case for per-queue stats today is checking
+for traffic imbalance. Add simple traffic balance analysis to qstats.
 
-  $ ynltool qstat show group-by queue
-  eth0  rx-0     packets:        70196880           bytes:    178633973750
-  eth0  rx-1     packets:        63623419           bytes:    197274745250
-  ...
-  eth0  tx-1     packets:        98645810           bytes:    631247647938
-                    stop:            1048            wake:            1048
-  eth0  tx-2     packets:        86775824           bytes:    563930471952
-                    stop:            1126            wake:            1126
+ $ ynltool qstat balance
+ eth0 rx 44 queues:
+  rx-packets  : cv=6.9% ns=24.2% stddev=512006493
+                min=6278921110 max=8011570575 mean=7437054644
+  rx-bytes    : cv=6.9% ns=24.1% stddev=759670503060
+                min=9326315769440 max=11884393670786 mean=11035439201354
   ...
 
-  $ ynltool -j qstat  | jq
+  $ ynltool -j qstat balance | jq
   [
    {
     "ifname": "eth0",
     "ifindex": 2,
-    "rx": {
-      "packets": 493396439,
-      "bytes": 1443608198921
+    "queue-type": "rx",
+    "rx-packets": {
+      "queue-count": 44,
+      "min": 6278301665,
+      "max": 8010780185,
+      "mean": 7.43635E+9,
+      "stddev": 5.12012E+8,
+      "coefficient-of-variation": 6.88525,
+      "normalized-spread": 24.249
     },
-    "tx": {
-      "packets": 746239978,
-      "bytes": 4574333772645,
-      "stop": 7072,
-      "wake": 7072
-    }
-   }
-  ]
+   ...
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- tools/net/ynl/ynltool/main.h   |   1 +
- tools/net/ynl/ynltool/main.c   |   3 +-
- tools/net/ynl/ynltool/qstats.c | 330 +++++++++++++++++++++++++++++++++
- 3 files changed, 333 insertions(+), 1 deletion(-)
- create mode 100644 tools/net/ynl/ynltool/qstats.c
+ tools/net/ynl/ynltool/Makefile |   2 +-
+ tools/net/ynl/ynltool/qstats.c | 293 ++++++++++++++++++++++++++++++++-
+ 2 files changed, 293 insertions(+), 2 deletions(-)
 
-diff --git a/tools/net/ynl/ynltool/main.h b/tools/net/ynl/ynltool/main.h
-index fd05d21451a2..c7039f9ac55a 100644
---- a/tools/net/ynl/ynltool/main.h
-+++ b/tools/net/ynl/ynltool/main.h
-@@ -61,5 +61,6 @@ int cmd_select(const struct cmd *cmds, int argc, char **argv,
+diff --git a/tools/net/ynl/ynltool/Makefile b/tools/net/ynl/ynltool/Makefile
+index 11240740ed81..86c30b7420cf 100644
+--- a/tools/net/ynl/ynltool/Makefile
++++ b/tools/net/ynl/ynltool/Makefile
+@@ -31,7 +31,7 @@ Q = @
  
- /* subcommands */
- int do_page_pool(int argc, char **argv);
-+int do_qstats(int argc, char **argv);
+ $(YNLTOOL): ../libynl.a $(OBJS)
+ 	$(Q)echo -e "\tLINK $@"
+-	$(Q)$(CC) $(CFLAGS) -o $@ $(OBJS) ../libynl.a -lmnl
++	$(Q)$(CC) $(CFLAGS) -o $@ $(OBJS) ../libynl.a -lmnl -lm
  
- #endif /* __YNLTOOL_H */
-diff --git a/tools/net/ynl/ynltool/main.c b/tools/net/ynl/ynltool/main.c
-index f83c6f3245c8..5d0f428eed0a 100644
---- a/tools/net/ynl/ynltool/main.c
-+++ b/tools/net/ynl/ynltool/main.c
-@@ -47,7 +47,7 @@ static int do_help(int argc __attribute__((unused)),
- 		"Usage: %s [OPTIONS] OBJECT { COMMAND | help }\n"
- 		"       %s version\n"
- 		"\n"
--		"       OBJECT := { page-pool }\n"
-+		"       OBJECT := { page-pool | qstats }\n"
- 		"       " HELP_SPEC_OPTIONS "\n"
- 		"",
- 		bin_name, bin_name);
-@@ -72,6 +72,7 @@ static int do_version(int argc __attribute__((unused)),
- static const struct cmd commands[] = {
- 	{ "help",	do_help },
- 	{ "page-pool",	do_page_pool },
-+	{ "qstats",	do_qstats },
- 	{ "version",	do_version },
- 	{ 0 }
- };
+ %.o: %.c ../libynl.a
+ 	$(Q)echo -e "\tCC $@"
 diff --git a/tools/net/ynl/ynltool/qstats.c b/tools/net/ynl/ynltool/qstats.c
-new file mode 100644
-index 000000000000..fcdbb6d9a852
---- /dev/null
+index fcdbb6d9a852..31fb45709ffa 100644
+--- a/tools/net/ynl/ynltool/qstats.c
 +++ b/tools/net/ynl/ynltool/qstats.c
-@@ -0,0 +1,330 @@
-+// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+@@ -5,6 +5,7 @@
+ #include <string.h>
+ #include <errno.h>
+ #include <net/if.h>
++#include <math.h>
+ 
+ #include <ynl.h>
+ #include "netdev-user.h"
+@@ -13,6 +14,16 @@
+ 
+ static enum netdev_qstats_scope scope; /* default - device */
+ 
++struct queue_balance {
++	unsigned int ifindex;
++	enum netdev_queue_type type;
++	unsigned int queue_count;
++	__u64 *rx_packets;
++	__u64 *rx_bytes;
++	__u64 *tx_packets;
++	__u64 *tx_bytes;
++};
 +
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <errno.h>
-+#include <net/if.h>
-+
-+#include <ynl.h>
-+#include "netdev-user.h"
-+
-+#include "main.h"
-+
-+static enum netdev_qstats_scope scope; /* default - device */
-+
-+static void print_json_qstats(struct netdev_qstats_get_list *qstats)
+ static void print_json_qstats(struct netdev_qstats_get_list *qstats)
+ {
+ 	jsonw_start_array(json_wtr);
+@@ -293,6 +304,283 @@ static int do_show(int argc, char **argv)
+ 	return ret;
+ }
+ 
++static void compute_stats(__u64 *values, unsigned int count,
++			  double *mean, double *stddev, __u64 *min, __u64 *max)
 +{
-+	jsonw_start_array(json_wtr);
++	double sum = 0.0, variance = 0.0;
++	unsigned int i;
 +
-+	ynl_dump_foreach(qstats, qs) {
-+		char ifname[IF_NAMESIZE];
-+		const char *name;
++	*min = ~0ULL;
++	*max = 0;
 +
-+		jsonw_start_object(json_wtr);
-+
-+		name = if_indextoname(qs->ifindex, ifname);
-+		if (name)
-+			jsonw_string_field(json_wtr, "ifname", name);
-+		jsonw_uint_field(json_wtr, "ifindex", qs->ifindex);
-+
-+		if (qs->_present.queue_type)
-+			jsonw_string_field(json_wtr, "queue-type",
-+					   netdev_queue_type_str(qs->queue_type));
-+		if (qs->_present.queue_id)
-+			jsonw_uint_field(json_wtr, "queue-id", qs->queue_id);
-+
-+		if (qs->_present.rx_packets || qs->_present.rx_bytes ||
-+		    qs->_present.rx_alloc_fail || qs->_present.rx_hw_drops ||
-+		    qs->_present.rx_csum_complete || qs->_present.rx_hw_gro_packets) {
-+			jsonw_name(json_wtr, "rx");
-+			jsonw_start_object(json_wtr);
-+			if (qs->_present.rx_packets)
-+				jsonw_uint_field(json_wtr, "packets", qs->rx_packets);
-+			if (qs->_present.rx_bytes)
-+				jsonw_uint_field(json_wtr, "bytes", qs->rx_bytes);
-+			if (qs->_present.rx_alloc_fail)
-+				jsonw_uint_field(json_wtr, "alloc-fail", qs->rx_alloc_fail);
-+			if (qs->_present.rx_hw_drops)
-+				jsonw_uint_field(json_wtr, "hw-drops", qs->rx_hw_drops);
-+			if (qs->_present.rx_hw_drop_overruns)
-+				jsonw_uint_field(json_wtr, "hw-drop-overruns", qs->rx_hw_drop_overruns);
-+			if (qs->_present.rx_hw_drop_ratelimits)
-+				jsonw_uint_field(json_wtr, "hw-drop-ratelimits", qs->rx_hw_drop_ratelimits);
-+			if (qs->_present.rx_csum_complete)
-+				jsonw_uint_field(json_wtr, "csum-complete", qs->rx_csum_complete);
-+			if (qs->_present.rx_csum_unnecessary)
-+				jsonw_uint_field(json_wtr, "csum-unnecessary", qs->rx_csum_unnecessary);
-+			if (qs->_present.rx_csum_none)
-+				jsonw_uint_field(json_wtr, "csum-none", qs->rx_csum_none);
-+			if (qs->_present.rx_csum_bad)
-+				jsonw_uint_field(json_wtr, "csum-bad", qs->rx_csum_bad);
-+			if (qs->_present.rx_hw_gro_packets)
-+				jsonw_uint_field(json_wtr, "hw-gro-packets", qs->rx_hw_gro_packets);
-+			if (qs->_present.rx_hw_gro_bytes)
-+				jsonw_uint_field(json_wtr, "hw-gro-bytes", qs->rx_hw_gro_bytes);
-+			if (qs->_present.rx_hw_gro_wire_packets)
-+				jsonw_uint_field(json_wtr, "hw-gro-wire-packets", qs->rx_hw_gro_wire_packets);
-+			if (qs->_present.rx_hw_gro_wire_bytes)
-+				jsonw_uint_field(json_wtr, "hw-gro-wire-bytes", qs->rx_hw_gro_wire_bytes);
-+			jsonw_end_object(json_wtr);
-+		}
-+
-+		if (qs->_present.tx_packets || qs->_present.tx_bytes ||
-+		    qs->_present.tx_hw_drops || qs->_present.tx_csum_none ||
-+		    qs->_present.tx_hw_gso_packets) {
-+			jsonw_name(json_wtr, "tx");
-+			jsonw_start_object(json_wtr);
-+			if (qs->_present.tx_packets)
-+				jsonw_uint_field(json_wtr, "packets", qs->tx_packets);
-+			if (qs->_present.tx_bytes)
-+				jsonw_uint_field(json_wtr, "bytes", qs->tx_bytes);
-+			if (qs->_present.tx_hw_drops)
-+				jsonw_uint_field(json_wtr, "hw-drops", qs->tx_hw_drops);
-+			if (qs->_present.tx_hw_drop_errors)
-+				jsonw_uint_field(json_wtr, "hw-drop-errors", qs->tx_hw_drop_errors);
-+			if (qs->_present.tx_hw_drop_ratelimits)
-+				jsonw_uint_field(json_wtr, "hw-drop-ratelimits", qs->tx_hw_drop_ratelimits);
-+			if (qs->_present.tx_csum_none)
-+				jsonw_uint_field(json_wtr, "csum-none", qs->tx_csum_none);
-+			if (qs->_present.tx_needs_csum)
-+				jsonw_uint_field(json_wtr, "needs-csum", qs->tx_needs_csum);
-+			if (qs->_present.tx_hw_gso_packets)
-+				jsonw_uint_field(json_wtr, "hw-gso-packets", qs->tx_hw_gso_packets);
-+			if (qs->_present.tx_hw_gso_bytes)
-+				jsonw_uint_field(json_wtr, "hw-gso-bytes", qs->tx_hw_gso_bytes);
-+			if (qs->_present.tx_hw_gso_wire_packets)
-+				jsonw_uint_field(json_wtr, "hw-gso-wire-packets", qs->tx_hw_gso_wire_packets);
-+			if (qs->_present.tx_hw_gso_wire_bytes)
-+				jsonw_uint_field(json_wtr, "hw-gso-wire-bytes", qs->tx_hw_gso_wire_bytes);
-+			if (qs->_present.tx_stop)
-+				jsonw_uint_field(json_wtr, "stop", qs->tx_stop);
-+			if (qs->_present.tx_wake)
-+				jsonw_uint_field(json_wtr, "wake", qs->tx_wake);
-+			jsonw_end_object(json_wtr);
-+		}
-+
-+		jsonw_end_object(json_wtr);
++	if (count == 0) {
++		*mean = 0;
++		*stddev = 0;
++		*min = 0;
++		return;
 +	}
 +
-+	jsonw_end_array(json_wtr);
++	for (i = 0; i < count; i++) {
++		sum += values[i];
++		if (values[i] < *min)
++			*min = values[i];
++		if (values[i] > *max)
++			*max = values[i];
++	}
++
++	*mean = sum / count;
++
++	if (count > 1) {
++		for (i = 0; i < count; i++) {
++			double diff = values[i] - *mean;
++
++			variance += diff * diff;
++		}
++		*stddev = sqrt(variance / (count - 1));
++	} else {
++		*stddev = 0;
++	}
 +}
 +
-+static void print_one(bool present, const char *name, unsigned long long val,
-+		      int *line)
++static void print_balance_stats(const char *name, enum netdev_queue_type type,
++				__u64 *values, unsigned int count)
 +{
-+	if (!present)
++	double mean, stddev, cv, ns;
++	__u64 min, max;
++
++	if ((name[0] == 'r' && type != NETDEV_QUEUE_TYPE_RX) ||
++	    (name[0] == 't' && type != NETDEV_QUEUE_TYPE_TX))
 +		return;
 +
-+	if (!*line) {
-+		printf("              ");
-+		++(*line);
-+	}
++	compute_stats(values, count, &mean, &stddev, &min, &max);
 +
-+	/* Don't waste space on tx- and rx- prefix, its implied by queue type */
-+	if (scope == NETDEV_QSTATS_SCOPE_QUEUE &&
-+	    (name[0] == 'r' || name[0] == 't') &&
-+	    name[1] == 'x' && name[2] == '-')
-+		name += 3;
++	cv = mean > 0 ? (stddev / mean) * 100.0 : 0.0;
++	ns = min + max > 0 ? (double)2 * (max - min) / (max + min) * 100 : 0.0;
 +
-+	printf(" %15s: %15llu", name, val);
-+
-+	if (++(*line) == 3) {
-+		printf("\n");
-+		*line = 0;
-+	}
++	printf("  %-12s: cv=%.1f%% ns=%.1f%% stddev=%.0f\n",
++	       name, cv, ns, stddev);
++	printf("  %-12s  min=%llu max=%llu mean=%.0f\n",
++	       "", min, max, mean);
 +}
 +
-+static void print_plain_qstats(struct netdev_qstats_get_list *qstats)
++static void
++print_balance_stats_json(const char *name, enum netdev_queue_type type,
++			 __u64 *values, unsigned int count)
 +{
-+	ynl_dump_foreach(qstats, qs) {
-+		char ifname[IF_NAMESIZE];
-+		const char *name;
-+		int n;
++	double mean, stddev, cv, ns;
++	__u64 min, max;
 +
-+		name = if_indextoname(qs->ifindex, ifname);
-+		if (name)
-+			printf("%s", name);
-+		else
-+			printf("ifindex:%u", qs->ifindex);
++	if ((name[0] == 'r' && type != NETDEV_QUEUE_TYPE_RX) ||
++	    (name[0] == 't' && type != NETDEV_QUEUE_TYPE_TX))
++		return;
 +
-+		if (qs->_present.queue_type && qs->_present.queue_id)
-+			printf("\t%s-%-3u",
-+			       netdev_queue_type_str(qs->queue_type),
-+			       qs->queue_id);
-+		else
-+			printf("\t      ");
++	compute_stats(values, count, &mean, &stddev, &min, &max);
 +
-+		n = 1;
++	cv = mean > 0 ? (stddev / mean) * 100.0 : 0.0;
++	ns = min + max > 0 ? (double)2 * (max - min) / (max + min) * 100 : 0.0;
 +
-+		/* Basic counters */
-+		print_one(qs->_present.rx_packets, "rx-packets", qs->rx_packets, &n);
-+		print_one(qs->_present.rx_bytes, "rx-bytes", qs->rx_bytes, &n);
-+		print_one(qs->_present.tx_packets, "tx-packets", qs->tx_packets, &n);
-+		print_one(qs->_present.tx_bytes, "tx-bytes", qs->tx_bytes, &n);
-+
-+		/* RX error/drop counters */
-+		print_one(qs->_present.rx_alloc_fail, "rx-alloc-fail",
-+			  qs->rx_alloc_fail, &n);
-+		print_one(qs->_present.rx_hw_drops, "rx-hw-drops",
-+			  qs->rx_hw_drops, &n);
-+		print_one(qs->_present.rx_hw_drop_overruns, "rx-hw-drop-overruns",
-+			  qs->rx_hw_drop_overruns, &n);
-+		print_one(qs->_present.rx_hw_drop_ratelimits, "rx-hw-drop-ratelimits",
-+			  qs->rx_hw_drop_ratelimits, &n);
-+
-+		/* RX checksum counters */
-+		print_one(qs->_present.rx_csum_complete, "rx-csum-complete",
-+			  qs->rx_csum_complete, &n);
-+		print_one(qs->_present.rx_csum_unnecessary, "rx-csum-unnecessary",
-+			  qs->rx_csum_unnecessary, &n);
-+		print_one(qs->_present.rx_csum_none, "rx-csum-none",
-+			  qs->rx_csum_none, &n);
-+		print_one(qs->_present.rx_csum_bad, "rx-csum-bad",
-+			  qs->rx_csum_bad, &n);
-+
-+		/* RX GRO counters */
-+		print_one(qs->_present.rx_hw_gro_packets, "rx-hw-gro-packets",
-+			  qs->rx_hw_gro_packets, &n);
-+		print_one(qs->_present.rx_hw_gro_bytes, "rx-hw-gro-bytes",
-+			  qs->rx_hw_gro_bytes, &n);
-+		print_one(qs->_present.rx_hw_gro_wire_packets, "rx-hw-gro-wire-packets",
-+			  qs->rx_hw_gro_wire_packets, &n);
-+		print_one(qs->_present.rx_hw_gro_wire_bytes, "rx-hw-gro-wire-bytes",
-+			  qs->rx_hw_gro_wire_bytes, &n);
-+
-+		/* TX error/drop counters */
-+		print_one(qs->_present.tx_hw_drops, "tx-hw-drops",
-+			  qs->tx_hw_drops, &n);
-+		print_one(qs->_present.tx_hw_drop_errors, "tx-hw-drop-errors",
-+			  qs->tx_hw_drop_errors, &n);
-+		print_one(qs->_present.tx_hw_drop_ratelimits, "tx-hw-drop-ratelimits",
-+			  qs->tx_hw_drop_ratelimits, &n);
-+
-+		/* TX checksum counters */
-+		print_one(qs->_present.tx_csum_none, "tx-csum-none",
-+			  qs->tx_csum_none, &n);
-+		print_one(qs->_present.tx_needs_csum, "tx-needs-csum",
-+			  qs->tx_needs_csum, &n);
-+
-+		/* TX GSO counters */
-+		print_one(qs->_present.tx_hw_gso_packets, "tx-hw-gso-packets",
-+			  qs->tx_hw_gso_packets, &n);
-+		print_one(qs->_present.tx_hw_gso_bytes, "tx-hw-gso-bytes",
-+			  qs->tx_hw_gso_bytes, &n);
-+		print_one(qs->_present.tx_hw_gso_wire_packets, "tx-hw-gso-wire-packets",
-+			  qs->tx_hw_gso_wire_packets, &n);
-+		print_one(qs->_present.tx_hw_gso_wire_bytes, "tx-hw-gso-wire-bytes",
-+			  qs->tx_hw_gso_wire_bytes, &n);
-+
-+		/* TX queue control */
-+		print_one(qs->_present.tx_stop, "tx-stop", qs->tx_stop, &n);
-+		print_one(qs->_present.tx_wake, "tx-wake", qs->tx_wake, &n);
-+
-+		if (n)
-+			printf("\n");
-+	}
++	jsonw_name(json_wtr, name);
++	jsonw_start_object(json_wtr);
++	jsonw_uint_field(json_wtr, "queue-count", count);
++	jsonw_uint_field(json_wtr, "min", min);
++	jsonw_uint_field(json_wtr, "max", max);
++	jsonw_float_field(json_wtr, "mean", mean);
++	jsonw_float_field(json_wtr, "stddev", stddev);
++	jsonw_float_field(json_wtr, "coefficient-of-variation", cv);
++	jsonw_float_field(json_wtr, "normalized-spread", ns);
++	jsonw_end_object(json_wtr);
 +}
 +
-+static int do_show(int argc, char **argv)
++static int cmp_ifindex_type(const void *a, const void *b)
++{
++	const struct netdev_qstats_get_rsp *qa = a;
++	const struct netdev_qstats_get_rsp *qb = b;
++
++	if (qa->ifindex != qb->ifindex)
++		return qa->ifindex - qb->ifindex;
++	if (qa->queue_type != qb->queue_type)
++		return qa->queue_type - qb->queue_type;
++	return qa->queue_id - qb->queue_id;
++}
++
++static int do_balance(int argc, char **argv __attribute__((unused)))
 +{
 +	struct netdev_qstats_get_list *qstats;
 +	struct netdev_qstats_get_req *req;
++	struct netdev_qstats_get_rsp **sorted;
 +	struct ynl_error yerr;
 +	struct ynl_sock *ys;
++	unsigned int count = 0;
++	unsigned int i, j;
 +	int ret = 0;
 +
-+	/* Parse options */
-+	while (argc > 0) {
-+		if (is_prefix(*argv, "scope") || is_prefix(*argv, "group-by")) {
-+			NEXT_ARG();
-+
-+			if (!REQ_ARGS(1))
-+				return -1;
-+
-+			if (is_prefix(*argv, "queue")) {
-+				scope = NETDEV_QSTATS_SCOPE_QUEUE;
-+			} else if (is_prefix(*argv, "device")) {
-+				scope = 0;
-+			} else {
-+				p_err("invalid scope value '%s'", *argv);
-+				return -1;
-+			}
-+			NEXT_ARG();
-+		} else {
-+			p_err("unknown option '%s'", *argv);
-+			return -1;
-+		}
++	if (argc > 0) {
++		p_err("balance command takes no arguments");
++		return -1;
 +	}
 +
 +	ys = ynl_sock_create(&ynl_netdev_family, &yerr);
@@ -418,8 +275,8 @@ index 000000000000..fcdbb6d9a852
 +		goto exit_close;
 +	}
 +
-+	if (scope)
-+		netdev_qstats_get_req_set_scope(req, scope);
++	/* Always use queue scope for balance analysis */
++	netdev_qstats_get_req_set_scope(req, NETDEV_QSTATS_SCOPE_QUEUE);
 +
 +	qstats = netdev_qstats_get_dump(ys, req);
 +	netdev_qstats_get_req_free(req);
@@ -429,53 +286,173 @@ index 000000000000..fcdbb6d9a852
 +		goto exit_close;
 +	}
 +
-+	/* Print the stats as returned by the kernel */
-+	if (json_output)
-+		print_json_qstats(qstats);
-+	else
-+		print_plain_qstats(qstats);
++	/* Count and sort queues */
++	ynl_dump_foreach(qstats, qs)
++		count++;
 +
++	if (count == 0) {
++		if (json_output)
++			jsonw_start_array(json_wtr);
++		else
++			printf("No queue statistics available\n");
++		goto exit_free_qstats;
++	}
++
++	sorted = calloc(count, sizeof(*sorted));
++	if (!sorted) {
++		p_err("failed to allocate sorted array");
++		ret = -1;
++		goto exit_free_qstats;
++	}
++
++	i = 0;
++	ynl_dump_foreach(qstats, qs)
++		sorted[i++] = qs;
++
++	qsort(sorted, count, sizeof(*sorted), cmp_ifindex_type);
++
++	if (json_output)
++		jsonw_start_array(json_wtr);
++
++	/* Process each device/queue-type combination */
++	i = 0;
++	while (i < count) {
++		__u64 *rx_packets, *rx_bytes, *tx_packets, *tx_bytes;
++		enum netdev_queue_type type = sorted[i]->queue_type;
++		unsigned int ifindex = sorted[i]->ifindex;
++		unsigned int queue_count = 0;
++		char ifname[IF_NAMESIZE];
++		const char *name;
++
++		/* Count queues for this device/type */
++		for (j = i; j < count && sorted[j]->ifindex == ifindex &&
++		     sorted[j]->queue_type == type; j++)
++			queue_count++;
++
++		/* Skip if no packets/bytes (inactive queues) */
++		if (!sorted[i]->_present.rx_packets &&
++		    !sorted[i]->_present.rx_bytes &&
++		    !sorted[i]->_present.tx_packets &&
++		    !sorted[i]->_present.tx_bytes)
++			goto next_ifc;
++
++		/* Allocate arrays for statistics */
++		rx_packets = calloc(queue_count, sizeof(*rx_packets));
++		rx_bytes   = calloc(queue_count, sizeof(*rx_bytes));
++		tx_packets = calloc(queue_count, sizeof(*tx_packets));
++		tx_bytes   = calloc(queue_count, sizeof(*tx_bytes));
++
++		if (!rx_packets || !rx_bytes || !tx_packets || !tx_bytes) {
++			p_err("failed to allocate statistics arrays");
++			free(rx_packets);
++			free(rx_bytes);
++			free(tx_packets);
++			free(tx_bytes);
++			ret = -1;
++			goto exit_free_sorted;
++		}
++
++		/* Collect statistics */
++		for (j = 0; j < queue_count; j++) {
++			rx_packets[j] = sorted[i + j]->_present.rx_packets ?
++					sorted[i + j]->rx_packets : 0;
++			rx_bytes[j] = sorted[i + j]->_present.rx_bytes ?
++				      sorted[i + j]->rx_bytes : 0;
++			tx_packets[j] = sorted[i + j]->_present.tx_packets ?
++					sorted[i + j]->tx_packets : 0;
++			tx_bytes[j] = sorted[i + j]->_present.tx_bytes ?
++				      sorted[i + j]->tx_bytes : 0;
++		}
++
++		name = if_indextoname(ifindex, ifname);
++
++		if (json_output) {
++			jsonw_start_object(json_wtr);
++			if (name)
++				jsonw_string_field(json_wtr, "ifname", name);
++			jsonw_uint_field(json_wtr, "ifindex", ifindex);
++			jsonw_string_field(json_wtr, "queue-type",
++					   netdev_queue_type_str(type));
++
++			print_balance_stats_json("rx-packets", type,
++						 rx_packets, queue_count);
++			print_balance_stats_json("rx-bytes", type,
++						 rx_bytes, queue_count);
++			print_balance_stats_json("tx-packets", type,
++						 tx_packets, queue_count);
++			print_balance_stats_json("tx-bytes", type,
++						 tx_bytes, queue_count);
++
++			jsonw_end_object(json_wtr);
++		} else {
++			if (name)
++				printf("%s", name);
++			else
++				printf("ifindex:%u", ifindex);
++			printf(" %s %d queues:\n",
++			       netdev_queue_type_str(type), queue_count);
++
++			print_balance_stats("rx-packets", type,
++					    rx_packets, queue_count);
++			print_balance_stats("rx-bytes", type,
++					    rx_bytes, queue_count);
++			print_balance_stats("tx-packets", type,
++					    tx_packets, queue_count);
++			print_balance_stats("tx-bytes", type,
++					    tx_bytes, queue_count);
++			printf("\n");
++		}
++
++		free(rx_packets);
++		free(rx_bytes);
++		free(tx_packets);
++		free(tx_bytes);
++
++next_ifc:
++		i += queue_count;
++	}
++
++	if (json_output)
++		jsonw_end_array(json_wtr);
++
++exit_free_sorted:
++	free(sorted);
++exit_free_qstats:
 +	netdev_qstats_get_list_free(qstats);
 +exit_close:
 +	ynl_sock_destroy(ys);
 +	return ret;
 +}
 +
-+static int do_help(int argc __attribute__((unused)),
-+		   char **argv __attribute__((unused)))
-+{
-+	if (json_output) {
-+		jsonw_null(json_wtr);
-+		return 0;
-+	}
-+
-+	fprintf(stderr,
-+		"Usage: %s qstats { COMMAND | help }\n"
-+		"       %s qstats [ show ] [ OPTIONS ]\n"
-+		"\n"
-+		"       OPTIONS := { scope queue | group-by { device | queue } }\n"
-+		"\n"
-+		"       show                  - Display queue statistics (default)\n"
-+		"                               Statistics are aggregated for the entire device.\n"
-+		"       show scope queue      - Display per-queue statistics\n"
-+		"       show group-by device  - Display device-aggregated statistics (default)\n"
-+		"       show group-by queue   - Display per-queue statistics\n"
-+		"",
-+		bin_name, bin_name);
-+
-+	return 0;
-+}
-+
-+static const struct cmd qstats_cmds[] = {
-+	{ "show",	do_show },
-+	{ "help",	do_help },
-+	{ 0 }
-+};
-+
-+int do_qstats(int argc, char **argv)
-+{
-+	return cmd_select(qstats_cmds, argc, argv, do_help);
-+}
+ static int do_help(int argc __attribute__((unused)),
+ 		   char **argv __attribute__((unused)))
+ {
+@@ -304,6 +592,7 @@ static int do_help(int argc __attribute__((unused)),
+ 	fprintf(stderr,
+ 		"Usage: %s qstats { COMMAND | help }\n"
+ 		"       %s qstats [ show ] [ OPTIONS ]\n"
++		"       %s qstats balance\n"
+ 		"\n"
+ 		"       OPTIONS := { scope queue | group-by { device | queue } }\n"
+ 		"\n"
+@@ -312,14 +601,16 @@ static int do_help(int argc __attribute__((unused)),
+ 		"       show scope queue      - Display per-queue statistics\n"
+ 		"       show group-by device  - Display device-aggregated statistics (default)\n"
+ 		"       show group-by queue   - Display per-queue statistics\n"
++		"       balance               - Analyze traffic distribution balance.\n"
+ 		"",
+-		bin_name, bin_name);
++		bin_name, bin_name, bin_name);
+ 
+ 	return 0;
+ }
+ 
+ static const struct cmd qstats_cmds[] = {
+ 	{ "show",	do_show },
++	{ "balance",	do_balance },
+ 	{ "help",	do_help },
+ 	{ 0 }
+ };
 -- 
 2.51.1
 
