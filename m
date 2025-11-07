@@ -1,113 +1,225 @@
-Return-Path: <netdev+bounces-236872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 515A7C410D1
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 18:33:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10DD0C4126C
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 18:50:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10D203A4716
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 17:33:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFFB2188C713
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 17:50:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5F27334683;
-	Fri,  7 Nov 2025 17:33:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68F6B3358B7;
+	Fri,  7 Nov 2025 17:50:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mwN0/2co"
 X-Original-To: netdev@vger.kernel.org
-Received: from eidolon.nox.tf (eidolon.nox.tf [185.142.180.128])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0DCB24DFF3
-	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 17:33:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.128
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F156207A22;
+	Fri,  7 Nov 2025 17:50:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762536816; cv=none; b=qDr4t8E884LYZ7879EaK03+mfWt1uUlHZkl6KsZgWvJFhdue1CGeuXNXBj9H+wvq9QZof5GTMOjjWhAGylH3JPDVs8UBgyvrWlKI9GjH6dPWu5CzJaYUJ4lFRfEiokhUApt4tQ9oZdkRxVhk1w8cviArFedSxxfbNc5c5UHVi6A=
+	t=1762537808; cv=none; b=MIXi2F0SvLGrLibJtu/Qe5XbmmPLaoItA08eCL0d0Fz6qvHgVE3gz8XbkHVJ/vQYAZlkw12J3zFq1Zlv6a7A+vKPoTuudt8M/7TSfHGdjZcaWe2r1wQgCMFZS/+IuWh6tlD1uM8bbhyH1EjlFWaazpGjKKB0a2ZNL8V2L+j5v60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762536816; c=relaxed/simple;
-	bh=pVsTGEt3BLsaovZA47CerrPJ8u4bEnWkY7XJRrA6SzM=;
+	s=arc-20240116; t=1762537808; c=relaxed/simple;
+	bh=qwOodP/5x1cLJTKNu9BoI3+Z+jnZGDSbAh6AAftJ9EU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ordb32Y3OZdQw5JoO9+UvN3Cnzd+2/zFnaJkOCHlUsGDpErE7zOL7c7JNLQHw74KZngdjiHcazCFV3+Hb42cWo9GPD+BcVa7cQhZIqOZqOeIFNd9tAQADFw5egv5IlxzwWsByiX4TQ/Xnp8aPJjfuqzEAYMFoRXFqBkqVX9agBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=diac24.net; spf=pass smtp.mailfrom=diac24.net; arc=none smtp.client-ip=185.142.180.128
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=diac24.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=diac24.net
-Received: from equinox by eidolon.nox.tf with local (Exim 4.98.2)
-	(envelope-from <equinox@diac24.net>)
-	id 1vHQL4-00000003FjR-2Rx4;
-	Fri, 07 Nov 2025 18:33:30 +0100
-Date: Fri, 7 Nov 2025 18:33:30 +0100
-From: David 'equinox' Lamparter <equinox@diac24.net>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, horms@kernel.org,
-	dsahern@kernel.org, petrm@nvidia.com, willemb@google.com,
-	daniel@iogearbox.net, fw@strlen.de, ishaangandhi@gmail.com,
-	rbonica@juniper.net, tom@herbertland.com
-Subject: Re: [PATCH net-next v2 1/3] ipv4: icmp: Add RFC 5837 support
-Message-ID: <aQ4tamfiDiC1TomU@eidolon.nox.tf>
-References: <20251027082232.232571-1-idosch@nvidia.com>
- <20251027082232.232571-2-idosch@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=MDCRO7DNIPalo81ekbX9KpE+2U2V85NXYIlD4f6FpCFtWGhpi9B+oRwI57Ii+hvRqxR1+utdDiuUQvCINfLzn9MF2Ho5b9kYe8Uum6A4AYpePLnpUKUAlWH67F2fTk0Tfpr1F8Y7wG0eT+Hpt9jSIjf6skHpIfGymtjUPxJB/+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mwN0/2co; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A598C19423;
+	Fri,  7 Nov 2025 17:50:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762537807;
+	bh=qwOodP/5x1cLJTKNu9BoI3+Z+jnZGDSbAh6AAftJ9EU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mwN0/2coA4Qf/IpWvb+0v8FoX9cr8GFvrLJJe+4Bbi7LwojS9l7Hq8FLSt9FgqQwb
+	 3vxKFGdOfW7lT3Pu+/gjHvTJl7G9V6z2jPT2YqogO5dyFosHVYpgi16S/SfoPjLXJK
+	 R5jsdf7vbg+ykR0caNdoUkYtABaHVQyKTYf6Rq2lsn2PKzz4Obq3//flygKqSKwwh0
+	 WU+rBGCDZAPCucxy3Qu0jiStshzGLUL5ug3ebSFozrS9mRcvGQhDotlZ/RxBkiW992
+	 pmikayXdT2Dd+1z2nw8KDHski2STK+282bf8MvOOHPOg5HHnVggAmAGppTVK+jIq+D
+	 +zKAhWz5NNXIw==
+Date: Fri, 7 Nov 2025 17:50:02 +0000
+From: Simon Horman <horms@kernel.org>
+To: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Cc: Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org
+Subject: Re: [net-next,v2 7/7] net: ravb: Use common defines for time
+ stamping control
+Message-ID: <aQ4xSv9629XF-Bt3@horms.kernel.org>
+References: <20251104222420.882731-1-niklas.soderlund+renesas@ragnatech.se>
+ <20251104222420.882731-8-niklas.soderlund+renesas@ragnatech.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20251027082232.232571-2-idosch@nvidia.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20251104222420.882731-8-niklas.soderlund+renesas@ragnatech.se>
 
-On Mon, Oct 27, 2025 at 10:22:30AM +0200, Ido Schimmel wrote:
-> +/* ICMP Extension Object Classes */
-> +#define ICMP_EXT_OBJ_CLASS_IIO		2	/* RFC 5837 */
-> +
-> +/* Interface Information Object - RFC 5837 */
-> +enum {
-> +	ICMP_EXT_CTYPE_IIO_ROLE_IIF,
-> +};
+On Tue, Nov 04, 2025 at 11:24:20PM +0100, Niklas Söderlund wrote:
+> Instead of translating to/from driver specific flags for packet time
+> stamp control use the common flags directly. This simplifies the driver
+> as the translating code can be removed while at the same time making it
+> clear the flags are not flags written to hardware registers.
+> 
+> The change from a device specific bit-field track variable to the common
+> enum datatypes forces us to touch the ravb_rx_rcar_hwstamp() in a non
+> trivial way. To make this cleaner and easier to understand expand the
+> nested conditions.
+> 
+> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
 
 ...
 
-> +static __be32 icmp_ext_iio_addr4_find(const struct net_device *dev)
-> +{
-> +	struct in_device *in_dev;
-> +	struct in_ifaddr *ifa;
-> +
-> +	in_dev = __in_dev_get_rcu(dev);
-> +	if (!in_dev)
-> +		return 0;
-> +
-> +	/* It is unclear from RFC 5837 which IP address should be chosen, but
-> +	 * it makes sense to choose a global unicast address.
-> +	 */
-> +	in_dev_for_each_ifa_rcu(ifa, in_dev) {
-> +		if (READ_ONCE(ifa->ifa_flags) & IFA_F_SECONDARY)
-> +			continue;
-> +		if (ifa->ifa_scope != RT_SCOPE_UNIVERSE ||
-> +		    ipv4_is_multicast(ifa->ifa_address))
-> +			continue;
-> +		return ifa->ifa_address;
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index 5477bb5c69ae..1680e94b9242 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -950,13 +950,14 @@ static void ravb_rx_rcar_hwstamp(struct ravb_private *priv, int q,
+>  				 struct ravb_ex_rx_desc *desc,
+>  				 struct sk_buff *skb)
+>  {
+> -	u32 get_ts = priv->tstamp_rx_ctrl & RAVB_RXTSTAMP_TYPE;
+>  	struct skb_shared_hwtstamps *shhwtstamps;
+>  	struct timespec64 ts;
+> +	bool get_ts;
+>  
+> -	get_ts &= (q == RAVB_NC) ?
+> -		RAVB_RXTSTAMP_TYPE_V2_L2_EVENT :
+> -		~RAVB_RXTSTAMP_TYPE_V2_L2_EVENT;
+> +	if (q == RAVB_NC)
+> +		get_ts = priv->tstamp_rx_ctrl == HWTSTAMP_FILTER_PTP_V2_L2_EVENT;
+> +	else
+> +		get_ts = priv->tstamp_rx_ctrl != HWTSTAMP_FILTER_PTP_V2_L2_EVENT;
+>  
+>  	if (!get_ts)
+>  		return;
 
-For 5837, this should be an address identifying the interface.  This
-sets up a rather tricky situation if there's a /32 configured on the
-interface in the context of unnumbered operation.  Arguably, in that
-case class 5 (node info) should be used rather than class 2 (interface
-info).  Class 5 also allows sticking an IPv6 address in an ICMPv4 reply.
+Hi Niklas,
 
-I would argue the logic here should be an order of preference:
+It is Friday evening and I'm exercising a new tool, so please forgive me if
+this analysis is wrong. But it seems that there are cases where there old
+bit-based logic and the new integer equality based logic don't match.
 
-1. any global non-/32 address on the interface, in a class 2 object
-2. any global /32 on the interface, in a class 5 object
-3. any global IPv6 on the interface, in a class 5 object
-4. any global address from any interface in the VRF, preferring
-   loopback, in a class 5 object (addrsel logic, really)
+1. If q == RAVB_NC then previously timestamping would occur
+   for HWTSTAMP_FILTER_ALL, because:
 
-[class 5 is draft-ietf-intarea-extended-icmp-nodeid]
+   (RAVB_TXTSTAMP_ENABLED | RAVB_RXTSTAMP_TYPE_ALL) &
+    RAVB_RXTSTAMP_TYPE & RAVB_RXTSTAMP_TYPE_V2_L2_EVENT =
+   (0x10 | 0x6) & 0x06 & 0x02 = 0x2, which is non-zero.
 
-+ analog for IPv6
+   But with the new logic timestamping does not occur because:
 
-(cf. my other mail in the thread)
+   HWTSTAMP_FILTER_ALL == HWTSTAMP_FILTER_PTP_V2_L2_EVENT is false
 
-Cheers,
+2. If q != RAVB_NC then previously timestamping would not occur
+   for HWTSTAMP_FILTER_NONE because:
 
+   0 & RAVB_RXTSTAMP_TYPE & RAVB_RXTSTAMP_TYPE_V2_L2_EVENT = 0
 
--equi
+   But with the new logic timestamping does occur because:
+
+   HWTSTAMP_FILTER_NONE != HWTSTAMP_FILTER_PTP_V2_L2_EVENT is true
+
+I came across this by chance because this patch is currently
+the most recent patch in net-next that touches C code. And I was
+exercising Claude Code with https://github.com/masoncl/review-prompts
+It reported the above and after significantly
+more thinking I've come to agree with it.
+
+But it is Friday evening, so YMMV.
+
+For reference, I've provided the text generated by Claude Code at the end of
+this email.
+
+...
+
+> @@ -2446,15 +2437,13 @@ static int ravb_hwtstamp_set(struct net_device *ndev,
+>  			     struct netlink_ext_ack *extack)
+>  {
+>  	struct ravb_private *priv = netdev_priv(ndev);
+> -	u32 tstamp_rx_ctrl = RAVB_RXTSTAMP_ENABLED;
+> -	u32 tstamp_tx_ctrl;
+> +	enum hwtstamp_rx_filters tstamp_rx_ctrl;
+> +	enum hwtstamp_tx_types tstamp_tx_ctrl;
+>  
+>  	switch (config->tx_type) {
+>  	case HWTSTAMP_TX_OFF:
+> -		tstamp_tx_ctrl = 0;
+> -		break;
+>  	case HWTSTAMP_TX_ON:
+> -		tstamp_tx_ctrl = RAVB_TXTSTAMP_ENABLED;
+> +		tstamp_tx_ctrl = config->tx_type;
+>  		break;
+>  	default:
+>  		return -ERANGE;
+> @@ -2462,14 +2451,12 @@ static int ravb_hwtstamp_set(struct net_device *ndev,
+>  
+>  	switch (config->rx_filter) {
+>  	case HWTSTAMP_FILTER_NONE:
+> -		tstamp_rx_ctrl = 0;
+> -		break;
+>  	case HWTSTAMP_FILTER_PTP_V2_L2_EVENT:
+> -		tstamp_rx_ctrl |= RAVB_RXTSTAMP_TYPE_V2_L2_EVENT;
+> +		tstamp_rx_ctrl = config->rx_filter;
+>  		break;
+>  	default:
+>  		config->rx_filter = HWTSTAMP_FILTER_ALL;
+> -		tstamp_rx_ctrl |= RAVB_RXTSTAMP_TYPE_ALL;
+> +		tstamp_rx_ctrl = HWTSTAMP_FILTER_ALL;
+>  	}
+>  
+>  	priv->tstamp_tx_ctrl = tstamp_tx_ctrl;
+> -- 
+> 2.51.1
+> 
+> 
+
+Text generated by Claude Code:
+
+Is this logic translation correct? Looking at the old bit-field
+operations and new enum comparisons, the behavior seems to change in
+two cases:
+
+Old behavior (from ravb_hwtstamp_set):
+  - FILTER_NONE stored as 0
+  - FILTER_PTP_V2_L2_EVENT stored as 0x12 (ENABLED | TYPE_V2_L2)
+  - FILTER_ALL stored as 0x16 (ENABLED | TYPE_ALL)
+
+Old ravb_rx_rcar_hwstamp for RAVB_NC queue:
+  get_ts = (0x12 & 0x06) & 0x02 = 0x02 & 0x02 = 0x02 (timestamp)
+  get_ts = (0x16 & 0x06) & 0x02 = 0x06 & 0x02 = 0x02 (timestamp)
+
+So the old code timestamps RAVB_NC queue packets for both
+FILTER_PTP_V2_L2_EVENT and FILTER_ALL.
+
+New ravb_rx_rcar_hwstamp for RAVB_NC queue with FILTER_ALL:
+  get_ts = (HWTSTAMP_FILTER_ALL == HWTSTAMP_FILTER_PTP_V2_L2_EVENT)
+  get_ts = (1 == 9) = false (no timestamp)
+
+Similarly for non-RAVB_NC queue, old behavior with FILTER_NONE:
+  get_ts = (0 & 0x06) & ~0x02 = 0 & ~0x02 = 0 (no timestamp)
+
+New behavior for non-RAVB_NC queue with FILTER_NONE:
+  get_ts = (HWTSTAMP_FILTER_NONE != HWTSTAMP_FILTER_PTP_V2_L2_EVENT)
+  get_ts = (0 != 9) = true (timestamp)
+
+Can the refactoring introduce these two behavior changes?
+
+1. RAVB_NC queue with FILTER_ALL: old code timestamps, new code doesn't
+2. Non-RAVB_NC queue with FILTER_NONE: old code doesn't timestamp, new
+   code does
 
