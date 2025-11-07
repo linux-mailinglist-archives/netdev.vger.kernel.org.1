@@ -1,87 +1,87 @@
-Return-Path: <netdev+bounces-236699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CE95C3EFB6
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 09:37:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CA2CC3EFCC
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 09:39:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F0DD3ADDB0
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 08:37:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3797188C6FF
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 08:40:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 922B3310768;
-	Fri,  7 Nov 2025 08:37:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 862FE310768;
+	Fri,  7 Nov 2025 08:39:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ia1ZK1wV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4OF3KzRg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2F74310627
-	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 08:37:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFAAB2C1580
+	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 08:39:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762504639; cv=none; b=QOnY567IO4QjHoWNByo8EPiL7cgKcY+u6IgXiUDR/XgfaYYv/sVgugHjj7DO4CUPZCLJwHJMAmw5JnHhoTnIq2RkhI0zmcp6iJAp34KX96E5gUsvoGwtxOhMgTSFTmlucz31DIRrBpdFNO7L/QbqFqHHBcfPM+9xolZQgNGWEAQ=
+	t=1762504780; cv=none; b=G6XuksCEvJpEGOBn+KbjEFUxtQii1I5rx/0EwrXizrEaZWwolyOkQcOCY/E5W7dk+hYTfWhlqlVEjXB+GeftsjJnTj6628vca0QsjY7xQgTaFIFdvqbp7kGrIoFLY1Iyhm+iTC+0JWWVMmb7cV4QD7e+H4euYPrBhiq5jF5HoK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762504639; c=relaxed/simple;
-	bh=ZcRp2wy6tbxP6b7VzXvU0rEPtZp5mqsvIIQ2KkrLqEo=;
+	s=arc-20240116; t=1762504780; c=relaxed/simple;
+	bh=kYVE45xpcC90+XTYvaEHaf0WQiEfCqI7QosfDY/Pvfk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qIAHrK0E5HFDmumSCzl6I+ZXiXpScUxGgA5EifBKYhqrTpNAl6MKnFuG8hncvbAw2VqycEjPQpc05LqHgg29taeYYj3L5gSKzEVcHX/eJLj3u0Lzr1Y/VBDRSJL6p7bTkyuRNu+kyZH3cvHRHfBWR/xe5F1PoooZWCqVZIUG70k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ia1ZK1wV; arc=none smtp.client-ip=209.85.160.180
+	 To:Cc:Content-Type; b=N5cAGZ2BaR9fATz8XpXbho2kYAtMEIi2KlNWWufey5wSV6I8CjWncise7q1zPTg2y0OLfhR8/tcUcOxZA8+M0QfUhPyjsmVSl4fxFiCYKu+QrqFUtXJ6+kdiEdx9cRFDxHWXfwBJdkMYdh6DFRoubGHedvaraS9bvJv3LoUZQQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4OF3KzRg; arc=none smtp.client-ip=209.85.160.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4ed69197d32so6736571cf.3
-        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 00:37:17 -0800 (PST)
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4e4d9fc4316so4399051cf.2
+        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 00:39:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762504637; x=1763109437; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1762504778; x=1763109578; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NAHo1HzSbo/qjp6ufIhn6ZVedIIKjn3lQbr4hjVkzZ8=;
-        b=Ia1ZK1wVRlfMu71FhU77ciP++HVK6b9Kq9xoZ3MJZ0fULs3JF1iVft2Iw8EXFr/dDU
-         snBmWdRGrCCpxrTaLiQQhwoFgIIytETk8kEF4Cn+B7TmxGyfCOtw2WVjB8xXGYNNmNJF
-         BqMb7Z1evL3V9qgFXIVKefSTamPXj/wqpZd6NCGx96D9ucD4pFzsup35CtheVTF2altB
-         FjsaErHWhK1h/j9kNZWfXjjMMJhb6ROIQNKY87tCEZPAPpWjmQ9t71hNiFkiBzF/xPYC
-         LNBnRI/P1KM2DfkhWZxwCf3P7H9Hs596aOnpBtYxb8D2wZwy1bmRn3C/8PkANOlMM9S9
-         ZuyQ==
+        bh=kYVE45xpcC90+XTYvaEHaf0WQiEfCqI7QosfDY/Pvfk=;
+        b=4OF3KzRgkOvYfrSC6Pl/EhBdDcFubURBmY1n9Zqgj9taBwzkepLLpwmS4mKfXh29rG
+         ngb96Is3bacRymizEWLTpkkA/ZzfZ8zXJj/WIbH4ZF763cIjSiTaQeqwkoAklrz2Cq7u
+         TBhFksxt87k7D8D3k0SRin83ZQXwgRehYjtMGDuId56i7KNJJz2GY0Ki0g5qegavVWhY
+         FaTZNbxkcNSgT6ljOr1ZoDUBURv2gwD3+si1lkRV/Bv3ZAmJx86AO0GiYe/hpzYc4SCk
+         0mHuJJ774/wux9iR7bpTJsh2vmtBEObnUrlaqoQek4T9203uFDqGlcNrzKMr9BkQy1zI
+         PRig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762504637; x=1763109437;
+        d=1e100.net; s=20230601; t=1762504778; x=1763109578;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=NAHo1HzSbo/qjp6ufIhn6ZVedIIKjn3lQbr4hjVkzZ8=;
-        b=iNqQ0G34pE7DKLM0nDTOycHtCIZSj36iLXlzwz7N5aCm1SLPc5Ly+dyk6GfyRapwH+
-         pf8td4lK7JMPlQiTGADCO4IVdRSyBkGHkmAp8Reuy5eloRHs1KzFBaz6Zy7pYg685KJs
-         MiIw1WUMv0BWG0KueUDKX+JBC3a6YQCBGSygB1M4C86LOzKUf6OocM5SyzToBx8/Rai3
-         uKc6agFdvwC3rZiWjW8+RgWKkGj2QLj1vZpBRRO2Xlo7GsuRJsBbAugtR8gB1PUFt7Fi
-         j9CkDvOyFGyZaHoVj1gsq+Qr0V1847W4EvVQ3K/XbJ8WZ0kbp7UVs3bFqn9zJiJq2zmT
-         h4vA==
-X-Forwarded-Encrypted: i=1; AJvYcCVDcz+tYW4NY7d5VZvFueoj+0h94qOfgGpcmYEV1tikWntbq/pOS8Wm+5rT8PcN0R8HHLtLSSM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKH/8bgv6K11G+x9Zq1LcOvuad5uirBmO+MhjPRUXnEy1ckDuQ
-	PzXWAk61UwKpr3zC3fp2O+NtURnSwGD3PRHfWTVO2zys8IZLtiid7VHMJ0wywwEx+PzYam814wO
-	7S8/IQush67nprqRnUtPn3ypGgxAqMXFC8dhjCnZl
-X-Gm-Gg: ASbGncsvrAW1nRGhonxtZ7GPIXRQHLMQbYLlyOGWwwlMa9E9mG9iK0cAoEzkNfeslTD
-	sDK39+JmAhxaIZ0QvTuc+KE4/DXuHXGt4W7klGsSMQtQigSS/stWIFl6w+f9v3dkAZf/RQW7Mvy
-	EktDbdA7elPtGM2Mmkl/UTMsbHpfzdI44UoCjg+TE9u3LRV3Il4nQbGGvwFd6vxfzAiz9T737ky
-	cYhXYAIZ8UCPJvVymFu2fy43d+248eGTxTUHqkdCPgSkYYDeGF+fMgbeXvf3GgIESMES1Ux
-X-Google-Smtp-Source: AGHT+IGAsBRUPSkKmJbr8pafQhg7lmSw2lkFyie4shHo35ZXjciQYO3XM1JIg0qxoIko62h34jnJa962xGRLJCvlpx0=
-X-Received: by 2002:a05:622a:1455:b0:4b7:9f68:52d6 with SMTP id
- d75a77b69052e-4ed94939baemr24499511cf.9.1762504636486; Fri, 07 Nov 2025
- 00:37:16 -0800 (PST)
+        bh=kYVE45xpcC90+XTYvaEHaf0WQiEfCqI7QosfDY/Pvfk=;
+        b=E/j0zSQlO5IvaSeRco7lS0O5tBEUDCRfssK2SEZ56psZiNE3hEWMWf4QbB+mhEe2QQ
+         GRx2/SbY+w4730HgCSTN6f+puHVuAs+Q0TJgV/5SHSzmiT0Ca6MpDRv8g3U15RAAI6hC
+         JsOQ98sIFQYRurp4j5BQzuPQ4p9o4djo3rgjWCe0LsOrD7IgRCOYKdRpy9PnlsjzBWhV
+         MMlIKznRw8NjVvlR/jAwyoDzmesAG28cFcLE7/ONcC2BLTtPBZk+zUvcfoG9r8Gzgq4e
+         z49JSpQ5R7REJ1jKLjTMimSJ1jyxI5BIC+fCe83uPRcxWUxyeHXC+P/lVJiZdAhK20m5
+         //rQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVd8HivdDlyS332Cq1qUDMUPrhC1YnQ1yp8yLJBwPRz8CMtdreKTPPNyTAbV+RbBkNyRw+AnrA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyhAR/NRlrIfUKUc1ooee3d9JchCnSLCjWYiIKHAzTTPSi8MvNF
+	2nzKb0drpBJzMt8UnqHSe417VH0AIDl+S8713P7nR62oVZDz7dHWqVy/WJSRUyQdMLJyzKf+UUS
+	Hj7L/8na8yd4tj34+4zoumViazHSEXb6t4uN9GTEz
+X-Gm-Gg: ASbGncusRMctfGD+Fl3B/llfdUBIzPcKw4uIkSmB0uM9miupdC4TfIB5zq6gy0Tx6tx
+	gySIk4MvC2rcMI4ROwxg8CRQkQgDdadMFO9BYliZwtmqm4w25e5SD5bJJnyPPJ1WQG/C1xVscHy
+	zwKJKewk8CZ92sGLUXNfqN+WHO0dYr5MSoBa7+fPU1Akdk5wl5wxKwWY4rPqT7YAFbCc5cBUDP6
+	J7k9eziX/2Q0z7bSvIRIXgl1fLNCqEW9HohHBhJf1XM9k4Qs9QjC6y46PzwwA==
+X-Google-Smtp-Source: AGHT+IHbrojSXnBJKENzwsj6FeMBGmlNP99VjtuqLu8+oamkq1eYMf4xpuaFFcIUv90NoMBnb1S4el847tZOPRDfjlI=
+X-Received: by 2002:a05:622a:19a8:b0:4b5:ea1f:77ec with SMTP id
+ d75a77b69052e-4ed94805f1amr27532541cf.0.1762504777577; Fri, 07 Nov 2025
+ 00:39:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251106003357.273403-1-kuniyu@google.com> <20251106003357.273403-4-kuniyu@google.com>
-In-Reply-To: <20251106003357.273403-4-kuniyu@google.com>
+References: <20251106003357.273403-1-kuniyu@google.com> <20251106003357.273403-5-kuniyu@google.com>
+In-Reply-To: <20251106003357.273403-5-kuniyu@google.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 7 Nov 2025 00:37:05 -0800
-X-Gm-Features: AWmQ_blo9-Y_rIFKnj6lDR4CyGMzE2TvKpqpTpyCsXFXY0i0NFDiKgVmz4i0pN4
-Message-ID: <CANn89i+CntWvmzsSVOzUDTw4Cb0cf3-83C8Y7ByPxD7iN38vtw@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 3/6] tcp: Remove redundant init for req->num_timeout.
+Date: Fri, 7 Nov 2025 00:39:26 -0800
+X-Gm-Features: AWmQ_blSmLIAN8RykrYkSdNmh5bJb7yb7W8mJWUASSFcivvY__oEfqpUWdvevvM
+Message-ID: <CANn89iJUpAELx3ej0RyNH6XXGE_QDnY_QHiHe6ZXA36usLxgPQ@mail.gmail.com>
+Subject: Re: [PATCH v1 net-next 4/6] tcp: Remove timeout arg from reqsk_timeout().
 To: Kuniyuki Iwashima <kuniyu@google.com>
 Cc: Neal Cardwell <ncardwell@google.com>, "David S . Miller" <davem@davemloft.net>, 
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
@@ -92,29 +92,12 @@ Content-Transfer-Encoding: quoted-printable
 On Wed, Nov 5, 2025 at 4:34=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.com=
 > wrote:
 >
-> Commit 5903123f662e ("tcp: Use BPF timeout setting for SYN ACK
-> RTO") introduced req->timeout and initialised it in 3 places:
+> reqsk_timeout() is always called with @timeout being TCP_RTO_MAX.
 >
->   1. reqsk_alloc() sets 0
->   2. inet_reqsk_alloc() sets TCP_TIMEOUT_INIT
->   3. tcp_conn_request() sets tcp_timeout_init()
+> Let's remove the arg.
 >
-> 1. has been always redundant as 2. overwrites it immediately.
->
-> 2. was necessary for TFO SYN+ACK but is no longer needed after
-> commit 8ea731d4c2ce ("tcp: Make SYN ACK RTO tunable by BPF
-> programs with TFO").
->
-> 3. was moved to reqsk_queue_hash_req() in the previous patch.
->
-> Now, we always initialise req->timeout just before scheduling
-> the SYN+ACK timer:
->
->   * For non-TFO SYN+ACK : reqsk_queue_hash_req()
->   * For TFO SYN+ACK     : tcp_fastopen_create_child()
->
-> Let's remove the redundant initialisation of req->timeout in
-> reqsk_alloc() and inet_reqsk_alloc().
+> As a prep for the next patch, reqsk_timeout() is moved to tcp.h
+> and renamed to tcp_reqsk_timeout().
 >
 > Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
 
