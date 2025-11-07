@@ -1,106 +1,71 @@
-Return-Path: <netdev+bounces-236598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DD54C3E3C7
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 03:22:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB88AC3E409
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 03:32:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 577374E0EC4
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 02:22:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BC5B3AB67E
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 02:32:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBD242D781F;
-	Fri,  7 Nov 2025 02:22:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF7902D9ED7;
+	Fri,  7 Nov 2025 02:32:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DqUXaJWB"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GH3vDB/y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 137D02C0F89
-	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 02:22:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFD8118DB1E;
+	Fri,  7 Nov 2025 02:32:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762482156; cv=none; b=hCaF8PUiVYkaDwPuwjhBg8+M+zJ3qg809QIQmgwPft7NG+6EUrwRQ4p1HOAP2z8SfKmsN/4JrKxlpj+C+xA+UvO1nmSTUbqdcdi6ojOZV/KV5A+Q9AQSHKoG++ONjs5IIWflmcJ1pvIzXq/y9Ksq7gqxx+fzBOt7fPAl6g+t+CU=
+	t=1762482751; cv=none; b=imppQYcaqp8TGrlpoeENHoXZKrC+UbgyZZMWMmFqJvSOI8JyLEgJhG+PgejWr4SquhN+WQrIAbrC/AtUzMJswWBtzQYcJW7xjFH2ZCVA0g1uCjX4jkaWK6UWI4WJpkYP8gttgW/owYu5I5ssNwVytcEpzUbx1GJqnH8rK59m0+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762482156; c=relaxed/simple;
-	bh=2wJsYMHByxXf8C901yNivTAphL8IDvSKSXz3egAjoMA=;
+	s=arc-20240116; t=1762482751; c=relaxed/simple;
+	bh=8AZUtJSjZbIu0bdghP1eunb4IxNIfI0QWmogY0q3qP8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uzLbCvyYcwfLrrg9YdsC4EldNH1ZNh71BWGLwvQuVpjIvTOiDo6nlGsJ68d8BLqGuVueazdppzIjjNVRXRIUG7pxKRpbDsZEqXycp+zXydV7CMwrKNeaeHIhHFQvSm2gglTRRsnsLjiLCKOukQediUaVLkfE6pvyS6H+AAv0TvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DqUXaJWB; arc=none smtp.client-ip=209.85.128.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-781421f5bf5so2508717b3.3
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 18:22:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762482154; x=1763086954; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=x9ARDwGb0uPrxOLhySJFLBJZQJy4UrXx7An6ywngF4w=;
-        b=DqUXaJWB5PXNmMbZbMmV8yU2xnR+VMGbcSefumrZ2KC0fP4PSExfVQyBH7/dN4XMy8
-         bP3JRnp97MEXxuTF9MK1pNo85R2zbXJKuQF3Ki+uCo7FZT8Zk6vXEl2qdn5FC2EP7qFP
-         yk/d3OxPE5xIUNnSZ8nX/msDGXjfhRxnAHUXjkZnlHaXtcXGvgjiPX1sv5F4yyvw+DSM
-         GUraAmB8Uh7dYG/FU658NtFUownW1LBaX2F8wsByylqGJ/z66YItnMxksifX4KDNRvRE
-         kmi8Ivq4cEGkJyq2a/PpZnX3jEgmIxPgGlS/CYYx8uufjNsIcY67wvCvwc/14V8GcOVC
-         LHXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762482154; x=1763086954;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=x9ARDwGb0uPrxOLhySJFLBJZQJy4UrXx7An6ywngF4w=;
-        b=Z9q8sRnxZ4tO6MspmBHCM+HCwLWJbi257hG0CyyfZdl48tyEik+8sTkFk6Sx93T0+P
-         shWIYi4Usev6b0BZ3wS8vnX+q9gxTxZWji1YPJADhaRJw3BMfYME2zn7nFxmugB/k2fr
-         r1fJxeHCHM6EjEHlxcU1SxzYl5zlcPd3TFMcIRVtawIfS/veRq9L9cR9k9qb1IjMaxc6
-         bBbCBxHN3H9hYf4r+JXCVTs/hbuRX8fvP1y1gPmaUFSQe5SIuXID3RbUECqPaW7+iH2D
-         npVzHx3rE5P03ntGeKtL77uD21uAQKGk2uSLFRkuR02Wnk3xbGGnAQL+ZNeN62kfV8Im
-         K7Ww==
-X-Forwarded-Encrypted: i=1; AJvYcCXw10+cBDbwpflr3Ng6it/JtZibenkQCsgKPwbgd3Iqmp6RMHi2BALnOXW5oXbVdPkV3oALX3Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwkQK9oQhortR5EgbZ3zq4AlzT4+FsTc3yF2pPUORoIUH0DNQHT
-	zHdPG2EVkL50eP3Bj1+ui4OAI5XnW9by6CCfVeOhvot0qtC3Zlj+uEgb
-X-Gm-Gg: ASbGncsyTMNltXy5Iw1ovqlCl3WiD2dlHHl+ecl9pfcvAbsQflMUHZCbvRmvts454hP
-	aL4I8pqnZdc3c1cvryhMRR4oe+zQV/HaxwjZLcg8MQvUtE/W3sOyUJabdF8GMGLVzhwEsJZIOOF
-	nbvrg/Vk0MK3CaglEk4+K/DCd/v0goKlCSPLy3LBxQdVf0Y0JO4lJ1pPnDHgtZw3r4nlR62VpH/
-	roOkyCW+BAXrPz6c6rs4N4QcJojv4LRq10pfh/9dR70O7smRx6crJO/bg1jvE5iQeXmwRfVhKXI
-	xJqi3YojMw2ebBped6QXqAL1XuS0jlAXH1l3hr1EpgBoLbL5sVIK5+VDpqKCZkTmGmvgcjYcWur
-	VnrqDACpMKPKUfTN/nMe3AvpbIkP1jLnpN0ACnZYectTKXT7rwubIpPWPLVeUIqfBzyIFPvfMTV
-	0RqbR09SRbzUkd26K975we3gDfPAvJ257fCcBY
-X-Google-Smtp-Source: AGHT+IExkQylr1jShV9Ea1kIXdpiUjvn8t/+xJOL3Cfgf/yFTKueS7J/oTfsuiw/7plu274iEpUp6A==
-X-Received: by 2002:a05:690c:6f8a:b0:787:badd:4c with SMTP id 00721157ae682-787c534ae89mr26865527b3.27.1762482153981;
-        Thu, 06 Nov 2025 18:22:33 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:40::])
-        by smtp.gmail.com with ESMTPSA id 956f58d0204a3-640b5c91334sm1361787d50.1.2025.11.06.18.22.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Nov 2025 18:22:33 -0800 (PST)
-Date: Thu, 6 Nov 2025 18:22:31 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Mina Almasry <almasrymina@google.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=NJmzlcqkqDd5+KbZp+cz6cpsqh9i+xyWxPuB20b63y//Rxqp7B+Qvl5AQfQ5ECEMIrzDBsTP0t6aIpB3ZLHpboreFLatncXHPEdbJzTDp2+wy9VDaUJkcbgpR2h06sMZTtw4rVW5KZI1WE7PIWHiOBtx2cfNKTlFdnwE/pXSU6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GH3vDB/y; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=oqZYRwITV1tIClSNKZT4kQ9NDRETBwvBumZWmmbLSGo=; b=GH3vDB/yuN2m28NbUXVt3k3Fad
+	MN5iO/zI4OfUmGuyudGhXiyYoL4uZtFJaA4Cus7/uEiVhlOikdWi41Se+SvzuXmruq/5g93CTh+4f
+	jWpoYrw4ZUn4OpD6vq20GhbFyo5bwpQpqZnfeVgVqJ5VvC0e4K9iJRz/cRJPqqNO8Qzs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vHCGu-00DB5C-Fb; Fri, 07 Nov 2025 03:32:16 +0100
+Date: Fri, 7 Nov 2025 03:32:16 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Michael Dege <michael.dege@renesas.com>
+Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Neal Cardwell <ncardwell@google.com>,
-	David Ahern <dsahern@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arch@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v6 5/6] net: devmem: document
- SO_DEVMEM_AUTORELEASE socket option
-Message-ID: <aQ1X55NjyDU806Tc@devvm11784.nha0.facebook.com>
-References: <20251104-scratch-bobbyeshleman-devmem-tcp-token-upstream-v6-0-ea98cf4d40b3@meta.com>
- <20251104-scratch-bobbyeshleman-devmem-tcp-token-upstream-v6-5-ea98cf4d40b3@meta.com>
- <aQuKi535hyWMLBX4@mini-arch>
- <CAHS8izNv89OicB7Nv5s-JbZ8nnMEE5R0-B54UiVQPXOQBx9PbQ@mail.gmail.com>
- <aQumHEL6GgxsPQEM@mini-arch>
- <aQva8v22RVQEgPi_@mini-arch>
+	Richard Cochran <richardcochran@gmail.com>,
+	Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund@ragnatech.se>,
+	Paul Barker <paul@pbarker.dev>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>, netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	Nikita Yushchenko <nikita.yoush@cogentembedded.com>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: Re: [PATCH net-next 09/10] net: renesas: rswitch: add simple l3
+ routing
+Message-ID: <06213fb1-12dc-4045-803e-d2a65c7e9fc6@lunn.ch>
+References: <20251106-add_l3_routing-v1-0-dcbb8368ca54@renesas.com>
+ <20251106-add_l3_routing-v1-9-dcbb8368ca54@renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -109,31 +74,137 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <aQva8v22RVQEgPi_@mini-arch>
+In-Reply-To: <20251106-add_l3_routing-v1-9-dcbb8368ca54@renesas.com>
 
-On Wed, Nov 05, 2025 at 03:17:06PM -0800, Stanislav Fomichev wrote:
-> On 11/05, Stanislav Fomichev wrote:
-> 
-> Thank you for the context!
-> 
-> I think that the current approach is ok, we can go with that, but I
-> wonder whether we can simplify things a bit? What if we prohibit the
-> co-existence of autorelease=on and autorelease=off sockets on the
-> system? The first binding basically locks the kernel path into one way or
-> the other (presumably by using static-branch) and prohibits new bindings
-> that use a different mode. It will let us still keep the mode on the binding
-> and will help us not think about the co-existance (we can also still keep
-> things like one-dmabuf-per-socket restrictions in the new mode, etc).
-> 
+> +void rswitch_update_l3_offload(struct rswitch_private *priv)
+> +{
+> +	u32 all_ports_mask = GENMASK(RSWITCH_NUM_AGENTS - 1, 0);
+> +	struct rswitch_device *rdev;
+> +	bool l3_offload_enable_cond;
+> +	u32 l3_rdev_count;
+> +	u32 l3_ports_mask;
+> +
+> +	l3_ports_mask = all_ports_mask;
+> +
+> +	l3_rdev_count = 0;
+> +	rswitch_for_all_ports(priv, rdev) {
+> +		if (rdev_for_l3_offload(rdev)) {
+> +			l3_rdev_count++;
+> +			l3_ports_mask &= ~BIT(rdev->port);
+> +		}
+> +	}
+> +
+> +	l3_offload_enable_cond = (l3_rdev_count >= 2);
+> +
+> +#define FWPC0_L3_MASK (FWPC0_LTHTA | FWPC0_IP4UE | FWPC0_IP4TE | FWPC0_IP4OE)
+> +	rswitch_for_all_ports(priv, rdev) {
+> +		if (rdev_for_l3_offload(rdev) && l3_offload_enable_cond) {
+> +			/* Update allowed offload destinations even for ports
+> +			 * with l3 offload enabled earlier.
+> +			 *
+> +			 * Allow offload routing to self for hw port.
+> +			 */
+> +			rswitch_modify(priv->addr, FWPC1(rdev->port),
+> +				       FWPC1_LTHFW_MASK,
+> +				       FIELD_PREP(FWPC1_LTHFW_MASK, l3_ports_mask));
+> +			if (!rdev->l3_offload_enabled) {
+> +				rswitch_modify(priv->addr, FWPC0(rdev->port),
+> +					       0,
+> +					       FWPC0_L3_MASK);
+> +				rdev->l3_offload_enabled = 1;
+> +				netdev_info(rdev->ndev, "starting l3 offload\n");
 
-That approach is okay by me.
+This, and the other netdev_info calls should probably be debug.
 
-Best,
-Bobby
+> +static bool rswitch_l23update_hw_op(struct rswitch_private *priv,
+> +				    struct rswitch_l23update *update,
+> +				    bool install)
+> +{
+> +	u8 *dst_mac = update->spec.dst_mac;
+> +	u32 val;
+> +	int ret;
+> +
+> +	val = FIELD_PREP(FWL23URL0_RN, update->index) |
+> +	      FIELD_PREP(FWL23URL0_PV,
+> +			 install ? GENMASK(RSWITCH_NUM_AGENTS - 1, 0) : 0);
+> +	iowrite32(val, priv->addr + FWL23URL0);
+> +
+> +	val = FWL23URL1_TTLU |
+> +	      FWL23URL1_MSAU |
+> +	      FWL23URL1_MDAU |
+> +	      (dst_mac[0] << 8) | (dst_mac[1] << 0);
+> +	iowrite32(val, priv->addr + FWL23URL1);
+> +
+> +	val = (dst_mac[2] << 24) | (dst_mac[3] << 16) |
+> +	      (dst_mac[4] << 8)  | (dst_mac[5] << 0);
+> +	iowrite32(val, priv->addr + FWL23URL2);
+> +
+> +	iowrite32(0, priv->addr + FWL23URL3);
+> +
+> +	/* Rule write starts after writing to FWL23URL3 */
+> +
+> +	ret = rswitch_reg_wait(priv->addr, FWL23URLR, FWL23URLR_L, 0);
+> +	if (ret) {
+> +		dev_err(&priv->pdev->dev, "timeout writing l23_update\n");
+> +		return false;
 
-> I think for you, Mina, this should still work? You have a knob to go back
-> to the old mode if needed. At the same time, we keep the UAPI surface
-> smaller and keep the path more simple. Ideally, we can also deprecate
-> the old mode at some point (if you manage to successfully migrate of
-> course). WDYT?
+Why not make this an int function and return -ETIMEDOUT?
+
+> +static bool rmon_ipv4_dst_offload_hw_op(struct rswitch_route_monitor *rmon,
+> +					struct rmon_ipv4_dst_offload *offload,
+> +					u8 frame_type, bool install)
+
+Why all this bool functions? Especially when you have calls returning
+error codes you are throwing away.
+
+> +static struct rswitch_l23update *rswitch_get_l23update(struct rswitch_private *priv,
+> +						       struct rswitch_l23update_spec *spec)
+> +{
+> +	struct rswitch_l23update *update;
+> +
+> +	spin_lock(&priv->l3_lock);
+> +
+> +	list_for_each_entry(update, &priv->l23_update_list, list) {
+> +		if (rswitch_l23update_matches_spec(update, spec)) {
+> +			update->use_count++;
+> +			goto out;
+> +		}
+> +	}
+> +
+> +	update = kzalloc(sizeof(*update), GFP_ATOMIC);
+> +	if (!update)
+> +		goto out;
+> +
+> +	update->use_count = 1;
+> +	update->spec = *spec;
+> +	update->index = find_first_zero_bit(priv->l23_update_bitmap,
+> +					    RSWITCH_MAX_NUM_RRULE);
+> +	if (update->index == RSWITCH_MAX_NUM_RRULE) {
+> +		dev_err_ratelimited(&priv->pdev->dev,
+> +				    "out of l23_update entries\n");
+> +		/* FIXME: trigger expire? */
+> +		goto no_free_bit;
+> +	}
+> +	set_bit(update->index, priv->l23_update_bitmap);
+> +
+> +	if (!rswitch_l23update_hw_op(priv, update, true))
+> +		goto hw_op_failed;
+> +
+> +	list_add(&update->list, &priv->l23_update_list);
+> +out:
+> +	spin_unlock(&priv->l3_lock);
+> +
+> +	return update;
+> +
+> +hw_op_failed:
+> +	clear_bit(update->index, priv->l23_update_bitmap);
+> +no_free_bit:
+> +	kfree(update);
+> +	update = NULL;
+> +	goto out;
+
+It is pretty unusual to have a backwards goto, especially in error
+handling. This is one case where a scoped_guard() might make sense.
+
+	Andrew
 
