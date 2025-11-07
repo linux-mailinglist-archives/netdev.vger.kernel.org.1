@@ -1,232 +1,166 @@
-Return-Path: <netdev+bounces-236789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15484C40253
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 14:37:22 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFCB1C402B3
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 14:43:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8DA7D188A6C1
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 13:37:46 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2CFC94F1048
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 13:43:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB3242EC08C;
-	Fri,  7 Nov 2025 13:37:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 080C22F691B;
+	Fri,  7 Nov 2025 13:43:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b="gaEKcgN9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="APmylv60"
 X-Original-To: netdev@vger.kernel.org
-Received: from TYVP286CU001.outbound.protection.outlook.com (mail-japaneastazon11011013.outbound.protection.outlook.com [52.101.125.13])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6363C2E975E;
-	Fri,  7 Nov 2025 13:37:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.125.13
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762522637; cv=fail; b=pG3h8RQ8DPg++FG2QOtdIzX6Msak4KcjLOLGDl0UcURkFTtEGh3TmMBNRtAElSbdyg/HlsFlLD+3sJ48OG7oX9QEqtxUufYvTGVvDeZCOqfXD1yCIlioT5XMImwaTOI1YfctYKLlyeweNsxgtA/s3YVhnK/ZYEqEP9umjpq1Ipc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762522637; c=relaxed/simple;
-	bh=ZvSJ0sRnhfQvUUPJyD7GRVSl0MFC1JB6WKCtFKwQn3A=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=KUvqBZwWn28ZIiXTnze/O3dwtOoBpFlX0qFq9qrLdNyuXTTLk6rDaMRKgs94R1ExmqvtG3moOVR38HwkdOl9d6nwhcAhqfTqzt2KHi34X0s8q57eFv6TdV4od+jMsTxERiTa+vYSepZwRyAHcNGacyOhDzSF0jsdsH4xVDnMHDg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com; spf=pass smtp.mailfrom=renesas.com; dkim=pass (1024-bit key) header.d=renesas.com header.i=@renesas.com header.b=gaEKcgN9; arc=fail smtp.client-ip=52.101.125.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=renesas.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DPF7hU1+lYwBto0tuOtymynub0yfSuSSth3eytjWMVPs/SUkBq3pespuzwsnYHbcKeyU7A04nARtI+Nrx1Fp8Vf7X3Ors3VPEBAJzjVZfYKbLK6agt7Cq0j9i68U7m3jOlu5R59K+phJeuEtgvO5gid2alT7tymhGPtguwZTIamytF+qoET0BvpTVaobBBAVUZYXRH3OkPh1/R/YNOLsRRlLYKBW70P2GAkEhnVoGbOpWBf/sGWglHykyoaJWvhR6kv7snfHivleAsdc2D9oZGPf3RT407ccQqb//KnxpDg7S/vziOjUVhuKoroeURb5UdKq0vycHysjwMadDfWUjw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zf2JlL9cWhrbZNDykihDqwTk7v7m20q0JsLVucnt3CE=;
- b=WMMV5y7SIrwW3vJSfmSExU1UN0xSLSw5I9oJ3hD9WSvZmXm1614tZSOzNG4lf10lB/WJRg0zQhsJQoZVJgFFcBtGoj74ZVtwaf1v4yBmTmbsdMFTmEEH8PYIKxNzoCeMik9nGm3Mlue46Cya2kzbaCniXZmZL7icDCkLsUbo07vZuMCXincC1qtrbbdggf2l++jtHi7md8vXdkY83sfDwO6oZ9ZJ25CFeJwNKMFgqRZi3ZBLF2Adu7pL0h4cWRT8jexDkkMNU8sFmYIn90FtwPnI5tL+MLJSUDfteKd04Q0bhiyWG7ItXjE7IzNl6ejXhsteaqaXbrPwKic/Ci9lvA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=renesas.com; dmarc=pass action=none header.from=renesas.com;
- dkim=pass header.d=renesas.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=renesas.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zf2JlL9cWhrbZNDykihDqwTk7v7m20q0JsLVucnt3CE=;
- b=gaEKcgN9bdBJpdSE1lVBspful5tzdh/vIc6UPUOz3RFt6GSdBEXNn63PsSCFY1K7EtbY09ljF+53V6NkgBxKjc3Q96cfIx0pzBO9m8AQb5iMkabw5d5eEnUb7qg87x4G2MYNEA/e7bKQq4PzweScsn9jQngmx6aUl2IeltBD29Q=
-Received: from TY4PR01MB14282.jpnprd01.prod.outlook.com (2603:1096:405:20d::9)
- by OSZPR01MB9548.jpnprd01.prod.outlook.com (2603:1096:604:1d5::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.12; Fri, 7 Nov
- 2025 13:37:09 +0000
-Received: from TY4PR01MB14282.jpnprd01.prod.outlook.com
- ([fe80::37ea:efd9:8ca0:706a]) by TY4PR01MB14282.jpnprd01.prod.outlook.com
- ([fe80::37ea:efd9:8ca0:706a%6]) with mapi id 15.20.9298.010; Fri, 7 Nov 2025
- 13:37:09 +0000
-From: Michael Dege <michael.dege@renesas.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>,
-	niklas.soderlund <niklas.soderlund@ragnatech.se>, Paul Barker
-	<paul@pbarker.dev>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
-	<krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Geert Uytterhoeven
-	<geert+renesas@glider.be>, magnus.damm <magnus.damm@gmail.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Nikita Yushchenko
-	<nikita.yoush@cogentembedded.com>, Christophe JAILLET
-	<christophe.jaillet@wanadoo.fr>
-Subject: RE: [PATCH net-next 02/10] net: renesas: rswitch: enable Phy link
- status pin
-Thread-Topic: [PATCH net-next 02/10] net: renesas: rswitch: enable Phy link
- status pin
-Thread-Index: AQHcTxyxrfXSRPKSRUepba0KAxc+aLTmagKAgADO1DA=
-Date: Fri, 7 Nov 2025 13:37:09 +0000
-Message-ID:
- <TY4PR01MB142828212650327073195FE4382C3A@TY4PR01MB14282.jpnprd01.prod.outlook.com>
-References: <20251106-add_l3_routing-v1-0-dcbb8368ca54@renesas.com>
- <20251106-add_l3_routing-v1-2-dcbb8368ca54@renesas.com>
- <eda96e9b-2a35-42e8-b1dd-ffde39644fbf@lunn.ch>
-In-Reply-To: <eda96e9b-2a35-42e8-b1dd-ffde39644fbf@lunn.ch>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=renesas.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: TY4PR01MB14282:EE_|OSZPR01MB9548:EE_
-x-ms-office365-filtering-correlation-id: 9cad7b65-283d-4a3c-1460-08de1e02c045
-x-ld-processed: 53d82571-da19-47e4-9cb4-625a166a4a2a,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|376014|7416014|1800799024|38070700021;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?KODNQQmnm9EDGHEjoYk2tN0NlezpLRg0HaadSj7wV2QkwD+YxFhpCNCQAHEc?=
- =?us-ascii?Q?ZYaUQKi1KVUtGJ2WweQ+40pszgZn7gg3SBWQEGATE8cn1HGACWScfOOSTGva?=
- =?us-ascii?Q?cmLzuEJ8iufX23InVVMEIqRpujdRt4jEBYp6XFmETu6JBvCeqPWLp6Fdm+r6?=
- =?us-ascii?Q?UzGaRX31W9U/YYD/jlklBB68/iZzDlnUzTPCVQp4RRzqw+xcI3dY8ceaBzkC?=
- =?us-ascii?Q?29lMVjyFCiEbl0dhwTkpWaR7LkeBnWUNDLpNJZ0mpS/XyCa6LJpdASunMdy/?=
- =?us-ascii?Q?/1J0HEu67tLrxpWKf0/B5k7taDpFkU0ea+RjYhH5BkOVjteujaTCQ8mGz0KE?=
- =?us-ascii?Q?XCjnXY8eRfY8Ij6e2Jubz+o3e+nDzs0vheZVuVUEamfyKWolBqFOBvGOdeoJ?=
- =?us-ascii?Q?GhWfn3/p+7oNjR+VUzGoanJhfGBlQexuEexrpscEhlXSmIQCBjg1utOtbiz8?=
- =?us-ascii?Q?sjNFOSvDBjbcddGUN7szf76C13ibyYsqj5LAhrhwYnA7457IsnDpDtTiAluE?=
- =?us-ascii?Q?1iv/RKvmdMtrKKu6mC9jjfo80RLk8SCi1vdUzZMzg0jX/Ba+5LZxtbX1h699?=
- =?us-ascii?Q?LzfiOglXkTlGssLaZoKJFyv4wj4rwlcIr2QvJLOOh1kyCmRTBvIYiJFPVuda?=
- =?us-ascii?Q?CXzuu8d76Snk9sFLNltyRJtnLR6wcjYw+PyFwBCRxPrLeAmCusDwg0++4JvC?=
- =?us-ascii?Q?tJ/RrVWVU9TxoBwgsvSpJZHMawGp1a0HB1gAoMHfSGf8SXQ58EpjsoaTUY0K?=
- =?us-ascii?Q?zbP/8PNmbF2cndtehlSW2Pu+R7ZdgjHxbOl0ZpWQfG/3wknrCMzdWGCalRa1?=
- =?us-ascii?Q?z1r8MlOkR9Tj25ORSyCKYrAYjaqrLungqzBmVXjPc8wt2La8iwuQQF944wus?=
- =?us-ascii?Q?afJlYiZho5IyKy0t2h4/Ov1kENGfnHOc4WQoJ41WfFJDVTVeAyfIk9ldmiCv?=
- =?us-ascii?Q?VrSLwoknyVMpnR7S/Ke9KvLypd44mj8DCQyHH7sxr5+ulQmRDpyjq8a71uFa?=
- =?us-ascii?Q?eFlDhriv1ZpJWBM+Hdy26KSknYLJKWISVhFWUO/8xQpkWApxg6pz46L/CFYH?=
- =?us-ascii?Q?P2lO1AFRDPe6PNSvzZ8j8fSRKfQndO9E7zfFTtRBykiljak3jOuv184RCyQs?=
- =?us-ascii?Q?XqrVtPvF+K+18MPaYIeNfslEhLFtchrFmkmSOVJX4yChY/icQp6Zf9K7Wd+I?=
- =?us-ascii?Q?VjafwZSXt1BesQVig7IY+pEHs1cxQaxy/wkWGpvjaWxd0rzUei23SUIXXtYU?=
- =?us-ascii?Q?DSggFRbtghfw68zRn+bnZXQ3kSKanUuzZApPbsW9zDBpJGo8PCM6g+EG3VVv?=
- =?us-ascii?Q?TwEVK12t9DNrfVA0A0SwaMRUYGIxwCwP6SadiSAxZj6QETe6qP9qvRh9VppP?=
- =?us-ascii?Q?uHqks2uDzol1c49fLyJ4m4XrxO0KqtNOCsTsMnHJ0VseozVKSfGDkQmt/iey?=
- =?us-ascii?Q?17se3kZsA7McdW9cgC+XecSXODd1pq1ebp2WzqdgC8jHBz08M0c+1bv4+zUm?=
- =?us-ascii?Q?YVNEpSVzBNu23yCrQ1E4Fr7aOaZjurhxtESm?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY4PR01MB14282.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(38070700021);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?/w+Gd5Pf4DztsrD7DFm7taJEGN+k3T86hm2dKHAqVcUqb/foha66hydxOktS?=
- =?us-ascii?Q?eUV5S8LDwdojfDUb5A3CbkhkJynQcOn6MxboObdCvkb/+5jK255iPby3efBw?=
- =?us-ascii?Q?mod/QlyoQlIQ4O0gAL/bIvgOh/10hKBMg6Lz9qMJNtb6PWU+HLLq0UHgx9mB?=
- =?us-ascii?Q?/Ndi/zgatziT9QRtARhm2P4Ykx5/aAxgbmxFzuDjgfEfLClbyJpnZroFOV48?=
- =?us-ascii?Q?dR2CWiASrtRUBbTtvj9ogUyeFBWXNLFEfroffab79ROcilCuu1GjlE58GIMb?=
- =?us-ascii?Q?uArVLUUpUEBYIlb4tyAZEbpzuLVcjZL60+kHwKJz37PE4tjSQkSfrdNWP9oY?=
- =?us-ascii?Q?Xazr1ys0ZWgbmFr16Hh4H3kevi3SRc4fv0QNKVoYhhkTimP2ARQtOOrU2eU9?=
- =?us-ascii?Q?GitnIej0mkpzqsmc1YNxVHegdmPhoPTXB/Na0O+mSB2QxFeRwZWh6/geNGAx?=
- =?us-ascii?Q?kkoJDRd8cBwqlXY3J8MZL7/C/yPZmGql+DduRocDoxKRPleWSmktfwODNRpV?=
- =?us-ascii?Q?cw71iyZ8SR/sGhFvhXStHlOJxW1cXIwpIz/R9TGz5FjN9xKeK0X3OtZEDlRY?=
- =?us-ascii?Q?h8epLfXGYxCqHe/wHoJwxO1OiL2NrLzN/OGW2yElLyRBFfHF90czsV1dy04B?=
- =?us-ascii?Q?fUx5NJnnDLLWl+F5b6defjny8RqgtIctngOIpAK12Q7JzEMpBRWeKPEuS7iD?=
- =?us-ascii?Q?fg8l13QQ5Lswz0imk09XD2u2DPM/dSxiSdkMYQDBnePkS3kcRPwdFR1mQg8j?=
- =?us-ascii?Q?A0gNovj43C6wb7BC6Ly+xJblIOER7r69598hkYJX2bNAGidomYih19KVPkju?=
- =?us-ascii?Q?exm5LwoUff+dsD/YGA8ZN+fy2xNT5FwY8n80dTaxYqsCFFmLJXjMw/cPBwbE?=
- =?us-ascii?Q?nt9QFSoHl8zYOyhkOzryuODCyHjHpAC+uf6H7zyEq9rYoj6B3WbHethbHMof?=
- =?us-ascii?Q?sWmb8twieSrSnIVC+ZPVGWPOUTsPwumjB+uhYH+MxgOPrbi5DaPvkNgEa6LG?=
- =?us-ascii?Q?fGYyLgXG2EnlOlAJCFETwDA/z0UUulePix9HjHPsI9O3S5+J1ssOb2xjl3pz?=
- =?us-ascii?Q?DdZqVHglmBCgYNa4QPusiNdHPUArvsUmQBAgx6/QtbdVVzF6cEULxzwEo15j?=
- =?us-ascii?Q?L33rqZ8vLYO+wTT95t9u34NyQLm7xmKL90Ryt5y3UF8Mlf5eNqQwOh39u8Sd?=
- =?us-ascii?Q?4rWSBFu1dObjYzE5fYcrVCNDY5zz6Pe33/t70VgCratAj3r9+GuNq7IZTVCE?=
- =?us-ascii?Q?0EWKU3IwHZl9YBUiXWVZStc2L6v6fEv9lId18SE+hvAD7lN9M91VpCWcr1yB?=
- =?us-ascii?Q?G2HfltKGvbE2FeozRUzJomwerGu4kcxTYX/5Ld4is57QptSAf2DZM4dxnULF?=
- =?us-ascii?Q?kyWl30OVmF5yiDlAEPYhi86N3LG9zprOITpdzFbSWrhm5pzh/wRN+2UyEDVF?=
- =?us-ascii?Q?u4nlZIXfRLzdVwNjgommAqyuoY0mHLhJvGzHidLmdDP25C/u+y2UiKOg2OcF?=
- =?us-ascii?Q?U5Zkz4TB2Oug1R1Uy6SObt8EG8s20j4jnr64VEJVUN6n2sabQ0LiW5FpfmNA?=
- =?us-ascii?Q?fkbRq0G9Cl99cbX0A+d0NdDGHnAHV70jvXxijUUl?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD2912F2605;
+	Fri,  7 Nov 2025 13:43:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762522982; cv=none; b=Qrg0H+lEzTTE82i9gyB8PX2AG0/fp0gtUmB1C35IgesyVJn6zHqbv/swYidEQT06LfNsFXr8PX6wpaim0wQmzd30JS2w0XribjNzKhJnJydQx2m/StT5hgUUvoC5yU83Ej8kX3AkkRgTVCysehR6n9rLAfZf0GVSuGl95BjQ0jA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762522982; c=relaxed/simple;
+	bh=mVhNPlLjxSXohTIokzVQKOtrdJswU2kcvPbGFxRD4Ig=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=msLXmBcTpDeqfXBrzPADj1Umj4W+b+0F2eGlo0fzKE2+o+M8pKOG3pH/xIblL3XyW/yvGd3KNeaofp3aUBhhENAFkgsqfYR+R1eD7e6zUFG4erdbICBh1QFGcGvxDOuEhyKZ7GeKFf4mldQW3Ucun0mCVKH5/oGjTkFqpzKQmDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=APmylv60; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBDA4C4CEF8;
+	Fri,  7 Nov 2025 13:42:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762522982;
+	bh=mVhNPlLjxSXohTIokzVQKOtrdJswU2kcvPbGFxRD4Ig=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=APmylv60JbvoLid/67a1Lg2RUqkHsQeS27fqWkrDCeavaJYQCdjXy8wY6ud5MU+6+
+	 a1aOqgDi7sMGJMx9JkECexe3NyIeh1RM4BxFwBCaxosUXz6bpOByK3siWzcuOVTztW
+	 7MiCzKQ5fV3SvixxCCqyDpaaOC2Yri/TI0XQ4fkRq0h6YTdNDoY7/7VyS2IIuGpJm6
+	 AbjVvRQRI3Q5QG//gwAo8ec5jyhpXynjXbvjOqZQbRjJx4sGfBy8R41S4vu6Wm7Dx9
+	 sbhf1TTMAl+05Vs1ITmxlat8ACZXKISQxktdnP9GlRl/PeqDiZMYPsOK/0IKKAS2tY
+	 S1CgLdwCgUkVw==
+Message-ID: <b9f01e64-f7cc-4f5a-9716-5767b37e2245@kernel.org>
+Date: Fri, 7 Nov 2025 14:42:58 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: renesas.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TY4PR01MB14282.jpnprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9cad7b65-283d-4a3c-1460-08de1e02c045
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Nov 2025 13:37:09.7419
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: xaKQdVwgNSqdAjIw93wAcflupA5EHPcAv6AA7lWtb6prk/tr+zkzfRhD5aSv4MhLldQHSezfL9XzRHcvX4gyNkmteSTwqZu/vEJcpC0OZaA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: OSZPR01MB9548
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net V3 1/2] veth: enable dev_watchdog for detecting
+ stalled TXQs
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
+ <toke@toke.dk>, Eric Dumazet <eric.dumazet@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ ihor.solodrai@linux.dev, "Michael S. Tsirkin" <mst@redhat.com>,
+ makita.toshiaki@lab.ntt.co.jp, toshiaki.makita1@gmail.com,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kernel-team@cloudflare.com
+References: <176236363962.30034.10275956147958212569.stgit@firesoul>
+ <176236369293.30034.1875162194564877560.stgit@firesoul>
+ <20251106172919.24540443@kernel.org>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20251106172919.24540443@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
 
 
-> -----Original Message-----
-> From: Andrew Lunn <andrew@lunn.ch>
-> Sent: Friday, November 7, 2025 2:16 AM
-> To: Michael Dege <michael.dege@renesas.com>
-> Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>; Andrew Lunn <an=
-drew+netdev@lunn.ch>; David
-> S. Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jaku=
-b Kicinski <kuba@kernel.org>;
-> Paolo Abeni <pabeni@redhat.com>; Richard Cochran <richardcochran@gmail.co=
-m>; niklas.soderlund
-> <niklas.soderlund@ragnatech.se>; Paul Barker <paul@pbarker.dev>; Rob Herr=
-ing <robh@kernel.org>;
-> Krzysztof Kozlowski <krzk+dt@kernel.org>; Conor Dooley <conor+dt@kernel.o=
-rg>; Geert Uytterhoeven
-> <geert+renesas@glider.be>; magnus.damm <magnus.damm@gmail.com>; netdev@vg=
-er.kernel.org; linux-renesas-
-> soc@vger.kernel.org; linux-kernel@vger.kernel.org; devicetree@vger.kernel=
-.org; Nikita Yushchenko
-> <nikita.yoush@cogentembedded.com>; Christophe JAILLET <christophe.jaillet=
-@wanadoo.fr>
-> Subject: Re: [PATCH net-next 02/10] net: renesas: rswitch: enable Phy lin=
-k status pin
->
-> On Thu, Nov 06, 2025 at 01:55:26PM +0100, Michael Dege wrote:
-> > Enable Phy link status pin for boards which support this feature.
->
-> Probably repeating what others have said. Please zoom out and give us an =
-idea what a link-status pin
-> is? I don't remember seeing this term used before.
->
->       Andrew
+On 07/11/2025 02.29, Jakub Kicinski wrote:
+> On Wed, 05 Nov 2025 18:28:12 +0100 Jesper Dangaard Brouer wrote:
+>> The changes introduced in commit dc82a33297fc ("veth: apply qdisc
+>> backpressure on full ptr_ring to reduce TX drops") have been found to cause
+>> a race condition in production environments.
+>>
+>> Under specific circumstances, observed exclusively on ARM64 (aarch64)
+>> systems with Ampere Altra Max CPUs, a transmit queue (TXQ) can become
+>> permanently stalled. This happens when the race condition leads to the TXQ
+>> entering the QUEUE_STATE_DRV_XOFF state without a corresponding queue wake-up,
+>> preventing the attached qdisc from dequeueing packets and causing the
+>> network link to halt.
+>>
+>> As a first step towards resolving this issue, this patch introduces a
+>> failsafe mechanism. It enables the net device watchdog by setting a timeout
+>> value and implements the .ndo_tx_timeout callback.
+>>
+>> If a TXQ stalls, the watchdog will trigger the veth_tx_timeout() function,
+>> which logs a warning and calls netif_tx_wake_queue() to unstall the queue
+>> and allow traffic to resume.
+>>
+>> The log message will look like this:
+>>
+>>   veth42: NETDEV WATCHDOG: CPU: 34: transmit queue 0 timed out 5393 ms
+>>   veth42: veth backpressure stalled(n:1) TXQ(0) re-enable
+>>
+>> This provides a necessary recovery mechanism while the underlying race
+>> condition is investigated further. Subsequent patches will address the root
+>> cause and add more robust state handling.
+>>
+>> Fixes: dc82a33297fc ("veth: apply qdisc backpressure on full ptr_ring to reduce TX drops")
+>> Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
+>> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+> 
+> I think this belongs in net-next.. Fail safe is not really a bug fix.
+> I'm slightly worried we're missing a corner case and will cause
+> timeouts to get printed for someone's config.
+> 
 
-Thank you for your comment I will add an explanation.
+This is a recovery fix.  If the race condition fix isn't 100% then this
+patch will allow veth to recover.  Thus, to me it makes sense to group
+these two patches together.
 
-Michael
-________________________________
+I'm more worried that we we're missing a corner case that we cannot
+recover from. Than triggering timeouts to get printed, for a config
+where NAPI consumer veth_poll() takes more that 5 seconds to run (budget
+max 64 packets this needs to consume packets at a rate less than 12.8
+pps). It might be good to get some warnings if the system is operating
+this slow.
 
-Renesas Electronics Europe GmbH
-Registered Office: Arcadiastrasse 10
-DE-40472 Duesseldorf
-Commercial Registry: Duesseldorf, HRB 3708
-Managing Director: Carsten Jauch
-VAT-No.: DE 14978647
-Tax-ID-No: 105/5839/1793
+Also remember this is not the default config that most people use.
+The code is only activated if attaching a qdisc to veth, which isn't
+default. Plus, NAPI mode need to be activated, where in normal NAPI mode
+the producer and consumer usually runs on the same CPU, which makes it
+impossible to overflow the ptr_ring.  The veth backpressure is primarily
+needed when running with threaded-NAPI, where it is natural that
+producer and consumer runs on different CPUs. In our production setup
+the consumer is always slower than the producer (as the product inside
+the namespace have installed too many nftables rules).
 
-Legal Disclaimer: This e-mail communication (and any attachment/s) is confi=
-dential and contains proprietary information, some or all of which may be l=
-egally privileged. It is intended solely for the use of the individual or e=
-ntity to which it is addressed. Access to this email by anyone else is unau=
-thorized. If you are not the intended recipient, any disclosure, copying, d=
-istribution or any action taken or omitted to be taken in reliance on it, i=
-s prohibited and may be unlawful.
+
+>> +static void veth_tx_timeout(struct net_device *dev, unsigned int txqueue)
+>> +{
+>> +	struct netdev_queue *txq = netdev_get_tx_queue(dev, txqueue);
+>> +
+>> +	netdev_err(dev, "veth backpressure stalled(n:%ld) TXQ(%u) re-enable\n",
+>> +		   atomic_long_read(&txq->trans_timeout), txqueue);
+> 
+> If you think the trans_timeout is useful, let's add it to the message
+> core prints? And then we can make this msg just veth specific, I don't
+> think we should be repeating what core already printed.
+
+The trans_timeout is a counter for how many times this TXQ have seen a
+timeout.  It is practical as it directly tell us if this a frequent
+event (without having to search log files for similar events).
+
+It does make sense to add this to the core message ("NETDEV WATCHDOG")
+with the same argument.  For physical NICs these logs are present in
+production. Looking at logs through Kibana (right now) and it would make
+my life easier to see the number of times the individual queues have
+experienced timeouts.  The logs naturally gets spaced in time by the
+timeout, making it harder to tell the even frequency. Such a patch would
+naturally go though net-next.
+
+Do you still want me to remove the frequency counter from this message?
+By the same argument it is practical for me to have as a single log line
+when troubleshooting this in practice.  BTW, I've already backported
+this watchdog patch to prod kernel (without race fix) and I'll try to
+reproduce the race in staging/lab on some ARM64 servers.  If I reproduce
+it will be practical to have this counter.
+
+--Jesper
 
