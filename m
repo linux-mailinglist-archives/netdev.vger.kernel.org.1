@@ -1,276 +1,305 @@
-Return-Path: <netdev+bounces-236712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74654C3F3D4
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 10:48:11 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17937C3F45B
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 10:54:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFA6D3A9277
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 09:46:20 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EA9F34E4DEA
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 09:54:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 729B221CC56;
-	Fri,  7 Nov 2025 09:46:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B9132DE6E5;
+	Fri,  7 Nov 2025 09:54:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="emHV+ecR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jIF3Oqme"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-02.galae.net (smtpout-02.galae.net [185.246.84.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F2B2D8792
-	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 09:46:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.84.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E47A82701C4
+	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 09:54:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762508778; cv=none; b=hto6sa+iYJr5Bs8LsSnLPvScP2TRvdXy1JVQk17sZMLfxz7UwqfzpR4PfUsIw7q8+Rl1sLeo0uzLJZrhbrVvHSiVJlK4huEPeFAnd4fhLagXuPmyjeaRlIPAbs8NGnrrE9a3IzX1z07FTcv0orpvr1vTZ+H5e9cxM1PW+YQMzUQ=
+	t=1762509245; cv=none; b=sPVHHP+o9yJ2mLmY60dkBcGrH1o9Ot55sZKuY7a8fE+AUiAM3OBtPC2INT+kZLdJku+G8jALIx4K8sf2ucHln+uQmiY0+3Hjig/pkTfTggYdS/SnHRrqWRpzKPtr1Dprkjv7fH+t8XiOonHbZWpsQhjMzXb01Hl6VrxXG9mKrNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762508778; c=relaxed/simple;
-	bh=CUb1UJSqe0J7eiFVk9FclskMnkcpr7t9CwNggoZDnJQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=feP23CJJMYI9TeaLR+9PwbNAsW70ClOcgArtYxc3d5pb+5AkR1UsGRLM1ur3r2vbiNQ3dQZpYHNpC0KaJzIGgEhcu6j4yAuVgteRBL99EikzQl2RzKRmutV6v22iJJ15xgQBVsbls0/O4tDWZo7O6x+1aYrt8u+ByOfk3J/AZJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=emHV+ecR; arc=none smtp.client-ip=185.246.84.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-02.galae.net (Postfix) with ESMTPS id A2E4F1A191C;
-	Fri,  7 Nov 2025 09:46:06 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id 78B73606A6;
-	Fri,  7 Nov 2025 09:46:06 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B7E6E11851F88;
-	Fri,  7 Nov 2025 10:46:04 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1762508766; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=pejro6m8PvIgGo9bZixg+NiOc0vkGtgoLl3JZUg3MuE=;
-	b=emHV+ecRkjSsv4LJWGCoeb+ZECWxYFYjOugu1GQE7hcHEI3cuPIXxLabOlZUltVyDm4LY4
-	OsySXGF105CMQsw/N/f3r70MGdBGseIAhVW2br8P644HV5/BfVV2myVJZWlGcI3MVkixoj
-	P3xpl09cK0su04xHPkhNfsJVDqPaTg6+Ypcz0axtTRSVNd7jqF/w95+RsG3eEGdlOuyJHh
-	/bfsOci3/JVIeO2tA3I/GAgXu9xOjbwOhl+Fq8EktW4aDeVFF2Ad3mTzrPbnSRfj8OdcdT
-	HsPvSJ+wrzEXbb29RDNY+0eAf5v416YlMWsY84Hi/YdlI9eklpjprk2GuQNf4Q==
-Date: Fri, 7 Nov 2025 10:46:02 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Michal Kubecek <mkubecek@suse.cz>, Jakub Kicinski <kuba@kernel.org>,
- netdev@vger.kernel.org
-Subject: Re: [PATCH ethtool-next v2] netlink: tsconfig: add HW time stamping
- configuration
-Message-ID: <20251107104602.69e2607f@kmaincent-XPS-13-7390>
-In-Reply-To: <20251105192453.3542275-1-vadim.fedorenko@linux.dev>
-References: <20251105192453.3542275-1-vadim.fedorenko@linux.dev>
-Organization: bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1762509245; c=relaxed/simple;
+	bh=LJJEk10POdcTsPhHa19ZeOv6WD/yQjLxyWkbC1toxzM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=q6kK5dV0oI2IFLCfB27XDvzf9OtM7SHyzTm+MjInDiF5aypSwoD4tvZlTNZZXJ0k/reHB4PiF/i+4TJ9TlJwPXT+4OR6AwbF55hSpJwsE3X5nVzsyvbO8jE/nImUOePVvIQjqAQbw8JTJvdeUmCyBHZKN5STuN/3E7X+Qf6TDEg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jIF3Oqme; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-29470bc80ceso6088375ad.1
+        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 01:54:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762509242; x=1763114042; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PdFrpCMgzVY+qjVrXkUkn7fFQNGJUHKXO+rmqKz+1v0=;
+        b=jIF3Oqmezwi0bkvjLvyK9FinpmRgMKMxmFSe6ydV8ke5dzJSqn2L6Imo796wsLbinB
+         QA9ih+nvrDQmQvvFwO90moH8dSWlrGJVQi/OIZ4vR/+O/3p1CPRxf5tVb1TP+L7CM1m7
+         /L+f3iq6Uc9fz2szO67I5+UZdhU69Q5mVk4mahhmdF9P6NoLq8bXCLPBo3CeJCBNroRV
+         wgV351693syWR1QwuAje3Es9lA7mnFsVwi43UZi7NI+AElE9D225LA/mqmNYycl4mBtD
+         dEDfS0OcxcmFzHGSQMzwmgezdF2K93fSekdOj20St1lLti78IcgNrm5SmcE8vssw1KjC
+         rDtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762509242; x=1763114042;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=PdFrpCMgzVY+qjVrXkUkn7fFQNGJUHKXO+rmqKz+1v0=;
+        b=oK5F/8oWZdV58NaRdrKqkziLWnPHjPwWMSv367v2GVFd8j6xM6zcwsivDMCvpOZBcU
+         NRtNt9bOSoIR+gFv2dF2+M6J7wVO8dxEBrpceeEaR8Ja2YV3ae4Bg1h0d6DyQYHkuNZd
+         MFoDvl5ey3IcsuWdOuHPGAoV0tbsaa97PbkYxxo1gUu2SDV747Hc60PvfqF19hwZ3oGH
+         SObrrnmJtQeTIJoG+z3J9Pb8BPA7T6lCFzynJe1yZiDXSd1VRgunJhH9epddzBViwnDj
+         Z4YxpMZqBn2Dcp21Po3dRD0+qMs0lJ9XE98x0tuIKo3lebS3PIRlUFOK6ovBtz3Qhkky
+         GQTg==
+X-Forwarded-Encrypted: i=1; AJvYcCX1Lz/SM9LT9y4uoOMxZgPwGGLmgkmkydKHHRa1Zc3sEGzkwCnhFqR7mWLywoJ2bvBXEm0DNYo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxEeZZZXnjuEAOhAYwnecyt7+a2QVM9ZmDpgmypAr+WqyRMehnb
+	FFGL2v0pOQsfSbfr49RskD42EOjMjJZ6whdeQWM0Ws5/DBpmyRF7zV0kyA24EZpOgh9al72lXwv
+	Ti+bgmzUicUnvVusqkR0ze69gFpLaZQs=
+X-Gm-Gg: ASbGnct6jjyOLj8219hJZtvy8n2U6MuqBpTR1L9izh5NvDA3ygRNqw0LvfJJw3TWfHT
+	GYRGrd5FZoD0kuum7J5h2JNAyJe2oGfdtYn1G00wjYIj+D4akCtn2l33eGCFpLuC31moRNXEYaO
+	YVFIWEoLT16dqTiJCwsNWDZmPmKA8t/dLRkD68cm+xvBeB2jxX+C0IWobVmphY1R/FNuUfJ8Fj5
+	azaFQb7IPtourt5Eo2AlHUf1X9f11Y4h7rNgdgowT8BHEm2wJTLEyelO/m0Ynwr1n9ZgXtA
+X-Google-Smtp-Source: AGHT+IE11zhMAgi5cvIEZMVAHip/aU++LIjg8RLYkVfjpVQzr3BdfJWiu8X8UTY8why69UfvnlPjVZ1PmACNZK12Mhk=
+X-Received: by 2002:a17:902:e847:b0:292:9ac7:2608 with SMTP id
+ d9443c01a7336-297c94b32a9mr15262395ad.8.1762509242005; Fri, 07 Nov 2025
+ 01:54:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <CACueBy7yNo4jq4HbiLXn0ez14w8CUTtTpPHmpSB-Ou6jhhNypA@mail.gmail.com>
+ <CANn89iL9e9TZoOZ8KG66ea37bo=WztPqRPk8A9i0Ntx2KidYBw@mail.gmail.com>
+ <aQtubP3V6tUOaEl5@shredder> <CACueBy6LKYmusLjQPnQGCoSZQLEVAo5_X47B-gaH-2dSx6xDuw@mail.gmail.com>
+In-Reply-To: <CACueBy6LKYmusLjQPnQGCoSZQLEVAo5_X47B-gaH-2dSx6xDuw@mail.gmail.com>
+From: chuang <nashuiliang@gmail.com>
+Date: Fri, 7 Nov 2025 17:53:51 +0800
+X-Gm-Features: AWmQ_bnKgi56ZSPNSnKawG2OgOKGBH6FrWpo36dTSyLysdWpwJuxy5qm1OA073U
+Message-ID: <CACueBy4EAuBoHDQPVSg_wdUYXYxQzToRx4Y+TSgcBwxEcODt_w@mail.gmail.com>
+Subject: Re: [PATCH net] ipv4: route: Prevent rt_bind_exception() from
+ rebinding stale fnhe
+To: Ido Schimmel <idosch@idosch.org>
+Cc: Eric Dumazet <edumazet@google.com>, stable@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Networking <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Last-TLS-Session-Version: TLSv1.3
 
-On Wed,  5 Nov 2025 19:24:53 +0000
-Vadim Fedorenko <vadim.fedorenko@linux.dev> wrote:
+Thanks for reviewing the patch. I'm providing the detailed analysis
+and debugging traces below to confirm the root cause and exact
+location of the reference count leak.
 
-> The kernel supports configuring HW time stamping modes via netlink
-> messages, but previous implementation added support for HW time stamping
-> source configuration. Add support to configure TX/RX time stamping.
-> We keep TX type and RX filter configuration as a bit value, but if we
-> will need multibit value to be set in the future, there is an option to
-> use "rx-filters" keyword which will be mutually exclusive with current
-> "rx-filter" keyword. The same applies to "tx-type".
->=20
-> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-> ---
->  ethtool.8.in       | 12 ++++++-
->  ethtool.c          |  1 +
->  netlink/tsconfig.c | 78 +++++++++++++++++++++++++++++++++++++++++++++-
->  3 files changed, 89 insertions(+), 2 deletions(-)
->=20
-> diff --git a/ethtool.8.in b/ethtool.8.in
-> index 8874ade..1788588 100644
-> --- a/ethtool.8.in
-> +++ b/ethtool.8.in
-> @@ -357,6 +357,10 @@ ethtool \- query or control network driver and hardw=
-are
-> settings .IR N
->  .BI qualifier
->  .IR precise|approx ]
-> +.RB [ tx
-> +.IR TX-TYPE ]
-> +.RB [ rx-filter
-> +.IR RX-FILTER ]
->  .HP
->  .B ethtool \-x|\-\-show\-rxfh\-indir|\-\-show\-rxfh
->  .I devname
-> @@ -1287,7 +1291,7 @@ for IEEE 1588 quality and "approx" is for NICs DMA
-> point. Show the selected time stamping PTP hardware clock configuration.
->  .TP
->  .B \-\-set\-hwtimestamp\-cfg
-> -Select the device's time stamping PTP hardware clock.
-> +Sets the device's time stamping PTP hardware clock configuration.
->  .RS 4
->  .TP
->  .BI index \ N
-> @@ -1296,6 +1300,12 @@ Index of the ptp hardware clock
->  .BI qualifier \ precise | approx
->  Qualifier of the ptp hardware clock. Mainly "precise" the default one is
->  for IEEE 1588 quality and "approx" is for NICs DMA point.
-> +.TP
-> +.BI tx \ TX-TYPE
-> +Type of TX time stamping to configure
-> +.TP
-> +.BI rx-filter \ RX-FILTER
-> +Type of RX time stamping filter to configure
->  .RE
->  .TP
->  .B \-x \-\-show\-rxfh\-indir \-\-show\-rxfh
-> diff --git a/ethtool.c b/ethtool.c
-> index bd45b9e..521e6fe 100644
-> --- a/ethtool.c
-> +++ b/ethtool.c
-> @@ -6068,6 +6068,7 @@ static const struct option args[] =3D {
->  		.nlfunc	=3D nl_stsconfig,
->  		.help	=3D "Select hardware time stamping",
->  		.xhelp	=3D "		[ index N qualifier
-> precise|approx ]\n"
-> +			  "		[ tx TX-TYPE ] [ rx-filter
-> RX-FILTER ]\n" },
->  	{
->  		.opts	=3D "-x|--show-rxfh-indir|--show-rxfh",
-> diff --git a/netlink/tsconfig.c b/netlink/tsconfig.c
-> index d427c7b..7dee4d1 100644
-> --- a/netlink/tsconfig.c
-> +++ b/netlink/tsconfig.c
-> @@ -17,6 +17,7 @@
->  #include "netlink.h"
->  #include "bitset.h"
->  #include "parser.h"
-> +#include "strset.h"
->  #include "ts.h"
-> =20
->  /* TSCONFIG_GET */
-> @@ -94,6 +95,67 @@ int nl_gtsconfig(struct cmd_context *ctx)
-> =20
->  /* TSCONFIG_SET */
-> =20
-> +int tsconfig_txrx_parser(struct nl_context *nlctx, uint16_t type,
-> +			 const void *data __maybe_unused,
-> +			 struct nl_msg_buff *msgbuff,
-> +			 void *dest __maybe_unused)
-> +{
-> +	const struct stringset *values;
-> +	const char *arg =3D *nlctx->argp;
-> +	unsigned int count, i;
-> +
-> +	nlctx->argp++;
-> +	nlctx->argc--;
-> +	if (netlink_init_ethnl2_socket(nlctx) < 0)
-> +		return -EIO;
-> +
-> +	switch (type) {
-> +	case ETHTOOL_A_TSCONFIG_TX_TYPES:
-> +		values =3D global_stringset(ETH_SS_TS_TX_TYPES,
-> nlctx->ethnl2_socket);
-> +		break;
-> +	case ETHTOOL_A_TSCONFIG_RX_FILTERS:
-> +		values =3D global_stringset(ETH_SS_TS_RX_FILTERS,
-> nlctx->ethnl2_socket);
-> +		break;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +
-> +	count =3D get_count(values);
-> +	for (i =3D 0; i < count; i++) {
-> +		const char *name =3D get_string(values, i);
-> +
-> +		if (!strcmp(name, arg))
-> +			break;
-> +	}
-> +
-> +	if (i !=3D count) {
+1. Environment and Symptom
 
-It would be nicer to have a small if instead of the big one:
-if (i =3D=3D count)
-	return -EINVAL;
+The issue was consistently reproduced when routing TCP traffic through
+a Software IP Tunnel interface (sit0). The traffic flow  is:
 
-With that change:
-Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
+  APP -> sit0 (IP tunnel) -> outside
 
-Thank you!
+This leads to a reference count leak that prevents the device from
+being freed during unregistration, resulting in the kernel log
+warning:
 
-> +		struct nlattr *bits_attr, *bit_attr;
-> +
-> +		if (ethnla_put_flag(msgbuff, ETHTOOL_A_BITSET_NOMASK, true))
-> +			return -EMSGSIZE;
-> +
-> +		bits_attr =3D ethnla_nest_start(msgbuff,
-> ETHTOOL_A_BITSET_BITS);
-> +		if (!bits_attr)
-> +			return -EMSGSIZE;
-> +
-> +		bit_attr =3D ethnla_nest_start(msgbuff,
-> ETHTOOL_A_BITSET_BITS_BIT);
-> +		if (!bit_attr) {
-> +			ethnla_nest_cancel(msgbuff, bits_attr);
-> +			return -EMSGSIZE;
-> +		}
-> +		if (ethnla_put_u32(msgbuff, ETHTOOL_A_BITSET_BIT_INDEX, i) ||
-> +		    ethnla_put_flag(msgbuff, ETHTOOL_A_BITSET_BIT_VALUE,
-> true)) {
-> +			ethnla_nest_cancel(msgbuff, bits_attr);
-> +			ethnla_nest_cancel(msgbuff, bit_attr);
-> +			return -EMSGSIZE;
-> +		}
-> +		mnl_attr_nest_end(msgbuff->nlhdr, bit_attr);
-> +		mnl_attr_nest_end(msgbuff->nlhdr, bits_attr);
-> +		return 0;
-> +	}
-> +	return -EINVAL;
-> +}
-> +
->  static const struct param_parser stsconfig_params[] =3D {
->  	{
->  		.arg		=3D "index",
-> @@ -109,6 +171,20 @@ static const struct param_parser stsconfig_params[] =
-=3D {
->  		.handler	=3D tsinfo_qualifier_parser,
->  		.min_argc	=3D 1,
->  	},
-> +	{
-> +		.arg		=3D "tx",
-> +		.type		=3D ETHTOOL_A_TSCONFIG_TX_TYPES,
-> +		.handler	=3D tsconfig_txrx_parser,
-> +		.group		=3D ETHTOOL_A_TSCONFIG_TX_TYPES,
-> +		.min_argc	=3D 1,
-> +	},
-> +	{
-> +		.arg		=3D "rx-filter",
-> +		.type		=3D ETHTOOL_A_TSCONFIG_RX_FILTERS,
-> +		.handler	=3D tsconfig_txrx_parser,
-> +		.group		=3D ETHTOOL_A_TSCONFIG_RX_FILTERS,
-> +		.min_argc	=3D 1,
-> +	},
->  	{}
->  };
-> =20
-> @@ -134,7 +210,7 @@ int nl_stsconfig(struct cmd_context *ctx)
->  	if (ret < 0)
->  		return ret;
->  	if (ethnla_fill_header(msgbuff, ETHTOOL_A_TSCONFIG_HEADER,
-> -			       ctx->devname, 0))
-> +			       ctx->devname, ETHTOOL_FLAG_COMPACT_BITSETS))
->  		return -EMSGSIZE;
-> =20
->  	ret =3D nl_parser(nlctx, stsconfig_params, NULL, PARSER_GROUP_NEST,
-> NULL);
+  unregister_netdevice: waiting for sit0 to become free. Usage count =3D N
+
+2. Enable refcnt_tracer
+
+Live-crash analysis identified a stale dst entry retaining a reference
+to sit0. With CONFIG_NET_DEV_REFCNT_TRACKER enabled, the allocation
+stack for the leaked reference was identified:
+
+[1279559.416854] leaked reference.
+[1279559.416955]  dst_init+0x48/0x100
+[1279559.416965]  dst_alloc+0x66/0xd0
+[1279559.416966]  rt_dst_alloc+0x3c/0xd0
+[1279559.416974]  ip_route_output_key_hash_rcu+0x1d7/0x940
+[1279559.416978]  ip_route_output_key_hash+0x6d/0xa0
+[1279559.416979]  ip_route_output_flow+0x1f/0x70
+[1279559.416980]  __ip_queue_xmit+0x415/0x480
+[1279559.416984]  ip_queue_xmit+0x15/0x20
+[1279559.416986]  __tcp_transmit_skb+0xad4/0xc50
+
+3. Pinpointing the Unmatched dst_hold()
+
+To pinpoint the specific reference not released, we added tracepoints
+to all dst_hold/put functions and used eBPF to record the full
+lifecycle. The tracing identified a hold operation with the following
+call stack:
+
+do_trace_dst_entry_inc+0x45
+rt_set_nexthop.constprop.0+0x376      /* <<<<<<<<<<<<<<<<<<<< HERE */
+__mkroute_output+0x2B7
+ip_route_output_key_hash_rcu+0xBD
+ip_route_output_key_hash+0x6D
+ip_route_output_flow+0x1F
+inet_sk_rebuild_header+0x19C
+__tcp_retransmit_skb+0x7E
+tcp_retransmit_skb+0x19
+tcp_retransmit_timer+0x3DF
+
+The address rt_set_nexthop.constprop.0+0x376 corresponds to the
+dst_hold() call inside rt_bind_exception().
+
+4. Root Cause Analysis
+
+The sit driver's packet transmission path calls: sit_tunnel_xmit() ->
+... -> update_or_create_fnhe(), which lead to fnhe_remove_oldest()
+being called to delete entries exceeding the
+FNHE_RECLAIM_DEPTH+random.
+
+The race window is between fnhe_remove_oldest() selecting fnheX for
+deletion and the subsequent kfree_rcu(). During this time, the
+concurrent path's __mkroute_output() -> find_exception() can fetch the
+soon-to-be-deleted fnheX, and rt_bind_exception() then binds it with a
+new dst using a dst_hold(). When the original fnheX is freed via RCU,
+the dst reference remains permanently leaked.
+
+5. Fix Validation with eBPF
+
+The patch mitigates this by zeroing fnhe_daddr before the
+RCU-protected deletion steps. This prevents rt_bind_exception() from
+attempting to reuse the entry.
+The fix was validated by probing the rt_bind_exception path (which in
+my environment is optimized to rt_set_nexthop.constprop.0) to catch
+any zeroed but active FNHEs being processed:
+
+bpftrace -e 'kprobe:rt_set_nexthop.constprop.0
+{
+    $rt =3D (struct rtable *)arg0;
+    $fnhe =3D (struct fib_nh_exception *)arg3;
+    $fi =3D (struct flowi *)arg4;
+
+    /* Check for an FNHE that is marked for deletion (daddr =3D=3D 0)
+     * but is still visible/valid (fnhe_expires !=3D 0 and not expired).
+     */
+    if ($fi !=3D 0 && $fnhe !=3D 0 && $fnhe->fnhe_daddr =3D=3D 0 &&
+$fnhe->fnhe_expires !=3D 0 && $fnhe->fnhe_expires >=3D jiffies) {
+        printf("rt: %llx, dev: %s, will leak before this patch\n",
+$rt, $rt->dst.dev->name);
+    }
+}'
 
 
 
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+On Thu, Nov 6, 2025 at 8:31=E2=80=AFAM chuang <nashuiliang@gmail.com> wrote=
+:
+>
+> Thanks, your analysis is excellent and makes perfect sense. I can
+> briefly describe the issue.
+>
+> This problem took quite some time to analyze overall =E2=80=94 we enabled
+> netdev refcnt, added dst tracepoints, and eventually captured a race
+> condition between fnhe deletion and rt_bind_exception.
+>
+> In our environment, we use the sit driver(ip tunnel). During the xmit
+> path, it records the PMTU for each destination, creating or updating
+> fnhe entries (even when the MTU is already appropriate). Because there
+> are many data flows, the sit driver updates PMTU very frequently,
+> which leads to the race condition mentioned above.
+>
+> Sorry for the brief summary =E2=80=94 I=E2=80=99ll provide a more detaile=
+d explanation
+> later, along with the patch verification method.
+>
+> On Wed, Nov 5, 2025 at 23:34 Ido Schimmel <idosch@idosch.org> wrote:
+> >
+> > On Wed, Nov 05, 2025 at 06:26:22AM -0800, Eric Dumazet wrote:
+> > > On Mon, Nov 3, 2025 at 7:09=E2=80=AFPM chuang <nashuiliang@gmail.com>=
+ wrote:
+> > > >
+> > > > From 35dbc9abd8da820007391b707bd2c1a9c99ee67d Mon Sep 17 00:00:00 2=
+001
+> > > > From: Chuang Wang <nashuiliang@gmail.com>
+> > > > Date: Tue, 4 Nov 2025 02:52:11 +0000
+> > > > Subject: [PATCH net] ipv4: route: Prevent rt_bind_exception() from =
+rebinding
+> > > >  stale fnhe
+> > > >
+> > > > A race condition exists between fnhe_remove_oldest() and
+> > > > rt_bind_exception() where a fnhe that is scheduled for removal can =
+be
+> > > > rebound to a new dst.
+> > > >
+> > > > The issue occurs when fnhe_remove_oldest() selects an fnhe (fnheX)
+> > > > for deletion, but before it can be flushed and freed via RCU,
+> > > > CPU 0 enters rt_bind_exception() and attempts to reuse the entry.
+> > > >
+> > > > CPU 0                             CPU 1
+> > > > __mkroute_output()
+> > > >   find_exception() [fnheX]
+> > > >                                   update_or_create_fnhe()
+> > > >                                     fnhe_remove_oldest() [fnheX]
+> > > >   rt_bind_exception() [bind dst]
+> > > >                                   RCU callback [fnheX freed, dst le=
+ak]
+> > > >
+> > > > If rt_bind_exception() successfully binds fnheX to a new dst, the
+> > > > newly bound dst will never be properly freed because fnheX will
+> > > > soon be released by the RCU callback, leading to a permanent
+> > > > reference count leak on the old dst and the device.
+> > > >
+> > > > This issue manifests as a device reference count leak and a
+> > > > warning in dmesg when unregistering the net device:
+> > > >
+> > > >   unregister_netdevice: waiting for ethX to become free. Usage coun=
+t =3D N
+> > > >
+> > > > Fix this race by clearing 'oldest->fnhe_daddr' before calling
+> > > > fnhe_flush_routes(). Since rt_bind_exception() checks this field,
+> > > > setting it to zero prevents the stale fnhe from being reused and
+> > > > bound to a new dst just before it is freed.
+> > > >
+> > > > Cc: stable@vger.kernel.org
+> > > > Fixes: 67d6d681e15b ("ipv4: make exception cache less predictible")
+> > >
+> > > I do not see how this commit added the bug you are looking at ?
+> >
+> > Not the author, but my understanding is that the issue is that an
+> > exception entry which is queued for deletion allows a dst entry to be
+> > bound to it. As such, nobody will ever release the reference from the
+> > dst entry and the associated net device.
+> >
+> > Before 67d6d681e15b, exception entries were only queued for deletion by
+> > ip_del_fnhe() and it prevented dst entries from binding themselves to
+> > the deleted exception entry by clearing 'fnhe->fnhe_daddr' which is
+> > checked in rt_bind_exception(). See ee60ad219f5c7.
+> >
+> > 67d6d681e15b added another point in the code that queues exception
+> > entries for deletion, but without clearing 'fnhe->fnhe_daddr' first.
+> > Therefore, it added another instance of the bug that was fixed in
+> > ee60ad219f5c7.
+> >
+> > >
+> > > > Signed-off-by: Chuang Wang <nashuiliang@gmail.com>
+> > > > ---
+> > > >  net/ipv4/route.c | 5 +++++
+> > > >  1 file changed, 5 insertions(+)
+> > > >
+> > > > diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+> > > > index 6d27d3610c1c..b549d6a57307 100644
+> > > > --- a/net/ipv4/route.c
+> > > > +++ b/net/ipv4/route.c
+> > > > @@ -607,6 +607,11 @@ static void fnhe_remove_oldest(struct
+> > > > fnhe_hash_bucket *hash)
+> > > >                         oldest_p =3D fnhe_p;
+> > > >                 }
+> > > >         }
+> > > > +
+> > > > +       /* Clear oldest->fnhe_daddr to prevent this fnhe from being
+> > > > +        * rebound with new dsts in rt_bind_exception().
+> > > > +        */
+> > > > +       oldest->fnhe_daddr =3D 0;
+> > > >         fnhe_flush_routes(oldest);
+> > > >         *oldest_p =3D oldest->fnhe_next;
+> > > >         kfree_rcu(oldest, rcu);
+> > > > --
+> > >
 
