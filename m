@@ -1,120 +1,101 @@
-Return-Path: <netdev+bounces-236848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BDD0C40ABC
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 16:50:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23AC6C40B20
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 16:55:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6B8724F1E3B
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 15:50:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38B26565580
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 15:55:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 807D2328B65;
-	Fri,  7 Nov 2025 15:50:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B93832E149;
+	Fri,  7 Nov 2025 15:54:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aTVAOP0I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UTpdB5TR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4FAD32C954
-	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 15:50:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60ED02C237E;
+	Fri,  7 Nov 2025 15:54:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762530611; cv=none; b=HzNsNyfvVi96Ni94YrocLRk7mCtHXox3Rzy83qL6A7x4tGutr23wZIbRs+TVs3x5jNeVkNedPMrywmT24SklMeXg+8m2LGIsiDKJFZNB0A44VA5Exd//6tcoVaQL2y8lSvtjUgU/ma8NJZxHXg1weJ+oaM+iuPYzWOMazS8vqR4=
+	t=1762530872; cv=none; b=jZFQpKMjRqaltol7Bw9RrLvIHOSueEbIjcolVpjfJNF37PIk6lAOSKyoUbgFJWn9VLPhdp01oEFWjKfI3bJZNxSuth0RKj6IAagIjLOthhlbOVZEK4Yyte/Kkffn9Hmj4btPQz1Mbkcw46DwgJ4AQfh3N9tQj1PP6fLxjRsecBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762530611; c=relaxed/simple;
-	bh=rMuibsfjwQTkZxmIQzy8sIFXgg7FCnLwNlI1IDc3+0M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IkFEDUA4IJ3288ZUhnanOhYjXE/9ACxPCVA7T5H12cJks+wsknw1pv4bcRM/piCpWTwqFO/od8S/j/kkZWcDuYIZJYWpsA+C1nLjDOAVaZqXUQXL2Y94k69gMDkLaXEjerr/uF5GdTgt8mIuEKhAA2JcUHG0kfyPKM2MBOj6JI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aTVAOP0I; arc=none smtp.client-ip=209.85.166.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-92aee734585so32617639f.3
-        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 07:50:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762530609; x=1763135409; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rMuibsfjwQTkZxmIQzy8sIFXgg7FCnLwNlI1IDc3+0M=;
-        b=aTVAOP0IZu1g/NzeINRMge3lhBW2BaKDuE8TFTFrnZlEZFSnFUy5R4O2kKcpU8RlDc
-         ObjgIggp2fbe/zyUvKdiQuDonUsSyQ0n/9xSUC/zGrc3XU9CYLgnvxKNyjwTCwvAqYlR
-         V1PX5Hc0j61qKTyU8Y4ok8hyI95zvAvgoPuBKxH8V3XMvTgBKqRy47CaUSB9Xuj88+K7
-         e1jnnRsTLUx5xQO2LkShqrSMHcAbxAMqmq4DE+iBENCn5H2LC+Euu6EAFzUCOoNpijjn
-         bMX5F7RI6KBDcyrOOpwL0NpfJhicC6hjXLj1dwvC/m0gBlzqjfoc/F+vJwV8aRaa1uW3
-         OAZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762530609; x=1763135409;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=rMuibsfjwQTkZxmIQzy8sIFXgg7FCnLwNlI1IDc3+0M=;
-        b=FBdwWFjbsJS7nZstzN/izMYmihz2GcMtO3zcLoGsHssVNM41NkiJJub5o74a8fj6oF
-         iCH8QTY6CcrennqAWt/kk0s3jwXrRA6Sjc733MTyKa7jEU75J/c4m4SfRyvZgb8KGj9M
-         LyXdIMErCrin3buBWNt4FQmyc9MmmjaKjqKwJLAVaJ9CLSDUjjFt/YBuONruAK+nkOCL
-         KD1O0xkyVHE7fIFcUlVULoUJ2qyODc3C5B4qpkGmbRNvqcwyivXeLLy7FpfaWflwa3GR
-         2jMqrraVFJiWzQhSxiQh4wG/5zfirClW0tpgN2FxQYZQed9FBhvfuDkSCgY/ARgFlUCR
-         gzpA==
-X-Forwarded-Encrypted: i=1; AJvYcCWf4h+iMREI5qr24goI1xb5rPEMinsWBbOinqLfpxlgWsrRozXKJrL1KCjIt4brX4D9CFRZVJk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPF/Ral/Q+PPPZ4+PWoqtjM36ueFLiEUE+Afzk00M+hQOTDX6J
-	8PZ5UNQDKkocqtAm0fIAEUFtQcP41tHC078OsOF+8UZjWe+0bYvVtYhDQwL3eydjVZfyTPmpVjZ
-	3qARJwF+V25Ml5ALESLNl0z+stF6mtwjftO23qY4=
-X-Gm-Gg: ASbGnctX2YHvwP2YyxuUIbsP8BR8r1jOcOUbc+YPLVs42q+4ZnM3NIyWHFQ7CXdGwSD
-	gjd1qqoE3zwc81tQz9EMUqj5lYH3wA0lVykpw+Z4AnhydLVzf8SWOaJ9lVmvFnJXnyVzePcTOeA
-	RFlqbdg91duMOaI4jQaRznq8ct/tu2Ry7EcCoi+WXkB3MKfhNklWdKUqXDKgIVxw/WE5LnbQapB
-	CIJN2SdClYMBvIkv5M/WXTXKfkVA0JPe5T7Z05S84aGoc5cjlulYMxRaZdfSblUiU/SDY3exlA=
-X-Google-Smtp-Source: AGHT+IEI4mqtLjtT50kKot5I71++nWm81AjX7kDf3Fm5ROHG41tPu9V9bm9okZPGUMFrI0Z7WTqTyW2s4aMttUt4JA0=
-X-Received: by 2002:a05:6e02:1707:b0:433:2df8:5dcb with SMTP id
- e9e14a558f8ab-4335f4932demr54075995ab.17.1762530609089; Fri, 07 Nov 2025
- 07:50:09 -0800 (PST)
+	s=arc-20240116; t=1762530872; c=relaxed/simple;
+	bh=K+CYTJmhXzXtU1VvrV2fmqOB1GMwfv/N3ycEEm7Wqa0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=h0T46QSFCfX/+tuIZNK6lFjlLyKRCrf8R1kiJvq7FghbMyuDg3P0Y+cCLlN3iOPm/PGneTTkQ+1audL7veoSK6pFJoCZNvfdhXTxnz1a9SX1MhymZ04LKZt92P2CV+0ChEO2JNPoLQN0dQHfYQZ2bPqChap6O2VYRt8NRtpAtNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UTpdB5TR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83A62C16AAE;
+	Fri,  7 Nov 2025 15:54:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762530872;
+	bh=K+CYTJmhXzXtU1VvrV2fmqOB1GMwfv/N3ycEEm7Wqa0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=UTpdB5TRgLJ30KkodfimJdie1f/Pphfg7S/pOXZMlb4Tdplr820nZLaVYM8MtnRpC
+	 40k6JG25OWjB0+lalrF7WZnXryl4EywsUmhW8x55oTqsDsyeW7jAs6Whxtpzv6lPXA
+	 X777lCThGMC67so341CoWBY0Q9aVbDTPWz0xmiaE9k2loCesaB3gQntubOUWaa+zjZ
+	 8Ngu2FeRVYXFLZZzlJPGOKXvMWw5Ph9rFSDpNlXVZ53IL5Bady0UHK5wZNYyOm5y3V
+	 6gM83txzkgiMo3pEZSQX6YhLSg5/VnPXccFhhuxnxO5gzkc4w3i+A5x0Ujlu1Bq4Lq
+	 8/motA70DKhLQ==
+Date: Fri, 7 Nov 2025 07:54:30 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
+ razor@blackwall.org, pabeni@redhat.com, willemb@google.com,
+ sdf@fomichev.me, john.fastabend@gmail.com, martin.lau@kernel.org,
+ jordan@jrife.io, maciej.fijalkowski@intel.com, magnus.karlsson@intel.com,
+ dw@davidwei.uk, toke@redhat.com, yangzhenze@bytedance.com,
+ wangdongdong.6@bytedance.com
+Subject: Re: [PATCH net-next v4 11/14] netkit: Implement
+ rtnl_link_ops->alloc and ndo_queue_create
+Message-ID: <20251107075430.6a4f32ff@kernel.org>
+In-Reply-To: <12551093-9384-4801-b2d1-a5505a87f9b4@iogearbox.net>
+References: <20251031212103.310683-1-daniel@iogearbox.net>
+	<20251031212103.310683-12-daniel@iogearbox.net>
+	<20251106164106.7b858706@kernel.org>
+	<12551093-9384-4801-b2d1-a5505a87f9b4@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251106202935.1776179-1-edumazet@google.com> <20251106202935.1776179-4-edumazet@google.com>
- <CAL+tcoBEEjO=-yvE7ZJ4sB2smVBzUht1gJN85CenJhOKV2nD7Q@mail.gmail.com> <CANn89i+fN=Qda_J52dEZGtXbD-hwtVdTQmQGhNW_m_Ys-JFJSA@mail.gmail.com>
-In-Reply-To: <CANn89i+fN=Qda_J52dEZGtXbD-hwtVdTQmQGhNW_m_Ys-JFJSA@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 7 Nov 2025 23:49:32 +0800
-X-Gm-Features: AWmQ_bnvMgViNRJ7TWP9jVwXCjQ0GWxGO8aB7bLlYy3A5X8vtUkyYQZ396Ih1ZQ
-Message-ID: <CAL+tcoBGSvdoHUO6JD2ggxx3zUY=Mgms+wKSp3GkLN-pLO3=RA@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/3] net: increase skb_defer_max default to 128
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 7, 2025 at 11:47=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Fri, Nov 7, 2025 at 7:37=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.=
-com> wrote:
-> >
-> > On Fri, Nov 7, 2025 at 4:30=E2=80=AFAM Eric Dumazet <edumazet@google.co=
-m> wrote:
-> > >
-> > > skb_defer_max value is very conservative, and can be increased
-> > > to avoid too many calls to kick_defer_list_purge().
-> > >
-> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> >
-> > I was thinking if we ought to enlarge NAPI_SKB_CACHE_SIZE() to 128 as
-> > well since the freeing skb happens in the softirq context, which I
-> > came up with when I was doing the optimization for af_xdp. That is
-> > also used to defer freeing skb to obtain some improvement in
-> > performance. I'd like to know your opinion on this, thanks in advance!
->
-> Makes sense. I even had a patch like this in my queue ;)
+On Fri, 7 Nov 2025 16:01:44 +0100 Daniel Borkmann wrote:
+> On 11/7/25 1:41 AM, Jakub Kicinski wrote:
+> > On Fri, 31 Oct 2025 22:21:00 +0100 Daniel Borkmann wrote: =20
+> >> +static void netkit_get_channels(struct net_device *dev,
+> >> +				struct ethtool_channels *channels)
+> >> +{
+> >> +	channels->max_rx =3D dev->num_rx_queues;
+> >> +	channels->max_tx =3D dev->num_tx_queues;
+> >> +	channels->max_other =3D 0;
+> >> +	channels->max_combined =3D 1;
+> >> +	channels->rx_count =3D dev->real_num_rx_queues;
+> >> +	channels->tx_count =3D dev->real_num_tx_queues;
+> >> +	channels->other_count =3D 0;
+> >> +	channels->combined_count =3D 0;
+> >>   } =20
+> >=20
+> > Why do we need to implement get_channels? =20
+>=20
+> Thanks for the feedback. I think this one was useful imho since it allowed
+> for introspection via ethtool on netkit side e.g. the max_rx vs rx_count.
 
-Great to hear that. Look forward to seeing it soon :)
+Right, but we have netdev-nl queue-get now which also reports the new
+"lease"/"peer" info so it will be much clearer.
 
-Thanks,
-Jason
+Ah, is this because libbpf looks at channels to figure out the queue
+count? Can we make it use netdev-nl ?
+
+I guess it could also count the entries in $sysfs/queues/rx-* but that
+doesn't express the fact that queue 0 is unusable. Which I suppose the
+get_channels implementation was trying to "express" by setting
+max_combined=3D1 ? =F0=9F=98=B6=EF=B8=8F
 
