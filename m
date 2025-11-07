@@ -1,149 +1,150 @@
-Return-Path: <netdev+bounces-236853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E783C40C72
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 17:09:49 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52C9EC40C8A
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 17:10:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 838425673AB
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 16:09:07 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 323594F3E6D
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 16:10:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2E9331D36C;
-	Fri,  7 Nov 2025 16:08:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9D542F3614;
+	Fri,  7 Nov 2025 16:09:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ooaASJ15"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="vn3cbOu+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB438328B62
-	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 16:08:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB41D2DAFBE;
+	Fri,  7 Nov 2025 16:09:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762531736; cv=none; b=JiGi0RPqlzTaiSf3knOtigYDruK4EZK2qB4qwAQ+6SMV6rqHnDhHpXH8Bs3YGKU+Dzh+QkBMb4dpD5VuEKTswUISsmjrllMYTEhtK57yuh0Mj+ak/oVwBxzIGp3av/SmZvWAbGBueG9iPh+2/WG49Tu9jUcTHXCqsDvxoGhFj5U=
+	t=1762531759; cv=none; b=txfsWlyYR6L3YwY+Ek44gAV8kC1O2w6KYJ3/VNYzQaOGyWCzrb1hOF0B8FyqYqH6T/He5B0JKk3tU22GwuacO9qlnoHqmgaUFx20xXj/I9dWrCEO0YSkLlkMVgb+UvUUpSBZUUa/M7HW24nUK4L2vnkXZrsdPdseDSfBs04vJXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762531736; c=relaxed/simple;
-	bh=sZXGO5xI6o93fTLqIP09KiWgl3xP9CgiOlzXgWwFeOQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=s+KihKDA1N7oHmxM17i77tsUhqt0ELi9pPhG47t1z8NAX/xo7Ih6iQiow8mSHwEjIp02NGckF/zgSfrSACjAyeG/GTQNP1f7v0HBVXZ8xqJKEPQkhENT8iYMfz+Vjw1ZhKNwzjJSPJT7yibRVvgoj2zKmXap2HZ7FfNKHzPY/2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ooaASJ15; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4ed69197d32so12902211cf.3
-        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 08:08:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762531732; x=1763136532; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sZXGO5xI6o93fTLqIP09KiWgl3xP9CgiOlzXgWwFeOQ=;
-        b=ooaASJ15+26g9ww7Mi/euKUblwEbM+ZmhIPXB9O7w8ZZX9wSfMcWjiGdKsNGUXH2OX
-         4aWuqoPQSVEFZR2rras2FtbIKSFnSq03/8krB8KM8rBulO3Ojg6w6SmjnUCKKaj+j5Qr
-         AHae81Rv9rWqjlb56yoTD+9Hm+x3lFzNZOPvj/ky/DVMzobThcxJlTATNlPNfw+kFSoe
-         Cm5MMh478uW0V/Zih/7Gfrda/2ANdl7iudySiGuF7dHghiSwaXFRsR2UGVBjdVweOyz+
-         BmXhI1X3axfzm+F8KiC59unvTI+i1LMhqZdwsLkQ2JFcu1o0MuGrOSM8EeNwN62OAn5M
-         M9JQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762531732; x=1763136532;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=sZXGO5xI6o93fTLqIP09KiWgl3xP9CgiOlzXgWwFeOQ=;
-        b=FfVOntaM4U0QQkuekAXMGpkDvz4jG/WTTn8nWVLNt9p6GUbxLiiqz3Z0YhsDncOPG8
-         bqIkW9pP3PuyspSkYPT0z1KbNrcUy3onBzj3PrNaMTn0ubIOjk6rqyx+xtraX0xirCTJ
-         4aRSczDIlirgc8f4Vgnm76eoOj0tjmipNUgsDApgKaiqVePs1KQhne0TO5q45kXCT/mV
-         KPGIVYT4K823yFCKV73kkufsZczKhkm8YgT+bya1DzeTiXkexPBJ+WEdF2b2L7/IW30/
-         FrXVmPuHSO5U4z0WjcTHsvpsXu1i6AirHsyVyiv/eYyThd4XedJ9pZ1l40ApMulOQ5d1
-         Dpvg==
-X-Forwarded-Encrypted: i=1; AJvYcCUQmuxw9nEiZWKgCJyeULOc1CMY8UbDJ2H369OO1LZxBuASovNDhwU2BA/3kwDhLKRXin9pe+E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxAQSP2zA/O+N5KCB6MXdf+exkPrvyZ1QLTa/OsXsxEFiiNM7Bo
-	D92yHx9lCbGx19oqY/VHTx/6H2UZqWryg3u3R6CZ9mxOOHB2d/268dqkx0DXzfbJqPQHYtwi95t
-	ek7t6xdrmQ1+ZzqvShhJthr72hEqpo8IgneCzoqfd
-X-Gm-Gg: ASbGncsNOlXnf1dH9b757otTqmK68avZp3MdY96/S/oAwvjuV+yPeTDarXvRYNiZaw/
-	0LW2k5Zj72leYvhbK5Yw8ftC21VMC0Kfu9EGsRJGwo197d3i48t00UwEw9izmwTSrDPHM8n4oxN
-	ZYwEnVjXmIRHOVQskgFH7ArcvYewQErtjLJ1GFKc06BW+5ky/5SxyXqDEYadLlOVr3Sqs7DgJLB
-	OniNkA50gi+WIf/bNNDsBZLDwQx8Vm1PFxuLGuZ/skvMNVQ2xLzaBPFNnMBBHRgpBdxdtYigonX
-	QryqhA==
-X-Google-Smtp-Source: AGHT+IEuSAtw09ysTUFNCsb+6BLqorLTupTyCp8piycvQEriwi2baf+bldT5Ns5NQw0QxXuNSUGgNM4NN28IZKR3EQA=
-X-Received: by 2002:a05:622a:4f:b0:4da:155a:76fc with SMTP id
- d75a77b69052e-4ed9493a564mr48549891cf.16.1762531731551; Fri, 07 Nov 2025
- 08:08:51 -0800 (PST)
+	s=arc-20240116; t=1762531759; c=relaxed/simple;
+	bh=fsY3NKKjdEAZnR/YNjwGYfIiYz3H855QFv+flLleryQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JGU6JfcNIxoAq9W5FvmX8WPRieo5qLDPCh9+TQmBO/1Nk37WYAe/M2MvQ2XgENPrU4xDywUtbwcTsaP0a76hizQ1ZutHoSvjZozhqeUnYPg49NO/waM/gRPI0h9cxFIdI4eryOlV+UVnaHZ4xLtXh3/fYUH6oBCfJl2ral4S6UY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=vn3cbOu+; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=fwpXxoU8iEmC+DaN7Cr9PGN8QVIi8rUJqHbS4C13YiQ=; b=vn3cbOu+GFQMbus8RTESyhk+QD
+	l4MSz/4gSrLSWpMwTcHMS8POSDqXlYoqW6hd0IVlrkrHN0rw/yZ1S8tjbRotxVZckRVVD5aRb8bPB
+	u2YW04OZjQkWBC/IllYfMqxS3Dir+tyGqw82YW/NF7mlLI684toDkm0bSBsVAcqCbYiV7/jxwioKY
+	+/pe49r2zq2ujlFEiw4kOmyaMOLhRepjPkmnOJVla7Zg8W/csk11yTw9Aw59+2MoFRvcckO8KEMVM
+	IwqMBuTNFDkx39IA961qvS8bRUtzUhe9fuWfVrlXNzSefV5rCz9+Bo9Qr7u3Tve04azN7os0yDbxA
+	N0fCfdkQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:32908)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vHP1N-000000006sy-0WaB;
+	Fri, 07 Nov 2025 16:09:05 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vHP1F-000000007hv-1jzX;
+	Fri, 07 Nov 2025 16:08:57 +0000
+Date: Fri, 7 Nov 2025 16:08:57 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Emil Renner Berthing <kernel@esmil.dk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Keguang Zhang <keguang.zhang@gmail.com>,
+	Kevin Hilman <khilman@baylibre.com>,
+	linux-amlogic@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-mips@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Minda Chen <minda.chen@starfivetech.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>, netdev@vger.kernel.org,
+	Nobuhiro Iwamatsu <nobuhiro.iwamatsu.x90@mail.toshiba>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 11/16] net: stmmac: starfive: use
+ stmmac_get_phy_intf_sel()
+Message-ID: <aQ4ZmXB_eFjKXgIv@shell.armlinux.org.uk>
+References: <aQ4ByErmsnAPSHIL@shell.armlinux.org.uk>
+ <E1vHNSR-0000000DkSt-0wDu@rmk-PC.armlinux.org.uk>
+ <CANBLGczzW+kjvSqYm5YVt+2sdLtgyZfa=fhsU1Q-nUjSVvB4cw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251106202935.1776179-1-edumazet@google.com> <20251106202935.1776179-4-edumazet@google.com>
- <CAL+tcoBEEjO=-yvE7ZJ4sB2smVBzUht1gJN85CenJhOKV2nD7Q@mail.gmail.com>
- <CANn89i+fN=Qda_J52dEZGtXbD-hwtVdTQmQGhNW_m_Ys-JFJSA@mail.gmail.com>
- <CAL+tcoBGSvdoHUO6JD2ggxx3zUY=Mgms+wKSp3GkLN-pLO3=RA@mail.gmail.com>
- <CANn89iJcWc+Qi7xVcsnLOA1q9qjtqZLL5W4YQg=SND3tX=sLgw@mail.gmail.com> <CAL+tcoCmpzJ_z4DCvcoWok2LrR9vL2An8j3zi5XHOjiSity3jg@mail.gmail.com>
-In-Reply-To: <CAL+tcoCmpzJ_z4DCvcoWok2LrR9vL2An8j3zi5XHOjiSity3jg@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 7 Nov 2025 08:08:40 -0800
-X-Gm-Features: AWmQ_bnJcwe_AZmVvJvm1hLi02ObRt_W8pT1UUCydljBibMiLmk7IO_OKoFW7Ts
-Message-ID: <CANn89i+4OKrAq6DPZ_=MeDhGmEXDn6k-dRrEyzO8pmy=hN6VwA@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/3] net: increase skb_defer_max default to 128
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANBLGczzW+kjvSqYm5YVt+2sdLtgyZfa=fhsU1Q-nUjSVvB4cw@mail.gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, Nov 7, 2025 at 8:04=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.co=
-m> wrote:
->
-> On Sat, Nov 8, 2025 at 12:00=E2=80=AFAM Eric Dumazet <edumazet@google.com=
-> wrote:
+On Fri, Nov 07, 2025 at 11:00:35AM -0500, Emil Renner Berthing wrote:
+> Quoting Russell King (Oracle) (2025-11-07 15:28:55)
+> > Use stmmac_get_phy_intf_sel() to decode the PHY interface mode to the
+> > phy_intf_sel value, validate the result and use that to set the
+> > control register to select the operating mode for the DWMAC core.
 > >
-> > On Fri, Nov 7, 2025 at 7:50=E2=80=AFAM Jason Xing <kerneljasonxing@gmai=
-l.com> wrote:
-> > >
-> > > On Fri, Nov 7, 2025 at 11:47=E2=80=AFPM Eric Dumazet <edumazet@google=
-.com> wrote:
-> > > >
-> > > > On Fri, Nov 7, 2025 at 7:37=E2=80=AFAM Jason Xing <kerneljasonxing@=
-gmail.com> wrote:
-> > > > >
-> > > > > On Fri, Nov 7, 2025 at 4:30=E2=80=AFAM Eric Dumazet <edumazet@goo=
-gle.com> wrote:
-> > > > > >
-> > > > > > skb_defer_max value is very conservative, and can be increased
-> > > > > > to avoid too many calls to kick_defer_list_purge().
-> > > > > >
-> > > > > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > > > >
-> > > > > I was thinking if we ought to enlarge NAPI_SKB_CACHE_SIZE() to 12=
-8 as
-> > > > > well since the freeing skb happens in the softirq context, which =
-I
-> > > > > came up with when I was doing the optimization for af_xdp. That i=
-s
-> > > > > also used to defer freeing skb to obtain some improvement in
-> > > > > performance. I'd like to know your opinion on this, thanks in adv=
-ance!
-> > > >
-> > > > Makes sense. I even had a patch like this in my queue ;)
-> > >
-> > > Great to hear that. Look forward to seeing it soon :)
+> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > ---
+> >  .../ethernet/stmicro/stmmac/dwmac-starfive.c  | 22 +++++--------------
+> >  1 file changed, 6 insertions(+), 16 deletions(-)
 > >
-> > Oh please go ahead !
->
-> Okay, thanks for letting me post this minor change. I just thought you
-> wanted to do this on your own :P
->
-> Will do it soon :)
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
+> > index 1ef72576c6f1..00078b7a6486 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c
+> > @@ -35,25 +35,15 @@ static int starfive_dwmac_set_mode(struct plat_stmmacenet_data *plat_dat)
+> >         struct starfive_dwmac *dwmac = plat_dat->bsp_priv;
+> >         struct regmap *regmap;
+> >         unsigned int args[2];
+> > -       unsigned int mode;
+> > +       int phy_intf_sel;
+> >         int err;
+> >
+> > -       switch (plat_dat->phy_interface) {
+> > -       case PHY_INTERFACE_MODE_RMII:
+> > -               mode = STARFIVE_DWMAC_PHY_INFT_RMII;
+> > -               break;
+> > -
+> > -       case PHY_INTERFACE_MODE_RGMII:
+> > -       case PHY_INTERFACE_MODE_RGMII_ID:
+> > -       case PHY_INTERFACE_MODE_RGMII_RXID:
+> > -       case PHY_INTERFACE_MODE_RGMII_TXID:
+> > -               mode = STARFIVE_DWMAC_PHY_INFT_RGMII;
+> > -               break;
+> 
+> After these two patches the STARFIVE_DWMAC_PHY_INFT_RMII and ..RGMII macros are
+> left unused.
 
-Note that I was thinking to free only 32 skbs if we fill up the array
-completely.
+Thanks, I'll remove them in this patch.
 
-Current code frees half of it, this seems better trying to keep 96
-skbs and free 32 of them.
+> Maybe just squash the patches and remove the definitions?
 
-Same for the bulk alloc, we could probably go to 32 (instead of 16)
+It's two logical changes, thus two patches. Reviewers find that this
+makes it easier to review.
+
+Given the number of platform glues that I'm modifying, I don't want
+to change some of them using one big all encompassing patch and
+others as a set of logical changes - that would be totally insane
+to manage.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
