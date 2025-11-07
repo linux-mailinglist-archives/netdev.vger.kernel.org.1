@@ -1,151 +1,268 @@
-Return-Path: <netdev+bounces-236874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13292C41272
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 18:51:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEBF6C4128D
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 18:53:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 88A85188377A
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 17:52:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91545188530F
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 17:54:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 540F4336EDD;
-	Fri,  7 Nov 2025 17:51:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98CF43370E1;
+	Fri,  7 Nov 2025 17:53:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ELrQNNZt"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Mwq1wm0H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0E6334C25
-	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 17:51:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE579337694
+	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 17:53:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762537889; cv=none; b=FbFq5rIK9KpRK7xxiWUrZkxFQyIu+BFNMZximefCT6PMcWeuF0ACgshYZyjtdj36bIn6b4zO7ALd66MRC9kO1paNTFUOunHBL26DMyswtAgN1bVd9VN7oA306FdpWvtuzB+ryk9bgq8VD6KNG+xuN+2BRsSsIJMs+rB5PIVHuJI=
+	t=1762538015; cv=none; b=WLXPTWSVgXzXI/wyZJm0Zez9/BsMY2P7rxtShl4PoBYpNlo8P7/RKUp7R/ZNkcgyttcduQ+3LvmyDcmjtywr3Qu8H2Y2ZbKBKF3UBQGX2m0ZUTpl7XZELOY5udP4YSAlRSw+xC8Ymt9QMGV0wSjQ5bzpiSrSrupn2mHoJGT2bAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762537889; c=relaxed/simple;
-	bh=zH5Y5kzfZDqM6XSPZXHd+xDsjJay/Ois7rZjMY6UsPU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A0kuX8miSZwQBPvjnt6PZIMgd6Gh1da+G+7p0hVXBWnHE14+dqRj9k7ytHETf4AIgShVSni+XdFbSF6qdnYbenuPJwyWMzYW2LqbQP24MuvfHjlP+Toi1f3TJYgBnU75oci6cNWJxUUywWIuf7FSAew5aT5CBuGLIAMHUOYKE0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ELrQNNZt; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4710683a644so6853775e9.0
-        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 09:51:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762537886; x=1763142686; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3Tucutz7IrOhRztkZU3smHLVMxqcaOobL5jt095lc2k=;
-        b=ELrQNNZtZ8xpyrUTaNVMrMLq6edSahgtODjiKm1IKWRWjWseiPqOOQhk1anKez3R3S
-         8T+u+cMNZ7ztTu0DnveXsu7TuI93hL0HOIUEG4uMv+Fbfa2ls1yVSCKK8p/fCbDSC+cm
-         UVNvMrpIn4Y1pzdQWBN7WcbtmJopnlnzNsOmV3c6WrcGlVVwdiZbVTO2BvBdtWuLYhqV
-         qk741iJpVI6iTsleB0+cO0DAi80Wsdt43uMhT8Mxjxo2/h0Z8tFvMESZLdyCV8AhyaM/
-         5QXnZR1Q0oUIjeN+7442j8mCLFcl4Z0SFtewxSlgIKOh0eyzSxJQTcORp34lE4LhEveK
-         QALw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762537886; x=1763142686;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=3Tucutz7IrOhRztkZU3smHLVMxqcaOobL5jt095lc2k=;
-        b=SzWceyDlbD9Got6cAHqNu25V+n5pu1pHPmCnPXqejPaTZ/T5dF+uNFY3HNe3a0YrTI
-         ZszSpNGh/3ulBL+iiw5PBuwCYChzlFRUYqR1RqUpIfcJtcRE0TnPr0VWrvdo+7zAEHe5
-         ru4y3GQwyWGmFpps5kN3TriISO2dM7Wydm41Dr/RxkWhl9NOfNGYA8SjWveYOtL9D/OU
-         u/FfQ3/01etw0yXKrmCTaiZPr8lWxg+J68LKrB22V5+dgL1p/dBg1VSKS1aqficRQrM7
-         60VBFlSwoaYCGyWyjJgqcTf3FHC0RGpgVHIuChykc0mf1GYFmsivRXbdwHxGT8LJmmyn
-         3mJw==
-X-Forwarded-Encrypted: i=1; AJvYcCUeTdcXx9lrLhAo6qYmAGPod8iA8zSb5R0a+/p55Bv8PlH3N1/aRxM5sNcP9/EZWeCWzrzKaUM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwgFGwkyTUtLAuijXQ/evvMZhF37oIFswuMmnmgp3d+yDcbgUVg
-	D+dpX0sB3SrfTz9vJt2AD31I22ArKZ/JgG3c3FWMYOCu+EKGnTI5c+ty
-X-Gm-Gg: ASbGncv7vzMTypZeUyF7I+ST0oVj9pTVL1x+HJtc33jdRpWLCVt2DDdJBpZvumKjyMD
-	UvfIoJA/mNP7pDaEy2w+Pu3Ym4LUwNM0Y1K6WONI//10g9/fsFSVSg47eWubaCSH2qLTZyypRbM
-	KHGpf3JEjGVeXwhX8jZEPOjgxG1xbw4yKkmuiHa3iqbc2xkesSTAFZAEpLuMBssdgJvnZ1zdd+s
-	KeFt9nigdrrrGV3lsgwPeZt+QTOsDn1Kd7vBwChQmVxcMR+pjsWuPhbzobCsBNRteAo/jwR/r6d
-	bq3swnPSHxWhquytfMfvE+apqc/jMX1tc3xiPugXK+zMajZcE8EY2EEnJQ+WMiKFlwD2Or239xa
-	u9Tocmq2j/nMG0X1EtkIvqW8O1ecOJJ4kp+wGdvB1w8zuqxjYRyBvTI8KbqJv+vJdmPV0In/NNd
-	DwrW9maxRUxgQbpRS9L+fc79s3LV7rywv4CeL0UD3IS0cF9M32XNr+
-X-Google-Smtp-Source: AGHT+IEoWHsw26cGBlNpbuXd/J8PJbsclbLScfONHz/78/yXn3dKVEpgZr30FQ4+9RfcD30Gp2hhjg==
-X-Received: by 2002:a05:600c:c0c9:b0:475:d7fd:5c59 with SMTP id 5b1f17b1804b1-4776e57b741mr22139575e9.16.1762537885623;
-        Fri, 07 Nov 2025 09:51:25 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47763e4f89fsm49280675e9.3.2025.11.07.09.51.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Nov 2025 09:51:25 -0800 (PST)
-Date: Fri, 7 Nov 2025 17:51:23 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Petr Mladek <pmladek@suse.com>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Andrew Morton
- <akpm@linux-foundation.org>, Junrui Luo <moonafterrain@outlook.com>,
- linux-kernel@vger.kernel.org, rostedt@goodmis.org, tiwai@suse.com,
- perex@perex.cz, linux-sound@vger.kernel.org, mchehab@kernel.org,
- awalls@md.metrocast.net, linux-media@vger.kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org
-Subject: Re: [PATCH 1/4] lib/sprintf: add scnprintf_append() helper function
-Message-ID: <20251107175123.70ded89e@pumpkin>
-In-Reply-To: <aQ3riwUO_3v3UOvj@pathway.suse.cz>
-References: <20251107051616.21606-1-moonafterrain@outlook.com>
-	<SYBPR01MB788110A77D7F0F7A27F0974FAFC3A@SYBPR01MB7881.ausprd01.prod.outlook.com>
-	<20251106213833.546c8eaba8aec6aa6a5e30b6@linux-foundation.org>
-	<20251107091246.4e5900f4@pumpkin>
-	<aQ29Zzajef81E2DZ@smile.fi.intel.com>
-	<aQ3riwUO_3v3UOvj@pathway.suse.cz>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1762538015; c=relaxed/simple;
+	bh=fs7/9+UAJ0O37vS4AEZpPSq7wJqBLQloS7BQLOVYoUI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=D2zI3YDdv+OKKmaTKKFKkhuuT029ngsXT4vg9bHeB9HtsPeR/T9EcI9Q9aRxjZOj3WBIrVFYSu523S0cT3Gnrdy5sC5FU2aU+5j/IvIyGSkrTrnHuuUNQ9CJ3G7Ra0manQPKmo8IGX7GsQrcKxyKYc6I4t3UkhDVN2mhk0VP2DA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Mwq1wm0H; arc=none smtp.client-ip=95.215.58.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <52bbb293-d3c6-435b-b306-fe6782512a1b@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1762538007;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EJ7ANzwEsj0X5PDTfV3hCmixDXnOUw5mE09Z9QH8E+A=;
+	b=Mwq1wm0HEinHxsKQAK2CJ2hHuidzwJjGCgkZKCMEdf8kKyw3auaxc5H+QFtAVsceUaslm7
+	qy8PXe3TngLQ2YfQxmHMnSUpfKrDLeWm/ZQSI6u9B3hvz3+6/VZFieJpITrd9uC33o6YOJ
+	a+mZ2Wj6TRGfZdIjk7aSFi9NvCBawVA=
+Date: Fri, 7 Nov 2025 17:53:22 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH ethtool-next v2] netlink: tsconfig: add HW time stamping
+ configuration
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Michal Kubecek <mkubecek@suse.cz>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org
+References: <20251105192453.3542275-1-vadim.fedorenko@linux.dev>
+ <20251107104602.69e2607f@kmaincent-XPS-13-7390>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20251107104602.69e2607f@kmaincent-XPS-13-7390>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, 7 Nov 2025 13:52:27 +0100
-Petr Mladek <pmladek@suse.com> wrote:
-
-> On Fri 2025-11-07 11:35:35, Andy Shevchenko wrote:
-> > On Fri, Nov 07, 2025 at 09:12:46AM +0000, David Laight wrote:  
-> > > On Thu, 6 Nov 2025 21:38:33 -0800
-> > > Andrew Morton <akpm@linux-foundation.org> wrote:  
-> > > > On Fri,  7 Nov 2025 13:16:13 +0800 Junrui Luo <moonafterrain@outlook.com> wrote:  
-> > 
-> > ...
-> >   
-> > > That is true for all the snprintf() functions.
-> > >   
-> > > > I wonder if we should instead implement a kasprintf() version of this
-> > > > which reallocs each time and then switch all the callers over to that.  
-> > > 
-> > > That adds the cost of a malloc, and I, like kasprintf() probably ends up
-> > > doing all the work of snprintf twice.
-> > > 
-> > > I'd be tempted to avoid the strlen() by passing in the offset.
-> > > So (say):
-> > > #define scnprintf_at(buf, len, off, ...) \
-> > > 	scnprintf((buf) + off, (len) - off, __VA_ARGS__)  
+On 07/11/2025 09:46, Kory Maincent wrote:
+> On Wed,  5 Nov 2025 19:24:53 +0000
+> Vadim Fedorenko <vadim.fedorenko@linux.dev> wrote:
 > 
-> It does not handle correctly the situation when len < off.
-> Othersise, it looks good.
-
-That shouldn't happen unless the calling code is really buggy.
-There is also a WARN_ON_ONCE() at the top of snprintf().
-
-	David
-
+>> The kernel supports configuring HW time stamping modes via netlink
+>> messages, but previous implementation added support for HW time stamping
+>> source configuration. Add support to configure TX/RX time stamping.
+>> We keep TX type and RX filter configuration as a bit value, but if we
+>> will need multibit value to be set in the future, there is an option to
+>> use "rx-filters" keyword which will be mutually exclusive with current
+>> "rx-filter" keyword. The same applies to "tx-type".
+>>
+>> Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+>> ---
+>>   ethtool.8.in       | 12 ++++++-
+>>   ethtool.c          |  1 +
+>>   netlink/tsconfig.c | 78 +++++++++++++++++++++++++++++++++++++++++++++-
+>>   3 files changed, 89 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/ethtool.8.in b/ethtool.8.in
+>> index 8874ade..1788588 100644
+>> --- a/ethtool.8.in
+>> +++ b/ethtool.8.in
+>> @@ -357,6 +357,10 @@ ethtool \- query or control network driver and hardware
+>> settings .IR N
+>>   .BI qualifier
+>>   .IR precise|approx ]
+>> +.RB [ tx
+>> +.IR TX-TYPE ]
+>> +.RB [ rx-filter
+>> +.IR RX-FILTER ]
+>>   .HP
+>>   .B ethtool \-x|\-\-show\-rxfh\-indir|\-\-show\-rxfh
+>>   .I devname
+>> @@ -1287,7 +1291,7 @@ for IEEE 1588 quality and "approx" is for NICs DMA
+>> point. Show the selected time stamping PTP hardware clock configuration.
+>>   .TP
+>>   .B \-\-set\-hwtimestamp\-cfg
+>> -Select the device's time stamping PTP hardware clock.
+>> +Sets the device's time stamping PTP hardware clock configuration.
+>>   .RS 4
+>>   .TP
+>>   .BI index \ N
+>> @@ -1296,6 +1300,12 @@ Index of the ptp hardware clock
+>>   .BI qualifier \ precise | approx
+>>   Qualifier of the ptp hardware clock. Mainly "precise" the default one is
+>>   for IEEE 1588 quality and "approx" is for NICs DMA point.
+>> +.TP
+>> +.BI tx \ TX-TYPE
+>> +Type of TX time stamping to configure
+>> +.TP
+>> +.BI rx-filter \ RX-FILTER
+>> +Type of RX time stamping filter to configure
+>>   .RE
+>>   .TP
+>>   .B \-x \-\-show\-rxfh\-indir \-\-show\-rxfh
+>> diff --git a/ethtool.c b/ethtool.c
+>> index bd45b9e..521e6fe 100644
+>> --- a/ethtool.c
+>> +++ b/ethtool.c
+>> @@ -6068,6 +6068,7 @@ static const struct option args[] = {
+>>   		.nlfunc	= nl_stsconfig,
+>>   		.help	= "Select hardware time stamping",
+>>   		.xhelp	= "		[ index N qualifier
+>> precise|approx ]\n"
+>> +			  "		[ tx TX-TYPE ] [ rx-filter
+>> RX-FILTER ]\n" },
+>>   	{
+>>   		.opts	= "-x|--show-rxfh-indir|--show-rxfh",
+>> diff --git a/netlink/tsconfig.c b/netlink/tsconfig.c
+>> index d427c7b..7dee4d1 100644
+>> --- a/netlink/tsconfig.c
+>> +++ b/netlink/tsconfig.c
+>> @@ -17,6 +17,7 @@
+>>   #include "netlink.h"
+>>   #include "bitset.h"
+>>   #include "parser.h"
+>> +#include "strset.h"
+>>   #include "ts.h"
+>>   
+>>   /* TSCONFIG_GET */
+>> @@ -94,6 +95,67 @@ int nl_gtsconfig(struct cmd_context *ctx)
+>>   
+>>   /* TSCONFIG_SET */
+>>   
+>> +int tsconfig_txrx_parser(struct nl_context *nlctx, uint16_t type,
+>> +			 const void *data __maybe_unused,
+>> +			 struct nl_msg_buff *msgbuff,
+>> +			 void *dest __maybe_unused)
+>> +{
+>> +	const struct stringset *values;
+>> +	const char *arg = *nlctx->argp;
+>> +	unsigned int count, i;
+>> +
+>> +	nlctx->argp++;
+>> +	nlctx->argc--;
+>> +	if (netlink_init_ethnl2_socket(nlctx) < 0)
+>> +		return -EIO;
+>> +
+>> +	switch (type) {
+>> +	case ETHTOOL_A_TSCONFIG_TX_TYPES:
+>> +		values = global_stringset(ETH_SS_TS_TX_TYPES,
+>> nlctx->ethnl2_socket);
+>> +		break;
+>> +	case ETHTOOL_A_TSCONFIG_RX_FILTERS:
+>> +		values = global_stringset(ETH_SS_TS_RX_FILTERS,
+>> nlctx->ethnl2_socket);
+>> +		break;
+>> +	default:
+>> +		return -EINVAL;
+>> +	}
+>> +
+>> +	count = get_count(values);
+>> +	for (i = 0; i < count; i++) {
+>> +		const char *name = get_string(values, i);
+>> +
+>> +		if (!strcmp(name, arg))
+>> +			break;
+>> +	}
+>> +
+>> +	if (i != count) {
 > 
-> > > Then you can chain calls, eg:
-> > > 	off = scnprintf(buf, sizeof buf, ....);
-> > > 	off += scnprintf_at(buf, sizeof buf, off, ....);  
-> > 
-> > I like this suggestion. Also note, that the original implementation works directly
-> > on static buffers.  
+> It would be nicer to have a small if instead of the big one:
+> if (i == count)
+> 	return -EINVAL;
+
+Fair, dunno where I got this pattern. Thanks!
+
+> With that change:
+> Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
 > 
-> I would prefer this as well. IMHO, it encourages people to write a better code.
+> Thank you!
 > 
-> Best Regards,
-> Petr
+>> +		struct nlattr *bits_attr, *bit_attr;
+>> +
+>> +		if (ethnla_put_flag(msgbuff, ETHTOOL_A_BITSET_NOMASK, true))
+>> +			return -EMSGSIZE;
+>> +
+>> +		bits_attr = ethnla_nest_start(msgbuff,
+>> ETHTOOL_A_BITSET_BITS);
+>> +		if (!bits_attr)
+>> +			return -EMSGSIZE;
+>> +
+>> +		bit_attr = ethnla_nest_start(msgbuff,
+>> ETHTOOL_A_BITSET_BITS_BIT);
+>> +		if (!bit_attr) {
+>> +			ethnla_nest_cancel(msgbuff, bits_attr);
+>> +			return -EMSGSIZE;
+>> +		}
+>> +		if (ethnla_put_u32(msgbuff, ETHTOOL_A_BITSET_BIT_INDEX, i) ||
+>> +		    ethnla_put_flag(msgbuff, ETHTOOL_A_BITSET_BIT_VALUE,
+>> true)) {
+>> +			ethnla_nest_cancel(msgbuff, bits_attr);
+>> +			ethnla_nest_cancel(msgbuff, bit_attr);
+>> +			return -EMSGSIZE;
+>> +		}
+>> +		mnl_attr_nest_end(msgbuff->nlhdr, bit_attr);
+>> +		mnl_attr_nest_end(msgbuff->nlhdr, bits_attr);
+>> +		return 0;
+>> +	}
+>> +	return -EINVAL;
+>> +}
+>> +
+>>   static const struct param_parser stsconfig_params[] = {
+>>   	{
+>>   		.arg		= "index",
+>> @@ -109,6 +171,20 @@ static const struct param_parser stsconfig_params[] = {
+>>   		.handler	= tsinfo_qualifier_parser,
+>>   		.min_argc	= 1,
+>>   	},
+>> +	{
+>> +		.arg		= "tx",
+>> +		.type		= ETHTOOL_A_TSCONFIG_TX_TYPES,
+>> +		.handler	= tsconfig_txrx_parser,
+>> +		.group		= ETHTOOL_A_TSCONFIG_TX_TYPES,
+>> +		.min_argc	= 1,
+>> +	},
+>> +	{
+>> +		.arg		= "rx-filter",
+>> +		.type		= ETHTOOL_A_TSCONFIG_RX_FILTERS,
+>> +		.handler	= tsconfig_txrx_parser,
+>> +		.group		= ETHTOOL_A_TSCONFIG_RX_FILTERS,
+>> +		.min_argc	= 1,
+>> +	},
+>>   	{}
+>>   };
+>>   
+>> @@ -134,7 +210,7 @@ int nl_stsconfig(struct cmd_context *ctx)
+>>   	if (ret < 0)
+>>   		return ret;
+>>   	if (ethnla_fill_header(msgbuff, ETHTOOL_A_TSCONFIG_HEADER,
+>> -			       ctx->devname, 0))
+>> +			       ctx->devname, ETHTOOL_FLAG_COMPACT_BITSETS))
+>>   		return -EMSGSIZE;
+>>   
+>>   	ret = nl_parser(nlctx, stsconfig_params, NULL, PARSER_GROUP_NEST,
+>> NULL);
+> 
+> 
+> 
 
 
