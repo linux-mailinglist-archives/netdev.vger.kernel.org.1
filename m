@@ -1,117 +1,140 @@
-Return-Path: <netdev+bounces-236771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB2A4C3FE47
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 13:29:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CEA8C3FF5B
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 13:43:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E7B81890CB7
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 12:29:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C472189A95E
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 12:42:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 162472D062F;
-	Fri,  7 Nov 2025 12:29:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAABE244691;
+	Fri,  7 Nov 2025 12:40:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="NUgdNTea"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ojqohzya"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1FDF2417F0;
-	Fri,  7 Nov 2025 12:29:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC85221294
+	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 12:40:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762518554; cv=none; b=f671yYKnfrsSK3QAkkXKmur6495D5dcFYWTSNr7342T8RSiykeZ4QfKKYcpuPxFwMMCzIXKQq0rFz1GesShUYM3QL8bkeU+u4ssWZ153fFsFi2v8tsNmmGjVxMPdAnunUI3gHruR9l8DSiUH+fBn815Zi17/7us0fmxpe0MV4XQ=
+	t=1762519244; cv=none; b=eIr8Yo9ux6H1NzNQoDkn1zPLGioJ06TzROfso0EfLKG1YuZNom+bJmGDvRo0bSzmdExbkpfqeryDxNfAWK1C2CSeUmtcIrI8EAmtyt8/7MQNN0nDGit+nmPBUTwPX4A5QhL/yTkuQj3Rwce1WmB6ueH/Te46PlyGlRytjRTd++0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762518554; c=relaxed/simple;
-	bh=18N4H57Jk1epoG9Sh676fcKQoOXWTEOLpm928Dvv4gI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QNFOfKq/zTBVW4Y1fT//edV6nfe0LkGjalBVm16YOd29mRgkQ/gDU9qdyZRwXGFc0zDqVZ3bhflNGDEUHO1lg3CqUSHgzlPvAfeob9xtEWqOlSaSW4hxm1ED5+GzWnvQl09QgqALHbybXkH7a5cSGJVBCyKjKd/5jVc1G8WnP24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=NUgdNTea; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=OS9TgP69ehGD5yxqH90DzusdYBQmnfuojUpTp9rV3No=; b=NUgdNTeaodv4jwVg4hVhaAiaHQ
-	vlcyccwtXQVEGVb21aWZWqpiKW3/7l9PPgBGkM6aAqkzybjLgMMZ2nW7khhRqweETKL2hD9dNdtD8
-	HsYpzbiMHPaxd5emfuuYtbXuOmDYdc+es62/fvVyBqB4iO57dnNWhFFpG80OFd1ylsbIlYL554j/5
-	+COzmUHBw+ZWi5EOlmJVtRt1fYRcJzQva7JAeXh2OWysg5weLO8zfByMpFLoyhccDjWUTnhgn+X5b
-	m74wrGtuig7jl6mtZSVdengTJgV0klMvP+0bHPlr7efd/2y+SkewwXMfc0Lp1e6/8fH06v++H46qe
-	8KixF+fg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55958)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1vHLaJ-000000006Ti-3yNM;
-	Fri, 07 Nov 2025 12:28:56 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1vHLaF-000000007Zu-06g1;
-	Fri, 07 Nov 2025 12:28:51 +0000
-Date: Fri, 7 Nov 2025 12:28:50 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: Re: [PATCH net-next] net: phy: mscc: Add support for PHY LEDs on
- VSC8541
-Message-ID: <aQ3mAhaZQa8_99Ah@shell.armlinux.org.uk>
-References: <20251106200309.1096131-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <ee6a79ae-4857-44e4-b8e9-29cdd80d828f@lunn.ch>
- <CA+V-a8vFEHr+3yR7=JAki3YDe==dAUv3m4PrD-nWhVg8hXgJcQ@mail.gmail.com>
+	s=arc-20240116; t=1762519244; c=relaxed/simple;
+	bh=yiO4zmlXl/JS4+/5pfenaSwhIEXN8TsZ0bJb6jdcmBQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=W+u3rNtpvNq5gwd75QNkZ+Lf1mu9t+73qsWsIQyGrnkoSMgKdfSyoH7gjXRDHHjfjcxvW6kIf7fZxjA4cnDZ6XgBTRO7dj4kMcMPXU0kLc016DeTgQNqSTsGZc6x1Uxy9qAsqxNOK2fTE+6Q7EF4N5ERPHmgutp1x16Yt2RRgG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=ojqohzya; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5A78uOjH029896;
+	Fri, 7 Nov 2025 12:40:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2025-04-25; bh=/0VLNF0XkFoex+vaPitGJVE8wC0bF
+	6xQJKj8eU4gdQw=; b=ojqohzyaWfWnk09WMS0ExCXmNPqW210zoAH7sThXNon0B
+	tcjIYWW5tAb9NK+yq9l9mhG9N4yhBoW1noZTNoRtRkK7hDRQQV/0zAq6WIfWyMk5
+	gf+/LGcRcEQiqBwMancmuK3vx/vr8E7JGm9gLqicEjsHq26397y4mtDADJpcAzUe
+	0t17GOF7hV3r6Pt3yy3+22szUKwej5h8UJMQOxFMJuBN6H+LJ1RWVxoCM9DuDoLW
+	CHGhaVIFzS8FBcqBtiW8y+smwN/fxAM6izLNE0KNoo2GFQ/PPGPCe9vV+CEAQo70
+	T41eidbrjMJ5Vzjpg1QMyXwUPcf5ygiXv1ODfWS3g==
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4a8yhj1tp8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 07 Nov 2025 12:40:28 +0000 (GMT)
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5A7BR2PV039780;
+	Fri, 7 Nov 2025 12:40:27 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4a58ndf1xs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 07 Nov 2025 12:40:27 +0000
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5A7CYtQS010259;
+	Fri, 7 Nov 2025 12:40:26 GMT
+Received: from ca-dev110.us.oracle.com (ca-dev110.us.oracle.com [10.129.136.45])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 4a58ndf1wc-1;
+	Fri, 07 Nov 2025 12:40:26 +0000
+From: Alok Tiwari <alok.a.tiwari@oracle.com>
+To: przemyslaw.kitszel@intel.com, aleksander.lobakin@intel.com,
+        anthony.l.nguyen@intel.com, andrew+netdev@lunn.ch, kuba@kernel.org,
+        davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+        intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Cc: alok.a.tiwarilinux@gmail.com, alok.a.tiwari@oracle.com
+Subject: [PATCH net-next] ice: fix comment typo and correct module format string
+Date: Fri,  7 Nov 2025 04:39:41 -0800
+Message-ID: <20251107123956.1125342-1-alok.a.tiwari@oracle.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CA+V-a8vFEHr+3yR7=JAki3YDe==dAUv3m4PrD-nWhVg8hXgJcQ@mail.gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-07_03,2025-11-06_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 suspectscore=0
+ mlxlogscore=999 malwarescore=0 spamscore=0 adultscore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2510240000
+ definitions=main-2511070103
+X-Authority-Analysis: v=2.4 cv=BdrVE7t2 c=1 sm=1 tr=0 ts=690de8bc cx=c_pps
+ a=XiAAW1AwiKB2Y8Wsi+sD2Q==:117 a=XiAAW1AwiKB2Y8Wsi+sD2Q==:17
+ a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8
+ a=q7LjOxSivl45Mpgk1VYA:9 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA2MDEzMyBTYWx0ZWRfX4rRXsLvQ6glp
+ vLtyIJ09HHf/hjkFmBjbdfJzPAGulz25wvY7STW/SVBxNMnX4cpiVnhjJ5MKkGL+L5MbZWD1cZl
+ wrL1awaKLhaSfyRcmjC2mBSva5NiUMFAHpf+3v4LAjpSBF81vC7hg6YYj4g748T5oJLH9NUrN4H
+ SqqPKmvHOXyPo8NH+5Z1q3x4qmNT2T16ByJaurLFg+gs/FYv4xpk3zeth5Cf0Spr5qZ6ItDVjoJ
+ PXgcecK5/wxmYrf37ym24H4xD6RywF3+87LusmW5vpkvnT/j3tINkKREgXCCgmkdSwlL/FHgSrW
+ UcYP3+G817/gMm66Yy8Pyi1/X27V2TVamBY9DR/Iu7hnUr/Oa9YwEd9o3vovn0r/wBEghznRFAN
+ FfiPYekPpPSBdNin8cGus7YVSy8h3w==
+X-Proofpoint-ORIG-GUID: -JigYjdm-M1TYjLkrH15ltF9tuy99P6m
+X-Proofpoint-GUID: -JigYjdm-M1TYjLkrH15ltF9tuy99P6m
 
-On Fri, Nov 07, 2025 at 10:34:32AM +0000, Lad, Prabhakar wrote:
-> On Thu, Nov 6, 2025 at 8:45 PM Andrew Lunn <andrew@lunn.ch> wrote:
-> > > +static int vsc85xx_led_cntl_set_lock_unlock(struct phy_device *phydev,
-> > > +                                         u8 led_num,
-> > > +                                         u8 mode, bool lock)
-> > >  {
-> > >       int rc;
-> > >       u16 reg_val;
-> > >
-> > > -     mutex_lock(&phydev->lock);
-> > > +     if (lock)
-> > > +             mutex_lock(&phydev->lock);
-> > >       reg_val = phy_read(phydev, MSCC_PHY_LED_MODE_SEL);
-> > >       reg_val &= ~LED_MODE_SEL_MASK(led_num);
-> > >       reg_val |= LED_MODE_SEL(led_num, (u16)mode);
-> > >       rc = phy_write(phydev, MSCC_PHY_LED_MODE_SEL, reg_val);
-> > > -     mutex_unlock(&phydev->lock);
-> > > +     if (lock)
-> > > +             mutex_unlock(&phydev->lock);
+- Fix a typo in the ice_fdir_has_frag() kernel-doc comment ("is" -> "if")
 
-If you used the provided helpers rather than open-coding a read-modify-
-write, then you wouldn't even need this lock. Please use phy_modify().
+- Correct the NVM erase error message format string from "0x02%x" to
+  "0x%02x" so the module value is printed correctly.
 
+Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
+---
+ drivers/net/ethernet/intel/ice/ice_fdir.c      | 2 +-
+ drivers/net/ethernet/intel/ice/ice_fw_update.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_fdir.c b/drivers/net/ethernet/intel/ice/ice_fdir.c
+index 26b357c0ae15..ec73088ef37b 100644
+--- a/drivers/net/ethernet/intel/ice/ice_fdir.c
++++ b/drivers/net/ethernet/intel/ice/ice_fdir.c
+@@ -1121,7 +1121,7 @@ ice_fdir_get_gen_prgm_pkt(struct ice_hw *hw, struct ice_fdir_fltr *input,
+  * ice_fdir_has_frag - does flow type have 2 ptypes
+  * @flow: flow ptype
+  *
+- * returns true is there is a fragment packet for this ptype
++ * returns true if there is a fragment packet for this ptype
+  */
+ bool ice_fdir_has_frag(enum ice_fltr_ptype flow)
+ {
+diff --git a/drivers/net/ethernet/intel/ice/ice_fw_update.c b/drivers/net/ethernet/intel/ice/ice_fw_update.c
+index d86db081579f..973a13d3d92a 100644
+--- a/drivers/net/ethernet/intel/ice/ice_fw_update.c
++++ b/drivers/net/ethernet/intel/ice/ice_fw_update.c
+@@ -534,7 +534,7 @@ ice_erase_nvm_module(struct ice_pf *pf, u16 module, const char *component,
+ 	}
+ 
+ 	if (completion_retval) {
+-		dev_err(dev, "Firmware failed to erase %s (module 0x02%x), aq_err %s\n",
++		dev_err(dev, "Firmware failed to erase %s (module 0x%02x), aq_err %s\n",
+ 			component, module,
+ 			libie_aq_str((enum libie_aq_err)completion_retval));
+ 		NL_SET_ERR_MSG_MOD(extack, "Firmware failed to erase flash");
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.50.1
+
 
