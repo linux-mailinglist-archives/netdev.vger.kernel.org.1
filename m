@@ -1,151 +1,109 @@
-Return-Path: <netdev+bounces-236769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59601C3FDDC
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 13:15:41 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75A6FC3FE3E
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 13:28:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 058DB1895DA3
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 12:16:06 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 65DB04E1531
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 12:28:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4626D86331;
-	Fri,  7 Nov 2025 12:15:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34FF32D062F;
+	Fri,  7 Nov 2025 12:28:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1NoXctJV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840E6F9D9
-	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 12:15:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83A9D299A94
+	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 12:28:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762517737; cv=none; b=fxniOP10HfIgce7WI3Mm4gIm/flIOWsPTVjSMgaGUFntQkgZlL0p3xl75Ocjk9H9qaS1FGeO14QrJeIuh8KBWo8aY7f2WyryWwQNZKzUuBX8I+nblwGg/lvdWv9WcUxwz/wk+OrB2s1v9F1w2SwsyJqBtTk0xIszLFlp1RYMKes=
+	t=1762518531; cv=none; b=T7NJj8zXPVPYXZOwTpOhOfzoZhXLiyfhN2D3oSvNNk2uWynV3q8NJkp8SQBBYWUmkHgW3XxBimlt6k2IhGSbYDAD715kkWX5OG1qpFkO6jRtxAOTJS8C8pApOFAq5ypj/LDVlU6lWrLqFS9ewIFY8HqYvQ5arBcsclntlqPli3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762517737; c=relaxed/simple;
-	bh=nJkqvuboRcE/Q+Tc5FS/2w7Fqq08ZLK98rivwvqUbwo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lamLg/PybF4v3HrXsTCn9+buAzrl21u29HdWpNm2ls2Yfbr4iAGMH5g0oZaBRdLAegI7ybI2k75it4D+TJ/VHM8TwlURiX9DhNotirkw+UDZeEYCcJssXQqTNhhVhH557hq2PdmRhMEQLr3tYccDMeZlaiamu7oexq0pHVq6pec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-640ace5f283so853914a12.2
-        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 04:15:35 -0800 (PST)
+	s=arc-20240116; t=1762518531; c=relaxed/simple;
+	bh=u/AQ2dLPqloBHb+l0NlkIxT1yNRlgXOd+F2Ku7n6B68=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=k5SYMhONE411wmmcYgNdG3ljmMvtycbDfGSyMV0i0qajn1gPLzkgOYfp7JHe9YZvhUYiGqqZQ2VDYh2P9rCSUh20yN9HSWUfmnrph3H/yHFqUZyPYKIhrTo7wJT+YNH13qmAndJc0AUKwKRN1y2b0XOhmNpx9xxwe95M8GUGnpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1NoXctJV; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4e89de04d62so5654391cf.0
+        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 04:28:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1762518527; x=1763123327; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=u/AQ2dLPqloBHb+l0NlkIxT1yNRlgXOd+F2Ku7n6B68=;
+        b=1NoXctJVLg9Sa2AUyrjg+plC6p/VxS1hl4KBapSCZmgGCoEPFVuIzLT6cHPJ+9aH3v
+         YGZwy9eZG4XEJ4q8G9vHdn3WjqdeozVW/jMQC00zTgbLkxDCl2UDFzvVqFDBGQmnHIH3
+         FvKVdvd5SQw1OlEpdEmVtj/OuIkuPVScM5BfiRYUdyVMr6WPc52PHRDX7U12xD1by2Lk
+         u9X54lfXCt/k+iMFPE6sdxLZr44KcpCWXQNR+feoCvjNFSVRMXXKToezSE1IEkywKrPN
+         Q5hJyU8ga2ZEnkkt33fD+mQhtTyukpxKqI+E339tmx1VWGsLOWAg/rHIyIy4k7iwLdy5
+         1jSQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762517734; x=1763122534;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9TZaiKqhNgkqzTPucju46v7m2DA66SO62KdivqxzuRo=;
-        b=bWGTNaRQRqTGLhiVfy6oi4KAhI9fpHeE1jAiYZR362bV0srJsNvPl9W/Bk55OJ/SCa
-         Ns8XIyMLsLtEdP+p/m+nfO2LKGk/V6pJeGIdTC2xkyWby476RgZXRDFAucmNO0gBwSZE
-         IKvnCIdCtZnvkgNQAeLlcRMS46NbpGnAp0lA8MOEnezEVoWEok+uqB7hR/nNMo0jGiUd
-         FpmU1XW/lDwweeMkk/ok+jZhBfL64HfDUTnDaWofJMPIy+IzP+Tt6EdRui/J2qx43728
-         4/O3lg6yH7amz89E2y89j/M2gc6PKdN79U+A+ddMO8gIzZoQIZYHEqB7lcQAjIi8M7dX
-         mA2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXlqPMUE2SRDeCWQPTVVIyVgxLBloPYuhXpVRjZNePsIWl+2k1I97EiRJXcmLTlckuhsJdCDnE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzv1gk9AnEvcI72r7bkGtId8+j0c88c3eG0C5+ZEKpGQ6sMn4Fl
-	Wa/DGZVxYcLAmJ7YWprXVJUTn09j46MtWk7u/1D+MXU5zkx0mnUf555O
-X-Gm-Gg: ASbGncvXwrZsrE9PuB0l3d2KLzhetYO3CWIiLH3zAPrx37Mv1chmh5JDjJ7o/+/PKEy
-	+ieVF1EBocbqCojoLnPwZYVClE/Ype9ByPUjp8yAYBfjHNw+y9TZYWaBIIWz4x+K03sBOhLDg7O
-	Qo3eH34ZG2syxVxBfl3KLRt4uD42aMOKeen3JD0LKySDqlk46lhg4Rc4Sd6Ji8ly67Eb+HFczdH
-	ES05Ll7TZt4uPMo6IOlqJpgCUWhAn112RiKlkYnWbprvy2BDCMsifRkAsNju2Y+jxbo55fzjM+9
-	gi1CArVGs7YpPUNcImLHB2oI4C0Q+GMfTDjWY5l2yey+jTmOq2a8w6bJGe2kzlRlE6RMBB6DIXy
-	gTF1F63M1GzOqPBPQB52cenCWrBGphjxl0DX2BGL/p/a+urqmXt4RqYeUIHOH7cV0Rmqc2tda
-X-Google-Smtp-Source: AGHT+IE3/J/dxqkJPk30iDOhIppMHlMoso5VHvUHsgLu5K1wh3uTQSXzctyO2l8Q+jxjQDXMOxbbkA==
-X-Received: by 2002:a17:907:9712:b0:b45:b1f2:fac0 with SMTP id a640c23a62f3a-b72c0a38fe0mr256514066b.29.1762517733686;
-        Fri, 07 Nov 2025 04:15:33 -0800 (PST)
-Received: from gmail.com ([2a03:2880:30ff:6::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b72bf97e563sm226981766b.41.2025.11.07.04.15.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Nov 2025 04:15:33 -0800 (PST)
-Date: Fri, 7 Nov 2025 04:15:30 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Gustavo Luiz Duarte <gustavold@gmail.com>
-Cc: Andre Carvalho <asantostc@gmail.com>, Simon Horman <horms@kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next 1/4] netconsole: Simplify send_fragmented_body()
-Message-ID: <s6zjlx2geyjlfwgp2rvw2qolgu6vnsstv5y2rdihxwkt5i45nb@y6jzzo5pvgge>
-References: <20251105-netconsole_dynamic_extradata-v1-0-142890bf4936@meta.com>
- <20251105-netconsole_dynamic_extradata-v1-1-142890bf4936@meta.com>
+        d=1e100.net; s=20230601; t=1762518527; x=1763123327;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=u/AQ2dLPqloBHb+l0NlkIxT1yNRlgXOd+F2Ku7n6B68=;
+        b=B0bVSZ3HsOcrlIuWlf3tJ5CzgV3Tbpb65Qc7d3Oaq8XzYz4/cu9xY4BIArS0oRr4eh
+         i0aHzdN7rAwpCSvypIMCKmg4o0XBKZ5Cq2UEz4xHT9+sboLvkzjBD5eFxlIHX941BfII
+         hz0DYneZlaF+TK5MGaE+8n0+lFMiMqByx1O3V/TXZxuwu+K/RWJl46pjdUrdhIxwYZzK
+         rcORmtv0Wn10tERrBVRJn62zXqlDQI980YbStOuXlN7PPKPKfJHD5g/zOxogJxCTfgoO
+         sndqVBpTyE9/2jfpBiBFUIgQdM5Nd3pEzW+LFLzOS9s0znkFLdDga7qgO90HIeS2V940
+         skRw==
+X-Forwarded-Encrypted: i=1; AJvYcCWtNBAjT10WAgAIQPFL264MJciD8az5uVR5Vuqb+wZY9DzFRCl2in+7gIs+Z0ABDSJqndBijVc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzicEC3V5j1VXlpmvXrkqVf4YVY+qinPdDdJI2YM0/N5AX1l8lt
+	ZIRAx3Y7wXTy6og3vszM6EibTwgynOVZg+m2kNNNbj8wrBnGSS7a47Zx/zEgEMGjvEr6wxFkEDH
+	FNgKxHuMFKO2aW0pnptyibz9c+N8EUJDwjvHTBAXR
+X-Gm-Gg: ASbGnctyuRJND3HwS2gicvUurw6H+COFQ0lz0SXJEPRJUaJ+S/gUObPneYsDNcyyTJV
+	qzyrh/dPqzB08IFZ3CZnPF+Q3vbBsDKm+MoUh+gcHeOEK/IbulHIqfOrK2+zGhGjNuC72kg1FIc
+	eWgOgJyQZK97lRuhjkpzEMVAPlfFMoMN8Ow5P5X4EL4xW+nbOrNOtsbUVP78TJLclnPHJkZHms8
+	k8Z925C0lhcR85e5lgtMuBfffZVOctvzJ6YScoup1WBwAN2y5eT+v09HBjnmVgZyTBw4jub
+X-Google-Smtp-Source: AGHT+IFe9Gh0/m+VkoCvK4OKuqq6dN1QEE1387pHlYjy8VUbPAVoGhX3oSZ4yy6zEvn43yBrQCfw8ngHX15EXesmWdc=
+X-Received: by 2002:a05:622a:190d:b0:4e8:b288:7b6a with SMTP id
+ d75a77b69052e-4ed94a83c9fmr30802591cf.82.1762518527099; Fri, 07 Nov 2025
+ 04:28:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251105-netconsole_dynamic_extradata-v1-1-142890bf4936@meta.com>
+References: <20251106202935.1776179-1-edumazet@google.com> <20251106202935.1776179-3-edumazet@google.com>
+ <87ikfmnl15.fsf@toke.dk>
+In-Reply-To: <87ikfmnl15.fsf@toke.dk>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 7 Nov 2025 04:28:35 -0800
+X-Gm-Features: AWmQ_bmKgFrQduf5kNqowahqhYwG-he0F8L4rTKeIMYAum9GRffPg0zmuAQYegE
+Message-ID: <CANn89iJsH3iGuFct0DrLfN8tiga5hNKBQXsX-PgOWNERgHwqMg@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/3] net: fix napi_consume_skb() with alien skbs
+To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 05, 2025 at 09:06:43AM -0800, Gustavo Luiz Duarte wrote:
-> Refactor send_fragmented_body() to use separate offset tracking for
-> msgbody, and extradata instead of complex conditional logic.
-> The previous implementation used boolean flags and calculated offsets
-> which made the code harder to follow.
-> 
-> The new implementation maintains independent offset counters
-> (msgbody_offset, extradata_offset) and processes each section
-> sequentially, making the data flow more straightforward and the code
-> easier to maintain.
-> 
-> This is a preparatory refactoring with no functional changes, which will
-> allow easily splitting extradata_complete into separate userdata and
-> sysdata buffers in the next patch.
-> 
-> Signed-off-by: Gustavo Luiz Duarte <gustavold@gmail.com>
-> ---
->  drivers/net/netconsole.c | 73 ++++++++++++++++--------------------------------
->  1 file changed, 24 insertions(+), 49 deletions(-)
-> 
-> diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-> index 5d8d0214786c..0a8ba7c4bc9d 100644
-> --- a/drivers/net/netconsole.c
-> +++ b/drivers/net/netconsole.c
-> @@ -1553,13 +1553,16 @@ static void send_fragmented_body(struct netconsole_target *nt,
->  				 const char *msgbody, int header_len,
->  				 int msgbody_len, int extradata_len)
->  {
-> -	int sent_extradata, preceding_bytes;
->  	const char *extradata = NULL;
->  	int body_len, offset = 0;
-> +	int extradata_offset = 0;
-> +	int msgbody_offset = 0;
->  
->  #ifdef CONFIG_NETCONSOLE_DYNAMIC
->  	extradata = nt->extradata_complete;
->  #endif
+On Fri, Nov 7, 2025 at 3:23=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen <to=
+ke@redhat.com> wrote:
 
+> Impressive!
+>
+> Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
 
-extradata could be NULL at this time if CONFIG_NETCONSOLE_DYNAMIC is
-unset. Basically extradata=NULL will not be replaced.
+Thanks !
 
-> +	if (WARN_ON_ONCE(!extradata && extradata_len != 0))
-> +		return;
+Note that my upcoming plan is also to plumb skb_attempt_defer_free()
+into __kfree_skb().
 
-And entradata_len = 0 for CONFIG_NETCONSOLE_DYNAMIC disabled.
+[ Part of a refactor, puting skb_unref() in skb_attempt_defer_free() ]
 
-> +		/* write msgbody first */
-> +		this_chunk = min(msgbody_len - msgbody_offset,
-> +				 MAX_PRINT_CHUNK - this_header);
-> +		memcpy(nt->buf + this_header, msgbody + msgbody_offset,
-> +		       this_chunk);
-> +		msgbody_offset += this_chunk;
-> +		this_offset += this_chunk;
-> +
-> +		/* after msgbody, append extradata */
-> +		this_chunk = min(extradata_len - extradata_offset,
-> +				 MAX_PRINT_CHUNK - this_header - this_offset);
-> +		memcpy(nt->buf + this_header + this_offset,
-> +		       extradata + extradata_offset, this_chunk);
-
-then you are going to memcpy from NULL pointer (`extradata + extradata_offset` == 0).
-
-I got this my vim LSP that printed:
-
-	Null pointer passed as 2nd argument to memory copy function [unix.cstring.NullArg]
-
+TCP under pressure would benefit from this a _lot_.
 
