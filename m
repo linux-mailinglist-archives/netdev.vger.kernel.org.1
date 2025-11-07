@@ -1,107 +1,134 @@
-Return-Path: <netdev+bounces-236670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FB9CC3EDC1
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 09:02:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C97F5C3EDCD
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 09:03:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 284FF3B0A17
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 08:01:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74A243AE4BA
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 08:01:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1F1630F800;
-	Fri,  7 Nov 2025 08:01:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UMTV+leH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5C1A2F6585;
+	Fri,  7 Nov 2025 08:01:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f42.google.com (mail-yx1-f42.google.com [74.125.224.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21FCE30E0F5
-	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 08:01:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E9172E54AA;
+	Fri,  7 Nov 2025 08:01:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762502462; cv=none; b=sxq5cHOrtCfU3vZbmhLr6OPwU9gfk3H/iwb73HItQqWkt6z5CFogtxWdCsX14iV7agpPcWGJWsH4byCdGy+xS7fAvV9VvbWY39Tuf4FuNBEGsnG8E+7VUCHvIlaqTX+1QzpIaQEuxefTpgsQPKRYvvWNcGNfzNUdnU5q6fKLktg=
+	t=1762502507; cv=none; b=TC6fKtEbreQCUbtU3I899+uoKDwPrPmEVnCqdVRHLFsbVZHo8SOZpD7oF1A75FNPKFgfwwfGwmrASG/FvkoC4VpJHeidoMtKNldpZFL45VNgDica6IkH4yL4voCfSHq6hmU2IIWPV88FBa7qziA35twjKyqHUHC8w1XaPNGLSMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762502462; c=relaxed/simple;
-	bh=veR/cAm8Ilj4Kxe6dRnZ0XO/VbVZAnhHxEpGLSvMtV4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=e7ebxg2ZF1lkG901QahY99j8HE4OVu6RkL2/pJGB07oPk+gzkhGd0H5Nsf3wgIQRL7Sf4dyFQ0PtIz14q1pdqruCwkhuMYqRUPxWXN8Ltai465Bbxck5sdGi/J84iPfwmu2M6euEzYGdq6rsEVKMLNI1Dp+Rai8DpXtSmr2XgLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UMTV+leH; arc=none smtp.client-ip=74.125.224.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yx1-f42.google.com with SMTP id 956f58d0204a3-63f976ef4bdso434668d50.1
-        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 00:01:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762502460; x=1763107260; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=veR/cAm8Ilj4Kxe6dRnZ0XO/VbVZAnhHxEpGLSvMtV4=;
-        b=UMTV+leHob+OXl7sFDwwxdfOPQ5JMzv9T+1cveWW1hVx5XtAWpXKPY/Z5rUVKjPnQA
-         u5j4HXCMnbHZ+f/DyTSb4KAsR6kYdZznkAPI9+WCAUK6z5FPlTbTH8fSVsySO0VzSkpL
-         ZmVD57F7/a1VsV8C7yqKXLINLPWpBdKFoFErtYlUvyJFFinvVsq14M68wifFl4I+PCtm
-         zCrLcma1C8T8vOtC37QDJ4rrkSkml3nyUPU3CVctcLa+LZU1/MhfaqicGP8LVj+5xTT3
-         gCGFACc9lYoF/iTwMLrN9lz7UsI4iJPPgMUEQgzIkOl1R1QvsEO3Dt1zT30jPDiO8sQ0
-         nWgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762502460; x=1763107260;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=veR/cAm8Ilj4Kxe6dRnZ0XO/VbVZAnhHxEpGLSvMtV4=;
-        b=vBSAloSApwAGrTcFNY0YDCigWTGHeZBxHDEyDrhc7wecgwXi/j4k14UbyngIUkywc0
-         jrlDa8Hy4omkLCljMs1mDHio2ayeR2S1LyGSt9zmsMBEGsMd5OGxrAa1fhsy2qS7UYTe
-         jo7UO5BKitasfu2MRqgzYETSRR09l0JhHxgZtu6J5HuobymYM0UX8W8EEgVCM0W1nfnm
-         pczTDrIkWW4s3uLJV2sH+ivbl0u07aphvRbrWtbrhfhgrqhRvo70+DYRV73O2QuzE72D
-         pNtl6zWXV4n00t1/AJz1Mt5qsuRbDychz86pWQ5rFscSeHqVKkdeJTeAqD1ZkyQpTvJC
-         S2tg==
-X-Forwarded-Encrypted: i=1; AJvYcCVSz8lCJeXJ7sSWS0ec+bfmfElZxkwzDI9Mb75fuii6Vdnf6r7DrncdronaDfID/K38Dh4nN8k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxy7nxyi0SrNVZO6zdl6cXa99gvdD5gSZ28kFWvH61wuSGoL3w+
-	UsUAHWNuzEf+z/p/dOSbnqtBH16ovDj2Dy72KtgXe0nUkSOFWzQOF07Nei7Gxe5S22Rt25Y7o7w
-	0y2G3GNjEOX8RQVrapbTI6bNjYD92oW7X5McaK24T
-X-Gm-Gg: ASbGncuPiLE0WH7+NvqxswUTow4kSujiAzO10flhbDz9kPI/Wn08V8Fv9wLANef9htw
-	TeG0huXiTYNVzDVkmWUXbvFgHyJpiJpSoNMCSrH+mrDVNT25h7LldjclOKmcuhd0BfFW0U4Zir2
-	9FxaOjy6ojJ4W8XU5PAJmwj3WeHmhPilUqdVRdz6vZU4VuuG+OF+sAkE/7ftELPMvBeGrYEEt8s
-	v0KwJGbMEN8+3kVTOdUIkzuMagVmLvh2z8uK+ODxSuNV8dHh+xFTgoNxRPH6Uq27sL2gFrTLofI
-	oqqtzHU=
-X-Google-Smtp-Source: AGHT+IHr85spVAlR97UA+ReNxKh2hEyQw6ZXPxNyrC6SYT/nwHeElKYe3UDiSOtD18g9TlwmpoJlObkPwsMRYvN8JRQ=
-X-Received: by 2002:a05:690e:42d8:b0:63f:bd67:7c50 with SMTP id
- 956f58d0204a3-640c42a98a5mr1403871d50.44.1762502459496; Fri, 07 Nov 2025
- 00:00:59 -0800 (PST)
+	s=arc-20240116; t=1762502507; c=relaxed/simple;
+	bh=uQtoVfEhislDIn8sEGj3Bst3lX9RqEJuI/gzLz6xqIk=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=ZDISZtBvVROhEb5y2koYiU7QNYb7MgkG5+BnEpwe7GcriePAP5MPMG2LR5kRsHUZBJMeeKQwdNYdkBNLD9GJ4H7HyU58u1y0pgAePzPc3YyPFc0+3jXRbounn/fbGOzhgNthqSQ47bR0C1xdP7AhURpefTJPi1NO4so/pdUBzIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost.localdomain (unknown [202.112.113.212])
+	by APP-05 (Coremail) with SMTP id zQCowADHcO9Opw1p7Z7fAQ--.5941S2;
+	Fri, 07 Nov 2025 16:01:27 +0800 (CST)
+From: Ma Ke <make24@iscas.ac.cn>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	sdf@fomichev.me,
+	atenart@kernel.org,
+	kuniyu@google.com,
+	yajun.deng@linux.dev,
+	gregkh@suse.de,
+	ebiederm@xmission.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	akpm@linux-foundation.org,
+	Ma Ke <make24@iscas.ac.cn>,
+	stable@vger.kernel.org
+Subject: [PATCH] net: Fix error handling in netdev_register_kobject
+Date: Fri,  7 Nov 2025 16:01:17 +0800
+Message-Id: <20251107080117.15099-1-make24@iscas.ac.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:zQCowADHcO9Opw1p7Z7fAQ--.5941S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7AF43XF13Jw1DAryUZFy7Wrg_yoW8Ar48pw
+	45Wa9xJrWkKr4j9ws7ZF1kWa40kF1Ikws3Ca4Fyw1S9rs5Xr9agrWUKrWFg3W8AaykuFy5
+	tFy7Cw45ZayUZaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUP014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Cr1j6rxdM28EF7xvwVC2z280aVCY1x0267AKxVWxJr
+	0_GcWlnxkEFVAIw20F6cxK64vIFxWle2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xv
+	F2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r
+	4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I
+	648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AFwI0_Jw0_GFylc2xSY4AK67
+	AK6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAF
+	wI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc4
+	0Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AK
+	xVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr
+	1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUjXTm3UU
+	UUU==
+X-CM-SenderInfo: ppdnvj2u6l2u1dvotugofq/
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20251106003357.273403-1-kuniyu@google.com> <20251106003357.273403-2-kuniyu@google.com>
-In-Reply-To: <20251106003357.273403-2-kuniyu@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 7 Nov 2025 00:00:47 -0800
-X-Gm-Features: AWmQ_bm7sjjFJJDdTQjzyC1omjDhx9dWMe6I2OQrEQT0YlPkhfjIl1nSlWH9whc
-Message-ID: <CANn89i+O2rHbuchhN2EPoPscbgxNJzrYmf=-5M0BpAUXOeCAQg@mail.gmail.com>
-Subject: Re: [PATCH v1 net-next 1/6] tcp: Call tcp_syn_ack_timeout() directly.
-To: Kuniyuki Iwashima <kuniyu@google.com>
-Cc: Neal Cardwell <ncardwell@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Yuchung Cheng <ycheng@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 5, 2025 at 4:34=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.com=
-> wrote:
->
-> Since DCCP has been removed, we do not need to use
-> request_sock_ops.syn_ack_timeout().
->
-> Let's call tcp_syn_ack_timeout() directly.
->
-> Now other function pointers of request_sock_ops are
-> protocol-dependent.
->
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@google.com>
+After calling device_initialize(), the reference count of the device
+is set to 1. If device_add() fails or register_queue_kobjects() fails,
+the function returns without calling put_device() to release the
+initial reference, causing a memory leak of the device structure.
+Similarly, in netdev_unregister_kobject(), after calling device_del(),
+there is no call to put_device() to release the initial reference,
+leading to a memory leak. Add put_device() in the error paths of
+netdev_register_kobject() and after device_del() in
+netdev_unregister_kobject() to properly release the device references.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Found by code review.
+
+Cc: stable@vger.kernel.org
+Fixes: a1b3f594dc5f ("net: Expose all network devices in a namespaces in sysfs")
+Signed-off-by: Ma Ke <make24@iscas.ac.cn>
+---
+ net/core/net-sysfs.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+index ca878525ad7c..d3895f26a0c8 100644
+--- a/net/core/net-sysfs.c
++++ b/net/core/net-sysfs.c
+@@ -2327,6 +2327,7 @@ void netdev_unregister_kobject(struct net_device *ndev)
+ 	pm_runtime_set_memalloc_noio(dev, false);
+ 
+ 	device_del(dev);
++	put_device(dev);
+ }
+ 
+ /* Create sysfs entries for network device. */
+@@ -2357,7 +2358,7 @@ int netdev_register_kobject(struct net_device *ndev)
+ 
+ 	error = device_add(dev);
+ 	if (error)
+-		return error;
++		goto out_put_device;
+ 
+ 	error = register_queue_kobjects(ndev);
+ 	if (error) {
+@@ -2367,6 +2368,10 @@ int netdev_register_kobject(struct net_device *ndev)
+ 
+ 	pm_runtime_set_memalloc_noio(dev, true);
+ 
++	return 0;
++
++out_put_device:
++	put_device(dev);
+ 	return error;
+ }
+ 
+-- 
+2.17.1
+
 
