@@ -1,106 +1,243 @@
-Return-Path: <netdev+bounces-236877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 345EDC412F3
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 19:01:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A638C41456
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 19:21:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A9BEE4E51E8
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 18:01:21 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C42F34E94AD
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 18:21:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFE49295DAC;
-	Fri,  7 Nov 2025 18:01:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52BBF33A00C;
+	Fri,  7 Nov 2025 18:20:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="s3asmT3V"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GgTFGBwn"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF0A91DB125
-	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 18:01:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0D672DECDF
+	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 18:20:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762538479; cv=none; b=kk92KrDWxOjEds+dLv7pueJ9qmgTypuR1HwjFuK//dAxJu6POSGWQ3u/tP/VepjnBSQCzV8AWLtThTCPV17kK8FRlZ0Y9060HQbIdv03MnnMeouXYmmueczfMdKAaWc6plR32EhehYxxgmdE9qNEAO+z9SS43q6V7x1B3RG6yhI=
+	t=1762539659; cv=none; b=lZvBH7biWtHoFKB3U2HKm4x7APOpJjAy7F+CU1HrNCc2GnoyxdDAwOMV7LBwzvssudpbsg7/MD0SIyuWc6KPXXaJTQyin7o/291ICODeoS+LzBzxJz/lGWFG3yn4HR/PXtieH4V6E2ol/fb3f2gdZjNidtc71Hwl0x1bMiXM9gk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762538479; c=relaxed/simple;
-	bh=h3U6wkQUVKXBFLoXt7I24LS6WiGGAaHs05KTgE1xk4s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A0TD4lKmqilE0mBqARzxbAjG8F9XvAjPkJQlMkQpmcyKImmIjYDUGydhZpaIzF9fEdb2B+KMnWqI8Hlh3lLIoYBPU38pk4zTMsOb9yOkyRG5Eg8vufwKzCHyM6dpGAaBvNsZbjJIH/ttE25ruYjpwkUkSPUcMS8MJbMT4AzkQGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=s3asmT3V; arc=none smtp.client-ip=95.215.58.180
+	s=arc-20240116; t=1762539659; c=relaxed/simple;
+	bh=Q/gR2HYyuZ615NXxkfo/E+QmBiaqZa/aLTNQ0aQB40w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Fs4kUcc4HfNxXRl4kIemo2n1G/83rnYK07eUV2Vncr6cvB0yiloAahTfwHKG5Agr0jIIpsJrxcV891ddfFVOwwrhYeqc1ZBuPFjs59xQa5Ia3sPBwzDt44J8ZZ4hJ0e9rFSC+QBRi7HRr+wfAy3ZHl7HU6NRI8tZwEmU/sPp2gA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GgTFGBwn; arc=none smtp.client-ip=91.218.175.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <cd54cc15-b51f-4bf7-9362-2086031a9c7a@linux.dev>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1762538473;
+	t=1762539654;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=apID74Euc7USZiCjVL0Jk33yLeWITRkTPWzpBzwP2Zg=;
-	b=s3asmT3VDZYM1Nghx7ZOvTnzKHG3092h2MoIgsqtxuuvlUDe3/zCmn1KWbNt0iNSnesNJB
-	KcjMTdoLaFVNPue01+aAaprN91HXo3RtDsQjxpglL+zXJzB33YK2QPZ42/lczvOsfClKCB
-	oCByuU6uqqKqIeo+ZifpgowLQrV42Pk=
-Date: Fri, 7 Nov 2025 18:01:02 +0000
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=QoZULchYy7trdqIxzOWKX9dVYUWTQazldyq633QAi6Y=;
+	b=GgTFGBwnxZQG2M0sg0HkFF8oNuIXuky3rWp1p5cLZ8G+ICUNK6efSd24RZdJ45T6bbsoGz
+	aUxccronMeW5v0mIuv0QqmW4xGAOm7Hfnj8LnXfiHAG+3R6ZWkmZJf43CCPfGxa+0eJUhG
+	nVDSsSfTRNIhIuznWlOfmMVK2ZVVf/g=
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+To: Michal Kubecek <mkubecek@suse.cz>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Subject: [PATCH ethtool-next v3] netlink: tsconfig: add HW time stamping configuration
+Date: Fri,  7 Nov 2025 18:20:44 +0000
+Message-ID: <20251107182044.3545092-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] ptp: ocp: Document sysfs output format for backward
- compatibility
-To: Zhongqiu Han <zhongqiu.han@oss.qualcomm.com>, jonathan.lemon@gmail.com,
- richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20251107074533.416048-1-zhongqiu.han@oss.qualcomm.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20251107074533.416048-1-zhongqiu.han@oss.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-On 07/11/2025 07:45, Zhongqiu Han wrote:
-> Add a comment to ptp_ocp_tty_show() explaining that the sysfs output
-> intentionally does not include a trailing newline. This is required for
-> backward compatibility with existing userspace software that reads the
-> sysfs attribute and uses the value directly as a device path.
-> 
-> A previous attempt to add a newline to align with common kernel
-> conventions broke userspace applications that were opening device paths
-> like "/dev/ttyS4\n" instead of "/dev/ttyS4", resulting in ENOENT errors.
-> 
-> This comment prevents future attempts to "fix" this behavior, which would
-> break existing userspace applications.
-> 
-> Link: https://lore.kernel.org/netdev/20251030124519.1828058-1-zhongqiu.han@oss.qualcomm.com/
-> Link: https://lore.kernel.org/netdev/aef3b850-5f38-4c28-a018-3b0006dc2f08@linux.dev/
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> Signed-off-by: Zhongqiu Han <zhongqiu.han@oss.qualcomm.com>
-> ---
->   drivers/ptp/ptp_ocp.c | 6 ++++++
->   1 file changed, 6 insertions(+)
-> 
-> diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
-> index a5c363252986..eeebe4d149f7 100644
-> --- a/drivers/ptp/ptp_ocp.c
-> +++ b/drivers/ptp/ptp_ocp.c
-> @@ -3430,6 +3430,12 @@ ptp_ocp_tty_show(struct device *dev, struct device_attribute *attr, char *buf)
->   	struct dev_ext_attribute *ea = to_ext_attr(attr);
->   	struct ptp_ocp *bp = dev_get_drvdata(dev);
->   
-> +	/*
-> +	 * NOTE: This output does not include a trailing newline for backward
-> +	 * compatibility. Existing userspace software uses this value directly
-> +	 * as a device path (e.g., "/dev/ttyS4"), and adding a newline would
-> +	 * break those applications. Do not add a newline to this output.
-> +	 */
->   	return sysfs_emit(buf, "ttyS%d", bp->port[(uintptr_t)ea->var].line);
->   }
->   
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+The kernel supports configuring HW time stamping modes via netlink
+messages, but previous implementation added support for HW time stamping
+source configuration. Add support to configure TX/RX time stamping.
+We keep TX type and RX filter configuration as a bit value, but if we
+will need multibit value to be set in the future, there is an option to
+use "rx-filters" keyword which will be mutually exclusive with current
+"rx-filter" keyword. The same applies to "tx-type".
+
+Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
+---
+v2 -> v3:
+* improve code style
+v1 -> v2:
+* improve commit message
+---
+ ethtool.8.in       | 12 +++++++-
+ ethtool.c          |  1 +
+ netlink/tsconfig.c | 77 +++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 88 insertions(+), 2 deletions(-)
+
+diff --git a/ethtool.8.in b/ethtool.8.in
+index 8874ade..1788588 100644
+--- a/ethtool.8.in
++++ b/ethtool.8.in
+@@ -357,6 +357,10 @@ ethtool \- query or control network driver and hardware settings
+ .IR N
+ .BI qualifier
+ .IR precise|approx ]
++.RB [ tx
++.IR TX-TYPE ]
++.RB [ rx-filter
++.IR RX-FILTER ]
+ .HP
+ .B ethtool \-x|\-\-show\-rxfh\-indir|\-\-show\-rxfh
+ .I devname
+@@ -1287,7 +1291,7 @@ for IEEE 1588 quality and "approx" is for NICs DMA point.
+ Show the selected time stamping PTP hardware clock configuration.
+ .TP
+ .B \-\-set\-hwtimestamp\-cfg
+-Select the device's time stamping PTP hardware clock.
++Sets the device's time stamping PTP hardware clock configuration.
+ .RS 4
+ .TP
+ .BI index \ N
+@@ -1296,6 +1300,12 @@ Index of the ptp hardware clock
+ .BI qualifier \ precise | approx
+ Qualifier of the ptp hardware clock. Mainly "precise" the default one is
+ for IEEE 1588 quality and "approx" is for NICs DMA point.
++.TP
++.BI tx \ TX-TYPE
++Type of TX time stamping to configure
++.TP
++.BI rx-filter \ RX-FILTER
++Type of RX time stamping filter to configure
+ .RE
+ .TP
+ .B \-x \-\-show\-rxfh\-indir \-\-show\-rxfh
+diff --git a/ethtool.c b/ethtool.c
+index bd45b9e..521e6fe 100644
+--- a/ethtool.c
++++ b/ethtool.c
+@@ -6068,6 +6068,7 @@ static const struct option args[] = {
+ 		.nlfunc	= nl_stsconfig,
+ 		.help	= "Select hardware time stamping",
+ 		.xhelp	= "		[ index N qualifier precise|approx ]\n"
++			  "		[ tx TX-TYPE ] [ rx-filter RX-FILTER ]\n"
+ 	},
+ 	{
+ 		.opts	= "-x|--show-rxfh-indir|--show-rxfh",
+diff --git a/netlink/tsconfig.c b/netlink/tsconfig.c
+index d427c7b..f4ed10e 100644
+--- a/netlink/tsconfig.c
++++ b/netlink/tsconfig.c
+@@ -17,6 +17,7 @@
+ #include "netlink.h"
+ #include "bitset.h"
+ #include "parser.h"
++#include "strset.h"
+ #include "ts.h"
+ 
+ /* TSCONFIG_GET */
+@@ -94,6 +95,66 @@ int nl_gtsconfig(struct cmd_context *ctx)
+ 
+ /* TSCONFIG_SET */
+ 
++int tsconfig_txrx_parser(struct nl_context *nlctx, uint16_t type,
++			 const void *data __maybe_unused,
++			 struct nl_msg_buff *msgbuff,
++			 void *dest __maybe_unused)
++{
++	struct nlattr *bits_attr, *bit_attr;
++	const struct stringset *values;
++	const char *arg = *nlctx->argp;
++	unsigned int count, i;
++
++	nlctx->argp++;
++	nlctx->argc--;
++	if (netlink_init_ethnl2_socket(nlctx) < 0)
++		return -EIO;
++
++	switch (type) {
++	case ETHTOOL_A_TSCONFIG_TX_TYPES:
++		values = global_stringset(ETH_SS_TS_TX_TYPES, nlctx->ethnl2_socket);
++		break;
++	case ETHTOOL_A_TSCONFIG_RX_FILTERS:
++		values = global_stringset(ETH_SS_TS_RX_FILTERS, nlctx->ethnl2_socket);
++		break;
++	default:
++		return -EINVAL;
++	}
++
++	count = get_count(values);
++	for (i = 0; i < count; i++) {
++		const char *name = get_string(values, i);
++
++		if (!strcmp(name, arg))
++			break;
++	}
++
++	if (i != count)
++		return -EINVAL;
++
++	if (ethnla_put_flag(msgbuff, ETHTOOL_A_BITSET_NOMASK, true))
++		return -EMSGSIZE;
++
++	bits_attr = ethnla_nest_start(msgbuff, ETHTOOL_A_BITSET_BITS);
++	if (!bits_attr)
++		return -EMSGSIZE;
++
++	bit_attr = ethnla_nest_start(msgbuff, ETHTOOL_A_BITSET_BITS_BIT);
++	if (!bit_attr) {
++		ethnla_nest_cancel(msgbuff, bits_attr);
++		return -EMSGSIZE;
++	}
++	if (ethnla_put_u32(msgbuff, ETHTOOL_A_BITSET_BIT_INDEX, i) ||
++	    ethnla_put_flag(msgbuff, ETHTOOL_A_BITSET_BIT_VALUE, true)) {
++		ethnla_nest_cancel(msgbuff, bits_attr);
++		ethnla_nest_cancel(msgbuff, bit_attr);
++		return -EMSGSIZE;
++	}
++	mnl_attr_nest_end(msgbuff->nlhdr, bit_attr);
++	mnl_attr_nest_end(msgbuff->nlhdr, bits_attr);
++	return 0;
++}
++
+ static const struct param_parser stsconfig_params[] = {
+ 	{
+ 		.arg		= "index",
+@@ -109,6 +170,20 @@ static const struct param_parser stsconfig_params[] = {
+ 		.handler	= tsinfo_qualifier_parser,
+ 		.min_argc	= 1,
+ 	},
++	{
++		.arg		= "tx",
++		.type		= ETHTOOL_A_TSCONFIG_TX_TYPES,
++		.handler	= tsconfig_txrx_parser,
++		.group		= ETHTOOL_A_TSCONFIG_TX_TYPES,
++		.min_argc	= 1,
++	},
++	{
++		.arg		= "rx-filter",
++		.type		= ETHTOOL_A_TSCONFIG_RX_FILTERS,
++		.handler	= tsconfig_txrx_parser,
++		.group		= ETHTOOL_A_TSCONFIG_RX_FILTERS,
++		.min_argc	= 1,
++	},
+ 	{}
+ };
+ 
+@@ -134,7 +209,7 @@ int nl_stsconfig(struct cmd_context *ctx)
+ 	if (ret < 0)
+ 		return ret;
+ 	if (ethnla_fill_header(msgbuff, ETHTOOL_A_TSCONFIG_HEADER,
+-			       ctx->devname, 0))
++			       ctx->devname, ETHTOOL_FLAG_COMPACT_BITSETS))
+ 		return -EMSGSIZE;
+ 
+ 	ret = nl_parser(nlctx, stsconfig_params, NULL, PARSER_GROUP_NEST, NULL);
+-- 
+2.47.3
+
 
