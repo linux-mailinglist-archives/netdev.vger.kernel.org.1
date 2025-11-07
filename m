@@ -1,137 +1,110 @@
-Return-Path: <netdev+bounces-236841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4A19C409E7
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 16:37:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 619C7C40A0B
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 16:38:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 502D7348CE4
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 15:37:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BDD31A4500B
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 15:38:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA2FB329C68;
-	Fri,  7 Nov 2025 15:37:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EF0732B993;
+	Fri,  7 Nov 2025 15:37:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BeuYfa91"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mUjwOTCD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E16B268690;
-	Fri,  7 Nov 2025 15:37:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03DF632D7F7
+	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 15:37:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762529830; cv=none; b=N4GgXg/2zIdGGvOvJ6rbAe6ku7lwytB5R5XSJsWV7ugfHksewiLgxIcFPujSlEGa0jOIVRWswoZXm9Pum+hKUw/dLs7yOQr6yA8MAfS2J3yhfpvzYaXfhoHN8ERZfMNoqVPlmlZhnvxs+AWONg/S+rars1xWdoKHamLL4doa4JU=
+	t=1762529862; cv=none; b=NS5+5awfj8tnBXhXKq0pduYlwToqYfYfHEndBHGtlsgpKGkkq3O92rYbCvZRkEKGOPQnvStQeHplCtrMNK1u0orvC2tqGBUJ+zbv/nGqmeOcK8+wEFe+6NSa2q1UqtInXpewykFLhgfzAJKAslCXKU3ow5sana8IpB+qhAn4828=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762529830; c=relaxed/simple;
-	bh=bCrSoQu63h7TXwxNL43pN4r1ALSnNbU5F1bAl9mdBuo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Zsmu/ZzhxeSPZnQ0ZBnEWmaaqxGRiechWgqNNl+XH78lOwz+jB9aHgnX4qKA1jOkZAtEcGrO8vVUq73Ii5ddaEofjd2LWKQn6lAjIaF3ieQEKkIAw78seuo1ADDNCjw7Z15ZDFLGKvovy4PFB32a9/AhJBl1rqanUznoUXIQr2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=BeuYfa91; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5A7EsWro030381;
-	Fri, 7 Nov 2025 15:37:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=bCrSoQ
-	u63h7TXwxNL43pN4r1ALSnNbU5F1bAl9mdBuo=; b=BeuYfa914//ktvu51uwdg2
-	NYmbwv7NxePH+S87wg4vSgN0kqEhq+KL13zMZkpaaBy81SNyPLdMuMHzkQncMWKo
-	e3d5Ra1P/fr1kV4hfaHnj5hnccayOUFd/5P+EYKZb2wtQFprVinpQOx6PI9Y5vqz
-	NVzNDt9A9P7GVkTejtSuIfWmuaCLQqBgDrJOkRRePYMYwQpewLi9kdpauslfrKNQ
-	ztUrpA7a1gw+C76Er0L8VlKi+nu+lmWRBt1l31XNsILf2akEDAAVNKmyrsCURdqo
-	IysLIgIBerQqXb4mdG4i+ZwACUxWi6MP9V0PpgkcljanGlpaHN3TuY5njGgs05PQ
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a9jxmr8b3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 07 Nov 2025 15:37:02 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5A7FPskd003030;
-	Fri, 7 Nov 2025 15:37:02 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4a9jxmr8ax-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 07 Nov 2025 15:37:02 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5A7FJVF2019320;
-	Fri, 7 Nov 2025 15:37:01 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 4a5whnud8b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 07 Nov 2025 15:37:00 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5A7FausR50725316
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 7 Nov 2025 15:36:56 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BBDEA20040;
-	Fri,  7 Nov 2025 15:36:56 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6806920043;
-	Fri,  7 Nov 2025 15:36:56 +0000 (GMT)
-Received: from [9.111.185.176] (unknown [9.111.185.176])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri,  7 Nov 2025 15:36:56 +0000 (GMT)
-Message-ID: <e238fdb5-f495-41dc-9f5a-7367d480cd08@linux.ibm.com>
-Date: Fri, 7 Nov 2025 16:36:56 +0100
+	s=arc-20240116; t=1762529862; c=relaxed/simple;
+	bh=PcTNp6i17O0e+BLHYjsVXsCRYYYllDagEWviEpSI6Tg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Oo42bd8cP6H8L9oK3gg0gVa+DHj3FhB558cjMwcXpuPL/upCSsHT9fr6461bSlIJM4jK7yrrJec7dutgJ7Ff7QDg/le7MMut5z0jhHz0WsbASMa8y7ug2dKQsO/2I1INS9en68rE9VrlX5PUeNCimNP7922BDaGepnmuPlKBhwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mUjwOTCD; arc=none smtp.client-ip=209.85.166.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-948614ceac0so57508339f.0
+        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 07:37:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762529860; x=1763134660; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PcTNp6i17O0e+BLHYjsVXsCRYYYllDagEWviEpSI6Tg=;
+        b=mUjwOTCDzOO2yYEhwD8qxIkbCjZMjTPbSXqR/wVTRQ2nQvpdKbBlWpACcYOka1K39e
+         xwL4vF07eXyltIS1qJw5e3m3P9JHclM+A2ENH0JWKDOwYPEmM1FOe7D/973FGZYkoLhK
+         I31OC6aZ+5rX/JyQZiXmZ45GlClp3VgPZ4QL9JfHQXfpOtlZMBknStMDjUXWDWRDTJtZ
+         Y5rZweIGqws7nRsTYVrpACHYYNafa0h2Taq7xPo0z05h1lhxDjjKK7T4ALcE81UpA294
+         OCjdwF2SowJnvElPIAsTTxkGNEmWjEWaHczr+tnL/ajYi1uffDsRHxhL90Jg2xCau94k
+         GAUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762529860; x=1763134660;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=PcTNp6i17O0e+BLHYjsVXsCRYYYllDagEWviEpSI6Tg=;
+        b=Md97go2uXPEujFvMOIOjXfkrybUa5LzzHltV9roqkJQUK5lpwyQrUuIqReyYvzlMf6
+         SlHLAUrXv+3ZRZUtiyPXTDPudhoYig5kJ40afTHYeco8KhRqIJ+R4PfBGJ0CDhpA+l0g
+         4EyNTa+hFPqxijqal9ta7jrmUEyRsQmBCczjaOQN4iko4iGa1BUuZrv6fx8wS0pCLB69
+         HlJaYnPteO3+cUn5Kf6xPx2TRYIR5Ai6jxOZgOSj+y3dLAt9wnmTu+HHfCb0VBpcLV08
+         Gk6qLtIDDEXy0eFzcIVD4+iAReaezRIJ7sfAb+brdDJXJJDI2Nuv33dIa8H5P2vqgSNO
+         Ii7A==
+X-Forwarded-Encrypted: i=1; AJvYcCWT9syGqWeqBqsU05ynShT1hXmeerFHINmk1NF2jMMheoHXNgTTRr6HQXSMI+saBR/YnMdjWR0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRJaveSeX0PquGrNyR7M3zLRWvIKNzhsAvPiIuD3i+8LFMdDXD
+	Oy/dQvxkIZ4dg1u2wzdhEkx1mVzwCnDSlf6p5Xai/hCNHHP/xVQjNsIThZN7uFd0mDO6hx/sgy8
+	fwuxhSUk4CZWk1kwJua7euwoJ1bGLaYA=
+X-Gm-Gg: ASbGncsFFbhimU8hDXugEiAFHsSdJ64YrS+C+iSrCB0CBN17m7M+OwvXpGZ/nX2hw3i
+	CFLw51ZMkj1bayxbE/ea7oadAg1GsKfVMgg61D3uJrijdYeBq9P7crEK0llNF3ogw/LE29mwVxx
+	YomANbDE1GP5+PbfBe71sIuzfTx60K7FcLIv5CPC802BaNFGk2/MSYhIJFWmw3HYE4y35POHBcB
+	VFPeTht3tH8Mo7ehMT1BK1BrRRME0JL7njoRAh5sv0vJKkOb4xnanQL1K3kRljJ
+X-Google-Smtp-Source: AGHT+IHimwf6Y5QF0sEpiCsBaAvWY3LxV+5d6j8uyAuBqbth/ogckKBGyuJsUJSnpaoB/l2L2VP4SQhtKBDMnefk2eQ=
+X-Received: by 2002:a05:6e02:3704:b0:433:4fc9:7b28 with SMTP id
+ e9e14a558f8ab-4335f46f7c3mr48036935ab.28.1762529860086; Fri, 07 Nov 2025
+ 07:37:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] net/smc: fix mismatch between CLC header and
- proposal
-To: "D. Wythe" <alibuda@linux.alibaba.com>, mjambigi@linux.ibm.com,
-        wenjia@linux.ibm.com, dust.li@linux.alibaba.com,
-        tonylu@linux.alibaba.com, guwen@linux.alibaba.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
-        pabeni@redhat.com, edumazet@google.com, sidraya@linux.ibm.com,
-        jaka@linux.ibm.com
-References: <20251107024029.88753-1-alibuda@linux.alibaba.com>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <20251107024029.88753-1-alibuda@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Authority-Analysis: v=2.4 cv=BZvVE7t2 c=1 sm=1 tr=0 ts=690e121e cx=c_pps
- a=GFwsV6G8L6GxiO2Y/PsHdQ==:117 a=GFwsV6G8L6GxiO2Y/PsHdQ==:17
- a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22
- a=SRrdq9N9AAAA:8 a=VnNF1IyMAAAA:8 a=ESNYVigEsH7QVG4fgMUA:9 a=QEXdDO2ut3YA:10
- a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA3MDEyMiBTYWx0ZWRfX4dvWmd4ENyMG
- YEEIXZN2fK2l3iRHs4ufppVhOz7ld6lfm+cosbqGrQ7xiPUt/mW5ZQ5Uhmukkdp+veHg5Hy6vvS
- Qfe0l7WHQdkJeK9NKUyRo3/gWDFRu/H5sQ7FhSCvK5ChrMwg7/vROyjK/nOBFVTpGSfWe1G31qK
- 7Sezvm37LK6AHQiZuxa+Xy5j6mG5Nw97cDXlYb224SVxzOm+djrV1OS1D59L99IEKKUKAn+ia8X
- kI8m43rDNHIf6MHAEWCBHp/K0xkgh6lwFhJAthLXJvFo0ZBgYqAaKJ0TuBqz/oa6Sof7A0T2tzI
- A98ZWZSmyWgdgsqYiaVm8ri1qdBsO9kOY6Gru+BltkQl+/pUopPgJs9n+Pp+hQRgqGjkAx+tiF7
- /FwdQRtW9iLVpk4TPU3IyhRZUH7teg==
-X-Proofpoint-GUID: KH4Tg-uLZ3AOsT9Olu5qQBTbighSBv6V
-X-Proofpoint-ORIG-GUID: -zCtIbyES6nWr9OnAqwO-vYTlvTm_mUY
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-07_04,2025-11-06_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 spamscore=0 phishscore=0 suspectscore=0 clxscore=1015
- priorityscore=1501 malwarescore=0 impostorscore=0 bulkscore=0
- lowpriorityscore=0 classifier=typeunknown authscore=0 authtc= authcc=
- route=outbound adjust=0 reason=mlx scancount=1 engine=8.19.0-2510240000
- definitions=main-2511070122
+References: <20251106202935.1776179-1-edumazet@google.com> <20251106202935.1776179-4-edumazet@google.com>
+In-Reply-To: <20251106202935.1776179-4-edumazet@google.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 7 Nov 2025 23:37:04 +0800
+X-Gm-Features: AWmQ_blkK19nMa7HpFy9lL2LpTPugUD0NAN-zyXno2LX6bCptl63L6jLF65DTg8
+Message-ID: <CAL+tcoBEEjO=-yvE7ZJ4sB2smVBzUht1gJN85CenJhOKV2nD7Q@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/3] net: increase skb_defer_max default to 128
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Nov 7, 2025 at 4:30=E2=80=AFAM Eric Dumazet <edumazet@google.com> w=
+rote:
+>
+> skb_defer_max value is very conservative, and can be increased
+> to avoid too many calls to kick_defer_list_purge().
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
+I was thinking if we ought to enlarge NAPI_SKB_CACHE_SIZE() to 128 as
+well since the freeing skb happens in the softirq context, which I
+came up with when I was doing the optimization for af_xdp. That is
+also used to defer freeing skb to obtain some improvement in
+performance. I'd like to know your opinion on this, thanks in advance!
 
-On 07.11.25 03:40, D. Wythe wrote:
-> Fixes: 8c3dca341aea ("net/smc: build and send V2 CLC proposal")
-> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
 
-Thank you, D. Wythe
-
-Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
-
+Thanks!
 
