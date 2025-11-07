@@ -1,170 +1,235 @@
-Return-Path: <netdev+bounces-236823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 581F7C4063B
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 15:35:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95981C40632
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 15:34:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5EF8C3B520F
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 14:31:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A8583A993E
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 14:31:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 476E9328B54;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1956532860F;
 	Fri,  7 Nov 2025 14:31:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="lM6KaFrI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PUaP2ILJ";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="mLk97YuD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BEF92C2369
-	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 14:31:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49AC02E040D
+	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 14:31:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762525871; cv=none; b=uTyalLmcPaNPed/ZbhsukHW7ClfE1k66qNJi+dR/jRfcy6H1H2stzrAoq+9fANCuwRJwwp2t9II/Y8pNOteSv7mgL9cnw6Sr/wVwFBT7xfC+pyMj3fTMkXWCcU7htjkEpZC24MKSn4UyDBZEn7A5XVksXZzJIE+EfDhZxnitjlA=
+	t=1762525871; cv=none; b=ZEzxHKVlfrr5cnQntTjmaHpmo8Pfq3A1mBSTTNWnFaUz824r3gVRD5KTeZWkbVRxAszvEUnT+j9CjADmgD2OaGIr580L4gpDQkVdUOOJCFDtWACYcqXXqZPnWM5JUiLmJ7+CPig7vx6Y01JkL8+KGURzDbtx9EtoRnaoOZHwV5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1762525871; c=relaxed/simple;
-	bh=pOrgQrnt2bAV2rwFEhenpVMFIt6XO4Pcr4+DbOhQoIY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GaFtO0On9dZionlpQudXsryVV+dhli9zUZkSqiSIXJz0EGxlrbsx/YW3Chku3iv013r0hewziIezO31toIQ+gJnJ5TEb56dg65f/M/Uo+DMf0twwj5o8Z0KWihLLfxNes0SQIssSVcGY4ynQFs67XF8FOWoHQWHpQfgdMqfuUcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=lM6KaFrI; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5A7E58Ve032330;
-	Fri, 7 Nov 2025 14:30:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=HuyCyNIxSTtU1XKMsaRkv99RE6i6L
-	6TQ42UPOrrYmNE=; b=lM6KaFrIIWwHXLb7B02L+owzJ+4qFlBpnJj+LVkddwlLO
-	C3bRed/etj9KXGsMQlrPV9IPcfuCv9oWMiM5ylVuToyV9wcxxo3P5Fw09XVfZO69
-	OjGKiuOm475jgMX/ICP+nK6rV5pPE25Obp9JDZaWJs2M3Fm7d3e23BUBHtEJtW0i
-	thqtObtZQaCWIKCKtL8mCUusHmXs2zWA1H5zIzIsXraXwSNxOoKoSAkNi7tzP+6o
-	6lFrX/33WSC3rZEt+BCZ0RZQf7dv6WZk/4tUb+d4PdS6aMsoKD4tJ+EleCNaejuB
-	5RiugqQfPKxlHQOzclrs/D9RXYWiIiHswhq6VfsMA==
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4a9j77r1x4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 07 Nov 2025 14:30:55 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5A7DlDrC023016;
-	Fri, 7 Nov 2025 14:30:55 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 4a58nhcsyy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 07 Nov 2025 14:30:55 +0000
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5A7EUsPT020742;
-	Fri, 7 Nov 2025 14:30:54 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 4a58nhcsxj-1;
-	Fri, 07 Nov 2025 14:30:54 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: przemyslaw.kitszel@intel.com, aleksander.lobakin@intel.com,
-        anthony.l.nguyen@intel.com, andrew+netdev@lunn.ch, kuba@kernel.org,
-        davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-        horms@kernel.org, intel-wired-lan@lists.osuosl.org,
-        netdev@vger.kernel.org
-Cc: alok.a.tiwarilinux@gmail.com, alok.a.tiwari@oracle.com
-Subject: [PATCH net-next v3] iavf: clarify VLAN add/delete log messages and lower log level
-Date: Fri,  7 Nov 2025 06:30:26 -0800
-Message-ID: <20251107143051.2610996-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.50.1
+	bh=4ACT8X04sb6fAW3+47LxhHcq7/anCem7+kuAeIdPdiU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AffLtG00dMNPCkoOCDam66sm2PiJrkMXb3oI1bwQacRR9kF3i0Cw/dQNk2Wo6/tAtNJJHvvxQrYbG6XuUzU0jBT67/FxNxeOB57roACzmdalYAgWEoR3loo2QJxZEqAyVHgeqNbNjZJ6Fjf+cNOxzmt8vrV5xjntHGeUOTSgUDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PUaP2ILJ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=mLk97YuD; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762525868;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xL9UWKNVFseJyc8ZZEBbh4eUS+K/pGNVZX2OMNyP0Mg=;
+	b=PUaP2ILJ0eQ7Swrjje1R9Enx6fEu/eFwiizD1/g6u+KeU9oBWkJ2BXtSQyVAEUtWpYd6TV
+	Mo4Ps0o+PCM3J8q+jzOAsI3j04Im1OqJzxkf3h1dRex4m4UBMtvtfWWrTWOvbNfeIcTQxL
+	hwWce1AbQ77tbZbZogywWSaGQtd5AfE=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-461-ks4FB9TfOZqwsgbrK-_4iA-1; Fri, 07 Nov 2025 09:31:03 -0500
+X-MC-Unique: ks4FB9TfOZqwsgbrK-_4iA-1
+X-Mimecast-MFC-AGG-ID: ks4FB9TfOZqwsgbrK-_4iA_1762525862
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-b72ad85ee9aso98474566b.3
+        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 06:31:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1762525862; x=1763130662; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xL9UWKNVFseJyc8ZZEBbh4eUS+K/pGNVZX2OMNyP0Mg=;
+        b=mLk97YuDYnfIMKSd3JKJTZrltUK5pFbg40ErvP8RuWFTwQaOgCdWIEABTiQkxTvgXS
+         IN+8xcaiO2Wz70H8leqWjgwlAEPtfBF3tc6Z+k9ZLfvPbevMmJr1cf/HTHrx+xhWNy/N
+         SfvR8k3VQSudhECmQeU+1VtiePzpZ1tjOwtPWXn4HLsfEOh+/o6rgNlYLYjXyjluVs2X
+         bKmdLt9Rq6A1RIBuHeJ39twkX3f+84ZaJyagUzUEfANjCBv+sGJ5w6efmik0heIpsSOn
+         OiNEPO/8OI1eLrPOHRWuRR7I8VfRE7+ynJEsWqEY3HVsZCqt14548/7O9I06rwb9mArS
+         DpyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762525862; x=1763130662;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xL9UWKNVFseJyc8ZZEBbh4eUS+K/pGNVZX2OMNyP0Mg=;
+        b=lc34Kmq8AJLEhlqrzBrybMYhGriDfp0WSVblT/JzQOMLfxGA3Ex+Y7fdjLjZyteiED
+         Jgu7E2y4+ll2rwqsGYojfh5cuZlTPxU4912uBFsYLIjTOeb2eWy9t37K3nyd/jbKW0QF
+         sd9L7GsDG1HkVRHCVMVcaJCBOjankLUYnCTMv5jg410xiNlZMKxsOMCwfhdskENVzh8X
+         Ge13Rdl3IpMhNwvOlAA6d0I0hXl6+8JUc+sE51N+RcWysvItTObXAmYXmpvjaDbsxEWv
+         GxFSRcPkUCmazZTciYch1r1lBZ3hPpSEYoRjKgA/VnCxo95xI+QDpl9joXh5CWSpE6vp
+         Z79Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXzCOx/9XlCdqQOBBLyQDU/cJ96GKk+ds99OkupSawxxMR4pK7jtg6g2aSoGh0w3C9v01vzUwk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyYbVXRVqVHWIlXpZdNNAOTNRNlk0XTgHhsYySyJqSj9fJOqWfE
+	HtaxCvZK5hzhK6iXF3xfCAe9ttqdjd5Ov9IMFRYe+jJCAq2Mm99Q2ZkEyfSXpqiV+Su3e3TavPJ
+	XcmTIl8TA+2eJoguuC/OASHrbzStmK3NUNf6HOR076+YGm3iS7oD/xEO0PQ==
+X-Gm-Gg: ASbGncuys+L4bGU4vSGwcldoc+NNSiWE9al5KITr77o+OUHE7GCGkTYfOiCKCJb0hW3
+	pwXz1n+R1Cu5ztkWqFm7Uq/R+4gheaen0owui9y14IOf2KlrNcrXzg98LLQu/REkFrOqXWEO4bw
+	LB4oe0cTfLe00f92b+YW1fLu5K+V5+5AdJm/iCyarizqsk5ztZm0YjBYC9S+NEPV/wbpDmZCLev
+	Im4gTOZ5RtXhQ+XGwvbFOuE2fhOqDSgtrk99FgHppIMGwN2GBT/cVYWZWfn61Zeb0fXW7e2jdAV
+	7Cnd0N14u/Hj8p1Gw8Yrk2oEGW47vQnQQWInwTBoeIpKhdcHercwLoM/rlBmaC8fo8/llQh2nSb
+	eibef/lYuxkmZmzhv7t/l0iNLTm2IdMaVdQionLnZdcf8uL8VmGk=
+X-Received: by 2002:a17:907:9713:b0:b70:b4db:ae83 with SMTP id a640c23a62f3a-b72c0db4a61mr338299366b.60.1762525862100;
+        Fri, 07 Nov 2025 06:31:02 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFVGP6jVhYiYdDeDEvDFwhwEthJq43aCkNDIhOMB5uynFpxGPUKrXfFtjd4lbRPq2WOuVI1vw==
+X-Received: by 2002:a17:907:9713:b0:b70:b4db:ae83 with SMTP id a640c23a62f3a-b72c0db4a61mr338295766b.60.1762525861624;
+        Fri, 07 Nov 2025 06:31:01 -0800 (PST)
+Received: from sgarzare-redhat (host-79-46-200-153.retail.telecomitalia.it. [79.46.200.153])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b72bfa11295sm256401966b.67.2025.11.07.06.30.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Nov 2025 06:31:01 -0800 (PST)
+Date: Fri, 7 Nov 2025 15:30:58 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
+	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Bryan Tan <bryan-bt.tan@broadcom.com>, Vishnu Dasa <vishnu.dasa@broadcom.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, berrange@redhat.com, Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v8 06/14] vsock/virtio: add netns to virtio
+ transport common
+Message-ID: <4d365ifyw5ncyboonznnnm6ua7psyt3ripzpvtyd35qa5zsgwv@f2kfgzgoc26c>
+References: <20251023-vsock-vmtest-v8-0-dea984d02bb0@meta.com>
+ <20251023-vsock-vmtest-v8-6-dea984d02bb0@meta.com>
+ <hkwlp6wpiik35zesxqfe6uw7m6uayd4tcbvrg55qhhej3ox33q@lah2dwed477g>
+ <aQ1e3/DZbgnYw4Ja@devvm11784.nha0.facebook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-07_03,2025-11-06_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 malwarescore=0
- mlxlogscore=999 mlxscore=0 adultscore=0 spamscore=0 bulkscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2510240000 definitions=main-2511070119
-X-Proofpoint-GUID: 9nZ0CKNCiYJFQoYQiAPGwwJDiigxscM0
-X-Proofpoint-ORIG-GUID: 9nZ0CKNCiYJFQoYQiAPGwwJDiigxscM0
-X-Authority-Analysis: v=2.4 cv=aNv9aL9m c=1 sm=1 tr=0 ts=690e029f b=1 cx=c_pps
- a=zPCbziy225d3KhSqZt3L1A==:117 a=zPCbziy225d3KhSqZt3L1A==:17
- a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=QyXUC8HyAAAA:8 a=yPCof4ZbAAAA:8
- a=qHh1Kq1xxaR9noxbE6oA:9 cc=ntf awl=host:12100
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA3MDExNSBTYWx0ZWRfXwYRSEeDg6fsv
- XN5eSVPzaO1UdXzpRqAhbkJjuuGdNSZvulQunOvrbf7yjzAxboakcJ8Z7kncNubZcA6PLYaoHiK
- zi8eAcWHUCY2afWvll1sBiBgl42zEYlIeEx9VXyVMlP4Zo3PZ+qqd2ME9Ok2RNB8H0ms/1tjs9O
- ZZPpJbZcEF4dXumng2dJiLtpkH0u9fk2Zkct4rEg0oeJCIS1q/9C961N9kgtzDDcz8LwEqzZNdW
- 54z05zuLgyUEzDF5fxB0kUxZNw/dmHcXSlAzEdgZaBvxdLgmyOw0rPBBgqpfz47Ki5fgvPZkqpV
- nEXShVvnBN30/oomMRIH5aI2Bp7CCDY6wC9hZB2xpvbkhnPu/2GeTDMDAqIoHW9QEW0aigvMliY
- fpQc7dQh+hmGGSV2Nll1yOKRe4DY3DrSoWUNS5+0LychSVMomSg=
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <aQ1e3/DZbgnYw4Ja@devvm11784.nha0.facebook.com>
 
-The current dev_warn messages for too many VLAN changes are confusing
-and one place incorrectly references "add" instead of "delete" VLANs
-due to copy-paste errors.
+On Thu, Nov 06, 2025 at 06:52:15PM -0800, Bobby Eshleman wrote:
+>On Thu, Nov 06, 2025 at 05:20:05PM +0100, Stefano Garzarella wrote:
+>> On Thu, Oct 23, 2025 at 11:27:45AM -0700, Bobby Eshleman wrote:
+>> > From: Bobby Eshleman <bobbyeshleman@meta.com>
+>> >
+>> > Enable network namespace support in the virtio-vsock common transport
+>> > layer by declaring namespace pointers in the transmit and receive
+>> > paths.
+>> >
+>> > The changes include:
+>> > 1. Add a 'net' field to virtio_vsock_pkt_info to carry the namespace
+>> >   pointer for outgoing packets.
+>> > 2. Store the namespace and namespace mode in the skb control buffer when
+>> >   allocating packets (except for VIRTIO_VSOCK_OP_RST packets which do
+>> >   not have an associated socket).
+>> > 3. Retrieve namespace information from skbs on the receive path for
+>> >   lookups using vsock_find_connected_socket_net() and
+>> >   vsock_find_bound_socket_net().
+>> >
+>> > This allows users of virtio transport common code
+>> > (vhost-vsock/virtio-vsock) to later enable namespace support.
+>> >
+>> > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+>> > ---
+>> > Changes in v7:
+>> > - add comment explaining the !vsk case in 
+>> > virtio_transport_alloc_skb()
+>> > ---
+>> > include/linux/virtio_vsock.h            |  1 +
+>> > net/vmw_vsock/virtio_transport_common.c | 21 +++++++++++++++++++--
+>> > 2 files changed, 20 insertions(+), 2 deletions(-)
+>> >
+>> > diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>> > index 29290395054c..f90646f82993 100644
+>> > --- a/include/linux/virtio_vsock.h
+>> > +++ b/include/linux/virtio_vsock.h
+>> > @@ -217,6 +217,7 @@ struct virtio_vsock_pkt_info {
+>> > 	u32 remote_cid, remote_port;
+>> > 	struct vsock_sock *vsk;
+>> > 	struct msghdr *msg;
+>> > +	struct net *net;
+>> > 	u32 pkt_len;
+>> > 	u16 type;
+>> > 	u16 op;
+>> > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>> > index dcc8a1d5851e..b8e52c71920a 100644
+>> > --- a/net/vmw_vsock/virtio_transport_common.c
+>> > +++ b/net/vmw_vsock/virtio_transport_common.c
+>> > @@ -316,6 +316,15 @@ static struct sk_buff *virtio_transport_alloc_skb(struct virtio_vsock_pkt_info *
+>> > 					 info->flags,
+>> > 					 zcopy);
+>> >
+>> > +	/*
+>> > +	 * If there is no corresponding socket, then we don't have a
+>> > +	 * corresponding namespace. This only happens For VIRTIO_VSOCK_OP_RST.
+>> > +	 */
+>>
+>> So, in virtio_transport_recv_pkt() should we check that `net` is not set?
+>>
+>> Should we set it to NULL here?
+>>
+>
+>Sounds good to me.
+>
+>> > +	if (vsk) {
+>> > +		virtio_vsock_skb_set_net(skb, info->net);
+>>
+>> Ditto here about the net refcnt, can the net disappear?
+>> Should we use get_net() in some way, or the socket will prevent that?
+>>
+>
+>As long as the socket has an outstanding skb it can't be destroyed and
+>so will have a reference to the net, that is after skb_set_owner_w() and
+>freeing... so I think this is okay.
+>
+>But, maybe we could simplify the implied relationship between skb, sk,
+>and net by removing the VIRTIO_VSOCK_SKB_CB(skb)->net entirely, and only
+>ever referring to sock_net(skb->sk)? I remember originally having a
+>reason for adding it to the cb, but my hunch is it that it was probably
+>some confusion over the !vsk case.
+>
+>WDYT?
 
-- Use dev_info instead of dev_warn to lower the log level.
-- Rephrase the message to: "virtchnl: Too many VLAN [add|delete]
-  ([v1|v2]) requests; splitting into multiple messages to PF\n".
+If vsk == NULL, I'm expecting that also skb->sk is not valid, right?
 
-Suggested-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
----
-v1 -> v2
-remove "\n" b/w message 
-added vvfl and vvfl_v2 prefix
-v2 -> v3
-removed vvfl/vvfl_v2 prefix and using virtchnl:
-prefix and (v1/v2) in the sentence suggested by Alex.
----
- drivers/net/ethernet/intel/iavf/iavf_virtchnl.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+Indeed we call skb_set_owner_w() only if vsk != NULL in 
+virtio_transport_alloc_skb().
 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-index 34a422a4a29c..88156082a41d 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_virtchnl.c
-@@ -793,7 +793,8 @@ void iavf_add_vlans(struct iavf_adapter *adapter)
- 
- 		len = virtchnl_struct_size(vvfl, vlan_id, count);
- 		if (len > IAVF_MAX_AQ_BUF_SIZE) {
--			dev_warn(&adapter->pdev->dev, "Too many add VLAN changes in one request\n");
-+			dev_info(&adapter->pdev->dev,
-+				 "virtchnl: Too many VLAN add (v1) requests; splitting into multiple messages to PF\n");
- 			while (len > IAVF_MAX_AQ_BUF_SIZE)
- 				len = virtchnl_struct_size(vvfl, vlan_id,
- 							   --count);
-@@ -838,7 +839,8 @@ void iavf_add_vlans(struct iavf_adapter *adapter)
- 
- 		len = virtchnl_struct_size(vvfl_v2, filters, count);
- 		if (len > IAVF_MAX_AQ_BUF_SIZE) {
--			dev_warn(&adapter->pdev->dev, "Too many add VLAN changes in one request\n");
-+			dev_info(&adapter->pdev->dev,
-+				 "virtchnl: Too many VLAN add (v2) requests; splitting into multiple messages to PF\n");
- 			while (len > IAVF_MAX_AQ_BUF_SIZE)
- 				len = virtchnl_struct_size(vvfl_v2, filters,
- 							   --count);
-@@ -941,7 +943,8 @@ void iavf_del_vlans(struct iavf_adapter *adapter)
- 
- 		len = virtchnl_struct_size(vvfl, vlan_id, count);
- 		if (len > IAVF_MAX_AQ_BUF_SIZE) {
--			dev_warn(&adapter->pdev->dev, "Too many delete VLAN changes in one request\n");
-+			dev_info(&adapter->pdev->dev,
-+				 "virtchnl: Too many VLAN delete (v1) requests; splitting into multiple messages to PF\n");
- 			while (len > IAVF_MAX_AQ_BUF_SIZE)
- 				len = virtchnl_struct_size(vvfl, vlan_id,
- 							   --count);
-@@ -987,7 +990,8 @@ void iavf_del_vlans(struct iavf_adapter *adapter)
- 
- 		len = virtchnl_struct_size(vvfl_v2, filters, count);
- 		if (len > IAVF_MAX_AQ_BUF_SIZE) {
--			dev_warn(&adapter->pdev->dev, "Too many add VLAN changes in one request\n");
-+			dev_info(&adapter->pdev->dev,
-+				 "virtchnl: Too many VLAN delete (v2) requests; splitting into multiple messages to PF\n");
- 			while (len > IAVF_MAX_AQ_BUF_SIZE)
- 				len = virtchnl_struct_size(vvfl_v2, filters,
- 							   --count);
--- 
-2.50.1
+Maybe we need to change virtio_transport_recv_pkt() where the `net` 
+should be passed in some way by the caller, so maybe this is the reason 
+why you needed it in the cb. But also in that case, I think we can get 
+the `net` in some way and pass it to virtio_transport_recv_pkt() and 
+avoid the change in the cb:
+- vsock_lookpback.c in vsock_loopback_work() we can use vsock->net
+- vhost/vsock.c in vhost_vsock_handle_tx_kick(), ditto we can use 
+   vsock->net
+- virtio_transport.c we can just pass always the dummy_net
+
+Same fot the net_mode.
+
+Maybe the real problem is in the send_pkt callbacks, where the skb is 
+used to get the socket, but as you mention, I think in this path 
+skb_set_owner_w() is already called, so we can get that info from there 
+in some way.
+
+Not sure, but yeah, if we can remove that, it will be much clear IMO.
+
+Thanks,
+Stefano
 
 
