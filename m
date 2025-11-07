@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-236731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236733-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6036BC3F7E2
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 11:35:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6D95C3F827
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 11:38:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C67F43A779A
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 10:32:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B1E63B7F00
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 10:33:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE3B9322C67;
-	Fri,  7 Nov 2025 10:30:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06A0A320CB8;
+	Fri,  7 Nov 2025 10:30:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="kED9AsCl"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="loOy/frR"
 X-Original-To: netdev@vger.kernel.org
-Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012028.outbound.protection.outlook.com [52.101.48.28])
+Received: from CY7PR03CU001.outbound.protection.outlook.com (mail-westcentralusazon11010039.outbound.protection.outlook.com [40.93.198.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C9DD320CBF;
-	Fri,  7 Nov 2025 10:30:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3F631A04F;
+	Fri,  7 Nov 2025 10:30:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.198.39
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762511435; cv=fail; b=pn0TApNpne41FMeTJo6nB6NQAY45+ymw2uNsjIx4mBuM+/YhztWPT1yNuBFKCE7hUfG8nWmTFSSMnEwCeuhPGMFAnTNcogVUFLETSUD/87jmvkQu96MlQOAgcvu+i3mWOTdxvNNM7lK7QjVTVN9lA+L9vxgGcFNkeOT7B2zr/MI=
+	t=1762511448; cv=fail; b=ZQH6PPOhnntg3x0pzvtRI0ABtEiVtBC1JNLZM1LnGcylr60WrxIcYg+XVPCeWM+Pb1jvxRGqzD69CoJOi36Iglm6oxjUU5LOk0KIomLXBhadKq+zHGUqoM9MbjnjfVKZv7V6e3Df6d+HQucqNVitAWPrB6Be1GlPp0PXQDKoKEE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762511435; c=relaxed/simple;
-	bh=YDig1/ulXJiK4BMA2ClROq9MzOUYtvUgzz/80LfgDpk=;
+	s=arc-20240116; t=1762511448; c=relaxed/simple;
+	bh=qIQOcIZQ6yFKzrEQOmWqhEjRX9AQDwC8lliuaP1RQ/U=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cjdlgR4aiCGN6SQY4pObTNclDfIwHfzt9jux+7Fr91zsIUYcd+OSam43ykQS925AraaQTWbivE9jF8v6kc7ad892Qv4WAr3B+NxUkjgly0RYDLYQlHNzwi6vmHQ4lEFHRzM2jbOJiYm3mEtg6qae55yLqfPgk+7pij1WcP3ztE0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=kED9AsCl; arc=fail smtp.client-ip=52.101.48.28
+	 MIME-Version:Content-Type; b=EqxvOW4dkQbeYFrzcxl3X8L3u+ErGnNqV/I4RrztN2eYnXOqpEfYxRC/Zz+DQb2QehHlscdoay+b5QcVL0pCcnTHpQijhFq87qnUsQunI0Rz0+ruysCyXU9Uh1+DHvaSp+OshXyK15KptdYYyDHGL9p+o2e0TwigmwSit3C0B8Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=loOy/frR; arc=fail smtp.client-ip=40.93.198.39
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fvm/sDcc+eREu7WVp/KevN5Hs2rB0T7FnbIZMAz67PJfHkhoSzK2eUi9g5CqjCfhgU+faQ76/GRo5CBacLjlfL7xEP/cLN2qx3Toe07Sx1B/PsRO9bUDVriCy5lQdM76C3oNsKkUbZeUw9DDERrjNOgehOk7its8y5/+9NhBLCo6Z7FY6AqCddIxp6OIKev1r+wPhjpntanBbOGhDQpb/N12wX7owXb0Nz7AT8pCNn+rj9SzwGdl5BXMSChFXkDVzdrnMLmnslNRVw5ENwBTrESjJdW+FOKzdFU3n1hZBU3Qm5OkThJQeGWYXvnLsmxi7YKOBAAkRcq+ka/Kp1fpQQ==
+ b=pRiZftQuBZzhhBtyJQv7ezo4nzinfiHZ8VJh40sALWd2G2HbVuusI11mrUr3zlNerVW87RZvEvKxtN0pLVWYh1nedxZwHPjyVotJ9U2QYuMGKiyzUmlRFm9MJMYPGVwo7SWigAiewVQHkXQaWllKIW4Su/qQF1eW61wBGxjfzfcyogR5Lb/K9Rm+RF3dgHFK0ECxn+m6rzNTxM0ah6LFm879T81b740T1Uowp/iXJJpliS4eSnBn9ZvGWnD+j8ecH4nAhHaEPHgLD0tRY1UuE1Z1TDD84ql8+D7MpLe6D5Mx07UjR+3uCF6xmKFtTNrpWLq78DBiTafqM/t9CN4+Mg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HaeLEZ5sF2mVL2TahAify3GyrPWSZ8VkbOUQmg/QtN0=;
- b=lNm3M59WjgZ62H4tlWPgfeV5pvNH9ocFuAezDDbKIrrxVq3ZyuNrBl1lFLSbaUBd52DIktyY2uRDsgMayOuK4Ui3R5wdoVP2Ibs3yCUbmdbVy0ENJOY9ku/ao7wpreXUax6rvzI5EXDsg6K5hnms8DDfTaLZY5M2vV7ZrxPHNJt/8cD7xfVEXySDGkpY1irQR85L9Yq9Euw68gnFCxsSRedJ77cv76J0y/goOLjBBZ5XlZ0v1JKYkLRUbNgI1StSaD5hdualDHKnVyF/MzbB1Ri7C6hC+c3jX54vvWUc+4HPVZWTUZTY0xuo4m5EwR5Y/8meuyc6LAJoziGOqJNAGA==
+ bh=e9fIS60WSA8Msu5O4rsL9/A/R6KcFaPCpozKsTYF5Sc=;
+ b=bcKz8PclFde8Hr+RLZTGKN3GgPAq4ndXhlr1tb0gk929zapovU0qy2j4lz80LM9bNShzA/QKGc1bVgpSNCj/S9cN5Vr496IWfktD6HPTRBkllDsK6U7PULU2/sPcr7cAMUEmTBAtiEnOTpmvl8/cI18kfG1iSFUYR5b5x8f/z0sL9skVbg4xYBhq0NTZB7dKObqNzeEh/JBdsjmgDEUQcyFQZWGhtsebA9ejHW2XQcJudjw2v7IpPPSYJ6nqXOQTa5o/aSuJVoIBcvAs0F+tWPy1bsDB/8d5j5Rhcek8y0sgBPQGaO9vPHvRCkMW3rmf4YA6vUcAXkKIpVbWokTGXA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.118.232) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -45,17 +45,17 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HaeLEZ5sF2mVL2TahAify3GyrPWSZ8VkbOUQmg/QtN0=;
- b=kED9AsClBdbllrFZR42pBGMRxaKYYUkkM1vlPs8L2EnGonhG05+RdImfQCyghw9QWzfrg0jaftXJf7S2M/o9V0MRyp4sj8arzSfxIVGOOcawl9Hn9htC3d/xU/hHRBHU4Bdua/8E8LCq6AyvwSDDM+Mp3Dvx0i0hYmwEY2kG7RTzREDSbxy2tkj5pHNWVRm3mH+D2MF4Ez/lEDhzbA1eS1LCPdrCwCbC60a+CkjWKxPGpMm/Ouzj42RKppjCjYtpCaNUKCe9kvZ/DxsnKwmdpo/BQkGMKNO7d7ophjvpERh7gsBF3YaOzn9H7pRjF5z3eFQT11nZl3ZYetM/2utSbQ==
-Received: from BL0PR0102CA0065.prod.exchangelabs.com (2603:10b6:208:25::42) by
- PH7PR12MB8595.namprd12.prod.outlook.com (2603:10b6:510:1b5::5) with Microsoft
+ bh=e9fIS60WSA8Msu5O4rsL9/A/R6KcFaPCpozKsTYF5Sc=;
+ b=loOy/frRbuqasbIxoh0kC263nhBBpy4Nev1H8VpzKFWkD3S4Jj4Xybw2WUT0MYEyNKokC12fGwN/Gpg8xj3E/L0OkSdcJsw1BQGZp/Ioo2tzt1/I/BVEP48t2CTze7z4hmtNRy6bboyXzs/den/zh0FVBRH3M19JEFd62dF97INLUM9lNPdYdVN1ey9LeWGUY1Ba9FpNMS435rkziNFWC5neyoRHDcHw9ORko8l72hRFXwXexnEHZ/FFJv1zFCs70QXMjkgHXK7EAZhYHshPrVumJTVC8/01sEtIGyHYHTUKb2OohlnnuI8OFGoujyNBlsrIINt9pSKAC746L/XDCQ==
+Received: from BL0PR0102CA0020.prod.exchangelabs.com (2603:10b6:207:18::33) by
+ CH3PR12MB9249.namprd12.prod.outlook.com (2603:10b6:610:1bc::7) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9298.12; Fri, 7 Nov 2025 10:30:23 +0000
-Received: from BN3PEPF0000B06A.namprd21.prod.outlook.com
- (2603:10b6:208:25:cafe::cb) by BL0PR0102CA0065.outlook.office365.com
- (2603:10b6:208:25::42) with Microsoft SMTP Server (version=TLS1_3,
+ 15.20.9298.10; Fri, 7 Nov 2025 10:30:40 +0000
+Received: from BN3PEPF0000B06C.namprd21.prod.outlook.com
+ (2603:10b6:207:18:cafe::1f) by BL0PR0102CA0020.outlook.office365.com
+ (2603:10b6:207:18::33) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.9298.12 via Frontend Transport; Fri,
- 7 Nov 2025 10:30:37 +0000
+ 7 Nov 2025 10:29:35 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -63,31 +63,37 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
  216.228.118.232 as permitted sender) receiver=protection.outlook.com;
  client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
 Received: from mail.nvidia.com (216.228.118.232) by
- BN3PEPF0000B06A.mail.protection.outlook.com (10.167.243.69) with Microsoft
+ BN3PEPF0000B06C.mail.protection.outlook.com (10.167.243.71) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9320.0 via Frontend Transport; Fri, 7 Nov 2025 10:30:22 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
+ 15.20.9320.0 via Frontend Transport; Fri, 7 Nov 2025 10:30:39 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
  (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Fri, 7 Nov
- 2025 02:30:09 -0800
+ 2025 02:30:25 -0800
 Received: from drhqmail202.nvidia.com (10.126.190.181) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.20; Fri, 7 Nov 2025 02:30:08 -0800
+ 15.2.2562.20; Fri, 7 Nov 2025 02:30:24 -0800
 Received: from f42.dev-l-178 (10.127.8.9) by mail.nvidia.com (10.126.190.181)
  with Microsoft SMTP Server id 15.2.2562.20 via Frontend Transport; Fri, 7 Nov
- 2025 02:30:05 -0800
+ 2025 02:30:18 -0800
 From: Dragos Tatulea <dtatulea@nvidia.com>
 To: Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer
-	<hawk@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Shuah Khan <shuah@kernel.org>
+	<hawk@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+	<pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+	<martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
+	<song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
+	<john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav Fomichev
+	<sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Simon Horman <horms@kernel.org>
 CC: Dragos Tatulea <dtatulea@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
-	<netdev@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [RFC 1/2] page_pool: add benchmarking for napi-based recycling
-Date: Fri, 7 Nov 2025 12:28:45 +0200
-Message-ID: <20251107102853.1082118-4-dtatulea@nvidia.com>
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<bpf@vger.kernel.org>
+Subject: [RFC 2/2] xdp: Delegate fast path return decision to page_pool
+Date: Fri, 7 Nov 2025 12:28:46 +0200
+Message-ID: <20251107102853.1082118-5-dtatulea@nvidia.com>
 X-Mailer: git-send-email 2.50.1
 In-Reply-To: <20251107102853.1082118-2-dtatulea@nvidia.com>
 References: <20251107102853.1082118-2-dtatulea@nvidia.com>
@@ -102,244 +108,329 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: ExternallySecured
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN3PEPF0000B06A:EE_|PH7PR12MB8595:EE_
-X-MS-Office365-Filtering-Correlation-Id: 94c546f4-3fcf-434b-2488-08de1de8a87d
+X-MS-TrafficTypeDiagnostic: BN3PEPF0000B06C:EE_|CH3PR12MB9249:EE_
+X-MS-Office365-Filtering-Correlation-Id: dedf7ff1-dae5-4c51-7186-08de1de8b276
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|7416014|376014|82310400026;
+	BCL:0;ARA:13230040|36860700013|376014|7416014|1800799024|82310400026|921020;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?QRSb8Vh1eTOQ8NHVBy73zTrwoGIyfgxBd3kjD49SyHL6v8NlSW2LJNxp2pFa?=
- =?us-ascii?Q?n8P7/9N86UMel2v9QI8A6fru9BbRYHMPwr3U3zTTM2xlo5wEFY6Hg0c9/qvS?=
- =?us-ascii?Q?4612UwW2ESKQjG/5IgwNUEUEoGNIttt7iXf/TfwAG1+ScCCFIjgg/ToMPZT2?=
- =?us-ascii?Q?/CS2Lg66DN+yjJKWNbeIeKbnlEJ6bsoNWNIYnofGYZbeY+8f6zRlIaxSfJ81?=
- =?us-ascii?Q?cN2goKZAyhCWd81oytw21b7cxQwt0uezePc757ao6Xn7+s82+sr6vGhuMCHK?=
- =?us-ascii?Q?RzcZwMW8aYrrjGpTzd/jCTzZ+vr7g748g847qpyIH0Wgiqrx9IYXoTjgcjkK?=
- =?us-ascii?Q?5QJzXL8O9BRS6K822pvtlo5Sq2GVcovcd0b5vRXIBRdUxID6he3rDM/uA3if?=
- =?us-ascii?Q?mWx4023QOBOh4jv/+u909XqOZy/i/9XjDZp5RjfBpS4iA84gFoZayBSwPXD4?=
- =?us-ascii?Q?QBsaLo2ljPZU2sA7xIE9NV2dXdbb8ZSW+QPnUm7dJbj1r5PjJ9bhBt3IX5rv?=
- =?us-ascii?Q?XTZyA409yEkdGnlFzs5d4k4w3mQP7k257uYwr23V3Faoeek7RQ7IZr/RDTAI?=
- =?us-ascii?Q?mWpqlg5A0j3T3L9hStUpItokyl8rcF260z3Y49yVLRy+I3vszDTxcsN/k3g6?=
- =?us-ascii?Q?1/ri0FzI9l5LqZ4WFjqcIjd+bs1EDpPyOcrpTlkyNJG52hdTzvm+31DwhAdo?=
- =?us-ascii?Q?LPEUnHVT2IUamWKgiSn+30XbKZTz2M3Xp+d/m+wBlvlVIirqAyQs5j97Ws5/?=
- =?us-ascii?Q?cXGTo+Go1xmcM3jXIaFMhn0Xk74LY6voZGKhghakY86Kp5glZoAQx+fif5WN?=
- =?us-ascii?Q?PhYVEBKhA6/0qp+/pK93jb2biWyWzPPig45ZTGtoVHb/Dj1sKzRhKCKYApLi?=
- =?us-ascii?Q?h7AWp08R08QHgDnunBf1e7y2z5OKBwyEM8HJnbp/QMAIS1o55aq7CNQwdRdr?=
- =?us-ascii?Q?xmxAbNe1Yc39AjDusxkgMRANYBpk9/Xb62RgzN6Wx4iv366HInkUTqYp6nQJ?=
- =?us-ascii?Q?T0Jm27kAxmE3HxTeWrjUZAzr3qRIuL5ZVUXSsVmDSZmvwq/tl0PP986M2pq0?=
- =?us-ascii?Q?/didiT0daBjnNAtKwV6XnlMadGNvXRxzK5tDyYZeWRvcpmhZYvpkUJT40Dmd?=
- =?us-ascii?Q?IJcDdC9ZXYJ6tyzYBdXoaIxAXeBZuXvaPgLMXs7UWwMJ3HTlZL7zIh2/f+kF?=
- =?us-ascii?Q?gShzqRVrMmWTYCMZhXzTHM2k+0r+dEYNQCKX1ZYGWTceL3dEPahqCMSGWn3j?=
- =?us-ascii?Q?9vEL2joUngPyrzaWCnT6V/CezTktBdtWsIhF51N1dJwHze09RFpulijm8i+q?=
- =?us-ascii?Q?Jw/WHz4stxnY7MkZYBb9YLKnpTFQT5nMiUBh/JMNYBqOlTvcXXhT/SfPK5Cw?=
- =?us-ascii?Q?fS51ubkLA3jkhlELOBq3ic6DkqDs2ochotnnnymALwJtjoXBXHRHXExC16tA?=
- =?us-ascii?Q?QAQtt5z6VXs/Ao0R8LU2eihrcDkqjpETEyUUcCduEtcN2Q6qYVeFnjBi5whP?=
- =?us-ascii?Q?Nu8fDxeTW+rpfInRR3kTAfMi4Ppo0irv9e/GqS+kgKWoG0Hi/duBsAWP5EZu?=
- =?us-ascii?Q?cENpzlSFEtAsNb/A4UA=3D?=
+	=?us-ascii?Q?Xq611W5P3m+BEiv+ZsiM1NwCTdiaAUtc2TAxhyWHv3IAqK+kfW+jYoRV4ZOZ?=
+ =?us-ascii?Q?ybTa3xoAs+1EFc9wqfmDhaQ/2+bE1WQKotytG+IbRK/qnTkKL6oKvrI9SDSO?=
+ =?us-ascii?Q?gaU+FPHu32QB1pDF16+wdwAtg2W4RRoexd/I6upSScrgzym0U5E8/0IAKOl+?=
+ =?us-ascii?Q?LryohBaO6zNEEWN5udNG0CTTnAqGIwKL0Cr4BHqPI8sa8qbWrp77dV1MarwH?=
+ =?us-ascii?Q?pci3z/cCLQ/AX/69y9FGJPE6pZa3y95sLHSuJJSEkDclLACQJD5cdhYEH058?=
+ =?us-ascii?Q?CEyNKORoU+99GgFwQvuwOVUYApYgnLLw+bAWRP92CYCdI5MzMpFsj+LjAQrB?=
+ =?us-ascii?Q?apvwXHyGJyw+k6JNZ30/R6fxjCW8dT9BeehUpqt+9ByKoA4bAymDM1XlHC79?=
+ =?us-ascii?Q?iofMy2DnU+LFgAvDlMO8/7vt0wiuHjXaQxforZbxJ0mMOqSizcVtXgkJyeWM?=
+ =?us-ascii?Q?aO7z86nC9MoSKmBJ8YorVm24Ejm0Er9dAzB3b9qTgh2AuE8He8eBTPoDjeUo?=
+ =?us-ascii?Q?5JNd2dLMNDlNkr4eH6G9rGsBXC4+QoBgJQSTU0kj70CY8lxiAFFyVDEVaHXd?=
+ =?us-ascii?Q?C6Fa8NmblLJ8AVE0l5q8577sn6AT2yYut6bWzM8SdP+cN0F5Dct/lLo8BaSX?=
+ =?us-ascii?Q?Qu6f20szcH2ITr7x4nwMXFw/XqpgSfZ+7ESxxIg//H0E0ctcCMEIm+e5zqot?=
+ =?us-ascii?Q?prHwk3o+wWHhFYTp5zXWY0RgKTEOJcEPrlVyfF48fO+I0KaWlBstQEX1PbVC?=
+ =?us-ascii?Q?ia9U4hC/bJ64aTbaDk9QLXEKRVAdbwC+15W6raGAHprX8y7BXBN3MzF6J5sU?=
+ =?us-ascii?Q?1bFmX2DbEzDeDQlDQjZ4/jKZeL7CItmCF+ozt01QKdPVUxhTgSWkaCCDTiuU?=
+ =?us-ascii?Q?l6V1UQ8voeBpHnKq5KaIIoJ1s+kEFAuFGTttyedwTD+9rR9mONC5FXAb0iVy?=
+ =?us-ascii?Q?P51FLslajR8zpXP8vkq7g1NE3AhV3Bxi/Qqyjjblg9dd8VVAY5IXhdN/WsuK?=
+ =?us-ascii?Q?h/7ncQv0nPy2KgLmwd+7kl4SLYTSpV910NXKkondFLaH0iHaWBtcFU/fnRau?=
+ =?us-ascii?Q?YzErxwra3wTaLj9CGh2mZ54XjvCRBV4fDHVAIT0ZXtLRrpXiN7QXUC2Anovx?=
+ =?us-ascii?Q?GGQVsrVDx9YwC1xAA1E00jyDBiSFCat63zkofa9NHtfWe0MKaVthXEXPcq1H?=
+ =?us-ascii?Q?qEisrLLUNiUVQ6JB3Gl40IJrsCc5kGzGvjgm2o5tXvp84ykrOj8s87aAGNXb?=
+ =?us-ascii?Q?Xb69FgXkRczFpJKID1pqeXxSJefUikgj7Ryfe7NOGIjcPGOmFrZnOFb2vGOH?=
+ =?us-ascii?Q?0Hzs3jxUYt25xGd1xJkah7+nAFtW4z7dQnpemrBMQ2uvbZYqQsk6YB9+3gfv?=
+ =?us-ascii?Q?9hrBnA2PNKsv/lk2EyWtpgBf9S23yRxh89/bL+wt4VdnPL9tGOyldRsZ8fzW?=
+ =?us-ascii?Q?qfergSM4dN+vL/Jk0RYqIOpubeu0sTADlYxgP3hW/V5pCugNKwvmZHuKX+Uq?=
+ =?us-ascii?Q?XoQiW5Ru1gb49V/r4YY9ECzrYgrwySOko9sQxUDZ4pw9aT+mVy1A10YatThh?=
+ =?us-ascii?Q?9vbewB32aKz3LVi9Gp5ykgbZI2hcQpevZc4VT8qN?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(7416014)(376014)(82310400026);DIR:OUT;SFP:1101;
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(7416014)(1800799024)(82310400026)(921020);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Nov 2025 10:30:22.7823
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Nov 2025 10:30:39.5233
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 94c546f4-3fcf-434b-2488-08de1de8a87d
+X-MS-Exchange-CrossTenant-Network-Message-Id: dedf7ff1-dae5-4c51-7186-08de1de8b276
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BN3PEPF0000B06A.namprd21.prod.outlook.com
+	BN3PEPF0000B06C.namprd21.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB8595
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9249
 
-The code brings back the tasklet based code in order
-to be able to run in softirq context.
+XDP uses the BPF_RI_F_RF_NO_DIRECT flag to mark contexts where it is not
+allowed to do direct recycling, even though the direct flag was set by
+the caller. This is confusing and can lead to races which are hard to
+detect [1].
 
-One additional test is added which benchmarks the
-impact of page_pool_napi_local().
+Furthermore, the page_pool already contains an internal
+mechanism which checks if it is safe to switch the direct
+flag from off to on.
+
+This patch drops the use of the BPF_RI_F_RF_NO_DIRECT flag and always
+calls the page_pool release with the direct flag set to false. The
+page_pool will decide if it is safe to do direct recycling. This
+is not free but it is worth it to make the XDP code safer. The
+next paragrapsh are discussing the performance impact.
+
+Performance wise, there are 3 cases to consider. Looking from
+__xdp_return() for MEM_TYPE_PAGE_POOL case:
+
+1) napi_direct == false:
+  - Before: 1 comparison in __xdp_return() + call of
+    page_pool_napi_local() from page_pool_put_unrefed_netmem().
+  - After: Only one call to page_pool_napi_local().
+
+2) napi_direct == true && BPF_RI_F_RF_NO_DIRECT
+  - Before: 2 comparisons in __xdp_return() + call of
+    page_pool_napi_local() from page_pool_put_unrefed_netmem().
+  - After: Only one call to page_pool_napi_local().
+
+3) napi_direct == true && !BPF_RI_F_RF_NO_DIRECT
+  - Before: 2 comparisons in __xdp_return().
+  - After: One call to page_pool_napi_local()
+
+Case 1 & 2 are the slower paths and they only have to gain.
+But they are slow anyway so the gain is small.
+
+Case 3 is the fast path and is the one that has to be considered more
+closely. The 2 comparisons from __xdp_return() are swapped for the more
+expensive page_pool_napi_local() call.
+
+Using the page_pool benchmark between the fast-path and the
+newly-added NAPI aware mode to measure [2] how expensive
+page_pool_napi_local() is:
+
+  bench_page_pool: time_bench_page_pool01_fast_path(): in_serving_softirq fast-path
+  bench_page_pool: Type:tasklet_page_pool01_fast_path Per elem: 15 cycles(tsc) 7.537 ns (step:0)
+
+  bench_page_pool: time_bench_page_pool04_napi_aware(): in_serving_softirq fast-path
+  bench_page_pool: Type:tasklet_page_pool04_napi_aware Per elem: 20 cycles(tsc) 10.490 ns (step:0)
+
+... and the slow path for reference:
+
+  bench_page_pool: time_bench_page_pool02_ptr_ring(): in_serving_softirq fast-path
+  bench_page_pool: Type:tasklet_page_pool02_ptr_ring Per elem: 30 cycles(tsc) 15.395 ns (step:0)
+
+So the impact is small in the fast-path, but not negligible. One thing
+to consider is the fact that the comparisons from napi_direct are
+dropped. That means that the impact will be smaller than the
+measurements from the benchmark.
+
+[1] Commit 2b986b9e917b ("bpf, cpumap: Disable page_pool direct xdp_return need larger scope")
+[2] Intel Xeon Platinum 8580
 
 Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
 ---
- .../bench/page_pool/bench_page_pool_simple.c  | 92 ++++++++++++++++++-
- 1 file changed, 90 insertions(+), 2 deletions(-)
+ drivers/net/veth.c     |  2 --
+ include/linux/filter.h | 22 ----------------------
+ include/net/xdp.h      |  2 +-
+ kernel/bpf/cpumap.c    |  2 --
+ net/bpf/test_run.c     |  2 --
+ net/core/filter.c      |  2 +-
+ net/core/xdp.c         | 24 ++++++++++++------------
+ 7 files changed, 14 insertions(+), 42 deletions(-)
 
-diff --git a/tools/testing/selftests/net/bench/page_pool/bench_page_pool_simple.c b/tools/testing/selftests/net/bench/page_pool/bench_page_pool_simple.c
-index cb6468adbda4..84683c547814 100644
---- a/tools/testing/selftests/net/bench/page_pool/bench_page_pool_simple.c
-+++ b/tools/testing/selftests/net/bench/page_pool/bench_page_pool_simple.c
-@@ -9,6 +9,7 @@
- #include <linux/limits.h>
- #include <linux/module.h>
- #include <linux/mutex.h>
-+#include <linux/netdevice.h>
- #include <net/page_pool/helpers.h>
+diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+index a3046142cb8e..6d5c1e0b05a7 100644
+--- a/drivers/net/veth.c
++++ b/drivers/net/veth.c
+@@ -975,7 +975,6 @@ static int veth_poll(struct napi_struct *napi, int budget)
  
- #include "time_bench.h"
-@@ -16,6 +17,8 @@
- static int verbose = 1;
- #define MY_POOL_SIZE 1024
+ 	bq.count = 0;
  
-+DEFINE_MUTEX(wait_for_tasklet);
-+
- /* Makes tests selectable. Useful for perf-record to analyze a single test.
-  * Hint: Bash shells support writing binary number like: $((2#101010)
-  *
-@@ -31,6 +34,10 @@ enum benchmark_bit {
- 	bit_run_bench_no_softirq01,
- 	bit_run_bench_no_softirq02,
- 	bit_run_bench_no_softirq03,
-+	bit_run_bench_tasklet01,
-+	bit_run_bench_tasklet02,
-+	bit_run_bench_tasklet03,
-+	bit_run_bench_tasklet04,
+-	xdp_set_return_frame_no_direct();
+ 	done = veth_xdp_rcv(rq, budget, &bq, &stats);
+ 
+ 	if (stats.xdp_redirect > 0)
+@@ -994,7 +993,6 @@ static int veth_poll(struct napi_struct *napi, int budget)
+ 
+ 	if (stats.xdp_tx > 0)
+ 		veth_xdp_flush(rq, &bq);
+-	xdp_clear_return_frame_no_direct();
+ 
+ 	return done;
+ }
+diff --git a/include/linux/filter.h b/include/linux/filter.h
+index f5c859b8131a..877e40d81a4c 100644
+--- a/include/linux/filter.h
++++ b/include/linux/filter.h
+@@ -764,7 +764,6 @@ struct bpf_nh_params {
  };
  
- #define bit(b)		(1 << (b))
-@@ -120,7 +127,12 @@ static void pp_fill_ptr_ring(struct page_pool *pp, int elems)
- 	kfree(array);
+ /* flags for bpf_redirect_info kern_flags */
+-#define BPF_RI_F_RF_NO_DIRECT	BIT(0)	/* no napi_direct on return_frame */
+ #define BPF_RI_F_RI_INIT	BIT(1)
+ #define BPF_RI_F_CPU_MAP_INIT	BIT(2)
+ #define BPF_RI_F_DEV_MAP_INIT	BIT(3)
+@@ -1163,27 +1162,6 @@ struct bpf_prog *bpf_patch_insn_single(struct bpf_prog *prog, u32 off,
+ 				       const struct bpf_insn *patch, u32 len);
+ int bpf_remove_insns(struct bpf_prog *prog, u32 off, u32 cnt);
+ 
+-static inline bool xdp_return_frame_no_direct(void)
+-{
+-	struct bpf_redirect_info *ri = bpf_net_ctx_get_ri();
+-
+-	return ri->kern_flags & BPF_RI_F_RF_NO_DIRECT;
+-}
+-
+-static inline void xdp_set_return_frame_no_direct(void)
+-{
+-	struct bpf_redirect_info *ri = bpf_net_ctx_get_ri();
+-
+-	ri->kern_flags |= BPF_RI_F_RF_NO_DIRECT;
+-}
+-
+-static inline void xdp_clear_return_frame_no_direct(void)
+-{
+-	struct bpf_redirect_info *ri = bpf_net_ctx_get_ri();
+-
+-	ri->kern_flags &= ~BPF_RI_F_RF_NO_DIRECT;
+-}
+-
+ static inline int xdp_ok_fwd_dev(const struct net_device *fwd,
+ 				 unsigned int pktlen)
+ {
+diff --git a/include/net/xdp.h b/include/net/xdp.h
+index aa742f413c35..2a44d84a7611 100644
+--- a/include/net/xdp.h
++++ b/include/net/xdp.h
+@@ -446,7 +446,7 @@ struct xdp_frame *xdp_convert_buff_to_frame(struct xdp_buff *xdp)
  }
  
--enum test_type { type_fast_path, type_ptr_ring, type_page_allocator };
-+enum test_type {
-+	type_fast_path,
-+	type_napi_aware,
-+	type_ptr_ring,
-+	type_page_allocator,
-+};
+ void __xdp_return(netmem_ref netmem, enum xdp_mem_type mem_type,
+-		  bool napi_direct, struct xdp_buff *xdp);
++		  struct xdp_buff *xdp);
+ void xdp_return_frame(struct xdp_frame *xdpf);
+ void xdp_return_frame_rx_napi(struct xdp_frame *xdpf);
+ void xdp_return_buff(struct xdp_buff *xdp);
+diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
+index 703e5df1f4ef..3ece03dc36bd 100644
+--- a/kernel/bpf/cpumap.c
++++ b/kernel/bpf/cpumap.c
+@@ -253,7 +253,6 @@ static void cpu_map_bpf_prog_run(struct bpf_cpu_map_entry *rcpu, void **frames,
  
- /* Depends on compile optimizing this function */
- static int time_bench_page_pool(struct time_bench_record *rec, void *data,
-@@ -132,6 +144,7 @@ static int time_bench_page_pool(struct time_bench_record *rec, void *data,
+ 	rcu_read_lock();
+ 	bpf_net_ctx = bpf_net_ctx_set(&__bpf_net_ctx);
+-	xdp_set_return_frame_no_direct();
  
- 	struct page_pool *pp;
- 	struct page *page;
-+	struct napi_struct napi = {0};
+ 	ret->xdp_n = cpu_map_bpf_prog_run_xdp(rcpu, frames, ret->xdp_n, stats);
+ 	if (unlikely(ret->skb_n))
+@@ -263,7 +262,6 @@ static void cpu_map_bpf_prog_run(struct bpf_cpu_map_entry *rcpu, void **frames,
+ 	if (stats->redirect)
+ 		xdp_do_flush();
  
- 	struct page_pool_params pp_params = {
- 		.order = 0,
-@@ -141,6 +154,7 @@ static int time_bench_page_pool(struct time_bench_record *rec, void *data,
- 		.dev = NULL, /* Only use for DMA mapping */
- 		.dma_dir = DMA_BIDIRECTIONAL,
- 	};
-+	struct page_pool_stats stats = {0};
+-	xdp_clear_return_frame_no_direct();
+ 	bpf_net_ctx_clear(bpf_net_ctx);
+ 	rcu_read_unlock();
  
- 	pp = page_pool_create(&pp_params);
- 	if (IS_ERR(pp)) {
-@@ -155,6 +169,11 @@ static int time_bench_page_pool(struct time_bench_record *rec, void *data,
- 	else
- 		pr_warn("%s(): Cannot use page_pool fast-path\n", func);
+diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
+index 8b7d0b90fea7..a0fe03e9e527 100644
+--- a/net/bpf/test_run.c
++++ b/net/bpf/test_run.c
+@@ -289,7 +289,6 @@ static int xdp_test_run_batch(struct xdp_test_data *xdp, struct bpf_prog *prog,
+ 	local_bh_disable();
+ 	bpf_net_ctx = bpf_net_ctx_set(&__bpf_net_ctx);
+ 	ri = bpf_net_ctx_get_ri();
+-	xdp_set_return_frame_no_direct();
  
-+	if (type == type_napi_aware) {
-+		napi.list_owner = smp_processor_id();
-+		page_pool_enable_direct_recycling(pp, &napi);
-+	}
-+
- 	time_bench_start(rec);
- 	/** Loop to measure **/
- 	for (i = 0; i < rec->loops; i++) {
-@@ -173,7 +192,13 @@ static int time_bench_page_pool(struct time_bench_record *rec, void *data,
- 			page_pool_recycle_direct(pp, page);
- 
- 		} else if (type == type_ptr_ring) {
--			/* Normal return path */
-+			/* Normal return path, either direct or via ptr_ring */
-+			page_pool_put_page(pp, page, -1, false);
-+
-+		} else if (type == type_napi_aware) {
-+			/* NAPI-aware recycling: uses fast-path recycling if
-+			 * possible.
-+			 */
- 			page_pool_put_page(pp, page, -1, false);
- 
- 		} else if (type == type_page_allocator) {
-@@ -188,6 +213,14 @@ static int time_bench_page_pool(struct time_bench_record *rec, void *data,
- 		}
+ 	for (i = 0; i < batch_sz; i++) {
+ 		page = page_pool_dev_alloc_pages(xdp->pp);
+@@ -352,7 +351,6 @@ static int xdp_test_run_batch(struct xdp_test_data *xdp, struct bpf_prog *prog,
+ 			err = ret;
  	}
- 	time_bench_stop(rec, loops_cnt);
+ 
+-	xdp_clear_return_frame_no_direct();
+ 	bpf_net_ctx_clear(bpf_net_ctx);
+ 	local_bh_enable();
+ 	return err;
+diff --git a/net/core/filter.c b/net/core/filter.c
+index 16105f52927d..5622ec5ac19c 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -4187,7 +4187,7 @@ static bool bpf_xdp_shrink_data(struct xdp_buff *xdp, skb_frag_t *frag,
+ 	}
+ 
+ 	if (release) {
+-		__xdp_return(netmem, mem_type, false, zc_frag);
++		__xdp_return(netmem, mem_type, zc_frag);
+ 	} else {
+ 		if (!tail)
+ 			skb_frag_off_add(frag, shrink);
+diff --git a/net/core/xdp.c b/net/core/xdp.c
+index 9100e160113a..cf8eab699d9a 100644
+--- a/net/core/xdp.c
++++ b/net/core/xdp.c
+@@ -431,18 +431,18 @@ EXPORT_SYMBOL_GPL(xdp_rxq_info_attach_page_pool);
+  * of xdp_frames/pages in those cases.
+  */
+ void __xdp_return(netmem_ref netmem, enum xdp_mem_type mem_type,
+-		  bool napi_direct, struct xdp_buff *xdp)
++		  struct xdp_buff *xdp)
+ {
+ 	switch (mem_type) {
+ 	case MEM_TYPE_PAGE_POOL:
+ 		netmem = netmem_compound_head(netmem);
+-		if (napi_direct && xdp_return_frame_no_direct())
+-			napi_direct = false;
 +
-+	if (type == type_napi_aware) {
-+		page_pool_get_stats(pp, &stats);
-+		if (stats.recycle_stats.cached < rec->loops)
-+			pr_warn("%s(): NAPI-aware recycling wasn't used\n",
-+				func);
-+	}
-+
+ 		/* No need to check netmem_is_pp() as mem->type knows this a
+ 		 * page_pool page
++		 *
++		 * page_pool can detect direct recycle.
+ 		 */
+-		page_pool_put_full_netmem(netmem_get_pp(netmem), netmem,
+-					  napi_direct);
++		page_pool_put_full_netmem(netmem_get_pp(netmem), netmem, false);
+ 		break;
+ 	case MEM_TYPE_PAGE_SHARED:
+ 		page_frag_free(__netmem_address(netmem));
+@@ -471,10 +471,10 @@ void xdp_return_frame(struct xdp_frame *xdpf)
+ 	sinfo = xdp_get_shared_info_from_frame(xdpf);
+ 	for (u32 i = 0; i < sinfo->nr_frags; i++)
+ 		__xdp_return(skb_frag_netmem(&sinfo->frags[i]), xdpf->mem_type,
+-			     false, NULL);
++			     NULL);
+ 
  out:
- 	page_pool_destroy(pp);
- 	return loops_cnt;
-@@ -211,6 +244,54 @@ static int time_bench_page_pool03_slow(struct time_bench_record *rec,
- 	return time_bench_page_pool(rec, data, type_page_allocator, __func__);
+-	__xdp_return(virt_to_netmem(xdpf->data), xdpf->mem_type, false, NULL);
++	__xdp_return(virt_to_netmem(xdpf->data), xdpf->mem_type, NULL);
  }
+ EXPORT_SYMBOL_GPL(xdp_return_frame);
  
-+static int time_bench_page_pool04_napi_aware(struct time_bench_record *rec,
-+					     void *data)
-+{
-+	return time_bench_page_pool(rec, data, type_napi_aware, __func__);
-+}
-+
-+/* Testing page_pool requires running under softirq.
-+ *
-+ * Running under a tasklet satisfy this, as tasklets are built on top of
-+ * softirq.
-+ */
-+static void pp_tasklet_handler(struct tasklet_struct *t)
-+{
-+	uint32_t nr_loops = loops;
-+
-+	if (in_serving_softirq())
-+		pr_warn("%s(): in_serving_softirq fast-path\n",
-+			__func__); // True
-+	else
-+		pr_warn("%s(): Cannot use page_pool fast-path\n", __func__);
-+
-+	if (enabled(bit_run_bench_tasklet01))
-+		time_bench_loop(nr_loops, 0, "tasklet_page_pool01_fast_path",
-+				NULL, time_bench_page_pool01_fast_path);
-+
-+	if (enabled(bit_run_bench_tasklet02))
-+		time_bench_loop(nr_loops, 0, "tasklet_page_pool02_ptr_ring",
-+				NULL, time_bench_page_pool02_ptr_ring);
-+
-+	if (enabled(bit_run_bench_tasklet03))
-+		time_bench_loop(nr_loops, 0, "tasklet_page_pool03_slow", NULL,
-+				time_bench_page_pool03_slow);
-+
-+	if (enabled(bit_run_bench_tasklet04))
-+		time_bench_loop(nr_loops, 0, "tasklet_page_pool04_napi_aware",
-+				NULL, time_bench_page_pool04_napi_aware);
-+
-+	mutex_unlock(&wait_for_tasklet); /* Module __init waiting on unlock */
-+}
-+DECLARE_TASKLET_DISABLED(pp_tasklet, pp_tasklet_handler);
-+
-+static void run_tasklet_tests(void)
-+{
-+	tasklet_enable(&pp_tasklet);
-+	/* "Async" schedule tasklet, which runs on the CPU that schedule it */
-+	tasklet_schedule(&pp_tasklet);
-+}
-+
- static int run_benchmark_tests(void)
+@@ -488,10 +488,10 @@ void xdp_return_frame_rx_napi(struct xdp_frame *xdpf)
+ 	sinfo = xdp_get_shared_info_from_frame(xdpf);
+ 	for (u32 i = 0; i < sinfo->nr_frags; i++)
+ 		__xdp_return(skb_frag_netmem(&sinfo->frags[i]), xdpf->mem_type,
+-			     true, NULL);
++			     NULL);
+ 
+ out:
+-	__xdp_return(virt_to_netmem(xdpf->data), xdpf->mem_type, true, NULL);
++	__xdp_return(virt_to_netmem(xdpf->data), xdpf->mem_type, NULL);
+ }
+ EXPORT_SYMBOL_GPL(xdp_return_frame_rx_napi);
+ 
+@@ -542,7 +542,7 @@ EXPORT_SYMBOL_GPL(xdp_return_frame_bulk);
+  */
+ void xdp_return_frag(netmem_ref netmem, const struct xdp_buff *xdp)
  {
- 	uint32_t nr_loops = loops;
-@@ -251,12 +332,19 @@ static int __init bench_page_pool_simple_module_init(void)
- 
- 	run_benchmark_tests();
- 
-+	mutex_lock(&wait_for_tasklet);
-+	run_tasklet_tests();
-+	/* Sleep on mutex, waiting for tasklet to release */
-+	mutex_lock(&wait_for_tasklet);
-+
- 	return 0;
+-	__xdp_return(netmem, xdp->rxq->mem.type, true, NULL);
++	__xdp_return(netmem, xdp->rxq->mem.type, NULL);
  }
- module_init(bench_page_pool_simple_module_init);
+ EXPORT_SYMBOL_GPL(xdp_return_frag);
  
- static void __exit bench_page_pool_simple_module_exit(void)
- {
-+	tasklet_kill(&pp_tasklet);
-+
- 	if (verbose)
- 		pr_info("Unloaded\n");
+@@ -556,10 +556,10 @@ void xdp_return_buff(struct xdp_buff *xdp)
+ 	sinfo = xdp_get_shared_info_from_buff(xdp);
+ 	for (u32 i = 0; i < sinfo->nr_frags; i++)
+ 		__xdp_return(skb_frag_netmem(&sinfo->frags[i]),
+-			     xdp->rxq->mem.type, true, xdp);
++			     xdp->rxq->mem.type, xdp);
+ 
+ out:
+-	__xdp_return(virt_to_netmem(xdp->data), xdp->rxq->mem.type, true, xdp);
++	__xdp_return(virt_to_netmem(xdp->data), xdp->rxq->mem.type, xdp);
  }
+ EXPORT_SYMBOL_GPL(xdp_return_buff);
+ 
 -- 
 2.50.1
 
