@@ -1,405 +1,241 @@
-Return-Path: <netdev+bounces-236894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B325C419BC
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 21:44:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C11C1C41A3A
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 21:53:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 818083BB23C
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 20:44:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8CD83BEDFE
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 20:53:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D83A30F80F;
-	Fri,  7 Nov 2025 20:43:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7E2F30F538;
+	Fri,  7 Nov 2025 20:53:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DspA49r3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KHjxLduA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+Received: from mail-yx1-f45.google.com (mail-yx1-f45.google.com [74.125.224.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B56B30F7E8
-	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 20:43:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDEAA30EF86
+	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 20:53:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762548235; cv=none; b=iIliIGv16bSnDEtZoZB86r/NM2tX2u+2063x6RqtXoqNwa5Td57r+Ler7s3j5W3v4niAyzG8BAPtJQ6q5QnZj7zk5V97anr9kPKQHRVqkx4wvEZ3iBtQ1hICCK6W4GWt9KkVtYFnLppMDgMR4grco5De2tBCedujF1yAIiKB7uU=
+	t=1762548811; cv=none; b=kbxC3tlMFsm7gJn3ZbqKnV/ayEUf29+kFhst6cnhPgH5vVWAAckWtvEgStjI9TEe0Xuzf8IGiY0wA1yDWmEek2T9IN9aSy48TGArecJ23+Sp6YB2n7jWJOM0D/RWE/lpDVo2Y/B4sPlS3R5bpVUVjtRvlMebgRHb5KXIf3hkInw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762548235; c=relaxed/simple;
-	bh=QsWGhTEv5o5MmhceuHSHYM4Lx5h1hcZORNffawLbY1U=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=b8xkpABPBrcBp2TSG/zpdzeS5rDYYmMdO4EZdBcwMgdojs7KJEz9GLSzj5JgNTwmTf7IwtCsmWV1uN8Os+J1t+AoGZej4mLnwqpin3rpZ8f6Lxc7OA8veuhzI6eFFNBPbPdxwI8aggOQKTJ7sYlAckOHoXHG1uB08rXWR9FBj8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DspA49r3; arc=none smtp.client-ip=209.85.128.182
+	s=arc-20240116; t=1762548811; c=relaxed/simple;
+	bh=ljO4JvzYez1krH2vOKDSHh0LKeuwRchWTqG+Aa5yOl4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZQPvlM4avrnO/DXSp83HluXB0b5LwaoTk8+V8wZ3eT5NOvT71mgW6vLMT+pHkmiD7sP/hMmsHuqrsUv/mbnF9a8aTBqW9OrVKH4QLO6K8R0gh5ftnGCiNXVhlbZ3u484DniFQfW5bK4HTYrESSyCHu/2XHmRzOL4QfXUiQgX6Kc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KHjxLduA; arc=none smtp.client-ip=74.125.224.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-786a85a68c6so12461137b3.3
-        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 12:43:53 -0800 (PST)
+Received: by mail-yx1-f45.google.com with SMTP id 956f58d0204a3-640d45e66f5so24253d50.1
+        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 12:53:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762548232; x=1763153032; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1762548809; x=1763153609; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JRbS6VI2bNTHm/o6rxRH2I/vNUA+a3DGv8cXb7Is3Tw=;
-        b=DspA49r3tFYTrhmBNybZrF/Yd2TjNJEfnuLq6ABrJHho4uFwORzqJ24Yb3oFG1YsIL
-         3BAQO1+StBAc3GoniKhaYNmz/zr+glIlBZcEdJtcj6vqx8agtuTkxG/WWXYyYXCp7g5b
-         NytO6R/UwfxbHhe1ekraEZFD/HqRE/TGoz6VxMPG0QmyTf84N4JTHK6vRHFygdKd8XER
-         OmK+AXgU6IpzXR/hQN+39vz2KOup05ubU3OitD5s+HrINjlUZdqWXVZga9jdjJSlR4na
-         AnEVY1zF5rKJRC3axCfvelmMgdYjyn/qdTJyL5XAe9MbWaNOa0Sxpad36P+Z7GNZ3Cti
-         lqCg==
+        bh=ndAmh0MjfxVBBMOro9qnccRFjet8LAlaiu54q/obIYI=;
+        b=KHjxLduA0yJRF9gYLLhzLwSA3XQnvK8Umf+c8k/NcwFCLaz7HlWp6KD/O271uYQ6sc
+         vpyDmCs+Gywp3opLba6Vdc/lsMqjWOoruiqOysJ9KxfWH2zmwQz/XK0OfeB1qB//yMp3
+         y5Nn+pzbqs3apkQlT8zGQ5refWJXFxbl/9Mmc8Rp8O3wDzp9POOhUGdyTixMbDFVTgi2
+         Dhgz9qhXlzzan5J76fdyU3RHQGozEFIF7LLdOcnbW6izx7aCuqvNGXGtTYFK/xMJQ2Yd
+         FjGdwIzG0AN5pObeDa6aDa2g7t2hR34uGCOSOSxHeXjnSIowi7pYQO6K85E4I0LV6KeW
+         WTmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762548232; x=1763153032;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1762548809; x=1763153609;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=JRbS6VI2bNTHm/o6rxRH2I/vNUA+a3DGv8cXb7Is3Tw=;
-        b=W6qXqorVeLDaYB5wDxA60yH9LlES5/ODOinKOJqy6tFhoDe50l/a4vMmaKJCkl9JXO
-         P/jPvcOtMHhcF2ZNx5sv3xbRxtUA9qek3mbbqhiVB2cEqfWSMUstGsK4Yb506p+xbVEk
-         4HSTptKHQU57GazUYkY6hc+0H0A7o9v3sMxePuXikVCBorQYMQTbutlQvJTwvEE8p2kC
-         IHkf7rrENbQtR7cAAz53RstyHus6tgDXZql44Xb2mNJsn1Z2lc2TnTpBnnevyUvUngb/
-         fAGhkxCzLWVkIlCyX+bsRRdaO1itC1F0WbU5dTJZ3+GASAPXWBXAYnKt7pYZvgHli4RB
-         2qDg==
-X-Gm-Message-State: AOJu0YyEB6VZO3RRPLxysjU+BxkhZZgPFOELb6h6Bm7RWt63WJnnjo0W
-	H5kXC701/YrJe4DqCxN5e88dQDx+RrWjLsV/Dgb922xT4/kS96ZljR33
-X-Gm-Gg: ASbGncuSObilg5nq/6I5MGOXcJrLvA2xh4uFo4zw9FU2s62N2z2gsB482oVOZXzcd0m
-	SDLq2yfM0CYYZK5gKom2pNL2TwG17gAwpVSxTQsZ2z2zUX7uO1EvfxwLAUo2VLR27aF+2Dp1mjP
-	UT1hsSYjFrMm/IPw+NriZdX57D+4P231cUgs4Hw5aqVrViR8nY7wCt3YmcPrvQbFQMP6QV+ZmZN
-	DWnZYXTmIUCPjgqhTKAwCW/0oePVFc/yliCWRswXFLWzqChoRLm29C/UiPF94SRK3MG5lRcfNDH
-	mVbNGu6AoYjGqSx8JmJ2LepsIGKiKH+1lHS+2zGmxF3UooXqYxhBIA7d+wbhRuotJkbKlzxYAvd
-	dQYHPHccNm4s4j9FEbIHkevvYLV5imRpas0Wlx5Z+EhUK2UGTepSr/N6Xk6sAsFCxsynr1jGzXl
-	njKio2hABJtA==
-X-Google-Smtp-Source: AGHT+IE0Ugc4C6NPSk5vUZlI98wOMo4Ff0U+yawpaKDpCc1QgQFDLIe3p4+5eXnHVHgkKJ3wKPJQDw==
-X-Received: by 2002:a05:690c:6ac9:b0:785:cbf4:72cd with SMTP id 00721157ae682-787d53524b1mr8282087b3.3.1762548232348;
-        Fri, 07 Nov 2025 12:43:52 -0800 (PST)
-Received: from localhost ([2a03:2880:25ff:73::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-787d6809e07sm856687b3.3.2025.11.07.12.43.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Nov 2025 12:43:51 -0800 (PST)
-From: Daniel Zahka <daniel.zahka@gmail.com>
-To: Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Srujana Challa <schalla@marvell.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Brett Creeley <brett.creeley@amd.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Sunil Goutham <sgoutham@marvell.com>,
-	Linu Cherian <lcherian@marvell.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Jerin Jacob <jerinj@marvell.com>,
-	hariprasad <hkelam@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Mark Bloch <mbloch@nvidia.com>,
-	Ido Schimmel <idosch@nvidia.com>,
-	Petr Machata <petrm@nvidia.com>,
-	Manish Chopra <manishc@marvell.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Roger Quadros <rogerq@kernel.org>,
-	Loic Poulain <loic.poulain@oss.qualcomm.com>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Dave Ertman <david.m.ertman@intel.com>,
-	Vlad Dumitrescu <vdumitrescu@nvidia.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Alexander Sverdlin <alexander.sverdlin@gmail.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	linux-rdma@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-omap@vger.kernel.org
-Subject: [PATCH net-next v3 2/2] net/mlx5: implement swp_l4_csum_mode via devlink params
-Date: Fri,  7 Nov 2025 12:43:46 -0800
-Message-ID: <20251107204347.4060542-3-daniel.zahka@gmail.com>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251107204347.4060542-1-daniel.zahka@gmail.com>
-References: <20251107204347.4060542-1-daniel.zahka@gmail.com>
+        bh=ndAmh0MjfxVBBMOro9qnccRFjet8LAlaiu54q/obIYI=;
+        b=EZnFflUf7gIZJcBCcuI8ow6G2N9j1JXMeCaVTwVxR+R/UidYL2Ccnml7tNagTOXfgG
+         4tcCdYY26gGbEB7SL8W09LUEAcab8QDej+cZvnSZQdV0YAHhUxiJvfvJffPJssDObeWV
+         nrjFSbAUE+bJPYFt8Rl64OHw/8C+rV+cWLxOE6746CWYGvkrsXUKHkKxFcq+dRaq7lHg
+         /BYboHRx/Ste/hcSJv5N6iB8bpyK1fGjJ37M0VwK015aRCeoZj13dwP5ObQu+V5m5FAX
+         tZDUz791F+QBMattD5ap9ANpSlWJ7q5dw7YU77QMP+eis/7Sd87wWCFqRDhdqnQzu03t
+         x/EA==
+X-Forwarded-Encrypted: i=1; AJvYcCWRgYEy+JVSOa8OuZmjbrPd7VAgrYlSDAQKbXJrl98qb5FBA8KiRUZU2RGDeiRhDwfoWGiCUzw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwkOqKdo3B7G2Cez1kDMjZ0Qv/FhuUTx03V46IF9e7jVu2jqw4s
+	99AHMeIz8SJD4R8/cZ7KRf1oeKqHkvvnxnqtQH2awuGVksoL+K5deIXJFOl5BSDWmptDHDwzbpL
+	F0hecdcxGPCW0pLDj/qqHifaiZiVrxqU=
+X-Gm-Gg: ASbGncv5Au3hsE5JiUewx+GdJxJNIK+BpgftoMA2k5mXPUdyPrQdmtrv66ChDEU7BsZ
+	GVbQ3kTZXCN/ObDjUXkBMUTU+7GBk8R2hz4T3IyT69wcS9nhSdLzJSIjxXEfWccl3/wiukiMB/h
+	gR7Q7NUImZZxHY/9bSaMupipIO9v5uU30z2fjdgQX3XfIMTDt3exN4AGBAbESZj34wmXJc8qC+l
+	z3mroXYlphFQeSSoz4zFUdENf8hxbxRZ+scgbJ8lyIx3RYZN+RRkMm2GXn3CyuJ5taE/gq5gpIb
+	2dhU65d5rj1GLGHMgifhOg==
+X-Google-Smtp-Source: AGHT+IFA5LRJyKMNpiLJ6acp+jtqn28437tPxYxfpfcUscZsu2WEuoubDNLDYs74uabDBYBM/7EmlyOaY/35gs8ZEr4=
+X-Received: by 2002:a05:690c:a:b0:786:4fd5:e5d4 with SMTP id
+ 00721157ae682-787d54166b6mr4447577b3.6.1762548808930; Fri, 07 Nov 2025
+ 12:53:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20251105-netconsole_dynamic_extradata-v1-0-142890bf4936@meta.com>
+ <20251105-netconsole_dynamic_extradata-v1-2-142890bf4936@meta.com> <jejsptfg7cqmbcm467tb72gg3mwsqge6iz4qy4wy5ifev2sgim@hukyfgsr74xj>
+In-Reply-To: <jejsptfg7cqmbcm467tb72gg3mwsqge6iz4qy4wy5ifev2sgim@hukyfgsr74xj>
+From: Gustavo Luiz Duarte <gustavold@gmail.com>
+Date: Fri, 7 Nov 2025 20:53:18 +0000
+X-Gm-Features: AWmQ_bmKloNJpWlaMH-L-FWBG3Z5z2qrAABsdDUdzzHSOuB9z0bXDZ5dbKaYqbQ
+Message-ID: <CAGSyskXmLQi7urQodZVNF7n6j2OTVB4yGoXDQrHccsM0kniSkA@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/4] netconsole: Split userdata and sysdata
+To: Breno Leitao <leitao@debian.org>
+Cc: Andre Carvalho <asantostc@gmail.com>, Simon Horman <horms@kernel.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-swp_l4_csum_mode controls how L4 transmit checksums are computed when
-using Software Parser (SWP) hints for header locations.
+On Fri, Nov 7, 2025 at 1:23=E2=80=AFPM Breno Leitao <leitao@debian.org> wro=
+te:
+> > diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+> > index 0a8ba7c4bc9d..e780c884db83 100644
+> > --- a/drivers/net/netconsole.c
+> > +++ b/drivers/net/netconsole.c
+> > @@ -50,7 +50,8 @@ MODULE_LICENSE("GPL");
+> >  /* The number 3 comes from userdata entry format characters (' ', '=3D=
+', '\n') */
+> >  #define MAX_EXTRADATA_NAME_LEN               (MAX_EXTRADATA_ENTRY_LEN =
+- \
+> >                                       MAX_EXTRADATA_VALUE_LEN - 3)
+> > -#define MAX_EXTRADATA_ITEMS          16
+> > +#define MAX_USERDATA_ITEMS           16
+>
+> Do we still need to have MAX_USERDATA_ITEMS cap with your new approach?
 
-Supported values:
-  1. device_default: use device default setting.
-  2. full_csum: calculate L4 checksum with the pseudo-header.
-  3. l4_only: calculate L4 checksum without the pseudo-header. Only
-     available when swp_l4_csum_mode_l4_only is set in
-     mlx5_ifc_nv_sw_offload_cap_bits.
+That is a good point. I did think about this and ended up deciding to
+keep a limit as a safety measure against userspace creating a boatload
+of items until we run out of memory.
 
-The l4_only setting is a dependency for PSP initialization in
-mlx5e_psp_init().
+>
+> > +#define MAX_SYSDATA_ITEMS            4
+>
+> Can we have this one inside enum sysdata_feature?
+>
+> Something as:
+>
+>   enum sysdata_feature {
+>       SYSDATA_CPU_NR =3D BIT(0),
+>       SYSDATA_TASKNAME =3D BIT(1),
+>       SYSDATA_RELEASE =3D BIT(2),
+>       SYSDATA_MSGID =3D BIT(3),
+>       MAX_SYSDATA_ITEMS =3D 4  /* Sentinel: highest bit position */
+>   };
 
-Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
----
+Sure, I will do this in v2.
 
-Notes:
-    v2:
-    - use extack in mlx5_nv_param_devlink_swp_l4_csum_mode_get()
-    - fix indentation issue in mlx5.rst entry
 
- Documentation/networking/devlink/mlx5.rst     |   9 +
- .../net/ethernet/mellanox/mlx5/core/devlink.h |   3 +-
- .../mellanox/mlx5/core/lib/nv_param.c         | 161 ++++++++++++++++++
- 3 files changed, 172 insertions(+), 1 deletion(-)
+> > @@ -1353,22 +1311,21 @@ static void populate_configfs_item(struct netco=
+nsole_target *nt,
+> >
+> >  static int sysdata_append_cpu_nr(struct netconsole_target *nt, int off=
+set)
+> >  {
+> > -     /* Append cpu=3D%d at extradata_complete after userdata str */
+> > -     return scnprintf(&nt->extradata_complete[offset],
+> > +     return scnprintf(&nt->sysdata[offset],
+> >                        MAX_EXTRADATA_ENTRY_LEN, " cpu=3D%u\n",
+>
+> This is confusing. It is writing to sysdata but checking extradata entry =
+len.
 
-diff --git a/Documentation/networking/devlink/mlx5.rst b/Documentation/networking/devlink/mlx5.rst
-index 0e5f9c76e514..675b5a1ec625 100644
---- a/Documentation/networking/devlink/mlx5.rst
-+++ b/Documentation/networking/devlink/mlx5.rst
-@@ -218,6 +218,15 @@ parameters.
-        * ``balanced`` : Merges fewer CQEs, resulting in a moderate compression ratio but maintaining a balance between bandwidth savings and performance
-        * ``aggressive`` : Merges more CQEs into a single entry, achieving a higher compression rate and maximizing performance, particularly under high traffic loads
- 
-+   * - ``swp_l4_csum_mode``
-+     - string
-+     - permanent
-+     - Configure how the L4 checksum is calculated by the device when using
-+       Software Parser (SWP) hints for header locations.
-+       * ``device_default`` : Use the device's default checksum calculation mode
-+       * ``full_csum`` : Calculate full checksum including the pseudo-header
-+       * ``l4_only`` : Calculate L4-only checksum, excluding the pseudo-header
-+
- The ``mlx5`` driver supports reloading via ``DEVLINK_CMD_RELOAD``
- 
- Info versions
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/devlink.h b/drivers/net/ethernet/mellanox/mlx5/core/devlink.h
-index c9555119a661..43b9bf8829cf 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/devlink.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/devlink.h
-@@ -26,7 +26,8 @@ enum mlx5_devlink_param_id {
- 	MLX5_DEVLINK_PARAM_ID_PCIE_CONG_IN_HIGH,
- 	MLX5_DEVLINK_PARAM_ID_PCIE_CONG_OUT_LOW,
- 	MLX5_DEVLINK_PARAM_ID_PCIE_CONG_OUT_HIGH,
--	MLX5_DEVLINK_PARAM_ID_CQE_COMPRESSION_TYPE
-+	MLX5_DEVLINK_PARAM_ID_CQE_COMPRESSION_TYPE,
-+	MLX5_DEVLINK_PARAM_ID_SWP_L4_CSUM_MODE,
- };
- 
- struct mlx5_trap_ctx {
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
-index 3d2195338d39..3dc5b899a5fb 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/nv_param.c
-@@ -8,6 +8,8 @@ enum {
- 	MLX5_CLASS_0_CTRL_ID_NV_GLOBAL_PCI_CONF               = 0x80,
- 	MLX5_CLASS_0_CTRL_ID_NV_GLOBAL_PCI_CAP                = 0x81,
- 	MLX5_CLASS_0_CTRL_ID_NV_SW_OFFLOAD_CONFIG             = 0x10a,
-+	MLX5_CLASS_0_CTRL_ID_NV_SW_OFFLOAD_CAP                = 0x10b,
-+	MLX5_CLASS_0_CTRL_ID_NV_SW_ACCELERATE_CONF            = 0x11d,
- 
- 	MLX5_CLASS_3_CTRL_ID_NV_PF_PCI_CONF                   = 0x80,
- };
-@@ -123,6 +125,17 @@ struct mlx5_ifc_nv_sw_offload_conf_bits {
- 	u8         lro_log_timeout0[0x4];
- };
- 
-+struct mlx5_ifc_nv_sw_offload_cap_bits {
-+	u8         reserved_at_0[0x19];
-+	u8         swp_l4_csum_mode_l4_only[0x1];
-+	u8         reserved_at_1a[0x6];
-+};
-+
-+struct mlx5_ifc_nv_sw_accelerate_conf_bits {
-+	u8         swp_l4_csum_mode[0x2];
-+	u8         reserved_at_2[0x3e];
-+};
-+
- #define MNVDA_HDR_SZ \
- 	(MLX5_ST_SZ_BYTES(mnvda_reg) - \
- 	 MLX5_BYTE_OFF(mnvda_reg, configuration_item_data))
-@@ -195,6 +208,30 @@ mlx5_nv_param_read_sw_offload_conf(struct mlx5_core_dev *dev, void *mnvda,
- 	return mlx5_nv_param_read(dev, mnvda, len);
- }
- 
-+static int
-+mlx5_nv_param_read_sw_offload_cap(struct mlx5_core_dev *dev, void *mnvda,
-+				  size_t len)
-+{
-+	MLX5_SET_CFG_ITEM_TYPE(global, mnvda, type_class, 0);
-+	MLX5_SET_CFG_ITEM_TYPE(global, mnvda, parameter_index,
-+			       MLX5_CLASS_0_CTRL_ID_NV_SW_OFFLOAD_CAP);
-+	MLX5_SET_CFG_HDR_LEN(mnvda, nv_sw_offload_cap);
-+
-+	return mlx5_nv_param_read(dev, mnvda, len);
-+}
-+
-+static int
-+mlx5_nv_param_read_sw_accelerate_conf(struct mlx5_core_dev *dev, void *mnvda,
-+				      size_t len)
-+{
-+	MLX5_SET_CFG_ITEM_TYPE(global, mnvda, type_class, 0);
-+	MLX5_SET_CFG_ITEM_TYPE(global, mnvda, parameter_index,
-+			       MLX5_CLASS_0_CTRL_ID_NV_SW_ACCELERATE_CONF);
-+	MLX5_SET_CFG_HDR_LEN(mnvda, nv_sw_accelerate_conf);
-+
-+	return mlx5_nv_param_read(dev, mnvda, len);
-+}
-+
- static const char *const
- 	cqe_compress_str[] = { "balanced", "aggressive" };
- 
-@@ -269,6 +306,124 @@ mlx5_nv_param_devlink_cqe_compress_set(struct devlink *devlink, u32 id,
- 	return mlx5_nv_param_write(dev, mnvda, sizeof(mnvda));
- }
- 
-+enum swp_l4_csum_mode {
-+	SWP_L4_CSUM_MODE_DEVICE_DEFAULT = 0,
-+	SWP_L4_CSUM_MODE_FULL_CSUM = 1,
-+	SWP_L4_CSUM_MODE_L4_ONLY = 2,
-+};
-+
-+static const char *const
-+	swp_l4_csum_mode_str[] = { "device_default", "full_csum", "l4_only" };
-+
-+static int
-+mlx5_nv_param_devlink_swp_l4_csum_mode_get(struct devlink *devlink, u32 id,
-+					   struct devlink_param_gset_ctx *ctx,
-+					   struct netlink_ext_ack *extack)
-+{
-+	struct mlx5_core_dev *dev = devlink_priv(devlink);
-+	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
-+	u8 value = U8_MAX;
-+	void *data;
-+	int err;
-+
-+	err = mlx5_nv_param_read_sw_accelerate_conf(dev, mnvda, sizeof(mnvda));
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Failed to read sw_accelerate_conf mnvda reg");
-+		return err;
-+	}
-+
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+	value = MLX5_GET(nv_sw_accelerate_conf, data, swp_l4_csum_mode);
-+
-+	if (value >= ARRAY_SIZE(swp_l4_csum_mode_str)) {
-+		NL_SET_ERR_MSG_FMT_MOD(extack,
-+				       "Invalid swp_l4_csum_mode value %u read from device",
-+				       value);
-+		return -EINVAL;
-+	}
-+
-+	strscpy(ctx->val.vstr, swp_l4_csum_mode_str[value],
-+		sizeof(ctx->val.vstr));
-+	return 0;
-+}
-+
-+static int
-+mlx5_nv_param_devlink_swp_l4_csum_mode_validate(struct devlink *devlink, u32 id,
-+						union devlink_param_value val,
-+						struct netlink_ext_ack *extack)
-+{
-+	struct mlx5_core_dev *dev = devlink_priv(devlink);
-+	u32 cap[MLX5_ST_SZ_DW(mnvda_reg)] = {};
-+	void *data;
-+	int err, i;
-+
-+	for (i = 0; i < ARRAY_SIZE(swp_l4_csum_mode_str); i++) {
-+		if (!strcmp(val.vstr, swp_l4_csum_mode_str[i]))
-+			break;
-+	}
-+
-+	if (i >= ARRAY_SIZE(swp_l4_csum_mode_str)) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Invalid value, supported values are device_default/full_csum/l4_only");
-+		return -EINVAL;
-+	}
-+
-+	if (i == SWP_L4_CSUM_MODE_L4_ONLY) {
-+		err = mlx5_nv_param_read_sw_offload_cap(dev, cap, sizeof(cap));
-+		if (err) {
-+			NL_SET_ERR_MSG_MOD(extack,
-+					   "Failed to read sw_offload_cap");
-+			return err;
-+		}
-+
-+		data = MLX5_ADDR_OF(mnvda_reg, cap, configuration_item_data);
-+		if (!MLX5_GET(nv_sw_offload_cap, data, swp_l4_csum_mode_l4_only)) {
-+			NL_SET_ERR_MSG_MOD(extack,
-+					   "l4_only mode is not supported on this device");
-+			return -EOPNOTSUPP;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+static int
-+mlx5_nv_param_devlink_swp_l4_csum_mode_set(struct devlink *devlink, u32 id,
-+					   struct devlink_param_gset_ctx *ctx,
-+					   struct netlink_ext_ack *extack)
-+{
-+	struct mlx5_core_dev *dev = devlink_priv(devlink);
-+	u32 mnvda[MLX5_ST_SZ_DW(mnvda_reg)] = {};
-+	void *data;
-+	u8 value;
-+	int err;
-+
-+	if (!strcmp(ctx->val.vstr, "device_default"))
-+		value = SWP_L4_CSUM_MODE_DEVICE_DEFAULT;
-+	else if (!strcmp(ctx->val.vstr, "full_csum"))
-+		value = SWP_L4_CSUM_MODE_FULL_CSUM;
-+	else
-+		value = SWP_L4_CSUM_MODE_L4_ONLY;
-+
-+	err = mlx5_nv_param_read_sw_accelerate_conf(dev, mnvda, sizeof(mnvda));
-+	if (err) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Failed to read sw_accelerate_conf mnvda reg");
-+		return err;
-+	}
-+
-+	data = MLX5_ADDR_OF(mnvda_reg, mnvda, configuration_item_data);
-+	MLX5_SET(nv_sw_accelerate_conf, data, swp_l4_csum_mode, value);
-+
-+	err = mlx5_nv_param_write(dev, mnvda, sizeof(mnvda));
-+	if (err)
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Failed to write sw_accelerate_conf mnvda reg");
-+
-+	return err;
-+}
-+
- static int mlx5_nv_param_read_global_pci_conf(struct mlx5_core_dev *dev,
- 					      void *mnvda, size_t len)
- {
-@@ -548,6 +703,12 @@ static const struct devlink_param mlx5_nv_param_devlink_params[] = {
- 			     mlx5_nv_param_devlink_cqe_compress_get,
- 			     mlx5_nv_param_devlink_cqe_compress_set,
- 			     mlx5_nv_param_devlink_cqe_compress_validate),
-+	DEVLINK_PARAM_DRIVER(MLX5_DEVLINK_PARAM_ID_SWP_L4_CSUM_MODE,
-+			     "swp_l4_csum_mode", DEVLINK_PARAM_TYPE_STRING,
-+			     BIT(DEVLINK_PARAM_CMODE_PERMANENT),
-+			     mlx5_nv_param_devlink_swp_l4_csum_mode_get,
-+			     mlx5_nv_param_devlink_swp_l4_csum_mode_set,
-+			     mlx5_nv_param_devlink_swp_l4_csum_mode_validate),
- };
- 
- int mlx5_nv_param_register_dl_params(struct devlink *devlink)
--- 
-2.47.3
+My understanding is that extradata is a way to refer to both userdata
+and sysdata, and MAX_EXTRADATA_ENTRY_LEN is the maximum size for both
+(and the arithmetic used to define MAX_EXTRADATA_VALUE_LEN and
+MAX_EXTRADATA_NAME_LEN also applies to both). Do you want to define
+separate maximum sizes for userdata items and sysdata items?
 
+> > @@ -1533,11 +1475,11 @@ static void send_msg_no_fragmentation(struct ne=
+tconsole_target *nt,
+> >               memcpy(nt->buf, msg, msg_len);
+> >       }
+> >
+> > -     if (extradata)
+> > -             msg_len +=3D scnprintf(&nt->buf[msg_len],
+> > -                                  MAX_PRINT_CHUNK - msg_len,
+> > -                                  "%s", extradata);
+> > -
+> > +#ifdef CONFIG_NETCONSOLE_DYNAMIC
+> > +     msg_len +=3D scnprintf(&nt->buf[msg_len],
+> > +                          MAX_PRINT_CHUNK - msg_len,
+> > +                          "%s%s", nt->userdata, nt->sysdata);
+> > +#endif
+>
+> I am not sure I like this ifdef in here. Can you if userdata or sysdata a=
+re
+> valid, and then scnprintf() instead of using ifdef?
+
+OK, will do that in v2.
+
+
+> > @@ -1594,12 +1547,20 @@ static void send_fragmented_body(struct netcons=
+ole_target *nt,
+> >               msgbody_offset +=3D this_chunk;
+> >               this_offset +=3D this_chunk;
+> >
+> > -             /* after msgbody, append extradata */
+> > -             this_chunk =3D min(extradata_len - extradata_offset,
+> > +             /* after msgbody, append userdata */
+> > +             this_chunk =3D min(userdata_len - userdata_offset,
+>
+> Please assign this "userdata_len - userdata_offset" to a variable and giv=
+e it a
+> name, so, it help us to reason about the code.
+
+What about:
+
+int data_remaining =3D userdata_len - userdata_offset;
+int buffer_remaining =3D MAX_PRINT_CHUNK - this_header - this_offset;
+this_chunk =3D min(data_remaining, buffer_remaining);
+
+>
+> >                                MAX_PRINT_CHUNK - this_header - this_off=
+set);
+> >               memcpy(nt->buf + this_header + this_offset,
+> > -                    extradata + extradata_offset, this_chunk);
+> > -             extradata_offset +=3D this_chunk;
+> > +                    userdata + userdata_offset, this_chunk);
+> > +             userdata_offset +=3D this_chunk;
+> > +             this_offset +=3D this_chunk;
+> > +
+> > +             /* after userdata, append sysdata */
+> > +             this_chunk =3D min(sysdata_len - sysdata_offset,
+> > +                              MAX_PRINT_CHUNK - this_header - this_off=
+set);
+> > +             memcpy(nt->buf + this_header + this_offset,
+> > +                    sysdata + sysdata_offset, this_chunk);
+
+I realize we have the same NULL pointer arithmetic problem here. I
+will fix it by checking if sysdata or userdata is NULL.
+
+>
+> s/this_header/this_header_offset?
+
+I just realized that this_header is not even necessary. I can simply
+add header_len to this_offset and get rid of this variable altogether.
+
+>
+> Now that you are touching this code, please review these variable to keep=
+ them named correct.
+>
+> Maybe adding _ptr for pointer, and _offset for offsets and _len for lengh=
+ts?
+
+Once I get rid of this_header and add the _ptr suffix, I think it will
+be much clearer.
+
+Also, I find offset and this_offset confusing. What about replacing by
+msg_offset and buffer_offset ?
+
+>
+> Thank you for your work reasong about all of this!
+
+Thanks for the review!
 
