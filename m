@@ -1,194 +1,173 @@
-Return-Path: <netdev+bounces-236668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A768BC3EC38
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 08:32:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76AFCC3ECE3
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 08:45:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 668BC3AFC17
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 07:31:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F2323A52E8
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 07:45:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B3333090C2;
-	Fri,  7 Nov 2025 07:31:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34C2A2571C5;
+	Fri,  7 Nov 2025 07:45:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="jcitbyxT";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="K+cgER4F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7B9B289E06
-	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 07:31:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56781309EE3
+	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 07:45:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762500691; cv=none; b=Qx0YDKlxc9113VBH0syyOSmFrUgG+UZG8AYyl1/A7nmVAmHwxmYf4C2nO7M9cYw3GesrbXyfMaFGknq138wfj1IiRML30lNUUVixv35N/mIVBFR+4EYAd4XaSGkCi9K4tjUF2U+wNlOPNonPqPShdkFbpKB3+ddx/rUFOWeAriI=
+	t=1762501544; cv=none; b=QIT2/YZqarnyjbdRlA+uNyf/zBKPUXgEtpWKwXFmfzC3hvpBgEiY3EhnkBXOsyr20BEJ3o6D+1OUxtv1aLEKcFgIytNvKtKXm24CZLUbWHlLcQsSFQrrjqWGzS0b5bOQZZY4K568nkt3KI9Ile8K2ir108Wp8Uyvr7V0B1uY3w4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762500691; c=relaxed/simple;
-	bh=XjB0m3lhpum+kNFv1N6CbMC3QAg71MXUb9/tvtzc4sY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=aL74PyspnmQAiDtvGlJDlKuym/Ctk/qR3iw++bP69XZ0byXamRkHaR5IylcnCCYnjNA9W4Y+rvJJInDY6rbt36ZKyeM9VSqW8xlbVhbNJnVr5waA+RGx4FNqxWuMeEL2Rn+FKfFy+ZzGxLwbCvYFGhvpmnTTQ8GZBhoN/C90Tm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-948610ae935so38230339f.2
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 23:31:28 -0800 (PST)
+	s=arc-20240116; t=1762501544; c=relaxed/simple;
+	bh=iL9jg8JielYKJvltCPaRLVi9XYRF3/bpxORT8vDhO0A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=chHmsOXXtc+P7rrn4uDzzT/NKg7wR6VrXQBFbmn4/QZ/WCeVfjesGuYDlfwmYDZCHaVBf86ltm0iq4h/AU8ZDip//ekyCYpQV8hA7HrJtdHQjXDNi4nqtQF3rz7zsqy7uy9J+VBuL4VdkizMwG3uiJqWAock/bY5mvssE4vLrog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=jcitbyxT; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=K+cgER4F; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5A744mn22085471
+	for <netdev@vger.kernel.org>; Fri, 7 Nov 2025 07:45:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=qcppdkim1; bh=JAQSrdQnU5b+xEfyyzGPcAxz+3ZD1vRWfFZ
+	NNoPawVE=; b=jcitbyxTeiUIeD4Zd7brr/eGbSa921wc1LegkI2wONEEFmA9ISH
+	Gz5EVMyOKMv87BjUyspDbipAiLED0M0nTbkeWGmUWrGrut5QvP/0VssQqdlpqWtb
+	2aAtigd2fZgrg8jtrQjfX6lOw+5PKTXiljmK4WkmjLpQiA+yMcqhR/9gdBZTejCB
+	M9mEpWy6g+I4A9yvR5avp5w7DEKcjldzwwbQNCcKMsW6PdlMPSznp2S6/S/1+hmA
+	83wB3jF/MynjmLgvonuk/cdJTvaVjTFDXyxERmaFSq/dddsIC2dYCSVHsLJfZb6E
+	NUylz13x0fBu6vj1iRNWPleY1a56v4T/Orw==
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com [209.85.214.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4a99e78hmp-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 07:45:41 +0000 (GMT)
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-29085106b99so10096705ad.1
+        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 23:45:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1762501540; x=1763106340; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JAQSrdQnU5b+xEfyyzGPcAxz+3ZD1vRWfFZNNoPawVE=;
+        b=K+cgER4FmPPG+Xxd3QbDJ4se9xpzCQ+ZCyNEROtmdd2ymK1KcPxV4OAVL6djWGumNw
+         6gOGufFE5FbguioYoMk8ZZOlntdE6D6Y2s69z4ORmUxaUnTjlDLCVTvuIE/fAe7Yg6a3
+         D7839kvP98Apwf+unYSCtagnJQiD0oW4VdN2Hpp5hbEd1kIAdvQ1R3WRP7smDZ/1lv/W
+         PgaCTvrWecWLNDUtyw4SU9h7N3wlq1N6WjgZCHgDK0Xxr1xcQbSPuVAIH2tyLWs07FFn
+         kiP2hUMdlw0zKRw57DMSwW6zdNsvgcqcUnje/jL+1+XZSAo5+IypOKOrHz/XmS4HHraj
+         wjKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762500688; x=1763105488;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=aHi0GSDWw+DFPzwz+Hy0dteO68RU8wWgdmOIcy+/qFc=;
-        b=rbjbxhHSNbnZEvlPFf7YOQMStUJxA8b6NuPBArYitgUWsdxBZHmBicnwsImf32vwLp
-         Nisvaogax97H0RmMYjzexNLK9XXCqGSr1YC80fb0o8LcLjrJbUkJl+boHi8w4dqNywqF
-         emBUIZIfiaOKfh0fvT67aFJkYQsQWTOy9Ea671XDDdIUu+pUb7+LQcav2B+Hs4lH77Nk
-         LxYJWyJXZzVUm+QIVCaA0k3oWt51jJb3W57vXpesxTIBcteNI6Xys3gWe+KrzU3OzuKS
-         AYCVw1EbBZlYduUzToQrAJ9pCN5LmYIa5SO71QKb5ubKmpDAPbOiyKzFlJNpxLb/hUMh
-         rg2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCW0biq42Iu2Esy/tkJl1vEkd+p/Te4HyZWIPpmjPsQw92Z6/VvJSUdgueiO+EZqXfJXxLkqo/8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywy7gbdZHPjQ3sR6MKy/SSxFyotYev+F3QlBBdUzzYKIKm3yoNJ
-	TWT1aMgCpg/LZl5FJLs0WeY7FF8AeTDRiI0YupXEs5dCYrAlpKlEA5QlFt+zsNLwNiOv/sxtEcH
-	byfPoVjl5Zq9Zoleh7MSpt7D/KLNmXRVzACbhvX1ZfuZvxKXxnNuCXHUmDeE=
-X-Google-Smtp-Source: AGHT+IE8e6TZwBMJKL7y90nEbznBhuBiS/GtlVHJKR1ml/b1KG3VAoMOrpAzwKfMju3KxqSIT3PgxZH9QyyiaDLlAFUqlAPy4kZp
+        d=1e100.net; s=20230601; t=1762501540; x=1763106340;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JAQSrdQnU5b+xEfyyzGPcAxz+3ZD1vRWfFZNNoPawVE=;
+        b=ecRfcdfhqmiCIwS6CSnye+B3+tMJldZ1dIDMjcWX6mHQ0FFDKd3OrID3z+HkxbbQPx
+         pfATO7j/fTqEbCo1l8L8Vy91Tu3Wa9AgWY2NxzGuvcYVhfMuCFqYHGmjIQBuTovKGoHJ
+         +xg9PZCoWHoh8ElLHgV4h0Vpudam101Do2t4S3dQQlzX+a6KTNSILeKmutMIuh2dhybB
+         D5CxA00dPQw24lZTBuyxsdyXeRu/jDk6dtZCHxXh96M/etlIKPjMl8sSMiKLywd8VeAD
+         POWLaC/DXChPp3J9JHpHDOzhyk28hDcwlX8PhLmqO6n7dofcoA6lnRFbRLJITiOx9XMg
+         rnVw==
+X-Gm-Message-State: AOJu0Yx4XSgw/Xv+WmzI2gM7Y2wiTfRsEZIyWRkYv8OLIpD955aO7spp
+	gjwkmGQF5qcWwQASbYUF8KT4KqSUKypZYTGRb4vvCHmUfk9zavTyHl4PmTmK0tzCSt+++SnrFEf
+	ZsbUAQITrP3LoQrTJMNfCzo6An27/SllvJewi7dy6jCxqgWsm46EzlULYTkM=
+X-Gm-Gg: ASbGncvqnwco0EOPpj5sELt10uA7NwsFH4Yr5DOjU9ki2l7ksKMVylwDrEuKxPV1tO1
+	jiVudC2Zpb6C2Hi4a6FWR7qBmcJDnzNpaf6Hxxot2oGiVE2bZE8kwXSGET4LP5ZfECu71Ob00BZ
+	av7jZtCTF0x09fXbaYoGY5P88HuVKm7AlbAsj39Ql1FX52kjj1R02A2TeSZ+QRAsAQkwx2BRXIp
+	4nWPpjbigCkSD9z2xEWU6H07kMp2XnXbmNwVFzm2A/a+R9ImZ26VOeFRteClGhP6885SoKsQPPS
+	t6DNEnJQKd/g5aczivBT4Tpb5TRLclABDSGeOte7ZIA0cAslup6ROd0AxMbbpDD7UHCBt8NZEmK
+	ws7UhHC5fTxBFVL5ScDyHk/rkgekcFEORkB+mHPcf1rVhsCCXsq4pb7jemF5llbXI8g==
+X-Received: by 2002:a17:903:b43:b0:271:479d:3dcb with SMTP id d9443c01a7336-297c0395192mr28621805ad.6.1762501540135;
+        Thu, 06 Nov 2025 23:45:40 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGKeLzOMREliBO3SqmoQQ2j3ltfEsJ0J2WpMRv3VjriUjF30BWJ92SOqCEY+shDXYfmeUtCwA==
+X-Received: by 2002:a17:903:b43:b0:271:479d:3dcb with SMTP id d9443c01a7336-297c0395192mr28621335ad.6.1762501539539;
+        Thu, 06 Nov 2025 23:45:39 -0800 (PST)
+Received: from zhonhan-gv.qualcomm.com (tpe-colo-wan-fw-bordernet.qualcomm.com. [103.229.16.4])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29651cd2418sm50884275ad.109.2025.11.06.23.45.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Nov 2025 23:45:39 -0800 (PST)
+From: Zhongqiu Han <zhongqiu.han@oss.qualcomm.com>
+To: jonathan.lemon@gmail.com, vadim.fedorenko@linux.dev,
+        richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        zhongqiu.han@oss.qualcomm.com
+Subject: [PATCH] ptp: ocp: Document sysfs output format for backward compatibility
+Date: Fri,  7 Nov 2025 15:45:33 +0800
+Message-ID: <20251107074533.416048-1-zhongqiu.han@oss.qualcomm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3486:b0:433:3315:e9ee with SMTP id
- e9e14a558f8ab-4335f41dccamr34232925ab.10.1762500687896; Thu, 06 Nov 2025
- 23:31:27 -0800 (PST)
-Date: Thu, 06 Nov 2025 23:31:27 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <690da04f.a70a0220.22f260.0028.GAE@google.com>
-Subject: [syzbot] [net?] [mm?] INFO: rcu detected stall in rescuer_thread (2)
-From: syzbot <syzbot+d5f7a5097c24c7c2dbbb@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA3MDA2MCBTYWx0ZWRfX1aoM/o9iZmh2
+ 1ggE8QZoK5lIZMiQvvlE4jInBzOW5nHO88eojGVNIuAvcV/4Od6F0I9/Le3bz8LE94bxdg3XPwt
+ +fekDA/FgqLg/xGR8nNjdOReLpAKdt9Hpb6KnC+2onCL69TkcxIYuOYp5qIDxjXQfGOwWI0XbA0
+ agaI9ptuMJbK/LSA+tQIm7Iv9Va9N6bmM5r1DdXPaESpefI0MJSzQpeVAJPm4YH6jQRYOT3v1e5
+ JvnlzDAvNLKijjjF4M/djclBTLiUWt+CFQrsDFcLbyy5s4yOspKvAWUYKfFjF3dHfRbp6X2agAl
+ N2ZJzbHhXiitaZsCUytMElLlhMxK/ppZomwpgZKqtg80kf+X4PUAwBMsnxovw2JpoQD9AwktgVY
+ 9ov46FTUT5BQrY6/0NXqiEfhLA5MPQ==
+X-Proofpoint-ORIG-GUID: XAHSsvcBNJpWZqdvXEZ2BpsONvZWOOJp
+X-Authority-Analysis: v=2.4 cv=A+hh/qWG c=1 sm=1 tr=0 ts=690da3a5 cx=c_pps
+ a=cmESyDAEBpBGqyK7t0alAg==:117 a=nuhDOHQX5FNHPW3J6Bj6AA==:17
+ a=6UeiqGixMTsA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=VwQbUJbxAAAA:8 a=EUspDBNiAAAA:8 a=P3xlrWuPvaME_hMzoIMA:9
+ a=1OuFwYUASf3TG4hYMiVC:22
+X-Proofpoint-GUID: XAHSsvcBNJpWZqdvXEZ2BpsONvZWOOJp
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-07_01,2025-11-06_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 lowpriorityscore=0 suspectscore=0 spamscore=0 bulkscore=0
+ malwarescore=0 impostorscore=0 phishscore=0 priorityscore=1501 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2511070060
 
-Hello,
+Add a comment to ptp_ocp_tty_show() explaining that the sysfs output
+intentionally does not include a trailing newline. This is required for
+backward compatibility with existing userspace software that reads the
+sysfs attribute and uses the value directly as a device path.
 
-syzbot found the following issue on:
+A previous attempt to add a newline to align with common kernel
+conventions broke userspace applications that were opening device paths
+like "/dev/ttyS4\n" instead of "/dev/ttyS4", resulting in ENOENT errors.
 
-HEAD commit:    b1d9154878ce Merge branch 'net-mlx5e-shampo-fixes-for-64kb..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=15cc5bcd980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e46b8a1c645465a9
-dashboard link: https://syzkaller.appspot.com/bug?extid=d5f7a5097c24c7c2dbbb
-compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=134820b4580000
+This comment prevents future attempts to "fix" this behavior, which would
+break existing userspace applications.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/bef31d61ceb8/disk-b1d91548.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/67c31be6c377/vmlinux-b1d91548.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/7b9f62743e14/bzImage-b1d91548.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+d5f7a5097c24c7c2dbbb@syzkaller.appspotmail.com
-
-rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-rcu: 	(detected by 0, t=12991 jiffies, g=11121, q=1246 ncpus=2)
-rcu: All QSes seen, last rcu_preempt kthread activity 3112 (4294972946-4294969834), jiffies_till_next_fqs=1, root ->qsmask 0x0
-rcu: rcu_preempt kthread starved for 3112 jiffies! g11121 f0x2 RCU_GP_WAIT_FQS(5) ->state=0x0 ->cpu=1
-rcu: 	Unless rcu_preempt kthread gets sufficient CPU time, OOM is now expected behavior.
-rcu: RCU grace-period kthread stack dump:
-task:rcu_preempt     state:R  running task     stack:27288 pid:16    tgid:16    ppid:2      task_flags:0x208040 flags:0x00080000
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:5325 [inline]
- __schedule+0x1798/0x4cc0 kernel/sched/core.c:6929
- __schedule_loop kernel/sched/core.c:7011 [inline]
- schedule+0x165/0x360 kernel/sched/core.c:7026
- schedule_timeout+0x12b/0x270 kernel/time/sleep_timeout.c:99
- rcu_gp_fqs_loop+0x301/0x1540 kernel/rcu/tree.c:2083
- rcu_gp_kthread+0x99/0x390 kernel/rcu/tree.c:2285
- kthread+0x711/0x8a0 kernel/kthread.c:463
- ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-rcu: Stack dump where RCU GP kthread last ran:
-Sending NMI from CPU 0 to CPUs 1:
-NMI backtrace for cpu 1
-CPU: 1 UID: 0 PID: 6005 Comm: kworker/R-wg-cr Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/02/2025
-Workqueue: wg-crypt-wg2 wg_packet_tx_worker
-RIP: 0010:rb_erase+0xb/0xe60 lib/rbtree.c:441
-Code: ca 66 66 66 66 66 2e 0f 1f 84 00 00 00 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 55 41 57 41 56 41 55 <41> 54 53 48 83 ec 28 48 89 f3 49 89 fd 48 b9 00 00 00 00 00 fc ff
-RSP: 0018:ffffc90000a08ce0 EFLAGS: 00000046
-RAX: 0000000000000000 RBX: ffff8880b8927c90 RCX: ffff88801f7a5ac0
-RDX: 0000000000010000 RSI: ffff8880b8927c90 RDI: ffff88807de66340
-RBP: 1ffff1100fbccc68 R08: ffffffff8f7cdc77 R09: 1ffffffff1ef9b8e
-R10: dffffc0000000000 R11: fffffbfff1ef9b8f R12: ffff8880b8927c98
-R13: dffffc0000000000 R14: ffff88807de66340 R15: 1ffff11017124f93
-FS:  0000000000000000(0000) GS:ffff88812623c000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000056323a462a38 CR3: 000000002891e000 CR4: 00000000003526f0
-Call Trace:
- <IRQ>
- rb_erase_cached include/linux/rbtree.h:126 [inline]
- timerqueue_del+0xae/0x100 lib/timerqueue.c:57
- __remove_hrtimer kernel/time/hrtimer.c:1114 [inline]
- __run_hrtimer kernel/time/hrtimer.c:1757 [inline]
- __hrtimer_run_queues+0x364/0xc60 kernel/time/hrtimer.c:1841
- hrtimer_interrupt+0x45b/0xaa0 kernel/time/hrtimer.c:1903
- local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1041 [inline]
- __sysvec_apic_timer_interrupt+0x10b/0x410 arch/x86/kernel/apic/apic.c:1058
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1052 [inline]
- sysvec_apic_timer_interrupt+0xa1/0xc0 arch/x86/kernel/apic/apic.c:1052
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
-RIP: 0010:queued_write_lock_slowpath+0x125/0x260 kernel/locking/qrwlock.c:85
-Code: 00 01 00 00 43 0f b6 04 27 84 c0 74 35 89 d9 80 e1 07 80 c1 03 38 c1 7c 29 48 89 df e8 e4 b8 dc f6 eb 1f f3 90 43 0f b6 04 27 <84> c0 74 14 89 d9 80 e1 07 80 c1 03 38 c1 7c 08 48 89 df e8 c3 b8
-RSP: 0018:ffffc90003337300 EFLAGS: 00000206
-RAX: 0000000000000000 RBX: ffffffff8f3dd900 RCX: ffffffff8b490058
-RDX: 0000000000000001 RSI: 0000000000000004 RDI: ffffffff8f3dd900
-RBP: ffffc900033373b0 R08: ffffffff8f3dd903 R09: 1ffffffff1e7bb20
-R10: dffffc0000000000 R11: fffffbfff1e7bb21 R12: dffffc0000000000
-R13: 1ffff92000666e64 R14: ffffc90003337350 R15: 1ffffffff1e7bb20
- queued_write_lock include/asm-generic/qrwlock.h:101 [inline]
- do_raw_write_lock+0x1f2/0x260 kernel/locking/spinlock_debug.c:211
- ___neigh_create+0xe81/0x2260 net/core/neighbour.c:690
- ip6_finish_output2+0x1175/0x1480 net/ipv6/ip6_output.c:128
- NF_HOOK_COND include/linux/netfilter.h:307 [inline]
- ip6_output+0x340/0x550 net/ipv6/ip6_output.c:247
- ip6tunnel_xmit include/net/ip6_tunnel.h:162 [inline]
- udp_tunnel6_xmit_skb+0x68d/0xb30 net/ipv6/ip6_udp_tunnel.c:112
- send6+0x5ac/0x8d0 drivers/net/wireguard/socket.c:152
- wg_socket_send_skb_to_peer+0x111/0x1d0 drivers/net/wireguard/socket.c:178
- wg_packet_create_data_done drivers/net/wireguard/send.c:251 [inline]
- wg_packet_tx_worker+0x1c8/0x7c0 drivers/net/wireguard/send.c:276
- process_one_work kernel/workqueue.c:3263 [inline]
- process_scheduled_works+0xae1/0x17b0 kernel/workqueue.c:3346
- rescuer_thread+0x53c/0xdd0 kernel/workqueue.c:3523
- kthread+0x711/0x8a0 kernel/kthread.c:463
- ret_from_fork+0x4bc/0x870 arch/x86/kernel/process.c:158
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
- </TASK>
-
-
+Link: https://lore.kernel.org/netdev/20251030124519.1828058-1-zhongqiu.han@oss.qualcomm.com/
+Link: https://lore.kernel.org/netdev/aef3b850-5f38-4c28-a018-3b0006dc2f08@linux.dev/
+Suggested-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Zhongqiu Han <zhongqiu.han@oss.qualcomm.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/ptp/ptp_ocp.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+index a5c363252986..eeebe4d149f7 100644
+--- a/drivers/ptp/ptp_ocp.c
++++ b/drivers/ptp/ptp_ocp.c
+@@ -3430,6 +3430,12 @@ ptp_ocp_tty_show(struct device *dev, struct device_attribute *attr, char *buf)
+ 	struct dev_ext_attribute *ea = to_ext_attr(attr);
+ 	struct ptp_ocp *bp = dev_get_drvdata(dev);
+ 
++	/*
++	 * NOTE: This output does not include a trailing newline for backward
++	 * compatibility. Existing userspace software uses this value directly
++	 * as a device path (e.g., "/dev/ttyS4"), and adding a newline would
++	 * break those applications. Do not add a newline to this output.
++	 */
+ 	return sysfs_emit(buf, "ttyS%d", bp->port[(uintptr_t)ea->var].line);
+ }
+ 
+-- 
+2.43.0
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
