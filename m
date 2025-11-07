@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-236861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 314BBC40DE4
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 17:27:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FE2BC40DD8
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 17:26:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 032E74E4995
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 16:23:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EE593A943C
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 16:23:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 106F0275B0F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F47827B50F;
 	Fri,  7 Nov 2025 16:23:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UBMUo84b"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bDXH6V9/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0471274B48
-	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 16:23:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7995327877D
+	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 16:23:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762532588; cv=none; b=G4otU6le6RhUo107/YAbl752OM2xi7ps/Xn0yt7oUZBimAwq93/jev6KO+ufUMwVoKwNZAH58IKnfVxsLxgw8o7U29VCZuy9hIo80/g2bnWb+3nyTexm85AiXH6Yb/5f3LjjUExc56klMW49z6rxfiCUeRt/PBoTgE1mFGosrHA=
+	t=1762532588; cv=none; b=sPp4RCvwWZYt6OO4ssgQZ/+kJXzHjTeC+nhLM1d2uGbymcz1+KsdDx6adBQePQbSCRaToYMxPXk2O/VXZ7y+TiYcoNMBZIVoSfH/cjU7I6mk3DCpcae8EN+Vzb4q0q0cAWHbILObGdSQ9IyNK+gCEi43ySOCvIi5Qg9K4LUqWLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1762532588; c=relaxed/simple;
-	bh=LUviT9N/Mbx0OTPuAbFckwoNAdcxWVfSK3AExgVTnrw=;
+	bh=Css/3z35h04voRKKYIOGIk9k2Jh/a6vnuNnjmrPB4xs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=e8g0tuC+8vpGIQ7uVUDuOq7O1/iga+1hiPHXU1hMjB1rk2j4YD8k3Enn0klIbBHgYuLhY03vb1dAEN2vX8Xiynf33A/jgDEw8M7h0FWeCDK8LkY/sR/CbPqTdefmcx0mgLZYqhC3CmeYvUJsyB9LGAsqSl31XqkPrGMvv2EKKG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UBMUo84b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43C45C116B1;
+	 MIME-Version; b=FGSRQbCTC9Wuu+K4wW+KZJ5fViAcqDGtOdHvl3Eu9rYQs0yk9UM3lD4swidE2TGpwbxyAzr1Z7cpL+KxCRXHaTuMfW2UStc9drlRr6kw2k/445zvf2eiLDzZ/YKEGJAul/TZFTC8Vy5kqylDm2/LCqoQR072lwVq0m9yL5Qz8Ro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bDXH6V9/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E28A6C113D0;
 	Fri,  7 Nov 2025 16:23:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762532587;
-	bh=LUviT9N/Mbx0OTPuAbFckwoNAdcxWVfSK3AExgVTnrw=;
+	s=k20201202; t=1762532588;
+	bh=Css/3z35h04voRKKYIOGIk9k2Jh/a6vnuNnjmrPB4xs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UBMUo84bT+FxIx63QVfQrwZkLmKx9k/h4c8o/T00CvU95n1Je0tHgzNq5IRumQubb
-	 sdYgV6XV/Uxc241cCS4jl7zX2fejOx2Gem5cV2kW+DuySILLinU/DZ7beDtwpHeAbp
-	 3Skd9Fd92i4zBKkogF+r+YyCx1dyaiqQeTu6YHGOfh07l0+stolZ/C63rm5g9/nTFj
-	 gUXQpzR32tUVfc/wn3iQufHV45SP8pz+NSQJx5+HL0CqjnXK/4R/qbAkIqwuGDCQMZ
-	 TKx2HmQTauHBaor1HilH9UmUKAi3sPrAb9sAMVV9PERPp6q7D5Gtbu3DRW/zUs59en
-	 ajQTYtTVUuLtQ==
+	b=bDXH6V9/aIDX8JDGBaa7DXxr8WJwTY5UsB4f1D01bu2G2SKEczc6BMfUeV2d4w3ry
+	 /E+g9R5eyWbFdQjMwFJNMhdCmsOp7OU3zXIcl11NyUIhD9f+CfRkiN/nVaVqK45wnY
+	 0sDpdbepiHgoUCK0Uz0UGh+6c4/K5ZnxiKYW7HfnL48X/7UwIgzOG9+QggDkW80T/i
+	 XoR46+Hmw4m/irNeUsfkdnktVoRENxlSrzDPRxvAEppK8I2XkXX0Ul29sckwSpwij4
+	 OUkmmGIg9IHZKj/IodMdFM1klrAKBzpPY9dN9VF7+EoIp1kXXESk6TEdmAqWEo/x7i
+	 1cAeykTuV+3lw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net,
 	donald.hunter@gmail.com
@@ -53,9 +53,9 @@ Cc: netdev@vger.kernel.org,
 	joe@dama.to,
 	jstancek@redhat.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v2 1/4] tools: ynltool: create skeleton for the C command
-Date: Fri,  7 Nov 2025 08:22:24 -0800
-Message-ID: <20251107162227.980672-2-kuba@kernel.org>
+Subject: [PATCH net-next v2 2/4] tools: ynltool: add page-pool stats
+Date: Fri,  7 Nov 2025 08:22:25 -0800
+Message-ID: <20251107162227.980672-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <20251107162227.980672-1-kuba@kernel.org>
 References: <20251107162227.980672-1-kuba@kernel.org>
@@ -67,599 +67,713 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Based on past discussions it seems like integration of YNL into
-iproute2 is unlikely. YNL itself is not great as a C library,
-since it has no backward compat (we routinely change types).
+Replace the page-pool sample with page pool support in ynltool.
 
-Most of the operations can be performed with the generic Python
-CLI directly. There is, however, a handful of operations where
-summarization of kernel output is very useful (mostly related
-to stats: page-pool, qstat).
+ # ynltool page-pool stats
+    eth0[2]	page pools: 18 (zombies: 0)
+		refs: 171456 bytes: 702283776 (refs: 0 bytes: 0)
+		recycling: 97.3% (alloc: 2679:6134966 recycle: 1250981:4719386)
+ # ynltool -j page-pool stats | jq
+ [
+  {
+    "ifname": "eth0",
+    "ifindex": 2,
+    "page_pools": 18,
+    "zombies": 0,
+    "live": {
+      "refs": 171456,
+      "bytes": 702283776
+    },
+    "zombie": {
+      "refs": 0,
+      "bytes": 0
+    },
+    "recycling_pct": 97.2746,
+    "alloc": {
+      "slow": 2679,
+      "fast": 6135029
+    },
+    "recycle": {
+      "ring": 1250997,
+      "cache": 4719432
+    }
+  }
+ ]
 
-Create a command (inspired by bpftool, I think it stood the test
-of time reasonably well) to be able to plug the subcommands into.
+ # ynltool page-pool stats group-by pp
+ pool id: 108  dev: eth0[2]  napi: 530
+   inflight: 9472 pages 38797312 bytes
+   recycling: 95.5% (alloc: 148:208379 recycle: 45386:153842)
+ pool id: 107  dev: eth0[2]  napi: 529
+   inflight: 9408 pages 38535168 bytes
+   recycling: 94.9% (alloc: 147:180178 recycle: 42251:128808)
 
-Link: https://lore.kernel.org/1754895902-8790-1-git-send-email-ernis@linux.microsoft.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
 v2:
- - use kernel source version
-v1: https://lore.kernel.org/20251104232348.1954349-3-kuba@kernel.org
+ - cleanup the Makefile deps a little
+v1: https://lore.kernel.org/20251104232348.1954349-4-kuba@kernel.org
 ---
- tools/net/ynl/Makefile              |   3 +-
- tools/net/ynl/ynltool/Makefile      |  52 +++++
- tools/net/ynl/ynltool/json_writer.h |  75 ++++++++
- tools/net/ynl/ynltool/main.h        |  62 ++++++
- tools/net/ynl/ynltool/json_writer.c | 288 ++++++++++++++++++++++++++++
- tools/net/ynl/ynltool/main.c        | 240 +++++++++++++++++++++++
- tools/net/ynl/ynltool/.gitignore    |   1 +
- 7 files changed, 720 insertions(+), 1 deletion(-)
- create mode 100644 tools/net/ynl/ynltool/Makefile
- create mode 100644 tools/net/ynl/ynltool/json_writer.h
- create mode 100644 tools/net/ynl/ynltool/main.h
- create mode 100644 tools/net/ynl/ynltool/json_writer.c
- create mode 100644 tools/net/ynl/ynltool/main.c
- create mode 100644 tools/net/ynl/ynltool/.gitignore
+ tools/net/ynl/ynltool/Makefile    |  11 +-
+ tools/net/ynl/ynltool/main.h      |   3 +
+ tools/net/ynl/samples/page-pool.c | 149 ----------
+ tools/net/ynl/ynltool/main.c      |   3 +-
+ tools/net/ynl/ynltool/page-pool.c | 461 ++++++++++++++++++++++++++++++
+ 5 files changed, 473 insertions(+), 154 deletions(-)
+ delete mode 100644 tools/net/ynl/samples/page-pool.c
+ create mode 100644 tools/net/ynl/ynltool/page-pool.c
 
-diff --git a/tools/net/ynl/Makefile b/tools/net/ynl/Makefile
-index 211df5a93ad9..31ed20c0f3f8 100644
---- a/tools/net/ynl/Makefile
-+++ b/tools/net/ynl/Makefile
-@@ -12,10 +12,11 @@ endif
- libdir  ?= $(prefix)/$(libdir_relative)
- includedir ?= $(prefix)/include
- 
--SUBDIRS = lib generated samples
-+SUBDIRS = lib generated samples ynltool
- 
- all: $(SUBDIRS) libynl.a
- 
-+ynltool: | lib generated libynl.a
- samples: | lib generated
- libynl.a: | lib generated
- 	@echo -e "\tAR $@"
 diff --git a/tools/net/ynl/ynltool/Makefile b/tools/net/ynl/ynltool/Makefile
-new file mode 100644
-index 000000000000..cfabab3a20da
---- /dev/null
+index cfabab3a20da..11240740ed81 100644
+--- a/tools/net/ynl/ynltool/Makefile
 +++ b/tools/net/ynl/ynltool/Makefile
-@@ -0,0 +1,52 @@
-+# SPDX-License-Identifier: GPL-2.0-only
+@@ -10,7 +10,7 @@ CFLAGS := -Wall -Wextra -Werror -O2
+ ifeq ("$(DEBUG)","1")
+   CFLAGS += -g -fsanitize=address -fsanitize=leak -static-libasan
+ endif
+-CFLAGS += -I../lib
++CFLAGS += -I../lib -I../generated -I../../../include/uapi/
+ 
+ SRC_VERSION := \
+ 	$(shell make --no-print-directory -sC ../../../.. kernelversion || \
+@@ -29,14 +29,17 @@ all: $(YNLTOOL)
+ 
+ Q = @
+ 
+-$(YNLTOOL): $(OBJS)
++$(YNLTOOL): ../libynl.a $(OBJS)
+ 	$(Q)echo -e "\tLINK $@"
+-	$(Q)$(CC) $(CFLAGS) -o $@ $(OBJS)
++	$(Q)$(CC) $(CFLAGS) -o $@ $(OBJS) ../libynl.a -lmnl
+ 
+-%.o: %.c main.h json_writer.h
++%.o: %.c ../libynl.a
+ 	$(Q)echo -e "\tCC $@"
+ 	$(Q)$(COMPILE.c) -MMD -c -o $@ $<
+ 
++../libynl.a:
++	$(Q)$(MAKE) -C ../
 +
-+include ../Makefile.deps
-+
-+INSTALL	?= install
-+prefix  ?= /usr
-+
-+CC := gcc
-+CFLAGS := -Wall -Wextra -Werror -O2
-+ifeq ("$(DEBUG)","1")
-+  CFLAGS += -g -fsanitize=address -fsanitize=leak -static-libasan
-+endif
-+CFLAGS += -I../lib
-+
-+SRC_VERSION := \
-+	$(shell make --no-print-directory -sC ../../../.. kernelversion || \
-+		echo "unknown")
-+
-+CFLAGS += -DSRC_VERSION='"$(SRC_VERSION)"'
-+
-+SRCS := $(wildcard *.c)
-+OBJS := $(patsubst %.c,$(OUTPUT)%.o,$(SRCS))
-+
-+YNLTOOL := $(OUTPUT)ynltool
-+
-+include $(wildcard *.d)
-+
-+all: $(YNLTOOL)
-+
-+Q = @
-+
-+$(YNLTOOL): $(OBJS)
-+	$(Q)echo -e "\tLINK $@"
-+	$(Q)$(CC) $(CFLAGS) -o $@ $(OBJS)
-+
-+%.o: %.c main.h json_writer.h
-+	$(Q)echo -e "\tCC $@"
-+	$(Q)$(COMPILE.c) -MMD -c -o $@ $<
-+
-+clean:
-+	rm -f *.o *.d *~
-+
-+distclean: clean
-+	rm -f $(YNLTOOL)
-+
-+bindir ?= /usr/bin
-+
-+install: $(YNLTOOL)
-+	install -m 0755 $(YNLTOOL) $(DESTDIR)$(bindir)/$(YNLTOOL)
-+
-+.PHONY: all clean distclean
-+.DEFAULT_GOAL=all
-diff --git a/tools/net/ynl/ynltool/json_writer.h b/tools/net/ynl/ynltool/json_writer.h
-new file mode 100644
-index 000000000000..0f1e63c88f6a
---- /dev/null
-+++ b/tools/net/ynl/ynltool/json_writer.h
-@@ -0,0 +1,75 @@
-+/* SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause) */
-+/*
-+ * Simple streaming JSON writer
-+ *
-+ * This takes care of the annoying bits of JSON syntax like the commas
-+ * after elements
-+ *
-+ * Authors:	Stephen Hemminger <stephen@networkplumber.org>
-+ */
-+
-+#ifndef _JSON_WRITER_H_
-+#define _JSON_WRITER_H_
-+
-+#include <stdbool.h>
-+#include <stdint.h>
-+#include <stdarg.h>
-+#include <stdio.h>
-+
-+/* Opaque class structure */
-+typedef struct json_writer json_writer_t;
-+
-+/* Create a new JSON stream */
-+json_writer_t *jsonw_new(FILE *f);
-+/* End output to JSON stream */
-+void jsonw_destroy(json_writer_t **self_p);
-+
-+/* Cause output to have pretty whitespace */
-+void jsonw_pretty(json_writer_t *self, bool on);
-+
-+/* Reset separator to create new JSON */
-+void jsonw_reset(json_writer_t *self);
-+
-+/* Add property name */
-+void jsonw_name(json_writer_t *self, const char *name);
-+
-+/* Add value  */
-+void __attribute__((format(printf, 2, 0))) jsonw_vprintf_enquote(json_writer_t *self,
-+								 const char *fmt,
-+								 va_list ap);
-+void __attribute__((format(printf, 2, 3))) jsonw_printf(json_writer_t *self,
-+							const char *fmt, ...);
-+void jsonw_string(json_writer_t *self, const char *value);
-+void jsonw_bool(json_writer_t *self, bool value);
-+void jsonw_float(json_writer_t *self, double number);
-+void jsonw_float_fmt(json_writer_t *self, const char *fmt, double num);
-+void jsonw_uint(json_writer_t *self, uint64_t number);
-+void jsonw_hu(json_writer_t *self, unsigned short number);
-+void jsonw_int(json_writer_t *self, int64_t number);
-+void jsonw_null(json_writer_t *self);
-+void jsonw_lluint(json_writer_t *self, unsigned long long int num);
-+
-+/* Useful Combinations of name and value */
-+void jsonw_string_field(json_writer_t *self, const char *prop, const char *val);
-+void jsonw_bool_field(json_writer_t *self, const char *prop, bool value);
-+void jsonw_float_field(json_writer_t *self, const char *prop, double num);
-+void jsonw_uint_field(json_writer_t *self, const char *prop, uint64_t num);
-+void jsonw_hu_field(json_writer_t *self, const char *prop, unsigned short num);
-+void jsonw_int_field(json_writer_t *self, const char *prop, int64_t num);
-+void jsonw_null_field(json_writer_t *self, const char *prop);
-+void jsonw_lluint_field(json_writer_t *self, const char *prop,
-+			unsigned long long int num);
-+void jsonw_float_field_fmt(json_writer_t *self, const char *prop,
-+			   const char *fmt, double val);
-+
-+/* Collections */
-+void jsonw_start_object(json_writer_t *self);
-+void jsonw_end_object(json_writer_t *self);
-+
-+void jsonw_start_array(json_writer_t *self);
-+void jsonw_end_array(json_writer_t *self);
-+
-+/* Override default exception handling */
-+typedef void (jsonw_err_handler_fn)(const char *);
-+
-+#endif /* _JSON_WRITER_H_ */
+ clean:
+ 	rm -f *.o *.d *~
+ 
 diff --git a/tools/net/ynl/ynltool/main.h b/tools/net/ynl/ynltool/main.h
-new file mode 100644
-index 000000000000..f4a70acf2085
---- /dev/null
+index f4a70acf2085..fd05d21451a2 100644
+--- a/tools/net/ynl/ynltool/main.h
 +++ b/tools/net/ynl/ynltool/main.h
-@@ -0,0 +1,62 @@
-+/* SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause) */
-+/* Copyright (C) 2017-2018 Netronome Systems, Inc. */
-+/* Copyright Meta Platforms, Inc. and affiliates */
+@@ -59,4 +59,7 @@ struct cmd {
+ int cmd_select(const struct cmd *cmds, int argc, char **argv,
+ 	       int (*help)(int argc, char **argv));
+ 
++/* subcommands */
++int do_page_pool(int argc, char **argv);
 +
-+#ifndef __YNLTOOL_H
-+#define __YNLTOOL_H
-+
-+#ifndef _GNU_SOURCE
-+#define _GNU_SOURCE
-+#endif
-+#include <stdbool.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <errno.h>
-+#include <string.h>
-+
-+#include "json_writer.h"
-+
-+#define NEXT_ARG()	({ argc--; argv++; if (argc < 0) usage(); })
-+#define NEXT_ARGP()	({ (*argc)--; (*argv)++; if (*argc < 0) usage(); })
-+#define BAD_ARG()	({ p_err("what is '%s'?", *argv); -1; })
-+#define GET_ARG()	({ argc--; *argv++; })
-+#define REQ_ARGS(cnt)							\
-+	({								\
-+		int _cnt = (cnt);					\
-+		bool _res;						\
-+									\
-+		if (argc < _cnt) {					\
-+			p_err("'%s' needs at least %d arguments, %d found", \
-+			      argv[-1], _cnt, argc);			\
-+			_res = false;					\
-+		} else {						\
-+			_res = true;					\
-+		}							\
-+		_res;							\
-+	})
-+
-+#define HELP_SPEC_OPTIONS						\
-+	"OPTIONS := { {-j|--json} [{-p|--pretty}] }"
-+
-+extern const char *bin_name;
-+
-+extern json_writer_t *json_wtr;
-+extern bool json_output;
-+extern bool pretty_output;
-+
-+void __attribute__((format(printf, 1, 2))) p_err(const char *fmt, ...);
-+void __attribute__((format(printf, 1, 2))) p_info(const char *fmt, ...);
-+
-+bool is_prefix(const char *pfx, const char *str);
-+int detect_common_prefix(const char *arg, ...);
-+void usage(void) __attribute__((noreturn));
-+
-+struct cmd {
-+	const char *cmd;
-+	int (*func)(int argc, char **argv);
-+};
-+
-+int cmd_select(const struct cmd *cmds, int argc, char **argv,
-+	       int (*help)(int argc, char **argv));
-+
-+#endif /* __YNLTOOL_H */
-diff --git a/tools/net/ynl/ynltool/json_writer.c b/tools/net/ynl/ynltool/json_writer.c
-new file mode 100644
-index 000000000000..c8685e592cd3
---- /dev/null
-+++ b/tools/net/ynl/ynltool/json_writer.c
-@@ -0,0 +1,288 @@
-+// SPDX-License-Identifier: (GPL-2.0-or-later OR BSD-2-Clause)
-+/*
-+ * Simple streaming JSON writer
-+ *
-+ * This takes care of the annoying bits of JSON syntax like the commas
-+ * after elements
-+ *
-+ * Authors:	Stephen Hemminger <stephen@networkplumber.org>
-+ */
-+
-+#include <stdio.h>
-+#include <stdbool.h>
-+#include <stdarg.h>
-+#include <assert.h>
-+#include <malloc.h>
-+#include <inttypes.h>
-+#include <stdint.h>
-+
-+#include "json_writer.h"
-+
-+struct json_writer {
-+	FILE		*out;
-+	unsigned	depth;
-+	bool		pretty;
-+	char		sep;
-+};
-+
-+static void jsonw_indent(json_writer_t *self)
-+{
-+	unsigned i;
-+	for (i = 0; i < self->depth; ++i)
-+		fputs("    ", self->out);
-+}
-+
-+static void jsonw_eol(json_writer_t *self)
-+{
-+	if (!self->pretty)
-+		return;
-+
-+	putc('\n', self->out);
-+	jsonw_indent(self);
-+}
-+
-+static void jsonw_eor(json_writer_t *self)
-+{
-+	if (self->sep != '\0')
-+		putc(self->sep, self->out);
-+	self->sep = ',';
-+}
-+
-+static void jsonw_puts(json_writer_t *self, const char *str)
-+{
-+	putc('"', self->out);
-+	for (; *str; ++str)
-+		switch (*str) {
-+		case '\t':
-+			fputs("\\t", self->out);
-+			break;
-+		case '\n':
-+			fputs("\\n", self->out);
-+			break;
-+		case '\r':
-+			fputs("\\r", self->out);
-+			break;
-+		case '\f':
-+			fputs("\\f", self->out);
-+			break;
-+		case '\b':
-+			fputs("\\b", self->out);
-+			break;
-+		case '\\':
-+			fputs("\\\\", self->out);
-+			break;
-+		case '"':
-+			fputs("\\\"", self->out);
-+			break;
-+		default:
-+			putc(*str, self->out);
-+		}
-+	putc('"', self->out);
-+}
-+
-+json_writer_t *jsonw_new(FILE *f)
-+{
-+	json_writer_t *self = malloc(sizeof(*self));
-+	if (self) {
-+		self->out = f;
-+		self->depth = 0;
-+		self->pretty = false;
-+		self->sep = '\0';
-+	}
-+	return self;
-+}
-+
-+void jsonw_destroy(json_writer_t **self_p)
-+{
-+	json_writer_t *self = *self_p;
-+
-+	assert(self->depth == 0);
-+	fputs("\n", self->out);
-+	fflush(self->out);
-+	free(self);
-+	*self_p = NULL;
-+}
-+
-+void jsonw_pretty(json_writer_t *self, bool on)
-+{
-+	self->pretty = on;
-+}
-+
-+void jsonw_reset(json_writer_t *self)
-+{
-+	assert(self->depth == 0);
-+	self->sep = '\0';
-+}
-+
-+static void jsonw_begin(json_writer_t *self, int c)
-+{
-+	jsonw_eor(self);
-+	putc(c, self->out);
-+	++self->depth;
-+	self->sep = '\0';
-+}
-+
-+static void jsonw_end(json_writer_t *self, int c)
-+{
-+	assert(self->depth > 0);
-+
-+	--self->depth;
-+	if (self->sep != '\0')
-+		jsonw_eol(self);
-+	putc(c, self->out);
-+	self->sep = ',';
-+}
-+
-+void jsonw_name(json_writer_t *self, const char *name)
-+{
-+	jsonw_eor(self);
-+	jsonw_eol(self);
-+	self->sep = '\0';
-+	jsonw_puts(self, name);
-+	putc(':', self->out);
-+	if (self->pretty)
-+		putc(' ', self->out);
-+}
-+
-+void jsonw_vprintf_enquote(json_writer_t *self, const char *fmt, va_list ap)
-+{
-+	jsonw_eor(self);
-+	putc('"', self->out);
-+	vfprintf(self->out, fmt, ap);
-+	putc('"', self->out);
-+}
-+
-+void jsonw_printf(json_writer_t *self, const char *fmt, ...)
-+{
-+	va_list ap;
-+
-+	va_start(ap, fmt);
-+	jsonw_eor(self);
-+	vfprintf(self->out, fmt, ap);
-+	va_end(ap);
-+}
-+
-+void jsonw_start_object(json_writer_t *self)
-+{
-+	jsonw_begin(self, '{');
-+}
-+
-+void jsonw_end_object(json_writer_t *self)
-+{
-+	jsonw_end(self, '}');
-+}
-+
-+void jsonw_start_array(json_writer_t *self)
-+{
-+	jsonw_begin(self, '[');
-+}
-+
-+void jsonw_end_array(json_writer_t *self)
-+{
-+	jsonw_end(self, ']');
-+}
-+
-+void jsonw_string(json_writer_t *self, const char *value)
-+{
-+	jsonw_eor(self);
-+	jsonw_puts(self, value);
-+}
-+
-+void jsonw_bool(json_writer_t *self, bool val)
-+{
-+	jsonw_printf(self, "%s", val ? "true" : "false");
-+}
-+
-+void jsonw_null(json_writer_t *self)
-+{
-+	jsonw_printf(self, "null");
-+}
-+
-+void jsonw_float_fmt(json_writer_t *self, const char *fmt, double num)
-+{
-+	jsonw_printf(self, fmt, num);
-+}
-+
-+void jsonw_float(json_writer_t *self, double num)
-+{
-+	jsonw_printf(self, "%g", num);
-+}
-+
-+void jsonw_hu(json_writer_t *self, unsigned short num)
-+{
-+	jsonw_printf(self, "%hu", num);
-+}
-+
-+void jsonw_uint(json_writer_t *self, uint64_t num)
-+{
-+	jsonw_printf(self, "%"PRIu64, num);
-+}
-+
-+void jsonw_lluint(json_writer_t *self, unsigned long long int num)
-+{
-+	jsonw_printf(self, "%llu", num);
-+}
-+
-+void jsonw_int(json_writer_t *self, int64_t num)
-+{
-+	jsonw_printf(self, "%"PRId64, num);
-+}
-+
-+void jsonw_string_field(json_writer_t *self, const char *prop, const char *val)
-+{
-+	jsonw_name(self, prop);
-+	jsonw_string(self, val);
-+}
-+
-+void jsonw_bool_field(json_writer_t *self, const char *prop, bool val)
-+{
-+	jsonw_name(self, prop);
-+	jsonw_bool(self, val);
-+}
-+
-+void jsonw_float_field(json_writer_t *self, const char *prop, double val)
-+{
-+	jsonw_name(self, prop);
-+	jsonw_float(self, val);
-+}
-+
-+void jsonw_float_field_fmt(json_writer_t *self,
-+			   const char *prop,
-+			   const char *fmt,
-+			   double val)
-+{
-+	jsonw_name(self, prop);
-+	jsonw_float_fmt(self, fmt, val);
-+}
-+
-+void jsonw_uint_field(json_writer_t *self, const char *prop, uint64_t num)
-+{
-+	jsonw_name(self, prop);
-+	jsonw_uint(self, num);
-+}
-+
-+void jsonw_hu_field(json_writer_t *self, const char *prop, unsigned short num)
-+{
-+	jsonw_name(self, prop);
-+	jsonw_hu(self, num);
-+}
-+
-+void jsonw_lluint_field(json_writer_t *self,
-+			const char *prop,
-+			unsigned long long int num)
-+{
-+	jsonw_name(self, prop);
-+	jsonw_lluint(self, num);
-+}
-+
-+void jsonw_int_field(json_writer_t *self, const char *prop, int64_t num)
-+{
-+	jsonw_name(self, prop);
-+	jsonw_int(self, num);
-+}
-+
-+void jsonw_null_field(json_writer_t *self, const char *prop)
-+{
-+	jsonw_name(self, prop);
-+	jsonw_null(self);
-+}
+ #endif /* __YNLTOOL_H */
+diff --git a/tools/net/ynl/samples/page-pool.c b/tools/net/ynl/samples/page-pool.c
+deleted file mode 100644
+index e5d521320fbf..000000000000
+--- a/tools/net/ynl/samples/page-pool.c
++++ /dev/null
+@@ -1,149 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0
+-#define _GNU_SOURCE
+-
+-#include <stdio.h>
+-#include <string.h>
+-
+-#include <ynl.h>
+-
+-#include <net/if.h>
+-
+-#include "netdev-user.h"
+-
+-struct stat {
+-	unsigned int ifc;
+-
+-	struct {
+-		unsigned int cnt;
+-		size_t refs, bytes;
+-	} live[2];
+-
+-	size_t alloc_slow, alloc_fast, recycle_ring, recycle_cache;
+-};
+-
+-struct stats_array {
+-	unsigned int i, max;
+-	struct stat *s;
+-};
+-
+-static struct stat *find_ifc(struct stats_array *a, unsigned int ifindex)
+-{
+-	unsigned int i;
+-
+-	for (i = 0; i < a->i; i++) {
+-		if (a->s[i].ifc == ifindex)
+-			return &a->s[i];
+-	}
+-
+-	a->i++;
+-	if (a->i == a->max) {
+-		a->max *= 2;
+-		a->s = reallocarray(a->s, a->max, sizeof(*a->s));
+-	}
+-	a->s[i].ifc = ifindex;
+-	return &a->s[i];
+-}
+-
+-static void count(struct stat *s, unsigned int l,
+-		  struct netdev_page_pool_get_rsp *pp)
+-{
+-	s->live[l].cnt++;
+-	if (pp->_present.inflight)
+-		s->live[l].refs += pp->inflight;
+-	if (pp->_present.inflight_mem)
+-		s->live[l].bytes += pp->inflight_mem;
+-}
+-
+-int main(int argc, char **argv)
+-{
+-	struct netdev_page_pool_stats_get_list *pp_stats;
+-	struct netdev_page_pool_get_list *pools;
+-	struct stats_array a = {};
+-	struct ynl_error yerr;
+-	struct ynl_sock *ys;
+-
+-	ys = ynl_sock_create(&ynl_netdev_family, &yerr);
+-	if (!ys) {
+-		fprintf(stderr, "YNL: %s\n", yerr.msg);
+-		return 1;
+-	}
+-
+-	a.max = 128;
+-	a.s = calloc(a.max, sizeof(*a.s));
+-	if (!a.s)
+-		goto err_close;
+-
+-	pools = netdev_page_pool_get_dump(ys);
+-	if (!pools)
+-		goto err_free;
+-
+-	ynl_dump_foreach(pools, pp) {
+-		struct stat *s = find_ifc(&a, pp->ifindex);
+-
+-		count(s, 1, pp);
+-		if (pp->_present.detach_time)
+-			count(s, 0, pp);
+-	}
+-	netdev_page_pool_get_list_free(pools);
+-
+-	pp_stats = netdev_page_pool_stats_get_dump(ys);
+-	if (!pp_stats)
+-		goto err_free;
+-
+-	ynl_dump_foreach(pp_stats, pp) {
+-		struct stat *s = find_ifc(&a, pp->info.ifindex);
+-
+-		if (pp->_present.alloc_fast)
+-			s->alloc_fast += pp->alloc_fast;
+-		if (pp->_present.alloc_refill)
+-			s->alloc_fast += pp->alloc_refill;
+-		if (pp->_present.alloc_slow)
+-			s->alloc_slow += pp->alloc_slow;
+-		if (pp->_present.recycle_ring)
+-			s->recycle_ring += pp->recycle_ring;
+-		if (pp->_present.recycle_cached)
+-			s->recycle_cache += pp->recycle_cached;
+-	}
+-	netdev_page_pool_stats_get_list_free(pp_stats);
+-
+-	for (unsigned int i = 0; i < a.i; i++) {
+-		char ifname[IF_NAMESIZE];
+-		struct stat *s = &a.s[i];
+-		const char *name;
+-		double recycle;
+-
+-		if (!s->ifc) {
+-			name = "<orphan>\t";
+-		} else {
+-			name = if_indextoname(s->ifc, ifname);
+-			if (name)
+-				printf("%8s", name);
+-			printf("[%u]\t", s->ifc);
+-		}
+-
+-		printf("page pools: %u (zombies: %u)\n",
+-		       s->live[1].cnt, s->live[0].cnt);
+-		printf("\t\trefs: %zu bytes: %zu (refs: %zu bytes: %zu)\n",
+-		       s->live[1].refs, s->live[1].bytes,
+-		       s->live[0].refs, s->live[0].bytes);
+-
+-		/* We don't know how many pages are sitting in cache and ring
+-		 * so we will under-count the recycling rate a bit.
+-		 */
+-		recycle = (double)(s->recycle_ring + s->recycle_cache) /
+-			(s->alloc_fast + s->alloc_slow) * 100;
+-		printf("\t\trecycling: %.1lf%% (alloc: %zu:%zu recycle: %zu:%zu)\n",
+-		       recycle, s->alloc_slow, s->alloc_fast,
+-		       s->recycle_ring, s->recycle_cache);
+-	}
+-
+-	ynl_sock_destroy(ys);
+-	return 0;
+-
+-err_free:
+-	free(a.s);
+-err_close:
+-	fprintf(stderr, "YNL: %s\n", ys->err.msg);
+-	ynl_sock_destroy(ys);
+-	return 2;
+-}
 diff --git a/tools/net/ynl/ynltool/main.c b/tools/net/ynl/ynltool/main.c
-new file mode 100644
-index 000000000000..8e15e4ee543f
---- /dev/null
+index 8e15e4ee543f..f83c6f3245c8 100644
+--- a/tools/net/ynl/ynltool/main.c
 +++ b/tools/net/ynl/ynltool/main.c
-@@ -0,0 +1,240 @@
+@@ -47,7 +47,7 @@ static int do_help(int argc __attribute__((unused)),
+ 		"Usage: %s [OPTIONS] OBJECT { COMMAND | help }\n"
+ 		"       %s version\n"
+ 		"\n"
+-		"       OBJECT := { }\n"
++		"       OBJECT := { page-pool }\n"
+ 		"       " HELP_SPEC_OPTIONS "\n"
+ 		"",
+ 		bin_name, bin_name);
+@@ -71,6 +71,7 @@ static int do_version(int argc __attribute__((unused)),
+ 
+ static const struct cmd commands[] = {
+ 	{ "help",	do_help },
++	{ "page-pool",	do_page_pool },
+ 	{ "version",	do_version },
+ 	{ 0 }
+ };
+diff --git a/tools/net/ynl/ynltool/page-pool.c b/tools/net/ynl/ynltool/page-pool.c
+new file mode 100644
+index 000000000000..4b24492abab7
+--- /dev/null
++++ b/tools/net/ynl/ynltool/page-pool.c
+@@ -0,0 +1,461 @@
 +// SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+/* Copyright (C) 2017-2018 Netronome Systems, Inc. */
-+/* Copyright Meta Platforms, Inc. and affiliates */
 +
-+#include <ctype.h>
-+#include <errno.h>
-+#include <getopt.h>
 +#include <stdio.h>
 +#include <stdlib.h>
 +#include <string.h>
-+#include <stdarg.h>
++#include <errno.h>
++#include <net/if.h>
++
++#include <ynl.h>
++#include "netdev-user.h"
 +
 +#include "main.h"
 +
-+const char *bin_name;
-+static int last_argc;
-+static char **last_argv;
-+static int (*last_do_help)(int argc, char **argv);
-+json_writer_t *json_wtr;
-+bool pretty_output;
-+bool json_output;
++struct pp_stat {
++	unsigned int ifc;
 +
-+static void __attribute__((noreturn)) clean_and_exit(int i)
++	struct {
++		unsigned int cnt;
++		size_t refs, bytes;
++	} live[2];
++
++	size_t alloc_slow, alloc_fast, recycle_ring, recycle_cache;
++};
++
++struct pp_stats_array {
++	unsigned int i, max;
++	struct pp_stat *s;
++};
++
++static struct pp_stat *find_ifc(struct pp_stats_array *a, unsigned int ifindex)
 +{
-+	if (json_output)
-+		jsonw_destroy(&json_wtr);
++	unsigned int i;
 +
-+	exit(i);
++	for (i = 0; i < a->i; i++) {
++		if (a->s[i].ifc == ifindex)
++			return &a->s[i];
++	}
++
++	a->i++;
++	if (a->i == a->max) {
++		a->max *= 2;
++		a->s = reallocarray(a->s, a->max, sizeof(*a->s));
++	}
++	a->s[i].ifc = ifindex;
++	return &a->s[i];
 +}
 +
-+void usage(void)
++static void count_pool(struct pp_stat *s, unsigned int l,
++		       struct netdev_page_pool_get_rsp *pp)
 +{
-+	last_do_help(last_argc - 1, last_argv + 1);
++	s->live[l].cnt++;
++	if (pp->_present.inflight)
++		s->live[l].refs += pp->inflight;
++	if (pp->_present.inflight_mem)
++		s->live[l].bytes += pp->inflight_mem;
++}
 +
-+	clean_and_exit(-1);
++/* We don't know how many pages are sitting in cache and ring
++ * so we will under-count the recycling rate a bit.
++ */
++static void print_json_recycling_stats(struct pp_stat *s)
++{
++	double recycle;
++
++	if (s->alloc_fast + s->alloc_slow) {
++		recycle = (double)(s->recycle_ring + s->recycle_cache) /
++			(s->alloc_fast + s->alloc_slow) * 100;
++		jsonw_float_field(json_wtr, "recycling_pct", recycle);
++	}
++
++	jsonw_name(json_wtr, "alloc");
++	jsonw_start_object(json_wtr);
++	jsonw_uint_field(json_wtr, "slow", s->alloc_slow);
++	jsonw_uint_field(json_wtr, "fast", s->alloc_fast);
++	jsonw_end_object(json_wtr);
++
++	jsonw_name(json_wtr, "recycle");
++	jsonw_start_object(json_wtr);
++	jsonw_uint_field(json_wtr, "ring", s->recycle_ring);
++	jsonw_uint_field(json_wtr, "cache", s->recycle_cache);
++	jsonw_end_object(json_wtr);
++}
++
++static void print_plain_recycling_stats(struct pp_stat *s)
++{
++	double recycle;
++
++	if (s->alloc_fast + s->alloc_slow) {
++		recycle = (double)(s->recycle_ring + s->recycle_cache) /
++			(s->alloc_fast + s->alloc_slow) * 100;
++		printf("recycling: %.1lf%% (alloc: %zu:%zu recycle: %zu:%zu)",
++		       recycle, s->alloc_slow, s->alloc_fast,
++		       s->recycle_ring, s->recycle_cache);
++	}
++}
++
++static void print_json_stats(struct pp_stats_array *a)
++{
++	jsonw_start_array(json_wtr);
++
++	for (unsigned int i = 0; i < a->i; i++) {
++		char ifname[IF_NAMESIZE];
++		struct pp_stat *s = &a->s[i];
++		const char *name;
++
++		jsonw_start_object(json_wtr);
++
++		if (!s->ifc) {
++			jsonw_string_field(json_wtr, "ifname", "<orphan>");
++			jsonw_uint_field(json_wtr, "ifindex", 0);
++		} else {
++			name = if_indextoname(s->ifc, ifname);
++			if (name)
++				jsonw_string_field(json_wtr, "ifname", name);
++			jsonw_uint_field(json_wtr, "ifindex", s->ifc);
++		}
++
++		jsonw_uint_field(json_wtr, "page_pools", s->live[1].cnt);
++		jsonw_uint_field(json_wtr, "zombies", s->live[0].cnt);
++
++		jsonw_name(json_wtr, "live");
++		jsonw_start_object(json_wtr);
++		jsonw_uint_field(json_wtr, "refs", s->live[1].refs);
++		jsonw_uint_field(json_wtr, "bytes", s->live[1].bytes);
++		jsonw_end_object(json_wtr);
++
++		jsonw_name(json_wtr, "zombie");
++		jsonw_start_object(json_wtr);
++		jsonw_uint_field(json_wtr, "refs", s->live[0].refs);
++		jsonw_uint_field(json_wtr, "bytes", s->live[0].bytes);
++		jsonw_end_object(json_wtr);
++
++		if (s->alloc_fast || s->alloc_slow)
++			print_json_recycling_stats(s);
++
++		jsonw_end_object(json_wtr);
++	}
++
++	jsonw_end_array(json_wtr);
++}
++
++static void print_plain_stats(struct pp_stats_array *a)
++{
++	for (unsigned int i = 0; i < a->i; i++) {
++		char ifname[IF_NAMESIZE];
++		struct pp_stat *s = &a->s[i];
++		const char *name;
++
++		if (!s->ifc) {
++			printf("<orphan>\t");
++		} else {
++			name = if_indextoname(s->ifc, ifname);
++			if (name)
++				printf("%8s", name);
++			printf("[%u]\t", s->ifc);
++		}
++
++		printf("page pools: %u (zombies: %u)\n",
++		       s->live[1].cnt, s->live[0].cnt);
++		printf("\t\trefs: %zu bytes: %zu (refs: %zu bytes: %zu)\n",
++		       s->live[1].refs, s->live[1].bytes,
++		       s->live[0].refs, s->live[0].bytes);
++
++		if (s->alloc_fast || s->alloc_slow) {
++			printf("\t\t");
++			print_plain_recycling_stats(s);
++			printf("\n");
++		}
++	}
++}
++
++static bool
++find_pool_stat_in_list(struct netdev_page_pool_stats_get_list *pp_stats,
++		       __u64 pool_id, struct pp_stat *pstat)
++{
++	ynl_dump_foreach(pp_stats, pp) {
++		if (!pp->_present.info || !pp->info._present.id)
++			continue;
++		if (pp->info.id != pool_id)
++			continue;
++
++		memset(pstat, 0, sizeof(*pstat));
++		if (pp->_present.alloc_fast)
++			pstat->alloc_fast = pp->alloc_fast;
++		if (pp->_present.alloc_refill)
++			pstat->alloc_fast += pp->alloc_refill;
++		if (pp->_present.alloc_slow)
++			pstat->alloc_slow = pp->alloc_slow;
++		if (pp->_present.recycle_ring)
++			pstat->recycle_ring = pp->recycle_ring;
++		if (pp->_present.recycle_cached)
++			pstat->recycle_cache = pp->recycle_cached;
++		return true;
++	}
++	return false;
++}
++
++static void
++print_json_pool_list(struct netdev_page_pool_get_list *pools,
++		     struct netdev_page_pool_stats_get_list *pp_stats,
++		     bool zombies_only)
++{
++	jsonw_start_array(json_wtr);
++
++	ynl_dump_foreach(pools, pp) {
++		char ifname[IF_NAMESIZE];
++		struct pp_stat pstat;
++		const char *name;
++
++		if (zombies_only && !pp->_present.detach_time)
++			continue;
++
++		jsonw_start_object(json_wtr);
++
++		jsonw_uint_field(json_wtr, "id", pp->id);
++
++		if (pp->_present.ifindex) {
++			name = if_indextoname(pp->ifindex, ifname);
++			if (name)
++				jsonw_string_field(json_wtr, "ifname", name);
++			jsonw_uint_field(json_wtr, "ifindex", pp->ifindex);
++		}
++
++		if (pp->_present.napi_id)
++			jsonw_uint_field(json_wtr, "napi_id", pp->napi_id);
++
++		if (pp->_present.inflight)
++			jsonw_uint_field(json_wtr, "refs", pp->inflight);
++
++		if (pp->_present.inflight_mem)
++			jsonw_uint_field(json_wtr, "bytes", pp->inflight_mem);
++
++		if (pp->_present.detach_time)
++			jsonw_uint_field(json_wtr, "detach_time", pp->detach_time);
++
++		if (pp->_present.dmabuf)
++			jsonw_uint_field(json_wtr, "dmabuf", pp->dmabuf);
++
++		if (find_pool_stat_in_list(pp_stats, pp->id, &pstat) &&
++		    (pstat.alloc_fast || pstat.alloc_slow))
++			print_json_recycling_stats(&pstat);
++
++		jsonw_end_object(json_wtr);
++	}
++
++	jsonw_end_array(json_wtr);
++}
++
++static void
++print_plain_pool_list(struct netdev_page_pool_get_list *pools,
++		      struct netdev_page_pool_stats_get_list *pp_stats,
++		      bool zombies_only)
++{
++	ynl_dump_foreach(pools, pp) {
++		char ifname[IF_NAMESIZE];
++		struct pp_stat pstat;
++		const char *name;
++
++		if (zombies_only && !pp->_present.detach_time)
++			continue;
++
++		printf("pool id: %llu", pp->id);
++
++		if (pp->_present.ifindex) {
++			name = if_indextoname(pp->ifindex, ifname);
++			if (name)
++				printf("  dev: %s", name);
++			printf("[%u]", pp->ifindex);
++		}
++
++		if (pp->_present.napi_id)
++			printf("  napi: %llu", pp->napi_id);
++
++		printf("\n");
++
++		if (pp->_present.inflight || pp->_present.inflight_mem) {
++			printf("  inflight:");
++			if (pp->_present.inflight)
++				printf(" %llu pages", pp->inflight);
++			if (pp->_present.inflight_mem)
++				printf(" %llu bytes", pp->inflight_mem);
++			printf("\n");
++		}
++
++		if (pp->_present.detach_time)
++			printf("  detached: %llu\n", pp->detach_time);
++
++		if (pp->_present.dmabuf)
++			printf("  dmabuf: %u\n", pp->dmabuf);
++
++		if (find_pool_stat_in_list(pp_stats, pp->id, &pstat) &&
++		    (pstat.alloc_fast || pstat.alloc_slow)) {
++			printf("  ");
++			print_plain_recycling_stats(&pstat);
++			printf("\n");
++		}
++	}
++}
++
++static void aggregate_device_stats(struct pp_stats_array *a,
++				   struct netdev_page_pool_get_list *pools,
++				   struct netdev_page_pool_stats_get_list *pp_stats)
++{
++	ynl_dump_foreach(pools, pp) {
++		struct pp_stat *s = find_ifc(a, pp->ifindex);
++
++		count_pool(s, 1, pp);
++		if (pp->_present.detach_time)
++			count_pool(s, 0, pp);
++	}
++
++	ynl_dump_foreach(pp_stats, pp) {
++		struct pp_stat *s = find_ifc(a, pp->info.ifindex);
++
++		if (pp->_present.alloc_fast)
++			s->alloc_fast += pp->alloc_fast;
++		if (pp->_present.alloc_refill)
++			s->alloc_fast += pp->alloc_refill;
++		if (pp->_present.alloc_slow)
++			s->alloc_slow += pp->alloc_slow;
++		if (pp->_present.recycle_ring)
++			s->recycle_ring += pp->recycle_ring;
++		if (pp->_present.recycle_cached)
++			s->recycle_cache += pp->recycle_cached;
++	}
++}
++
++static int do_stats(int argc, char **argv)
++{
++	struct netdev_page_pool_stats_get_list *pp_stats;
++	struct netdev_page_pool_get_list *pools;
++	enum {
++		GROUP_BY_DEVICE,
++		GROUP_BY_POOL,
++	} group_by = GROUP_BY_DEVICE;
++	bool zombies_only = false;
++	struct pp_stats_array a = {};
++	struct ynl_error yerr;
++	struct ynl_sock *ys;
++	int ret = 0;
++
++	/* Parse options */
++	while (argc > 0) {
++		if (is_prefix(*argv, "group-by")) {
++			NEXT_ARG();
++
++			if (!REQ_ARGS(1))
++				return -1;
++
++			if (is_prefix(*argv, "device")) {
++				group_by = GROUP_BY_DEVICE;
++			} else if (is_prefix(*argv, "pp") ||
++				   is_prefix(*argv, "page-pool") ||
++				   is_prefix(*argv, "none")) {
++				group_by = GROUP_BY_POOL;
++			} else {
++				p_err("invalid group-by value '%s'", *argv);
++				return -1;
++			}
++			NEXT_ARG();
++		} else if (is_prefix(*argv, "zombies")) {
++			zombies_only = true;
++			group_by = GROUP_BY_POOL;
++			NEXT_ARG();
++		} else {
++			p_err("unknown option '%s'", *argv);
++			return -1;
++		}
++	}
++
++	ys = ynl_sock_create(&ynl_netdev_family, &yerr);
++	if (!ys) {
++		p_err("YNL: %s", yerr.msg);
++		return -1;
++	}
++
++	pools = netdev_page_pool_get_dump(ys);
++	if (!pools) {
++		p_err("failed to get page pools: %s", ys->err.msg);
++		ret = -1;
++		goto exit_close;
++	}
++
++	pp_stats = netdev_page_pool_stats_get_dump(ys);
++	if (!pp_stats) {
++		p_err("failed to get page pool stats: %s", ys->err.msg);
++		ret = -1;
++		goto exit_free_pp_list;
++	}
++
++	/* If grouping by pool, print individual pools */
++	if (group_by == GROUP_BY_POOL) {
++		if (json_output)
++			print_json_pool_list(pools, pp_stats, zombies_only);
++		else
++			print_plain_pool_list(pools, pp_stats, zombies_only);
++	} else {
++		/* Aggregated stats mode (group-by device) */
++		a.max = 64;
++		a.s = calloc(a.max, sizeof(*a.s));
++		if (!a.s) {
++			p_err("failed to allocate stats array");
++			ret = -1;
++			goto exit_free_stats_list;
++		}
++
++		aggregate_device_stats(&a, pools, pp_stats);
++
++		if (json_output)
++			print_json_stats(&a);
++		else
++			print_plain_stats(&a);
++
++		free(a.s);
++	}
++
++exit_free_stats_list:
++	netdev_page_pool_stats_get_list_free(pp_stats);
++exit_free_pp_list:
++	netdev_page_pool_get_list_free(pools);
++exit_close:
++	ynl_sock_destroy(ys);
++	return ret;
 +}
 +
 +static int do_help(int argc __attribute__((unused)),
@@ -671,207 +785,33 @@ index 000000000000..8e15e4ee543f
 +	}
 +
 +	fprintf(stderr,
-+		"Usage: %s [OPTIONS] OBJECT { COMMAND | help }\n"
-+		"       %s version\n"
++		"Usage: %s page-pool { COMMAND | help }\n"
++		"       %s page-pool stats [ OPTIONS ]\n"
 +		"\n"
-+		"       OBJECT := { }\n"
-+		"       " HELP_SPEC_OPTIONS "\n"
++		"       OPTIONS := { group-by { device | page-pool | none } | zombies }\n"
++		"\n"
++		"       stats                   - Display page pool statistics\n"
++		"       stats group-by device   - Group statistics by network device (default)\n"
++		"       stats group-by page-pool | pp | none\n"
++		"                               - Show individual page pool details (no grouping)\n"
++		"       stats zombies           - Show only zombie page pools (detached but with\n"
++		"                                 pages in flight). Implies group-by page-pool.\n"
 +		"",
 +		bin_name, bin_name);
 +
 +	return 0;
 +}
 +
-+static int do_version(int argc __attribute__((unused)),
-+		      char **argv __attribute__((unused)))
-+{
-+	if (json_output) {
-+		jsonw_start_object(json_wtr);
-+		jsonw_name(json_wtr, "version");
-+		jsonw_printf(json_wtr, SRC_VERSION);
-+		jsonw_end_object(json_wtr);
-+	} else {
-+		printf("%s " SRC_VERSION "\n", bin_name);
-+	}
-+	return 0;
-+}
-+
-+static const struct cmd commands[] = {
++static const struct cmd page_pool_cmds[] = {
 +	{ "help",	do_help },
-+	{ "version",	do_version },
++	{ "stats",	do_stats },
 +	{ 0 }
 +};
 +
-+int cmd_select(const struct cmd *cmds, int argc, char **argv,
-+	       int (*help)(int argc, char **argv))
++int do_page_pool(int argc, char **argv)
 +{
-+	unsigned int i;
-+
-+	last_argc = argc;
-+	last_argv = argv;
-+	last_do_help = help;
-+
-+	if (argc < 1 && cmds[0].func)
-+		return cmds[0].func(argc, argv);
-+
-+	for (i = 0; cmds[i].cmd; i++) {
-+		if (is_prefix(*argv, cmds[i].cmd)) {
-+			if (!cmds[i].func) {
-+				p_err("command '%s' is not available", cmds[i].cmd);
-+				return -1;
-+			}
-+			return cmds[i].func(argc - 1, argv + 1);
-+		}
-+	}
-+
-+	help(argc - 1, argv + 1);
-+
-+	return -1;
++	return cmd_select(page_pool_cmds, argc, argv, do_help);
 +}
-+
-+bool is_prefix(const char *pfx, const char *str)
-+{
-+	if (!pfx)
-+		return false;
-+	if (strlen(str) < strlen(pfx))
-+		return false;
-+
-+	return !memcmp(str, pfx, strlen(pfx));
-+}
-+
-+/* Last argument MUST be NULL pointer */
-+int detect_common_prefix(const char *arg, ...)
-+{
-+	unsigned int count = 0;
-+	const char *ref;
-+	char msg[256];
-+	va_list ap;
-+
-+	snprintf(msg, sizeof(msg), "ambiguous prefix: '%s' could be '", arg);
-+	va_start(ap, arg);
-+	while ((ref = va_arg(ap, const char *))) {
-+		if (!is_prefix(arg, ref))
-+			continue;
-+		count++;
-+		if (count > 1)
-+			strncat(msg, "' or '", sizeof(msg) - strlen(msg) - 1);
-+		strncat(msg, ref, sizeof(msg) - strlen(msg) - 1);
-+	}
-+	va_end(ap);
-+	strncat(msg, "'", sizeof(msg) - strlen(msg) - 1);
-+
-+	if (count >= 2) {
-+		p_err("%s", msg);
-+		return -1;
-+	}
-+
-+	return 0;
-+}
-+
-+void p_err(const char *fmt, ...)
-+{
-+	va_list ap;
-+
-+	va_start(ap, fmt);
-+	if (json_output) {
-+		jsonw_start_object(json_wtr);
-+		jsonw_name(json_wtr, "error");
-+		jsonw_vprintf_enquote(json_wtr, fmt, ap);
-+		jsonw_end_object(json_wtr);
-+	} else {
-+		fprintf(stderr, "Error: ");
-+		vfprintf(stderr, fmt, ap);
-+		fprintf(stderr, "\n");
-+	}
-+	va_end(ap);
-+}
-+
-+void p_info(const char *fmt, ...)
-+{
-+	va_list ap;
-+
-+	if (json_output)
-+		return;
-+
-+	va_start(ap, fmt);
-+	vfprintf(stderr, fmt, ap);
-+	fprintf(stderr, "\n");
-+	va_end(ap);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	static const struct option options[] = {
-+		{ "json",	no_argument,	NULL,	'j' },
-+		{ "help",	no_argument,	NULL,	'h' },
-+		{ "pretty",	no_argument,	NULL,	'p' },
-+		{ "version",	no_argument,	NULL,	'V' },
-+		{ 0 }
-+	};
-+	bool version_requested = false;
-+	int opt, ret;
-+
-+	setlinebuf(stdout);
-+
-+	last_do_help = do_help;
-+	pretty_output = false;
-+	json_output = false;
-+	bin_name = "ynltool";
-+
-+	opterr = 0;
-+	while ((opt = getopt_long(argc, argv, "Vhjp",
-+				  options, NULL)) >= 0) {
-+		switch (opt) {
-+		case 'V':
-+			version_requested = true;
-+			break;
-+		case 'h':
-+			return do_help(argc, argv);
-+		case 'p':
-+			pretty_output = true;
-+			/* fall through */
-+		case 'j':
-+			if (!json_output) {
-+				json_wtr = jsonw_new(stdout);
-+				if (!json_wtr) {
-+					p_err("failed to create JSON writer");
-+					return -1;
-+				}
-+				json_output = true;
-+			}
-+			jsonw_pretty(json_wtr, pretty_output);
-+			break;
-+		default:
-+			p_err("unrecognized option '%s'", argv[optind - 1]);
-+			if (json_output)
-+				clean_and_exit(-1);
-+			else
-+				usage();
-+		}
-+	}
-+
-+	argc -= optind;
-+	argv += optind;
-+	if (argc < 0)
-+		usage();
-+
-+	if (version_requested)
-+		ret = do_version(argc, argv);
-+	else
-+		ret = cmd_select(commands, argc, argv, do_help);
-+
-+	if (json_output)
-+		jsonw_destroy(&json_wtr);
-+
-+	return ret;
-+}
-diff --git a/tools/net/ynl/ynltool/.gitignore b/tools/net/ynl/ynltool/.gitignore
-new file mode 100644
-index 000000000000..f38848dbb0d3
---- /dev/null
-+++ b/tools/net/ynl/ynltool/.gitignore
-@@ -0,0 +1 @@
-+ynltool
 -- 
 2.51.1
 
