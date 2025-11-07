@@ -1,140 +1,139 @@
-Return-Path: <netdev+bounces-236772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CEA8C3FF5B
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 13:43:15 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C05E2C3FFDF
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 13:52:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C472189A95E
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 12:42:49 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 719284E4EED
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 12:52:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAABE244691;
-	Fri,  7 Nov 2025 12:40:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8206A28507B;
+	Fri,  7 Nov 2025 12:52:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ojqohzya"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="QNjRTMBx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC85221294
-	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 12:40:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E50C28467C
+	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 12:52:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762519244; cv=none; b=eIr8Yo9ux6H1NzNQoDkn1zPLGioJ06TzROfso0EfLKG1YuZNom+bJmGDvRo0bSzmdExbkpfqeryDxNfAWK1C2CSeUmtcIrI8EAmtyt8/7MQNN0nDGit+nmPBUTwPX4A5QhL/yTkuQj3Rwce1WmB6ueH/Te46PlyGlRytjRTd++0=
+	t=1762519953; cv=none; b=pfgs82ATv7vSbBDk3YmGGretuLzj/L/qZRn0C6p2kJSd3SdYD2Tg3aG01qDVoJImntbKgJY03/7kahnPkMQzeicCFff5l55yNXR0HRGWzD5dJzpM5VnB00i41sPpf1v3fdDOwQ433vZglylEPbGkl1zO4ZU/jCtU5H/0XcrYwwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762519244; c=relaxed/simple;
-	bh=yiO4zmlXl/JS4+/5pfenaSwhIEXN8TsZ0bJb6jdcmBQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=W+u3rNtpvNq5gwd75QNkZ+Lf1mu9t+73qsWsIQyGrnkoSMgKdfSyoH7gjXRDHHjfjcxvW6kIf7fZxjA4cnDZ6XgBTRO7dj4kMcMPXU0kLc016DeTgQNqSTsGZc6x1Uxy9qAsqxNOK2fTE+6Q7EF4N5ERPHmgutp1x16Yt2RRgG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=ojqohzya; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5A78uOjH029896;
-	Fri, 7 Nov 2025 12:40:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=/0VLNF0XkFoex+vaPitGJVE8wC0bF
-	6xQJKj8eU4gdQw=; b=ojqohzyaWfWnk09WMS0ExCXmNPqW210zoAH7sThXNon0B
-	tcjIYWW5tAb9NK+yq9l9mhG9N4yhBoW1noZTNoRtRkK7hDRQQV/0zAq6WIfWyMk5
-	gf+/LGcRcEQiqBwMancmuK3vx/vr8E7JGm9gLqicEjsHq26397y4mtDADJpcAzUe
-	0t17GOF7hV3r6Pt3yy3+22szUKwej5h8UJMQOxFMJuBN6H+LJ1RWVxoCM9DuDoLW
-	CHGhaVIFzS8FBcqBtiW8y+smwN/fxAM6izLNE0KNoo2GFQ/PPGPCe9vV+CEAQo70
-	T41eidbrjMJ5Vzjpg1QMyXwUPcf5ygiXv1ODfWS3g==
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4a8yhj1tp8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 07 Nov 2025 12:40:28 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5A7BR2PV039780;
-	Fri, 7 Nov 2025 12:40:27 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4a58ndf1xs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 07 Nov 2025 12:40:27 +0000
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5A7CYtQS010259;
-	Fri, 7 Nov 2025 12:40:26 GMT
-Received: from ca-dev110.us.oracle.com (ca-dev110.us.oracle.com [10.129.136.45])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 4a58ndf1wc-1;
-	Fri, 07 Nov 2025 12:40:26 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: przemyslaw.kitszel@intel.com, aleksander.lobakin@intel.com,
-        anthony.l.nguyen@intel.com, andrew+netdev@lunn.ch, kuba@kernel.org,
-        davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-        intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Cc: alok.a.tiwarilinux@gmail.com, alok.a.tiwari@oracle.com
-Subject: [PATCH net-next] ice: fix comment typo and correct module format string
-Date: Fri,  7 Nov 2025 04:39:41 -0800
-Message-ID: <20251107123956.1125342-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1762519953; c=relaxed/simple;
+	bh=snI4yqGepDdWNnY0kbg2UNmoXx+IQh7u1C5ywqjd/MY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V4sG7cknx0x9P8mDMh6BLhhW7Vkfyd8qPlQwhaYZaBZnmIQLkEgZNhTnEpLJMLqVHI9ofgJprJsfhk7BnKpXuKqh3rSN/lWkrPo/9/huH+F6z6Tn0LsP6RnLUbypJ/UsmZiDQ/qeL1jVL/nVmndm+A1IUQEvXy3F2qsC9Xna6tU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=QNjRTMBx; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-640c6577120so1478621a12.1
+        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 04:52:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1762519950; x=1763124750; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1K/WGyrSvPxGdmHGTAm83AxLQquBqybYtMrmz64lWv4=;
+        b=QNjRTMBx9T1Yw861AigEB7mgXG7Psqi/QMo+dMfXkN91Q5iYliuex0rGKMWT6rj7qL
+         8bn8ptrpyQWiuGeDyJxQZCFw/EVUlIYCjWK/oi5QxpNtps6YAIKoZDKNgKrHYYjx5KXM
+         +oPsZu9VRu6bgzD8v2oHwG/tH6QqH0xs3F/Km7gqEfAMuWX1zCftLp83nmw+3tAhdS9b
+         Uu+uI049IB8dMHWkv+JYeJrpV7aiT73Z62y5RnftF9OOh5tFpeaKHfvVo6nD75cU/VWI
+         iDE0psv82sm7u9EJk6UjVmVsMW4mZF+8HTa6b1s6uAEJKrydG3LA3bkvZbfCJKohlyiV
+         YwmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762519950; x=1763124750;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1K/WGyrSvPxGdmHGTAm83AxLQquBqybYtMrmz64lWv4=;
+        b=Ju5LIVaXY1JK0XHx5t6PDnZWvIXsdgQy9awoM1Pcjkabyc8epywO/n+pi2THeei8k8
+         gU0l/pNRWiI6SEyaEBP/QXp5Xp/zqbRfHbLBAIvrcxm1ECKjOQfHT0KTODb7G1xyJJUw
+         56lZQ9AlgixSNhqMVuje/8PsXRd8TkBSxPCf3bry3An5NWzBPUs9NeaxvJogpZLviZ2A
+         lCPKFC07CV5KeAGbv/eEfheGp25f/z+LR2e9BwKy5H8C0MyUhMlJY534e+BPqjpeUV/B
+         zYzft1MLpC2iMl9BAnF/OBWFz615DoJiJS99jPMYNZAwooTAG7Mvq/g7NrCARUzph1oD
+         5eXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVRQAyjsD2J9/WDO7+48zED7a+Nd68MZXPMSKgIc5SzQyE60G1h5JciAgheM8tbbov717b9XmE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyHWzwpAerngXnJTBKKr3Slydme4exwqFHhVxFLq+PCI4xS6XSX
+	+kZ9Ml3JDQQKQH+8zuF4uU/XQqEqt0sahgH+V1IFhuNAF56pikyT9W2+9sblOp5bUrA=
+X-Gm-Gg: ASbGncuSGFOUoLudkyT1fYF94khkrWW8yEYsohXSkS2DFLykBnSfr1f5rRFciEJeoah
+	wm/ZVc2X2AI0HgYAJLf9U67jzM96wyWm3Z//FCgsB0wT4ZC6qfi5oqUy0HlqS2U2ZePlf7gCnYH
+	LiAlg+9bAOLRmOmECvniHMhW5pXHao3/Tfy/V4gcdge4ZJRaoUWUZzo8aJ9VZrys9383o83iGCf
+	1PvLkPknOiNqNKs5xnraWqB/H7WG/9HcZmaeRnvdbmhl+Z9mS8KnozXCLhytkkYMK4L1qE7fkBH
+	EROFLwNM6qR2eaYbUCtRTVAFRqVx+LbEf2MP1GoTGzinxXZdeOTqEyST2p4BuK3MJXQnSgI6Ojb
+	WtTW/HWq9ubXLvByk3pfv2UfrujLkaMYlPtzSfKrThrvP0vbE/d2bmqVyZMAJVy4F86AWaSN/eQ
+	9RZXc1DhbK5AawQw==
+X-Google-Smtp-Source: AGHT+IFRXKZs5/2DM3+3kiNXkbk52MOjdWuG5THbqAxP2FWnWGBNPVkzgPQQurODQzOo7kyJEIWPlg==
+X-Received: by 2002:a05:6402:3551:b0:640:c779:909 with SMTP id 4fb4d7f45d1cf-6413f05a3demr3023096a12.27.1762519949785;
+        Fri, 07 Nov 2025 04:52:29 -0800 (PST)
+Received: from pathway.suse.cz ([176.114.240.130])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6411f8142b9sm3988302a12.12.2025.11.07.04.52.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Nov 2025 04:52:29 -0800 (PST)
+Date: Fri, 7 Nov 2025 13:52:27 +0100
+From: Petr Mladek <pmladek@suse.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: David Laight <david.laight.linux@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Junrui Luo <moonafterrain@outlook.com>,
+	linux-kernel@vger.kernel.org, rostedt@goodmis.org, tiwai@suse.com,
+	perex@perex.cz, linux-sound@vger.kernel.org, mchehab@kernel.org,
+	awalls@md.metrocast.net, linux-media@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH 1/4] lib/sprintf: add scnprintf_append() helper function
+Message-ID: <aQ3riwUO_3v3UOvj@pathway.suse.cz>
+References: <20251107051616.21606-1-moonafterrain@outlook.com>
+ <SYBPR01MB788110A77D7F0F7A27F0974FAFC3A@SYBPR01MB7881.ausprd01.prod.outlook.com>
+ <20251106213833.546c8eaba8aec6aa6a5e30b6@linux-foundation.org>
+ <20251107091246.4e5900f4@pumpkin>
+ <aQ29Zzajef81E2DZ@smile.fi.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-07_03,2025-11-06_01,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 mlxscore=0 suspectscore=0
- mlxlogscore=999 malwarescore=0 spamscore=0 adultscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2510240000
- definitions=main-2511070103
-X-Authority-Analysis: v=2.4 cv=BdrVE7t2 c=1 sm=1 tr=0 ts=690de8bc cx=c_pps
- a=XiAAW1AwiKB2Y8Wsi+sD2Q==:117 a=XiAAW1AwiKB2Y8Wsi+sD2Q==:17
- a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8
- a=q7LjOxSivl45Mpgk1VYA:9 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA2MDEzMyBTYWx0ZWRfX4rRXsLvQ6glp
- vLtyIJ09HHf/hjkFmBjbdfJzPAGulz25wvY7STW/SVBxNMnX4cpiVnhjJ5MKkGL+L5MbZWD1cZl
- wrL1awaKLhaSfyRcmjC2mBSva5NiUMFAHpf+3v4LAjpSBF81vC7hg6YYj4g748T5oJLH9NUrN4H
- SqqPKmvHOXyPo8NH+5Z1q3x4qmNT2T16ByJaurLFg+gs/FYv4xpk3zeth5Cf0Spr5qZ6ItDVjoJ
- PXgcecK5/wxmYrf37ym24H4xD6RywF3+87LusmW5vpkvnT/j3tINkKREgXCCgmkdSwlL/FHgSrW
- UcYP3+G817/gMm66Yy8Pyi1/X27V2TVamBY9DR/Iu7hnUr/Oa9YwEd9o3vovn0r/wBEghznRFAN
- FfiPYekPpPSBdNin8cGus7YVSy8h3w==
-X-Proofpoint-ORIG-GUID: -JigYjdm-M1TYjLkrH15ltF9tuy99P6m
-X-Proofpoint-GUID: -JigYjdm-M1TYjLkrH15ltF9tuy99P6m
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aQ29Zzajef81E2DZ@smile.fi.intel.com>
 
-- Fix a typo in the ice_fdir_has_frag() kernel-doc comment ("is" -> "if")
+On Fri 2025-11-07 11:35:35, Andy Shevchenko wrote:
+> On Fri, Nov 07, 2025 at 09:12:46AM +0000, David Laight wrote:
+> > On Thu, 6 Nov 2025 21:38:33 -0800
+> > Andrew Morton <akpm@linux-foundation.org> wrote:
+> > > On Fri,  7 Nov 2025 13:16:13 +0800 Junrui Luo <moonafterrain@outlook.com> wrote:
+> 
+> ...
+> 
+> > That is true for all the snprintf() functions.
+> > 
+> > > I wonder if we should instead implement a kasprintf() version of this
+> > > which reallocs each time and then switch all the callers over to that.
+> > 
+> > That adds the cost of a malloc, and I, like kasprintf() probably ends up
+> > doing all the work of snprintf twice.
+> > 
+> > I'd be tempted to avoid the strlen() by passing in the offset.
+> > So (say):
+> > #define scnprintf_at(buf, len, off, ...) \
+> > 	scnprintf((buf) + off, (len) - off, __VA_ARGS__)
 
-- Correct the NVM erase error message format string from "0x02%x" to
-  "0x%02x" so the module value is printed correctly.
+It does not handle correctly the situation when len < off.
+Othersise, it looks good.
 
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
----
- drivers/net/ethernet/intel/ice/ice_fdir.c      | 2 +-
- drivers/net/ethernet/intel/ice/ice_fw_update.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+> > Then you can chain calls, eg:
+> > 	off = scnprintf(buf, sizeof buf, ....);
+> > 	off += scnprintf_at(buf, sizeof buf, off, ....);
+> 
+> I like this suggestion. Also note, that the original implementation works directly
+> on static buffers.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_fdir.c b/drivers/net/ethernet/intel/ice/ice_fdir.c
-index 26b357c0ae15..ec73088ef37b 100644
---- a/drivers/net/ethernet/intel/ice/ice_fdir.c
-+++ b/drivers/net/ethernet/intel/ice/ice_fdir.c
-@@ -1121,7 +1121,7 @@ ice_fdir_get_gen_prgm_pkt(struct ice_hw *hw, struct ice_fdir_fltr *input,
-  * ice_fdir_has_frag - does flow type have 2 ptypes
-  * @flow: flow ptype
-  *
-- * returns true is there is a fragment packet for this ptype
-+ * returns true if there is a fragment packet for this ptype
-  */
- bool ice_fdir_has_frag(enum ice_fltr_ptype flow)
- {
-diff --git a/drivers/net/ethernet/intel/ice/ice_fw_update.c b/drivers/net/ethernet/intel/ice/ice_fw_update.c
-index d86db081579f..973a13d3d92a 100644
---- a/drivers/net/ethernet/intel/ice/ice_fw_update.c
-+++ b/drivers/net/ethernet/intel/ice/ice_fw_update.c
-@@ -534,7 +534,7 @@ ice_erase_nvm_module(struct ice_pf *pf, u16 module, const char *component,
- 	}
- 
- 	if (completion_retval) {
--		dev_err(dev, "Firmware failed to erase %s (module 0x02%x), aq_err %s\n",
-+		dev_err(dev, "Firmware failed to erase %s (module 0x%02x), aq_err %s\n",
- 			component, module,
- 			libie_aq_str((enum libie_aq_err)completion_retval));
- 		NL_SET_ERR_MSG_MOD(extack, "Firmware failed to erase flash");
--- 
-2.50.1
+I would prefer this as well. IMHO, it encourages people to write a better code.
 
+Best Regards,
+Petr
 
