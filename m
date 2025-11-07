@@ -1,239 +1,140 @@
-Return-Path: <netdev+bounces-236735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2139C3F833
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 11:39:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5098DC3F8AE
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 11:43:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B7C1E4F0454
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 10:36:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7994D3B5FD2
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 10:37:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D04F132BF55;
-	Fri,  7 Nov 2025 10:36:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="pYufGIN7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F06EA2FB0B2;
+	Fri,  7 Nov 2025 10:37:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D64B290D81;
-	Fri,  7 Nov 2025 10:36:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A6AF2E1F02
+	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 10:37:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762511811; cv=none; b=n1ETVLEnptwYDjhQ2DX1nSFfygCzw7kH6xR9FSJs/0E7Eb+ELyzWM+OkDLTT7Od8OSCjx3KS9vdaU5QciIFRTGc0rhCfqQzzBvx8OeWKJLdu4pEj7JOtK7E4ClVHi3QyC2X22mBlfL7SSB4oQpkt+FUKBg+9hCRkD6VYps6S5Ms=
+	t=1762511832; cv=none; b=J6OM4NNOCzPfw7Pwvt1Z7MG71dYahvyYijt84aUCitiQYuhj7Eley9ttp3M0eHHo01a6VnLr+9ELJ90f+4mx6r/9Lu2UiH3oukP/XTU5SOlN1LVeU354CKY9wfBWxKJeQRxY2QnbjiYUytsjE5xVAAIPlo7o+WugLiBEa9KmpLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762511811; c=relaxed/simple;
-	bh=W3XA4O4boMpqyIDRv4Vw7fYsHQbOO+0xJ0SlKyYcqI0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gJeLeR27aFLRANU692wfcH0K3PKE8y8+Zq1Ps0H/d3njU4W3QN83UyYLCwa/g+FPGrEL/sQsEOkAujqdbwlT4W78lyuPjGvSJy72Tnc/rlKkMdYg18BrDO6jRlww8xyA/ITn68YGVtZtdgG3Fmj7MqV87iatEmvER9NHY1ro2H8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=pYufGIN7; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1762511806;
-	bh=W3XA4O4boMpqyIDRv4Vw7fYsHQbOO+0xJ0SlKyYcqI0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=pYufGIN7RYAeRlellj6N2gZSHDdPM/SyGPzwncHtmDa3CybeRRFucgw8OAIhNnmLo
-	 /9gukKEt1mLLCxvDb964d14ur0TsHUks6z6L/+6Eq/w+VNenF3jWckg3RG1MDOLTq6
-	 GqpHMmLKrT/yzbcd2Qip7j4u7wdher+hX1WDr6Q6oIStNzkz5IzWcPDMrWHXEKi0/X
-	 gywJc5QADo3ZfucXonoeoilwp9h/oVkhmbXD+XfhQFokN1FF/ioQAnXCjrOAxovXfe
-	 iPtuh3bWr8GTf6q9vPLEs36wxgqk7YBUaVglgujSp+L8HyAnUviL1kgNRGk+s19XGU
-	 ydOsrMZath9dw==
-Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id BC34A17E0364;
-	Fri,  7 Nov 2025 11:36:45 +0100 (CET)
-Message-ID: <6f1bbbc7-ca54-43f9-953d-725902af7b10@collabora.com>
-Date: Fri, 7 Nov 2025 11:36:45 +0100
+	s=arc-20240116; t=1762511832; c=relaxed/simple;
+	bh=eMf/eH5g9+qHAMb+8wJaNUcxZgYuiICqmFLPZFnpo4s=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ebsksWhLOvBbez63V2R1NiXK8Qh5UP2dOIHgSBaGJnOgjjZzRAZ1BljkKwOqU4Kkoc2atauyhG1ley7sjbNFtc74WT3fJgHusTDtzUHfDy4c8MejJ33AUuRPFc1t0ey+uUX8M50Tsft9daNy8zcUV9P7ipoqUSffvTO5qUtOUjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b626a4cd9d6so93807366b.3
+        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 02:37:10 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762511828; x=1763116628;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PYxPX39aiXPG9LpO5fBpAwbvm12lOvNOQqkacwnET/I=;
+        b=YgZYnsrh1WD10umx8Muvpc7Ni2nz72WUhaFGjHB3QoweHGyBC10QD2LCrFmgs0/v35
+         KUaxv6JDtFMSzYCxLPBGqNGxR95czvlY8iunE4aiKnMR+MPsVnnx855DGol2PJxfW0Zm
+         LXNxXD3WGAs9i2wUKOdGQFCnrW1LAeHPjD1fiFe9wd1LuaUmOW2k11On+SkfZtlahQLj
+         3KIf/VW8fUSnoMxrHJUt/GZ0C5FOKIMuh+Z3pyyiGqUKn2ECcOizwvl4uJnF3s+95QGu
+         bkpITyopFZ6KPtK017KheX2W0Z0Q5j7UyOD0rOIUu5erWqpXC7iBM6M0ogWBFm3dfs7e
+         hMMw==
+X-Gm-Message-State: AOJu0YwbYHx8Vp/SDke3thBoUxAK0oBnOsQguvPxppd2x1xwFSQif6Yx
+	d1MqhKCoLpJIJCkmvMgOwS6W3gfTMIWw0PAOWo3pY7CjpFxuRdS8/bCs
+X-Gm-Gg: ASbGncvlLUfr0+uAae5GDwTkg8eTKRXObD1daB+vmaPtY572QNtpfDIWyLqeMRJL2e0
+	7mjtduPQB9yEqN0UeL+Qi01wAlXtdeqo4vgdkVpHsTo93UTfJiPASMXJDaDVbEu8bbFi5Ktb+Sh
+	g2OCozpExAicrui94xxzwvGL7gVVLuqDapLtSiyS12JEyaycSBjBGPCki1PDXsqAyEuIrzHU5jo
+	z1Ez2fYTyAULhKhYR/wNVCojOw1C8GfaMpSaCQ+zFZEKUA6ICYEX1PbNTuWBwt6eJbZj55QBl4q
+	zHfi3ApJluAGeeAFhu8mMmhbHuYpuRAvTjLBJqkPhvd1MXlm4Kdm8wP7809pNEYfAvDmy87ZMJ5
+	KqJnea9QnmgQsaKoQ1WZTpVF3FCBTg86vk2KmoO913BAmIrlOGoYCwo5MteBZVbW3IiaCj2uJ9+
+	7o
+X-Google-Smtp-Source: AGHT+IHspdoeRYSgkuMSLcqAikqjJkVsvNpM0VSajCVJYUAsUVB3DD3T7XeSecb7Mxuf0FOhKTcU7Q==
+X-Received: by 2002:a17:907:7f26:b0:b5c:835d:8d2a with SMTP id a640c23a62f3a-b72c092858bmr300722366b.15.1762511828356;
+        Fri, 07 Nov 2025 02:37:08 -0800 (PST)
+Received: from localhost ([2a03:2880:30ff:7::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b72bf980112sm204583766b.40.2025.11.07.02.37.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Nov 2025 02:37:07 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+Date: Fri, 07 Nov 2025 02:36:59 -0800
+Subject: [PATCH net-next] tg3: Fix num of RX queues being reported by
+ ethtool
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 20/21] pmdomain: mediatek: Add bus protect control flow
- for MT8189
-To: "irving.ch.lin" <irving-ch.lin@mediatek.com>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
- <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
- Ulf Hansson <ulf.hansson@linaro.org>,
- Richard Cochran <richardcochran@gmail.com>
-Cc: Qiqi Wang <qiqi.wang@mediatek.com>, linux-clk@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- linux-pm@vger.kernel.org, netdev@vger.kernel.org,
- Project_Global_Chrome_Upstream_Group@mediatek.com, sirius.wang@mediatek.com,
- vince-wl.liu@mediatek.com, jh.hsu@mediatek.com
-References: <20251106124330.1145600-1-irving-ch.lin@mediatek.com>
- <20251106124330.1145600-21-irving-ch.lin@mediatek.com>
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Content-Language: en-US
-In-Reply-To: <20251106124330.1145600-21-irving-ch.lin@mediatek.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20251107-tg3_counts-v1-1-337fe5c8ccb7@debian.org>
+X-B4-Tracking: v=1; b=H4sIAMrLDWkC/x3MQQqDMBAF0KsMf23ARLRtrlKKaDLa2YwliUWQ3
+ F3wHeCdyJyEMzydSPyXLJvCk20I4TvpykYiPMG1rre2fZiydmPYdi3ZvPqnczzEZZgDGsIv8SL
+ Hnb2hXIzyUfCp9QJZAQ7SZgAAAA==
+X-Change-ID: 20251107-tg3_counts-95822e6df6bc
+To: Pavan Chebbi <pavan.chebbi@broadcom.com>, 
+ Michael Chan <mchan@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ kernel-team@meta.com, Breno Leitao <leitao@debian.org>, 
+ Michael Chan <michael.chan@broadcom.com>
+X-Mailer: b4 0.15-dev-dd21f
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1290; i=leitao@debian.org;
+ h=from:subject:message-id; bh=eMf/eH5g9+qHAMb+8wJaNUcxZgYuiICqmFLPZFnpo4s=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpDcvS2ZNuAaHikm+jUDd5hWH3bnoEtJvSSMXC/
+ h1DfqotJ4SJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaQ3L0gAKCRA1o5Of/Hh3
+ bR9LEAChuJJn+gSKpu642uFSOYhLg5VmxV7dogz+nKSv7HKlDkfVsAyysneU9k3Q2rsM+/nXfYI
+ Tww9Xr2HjUIS/SyxrF9lYT+GcwJnVNPXc96mV70mL+W0Ex0pJvXNF/y5U4Gyz4yhlQnSPps5ElC
+ lf3w1J9wRhTdE1xOpvymF79jpjK9HvfOo8t/AqPzF+JdDpKEXuJWhVCyTySmOAcjObi4tRgBG3k
+ r2KZAYnKMqD1rVBmIKX7RYoYvVG3JaG8GirQ4DB6hYA/ik7f5xyYY//QajMDRT01rossbzJE1I1
+ txALD0imLrg+osQO+oBmKwKt9NjWmq7S/fmXzESoRqCpvWa0cGwKeqVKA/sZzut7cM0zTjFz3jr
+ ++brtuBRaHIvxa17M8Ih8MFCPqymRhqFCfntwV6Znh8ftn9LoTM/awdXkFjYPheYN66qbsCD0SK
+ Q61cogyFw4l7j3oKeK4BQ6GqLr/Kcq6ex7/QetXNGdjLuqww+a7Cn45FtYUb3YzcCWWoppjS4ok
+ REagAT2s1vP+NydpicJSwk2++lNT366QJ5nTFN5af1FvRmbuX5uOCtaYS4Q7uxXlkX+bPuWBenr
+ P2AKfFpy+aQpXQtDHHlJEMjVwN4JqmaqCBe/Xl4iVwTsENeKnYcwRnJ6kanJlh+v82BbuaaJgqT
+ G71kGjxJJnr8WsA==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-Il 06/11/25 13:42, irving.ch.lin ha scritto:
-> From: Irving-CH Lin <irving-ch.lin@mediatek.com>
-> 
-> In MT8189 mminfra power domain, the bus protect policy separates
-> into two parts, one is set before subsys clocks enabled, and another
-> need to enable after subsys clocks enable.
-> 
-> Signed-off-by: Irving-CH Lin <irving-ch.lin@mediatek.com>
-> ---
->   drivers/pmdomain/mediatek/mtk-pm-domains.c | 31 ++++++++++++++++++----
->   drivers/pmdomain/mediatek/mtk-pm-domains.h |  5 ++++
->   2 files changed, 31 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/pmdomain/mediatek/mtk-pm-domains.c b/drivers/pmdomain/mediatek/mtk-pm-domains.c
-> index 164c6b519af3..222846e52daf 100644
-> --- a/drivers/pmdomain/mediatek/mtk-pm-domains.c
-> +++ b/drivers/pmdomain/mediatek/mtk-pm-domains.c
-> @@ -250,7 +250,7 @@ static int scpsys_bus_protect_set(struct scpsys_domain *pd,
->   					MTK_POLL_DELAY_US, MTK_POLL_TIMEOUT);
->   }
->   
-> -static int scpsys_bus_protect_enable(struct scpsys_domain *pd)
-> +static int scpsys_bus_protect_enable(struct scpsys_domain *pd, u8 flags)
->   {
->   	for (int i = 0; i < SPM_MAX_BUS_PROT_DATA; i++) {
->   		const struct scpsys_bus_prot_data *bpd = &pd->data->bp_cfg[i];
-> @@ -259,6 +259,10 @@ static int scpsys_bus_protect_enable(struct scpsys_domain *pd)
->   		if (!bpd->bus_prot_set_clr_mask)
->   			break;
->   
-> +		if ((bpd->flags & BUS_PROT_IGNORE_SUBCLK) !=
-> +		    (flags & BUS_PROT_IGNORE_SUBCLK))
-> +			continue;
-> +
->   		if (bpd->flags & BUS_PROT_INVERTED)
->   			ret = scpsys_bus_protect_clear(pd, bpd);
->   		else
-> @@ -270,7 +274,7 @@ static int scpsys_bus_protect_enable(struct scpsys_domain *pd)
->   	return 0;
->   }
->   
-> -static int scpsys_bus_protect_disable(struct scpsys_domain *pd)
-> +static int scpsys_bus_protect_disable(struct scpsys_domain *pd, u8 flags)
->   {
->   	for (int i = SPM_MAX_BUS_PROT_DATA - 1; i >= 0; i--) {
->   		const struct scpsys_bus_prot_data *bpd = &pd->data->bp_cfg[i];
-> @@ -279,6 +283,10 @@ static int scpsys_bus_protect_disable(struct scpsys_domain *pd)
->   		if (!bpd->bus_prot_set_clr_mask)
->   			continue;
->   
-> +		if ((bpd->flags & BUS_PROT_IGNORE_SUBCLK) !=
+Using num_online_cpus() to report number of queues is actually not
+correct, as reported by Michael[1].
 
-Is that the right name for this flag?
+netif_get_num_default_rss_queues() was used to replace num_online_cpus()
+in the past, but tg3 ethtool callbacks didn't get converted. Doing it
+now.
 
-As far as I understand, you have to set bus protection in two steps, right?
-So in the first step you're setting bus protection for the MM_INFRA and for
-MM_INFRA_2ND - and in the second step you're setting MM_INFRA_IGN and 2_IGN.
+Link: https://lore.kernel.org/all/CACKFLim7ruspmqvjr6bNRq5Z_XXVk3vVaLZOons7kMCzsEG23A@mail.gmail.com/#t [1]
 
-So the first step (the prots with BUS_PROT_IGNORE_SUBCLK) unlocks SUBSYS clks
-and SRAM ISO access, the second one does the rest.
+Signed-off-by: Breno Leitao <leitao@debian.org>
+Suggested-by: Michael Chan <michael.chan@broadcom.com>
+---
+ drivers/net/ethernet/broadcom/tg3.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I think that a better name for this, at this point would be...
+diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
+index fa58c3ffceb06..e21f7c6a6de70 100644
+--- a/drivers/net/ethernet/broadcom/tg3.c
++++ b/drivers/net/ethernet/broadcom/tg3.c
+@@ -12729,7 +12729,7 @@ static u32 tg3_get_rx_ring_count(struct net_device *dev)
+ 	if (netif_running(tp->dev))
+ 		return tp->rxq_cnt;
+ 
+-	return min(num_online_cpus(), TG3_RSS_MAX_NUM_QS);
++	return min_t(u32, netif_get_num_default_rss_queues(), tp->rxq_max);
+ }
+ 
+ static u32 tg3_get_rxfh_indir_size(struct net_device *dev)
 
-if ((bpd->flags & local_flags) & BUS_PROT_SRAM_PROTECTION)
-	continue;
+---
+base-commit: 6fc33710cd6c55397e606eeb544bdf56ee87aae5
+change-id: 20251107-tg3_counts-95822e6df6bc
 
-What do you think?
-
-Regards,
-Angelo
-
-> +		    (flags & BUS_PROT_IGNORE_SUBCLK))
-> +			continue;
-> +
->   		if (bpd->flags & BUS_PROT_INVERTED)
->   			ret = scpsys_bus_protect_set(pd, bpd);
->   		else
-> @@ -632,6 +640,15 @@ static int scpsys_power_on(struct generic_pm_domain *genpd)
->   	if (ret)
->   		goto err_pwr_ack;
->   
-> +	/*
-> +	 * In MT8189 mminfra power domain, the bus protect policy separates
-> +	 * into two parts, one is set before subsys clocks enabled, and another
-> +	 * need to enable after subsys clocks enable.
-> +	 */
-> +	ret = scpsys_bus_protect_disable(pd, BUS_PROT_IGNORE_SUBCLK);
-> +	if (ret < 0)
-> +		goto err_pwr_ack;
-> +
->   	/*
->   	 * In few Mediatek platforms(e.g. MT6779), the bus protect policy is
->   	 * stricter, which leads to bus protect release must be prior to bus
-> @@ -648,7 +665,7 @@ static int scpsys_power_on(struct generic_pm_domain *genpd)
->   	if (ret < 0)
->   		goto err_disable_subsys_clks;
->   
-> -	ret = scpsys_bus_protect_disable(pd);
-> +	ret = scpsys_bus_protect_disable(pd, 0);
->   	if (ret < 0)
->   		goto err_disable_sram;
->   
-> @@ -662,7 +679,7 @@ static int scpsys_power_on(struct generic_pm_domain *genpd)
->   	return 0;
->   
->   err_enable_bus_protect:
-> -	scpsys_bus_protect_enable(pd);
-> +	scpsys_bus_protect_enable(pd, 0);
->   err_disable_sram:
->   	scpsys_sram_disable(pd);
->   err_disable_subsys_clks:
-> @@ -683,7 +700,7 @@ static int scpsys_power_off(struct generic_pm_domain *genpd)
->   	bool tmp;
->   	int ret;
->   
-> -	ret = scpsys_bus_protect_enable(pd);
-> +	ret = scpsys_bus_protect_enable(pd, 0);
->   	if (ret < 0)
->   		return ret;
->   
-> @@ -697,6 +714,10 @@ static int scpsys_power_off(struct generic_pm_domain *genpd)
->   
->   	clk_bulk_disable_unprepare(pd->num_subsys_clks, pd->subsys_clks);
->   
-> +	ret = scpsys_bus_protect_enable(pd, BUS_PROT_IGNORE_SUBCLK);
-> +	if (ret < 0)
-> +		return ret;
-> +
->   	if (MTK_SCPD_CAPS(pd, MTK_SCPD_MODEM_PWRSEQ))
->   		scpsys_modem_pwrseq_off(pd);
->   	else
-> diff --git a/drivers/pmdomain/mediatek/mtk-pm-domains.h b/drivers/pmdomain/mediatek/mtk-pm-domains.h
-> index f608e6ec4744..a5dca24cbc2f 100644
-> --- a/drivers/pmdomain/mediatek/mtk-pm-domains.h
-> +++ b/drivers/pmdomain/mediatek/mtk-pm-domains.h
-> @@ -56,6 +56,7 @@ enum scpsys_bus_prot_flags {
->   	BUS_PROT_REG_UPDATE = BIT(1),
->   	BUS_PROT_IGNORE_CLR_ACK = BIT(2),
->   	BUS_PROT_INVERTED = BIT(3),
-> +	BUS_PROT_IGNORE_SUBCLK = BIT(4),
->   };
->   
->   enum scpsys_bus_prot_block {
-> @@ -95,6 +96,10 @@ enum scpsys_bus_prot_block {
->   		_BUS_PROT(_hwip, _mask, _set, _clr, _mask, _sta,	\
->   			  BUS_PROT_REG_UPDATE)
->   
-> +#define BUS_PROT_WR_IGN_SUBCLK(_hwip, _mask, _set, _clr, _sta)		\
-> +		_BUS_PROT(_hwip, _mask, _set, _clr, _mask, _sta,	\
-> +			  BUS_PROT_IGNORE_CLR_ACK | BUS_PROT_IGNORE_SUBCLK)
-> +
->   #define BUS_PROT_INFRA_UPDATE_TOPAXI(_mask)			\
->   		BUS_PROT_UPDATE(INFRA, _mask,			\
->   				INFRA_TOPAXI_PROTECTEN,		\
-
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
 
 
