@@ -1,86 +1,108 @@
-Return-Path: <netdev+bounces-236585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A302C3E22A
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 02:33:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CADEC3E29C
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 02:50:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 14CD94E7616
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 01:33:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EF21188C13C
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 01:51:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AE4C2F1FE1;
-	Fri,  7 Nov 2025 01:33:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7410A2EFDA2;
+	Fri,  7 Nov 2025 01:50:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HZDtFRxT"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="afxGjvyD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE7B262FFC;
-	Fri,  7 Nov 2025 01:33:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49CF820C037;
+	Fri,  7 Nov 2025 01:50:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762479205; cv=none; b=nStleW1gBe8G2B6xWPAy59Od0OpBk++EcIHVKznRDsK2EkGOUo+kXRVQCmbrBxdUAPM/YaTeeH6wUYZKGrpBDrFLSYuD7CAKmNaaV4zIC/yavtLF7RtwJ6mSDHOXPV+BnZeFxXAqohTVjNIkyDaVvXc8ponHoktDDn8LDMtvzik=
+	t=1762480242; cv=none; b=LQSDBPU7tup/zGivPLTZbMZ5KWDSh+xJh5IZ2Vw4/TbpgaPVKSBL18YhfGw1iIPr2YrQ8fygm7t5+Z8y8CRF4jgWTS71CYJ4hYtDyyajyzs4CKZWhh0c8utCjNMyue7+xIQu3ieMmlOUSEzpJDJSqmQPi/bP5XK+CZ8wWBPxTps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762479205; c=relaxed/simple;
-	bh=PK7Z65DZGnYLDCAiL5Ph+9HVPYcOYAtAYKPp1a9+thY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dgUwFDBhe1NDhbiAJVuQSTbzL7w0PyTuMqJXUdKAgNPsW9yveaz+0k6QSqaX0RO+ucxV6RJk1qtL7DB9rwEey5x+CJCJEjCTOeeS/748HZHnDQxdPyWS2fQOXRn0rsQsNMejEp7a+oSBWlKZqDUPdA5JYYilR7VcoCpKqwNV3JY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HZDtFRxT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2743CC116C6;
-	Fri,  7 Nov 2025 01:33:23 +0000 (UTC)
+	s=arc-20240116; t=1762480242; c=relaxed/simple;
+	bh=Xq51Z/9D2fZDatgMXKL0KxpS0FoLycB7VoFYeF3j0NQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=a0f2dTIWP7V5YNweYCnyLr4Lg5qW1m2jRQLfHcZwFDdjuwdN1hr+sTv733RDzwcntseFLd+kUp5ADVoHj03mkY+sBQbZNy5oHGhHJ9eVxxwpDcUdXzxfNe22G1BTW+G2qrQQW4ZrUMwGZqJh2wZxq2soV9BI2FoPvvFbOMiNDRc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=afxGjvyD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3C40C4CEF7;
+	Fri,  7 Nov 2025 01:50:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762479205;
-	bh=PK7Z65DZGnYLDCAiL5Ph+9HVPYcOYAtAYKPp1a9+thY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HZDtFRxTxzd3xikS/f+aycu7YIXmI9UGBNqjJz6+mH/rWmM5sdTd2jsJMxzcCdzq2
-	 hyDD7hww9hoFo5X224lwyesdTFd3RRyYt3gp0GGgs7Uhe+GOyUeZZj+wSkl469Kh3q
-	 TSiNFhkZ6AAHXrCeg54DIWesWe6qwatLr5UXZ5XhbnUmacVzzwf79bZz9Zms3ooyP4
-	 kcRrom2suZUgXqhwfDEcvFI1pUj4YyTVaUX2gMSPvI/uC0JfIDRpT/WRkIDWLW9HBm
-	 82ZMVREYe5M7qwXkVriF+ggbDIg/oN1dLDh3xCTKsX1Ko0LLnuHQ4/BSTEO0jOzvab
-	 LPE5mWFmXkW7g==
-Date: Thu, 6 Nov 2025 17:33:20 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Byungchul Park <byungchul@sk.com>
-Cc: linux-mm@kvack.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
- harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
- davem@davemloft.net, hawk@kernel.org, john.fastabend@gmail.com,
- sdf@fomichev.me, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
- mbloch@nvidia.com, andrew+netdev@lunn.ch, edumazet@google.com,
- pabeni@redhat.com, akpm@linux-foundation.org, david@redhat.com,
- lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
- rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org,
- jackmanb@google.com, hannes@cmpxchg.org, ziy@nvidia.com,
- ilias.apalodimas@linaro.org, willy@infradead.org, brauner@kernel.org,
- kas@kernel.org, yuzhao@google.com, usamaarif642@gmail.com,
- baolin.wang@linux.alibaba.com, almasrymina@google.com, toke@redhat.com,
- asml.silence@gmail.com, bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
- sfr@canb.auug.org.au, dw@davidwei.uk, ap420073@gmail.com,
- dtatulea@nvidia.com
-Subject: Re: [RFC mm v5 1/2] page_pool: check nmdesc->pp to see its usage as
- page pool for net_iov not page-backed
-Message-ID: <20251106173320.2f8e683a@kernel.org>
-In-Reply-To: <20251103075108.26437-2-byungchul@sk.com>
-References: <20251103075108.26437-1-byungchul@sk.com>
-	<20251103075108.26437-2-byungchul@sk.com>
+	s=k20201202; t=1762480241;
+	bh=Xq51Z/9D2fZDatgMXKL0KxpS0FoLycB7VoFYeF3j0NQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=afxGjvyDQkcynlOHFmuYaA8bA0ELkiZO3OVHeiI/ZLaV8Evb1QgXFOF/OjvpUirpI
+	 VkSjiHKXJNqt1SnlNx5z+VeRALHg6Pf4sZTaQlyncsjgUoW5Su7Hp+9CdrOxAPoKDb
+	 gIEc6auI/rkDePtrCvDlxcyR6M80MbbYQNy9KhffhJG3Bi/ICodlsn7aKaq/DCcUfo
+	 OtEL7kj1eMp2NUbqVZFKvf1oe3xmKKUMMe0x7EPs4MNIVpm0psL7xvMd6ADdrtso7O
+	 UKwGUbLeKyE2bBc9OehxwgahyYK0llr8eM34Lvg01KG1jQJYzNS6zj8wrv/nLDRr7V
+	 ZmsQL344pMLDQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDA539EF976;
+	Fri,  7 Nov 2025 01:50:15 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [net-next,v2 0/7] net: renesas: Cleanup usage of gPTP flags
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176248021450.451816.5444160112650392345.git-patchwork-notify@kernel.org>
+Date: Fri, 07 Nov 2025 01:50:14 +0000
+References: <20251104222420.882731-1-niklas.soderlund+renesas@ragnatech.se>
+In-Reply-To: <20251104222420.882731-1-niklas.soderlund+renesas@ragnatech.se>
+To: =?utf-8?q?Niklas_S=C3=B6derlund_=3Cniklas=2Esoderlund+renesas=40ragnatech=2E?=@codeaurora.org,
+	=?utf-8?q?se=3E?=@codeaurora.org
+Cc: paul@pbarker.dev, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ yoshihiro.shimoda.uh@renesas.com, geert+renesas@glider.be,
+ magnus.damm@gmail.com, richardcochran@gmail.com, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org
 
-On Mon,  3 Nov 2025 16:51:07 +0900 Byungchul Park wrote:
-> However, for net_iov not
-> page-backed, the identification cannot be based on the page_type.
-> Instead, nmdesc->pp can be used to see if it belongs to a page pool, by
-> making sure nmdesc->pp is NULL otherwise.
+Hello:
 
-Please explain why. Isn't the type just a value in a field?
-Which net_iov could also set accordingly.. ?
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue,  4 Nov 2025 23:24:13 +0100 you wrote:
+> Hello,
+> 
+> This series aim is to prepare for future work that will enable the use
+> of gPTP on R-Car RAVB on Gen4. Currently RAVB have a dedicated gPTP
+> implementation supported on Gen2 and Gen3 (ravb_ptp.c). For Gen4 a new
+> implementation that is already upstream (rcar_gen4_ptp.c) and used by
+> other Gen4 devices such as RTSN and RSWITCH is needed.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v2,1/7] net: rswitch: Move definition of S4 gPTP offset
+    https://git.kernel.org/netdev/net-next/c/e98d8792929d
+  - [net-next,v2,2/7] net: rcar_gen4_ptp: Move control fields to users
+    https://git.kernel.org/netdev/net-next/c/50ab1c6becde
+  - [net-next,v2,3/7] net: rswitch: Use common defines for time stamping control
+    https://git.kernel.org/netdev/net-next/c/b314e4f7a9d9
+  - [net-next,v2,4/7] net: rtsn: Use common defines for time stamping control
+    https://git.kernel.org/netdev/net-next/c/e43791f40b81
+  - [net-next,v2,5/7] net: rcar_gen4_ptp: Remove unused defines
+    https://git.kernel.org/netdev/net-next/c/3614d249d1da
+  - [net-next,v2,6/7] net: ravb: Break out Rx hardware timestamping
+    https://git.kernel.org/netdev/net-next/c/5ce97b8d6132
+  - [net-next,v2,7/7] net: ravb: Use common defines for time stamping control
+    https://git.kernel.org/netdev/net-next/c/16e2e6cf75e6
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
