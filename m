@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-236549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59E65C3DF26
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 01:09:12 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C32EC3DF29
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 01:09:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 119663AF4A1
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 00:09:11 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EB6674E59CE
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 00:09:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD9D81DE2D8;
-	Fri,  7 Nov 2025 00:09:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1E4D1E8329;
+	Fri,  7 Nov 2025 00:09:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cHPWiBb8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kf6RUULZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89A571D61BC
-	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 00:09:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C8C41D61BC
+	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 00:09:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762474147; cv=none; b=XY5tdePWVxXnBKootyO90S8/PaRrzE82HKZcnWfPbuSOfUNs1o6PjjFhjsMOCfqY2YUwfjnokwZfP0A6ODsMPVzEFmF4ntDdElpYsMSpToCfUKEBKD21W2otP2shS955+YnZyiunpoiuzrV9F0IvHgtTeRYZkIYZSTnBWhYEDs0=
+	t=1762474149; cv=none; b=kGk2Gqepj05Bd9i98bb3DthAlks0ru36J5/b9Sghhg+ZarAWFKtRIvnd8SOtJ5YIPXzN+7B4k8pkBzF5trS+GDEoiVfZzde/06rqDzr6Rczp/yvZqm+amifzK+dz9ez+GYJc6AP8kERYYO045jgFd1wBK0IuCbuMQ2SfrwD/APY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762474147; c=relaxed/simple;
-	bh=qB3UJgZKO4pLe2klvg11v11rwr3rwA7JmxvTY26QNQ4=;
+	s=arc-20240116; t=1762474149; c=relaxed/simple;
+	bh=oP81PNwkIIKElhU0yfZftLgi3jPdmpAqHiqEHx34yyE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=g183KZ4KznGFU0Arg7xSzBJQT3xwSB5bjMyKJsQMlZZwcFDqVQAorrQ0xAWc80SjHu4M5/cZ69yxkrx/fN54qnjLR4wNkG06XPux49KmbznMRv1HqnzXrP7G46UR5Dd+6FiYys5ODezhbk6UzgfLOuLPevw6jVXDynOeoljGb94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cHPWiBb8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E98D1C4CEF7;
-	Fri,  7 Nov 2025 00:09:06 +0000 (UTC)
+	 MIME-Version; b=LNC7e2BtS/8X2Wb57aF6TiJdSnnhrUb6N78q2s1U3vh8d/0fSNlpYEWK+IF8Ydh8nOk4CokysvkJNzNgAoHzfz4SmJAD6p2R3DwTbTDMNmNmoCut+4j0bqK9KKEDOCPxj480t/Q8c0VYHwxd7l8JZ5V85stgwvd4CSXBmU7yQC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kf6RUULZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED825C4CEFB;
+	Fri,  7 Nov 2025 00:09:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762474147;
-	bh=qB3UJgZKO4pLe2klvg11v11rwr3rwA7JmxvTY26QNQ4=;
+	s=k20201202; t=1762474148;
+	bh=oP81PNwkIIKElhU0yfZftLgi3jPdmpAqHiqEHx34yyE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cHPWiBb8w6xGY1z3MKBl7xEJVUxf3YiS3wCY607WD3Sy/X7mhlwNq5v9KyRoNeRE5
-	 hRafIHvJUSHnDTg84FWfPoMHwAnyD3a1zVQKv5AzbVfJaR0opqnQcqpllsDrfsx/j7
-	 tSKodvNTxY2oNTCwXvrsa7dPslXxJpoFY0pE3e8oPRsGV6aW+IdN6nobwuv66IRzfw
-	 fAIhiCMndf1EmyaNcigHpP6U/phMWnxCw6+AeYk0rxDCCg/qC4rPLjbMydBY/hsa8B
-	 Ege+3o/MFSd0CdAmqNCglbFNu0RjyX8aLkbsWAoif/jLU7X/r73M5U/bYuR9aZTmLq
-	 YQqeyUukcn5lA==
+	b=kf6RUULZUiMrEiWjOsUrfVROdWM6mVSrl2h6PhXmtIV5GGzbE0hkUPcU/cpkbUhVu
+	 skm6HwYWfuhed9s+fNKwnfJmz/3YmNTK8lbWaDhhJGTCITly/24nWvYbYbz6Pt5XWT
+	 lwTJ8JuuhpiqM6eYWosKswumt8yWr3WbmCGdJMuHhdqfVSSIbAld+jhBxOUunOWlrU
+	 4sVQ//a+qgxdTypUFKxUfn49ulnqvBen+niINHW9C70i9pfSAAWRhUd4KsBoPeS/Ep
+	 alSo8DZ6qG+qlQsfcogWJhSvRww4LbFRs6erTfLUG7bQCpZkgFGKErihkIzCIjOOi4
+	 CQ3GvOJqmftzw==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -52,10 +52,11 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
 	Jiri Pirko <jiri@nvidia.com>,
-	mbloch@nvidia.com
-Subject: [PATCH net-next V2 1/3] devlink: Introduce switchdev_inactive eswitch mode
-Date: Thu,  6 Nov 2025 16:08:29 -0800
-Message-ID: <20251107000831.157375-2-saeed@kernel.org>
+	mbloch@nvidia.com,
+	Adithya Jayachandran <ajayachandra@nvidia.com>
+Subject: [PATCH net-next V2 2/3] net/mlx5: MPFS, add support for dynamic enable/disable
+Date: Thu,  6 Nov 2025 16:08:30 -0800
+Message-ID: <20251107000831.157375-3-saeed@kernel.org>
 X-Mailer: git-send-email 2.51.1
 In-Reply-To: <20251107000831.157375-1-saeed@kernel.org>
 References: <20251107000831.157375-1-saeed@kernel.org>
@@ -69,113 +70,238 @@ Content-Transfer-Encoding: 8bit
 
 From: Saeed Mahameed <saeedm@nvidia.com>
 
-Adds DEVLINK_ESWITCH_MODE_SWITCHDEV_INACTIVE attribute to UAPI and
-documentation.
+MPFS (Multi PF Switch) is enabled by default in Multi-Host environments,
+the driver keeps a list of desired unicast mac addresses of all vports
+(vfs/Sfs) and applied to HW via L2_table FW command.
 
-Before having traffic flow through an eswitch, a user may want to have the
-ability to block traffic towards the FDB until FDB is fully programmed and
-the user is ready to send traffic to it. For example: when two eswitches
-are present for vports in a multi-PF setup, one eswitch may take over the
-traffic from the other when the user chooses.
-Before this take over, a user may want to first program the inactive
-eswitch and then once ready redirect traffic to this new eswitch.
+Add API to dynamically apply the list of MACs to HW when needed for next
+patches, to utilize this new API in devlink eswitch active/in-active uAPI.
 
-switchdev modes transition semantics:
-
-legacy->switchdev_inactive: Create switchdev mode normally, traffic not
-  allowed to flow yet.
-
-switchdev_inactive->switchdev: Enable traffic to flow.
-
-switchdev->switchdev_inactive: Block traffic on the FDB, FDB and
-  representros state and content is preserved.
-
-When eswitch is configured to this mode, traffic is ignored/dropped on
-this eswitch FDB, while current configuration is kept, e.g FDB rules and
-netdev representros are kept available, FDB programming is allowed.
-
-Example:
- # start inactive switchdev
-devlink dev eswitch set pci/0000:08:00.1 mode switchdev_inactive
- # setup TC rules, representors etc ..
- # activate
-devlink dev eswitch set pci/0000:08:00.1 mode switchdev
-
+Issue: 4314625
+Change-Id: I185c144319e514f787811f556888e1b727bdbf35
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+Signed-off-by: Adithya Jayachandran <ajayachandra@nvidia.com>
 Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 ---
- Documentation/netlink/specs/devlink.yaml            |  2 ++
- .../networking/devlink/devlink-eswitch-attr.rst     | 13 +++++++++++++
- include/uapi/linux/devlink.h                        |  1 +
- net/devlink/netlink_gen.c                           |  2 +-
- 4 files changed, 17 insertions(+), 1 deletion(-)
+ .../ethernet/mellanox/mlx5/core/lib/mpfs.c    | 115 +++++++++++++++---
+ .../ethernet/mellanox/mlx5/core/lib/mpfs.h    |   9 ++
+ 2 files changed, 107 insertions(+), 17 deletions(-)
 
-diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
-index 3db59c965869..426d5aa7d955 100644
---- a/Documentation/netlink/specs/devlink.yaml
-+++ b/Documentation/netlink/specs/devlink.yaml
-@@ -99,6 +99,8 @@ definitions:
-         name: legacy
-       -
-         name: switchdev
-+      -
-+        name: switchdev-inactive
-   -
-     type: enum
-     name: eswitch-inline-mode
-diff --git a/Documentation/networking/devlink/devlink-eswitch-attr.rst b/Documentation/networking/devlink/devlink-eswitch-attr.rst
-index 08bb39ab1528..eafe09abc40c 100644
---- a/Documentation/networking/devlink/devlink-eswitch-attr.rst
-+++ b/Documentation/networking/devlink/devlink-eswitch-attr.rst
-@@ -39,6 +39,10 @@ The following is a list of E-Switch attributes.
-          rules.
-        * ``switchdev`` allows for more advanced offloading capabilities of
-          the E-Switch to hardware.
-+       * ``switchdev_inactive`` switchdev mode but starts inactive, doesn't allow traffic
-+         until explicitly activated. This mode is useful for orchestrators that
-+         want to prepare the device in switchdev mode but only activate it when
-+         all configurations are done.
-    * - ``inline-mode``
-      - enum
-      - Some HWs need the VF driver to put part of the packet
-@@ -74,3 +78,12 @@ Example Usage
- 
-     # enable encap-mode with legacy mode
-     $ devlink dev eswitch set pci/0000:08:00.0 mode legacy inline-mode none encap-mode basic
-+
-+    # start switchdev mode in inactive state
-+    $ devlink dev eswitch set pci/0000:08:00.0 mode switchdev_inactive
-+
-+    # setup switchdev configurations, representors, FDB entries, etc..
-+    ...
-+
-+    # activate switchdev mode to allow traffic
-+    $ devlink dev eswitch set pci/0000:08:00.0 mode switchdev
-diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
-index bcad11a787a5..157f11d3fb72 100644
---- a/include/uapi/linux/devlink.h
-+++ b/include/uapi/linux/devlink.h
-@@ -181,6 +181,7 @@ enum devlink_sb_threshold_type {
- enum devlink_eswitch_mode {
- 	DEVLINK_ESWITCH_MODE_LEGACY,
- 	DEVLINK_ESWITCH_MODE_SWITCHDEV,
-+	DEVLINK_ESWITCH_MODE_SWITCHDEV_INACTIVE,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.c
+index 4450091e181a..f27b5adb9606 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.c
+@@ -65,13 +65,14 @@ static int del_l2table_entry_cmd(struct mlx5_core_dev *dev, u32 index)
+ /* UC L2 table hash node */
+ struct l2table_node {
+ 	struct l2addr_node node;
+-	u32                index; /* index in HW l2 table */
++	int                index; /* index in HW l2 table */
+ 	int                ref_count;
  };
  
- enum devlink_eswitch_inline_mode {
-diff --git a/net/devlink/netlink_gen.c b/net/devlink/netlink_gen.c
-index 9fd00977d59e..5ad435aee29d 100644
---- a/net/devlink/netlink_gen.c
-+++ b/net/devlink/netlink_gen.c
-@@ -229,7 +229,7 @@ static const struct nla_policy devlink_eswitch_get_nl_policy[DEVLINK_ATTR_DEV_NA
- static const struct nla_policy devlink_eswitch_set_nl_policy[DEVLINK_ATTR_ESWITCH_ENCAP_MODE + 1] = {
- 	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
- 	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
--	[DEVLINK_ATTR_ESWITCH_MODE] = NLA_POLICY_MAX(NLA_U16, 1),
-+	[DEVLINK_ATTR_ESWITCH_MODE] = NLA_POLICY_MAX(NLA_U16, 2),
- 	[DEVLINK_ATTR_ESWITCH_INLINE_MODE] = NLA_POLICY_MAX(NLA_U8, 3),
- 	[DEVLINK_ATTR_ESWITCH_ENCAP_MODE] = NLA_POLICY_MAX(NLA_U8, 1),
+ struct mlx5_mpfs {
+ 	struct hlist_head    hash[MLX5_L2_ADDR_HASH_SIZE];
+ 	struct mutex         lock; /* Synchronize l2 table access */
++	bool                 enabled;
+ 	u32                  size;
+ 	unsigned long        *bitmap;
  };
+@@ -114,6 +115,8 @@ int mlx5_mpfs_init(struct mlx5_core_dev *dev)
+ 		return -ENOMEM;
+ 	}
+ 
++	mpfs->enabled = true;
++
+ 	dev->priv.mpfs = mpfs;
+ 	return 0;
+ }
+@@ -135,7 +138,7 @@ int mlx5_mpfs_add_mac(struct mlx5_core_dev *dev, u8 *mac)
+ 	struct mlx5_mpfs *mpfs = dev->priv.mpfs;
+ 	struct l2table_node *l2addr;
+ 	int err = 0;
+-	u32 index;
++	int index;
+ 
+ 	if (!mpfs)
+ 		return 0;
+@@ -148,30 +151,34 @@ int mlx5_mpfs_add_mac(struct mlx5_core_dev *dev, u8 *mac)
+ 		goto out;
+ 	}
+ 
+-	err = alloc_l2table_index(mpfs, &index);
+-	if (err)
+-		goto out;
+-
+ 	l2addr = l2addr_hash_add(mpfs->hash, mac, struct l2table_node, GFP_KERNEL);
+ 	if (!l2addr) {
+ 		err = -ENOMEM;
+-		goto hash_add_err;
++		goto out;
+ 	}
+ 
+-	err = set_l2table_entry_cmd(dev, index, mac);
+-	if (err)
+-		goto set_table_entry_err;
++	index = -1;
++
++	if (mpfs->enabled) {
++		err = alloc_l2table_index(mpfs, &index);
++		if (err)
++			goto hash_del;
++		err = set_l2table_entry_cmd(dev, index, mac);
++		if (err)
++			goto free_l2table_index;
++		mlx5_core_dbg(dev, "MPFS entry %pM, set @index (%d)\n",
++			      l2addr->node.addr, l2addr->index);
++	}
+ 
+ 	l2addr->index = index;
+ 	l2addr->ref_count = 1;
+ 
+ 	mlx5_core_dbg(dev, "MPFS mac added %pM, index (%d)\n", mac, index);
+ 	goto out;
+-
+-set_table_entry_err:
+-	l2addr_hash_del(l2addr);
+-hash_add_err:
++free_l2table_index:
+ 	free_l2table_index(mpfs, index);
++hash_del:
++	l2addr_hash_del(l2addr);
+ out:
+ 	mutex_unlock(&mpfs->lock);
+ 	return err;
+@@ -183,7 +190,7 @@ int mlx5_mpfs_del_mac(struct mlx5_core_dev *dev, u8 *mac)
+ 	struct mlx5_mpfs *mpfs = dev->priv.mpfs;
+ 	struct l2table_node *l2addr;
+ 	int err = 0;
+-	u32 index;
++	int index;
+ 
+ 	if (!mpfs)
+ 		return 0;
+@@ -200,12 +207,86 @@ int mlx5_mpfs_del_mac(struct mlx5_core_dev *dev, u8 *mac)
+ 		goto unlock;
+ 
+ 	index = l2addr->index;
+-	del_l2table_entry_cmd(dev, index);
++	if (index >= 0) {
++		del_l2table_entry_cmd(dev, index);
++		free_l2table_index(mpfs, index);
++		mlx5_core_dbg(dev, "MPFS entry %pM, deleted @index (%d)\n",
++			      mac, index);
++	}
+ 	l2addr_hash_del(l2addr);
+-	free_l2table_index(mpfs, index);
+ 	mlx5_core_dbg(dev, "MPFS mac deleted %pM, index (%d)\n", mac, index);
+ unlock:
+ 	mutex_unlock(&mpfs->lock);
+ 	return err;
+ }
+ EXPORT_SYMBOL(mlx5_mpfs_del_mac);
++
++int mlx5_mpfs_enable(struct mlx5_core_dev *dev)
++{
++	struct mlx5_mpfs *mpfs = dev->priv.mpfs;
++	struct l2table_node *l2addr;
++	struct hlist_node *n;
++	int err = 0;
++
++	if (!mpfs)
++		return -ENODEV;
++
++	mutex_lock(&mpfs->lock);
++	if (mpfs->enabled)
++		goto out;
++	mpfs->enabled = true;
++	mlx5_core_dbg(dev, "MPFS enabling mpfs\n");
++
++	mlx5_mpfs_foreach(l2addr, n, mpfs) {
++		u32 index;
++
++		err = alloc_l2table_index(mpfs, &index);
++		if (err) {
++			mlx5_core_err(dev, "Failed to allocated MPFS index for %pM, err(%d)\n",
++				      l2addr->node.addr, err);
++			goto out;
++		}
++
++		err = set_l2table_entry_cmd(dev, index, l2addr->node.addr);
++		if (err) {
++			mlx5_core_err(dev, "Failed to set MPFS l2table entry for %pM index=%d, err(%d)\n",
++				      l2addr->node.addr, index, err);
++			free_l2table_index(mpfs, index);
++			goto out;
++		}
++
++		l2addr->index = index;
++		mlx5_core_dbg(dev, "MPFS entry %pM, set @index (%d)\n",
++			      l2addr->node.addr, l2addr->index);
++	}
++out:
++	mutex_unlock(&mpfs->lock);
++	return err;
++}
++
++void mlx5_mpfs_disable(struct mlx5_core_dev *dev)
++{
++	struct mlx5_mpfs *mpfs = dev->priv.mpfs;
++	struct l2table_node *l2addr;
++	struct hlist_node *n;
++
++	if (!mpfs)
++		return;
++
++	mutex_lock(&mpfs->lock);
++	if (!mpfs->enabled)
++		goto unlock;
++	mlx5_mpfs_foreach(l2addr, n, mpfs) {
++		if (l2addr->index < 0)
++			continue;
++		del_l2table_entry_cmd(dev, l2addr->index);
++		free_l2table_index(mpfs, l2addr->index);
++		mlx5_core_dbg(dev, "MPFS entry %pM, deleted @index (%d)\n",
++			      l2addr->node.addr, l2addr->index);
++		l2addr->index = -1;
++	}
++	mpfs->enabled = false;
++	mlx5_core_dbg(dev, "MPFS disabled\n");
++unlock:
++	mutex_unlock(&mpfs->lock);
++}
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h b/drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h
+index 4a293542a7aa..be0ccdd5a0aa 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.h
+@@ -45,6 +45,10 @@ struct l2addr_node {
+ 	u8                addr[ETH_ALEN];
+ };
+ 
++#define mlx5_mpfs_foreach(hs, tmp, mpfs) \
++	for (int j = 0; j < MLX5_L2_ADDR_HASH_SIZE; j++) \
++		hlist_for_each_entry_safe(hs, tmp, &(mpfs)->hash[j], node.hlist)
++
+ #define for_each_l2hash_node(hn, tmp, hash, i) \
+ 	for (i = 0; i < MLX5_L2_ADDR_HASH_SIZE; i++) \
+ 		hlist_for_each_entry_safe(hn, tmp, &(hash)[i], hlist)
+@@ -82,11 +86,16 @@ struct l2addr_node {
+ })
+ 
+ #ifdef CONFIG_MLX5_MPFS
++struct mlx5_core_dev;
+ int  mlx5_mpfs_init(struct mlx5_core_dev *dev);
+ void mlx5_mpfs_cleanup(struct mlx5_core_dev *dev);
++int mlx5_mpfs_enable(struct mlx5_core_dev *dev);
++void mlx5_mpfs_disable(struct mlx5_core_dev *dev);
+ #else /* #ifndef CONFIG_MLX5_MPFS */
+ static inline int  mlx5_mpfs_init(struct mlx5_core_dev *dev) { return 0; }
+ static inline void mlx5_mpfs_cleanup(struct mlx5_core_dev *dev) {}
++static inline int mlx5_mpfs_enable(struct mlx5_core_dev *dev) { return 0; }
++static inline void mlx5_mpfs_disable(struct mlx5_core_dev *dev) {}
+ #endif
+ 
+ #endif
 -- 
 2.51.1
 
