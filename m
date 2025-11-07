@@ -1,166 +1,150 @@
-Return-Path: <netdev+bounces-236790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFCB1C402B3
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 14:43:26 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D2C5C402C8
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 14:45:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2CFC94F1048
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 13:43:13 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E46254E9656
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 13:45:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 080C22F691B;
-	Fri,  7 Nov 2025 13:43:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E044D2FD66E;
+	Fri,  7 Nov 2025 13:45:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="APmylv60"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="GPA4gY34"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD2912F2605;
-	Fri,  7 Nov 2025 13:43:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 951C92D7D59
+	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 13:45:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762522982; cv=none; b=Qrg0H+lEzTTE82i9gyB8PX2AG0/fp0gtUmB1C35IgesyVJn6zHqbv/swYidEQT06LfNsFXr8PX6wpaim0wQmzd30JS2w0XribjNzKhJnJydQx2m/StT5hgUUvoC5yU83Ej8kX3AkkRgTVCysehR6n9rLAfZf0GVSuGl95BjQ0jA=
+	t=1762523107; cv=none; b=htSm0p/mMcPsJNXEjIlajMKPgN6FZKr6QfP9fwCpwnaJNJ3DyYl3+3liiip3ba7RbXf1GydocQGOmlXAobGNkGprKuSIBshzaOcwNSuCeM/MbEQk3Q1QofRPaVM3j5NZrJnK90JIFGCZpCX6a6pKf/6WGio9yR4fEGnd1nzNl0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762522982; c=relaxed/simple;
-	bh=mVhNPlLjxSXohTIokzVQKOtrdJswU2kcvPbGFxRD4Ig=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=msLXmBcTpDeqfXBrzPADj1Umj4W+b+0F2eGlo0fzKE2+o+M8pKOG3pH/xIblL3XyW/yvGd3KNeaofp3aUBhhENAFkgsqfYR+R1eD7e6zUFG4erdbICBh1QFGcGvxDOuEhyKZ7GeKFf4mldQW3Ucun0mCVKH5/oGjTkFqpzKQmDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=APmylv60; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBDA4C4CEF8;
-	Fri,  7 Nov 2025 13:42:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762522982;
-	bh=mVhNPlLjxSXohTIokzVQKOtrdJswU2kcvPbGFxRD4Ig=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=APmylv60JbvoLid/67a1Lg2RUqkHsQeS27fqWkrDCeavaJYQCdjXy8wY6ud5MU+6+
-	 a1aOqgDi7sMGJMx9JkECexe3NyIeh1RM4BxFwBCaxosUXz6bpOByK3siWzcuOVTztW
-	 7MiCzKQ5fV3SvixxCCqyDpaaOC2Yri/TI0XQ4fkRq0h6YTdNDoY7/7VyS2IIuGpJm6
-	 AbjVvRQRI3Q5QG//gwAo8ec5jyhpXynjXbvjOqZQbRjJx4sGfBy8R41S4vu6Wm7Dx9
-	 sbhf1TTMAl+05Vs1ITmxlat8ACZXKISQxktdnP9GlRl/PeqDiZMYPsOK/0IKKAS2tY
-	 S1CgLdwCgUkVw==
-Message-ID: <b9f01e64-f7cc-4f5a-9716-5767b37e2245@kernel.org>
-Date: Fri, 7 Nov 2025 14:42:58 +0100
+	s=arc-20240116; t=1762523107; c=relaxed/simple;
+	bh=Z7b9EvNVsTIOgVW854RzAhYgYT7r8jwyeS6vvlP+sCo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Awmgrkt2f//NPIZQyjy9AhYeszl7Tq1OmIa0SLkrpYEqBMQ3yyMjQekxxKLpfduSzXP8Y7vZqOvjNQvmsh8gP+QY48XytqxcnpBsN68EZMhxviWKitfMCPTcMA0EEpCfSfWOegu6FWtZ2wofJm4tuzSoWa/k+AoFrD+7S4PXxUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=GPA4gY34; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4711b95226dso7639895e9.0
+        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 05:45:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1762523104; x=1763127904; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Aqlg6h5PejcfsHJcPU/gba8WV8jhIrIxPWFwCEoKBmc=;
+        b=GPA4gY34GeEB9Wotmac5siDaXgRbSNF1gtenJ+AoQ9brwil7+In/L55Efd50P14w4D
+         NOy/z4AxuDp3WUr7iV1W6qr3NpzVPG2m9nyMocKN53A0OtwDTAG9T9Yw6Rj2Pw4joOUG
+         eacmb9+rAKIxO5SXJPT8J3x9uMWItH5Kk8A+pxhJVk9bwUYHAhCcgL9DcKp3CmTJrjik
+         m5AmGk5lEiznFhJX2qst/VVGpLCAUe9SDzj2i3EQw4viQtkHBRtyFfAEK1aGMDqs/oZD
+         wZBmP/egn4BHT/C4ktdSbuIXbUTAGjX0430lJVCGLlZMay7swbPXEGw9ep+Of1xo336P
+         SoNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762523104; x=1763127904;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Aqlg6h5PejcfsHJcPU/gba8WV8jhIrIxPWFwCEoKBmc=;
+        b=RPHrcqwCKfclfpPovDxKj8ZT9yQF2kHqgXlIeaqW2X2ZVwvycD869ZSBxCgpv6bOf2
+         V94RZaP2P7iT2au9qFI6+gIw3dCQzSmSQqCR6JFdkHMn7upAFaV1nTJs0oBWUFx8tdJB
+         XoFoqGzkjw4gHCU7ZQF3Cs6Ri8//CmfGlMoQ8oY/OSEPLsZmauHS330Jr29sqLHqqjbr
+         nh2/ITw+9WPoaievwj4KZp9+iurMugjUr1QbkZAVGdXS0GRrmeOWS4KXjV6tzwchQL/6
+         ktjUmt0YUcgYL/h10+0SsdqBB+u9dwok5zUNM4YlJdIMsIoUZu10H9cAB6JYeZp78N4f
+         8cBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXgfrhMUrRaHjoC8mfRUJ4qAANIB4Msz7laLVWqICMQKkmJ2y9iIFW/Bp95B+kvk6cTV5a1dnM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIepjWC+gc/IF/J7bCYI0zy4EJovrEeiCwBNKVsLNgGWk8I5ip
+	QB4Mv1eUvTSskP2bRqR5Ax9Kl0Ws4GO7P3lF8pBGuCQyhYr/4Kt7UH6HPG8sILucOaE=
+X-Gm-Gg: ASbGncs2sWBckFdKBiLVcOscs7wqtqQXFEIWpcUSvT3XgJDyQZ2nyMjiDetb3k8sSff
+	NFTh1TfiISYYpewgsxF+bod+l70U2iSEIqLXAdhJ5BZ1V3fdJPEhnzTAK6IqHhBfGzQxuGRYacw
+	84PvH8I59Q093spVsRpM74Nt+RUQWZbCIGU97RZ1rpCbsK29CAjkaTHeRU+s9y9iBX47ywILTut
+	y9BN/it4tmbI//afrkTKmepNqz9IZ5dDTjnUa2GyqAnTY/Uk+KbZNYKyd7f1ajey0ltYaaivPRL
+	rgpd4ojz1VjB6kXRQ5xCZ2cGbgOk1mtU3C8tkqddn4J3W3NKUTq1kCew5yaycND1xL8HoZxUq6c
+	QbHo15axbe2ZShEXr2+iTuItgvkGYjbET08sLClau2eBstptyqf9/++Mvyh+ftw/h7l2Zb/zUPl
+	9God/kcdixL86hHK+oesOXfeZU
+X-Google-Smtp-Source: AGHT+IFpZyba28WKyl422zPLm41vfwB1Tx6c+F358chDdmmWGy7/8ZYNpD09113Drv9QcArg+dOETQ==
+X-Received: by 2002:a05:600c:1f0d:b0:46e:4586:57e4 with SMTP id 5b1f17b1804b1-4776bcb8963mr24023815e9.24.1762523103775;
+        Fri, 07 Nov 2025 05:45:03 -0800 (PST)
+Received: from localhost.localdomain ([2a00:6d43:105:c401:e307:1a37:2e76:ce91])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42abe62b23csm5282046f8f.10.2025.11.07.05.45.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Nov 2025 05:45:03 -0800 (PST)
+From: Marco Crivellari <marco.crivellari@suse.com>
+To: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Tejun Heo <tj@kernel.org>,
+	Lai Jiangshan <jiangshanlai@gmail.com>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Marco Crivellari <marco.crivellari@suse.com>,
+	Michal Hocko <mhocko@suse.com>,
+	Karsten Keil <isdn@linux-pingi.de>
+Subject: [PATCH] isdn: kcapi: add WQ_PERCPU to alloc_workqueue users
+Date: Fri,  7 Nov 2025 14:44:52 +0100
+Message-ID: <20251107134452.198378-1-marco.crivellari@suse.com>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net V3 1/2] veth: enable dev_watchdog for detecting
- stalled TXQs
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
- <toke@toke.dk>, Eric Dumazet <eric.dumazet@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- ihor.solodrai@linux.dev, "Michael S. Tsirkin" <mst@redhat.com>,
- makita.toshiaki@lab.ntt.co.jp, toshiaki.makita1@gmail.com,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kernel-team@cloudflare.com
-References: <176236363962.30034.10275956147958212569.stgit@firesoul>
- <176236369293.30034.1875162194564877560.stgit@firesoul>
- <20251106172919.24540443@kernel.org>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20251106172919.24540443@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
+Currently if a user enqueues a work item using schedule_delayed_work() the
+used wq is "system_wq" (per-cpu wq) while queue_delayed_work() use
+WORK_CPU_UNBOUND (used when a cpu is not specified). The same applies to
+schedule_work() that is using system_wq and queue_work(), that makes use
+again of WORK_CPU_UNBOUND.
+This lack of consistency cannot be addressed without refactoring the API.
 
+alloc_workqueue() treats all queues as per-CPU by default, while unbound
+workqueues must opt-in via WQ_UNBOUND.
 
-On 07/11/2025 02.29, Jakub Kicinski wrote:
-> On Wed, 05 Nov 2025 18:28:12 +0100 Jesper Dangaard Brouer wrote:
->> The changes introduced in commit dc82a33297fc ("veth: apply qdisc
->> backpressure on full ptr_ring to reduce TX drops") have been found to cause
->> a race condition in production environments.
->>
->> Under specific circumstances, observed exclusively on ARM64 (aarch64)
->> systems with Ampere Altra Max CPUs, a transmit queue (TXQ) can become
->> permanently stalled. This happens when the race condition leads to the TXQ
->> entering the QUEUE_STATE_DRV_XOFF state without a corresponding queue wake-up,
->> preventing the attached qdisc from dequeueing packets and causing the
->> network link to halt.
->>
->> As a first step towards resolving this issue, this patch introduces a
->> failsafe mechanism. It enables the net device watchdog by setting a timeout
->> value and implements the .ndo_tx_timeout callback.
->>
->> If a TXQ stalls, the watchdog will trigger the veth_tx_timeout() function,
->> which logs a warning and calls netif_tx_wake_queue() to unstall the queue
->> and allow traffic to resume.
->>
->> The log message will look like this:
->>
->>   veth42: NETDEV WATCHDOG: CPU: 34: transmit queue 0 timed out 5393 ms
->>   veth42: veth backpressure stalled(n:1) TXQ(0) re-enable
->>
->> This provides a necessary recovery mechanism while the underlying race
->> condition is investigated further. Subsequent patches will address the root
->> cause and add more robust state handling.
->>
->> Fixes: dc82a33297fc ("veth: apply qdisc backpressure on full ptr_ring to reduce TX drops")
->> Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
->> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
-> 
-> I think this belongs in net-next.. Fail safe is not really a bug fix.
-> I'm slightly worried we're missing a corner case and will cause
-> timeouts to get printed for someone's config.
-> 
+This default is suboptimal: most workloads benefit from unbound queues,
+allowing the scheduler to place worker threads where they’re needed and
+reducing noise when CPUs are isolated.
 
-This is a recovery fix.  If the race condition fix isn't 100% then this
-patch will allow veth to recover.  Thus, to me it makes sense to group
-these two patches together.
+This continues the effort to refactor workqueue APIs, which began with
+the introduction of new workqueues and a new alloc_workqueue flag in:
 
-I'm more worried that we we're missing a corner case that we cannot
-recover from. Than triggering timeouts to get printed, for a config
-where NAPI consumer veth_poll() takes more that 5 seconds to run (budget
-max 64 packets this needs to consume packets at a rate less than 12.8
-pps). It might be good to get some warnings if the system is operating
-this slow.
+commit 128ea9f6ccfb ("workqueue: Add system_percpu_wq and system_dfl_wq")
+commit 930c2ea566af ("workqueue: Add new WQ_PERCPU flag")
 
-Also remember this is not the default config that most people use.
-The code is only activated if attaching a qdisc to veth, which isn't
-default. Plus, NAPI mode need to be activated, where in normal NAPI mode
-the producer and consumer usually runs on the same CPU, which makes it
-impossible to overflow the ptr_ring.  The veth backpressure is primarily
-needed when running with threaded-NAPI, where it is natural that
-producer and consumer runs on different CPUs. In our production setup
-the consumer is always slower than the producer (as the product inside
-the namespace have installed too many nftables rules).
+This change adds a new WQ_PERCPU flag to explicitly request
+alloc_workqueue() to be per-cpu when WQ_UNBOUND has not been specified.
 
+With the introduction of the WQ_PERCPU flag (equivalent to !WQ_UNBOUND),
+any alloc_workqueue() caller that doesn’t explicitly specify WQ_UNBOUND
+must now use WQ_PERCPU.
 
->> +static void veth_tx_timeout(struct net_device *dev, unsigned int txqueue)
->> +{
->> +	struct netdev_queue *txq = netdev_get_tx_queue(dev, txqueue);
->> +
->> +	netdev_err(dev, "veth backpressure stalled(n:%ld) TXQ(%u) re-enable\n",
->> +		   atomic_long_read(&txq->trans_timeout), txqueue);
-> 
-> If you think the trans_timeout is useful, let's add it to the message
-> core prints? And then we can make this msg just veth specific, I don't
-> think we should be repeating what core already printed.
+Once migration is complete, WQ_UNBOUND can be removed and unbound will
+become the implicit default.
 
-The trans_timeout is a counter for how many times this TXQ have seen a
-timeout.  It is practical as it directly tell us if this a frequent
-event (without having to search log files for similar events).
+Suggested-by: Tejun Heo <tj@kernel.org>
+Signed-off-by: Marco Crivellari <marco.crivellari@suse.com>
+---
+ drivers/isdn/capi/kcapi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-It does make sense to add this to the core message ("NETDEV WATCHDOG")
-with the same argument.  For physical NICs these logs are present in
-production. Looking at logs through Kibana (right now) and it would make
-my life easier to see the number of times the individual queues have
-experienced timeouts.  The logs naturally gets spaced in time by the
-timeout, making it harder to tell the even frequency. Such a patch would
-naturally go though net-next.
+diff --git a/drivers/isdn/capi/kcapi.c b/drivers/isdn/capi/kcapi.c
+index c5d13bdc239b..e8f7e52354bc 100644
+--- a/drivers/isdn/capi/kcapi.c
++++ b/drivers/isdn/capi/kcapi.c
+@@ -907,7 +907,7 @@ int __init kcapi_init(void)
+ {
+ 	int err;
+ 
+-	kcapi_wq = alloc_workqueue("kcapi", 0, 0);
++	kcapi_wq = alloc_workqueue("kcapi", WQ_PERCPU, 0);
+ 	if (!kcapi_wq)
+ 		return -ENOMEM;
+ 
+-- 
+2.51.1
 
-Do you still want me to remove the frequency counter from this message?
-By the same argument it is practical for me to have as a single log line
-when troubleshooting this in practice.  BTW, I've already backported
-this watchdog patch to prod kernel (without race fix) and I'll try to
-reproduce the race in staging/lab on some ARM64 servers.  If I reproduce
-it will be practical to have this counter.
-
---Jesper
 
