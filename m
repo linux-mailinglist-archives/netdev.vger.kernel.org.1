@@ -1,108 +1,125 @@
-Return-Path: <netdev+bounces-236587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CADEC3E29C
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 02:50:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 874E5C3E2ED
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 02:59:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EF21188C13C
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 01:51:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E5461889046
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 01:59:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7410A2EFDA2;
-	Fri,  7 Nov 2025 01:50:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="afxGjvyD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 275852FB632;
+	Fri,  7 Nov 2025 01:59:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49CF820C037;
-	Fri,  7 Nov 2025 01:50:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB8D233993;
+	Fri,  7 Nov 2025 01:59:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762480242; cv=none; b=LQSDBPU7tup/zGivPLTZbMZ5KWDSh+xJh5IZ2Vw4/TbpgaPVKSBL18YhfGw1iIPr2YrQ8fygm7t5+Z8y8CRF4jgWTS71CYJ4hYtDyyajyzs4CKZWhh0c8utCjNMyue7+xIQu3ieMmlOUSEzpJDJSqmQPi/bP5XK+CZ8wWBPxTps=
+	t=1762480763; cv=none; b=js5SdOC4AiJJ/U1KLJS4EE88TTriKPktADLg2XZdS1o52LzKQcZnYsU+JbpACKIF8uPpNLGozTRuMKjG8eCmVhKBy9i6/qIUfrs9L5t1iwDDOTSgPvborLcw6FVK+xO9c0RUImOiWRPXw1sChZE+y4knlXnBVLEjcFuCtkSUO1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762480242; c=relaxed/simple;
-	bh=Xq51Z/9D2fZDatgMXKL0KxpS0FoLycB7VoFYeF3j0NQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=a0f2dTIWP7V5YNweYCnyLr4Lg5qW1m2jRQLfHcZwFDdjuwdN1hr+sTv733RDzwcntseFLd+kUp5ADVoHj03mkY+sBQbZNy5oHGhHJ9eVxxwpDcUdXzxfNe22G1BTW+G2qrQQW4ZrUMwGZqJh2wZxq2soV9BI2FoPvvFbOMiNDRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=afxGjvyD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3C40C4CEF7;
-	Fri,  7 Nov 2025 01:50:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762480241;
-	bh=Xq51Z/9D2fZDatgMXKL0KxpS0FoLycB7VoFYeF3j0NQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=afxGjvyDQkcynlOHFmuYaA8bA0ELkiZO3OVHeiI/ZLaV8Evb1QgXFOF/OjvpUirpI
-	 VkSjiHKXJNqt1SnlNx5z+VeRALHg6Pf4sZTaQlyncsjgUoW5Su7Hp+9CdrOxAPoKDb
-	 gIEc6auI/rkDePtrCvDlxcyR6M80MbbYQNy9KhffhJG3Bi/ICodlsn7aKaq/DCcUfo
-	 OtEL7kj1eMp2NUbqVZFKvf1oe3xmKKUMMe0x7EPs4MNIVpm0psL7xvMd6ADdrtso7O
-	 UKwGUbLeKyE2bBc9OehxwgahyYK0llr8eM34Lvg01KG1jQJYzNS6zj8wrv/nLDRr7V
-	 ZmsQL344pMLDQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDA539EF976;
-	Fri,  7 Nov 2025 01:50:15 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1762480763; c=relaxed/simple;
+	bh=7DAjkr9cSxRS0fZbyexesbeKd4d8lXU4RfB66rg63DY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fVhEPUdk1/VkP86IzN3nZN8rSyIaxeVS8L91qEZtsKMekNTi3nSH4cQXRd8fiLKpIs7BWvq/aPFhSkJTvIR0eJVvBs6D+AxxY3ii0GTBxXAl2TXAF6XxPTn9JCJryj16irXKOftCfdYdiuYdH7hA3KB+IIBEtGHddSSncip8N3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-c45ff70000001609-41-690d526b4ee5
+Date: Fri, 7 Nov 2025 10:59:02 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: linux-mm@kvack.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
+	harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
+	davem@davemloft.net, hawk@kernel.org, john.fastabend@gmail.com,
+	sdf@fomichev.me, saeedm@nvidia.com, leon@kernel.org,
+	tariqt@nvidia.com, mbloch@nvidia.com, andrew+netdev@lunn.ch,
+	edumazet@google.com, pabeni@redhat.com, akpm@linux-foundation.org,
+	david@redhat.com, lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
+	surenb@google.com, mhocko@suse.com, horms@kernel.org,
+	jackmanb@google.com, hannes@cmpxchg.org, ziy@nvidia.com,
+	ilias.apalodimas@linaro.org, willy@infradead.org,
+	brauner@kernel.org, kas@kernel.org, yuzhao@google.com,
+	usamaarif642@gmail.com, baolin.wang@linux.alibaba.com,
+	almasrymina@google.com, toke@redhat.com, asml.silence@gmail.com,
+	bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
+	sfr@canb.auug.org.au, dw@davidwei.uk, ap420073@gmail.com,
+	dtatulea@nvidia.com
+Subject: Re: [RFC mm v5 1/2] page_pool: check nmdesc->pp to see its usage as
+ page pool for net_iov not page-backed
+Message-ID: <20251107015902.GA3021@system.software.com>
+References: <20251103075108.26437-1-byungchul@sk.com>
+ <20251103075108.26437-2-byungchul@sk.com>
+ <20251106173320.2f8e683a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next,v2 0/7] net: renesas: Cleanup usage of gPTP flags
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176248021450.451816.5444160112650392345.git-patchwork-notify@kernel.org>
-Date: Fri, 07 Nov 2025 01:50:14 +0000
-References: <20251104222420.882731-1-niklas.soderlund+renesas@ragnatech.se>
-In-Reply-To: <20251104222420.882731-1-niklas.soderlund+renesas@ragnatech.se>
-To: =?utf-8?q?Niklas_S=C3=B6derlund_=3Cniklas=2Esoderlund+renesas=40ragnatech=2E?=@codeaurora.org,
-	=?utf-8?q?se=3E?=@codeaurora.org
-Cc: paul@pbarker.dev, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- yoshihiro.shimoda.uh@renesas.com, geert+renesas@glider.be,
- magnus.damm@gmail.com, richardcochran@gmail.com, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251106173320.2f8e683a@kernel.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0iTYRTHefZeHY5eV+ZT9mkFkZXaKjpBFwmKByKQpA9dqEZ70eFctZlp
+	EGw1yCLNlZLOBbPwbhmzdFqW6dQsupnF201tVlIts1XiUrI5k/r2439+/M/5cHhKeZ+Zy+sM
+	6aLRoNGrWDkt/xJesjR1q0IX3z6wBBy1NSxUj2ZCeb+bgUDNoAwcVfUIfgRecTDR3IHgu6eT
+	hc9tfgSXSkYocDyy0vCz9hcFjU2DCD4VXmbhfYeXg2rXFugr+0DDzRMNFHjP3GUhxzpGQXNg
+	iINj7opgcZ2Zg8f1uQzk/yqloMHcz8HTJgcLvTUTDHxozaGhy15Jw3CBh4K+3ATocM6Gkfs+
+	BJ7aBhmMnL7AwrOiJhlcb37GwbluJwsD1j4E3W1eGgrGs1kotuQiGBsNVg7l/WCguL2XS4gl
+	FkliSZvvK0WuVb6QkeeFNppIt+7JSKP9DUecrkOkriKGnJK6KeKqOskSl/8sR14/v8mSu4Vj
+	NGl8u5o0ur/LSM7xITYxcod8jVbU6zJEY9y6vfKUHlsBe8DGZeaP25AZ3WNOoTAeCyuwK2dC
+	Ns21Te30JNPCAux5UB5yWGEhlqQANcmzgrm1rijoyHlKGOZwodQbkmYK6Xj4qzkkKYRV2Ho+
+	LyQphWyEzdceMlODCNxV9C60gRJisPT7Y3AzH+RoXP6bn4zDhGX4ZbGDneRIYT5uqe/8e5yP
+	x/mWGVM8B9+pkOg8JNj/a7X/12r/1+pEVBVS6gwZaRqdfkVsSpZBlxm7b3+aCwVfrOzo+E43
+	8j9OakUCj1ThitFb4Tolo8kwZaW1IsxTqlmKlYZgpNBqso6Ixv17jIf0oqkVRfO0KkqhHjms
+	VQrJmnQxVRQPiMbpqYwPm2tGmgfmnuNnH+0+mKdUETG6M/lKbkJWqbp90TxjprZgV+CqN25V
+	Mlg4v9q9zdG1vqpF/T4+sNvmWxvYbsIZzVe615c7xMhPzprEj6hoMEq/9kZSqSsqgvHoTu7t
+	SWiJ3vBtw4zhMt/yJ/HC6ZLs253ezUcXL9940Q91WvVLQJtUtClFsyyGMpo0fwAGlwewXgMA
+	AA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTYRjHe8/lPcfh4qRWh4KIGUiCWVD0RFFSVC/dCUGoD7Xy1MZ05bZE
+	g2DmoJI0V4pzrrKrl6zBNJ2SEc57mKVmxywty6Iys1ymadpcRH378/tfni8PTwfdYefxWr1J
+	MujVcSqsYBQ7VqdG6HYrtUsbh4PB4SzBcGs0CQpeuVkYK3lPgaO4HIF3rJuDqep6BMO1DRg+
+	eb4huHZlhAZHq4WB786fNFRWvUfw0XYbQ399Hwe3XNuh9+Y7Bu6dqqCh71wjhnTLOA3VY4Mc
+	nHQX+oZLzRx4Ljax8Lg8g4WsnzdoqDC/4qC9yoGhp2SKhXc16Qw02YsYGMqupaE3Iwrq8+fA
+	yMMBBLXOCgpGzl7E8DS3ioK71U85uNCWj+GNpRdBm6ePgeyJ0xjyUjIQjI/6JgczvSzk1fVw
+	UZEkRZYx8Qx8oUlZURdFOm1Whsj3mylSaX/JkXzXMVJaGE7S5DaauIrPYOL6dp4jLzrvYdJo
+	G2dI5etVpNI9TJH01EG8a84exZpYKU6bKBki1+5XaDqs2fiolUvKmrAiM2pm01AALwrLRWdV
+	HTOtGWGRWNtS4OdYCBNleYye1iE+binN9WUUPC0McaJN7vGHggWTOPTF7A8phZWiJSfTHwoS
+	TiPRXPaI/WPMEpty3/ov0EK4KE9+oNIQ79PzxYJJfhoHCMvE53kOPK1nC6Hig/IGKhMp7f+1
+	7f+17f/a+YguRiFafWK8Whu3YolRp0nWa5OWHDwS70K+L7p5YsLqRt72zTVI4JEqUDl6P1Ab
+	xKoTjcnxNUjkaVWIcoXeh5Sx6uTjkuHIPsOxOMlYg+bzjGquckuMtD9IOKw2STpJOioZ/roU
+	HzDPjCIWShFXTZrV/S11V36sD5W6Cp1FXMZXnRT941JMk+34rkMm3PU46xfbfHiGl3q9lcR0
+	5CRulDXrLjNbyg3DmxIGPd0fo9PDnsxMeNbxxjip++wZMMd+bd0bvKAl8nNdf1H71uvRoTsD
+	E8qiFk+JYQeuP8nZcMZeuC0l1W2n12CvijFq1MvCaYNR/RuahmFKQQMAAA==
+X-CFilter-Loop: Reflected
 
-Hello:
+On Thu, Nov 06, 2025 at 05:33:20PM -0800, Jakub Kicinski wrote:
+> On Mon,  3 Nov 2025 16:51:07 +0900 Byungchul Park wrote:
+> > However, for net_iov not
+			  ^
+		*not* page-backed
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue,  4 Nov 2025 23:24:13 +0100 you wrote:
-> Hello,
+> > page-backed, the identification cannot be based on the page_type.
+> > Instead, nmdesc->pp can be used to see if it belongs to a page pool, by
+> > making sure nmdesc->pp is NULL otherwise.
 > 
-> This series aim is to prepare for future work that will enable the use
-> of gPTP on R-Car RAVB on Gen4. Currently RAVB have a dedicated gPTP
-> implementation supported on Gen2 and Gen3 (ravb_ptp.c). For Gen4 a new
-> implementation that is already upstream (rcar_gen4_ptp.c) and used by
-> other Gen4 devices such as RTSN and RSWITCH is needed.
-> 
-> [...]
+> Please explain why. Isn't the type just a value in a field?
+> Which net_iov could also set accordingly.. ?
 
-Here is the summary with links:
-  - [net-next,v2,1/7] net: rswitch: Move definition of S4 gPTP offset
-    https://git.kernel.org/netdev/net-next/c/e98d8792929d
-  - [net-next,v2,2/7] net: rcar_gen4_ptp: Move control fields to users
-    https://git.kernel.org/netdev/net-next/c/50ab1c6becde
-  - [net-next,v2,3/7] net: rswitch: Use common defines for time stamping control
-    https://git.kernel.org/netdev/net-next/c/b314e4f7a9d9
-  - [net-next,v2,4/7] net: rtsn: Use common defines for time stamping control
-    https://git.kernel.org/netdev/net-next/c/e43791f40b81
-  - [net-next,v2,5/7] net: rcar_gen4_ptp: Remove unused defines
-    https://git.kernel.org/netdev/net-next/c/3614d249d1da
-  - [net-next,v2,6/7] net: ravb: Break out Rx hardware timestamping
-    https://git.kernel.org/netdev/net-next/c/5ce97b8d6132
-  - [net-next,v2,7/7] net: ravb: Use common defines for time stamping control
-    https://git.kernel.org/netdev/net-next/c/16e2e6cf75e6
+page_type field is in 'struct page', so 'struct page' can check the type.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+However, the field is not in 'struct net_iov', so 'struct net_iov' that
+is not backed by page, cannot use the type checking to see if it's page
+pool'ed instance.
 
+I'm afraid I didn't get your questions.  I will try to explain again
+properly if you give me more detail and example about your questions or
+requirement.
 
+	Byungchul
 
