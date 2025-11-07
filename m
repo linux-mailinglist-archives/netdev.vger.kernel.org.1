@@ -1,126 +1,168 @@
-Return-Path: <netdev+bounces-236710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EDD8C3F305
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 10:36:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF402C3F392
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 10:44:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0223E3B1573
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 09:35:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AE1E188E95E
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 09:44:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B8243016EB;
-	Fri,  7 Nov 2025 09:35:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D62305079;
+	Fri,  7 Nov 2025 09:40:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JxMjRvx0"
+	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="SYHfiDXB";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="cT6wAxxJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from flow-b3-smtp.messagingengine.com (flow-b3-smtp.messagingengine.com [202.12.124.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76CBC2F531F;
-	Fri,  7 Nov 2025 09:35:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F750302155
+	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 09:40:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762508146; cv=none; b=Z63wB1yPncfTLluLEAZmaf2oGpWGHi+D2GMXsDHNMY8JdNf9M3x+SeMfKBuQ8phH1F+LMb4U2oaWnOsDdF5SohJ2xz7gnsiLY9R2tU0JhIHPaAAUfPo87nFEv0O6tfIhbJ6XA199B7/+50fTMDWf5nxbbrFD5bnPTOmFVZJBGl8=
+	t=1762508450; cv=none; b=ggF9IKOwZ54M0vHjPLMEmVwecEV7rIjCDdqGxpcWzcNOjYPRG84tBqrB7pDcE+7HGDnHN92z62mha5fHylyWS1p+i4NtNN5CQGEDtCrXpbp5toegqNML+gDf4GeO/A3J2PXKU/6OXan5qI6XuXbXd4oLm/uN/PxEhIify2l7lZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762508146; c=relaxed/simple;
-	bh=D6+yKptFABPYFPYxyWtBQ5zOKqzK3MNINc2rvH2D/n0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ouYfM0aLKoWTbSJE6+hSt262Ea/5TfJ+Uc+rJHSpRNkl9rt8ZQAQfqHQba8YbdP1zqvcl2eEnPJAtR2zwX5c9n127sZUW52kpPAJDwin+FThq2+yu4wprQG001J+EA589XNPoxBJ3sEk3E6AtZtXw9Ta3zAX9zVzZRP/Mlwrf/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JxMjRvx0; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762508144; x=1794044144;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=D6+yKptFABPYFPYxyWtBQ5zOKqzK3MNINc2rvH2D/n0=;
-  b=JxMjRvx0Z+62vaxS1jc3+6bFKL+ouYPJOMCbMZIrRUncwhvCIFa9YLDx
-   Sdpu8OiL8T1r9KagxVtmBE6qnrvpqX1BzDlhI13u5U49HIdjzS1LmFvoa
-   ZarjVfrDc9uLfviLAm7sGqGWMJ7ull8OOWHrfXAQSXyI0yPO7Hk1z/pI+
-   c/OOT38xQYtwYmmaoK7J/plXyfKC3nilN0rxUoGI3xU8z9Cut0NMAtZ5B
-   go+kl7TXUlrN3UY2t74h/rd75tmg8zdMRSnWAathtNKMC90Y5tQxZTTkl
-   4IJAo5lrPx/NxUJjYW0Kom71HmU9OlLsEMETXPYiJ/Cu45nfQpP1J6zgr
-   Q==;
-X-CSE-ConnectionGUID: 8UPIavC3Sg+ZfOGTe7XIxw==
-X-CSE-MsgGUID: 1MYkzOWESGy0mOFbzYk9HQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="64562382"
-X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
-   d="scan'208";a="64562382"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2025 01:35:43 -0800
-X-CSE-ConnectionGUID: LsAWghEFRpKKLxOW5gSDpQ==
-X-CSE-MsgGUID: ipmj13SgRROyYswd7KgaXg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,286,1754982000"; 
-   d="scan'208";a="192360859"
-Received: from vpanait-mobl.ger.corp.intel.com (HELO ashevche-desk.local) ([10.245.245.27])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2025 01:35:39 -0800
-Received: from andy by ashevche-desk.local with local (Exim 4.98.2)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1vHIsZ-00000006Q6y-30Zg;
-	Fri, 07 Nov 2025 11:35:35 +0200
-Date: Fri, 7 Nov 2025 11:35:35 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: David Laight <david.laight.linux@gmail.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Junrui Luo <moonafterrain@outlook.com>,
-	linux-kernel@vger.kernel.org, pmladek@suse.com, rostedt@goodmis.org,
-	tiwai@suse.com, perex@perex.cz, linux-sound@vger.kernel.org,
-	mchehab@kernel.org, awalls@md.metrocast.net,
-	linux-media@vger.kernel.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 1/4] lib/sprintf: add scnprintf_append() helper function
-Message-ID: <aQ29Zzajef81E2DZ@smile.fi.intel.com>
-References: <20251107051616.21606-1-moonafterrain@outlook.com>
- <SYBPR01MB788110A77D7F0F7A27F0974FAFC3A@SYBPR01MB7881.ausprd01.prod.outlook.com>
- <20251106213833.546c8eaba8aec6aa6a5e30b6@linux-foundation.org>
- <20251107091246.4e5900f4@pumpkin>
+	s=arc-20240116; t=1762508450; c=relaxed/simple;
+	bh=H4VZ7BRsQRxxEpebWYiW1yybA1vJj6bju9/Zs/aPnpw=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=OfzCGjzHiTl23hBjJroOadCeQaB7jdqwjbihVQAVraiXWee3LqvV13hVh65wD5WdJDJVfasF83Z/8EdllBBRynfQqUa5q13s8jRljUcpDJX0zjHQNBtYQAQZe/ATYL3Ds83egWkTyJpn3G3hsyf6aFDwtBWvTGhPLDPg38T6R48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=SYHfiDXB; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=cT6wAxxJ; arc=none smtp.client-ip=202.12.124.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
+Received: from phl-compute-11.internal (phl-compute-11.internal [10.202.2.51])
+	by mailflow.stl.internal (Postfix) with ESMTP id E22241300249;
+	Fri,  7 Nov 2025 04:40:46 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-11.internal (MEProxy); Fri, 07 Nov 2025 04:40:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
+	 h=cc:cc:content-id:content-transfer-encoding:content-type
+	:content-type:date:date:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to; s=fm1; t=1762508446; x=1762515646; bh=OW+A6XfmGnrC5ViNjXF/T
+	32WDBvQr2vz6kUkY023xH4=; b=SYHfiDXBYChnbemLuenJsuq1WAhcMJXAsqgsf
+	odd8A5f03QHykRpwARRNRjRAMiBQMdqH7ccEcF31DJPB3tVdXRJKCPVN9U1+snWR
+	k3761Sc/H/K0Ac64XWDtjofBMyBzVxliQgyoHtgANp2Y5XgDqV+8FrjsjuadQkcc
+	Yl9qdpV9O1qy1QxmBzEa5EE+dTZlaDCugbgZewf+elPiDc4WWNc3S/Mwb+saSI/z
+	VS6YbdZr7zTn+10nUcAk/N8vNZurPmzX0p6WgL7jIX++cIFPA5to2LruEf/Bm6Dl
+	3l453yuAhuo9Y91i1NlEZPkkGQbfoKa8+/+DECj78WUNBh2Hg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-id
+	:content-transfer-encoding:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1762508446; x=1762515646; bh=OW+A6XfmGnrC5ViNjXF/T32WDBvQr2vz6kU
+	kY023xH4=; b=cT6wAxxJlyuCCxqwaSTMEYcGSOf/4/xGjoc0FN5EOl5qKPW6NHo
+	OZnSaExNBZ1wzq3ONe5dce68lb0KwcWC4GtFypbOwpT8nsX3Rj04T3sLwhHPnBNX
+	kGBlMJogsTqVr05teyRMHsZWARxD0QgKm3GBREpcDYQCn9ACzDNSd7iatWvm431f
+	qgTFQ2U1vTO/4Z+OZcnVc9jzVjHENuWdMI7DMtcxEkE0ew0uslM/6cedlDMC7oCM
+	Z/M8nBOIzDmNa/iNw9jUzSB+ZlS1Pk3XTqDmvBH8Hf7X8LbrDUT1nSBl0HjMKXcY
+	Eok95UTjw8dPRjnaXukYhsa8ufnK+PKKLdg==
+X-ME-Sender: <xms:nr4NaYxwi-RkgSKF7kkAQ-Trwr_klx9ktaMeFpnr_SlGZbrug3UXUg>
+    <xme:nr4NabWu9U1WUC9tKzWfZ7k25rRu24QghajfMl_cw2e2kEQJxcjcqLm9Xne669UHG
+    fhYvv1XVuOXua_FhTSy7798o9PiqS3w88PBKl7XE2x2IGot1Lr-CHlJ>
+X-ME-Received: <xmr:nr4NaQi_-oQrTyWewFtR1AKyXWQGhmQw1J4zIdqafKmk9FUzjRCsZsQemxsjj1VHHtXTfbA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeffedrtdeggddukeelfedvucetufdoteggodetrf
+    dotffvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfurfetoffkrfgpnffqhgenuceu
+    rghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujf
+    gurhephffvvefujghfofggtgfgfffksehtqhertdertddvnecuhfhrohhmpeflrgihucgg
+    ohhssghurhhghhcuoehjvhesjhhvohhssghurhhghhdrnhgvtheqnecuggftrfgrthhtvg
+    hrnhepieefvdelfeeljeevtefhfeeiudeuiedvfeeiveelffduvdevfedtheffffetfeff
+    necuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepjhhvse
+    hjvhhoshgsuhhrghhhrdhnvghtpdhnsggprhgtphhtthhopeekpdhmohguvgepshhmthhp
+    ohhuthdprhgtphhtthhopehnihgtohhlrghsrdguihgthhhtvghlseeifihinhgurdgtoh
+    hmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthho
+    pehsughfsehfohhmihgthhgvvhdrmhgvpdhrtghpthhtohepvgguuhhmrgiivghtsehgoh
+    hoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghp
+    thhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthhdprhgtphhtthhopehprg
+    gsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdr
+    khgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:nr4NaTCkrWZrl1WkrXPmiTyXQvckK1L17Nc7k6ebfDbc2431bfv-vw>
+    <xmx:nr4NaeuW8N1NeVJ8Wjbh1W-GFn4FxtC3oA0wCXcv7Xy8niydsEK9Yg>
+    <xmx:nr4NafdhY3LzyneVU6GqtUU-M9hQ7kbVDQul8SPJBbhceAeP0ve0jQ>
+    <xmx:nr4Nab_wywLjEzEhZXm3VgS3ygSnIXxAnHd8TK04kpsTxSO-gwvNYg>
+    <xmx:nr4NaR7rvUk1k8nVpPLlHA3sf--KADsrMEQFx6rOmXp9Hy3KuBDq34C4>
+Feedback-ID: i53714940:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 7 Nov 2025 04:40:45 -0500 (EST)
+Received: by vermin.localdomain (Postfix, from userid 1000)
+	id F3C741C04E6; Fri,  7 Nov 2025 01:40:42 -0800 (PST)
+Received: from vermin (localhost [127.0.0.1])
+	by vermin.localdomain (Postfix) with ESMTP id F1BAE1C01BD;
+	Fri,  7 Nov 2025 10:40:42 +0100 (CET)
+From: Jay Vosburgh <jv@jvosburgh.net>
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+cc: "David S . Miller" <davem@davemloft.net>,
+    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+    Eric Dumazet <edumazet@google.com>,
+    Andrew Lunn <andrew+netdev@lunn.ch>,
+    Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org
+Subject: Re: [PATCH net] bonding: fix mii_status when slave is down
+In-reply-to: <20251106180252.3974772-1-nicolas.dichtel@6wind.com>
+References: <20251106180252.3974772-1-nicolas.dichtel@6wind.com>
+Comments: In-reply-to Nicolas Dichtel <nicolas.dichtel@6wind.com>
+   message dated "Thu, 06 Nov 2025 19:02:52 +0100."
+X-Mailer: MH-E 8.6+git; nmh 1.7+dev; Emacs 29.0.50
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251107091246.4e5900f4@pumpkin>
-Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
- krs, Bertel Jungin Aukio 5, 02600 Espoo
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <398690.1762508442.1@vermin>
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 07 Nov 2025 10:40:42 +0100
+Message-ID: <398691.1762508442@vermin>
 
-On Fri, Nov 07, 2025 at 09:12:46AM +0000, David Laight wrote:
-> On Thu, 6 Nov 2025 21:38:33 -0800
-> Andrew Morton <akpm@linux-foundation.org> wrote:
-> > On Fri,  7 Nov 2025 13:16:13 +0800 Junrui Luo <moonafterrain@outlook.com> wrote:
+Nicolas Dichtel <nicolas.dichtel@6wind.com> wrote:
 
-...
+>netif_carrier_ok() doesn't check if the slave is up. Before the below
+>commit, netif_running() was also checked.
+>
+>Fixes: 23a6037ce76c ("bonding: Remove support for use_carrier")
+>Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 
-> That is true for all the snprintf() functions.
-> 
-> > I wonder if we should instead implement a kasprintf() version of this
-> > which reallocs each time and then switch all the callers over to that.
-> 
-> That adds the cost of a malloc, and I, like kasprintf() probably ends up
-> doing all the work of snprintf twice.
-> 
-> I'd be tempted to avoid the strlen() by passing in the offset.
-> So (say):
-> #define scnprintf_at(buf, len, off, ...) \
-> 	scnprintf((buf) + off, (len) - off, __VA_ARGS__)
-> 
-> Then you can chain calls, eg:
-> 	off = scnprintf(buf, sizeof buf, ....);
-> 	off += scnprintf_at(buf, sizeof buf, off, ....);
-
-I like this suggestion. Also note, that the original implementation works directly
-on static buffers.
-
--- 
-With Best Regards,
-Andy Shevchenko
+Acked-by: Jay Vosburgh <jv@jvosburgh.net>
 
 
+>---
+> drivers/net/bonding/bond_main.c | 5 +++--
+> 1 file changed, 3 insertions(+), 2 deletions(-)
+>
+>diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_m=
+ain.c
+>index e95e593cd12d..5abef8a3b775 100644
+>--- a/drivers/net/bonding/bond_main.c
+>+++ b/drivers/net/bonding/bond_main.c
+>@@ -2120,7 +2120,7 @@ int bond_enslave(struct net_device *bond_dev, struc=
+t net_device *slave_dev,
+> 	/* check for initial state */
+> 	new_slave->link =3D BOND_LINK_NOCHANGE;
+> 	if (bond->params.miimon) {
+>-		if (netif_carrier_ok(slave_dev)) {
+>+		if (netif_running(slave_dev) && netif_carrier_ok(slave_dev)) {
+> 			if (bond->params.updelay) {
+> 				bond_set_slave_link_state(new_slave,
+> 							  BOND_LINK_BACK,
+>@@ -2665,7 +2665,8 @@ static int bond_miimon_inspect(struct bonding *bond=
+)
+> 	bond_for_each_slave_rcu(bond, slave, iter) {
+> 		bond_propose_link_state(slave, BOND_LINK_NOCHANGE);
+> =
+
+>-		link_state =3D netif_carrier_ok(slave->dev);
+>+		link_state =3D netif_running(slave->dev) &&
+>+			     netif_carrier_ok(slave->dev);
+> =
+
+> 		switch (slave->link) {
+> 		case BOND_LINK_UP:
+>-- =
+
+>2.47.1
+>
 
