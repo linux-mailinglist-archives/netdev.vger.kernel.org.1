@@ -1,46 +1,102 @@
-Return-Path: <netdev+bounces-236767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10016C3FBB0
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 12:26:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49689C3FBE3
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 12:34:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C7E4D4F0C1C
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 11:26:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0353A3A9B71
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 11:34:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 585DC3218B3;
-	Fri,  7 Nov 2025 11:26:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C4B2269B1C;
+	Fri,  7 Nov 2025 11:34:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="mbhMlNg6";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="LiW8DJN4"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90D40320CD5;
-	Fri,  7 Nov 2025 11:26:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BA3A1DE3C0
+	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 11:34:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762514786; cv=none; b=b6l22yx6ACmMAs7MO5gEBKAiSotn58OMEPHfSjHyOAlcjPQpH4gUIhQQAa4moc9ZjOkV6JqDOJwUdWju+Izb3jxN+JJrJMwtWtu6GsR4Nc5Afv0ZNm7Io3XsiuPU+/fNKtAngEi2zeQWryIjAHftKDzxcMceeWs5LNtVGE44ORg=
+	t=1762515282; cv=none; b=Dvt3zpiDJIkmC1gKP81U9N+xaATVVK9RkSzyXGK07E0BcRIEuyQf+lTRTYrWLCpxUjom9AGXIF63xK3g7edREcFkQFRymtC700i861gUwkEBPLEUe/JtC3C7KDPxaHJWUdBCj76yOKlBGWPX7wUZLAM0a4pG4jDZgXMUkInzUKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762514786; c=relaxed/simple;
-	bh=FGIF3AoxOcgxBzxbbyfwHFNHYIATq7p/8YSXNS1LfD4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=HLfWH5/M6eyqWeSUCR+Bmp6lg4zi1ESQblunXXf55L4AwPWzKalirQSldopq62DqnWSDiCfkGyuhXvf0Q+fgzd/0NrnqnH6e46lJnm+K0OezPegQW8ut9EFrzveXqPDwqByuGBjBoFYgVW42XhybyZNYJhh31oI9sKnBAamVOjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4d2xZp4wr4zHnHB0;
-	Fri,  7 Nov 2025 19:26:10 +0800 (CST)
-Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
-	by mail.maildlp.com (Postfix) with ESMTPS id C878C1401DC;
-	Fri,  7 Nov 2025 19:26:19 +0800 (CST)
-Received: from [10.123.122.223] (10.123.122.223) by
- mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 7 Nov 2025 14:26:19 +0300
-Message-ID: <1d2b1281-3ac5-4bf0-88d9-6b88e5d42d66@huawei.com>
-Date: Fri, 7 Nov 2025 14:26:18 +0300
+	s=arc-20240116; t=1762515282; c=relaxed/simple;
+	bh=DzX6zG53hv2kHHowOZ2dLhM5tvxoiava9KZ5+Tv0Ouo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oNIcANcl6OSTuxTgfiSRysgec5GW+w5TEvTRQT3hl+yktZB9QxFqY4nBfNZ85fE5p7lBAGWAmBg2ZyGGD4L6LTN/6KYGk747D3wSTGghLE6+3t6RvltiMof/P4DqrfTDXS6tcnMBOjGWyotYThu5LiOhqSppC62QJso169W1fes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=mbhMlNg6; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=LiW8DJN4; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5A744mMV2085474
+	for <netdev@vger.kernel.org>; Fri, 7 Nov 2025 11:34:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	UiFlhUG339a0VfWabSoqEEVYWNHYCJ3zv2+BmKWjfS8=; b=mbhMlNg6a8Eh/Eg4
+	jC25f3ERL8KtItYqJP1T4SCPF5sO0yqkdB/xxI28Sow7f+paVZT8IcxO6q5WKQco
+	/QkkvXrNM/3Q3kWcCFtMNkq4grI8mKUGYV+bm4ugCTP2g8OQoXj8wj5BxmO5GoVj
+	HZ7k/6AECNCJ4h1xe4jlr2ulZQiI+U558tWmsPc1MgRZycHjGyxW5DjZ7RNYU/dj
+	YF8HL/C0CwjXjsbF36F5CLW6bgeQhOuajLrj4XgY7n1W5bzVRPTba0mryeYs9Is5
+	thz4vL1lu64xgwoyOettJbFuvWqG9u+hsQ5Kj8r1U3MZb4GtRTCqRERfMt5xuC8E
+	ay1pzQ==
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com [209.85.160.198])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4a99e798jr-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 11:34:39 +0000 (GMT)
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-4ed6a906c52so1690051cf.2
+        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 03:34:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=oss.qualcomm.com; s=google; t=1762515279; x=1763120079; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UiFlhUG339a0VfWabSoqEEVYWNHYCJ3zv2+BmKWjfS8=;
+        b=LiW8DJN4opCVlkTHF1XTfs1ZXmHEXF4VWKYXGG0aU71mBqkHjLSaVZn5/Ft79uAuOK
+         M4fCMEixaqT4zkeR+r2zCeq1ILhSyFxh9rORySZdmHHXag/ZhDGsem/0R/sHOe5ARxAN
+         wCco9ofokb8yrdNC8Q9GJC/g7Ds6FD/1WwnKxAwJ0Z6TV9Fm+CzlGwFtdeqUMRYoTvd0
+         ycHk8hA1nNgXOyvkcAOFmbP+YE4nRj0v2zADo9vG+gf5kiVNfS/G+Pojmd2tS1dQktNf
+         VzCKZof1c/QSUqra4jL7J9Aocn4ZwlS1RrgYc3rLaHD1FIwWL/n+7UbCkiUAOptnx8KT
+         l+Mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762515279; x=1763120079;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UiFlhUG339a0VfWabSoqEEVYWNHYCJ3zv2+BmKWjfS8=;
+        b=jGsM4lLsnjo01jbMHOBZLM7fRcPiDfr+U66Cz1fosR8RTUWUo/p7aoMbZZIP242atu
+         s72kEe6MwS0dluQpslw4YzhOeR4wvLPH/bpQZwxhcL2ZNhD9fRTi0yG7gTsICNl7LFSk
+         bcKp+ZGFBn+7ER+9awkt+bjV7EFaH8uiKwHlzfF0bsTQezgdjOW0P9ZR90mzlWADSIFR
+         cycB6NiatLnasJ40DmZ4fUUjkrr0tIwBjHlF570nQDke/rW2LhXaD56BhIwArd9jnk4G
+         WEWoFdHkzkqYcbO8scoZPU3losaeUOqrVO5oD6NEBfUuD8v4/rZ+XnceoNIbiuMqtxCf
+         TEJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWQW6R+DCh96bh0aNWNdsoxK7y9SlWcpj5qaxuTXDvw+odvWd0kEn7OhSqGDNhse0YuKWilmsk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymOjQQluent+XHjsBgbm/894PP7w1sTnOPawPysEgA0tqMxuER
+	vKF3713MEnTVFn6khm5HhCjwgalBhienIYRRg4b6dLzuWnMNdFCvZkIlpS+V3SCo/0rSouS+x2K
+	pq8+pzddt9NL83iKOIjT8CIvCenHX0V5TPt19XGRFLEzPrXu3BLKWOLbFJ64=
+X-Gm-Gg: ASbGncsVvcq4+guk5KwSPJ9wVQLZoYw1RALO5oIXasrJDONcsYcxjuuTdJd7XQGU6q/
+	81uGeTXxvMka7BguPz/Z0dNPXAm3jRnSnE0P/4JN2FQFlqc7/iAZgHzkXDltt2aov4+umqEUX3u
+	immouwH8b3SS3enh8iBoWqn0pIVORFJBcVCm0HdY6G9NVfHtmjJlDvvF7OJcBI5P/c7oljND10Z
+	oYcHxS7ulYBdrMm4tUW6eZ+OwgYKOAAfxFStMpl/TO/AYAMyNV7DZIIsE+nkeaVOV2zYQWh5G2E
+	cxe0THJZUon1Dag1WPPHWiaiCXb+64/abD/CkECgnCPZ5EYTaFDRy/TyweHa7cYyq/72p82eosp
+	E0fozqFQM0qtOY8SrlyG5QqOYvBS6SDDcRoV2f4z9WxBnJHKZ5bgJoSWt
+X-Received: by 2002:ac8:588f:0:b0:4b5:e4dc:1ee5 with SMTP id d75a77b69052e-4ed949427a0mr23309151cf.3.1762515278795;
+        Fri, 07 Nov 2025 03:34:38 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG+LAqOyus8ryKtljdjGtTT8tpekQXhHgSlDk1UkXksjpY7RbYCRhZLRuzIlyV/Mr61stF/eQ==
+X-Received: by 2002:ac8:588f:0:b0:4b5:e4dc:1ee5 with SMTP id d75a77b69052e-4ed949427a0mr23308921cf.3.1762515278322;
+        Fri, 07 Nov 2025 03:34:38 -0800 (PST)
+Received: from [192.168.119.202] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b72bdbc95e4sm223260366b.12.2025.11.07.03.34.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Nov 2025 03:34:36 -0800 (PST)
+Message-ID: <a80d25e3-9178-441c-8b09-3f69b703484d@oss.qualcomm.com>
+Date: Fri, 7 Nov 2025 12:34:33 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,73 +104,142 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 06/14] ipvlan: Support GSO for port -> ipvlan
-To: Eric Dumazet <edumazet@google.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<andrey.bokhanko@huawei.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-References: <20251105161450.1730216-1-skorodumov.dmitry@huawei.com>
- <20251105161450.1730216-7-skorodumov.dmitry@huawei.com>
- <CANn89i+iq3PVz6_maSeGJT4DxcYfP8sN0_v=DTkin+AMhV-BNA@mail.gmail.com>
- <dfad18c7-0721-486a-bd6e-75107bb54920@huawei.com>
- <bd0da59d-153f-4930-851a-68117dbcc2de@huawei.com>
- <CANn89iKioXqA3vdKdpL9iZYVU0qOPGCKxYiStc=WNWQ3+ARP_w@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: stmmac: qcom-ethqos: remove MAC_CTRL_REG
+ modification
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Mohd Ayaan Anwar <mohd.anwar@oss.qualcomm.com>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+        Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>
+References: <E1vE3GG-0000000CCuC-0ac9@rmk-PC.armlinux.org.uk>
+ <7a774a6d-3f8f-4f77-9752-571eadd599bf@oss.qualcomm.com>
+ <aQNXTscqFcucETEW@shell.armlinux.org.uk>
+ <bb2865b6-6c17-49e4-b18f-b9baad771830@oss.qualcomm.com>
+ <aQNwoC6aMPMMk4M1@shell.armlinux.org.uk>
 Content-Language: en-US
-From: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>
-In-Reply-To: <CANn89iKioXqA3vdKdpL9iZYVU0qOPGCKxYiStc=WNWQ3+ARP_w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
+In-Reply-To: <aQNwoC6aMPMMk4M1@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: mscpeml100003.china.huawei.com (10.199.174.67) To
- mscpeml500004.china.huawei.com (7.188.26.250)
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA3MDA5NCBTYWx0ZWRfX3itPH6+aD53v
+ YPwYGpYzcA2EscaadcR/W8YbhF5R3d+w/DXaVE+3ySAqQ40MOrnhuOf5ujbS6wB5PmvREgG9rKp
+ NgK/drtYw0Cy97S9S5iDSybLNoHFRMYYEiREI2CHsH09sQHeWNL28Vnri2nze1nlLEWsVtvhlIv
+ yT0AeXjag3+QDLfZFfex31v9hiCD6AxpLli1F46IBnTRiiLIM82fux6dVqWOcuUmVeQ66HZLocR
+ iD8EUPc6E3u9hhPr942C8xpHl0RhmQPYwcl3Pf7dHUGoDMG6Puc7g1aARxy+PjjyTtfJN1vmWMZ
+ /IV/nya4uNAawdU4//6AwYOqHYUKulc0v0rtqsJ0wHFqsM3nkb4ntPK1j/HE65GBV/Ql10sFNSY
+ XR1nHuxzGycAFyObRsY0/HGK5na7Vg==
+X-Proofpoint-ORIG-GUID: pgrNvEATWiGgJfCRQHqqgiIVJr2ii6A4
+X-Authority-Analysis: v=2.4 cv=A+hh/qWG c=1 sm=1 tr=0 ts=690dd94f cx=c_pps
+ a=mPf7EqFMSY9/WdsSgAYMbA==:117 a=FpWmc02/iXfjRdCD7H54yg==:17
+ a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=VwQbUJbxAAAA:8 a=COk6AnOGAAAA:8
+ a=H4ebBzf8g92K_wxokogA:9 a=QEXdDO2ut3YA:10 a=dawVfQjAaf238kedN5IG:22
+ a=TjNXssC_j7lpFel5tvFf:22
+X-Proofpoint-GUID: pgrNvEATWiGgJfCRQHqqgiIVJr2ii6A4
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-07_02,2025-11-06_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 lowpriorityscore=0 suspectscore=0 spamscore=0 bulkscore=0
+ malwarescore=0 impostorscore=0 phishscore=0 priorityscore=1501 adultscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2511070094
 
->> I see that currently there is no any tests for this ipvlan module (may be I missed something).. Do you have any ideas about tests? I'm a bit  confused at the moment: designing tests from scratch - this might be a bit tricky.
+On 10/30/25 3:05 PM, Russell King (Oracle) wrote:
+> On Thu, Oct 30, 2025 at 02:08:41PM +0100, Konrad Dybcio wrote:
+>> On 10/30/25 1:17 PM, Russell King (Oracle) wrote:
+>>> Konrad, Ayaan,
+>>>
+>>> Can you shed any light on the manipulation of the RGMII_IO_MACRO_CONFIG
+>>> and RGMII_IO_MACRO_CONFIG2 registers in ethqos_configure_sgmii()?
+>>>
+>>> Specifically:
+>>> - why would RGMII_CONFIG2_RGMII_CLK_SEL_CFG be set for 2.5G and 1G
+>>>   speeds, but never be cleared for any other speed?
 >>
->> Or it is enough just describe test-cases I checked manually (in some of the patches of the series)?
-> I have some hard time to figure out why you are changing ipvlan, with
-> some features that seem quite unrelated.
-Sorry! I had to sent a more descriptive cover letter with CC to all maintainers
-> ipvlan is heavily used by Google, I am quite reluctant to see a huge
-> chunk of changes that I do not understand, without spending hours on
-> it.
->
-> The MAC-NAT keyword seems more related to a bridge.
->
-I tried to make all the new functionality to not affect any existing code. The only place that changes behavior - is "[patch 2] Send mcasts out directly in ipvlan_xmit_mode_l2". May be I should spend some time and invent a way to not change behavior at all. All other places should be under "if (ipvlan_is_macnat(port))".
+>> BIT(16) - "enable to transmit delayed clock in RGMII 100/10 ID Mode"
+> 
+> I guess that means that changing this bit is not relevant for the SGMII
+> path, and thus can be removed:
+> 
+>         switch (speed) {
+>         case SPEED_2500:
+> -               rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
+> -                             RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
+> -                             RGMII_IO_MACRO_CONFIG2);
+>                 ethqos_set_serdes_speed(ethqos, SPEED_2500);
+>                 ethqos_pcs_set_inband(priv, false);
+>                 break;
+>         case SPEED_1000:
+> -               rgmii_updatel(ethqos, RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
+> -                             RGMII_CONFIG2_RGMII_CLK_SEL_CFG,
+> -                             RGMII_IO_MACRO_CONFIG2);
+>                 ethqos_set_serdes_speed(ethqos, SPEED_1000);
+>                 ethqos_pcs_set_inband(priv, true);
+> 
+>>> - why is RGMII_CONFIG_SGMII_CLK_DVDR set to SGMII_10M_RX_CLK_DVDR
+>>>   for 10M, but never set to any other value for other speeds?
+>>
+>> [18:10] - In short, it configures a divider. The expected value is 0x13
+>> for 10 Mbps / RMII mode
+> 
+> This gets confusing. Is the "/" meaning "10Mbps in RMII mode" or "10Mbps
+> or RMII mode".
+> 
+>> which seems to have been problematic given:
+>>
+>> https://lore.kernel.org/all/20231212092208.22393-1-quic_snehshah@quicinc.com/
+>>
+>> But it didn't say what hardware had this issue.. whether it concerns a
+>> specific SoC or all of them..
+>>
+>> A programming guide mentions the new 0x31 value for 10 Mbps in a
+>> SoC-common paragraph so I suppose it's indeed better-er.. Perhaps issues
+>> could arise if you switch back to a faster mode?
+> 
+> Could the 0x13 be a typo? Its suspicious that the two values are 0x13
+> vs 0x31. 0x13 = 19 vs 0x31 = 49. 0x31 makes more sense than 19.
+> 
+> The platform glue is required to supply clk_rx_i to the dwmac's MAC
+> receive path, deriving it from the 125MHz SGMII rx link clock divided
+> by 1, 5 or 50. Normally, this would be done by hardware signals output
+> from the dwmac.
+> 
+> This suggests that the value programmed is one less than the actual
+> divisor.
+> 
+> There's two possibilities why this value needs to be programmed:
+> 
+> 1. the hardware doesn't divide the SGMII rx link clock according to
+> the hardware signals output from the dwmac, and needs the divisor to
+> be manually programmed. This would require the divisor to also be
+> programmed to 4 for 100M (but the driver doesn't do this.)
+> 
+> 2. the hardware selects the clk_rx_i depending on the hardware
+> signals, and while 1G and 100M use a fixed divisor of 1 and 5, the
+> 10M divisor needs to be manually programmed.
+> 
+> Any ideas what's really going on here?
 
-Now I'd also want to implement some tests, and try to ensure, that existing functionality continues work well. I hope that after review and tests, there will be no bugs.
+The computer says:
 
-> The MAC-NAT keyword seems more related to a bridge.
+RGMII ID mode - speed == 10 ? 0x13 : dontcare?
+RMII Bypass ID mode - - speed == (10 || 100) ? 0x13 : dontcare?
+(*the 100 above says "default" but that's again 0x13)
 
-At start of work on this feature, I saw options: 1) Modify IPVLan 2) Modify net/bridge 3) clone IPVLan to new module and extend it
+RMII mode (100 Mbps) - default (0x13)
+RMII mode (10 MBps) - 0x13
 
-But net/bridge is already overbloated, and I believe it is better not touch it. And IPVlan already has all the required infrastructure functions. Actually, all new functionality - is about 600 lines of diff (patches 1 and 4). The IPVLan is essentially "bridge" in its functionality.. extending it to learn IPs and do mac-nat - is easy. All other diffs - are just improvements (like improve handling IP conflicts, refactor validator/address events handling)
+SGMII mode - speed == 10 ? 0x31 : 0x13
 
-And... i saw a lot of people are already using IPVLan to bridge to WiFi - though with a lot of limitations and troubles.
+Make of that what you will, I would *guess* there may be something like
+2. going on
 
-Here is a bit rewritten documentation (AI also suggests server-case scenarios, but I'm skeptical about it):
-
-+4.4 L2_MACNAT mode:
-+-------------------
-+
-+This mode extends the L2 mode and is primarily designed for desktop virtual
-+machines that need to bridge to wireless interfaces. In standard L2 mode,
-+you must configure IP addresses on slave interfaces to enable frame
-+multiplexing between slaves and the master.
-+
-+In L2_MACNAT mode, IPVLAN automatically learns IPv4/IPv6 and MAC addresses
-+from outgoing packets. For transmitted packets, the source MAC address
-+is replaced with the MAC address of the main interface. Received packets
-+are routed to the interface that previously used the destination address,
-+and the destination MAC is replaced with the learned MAC address.
-+
-+This enables slave interfaces to automatically obtain IP addresses
-+via DHCP and IPv6 autoconfiguration.
-+
-+Additionally, dev_add_pack() is configured on the master interface to capture
-+outgoing frames and multiplex them to slave interfaces when necessary.
-
-Dmitry
-
-
+Konrad
 
