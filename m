@@ -1,101 +1,124 @@
-Return-Path: <netdev+bounces-236849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23AC6C40B20
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 16:55:54 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id C267EC40B9A
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 17:00:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38B26565580
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 15:55:05 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1EAF04F232C
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 16:00:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B93832E149;
-	Fri,  7 Nov 2025 15:54:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D4811F4174;
+	Fri,  7 Nov 2025 16:00:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UTpdB5TR"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CrZAY3hi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60ED02C237E;
-	Fri,  7 Nov 2025 15:54:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C0BC1A3179
+	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 16:00:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762530872; cv=none; b=jZFQpKMjRqaltol7Bw9RrLvIHOSueEbIjcolVpjfJNF37PIk6lAOSKyoUbgFJWn9VLPhdp01oEFWjKfI3bJZNxSuth0RKj6IAagIjLOthhlbOVZEK4Yyte/Kkffn9Hmj4btPQz1Mbkcw46DwgJ4AQfh3N9tQj1PP6fLxjRsecBo=
+	t=1762531241; cv=none; b=u2G6lpbve7fu9J9iAXDNSFhM40/JaMonDXLKHPnQaju/IQFhH4M1PEM8BVEFCIWLaxowXPIizClf246n4ajs4tr4RH7mgVJdgBQmPwa5hBtv6+IbofKf6ZbEN6F8OeDICimW0cQ2K+i3CAB2fHUaJdQDic/RpBYhj9a9zU3Afyg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762530872; c=relaxed/simple;
-	bh=K+CYTJmhXzXtU1VvrV2fmqOB1GMwfv/N3ycEEm7Wqa0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=h0T46QSFCfX/+tuIZNK6lFjlLyKRCrf8R1kiJvq7FghbMyuDg3P0Y+cCLlN3iOPm/PGneTTkQ+1audL7veoSK6pFJoCZNvfdhXTxnz1a9SX1MhymZ04LKZt92P2CV+0ChEO2JNPoLQN0dQHfYQZ2bPqChap6O2VYRt8NRtpAtNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UTpdB5TR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83A62C16AAE;
-	Fri,  7 Nov 2025 15:54:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762530872;
-	bh=K+CYTJmhXzXtU1VvrV2fmqOB1GMwfv/N3ycEEm7Wqa0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UTpdB5TRgLJ30KkodfimJdie1f/Pphfg7S/pOXZMlb4Tdplr820nZLaVYM8MtnRpC
-	 40k6JG25OWjB0+lalrF7WZnXryl4EywsUmhW8x55oTqsDsyeW7jAs6Whxtpzv6lPXA
-	 X777lCThGMC67so341CoWBY0Q9aVbDTPWz0xmiaE9k2loCesaB3gQntubOUWaa+zjZ
-	 8Ngu2FeRVYXFLZZzlJPGOKXvMWw5Ph9rFSDpNlXVZ53IL5Bady0UHK5wZNYyOm5y3V
-	 6gM83txzkgiMo3pEZSQX6YhLSg5/VnPXccFhhuxnxO5gzkc4w3i+A5x0Ujlu1Bq4Lq
-	 8/motA70DKhLQ==
-Date: Fri, 7 Nov 2025 07:54:30 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
- razor@blackwall.org, pabeni@redhat.com, willemb@google.com,
- sdf@fomichev.me, john.fastabend@gmail.com, martin.lau@kernel.org,
- jordan@jrife.io, maciej.fijalkowski@intel.com, magnus.karlsson@intel.com,
- dw@davidwei.uk, toke@redhat.com, yangzhenze@bytedance.com,
- wangdongdong.6@bytedance.com
-Subject: Re: [PATCH net-next v4 11/14] netkit: Implement
- rtnl_link_ops->alloc and ndo_queue_create
-Message-ID: <20251107075430.6a4f32ff@kernel.org>
-In-Reply-To: <12551093-9384-4801-b2d1-a5505a87f9b4@iogearbox.net>
-References: <20251031212103.310683-1-daniel@iogearbox.net>
-	<20251031212103.310683-12-daniel@iogearbox.net>
-	<20251106164106.7b858706@kernel.org>
-	<12551093-9384-4801-b2d1-a5505a87f9b4@iogearbox.net>
+	s=arc-20240116; t=1762531241; c=relaxed/simple;
+	bh=erRiwf/H0DJobTUclpjvrIKXSICoT7jx0oxAMM1hJaQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=t+tRXNAwL7Ov1AHqWOPDNjVy7kNpPTRGwV8ieOPtJy8xffITsLKUiRe48K33PXfbLeEGA1OAVzmoHvFOtAfJPV+sbIWGbIZG7p+CfXoyZc73rT1la0CIly9var4FuupDlsg4ytrSyO0yg2AFiqPMqtbQr6UDPG20d8WkbD9zn1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CrZAY3hi; arc=none smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-8801f4e308dso8607656d6.0
+        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 08:00:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1762531238; x=1763136038; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=erRiwf/H0DJobTUclpjvrIKXSICoT7jx0oxAMM1hJaQ=;
+        b=CrZAY3hi34ZiAFwEMgQHbE6HqV2NKhEHzEnxaYGRg/15UpvPqCzf+g++W1n9/1+H1C
+         KFlU/NUprywgs7bstTdremdmX+5qfvIrjuIEtDMXCv7JVgqozywdT8u/m87LCUm5E8cs
+         M2HWZdnNR0aeM4yFpymUkjxQz8kJA41JpsluaaovpuUhhT/Hd5Ap9EPuUJL7773gJ3Oj
+         ATFgXj+m9vIfYEByWCiurywHyT0jggUjcdcnbv+wiSNU2zSudpqf6LP02e0V/5LQSTzi
+         lYrcYeHb6Ok7Oz5P6YlMTJONF6taY7kBR4YGFu48qV15H2yJQUjmihL3SKHjPXhKc9eB
+         kDdA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762531238; x=1763136038;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=erRiwf/H0DJobTUclpjvrIKXSICoT7jx0oxAMM1hJaQ=;
+        b=h/ertIojPBpOP0/fLZgEYc2s3oZ0lubNAB1Tombq0rEen8ZO6CkH5ry/qUk7+/tFS0
+         iS+7d/hFdhiX/iJlbmLPA2LBTvlcMhmdAXin2HiJbeJ7FZ1X8XvH1kEoP9lbzx8h2ajU
+         Oa1BqfxZFQGxYhv/tvygqM1W+4VXyiGcR5CkR46cmMMv7vjUtMwU5EgpUpf1Od/3S0vi
+         1hGEWneT6tk9goV6hYUwD+w7amdhzbu6u/b/9IlHPsXX5K1tojsClGVJWj8FdJumiJ8P
+         QLUUUeZ/KAnS1/Q9bxF8XP6J/e+Gp5fl//n+GajIenkmutLkwJDKJpW2wFjcPyvXhSEU
+         bGKg==
+X-Forwarded-Encrypted: i=1; AJvYcCVuXR2V1txainAGZxeJ1edyVwTHSzk8FGPZSJSzFeq7KAQ6KSQJAxM0HIkEXypueeJi/t3l6jc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+iXKFj8BMaWEMsZgJVBnoK25++ylBeat85tR4K4e3XEL14FZ0
+	PMNycXBVTkbtZufWL9z7W7iwRAntvF1u69LnXoHsPmX+8uoGGooVmfnrqFhNUmpxDZaUvQlyl8i
+	ZfwzlD7N9Msy0WLb2l+KQ15y6uSB9kmEaD+ltm8SI
+X-Gm-Gg: ASbGncu5Eo8OTWu2pP/CN2bnbwT/OgGkklA4MH7POxFT7qw54VOi8tYRxvwZBrXOUvJ
+	VCfaObwTLMwl8hnGjEm+JsKb41ycHwEvNtFhzRUWlmoRD1HoX+VxE7GztWkMJ4FFbsY1wH/FIq/
+	hTl6QI5YuM+WVcvHlPvZGlS87bB+Yz0a0fLTRBYSnMaxeFgPJwyvO8o3rue57ggk68njOECKHG7
+	tP5BPblSS6kqezk29i16BsXlttpdvHzqfvRioTRpNmjwKwEjfx4Me1GrJWH
+X-Google-Smtp-Source: AGHT+IHIuHahaG1lyHk02T9VszvlGamnHMHGuqMQ4MKUDQap3agaUlf0rUwO9dXShO3EqF24cTvgJA2eAKBmGpVnwwk=
+X-Received: by 2002:ad4:5d62:0:b0:880:4f0d:e07c with SMTP id
+ 6a1803df08f44-881766cd890mr48619956d6.30.1762531237958; Fri, 07 Nov 2025
+ 08:00:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20251106202935.1776179-1-edumazet@google.com> <20251106202935.1776179-4-edumazet@google.com>
+ <CAL+tcoBEEjO=-yvE7ZJ4sB2smVBzUht1gJN85CenJhOKV2nD7Q@mail.gmail.com>
+ <CANn89i+fN=Qda_J52dEZGtXbD-hwtVdTQmQGhNW_m_Ys-JFJSA@mail.gmail.com> <CAL+tcoBGSvdoHUO6JD2ggxx3zUY=Mgms+wKSp3GkLN-pLO3=RA@mail.gmail.com>
+In-Reply-To: <CAL+tcoBGSvdoHUO6JD2ggxx3zUY=Mgms+wKSp3GkLN-pLO3=RA@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 7 Nov 2025 08:00:26 -0800
+X-Gm-Features: AWmQ_bmUxjn6W-PH_Q2Gg1QihCKipVhKodHuqRUzwPh6gicr-N4dfCv99dRU9mw
+Message-ID: <CANn89iJcWc+Qi7xVcsnLOA1q9qjtqZLL5W4YQg=SND3tX=sLgw@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/3] net: increase skb_defer_max default to 128
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 7 Nov 2025 16:01:44 +0100 Daniel Borkmann wrote:
-> On 11/7/25 1:41 AM, Jakub Kicinski wrote:
-> > On Fri, 31 Oct 2025 22:21:00 +0100 Daniel Borkmann wrote: =20
-> >> +static void netkit_get_channels(struct net_device *dev,
-> >> +				struct ethtool_channels *channels)
-> >> +{
-> >> +	channels->max_rx =3D dev->num_rx_queues;
-> >> +	channels->max_tx =3D dev->num_tx_queues;
-> >> +	channels->max_other =3D 0;
-> >> +	channels->max_combined =3D 1;
-> >> +	channels->rx_count =3D dev->real_num_rx_queues;
-> >> +	channels->tx_count =3D dev->real_num_tx_queues;
-> >> +	channels->other_count =3D 0;
-> >> +	channels->combined_count =3D 0;
-> >>   } =20
-> >=20
-> > Why do we need to implement get_channels? =20
->=20
-> Thanks for the feedback. I think this one was useful imho since it allowed
-> for introspection via ethtool on netkit side e.g. the max_rx vs rx_count.
+On Fri, Nov 7, 2025 at 7:50=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.co=
+m> wrote:
+>
+> On Fri, Nov 7, 2025 at 11:47=E2=80=AFPM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >
+> > On Fri, Nov 7, 2025 at 7:37=E2=80=AFAM Jason Xing <kerneljasonxing@gmai=
+l.com> wrote:
+> > >
+> > > On Fri, Nov 7, 2025 at 4:30=E2=80=AFAM Eric Dumazet <edumazet@google.=
+com> wrote:
+> > > >
+> > > > skb_defer_max value is very conservative, and can be increased
+> > > > to avoid too many calls to kick_defer_list_purge().
+> > > >
+> > > > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > >
+> > > I was thinking if we ought to enlarge NAPI_SKB_CACHE_SIZE() to 128 as
+> > > well since the freeing skb happens in the softirq context, which I
+> > > came up with when I was doing the optimization for af_xdp. That is
+> > > also used to defer freeing skb to obtain some improvement in
+> > > performance. I'd like to know your opinion on this, thanks in advance=
+!
+> >
+> > Makes sense. I even had a patch like this in my queue ;)
+>
+> Great to hear that. Look forward to seeing it soon :)
 
-Right, but we have netdev-nl queue-get now which also reports the new
-"lease"/"peer" info so it will be much clearer.
-
-Ah, is this because libbpf looks at channels to figure out the queue
-count? Can we make it use netdev-nl ?
-
-I guess it could also count the entries in $sysfs/queues/rx-* but that
-doesn't express the fact that queue 0 is unusable. Which I suppose the
-get_channels implementation was trying to "express" by setting
-max_combined=3D1 ? =F0=9F=98=B6=EF=B8=8F
+Oh please go ahead !
 
