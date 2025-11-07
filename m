@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-236676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38344C3EE1B
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 09:08:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6577C3EE2A
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 09:09:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B678234C10E
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 08:08:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA0AE3B1137
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 08:08:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35E6E30F814;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C8C4310768;
 	Fri,  7 Nov 2025 08:08:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QjTGTuUr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MvAUggh/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C10530FC3F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B28003101A2
 	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 08:08:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762502887; cv=none; b=EmHsyxYy2LdHrZEIJN+LYlV48KzcYWjARC5o3TBQVFIMcBbN/c1VHWsvcq/sXNsUHnw0/ECroKETRdR+5mVMdi2cFouHZQnPX3KwHtcY0+fRPc2RwOprOhNexmNd3eBmrUvT7zOjwqVfJZxWwwohaEnVqFys+IqcDotiXJS+6FE=
+	t=1762502887; cv=none; b=pKJS8Fb8zw/bcZJbE3y0mhUGpS9gG+QqdnH9e+LvaNeLo22GC2xx4w7npVIHxQL/dtsJzNY5/XAlZER5eh7x0jvOessNADa4BFi9sqRJYroi4BpH3eeWhr3JXj3yXAzcFtvOVUGTTwMLyMvK4YIsVn0IdJYbSiLZrBlTYBRBEzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1762502887; c=relaxed/simple;
-	bh=c/ypx/7KDRitSfXO3iv/XG5GJJGXfdxf5+ySmcx3JiY=;
+	bh=T+fv7B4EGOErJ4vvULFWmw8UusTVspY0S65zOSRYCp4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=I8LmvRYduRq/2d1XVIdSub+iWhwhH7zCkMRX52MODoEii+K2/dczhpXZOr1ua68i8WMHQND5fMmOdaIU884x+K05DC7JEwPUgyYNmDFFukhj++GiBsgWN3ZSrGo3MPIQwKyy3+I0ZooW2Gn+20knebyJveKQwwEWgKB9rvGPSYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QjTGTuUr; arc=none smtp.client-ip=209.85.218.53
+	 MIME-Version; b=UoRMo60UNdeV9XyOdUIwwQE+7v+4YkDePzPkniGBPXkYNzyQVcm/fp534gB2C3m9p7//DRPQXVGECfGHIZJGvSXWajeqHVoWhZCFErch4by8nnEdQph432QVUSX5IqpVdq5xCH7rIT8TBwDAnt5ALBlCfB77i/v08w/o+BpEs90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MvAUggh/; arc=none smtp.client-ip=209.85.208.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-b72134a5125so69880766b.0
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-64149f78c0dso182236a12.3
         for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 00:08:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20230601; t=1762502884; x=1763107684; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=AliuwcJnqc6fNYruuHtll/VWN2+GFQQMz8uQSPpdEUc=;
-        b=QjTGTuUrmMwl1d16OgsrkmJ6o1hDSFNobzew3cZKkujplevGxZRuunh5VcnNtH3315
-         8qFLUkV1iKs2IAdtI4jwlnaZOqn2D0vF1nSLipefVm2k2W+ofSNMiDLGM1yE/k7H4ZAE
-         JCldsgVSCMy7EPAo8eqCiLJUs6FKygwLFjCUHff8PBDfACJiorqbv0ttqLpPrX2knqIf
-         TLiwU4AyaSqF9Gp+wWyvwxgm8V68H+EzZlQwl1JnD36dXdlvhJTc0FA1soWPtdKHKbXl
-         aWNowiEnrkvA0tjpzZw0KhXH6cKcbKTM2Pv3s6u7kGZVIOelQbSXGdScvHzkeC3O39C0
-         +1Lg==
+        bh=/xZ5yli4HyPeAHciL3B8npkM3Dz4xiXZ5nUJPMyAy7w=;
+        b=MvAUggh/j9KbagwjBgk/EWhlAc9pkXVQolxRfhDIb4KSplp2OHsbD8sJwBLi7AfyzX
+         D6N1Dl9AG9Y/wHQiJCbO9khKXe6X9cTGDC9UmCDtCxclGCQkdYekgKZGhbFgJbHY8fVw
+         85IW4mhTm3kDJVN2AoiALH6BIUm0Ma7Q09IMG/gMJ0xBQXY5yAVGBfUaAYXrpglcR81N
+         M5fEKOkGCCIqv2YVSdivla4EOoL3nduNJkvGqP8zbXJ8NUU/z/9JSYdb8lhQXShI24jA
+         cyaZrAaUsxK4XbLDWUEbtNB4K14LU2eOa1/9XfSfXEYQML5bodKI8As0otegYcpub80U
+         Rg+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1762502884; x=1763107684;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=AliuwcJnqc6fNYruuHtll/VWN2+GFQQMz8uQSPpdEUc=;
-        b=meKvpFSMfcBrBNm6CvzUREb6a9WZDtuIqFLNN1qjINbKM29BzULc6t+ouWxghZsh45
-         nLI3q9rTvtR8+JHj0SqL/0eGKK2pCMIcBCXBF2UwDKg13i7unjK+EDTO0F6D+oQL0lFi
-         dzeivCDCvCmf6oy394LjGWQ7WfBvAuhSw8uuOo9J/45jl8AsKU0N19THlHLXYQGSOYLc
-         4hvkJqUVc6Fbhkee7sJL0xG0iZBYj5RoLomg+6xszb/JFyW8pxO/9mDdU7+V0s5HvXwl
-         1OlKmVDXNyRx/762Xqc5VA0N6QGVfckliNYImakxvkbOlUccF/jvF79qIUkc9nsW22xb
-         ponw==
-X-Gm-Message-State: AOJu0YzH7h2UbgAc4ARRH5B6jdIiSC8S1zOW0TY4MmRJGIQVtCyq+b5m
-	2XWZK4tUwHVOxhhypLn+GC4SJh8n+f5PhqnZ0qE9anaA0eI8Mb2OmBe7
-X-Gm-Gg: ASbGncsAYlc4MUJsM9iFPUzh9wbebxg85wphCPUZ9rhuwyZW9gtg/+QCExrTMI6LJFN
-	KbU8cTvXvWxZzi0xxYVX5WeIKDm3WDrVCjXHQR57CAA4SzWBJAiT5drDZzPAfQlWFwmy+kA/fLH
-	5cmum77Caf7rSrzsuhcsfVOWRCX0hsrNiX3A4uRvt/vH05ipfaE+j7K4zGB3bdY1x6FTMAD+lmX
-	tiAU46ja70KYGg+zPEZ/4SnRHfqWGF/evrqzvr57Jpk0pVo4qf0UQEiwbZDSStTKJG0Ardmo9cB
-	NKRvq00aIesh3s6Yj3VPlfbEG4ZEKGWWre9O9cXs1KtPkVf9QbYmcfierjED9DrKVDtzHYeze0e
-	GC5wGnTXpWFCL2OGNO09aY8GK1uhFjI6pArK8Mn5BnR7xgKXyfbgwzhgcsh6kF1D4M/VJTBpfWq
-	vRZx48QxiS68H1byn31/Unu+OsXQPYi4eYE8BFZdyFhUpwYW7Ksy91GuUh
-X-Google-Smtp-Source: AGHT+IEstEw1exNyTbFuvnvrUK3nX+jDWzrwRf9MNF5NOkcJ6wg9CRw5gIOyRK6s0Hlt8IeRAvgQVw==
-X-Received: by 2002:a17:907:9607:b0:b70:b5b9:1f82 with SMTP id a640c23a62f3a-b72c0abcb78mr238175466b.31.1762502882846;
-        Fri, 07 Nov 2025 00:08:02 -0800 (PST)
+        bh=/xZ5yli4HyPeAHciL3B8npkM3Dz4xiXZ5nUJPMyAy7w=;
+        b=A5iALM8bBoe47lbxyu8I7ha9P3EOf1Lr/6WLcKrTx0zBZKmsrLih5nQwYzjZ+ykF0L
+         y4Wbhv+3h3Q+FJ0x3DO5qej62oL8/v+ZzR2krFG21/vch99MDGGhnfJkqf5O1oCMZz3C
+         hkPlcqhAiu9oq4AtrXNqjeK9QINKaZaYR6JrezTtG6UifrEvu4PGq1SlxADDLu2UMbwp
+         6yt97tLWRmVQb+kqYLtu/ZLTgY8UsdPUYP86T44yhljk+pEh3daT3rkI+rHT/FlbiH4a
+         5Z7NqjmGbfd/QpES+ifmK2FW6HfbaMFMB3fYxCzgCxjVPO2ZO5qnuxf5+Eh8GGNZ9Aar
+         E2Ww==
+X-Gm-Message-State: AOJu0YyDPtoSiBl/1D+wi08y9IQpG+eBcu0QThujbjqyJuf9RZyEW4KG
+	AQbIc5TIjQZe81NdICJu8fiQwNWI7CbNqHzdVBBWobnUZcKDisJ7/I14
+X-Gm-Gg: ASbGncvgXc2G7nGl4Ic92t/LVm8ILmnnvryMq/27qCsffN4KJkAaMjBKsXbIC0Bx6LP
+	rLmSDZr2wGdsZSXqMMDhbfsZOdnI1DVXRIYxOzsy98Yz+CVpimfpShK7yxipOL7qxXOAAZtKtqW
+	qKQZQYmYoIWS48ReGzGCd+db9H+O3bMFt3m0hr9mkWNOY8fmC9qpiq9Gj7q468MW2IhX7ibzAp/
+	tm0RktmfLX/YOiao5a+vFaCtyZc91HtZSx+C4nY4mwQ6znkybHDCa6jmG6Ppgk5kq6SfksH3y/i
+	XOoAqbl05EN9ApuBA5tmqVwsekroKLH9EukzYbkC47VzM4h6f+Zy6X+UBu4KWfLYTVCEQ0mv0xW
+	rCFrsqOr17MyCkDqFUgicctS3WDfeN6QAIJWJHW6XkpVD/g7dyDTv71TJRap7ENYOFtqMAvISH/
+	Ub5OwW0Y/JQGWteK50Os6l8o8d9OYBFc0wN84ct8ADSl0GFBSbRYYa3Jlk
+X-Google-Smtp-Source: AGHT+IH9b/MYYIuDyWdT7ZTBQkoaDfwy59F6a7uHK4JT6ZExE1cuece4EF876eM8gMqHiUFkgjKe3Q==
+X-Received: by 2002:a17:907:9608:b0:b6d:5718:d43f with SMTP id a640c23a62f3a-b72c0abc187mr227415266b.39.1762502884014;
+        Fri, 07 Nov 2025 00:08:04 -0800 (PST)
 Received: from localhost (dslb-002-205-018-238.002.205.pools.vodafone-ip.de. [2.205.18.238])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b72d32e25f6sm46179466b.5.2025.11.07.00.08.02
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b72bf60ef8asm173812266b.30.2025.11.07.00.08.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Nov 2025 00:08:02 -0800 (PST)
+        Fri, 07 Nov 2025 00:08:03 -0800 (PST)
 From: Jonas Gorski <jonas.gorski@gmail.com>
 To: Florian Fainelli <florian.fainelli@broadcom.com>,
 	Andrew Lunn <andrew@lunn.ch>,
@@ -83,9 +83,9 @@ To: Florian Fainelli <florian.fainelli@broadcom.com>,
 	Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 3/8] net: dsa: b53: move writing ARL entries into their own functions
-Date: Fri,  7 Nov 2025 09:07:44 +0100
-Message-ID: <20251107080749.26936-4-jonas.gorski@gmail.com>
+Subject: [PATCH net-next 4/8] net: dsa: b53: provide accessors for accessing ARL_SRCH_CTL
+Date: Fri,  7 Nov 2025 09:07:45 +0100
+Message-ID: <20251107080749.26936-5-jonas.gorski@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251107080749.26936-1-jonas.gorski@gmail.com>
 References: <20251107080749.26936-1-jonas.gorski@gmail.com>
@@ -97,92 +97,85 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Move writing ARL entries into individual functions for each format.
+In order to more easily support more formats, move accessing
+ARL_SRCH_CTL into helper functions to contain the differences.
 
 Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
 ---
- drivers/net/dsa/b53/b53_common.c | 38 ++++++++++++++++++++++----------
- 1 file changed, 26 insertions(+), 12 deletions(-)
+ drivers/net/dsa/b53/b53_common.c | 37 +++++++++++++++++++++-----------
+ 1 file changed, 24 insertions(+), 13 deletions(-)
 
 diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
-index d99e15a7a6bb..9eb7ca878e30 100644
+index 9eb7ca878e30..b13437ea21a0 100644
 --- a/drivers/net/dsa/b53/b53_common.c
 +++ b/drivers/net/dsa/b53/b53_common.c
-@@ -1860,6 +1860,16 @@ static void b53_arl_read_entry_25(struct b53_device *dev,
- 	b53_arl_to_entry_25(ent, mac_vid);
+@@ -2033,18 +2033,37 @@ int b53_fdb_del(struct dsa_switch *ds, int port,
  }
+ EXPORT_SYMBOL(b53_fdb_del);
  
-+static void b53_arl_write_entry_25(struct b53_device *dev,
-+				   const struct b53_arl_entry *ent, u8 idx)
-+{
-+	u64 mac_vid;
+-static int b53_arl_search_wait(struct b53_device *dev)
++static void b53_read_arl_srch_ctl(struct b53_device *dev, u8 *val)
+ {
+-	unsigned int timeout = 1000;
+-	u8 reg, offset;
++	u8 offset;
 +
-+	b53_arl_from_entry_25(&mac_vid, ent);
-+	b53_write64(dev, B53_ARLIO_PAGE, B53_ARLTBL_MAC_VID_ENTRY(idx),
-+		    mac_vid);
++	if (is5325(dev) || is5365(dev))
++		offset = B53_ARL_SRCH_CTL_25;
++	else
++		offset = B53_ARL_SRCH_CTL;
++
++	b53_read8(dev, B53_ARLIO_PAGE, offset, val);
 +}
 +
- static void b53_arl_read_entry_95(struct b53_device *dev,
- 				  struct b53_arl_entry *ent, u8 idx)
- {
-@@ -1872,6 +1882,19 @@ static void b53_arl_read_entry_95(struct b53_device *dev,
- 	b53_arl_to_entry(ent, mac_vid, fwd_entry);
- }
- 
-+static void b53_arl_write_entry_95(struct b53_device *dev,
-+				   const struct b53_arl_entry *ent, u8 idx)
++static void b53_write_arl_srch_ctl(struct b53_device *dev, u8 val)
 +{
-+	u32 fwd_entry;
-+	u64 mac_vid;
-+
-+	b53_arl_from_entry(&mac_vid, &fwd_entry, ent);
-+	b53_write64(dev, B53_ARLIO_PAGE, B53_ARLTBL_MAC_VID_ENTRY(idx),
-+		    mac_vid);
-+	b53_write32(dev, B53_ARLIO_PAGE, B53_ARLTBL_DATA_ENTRY(idx),
-+		    fwd_entry);
-+}
-+
- static int b53_arl_read(struct b53_device *dev, const u8 *mac,
- 			u16 vid, struct b53_arl_entry *ent, u8 *idx)
- {
-@@ -1912,9 +1935,8 @@ static int b53_arl_op(struct b53_device *dev, int op, int port,
- 		      const unsigned char *addr, u16 vid, bool is_valid)
- {
- 	struct b53_arl_entry ent;
--	u32 fwd_entry;
--	u64 mac, mac_vid = 0;
- 	u8 idx = 0;
-+	u64 mac;
- 	int ret;
++	u8 offset;
  
- 	/* Convert the array into a 64-bit MAC */
-@@ -1947,7 +1969,6 @@ static int b53_arl_op(struct b53_device *dev, int op, int port,
- 		/* We could not find a matching MAC, so reset to a new entry */
- 		dev_dbg(dev->dev, "{%pM,%.4d} not found, using idx: %d\n",
- 			addr, vid, idx);
--		fwd_entry = 0;
- 		break;
- 	default:
- 		dev_dbg(dev->dev, "{%pM,%.4d} found, using idx: %d\n",
-@@ -1975,16 +1996,9 @@ static int b53_arl_op(struct b53_device *dev, int op, int port,
- 	ent.is_age = false;
- 	memcpy(ent.mac, addr, ETH_ALEN);
  	if (is5325(dev) || is5365(dev))
--		b53_arl_from_entry_25(&mac_vid, &ent);
-+		b53_arl_write_entry_25(dev, &ent, idx);
+ 		offset = B53_ARL_SRCH_CTL_25;
  	else
--		b53_arl_from_entry(&mac_vid, &fwd_entry, &ent);
--
--	b53_write64(dev, B53_ARLIO_PAGE,
--		    B53_ARLTBL_MAC_VID_ENTRY(idx), mac_vid);
--
--	if (!is5325(dev) && !is5365(dev))
--		b53_write32(dev, B53_ARLIO_PAGE,
--			    B53_ARLTBL_DATA_ENTRY(idx), fwd_entry);
-+		b53_arl_write_entry_95(dev, &ent, idx);
+ 		offset = B53_ARL_SRCH_CTL;
  
- 	return b53_arl_rw_op(dev, 0);
- }
++	b53_write8(dev, B53_ARLIO_PAGE, offset, val);
++}
++
++static int b53_arl_search_wait(struct b53_device *dev)
++{
++	unsigned int timeout = 1000;
++	u8 reg;
++
+ 	do {
+-		b53_read8(dev, B53_ARLIO_PAGE, offset, &reg);
++		b53_read_arl_srch_ctl(dev, &reg);
+ 		if (!(reg & ARL_SRCH_STDN))
+ 			return -ENOENT;
+ 
+@@ -2099,23 +2118,15 @@ int b53_fdb_dump(struct dsa_switch *ds, int port,
+ 	unsigned int count = 0, results_per_hit = 1;
+ 	struct b53_device *priv = ds->priv;
+ 	struct b53_arl_entry results[2];
+-	u8 offset;
+ 	int ret;
+-	u8 reg;
+ 
+ 	if (priv->num_arl_bins > 2)
+ 		results_per_hit = 2;
+ 
+ 	mutex_lock(&priv->arl_mutex);
+ 
+-	if (is5325(priv) || is5365(priv))
+-		offset = B53_ARL_SRCH_CTL_25;
+-	else
+-		offset = B53_ARL_SRCH_CTL;
+-
+ 	/* Start search operation */
+-	reg = ARL_SRCH_STDN;
+-	b53_write8(priv, B53_ARLIO_PAGE, offset, reg);
++	b53_write_arl_srch_ctl(priv, ARL_SRCH_STDN);
+ 
+ 	do {
+ 		ret = b53_arl_search_wait(priv);
 -- 
 2.43.0
 
