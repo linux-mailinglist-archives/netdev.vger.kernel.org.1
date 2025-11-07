@@ -1,225 +1,151 @@
-Return-Path: <netdev+bounces-236873-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236874-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10DD0C4126C
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 18:50:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13292C41272
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 18:51:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFFB2188C713
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 17:50:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 88A85188377A
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 17:52:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68F6B3358B7;
-	Fri,  7 Nov 2025 17:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 540F4336EDD;
+	Fri,  7 Nov 2025 17:51:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mwN0/2co"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ELrQNNZt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F156207A22;
-	Fri,  7 Nov 2025 17:50:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0E6334C25
+	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 17:51:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762537808; cv=none; b=MIXi2F0SvLGrLibJtu/Qe5XbmmPLaoItA08eCL0d0Fz6qvHgVE3gz8XbkHVJ/vQYAZlkw12J3zFq1Zlv6a7A+vKPoTuudt8M/7TSfHGdjZcaWe2r1wQgCMFZS/+IuWh6tlD1uM8bbhyH1EjlFWaazpGjKKB0a2ZNL8V2L+j5v60=
+	t=1762537889; cv=none; b=FbFq5rIK9KpRK7xxiWUrZkxFQyIu+BFNMZximefCT6PMcWeuF0ACgshYZyjtdj36bIn6b4zO7ALd66MRC9kO1paNTFUOunHBL26DMyswtAgN1bVd9VN7oA306FdpWvtuzB+ryk9bgq8VD6KNG+xuN+2BRsSsIJMs+rB5PIVHuJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762537808; c=relaxed/simple;
-	bh=qwOodP/5x1cLJTKNu9BoI3+Z+jnZGDSbAh6AAftJ9EU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MDCRO7DNIPalo81ekbX9KpE+2U2V85NXYIlD4f6FpCFtWGhpi9B+oRwI57Ii+hvRqxR1+utdDiuUQvCINfLzn9MF2Ho5b9kYe8Uum6A4AYpePLnpUKUAlWH67F2fTk0Tfpr1F8Y7wG0eT+Hpt9jSIjf6skHpIfGymtjUPxJB/+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mwN0/2co; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A598C19423;
-	Fri,  7 Nov 2025 17:50:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762537807;
-	bh=qwOodP/5x1cLJTKNu9BoI3+Z+jnZGDSbAh6AAftJ9EU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mwN0/2coA4Qf/IpWvb+0v8FoX9cr8GFvrLJJe+4Bbi7LwojS9l7Hq8FLSt9FgqQwb
-	 3vxKFGdOfW7lT3Pu+/gjHvTJl7G9V6z2jPT2YqogO5dyFosHVYpgi16S/SfoPjLXJK
-	 R5jsdf7vbg+ykR0caNdoUkYtABaHVQyKTYf6Rq2lsn2PKzz4Obq3//flygKqSKwwh0
-	 WU+rBGCDZAPCucxy3Qu0jiStshzGLUL5ug3ebSFozrS9mRcvGQhDotlZ/RxBkiW992
-	 pmikayXdT2Dd+1z2nw8KDHski2STK+282bf8MvOOHPOg5HHnVggAmAGppTVK+jIq+D
-	 +zKAhWz5NNXIw==
-Date: Fri, 7 Nov 2025 17:50:02 +0000
-From: Simon Horman <horms@kernel.org>
-To: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Paul Barker <paul@pbarker.dev>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>, netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org
-Subject: Re: [net-next,v2 7/7] net: ravb: Use common defines for time
- stamping control
-Message-ID: <aQ4xSv9629XF-Bt3@horms.kernel.org>
-References: <20251104222420.882731-1-niklas.soderlund+renesas@ragnatech.se>
- <20251104222420.882731-8-niklas.soderlund+renesas@ragnatech.se>
+	s=arc-20240116; t=1762537889; c=relaxed/simple;
+	bh=zH5Y5kzfZDqM6XSPZXHd+xDsjJay/Ois7rZjMY6UsPU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=A0kuX8miSZwQBPvjnt6PZIMgd6Gh1da+G+7p0hVXBWnHE14+dqRj9k7ytHETf4AIgShVSni+XdFbSF6qdnYbenuPJwyWMzYW2LqbQP24MuvfHjlP+Toi1f3TJYgBnU75oci6cNWJxUUywWIuf7FSAew5aT5CBuGLIAMHUOYKE0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ELrQNNZt; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4710683a644so6853775e9.0
+        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 09:51:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762537886; x=1763142686; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3Tucutz7IrOhRztkZU3smHLVMxqcaOobL5jt095lc2k=;
+        b=ELrQNNZtZ8xpyrUTaNVMrMLq6edSahgtODjiKm1IKWRWjWseiPqOOQhk1anKez3R3S
+         8T+u+cMNZ7ztTu0DnveXsu7TuI93hL0HOIUEG4uMv+Fbfa2ls1yVSCKK8p/fCbDSC+cm
+         UVNvMrpIn4Y1pzdQWBN7WcbtmJopnlnzNsOmV3c6WrcGlVVwdiZbVTO2BvBdtWuLYhqV
+         qk741iJpVI6iTsleB0+cO0DAi80Wsdt43uMhT8Mxjxo2/h0Z8tFvMESZLdyCV8AhyaM/
+         5QXnZR1Q0oUIjeN+7442j8mCLFcl4Z0SFtewxSlgIKOh0eyzSxJQTcORp34lE4LhEveK
+         QALw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762537886; x=1763142686;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=3Tucutz7IrOhRztkZU3smHLVMxqcaOobL5jt095lc2k=;
+        b=SzWceyDlbD9Got6cAHqNu25V+n5pu1pHPmCnPXqejPaTZ/T5dF+uNFY3HNe3a0YrTI
+         ZszSpNGh/3ulBL+iiw5PBuwCYChzlFRUYqR1RqUpIfcJtcRE0TnPr0VWrvdo+7zAEHe5
+         ru4y3GQwyWGmFpps5kN3TriISO2dM7Wydm41Dr/RxkWhl9NOfNGYA8SjWveYOtL9D/OU
+         u/FfQ3/01etw0yXKrmCTaiZPr8lWxg+J68LKrB22V5+dgL1p/dBg1VSKS1aqficRQrM7
+         60VBFlSwoaYCGyWyjJgqcTf3FHC0RGpgVHIuChykc0mf1GYFmsivRXbdwHxGT8LJmmyn
+         3mJw==
+X-Forwarded-Encrypted: i=1; AJvYcCUeTdcXx9lrLhAo6qYmAGPod8iA8zSb5R0a+/p55Bv8PlH3N1/aRxM5sNcP9/EZWeCWzrzKaUM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwgFGwkyTUtLAuijXQ/evvMZhF37oIFswuMmnmgp3d+yDcbgUVg
+	D+dpX0sB3SrfTz9vJt2AD31I22ArKZ/JgG3c3FWMYOCu+EKGnTI5c+ty
+X-Gm-Gg: ASbGncv7vzMTypZeUyF7I+ST0oVj9pTVL1x+HJtc33jdRpWLCVt2DDdJBpZvumKjyMD
+	UvfIoJA/mNP7pDaEy2w+Pu3Ym4LUwNM0Y1K6WONI//10g9/fsFSVSg47eWubaCSH2qLTZyypRbM
+	KHGpf3JEjGVeXwhX8jZEPOjgxG1xbw4yKkmuiHa3iqbc2xkesSTAFZAEpLuMBssdgJvnZ1zdd+s
+	KeFt9nigdrrrGV3lsgwPeZt+QTOsDn1Kd7vBwChQmVxcMR+pjsWuPhbzobCsBNRteAo/jwR/r6d
+	bq3swnPSHxWhquytfMfvE+apqc/jMX1tc3xiPugXK+zMajZcE8EY2EEnJQ+WMiKFlwD2Or239xa
+	u9Tocmq2j/nMG0X1EtkIvqW8O1ecOJJ4kp+wGdvB1w8zuqxjYRyBvTI8KbqJv+vJdmPV0In/NNd
+	DwrW9maxRUxgQbpRS9L+fc79s3LV7rywv4CeL0UD3IS0cF9M32XNr+
+X-Google-Smtp-Source: AGHT+IEoWHsw26cGBlNpbuXd/J8PJbsclbLScfONHz/78/yXn3dKVEpgZr30FQ4+9RfcD30Gp2hhjg==
+X-Received: by 2002:a05:600c:c0c9:b0:475:d7fd:5c59 with SMTP id 5b1f17b1804b1-4776e57b741mr22139575e9.16.1762537885623;
+        Fri, 07 Nov 2025 09:51:25 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47763e4f89fsm49280675e9.3.2025.11.07.09.51.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Nov 2025 09:51:25 -0800 (PST)
+Date: Fri, 7 Nov 2025 17:51:23 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Petr Mladek <pmladek@suse.com>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, Andrew Morton
+ <akpm@linux-foundation.org>, Junrui Luo <moonafterrain@outlook.com>,
+ linux-kernel@vger.kernel.org, rostedt@goodmis.org, tiwai@suse.com,
+ perex@perex.cz, linux-sound@vger.kernel.org, mchehab@kernel.org,
+ awalls@md.metrocast.net, linux-media@vger.kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH 1/4] lib/sprintf: add scnprintf_append() helper function
+Message-ID: <20251107175123.70ded89e@pumpkin>
+In-Reply-To: <aQ3riwUO_3v3UOvj@pathway.suse.cz>
+References: <20251107051616.21606-1-moonafterrain@outlook.com>
+	<SYBPR01MB788110A77D7F0F7A27F0974FAFC3A@SYBPR01MB7881.ausprd01.prod.outlook.com>
+	<20251106213833.546c8eaba8aec6aa6a5e30b6@linux-foundation.org>
+	<20251107091246.4e5900f4@pumpkin>
+	<aQ29Zzajef81E2DZ@smile.fi.intel.com>
+	<aQ3riwUO_3v3UOvj@pathway.suse.cz>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251104222420.882731-8-niklas.soderlund+renesas@ragnatech.se>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 04, 2025 at 11:24:20PM +0100, Niklas Söderlund wrote:
-> Instead of translating to/from driver specific flags for packet time
-> stamp control use the common flags directly. This simplifies the driver
-> as the translating code can be removed while at the same time making it
-> clear the flags are not flags written to hardware registers.
+On Fri, 7 Nov 2025 13:52:27 +0100
+Petr Mladek <pmladek@suse.com> wrote:
+
+> On Fri 2025-11-07 11:35:35, Andy Shevchenko wrote:
+> > On Fri, Nov 07, 2025 at 09:12:46AM +0000, David Laight wrote:  
+> > > On Thu, 6 Nov 2025 21:38:33 -0800
+> > > Andrew Morton <akpm@linux-foundation.org> wrote:  
+> > > > On Fri,  7 Nov 2025 13:16:13 +0800 Junrui Luo <moonafterrain@outlook.com> wrote:  
+> > 
+> > ...
+> >   
+> > > That is true for all the snprintf() functions.
+> > >   
+> > > > I wonder if we should instead implement a kasprintf() version of this
+> > > > which reallocs each time and then switch all the callers over to that.  
+> > > 
+> > > That adds the cost of a malloc, and I, like kasprintf() probably ends up
+> > > doing all the work of snprintf twice.
+> > > 
+> > > I'd be tempted to avoid the strlen() by passing in the offset.
+> > > So (say):
+> > > #define scnprintf_at(buf, len, off, ...) \
+> > > 	scnprintf((buf) + off, (len) - off, __VA_ARGS__)  
 > 
-> The change from a device specific bit-field track variable to the common
-> enum datatypes forces us to touch the ravb_rx_rcar_hwstamp() in a non
-> trivial way. To make this cleaner and easier to understand expand the
-> nested conditions.
+> It does not handle correctly the situation when len < off.
+> Othersise, it looks good.
+
+That shouldn't happen unless the calling code is really buggy.
+There is also a WARN_ON_ONCE() at the top of snprintf().
+
+	David
+
 > 
-> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
-
-...
-
-> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-> index 5477bb5c69ae..1680e94b9242 100644
-> --- a/drivers/net/ethernet/renesas/ravb_main.c
-> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> @@ -950,13 +950,14 @@ static void ravb_rx_rcar_hwstamp(struct ravb_private *priv, int q,
->  				 struct ravb_ex_rx_desc *desc,
->  				 struct sk_buff *skb)
->  {
-> -	u32 get_ts = priv->tstamp_rx_ctrl & RAVB_RXTSTAMP_TYPE;
->  	struct skb_shared_hwtstamps *shhwtstamps;
->  	struct timespec64 ts;
-> +	bool get_ts;
->  
-> -	get_ts &= (q == RAVB_NC) ?
-> -		RAVB_RXTSTAMP_TYPE_V2_L2_EVENT :
-> -		~RAVB_RXTSTAMP_TYPE_V2_L2_EVENT;
-> +	if (q == RAVB_NC)
-> +		get_ts = priv->tstamp_rx_ctrl == HWTSTAMP_FILTER_PTP_V2_L2_EVENT;
-> +	else
-> +		get_ts = priv->tstamp_rx_ctrl != HWTSTAMP_FILTER_PTP_V2_L2_EVENT;
->  
->  	if (!get_ts)
->  		return;
-
-Hi Niklas,
-
-It is Friday evening and I'm exercising a new tool, so please forgive me if
-this analysis is wrong. But it seems that there are cases where there old
-bit-based logic and the new integer equality based logic don't match.
-
-1. If q == RAVB_NC then previously timestamping would occur
-   for HWTSTAMP_FILTER_ALL, because:
-
-   (RAVB_TXTSTAMP_ENABLED | RAVB_RXTSTAMP_TYPE_ALL) &
-    RAVB_RXTSTAMP_TYPE & RAVB_RXTSTAMP_TYPE_V2_L2_EVENT =
-   (0x10 | 0x6) & 0x06 & 0x02 = 0x2, which is non-zero.
-
-   But with the new logic timestamping does not occur because:
-
-   HWTSTAMP_FILTER_ALL == HWTSTAMP_FILTER_PTP_V2_L2_EVENT is false
-
-2. If q != RAVB_NC then previously timestamping would not occur
-   for HWTSTAMP_FILTER_NONE because:
-
-   0 & RAVB_RXTSTAMP_TYPE & RAVB_RXTSTAMP_TYPE_V2_L2_EVENT = 0
-
-   But with the new logic timestamping does occur because:
-
-   HWTSTAMP_FILTER_NONE != HWTSTAMP_FILTER_PTP_V2_L2_EVENT is true
-
-I came across this by chance because this patch is currently
-the most recent patch in net-next that touches C code. And I was
-exercising Claude Code with https://github.com/masoncl/review-prompts
-It reported the above and after significantly
-more thinking I've come to agree with it.
-
-But it is Friday evening, so YMMV.
-
-For reference, I've provided the text generated by Claude Code at the end of
-this email.
-
-...
-
-> @@ -2446,15 +2437,13 @@ static int ravb_hwtstamp_set(struct net_device *ndev,
->  			     struct netlink_ext_ack *extack)
->  {
->  	struct ravb_private *priv = netdev_priv(ndev);
-> -	u32 tstamp_rx_ctrl = RAVB_RXTSTAMP_ENABLED;
-> -	u32 tstamp_tx_ctrl;
-> +	enum hwtstamp_rx_filters tstamp_rx_ctrl;
-> +	enum hwtstamp_tx_types tstamp_tx_ctrl;
->  
->  	switch (config->tx_type) {
->  	case HWTSTAMP_TX_OFF:
-> -		tstamp_tx_ctrl = 0;
-> -		break;
->  	case HWTSTAMP_TX_ON:
-> -		tstamp_tx_ctrl = RAVB_TXTSTAMP_ENABLED;
-> +		tstamp_tx_ctrl = config->tx_type;
->  		break;
->  	default:
->  		return -ERANGE;
-> @@ -2462,14 +2451,12 @@ static int ravb_hwtstamp_set(struct net_device *ndev,
->  
->  	switch (config->rx_filter) {
->  	case HWTSTAMP_FILTER_NONE:
-> -		tstamp_rx_ctrl = 0;
-> -		break;
->  	case HWTSTAMP_FILTER_PTP_V2_L2_EVENT:
-> -		tstamp_rx_ctrl |= RAVB_RXTSTAMP_TYPE_V2_L2_EVENT;
-> +		tstamp_rx_ctrl = config->rx_filter;
->  		break;
->  	default:
->  		config->rx_filter = HWTSTAMP_FILTER_ALL;
-> -		tstamp_rx_ctrl |= RAVB_RXTSTAMP_TYPE_ALL;
-> +		tstamp_rx_ctrl = HWTSTAMP_FILTER_ALL;
->  	}
->  
->  	priv->tstamp_tx_ctrl = tstamp_tx_ctrl;
-> -- 
-> 2.51.1
+> > > Then you can chain calls, eg:
+> > > 	off = scnprintf(buf, sizeof buf, ....);
+> > > 	off += scnprintf_at(buf, sizeof buf, off, ....);  
+> > 
+> > I like this suggestion. Also note, that the original implementation works directly
+> > on static buffers.  
 > 
+> I would prefer this as well. IMHO, it encourages people to write a better code.
 > 
+> Best Regards,
+> Petr
 
-Text generated by Claude Code:
-
-Is this logic translation correct? Looking at the old bit-field
-operations and new enum comparisons, the behavior seems to change in
-two cases:
-
-Old behavior (from ravb_hwtstamp_set):
-  - FILTER_NONE stored as 0
-  - FILTER_PTP_V2_L2_EVENT stored as 0x12 (ENABLED | TYPE_V2_L2)
-  - FILTER_ALL stored as 0x16 (ENABLED | TYPE_ALL)
-
-Old ravb_rx_rcar_hwstamp for RAVB_NC queue:
-  get_ts = (0x12 & 0x06) & 0x02 = 0x02 & 0x02 = 0x02 (timestamp)
-  get_ts = (0x16 & 0x06) & 0x02 = 0x06 & 0x02 = 0x02 (timestamp)
-
-So the old code timestamps RAVB_NC queue packets for both
-FILTER_PTP_V2_L2_EVENT and FILTER_ALL.
-
-New ravb_rx_rcar_hwstamp for RAVB_NC queue with FILTER_ALL:
-  get_ts = (HWTSTAMP_FILTER_ALL == HWTSTAMP_FILTER_PTP_V2_L2_EVENT)
-  get_ts = (1 == 9) = false (no timestamp)
-
-Similarly for non-RAVB_NC queue, old behavior with FILTER_NONE:
-  get_ts = (0 & 0x06) & ~0x02 = 0 & ~0x02 = 0 (no timestamp)
-
-New behavior for non-RAVB_NC queue with FILTER_NONE:
-  get_ts = (HWTSTAMP_FILTER_NONE != HWTSTAMP_FILTER_PTP_V2_L2_EVENT)
-  get_ts = (0 != 9) = true (timestamp)
-
-Can the refactoring introduce these two behavior changes?
-
-1. RAVB_NC queue with FILTER_ALL: old code timestamps, new code doesn't
-2. Non-RAVB_NC queue with FILTER_NONE: old code doesn't timestamp, new
-   code does
 
