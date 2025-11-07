@@ -1,230 +1,262 @@
-Return-Path: <netdev+bounces-236844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C418C40A59
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 16:45:10 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CC75C40A74
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 16:46:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D50AB1893FE9
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 15:45:34 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1C08034F2AC
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 15:46:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 755B532D7D8;
-	Fri,  7 Nov 2025 15:45:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8D433016E8;
+	Fri,  7 Nov 2025 15:46:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qti9o61k"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nN6JXYfD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A597932D0F9
-	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 15:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08BC02C2369
+	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 15:46:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762530308; cv=none; b=dG07yb9miOeh7Kw/fhdELT1+G+s64VuiBetD2+JZVhygzUYdM1JSepVE18DbjNn8dcBYvoaODFTFTD37yxQLRC0G2BO53F2Y0CD88qUj1VKYJa4fjosHJOaQcijeghfM4x1fo3FQuha3WA30+cWnsMAxTTRlGSFLYrWxsjvU78U=
+	t=1762530377; cv=none; b=ZD4hGnNgjGZ9VsNKAozxUGMRlSBs0M9X8FjQKPHm6FjB6bY5gmsLD6BLQH0654lz4W7MYm4fqK58Zg9yQSqcOqAVp7QVjLKxYlrWVY4olpGemGddLAGwtOv1aY3UuE/dQq2aP7+gcq+6r+iJZX0jLkq57zUH3dzzFy0PT7N2kjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762530308; c=relaxed/simple;
-	bh=5iYJEqegYp4DylAFjqtesOu4OtnEugBH/GmaqwizSAs=;
+	s=arc-20240116; t=1762530377; c=relaxed/simple;
+	bh=AIekf4cKOjrujJFSERZNBkCdVXTGaZz6CyfXde4Y8nM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DCbnA131V5mru5QjitX9gD85Rj7FEIFjXuSLiflC99tAIuNE4jnubK1OTQfHlXRbIW28F/num12VSmPOgle+d+iMKXWjFBiIQUC9GxlTIhCyLo3cKEaBhaWcfIARrEHkmI7dQe+HD5i0c2FbBg17unFV7GobRc5gVAjWta5W49I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qti9o61k; arc=none smtp.client-ip=209.85.166.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-43320988dcfso3114085ab.3
-        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 07:45:06 -0800 (PST)
+	 To:Cc:Content-Type; b=UC68AjTVzu2UqANGQVE/N0VNAPSntyjuY1r1B47/7D0SBEC3YYohTRrs65X3UIGxDE6Eo2eKHfrKssCi/EnNjsjVDOhtf3L0NM9UrTyh/qeUFKkNVNet+OFcj4iJa7iGJY9yiLtlXKNga+e+moUMnzJY3fBvE9Ao0f0OoRpQb00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nN6JXYfD; arc=none smtp.client-ip=209.85.219.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-87bb66dd224so10171996d6.3
+        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 07:46:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762530306; x=1763135106; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1762530375; x=1763135175; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=AAuQV3P10tvELq+4DDVuXMDJZC15r/ACPECa19wk8Gc=;
-        b=Qti9o61kPdrR9eia/keHTHj35+1roy70r6onj/zNW/Eo2H96ShY9sUxIDInj3ksC5G
-         VpGYPH1i0VC+5fxJPtGcUArenQmpbh48SbWSM//KD/557PqRuGcKFTAW2VvIbIlDDYQd
-         bQb77jFprhSPi2FT+M3JIPw4e23IPgigfm+DiQg0cDhePPhmF/+W7Cmjy/G/X63Gc4D+
-         5tbT3SRYJQOdqBM17uJAQe7E3cvM4/iYZDf6k/25mLu+nqXFS+55ChCFLssmJxEfrboR
-         LHXoPUU1GdlzSk+sVItOVVwnC/Br+BLcLVnQDJLzoRBAZ0oZhVFIZ4n4sMDa63ZlFkGy
-         70Xw==
+        bh=SmFKfcAXka27qOJswJYQHivunF6dOITkjwuMJ+EktRs=;
+        b=nN6JXYfDD4M2WdT6hEwQKdJUvRtE31LRoC+TY+qKLPTj3bKhWAyk++aC6mhAFNOVNw
+         Evp+WzH+t/JHKCHtrHJjXHCkvXqrwOCR6zoJ8Q4aXJ6plPz3JKklbbgyMn41z15MnpvW
+         Ihzpnd2g+uvAsLvADunKgioLrSFBF5GZJjOmE4HKIQHU+DiFP+YmjUdErWS3GA6HxOwQ
+         PNViiKcvBkvB6R811GVRaau5HFt6mR3QSjI/u3a0gBZmoChwUBFuZSdlZ2Hu2CcXs0HP
+         WnyIWXXJrnACtjUsKOGX+DL/YYW5uA6lvQteNy0hnHrVRsMQSUbnLyIMnb3scpuN6OH0
+         iw5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762530306; x=1763135106;
+        d=1e100.net; s=20230601; t=1762530375; x=1763135175;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=AAuQV3P10tvELq+4DDVuXMDJZC15r/ACPECa19wk8Gc=;
-        b=tzeyCVdsV0LXUa0iFzPNRtsqiYGI5QTJ9h2kJbutIDHeMYD8SxiPK5q+Amuv32ogzh
-         6r4OLO8YAPvLPL0zxbjsjeulnZYIIJDPmQLn5fwy1CRpyuimjZ32mWqwKnwFq2yBT9EG
-         Z43w4ByN0ZOWrsD4IDhF1xtM9FUfMjI+wSeybWgwgta10UaqhVrqu6qk4A3rUyvhi1J6
-         U1QXA26vwBl+EOl3wf7tip9uKWfXihFwhTCTVUPjNdMdMRLyBhTJnwWvFFsjHpIGT6ay
-         f1hOoL/Wpf/YMajrM8uwYHBv3Z+rcwFl+q2UUFtWj/bXGtqEi6AE5s6AQf7ua4dsnXjO
-         ha1g==
-X-Forwarded-Encrypted: i=1; AJvYcCXqJGD5QSjttlatBcae4Qg+zzUX+MJc4wlyZqgs+UzZ3FQ4w3SGJmLzbx5bnOjEgxCU/TKj3Ns=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+NJV1yi8s4rcAk1zH+vW/HFXJi0R1yK5tzb0Vtl3rIERxGMCN
-	eyNNGZwHuY2Jjj0vZO+ReyG3Sh/eV6AP+ux7hz7q5l3zIvOAZ69ldzgTZLzEDlMV658Y9w5mRLV
-	s3O61Dy6hV7iw3K17ZIpZXogJixaEAwg=
-X-Gm-Gg: ASbGncu6X1GjBK4q0WV33MWcbcJLahBQT5AhcCI8dtLFltrx3RdbM0QcdVWkaPxS3lF
-	z01oCs0QBsjCvWnCiigwl6A4x7fIX1Wanc8LMBj4Gf8J+hk1oXBgbNkeDJQqlK0ecPwpenK03ad
-	I2v4XNFGZ8kfrSSlBgQAkWJFPOhgSvyGf1O6xO5P/+aOVYBeUBgmCE2olD0M/gR6rKGVZtwvlUD
-	sJn800w2YHZA3sFL79SW4ucEbX4m5WTWy4NGxK0phOY3a5cWX8fr4MbWOAhtSVyxLce8k3XECI=
-X-Google-Smtp-Source: AGHT+IFcaVgekAXNby3+vvoJfMusidfHdXgYe71+3tRaD8t2HUSilWUh3528qR0xPcQuTk8N64hTg2gtS2LK7FRxhac=
-X-Received: by 2002:a92:cd8d:0:b0:433:2597:8cc with SMTP id
- e9e14a558f8ab-4335f455e61mr49443635ab.29.1762530305601; Fri, 07 Nov 2025
- 07:45:05 -0800 (PST)
+        bh=SmFKfcAXka27qOJswJYQHivunF6dOITkjwuMJ+EktRs=;
+        b=HJBnayUse065zMywus2o3kCKq5DI33oLj8HS3yMykRf2c5nfpR5IAROOGtln9U92P5
+         3avccv7h3HsqmKvhEaUFOZDlVbdaDxuVGMGsKfJSzz6w9AJXSH35ujUgE3dwHqZEuWF9
+         CWs/ntaatLzA2VZIeWE9d2lqiVnXgrkkT6iMzgsMKXBaQfTq/JzKdLejR1EsIDAbbChE
+         pJ5aJOgW1DdnBl+gH+TpBpoXeDPHruSL+UlIC2DDRMzGGxdXf13sGYqgpqB+SF2tAdmr
+         Mn59rAqjRrLXxA5Z1YGiSzmCmPIog63VxLcPR20l6OqJQV0xkOjVZnxe7B6ObhRRjmw1
+         zvqw==
+X-Forwarded-Encrypted: i=1; AJvYcCVZ1uXqXl6BvSNrQ9rPnr/vSQil/ouqcvIq56ZuDDethd9swkwj3ztOjM7nfUwyesdLnGuT+Vo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyI9UTRdI/orWdI761zKFwHoHQJYvfsjPqUNvWmQ2fWae7tvQcJ
+	QsryWqJ4XOYhCjJGfChBOjHEgIt50jaTSMMNvk+hPiV9e6EF00YG0nIJ5S6dAfjTbwqLghdAzNh
+	z0vM4+VWAMrmZEK4YZEJALiC58CzxwpBRQC/PdDNe
+X-Gm-Gg: ASbGncu240p8emvzMLlpWX0xu/m1c2vDR2Oewz60hQ7dQsy3DrcguknZjWQeI4nq8YA
+	gvSXAKNmKIkR5snfuQSd3EOCEZvp1Y619kqcTMji3mid5MqlzQ978xTsfxDVrZ0O2PWRXRjUBIx
+	AtEQSa/BBonh/0AG5vbFheSsmoSCdlnYeOuoeG/vbivImJp3P1VFxGBRNekTAJFWrGSIwJGIxZx
+	nx15RO6Z7B8J3JyVmgZrw+n5V3aTLk0YtSAOmbouwiLOt7yOhi7cWk2vUMC
+X-Google-Smtp-Source: AGHT+IEie9Qk1ci1n+OEznH44DBqofYkezo9/GlpKHgDD0O9plkCz4O4c3lOpXdFbEo7OuJN+BxI9myO8aAXIPIJ6Q4=
+X-Received: by 2002:a05:6214:1d2c:b0:87d:e32:81c4 with SMTP id
+ 6a1803df08f44-88176762888mr46388566d6.48.1762530374483; Fri, 07 Nov 2025
+ 07:46:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251106202935.1776179-1-edumazet@google.com> <20251106202935.1776179-3-edumazet@google.com>
-In-Reply-To: <20251106202935.1776179-3-edumazet@google.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 7 Nov 2025 23:44:29 +0800
-X-Gm-Features: AWmQ_bkhaFfuA_kFwV3-5szwLD7JEYO3iJnw1bgi0G8HvSluayHkXmJXo1diVf0
-Message-ID: <CAL+tcoDqUYgu0iVKm0Ss-jg+RXHSgoFxG9tMRdxE9ycKz7Gt=Q@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/3] net: fix napi_consume_skb() with alien skbs
-To: Eric Dumazet <edumazet@google.com>
+References: <20251013145416.829707-1-edumazet@google.com> <20251013145416.829707-6-edumazet@google.com>
+ <877bw1ooa7.fsf@toke.dk> <CANn89iJ70QW5v2NnnuH=td0NimgEaQgdxiof0_=yPS1AnZRggg@mail.gmail.com>
+In-Reply-To: <CANn89iJ70QW5v2NnnuH=td0NimgEaQgdxiof0_=yPS1AnZRggg@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 7 Nov 2025 07:46:03 -0800
+X-Gm-Features: AWmQ_bkBvkTEQzWVbsQPEmdzIUaSBZARQ7B2FlavtGDeMkEAbPzh0rIm7TRyKRg
+Message-ID: <CANn89iKY7uMX41aLZA6cFXbjR49Z+WCSd7DgZDkTqXxfeqnXmg@mail.gmail.com>
+Subject: Re: [PATCH v1 net-next 5/5] net: dev_queue_xmit() llist adoption
+To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
 Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
+	Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 7, 2025 at 4:30=E2=80=AFAM Eric Dumazet <edumazet@google.com> w=
+On Fri, Nov 7, 2025 at 7:37=E2=80=AFAM Eric Dumazet <edumazet@google.com> w=
 rote:
 >
-> There is a lack of NUMA awareness and more generally lack
-> of slab caches affinity on TX completion path.
->
-> Modern drivers are using napi_consume_skb(), hoping to cache sk_buff
-> in per-cpu caches so that they can be recycled in RX path.
->
-> Only use this if the skb was allocated on the same cpu,
-> otherwise use skb_attempt_defer_free() so that the skb
-> is freed on the original cpu.
->
-> This removes contention on SLUB spinlocks and data structures.
->
-> After this patch, I get ~50% improvement for an UDP tx workload
-> on an AMD EPYC 9B45 (IDPF 200Gbit NIC with 32 TX queues).
->
-> 80 Mpps -> 120 Mpps.
->
-> Profiling one of the 32 cpus servicing NIC interrupts :
->
-> Before:
->
-> mpstat -P 511 1 1
->
-> Average:     CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal =
- %guest  %gnice   %idle
-> Average:     511    0.00    0.00    0.00    0.00    0.00   98.00    0.00 =
-   0.00    0.00    2.00
->
->     31.01%  ksoftirqd/511    [kernel.kallsyms]  [k] queued_spin_lock_slow=
-path
->     12.45%  swapper          [kernel.kallsyms]  [k] queued_spin_lock_slow=
-path
->      5.60%  ksoftirqd/511    [kernel.kallsyms]  [k] __slab_free
->      3.31%  ksoftirqd/511    [kernel.kallsyms]  [k] idpf_tx_clean_buf_rin=
-g
->      3.27%  ksoftirqd/511    [kernel.kallsyms]  [k] idpf_tx_splitq_clean_=
-all
->      2.95%  ksoftirqd/511    [kernel.kallsyms]  [k] idpf_tx_splitq_start
->      2.52%  ksoftirqd/511    [kernel.kallsyms]  [k] fq_dequeue
->      2.32%  ksoftirqd/511    [kernel.kallsyms]  [k] read_tsc
->      2.25%  ksoftirqd/511    [kernel.kallsyms]  [k] build_detached_freeli=
-st
->      2.15%  ksoftirqd/511    [kernel.kallsyms]  [k] kmem_cache_free
->      2.11%  swapper          [kernel.kallsyms]  [k] __slab_free
->      2.06%  ksoftirqd/511    [kernel.kallsyms]  [k] idpf_features_check
->      2.01%  ksoftirqd/511    [kernel.kallsyms]  [k] idpf_tx_splitq_clean_=
-hdr
->      1.97%  ksoftirqd/511    [kernel.kallsyms]  [k] skb_release_data
->      1.52%  ksoftirqd/511    [kernel.kallsyms]  [k] sock_wfree
->      1.34%  swapper          [kernel.kallsyms]  [k] idpf_tx_clean_buf_rin=
-g
->      1.23%  swapper          [kernel.kallsyms]  [k] idpf_tx_splitq_clean_=
-all
->      1.15%  ksoftirqd/511    [kernel.kallsyms]  [k] dma_unmap_page_attrs
->      1.11%  swapper          [kernel.kallsyms]  [k] idpf_tx_splitq_start
->      1.03%  swapper          [kernel.kallsyms]  [k] fq_dequeue
->      0.94%  swapper          [kernel.kallsyms]  [k] kmem_cache_free
->      0.93%  swapper          [kernel.kallsyms]  [k] read_tsc
->      0.81%  ksoftirqd/511    [kernel.kallsyms]  [k] napi_consume_skb
->      0.79%  swapper          [kernel.kallsyms]  [k] idpf_tx_splitq_clean_=
-hdr
->      0.77%  ksoftirqd/511    [kernel.kallsyms]  [k] skb_free_head
->      0.76%  swapper          [kernel.kallsyms]  [k] idpf_features_check
->      0.72%  swapper          [kernel.kallsyms]  [k] skb_release_data
->      0.69%  swapper          [kernel.kallsyms]  [k] build_detached_freeli=
-st
->      0.58%  ksoftirqd/511    [kernel.kallsyms]  [k] skb_release_head_stat=
+> On Fri, Nov 7, 2025 at 7:28=E2=80=AFAM Toke H=C3=B8iland-J=C3=B8rgensen <=
+toke@redhat.com> wrote:
+> >
+> > Eric Dumazet <edumazet@google.com> writes:
+> >
+> > > Remove busylock spinlock and use a lockless list (llist)
+> > > to reduce spinlock contention to the minimum.
+> > >
+> > > Idea is that only one cpu might spin on the qdisc spinlock,
+> > > while others simply add their skb in the llist.
+> > >
+> > > After this patch, we get a 300 % improvement on heavy TX workloads.
+> > > - Sending twice the number of packets per second.
+> > > - While consuming 50 % less cycles.
+> > >
+> > > Note that this also allows in the future to submit batches
+> > > to various qdisc->enqueue() methods.
+> > >
+> > > Tested:
+> > >
+> > > - Dual Intel(R) Xeon(R) 6985P-C  (480 hyper threads).
+> > > - 100Gbit NIC, 30 TX queues with FQ packet scheduler.
+> > > - echo 64 >/sys/kernel/slab/skbuff_small_head/cpu_partial (avoid cont=
+ention in mm)
+> > > - 240 concurrent "netperf -t UDP_STREAM -- -m 120 -n"
+> >
+> > Hi Eric
+> >
+> > While testing this with sch_cake (to get a new baseline for the mq_cake
+> > patches as Jamal suggested), I found that this patch completely destroy=
+s
+> > the performance of cake in particular.
+> >
+> > I run a small UDP test (64-byte packets across 16 flows through
+> > xdp-trafficgen, offered load is ~5Mpps) with a single cake instance on
+> > as the root interface qdisc.
+> >
+> > With a stock Fedora (6.17.7) kernel, this gets me around 630 Kpps acros=
+s
+> > 8 queues (on an E810-C, ice driver):
+> >
+> > Ethtool(ice0p1  ) stat:     40321218 (     40,321,218) <=3D tx_bytes /s=
+ec
+> > Ethtool(ice0p1  ) stat:     42841424 (     42,841,424) <=3D tx_bytes.ni=
+c /sec
+> > Ethtool(ice0p1  ) stat:      5248505 (      5,248,505) <=3D tx_queue_0_=
+bytes /sec
+> > Ethtool(ice0p1  ) stat:        82008 (         82,008) <=3D tx_queue_0_=
+packets /sec
+> > Ethtool(ice0p1  ) stat:      3425984 (      3,425,984) <=3D tx_queue_1_=
+bytes /sec
+> > Ethtool(ice0p1  ) stat:        53531 (         53,531) <=3D tx_queue_1_=
+packets /sec
+> > Ethtool(ice0p1  ) stat:      5277496 (      5,277,496) <=3D tx_queue_2_=
+bytes /sec
+> > Ethtool(ice0p1  ) stat:        82461 (         82,461) <=3D tx_queue_2_=
+packets /sec
+> > Ethtool(ice0p1  ) stat:      5285736 (      5,285,736) <=3D tx_queue_3_=
+bytes /sec
+> > Ethtool(ice0p1  ) stat:        82590 (         82,590) <=3D tx_queue_3_=
+packets /sec
+> > Ethtool(ice0p1  ) stat:      5280731 (      5,280,731) <=3D tx_queue_4_=
+bytes /sec
+> > Ethtool(ice0p1  ) stat:        82511 (         82,511) <=3D tx_queue_4_=
+packets /sec
+> > Ethtool(ice0p1  ) stat:      5275665 (      5,275,665) <=3D tx_queue_5_=
+bytes /sec
+> > Ethtool(ice0p1  ) stat:        82432 (         82,432) <=3D tx_queue_5_=
+packets /sec
+> > Ethtool(ice0p1  ) stat:      5276398 (      5,276,398) <=3D tx_queue_6_=
+bytes /sec
+> > Ethtool(ice0p1  ) stat:        82444 (         82,444) <=3D tx_queue_6_=
+packets /sec
+> > Ethtool(ice0p1  ) stat:      5250946 (      5,250,946) <=3D tx_queue_7_=
+bytes /sec
+> > Ethtool(ice0p1  ) stat:        82046 (         82,046) <=3D tx_queue_7_=
+packets /sec
+> > Ethtool(ice0p1  ) stat:            1 (              1) <=3D tx_restart =
+/sec
+> > Ethtool(ice0p1  ) stat:       630023 (        630,023) <=3D tx_size_127=
+.nic /sec
+> > Ethtool(ice0p1  ) stat:       630019 (        630,019) <=3D tx_unicast =
+/sec
+> > Ethtool(ice0p1  ) stat:       630020 (        630,020) <=3D tx_unicast.=
+nic /sec
+> >
+> > However, running the same test on a net-next kernel, performance drops
+> > to round 10 Kpps(!):
+> >
+> > Ethtool(ice0p1  ) stat:       679003 (        679,003) <=3D tx_bytes /s=
+ec
+> > Ethtool(ice0p1  ) stat:       721440 (        721,440) <=3D tx_bytes.ni=
+c /sec
+> > Ethtool(ice0p1  ) stat:       123539 (        123,539) <=3D tx_queue_0_=
+bytes /sec
+> > Ethtool(ice0p1  ) stat:         1930 (          1,930) <=3D tx_queue_0_=
+packets /sec
+> > Ethtool(ice0p1  ) stat:         1776 (          1,776) <=3D tx_queue_1_=
+bytes /sec
+> > Ethtool(ice0p1  ) stat:           28 (             28) <=3D tx_queue_1_=
+packets /sec
+> > Ethtool(ice0p1  ) stat:         1837 (          1,837) <=3D tx_queue_2_=
+bytes /sec
+> > Ethtool(ice0p1  ) stat:           29 (             29) <=3D tx_queue_2_=
+packets /sec
+> > Ethtool(ice0p1  ) stat:         1776 (          1,776) <=3D tx_queue_3_=
+bytes /sec
+> > Ethtool(ice0p1  ) stat:           28 (             28) <=3D tx_queue_3_=
+packets /sec
+> > Ethtool(ice0p1  ) stat:         1654 (          1,654) <=3D tx_queue_4_=
+bytes /sec
+> > Ethtool(ice0p1  ) stat:           26 (             26) <=3D tx_queue_4_=
+packets /sec
+> > Ethtool(ice0p1  ) stat:       222026 (        222,026) <=3D tx_queue_5_=
+bytes /sec
+> > Ethtool(ice0p1  ) stat:         3469 (          3,469) <=3D tx_queue_5_=
+packets /sec
+> > Ethtool(ice0p1  ) stat:       183072 (        183,072) <=3D tx_queue_6_=
+bytes /sec
+> > Ethtool(ice0p1  ) stat:         2861 (          2,861) <=3D tx_queue_6_=
+packets /sec
+> > Ethtool(ice0p1  ) stat:       143322 (        143,322) <=3D tx_queue_7_=
+bytes /sec
+> > Ethtool(ice0p1  ) stat:         2239 (          2,239) <=3D tx_queue_7_=
+packets /sec
+> > Ethtool(ice0p1  ) stat:        10609 (         10,609) <=3D tx_size_127=
+.nic /sec
+> > Ethtool(ice0p1  ) stat:        10609 (         10,609) <=3D tx_unicast =
+/sec
+> > Ethtool(ice0p1  ) stat:        10609 (         10,609) <=3D tx_unicast.=
+nic /sec
+> >
+> > Reverting commit 100dfa74cad9 ("net: dev_queue_xmit() llist adoption")
+> > (and the followon f8a55d5e71e6 ("net: add a fast path in
+> > __netif_schedule()"), but that alone makes no difference) gets me back
+> > to the previous 630-650 Kpps range.
+> >
+> > I couldn't find any other qdisc that suffers in the same way (tried
+> > fq_codel, sfq and netem as single root qdiscs), so this seems to be som=
 e
->      0.56%  ksoftirqd/511    [kernel.kallsyms]  [k] __put_partials
->      0.55%  ksoftirqd/511    [kernel.kallsyms]  [k] kmem_cache_free_bulk
->      0.48%  swapper          [kernel.kallsyms]  [k] sock_wfree
+> > specific interaction between the llist implementation and sch_cake. Any
+> > idea what could be causing this?
 >
-> After:
+> I would take a look at full "tc -s -d qdisc" and see if anything
+> interesting is showing up (requeues ?)
 >
-> mpstat -P 511 1 1
+> ALso look if you have drops (perf record -a -e skb:kfree_skb)
 >
-> Average:     CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal =
- %guest  %gnice   %idle
-> Average:     511    0.00    0.00    0.00    0.00    0.00   51.49    0.00 =
-   0.00    0.00   48.51
->
->     19.10%  swapper          [kernel.kallsyms]  [k] idpf_tx_splitq_clean_=
-hdr
->     13.86%  swapper          [kernel.kallsyms]  [k] idpf_tx_clean_buf_rin=
-g
->     10.80%  swapper          [kernel.kallsyms]  [k] skb_attempt_defer_fre=
-e
->     10.57%  swapper          [kernel.kallsyms]  [k] idpf_tx_splitq_clean_=
-all
->      7.18%  swapper          [kernel.kallsyms]  [k] queued_spin_lock_slow=
-path
->      6.69%  swapper          [kernel.kallsyms]  [k] sock_wfree
->      5.55%  swapper          [kernel.kallsyms]  [k] dma_unmap_page_attrs
->      3.10%  swapper          [kernel.kallsyms]  [k] fq_dequeue
->      3.00%  swapper          [kernel.kallsyms]  [k] skb_release_head_stat=
-e
->      2.73%  swapper          [kernel.kallsyms]  [k] read_tsc
->      2.48%  swapper          [kernel.kallsyms]  [k] idpf_tx_splitq_start
->      1.20%  swapper          [kernel.kallsyms]  [k] idpf_features_check
->      1.13%  swapper          [kernel.kallsyms]  [k] napi_consume_skb
->      0.93%  swapper          [kernel.kallsyms]  [k] idpf_vport_splitq_nap=
-i_poll
->      0.64%  swapper          [kernel.kallsyms]  [k] native_send_call_func=
-_single_ipi
->      0.60%  swapper          [kernel.kallsyms]  [k] acpi_processor_ffh_cs=
-tate_enter
->      0.53%  swapper          [kernel.kallsyms]  [k] io_idle
->      0.43%  swapper          [kernel.kallsyms]  [k] netif_skb_features
->      0.41%  swapper          [kernel.kallsyms]  [k] __direct_call_cpuidle=
-_state_enter2
->      0.40%  swapper          [kernel.kallsyms]  [k] native_irq_return_ire=
-t
->      0.40%  swapper          [kernel.kallsyms]  [k] idpf_tx_buf_hw_update
->      0.36%  swapper          [kernel.kallsyms]  [k] sched_clock_noinstr
->      0.34%  swapper          [kernel.kallsyms]  [k] handle_softirqs
->      0.32%  swapper          [kernel.kallsyms]  [k] net_rx_action
->      0.32%  swapper          [kernel.kallsyms]  [k] dql_completed
->      0.32%  swapper          [kernel.kallsyms]  [k] validate_xmit_skb
->      0.31%  swapper          [kernel.kallsyms]  [k] skb_network_protocol
->      0.29%  swapper          [kernel.kallsyms]  [k] skb_csum_hwoffload_he=
-lp
->      0.29%  swapper          [kernel.kallsyms]  [k] x2apic_send_IPI
->      0.28%  swapper          [kernel.kallsyms]  [k] ktime_get
->      0.24%  swapper          [kernel.kallsyms]  [k] __qdisc_run
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> You are sharing one qdisc on 8 queues ?
 
-Thanks for your brilliant work that really gives me so much
-inspiration one more time.
+I also assume you are running net-next, because final patch was a bit diffe=
+rent
 
-Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+int count =3D 0;
 
-Thanks,
-Jason
+llist_for_each_entry_safe(skb, next, ll_list, ll_node) {
+    prefetch(next);
+    skb_mark_not_on_list(skb);
+    rc =3D dev_qdisc_enqueue(skb, q, &to_free, txq);
+    count++;
+}
+qdisc_run(q);
+if (count !=3D 1)
+    rc =3D NET_XMIT_SUCCESS;
 
