@@ -1,158 +1,177 @@
-Return-Path: <netdev+bounces-236762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id D45C8C3FB44
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 12:20:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B75CFC3FB7A
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 12:23:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CA6604E1970
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 11:20:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C0233AE8BF
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 11:22:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D3BA31D750;
-	Fri,  7 Nov 2025 11:20:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 596BC322753;
+	Fri,  7 Nov 2025 11:22:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jUkZvzKt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rImSqDdr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D39F02F691D
-	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 11:20:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0406F320A38;
+	Fri,  7 Nov 2025 11:22:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762514417; cv=none; b=rTjcfy+MA4C9ElSWCPTLFei9mz/RA407eJtzZ4Mg2LYVu10QVPWBKwIb2ZNv/jPPUT24/xDqvwf3/hsiYN6nj5r4jFkWXGGAg8UD6Gry6G12316vaQq6+luwrbtZvnHrUKJCrge+IqLHfVkBD2CA3TH6Tc45QmHr5pPSILTQ6F8=
+	t=1762514541; cv=none; b=YcoJ9TDgV9D8m/Ed3E4aXgDvZ0hiGCk8UfSeqiRmfE8C+cxESbq+4sSYpy3K2l9spQLwVGbvXkHw1IJrYbZIjwQOzrhZgyYFFOEHvZYOv7S09DxZHBBEhAsbLnHywSUqhU+zghyARghSQyFnO8zn+Ao/utW3B5bAZngg5eBFThE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762514417; c=relaxed/simple;
-	bh=BRaK+VjCK1hNZi3/Bm25vdWhbCF3f4DmIMNp6ZePR/4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pl6Gty86vVTYKjoZ36cxmSbtwxC/A8ausc5dNAV2QEz2Da3UFBsigzR9wKU7vJlWBj6of+opp8n1Sp8JN2YlGpmuoYGaBFnTuZ+FZAqwfisvN4Z+l8Jmun8K3Cq7kz6W0lswQqlpo8DfHAGiNkBrtAeImorKFLHiWEhhg/Chlqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jUkZvzKt; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-4ed96544434so6139221cf.1
-        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 03:20:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762514415; x=1763119215; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fCuntcHPB7jt7B/bSZdm9gqlzC6yu+GRicnaUIhJiE0=;
-        b=jUkZvzKtLY+JSbhFO4QDQAGxkk4ytJCkr8KMyQ/klCNASqBvBpGxSiLm2fdHMiJCKO
-         Ut+ahhOqbegytRzh+KR5nabbJRq2vR+cB3X73kbMFv+Q10e7un0CORbff6BDJdwk684P
-         gWKx+ZSUDBI6680d7NmVMabEKpPAvNxb96FRI/I3EutuLavhEQGAMNeMGzydzluohZTG
-         vxgnvW9dPj+MV0o+w14sN24hebsdyN2KRBmxOkxQAzZ/g+0EDS5GYnh9S4xbdunYctQe
-         BC9KASBUx8/3VYjCTQ5AYZuc2ZDiaLAYBY5QIqvSBE4liwEqaOcQ/8lQvJMDx2EPOgST
-         XAvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762514415; x=1763119215;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=fCuntcHPB7jt7B/bSZdm9gqlzC6yu+GRicnaUIhJiE0=;
-        b=A+3/9KmSM5LWl9w31mcHcKJVpsh1SGz27Mx0whPERNZfTBUbodB0RxECtWRIqo0Ivu
-         fkp/zEVI6nkYQFtuw+GCgaKKvEMgweFb1KkFFvG92Zmo0e9FhSeZ/AskZsBFhWdev9Rt
-         2F2swz9zhh+iZj/RF2bVikuAj6L9Y980329/6r/TA10uidKg8IX3po5MN+RqQbws6eeY
-         iZDpO3idg9mc84ywyU61RmIPq6tYsYktbe2be7bE4SJG00KRvh/aCPQrOd68YAYeBpxq
-         BZyqjqy103TkqvVZGmZiRYRyUZvy5iXtEBjD6otqwIKwZtGv0NCbzd5wocVndcQTduC6
-         7MVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUHXoMTnyLDGeCOsfdW1ka7zhJDNmepDXfJ0fnQepq9pCWsLIz7kpg87XOZNdlYrZDC7JpNmRY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLILk2Jnopd3CnF+mIiTYoXjpBgcWwYqd/B96Yz36a4nzKWkPf
-	ZFPyO9bsGNp+XTRbnRE2GhdzUDyrJObkaXp7eLWNzbBgi8OJkTwuk0Fdm32G++colw7t2xa2jxD
-	d6hm8wsyPcO+8KLKxdxoLyPJau9lmAneYse91wEZk
-X-Gm-Gg: ASbGnctw/uKBMJETHcL+8gRcrX11aWijAtsOpYw8XAFS3Xh8BbBRoYcAdFbXVpCmAiE
-	GAzAsLLl6LyNktojwbsVQYAaoXT+UurbTM5eSJQdHxz8WBe24SdjHcIFx/ci+XvgQwnvAQjLFbW
-	M3YMfFMpkv8kuxqubiUwcHyLIn7l9nf7fYP5bZAl14OXqgmAU8BbL1NbwZYaau3kJnAuxnPVeok
-	4j07tZHmKZVGMi7OdLW9kN5Vb0VEyBQVeuXhvnXFIRzZzoqdz+opY6g4YFbMaBTbtJJ/Wad
-X-Google-Smtp-Source: AGHT+IGC3fYMjryS9zADloir/gP2Yamma9UjG5JSmMf62xT/E/o9kWnU3HSHFswBMiaxi1WGy0axf3d/DY0sMx5XNcM=
-X-Received: by 2002:ac8:5702:0:b0:4ec:f969:cabc with SMTP id
- d75a77b69052e-4ed9494e284mr28907961cf.10.1762514414438; Fri, 07 Nov 2025
- 03:20:14 -0800 (PST)
+	s=arc-20240116; t=1762514541; c=relaxed/simple;
+	bh=WqJuyrothph0jJUBiuUUbS1FvhvPkDqkS2NhaeN0xV0=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=QredjCOU8zlUyJ/7Joi7+QKVPC9ei+fvD3PXcAJJJxuUsxNT4uCPqOj9sMVPA6Zjk912FkRg2N2CLgTK0h5HiDZfB4/bR2h9z4MIlCt32NTPLoKD/ckNI6ig35/s1nS05XBUJh5Kd6aL7LdD6svEEe2xkFLsV0d2vEmyOddL3cc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rImSqDdr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45321C4CEF7;
+	Fri,  7 Nov 2025 11:22:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762514540;
+	bh=WqJuyrothph0jJUBiuUUbS1FvhvPkDqkS2NhaeN0xV0=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
+	b=rImSqDdr0csAuwceoiZMORIrJXnobUCP+yoqx199IwW4RPtIeHWgGg8yhQ45V/D7R
+	 HxCBJlEMisUSTZWQ74AkbgFanp3OacerkO8+FsunvIN8Qv1PJjoKvEhbkIBisz2yNh
+	 fHEnA2G6Z+rnjMkyoYcahxv0PRsrM8NiFmSYDw5XFjOljLa3mMJnwZAikRLma8aHey
+	 0V3PWYoagJTX1nuIdJ2Oom+6PchZMhCgWc6c354u4h/wXc/BosroSeZA0hazMf3txS
+	 iSFPT4TBGUlSnwuvzF4pqevVMyluivzg/6sz2Tim0ZSb22VBqsrJyyImM6xekisJtj
+	 QhXJiXhB/cEDw==
+Date: Fri, 07 Nov 2025 05:22:18 -0600
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251107080117.15099-1-make24@iscas.ac.cn>
-In-Reply-To: <20251107080117.15099-1-make24@iscas.ac.cn>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 7 Nov 2025 03:20:03 -0800
-X-Gm-Features: AWmQ_bnEuaGnleUmw5tdQ2p6tHQd4r5RAkYYgVZBqY4gtBL8VHSKOH_-igWdJDQ
-Message-ID: <CANn89iKswhYk4ASH0oG1YbvNsP9Yxuk4vSX5P45Tj_UY+s16VQ@mail.gmail.com>
-Subject: Re: [PATCH] net: Fix error handling in netdev_register_kobject
-To: Ma Ke <make24@iscas.ac.cn>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	sdf@fomichev.me, atenart@kernel.org, kuniyu@google.com, yajun.deng@linux.dev, 
-	gregkh@suse.de, ebiederm@xmission.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, akpm@linux-foundation.org, 
-	stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: linux-stm32@st-md-mailman.stormreply.com, 
+ Eric Dumazet <edumazet@google.com>, Fabio Estevam <festevam@gmail.com>, 
+ David Wu <david.wu@rock-chips.com>, 
+ Geert Uytterhoeven <geert+renesas@glider.be>, 
+ Samin Guo <samin.guo@starfivetech.com>, linux-amlogic@lists.infradead.org, 
+ netdev@vger.kernel.org, imx@lists.linux.dev, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ linux-renesas-soc@vger.kernel.org, Clark Wang <xiaoning.wang@nxp.com>, 
+ Jerome Brunet <jbrunet@baylibre.com>, 
+ Jernej Skrabec <jernej.skrabec@gmail.com>, Guo Ren <guoren@kernel.org>, 
+ Jose Abreu <joabreu@synopsys.com>, 
+ Neil Armstrong <neil.armstrong@linaro.org>, 
+ "G. Jaya Kumaran" <vineetha.g.jaya.kumaran@intel.com>, 
+ Bjorn Andersson <andersson@kernel.org>, 
+ Shuang Liang <liangshuang@eswincomputing.com>, 
+ Nobuhiro Iwamatsu <nobuhiro.iwamatsu.x90@mail.toshiba>, 
+ Swathi K S <swathi.ks@samsung.com>, linux-arm-msm@vger.kernel.org, 
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
+ linux-rockchip@lists.infradead.org, Frank Li <Frank.Li@nxp.com>, 
+ Emil Renner Berthing <kernel@esmil.dk>, 
+ Shangjuan Wei <weishangjuan@eswincomputing.com>, 
+ Vinod Koul <vkoul@kernel.org>, Richard Cochran <richardcochran@gmail.com>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Maxime Ripard <mripard@kernel.org>, linux-arm-kernel@lists.infradead.org, 
+ Jan Petrous <jan.petrous@oss.nxp.com>, 
+ Drew Fustini <dfustini@tenstorrent.com>, s32@nxp.com, 
+ Conor Dooley <conor+dt@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Samuel Holland <samuel@sholland.org>, Kevin Hilman <khilman@baylibre.com>, 
+ devicetree@vger.kernel.org, Chen-Yu Tsai <wens@kernel.org>, 
+ linux-mips@vger.kernel.org, Konrad Dybcio <konradybcio@kernel.org>, 
+ Matthew Gerlach <matthew.gerlach@altera.com>, 
+ Zhi Li <lizhi2@eswincomputing.com>, linux-sunxi@lists.linux.dev, 
+ Heiko Stuebner <heiko@sntech.de>, 
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
+ Fu Wei <wefu@redhat.com>, Linux Team <linux-imx@nxp.com>, 
+ Christophe Roullier <christophe.roullier@foss.st.com>, 
+ Pengutronix Kernel Team <kernel@pengutronix.de>, 
+ Keguang Zhang <keguang.zhang@gmail.com>, 
+ Sascha Hauer <s.hauer@pengutronix.de>, 
+ Romain Gantois <romain.gantois@bootlin.com>, 
+ Magnus Damm <magnus.damm@gmail.com>, Drew Fustini <fustini@kernel.org>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Shawn Guo <shawnguo@kernel.org>, 
+ linux-kernel@vger.kernel.org, Inochi Amaoto <inochiama@gmail.com>, 
+ Jakub Kicinski <kuba@kernel.org>, sophgo@lists.linux.dev, 
+ Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>, 
+ Minda Chen <minda.chen@starfivetech.com>, linux-riscv@lists.infradead.org, 
+ Martin Blumenstingl <martin.blumenstingl@googlemail.com>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Chen Wang <unicorn_wang@outlook.com>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+In-Reply-To: <20251107-qcom-sa8255p-emac-v5-1-01d3e3aaf388@linaro.org>
+References: <20251107-qcom-sa8255p-emac-v5-0-01d3e3aaf388@linaro.org>
+ <20251107-qcom-sa8255p-emac-v5-1-01d3e3aaf388@linaro.org>
+Message-Id: <176251453854.1709481.17350672291824662534.robh@kernel.org>
+Subject: Re: [PATCH v5 1/8] dt-bindings: net: qcom: document the ethqos
+ device for SCMI-based systems
 
-On Fri, Nov 7, 2025 at 12:01=E2=80=AFAM Ma Ke <make24@iscas.ac.cn> wrote:
->
-> After calling device_initialize(), the reference count of the device
-> is set to 1. If device_add() fails or register_queue_kobjects() fails,
-> the function returns without calling put_device() to release the
-> initial reference, causing a memory leak of the device structure.
-> Similarly, in netdev_unregister_kobject(), after calling device_del(),
-> there is no call to put_device() to release the initial reference,
-> leading to a memory leak. Add put_device() in the error paths of
-> netdev_register_kobject() and after device_del() in
-> netdev_unregister_kobject() to properly release the device references.
->
-> Found by code review.
->
-> Cc: stable@vger.kernel.org
-> Fixes: a1b3f594dc5f ("net: Expose all network devices in a namespaces in =
-sysfs")
-> Signed-off-by: Ma Ke <make24@iscas.ac.cn>
+
+On Fri, 07 Nov 2025 11:29:51 +0100, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> 
+> Describe the firmware-managed variant of the QCom DesignWare MAC. As the
+> properties here differ a lot from the HLOS-managed variant, lets put it
+> in a separate file. Since we need to update the maximum number of power
+> domains, let's update existing bindings referencing the top-level
+> snps,dwmac.yaml and limit their maxItems for power-domains to 1.
+> 
+> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 > ---
->  net/core/net-sysfs.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
->
-> diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-> index ca878525ad7c..d3895f26a0c8 100644
-> --- a/net/core/net-sysfs.c
-> +++ b/net/core/net-sysfs.c
-> @@ -2327,6 +2327,7 @@ void netdev_unregister_kobject(struct net_device *n=
-dev)
->         pm_runtime_set_memalloc_noio(dev, false);
->
->         device_del(dev);
-> +       put_device(dev);
+>  .../bindings/net/allwinner,sun7i-a20-gmac.yaml     |  3 +
+>  .../bindings/net/altr,socfpga-stmmac.yaml          |  3 +
+>  .../bindings/net/amlogic,meson-dwmac.yaml          |  3 +
+>  .../devicetree/bindings/net/eswin,eic7700-eth.yaml |  3 +
+>  .../devicetree/bindings/net/intel,dwmac-plat.yaml  |  3 +
+>  .../bindings/net/loongson,ls1b-gmac.yaml           |  3 +
+>  .../bindings/net/loongson,ls1c-emac.yaml           |  3 +
+>  .../devicetree/bindings/net/nxp,dwmac-imx.yaml     |  3 +
+>  .../devicetree/bindings/net/nxp,lpc1850-dwmac.yaml |  3 +
+>  .../devicetree/bindings/net/nxp,s32-dwmac.yaml     |  3 +
+>  .../devicetree/bindings/net/qcom,ethqos.yaml       |  3 +
+>  .../bindings/net/qcom,sa8255p-ethqos.yaml          | 98 ++++++++++++++++++++++
+>  .../devicetree/bindings/net/renesas,rzn1-gmac.yaml |  3 +
+>  .../bindings/net/renesas,rzv2h-gbeth.yaml          |  3 +
+>  .../devicetree/bindings/net/rockchip-dwmac.yaml    |  3 +
+>  .../devicetree/bindings/net/snps,dwmac.yaml        |  5 +-
+>  .../bindings/net/sophgo,cv1800b-dwmac.yaml         |  3 +
+>  .../bindings/net/sophgo,sg2044-dwmac.yaml          |  3 +
+>  .../bindings/net/starfive,jh7110-dwmac.yaml        |  3 +
+>  .../devicetree/bindings/net/stm32-dwmac.yaml       |  3 +
+>  .../devicetree/bindings/net/tesla,fsd-ethqos.yaml  |  3 +
+>  .../devicetree/bindings/net/thead,th1520-gmac.yaml |  3 +
+>  .../bindings/net/toshiba,visconti-dwmac.yaml       |  3 +
+>  MAINTAINERS                                        |  1 +
+>  24 files changed, 166 insertions(+), 1 deletion(-)
+> 
 
-Please take a look at free_netdev()
+My bot found errors running 'make dt_binding_check' on your patch:
 
->  }
->
->  /* Create sysfs entries for network device. */
-> @@ -2357,7 +2358,7 @@ int netdev_register_kobject(struct net_device *ndev=
-)
->
->         error =3D device_add(dev);
->         if (error)
-> -               return error;
-> +               goto out_put_device;
->
->         error =3D register_queue_kobjects(ndev);
->         if (error) {
-> @@ -2367,6 +2368,10 @@ int netdev_register_kobject(struct net_device *nde=
-v)
->
->         pm_runtime_set_memalloc_noio(dev, true);
->
-> +       return 0;
-> +
-> +out_put_device:
-> +       put_device(dev);
->         return error;
+yamllint warnings/errors:
 
-This seems bogus.
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/qcom,sa8255p-ethqos.yaml: $id: Cannot determine base path from $id, relative path/filename doesn't match actual path or filename
+ 	 $id: http://devicetree.org/schemas/net/qcom,ethqos-scmi.yaml
+ 	file: /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/qcom,sa8255p-ethqos.yaml
 
-Was your report based on AI or some tooling ?
+doc reference errors (make refcheckdocs):
 
-You would think that syzbot would have found an issue a long time ago...
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20251107-qcom-sa8255p-emac-v5-1-01d3e3aaf388@linaro.org
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
+
 
