@@ -1,107 +1,154 @@
-Return-Path: <netdev+bounces-236742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5041C3FA08
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 12:04:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 71A8BC3FA11
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 12:05:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B85971891298
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 11:04:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C649518914DC
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 11:05:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06C0A31A571;
-	Fri,  7 Nov 2025 11:04:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 310E531E0EA;
+	Fri,  7 Nov 2025 11:04:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jRjor6wD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ldsIBA7i"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C2131A07B;
-	Fri,  7 Nov 2025 11:04:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0528031B104;
+	Fri,  7 Nov 2025 11:04:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762513467; cv=none; b=DF0y9SCGsZnCMBCr3a+zAW/8R/4Ha6vxvhCENsPYOYiftyM9MqteFOFRfRLNFi7Bkfl+69X44avXKE/WZlPVk507pgppM75qWX5x24CgNNTNVztkAlxCuDpVfB4eUySu0YOFnr/t8AM8rsPNzocTBxvBdcm6C3zs40Ik+3ajnTA=
+	t=1762513474; cv=none; b=dIimKQMBbCvuG/8FOOXBJJXa8fra3uL0r/8KebPQA4CYzn9vEJrqqndlZ6IJoAyWrxWhRPkqJqHHo6O8H84esx/hQ0FNzW1NoE+MNHUq2aZbu61g8LtbKqR9I9fPSSlwzQOg8vO9ZR2rNt06ysTpAvuTKY5H1nnq9zxt8cuucFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762513467; c=relaxed/simple;
-	bh=sl9h3yMfjPSxtJrcT6HfRKy85d3oCmDAKn59+bM3b/k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dGjY01JiJC8PxaAO5H8Fpc2fliRXlcmP1gfviwDtXWTnvs4sqlgiNrSgfBVv8S/hayn87OhuC5WMXrJXKmIKtz2s39FJKhcblFQacoOytWmHElPrho3Jwz8YetFYEvOHAxqFwDuSgrTSFjdK7LDI0joxnh3LYJ06KNwxHWPEGUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jRjor6wD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D5E9C19421;
-	Fri,  7 Nov 2025 11:04:24 +0000 (UTC)
+	s=arc-20240116; t=1762513474; c=relaxed/simple;
+	bh=BvnStadPPZig6VYjAjMr1d2Qtw5EOq71oMfP2oI6vbg=;
+	h=Content-Type:MIME-Version:Message-Id:In-Reply-To:References:
+	 Subject:From:To:Cc:Date; b=VRG1sbRrUJ6yTT0wZ781uj4pwSGI8exlXejsheFOoTWWkTU/YzBB8UeRw6VxdcLtyvz14HVA9fYeJpso4PmS4qCGGoMCOtY9qXsISahsbCL45PXgx5mUveYlnXX+ToLmi249nxmausWjjQ+B9igu0npyFASZ4nxieMHoslJVTDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ldsIBA7i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44252C4CEF8;
+	Fri,  7 Nov 2025 11:04:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762513467;
-	bh=sl9h3yMfjPSxtJrcT6HfRKy85d3oCmDAKn59+bM3b/k=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jRjor6wDeHJRiukHQkSIdsva65dzC+eNBo25iJQ0X1DLR0Yu8g7D42n6ZfISmdxqM
-	 mToyYEbbPAhOIi1B1PYFHpOECT3R13mUxS6FHvWMGvC5rgvAbPpG1TKi+O+bMQ7PXi
-	 Cd1TgW782RRhq6nYrn9LBV2cfNoBa81QJF/M7aUPE766HJTFMo5wOMM4uBwW632wU3
-	 t4b2vILugTMIMJmhtOL9vNUZ7mf7eh0td+LoDLeLOpQhUAp24aOjgpDtOsNczFocla
-	 Wg2hIYnLZulpVbVjay0W+rMR6GpQomPfkRqh+Ev8FmrEf/8vINh4uCyReh4cZxCO25
-	 sOzX9D015tJaw==
-Date: Fri, 7 Nov 2025 11:04:22 +0000
-From: Simon Horman <horms@kernel.org>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: Breno Leitao <leitao@debian.org>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Michael Chan <mchan@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-team@meta.com
-Subject: Re: [PATCH net-next] tg3: extract GRXRINGS from .get_rxnfc
-Message-ID: <aQ3SNvSigJwffoQK@horms.kernel.org>
-References: <20251105-grxrings_v1-v1-1-54c2caafa1fd@debian.org>
- <CACKFLim7ruspmqvjr6bNRq5Z_XXVk3vVaLZOons7kMCzsEG23A@mail.gmail.com>
- <4abcq7mgx5soziyo55cdrubbr44xrscuqp7gmr2lys5eilxfcs@u4gy5bsoxvrt>
- <CACKFLinyjqWRue89WDzyNXUM2gWPbKRO8k9wzN=JjRqdrHz_fA@mail.gmail.com>
+	s=k20201202; t=1762513472;
+	bh=BvnStadPPZig6VYjAjMr1d2Qtw5EOq71oMfP2oI6vbg=;
+	h=In-Reply-To:References:Subject:From:To:Cc:Date:From;
+	b=ldsIBA7iZ/WYl7HzA2SE0gy1mNxaUYFHZFgX9SXeLez7ruIVkPHtlIoIT3/jr5CK4
+	 osaIp5/l1zfNkDjvx9XU7eXnMV3CMY23KZeznI1inR8/xp2hdkO/5dgFgN9Qt35fGk
+	 /FbYGi4NwdCkjsZ2v/VSEqnQmms07LFVNJ2GK88LcktCW9CRSY5wspsQbV2GldsUYM
+	 2A5Q1rvaaAOq1jg3UpgIfan50aqqW4eqLmSujf+RGOtwuUD585stqi8pZg1UmoOUd4
+	 j+epm8FMT4NkzsznMAH03+UrAsczfTJ+lOD6b1cop/VCttFlws0wAOhobIUPRJJIJs
+	 HPzmAZR7bQZrg==
+Content-Type: multipart/mixed; boundary="===============5137293592050232588=="
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACKFLinyjqWRue89WDzyNXUM2gWPbKRO8k9wzN=JjRqdrHz_fA@mail.gmail.com>
+Message-Id: <e7c21df731231e96fd630f5486d6a4af9daf73b8ee5dcd09e8284912ef90c818@mail.kernel.org>
+In-Reply-To: <20251107102853.1082118-4-dtatulea@nvidia.com>
+References: <20251107102853.1082118-4-dtatulea@nvidia.com>
+Subject: Re: [RFC 1/2] page_pool: add benchmarking for napi-based recycling
+From: bot+bpf-ci@kernel.org
+To: dtatulea@nvidia.com,kuba@kernel.org,hawk@kernel.org,davem@davemloft.net,edumazet@google.com,pabeni@redhat.com,horms@kernel.org,shuah@kernel.org
+Cc: dtatulea@nvidia.com,tariqt@nvidia.com,netdev@vger.kernel.org,linux-kselftest@vger.kernel.org,linux-kernel@vger.kernel.org,ast@kernel.org,andrii@kernel.org,daniel@iogearbox.net,martin.lau@kernel.org,eddyz87@gmail.com,yonghong.song@linux.dev,clm@meta.com,ihor.solodrai@linux.dev
+Date: Fri,  7 Nov 2025 11:04:32 +0000 (UTC)
 
-On Thu, Nov 06, 2025 at 10:45:21AM -0800, Michael Chan wrote:
-> On Thu, Nov 6, 2025 at 9:06 AM Breno Leitao <leitao@debian.org> wrote:
-> >     tg3: Fix num of RX queues being reported by ethtool
-> >
-> >     Using num_online_cpus() to report number of queues is actually not
-> >     correct, as reported by Michael[1].
-> >
-> >     netif_get_num_default_rss_queues() was used to replace num_online_cpus()
-> >     in the past, but tg3 ethtool callbacks didn't get converted. Doing it
-> >     now.
-> >
-> >     Link: https://lore.kernel.org/all/CACKFLim7ruspmqvjr6bNRq5Z_XXVk3vVaLZOons7kMCzsEG23A@mail.gmail.com/#t [1]
-> >
-> >     Signed-off-by: Breno Leitao <leitao@debian.org>
-> >     Suggested-by: Michael Chan <michael.chan@broadcom.com>
-> >
-> > diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-> > index fa58c3ffceb06..5fdaee7ef9d7a 100644
-> > --- a/drivers/net/ethernet/broadcom/tg3.c
-> > +++ b/drivers/net/ethernet/broadcom/tg3.c
-> > @@ -12729,7 +12729,7 @@ static u32 tg3_get_rx_ring_count(struct net_device *dev)
-> >         if (netif_running(tp->dev))
-> >                 return tp->rxq_cnt;
-> >
-> > -       return min(num_online_cpus(), TG3_RSS_MAX_NUM_QS);
-> > +       return min((u32) netif_get_num_default_rss_queues(), tp->rxq_max);
-> 
-> Isn't it better to use min_t()?
+--===============5137293592050232588==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-FWIIW, umin() seems appropriate to me.
+> diff --git a/tools/testing/selftests/net/bench/page_pool/bench_page_pool_simple.c b/tools/testing/selftests/net/bench/page_pool/bench_page_pool_simple.c
+> index cb6468adb..84683c547 100644
+> --- a/tools/testing/selftests/net/bench/page_pool/bench_page_pool_simple.c
+> +++ b/tools/testing/selftests/net/bench/page_pool/bench_page_pool_simple.c
+> @@ -16,6 +17,8 @@
+>  static int verbose = 1;
+>  #define MY_POOL_SIZE 1024
+>
+> +DEFINE_MUTEX(wait_for_tasklet);
+> +
 
-Commit 80fcac55385c ("minmax: add umin(a, b) and umax(a, b)")
-includes quite a long explanation of why it exists.
-And that does seem to match this case.
+[ ... ]
+
+> +/* Testing page_pool requires running under softirq.
+> + *
+> + * Running under a tasklet satisfy this, as tasklets are built on top of
+> + * softirq.
+> + */
+> +static void pp_tasklet_handler(struct tasklet_struct *t)
+> +{
+> +	uint32_t nr_loops = loops;
+> +
+> +	if (in_serving_softirq())
+> +		pr_warn("%s(): in_serving_softirq fast-path\n",
+> +			__func__); // True
+> +	else
+> +		pr_warn("%s(): Cannot use page_pool fast-path\n", __func__);
+> +
+> +	if (enabled(bit_run_bench_tasklet01))
+> +		time_bench_loop(nr_loops, 0, "tasklet_page_pool01_fast_path",
+> +				NULL, time_bench_page_pool01_fast_path);
+> +
+> +	if (enabled(bit_run_bench_tasklet02))
+> +		time_bench_loop(nr_loops, 0, "tasklet_page_pool02_ptr_ring",
+> +				NULL, time_bench_page_pool02_ptr_ring);
+> +
+> +	if (enabled(bit_run_bench_tasklet03))
+> +		time_bench_loop(nr_loops, 0, "tasklet_page_pool03_slow", NULL,
+> +				time_bench_page_pool03_slow);
+> +
+> +	if (enabled(bit_run_bench_tasklet04))
+> +		time_bench_loop(nr_loops, 0, "tasklet_page_pool04_napi_aware",
+> +				NULL, time_bench_page_pool04_napi_aware);
+> +
+> +	mutex_unlock(&wait_for_tasklet); /* Module __init waiting on unlock */
+        ^^^^^^^^^^^^^
+
+Can mutex_unlock() be called from softirq context? The pp_tasklet_handler()
+function runs as a tasklet handler in softirq context, but mutexes are
+sleeping locks that require process context. Would a completion or spinlock
+be more appropriate here?
+
+The synchronization pattern appears to be:
+  bench_page_pool_simple_module_init()->mutex_lock(&wait_for_tasklet)
+  bench_page_pool_simple_module_init()->tasklet_schedule(&pp_tasklet)
+  bench_page_pool_simple_module_init()->mutex_lock(&wait_for_tasklet) [blocks]
+  pp_tasklet_handler()->mutex_unlock(&wait_for_tasklet) [softirq context]
+
+> +}
+> +DECLARE_TASKLET_DISABLED(pp_tasklet, pp_tasklet_handler);
+> +
+> +static void run_tasklet_tests(void)
+> +{
+> +	tasklet_enable(&pp_tasklet);
+> +	/* "Async" schedule tasklet, which runs on the CPU that schedule it */
+> +	tasklet_schedule(&pp_tasklet);
+> +}
+
+[ ... ]
+
+> @@ -251,12 +332,19 @@ static int __init bench_page_pool_simple_module_init(void)
+>
+>  	run_benchmark_tests();
+>
+> +	mutex_lock(&wait_for_tasklet);
+> +	run_tasklet_tests();
+> +	/* Sleep on mutex, waiting for tasklet to release */
+> +	mutex_lock(&wait_for_tasklet);
+> +
+>  	return 0;
+>  }
+
+---
+AI reviewed your patch. Please fix the bug or email reply why it's not a bug.
+See: https://github.com/kernel-patches/vmtest/blob/master/ci/claude/README.md
+
+CI run summary: https://github.com/kernel-patches/bpf/actions/runs/19165940352
+
+--===============5137293592050232588==--
 
