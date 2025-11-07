@@ -1,128 +1,95 @@
-Return-Path: <netdev+bounces-236575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FB8FC3E0C2
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 01:53:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60066C3E0F1
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 01:57:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AAC404EB8E0
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 00:52:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19A803A73E5
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 00:57:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7601D301498;
-	Fri,  7 Nov 2025 00:50:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73CED2DF140;
+	Fri,  7 Nov 2025 00:57:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RtWXk78j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="syt4MBuT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 647972FD7A3
-	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 00:50:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4548361FCE;
+	Fri,  7 Nov 2025 00:57:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762476605; cv=none; b=bgsAtgAzm+fiN1qhzJpWYgNfCa4icIABSwDTnya2PJRrCt7XEIqISpi+dVDv2o0UFEfhv7l4Bl2Gy76vK0YaoQ+V5iD2aq0mKO9v3mimnN8qVNVLZVZgP2uEYtBCNixdGcwwrUVZl/5fRE9u/mCPtcOegJ2ZNPpNcttssHKFSt0=
+	t=1762477054; cv=none; b=VDklBT95OmDKP3dA0DcH4r5LUdraJvj0rCYXBX6ZTAkpZxpUO/lOXXAPiNoYLL/p0zZMg2DA0TJBWDi6zVNSoG96MBarQf9Yz/kLJqw5S/Srf+8Zpgu6ew+EZl31FBhjxKHxA6tbeusG1QaL0Afaq4y01ra1WXoKdPby4Q3Ay7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762476605; c=relaxed/simple;
-	bh=iMU473kfbxLIfx41vDd7YtatXvonwJ3nvGqIOn/zk5I=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=kssXzk0kYXa4/NnfM8VNYoSR4VfraYb7744qJ6RIWtpQ1ZcWGaTB8Be2SX8qKIoE9JYZoR8ncqzw8UmARxSn3ZqdJ9rANlaYQaNlGfz42caKvbS4fmohzl18ZB1+byUf7ABM+nd1niaBOBa3ABwACHn9Wu+UG3AsnN6kwgbT/j0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RtWXk78j; arc=none smtp.client-ip=209.85.215.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-b593def09e3so131986a12.2
-        for <netdev@vger.kernel.org>; Thu, 06 Nov 2025 16:50:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762476602; x=1763081402; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uegf6nxs6P81Dwl5DQm2UBLSV3f9YHB+8bNv996m32s=;
-        b=RtWXk78j34yrafHbvKJq76DRJx2KD3ljRmGfybDyf+nVnQLpDf/QfXoN0MEDTd+JMo
-         h2AFksiRxOdEIZTL3VpL+fGzwjiCtJAWWjLhEFR3L88neL+bgN/9cYVkCMGmMe8AD7JK
-         S+0eg+k6M3LshYM5/m+i5PL1Zo4+XiYE+kiSiyruhmjnhEYiNaK882XAVfX3LG6cpzyA
-         gZP3uaRSMs1fV9s6QrGD0byqN+7YKIl8ruouw9CI4eo8CTVSmGcgueaL9Cut6m13ZKC1
-         Gynp7APdpH/+ZxqvpPeLoPQWy1+DdcXfqTXj8HiN5mqxPvtPL0XHxfYbLheOvBJs/Mtv
-         sr3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762476602; x=1763081402;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=uegf6nxs6P81Dwl5DQm2UBLSV3f9YHB+8bNv996m32s=;
-        b=jW/glgadB9uYa06szxfTy64/v/nv+J94T6ozYiH1hnd3xXTjHb/SNCCOd3abK3l2y5
-         6xIJxcq8fFnjfSVk7zsC0sMcPqogwFd4aIsbLuUYfm7eJWjm6UUlA7L0ubtomtH5h1P8
-         Z+xWGOxPU0/B9bwVllj+RZT2gad2OfE1OiQXq+aUCZvUAWXlW/n54uQLdpuGGTrBrq8T
-         zoJSrBqoyiyEtyBAFhn+v4npLulnsPIITgsMDpa49TgqEUinoGi9e+PeHmjU6wCaq6/P
-         lHThGNTi+I7uO1gJ1Bgxa2wCDT9F3UBkVJsDW2QCSN/Avi1jlST1ht2mrzLop5BuJWlt
-         6O2g==
-X-Forwarded-Encrypted: i=1; AJvYcCVtHe9OqGuS1MizXzIvl77a1AgMlKuZibWgC+VTVL1fzT7kiEQ+3LvSaADu44hm0qqkepuXWZM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyRKoeqL5ch2KdTC4Rjhxs3nmhO86yu8YNQ6Ua+27A2dTdYYJ9w
-	eveoxsGGnKoVS+qdHNGR//Sx6kj1i1MW1aYboahk1IolSFNO9Ugh9ntOylFqGw==
-X-Gm-Gg: ASbGnct6MBg7sY47mr95EIk0iZOQwxS89Pgrin/uAhfqcW2n/grL+nLw8Nptczbst4g
-	hqCXEj9OPttzS3yY1UdGQuOogqFP6r4rw/Hhnlq7sUo41ypglAk8UuLxxkSUYF7xH+HTZanNe7b
-	1oIWMEfjjcImQSgtWA9l8OJx5fgAS/qF2CoJLqMU6kXfgZ2woAJ5MGvW7zrC9TKH3EpGQCuYm7Q
-	9BkZxrbAQBuqH4GspyzkWZJAKgPxt6/W0wmVbB3sv/RSLaXKzo+9UG1HrLmKHoZUp2IT6ZD0hYN
-	cZJStQgRotdTFu3NEvjdt4jQH16uBhetU+zWUz+UZrWoGcivpYVy9lZ5GiJdSyCLOBypyo5wXoT
-	QHLfb2R1GdncEmTMXZLZsK+pqhyxlQxOOHNdN2PIqlpesYMzihC0D1k6kxQKkPB4lzW4vE5rV
-X-Google-Smtp-Source: AGHT+IEn4ofaJtpDiBFAzxzfLcnblypBsnuT/tfNp8v2pmgiedvOY3KtH3CWotZWmHCTlxnnmEILUA==
-X-Received: by 2002:a17:902:ecca:b0:295:a1a5:baee with SMTP id d9443c01a7336-297c03d28dfmr16719935ad.4.1762476602405;
-        Thu, 06 Nov 2025 16:50:02 -0800 (PST)
-Received: from localhost ([2a03:2880:2ff:6::])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29651c778a5sm41166315ad.73.2025.11.06.16.50.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Nov 2025 16:50:02 -0800 (PST)
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-Date: Thu, 06 Nov 2025 16:49:55 -0800
-Subject: [PATCH net-next v3 11/11] selftests/vsock: disable shellcheck
- SC2317 and SC2119
+	s=arc-20240116; t=1762477054; c=relaxed/simple;
+	bh=+HNsLXJ/tO6B0e84iu9sD/tN/wykl6Kgdq5YXLsIuBs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=b8Mp0HR9Eh9jhSGDzMBbQKR9TXa+aw4BYmDaNnc8zeyLjeKwwAiK6r4KzWJw7MCVKSocrbwNCxtUBGf0it/WRpP4WjH2IRz6R7bvYDiQyBL0OCW7VkYfLmWbFerOoaFOOyEyLm1voLf5D21SvkMLWXBurSC3ACbjWqAInYgjaFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=syt4MBuT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41AB8C4AF09;
+	Fri,  7 Nov 2025 00:57:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762477054;
+	bh=+HNsLXJ/tO6B0e84iu9sD/tN/wykl6Kgdq5YXLsIuBs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=syt4MBuTR69E/hMTxgvO86jwnQg0bXv+oygHb0D4sAfayztR8x5XpZEkO2ecr5s01
+	 Px7aSTv7mGPaLruLLuzmzYVAKY64l9PFPb6gWch2Q7AgWD/g/rdIdc9xxndEzzYgaE
+	 FsCaGz5bCEWQCkgT1pwlTmoDqobtVI5V7IM46rsATnDTOvtn2rWePziXv9pW+PYXvB
+	 LBR8aUVCeUXy7w2SBrvt/KLLc0dVrNqhtoXH6+TCNumn/PT51EPa8i2EgALEyteEcC
+	 6UMxYoeeJOqcOC/1W9TjN7fg8gnOTdQrDFIhTRLB2ppAOrrCKL5hSOhcU9Jb4tD/fl
+	 phvP/tg7+TN2A==
+Date: Thu, 6 Nov 2025 16:57:32 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Prithvi Tambewagh <activprithvi@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ horms@kernel.org, alexanderduyck@fb.com, chuck.lever@oracle.com,
+ linyunsheng@huawei.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
+ david.hunter.linux@gmail.com, khalid@kernel.org,
+ linux-kernel-mentees@lists.linux.dev,
+ syzbot+4b8a1e4690e64b018227@syzkaller.appspotmail.com
+Subject: Re: [PATCH] net: core: Initialize new header to zero in
+ pskb_expand_head
+Message-ID: <20251106165732.6ea6bd87@kernel.org>
+In-Reply-To: <20251106192423.412977-1-activprithvi@gmail.com>
+References: <20251106192423.412977-1-activprithvi@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20251106-vsock-selftests-fixes-and-improvements-v3-11-519372e8a07b@meta.com>
-References: <20251106-vsock-selftests-fixes-and-improvements-v3-0-519372e8a07b@meta.com>
-In-Reply-To: <20251106-vsock-selftests-fixes-and-improvements-v3-0-519372e8a07b@meta.com>
-To: Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>
-Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Bobby Eshleman <bobbyeshleman@meta.com>
-X-Mailer: b4 0.14.3
 
-From: Bobby Eshleman <bobbyeshleman@meta.com>
+On Fri,  7 Nov 2025 00:54:23 +0530 Prithvi Tambewagh wrote:
+> KMSAN reports uninitialized value in can_receive(). The crash trace shows
+> the uninitialized value was created in pskb_expand_head(). This function
+> expands header of a socket buffer using kmalloc_reserve() which doesn't
+> zero-initialize the memory. When old packet data is copied to the new
+> buffer at an offset of data+nhead, new header area (first nhead bytes of
+> the new buffer) are left uninitialized. This is fixed by using memset()
+> to zero-initialize this header of the new buffer.
 
-Disable shellcheck rules SC2317 an SC2119. These rules are being
-triggered due to false positives. For SC2317, many `return
-"${KSFT_PASS}"` lines are reported as unreachable, even though they are
-executed during normal runs. For SC2119, the fact that
-log_guest/log_host accept either stdin or arguments triggers SC2119,
-despite being valid.
+It's caller's responsibility to initialize the skb data, please leave
+the core alone..
 
-Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
----
- tools/testing/selftests/vsock/vmtest.sh | 2 ++
- 1 file changed, 2 insertions(+)
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index 6841e61a6bd0..3486271260ac 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -2282,6 +2282,8 @@ int pskb_expand_head(struct sk_buff *skb, int nhead, int ntail,
+>  	 */
+>  	memcpy(data + nhead, skb->head, skb_tail_pointer(skb) - skb->head);
+>  
+> +	memset(data, 0, size);
 
-diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
-index cde048bd7fe6..bda1ad173ad1 100755
---- a/tools/testing/selftests/vsock/vmtest.sh
-+++ b/tools/testing/selftests/vsock/vmtest.sh
-@@ -7,6 +7,8 @@
- #		* virtme-ng
- #		* busybox-static (used by virtme-ng)
- #		* qemu	(used by virtme-ng)
-+#
-+# shellcheck disable=SC2317,SC2119
- 
- readonly SCRIPT_DIR="$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
- readonly KERNEL_CHECKOUT=$(realpath "${SCRIPT_DIR}"/../../../../)
+We just copied the data in there, and now you're zeroing it.
 
+>  	memcpy((struct skb_shared_info *)(data + size),
 -- 
-2.47.3
-
+pw-bot: cr
 
