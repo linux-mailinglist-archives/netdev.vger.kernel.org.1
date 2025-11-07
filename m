@@ -1,137 +1,131 @@
-Return-Path: <netdev+bounces-236798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73DC1C40391
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 14:57:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 81401C403D3
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 15:01:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BD2424F21E4
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 13:55:45 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 817114F0D37
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 13:59:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F60A319859;
-	Fri,  7 Nov 2025 13:55:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16065319857;
+	Fri,  7 Nov 2025 13:59:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E31263195EC
-	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 13:55:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E448433BC
+	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 13:59:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762523742; cv=none; b=ClH4Edgg18KTyTyaVlWhFNx3VRN+/2aRXkf4uJr5NzhRv0cUsA+ONHbCqAA2zzB5NQNccDedUZmHEjvcA3Z/Rhm8/iQ1Sn4Bq14HS0WuTwwXy6l9M8UTSmYGsII61XXPSsVhQCIPv3pnOn7IWtga8zIrAiahyef3pBGYrwyWRW0=
+	t=1762523957; cv=none; b=fWC8qIuWOpG++nuFXpt6mauMpTw8CTCtnyl9zkeCy1L2Dkd5/vBlsU0loUfKwH61K+BrM35KOYuuXgfJb8NQOzZn3z7HmpoHFfuCWXQicKcNdkTkULCRUp7bO8D9Hbc2z2tD3hXr4vkHL1WRAWgIHixXofAMZneB+zV9dmULsQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762523742; c=relaxed/simple;
-	bh=Hxb/gWTOsdtHlXVI0iFMLTENSvzBdCoasJxqnUiXeIY=;
+	s=arc-20240116; t=1762523957; c=relaxed/simple;
+	bh=8JxOVPMisbF56oYxS5Y+sDye3oJBmOCWA+veCsBSQt0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F2JuLVwo8Zchj/ZwMmibsNxzvddv+EASkMvquYeceyqp1+hyYEe9rrZ+5y735klj7h4llSKE9y8H9wl1vchxXAYnSY1sBkYGMqcygS4/zfZvDm6lMpHFS3hvbGKOkW7P/kJRl3TSB5BNFF1wJ1Pj+OItenrXueaPcKUDLQh9zC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.52
+	 Content-Type:Content-Disposition:In-Reply-To; b=rMlie/Oc9v95LmlKN4gJjkRLMLSciV1YZWZ4Hexrq8iJg7Wi6ABk99DnhxTl1shMYQaFBRb8PWqa7gp8AyQLfPENtOsvfYyel+pJUyOvb4a38YlbgK6N9JdVaOdElhHP/LHAWZx9xrvoCtAEAWTUPVCHqWkkI86oaMaIwTGbyHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-640b06fa959so1396959a12.3
-        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 05:55:40 -0800 (PST)
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b727f452fffso132909966b.1
+        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 05:59:15 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762523739; x=1763128539;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nZE6WJJFFBiJVTyI5OvLy2/eZGTZ4IdwtaNd7dO/eBE=;
-        b=RyV/c/KhdzMEpktJYmNCJWQYjq6C3G3gH23JoDnMQTE3IrtMCwMSMWIFtD3uSGsXIx
-         Wnv6Vx4wJ5IVw0jMNMCwUceT8frv9qut5/WpibsyTH4Fp95hlNyotA5n7h2L1lxW0ED7
-         rYm+Zhdntk03zIzepnxPVdMFbPfd1PKwGfhxFwaiyvDAK+pkmt2Qyasu+3+TOz7QwQtn
-         SWj+vAq5gpUdEAdYt8seujGMpFAnhpj0VPVxb3CjWjZKfUk3LNTpSDgS9d6mpHepYPTM
-         NF1ATmGqsWBP9f8KRbGMur4hrRog+UswO787Ie4jvpLv4tha94m/STmChAGrBkXox8Yh
-         Wt1A==
-X-Forwarded-Encrypted: i=1; AJvYcCVRf8PbmTLkHZ2htrQ6TD85qmqKA83COKvZW55CjMATJY+3GMStuqV1rgIhmu/REU7dr55daxg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw54LJsW78txgXug7I3ml5az1BQ5kcSqpeF2iHEsCN0I362HIaC
-	5DGCId2P+NSdXKEAXjtisGgOzL3o9SQzSt5Jm5+R9Q4hJagb0iXu/STF
-X-Gm-Gg: ASbGnctUXid28hK1jrYQMrP3YJgMVH61crnnhv/bSy47bD/tW0Q9OelBr3QrsyJpDyZ
-	qB24PaiI8vEBNfeHaWH3hohVOwvbVWvcKmnC8pBg9hgL27LVSqRNzZODCZNYsKwPybjS7832X0b
-	YZVhnEmhP0icndwEcmT8CLN1VHQP9LkkV/AeVENP5NAddCDSRuxcgzMns76c/3ootyyjGMI2cEw
-	wA6toUegUFP6ywVUq9+GOveOuZ4lgYUUkMKsneulKnnbK3ioFj/CneV5tCQtLb6DtYaBnIipdgI
-	MBVr9kC07xxu2Of0qAAo97d75AI3iUJZBEgDlJTs+FWr62Ww1a2vEofhvLRm14himRFcYZVrr5y
-	fDWEjy+CNfddazIFswDwdOq+LnJQ/7kNPWxdf2QEdjhhNcy2ba4xC2Em9KXpxyzeopwuYYDhObf
-	fP
-X-Google-Smtp-Source: AGHT+IHlTScJC+oO2U1HIWORq+rSxPXReipszaWTgQ3KvvBT9dPCs3MWAerxSZPOSFFxVPN9CHWH7A==
-X-Received: by 2002:a05:6402:3550:b0:640:c918:e3b with SMTP id 4fb4d7f45d1cf-6413f0f5f4cmr3131005a12.26.1762523739041;
-        Fri, 07 Nov 2025 05:55:39 -0800 (PST)
-Received: from gmail.com ([2a03:2880:30ff:1::])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6412a27d68dsm3303524a12.9.2025.11.07.05.55.37
+        d=1e100.net; s=20230601; t=1762523954; x=1763128754;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zJVwwG9Ykxrpv2wC8GWxsRY2S8SK8LdQYPdOrnHuv/4=;
+        b=B7j9MkSplDjRlRi5rvk0kWiDxJENmS5hJbOAAoPWX2g/+48bj6dBOZlrOGNmzPGYiL
+         T92qpseGBpNdwqFp76wRQRt2xva/o5TtnhVqPmrfGLBYn81x3JGDEP/VK2cb6UD+s02X
+         ginnxGh0h1Y4+B686GxTznC8CYQ7jH3Tz1iJsrR0h0E0Ej0VQ30flllU1t9buvhmkinL
+         fOWHqF8sk54IFR521Q7RAFH65GFLvNs+0/Nphf4lBUFFjcZSNU8cS3zrMBORzMGllWVx
+         VjLScDLZcygCNyo3nBroUMXPZxQ4BvKsiGW6Kg/Q1A5w0a2d+n9h9nUs8sVecnnhnY7y
+         IW6A==
+X-Forwarded-Encrypted: i=1; AJvYcCV2WYCKL9lkkknDZAveZ/b1N07b9Oh4VPx1+cg48FqD2IGKJbu0QgPzVM7A3CzJATPGn36AOQU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+ROUWYnsP8uRPzikiBfaQ/YEVwlNJ6rN88TkJiBUpY7cIBaNo
+	ywOnvrENdE9DZ1NoRNK1AzL/cw4dA3NOLq2mx0m/korBioiXp9xctEPo
+X-Gm-Gg: ASbGncsVWQ7KT3iCeNI+HDb7TVOn5xP17PMDjodFS66LmP6Q4P1Pn/V8qzfYcE2gywx
+	FHewsWHxpIB27mXic2m/+QXVZ2cL71VHSjXkonSOv6G1121D+D/cl+Ld0qtVucppgG9c59tQlrG
+	aOhgm0EgpCI/QpitrmUpVYeREkn9v13Ib95UAggOLkTxVVbGWZTJK24p2jGEF9zQNaHvah1hyXI
+	O2XyQpijPg6obCx2kEoyBvX7e5M/aw/UlXv5bRcX7ZGCDDLVsqZsmghI2M2dHDlOM2y5EWi41bM
+	ofeQbmcL3qny1O3lxcFmldOgMKNReSx+VQ+B2oW82DfS4WA/ehYH6oLImuUkt9XTKid6d2bln6u
+	Oa4Y2utoTiEdTA8HCEyVFqvJFMilC+is9k9LvNi84hzbddkCCUFERokvdluXep2Q3XCQsbDwsUp
+	aa
+X-Google-Smtp-Source: AGHT+IEnql9f6VQXY9z+xJPuqmV/UVO/NZG7OfzcZVuiSrpqgNziJ9vCyEN3HJ1eqE7qwBWjWJ2N/A==
+X-Received: by 2002:a17:907:3f99:b0:b6d:f416:2f3 with SMTP id a640c23a62f3a-b72d0ad0b7amr205260966b.19.1762523953394;
+        Fri, 07 Nov 2025 05:59:13 -0800 (PST)
+Received: from gmail.com ([2a03:2880:30ff:7::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b72bf9bc214sm261464466b.52.2025.11.07.05.59.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Nov 2025 05:55:38 -0800 (PST)
-Date: Fri, 7 Nov 2025 05:55:36 -0800
+        Fri, 07 Nov 2025 05:59:13 -0800 (PST)
+Date: Fri, 7 Nov 2025 05:59:10 -0800
 From: Breno Leitao <leitao@debian.org>
 To: Simon Horman <horms@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	david decotigny <decot@googlers.com>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, asantostc@gmail.com, efault@gmx.de, calvin@wbinvd.org, 
-	kernel-team@meta.com, jv@jvosburgh.net
-Subject: Re: [PATCH net v9 4/4] selftest: netcons: add test for netconsole
- over bonded interfaces
-Message-ID: <f44ccmfiiq47ecug5jyfxsi2imsytzhg25szr5yotpdry2b32h@5hxqifqyvsjz>
-References: <20251106-netconsole_torture-v9-0-f73cd147c13c@debian.org>
- <20251106-netconsole_torture-v9-4-f73cd147c13c@debian.org>
- <aQ3ExWwuiiN0xyBE@horms.kernel.org>
+Cc: Michael Chan <michael.chan@broadcom.com>, 
+	Pavan Chebbi <pavan.chebbi@broadcom.com>, Michael Chan <mchan@broadcom.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kernel-team@meta.com
+Subject: Re: [PATCH net-next] tg3: extract GRXRINGS from .get_rxnfc
+Message-ID: <pj3m2f53zs47z2i6se4qaqs6izwfsgssnslna7ik7t2my3lpcr@7jyvaialnjxq>
+References: <20251105-grxrings_v1-v1-1-54c2caafa1fd@debian.org>
+ <CACKFLim7ruspmqvjr6bNRq5Z_XXVk3vVaLZOons7kMCzsEG23A@mail.gmail.com>
+ <4abcq7mgx5soziyo55cdrubbr44xrscuqp7gmr2lys5eilxfcs@u4gy5bsoxvrt>
+ <CACKFLinyjqWRue89WDzyNXUM2gWPbKRO8k9wzN=JjRqdrHz_fA@mail.gmail.com>
+ <aQ3SNvSigJwffoQK@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <aQ3ExWwuiiN0xyBE@horms.kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <aQ3SNvSigJwffoQK@horms.kernel.org>
 
-Hello Simon,
-
-On Fri, Nov 07, 2025 at 10:07:01AM +0000, Simon Horman wrote:
-> On Thu, Nov 06, 2025 at 07:56:50AM -0800, Breno Leitao wrote:
-> >  function create_dynamic_target() {
-> >  	local FORMAT=${1:-"extended"}
-> >  	local NCPATH=${2:-"$NETCONS_PATH"}
-> > -	_create_dynamic_target "${FORMAT}" "${NCPATH}"
-> > +	create_and_enable_dynamic_target "${FORMAT}" "${NCPATH}"
+On Fri, Nov 07, 2025 at 11:04:22AM +0000, Simon Horman wrote:
+> On Thu, Nov 06, 2025 at 10:45:21AM -0800, Michael Chan wrote:
+> > On Thu, Nov 6, 2025 at 9:06 AM Breno Leitao <leitao@debian.org> wrote:
+> > >     tg3: Fix num of RX queues being reported by ethtool
+> > >
+> > >     Using num_online_cpus() to report number of queues is actually not
+> > >     correct, as reported by Michael[1].
+> > >
+> > >     netif_get_num_default_rss_queues() was used to replace num_online_cpus()
+> > >     in the past, but tg3 ethtool callbacks didn't get converted. Doing it
+> > >     now.
+> > >
+> > >     Link: https://lore.kernel.org/all/CACKFLim7ruspmqvjr6bNRq5Z_XXVk3vVaLZOons7kMCzsEG23A@mail.gmail.com/#t [1]
+> > >
+> > >     Signed-off-by: Breno Leitao <leitao@debian.org>
+> > >     Suggested-by: Michael Chan <michael.chan@broadcom.com>
+> > >
+> > > diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
+> > > index fa58c3ffceb06..5fdaee7ef9d7a 100644
+> > > --- a/drivers/net/ethernet/broadcom/tg3.c
+> > > +++ b/drivers/net/ethernet/broadcom/tg3.c
+> > > @@ -12729,7 +12729,7 @@ static u32 tg3_get_rx_ring_count(struct net_device *dev)
+> > >         if (netif_running(tp->dev))
+> > >                 return tp->rxq_cnt;
+> > >
+> > > -       return min(num_online_cpus(), TG3_RSS_MAX_NUM_QS);
+> > > +       return min((u32) netif_get_num_default_rss_queues(), tp->rxq_max);
+> > 
+> > Isn't it better to use min_t()?
 > 
-> Sorry for not noticing this when I looked over v8.
-> It's not that important and I don't think it should block progress.
+> FWIIW, umin() seems appropriate to me.
 > 
-> create_and_enable_dynamic_target() seems to only be used here.
-> If so, perhaps the 'enabled' line could simply be added to
-> create_dynamic_target() instead of creating adding
-> create_and_enable_dynamic_target().
+> Commit 80fcac55385c ("minmax: add umin(a, b) and umax(a, b)")
+> includes quite a long explanation of why it exists.
+> And that does seem to match this case.
 
-This is a good catch. I _think_ it is worth fixing, in fact.
+I've send the patch using `min_t` in [1] before this reply, and if
+I don't hear any concern about replacing min_t by umin(), I will update
+that patch with umin().
 
-I will send a v10 with this additional change.
-
-	diff --git a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-	index 09553ecd50e39..3f891bd68d03c 100644
-	--- a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-	+++ b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-	@@ -147,15 +147,12 @@ function _create_dynamic_target() {
-		fi
-	}
-
-	-function create_and_enable_dynamic_target() {
-	-       _create_dynamic_target "${FORMAT}" "${NCPATH}"
-	-       echo 1 > "${NCPATH}"/enabled
-	-}
-	-
-	function create_dynamic_target() {
-		local FORMAT=${1:-"extended"}
-		local NCPATH=${2:-"$NETCONS_PATH"}
-	-       create_and_enable_dynamic_target "${FORMAT}" "${NCPATH}"
-	+
-	+       _create_dynamic_target "${FORMAT}" "${NCPATH}"
-	+       echo 1 > "${NCPATH}"/enabled
-
-		# This will make sure that the kernel was able to
-		# load the netconsole driver configuration. The console message
-
-
-Thanks for the review!
---breno
+Link: https://lore.kernel.org/all/20251107-tg3_counts-v1-1-337fe5c8ccb7@debian.org/ [1]
 
