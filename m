@@ -1,553 +1,205 @@
-Return-Path: <netdev+bounces-236891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20692C418FB
-	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 21:15:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CE9EC4192A
+	for <lists+netdev@lfdr.de>; Fri, 07 Nov 2025 21:20:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3EC2B4F37B1
-	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 20:14:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 071E03AFC94
+	for <lists+netdev@lfdr.de>; Fri,  7 Nov 2025 20:20:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9A01335060;
-	Fri,  7 Nov 2025 20:13:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 603CA2D3EDC;
+	Fri,  7 Nov 2025 20:20:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m+E6OKr+"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="cBMC4zbr";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="WJxUZbi4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 775A233EAF5
-	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 20:13:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98ADF18E1F
+	for <netdev@vger.kernel.org>; Fri,  7 Nov 2025 20:20:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762546391; cv=none; b=MzKLKigB3OKehS7Y2xBZFOWR/g+VwgW/Ns7gtZFqYKuoxubwF94gU2PKsZ8fBPrPBVsZdhiVLcScgMfHEY1ewbpsZXLAwDZPtc2Qz7RxGWyx3HuXIBcaGuM2onJ5DvNksXXCofH4ZYm+Bmjgskhe+7MOgtVLZEUdjeYYMSURhGo=
+	t=1762546811; cv=none; b=t3Ebcx7d0AItCJd6zEnKYIi73udg4yauJrOnmEbpB7kAaDyKpnalWU/9QQ0qKi52qZvpPtmXF9PQjYBw/Mi4aQkkxxnstJ6o2e497PZfZxW+GEbRCBDPmtYfl5ffZLJtARXmX1VxMZLvD7BoBBJa4BK8uxMRQeZcmKrnkNh8T9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762546391; c=relaxed/simple;
-	bh=VeXxys7M6WNFVWFMzdXiinidVLDPeQLbM6MrcPzRPdY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EHU028S/XyxpUiqVoCR9U/PoZQWgpEtNLXBTixp/+gMAb6iguXqpx/ptTdgDD+S6gDwSdRRJaj/LtULkqf8rZeOGNON324NYg0d7JSnCbm3zf3c607QbbJPba+E+AwHG7hYmoDPyFIAi1iDFa7FBPWH0RCxwN3Qx/c1L2kV+la4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m+E6OKr+; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7b22ffa2a88so88725b3a.1
-        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 12:13:09 -0800 (PST)
+	s=arc-20240116; t=1762546811; c=relaxed/simple;
+	bh=mwg5t2qFuKb3CBJdAVY62UXJrqH3P6gsN7NgMRAFKBE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cPwQ9hPVH6aPY51l5vHzTzYNfU4bz4FXUZocsMNarNa4Bm9K6eOIRaozOrGPNGaiwgXRW8ea7TCeE2AG1f4naWN2QfnSEOJ/aVmeAQi4qyFfYOk8F8fS7nlyvh8pIuvu7p3WEFIAmJolchbUFL8eKnT3DOx4EFFYGnmC/TEAVcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=cBMC4zbr; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=WJxUZbi4; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5A7DSIu53291959
+	for <netdev@vger.kernel.org>; Fri, 7 Nov 2025 20:20:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	nRbsNOo6UJxtICpkZwkcsd0QvQyPYGLyJjw+iQFDDn8=; b=cBMC4zbrMT0si0ET
+	yOXMUgL84VbkcX2xEYJ4v9v6sezYn+KehDPExpU9xBIIw1Mh0kzfi/67TWs8yylt
+	GZBLInXuBeJPed5lUsMhy0SmMSrCN+m/5zWwC6FqYLAoZHw696P0TA0NzLxaBsKb
+	xttqbTWQYdjOcKb9CJSxPbymaB+PV6pQc5jj9pFdoac1UHeWPEhfu/5Ec+Yfk20c
+	VsJZgYXCCWN1WUlJ81Zprohqolu3IzeqBIgOY1pjXCjikT05z6UIpQUYGs/dj57+
+	fTjfpZmLh0LbV2FK5EfPrX6yR143wGrYDHzVHXLDo3EBOZNF9GWJd6YWT3UMRT32
+	NpKtTw==
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com [209.85.214.199])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4a9hpbh4j5-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 20:20:08 +0000 (GMT)
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-2956cdcdc17so11760845ad.3
+        for <netdev@vger.kernel.org>; Fri, 07 Nov 2025 12:20:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762546388; x=1763151188; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gUHXoobgkPy98MRo13yjlOPEv6tlNuTLwaeoWTXAfig=;
-        b=m+E6OKr+pBbrSGROtFAhy3Ok3JFca24Z1XEIHaftxy84ntnr+jC36kBvM+UgHgIezG
-         gY28InMEkhK0nTQT5dFIl2Kn+7kUjlhv42KYtj6Ho+zAdrisnfeqI73Br5IGvPVqvSX4
-         L7s++ozN8myAA39Dyc73gp9va8Q8iIS8SJLpU1ZzF5VPwPn8525iYPnSyzeOo62WlQFY
-         0tkkwCSPS2oX0hNWq3jFMTT8PxqzQEEEsFZpoF0eRqG5JdszoGMxmHLF9mFsKj+KpkYP
-         tRLuEg90kXQEJnzub8bhkOA54F83ZBGUBPQCurgxzH+quCDonV6mrNIA+l6YDOvKxiur
-         QKMw==
+        d=oss.qualcomm.com; s=google; t=1762546807; x=1763151607; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nRbsNOo6UJxtICpkZwkcsd0QvQyPYGLyJjw+iQFDDn8=;
+        b=WJxUZbi4sZwA6uQlJOq2RN4YRHvcOL4xqRuyaf4w6nkzC7NqttlqX7Ex0QX28RiBmK
+         7eqMsUM3VfEh8Z5+3jc9RiLF4XZ1SQibqhPtSY2RgzdvDflYtBBvqgbtuevHyfCJjK7H
+         r79RcHH20i4uc+k5L4R9GL95tl/VDVjXt9T5ANU0TaTsziE4I7dr8AGVOz6I7MzgHzJA
+         iYViYJQmgH/YVi/df4+hnOPoNGR9OEnUq2WJr3wiRB/BWhaYz1IlVDi2MBjW3Mn6wnMD
+         UDwxci6OF9Ac5IbEpj2kMGklmgIhPjYRfAIr/2ckhbL0rAH8NdaMU9O5bXlALnrS+9N6
+         WOOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762546388; x=1763151188;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=gUHXoobgkPy98MRo13yjlOPEv6tlNuTLwaeoWTXAfig=;
-        b=JOrlmXyDBJyM5OROjzw8laVh1qKuEMWu+J/psjMjRhp0tvF4zdqQ4g9LdlaNHCO7Re
-         ej/LPjDOxwL3dREte1zhLhyv+q41gpDiIo12AlQ096e9mDPdgoQyGisYB5r1gC40i8z1
-         h826xMXplyGuwP2Si9tRLkX5GadChTBpg+QOJJzvH+NZ5euBY2G/rr5XxFCkL1zLInE9
-         z3y8L2v7IHy9Rj+1ZYhSG3FFK5C1u93l+vvM1GrqCjqE0mvZqIfMtxcCW7yKspFE3dvA
-         mCkj4Hs2AEwgWZlv0fJHR+7ZB2zt22z8kkXrOJO2QVV25TtrElFumPTVJHGhrFZiPsEm
-         5b5A==
-X-Gm-Message-State: AOJu0Yyn4HCkOTXsBLA/K1EwETLAyd3c04TFEATnC4MDUZIIU+9d25G9
-	2Qrh4LJor/TVuzBzi0kqXsZEBBflsmfHJVNhBmdQ7xhTcn77mtus9l2W
-X-Gm-Gg: ASbGncuZcMsqaMJegELCzyZP6qS9HKqpkuIoBQPuP7esoiuAt/U0q+wzeuPBvYbpsnd
-	59AxTfWztC9BO14eeAxmrJ5jx07jCGEnL8dRNt1Fj3X3FQ+Mj+i+ilJJU2su5ya7L88TYxFhnHk
-	5OOu5z5fNFnetK5lbxJmOWKT35o/seFqIHi97f+C8JIbhtQKSqspn3zRrgv/0fkSvHyM9ehk3pg
-	OdPp6063dg+tN37v+iD0xSKHjP2a8F+FOroYwJ9QImFgWhzu7063mJO5qpi49wjyi7t6DqvglA8
-	vq6sYMg81ozMGg5R6envOcXfuCMLxZRRLKqIHT3Uny5Dg5hrmkciudmabvuvRClgJmLFD0SFIH9
-	4vwml+oh4/lmKRoK7vdCOuzqO5SJXbXqHgyVOgjR3Q6oHGLdGIno55HBBwenJkSxZ8IDbDfS00a
-	jx8na4ZlC6t2xUjZjZJM0Caw==
-X-Google-Smtp-Source: AGHT+IHwObHoVf6Gov0hlem78+t1JM6KaFPQCh/l+JXUg2EE7397e/1bJ/JWHYsVMex4bJf06v2npA==
-X-Received: by 2002:a05:6a21:e097:b0:33e:561b:fb22 with SMTP id adf61e73a8af0-353a405e5f5mr475309637.50.1762546388215;
-        Fri, 07 Nov 2025 12:13:08 -0800 (PST)
-Received: from iku.. ([2401:4900:1c07:5fe8:9724:b1da:3d06:ab48])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b0cc17784bsm3828553b3a.47.2025.11.07.12.13.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Nov 2025 12:13:07 -0800 (PST)
-From: Prabhakar <prabhakar.csengg@gmail.com>
-X-Google-Original-From: Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	Prabhakar <prabhakar.csengg@gmail.com>,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: [PATCH net-next v2 3/3] net: phy: mscc: Add support for PHY LED control
-Date: Fri,  7 Nov 2025 20:12:32 +0000
-Message-ID: <20251107201232.282152-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251107201232.282152-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
-References: <20251107201232.282152-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+        d=1e100.net; s=20230601; t=1762546807; x=1763151607;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nRbsNOo6UJxtICpkZwkcsd0QvQyPYGLyJjw+iQFDDn8=;
+        b=FqJ4qPz2A8TyxxKAScM6JEyRwi2x4xUHQ3cZVLDLdiCGcgGR3BjK5KO+a6otJuCcSw
+         dvx3lM5VN/Pp9V3MqyJ9iwNrFLsdq1bveeV/FCl19hXXkisVUwzSo0vph4eA+e1yTmMJ
+         giPEno4pFdLKUR3vYkOlQ21daMqjiEebmP2wHeqsnvphm/bDIbpmL6wZg7n4X07iKXv6
+         qtQnWFc9r9Sr5SyajYSf1wxKLOqJAPw5Xz6HSUECu5EVl9WfPzt0WTePEoIrEhjOOEWf
+         SCGiidJ5/qsMn3Y397LvzAKoJZWHSjUIIwU2KA3kma2tDR4692i4KDh1f9VLlh7liCO+
+         K/1A==
+X-Forwarded-Encrypted: i=1; AJvYcCUskVEoHeMVpec0Dv/4bMHMZb7M+MvpfjRfqrkO5PAvdzwDJ/rCNecfjCYuiWg9zuxVaYcXVmo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJm+UWPLfGC9kclGJuPltVwk5yvx2PYezYcyfow2C9Ga0Tqdo8
+	PSuymjdb4HymEGL/en11+oErdy2zWbhhbpSRkCB1p+Yp0YM/cF3ICnWNucecflZnK9mHV8McMv+
+	jlR2WHmttRLRaEHsRVqjscbXUw1FVnACc1dpBTi0HNmw7dtpF6FSoVPc2yok=
+X-Gm-Gg: ASbGnctppPIFT8xKW8Ehi9l7xnkNTzKw4sfAV1M/D/gr/c4rU2rWGKMSPXBd2mb6EUy
+	Puj9YZ7SSKwoNY7X0J9jx+0B13cPPlvsRjIzIbqv4dzv7G5Wi3B/J1frAXd1JxFd2xEpsq3FYeP
+	BvsfswP3zhPO3BI7xe592XKquoCxxy0ON3My8zqV6FCa+UJZ4Tf0uUP9Ymv5tbojAOOAwdGt89u
+	kdFmljMa155MRZJ6js4eoNZdyin2bVp/5DMH2oPuNdSjSWnGC1xqVGMsscalzyK/Cz769zgxv0p
+	kyZYzwfiSVSI7O4gmfP0/H3erV33mWsWaVAxAuubnshCk8LlXdixiVs3NE2CE9W86iPDycawwki
+	5OLXh7oKWyMn4XWsBhlQxGvTYpRP+9ODfR8CLVemdac8Z8tHu23Xn+ADWq06ciA==
+X-Received: by 2002:a17:902:fc4f:b0:295:595c:d002 with SMTP id d9443c01a7336-297e5643d62mr4435205ad.15.1762546807187;
+        Fri, 07 Nov 2025 12:20:07 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGjlIBWO8KYF6P/PNB+fj/0Z6Jmz8mLVHUG89yR435QivYEb+MO8cT71+Q6lnS/aYFc+tGslw==
+X-Received: by 2002:a17:902:fc4f:b0:295:595c:d002 with SMTP id d9443c01a7336-297e5643d62mr4434865ad.15.1762546806655;
+        Fri, 07 Nov 2025 12:20:06 -0800 (PST)
+Received: from [10.226.49.150] (i-global254.qualcomm.com. [199.106.103.254])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29651c701e9sm68086695ad.52.2025.11.07.12.20.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Nov 2025 12:20:06 -0800 (PST)
+Message-ID: <7820644f-078a-4578-a444-5cc4b6844489@oss.qualcomm.com>
+Date: Fri, 7 Nov 2025 13:20:03 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/2] Introduce DRM_RAS using generic netlink for RAS
+To: Rodrigo Vivi <rodrigo.vivi@intel.com>, netdev@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: dri-devel@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
+        Hawking Zhang <Hawking.Zhang@amd.com>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Lukas Wunner <lukas@wunner.de>, Dave Airlie <airlied@gmail.com>,
+        Simona Vetter <simona.vetter@ffwll.ch>,
+        Aravind Iddamsetty <aravind.iddamsetty@linux.intel.com>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>
+References: <20250929214415.326414-4-rodrigo.vivi@intel.com>
+ <c8caad3b-d7b9-4e0c-8d90-5b2bc576cabf@oss.qualcomm.com>
+ <aQylrqUCRkkUYzQl@intel.com>
+Content-Language: en-US
+From: Zack McKevitt <zachary.mckevitt@oss.qualcomm.com>
+In-Reply-To: <aQylrqUCRkkUYzQl@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA3MDE2NyBTYWx0ZWRfX929tG+gG0VNY
+ eeg1bUrmAgh9VxaUq0SsPZf2cw9EaWovgOoRJeq4SyMgHSJ2sPWSLZFHok6pTRo10wquZVP7kfx
+ TCDBcUSyRc89PgfYQJUAivn/ZOYW0ltCIrvZMm2FyW+bA8wOOb4zC28nVplF+tng0+sXjwwp+Oq
+ x6Zd77HSFu16KRxzgdMKyyYWC/YxibzBQat1SPaBOdtGZ18wz6XLAJTiRtkna322S9o1X4TZGqq
+ DMNedMohu0AIrJ7U9NkXp1xzzGWho3RGJY5qciyzUihhqCGLBYTTiVJzhsuJOCRlArYTRlRkPKt
+ gpfc840iV2Q7fi/ETwzG7D+ybZD4UUBBoobEfwUaPHG1NmGk/bAdNLJue56hJ/JTPShEd6lFbbT
+ w11i3w+scLAoO2fK0wrIPOnlJUhC5A==
+X-Proofpoint-GUID: i2pVgDByM9rBF-9IHtAhoo4dETY2h1Qk
+X-Proofpoint-ORIG-GUID: i2pVgDByM9rBF-9IHtAhoo4dETY2h1Qk
+X-Authority-Analysis: v=2.4 cv=GZcaXAXL c=1 sm=1 tr=0 ts=690e5478 cx=c_pps
+ a=JL+w9abYAAE89/QcEU+0QA==:117 a=JYp8KDb2vCoCEuGobkYCKw==:17
+ a=IkcTkHD0fZMA:10 a=6UeiqGixMTsA:10 a=s4-Qcg_JpJYA:10
+ a=VkNPw1HP01LnGYTKEx00:22 a=PTgRNUtVYmAdSUgUj-UA:9 a=QEXdDO2ut3YA:10
+ a=324X-CrmTo6CU4MGRt3R:22
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-07_06,2025-11-06_01,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 suspectscore=0 phishscore=0 lowpriorityscore=0 impostorscore=0
+ clxscore=1011 spamscore=0 adultscore=0 malwarescore=0 priorityscore=1501
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2511070167
 
-From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-Add support for the PHY LED controller in the MSCC VSC85xx driver. The
-implementation provides LED brightness and hardware control through the
-LED subsystem and integrates with the standard 'netdev' trigger.
 
-Introduce new register definitions for the LED behavior register
-(MSCC_PHY_LED_BEHAVIOR = 30) and the LED combine disable bits, which
-control whether LEDs indicate link-only or combined link and activity
-status. Implement a helper, vsc8541_led_combine_disable_set(), to update
-these bits safely using phy_modify().
+On 11/6/2025 6:42 AM, Rodrigo Vivi wrote:
+>>
+>>> Also, it is worth to mention that we have a in-tree pyynl/cli.py tool that entirely
+>>> exercises this new API, hence I hope this can be the reference code for the uAPI
+>>> usage, while we continue with the plan of introducing IGT tests and tools for this
+>>> and adjusting the internal vendor tools to open with open source developments and
+>>> changing them to support these flows.
+>>
+>> I think it would be nice to see some accompanying userspace code that makes
+>> use of this implementation to have as a reference if at all possible.
+> 
+> We have some folks working on the userspace tools, but I just realized that
+> perhaps we don't even need that and we could perhaps only using the
+> kernel-tools/ynl as official drm-ras consumer?
+> 
+> $ sudo ynl --family drm_ras --dump list-nodes
+> [{'device-name': '00:02.0',
+>    'node-id': 0,
+>    'node-name': 'non-fatal',
+>    'node-type': 'error-counter'},
+>   {'device-name': '00:02.0',
+>    'node-id': 1,
+>    'node-name': 'correctable',
+>   'node-type': 'error-counter'}]
+> 
+> thoughts?
+> 
 
-Add support for LED brightness control and hardware mode configuration.
-The new callbacks implement the standard LED class operations, allowing
-user control through sysfs. The brightness control maps to PHY LED force
-on/off modes. The hardware control get and set functions translate
-between the PHY-specific LED mode encodings and the LED subsystem
-TRIGGER_NETDEV_* rules.
+I think this is probably ok for demonstrating this patch's 
+functionality, but some userspace code would be helpful as a reference 
+for applications that might want to integrate this directly instead of 
+relying on CLI tools.
 
-The combine feature is managed automatically based on the selected
-rules. When both RX and TX activity are disabled, the combine feature is
-turned off, causing LEDs to indicate link-only status. When either RX or
-TX activity is enabled, the combine feature remains active and LEDs
-indicate combined link and activity.
+>>
+>> As a side note, I will be on vacation for a couple of weeks as of this
+>> weekend and my response time will be affected.
+> 
+> Thank you,
+> Please let me know if you have further thoughts here, or if you see any blocker
+> or an ack to move forward with this path.
+> 
+> Thanks,
+> Rodrigo.
+> 
 
-Register the LED callbacks for all VSC85xx PHY variants so that the LED
-subsystem can manage their indicators consistently. Existing device tree
-LED configuration and default behavior are preserved.
+No further thoughts on the patch contents, I think it looks good. I see 
+that Jakub posted some TODOs while I was away, so I assume there will be 
+another iteration that I will take a look at if/when that comes in.
 
-Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
----
-v1->v2:
-- Added LED control support to all VSC85xx PHY variants.
-- Renamed led callbacks to vsc85xx_* for consistency.
-- Defaulted the LEDs on probe to the default array before parsing DT.
-- Used phy_modify() in vsc85xx_led_brightness_set()
-- Return value of phy_read() checked in vsc85xx_led_hw_control_get()
-- Reverse Christmas tree in vsc85xx_led_hw_is_supported()
-- Updated the commit message to clarify the LED combine feature behavior.
----
- drivers/net/phy/mscc/mscc.h      |   4 +
- drivers/net/phy/mscc/mscc_main.c | 246 +++++++++++++++++++++++++++++++
- 2 files changed, 250 insertions(+)
-
-diff --git a/drivers/net/phy/mscc/mscc.h b/drivers/net/phy/mscc/mscc.h
-index 2eef5956b9cc..65c9d7bd9315 100644
---- a/drivers/net/phy/mscc/mscc.h
-+++ b/drivers/net/phy/mscc/mscc.h
-@@ -85,6 +85,10 @@ enum rgmii_clock_delay {
- #define LED_MODE_SEL_MASK(x)		  (GENMASK(3, 0) << LED_MODE_SEL_POS(x))
- #define LED_MODE_SEL(x, mode)		  (((mode) << LED_MODE_SEL_POS(x)) & LED_MODE_SEL_MASK(x))
- 
-+#define MSCC_PHY_LED_BEHAVIOR		  30
-+#define LED_COMBINE_DIS_MASK(x)		  BIT(x)
-+#define LED_COMBINE_DIS(x, dis)		  (((dis) ? 1 : 0) << (x))
-+
- #define MSCC_EXT_PAGE_CSR_CNTL_17	  17
- #define MSCC_EXT_PAGE_CSR_CNTL_18	  18
- 
-diff --git a/drivers/net/phy/mscc/mscc_main.c b/drivers/net/phy/mscc/mscc_main.c
-index 788344b7eb38..550671fba8b6 100644
---- a/drivers/net/phy/mscc/mscc_main.c
-+++ b/drivers/net/phy/mscc/mscc_main.c
-@@ -201,6 +201,15 @@ static int vsc85xx_led_cntl_set(struct phy_device *phydev,
- 	return phy_modify(phydev, MSCC_PHY_LED_MODE_SEL, mask, val);
- }
- 
-+static int vsc85xx_led_combine_disable_set(struct phy_device *phydev,
-+					   u8 led_num, bool combine_disable)
-+{
-+	u16 mask = LED_COMBINE_DIS_MASK(led_num);
-+	u16 val = LED_COMBINE_DIS(led_num, combine_disable);
-+
-+	return phy_modify(phydev, MSCC_PHY_LED_BEHAVIOR, mask, val);
-+}
-+
- static int vsc85xx_mdix_get(struct phy_device *phydev, u8 *mdix)
- {
- 	u16 reg_val;
-@@ -2234,6 +2243,7 @@ static int vsc85xx_probe_common(struct phy_device *phydev,
- 				const u32 *default_led_mode)
- {
- 	struct vsc8531_private *vsc8531;
-+	struct device_node *np;
- 	int ret;
- 
- 	/* Check rate magic if needed (only for non-package PHYs) */
-@@ -2285,10 +2295,186 @@ static int vsc85xx_probe_common(struct phy_device *phydev,
- 			return ret;
- 	}
- 
-+	/*
-+	 * Check for LED configuration in device tree if available
-+	 * or fall back to default `vsc8531,led-x-mode` DT properties.
-+	 */
-+	np = of_get_child_by_name(phydev->mdio.dev.of_node, "leds");
-+	if (np) {
-+		of_node_put(np);
-+
-+		/* Force to defaults */
-+		for (unsigned int i = 0; i < vsc8531->nleds; i++)
-+			vsc8531->leds_mode[i] = default_led_mode[i];
-+
-+		return 0;
-+	}
-+
- 	/* Parse LED modes from device tree */
- 	return vsc85xx_dt_led_modes_get(phydev, default_led_mode);
- }
- 
-+static int vsc85xx_led_brightness_set(struct phy_device *phydev,
-+				      u8 index, enum led_brightness value)
-+{
-+	struct vsc8531_private *vsc8531 = phydev->priv;
-+
-+	if (index >= vsc8531->nleds)
-+		return -EINVAL;
-+
-+	return vsc85xx_led_cntl_set(phydev, index, value == LED_OFF ?
-+				    VSC8531_FORCE_LED_OFF : VSC8531_FORCE_LED_ON);
-+}
-+
-+static int vsc85xx_led_hw_is_supported(struct phy_device *phydev, u8 index,
-+				       unsigned long rules)
-+{
-+	static const unsigned long supported = BIT(TRIGGER_NETDEV_LINK_1000) |
-+					       BIT(TRIGGER_NETDEV_LINK_100) |
-+					       BIT(TRIGGER_NETDEV_LINK_10) |
-+					       BIT(TRIGGER_NETDEV_LINK) |
-+					       BIT(TRIGGER_NETDEV_RX) |
-+					       BIT(TRIGGER_NETDEV_TX);
-+	struct vsc8531_private *vsc8531 = phydev->priv;
-+
-+	if (index >= vsc8531->nleds)
-+		return -EINVAL;
-+
-+	if (rules & ~supported)
-+		return -EOPNOTSUPP;
-+
-+	return 0;
-+}
-+
-+static int vsc85xx_led_hw_control_get(struct phy_device *phydev, u8 index,
-+				      unsigned long *rules)
-+{
-+	struct vsc8531_private *vsc8531 = phydev->priv;
-+	u8 mode, behavior;
-+	int rc;
-+
-+	if (index >= vsc8531->nleds)
-+		return -EINVAL;
-+
-+	rc = phy_read(phydev, MSCC_PHY_LED_MODE_SEL);
-+	if (rc < 0)
-+		return rc;
-+	mode = (rc & LED_MODE_SEL_MASK(index)) >> LED_MODE_SEL_POS(index);
-+
-+	rc = phy_read(phydev, MSCC_PHY_LED_BEHAVIOR);
-+	if (rc < 0)
-+		return rc;
-+	behavior = (rc & LED_COMBINE_DIS_MASK(index)) >> index;
-+
-+	switch (mode) {
-+	case VSC8531_LINK_ACTIVITY:
-+	case VSC8531_ACTIVITY:
-+		*rules = BIT(TRIGGER_NETDEV_LINK);
-+		break;
-+
-+	case VSC8531_LINK_1000_ACTIVITY:
-+		*rules = BIT(TRIGGER_NETDEV_LINK_1000) |
-+			 BIT(TRIGGER_NETDEV_LINK);
-+		break;
-+
-+	case VSC8531_LINK_100_ACTIVITY:
-+		*rules = BIT(TRIGGER_NETDEV_LINK_100) |
-+			 BIT(TRIGGER_NETDEV_LINK);
-+		break;
-+
-+	case VSC8531_LINK_10_ACTIVITY:
-+		*rules = BIT(TRIGGER_NETDEV_LINK_10) |
-+			 BIT(TRIGGER_NETDEV_LINK);
-+		break;
-+
-+	case VSC8531_LINK_100_1000_ACTIVITY:
-+		*rules = BIT(TRIGGER_NETDEV_LINK_1000) |
-+			 BIT(TRIGGER_NETDEV_LINK_100) |
-+			 BIT(TRIGGER_NETDEV_LINK);
-+		break;
-+
-+	case VSC8531_LINK_10_1000_ACTIVITY:
-+		*rules = BIT(TRIGGER_NETDEV_LINK_1000) |
-+			 BIT(TRIGGER_NETDEV_LINK_10) |
-+			 BIT(TRIGGER_NETDEV_LINK);
-+		break;
-+
-+	case VSC8531_LINK_10_100_ACTIVITY:
-+		*rules = BIT(TRIGGER_NETDEV_LINK_100) |
-+			 BIT(TRIGGER_NETDEV_LINK_10) |
-+			 BIT(TRIGGER_NETDEV_LINK);
-+		break;
-+
-+	default:
-+		*rules = 0;
-+		break;
-+	}
-+
-+	if (!behavior && *rules)
-+		*rules |= BIT(TRIGGER_NETDEV_RX) | BIT(TRIGGER_NETDEV_TX);
-+
-+	return 0;
-+}
-+
-+static int vsc85xx_led_hw_control_set(struct phy_device *phydev, u8 index,
-+				      unsigned long rules)
-+{
-+	struct vsc8531_private *vsc8531 = phydev->priv;
-+	u8 mode = VSC8531_FORCE_LED_ON;
-+	bool combine_disable = false;
-+	bool has_rx, has_tx;
-+	int ret;
-+
-+	if (index >= vsc8531->nleds)
-+		return -EINVAL;
-+
-+	if (rules & BIT(TRIGGER_NETDEV_LINK))
-+		mode = VSC8531_LINK_ACTIVITY;
-+
-+	if (rules & BIT(TRIGGER_NETDEV_LINK_10))
-+		mode = VSC8531_LINK_10_ACTIVITY;
-+
-+	if (rules & BIT(TRIGGER_NETDEV_LINK_100))
-+		mode = VSC8531_LINK_100_ACTIVITY;
-+
-+	if (rules & BIT(TRIGGER_NETDEV_LINK_1000))
-+		mode = VSC8531_LINK_1000_ACTIVITY;
-+
-+	if (rules & BIT(TRIGGER_NETDEV_LINK_100) &&
-+	    rules & BIT(TRIGGER_NETDEV_LINK_1000))
-+		mode = VSC8531_LINK_100_1000_ACTIVITY;
-+
-+	if (rules & BIT(TRIGGER_NETDEV_LINK_10) &&
-+	    rules & BIT(TRIGGER_NETDEV_LINK_1000))
-+		mode = VSC8531_LINK_10_1000_ACTIVITY;
-+
-+	if (rules & BIT(TRIGGER_NETDEV_LINK_10) &&
-+	    rules & BIT(TRIGGER_NETDEV_LINK_100))
-+		mode = VSC8531_LINK_10_100_ACTIVITY;
-+
-+	/*
-+	 * The VSC85xx PHYs provides an option to control LED behavior. By
-+	 * default, the LEDx combine function is enabled, meaning the LED
-+	 * will be on when there is link/activity or duplex/collision. If
-+	 * the combine function is disabled, the LED will be on only for
-+	 * link or duplex.
-+	 *
-+	 * To control this behavior, we check the selected rules. If both
-+	 * RX and TX activity are not selected, the LED combine function
-+	 * is disabled; otherwise, it remains enabled.
-+	 */
-+	has_rx = !!(rules & BIT(TRIGGER_NETDEV_RX));
-+	has_tx = !!(rules & BIT(TRIGGER_NETDEV_TX));
-+	if (!has_rx && !has_tx)
-+		combine_disable = true;
-+
-+	ret = vsc85xx_led_combine_disable_set(phydev, index, combine_disable);
-+	if (ret < 0)
-+		return ret;
-+
-+	return vsc85xx_led_cntl_set(phydev, index, mode);
-+}
-+
- static int vsc8514_probe(struct phy_device *phydev)
- {
- 	static const struct vsc85xx_probe_config vsc8514_cfg = {
-@@ -2382,6 +2568,10 @@ static struct phy_driver vsc85xx_driver[] = {
- 	.get_sset_count = &vsc85xx_get_sset_count,
- 	.get_strings    = &vsc85xx_get_strings,
- 	.get_stats      = &vsc85xx_get_stats,
-+	.led_brightness_set = vsc85xx_led_brightness_set,
-+	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
-+	.led_hw_control_get = vsc85xx_led_hw_control_get,
-+	.led_hw_control_set = vsc85xx_led_hw_control_set,
- },
- {
- 	.phy_id		= PHY_ID_VSC8502,
-@@ -2406,6 +2596,10 @@ static struct phy_driver vsc85xx_driver[] = {
- 	.get_sset_count = &vsc85xx_get_sset_count,
- 	.get_strings    = &vsc85xx_get_strings,
- 	.get_stats      = &vsc85xx_get_stats,
-+	.led_brightness_set = vsc85xx_led_brightness_set,
-+	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
-+	.led_hw_control_get = vsc85xx_led_hw_control_get,
-+	.led_hw_control_set = vsc85xx_led_hw_control_set,
- },
- {
- 	.phy_id		= PHY_ID_VSC8504,
-@@ -2433,6 +2627,10 @@ static struct phy_driver vsc85xx_driver[] = {
- 	.get_stats      = &vsc85xx_get_stats,
- 	.inband_caps    = vsc85xx_inband_caps,
- 	.config_inband  = vsc85xx_config_inband,
-+	.led_brightness_set = vsc85xx_led_brightness_set,
-+	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
-+	.led_hw_control_get = vsc85xx_led_hw_control_get,
-+	.led_hw_control_set = vsc85xx_led_hw_control_set,
- },
- {
- 	.phy_id		= PHY_ID_VSC8514,
-@@ -2458,6 +2656,10 @@ static struct phy_driver vsc85xx_driver[] = {
- 	.get_stats      = &vsc85xx_get_stats,
- 	.inband_caps    = vsc85xx_inband_caps,
- 	.config_inband  = vsc85xx_config_inband,
-+	.led_brightness_set = vsc85xx_led_brightness_set,
-+	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
-+	.led_hw_control_get = vsc85xx_led_hw_control_get,
-+	.led_hw_control_set = vsc85xx_led_hw_control_set,
- },
- {
- 	.phy_id		= PHY_ID_VSC8530,
-@@ -2482,6 +2684,10 @@ static struct phy_driver vsc85xx_driver[] = {
- 	.get_sset_count = &vsc85xx_get_sset_count,
- 	.get_strings    = &vsc85xx_get_strings,
- 	.get_stats      = &vsc85xx_get_stats,
-+	.led_brightness_set = vsc85xx_led_brightness_set,
-+	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
-+	.led_hw_control_get = vsc85xx_led_hw_control_get,
-+	.led_hw_control_set = vsc85xx_led_hw_control_set,
- },
- {
- 	.phy_id		= PHY_ID_VSC8531,
-@@ -2506,6 +2712,10 @@ static struct phy_driver vsc85xx_driver[] = {
- 	.get_sset_count = &vsc85xx_get_sset_count,
- 	.get_strings    = &vsc85xx_get_strings,
- 	.get_stats      = &vsc85xx_get_stats,
-+	.led_brightness_set = vsc85xx_led_brightness_set,
-+	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
-+	.led_hw_control_get = vsc85xx_led_hw_control_get,
-+	.led_hw_control_set = vsc85xx_led_hw_control_set,
- },
- {
- 	.phy_id		= PHY_ID_VSC8540,
-@@ -2530,6 +2740,10 @@ static struct phy_driver vsc85xx_driver[] = {
- 	.get_sset_count = &vsc85xx_get_sset_count,
- 	.get_strings    = &vsc85xx_get_strings,
- 	.get_stats      = &vsc85xx_get_stats,
-+	.led_brightness_set = vsc85xx_led_brightness_set,
-+	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
-+	.led_hw_control_get = vsc85xx_led_hw_control_get,
-+	.led_hw_control_set = vsc85xx_led_hw_control_set,
- },
- {
- 	.phy_id		= PHY_ID_VSC8541,
-@@ -2554,6 +2768,10 @@ static struct phy_driver vsc85xx_driver[] = {
- 	.get_sset_count = &vsc85xx_get_sset_count,
- 	.get_strings    = &vsc85xx_get_strings,
- 	.get_stats      = &vsc85xx_get_stats,
-+	.led_brightness_set = vsc85xx_led_brightness_set,
-+	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
-+	.led_hw_control_get = vsc85xx_led_hw_control_get,
-+	.led_hw_control_set = vsc85xx_led_hw_control_set,
- },
- {
- 	.phy_id		= PHY_ID_VSC8552,
-@@ -2580,6 +2798,10 @@ static struct phy_driver vsc85xx_driver[] = {
- 	.get_stats      = &vsc85xx_get_stats,
- 	.inband_caps    = vsc85xx_inband_caps,
- 	.config_inband  = vsc85xx_config_inband,
-+	.led_brightness_set = vsc85xx_led_brightness_set,
-+	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
-+	.led_hw_control_get = vsc85xx_led_hw_control_get,
-+	.led_hw_control_set = vsc85xx_led_hw_control_set,
- },
- {
- 	PHY_ID_MATCH_EXACT(PHY_ID_VSC856X),
-@@ -2603,6 +2825,10 @@ static struct phy_driver vsc85xx_driver[] = {
- 	.get_stats      = &vsc85xx_get_stats,
- 	.inband_caps    = vsc85xx_inband_caps,
- 	.config_inband  = vsc85xx_config_inband,
-+	.led_brightness_set = vsc85xx_led_brightness_set,
-+	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
-+	.led_hw_control_get = vsc85xx_led_hw_control_get,
-+	.led_hw_control_set = vsc85xx_led_hw_control_set,
- },
- {
- 	.phy_id		= PHY_ID_VSC8572,
-@@ -2631,6 +2857,10 @@ static struct phy_driver vsc85xx_driver[] = {
- 	.get_stats      = &vsc85xx_get_stats,
- 	.inband_caps    = vsc85xx_inband_caps,
- 	.config_inband  = vsc85xx_config_inband,
-+	.led_brightness_set = vsc85xx_led_brightness_set,
-+	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
-+	.led_hw_control_get = vsc85xx_led_hw_control_get,
-+	.led_hw_control_set = vsc85xx_led_hw_control_set,
- },
- {
- 	.phy_id		= PHY_ID_VSC8574,
-@@ -2659,6 +2889,10 @@ static struct phy_driver vsc85xx_driver[] = {
- 	.get_stats      = &vsc85xx_get_stats,
- 	.inband_caps    = vsc85xx_inband_caps,
- 	.config_inband  = vsc85xx_config_inband,
-+	.led_brightness_set = vsc85xx_led_brightness_set,
-+	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
-+	.led_hw_control_get = vsc85xx_led_hw_control_get,
-+	.led_hw_control_set = vsc85xx_led_hw_control_set,
- },
- {
- 	PHY_ID_MATCH_EXACT(PHY_ID_VSC8575),
-@@ -2684,6 +2918,10 @@ static struct phy_driver vsc85xx_driver[] = {
- 	.get_stats      = &vsc85xx_get_stats,
- 	.inband_caps    = vsc85xx_inband_caps,
- 	.config_inband  = vsc85xx_config_inband,
-+	.led_brightness_set = vsc85xx_led_brightness_set,
-+	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
-+	.led_hw_control_get = vsc85xx_led_hw_control_get,
-+	.led_hw_control_set = vsc85xx_led_hw_control_set,
- },
- {
- 	PHY_ID_MATCH_EXACT(PHY_ID_VSC8582),
-@@ -2709,6 +2947,10 @@ static struct phy_driver vsc85xx_driver[] = {
- 	.get_stats      = &vsc85xx_get_stats,
- 	.inband_caps    = vsc85xx_inband_caps,
- 	.config_inband  = vsc85xx_config_inband,
-+	.led_brightness_set = vsc85xx_led_brightness_set,
-+	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
-+	.led_hw_control_get = vsc85xx_led_hw_control_get,
-+	.led_hw_control_set = vsc85xx_led_hw_control_set,
- },
- {
- 	PHY_ID_MATCH_EXACT(PHY_ID_VSC8584),
-@@ -2735,6 +2977,10 @@ static struct phy_driver vsc85xx_driver[] = {
- 	.link_change_notify = &vsc85xx_link_change_notify,
- 	.inband_caps    = vsc85xx_inband_caps,
- 	.config_inband  = vsc85xx_config_inband,
-+	.led_brightness_set = vsc85xx_led_brightness_set,
-+	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
-+	.led_hw_control_get = vsc85xx_led_hw_control_get,
-+	.led_hw_control_set = vsc85xx_led_hw_control_set,
- }
- 
- };
--- 
-2.43.0
-
+>>
+>> Thanks,
+>>
+>> Zack
 
