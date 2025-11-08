@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-236944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0108C4255F
-	for <lists+netdev@lfdr.de>; Sat, 08 Nov 2025 04:01:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5E46C42568
+	for <lists+netdev@lfdr.de>; Sat, 08 Nov 2025 04:01:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B28BC189370C
-	for <lists+netdev@lfdr.de>; Sat,  8 Nov 2025 03:01:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E4CC1882AC7
+	for <lists+netdev@lfdr.de>; Sat,  8 Nov 2025 03:02:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16F832D480E;
-	Sat,  8 Nov 2025 03:01:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB6C82D73A0;
+	Sat,  8 Nov 2025 03:01:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MTXQunW2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p4P3ihaQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E36C22D3EDC;
-	Sat,  8 Nov 2025 03:00:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9065B258EF5;
+	Sat,  8 Nov 2025 03:01:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762570860; cv=none; b=B2lxUH9g5WwKPuoy0sd685K4I7TuHmMhsQlTcHb2kvqvlB8EbCFY2AfL7oCi4Cwa7F2CXcDPfkLmQZofVHaUiBeRmQxMtN4vSU7dwDgyMSKrpnHuVS+DMHxCoi65YdvzwR9OCaol1h+4mQDNPaYJyH/IO0gfL1mIqWS5ZOM8GL0=
+	t=1762570861; cv=none; b=klOrTddYxQPR2DejFl5Ic4xp715sA/xofn+/B1InPSlWjqvUhYkH8aKmVHg7USuLx8xpx4ZjG37MrIKj8ySUgFo4iBX2HERewfdlJH8EL8H/iIAVZkA4AKZyBo6mxv1qhxtCicyAO9P0cSTOazHkZp8Wx+2kMkOoWH3Edo180ms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762570860; c=relaxed/simple;
-	bh=lAyzPUG3TPMZfvydWS3IdN9XCMSpjLM646Zvz9HjArI=;
+	s=arc-20240116; t=1762570861; c=relaxed/simple;
+	bh=vxdNXH57C9w1M2OkY45LeSU26Hq2p55YcG6tRkp4xnE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=EAy4uS38b46kt1bF1xYhm7jw/8jHrdg+XQESBW/mUecz/TpUoIVWbE1yuvueCGeR/69a1aAZTmYIOKgmR36e67bkJd2jDf9A/wgw9VhUczsP9hX6UKnyr/6ssNrF7Mhb+fCJ2/X0ZDBrKxqg4cCL4+8HwQXBWa4rZuHrvRGFGBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MTXQunW2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 924EFC4CEF5;
-	Sat,  8 Nov 2025 03:00:59 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=as0+ycmyP6YXMjKo2hg1BCbA53MrQJV4aDGtUXzkxAPszbbStJvJ2c11ye3Pt6C/3d8zbiQw+MnSUgFh1LoYvHDpfEWr6L7okR8nu2TI31KRtteEnzKUgnxmu8clgUMiZBGhfN50OdaRNRxazuCpt+L2vmds28UReXag9hEJ/D4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p4P3ihaQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C807C4CEF7;
+	Sat,  8 Nov 2025 03:01:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762570859;
-	bh=lAyzPUG3TPMZfvydWS3IdN9XCMSpjLM646Zvz9HjArI=;
+	s=k20201202; t=1762570861;
+	bh=vxdNXH57C9w1M2OkY45LeSU26Hq2p55YcG6tRkp4xnE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MTXQunW2BI1ywfH5gldPFNQ+IThAp+Bmzxu5owdyo6xEPjKrxRDkblBGtJc5YMkX+
-	 RdNis0kXb6M1wdhw0qthwwyMZ37rk1YBLpIHMRvqXvfvhg8qg9MHZ6K6Ejvxhf2IkI
-	 yI/uCaY8AlI70QNhecfv1g9cq6PPlYYqRGhuu8kJxCNFGcl9h0RYK/eTo1fuYyaCP4
-	 EW8jLDgpG69ZuFoX9uzDtPUdfhrSnKB/RP0/xHfpRuB11HVuJZBKb07qyDSL8ifOze
-	 Kv6rSNka+mYsvN2RAH6bPjtUEiU07ONbjTfsupQyvdW9B/WYb/ijSEkN9i5W01mNJh
-	 MwLG2h0pcx9Sg==
+	b=p4P3ihaQXJUMgOCRFLDWAyJcvj3QUnTJnxqzp3HIxBmuLN36TTL/5SikPA55efjIz
+	 1EGo8JheZWnikuyHlJ3DVZQR7e73trMacpiYHbObkDj27MuIgk4IuYI4JSkEMhToYc
+	 +NzfeelgaBahZFm9gaAJYdk/xUZKNQVDLDxtsxM1R06siF//KicRPgobGYAEVQZ8hF
+	 RI8DfoeCGUlTx6UV+ohdtGRIuZ8RZduAtrdCNz61jUKkSsweU+BHTDhCJqIW+9GAic
+	 ISBj2r6lHNyA5xoCes2GlUjf+F/Uzyf11hssMdyKnSAYj7Y5fcp1fgx0bcuJTE7DI9
+	 feHi/AanyfNYA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAD603A40FCA;
-	Sat,  8 Nov 2025 03:00:32 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C7E3A40FCA;
+	Sat,  8 Nov 2025 03:00:34 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,50 +52,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/2] net: phy: Add Open Alliance TC14
- 10Base-T1S
- PHY cable diagnostic support
+Subject: Re: [PATCH net-next v3] net: mana: Fix incorrect speed reported by
+ debugfs
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176257083173.1232193.2524115929455028115.git-patchwork-notify@kernel.org>
-Date: Sat, 08 Nov 2025 03:00:31 +0000
-References: <20251105051213.50443-1-parthiban.veerasooran@microchip.com>
-In-Reply-To: <20251105051213.50443-1-parthiban.veerasooran@microchip.com>
-To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-Cc: piergiorgio.beruto@gmail.com, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, parthiban.veerasooran@microchip.com
+ <176257083299.1232193.3554184058724318559.git-patchwork-notify@kernel.org>
+Date: Sat, 08 Nov 2025 03:00:32 +0000
+References: <1762369468-32570-1-git-send-email-ernis@linux.microsoft.com>
+In-Reply-To: <1762369468-32570-1-git-send-email-ernis@linux.microsoft.com>
+To: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+ dipayanroy@linux.microsoft.com, shirazsaleem@microsoft.com,
+ kotaranov@microsoft.com, longli@microsoft.com, linux-hyperv@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 5 Nov 2025 10:42:11 +0530 you wrote:
-> This patch series adds Open Alliance TC14 (OATC14) 10BASE-T1S cable
-> diagnostic feature support to the Linux kernel PHY subsystem and enable
-> this feature for Microchip LAN867x Rev.D0 PHYs. These patches provide
-> standardized cable test functionality for 10BASE-T1S Ethernet PHYs,
-> allowing users to perform cable diagnostics via ethtool.
+On Wed,  5 Nov 2025 11:04:28 -0800 you wrote:
+> Once the netshaper is created for MANA, the current bandwidth
+> is reported in debugfs like this:
 > 
-> Patch Summary:
-> 1. add OATC14 10BASE-T1S PHY cable diagnostic support
-> 	- Implements support for the OATC14 cable diagnostic feature in
-> 	  Clause 45 PHYs.
-> 	- Adds functions to start a cable test and retrieve its status,
-> 	  mapping hardware results to ethtool codes.
-> 	- Exports these functions for use by PHY drivers.
-> 	- Open Alliance TC14 10BASE-T1S Advanced Diagnostic PHY Features.
-> 	  https://opensig.org/wp-content/uploads/2025/06/OPEN_Alliance_10BASE-T1S_Advanced_PHY_features_for-automotive_Ethernet_V2.1b.pdf
+> $ sudo ./tools/net/ynl/pyynl/cli.py \
+>   --spec Documentation/netlink/specs/net_shaper.yaml \
+>   --do set \
+>   --json '{"ifindex":'3',
+>            "handle":{ "scope": "netdev", "id":'1' },
+>            "bw-max": 200000000 }'
+> None
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v3,1/2] net: phy: phy-c45: add OATC14 10BASE-T1S PHY cable diagnostic support
-    https://git.kernel.org/netdev/net-next/c/b87ee13e3493
-  - [net-next,v3,2/2] net: phy: microchip_t1s:: add cable diagnostic support for LAN867x Rev.D0
-    https://git.kernel.org/netdev/net-next/c/f424409483d2
+  - [net-next,v3] net: mana: Fix incorrect speed reported by debugfs
+    https://git.kernel.org/netdev/net-next/c/140039580efa
 
 You are awesome, thank you!
 -- 
