@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-236969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236970-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D4E6C428AB
-	for <lists+netdev@lfdr.de>; Sat, 08 Nov 2025 08:04:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BFE0EC428AE
+	for <lists+netdev@lfdr.de>; Sat, 08 Nov 2025 08:04:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 526E83ADD75
-	for <lists+netdev@lfdr.de>; Sat,  8 Nov 2025 07:04:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7B093AE612
+	for <lists+netdev@lfdr.de>; Sat,  8 Nov 2025 07:04:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D810427877D;
-	Sat,  8 Nov 2025 07:04:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CC772DC767;
+	Sat,  8 Nov 2025 07:04:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n+A6YENe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g9zYnovt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0FA13D6F
-	for <netdev@vger.kernel.org>; Sat,  8 Nov 2025 07:04:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 548DD2D5C6C
+	for <netdev@vger.kernel.org>; Sat,  8 Nov 2025 07:04:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762585470; cv=none; b=aFbAGGaOU6oZsPFR5W3EToKz4YJ4Yb3QLoTxawWNsKE+wy3ReuYpR0smK24EFdXTwt1gg7ta3vY+Ktll6YQjBWIaVm9YW1RqPCBM9BGfC+Mfp0qJVFKcnZggfJobDJVSOC8OY7z29mLb0uVQb+k/QTi2ZzV72ocpDAT0wUfUx8w=
+	t=1762585471; cv=none; b=mow2KkdV2OblRy1YIjaT69jyLLmOvyW81oPdUNjuHWiFV1RuznvXrWLBnl4mRKcmBa8wAxhHOtac7krYvOwUY681CO072rsJRfGff+EnakMbx5MVDujeufWiRPSW8raRR489IduaXiW5ETaMcBuxpe3bLFYpAWjn9yi51GXhF2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762585470; c=relaxed/simple;
-	bh=FDld2LClMpbOOLMGgiOdO+XthaJfZu3U3U52gVVDz/k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Zm17TxUmzQrxuSl4AazRHU9aFodefXi7UcQrFKmSj6KbD+Z027ptEvb/22SJVl1QQAk6D1i6Auzrbpkk5wlRWxthBmN/ZCippvICVrZprEaSjvS400x+0dre1YQdCMkghJwYBkCIDmfHOkiExemKAEY6enY1cfhvwBHDgXNaFEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n+A6YENe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 209CEC4CEF7;
-	Sat,  8 Nov 2025 07:04:30 +0000 (UTC)
+	s=arc-20240116; t=1762585471; c=relaxed/simple;
+	bh=qB3UJgZKO4pLe2klvg11v11rwr3rwA7JmxvTY26QNQ4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=m91flxAXponaURbVlOg9cA2BWWSxQWC2PBIHU2/4gMmv9twCMV+zfAeChPLHaSVRE81yGGTtU5u7HGewcoz/TnkBoHJ+WSftToeuunjhFvjPQkpS0ug/WKAoJyth0hAL36S5ITsseVIhrPWF4/8eg0nG4XEYmDmgPdR2jra4k6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g9zYnovt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18CB0C4CEFB;
+	Sat,  8 Nov 2025 07:04:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762585470;
-	bh=FDld2LClMpbOOLMGgiOdO+XthaJfZu3U3U52gVVDz/k=;
-	h=From:To:Cc:Subject:Date:From;
-	b=n+A6YENetwRG2JdeTuLkbnymIyjKAdSieQJYvS/WwdkFF6QeKLQnTmz4s078pRxWl
-	 iyFcM1LvT9cBKz34LRmlm5LdD2tlrN7qY/u+Qlf1fOxgAS068VG53H3XMBLwr/+QA6
-	 nSCkJURqYhC0vA8Pdg73qBUBLB1G4NiIBJ2LNGcJQ6IrF3jVjMWPq0qF0K7jYXqzXp
-	 E+vWEUUAn3od8FsjKpkfcFolgZSEVZhnWXxOLS6WiTYQIQHFGhPpBPePqEVvFzNZQ9
-	 dAyXdnbmsuQHrXw8hG7wlWOa/lLRdMiB8n9SR9wclLWMkoIIWth2MGL35EGnt96+lf
-	 TPL13lMLKqwQw==
+	s=k20201202; t=1762585471;
+	bh=qB3UJgZKO4pLe2klvg11v11rwr3rwA7JmxvTY26QNQ4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=g9zYnovtZrHXJuJ7KXjSbwa9/No3w10LUGBM4FIYJBz/zsTU98+Aie9XfqQU6VIrV
+	 YLAj47Cq5EpNAGBhXiJoRXVRSkI0f9lmXqAPs7yGFSrT+TIRXLeNEVUdWxYFWDCCNr
+	 cP9vz3IovNLVUHxa5Rd1WnlXIA1t8J6nX7KqPuRCxRxIlvD6iFe4JEVeXXmo0HBxn7
+	 yIXBcy4f4x8tOfbxDh8jQM9J0PqKO1vmtHeACX2BT/POHWHVi4pWsG6JH/7zKpRKM8
+	 yDC5+ReXXRrKNSSyb08mmd8XFyGTZqZYF0JeN4RI2LJZQnB1m7zqeWzZWMsczlDr0R
+	 AHOKQrNBsKIIA==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -52,10 +53,12 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
 	Jiri Pirko <jiri@nvidia.com>,
 	mbloch@nvidia.com
-Subject: [PATCH net-next V3 0/3] devlink eswitch inactive mode
-Date: Fri,  7 Nov 2025 23:04:01 -0800
-Message-ID: <20251108070404.1551708-1-saeed@kernel.org>
+Subject: [PATCH net-next V3 1/3] devlink: Introduce switchdev_inactive eswitch mode
+Date: Fri,  7 Nov 2025 23:04:02 -0800
+Message-ID: <20251108070404.1551708-2-saeed@kernel.org>
 X-Mailer: git-send-email 2.51.1
+In-Reply-To: <20251108070404.1551708-1-saeed@kernel.org>
+References: <20251108070404.1551708-1-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,66 +69,113 @@ Content-Transfer-Encoding: 8bit
 
 From: Saeed Mahameed <saeedm@nvidia.com>
 
-v2->v3:
-  - Fix cocci check %pe
-  - minor improvement: create FDB drop counter once.
-
-v1->v2:
-  - Introduce new devlink mode instead of state, Jiri's suggestion.
-  - Address kernel robot issues reported in v1.
-      no previous prototype for 'mlx5_mpfs_enable'
-
-v2: https://lore.kernel.org/all/20251107000831.157375-1-saeed@kernel.org/
-v1: https://lore.kernel.org/all/20251016013618.2030940-1-saeed@kernel.org/
+Adds DEVLINK_ESWITCH_MODE_SWITCHDEV_INACTIVE attribute to UAPI and
+documentation.
 
 Before having traffic flow through an eswitch, a user may want to have the
-ability to block traffic towards the FDB until FDB is fully programmed and the
-user is ready to send traffic to it. For example: when two eswitches are present
-for vports in a multi-PF setup, one eswitch may take over the traffic from the
-other when the user chooses. Before this take over, a user may want to first
-program the inactive eswitch and then once ready redirect traffic to this new
-eswitch.
+ability to block traffic towards the FDB until FDB is fully programmed and
+the user is ready to send traffic to it. For example: when two eswitches
+are present for vports in a multi-PF setup, one eswitch may take over the
+traffic from the other when the user chooses.
+Before this take over, a user may want to first program the inactive
+eswitch and then once ready redirect traffic to this new eswitch.
 
-This series introduces a user-configurable mode for an eswitch that allows
-dynamically switching between active and inactive modes. When inactive, traffic
-does not flow through the eswitch. While inactive, steering pipeline
-configuration can be done (e.g. adding TC rules, discovering representors,
-enabling the desired SDN modes such as bridge/OVS/DPDK/etc). Once configuration
-is completed, a user can set the eswitch mode to active and have traffic flow
-through. This allows admins to upgrade forwarding pipeline rules with very
-minimal downtime and packet drops.
+switchdev modes transition semantics:
 
-A user can start the eswitch in switchdev or switchdev_inactive mode.
+legacy->switchdev_inactive: Create switchdev mode normally, traffic not
+  allowed to flow yet.
 
-Active: Traffic is enabled on this eswitch FDB.
-Inactive: Traffic is ignored/dropped on this eswitch FDB.
+switchdev_inactive->switchdev: Enable traffic to flow.
 
-An example use case:
-$ devlink dev eswitch set pci/0000:08:00.1 mode switchdev_inactive
-Setup FDB pipeline and netdev representors
-...
-Once ready to start receiving traffic
-$ devlink dev eswitch set pci/0000:08:00.1 mode switchdev
+switchdev->switchdev_inactive: Block traffic on the FDB, FDB and
+  representros state and content is preserved.
 
+When eswitch is configured to this mode, traffic is ignored/dropped on
+this eswitch FDB, while current configuration is kept, e.g FDB rules and
+netdev representros are kept available, FDB programming is allowed.
 
-Saeed Mahameed (3):
-  devlink: Introduce switchdev_inactive eswitch mode
-  net/mlx5: MPFS, add support for dynamic enable/disable
-  net/mlx5: E-Switch, support eswitch inactive mode
+Example:
+ # start inactive switchdev
+devlink dev eswitch set pci/0000:08:00.1 mode switchdev_inactive
+ # setup TC rules, representors etc ..
+ # activate
+devlink dev eswitch set pci/0000:08:00.1 mode switchdev
 
- Documentation/netlink/specs/devlink.yaml      |   2 +
- .../devlink/devlink-eswitch-attr.rst          |  13 ++
- .../mellanox/mlx5/core/esw/adj_vport.c        |  15 +-
- .../net/ethernet/mellanox/mlx5/core/eswitch.h |   6 +
- .../mellanox/mlx5/core/eswitch_offloads.c     | 207 +++++++++++++++++-
- .../net/ethernet/mellanox/mlx5/core/fs_core.c |   5 +
- .../ethernet/mellanox/mlx5/core/lib/mpfs.c    | 116 ++++++++--
- .../ethernet/mellanox/mlx5/core/lib/mpfs.h    |   9 +
- include/linux/mlx5/fs.h                       |   1 +
- include/uapi/linux/devlink.h                  |   1 +
- net/devlink/netlink_gen.c                     |   2 +-
- 11 files changed, 338 insertions(+), 39 deletions(-)
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+---
+ Documentation/netlink/specs/devlink.yaml            |  2 ++
+ .../networking/devlink/devlink-eswitch-attr.rst     | 13 +++++++++++++
+ include/uapi/linux/devlink.h                        |  1 +
+ net/devlink/netlink_gen.c                           |  2 +-
+ 4 files changed, 17 insertions(+), 1 deletion(-)
 
+diff --git a/Documentation/netlink/specs/devlink.yaml b/Documentation/netlink/specs/devlink.yaml
+index 3db59c965869..426d5aa7d955 100644
+--- a/Documentation/netlink/specs/devlink.yaml
++++ b/Documentation/netlink/specs/devlink.yaml
+@@ -99,6 +99,8 @@ definitions:
+         name: legacy
+       -
+         name: switchdev
++      -
++        name: switchdev-inactive
+   -
+     type: enum
+     name: eswitch-inline-mode
+diff --git a/Documentation/networking/devlink/devlink-eswitch-attr.rst b/Documentation/networking/devlink/devlink-eswitch-attr.rst
+index 08bb39ab1528..eafe09abc40c 100644
+--- a/Documentation/networking/devlink/devlink-eswitch-attr.rst
++++ b/Documentation/networking/devlink/devlink-eswitch-attr.rst
+@@ -39,6 +39,10 @@ The following is a list of E-Switch attributes.
+          rules.
+        * ``switchdev`` allows for more advanced offloading capabilities of
+          the E-Switch to hardware.
++       * ``switchdev_inactive`` switchdev mode but starts inactive, doesn't allow traffic
++         until explicitly activated. This mode is useful for orchestrators that
++         want to prepare the device in switchdev mode but only activate it when
++         all configurations are done.
+    * - ``inline-mode``
+      - enum
+      - Some HWs need the VF driver to put part of the packet
+@@ -74,3 +78,12 @@ Example Usage
+ 
+     # enable encap-mode with legacy mode
+     $ devlink dev eswitch set pci/0000:08:00.0 mode legacy inline-mode none encap-mode basic
++
++    # start switchdev mode in inactive state
++    $ devlink dev eswitch set pci/0000:08:00.0 mode switchdev_inactive
++
++    # setup switchdev configurations, representors, FDB entries, etc..
++    ...
++
++    # activate switchdev mode to allow traffic
++    $ devlink dev eswitch set pci/0000:08:00.0 mode switchdev
+diff --git a/include/uapi/linux/devlink.h b/include/uapi/linux/devlink.h
+index bcad11a787a5..157f11d3fb72 100644
+--- a/include/uapi/linux/devlink.h
++++ b/include/uapi/linux/devlink.h
+@@ -181,6 +181,7 @@ enum devlink_sb_threshold_type {
+ enum devlink_eswitch_mode {
+ 	DEVLINK_ESWITCH_MODE_LEGACY,
+ 	DEVLINK_ESWITCH_MODE_SWITCHDEV,
++	DEVLINK_ESWITCH_MODE_SWITCHDEV_INACTIVE,
+ };
+ 
+ enum devlink_eswitch_inline_mode {
+diff --git a/net/devlink/netlink_gen.c b/net/devlink/netlink_gen.c
+index 9fd00977d59e..5ad435aee29d 100644
+--- a/net/devlink/netlink_gen.c
++++ b/net/devlink/netlink_gen.c
+@@ -229,7 +229,7 @@ static const struct nla_policy devlink_eswitch_get_nl_policy[DEVLINK_ATTR_DEV_NA
+ static const struct nla_policy devlink_eswitch_set_nl_policy[DEVLINK_ATTR_ESWITCH_ENCAP_MODE + 1] = {
+ 	[DEVLINK_ATTR_BUS_NAME] = { .type = NLA_NUL_STRING, },
+ 	[DEVLINK_ATTR_DEV_NAME] = { .type = NLA_NUL_STRING, },
+-	[DEVLINK_ATTR_ESWITCH_MODE] = NLA_POLICY_MAX(NLA_U16, 1),
++	[DEVLINK_ATTR_ESWITCH_MODE] = NLA_POLICY_MAX(NLA_U16, 2),
+ 	[DEVLINK_ATTR_ESWITCH_INLINE_MODE] = NLA_POLICY_MAX(NLA_U8, 3),
+ 	[DEVLINK_ATTR_ESWITCH_ENCAP_MODE] = NLA_POLICY_MAX(NLA_U8, 1),
+ };
 -- 
 2.51.1
 
