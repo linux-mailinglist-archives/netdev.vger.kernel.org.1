@@ -1,202 +1,182 @@
-Return-Path: <netdev+bounces-236977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id E14CAC42BE9
-	for <lists+netdev@lfdr.de>; Sat, 08 Nov 2025 12:31:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 13181C42BF5
+	for <lists+netdev@lfdr.de>; Sat, 08 Nov 2025 12:40:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 677CC3499EA
-	for <lists+netdev@lfdr.de>; Sat,  8 Nov 2025 11:31:23 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D6D0134A2A8
+	for <lists+netdev@lfdr.de>; Sat,  8 Nov 2025 11:40:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26B79223DF9;
-	Sat,  8 Nov 2025 11:31:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AADF629A32D;
+	Sat,  8 Nov 2025 11:40:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JrLwPfcJ"
+	dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b="APTqCz1J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mxout2.routing.net (mxout2.routing.net [134.0.28.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51B961F4CA9
-	for <netdev@vger.kernel.org>; Sat,  8 Nov 2025 11:31:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D8F27B349;
+	Sat,  8 Nov 2025 11:40:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.0.28.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762601477; cv=none; b=pHPa/Mp8foFuwHFnJo67s5SJ8X1ipvDo120+VQ2ottNg1/0+7dbNM6uKm/rC4aaV1pOye/GnZQGdL3GUfMvYlh/UFYx8q501cBLZEvjp4SaEvavQZpsfvnpFRG3zUvR6bme3hPsESRRA38mOaGw4hnFEpatcSc3hTkdA6PiAZdk=
+	t=1762602004; cv=none; b=Ge7hDOhkt8lFt5sH6d1nfpNKzHtN4uZqF/1/b/I0wC80/VP3T62OXg3DPa3yqKuZktUjezCnJ3G6rsfpJk/p7gD8+QCxb3kOiOjm+J8oOwnDJ6uWaWA4Msh2QcbnCOA1Fnd09nPYeDUXfH5ygyItpvhCH0gxQyMzLUWuHFZdBe4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762601477; c=relaxed/simple;
-	bh=BVqZOiuHq1xKbjFJroWD/ayEpS2V8z6nVjtDvArFpCQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FotIrYNF/pnJBAxZ9uYkTZtX4SlmN2krj+n2sJJ/ULMbGoMG1mfD+kjeAz8a/5FeQDZNdbkeLfXnTi6Q5aIXnWJpgdxgwkAr9ctOarCpITAhSEzjy1xap/3xCGahH5Wsh3usPfNn3tmpdzvIANUvTCAI8I7fkI+fWpAKAAzvAjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JrLwPfcJ; arc=none smtp.client-ip=209.85.128.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-786a85a68c6so15868537b3.3
-        for <netdev@vger.kernel.org>; Sat, 08 Nov 2025 03:31:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762601474; x=1763206274; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kul+ldlZcfc/to5UiPCGqycfdspo1AsYJb25duvzMaE=;
-        b=JrLwPfcJh+ktBerU25Y8g0AAECzCh4wv3xEpisk+2BUvXGb28DqwLkK0rJz6DfciX1
-         SQI2wE4XSgsnqk+NdHGk66VHMn3XrIM14/e1G0a2XVOvkLRn5MoUHLnPI3f2ZN9/wfTm
-         WHH54s6+DhQ3Hs8p+gIi8WooUDmvlGghgo6S5qfbNkGjOpfkOxcaWQD3jdihxGivdwkk
-         8rJPSo4X3s7BwosiiNSbKNxBtqbI5OD4jG93rIRxSa9QQhvT6O7QExVAuqIA6wh4E5Un
-         GFKXHTGma6YlW+SxmAFg/e5oensWA3Ln/SpPqv6c5Df08Q1LWEj72h9YZuhiWTjyNxYI
-         Lj2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762601474; x=1763206274;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=kul+ldlZcfc/to5UiPCGqycfdspo1AsYJb25duvzMaE=;
-        b=h5B1IdVF14H1k1hHFLZ18dYsBrlarrcDHb/VlpOLLQj5x/MBLTLabmSQdKLjZwW8my
-         lV+ajyKyuUVqaysDzRfd6fxw3NHDwy0qbYSaJmZuXso4f6aF/CpAIzh8yQk/pTilqh1c
-         HtcxfwgKwreTeC4593cjU8fZSiiydnbXGVKo/Eev8IxMPWhcg21JmMTDJUpz47MfY82G
-         XVwLhasiDaeCreuI+7ScujLwl6+ECZptNQFnckLkPYN4UyKsKWa5IJbtlgEHMI2ZkKtt
-         vhR8a4xOwY9VfNXiOs4szK25k9wRpXv4ULwBvsEM7MfXLwPp7eFSPFfLIEN3Ft5RTR2e
-         9sSg==
-X-Forwarded-Encrypted: i=1; AJvYcCWS1vgnXKneZg6pUNrhH4LlI0EZFkBiNQaT2TAj6TI5Rt3gMlJf89WHC6SXCVrIki57w7Zfqb0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxpVq1nuDsR7FvyrjEjUJVFvdHEg4KE5NJDkAySWADu91/CHuLJ
-	HCWWXaf1ZmaHzyZwYJEPpyB16VewPuHd/BAo4aQJ4z7Ty4C4R1XJCIfIs3AQh9KwKmuqVbjTWtE
-	62EkPU4axXsQ4YsdQ+RunKPhiRq/r7k8=
-X-Gm-Gg: ASbGncvWirQJmVTiRMt4Qf65jYBMNwBsh3hmHCxJKp6AEZCcIYsBplJDxeiLYu46cDC
-	qEPhOLJZ97CUNfK8vds+HaVOC452TIjzxTGM80OTpfn+gB+VDJuqyrli3PzHEJLUCBe69sxLe2j
-	Y6vwPvDirba/zEygFvw8oDOVYZy/dVC5wxUq5+nJbgr7+4c0V7eCqZhMZaz0UO7YE3kxTHOS2Qb
-	cy8x28ERwLzBv0JD2ynlUF2OQdwOQUPdnBf1IA/Kwn4j8hV0Z9is8ZILKUA6ACFOiHLRg==
-X-Google-Smtp-Source: AGHT+IEPK3nR0sMFaFS7BVTaqHw85Bdn4UsHG71bXQaV4089JTCQ2FMUL36I5F+8NGGUYJOBhMwzB+DnUk0UOWj7D6o=
-X-Received: by 2002:a05:690c:26ca:b0:786:a39e:e836 with SMTP id
- 00721157ae682-787d545e8eamr14846547b3.60.1762601474112; Sat, 08 Nov 2025
- 03:31:14 -0800 (PST)
+	s=arc-20240116; t=1762602004; c=relaxed/simple;
+	bh=rcvqYef/OxWDoBBkjpuWqzOIQ8eqGLlRvppwm1CrAF4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q3uxy5Sc5fGNRqrl4auI8AqI7glOIdwqjLNO1mrrWvYk36N+Herm6EDso/BR1KReMz6Mab9W+YwdirJJGjcgXG1wZzzkdvXkcwVoNvCJaVfcnRe0s68w9zvVy2F9/znB6qb9+p8KFnhwNeXiF6FNAzQ+dcFGS/FJ/vnzQxHMcA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de; spf=pass smtp.mailfrom=fw-web.de; dkim=pass (1024-bit key) header.d=mailerdienst.de header.i=@mailerdienst.de header.b=APTqCz1J; arc=none smtp.client-ip=134.0.28.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fw-web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fw-web.de
+Received: from mxbulk.masterlogin.de (unknown [192.168.10.85])
+	by mxout2.routing.net (Postfix) with ESMTP id B39E55FE85;
+	Sat,  8 Nov 2025 11:39:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mailerdienst.de;
+	s=routing; t=1762601993;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=p7uhLo/agwhBgHHuGTDmQCEG8rXbE6aWjg4WrceCqds=;
+	b=APTqCz1Jc5s6V9bo+Co9k6atAjhC8MSQ8UIbwhAgzwkK1lYFMnKX8RWZMJvtbQRHJvEd1L
+	n6NXXf7tB2w4lrI9CxYR176AZGo/swW3YjHyOiiHx+Ia66RCUbBISM55hVUAqyZ5hs6Dy9
+	s53BNxko/6xW3qq3oOWFb+dCpoQ6dTQ=
+Received: from frank-u24.. (fttx-pool-217.61.148.22.bambit.de [217.61.148.22])
+	by mxbulk.masterlogin.de (Postfix) with ESMTPSA id 72F171226CD;
+	Sat,  8 Nov 2025 11:39:53 +0000 (UTC)
+From: Frank Wunderlich <linux@fw-web.de>
+To: Felix Fietkau <nbd@nbd.name>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Russell King <linux@armlinux.org.uk>
+Cc: Frank Wunderlich <frank-w@public-files.de>,
+	Daniel Golle <daniel@makrotopia.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: [RFC net-next 0/3] Add RSS and LRO support
+Date: Sat,  8 Nov 2025 12:39:16 +0100
+Message-ID: <20251108113926.102054-1-linux@fw-web.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251107083006.44604-1-jonas.gorski@gmail.com>
- <ce95eb8c-0d40-464d-b729-80e1ea71051c@lunn.ch> <CAOiHx=kt+pMVJ+MCUKC3M6QeMg+gamYsnhBAHkG3b6SGEknOuw@mail.gmail.com>
- <ec456ae4-18ea-4f77-ba9a-a5d35bf1b1fd@lunn.ch> <20251107144515.ybwcfyppzashtc5c@skbuf>
- <aQ4RR4OQI9f2bBOG@shell.armlinux.org.uk>
-In-Reply-To: <aQ4RR4OQI9f2bBOG@shell.armlinux.org.uk>
-From: Jonas Gorski <jonas.gorski@gmail.com>
-Date: Sat, 8 Nov 2025 12:31:02 +0100
-X-Gm-Features: AWmQ_bnqz5T9iPGsG_Fj5OGHtnPj0EPUXcQY2h_Hcli3mW3aM4IFpy_1DrOQDgI
-Message-ID: <CAOiHx=mBPUg-a=_PgdrOD25A=Gz8gEkG9Z+JkNkCv8u1zoLpVw@mail.gmail.com>
-Subject: Re: [PATCH net v2] net: dsa: b53: bcm531x5: fix cpu rgmii mode interpretation
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Florian Fainelli <florian.fainelli@broadcom.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	=?UTF-8?B?w4FsdmFybyBGZXJuw6FuZGV6IFJvamFz?= <noltari@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 7, 2025 at 4:33=E2=80=AFPM Russell King (Oracle)
-<linux@armlinux.org.uk> wrote:
->
-> On Fri, Nov 07, 2025 at 04:45:15PM +0200, Vladimir Oltean wrote:
-> > On Fri, Nov 07, 2025 at 03:07:48PM +0100, Andrew Lunn wrote:
-> > > > There is allwinner/sun7i-a20-lamobo-r1.dts, which uses "rgmii-txid"=
-,
-> > > > which is untouched by this patch. The ethernet interface uses "rgmi=
-i".
-> > >
-> > > Which is odd, but lets leave it alone.
-> > >
-> > > > And there is arch/arm/boot/dts/aspeed/aspeed-bmc-facebook-elbert.dt=
-s,
-> > > > where a comment says that it has a BCM53134, but there is no such
-> > > > node. The ethernet node uses "rgmii".
-> > >
-> > > aspeed pretty much always get phy-mode wrong. So i would not worry to=
-o
-> > > much about this.
-> > >
-> > > > So one doesn't define one, one uses rgmii-id on the switch / phy si=
-de
-> > > > and rgmii on the ethernet mac side, and one only defines the ethern=
-et
-> > > > mac side as rgmii.
-> > >
-> > > That is reasonable. It is a lot less clear what is correct for a
-> > > MAC-MAC connection. For a MAC-PHY connection we do have documentation=
-,
-> > > the preference is that the PHY adds the delays, not the MAC. If the
-> > > switch is playing PHY, then having it add delays is sensible.
-> > >
-> > > > > I would maybe add a dev_warn() here, saying the DT blob is out of=
- date
-> > > > > and needs fixing. And fix all the in kernel .dts files.
-> > > >
-> > > > Sure I can add a warning.
-> > >
-> > > Great, thanks.
-> > >
-> > >     Andrew
-> >
-> > +Russell
->
-> As this is discussing the applicability of RGMII delays for DSA
-> switches, I've long held out that the situation is a mess, and
-> diverges from what we decide to do for MACs - so I'd prefer not
-> to get involved in this, except to say...
->
-> > Since there is no 'correct' way to apply RGMII delays on a MAC accordin=
-g
-> > to phy-mode, my advice, if possible, would be to leave sleeping dogs li=
-e
-> > and fix broken setups by adding the explicit device tree properties in
-> > the MAC, and adding driver support for parsing these.
->
-> Indeed - let's not break existing working setups. If there is a
-> problem with them, then that's the time to start thinking about
-> changing them.
+From: Frank Wunderlich <frank-w@public-files.de>
 
-I completely understand the reluctance to change anything, and I'm
-trying my best to not break anything:
+This series is currently only for discussion to get the upported SDK driver
+changes in a good shape.
+To use it some other parts are still missing like USXGMII PCS support on
+mt7988.
 
-The only mode used by in-tree device trees is "rgmii-txid". This
-already behaved as it would for a PHY, and I did not change the
-behavior.
-As you probably know "rgmii" is often wrongly used, and the old
-behavior was to enable delays in both directions in this case. I did
-not change the behavior here either.
+patches are upported from mtk SDK:
+- https://git01.mediatek.com/plugins/gitiles/openwrt/feeds/mtk-openwrt-feeds/+/refs/heads/master/master/files/target/linux/mediatek/patches-6.12/999-eth-08-mtk_eth_soc-add-register-definitions-for-rss-lro-reg.patch
+- https://git01.mediatek.com/plugins/gitiles/openwrt/feeds/mtk-openwrt-feeds/+/refs/heads/master/master/files/target/linux/mediatek/patches-6.12/999-eth-09-mtk_eth_soc-add-rss-support.patch
+- https://git01.mediatek.com/plugins/gitiles/openwrt/feeds/mtk-openwrt-feeds/+/refs/heads/master/master/files/target/linux/mediatek/patches-6.12/999-eth-10-mtk_eth_soc-add-hw-lro-support.patch
 
-So for the known cases, and the suspected "wrong" usages, I did not
-change anything, so these will continue working as expected.
+RSS / LRO
 
-My interpretation here so far was/is, and what I'm trying to follow here is=
-:
+HW-acceleration for ending traffic. For routed traffic PPE is needed and
+hw offloading in nftables.
+Bridged traffic may need additional changes (openwrt use bridger utility).
 
-if this is the CPU port that is connected to a different MAC (that is
-controlled by the host), then on that port the switch is the "PHY", so
-it is responsible for the delays according to phy-mode, as the other
-MAC is supposed to not enable any (and doesn't know that there is a
-DSA switch on the other side, unless it also is a DSA switch).
+RSS (Receive Side Scaling)
 
-In any other case, don't apply any delays, because here the switch is
-the MAC, and the other side is a PHY (or "PHY") and therefore
-responsible for any delays that are needed.
+using 4 additional IRQ for spreading load
 
-Having an external b53 switch connected via its CPU port to an
-internal b53 switch is a common setup on BCM63XX, so here b53 must
-enable delays on one side, and currently it does not enable them on
-either side.
+cat /proc/interrupts | grep ethernet
 
-Currently, the only way to configure this is by using the definitely
-wrong "rgmii" phy-mode. Anyone writing a new board will just use it,
-because it works, and we can't prevent it. I want to give the option
-of using the less wrong "rgmii-id" value, which at least (in my
-interpretation) matches the spirit of phy-mode.
+echo 1 > /proc/irq/105/smp_affinity
+echo 2 > /proc/irq/106/smp_affinity
+echo 4 > /proc/irq/107/smp_affinity
+echo 8 > /proc/irq/108/smp_affinity
 
-Would it ease your concerns if I guard enabling delays with
-dsa_port_is_cpu())? To make clear that we don't enable delays on any
-user/dsa ports, and only the one that goes in the direction of the
-kernel/host (the "root" of the DSA tree).
+moving tx frame-engine irq to different cpu (here 3rd)
+echo 4 > /proc/irq/103/smp_affinity
 
-Best regards,
-Jonas
+disable RPS (Receive Packet Steering) for all macs:
+
+echo 0 > /sys/devices/platform/soc/15100000.ethernet/net/eth0/queues/rx-0/rps_cpus
+
+pay attention on iperf-version (iperf 3.17 is ok, 3.12 is not)
+
+traffic must be created using multiple streams so that it can be splitted, so use
+multithreaded iperf3
+
+on R4: bin/iperf3 -s
+on the other side: iperf3 -c 192.168.1.1 -i 1 -P 4
+
+you should reach ~9.3 GBit/s
+
+and see spreading load over CPU cores
+
+root@bpi-r4-phy-8G:~# cat /proc/interrupts | grep eth
+103: 20 198366 0 0 GICv3 229 Level 15100000.ethernet
+105: 3611 0 0 0 GICv3 221 Level 15100000.ethernet, 15100000.ethernet
+106: 2 6842 0 0 GICv3 222 Level 15100000.ethernet, 15100000.ethernet
+107: 4 0 27643 0 GICv3 223 Level 15100000.ethernet, 15100000.ethernet
+108: 3 0 0 27925 GICv3 224 Level 15100000.ethernet, 15100000.ethernet
+
+using the iperf3 from debian bookworm (3.12) results in only 6.7GBit/s, so
+newer version is needed (not tested yet in trixie).
+
+LRO(Large Receive Offload)
+
+Add HW LRO RX rule:
+
+ethtool -N [interface] flow-type tcp4 dst-ip [IP] action 0 loc [0/1]
+
+Delete HW LRO RX rule:
+
+ethtool -N [interface] delete [0/1]
+
+Enable/Disable HW LRO rule:
+
+ethtool -K [interface] lro [on | off]
+
+Show the current offload features:
+
+ethtool -k [interface]
+
+example:
+
+ethtool -N eth2 flow-type tcp4 dst-ip 192.168.1.1 action 0 loc 0
+ethtool -K eth2 lro on ethtool -k eth2
+
+using iperf(2) instead of iperf3 to reach full traffic!
+
+verify with propritary debugfs (not part of this series)
+
+Enable HW LRO rings
+echo 4 1 > /proc/mtketh/hw_lro_auto_tlb
+Enable HW LRO statistics
+echo 5 1 > /proc/mtketh/hw_lro_auto_tlb
+
+cat /proc/mtketh/hw_lro_stats
+
+Mason Chang (3):
+  net: ethernet: mtk_eth_soc: Add register definitions for RSS and LRO
+  net: ethernet: mtk_eth_soc: Add RSS support
+  net: ethernet: mtk_eth_soc: Add LRO support
+
+ drivers/net/ethernet/mediatek/mtk_eth_soc.c | 770 ++++++++++++++++----
+ drivers/net/ethernet/mediatek/mtk_eth_soc.h | 171 +++--
+ 2 files changed, 757 insertions(+), 184 deletions(-)
+
+-- 
+2.43.0
+
 
