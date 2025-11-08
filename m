@@ -1,146 +1,188 @@
-Return-Path: <netdev+bounces-236975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EF02C42A4F
-	for <lists+netdev@lfdr.de>; Sat, 08 Nov 2025 10:24:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F83AC42A0C
+	for <lists+netdev@lfdr.de>; Sat, 08 Nov 2025 10:11:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 33BAF4E1F00
-	for <lists+netdev@lfdr.de>; Sat,  8 Nov 2025 09:24:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9FAB8188CB46
+	for <lists+netdev@lfdr.de>; Sat,  8 Nov 2025 09:11:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D54D52E9ECA;
-	Sat,  8 Nov 2025 09:24:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 633DB2E0B47;
+	Sat,  8 Nov 2025 09:11:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="VEXqEaiH";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="dsnGCQtj";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="VEXqEaiH";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="dsnGCQtj"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 200272737F8;
-	Sat,  8 Nov 2025 09:24:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95BE12E8881
+	for <netdev@vger.kernel.org>; Sat,  8 Nov 2025 09:11:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762593879; cv=none; b=pq9RGAU81JwjmQRJ5mUpuCRzh3Jsquhyg+z0wjfrrVmf+TD+/kJ/AfKdo3Qjet8GlLikvALWMZMFGTw0gS2Sio66EEufJ+5yM4LYrLOJt/GPFwHte/d03kdj337K3j3WbOOL5J2HJ8gBcklb95hM7JXhbGSY+xECKfi5Q2jI9Vg=
+	t=1762593084; cv=none; b=KT/JUxp1LJC/vycNfwkdeonb8wvxWJ2okYNoQray1HakZinczD6xisuJHTxyofunZIJWssQWFlAUUIfZgxnSC84lA4LPGxmOuJrSDOmYBj8p0sJbWRutEFDqj7dqu1PwMrK2Epe4wQZa31WvxTYHVjOwDd0wgYSAHuGdDJY2Xok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762593879; c=relaxed/simple;
-	bh=+LS6ZrGO7B6vLyR4/fHLFcG30wc9EjVsZTbQqzeQlp0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=l4J119H19axrywjAZyVYy57zSnkp3tl/mEzKwLYbBOOoCsn8TZxuytVu8pV0LbhFpLVpV/z8prtrOVvlTNbXMkuQh1/dawiPeTZj0aegDFLC3QK33WV+OXpseBL1adlbh1lHNDbRg+dmVyt55sKFRVjUiDZ2xT492zr3XMR6Mq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTPS id 4d3VPS3q9gzKHMbr;
-	Sat,  8 Nov 2025 17:05:00 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id EA27C1A07BB;
-	Sat,  8 Nov 2025 17:05:11 +0800 (CST)
-Received: from [10.67.111.176] (unknown [10.67.111.176])
-	by APP4 (Coremail) with SMTP id gCh0CgAnUF3GBw9pgLIYAA--.42082S2;
-	Sat, 08 Nov 2025 17:05:11 +0800 (CST)
-Message-ID: <e0c0f8b7-112f-40d7-b211-89065e9003b2@huaweicloud.com>
-Date: Sat, 8 Nov 2025 17:05:10 +0800
+	s=arc-20240116; t=1762593084; c=relaxed/simple;
+	bh=zulggbQ9C+sfhABO3XdhEKdaWpkBF7JTTQpkPFyR3sQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MDiIC7+m7qfB2ItJWxRZ9pM2YaFxoohdIjGc1GyGnVA+L6zYvXb44edSVAZ5O89wUtU0AuUlmp0BLMl6v2qv9vFkXaQ04UCaI1JFYkMckH+ooJM2MTcVEuruam+x8eef2FC4AJuPpyijW7bNEkQDB3rys09SnNeyLcuIQtc0ZBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=VEXqEaiH; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=dsnGCQtj; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=VEXqEaiH; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=dsnGCQtj; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id CA96C1FF8F;
+	Sat,  8 Nov 2025 09:11:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1762593080; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iyPEC34QD5BJvwLcoZhQkmhqMSp26TfjdL7fKVEwOg4=;
+	b=VEXqEaiH+M8wBuf6L8At9YVraFTRw7fkZTAZCTDKqOrVxSYjiWsCUVnnPPbUgDhjdT66VS
+	b1o+9A+f96E8an02iQYmzIQbQ2cNyRJugwtind6jadPdteboq3dyRLEHqoA/PylFPXZbDv
+	RTdCXWFgymBB1bt5X1s2GpWC3S0Ul/o=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1762593080;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iyPEC34QD5BJvwLcoZhQkmhqMSp26TfjdL7fKVEwOg4=;
+	b=dsnGCQtj31jQosQNPui7DGi2tdwv+nsOOxgFDEi/PJ4BALRn4SYQsjDxBELw1l6DaxYYyD
+	zZ5RjmcLexyrePCg==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1762593080; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iyPEC34QD5BJvwLcoZhQkmhqMSp26TfjdL7fKVEwOg4=;
+	b=VEXqEaiH+M8wBuf6L8At9YVraFTRw7fkZTAZCTDKqOrVxSYjiWsCUVnnPPbUgDhjdT66VS
+	b1o+9A+f96E8an02iQYmzIQbQ2cNyRJugwtind6jadPdteboq3dyRLEHqoA/PylFPXZbDv
+	RTdCXWFgymBB1bt5X1s2GpWC3S0Ul/o=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1762593080;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iyPEC34QD5BJvwLcoZhQkmhqMSp26TfjdL7fKVEwOg4=;
+	b=dsnGCQtj31jQosQNPui7DGi2tdwv+nsOOxgFDEi/PJ4BALRn4SYQsjDxBELw1l6DaxYYyD
+	zZ5RjmcLexyrePCg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5B856132DD;
+	Sat,  8 Nov 2025 09:11:20 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id jVyiFDgJD2liNwAAD6G6ig
+	(envelope-from <tiwai@suse.de>); Sat, 08 Nov 2025 09:11:20 +0000
+Date: Sat, 08 Nov 2025 10:11:19 +0100
+Message-ID: <877bw0rirs.wl-tiwai@suse.de>
+From: Takashi Iwai <tiwai@suse.de>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: David Laight <david.laight.linux@gmail.com>,
+	Junrui Luo <moonafterrain@outlook.com>,
+	linux-kernel@vger.kernel.org,
+	pmladek@suse.com,
+	rostedt@goodmis.org,
+	andriy.shevchenko@linux.intel.com,
+	tiwai@suse.com,
+	perex@perex.cz,
+	linux-sound@vger.kernel.org,
+	mchehab@kernel.org,
+	awalls@md.metrocast.net,
+	linux-media@vger.kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 1/4] lib/sprintf: add scnprintf_append() helper function
+In-Reply-To: <20251107161130.4418562992d2477c4accc6ef@linux-foundation.org>
+References: <20251107051616.21606-1-moonafterrain@outlook.com>
+	<SYBPR01MB788110A77D7F0F7A27F0974FAFC3A@SYBPR01MB7881.ausprd01.prod.outlook.com>
+	<20251106213833.546c8eaba8aec6aa6a5e30b6@linux-foundation.org>
+	<20251107091246.4e5900f4@pumpkin>
+	<20251107161130.4418562992d2477c4accc6ef@linux-foundation.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) Emacs/27.2 Mule/6.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 13/31] cpuset: Update HK_TYPE_DOMAIN cpumask from cpuset
-To: Frederic Weisbecker <frederic@kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-Cc: =?UTF-8?Q?Michal_Koutn=C3=BD?= <mkoutny@suse.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Bjorn Helgaas <bhelgaas@google.com>,
- Catalin Marinas <catalin.marinas@arm.com>, Danilo Krummrich
- <dakr@kernel.org>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Gabriele Monaco <gmonaco@redhat.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Jens Axboe <axboe@kernel.dk>, Johannes Weiner <hannes@cmpxchg.org>,
- Lai Jiangshan <jiangshanlai@gmail.com>,
- Marco Crivellari <marco.crivellari@suse.com>, Michal Hocko
- <mhocko@suse.com>, Muchun Song <muchun.song@linux.dev>,
- Paolo Abeni <pabeni@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
- Phil Auld <pauld@redhat.com>, "Rafael J . Wysocki" <rafael@kernel.org>,
- Roman Gushchin <roman.gushchin@linux.dev>,
- Shakeel Butt <shakeel.butt@linux.dev>, Simon Horman <horms@kernel.org>,
- Tejun Heo <tj@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Vlastimil Babka <vbabka@suse.cz>, Waiman Long <longman@redhat.com>,
- Will Deacon <will@kernel.org>, cgroups@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
- linux-mm@kvack.org, linux-pci@vger.kernel.org, netdev@vger.kernel.org
-References: <20251105210348.35256-1-frederic@kernel.org>
- <20251105210348.35256-14-frederic@kernel.org>
-Content-Language: en-US
-From: Chen Ridong <chenridong@huaweicloud.com>
-In-Reply-To: <20251105210348.35256-14-frederic@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:gCh0CgAnUF3GBw9pgLIYAA--.42082S2
-X-Coremail-Antispam: 1UD129KBjvdXoW7JrWUCF4fXF43Gr1UAF4kCrg_yoWDuFc_Wr
-	15WF4Uuw15JFyqgw1Yy34qga1fJa17t39aqa48try5W3Z5JF43Jrs3A345Ca13Xa4xJF1a
-	934kK393ZrnFqjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbxkYFVCjjxCrM7AC8VAFwI0_Wr0E3s1l1xkIjI8I6I8E6xAIw20E
-	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
-	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVWDJVCq3wA2z4x0Y4vE2Ix0cI8IcVCY1x02
-	67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7CjxVAaw2AF
-	wI0_Wrv_ZF1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26rWY6r4U
-	JwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
-	0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
-	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0
-	EksDUUUUU==
-X-CM-SenderInfo: hfkh02xlgr0w46kxt4xhlfz01xgou0bp/
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-Spam-Level: 
+X-Spamd-Result: default: False [-1.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	SUSPICIOUS_RECIPS(1.50)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCPT_COUNT_TWELVE(0.00)[18];
+	FUZZY_RATELIMITED(0.00)[rspamd.com];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	TAGGED_RCPT(0.00)[];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com,outlook.com];
+	TO_DN_SOME(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	FREEMAIL_CC(0.00)[gmail.com,outlook.com,vger.kernel.org,suse.com,goodmis.org,linux.intel.com,perex.cz,kernel.org,md.metrocast.net,davemloft.net,google.com,redhat.com];
+	RCVD_TLS_ALL(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
+X-Spam-Flag: NO
+X-Spam-Score: -1.80
+
+On Sat, 08 Nov 2025 01:11:30 +0100,
+Andrew Morton wrote:
+> 
+> On Fri, 7 Nov 2025 09:12:46 +0000 David Laight <david.laight.linux@gmail.com> wrote:
+> 
+> > > I wonder if we should instead implement a kasprintf() version of this
+> > > which reallocs each time and then switch all the callers over to that.
+> > 
+> > That adds the cost of a malloc, and I, like kasprintf() probably ends up
+> > doing all the work of snprintf twice.
+> 
+> There is no need at all to optimize the performance of scruffy once-off
+> string pasting functions.  For these it's better to optimize for
+> readability, reliability.  maintainability.
+
+Actually this scnprintf_append() helper was my suggestion in another
+threads:
+  https://lore.kernel.org/ME2PR01MB3156CEC4F31F253C9B540FB7AFFDA@ME2PR01MB3156.ausprd01.prod.outlook.com
+  https://lore.kernel.org/SYBPR01MB7881987D79C62D8122B655FEAFC6A@SYBPR01MB7881.ausprd01.prod.outlook.com
+
+Basically its use is for filling a substring with s*printf() inside a
+fixed string such as a field in a struct.  Through a quick grep, there
+are many kernel code doing it without bounce checks, and it's for
+helping those.  So it's a bit different from what you assumed with the
+re-allocatable buffers.
+
+The most merit of this API is that it can just be a kind of drop-in
+replacement without extra variable to keep the offset, as found in
+this patch series.
+
+Though, it won't change too much to introduce an offset variable as
+the API David suggested, which looks nice, so I myself don't mind
+either way (it's a bike-shed topic, after all :)
 
 
+thanks,
 
-
-> +int housekeeping_update(struct cpumask *mask, enum hk_type type)
-> +{
-> +	struct cpumask *trial, *old = NULL;
-> +
-> +	if (type != HK_TYPE_DOMAIN)
-> +		return -ENOTSUPP;
-> +
-> +	trial = kmalloc(cpumask_size(), GFP_KERNEL);
-> +	if (!trial)
-> +		return -ENOMEM;
-> +
-> +	cpumask_andnot(trial, housekeeping_cpumask(HK_TYPE_DOMAIN_BOOT), mask);
-
-Since there's no comment for the 'mask' parameter, would it be better to name it 'isol_mask'? This
-would make it clearer that this is the isolation mask input and what is doing here.
-
-> +	if (!cpumask_intersects(trial, cpu_online_mask)) {
-> +		kfree(trial);
-> +		return -EINVAL;
-> +	}
-> +
-> +	if (!housekeeping.flags)
-> +		static_branch_enable(&housekeeping_overridden);
-> +
-> +	if (housekeeping.flags & BIT(type))
-> +		old = housekeeping_cpumask_dereference(type);
-> +	else
-> +		WRITE_ONCE(housekeeping.flags, housekeeping.flags | BIT(type));
-> +	rcu_assign_pointer(housekeeping.cpumasks[type], trial);
-> +
-> +	synchronize_rcu();
-> +
-> +	kfree(old);
-> +
-> +	return 0;
-> +}
-> +
-
-
--- 
-Best regards,
-Ridong
-
+Takashi
 
