@@ -1,75 +1,95 @@
-Return-Path: <netdev+bounces-236938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A796C42546
-	for <lists+netdev@lfdr.de>; Sat, 08 Nov 2025 03:59:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AAD3C4254D
+	for <lists+netdev@lfdr.de>; Sat, 08 Nov 2025 04:00:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C27E61893301
-	for <lists+netdev@lfdr.de>; Sat,  8 Nov 2025 03:00:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA5D43BF177
+	for <lists+netdev@lfdr.de>; Sat,  8 Nov 2025 03:00:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AD562C21C1;
-	Sat,  8 Nov 2025 02:59:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42DB2157480;
+	Sat,  8 Nov 2025 03:00:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZF0eJ3cj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XZT0FYEl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D0EBA34;
-	Sat,  8 Nov 2025 02:59:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1706D748F;
+	Sat,  8 Nov 2025 03:00:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762570779; cv=none; b=rz8ORmYsYeX02OMYboBqQkCWjxn/hfSBHOpKipSEQya6P29pKUclIQb8lQi9SWbc9XA0CRjOMUkWMPfqyKP9RkUJFRGLVhuPpjs4eGyxop+GzNaHrHGvZ54IDXNN31BDwEr2z1CaXS6Ik/JxiTEn7av9SY6P2QGVzpd4HPo0/YA=
+	t=1762570835; cv=none; b=ez+2iBHJahSV28XGhuyQB1AC0jkaJ864/1E/Z5eNuSf5t8CtEzokz4w+mSGKkJd0FLM0xXT2ghz88zGAIkBD+4U/6L3mLk4zXcvisFSQSQweaUfHFbRModwbO8uRqNUP/0VEnET1JjuMgZtbfLbodjmlOmI4gqUKmVkgJIS94hY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762570779; c=relaxed/simple;
-	bh=r0V8RunR0rphJHRhau+kMyV3SG5U13zHxEWpzPFnguI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Kd7y0jmA5w7BU5++q7KCXn0gTlxHvfNFO9pMBTmnyzaww16K8j81rY6N/84AsmcX2E0a1ZsyobsDa/Co3/hWOaUkWTDvS47AjeS2OWRl8mhSmELutLtWAAOx0o57g1XMnG7XRg173IIT899uS5Y1BObOoabHR+/mWQtkzSO162g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZF0eJ3cj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7ED21C4CEF5;
-	Sat,  8 Nov 2025 02:59:38 +0000 (UTC)
+	s=arc-20240116; t=1762570835; c=relaxed/simple;
+	bh=Vy1J3SyqFWlVAbP05a62I5YuDOrB6SkejVaOSzy3d98=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=CPDUddtL9N603V8zwmoA50qpSxUEqDo57uUqrZcWBXcp2Pju10cSdYtJk9MJRXN7lpsEBIf3aCm/J14FJ+LRHbrN0ntrGSOFtEZxdg6S9ltKYDQZZmbBhdX2M1ZeHJPY5f9vRshDU3cCTS50Yc63jshgC+M9nyeCiK1E1EVXbvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XZT0FYEl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4588C19421;
+	Sat,  8 Nov 2025 03:00:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762570779;
-	bh=r0V8RunR0rphJHRhau+kMyV3SG5U13zHxEWpzPFnguI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZF0eJ3cj5NC2kZBVIPr713n7H9kzbW4y9Ka8Sa+JQ+QABIi52szMU/l8BrK03RRc6
-	 hJzIR01dKp5+WBw6iNaz3XbRPj3sa5Hf227+T/Sp2wSMbPvUHLeYzTxMe7GiyiJ/rZ
-	 b1AweB1VxNWR9xYCSxFP9eZuLMuBWaJw49LaHOeOyPKzdKolWtq1WGCbwOcnsHDedP
-	 l5NGqoo5b1LcyMQa9HgmI1iForVC1bh1oHsba6tcbSiSi4So5sa2XHeIDYOq1JR/Gh
-	 eVcObMGxy+TsE7/gbSRR2A/Gy+nutdwjYKnzdErOfD5gxaXtKCiviNezQMSfEVemlf
-	 1EUvAmoQdpPWA==
-Date: Fri, 7 Nov 2025 18:59:37 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: shenwei.wang@nxp.com, xiaoning.wang@nxp.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- eric@nelint.com, imx@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: fec: correct rx_bytes statistic for the case
- SHIFT16 is set
-Message-ID: <20251107185937.0cbaf200@kernel.org>
-In-Reply-To: <20251106021421.2096585-1-wei.fang@nxp.com>
-References: <20251106021421.2096585-1-wei.fang@nxp.com>
+	s=k20201202; t=1762570834;
+	bh=Vy1J3SyqFWlVAbP05a62I5YuDOrB6SkejVaOSzy3d98=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=XZT0FYElu90WYbbDSDLHzO9cbv4q5shUgjxmKjjKxTVM5+mIcqErRxRruQJNdVvL7
+	 xSQ3vTiR6eJ450D1K7D+0ReR3Wrwl4jo1QTrC7tgzYRsd+yIL4fHEB4VLC88/fzUt3
+	 48ZF9LtSUEPqX5uOisLh2v/94cIR4OWP1kMb/YG/dGiq6BgIizcIErnUBgMJyS47nN
+	 GdjuQhYIjuQx19B2drWR+1KFQt8Sid8nYNPl4zXExJmj53pEHt5kCNhcsMId3qGL6B
+	 +k7jL1KnjsvdXfkPvw6MMcGhYZ2vtXolgy0ZJU8rjsvf099B1HLReSqMDPfoo9/Rju
+	 f+gJzCD68VteA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E4A3A40FCA;
+	Sat,  8 Nov 2025 03:00:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: fec: correct rx_bytes statistic for the case
+ SHIFT16
+ is set
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176257080700.1232193.7245500159998786642.git-patchwork-notify@kernel.org>
+Date: Sat, 08 Nov 2025 03:00:07 +0000
+References: <20251106021421.2096585-1-wei.fang@nxp.com>
+In-Reply-To: <20251106021421.2096585-1-wei.fang@nxp.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: shenwei.wang@nxp.com, xiaoning.wang@nxp.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ eric@nelint.com, imx@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-On Thu,  6 Nov 2025 10:14:21 +0800 Wei Fang wrote:
->  		ndev->stats.rx_bytes += pkt_len;
-> +		if (fep->quirks & FEC_QUIRK_HAS_RACC)
-> +			ndev->stats.rx_bytes -= 2;
+Hello:
 
-Orthogonal to this patch, but why not:
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-	ndev->stats.rx_bytes += pkt_len - sub_len;
+On Thu,  6 Nov 2025 10:14:21 +0800 you wrote:
+> Two additional bytes in front of each frame received into the RX FIFO if
+> SHIFT16 is set, so we need to subtract the extra two bytes from pkt_len
+> to correct the statistic of rx_bytes.
+> 
+> Fixes: 3ac72b7b63d5 ("net: fec: align IP header in hardware")
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> 
+> [...]
 
-? Is this driver intentionally counting FCS as bytes?
+Here is the summary with links:
+  - [net] net: fec: correct rx_bytes statistic for the case SHIFT16 is set
+    https://git.kernel.org/netdev/net/c/ad17e7e92a7c
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
