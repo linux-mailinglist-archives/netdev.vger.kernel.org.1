@@ -1,57 +1,54 @@
-Return-Path: <netdev+bounces-236958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAAD6C427EC
-	for <lists+netdev@lfdr.de>; Sat, 08 Nov 2025 07:03:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 572AAC4283B
+	for <lists+netdev@lfdr.de>; Sat, 08 Nov 2025 07:26:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 59E174E1BEF
-	for <lists+netdev@lfdr.de>; Sat,  8 Nov 2025 06:03:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D086A3B4495
+	for <lists+netdev@lfdr.de>; Sat,  8 Nov 2025 06:26:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE8B42248B9;
-	Sat,  8 Nov 2025 06:03:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 533C92D877A;
+	Sat,  8 Nov 2025 06:26:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="OpF2M3Dh"
+	dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b="g6xTdNiT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-m49197.qiye.163.com (mail-m49197.qiye.163.com [45.254.49.197])
+Received: from mail-m49198.qiye.163.com (mail-m49198.qiye.163.com [45.254.49.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F7A1800;
-	Sat,  8 Nov 2025 06:03:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53DA12DAFA1;
+	Sat,  8 Nov 2025 06:26:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.49.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762581820; cv=none; b=rcm5gyBTB4VE1fDbQ6z9fzqYOGTCeOAoOeWJLofQ0wxBpWfF75ntsIcDfgucU4qHWV47908eGeKhn8WicX64NqC2Pph5UTOStoRIOVc8XGyshdm4yFmxBCquW0e/unNofEt5nTw10CYjNLf9dXfNzPWjyYWBootH33BXXBFFiA8=
+	t=1762583202; cv=none; b=QLQ4fJcnzViXNkYJSCEdTxuEEc6paFHFf21YDEv2v0Y6Nl+/4zNyNmFWq/1r7iu5zYKb0Djjv2xWyvwsuIU58uuZBZf9Kv5kdmjfuuet7zYZAQPtj32BqJvkqbar2UwylX9ICgnP9TllWy/S6YjmSlyklUDCw6I0IJumxafxwJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762581820; c=relaxed/simple;
-	bh=E1zMOuHLo5HrFCo02ewf2DH9+Lyh+E7j8NuZaDLVyfQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=G5OWR89us2NptbdbI1YgZm1zYNxz8dP+dCYWE8PRgfppsA+3eB4cO+LMFPwXbERsy4ImoQXRm7XRMF10QwXs/4fBy/q7104LeTkHJIj3plFT7mVEBVjqUPC7Tr3Jlo49vorgTkCECTuRimFq4YZJmH5HciqbxZvXK/mZAQr2tx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=OpF2M3Dh; arc=none smtp.client-ip=45.254.49.197
+	s=arc-20240116; t=1762583202; c=relaxed/simple;
+	bh=65teNlTbq6Jevo8Cf4DSX/Qnl0RKO/VMIyVZHQWG5Nw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pEpm1KcjcfzEcYUIPpIIDvRVTMTXgrmm3WSM8gZ8C9xLGNTLyKw19J3nEVpWpFmBHyQU0N3crXJnVVEYRFsmUlKU1nY1wnxZoVfrnbeUhT9X7bLGH7SW6XcE29US/mVZ+FRN1S3yi6w6f1ME4HlepHQgY0YF8PAJdGYIchFlFbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn; spf=pass smtp.mailfrom=seu.edu.cn; dkim=pass (1024-bit key) header.d=seu.edu.cn header.i=@seu.edu.cn header.b=g6xTdNiT; arc=none smtp.client-ip=45.254.49.198
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=seu.edu.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=seu.edu.cn
-Received: from LAPTOP-N070L597.localdomain (unknown [223.112.146.162])
-	by smtp.qiye.163.com (Hmail) with ESMTP id 28d8d2699;
-	Sat, 8 Nov 2025 12:47:52 +0800 (GMT+08:00)
+Received: from LAPTOP-N070L597.localdomain (unknown [58.241.16.34])
+	by smtp.qiye.163.com (Hmail) with ESMTP id 28d8d27a7;
+	Sat, 8 Nov 2025 13:10:57 +0800 (GMT+08:00)
 From: Zilin Guan <zilin@seu.edu.cn>
-To: horms@kernel.org
-Cc: chuck.lever@oracle.com,
+To: steffen.klassert@secunet.com
+Cc: herbert@gondor.apana.org.au,
 	davem@davemloft.net,
 	edumazet@google.com,
-	jianhao.xu@seu.edu.cn,
-	kernel-tls-handshake@lists.linux.dev,
 	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
 	pabeni@redhat.com,
-	zilin@seu.edu.cn
-Subject: Re: [PATCH] net/handshake: Fix memory leak in tls_handshake_accept()
-Date: Sat,  8 Nov 2025 04:47:51 +0000
-Message-Id: <20251108044751.1229123-1-zilin@seu.edu.cn>
+	horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	jianhao.xu@seu.edu.cn,
+	Zilin Guan <zilin@seu.edu.cn>
+Subject: [PATCH] xfrm: fix memory leak in xfrm_add_acquire()
+Date: Sat,  8 Nov 2025 05:10:54 +0000
+Message-Id: <20251108051054.1259265-1-zilin@seu.edu.cn>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <aQ3HJRwkz6j512o7@horms.kernel.org>
-References: <aQ3HJRwkz6j512o7@horms.kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,69 +56,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-HM-Tid: 0a9a61cace6603a1kunm693c2da794dfac
+X-HM-Tid: 0a9a61dfeef903a1kunm2bd550c094fc87
 X-HM-MType: 10
-X-HM-Spam-Status: e1kfGhgUHx5ZQUpXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
-	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVlDSUweVh5MTUxIGB9JSU8YT1YeHw5VEwETFhoSFy
-	QUDg9ZV1kYEgtZQVlJSUhVSkpJVUpPTVVKTUlZV1kWGg8SFR0UWUFZT0tIVUpLSUJNS0pVSktLVU
-	tZBg++
+X-HM-Spam-Status: e1kfGhgUHx5ZQUtXWQgPGg8OCBgUHx5ZQUlOS1dZFg8aDwILHllBWSg2Ly
+	tZV1koWUFITzdXWS1ZQUlXWQ8JGhUIEh9ZQVkaQkwfVkxDTElJGkNPSRpJTVYeHw5VEwETFhoSFy
+	QUDg9ZV1kYEgtZQVlOQ1VJT0pVSk1VSE9ZV1kWGg8SFR0UWUFZS1VLVUtVS1kG
 DKIM-Signature: a=rsa-sha256;
-	b=OpF2M3Dh7/LUc8wzAlflSGi0kjjzPfctdVZjmbvTTkCPhdHF6bhwSGCVvVLijrWqlUIbYSQiKFJ628T0zTNtNuuRNDFA6lxgXrGASpVnoXMMEGTUT9HiGH51L1zrr2uv5UlaDcP/6Q1zjoBCcn6nTT+paM3VOoI5Os/qsAEwIlo=; s=default; c=relaxed/relaxed; d=seu.edu.cn; v=1;
-	bh=TAQmMO31HLgMDtOVSeqgq4qykOpghHX0B3OEYJv781A=;
+	b=g6xTdNiTOkuSum0lSOnJ+XO+D8ICTqGUbfprLYtZmnjwOuPh4baATXL/TrgzJXwqk+v7Y7eNBZNqbffz8i7n9LBraf3j1AasrP1NaSqytyDYXolL67tC/gpMlD9ciQiggGcXTpbGuiKPXq8r8RomY850Uu1V3G2LfuEXadiTHW0=; s=default; c=relaxed/relaxed; d=seu.edu.cn; v=1;
+	bh=mSnBSZgX14bQ00Hppf/u9+1AsIxnmoTIZoBNhjNfJog=;
 	h=date:mime-version:subject:message-id:from;
 
-On Fri, Nov 07, 2025 at 10:17:09AM +0000, Simon Horman wrote:
-> On Thu, Nov 06, 2025 at 02:45:11PM +0000, Zilin Guan wrote:
-> > In tls_handshake_accept(), a netlink message is allocated using
-> > genlmsg_new(). In the error handling path, genlmsg_cancel() is called
-> > to cancel the message construction, but the message itself is not freed.
-> > This leads to a memory leak.
-> > 
-> > Fix this by calling nlmsg_free() in the error path after genlmsg_cancel()
-> > to release the allocated memory.
-> > 
-> > Fixes: 2fd5532044a89 ("net/handshake: Add a kernel API for requesting a TLSv1.3 handshake")
-> > Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
-> > ---
-> >  net/handshake/tlshd.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/net/handshake/tlshd.c b/net/handshake/tlshd.c
-> > index 081093dfd553..8f9532a15f43 100644
-> > --- a/net/handshake/tlshd.c
-> > +++ b/net/handshake/tlshd.c
-> > @@ -259,6 +259,7 @@ static int tls_handshake_accept(struct handshake_req *req,
-> >  
-> >  out_cancel:
-> >  	genlmsg_cancel(msg, hdr);
-> 
-> Hi Zilin Guan,
-> 
-> I don't think genlmsg_cancel() is necessary if msg is freed on the next line.
-> If so, I suggest removing it, and renaming out_cancel accordingly.
->
-> > +	nlmsg_free(msg);
-> >  out:
-> >  	return ret;
-> >  }
-> > -- 
-> > 2.34.1
-> > 
+xfrm_add_acquire() constructs an xfrm_policy by calling
+xfrm_policy_construct(), which allocates the policy structure via
+xfrm_policy_alloc() and initializes its security context.
 
-Hi Simon,
+However, xfrm_add_acquire() currently releases the policy with kfree(),
+which skips the proper cleanup and causes a memory leak.
 
-Thanks for your review.
+Fix this by calling xfrm_policy_destroy() instead of kfree() to
+properly release the policy and its associated resources, consistent
+with the cleanup path in xfrm_policy_construct().
 
-I followed the pattern I observed in other parts of the kernel, for example,
-in cifs_swn_send_register_message() in fs/smb/client/cifs_swn.c, where
-genlmsg_cancel() is also called before nlmsg_free() in the error path.
+Fixes: 980ebd25794f ("[IPSEC]: Sync series - acquire insert")
+Signed-off-by: Zilin Guan <zilin@seu.edu.cn>
+---
+ net/xfrm/xfrm_user.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-My understanding is that this is the proper way to unwind the message
-construction before freeing it.
+diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+index 010c9e6638c0..23c9bb42bb2a 100644
+--- a/net/xfrm/xfrm_user.c
++++ b/net/xfrm/xfrm_user.c
+@@ -3035,7 +3035,7 @@ static int xfrm_add_acquire(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	}
+ 
+ 	xfrm_state_free(x);
+-	kfree(xp);
++	xfrm_policy_destroy(xp);
+ 
+ 	return 0;
+ 
+-- 
+2.34.1
 
-If you still believe it's unnecessary, I am happy to send a v2 patch
-to remove it.
-
-Best regards,
-Zilin Guan
 
