@@ -1,102 +1,61 @@
-Return-Path: <netdev+bounces-236987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8F2BC42E90
-	for <lists+netdev@lfdr.de>; Sat, 08 Nov 2025 15:49:50 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E83DC42ED1
+	for <lists+netdev@lfdr.de>; Sat, 08 Nov 2025 16:21:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id D1A594E29D5
-	for <lists+netdev@lfdr.de>; Sat,  8 Nov 2025 14:49:49 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EE35B4E0597
+	for <lists+netdev@lfdr.de>; Sat,  8 Nov 2025 15:21:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D5A620010A;
-	Sat,  8 Nov 2025 14:49:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD47C1DED57;
+	Sat,  8 Nov 2025 15:21:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d/avrUew"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tcL8aPM6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F5971DF72C
-	for <netdev@vger.kernel.org>; Sat,  8 Nov 2025 14:49:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 990DD14884C
+	for <netdev@vger.kernel.org>; Sat,  8 Nov 2025 15:21:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762613386; cv=none; b=pQnXsMmzCsh+7gNYj8BiRVh/QjVruVu0serNqVCo19FLhk1WZoJzgVHeGHaa6LJf1EpFRUx/j9iPrM5a+BrCHfwrXzK4pGLUw73tQ1wb92UjO93MMcvTHHAaXZnnb/iXtVj6lwKfRizxvyjfIaHLFW/wAo8bY0OXWv2WL3oNNxU=
+	t=1762615308; cv=none; b=O50BM80fHnNsm0/gOqW+5NlH6sHHbR1DXXLe1fpMZ9phrbsecPWUfJCvSgsTBQbsaaVyFcLRt0YHAH2op3YOnfhGcvhjj/caqjJlg4H115/YvQLf6xQzdIKVYt2/VEa0itUAwRscX7VpQPEddqV5/SG/9RkSLRhodMOQghwodiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762613386; c=relaxed/simple;
-	bh=1qg5xHB+nfsvZ/YDPOXzqun0wcu3deUA7lnrXuhvV5U=;
+	s=arc-20240116; t=1762615308; c=relaxed/simple;
+	bh=VP9OHcfqYgHtwlQzDrlW0wejPk6ULAFUw92nuf8FCCw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GY7I67y+EzzbdhjB+gOK3SXwrpTgr3awyP7ync0fQ2Ged/8CplrQOtgCc1xSi62GwIqgrNrh2//fV6nMTEUTQRlNU5BIkfMoUfJc/wX3L4CEn+eD2b/LbNfypFwyGfkbZWycwm7Peqz+BEHAKqLhWXGvbcEJDEcQEm3seKEw9Hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d/avrUew; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-477549b3082so15162025e9.0
-        for <netdev@vger.kernel.org>; Sat, 08 Nov 2025 06:49:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762613383; x=1763218183; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=t4ff5VcmU3TU7OayGkuk1bQc9Z5JUweNP/HWBPOh5Pg=;
-        b=d/avrUewndpTw+Duui9WHrEkTEsNxfWeabxwancDQ7ix3gUqRCeMa1/eevj2vz0dBm
-         iouHw9L88hRi3WF0sqKR1iydY2d/5xW8AQUGPJIGS1B2xeY/bvqWyHgiF4y5nQdOlUHK
-         SpoFF4qoywMa4B79YQYPQ9Ye0OTCzS3BHmy1aLTT45ag2H9YPmjEEH0Os+Q76ifJOvy+
-         RWOguPKUmmzncuTKbsg5/iIrBHwjtCHssuOTltCZycjwKWZvZ97N5OhWhOGQJ8l+Ejl+
-         cpWjYIRq2vIzVVxL3D+4/LD3FEueZP9eEPxdd1I9HUEecoWuQc2jwaPNYiT2pW04tJq2
-         PR7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762613383; x=1763218183;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=t4ff5VcmU3TU7OayGkuk1bQc9Z5JUweNP/HWBPOh5Pg=;
-        b=RMN9SK8lpfLpELgqVdNbBFTDMym9G0kzrh89nTlKZSGM4sqy38pGjcE3tFj8Zcv0Nr
-         KTff8KOCkcT6o5CaiDvChIWe0jUGnmI55w1dE1UFu7nV0g8B13sn0+zs+PwBJyAAXGE+
-         nBpWCFeXjN4H5B3+Gao88EQdhwpCDZS3X7IIrfOzDY7iFzuhBVTop8FLUk1KS66euJ+O
-         xS9us2lE5wzLl1MDc6cV/ezMygPfvGMASPEk9VgQSX/J59XU4TVvqTKWEkjAfkEY0ziV
-         CVFk7d5d3KoJU9egdX3E8vuFU1bsHC5RxcYbbm7zCah09CfCHskqAQYXSKOunREfyiOX
-         yntw==
-X-Forwarded-Encrypted: i=1; AJvYcCUPHH+i+aTEz0+DA11Vmvir3gHpID0HIJsRatnLNVfTAkmbqsYBF2M60bJfJv4xftku4pbLOLY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyz29bzHrp/s8XIxV1h8vWzfPEMWwClXLKtSvw8JBdkyOooJmUj
-	QFwKdQR6im/DLh2/I4+dxsX7tnnE1Zwm3pKxQilUa3a30QyP6o6aXeDn
-X-Gm-Gg: ASbGncv2OgVXMED6/Wdw/zw/SnwzvOFIgK8/5V95kXpJ21nlReFQxYvObh8RXNA4FfP
-	SKYmJGBLUOQ9ixS5Vw7OwEVMXlUQqvgCgFzJHyxeTHFA/xJvx8okcm5TdjuLC55gDBs02UMAtVQ
-	pEuManR+lntCVG2bn9b1d3hKHJ6AqDR5ekXfJCZ5wDg0j5G1u5ughcTGpSwF5d1AeNay47xz2u7
-	kFmDk4YlFj9OtY5k6Cp/qHqRQnmQGrQ1Ep92WMxEL3Wpgyh36mFGv4jZW1nJ/jC6A6UvUGvoWgU
-	ZCbOrJiUQhCuRoUW3n2nW7q2S5m5dTUfxnS9HR4nlNAqV5y6MPehtlSq6lm6gYfQU2xKsiJi/uC
-	6uGEAIXrbh5+1ICbzZCgtqgafFRxUtFvUZWQERqC3TJhv1XffQSip1gftwLmJTn2HOCfc3sFzjl
-	lYT7ScM6NehScwRGwxAWW/seH73syXn7MDGVeXiwkv1JqlxAUFcb5fD8g=
-X-Google-Smtp-Source: AGHT+IGydhhnshsez8CN8u1LX2G3/DoXSvva/5h6RN82FBeD+H9WCO0u3sOvJvmAtBnf+0fs2vK1Kw==
-X-Received: by 2002:a05:6000:18a3:b0:429:8b47:2f35 with SMTP id ffacd0b85a97d-42b2dc23fafmr2404180f8f.26.1762613382340;
-        Sat, 08 Nov 2025 06:49:42 -0800 (PST)
-Received: from eldamar.lan (c-82-192-244-13.customer.ggaweb.ch. [82.192.244.13])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b2e96441dsm4401402f8f.23.2025.11.08.06.49.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 08 Nov 2025 06:49:41 -0800 (PST)
-Sender: Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>
-Received: by eldamar.lan (Postfix, from userid 1000)
-	id 77A82BE2EE7; Sat, 08 Nov 2025 15:49:40 +0100 (CET)
-Date: Sat, 8 Nov 2025 15:49:40 +0100
-From: Salvatore Bonaccorso <carnil@debian.org>
-To: Fernando Fernandez Mancera <fmancera@suse.de>
-Cc: mc36 <csmate@nop.hu>, Jason Xing <kerneljasonxing@gmail.com>,
-	alekcejk@googlemail.com, Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
-	1118437@bugs.debian.org, netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: null pointer dereference in interrupt after receiving an ip
- packet on veth from xsk from user space
-Message-ID: <aQ9YhCAdu7QNyYxu@eldamar.lan>
-References: <0435b904-f44f-48f8-afb0-68868474bf1c@nop.hu>
- <CAL+tcoA5qDAcnZpmULsnD=X6aVP-ztRxPv5z1OSP-nvtNEk+-w@mail.gmail.com>
- <643fbe8f-ba76-49b4-9fb7-403535fd5638@nop.hu>
- <CAL+tcoDqgQbs20xV34RFWDoE5YPXS-ne3FBns2n9t4eggx8LAQ@mail.gmail.com>
- <d8808206-0951-4512-91cb-58839ba9b8c4@nop.hu>
- <7e58078f-8355-4259-b929-c37abbc1f206@suse.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=pX/7N+ZYx+E/MPVAOoJynf4sZOHohC/GD/QwAWe8H5c0QJ2sqw621CQ61NYNmH1ezM0VKqCbQzGtkICnlTwCov8F7LfhOAFCxBYQW+HiyccDfbquq7bz7XjmrXRIzJuc1JRRwOK6o8Th7dqOFx2M9O5Ld3pfM63Km+LgufUAqNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tcL8aPM6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A54D3C4CEF5;
+	Sat,  8 Nov 2025 15:21:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762615308;
+	bh=VP9OHcfqYgHtwlQzDrlW0wejPk6ULAFUw92nuf8FCCw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=tcL8aPM6RnshElCPuaHl5l5kZxKSlcOTXOyyLltAmhkHcO/3y0o8phB5SsagBxZGF
+	 tw84jxRxLC/LtY7IPY+KhkQDdT9u+kurZftRU0KZIT/CXweIgpPBAnbxnXE1tGaz/S
+	 BZCoMkrj94M3StyBfHvWIquC/ttYIQJZbdUyANDc/485KsaIhOM85uQASKbWu2cxij
+	 6hdwAbGbcJQFkh9I6tK8niih13XrKTvOL2/rHDTWEg7x8IkFprjB1/2UGgUhHNdQZV
+	 7/q+29oXzKuRD21PkI231R76LTE4hmdXUne0W0X+QgH9+uo5Ze0AIXzso1cDYOyRk9
+	 SpDpOO6u+KxEw==
+Date: Sat, 8 Nov 2025 15:21:43 +0000
+From: Simon Horman <horms@kernel.org>
+To: Saeed Mahameed <saeed@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
+	mbloch@nvidia.com, Adithya Jayachandran <ajayachandra@nvidia.com>
+Subject: Re: [PATCH net-next V2 2/3] net/mlx5: MPFS, add support for dynamic
+ enable/disable
+Message-ID: <aQ9gB4lCBaK19bRo@horms.kernel.org>
+References: <20251107000831.157375-1-saeed@kernel.org>
+ <20251107000831.157375-3-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,53 +64,109 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7e58078f-8355-4259-b929-c37abbc1f206@suse.de>
+In-Reply-To: <20251107000831.157375-3-saeed@kernel.org>
 
-Hi,
-
-On Tue, Oct 21, 2025 at 12:51:32PM +0200, Fernando Fernandez Mancera wrote:
+On Thu, Nov 06, 2025 at 04:08:30PM -0800, Saeed Mahameed wrote:
+> From: Saeed Mahameed <saeedm@nvidia.com>
 > 
+> MPFS (Multi PF Switch) is enabled by default in Multi-Host environments,
+> the driver keeps a list of desired unicast mac addresses of all vports
+> (vfs/Sfs) and applied to HW via L2_table FW command.
 > 
-> On 10/20/25 11:31 PM, mc36 wrote:
-> > hi,
-> > 
-> > On 10/20/25 11:04, Jason Xing wrote:
-> > > 
-> > > I followed your steps you attached in your code:
-> > > ////// gcc xskInt.c -lxdp
-> > > ////// sudo ip link add veth1 type veth
-> > > ////// sudo ip link set veth0 up
-> > > ////// sudo ip link set veth1 up
-> > 
-> > ip link set dev veth1 address 3a:10:5c:53:b3:5c
-> > 
-> > > ////// sudo ./a.out
-> > > 
-> > that will do the trick on a recent kerlek....
-> > 
-> > its the destination mac in the c code....
-> > 
-> > ps: chaining in the original reporter from the fedora land.....
-> > 
-> > 
-> > have a nice day,
-> > 
-> > cs
-> > 
-> > 
+> Add API to dynamically apply the list of MACs to HW when needed for next
+> patches, to utilize this new API in devlink eswitch active/in-active uAPI.
 > 
-> hi, FWIW I have reproduced this and I bisected it, issue was introduced at
-> 30f241fcf52aaaef7ac16e66530faa11be78a865 - working on a patch.
+> Issue: 4314625
+> Change-Id: I185c144319e514f787811f556888e1b727bdbf35
 
-Just a qustion in particular for the stable series shipping the commit
-(now only 6.17.y relevant at this point since 6.16.y is EOL): Give the
-proper fix will take a bit more time to develop, would it make sense
-to at least revert the offending commit in the stable series as the
-issue is, unless I missunderstood the report, remotely(?) triggerable
-denial of service? 
+nit: the issue and Change-Id should be dropped when upstreaming patches.
 
-Or do I miss something here?
+> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+> Signed-off-by: Adithya Jayachandran <ajayachandra@nvidia.com>
+> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+> ---
+>  .../ethernet/mellanox/mlx5/core/lib/mpfs.c    | 115 +++++++++++++++---
+>  .../ethernet/mellanox/mlx5/core/lib/mpfs.h    |   9 ++
+>  2 files changed, 107 insertions(+), 17 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.c
 
-Regards,
-Salvatore
+...
+
+> @@ -148,30 +151,34 @@ int mlx5_mpfs_add_mac(struct mlx5_core_dev *dev, u8 *mac)
+
+...
+
+> +	if (mpfs->enabled) {
+> +		err = alloc_l2table_index(mpfs, &index);
+> +		if (err)
+> +			goto hash_del;
+> +		err = set_l2table_entry_cmd(dev, index, mac);
+> +		if (err)
+> +			goto free_l2table_index;
+> +		mlx5_core_dbg(dev, "MPFS entry %pM, set @index (%d)\n",
+> +			      l2addr->node.addr, l2addr->index);
+
+nit: the following patch updates the line above to:
+
+			      l2addr->node.addr, index);
+
+     I don't think that change belongs in the following patch.
+
+...
+
+> +int mlx5_mpfs_enable(struct mlx5_core_dev *dev)
+> +{
+> +	struct mlx5_mpfs *mpfs = dev->priv.mpfs;
+> +	struct l2table_node *l2addr;
+> +	struct hlist_node *n;
+> +	int err = 0;
+> +
+> +	if (!mpfs)
+> +		return -ENODEV;
+> +
+> +	mutex_lock(&mpfs->lock);
+> +	if (mpfs->enabled)
+> +		goto out;
+> +	mpfs->enabled = true;
+> +	mlx5_core_dbg(dev, "MPFS enabling mpfs\n");
+> +
+> +	mlx5_mpfs_foreach(l2addr, n, mpfs) {
+> +		u32 index;
+> +
+> +		err = alloc_l2table_index(mpfs, &index);
+> +		if (err) {
+> +			mlx5_core_err(dev, "Failed to allocated MPFS index for %pM, err(%d)\n",
+> +				      l2addr->node.addr, err);
+> +			goto out;
+> +		}
+> +
+> +		err = set_l2table_entry_cmd(dev, index, l2addr->node.addr);
+> +		if (err) {
+> +			mlx5_core_err(dev, "Failed to set MPFS l2table entry for %pM index=%d, err(%d)\n",
+> +				      l2addr->node.addr, index, err);
+> +			free_l2table_index(mpfs, index);
+> +			goto out;
+> +		}
+> +
+> +		l2addr->index = index;
+> +		mlx5_core_dbg(dev, "MPFS entry %pM, set @index (%d)\n",
+> +			      l2addr->node.addr, l2addr->index);
+> +	}
+> +out:
+> +	mutex_unlock(&mpfs->lock);
+
+I realise that error handling can be complex at best, and particularly
+so when configuration ends up being partially applied. But I am wondering
+if the cleanup here is sufficient.
+
+In a similar vein, I also note that although this function returns an
+error, it is ignored by callers which are added by the following patch.
+Likewise for mlx5_esw_fdb_drop_create() which is also added by the
+following patch.
+
+> +	return err;
+> +}
+
+...
 
