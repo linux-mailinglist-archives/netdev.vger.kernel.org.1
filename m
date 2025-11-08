@@ -1,64 +1,72 @@
-Return-Path: <netdev+bounces-236927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D862C42437
-	for <lists+netdev@lfdr.de>; Sat, 08 Nov 2025 02:54:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58D31C42461
+	for <lists+netdev@lfdr.de>; Sat, 08 Nov 2025 03:05:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 074EB34A854
-	for <lists+netdev@lfdr.de>; Sat,  8 Nov 2025 01:54:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18AB6420026
+	for <lists+netdev@lfdr.de>; Sat,  8 Nov 2025 02:04:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B05FD29DB65;
-	Sat,  8 Nov 2025 01:54:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94CCB21D011;
+	Sat,  8 Nov 2025 02:04:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mf+Gza0J"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eEV7lI2v"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EE8D219A71;
-	Sat,  8 Nov 2025 01:54:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6372D249EB;
+	Sat,  8 Nov 2025 02:04:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762566887; cv=none; b=dOTmGwJd3AQIFWNnqYvUn4gONq74S4xAPIFOY+3o7dD8FtEQ7mHRagvq/kc06PdBG+oAuVi1QkI5lfOD72zL7W+tFbEHDufL8pzV2ew1TYKRTHwwiLawP3Gd+qbylIWDqo/cdWbJXXNEmq69f6fAN8747GeOrWCI9ntpFYedfyA=
+	t=1762567495; cv=none; b=E68LOJo5lMKSdBYmFXbH+cEGgRKYQVP4BoPYYm9AHeaHxlRZPMaiEVCq2ROg78T+FMqTxHSTG5xw/TNtR7wOFkg6SR0+VNRD3EtLrAwTHppL61/MgeAdAqkBopduKxkGDdcVzAl1Pat4Z+yhKfJBcG/EmFxNTKUpZX6j8upnDxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762566887; c=relaxed/simple;
-	bh=KwsTq0eN5+f8YdZnUHqQpE5xoyBoiV9hCa9F5h/P17o=;
+	s=arc-20240116; t=1762567495; c=relaxed/simple;
+	bh=A3pw3Uws4FZADY+XV/OyRYWDL7iOaTifPSKlNij7irY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uoOejuhJ4T/aVt0pqcsopypYvRYqPybM1zGiK5cj+mBGgQyc3Axb9cf7LGe1tuF4atgi+YnytxGICKdr8+83tUM9lm25oxMFj1ZdJUyHZM2pF1m1B1FH757MBv/7O3CszZdypaVlvouwVqsOjQGR2spAoARA9rb6SuDF5gYb7C0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mf+Gza0J; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EBE8C4CEF5;
-	Sat,  8 Nov 2025 01:54:46 +0000 (UTC)
+	 MIME-Version:Content-Type; b=nFImNn4KnPiRZ79jyxRdt1q1s2fVrSIVJLJoMRegtcpA+Fk6vscMcuMcU3qOA+lFLiyA9wxFwhfJ4/fBcOcjSwPrV16vH59zJORlZsuxS48n68D6jbhtMtc5otwwt3GHjD3XTTrNeH3b+krJ3r/VaRsR+5CAj8XUL/MAtWH/2os=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eEV7lI2v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43482C19422;
+	Sat,  8 Nov 2025 02:04:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762566887;
-	bh=KwsTq0eN5+f8YdZnUHqQpE5xoyBoiV9hCa9F5h/P17o=;
+	s=k20201202; t=1762567495;
+	bh=A3pw3Uws4FZADY+XV/OyRYWDL7iOaTifPSKlNij7irY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Mf+Gza0JFU9wwYzaaLr+Yz+a/NK52E0dh7W0GPm5dBRZRLEOWC1aoz67jd6UiXZWN
-	 ggugPJh3Rg4bNcs3N4qCQzqznHh0xcz1m8CbkRqwTFfohJ0meHtsYwdDwL9s8sl2lJ
-	 3a+mBCq6YiSdLHlhQ60jbpdiMIZzsZw58o/QpPzYYETu5oaaKm2chHyHNDd4Gt5Tyw
-	 V67EoOgzymb0GmmZMZgazI7b9yPArdQk+846eQQXKxWHFgrZOxzznH/XkOtvfQziCO
-	 vYen+B+Jdbu+C1c5Sb/fhOtVMLquY0lG83/vFpnHKEUdQqUsQnH4rV0CdBnXDahCst
-	 IKf0IseIm7i/A==
-Date: Fri, 7 Nov 2025 17:54:45 -0800
+	b=eEV7lI2vd9vmThz2VkxS0lgZgpOPpnE4n6Xf69h83jIdSo4O9Um4w/9ITyIh81bYo
+	 sgjGTq+rCn87XjDmDzLJE2sDT3Sjnj1sx4R1kDpVp/MQp8pearKzNZ72aE/CVrxw3v
+	 rH7FBNnvqQ1I0P16AN9k0sy6qWJRyR2CxMsXhUwolfLJo1IZflM+eH2G3b/moiDZ+Z
+	 ic4WUqvQ9lGmStcjUSqrSz07IUJo1e8BjHZH4CHV9kKKA4WpzQUC3bG3CG7mUFyO06
+	 /rhHqDdwKoziT52hrtqjhOutQQFU95WQZll/lktGyuNbb+6UMz9obpzI8cM0hQZ9rK
+	 AuRLaC/9qSCnw==
+Date: Fri, 7 Nov 2025 18:04:53 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: netdev@vger.kernel.org, Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?=
- <toke@toke.dk>, Eric Dumazet <eric.dumazet@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- ihor.solodrai@linux.dev, "Michael S. Tsirkin" <mst@redhat.com>,
- makita.toshiaki@lab.ntt.co.jp, toshiaki.makita1@gmail.com,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kernel-team@cloudflare.com
-Subject: Re: [PATCH net V3 1/2] veth: enable dev_watchdog for detecting
- stalled TXQs
-Message-ID: <20251107175445.58eba452@kernel.org>
-In-Reply-To: <b9f01e64-f7cc-4f5a-9716-5767b37e2245@kernel.org>
-References: <176236363962.30034.10275956147958212569.stgit@firesoul>
-	<176236369293.30034.1875162194564877560.stgit@firesoul>
-	<20251106172919.24540443@kernel.org>
-	<b9f01e64-f7cc-4f5a-9716-5767b37e2245@kernel.org>
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Joshua Washington <joshwash@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
+ <ilias.apalodimas@linaro.org>, Simon Horman <horms@kernel.org>, Willem de
+ Bruijn <willemb@google.com>, ziweixiao@google.com, Vedant Mathur
+ <vedantmathur@google.com>, io-uring@vger.kernel.org, David Wei
+ <dw@davidwei.uk>
+Subject: Re: [PATCH net v1 2/2] gve: use max allowed ring size for ZC
+ page_pools
+Message-ID: <20251107180453.17f0ed39@kernel.org>
+In-Reply-To: <k3h635mirxo3wichhpxosw4hxvfu67khqs2jyna3muhhj5pmvm@4t2gypnckuri>
+References: <20251105200801.178381-1-almasrymina@google.com>
+	<20251105200801.178381-2-almasrymina@google.com>
+	<20251105171142.13095017@kernel.org>
+	<CAHS8izNg63A9W5GkGVgy0_v1U6_rPgCj1zu2_5QnUKcR9eTGFg@mail.gmail.com>
+	<20251105182210.7630c19e@kernel.org>
+	<CAHS8izP0y1t4LU3nBj4h=3zw126dMtMNHUiXASuqDNyVuyhFYQ@mail.gmail.com>
+	<qhi7uuq52irirmviv3xex6h5tc4w4x6kcjwhqh735un3kpcx5x@2phgy3mnmg4p>
+	<20251106171833.72fe18a9@kernel.org>
+	<k3h635mirxo3wichhpxosw4hxvfu67khqs2jyna3muhhj5pmvm@4t2gypnckuri>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,74 +76,70 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 7 Nov 2025 14:42:58 +0100 Jesper Dangaard Brouer wrote:
-> > I think this belongs in net-next.. Fail safe is not really a bug fix.
-> > I'm slightly worried we're missing a corner case and will cause
-> > timeouts to get printed for someone's config.
-> 
-> This is a recovery fix.  If the race condition fix isn't 100% then this
-> patch will allow veth to recover.  Thus, to me it makes sense to group
-> these two patches together.
-> 
-> I'm more worried that we we're missing a corner case that we cannot
-> recover from. Than triggering timeouts to get printed, for a config
-> where NAPI consumer veth_poll() takes more that 5 seconds to run (budget
-> max 64 packets this needs to consume packets at a rate less than 12.8
-> pps). It might be good to get some warnings if the system is operating
-> this slow.
-> 
-> Also remember this is not the default config that most people use.
-> The code is only activated if attaching a qdisc to veth, which isn't
-> default. Plus, NAPI mode need to be activated, where in normal NAPI mode
-> the producer and consumer usually runs on the same CPU, which makes it
-> impossible to overflow the ptr_ring.  The veth backpressure is primarily
-> needed when running with threaded-NAPI, where it is natural that
-> producer and consumer runs on different CPUs. In our production setup
-> the consumer is always slower than the producer (as the product inside
-> the namespace have installed too many nftables rules).
-
-I understand all of this, but IMO the fix is in patch 2.
-This is a resiliency improvement, not a fix.
-
-> >> +static void veth_tx_timeout(struct net_device *dev, unsigned int txqueue)
-> >> +{
-> >> +	struct netdev_queue *txq = netdev_get_tx_queue(dev, txqueue);
-> >> +
-> >> +	netdev_err(dev, "veth backpressure stalled(n:%ld) TXQ(%u) re-enable\n",
-> >> +		   atomic_long_read(&txq->trans_timeout), txqueue);  
+On Fri, 7 Nov 2025 13:35:44 +0000 Dragos Tatulea wrote:
+> On Thu, Nov 06, 2025 at 05:18:33PM -0800, Jakub Kicinski wrote:
+> > On Thu, 6 Nov 2025 17:25:43 +0000 Dragos Tatulea wrote:  
+> > > I see a similar issue with io_uring as well: for a 9K MTU with 4K ring
+> > > size there are ~1% allocation errors during a simple zcrx test.
+> > > 
+> > > mlx5 calculates 16K pages and the io_uring zcrx buffer matches exactly
+> > > that size (16K * 4K). Increasing the buffer doesn't help because the
+> > > pool size is still what the driver asked for (+ also the
+> > > internal pool limit). Even worse: eventually ENOSPC is returned to the
+> > > application. But maybe this error has a different fix.  
 > > 
-> > If you think the trans_timeout is useful, let's add it to the message
-> > core prints? And then we can make this msg just veth specific, I don't
-> > think we should be repeating what core already printed.  
+> > Hm, yes, did you trace it all the way to where it comes from?
+> > page pool itself does not have any ENOSPC AFAICT. If the cache
+> > is full we free the page back to the provider via .release_netmem
+> >  
+> Yes I did. It happens in io_cqe_cache_refill() when there are no more
+> CQEs:
+> https://elixir.bootlin.com/linux/v6.17.7/source/io_uring/io_uring.c#L775
 > 
-> The trans_timeout is a counter for how many times this TXQ have seen a
-> timeout.  It is practical as it directly tell us if this a frequent
-> event (without having to search log files for similar events).
+> Looking at the code in zcrx I see that the amount of RQ entries and CQ
+> entries is 4K, which matches the device ring size, but doesn't match the
+> amount of pages available in the buffer:
+> https://github.com/isilence/liburing/blob/zcrx/rx-buf-len/examples/zcrx.c#L410
+> https://github.com/isilence/liburing/blob/zcrx/rx-buf-len/examples/zcrx.c#L176
 > 
-> It does make sense to add this to the core message ("NETDEV WATCHDOG")
-> with the same argument.  For physical NICs these logs are present in
-> production. Looking at logs through Kibana (right now) and it would make
-> my life easier to see the number of times the individual queues have
-> experienced timeouts.  The logs naturally gets spaced in time by the
-> timeout, making it harder to tell the even frequency. Such a patch would
-> naturally go though net-next.
+> Doubling the CQs (or both RQ and CQ size) makes the ENOSPC go away.
+> 
+> > > Adapting the pool size to the io_uring buffer size works very well. The
+> > > allocation errors are gone and performance is improved.
+> > > 
+> > > AFAIU, a page_pool with underlying pre-allocated memory is not really a
+> > > cache. So it is useful to be able to adapt to the capacity reserved by
+> > > the application.
+> > > 
+> > > Maybe one could argue that the zcrx example from liburing could also be
+> > > improved. But one thing is sure: aligning the buffer size to the
+> > > page_pool size calculated by the driver based on ring size and MTU
+> > > is a hassle. If the application provides a large enough buffer, things
+> > > should "just work".  
+> > 
+> > Yes, there should be no ENOSPC. I think io_uring is more thorough
+> > in handling the corner cases so what you're describing is more of 
+> > a concern..
+> 
+> Is this error something that io_uring should fix or is this similar to
+> EAGAIN where the application has to retry?
 
-Right, I see how it'd be useful. I think it's worth adding in the core.
+Not sure.. let me CC them.
 
-> Do you still want me to remove the frequency counter from this message?
-> By the same argument it is practical for me to have as a single log line
-> when troubleshooting this in practice. 
+> > Keep in mind that we expect multiple page pools from one provider.
+> > We want the pages to flow back to the MP level so other PPs can grab
+> > them.
+> >  
+> Oh, right, I forgot... And this can happen now only for devmem though,
+> right?
 
-IOW it makes it easier to query logs for veth timeouts vs non-veth
-timeouts? I'm tempted to suggest adding driver name to the logs in
-the core :) but it's fine, I'm already asking you to add the timeout
-count in the core.
+Right, tho I think David is also working on some queue sharing?
 
-I'm just trying to make sure everyone can benefit from the good ideas,
-rather than hiding them in one driver.
+> Still, this is an additional reason to give more control to the MP
+> over the page_pool config, right?
 
-> BTW, I've already backported this watchdog patch to prod kernel
-> (without race fix) and I'll try to reproduce the race in staging/lab
-> on some ARM64 servers.  If I reproduce it will be practical to have
-> this counter.
+This one I'm really not sure needs to be exposed via MP vs just
+netdev-nl. But yes, I'd imagine the driver default may be sub-optimal
+in either direction so giving user control over the sizing would be
+good.
 
