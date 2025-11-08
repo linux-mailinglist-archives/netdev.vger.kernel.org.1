@@ -1,68 +1,55 @@
-Return-Path: <netdev+bounces-237006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237007-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 460A0C43005
-	for <lists+netdev@lfdr.de>; Sat, 08 Nov 2025 17:37:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02313C43193
+	for <lists+netdev@lfdr.de>; Sat, 08 Nov 2025 18:23:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E97F34E4A0C
-	for <lists+netdev@lfdr.de>; Sat,  8 Nov 2025 16:37:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76BEF3A1B72
+	for <lists+netdev@lfdr.de>; Sat,  8 Nov 2025 17:20:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A472116E0;
-	Sat,  8 Nov 2025 16:37:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB24C227EB9;
+	Sat,  8 Nov 2025 17:20:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UogX/wtW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fBB0NZLp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32E7F3A8F7;
-	Sat,  8 Nov 2025 16:37:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A932116E0
+	for <netdev@vger.kernel.org>; Sat,  8 Nov 2025 17:20:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762619822; cv=none; b=WBM/MP1NdMdMHmI88+OOm8kcwUqgE7bvBmiY0OTyiSceaq2/jLAYLlshswuCyTOleNF0Y/E/i7fi2FYGSqScfjirNXWJBEks7qw/grXTEgoJWEGNQzap4PrZQUOidWXJPDeJSJrwJFHQUzltzFYhpBjX4jtjIYFB6Lr7upeI9RE=
+	t=1762622418; cv=none; b=sJBSzhUD/KbmmBcwnxsaq47L9C51j6SM8oHlSGpT5TAhYacRtXJlZkkalxngBLlEJF7ZSH80o3BzzVdyNJINFN6Fi73n2jrdo15AMp5bUuOBymJCCVRCkBBHHggXMgZLkKaKcmVhlWnd/EEUmw4jtJtPUKrbLZDvXOvbpTASxIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762619822; c=relaxed/simple;
-	bh=LVT/aIc2AON71l19ykVx0Fj5Bo0LsiK+P1KP4yuRAkc=;
+	s=arc-20240116; t=1762622418; c=relaxed/simple;
+	bh=4uBXZNjEeUsMFg1PyKHuxUfuFeuIUqbxNWqH+XsncZY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pJ2QJm5Osjs6gv6p0XZ+MkY/RHtSOHxWXqWxw7q2OFKbHB0/1J1QgylMhU7wb4LAI7+gtpCmXzvFyZfkyrX+K2tS4TCho3QjpZsGtEarYD2fPQj2G8VFJt56OIo7/HQ+IVwhUM8WF7tAHPSY9ws45FY5xhnm2gApCvlHkTDy4N0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UogX/wtW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 334C7C16AAE;
-	Sat,  8 Nov 2025 16:36:57 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=d6IeXoKCWxVB0FPVsjO+gUEdScDw/5PuBFpxAeg5AQbTqYI813Kx6CPzqsgL6AfSgA6mD38KrQJ4etkQ6afAG1p7eMFvxq9ZsJ3vn7MGf9732/lFUNlH04TCLur/wFxRqqrce5zNdYSbF8ZsY5EibK7PmvMvFMNcug9RBLfYtsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fBB0NZLp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 533CAC4AF09;
+	Sat,  8 Nov 2025 17:20:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762619820;
-	bh=LVT/aIc2AON71l19ykVx0Fj5Bo0LsiK+P1KP4yuRAkc=;
+	s=k20201202; t=1762622418;
+	bh=4uBXZNjEeUsMFg1PyKHuxUfuFeuIUqbxNWqH+XsncZY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UogX/wtWXGveHNi5Em0vXRdgXw47JbmHjtRNDT1sbxetQOrviyCtRRnWBqFBMbyh/
-	 DjfLPBul3iwbBViop268FCO1X1Sh345YbI0xD7QH4rTBGwV82ApQ0uo2HcEKGi91i5
-	 T4ixlSoOkS0aVHfEw9wTUDzdVlg0EaYv2veGEEN1nqtVnvmtluIvThF2BBVEE1TaM1
-	 QGbzZOo1waADecLNENgmjqFwpPd9DYb2PyR5hYc8tAaA0JxPFDiCnP6fgXIQXFkjRT
-	 SD1Ls0Pi+qbphltPr0kHJO6ywttC7sqMeeAlEglbSC0OZ+gpunSTmLV6lib5M45Qo0
-	 nbhdv69juwlqQ==
-Date: Sat, 8 Nov 2025 16:36:55 +0000
+	b=fBB0NZLp5IH2E2etese6w6N2OmdjvSftvJX5j98h1R8XtJu21Q7Dfhq51/XRWtgrH
+	 hGr4UIa+biFRFYlok4QKaNz8i1PExtd5xQPoBt5ukAjyafVjOa3uctbi8Lhy6hTBuq
+	 RDfyP/jmtOk/BBdbZ3XeKr1N4c81dpgZxrZ6HxQmsyHEN+kQ55F/x/wS8fSaD2EItr
+	 EHiiq4/jamcGK1luSUdnwf8jLfsf5fsdJdslUSvaFhPNc/tHYyoUA3K7nlo3D0z8fq
+	 a+B5U3ghKA+IPCsziyZQFhGvbMqmtQXMlwmbEA29VwCRWQHKs64bIPvopCeyatp7ZV
+	 zvHPGj4ZxFPEQ==
+Date: Sat, 8 Nov 2025 17:20:15 +0000
 From: Simon Horman <horms@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Ally Heev <allyheev@gmail.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	Dan Carpenter <dan.carpenter@linaro.org>
-Subject: Re: [Intel-wired-lan] [PATCH v3] net: ethernet: fix uninitialized
- pointers with free attribute
-Message-ID: <aQ9xp9pchMwml30P@horms.kernel.org>
-References: <20251106-aheev-uninitialized-free-attr-net-ethernet-v3-1-ef2220f4f476@gmail.com>
- <575bfdb1-8fc4-4147-8af7-33c40e619b66@intel.com>
+To: Joshua Hay <joshua.a.hay@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Subject: Re: [Intel-wired-lan][PATCH iwl-next v9 01/10] idpf: introduce local
+ idpf structure to store virtchnl queue chunks
+Message-ID: <aQ97z8ZZToGIxb3X@horms.kernel.org>
+References: <20251021233056.1320108-1-joshua.a.hay@intel.com>
+ <20251021233056.1320108-2-joshua.a.hay@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,74 +58,75 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <575bfdb1-8fc4-4147-8af7-33c40e619b66@intel.com>
+In-Reply-To: <20251021233056.1320108-2-joshua.a.hay@intel.com>
 
-On Thu, Nov 06, 2025 at 03:07:26PM +0100, Alexander Lobakin wrote:
-> From: Ally Heev <allyheev@gmail.com>
-> Date: Thu, 06 Nov 2025 17:25:48 +0530
-> 
-> > Uninitialized pointers with `__free` attribute can cause undefined
-> > behavior as the memory assigned randomly to the pointer is freed
-> > automatically when the pointer goes out of scope.
-> > 
-> > It is better to initialize and assign pointers with `__free`
-> > attribute in one statement to ensure proper scope-based cleanup.
-> > 
-> > Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> > Closes: https://lore.kernel.org/all/aPiG_F5EBQUjZqsl@stanley.mountain/
-> > Signed-off-by: Ally Heev <allyheev@gmail.com>
-> > ---
-> > Changes in v3:
-> > - fixed style issues
-> > - Link to v2: https://lore.kernel.org/r/20251106-aheev-uninitialized-free-attr-net-ethernet-v2-1-048da0c5d6b6@gmail.com
-> > 
-> > Changes in v2:
-> > - fixed non-pointer initialization to NULL
-> > - NOTE: drop v1
-> > - Link to v1: https://lore.kernel.org/r/20251105-aheev-uninitialized-free-attr-net-ethernet-v1-1-f6ea84bbd750@gmail.com
-> > ---
-> >  drivers/net/ethernet/intel/ice/ice_flow.c       | 5 +++--
-> >  drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 5 +++--
-> >  2 files changed, 6 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_flow.c b/drivers/net/ethernet/intel/ice/ice_flow.c
-> > index 6d5c939dc8a515c252cd2b77d155b69fa264ee92..3590dacf3ee57879b3809d715e40bb290e40c4aa 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice_flow.c
-> > +++ b/drivers/net/ethernet/intel/ice/ice_flow.c
-> > @@ -1573,12 +1573,13 @@ ice_flow_set_parser_prof(struct ice_hw *hw, u16 dest_vsi, u16 fdir_vsi,
-> >  			 struct ice_parser_profile *prof, enum ice_block blk)
-> >  {
-> >  	u64 id = find_first_bit(prof->ptypes, ICE_FLOW_PTYPE_MAX);
-> > -	struct ice_flow_prof_params *params __free(kfree);
-> >  	u8 fv_words = hw->blk[blk].es.fvw;
-> >  	int status;
-> >  	int i, idx;
-> >  
-> > -	params = kzalloc(sizeof(*params), GFP_KERNEL);
-> > +	struct ice_flow_prof_params *params __free(kfree) =
-> > +		kzalloc(sizeof(*params), GFP_KERNEL);
-> 
-> Please don't do it that way. It's not C++ with RAII and
-> declare-where-you-use.
-> Just leave the variable declarations where they are, but initialize them
-> with `= NULL`.
-> 
-> Variable declarations must be in one block and sorted from the longest
-> to the shortest.
-> 
-> But most important, I'm not even sure how you could trigger an
-> "undefined behaviour" here. Both here and below the variable tagged with
-> `__free` is initialized right after the declaration block, before any
-> return. So how to trigger an UB here?
+On Tue, Oct 21, 2025 at 04:30:47PM -0700, Joshua Hay wrote:
 
-FWIIW, I'd prefer if we sidestepped this discussion entirely
-by not using __free [1] in this driver.
+...
 
-It seems to me that for both functions updated by this
-patch that can easily be achieved using an idiomatic
-goto label to free on error.
+> diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
 
-[1] https://docs.kernel.org/process/maintainer-netdev.html#using-device-managed-and-cleanup-h-constructs
+...
+
+> @@ -1237,6 +1242,8 @@ static struct idpf_vport *idpf_vport_alloc(struct idpf_adapter *adapter,
+>  
+>  	return vport;
+>  
+> +free_qreg_chunks:
+> +	kfree(adapter->vport_config[idx]->qid_reg_info.queue_chunks);
+
+I think that the following is also needed here, to avoid a subsequent
+double-free.
+
+	adapter->vport_config[idx]->qid_reg_info.queue_chunks = NULL;
+
+>  free_vector_idxs:
+>  	kfree(vport->q_vector_idxs);
+>  free_vport:
+
+...
+
+> @@ -3658,6 +3668,11 @@ void idpf_vport_init(struct idpf_vport *vport, struct idpf_vport_max_q *max_q)
+>  	rss_data = &vport_config->user_config.rss_data;
+>  	vport_msg = adapter->vport_params_recvd[idx];
+>  
+> +	err = idpf_vport_init_queue_reg_chunks(vport_config,
+> +					       &vport_msg->chunks);
+> +	if (err)
+> +		return err;
+> +
+>  	vport_config->max_q.max_txq = max_q->max_txq;
+>  	vport_config->max_q.max_rxq = max_q->max_rxq;
+>  	vport_config->max_q.max_complq = max_q->max_complq;
+> @@ -3690,15 +3705,17 @@ void idpf_vport_init(struct idpf_vport *vport, struct idpf_vport_max_q *max_q)
+>  
+>  	if (!(vport_msg->vport_flags &
+>  	      cpu_to_le16(VIRTCHNL2_VPORT_UPLINK_PORT)))
+> -		return;
+> +		return 0;
+>  
+>  	err = idpf_ptp_get_vport_tstamps_caps(vport);
+>  	if (err) {
+>  		pci_dbg(vport->adapter->pdev, "Tx timestamping not supported\n");
+> -		return;
+> +		return err == -EOPNOTSUPP ? 0 : err;
+
+If a non-zero value is returned here, then
+the allocation (of adapter->vport_config[idx]->qid_reg_info.queue_chunks)
+made in idpf_vport_init_queue_reg_chunks() will be leaked.
+
+I think it should be both freed and set to NULL in this error path.
+Which I think suggests a helper to do so here and elsewhere.
+
+Flagged by Claude Code with https://github.com/masoncl/review-prompts/
+
+
+>  	}
+>  
+>  	INIT_WORK(&vport->tstamp_task, idpf_tstamp_task);
+> +
+> +	return 0;
+>  }
 
 ...
 
