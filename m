@@ -1,535 +1,135 @@
-Return-Path: <netdev+bounces-236972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1D0AC428B4
-	for <lists+netdev@lfdr.de>; Sat, 08 Nov 2025 08:04:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2149BC42906
+	for <lists+netdev@lfdr.de>; Sat, 08 Nov 2025 08:58:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B4E574E175C
-	for <lists+netdev@lfdr.de>; Sat,  8 Nov 2025 07:04:44 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E4BB24E0432
+	for <lists+netdev@lfdr.de>; Sat,  8 Nov 2025 07:58:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60AED2E54A8;
-	Sat,  8 Nov 2025 07:04:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7965026FA6E;
+	Sat,  8 Nov 2025 07:58:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S+J4RzGW"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Rv2wxtoh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AAFA2E5437
-	for <netdev@vger.kernel.org>; Sat,  8 Nov 2025 07:04:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D68C24A07;
+	Sat,  8 Nov 2025 07:58:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762585473; cv=none; b=bgrSMpXp37J96GjMBZ4vrog2GixYPFf1KWo7BJAY79C4kE16sEcQGqyWQnr9fes/Rpg4m7R0w3xogutmteRPmQzi6JW0MF6b/e9W7J+MSFHmVopNqlG2qhl9W/GZ6fyjDKxrQ4wO+AWwEKoRn+4N+tpRA8e5nXWNerMnCopDilU=
+	t=1762588722; cv=none; b=X0XEdnH9X2jriM+JF811bdsFhD6rwINPx7h8YsH0/PXexhtvbXfh6ZlfalRKQt7PQsWpW9GiRRFq+mkgjaIPGFwcvwfDCY6DukVazLNlxZi5HdrsXg4RaijnVGfq0lgfEX55n1B/hP4MhzPq21V+UbnbJkQxP9Z0otMu9jdJZ3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762585473; c=relaxed/simple;
-	bh=pOY9Dgkfe1aULhtHdEiGftiFB1jAfLtrMtUSoGYm6Bw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=D2BUBndjLwvrsRKQ0UYj37E/Jmu1JUNLJ/DQIxIosYLU3KZL40CohMHxxkcPpoWxLhMqEX9ICq38iVFhJP67ZxhvsWgG3Oh9ZyCSuzT45f70/wXIrFB6HtJhRwxPzYK3IOBPRjwGQvHhG8D/Fpx07vaaW+/t1WxASi9iCdQfh8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S+J4RzGW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01406C4CEFB;
-	Sat,  8 Nov 2025 07:04:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762585473;
-	bh=pOY9Dgkfe1aULhtHdEiGftiFB1jAfLtrMtUSoGYm6Bw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=S+J4RzGWFjBttX2dUbrHAXExPDKDf/zXEHN6XaC1OB8eTR/aIszAYq+2aYL/++xdW
-	 c/OrRQx6AQuqQsOc+SFyhaFO9Ccee5dY9yHZgJdQjl+Ame/qusdLPaNKmq+AmSqd+q
-	 xujcF+1+WrmD/rua7ugUeWYRqqN0qY39+s+rQAOsjPT38iN2U1wK/7hrAoz5XUC0tm
-	 Im5RV84y6F7UCfgYvvnMpXdIta0obhPWx74wD8m7J+SPHmh1jPrcePQJxJApFokMYY
-	 GnktK2JDscGWOX8c9RzNqaUnVMy+j/541KecwN14eKJunKV0dgEmCvA963S8bLH0xA
-	 ryu5Swi/m4GHw==
-From: Saeed Mahameed <saeed@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1762588722; c=relaxed/simple;
+	bh=ZXBkkkwvzKwb/Ha1NZvhSVCO6KAj+CY5jBPvpesBOwU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ASxRmxQyYhJIqRiKwzIkNAHRnlk57J5U7lFjGFE0Nv0MUfF3NQ+Ni+necWFwbDgyKjS6tf+kONond9s/HbB0bPQ16sQsZSMYmhe6Jzz9ctUfz4VgUH7NrJgCmNg314EVVenDW/+Y2Q+KStMow1DA9W+Xw81XVeqja+iDzqdN340=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Rv2wxtoh; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=13csuvQtsJof1dOcx8aG6Jr6ZCLtdjpsnRWnJo51I84=; b=Rv2wxtohwqYJPfuCefjstYazhS
+	J7sVL69bsh133ujRSUUL9rrB0a/kzxTXGGikUf2yKLeg7SmIMIT8UuJNoKhzCvfyGAAWz5Pe+EeEm
+	h2Q3xUXo+zHXfnRbj7Qyw+yNd1OHpPxkgHGUi0HVF6jlGu4p8MUsSzzkzdi1BfcZ8nJ49iFCq6/se
+	ZFmURo5WkmDkDgxbjYGaHpgr5UnQva3gNUyY8WgIrCVrLxhKy+ZdWv2qrhTCFKDvav2VUb6zLH+VB
+	pr2JJLW3b4SiifkY32GzQxiS7P334PO84sQOHxisN0vvi52hhb/G8h9REWWVIxAKPkvD8a139wNRt
+	Mb4K10Ng==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41096)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vHdq8-000000007Vz-3J1j;
+	Sat, 08 Nov 2025 07:58:28 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vHdpz-000000008Nb-48sV;
+	Sat, 08 Nov 2025 07:58:20 +0000
+Date: Sat, 8 Nov 2025 07:58:19 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>,
-	netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Jiri Pirko <jiri@nvidia.com>,
-	mbloch@nvidia.com,
-	Adithya Jayachandran <ajayachandra@nvidia.com>
-Subject: [PATCH net-next V3 3/3] net/mlx5: E-Switch, support eswitch inactive mode
-Date: Fri,  7 Nov 2025 23:04:04 -0800
-Message-ID: <20251108070404.1551708-4-saeed@kernel.org>
-X-Mailer: git-send-email 2.51.1
-In-Reply-To: <20251108070404.1551708-1-saeed@kernel.org>
-References: <20251108070404.1551708-1-saeed@kernel.org>
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Keguang Zhang <keguang.zhang@gmail.com>,
+	Kevin Hilman <khilman@baylibre.com>,
+	linux-amlogic@lists.infradead.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-mips@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Minda Chen <minda.chen@starfivetech.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>, netdev@vger.kernel.org,
+	Nobuhiro Iwamatsu <nobuhiro.iwamatsu.x90@mail.toshiba>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 16/16] net: stmmac: visconti: use
+ stmmac_get_phy_intf_sel()
+Message-ID: <aQ74G_WqoAusC2wd@shell.armlinux.org.uk>
+References: <aQ4ByErmsnAPSHIL@shell.armlinux.org.uk>
+ <E1vHNSq-0000000DkTN-3RoV@rmk-PC.armlinux.org.uk>
+ <14f80863-5766-437a-8e38-8991a1a725f9@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <14f80863-5766-437a-8e38-8991a1a725f9@bootlin.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: Saeed Mahameed <saeedm@nvidia.com>
+On Fri, Nov 07, 2025 at 07:23:26PM +0100, Maxime Chevallier wrote:
+> Hi Russell,
+> 
+> On 07/11/2025 15:29, Russell King (Oracle) wrote:
+> > -	switch (plat_dat->phy_interface) {
+> > -	case PHY_INTERFACE_MODE_RGMII:
+> > -	case PHY_INTERFACE_MODE_RGMII_ID:
+> > -	case PHY_INTERFACE_MODE_RGMII_RXID:
+> > -	case PHY_INTERFACE_MODE_RGMII_TXID:
+> > -		phy_intf_sel = ETHER_CONFIG_INTF_RGMII;
+> > -		break;
+> > -	case PHY_INTERFACE_MODE_MII:
+> > -		phy_intf_sel = ETHER_CONFIG_INTF_MII;
+> > -		break;
+> > -	case PHY_INTERFACE_MODE_RMII:
+> > -		phy_intf_sel = ETHER_CONFIG_INTF_RMII;
+> > -		break;
+> > -	default:
+> > +	int phy_intf_sel;
+> > +
+> > +	phy_intf_sel = stmmac_get_phy_intf_sel(plat_dat->phy_interface);
+> > +	if (phy_intf_sel != PHY_INTF_SEL_GMII_MII &&
+> > +	    phy_intf_sel != PHY_INTF_SEL_RGMII &&
+> > +	    phy_intf_sel != PHY_INTF_SEL_RMII) {
+> >  		dev_err(&pdev->dev, "Unsupported phy-mode (%d)\n", plat_dat->phy_interface);
+> >  		return -EOPNOTSUPP;
+> >  	}
+> 
+> Probably not too big of a deal, but don't we now incorrectly accept the
+> "gmii" mode ?
 
-Add support for eswitch switchdev inactive mode
+We will accept GMII mode, but (a) does that matter, and (b) shouldn't
+the DT binding be checking the phy-mode (we have some bindings that do.)
 
-Inactive mode: Drop all traffic going to FDB, Remove
-mpfs l2 rules and disconnect adjacent vports.
-
-Active mode: Traffic flows through FDB, mpfs table populated, and
-adjacent vports are connected.
-
-Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
-Signed-off-by: Adithya Jayachandran <ajayachandra@nvidia.com>
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
----
- .../mellanox/mlx5/core/esw/adj_vport.c        |  15 +-
- .../net/ethernet/mellanox/mlx5/core/eswitch.h |   6 +
- .../mellanox/mlx5/core/eswitch_offloads.c     | 207 +++++++++++++++++-
- .../net/ethernet/mellanox/mlx5/core/fs_core.c |   5 +
- .../ethernet/mellanox/mlx5/core/lib/mpfs.c    |   2 +-
- include/linux/mlx5/fs.h                       |   1 +
- 6 files changed, 214 insertions(+), 22 deletions(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/adj_vport.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/adj_vport.c
-index 0091ba697bae..250af09b5af2 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/esw/adj_vport.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/adj_vport.c
-@@ -4,13 +4,8 @@
- #include "fs_core.h"
- #include "eswitch.h"
- 
--enum {
--	MLX5_ADJ_VPORT_DISCONNECT = 0x0,
--	MLX5_ADJ_VPORT_CONNECT = 0x1,
--};
--
--static int mlx5_esw_adj_vport_modify(struct mlx5_core_dev *dev,
--				     u16 vport, bool connect)
-+int mlx5_esw_adj_vport_modify(struct mlx5_core_dev *dev, u16 vport,
-+			      bool connect)
- {
- 	u32 in[MLX5_ST_SZ_DW(modify_vport_state_in)] = {};
- 
-@@ -24,7 +19,7 @@ static int mlx5_esw_adj_vport_modify(struct mlx5_core_dev *dev,
- 	MLX5_SET(modify_vport_state_in, in, egress_connect_valid, 1);
- 	MLX5_SET(modify_vport_state_in, in, ingress_connect, connect);
- 	MLX5_SET(modify_vport_state_in, in, egress_connect, connect);
--
-+	MLX5_SET(modify_vport_state_in, in, admin_state, connect);
- 	return mlx5_cmd_exec_in(dev, modify_vport_state, in);
- }
- 
-@@ -96,7 +91,6 @@ static int mlx5_esw_adj_vport_create(struct mlx5_eswitch *esw, u16 vhca_id,
- 	if (err)
- 		goto acl_ns_remove;
- 
--	mlx5_esw_adj_vport_modify(esw->dev, vport_num, MLX5_ADJ_VPORT_CONNECT);
- 	return 0;
- 
- acl_ns_remove:
-@@ -117,8 +111,7 @@ static void mlx5_esw_adj_vport_destroy(struct mlx5_eswitch *esw,
- 
- 	esw_debug(esw->dev, "Destroying adjacent vport %d for vhca_id 0x%x\n",
- 		  vport_num, vport->vhca_id);
--	mlx5_esw_adj_vport_modify(esw->dev, vport_num,
--				  MLX5_ADJ_VPORT_DISCONNECT);
-+
- 	mlx5_esw_offloads_rep_remove(esw, vport);
- 	mlx5_fs_vport_egress_acl_ns_remove(esw->dev->priv.steering,
- 					   vport->index);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-index 16eb99aba2a7..beaec450a734 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
-@@ -264,6 +264,9 @@ struct mlx5_eswitch_fdb {
- 
- 		struct offloads_fdb {
- 			struct mlx5_flow_namespace *ns;
-+			struct mlx5_flow_table *drop_root;
-+			struct mlx5_flow_handle *drop_root_rule;
-+			struct mlx5_fc *drop_root_fc;
- 			struct mlx5_flow_table *tc_miss_table;
- 			struct mlx5_flow_table *slow_fdb;
- 			struct mlx5_flow_group *send_to_vport_grp;
-@@ -392,6 +395,7 @@ struct mlx5_eswitch {
- 	struct mlx5_esw_offload offloads;
- 	u32 last_vport_idx;
- 	int                     mode;
-+	bool                    offloads_inactive;
- 	u16                     manager_vport;
- 	u16                     first_host_vport;
- 	u8			num_peers;
-@@ -634,6 +638,8 @@ const u32 *mlx5_esw_query_functions(struct mlx5_core_dev *dev);
- 
- void mlx5_esw_adjacent_vhcas_setup(struct mlx5_eswitch *esw);
- void mlx5_esw_adjacent_vhcas_cleanup(struct mlx5_eswitch *esw);
-+int mlx5_esw_adj_vport_modify(struct mlx5_core_dev *dev, u16 vport,
-+			      bool connect);
- 
- #define MLX5_DEBUG_ESWITCH_MASK BIT(3)
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-index 4092ea29c630..0b1a180ef238 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-@@ -1577,6 +1577,7 @@ esw_chains_create(struct mlx5_eswitch *esw, struct mlx5_flow_table *miss_fdb)
- 	attr.max_grp_num = esw->params.large_group_num;
- 	attr.default_ft = miss_fdb;
- 	attr.mapping = esw->offloads.reg_c0_obj_pool;
-+	attr.fs_base_prio = FDB_BYPASS_PATH;
- 
- 	chains = mlx5_chains_create(dev, &attr);
- 	if (IS_ERR(chains)) {
-@@ -2355,6 +2356,131 @@ static void esw_mode_change(struct mlx5_eswitch *esw, u16 mode)
- 	mlx5_devcom_comp_unlock(esw->dev->priv.hca_devcom_comp);
- }
- 
-+static void mlx5_esw_fdb_drop_destroy(struct mlx5_eswitch *esw)
-+{
-+	if (!esw->fdb_table.offloads.drop_root)
-+		return;
-+
-+	esw_debug(esw->dev, "Destroying FDB drop root table %#x fc %#x\n",
-+		  esw->fdb_table.offloads.drop_root->id,
-+		  esw->fdb_table.offloads.drop_root_fc->id);
-+	mlx5_del_flow_rules(esw->fdb_table.offloads.drop_root_rule);
-+	/* Don't free flow counter here, can be reused on a later activation */
-+	mlx5_destroy_flow_table(esw->fdb_table.offloads.drop_root);
-+	esw->fdb_table.offloads.drop_root_rule = NULL;
-+	esw->fdb_table.offloads.drop_root = NULL;
-+}
-+
-+static int mlx5_esw_fdb_drop_create(struct mlx5_eswitch *esw)
-+{
-+	struct mlx5_flow_destination drop_fc_dst = {};
-+	struct mlx5_flow_table_attr ft_attr = {};
-+	struct mlx5_flow_destination *dst = NULL;
-+	struct mlx5_core_dev *dev = esw->dev;
-+	struct mlx5_flow_namespace *root_ns;
-+	struct mlx5_flow_act flow_act = {};
-+	struct mlx5_flow_handle *flow_rule;
-+	struct mlx5_flow_table *table;
-+	int err = 0, dst_num = 0;
-+
-+	if (esw->fdb_table.offloads.drop_root)
-+		return 0;
-+
-+	root_ns = esw->fdb_table.offloads.ns;
-+
-+	ft_attr.prio = FDB_DROP_ROOT;
-+	ft_attr.max_fte = 1;
-+	ft_attr.autogroup.max_num_groups = 1;
-+	table = mlx5_create_auto_grouped_flow_table(root_ns, &ft_attr);
-+	if (IS_ERR(table)) {
-+		esw_warn(dev, "Failed to create fdb drop root table, err %pe\n",
-+			 table);
-+		return PTR_ERR(table);
-+	}
-+
-+	/* Drop FC reusable, create once on first deactivation of FDB */
-+	if (!esw->fdb_table.offloads.drop_root_fc) {
-+		struct mlx5_fc *counter = mlx5_fc_create(dev, 0);
-+
-+		err = PTR_ERR_OR_ZERO(counter);
-+		if (err)
-+			esw_warn(esw->dev, "create fdb drop fc err %d\n", err);
-+		else
-+			esw->fdb_table.offloads.drop_root_fc = counter;
-+	}
-+
-+	flow_act.action = MLX5_FLOW_CONTEXT_ACTION_DROP;
-+
-+	if (esw->fdb_table.offloads.drop_root_fc) {
-+		flow_act.action |= MLX5_FLOW_CONTEXT_ACTION_COUNT;
-+		drop_fc_dst.type = MLX5_FLOW_DESTINATION_TYPE_COUNTER;
-+		drop_fc_dst.counter = esw->fdb_table.offloads.drop_root_fc;
-+		dst = &drop_fc_dst;
-+		dst_num++;
-+	}
-+
-+	flow_rule = mlx5_add_flow_rules(table, NULL, &flow_act, dst, dst_num);
-+	err = PTR_ERR_OR_ZERO(flow_rule);
-+	if (err) {
-+		esw_warn(esw->dev,
-+			 "fs offloads: Failed to add vport rx drop rule err %d\n",
-+			 err);
-+		goto err_flow_rule;
-+	}
-+
-+	esw->fdb_table.offloads.drop_root = table;
-+	esw->fdb_table.offloads.drop_root_rule = flow_rule;
-+	esw_debug(esw->dev, "Created FDB drop root table %#x fc %#x\n",
-+		  table->id, dst ? dst->counter->id : 0);
-+	return 0;
-+
-+err_flow_rule:
-+	/* no need to free drop fc, esw_offloads_steering_cleanup will do it */
-+	mlx5_destroy_flow_table(table);
-+	return err;
-+}
-+
-+static void mlx5_esw_fdb_active(struct mlx5_eswitch *esw)
-+{
-+	struct mlx5_vport *vport;
-+	unsigned long i;
-+
-+	mlx5_esw_fdb_drop_destroy(esw);
-+	mlx5_mpfs_enable(esw->dev);
-+
-+	mlx5_esw_for_each_vf_vport(esw, i, vport, U16_MAX) {
-+		if (!vport->adjacent)
-+			continue;
-+		esw_debug(esw->dev, "Connecting vport %d to eswitch\n",
-+			  vport->vport);
-+		mlx5_esw_adj_vport_modify(esw->dev, vport->vport, true);
-+	}
-+
-+	esw->offloads_inactive = false;
-+	esw_warn(esw->dev, "MPFS/FDB active\n");
-+}
-+
-+static void mlx5_esw_fdb_inactive(struct mlx5_eswitch *esw)
-+{
-+	struct mlx5_vport *vport;
-+	unsigned long i;
-+
-+	mlx5_mpfs_disable(esw->dev);
-+	mlx5_esw_fdb_drop_create(esw);
-+
-+	mlx5_esw_for_each_vf_vport(esw, i, vport, U16_MAX) {
-+		if (!vport->adjacent)
-+			continue;
-+		esw_debug(esw->dev, "Disconnecting vport %u from eswitch\n",
-+			  vport->vport);
-+
-+		mlx5_esw_adj_vport_modify(esw->dev, vport->vport, false);
-+	}
-+
-+	esw->offloads_inactive = true;
-+	esw_warn(esw->dev, "MPFS/FDB inactive\n");
-+}
-+
- static int esw_offloads_start(struct mlx5_eswitch *esw,
- 			      struct netlink_ext_ack *extack)
- {
-@@ -3438,6 +3564,10 @@ static int esw_offloads_steering_init(struct mlx5_eswitch *esw)
- 
- static void esw_offloads_steering_cleanup(struct mlx5_eswitch *esw)
- {
-+	mlx5_esw_fdb_drop_destroy(esw);
-+	if (esw->fdb_table.offloads.drop_root_fc)
-+		mlx5_fc_destroy(esw->dev, esw->fdb_table.offloads.drop_root_fc);
-+	esw->fdb_table.offloads.drop_root_fc = NULL;
- 	esw_destroy_vport_rx_drop_rule(esw);
- 	esw_destroy_vport_rx_drop_group(esw);
- 	esw_destroy_vport_rx_group(esw);
-@@ -3600,6 +3730,11 @@ int esw_offloads_enable(struct mlx5_eswitch *esw)
- 	if (err)
- 		goto err_steering_init;
- 
-+	if (esw->offloads_inactive)
-+		mlx5_esw_fdb_inactive(esw);
-+	else
-+		mlx5_esw_fdb_active(esw);
-+
- 	/* Representor will control the vport link state */
- 	mlx5_esw_for_each_vf_vport(esw, i, vport, esw->esw_funcs.num_vfs)
- 		vport->info.link_state = MLX5_VPORT_ADMIN_STATE_DOWN;
-@@ -3666,6 +3801,9 @@ void esw_offloads_disable(struct mlx5_eswitch *esw)
- 	esw_offloads_metadata_uninit(esw);
- 	mlx5_rdma_disable_roce(esw->dev);
- 	mlx5_esw_adjacent_vhcas_cleanup(esw);
-+	/* must be done after vhcas cleanup to avoid adjacent vports connect */
-+	if (esw->offloads_inactive)
-+		mlx5_esw_fdb_active(esw); /* legacy mode always active */
- 	mutex_destroy(&esw->offloads.termtbl_mutex);
- }
- 
-@@ -3676,6 +3814,7 @@ static int esw_mode_from_devlink(u16 mode, u16 *mlx5_mode)
- 		*mlx5_mode = MLX5_ESWITCH_LEGACY;
- 		break;
- 	case DEVLINK_ESWITCH_MODE_SWITCHDEV:
-+	case DEVLINK_ESWITCH_MODE_SWITCHDEV_INACTIVE:
- 		*mlx5_mode = MLX5_ESWITCH_OFFLOADS;
- 		break;
- 	default:
-@@ -3685,14 +3824,17 @@ static int esw_mode_from_devlink(u16 mode, u16 *mlx5_mode)
- 	return 0;
- }
- 
--static int esw_mode_to_devlink(u16 mlx5_mode, u16 *mode)
-+static int esw_mode_to_devlink(struct mlx5_eswitch *esw, u16 *mode)
- {
--	switch (mlx5_mode) {
-+	switch (esw->mode) {
- 	case MLX5_ESWITCH_LEGACY:
- 		*mode = DEVLINK_ESWITCH_MODE_LEGACY;
- 		break;
- 	case MLX5_ESWITCH_OFFLOADS:
--		*mode = DEVLINK_ESWITCH_MODE_SWITCHDEV;
-+		if (esw->offloads_inactive)
-+			*mode = DEVLINK_ESWITCH_MODE_SWITCHDEV_INACTIVE;
-+		else
-+			*mode = DEVLINK_ESWITCH_MODE_SWITCHDEV;
- 		break;
- 	default:
- 		return -EINVAL;
-@@ -3798,6 +3940,45 @@ static bool mlx5_devlink_netdev_netns_immutable_set(struct devlink *devlink,
- 	return ret;
- }
- 
-+/* Returns true when only changing between active and inactive switchdev mode */
-+static bool mlx5_devlink_switchdev_active_mode_change(struct mlx5_eswitch *esw,
-+						      u16 devlink_mode)
-+{
-+	/* current mode is not switchdev */
-+	if (esw->mode != MLX5_ESWITCH_OFFLOADS)
-+		return false;
-+
-+	/* new mode is not switchdev */
-+	if (devlink_mode != DEVLINK_ESWITCH_MODE_SWITCHDEV &&
-+	    devlink_mode != DEVLINK_ESWITCH_MODE_SWITCHDEV_INACTIVE)
-+		return false;
-+
-+	/* already inactive: no change in current state */
-+	if (devlink_mode == DEVLINK_ESWITCH_MODE_SWITCHDEV_INACTIVE &&
-+	    esw->offloads_inactive)
-+		return false;
-+
-+	/* already active: no change in current state */
-+	if (devlink_mode == DEVLINK_ESWITCH_MODE_SWITCHDEV &&
-+	    !esw->offloads_inactive)
-+		return false;
-+
-+	down_write(&esw->mode_lock);
-+	esw->offloads_inactive = !esw->offloads_inactive;
-+	esw->eswitch_operation_in_progress = true;
-+	up_write(&esw->mode_lock);
-+
-+	if (esw->offloads_inactive)
-+		mlx5_esw_fdb_inactive(esw);
-+	else
-+		mlx5_esw_fdb_active(esw);
-+
-+	down_write(&esw->mode_lock);
-+	esw->eswitch_operation_in_progress = false;
-+	up_write(&esw->mode_lock);
-+	return true;
-+}
-+
- int mlx5_devlink_eswitch_mode_set(struct devlink *devlink, u16 mode,
- 				  struct netlink_ext_ack *extack)
- {
-@@ -3812,12 +3993,16 @@ int mlx5_devlink_eswitch_mode_set(struct devlink *devlink, u16 mode,
- 	if (esw_mode_from_devlink(mode, &mlx5_mode))
- 		return -EINVAL;
- 
--	if (mode == DEVLINK_ESWITCH_MODE_SWITCHDEV && mlx5_get_sd(esw->dev)) {
-+	if (mlx5_mode == MLX5_ESWITCH_OFFLOADS && mlx5_get_sd(esw->dev)) {
- 		NL_SET_ERR_MSG_MOD(extack,
- 				   "Can't change E-Switch mode to switchdev when multi-PF netdev (Socket Direct) is configured.");
- 		return -EPERM;
- 	}
- 
-+	/* Avoid try_lock, active/inactive mode change is not restricted */
-+	if (mlx5_devlink_switchdev_active_mode_change(esw, mode))
-+		return 0;
-+
- 	mlx5_lag_disable_change(esw->dev);
- 	err = mlx5_esw_try_lock(esw);
- 	if (err < 0) {
-@@ -3840,7 +4025,7 @@ int mlx5_devlink_eswitch_mode_set(struct devlink *devlink, u16 mode,
- 	esw->eswitch_operation_in_progress = true;
- 	up_write(&esw->mode_lock);
- 
--	if (mode == DEVLINK_ESWITCH_MODE_SWITCHDEV &&
-+	if (mlx5_mode == MLX5_ESWITCH_OFFLOADS &&
- 	    !mlx5_devlink_netdev_netns_immutable_set(devlink, true)) {
- 		NL_SET_ERR_MSG_MOD(extack,
- 				   "Can't change E-Switch mode to switchdev when netdev net namespace has diverged from the devlink's.");
-@@ -3848,25 +4033,27 @@ int mlx5_devlink_eswitch_mode_set(struct devlink *devlink, u16 mode,
- 		goto skip;
- 	}
- 
--	if (mode == DEVLINK_ESWITCH_MODE_LEGACY)
-+	if (mlx5_mode == MLX5_ESWITCH_LEGACY)
- 		esw->dev->priv.flags |= MLX5_PRIV_FLAGS_SWITCH_LEGACY;
- 	mlx5_eswitch_disable_locked(esw);
--	if (mode == DEVLINK_ESWITCH_MODE_SWITCHDEV) {
-+	if (mlx5_mode == MLX5_ESWITCH_OFFLOADS) {
- 		if (mlx5_devlink_trap_get_num_active(esw->dev)) {
- 			NL_SET_ERR_MSG_MOD(extack,
- 					   "Can't change mode while devlink traps are active");
- 			err = -EOPNOTSUPP;
- 			goto skip;
- 		}
-+		esw->offloads_inactive =
-+			(mode == DEVLINK_ESWITCH_MODE_SWITCHDEV_INACTIVE);
- 		err = esw_offloads_start(esw, extack);
--	} else if (mode == DEVLINK_ESWITCH_MODE_LEGACY) {
-+	} else if (mlx5_mode == MLX5_ESWITCH_LEGACY) {
- 		err = esw_offloads_stop(esw, extack);
- 	} else {
- 		err = -EINVAL;
- 	}
- 
- skip:
--	if (mode == DEVLINK_ESWITCH_MODE_SWITCHDEV && err)
-+	if (mlx5_mode == MLX5_ESWITCH_OFFLOADS && err)
- 		mlx5_devlink_netdev_netns_immutable_set(devlink, false);
- 	down_write(&esw->mode_lock);
- 	esw->eswitch_operation_in_progress = false;
-@@ -3885,7 +4072,7 @@ int mlx5_devlink_eswitch_mode_get(struct devlink *devlink, u16 *mode)
- 	if (IS_ERR(esw))
- 		return PTR_ERR(esw);
- 
--	return esw_mode_to_devlink(esw->mode, mode);
-+	return esw_mode_to_devlink(esw, mode);
- }
- 
- static int mlx5_esw_vports_inline_set(struct mlx5_eswitch *esw, u8 mlx5_mode,
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
-index 2db3ffb0a2b2..2ca3bddbdf05 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/fs_core.c
-@@ -3520,6 +3520,11 @@ static int init_fdb_root_ns(struct mlx5_flow_steering *steering)
- 	if (!steering->fdb_root_ns)
- 		return -ENOMEM;
- 
-+	maj_prio = fs_create_prio(&steering->fdb_root_ns->ns, FDB_DROP_ROOT, 1);
-+	err = PTR_ERR_OR_ZERO(maj_prio);
-+	if (err)
-+		goto out_err;
-+
- 	err = create_fdb_bypass(steering);
- 	if (err)
- 		goto out_err;
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.c
-index 99fb7a53add0..4a88a42ae4f7 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/mpfs.c
-@@ -167,7 +167,7 @@ int mlx5_mpfs_add_mac(struct mlx5_core_dev *dev, u8 *mac)
- 		if (err)
- 			goto free_l2table_index;
- 		mlx5_core_dbg(dev, "MPFS entry %pM, set @index (%d)\n",
--			      l2addr->node.addr, l2addr->index);
-+			      l2addr->node.addr, index);
- 	}
- 
- 	l2addr->index = index;
-diff --git a/include/linux/mlx5/fs.h b/include/linux/mlx5/fs.h
-index 6ac76a0c3827..7bf2449c53b2 100644
---- a/include/linux/mlx5/fs.h
-+++ b/include/linux/mlx5/fs.h
-@@ -116,6 +116,7 @@ enum mlx5_flow_namespace_type {
- };
- 
- enum {
-+	FDB_DROP_ROOT,
- 	FDB_BYPASS_PATH,
- 	FDB_CRYPTO_INGRESS,
- 	FDB_TC_OFFLOAD,
 -- 
-2.51.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
