@@ -1,77 +1,61 @@
-Return-Path: <netdev+bounces-236935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-236936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1EADC424F4
-	for <lists+netdev@lfdr.de>; Sat, 08 Nov 2025 03:37:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AC63C42515
+	for <lists+netdev@lfdr.de>; Sat, 08 Nov 2025 03:41:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCA093AE711
-	for <lists+netdev@lfdr.de>; Sat,  8 Nov 2025 02:37:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 383173BC1B2
+	for <lists+netdev@lfdr.de>; Sat,  8 Nov 2025 02:41:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF8832957CD;
-	Sat,  8 Nov 2025 02:37:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 084252BD5A1;
+	Sat,  8 Nov 2025 02:41:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u1eDVBuy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gkObT6VY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 912AC28507B;
-	Sat,  8 Nov 2025 02:37:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D836727702E
+	for <netdev@vger.kernel.org>; Sat,  8 Nov 2025 02:41:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762569435; cv=none; b=qpmS0flzEsJqquTpYozqwHFLCZxIcv4b5VKl7adu2eHLJJml9nQHGLjyxp3kUv9/kLE7FEt4xxaqywybyb7M1mnzs20uwv+lPqb243tjv7qmKfNYtdErxcQ1c7icFKku+b/EnNjkenc/UVPingKCAQb4E4sJDiAC6WFL2l055Zk=
+	t=1762569663; cv=none; b=Mk3/SptckMh+zoF7L1++03DZ3/dak7YbdiwNY6AgqDZhabHrVelwGZpz+FWChwN5gR3pVgofw0MxrZFpJNTwvrqGlruAY2iqjfusFxS1umMzZVx6ebfkRiIYy+jZ1PicKXAcDGWXBGuf8OtYK887flVhygFxnmbAMBbNXrfNzBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762569435; c=relaxed/simple;
-	bh=Ou3u7Vf6165AwGz1NI7XrAGwfnZWVMEdqoH1Q7dBYYk=;
+	s=arc-20240116; t=1762569663; c=relaxed/simple;
+	bh=xVXlkI1ZGtDrbiL92CZlbKPAXXpGnUe237tMarden+A=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QqWJrqHeFSKRg5Yri/c5atqp+OF9UBbyryTzwyQh2GTPaFQnzUAG3MhXGjeeJJrb1i0sv67N/5OWKrLtNsISMZUvW0d4Strtb+olz8UHJGqmv289FhkL1+ZYtdu2NdB6aWsbyt6r/HMT/zZYtyWDplTn/vpsZrvuYsnD4y+3A2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u1eDVBuy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07224C19422;
-	Sat,  8 Nov 2025 02:37:12 +0000 (UTC)
+	 MIME-Version:Content-Type; b=JdBF3aWCIQvIkPwIH5Wuf/IiNsP2YzBfxniPgClZQcy3s9KoSWA5v9qeBTJNNX8R/GQRDq8eLFnFydO0kpeSYeg5bdkSbP5TRmZ5vDiDyCujmK0r5Tr1jYe1bEALM+uo7fqhkI4VgBUGkc7YeYrlPIH/x/nh5ZYizscecE/hKbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gkObT6VY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F41E5C4AF09;
+	Sat,  8 Nov 2025 02:41:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762569435;
-	bh=Ou3u7Vf6165AwGz1NI7XrAGwfnZWVMEdqoH1Q7dBYYk=;
+	s=k20201202; t=1762569663;
+	bh=xVXlkI1ZGtDrbiL92CZlbKPAXXpGnUe237tMarden+A=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=u1eDVBuyluzoT6wpUlZ1bNsISDdrnxrud/MWHNRrWneUQUSr0tLuPmnvHaGQ4xM4N
-	 //QJVSvXi9HicgXpdx9lhmTzGfyQd1bxAmnkwgqJd4+HcNQjvlaqLETmjHzDwMocZG
-	 8VBtwlLx06pOqPlDEr20kSSpYKH6ZdUF4BnNlcvHfDy2+SaerJT4o0RKUNtzkA3de2
-	 RDvboLOVpWoce0ylhnS/eztY27WUcAML5hVi3DM2XGkcgXhW2UE1gkvicQXHNY4GoN
-	 dXUHNw5MJNUrRv6j79+MScwp6ZAzr0iGyf4P1L4ym85uTBntzQGq+IZTRkJHrnBc40
-	 AZ06qf8B8xzzA==
-Date: Fri, 7 Nov 2025 18:37:12 -0800
+	b=gkObT6VY2uQPNyl7BIzQnlX013AZ28B1Umc9mgu6Fx4HdDrfTDLDS0gtNuzQRdVWw
+	 Lzl8JZoUJ6bh/4KSlLQftuURCbDGxH41sFd6m/bi/WrQuIxluqodfuVcPZuOGYpWbm
+	 UlZCWoh5BgHXJMZOr4RyzQGvqu6MmfEMQDWTPf4KsnI0wiRECJruTk/i1QsQrebZF7
+	 dJ7j5YnN6gQ6rv86Wg7Y8+8FzqvwPnZfNLv1YGUmv1gzcoiFTzeW/d5OsmWCicMNK6
+	 PTbz+rjrTpfFA9YAqNsQYXkvlvmvf2cImBdqk0Ij88H9sumvHZERlOejtxbT8dp8ib
+	 gB21KWHEjXE+Q==
+Date: Fri, 7 Nov 2025 18:41:02 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Byungchul Park <byungchul@sk.com>
-Cc: linux-mm@kvack.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
- harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
- davem@davemloft.net, hawk@kernel.org, john.fastabend@gmail.com,
- sdf@fomichev.me, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
- mbloch@nvidia.com, andrew+netdev@lunn.ch, edumazet@google.com,
- pabeni@redhat.com, akpm@linux-foundation.org, david@redhat.com,
- lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
- rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org,
- jackmanb@google.com, hannes@cmpxchg.org, ziy@nvidia.com,
- ilias.apalodimas@linaro.org, willy@infradead.org, brauner@kernel.org,
- kas@kernel.org, yuzhao@google.com, usamaarif642@gmail.com,
- baolin.wang@linux.alibaba.com, almasrymina@google.com, toke@redhat.com,
- asml.silence@gmail.com, bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
- sfr@canb.auug.org.au, dw@davidwei.uk, ap420073@gmail.com,
- dtatulea@nvidia.com
-Subject: Re: [RFC mm v5 1/2] page_pool: check nmdesc->pp to see its usage as
- page pool for net_iov not page-backed
-Message-ID: <20251107183712.36228f2a@kernel.org>
-In-Reply-To: <20251108022458.GA65163@system.software.com>
-References: <20251103075108.26437-1-byungchul@sk.com>
-	<20251103075108.26437-2-byungchul@sk.com>
-	<20251106173320.2f8e683a@kernel.org>
-	<20251107015902.GA3021@system.software.com>
-	<20251106180810.6b06f71a@kernel.org>
-	<20251107044708.GA54407@system.software.com>
-	<20251107174129.62a3f39c@kernel.org>
-	<20251108022458.GA65163@system.software.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: Manish Chopra <manishc@marvell.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
+ Cochran <richardcochran@gmail.com>, Simon Horman <horms@kernel.org>, Jacob
+ Keller <jacob.e.keller@intel.com>, Kory Maincent
+ <kory.maincent@bootlin.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/2] bnx2x: convert to use ndo_hwtstamp
+ callbacks
+Message-ID: <20251107184102.65b0f765@kernel.org>
+In-Reply-To: <20251106213717.3543174-2-vadim.fedorenko@linux.dev>
+References: <20251106213717.3543174-1-vadim.fedorenko@linux.dev>
+	<20251106213717.3543174-2-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,31 +65,25 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sat, 8 Nov 2025 11:24:58 +0900 Byungchul Park wrote:
-> On Fri, Nov 07, 2025 at 05:41:29PM -0800, Jakub Kicinski wrote:
-> > On Fri, 7 Nov 2025 13:47:08 +0900 Byungchul Park wrote:  
-> > > The offset of page_type in struct page cannot be used in struct net_iov
-> > > for the same purpose, since the offset in struct net_iov is for storing
-> > > (struct net_iov_area *)owner.  
-> > 
-> > owner does not have to be at a fixed offset. Can we not move owner
-> > to _pp_mapping_pad ? Or reorder it with type, enum net_iov_type
-> > only has 2 values we can smoosh it with page_type easily.  
-> 
-> I'm still confused.  I think you probably understand what this work is
-> for.  (I've explained several times with related links.)  Or am I
-> missing something from your questions?
-> 
-> I've answered your question directly since you asked, but the point is
-> that, struct net_iov will no longer overlay on struct page.
-> 
-> Instead, struct netmem_desc will be responsible for keeping the pp
-> fields while struct page will lay down the resonsibility, once the pp
-> fields will be removed from struct page like:
+On Thu,  6 Nov 2025 21:37:16 +0000 Vadim Fedorenko wrote:
+> +	switch (config->tx_type) {
+> +	case HWTSTAMP_TX_ONESTEP_SYNC:
+> +	case HWTSTAMP_TX_ONESTEP_P2P:
+> +		NL_SET_ERR_MSG_MOD(extack,
+> +				   "One-step timestamping is not supported");
+> +		return -ERANGE;
+> +	default:
+> +		break;
+> +	}
 
-I understand the end goal. I don't understand why patch 1 is a step 
-in that direction, and you seem incapable of explaining it. So please
-either follow my suggestion on how to proceed with patch 2 without
-patch 1 in current form. Or come back when have the full conversion
-ready.
+This is the wrong way around, if someone adds a new value unsupported
+by the driver it will pass. We should be listing the supported types
+and
+
+	default:
+		...ERR_MSG..
+		return -ERANGE;
+	}
+-- 
+pw-bot: cr
 
