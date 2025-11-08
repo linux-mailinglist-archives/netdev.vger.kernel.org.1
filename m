@@ -1,158 +1,141 @@
-Return-Path: <netdev+bounces-237008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9D74C431FC
-	for <lists+netdev@lfdr.de>; Sat, 08 Nov 2025 18:30:15 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6F05C43217
+	for <lists+netdev@lfdr.de>; Sat, 08 Nov 2025 18:35:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F3753A89E2
-	for <lists+netdev@lfdr.de>; Sat,  8 Nov 2025 17:30:14 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A9FC84E1280
+	for <lists+netdev@lfdr.de>; Sat,  8 Nov 2025 17:35:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E3C826A1CF;
-	Sat,  8 Nov 2025 17:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA4E1239E6C;
+	Sat,  8 Nov 2025 17:35:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xz7PhYlN"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="XlZcqYdJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f195.google.com (mail-pl1-f195.google.com [209.85.214.195])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08135267F58
-	for <netdev@vger.kernel.org>; Sat,  8 Nov 2025 17:30:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56DE734D395
+	for <netdev@vger.kernel.org>; Sat,  8 Nov 2025 17:35:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762623013; cv=none; b=it4t/nTjDwf4hi5RBdkS0a2jbPRh7+OqqmUBxmSG0GfRCBemtKAItpBwslY0Synzmbc8WCcFL9yQbFNFUAo1qfGzS9PuEoq3VEMHDFTcwElCdpqbEyCUoCVl40wgJualkzNnq7QCXd/l+ySO+lmrNWsh/PbkrSU6hjqMXglvwDs=
+	t=1762623351; cv=none; b=rfwPDdPmoSBvjkyyH1xzdeeVGFD21Bj9cxxWhGAfBjM94A+VOKCcNipd4YlYCnbHgAHTd25mwP5+sJCWACZEOyHFmRKitV5b7UMXXaTtxaXrRSfvtrClOpoJurILngXvM0POba1VyQjL7kg5sp2s6BUBIdoQRV7RY9noncqwnjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762623013; c=relaxed/simple;
-	bh=mqvOz/c5PMEmaEMrlMTr9mIFRYBwkDh40KxWBaUTkP0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F22BiPHq9qzllkbP/YhgPOhAPOwVxCHUDxN2vWM7xh8Nny/Bb1fqie+YDqpQN5ah9rXFYJ70H2P74E+ihKKg4bmWMXdjYCQ5Hlmj+ejiMs6R7J6tg8EcezukkvZJjXbjxlFiRl8oxejt8rga3NXHtEfnrbtPii25IOBo8JCfMg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xz7PhYlN; arc=none smtp.client-ip=209.85.214.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f195.google.com with SMTP id d9443c01a7336-29599f08202so21599715ad.3
-        for <netdev@vger.kernel.org>; Sat, 08 Nov 2025 09:30:10 -0800 (PST)
+	s=arc-20240116; t=1762623351; c=relaxed/simple;
+	bh=AVfRufsBy1zGLG3Ybk9J5YXqHNE2ZgDpQvsbUWeAjRw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HirWjpd0QAflMNDnbAQiTXtNRnNElAVTTiL2il6SeSUWPcCj80Zc2lF0YzmxH8IvAwFt/Q4s1/dZLs6dDZilkhQ4kxWBzuwp28Ess5ZDq1cp78BDaDnUCZmBaY0ouDWLe6L28As1Cf0WQRJ6NrQormAifFAhgB26YRs0rR4nfb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=XlZcqYdJ; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-47117f92e32so14311585e9.1
+        for <netdev@vger.kernel.org>; Sat, 08 Nov 2025 09:35:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762623010; x=1763227810; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ksh9yCu4UesSZktaqp077/wo5kGK4/tiGrzTuoLqT7M=;
-        b=Xz7PhYlN7QTrZUnk7vH9yXuvdg9pHlnstZrtSYCJ4rBT6tpcyp3w01cJ/sPGTP5nwS
-         2mYMqN6cRkR1XTdbATmjJ5bRrcRPIVZtAHX4tfrXYVtmRiX9xSWj0gYvaQasTc7dfCw1
-         g4mmHseOONvyXw+6NJ9ofaiTrvFPoaSG4RnPQqGrmslUEcFB6Ojgz34engdIkjWdgLVo
-         UduqA2rm6968FfzKoeExcrYtoQKVakkccjkE3V8//OfNw7iv66nZ8Iipk0yGy0CJZQmC
-         9XvLvKVRdH9n/93wifslMqka4cGgKRrTvrJINn+r9jMPhJsPlyE6ga51lGyt5aVHWmu/
-         zhrA==
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1762623346; x=1763228146; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=BLaQ6AXjkW7CDVrWIrRktAfa0T9Ox496TUA4Te5axmY=;
+        b=XlZcqYdJocTDhpqRIxWQs9qHPEffJiOvwR+pZmyA0mwZCiEIq5J8wiPKGSZ4xjq0Rd
+         j3g5FV3fWHQDbGPMbk4cly3pMumve02d/vo92UY9DwECli1P9siATebw4EjvULHhSbzu
+         3XcO1RM9TFWSD1llY6jgzVrfeB/lb8I68HXdgXFat6+BpP8vzdVVaHWuDrTw5FvZrRqJ
+         SB1jUR44Jd9KauEyK2tUuNaJ4qwQCVR+ibp7dCa9VtbAZwXqJf2PS4ltNAKHF9Hz+IB9
+         uWwzf5Tc37gnfaJSsolGlgg6OcrCyKcCpoYSByA8LmwUQNyrfAP/t96gCqpk3wAYyiJ5
+         2r0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762623010; x=1763227810;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ksh9yCu4UesSZktaqp077/wo5kGK4/tiGrzTuoLqT7M=;
-        b=sccYQPx2UzC6G+6AaQxHiRmWzJv3nwgK+UlW8yL7g6dKl/H+cI1EUqfoLVhlrQt7U2
-         2GPPcZcve02VSj4mH5MERMU5rnjLV5LMc8tuDGTb87Fx1NuPU7fF1/GVzjqpFXeoleZZ
-         PBirxQ52MDeVuzU5+G2pU39SnJCLzxduzbMulPExvOnRloYiqDVFkN68pGuq/44Uvruw
-         rSiiV932KVXGgXLEoPnU5DZRf5p8PGfRkUBgpCIK8L3syI2+W3wEKkwBWkdHZWAw8mMd
-         WJRq1e8Cxq+7GRXLVSy1cBjiySwvp1aqqgXXJfhPa/jU2sWn98AFrlYkF3oSYEjVD6rg
-         IDwg==
-X-Forwarded-Encrypted: i=1; AJvYcCVtQ1RNjMV0XW+9PYa4HtSAp2AnDGQSIuoD3BjSJiIm459K5eHS2Ol3VUjK3QnZwiupF32afgQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YykIc7NbjQyvZ6JEWuriDsdezcqKokd6NvFMKYRICtB+6Ymd/EF
-	g+2De/rmvfyiHCMc1zCP9d/sWKrGXLGOtrv5T7tNo+NsXUST3ZQH3/6kwhi1FznJ
-X-Gm-Gg: ASbGncvrUX73KiUx05Qdf6vYk8LzZEEHNdQzD/Ikr5M//RlFtND+Fn2uu6P5v/51gm3
-	BWxnuzhF/8u+CkSbe3qv3lax/7MdmMgpR5p5Vjz81t/ZMondbbzxmMDSzic2GRAETDFn5oOsF0T
-	xC8+O4Qq0FtIBTaSZ1+sYBxDTywdd7rO9KdI5uTTAB0VlCEo+sNW6GEqgOdLaD7mcPq+LOMbpmo
-	5yGXr/grgGubNBFww1gxTa71NbOiCWWa+aW1YHx/LfIl2pd5/NoJQ01nzJcQDwAe3EaI5eATJAG
-	OlJpIhg9f6elqiBTNTnMqiTY/wU/UBK+BrgORNochBt6XgMhcr9I36PrBCYlDBSYxfjp9hzpp2w
-	JqAVc9Ek39OgRQVcjKGc/G8bQi/XNcpDuYaBRoE3e665aeHRgg8dlrFG2urMTOIOa40cX1eJ8Ch
-	fsXwrAKwh7afUZe8XG8co=
-X-Google-Smtp-Source: AGHT+IFLUU/VWag8EJzSY/0xYAOHUmVtlabS8D9NAS2JD/HU1e2hrzCK0vE/MQxp1herrE49UHd/uA==
-X-Received: by 2002:a17:902:e848:b0:296:3f23:b939 with SMTP id d9443c01a7336-297e56ce0b1mr51308795ad.42.1762623010252;
-        Sat, 08 Nov 2025 09:30:10 -0800 (PST)
-Received: from fedora ([103.120.31.122])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29650c5c72esm93914635ad.33.2025.11.08.09.30.04
+        d=1e100.net; s=20230601; t=1762623346; x=1763228146;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BLaQ6AXjkW7CDVrWIrRktAfa0T9Ox496TUA4Te5axmY=;
+        b=LBmXpdw5Znh8o1tC0m5X77m3tLW4wKT1W1pQjJECcJeCYlMgljNJFq8LIRb3anphfz
+         Bxq4FLB6JAcpD1Gg4FqQfyWtWTMcjWydohU53i+MsFh20coc7cuv9F7xXBuVycT4mb89
+         NoD9NZB+E+Yjw8pR7iL8FiDYO2v0fSDLKS2jypVdwFpMSZpK/GWBZUajOqeqlWkUryvp
+         b1GERej7WJ8jlysUuLFmep6QO17vDdbWuPcuVzxROYXTAYBr0/BjQFTsBAjnQRweEheW
+         HA6ku0DvY80VsOCZ19ZWAfvYWZsDrSi27vuM5M8zy3OFGToU91NlokeWp7pzACFzpmw6
+         qMVg==
+X-Gm-Message-State: AOJu0Yx4GHdE8Arlrjf6ZsdhexDZ/i3JAzFqpYWu5rkJWZoh3yzN+gqr
+	m8N5nxB9xgkn7c+191rR+O3j1evin7W/CzsPVnOfcIFq0JwNE8TrwpQMZiGLGG6BhAV8bC8xQYN
+	prOduqwQ=
+X-Gm-Gg: ASbGncskv3oPiga92zHz46y6Y6XrncwcBjWrNyxaS+6EBuqPPLhCilfk41vwSJfNQPH
+	VaR34HMeFSP4izf5jdY9YXkA7x2AO/k5y3agm/kqg00wKZyjwGp31/6YTRYR1Duj+X0xNXI/Ngt
+	srkBApQkQmSRA/a4LgNqtU7pBmf+W76hTkvabulScSKRSor/fsODt/gIKdpm7RAyiBWy4BBHJqd
+	3r+K6h/YyAL4M5ytySuDuxAkxUW908vqrrw0R5Y81U6uIfr5isKUB11RxSdotATkf9LBzRkJF87
+	S5dcsCQxwQkUjSqlBeb+TnxBuwKcUx2z43b5T+fNcfLsk37WtbXRGFGYP2uBLsdOt8mCXu9WB4B
+	jimHvD5Cd1ElGAH+QjYgNJ9vKDRPEL4Mg4u4MMyU0BQYRTsjKxU+OsvGYl1bZCkMk9da7LnC0dV
+	Q7UHuMzlVUZaOhR5RQ4WjS66fBV0kqwBQEgW8oyXE9oSuTHBLLDg==
+X-Google-Smtp-Source: AGHT+IHGLEYYDQAZ7uc4ZLEeSHgjt73zWGLxBfUYFj3dzWvQX8ZkpbGSnA72GR03PFGVtAUM0IQtDg==
+X-Received: by 2002:a05:600c:a05:b0:477:54cd:202e with SMTP id 5b1f17b1804b1-4777322eeb2mr26791325e9.2.1762623345245;
+        Sat, 08 Nov 2025 09:35:45 -0800 (PST)
+Received: from phoenix.lan (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4776bccd41bsm111163325e9.2.2025.11.08.09.35.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 08 Nov 2025 09:30:09 -0800 (PST)
-Date: Sat, 8 Nov 2025 22:59:59 +0530
-From: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Xing <kernelxing@tencent.com>, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kernel-mentees@lists.linuxfoundation.org
-Subject: Re: [PATCH] selftest: net: fix variable sized type not at the end of
- struct warnings
-Message-ID: <aQ9-F34aW__rlMuD@fedora>
-References: <20251027050856.30270-1-ankitkhushwaha.linux@gmail.com>
- <aQD8AOZduY4Fit3k@horms.kernel.org>
+        Sat, 08 Nov 2025 09:35:44 -0800 (PST)
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>,
+	ernis@linux.microsoft.com
+Subject: [PATCH iproute2] netshaper: remove unused variable
+Date: Sat,  8 Nov 2025 09:35:26 -0800
+Message-ID: <20251108173540.21503-1-stephen@networkplumber.org>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <aQD8AOZduY4Fit3k@horms.kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 28, 2025 at 05:23:12PM +0000, Simon Horman wrote:
-> On Mon, Oct 27, 2025 at 10:38:56AM +0530, Ankit Khushwaha wrote:
-> > Some network selftests defined variable-sized types defined at the end of
-> > struct causing -Wgnu-variable-sized-type-not-at-end warning.
-> > 
-> > warning:
-> > timestamping.c:285:18: warning: field 'cm' with variable sized type 
-> > 'struct cmsghdr' not at the end of a struct or class is a GNU 
-> > extension [-Wgnu-variable-sized-type-not-at-end]
-> >   285 |                 struct cmsghdr cm;
-> >       |                                ^
-> > 
-> > ipsec.c:835:5: warning: field 'u' with variable sized type 'union 
-> > (unnamed union at ipsec.c:831:3)' not at the end of a struct or class 
-> > is a GNU extension [-Wgnu-variable-sized-type-not-at-end]
-> >   835 |                 } u;
-> >       |                   ^
-> > 
-> > This patch move these field at the end of struct to fix these warnings.
-> > 
-> > Signed-off-by: Ankit Khushwaha <ankitkhushwaha.linux@gmail.com>
-> 
-> Hi Ankit,
-> 
-> I don't believe this change is correct.
-> 
-> I think that the intention of the code is the char arrays (buf and control)
-> provide the buffer space for the variable-length trailing field
-> of the preceding structure. Where we basically have a header followed
-> by data. But your patch would place the before the header.
->
-Hi Simon,
-So if buf and control providing the buffer space, then i think it is
-better to suppress `-Wgnu-variable-sized-type-not-at-end` warning 
-within this block of code.
+Clang complains that the variable 'n' used for nlmsghdr is passed
+uninitiailized. Remove it because it is never used.
 
-	#pragma GCC diagnostic push
-	#pragma GCC diagnostic ignored "-Wgnu-variable-sized-type-not-at-end"
+Fixes: 6f7779ad4ef6 ("netshaper: Add netshaper command")
+Cc: ernis@linux.microsoft.com
 
-	struct {
-		union {
-			struct xfrm_algo        alg;
-			struct xfrm_algo_aead   aead;
-			struct xfrm_algo_auth   auth;
-		} u;
-		char buf[XFRM_ALGO_KEY_BUF_SIZE];
-	} alg = {};
+Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+---
+ netshaper/netshaper.c | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-	#pragma GCC diagnostic pop
+diff --git a/netshaper/netshaper.c b/netshaper/netshaper.c
+index edd964c1..47fb805e 100644
+--- a/netshaper/netshaper.c
++++ b/netshaper/netshaper.c
+@@ -98,7 +98,7 @@ static void print_netshaper_attrs(struct nlmsghdr *answer)
+ 	}
+ }
+ 
+-static int do_cmd(int argc, char **argv, struct nlmsghdr *n, int cmd)
++static int do_cmd(int argc, char **argv, int cmd)
+ {
+ 	GENL_REQUEST(req, 1024, genl_family, 0, NET_SHAPER_FAMILY_VERSION, cmd,
+ 		     NLM_F_REQUEST | NLM_F_ACK);
+@@ -220,7 +220,6 @@ static int do_cmd(int argc, char **argv, struct nlmsghdr *n, int cmd)
+ 
+ int main(int argc, char **argv)
+ {
+-	struct nlmsghdr *n;
+ 	int color = default_color_opt();
+ 
+ 	while (argc > 1) {
+@@ -258,11 +257,11 @@ int main(int argc, char **argv)
+ 		argv++;
+ 
+ 		if (strcmp(*argv, "set") == 0)
+-			return do_cmd(argc - 1, argv + 1, n, NET_SHAPER_CMD_SET);
++			return do_cmd(argc - 1, argv + 1, NET_SHAPER_CMD_SET);
+ 		if (strcmp(*argv, "delete") == 0)
+-			return do_cmd(argc - 1, argv + 1, n, NET_SHAPER_CMD_DELETE);
++			return do_cmd(argc - 1, argv + 1, NET_SHAPER_CMD_DELETE);
+ 		if (strcmp(*argv, "show") == 0)
+-			return do_cmd(argc - 1, argv + 1, n, NET_SHAPER_CMD_GET);
++			return do_cmd(argc - 1, argv + 1, NET_SHAPER_CMD_GET);
+ 		if (strcmp(*argv, "help") == 0) {
+ 			usage();
+ 			return 0;
+-- 
+2.51.0
 
-I think this would be fine.
-
-Thanks
--- Ankit
 
