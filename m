@@ -1,171 +1,162 @@
-Return-Path: <netdev+bounces-237021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94C49C4353D
-	for <lists+netdev@lfdr.de>; Sat, 08 Nov 2025 23:18:40 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC4DFC436A5
+	for <lists+netdev@lfdr.de>; Sun, 09 Nov 2025 01:11:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8A5DE4E25EF
-	for <lists+netdev@lfdr.de>; Sat,  8 Nov 2025 22:18:39 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A579A4E21C1
+	for <lists+netdev@lfdr.de>; Sun,  9 Nov 2025 00:11:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B77572749E4;
-	Sat,  8 Nov 2025 22:18:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C66D6FC5;
+	Sun,  9 Nov 2025 00:11:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="KeZx0z5c"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YQfla0ev"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25CF334D38B
-	for <netdev@vger.kernel.org>; Sat,  8 Nov 2025 22:18:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 096AA34D3B7
+	for <netdev@vger.kernel.org>; Sun,  9 Nov 2025 00:11:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762640315; cv=none; b=jXltmYGgHRM+A3xCjNu/PsueEdbtJCIBXXPFAApHMBLSOV61PTmh2JIekWWmsFlf0zn+MMVuX0ueOJnk87DQGl/jcduZ7C1wdeXwR5YE4+63/VlhjYSnax6z7ucord8qI/lqI7rsPfvMwt6zcYa8yaSSN/ABwuTr6qRwzHILgzk=
+	t=1762647062; cv=none; b=Pec8msvBjCiWTg9pF/65A2z9mqnBQQYkYtuxWhzbOc4BBLtrnzGHk9L+NANNPAy1VL0X58bZxUgGD1n95H5KHV1uTYvE4H/VfZ80PvFpI/PRtuRKZDnzzRRfsFVIHVtuqH2jpL6GrzbqZVuXi7KFrzJuiVKlVpGuOI+OjF/voj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762640315; c=relaxed/simple;
-	bh=sOyWUH4PJlEt0W4EDV6GU7ywI9tQ+pHIBDmOGSIJvzo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EwHsx2KFDHCUkqFGxYGjmosztvsTZ9RuNfgL105+IMoeqMt2yYt5/nQVlmc3WC39Iv+bTXIGQP4v2s90PVDxWUglhzSobqSSn0mbGb2IOWksQK2ASVXk504J8MD6N6HvcVz9bubMSwVfmKGXoZe1ET+5MlJmQaSp1M5LR64TPtc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=KeZx0z5c; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7b0c3451272so2416965b3a.0
-        for <netdev@vger.kernel.org>; Sat, 08 Nov 2025 14:18:33 -0800 (PST)
+	s=arc-20240116; t=1762647062; c=relaxed/simple;
+	bh=uciTLeXnGZa+fHKIKHqbTzuMHbVFCOUEY8frA2QOXIw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=C9LptAdYPQ6dxELNeHQt26krPthuw/bHhiO0d09F3ZuH5edq5r/n4UknUNuh7XBN7bH+2JUH6k3kO9qiYYBHJlXjXlodVH9KGPFgDlck4NC1G9Zktgww3Pi9kcCDXR4LetZP7ojHR6r1XzJ0dIq87RPNA/avLscVZghuAiVn/fA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YQfla0ev; arc=none smtp.client-ip=209.85.166.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-43323851d03so7421955ab.0
+        for <netdev@vger.kernel.org>; Sat, 08 Nov 2025 16:11:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1762640313; x=1763245113; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3zx7ylCByFKgLwnrdIb/dt/z22++1cxZrkl9z5eA2Bk=;
-        b=KeZx0z5cPlvDxue1VbN1WJMlYI4gLxBuUGi7DQ7eeVZyUJ61fwoCEf8pNnObN8nBQT
-         gL+UY3r/0ctrW7S25bbx7R6b5igiSEoMjPS6OBw2f5O4lPtij1wXahH/aVJNngL6Nvb5
-         RdkFmAgOVpJ+LQUyABO+ri9euocCDZ2ZeUcVtFyUgScc059V60+MQ3sp86khQ8ECuvuD
-         KhVhv+180a4Cacr2BA6mBC39+Z1tGBtDTvSWziJnvn0tNbJjX4J94/26FZ4poMKoEFsO
-         4QSQo21ph5VykJV7DcWqXjGBLFZr6/8l+EB6kn2mKWKt0ELeSIpI6kPGo9d1gcDOXBf5
-         GLDA==
+        d=gmail.com; s=20230601; t=1762647060; x=1763251860; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uciTLeXnGZa+fHKIKHqbTzuMHbVFCOUEY8frA2QOXIw=;
+        b=YQfla0eveU4PkcTFB2oDv0QshlnaEl2LtUOSsB+3Id3XblfdxENF0+CNwWkPMEbOED
+         cHOElH1L25wembKk/zOM+25uKLPcaUuVi8qZvnr4cGV1uyrZ+oRT+GECpgq1uRrCzS+e
+         FvQim8puz5Si9RTkbhq2MQ5fKr4TNzW9Y0hMQIL05/MqfR9H2krTtsD8sh9rOEn5f501
+         rFeWYqF2KlDM21Wn1igqMHxfMO3uUNmnYc/D+OyF5VQo3sFUfyrAXvwZdaibmEl2R4Rz
+         vVxSLAc2BQCyzGBymVduHddoT6+4tHNhtDEComqw5ts/h19LO+KyHQ2jfZEMA4YZtxnP
+         DdEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762640313; x=1763245113;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3zx7ylCByFKgLwnrdIb/dt/z22++1cxZrkl9z5eA2Bk=;
-        b=JS5yLBBXiDs36Lm79HUPzdCWyoJws+8B2cc5+Nj8I2sBcogsuhHJ1SPOYa4MJjvmOJ
-         PmGtyRNhGrUTSwqWyTeTjAI8/Xz2nkDdluFtx7g4G61fjDQr+1nAkv6qSihStauczILz
-         WSTN0/hnQ3mbBWkOCuQiNiuDPtMqwR64mysmLgS4EanJV2JhnuWEj0xChfDLoEJX57qr
-         jazh+0pkgBHeEHA7iRfe29N5ZsdHqKlpVSCUL/kdV5z+TIY+9p7lyD2BPqglf3CszV3I
-         IvNpyPqUmdTO4VxKcxz0cDd4NZQAwaktUB2AOjWtZvqKlMB8gMV0RbxCwXfo5S7t0ZFz
-         u/SQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXC4DCI3bsNXhrW56QK3W6r8cWN2bYz7QwDJ4tON3LMURCINPLASIcDB9uYrph0njfDyyZ3QOY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYoSfNwwsdnW7FRzXLklB862SsiRaH+K11Vlca3Qs8Ifg96FMj
-	IjY1lIgSdNDwQBYRPZ6lPBaLpiri1IUX7vm8j8UoLb7IHU02dZybm+Kk7RcK8iiCXuw=
-X-Gm-Gg: ASbGncuMvSml7FVkF9KflOysFn+lKLLprmep/rZKJC4GyAcvbzjg0vka76Y7wsboqeK
-	hyS8j5Js4L3tJScZKCzdtFkMHmNp64Cpw5xqqu7XdNiH8ru1OLFNo+hR6A20tyJ/l+58jARpKSb
-	QhpEJ5Pw/EnBPPg3UL570aQ6/EwFEpCTInZY/125YbfBQ1TSJ5eY89hf+yPPL/WKuH6IWPhuX3C
-	GamuzWHIEnC1+5YDYKHSeAnX0XC8cpu0TDFu+tMkgrZpDZj07KYDfmZKuKV9WWe6uxyhI8+QCDk
-	hMycwhd4B44DFc81wOSwxT9tHqsOYHy+z0G31SxInxGqVyaRUXdwVJzmR6oLAiy7ukw0Ki237c/
-	jMgzH5H7qWRZfvPAhaGEn3865Sy+xjzqTk98DG945aPgXlLLZJ5oHOa0J2i5RVl+cpqxMGDieda
-	FJemgV/EMsDOyGkrnmrGM3X73E8rXOpAgZfICKVEA=
-X-Google-Smtp-Source: AGHT+IHVqg/I2K+vXn8GBrbNkUba1q+CpIdME76U3ZTaZG5D0gzbbdMTno/0fMW9E6prqlQF4bKJoQ==
-X-Received: by 2002:a05:6a21:9997:b0:334:a72c:806e with SMTP id adf61e73a8af0-353a385c312mr5583647637.43.1762640313406;
-        Sat, 08 Nov 2025 14:18:33 -0800 (PST)
-Received: from [192.168.86.109] ([136.27.45.11])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-ba8f9ce521dsm8628289a12.9.2025.11.08.14.18.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 08 Nov 2025 14:18:32 -0800 (PST)
-Message-ID: <b226b398-0985-4143-b0ea-14f785fe4d1b@davidwei.uk>
-Date: Sat, 8 Nov 2025 14:18:31 -0800
+        d=1e100.net; s=20230601; t=1762647060; x=1763251860;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=uciTLeXnGZa+fHKIKHqbTzuMHbVFCOUEY8frA2QOXIw=;
+        b=NQKWh1b0rT/YRKkOugC5odfTwXlBU38gLZjkrt3QhjBCulzUPtXETZ/E81YVL815XW
+         WheDaNunxUEsDMyDZTlAyt7SkpuhelY/mxeGz/7ONdFkwIDtRvB94thOOTLZwl62A/a/
+         VDlGkkP2nsM2sTlaQjNk9yh4RQ6Oj+bTR4f9x4zN1Pd8nQcnqf5QwG7OEvgbpx8sRhan
+         quSo2yw5072oEBRTL2MQTlYFjOd4v+1A7MNexh5ZXONArlglIhFt+b5pPs7ukg3/OYO1
+         sDOndnyFc1KV/8YwjsQ3g6YCAAERtTMMFTizCmKWkG3Wut7C3vnhswwzzuZVuN8SUkiL
+         iLUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWmOgy1n7nQpBefYPzqn9AqnDf+wol2gI6oR27xmNvbh+urIqNCnD9r/WV2HkOTaG1wl7i+3N4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0cmzx2eyDPeXkDoS10oJa0osJZlpI93cBwvGbK2RjIMwGu8Md
+	x1UfAnJE4Zp+rad/X/Y4dfWmkutmInnnRl3O9tiX3SFZLsthtNFfB3EzbdTZf0ouqqS2qmwqadx
+	m8ONU6btfkgVb+2H9NmIcHI/yoIzVs/E=
+X-Gm-Gg: ASbGnct+9toccYiZfFagCB99FtUYLAwpk2FBvGMfs8ZBDr677NJAIEoW0KoQoeubncQ
+	u/ADeSVkVhjeKS4kawOBke6mnNe8i9mQWtIuSYPpK81y3fllZwc8UuXOZ4ToXW73Q/nAx/WvMoz
+	wWpMoo3vEZYlDJmuPTXDEdBcrqh1UL6hBxy/st4ibqjanIH+wQUmLY9jeRHQCqurf31sivE6wOb
+	hpc5eNMi4xggSb+fWDBUxBfj3Kc8RlWUYKkezqyz94BMUAR3nfN9H6cbyf+BGyG
+X-Google-Smtp-Source: AGHT+IE6q3ZwFR3f7NoF+liqpAJtsjQrZpjUSa+tOSFG0ga97sj8kN0pG548UbIbviTE50Tohd1SyQw9NrBfD4bqVnc=
+X-Received: by 2002:a05:6e02:1606:b0:433:2cca:f004 with SMTP id
+ e9e14a558f8ab-43367e65122mr55491525ab.23.1762647060040; Sat, 08 Nov 2025
+ 16:11:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 00/14] netkit: Support for io_uring zero-copy
- and AF_XDP
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
- razor@blackwall.org, pabeni@redhat.com, willemb@google.com, sdf@fomichev.me,
- john.fastabend@gmail.com, martin.lau@kernel.org, jordan@jrife.io,
- maciej.fijalkowski@intel.com, magnus.karlsson@intel.com, toke@redhat.com,
- yangzhenze@bytedance.com, wangdongdong.6@bytedance.com
-References: <20251031212103.310683-1-daniel@iogearbox.net>
- <aQqKsGDdeYQqA91s@mini-arch>
- <458d088f-dace-4869-b4af-b381d6ca5af1@davidwei.uk>
- <aQuq1mhm7cM8kkLY@mini-arch>
-Content-Language: en-US
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <aQuq1mhm7cM8kkLY@mini-arch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <0435b904-f44f-48f8-afb0-68868474bf1c@nop.hu> <CAL+tcoA5qDAcnZpmULsnD=X6aVP-ztRxPv5z1OSP-nvtNEk+-w@mail.gmail.com>
+ <643fbe8f-ba76-49b4-9fb7-403535fd5638@nop.hu> <CAL+tcoDqgQbs20xV34RFWDoE5YPXS-ne3FBns2n9t4eggx8LAQ@mail.gmail.com>
+ <d8808206-0951-4512-91cb-58839ba9b8c4@nop.hu> <7e58078f-8355-4259-b929-c37abbc1f206@suse.de>
+ <aQ9YhCAdu7QNyYxu@eldamar.lan>
+In-Reply-To: <aQ9YhCAdu7QNyYxu@eldamar.lan>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sun, 9 Nov 2025 08:10:23 +0800
+X-Gm-Features: AWmQ_bnqB8P6josJY8yWeOXB9YCvh_6FqaX49H8uEkcVmwtgx1Xz_DKqbz4CsnE
+Message-ID: <CAL+tcoBQPBh_GSeO71=OGx2og_BQ0YaWsA7zzNpC08yYGGfVig@mail.gmail.com>
+Subject: Re: null pointer dereference in interrupt after receiving an ip
+ packet on veth from xsk from user space
+To: Salvatore Bonaccorso <carnil@debian.org>
+Cc: Fernando Fernandez Mancera <fmancera@suse.de>, mc36 <csmate@nop.hu>, alekcejk@googlemail.com, 
+	Jonathan Lemon <jonathan.lemon@gmail.com>, Stanislav Fomichev <sdf@fomichev.me>, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Magnus Karlsson <magnus.karlsson@intel.com>, 
+	=?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 1118437@bugs.debian.org, 
+	netdev@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2025-11-05 11:51, Stanislav Fomichev wrote:
-> On 11/04, David Wei wrote:
->> On 2025-11-04 15:22, Stanislav Fomichev wrote:
->>> On 10/31, Daniel Borkmann wrote:
->>>> Containers use virtual netdevs to route traffic from a physical netdev
->>>> in the host namespace. They do not have access to the physical netdev
->>>> in the host and thus can't use memory providers or AF_XDP that require
->>>> reconfiguring/restarting queues in the physical netdev.
->>>>
->>>> This patchset adds the concept of queue peering to virtual netdevs that
->>>> allow containers to use memory providers and AF_XDP at native speed.
->>>> These mapped queues are bound to a real queue in a physical netdev and
->>>> act as a proxy.
->>>>
->>>> Memory providers and AF_XDP operations takes an ifindex and queue id,
->>>> so containers would pass in an ifindex for a virtual netdev and a queue
->>>> id of a mapped queue, which then gets proxied to the underlying real
->>>> queue. Peered queues are created and bound to a real queue atomically
->>>> through a generic ynl netdev operation.
->>>>
->>>> We have implemented support for this concept in netkit and tested the
->>>> latter against Nvidia ConnectX-6 (mlx5) as well as Broadcom BCM957504
->>>> (bnxt_en) 100G NICs. For more details see the individual patches.
->>>>
->>>> v3->v4:
->>>>    - ndo_queue_create store dst queue via arg (Nikolay)
->>>>    - Small nits like a spelling issue + rev xmas (Nikolay)
->>>>    - admin-perm flag in bind-queue spec (Jakub)
->>>>    - Fix potential ABBA deadlock situation in bind (Jakub, Paolo, Stan)
->>>>    - Add a peer dev_tracker to not reuse the sysfs one (Jakub)
->>>>    - New patch (12/14) to handle the underlying device going away (Jakub)
->>>>    - Improve commit message on queue-get (Jakub)
->>>>    - Do not expose phys dev info from container on queue-get (Jakub)
->>>>    - Add netif_put_rx_queue_peer_locked to simplify code (Stan)
->>>>    - Rework xsk handling to simplify the code and drop a few patches
->>>>    - Rebase and retested everything with mlx5 + bnxt_en
->>>
->>> I mostly looked at patches 1-8 and they look good to me. Will it be
->>> possible to put your sample runs from 13 and 14 into a selftest form? Even
->>> if you require real hw, that should be doable, similar to
->>> tools/testing/selftests/drivers/net/hw/devmem.py, right?
->>
->> Thanks for taking a look. For io_uring at least, it requires both a
->> routable VIP that can be assigned to the netkit in a netns and a BPF
->> program for skb forwarding. I could add a selftest, but it'll be hard to
->> generalise across all envs. I'm hoping to get self contained QEMU VM
->> selftest support first. WDYT?
-> 
-> You can start at least with having what you have in patch 3 as a
-> selftest. NIPA runs with fbnic qemu model, you should be able to at
-> least test the netns setup, make sure peer-info works as expected, etc.
-> You can verify that things like changing the number of channels are
-> blocked when you have the queued bound to netkit..
-> 
-> But also, regarding the datapath test, not sure you need another qemu. Not
-> even sure why you need a vip? You can carve a single port and share
-> the same host ip in the netns? Alternatively I think you can carve
-> out 192.168.x.y from /32 and assign it to the machine. We have datapath
-> devmem tests working without any special qemu vms (besides, well,
-> special fbnic qemu, but you should be able to test on it as well).
+On Sat, Nov 8, 2025 at 10:49=E2=80=AFPM Salvatore Bonaccorso <carnil@debian=
+.org> wrote:
+>
+> Hi,
+>
+> On Tue, Oct 21, 2025 at 12:51:32PM +0200, Fernando Fernandez Mancera wrot=
+e:
+> >
+> >
+> > On 10/20/25 11:31 PM, mc36 wrote:
+> > > hi,
+> > >
+> > > On 10/20/25 11:04, Jason Xing wrote:
+> > > >
+> > > > I followed your steps you attached in your code:
+> > > > ////// gcc xskInt.c -lxdp
+> > > > ////// sudo ip link add veth1 type veth
+> > > > ////// sudo ip link set veth0 up
+> > > > ////// sudo ip link set veth1 up
+> > >
+> > > ip link set dev veth1 address 3a:10:5c:53:b3:5c
+> > >
+> > > > ////// sudo ./a.out
+> > > >
+> > > that will do the trick on a recent kerlek....
+> > >
+> > > its the destination mac in the c code....
+> > >
+> > > ps: chaining in the original reporter from the fedora land.....
+> > >
+> > >
+> > > have a nice day,
+> > >
+> > > cs
+> > >
+> > >
+> >
+> > hi, FWIW I have reproduced this and I bisected it, issue was introduced=
+ at
+> > 30f241fcf52aaaef7ac16e66530faa11be78a865 - working on a patch.
+>
+> Just a qustion in particular for the stable series shipping the commit
+> (now only 6.17.y relevant at this point since 6.16.y is EOL): Give the
+> proper fix will take a bit more time to develop, would it make sense
+> to at least revert the offending commit in the stable series as the
+> issue is, unless I missunderstood the report, remotely(?) triggerable
+> denial of service?
+>
+> Or do I miss something here?
 
-There's a check in netdev core that prevents forwarding net_iovs. The
-only way to forward packets to netkit in a netns is using bpf. If
-there's no routable VIP, then the bpf prog also has to do bidirectional
-NAT.
+We've been working on this already. Please find the patches at
+https://lore.kernel.org/all/20251031093230.82386-1-kerneljasonxing@gmail.co=
+m/
+
+Yes, my solution is to revert first and apply a pre-allocate array to
+temporarily store the descriptors that will be published at the tx
+completion phase.
+
+If you also care about this, please feel free to review the whole
+idea. As long as everyone is on board, I will send an official version
+with more detailed updates. I'm still waiting for more suggestions :)
+
+Thanks,
+Jason
 
