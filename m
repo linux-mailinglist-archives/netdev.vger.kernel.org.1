@@ -1,156 +1,164 @@
-Return-Path: <netdev+bounces-237052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FBE0C43F29
-	for <lists+netdev@lfdr.de>; Sun, 09 Nov 2025 14:46:30 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBF4CC43F2F
+	for <lists+netdev@lfdr.de>; Sun, 09 Nov 2025 14:47:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D8CD3AB17A
-	for <lists+netdev@lfdr.de>; Sun,  9 Nov 2025 13:46:29 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 4B6834E1D3C
+	for <lists+netdev@lfdr.de>; Sun,  9 Nov 2025 13:47:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A98FE2E172D;
-	Sun,  9 Nov 2025 13:46:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D19D32E172D;
+	Sun,  9 Nov 2025 13:46:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b="fG7eZJTB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jpULyxSj"
 X-Original-To: netdev@vger.kernel.org
-Received: from zg8tmja2lje4os43os4xodqa.icoremail.net (zg8tmja2lje4os43os4xodqa.icoremail.net [206.189.79.184])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27A65263F44
-	for <netdev@vger.kernel.org>; Sun,  9 Nov 2025 13:46:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.79.184
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0159F2FB99D
+	for <netdev@vger.kernel.org>; Sun,  9 Nov 2025 13:46:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762695986; cv=none; b=NRoTp3ydWkgGH566BHk5xfsWbBV0XmyqD4syE6UixJyJ1XaGJZNamlizx303jEIYexeeqOz5PDysKF12bdZB4+bK1Fme2ibZ43BH8LgurkTy28D8UHIe+hTusBLpsVRq1K9l0iysU3TiISXFmGAzkgy2rEXt+/PFQ3w9KQzF7Ss=
+	t=1762696016; cv=none; b=izgDfbf6txCCXCyM4dM8WyNOZu1vnx0lWCGcc3vR4k4mxUpwkU4UTijXgSNujkZDg77HpIo/mDRM/daqJ5NCYdQKnBckAbKA7mqm/3c3TyaYXZTjDZwbvLxuzmd6LApV5yNV0ZlConYg9R845wiScUzK+E7e49JTMvwwSPDpzgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762695986; c=relaxed/simple;
-	bh=oaDvmiad5GEafcx24qyGRiv8OqHVkLAlkuF7smx5/bQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=pQGHxsrs7zBjSwa9VkJI6YIuRtcuR7OwXj7p965BXmFq3YuHNo32bPFX5O0tGl36eGNFto1HPAxy+o2/XFePxZ03RsAy0yauwIysaKQq7QKvS5IqQqafVX6pSWg/eT/pdDnMLi47uxA07Pj/dfKST7QUOr4d4zvfoPHkvbbRR7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mails.tsinghua.edu.cn; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn; dkim=pass (1024-bit key) header.d=mails.tsinghua.edu.cn header.i=@mails.tsinghua.edu.cn header.b=fG7eZJTB; arc=none smtp.client-ip=206.189.79.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mails.tsinghua.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mails.tsinghua.edu.cn
+	s=arc-20240116; t=1762696016; c=relaxed/simple;
+	bh=78sRp5/pEa3exZ9nnd39D16LidtkS04WArCUHi6XxZ8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jFaUdiIhrcYq3/wnpmT1FRiyrsfoExgEhKpZaou7G2BXUEjekyfO5xZqeK25s8M+DcLCxexSJ1j0mtRbS4bkRPf+Gud5FnfVkrRz0WuTbEzAux0k1vEgZHrkcumFcuBx0E5+MRlOIPYpYJYgGXKTtfY+CLC0xY5kk88Jeno0ruw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jpULyxSj; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-b6d402422c2so443977966b.2
+        for <netdev@vger.kernel.org>; Sun, 09 Nov 2025 05:46:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=mails.tsinghua.edu.cn; s=dkim; h=Received:From:To:Cc:Subject:
-	Date:Message-Id:MIME-Version:Content-Type:
-	Content-Transfer-Encoding; bh=WrjUiJspR5xJulm2pKopqEBqEUVD/+Bhra
-	9sFh9vJfQ=; b=fG7eZJTBkWNQN7CiexYQQcGrp3Im41ju1pu9xdexgmyebdpsQj
-	9zPm/gl4ur0U8oFqDVHJwE+R8MHbdN0NmHjEXZx9U2sooOJcdpLAMFkGux8kAN80
-	Zgag69We3Os3/JNySr0xaaLPdxrjfrZJEvtzYu8oXbz3qFvnZ8/0JbCAs=
-Received: from estar-Super-Server.. (unknown [103.233.162.254])
-	by web4 (Coremail) with SMTP id ywQGZQAHNqQWmxBp3iH6BQ--.2322S2;
-	Sun, 09 Nov 2025 21:46:09 +0800 (CST)
-From: Yizhou Zhao <zhaoyz24@mails.tsinghua.edu.cn>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org
-Subject: Discussion: Potential Hardening Ideas for ICMP Error Handling
-Date: Sun,  9 Nov 2025 21:46:00 +0800
-Message-Id: <20251109134600.292125-1-zhaoyz24@mails.tsinghua.edu.cn>
-X-Mailer: git-send-email 2.34.1
+        d=gmail.com; s=20230601; t=1762696013; x=1763300813; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qOxOVz3OD8A8kOJ9jS3tsAyXqepvPRy5WhOjggMQTeU=;
+        b=jpULyxSjrasurBovd3jqp64akl/RwadL36n1rGmyvjqM6Bd/80RLfhQGNxUOd/6RM8
+         N/G8QxBCZHdYJIEULKpKXq1cra0PTbIXv/idbLh49wMaNAnjBETXPb6FnuFC6qKMxcGz
+         5M0dYD7FKcE6ITAruC7kz7fO0+Hiv+5EssyBCVOr8RQSTNVvhZA31BF2oKW2A2dZxHJp
+         BvbYE3nUyb5/wCEk1g9aTZKdKb/yUWCan9xehxVqepEWkVQPZ8R7WrRUfVdnCF5/uq3T
+         VCqBEojf5Op2vMbZiKp3CA98O5BbIj/u9dHDqTcVAsW+4J0SF59+VyZQn8PevRKtr27t
+         BsYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762696013; x=1763300813;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qOxOVz3OD8A8kOJ9jS3tsAyXqepvPRy5WhOjggMQTeU=;
+        b=Yl+DlMaaJLmFnsjEcPjzr0XLWQcpIYB2CI0ru2h47OAVD6Z9trk86p4TVYzHX8hL0+
+         OIWVWW0DnBVAAI8Fq7dSwnVq3OzHWOjQsvWsODonmQVRtlPxmwEg9VQGOnBNEfsW0FUy
+         85/P7RkxH263QXebhviOshpMkk8lVUSrb954+3nJPAry063rlzy2DB87VU4E09gDdqLu
+         H/KRoTMnHezjjKoShIuvtn6aP3AeTNwycdVIviSMikFPIy7dKsD5YasHA0UjWUv5Aq3/
+         D4iNuRjsCSrxk8i5ujbZNilqCh+BIW5b/DgGokts8gf5e8z8MbMmBYXTmRU4nnWTOD9Y
+         GKCg==
+X-Forwarded-Encrypted: i=1; AJvYcCVSJQGZErLVvcvYaGY7k8lqDC4SygN3ELEZPQkKMJI4tRipc2oZCGUfjVsFaVal8aSjMOUO3jc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxaPawDsTLKHucCjBeIMBVMp+p/9YFCZb2idQP4922LRnuhti9G
+	cxq6o0kKGAMMrL+NM4x8FvejU2sI9c7O1qJbbdKcxmsDNnKZT1PiQJVU
+X-Gm-Gg: ASbGnctlmjzH5Q8vd7hDCZD4PYRzJNXVuuydpQEiMBV1ysWH52mebjqUAGgh6Dcpvlz
+	+RaWGZ5Nc7P3EBSPXH7kkrP+xCcl2RV3Bb41MqtXzEkuxK7z8IrANAWyjJJTH7VUQWkOWVZcc/6
+	TBVzR0DpsgdlGBJfhsBcTPmgJjE+L54ZAPZvhr6EHgaVqTpQHilOsNfifWK24JCx6wX7QvcwzCv
+	Q+685sTdhRrE1+w4xgFmaivZprCkRanVyZZrI9xLHCjNCt1W1SRid3/3nSfljBiIMIiqlrhZj9K
+	59YfiZbfA9hF75f0P5HlmhAfxtwZ961butFzBth/eZwRWToKkaFZwGV50ICYc/HU0b5nf33QvLO
+	kwUA1CXdsBDFIKK26lE416ppNiGa/5Cn0S/38tJke/BVPtSP+sprnp0t2TuRjmDPVytkQlLU3go
+	1yji0k+5YSMYghp+Bqmxw+G1n07iIGUMU0s3m+BFo2plY1f/7jNHMFfUO1
+X-Google-Smtp-Source: AGHT+IG2hV7b23VcX9jieNe0izeHc+iQCgBkne69iwz7GrZJIKFtnUWh9WFnd5ZT0ZMVj1EktFc7Rg==
+X-Received: by 2002:a17:906:f5a2:b0:b72:6f76:cf73 with SMTP id a640c23a62f3a-b72e03037c4mr554584666b.21.1762696013043;
+        Sun, 09 Nov 2025 05:46:53 -0800 (PST)
+Received: from localhost (dslb-002-205-018-238.002.205.pools.vodafone-ip.de. [2.205.18.238])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b72bfa24d14sm804313566b.74.2025.11.09.05.46.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Nov 2025 05:46:52 -0800 (PST)
+From: Jonas Gorski <jonas.gorski@gmail.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	=?UTF-8?q?=C3=81lvaro=20Fern=C3=A1ndez=20Rojas?= <noltari@gmail.com>,
+	Vivien Didelot <vivien.didelot@gmail.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] net: dsa: tag_brcm: do not mark link local traffic as offloaded
+Date: Sun,  9 Nov 2025 14:46:35 +0100
+Message-ID: <20251109134635.243951-1-jonas.gorski@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:ywQGZQAHNqQWmxBp3iH6BQ--.2322S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxXw1DArWkAr1UXr4DJF4DXFb_yoWrXFyUpF
-	Wvka4kKw4Ut3Z7WwnrZa18u3yrKrs7Gw45G3W5u34Iya90kFySvF4Sgw42va47Crn8Z3Wa
-	qr4jqrWDAF15uaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUU9ab7Iv0xC_Kw4lb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I2
-	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
-	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xII
-	jxv20xvEc7CjxVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I
-	8E87Iv6xkF7I0E14v26rxl6s0DM2vYz4IE04k24VAvwVAKI4IrM2AIxVAIcxkEcVAq07x2
-	0xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18Mc
-	Ij6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l
-	c7CjxVAaw2AFwI0_JF0_Jw1lc2xSY4AK67AK6ry8MxAIw28IcxkI7VAKI48JMxC20s026x
-	CaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_
-	JrWlx4CE17CEb7AF67AKxVWUAVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r
-	1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_
-	Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8Jr
-	UvcSsGvfC2KfnxnUUI43ZEXa7IU5tOzDUUUUU==
-X-CM-SenderInfo: 52kd05r2suqzpdlo2hxwvl0wxkxdhvlgxou0/1tbiAQIBAWkPJHjWjAAGsl
 
-Dear netdev maintainers,
+Broadcom switches locally terminate link local traffic and do not
+forward it, so we should not mark it as offloaded.
 
-We previously shared some ICMP Error-related verification issues via
-security@kernel.org. These issues make attackers able to spoof ICMP
-Error packets and modify FNHE caches without strong validation. As 
-these cases involve stateless protocols such as ICMP and UDP, it is 
-inherently difficult to propose a complete or definitive fix. However,
-in certain deployment scenarios these weaknesses can still be exploitable
-in practice — for example by polluting routing or PMTU caches (leading
-to unintended fragmentation behavior or route changes), or by leveraging
-side channels to infer additional information.
+In some situations we still want/need to flood this traffic, e.g. if STP
+is disabled, or it is explicitly enabled via the group_fwd_mask. But if
+the skb is marked as offloaded, the kernel will assume this was already
+done in hardware, and the packets never reach other bridge ports.
 
-Based on earlier discussions, we would like to share several potential
-hardening ideas with the list for broader consideration.
+So ensure that link local traffic is never marked as offloaded, so that
+the kernel can forward/flood these packets in software if needed.
 
-**1. Handling of embedded ICMP packets in ICMP Fragmentation Needed**
+Since the local termination in not configurable, check the destination
+MAC, and never mark packets as offloaded if it is a link local ether
+address.
 
-From earlier discussions, we revisited how ICMP Fragmentation Needed /
-Packet Too Big messages embed an inner ICMP packet (most commonly Echo
-Request/Reply). Echo Request may legitimately carry a payload for PMTU
-probing and should continue to be handled accordingly. However, other
-ICMP types — including Echo Reply — are short to exceed mtu, or passively 
-generated and are not used for PMTU discovery, so embedded other types 
-of packets should not trigger PMTU updates.
+While modern switches set the tag reason code to BRCM_EG_RC_PROT_TERM
+for trapped link local traffic, they also set it for link local traffic
+that is flooded (01:80:c2:00:00:10 to 01:80:c2:00:00:2f), so we cannot
+use it and need to look at the destination address for them as well.
 
-In testing, we also noticed that Linux currently validates an embedded
-ping packet in Fragmentation Needed messages primarily by checking the
-16-bit identifier. **Without correlating additional context (such as the
-destination address of the original flow or the expected packet length)**,
-this check can be ambiguous and may allow cache updates based on
-insufficiently validated inputs.
+Fixes: 964dbf186eaa ("net: dsa: tag_brcm: add support for legacy tags")
+Fixes: 0e62f543bed0 ("net: dsa: Fix duplicate frames flooded by learning")
+Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
+---
+I shortly considered changing dsa_default_offload_fwd_mark(), but
+decided against it because other switches may have a working trap bit,
+and would then do a needless destination mac check.
 
-One possible hardening direction is to require stronger correlation for
-PMTU updates derived from embedded ICMP packets — for example, verifying
-the original destination address or additional fields beyond the short
-identifier — and ignoring embedded ICMP types that are never used for
-PMTU probing.
+I used likely() because br_input.c uses
+unlikely(is_link_local_ether_addr()), and that seemed reasonable.
 
-**2. Deliver ICMP Errors only to connected (private) UDP sockets.**
+ net/dsa/tag_brcm.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-Requiring a socket to be connected (peer 5-tuple known) forces an attacker
-to first infer the peer port/address, raising the bar for off-path 
-injection while preserving normal connected UDP use (DNS clients, RTP,
-etc.).
+diff --git a/net/dsa/tag_brcm.c b/net/dsa/tag_brcm.c
+index d9c77fa553b5..eadb358179ce 100644
+--- a/net/dsa/tag_brcm.c
++++ b/net/dsa/tag_brcm.c
+@@ -176,7 +176,8 @@ static struct sk_buff *brcm_tag_rcv_ll(struct sk_buff *skb,
+ 	/* Remove Broadcom tag and update checksum */
+ 	skb_pull_rcsum(skb, BRCM_TAG_LEN);
+ 
+-	dsa_default_offload_fwd_mark(skb);
++	if (likely(!is_link_local_ether_addr(eth_hdr(skb)->h_dest)))
++		dsa_default_offload_fwd_mark(skb);
+ 
+ 	return skb;
+ }
+@@ -250,7 +251,8 @@ static struct sk_buff *brcm_leg_tag_rcv(struct sk_buff *skb,
+ 	/* Remove Broadcom tag and update checksum */
+ 	skb_pull_rcsum(skb, len);
+ 
+-	dsa_default_offload_fwd_mark(skb);
++	if (likely(!is_link_local_ether_addr(eth_hdr(skb)->h_dest)))
++		dsa_default_offload_fwd_mark(skb);
+ 
+ 	dsa_strip_etype_header(skb, len);
+ 
 
-**3. Ignore embedded ICMP packets in ICMP Redirect.**
-
-Although Linux exposes accept_redirects to disable processing of
-Redirect messages, this setting remains enabled by default on hosts.
-This means that hosts may still update their next-hop selection based
-on unauthenticated Redirects constructed from embedded packets whose
-legitimacy cannot be reliably verified.
-
-Even in environments where Redirects are used for local load balancing,
-ICMP itself imposes **negligible bandwidth overhead**, so disabling or
-constraining ICMP-triggered routing changes does not materially affect
-traffic distribution. At the same time, the stateless nature of ICMP
-makes Redirect messages particularly easy to spoof, and the kernel
-currently has limited context available to validate them.
-
-**4. Prevent raw sockets from processing ICMP errors**
-
-In current code paths (e.g., icmp_socket_deliver() → raw_icmp_error()), 
-raw socket error handling can end up calling the same routing update 
-codepaths (FNHE updates) with very weak validation: essentially the 
-existence of a raw socket matching IP/protocol is sufficient. This is
-risky — tools or servers that open raw sockets (such as NMap) could be 
-tricked into causing cache pollution. We propose in the current design,
-raw sockets should not be allowed to trigger FNHE updates, **even if it 
-is connected, since only IP addresses are checked, without further 
-checks like port/sequence numbers**. Or maybe strong checks could be 
-applied? But we don't have good ideas yet.
-
-Yours Sincerely,
-Yizhou Zhao
+base-commit: 96a9178a29a6b84bb632ebeb4e84cf61191c73d5
+-- 
+2.43.0
 
 
