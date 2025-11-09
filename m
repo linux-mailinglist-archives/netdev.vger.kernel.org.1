@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-237039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDAB4C43BE8
-	for <lists+netdev@lfdr.de>; Sun, 09 Nov 2025 11:40:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 219D4C43C24
+	for <lists+netdev@lfdr.de>; Sun, 09 Nov 2025 11:46:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A1EB04E409A
-	for <lists+netdev@lfdr.de>; Sun,  9 Nov 2025 10:40:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDDD8188A249
+	for <lists+netdev@lfdr.de>; Sun,  9 Nov 2025 10:47:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 709F62D5C6C;
-	Sun,  9 Nov 2025 10:39:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 430CE13D891;
+	Sun,  9 Nov 2025 10:46:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="n8/o6YJv"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Ag2uWTmq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B571A2874FA
-	for <netdev@vger.kernel.org>; Sun,  9 Nov 2025 10:39:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FF9C19CCF7
+	for <netdev@vger.kernel.org>; Sun,  9 Nov 2025 10:46:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762684798; cv=none; b=TnIliz1R5d5vv7B2CWmYn5fTbuGqBHYfJJDI3vhRMdA0TnuZ6XUhKsy6u8+8ATmqq77bxlLGR3hE+zT12JI09feUZj3aavBT+zD0yczr8bkFggtSc/0BG/q7+1YRAcr2Wieav1RXY69ygYflBIuQnCFtnNSdgkLuqF+axcvJFSg=
+	t=1762685204; cv=none; b=j6eTKC8VGa+VV2XjsJynk/GXjd9DMNZ6yxgk6JF8nSb9GnHAm4PtXWbxb+sYhtB5zj5Aath9z1Z92m2DxtFqJkiTByTojjphzYSmEAfbmNO57Nb3oD54IObMMTFz6wldFSxN/A/Py5C1oEeVDjKvdJsN/qKthJiWAfxnQi6P5qI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762684798; c=relaxed/simple;
-	bh=GWv7Yx0foUQULYjiBsrLoexN62ZpupZwV+SSKDZSTAQ=;
+	s=arc-20240116; t=1762685204; c=relaxed/simple;
+	bh=Gw0g1frSlMFqGOfUOTrqn9WRh4UUBCaivw+F9BN+lJ4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fm5calyMwEkESSCh7/69NhDYpyY4nR/Yun2NwGrFIHRNurgw5+y3G4JUKxVvIupjk4L+sjFhkevUC4pWVI7YmzL2UFajWTplcHGaCQhz5ZVr6RyTwvksfyhI+Z6HA6j3Qyh7t9DI886onPc5zfUghVLZEhOuYwntUrzmnWlYbyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=n8/o6YJv; arc=none smtp.client-ip=209.85.218.41
+	 Content-Type:Content-Disposition:In-Reply-To; b=QMGSHYXsW7RMSa0Bb6YxfqMyE0R3Pv+K2VgYYnfA6/lyhwqrJgwQL6J5ZYRRuuoGH8x+9Mmp4dzIOuLw3NoWKE/UZbvZQHWIk/ocHu7EDQlw41gVxW2iW8BXqKiEmpAJE8SrumuGb+rWKmW5OjMJ4HIPsg9CVEMWkaEEa+/lr3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=Ag2uWTmq; arc=none smtp.client-ip=209.85.218.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-b72134a5125so305237566b.0
-        for <netdev@vger.kernel.org>; Sun, 09 Nov 2025 02:39:56 -0800 (PST)
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b72b495aa81so240091666b.2
+        for <netdev@vger.kernel.org>; Sun, 09 Nov 2025 02:46:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1762684795; x=1763289595; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1762685201; x=1763290001; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=M9k5NU9CvPXHOQFjRFf4cyiGap0OxcUU7zGSG67KNV0=;
-        b=n8/o6YJv6xt348UZQWCazGHg2q1OqiXq3gR7JRCK3HEk0scr1LCmQi+0cAJqH275+i
-         lingcDtNQduxWVmM7Fa+AtnvM9hZXSiMR3ZgwutviZW3UVooqZX1HLf57+1xyfH8whOz
-         ZmbHGW48qrzZyMtktbeSBrbZNcwVtdER1yTUSH8lfsrJ9mLoBcvx3czHC63wDmRySAr4
-         oyaB1KhInmHOI4Zpiaf/s+m32XBRB5+Ui9GJ2GaqrvFKYw1n7jPcC3deEK4dh9y/3dbI
-         zBz48Hrz1y1vQlsa1XSbEt8fF6Q/uzzNUtvS7H27e+m6pbVoSlCSBCGg+o8hbv7ELNuE
-         pV6g==
+        bh=LobDOj+CVtAhCKBNhLXMD5rH/KOzKtMHgkkQPmZQZqo=;
+        b=Ag2uWTmqD09kBZlgvoYOgY6VrhyKsgtK3e83kiDzIN24+Fyll2ecIY77VjdqFkn1d6
+         M4txSFvBFcaxACI+vogH1CyoiWHn+bkEYn2cyIO9fRfHOX0J1X+enwHvPCT/r9sLZDVO
+         qSgItPzWqXGtfG9YFkCLO24zRMqrL8f+JKexS9TojFf4QtbjD1gS68uql43rXZTKDkMY
+         5tNjeuR4EhuZorFrQpef41PjIizgs6aThpyNAR+BDHVuYrdUsYgDyxfBuxevuPz1Z501
+         xlajPhNO3FHmAi450ZTwcx+/09/3TXG3kp4ddSvh5YdIymQEHpQN75H3EtYIDFtiMHEg
+         kq4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762684795; x=1763289595;
+        d=1e100.net; s=20230601; t=1762685201; x=1763290001;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=M9k5NU9CvPXHOQFjRFf4cyiGap0OxcUU7zGSG67KNV0=;
-        b=eRIi8Q1B6SAsEjalM8L2PSDo3ZUqUjUR0R+hDMu4z+1mKM5KodkMyjIzcVZgG5NE0p
-         k8Osq592CRiYeM51pBom5213AZwckobdYQGn4KNtbVSgEPEkVB2/z/XRfERk/poFsLO3
-         JvVlqJsBwnygKfMcOt7oONnGpKE8Wlv0tGU55tohxVGRMBnFppkx5dJmeIBiwZJwyPS6
-         vT9S9w8yHtLzzLA8dFOqOapwCtR7vg3NYVx3osGI1NJIazMw4+Wt5M2aTMrx4WTsc1cz
-         tARYkT8jwaHZG6fXJ2tzM5cKUi5+tObp82+qyu5eoNkMkrL/7mPUB72DNcdYCMKd7BWC
-         hZow==
-X-Forwarded-Encrypted: i=1; AJvYcCVVTmKBzd5GCoXEOJ43DnLVV2qo9y5X0rmVpKhkGSQtDrSyJNoCbEHqSAOOEhMqjAaeGG2Z8PM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywi/iSRrfg0qAC8xuExkq5hnKTFcBGcyA8eAv+zn0dLGHQch7Yq
-	s/b5H/DgWOs27eUA1yGRhm7yfpPtnVPlkS/neonzp9d08i9H6HCW1TuZXrHNEfaFeAI=
-X-Gm-Gg: ASbGncujAqfUywIsRsOJKwUaiMjfacAxokXBWnmorX8hSwSwJhJIQI3MBgwheP2S12I
-	HesNH9LNpmcEzU7Zqhqj/KbFtpLtHpT9dau6S3JxME2Jg8kJpO/DnT9gEmfbzKdlF0lJjngEZrh
-	MtnoCNVy4+ROvOla+QOPXwIdsihiktWuiJS2JoU/jou0296MS/3rj+N9qhz60Kc3xD96FsqoAmE
-	XstUcdjFoSoz6OVAvVZvf/kH6h2VOr5tz+858cImq8lnZhTOel5CHdX2Om0sMJFxQxzW4DIJjQx
-	HtKOb39HqW/GFYrr3xhyts6BgcTkgEfmeTLQeGRByUKBkGG2PmmsEHdnV1+DDg8TFzsN+oKHY7T
-	EdcsYNr+JddRpYb4pxfnXQxDoVlqq6zkoe0jibMyTIcFL208W/QDwmxQh8CSdk3WM/DHW59ZO/L
-	vbsap6/1tMgkTJNsBX
-X-Google-Smtp-Source: AGHT+IGiAUMWo+QvSERmjIIMyP89hGQRiOZTK4ZUYS5n6Hi8A+5UCIsgg27hL+sayFE1WTxmR9XApA==
-X-Received: by 2002:a17:906:6a08:b0:b70:b83a:73d5 with SMTP id a640c23a62f3a-b72e0591f8dmr463037266b.46.1762684795103;
-        Sun, 09 Nov 2025 02:39:55 -0800 (PST)
+        bh=LobDOj+CVtAhCKBNhLXMD5rH/KOzKtMHgkkQPmZQZqo=;
+        b=YnT/BH3PmO3fBYIQz2rl5emoBV1v5GOEJbv2mpqkxzRqs7b1tWolvz8pUvSI7IIkXb
+         +Om4emEMjYlcoVFFIl6qmtl/wGQB5fsInbGLDONx1dItS1I/WxfzgN4ZG7hJQnYTzS3c
+         YVMyRAldu6slny+jsW/ELeDfi8UwXkcHtdqIUoGbN6UefGjqjRzYDvMgutnAt/ASdZtS
+         5+ttrP8JTuRXV3b6GMtAfWi7ASaD5R8ixG4pBVLEwAK8yTQLCm/nqL374UqmK7RioQmE
+         IJ1CIG4kQc1dn6S/sRPGZNXkswu+L5dBFd27Q01CWhtW8IWdJgLBNqPmyZ518De32Bqu
+         38Zw==
+X-Forwarded-Encrypted: i=1; AJvYcCUbGXh9Yw1MfQDu82XfdcQkn4Gi9GUSvajAhx9Y3OA60yMkAJI4iNFTRTJxb5zkJ/ZKuJZ42eI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHELNU7BozRdCP69rujdIXiCzNmxbmnmrCsQSz50OZ+eL6C354
+	bsP9gSWcjDtJs1p4BKv15Pmz0rEEUSLdL0iEBb+oiqHlRlt/4RPrIGENlhf0joii7ZE=
+X-Gm-Gg: ASbGncsD1ke3AgKxIqHcdNShSBCbK8t2bGzKoyty6+9lVOOavWEIYN3FULDPPzJMxlF
+	6EhzcG+8YaIRIu4V8ENACb2h0mztDA3jBJ521Lq+knD4IO+adMFJvXQOsFLeWjs9ki1lrojzuFo
+	1Gv5Uolcje/QbQmp7mhHw7ypwUO/X85oswocvjgWgTdhez59UayYpO3kmR5qzjUTL+LS3ZD27Wx
+	hkfpOgfRljTLrI0WCkYWxtDtwCfOZ6az7o7ziiYOnEXbLiXx6t0C5DwqJy1LMHhJQi3KUjnvtvh
+	IePtXXrOir6mqFu7sbDeVKuQ/qpfTIFiMP9gRMCebGcLY/u5bSK3MYaCWx75+ljdm8DW01I4huZ
+	Xbbfk2Mj0rRnS2/oAqqQlwxuGW33F41AytcmR4Br7AJ/vl7hIfsKjA956CJWF3a3C7PwGY8PCFn
+	Ljum7dJTd7BKSYCsBi
+X-Google-Smtp-Source: AGHT+IEf3v9YSyb6OvnE4os4GAWYkoIF/Hz2buBIRvx1KU2RTdYxzUhIiX3St2MD76hgPlkL2ITw2Q==
+X-Received: by 2002:a17:907:3fa8:b0:b72:afb1:fc4 with SMTP id a640c23a62f3a-b72e04c5bd6mr465868766b.50.1762685200809;
+        Sun, 09 Nov 2025 02:46:40 -0800 (PST)
 Received: from jiri-mlt ([85.163.81.98])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b72bf97d0f3sm813415066b.48.2025.11.09.02.39.53
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b72de4f920bsm497418966b.67.2025.11.09.02.46.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Nov 2025 02:39:54 -0800 (PST)
-Date: Sun, 9 Nov 2025 11:39:52 +0100
+        Sun, 09 Nov 2025 02:46:40 -0800 (PST)
+Date: Sun, 9 Nov 2025 11:46:37 +0100
 From: Jiri Pirko <jiri@resnulli.us>
-To: Daniel Zahka <daniel.zahka@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+To: Saeed Mahameed <saeed@kernel.org>
+Cc: Daniel Zahka <daniel.zahka@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
 	Jonathan Corbet <corbet@lwn.net>, Srujana Challa <schalla@marvell.com>, 
 	Bharat Bhushan <bbhushan2@marvell.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
 	Brett Creeley <brett.creeley@amd.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -102,9 +102,10 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, linux-omap@vger.kernel.org
 Subject: Re: [PATCH net-next v3 2/2] net/mlx5: implement swp_l4_csum_mode via
  devlink params
-Message-ID: <mfuluoi4nebyc4avj52gkfs4nqikn6uwhqnkf4o6xfswtpceuq@zhpokcx6bb6l>
+Message-ID: <jhmdihtp63rblcjiy2pibhnz2sikvbm6bhnkclq3l2ndxgbqbb@e3t23x2x2r46>
 References: <20251107204347.4060542-1-daniel.zahka@gmail.com>
  <20251107204347.4060542-3-daniel.zahka@gmail.com>
+ <aQ7f1T1ZFUKRLQRh@x130>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -113,27 +114,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251107204347.4060542-3-daniel.zahka@gmail.com>
+In-Reply-To: <aQ7f1T1ZFUKRLQRh@x130>
 
-Fri, Nov 07, 2025 at 09:43:46PM +0100, daniel.zahka@gmail.com wrote:
->swp_l4_csum_mode controls how L4 transmit checksums are computed when
->using Software Parser (SWP) hints for header locations.
+Sat, Nov 08, 2025 at 07:14:45AM +0100, saeed@kernel.org wrote:
+>On 07 Nov 12:43, Daniel Zahka wrote:
+>> swp_l4_csum_mode controls how L4 transmit checksums are computed when
+>> using Software Parser (SWP) hints for header locations.
+>> 
+>> Supported values:
+>>  1. device_default: use device default setting.
+>>  2. full_csum: calculate L4 checksum with the pseudo-header.
+>>  3. l4_only: calculate L4 checksum without the pseudo-header. Only
+>>     available when swp_l4_csum_mode_l4_only is set in
+>>     mlx5_ifc_nv_sw_offload_cap_bits.
+>> 
+>> The l4_only setting is a dependency for PSP initialization in
+>> mlx5e_psp_init().
+>> 
+>> Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
+>> ---
+>> 
+>> Notes:
+>>    v2:
+>>    - use extack in mlx5_nv_param_devlink_swp_l4_csum_mode_get()
+>>    - fix indentation issue in mlx5.rst entry
+>> 
+>> Documentation/networking/devlink/mlx5.rst     |   9 +
+>> .../net/ethernet/mellanox/mlx5/core/devlink.h |   3 +-
+>> .../mellanox/mlx5/core/lib/nv_param.c         | 161 ++++++++++++++++++
+>> 3 files changed, 172 insertions(+), 1 deletion(-)
+>> 
+>> diff --git a/Documentation/networking/devlink/mlx5.rst b/Documentation/networking/devlink/mlx5.rst
+>> index 0e5f9c76e514..675b5a1ec625 100644
+>> --- a/Documentation/networking/devlink/mlx5.rst
+>> +++ b/Documentation/networking/devlink/mlx5.rst
+>> @@ -218,6 +218,15 @@ parameters.
+>>        * ``balanced`` : Merges fewer CQEs, resulting in a moderate compression ratio but maintaining a balance between bandwidth savings and performance
+>>        * ``aggressive`` : Merges more CQEs into a single entry, achieving a higher compression rate and maximizing performance, particularly under high traffic loads
+>> 
+>> +   * - ``swp_l4_csum_mode``
+>> +     - string
+>> +     - permanent
+>> +     - Configure how the L4 checksum is calculated by the device when using
+>> +       Software Parser (SWP) hints for header locations.
+>> +       * ``device_default`` : Use the device's default checksum calculation mode
 >
->Supported values:
->  1. device_default: use device default setting.
->  2. full_csum: calculate L4 checksum with the pseudo-header.
->  3. l4_only: calculate L4 checksum without the pseudo-header. Only
->     available when swp_l4_csum_mode_l4_only is set in
->     mlx5_ifc_nv_sw_offload_cap_bits.
+>Let's omit the device, just "default".
 >
->The l4_only setting is a dependency for PSP initialization in
->mlx5e_psp_init().
+>So, I checked a couple of flows internally, and it seems this allows
+>some flexibility in the FW to decide later on which mode to pick,
+>based on other parameters, which practically means
+>"user has no preference on this param". Driver can only find out
+>after boot, when it reads the runtime capabilities, but still
+>this is a bug, by the time the driver reads this (in devlink), the
+>default value should've already been determined by FW, so FW must
+>return the actual runtime value. Which can only be one of the following
+
+I don't think it is correct to expose the "default" as a value.
+
+On read, user should see the configured value, either "full_csum" or
+"l4_only". Reporting "default" to the user does not make any sense.
+On write, user should pass either "full_csum" or "l4_only". Why we would
+ever want to pass "default"?
+
+Regardless this patch, since this is param to be reflected on fw reboot
+(permanent cmode), I think it would be nice to expose indication if
+param value passed to user currently affects the fw, or if it is going
+to be applied after fw reboot. Perhaps a simple bool attr would do?
+
+
 >
->Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
+>> +       * ``full_csum`` : Calculate full checksum including the pseudo-header
+>> +       * ``l4_only`` : Calculate L4-only checksum, excluding the pseudo-header
 
-Daniel, I asked twice if this could be a non-driver param. Jakub asked
-for clearer definition of this know in that context.
-
-Not sure why you are ignoring this :/
-
+[...]
 
