@@ -1,198 +1,185 @@
-Return-Path: <netdev+bounces-237070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31563C445D2
-	for <lists+netdev@lfdr.de>; Sun, 09 Nov 2025 20:19:31 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B942C445FC
+	for <lists+netdev@lfdr.de>; Sun, 09 Nov 2025 20:24:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE2DE188A188
-	for <lists+netdev@lfdr.de>; Sun,  9 Nov 2025 19:19:55 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 69CE53462C8
+	for <lists+netdev@lfdr.de>; Sun,  9 Nov 2025 19:24:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9790521858D;
-	Sun,  9 Nov 2025 19:19:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8940238C36;
+	Sun,  9 Nov 2025 19:24:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=tu-berlin.de header.i=@tu-berlin.de header.b="VBuJiuO3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i6dTkOa9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailrelay.tu-berlin.de (mailrelay.tu-berlin.de [130.149.7.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FF594C81
-	for <netdev@vger.kernel.org>; Sun,  9 Nov 2025 19:19:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=130.149.7.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF51A21D5AA
+	for <netdev@vger.kernel.org>; Sun,  9 Nov 2025 19:24:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762715966; cv=none; b=rPtNyohkR85+TohfKNdaPU6WUT25wdfKZn1lD4V7+9oLeyugfNIugOwC9CEN2X57jef+b+6vlChORvzIszcViSMI1QiKNDook6QJoUQSY0/4KXurLhpBoMYgwPF8Jkkh/dE9BbWuNP5qtqWov79BJxoVt8hJtcq8a+xLMgcn2aE=
+	t=1762716284; cv=none; b=sk4kmhvTItIifquSpESKMRwBysZ2Gh286HOMm/GuFL3v5t/HjA21D3dUY5yZJXRCwIAJiyFr7uxSrYZpt18JGpNDyTL+ZVjDk6ZYwGg587tO9GH/jfdvpiybBgJLaqi+a21HVdh+unwdKeIF8eOAwoeuL0Knfi2tFK6rNssqGQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762715966; c=relaxed/simple;
-	bh=/hJLMiUuL2LVCdhxZX8XJQoP1hWjfNQBp2VrOTJaFpA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=HP8Qz218vQYOwRPYW3wI3uhVrESN9RmGeFH3MhkCd4mwSt6LwcqaUos7egTRAIm4E7/2oJBvUZXAZN4WNQ7t9B4x0a0WfeW4U3Ha9ONX53ZtNeTG/wxxQ25KjSZCDzNG455YtzM6vrjdeiFFvR4/VEhfKxn///f+lk7acGBoJLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tu-berlin.de; spf=pass smtp.mailfrom=tu-berlin.de; dkim=pass (1024-bit key) header.d=tu-berlin.de header.i=@tu-berlin.de header.b=VBuJiuO3; arc=none smtp.client-ip=130.149.7.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tu-berlin.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tu-berlin.de
+	s=arc-20240116; t=1762716284; c=relaxed/simple;
+	bh=/E2065CYZGXfqGZTKvMv4TkgohZjDxfQeXejzHAHj4c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DyugGoIaLEniaOuD9GgyJYioHurpoogn0oBuSc44gu9dUe8wedF9uVzQ+7kUo5trODF8Xfahlyj3199wVMNRyL08n9+uuqcLLxT1YBvEaYyDJ0wrw/EHybUTfKLMSwmpC5Ya/u50NN4vSMmGzoPE4Nikhy9SS+2K8vLyK5u7YKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i6dTkOa9; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-b3d196b7eeeso348611266b.0
+        for <netdev@vger.kernel.org>; Sun, 09 Nov 2025 11:24:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tu-berlin.de; l=2900; s=dkim-tub; t=1762715963;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=9t6okxIrip/xPFvPu9sHeKspgBirvv7MIuQRM54c7iE=;
-  b=VBuJiuO3qNKTqwy99WlTgcnulaeXZ+Mev5ygvmzMWL1Q09Rl/6P2vYdu
-   Q9UAUUG0pp9aBzPPUUpQMKQX8XFMSz1ntYVaf0BEMYOcIyTFazjJGY1mA
-   /ZqPTWGPVD/5etJXJYUi5uFO0M2v1bFNvaI+LrSfDLQ0VR8AFJXmUoCLb
-   s=;
-X-CSE-ConnectionGUID: r3q0XGRiQo6p94eyeyKgZw==
-X-CSE-MsgGUID: 7vOH0Ru1TE2OvNEQ6HLiDA==
-X-IronPort-AV: E=Sophos;i="6.19,292,1754949600"; 
-   d="scan'208";a="52105249"
-Received: from bulkmail.tu-berlin.de (HELO mail.tu-berlin.de) ([141.23.12.143])
-  by mailrelay.tu-berlin.de with ESMTP; 09 Nov 2025 20:18:10 +0100
-Message-ID: <ef601e55-16a0-4d3e-bd0d-536ed9dd29cd@tu-berlin.de>
-Date: Sun, 9 Nov 2025 20:18:08 +0100
+        d=gmail.com; s=20230601; t=1762716281; x=1763321081; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=TIKKGAUxLaG+QVE3XjDCtS0yAOmsRVmTQnPpcMwaNFo=;
+        b=i6dTkOa9gYlF3U9nMkC004x/rZ30yV9M3mv+6qYKUkatMfq9cbfHAXeuQFC3pJbnDq
+         I2c64cZ+Nwwrm8sJv1RG6LGlPclmLc0iB0WmpwlXkSzbtS9P18+4oNJS7UVUOSaE3QGv
+         Aik+ogNOsGEUq2CIbKHfaORZJYsBnThQwKid/zQdqtlxWapQfBeOAmyfS+F4uMxj1ew/
+         o9OqtZ3X773yNKUonCgN+1vmBICzW0aqgkZ9Z2SwWCZQMbwBgABdkHrAVOMKk9nqaUGW
+         63QLG14msXymsSCEE/gboDSEgcxomPVyKTPKdnj+0A/VS/B0p6bqrmunddtqrQQC0O3k
+         miIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762716281; x=1763321081;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TIKKGAUxLaG+QVE3XjDCtS0yAOmsRVmTQnPpcMwaNFo=;
+        b=ejWlMQn1MYqgDX3oYBCZQbeBjvYmSarvZUXsBU6wYL5/RRMfWr+lcBUodVGeAIj7jQ
+         Jx19kSFHjPxU7k+JUwRoJ6C37X57by0P8jt7DOG2HBEb6sqSg40rDV1uNqgdVMDUvVwp
+         gtpW7LKYBDuuX0VafoyllwxlQi1wyn2ItPLa0zahAPEDRA33UAz2xZlQLvqCvV0oZ1RE
+         jREr51+hvUp8/5rzHnW2ShLOlQu1pc9HwIqx1YCecJZN/QYsOVJz2mX3jFwSXS9f7fOj
+         fbT6D2jfdX9K5uO7dDWZ71Ohy7KuS/ftCB5vzAlGuTDUycCnAyRiNml0YZcVPbc+a47N
+         FBDw==
+X-Forwarded-Encrypted: i=1; AJvYcCXh8vPmNFMlHFeLZEKpBGqBGtOdKsbAbhfuYtJwSy4PprrFKxr4W+gTdkSs8BRIq5piUKhcewI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNDbcrCH/ELz2x3V6hgUfWct/IP1EmGbIwHi5+mo2WomiZhEW0
+	m+A+zfJZ97oAya2ENQKZH7Qba+E3YS9wEWjfZ2zN/CYVsjCMxhCfy8bI
+X-Gm-Gg: ASbGncvBbWtjG4JCndwWsNICgqR/jWxnZJrjJbweCnyLz+ogietSmJguj7BNRLXhMyd
+	R04ndHZw17szBhv+ErOI/5BgOCcpnqp5gm2Hz+E7a9bZoEO6gZRokk20uRL0NLkcXGjGWQIu11I
+	V771fLylT/NdI/mgOs2UdQoIP+xwe57O2BGqca2tCwEYUBQ7so+OQ3ptXbeeZeRwNe2+EIIhFAl
+	FQIqYu45zqejy1wmSM1Sa7bGWdUFob1HCauFhEgyR5qjc38ijPOutzej3pYfxqIOryXXywOWJj5
+	QCeEf7O9/jFHW0H7YlkIXe0DaYopqj9qi9/fCrc0VnDm62w54TBFaIwAsXGcenXH4uNUXV8jN70
+	Z5MH8yOR94ZUIaIQMtLNoWNGzJ23e54sO/JADbCEixN4nKgqd9mWRJgsJEXtnOI+9QMRGQ9brmS
+	7mGgmle2VsR18A3QAcjhDgwE+saLm063JIWIULfyJpUvGBCLOLIYYXqXZSlL7vnH/A/CoZZME=
+X-Google-Smtp-Source: AGHT+IHcavlGRtCMXIYLReGyT/wu2uhwzR3CuuOMBLjG6pTiN0jeib0DEyX5FIv4+8BofcYcOeVwtg==
+X-Received: by 2002:a17:906:d554:b0:b72:d001:7653 with SMTP id a640c23a62f3a-b72e02d62cemr545418666b.19.1762716281018;
+        Sun, 09 Nov 2025 11:24:41 -0800 (PST)
+Received: from eric (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b72bf97e447sm919652466b.42.2025.11.09.11.24.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Nov 2025 11:24:40 -0800 (PST)
+From: Eric Woudstra <ericwouds@gmail.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	Phil Sutter <phil@nwl.cc>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>
+Cc: netfilter-devel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	bridge@lists.linux.dev,
+	Eric Woudstra <ericwouds@gmail.com>
+Subject: [PATCH v17 nf-next 0/4] conntrack: bridge: add double vlan, pppoe and pppoe-in-q
+Date: Sun,  9 Nov 2025 20:24:23 +0100
+Message-ID: <20251109192427.617142-1-ericwouds@gmail.com>
+X-Mailer: git-send-email 2.50.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 net-next 5/5] net: dev_queue_xmit() llist adoption
-To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>, "Eric
- Dumazet" <edumazet@google.com>
-CC: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
-	<xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, Kuniyuki Iwashima
-	<kuniyu@google.com>, Willem de Bruijn <willemb@google.com>,
-	<netdev@vger.kernel.org>, <eric.dumazet@gmail.com>
-References: <20251013145416.829707-1-edumazet@google.com>
- <20251013145416.829707-6-edumazet@google.com> <877bw1ooa7.fsf@toke.dk>
- <CANn89iJ70QW5v2NnnuH=td0NimgEaQgdxiof0_=yPS1AnZRggg@mail.gmail.com>
- <CANn89iKY7uMX41aLZA6cFXbjR49Z+WCSd7DgZDkTqXxfeqnXmg@mail.gmail.com>
- <CANn89iLQ3G6ffTN+=98+DDRhOzw8TNDqFd_YmYn168Qxyi4ucA@mail.gmail.com>
- <CANn89iLqUtGkgXj0BgrXJD8ckqrHkMriapKpwHNcMP06V_fAGQ@mail.gmail.com>
- <871pm7np2w.fsf@toke.dk>
-Content-Language: en-US
-From: =?UTF-8?Q?Jonas_K=C3=B6ppeler?= <j.koeppeler@tu-berlin.de>
-In-Reply-To: <871pm7np2w.fsf@toke.dk>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
 
-On 11/9/25 5:33 PM, Toke Høiland-Jørgensen wrote:
-> Not sure why there's this difference between your setup or mine; some
-> .config or hardware difference related to the use of atomics? Any other
-> ideas?
+Conntrack bridge only tracks untagged and 802.1q.
 
-Hi Eric, hi Toke,
+To make the bridge-fastpath experience more similar to the
+forward-fastpath experience, introduce patches for double vlan,
+pppoe and pppoe-in-q tagged packets to bridge conntrack and to
+bridge filter chain.
 
-I observed a similar behavior where CAKE's throughput collapses after the patch.
+Changes in v17:
 
-Test setup:
-- 4 queues CAKE root qdisc
-- 64-byte packets at ~21 Mpps
-- Intel Xeon Gold 6209U + 25GbE Intel XXV710 NIC
-- DuT forwards incoming traffic back to traffic generator through cake
+- Add patch for nft_set_pktinfo_ipv4/6_validate() adding nhoff argument.
+- Stopped using skb_set_network_header() in nft_set_bridge_pktinfo,
+   using the new offset for nft_set_pktinfo_ipv4/6_validate instead.
+- When pskb_may_pull() fails in nft_set_bridge_pktinfo() set proto to 0,
+   resulting in pktinfo unspecified.
 
-Throughput over 10 seconds before/after patch:
+Changes in v16:
 
-Before patch:
-0.475   mpps
-0.481   mpps
-0.477   mpps
-0.478   mpps
-0.478   mpps
-0.477   mpps
-0.479   mpps
-0.481   mpps
-0.481   mpps
+- Changed nft_chain_filter patch: Only help populating pktinfo offsets,
+   call nft_do_chain() with original network_offset.
+- Changed commit messages.
+- Removed kernel-doc comments.
 
-After patch:
-0.265  mpps
-0.035  mpps
-0.003  mpps
-0.002  mpps
-0.001  mpps
-0.002  mpps
-0.002  mpps
-0.002  mpps
-0.002  mpps
+Changes in v15:
 
----
+- Do not munge skb->protocol.
+- Introduce nft_set_bridge_pktinfo() helper.
+- Introduce nf_ct_bridge_pre_inner() helper.
+- nf_ct_bridge_pre(): Don't trim on ph->hdr.length, only compare to what
+   ip header claims and return NF_ACCEPT if it does not match.
+- nf_ct_bridge_pre(): Renamed u32 data_len to pppoe_len.
+- nf_ct_bridge_pre(): Reset network_header only when ret == NF_ACCEPT.
+- nf_checksum(_partial)(): Use of skb_network_offset().
+- nf_checksum(_partial)(): Use 'if (WARN_ON()) return 0' instead.
+- nf_checksum(_partial)(): Added comments
 
+Changes in v14:
 
- From the qdisc I also see a large number of drops. Running:
+- nf_checksum(_patial): Use DEBUG_NET_WARN_ON_ONCE(
+   !skb_pointer_if_linear()) instead of pskb_may_pull().
+- nft_do_chain_bridge: Added default case ph->proto is neither
+   ipv4 nor ipv6.
+- nft_do_chain_bridge: only reset network header when ret == NF_ACCEPT.
 
-     perf record -a -e skb:kfree_skb
+Changes in v13:
 
-shows `QDISC_OVERLIMIT` and `CAKE_FLOOD` as the drop reasons.
+- Do not use pull/push before/after calling nf_conntrack_in() or
+   nft_do_chain().
+- Add patch to correct calculating checksum when skb->data !=
+   skb_network_header(skb).
 
-`tc` statistics before/after the patch:
+Changes in v12:
 
-Before patch:
-- drops: 32
-- packets: 4,786,109
-- memory_used: 8,916,480
-- requeues: 254
+- Only allow tracking this traffic when a conntrack zone is set.
+- nf_ct_bridge_pre(): skb pull/push without touching the checksum,
+   because the pull is always restored with push.
+- nft_do_chain_bridge(): handle the extra header similar to
+   nf_ct_bridge_pre(), using pull/push.
 
-After patch:
-- drops: 13,601,075
-- packets: 322,540
-- memory_used: 15,504,576
-- requeues: 273
+Changes in v11:
 
----
+- nft_do_chain_bridge(): Proper readout of encapsulated proto.
+- nft_do_chain_bridge(): Use skb_set_network_header() instead of thoff.
+- removed test script, it is now in separate patch.
 
-Call graph of `__dev_queue_xmit` after the patch (CPU time percentages):
+v10 split from patch-set: bridge-fastpath and related improvements v9
 
-53.37%  __dev_queue_xmit
-   21.02%  __qdisc_run
-     13.79%  sch_direct_xmit
-       12.01%  _raw_spin_lock
-         11.30%  do_raw_spin_lock
-           11.06%  __pv_queued_spin_lock_slowpath
-     0.73%  _raw_spin_unlock
-       0.58%  lock_release
-     0.69%  dev_hard_start_xmit
-     6.91%  cake_dequeue
-       1.82%  sk_skb_reason_drop
-         1.10%  skb_release_data
-         0.65%  kfree_skbmem
-           0.61%  kmem_cache_free
-       1.64%  get_random_u32
-       0.97%  ktime_get
-         0.86%  seqcount_lockdep_reader_access.constprop.0
-       0.91%  cake_dequeue_one
-   16.49%  _raw_spin_lock
-     15.71%  do_raw_spin_lock
-       15.54%  __pv_queued_spin_lock_slowpath
-   10.00%  dev_qdisc_enqueue
-     9.94%  cake_enqueue
-       4.90%  cake_hash
-       2.85%  __skb_flow_dissect
-         1.08%  lock_acquire
-         0.65%  lock_release
-       1.17%  __siphash_unaligned
-       2.20%  ktime_get
-         1.94%  seqcount_lockdep_reader_access.constprop.0
-       0.69%  cake_get_flow_quantum / get_random_u16
-   1.99%  netdev_core_pick_tx
-     1.79%  i40e_lan_select_queue
-     1.62%  netdev_pick_tx
-       0.78%  lock_acquire
-       0.52%  lock_release
-     0.82%  lock_acquire
-   0.76%  kfree_skb_list_reason
-     0.52%  skb_release_data
-   1.02%  lock_acquire
-     0.63%  lock_release
+Eric Woudstra (4):
+  netfilter: utils: nf_checksum(_partial) correct data!=networkheader
+  netfilter: bridge: Add conntrack double vlan and pppoe
+  netfilter: nft_set_pktinfo_ipv4/6_validate: Add nhoff argument
+  netfilter: nft_chain_filter: Add bridge double vlan and pppoe
 
----
+ include/net/netfilter/nf_tables_ipv4.h     | 21 +++--
+ include/net/netfilter/nf_tables_ipv6.h     | 21 +++--
+ net/bridge/netfilter/nf_conntrack_bridge.c | 92 ++++++++++++++++++----
+ net/netfilter/nft_chain_filter.c           | 59 ++++++++++++--
+ net/netfilter/utils.c                      | 28 +++++--
+ 5 files changed, 176 insertions(+), 45 deletions(-)
 
-The `_raw_spin_lock` portion under `__qdisc_run -> sch_direct_xmit` is slightly higher after the patch compared to before (from 5.68% to 12.01%).
-It feels like once sch_cake starts dropping packets it (due to overlimit and cobalt-drops) the throughput collapses. Could it be that the overlimit
-is reached "faster" when there are more CPUs trying to enqueue packets, thus reaching cake's queue limit due to the "batch" enqueue behavior,
-which then leads to cake starting to drop packets?
-
-
-Jonas
+-- 
+2.50.0
 
 
