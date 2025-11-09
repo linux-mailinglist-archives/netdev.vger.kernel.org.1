@@ -1,270 +1,100 @@
-Return-Path: <netdev+bounces-237067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D988FC444AF
-	for <lists+netdev@lfdr.de>; Sun, 09 Nov 2025 18:42:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A70E9C44549
+	for <lists+netdev@lfdr.de>; Sun, 09 Nov 2025 19:57:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7BEFF4E200F
-	for <lists+netdev@lfdr.de>; Sun,  9 Nov 2025 17:42:14 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1784B4E3778
+	for <lists+netdev@lfdr.de>; Sun,  9 Nov 2025 18:57:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A43783002CA;
-	Sun,  9 Nov 2025 17:42:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96DE023184A;
+	Sun,  9 Nov 2025 18:57:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W1O2fIM5"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="YvlECcl3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 809DB1E0083
-	for <netdev@vger.kernel.org>; Sun,  9 Nov 2025 17:42:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C08DB223DE9
+	for <netdev@vger.kernel.org>; Sun,  9 Nov 2025 18:57:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762710132; cv=none; b=tPa8fR2u1HQBPDNA07ThjFBsRcxsyFHbVmdYgVNcOJU9fgpK71Ysg9HOo2U3UY6rTWkPlNjrfMv2IxI8rBxKruBv7wSZfFhMPu+bH3ohzmZ/udRUbiIqjRWA7M6FZI7WT7jH8DDMcpns1pgJeJS0E9xgvCV9zZhBIpxzWaZZztc=
+	t=1762714665; cv=none; b=Q3HJ9X5KKlTcKQ3mqt8BBmnbDsCzZQprxzFYCBofdaTw5X5h7LpaTIYG/zIaTRM5uP1vA14tJydVOoqtVFkg4FqJ9+4CFAgrDumLzJw32WEK/MuFoLqsOILP3RVe1yyp7dya1o4mVyXbkd3klFP9By9ulq2BdoHhHhZt2B4m+Lc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762710132; c=relaxed/simple;
-	bh=zc9hK0jHrMMiD+V7uBIpSu5vlq30um47umH/ZCf0DNE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GWffCbUUbDxjeD/SSQk/c6qM81LB1C88kCbo04PjLaHqL+DG1+VvcWB2o4lEv2oGtCex+vB1YIhWnZeLLRT/eW0V1ISdNble5lqBmVyl6HkLuUVPVDaE6CXcwVpbTIRy7t3KuvF+8quGqaYH+lEC/ME0IbcoEovHVrp/P3/AczY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W1O2fIM5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BED96C4CEFB;
-	Sun,  9 Nov 2025 17:42:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762710129;
-	bh=zc9hK0jHrMMiD+V7uBIpSu5vlq30um47umH/ZCf0DNE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=W1O2fIM5M65CVlxw4zJgVvoDcltTeirpqDwkjtF4GJnFyO/5rb83Dfc89C71GLj76
-	 ySdyNlSD5Hv/5q2A+SHc2x5E+H5HbzmyvDbMo2mYQ/kxhdhv3XY59511Yh4ZY56EUA
-	 q0INMbt4TtNUDS+320pnmSD9Utx/5wAlqAXf1+PCJ7GFrVZihiCsRg5dz9eq8baAxq
-	 fiTOgXLu0QTMuRVOOBHUP+sA0IiOjYPY2vEjcXg5xNhHwxxnilP6nDRBG1M7pFn5h3
-	 Ben/eUkpFFF5kcvQ03unfJnhGAHkLafJK0Hhzt9VzPv7tnhKAj65UM5qNj1KyYdMSO
-	 2n811bSBFN2nw==
-Message-ID: <737664cf-bd1b-4ea7-9203-1a8e6a3473b7@kernel.org>
-Date: Sun, 9 Nov 2025 10:42:07 -0700
+	s=arc-20240116; t=1762714665; c=relaxed/simple;
+	bh=KLAk9ssiOdN8KNk1XI76eIb62u2hRBoNH+s44yZbPRA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bebnHLeA4piGEL6kNYf3dRokT+jtmeLQoH2mT6VM5PbM0xR20uJX7x2hi3ZQtEewq+wGZteYL7w3SXL9F6wsHKDVFhriUwB36CgPOxlJHtKen2OrQ0aPjvl2eCHJltIU9vRUJkFaq6omA10J+MMR35CfampwA/En5ozbpkCsMig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=YvlECcl3; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-b4755f37c3eso1793909a12.3
+        for <netdev@vger.kernel.org>; Sun, 09 Nov 2025 10:57:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1762714663; x=1763319463; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O5qrQnxGT0Lw22uNFB/a8xg+6EJqZOWt4X5tQ9MzjHY=;
+        b=YvlECcl3OF1KxR16gQN00IA9YeNkgwZtqFOSsQSSwzBNBDEQ6+FliKyI2wmsSFoNcC
+         Mi7wizxqTz7l4bOrTTYOSwh/QvHVKEcYUT+5MJktLE5WvUr+Rii3GKM4ZI54+v7iW5kh
+         NW+9SQw8vh+zgHpvwNyLVhcDfoiUL085pyaykh/yKUQkC0liLuK7AvVsgdc6HQjuTV+/
+         wxi1KT8Mrjk6yo3WKPOq5m+yAh6G3/9mBZTBYL2DDpFOt+iqLnS5kNTE0f6cxdxl6gC2
+         vilbBEZ8jZlCfdFwxUeZWl2OVSTKKl+sPpeITCfbB0yGzaF9GLKQhebeKvOk0cbHbNAU
+         paJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762714663; x=1763319463;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=O5qrQnxGT0Lw22uNFB/a8xg+6EJqZOWt4X5tQ9MzjHY=;
+        b=o5o99XIwCV92A2BvFeQ5S2MDAGKAZa8N3q/zR0ccw5QKgdLUbxV37fZWA3naXORvir
+         hcThf1hkv/wXhLx2b7YIsYGULpc+JjJqWXrlJRfS3aVZEl0579SzlAcLKtXhKlVjFK0t
+         c4oBEXXTOWQyzjlTHfI+GmKrz9ThwPmMjVEaTKohe/+u+RYNMJfVVOlclDKVNigzwnXt
+         js/2gGgA7hmHk7c8lj4TYnSePtQfcsyI762saDTHyH1D34m0+gNcfwLL0jS2t0V47Ffp
+         7r49n8JmAiD2lbkAn34/U+zGrv4w2gF99MDo9h6w+hhSfgROmE0zKK1NObFFn06F7cuD
+         2ymg==
+X-Gm-Message-State: AOJu0Yyw/t0LAilSba0LNZ/e4X3Yv5u4tGFWTc/aEPg0lj0DpZfohCoM
+	pTgoRffvAB1cFO662mFpVECwwtg4bu5YauAPt9zU/iJHYbcFwug90ns+JEmHQi8wwIw=
+X-Gm-Gg: ASbGnctVgwk21YGzVnU9BCoj+e/IXkFKCcB0r5FdXkYqnKz9wVmMoG4DYOcs9eWuT9t
+	SaIVeOTJIgdt6gCZCc2KdjC9vLTS0DL48XrthpFi6AUcJdmryvMjexDGkGyGh9XYNz7BloFXA1T
+	4UcQr0I+QqbLCOWy/MLtaAVg/yuqfDCys3Qqhh5CjnVx0q3egBI2c4jSG0sDz3Qa1Loq1uvB85l
+	bdbqxhgevIzmlwUScACj4MdnB5/zyyZGaCpaH8vNksMP+S/9V3iQ7A/VuDsTTu2ViJMtYC30C4q
+	5rCT48v1oshrYZ6JrRUot7Ma75dwvLxosbbqf1G6htgCSHNTau4lIFSEdzwK02AJ2kryykT/XQZ
+	5XGcKtmqRZXfyDNGzCKY5gHGKWCo6GNE4X4BMURadAPkdSzdPBDCCkiMAcBr9HDN1RmWtaVt2aS
+	C0oAdE30h0ma8YGOMlDrT2ZMrMDiJdjlPvtvMWs2Ae8TiO
+X-Google-Smtp-Source: AGHT+IGMUh5xZmIxbrnjEBKDE/tM3dCl2C0UYXAfZHCP9kIT5D5dIrl26nSArjkVz5o7qHKQtlmjKw==
+X-Received: by 2002:a17:903:fad:b0:297:dade:456e with SMTP id d9443c01a7336-297e56dc6ccmr70092495ad.44.1762714662904;
+        Sun, 09 Nov 2025 10:57:42 -0800 (PST)
+Received: from phoenix (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b0cca57fb5sm9064197b3a.56.2025.11.09.10.57.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Nov 2025 10:57:42 -0800 (PST)
+Date: Sun, 9 Nov 2025 10:57:39 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Petr Oros <poros@redhat.com>
+Cc: netdev@vger.kernel.org, dsahern@kernel.org, jiri@resnulli.us, Ivan
+ Vecera <ivecera@redhat.com>
+Subject: Re: [PATCH iproute2-next v2] dpll: Add dpll command
+Message-ID: <20251109105739.55162f32@phoenix>
+In-Reply-To: <20251107173116.96622-1-poros@redhat.com>
+References: <20251107173116.96622-1-poros@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iproute2-next v2] dpll: Add dpll command
-Content-Language: en-US
-To: Petr Oros <poros@redhat.com>, netdev@vger.kernel.org
-Cc: stephen@networkplumber.org, jiri@resnulli.us,
- Ivan Vecera <ivecera@redhat.com>
-References: <20251107173116.96622-1-poros@redhat.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20251107173116.96622-1-poros@redhat.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 11/7/25 10:31 AM, Petr Oros wrote:
-> diff --git a/dpll/dpll.c b/dpll/dpll.c
-> new file mode 100644
-> index 00000000000000..995f90b66759fa
-> --- /dev/null
-> +++ b/dpll/dpll.c
-> @@ -0,0 +1,2022 @@
-> +/* SPDX-License-Identifier: GPL-2.0-or-later */
-> +/*
-> + * dpll.c	DPLL tool
-> + *
-> + * Authors:	Petr Oros <poros@redhat.com>
-> + */
-> +
-> +#include <errno.h>
-> +#include <getopt.h>
-> +#include <inttypes.h>
-> +#include <poll.h>
-> +#include <signal.h>
-> +#include <stdbool.h>
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <string.h>
-> +#include <unistd.h>
-> +#include <linux/dpll.h>
-> +#include <linux/genetlink.h>
-> +#include <libmnl/libmnl.h>
-> +
-> +#include "../devlink/mnlg.h"
-
-Add a separate patch that moves mnlg.c to lib, and mnlg.h to include.
-
-> +#include "mnl_utils.h"
-> +#include "version.h"
-> +#include "utils.h"
-> +#include "json_print.h"
-> +
-> +#define pr_err(args...) fprintf(stderr, ##args)
-> +#define pr_out(args...) fprintf(stdout, ##args)
-> +
-> +struct dpll {
-> +	struct mnlu_gen_socket nlg;
-> +	int argc;
-> +	char **argv;
-> +	bool json_output;
-> +};
-> +
-> +static volatile sig_atomic_t monitor_running = 1;
-> +
-> +static void monitor_sig_handler(int signo __attribute__((unused)))
-> +{
-> +	monitor_running = 0;
-> +}
-> +
-> +static int str_to_bool(const char *s, bool *val)
-> +{
-> +	if (!strcmp(s, "true") || !strcmp(s, "1") || !strcmp(s, "enable"))
-> +		*val = true;
-> +	else if (!strcmp(s, "false") || !strcmp(s, "0") ||
-> +		 !strcmp(s, "disable"))
-> +		*val = false;
-> +	else
-> +		return -EINVAL;
-> +	return 0;
-> +}
-
-This essentially replicates parse_one_of(). Make it a function in
-lib/utils.c and update it to use parse_one_of.
-
-...
+On Fri,  7 Nov 2025 18:31:16 +0100
+Petr Oros <poros@redhat.com> wrote:
 
 > +
-> +static int str_to_dpll_pin_state(const char *s, __u32 *v)
-> +{
-> +	if (!strcmp(s, "connected"))
-> +		*v = DPLL_PIN_STATE_CONNECTED;
-> +	else if (!strcmp(s, "disconnected"))
-> +		*v = DPLL_PIN_STATE_DISCONNECTED;
-> +	else if (!strcmp(s, "selectable"))
-> +		*v = DPLL_PIN_STATE_SELECTABLE;
-> +	else
-> +		return -EINVAL;
-> +	return 0;
-> +}
-
-dpll_pin_state_name is the inverse of this; create a table that is used
-for both directions.
-
-> +
-> +static int str_to_dpll_pin_type(const char *s, __u32 *type)
-> +{
-> +	if (!strcmp(s, "mux"))
-> +		*type = DPLL_PIN_TYPE_MUX;
-> +	else if (!strcmp(s, "ext"))
-> +		*type = DPLL_PIN_TYPE_EXT;
-> +	else if (!strcmp(s, "synce-eth-port"))
-> +		*type = DPLL_PIN_TYPE_SYNCE_ETH_PORT;
-> +	else if (!strcmp(s, "int-oscillator"))
-> +		*type = DPLL_PIN_TYPE_INT_OSCILLATOR;
-> +	else if (!strcmp(s, "gnss"))
-> +		*type = DPLL_PIN_TYPE_GNSS;
-> +	else
-> +		return -EINVAL;
-> +	return 0;
-> +}
-
-dpll_pin_type_name below is the inverse of this. Do the same here - 1
-table used by both directions.
-
-> +
-> +static int dpll_parse_state(struct dpll *dpll, __u32 *state)
-> +{
-> +	const char *str = dpll_argv(dpll);
-> +
-> +	if (str_to_dpll_pin_state(str, state)) {
-> +		pr_err("invalid state: %s (use connected/disconnected/selectable)\n",
-> +		       str);
-> +		return -EINVAL;
-> +	}
-> +	dpll_arg_inc(dpll);
-> +	return 0;
-> +}
-> +
-> +static int dpll_parse_direction(struct dpll *dpll, __u32 *direction)
-> +{
-> +	if (dpll_argv_match_inc(dpll, "input")) {
-> +		*direction = DPLL_PIN_DIRECTION_INPUT;
-> +	} else if (dpll_argv_match_inc(dpll, "output")) {
-> +		*direction = DPLL_PIN_DIRECTION_OUTPUT;
-> +	} else {
-> +		pr_err("invalid direction: %s (use input/output)\n",
-> +		       dpll_argv(dpll));
-> +		return -EINVAL;
-> +	}
-> +	return 0;
-> +}
-
-again here.
-
-> +
-> +static int dpll_parse_pin_type(struct dpll *dpll, __u32 *type)
-> +{
-> +	const char *str = dpll_argv(dpll);
-> +
-> +	if (str_to_dpll_pin_type(str, type)) {
-> +		pr_err("invalid type: %s (use mux/ext/synce-eth-port/int-oscillator/gnss)\n",> +		       str);
-> +		return -EINVAL;
-> +	}
-> +	dpll_arg_inc(dpll);
-> +	return 0;
-> +}
-> +
-> +static int dpll_parse_u32(struct dpll *dpll, const char *arg_name,
-> +			  __u32 *val_ptr)
-> +{
-> +	const char *__str = dpll_argv_next(dpll);
-> +
-> +	if (!__str) {
-> +		pr_err("%s requires an argument\n", arg_name);
-> +		return -EINVAL;
-> +	}
-> +	if (get_u32(val_ptr, __str, 0)) {
-> +		pr_err("invalid %s: %s\n", arg_name, __str);
-> +		return -EINVAL;
-> +	}
-> +	return 0;
-> +}
-> +
-> +static int dpll_parse_attr_u32(struct dpll *dpll, struct nlmsghdr *nlh,
-> +			       const char *arg_name, int attr_id)
-> +{
-> +	__u32 val;
-> +
-> +	if (dpll_parse_u32(dpll, arg_name, &val))
-> +		return -EINVAL;
-> +	mnl_attr_put_u32(nlh, attr_id, val);
-> +	return 0;
-> +}
-> +
-> +static int dpll_parse_attr_s32(struct dpll *dpll, struct nlmsghdr *nlh,
-> +			       const char *arg_name, int attr_id)
-> +{
-> +	const char *str = dpll_argv_next(dpll);
-> +	__s32 val;
-> +
-> +	if (!str) {
-> +		pr_err("%s requires an argument\n", arg_name);
-> +		return -EINVAL;
-> +	}
-> +	if (get_s32(&val, str, 0)) {
-> +		pr_err("invalid %s: %s\n", arg_name, str);
-> +		return -EINVAL;
-> +	}
-> +	mnl_attr_put_u32(nlh, attr_id, val);
-
-function is `_s32` but the put here is `_u32`.
-
-
-> +	return 0;
-> +}
-> +
-
-...
-
 > +/* Macros for printing netlink attributes
 > + * These macros combine the common pattern of:
 > + *
@@ -276,17 +106,10 @@ function is `_s32` but the put here is `_u32`.
 > + */
 > +
 > +#define DPLL_PR_INT_FMT(tb, attr_id, name, format_str)                         \
-
-INT
-
 > +	do {                                                                   \
 > +		if (tb[attr_id])                                               \
 > +			print_int(PRINT_ANY, name, format_str,                 \
 > +				  mnl_attr_get_u32(tb[attr_id]));              \
-
-u32?
-
-
 > +	} while (0)
 > +
 > +#define DPLL_PR_UINT_FMT(tb, attr_id, name, format_str)                        \
@@ -322,9 +145,6 @@ u32?
 > +
 > +/* Helper to read signed int (can be s32 or s64 depending on value) */
 > +static __s64 mnl_attr_get_sint(const struct nlattr *attr)
-
-one user of mnl_attr_get_sint and it expects s64
-
 > +{
 > +	if (mnl_attr_get_payload_len(attr) == sizeof(__s32))
 > +		return *(__s32 *)mnl_attr_get_payload(attr);
@@ -339,54 +159,94 @@ one user of mnl_attr_get_sint and it expects s64
 > +				  mnl_attr_get_sint(tb[attr_id]));             \
 > +	} while (0)
 > +
-
-...
-
-> +static int cmd_device_show(struct dpll *dpll)
-> +{
-> +	bool has_id = false;
-> +	__u32 id = 0;
+> +#define DPLL_PR_SINT(tb, attr_id, name)                                        \
+> +	DPLL_PR_SINT_FMT(tb, attr_id, name, "  " name ": %" PRId64 "\n")
 > +
-> +	while (dpll_argc(dpll) > 0) {
-> +		if (dpll_argv_match(dpll, "id")) {
-> +			if (dpll_parse_u32(dpll, "id", &id))
-> +				return -EINVAL;
-> +			has_id = true;
-> +		} else {
-> +			pr_err("unknown option: %s\n", dpll_argv(dpll));
-> +			return -EINVAL;
-> +		}
-> +	}
+> +#define DPLL_PR_STR(tb, attr_id, name)                                         \
+> +	DPLL_PR_STR_FMT(tb, attr_id, name, "  " name ": %s\n")
 > +
-> +	if (has_id)
-> +		return cmd_device_show_id(dpll, id);
-> +	else
-
-else is not needed, just
-	if ()
-		return...
-
-	return ...
-
-> +		return cmd_device_show_dump(dpll);
-> +}
+> +/* Temperature macro - JSON prints raw millidegrees, human prints formatted */
+> +#define DPLL_PR_TEMP(tb, attr_id)                                              \
+> +	do {                                                                   \
+> +		if (tb[attr_id]) {                                             \
+> +			__s32 temp = mnl_attr_get_u32(tb[attr_id]);            \
+> +			if (is_json_context()) {                               \
+> +				print_int(PRINT_JSON, "temp", NULL, temp);     \
+> +			} else {                                               \
+> +				div_t d = div(temp, 1000);                     \
+> +				pr_out("  temp: %d.%03d C\n", d.quot, d.rem);  \
+> +			}                                                      \
+> +		}                                                              \
+> +	} while (0)
+> +
+> +/* Generic version with custom format */
+> +#define DPLL_PR_ENUM_STR_FMT(tb, attr_id, name, format_str, name_func)         \
+> +	do {                                                                   \
+> +		if (tb[attr_id])                                               \
+> +			print_string(                                          \
+> +				PRINT_ANY, name, format_str,                   \
+> +				name_func(mnl_attr_get_u32(tb[attr_id])));     \
+> +	} while (0)
+> +
+> +/* Simple version with auto-generated format */
+> +#define DPLL_PR_ENUM_STR(tb, attr_id, name, name_func)                         \
+> +	DPLL_PR_ENUM_STR_FMT(tb, attr_id, name, "  " name ": %s\n", name_func)
+> +
+> +/* Multi-attr enum printer - handles multiple occurrences of same attribute */
+> +#define DPLL_PR_MULTI_ENUM_STR(nlh, attr_id, name, name_func)                  \
+> +	do {                                                                   \
+> +		struct nlattr *__attr;                                         \
+> +		bool __first = true;                                           \
+> +                                                                               \
+> +		if (!nlh)                                                      \
+> +			break;                                                 \
+> +                                                                               \
+> +		mnl_attr_for_each(__attr, nlh, sizeof(struct genlmsghdr))      \
+> +		{                                                              \
+> +			if (mnl_attr_get_type(__attr) == (attr_id)) {          \
+> +				__u32 __val = mnl_attr_get_u32(__attr);        \
+> +				if (__first) {                                 \
+> +					if (is_json_context()) {               \
+> +						open_json_array(PRINT_JSON,    \
+> +								name);         \
+> +					} else {                               \
+> +						pr_out("  " name ":");         \
+> +					}                                      \
+> +					__first = false;                       \
+> +				}                                              \
+> +				if (is_json_context()) {                       \
+> +					print_string(PRINT_JSON, NULL, NULL,   \
+> +						     name_func(__val));        \
+> +				} else {                                       \
+> +					pr_out(" %s", name_func(__val));       \
+> +				}                                              \
+> +			}                                                      \
+> +		}                                                              \
+> +		if (__first)                                                   \
+> +			break;                                                 \
+> +		if (is_json_context()) {                                       \
+> +			close_json_array(PRINT_JSON, NULL);                    \
+> +		} else {                                                       \
+> +			pr_out("\n");                                          \
+> +		}                                                              \
+> +	} while (0)
 > +
 
-A few "legacy" comments? this is the first submissions for this command
-to iproute2, so how is there a legacy expectation?
+Code with large macros is harder to read and harder to maintain.
+Why can this not be inline functions?
+Why do you need to reinvent yet another netlink parser.
 
-> +			pr_out("    ");
-> +			if (freq_min == freq_max) {
-> +				print_lluint(PRINT_FP, NULL, "%" PRIu64 " Hz\n",
-> +					     freq_min);
-> +			} else {
-> +				print_lluint(PRINT_FP, NULL, "%" PRIu64,
-> +					     freq_min);
-> +				pr_out("-");
-> +				print_lluint(PRINT_FP, NULL, "%" PRIu64 " Hz\n",
-> +					     freq_max);
-> +			}
-> +		}
-> +
+Code that does is_json_context() is more verbose than necessary.
 
+> +				if (is_json_context()) {                       \
+> +					print_string(PRINT_JSON, NULL, NULL,   \
+> +						     name_func(__val));        \
+> +				} else {                                       \
+> +					pr_out(" %s", name_func(__val));       \
+> +				}          
+
+Can be replaced by:
+			print_string(PRINT_ANY, NULL, " %s", name_func(__val));
+
+Please use existing code patterns.
 
