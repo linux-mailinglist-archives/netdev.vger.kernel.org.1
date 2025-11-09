@@ -1,198 +1,200 @@
-Return-Path: <netdev+bounces-237050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D15C1C43D47
-	for <lists+netdev@lfdr.de>; Sun, 09 Nov 2025 13:17:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 068CDC43E3A
+	for <lists+netdev@lfdr.de>; Sun, 09 Nov 2025 13:54:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 205903A0855
-	for <lists+netdev@lfdr.de>; Sun,  9 Nov 2025 12:17:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B262E3AD980
+	for <lists+netdev@lfdr.de>; Sun,  9 Nov 2025 12:54:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3521E2EBB8C;
-	Sun,  9 Nov 2025 12:16:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 913EA2F25F6;
+	Sun,  9 Nov 2025 12:54:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="UKZ9NVzr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Zmac/QXw"
 X-Original-To: netdev@vger.kernel.org
-Received: from PH7PR06CU001.outbound.protection.outlook.com (mail-westus3azon11010019.outbound.protection.outlook.com [52.101.201.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 744712EBB9C
-	for <netdev@vger.kernel.org>; Sun,  9 Nov 2025 12:16:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.201.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762690618; cv=fail; b=nfPTBTil9mAns5ATJAQI9rurqIYc44bqeE9MEcv6SfRszFE/cv/Q8KnTkLrOZOC8SxXExwjAiGy41o65CNvUHQoVIzIJp1HKQc6qLbGTAgmL/4m3ue8kWKobv220S9I8mHXVPOFuBIl+s7Sr8mLqsA1kmTqo0ZXifTdL8NMXGPA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762690618; c=relaxed/simple;
-	bh=FejNdNGWsHi0lIh5+3hTuT1WukRiA2yS9aRXiz7syj8=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=PvGqHswXGJLlJxyhixCAjKysTfsbMcsl8sJH5zi28kaStnfZxhl/u51ZNrqg+jTPBR+pCTFLKAu1jGQIq5aKDP1DVxV0Qm2Lz0DwB6pQahvlShd1zTvKMp7tmaQukQyohqxeMQF24eeWKZkNF0mhefAsf6nv72UjOX6dWY4mRfk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=UKZ9NVzr; arc=fail smtp.client-ip=52.101.201.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=czTua954gcvYpQl9pGl08M4NstkVhhUhC8qAwNaS7WeKFKYuJQjN0GY9kGqzcgeAWqstsclroXz3gprPFq+PfRDEZnpmnzcesBKrwdVbrHj8FD93ALhCvTegEHxRbjGE7x9LOO/GZdLw8jJOUsaKK+qdSn6e/0MG1aM/d8nvgZQI332wKv+g1VF7AlGJ2W+s2uMSNNlfHsfjnK9EQjV7pWtlsjRi2hFsLJRaIu8RxgUI4D03/gVggeAi74nMfZuavUhJH1A4N9NAU0Zi50FvIAEvCCKPfyXzUlVAy3g92MJnQRAduuHEcNImJngyF6jkvfV9R6M27FdYFC9mcXG+Kw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oHVJ2GIbbA4ol237UKLOJVxH3naNhOA84AAgN3cZyxo=;
- b=UkKH0wZvEnjuLikkbMGnJY06m0wWeqsmydwG/qKScj5vXtTDiV/YIgkQR/AqAyKRQ6os4vTxjUB2/rLyL4UEiDhGOr7juOmsi+UvW8fG6JGGCShUJp5pVwoZC5q6Bvs8V1iBzKPdOaEif/tLm6Bj0auXaT/6AYRgcVGoh5e9vvT3FXxQa6DYzKMJ2QUrQGaZGyvh2tM3eyMQUsMyJzE+c49E+jimu6XvFsallTBWy7RzmopgPfTbcC1DlNFSZRMv7LveQ7Q0kCbmjiZG/5i+NJk50HjJLzx56Lj4BMdaBfyxI3kNKKNvG8mYEgVnhZY5FGKBQnKTiEiElBI3zYWUSw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oHVJ2GIbbA4ol237UKLOJVxH3naNhOA84AAgN3cZyxo=;
- b=UKZ9NVzrgs5gvzlDAm2xWpd9VQsQf/VHLVM0wpBHmW40pazZ4rB2NosxTSZEn1pyyNPci2/aNSooDj+ueLKyqnxdrObTouzIFleM9zDOsMu+XKoJ9+90Og2z8xGl8l3j2EHu5OIvJKPqmQm+8ieZw2LbPEE1C1FF8IU4I6ETUwH/RDJoP3E9My27RDrztgvRD2uF1ZXnbOdZaFjkGnuD2GreUVdbnyo27+krvtLWFaLDOFa7gT2onrggmqpg2fycFWG/oJzcRpNxdijnf2D6tqhJ6YBoXFq1n8EZ67AF66Uj7mNf2D5yMT0YYI/P/nWT/tv6YDgVeSstfEiz1Ki73Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB7500.namprd12.prod.outlook.com (2603:10b6:610:148::17)
- by CH3PR12MB8972.namprd12.prod.outlook.com (2603:10b6:610:169::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.16; Sun, 9 Nov
- 2025 12:16:51 +0000
-Received: from CH3PR12MB7500.namprd12.prod.outlook.com
- ([fe80::7470:5626:d269:2bf2]) by CH3PR12MB7500.namprd12.prod.outlook.com
- ([fe80::7470:5626:d269:2bf2%4]) with mapi id 15.20.9298.012; Sun, 9 Nov 2025
- 12:16:51 +0000
-Message-ID: <1f46970e-8bbc-45ef-98fa-250cc1649ee2@nvidia.com>
-Date: Sun, 9 Nov 2025 14:16:45 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] netlink: specs: netdev: Add missing qstats
- counters to reply
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
- Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
- Carolina Jubran <cjubran@nvidia.com>
-References: <20251105194010.688798-1-gal@nvidia.com>
- <20251105171359.4f14b199@kernel.org>
-From: Gal Pressman <gal@nvidia.com>
-Content-Language: en-US
-In-Reply-To: <20251105171359.4f14b199@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: TL0P290CA0001.ISRP290.PROD.OUTLOOK.COM
- (2603:1096:950:5::15) To CH3PR12MB7500.namprd12.prod.outlook.com
- (2603:10b6:610:148::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB5782EBDDC
+	for <netdev@vger.kernel.org>; Sun,  9 Nov 2025 12:54:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762692880; cv=none; b=JTAYOMrE4BXMp68595PZoO+IiZSmJgaqGXQlpV6qPZRPFQqy1pIkSu8jfJqmAFRJSatgZTprizye7ciVbLlRZX0rfJbipXCbgnduBQKR3Zys0SxNOGOaL6jQTaI6CoDpNw+OUUeKxgyidhGTMg2iJ539rN6GXWiqA3pbRTpi1Ck=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762692880; c=relaxed/simple;
+	bh=ZPClDyHUowmohhGkWav/u/LrJy4eS94PPaNO8VOAhpw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZAcsLEbaOXmdGEDnsDeIazUy3mECa0geGFlAHbvQGww6ouMKA+oIkDvWejl0GdsCiF/9whpaVPReL58IBqZrhAxLwEinUaiOOgf8MOGs5l8tVCz4YIzTRYLt0XtCRt2PfOf0lb7deLjW4vhRW6s0xm+AgkqqC4pMfXhBxh/mmXk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Zmac/QXw; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-4ed65fa5e50so11146581cf.0
+        for <netdev@vger.kernel.org>; Sun, 09 Nov 2025 04:54:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1762692878; x=1763297678; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iCqIZTfX254IvBTWWQpjKZsfwk2La1cDqTNLXnN/Ay8=;
+        b=Zmac/QXwAcYKgU2AV2PZtXH+9p8+4M/rpnEJGteJY7IXgUn8KsfDOGQ0kHG5W623kO
+         2f+dShu88TQTq2bP/Wr+UZwd/UDPOrEGp1/da3glVQx+BKG89HTceLmZuIHvGPmBEkBq
+         gvfs2T4/Sj+FIHOpPYoYSBazTjQjkAvh03LkG2HMsCPQOUCaXq0maA6QsAKM6T8yqhSX
+         bwssDZsOxM71BfyVPrRgfPCd0hlxEQKB09IxPYIAHWIqXY3qGa1wENQKnWa0o8rSF6K7
+         7fwivbYX2uZKshWN6JspRgOzF2BHqN0RO1mA9GC5GY6HsB+IAOs+nrEfHCNoWeUNoMJ4
+         sbFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762692878; x=1763297678;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=iCqIZTfX254IvBTWWQpjKZsfwk2La1cDqTNLXnN/Ay8=;
+        b=gvc4uvpHEYX8qt2ZAmnQkSR9Zp41KYw1ym9DcsqQHmaczryciLYUQvC8U56VAsDoOT
+         xVgBjTIS8OZpEOj1bW0jhHEpIxJvFq8KzyYvjChzPz9+iHiXIDArHTUgY01f3bKn+svi
+         uuAtaD6cSlNFqfgH6yHnnKqn3IabY9wjpr7496gQuZ9lF9jzsH1xBwdfDjdnAzOeH0+w
+         0v7ayKEGazPJzYmIsG7BWYiNCDQeyuzR09NoATTWrfYw/Uk6MeDI2N5c2+JxLlNVFmk5
+         a3UPaXh/0TjyHbOq3qkwH7t1eD/hP5x4bEYFZutMmXd07tghk9cvTOrqD6eW6IazJQQa
+         8DsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXNRDdZeUG5YZSfGpjYJeuW1i9CwFUhLumm2KsdVWu6PXgE+wKOX7xZD4QEMBzEBJDL/Pi0kv4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxiGJqGU4PPzC0cp4K/wrfh13EdhydZSlbT8pL/SzPAfdAeaOg1
+	s3icw/RYr5A0IE6ToQwf0uKsVCktFXKimVm+cNltrVq08G0ycYMHO0PM8HarxtmjQVc+yaUjkSG
+	hVEkYOqQcipgTxM8v3So/j4mD9lOgImzg9hjpYeWP
+X-Gm-Gg: ASbGncucuPJa9c1vj7RMhZsMfVJbzTNRjBy2kKIeJlIqvNWXRhenLNB0mv5Apu9+J1i
+	vu5PK4tlhcu4BD4zJ2NuzUyvHx+lCC7gXX2mW5tLfxkFiitVqoOXZhxxzaRdVzHTbkPFHiSH841
+	RqKA+BuSIUOoeLEUM1+kSnplNBZ7ML/Gq8F5v1yCr1YCkQLEfuEb+FvQdxhv0iF9V/ujMn6NJ/p
+	m6goKHWoP3+D1k9WtWFUSt4QjagJiP5JLkkpnn4SA6rCRuS9eWYJhnV6qBkyukuk3qL8w==
+X-Google-Smtp-Source: AGHT+IGY3hG/sJIVPrZRcNzxYmF4q92yRlM1yL9NWPeHIARXj96qdQqKf/b+mQhCvG3YIpTIJrgx5/EqLEHwVEN5JkU=
+X-Received: by 2002:ac8:5a92:0:b0:4e8:b812:2e2a with SMTP id
+ d75a77b69052e-4eda4e94134mr62615191cf.24.1762692877385; Sun, 09 Nov 2025
+ 04:54:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB7500:EE_|CH3PR12MB8972:EE_
-X-MS-Office365-Filtering-Correlation-Id: e3e918f0-328d-4479-746d-08de1f89dcd5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?djBEdGtiUmN5dU01SzRTTWUrMnd5dXJkQlBCYjRXY3ZodmYxZlhqeW9ZOUhq?=
- =?utf-8?B?dklYRFcxS2JEb3BOYWtiR0RvaWl2OW1RQjBRODlHYnFuRGZYZkVDQVhBQll2?=
- =?utf-8?B?ZmUvYUtUK3VYZysydmtiOWRQWHRkM25ha3VqMEI2eGkveElqYlRWaCtMbFJE?=
- =?utf-8?B?MG5pa0hueTl3SGJTMnpHU082cEMrZGVSUUx2Y0FzNWVaOHVJRlRsanhyTFZ3?=
- =?utf-8?B?UzJQK0JBbUNzOFRuKy9SVkdPUE5JSVlPM0l1eFhjK3B1WFJHbzh0SjBwOCsx?=
- =?utf-8?B?REFvMVlFVmtZVTZWOGloZzBEbXNMYzRNNEhvOW9WR2F3MXY3N1ZqRnNsSnhI?=
- =?utf-8?B?d2VUR085ckIxVStoM05mR3VWSm1yWmgwSlRFejh0RDJzY3g1Mk12YnViOFEw?=
- =?utf-8?B?QXZnRGFGNmRobzJicUF1bEJRRCtwek53ajNBYnhzSXRmOFJLYndCc3h4V2p4?=
- =?utf-8?B?RnhGcXpGanY2amczUThJMDZ4MCtaM2ZLMmh1Y0Rhb1luNUd5OWhnM0JvbDhq?=
- =?utf-8?B?Syt1TlhQalFyWWljWUhsdktIcSs5L01CcmdhNHNQOU1ZcWVlcVY3YjhqVjQy?=
- =?utf-8?B?M3dyZUV3eDBCTjh0WE1tVng2d21xNnJWSkVsaXFWS0hrUE1xN2ErZHg4Q1RR?=
- =?utf-8?B?dXZUeTFBb3BadVpONzFMOG00M3V5NFpuUzVvWHJqOUJQU1pNVzNsNGFEbkJH?=
- =?utf-8?B?WDZsTzF3eWpad2EwaGk1bUNYMyt5Z2MrMmlVckZIeTIyd084bGIzUmozZldD?=
- =?utf-8?B?SUwxN0x4OEhka2lPbHhQRG1xZERPMzNITHJramNacW56d2FXdWxqenpMb205?=
- =?utf-8?B?VktwbElLallmTTVJSGxJcWpLN1RIQUw5U2taazloYUxYSFVCVXN4cEJGdFhh?=
- =?utf-8?B?L3ZtVCs5YVFzcktZNkNYTFJzVGhvK1c0dURXSTRCRDRCK0pkMEZoVnludVlj?=
- =?utf-8?B?TnhlTEowaXF0cVErYS9jK05RV0VPTy8vWjZmUlZwOXNYdUhjRzFVSGo2c29n?=
- =?utf-8?B?Q2hSYy9VcTFlNE1UMnVBWjZMUm1SRDlvdXZWTEd5ZFpHOCtFeWU2SGhNV3Jv?=
- =?utf-8?B?aXdxWEE1Qm1Ld2VNVVNYUW41TWgrZWsxbnJtczNxaTZBRmROWXZYQUxmbTFK?=
- =?utf-8?B?UEhxWm5EcmtpdW1zcnljenJRU1FuTHlkUlFyYlhWakxWOHdUQUhLZnZPZFly?=
- =?utf-8?B?Rmkrc29zdkUrdzNjK0puMXE5aUp4WkNzYmNjM0dMSlZoNnJoNGQvOG9udEJV?=
- =?utf-8?B?YTVyWEZjd29HNE8ybmhmWmc5dUFoWmR6NWovNDNpdlpqUVpGcVN3YjNrNXNj?=
- =?utf-8?B?UHVYRFgzSEtDVys5Z0prMG56VHlnencyTHV5S2hNbVRQU0RBUkZKOWJLUk00?=
- =?utf-8?B?UFlydFZkS3A4S1I1OGZwbDlNVzVHZG9XdmZCQW9OdzRKNVJCaDhiVmNBWjVR?=
- =?utf-8?B?cGo0NDU2QXV1ZXdmS2xRT2VUZjZBbDlzblg1bkdqdmNEcnFYdFk2eWxxWkRw?=
- =?utf-8?B?RTJMYWJvdkM1aktzOHV4eVVjUGY4cjNpVkJUZGROUDIybVkyRzNFOFh3b0FV?=
- =?utf-8?B?aTJqQXlxeDd6RlZjWXZjUS8wcktlamtTLzJld0ZscERIL0ZodC9VRUo0R1Vx?=
- =?utf-8?B?UHZtWEVlUHEzeUVCOWlIU2pGSUxtb3ZzMGQyVE5RYVBLU0lMV0hqYmkwUk9R?=
- =?utf-8?B?T096V1poenlsYTUxaHA1MngvUjBGMzhwSjZGdnhBeUM4QUlGMnB1SDdUbjVv?=
- =?utf-8?B?OU9wdDByTW9oYVcrUFlqcVVLaXQyWFprSExnL0s3d3RpbUkxcVJTL09pczJO?=
- =?utf-8?B?UmN1UnlPbGl1L05zRjlXMTRUWW4vRk9SM3prTXNxUDk5ZmJrZWZjcVd3VFQy?=
- =?utf-8?B?RWtGT01oc3VUbW9VTDNUS1AvbnNUNThGczdUeXMvcFVyZjd2QnBsckM3Z3k1?=
- =?utf-8?B?TFhKR0puY1ZMYmFJUjRtdUNFdjFZaGR4Q3RWdjhrTWhKQWQxUXVCUlRBMitn?=
- =?utf-8?B?OEhrRFh2bFhRPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7500.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?TDRkU3VtcXRmSlVnbEpPZllOM3RobVpoYmZhMVE0bW1JTVRjZDZ1SlJpSnlY?=
- =?utf-8?B?YnFaT2tQOEtBaG14SjdzeFdIbEFZT3M5bGN5RkRQa3EzTUpmNitoN2tMSDJQ?=
- =?utf-8?B?Z0dZVTRrZk8vQ1gxVzRGR3J6NnczVnk5RDNpaHBVV1dxS0xnRXdtSnFFL2dh?=
- =?utf-8?B?QWZvNkFWSGRBVVplOTMzWTF1T0dzUXFPMmlrTENrZ2w4bTFLTTVIenRvVU92?=
- =?utf-8?B?SkV3Z0tZTmIxbnBuMWJzcnZSd0FEb1lzak02WUZjdGZWV1FaMkNDM0R0ODRW?=
- =?utf-8?B?TVBNMnl2ZEpNdXZQUnR1ZllVcU92dm9DcjJwNlRhOU0vWG40MTQ1TmtZeHc0?=
- =?utf-8?B?QUZYOHRLTVVsOWVreFEyWURHR2lLL0d1OHRFVG9rWExmY3NrUW5GRlhiYkhN?=
- =?utf-8?B?VVNZbTNKRnJSenRraUdUcjRpNlZMd1M3bG4zRHRIa2E2a3l4aWE5a1dOcTdx?=
- =?utf-8?B?OUZqNEd0clNQaUsvNXNmaE1Sd0FoYjkzSk0rdWlCMWZLTW5SV3Vld1ZJNzJJ?=
- =?utf-8?B?ZUNOTzlkZ3l5QWtNc3VoSndwUWlGbFh1V2RFYVorYTJXV0c3Q0ZZZC85UDVX?=
- =?utf-8?B?blJEMzFWSEN6RzZpYkNuZGwrYWc0OTBQM0RNY3FiSnkxSnEraXBIUk1BanFL?=
- =?utf-8?B?UCthVWlYbHVKNmRqZ2hlT0RVU0VKVnExd3J3eWFJd090b2c2SHpWY3lWZElW?=
- =?utf-8?B?QkZKeEw0T2MzKzQ0OERoaUJrZ2FRVnFZMnh4MFhDYnZELzJUYjlUY2xUYnQ2?=
- =?utf-8?B?QU1WMkJuTUZ1ekFWQU9zVmdNUVQwRGtUcFdMY1RPYXoyRDZhY0FCSHdCZ0lw?=
- =?utf-8?B?azc3dlpSSnpkcmNnbnZIYmJNUmk4N2dYai8wOXVrRmFWRmthNytlSDU4ZVdu?=
- =?utf-8?B?UzN6NmFZSkhoWVhWY3kwUkgzS1dWSmllZlRheGJPMU1NMVpSUnNSQ0R3Zk5u?=
- =?utf-8?B?c3NaSC9yaTB0cVpUUWV6UjRDM2JyQ2VGTFI2WEduejZaQkxTOE5XSGswZ1FB?=
- =?utf-8?B?ODBLeWhJcWtqeXhrSHNLaWp6YXR1TnFFTzk5QU9NLzRNWnJVOTBzaHJpRmV5?=
- =?utf-8?B?SWgyTWZuRUI1ZDN3MGRHVmVHN2JtL1I5TjhhOTdNOFppZVdJNUd3alA4ZTBt?=
- =?utf-8?B?RDNhT2JBczVXVFB4MEQ3QXl0VldEci9YcVRmcXU5WHB2eDVyQUZQVkdUMDNO?=
- =?utf-8?B?Z3dqL0x2ZUJjNnZUaEo5N050aE9SUUJvL09WTWUrM1c3bW1kZnorSk90RzFm?=
- =?utf-8?B?dURCL0VKVGI4dWYxeDhUY1IrM3ZwRHZzSklCNGxsT3I1THh0RzUwZXB1Q29m?=
- =?utf-8?B?VlRSN0dzaytLaEhWS1FYRlR3aTZrTVdsY1F6ZVRXSXpCcDRBNjdwaDhibHA5?=
- =?utf-8?B?OGJYT2xTY2Q1Rlpob0VmQUYybXJ3WE5lWFB6bjNVRlMveWw5R3ZHODNNaEhx?=
- =?utf-8?B?Yjg3cWE5cEZSQmhCbUR4NzdNQjYrZXVJQnhzdTRwN1RtSjFiZXJHQzdLVWxN?=
- =?utf-8?B?RCthRW9DVHdiM3hCVkl4UDlIdEwzQlFqN1NIYmxtUnpSU0w4S1FabWh6L1F4?=
- =?utf-8?B?SHkxYjZVdUNzUXRxTEoxS3l6Q1lPVzJZOWR6MVFyazJvMHpYR1IvUHRUOUl3?=
- =?utf-8?B?Ly94RzR0WUgxallJV2M3Wk02QU5zS1plKzhnSUxrcVVMbWVQKzB2b1RvbXJS?=
- =?utf-8?B?SUhJbzlnN2wxbXIzSG9DZ3ZEaFcvY2VjR3psVmd6YnROdFYvaSt2SEVRZk9n?=
- =?utf-8?B?VklNWXNvV1BNbDMrNmdDRCtac2dZYkc4dDVrRHFFRHdYYnoyUnRUQyt1OTJy?=
- =?utf-8?B?VnBnQmxSZ1hJVitGMmNKNFdLN1FpclFSVkE5NEtqcFNSZndTRHNCck1mMzFt?=
- =?utf-8?B?dmViZE5BSUlPbmd5cEd0MUF0R0lVSnVlbis5THhlVHJ6bk5VSEJTdmJaeFZS?=
- =?utf-8?B?aXdkS0dDMTM0WE5zUXgxQXhLaFNpUkJGYTE3SGNheWtJYTYyN1RMUTRiZW9E?=
- =?utf-8?B?Z2dsRlNIWHdpZlEyeTFyc1kxWWRPejV6bUlGRXRLeHFlbHpuU1NrTlMxZlI1?=
- =?utf-8?B?ZTJFMEQ5THczYmFqMjhKMXBIeUxNaGpZRlhucUZ5dXZ5QzJUaTZxZDdYZjVS?=
- =?utf-8?Q?NnmY=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e3e918f0-328d-4479-746d-08de1f89dcd5
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7500.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Nov 2025 12:16:51.2292
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JcUuDcy1uRDnVvNEde0xK/QIeoF8uqoNKV85DhR2gIVxgX3rK9rbWgbcHI1XMKXQ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8972
+References: <20251013145416.829707-1-edumazet@google.com> <20251013145416.829707-6-edumazet@google.com>
+ <877bw1ooa7.fsf@toke.dk> <CANn89iJ70QW5v2NnnuH=td0NimgEaQgdxiof0_=yPS1AnZRggg@mail.gmail.com>
+ <CANn89iKY7uMX41aLZA6cFXbjR49Z+WCSd7DgZDkTqXxfeqnXmg@mail.gmail.com> <CANn89iLQ3G6ffTN+=98+DDRhOzw8TNDqFd_YmYn168Qxyi4ucA@mail.gmail.com>
+In-Reply-To: <CANn89iLQ3G6ffTN+=98+DDRhOzw8TNDqFd_YmYn168Qxyi4ucA@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sun, 9 Nov 2025 04:54:26 -0800
+X-Gm-Features: AWmQ_bkPZyh8pfYTW4Ig9DXSHOW6QfVhyquFv_KkZYlMwJpcxFJjW1KeviV8rnE
+Message-ID: <CANn89iLqUtGkgXj0BgrXJD8ckqrHkMriapKpwHNcMP06V_fAGQ@mail.gmail.com>
+Subject: Re: [PATCH v1 net-next 5/5] net: dev_queue_xmit() llist adoption
+To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 06/11/2025 3:13, Jakub Kicinski wrote:
-> On Wed, 5 Nov 2025 21:40:10 +0200 Gal Pressman wrote:
->> Add all qstats counter attributes (HW-GRO, HW-GSO, checksum, drops,
->> etc.) to the qstats-get reply specification. The kernel already sends
->> these, but they were missing from the spec.
->>
->> Fixes: 92f8b1f5ca0f ("netdev: add queue stat for alloc failures")
->> Fixes: 0cfe71f45f42 ("netdev: add queue stats")
->> Fixes: 13c7c941e729 ("netdev: add qstat for csum complete")
->> Fixes: b56035101e1c ("netdev: Add queue stats for TX stop and wake")
->> Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
->> Signed-off-by: Gal Pressman <gal@nvidia.com>
-> 
-> Spooky how something is broken for over a year and then multiple people
-> send a fix within 24h! Please TAL at:
-> https://lore.kernel.org/all/20251104232348.1954349-2-kuba@kernel.org/
+On Sun, Nov 9, 2025 at 2:09=E2=80=AFAM Eric Dumazet <edumazet@google.com> w=
+rote:
+>
+>
+> This might be something related to XDP, because I ran the following
+> test (IDPF, 32 TX queues)
+>
+> tc qd replace dev eth1 root cake
+> ./super_netperf 16 -H tjbp27 -t UDP_STREAM -l 1000 -- -m 64 -Nn &
+>
+> Before my series : ~360 Kpps
+> After my series : ~550 Kpps
 
-Sorry, didn't notice your submission, thanks for the link!
+Or ... being faster uncovered an old qdisc bug.
+
+I mentioned the 'requeues' because I have seen this counter lately,
+and was wondering if this could
+be a driver bug.
+
+It seems the bug is in generic qdisc code: try_bulk_dequeue_skb() is
+trusting BQL, but can not see the driver might block before BQL.
+
+ I am testing the following patch, it would be great if this solution
+works for you.
+
+diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+index d9a98d02a55fc361a223f3201e37b6a2b698bb5e..e18584604f0faab4e4d86a29565=
+d7d982c9eb41d
+100644
+--- a/net/sched/sch_generic.c
++++ b/net/sched/sch_generic.c
+@@ -180,9 +180,10 @@ static inline void dev_requeue_skb(struct sk_buff
+*skb, struct Qdisc *q)
+ static void try_bulk_dequeue_skb(struct Qdisc *q,
+                                 struct sk_buff *skb,
+                                 const struct netdev_queue *txq,
+-                                int *packets)
++                                int *packets, int quota)
+ {
+        int bytelimit =3D qdisc_avail_bulklimit(txq) - skb->len;
++       int cnt =3D 0;
+
+        while (bytelimit > 0) {
+                struct sk_buff *nskb =3D q->dequeue(q);
+@@ -193,8 +194,10 @@ static void try_bulk_dequeue_skb(struct Qdisc *q,
+                bytelimit -=3D nskb->len; /* covers GSO len */
+                skb->next =3D nskb;
+                skb =3D nskb;
+-               (*packets)++; /* GSO counts as one pkt */
++               if (++cnt >=3D quota)
++                       break;
+        }
++       (*packets) +=3D cnt;
+        skb_mark_not_on_list(skb);
+ }
+
+@@ -228,7 +231,7 @@ static void try_bulk_dequeue_skb_slow(struct Qdisc *q,
+  * A requeued skb (via q->gso_skb) can also be a SKB list.
+  */
+ static struct sk_buff *dequeue_skb(struct Qdisc *q, bool *validate,
+-                                  int *packets)
++                                  int *packets, int quota)
+ {
+        const struct netdev_queue *txq =3D q->dev_queue;
+        struct sk_buff *skb =3D NULL;
+@@ -295,7 +298,7 @@ static struct sk_buff *dequeue_skb(struct Qdisc
+*q, bool *validate,
+        if (skb) {
+ bulk:
+                if (qdisc_may_bulk(q))
+-                       try_bulk_dequeue_skb(q, skb, txq, packets);
++                       try_bulk_dequeue_skb(q, skb, txq, packets, quota);
+                else
+                        try_bulk_dequeue_skb_slow(q, skb, packets);
+        }
+@@ -387,7 +390,7 @@ bool sch_direct_xmit(struct sk_buff *skb, struct Qdisc =
+*q,
+  *                             >0 - queue is not empty.
+  *
+  */
+-static inline bool qdisc_restart(struct Qdisc *q, int *packets)
++static inline bool qdisc_restart(struct Qdisc *q, int *packets, int quota)
+ {
+        spinlock_t *root_lock =3D NULL;
+        struct netdev_queue *txq;
+@@ -396,7 +399,7 @@ static inline bool qdisc_restart(struct Qdisc *q,
+int *packets)
+        bool validate;
+
+        /* Dequeue packet */
+-       skb =3D dequeue_skb(q, &validate, packets);
++       skb =3D dequeue_skb(q, &validate, packets, quota);
+        if (unlikely(!skb))
+                return false;
+
+@@ -414,7 +417,7 @@ void __qdisc_run(struct Qdisc *q)
+        int quota =3D READ_ONCE(net_hotdata.dev_tx_weight);
+        int packets;
+
+-       while (qdisc_restart(q, &packets)) {
++       while (qdisc_restart(q, &packets, quota)) {
+                quota -=3D packets;
+                if (quota <=3D 0) {
+                        if (q->flags & TCQ_F_NOLOCK)
 
