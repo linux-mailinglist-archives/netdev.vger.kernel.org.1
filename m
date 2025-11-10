@@ -1,179 +1,306 @@
-Return-Path: <netdev+bounces-237335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1BACC48FB1
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 20:23:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 07EFAC49050
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 20:29:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10AA53B3365
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 19:14:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFDDB3A6638
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 19:24:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB6F932B992;
-	Mon, 10 Nov 2025 19:14:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10BF4331A72;
+	Mon, 10 Nov 2025 19:24:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="aoxaWRZC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bv3p5nzH";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="r5rc7s6J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C48C2D8DD1
-	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 19:14:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E714329C4D
+	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 19:24:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762802052; cv=none; b=Xh/NG17BIoawIi9IBDoVg3Q/0Ox1aCkfW+mX9W3arAB0bEsErpVg87VCWDBRQ2VKQzme0iHwOBP1nlDBsG/MYV2yow149VkQR6j+bRNtAGqIWlof8M2gLooY1IQ2eGbUHqRNx/HooDU0UH9UGHAR6VR9bRuniHZQcAUS4jE0wWo=
+	t=1762802644; cv=none; b=Wj2/DT0x+jNLwQQ1Pnc23C2RWHAa9pXbRzlc3mfi+8k5oBFaQJYnL218QSZymX7Ey7ux06sZ+q+pgHJwcpbfHkQovNTM1Cbzsg429IWZzTw/8/G0bQZflJwLCqOb1NuW/QzmW03rD067B6WyJ2bSqY2zAnYSXr/q1FdIy8zhv6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762802052; c=relaxed/simple;
-	bh=mldFs3lgziJLDd1VaLkbA+Q79vCBKVCBAT097NrFH04=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jzFcwRzGGtvy6/NDVfDms9oybtgPkI4cL+7lZBRdRuxsjiu5PTZ+rSFw5TTXLMMHyf3vfFwa3nynfwrX8DJUGj78DNEtT7+GEpImZ27dYECwHHcBd8yl/y6PvL+exG1qW8rOpiAVAEUoB3haTiRkzh/2jIjmIImVDbblkCS4Hek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=aoxaWRZC; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5AAJ5m8n022535;
-	Mon, 10 Nov 2025 19:13:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-transfer-encoding:date:from:message-id:mime-version
-	:subject:to; s=corp-2025-04-25; bh=KpXejc+jLka+M3pFuI6nQwOEZn/4E
-	sJzwleh4PV0vjI=; b=aoxaWRZC+PYThw3HB/FEi3BxmBZmMbDPEv1+WrqExSfFu
-	otKKOM5qp9RUbDwuIREczU695Mdsdyi9kJrNOvK9BIiwnTmw+rlE0G1WGtyMDZ0C
-	IKFPQnh1DKDzRRC/FipAASPG9ON4AeUFdtCDGOis8nzSvMVQ2od1Mfi1Nu2cZPzQ
-	PWEHPJ8OqAONC3GxbcfrOk+NnmVLIoJHnO9p9wbw1EYYxA3tVdRDKRqPQMarCL7O
-	yQlCKLFe/XR8L7aBEaUnFnIC32oZZnIDZc1vlnYJj6gktjBt8ETzhl1PUy3vzOw6
-	hoSuPpaLuO114UKUi8WPvPiBQGiaBYUwiO4cbswKw==
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 4abnw6r0gt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 10 Nov 2025 19:13:49 +0000 (GMT)
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 5AAHmOvI020966;
-	Mon, 10 Nov 2025 19:13:48 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 4a9va8j330-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 10 Nov 2025 19:13:48 +0000
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 5AAJ8lcO019732;
-	Mon, 10 Nov 2025 19:13:48 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 4a9va8j32f-1;
-	Mon, 10 Nov 2025 19:13:47 +0000
-From: Alok Tiwari <alok.a.tiwari@oracle.com>
-To: pmenzel@molgen.mpg.de, przemyslaw.kitszel@intel.com,
-        aleksander.lobakin@intel.com, anthony.l.nguyen@intel.com,
-        andrew+netdev@lunn.ch, kuba@kernel.org, davem@davemloft.net,
-        edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
-        intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Cc: alok.a.tiwarilinux@gmail.com, alok.a.tiwari@oracle.com
-Subject: [PATCH v2 net] i40e: fix src IP mask checks and memcpy argument names in cloud filter
-Date: Mon, 10 Nov 2025 11:13:38 -0800
-Message-ID: <20251110191344.278323-1-alok.a.tiwari@oracle.com>
-X-Mailer: git-send-email 2.50.1
+	s=arc-20240116; t=1762802644; c=relaxed/simple;
+	bh=rwed5s0NZcKmoWliUWQycRPIRqkLjWCU1S0rHF7ZPc8=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=j9twU9T7qrEIkBFzD6tw8XazF1IwYjbhgFQwykU3QK762dIPZ/5FwnflI7btjcLuBX9uk+gaTF61VWlWv9OTtobdVftA+scG3+3/zzLxzt5ysRTZHze+Mzc4xzcUYc1bVsPNGKNu+VV+Vef3FWJ8yHp3wikJni5LIf58/byOoas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Bv3p5nzH; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=r5rc7s6J; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762802641;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qFmkfkXaVUQbQzQgIBWtDhMvK7IUgEF1iDdcU6dO2Sg=;
+	b=Bv3p5nzHbIqoKj3SLJXk3yNDlDsBKSvK1Rh5oKgkew6mbpgIH3kPCNWsOiq2gwzAMrdgX3
+	nyOhLAMxsBIW6lCC1JCTgu/oEzskCrC6yfSmW2Rwq/ydcA/fuhgdLN/P44sL3bJO5xehLD
+	0qAuC2L9/xdE+wDv5SjWxehj0C+/RUQ=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-447-oKphTEZ8NoCpoglgf6V07w-1; Mon, 10 Nov 2025 14:23:59 -0500
+X-MC-Unique: oKphTEZ8NoCpoglgf6V07w-1
+X-Mimecast-MFC-AGG-ID: oKphTEZ8NoCpoglgf6V07w_1762802639
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-42b33d2a818so685018f8f.3
+        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 11:23:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1762802638; x=1763407438; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=qFmkfkXaVUQbQzQgIBWtDhMvK7IUgEF1iDdcU6dO2Sg=;
+        b=r5rc7s6JJ7jipKP/eIHEqfKQAfg4KETwrzlyyHwu+BT49FHPgb8pCEwPRmU7V+g7/H
+         6Od5kDsHxgYA9uc/yWk93eZ9dwZzLMyCM6gQq2JUcw/kuF6KWQqu4Q9NLzGyqVau721U
+         9AyKrmGiji/UuwNhMDrbUe2pRsrY2RH0v3hk7gzd6IQglWQNEVbDkYNO2NudEz5896Qe
+         lq/q1Wet23wUww3DTfTq67WyJveNg6WSmV2Jnwf1DRkjbnIMq2DKPeWDRj2Kq3AL/y+B
+         q2YgFCh6pvmDT/tPYcvWDO/zZdN/nNXgbQpGfO78hEm0s+7pWKZEQKPi/fXi9roonnEC
+         EW3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762802638; x=1763407438;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qFmkfkXaVUQbQzQgIBWtDhMvK7IUgEF1iDdcU6dO2Sg=;
+        b=SVavKsGEdLneZFs3/kN04XTY3BwlXFrqJiGUL7Bn5yM2/1tRnDFzRN1RSBKPNakx1p
+         q77vk9fdaSFs5kh2mYbjFK+5IWrqluQs+qTIuvAMCLA7pNP5wM/1OrXOf08Rnt9Ci4Rm
+         0IEJ9jHpACfx4Mw0i8ufAjdch1gz1+IM8j4+Xbu7FPSmgA4p1c3FO8okOwOEhh8J9cgs
+         bDatidLgZwvD6eK438suWw+i3SlF2lxnwFH7LNEmDEEQmhbxNnVJfMHeTCxX/C5v7iuB
+         I6C0fKpXrJvE1crOqFgknhTGuwwZbjdUEFPxgGmKSMhnccSxCBpIx65REtrQohb0hnlY
+         NuSw==
+X-Forwarded-Encrypted: i=1; AJvYcCX/YrOthof+RxhX3xVpO8LG/8K9owUasiYI/r4N5aayejFCMHQ9R54u2unz3G1umcRfqXxTGsg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwTdKf47h7H5Ya0yfNx5U+6hRBYH7sYcX6SWWQKxsz+YzvlIbBQ
+	lt7EawML3RnDW1j2VsbAg4abJP6RznTcZ31QMD7C2HKvEYfH+j6JKTBflZ4LVhWR1NMAW3ZMQJd
+	2EkOeuJgmpI5PvFb0armTANQoBSt3BNy8TDr8TSI7HebMvAWjtX6t1XW46Q==
+X-Gm-Gg: ASbGncuWVVUHdE5B6MVD3mwo3HUxGj+TzETopmox2TVBjWUTcvDOSWBnQdFVEJG2iXg
+	1PTkVkzuC9UD9I07/gyP43wV9/GQ2ETbMHYnyu9f9g8X8Y+HQL4lDkd9G+KLGs9q5hrbX3KDiEO
+	GeoCdndbqjNA3v1UWHs+NVyzcgn1Bz1vhW3JBxJWG4iNIVYSdfI3+sZf+RXpZRey3YRiWTkXQGn
+	+HZA844z12VsxvfsCjIPgKD4IK40mKtHzkjoUZe4xiOslfbl0yLjvkIe8caPwECRVSBKLf//jrJ
+	9P9zIhia9URppB8DSroaA83D4z5JfxJpRNfqtYFZuCGT/c5ojX6ontLCo3zrzZM/SgWPOjaSZ/Q
+	IWAqCTzorrYLvgBHjWBuUBKcNJ5CdEVG/tIlRPw==
+X-Received: by 2002:a05:6000:651:b0:429:b525:6dc2 with SMTP id ffacd0b85a97d-42b2dbefc86mr7908397f8f.17.1762802638500;
+        Mon, 10 Nov 2025 11:23:58 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEK0p4ZVbPaMR6u3DJwr59ksa4Yn0ftjlHyu6Ldm6oYWj198VONDc1tIZaDJUusWs9Czg8v2Q==
+X-Received: by 2002:a05:6000:651:b0:429:b525:6dc2 with SMTP id ffacd0b85a97d-42b2dbefc86mr7908365f8f.17.1762802637995;
+        Mon, 10 Nov 2025 11:23:57 -0800 (PST)
+Received: from [192.168.68.125] (bzq-79-177-148-50.red.bezeqint.net. [79.177.148.50])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b330f6899sm12270704f8f.21.2025.11.10.11.23.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Nov 2025 11:23:57 -0800 (PST)
+Message-ID: <14706795-48fe-43d0-b9c8-53b3d1805c98@redhat.com>
+Date: Mon, 10 Nov 2025 21:23:55 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/2] net: ionic: add dma_wmb() before ringing TX
+ doorbell
+From: mohammad heib <mheib@redhat.com>
+To: Brett Creeley <bcreeley@amd.com>
+Cc: patchwork-bot+netdevbpf@kernel.org, netdev@vger.kernel.org,
+ brett.creeley@amd.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ kuba@kernel.org
+References: <20251031155203.203031-1-mheib@redhat.com>
+ <176221980675.2281445.11881424128057121869.git-patchwork-notify@kernel.org>
+ <78ea772b-bd14-4732-b685-c320ebcb5c55@amd.com>
+ <CANQtZ2y5s2m-Gxeqs7-czeKBfGDgfGv+CX_MLL0s-J3JVdCqAg@mail.gmail.com>
+Content-Language: en-US
+In-Reply-To: <CANQtZ2y5s2m-Gxeqs7-czeKBfGDgfGv+CX_MLL0s-J3JVdCqAg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
- definitions=2025-11-10_07,2025-11-10_02,2025-10-01_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 malwarescore=0
- adultscore=0 bulkscore=0 suspectscore=0 spamscore=0 mlxscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2510240000 definitions=main-2511100163
-X-Authority-Analysis: v=2.4 cv=Rv7I7SmK c=1 sm=1 tr=0 ts=6912396d cx=c_pps
- a=OOZaFjgC48PWsiFpTAqLcw==:117 a=OOZaFjgC48PWsiFpTAqLcw==:17
- a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=yPCof4ZbAAAA:8 a=QyXUC8HyAAAA:8
- a=NcnMm06Wdh5AIhxd0tAA:9 a=cPQSjfK2_nFv0Q5t_7PE:22
-X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTEwMDE2MiBTYWx0ZWRfXwjh3yMqXaGcC
- D2AIuKd+bnMB++VrYoQo/xkO7a8hMm2Cm6PNfDRWJ6eK6xMfoa4YTRcL38bjiViCy0MRbuJ95y8
- lUPrQLBLqYiiA5En6AKAUV2d2Ht4flbaBl6AI3qkV4tcqZA8aJIO/rWuvdDek6Ae4lgUxY+RtyX
- lUN1GVeiyJwXYlhi9RySXjpsnqsaDn9hslnkjpykq6dx6HiH+AN9YWLmoez2sIpb/is1CgCQG0j
- t9eM+hknxErTtTVO4EoReR2NG6nv2M5kT6GLu6yuUoN72K+fvub9uBOPezf6c5CycdwY9A1I1JO
- gT0zvGMcoMuGVdtBn/6guGIZy2MdSgdNHZ/somHyZfoc011Nh77jKsy9I8JmItZ8RFTVhJLFds4
- jdOQ9mZGeHqf90gP5uexiZvv5csEww==
-X-Proofpoint-ORIG-GUID: NsXZ8sJbRETJnJ0uuAK_Jy-yKhDQn3Yu
-X-Proofpoint-GUID: NsXZ8sJbRETJnJ0uuAK_Jy-yKhDQn3Yu
 
-Fix following issues in the IPv4 and IPv6 cloud filter handling logic in
-both the add and delete paths:
+Hi Brett,
 
-- The source-IP mask check incorrectly compares mask.src_ip[0] against
-  tcf.dst_ip[0]. Update it to compare against tcf.src_ip[0]. This likely
-  goes unnoticed because the check is in an "else if" path that only
-  executes when dst_ip is not set, most cloud filter use cases focus on
-  destination-IP matching, and the buggy condition can accidentally
-  evaluate true in some cases.
+I was looking at Documentation/memory-barriers.txt, specifically this 
+example:
 
-- memcpy() for the IPv4 source address incorrectly uses
-  ARRAY_SIZE(tcf.dst_ip) instead of ARRAY_SIZE(tcf.src_ip), although
-  both arrays are the same size.
+1928         if (desc->status != DEVICE_OWN) {
+1929                 /* do not read data until we own descriptor */
+1930                 dma_rmb();
+1931
+1932                 /* read/modify data */
+1933                 read_data = desc->data;
+1934                 desc->data = write_data;
+1935
+1936                 /* flush modifications before status update */
+1937                 dma_wmb();
+1938
+1939                 /* assign ownership */
+1940                 desc->status = DEVICE_OWN;
+1941
+1942                 /* Make descriptor status visible to the device 
+followed by
+1943                  * notify device of new descriptor
+1944                  */
+1945                 writel(DESC_NOTIFY, doorbell);
+1946         }
+1947
+1948      The dma_rmb() allows us to guarantee that the device has 
+released ownership
+1949      before we read the data from the descriptor, and the dma_wmb() 
+allows
+1950      us to guarantee the data is written to the descriptor before 
+the device
+1951      can see it now has ownership.  The dma_mb() implies both a 
+dma_rmb() and
+1952      a dma_wmb().
+1953
 
-- The IPv4 memcpy operations used ARRAY_SIZE(tcf.dst_ip) and ARRAY_SIZE
-  (tcf.src_ip), Update these to use sizeof(cfilter->ip.v4.dst_ip) and
-  sizeof(cfilter->ip.v4.src_ip) to ensure correct and explicit copy size.
 
-- In the IPv6 delete path, memcmp() uses sizeof(src_ip6) when comparing
-  dst_ip6 fields. Replace this with sizeof(dst_ip6) to make the intent
-  explicit, even though both fields are struct in6_addr.
+As described there, dma_wmb() guarantees that all descriptor writes are 
+visible to the device before ownership (or notification) is handed over 
+via the doorbell.
 
-Fixes: e284fc280473 ("i40e: Add and delete cloud filter")
-Signed-off-by: Alok Tiwari <alok.a.tiwari@oracle.com>
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
----
-v1 -> v2
-update patch subject line and replace ARRAY_SIZE with sizeof
-as suggested by Alex and added Reviewed-by Alex and Paul.
----
- drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+In our case, the original confusion came from the fact that 
+ionic_tx_tcp_inner_pseudo_csum() was updating the SKB data after 
+mapping, which indeed could require a DMA barrier to make sure those 
+writes are visible.
+After applying patch 2 from the same series, all data modifications now 
+happen before the DMA mapping, so the descriptors and buffers are 
+already consistent when the doorbell is written.
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-index 081a4526a2f0..dd9fb170d98b 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-@@ -3818,10 +3818,10 @@ static int i40e_vc_del_cloud_filter(struct i40e_vf *vf, u8 *msg)
- 		cfilter.n_proto = ETH_P_IP;
- 		if (mask.dst_ip[0] & tcf.dst_ip[0])
- 			memcpy(&cfilter.ip.v4.dst_ip, tcf.dst_ip,
--			       ARRAY_SIZE(tcf.dst_ip));
--		else if (mask.src_ip[0] & tcf.dst_ip[0])
-+			       sizeof(cfilter.ip.v4.dst_ip));
-+		else if (mask.src_ip[0] & tcf.src_ip[0])
- 			memcpy(&cfilter.ip.v4.src_ip, tcf.src_ip,
--			       ARRAY_SIZE(tcf.dst_ip));
-+			       sizeof(cfilter.ip.v4.src_ip));
- 		break;
- 	case VIRTCHNL_TCP_V6_FLOW:
- 		cfilter.n_proto = ETH_P_IPV6;
-@@ -3876,7 +3876,7 @@ static int i40e_vc_del_cloud_filter(struct i40e_vf *vf, u8 *msg)
- 		/* for ipv6, mask is set for all sixteen bytes (4 words) */
- 		if (cfilter.n_proto == ETH_P_IPV6 && mask.dst_ip[3])
- 			if (memcmp(&cfilter.ip.v6.dst_ip6, &cf->ip.v6.dst_ip6,
--				   sizeof(cfilter.ip.v6.src_ip6)))
-+				   sizeof(cfilter.ip.v6.dst_ip6)))
- 				continue;
- 		if (mask.vlan_id)
- 			if (cfilter.vlan_id != cf->vlan_id)
-@@ -3964,10 +3964,10 @@ static int i40e_vc_add_cloud_filter(struct i40e_vf *vf, u8 *msg)
- 		cfilter->n_proto = ETH_P_IP;
- 		if (mask.dst_ip[0] & tcf.dst_ip[0])
- 			memcpy(&cfilter->ip.v4.dst_ip, tcf.dst_ip,
--			       ARRAY_SIZE(tcf.dst_ip));
--		else if (mask.src_ip[0] & tcf.dst_ip[0])
-+			       sizeof(cfilter->ip.v4.dst_ip));
-+		else if (mask.src_ip[0] & tcf.src_ip[0])
- 			memcpy(&cfilter->ip.v4.src_ip, tcf.src_ip,
--			       ARRAY_SIZE(tcf.dst_ip));
-+			       sizeof(cfilter->ip.v4.src_ip));
- 		break;
- 	case VIRTCHNL_TCP_V6_FLOW:
- 		cfilter->n_proto = ETH_P_IPV6;
--- 
-2.50.1
+That’s why I added the barrier initially, to handle the case where the 
+CPU might update memory visible to the device right before ringing the 
+doorbell.
+With the current order (after patch 2), the need for it is less clear, 
+but the change is harmless and ensures correctness on weakly ordered 
+architectures.
+
+DMA ordering is not exactly my strongest area, so it’s possible that I 
+added it out of caution rather than necessity. Sorry if that caused 
+confusion
+
+On 11/10/25 9:21 PM, Mohammad Heib wrote:
+> Hi Brett,
+> 
+> I was looking at Documentation/memory-barriers.txt, specifically this 
+> example:
+> 
+> 1928         if (desc->status != DEVICE_OWN) {
+> 1929                 /* do not read data until we own descriptor */
+> 1930                 dma_rmb();
+> 1931
+> 1932                 /* read/modify data */
+> 1933                 read_data = desc->data;
+> 1934                 desc->data = write_data;
+> 1935
+> 1936                 /* flush modifications before status update */
+> 1937                 dma_wmb();
+> 1938
+> 1939                 /* assign ownership */
+> 1940                 desc->status = DEVICE_OWN;
+> 1941
+> 1942                 /* Make descriptor status visible to the device 
+> followed by
+> 1943                  * notify device of new descriptor
+> 1944                  */
+> 1945                 writel(DESC_NOTIFY, doorbell);
+> 1946         }
+> 1947
+> 1948      The dma_rmb() allows us to guarantee that the device has 
+> released ownership
+> 1949      before we read the data from the descriptor, and the dma_wmb() 
+> allows
+> 1950      us to guarantee the data is written to the descriptor before 
+> the device
+> 1951      can see it now has ownership.  The dma_mb() implies both a 
+> dma_rmb() and
+> 1952      a dma_wmb().
+> 1953
+> 
+> 
+> As described there, |dma_wmb()| guarantees that all descriptor writes 
+> are visible to the device before ownership (or notification) is handed 
+> over via the doorbell.
+> 
+> In our case, the original confusion came from the fact that | 
+> ionic_tx_tcp_inner_pseudo_csum()| was updating the SKB data after 
+> mapping, which indeed could require a DMA barrier to make sure those 
+> writes are visible.
+> After applying patch 2 from the same series, all data modifications now 
+> happen before the DMA mapping, so the descriptors and buffers are 
+> already consistent when the doorbell is written.
+> 
+> That’s why I added the barrier initially, to handle the case where the 
+> CPU might update memory visible to the device right before ringing the 
+> doorbell.
+> With the current order (after patch 2), the need for it is less clear, 
+> but the change is harmless and ensures correctness on weakly ordered 
+> architectures.
+> 
+> DMA ordering is not exactly my strongest area, so it’s possible that I 
+> added it out of caution rather than necessity. Sorry if that caused 
+> confusion
+> 
+> 
+> 
+> On Mon, Nov 10, 2025 at 7:28 PM Brett Creeley <bcreeley@amd.com 
+> <mailto:bcreeley@amd.com>> wrote:
+> 
+> 
+> 
+>     On 11/3/2025 5:30 PM, patchwork-bot+netdevbpf@kernel.org
+>     <mailto:patchwork-bot%2Bnetdevbpf@kernel.org> wrote:
+>      > Caution: This message originated from an External Source. Use
+>     proper caution when opening attachments, clicking links, or responding.
+>      >
+>      >
+>      > Hello:
+>      >
+>      > This series was applied to netdev/net.git (main)
+>      > by Jakub Kicinski <kuba@kernel.org <mailto:kuba@kernel.org>>:
+>      >
+>      > On Fri, 31 Oct 2025 17:52:02 +0200 you wrote:
+>      >> From: Mohammad Heib <mheib@redhat.com <mailto:mheib@redhat.com>>
+>      >>
+>      >> The TX path currently writes descriptors and then immediately
+>     writes to
+>      >> the MMIO doorbell register to notify the NIC.  On weakly ordered
+>      >> architectures, descriptor writes may still be pending in CPU or DMA
+>      >> write buffers when the doorbell is issued, leading to the device
+>      >> fetching stale or incomplete descriptors.
+> 
+>     Apologies for the late response, but it's not clear to me why this is
+>     necessary.
+> 
+>     In other vendors the "doorbell record" (dbr) is writing another
+>     location
+>     in system memory, not an mmio write. These cases do use a dma_wmb().
+> 
+>     Why isn't the writeq() sufficient in our case? According to
+>     Documentation/memory-barriers.txt it seems like writeq() should be
+>     sufficient.
+> 
+>     Thanks,
+> 
+>     Brett
+>      >>
+>      >> [...]
+>      >
+>      > Here is the summary with links:
+>      >    - [net,1/2] net: ionic: add dma_wmb() before ringing TX doorbell
+>      > https://git.kernel.org/netdev/net/c/d261f5b09c28 <https://
+>     git.kernel.org/netdev/net/c/d261f5b09c28>
+>      >    - [net,2/2] net: ionic: map SKB after pseudo-header checksum prep
+>      > https://git.kernel.org/netdev/net/c/de0337d641bf <https://
+>     git.kernel.org/netdev/net/c/de0337d641bf>
+>      >
+>      > You are awesome, thank you!
+>      > --
+>      > Deet-doot-dot, I am a bot.
+>      > https://korg.docs.kernel.org/patchwork/pwbot.html <https://
+>     korg.docs.kernel.org/patchwork/pwbot.html>
+>      >
+>      >
+> 
 
 
