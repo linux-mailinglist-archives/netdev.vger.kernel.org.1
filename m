@@ -1,91 +1,74 @@
-Return-Path: <netdev+bounces-237343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C762FC492B9
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 21:02:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64DABC49310
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 21:09:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98EBF188EA98
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 20:02:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C809C1890504
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 20:09:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA7B32DF136;
-	Mon, 10 Nov 2025 20:02:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4337433F8B4;
+	Mon, 10 Nov 2025 20:09:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H0MMjHYL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QcpUyVdm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DDE62D7DC2
-	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 20:02:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B2533F8A6;
+	Mon, 10 Nov 2025 20:09:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762804939; cv=none; b=o34CPlbEVcwEFjuUojfBvsGh3hT6PY3bIIb4w3kk2mPkszZtFvFtqdBXShS+aZOIlH6ldoAGVjyVSy9sGkC25NsevNuWcKJQFKTV006VSHEObgzhqVqA14O3G9KfD4J0lGjyuTzVcXuPr9tOVD5DVYvC8RulpDWADt0qmPe6uic=
+	t=1762805358; cv=none; b=XBOFPDMF8Jo4sSgjh0BBahNYdjraf3UJUpLCwjB/P5IdOzrCYCQDj9N5LXNvV/JEWuhtVuWIfvchja+e2C/hZpVzueZf50+NMDz52SZrpX4MS1gC0iBdp67oQjf738oyz5xNrDatlMcu4GUHQikMtBzg2hq1rpAhXl/453pvutw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762804939; c=relaxed/simple;
-	bh=WEbUCqKPpqNwVY1zEPDo64sJfZj+DKjf0qTpZ5wdgfo=;
+	s=arc-20240116; t=1762805358; c=relaxed/simple;
+	bh=0iOhbGLxfSoLRBYgw+mP+RQa87LiNVPt6z/z3LThk5Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gtL1oz66OHshskL8HQfHQE9Eq7IQB/PMY22itshk7erM+A+8Y93uWg0ggASyBFlcnygoXu0f4rfrnQACsj6vJBMxx8s7fYkDG9RKoZ///1pfZRNKuw2S4O+4dLooyjCDoWLtTlsMC+Wes5ji6WRUB1IpBTICfHEjT+OiQI2bBOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H0MMjHYL; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-29555b384acso32289895ad.1
-        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 12:02:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762804938; x=1763409738; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0NLYN6jTBEGwmHxj0J2TeyxS9PbPiD4fPo/j2nnYR3E=;
-        b=H0MMjHYLFhbaiGud6XqzQNAlgdWZuWDFA1MdfQjuaI4XTFwkbEXIkeuK9swa3VbLgl
-         P2NluPnBZSgQ7gI3Ir6904KbVN2DSCr+FsH+ftX0M9/kYAuRpmmeCWUusdhK1SEiNjGC
-         0H+Qs6+xYj/xDN5KGTx3nZ8pnLtc+lPOYS22nnkz5if4dILv/6ZCp6eXv1OLiZ462ur1
-         j8Wtjz3XJlSk6QI2+QnnivCKcrbL4m/agB9f+aQWDLB+B/IrXiSQn6ni5a6BcX2kWpNk
-         IYk8uoSofJc91BfW8koVHNTqCSvoUZEh8FMDGu7BRsY5/bH7tbFXW/JYFWfH4SG47oXU
-         FvTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762804938; x=1763409738;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0NLYN6jTBEGwmHxj0J2TeyxS9PbPiD4fPo/j2nnYR3E=;
-        b=pa8QhchxriVCaMrBsdb6CDf9Hf0wuNxFwSQ+3WnDAm5CI8+VtISPNeWgrUvz81JSzr
-         fQ+DXM4Y0JWqVviSHwZjKp+AZ+wzAgQEd9SlWfKhwevnti5Pyyx5sB7m3A1tnJSLc2Ir
-         z1IeDhqvHPag8H3IbXfRGS8w7Ce6pCQ2MKe2JIY98e221tcDDxlEnKIvWvn5ZMLO2sf5
-         k7A8inTE8z74eJu3qLECaIPiPSJAVilW8bRyu0/M4DG+Dyo5K6+8cFdv919bQf5e+GJv
-         sbikZTLbjPQC6wKbEFduPpg8M/GNe/6G5JpwmKEBQyOSxMWAtrIHihrfza3cwKrju4NZ
-         lZeg==
-X-Forwarded-Encrypted: i=1; AJvYcCW0ah6S9zdhyPjCX0iXOnz9QdjbcN8O3GTTEIxIMcfUt6a9gf9Oh6vLT1kFugwy5si3qnphc+4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YygvDQKl1KNHcymOvf8KMKKMQFTn/55U/FlGS0gRw3C29DfhjW6
-	nBbkICyNGtDlCUcXxb5hK7eMb1wINaXFghHO3QMXGCm+Bicn3K2LVCkc
-X-Gm-Gg: ASbGncsOQhCVdr+XkuDrlF5btXPeqY7DTnadYKb0CFXDefrKY/aZzD80ATmPCW2g5nc
-	D4h8jeUFGuN3gWMI7025yGGjabsrQ9KDvQfpG9K3yPvuUlaxRm0W28zeRDMd+6t7xprj7do+Duq
-	LZVJI6b9tQSoGL04U03rXdMmtI+9hVX13X9To3Ljh+UOVvAWR0PTDuS+HyASkc25Z2VUBv/9dse
-	a0UseGi5GI/615pJv2+Fz09/oP0PUT4baJqUzWBB1qpbrReyVG81N8XZWSxtaTHFtE6XE1eZS9O
-	H1endQx9MHq1UhLQO+Cam/uJcERI5LbDa7RqPm1Tv4tdaN0y0uZWsqE7SKAgWDO0CK/8PMkWo/4
-	TbH71bMYmbJeovlMxsjNH7qhD9zppUAgpJwF/RuZ01gF1MOyGy4LJZbZSXenhUnalYsw5J0GfOP
-	q86WUvBw==
-X-Google-Smtp-Source: AGHT+IEx5DrKUEdpyrpancufPKZNJjbcQnhJSxpDOTbqT+ORySyjiLg4DxwBtCBYpfTv90p5Dx8iQQ==
-X-Received: by 2002:a17:903:1a27:b0:297:ec1a:9db8 with SMTP id d9443c01a7336-297ec1a9e0dmr131667795ad.49.1762804937650;
-        Mon, 10 Nov 2025 12:02:17 -0800 (PST)
-Received: from localhost ([2601:647:6881:9060:9974:abff:f64:1199])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-341a699c011sm18596997a91.14.2025.11.10.12.02.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Nov 2025 12:02:17 -0800 (PST)
-Date: Mon, 10 Nov 2025 12:02:15 -0800
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Ranganath V N <vnranganath.20@gmail.com>
-Cc: edumazet@google.com, davem@davemloft.net, david.hunter.linux@gmail.com,
-	horms@kernel.org, jhs@mojatatu.com, jiri@resnulli.us,
-	khalid@kernel.org, kuba@kernel.org, pabeni@redhat.com,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	skhan@linuxfoundation.org,
-	syzbot+0c85cae3350b7d486aee@syzkaller.appspotmail.com
-Subject: Re: [PATCH v4 net 0/2] net: sched: initialize struct tc_ife to fix
- kernel-infoleak
-Message-ID: <aRJExzyyqdt1V6cP@pop-os.localdomain>
-References: <20251109091336.9277-1-vnranganath.20@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=u/KO+aqcWae+8d3sflX7rxMV+sBE/nrpnT5e5VWLtCHVIKJJSZ3p8mLKjJOceuRCinyQpdBcPST2XABYwCsxShQ2aX4dkoWBgogL+WvlW8sXqtTgmASKOsL/6wq/26jqQMhjORHDoNIPxEaeDbaLx6qCURtZRYHZ8o/vqoF42R0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QcpUyVdm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50174C4CEF5;
+	Mon, 10 Nov 2025 20:09:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762805357;
+	bh=0iOhbGLxfSoLRBYgw+mP+RQa87LiNVPt6z/z3LThk5Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QcpUyVdmcLgbVnPvtvG5sn+9VBwKYizaBkOPJ4X74CZDnGzJtx7BAJ+tIxFT21Fc3
+	 kuqmvrJf3ya8gDyeZhjrs97LF4iKzBJX+0qjLU2uDBpRj33RsHW7WQe0f1a6wMULsK
+	 MHACPV9+uXAHvFPFb8X1myONhP1kPiEGf/spaX/s4HySFB9r8akxvZuqLJRMmHyzOj
+	 WQUq3suhO1/hWXwR5IdxvwzYWwP5s0d0pAsX0p+V74Gc+MZCCi+JLZEkAY6sRJwvNO
+	 mRp3nvkU4CihCyV3xqso5fKJMu09coOWxk01X2N2w3NYFxPA5T4LgFDolk3DbjgZ0F
+	 1MBO1cOUQqWug==
+Date: Mon, 10 Nov 2025 20:09:10 +0000
+From: Simon Horman <horms@kernel.org>
+To: Inochi Amaoto <inochiama@gmail.com>
+Cc: Han Gao <rabenda.cn@gmail.com>, Icenowy Zheng <uwu@icenowy.me>,
+	Vivian Wang <wangruikang@iscas.ac.cn>, Yao Zi <ziyao@disroot.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chen Wang <unicorn_wang@outlook.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	sophgo@lists.linux.dev, linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, Yixun Lan <dlan@gentoo.org>,
+	Longbin Li <looong.bin@gmail.com>, Andrew Lunn <andrew@lunn.ch>
+Subject: Re: [PATCH v7 3/3] net: stmmac: dwmac-sophgo: Add phy interface
+ filter
+Message-ID: <aRJGZjgTgcjZgIqe@horms.kernel.org>
+References: <20251107111715.3196746-1-inochiama@gmail.com>
+ <20251107111715.3196746-4-inochiama@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,24 +77,75 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251109091336.9277-1-vnranganath.20@gmail.com>
+In-Reply-To: <20251107111715.3196746-4-inochiama@gmail.com>
 
-On Sun, Nov 09, 2025 at 02:43:34PM +0530, Ranganath V N wrote:
-> This series addresses the uninitialization of the struct which has
-> 2 bytes of padding. And copying this uninitialized data to userspace
-> can leak info from kernel memory.
+On Fri, Nov 07, 2025 at 07:17:15PM +0800, Inochi Amaoto wrote:
+> As the SG2042 has an internal rx delay, the delay should be removed
+> when initializing the mac, otherwise the phy will be misconfigurated.
 > 
-> This series ensures all members and padding are cleared prior to
-> begin copied.
+> Fixes: 543009e2d4cd ("net: stmmac: dwmac-sophgo: Add support for Sophgo SG2042 SoC")
+> Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
+> Tested-by: Han Gao <rabenda.cn@gmail.com>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> ---
+>  .../ethernet/stmicro/stmmac/dwmac-sophgo.c    | 20 ++++++++++++++++++-
+>  1 file changed, 19 insertions(+), 1 deletion(-)
 > 
-> This change silences the KMSAN report and prevents potential information
-> leaks from the kernel memory.
-> 
-> Signed-off-by: Ranganath V N <vnranganath.20@gmail.com>
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
 
-Looks good to me too.
+...
 
-Acked-by: Cong Wang <xiyou.wangcong@gmail.com>
+> @@ -50,11 +56,23 @@ static int sophgo_dwmac_probe(struct platform_device *pdev)
+>  	if (ret)
+>  		return ret;
+>  
+> +	data = device_get_match_data(&pdev->dev);
+> +	if (data && data->has_internal_rx_delay) {
+> +		plat_dat->phy_interface = phy_fix_phy_mode_for_mac_delays(plat_dat->phy_interface,
+> +									  false, true);
+> +		if (plat_dat->phy_interface == PHY_INTERFACE_MODE_NA)
+> +			return -EINVAL;
 
-Thanks!
+I'm sorry if this is a false positive. Because, more so than Russell [1], I
+confused about how about the treatment of phy_interface. But it seems that
+there is a miss match between the use of phy_fix_phy_mode_for_mac_delays()
+above and the binding.
+
+The call to phy_fix_phy_mode_for_mac_delays() above will return
+PHY_INTERFACE_MODE_NA unless phy_interface is PHY_INTERFACE_MODE_RGMII_ID
+or PHY_INTERFACE_MODE_RGMII_RXID.
+
+  phy_interface_t phy_fix_phy_mode_for_mac_delays(phy_interface_t interface,
+						bool mac_txid, bool mac_rxid)
+  ...
+	if (mac_rxid) {
+		if (interface == PHY_INTERFACE_MODE_RGMII_ID)
+			return PHY_INTERFACE_MODE_RGMII_TXID;
+		if (interface == PHY_INTERFACE_MODE_RGMII_RXID)
+			return PHY_INTERFACE_MODE_RGMII;
+		return PHY_INTERFACE_MODE_NA;
+	}
+  ...
+
+Looking at phy_modes(), unsurprisingly, the following mappings occur:
+* "rgmii" -> PHY_INTERFACE_MODE_RGMII
+* "rgmii-id" -> PHY_INTERFACE_MODE_RGMII_ID
+* "rgmii-rxid" -> PHY_INTERFACE_MODE_RGMII_RXID
+* "rgmii-txid" -> PHY_INTERFACE_MODE_RGMII_TXID
+
+And in the binding, patch 1/3 of this series, only phy-mode rgmii-txid or
+rgmii-id is allowed.
+
+But if rgmii-txid is used, PHY_INTERFACE_MODE_RGMII_TXID will be passed to
+phy_fix_phy_mode_for_mac_delays(), which will return PHY_INTERFACE_MODE_NA.
+
+Again, I'm confused about the mapping in phy_fix_phy_mode_for_mac_delays().
+But there does seem to be some inconsistency between the binding and
+the driver implementation here.
+
+Flagged by Claude Code with https://github.com/masoncl/review-prompts/ 
+
+[1] https://lore.kernel.org/all/aPSubO4tJjN_ns-t@shell.armlinux.org.uk/
+
+...
 
