@@ -1,404 +1,314 @@
-Return-Path: <netdev+bounces-237145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237146-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 901D9C461CA
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 12:06:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27884C461E3
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 12:07:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 15BAB34732C
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 11:06:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E460A1885957
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 11:07:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E73EF306B11;
-	Mon, 10 Nov 2025 11:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 175BC307486;
+	Mon, 10 Nov 2025 11:06:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SiW2B8mL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lDEn1IiD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA2A62E63C;
-	Mon, 10 Nov 2025 11:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18ACD273F9
+	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 11:06:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762772777; cv=none; b=hftJx4mZXjcEmMv1vclROtzhVEz5noP7PVSbk+yq5Jh3lnUt5gEyPz6TrfQrno56ZPOLK4/jASPD+15I4kjIy746+gtIRlppd4swDgf3MrkOWemyPZoX0P2dGT+jITqvQl+tue4ZMOEFtxAB0ji5owIq3nTV8nNn9cwlXgjAYfA=
+	t=1762772811; cv=none; b=O17xzk3yvwAmZvXXFvsEEGgsQ2HGQ53T5xexvNGCVf8bZQW3bG8m19fDVlwaU/a30QiiEbqQlE6flgUz8fFBl3PDnDWR6+NpX0HVLMJ8FEGrsfNHGEd3YHyVYzyO9+VZn9VDMOMIplJUuFVXrinXCI9mk9z9j6ZiZHScgvQEfkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762772777; c=relaxed/simple;
-	bh=qIObqiroWcgVL4Dt8RU7ppjIuvnj+Y2jxYFSiNagdVI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q/ZEl3LEjeh/xdQhp2ObOa7biHd4I4x+27f637OPOhlUrYXiL9f+yMYNUoeUhutF3ocAVnh/cUBMsv51yIqZzw0Ht1W+C36+EUCJPX0y7OQfjrqT9W29N8yO7J8hVw3KdYi+27qCxM1qRNaSCToiTC5oaVUAtTLIClSzJ6kMVwg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SiW2B8mL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1998C116B1;
-	Mon, 10 Nov 2025 11:06:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762772775;
-	bh=qIObqiroWcgVL4Dt8RU7ppjIuvnj+Y2jxYFSiNagdVI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=SiW2B8mLy3S8XHCuBpY45fj0nYxsGJyTG/9aTuD1a2SZlHAhUsitzqjyNmv5Y6JKV
-	 5dHk55Kdu6crkKN1/RxlEoiPlD/bybWYtegP8WYr1dS4FJSfTKAXi7SQvRsDFlR+vW
-	 j/jHxAfg2dAkNwu2MipHANxx5fAARWe6cexWsUZkP/p80NtR3uGspMTltkJnmDtQ2K
-	 r61cIiaLO6MgTXP8hjlEkeHjR9eMGTTN2fFutZwdyiA9gH0taIi8ffr1ATOOiCqEwK
-	 2DXRAz0+8eTi0RCLQiAzWiqF9RLJJEhj2vV967F/fYnR810sWqPDRvDtcrQphrFY25
-	 M2FunhX11Etjg==
-Message-ID: <d0fc4c6a-c4d7-4d62-9e6f-6c05c96a51de@kernel.org>
-Date: Mon, 10 Nov 2025 12:06:08 +0100
+	s=arc-20240116; t=1762772811; c=relaxed/simple;
+	bh=/jUpBnUkxmAdbYaJkKyc6YlPMjaSQv8ZF79+I1M/FCw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ejHWXRjY8cTvKyvEf9G3lZ6zCREOSl2BXq4m8W8kmbUFLhAWOpazblFKnB8jCt7w11Z2cj5f5K5Ai1ZJCc9YeybXuh/JdnSwYZ8QXWblAbrB19gZcATiLmpvpwiN6szILqMHIIPattbSj2GUrB6SbBVY47s5ZtfUMuyDGUq3Q0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lDEn1IiD; arc=none smtp.client-ip=209.85.219.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-88246676008so15090486d6.3
+        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 03:06:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1762772806; x=1763377606; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TZlDwF1uZo+6iYVM/WU/KP07QPOLCz1d2Q7NhIAKrgQ=;
+        b=lDEn1IiD1iJSspe/h7oRsmkWm5uvUB8/Xk+Ekt4hnDC1QDvoIYp7DK3DZ6n2pTzKRP
+         HYSvsSecaMvCkA59ILp4BeSWb92ZFqKQADnG0Z2SDBrai97Qkz7KGfcQO/isNcgMr+dd
+         3R58af6ij/w3zmpsTPdpukGLEmte1xEws9apkNPfL92Auh++D54QHZn2cAboKBa4T+VQ
+         CCpbIhS4qc8rTFEGTchokdAelIImN6OXHNuAWZF+ZuUpg0X6pO83F8992Y2o/05kXZMl
+         ITDF/9ZmbUiMttT1XOemwV+g2909jnMj91TbqXE482XrVRK/sJZ2+W3sNAXrGheGqJzz
+         oGxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762772806; x=1763377606;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=TZlDwF1uZo+6iYVM/WU/KP07QPOLCz1d2Q7NhIAKrgQ=;
+        b=M+QZzHFnTci3wydOghv3jVskzdjj/+eHcqtgUfAmpTrYNYcU8HDmDNvvCI2kNntVqz
+         fz/4DYbo3vIUlbedLS/fMgKWZgiE3yrCGfjrLE3p9UNzBNm/T9Rt/KpsyRtmrBFRdTX2
+         p/Q4OQHwKg5L/ky6cv0i/ztM76QPDF5L/y6hcznuha14S7No+gRtLtnJE6NFz1MtARkt
+         HMs3ZAeI6QpAwhZGrcObGxhqFaJikYN/AWV25AOZUkyuMW7FLY/trnUliD8GtOWu/mj5
+         ltdkV5/46TqIJ1I+H7ElVUXe2VaxRWhZNnxLv/Jy/NKSUBTqD5DwgXHpsZcnx7QPXvXa
+         yGYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV8kC+RzXE1HBEZ5di2tUkkjRc6GTtKjrVu6UBubq0wjgZrYAcdt1ukwKACP28BzB2yIyv1aGQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxF3AsliAO20oWOXJwNA53VtssRHLebMeKz2uiwPSCa11RmsSi3
+	5nIoVpyGpFPFCZ0WSx5YgKwAUSk3DoXAfUw+F7BSactcGfkjpSZLC13CElr07QWocVFxC945InB
+	P4I+3ehN8lsqeCWkQ/hqxunDO60K8kbSSjXF2Kkj7
+X-Gm-Gg: ASbGncuNWkrVTpIS8ZAkeDywt0Yd7kQHJZ7o87diAKS0xDH+UB2JOnnL6fWkOdodHMJ
+	ZqUWKuaf82iv9fR6ioWjDfvhhNd6nwluzwEr5cxDSCLHBSCpbZno7FEYjarOLa4SEo/8RySEMJ4
+	elHZYNbXUOQlZUvWI/ogLaAa84OzZrJNxoLicNQsUwHGzSc2tL6YfwOdTtL18bwwIQkD+dcsEnW
+	M5u7MQX5rs0PTMRIeOJud/0Qb1cHz1zp6+RfYjXq66ggVWKgFirZvXDoDYpvvHoYmWsd9WI//1C
+	9SaPDkU=
+X-Google-Smtp-Source: AGHT+IErfuHZa8wEPzyF9Cfy8fvRXDoa9eur3IHCDQmPWqEk3WbCIWP2YxTN/9nJraiIUoW/zqhDmYZzy+VjBUVoXeE=
+X-Received: by 2002:a05:6214:528a:b0:80a:7bd3:e61d with SMTP id
+ 6a1803df08f44-882386c6c3fmr111087866d6.34.1762772803767; Mon, 10 Nov 2025
+ 03:06:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 2/2] xdp: Delegate fast path return decision to page_pool
-To: Dragos Tatulea <dtatulea@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Simon Horman <horms@kernel.org>,
- Toshiaki Makita <toshiaki.makita1@gmail.com>,
- David Ahern <dsahern@kernel.org>
-Cc: Tariq Toukan <tariqt@nvidia.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- Martin KaFai Lau <martin.lau@linux.dev>, KP Singh <kpsingh@kernel.org>
-References: <20251107102853.1082118-2-dtatulea@nvidia.com>
- <20251107102853.1082118-5-dtatulea@nvidia.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20251107102853.1082118-5-dtatulea@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20251109161215.2574081-1-edumazet@google.com> <cb568e91-9114-4e9a-ba88-eb4fc3772690@kernel.org>
+In-Reply-To: <cb568e91-9114-4e9a-ba88-eb4fc3772690@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 10 Nov 2025 03:06:32 -0800
+X-Gm-Features: AWmQ_bl7N7tZUVqrLGviAHPvf1_xcfaibwkZ2ZuZWsBBQCupUNH0Kxu2PL9Fssw
+Message-ID: <CANn89iJtEhs=sGsRF+NATcLL9-F8oKWxN_2igJehP8RvZjT-Lg@mail.gmail.com>
+Subject: Re: [PATCH net] net_sched: limit try_bulk_dequeue_skb() batches
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Nov 10, 2025 at 2:36=E2=80=AFAM Jesper Dangaard Brouer <hawk@kernel=
+.org> wrote:
+>
+>
+>
+> On 09/11/2025 17.12, Eric Dumazet wrote:
+> > After commit 100dfa74cad9 ("inet: dev_queue_xmit() llist adoption")
+> > I started seeing many qdisc requeues on IDPF under high TX workload.
+> >
+> > $ tc -s qd sh dev eth1 handle 1: ; sleep 1; tc -s qd sh dev eth1 handle=
+ 1:
+> > qdisc mq 1: root
+> >   Sent 43534617319319 bytes 268186451819 pkt (dropped 0, overlimits 0 r=
+equeues 3532840114)
+> >   backlog 1056Kb 6675p requeues 3532840114
+> > qdisc mq 1: root
+> >   Sent 43554665866695 bytes 268309964788 pkt (dropped 0, overlimits 0 r=
+equeues 3537737653)
+> >   backlog 781164b 4822p requeues 3537737653
+> >
+> > This is caused by try_bulk_dequeue_skb() being only limited by BQL budg=
+et.
+> >
+> > perf record -C120-239 -e qdisc:qdisc_dequeue sleep 1 ; perf script
+> > ...
+> >   netperf 75332 [146]  2711.138269: qdisc:qdisc_dequeue: dequeue ifinde=
+x=3D5 qdisc handle=3D0x80150000 parent=3D0x10013 txq_state=3D0x0 packets=3D=
+1292 skbaddr=3D0xff378005a1e9f200
+> >   netperf 75332 [146]  2711.138953: qdisc:qdisc_dequeue: dequeue ifinde=
+x=3D5 qdisc handle=3D0x80150000 parent=3D0x10013 txq_state=3D0x0 packets=3D=
+1213 skbaddr=3D0xff378004d607a500
+> >   netperf 75330 [144]  2711.139631: qdisc:qdisc_dequeue: dequeue ifinde=
+x=3D5 qdisc handle=3D0x80150000 parent=3D0x10013 txq_state=3D0x0 packets=3D=
+1233 skbaddr=3D0xff3780046be20100
+> >   netperf 75333 [147]  2711.140356: qdisc:qdisc_dequeue: dequeue ifinde=
+x=3D5 qdisc handle=3D0x80150000 parent=3D0x10013 txq_state=3D0x0 packets=3D=
+1093 skbaddr=3D0xff37800514845b00
+> >   netperf 75337 [151]  2711.141037: qdisc:qdisc_dequeue: dequeue ifinde=
+x=3D5 qdisc handle=3D0x80150000 parent=3D0x10013 txq_state=3D0x0 packets=3D=
+1353 skbaddr=3D0xff37800460753300
+> >   netperf 75337 [151]  2711.141877: qdisc:qdisc_dequeue: dequeue ifinde=
+x=3D5 qdisc handle=3D0x80150000 parent=3D0x10013 txq_state=3D0x0 packets=3D=
+1367 skbaddr=3D0xff378004e72c7b00
+> >   netperf 75330 [144]  2711.142643: qdisc:qdisc_dequeue: dequeue ifinde=
+x=3D5 qdisc handle=3D0x80150000 parent=3D0x10013 txq_state=3D0x0 packets=3D=
+1202 skbaddr=3D0xff3780045bd60000
+> > ...
+> >
+> > This is bad because :
+> >
+> > 1) Large batches hold one victim cpu for a very long time.
+> >
+> > 2) Driver often hit their own TX ring limit (all slots are used).
+> >
+> > 3) We call dev_requeue_skb()
+> >
+> > 4) Requeues are using a FIFO (q->gso_skb), breaking qdisc ability to
+> >     implement FQ or priority scheduling.
+> >
+> > 5) dequeue_skb() gets packets from q->gso_skb one skb at a time
+> >     with no xmit_more support. This is causing many spinlock games
+> >     between the qdisc and the device driver.
+> >
+> > Requeues were supposed to be very rare, lets keep them this way.
+> >
+> > Limit batch sizes to /proc/sys/net/core/dev_weight (default 64) as
+> > __qdisc_run() was designed to use.
+> >
+> > Fixes: 5772e9a3463b ("qdisc: bulk dequeue support for qdiscs with TCQ_F=
+_ONETXQUEUE")
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > Cc: Jesper Dangaard Brouer <hawk@kernel.org>
+> > Cc: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+> > ---
+> >   net/sched/sch_generic.c | 17 ++++++++++-------
+> >   1 file changed, 10 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+> > index d9a98d02a55fc361a223f3201e37b6a2b698bb5e..852e603c17551ee719bf1c5=
+61848d5ef0699ab5d 100644
+> > --- a/net/sched/sch_generic.c
+> > +++ b/net/sched/sch_generic.c
+> > @@ -180,9 +180,10 @@ static inline void dev_requeue_skb(struct sk_buff =
+*skb, struct Qdisc *q)
+> >   static void try_bulk_dequeue_skb(struct Qdisc *q,
+> >                                struct sk_buff *skb,
+> >                                const struct netdev_queue *txq,
+> > -                              int *packets)
+> > +                              int *packets, int budget)
+> >   {
+> >       int bytelimit =3D qdisc_avail_bulklimit(txq) - skb->len;
+> > +     int cnt =3D 0;
+>
+> You patch makes perfect sense, that we want this budget limit.
+>
+> But: Why isn't bytelimit saving us?
+
+BQL can easily grow
+/sys/class/net/eth1/queues/tx-XXX/byte_queue_limits/limit to quite big
+values with MQ high speed devices.
+
+Each TX queue is usually serviced with RR, meaning that some of them
+can get a long standing queue.
 
 
+tjbp26:/home/edumazet# ./super_netperf 200 -H tjbp27 -l 100 &
+[1] 198996
 
-On 07/11/2025 11.28, Dragos Tatulea wrote:
-> XDP uses the BPF_RI_F_RF_NO_DIRECT flag to mark contexts where it is not
-> allowed to do direct recycling, even though the direct flag was set by
-> the caller. This is confusing and can lead to races which are hard to
-> detect [1].
-> 
-> Furthermore, the page_pool already contains an internal
-> mechanism which checks if it is safe to switch the direct
-> flag from off to on.
-> 
-> This patch drops the use of the BPF_RI_F_RF_NO_DIRECT flag and always
-> calls the page_pool release with the direct flag set to false. The
-> page_pool will decide if it is safe to do direct recycling. This
-> is not free but it is worth it to make the XDP code safer. The
-> next paragrapsh are discussing the performance impact.
-> 
-> Performance wise, there are 3 cases to consider. Looking from
-> __xdp_return() for MEM_TYPE_PAGE_POOL case:
-> 
-> 1) napi_direct == false:
->    - Before: 1 comparison in __xdp_return() + call of
->      page_pool_napi_local() from page_pool_put_unrefed_netmem().
->    - After: Only one call to page_pool_napi_local().
-> 
-> 2) napi_direct == true && BPF_RI_F_RF_NO_DIRECT
->    - Before: 2 comparisons in __xdp_return() + call of
->      page_pool_napi_local() from page_pool_put_unrefed_netmem().
->    - After: Only one call to page_pool_napi_local().
-> 
-> 3) napi_direct == true && !BPF_RI_F_RF_NO_DIRECT
->    - Before: 2 comparisons in __xdp_return().
->    - After: One call to page_pool_napi_local()
-> 
-> Case 1 & 2 are the slower paths and they only have to gain.
-> But they are slow anyway so the gain is small.
-> 
-> Case 3 is the fast path and is the one that has to be considered more
-> closely. The 2 comparisons from __xdp_return() are swapped for the more
-> expensive page_pool_napi_local() call.
-> 
-> Using the page_pool benchmark between the fast-path and the
-> newly-added NAPI aware mode to measure [2] how expensive
-> page_pool_napi_local() is:
-> 
->    bench_page_pool: time_bench_page_pool01_fast_path(): in_serving_softirq fast-path
->    bench_page_pool: Type:tasklet_page_pool01_fast_path Per elem: 15 cycles(tsc) 7.537 ns (step:0)
-> 
->    bench_page_pool: time_bench_page_pool04_napi_aware(): in_serving_softirq fast-path
->    bench_page_pool: Type:tasklet_page_pool04_napi_aware Per elem: 20 cycles(tsc) 10.490 ns (step:0)
-> 
+tjbp26:/home/edumazet# grep .
+/sys/class/net/eth1/queues/tx-*/byte_queue_limits/limit
+/sys/class/net/eth1/queues/tx-0/byte_queue_limits/limit:116826
+/sys/class/net/eth1/queues/tx-10/byte_queue_limits/limit:84534
+/sys/class/net/eth1/queues/tx-11/byte_queue_limits/limit:342924
+/sys/class/net/eth1/queues/tx-12/byte_queue_limits/limit:433302
+/sys/class/net/eth1/queues/tx-13/byte_queue_limits/limit:409254
+/sys/class/net/eth1/queues/tx-14/byte_queue_limits/limit:434112
+/sys/class/net/eth1/queues/tx-15/byte_queue_limits/limit:68304
+/sys/class/net/eth1/queues/tx-16/byte_queue_limits/limit:65610
+/sys/class/net/eth1/queues/tx-17/byte_queue_limits/limit:65772
+/sys/class/net/eth1/queues/tx-18/byte_queue_limits/limit:69822
+/sys/class/net/eth1/queues/tx-19/byte_queue_limits/limit:440634
+/sys/class/net/eth1/queues/tx-1/byte_queue_limits/limit:70308
+/sys/class/net/eth1/queues/tx-20/byte_queue_limits/limit:304824
+/sys/class/net/eth1/queues/tx-21/byte_queue_limits/limit:497856
+/sys/class/net/eth1/queues/tx-22/byte_queue_limits/limit:70308
+/sys/class/net/eth1/queues/tx-23/byte_queue_limits/limit:535408
+/sys/class/net/eth1/queues/tx-24/byte_queue_limits/limit:79419
+/sys/class/net/eth1/queues/tx-25/byte_queue_limits/limit:70170
+/sys/class/net/eth1/queues/tx-26/byte_queue_limits/limit:1595568
+/sys/class/net/eth1/queues/tx-27/byte_queue_limits/limit:579108
+/sys/class/net/eth1/queues/tx-28/byte_queue_limits/limit:430578
+/sys/class/net/eth1/queues/tx-29/byte_queue_limits/limit:647172
+/sys/class/net/eth1/queues/tx-2/byte_queue_limits/limit:345492
+/sys/class/net/eth1/queues/tx-30/byte_queue_limits/limit:612392
+/sys/class/net/eth1/queues/tx-31/byte_queue_limits/limit:344376
+/sys/class/net/eth1/queues/tx-3/byte_queue_limits/limit:154740
+/sys/class/net/eth1/queues/tx-4/byte_queue_limits/limit:60588
+/sys/class/net/eth1/queues/tx-5/byte_queue_limits/limit:71970
+/sys/class/net/eth1/queues/tx-6/byte_queue_limits/limit:70308
+/sys/class/net/eth1/queues/tx-7/byte_queue_limits/limit:695454
+/sys/class/net/eth1/queues/tx-8/byte_queue_limits/limit:101760
+/sys/class/net/eth1/queues/tx-9/byte_queue_limits/limit:65286
 
-IMHO fast-path slowdown is significant.  This fast-path is used for the
-XDP_DROP use-case in drivers.  The fast-path is competing with the speed
-of updating an (per-cpu) array and a function-call overhead. The
-performance target for XDP_DROP is NIC *wirespeed* which at 100Gbit/s is
-148Mpps (or 6.72ns between packets).
+Then if we send many small packets in a row, limit/pkt_avg_len can go
+to arbitrary values.
 
-I still want to seriously entertain this idea, because (1) because the
-bug[1] was hard to find, and (2) this is mostly an XDP API optimization
-that isn't used by drivers (they call page_pool APIs directly for
-XDP_DROP case).
-Drivers can do this because they have access to the page_pool instance.
+Thanks.
 
-Thus, this isn't a XDP_DROP use-case.
-  - This is either XDP_REDIRECT or XDP_TX use-case.
-
-The primary change in this patch is, changing the XDP API call 
-xdp_return_frame_rx_napi() effectively to xdp_return_frame().
-
-Looking at code users of this call:
-  (A) Seeing a number of drivers using this to speed up XDP_TX when 
-*completing* packets from TX-ring.
-  (B) drivers/net/xen-netfront.c use looks incorrect.
-  (C) drivers/net/virtio_net.c use can easily be removed.
-  (D) cpumap.c and drivers/net/tun.c should not be using this call.
-  (E) devmap.c is the main user (with multiple calls)
-
-The (A) user will see a performance drop for XDP_TX, but these driver
-should be able to instead call the page_pool APIs directly as they
-should have access to the page_pool instance.
-
-Users (B)+(C)+(D) simply needs cleanup.
-
-User (E): devmap is the most important+problematic user (IIRC this was
-the cause of bug[1]).  XDP redirecting into devmap and running a new
-XDP-prog (per target device) was a prime user of this call
-xdp_return_frame_rx_napi() as it gave us excellent (e.g. XDP_DROP)
-performance.
-
-Perhaps we should simply measure the impact on devmap + 2nd XDP-prog
-doing XDP_DROP.  Then, we can see if overhead is acceptable... ?
-
-> ... and the slow path for reference:
-> 
->    bench_page_pool: time_bench_page_pool02_ptr_ring(): in_serving_softirq fast-path
->    bench_page_pool: Type:tasklet_page_pool02_ptr_ring Per elem: 30 cycles(tsc) 15.395 ns (step:0)
-
-The devmap user will basically fallback to using this code path.
-
-> So the impact is small in the fast-path, but not negligible. One thing
-> to consider is the fact that the comparisons from napi_direct are
-> dropped. That means that the impact will be smaller than the
-> measurements from the benchmark.
-> 
-> [1] Commit 2b986b9e917b ("bpf, cpumap: Disable page_pool direct xdp_return need larger scope")
-> [2] Intel Xeon Platinum 8580
-> 
-> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
-> ---
->   drivers/net/veth.c     |  2 --
->   include/linux/filter.h | 22 ----------------------
->   include/net/xdp.h      |  2 +-
->   kernel/bpf/cpumap.c    |  2 --
->   net/bpf/test_run.c     |  2 --
->   net/core/filter.c      |  2 +-
->   net/core/xdp.c         | 24 ++++++++++++------------
->   7 files changed, 14 insertions(+), 42 deletions(-)
-> 
-> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-> index a3046142cb8e..6d5c1e0b05a7 100644
-> --- a/drivers/net/veth.c
-> +++ b/drivers/net/veth.c
-> @@ -975,7 +975,6 @@ static int veth_poll(struct napi_struct *napi, int budget)
->   
->   	bq.count = 0;
->   
-> -	xdp_set_return_frame_no_direct();
->   	done = veth_xdp_rcv(rq, budget, &bq, &stats);
->   
->   	if (stats.xdp_redirect > 0)
-> @@ -994,7 +993,6 @@ static int veth_poll(struct napi_struct *napi, int budget)
->   
->   	if (stats.xdp_tx > 0)
->   		veth_xdp_flush(rq, &bq);
-> -	xdp_clear_return_frame_no_direct();
->   
->   	return done;
->   }
-> diff --git a/include/linux/filter.h b/include/linux/filter.h
-> index f5c859b8131a..877e40d81a4c 100644
-> --- a/include/linux/filter.h
-> +++ b/include/linux/filter.h
-> @@ -764,7 +764,6 @@ struct bpf_nh_params {
->   };
->   
->   /* flags for bpf_redirect_info kern_flags */
-> -#define BPF_RI_F_RF_NO_DIRECT	BIT(0)	/* no napi_direct on return_frame */
->   #define BPF_RI_F_RI_INIT	BIT(1)
->   #define BPF_RI_F_CPU_MAP_INIT	BIT(2)
->   #define BPF_RI_F_DEV_MAP_INIT	BIT(3)
-> @@ -1163,27 +1162,6 @@ struct bpf_prog *bpf_patch_insn_single(struct bpf_prog *prog, u32 off,
->   				       const struct bpf_insn *patch, u32 len);
->   int bpf_remove_insns(struct bpf_prog *prog, u32 off, u32 cnt);
->   
-> -static inline bool xdp_return_frame_no_direct(void)
-> -{
-> -	struct bpf_redirect_info *ri = bpf_net_ctx_get_ri();
-> -
-> -	return ri->kern_flags & BPF_RI_F_RF_NO_DIRECT;
-> -}
-> -
-> -static inline void xdp_set_return_frame_no_direct(void)
-> -{
-> -	struct bpf_redirect_info *ri = bpf_net_ctx_get_ri();
-> -
-> -	ri->kern_flags |= BPF_RI_F_RF_NO_DIRECT;
-> -}
-> -
-> -static inline void xdp_clear_return_frame_no_direct(void)
-> -{
-> -	struct bpf_redirect_info *ri = bpf_net_ctx_get_ri();
-> -
-> -	ri->kern_flags &= ~BPF_RI_F_RF_NO_DIRECT;
-> -}
-> -
->   static inline int xdp_ok_fwd_dev(const struct net_device *fwd,
->   				 unsigned int pktlen)
->   {
-> diff --git a/include/net/xdp.h b/include/net/xdp.h
-> index aa742f413c35..2a44d84a7611 100644
-> --- a/include/net/xdp.h
-> +++ b/include/net/xdp.h
-> @@ -446,7 +446,7 @@ struct xdp_frame *xdp_convert_buff_to_frame(struct xdp_buff *xdp)
->   }
->   
->   void __xdp_return(netmem_ref netmem, enum xdp_mem_type mem_type,
-> -		  bool napi_direct, struct xdp_buff *xdp);
-> +		  struct xdp_buff *xdp);
->   void xdp_return_frame(struct xdp_frame *xdpf);
->   void xdp_return_frame_rx_napi(struct xdp_frame *xdpf);
->   void xdp_return_buff(struct xdp_buff *xdp);
-> diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
-> index 703e5df1f4ef..3ece03dc36bd 100644
-> --- a/kernel/bpf/cpumap.c
-> +++ b/kernel/bpf/cpumap.c
-> @@ -253,7 +253,6 @@ static void cpu_map_bpf_prog_run(struct bpf_cpu_map_entry *rcpu, void **frames,
->   
->   	rcu_read_lock();
->   	bpf_net_ctx = bpf_net_ctx_set(&__bpf_net_ctx);
-> -	xdp_set_return_frame_no_direct();
->   
->   	ret->xdp_n = cpu_map_bpf_prog_run_xdp(rcpu, frames, ret->xdp_n, stats);
->   	if (unlikely(ret->skb_n))
-> @@ -263,7 +262,6 @@ static void cpu_map_bpf_prog_run(struct bpf_cpu_map_entry *rcpu, void **frames,
->   	if (stats->redirect)
->   		xdp_do_flush();
->   
-> -	xdp_clear_return_frame_no_direct();
->   	bpf_net_ctx_clear(bpf_net_ctx);
->   	rcu_read_unlock();
->   
-> diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
-> index 8b7d0b90fea7..a0fe03e9e527 100644
-> --- a/net/bpf/test_run.c
-> +++ b/net/bpf/test_run.c
-> @@ -289,7 +289,6 @@ static int xdp_test_run_batch(struct xdp_test_data *xdp, struct bpf_prog *prog,
->   	local_bh_disable();
->   	bpf_net_ctx = bpf_net_ctx_set(&__bpf_net_ctx);
->   	ri = bpf_net_ctx_get_ri();
-> -	xdp_set_return_frame_no_direct();
->   
->   	for (i = 0; i < batch_sz; i++) {
->   		page = page_pool_dev_alloc_pages(xdp->pp);
-> @@ -352,7 +351,6 @@ static int xdp_test_run_batch(struct xdp_test_data *xdp, struct bpf_prog *prog,
->   			err = ret;
->   	}
->   
-> -	xdp_clear_return_frame_no_direct();
->   	bpf_net_ctx_clear(bpf_net_ctx);
->   	local_bh_enable();
->   	return err;
-> diff --git a/net/core/filter.c b/net/core/filter.c
-> index 16105f52927d..5622ec5ac19c 100644
-> --- a/net/core/filter.c
-> +++ b/net/core/filter.c
-> @@ -4187,7 +4187,7 @@ static bool bpf_xdp_shrink_data(struct xdp_buff *xdp, skb_frag_t *frag,
->   	}
->   
->   	if (release) {
-> -		__xdp_return(netmem, mem_type, false, zc_frag);
-> +		__xdp_return(netmem, mem_type, zc_frag);
->   	} else {
->   		if (!tail)
->   			skb_frag_off_add(frag, shrink);
-> diff --git a/net/core/xdp.c b/net/core/xdp.c
-> index 9100e160113a..cf8eab699d9a 100644
-> --- a/net/core/xdp.c
-> +++ b/net/core/xdp.c
-> @@ -431,18 +431,18 @@ EXPORT_SYMBOL_GPL(xdp_rxq_info_attach_page_pool);
->    * of xdp_frames/pages in those cases.
->    */
->   void __xdp_return(netmem_ref netmem, enum xdp_mem_type mem_type,
-> -		  bool napi_direct, struct xdp_buff *xdp)
-> +		  struct xdp_buff *xdp)
->   {
->   	switch (mem_type) {
->   	case MEM_TYPE_PAGE_POOL:
->   		netmem = netmem_compound_head(netmem);
-> -		if (napi_direct && xdp_return_frame_no_direct())
-> -			napi_direct = false;
-> +
->   		/* No need to check netmem_is_pp() as mem->type knows this a
->   		 * page_pool page
-> +		 *
-> +		 * page_pool can detect direct recycle.
->   		 */
-> -		page_pool_put_full_netmem(netmem_get_pp(netmem), netmem,
-> -					  napi_direct);
-> +		page_pool_put_full_netmem(netmem_get_pp(netmem), netmem, false);
->   		break;
->   	case MEM_TYPE_PAGE_SHARED:
->   		page_frag_free(__netmem_address(netmem));
-> @@ -471,10 +471,10 @@ void xdp_return_frame(struct xdp_frame *xdpf)
->   	sinfo = xdp_get_shared_info_from_frame(xdpf);
->   	for (u32 i = 0; i < sinfo->nr_frags; i++)
->   		__xdp_return(skb_frag_netmem(&sinfo->frags[i]), xdpf->mem_type,
-> -			     false, NULL);
-> +			     NULL);
->   
->   out:
-> -	__xdp_return(virt_to_netmem(xdpf->data), xdpf->mem_type, false, NULL);
-> +	__xdp_return(virt_to_netmem(xdpf->data), xdpf->mem_type, NULL);
->   }
->   EXPORT_SYMBOL_GPL(xdp_return_frame);
->   
-> @@ -488,10 +488,10 @@ void xdp_return_frame_rx_napi(struct xdp_frame *xdpf)
->   	sinfo = xdp_get_shared_info_from_frame(xdpf);
->   	for (u32 i = 0; i < sinfo->nr_frags; i++)
->   		__xdp_return(skb_frag_netmem(&sinfo->frags[i]), xdpf->mem_type,
-> -			     true, NULL);
-> +			     NULL);
->   
->   out:
-> -	__xdp_return(virt_to_netmem(xdpf->data), xdpf->mem_type, true, NULL);
-> +	__xdp_return(virt_to_netmem(xdpf->data), xdpf->mem_type, NULL);
->   }
->   EXPORT_SYMBOL_GPL(xdp_return_frame_rx_napi);
-
-The changed to xdp_return_frame_rx_napi() makes it equvilent to 
-xdp_return_frame().
-
->   
-> @@ -542,7 +542,7 @@ EXPORT_SYMBOL_GPL(xdp_return_frame_bulk);
->    */
->   void xdp_return_frag(netmem_ref netmem, const struct xdp_buff *xdp)
->   {
-> -	__xdp_return(netmem, xdp->rxq->mem.type, true, NULL);
-> +	__xdp_return(netmem, xdp->rxq->mem.type, NULL);
->   }
->   EXPORT_SYMBOL_GPL(xdp_return_frag);
->   
-> @@ -556,10 +556,10 @@ void xdp_return_buff(struct xdp_buff *xdp)
->   	sinfo = xdp_get_shared_info_from_buff(xdp);
->   	for (u32 i = 0; i < sinfo->nr_frags; i++)
->   		__xdp_return(skb_frag_netmem(&sinfo->frags[i]),
-> -			     xdp->rxq->mem.type, true, xdp);
-> +			     xdp->rxq->mem.type, xdp);
->   
->   out:
-> -	__xdp_return(virt_to_netmem(xdp->data), xdp->rxq->mem.type, true, xdp);
-> +	__xdp_return(virt_to_netmem(xdp->data), xdp->rxq->mem.type, xdp);
->   }
->   EXPORT_SYMBOL_GPL(xdp_return_buff);
->   
-
+>
+>
+> Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
+>
+> >       while (bytelimit > 0) {
+> >               struct sk_buff *nskb =3D q->dequeue(q);
+> > @@ -193,8 +194,10 @@ static void try_bulk_dequeue_skb(struct Qdisc *q,
+> >               bytelimit -=3D nskb->len; /* covers GSO len */
+> >               skb->next =3D nskb;
+> >               skb =3D nskb;
+> > -             (*packets)++; /* GSO counts as one pkt */
+> > +             if (++cnt >=3D budget)
+> > +                     break;
+> >       }
+> > +     (*packets) +=3D cnt;
+> >       skb_mark_not_on_list(skb);
+> >   }
+> >
+> > @@ -228,7 +231,7 @@ static void try_bulk_dequeue_skb_slow(struct Qdisc =
+*q,
+> >    * A requeued skb (via q->gso_skb) can also be a SKB list.
+> >    */
+> >   static struct sk_buff *dequeue_skb(struct Qdisc *q, bool *validate,
+> > -                                int *packets)
+> > +                                int *packets, int budget)
+> >   {
+> >       const struct netdev_queue *txq =3D q->dev_queue;
+> >       struct sk_buff *skb =3D NULL;
+> > @@ -295,7 +298,7 @@ static struct sk_buff *dequeue_skb(struct Qdisc *q,=
+ bool *validate,
+> >       if (skb) {
+> >   bulk:
+> >               if (qdisc_may_bulk(q))
+> > -                     try_bulk_dequeue_skb(q, skb, txq, packets);
+> > +                     try_bulk_dequeue_skb(q, skb, txq, packets, budget=
+);
+> >               else
+> >                       try_bulk_dequeue_skb_slow(q, skb, packets);
+> >       }
+> > @@ -387,7 +390,7 @@ bool sch_direct_xmit(struct sk_buff *skb, struct Qd=
+isc *q,
+> >    *                          >0 - queue is not empty.
+> >    *
+> >    */
+> > -static inline bool qdisc_restart(struct Qdisc *q, int *packets)
+> > +static inline bool qdisc_restart(struct Qdisc *q, int *packets, int bu=
+dget)
+> >   {
+> >       spinlock_t *root_lock =3D NULL;
+> >       struct netdev_queue *txq;
+> > @@ -396,7 +399,7 @@ static inline bool qdisc_restart(struct Qdisc *q, i=
+nt *packets)
+> >       bool validate;
+> >
+> >       /* Dequeue packet */
+> > -     skb =3D dequeue_skb(q, &validate, packets);
+> > +     skb =3D dequeue_skb(q, &validate, packets, budget);
+> >       if (unlikely(!skb))
+> >               return false;
+> >
+> > @@ -414,7 +417,7 @@ void __qdisc_run(struct Qdisc *q)
+> >       int quota =3D READ_ONCE(net_hotdata.dev_tx_weight);
+> >       int packets;
+> >
+> > -     while (qdisc_restart(q, &packets)) {
+> > +     while (qdisc_restart(q, &packets, quota)) {
+> >               quota -=3D packets;
+> >               if (quota <=3D 0) {
+> >                       if (q->flags & TCQ_F_NOLOCK)
+>
 
