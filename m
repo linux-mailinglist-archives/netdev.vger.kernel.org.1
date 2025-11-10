@@ -1,151 +1,130 @@
-Return-Path: <netdev+bounces-237348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B64FC49558
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 21:57:57 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDDE5C49597
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 22:01:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87A1F3B1445
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 20:56:36 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6E5524F2D85
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 20:59:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59AEA2F8BC5;
-	Mon, 10 Nov 2025 20:55:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC5ED2F616E;
+	Mon, 10 Nov 2025 20:58:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QcOtzwgx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YX7+DKvC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AC8A2F83C3;
-	Mon, 10 Nov 2025 20:55:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F762F6577
+	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 20:58:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762808144; cv=none; b=UDQmuaFbA7apWx+R6MQUgfsC4t7pVAAgnlCRTkn88WxL1zodWIvetCoh5udvhbzRFYX9eIWeV3A1J/9EP8CNdO6LsXVbVXpuetofUKGuJOMFU+MDskooOZ75YxBNOUZ+Zw6rIT4icss2u5v85FxvAGfrYyBjWRbBhi2ftpWreME=
+	t=1762808331; cv=none; b=CYET09UGHJROWSRFeHXGGE4dJDn8SLyaFZv3mn1lFkfB4CXYJsJm/k7jYdhl7xCGkck0ADJGMul8hgaVukZoQrElQUoaiptIjMZ2dUhRfyRmFwQRYNi0e/e89hRnnBbfdq+ZkjSm3VNnIWkHT+913jF7QGI6M6EdLbbayrFr8lY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762808144; c=relaxed/simple;
-	bh=YGwndXDVfw313ofFvJKijTm0xMqmknLKipL/FYTW6Uk=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=L+cbwiyoy+PVHYLp+iU8Nty8MTBQ30hnqUhP/3vHZRZ3CtIzv9alncXkCBkCM9bvv/JnGkXYV6HWbEoBogy1qfSuQ6GaGdqYV9teNaljogyqnCQxzNDCpxweHIA5VObuqkTCkUUYHuXFoOhyEcZo9k6f1OwW0fN2+VZoM61au6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QcOtzwgx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFAE7C113D0;
-	Mon, 10 Nov 2025 20:55:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762808143;
-	bh=YGwndXDVfw313ofFvJKijTm0xMqmknLKipL/FYTW6Uk=;
-	h=From:Date:Subject:To:Cc:From;
-	b=QcOtzwgxX0m2Cd2j4GyjQOrKbGRga4McuYApdEnHSkrjQPaS+XaiBc46Jw/GOUCxC
-	 Vhd02uLuw8WatRi8PCRpJEPnMx8QYaZ+7cFGctTtyGaKYAVkn3Erzz0HG4sSfxtzXr
-	 jXVb5LvUzggiQTIuFTtY+WBIPn5O3y2t6+v4+UtOAqMnGTVkShVv+RJ5bjS/8aydQh
-	 BMDQLg5nNHKmwPIcJf2k5lAa8kVGIsUhGjc8egH4FywiO+pXnkKRXOkMB/gJV3mp1N
-	 0mENLdf0P2PuSBDuYgF2Q6Ct50c0E3sikZPZxZ1zK24fD2sBdfBE3eLwBmXx3/0IyC
-	 6ZlmtmKi3HJtg==
-From: Nathan Chancellor <nathan@kernel.org>
-Date: Mon, 10 Nov 2025 13:55:34 -0700
-Subject: [PATCH net-next v2] net: netcp: ethss: Fix type of first parameter
- in hwtstamp stubs
+	s=arc-20240116; t=1762808331; c=relaxed/simple;
+	bh=B0tu5HKnKF3FvVdokFFssqR9C8sJEU7TcOiIpVa5V+I=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=PEAf3utRBodamEKC92+lCQ+7v9ehsIAumtsgeBbWC7co+KV8xrPJ2tsuFdEiWwXloBOXnSo+YN32VVSdVDPU36MCL1+gK/OmLfKJSfc31UDYXX2tPZzO4EQzMhN5/ZwpIkAJLExAKuj6rA3ilS9NEV9cWwSmXppGGQmcGwPxTVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--brianvv.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YX7+DKvC; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--brianvv.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-3407734d98bso4515831a91.3
+        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 12:58:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1762808329; x=1763413129; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=XTDq9jeaQo0wOalgK/xieMtHrhoMAPHOMHOfOMk3yEo=;
+        b=YX7+DKvCbXIWmylCrbttRLrjwnAjbdrimGJjabgMsjJ0rdJWhaFVZk5WzJd4t0XBWx
+         775DHK/+xtmOUjytxG3zx6NyRYhIMdZI0vrh2MCV2L0C+qLflEJj5ZERCL635FXBhOzY
+         Nsq/nQyburmwg4WdtoRl2mpOc/WqsIG4UW2jP+a8PWFUGMAdZm9gV0NMYIGj+5XLy7I7
+         syEuoAarHFfsLR2QsVhtlqqToDpTW8TpaTsLXdtzj8OBGhCTl3+qwDNGbmINOg4vm7kg
+         kyU/wvKV95w5/h4U5wDF8cgeS/qsENvQtGbnNJbPlzCAhhRfYgTp41dn+SrDAk/pcYfJ
+         XoFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762808329; x=1763413129;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XTDq9jeaQo0wOalgK/xieMtHrhoMAPHOMHOfOMk3yEo=;
+        b=oQYIIPgHspqZhvh7T+m/bfk/S7huCwEdA0UY6X5alg24efb60lkvI621rAZzIxENGW
+         sM/PjENFT2Nnnw/LpRuU0++goIQGSA//J0GUB1WGdL6U6Ct+XEfZylJ0nx/F+GQL24Ly
+         Um9bmrP5EfEu9+098xQd6U3/wSRETF5E6jdlO4Yf+q37tNJ/ltd3Jr3TgT4Q/ftrVT7y
+         IL4HlUyBBh5hL3ZoFdyQiNiog+CLz0LnEx4maXuNC3Qb2y/l1kvLBywpqdwQbB/BB1RZ
+         Hv8peUC+IRevhMGw9LCCvRTB+yqJePaFwJiYakPTO887GFlH7XKkFsmjSC4wpSK2j1QU
+         EzJg==
+X-Forwarded-Encrypted: i=1; AJvYcCUkd32DmjGbv7e1vyyzfJiO8jNAic3aOfH7kcHvYAd4CQG4aCiVZIc7H0774GOkq9jr8WWASoE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEQ0W0IA7jgm0+aFfliHGfASv9JZn6aN/eLRvQuIOQ9ac5iElj
+	ulRRMaViq6PgZke0kIzlCJVomfjssYrN5b4Dp9Ca8M3rwoRXKD4RBGLT0ESvceH8TrpWuovOOUo
+	eK7u6XBaI7w==
+X-Google-Smtp-Source: AGHT+IHvzBtOuQaT0QbtsDDe5GbIuvBIJRBAx2LgnXxO3WuRHCzu/LTGZ6OKcVN0BcGwSzLApG60io4lmv5I
+X-Received: from pjbsc8.prod.google.com ([2002:a17:90b:5108:b0:343:8627:1010])
+ (user=brianvv job=prod-delivery.src-stubby-dispatcher) by 2002:a17:90b:5588:b0:340:be44:dd11
+ with SMTP id 98e67ed59e1d1-3436ccfe211mr9734686a91.27.1762808329392; Mon, 10
+ Nov 2025 12:58:49 -0800 (PST)
+Date: Mon, 10 Nov 2025 20:58:37 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251110-netcp_ethss-fix-cpts-stubs-clang-wifpts-v2-1-aa6204ec1f43@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAEVREmkC/5WOUQ6CMBBEr0L22zVtxYB+eQ9DTClbaCRAuhUxh
- Lu7cgM/Z2b3zazAFAMxXLMVIs2BwziIMIcMXGeHljA0osEoc9ZaFThQctODUseMPizopsTI6VU
- zul4e8B38z2p8UXqvm9wWNQhtiiTne9MdBCKgJUElSRc4jfGzT5j1nv/dNmvUaEtlT8rl5mLL2
- 5PiQP1xjC1U27Z9ASzjNY3pAAAA
-X-Change-ID: 20251107-netcp_ethss-fix-cpts-stubs-clang-wifpts-df78ff1d4a7b
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
- Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
- Kory Maincent <kory.maincent@bootlin.com>, netdev@vger.kernel.org, 
- llvm@lists.linux.dev, patches@lists.linux.dev, 
- Nathan Chancellor <nathan@kernel.org>
-X-Mailer: b4 0.15-dev
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3570; i=nathan@kernel.org;
- h=from:subject:message-id; bh=YGwndXDVfw313ofFvJKijTm0xMqmknLKipL/FYTW6Uk=;
- b=owGbwMvMwCUmm602sfCA1DTG02pJDJlCgT4iKSma9h+d9s8ISJx4bmW/5pfE1m9FS77Y/db5F
- TJ/c++2jlIWBjEuBlkxRZbqx6rHDQ3nnGW8cWoSzBxWJpAhDFycAjARwW5Ghv9qmf3PVl9Ol5ws
- ZJU5Q+7pnNot/bvlrt99kvBNsnvZ/r0M/4w+S4ddT/1eWua7waP9wYYlyTwXcxaopps4m/ZoHX2
- 4kAMA
-X-Developer-Key: i=nathan@kernel.org; a=openpgp;
- fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
+Message-ID: <20251110205837.3140385-1-brianvv@google.com>
+Subject: [iwl-net PATCH] idpf: reduce mbx_task schedule delay to 300us
+From: Brian Vazquez <brianvv@google.com>
+To: Brian Vazquez <brianvv.kernel@gmail.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	intel-wired-lan@lists.osuosl.org
+Cc: David Decotigny <decot@google.com>, Anjali Singhai <anjali.singhai@intel.com>, 
+	Sridhar Samudrala <sridhar.samudrala@intel.com>, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, emil.s.tantilov@intel.com, 
+	Brian Vazquez <brianvv@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-When building without CONFIG_TI_CPTS, there are a series of errors from
--Wincompatible-pointer-types:
+During the IDPF init phase, the mailbox runs in poll mode until it is
+configured to properly handle interrupts. The previous delay of 300ms is
+excessively long for the mailbox polling mechanism, which causes a slow
+initialization of ~2s:
 
-  drivers/net/ethernet/ti/netcp_ethss.c:3831:27: error: initialization of 'int (*)(void *, struct kernel_hwtstamp_config *)' from incompatible pointer type 'int (*)(struct gbe_intf *, struct kernel_hwtstamp_config *)' [-Wincompatible-pointer-types]
-   3831 |         .hwtstamp_get   = gbe_hwtstamp_get,
-        |                           ^~~~~~~~~~~~~~~~
-  drivers/net/ethernet/ti/netcp_ethss.c:3831:27: note: (near initialization for 'gbe_module.hwtstamp_get')
-  drivers/net/ethernet/ti/netcp_ethss.c:2758:19: note: 'gbe_hwtstamp_get' declared here
-   2758 | static inline int gbe_hwtstamp_get(struct gbe_intf *gbe_intf,
-        |                   ^~~~~~~~~~~~~~~~
-  drivers/net/ethernet/ti/netcp_ethss.c:3832:27: error: initialization of 'int (*)(void *, struct kernel_hwtstamp_config *, struct netlink_ext_ack *)' from incompatible pointer type 'int (*)(struct gbe_intf *, struct kernel_hwtstamp_config *, struct netlink_ext_ack *)' [-Wincompatible-pointer-types]
-   3832 |         .hwtstamp_set   = gbe_hwtstamp_set,
-        |                           ^~~~~~~~~~~~~~~~
-  drivers/net/ethernet/ti/netcp_ethss.c:3832:27: note: (near initialization for 'gbe_module.hwtstamp_set')
-  drivers/net/ethernet/ti/netcp_ethss.c:2764:19: note: 'gbe_hwtstamp_set' declared here
-   2764 | static inline int gbe_hwtstamp_set(struct gbe_intf *gbe_intf,
-        |                   ^~~~~~~~~~~~~~~~
+echo 0000:06:12.4 > /sys/bus/pci/drivers/idpf/bind
 
-In a recent conversion to ndo_hwtstamp, the type of the first parameter
-was updated for the CONFIG_TI_CPTS=y implementations of
-gbe_hwtstamp_get() and gbe_hwtstamp_set() but not the CONFIG_TI_CPTS=n
-ones.
+[   52.444239] idpf 0000:06:12.4: enabling device (0000 -> 0002)
+[   52.485005] idpf 0000:06:12.4: Device HW Reset initiated
+[   54.177181] idpf 0000:06:12.4: PTP init failed, err=-EOPNOTSUPP
+[   54.206177] idpf 0000:06:12.4: Minimum RX descriptor support not provided, using the default
+[   54.206182] idpf 0000:06:12.4: Minimum TX descriptor support not provided, using the default
 
-Update the type of the first parameter in the CONFIG_TI_CPTS=n stubs to
-resolve the errors.
+Changing the delay to 300us avoids the delays during the initial mailbox
+transactions, making the init phase much faster:
 
-Fixes: 3f02b8272557 ("ti: netcp: convert to ndo_hwtstamp callbacks")
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+[   83.342590] idpf 0000:06:12.4: enabling device (0000 -> 0002)
+[   83.384402] idpf 0000:06:12.4: Device HW Reset initiated
+[   83.518323] idpf 0000:06:12.4: PTP init failed, err=-EOPNOTSUPP
+[   83.547430] idpf 0000:06:12.4: Minimum RX descriptor support not provided, using the default
+[   83.547435] idpf 0000:06:12.4: Minimum TX descriptor support not provided, using the default
+
+Signed-off-by: Brian Vazquez <brianvv@google.com>
 ---
-Changes in v2:
-- Rewrite commit message, as this issue is visible with just
-  -Wincompatible-pointer-types with both clang and GCC. I have an out of
-  tree patch to build with -Wincompatible-function-pointer-types-strict
-  locally applied, which actually changes the type of warning emitted in
-  this case... https://godbolt.org/z/WGb1cYqod
-- Carry forward Vadim's reviewed-by, as the code fix is unchanged.
-- Link to v1: https://patch.msgid.link/20251107-netcp_ethss-fix-cpts-stubs-clang-wifpts-v1-1-a80a30c429a8@kernel.org
----
- drivers/net/ethernet/ti/netcp_ethss.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/intel/idpf/idpf_lib.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/ti/netcp_ethss.c b/drivers/net/ethernet/ti/netcp_ethss.c
-index 0ae44112812c..4f6cc6cd1f03 100644
---- a/drivers/net/ethernet/ti/netcp_ethss.c
-+++ b/drivers/net/ethernet/ti/netcp_ethss.c
-@@ -2755,13 +2755,13 @@ static inline void gbe_unregister_cpts(struct gbe_priv *gbe_dev)
- {
- }
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+index 52fe45b42095..44fbffab9737 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
+@@ -1313,7 +1313,7 @@ void idpf_mbx_task(struct work_struct *work)
+ 		idpf_mb_irq_enable(adapter);
+ 	else
+ 		queue_delayed_work(adapter->mbx_wq, &adapter->mbx_task,
+-				   msecs_to_jiffies(300));
++				   usecs_to_jiffies(300));
  
--static inline int gbe_hwtstamp_get(struct gbe_intf *gbe_intf,
-+static inline int gbe_hwtstamp_get(void *intf_priv,
- 				   struct kernel_hwtstamp_config *cfg)
- {
- 	return -EOPNOTSUPP;
+ 	idpf_recv_mb_msg(adapter, adapter->hw.arq);
  }
- 
--static inline int gbe_hwtstamp_set(struct gbe_intf *gbe_intf,
-+static inline int gbe_hwtstamp_set(void *intf_priv,
- 				   struct kernel_hwtstamp_config *cfg,
- 				   struct netlink_ext_ack *extack)
- {
-
----
-base-commit: 01c87d7f48b4f9b8be0950ed4de5d345632bd564
-change-id: 20251107-netcp_ethss-fix-cpts-stubs-clang-wifpts-df78ff1d4a7b
-
-Best regards,
---  
-Nathan Chancellor <nathan@kernel.org>
+-- 
+2.51.2.1041.gc1ab5b90ca-goog
 
 
