@@ -1,115 +1,185 @@
-Return-Path: <netdev+bounces-237376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31092C49C76
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 00:38:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BFB7C49C95
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 00:39:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 555EB3AD4D4
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 23:37:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 937CB3AE11D
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 23:37:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8626303A21;
-	Mon, 10 Nov 2025 23:37:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66FE303A3D;
+	Mon, 10 Nov 2025 23:37:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iU4aKmJm"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="U0xyIRec"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E682F2DECCC
-	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 23:37:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 874B1288C22;
+	Mon, 10 Nov 2025 23:37:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762817849; cv=none; b=tOhy1ZX9oDC/9/DYnYSNSx8VgNSk2+aoSPD98v7ENvBbNCdR+8xrOTM4VMpTZ1dS3pSnjzmvZalOsVwyYslDjAbfWqzyHIMVXWoOSiHhAjUKL8jIGexrQZ7BPMbEh/cQrpvW3WqjCAu0wCdR2YYWY7nDeXtHRvCibvvRLIeDDZs=
+	t=1762817871; cv=none; b=ap5+zyL/DEezOZz7arzVt4pngyf2llDgpIErkRYcQRFBOQ1zMxlOi3yyYyffNmKXDXnJqyrFBzDr3SVDD3Q9NWYLi2GH9A3SCvJggB14btwL/D+KkvJPSXgnatQV5BZHpt8PbDBfSoXte/ullETjjaRcc2AG+5tnk8BE2IVwc4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762817849; c=relaxed/simple;
-	bh=rXO4cV7y/7KRb7+PNQISNcMuBYWSEWB/8HSqi1ED97Q=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=eXUjAbySTA9mtSbdz60QhN9T5jWaQAwSpKOn6/epJ0Wz2pC9XGj+f+fAaR+J358fbnva5kcJs0vGhTH0m8CyjzfJJ5we8oSNSFOavBu1ZZUCkN1HZbXE1eeV6jB7LuFiBDKQ+/XthUziTIy4v8uN5zP+73/XZ76qnQGC6OiQTxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iU4aKmJm; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-7af6a6f20easo2878252b3a.0
-        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 15:37:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762817846; x=1763422646; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sONTki0cwOLfaZkpfYHcU55+KIViW3n5GsMd/O6clDo=;
-        b=iU4aKmJmPQFFu6HuGPy+dniFZzsRzu93Dztck37kZux+NCANth5dS/vn5Kf7tl1cs8
-         8eDdYdJ7kqKRx5Woe7IEOo5m+4KdS/EQ6G9g/wVpwJF/altfX5qGUBq3hYXA1NXgDAdA
-         kikT3CzIf85oY4pC/aOdq9t2PL2SwtLaQE5wQnqcMxJ1+c1TlL1ChasGIUmjMtZTXbMi
-         G0KyCDdObgOvygJQge/6ovktyRI+joN0I7ZblWsQCk+tft329gQBzPU7TedOe3PERrk1
-         MONBz4NxHCjuqQTIWdHtiHWF+KZDJ10mQBFn5YED7t+I4sFzPTziFLSPPiGq3Xw2Qwxn
-         43PQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762817846; x=1763422646;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sONTki0cwOLfaZkpfYHcU55+KIViW3n5GsMd/O6clDo=;
-        b=Yfgv9NbuOZk2prQEUTzfsVmoLPRXGchfbXbUb3/qVVgiD5/MTaNUKOiOFUqHhn8uUo
-         ISU0KZ7z6ZW6y9kfxy+D8GWExUWR8NIcDLvRG11OFMZLAOpacZpKJnptVInXZFUI6lYI
-         pzD1OgvfsnGc3GxW4CKo//jBxmLycTXB/gK72z9Jz/qhlzgqbLW3kAM72ubKh9DcDQvJ
-         ezEMlOcpeCGFWXMxdUQJslNbiHi6ZHshLFd693iFtCRH2uSW4mgSL2l+llemKVRnS0Uf
-         yXI/wOrC3xN8hHQ5Ryun5OY1sOwqaLE/8R5HY+RqbjfnsrdzENKmC9qhH2LUWCfadfAo
-         968w==
-X-Forwarded-Encrypted: i=1; AJvYcCWunWGb5sa2dZ0R2ywyIQcMh9hK9tmOVMp/qPC82mLAiduneB37YbN+JyGzil3yUYN7YLsoFvM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzCZdkSKGN/QSrYE3Sm9v5iB5SkNUiF00fmPfOHr/SdusXnMwuj
-	UmiK0TXy0Irh8pTYx3BMrUoaXnTWjmltU8WHRq9m5llpKQ4rV3AJPrKS
-X-Gm-Gg: ASbGncu+ssyai6XPWxdLO6Y+YeRGADQ2Ds5AsJPw5l5CCoT6oqZgNVepwpa+/5y+lbk
-	oqjX2AM8hK3fGv399aKQ4kOq4h2+HxcI1vzhQ2dqGlXSzbmdqkNqLj9ifsGI0L4CnOwab7oK3o0
-	CB0Wbwj85cymY2fiReplbe3aWV9bEdnL2DcwvUxcBrZ8v5lWGFlq/WQbpLAWOI7fP/N38BTRo9C
-	YavfHA+2SPeSfboZUJEsWywAFw5hzb+MjwMdHWfYFxBo/32uK6Y5fcB/7NooyvH7nTvmftGiop3
-	gjQYs7EshXeugvqSnuUNb62AmdE4R52u+twxxJ0WK1P9w6vbqJqO4FpN1Bo0lA7YfH/Qn740sJ9
-	pYwpEavShbrj7gV8B9Rgz0XrynWJBMSVEw9f0o9bWSthiUbEjbrb1J8unAvm7jTmzRc01nvlBRv
-	tFCuUJt5s8p0y+y2Fp3pqHOGs3d0YZyMM/bOz/Ck9PYul4cLQRISoooSzWJsI5EQWp
-X-Google-Smtp-Source: AGHT+IHk0TS6U1teQSHT2W5LJ/UoVkLAhqZnFd416dWAUwj/XxNWZoZkE3GEbfX7u/ERSkanItOk1A==
-X-Received: by 2002:a05:6a21:6da0:b0:2df:b68d:f73 with SMTP id adf61e73a8af0-353a3355034mr14081651637.34.1762817846261;
-        Mon, 10 Nov 2025 15:37:26 -0800 (PST)
-Received: from localhost (p5332007-ipxg23901hodogaya.kanagawa.ocn.ne.jp. [180.34.120.7])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-ba8ffd3f6easm14277596a12.21.2025.11.10.15.37.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Nov 2025 15:37:25 -0800 (PST)
-Date: Tue, 11 Nov 2025 08:37:20 +0900 (JST)
-Message-Id: <20251111.083720.572544715756974945.fujita.tomonori@gmail.com>
-To: ojeda@kernel.org
-Cc: fujita.tomonori@gmail.com, alex.gaynor@gmail.com, tmgross@umich.edu,
- netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
- boqun.feng@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
- lossin@kernel.org, a.hindborg@kernel.org, aliceryhl@google.com,
- dakr@kernel.org, linux-kernel@vger.kernel.org, patches@lists.linux.dev
-Subject: Re: [PATCH 3/3] rust: net: phy: follow usual comment conventions
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <20251110122223.1677654-3-ojeda@kernel.org>
-References: <20251110122223.1677654-1-ojeda@kernel.org>
-	<20251110122223.1677654-3-ojeda@kernel.org>
+	s=arc-20240116; t=1762817871; c=relaxed/simple;
+	bh=odPTQHqCk/AknyMQCUhv0A0QcmH6YIldSa1T8WY4Ets=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=F5JZzhuW2tKHrw9eSdAyBpPGg2Mn/Sn0+0l/oa6Z6SiRpdMJth8O6bfi5cHdDYiy+tob37CR+Bc2t2jgzXTgSAUK6HoKYWJ/kEprD4ltcFNlrK826YG/jTBGWoQyUWX+sHhZ4VF7Cwc1+P6J/akTIpuFllIPTOLoQyELTsRoRJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=U0xyIRec; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <3eb5379f-c7ad-4aea-ab9a-20e07b7f34d0@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1762817866;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=N5NdZ3Il1D+l8lwQLcK5dXwNIadjasDY9t8ilnV/mV0=;
+	b=U0xyIRecUBR+iYd+jFcmevJu/4H+A2bbNJnN96yfE0hlgn9ZMrH3LxAIKYqZS4s3cJ1uvm
+	+7WK+gk43pd/VuQQ8rDReqm1AlKlWm8GBWmK3v11GgPPZIdbI1RU8LPuoyCqW5EbUBDj5d
+	3Ou4TSlLX99wMRUdq/vNAC0vrqSI3Ow=
+Date: Mon, 10 Nov 2025 23:37:33 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
+MIME-Version: 1.0
+Subject: Re: [PATCH v1 19/23] ptp: ocp: Switch to use %ptSp
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Corey Minyard <corey@minyard.net>, =?UTF-8?Q?Christian_K=C3=B6nig?=
+ <christian.koenig@amd.com>, "Dr. David Alan Gilbert" <linux@treblig.org>,
+ Alex Deucher <alexander.deucher@amd.com>,
+ Thomas Zimmermann <tzimmermann@suse.de>,
+ Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+ Rob Clark <robin.clark@oss.qualcomm.com>,
+ Matthew Brost <matthew.brost@intel.com>, Hans Verkuil <hverkuil@kernel.org>,
+ Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>,
+ Ulf Hansson <ulf.hansson@linaro.org>,
+ Vitaly Lifshits <vitaly.lifshits@intel.com>,
+ Manivannan Sadhasivam <mani@kernel.org>, Niklas Cassel <cassel@kernel.org>,
+ Calvin Owens <calvin@wbinvd.org>, Sagi Maimon <maimon.sagi@gmail.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Karan Tilak Kumar <kartilak@cisco.com>,
+ Casey Schaufler <casey@schaufler-ca.com>,
+ Steven Rostedt <rostedt@goodmis.org>, Petr Mladek <pmladek@suse.com>,
+ Max Kellermann <max.kellermann@ionos.com>, Takashi Iwai <tiwai@suse.de>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ openipmi-developer@lists.sourceforge.net, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
+ amd-gfx@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+ freedreno@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
+ linux-mmc@vger.kernel.org, netdev@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, linux-pci@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-staging@lists.linux.dev, ceph-devel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, linux-sound@vger.kernel.org
+Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+ Sergey Senozhatsky <senozhatsky@chromium.org>,
+ Jonathan Corbet <corbet@lwn.net>, Sumit Semwal <sumit.semwal@linaro.org>,
+ Gustavo Padovan <gustavo@padovan.org>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Dmitry Baryshkov <lumag@kernel.org>,
+ Abhinav Kumar <abhinav.kumar@linux.dev>,
+ Jessica Zhang <jesszhan0024@gmail.com>, Sean Paul <sean@poorly.run>,
+ Marijn Suijten <marijn.suijten@somainline.org>,
+ Konrad Dybcio <konradybcio@kernel.org>,
+ Lucas De Marchi <lucas.demarchi@intel.com>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ Mauro Carvalho Chehab <mchehab@kernel.org>,
+ Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+ Kishon Vijay Abraham I <kishon@kernel.org>,
+ Bjorn Helgaas <bhelgaas@google.com>, Rodolfo Giometti
+ <giometti@enneenne.com>, Jonathan Lemon <jonathan.lemon@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Stefan Haberland <sth@linux.ibm.com>, Jan Hoeppner <hoeppner@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Satish Kharat <satishkh@cisco.com>,
+ Sesidhar Baddela <sebaddel@cisco.com>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Xiubo Li
+ <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
+ Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>
+References: <20251110184727.666591-1-andriy.shevchenko@linux.intel.com>
+ <20251110184727.666591-20-andriy.shevchenko@linux.intel.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20251110184727.666591-20-andriy.shevchenko@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 10 Nov 2025 13:22:23 +0100
-Miguel Ojeda <ojeda@kernel.org> wrote:
-
-> Examples should aim to follow the usual conventions, which makes
-> documentation more consistent with code and itself, and it should also
-> help newcomers learn them more easily.
+On 10/11/2025 18:40, Andy Shevchenko wrote:
+> Use %ptSp instead of open coded variants to print content of
+> struct timespec64 in human readable format.
 > 
-> Thus change the comments to follow them.
+> While at it, fix wrong use of %ptT against struct timespec64.
+> It's kinda lucky that it worked just because the first member
+> there 64-bit and it's of time64_t type. Now with %ptS it may
+> be used correctly.
 > 
-> Link: https://docs.kernel.org/rust/coding-guidelines.html#comments
-> Signed-off-by: Miguel Ojeda <ojeda@kernel.org>
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 > ---
->  rust/kernel/net/phy/reg.rs | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>   drivers/ptp/ptp_ocp.c | 15 ++++++---------
+>   1 file changed, 6 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+> index a5c363252986..a0bb8d3045d2 100644
+> --- a/drivers/ptp/ptp_ocp.c
+> +++ b/drivers/ptp/ptp_ocp.c
+> @@ -3261,7 +3261,7 @@ signal_show(struct device *dev, struct device_attribute *attr, char *buf)
+>   			   signal->duty, signal->phase, signal->polarity);
+>   
+>   	ts = ktime_to_timespec64(signal->start);
+> -	count += sysfs_emit_at(buf, count, " %ptT TAI\n", &ts);
+> +	count += sysfs_emit_at(buf, count, " %ptS TAI\n", &ts);
+>   
+>   	return count;
+>   }
+> @@ -4287,11 +4287,9 @@ ptp_ocp_summary_show(struct seq_file *s, void *data)
+>   		ns += (s64)bp->utc_tai_offset * NSEC_PER_SEC;
+>   		sys_ts = ns_to_timespec64(ns);
+>   
+> -		seq_printf(s, "%7s: %lld.%ld == %ptT TAI\n", "PHC",
+> -			   ts.tv_sec, ts.tv_nsec, &ts);
+> -		seq_printf(s, "%7s: %lld.%ld == %ptT UTC offset %d\n", "SYS",
+> -			   sys_ts.tv_sec, sys_ts.tv_nsec, &sys_ts,
+> -			   bp->utc_tai_offset);
+> +		seq_printf(s, "%7s: %ptSp == %ptS TAI\n", "PHC", &ts, &ts);
+> +		seq_printf(s, "%7s: %ptSp == %ptS UTC offset %d\n", "SYS",
+> +			   &sys_ts, &sys_ts, bp->utc_tai_offset);
+>   		seq_printf(s, "%7s: PHC:SYS offset: %lld  window: %lld\n", "",
+>   			   timespec64_to_ns(&ts) - ns,
+>   			   post_ns - pre_ns);
+> @@ -4499,9 +4497,8 @@ ptp_ocp_phc_info(struct ptp_ocp *bp)
+>   		 ptp_clock_index(bp->ptp));
+>   
+>   	if (!ptp_ocp_gettimex(&bp->ptp_info, &ts, NULL))
+> -		dev_info(&bp->pdev->dev, "Time: %lld.%ld, %s\n",
+> -			 ts.tv_sec, ts.tv_nsec,
+> -			 bp->sync ? "in-sync" : "UNSYNCED");
+> +		dev_info(&bp->pdev->dev, "Time: %ptSp, %s\n",
+> +			 &ts, bp->sync ? "in-sync" : "UNSYNCED");
+>   }
+>   
+>   static void
 
-Reviewed-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Acked-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
