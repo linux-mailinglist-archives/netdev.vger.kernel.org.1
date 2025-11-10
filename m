@@ -1,103 +1,131 @@
-Return-Path: <netdev+bounces-237180-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237181-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC9A2C46A75
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 13:41:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2C71C46B02
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 13:47:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 623421893C02
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 12:39:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3EDA31882296
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 12:44:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC69930E858;
-	Mon, 10 Nov 2025 12:38:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1673A30E82E;
+	Mon, 10 Nov 2025 12:43:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b="eQ4QZa0H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C27630BF77
-	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 12:38:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D650223DF9
+	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 12:43:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762778307; cv=none; b=P/DjVdc1HLsFPRne8rgZqV3IgZhq3IjNAnZymTtbe7ygdbSWIJvWTl39+1Oxg/PK3XVOFP22b+BSMnfDLMw0ZGx6nFRRtsahs1UOpd9j/J5oq68Nrdm+ySNI7JN5qgk/D6r+mvFRLw0SpbpJ60xnX+kk6+RU96FPvgunTMn2/vE=
+	t=1762778637; cv=none; b=rFnnAvno+vBA9/b+x4ey8KQnFQME01vcdLrt2AseV/+YcHhp7mkKRN0ua/BHZctGpyxcjK/1i40ktZ9TdKjy5ZqENJcueocAZdw4SSh8IDJ8PueeZ06ZOX58soraud+qcZw81Yt2m468nmRKuJXDEj46DFtDpD+rSkFyru2TA0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762778307; c=relaxed/simple;
-	bh=xTFQJUL0lkezhYAsgGSIUDLeIxSvIp5EbM5Uvpm9yqU=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=k4p1ZPTxyHqe1Zxsc8+LprhIg6Qu0qgBY/cNLOMkkojQp6n59W0fOYSD/k8sJkhWHYedMvkq86OCjWsPSTLbZzqMIj7slP978EtjrHglBJEQTU/D7FWhhQmCcEwpShRvEFaWCDgUFp748q606VYgqzLRJlDslKDbE3otM0eTK1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-9489bf08bcfso110500539f.3
-        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 04:38:25 -0800 (PST)
+	s=arc-20240116; t=1762778637; c=relaxed/simple;
+	bh=Dqk2TNHLlYpECDsfQQqf3/nq6Wnc//qiCf3BE7O4V2s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a/wbk9V3IAmkH6KSni8pNejGVIojGhgOfkw+t9PiNe91h5xKVcAup3zVjCVWbdlzk8jPrb3olFXK6iDX651fjyTFTRE30iQPaAKG3E0wb279ilhyi51P8fWDk2UyPdokMpEmsDioAdyJef7LSx8jJQm8F75rI+JwwHu4qQCMWRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr; spf=pass smtp.mailfrom=sartura.hr; dkim=pass (2048-bit key) header.d=sartura.hr header.i=@sartura.hr header.b=eQ4QZa0H; arc=none smtp.client-ip=209.85.222.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sartura.hr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sartura.hr
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-85a4ceb4c3dso278238085a.3
+        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 04:43:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sartura.hr; s=sartura; t=1762778634; x=1763383434; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=mokE1STeYnllduXZ+33QLu6bZS1LJLoqGu+1OJ9vbsE=;
+        b=eQ4QZa0HSfmvDaneX1yhRverg6HXnlIrxWyjAK7uE1jJ5BKaSe/xA8t/F7RdnWjkeX
+         TgM+xZR/D1d5GZ6y0P89b/frEf3b9W/Ee1GRuWr9eA8bUJ1XMCEFeWlCgpwSpfVOIO7P
+         scr74wPRw65BlG7lhr2W+Rwm43O1MqqfG6/BFTBuZ+VYSWSOGFfoX6r1qDK8zPc7saoV
+         FMvP5CfLaOQsSf9sFVvwMiUPNLa1er+aKEPYSYlZn22OTzFZjVoeERwMJndSQ7V0XNcE
+         P6aosstbsnwgWlFS4P8yQLxr8i5SJJtHfB+7866VaT9pKSODlblD6EPdfFNXI37AE6J0
+         Fuzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762778305; x=1763383105;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pfeuF7t9W0tZyiOKHRfcCmdh/gFU/KWuvzDJl6kuhGI=;
-        b=eKVUy/zhwuwvyGmXmWcqUr0bQG8GstVOgCZKBZRjBiLJ+pjcFuDHDSM+gWgieYcQQ4
-         CKq4ADyupjwAGK0RkgtTW+zUc+4mGTsh/tAsUUtuz5xCNZfpsAjXbGvaHJJmoYqyIZYL
-         XyTOqRW7D5XgkcNAoX9rcnNTJBznk8LbnHpccThY26850DH4a3S6XZOB1FT5gyrVqW/j
-         6PwTYkk4ey/prpBEJCw8Tazqv0IczpR0wIfV6QQGwmc81zI0G1fRz5UjBVFkShqHEt2X
-         vHlmzKEPw1C1tOH/GEbnwO+sYPFf/4t2c4H2PBRxE9E4eHcKNHH6QL1TucJ3CDbN3//6
-         VbOw==
-X-Forwarded-Encrypted: i=1; AJvYcCXJINuBzGBFzX8pOX2JUzD3acpv+HCpOL27ucsCJdW2MEwGibPlC0AxK+62hiW2+KgQl2gmTZE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxzN/OO2dtHMlX7s0MDMwYC9ZM3cBI6dMkyLaFOVk+MTsGpMa46
-	Xg/alhMWnjzs/bPzHL1U4jlJfnvDIty2HHjf8cAUki6qGpownngDskpX1xsFxn/13+mDFABe9xY
-	Hdk1SQ/U3qAwWunNMYCQVR2dgALBF4EoLcsnf/4EP8iScTUPMl0THStC/sL0=
-X-Google-Smtp-Source: AGHT+IGtuLGpBtrmikrQ9Ic4MmXUZMZWF+Y3kzEQnrlfWw9N/Yc4msFn9uKoKTYkQC1V9aXzMzhsOkvyWhzdv4VkCDcqwVS4X2eK
+        d=1e100.net; s=20230601; t=1762778634; x=1763383434;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mokE1STeYnllduXZ+33QLu6bZS1LJLoqGu+1OJ9vbsE=;
+        b=lN6YIeySXwboa4kSSi7CU7WQe365Xxusr/5KES58PcQTHxnEvNEoHKeXiKwzahGCBu
+         qoDqjuBUIQroBH0Gmzjx+jHb0vI0Vjkb8Kvnw34U798C3W3mbmiYzpBkc+wuuikHZ/9S
+         oGBLdeeG3oqRmrk5dqcfk77vG39p0TwWnPEtSivjCweWFPns5qV8dXY2oP+D7wFWjt+b
+         jl+f0okNE+4+uZTzbFy0pW5FkHHjfB4fkObdXuUoMQA1+yO9dJQs5gYqUyZtcKdD8a5w
+         sTQGCx745e6s7CZWOR9dxDDA6Q2T9UsrMf65x/0n38ItINqyiOV0YcksNmTJ131JGsM4
+         x9nw==
+X-Forwarded-Encrypted: i=1; AJvYcCXLFX4zIBHbsdKwaIy71vb/caNlp+1TX9zUUJsEvdI8bBUoQ3/+FiRbAOUYk2vHYiGZMcssysY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhHbBIhohJ1kc6cjCtn4s7EFy6UIr4nVATLd5xGssnjbOIhy2Q
+	Y5zKHnkeizuSvOdVS2QqBp7vRhGpcm3jwuRXH9I4U5Kprb6rW12BqKV4vIfJYSjN/9w=
+X-Gm-Gg: ASbGncv4UplQE6BnLu+ypBLITyYmTlp7EGhpBqpbLBP7iT7pgF/8tHX6DrptynsfwM/
+	6lSTyQjRzy8awxszCnLoTsDUGoZZnp6kWb25OT1AgwxWqur1RG5kGplH1R/a7Z0AAvLgq1WWN+C
+	qI3poV1S5CH1o9sdL7ev05in3ZfcLNrgl6uhbwJZEiW8Des3sEIe58OrFTslzxlgqJWH/SEymSe
+	3bClBMf3/s0twwObfr2IifKOHJG6/QOLnShdH8DEqvoCKOsAr9S9wbdyw9blC7lnvYD3Ntlgv+N
+	MRbk2IEnJKrUHuceDApxVzIA80AcDYK40KCfdIDyzisGq+nP7CtDhqa/P9SMzy4t3DcO94rE+MR
+	DSJLpMS6MIopOp4gn2/RWt2kuXDYeuTTk505OCYGS+nRqfmUCF0oTBA7eHZr7+RcWbMBYsuH6gh
+	98DTo9LDb5AU5I8Z+x/R7k349k3ygPv5g=
+X-Google-Smtp-Source: AGHT+IHzD9vQiWPhgW/CmDZ0Sh3mVAM0JnEabgV9DyCHXVHZqLCr17WfmN9Rv8GMnK6YWCsW15692w==
+X-Received: by 2002:a05:620a:2982:b0:8b0:f2bd:474d with SMTP id af79cd13be357-8b257f6bb13mr863976085a.64.1762778634203;
+        Mon, 10 Nov 2025 04:43:54 -0800 (PST)
+Received: from fedora (cpezg-94-253-146-68-cbl.xnet.hr. [94.253.146.68])
+        by smtp.googlemail.com with ESMTPSA id af79cd13be357-8b2355c24f6sm1002765885a.6.2025.11.10.04.43.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Nov 2025 04:43:52 -0800 (PST)
+From: Robert Marko <robert.marko@sartura.hr>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	Steen.Hegelund@microchip.com,
+	daniel.machon@microchip.com,
+	UNGLinuxDriver@microchip.com,
+	horatiu.vultur@microchip.com,
+	rmk+kernel@armlinux.org.uk,
+	netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: luka.perkov@sartura.hr,
+	Robert Marko <robert.marko@sartura.hr>
+Subject: [PATCH net-next v2] net: sparx5/lan969x: populate netdev of_node
+Date: Mon, 10 Nov 2025 13:42:53 +0100
+Message-ID: <20251110124342.199216-1-robert.marko@sartura.hr>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a6f:b0:433:2390:d556 with SMTP id
- e9e14a558f8ab-43367e4c6f5mr103496525ab.26.1762778305300; Mon, 10 Nov 2025
- 04:38:25 -0800 (PST)
-Date: Mon, 10 Nov 2025 04:38:25 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6911dcc1.a70a0220.22f260.00ee.GAE@google.com>
-Subject: [syzbot] Monthly nfc report (Nov 2025)
-From: syzbot <syzbot+listf1e3e59758b3b8109ede@syzkaller.appspotmail.com>
-To: krzk@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello nfc maintainers/developers,
+Populate of_node for the port netdevs, to make the individual ports
+of_nodes available in sysfs.
 
-This is a 31-day syzbot report for the nfc subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/nfc
-
-During the period, 0 new issues were detected and 0 were fixed.
-In total, 6 issues are still open and 28 have already been fixed.
-
-Some of the still happening issues:
-
-Ref Crashes Repro Title
-<1> 1029    Yes   INFO: task hung in nfc_rfkill_set_block
-                  https://syzkaller.appspot.com/bug?extid=3e3c2f8ca188e30b1427
-<2> 518     Yes   INFO: task hung in rfkill_unregister (3)
-                  https://syzkaller.appspot.com/bug?extid=bb540a4bbfb4ae3b425d
-<3> 145     Yes   KMSAN: uninit-value in nci_ntf_packet (3)
-                  https://syzkaller.appspot.com/bug?extid=3f8fa0edaa75710cd66e
-<4> 87      Yes   INFO: task hung in rfkill_sync_work
-                  https://syzkaller.appspot.com/bug?extid=9ef743bba3a17c756174
-<5> 23      Yes   WARNING in nfc_rfkill_set_block
-                  https://syzkaller.appspot.com/bug?extid=535bbe83dfc3ae8d4be3
-
+Signed-off-by: Robert Marko <robert.marko@sartura.hr>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Changes in v2:
+* Per Daniels suggestion, set it directly in sparx5_create_port()
+instead of doing it in the dedicated netdev registration function.
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+ drivers/net/ethernet/microchip/sparx5/sparx5_main.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
+index 40b1bfc600a7..582145713cfd 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_main.c
+@@ -395,6 +395,8 @@ static int sparx5_create_port(struct sparx5 *sparx5,
+ 
+ 	spx5_port->phylink = phylink;
+ 
++	spx5_port->ndev->dev.of_node = spx5_port->of_node;
++
+ 	return 0;
+ }
+ 
+-- 
+2.51.1
 
-You may send multiple commands in a single email message.
 
