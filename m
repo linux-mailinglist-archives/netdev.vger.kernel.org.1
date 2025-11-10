@@ -1,88 +1,88 @@
-Return-Path: <netdev+bounces-237262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB332C47CF5
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 17:12:20 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27E0CC47D16
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 17:13:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6B00189770B
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 16:03:01 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EC6754F1A0B
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 16:02:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E1002749CF;
-	Mon, 10 Nov 2025 16:02:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FDA0277C9A;
+	Mon, 10 Nov 2025 16:02:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ersaASPu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IQ9iZFiJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADD8F25A340
-	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 16:02:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1797279DB1
+	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 16:02:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762790528; cv=none; b=J4vHvlSfz2f1i+uRNz47pBCej9tOQz9+v7hNC3iBr8ESqp2ztYk7ml8L/KDaWCwsQ9ePHWWaK5XL+fs2isKYJUoLMtdMwBUvrXe5uUegyM2e42zcznETQqhW3xKYb2Iqenb5qE5EXWl2Q8QrlUwy6Lx26zCGbNSBEAGd8cNW3aY=
+	t=1762790535; cv=none; b=VQS/5/4xozDZW/SozXuMum+jnhnj/Jc2o3/RAh/nNtAs7QzDRWh1VRaQsTsessDcejSR1+SMWCEijcGmbP2jWNrOtqoIWYOeRyQ3GUepQKqy0638+X+8k7kcwDuGOm/pOoCxZm2LpcT/l/vS8N4rrn4bZ5580BB8BMBvucofjQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762790528; c=relaxed/simple;
-	bh=q5RMojH2VGCMQgKvaa3A29T7772dtNaR6Hftgw18aBI=;
+	s=arc-20240116; t=1762790535; c=relaxed/simple;
+	bh=sHhrzAfLMB9xUtBdjScQshjit/fi3WqZTotpnb7tg0A=;
 	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GF84Cs6D+nbALe96AuoEocDEAPN621dD8b7DPASfkgHRenQv9WwViGjECDABtd9rguKBFlSBih0iMiK19qk4h7Db+fYhb0thU3TJOMyNfhQezJGl4qJKHbwMWa/97kQEuiqiO26rChlx/14fNHoskgIVH6dulS/KehoKXjvh3xM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ersaASPu; arc=none smtp.client-ip=209.85.210.169
+	 MIME-Version:Content-Type; b=ATA6SByC53i1kWLsV6qzDsgOceN7TafL/2zZSsC+/tsEQqjgpURBl8eK8dlLN/gpOEZ3mR2nS/dY5wsELpPYMAyZ/hyUSUia5YjpOyqOI1Gn1SPJP4Khz0/i2KPzZcQPhmGZ7/aejXNZ7n5uiolc45Kd9iX2XypVMhM65gumTvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IQ9iZFiJ; arc=none smtp.client-ip=209.85.215.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7aace33b75bso3308138b3a.1
-        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 08:02:06 -0800 (PST)
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-b550eff972eso1873163a12.3
+        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 08:02:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762790524; x=1763395324; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1762790532; x=1763395332; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=n1U5yhLdj+7VJtH+5tOxQav9/Er3K3aeP9EDV8YY8c4=;
-        b=ersaASPuNdI1jx32fT81fbBlNVB0Gm3b9HOUmNEk9S7H1lthkZKyK8IMRzMbmMV2kz
-         0dtEm0m/sMb4Ga3MZOhZFJabk4oyVwbZalLKIbiTPqZopo2ccd6plCfWEF+h6rQ6lnxX
-         T63JO3iKSTd2TQrbNNn0zcNnt4lV/crSDnjvMTXZn6eueZNcXg1elRr1Ilu3kN99UmB+
-         2Ndr/iF71jogLzx1ifAornOqgYRPfbGoS5NdNN4+iB6icNh+8CiOJcJO5r/dzEWlORbA
-         Y33JK+q2xlQgRd8Ew0p0zJTydwjGc1V7SaAKrG7ti32PkVMW3oaYDyyWr/gcf4sinGNb
-         d07g==
+        bh=378CvQzORWXRuJZwkSj1ctKhT3bdYrfd/uZ3cPX6Z58=;
+        b=IQ9iZFiJxbSXYnSWG6YSEnDDhmWPmQWA7ML1WeO9mP2D2PnfMwK65Wu7Q4Geq2qlMD
+         D0RGr8sxvdjz1a6YnSM+tSRAc3mReoByr68At/tFO/dZYxXNzMuCdejHyhr+ykCPmW/C
+         M5X6M4R73SoycVurVkAU8WXPvnw2Bu5Og53+s0IYwoW0zkgoARKf9xInwfTEZlBFEXR5
+         gvWuRsaoocwfsSqDIhY0RvxllcZgs7bur5vCq3+VIri0gNCvfoz7DU+YRDzO5EbkHEwi
+         /BJ06rHMwN2onntXqdA8k5IUxII7ytMBK7x2CzcHcR4DSZdoD4OuOM/xZSVnlNmPX2vL
+         q62Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762790524; x=1763395324;
+        d=1e100.net; s=20230601; t=1762790532; x=1763395332;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=n1U5yhLdj+7VJtH+5tOxQav9/Er3K3aeP9EDV8YY8c4=;
-        b=BqiP4bf9kwUVgDk6Hpo6qgfyaSO6bs6VoHTOI46Ld/pWhJHj0/4tp9HoBREfqkK0pG
-         JR5vxpEtI1zCCdP656NJNKUFEbCZX4np/vK+jxYgxHCWQiMKvf45GsJxCQIchX5AcuiL
-         oDX/HR82lFHTYGQ3flzYxDCp389oDhrBxnUA8psvd+SpuoP0+rr0vlUwYcgAORWfXtdh
-         4ILyQPCJYR+0vAhrdJ8olWrUNaT9FZiZ4lq+QhFn/IBg4fm8U5er+S3JzIuVDy+7gn9J
-         EAz6rIxmZ3LO4y9GxpezQtI6UPrrfER75JzVSkKdIBE4ELQkQ5R0BQbWIiHm9JUTI4WZ
-         3XCg==
-X-Gm-Message-State: AOJu0YwOOvi/x2zJ+xDJTd0HO9juK0Vp5ue0DbrS6zhQd72LLoVG/zoa
-	X895cLocUh/REW7roe6pM2dqXlOnsjyoxRa5+oOk5AlIrq1qELsj+EzAjKnDvA==
-X-Gm-Gg: ASbGncu50LyJjW1/CXDdV8uMwDzYaFUyAoaQJE45496gO/3dsk1kd3g4mnqqWKBlRrr
-	WIWpbLLAl7HMW2rmp4Y8pbK+pN33QXB0fyQKNBCLShDFN7ZaB7eZCYWWDMc9YlfqH9d8XV5D9qe
-	pIbvPgznkiD3Fl5mee0YvABHYI4o5yJwCDwVLEGdQn/4K8ZZC8qqh/Pxpi+NIjpXDboR8zOCzqx
-	E/hbgJY9wkZVoBdFqLCP0jGdDj7K+NwzXzrJ6iCALrJ12BtPC5bP2fCbVFZYNHKczqV17+gREVc
-	XZEbPjLDJgIlAsnTnwxMaEkpLUf5SnbMOSZ9ErtqiGoCTJwJWqHVfNf21KoaH2V+eLqwdfcOk1Q
-	PWKirAQtHYZQVnNUl8wIgV3SZp7mayvginjkZDAE5kqWvWkXr26HkJ3kYCUh2YYb8GWAXkWapv7
-	M5+/9YGPqvnw4MCq8XfhFZJ/rBqIgj4Kz3SB8C2TzIBxkY
-X-Google-Smtp-Source: AGHT+IG/YTDsfiuL6hYK8rzL4mtV2uED8fldGvj2RAAPT1DehpLBagjSCDxDjfYb9w8mq3ffzauFjA==
-X-Received: by 2002:a05:6a21:1506:b0:353:ec70:30dd with SMTP id adf61e73a8af0-353ec7031e0mr10888604637.51.1762790524296;
-        Mon, 10 Nov 2025 08:02:04 -0800 (PST)
+        bh=378CvQzORWXRuJZwkSj1ctKhT3bdYrfd/uZ3cPX6Z58=;
+        b=P8pMcBz0HgXxWt85biTnkt20jSNrCCvOo89O/XdhK85k1p2Erzh3AeBuBOTDd6Gi4n
+         urdhWFTRZutbjnKRLPJJL+2ysjOXatPEQAHp2HyN1i8vdmBJYsHtWbl8fHCtwYjCvujf
+         1hswjGRSMzfRUt/xAONVEnQHvJflJZdi/ofnoPtXnOOfA+hLAwinJibpGKEZAU7e6Nsb
+         1qdcRXmpTq7CQrM7mTefil6DfKImHbTG7vQyRWLJZoHDah+FQPhP8icioMgRMi/C4GBo
+         UJzheyyro9pVuO8AiYUP0PHsbssjECIBWiuh6KH46k9mvg8vJ1eE34XFMID9Yb6Cq40i
+         6kNw==
+X-Gm-Message-State: AOJu0Yw+D6LfAKrtA9FSTXfQIMK/KeaZiUhSJMMJP1DV7eNKZTmsThA7
+	iFStkHOL+kIU8RoUTveJXclmKsjoBe4qZfp8ocoXjtHF6MbIIoi0ViIlw1/3Tw==
+X-Gm-Gg: ASbGncu6CKb71EdJa8cc38T8hfn1ByNVNdAex6Am7bhdjOxZqHIpVYf7z50V86dBKdr
+	4SPXGloOj4UEm1/vf2HMlGEQSfSD3VIcwiNJQcbd/hyBJ2dvt9nY9jRfbwQ6BA3fKMpPHkMcM76
+	JsgXlJ/80YVKaDCln3ysTs5V5bVG/QvZUjK8v8lQDdQcA8Pveygmmw+v9T63ghK385kC55a+TH+
+	SjB3xedHV4zikK4KLLiE6x8fXVgdmoMiKOhZbLPj+N/B8oUymUcsok23wFtrCcsZpdmBTC9fEsh
+	chogbc/51tKRVl+ZCuqbOIgGwF9YzsZ2MCUHqKwUWFNJ1pSOo9J2maNBfR9zCz8tCGP100lqnbq
+	5s0LMHS71fNuWktowkrdXJh0emCIRZhwa8MuHFUBSldOe0FMGYmEfXEudtHyV1OReR8fnI8FwIc
+	UUNqRvKWS6blAJVDVfGqJAM5Zb93TkIVPFqB4406bUtY2n
+X-Google-Smtp-Source: AGHT+IFFS7qoc+sKO7s7yJlr+M3siXx5VrfCN8e2hHTgUwuYG3tX31+dlCV0pmy1xqOX33zQfVrG5w==
+X-Received: by 2002:a17:902:ea10:b0:290:91d2:9304 with SMTP id d9443c01a7336-297e5411b0emr102012345ad.4.1762790531718;
+        Mon, 10 Nov 2025 08:02:11 -0800 (PST)
 Received: from ahduyck-xeon-server.home.arpa ([2605:59c8:829:4c00:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-ba8ffe36bbasm12956438a12.18.2025.11.10.08.02.03
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-297ed6808ddsm76806025ad.17.2025.11.10.08.02.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Nov 2025 08:02:03 -0800 (PST)
-Subject: [net-next PATCH v3 09/10] fbnic: Add SW shim for MDIO interface to
- PMA/PMD and PCS
+        Mon, 10 Nov 2025 08:02:10 -0800 (PST)
+Subject: [net-next PATCH v3 10/10] fbnic: Replace use of internal PCS w/
+ Designware XPCS
 From: Alexander Duyck <alexander.duyck@gmail.com>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org, kernel-team@meta.com, andrew+netdev@lunn.ch,
  hkallweit1@gmail.com, linux@armlinux.org.uk, pabeni@redhat.com,
  davem@davemloft.net
-Date: Mon, 10 Nov 2025 08:02:02 -0800
+Date: Mon, 10 Nov 2025 08:02:09 -0800
 Message-ID: 
- <176279052268.2130772.13356059815114333743.stgit@ahduyck-xeon-server.home.arpa>
+ <176279052948.2130772.667088346078043043.stgit@ahduyck-xeon-server.home.arpa>
 In-Reply-To: 
  <176279018050.2130772.17812295685941097123.stgit@ahduyck-xeon-server.home.arpa>
 References: 
@@ -99,293 +99,254 @@ Content-Transfer-Encoding: 7bit
 
 From: Alexander Duyck <alexanderduyck@fb.com>
 
-In order for us to support a phydev and PCS device we need to add an MDIO
-bus to allow the drivers to have access to the registers for the device.
-This change adds such an interface.
+As we have exposed the PCS registers via the SWMII we can now start looking
+at connecting the XPCS driver to those registers and let it mange the PCS
+instead of us doing it directly from the fbnic driver.
 
-The interface will consist of 2 PHYs each consisting of a PMA/PMD and a PCS
-located at addresses 0 and 1. There is a need for 2 PHYs due to the fact
-that in order to support the 2 lane modes we will needed to access and
-configure the PCS vendor registers and RSFEC registers from the second lane
-identical to the first.
-
-One side effect of this is that we have to report config values for both
-lanes of the PHY as those registers can be poked and technically they would
-be valid. For now I am going to have the second lane report speeds
-equivalent to the given config for 2 lanes as we should be configuring both
-lanes identical for the 2 lane modes.
-
-The plan is in the future to extend out this interface adding RSFEC support
-to the PMA through a remapping our CSRs which will essentially convert the
-standard c45 offsets to ones matching the setup within our device.
+For now this just gets us the ability to detect link. The hop is in the
+future to add some of the vendor specific registers to being enabling XPCS
+configuration of the interface.
 
 Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
 ---
- drivers/net/ethernet/meta/fbnic/Makefile     |    1 
- drivers/net/ethernet/meta/fbnic/fbnic.h      |    5 +
- drivers/net/ethernet/meta/fbnic/fbnic_mac.h  |    1 
- drivers/net/ethernet/meta/fbnic/fbnic_mdio.c |  190 ++++++++++++++++++++++++++
- drivers/net/ethernet/meta/fbnic/fbnic_pci.c  |    3 
- 5 files changed, 200 insertions(+)
- create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_mdio.c
+ drivers/net/ethernet/meta/Kconfig               |    1 
+ drivers/net/ethernet/meta/fbnic/fbnic_irq.c     |    2 
+ drivers/net/ethernet/meta/fbnic/fbnic_netdev.c  |    7 --
+ drivers/net/ethernet/meta/fbnic/fbnic_netdev.h  |    4 +
+ drivers/net/ethernet/meta/fbnic/fbnic_phylink.c |  104 +++++++++++------------
+ 5 files changed, 55 insertions(+), 63 deletions(-)
 
-diff --git a/drivers/net/ethernet/meta/fbnic/Makefile b/drivers/net/ethernet/meta/fbnic/Makefile
-index 15e8ff649615..72c41af65364 100644
---- a/drivers/net/ethernet/meta/fbnic/Makefile
-+++ b/drivers/net/ethernet/meta/fbnic/Makefile
-@@ -21,6 +21,7 @@ fbnic-y := fbnic_csr.o \
- 	   fbnic_pci.o \
- 	   fbnic_phylink.o \
- 	   fbnic_rpc.o \
-+	   fbnic_mdio.o \
- 	   fbnic_time.o \
- 	   fbnic_tlv.o \
- 	   fbnic_txrx.o \
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic.h b/drivers/net/ethernet/meta/fbnic/fbnic.h
-index fac1283d0ade..779a083b9215 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic.h
-@@ -95,6 +95,9 @@ struct fbnic_dev {
- 	u64 prev_firmware_time;
+diff --git a/drivers/net/ethernet/meta/Kconfig b/drivers/net/ethernet/meta/Kconfig
+index dff51f23d295..ca5c7ac2a5bc 100644
+--- a/drivers/net/ethernet/meta/Kconfig
++++ b/drivers/net/ethernet/meta/Kconfig
+@@ -26,6 +26,7 @@ config FBNIC
+ 	depends on PTP_1588_CLOCK_OPTIONAL
+ 	select NET_DEVLINK
+ 	select PAGE_POOL
++	select PCS_XPCS
+ 	select PHYLINK
+ 	select PLDMFW
+ 	help
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_irq.c b/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
+index 73dd10b7a1a8..f2ccb33fa67a 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
+@@ -143,7 +143,7 @@ static irqreturn_t fbnic_mac_msix_intr(int __always_unused irq, void *data)
+ 		 */
+ 		if (netif_carrier_ok(fbd->netdev))
+ 			fbn->link_down_events += link_down_event;
+-		phylink_pcs_change(&fbn->phylink_pcs, false);
++		phylink_pcs_change(fbn->pcs, false);
+ 	}
  
- 	struct fbnic_fw_log fw_log;
-+
-+	/* MDIO bus for PHYs */
-+	struct mii_bus *mdio_bus;
- };
+ 	return IRQ_HANDLED;
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+index 65318a5b466e..81c9d5c9a4b2 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+@@ -697,10 +697,7 @@ void fbnic_reset_queues(struct fbnic_net *fbn,
+  **/
+ void fbnic_netdev_free(struct fbnic_dev *fbd)
+ {
+-	struct fbnic_net *fbn = netdev_priv(fbd->netdev);
+-
+-	if (fbn->phylink)
+-		phylink_destroy(fbn->phylink);
++	fbnic_phylink_destroy(fbd->netdev);
  
- /* Reserve entry 0 in the MSI-X "others" array until we have filled all
-@@ -204,6 +207,8 @@ void fbnic_dbg_exit(void);
+ 	free_netdev(fbd->netdev);
+ 	fbd->netdev = NULL;
+@@ -802,7 +799,7 @@ struct net_device *fbnic_netdev_alloc(struct fbnic_dev *fbd)
  
- void fbnic_rpc_reset_valid_entries(struct fbnic_dev *fbd);
+ 	netif_tx_stop_all_queues(netdev);
  
-+int fbnic_mdiobus_create(struct fbnic_dev *fbd);
-+
- void fbnic_csr_get_regs(struct fbnic_dev *fbd, u32 *data, u32 *regs_version);
- int fbnic_csr_regs_len(struct fbnic_dev *fbd);
+-	if (fbnic_phylink_init(netdev)) {
++	if (fbnic_phylink_create(netdev)) {
+ 		fbnic_netdev_free(fbd);
+ 		return NULL;
+ 	}
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
+index c2e45ff64e34..54a8bf172fa6 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
+@@ -44,7 +44,7 @@ struct fbnic_net {
  
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mac.h b/drivers/net/ethernet/meta/fbnic/fbnic_mac.h
-index 2b08046645f2..2a9440df5e1d 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_mac.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_mac.h
-@@ -55,6 +55,7 @@ enum {
- 	FBNIC_AUI_50GAUI1	= 2,	/* 53.125GBd	53.125   * 1 */
- 	FBNIC_AUI_100GAUI2	= 3,	/* 106.25GBd	53.125   * 2 */
- 	FBNIC_AUI_UNKNOWN	= 4,
-+	__FBNIC_AUI_MAX__
- };
+ 	struct phylink *phylink;
+ 	struct phylink_config phylink_config;
+-	struct phylink_pcs phylink_pcs;
++	struct phylink_pcs *pcs;
  
- #define FBNIC_AUI_MODE_R2	(FBNIC_AUI_LAUI2)
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mdio.c b/drivers/net/ethernet/meta/fbnic/fbnic_mdio.c
-new file mode 100644
-index 000000000000..7eeaeb03529b
---- /dev/null
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_mdio.c
-@@ -0,0 +1,190 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) Meta Platforms, Inc. and affiliates. */
-+
-+#include <linux/mdio.h>
+ 	u8 aui;
+ 	u8 fec;
+@@ -106,6 +106,8 @@ int fbnic_phylink_ethtool_ksettings_get(struct net_device *netdev,
+ 					struct ethtool_link_ksettings *cmd);
+ int fbnic_phylink_get_fecparam(struct net_device *netdev,
+ 			       struct ethtool_fecparam *fecparam);
++int fbnic_phylink_create(struct net_device *netdev);
++void fbnic_phylink_destroy(struct net_device *netdev);
+ int fbnic_phylink_init(struct net_device *netdev);
+ void fbnic_phylink_pmd_training_complete_notify(struct net_device *netdev);
+ bool fbnic_check_split_frames(struct bpf_prog *prog,
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
+index 592e9642a418..188155f43416 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
+@@ -1,6 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0
+ /* Copyright (c) Meta Platforms, Inc. and affiliates. */
+ 
 +#include <linux/pcs/pcs-xpcs.h>
-+
-+#include "fbnic.h"
-+#include "fbnic_netdev.h"
-+
-+#define DW_VENDOR		BIT(15)
-+#define FBNIC_PCS_VENDOR	BIT(9)
-+#define FBNIC_PCS_ZERO_MASK	(DW_VENDOR - FBNIC_PCS_VENDOR)
-+
-+static int
-+fbnic_mdio_read_pmapmd(struct fbnic_dev *fbd, int addr, int regnum)
-+{
-+	u16 ctrl1[__FBNIC_AUI_MAX__][2] = {
-+		{ MDIO_PMA_CTRL1_SPEED25G, MDIO_PMA_CTRL1_SPEED50G },
-+		{ MDIO_PMA_CTRL1_SPEED50G, MDIO_PMA_CTRL1_SPEED50G },
-+		{ MDIO_PMA_CTRL1_SPEED50G, MDIO_PMA_CTRL1_SPEED100G },
-+		{ MDIO_PMA_CTRL1_SPEED100G, MDIO_PMA_CTRL1_SPEED100G },
-+		{ 0, 0 }};
-+	u8 aui = FBNIC_AUI_UNKNOWN;
-+	struct fbnic_net *fbn;
-+	int ret = 0;
-+
-+	if (fbd->netdev) {
-+		fbn = netdev_priv(fbd->netdev);
-+		if (fbn->aui < FBNIC_AUI_UNKNOWN)
-+			aui = fbn->aui;
-+	}
-+
-+	switch (regnum) {
-+	case MDIO_CTRL1:
-+		ret = ctrl1[aui][addr & 1];
-+		break;
-+	case MDIO_STAT1:
-+		ret = (fbd->pmd_state == FBNIC_PMD_SEND_DATA) ?
-+		      MDIO_STAT1_LSTATUS : 0;
-+		break;
-+	case MDIO_DEVID1:
-+		ret = MP_FBNIC_XPCS_PMA_100G_ID >> 16;
-+		break;
-+	case MDIO_DEVID2:
-+		ret = MP_FBNIC_XPCS_PMA_100G_ID & 0xffff;
-+		break;
-+	case MDIO_DEVS1:
-+		ret = MDIO_DEVS_PMAPMD | MDIO_DEVS_PCS;
-+		break;
-+	case MDIO_STAT2:
-+		ret = MDIO_STAT2_DEVPRST_VAL;
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	dev_dbg(fbd->dev,
-+		"SWMII PMAPMD Rd: Addr: %d RegNum: %d Value: 0x%04x\n",
-+		addr, regnum, ret);
-+
-+	return ret;
-+}
-+
-+static int
-+fbnic_mdio_read_pcs(struct fbnic_dev *fbd, int addr, int regnum)
-+{
-+	int ret;
-+
-+	/* Report 0 for reserved registers */
-+	if (regnum & FBNIC_PCS_ZERO_MASK)
-+		return 0;
-+
-+	/* Intercept and return correct ID for PCS */
-+	if (regnum == MDIO_DEVID1)
-+		return DW_XPCS_ID >> 16;
-+	if (regnum == MDIO_DEVID2)
-+		return DW_XPCS_ID & 0xffff;
-+	if (regnum == MDIO_DEVS1)
-+		return MDIO_DEVS_PMAPMD | MDIO_DEVS_PCS;
-+
-+	/* Swap vendor page bit for FBNIC PCS vendor page bit */
-+	if (regnum & DW_VENDOR)
-+		regnum ^= DW_VENDOR | FBNIC_PCS_VENDOR;
-+
-+	ret = fbnic_rd32(fbd, FBNIC_PCS_PAGE(addr) + regnum);
-+
-+	dev_dbg(fbd->dev,
-+		"SWMII PCS Rd: Addr: %d RegNum: %d Value: 0x%04x\n",
-+		addr, regnum, ret);
-+
-+	return ret;
-+}
-+
-+static int
-+fbnic_mdio_read_c45(struct mii_bus *bus, int addr, int devnum, int regnum)
-+{
-+	struct fbnic_dev *fbd = bus->priv;
-+
-+	if (addr & ~1)
-+		return 0;
-+
-+	if (devnum == MDIO_MMD_PMAPMD)
-+		return fbnic_mdio_read_pmapmd(fbd, addr, regnum);
-+
-+	if (devnum == MDIO_MMD_PCS)
-+		return fbnic_mdio_read_pcs(fbd, addr, regnum);
-+
-+	return 0;
-+}
-+
-+static void
-+fbnic_mdio_write_pmapmd(struct fbnic_dev *fbd, int addr, int regnum, u16 val)
-+{
-+	dev_dbg(fbd->dev,
-+		"SWMII PMAPMD Wr: Addr: %d RegNum: %d Value: 0x%04x\n",
-+		addr, regnum, val);
-+}
-+
-+static void
-+fbnic_mdio_write_pcs(struct fbnic_dev *fbd, int addr, int regnum, u16 val)
-+{
-+	/* Skip write for reserved registers */
-+	if (regnum & FBNIC_PCS_ZERO_MASK)
-+		return;
-+
-+	/* Swap vendor page bit for FBNIC PCS vendor page bit */
-+	if (regnum & DW_VENDOR)
-+		regnum ^= DW_VENDOR | FBNIC_PCS_VENDOR;
-+
-+	fbnic_wr32(fbd, FBNIC_PCS_PAGE(addr) + regnum, val);
-+
-+	dev_dbg(fbd->dev,
-+		"SWMII PCS Wr: Addr: %d RegNum: %d Value: 0x%04x\n",
-+		addr, regnum, val);
-+}
-+
-+static int
-+fbnic_mdio_write_c45(struct mii_bus *bus, int addr, int devnum,
-+		     int regnum, u16 val)
-+{
-+	struct fbnic_dev *fbd = bus->priv;
-+
-+	if (addr & ~1)
-+		return 0;
-+
-+	if (devnum == MDIO_MMD_PMAPMD)
-+		fbnic_mdio_write_pmapmd(fbd, addr, regnum, val);
-+
-+	if (devnum == MDIO_MMD_PCS)
-+		fbnic_mdio_write_pcs(fbd, addr, regnum, val);
-+
-+	return 0;
-+}
-+
+ #include <linux/phy.h>
+ #include <linux/phylink.h>
+ 
+@@ -101,56 +102,6 @@ int fbnic_phylink_get_fecparam(struct net_device *netdev,
+ 	return 0;
+ }
+ 
+-static struct fbnic_net *
+-fbnic_pcs_to_net(struct phylink_pcs *pcs)
+-{
+-	return container_of(pcs, struct fbnic_net, phylink_pcs);
+-}
+-
+-static void
+-fbnic_phylink_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
+-			    struct phylink_link_state *state)
+-{
+-	struct fbnic_net *fbn = fbnic_pcs_to_net(pcs);
+-	struct fbnic_dev *fbd = fbn->fbd;
+-
+-	switch (fbn->aui) {
+-	case FBNIC_AUI_25GAUI:
+-		state->speed = SPEED_25000;
+-		break;
+-	case FBNIC_AUI_LAUI2:
+-	case FBNIC_AUI_50GAUI1:
+-		state->speed = SPEED_50000;
+-		break;
+-	case FBNIC_AUI_100GAUI2:
+-		state->speed = SPEED_100000;
+-		break;
+-	default:
+-		state->link = 0;
+-		return;
+-	}
+-
+-	state->duplex = DUPLEX_FULL;
+-
+-	state->link = (fbd->pmd_state == FBNIC_PMD_SEND_DATA) &&
+-		      (rd32(fbd, FBNIC_PCS(MDIO_STAT1, 0)) &
+-		       MDIO_STAT1_LSTATUS);
+-}
+-
+-static int
+-fbnic_phylink_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
+-			 phy_interface_t interface,
+-			 const unsigned long *advertising,
+-			 bool permit_pause_to_mac)
+-{
+-	return 0;
+-}
+-
+-static const struct phylink_pcs_ops fbnic_phylink_pcs_ops = {
+-	.pcs_config = fbnic_phylink_pcs_config,
+-	.pcs_get_state = fbnic_phylink_pcs_get_state,
+-};
+-
+ static struct phylink_pcs *
+ fbnic_phylink_mac_select_pcs(struct phylink_config *config,
+ 			     phy_interface_t interface)
+@@ -158,7 +109,7 @@ fbnic_phylink_mac_select_pcs(struct phylink_config *config,
+ 	struct net_device *netdev = to_net_dev(config->dev);
+ 	struct fbnic_net *fbn = netdev_priv(netdev);
+ 
+-	return &fbn->phylink_pcs;
++	return fbn->pcs;
+ }
+ 
+ static int
+@@ -227,13 +178,33 @@ static const struct phylink_mac_ops fbnic_phylink_mac_ops = {
+ 	.mac_link_up = fbnic_phylink_mac_link_up,
+ };
+ 
+-int fbnic_phylink_init(struct net_device *netdev)
 +/**
-+ * fbnic_mdiobus_create - Create an MDIO bus to allow interfacing w/ PHYs
-+ * @fbd: Pointer to FBNIC device structure to populate bus on
++ * fbnic_phylink_create - Phylink device creation
++ * @netdev: Network Device struct to attach phylink device
 + *
-+ * Initialize an MDIO bus and place a pointer to it on the fbd struct. This bus
-+ * will be used to interface with the PMA/PMD and PCS.
++ * Initialize and attach a phylink instance to the device. The phylink
++ * device will make use of the netdev struct to track carrier and will
++ * eventually be used to expose the current state of the MAC and PCS
++ * setup.
 + *
 + * Return: 0 on success, negative on failure
 + **/
-+int fbnic_mdiobus_create(struct fbnic_dev *fbd)
-+{
-+	struct mii_bus *bus;
++int fbnic_phylink_create(struct net_device *netdev)
+ {
+ 	struct fbnic_net *fbn = netdev_priv(netdev);
+ 	struct fbnic_dev *fbd = fbn->fbd;
++	struct phylink_pcs *pcs;
+ 	struct phylink *phylink;
 +	int err;
 +
-+	bus = devm_mdiobus_alloc(fbd->dev);
-+	if (!bus)
-+		return -ENOMEM;
-+
-+	bus->name = "fbnic_mii_bus";
-+	bus->read_c45 = &fbnic_mdio_read_c45;
-+	bus->write_c45 = &fbnic_mdio_write_c45;
-+	bus->parent = fbd->dev;
-+	bus->phy_mask = GENMASK(31, 2);
-+	bus->priv = fbd;
-+	snprintf(bus->id, MII_BUS_ID_SIZE, "%s-mii", dev_name(fbd->dev));
-+
-+	err = devm_mdiobus_register(fbd->dev, bus);
-+	if (err) {
-+		dev_err(fbd->dev, "Failed to create MDIO bus: %d\n", err);
++	pcs = xpcs_create_pcs_mdiodev(fbd->mdio_bus, 0);
++	if (IS_ERR(pcs)) {
++		err = PTR_ERR(pcs);
++		dev_err(fbd->dev, "Failed to create PCS device: %d\n", err);
 +		return err;
 +	}
-+
-+	fbd->mdio_bus = bus;
-+
-+	return 0;
-+}
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
-index 040bd520b160..7991e2870081 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
-@@ -339,6 +339,9 @@ static int fbnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		goto init_failure_mode;
- 	}
  
-+	if (fbnic_mdiobus_create(fbd))
-+		goto init_failure_mode;
+-	fbn->phylink_pcs.ops = &fbnic_phylink_pcs_ops;
++	fbn->pcs = pcs;
+ 
+ 	fbn->phylink_config.dev = &netdev->dev;
+ 	fbn->phylink_config.type = PHYLINK_NETDEV;
+@@ -256,14 +227,35 @@ int fbnic_phylink_init(struct net_device *netdev)
+ 	phylink = phylink_create(&fbn->phylink_config, NULL,
+ 				 fbnic_phylink_select_interface(fbn->aui),
+ 				 &fbnic_phylink_mac_ops);
+-	if (IS_ERR(phylink))
+-		return PTR_ERR(phylink);
++	if (IS_ERR(phylink)) {
++		err = PTR_ERR(phylink);
++		dev_err(netdev->dev.parent,
++			"Failed to create Phylink interface, err: %d\n", err);
++		xpcs_destroy_pcs(pcs);
++		return err;
++	}
+ 
+ 	fbn->phylink = phylink;
+ 
+ 	return 0;
+ }
+ 
++/**
++ * fbnic_phylink_destroy - Teardown phylink related interfaces
++ * @netdev: Network Device struct containing phylink device
++ *
++ * Detach and free resources related to phylink interface.
++ **/
++void fbnic_phylink_destroy(struct net_device *netdev)
++{
++	struct fbnic_net *fbn = netdev_priv(netdev);
 +
- 	netdev = fbnic_netdev_alloc(fbd);
- 	if (!netdev) {
- 		dev_err(&pdev->dev, "Netdev allocation failed\n");
++	if (fbn->phylink)
++		phylink_destroy(fbn->phylink);
++	if (fbn->pcs)
++		xpcs_destroy_pcs(fbn->pcs);
++}
++
+ /**
+  * fbnic_phylink_pmd_training_complete_notify - PMD training complete notifier
+  * @netdev: Netdev struct phylink device attached to
+@@ -287,5 +279,5 @@ void fbnic_phylink_pmd_training_complete_notify(struct net_device *netdev)
+ 
+ 	fbd->pmd_state = FBNIC_PMD_SEND_DATA;
+ 
+-	phylink_pcs_change(&fbn->phylink_pcs, false);
++	phylink_pcs_change(fbn->pcs, false);
+ }
 
 
 
