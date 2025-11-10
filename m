@@ -1,447 +1,135 @@
-Return-Path: <netdev+bounces-237222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC5EAC477A0
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 16:19:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62996C47816
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 16:24:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DCD3B189641E
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 15:15:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CEC83BCD40
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 15:16:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8450A31A053;
-	Mon, 10 Nov 2025 15:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF8CC313546;
+	Mon, 10 Nov 2025 15:13:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M9zyvTrq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rkTTL9wG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5221D31961B;
-	Mon, 10 Nov 2025 15:10:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49E8A314B75
+	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 15:13:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762787411; cv=none; b=K0qQooWdOxmYZzckixfJK8ueaBXZ6ZvDEl7gwIAb7HdmKEUtwg3Vwoe83GzNBD6/EvVTM6ROBsqDcdL96D83VVBYl+b8JTqfKY+wXuboaUxTSpCpltM3pds+hWjPxpOm+3r84esUgKPdRFaI29cOq5tfXgBWD5sMUWPa3RLLm9k=
+	t=1762787626; cv=none; b=UVhIx7P0ojNE6b3NdBPb6c5vnOOJBv9gw+SS5xQew/KldLFE630b6y296ZlBYClSSPym6Xy5mw2jXjzChWUG7qJwNFf8KHjYL7ZwAK/J2nwPeFPcp7ydJ75X3z6pv8NNCsy0HGZYKSnceAZxbj07p0KUOa4v6ZegxCMz4jYKy1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762787411; c=relaxed/simple;
-	bh=vStTifAnsGYOUzCE5jCoRuplSOsVaGyUhlN49sEMm2I=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=t9IwyMpiS9vZHk9nVAFXdQAVhGmGhZZFW/HljyKVRGUTU1RkRFy8qDtuWo9wfDd6EE7f5jSxn8WVLBCMZgqLiIWGLKc9gtrQvrjV0IjTDpIzAT83ZO2+u0RLmgRMBP8MsWdRkg4mswmUnh7vS8WHCjZEHaCtXhMh0bewu2bSHNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M9zyvTrq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0319CC4CEFB;
-	Mon, 10 Nov 2025 15:10:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762787409;
-	bh=vStTifAnsGYOUzCE5jCoRuplSOsVaGyUhlN49sEMm2I=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=M9zyvTrqvmM8kjq8pEZKJPOx0fn8q7QrrK+TkN/NZwC4xR2j7IsdkzIhY0SURqFzl
-	 LKS0KF0Db23IVtgxk0r0HgR9UACZFqGCtDPMyfhAPN2ecd4x06aCnGEhMrlLyeiNkL
-	 YePOwT92iRCBHke6TkYNRxNVr4Joo3Sk7RU5i/D41prAM7nJoAlDAi7PTmS/ZsHghD
-	 xARoPvZmkRKuvOKdQlDCIR42WFnGz21/ThKSGGJ9lRqHy/nQb93rFl2Ba0atr4FAxn
-	 rScsrHGufD5mjlDV3PW20Ja2k99udPDEIU5h4LSURIddlmLrWK0QzI1HI7z4x6meU+
-	 NG3+OKurWiRkA==
-From: Christian Brauner <brauner@kernel.org>
-Date: Mon, 10 Nov 2025 16:08:29 +0100
-Subject: [PATCH 17/17] selftests/namespaces: fix nsid tests
+	s=arc-20240116; t=1762787626; c=relaxed/simple;
+	bh=25kg4Lfr0fhTZNGgSn6dy2gqmvtndaAGHB3uI2sd1/g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WeARyoBqdPI7wVz8kSELrKNnALEK31VkFyk/3DFhhS5TUYVVSrVjl1pC0XGCY6GFsX4siC5tN/xzX604l/hN3+09OailcaGAZYwgsN59hBvrLhbvxW+b1oUPWkbrSU98OuC3Tlw54DM85rJTpL8z7CacOaLJ+2u5UFnd7V+gRiE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rkTTL9wG; arc=none smtp.client-ip=209.85.160.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4e88ed3a132so35510721cf.0
+        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 07:13:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1762787624; x=1763392424; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=25kg4Lfr0fhTZNGgSn6dy2gqmvtndaAGHB3uI2sd1/g=;
+        b=rkTTL9wGAZjEpVkI7b7TSc2n6bOUZ65OaUKQoqEkYtBkKk91wFdCrAMFSEUtXVFC9/
+         lpCTV1jkq4WkM9WHEwNobzxcBP1uVoqbtcnpD3ScRK7zPOhx3p4DJLSnwwqa69kzlBVR
+         F598i45uNcQiDsuXDiWpvVhYR+DdtKKVoKPf563TAe0SsSeca9Cg/tdpUUzaTDXe2e9a
+         koACfcf48gsxsPkI49oqy6vG5ROyVarsK/XX4hTlVBqCRf0Q7FeojalAPIRndzUuWiYU
+         7eqSfYUaAqhctH3DSj2APVC1w3k2XMfEvnVpDNxEUNGgGMOWCX5cX66IV4qRRPOHADRd
+         FUHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762787624; x=1763392424;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=25kg4Lfr0fhTZNGgSn6dy2gqmvtndaAGHB3uI2sd1/g=;
+        b=jEOLZzzpaQKyYM2IVxEAZH7WrOx3GemFdbMtf+wayns23IzoFSWCg7H542q6llqunk
+         8jttbK/oUKIVhqkJig3i7X4godLFvdpCce2foVYEszVpHdN3caTyxU3aknSHK8PU1Ivl
+         tRttVZFTyjQTdJw3a2U20gVbud4JAQvyqPYPzoA+GhHK8OHtkDIH2N5elc6DaktEIMXg
+         4R0/qDsZeQQYYTaKmS+ciL+fZfBbnmdIlTpSO9HUIDz6uTBwKGET2Q1zvK6t+7C546M5
+         CjB1XG+sEBqvOLZyGqx1sHVSi96+IvIEV1cspukhjLX/Btq43uFaEBpItI4Dc/S5ioSD
+         mI0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCW53X+XaIFxg/+Ru0UolaN4Wxf0Ft3oel19+WM/Fx4mQh8+gBLT9dV5HWGpY0Xi6ERvrWNsABs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwKetCatlrHFwCSXckNE7U8kXF0A03Bu6zgz7NFn3Fhr8viKyPf
+	6crxa8hH/HbGZq7wUA9ZhL0NHQsceygVG72z/qhU1AZqbjc+y4XO+1AlPvb08SKR+mqu7S1WBGI
+	tu/bbfQUqLcYcQiqnjp95/mObbn/jxLZS+bEGoDlf
+X-Gm-Gg: ASbGncsEIb5dF5NhuD4/wNGuP2ATy0byt/Y+A+jeWR9qtPpLEySAGy73iVqfJD5n3d8
+	zc8y6t8v5gOdI4Rr5bRdh6hYFfIaIYDGSCWGoIoNOPlKdsZbJR3GJozj+Ko/Kf60opbsCWLnqxf
+	jMqvRqjcKQGcB5qK6jBSBC2tbFxw1CSuenFSMW78fB7nTTSWjUFni6BoIo+kkYno7twKHxfcRly
+	Pa/tAgE7vk4HRlcoFwlAdQ7BPAMrvdJfkTCyoyXbuheYuIkxEU1VoSI7/OkQ6YpbxKT6Js=
+X-Google-Smtp-Source: AGHT+IHBXMZv1Bp/UySHMcA+E4BYEJlOOLGSVWQx82msjaQTd7ZDlV43ffpNtadWDINITS3JEoAq5GVGG8byxZBVqiI=
+X-Received: by 2002:a05:622a:4d1:b0:4b4:906b:d05d with SMTP id
+ d75a77b69052e-4ed997f396bmr139371821cf.29.1762787623719; Mon, 10 Nov 2025
+ 07:13:43 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251110-work-namespace-nstree-fixes-v1-17-e8a9264e0fb9@kernel.org>
-References: <20251110-work-namespace-nstree-fixes-v1-0-e8a9264e0fb9@kernel.org>
-In-Reply-To: <20251110-work-namespace-nstree-fixes-v1-0-e8a9264e0fb9@kernel.org>
-To: linux-fsdevel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>, 
- Jeff Layton <jlayton@kernel.org>
-Cc: Jann Horn <jannh@google.com>, Mike Yuan <me@yhndnzj.com>, 
- =?utf-8?q?Zbigniew_J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>, 
- Lennart Poettering <mzxreary@0pointer.de>, 
- Daan De Meyer <daan.j.demeyer@gmail.com>, Aleksa Sarai <cyphar@cyphar.com>, 
- Amir Goldstein <amir73il@gmail.com>, Tejun Heo <tj@kernel.org>, 
- Johannes Weiner <hannes@cmpxchg.org>, Thomas Gleixner <tglx@linutronix.de>, 
- Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
- linux-kernel@vger.kernel.org, cgroups@vger.kernel.org, bpf@vger.kernel.org, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- netdev@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, 
- Christian Brauner <brauner@kernel.org>
-X-Mailer: b4 0.15-dev-a6db3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=8375; i=brauner@kernel.org;
- h=from:subject:message-id; bh=vStTifAnsGYOUzCE5jCoRuplSOsVaGyUhlN49sEMm2I=;
- b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWQK/v+ycde+3E+K7pMO9zvv1Ul5vDRS5uOpjaFcFYdWx
- O0SEDZc21HKwiDGxSArpsji0G4SLrecp2KzUaYGzBxWJpAhDFycAjARUXlGhkuHy/ds+vmk5OXc
- JLVtzucLtKWsxG8lvsmKWfkuWfjS9xmMDFNX2fuu/8/G8/hzlcgNJ9FH3rNZNgtklG46OIdD7fu
- PYxwA
-X-Developer-Key: i=brauner@kernel.org; a=openpgp;
- fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
+References: <20251109161215.2574081-1-edumazet@google.com> <cb568e91-9114-4e9a-ba88-eb4fc3772690@kernel.org>
+ <CANn89iJtEhs=sGsRF+NATcLL9-F8oKWxN_2igJehP8RvZjT-Lg@mail.gmail.com> <4fc5d598-606d-4053-887a-d9b23586e35a@kernel.org>
+In-Reply-To: <4fc5d598-606d-4053-887a-d9b23586e35a@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 10 Nov 2025 07:13:31 -0800
+X-Gm-Features: AWmQ_bkdJsDFw-ZK7_g6m61G8z2anjKG_osgOXailiedM3FPqQMuws8qM_kZY2Q
+Message-ID: <CANn89iLUYB7UEvHVaa9w0M=kyDkbOHWQGyC3fh=Nq7yNTaV=og@mail.gmail.com>
+Subject: Re: [PATCH net] net_sched: limit try_bulk_dequeue_skb() batches
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+	kernel-team <kernel-team@cloudflare.com>, Jesse Brandeburg <jbrandeburg@cloudflare.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Ensure that we always kill and cleanup all processes.
+On Mon, Nov 10, 2025 at 7:04=E2=80=AFAM Jesper Dangaard Brouer <hawk@kernel=
+.org> wrote:
+>
+> Thanks for sharing.
+>
+> With these numbers it makes sense that BQL bytelimit isn't limiting this
+> much code much.
+>
+> e.g. 1595568 bytes / 1500 MTU =3D 1063 packets.
+>
+> Our prod also have large numbers:
+>
+> $ grep -H . /sys/class/net/REDACT0/queues/tx-*/byte_queue_limits/limit |
+> sort -k2rn -t: | head -n 10
+> /sys/class/net/ext0/queues/tx-38/byte_queue_limits/limit:819432
+> /sys/class/net/ext0/queues/tx-95/byte_queue_limits/limit:766227
+> /sys/class/net/ext0/queues/tx-2/byte_queue_limits/limit:715412
+> /sys/class/net/ext0/queues/tx-66/byte_queue_limits/limit:692073
+> /sys/class/net/ext0/queues/tx-20/byte_queue_limits/limit:679817
+> /sys/class/net/ext0/queues/tx-61/byte_queue_limits/limit:647638
+> /sys/class/net/ext0/queues/tx-11/byte_queue_limits/limit:642212
+> /sys/class/net/ext0/queues/tx-10/byte_queue_limits/limit:615188
+> /sys/class/net/ext0/queues/tx-48/byte_queue_limits/limit:613745
+> /sys/class/net/ext0/queues/tx-80/byte_queue_limits/limit:584850
+>
 
-Signed-off-by: Christian Brauner <brauner@kernel.org>
----
- tools/testing/selftests/namespaces/nsid_test.c | 107 ++++++++++++-------------
- 1 file changed, 51 insertions(+), 56 deletions(-)
+Exactly :/
 
-diff --git a/tools/testing/selftests/namespaces/nsid_test.c b/tools/testing/selftests/namespaces/nsid_test.c
-index e28accd74a57..527ade0a8673 100644
---- a/tools/testing/selftests/namespaces/nsid_test.c
-+++ b/tools/testing/selftests/namespaces/nsid_test.c
-@@ -6,6 +6,7 @@
- #include <libgen.h>
- #include <limits.h>
- #include <pthread.h>
-+#include <signal.h>
- #include <string.h>
- #include <sys/mount.h>
- #include <poll.h>
-@@ -14,12 +15,30 @@
- #include <sys/stat.h>
- #include <sys/socket.h>
- #include <sys/un.h>
-+#include <sys/wait.h>
- #include <unistd.h>
- #include <linux/fs.h>
- #include <linux/limits.h>
- #include <linux/nsfs.h>
- #include "../kselftest_harness.h"
- 
-+/* Fixture for tests that create child processes */
-+FIXTURE(nsid) {
-+	pid_t child_pid;
-+};
-+
-+FIXTURE_SETUP(nsid) {
-+	self->child_pid = 0;
-+}
-+
-+FIXTURE_TEARDOWN(nsid) {
-+	/* Clean up any child process that may still be running */
-+	if (self->child_pid > 0) {
-+		kill(self->child_pid, SIGKILL);
-+		waitpid(self->child_pid, NULL, 0);
-+	}
-+}
-+
- TEST(nsid_mntns_basic)
- {
- 	__u64 mnt_ns_id = 0;
-@@ -44,7 +63,7 @@ TEST(nsid_mntns_basic)
- 	close(fd_mntns);
- }
- 
--TEST(nsid_mntns_separate)
-+TEST_F(nsid, mntns_separate)
- {
- 	__u64 parent_mnt_ns_id = 0;
- 	__u64 child_mnt_ns_id = 0;
-@@ -90,6 +109,9 @@ TEST(nsid_mntns_separate)
- 		_exit(0);
- 	}
- 
-+	/* Track child for cleanup */
-+	self->child_pid = pid;
-+
- 	/* Parent process */
- 	close(pipefd[1]);
- 
-@@ -99,8 +121,6 @@ TEST(nsid_mntns_separate)
- 
- 	if (buf == 'S') {
- 		/* Child couldn't create namespace, skip test */
--		kill(pid, SIGTERM);
--		waitpid(pid, NULL, 0);
- 		close(fd_parent_mntns);
- 		SKIP(return, "No permission to create mount namespace");
- 	}
-@@ -123,10 +143,6 @@ TEST(nsid_mntns_separate)
- 
- 	close(fd_parent_mntns);
- 	close(fd_child_mntns);
--
--	/* Clean up child process */
--	kill(pid, SIGTERM);
--	waitpid(pid, NULL, 0);
- }
- 
- TEST(nsid_cgroupns_basic)
-@@ -153,7 +169,7 @@ TEST(nsid_cgroupns_basic)
- 	close(fd_cgroupns);
- }
- 
--TEST(nsid_cgroupns_separate)
-+TEST_F(nsid, cgroupns_separate)
- {
- 	__u64 parent_cgroup_ns_id = 0;
- 	__u64 child_cgroup_ns_id = 0;
-@@ -199,6 +215,9 @@ TEST(nsid_cgroupns_separate)
- 		_exit(0);
- 	}
- 
-+	/* Track child for cleanup */
-+	self->child_pid = pid;
-+
- 	/* Parent process */
- 	close(pipefd[1]);
- 
-@@ -208,8 +227,6 @@ TEST(nsid_cgroupns_separate)
- 
- 	if (buf == 'S') {
- 		/* Child couldn't create namespace, skip test */
--		kill(pid, SIGTERM);
--		waitpid(pid, NULL, 0);
- 		close(fd_parent_cgroupns);
- 		SKIP(return, "No permission to create cgroup namespace");
- 	}
-@@ -232,10 +249,6 @@ TEST(nsid_cgroupns_separate)
- 
- 	close(fd_parent_cgroupns);
- 	close(fd_child_cgroupns);
--
--	/* Clean up child process */
--	kill(pid, SIGTERM);
--	waitpid(pid, NULL, 0);
- }
- 
- TEST(nsid_ipcns_basic)
-@@ -262,7 +275,7 @@ TEST(nsid_ipcns_basic)
- 	close(fd_ipcns);
- }
- 
--TEST(nsid_ipcns_separate)
-+TEST_F(nsid, ipcns_separate)
- {
- 	__u64 parent_ipc_ns_id = 0;
- 	__u64 child_ipc_ns_id = 0;
-@@ -308,6 +321,9 @@ TEST(nsid_ipcns_separate)
- 		_exit(0);
- 	}
- 
-+	/* Track child for cleanup */
-+	self->child_pid = pid;
-+
- 	/* Parent process */
- 	close(pipefd[1]);
- 
-@@ -317,8 +333,6 @@ TEST(nsid_ipcns_separate)
- 
- 	if (buf == 'S') {
- 		/* Child couldn't create namespace, skip test */
--		kill(pid, SIGTERM);
--		waitpid(pid, NULL, 0);
- 		close(fd_parent_ipcns);
- 		SKIP(return, "No permission to create IPC namespace");
- 	}
-@@ -341,10 +355,6 @@ TEST(nsid_ipcns_separate)
- 
- 	close(fd_parent_ipcns);
- 	close(fd_child_ipcns);
--
--	/* Clean up child process */
--	kill(pid, SIGTERM);
--	waitpid(pid, NULL, 0);
- }
- 
- TEST(nsid_utsns_basic)
-@@ -371,7 +381,7 @@ TEST(nsid_utsns_basic)
- 	close(fd_utsns);
- }
- 
--TEST(nsid_utsns_separate)
-+TEST_F(nsid, utsns_separate)
- {
- 	__u64 parent_uts_ns_id = 0;
- 	__u64 child_uts_ns_id = 0;
-@@ -417,6 +427,9 @@ TEST(nsid_utsns_separate)
- 		_exit(0);
- 	}
- 
-+	/* Track child for cleanup */
-+	self->child_pid = pid;
-+
- 	/* Parent process */
- 	close(pipefd[1]);
- 
-@@ -426,8 +439,6 @@ TEST(nsid_utsns_separate)
- 
- 	if (buf == 'S') {
- 		/* Child couldn't create namespace, skip test */
--		kill(pid, SIGTERM);
--		waitpid(pid, NULL, 0);
- 		close(fd_parent_utsns);
- 		SKIP(return, "No permission to create UTS namespace");
- 	}
-@@ -450,10 +461,6 @@ TEST(nsid_utsns_separate)
- 
- 	close(fd_parent_utsns);
- 	close(fd_child_utsns);
--
--	/* Clean up child process */
--	kill(pid, SIGTERM);
--	waitpid(pid, NULL, 0);
- }
- 
- TEST(nsid_userns_basic)
-@@ -480,7 +487,7 @@ TEST(nsid_userns_basic)
- 	close(fd_userns);
- }
- 
--TEST(nsid_userns_separate)
-+TEST_F(nsid, userns_separate)
- {
- 	__u64 parent_user_ns_id = 0;
- 	__u64 child_user_ns_id = 0;
-@@ -526,6 +533,9 @@ TEST(nsid_userns_separate)
- 		_exit(0);
- 	}
- 
-+	/* Track child for cleanup */
-+	self->child_pid = pid;
-+
- 	/* Parent process */
- 	close(pipefd[1]);
- 
-@@ -535,8 +545,6 @@ TEST(nsid_userns_separate)
- 
- 	if (buf == 'S') {
- 		/* Child couldn't create namespace, skip test */
--		kill(pid, SIGTERM);
--		waitpid(pid, NULL, 0);
- 		close(fd_parent_userns);
- 		SKIP(return, "No permission to create user namespace");
- 	}
-@@ -559,10 +567,6 @@ TEST(nsid_userns_separate)
- 
- 	close(fd_parent_userns);
- 	close(fd_child_userns);
--
--	/* Clean up child process */
--	kill(pid, SIGTERM);
--	waitpid(pid, NULL, 0);
- }
- 
- TEST(nsid_timens_basic)
-@@ -591,7 +595,7 @@ TEST(nsid_timens_basic)
- 	close(fd_timens);
- }
- 
--TEST(nsid_timens_separate)
-+TEST_F(nsid, timens_separate)
- {
- 	__u64 parent_time_ns_id = 0;
- 	__u64 child_time_ns_id = 0;
-@@ -652,6 +656,9 @@ TEST(nsid_timens_separate)
- 		}
- 	}
- 
-+	/* Track child for cleanup */
-+	self->child_pid = pid;
-+
- 	/* Parent process */
- 	close(pipefd[1]);
- 
-@@ -660,8 +667,6 @@ TEST(nsid_timens_separate)
- 
- 	if (buf == 'S') {
- 		/* Child couldn't create namespace, skip test */
--		kill(pid, SIGTERM);
--		waitpid(pid, NULL, 0);
- 		close(fd_parent_timens);
- 		close(pipefd[0]);
- 		SKIP(return, "Cannot create time namespace");
-@@ -689,10 +694,6 @@ TEST(nsid_timens_separate)
- 
- 	close(fd_parent_timens);
- 	close(fd_child_timens);
--
--	/* Clean up child process */
--	kill(pid, SIGTERM);
--	waitpid(pid, NULL, 0);
- }
- 
- TEST(nsid_pidns_basic)
-@@ -719,7 +720,7 @@ TEST(nsid_pidns_basic)
- 	close(fd_pidns);
- }
- 
--TEST(nsid_pidns_separate)
-+TEST_F(nsid, pidns_separate)
- {
- 	__u64 parent_pid_ns_id = 0;
- 	__u64 child_pid_ns_id = 0;
-@@ -776,6 +777,9 @@ TEST(nsid_pidns_separate)
- 		}
- 	}
- 
-+	/* Track child for cleanup */
-+	self->child_pid = pid;
-+
- 	/* Parent process */
- 	close(pipefd[1]);
- 
-@@ -784,8 +788,6 @@ TEST(nsid_pidns_separate)
- 
- 	if (buf == 'S') {
- 		/* Child couldn't create namespace, skip test */
--		kill(pid, SIGTERM);
--		waitpid(pid, NULL, 0);
- 		close(fd_parent_pidns);
- 		close(pipefd[0]);
- 		SKIP(return, "No permission to create PID namespace");
-@@ -813,10 +815,6 @@ TEST(nsid_pidns_separate)
- 
- 	close(fd_parent_pidns);
- 	close(fd_child_pidns);
--
--	/* Clean up child process */
--	kill(pid, SIGTERM);
--	waitpid(pid, NULL, 0);
- }
- 
- TEST(nsid_netns_basic)
-@@ -860,7 +858,7 @@ TEST(nsid_netns_basic)
- 	close(fd_netns);
- }
- 
--TEST(nsid_netns_separate)
-+TEST_F(nsid, netns_separate)
- {
- 	__u64 parent_net_ns_id = 0;
- 	__u64 parent_netns_cookie = 0;
-@@ -920,6 +918,9 @@ TEST(nsid_netns_separate)
- 		_exit(0);
- 	}
- 
-+	/* Track child for cleanup */
-+	self->child_pid = pid;
-+
- 	/* Parent process */
- 	close(pipefd[1]);
- 
-@@ -929,8 +930,6 @@ TEST(nsid_netns_separate)
- 
- 	if (buf == 'S') {
- 		/* Child couldn't create namespace, skip test */
--		kill(pid, SIGTERM);
--		waitpid(pid, NULL, 0);
- 		close(fd_parent_netns);
- 		close(parent_sock);
- 		SKIP(return, "No permission to create network namespace");
-@@ -977,10 +976,6 @@ TEST(nsid_netns_separate)
- 	close(fd_parent_netns);
- 	close(fd_child_netns);
- 	close(parent_sock);
--
--	/* Clean up child process */
--	kill(pid, SIGTERM);
--	waitpid(pid, NULL, 0);
- }
- 
- TEST_HARNESS_MAIN
+BQL was very nice when we had a single queue and/or relatively slow NIC.
 
--- 
-2.47.3
+For 200Gbit NIC, assuming being able to run a napi poll every 100 usec,
+this means the napi poll has to tx-complete 2.5 MB per run, if a single flo=
+w
+is pushing 200Gbit on a single tx-queue.
 
+In reality, interrupt mitigations tend to space the napi poll delays, and B=
+QL
+reflects this by inflating /limit to a point BQL is not anymore effective.
 
