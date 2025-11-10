@@ -1,222 +1,161 @@
-Return-Path: <netdev+bounces-237287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04429C48735
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 19:00:12 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39264C4877D
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 19:05:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B05BC188DD03
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 18:00:09 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 14B9D4E1256
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 18:05:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE9913148D0;
-	Mon, 10 Nov 2025 17:58:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E13ED30BF67;
+	Mon, 10 Nov 2025 18:05:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a21IpJTp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VG0yfw8D"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yx1-f46.google.com (mail-yx1-f46.google.com [74.125.224.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F172303A23
-	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 17:58:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E5322E6CD4
+	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 18:05:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762797532; cv=none; b=pW5mCY3UY/aCVtVIvCmc86JzAEvrYJcav7yUD/HSnHGNxnoXUOrrgQMGZCN7Pf5cvQF6KDIi0wBbRRmUu4fRg0BQ9iXD+vp07uqEftKiBDlCRqv0ZtSd+aTn1kaMtwxbVgnWNIA0ey2GL3b+y00aJkynAm678CrXVfQeiKXRswk=
+	t=1762797921; cv=none; b=E0f8dnCqVdaAyZynzyqhvG2jSIDffar5LxHF1ICLEj8sVvYnWu4ofuk5bOQq67fKH2q6RtCBKgn91S5RXxZcrjSDc/cimOqDlZZ9STb48vWzAnlaANVCwnr1rzBN119o2lVDjIvWdKvW2zx+6AzYRyMY9ZdOxg9qICphK1qvYeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762797532; c=relaxed/simple;
-	bh=WGl8DP/e/+VnYn8C3uYrsdOuYr6SojLzWShAwr+tv6k=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TQ9D50sIBbBplC81DeIHBJGGo01SvZsTSG5K4CzN7CFjkFoNoK2JD0ufNmPJAHy2c2jF8mXWSdMCykwsYxtOv0/F6BGefTWYAIPwbjJwDR8ifmtO5ehVD5p6H9vjazIEtNl9iPqsH87DdZ6mIKzTwFck2zy0W8hIW2Me4u+5QqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a21IpJTp; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762797530;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mKzPhPd7GeQ9w5/pssxPxDnXDnFFtiQ8qQ0W7dttM3g=;
-	b=a21IpJTpWQxXrFNKiQSIgzt9GonO46jBzjFCRyJWtKTKgw4lF8TR/IRH0QBfXEdUKiEkwO
-	rmwLaJlNiwWeBICI9565Li/HouHWurgM285HAvgOrNJKtDJrdOi2nGBAk/KiWaEyzVBeGV
-	fupC0hpiUkbmiidwfcEdIvN5bCaq1f8=
-Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-378-mz8aEsrXO2yFozxKi_58aQ-1; Mon,
- 10 Nov 2025 12:58:45 -0500
-X-MC-Unique: mz8aEsrXO2yFozxKi_58aQ-1
-X-Mimecast-MFC-AGG-ID: mz8aEsrXO2yFozxKi_58aQ_1762797523
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 63123180048E;
-	Mon, 10 Nov 2025 17:58:43 +0000 (UTC)
-Received: from p16v.luc.cera.cz (unknown [10.45.224.193])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A1CB91800367;
-	Mon, 10 Nov 2025 17:58:40 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Petr Oros <poros@redhat.com>,
-	Prathosh Satish <Prathosh.Satish@microchip.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Michal Schmidt <mschmidt@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 6/6] dpll: zl3073x: Remove unused dev wrappers
-Date: Mon, 10 Nov 2025 18:58:18 +0100
-Message-ID: <20251110175818.1571610-7-ivecera@redhat.com>
-In-Reply-To: <20251110175818.1571610-1-ivecera@redhat.com>
-References: <20251110175818.1571610-1-ivecera@redhat.com>
+	s=arc-20240116; t=1762797921; c=relaxed/simple;
+	bh=Qr0I7fSX6b99zcO+zhCx8SyngvwHfavs+AINZxmTvKw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=upxmJWbMetEh1+bqqQN4etoORPLHu+s6JKYLoWW6WL2PrM5v3fdNzHB5SN+cStaxw9+OJYp3Jm1ZTnwa660AKkVeJJ/i/IscpU2Yoawo5ahb5VNlOk/Dqcvgy7uQHj7E6UDHAjmVJQ+axH6qOoYNTVzvgX/+qRwjVWFY55Fur98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VG0yfw8D; arc=none smtp.client-ip=74.125.224.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yx1-f46.google.com with SMTP id 956f58d0204a3-63f97c4eccaso3071267d50.2
+        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 10:05:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1762797919; x=1763402719; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c3VQF3OYSeTXxfA91yFIKF6gFG8XTUDg3wxKQIKvNfM=;
+        b=VG0yfw8DJNI1+bWJ4Ev4sGIkVEwtYoLI0x7KIVDm8/VPoNHiygMEeGtg1Kaxd0IbQ/
+         gCZdiN8fnDrh/0up6xryUPS7SMsynib1tMrlwTC2pLPpl+7AyVo/5tWLVbgQQ55pQ3Yj
+         Wjym000olfm4d6kINEKyOYI174hh4o+sfftiEoFZS0dbk5+UB3OasDJtPBR5Y4WHcN3W
+         poauZyNxmf0ZGEBF7V8YXVvh0c9REEuXN1zjDH0Xu0BBIxdie2F1Y32dJ5SqlSRWTzpN
+         F3NeUJU7fTicdaGtsmsJT/bi1H6YxECId8EkVtj77vXdHw7HclI8wzYQudW5A24S08NO
+         Eb8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762797919; x=1763402719;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=c3VQF3OYSeTXxfA91yFIKF6gFG8XTUDg3wxKQIKvNfM=;
+        b=cd8WeN2vfbFw4H5jb6nvuNz1ba8ozccdwLUxK1an7oqHpMiHam7HCmg6O+SgXQnzZU
+         x5rNDh0SMGw6JLwjRHxJ7R5joag5G9TvCjEPeOn+QaAw84XXIa3UQ8Pna7kLh+D66Cm/
+         tIWRasV8NkwI4nBck9+/UYfJZUbt3B5crggnCVCv17gnnNg54cgHatqBLwkjB+4/jB3Y
+         n7zgj6F9l7DdxS7+a8z8n0WDEBdAUcNXNUztufZ9qBlzVrl/aVdIR7ozqVYGzKNEKU6t
+         6x/G4DYDDHryeN6Tv0nL8GG5hP4JsEpfD+kROA7ccz715PhOoLAHE1ca4L58l14FWtpR
+         FysQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUKLZNbA064ju7e+uup4CoAMLgtHtyM15EM9hX6cdo+DJwk24eMMYg9z/FUx0X8zOyJotBdr8s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwYSNr2voB9bp7YG0gGZ60skGIEavYABcEZG5IzJ6UwlhmMhyRH
+	xyaFG6J3vIHM77//PASWT70ukJ1lo5gePPdLC5ZzplLw/RHEuZRcGaZ/sdHHfuY6BPOPvbMB8nz
+	1pT1M/9r+hT/PjoFy/w7a5rLqSro6X6UdRabWeJABL4U38UEUHIG8F/1faiY=
+X-Gm-Gg: ASbGncvTeiJDN4GPif883D6vc6UVI4p4TbA1+s1o9NwCfUo5OKIcEac+btHVTfX10bC
+	a6GdK9Bx5740y78M3Oz2xp0COnsOJTS13l4Ykc2LXfUT98jRt0ea4DoCP1WrOPBbU26+PqF4vxD
+	KT5O15+PhZhyg6a+Pw5Lq82s8Ty02s7wX34ZnQi3MhbG2jP4xFAdnP7z4DHHBNp4kThGMktBsBY
+	BsJZ3wOOtUPIwsFwBjNLbLSTlripbM4AFwljKEBZV5fIeuny3GgLb1Egt2DKt334DI2Eg8=
+X-Google-Smtp-Source: AGHT+IE9fVmi2GZZcZzrBiqlH9p0XE1wJvyclBgU1ZpJRBICG2W9GbkCd20psT+4gLSP1x3JnbZpVfQoMPHIJNfsQNs=
+X-Received: by 2002:a05:690c:a0a3:20b0:787:e117:9508 with SMTP id
+ 00721157ae682-787e117a145mr59262487b3.38.1762797918865; Mon, 10 Nov 2025
+ 10:05:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+References: <20251110094505.3335073-1-edumazet@google.com> <20251110084432.7fdf647b@kernel.org>
+ <CANn89i+KtA5C3rY2ump7qr=edvhvFw8fJ0HwRkiNHs=5+wwR3Q@mail.gmail.com> <20251110092736.5642f227@kernel.org>
+In-Reply-To: <20251110092736.5642f227@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 10 Nov 2025 10:05:06 -0800
+X-Gm-Features: AWmQ_bmGrLq8u6iiiGXnSQC-1edjvBP-unuu_XNf1qRvE9mOpfht9UpEDWeW5Q8
+Message-ID: <CANn89i+szfpkVD8y-71RTHCmZn5KoHV5X33HzTCf-M1Xq8LJ3g@mail.gmail.com>
+Subject: Re: [PATCH net-next 00/10] net_sched: speedup qdisc dequeue
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
+	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Remove several zl3073x_dev_... inline wrapper functions from core.h
-as they are no longer used by any callers.
+On Mon, Nov 10, 2025 at 9:27=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Mon, 10 Nov 2025 09:15:46 -0800 Eric Dumazet wrote:
+> > On Mon, Nov 10, 2025 at 8:44=E2=80=AFAM Jakub Kicinski <kuba@kernel.org=
+> wrote:
+> > >
+> > > On Mon, 10 Nov 2025 09:44:55 +0000 Eric Dumazet wrote:
+> > > > Avoid up to two cache line misses in qdisc dequeue() to fetch
+> > > > skb_shinfo(skb)->gso_segs/gso_size while qdisc spinlock is held.
+> > > >
+> > > > Idea is to cache gso_segs at enqueue time before spinlock is
+> > > > acquired, in the first skb cache line, where we already
+> > > > have qdisc_skb_cb(skb)->pkt_len.
+> > > >
+> > > > This series gives a 8 % improvement in a TX intensive workload.
+> > > >
+> > > > (120 Mpps -> 130 Mpps on a Turin host, IDPF with 32 TX queues)
+> > >
+> > > According to CI this breaks a bunch of tests.
+> > >
+> > > https://netdev.bots.linux.dev/contest.html?branch=3Dnet-next-2025-11-=
+10--12-00
+> > >
+> > > I think they all hit:
+> > >
+> > > [   20.682474][  T231] WARNING: CPU: 3 PID: 231 at ./include/net/sch_=
+generic.h:843 __dev_xmit_skb+0x786/0x1550
+> >
+> > Oh well, I will add this in V2, thank you !
+> >
+> > diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+> > index b76436ec3f4aa412bac1be3371f5c7c6245cc362..79501499dafba56271b9ebd=
+97a8f379ffdc83cac
+> > 100644
+> > --- a/include/net/sch_generic.h
+> > +++ b/include/net/sch_generic.h
+> > @@ -841,7 +841,7 @@ static inline unsigned int qdisc_pkt_segs(const
+> > struct sk_buff *skb)
+> >         u32 pkt_segs =3D qdisc_skb_cb(skb)->pkt_segs;
+> >
+> >         DEBUG_NET_WARN_ON_ONCE(pkt_segs !=3D
+> > -                              skb_is_gso(skb) ? skb_shinfo(skb)->gso_s=
+egs : 1);
+> > +                       (skb_is_gso(skb) ? skb_shinfo(skb)->gso_segs : =
+1));
+> >         return pkt_segs;
+> >  }
+>
+> Hm, I think we need more..
+>
+> The non-debug workers are also failing and they have DEBUG_NET=3Dn
+>
+> Looks like most of the non-debug tests are tunnel and bridge related.
+> VxLAN, GRE etc.
+>
+> https://netdev.bots.linux.dev/contest.html?pass=3D0&branch=3Dnet-next-202=
+5-11-10--12-00&executor=3Dvmksft-forwarding
 
-Removed functions:
-* zl3073x_dev_ref_ffo_get
-* zl3073x_dev_ref_is_enabled
-* zl3073x_dev_synth_dpll_get
-* zl3073x_dev_synth_is_enabled
-* zl3073x_dev_out_signal_format_get
+Nice !
 
-This is a cleanup after recent refactoring, as the remaining callers
-now fetch the state object and use the base helpers directly.
+tc_run()
+   mini_qdisc_bstats_cpu_update()  //
 
-Reviewed-by: Petr Oros <poros@redhat.com>
-Tested-by: Prathosh Satish <Prathosh.Satish@microchip.com>
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
- drivers/dpll/zl3073x/core.h | 77 -------------------------------------
- 1 file changed, 77 deletions(-)
-
-diff --git a/drivers/dpll/zl3073x/core.h b/drivers/dpll/zl3073x/core.h
-index fe8b70e25d3cc..09bca2d0926d5 100644
---- a/drivers/dpll/zl3073x/core.h
-+++ b/drivers/dpll/zl3073x/core.h
-@@ -182,21 +182,6 @@ zl3073x_output_pin_out_get(u8 id)
- 	return id / 2;
- }
- 
--/**
-- * zl3073x_dev_ref_ffo_get - get current fractional frequency offset
-- * @zldev: pointer to zl3073x device
-- * @index: input reference index
-- *
-- * Return: the latest measured fractional frequency offset
-- */
--static inline s64
--zl3073x_dev_ref_ffo_get(struct zl3073x_dev *zldev, u8 index)
--{
--	const struct zl3073x_ref *ref = zl3073x_ref_state_get(zldev, index);
--
--	return zl3073x_ref_ffo_get(ref);
--}
--
- /**
-  * zl3073x_dev_ref_freq_get - get input reference frequency
-  * @zldev: pointer to zl3073x device
-@@ -227,21 +212,6 @@ zl3073x_dev_ref_is_diff(struct zl3073x_dev *zldev, u8 index)
- 	return zl3073x_ref_is_diff(ref);
- }
- 
--/**
-- * zl3073x_dev_ref_is_enabled - check if the given input reference is enabled
-- * @zldev: pointer to zl3073x device
-- * @index: input reference index
-- *
-- * Return: true if input refernce is enabled, false otherwise
-- */
--static inline bool
--zl3073x_dev_ref_is_enabled(struct zl3073x_dev *zldev, u8 index)
--{
--	const struct zl3073x_ref *ref = zl3073x_ref_state_get(zldev, index);
--
--	return zl3073x_ref_is_enabled(ref);
--}
--
- /*
-  * zl3073x_dev_ref_is_status_ok - check the given input reference status
-  * @zldev: pointer to zl3073x device
-@@ -257,22 +227,6 @@ zl3073x_dev_ref_is_status_ok(struct zl3073x_dev *zldev, u8 index)
- 	return zl3073x_ref_is_status_ok(ref);
- }
- 
--/**
-- * zl3073x_dev_synth_dpll_get - get DPLL ID the synth is driven by
-- * @zldev: pointer to zl3073x device
-- * @index: synth index
-- *
-- * Return: ID of DPLL the given synthetizer is driven by
-- */
--static inline u8
--zl3073x_dev_synth_dpll_get(struct zl3073x_dev *zldev, u8 index)
--{
--	const struct zl3073x_synth *synth;
--
--	synth = zl3073x_synth_state_get(zldev, index);
--	return zl3073x_synth_dpll_get(synth);
--}
--
- /**
-  * zl3073x_dev_synth_freq_get - get synth current freq
-  * @zldev: pointer to zl3073x device
-@@ -289,22 +243,6 @@ zl3073x_dev_synth_freq_get(struct zl3073x_dev *zldev, u8 index)
- 	return zl3073x_synth_freq_get(synth);
- }
- 
--/**
-- * zl3073x_dev_synth_is_enabled - check if the given synth is enabled
-- * @zldev: pointer to zl3073x device
-- * @index: synth index
-- *
-- * Return: true if synth is enabled, false otherwise
-- */
--static inline bool
--zl3073x_dev_synth_is_enabled(struct zl3073x_dev *zldev, u8 index)
--{
--	const struct zl3073x_synth *synth;
--
--	synth = zl3073x_synth_state_get(zldev, index);
--	return zl3073x_synth_is_enabled(synth);
--}
--
- /**
-  * zl3073x_dev_out_synth_get - get synth connected to given output
-  * @zldev: pointer to zl3073x device
-@@ -341,21 +279,6 @@ zl3073x_dev_out_is_enabled(struct zl3073x_dev *zldev, u8 index)
- 	return zl3073x_synth_is_enabled(synth) && zl3073x_out_is_enabled(out);
- }
- 
--/**
-- * zl3073x_dev_out_signal_format_get - get output signal format
-- * @zldev: pointer to zl3073x device
-- * @index: output index
-- *
-- * Return: signal format of given output
-- */
--static inline u8
--zl3073x_dev_out_signal_format_get(struct zl3073x_dev *zldev, u8 index)
--{
--	const struct zl3073x_out *out = zl3073x_out_state_get(zldev, index);
--
--	return zl3073x_out_signal_format_get(out);
--}
--
- /**
-  * zl3073x_dev_out_dpll_get - get DPLL ID the output is driven by
-  * @zldev: pointer to zl3073x device
--- 
-2.51.0
-
+I am not sure this path was setting qdisc_pkt_len() either...
 
