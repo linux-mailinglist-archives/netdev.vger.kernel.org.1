@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-237133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id F198EC45B53
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 10:46:45 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 622B5C45B56
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 10:47:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A007D4E99FF
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 09:46:11 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C2C114E9C97
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 09:46:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79546302760;
-	Mon, 10 Nov 2025 09:45:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37283302158;
+	Mon, 10 Nov 2025 09:45:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="17pW+k5C"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C4mqSD7w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5290302158
-	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 09:45:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95DE630276D
+	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 09:45:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762767934; cv=none; b=aQtol0Nnggz8YQP3+dcWFI2tchYnwYx1JyTC8IxOUUDLeOCR/IQFWVRJIYW4mhS0JdUHErZGY24COxTJHKsbTsjcYRe291+RhbPg5B/6uD4a3NT7OWtW0ybJwbZwz35t9vcSplRK99m9E2bcBnmF2OKJvIlPByhWSf1qbY3Jzek=
+	t=1762767936; cv=none; b=FREunfgLjlJRMBHqg479iSN7tvsRmHBHivLAQeUlIXpzdIJlryixUEnOqopC8BZyxYpswz977QxUpjVNhAshXblJkzokTvukhCcVKELrN676Z7WSquHHqCWWedQzLVYiEobuEB0Z6wTIsSInD3N01KGMgNqnEZJR1W7gCdkEo7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762767934; c=relaxed/simple;
-	bh=WbgbEWH//Ad7zoVs46W86iap+3YMcevGaluj9W1QLpc=;
+	s=arc-20240116; t=1762767936; c=relaxed/simple;
+	bh=U+Q6HBkH/EaqnFacmeBoCewhqW5AE4SIxWOsZaRzYRw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=fhwJsP1JgFGTQWXcwlfDhMdPo1zF+npjpRNZQ1fmFlPvDh1HSV2JAdRjJzoAKPHQMCw1co4o6Tm7NNdfy+GgiebWB7yY/0QF8la4WNxN7qxwALddNvD9iSmHcIexpw4dWKQ7viNJtp6BUndi+XaFXiwytH+sgkMtzgxZP5l7lu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=17pW+k5C; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=ZbouwzdyRqWUo373FHasJyutbX68yEBSNbWhzxF7XpUPq0QpsY4DquRhf5bYVYrB4uG32VaOMeioPZMT41zsXGSdEQJYSoefbsO4V27VyMEh6VYtu+AG9YtUmcSJSEeQ3Sd8bdelesvYCAioqxKDl5q+ehGX1hFJwCn6Q0jqPvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C4mqSD7w; arc=none smtp.client-ip=209.85.160.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-786a0fe77d9so46839047b3.1
-        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 01:45:32 -0800 (PST)
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-4ed74e6c468so37700111cf.3
+        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 01:45:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762767932; x=1763372732; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1762767933; x=1763372733; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=R1S3tHvUI2JwnHZb5ykTGUNH7xemy+ivFYSnPdOb1Uw=;
-        b=17pW+k5CN36jL0naAksuP8WgJtY9t53HmfdYTTXuzUX9e08Ukegn+HxBt0n1L+GyOx
-         dfYBNQOumLQxrETG3Ihqi1EjXVcOxMqLWmOTM/PvRzByARsJJ0clRDfwHpQ24NlXGLMm
-         ZWppsJAefRvCNcPCHEgTxWYXKdDB3rj6nKTRqGS52SE4D61PEw2BpEFIoT1yXbhIZMVa
-         TyxtI7Yi4OuMDNztMlSy4c5IbeGl4fLR548ynRqroA9ms/kvZH+aMyyV5wW6dVW8FebV
-         ghm8Pm3qiIQIXcSt06Su1GgpZFcSus+Ot+jxLYmbZAC64z++Lb8T97Lx3dCC2H7K4IYv
-         KRYg==
+        bh=6rxQWPw07IXljR6ASfzKxXbue0kpoNIeXhvJKhiunWs=;
+        b=C4mqSD7w6GsPDkoowK5ltkzRlzyySqGUsD7Nqz5IFxBLdz0fqAKXdYMGv0zbX6Y/bI
+         yKMtunE7hSFa5Bp//NHCpy1n+G4BhXUu2FEUaPn7kDzWBtfVF3xcvO6e+CEgWNu93RFy
+         KAOvLtteWd0k2LbuIr7ngdkefZLL0Cki9yqCZaoTqftnp+gmjKo9jh2LLzIpMYUJLdj2
+         XepkK0Dv2s5FKoGJWlsJ6VTVhAoT1JCsDMKXy1Lu2MwWfjLJiiasAM2xGUH48Nlcb+qY
+         hzBrPnG+ke/5GFjsix2WSQj0spmRU11/leqpgCtplC7vLkm4pef0Woi1EOwvTnbPyufb
+         MQeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762767932; x=1763372732;
+        d=1e100.net; s=20230601; t=1762767933; x=1763372733;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=R1S3tHvUI2JwnHZb5ykTGUNH7xemy+ivFYSnPdOb1Uw=;
-        b=o6T1MLw5gmlI2CLQZn45JJF+QOds/hZMxmhkPjM6M9iVycTr/gZh0o7TlnClTyIjP/
-         t/HDXVlUiTXClAxaR0YdNqe+0puK9ps7BRdzcF3cRaqUFtyJUE9aS1oK0E+sNZX+6kEN
-         BCkkoKnpfuHtR5QGdot0d2b0YQZpL45VpgGr/yvzqwzdrdOEhHKoMmrVsxdFduIAiaha
-         ZnBwIFPWHyM0sVwa9SuTn67LOB7b35eko6/GqxZhORsy+wrpmznQCSa3rXvjBcya/7ys
-         jKTPeNYn9SdVBZ/YFWP7JOd6o3dTWtgQ7WnD8/QYh+2bILYz8e7qYkZAnvFuLalqgZUK
-         rDIg==
-X-Forwarded-Encrypted: i=1; AJvYcCWfP/m0MM5Uy+vPpVsFZ+mUuuGzfmEJbYos1VsDEUsyE3kZ/35FtRrvzk7R3VNa8AHzdUyixY8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjUpGY4ZqVxo5dZhNHAJRdUXfgw9Tpv2BZ7/TArN3rTJeHcSMb
-	++e/6s2BpcgUnRf5e4mEQj41lSFQVz3uowl7S8mHIvXrdSXM08NnfbkuaVT7pC51P3jSzT1V94c
-	tVHWKBrH5xPC4xA==
-X-Google-Smtp-Source: AGHT+IEBcNtpHmKPZB1r1iQAChT69UhdBnOy32U7kRnCzoc2bJxZCAJaukbC9HqXJoQWWbYrn8JisOUMbqe6yw==
-X-Received: from ywbdb15.prod.google.com ([2002:a05:690c:dcf:b0:787:d456:2e83])
+        bh=6rxQWPw07IXljR6ASfzKxXbue0kpoNIeXhvJKhiunWs=;
+        b=XnP3hu0lkRPB9YQs6nE62SMKOLyQsdRkwOT6yKyQcp5Woa6Jm9x4Po1IFL6QQC3/4G
+         H3x6AR49OaZ9q9WCnMzibpfeGiGIyWdnARQOH2kzCfreyI16zWzlTFuSD/ENEU+uNhXQ
+         kGXo0/Vu0liilETH1kedmpnZPS/3HMGktayxNfc7GdaZgtL579YPhEwq2IoO169yRT0T
+         FFzg/ye2iuwPN3O/7KXz9Ky0LD9jrCcpTfeMnU4rEkffugi7pbfeXgpIrVB9DcnTopM/
+         PCSgKwxlApK4w0Y7CI5zNPo01gDcQmTUtGssEMVsUVkWldPFKX0B27hA35KdaSdLLTdx
+         z+MA==
+X-Forwarded-Encrypted: i=1; AJvYcCXZ//GyzXUcmekmjKsnd6MlFGC5udL+UkWd3Or8mv8Teh4HMARDfXlXDfNxn/U0QLftR2QOAL8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBC4POxC8uP2lCUOj/MCpob35oXAYdionh0YDncLKwvASP0/1Q
+	6IK+5EFhquy9egbnX5AgiGMRsGNXUvLK63vQVix7c7jM1Mso532ujeDglNG0aLPgGf5E3n2iVjj
+	LnxGEQHW4jXQBqw==
+X-Google-Smtp-Source: AGHT+IEpAKKw+3phdqFTUURQ/Vub+BNZ7qJyjWD0HHWaDXEPjJLnvqu7fI8OEgFOnEXkbcNbMNrZu37I7IBxtA==
+X-Received: from qvlh19.prod.google.com ([2002:a0c:f413:0:b0:880:6bc3:488e])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:690c:6284:b0:787:c849:6544 with SMTP id 00721157ae682-787d535092cmr71778847b3.5.1762767931958;
- Mon, 10 Nov 2025 01:45:31 -0800 (PST)
-Date: Mon, 10 Nov 2025 09:45:02 +0000
+ 2002:ac8:5907:0:b0:4e8:abbc:a7d7 with SMTP id d75a77b69052e-4eda4ff5eacmr84332911cf.84.1762767933531;
+ Mon, 10 Nov 2025 01:45:33 -0800 (PST)
+Date: Mon, 10 Nov 2025 09:45:03 +0000
 In-Reply-To: <20251110094505.3335073-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,9 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251110094505.3335073-1-edumazet@google.com>
 X-Mailer: git-send-email 2.51.2.1041.gc1ab5b90ca-goog
-Message-ID: <20251110094505.3335073-8-edumazet@google.com>
-Subject: [PATCH net-next 07/10] net_sched: sch_fq: move qdisc_bstats_update()
- to fq_dequeue_skb()
+Message-ID: <20251110094505.3335073-9-edumazet@google.com>
+Subject: [PATCH net-next 08/10] net_sched: sch_fq: prefetch one skb ahead in dequeue()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -87,38 +86,51 @@ Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Group together changes to qdisc fields to reduce chances of false sharing
-if another cpu attempts to acquire the qdisc spinlock.
+prefetch the skb that we are likely to dequeue at the next dequeue().
 
-  qdisc_qstats_backlog_dec(sch, skb);
-  sch->q.qlen--;
-  qdisc_bstats_update(sch, skb);
+Also call fq_dequeue_skb() a bit sooner in fq_dequeue().
+
+This reduces the window between read of q.qlen and
+changes of fields in the cache line that could be dirtied
+by another cpu trying to queue a packet.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/sched/sch_fq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/sched/sch_fq.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
-index fee922da2f99c0c7ac6d86569cf3bbce47898951..0b0ca1aa9251f959e87dd5dc504fbe0f4cbc75eb 100644
+index 0b0ca1aa9251f959e87dd5dc504fbe0f4cbc75eb..6e5f2f4f241546605f8ba37f96275446c8836eee 100644
 --- a/net/sched/sch_fq.c
 +++ b/net/sched/sch_fq.c
-@@ -497,6 +497,7 @@ static void fq_dequeue_skb(struct Qdisc *sch, struct fq_flow *flow,
- 	skb_mark_not_on_list(skb);
- 	qdisc_qstats_backlog_dec(sch, skb);
- 	sch->q.qlen--;
-+	qdisc_bstats_update(sch, skb);
- }
- 
- static void flow_queue_add(struct fq_flow *flow, struct sk_buff *skb)
-@@ -776,7 +777,6 @@ static struct sk_buff *fq_dequeue(struct Qdisc *sch)
- 		f->time_next_packet = now + len;
- 	}
- out:
--	qdisc_bstats_update(sch, skb);
- 	return skb;
- }
- 
+@@ -480,7 +480,10 @@ static void fq_erase_head(struct Qdisc *sch, struct fq_flow *flow,
+ 			  struct sk_buff *skb)
+ {
+ 	if (skb == flow->head) {
+-		flow->head = skb->next;
++		struct sk_buff *next = skb->next;
++
++		prefetch(next);
++		flow->head = next;
+ 	} else {
+ 		rb_erase(&skb->rbnode, &flow->t_root);
+ 		skb->dev = qdisc_dev(sch);
+@@ -712,6 +715,7 @@ static struct sk_buff *fq_dequeue(struct Qdisc *sch)
+ 			goto begin;
+ 		}
+ 		prefetch(&skb->end);
++		fq_dequeue_skb(sch, f, skb);
+ 		if ((s64)(now - time_next_packet - q->ce_threshold) > 0) {
+ 			INET_ECN_set_ce(skb);
+ 			q->stat_ce_mark++;
+@@ -719,7 +723,6 @@ static struct sk_buff *fq_dequeue(struct Qdisc *sch)
+ 		if (--f->qlen == 0)
+ 			q->inactive_flows++;
+ 		q->band_pkt_count[fq_skb_cb(skb)->band]--;
+-		fq_dequeue_skb(sch, f, skb);
+ 	} else {
+ 		head->first = f->next;
+ 		/* force a pass through old_flows to prevent starvation */
 -- 
 2.51.2.1041.gc1ab5b90ca-goog
 
