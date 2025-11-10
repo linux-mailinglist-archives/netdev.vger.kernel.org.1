@@ -1,352 +1,148 @@
-Return-Path: <netdev+bounces-237263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27E0CC47D16
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 17:13:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF85AC47D3C
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 17:15:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EC6754F1A0B
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 16:02:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98A844A1543
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 16:04:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FDA0277C9A;
-	Mon, 10 Nov 2025 16:02:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E328D277C9A;
+	Mon, 10 Nov 2025 16:04:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IQ9iZFiJ"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Ab8K8VWU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+Received: from mail-pl1-f225.google.com (mail-pl1-f225.google.com [209.85.214.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1797279DB1
-	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 16:02:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C1BB228CA9
+	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 16:04:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762790535; cv=none; b=VQS/5/4xozDZW/SozXuMum+jnhnj/Jc2o3/RAh/nNtAs7QzDRWh1VRaQsTsessDcejSR1+SMWCEijcGmbP2jWNrOtqoIWYOeRyQ3GUepQKqy0638+X+8k7kcwDuGOm/pOoCxZm2LpcT/l/vS8N4rrn4bZ5580BB8BMBvucofjQk=
+	t=1762790688; cv=none; b=G9HTpc0H8LyRfPNO7grN4r2JWOvBzseql58Qy1xkYyQoU3ApOSCLMXgRH+gjuvUPD7NLkY5Drug1rjnG4AkkMM/UY9qd20jZAqPZeewMzxfLfCIS9EgxZpTUAEwATRq4pA1XdaXGcMynFHoU8FzXNeQLjZA3Zjpr8m8FtBv+9PU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762790535; c=relaxed/simple;
-	bh=sHhrzAfLMB9xUtBdjScQshjit/fi3WqZTotpnb7tg0A=;
-	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ATA6SByC53i1kWLsV6qzDsgOceN7TafL/2zZSsC+/tsEQqjgpURBl8eK8dlLN/gpOEZ3mR2nS/dY5wsELpPYMAyZ/hyUSUia5YjpOyqOI1Gn1SPJP4Khz0/i2KPzZcQPhmGZ7/aejXNZ7n5uiolc45Kd9iX2XypVMhM65gumTvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IQ9iZFiJ; arc=none smtp.client-ip=209.85.215.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-b550eff972eso1873163a12.3
-        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 08:02:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762790532; x=1763395332; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:message-id:date:cc:to:from:subject:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=378CvQzORWXRuJZwkSj1ctKhT3bdYrfd/uZ3cPX6Z58=;
-        b=IQ9iZFiJxbSXYnSWG6YSEnDDhmWPmQWA7ML1WeO9mP2D2PnfMwK65Wu7Q4Geq2qlMD
-         D0RGr8sxvdjz1a6YnSM+tSRAc3mReoByr68At/tFO/dZYxXNzMuCdejHyhr+ykCPmW/C
-         M5X6M4R73SoycVurVkAU8WXPvnw2Bu5Og53+s0IYwoW0zkgoARKf9xInwfTEZlBFEXR5
-         gvWuRsaoocwfsSqDIhY0RvxllcZgs7bur5vCq3+VIri0gNCvfoz7DU+YRDzO5EbkHEwi
-         /BJ06rHMwN2onntXqdA8k5IUxII7ytMBK7x2CzcHcR4DSZdoD4OuOM/xZSVnlNmPX2vL
-         q62Q==
+	s=arc-20240116; t=1762790688; c=relaxed/simple;
+	bh=xsCQeyVupDZ70P10hcuA2gENJ0NgW9gpLTOfi9ZPS6I=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=Xg2F5/orVBrE2jyX0ix1U7mmo6PI9CCLmFJfHU6So3PS6Y4ptXigaMCWrflmM3fT5y12EfBqKtD/GCaK59n1zSbZA2vxfxSSq/Dom/rh3WBdCMI3uG/J2y/Vv2tvhoBZ1Q9AY7I6tEposN/jJl/us9h2+hOUOxnHkOnmF9IZ0j8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Ab8K8VWU; arc=none smtp.client-ip=209.85.214.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f225.google.com with SMTP id d9443c01a7336-298145fe27eso14791575ad.1
+        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 08:04:47 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762790532; x=1763395332;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:message-id:date:cc:to:from:subject:x-gm-gg
+        d=1e100.net; s=20230601; t=1762790686; x=1763395486;
+        h=content-transfer-encoding:mime-version:message-id:references
+         :in-reply-to:subject:cc:to:from:date:dkim-signature:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=378CvQzORWXRuJZwkSj1ctKhT3bdYrfd/uZ3cPX6Z58=;
-        b=P8pMcBz0HgXxWt85biTnkt20jSNrCCvOo89O/XdhK85k1p2Erzh3AeBuBOTDd6Gi4n
-         urdhWFTRZutbjnKRLPJJL+2ysjOXatPEQAHp2HyN1i8vdmBJYsHtWbl8fHCtwYjCvujf
-         1hswjGRSMzfRUt/xAONVEnQHvJflJZdi/ofnoPtXnOOfA+hLAwinJibpGKEZAU7e6Nsb
-         1qdcRXmpTq7CQrM7mTefil6DfKImHbTG7vQyRWLJZoHDah+FQPhP8icioMgRMi/C4GBo
-         UJzheyyro9pVuO8AiYUP0PHsbssjECIBWiuh6KH46k9mvg8vJ1eE34XFMID9Yb6Cq40i
-         6kNw==
-X-Gm-Message-State: AOJu0Yw+D6LfAKrtA9FSTXfQIMK/KeaZiUhSJMMJP1DV7eNKZTmsThA7
-	iFStkHOL+kIU8RoUTveJXclmKsjoBe4qZfp8ocoXjtHF6MbIIoi0ViIlw1/3Tw==
-X-Gm-Gg: ASbGncu6CKb71EdJa8cc38T8hfn1ByNVNdAex6Am7bhdjOxZqHIpVYf7z50V86dBKdr
-	4SPXGloOj4UEm1/vf2HMlGEQSfSD3VIcwiNJQcbd/hyBJ2dvt9nY9jRfbwQ6BA3fKMpPHkMcM76
-	JsgXlJ/80YVKaDCln3ysTs5V5bVG/QvZUjK8v8lQDdQcA8Pveygmmw+v9T63ghK385kC55a+TH+
-	SjB3xedHV4zikK4KLLiE6x8fXVgdmoMiKOhZbLPj+N/B8oUymUcsok23wFtrCcsZpdmBTC9fEsh
-	chogbc/51tKRVl+ZCuqbOIgGwF9YzsZ2MCUHqKwUWFNJ1pSOo9J2maNBfR9zCz8tCGP100lqnbq
-	5s0LMHS71fNuWktowkrdXJh0emCIRZhwa8MuHFUBSldOe0FMGYmEfXEudtHyV1OReR8fnI8FwIc
-	UUNqRvKWS6blAJVDVfGqJAM5Zb93TkIVPFqB4406bUtY2n
-X-Google-Smtp-Source: AGHT+IFFS7qoc+sKO7s7yJlr+M3siXx5VrfCN8e2hHTgUwuYG3tX31+dlCV0pmy1xqOX33zQfVrG5w==
-X-Received: by 2002:a17:902:ea10:b0:290:91d2:9304 with SMTP id d9443c01a7336-297e5411b0emr102012345ad.4.1762790531718;
-        Mon, 10 Nov 2025 08:02:11 -0800 (PST)
-Received: from ahduyck-xeon-server.home.arpa ([2605:59c8:829:4c00:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-297ed6808ddsm76806025ad.17.2025.11.10.08.02.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Nov 2025 08:02:10 -0800 (PST)
-Subject: [net-next PATCH v3 10/10] fbnic: Replace use of internal PCS w/
- Designware XPCS
-From: Alexander Duyck <alexander.duyck@gmail.com>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org, kernel-team@meta.com, andrew+netdev@lunn.ch,
- hkallweit1@gmail.com, linux@armlinux.org.uk, pabeni@redhat.com,
- davem@davemloft.net
-Date: Mon, 10 Nov 2025 08:02:09 -0800
-Message-ID: 
- <176279052948.2130772.667088346078043043.stgit@ahduyck-xeon-server.home.arpa>
-In-Reply-To: 
- <176279018050.2130772.17812295685941097123.stgit@ahduyck-xeon-server.home.arpa>
-References: 
- <176279018050.2130772.17812295685941097123.stgit@ahduyck-xeon-server.home.arpa>
-User-Agent: StGit/1.5
+        bh=xsCQeyVupDZ70P10hcuA2gENJ0NgW9gpLTOfi9ZPS6I=;
+        b=EoHYyWu9H5ELDFu6EwGWPTN76mVBkHhyUcQ+6dp2q9go1SocHlgA9TSy0Q55mFzBK1
+         vGnmAbhXrKaI/6A/JDKSsZOrUxpCeP/lZ0W4qfabiwzSN0ifpqn4A0KatBsnhNPHNyjW
+         E+CofvLnCagT5jbRr7PyfUIsGUfwaPig5Sc/poXuAjl68wGxLzOEPndc8M5QVLf5S0qv
+         tQavWZhtVOzLmQaUg7P2OmQlg7IN+G79WR7XK0fYAHF3rgOgAH0+0WAZsIw2vUBDkeek
+         /b5PB9OMNbuChipKwd1/h/ujReVJHIVXynaaZxcqjUfS4hbQfTUPZInqTPput9nq1/To
+         do/g==
+X-Forwarded-Encrypted: i=1; AJvYcCWM6sgKMAiGW4MmIdSmXwvy8ZFfXK8xSXcOwGmbGK2mrbp5NwabizTP12RQomU8aqRXSIgKFWM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzIPKyw0nKYcTCQsCFbwkmfA2tgTUs4S4qekeTca5g9ThysVaZK
+	v7Zju4vWjvFiMqg14nWLRIPV8yJ8SDxCgE7Irdj1e/PKAkwvL4ehPPtrVYWK8SckOuvKUaHZRUI
+	ANuIBD6Jo7rWLP6GqhAXXOJqHBY6eHMc6S3mDQZYBmbwkgY2QGKaRSPZDS57VgifESSfY38SRTK
+	NE5B6K2jk+nniwg92o2tKbS2J1470oWZnNjiTHzYodxUY4u60TogSVd9y2kc9+Njv+Pz1SZTn3X
+	hOPWQk1KPhwVOY7
+X-Gm-Gg: ASbGnctkVGqO6Lc4hIDELBQTOIIIUBoBgoJVJv94RTEeOZXZZq33sg8XuoIlU/7mslX
+	JUTkZ+JQD5LaXj3kXNyD6oSdf9S7rjbT8/B4utzb/bO973fpYoCBqPffuXlJK6bdP7Rfr0vPWLp
+	jUCMxE8fgZGy3saIz2PUcvOlyr5Lw/tgau5tYH5qQPnL6dMGptfq6sgQdOqeEUGy77vTtHJOSrP
+	MwzHEPyTROEQlWn/5NO3jvlGX9wsNRDpYY0sC5fKQ4bxtExwJraBNiM92a9xDkw+PiA0AhZ08L+
+	WzizF33Qv9xt5GqNLafYCyH2ixfH3GhPcsBIeOl5yC+vEvZRPHN1DBgJhD84gkAG8OQomP+EygP
+	spD9pQGtehVV8ftycjU7KketzUsIUAzCjcIXsyLdBAjS3iiPCYbALlaLP7N3tU9JtVI6/0zRANn
+	VOhh1T92WCV6VI/bR0A5rd/TOiHEv5XvBLABMr9Ro=
+X-Google-Smtp-Source: AGHT+IF2maxCxijobChX5udhhWHRhWV7xhkRyQwFJ9OvYqtpBX6QsZQ8IJJmXDYIXNvARkjFyaIc1N/bmHtA
+X-Received: by 2002:a17:903:2311:b0:295:9e4e:4092 with SMTP id d9443c01a7336-297e571bcfdmr113815895ad.56.1762790686300;
+        Mon, 10 Nov 2025 08:04:46 -0800 (PST)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-12.dlp.protect.broadcom.com. [144.49.247.12])
+        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-298009d834asm6173285ad.16.2025.11.10.08.04.45
+        for <netdev@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 10 Nov 2025 08:04:46 -0800 (PST)
+X-Relaying-Domain: broadcom.com
+X-CFilter-Loop: Reflected
+Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-7b0e73b0eadso7152350b3a.3
+        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 08:04:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1762790684; x=1763395484; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:references
+         :in-reply-to:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xsCQeyVupDZ70P10hcuA2gENJ0NgW9gpLTOfi9ZPS6I=;
+        b=Ab8K8VWUF5lFwcaG39BN5HRtuy9WBb9T70SvNmz4gmr7sHFpvzg+OKkemTCI5ZWjHr
+         0/Lpm0iinaZ3b2lw29bq11wI8hJj2eRT8u0FaP0gVIbV7EHdcHoGpmGj/HVLDMleKwQY
+         Z0jILx8VfyBykGbgc9/tKj8QhSZ5zRrhHbQgY=
+X-Forwarded-Encrypted: i=1; AJvYcCUQNusjJTL1VwxjrfjFVVi/Jg6jmhSCWldgp3433871Ri+zu/M8q2v8K3c8FLdqhBpZVHbuaig=@vger.kernel.org
+X-Received: by 2002:a05:6a00:bd83:b0:7a2:83f2:4989 with SMTP id d2e1a72fcca58-7b225aea11cmr10247674b3a.5.1762790683943;
+        Mon, 10 Nov 2025 08:04:43 -0800 (PST)
+X-Received: by 2002:a05:6a00:bd83:b0:7a2:83f2:4989 with SMTP id d2e1a72fcca58-7b225aea11cmr10247634b3a.5.1762790683437;
+        Mon, 10 Nov 2025 08:04:43 -0800 (PST)
+Received: from ehlo.thunderbird.net ([2600:8802:b00:ba1:b6a4:5eaf:bf66:49de])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b0ca1e718asm12233192b3a.30.2025.11.10.08.04.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Nov 2025 08:04:42 -0800 (PST)
+Date: Mon, 10 Nov 2025 08:04:38 -0800
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+To: Jonas Gorski <jonas.gorski@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ =?ISO-8859-1?Q?=C1lvaro_Fern=E1ndez_Rojas?= <noltari@gmail.com>,
+ Vivien Didelot <vivien.didelot@gmail.com>
+CC: Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_net=5D_net=3A_dsa=3A_tag=5Fbrcm=3A_do_?=
+ =?US-ASCII?Q?not_mark_link_local_traffic_as_offloaded?=
+In-Reply-To: <20251109134635.243951-1-jonas.gorski@gmail.com>
+References: <20251109134635.243951-1-jonas.gorski@gmail.com>
+Message-ID: <BBB3B106-E173-4098-A90A-3A75C2C545B6@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-From: Alexander Duyck <alexanderduyck@fb.com>
+On November 9, 2025 5:46:35 AM PST, Jonas Gorski <jonas=2Egorski@gmail=2Eco=
+m> wrote:
+>Broadcom switches locally terminate link local traffic and do not
+>forward it, so we should not mark it as offloaded=2E
+>
+>In some situations we still want/need to flood this traffic, e=2Eg=2E if =
+STP
+>is disabled, or it is explicitly enabled via the group_fwd_mask=2E But if
+>the skb is marked as offloaded, the kernel will assume this was already
+>done in hardware, and the packets never reach other bridge ports=2E
+>
+>So ensure that link local traffic is never marked as offloaded, so that
+>the kernel can forward/flood these packets in software if needed=2E
+>
+>Since the local termination in not configurable, check the destination
+>MAC, and never mark packets as offloaded if it is a link local ether
+>address=2E
+>
+>While modern switches set the tag reason code to BRCM_EG_RC_PROT_TERM
+>for trapped link local traffic, they also set it for link local traffic
+>that is flooded (01:80:c2:00:00:10 to 01:80:c2:00:00:2f), so we cannot
+>use it and need to look at the destination address for them as well=2E
+>
+>Fixes: 964dbf186eaa ("net: dsa: tag_brcm: add support for legacy tags")
+>Fixes: 0e62f543bed0 ("net: dsa: Fix duplicate frames flooded by learning"=
+)
+>Signed-off-by: Jonas Gorski <jonas=2Egorski@gmail=2Ecom>
 
-As we have exposed the PCS registers via the SWMII we can now start looking
-at connecting the XPCS driver to those registers and let it mange the PCS
-instead of us doing it directly from the fbnic driver.
+Reviewed-by: Florian Fainelli <florian=2Efainelli@broadcom=2Ecom>
 
-For now this just gets us the ability to detect link. The hop is in the
-future to add some of the vendor specific registers to being enabling XPCS
-configuration of the interface.
-
-Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
----
- drivers/net/ethernet/meta/Kconfig               |    1 
- drivers/net/ethernet/meta/fbnic/fbnic_irq.c     |    2 
- drivers/net/ethernet/meta/fbnic/fbnic_netdev.c  |    7 --
- drivers/net/ethernet/meta/fbnic/fbnic_netdev.h  |    4 +
- drivers/net/ethernet/meta/fbnic/fbnic_phylink.c |  104 +++++++++++------------
- 5 files changed, 55 insertions(+), 63 deletions(-)
-
-diff --git a/drivers/net/ethernet/meta/Kconfig b/drivers/net/ethernet/meta/Kconfig
-index dff51f23d295..ca5c7ac2a5bc 100644
---- a/drivers/net/ethernet/meta/Kconfig
-+++ b/drivers/net/ethernet/meta/Kconfig
-@@ -26,6 +26,7 @@ config FBNIC
- 	depends on PTP_1588_CLOCK_OPTIONAL
- 	select NET_DEVLINK
- 	select PAGE_POOL
-+	select PCS_XPCS
- 	select PHYLINK
- 	select PLDMFW
- 	help
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_irq.c b/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
-index 73dd10b7a1a8..f2ccb33fa67a 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
-@@ -143,7 +143,7 @@ static irqreturn_t fbnic_mac_msix_intr(int __always_unused irq, void *data)
- 		 */
- 		if (netif_carrier_ok(fbd->netdev))
- 			fbn->link_down_events += link_down_event;
--		phylink_pcs_change(&fbn->phylink_pcs, false);
-+		phylink_pcs_change(fbn->pcs, false);
- 	}
- 
- 	return IRQ_HANDLED;
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-index 65318a5b466e..81c9d5c9a4b2 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-@@ -697,10 +697,7 @@ void fbnic_reset_queues(struct fbnic_net *fbn,
-  **/
- void fbnic_netdev_free(struct fbnic_dev *fbd)
- {
--	struct fbnic_net *fbn = netdev_priv(fbd->netdev);
--
--	if (fbn->phylink)
--		phylink_destroy(fbn->phylink);
-+	fbnic_phylink_destroy(fbd->netdev);
- 
- 	free_netdev(fbd->netdev);
- 	fbd->netdev = NULL;
-@@ -802,7 +799,7 @@ struct net_device *fbnic_netdev_alloc(struct fbnic_dev *fbd)
- 
- 	netif_tx_stop_all_queues(netdev);
- 
--	if (fbnic_phylink_init(netdev)) {
-+	if (fbnic_phylink_create(netdev)) {
- 		fbnic_netdev_free(fbd);
- 		return NULL;
- 	}
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-index c2e45ff64e34..54a8bf172fa6 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-@@ -44,7 +44,7 @@ struct fbnic_net {
- 
- 	struct phylink *phylink;
- 	struct phylink_config phylink_config;
--	struct phylink_pcs phylink_pcs;
-+	struct phylink_pcs *pcs;
- 
- 	u8 aui;
- 	u8 fec;
-@@ -106,6 +106,8 @@ int fbnic_phylink_ethtool_ksettings_get(struct net_device *netdev,
- 					struct ethtool_link_ksettings *cmd);
- int fbnic_phylink_get_fecparam(struct net_device *netdev,
- 			       struct ethtool_fecparam *fecparam);
-+int fbnic_phylink_create(struct net_device *netdev);
-+void fbnic_phylink_destroy(struct net_device *netdev);
- int fbnic_phylink_init(struct net_device *netdev);
- void fbnic_phylink_pmd_training_complete_notify(struct net_device *netdev);
- bool fbnic_check_split_frames(struct bpf_prog *prog,
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-index 592e9642a418..188155f43416 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-@@ -1,6 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0
- /* Copyright (c) Meta Platforms, Inc. and affiliates. */
- 
-+#include <linux/pcs/pcs-xpcs.h>
- #include <linux/phy.h>
- #include <linux/phylink.h>
- 
-@@ -101,56 +102,6 @@ int fbnic_phylink_get_fecparam(struct net_device *netdev,
- 	return 0;
- }
- 
--static struct fbnic_net *
--fbnic_pcs_to_net(struct phylink_pcs *pcs)
--{
--	return container_of(pcs, struct fbnic_net, phylink_pcs);
--}
--
--static void
--fbnic_phylink_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
--			    struct phylink_link_state *state)
--{
--	struct fbnic_net *fbn = fbnic_pcs_to_net(pcs);
--	struct fbnic_dev *fbd = fbn->fbd;
--
--	switch (fbn->aui) {
--	case FBNIC_AUI_25GAUI:
--		state->speed = SPEED_25000;
--		break;
--	case FBNIC_AUI_LAUI2:
--	case FBNIC_AUI_50GAUI1:
--		state->speed = SPEED_50000;
--		break;
--	case FBNIC_AUI_100GAUI2:
--		state->speed = SPEED_100000;
--		break;
--	default:
--		state->link = 0;
--		return;
--	}
--
--	state->duplex = DUPLEX_FULL;
--
--	state->link = (fbd->pmd_state == FBNIC_PMD_SEND_DATA) &&
--		      (rd32(fbd, FBNIC_PCS(MDIO_STAT1, 0)) &
--		       MDIO_STAT1_LSTATUS);
--}
--
--static int
--fbnic_phylink_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
--			 phy_interface_t interface,
--			 const unsigned long *advertising,
--			 bool permit_pause_to_mac)
--{
--	return 0;
--}
--
--static const struct phylink_pcs_ops fbnic_phylink_pcs_ops = {
--	.pcs_config = fbnic_phylink_pcs_config,
--	.pcs_get_state = fbnic_phylink_pcs_get_state,
--};
--
- static struct phylink_pcs *
- fbnic_phylink_mac_select_pcs(struct phylink_config *config,
- 			     phy_interface_t interface)
-@@ -158,7 +109,7 @@ fbnic_phylink_mac_select_pcs(struct phylink_config *config,
- 	struct net_device *netdev = to_net_dev(config->dev);
- 	struct fbnic_net *fbn = netdev_priv(netdev);
- 
--	return &fbn->phylink_pcs;
-+	return fbn->pcs;
- }
- 
- static int
-@@ -227,13 +178,33 @@ static const struct phylink_mac_ops fbnic_phylink_mac_ops = {
- 	.mac_link_up = fbnic_phylink_mac_link_up,
- };
- 
--int fbnic_phylink_init(struct net_device *netdev)
-+/**
-+ * fbnic_phylink_create - Phylink device creation
-+ * @netdev: Network Device struct to attach phylink device
-+ *
-+ * Initialize and attach a phylink instance to the device. The phylink
-+ * device will make use of the netdev struct to track carrier and will
-+ * eventually be used to expose the current state of the MAC and PCS
-+ * setup.
-+ *
-+ * Return: 0 on success, negative on failure
-+ **/
-+int fbnic_phylink_create(struct net_device *netdev)
- {
- 	struct fbnic_net *fbn = netdev_priv(netdev);
- 	struct fbnic_dev *fbd = fbn->fbd;
-+	struct phylink_pcs *pcs;
- 	struct phylink *phylink;
-+	int err;
-+
-+	pcs = xpcs_create_pcs_mdiodev(fbd->mdio_bus, 0);
-+	if (IS_ERR(pcs)) {
-+		err = PTR_ERR(pcs);
-+		dev_err(fbd->dev, "Failed to create PCS device: %d\n", err);
-+		return err;
-+	}
- 
--	fbn->phylink_pcs.ops = &fbnic_phylink_pcs_ops;
-+	fbn->pcs = pcs;
- 
- 	fbn->phylink_config.dev = &netdev->dev;
- 	fbn->phylink_config.type = PHYLINK_NETDEV;
-@@ -256,14 +227,35 @@ int fbnic_phylink_init(struct net_device *netdev)
- 	phylink = phylink_create(&fbn->phylink_config, NULL,
- 				 fbnic_phylink_select_interface(fbn->aui),
- 				 &fbnic_phylink_mac_ops);
--	if (IS_ERR(phylink))
--		return PTR_ERR(phylink);
-+	if (IS_ERR(phylink)) {
-+		err = PTR_ERR(phylink);
-+		dev_err(netdev->dev.parent,
-+			"Failed to create Phylink interface, err: %d\n", err);
-+		xpcs_destroy_pcs(pcs);
-+		return err;
-+	}
- 
- 	fbn->phylink = phylink;
- 
- 	return 0;
- }
- 
-+/**
-+ * fbnic_phylink_destroy - Teardown phylink related interfaces
-+ * @netdev: Network Device struct containing phylink device
-+ *
-+ * Detach and free resources related to phylink interface.
-+ **/
-+void fbnic_phylink_destroy(struct net_device *netdev)
-+{
-+	struct fbnic_net *fbn = netdev_priv(netdev);
-+
-+	if (fbn->phylink)
-+		phylink_destroy(fbn->phylink);
-+	if (fbn->pcs)
-+		xpcs_destroy_pcs(fbn->pcs);
-+}
-+
- /**
-  * fbnic_phylink_pmd_training_complete_notify - PMD training complete notifier
-  * @netdev: Netdev struct phylink device attached to
-@@ -287,5 +279,5 @@ void fbnic_phylink_pmd_training_complete_notify(struct net_device *netdev)
- 
- 	fbd->pmd_state = FBNIC_PMD_SEND_DATA;
- 
--	phylink_pcs_change(&fbn->phylink_pcs, false);
-+	phylink_pcs_change(fbn->pcs, false);
- }
-
-
+Florian
 
