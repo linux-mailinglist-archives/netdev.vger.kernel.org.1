@@ -1,88 +1,88 @@
-Return-Path: <netdev+bounces-237256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD18FC47CC2
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 17:10:34 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA330C47CD4
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 17:11:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ECD851889CED
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 16:02:09 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3B4744F5235
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 16:01:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C8DD274B30;
-	Mon, 10 Nov 2025 16:01:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2994277016;
+	Mon, 10 Nov 2025 16:01:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KeoeNVqC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eIRmsW2J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 438D125A340
-	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 16:01:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17375274B32
+	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 16:01:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762790485; cv=none; b=lVMULPI0xBqrmmGUS9ztyU9i9R/BqN+lZm+hjiPPKFp8gUZUlfwkTn1FbQfxUxmk6R3RDVdgBQUeAXGdFWZyvYoqvQlmilNC5aV6uW7DXAIne19+ySXl7ipSwQ+bJz0LMnWyYot9aBENY9M+ATaG7n3TpX1LBxuaV6B1gC9SQc4=
+	t=1762790492; cv=none; b=Hoad10Jr22UUBkAhD5dyBHHQBVU2AoOBAmniv00G8dVz9o4bQ1DJgNzubMVbu3SAvLFgztNbN1JvItCTljXdMhvwR5l4Hw4LkWGFKW60v6nXB5xe+u2kgWgtXKGv8K9tfLBplH6ab+euRY2UwU3zjTt1qNr8/PX/aL8BLQOpUfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762790485; c=relaxed/simple;
-	bh=CvBSJnrJJygzK5aLqcEZG5scSPAuiFuYqOO01bGZ/Hc=;
+	s=arc-20240116; t=1762790492; c=relaxed/simple;
+	bh=LU9+hzoJqYXd3BJQ+ZGwkF2U4ebKGsvYPQyqO+wovNI=;
 	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GnD17l5DNjUR+RexAuu5o2xk3WqDVmsoamYLGQBe7XQExobPUAjST42plfbAPG0bnYgZPL7pWgKEQZZ83FpEHpBnvZW88AojsSQNezG/hZsQFU4MEH59WW4bpVDCQRJoqpRz3/vzVZSxq+NiNvPj5ztJxZsbB4rDqcPn7nO1R4k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KeoeNVqC; arc=none smtp.client-ip=209.85.210.169
+	 MIME-Version:Content-Type; b=lF9e1Rf6AzNxnAxgRiHt2EKdGCcn++Kvz9y5Z30GcCDrEn012syaXnnrkodS9pU1sc3eKKHR/3Dc4S7dlvQss8bPSlnwJQ+5rwD6lHvdeR9Z9pAMMha8+h4tQGllBkAyMCOLkCZWNXZeydLm3iBpjKxJPP/QPPmrfqndZoHDyd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eIRmsW2J; arc=none smtp.client-ip=209.85.216.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-794e300e20dso2160097b3a.1
-        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 08:01:22 -0800 (PST)
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-3437ea05540so1626976a91.0
+        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 08:01:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762790481; x=1763395281; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1762790490; x=1763395290; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=S7BGTt4EtyuLU4TAz26suCmWKrFyiFfTss9rr2mUJ/I=;
-        b=KeoeNVqC9Bu8vyLCM9WWCClWdVl+y37Yfb+fOCJQRGAQmgoEMjGLepernBd8wHzNbW
-         FUMX5gxLBd6nhudDYo0TKgwm8pxIJDnrTRWQlhS66kgz7flCgMo0Y9ZFDD2dq5Tb5ZYJ
-         2TIBd5kI2qFAlnyRBVZUPyt54ONoZQ9Me3Runjc8I8T/BrbnrxF9EwIJAA+Q3MCllEho
-         6Ik9iRUiQiRIo6hB7IjWomrr5l+Prs1VRjEbsSs3KcBraW2S9DmsA261e8imI2j0Vuns
-         FEtOw7IDWSDcjvLBIo/ymfehK8MIFyQ47iFOKr11NiWzwT4+Xo7amIt9KK7Z4XAQOSRG
-         pp5A==
+        bh=XXDvR+ROPnTo82YIQ6XDEozK4ARl6RQeFW59s+teRhM=;
+        b=eIRmsW2JsaL3p8x7952b/OcN9ydDPpH8cEF2lzxRtkxfmxwCrLwoBp5ysaMgYDgO/0
+         d0iVl0L9+12lb6ggWdngpJ9fGTcwxDcPIHkYwYSyju+hX7iRAJtuZmcySTeRo+h0VvqO
+         IFthw9+W8nq7m5x8of4FMq6WuRmaWVb/Bpwl9mP8NoLv1gaDUkrBHTyrkbTjw5RtzGLk
+         UEsq29j76MXvCHmzcQg2qflGuWF2WrOdWFi87S2pX9991PGtNwBbqKvNFRFUM9rGvUu7
+         rcTll2hn6ekJNImK8VuT5TCvTmDNYPPqaShlzJW5ZNLysveiyyQcKh7zG0pIf+Ewjyf5
+         DRJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762790481; x=1763395281;
+        d=1e100.net; s=20230601; t=1762790490; x=1763395290;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=S7BGTt4EtyuLU4TAz26suCmWKrFyiFfTss9rr2mUJ/I=;
-        b=bnAV4tsc2FakkKOBLrS/g6heiZJGPsYA0wzs6MaHvls7A1WQaSVYix0Ssg2FWyTUJD
-         Q5XH8RXsDv1+tn+IJmuXT2NJQXv40IA7PmulIe4mEmOBICHzmAsm+KWth/KGbZv9TNw6
-         K2VYLc3cqoHt0OmDLO3Mj+U7Q34sa1cZd834lPo1nInIxW2QS33ua9sd+W3QWGSS/rQm
-         XKHHOgcFx6HOqzECd2xGOc+iegey/WohNDlVyfutui6Mv3q916sC2N/eaize1puWfSgk
-         0Y4cAzKLwaaoF+33R/cdx1NXbHXk5UVl9dQloT4tsN1ByUqlNbzfA5frLh40EVYP8dIL
-         Bhiw==
-X-Gm-Message-State: AOJu0YyYUe3lKrX+vhgxQSxF2LLQZIczOvhtoeOiqScFuGH+PWw380VZ
-	OVY2L0kwrE7ThOPSz8UWQXB0jn90w3W+negQKd3kAURek/fPjhDOng3OsJFaCQ==
-X-Gm-Gg: ASbGncslQ8Z1o7Ek3ntd0/7XBeF4beBuR0tIx4kd2BA37s0YLt4YhmZcuui0RFzzkVV
-	xSYIAPzIsRPqLY7wkvqI8GnaXKVyc5x9Imvh+09fMHFRWTsLSniBS86bE1ivq02t+JOwSuNL5/2
-	ORjTGn3oLfsMLwTXwHICas/FkyrnXhS/FRu5m5bDZ3im0dTW+lvOmaLdMGraTxhf9jIgDZVMp7b
-	KE3JIM8dOO3OWwCEle4TXiwAxNvWCTAjXw+bcO1NWtP1ix8jUwjitlItjyFOhWe4IWpo9eFCGRH
-	eos4LuRATd7UJAxa4d0GYCAJuOGUGlewTzQjtgb8BwfS6XUcqNgLx9SAcd11y6Qng6uikLy6bgx
-	9KJqO8mi8vcCYa4J7hQQVZWwTsrVsJ9gUj5h4gDlo3ZdTGHdLd+hu8H66d092Cbko9+STy2odJJ
-	Bn9TbwU9QhNDFJrG23fLDi/Kz7VVPt8DG7+FSkiE0j9xam
-X-Google-Smtp-Source: AGHT+IGgnmcvNzBH82jsfQILK6WJtj4vUZLnpaR3B5kYwisW9tGJcgj/NKsi4B1kBoGjK4y5sGTERw==
-X-Received: by 2002:a17:903:2350:b0:295:6b98:6d65 with SMTP id d9443c01a7336-297e1e611d8mr111411675ad.22.1762790480649;
-        Mon, 10 Nov 2025 08:01:20 -0800 (PST)
+        bh=XXDvR+ROPnTo82YIQ6XDEozK4ARl6RQeFW59s+teRhM=;
+        b=miZvDDQBZwkYFt3SmVHCvMtVJ9/GMCC7jINNqo+bVwumjdAxFR3ysPxgkW2BnmQ/Js
+         YfRZ1if+xowaXT4/qYSK/TRk54OnSfIv7xTDjhcC3Y/uhekGhgUePybSaSpJ66p3JOZJ
+         AC0u4Z5rLj1WZIMhH/rEmDb9Lj1/idnU7sYIVQGXE8LINtVUIj55tP7fb4wMEq7FK15q
+         9VYwPGQQSzmeS87aGKZMlVjhWdK8OoCZmsIm8MKgMHrzY/+8/9OrDe9TD3J0tGYJkOXw
+         sPVAWwqCnBzZg0QiTdoMTq1PiANER5qfBZsqUsS+4B/Y8rk0Z+st8luE1uiTljnvPQb2
+         Mf3w==
+X-Gm-Message-State: AOJu0YzbFJXmCsE30wZsLMElD4sgDkby5kBTg1xzbaaSiWyQv75EMfdY
+	V0w30aF495vuVIhDNn3eslIc71eFCpGblO4pRuw09MjwqxcPbYEGCaUGDRhv0w==
+X-Gm-Gg: ASbGncvGyhtE7/eOWvOS7OIb3pan2wrVt/5/gGI+cTg7NX+DQz9iUTF5k1q0LzUwbU4
+	oGVqE53YFrtHNT5+G0m16sDeJocqR/ZoBE2guJA2Uo6/3vVTe8LB1fSGH8NPRuCUbDO0Os/GN+4
+	c6YRKvJwMom1/jKOmKX2J5EEccdeYVcilyjXjY+lIphvOnAtaUpQqRUiOlNxVKKEcj9143DVg1s
+	Nhvy16YeSl1q0vHBoBSGceDN4R9dOlBdBb0vbCs6xVrj5doQXWPRWUrs/VvA9JiVKc9wqIIgImq
+	7zAMkOGbStfeW2dZzezqd4hDc/PR8shkTxZhkprtr5h2tQ6Rkg6UK3695iTlovRv19Dx/Uk67vH
+	a4P8OHGq8K9YjlqUyKsb2SW3mhck0Ea+2LeQC+NfGaVCt3hEJRSc6ORurp+GOTmB77j0lREiqUq
+	u41fcp12lBHC1aK10AJkHbJpyfJ1lwzogB9xIzgLhBXN5W
+X-Google-Smtp-Source: AGHT+IE5ZndMRmR1j8WMspXAGJ73fHdG6Kli8Hp6bMgjfcZTtcDAG+PIYamYyqyAgLlxrREgoud13A==
+X-Received: by 2002:a17:90b:3503:b0:341:2141:df76 with SMTP id 98e67ed59e1d1-3436cb22cc4mr10650627a91.13.1762790488429;
+        Mon, 10 Nov 2025 08:01:28 -0800 (PST)
 Received: from ahduyck-xeon-server.home.arpa ([2605:59c8:829:4c00:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-297d83c941esm96714505ad.44.2025.11.10.08.01.19
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34362f1f231sm9295377a91.10.2025.11.10.08.01.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Nov 2025 08:01:19 -0800 (PST)
-Subject: [net-next PATCH v3 03/10] net: pcs: xpcs: Add support for 25G, 50G,
- and 100G interfaces
+        Mon, 10 Nov 2025 08:01:27 -0800 (PST)
+Subject: [net-next PATCH v3 04/10] net: pcs: xpcs: Fix PMA identifier handling
+ in XPCS
 From: Alexander Duyck <alexander.duyck@gmail.com>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org, kernel-team@meta.com, andrew+netdev@lunn.ch,
  hkallweit1@gmail.com, linux@armlinux.org.uk, pabeni@redhat.com,
  davem@davemloft.net
-Date: Mon, 10 Nov 2025 08:01:18 -0800
+Date: Mon, 10 Nov 2025 08:01:26 -0800
 Message-ID: 
- <176279047835.2130772.6957093082370490671.stgit@ahduyck-xeon-server.home.arpa>
+ <176279048605.2130772.11372032499477099170.stgit@ahduyck-xeon-server.home.arpa>
 In-Reply-To: 
  <176279018050.2130772.17812295685941097123.stgit@ahduyck-xeon-server.home.arpa>
 References: 
@@ -99,201 +99,80 @@ Content-Transfer-Encoding: 7bit
 
 From: Alexander Duyck <alexanderduyck@fb.com>
 
-With this change we are adding support for 25G, 50G, and 100G interface
-types to the XPCS driver. This had supposedly been enabled with the
-addition of XLGMII but I don't see any capability for configuration there
-so I suspect it may need to be refactored in the future.
+The XPCS driver was mangling the PMA identifier as the original code
+appears to have been focused on just capturing the OUI. Rather than store a
+mangled ID it is better to work with the actual PMA ID and instead just
+mask out the values that don't apply rather than shifting them and
+reordering them as you still don't get the original OUI for the NIC without
+having to bitswap the values as per the definition of the layout in IEEE
+802.3-2022 22.2.4.3.1.
 
-With this change we can enable the XPCS driver with the selected interface
-and it should be able to detect link, speed, and report the link status to
-the phylink interface.
+By laying it out as it was in the hardware it is also less likely for us to
+have an unintentional collision as the enum values will occupy the revision
+number area while the OUI occupies the upper 22 bits.
 
 Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
 ---
- drivers/net/pcs/pcs-xpcs.c |  105 ++++++++++++++++++++++++++++++++++++++++++--
- include/uapi/linux/mdio.h  |    3 +
- 2 files changed, 104 insertions(+), 4 deletions(-)
+ drivers/net/pcs/pcs-xpcs.c   |    9 ++++-----
+ include/linux/pcs/pcs-xpcs.h |    2 +-
+ include/uapi/linux/mdio.h    |    5 +++++
+ 3 files changed, 10 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
-index 3d1bd5aac093..b33767c7b45c 100644
+index b33767c7b45c..8b5b5b63b74b 100644
 --- a/drivers/net/pcs/pcs-xpcs.c
 +++ b/drivers/net/pcs/pcs-xpcs.c
-@@ -37,6 +37,16 @@ static const int xpcs_10gkr_features[] = {
- 	__ETHTOOL_LINK_MODE_MASK_NBITS,
+@@ -1365,17 +1365,16 @@ static int xpcs_read_ids(struct dw_xpcs *xpcs)
+ 	if (ret < 0)
+ 		return ret;
+ 
+-	id = ret;
++	id = ret << 16;
+ 
+ 	ret = xpcs_read(xpcs, MDIO_MMD_PMAPMD, MDIO_DEVID2);
+ 	if (ret < 0)
+ 		return ret;
+ 
+-	/* Note the inverted dword order and masked out Model/Revision numbers
+-	 * with respect to what is done with the PCS ID...
++	/* For now we only record the OUI for the PMAPMD, we may want to
++	 * add the model number at some point in the future.
+ 	 */
+-	ret = (ret >> 10) & 0x3F;
+-	id |= ret << 16;
++	id |= ret & MDIO_DEVID2_OUI;
+ 
+ 	/* Set the PMA ID if it hasn't been pre-initialized */
+ 	if (xpcs->info.pma == DW_XPCS_PMA_ID_NATIVE)
+diff --git a/include/linux/pcs/pcs-xpcs.h b/include/linux/pcs/pcs-xpcs.h
+index e40f554ff717..4cf6bd611e5a 100644
+--- a/include/linux/pcs/pcs-xpcs.h
++++ b/include/linux/pcs/pcs-xpcs.h
+@@ -38,7 +38,7 @@ enum dw_xpcs_pma_id {
+ 	DW_XPCS_PMA_GEN4_6G_ID,
+ 	DW_XPCS_PMA_GEN5_10G_ID,
+ 	DW_XPCS_PMA_GEN5_12G_ID,
+-	WX_TXGBE_XPCS_PMA_10G_ID = 0x0018fc80,
++	WX_TXGBE_XPCS_PMA_10G_ID = 0xfc806000,
  };
  
-+static const int xpcs_25gbaser_features[] = {
-+	ETHTOOL_LINK_MODE_MII_BIT,
-+	ETHTOOL_LINK_MODE_Pause_BIT,
-+	ETHTOOL_LINK_MODE_Asym_Pause_BIT,
-+	ETHTOOL_LINK_MODE_25000baseCR_Full_BIT,
-+	ETHTOOL_LINK_MODE_25000baseKR_Full_BIT,
-+	ETHTOOL_LINK_MODE_25000baseSR_Full_BIT,
-+	__ETHTOOL_LINK_MODE_MASK_NBITS,
-+};
-+
- static const int xpcs_xlgmii_features[] = {
- 	ETHTOOL_LINK_MODE_Pause_BIT,
- 	ETHTOOL_LINK_MODE_Asym_Pause_BIT,
-@@ -67,6 +77,40 @@ static const int xpcs_xlgmii_features[] = {
- 	__ETHTOOL_LINK_MODE_MASK_NBITS,
- };
- 
-+static const int xpcs_50gbaser_features[] = {
-+	ETHTOOL_LINK_MODE_MII_BIT,
-+	ETHTOOL_LINK_MODE_Pause_BIT,
-+	ETHTOOL_LINK_MODE_Asym_Pause_BIT,
-+	ETHTOOL_LINK_MODE_50000baseKR_Full_BIT,
-+	ETHTOOL_LINK_MODE_50000baseSR_Full_BIT,
-+	ETHTOOL_LINK_MODE_50000baseCR_Full_BIT,
-+	ETHTOOL_LINK_MODE_50000baseLR_ER_FR_Full_BIT,
-+	ETHTOOL_LINK_MODE_50000baseDR_Full_BIT,
-+	__ETHTOOL_LINK_MODE_MASK_NBITS,
-+};
-+
-+static const int xpcs_50gbaser2_features[] = {
-+	ETHTOOL_LINK_MODE_MII_BIT,
-+	ETHTOOL_LINK_MODE_Pause_BIT,
-+	ETHTOOL_LINK_MODE_Asym_Pause_BIT,
-+	ETHTOOL_LINK_MODE_50000baseCR2_Full_BIT,
-+	ETHTOOL_LINK_MODE_50000baseKR2_Full_BIT,
-+	ETHTOOL_LINK_MODE_50000baseSR2_Full_BIT,
-+	__ETHTOOL_LINK_MODE_MASK_NBITS,
-+};
-+
-+static const int xpcs_100gbasep_features[] = {
-+	ETHTOOL_LINK_MODE_MII_BIT,
-+	ETHTOOL_LINK_MODE_Pause_BIT,
-+	ETHTOOL_LINK_MODE_Asym_Pause_BIT,
-+	ETHTOOL_LINK_MODE_100000baseKR2_Full_BIT,
-+	ETHTOOL_LINK_MODE_100000baseSR2_Full_BIT,
-+	ETHTOOL_LINK_MODE_100000baseCR2_Full_BIT,
-+	ETHTOOL_LINK_MODE_100000baseLR2_ER2_FR2_Full_BIT,
-+	ETHTOOL_LINK_MODE_100000baseDR2_Full_BIT,
-+	__ETHTOOL_LINK_MODE_MASK_NBITS,
-+};
-+
- static const int xpcs_10gbaser_features[] = {
- 	ETHTOOL_LINK_MODE_Pause_BIT,
- 	ETHTOOL_LINK_MODE_Asym_Pause_BIT,
-@@ -523,9 +567,38 @@ static int xpcs_get_max_xlgmii_speed(struct dw_xpcs *xpcs,
- 	return speed;
- }
- 
--static void xpcs_resolve_pma(struct dw_xpcs *xpcs,
--			     struct phylink_link_state *state)
-+static int xpcs_c45_read_pcs_speed(struct dw_xpcs *xpcs,
-+				   struct phylink_link_state *state)
- {
-+	int pcs_ctrl1;
-+
-+	pcs_ctrl1 = xpcs_read(xpcs, MDIO_MMD_PCS, MDIO_CTRL1);
-+	if (pcs_ctrl1 < 0)
-+		return pcs_ctrl1;
-+
-+	switch (pcs_ctrl1 & MDIO_CTRL1_SPEEDSEL) {
-+	case MDIO_PCS_CTRL1_SPEED25G:
-+		state->speed = SPEED_25000;
-+		break;
-+	case MDIO_PCS_CTRL1_SPEED50G:
-+		state->speed =  SPEED_50000;
-+		break;
-+	case MDIO_PCS_CTRL1_SPEED100G:
-+		state->speed = SPEED_100000;
-+		break;
-+	default:
-+		state->speed = SPEED_UNKNOWN;
-+		break;
-+	}
-+
-+	return 0;
-+}
-+
-+static int xpcs_resolve_pma(struct dw_xpcs *xpcs,
-+			    struct phylink_link_state *state)
-+{
-+	int err = 0;
-+
- 	state->pause = MLO_PAUSE_TX | MLO_PAUSE_RX;
- 	state->duplex = DUPLEX_FULL;
- 
-@@ -536,10 +609,18 @@ static void xpcs_resolve_pma(struct dw_xpcs *xpcs,
- 	case PHY_INTERFACE_MODE_XLGMII:
- 		state->speed = xpcs_get_max_xlgmii_speed(xpcs, state);
- 		break;
-+	case PHY_INTERFACE_MODE_25GBASER:
-+	case PHY_INTERFACE_MODE_50GBASER:
-+	case PHY_INTERFACE_MODE_LAUI:
-+	case PHY_INTERFACE_MODE_100GBASEP:
-+		err = xpcs_c45_read_pcs_speed(xpcs, state);
-+		break;
- 	default:
- 		state->speed = SPEED_UNKNOWN;
- 		break;
- 	}
-+
-+	return err;
- }
- 
- static int xpcs_validate(struct phylink_pcs *pcs, unsigned long *supported,
-@@ -945,10 +1026,10 @@ static int xpcs_get_state_c73(struct dw_xpcs *xpcs,
- 
- 		phylink_resolve_c73(state);
- 	} else {
--		xpcs_resolve_pma(xpcs, state);
-+		ret = xpcs_resolve_pma(xpcs, state);
- 	}
- 
--	return 0;
-+	return ret;
- }
- 
- static int xpcs_get_state_c37_sgmii(struct dw_xpcs *xpcs,
-@@ -1312,10 +1393,26 @@ static const struct dw_xpcs_compat synopsys_xpcs_compat[] = {
- 		.interface = PHY_INTERFACE_MODE_10GKR,
- 		.supported = xpcs_10gkr_features,
- 		.an_mode = DW_AN_C73,
-+	}, {
-+		.interface = PHY_INTERFACE_MODE_25GBASER,
-+		.supported = xpcs_25gbaser_features,
-+		.an_mode = DW_AN_C73,
- 	}, {
- 		.interface = PHY_INTERFACE_MODE_XLGMII,
- 		.supported = xpcs_xlgmii_features,
- 		.an_mode = DW_AN_C73,
-+	}, {
-+		.interface = PHY_INTERFACE_MODE_50GBASER,
-+		.supported = xpcs_50gbaser_features,
-+		.an_mode = DW_AN_C73,
-+	}, {
-+		.interface = PHY_INTERFACE_MODE_LAUI,
-+		.supported = xpcs_50gbaser2_features,
-+		.an_mode = DW_AN_C73,
-+	}, {
-+		.interface = PHY_INTERFACE_MODE_100GBASEP,
-+		.supported = xpcs_100gbasep_features,
-+		.an_mode = DW_AN_C73,
- 	}, {
- 		.interface = PHY_INTERFACE_MODE_10GBASER,
- 		.supported = xpcs_10gbaser_features,
+ struct dw_xpcs_info {
 diff --git a/include/uapi/linux/mdio.h b/include/uapi/linux/mdio.h
-index c33aa864ef66..2da509c9c0a5 100644
+index 2da509c9c0a5..b287f84036a5 100644
 --- a/include/uapi/linux/mdio.h
 +++ b/include/uapi/linux/mdio.h
-@@ -118,10 +118,13 @@
- #define MDIO_CTRL1_SPEED10P2B		(MDIO_CTRL1_SPEEDSELEXT | 0x04)
- /* 100 Gb/s */
- #define MDIO_PMA_CTRL1_SPEED100G	(MDIO_CTRL1_SPEEDSELEXT | 0x0c)
-+#define MDIO_PCS_CTRL1_SPEED100G	(MDIO_CTRL1_SPEEDSELEXT | 0x10)
- /* 25 Gb/s */
- #define MDIO_PMA_CTRL1_SPEED25G		(MDIO_CTRL1_SPEEDSELEXT | 0x10)
-+#define MDIO_PCS_CTRL1_SPEED25G		(MDIO_CTRL1_SPEEDSELEXT | 0x14)
- /* 50 Gb/s */
- #define MDIO_PMA_CTRL1_SPEED50G		(MDIO_CTRL1_SPEEDSELEXT | 0x14)
-+#define MDIO_PCS_CTRL1_SPEED50G		(MDIO_CTRL1_SPEEDSELEXT | 0x18)
- /* 2.5 Gb/s */
- #define MDIO_PMA_CTRL1_SPEED2_5G	(MDIO_CTRL1_SPEEDSELEXT | 0x18)
- /* 5 Gb/s */
+@@ -142,6 +142,11 @@
+ #define MDIO_AN_STAT1_PAGE		0x0040	/* Page received */
+ #define MDIO_AN_STAT1_XNP		0x0080	/* Extended next page status */
+ 
++/* Device Identifier 2 */
++#define MDIO_DEVID2_OUI			0xfc00	/* OUI Portion of PHY ID */
++#define MDIO_DEVID2_MODEL_NUM		0x03f0	/* Manufacturer's Model Number */
++#define MDIO_DEVID2_REV_NUM		0x000f	/* Revision Number */
++
+ /* Speed register. */
+ #define MDIO_SPEED_10G			0x0001	/* 10G capable */
+ #define MDIO_PMA_SPEED_2B		0x0002	/* 2BASE-TL capable */
 
 
 
