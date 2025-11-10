@@ -1,88 +1,88 @@
-Return-Path: <netdev+bounces-237259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D358C47D4C
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 17:15:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFB35C47CD7
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 17:11:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EEC944F3121
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 16:02:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD6661897565
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 16:02:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D15926FA77;
-	Mon, 10 Nov 2025 16:01:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB53A2765E2;
+	Mon, 10 Nov 2025 16:01:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uu5/Abbn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="izWjc5RG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A14E12773D4
-	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 16:01:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A1F8274B5C
+	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 16:01:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762790506; cv=none; b=c4YSTIef0+7TVL4Cxd0q2CBdxBX6loHPLha7qh011tvnJWgDurESfCLpWVbmWIx0+ouLk+fex8AGJc9zFgpr7PRZedY8hYC55uNc9u51oBo2uizDfqn+yeDLWn0NN45NpwEqC67l4MHruVkR5OEzaIrt1TzQRQTlZZo3bvFkJEw=
+	t=1762790515; cv=none; b=Ocod3B09yES3MB5FQ9ojUfBAZniNPN9xlFeSPPUfNlAJlISRctSUHe4GJgjHpy2SWItAnmH+nlhGt+wK50qiT/te3EyP8N6cYdl9DeD/wIVPFf7JdYKsEatOCods7F8qIWoL2C60xn2byTwHwbCeOXulL20dQDyFFLYh0mZMXpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762790506; c=relaxed/simple;
-	bh=k/yl9UJWLqC7o84Nr/U5yALEEvU7+KaksmcAaGzK4YU=;
+	s=arc-20240116; t=1762790515; c=relaxed/simple;
+	bh=cQDppkAU4n0nayD9NOb3TaNzsqgiKVa6yBuXSyy0LbE=;
 	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LVTKkXODqU2ZXAVfITfEp6f2eFqwFmXAI4taZ5X0se/khHp7OqZ/MqL6Za923rijJm0qROzaFmn6TK0PMfnJ0mXRom0+Go2JN0R7OvV6Emq0VGFMeVQLhGkYDB2/CPvvieipvZh+zdN5rFFcmnBm81x8SCy3le3ccgkthHPfiyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Uu5/Abbn; arc=none smtp.client-ip=209.85.215.171
+	 MIME-Version:Content-Type; b=lZxymQT6FimcuNXDFvhbhTHCuI8+N2ZCjgqziHbbSOj4GehpaYY4ipk+l5B4ugFmTfG0cpbDHwPuERKSblv4MgozIA9PYScgf6aADhFyZVcqQHagU8yTg4HY9c/JsdIPNJhU7XS3VKjV0+rNQHgDInJFWklvfBHugBVY1ZbG93o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=izWjc5RG; arc=none smtp.client-ip=209.85.210.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-b608df6d2a0so2470010a12.1
-        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 08:01:44 -0800 (PST)
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-7a4c202a30aso2507270b3a.2
+        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 08:01:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762790503; x=1763395303; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1762790512; x=1763395312; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=lHEzl/fdgNanz+gPhE0va0KzQvIPklNm4R2Ogm7AeTA=;
-        b=Uu5/AbbnKKVfkcgW2wF3FK6/AWOnIR0TRYCZJA0h1OaZ679rfvnxOn1iEolgw3QGAf
-         linG60febubQlCLJf3GulhvRNJFWtdsdmoEDBA586G/cF8zbXaZb/7P/I1e2dMV6begu
-         cKLgOnrhQrbJFdjoUAGMwL1EttJd+K9ovPL9DmbI9KhLRGfDwPbcdH8545p6BgtFIqAo
-         R/W1I+RRL/jXOXGhZRDAY00ZFb5yxG8xIlAmweiJNLxvql8CQlEQxoeOTfj+MpmYJE3g
-         EKUY8aScQJyQyC3FmVi8V/w7EYzDR6GGNtbM4c7D6uYIcmPsuTJS2C6XomVBtOfQkUaE
-         eLlw==
+        bh=YuVsRRyW1hs+Gl0kC92IjDFrA+s0orAO5v3OS4EIC8k=;
+        b=izWjc5RGZ4TSafob58wOWojW+RiYem2AMqo4W9a1pNYnfRbXZrOLQNnfYB1AKQX+gr
+         qrScgy+f6gvtQBk1VlboypETeDUlmc3sAP/OVac0DmSRtmnfuaVP7+AyTs50Lq6iyXMm
+         EVaCxaj10dhFGDxVOspGR5O4qn0ypN2cCo0J4rPKAayE0BFUVKVKklZK8n9oyiwmvenG
+         92xgZftm4LvTolo5X8kBrsMUk+3wa7Yg52rnNFkPROD/vAmzivY0DTmRu/InAHQ4Z/dA
+         aCp2Q5fvYs3nykNSIEKM2+1hQ3KfBadsLnC4ZQq7CDZscfGzkZ2sajdezEUA9HPsV1yq
+         t4sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762790503; x=1763395303;
+        d=1e100.net; s=20230601; t=1762790512; x=1763395312;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lHEzl/fdgNanz+gPhE0va0KzQvIPklNm4R2Ogm7AeTA=;
-        b=WewZ1hH22WE2+iidThONHiLiJ6+dw8pLGMtAnJhO+zg+dhha/udqFhMOAdmDAKs0e5
-         E9eXfp/lfn1KF+vjkAYVdxrXlRf1LYN/Oc5c+BRoVtmLkXeJ+k5o8N6Z41kwhP4uJbgG
-         AKk+xZdVNF+cJi2igH7Qx9hgndCJIfmHzspiQMChy8wfowoUR2vvlmQ8PX4/rZa2tfDI
-         fSFh6Do2Ljs87L3alQDlwlvVZHrLRA8KunsOmJUh6Q0Cj9ATDu5W6tsG4RukwfS99WOS
-         fI4gsgeqxBoR5ZIX0HcoA/fTrmJQwm8Pdgw5Kd2oBx/tLAGYgfl5iooMs+Ukg2TwVV6a
-         qDPg==
-X-Gm-Message-State: AOJu0YzQMfRQKbMmjHQjeg85Oghw1xDdOPFYKkHV7xlgDM0j7nnI7BTH
-	cOhrBZzMlCHvNWz8L1oYXQTWjKkIv5XMApynNiKnN7JjZETnVw+nE06zSbNHXQ==
-X-Gm-Gg: ASbGncugyerPEu2x7QZ5Ckl6R2eKguxV+CBuXHw/MV2Y8oKKZFxZ5Gh3o3f2M4zKB9Y
-	5542/y/sO/I4sYl7U04dzJqpPDqB7IchXnd132AeWy8ovljvkNqINZWtS2jm9KTB9BdsV7IC84L
-	b1QAFEHJ5T4I/vp9I0k6WKe4izbfJX9dfo1ffdAUbJVtYEW6t2h6JVPjrYcxHhudzqVQek/JKsc
-	ivLGCAvuOLJjiK44FhixierzCfKv2d0mT90C1ZyRtPvDtsiX+qfm6wD78atsSqqaxrAg3IWA6Md
-	otzSsVukKxaK88wXtupAzBdMyvJtmTSCipSM0l4oZ38SUPa/EtbLZ4O+AdLGvbNh91dpeJp1OVb
-	t+84IX844mFFmzXSLi7iNI5a2hm4QMHybwLbs+mVbzgOsdu2HwxRFyDUr9RbmpufoucFTb62t72
-	x+WlII7KPYKh4j8pckH0WmTErPv1l2euC7Ug==
-X-Google-Smtp-Source: AGHT+IFg3KrZVMAhBd1hc50UNgS6AJ7eHB8miq3M7V+GM9Xz0hsp7G/fnEZ6b1Dl0KuKy3O+5xkoGQ==
-X-Received: by 2002:a17:903:3848:b0:297:d939:393b with SMTP id d9443c01a7336-297e5709088mr102691525ad.58.1762790502811;
-        Mon, 10 Nov 2025 08:01:42 -0800 (PST)
+        bh=YuVsRRyW1hs+Gl0kC92IjDFrA+s0orAO5v3OS4EIC8k=;
+        b=nSeFWMKQLpmVA0pE5Doooch92FoIKWW3QAuZSSQJq3ve6tbcZNH7GsRkKHy0EkfmoR
+         ArenWTAxfa9rmDco/8grQlezrcmsD61Ve6iIWKoRg+gwm7EGVWwWddkgjFcdTHvshk1z
+         lJtqopRy3nGNBVdMAKNXW3d9UUhyUQNCqx7VKJrrNl+q/GMgZ7mC6Jw75b66ClEODU1v
+         FJTW/RpwjHCv6fXqcwdNi7K1ae0AR0PpWZ1rHm39LsJ2w3yHc2YqkD3UpTyOUFxoHrET
+         Jm7iSTiCuW6NjsZAgkunv6+9x0WrJM/e6tSU6l0T3yR43mdGgTWSwEOpGSh8ORpmP4d8
+         qonw==
+X-Gm-Message-State: AOJu0Ywl8v0JuGeSKIEM1HxqMCvnVAAEYVzo5ANuO8ZVI49Rx67Uzg61
+	xu9q8DDEdsBu1P9p5+D9XS6COkd9ZVSj/ry/HEeZBc2INn3uILHmTldABcNhBw==
+X-Gm-Gg: ASbGncs5IJzsfk3tWTxGnla7Y6pCoVzvr8F/TZAivOscUl1LEV2oed6k4ChtTlUQmPw
+	BpJYYvYH0WLrsukJizR3HTLPxqDorcMXKOfc7Nd7vNiRqz7oXtQvTVnFj9pXWdaDVJ3zizuwILu
+	7zSL/c0zy1K5VqwDm7VmG1Mmgd+3zIPm05+Yk6p83atGYwnNmE1odORRBEkbaPVGU6Zh25r9kHL
+	db4rgXl2yR2EbsglfnqaFOj5Ktgdrfi79k1ILsxXfCN4OYkYV+NJ+F0Kb+PZLNv4gRwz/GiV4BO
+	mzHjdMU+wojMix7SiDaph3jaXIn1EAFyvfxTVf7+M94Hpyofv+tnUnOwYmxeAfRjfZRkPbJf2hu
+	5gZ8zNQcqxSZBra86rMDnzdB0GleZvTBLMwpm2Ste1vvAb70hjZnMHSOu5HI99tTLjAGS+2PdeH
+	O+aymBvGOd+/wYKFg5/ie4F62RjfwOsvhV7Q==
+X-Google-Smtp-Source: AGHT+IFO/3kJaHiXjJYrxSbe3zdMEPBoZcG607e7UmrZDN8pGmwRuhA7+ZF2GCe4M93tlGF5WIrhOw==
+X-Received: by 2002:a05:6a00:124d:b0:7ac:1444:6779 with SMTP id d2e1a72fcca58-7b225b696eamr10238563b3a.11.1762790510431;
+        Mon, 10 Nov 2025 08:01:50 -0800 (PST)
 Received: from ahduyck-xeon-server.home.arpa ([2605:59c8:829:4c00:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29650968602sm153634305ad.9.2025.11.10.08.01.41
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b0c9c09f22sm12287508b3a.20.2025.11.10.08.01.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Nov 2025 08:01:41 -0800 (PST)
-Subject: [net-next PATCH v3 06/10] fbnic: Rename PCS IRQ to MAC IRQ as it is
- actually a MAC interrupt
+        Mon, 10 Nov 2025 08:01:49 -0800 (PST)
+Subject: [net-next PATCH v3 07/10] fbnic: Add logic to track PMD state via
+ MAC/PCS signals
 From: Alexander Duyck <alexander.duyck@gmail.com>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org, kernel-team@meta.com, andrew+netdev@lunn.ch,
  hkallweit1@gmail.com, linux@armlinux.org.uk, pabeni@redhat.com,
  davem@davemloft.net
-Date: Mon, 10 Nov 2025 08:01:40 -0800
+Date: Mon, 10 Nov 2025 08:01:48 -0800
 Message-ID: 
- <176279050055.2130772.11275348760974396296.stgit@ahduyck-xeon-server.home.arpa>
+ <176279050823.2130772.14046983051072163170.stgit@ahduyck-xeon-server.home.arpa>
 In-Reply-To: 
  <176279018050.2130772.17812295685941097123.stgit@ahduyck-xeon-server.home.arpa>
 References: 
@@ -99,256 +99,465 @@ Content-Transfer-Encoding: 7bit
 
 From: Alexander Duyck <alexanderduyck@fb.com>
 
-Throughout several spots in the code I had called out the IRQ as being
-related to the PCS. However the actual IRQ is a part of the MAC and it is
-just exposing PCS data. To more accurately reflect the owner of the calls
-this change makes it so that we rename the functions and values that are
-taking in the interrupt value and processing it to reflect that it is a MAC
-call and not a PCS one.
+One complication with the design of our part is that the PMD doesn't
+provide a direct signal to the host. Instead we have visibility to signals
+that the PCS provides to the MAC that allow us to check the link state
+through that.
 
-This change is mostly motivated by the fact that we will be moving the
-handling of this interrupt from being PCS focused to being more PMA/PMD
-focused as this will drive the phydev driver that I am adding instead of
-driving the PCS directly.
+That said we need to account for several things in the PMD and firmware
+when managing the link. Specifically when the link first starts to come up
+the PMD will cause the link to flap as the firmware will begin a training
+cycle when the link is first detected. As a result this will cause link
+flapping if we were to immediately report link up when the PCS first
+detects it.
+
+To address that we are adding a pmd_state variable that is meant to be a
+countdown of sorts indicating the state of the PMD. If the link is down the
+PMD will start out in the initialize state, otherwise if the link is up it
+will start out in the training state ready to report link up. If link is
+detected while in the initialize state the PMD state will switch to
+training, and if after 4 seconds the link is still stable we will
+transition to the send_data state.  With this we can avoid link flapping
+when a cable is first connected to the NIC.
+
+One side effect of this is that we need to pull the link state away from
+the PCS. For now we use a union of the PCS link state register value and
+the pmd_state. The plan is to add a phydev driver to report the pmd_state
+to the phylink interface. With that we can then look at switching over to
+the use of the XPCS driver for fbnic instead of having an internal one.
 
 Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
 ---
- drivers/net/ethernet/meta/fbnic/fbnic.h         |    6 ++---
- drivers/net/ethernet/meta/fbnic/fbnic_irq.c     |   30 ++++++++++++-----------
- drivers/net/ethernet/meta/fbnic/fbnic_mac.c     |   14 +++++------
- drivers/net/ethernet/meta/fbnic/fbnic_mac.h     |    8 +++---
- drivers/net/ethernet/meta/fbnic/fbnic_netdev.c  |    4 ++-
- drivers/net/ethernet/meta/fbnic/fbnic_phylink.c |    2 +-
- 6 files changed, 32 insertions(+), 32 deletions(-)
+ drivers/net/ethernet/meta/fbnic/fbnic.h         |    4 +
+ drivers/net/ethernet/meta/fbnic/fbnic_csr.h     |    2 +
+ drivers/net/ethernet/meta/fbnic/fbnic_irq.c     |    4 +
+ drivers/net/ethernet/meta/fbnic/fbnic_mac.c     |   59 ++++++++++++-----
+ drivers/net/ethernet/meta/fbnic/fbnic_mac.h     |   35 ++++++++--
+ drivers/net/ethernet/meta/fbnic/fbnic_netdev.c  |    2 -
+ drivers/net/ethernet/meta/fbnic/fbnic_netdev.h  |    2 -
+ drivers/net/ethernet/meta/fbnic/fbnic_pci.c     |   14 +++-
+ drivers/net/ethernet/meta/fbnic/fbnic_phylink.c |   79 +++++++++++++++++------
+ 9 files changed, 145 insertions(+), 56 deletions(-)
 
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic.h b/drivers/net/ethernet/meta/fbnic/fbnic.h
-index b03e5a3d5144..98929add5f21 100644
+index 98929add5f21..fac1283d0ade 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic.h
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic.h
-@@ -34,7 +34,7 @@ struct fbnic_dev {
- 	u32 __iomem *uc_addr4;
- 	const struct fbnic_mac *mac;
- 	unsigned int fw_msix_vector;
--	unsigned int pcs_msix_vector;
-+	unsigned int mac_msix_vector;
- 	unsigned short num_irqs;
+@@ -83,6 +83,10 @@ struct fbnic_dev {
+ 	/* Last @time_high refresh time in jiffies (to catch stalls) */
+ 	unsigned long last_read;
  
- 	struct {
-@@ -175,8 +175,8 @@ void fbnic_fw_free_mbx(struct fbnic_dev *fbd);
- void fbnic_hwmon_register(struct fbnic_dev *fbd);
- void fbnic_hwmon_unregister(struct fbnic_dev *fbd);
++	/* PMD specific data */
++	unsigned long end_of_pmd_training;
++	u8 pmd_state;
++
+ 	/* Local copy of hardware statistics */
+ 	struct fbnic_hw_stats hw_stats;
  
--int fbnic_pcs_request_irq(struct fbnic_dev *fbd);
--void fbnic_pcs_free_irq(struct fbnic_dev *fbd);
-+int fbnic_mac_request_irq(struct fbnic_dev *fbd);
-+void fbnic_mac_free_irq(struct fbnic_dev *fbd);
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
+index d3a7ad921f18..422265dc7abd 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
+@@ -787,6 +787,8 @@ enum {
  
- void fbnic_napi_name_irqs(struct fbnic_dev *fbd);
- int fbnic_napi_request_irq(struct fbnic_dev *fbd,
+ /* MAC PCS registers */
+ #define FBNIC_CSR_START_PCS		0x10000 /* CSR section delimiter */
++#define FBNIC_PCS_PAGE(n)	(0x10000 + 0x400 * (n))	/* 0x40000 + 1024*n */
++#define FBNIC_PCS(reg, n)	((reg) + FBNIC_PCS_PAGE(n))
+ #define FBNIC_CSR_END_PCS		0x10668 /* CSR section delimiter */
+ 
+ #define FBNIC_CSR_START_RSFEC		0x10800 /* CSR section delimiter */
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_irq.c b/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
-index 1c88a2bf3a7a..40947e142c5d 100644
+index 40947e142c5d..9b068b82f30a 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_irq.c
-@@ -118,12 +118,12 @@ void fbnic_fw_free_mbx(struct fbnic_dev *fbd)
- 	fbd->fw_msix_vector = 0;
+@@ -131,7 +131,9 @@ static irqreturn_t fbnic_mac_msix_intr(int __always_unused irq, void *data)
+ 
+ 	fbn = netdev_priv(fbd->netdev);
+ 
+-	phylink_pcs_change(&fbn->phylink_pcs, false);
++	/* Record link down events */
++	if (!fbd->mac->get_link(fbd, fbn->aui, fbn->fec))
++		phylink_pcs_change(&fbn->phylink_pcs, false);
+ 
+ 	return IRQ_HANDLED;
  }
- 
--static irqreturn_t fbnic_pcs_msix_intr(int __always_unused irq, void *data)
-+static irqreturn_t fbnic_mac_msix_intr(int __always_unused irq, void *data)
- {
- 	struct fbnic_dev *fbd = data;
- 	struct fbnic_net *fbn;
- 
--	if (fbd->mac->pcs_get_link_event(fbd) == FBNIC_LINK_EVENT_NONE) {
-+	if (fbd->mac->get_link_event(fbd) == FBNIC_LINK_EVENT_NONE) {
- 		fbnic_wr32(fbd, FBNIC_INTR_MASK_CLEAR(0),
- 			   1u << FBNIC_PCS_MSIX_ENTRY);
- 		return IRQ_HANDLED;
-@@ -137,20 +137,20 @@ static irqreturn_t fbnic_pcs_msix_intr(int __always_unused irq, void *data)
- }
- 
- /**
-- * fbnic_pcs_request_irq - Configure the PCS to enable it to advertise link
-+ * fbnic_mac_request_irq - Configure the MAC to enable it to advertise link
-  * @fbd: Pointer to device to initialize
-  *
-- * This function provides basic bringup for the MAC/PCS IRQ. For now the IRQ
-+ * This function provides basic bringup for the MAC/PHY IRQ. For now the IRQ
-  * will remain disabled until we start the MAC/PCS/PHY logic via phylink.
-  *
-  * Return: non-zero on failure.
-  **/
--int fbnic_pcs_request_irq(struct fbnic_dev *fbd)
-+int fbnic_mac_request_irq(struct fbnic_dev *fbd)
- {
- 	struct pci_dev *pdev = to_pci_dev(fbd->dev);
- 	int vector, err;
- 
--	WARN_ON(fbd->pcs_msix_vector);
-+	WARN_ON(fbd->mac_msix_vector);
- 
- 	vector = pci_irq_vector(pdev, FBNIC_PCS_MSIX_ENTRY);
- 	if (vector < 0)
-@@ -159,7 +159,7 @@ int fbnic_pcs_request_irq(struct fbnic_dev *fbd)
- 	/* Request the IRQ for PCS link vector.
- 	 * Map PCS cause to it, and unmask it
- 	 */
--	err = request_irq(vector, &fbnic_pcs_msix_intr, 0,
-+	err = request_irq(vector, &fbnic_mac_msix_intr, 0,
- 			  fbd->netdev->name, fbd);
- 	if (err)
- 		return err;
-@@ -168,22 +168,22 @@ int fbnic_pcs_request_irq(struct fbnic_dev *fbd)
- 	fbnic_wr32(fbd, FBNIC_INTR_MSIX_CTRL(FBNIC_INTR_MSIX_CTRL_PCS_IDX),
- 		   FBNIC_PCS_MSIX_ENTRY | FBNIC_INTR_MSIX_CTRL_ENABLE);
- 
--	fbd->pcs_msix_vector = vector;
-+	fbd->mac_msix_vector = vector;
- 
- 	return 0;
- }
- 
- /**
-- * fbnic_pcs_free_irq - Teardown the PCS IRQ to prepare for stopping
-+ * fbnic_mac_free_irq - Teardown the MAC IRQ to prepare for stopping
-  * @fbd: Pointer to device that is stopping
-  *
-- * This function undoes the work done in fbnic_pcs_request_irq and prepares
-+ * This function undoes the work done in fbnic_mac_request_irq and prepares
-  * the device to no longer receive traffic on the host interface.
-  **/
--void fbnic_pcs_free_irq(struct fbnic_dev *fbd)
-+void fbnic_mac_free_irq(struct fbnic_dev *fbd)
- {
- 	/* Vector has already been freed */
--	if (!fbd->pcs_msix_vector)
-+	if (!fbd->mac_msix_vector)
- 		return;
- 
- 	/* Disable interrupt */
-@@ -192,14 +192,14 @@ void fbnic_pcs_free_irq(struct fbnic_dev *fbd)
- 	fbnic_wrfl(fbd);
- 
- 	/* Synchronize IRQ to prevent race that would unmask vector */
--	synchronize_irq(fbd->pcs_msix_vector);
-+	synchronize_irq(fbd->mac_msix_vector);
- 
- 	/* Mask the vector */
- 	fbnic_wr32(fbd, FBNIC_INTR_MASK_SET(0), 1u << FBNIC_PCS_MSIX_ENTRY);
- 
- 	/* Free the vector */
--	free_irq(fbd->pcs_msix_vector, fbd);
--	fbd->pcs_msix_vector = 0;
-+	free_irq(fbd->mac_msix_vector, fbd);
-+	fbd->mac_msix_vector = 0;
- }
- 
- void fbnic_synchronize_irq(struct fbnic_dev *fbd, int nr)
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-index 2a84bd1d7e26..28a2e1fd3760 100644
+index 28a2e1fd3760..fd01d95c5348 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_mac.c
-@@ -434,14 +434,14 @@ static void fbnic_mac_tx_pause_config(struct fbnic_dev *fbd, bool tx_pause)
- 	wr32(fbd, FBNIC_RXB_PAUSE_DROP_CTRL, rxb_pause_ctrl);
+@@ -466,9 +466,8 @@ static u32 __fbnic_mac_cmd_config_asic(struct fbnic_dev *fbd,
+ 	return command_config;
  }
  
--static int fbnic_pcs_get_link_event_asic(struct fbnic_dev *fbd)
-+static int fbnic_mac_get_link_event(struct fbnic_dev *fbd)
+-static bool fbnic_mac_get_pcs_link_status(struct fbnic_dev *fbd)
++static bool fbnic_mac_get_link_status(struct fbnic_dev *fbd, u8 aui, u8 fec)
  {
--	u32 pcs_intr_mask = rd32(fbd, FBNIC_SIG_PCS_INTR_STS);
-+	u32 intr_mask = rd32(fbd, FBNIC_SIG_PCS_INTR_STS);
+-	struct fbnic_net *fbn = netdev_priv(fbd->netdev);
+ 	u32 pcs_status, lane_mask = ~0;
  
--	if (pcs_intr_mask & FBNIC_SIG_PCS_INTR_LINK_DOWN)
-+	if (intr_mask & FBNIC_SIG_PCS_INTR_LINK_DOWN)
- 		return FBNIC_LINK_EVENT_DOWN;
+ 	pcs_status = rd32(fbd, FBNIC_SIG_PCS_OUT0);
+@@ -476,7 +475,7 @@ static bool fbnic_mac_get_pcs_link_status(struct fbnic_dev *fbd)
+ 		return false;
  
--	return (pcs_intr_mask & FBNIC_SIG_PCS_INTR_LINK_UP) ?
-+	return (intr_mask & FBNIC_SIG_PCS_INTR_LINK_UP) ?
- 	       FBNIC_LINK_EVENT_UP : FBNIC_LINK_EVENT_NONE;
- }
+ 	/* Define the expected lane mask for the status bits we need to check */
+-	switch (fbn->aui) {
++	switch (aui) {
+ 	case FBNIC_AUI_100GAUI2:
+ 		lane_mask = 0xf;
+ 		break;
+@@ -484,7 +483,7 @@ static bool fbnic_mac_get_pcs_link_status(struct fbnic_dev *fbd)
+ 		lane_mask = 3;
+ 		break;
+ 	case FBNIC_AUI_LAUI2:
+-		switch (fbn->fec) {
++		switch (fec) {
+ 		case FBNIC_FEC_OFF:
+ 			lane_mask = 0x63;
+ 			break;
+@@ -502,7 +501,7 @@ static bool fbnic_mac_get_pcs_link_status(struct fbnic_dev *fbd)
+ 	}
  
-@@ -521,7 +521,7 @@ static bool fbnic_mac_get_pcs_link_status(struct fbnic_dev *fbd)
+ 	/* Use an XOR to remove the bits we expect to see set */
+-	switch (fbn->fec) {
++	switch (fec) {
+ 	case FBNIC_FEC_OFF:
+ 		lane_mask ^= FIELD_GET(FBNIC_SIG_PCS_OUT0_BLOCK_LOCK,
+ 				       pcs_status);
+@@ -521,7 +520,36 @@ static bool fbnic_mac_get_pcs_link_status(struct fbnic_dev *fbd)
  	return !lane_mask;
  }
  
--static bool fbnic_pcs_get_link_asic(struct fbnic_dev *fbd)
-+static bool fbnic_mac_get_link(struct fbnic_dev *fbd)
+-static bool fbnic_mac_get_link(struct fbnic_dev *fbd)
++static bool fbnic_pmd_update_state(struct fbnic_dev *fbd, bool signal_detect)
++{
++	/* Delay link up for 4 seconds to allow for link training.
++	 * The state transitions for this are as follows:
++	 *
++	 * All states have the following two transitions in common:
++	 *	Loss of signal -> FBNIC_PMD_INITIALIZE
++	 *		The condition handled below (!signal)
++	 *	Reconfiguration -> FBNIC_PMD_INITIALIZE
++	 *		Occurs when mac_prepare starts a PHY reconfig
++	 * FBNIC_PMD_TRAINING:
++	 *	signal still detected && 4s have passed -> Report link up
++	 *	When link is brought up in link_up -> FBNIC_PMD_SEND_DATA
++	 * FBNIC_PMD_INITIALIZE:
++	 *	signal detected -> FBNIC_PMD_TRAINING
++	 */
++	if (!signal_detect) {
++		fbd->pmd_state = FBNIC_PMD_INITIALIZE;
++	} else if (fbd->pmd_state == FBNIC_PMD_TRAINING &&
++		   time_before(fbd->end_of_pmd_training, jiffies)) {
++		return true;
++	} else if (fbd->pmd_state == FBNIC_PMD_INITIALIZE) {
++		fbd->end_of_pmd_training = jiffies + 4 * HZ;
++		fbd->pmd_state = FBNIC_PMD_TRAINING;
++	}
++
++	return fbd->pmd_state == FBNIC_PMD_SEND_DATA;
++}
++
++static bool fbnic_mac_get_link(struct fbnic_dev *fbd, u8 aui, u8 fec)
  {
  	bool link;
  
-@@ -869,8 +869,8 @@ static const struct fbnic_mac fbnic_mac_asic = {
+@@ -538,7 +566,8 @@ static bool fbnic_mac_get_link(struct fbnic_dev *fbd)
+ 	wr32(fbd, FBNIC_SIG_PCS_INTR_STS,
+ 	     FBNIC_SIG_PCS_INTR_LINK_DOWN | FBNIC_SIG_PCS_INTR_LINK_UP);
+ 
+-	link = fbnic_mac_get_pcs_link_status(fbd);
++	link = fbnic_mac_get_link_status(fbd, aui, fec);
++	link = fbnic_pmd_update_state(fbd, link);
+ 
+ 	/* Enable interrupt to only capture changes in link state */
+ 	wr32(fbd, FBNIC_SIG_PCS_INTR_MASK,
+@@ -586,20 +615,15 @@ void fbnic_mac_get_fw_settings(struct fbnic_dev *fbd, u8 *aui, u8 *fec)
+ 	}
+ }
+ 
+-static int fbnic_pcs_enable_asic(struct fbnic_dev *fbd)
++static void fbnic_mac_prepare(struct fbnic_dev *fbd, u8 aui, u8 fec)
+ {
+ 	/* Mask and clear the PCS interrupt, will be enabled by link handler */
+ 	wr32(fbd, FBNIC_SIG_PCS_INTR_MASK, ~0);
+ 	wr32(fbd, FBNIC_SIG_PCS_INTR_STS, ~0);
+ 
+-	return 0;
+-}
+-
+-static void fbnic_pcs_disable_asic(struct fbnic_dev *fbd)
+-{
+-	/* Mask and clear the PCS interrupt */
+-	wr32(fbd, FBNIC_SIG_PCS_INTR_MASK, ~0);
+-	wr32(fbd, FBNIC_SIG_PCS_INTR_STS, ~0);
++	/* If we don't have link tear it all down and start over */
++	if (!fbnic_mac_get_link_status(fbd, aui, fec))
++		fbd->pmd_state = FBNIC_PMD_INITIALIZE;
+ }
+ 
+ static void fbnic_mac_link_down_asic(struct fbnic_dev *fbd)
+@@ -867,10 +891,9 @@ static int fbnic_mac_get_sensor_asic(struct fbnic_dev *fbd, int id,
+ 
+ static const struct fbnic_mac fbnic_mac_asic = {
  	.init_regs = fbnic_mac_init_regs,
- 	.pcs_enable = fbnic_pcs_enable_asic,
- 	.pcs_disable = fbnic_pcs_disable_asic,
--	.pcs_get_link = fbnic_pcs_get_link_asic,
--	.pcs_get_link_event = fbnic_pcs_get_link_event_asic,
-+	.get_link = fbnic_mac_get_link,
-+	.get_link_event = fbnic_mac_get_link_event,
+-	.pcs_enable = fbnic_pcs_enable_asic,
+-	.pcs_disable = fbnic_pcs_disable_asic,
+ 	.get_link = fbnic_mac_get_link,
+ 	.get_link_event = fbnic_mac_get_link_event,
++	.prepare = fbnic_mac_prepare,
  	.get_fec_stats = fbnic_mac_get_fec_stats,
  	.get_pcs_stats = fbnic_mac_get_pcs_stats,
  	.get_eth_mac_stats = fbnic_mac_get_eth_mac_stats,
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_mac.h b/drivers/net/ethernet/meta/fbnic/fbnic_mac.h
-index ede5ff0dae22..414c170abcba 100644
+index 414c170abcba..2b08046645f2 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_mac.h
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_mac.h
-@@ -59,9 +59,9 @@ enum fbnic_sensor_id {
-  *	Configure and enable PCS to enable link if not already enabled
-  * void (*pcs_disable)(struct fbnic_dev *fbd);
-  *	Shutdown the link if we are the only consumer of it.
-- * bool (*pcs_get_link)(struct fbnic_dev *fbd);
-+ * bool (*get_link)(struct fbnic_dev *fbd);
-  *	Check PCS link status
-- * int (*pcs_get_link_event)(struct fbnic_dev *fbd)
-+ * int (*get_link_event)(struct fbnic_dev *fbd)
+@@ -10,6 +10,23 @@ struct fbnic_dev;
+ 
+ #define FBNIC_MAX_JUMBO_FRAME_SIZE	9742
+ 
++/* States loosely based on section 136.8.11.7.5 of IEEE 802.3-2022 Ethernet
++ * Standard.  These are needed to track the state of the PHY as it has a delay
++ * of several seconds from the time link comes up until it has completed
++ * training that we need to wait to report the link.
++ *
++ * Currently we treat training as a single block as this is managed by the
++ * firmware.
++ *
++ * We have FBNIC_PMD_SEND_DATA set to 0 as the expected default at driver load
++ * and we initialize the structure containing it to zero at allocation.
++ */
++enum {
++	FBNIC_PMD_SEND_DATA	= 0x0,
++	FBNIC_PMD_INITIALIZE	= 0x1,
++	FBNIC_PMD_TRAINING	= 0x2,
++};
++
+ enum {
+ 	FBNIC_LINK_EVENT_NONE	= 0,
+ 	FBNIC_LINK_EVENT_UP	= 1,
+@@ -55,15 +72,15 @@ enum fbnic_sensor_id {
+  * void (*init_regs)(struct fbnic_dev *fbd);
+  *	Initialize MAC registers to enable Tx/Rx paths and FIFOs.
+  *
+- * void (*pcs_enable)(struct fbnic_dev *fbd);
+- *	Configure and enable PCS to enable link if not already enabled
+- * void (*pcs_disable)(struct fbnic_dev *fbd);
+- *	Shutdown the link if we are the only consumer of it.
+- * bool (*get_link)(struct fbnic_dev *fbd);
+- *	Check PCS link status
+  * int (*get_link_event)(struct fbnic_dev *fbd)
   *	Get the current link event status, reports true if link has
   *	changed to either FBNIC_LINK_EVENT_DOWN or FBNIC_LINK_EVENT_UP
++ * bool (*get_link)(struct fbnic_dev *fbd, u8 aui, u8 fec);
++ *	Check link status
++ *
++ * void (*prepare)(struct fbnic_dev *fbd, u8 aui, u8 fec);
++ *	Prepare PHY for init by fetching settings, disabling interrupts,
++ *	and sending an updated PHY config to FW if needed.
   *
-@@ -76,8 +76,8 @@ struct fbnic_mac {
+  * void (*link_down)(struct fbnic_dev *fbd);
+  *	Configure MAC for link down event
+@@ -74,10 +91,10 @@ enum fbnic_sensor_id {
+ struct fbnic_mac {
+ 	void (*init_regs)(struct fbnic_dev *fbd);
  
- 	int (*pcs_enable)(struct fbnic_dev *fbd);
- 	void (*pcs_disable)(struct fbnic_dev *fbd);
--	bool (*pcs_get_link)(struct fbnic_dev *fbd);
--	int (*pcs_get_link_event)(struct fbnic_dev *fbd);
-+	bool (*get_link)(struct fbnic_dev *fbd);
-+	int (*get_link_event)(struct fbnic_dev *fbd);
+-	int (*pcs_enable)(struct fbnic_dev *fbd);
+-	void (*pcs_disable)(struct fbnic_dev *fbd);
+-	bool (*get_link)(struct fbnic_dev *fbd);
+ 	int (*get_link_event)(struct fbnic_dev *fbd);
++	bool (*get_link)(struct fbnic_dev *fbd, u8 aui, u8 fec);
++
++	void (*prepare)(struct fbnic_dev *fbd, u8 aui, u8 fec);
  
  	void (*get_fec_stats)(struct fbnic_dev *fbd, bool reset,
  			      struct fbnic_fec_stats *fec_stats);
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-index e95be0e7bd9e..2d5ae89b4a15 100644
+index 2d5ae89b4a15..65318a5b466e 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
-@@ -44,7 +44,7 @@ int __fbnic_open(struct fbnic_net *fbn)
- 	if (err)
- 		goto time_stop;
+@@ -86,10 +86,10 @@ static int fbnic_stop(struct net_device *netdev)
+ {
+ 	struct fbnic_net *fbn = netdev_priv(netdev);
  
--	err = fbnic_pcs_request_irq(fbd);
-+	err = fbnic_mac_request_irq(fbd);
- 	if (err)
- 		goto time_stop;
- 
-@@ -89,7 +89,7 @@ static int fbnic_stop(struct net_device *netdev)
++	fbnic_mac_free_irq(fbn->fbd);
  	phylink_suspend(fbn->phylink, fbnic_bmc_present(fbn->fbd));
  
  	fbnic_down(fbn);
--	fbnic_pcs_free_irq(fbn->fbd);
-+	fbnic_mac_free_irq(fbn->fbd);
+-	fbnic_mac_free_irq(fbn->fbd);
  
  	fbnic_time_stop(fbn);
  	fbnic_fw_xmit_ownership_msg(fbn->fbd, false);
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
+index b0a87c57910f..c2e45ff64e34 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
+@@ -107,7 +107,7 @@ int fbnic_phylink_ethtool_ksettings_get(struct net_device *netdev,
+ int fbnic_phylink_get_fecparam(struct net_device *netdev,
+ 			       struct ethtool_fecparam *fecparam);
+ int fbnic_phylink_init(struct net_device *netdev);
+-
++void fbnic_phylink_pmd_training_complete_notify(struct net_device *netdev);
+ bool fbnic_check_split_frames(struct bpf_prog *prog,
+ 			      unsigned int mtu, u32 hds_threshold);
+ #endif /* _FBNIC_NETDEV_H_ */
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
+index 4620f1847f2e..040bd520b160 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_pci.c
+@@ -207,6 +207,10 @@ static void fbnic_service_task(struct work_struct *work)
+ {
+ 	struct fbnic_dev *fbd = container_of(to_delayed_work(work),
+ 					     struct fbnic_dev, service_task);
++	struct net_device *netdev = fbd->netdev;
++
++	if (netif_running(netdev))
++		fbnic_phylink_pmd_training_complete_notify(netdev);
+ 
+ 	rtnl_lock();
+ 
+@@ -218,13 +222,13 @@ static void fbnic_service_task(struct work_struct *work)
+ 
+ 	fbnic_bmc_rpc_check(fbd);
+ 
+-	if (netif_carrier_ok(fbd->netdev)) {
+-		netdev_lock(fbd->netdev);
+-		fbnic_napi_depletion_check(fbd->netdev);
+-		netdev_unlock(fbd->netdev);
++	if (netif_carrier_ok(netdev)) {
++		netdev_lock(netdev);
++		fbnic_napi_depletion_check(netdev);
++		netdev_unlock(netdev);
+ 	}
+ 
+-	if (netif_running(fbd->netdev))
++	if (netif_running(netdev))
+ 		schedule_delayed_work(&fbd->service_task, HZ);
+ 
+ 	rtnl_unlock();
 diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-index 7ce3fdd25282..3c0bd435ee28 100644
+index 3c0bd435ee28..27e4073d9898 100644
 --- a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
 +++ b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-@@ -132,7 +132,7 @@ fbnic_phylink_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
+@@ -132,25 +132,9 @@ fbnic_phylink_pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
  
  	state->duplex = DUPLEX_FULL;
  
--	state->link = fbd->mac->pcs_get_link(fbd);
-+	state->link = fbd->mac->get_link(fbd);
+-	state->link = fbd->mac->get_link(fbd);
+-}
+-
+-static int
+-fbnic_phylink_pcs_enable(struct phylink_pcs *pcs)
+-{
+-	struct fbnic_net *fbn = fbnic_pcs_to_net(pcs);
+-	struct fbnic_dev *fbd = fbn->fbd;
+-
+-	return fbd->mac->pcs_enable(fbd);
+-}
+-
+-static void
+-fbnic_phylink_pcs_disable(struct phylink_pcs *pcs)
+-{
+-	struct fbnic_net *fbn = fbnic_pcs_to_net(pcs);
+-	struct fbnic_dev *fbd = fbn->fbd;
+-
+-	return fbd->mac->pcs_disable(fbd);
++	state->link = (fbd->pmd_state == FBNIC_PMD_SEND_DATA) &&
++		      (rd32(fbd, FBNIC_PCS(MDIO_STAT1, 0)) &
++		       MDIO_STAT1_LSTATUS);
  }
  
  static int
+@@ -164,8 +148,6 @@ fbnic_phylink_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
+ 
+ static const struct phylink_pcs_ops fbnic_phylink_pcs_ops = {
+ 	.pcs_config = fbnic_phylink_pcs_config,
+-	.pcs_enable = fbnic_phylink_pcs_enable,
+-	.pcs_disable = fbnic_phylink_pcs_disable,
+ 	.pcs_get_state = fbnic_phylink_pcs_get_state,
+ };
+ 
+@@ -179,12 +161,39 @@ fbnic_phylink_mac_select_pcs(struct phylink_config *config,
+ 	return &fbn->phylink_pcs;
+ }
+ 
++static int
++fbnic_phylink_mac_prepare(struct phylink_config *config, unsigned int mode,
++			  phy_interface_t iface)
++{
++	struct net_device *netdev = to_net_dev(config->dev);
++	struct fbnic_net *fbn = netdev_priv(netdev);
++	struct fbnic_dev *fbd = fbn->fbd;
++
++	fbd->mac->prepare(fbd, fbn->aui, fbn->fec);
++
++	return 0;
++}
++
+ static void
+ fbnic_phylink_mac_config(struct phylink_config *config, unsigned int mode,
+ 			 const struct phylink_link_state *state)
+ {
+ }
+ 
++static int
++fbnic_phylink_mac_finish(struct phylink_config *config, unsigned int mode,
++			 phy_interface_t iface)
++{
++	struct net_device *netdev = to_net_dev(config->dev);
++	struct fbnic_net *fbn = netdev_priv(netdev);
++	struct fbnic_dev *fbd = fbn->fbd;
++
++	/* Retest the link state and restart interrupts */
++	fbd->mac->get_link(fbd, fbn->aui, fbn->fec);
++
++	return 0;
++}
++
+ static void
+ fbnic_phylink_mac_link_down(struct phylink_config *config, unsigned int mode,
+ 			    phy_interface_t interface)
+@@ -213,7 +222,9 @@ fbnic_phylink_mac_link_up(struct phylink_config *config,
+ 
+ static const struct phylink_mac_ops fbnic_phylink_mac_ops = {
+ 	.mac_select_pcs = fbnic_phylink_mac_select_pcs,
++	.mac_prepare = fbnic_phylink_mac_prepare,
+ 	.mac_config = fbnic_phylink_mac_config,
++	.mac_finish = fbnic_phylink_mac_finish,
+ 	.mac_link_down = fbnic_phylink_mac_link_down,
+ 	.mac_link_up = fbnic_phylink_mac_link_up,
+ };
+@@ -254,3 +265,29 @@ int fbnic_phylink_init(struct net_device *netdev)
+ 
+ 	return 0;
+ }
++
++/**
++ * fbnic_phylink_pmd_training_complete_notify - PMD training complete notifier
++ * @netdev: Netdev struct phylink device attached to
++ *
++ * When the link first comes up the PMD will have a period of 2 to 3 seconds
++ * where the link will flutter due to link training. To avoid spamming the
++ * kernel log with messages about this we add a delay of 4 seconds from the
++ * time of the last PCS report of link so that we can guarantee we are unlikely
++ * to see any further link loss events due to link training.
++ **/
++void fbnic_phylink_pmd_training_complete_notify(struct net_device *netdev)
++{
++	struct fbnic_net *fbn = netdev_priv(netdev);
++	struct fbnic_dev *fbd = fbn->fbd;
++
++	if (fbd->pmd_state != FBNIC_PMD_TRAINING)
++		return;
++
++	if (!time_before(fbd->end_of_pmd_training, jiffies))
++		return;
++
++	fbd->pmd_state = FBNIC_PMD_SEND_DATA;
++
++	phylink_pcs_change(&fbn->phylink_pcs, false);
++}
 
 
 
