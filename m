@@ -1,90 +1,165 @@
-Return-Path: <netdev+bounces-237304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25A47C48946
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 19:34:06 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A1BEC48A27
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 19:47:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D54523B4A85
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 18:31:31 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 569A94E116A
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 18:47:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F83A32B995;
-	Mon, 10 Nov 2025 18:27:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9993332ABE8;
+	Mon, 10 Nov 2025 18:47:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MIHQfj+N"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LGoJh2Bf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DEC632B98B
-	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 18:27:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66A8B321445;
+	Mon, 10 Nov 2025 18:47:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762799233; cv=none; b=iXY11c/yHf6kWVdl9xjJCaJKrFBqlkW7sMh3Dv4tT0C7IZBWJ7RPEPLDaZJeD5bXyEo9aaeFfkGc7761eVS96gbVBhNuMjXlbqoggP4DI8PQ+FHd3+tQgeQukNmtKPzf9iNHKfkVs9ra/03ENljgUXqs2EP9A7S/dP+gjkQ58ew=
+	t=1762800461; cv=none; b=lYCRzW+zeLP/NPkDfHQprL/qzGw6aJfHb3DTU7Wp7zqXzPALRqOn2YOvdAytnJ6G6NmnBQConTuZT3WIbWAsgI5OigvQcvTqv27YzfwQos9nOej3mxO4/yUeTE4vCsP5+w1HELD3IOlzwsLn17hz6QqLoMww2hCHKRUwo93Ll+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762799233; c=relaxed/simple;
-	bh=Jo4KQohk0qAHMwR3XazWzSRyRFzOWbPZkI4FA8ppyNE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=omH65YEuaVmIf78Ag64NhUX6O3DORnmWmxbfyfOzWarXzgfWwPvZKo04HwgvhxTBjJv5OWpy/QKgeJnVYiY1MlrSFDY2p7i8VvVuKeQ1txch9pVPJZLy3FhLntRBANHdgUh5mhLUtPsoI659zoYFttAi+w6+OX6lF12zl+jdwe4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MIHQfj+N; arc=none smtp.client-ip=209.85.216.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-343514c7854so41304a91.1
-        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 10:27:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762799231; x=1763404031; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=wAEVQn71Lt+FJLFXbW1DizRgBnzxoKpEi8u5SYwmvaM=;
-        b=MIHQfj+NiRfEcUInXqK2Sa29bcGOKf27JSmgT/qqdaLNxxQ5HMcRPa4oXPNP8WxkMa
-         o4Vz9jK4APhu5dXgOQ/FIAWeyBjinRttwlzShaFYccMDFS2up+lziTfhneprLAuOshZk
-         VvxfyMAdIuqou30lO/L7sJA/nuyGfoexM6G+I23tPUzm25ygeN+P490xYrThIXD93Gfo
-         DGio2+bVzgFDBt1O5xs5MiudnhsyqIJTUnDKhu6FljdSmOraCea9+7iPzTk1WNH4s4GY
-         baGYBrH/bv9vNw7O6pKoYNb8wyQN4PkzL0Ths0wYmQpa6xnZws6pb4WP1wOXizw/ky8k
-         gjHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762799231; x=1763404031;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wAEVQn71Lt+FJLFXbW1DizRgBnzxoKpEi8u5SYwmvaM=;
-        b=Hqg2+gKPbXzXRlMIwEMlGBsHhW5O98f3JSEZqSwn60m4CRjedN17rXwHuSpuWU4X7d
-         xYcG3mDzNX+cKOz1gEMr/mFbfoYKMy13882Ezm7+5IfNgI7ef01HKpWcPs96vjzW0BSj
-         +S++UdsKWeTyymOMOKDsCg3bHdl7qQbsXMEAgIYi4JfzXZRvCc9qeTkWX/hVVIaK/rmB
-         +SJwvz6fU8Lpy5FUy9IVtPSjCE+zWX6bPAmetvv3CdvxB3bOep5zrfJqPtyg29Og/k3a
-         yjFCbY/cVyV9FPtlvXdXvYcCwcQG3pW0gb5gd7e6LX1s6XnGK3KOYG2HlldJk/O7h7YA
-         yHHQ==
-X-Gm-Message-State: AOJu0YxxZBVvTHPYWmwAIQYrEloovkA9sXAyT+61VcC19RY34oKCN0zv
-	MIYxnRO277MIh+MTX3vD9dfXCjxXdPa87GQeOSdmLfPphTbyGl58onFy
-X-Gm-Gg: ASbGnctXg/aWmUYFPbYQwil7rLcQx6rPZhEWkycGR09YECFN999zUo9NKZh/lK8ZMXY
-	bBBKsm3nKTomGKEBVkP3Zvw7RZ/LDwq6vqtZKDif7+qDliKS7Eq3aG67hgSIIIakgWnTXq7XSV8
-	7k3bXlqAipGgQZ8l3cncU/rIpUVsiCh6juQhXM3jilw8X+8g48nu2VgPRXOxaev3WrFftKuZbyl
-	pS13fBdUd+IDaw796M0s9jVHNdG1hh0f80HD5/ltGpLNlhUnoCMPHCmycupYDgDyzbv0Bjl0uoF
-	rlt2irmvhx5qzVGLzsJG7EqIl5L/eseX5ETFTF8Q4cu6uCLYHnCubqBi0VSSOCbg9URRY//MdmV
-	t7fD6y/O0DKfuJ6yQ/QdZIUAqPp4/GlWSEZhDhvshWujkbbml8QwDUbyJnTgSqPZFrsmkXA3Vuh
-	j/P1uuqt5ceswYY30w
-X-Google-Smtp-Source: AGHT+IFp+5QPdyLsVySxg6S/DGa6ThFvZYJARt+ZTjhpCxWXJLS3IdM0P8g9EmWbeYBwYclfdp8zMw==
-X-Received: by 2002:a17:90b:2dc9:b0:32e:2fa7:fe6b with SMTP id 98e67ed59e1d1-343bf23165cmr373892a91.14.1762799230756;
-        Mon, 10 Nov 2025 10:27:10 -0800 (PST)
-Received: from crl-3.node2.local ([125.63.65.162])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b0c9634f56sm12752943b3a.4.2025.11.10.10.27.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Nov 2025 10:27:10 -0800 (PST)
-From: Kriish Sharma <kriish.sharma2006@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org,
+	s=arc-20240116; t=1762800461; c=relaxed/simple;
+	bh=wAsccoU8w3B4eRMZuq2gxUaDz+Dt38AFte0j5k5tPOM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=f8b3W5vuv4s+XrWqI8Pq0RA3TaRw/MEVpgYTAM1ahjT1QyE7YmmDTJTBLniQowlxO8/sMtpIWDtIkVUfm9pabR0MK5QKdPljqSm3yNWLGVd55TvuBd9t0f85I+EzBcQz5VReCQ7quExOZuOi8ZKznIeSpKmiZMJ8ZxQ0GURhXF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LGoJh2Bf; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1762800459; x=1794336459;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=wAsccoU8w3B4eRMZuq2gxUaDz+Dt38AFte0j5k5tPOM=;
+  b=LGoJh2BfuuEOTUk0FiynunvbwgLCHK795YE0dQ/MitEsCtJpwtpHTNiH
+   Nj6DYMl0zfgqyZKeLkaIY24F4IrEO/yRszpr2pGlrgkllCR9uwnm+Ad6P
+   t82nYcC5sYBsM3u38jMXlH3omlApFSwmhr+bGxDW3c0GIsGsznSIq1Vl/
+   prU9QmGB93oR52h+IN8sUUIdWFSOtsVDl1/upJtDsCuargTd1crVycmb7
+   s+FgSrUKSzRx6B9/FNN0VMBgC2vv5PHlNXMAIzZWbsk4J9qBNsuspoSjD
+   eJsTYEWjytAZvwraGcA8LHnyUUyOAE+gQXStxJ4820FW5AMOL1xxCPDSO
+   A==;
+X-CSE-ConnectionGUID: 8l0vfIDUQsig8WVTeYr+tA==
+X-CSE-MsgGUID: w/1pe4BtTF24tYVmPynttA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="64769602"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="64769602"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2025 10:47:38 -0800
+X-CSE-ConnectionGUID: i9YCGhVJRUGQcVlTpVIfpg==
+X-CSE-MsgGUID: Z0/CCH/BSBOYpkaQrxg0zg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,294,1754982000"; 
+   d="scan'208";a="193749558"
+Received: from black.igk.intel.com ([10.91.253.5])
+  by fmviesa004.fm.intel.com with ESMTP; 10 Nov 2025 10:47:29 -0800
+Received: by black.igk.intel.com (Postfix, from userid 1003)
+	id E8E2195; Mon, 10 Nov 2025 19:47:28 +0100 (CET)
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Corey Minyard <corey@minyard.net>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+	"Dr. David Alan Gilbert" <linux@treblig.org>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+	Rob Clark <robin.clark@oss.qualcomm.com>,
+	Matthew Brost <matthew.brost@intel.com>,
+	Hans Verkuil <hverkuil@kernel.org>,
+	Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Vitaly Lifshits <vitaly.lifshits@intel.com>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>,
+	Calvin Owens <calvin@wbinvd.org>,
+	Sagi Maimon <maimon.sagi@gmail.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Karan Tilak Kumar <kartilak@cisco.com>,
+	Casey Schaufler <casey@schaufler-ca.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Petr Mladek <pmladek@suse.com>,
+	Max Kellermann <max.kellermann@ionos.com>,
+	Takashi Iwai <tiwai@suse.de>,
+	linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Kriish Sharma <kriish.sharma2006@gmail.com>
-Subject: [PATCH] ethtool: fix incorrect kernel-doc style comment in ethtool.h
-Date: Mon, 10 Nov 2025 18:25:45 +0000
-Message-Id: <20251110182545.2112596-1-kriish.sharma2006@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	openipmi-developer@lists.sourceforge.net,
+	linux-media@vger.kernel.org,
+	dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org,
+	amd-gfx@lists.freedesktop.org,
+	linux-arm-msm@vger.kernel.org,
+	freedreno@lists.freedesktop.org,
+	intel-xe@lists.freedesktop.org,
+	linux-mmc@vger.kernel.org,
+	netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	linux-pci@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-staging@lists.linux.dev,
+	ceph-devel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	linux-sound@vger.kernel.org
+Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	David Airlie <airlied@gmail.com>,
+	Simona Vetter <simona@ffwll.ch>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Dmitry Baryshkov <lumag@kernel.org>,
+	Abhinav Kumar <abhinav.kumar@linux.dev>,
+	Jessica Zhang <jesszhan0024@gmail.com>,
+	Sean Paul <sean@poorly.run>,
+	Marijn Suijten <marijn.suijten@somainline.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	=?UTF-8?q?Thomas=20Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	=?UTF-8?q?Krzysztof=20Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Rodolfo Giometti <giometti@enneenne.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Stefan Haberland <sth@linux.ibm.com>,
+	Jan Hoeppner <hoeppner@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Satish Kharat <satishkh@cisco.com>,
+	Sesidhar Baddela <sebaddel@cisco.com>,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Xiubo Li <xiubli@redhat.com>,
+	Ilya Dryomov <idryomov@gmail.com>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>
+Subject: [PATCH v1 00/23] treewide: Introduce %ptS for struct timespec64 and convert users
+Date: Mon, 10 Nov 2025 19:40:19 +0100
+Message-ID: <20251110184727.666591-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.50.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,37 +168,80 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Building documentation produced the following warning:
 
-  WARNING: ./include/linux/ethtool.h:495 This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
- * IEEE 802.3ck/df defines 16 bins for FEC histogram plus one more for
+Here is the third part of unification time printing in the kernel.
+This time for struct timespec64. The first patch brings support
+into printf() implementation (test cases and documentation update
+included) followed by the treewide conversion of the current users.
 
-This comment was not intended to be parsed as kernel-doc, so replace
-the '/**' with '/*' to silence the warning and align with normal
-comment style in header files.
+The idea is to have one or a few biggest users included, the rest
+can be taken next release cycle on the subsystem basis, but I won't
+object if the respective maintainers already give their tags. Depending
+on the tags received it may go via dedicated subsystem or via PRINTK
+tree.
 
-No functional changes.
+Note, not everything was compile-tested. Kunit test has been passed, though.
 
-Fixes: cc2f08129925 ("ethtool: add FEC bins histogram report")
-Signed-off-by: Kriish Sharma <kriish.sharma2006@gmail.com>
----
- include/linux/ethtool.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Andy Shevchenko (23):
+  lib/vsprintf: Add specifier for printing struct timespec64
+  ALSA: seq: Switch to use %ptSp
+  ceph: Switch to use %ptSp
+  libceph: Switch to use %ptSp
+  dma-buf: Switch to use %ptSp
+  drm/amdgpu: Switch to use %ptSp
+  drm/msm: Switch to use %ptSp
+  drm/vblank: Switch to use %ptSp
+  drm/xe: Switch to use %ptSp
+  e1000e: Switch to use %ptSp
+  igb: Switch to use %ptSp
+  ipmi: Switch to use %ptSp
+  media: av7110: Switch to use %ptSp
+  media: v4l2-ioctl: Switch to use %ptSp
+  mmc: mmc_test: Switch to use %ptSp
+  net: dsa: sja1105: Switch to use %ptSp
+  PCI: epf-test: Switch to use %ptSp
+  pps: Switch to use %ptSp
+  ptp: ocp: Switch to use %ptSp
+  s390/dasd: Switch to use %ptSp
+  scsi: fnic: Switch to use %ptS
+  scsi: snic: Switch to use %ptSp
+  tracing: Switch to use %ptSp
 
-diff --git a/include/linux/ethtool.h b/include/linux/ethtool.h
-index c2d8b4ec62eb..5c9162193d26 100644
---- a/include/linux/ethtool.h
-+++ b/include/linux/ethtool.h
-@@ -492,7 +492,7 @@ struct ethtool_pause_stats {
- };
- 
- #define ETHTOOL_MAX_LANES	8
--/**
-+/*
-  * IEEE 802.3ck/df defines 16 bins for FEC histogram plus one more for
-  * the end-of-list marker, total 17 items
-  */
+ Documentation/core-api/printk-formats.rst     | 11 ++++-
+ drivers/char/ipmi/ipmi_si_intf.c              |  3 +-
+ drivers/char/ipmi/ipmi_ssif.c                 |  6 +--
+ drivers/dma-buf/sync_debug.c                  |  2 +-
+ .../gpu/drm/amd/amdgpu/amdgpu_dev_coredump.c  |  3 +-
+ drivers/gpu/drm/drm_vblank.c                  |  6 +--
+ .../gpu/drm/msm/disp/msm_disp_snapshot_util.c |  3 +-
+ drivers/gpu/drm/msm/msm_gpu.c                 |  3 +-
+ drivers/gpu/drm/xe/xe_devcoredump.c           |  4 +-
+ drivers/media/v4l2-core/v4l2-ioctl.c          |  5 +-
+ drivers/mmc/core/mmc_test.c                   | 18 +++----
+ drivers/net/dsa/sja1105/sja1105_tas.c         |  8 ++--
+ drivers/net/ethernet/intel/e1000e/ptp.c       |  7 +--
+ drivers/net/ethernet/intel/igb/igb_ptp.c      |  7 +--
+ drivers/pci/endpoint/functions/pci-epf-test.c |  5 +-
+ drivers/pps/generators/pps_gen_parport.c      |  3 +-
+ drivers/pps/kapi.c                            |  3 +-
+ drivers/ptp/ptp_ocp.c                         | 15 +++---
+ drivers/s390/block/dasd.c                     |  3 +-
+ drivers/scsi/fnic/fnic_trace.c                | 46 ++++++++----------
+ drivers/scsi/snic/snic_debugfs.c              | 10 ++--
+ drivers/scsi/snic/snic_trc.c                  |  5 +-
+ drivers/staging/media/av7110/av7110.c         |  2 +-
+ fs/ceph/dir.c                                 |  5 +-
+ fs/ceph/inode.c                               | 47 ++++++-------------
+ fs/ceph/xattr.c                               |  6 +--
+ kernel/trace/trace_output.c                   |  6 +--
+ lib/tests/printf_kunit.c                      |  4 ++
+ lib/vsprintf.c                                | 25 ++++++++++
+ net/ceph/messenger_v2.c                       |  6 +--
+ sound/core/seq/seq_queue.c                    |  2 +-
+ sound/core/seq/seq_timer.c                    |  6 +--
+ 32 files changed, 131 insertions(+), 154 deletions(-)
+
 -- 
-2.34.1
+2.50.1
 
 
