@@ -1,133 +1,129 @@
-Return-Path: <netdev+bounces-237378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0871C49CC5
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 00:41:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22B3EC49CF5
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 00:46:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9F973AE472
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 23:39:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBB773AD132
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 23:46:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 252DC2FD689;
-	Mon, 10 Nov 2025 23:39:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D88D3303A1B;
+	Mon, 10 Nov 2025 23:46:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OPN4Sai3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oP2yrdDG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B586D2DCBEB
-	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 23:39:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A811D1DE8AE;
+	Mon, 10 Nov 2025 23:46:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762817971; cv=none; b=VqDyI1z+MnJiqXMBbnTuvEQEDX+J5KA0DYDFDn5WugkRQSv8jPXrzBIS4dL2OLNKzS8fu6YR78jR0K1M3UvntKYGc39qb2oDMtt36bXLUXoB1PZXJF5uoi7kEd9hydVKw3d4BdCiTvgkuwCULlwGyukpGB4vjwKiasos7nvHmIM=
+	t=1762818406; cv=none; b=G78Lfrd/3ZmONF4M4j+JBaWGvLxY5O+X2ipAjb/ErHsPoXg2+92PiTj6Y0TLB0sINRyUmAW1Td8VthevJIcUQ6tpJp5jc6kH1NU3xSUnq/wvg1XHOuk84cKS9fuZOr1eU2gPH+9dPr0Y+z8fsGU0kTZrDX2RaLME2wakO+BJR4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762817971; c=relaxed/simple;
-	bh=1cCEzFjzFyynAjNG1FFpcR8zgbzlE7XPHiymBHl+NSg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rhXvME9g6kq5t+LDQDG67kFrAngBdtUJs7H1KZThLARQLV7Ax3O5pOj/G43LTtx3XEzbdb/jeX0S/XJTHlzHEpthk4Qagwmtbzja8cukT1AbtpRxtKG61FJOivXhVl8+/ol6oby/12SVc5p4RcCpUWh+53w0fO8QON3i4c6r3ZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OPN4Sai3; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-34381ec9197so1918436a91.1
-        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 15:39:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762817969; x=1763422769; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1cCEzFjzFyynAjNG1FFpcR8zgbzlE7XPHiymBHl+NSg=;
-        b=OPN4Sai3Vd//m/qP3LSL5aIWMF/Oj7ZKNf41fVeidX+FH6BiyE7U22ug52jcnImDO1
-         Oflm8p3VbkU+YtbWWFB/DGMS80m5B6ieRhcihomDguGxx4O/PJvTqe1AIeuRtda5bJig
-         WYBYbe4VIVaNAr1lr2uhlibsjdrWqLktagHOk1bPJ4Hrp1iR6HFWEziLuOioDFTm39zY
-         yReSqXyt9NmUH6Eqtdppfc2i+z6/aol4DTrsKgI200typa5Nz081fmng1D0SBbTLRZPR
-         34J3Ym9MntMXTZjLFzjAxA70m4UKaO7/wpRpEX1FxQTkGqCIWvP+EG5oHelA2T0K6z2X
-         6YoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762817969; x=1763422769;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1cCEzFjzFyynAjNG1FFpcR8zgbzlE7XPHiymBHl+NSg=;
-        b=iT70Wk3aYc4w5vMg3f2Jc3KeIHhURxl6OWb3buQHX5kKPgAoG+giGyYzw1fcjolqQ/
-         dqsmjusEqvnb7Abw4pmML1RjGj7w3hOv1awm52gXYjk0e/7dYlPRQf/mCvkxp0cbhgLk
-         nwgHEvS6DFsJRSKQUrY5VB3JBQs9xuBRnI1gkD+EkV3jhs58P9TFdIA/d10rrmLTWXQO
-         IiLR0m9hy/B7HSJlR2r8Y5GIx+nk0Q6SjN9fPKIzkX84X3S5lA/zo5RlEoP/BE4Co/YB
-         M4J15ZYHwLK3Ok/zu3rXrQLFrIbEfFmAHUCFXKYA7k90pLPmFgPDC20qq++f5jEGomsV
-         CHjw==
-X-Forwarded-Encrypted: i=1; AJvYcCVVsteBDLRZ2hLladqzZj93qkB153PJfCB7uqdGxb/Sj0wIiA2kpmIUaAMv/Z1fsAY1Tgc5seo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw6quRwMrUzoDbXWJBAhc8+Bqb/3d6P7sZoi70pvjPpLT7xm+Ku
-	mjWKL8PqOhpnFl01GwfA+gAt7A1/cnQEYZN2CUXMJw381Q0Oc7RAQ0Yy
-X-Gm-Gg: ASbGncv34W8ECH8l1jO0qfg+2o0aumKYMhFz+0scNwkxzXZWzO0pv1l0cE93TfUIyrY
-	RSqnaO+vTqsRrBbFmNXTyhY57kb13EXod7MH/n8T6KlRSjBnUaiHvra3GeHoEl7Y4RdkHuGs18R
-	HvGm3YIAl+BMkFJxaJ94lmrVgXxL3tKh44szJjpcrE7N35JxrlJxFXUCVvT7x/9FdjEcEWotaoa
-	RyGJZqZKVNj86NCVZjtA/pLtT2qy4bU5CDXTIxzF19bplXZOyngbPyTcZyRxeCco8ddX2HdgEFR
-	IU/OWWNqpKMQwXGchU5G54DPg1BfId9cNVeWeTs/ugsbEYIVrJpUmxR/yGCYHXhAigv6UtrXPKh
-	f7++4MD/5az0aG+LVhh9d8XIjsXBPaUGD81KhenMuPv+mytoiIGRgmcEMX302HPFa0C+2qkiYme
-	w55rrUF82LtZQ=
-X-Google-Smtp-Source: AGHT+IGNoUDFbEycsFFzEVxa73D1puHH1tGo3xImIbeJfxgr+6wQcg9RSQmi7aGMv0B/b6rZU75/ww==
-X-Received: by 2002:a17:90b:180e:b0:33b:b020:5968 with SMTP id 98e67ed59e1d1-3436cb8de8dmr12568294a91.21.1762817968931;
-        Mon, 10 Nov 2025 15:39:28 -0800 (PST)
-Received: from archie.me ([210.87.74.117])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-ba90307193fsm13641074a12.38.2025.11.10.15.39.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Nov 2025 15:39:27 -0800 (PST)
-Received: by archie.me (Postfix, from userid 1000)
-	id 1A7E541D950E; Tue, 11 Nov 2025 06:39:25 +0700 (WIB)
-Date: Tue, 11 Nov 2025 06:39:25 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Documentation <linux-doc@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH net-next v3 0/9] xfrm docs update
-Message-ID: <aRJ3rVhjky-YmoEj@archie.me>
-References: <20251103015029.17018-2-bagasdotme@gmail.com>
+	s=arc-20240116; t=1762818406; c=relaxed/simple;
+	bh=4e1bgpUV/iimHsy8hCdENWKdiFeyy00W/2NkO5sEUAI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hc1vpq+YHIP7Y6K9fhHX8A5AH0KpARdFzL522+BGIzcq0Jk3oZ8u4ZR3r4SEfU24yDaDp9Z/8SHQEStF6jp/wXKDuIurX25JUSwhZOJs67aup0Sjc/KhbLGyE8/4u8t+SYQynXhPehsl2cuRo4A6fQ+5DXzI7fxm6vK023A39t0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oP2yrdDG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28E6FC4CEF5;
+	Mon, 10 Nov 2025 23:46:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762818406;
+	bh=4e1bgpUV/iimHsy8hCdENWKdiFeyy00W/2NkO5sEUAI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=oP2yrdDG0/mUFvFidbKQaKe6gJ9F/49YmJX2dk2zIRQVnLBAUt5Bk09EXUhtxHglT
+	 RAHcKDqMcD6UbGffywoOsfuUPYOzyut01P+a224sUF9Q/lCufFp9yx3N1QHe8hHzQ1
+	 h1Gcdd3ZW0XNvLVdJLo0EU9+29ceM4l9zpj0MH6jJCfTtB7C1/yevHRx8d/7412s8d
+	 I7WAj66CpWa5b2UnoISnNm/NI/L7rkfg3Llh78AlgAm4kaqySG0bWidh4Tqr8v6nCf
+	 UIrKMk8d7m0dQaOHa+KAQEtIcdyh5ignOrmz8lLJaeASJcxf/Y4qB4NfmGN21hdN5y
+	 KC7cNoFQCREBw==
+Date: Mon, 10 Nov 2025 15:46:43 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Saeed Mahameed <saeed@kernel.org>, Daniel Zahka
+ <daniel.zahka@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Srujana Challa
+ <schalla@marvell.com>, Bharat Bhushan <bbhushan2@marvell.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>, Brett Creeley <brett.creeley@amd.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Michael Chan
+ <michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, Tony
+ Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Sunil Goutham <sgoutham@marvell.com>, Linu
+ Cherian <lcherian@marvell.com>, Geetha sowjanya <gakula@marvell.com>, Jerin
+ Jacob <jerinj@marvell.com>, hariprasad <hkelam@marvell.com>, Subbaraya
+ Sundeep <sbhatta@marvell.com>, Tariq Toukan <tariqt@nvidia.com>, Saeed
+ Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Mark Bloch
+ <mbloch@nvidia.com>, Ido Schimmel <idosch@nvidia.com>, Petr Machata
+ <petrm@nvidia.com>, Manish Chopra <manishc@marvell.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Siddharth Vadapalli <s-vadapalli@ti.com>,
+ Roger Quadros <rogerq@kernel.org>, Loic Poulain
+ <loic.poulain@oss.qualcomm.com>, Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+ Johannes Berg <johannes@sipsolutions.net>, Vladimir Oltean
+ <olteanv@gmail.com>, Michal Swiatkowski
+ <michal.swiatkowski@linux.intel.com>, Aleksandr Loktionov
+ <aleksandr.loktionov@intel.com>, Dave Ertman <david.m.ertman@intel.com>,
+ Vlad Dumitrescu <vdumitrescu@nvidia.com>, "Russell King (Oracle)"
+ <rmk+kernel@armlinux.org.uk>, Alexander Sverdlin
+ <alexander.sverdlin@gmail.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-omap@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/2] net/mlx5: implement swp_l4_csum_mode
+ via devlink params
+Message-ID: <20251110154643.66d15800@kernel.org>
+In-Reply-To: <jhmdihtp63rblcjiy2pibhnz2sikvbm6bhnkclq3l2ndxgbqbb@e3t23x2x2r46>
+References: <20251107204347.4060542-1-daniel.zahka@gmail.com>
+	<20251107204347.4060542-3-daniel.zahka@gmail.com>
+	<aQ7f1T1ZFUKRLQRh@x130>
+	<jhmdihtp63rblcjiy2pibhnz2sikvbm6bhnkclq3l2ndxgbqbb@e3t23x2x2r46>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="aTusp3mqYER4Xr41"
-Content-Disposition: inline
-In-Reply-To: <20251103015029.17018-2-bagasdotme@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Sun, 9 Nov 2025 11:46:37 +0100 Jiri Pirko wrote:
+> >So, I checked a couple of flows internally, and it seems this allows
+> >some flexibility in the FW to decide later on which mode to pick,
+> >based on other parameters, which practically means
+> >"user has no preference on this param". Driver can only find out
+> >after boot, when it reads the runtime capabilities, but still
+> >this is a bug, by the time the driver reads this (in devlink), the
+> >default value should've already been determined by FW, so FW must
+> >return the actual runtime value. Which can only be one of the following  
+> 
+> I don't think it is correct to expose the "default" as a value.
+> 
+> On read, user should see the configured value, either "full_csum" or
+> "l4_only". Reporting "default" to the user does not make any sense.
+> On write, user should pass either "full_csum" or "l4_only". Why we would
+> ever want to pass "default"?
 
---aTusp3mqYER4Xr41
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+FWIW I agree that this feels a bit odd. Should the default be a flag
+attr? On get flag being present means the value is the FW default (no
+override present). On set passing the flag means user wants to reset
+to FW default (remove override)?
 
-On Mon, Nov 03, 2025 at 08:50:21AM +0700, Bagas Sanjaya wrote:
-> Hi,
->=20
-> Here are xfrm documentation patches. Patches [1-7/9] are formatting polis=
-hing;
-> [8/9] groups the docs and [9/9] adds MAINTAINERS entries for them.
+> Regardless this patch, since this is param to be reflected on fw reboot
+> (permanent cmode), I think it would be nice to expose indication if
+> param value passed to user currently affects the fw, or if it is going
+> to be applied after fw reboot. Perhaps a simple bool attr would do?
 
-netdev maintainers: Would you like to merge this series or not?
+IIUC we're basically talking about user having no information that 
+the update is pending? Could this be done by the core? Core can do 
+a ->get prior to calling ->set and if the ->set succeeds and 
+cmode != runtime record that the update is pending?
 
---=20
-An old man doll... just what I always wanted! - Clara
-
---aTusp3mqYER4Xr41
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCaRJ3rAAKCRD2uYlJVVFO
-o5l2AP9QdLeK5UwYeR12qSi/P8HWRDJPVuEZJ/D/TUwwWhp5ZwEA5GOBAq3sdTDK
-qdxwxx2kZ6EszBRgO0Q1LlJEWpmjZgI=
-=emxr
------END PGP SIGNATURE-----
-
---aTusp3mqYER4Xr41--
+That feels very separate from the series tho, there are 3 permanent
+params in mlx5, already. Is there something that makes this one special?
 
