@@ -1,104 +1,154 @@
-Return-Path: <netdev+bounces-237281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ECF0C486A8
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 18:48:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AC62C4870E
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 18:58:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AA3A3AE40F
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 17:48:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 608B41885D34
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 17:58:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56CAD2E542B;
-	Mon, 10 Nov 2025 17:48:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0F5D2E6CC4;
+	Mon, 10 Nov 2025 17:58:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SjBCbPjF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TlXeQsd/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB792DE1E6;
-	Mon, 10 Nov 2025 17:48:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C42A8255F2D
+	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 17:58:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762796893; cv=none; b=etT8UQpYEqbcffhXi98n1ZNy45T3d+0RxN0d03jJoqN2UadUqLffncIT/z7J1zk/fs4HWuOteX8rotNE5dikfyqXO0KnWzxbugC0EXK+PmTNAT9Bl8LN7DZIKYY3fVcGIh3QQP1qYDEETh0DkAAAQm4+uFEfSE3o20BXKzH6iUI=
+	t=1762797510; cv=none; b=ZXUySlEtGt65exDPmmyZZOMqZeDsNQaCohmJvgjzk6Bk+QGnVJncgiJsy/olByqnPGu2fBk1vztjG25JcsKnq2J13353cjQ+n838y8IPVjGXdHUpkvQt6Xak7lrJanbJZWruuYLpI2ejvJb9nCO6vJMLc/OFnp5yhDKajgi03co=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762796893; c=relaxed/simple;
-	bh=YgbgNsSEiQWlF4PLVZbqV3I1bOvbG0wsgtM8VKg1iBI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ubVA1rQrrItlSXI+YHuE2wIi8pfl2fv0ulMCsNJ9l2ujKOrkTFldVgi4kLtXPz/9TTcELIS27Jo2G3Q5BAFu07g7/tFECmP6/It7ooC5l5xu9zy1RMpWlY38kel6qQwJNzFW4UbAoKd+Jt+Yj49MGJzrubHtZyGEkdF0Ltp7SH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SjBCbPjF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4AE8C113D0;
-	Mon, 10 Nov 2025 17:48:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762796892;
-	bh=YgbgNsSEiQWlF4PLVZbqV3I1bOvbG0wsgtM8VKg1iBI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=SjBCbPjFf8CCqzZRPr7jq92dA+zmOBYsL5kjYvk8d/64Q+vbzzVG+X8CckDHnq/NZ
-	 vwwY6uBXSW+KMCVpKYpm4Mtn6IISmxIy5HhlToTJ9gsV8wCP29n0NUmCF82W91+mQb
-	 xVd7VJQNc6abB4NCy94LYfxJmNc7yNXt5b4wTi0KbJt2q5PKFGvgRXkyq/0h//pPcP
-	 o46qxF8RR4yaiceZhdwYQM0n6elEUfOrkd85e5H0fl3pkaKhGv8M970YrC/QOQgaVa
-	 gfJpGyQBvJiPNwTZxrQIfkdPcFSCl/iysdpvN6x75+9diOKookyBlqnF+j7ydAWQgO
-	 tO8Hh78vwbbmA==
-Date: Mon, 10 Nov 2025 17:48:08 +0000
-From: Simon Horman <horms@kernel.org>
-To: Kai-Heng Feng <kaihengf@nvidia.com>
-Cc: irusskikh@marvell.com, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: aquantia: Add missing descriptor cache invalidation
- on ATL2
-Message-ID: <aRIlWAR1Px-OFKEr@horms.kernel.org>
-References: <20251107052052.42126-1-kaihengf@nvidia.com>
+	s=arc-20240116; t=1762797510; c=relaxed/simple;
+	bh=nmOBoPP+KXPCADv8LoYu2K7otwUwoO2gwn+1j4NKkPY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=V+Knhm77/Pf5EKxw3jxu2aOCmBU6L6khGdPJGE8lgZ9fRmsZt5DYFKnT0AmcSR7+qgImUWEeW5ph4OZzyb61ye7HgnY1x4H+IwrtreFfA9X8/EaD9lDa/gmvNOvON5aqkb59C94A0XvJLfGevmy9JHB8La3u0PmyQjZxndGcZG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TlXeQsd/; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762797507;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=L+y8i4FklIJCXniWOmgzmbsIxv22QiNxkZNEPmMt81Y=;
+	b=TlXeQsd/yy6J3mFGk2/kVeRVJUlpCJk6DW2ua9KqOqvG4i0sYbwlW6ix/M+XvFgiElr8r+
+	JiKizx/Kj7K2e8aYNMjqPoikFvsnemYCp32qth2/md5ISz4DavULxXv+luyxBamkZKoSGr
+	Md0DS4eKlJB8ceAzWC5mJOVxZQVKKBE=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-581-EYV6PwUCPd-XVPZPbZ0Qnw-1; Mon,
+ 10 Nov 2025 12:58:24 -0500
+X-MC-Unique: EYV6PwUCPd-XVPZPbZ0Qnw-1
+X-Mimecast-MFC-AGG-ID: EYV6PwUCPd-XVPZPbZ0Qnw_1762797503
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id EBF391956061;
+	Mon, 10 Nov 2025 17:58:22 +0000 (UTC)
+Received: from p16v.luc.cera.cz (unknown [10.45.224.193])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C9D10180087B;
+	Mon, 10 Nov 2025 17:58:19 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Michal Schmidt <mschmidt@redhat.com>,
+	Petr Oros <poros@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 0/6] dpll: zl3073x: Refactor state management
+Date: Mon, 10 Nov 2025 18:58:12 +0100
+Message-ID: <20251110175818.1571610-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251107052052.42126-1-kaihengf@nvidia.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Fri, Nov 07, 2025 at 01:20:48PM +0800, Kai-Heng Feng wrote:
-> ATL2 hardware was missing descriptor cache invalidation in hw_stop(),
-> causing SMMU translation faults during device shutdown and module removal.
-> 
-> Commit 7a1bb49461b1 ("net: aquantia: fix potential IOMMU fault after
-> driver unbind") and commit ed4d81c4b3f2 ("net: aquantia: when cleaning
-> hw cache it should be toggled") fixed cache invalidation for ATL B0, but
-> ATL2 was left with only interrupt disabling. This allowed hardware to
-> write to cached descriptors after DMA memory was unmapped, triggering
-> SMMU faults.
-> 
-> Add shared aq_hw_invalidate_descriptor_cache() helper and use it in both
-> ATL B0 and ATL2 hw_stop() implementations for consistent behavior.
+This patch set is a refactoring of the zl3073x driver to clean up
+state management, improve modularity, and significantly reduce
+on-demand I/O.
 
-I think it would be useful to mention how this bug was found.
-And what sort of testing has been conducted: compilation only,
-exercised on real hardware, ...
+The driver's dpll.c implementation previously performed on-demand
+register reads and writes (wrapped in mailbox operations) to get
+or set properties like frequency, phase, and embedded-sync settings.
+This cluttered the DPLL logic with low-level I/O, duplicated locking,
+and led to inefficient bus traffic.
 
-As a bug fix I think this should have a Fixes tag denoting
-the commit that introduced the problem. In this case, perhaps:
+This series addresses this by:
+1. Splitting the monolithic 'core.c' into logical units ('ref.c',
+   'out.c', 'synth.c').
+2. Implementing a full read/write-back cache for 'zl3073x_ref' and
+   'zl3073x_out' structures.
 
-Fixes: e54dcf4bba3e ("net: atlantic: basic A2 init/deinit hw_ops")
+All state is now read once during '_state_fetch()' (and status updated
+periodically). DPLL get callbacks read from this cache. Set callbacks
+modify a copy of the state, which is then committed via a new
+'..._state_set()' function. These '_state_set' functions compare
+the new state to the cached state and write *only* the modified
+register values back to the hardware, all within a single mailbox
+sequence.
 
-The fixes tag should go immediately above your signed-off-by line,
-with no blank lines in between.
+The result is a much cleaner 'dpll.c' that is almost entirely
+free of direct register I/O, and all state logic is properly
+encapsulated in its respective file.
 
-> Signed-off-by: Kai-Heng Feng <kaihengf@nvidia.com>
+The series is broken down as follows:
 
-And lastly, for reference: as a fix for code present in the net tree, this
-should be targeted at that tree, which should be denoted in the Subject
-like this:
+* Patch 1: Changes the state structs to store raw register values
+  (e.g., 'config', 'ctrl') instead of parsed booleans, centralizing
+  parsing logic into the helpers.
+* Patch 2: Splits the logic from 'core.c' into new 'ref.c', 'out.c'
+  and 'synth.c' files, creating a 'zl3073x_dev_...' abstraction layer.
+* Patch 3: Introduces the caching concept by reading and caching
+  the reference monitor status periodically, removing scattered
+  reads from 'dpll.c'.
+* Patch 4: Expands the 'zl3073x_ref' struct to cache *all* reference
+  properties and adds 'zl3073x_ref_state_set()' to write back changes.
+* Patch 5: Does the same for the 'zl3073x_out' struct, caching all
+  output properties and adding 'zl3073x_out_state_set()'.
+* Patch 6: A final cleanup that removes the 'zl3073x_dev_...' wrapper
+  functions that became redundant after the refactoring.
 
-Subject: [PATCH net] ...
+Ivan Vecera (6):
+  dpll: zl3073x: Store raw register values instead of parsed state
+  dpll: zl3073x: Split ref, out, and synth logic from core
+  dpll: zl3073x: Cache reference monitor status
+  dpll: zl3073x: Cache all reference properties in zl3073x_ref
+  dpll: zl3073x: Cache all output properties in zl3073x_out
+  dpll: zl3073x: Remove unused dev wrappers
 
-You can see more on process for Networking patches here:
-https://docs.kernel.org/process/maintainer-netdev.html
+ drivers/dpll/zl3073x/Makefile |   3 +-
+ drivers/dpll/zl3073x/core.c   | 243 +----------
+ drivers/dpll/zl3073x/core.h   | 184 +++-----
+ drivers/dpll/zl3073x/dpll.c   | 776 ++++++++--------------------------
+ drivers/dpll/zl3073x/out.c    | 163 +++++++
+ drivers/dpll/zl3073x/out.h    |  88 ++++
+ drivers/dpll/zl3073x/prop.c   |  12 +-
+ drivers/dpll/zl3073x/ref.c    | 197 +++++++++
+ drivers/dpll/zl3073x/ref.h    | 126 ++++++
+ drivers/dpll/zl3073x/synth.c  |  87 ++++
+ drivers/dpll/zl3073x/synth.h  |  73 ++++
+ 11 files changed, 1008 insertions(+), 944 deletions(-)
+ create mode 100644 drivers/dpll/zl3073x/out.c
+ create mode 100644 drivers/dpll/zl3073x/out.h
+ create mode 100644 drivers/dpll/zl3073x/ref.c
+ create mode 100644 drivers/dpll/zl3073x/ref.h
+ create mode 100644 drivers/dpll/zl3073x/synth.c
+ create mode 100644 drivers/dpll/zl3073x/synth.h
 
-...
+-- 
+2.51.0
+
 
