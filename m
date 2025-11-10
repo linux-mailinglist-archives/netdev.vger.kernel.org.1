@@ -1,194 +1,286 @@
-Return-Path: <netdev+bounces-237141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19DE0C45D9F
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 11:14:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37F6EC45F3F
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 11:35:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B60FC188DA08
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 10:15:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 823043A61CF
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 10:35:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5CB8289378;
-	Mon, 10 Nov 2025 10:14:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21D5D30149E;
+	Mon, 10 Nov 2025 10:35:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R9Kdnr1I";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="AbbdYAeu"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="hhQAuU+N"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A6EF2EC090
-	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 10:14:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5994D2FF64C;
+	Mon, 10 Nov 2025 10:35:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762769688; cv=none; b=uHzsVWaAAgnqRXWKtmFROcEX4fnExFs+tNyLDXTBKNxM80eLhs7dTqenMog88IBiI6NTgL78yDzA4pyoTkWYwX3JXjelDusQxcU+E44uwI2+3b+pErhl0h3/CvlM3/1VZmX2oyqpou57P4AFkIlLRi8qG4I9f2BeZlSJtdlAIps=
+	t=1762770944; cv=none; b=hq658YpeDG1WDArAELaDdtO9ESKvAWZFWhXb0oRUYaZSIo5iYdT8p+/IMvfMZrVdcW+OlU8STKZq2CToH+Jo0MSiMWiAMPB4cnoKYhbHY/EwOACAvIlOZNTSbatUb9XT6oaDaONlHL/e0EC9xwc6LxFLHzxZwUqQ2bQPmbywoHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762769688; c=relaxed/simple;
-	bh=AZKUEGgjNpZfOXzOrP7zZL+C4dkyk8mLuG3m85G4guM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=bc16sDZ/UpCNTiBwrAmGz2M9NLrL2GlvRIPsv7JK057ZryLpMKAf/d02Ut5LvNB+TOTIVonC74SO/mKariVoRwZ7c+wy5j0cNqkv8cwWiYmZM3TN8X2LHKfHihq/gSNvZSi5faJQox93r2xsRJJFFkOZW3R0qjVd/41KRR3WMp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R9Kdnr1I; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=AbbdYAeu; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762769685;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bZRctZ7eCZieZVgnN5anpOxD0A/JDN7MJ2QsqWkfo3I=;
-	b=R9Kdnr1IdiYMf6kT4NXeXDVfCv8GzI2QYQMs16727mlFa4YVDP2BRpLo1cMaYu3YrOGBDE
-	3F69Znw5z/EHkezmvfJwHPo4ITC2pBy9Z5zT2M8/2VyTJKcTdkfHLdKbmc7G3KM+wpAMA1
-	po8T9ADHAGxDE21ToI9sTau2U70Av0Y=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-50-e5zbUB2iO7uuWKw1il8ijA-1; Mon, 10 Nov 2025 05:14:44 -0500
-X-MC-Unique: e5zbUB2iO7uuWKw1il8ijA-1
-X-Mimecast-MFC-AGG-ID: e5zbUB2iO7uuWKw1il8ijA_1762769683
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b7267543bc9so221275366b.2
-        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 02:14:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762769683; x=1763374483; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bZRctZ7eCZieZVgnN5anpOxD0A/JDN7MJ2QsqWkfo3I=;
-        b=AbbdYAeuBM6zOuiPafVwE5eBCQ+L8yuX2UaeIiAJJo5bTuMwecXYWGrxwPaSjkLPRj
-         uUc8VRnAJtcaU6/iMtqCiuFKUqO96M2t9X+67I5qiTZ3XHg5nRiEHA1I5eJaKzONspY8
-         V4MPWfHWzF8C3fI6OVgoVyF6qlDaU0+tS+RCVDM3t2XKx4zPfcPYrUizF/wGVYaenbrz
-         PKGfqd+kgaH6Ouy6ZvpARXAFy+6ScM3D+JofNBFDfIrMOvgs2r2oGOtc9raBYv6+bLB2
-         nTgIKIHyiWx2gbfm3f18KB9cv77p41glhTI/tESidbPZtmPtSRxBxlFr5xOJE5xwmTcr
-         nrBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762769683; x=1763374483;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=bZRctZ7eCZieZVgnN5anpOxD0A/JDN7MJ2QsqWkfo3I=;
-        b=lZov61uH42czH3Gi/pu56D2mDKnPvtAoQ+zB6OwSPl/+1mUdRkEiDy8rYJGnkFBCKv
-         GgmU+InnTq+d/XlarkXEnDiJTODZFFqjhhlJG8ME4bZNWTlyFjrLPs4vbyuaIb8NtPEy
-         3DzNx1ROL9GoN91dQvcTS+th+fIh2XqbLHL8UgP7Kv128iGVhGxPbPcTcZvxR24hvzl1
-         T2o1BVFVAVou+j+mzyljOLfEFQyHKyGnjKMDSTF6Na40LRRXlGgmAt5P/zGy/VEw/iU2
-         FZsH3SRmlA6iG0NrEu/FdSFB3wrqOsyHWnF1jYG3C0+vL9H9OGuJnMst0c0lb16+ocpT
-         9XcA==
-X-Forwarded-Encrypted: i=1; AJvYcCVJr35dvnmFfIniq44PbgOt8Fpx+FWe52cyaqmn75PB8d82AX6mphlg5j1evDypWeDcSUgGB+Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzeLceZ+RrmItSgpRhYOhiHL2O7cXmTjSrvx0fqUCxdEjrXrdUt
-	kLhkEQBYUfeB3zbC/0MmKUiXVq1jvQdgrahhw1bCI2hgHEbd8ZuBEVTPMar+Uq6AA2wOHO+NNIm
-	79tfJnazdMU15+bwbjuIVbnhTp1DARGoyuOnIMDOS/YQn0VF598lqM9MUug==
-X-Gm-Gg: ASbGnctQtg9b5e5j9ZgzqIdPFN5wQUaEbEafO/K7OeiZ8/DEazR1/Xlv1R2575LnLx8
-	sq/Ny0O3jf6t9oWubyRozgsrAfgqAoVbs9qE0xho2ahfI5MWqjxDBjBzswIX8+o9V60h/x9G7b7
-	OZPnZNnofBsTnwuLaFU1criuCGPPlk5t/7zu2KBvQ7ee6oVf90mzj1qA8iIa6uwnyHSictKpseZ
-	+/UlJIR+XTFewIrMSNfBoggH8nn/Ih8q02AfjKuEVhNNDJkn/AIPzBawNR76hqDckmSLbhL8JoG
-	adU8MefL0A3wSwwtP7VJbs9n7o+T8HeJ5J8kdX5NrfZ8a7DiWQrrAoAndAXD8LGHbzK9oET7Ce1
-	IHvbKV632h6Hq+Py82pDnSi4GSg==
-X-Received: by 2002:a17:907:841:b0:b72:67c2:6eb0 with SMTP id a640c23a62f3a-b72e0562e6dmr832813166b.62.1762769683354;
-        Mon, 10 Nov 2025 02:14:43 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE1nYy/FiP33oJYhV2poDNXyP32kiRanu9dHI2J75JSQDJScWo7uy5J9kqi3CrvoiYPtNSz/A==
-X-Received: by 2002:a17:907:841:b0:b72:67c2:6eb0 with SMTP id a640c23a62f3a-b72e0562e6dmr832810466b.62.1762769682934;
-        Mon, 10 Nov 2025 02:14:42 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b72bdbce8f9sm1051975166b.2.2025.11.10.02.14.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Nov 2025 02:14:42 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 6597A3291F8; Mon, 10 Nov 2025 11:14:41 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>
-Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>,
- Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
- Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn
- <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, Eric
- Dumazet <edumazet@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>
-Subject: Re: [PATCH net] net_sched: limit try_bulk_dequeue_skb() batches
-In-Reply-To: <20251109161215.2574081-1-edumazet@google.com>
-References: <20251109161215.2574081-1-edumazet@google.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Mon, 10 Nov 2025 11:14:41 +0100
-Message-ID: <87v7jimbxq.fsf@toke.dk>
+	s=arc-20240116; t=1762770944; c=relaxed/simple;
+	bh=NeK6KcdchkOG9JyXWuzd9Vn57w0zA4fF1eY5e0HFOns=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=dERKp8pS3KM5BK1A6cdqN6wRbj9buhyEqJlIphOfyuQ7+el8SoiM+xfZTw/yz1E+AlPJzSM+8BsH9o/F+MVu9AH/OIA3hm0+LafZEtpFZKBPoo6C6zxFAUGD/eMSDK0MZIRnIyt/5R30wbMo3Bx1dXVOB0hSJkifk1kDCsZbj5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=hhQAuU+N; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1204)
+	id D7054206C153; Mon, 10 Nov 2025 02:35:41 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com D7054206C153
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1762770941;
+	bh=0EpIh5dOPNjMm5DcewM3l78ahgbqe1mDUcWq6FpXZ+c=;
+	h=Date:From:To:Subject:From;
+	b=hhQAuU+NtmNDGglssz0HPzjdYZ6il2OToUc0Y8T83MUCKakgM0aXvEAxBAaID2wt+
+	 0DCKH+h0ivatUHIUt3tMDXL7m3QGCzgNqR1vrdqd16egHz72+shzEeePVw40hM+RK4
+	 xTKbU0ND1RnaWhtHc+7WIy3YzU/EeqANYuKJYVLI=
+Date: Mon, 10 Nov 2025 02:35:41 -0800
+From: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+To: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	longli@microsoft.com, kotaranov@microsoft.com, horms@kernel.org,
+	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com, shirazsaleem@microsoft.com,
+	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	dipayanroy@microsoft.com
+Subject: [PATCH net-next, v3] net: mana: Implement ndo_tx_timeout and
+ serialize queue resets per port.
+Message-ID: <20251110103541.GA30450@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-Eric Dumazet <edumazet@google.com> writes:
+Implement .ndo_tx_timeout for MANA so any stalled TX queue can be detected
+and a device-controlled port reset for all queues can be scheduled to a
+ordered workqueue. The reset for all queues on stall detection is
+recomended by hardware team.
 
-> After commit 100dfa74cad9 ("inet: dev_queue_xmit() llist adoption")
-> I started seeing many qdisc requeues on IDPF under high TX workload.
->
-> $ tc -s qd sh dev eth1 handle 1: ; sleep 1; tc -s qd sh dev eth1 handle 1:
-> qdisc mq 1: root
->  Sent 43534617319319 bytes 268186451819 pkt (dropped 0, overlimits 0 requ=
-eues 3532840114)
->  backlog 1056Kb 6675p requeues 3532840114
-> qdisc mq 1: root
->  Sent 43554665866695 bytes 268309964788 pkt (dropped 0, overlimits 0 requ=
-eues 3537737653)
->  backlog 781164b 4822p requeues 3537737653
->
-> This is caused by try_bulk_dequeue_skb() being only limited by BQL budget.
->
-> perf record -C120-239 -e qdisc:qdisc_dequeue sleep 1 ; perf script
-> ...
->  netperf 75332 [146]  2711.138269: qdisc:qdisc_dequeue: dequeue ifindex=
-=3D5 qdisc handle=3D0x80150000 parent=3D0x10013 txq_state=3D0x0 packets=3D1=
-292 skbaddr=3D0xff378005a1e9f200
->  netperf 75332 [146]  2711.138953: qdisc:qdisc_dequeue: dequeue ifindex=
-=3D5 qdisc handle=3D0x80150000 parent=3D0x10013 txq_state=3D0x0 packets=3D1=
-213 skbaddr=3D0xff378004d607a500
->  netperf 75330 [144]  2711.139631: qdisc:qdisc_dequeue: dequeue ifindex=
-=3D5 qdisc handle=3D0x80150000 parent=3D0x10013 txq_state=3D0x0 packets=3D1=
-233 skbaddr=3D0xff3780046be20100
->  netperf 75333 [147]  2711.140356: qdisc:qdisc_dequeue: dequeue ifindex=
-=3D5 qdisc handle=3D0x80150000 parent=3D0x10013 txq_state=3D0x0 packets=3D1=
-093 skbaddr=3D0xff37800514845b00
->  netperf 75337 [151]  2711.141037: qdisc:qdisc_dequeue: dequeue ifindex=
-=3D5 qdisc handle=3D0x80150000 parent=3D0x10013 txq_state=3D0x0 packets=3D1=
-353 skbaddr=3D0xff37800460753300
->  netperf 75337 [151]  2711.141877: qdisc:qdisc_dequeue: dequeue ifindex=
-=3D5 qdisc handle=3D0x80150000 parent=3D0x10013 txq_state=3D0x0 packets=3D1=
-367 skbaddr=3D0xff378004e72c7b00
->  netperf 75330 [144]  2711.142643: qdisc:qdisc_dequeue: dequeue ifindex=
-=3D5 qdisc handle=3D0x80150000 parent=3D0x10013 txq_state=3D0x0 packets=3D1=
-202 skbaddr=3D0xff3780045bd60000
-> ...
->
-> This is bad because :
->
-> 1) Large batches hold one victim cpu for a very long time.
->
-> 2) Driver often hit their own TX ring limit (all slots are used).
->
-> 3) We call dev_requeue_skb()
->
-> 4) Requeues are using a FIFO (q->gso_skb), breaking qdisc ability to
->    implement FQ or priority scheduling.
->
-> 5) dequeue_skb() gets packets from q->gso_skb one skb at a time
->    with no xmit_more support. This is causing many spinlock games
->    between the qdisc and the device driver.
->
-> Requeues were supposed to be very rare, lets keep them this way.
->
-> Limit batch sizes to /proc/sys/net/core/dev_weight (default 64) as
-> __qdisc_run() was designed to use.
->
-> Fixes: 5772e9a3463b ("qdisc: bulk dequeue support for qdiscs with TCQ_F_O=
-NETXQUEUE")
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Jesper Dangaard Brouer <hawk@kernel.org>
-> Cc: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+The change introduces a single ordered workqueue
+("mana_per_port_queue_reset_wq") with WQ_UNBOUND | WQ_MEM_RECLAIM and
+queues exactly one work_struct per port onto it.
 
-Makes sense!
+Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
+---
+Changes in v3:
+  -Fixed commit meesage, removed rtnl_trylock and added
+   disable_work_sync, fixed mana_queue_reset_work, and few
+   cosmetics.
+Changes in v2:
+  -Fixed cosmetic changes.
+---
+---
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 78 ++++++++++++++++++-
+ include/net/mana/gdma.h                       |  7 +-
+ include/net/mana/mana.h                       |  7 ++
+ 3 files changed, 90 insertions(+), 2 deletions(-)
 
-Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index cccd5b63cee6..636df3b066c5 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -298,6 +298,42 @@ static int mana_get_gso_hs(struct sk_buff *skb)
+ 	return gso_hs;
+ }
+ 
++static void mana_per_port_queue_reset_work_handler(struct work_struct *work)
++{
++	struct mana_queue_reset_work *reset_queue_work =
++			container_of(work, struct mana_queue_reset_work, work);
++
++	struct mana_port_context *apc = container_of(reset_queue_work,
++						     struct mana_port_context,
++						     queue_reset_work);
++	struct net_device *ndev = apc->ndev;
++	int err;
++
++	rtnl_lock();
++
++	/* Pre-allocate buffers to prevent failure in mana_attach later */
++	err = mana_pre_alloc_rxbufs(apc, ndev->mtu, apc->num_queues);
++	if (err) {
++		netdev_err(ndev, "Insufficient memory for reset post tx stall detection\n");
++		goto out;
++	}
++
++	err = mana_detach(ndev, false);
++	if (err) {
++		netdev_err(ndev, "mana_detach failed: %d\n", err);
++		goto dealloc_pre_rxbufs;
++	}
++
++	err = mana_attach(ndev);
++	if (err)
++		netdev_err(ndev, "mana_attach failed: %d\n", err);
++
++dealloc_pre_rxbufs:
++	mana_pre_dealloc_rxbufs(apc);
++out:
++	rtnl_unlock();
++}
++
+ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+ {
+ 	enum mana_tx_pkt_format pkt_fmt = MANA_SHORT_PKT_FMT;
+@@ -802,6 +838,23 @@ static int mana_change_mtu(struct net_device *ndev, int new_mtu)
+ 	return err;
+ }
+ 
++static void mana_tx_timeout(struct net_device *netdev, unsigned int txqueue)
++{
++	struct mana_port_context *apc = netdev_priv(netdev);
++	struct mana_context *ac = apc->ac;
++	struct gdma_context *gc = ac->gdma_dev->gdma_context;
++
++	/* Already in service, hence tx queue reset is not required.*/
++	if (gc->in_service)
++		return;
++
++	/* Note: If there are pending queue reset work for this port(apc),
++	 * subsequent request queued up from here are ignored. This is because
++	 * we are using the same work instance per port(apc).
++	 */
++	queue_work(ac->per_port_queue_reset_wq, &apc->queue_reset_work.work);
++}
++
+ static int mana_shaper_set(struct net_shaper_binding *binding,
+ 			   const struct net_shaper *shaper,
+ 			   struct netlink_ext_ack *extack)
+@@ -884,7 +937,9 @@ static const struct net_device_ops mana_devops = {
+ 	.ndo_bpf		= mana_bpf,
+ 	.ndo_xdp_xmit		= mana_xdp_xmit,
+ 	.ndo_change_mtu		= mana_change_mtu,
+-	.net_shaper_ops         = &mana_shaper_ops,
++	.ndo_tx_timeout		= mana_tx_timeout,
++	.net_shaper_ops		= &mana_shaper_ops,
++
+ };
+ 
+ static void mana_cleanup_port_context(struct mana_port_context *apc)
+@@ -3244,6 +3299,7 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
+ 	ndev->min_mtu = ETH_MIN_MTU;
+ 	ndev->needed_headroom = MANA_HEADROOM;
+ 	ndev->dev_port = port_idx;
++	ndev->watchdog_timeo = 15 * HZ;
+ 	SET_NETDEV_DEV(ndev, gc->dev);
+ 
+ 	netif_set_tso_max_size(ndev, GSO_MAX_SIZE);
+@@ -3283,6 +3339,10 @@ static int mana_probe_port(struct mana_context *ac, int port_idx,
+ 
+ 	debugfs_create_u32("current_speed", 0400, apc->mana_port_debugfs, &apc->speed);
+ 
++	/* Initialize the per port queue reset work.*/
++	INIT_WORK(&apc->queue_reset_work.work,
++		  mana_per_port_queue_reset_work_handler);
++
+ 	return 0;
+ 
+ free_indir:
+@@ -3488,6 +3548,15 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
+ 	if (ac->num_ports > MAX_PORTS_IN_MANA_DEV)
+ 		ac->num_ports = MAX_PORTS_IN_MANA_DEV;
+ 
++	ac->per_port_queue_reset_wq =
++			alloc_ordered_workqueue("mana_per_port_queue_reset_wq",
++						WQ_UNBOUND | WQ_MEM_RECLAIM);
++	if (!ac->per_port_queue_reset_wq) {
++		dev_err(dev, "Failed to allocate per port queue reset workqueue\n");
++		err = -ENOMEM;
++		goto out;
++	}
++
+ 	if (!resuming) {
+ 		for (i = 0; i < ac->num_ports; i++) {
+ 			err = mana_probe_port(ac, i, &ac->ports[i]);
+@@ -3557,6 +3626,8 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+ 			goto out;
+ 		}
+ 
++		disable_work_sync(&apc->queue_reset_work.work);
++
+ 		/* All cleanup actions should stay after rtnl_lock(), otherwise
+ 		 * other functions may access partially cleaned up data.
+ 		 */
+@@ -3581,6 +3652,11 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
+ 		free_netdev(ndev);
+ 	}
+ 
++	if (ac->per_port_queue_reset_wq) {
++		destroy_workqueue(ac->per_port_queue_reset_wq);
++		ac->per_port_queue_reset_wq = NULL;
++	}
++
+ 	mana_destroy_eq(ac);
+ out:
+ 	mana_gd_deregister_device(gd);
+diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
+index 637f42485dba..b892296705de 100644
+--- a/include/net/mana/gdma.h
++++ b/include/net/mana/gdma.h
+@@ -590,6 +590,10 @@ enum {
+ 
+ /* Driver can self reset on FPGA Reconfig EQE notification */
+ #define GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE BIT(17)
++
++/* Driver detects stalled send queues and recovers them */
++#define GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY BIT(18)
++
+ #define GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE BIT(6)
+ 
+ #define GDMA_DRV_CAP_FLAGS1 \
+@@ -601,7 +605,8 @@ enum {
+ 	 GDMA_DRV_CAP_FLAG_1_DYNAMIC_IRQ_ALLOC_SUPPORT | \
+ 	 GDMA_DRV_CAP_FLAG_1_SELF_RESET_ON_EQE | \
+ 	 GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE | \
+-	 GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE)
++	 GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE |\
++	 GDMA_DRV_CAP_FLAG_1_HANDLE_STALL_SQ_RECOVERY)
+ 
+ #define GDMA_DRV_CAP_FLAGS2 0
+ 
+diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
+index 8906901535f5..095f5f1cb2ad 100644
+--- a/include/net/mana/mana.h
++++ b/include/net/mana/mana.h
+@@ -475,6 +475,7 @@ struct mana_context {
+ 
+ 	struct mana_eq *eqs;
+ 	struct dentry *mana_eqs_debugfs;
++	struct workqueue_struct *per_port_queue_reset_wq;
+ 
+ 	struct net_device *ports[MAX_PORTS_IN_MANA_DEV];
+ 
+@@ -483,9 +484,15 @@ struct mana_context {
+ 	u32 link_event;
+ };
+ 
++struct mana_queue_reset_work {
++	/* Work structure */
++	struct work_struct work;
++};
++
+ struct mana_port_context {
+ 	struct mana_context *ac;
+ 	struct net_device *ndev;
++	struct mana_queue_reset_work queue_reset_work;
+ 
+ 	u8 mac_addr[ETH_ALEN];
+ 
+-- 
+2.43.0
 
 
