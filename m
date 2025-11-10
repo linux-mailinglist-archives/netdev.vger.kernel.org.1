@@ -1,113 +1,118 @@
-Return-Path: <netdev+bounces-237365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1416C49A5F
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 23:48:42 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77EFDC49AB6
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 23:58:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F45A3A50B1
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 22:48:41 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 56B034E8823
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 22:58:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E6F42153FB;
-	Mon, 10 Nov 2025 22:48:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6080C2FF172;
+	Mon, 10 Nov 2025 22:58:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gRX1C9ig"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wv5sTKvK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6163635958
-	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 22:48:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B0842ED16D;
+	Mon, 10 Nov 2025 22:58:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762814919; cv=none; b=Gru4zAypV6qIf+3lULWE7jDSJRAhxzoRKM0Nb+Nq6uZEGCXKyHjFO0pgePKFZKkkLmrtHc7irpdBmnT31WtoMmtSILk8T4YOpigR4iaomeSXRysuzIGNHt6xgzklt5GpVypWFMwMW4AlizGQWru49ZFCm1ayrvpSKy5FxRaymCA=
+	t=1762815515; cv=none; b=L8/dPTI2Mo7BpAQ7zZKdb4m0Ka9L9qPSoQLm3ehhqVEuEVlfvjwZP7m1yYZVHhtsUTB6dbSicVAS3JV2gelcJb955YFJQMqCMRdj9FsywI/7oBoKkqY+1abvwfNg5WdF9V/mClRWgwEsy++LGp4lcNxqiq9xXigjkDv6B49fW/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762814919; c=relaxed/simple;
-	bh=wSFL8ejyxW7kMg6dR7LSCkpCUCxvuFHLLetgwPrZcLs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EqLITboig3/OUOqNYnUKpkkRIfbfzqXu8rr/gi5fqd1/K5KeVoCFEv6L2+SG4BD7+NjVl16jZhPJx8EKF7GTRi7LdhK5ZnLod7edoK2SOBEFsb0u0eLxob19FvPfXL9qj5pwo1ClL2Ai5X3M1U1jBMIczHCnN/83db3VFX7oZhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gRX1C9ig; arc=none smtp.client-ip=209.85.216.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-34374febdefso2567330a91.0
-        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 14:48:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762814917; x=1763419717; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tzUd1xsf1Cz/NsknbALQRdXioBMZnJ6BlcUAVgh0Mj8=;
-        b=gRX1C9igqhIEKlL8y87ktLAzEXjPP2bGjdc8n6MP9PdOIRRuM9hJwCy1+ixC2z0fGI
-         IKXH4pcdkJnFJQq7+eXpbENy4PTYXCIhrXXULvUco6FSIE544b5MHdskzq+d4PrCO17x
-         wjjUyvI1H1N96w0KqH/OZsnJKjxf6NNz+eIPS2hbBV8jMPkLAz0SBDqr0QwN+OunW7AN
-         8aYyqh0mZtMso8HwFLx/aHhReNaMYeYb6UQ1PggXgYrMYAWx07ph+rThKgRbpahhPn8n
-         rGu+1U003g6aXY42XVDOqMIDOZDPak8SZQ8n3kY90xayNvSK7BASyHWEK2m8R6Lvusb2
-         uAxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762814917; x=1763419717;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tzUd1xsf1Cz/NsknbALQRdXioBMZnJ6BlcUAVgh0Mj8=;
-        b=uhiAmmfufuihduaah/5KDnJdPdeIEz4e62rJVUOV8a7UOI2dbK3dTTihvVWwZnDntq
-         n/OcfZbn9m3IezoE4xqqpEGIkh0N7oCzcFRCddHbYPcbB7aZbZhXFpeKPH2sLXMNjgqk
-         7tXw2i0P2AVIdjlEfSEjrIKEBFLuiG85iRyKmQYcZY15+bqCmzKLiqohquHesNRk+87D
-         c+LfZz4MbA7++M5rqJJNLbVSQltBSsXSTrC/MVaol3i4rN70F9jORW2ne6u1FLxgwwPf
-         juDQdIJlACtJlL8nGP8HVNk70JryACQqkFG8HiQAwoRdtVOCtgbr7KLVnv9MJcjggo8S
-         fZGg==
-X-Forwarded-Encrypted: i=1; AJvYcCVByQhrFO+fomQsnBBpgQw5bxWX+3l5ailU681AM6VkMWfRp4X+XCuZD97JE2lkf5w3FpCY0W4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWfMH1EHgxlz61icLm1kE9se4uXui5nVXbezFIxwL9Ld3Tadef
-	67JRitHIhiqdFRNUHh2BY50nTvGYA6l581GBMFrTv6ME1gMZE4eZC/L7
-X-Gm-Gg: ASbGncvbmNKGnfRUsyUB2Bvkv2PRRGnrS6fgTkZqu6TEs2KBlIbg6QrifJeto5x/DML
-	0mzOCT+bWdzHGaUzKhuSS/4ieD/WOGCoP6uiPFgWMXE1NhF1Cgzd06fc00jeh6u5PbCRdTZvxZi
-	eI/9mO8YKjO0bOFZcz8YEdv6mVRKZ+fDX5IcNJNv3DIVBcUArkW1bABcfTs/iDAYqHfI+H1bk4P
-	7y2Jg3Aojh9kzod7IcLLpK4qb2sVpUsoRjeShMdYudvdB4oYekCyYlEWWIa02SRYxRWkTScq33Y
-	u7ggrzS809C1EPw7NV0FO5781n66yCleY+oq9Rkf0zOktCi4X6qN7458JL0ZRXdhB67krg+P8C/
-	lwqxPatw6py6hGgp9UAHWHPjWukP7HgdZTwg4YKX2xk/3KNaNJohmyn8XjhX/WVx9QvzyLDoVii
-	PNusw=
-X-Google-Smtp-Source: AGHT+IEqhmNhFjSU/TmuvVKV3oS9D8zng/3u9ekiILntszQdgFXnCgx2RlGYStMyxlYsguTLuNUMiQ==
-X-Received: by 2002:a17:90b:50c6:b0:341:194:5e7a with SMTP id 98e67ed59e1d1-3436cd06567mr12255278a91.29.1762814916821;
-        Mon, 10 Nov 2025 14:48:36 -0800 (PST)
-Received: from localhost ([173.8.162.118])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-3434c31d86esm12473316a91.8.2025.11.10.14.48.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Nov 2025 14:48:36 -0800 (PST)
-Date: Mon, 10 Nov 2025 14:48:35 -0800
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: Victor Nogueira <victor@mojatatu.com>
-Cc: jhs@mojatatu.com, jiri@resnulli.us, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	horms@kernel.org, netdev@vger.kernel.org, wangliang74@huawei.com,
-	pctammela@mojatatu.ai
-Subject: Re: [PATCH net 2/2] selftests/tc-testing: Create tests trying to add
- children to clsact/ingress qdiscs
-Message-ID: <aRJrw5vMAwPKqJNP@pop-os.localdomain>
-References: <20251106205621.3307639-1-victor@mojatatu.com>
- <20251106205621.3307639-2-victor@mojatatu.com>
+	s=arc-20240116; t=1762815515; c=relaxed/simple;
+	bh=gp119oKTnpbHC1P/d+n3Qm9C5OlbMz4VTP9qPySDarM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Tdn2vaeK5au5lWUABw2vnSobJVCXgF/RKY2WofWP0EtNpwDTyM9v/m0mJlw6CEg0M/0EQRAf2zq5am2RKSuvVpVzo1lxrOJBAcYoFzfE/Vh8hr4uxA4m+wOf1rOi04K6VCK+2/CFPTG+2nEWAcpVKsGE2TXTlHxwc0V/GuiuPLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wv5sTKvK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADE8DC16AAE;
+	Mon, 10 Nov 2025 22:58:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762815514;
+	bh=gp119oKTnpbHC1P/d+n3Qm9C5OlbMz4VTP9qPySDarM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Wv5sTKvK8Fth+8Ulry2nulV4xCEtVBXnwIhWHQPmidsRNLKwkQ3d5V0GD068+lAO9
+	 LI3OqSg5CRVEyB//hIYRvUHrLnqzWExmmbDT9Z1UchTDbOP3Ryw9ll2uDjt6HDWyWj
+	 6KPxk/pHL763G49ToN0WUTIrt7+ddlaAHxfdQwJIFbCcTTqelmfK6pM2GNLDRQ4vys
+	 AfRF6fB43wY/PHKCpH1Uvy2oCOSMxac7NhkYiYrR01l/n/URrTywQFpukP74NlCWWD
+	 I99Zqwa+C5Z/WJT4fbNe3yCmM0qcOl3BeAEHvVNQphNd/uswiSxOEDkg692CA0h6BI
+	 d9gnLkn/HQN4w==
+Date: Mon, 10 Nov 2025 14:58:31 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Daniel Zahka <daniel.zahka@gmail.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Srujana Challa
+ <schalla@marvell.com>, Bharat Bhushan <bbhushan2@marvell.com>, Herbert Xu
+ <herbert@gondor.apana.org.au>, Brett Creeley <brett.creeley@amd.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Michael Chan
+ <michael.chan@broadcom.com>, Pavan Chebbi <pavan.chebbi@broadcom.com>, Tony
+ Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Sunil Goutham <sgoutham@marvell.com>, Linu
+ Cherian <lcherian@marvell.com>, Geetha sowjanya <gakula@marvell.com>, Jerin
+ Jacob <jerinj@marvell.com>, hariprasad <hkelam@marvell.com>, Subbaraya
+ Sundeep <sbhatta@marvell.com>, Tariq Toukan <tariqt@nvidia.com>, Saeed
+ Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Mark Bloch
+ <mbloch@nvidia.com>, Ido Schimmel <idosch@nvidia.com>, Petr Machata
+ <petrm@nvidia.com>, Manish Chopra <manishc@marvell.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Siddharth Vadapalli <s-vadapalli@ti.com>,
+ Roger Quadros <rogerq@kernel.org>, Loic Poulain
+ <loic.poulain@oss.qualcomm.com>, Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+ Johannes Berg <johannes@sipsolutions.net>, Vladimir Oltean
+ <olteanv@gmail.com>, Michal Swiatkowski
+ <michal.swiatkowski@linux.intel.com>, Aleksandr Loktionov
+ <aleksandr.loktionov@intel.com>, Dave Ertman <david.m.ertman@intel.com>,
+ Vlad Dumitrescu <vdumitrescu@nvidia.com>, "Russell King (Oracle)"
+ <rmk+kernel@armlinux.org.uk>, Alexander Sverdlin
+ <alexander.sverdlin@gmail.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
+ netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-omap@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/2] net/mlx5: implement swp_l4_csum_mode
+ via devlink params
+Message-ID: <20251110145831.15872b86@kernel.org>
+In-Reply-To: <25ebaf18-f009-45de-a3e4-fe440c42ef19@gmail.com>
+References: <20251107204347.4060542-1-daniel.zahka@gmail.com>
+	<20251107204347.4060542-3-daniel.zahka@gmail.com>
+	<mfuluoi4nebyc4avj52gkfs4nqikn6uwhqnkf4o6xfswtpceuq@zhpokcx6bb6l>
+	<25ebaf18-f009-45de-a3e4-fe440c42ef19@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251106205621.3307639-2-victor@mojatatu.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 06, 2025 at 05:56:21PM -0300, Victor Nogueira wrote:
-> In response to Wang's bug report [1], add the following test cases:
+On Mon, 10 Nov 2025 08:05:57 -0500 Daniel Zahka wrote:
+> On 11/9/25 5:39 AM, Jiri Pirko wrote:
+> > Daniel, I asked twice if this could be a non-driver param. Jakub asked
+> > for clearer definition of this know in that context.
+> >
+> > Not sure why you are ignoring this :/
+> >  
 > 
-> - Try and fail to add an fq child to an ingress qdisc
-> - Try and fail to add an fq child to a clsact qdisc
-> 
-> [1] https://lore.kernel.org/netdev/20251105022213.1981982-1-wangliang74@huawei.com/
-> 
-> Reviewed-by: Pedro Tammela <pctammela@mojatatu.ai>
-> Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+> My apologies. I think there was a miscommunication. I assumed Jakub's 
+> question was directed towards you. I have no objection to making it a 
+> generic param; I will do so in v4. It sounded to me like Jakub was 
+> wanting more information on what exactly this setting does beyond what I 
+> was able to provide in the commit message and mlx5 devlink 
+> documentation. My understanding is that this setting pertains to tx 
+> csums and how the device expects the driver to prepare partial csums 
+> when doing tx cso. I don't really know more than that. Especially not 
+> something like what the FW's role in implementing this is.
 
-Reviewed-by: Cong Wang <cwang@multikernel.io>
+Right, per To: field of my email I as asking Jiri for clarifications.
 
-Thanks
+Since we struggle to understand the semantics nack on making this
+generic. Chances are whoever reuses the "generic" param will have a
+different interpretation of its meaning, so what's the point of making
+it generic.
 
