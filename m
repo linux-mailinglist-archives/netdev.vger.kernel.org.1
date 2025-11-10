@@ -1,686 +1,435 @@
-Return-Path: <netdev+bounces-237163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A84A4C465BB
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 12:47:29 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D5E1C4668E
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 12:57:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC7941888163
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 11:47:35 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A5F2A344C75
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 11:57:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6A9130AACE;
-	Mon, 10 Nov 2025 11:47:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F44E309F12;
+	Mon, 10 Nov 2025 11:57:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="bRhsZZb7"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="CzUwT2WR"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+Received: from MW6PR02CU001.outbound.protection.outlook.com (mail-westus2azon11012023.outbound.protection.outlook.com [52.101.48.23])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E8CD26C39B
-	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 11:46:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762775220; cv=none; b=JSj55yczzj1MHDsKM1e56bWsDfDWkr3lMhIfFzawJLAzaLTzz1VgooIAO3Jrr3Wq1okxVMu7lqGeNytqtB4xwOKPWRu/Dn6hscrIeEO5Su+kVB8kpVhICzkDJafR6ydnTcD4OYpnYeGGsNIr9xCbosBi6/Bclr4cEeh/sVphfW8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762775220; c=relaxed/simple;
-	bh=+A6azEFDuQWTx86ITxq8fhpahULiLh/J+efgopPHuJs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=AtW/e9hRkdfzD5OH7Gnvonqf8GBEHdzLdwFNwlg/Iuv64p8AArPVV6zu1xCVsSDcRDcvHjj12m2eZ97UrtxW7FDuACU/aS1GgKnuG+WLnGVIeS3zmLIcw0RewfVqTkWfCzkesKHPqK/eE0k8WPPP+gjRzVYNbUoAM08/ScYhFdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=bRhsZZb7; arc=none smtp.client-ip=115.124.30.110
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1762775215; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=nQ/enn1P6PovsnP6vdSADV8ABjxOQN9dlGqmt2S0vcs=;
-	b=bRhsZZb7mQ2FMVO/GAse5DoP/qiz9Dh9X22vwrr/wFdhaYAxhu5jJW8pdwrjpGew6SinbotgKEujaAJGTV31l//aj5UjCXTFnv+12dQwDrLCxM68xKKZ9wS2V4jeLZF9vnPhlR0MD9eDVue5wvcsspJbCl46DI2fITiNm2KN6Mk=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Ws3ADyV_1762775213 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 10 Nov 2025 19:46:53 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	Philo Lu <lulie@linux.alibaba.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Lukas Bulwahn <lukas.bulwahn@redhat.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Vivian Wang <wangruikang@iscas.ac.cn>,
-	Troy Mitchell <troy.mitchell@linux.spacemit.com>,
-	Dust Li <dust.li@linux.alibaba.com>,
-	Andrew Lunn <andrew@lunn.ch>
-Subject: [PATCH net-next v13 5/5] eea: introduce ethtool support
-Date: Mon, 10 Nov 2025 19:46:48 +0800
-Message-Id: <20251110114648.8972-6-xuanzhuo@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20251110114648.8972-1-xuanzhuo@linux.alibaba.com>
-References: <20251110114648.8972-1-xuanzhuo@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A43D830BF65;
+	Mon, 10 Nov 2025 11:57:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.48.23
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762775840; cv=fail; b=Ge+by0+W9rcE0IsPDPeynen3zyopvfrnd+6WpaabkQWQwkuJMFMp9AG+WKAS00xyH0EUdUrfv4lseGpF++wr4UPQ03d+wXtSiqEPzQ4NLuqj5RnzUdUMnIoWYDh+2El8e1il5XlxyMVs8zu/rAi5o98l64H2qK2dBchzotzUwwo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762775840; c=relaxed/simple;
+	bh=703PGp9kA+2baZH++cP+4ZrLi737O6nPst2ZWDQlyyE=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=WjbpfyJn17izJrghIl37PlbPZc1P3AxITCY4GAVJCGbSJ6nEonpK/1/dtZoEuAAfT8vBDNkV1iOP8gUGoIyJ6rNAMgd/OmFdKQmVjtWKXqpWqbQtfmkZGdHFO43C7Y5sCIXbj7u+nyNzHk+Me4f6MBzIE2m6xPhXIyhZuJuavpw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=CzUwT2WR; arc=fail smtp.client-ip=52.101.48.23
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=kK2mzYfod5apOZ4vvvFYKpqIwQ+blEQt1HIRzR6EDWHubTvVH1bMHo1qP6NY5hkus/SzA9rQU1ruJt3bmz3CbOb+Mj0hm+tx9rO6KKF5nR+43oY+0Tw8x9LpFCdlWGsloFliN1ugjfZMjH//Ml/zYx7BpqHfxHh7r2kFTUkeIihFmBVm6jCJ7E9JoxMnNoKE8mXsT5MmeXkKvocv6cBagqegX9ejceCzhuF+8MfQU7e1E07QSnocEH76TRGsf4NVjr63dfTRS2KuPcSC7Mh+6wN09IkL8lfx05lC9xUUbqUvR9mOmpLEOyySiToNvU0ZR+c1MCy7uezcRVlKnKBc/Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9dpVUtq1jUl/p3KFM2uz9AgUzlS1kgtN0EYdlJB6VdY=;
+ b=wFhDhjsTsSmbUQtGI/fGYfVfLKBjsGzvcOx5UspWnD8bzWoForpX/H5cfmNmeuBlYfoUW5cfvLlnHfCMxVTEIKt+i16OMA1uRDMITDlzZZd3sClWkXfQyunlROAwb4IHQ7MkQrD8p5wfvuHhDW9DMEOSJ8t2XIs2ootk8vmBrqZlqf8hWFMJ36Rz7BGW84I318BnpvYWwFORDxxKdfhhyAkRfMPln6NCQDTdmpoxiarUTnI67Zf0MJkgU0IhHLjSwM+fUDIaSfvWAcM4kzsiZbIg2pQ1eXuYbrLF+bKkeNE2mEpt3fbKr5H0JhGHzRC39FVW3vi5F/EWNA80jhe+kw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9dpVUtq1jUl/p3KFM2uz9AgUzlS1kgtN0EYdlJB6VdY=;
+ b=CzUwT2WRiCPA8U1igX7TnWtBHS1qnO8o/EOrCF7d9DWiOq1ahc+X1rkZqXvQS7WasZh1yKsnQiDO58yEWsnw1cqLJHjwaD8YiruEbVhOdkNEaCAuva4ydxvduzL4JgA5Mvug6+dlvPaQD0LXzPissiM8qXEhXdYuz6necrVh4Fc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+ by PH7PR12MB9150.namprd12.prod.outlook.com (2603:10b6:510:2eb::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.16; Mon, 10 Nov
+ 2025 11:57:13 +0000
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79%5]) with mapi id 15.20.9298.015; Mon, 10 Nov 2025
+ 11:57:13 +0000
+Message-ID: <c505396e-6b04-4dbf-b251-d623261e6bb3@amd.com>
+Date: Mon, 10 Nov 2025 11:57:00 +0000
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v19 11/22] cxl: Define a driver interface for HPA free
+ space enumeration
+Content-Language: en-US
+To: Dave Jiang <dave.jiang@intel.com>, alejandro.lucero-palau@amd.com,
+ linux-cxl@vger.kernel.org, netdev@vger.kernel.org, dan.j.williams@intel.com,
+ edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com
+Cc: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+References: <20251006100130.2623388-1-alejandro.lucero-palau@amd.com>
+ <20251006100130.2623388-12-alejandro.lucero-palau@amd.com>
+ <ea62e7a2-4754-4e5f-aed3-2125c90ba007@intel.com>
+From: Alejandro Lucero Palau <alucerop@amd.com>
+In-Reply-To: <ea62e7a2-4754-4e5f-aed3-2125c90ba007@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: JNXP275CA0022.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:19::34)
+ To DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Git-Hash: c37913a6d456
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|PH7PR12MB9150:EE_
+X-MS-Office365-Filtering-Correlation-Id: e8b7e175-92e5-4665-3802-08de205048ee
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?RE1ub1N2QnFwdUJNS0VxMktLc0U4SjBUaS9ZSWtPL2dETkhzaHNvR1laNDZa?=
+ =?utf-8?B?a0wxRUNsYkpjdklpRDhCbDNpUXdlSzdBRnlSMERNbmFvZzljb1V1ZUV2ZktP?=
+ =?utf-8?B?ZUVZT05waWsrZVZjL1NyOUw2bjhqd0d2MCt1S0lKVGZhRUpKSUdSV0g3dnRK?=
+ =?utf-8?B?UVFwUFJDMmFwZ0pPNHEvbWxOTy9TZjVFN2tQZnR0cUJ5amd3VmtZYXZXV1dF?=
+ =?utf-8?B?R2lNaWVKZ3VUa3Z1VjhjdlN0Rys0aEdFMVZFZ3JKRDJQNUtKZ1JEa3VNem5S?=
+ =?utf-8?B?S0VZcy96bE5lUXl1VGFYREM1QjJ3ZjdxNk4ycGJQb3Z1YjV5aWJka3ZmZTVP?=
+ =?utf-8?B?QzVnYjFtbHNONFUydDZFSEFVZTFwUEFJdXdkUUJqckJRMGZRbmdtNW1RMHNH?=
+ =?utf-8?B?L1VaV3VCcHo3UGlGQTYwRUpiQktjdDV4TTFsNmtZbC9hK0NzaFk2REFWbXV0?=
+ =?utf-8?B?UkJ5Nnp3ZHJIQW9wdXBDQ25RdlVORWpFUU43VVhBQ2pCa21jRkJLNGtsRjcz?=
+ =?utf-8?B?VlZNaXEza1IvMGZuaVFObkdxdXM5bjF6YjdqQ0R6YTZsbnVkYUNRZ2tsVUhJ?=
+ =?utf-8?B?MFFkZmt3VmV6eWw2aklaeHRXdDRxNElHcm5wdmdqODdWMWtoM3RpN0NVV2Zx?=
+ =?utf-8?B?cEdZTEFZMEJiQ0xocEhxdlMzdWU4WW5IVThGRmI3SVZEZTNsbnB2RGN6NGZQ?=
+ =?utf-8?B?ZFpvc2w0cjFuenRqbjNZWDJGdmlXTzVGa1BnRjM0aFBETXcwN2lzUGIxTjBC?=
+ =?utf-8?B?MnZBbWczOCtBVEJEdDdBbjdTYnJxU3VoaXNiRzlpTExWcXNmM1FwZUNkOThk?=
+ =?utf-8?B?QVdXRlNCV0ZMUUNQRXI1TVVGMEpEY2JZU3dUU0ZmT0s4Z1NLMzFwUlMrMjkx?=
+ =?utf-8?B?dWJYKzYwdnkxWnh1ODZyOWZENmRYUlhIQXVuajRldUFaQVVqSTI4WkVtVG1Z?=
+ =?utf-8?B?WktkS0JqZzNncFdwclZtTHFZMVc2ODFWaGFMcDZkeGJrNjhhaTk3U2thL2Yr?=
+ =?utf-8?B?aGNaTGFsdmRmeHh4T3poR0R4bVF3MzZCQ2pVYk1mTFlqTHRQNXkrWVlxUkhX?=
+ =?utf-8?B?eVVYdlVJZG4rcEJQcFVlRFZUMG9PdXB3UFk2MkZxM3AwMkhtcWJCUFROazJI?=
+ =?utf-8?B?L0gxeXQ5a1dxVjV0QzJNMmxlYy9jRVJmQVoxbnNDckttRXIxK2k3RGwycWRi?=
+ =?utf-8?B?WVVzcGU3WDhzay9WcnRETU5PLzU5VzF4OVh1ejVKR1hpS0dhbjhQeVNDTkF6?=
+ =?utf-8?B?Zk5NaytBUFYyMWlacFVzV29EN0VlZjF5VHlGdDlTWXBMb0k2SnhDbzJldTFT?=
+ =?utf-8?B?OTNFekZTNjNvbFVBTFRRUEJCSkE2NGljWUFsbzFGMEhTK3BuWFF5RWhBdDdm?=
+ =?utf-8?B?bmdZTGFqcktGb3ZSQStFZXdpZW95d3lKREVrazRnS0lLVHZTeEFpL0c4ZUNn?=
+ =?utf-8?B?SzdhWGJCUm1Bb2VEY1R0REtSQ3BmZnRXN09SMit5ZWNTUWhOOGdjRmFMMk5q?=
+ =?utf-8?B?aURNa2U3bEYycDQ3WlFaRS85VnlNVHFWNEFpUjdWTEFXZ21oUjEwYUNFL3BV?=
+ =?utf-8?B?TUVTbGV3c0lUUDYvWENmK2dtZFNHY3BFaUJyOTEvdmxlK1pLckJoTzRBQjhR?=
+ =?utf-8?B?RW5vQXgyUGZNcEd1VTVjeFh5ZW94bGNITE1QYUdvelJkVjZwKzM4YVhHRXVs?=
+ =?utf-8?B?Y0ZCdFZnSkJhNEgva3RTRzBaNVhnejVxK3lUaTJlWmFnbkN2dzdyOHdDYnZ5?=
+ =?utf-8?B?MDlKRTlqQ3ZmQUUwRVVzZ0lPbWNJMGp2dGw5WUFENXVGZXJFNEY5RnZwNnpx?=
+ =?utf-8?B?c1J2MnV1aGdKczhsdjQ2L2MvWHJHZnZkU001dGhQRkwyMnRJTjdBKzhyUHpT?=
+ =?utf-8?B?anlUNmdCMnZETThWWjUwMTdQekJxKzVDU3hVTHV2R2dMWUtWclppcW9QQ0xq?=
+ =?utf-8?B?dWFBKzk3UFp5VGhFZDRtS0FxbmlHQ29vUUhXenpUQ1VuaXdhKytuVVprRzNV?=
+ =?utf-8?B?a0xoUzY2aWFkWHJvcE1lWFRtdnJNZnR4Q0kxUEFlMWMwd0NpWE4xc1JZaW4w?=
+ =?utf-8?Q?Gk6Paq?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?UmxwMXRsVWxFQzV4T08wMHVYYlJ0dWR6S3AvNkRUSGxONkhKSzZrVmZERzBr?=
+ =?utf-8?B?TVhsUGsxWHJ5ZVdpZjE4eHp3MlQyY3A3R09GQTRQTGJ3Qk1zMDY3MjZOa28r?=
+ =?utf-8?B?dm1zNXRObkhvbEZDUWQ0bCs1R0NwLzBPUndEV2NzMEtsems1R2hpOExLSGJY?=
+ =?utf-8?B?blFDaVliR0NiSjExdlo1UUpxU1llSTFmK3lmM2VIdVV3TG5kUmtwcnFMNXkw?=
+ =?utf-8?B?bWFnNlhCS1grK2JYYzhvaWltK0MxYW1BVmZxcTlUbzZKM0c5cHg0RVNXVnJJ?=
+ =?utf-8?B?NjZpTjlSVzlyNE5LZXdlMCtLU0VWNWczYUl3U0VkODc4bURJQlhBZ0R5bnJB?=
+ =?utf-8?B?eVJhejV5ZFMyclkvNzRKOWltd2RvV2ZwNENONFhwQ2lVVUNvQmY3eEkwQ2JQ?=
+ =?utf-8?B?Z0ZNbGluanlEemdCaGtyT1laclFuZDcrUW04YmpOeUVwWm9pNFM1YmlZSENB?=
+ =?utf-8?B?Tm5ncjg1QXBPTTlFLzJUeWJnbXNsMEVFNGp1eWxpVXI5YzJ3Ull6ZjU0K0Ey?=
+ =?utf-8?B?QU5pWGxOSzhKSDNrL2pmcGR6VURRbEFkL01LNG1FZi9mQi9VWGZER0ZkeExB?=
+ =?utf-8?B?NWJvZVJIU0E4M2JyZjNUTXRScjB0V0pIVWU5aVc0QnN5T2tScjRFQm03OW5i?=
+ =?utf-8?B?WHcrRjZsOWwydldBTjJCT3VXU2hXSFp0QUVhNmpOalFxNU5OaGVKaTlUV3F2?=
+ =?utf-8?B?OHVxWVFueVd1YmdVSGtCWW9mejhraWlLNjB0cndZZm1NekFxOFlLYWpwR0ZU?=
+ =?utf-8?B?d1VmSWtuQUFBdlgvenpxUmRkR2F0d2xxUWxZN09OYXh5dlNlb1h4RzRVa09W?=
+ =?utf-8?B?bEovK1RUREpwNkxVL0FRVFlxZlFOcW54cm1jOVNtUC9jdnJTVFF2TVVKL3My?=
+ =?utf-8?B?RVpuUjhkTFd5NzhnSnd2UUlGNmpIR1FqQ1M1WHZudnZJaGNsT0x4N1Q1eWFu?=
+ =?utf-8?B?eTlMdloyOFNzakYvM29LbTh0NkR6MTc2UlB6NVRrb0FCTkRPOFFNS05MTFdr?=
+ =?utf-8?B?NEtJbGgycW9Uc3NuY250QnlWbXFvTzhSQzF6dkRJS2ZreXJQWWJYbWg0ekhX?=
+ =?utf-8?B?OVhsOEpzTkxKU0RiWUMxcUlZbWpyajJYY1BYOUpianJQWVBCQUlmNldtMVVm?=
+ =?utf-8?B?K1p1cCtXbG4wT2xiZXQ4ZkVVcll3SWtaSU13TThPaDNKR2xTQzNZYVU5ZUZB?=
+ =?utf-8?B?QWQwTkh4eFlydG9rY01lZXJ5SHVJQ3FQOFFmQW1WTTJiRnJvZ21SM01WaWJE?=
+ =?utf-8?B?NXZ3anZYSHNvL2JLcU5na1g1YlJULzNEVk1mL2lRSlA1Z3p1RkxuWmJKUUg1?=
+ =?utf-8?B?UWhKWkY4NWFXVWw3K1VnYzlYaThpMDR4OTZCa0pKL3oyQ0licnpoN0x2Tm4w?=
+ =?utf-8?B?TkZHb1JlZDluN0pVU1h1K2IrQU9qTmpLQlVHd0FudXlmeUxzVmJJZTR6bmxZ?=
+ =?utf-8?B?L0pURk5NaHdoYnYvM01SRTJiblVpWFh1ZmJnT0NxVnlYWUlFZHJDeUtTS2Rh?=
+ =?utf-8?B?MG1XeUhSaUhhQlhkMUd0WnY3OWtid3FwZWhzbmpQWkJwRk5LZm1aNk0vdUI0?=
+ =?utf-8?B?TnpLQVdQbXFuTTBya2NHc3lwQ0dWMUhydTdGQTVOdEtmU0pEUlFNdkgzNkFQ?=
+ =?utf-8?B?RlRhZS9KaDArZm05TzdyUFBMbXVzdDdGSmVVZElTU3p6SE9GWDBGMW1vSkJY?=
+ =?utf-8?B?eFVLT3FWZGhSWjhEMnhXZkMxM25kdVF4bkVObnUxMU4rTktiVlh4d296VGM1?=
+ =?utf-8?B?THNzMzBuR05Lb3o4OEdYSkpna3BKOHVXNDFVMGlvNlNZUHljQmJUR25pbUdQ?=
+ =?utf-8?B?MFFJZkVpU2t4dGhJZ3VTOXpCbFJvdG1jdG1nKytlQS9kdW0xNTllYTBndE1i?=
+ =?utf-8?B?anVJTDJ4RkEvcm44SUZhUEFsQkl4dytMa0FwTDNQWmZVWUUzVTUwUHRzRDJK?=
+ =?utf-8?B?c0Z5TGhzcW9JTXlYRSs1eHk5UENkc3J6KzdHa0V0Qmc2RXgwclpzcTJHVXBC?=
+ =?utf-8?B?V1BNZEFpdGV3Smc0aGZ5WDlDUFRhL2grYUkzdXR3RHJIOFFnbEVsYk1seFpt?=
+ =?utf-8?B?cE1iU1J1d1NWM1g4TjhlQjN4U05ncEtSZnJtaEZsSzQycDRCU3doYnhncElZ?=
+ =?utf-8?Q?q3tUY6fiPzDHN9kxP0V1JFr/4?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e8b7e175-92e5-4665-3802-08de205048ee
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Nov 2025 11:57:13.0097
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: hdI9S/mtfJbjKG8QvBDF1c5r8CWzE1IFxQgkRZlr3aXjC4meV9cc0UVwcZ6hlhQ7wwsKdtz6jNKJbutVumX15g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB9150
 
-Add basic driver framework for the Alibaba Elastic Ethernet Adapter(EEA).
 
-This commit introduces ethtool support.
+On 10/15/25 19:17, Dave Jiang wrote:
+>
+> On 10/6/25 3:01 AM, alejandro.lucero-palau@amd.com wrote:
+>> From: Alejandro Lucero <alucerop@amd.com>
+>>
+>> CXL region creation involves allocating capacity from Device Physical Address
+>> (DPA) and assigning it to decode a given Host Physical Address (HPA). Before
+>> determining how much DPA to allocate the amount of available HPA must be
+>> determined. Also, not all HPA is created equal, some HPA targets RAM, some
+>> targets PMEM, some is prepared for device-memory flows like HDM-D and HDM-DB,
+>> and some is HDM-H (host-only).
+>>
+>> In order to support Type2 CXL devices, wrap all of those concerns into
+>> an API that retrieves a root decoder (platform CXL window) that fits the
+>> specified constraints and the capacity available for a new region.
+>>
+>> Add a complementary function for releasing the reference to such root
+>> decoder.
+>>
+>> Based on https://lore.kernel.org/linux-cxl/168592159290.1948938.13522227102445462976.stgit@dwillia2-xfh.jf.intel.com/
+>>
+>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+>> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+>> ---
+>>   drivers/cxl/core/region.c | 162 ++++++++++++++++++++++++++++++++++++++
+>>   drivers/cxl/cxl.h         |   3 +
+>>   include/cxl/cxl.h         |   6 ++
+>>   3 files changed, 171 insertions(+)
+>>
+>> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
+>> index e9bf42d91689..c5b66204ecde 100644
+>> --- a/drivers/cxl/core/region.c
+>> +++ b/drivers/cxl/core/region.c
+>> @@ -703,6 +703,168 @@ static int free_hpa(struct cxl_region *cxlr)
+>>   	return 0;
+>>   }
+>>   
+>> +struct cxlrd_max_context {
+>> +	struct device * const *host_bridges;
+>> +	int interleave_ways;
+>> +	unsigned long flags;
+>> +	resource_size_t max_hpa;
+>> +	struct cxl_root_decoder *cxlrd;
+>> +};
+>> +
+>> +static int find_max_hpa(struct device *dev, void *data)
+>> +{
+>> +	struct cxlrd_max_context *ctx = data;
+>> +	struct cxl_switch_decoder *cxlsd;
+>> +	struct cxl_root_decoder *cxlrd;
+>> +	struct resource *res, *prev;
+>> +	struct cxl_decoder *cxld;
+>> +	resource_size_t max;
+>> +	int found = 0;
+>> +
+>> +	if (!is_root_decoder(dev))
+>> +		return 0;
+>> +
+>> +	cxlrd = to_cxl_root_decoder(dev);
+>> +	cxlsd = &cxlrd->cxlsd;
+>> +	cxld = &cxlsd->cxld;
+>> +
+>> +	if ((cxld->flags & ctx->flags) != ctx->flags) {
+>> +		dev_dbg(dev, "flags not matching: %08lx vs %08lx\n",
+>> +			cxld->flags, ctx->flags);
+>> +		return 0;
+>> +	}
+>> +
+>> +	for (int i = 0; i < ctx->interleave_ways; i++) {
+>> +		for (int j = 0; j < ctx->interleave_ways; j++) {
+>> +			if (ctx->host_bridges[i] == cxlsd->target[j]->dport_dev) {
+>> +				found++;
+>> +				break;
+>> +			}
+>> +		}
+>> +	}
+>> +
+>> +	if (found != ctx->interleave_ways) {
+>> +		dev_dbg(dev,
+>> +			"Not enough host bridges. Found %d for %d interleave ways requested\n",
+>> +			found, ctx->interleave_ways);
+>> +		return 0;
+>> +	}
+>> +
+>> +	/*
+>> +	 * Walk the root decoder resource range relying on cxl_rwsem.region to
+>> +	 * preclude sibling arrival/departure and find the largest free space
+>> +	 * gap.
+>> +	 */
+>> +	lockdep_assert_held_read(&cxl_rwsem.region);
+>> +	res = cxlrd->res->child;
+>> +
+>> +	/* With no resource child the whole parent resource is available */
+>> +	if (!res)
+>> +		max = resource_size(cxlrd->res);
+>> +	else
+>> +		max = 0;
+>> +
+>> +	for (prev = NULL; res; prev = res, res = res->sibling) {
+>> +		struct resource *next = res->sibling;
+>> +		resource_size_t free = 0;
+>> +
+>> +		/*
+>> +		 * Sanity check for preventing arithmetic problems below as a
+>> +		 * resource with size 0 could imply using the end field below
+>> +		 * when set to unsigned zero - 1 or all f in hex.
+>> +		 */
+>> +		if (prev && !resource_size(prev))
+>> +			continue;
+>> +
+>> +		if (!prev && res->start > cxlrd->res->start) {
+>> +			free = res->start - cxlrd->res->start;
+>> +			max = max(free, max);
+>> +		}
+>> +		if (prev && res->start > prev->end + 1) {
+>> +			free = res->start - prev->end + 1;
+>> +			max = max(free, max);
+>> +		}
+>> +		if (next && res->end + 1 < next->start) {
+>> +			free = next->start - res->end + 1;
+>> +			max = max(free, max);
+>> +		}
+>> +		if (!next && res->end + 1 < cxlrd->res->end + 1) {
+>> +			free = cxlrd->res->end + 1 - res->end + 1;
+>> +			max = max(free, max);
+>> +		}
+>> +	}
+>> +
+>> +	dev_dbg(cxlrd_dev(cxlrd), "found %pa bytes of free space\n", &max);
+>> +	if (max > ctx->max_hpa) {
+>> +		if (ctx->cxlrd)
+>> +			put_device(cxlrd_dev(ctx->cxlrd));
+>> +		get_device(cxlrd_dev(cxlrd));
+>> +		ctx->cxlrd = cxlrd;
+>> +		ctx->max_hpa = max;
+>> +	}
+>> +	return 0;
+>> +}
+>> +
+>> +/**
+>> + * cxl_get_hpa_freespace - find a root decoder with free capacity per constraints
+>> + * @cxlmd: the mem device requiring the HPA
+>> + * @interleave_ways: number of entries in @host_bridges
+>> + * @flags: CXL_DECODER_F flags for selecting RAM vs PMEM, and Type2 device
+>> + * @max_avail_contig: output parameter of max contiguous bytes available in the
+>> + *		      returned decoder
+>> + *
+>> + * Returns a pointer to a struct cxl_root_decoder
+>> + *
+>> + * The return tuple of a 'struct cxl_root_decoder' and 'bytes available given
+>> + * in (@max_avail_contig))' is a point in time snapshot. If by the time the
+>> + * caller goes to use this decoder and its capacity is reduced then caller needs
+>> + * to loop and retry.
+>> + *
+>> + * The returned root decoder has an elevated reference count that needs to be
+>> + * put with cxl_put_root_decoder(cxlrd).
+>> + */
+>> +struct cxl_root_decoder *cxl_get_hpa_freespace(struct cxl_memdev *cxlmd,
+>> +					       int interleave_ways,
+>> +					       unsigned long flags,
+>> +					       resource_size_t *max_avail_contig)
+>> +{
+>> +	struct cxl_port *endpoint = cxlmd->endpoint;
+> Do the assignment right before the check. Would help prevent future issues of use before check.
+>
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
-Reviewed-by: Philo Lu <lulie@linux.alibaba.com>
-Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
-Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
----
- drivers/net/ethernet/alibaba/eea/Makefile     |   1 +
- .../net/ethernet/alibaba/eea/eea_ethtool.c    | 276 ++++++++++++++++++
- .../net/ethernet/alibaba/eea/eea_ethtool.h    |  50 ++++
- drivers/net/ethernet/alibaba/eea/eea_net.c    |   2 +
- drivers/net/ethernet/alibaba/eea/eea_net.h    |   5 +
- drivers/net/ethernet/alibaba/eea/eea_rx.c     |  29 +-
- drivers/net/ethernet/alibaba/eea/eea_tx.c     |  24 +-
- 7 files changed, 383 insertions(+), 4 deletions(-)
- create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.c
- create mode 100644 drivers/net/ethernet/alibaba/eea/eea_ethtool.h
+I'll do, but the pointer declaration will be placed the last one with 
+the new line length, just before the assignment. I bet some reviewers in 
+v20 will tell to do the assignment along with the declaration ...
 
-diff --git a/drivers/net/ethernet/alibaba/eea/Makefile b/drivers/net/ethernet/alibaba/eea/Makefile
-index fa34a005fa01..8f8fbb8d2d9a 100644
---- a/drivers/net/ethernet/alibaba/eea/Makefile
-+++ b/drivers/net/ethernet/alibaba/eea/Makefile
-@@ -4,5 +4,6 @@ eea-y := eea_ring.o \
- 	eea_net.o \
- 	eea_pci.o \
- 	eea_adminq.o \
-+	eea_ethtool.o \
- 	eea_tx.o \
- 	eea_rx.o
-diff --git a/drivers/net/ethernet/alibaba/eea/eea_ethtool.c b/drivers/net/ethernet/alibaba/eea/eea_ethtool.c
-new file mode 100644
-index 000000000000..16621c1bec2d
---- /dev/null
-+++ b/drivers/net/ethernet/alibaba/eea/eea_ethtool.c
-@@ -0,0 +1,276 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * Driver for Alibaba Elastic Ethernet Adapter.
-+ *
-+ * Copyright (C) 2025 Alibaba Inc.
-+ */
-+
-+#include <linux/ethtool.h>
-+#include <linux/ethtool_netlink.h>
-+
-+#include "eea_adminq.h"
-+
-+struct eea_stat_desc {
-+	char desc[ETH_GSTRING_LEN];
-+	size_t offset;
-+};
-+
-+#define EEA_TX_STAT(m)	{#m, offsetof(struct eea_tx_stats, m)}
-+#define EEA_RX_STAT(m)	{#m, offsetof(struct eea_rx_stats, m)}
-+
-+static const struct eea_stat_desc eea_rx_stats_desc[] = {
-+	EEA_RX_STAT(descs),
-+	EEA_RX_STAT(kicks),
-+};
-+
-+static const struct eea_stat_desc eea_tx_stats_desc[] = {
-+	EEA_TX_STAT(descs),
-+	EEA_TX_STAT(kicks),
-+};
-+
-+#define EEA_TX_STATS_LEN	ARRAY_SIZE(eea_tx_stats_desc)
-+#define EEA_RX_STATS_LEN	ARRAY_SIZE(eea_rx_stats_desc)
-+
-+static void eea_get_drvinfo(struct net_device *netdev,
-+			    struct ethtool_drvinfo *info)
-+{
-+	struct eea_net *enet = netdev_priv(netdev);
-+	struct eea_device *edev = enet->edev;
-+
-+	strscpy(info->driver,   KBUILD_MODNAME,     sizeof(info->driver));
-+	strscpy(info->bus_info, eea_pci_name(edev), sizeof(info->bus_info));
-+}
-+
-+static void eea_get_ringparam(struct net_device *netdev,
-+			      struct ethtool_ringparam *ring,
-+			      struct kernel_ethtool_ringparam *kernel_ring,
-+			      struct netlink_ext_ack *extack)
-+{
-+	struct eea_net *enet = netdev_priv(netdev);
-+
-+	ring->rx_max_pending = enet->cfg_hw.rx_ring_depth;
-+	ring->tx_max_pending = enet->cfg_hw.tx_ring_depth;
-+	ring->rx_pending = enet->cfg.rx_ring_depth;
-+	ring->tx_pending = enet->cfg.tx_ring_depth;
-+
-+	kernel_ring->tcp_data_split = enet->cfg.split_hdr ?
-+				      ETHTOOL_TCP_DATA_SPLIT_ENABLED :
-+				      ETHTOOL_TCP_DATA_SPLIT_DISABLED;
-+}
-+
-+static int eea_set_ringparam(struct net_device *netdev,
-+			     struct ethtool_ringparam *ring,
-+			     struct kernel_ethtool_ringparam *kernel_ring,
-+			     struct netlink_ext_ack *extack)
-+{
-+	struct eea_net *enet = netdev_priv(netdev);
-+	struct eea_net_init_ctx ctx;
-+	bool need_update = false;
-+	struct eea_net_cfg *cfg;
-+	bool sh;
-+
-+	enet_init_ctx(enet, &ctx);
-+
-+	cfg = &ctx.cfg;
-+
-+	if (ring->rx_pending != cfg->rx_ring_depth)
-+		need_update = true;
-+
-+	if (ring->tx_pending != cfg->tx_ring_depth)
-+		need_update = true;
-+
-+	sh = kernel_ring->tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_ENABLED;
-+	if (sh != !!(cfg->split_hdr))
-+		need_update = true;
-+
-+	if (!need_update)
-+		return 0;
-+
-+	cfg->rx_ring_depth = ring->rx_pending;
-+	cfg->tx_ring_depth = ring->tx_pending;
-+
-+	cfg->split_hdr = sh ? enet->cfg_hw.split_hdr : 0;
-+
-+	return eea_reset_hw_resources(enet, &ctx);
-+}
-+
-+static int eea_set_channels(struct net_device *netdev,
-+			    struct ethtool_channels *channels)
-+{
-+	struct eea_net *enet = netdev_priv(netdev);
-+	u16 queue_pairs = channels->combined_count;
-+	struct eea_net_init_ctx ctx;
-+	struct eea_net_cfg *cfg;
-+
-+	enet_init_ctx(enet, &ctx);
-+
-+	cfg = &ctx.cfg;
-+
-+	cfg->rx_ring_num = queue_pairs;
-+	cfg->tx_ring_num = queue_pairs;
-+
-+	return eea_reset_hw_resources(enet, &ctx);
-+}
-+
-+static void eea_get_channels(struct net_device *netdev,
-+			     struct ethtool_channels *channels)
-+{
-+	struct eea_net *enet = netdev_priv(netdev);
-+
-+	channels->combined_count = enet->cfg.rx_ring_num;
-+	channels->max_combined   = enet->cfg_hw.rx_ring_num;
-+}
-+
-+static void eea_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
-+{
-+	struct eea_net *enet = netdev_priv(netdev);
-+	u8 *p = data;
-+	u32 i, j;
-+
-+	if (stringset != ETH_SS_STATS)
-+		return;
-+
-+	for (i = 0; i < enet->cfg.rx_ring_num; i++) {
-+		for (j = 0; j < EEA_RX_STATS_LEN; j++)
-+			ethtool_sprintf(&p, "rx%u_%s", i,
-+					eea_rx_stats_desc[j].desc);
-+	}
-+
-+	for (i = 0; i < enet->cfg.tx_ring_num; i++) {
-+		for (j = 0; j < EEA_TX_STATS_LEN; j++)
-+			ethtool_sprintf(&p, "tx%u_%s", i,
-+					eea_tx_stats_desc[j].desc);
-+	}
-+}
-+
-+static int eea_get_sset_count(struct net_device *netdev, int sset)
-+{
-+	struct eea_net *enet = netdev_priv(netdev);
-+
-+	if (sset != ETH_SS_STATS)
-+		return -EOPNOTSUPP;
-+
-+	return enet->cfg.rx_ring_num * EEA_RX_STATS_LEN +
-+		enet->cfg.tx_ring_num * EEA_TX_STATS_LEN;
-+}
-+
-+static void eea_stats_fill_for_q(struct u64_stats_sync *syncp, u32 num,
-+				 const struct eea_stat_desc *desc,
-+				 u64 *data, u32 idx)
-+{
-+	void *stats_base = syncp;
-+	u32 start, i;
-+
-+	do {
-+		start = u64_stats_fetch_begin(syncp);
-+		for (i = 0; i < num; i++)
-+			data[idx + i] =
-+				u64_stats_read(stats_base + desc[i].offset);
-+
-+	} while (u64_stats_fetch_retry(syncp, start));
-+}
-+
-+static void eea_get_ethtool_stats(struct net_device *netdev,
-+				  struct ethtool_stats *stats, u64 *data)
-+{
-+	struct eea_net *enet = netdev_priv(netdev);
-+	u32 i, idx = 0;
-+
-+	for (i = 0; i < enet->cfg.rx_ring_num; i++) {
-+		struct eea_net_rx *rx = enet->rx[i];
-+
-+		eea_stats_fill_for_q(&rx->stats.syncp, EEA_RX_STATS_LEN,
-+				     eea_rx_stats_desc, data, idx);
-+
-+		idx += EEA_RX_STATS_LEN;
-+	}
-+
-+	for (i = 0; i < enet->cfg.tx_ring_num; i++) {
-+		struct eea_net_tx *tx = &enet->tx[i];
-+
-+		eea_stats_fill_for_q(&tx->stats.syncp, EEA_TX_STATS_LEN,
-+				     eea_tx_stats_desc, data, idx);
-+
-+		idx += EEA_TX_STATS_LEN;
-+	}
-+}
-+
-+void eea_update_rx_stats(struct eea_rx_stats *rx_stats,
-+			 struct eea_rx_ctx_stats *stats)
-+{
-+	u64_stats_update_begin(&rx_stats->syncp);
-+	u64_stats_add(&rx_stats->descs,             stats->descs);
-+	u64_stats_add(&rx_stats->packets,           stats->packets);
-+	u64_stats_add(&rx_stats->bytes,             stats->bytes);
-+	u64_stats_add(&rx_stats->drops,             stats->drops);
-+	u64_stats_add(&rx_stats->split_hdr_bytes,   stats->split_hdr_bytes);
-+	u64_stats_add(&rx_stats->split_hdr_packets, stats->split_hdr_packets);
-+	u64_stats_add(&rx_stats->length_errors,     stats->length_errors);
-+	u64_stats_update_end(&rx_stats->syncp);
-+}
-+
-+void eea_stats(struct net_device *netdev, struct rtnl_link_stats64 *tot)
-+{
-+	struct eea_net *enet = netdev_priv(netdev);
-+	u64 packets, bytes;
-+	u32 start;
-+	int i;
-+
-+	if (enet->rx) {
-+		for (i = 0; i < enet->cfg.rx_ring_num; i++) {
-+			struct eea_net_rx *rx = enet->rx[i];
-+
-+			do {
-+				start = u64_stats_fetch_begin(&rx->stats.syncp);
-+				packets = u64_stats_read(&rx->stats.packets);
-+				bytes = u64_stats_read(&rx->stats.bytes);
-+			} while (u64_stats_fetch_retry(&rx->stats.syncp,
-+						       start));
-+
-+			tot->rx_packets += packets;
-+			tot->rx_bytes   += bytes;
-+		}
-+	}
-+
-+	if (enet->tx) {
-+		for (i = 0; i < enet->cfg.tx_ring_num; i++) {
-+			struct eea_net_tx *tx = &enet->tx[i];
-+
-+			do {
-+				start = u64_stats_fetch_begin(&tx->stats.syncp);
-+				packets = u64_stats_read(&tx->stats.packets);
-+				bytes = u64_stats_read(&tx->stats.bytes);
-+			} while (u64_stats_fetch_retry(&tx->stats.syncp,
-+						       start));
-+
-+			tot->tx_packets += packets;
-+			tot->tx_bytes   += bytes;
-+		}
-+	}
-+}
-+
-+static int eea_get_link_ksettings(struct net_device *netdev,
-+				  struct ethtool_link_ksettings *cmd)
-+{
-+	struct eea_net *enet = netdev_priv(netdev);
-+
-+	cmd->base.speed  = enet->speed;
-+	cmd->base.duplex = enet->duplex;
-+	cmd->base.port   = PORT_OTHER;
-+
-+	return 0;
-+}
-+
-+const struct ethtool_ops eea_ethtool_ops = {
-+	.supported_ring_params = ETHTOOL_RING_USE_TCP_DATA_SPLIT,
-+	.get_drvinfo        = eea_get_drvinfo,
-+	.get_link           = ethtool_op_get_link,
-+	.get_ringparam      = eea_get_ringparam,
-+	.set_ringparam      = eea_set_ringparam,
-+	.set_channels       = eea_set_channels,
-+	.get_channels       = eea_get_channels,
-+	.get_strings        = eea_get_strings,
-+	.get_sset_count     = eea_get_sset_count,
-+	.get_ethtool_stats  = eea_get_ethtool_stats,
-+	.get_link_ksettings = eea_get_link_ksettings,
-+};
-diff --git a/drivers/net/ethernet/alibaba/eea/eea_ethtool.h b/drivers/net/ethernet/alibaba/eea/eea_ethtool.h
-new file mode 100644
-index 000000000000..1ee89b49addd
---- /dev/null
-+++ b/drivers/net/ethernet/alibaba/eea/eea_ethtool.h
-@@ -0,0 +1,50 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * Driver for Alibaba Elastic Ethernet Adapter.
-+ *
-+ * Copyright (C) 2025 Alibaba Inc.
-+ */
-+
-+#ifndef __EEA_ETHTOOL_H__
-+#define __EEA_ETHTOOL_H__
-+
-+struct eea_tx_stats {
-+	struct u64_stats_sync syncp;
-+	u64_stats_t descs;
-+	u64_stats_t packets;
-+	u64_stats_t bytes;
-+	u64_stats_t drops;
-+	u64_stats_t kicks;
-+};
-+
-+struct eea_rx_ctx_stats {
-+	u64 descs;
-+	u64 packets;
-+	u64 bytes;
-+	u64 drops;
-+	u64 split_hdr_bytes;
-+	u64 split_hdr_packets;
-+
-+	u64 length_errors;
-+};
-+
-+struct eea_rx_stats {
-+	struct u64_stats_sync syncp;
-+	u64_stats_t descs;
-+	u64_stats_t packets;
-+	u64_stats_t bytes;
-+	u64_stats_t drops;
-+	u64_stats_t kicks;
-+	u64_stats_t split_hdr_bytes;
-+	u64_stats_t split_hdr_packets;
-+
-+	u64_stats_t length_errors;
-+};
-+
-+void eea_update_rx_stats(struct eea_rx_stats *rx_stats,
-+			 struct eea_rx_ctx_stats *stats);
-+void eea_stats(struct net_device *netdev, struct rtnl_link_stats64 *tot);
-+
-+extern const struct ethtool_ops eea_ethtool_ops;
-+
-+#endif
-diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.c b/drivers/net/ethernet/alibaba/eea/eea_net.c
-index dc5895f5d495..397a05533774 100644
---- a/drivers/net/ethernet/alibaba/eea/eea_net.c
-+++ b/drivers/net/ethernet/alibaba/eea/eea_net.c
-@@ -437,6 +437,7 @@ static const struct net_device_ops eea_netdev = {
- 	.ndo_stop           = eea_netdev_stop,
- 	.ndo_start_xmit     = eea_tx_xmit,
- 	.ndo_validate_addr  = eth_validate_addr,
-+	.ndo_get_stats64    = eea_stats,
- 	.ndo_features_check = passthru_features_check,
- 	.ndo_tx_timeout     = eea_tx_timeout,
- };
-@@ -454,6 +455,7 @@ static struct eea_net *eea_netdev_alloc(struct eea_device *edev, u32 pairs)
- 	}
- 
- 	netdev->netdev_ops = &eea_netdev;
-+	netdev->ethtool_ops = &eea_ethtool_ops;
- 	SET_NETDEV_DEV(netdev, edev->dma_dev);
- 
- 	enet = netdev_priv(netdev);
-diff --git a/drivers/net/ethernet/alibaba/eea/eea_net.h b/drivers/net/ethernet/alibaba/eea/eea_net.h
-index b451f6765480..d98a1a94d86e 100644
---- a/drivers/net/ethernet/alibaba/eea/eea_net.h
-+++ b/drivers/net/ethernet/alibaba/eea/eea_net.h
-@@ -12,6 +12,7 @@
- #include <linux/netdevice.h>
- 
- #include "eea_adminq.h"
-+#include "eea_ethtool.h"
- #include "eea_ring.h"
- 
- #define EEA_VER_MAJOR		1
-@@ -38,6 +39,8 @@ struct eea_net_tx {
- 	u32 index;
- 
- 	char name[16];
-+
-+	struct eea_tx_stats stats;
- };
- 
- struct eea_rx_meta {
-@@ -90,6 +93,8 @@ struct eea_net_rx {
- 
- 	struct napi_struct napi;
- 
-+	struct eea_rx_stats stats;
-+
- 	u16 irq_n;
- 
- 	char name[16];
-diff --git a/drivers/net/ethernet/alibaba/eea/eea_rx.c b/drivers/net/ethernet/alibaba/eea/eea_rx.c
-index 4a802cf87de0..e0a0a9e29e99 100644
---- a/drivers/net/ethernet/alibaba/eea/eea_rx.c
-+++ b/drivers/net/ethernet/alibaba/eea/eea_rx.c
-@@ -32,6 +32,8 @@ struct eea_rx_ctx {
- 	u32 frame_sz;
- 
- 	struct eea_rx_meta *meta;
-+
-+	struct eea_rx_ctx_stats stats;
- };
- 
- static struct eea_rx_meta *eea_rx_meta_get(struct eea_net_rx *rx)
-@@ -199,6 +201,7 @@ static int eea_harden_check_overflow(struct eea_rx_ctx *ctx,
- 		pr_debug("%s: rx error: len %u exceeds truesize %u\n",
- 			 enet->netdev->name, ctx->len,
- 			 ctx->meta->truesize - ctx->meta->room);
-+		++ctx->stats.length_errors;
- 		return -EINVAL;
- 	}
- 
-@@ -215,6 +218,7 @@ static int eea_harden_check_size(struct eea_rx_ctx *ctx, struct eea_net *enet)
- 
- 	if (unlikely(ctx->hdr_len + ctx->len < ETH_HLEN)) {
- 		pr_debug("%s: short packet %u\n", enet->netdev->name, ctx->len);
-+		++ctx->stats.length_errors;
- 		return -EINVAL;
- 	}
- 
-@@ -356,6 +360,7 @@ static int process_remain_buf(struct eea_net_rx *rx, struct eea_rx_ctx *ctx)
- 
- err:
- 	dev_kfree_skb(rx->pkt.head_skb);
-+	++ctx->stats.drops;
- 	rx->pkt.do_drop = true;
- 	rx->pkt.head_skb = NULL;
- 	return 0;
-@@ -384,6 +389,7 @@ static int process_first_buf(struct eea_net_rx *rx, struct eea_rx_ctx *ctx)
- 	return 0;
- 
- err:
-+	++ctx->stats.drops;
- 	rx->pkt.do_drop = true;
- 	return 0;
- }
-@@ -415,9 +421,12 @@ static void eea_rx_desc_to_ctx(struct eea_net_rx *rx,
- 	ctx->flags = le16_to_cpu(desc->flags);
- 
- 	ctx->hdr_len = 0;
--	if (ctx->flags & EEA_DESC_F_SPLIT_HDR)
-+	if (ctx->flags & EEA_DESC_F_SPLIT_HDR) {
- 		ctx->hdr_len = le16_to_cpu(desc->len_ex) &
- 			EEA_RX_CDESC_HDR_LEN_MASK;
-+		ctx->stats.split_hdr_bytes += ctx->hdr_len;
-+		++ctx->stats.split_hdr_packets;
-+	}
- 
- 	ctx->more = ctx->flags & EEA_RING_DESC_F_MORE;
- }
-@@ -445,6 +454,8 @@ static int eea_cleanrx(struct eea_net_rx *rx, int budget,
- 
- 		eea_rx_meta_dma_sync_for_cpu(rx, meta, ctx->len);
- 
-+		ctx->stats.bytes += ctx->len;
-+
- 		if (!rx->pkt.idx)
- 			process_first_buf(rx, ctx);
- 		else
-@@ -462,17 +473,20 @@ static int eea_cleanrx(struct eea_net_rx *rx, int budget,
- skip:
- 		eea_rx_meta_put(rx, meta);
- 		ering_cq_ack_desc(rx->ering, 1);
-+		++ctx->stats.descs;
- 
- 		if (!ctx->more)
- 			memset(&rx->pkt, 0, sizeof(rx->pkt));
- 	}
- 
-+	ctx->stats.packets = packets;
-+
- 	return packets;
- }
- 
- static bool eea_rx_post(struct eea_net *enet, struct eea_net_rx *rx)
- {
--	u32 tailroom, headroom, room, len;
-+	u32 tailroom, headroom, room, flags, len;
- 	struct eea_rx_meta *meta;
- 	struct eea_rx_desc *desc;
- 	int err = 0, num = 0;
-@@ -512,9 +526,14 @@ static bool eea_rx_post(struct eea_net *enet, struct eea_net_rx *rx)
- 		++num;
- 	}
- 
--	if (num)
-+	if (num) {
- 		ering_kick(rx->ering);
- 
-+		flags = u64_stats_update_begin_irqsave(&rx->stats.syncp);
-+		u64_stats_inc(&rx->stats.kicks);
-+		u64_stats_update_end_irqrestore(&rx->stats.syncp, flags);
-+	}
-+
- 	/* true means busy, napi should be called again. */
- 	return !!err;
- }
-@@ -535,6 +554,8 @@ int eea_poll(struct napi_struct *napi, int budget)
- 	if (rx->ering->num_free > budget)
- 		busy |= eea_rx_post(enet, rx);
- 
-+	eea_update_rx_stats(&rx->stats, &ctx.stats);
-+
- 	busy |= received >= budget;
- 
- 	if (!busy) {
-@@ -720,6 +741,8 @@ struct eea_net_rx *eea_alloc_rx(struct eea_net_init_ctx *ctx, u32 idx)
- 	rx->index = idx;
- 	sprintf(rx->name, "rx.%u", idx);
- 
-+	u64_stats_init(&rx->stats.syncp);
-+
- 	/* ering */
- 	ering = ering_alloc(idx * 2, ctx->cfg.rx_ring_depth, ctx->edev,
- 			    ctx->cfg.rx_sq_desc_size,
-diff --git a/drivers/net/ethernet/alibaba/eea/eea_tx.c b/drivers/net/ethernet/alibaba/eea/eea_tx.c
-index a9c4cd0d75ff..acee33add96a 100644
---- a/drivers/net/ethernet/alibaba/eea/eea_tx.c
-+++ b/drivers/net/ethernet/alibaba/eea/eea_tx.c
-@@ -114,6 +114,13 @@ static u32 eea_clean_tx(struct eea_net_tx *tx)
- 		eea_tx_meta_put_and_unmap(tx, meta);
- 	}
- 
-+	if (stats.packets) {
-+		u64_stats_update_begin(&tx->stats.syncp);
-+		u64_stats_add(&tx->stats.bytes, stats.bytes);
-+		u64_stats_add(&tx->stats.packets, stats.packets);
-+		u64_stats_update_end(&tx->stats.syncp);
-+	}
-+
- 	return stats.packets;
- }
- 
-@@ -247,6 +254,10 @@ static int eea_tx_post_skb(struct eea_net_tx *tx, struct sk_buff *skb)
- 	meta->num = shinfo->nr_frags + 1;
- 	ering_sq_commit_desc(tx->ering);
- 
-+	u64_stats_update_begin(&tx->stats.syncp);
-+	u64_stats_add(&tx->stats.descs, meta->num);
-+	u64_stats_update_end(&tx->stats.syncp);
-+
- 	return 0;
- 
- err_cancel:
-@@ -258,6 +269,10 @@ static int eea_tx_post_skb(struct eea_net_tx *tx, struct sk_buff *skb)
- static void eea_tx_kick(struct eea_net_tx *tx)
- {
- 	ering_kick(tx->ering);
-+
-+	u64_stats_update_begin(&tx->stats.syncp);
-+	u64_stats_inc(&tx->stats.kicks);
-+	u64_stats_update_end(&tx->stats.syncp);
- }
- 
- netdev_tx_t eea_tx_xmit(struct sk_buff *skb, struct net_device *netdev)
-@@ -282,8 +297,13 @@ netdev_tx_t eea_tx_xmit(struct sk_buff *skb, struct net_device *netdev)
- 	skb_tx_timestamp(skb);
- 
- 	err = eea_tx_post_skb(tx, skb);
--	if (unlikely(err))
-+	if (unlikely(err)) {
-+		u64_stats_update_begin(&tx->stats.syncp);
-+		u64_stats_inc(&tx->stats.drops);
-+		u64_stats_update_end(&tx->stats.syncp);
-+
- 		dev_kfree_skb_any(skb);
-+	}
- 
- 	if (!netdev_xmit_more() || netif_xmit_stopped(txq))
- 		eea_tx_kick(tx);
-@@ -346,6 +366,8 @@ int eea_alloc_tx(struct eea_net_init_ctx *ctx, struct eea_net_tx *tx, u32 idx)
- 	struct eea_ring *ering;
- 	u32 i;
- 
-+	u64_stats_init(&tx->stats.syncp);
-+
- 	sprintf(tx->name, "tx.%u", idx);
- 
- 	ering = ering_alloc(idx * 2 + 1, ctx->cfg.tx_ring_depth, ctx->edev,
--- 
-2.32.0.3.g01195cf9f
 
+>> +	struct cxlrd_max_context ctx = {
+>> +		.flags = flags,
+>> +	};
+>> +	struct cxl_port *root_port;
+>> +
+>> +	if (!endpoint) {
+>> +		dev_dbg(&cxlmd->dev, "endpoint not linked to memdev\n");
+>> +		return ERR_PTR(-ENXIO);
+>> +	}
+>> +
+>> +	ctx.host_bridges = &endpoint->host_bridge;
+> Would there ever be a scenario where there would be multiple host bridges that requires this to be an array? I'm not seeing that usage in this patch series.
+
+
+It has been suggested by Dan the cxl core modified for Type2 needs to 
+cover other impending requirements, and this one comes from Dan's 
+original patchset.
+
+I could avoid the array as it is not being used for sfc, but let's ask 
+Dan specifically.
+
+
+
+>
+> DJ
+>
+>> +
+>> +	struct cxl_root *root __free(put_cxl_root) = find_cxl_root(endpoint);
+>> +	if (!root) {
+>> +		dev_dbg(&endpoint->dev, "endpoint is not related to a root port\n");
+>> +		return ERR_PTR(-ENXIO);
+>> +	}
+>> +
+>> +	root_port = &root->port;
+>> +	scoped_guard(rwsem_read, &cxl_rwsem.region)
+>> +		device_for_each_child(&root_port->dev, &ctx, find_max_hpa);
+>> +
+>> +	if (!ctx.cxlrd)
+>> +		return ERR_PTR(-ENOMEM);
+>> +
+>> +	*max_avail_contig = ctx.max_hpa;
+>> +	return ctx.cxlrd;
+>> +}
+>> +EXPORT_SYMBOL_NS_GPL(cxl_get_hpa_freespace, "CXL");
+>> +
+>> +void cxl_put_root_decoder(struct cxl_root_decoder *cxlrd)
+>> +{
+>> +	put_device(cxlrd_dev(cxlrd));
+>> +}
+>> +EXPORT_SYMBOL_NS_GPL(cxl_put_root_decoder, "CXL");
+>> +
+>>   static ssize_t size_store(struct device *dev, struct device_attribute *attr,
+>>   			  const char *buf, size_t len)
+>>   {
+>> diff --git a/drivers/cxl/cxl.h b/drivers/cxl/cxl.h
+>> index 793d4dfe51a2..076640e91ee0 100644
+>> --- a/drivers/cxl/cxl.h
+>> +++ b/drivers/cxl/cxl.h
+>> @@ -664,6 +664,9 @@ struct cxl_root_decoder *to_cxl_root_decoder(struct device *dev);
+>>   struct cxl_switch_decoder *to_cxl_switch_decoder(struct device *dev);
+>>   struct cxl_endpoint_decoder *to_cxl_endpoint_decoder(struct device *dev);
+>>   bool is_root_decoder(struct device *dev);
+>> +
+>> +#define cxlrd_dev(cxlrd) (&(cxlrd)->cxlsd.cxld.dev)
+>> +
+>>   bool is_switch_decoder(struct device *dev);
+>>   bool is_endpoint_decoder(struct device *dev);
+>>   struct cxl_root_decoder *cxl_root_decoder_alloc(struct cxl_port *port,
+>> diff --git a/include/cxl/cxl.h b/include/cxl/cxl.h
+>> index 043fc31c764e..2ec514c77021 100644
+>> --- a/include/cxl/cxl.h
+>> +++ b/include/cxl/cxl.h
+>> @@ -250,4 +250,10 @@ int cxl_set_capacity(struct cxl_dev_state *cxlds, u64 capacity);
+>>   struct cxl_memdev *devm_cxl_add_memdev(struct device *host,
+>>   				       struct cxl_dev_state *cxlds,
+>>   				       const struct cxl_memdev_ops *ops);
+>> +struct cxl_port;
+>> +struct cxl_root_decoder *cxl_get_hpa_freespace(struct cxl_memdev *cxlmd,
+>> +					       int interleave_ways,
+>> +					       unsigned long flags,
+>> +					       resource_size_t *max);
+>> +void cxl_put_root_decoder(struct cxl_root_decoder *cxlrd);
+>>   #endif /* __CXL_CXL_H__ */
+>
 
