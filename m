@@ -1,113 +1,66 @@
-Return-Path: <netdev+bounces-237099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AA52C4485A
-	for <lists+netdev@lfdr.de>; Sun, 09 Nov 2025 22:43:02 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DBD9C44B58
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 02:09:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1D4FC4E4525
-	for <lists+netdev@lfdr.de>; Sun,  9 Nov 2025 21:43:01 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 918274E19FB
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 01:09:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 456AF264612;
-	Sun,  9 Nov 2025 21:42:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y25dum1j";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="hyrjTR69"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87F2421019C;
+	Mon, 10 Nov 2025 01:09:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9115323A9B0
-	for <netdev@vger.kernel.org>; Sun,  9 Nov 2025 21:42:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from invmail4.hynix.com (exvmail4.skhynix.com [166.125.252.92])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45DE71A58D;
+	Mon, 10 Nov 2025 01:09:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762724577; cv=none; b=TYy2dJ5Gy2jGEfSvT5NgUITs4v+tlvLV1rYgPYQyFGD68yZDVmzEJiUy27c12RkG4dgkceG3/ZaBtPg7P9e3gQokg5tYm/yAl/I/dOa5nW6eEOp2A0BwC+7sxHTTeoQ/n5fSDNTh3PAg5j/4AYvvUcxwRHP5D+P7WvkR8jGOYgI=
+	t=1762736987; cv=none; b=fyeM4p78VsU4Kesps1UmH//+zZBkZIw9xng4rdUkarrUx8NC5w62jWKnoH4bDxAik4Bq+VxlL2CurRcOgfoF/YE0BHcSFGqMqPLdZRyKoonUoYrGArpK3/+14bSiPmpEUqZMlXR/u7ycnvMJxfU7MRRtYhiSvlkvcDWibevHCzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762724577; c=relaxed/simple;
-	bh=LmKB2duQIVCAvE+Z+ImdR2aiNTNb7iGVbnE+RW0CfL0=;
+	s=arc-20240116; t=1762736987; c=relaxed/simple;
+	bh=6lBX/PQAGMpxyYl0SnTFFRgoUlmWnhp6tbfnUe4KM5s=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D4hVUNedIqktvVuX4dpIGL3WTOkoptLutSehEobJUvX9AkMG1NyOS5h8sz7zMvtHTOmP17xRdTp+AI063v4HHwMd+IOohKiHN+5eV/NhMvOwS218VVlVmjLBxeLeaPC7XHkiSsAtrVq2DS2MZtn9ugq+aOzLb13Yy9CzeF/qF0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y25dum1j; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=hyrjTR69; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762724574;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6IXQ9UBlHWYywhU0Xh3V4xPK5ResoKCt5ne0jLzblXQ=;
-	b=Y25dum1jJWnHzR5cnAVLiw3T0PDUnIR20m6JHPsO8HX3RbjeJb2M8tYzjfCeRG0LZtfswM
-	rsifkULpJtOV5plyIihDWX0ENBS+qDizmZp38ncWGGODtaREKpKVTPxIkKZK0iiPBXBh63
-	e8gk7VSz0SavVv+8mVIyBKY6skQSL/o=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-159-C9EjPrXvPNms6b1blAmSOg-1; Sun, 09 Nov 2025 16:42:52 -0500
-X-MC-Unique: C9EjPrXvPNms6b1blAmSOg-1
-X-Mimecast-MFC-AGG-ID: C9EjPrXvPNms6b1blAmSOg_1762724572
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-475e032d81bso12814925e9.3
-        for <netdev@vger.kernel.org>; Sun, 09 Nov 2025 13:42:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762724571; x=1763329371; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6IXQ9UBlHWYywhU0Xh3V4xPK5ResoKCt5ne0jLzblXQ=;
-        b=hyrjTR69OMmYtJvXJshKmA9SIZQ2fUDlVQLP+DqgvQVt3QYS9nLHl7rG8STPn2+XVD
-         I85r+j8oLeNMFJvsspfcYJO7fgLkDebN0HL5oYudU9uBH8Qu58zC5QWIJWqIFCFSSD1C
-         YuVk3zJ/r+NQHCMlpaoCkHYeL5KKmELSgj91C/QAe/rGcUFcVaBQnAXuT2zdbpYd89hf
-         10ox7pfFgClayy0rDPwMFf4hmc7z+H0ommfuoKQuJ96Rm2eGqi+t5RVs83e2wn6foGac
-         rSYtF6DSBt2N7/JY8bw/bPiUJtiUWneMxb/AV9aja96OXzGjoO07hV3V6+tzqsvx48q+
-         pzPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762724571; x=1763329371;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6IXQ9UBlHWYywhU0Xh3V4xPK5ResoKCt5ne0jLzblXQ=;
-        b=erF19ucLggKpRxbN/5FfnxwkT/XUUSj9jNiHe7YEBJ9yfpWpkILTXQKjumJhJsqq1D
-         YNJILqFxMUCUVRbmhz6Iuauqa+tbzkcw1EgM9gxFYHR+KfWE0FFrKwpnwTFK0fXy8NGP
-         PIS/CE88CLlJa2VgQNAtSKMjUvkGurppAYyObue7VKbQFcb+Ho520QTOlmRpjG9iNcqQ
-         S57Aw70p19GS0wmLf8AAHRt0bV2W/+j7paZbmYiUUAYjrJPCMCmOiQ9hLM23b4LzETK6
-         G+HAdqJdh9ZNUmKQIJ/tYuqrgs75TxHUXyCmQaF5JS9gSAQeBZmkoNyN6Ni8MKp5HVLH
-         lU8g==
-X-Gm-Message-State: AOJu0YwLbh/GsizKFWJCtUeJ10nHJ97SofkVw380f5jm6ybGv7ixc9oU
-	rylSrkUGTskePkjleGonZ7h3CWjOvwCOsnAct/9eKXjBESI8EhLzHpi/jGiOqXd11hHcGh2fpDz
-	2kMOjZFns6c2uoAa3pThEdc3NMRP9SCgLvkVnJIC3Nip4kVsZmFaQhvj2UQ==
-X-Gm-Gg: ASbGnctZLU+W6x2tVw59txjQTl9RqVPv8G/pbtkOZhOSvMEkAZfuNYMDRDxO+Q//VCD
-	m1hvy7E3VsnU7/egEWch8plHIKnoThttBSS5Gzjeclb+xIR8t3bSJEfWC1yICScUXSk0atbMAm1
-	50mrBlyXLCK9Yhw5Er5GZ6Zh4WA+YKPY3ZUwbukvRn959rOUbhJ1NNOgD2amIJLyoo6TVHav1UF
-	Gao9kAYajOwA/FQ8Jd9AUEyZ5Ph+KlNEmcpKs8WHmIi4aKDQwhtykXF52NK6v97NWcZnRpNXjb7
-	VHEZLIpcLm0HEMF9zjaoJVvDqofEPj4RmsUoQFiyoTbtPsYhijuuFu6tjmAG7GFORGc=
-X-Received: by 2002:a05:600c:c4a1:b0:471:1717:40f with SMTP id 5b1f17b1804b1-4777326eb4dmr52273985e9.22.1762724571428;
-        Sun, 09 Nov 2025 13:42:51 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGoJBOUKmXnSs/COEMtg4usMh/sEWfzcIqGkN8whiHWFiHxtB0SnSQIC6SRXRLiuUoPaGqZVg==
-X-Received: by 2002:a05:600c:c4a1:b0:471:1717:40f with SMTP id 5b1f17b1804b1-4777326eb4dmr52273875e9.22.1762724571022;
-        Sun, 09 Nov 2025 13:42:51 -0800 (PST)
-Received: from redhat.com ([2a0d:6fc0:1536:2700:9203:49b4:a0d:b580])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47774d3557csm97500045e9.8.2025.11.09.13.42.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Nov 2025 13:42:50 -0800 (PST)
-Date: Sun, 9 Nov 2025 16:42:47 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Heng Qi <hengqi@linux.alibaba.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Alvaro Karsz <alvaro.karsz@solid-run.com>,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH net v4 3/4] virtio-net: correct hdr_len handling for
- VIRTIO_NET_F_GUEST_HDRLEN
-Message-ID: <20251109164133-mutt-send-email-mst@kernel.org>
-References: <20251029030913.20423-1-xuanzhuo@linux.alibaba.com>
- <20251029030913.20423-4-xuanzhuo@linux.alibaba.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=X281fVe7sJFmXHiBfJXoTkSo0BDgahSlchpHWVl7mx2GGanIWsRr+52GI/0g4kmUxWIRBHDqH01Jc04yDMLh0r7AQGsSF5jQ9HqI3A1XfT3pxNwSt7UP0Cw2LDknjHaCe3YqeTZG6OgzU9XKqeiWhpbrg3Uh3KbQ2cZaXYUV1ME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
+X-AuditID: a67dfc5b-c2dff70000001609-52-69113b4c406e
+Date: Mon, 10 Nov 2025 10:09:26 +0900
+From: Byungchul Park <byungchul@sk.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: linux-mm@kvack.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
+	harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
+	davem@davemloft.net, hawk@kernel.org, john.fastabend@gmail.com,
+	sdf@fomichev.me, saeedm@nvidia.com, leon@kernel.org,
+	tariqt@nvidia.com, mbloch@nvidia.com, andrew+netdev@lunn.ch,
+	edumazet@google.com, pabeni@redhat.com, akpm@linux-foundation.org,
+	david@redhat.com, lorenzo.stoakes@oracle.com,
+	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
+	surenb@google.com, mhocko@suse.com, horms@kernel.org,
+	jackmanb@google.com, hannes@cmpxchg.org, ziy@nvidia.com,
+	ilias.apalodimas@linaro.org, willy@infradead.org,
+	brauner@kernel.org, kas@kernel.org, yuzhao@google.com,
+	usamaarif642@gmail.com, baolin.wang@linux.alibaba.com,
+	almasrymina@google.com, toke@redhat.com, asml.silence@gmail.com,
+	bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
+	sfr@canb.auug.org.au, dw@davidwei.uk, ap420073@gmail.com,
+	dtatulea@nvidia.com
+Subject: Re: [RFC mm v5 1/2] page_pool: check nmdesc->pp to see its usage as
+ page pool for net_iov not page-backed
+Message-ID: <20251110010926.GA70011@system.software.com>
+References: <20251103075108.26437-1-byungchul@sk.com>
+ <20251103075108.26437-2-byungchul@sk.com>
+ <20251106173320.2f8e683a@kernel.org>
+ <20251107015902.GA3021@system.software.com>
+ <20251106180810.6b06f71a@kernel.org>
+ <20251107044708.GA54407@system.software.com>
+ <20251107174129.62a3f39c@kernel.org>
+ <20251108022458.GA65163@system.software.com>
+ <20251107183712.36228f2a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -116,90 +69,79 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251029030913.20423-4-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20251107183712.36228f2a@kernel.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA03Se0hUaRjHcd7znpuDQ2fG2t50o2W6gZVdttinCxVFcLCCwCK6N+UhD40a
+	42QaFWMNlFNa7eY2jhOZUV5raCx1poy8rE5FOegaJ7Ydy7ba7WKDNxoddGeKqP8+8Pz48v7x
+	8ljrZWJ5Oc0kGdP0Bh2rolUfoktmrVmskecUdWjA4axiofJTFpQ+r2MgWPWGAkdFDYL+4F8c
+	jNa3IOhrbmXhXVMvgsuXBjE42iw0DDiHMLg9bxC8tV1j4VVLNweVrrXQdfU1DXeO12LoPu1l
+	Ic8yjKE+2MPB0bqycLjazIGvJp+Bc0NXMNSan3PQ4XGw4K8aZeB1Yx4N9+3lNAQKmjF05S+H
+	luIfYPDhewTNzloKBk9dYKGz0EPBrfpODn5rL2bhpaULQXtTNw0FoRMsFOXkIxj+FE72nOln
+	oOgPP7c8QcxRFFZsev8RizfLn1LiE9tZWlTuPqBEt/1vTix27Rery+JFq9KORVdFLiu6en/l
+	xGdP7rCi1zZMi+4XC0V3XR8l5h3rYdeN26xakiwZ5EzJOHvpTlWKJ1TC7Hs8Jst//QJjRuXR
+	VhTFE2E+Od1Qhr7aUnCCi5gWppJe79Bns8J0oihBHPFYYQqxVBfSVqTisRDgiE3xM5FDjGAi
+	gY/m8Ijj1QKQG6bIRCvkYmK1Vn/uqAUNuV/4Dx0xFuKJMvIfZUV82HGkdISPMEqYS8w3f4os
+	xgmTyb2aVurLywI8abi9/osnkIYyhT6DBPt3Uft3Ufu3aDHCFUgrp2Wm6mXD/ISU7DQ5K2F3
+	eqoLhf/X1cOhLXWo15fUiAQe6aLVCqeRtYw+MyM7tRERHuvGqkO7BFmrTtZnH5SM6TuM+w1S
+	RiOK42ndePW8wQPJWmGP3iTtlaR9kvHrleKjYs3IdKSId46G/BP5xH9jfC99Jeka77pfJv3Y
+	zjEzAsscizyznbV/rh7N3rYkCa+vXHWp85Xthudp4YEj3dM2l5zPfzTG8IJKXNmWm9gx8CzY
+	3+k+OW9VQexF+dzZmZ4FkzZmxW0f2MQv3epKMve1/jz+9742+90pK7oOjhyKU6X6cnx7Nujo
+	jBT93HhszND/D1lxqNNbAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Se0hTYRyG+c53bg5Hx2V10KBYSmGUCgW/UsQg6KM7SQlC2cxTjrzEprIF
+	wcyFtdIsE3RpWZHltLRp3sioaV4KLBTjRKVmZRfNli3zsrItiPzvgfd93r9eHqsqmQBem5ou
+	6VI1yWpWQSu2R2Sv2hLhpw3r+wVQUl3FQuWkAW4MNjIwVfWBghJbPQLX1EsOZlvaEXxv62Bh
+	pHUcwbUrExhKnppp+FE9jaGp+QOCz0W3WHjfPsRBpX0bDJQP03AvpwHD0NlOFnLNMxhapsY4
+	ON540zNca+KgtbSLgWf1eQxcmL6OocE0yEFvcwkL/VWzDAw7cmnoslbQ4CxswzCQFw3tZQth
+	4skogrbqBgomzpSy0FfcTMHdlj4OCnrKWHhrHkDQ0zpEQ6H7JAsXs/IQzEx6JsfyXQxcfNTP
+	RYeSLFlmSevoV0zqKl5Q5HnROZrI9x9TpMn6miNl9gxSezOEWOQeTOy2Uyyxj5/nyKvn91jS
+	WTRDk6Y360hT43eK5GaPsTsXxikiE6VkbaakC43ar0hqdl9ljnTPM/TfLmVMqMLXgnx4UVgj
+	mgtPcl6mhWBxvHP6L7PCclGWp7CX/YUg0VxbTFuQgseCkxOL5H7GG8wX0kXnV5OnxPFKAcQ7
+	6d6KSjiFRYul9u+OUvATu4rf0V7GQogo//5EWRDv4UDxxm/eiz5CuGiqW+ptLBCWiQ/qO6h8
+	pLTOka1zZOt/uQxhG/LXpmamaLTJa1frDycZU7WG1QfSUuzIc6HyY+5zjcjVu8mBBB6pfZUy
+	56dVMZpMvTHFgUQeq/2V7gRBq1ImaoxHJV1avC4jWdI7UCBPqxcpN8dK+1XCIU26dFiSjki6
+	fynF+wSYEA7W/3wQtSdkfKNzxjia9m393kD3/Wj7pcT8rQldMb07bo+scuhiEwtWmg2+xbaY
+	2d0Ng5FLvix+aHg5FPRRrbgc52rbVZMhhy8Ocp0e7tzXHWPM2lP3o/v0qzUpX6btJxKWqzpQ
+	QQAJXGu31WzYFr/i4Gw5ziERH8mvOh9n2F6lmtYnacJDsE6v+QPGyCplPgMAAA==
+X-CFilter-Loop: Reflected
 
-On Wed, Oct 29, 2025 at 11:09:12AM +0800, Xuan Zhuo wrote:
-> The commit be50da3e9d4a ("net: virtio_net: implement exact header length
-> guest feature") introduces support for the VIRTIO_NET_F_GUEST_HDRLEN
-> feature in virtio-net.
+On Fri, Nov 07, 2025 at 06:37:12PM -0800, Jakub Kicinski wrote:
+> On Sat, 8 Nov 2025 11:24:58 +0900 Byungchul Park wrote:
+> > On Fri, Nov 07, 2025 at 05:41:29PM -0800, Jakub Kicinski wrote:
+> > > On Fri, 7 Nov 2025 13:47:08 +0900 Byungchul Park wrote:
+> > > > The offset of page_type in struct page cannot be used in struct net_iov
+> > > > for the same purpose, since the offset in struct net_iov is for storing
+> > > > (struct net_iov_area *)owner.
+> > >
+> > > owner does not have to be at a fixed offset. Can we not move owner
+> > > to _pp_mapping_pad ? Or reorder it with type, enum net_iov_type
+> > > only has 2 values we can smoosh it with page_type easily.
+> >
+> > I'm still confused.  I think you probably understand what this work is
+> > for.  (I've explained several times with related links.)  Or am I
+> > missing something from your questions?
+> >
+> > I've answered your question directly since you asked, but the point is
+> > that, struct net_iov will no longer overlay on struct page.
+> >
+> > Instead, struct netmem_desc will be responsible for keeping the pp
+> > fields while struct page will lay down the resonsibility, once the pp
+> > fields will be removed from struct page like:
 > 
-> This feature requires virtio-net to set hdr_len to the actual header
-> length of the packet when transmitting, the number of
-> bytes from the start of the packet to the beginning of the
-> transport-layer payload.
-> 
-> However, in practice, hdr_len was being set using skb_headlen(skb),
-> which is clearly incorrect. This commit fixes that issue.
-> 
-> Fixes: be50da3e9d4a ("net: virtio_net: implement exact header length guest feature")
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> I understand the end goal. I don't understand why patch 1 is a step
+> in that direction, and you seem incapable of explaining it. So please
+> either follow my suggestion on how to proceed with patch 2 without
 
-ca you supply some examples when this is wrong please?
+struct page and struct netmem_desc should keep difference information.
+Even though they are sharing some fields at the moment, it should
+eventually be decoupled, which I'm working on now.
 
-> ---
->  include/linux/virtio_net.h | 22 ++++++++++++++++------
->  1 file changed, 16 insertions(+), 6 deletions(-)
-> 
-> diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
-> index 710ae0d2d336..6ef0b737d548 100644
-> --- a/include/linux/virtio_net.h
-> +++ b/include/linux/virtio_net.h
-> @@ -217,25 +217,35 @@ static inline int virtio_net_hdr_from_skb(const struct sk_buff *skb,
->  
->  	if (skb_is_gso(skb)) {
->  		struct skb_shared_info *sinfo = skb_shinfo(skb);
-> +		u16 hdr_len = 0;
->  
->  		/* In certain code paths (such as the af_packet.c receive path),
->  		 * this function may be called without a transport header.
->  		 * In this case, we do not need to set the hdr_len.
->  		 */
+> patch 1 in current form. Or come back when have the full conversion
+> ready.
 
+This patch set represents the final phase of the full conversion process,
+awaiting the next steps. Once this patch is completed, the entire
+conversion will be finished, allowing for the final patch that removes
+the pp fields from the struct page to be carried out.
 
-
-you actually do initialize it, just to 0.
-the comment is confusing.
-
->  		if (skb_transport_header_was_set(skb))
-> -			hdr->hdr_len = __cpu_to_virtio16(little_endian,
-> -							 skb_headlen(skb));
-> +			hdr_len = skb_transport_offset(skb);
-
-better:
-	else
-		hdr_len = 0;
-
-
-
->  
->  		hdr->gso_size = __cpu_to_virtio16(little_endian,
->  						  sinfo->gso_size);
-> -		if (sinfo->gso_type & SKB_GSO_TCPV4)
-> +		if (sinfo->gso_type & SKB_GSO_TCPV4) {
->  			hdr->gso_type = VIRTIO_NET_HDR_GSO_TCPV4;
-> -		else if (sinfo->gso_type & SKB_GSO_TCPV6)
-> +			if (hdr_len)
-> +				hdr_len += tcp_hdrlen(skb);
-> +		} else if (sinfo->gso_type & SKB_GSO_TCPV6) {
->  			hdr->gso_type = VIRTIO_NET_HDR_GSO_TCPV6;
-> -		else if (sinfo->gso_type & SKB_GSO_UDP_L4)
-> +			if (hdr_len)
-> +				hdr_len += tcp_hdrlen(skb);
-> +		} else if (sinfo->gso_type & SKB_GSO_UDP_L4) {
->  			hdr->gso_type = VIRTIO_NET_HDR_GSO_UDP_L4;
-> -		else
-> +			if (hdr_len)
-> +				hdr_len += sizeof(struct udphdr);
-> +		} else {
->  			return -EINVAL;
-> +		}
-> +
-> +		hdr->hdr_len = __cpu_to_virtio16(little_endian, hdr_len);
-> +
->  		if (sinfo->gso_type & SKB_GSO_TCP_ECN)
->  			hdr->gso_type |= VIRTIO_NET_HDR_GSO_ECN;
->  	} else
-> -- 
-> 2.32.0.3.g01195cf9f
-
+	Byungchul
 
