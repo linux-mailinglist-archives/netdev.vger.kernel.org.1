@@ -1,210 +1,138 @@
-Return-Path: <netdev+bounces-237275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43387C483B0
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 18:11:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BACAFC48468
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 18:21:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id E21974F0BD2
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 16:56:29 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 155144F0C18
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 17:16:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A70AC2868A6;
-	Mon, 10 Nov 2025 16:55:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F5962641FC;
+	Mon, 10 Nov 2025 17:16:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="L07r9g/u";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ajCS7wHB";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="L07r9g/u";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ajCS7wHB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iN4YF2AT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACACD248F47
-	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 16:55:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C86491C6FEC
+	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 17:15:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762793725; cv=none; b=YlbZ45G6iINA7hrovCt8E7jHr5QMwGJ1Xq84DRZOHSpahabpeLKRnHwoNDHRQOk+EfjyuAImYnPGgBNAHINGyBAWCX2Tv7Eb1z3i6W1iBHoFQSFb8tH9i352Tg/8ml8SHvFllAVTfMmUf2h9bFvk7702A9vRaiMVPVA5uGbG6gg=
+	t=1762794961; cv=none; b=Z2z4cPLnfUvUA4VIkj2mq1uT/tsi4rhJo1FX8bgtKzBVuJhuxRfGyZs5yh/JID05AcK2BjV2n+lBfAIYZG4Dflla3SULGPfM9NXjghZGDsW51oHWwARbrmNPEjex0dHr+5VH2xQgCy4ysMEdBbImdDNQtEuDmhGadAFYfDb+8QQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762793725; c=relaxed/simple;
-	bh=FN8PJNNFcjUPFFsJs0n3S89M+sTD+u0bOToF10lMv/w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=faI5xFCaODXFnFreR2XOnB2qIsjac1NdpVssQ4nydITMxyieeZxfkc4iHw81MEgeSlp5mSWxyEPCcpbu982ntqMRm7GHV8v1ZJ5ezKGmZV5CX6x7Ik4B95sxpvTpK9JDS8VyAliYhlCSUIPTW9HrieX9pnkwLkMijjbt78+dmRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=L07r9g/u; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ajCS7wHB; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=L07r9g/u; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ajCS7wHB; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id B94A21FB4E;
-	Mon, 10 Nov 2025 16:55:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1762793719; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LDwvy1KrQpsGFFbI5MqDqPr+2S6nAnQlxlYATLgWh40=;
-	b=L07r9g/u2q2IhXJM7eO5VHt8GvFJCxdXA1oSUX2qVHadCniWxOSrXYOCs2uOUT7GOrt8h3
-	KViLS/e9GbLAIZjFTctWue/ksLKpSm86Bv8dUP7THJDJ62PChtSC3xepIA83n1+i3RHw+U
-	9mwg7wdKxMN6PD53PE5iIMNX89lRkB8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1762793719;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LDwvy1KrQpsGFFbI5MqDqPr+2S6nAnQlxlYATLgWh40=;
-	b=ajCS7wHB4cYYIFpjuFOg//7mdawXRNwa3oZzgZqlh+3mlnNoVs5Hrug7KbRVrDOAYuBikO
-	QSyRRSxM6M3tQ7Dw==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1762793719; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LDwvy1KrQpsGFFbI5MqDqPr+2S6nAnQlxlYATLgWh40=;
-	b=L07r9g/u2q2IhXJM7eO5VHt8GvFJCxdXA1oSUX2qVHadCniWxOSrXYOCs2uOUT7GOrt8h3
-	KViLS/e9GbLAIZjFTctWue/ksLKpSm86Bv8dUP7THJDJ62PChtSC3xepIA83n1+i3RHw+U
-	9mwg7wdKxMN6PD53PE5iIMNX89lRkB8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1762793719;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=LDwvy1KrQpsGFFbI5MqDqPr+2S6nAnQlxlYATLgWh40=;
-	b=ajCS7wHB4cYYIFpjuFOg//7mdawXRNwa3oZzgZqlh+3mlnNoVs5Hrug7KbRVrDOAYuBikO
-	QSyRRSxM6M3tQ7Dw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6A5D2144C7;
-	Mon, 10 Nov 2025 16:55:19 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id y9DzFvcYEmmDIgAAD6G6ig
-	(envelope-from <fmancera@suse.de>); Mon, 10 Nov 2025 16:55:19 +0000
-Message-ID: <768cbcab-a172-4fe8-9c08-6550f5e12420@suse.de>
-Date: Mon, 10 Nov 2025 17:54:39 +0100
+	s=arc-20240116; t=1762794961; c=relaxed/simple;
+	bh=q3gT6xLU+tIrITxHQJvuL8N+/olJ7lNbh4RUpS+p3pc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LRodMIUrq6boT2uz1qroH1nUXTnRl2u4GQvYEj8HH6mgHTPjCdhA+W1jdJKHV+IB+rJ+XjkHtvmj7d8YKCQWn8afDlfBUW5ikjJCXYT/tFyZ9dZs2Q+lWucHsYVX6OWT0uJKFf5hFOaRuq7wEK2sZ6iYj/T3U6HS7DsHHELuMxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iN4YF2AT; arc=none smtp.client-ip=209.85.160.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4e89de04d62so27597841cf.0
+        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 09:15:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1762794958; x=1763399758; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ltb2mIM0WB+GBKVlymLkGCeDhxuED5A8Qr1lJnPGsjA=;
+        b=iN4YF2AT8Xm3WOplmQOa5XCWYZeZHlxtqepgiP2HtYlAMpdPo37Y/EXiaHA8rK4NTt
+         H/qiQ3drTbQbWdShYVt/XsXzWEc2fMnIESOg7PA2AyeuPHKLnSp53XotmewQBjwBm06j
+         +Drm/2V76rFSCTnTEdMAyzIoT1Eo4q6Settjl1HtyA8hRVCH1OellmPl6AMN9+7J6mPx
+         c6Q3TBNCc2FkezhJ4t1rcykey04egPcdASwdwZ/OJi+UFGCvNxCuWia8le0laAwg6dEv
+         t3jgLjhwRW7TCei9hWgFM9stmpuUhDmCYDofwivGA9xsUKjA1CTENYxb909hyvj5uuNO
+         MQzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762794958; x=1763399758;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Ltb2mIM0WB+GBKVlymLkGCeDhxuED5A8Qr1lJnPGsjA=;
+        b=AcV2/biHqbMxOFEbdkuvc05Q4QQqyNriaJeF2kvlFIX7y9Dij2hFWCPBr18mri9Vp+
+         Vmw5tsTIXHWjXtdgVRMBDFVxBV8QHUKTy11A6UCD/lXGuAII9EkIyUywDwoNLL0uywUL
+         GQv2XCXFvQLrj0DFwc4Ws0txF4AwRoieiSirQvUkvtzCOPFavVrJOp04z6Qka8FTcboz
+         fFs+2R3qOHUbuB4QUvK3GnvT5YLT7+aGtgkxe+RNHA6rzofhdkWNCRc9R3KokZWshBNI
+         XSv7LrZ/OEmgCrklu4qqMl2V49qFvJab4oUKhf5OTEz4Emg93dCuNaRoMdMCk1knE5OL
+         GawA==
+X-Forwarded-Encrypted: i=1; AJvYcCUmPlxJGLumIz/kZnmcLyi3wJm+YJo2R+fojykPmQDRVbHC5EiRvR3KCQKW6dlZIuBO8QwUltA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwtVkTqHsDG6teAwqGKWWjXwernBlCrR353cQWrZyIDVN2uFk3T
+	U0Pi+skfrxNssvLheIXBgx/L6hQxLBiXxsT0ebXrRWAYM/fmB3O1xL1IZHppj3Tmi95qgwr9U94
+	Vd/AK8vv0U3rZX7NYN5EytRIEiHXaaveUMctSCrlf
+X-Gm-Gg: ASbGncvwLzIAxJ8BjIeU6feJT4vlFtP1O1RDbTlcreaWZfaUew7qI47VqFV8EkPQbWz
+	QsCUmrPR1cIcqtCI7xy8lAbEoIavQC1+m2gxxl7jMZoDwBc3MZfDh6on+3X7KrXUivff4SzQPDF
+	YTcRCT/06Lz85El12J5sJsDLJFbsc1Gyk380qNAaLLgxT/OhhmSLm6t/RgYD4XHGb86MD0N1FiX
+	xsXlWtETKU4taKdegVLVt2nbtwEZJ8wS3IBFkPY5txzCdugHiitkO6RkTb8
+X-Google-Smtp-Source: AGHT+IHkGy6q2p6uY+fsXhPiUJJO/IYV9wFfalejhsynKqQkEww9ef4WkLzBDGsMU+4NxrtRZYPZYxTezPey+97YcQs=
+X-Received: by 2002:ac8:5756:0:b0:4ed:680e:29cd with SMTP id
+ d75a77b69052e-4eda4ed8fdbmr114738101cf.27.1762794957266; Mon, 10 Nov 2025
+ 09:15:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: ipv6_route flags RTF_ADDRCONF and RTF_PREFIX_RT are not cleared
- when static on-link routes are added during IPv6 address configuration
-To: Garri Djavadyan <g.djavadyan@gmail.com>, netdev@vger.kernel.org
-Cc: Stephen Hemminger <stephen@networkplumber.org>, 1117959@bugs.debian.org,
- carnil@debian.org
-References: <ba807d39aca5b4dcf395cc11dca61a130a52cfd3.camel@gmail.com>
- <0df1840663483a9cebac9f3291bc2bd59f2b3c39.camel@gmail.com>
- <20251018013902.67802981@phoenix.lan> <aPzkVzX77z9CMVyy@eldamar.lan>
- <a25e2b7e899b9af7d25ea82f3a553fcc32c12052.camel@gmail.com>
-Content-Language: en-US
-From: Fernando Fernandez Mancera <fmancera@suse.de>
-In-Reply-To: <a25e2b7e899b9af7d25ea82f3a553fcc32c12052.camel@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[99.99%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	TAGGED_RCPT(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	TO_DN_SOME(0.00)[];
-	ARC_NA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FREEMAIL_TO(0.00)[gmail.com,vger.kernel.org];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	RCPT_COUNT_FIVE(0.00)[5];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:mid]
-X-Spam-Flag: NO
-X-Spam-Score: -2.80
+References: <20251110094505.3335073-1-edumazet@google.com> <20251110084432.7fdf647b@kernel.org>
+In-Reply-To: <20251110084432.7fdf647b@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 10 Nov 2025 09:15:46 -0800
+X-Gm-Features: AWmQ_blMZO6w-Bl0FzjR45tH8nntsGZtBltdCRyuh3gi3oij98t_j6FoJUdnpXQ
+Message-ID: <CANn89i+KtA5C3rY2ump7qr=edvhvFw8fJ0HwRkiNHs=5+wwR3Q@mail.gmail.com>
+Subject: Re: [PATCH net-next 00/10] net_sched: speedup qdisc dequeue
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
+	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+	Kuniyuki Iwashima <kuniyu@google.com>, Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, Nov 10, 2025 at 8:44=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Mon, 10 Nov 2025 09:44:55 +0000 Eric Dumazet wrote:
+> > Avoid up to two cache line misses in qdisc dequeue() to fetch
+> > skb_shinfo(skb)->gso_segs/gso_size while qdisc spinlock is held.
+> >
+> > Idea is to cache gso_segs at enqueue time before spinlock is
+> > acquired, in the first skb cache line, where we already
+> > have qdisc_skb_cb(skb)->pkt_len.
+> >
+> > This series gives a 8 % improvement in a TX intensive workload.
+> >
+> > (120 Mpps -> 130 Mpps on a Turin host, IDPF with 32 TX queues)
+>
+> According to CI this breaks a bunch of tests.
+>
+> https://netdev.bots.linux.dev/contest.html?branch=3Dnet-next-2025-11-10--=
+12-00
+>
+> I think they all hit:
+>
+> [   20.682474][  T231] WARNING: CPU: 3 PID: 231 at ./include/net/sch_gene=
+ric.h:843 __dev_xmit_skb+0x786/0x1550
 
+Oh well, I will add this in V2, thank you !
 
-On 10/25/25 11:21 PM, Garri Djavadyan wrote:
-> On Sat, 2025-10-25 at 16:53 +0200, Salvatore Bonaccorso wrote:
->> Hi Garri,
->>
->> On Sat, Oct 18, 2025 at 01:39:02AM -0700, Stephen Hemminger wrote:
->>> On Thu, 16 Oct 2025 00:12:40 +0200
->>> Garri Djavadyan <g.djavadyan@gmail.com> wrote:
->>>
->>>> Hi Everyone,
->>>>
->>>> A year ago I noticed a problem with handling ipv6_route flags
->>>> that in
->>>> some scenarios can lead to reachability issues. It was reported
->>>> here:
->>>>
->>>> https://bugzilla.kernel.org/show_bug.cgi?id=219205
->>>>
->>>>
->>>> Also it was recently reported in the Debian tracker after
->>>> checking if
->>>> the latest Debian stable is still affected:
->>>>
->>>> https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1117959
->>>>
->>>>
->>>> Unfortunately, the Debian team cannot act on the report because
->>>> no one
->>>> from the upstream kernel team has confirmed if the report in the
->>>> upstream tracker is valid or not. Therefore, I am checking if
->>>> anyone
->>>> can help confirm if the observed behavior is indeed a bug.
->>>>
->>>> Many thanks in advance!
->>>>
->>>> Regards,
->>>> Garri
->>>>
->>>
->>> Linux networking does not actively use kernel bugzilla.
->>> I forward the reports to the mailing list, that is all.
->>> After than sometimes developers go back and update bugzilla
->>> but it is not required or expected.
->>
->> Garri, best action would likely be to really post your full report on
->> netdev directly.
->>
->> Regards,
->> Salvatore
-> 
-> 
-> Thank you for your suggestions Stephen and Salvatore.
-> 
-> Below is the full report that was originally posted to the kernel
-> bugzilla a year ago. It is still reproducible with fresher kernels.
-> 
-> -----BEGIN REPORT-----
-> I noticed that the ipv6_route flags RTF_ADDRCONF and RTF_PREFIX_RT are
-> not cleared when static on-link routes are added during IPv6 address
-> configuration, and it leads to situations when the kernel updates the
-> static on-link routes with expiration time.
-> 
+diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+index b76436ec3f4aa412bac1be3371f5c7c6245cc362..79501499dafba56271b9ebd97a8=
+f379ffdc83cac
+100644
+--- a/include/net/sch_generic.h
++++ b/include/net/sch_generic.h
+@@ -841,7 +841,7 @@ static inline unsigned int qdisc_pkt_segs(const
+struct sk_buff *skb)
+        u32 pkt_segs =3D qdisc_skb_cb(skb)->pkt_segs;
 
-This is indeed a bug, I have a patch already and I am doing some testing 
-before sending it to net.git. I hope it can be sent tomorrow.
-
-Thanks,
-Fernando.
+        DEBUG_NET_WARN_ON_ONCE(pkt_segs !=3D
+-                              skb_is_gso(skb) ? skb_shinfo(skb)->gso_segs =
+: 1);
++                       (skb_is_gso(skb) ? skb_shinfo(skb)->gso_segs : 1));
+        return pkt_segs;
+ }
 
