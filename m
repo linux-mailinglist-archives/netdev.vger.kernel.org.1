@@ -1,133 +1,154 @@
-Return-Path: <netdev+bounces-237176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96723C469A6
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 13:31:44 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9344C46A1B
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 13:36:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3B1C3B3ECD
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 12:29:48 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8552E4E237F
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 12:36:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C61D3093C0;
-	Mon, 10 Nov 2025 12:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E8D130DD3C;
+	Mon, 10 Nov 2025 12:36:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vojs3Ny7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RUhEo0rk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D9F42FE585;
-	Mon, 10 Nov 2025 12:29:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5753230BF77
+	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 12:36:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762777786; cv=none; b=bd60k5uwBmRF3qNf2q2tuH5jPb0iVo9TEABDPaerQQCMsBD4dzXMTZv+NKXVmh0j+ZYPnqUBqF/SjSOYXqzhhSHQ4G6YsducrGC8EBoOnY6vE/dKTyrExI18/xbJp0P3lLnwJBGC94miImfazq/Bag7BeRBUWH4c0b4H2rkzn/Y=
+	t=1762778212; cv=none; b=naOQzLTu42tIW/uKGceyt2vGGVvH2iASyXz5Th8G4BZFxdRoFv4AGnTDkiO7wlbvTh0fHEMjD8Yj8iUkK/jAcdoEO7D64PS9ckKFAZtJsT0lhVCiYg2yZKKZwyEn4wh5rNjbSD2FEGn1aFe9170yAwMTKuzX+HDY+ThpwZxUavQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762777786; c=relaxed/simple;
-	bh=CHqHQvKuqRvxJRHlw0G9YM2cvk8+dDccmko+WcI99KA=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=ppM1OBJDbmTsEuOtQEURYcw4fAq0lVQiQO5SEDk7Dxke2h7/2GQn3GQwh1tJGBEcBOxOQ+3QTmc7h6wSCW+FmgquG8B3ISHLhvtp2VYAaLvcq3lEhuL8/tHaH+3z49mII3MiATS+fht15br6iemUwsU6CAZ1PnwZRCFvn/CwIZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vojs3Ny7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 384CFC16AAE;
-	Mon, 10 Nov 2025 12:29:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762777785;
-	bh=CHqHQvKuqRvxJRHlw0G9YM2cvk8+dDccmko+WcI99KA=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=Vojs3Ny7+r1bvs7xTzB+Em17tnHg4ejqwiAsKUBRNYBKq2ESJ8HM7869IXkyne2Ic
-	 kQYYlyBmu1zFWRa+XAKfg+syhhn8K7Ke/Aot2v11KTSHp0E+iUNBkh4cD9IDovyqLm
-	 I3qy+942BJ+DIqcDZ5xo75PyknQcArDRNJRFGjwoGZrHJkkyzGqNWYn6yS5v1Sfu+F
-	 T3edgQ6vZ1QXPQogA+ippFN1frbOwGnby77b3KjRDBEAT/mjKLLSmsiCAn4JPUwmez
-	 yfrUUnoHWOXIgAiE4QYBaHHoDbQ7usE/VbAQ4+F+cBaKnNnNbymnEDKXE29apneaw/
-	 xxSWFOH6NdReg==
-Date: Mon, 10 Nov 2025 06:29:43 -0600
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=arc-20240116; t=1762778212; c=relaxed/simple;
+	bh=/F8CU/GYM3kJa4k9M7OB1gti3rW5dpGB1vRfRxNdvqk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rUOOomA1D/cOrMPHCsr8LiTTQmaFNhlIWKZG010Ki2UeRKNW6oG3qNRvEOuq+LBdxhqEifSXQSRwzabgRkhhvGNu340UcIMIim7LSod0huu9MIjzIf+ppa4NUNCVoOu4ahvqHFFnDNWxUC85bi/2TuzGU36jurexprYBK8JN8H0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RUhEo0rk; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-47774d3536dso12812235e9.0
+        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 04:36:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762778209; x=1763383009; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BDisWXX1Y3E46k0LejRtyhxBgaWtSH2jsdovoZRUi74=;
+        b=RUhEo0rkhRjV++knqGkaySZb1GLgWwjX7bwtxtCfI+o7t8NY6h19pKjXoHMCT/AMDJ
+         yi7ZpIJy9xCUm5k+4gpsEd+CmztFQC2oi1QzVFLwYNc/Af1zuW8F3QLd+AhYIu3nwJJn
+         Kih8u7RkMNdsyUeG0/Dm+qmiy8FdUhJi5Tkq3ThMiqL5kc32uX9TvXgTKtxEYl41ZMt2
+         rQyKMdXCxbrAlvJyboox8C5T4l5kGw2FTP31quOb2Hbt8Xzi3MtNPMb+kB0O5Xx2nUiX
+         cFfMNZ/IdFxZr8nsWaZgnA5+Juo1mMbWTLPzidYquR1xFY+csrT+oBNf5bQgcJFeNSxH
+         UuoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762778209; x=1763383009;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BDisWXX1Y3E46k0LejRtyhxBgaWtSH2jsdovoZRUi74=;
+        b=mMz0wfIjFJ9GG6FTkiXczGWdNMJB+QZrpptkbbOt3qmlfcg1j08k8hNGy4tWdHJTid
+         UhZ0TmrbHT1VX4EIochbUvgh2si6pbGgMI23rM9WaIfolsGzVxzMIMnQvFe32pKKo+6V
+         e/ya5ONa9DmtOKND3E25FENYmu9J+Sg7jq3jZQE2Vdp8HTwn85uk7Z6RGx5Y4vdJdEkE
+         D2ZRdpbExnn5B2AN2VAzFcj76vp5I1MmFgGmkj9e8lFjCsmk0ZDsFYD/6QQkIlA7Eo5c
+         Tw+B0htbV6tXiEobippKPLPs+xDnK7D89Udml2tKvhx6rNQtRi8txtSJkTiQjUQn7lbx
+         YdnA==
+X-Forwarded-Encrypted: i=1; AJvYcCVGN9xXLPBLR87L+ymIMMlCnU9RPG9XZk9quEdUViyHd/sgp/UCtlr/pPFz3XNo4iVed4O3H8s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJ7D464ylnc9uEa4fKTADOfKfiNsLmHqJuBCt9k6ziDC+9vARl
+	f77PRuMg9iWdk3L+IphxSLm9Or/n8dBO80zA+1SyCu7hr1V+KrFwpVU2
+X-Gm-Gg: ASbGnctCx0MONuiJd6bo3TLurI7IDZBYBNDmN1HWVN6cKpsK0IG10rKsr0Aqa6pEaqW
+	9h8DDS6XbrUyAoORaetzED653hgK5spZLbBb7b8sLphHJpeBdJ69+wfF+jnsaiFeTUqTAQ0KG5e
+	+4vM7Qdw0t+mjtJ1dDfBtqlO+VKLPKy4xRbaP9Im1klpFdufF+wIbwgW0vsS2lMTASfS6WtmTcO
+	s85tHUtgolTabphXVsmWtqUdPF6TmKy8nasTvEgl7bkpdc+nKZyNmbFqO31D4vQgqbQbPP8sIO0
+	bkJFRSmDKMgnOeM2a9WBhre7TtlBXL6QSmKMXc4PjcO2JuHcqelr+86kgDAeDw4Sg2xxVCnWrWy
+	b7oq2IMaiKj1WjBEJxTOwJqSNSHOo8AD1f9cZFBqGWe2QUnkgqqbdOiZoWNWFlGqjgTCwuXDWcX
+	+sQ2nwTLVkBwcprss7mTBW+00N0ZdoxcpaZSK2XPmm/N8tCpbsQGs=
+X-Google-Smtp-Source: AGHT+IE8JnaqwYx1qAF2XhA4+KMEvpg0Zw8lsdqb6Uo4fgD6jKgMhNhYdA+4ok4hdFeiyUu/ZLO15g==
+X-Received: by 2002:a05:600c:c177:b0:471:665:e688 with SMTP id 5b1f17b1804b1-47772dfcf3emr65298225e9.17.1762778208522;
+        Mon, 10 Nov 2025 04:36:48 -0800 (PST)
+Received: from ?IPV6:2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c? ([2a01:4b00:bd21:4f00:7cc6:d3ca:494:116c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b303386f1sm13557436f8f.3.2025.11.10.04.36.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Nov 2025 04:36:47 -0800 (PST)
+Message-ID: <ca3899b0-f9b7-4b38-a6fd-a964a1746873@gmail.com>
+Date: Mon, 10 Nov 2025 12:36:46 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: Andrew Jeffery <andrew@codeconstruct.com.au>, netdev@vger.kernel.org, 
- Andrew Lunn <andrew+netdev@lunn.ch>, devicetree@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- taoren@meta.com, Po-Yu Chuang <ratbert@faraday-tech.com>, 
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
- Conor Dooley <conor+dt@kernel.org>, Joel Stanley <joel@jms.id.au>, 
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, linux-aspeed@lists.ozlabs.org
-To: Jacky Chou <jacky_chou@aspeedtech.com>
-In-Reply-To: <20251110-rgmii_delay_2600-v4-1-5cad32c766f7@aspeedtech.com>
-References: <20251110-rgmii_delay_2600-v4-0-5cad32c766f7@aspeedtech.com>
- <20251110-rgmii_delay_2600-v4-1-5cad32c766f7@aspeedtech.com>
-Message-Id: <176277778351.3693581.6347765163045847296.robh@kernel.org>
-Subject: Re: [PATCH net-next v4 1/4] dt-bindings: net: ftgmac100: Add delay
- properties for AST2600
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v1 2/2] gve: use max allowed ring size for ZC
+ page_pools
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Joshua Washington <joshwash@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Simon Horman <horms@kernel.org>, Willem de Bruijn <willemb@google.com>,
+ ziweixiao@google.com, Vedant Mathur <vedantmathur@google.com>,
+ Jakub Kicinski <kuba@kernel.org>
+References: <20251105200801.178381-1-almasrymina@google.com>
+ <20251105200801.178381-2-almasrymina@google.com>
+ <20251105171142.13095017@kernel.org>
+ <CAHS8izNg63A9W5GkGVgy0_v1U6_rPgCj1zu2_5QnUKcR9eTGFg@mail.gmail.com>
+ <20251105182210.7630c19e@kernel.org>
+ <CAHS8izP0y1t4LU3nBj4h=3zw126dMtMNHUiXASuqDNyVuyhFYQ@mail.gmail.com>
+ <qhi7uuq52irirmviv3xex6h5tc4w4x6kcjwhqh735un3kpcx5x@2phgy3mnmg4p>
+ <20251106171833.72fe18a9@kernel.org>
+ <k3h635mirxo3wichhpxosw4hxvfu67khqs2jyna3muhhj5pmvm@4t2gypnckuri>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <k3h635mirxo3wichhpxosw4hxvfu67khqs2jyna3muhhj5pmvm@4t2gypnckuri>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
+On 11/7/25 13:35, Dragos Tatulea wrote:
+> On Thu, Nov 06, 2025 at 05:18:33PM -0800, Jakub Kicinski wrote:
+>> On Thu, 6 Nov 2025 17:25:43 +0000 Dragos Tatulea wrote:
+>>> On Wed, Nov 05, 2025 at 06:56:46PM -0800, Mina Almasry wrote:
+>>>> On Wed, Nov 5, 2025 at 6:22 PM Jakub Kicinski <kuba@kernel.org> wrote:
+>>>>> Increasing cache sizes to the max seems very hacky at best.
+>>>>> The underlying implementation uses genpool and doesn't even
+>>>>> bother to do batching.
+>>>>
+>>>> OK, my bad. I tried to think through downsides of arbitrarily
+>>>> increasing the ring size in a ZC scenario where the underlying memory
+>>>> is pre-pinned and allocated anyway, and I couldn't think of any, but I
+>>>> won't argue the point any further.
+>>>>    
+>>> I see a similar issue with io_uring as well: for a 9K MTU with 4K ring
+>>> size there are ~1% allocation errors during a simple zcrx test.
+>>>
+>>> mlx5 calculates 16K pages and the io_uring zcrx buffer matches exactly
+>>> that size (16K * 4K). Increasing the buffer doesn't help because the
+>>> pool size is still what the driver asked for (+ also the
+>>> internal pool limit). Even worse: eventually ENOSPC is returned to the
+>>> application. But maybe this error has a different fix.
+>>
+>> Hm, yes, did you trace it all the way to where it comes from?
+>> page pool itself does not have any ENOSPC AFAICT. If the cache
+>> is full we free the page back to the provider via .release_netmem
+>>
+> Yes I did. It happens in io_cqe_cache_refill() when there are no more
+> CQEs:
+> https://elixir.bootlin.com/linux/v6.17.7/source/io_uring/io_uring.c#L775
 
-On Mon, 10 Nov 2025 19:09:25 +0800, Jacky Chou wrote:
-> The AST2600 contains two dies, each with its own MAC, and these MACs
-> require different delay configurations.
-> Previously, these delay values were configured during the bootloader
-> stage rather than in the driver. This change introduces the use of the
-> standard properties defined in ethernet-controller.yaml to configure
-> the delay values directly in the driver.
-> 
-> Add the new property, "aspeed,rgmii-delay-ps", to specify per step of
-> RGMII delay in different MACs. And for Aspeed platform, the total steps
-> of RGMII delay configuraion is 32 steps, so the total delay is
-> "apseed,rgmii-delay-ps' * 32.
-> Default delay values are declared so that tx-internal-delay-ps and
-> rx-internal-delay-ps become optional. If these properties are not present,
-> the driver will use the default values instead.
-> Add conditional schema constraints for Aspeed AST2600 MAC controllers:
-> - For MAC0/1, aspeed,rgmii-delay-ps property is 45 ps
-> - For MAC2/3, aspeed,rgmii-delay-ps property is 250 ps
-> - Both require the "aspeed,scu" and "aspeed,rgmii-delay-ps" properties.
-> Other compatible values remain unrestricted.
-> 
-> Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
-> ---
->  .../devicetree/bindings/net/faraday,ftgmac100.yaml | 35 ++++++++++++++++++++++
->  1 file changed, 35 insertions(+)
-> 
+-ENOSPC here means io_uring's CQ got full. It's non-fatal, the user
+is expected to process completions and reissue the request. And it's
+best to avoid that for performance reasons, e.g. by making the CQ
+bigger as you already noted.
 
-My bot found errors running 'make dt_binding_check' on your patch:
-
-yamllint warnings/errors:
-
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/faraday,ftgmac100.yaml: properties:aspeed,rgmii-delay-ps: 'anyOf' conditional failed, one must be fixed:
-	'maxItems' is a required property
-		hint: Only "maxItems" is required for a single entry if there are no constraints defined for the values.
-	'type' is not one of ['maxItems', 'description', 'deprecated']
-		hint: Only "maxItems" is required for a single entry if there are no constraints defined for the values.
-	Additional properties are not allowed ('type' was unexpected)
-		hint: Arrays must be described with a combination of minItems/maxItems/items
-	'type' is not one of ['description', 'deprecated', 'const', 'enum', 'minimum', 'maximum', 'multipleOf', 'default', '$ref', 'oneOf']
-	hint: cell array properties must define how many entries and what the entries are when there is more than one entry.
-	from schema $id: http://devicetree.org/meta-schemas/cell.yaml
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/faraday,ftgmac100.yaml: properties:aspeed,rgmii-delay-ps:type: 'integer' is not one of ['boolean', 'object']
-	from schema $id: http://devicetree.org/meta-schemas/core.yaml
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20251110-rgmii_delay_2600-v4-1-5cad32c766f7@aspeedtech.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
+-- 
+Pavel Begunkov
 
 
