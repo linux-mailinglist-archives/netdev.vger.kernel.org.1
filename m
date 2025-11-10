@@ -1,194 +1,151 @@
-Return-Path: <netdev+bounces-237347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C18F5C4943A
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 21:38:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B64FC49558
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 21:57:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A1B93A6811
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 20:38:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87A1F3B1445
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 20:56:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 265462F0C7A;
-	Mon, 10 Nov 2025 20:38:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59AEA2F8BC5;
+	Mon, 10 Nov 2025 20:55:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="FUtY4Y11"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QcOtzwgx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCE212EB5CE
-	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 20:38:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AC8A2F83C3;
+	Mon, 10 Nov 2025 20:55:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762807093; cv=none; b=EqR/lCdeCx8TZcpyDFv8JUMs1xy2HnP/E8VI8m9sjKkIVU+3CvolHA5LcbO3c0KXizxjym09X1YSyZbU1AfIzLyo+8E3cM7a+inUd99spf5FUvnbNC1AoCQy2kd+D6JJNrtL8JvHU0heMb9CFBQ7MXG3eQhy8Ara23DYL5tERQE=
+	t=1762808144; cv=none; b=UDQmuaFbA7apWx+R6MQUgfsC4t7pVAAgnlCRTkn88WxL1zodWIvetCoh5udvhbzRFYX9eIWeV3A1J/9EP8CNdO6LsXVbVXpuetofUKGuJOMFU+MDskooOZ75YxBNOUZ+Zw6rIT4icss2u5v85FxvAGfrYyBjWRbBhi2ftpWreME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762807093; c=relaxed/simple;
-	bh=3Ak2th6HK2dshHGZFNlkjRZYFwb3ZcIEd223LjkuYyk=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=a/8oIEMiekUSOx8TkMdf6PR6wj3oJDsr3QWDe7jof19erGrEFWFUcTKVlC0KyabVn/PLrEm7wzturcGSOwkWsOVizOPGP7qLuk6jzQbaJMIeFhZEZmSjzwyp0X0YRZKX0SQUpPZxMKtQdu+VKEza4BNBTxDyNEgmnbCgdAobHpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=FUtY4Y11; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-34182b1c64bso2094626a91.3
-        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 12:38:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1762807090; x=1763411890; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:subject:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KBn4xCrT4JF+dfeNYWDS5elzZrDcTBGlNYcERXvV3og=;
-        b=FUtY4Y11wSbIkiP82oImHLcCOtzmcBc6ks8dvH7mRQJXXmsDjD1343kan4bSjI7Zd3
-         YyHF6wKFABMbxu1sKkEYNNrdXBAnIuqd2LlbW+TJEenjrT6jxOAGsu6qrAaOc6buRgVR
-         mR+kl7w8lC/NV9NJZKxOM3S+zR59smqFYuj4ZB1QVyb0Jh3Qp9q0mqkWXKhUep48PNMj
-         B8wy8k4zt3df6pwrE0bGg2XIHB2HlsYbGyacv1OuFbJhMr6LRAw601oHf6u+Zn2YXAcP
-         RPmSbhOnrUgWY3PLZ2fs0Da+ZmCC1VPfMt6Sw1f5uZpZpZCvMJQqBW9+s/S6tQfyx68+
-         xIaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762807090; x=1763411890;
-        h=content-transfer-encoding:mime-version:message-id:subject:to:from
-         :date:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=KBn4xCrT4JF+dfeNYWDS5elzZrDcTBGlNYcERXvV3og=;
-        b=SESvM8cw0Ychh3QwQ+gzYrL+IC1yN9f0ix5Q/25zV4QlSE7vH8KuMMuaUv251+HTeP
-         xm6bPnBL1l19QADo9g9BPBWtXRnzWMj9AS/homdllZxIgZpZkHfJo3lFPPlXt1ktGOoj
-         OILm693ysYwEZyJMqfPvcmgdZjguZ9mvCN0/lauWLkpurLBeOv56IUdxKusSOuOg82BT
-         xs0yA1fAsBLeME2/NUTYdasgqslLtftxYHtjVbq9iJIXXvIjnwvenuguKVnDek6ZITak
-         b1LL+2q+pBte1Fzai0AH7zOu99gzarDDdqbzTB69uXUPPsVrPJ9uWz5FRRyEo/nF6TAa
-         fkxg==
-X-Gm-Message-State: AOJu0YxCyP1AZItfyIAgBKCGRhL9R4RgjzhqT79g80k7yAGeXqYTKtPz
-	lSK4jVnUKBpYktyKVKdhH1of+PgzIgfrVaL0T2jbM9Q7+djWF3V43ui73O1Vz/uxBlfIX9oM+KG
-	pjRer
-X-Gm-Gg: ASbGncvxqxOWXN7ddOQFYT3b5lAv9iNmpyV0G6oYQx6LOnuFn8csHLCb02CgyLmXpTg
-	41e1V0zXnceqm064YxVjBz05sLN3zsZmh+7dGNst5FAUwZp2hp1A5zInQ9gnVhDOxyrYBIB7Hji
-	/zI0+zV6irY96ZpyXykaK16mcL/A4fOhqr0Ezpa5k7PVrs1dKh7n8XAwD+6PIe/Nn7x5/Tc3J1M
-	hT01l3G8eTHw1vQtp+8OvuaPVlTYro9YnDUU8yxeRFzG6YTdv4NEBemqJ+9MEUHdAeHtoohv17x
-	y5GZVT/X+g8EMt7Q8WQXuybzJ0MmJX0GbkPdN9AOl3X9qe2nTNMXFUYxOsxkDkC0yQqCep7ABYe
-	P7V3ZElDJUWJ5TEs9T4cd7AJu80RPdK+Ixn2RzC1clR2t6QVLGoigEbRjejVBz2JyKQVyl6I3qH
-	kVFFZWjBThVANiRZ7EZ5JMxTkO+snXxOe+lv9HSEvOoaDC
-X-Google-Smtp-Source: AGHT+IGw2du7YIrJUmmwnRLyxTrlx+gO66o66i1nxUZBJAHD0g6nc/9xH93ROGdGWVMN+gro7i+v9Q==
-X-Received: by 2002:a17:90b:2709:b0:340:be4d:8980 with SMTP id 98e67ed59e1d1-3436cb89ab8mr10466668a91.14.1762807089916;
-        Mon, 10 Nov 2025 12:38:09 -0800 (PST)
-Received: from phoenix (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-ba900fa571esm13384755a12.26.2025.11.10.12.38.09
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Nov 2025 12:38:09 -0800 (PST)
-Date: Mon, 10 Nov 2025 12:38:07 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: netdev@vger.kernel.org
-Subject: Fw: [Bug 220774] New: netem is broken in 6.18
-Message-ID: <20251110123807.07ff5d89@phoenix>
+	s=arc-20240116; t=1762808144; c=relaxed/simple;
+	bh=YGwndXDVfw313ofFvJKijTm0xMqmknLKipL/FYTW6Uk=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=L+cbwiyoy+PVHYLp+iU8Nty8MTBQ30hnqUhP/3vHZRZ3CtIzv9alncXkCBkCM9bvv/JnGkXYV6HWbEoBogy1qfSuQ6GaGdqYV9teNaljogyqnCQxzNDCpxweHIA5VObuqkTCkUUYHuXFoOhyEcZo9k6f1OwW0fN2+VZoM61au6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QcOtzwgx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFAE7C113D0;
+	Mon, 10 Nov 2025 20:55:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762808143;
+	bh=YGwndXDVfw313ofFvJKijTm0xMqmknLKipL/FYTW6Uk=;
+	h=From:Date:Subject:To:Cc:From;
+	b=QcOtzwgxX0m2Cd2j4GyjQOrKbGRga4McuYApdEnHSkrjQPaS+XaiBc46Jw/GOUCxC
+	 Vhd02uLuw8WatRi8PCRpJEPnMx8QYaZ+7cFGctTtyGaKYAVkn3Erzz0HG4sSfxtzXr
+	 jXVb5LvUzggiQTIuFTtY+WBIPn5O3y2t6+v4+UtOAqMnGTVkShVv+RJ5bjS/8aydQh
+	 BMDQLg5nNHKmwPIcJf2k5lAa8kVGIsUhGjc8egH4FywiO+pXnkKRXOkMB/gJV3mp1N
+	 0mENLdf0P2PuSBDuYgF2Q6Ct50c0E3sikZPZxZ1zK24fD2sBdfBE3eLwBmXx3/0IyC
+	 6ZlmtmKi3HJtg==
+From: Nathan Chancellor <nathan@kernel.org>
+Date: Mon, 10 Nov 2025 13:55:34 -0700
+Subject: [PATCH net-next v2] net: netcp: ethss: Fix type of first parameter
+ in hwtstamp stubs
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20251110-netcp_ethss-fix-cpts-stubs-clang-wifpts-v2-1-aa6204ec1f43@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAEVREmkC/5WOUQ6CMBBEr0L22zVtxYB+eQ9DTClbaCRAuhUxh
+ Lu7cgM/Z2b3zazAFAMxXLMVIs2BwziIMIcMXGeHljA0osEoc9ZaFThQctODUseMPizopsTI6VU
+ zul4e8B38z2p8UXqvm9wWNQhtiiTne9MdBCKgJUElSRc4jfGzT5j1nv/dNmvUaEtlT8rl5mLL2
+ 5PiQP1xjC1U27Z9ASzjNY3pAAAA
+X-Change-ID: 20251107-netcp_ethss-fix-cpts-stubs-clang-wifpts-df78ff1d4a7b
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Nick Desaulniers <nick.desaulniers+lkml@gmail.com>, 
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, 
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+ Kory Maincent <kory.maincent@bootlin.com>, netdev@vger.kernel.org, 
+ llvm@lists.linux.dev, patches@lists.linux.dev, 
+ Nathan Chancellor <nathan@kernel.org>
+X-Mailer: b4 0.15-dev
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3570; i=nathan@kernel.org;
+ h=from:subject:message-id; bh=YGwndXDVfw313ofFvJKijTm0xMqmknLKipL/FYTW6Uk=;
+ b=owGbwMvMwCUmm602sfCA1DTG02pJDJlCgT4iKSma9h+d9s8ISJx4bmW/5pfE1m9FS77Y/db5F
+ TJ/c++2jlIWBjEuBlkxRZbqx6rHDQ3nnGW8cWoSzBxWJpAhDFycAjARwW5Ghv9qmf3PVl9Ol5ws
+ ZJU5Q+7pnNot/bvlrt99kvBNsnvZ/r0M/4w+S4ddT/1eWua7waP9wYYlyTwXcxaopps4m/ZoHX2
+ 4kAMA
+X-Developer-Key: i=nathan@kernel.org; a=openpgp;
+ fpr=2437CB76E544CB6AB3D9DFD399739260CB6CB716
 
-Regression caused by:
+When building without CONFIG_TI_CPTS, there are a series of errors from
+-Wincompatible-pointer-types:
 
-commit ec8e0e3d7adef940cdf9475e2352c0680189d14e
-Author: William Liu <will@willsroot.io>
-Date:   Tue Jul 8 16:43:26 2025 +0000
+  drivers/net/ethernet/ti/netcp_ethss.c:3831:27: error: initialization of 'int (*)(void *, struct kernel_hwtstamp_config *)' from incompatible pointer type 'int (*)(struct gbe_intf *, struct kernel_hwtstamp_config *)' [-Wincompatible-pointer-types]
+   3831 |         .hwtstamp_get   = gbe_hwtstamp_get,
+        |                           ^~~~~~~~~~~~~~~~
+  drivers/net/ethernet/ti/netcp_ethss.c:3831:27: note: (near initialization for 'gbe_module.hwtstamp_get')
+  drivers/net/ethernet/ti/netcp_ethss.c:2758:19: note: 'gbe_hwtstamp_get' declared here
+   2758 | static inline int gbe_hwtstamp_get(struct gbe_intf *gbe_intf,
+        |                   ^~~~~~~~~~~~~~~~
+  drivers/net/ethernet/ti/netcp_ethss.c:3832:27: error: initialization of 'int (*)(void *, struct kernel_hwtstamp_config *, struct netlink_ext_ack *)' from incompatible pointer type 'int (*)(struct gbe_intf *, struct kernel_hwtstamp_config *, struct netlink_ext_ack *)' [-Wincompatible-pointer-types]
+   3832 |         .hwtstamp_set   = gbe_hwtstamp_set,
+        |                           ^~~~~~~~~~~~~~~~
+  drivers/net/ethernet/ti/netcp_ethss.c:3832:27: note: (near initialization for 'gbe_module.hwtstamp_set')
+  drivers/net/ethernet/ti/netcp_ethss.c:2764:19: note: 'gbe_hwtstamp_set' declared here
+   2764 | static inline int gbe_hwtstamp_set(struct gbe_intf *gbe_intf,
+        |                   ^~~~~~~~~~~~~~~~
 
-    net/sched: Restrict conditions for adding duplicating netems to qdisc tree
-    
-    netem_enqueue's duplication prevention logic breaks when a netem
-    resides in a qdisc tree with other netems - this can lead to a
-    soft lockup and OOM loop in netem_dequeue, as seen in [1].
-    Ensure that a duplicating netem cannot exist in a tree with other
-    netems.
-    
-    Previous approaches suggested in discussions in chronological order:
-    
-    1) Track duplication status or ttl in the sk_buff struct. Considered
-    too specific a use case to extend such a struct, though this would
-    be a resilient fix and address other previous and potential future
-    DOS bugs like the one described in loopy fun [2].
-    
-    2) Restrict netem_enqueue recursion depth like in act_mirred with a
-    per cpu variable. However, netem_dequeue can call enqueue on its
-    child, and the depth restriction could be bypassed if the child is a
-    netem.
-    
-    3) Use the same approach as in 2, but add metadata in netem_skb_cb
-    to handle the netem_dequeue case and track a packet's involvement
-    in duplication. This is an overly complex approach, and Jamal
-    notes that the skb cb can be overwritten to circumvent this
-    safeguard.
-    
-    4) Prevent the addition of a netem to a qdisc tree if its ancestral
-    path contains a netem. However, filters and actions can cause a
-    packet to change paths when re-enqueued to the root from netem
-    duplication, leading us to the current solution: prevent a
-    duplicating netem from inhabiting the same tree as other netems.
-    
-    [1] https://lore.kernel.org/netdev/8DuRWwfqjoRDLDmBMlIfbrsZg9Gx50DHJc1ilxsEBNe2D6NMoigR_eIRIG0LOjMc3r10nUUZtArXx4oZBIdUfZQrwjcQhdinnMis_0G7VEk=@willsroot.io/
-    [2] https://lwn.net/Articles/719297/
-    
-    Fixes: 0afb51e72855 ("[PKT_SCHED]: netem: reinsert for duplication")
-    Reported-by: William Liu <will@willsroot.io>
-    Reported-by: Savino Dicanosa <savy@syst3mfailure.io>
-    Signed-off-by: William Liu <will@willsroot.io>
-    Signed-off-by: Savino Dicanosa <savy@syst3mfailure.io>
-    Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-    Link: https://patch.msgid.link/20250708164141.875402-1-will@willsroot.io
-    Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+In a recent conversion to ndo_hwtstamp, the type of the first parameter
+was updated for the CONFIG_TI_CPTS=y implementations of
+gbe_hwtstamp_get() and gbe_hwtstamp_set() but not the CONFIG_TI_CPTS=n
+ones.
 
+Update the type of the first parameter in the CONFIG_TI_CPTS=n stubs to
+resolve the errors.
 
-Begin forwarded message:
+Fixes: 3f02b8272557 ("ti: netcp: convert to ndo_hwtstamp callbacks")
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Signed-off-by: Nathan Chancellor <nathan@kernel.org>
+---
+Changes in v2:
+- Rewrite commit message, as this issue is visible with just
+  -Wincompatible-pointer-types with both clang and GCC. I have an out of
+  tree patch to build with -Wincompatible-function-pointer-types-strict
+  locally applied, which actually changes the type of warning emitted in
+  this case... https://godbolt.org/z/WGb1cYqod
+- Carry forward Vadim's reviewed-by, as the code fix is unchanged.
+- Link to v1: https://patch.msgid.link/20251107-netcp_ethss-fix-cpts-stubs-clang-wifpts-v1-1-a80a30c429a8@kernel.org
+---
+ drivers/net/ethernet/ti/netcp_ethss.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Date: Mon, 10 Nov 2025 19:13:57 +0000
-From: bugzilla-daemon@kernel.org
-To: stephen@networkplumber.org
-Subject: [Bug 220774] New: netem is broken in 6.18
+diff --git a/drivers/net/ethernet/ti/netcp_ethss.c b/drivers/net/ethernet/ti/netcp_ethss.c
+index 0ae44112812c..4f6cc6cd1f03 100644
+--- a/drivers/net/ethernet/ti/netcp_ethss.c
++++ b/drivers/net/ethernet/ti/netcp_ethss.c
+@@ -2755,13 +2755,13 @@ static inline void gbe_unregister_cpts(struct gbe_priv *gbe_dev)
+ {
+ }
+ 
+-static inline int gbe_hwtstamp_get(struct gbe_intf *gbe_intf,
++static inline int gbe_hwtstamp_get(void *intf_priv,
+ 				   struct kernel_hwtstamp_config *cfg)
+ {
+ 	return -EOPNOTSUPP;
+ }
+ 
+-static inline int gbe_hwtstamp_set(struct gbe_intf *gbe_intf,
++static inline int gbe_hwtstamp_set(void *intf_priv,
+ 				   struct kernel_hwtstamp_config *cfg,
+ 				   struct netlink_ext_ack *extack)
+ {
 
+---
+base-commit: 01c87d7f48b4f9b8be0950ed4de5d345632bd564
+change-id: 20251107-netcp_ethss-fix-cpts-stubs-clang-wifpts-df78ff1d4a7b
 
-https://bugzilla.kernel.org/show_bug.cgi?id=220774
+Best regards,
+--  
+Nathan Chancellor <nathan@kernel.org>
 
-            Bug ID: 220774
-           Summary: netem is broken in 6.18
-           Product: Networking
-           Version: 2.5
-          Hardware: All
-                OS: Linux
-            Status: NEW
-          Severity: high
-          Priority: P3
-         Component: Other
-          Assignee: stephen@networkplumber.org
-          Reporter: jschung2@proton.me
-        Regression: No
-
-[jschung@localhost ~]$ cat test.sh 
-#!/bin/bash
-
-DEV="eth0"
-NUM_QUEUES=32
-DUPLICATE_PERCENT="5%"
-
-tc qdisc del dev $DEV root > /dev/null 2>&1
-tc qdisc add dev $DEV root handle 1: mq
-
-for i in $(seq 1 $NUM_QUEUES); do
-    HANDLE_ID=$((i * 10))
-    PARENT_ID="1:$i"
-    tc qdisc add dev $DEV parent $PARENT_ID handle ${HANDLE_ID}: netem
-duplicate $DUPLICATE_PERCENT
-done
-
-[jschung@localhost ~]$ sudo ./test.sh 
-[  2976.073299] netem: change failed
-Error: netem: cannot mix duplicating netems with other netems in tree.
-
-[jschung@localhost ~]$ uname -r
-6.18.0-rc4
-
--- 
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.
 
