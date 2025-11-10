@@ -1,88 +1,88 @@
-Return-Path: <netdev+bounces-237257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA330C47CD4
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 17:11:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F08EDC47F65
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 17:33:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3B4744F5235
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 16:01:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0F034A59BD
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 16:01:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2994277016;
-	Mon, 10 Nov 2025 16:01:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 455B02749CE;
+	Mon, 10 Nov 2025 16:01:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eIRmsW2J"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U/giH2UQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17375274B32
-	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 16:01:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA60266584
+	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 16:01:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762790492; cv=none; b=Hoad10Jr22UUBkAhD5dyBHHQBVU2AoOBAmniv00G8dVz9o4bQ1DJgNzubMVbu3SAvLFgztNbN1JvItCTljXdMhvwR5l4Hw4LkWGFKW60v6nXB5xe+u2kgWgtXKGv8K9tfLBplH6ab+euRY2UwU3zjTt1qNr8/PX/aL8BLQOpUfE=
+	t=1762790501; cv=none; b=uPddLVDR5MX9llDhLoVV5FF4T8/cZ9XfWkkuNb6MEGiILlopsigCtvJUjowRlE+pzk1B5nJgMyIV1XfyY+u8oFAx7tiK2HAbHWm7I3lCMSsFg0MYd4INWQ/VDwf12M8iOCxw1DmQGhtLhX2DxxPXxpbFsTHkG6eQz+I0MRryjAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762790492; c=relaxed/simple;
-	bh=LU9+hzoJqYXd3BJQ+ZGwkF2U4ebKGsvYPQyqO+wovNI=;
+	s=arc-20240116; t=1762790501; c=relaxed/simple;
+	bh=jg86UAZlbo0kva6wH/gdGGi5OzEg2qpxgD1ZU1Q6wS4=;
 	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lF9e1Rf6AzNxnAxgRiHt2EKdGCcn++Kvz9y5Z30GcCDrEn012syaXnnrkodS9pU1sc3eKKHR/3Dc4S7dlvQss8bPSlnwJQ+5rwD6lHvdeR9Z9pAMMha8+h4tQGllBkAyMCOLkCZWNXZeydLm3iBpjKxJPP/QPPmrfqndZoHDyd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eIRmsW2J; arc=none smtp.client-ip=209.85.216.48
+	 MIME-Version:Content-Type; b=X4t1BqqDJavsy9/a5zuyzQpAXTZInjoGShkR3Wnnjo8jiHdGXtUrc+/6RLROHO9ADOzKXQV7ZyGjoaOY3uSb2ZISCgn02MirMVt19MDz6hPYuavRab7nUf5INAebJ7hZ8oEh9GSzGxO0KdMB/6k9kg7nKcIt9p3JDANSTmYO9Uk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U/giH2UQ; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-3437ea05540so1626976a91.0
-        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 08:01:30 -0800 (PST)
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-298144fb9bcso11113865ad.0
+        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 08:01:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762790490; x=1763395290; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1762790496; x=1763395296; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=XXDvR+ROPnTo82YIQ6XDEozK4ARl6RQeFW59s+teRhM=;
-        b=eIRmsW2JsaL3p8x7952b/OcN9ydDPpH8cEF2lzxRtkxfmxwCrLwoBp5ysaMgYDgO/0
-         d0iVl0L9+12lb6ggWdngpJ9fGTcwxDcPIHkYwYSyju+hX7iRAJtuZmcySTeRo+h0VvqO
-         IFthw9+W8nq7m5x8of4FMq6WuRmaWVb/Bpwl9mP8NoLv1gaDUkrBHTyrkbTjw5RtzGLk
-         UEsq29j76MXvCHmzcQg2qflGuWF2WrOdWFi87S2pX9991PGtNwBbqKvNFRFUM9rGvUu7
-         rcTll2hn6ekJNImK8VuT5TCvTmDNYPPqaShlzJW5ZNLysveiyyQcKh7zG0pIf+Ewjyf5
-         DRJw==
+        bh=fKHAc934kvSRFqWHGkEjU76SDQjUz1tgAFmDQdrl0ZY=;
+        b=U/giH2UQCNiSVwMXKuXtCAlQXcsVakJV+lVXBKnInvKpOA+OIGh4a3zPVH4Xd5rhA2
+         NWgOpKCDNiyoua/xrLgdXeUeNL+tsqFXuOKaFbJn6Vj6n+Gab1JjoCdavGViE1xfINdU
+         mP27iueXUjdgII99EC3ekZCxxrRm1Xo4KXcb9pmoWLtBWMOoEeFJ15qXq+lxcic/II7F
+         vvRbpnE8EvJVDgNZjfH+gnfi+QKKT78Oj82/sl+fzZe1urSuI2yxVdQVKLGGFlZr3ICE
+         i2m78UqvYITBxFdQ7JuwkY8yAPAK2AWWjNWYU3BX24sS5D4+3KX/chYKamak0nmJh9SF
+         g25A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762790490; x=1763395290;
+        d=1e100.net; s=20230601; t=1762790496; x=1763395296;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:message-id:date:cc:to:from:subject:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XXDvR+ROPnTo82YIQ6XDEozK4ARl6RQeFW59s+teRhM=;
-        b=miZvDDQBZwkYFt3SmVHCvMtVJ9/GMCC7jINNqo+bVwumjdAxFR3ysPxgkW2BnmQ/Js
-         YfRZ1if+xowaXT4/qYSK/TRk54OnSfIv7xTDjhcC3Y/uhekGhgUePybSaSpJ66p3JOZJ
-         AC0u4Z5rLj1WZIMhH/rEmDb9Lj1/idnU7sYIVQGXE8LINtVUIj55tP7fb4wMEq7FK15q
-         9VYwPGQQSzmeS87aGKZMlVjhWdK8OoCZmsIm8MKgMHrzY/+8/9OrDe9TD3J0tGYJkOXw
-         sPVAWwqCnBzZg0QiTdoMTq1PiANER5qfBZsqUsS+4B/Y8rk0Z+st8luE1uiTljnvPQb2
-         Mf3w==
-X-Gm-Message-State: AOJu0YzbFJXmCsE30wZsLMElD4sgDkby5kBTg1xzbaaSiWyQv75EMfdY
-	V0w30aF495vuVIhDNn3eslIc71eFCpGblO4pRuw09MjwqxcPbYEGCaUGDRhv0w==
-X-Gm-Gg: ASbGncvGyhtE7/eOWvOS7OIb3pan2wrVt/5/gGI+cTg7NX+DQz9iUTF5k1q0LzUwbU4
-	oGVqE53YFrtHNT5+G0m16sDeJocqR/ZoBE2guJA2Uo6/3vVTe8LB1fSGH8NPRuCUbDO0Os/GN+4
-	c6YRKvJwMom1/jKOmKX2J5EEccdeYVcilyjXjY+lIphvOnAtaUpQqRUiOlNxVKKEcj9143DVg1s
-	Nhvy16YeSl1q0vHBoBSGceDN4R9dOlBdBb0vbCs6xVrj5doQXWPRWUrs/VvA9JiVKc9wqIIgImq
-	7zAMkOGbStfeW2dZzezqd4hDc/PR8shkTxZhkprtr5h2tQ6Rkg6UK3695iTlovRv19Dx/Uk67vH
-	a4P8OHGq8K9YjlqUyKsb2SW3mhck0Ea+2LeQC+NfGaVCt3hEJRSc6ORurp+GOTmB77j0lREiqUq
-	u41fcp12lBHC1aK10AJkHbJpyfJ1lwzogB9xIzgLhBXN5W
-X-Google-Smtp-Source: AGHT+IE5ZndMRmR1j8WMspXAGJ73fHdG6Kli8Hp6bMgjfcZTtcDAG+PIYamYyqyAgLlxrREgoud13A==
-X-Received: by 2002:a17:90b:3503:b0:341:2141:df76 with SMTP id 98e67ed59e1d1-3436cb22cc4mr10650627a91.13.1762790488429;
-        Mon, 10 Nov 2025 08:01:28 -0800 (PST)
+        bh=fKHAc934kvSRFqWHGkEjU76SDQjUz1tgAFmDQdrl0ZY=;
+        b=EBLdeBA1uvZyBrH8xSuvzt2OwkPJ/8JzKaBg61MGyxhsROGzE6IEaGMsOrwj6QqnJj
+         CntWnVcQMOY22Hb8cfCNP9XwIYY6Y8bDffHLA6fWqnSHoPNGxIrqdGIgUA+Ll7rHF+kb
+         JTYHNaQRTYkkiYOz1arKh+hFGf8fHzQGNjJlreTMM2qRIMQrAI8ZxtR02Pyg2nx5c+wm
+         9v01algyDzYR2ahKseQrjU5vfKyMe86Pde0Wvwnlm+onYMIUqL75D4NDmu/rMQ4ZAONQ
+         VLjmafsBd8VUmCYDi4KlZEpCn13AJnJD9oTZQX7JGxr9B1e2g+DJYhGFKKC8dLwtWUum
+         lV5g==
+X-Gm-Message-State: AOJu0YxXaUQO9eKvJDb28UR2hoK9tSmYege2QMDW1/iKR/DPMIuQ1VsW
+	6UPYxt5Uc2nlCdDtf2RTu3qrsiW+t4glQbP45qgXGKX6PripADvjvZxLSV5EFg==
+X-Gm-Gg: ASbGncvuPikn2zu+rzDWk4jGabescumlRMnabNgQq2zwzZfFcnDLSKIBNk0A6FEB1TS
+	qE9J+hHjVbA8/TbdkNbmy79aE7/sq5NR/GRMmhoSGYYDOiyYG5mq1sWxwVy7wzcUFLGdAck6EGZ
+	lcutcWX2EsZ4XjOKSAwjyf8sqiVGxKvDKziJYlMNyltozqM9/C0ROU9rVR+4p1U6x63kg4FbKdj
+	fpPQYmJ4FdqRdr3614AoDvYZl+tddmM/gKs3yghKyW9/J2sCjv0CRCWx59iXQ5onj54AEVEaqY0
+	DXj5EJFhz7RFJ+lGrTsR2JzCaZMFep71SUyY8sqmpMsvJIchr9c+LdRPCjIY3lQI2MGuxPOLQq6
+	uiiLAW8xT9Mah2PlTNXMdrcVth0Es8UvvBTG0/KS0swZxlXYRNiog0R7cbrPm2cyTvT/u47odwU
+	1+MR4cd0CU9nmbIwSk8+KVyOD6PK5YL/XApw==
+X-Google-Smtp-Source: AGHT+IGndO4UJbAL8FPXEYgdHHhMilHqRnp8wwVPyjpue3tM9khiYrsUYP2hcKc2/d4S6tlOJX48nA==
+X-Received: by 2002:a17:903:1ac6:b0:272:c95c:866 with SMTP id d9443c01a7336-297e565d953mr100089485ad.20.1762790495373;
+        Mon, 10 Nov 2025 08:01:35 -0800 (PST)
 Received: from ahduyck-xeon-server.home.arpa ([2605:59c8:829:4c00:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-34362f1f231sm9295377a91.10.2025.11.10.08.01.27
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2965096b8ffsm150111705ad.21.2025.11.10.08.01.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Nov 2025 08:01:27 -0800 (PST)
-Subject: [net-next PATCH v3 04/10] net: pcs: xpcs: Fix PMA identifier handling
- in XPCS
+        Mon, 10 Nov 2025 08:01:34 -0800 (PST)
+Subject: [net-next PATCH v3 05/10] net: pcs: xpcs: Add support for FBNIC 25G,
+ 50G, 100G PMA
 From: Alexander Duyck <alexander.duyck@gmail.com>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org, kernel-team@meta.com, andrew+netdev@lunn.ch,
  hkallweit1@gmail.com, linux@armlinux.org.uk, pabeni@redhat.com,
  davem@davemloft.net
-Date: Mon, 10 Nov 2025 08:01:26 -0800
+Date: Mon, 10 Nov 2025 08:01:33 -0800
 Message-ID: 
- <176279048605.2130772.11372032499477099170.stgit@ahduyck-xeon-server.home.arpa>
+ <176279049361.2130772.7535770079337105870.stgit@ahduyck-xeon-server.home.arpa>
 In-Reply-To: 
  <176279018050.2130772.17812295685941097123.stgit@ahduyck-xeon-server.home.arpa>
 References: 
@@ -99,80 +99,85 @@ Content-Transfer-Encoding: 7bit
 
 From: Alexander Duyck <alexanderduyck@fb.com>
 
-The XPCS driver was mangling the PMA identifier as the original code
-appears to have been focused on just capturing the OUI. Rather than store a
-mangled ID it is better to work with the actual PMA ID and instead just
-mask out the values that don't apply rather than shifting them and
-reordering them as you still don't get the original OUI for the NIC without
-having to bitswap the values as per the definition of the layout in IEEE
-802.3-2022 22.2.4.3.1.
+The fbnic driver is planning to make use of the XPCS driver to enable
+support for PCS and better integration with phylink. To do this though we
+will need to enable several workarounds since the PMA/PMD interface for
+fbnic is likely to be unique since it is a mix of two different vendor
+products with a unique wrapper around the IP.
 
-By laying it out as it was in the hardware it is also less likely for us to
-have an unintentional collision as the enum values will occupy the revision
-number area while the OUI occupies the upper 22 bits.
+As such I have generated a PHY identifier based on IEEE 802.3-2022
+22.2.4.3.1 using the OUI belonging to Meta Platforms and used with our
+NICs. Using this we will provide it as the PHY ID via the SW based MDIO
+interface so that the fbnic device can be identified and necessary
+workarounds enabled in the XPCS driver.
+
+As an initial workaround this change adds an exception so that soft_reset
+is not set when the driver is initially bound to the PCS.
+
+In addition I have added logic to integrate the PMA link state into the
+link state for the PCS. With this we can avoid the link coming up too soon
+on the FBNIC PHY and as a result we can avoid link flaps.
 
 Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
 ---
- drivers/net/pcs/pcs-xpcs.c   |    9 ++++-----
- include/linux/pcs/pcs-xpcs.h |    2 +-
- include/uapi/linux/mdio.h    |    5 +++++
- 3 files changed, 10 insertions(+), 6 deletions(-)
+ drivers/net/pcs/pcs-xpcs.c   |   23 +++++++++++++++++++++--
+ include/linux/pcs/pcs-xpcs.h |    2 ++
+ 2 files changed, 23 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
-index b33767c7b45c..8b5b5b63b74b 100644
+index 8b5b5b63b74b..69a6c03fd9e7 100644
 --- a/drivers/net/pcs/pcs-xpcs.c
 +++ b/drivers/net/pcs/pcs-xpcs.c
-@@ -1365,17 +1365,16 @@ static int xpcs_read_ids(struct dw_xpcs *xpcs)
- 	if (ret < 0)
- 		return ret;
+@@ -597,7 +597,25 @@ static int xpcs_c45_read_pcs_speed(struct dw_xpcs *xpcs,
+ static int xpcs_resolve_pma(struct dw_xpcs *xpcs,
+ 			    struct phylink_link_state *state)
+ {
+-	int err = 0;
++	int pma_stat1, err = 0;
++
++	/* The Meta Platforms FBNIC PMD will go into a training state for
++	 * about 4 seconds when the link first comes up. During this time the
++	 * PCS link will bounce. To avoid reporting link up too soon we include
++	 * the PMA/PMD state provided by the driver.
++	 */
++	if (xpcs->info.pma == MP_FBNIC_XPCS_PMA_100G_ID) {
++		pma_stat1 = xpcs_read(xpcs, MDIO_MMD_PMAPMD, MDIO_STAT1);
++		if (pma_stat1 < 0) {
++			state->link = false;
++			return pma_stat1;
++		}
++
++		if (!(pma_stat1 & MDIO_STAT1_LSTATUS)) {
++			state->link = false;
++			return 0;
++		}
++	}
  
--	id = ret;
-+	id = ret << 16;
+ 	state->pause = MLO_PAUSE_TX | MLO_PAUSE_RX;
+ 	state->duplex = DUPLEX_FULL;
+@@ -1591,7 +1609,8 @@ static struct dw_xpcs *xpcs_create(struct mdio_device *mdiodev)
  
- 	ret = xpcs_read(xpcs, MDIO_MMD_PMAPMD, MDIO_DEVID2);
- 	if (ret < 0)
- 		return ret;
+ 	xpcs_get_interfaces(xpcs, xpcs->pcs.supported_interfaces);
  
--	/* Note the inverted dword order and masked out Model/Revision numbers
--	 * with respect to what is done with the PCS ID...
-+	/* For now we only record the OUI for the PMAPMD, we may want to
-+	 * add the model number at some point in the future.
- 	 */
--	ret = (ret >> 10) & 0x3F;
--	id |= ret << 16;
-+	id |= ret & MDIO_DEVID2_OUI;
- 
- 	/* Set the PMA ID if it hasn't been pre-initialized */
- 	if (xpcs->info.pma == DW_XPCS_PMA_ID_NATIVE)
+-	if (xpcs->info.pma == WX_TXGBE_XPCS_PMA_10G_ID)
++	if (xpcs->info.pma == WX_TXGBE_XPCS_PMA_10G_ID ||
++	    xpcs->info.pma == MP_FBNIC_XPCS_PMA_100G_ID)
+ 		xpcs->pcs.poll = false;
+ 	else
+ 		xpcs->need_reset = true;
 diff --git a/include/linux/pcs/pcs-xpcs.h b/include/linux/pcs/pcs-xpcs.h
-index e40f554ff717..4cf6bd611e5a 100644
+index 4cf6bd611e5a..36073f7b6bb4 100644
 --- a/include/linux/pcs/pcs-xpcs.h
 +++ b/include/linux/pcs/pcs-xpcs.h
-@@ -38,7 +38,7 @@ enum dw_xpcs_pma_id {
- 	DW_XPCS_PMA_GEN4_6G_ID,
+@@ -39,6 +39,8 @@ enum dw_xpcs_pma_id {
  	DW_XPCS_PMA_GEN5_10G_ID,
  	DW_XPCS_PMA_GEN5_12G_ID,
--	WX_TXGBE_XPCS_PMA_10G_ID = 0x0018fc80,
-+	WX_TXGBE_XPCS_PMA_10G_ID = 0xfc806000,
+ 	WX_TXGBE_XPCS_PMA_10G_ID = 0xfc806000,
++	/* Meta Platforms OUI 88:25:08, model 0, revision 0 */
++	MP_FBNIC_XPCS_PMA_100G_ID = 0x46904000,
  };
  
  struct dw_xpcs_info {
-diff --git a/include/uapi/linux/mdio.h b/include/uapi/linux/mdio.h
-index 2da509c9c0a5..b287f84036a5 100644
---- a/include/uapi/linux/mdio.h
-+++ b/include/uapi/linux/mdio.h
-@@ -142,6 +142,11 @@
- #define MDIO_AN_STAT1_PAGE		0x0040	/* Page received */
- #define MDIO_AN_STAT1_XNP		0x0080	/* Extended next page status */
- 
-+/* Device Identifier 2 */
-+#define MDIO_DEVID2_OUI			0xfc00	/* OUI Portion of PHY ID */
-+#define MDIO_DEVID2_MODEL_NUM		0x03f0	/* Manufacturer's Model Number */
-+#define MDIO_DEVID2_REV_NUM		0x000f	/* Revision Number */
-+
- /* Speed register. */
- #define MDIO_SPEED_10G			0x0001	/* 10G capable */
- #define MDIO_PMA_SPEED_2B		0x0002	/* 2BASE-TL capable */
 
 
 
