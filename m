@@ -1,486 +1,404 @@
-Return-Path: <netdev+bounces-237144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C2CBC46068
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 11:45:26 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 901D9C461CA
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 12:06:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 186F518917B7
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 10:44:10 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 15BAB34732C
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 11:06:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E804B3054E8;
-	Mon, 10 Nov 2025 10:43:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E73EF306B11;
+	Mon, 10 Nov 2025 11:06:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="UbQOn2LH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SiW2B8mL"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012042.outbound.protection.outlook.com [40.93.195.42])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF559305977;
-	Mon, 10 Nov 2025 10:43:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762771405; cv=fail; b=Y8gLungLqLRs7ihUrTV5CdyjS9jvlnWG/H9Jfk79vpt5e9lUHBA8HlOthe+HuBhjnd0VSQu6ubqFnltGE6ew36+PsuFEyhGEyQcpg4fCTpXJrQq2Lc+qyFbDKdC4V5lo8pVmwUxqrQBBr1DP8U4yNswI4Zp7l361km+YPLJaHZw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762771405; c=relaxed/simple;
-	bh=tlNurxHLVp5U3Jo/hiU3WJs7ivMfaB7Q71432EvhPzs=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=FhNDpAXCd/IK9QF3pv1rRz/MQu4EDan9ONBVos8A3AZatEiFy4Q89Qx3wJEfsKILhbqzCARZygWpeefhWDn3/2OF34OpokbBTqbLMlUUsxVbJ8eihf4LxDMLG6bjI3hlHJfRk9TinOmMCYzmEo3Sk2igQ03WbKiDZzZHlgeRVHU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=UbQOn2LH; arc=fail smtp.client-ip=40.93.195.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DMQQLS1eKnJ2BYf56z5dVxPEvzVmXd5kRjWjA06uVpR3y9JQnbSvBftmIL3Kwrncq6JhsF1wTyp58ZtNC243OgncJuEi8enrHo3gtVOGfDls5wPPNmYQO1QiL66oIfT5EwMNq0CXxTJ6dK1i8cRA58DRgTXSLcRbUh/W5RBIBWAqpkUHRfEJPEQxHl0SoCgelK9pPILXXD+HVYnDbCJWUrJ18RT4h/q4pYiFiDoKFiPc5FIktaPCbWS/H0pCYHTHHGJ6/hPFuVb37WrPQUVDIFdTqeg1xhoA6GoJ4fpQcQQcgffAJaPaRHLOe1z+8o/PrhEgcJz1BJry27WxupN6rw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=N2tOB5gfXT3cDgClfUWx5fK7AhPqd/3RaG0Jvdc5H+Y=;
- b=MYj7JTatl4E+ziQ1mmwvln6TzWeXuv6YDT8WQgcc1FacmI9qI1o/HQRUmVAnZLPCVO59yDr/P4QydvTuOch1uFsa36n1HjqkGLOJdgggu1YBV9r/wR4sSlkoPsTF1HgbXD/U3VTj0zahoIKSOVJwOJ2Gr6YlnJwr4cAEXpzpyZ+EmFLzocFkGhIzwLQFJZJlh+k4OhTcsw34Ze4UNNw0E8yBoa2GObTe4tcZF1PgiAByCT4d4E1v5mbBvNeTExhS6rLMvfRurMPDQ4V9JmP/MbkizxpbJQGxhDWEiCI5x84NHjlEmXJS/Oa8kXEUG0Tn2FdyjjrEIKYNpCRcMLw7PA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=N2tOB5gfXT3cDgClfUWx5fK7AhPqd/3RaG0Jvdc5H+Y=;
- b=UbQOn2LHdiKr52v7vJvwFgKJbmo0kWx4DdcjoaGbxddnCaYjHsbmJYhWcwq6LvuBk7hiEOXhR83e8pouP8fDmkdLfU9oaJ0BoGW5tEg8dCpjMitBocvOEpDq9e56WVMctKdvMnDyRlRhqDWMtIcOLDDHdHrdLW0Emhs/PvfGAI8=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
- by SN7PR12MB7955.namprd12.prod.outlook.com (2603:10b6:806:34d::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.16; Mon, 10 Nov
- 2025 10:43:20 +0000
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79%5]) with mapi id 15.20.9298.015; Mon, 10 Nov 2025
- 10:43:20 +0000
-Message-ID: <f94420fc-0b06-4d55-8178-b5eb07bc4bcd@amd.com>
-Date: Mon, 10 Nov 2025 10:43:14 +0000
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 01/22] cxl/mem: Arrange for always-synchronous memdev
- attach
-Content-Language: en-US
-To: "Koralahalli Channabasappa, Smita" <skoralah@amd.com>,
- Jonathan Cameron <jonathan.cameron@huawei.com>,
- alejandro.lucero-palau@amd.com
-Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
- dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
- dave.jiang@intel.com, Alison Schofield <alison.schofield@intel.com>
-References: <20251006100130.2623388-1-alejandro.lucero-palau@amd.com>
- <20251006100130.2623388-2-alejandro.lucero-palau@amd.com>
- <20251007134053.00000dd3@huawei.com>
- <801f4bcb-e12e-4fe2-a6d4-a46ca96a15f6@amd.com>
- <030a36b6-0ade-4ee1-a535-9f01b15581a6@amd.com>
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <030a36b6-0ade-4ee1-a535-9f01b15581a6@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: DU7P250CA0004.EURP250.PROD.OUTLOOK.COM
- (2603:10a6:10:54f::19) To DM6PR12MB4202.namprd12.prod.outlook.com
- (2603:10b6:5:219::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA2A62E63C;
+	Mon, 10 Nov 2025 11:06:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762772777; cv=none; b=hftJx4mZXjcEmMv1vclROtzhVEz5noP7PVSbk+yq5Jh3lnUt5gEyPz6TrfQrno56ZPOLK4/jASPD+15I4kjIy746+gtIRlppd4swDgf3MrkOWemyPZoX0P2dGT+jITqvQl+tue4ZMOEFtxAB0ji5owIq3nTV8nNn9cwlXgjAYfA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762772777; c=relaxed/simple;
+	bh=qIObqiroWcgVL4Dt8RU7ppjIuvnj+Y2jxYFSiNagdVI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=q/ZEl3LEjeh/xdQhp2ObOa7biHd4I4x+27f637OPOhlUrYXiL9f+yMYNUoeUhutF3ocAVnh/cUBMsv51yIqZzw0Ht1W+C36+EUCJPX0y7OQfjrqT9W29N8yO7J8hVw3KdYi+27qCxM1qRNaSCToiTC5oaVUAtTLIClSzJ6kMVwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SiW2B8mL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F1998C116B1;
+	Mon, 10 Nov 2025 11:06:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762772775;
+	bh=qIObqiroWcgVL4Dt8RU7ppjIuvnj+Y2jxYFSiNagdVI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=SiW2B8mLy3S8XHCuBpY45fj0nYxsGJyTG/9aTuD1a2SZlHAhUsitzqjyNmv5Y6JKV
+	 5dHk55Kdu6crkKN1/RxlEoiPlD/bybWYtegP8WYr1dS4FJSfTKAXi7SQvRsDFlR+vW
+	 j/jHxAfg2dAkNwu2MipHANxx5fAARWe6cexWsUZkP/p80NtR3uGspMTltkJnmDtQ2K
+	 r61cIiaLO6MgTXP8hjlEkeHjR9eMGTTN2fFutZwdyiA9gH0taIi8ffr1ATOOiCqEwK
+	 2DXRAz0+8eTi0RCLQiAzWiqF9RLJJEhj2vV967F/fYnR810sWqPDRvDtcrQphrFY25
+	 M2FunhX11Etjg==
+Message-ID: <d0fc4c6a-c4d7-4d62-9e6f-6c05c96a51de@kernel.org>
+Date: Mon, 10 Nov 2025 12:06:08 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|SN7PR12MB7955:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3db48195-0125-4bfb-ea7e-08de2045f6d1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?UThHNlMxZHlvNW5adEl4NHgyZDEvaW1KbjN2R0thbmZLOGJFT3N0N2pMZitu?=
- =?utf-8?B?YmFyam9hSEgrbTlCelVVSXZ1ZzNURjRDdkdldndBMlVqWHRFdVM2bkpjV1Z3?=
- =?utf-8?B?SGgvNWxES3djeWZicS81NCtKSzMrWGxXOGgyNjdyY3dDemZZR3hzL3l3MEc2?=
- =?utf-8?B?aEdobXcxZGZtRDVoM2g2dVZ4N045clVkWU45anA4b1ljQmZBNTk5S3RlZnIy?=
- =?utf-8?B?VndzNmRLVEZ4aFMrVzJBUitQRVdodk9nbHU1eUh5d2Y4NjJQYnNKczVQeUly?=
- =?utf-8?B?aGJCSVU5UmpPUzRwSjlvY3d0d25lRi9UcTB6Ym12ZCsrSUFxekF1ZmlMQmla?=
- =?utf-8?B?alEzL0w2TlNUVkJwaithQmJkMjRjcDY5N2RhMnh0NEk2Sm9HSDJkczVRM09k?=
- =?utf-8?B?SmU0MWlBWUFOcjlxSFZHOWNrM1RHRUsrZnl2azIwSGVBV3g1Ynh5Q2V4eURU?=
- =?utf-8?B?L2t2d0pCSnRML1k5V0dLK0tHanE5UXhNTm95dWNvQ1FiYWtSU01LaGxuN3gy?=
- =?utf-8?B?Qkp3RWZweFpMYW9Pb1Z6NGZSVDh0YXczbUN5SUpLTUVybVhxVksyYmhYdUhi?=
- =?utf-8?B?WnRnS1RVdmNrRnk3dUJibHVDdDdZblg3clpIRHRxMkZFU2MxM3Bkb1J1Q3hz?=
- =?utf-8?B?SzZFeDFqZk9kSmdyYnZBRzY3Yi9wLzdVazJRUGlBVDFqL3haaTVNRVJPNnkz?=
- =?utf-8?B?ZGptV2lMbFpZdTIyWGFKbTlPQnB6SHR1c3VxRzlpSUE0R1hsWGZpdDRGaXEx?=
- =?utf-8?B?VGZHMkZJVXJTd3JadDJ1QmY4clkwVDBZU1BXcDFlU3pmL1dRVzIrNDBicG9r?=
- =?utf-8?B?NHBpNDArazdKNDEyYnJEcmlxMmhVV0k4ei91T2ZvNHlaWUp2UWZXM1BLaFRO?=
- =?utf-8?B?ZkxNZ1UrK2JQVTNhZVc1ZXc4VWN5R25mREpJUENrVS9uQS9qQ09PRWJnc2Zt?=
- =?utf-8?B?S0VjamludzB6VllOdG4xcUx0Q3VPdm5zR3VqUThVK0RtKzIyTTZjcnJvZVE5?=
- =?utf-8?B?VXZMUThqSVFOL1VtYWxSOG5HZGtScUxDbEtYSGIyOENEWmV1MXF0eVBFdmh6?=
- =?utf-8?B?cHQxUWM0Smhad1dzeXFYb09iaHVNT2RZVVVxeUpKc2lwTmhzdVFxNnhwcGRH?=
- =?utf-8?B?aWtFR2JXbFpzWHlmaTIwSXcrMzY5ZHlDNUtybHF6czhBblo2RUJwRUFiV0FX?=
- =?utf-8?B?QUFsNWJOY0ZweUxsZTV3K0lGQUVQSnB6b0wvNnJVcjlkd0tHa1lWeGlzalNu?=
- =?utf-8?B?KzRsTjhuU0NlUndjeS9uOW54UGkwVVhXNG5VeUovcThDb1l3T1FGcVRJbkc3?=
- =?utf-8?B?SkVsNjRyYU5CSVlrSy8yT1ZFbVltUDk2V2RXcjJnQ2ZnVHVheWlYbmdnOGtJ?=
- =?utf-8?B?S05HcEtrV2ExYkRGbmVicEQ3WXo4WFI2ZVZZeDNVY2NKeWtHeDdKUXVJWGtL?=
- =?utf-8?B?Y0FrU0h6UzB4ZmQvU1NhNFFnaEVIb09lUEJvQlB0Z0FMbmJmRE4xTDJRR29r?=
- =?utf-8?B?MjlWVGI4Qkt3MzBVeld5LzB0U0NPeDAwaXRJQ0h3aWJrQ0tCNk9WV3ZlNFQ2?=
- =?utf-8?B?N0tUTlI0czRYRDJ5K3NSTFZ6TkxiZWV4U1lGSklTVWlkTHNUTkVaTUEreER3?=
- =?utf-8?B?cnQxbGR5NXhmZzFhU1NaSU5vaThYZ3lSaXFBa1FhU1M2dnp0LzVjOURqcDcv?=
- =?utf-8?B?UnJ6c09hNzVhMGZBbGlISGlmejZPcEV5MUgzNCtQd3oxcGhXRU95VUZZaU91?=
- =?utf-8?B?RWJ0OUVVL1ovK0NKYXo5LytOU1BhYlNMV2RSd3JMYjA1Tko2NW1oYVpreGt0?=
- =?utf-8?B?NENzWWRRWkVreHNhSWZjYVBxb1dCaEJBT2hXOFRtWE1rK0hiekJHNVJDZDIx?=
- =?utf-8?B?ZXRHRXptdlhZVjdJMnlnbjVSU3FNclJKZERiak91d0E5OFZSOCtGbkROL0hU?=
- =?utf-8?B?ZXl4TGw2M3pwTmpYa0VzS24ySTA0aG1ZWnl4Rzd6TjF0Mm00QlRnS2t5V1Nr?=
- =?utf-8?B?Y21HNWlRS2F3PT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?MlJNejdIRmRaZlhqeGpKVmZ0K3dKRTFXczh6b0FGb0tUMW1kVi9tbER2aUVu?=
- =?utf-8?B?enFDNGtTNThLTk9SdGd6TEdSOURTM2k0eTdDTXFHdGZGc1hrMHd5QnlqRDhF?=
- =?utf-8?B?ZVAxYlpWcFRKdzNhMmlKQlpYalMzUS9wUlhCalo3NzIveDJiUXV2ZXNPWXM3?=
- =?utf-8?B?WC9HZW5CYXNHTjRsUGthSkRRUVBVTzFiUThQWm8vNG1qK25CaUhlM1FrVTBW?=
- =?utf-8?B?TW9CMWN1WlUvbHl2aGo3TkhmRG9tamtrVzdVQmpBbnFzRkVIby9ST0NOY3hj?=
- =?utf-8?B?Y2VXR2JYUVZoMGVpUDFuWHJ1UUFXdE92YnZzc0FJa2NQK2l5TnFnQVd3b1RW?=
- =?utf-8?B?THY0bnJBQk1YMmlPa0VNWFdmTm0zTjVuMjg2VVlMbFFBNGlGSFI2UTFqS0g3?=
- =?utf-8?B?VEVTRXhtSjMxcTlaYVdUN0g3Zk9IeFFEeUNiWG1wRzYxaGVuT2Q4c1czUFMw?=
- =?utf-8?B?VDBabS9kMzRLekxTK3NsS1ZoKzlTL3VjVVRid3ZDMVdhanZVSDg1Uy9ON1kv?=
- =?utf-8?B?SmFUS0dnSk56aDhtZkZuNXZlM1RmbEx0b0FKRXZxSFg3a3JKaFRtWCtYUjYx?=
- =?utf-8?B?QVI5dzREWkhRNnZscmRPaVgrTjRoQXlia0NjWFFIM2UxQVlKTHJUc2hlekQw?=
- =?utf-8?B?anZadkptMXdKMko5MEZxTmtOZStiMW9YK1B4V1VkS0N4T0Fad3lQRkJkcDRC?=
- =?utf-8?B?KzRiRk1FMHNoN2RzTVI0R0NQNUYrN1FsTWpGQXBIUjlGZ0M3b2tPZ1kvYldw?=
- =?utf-8?B?WDZNbVE3YkF6TGZrL0U3Zml6QzNWTEQ2YlJoRHZhalZnS2k0dlJ4ek43aHZF?=
- =?utf-8?B?Yks3cHdCZUxpUnZZVm1LKzFMRWVrNDhnd0pZZllwU3NyVG1xcFBEM0R0TDhw?=
- =?utf-8?B?UVF5a0I2cm02VjduYjJ1RnowTGZCN1Ryd1l2dlk1eHhaVWpnNXRoT3B5OXlh?=
- =?utf-8?B?SnM3NDlHVVlrcWl0NDE4T1d6QW41ZExTQ1I0ejhRWDBnQ1E5RTFjaG9nbUZl?=
- =?utf-8?B?WlpHWEhVOVY0SjBHdTBnbFZ0RnVnVnh6bzFPVmZsL21PZndlMFQrNGs2blpW?=
- =?utf-8?B?dXpCZU1hSmZsYk95WGFQOGdwcG42bGRhaFVtajR6cGlzTW51bEs1Z1RaRGdu?=
- =?utf-8?B?VnpTWENlOHZvLzJhZ2t0OWdSRTF6bFRVZURoWHV6TnZ3WmhzV21XN2NPRlEw?=
- =?utf-8?B?aVBHTElPWmVnd0dtSGVPM3Y2NGt3aldvMm91RUlvMENUTjRqR0d0WmNLY0ho?=
- =?utf-8?B?Z09aYVVvbkQwYjdxT29QeE1qREY0NCtYWjR2ZVFRNnR0QUFoU2E3Ny9ocnFo?=
- =?utf-8?B?aHN6WUFPcGlsSGFiUTZsenl3YXJOWllRQ1g3ZHNBWjMvbHFEWUFVbDFoVllZ?=
- =?utf-8?B?UXJQYUUrbFJ1dlVPd0dDZ0hjc2hKRzh4cXl6TC9lOHB3Z0lKZUpWYWJWczVw?=
- =?utf-8?B?MVlNSEpFSUJHMXNrUlgrWENDTkZrV0R6MGFlQlFSTm9XcE15MVVqcVdCMTE1?=
- =?utf-8?B?bTRLSTBUSUNUbHFRMEkwSUlhSExoMzN0QUVJS1didmNaL3FTOVRVWHRWRVVC?=
- =?utf-8?B?NTRySUU3UDlpc2kwSlVXRTR0bTVaK2l0bzNDalpxaW1zekQ1MGIycmhsK3cr?=
- =?utf-8?B?NTkyOWppdGQ2YkQ4SWhpbms4VkVESGlFdTVTUnV1QVBaaGgzZVY1UHdOTFJw?=
- =?utf-8?B?bFNVZjdkeHd6aGZsNUFpM1RKQVo5QnJ1VHRRaFRON2g0Sm5Vb2diYTRyNW0y?=
- =?utf-8?B?dm9GUDhMMkQxenliU2ZKckJuUW1DcWhJY1BjTi9VaXpmcURBRFo3d1cwaFFY?=
- =?utf-8?B?NGJhKzBjTUZGZzZaUFFoamdiL25Hc2xuRWtNRFV1UG9zYkFJYnp3L0dWa1A2?=
- =?utf-8?B?NEZIWUJvVFdxdXVLdFNxNVZ6RFBIWlUxSzBuVlZ0OXN1MDByQyszT0IyejAr?=
- =?utf-8?B?UTlkUlpQNzNFWWpwWHZsNlV3S2RJQ25LV1V1c2tsRTdOZ1l5SERZL0xJd3FJ?=
- =?utf-8?B?dFdUV1YxYnRqR1VLejc2cERoRWtEUVYvMnNHV1hhMmZoUGNNcFowd0RYNmZ5?=
- =?utf-8?B?RklwYmw3VWY4d01tdTR4VjNoV1d6YS93Vy83NTdWb21LangwbXVET1NsQXBB?=
- =?utf-8?Q?0/gq+O2sSeZ7h+KDHytPluHgE?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3db48195-0125-4bfb-ea7e-08de2045f6d1
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Nov 2025 10:43:20.3721
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +hMe+y8fe11vTNSbPi02Q85YSHetIYYTTG/Hsgs1y3KmXAemaZ56T+UjkgR0drbFZTs7pRM5UjhnhvuPlgf7RQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7955
-
-Hi Smita,
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 2/2] xdp: Delegate fast path return decision to page_pool
+To: Dragos Tatulea <dtatulea@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Simon Horman <horms@kernel.org>,
+ Toshiaki Makita <toshiaki.makita1@gmail.com>,
+ David Ahern <dsahern@kernel.org>
+Cc: Tariq Toukan <tariqt@nvidia.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ Martin KaFai Lau <martin.lau@linux.dev>, KP Singh <kpsingh@kernel.org>
+References: <20251107102853.1082118-2-dtatulea@nvidia.com>
+ <20251107102853.1082118-5-dtatulea@nvidia.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20251107102853.1082118-5-dtatulea@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
-On 10/30/25 19:57, Koralahalli Channabasappa, Smita wrote:
-> Hi Alejandro,
->
-> I need patches 1–3 from this series as prerequisites for the 
-> Soft-Reserved coordination work, so I wanted to check in on your plans 
-> for the next revision.
->
-> Link to the discussion: 
-> https://lore.kernel.org/all/aPbOfFPIhtu5npaG@aschofie-mobl2.lan/
->
-> Are patches 1–3 already being updated as part of your v20 work?
-> If so, I can wait and pick them up from v20 directly.
 
+On 07/11/2025 11.28, Dragos Tatulea wrote:
+> XDP uses the BPF_RI_F_RF_NO_DIRECT flag to mark contexts where it is not
+> allowed to do direct recycling, even though the direct flag was set by
+> the caller. This is confusing and can lead to races which are hard to
+> detect [1].
+> 
+> Furthermore, the page_pool already contains an internal
+> mechanism which checks if it is safe to switch the direct
+> flag from off to on.
+> 
+> This patch drops the use of the BPF_RI_F_RF_NO_DIRECT flag and always
+> calls the page_pool release with the direct flag set to false. The
+> page_pool will decide if it is safe to do direct recycling. This
+> is not free but it is worth it to make the XDP code safer. The
+> next paragrapsh are discussing the performance impact.
+> 
+> Performance wise, there are 3 cases to consider. Looking from
+> __xdp_return() for MEM_TYPE_PAGE_POOL case:
+> 
+> 1) napi_direct == false:
+>    - Before: 1 comparison in __xdp_return() + call of
+>      page_pool_napi_local() from page_pool_put_unrefed_netmem().
+>    - After: Only one call to page_pool_napi_local().
+> 
+> 2) napi_direct == true && BPF_RI_F_RF_NO_DIRECT
+>    - Before: 2 comparisons in __xdp_return() + call of
+>      page_pool_napi_local() from page_pool_put_unrefed_netmem().
+>    - After: Only one call to page_pool_napi_local().
+> 
+> 3) napi_direct == true && !BPF_RI_F_RF_NO_DIRECT
+>    - Before: 2 comparisons in __xdp_return().
+>    - After: One call to page_pool_napi_local()
+> 
+> Case 1 & 2 are the slower paths and they only have to gain.
+> But they are slow anyway so the gain is small.
+> 
+> Case 3 is the fast path and is the one that has to be considered more
+> closely. The 2 comparisons from __xdp_return() are swapped for the more
+> expensive page_pool_napi_local() call.
+> 
+> Using the page_pool benchmark between the fast-path and the
+> newly-added NAPI aware mode to measure [2] how expensive
+> page_pool_napi_local() is:
+> 
+>    bench_page_pool: time_bench_page_pool01_fast_path(): in_serving_softirq fast-path
+>    bench_page_pool: Type:tasklet_page_pool01_fast_path Per elem: 15 cycles(tsc) 7.537 ns (step:0)
+> 
+>    bench_page_pool: time_bench_page_pool04_napi_aware(): in_serving_softirq fast-path
+>    bench_page_pool: Type:tasklet_page_pool04_napi_aware Per elem: 20 cycles(tsc) 10.490 ns (step:0)
+> 
 
-Yes, I'm sending v20 later today. This patch has some changes for fixing 
-the reported problems.
+IMHO fast-path slowdown is significant.  This fast-path is used for the
+XDP_DROP use-case in drivers.  The fast-path is competing with the speed
+of updating an (per-cpu) array and a function-call overhead. The
+performance target for XDP_DROP is NIC *wirespeed* which at 100Gbit/s is
+148Mpps (or 6.72ns between packets).
 
+I still want to seriously entertain this idea, because (1) because the
+bug[1] was hard to find, and (2) this is mostly an XDP API optimization
+that isn't used by drivers (they call page_pool APIs directly for
+XDP_DROP case).
+Drivers can do this because they have access to the page_pool instance.
 
->
-> If v20 is still in progress and may take some time, I can probably 
-> carry patches 1–3 at the start of my series, and if that helps, I can 
-> fold in the review comments by Jonathan while keeping authorship as 
-> is. I would only adjust wording in the commit descriptions to reflect 
-> the Soft-Reserved coordination context.
->
-> Alternatively, if you prefer to continue carrying them in the Type-2 
-> series, I can simply reference them as prerequisites instead.
->
-> I’m fine with either approach just trying to avoid duplicated effort 
-> and keep review in one place.
+Thus, this isn't a XDP_DROP use-case.
+  - This is either XDP_REDIRECT or XDP_TX use-case.
 
+The primary change in this patch is, changing the XDP API call 
+xdp_return_frame_rx_napi() effectively to xdp_return_frame().
 
-Let's see how v20 is received regarding the potential merge. If not 
-impending, you could take those patches.
+Looking at code users of this call:
+  (A) Seeing a number of drivers using this to speed up XDP_TX when 
+*completing* packets from TX-ring.
+  (B) drivers/net/xen-netfront.c use looks incorrect.
+  (C) drivers/net/virtio_net.c use can easily be removed.
+  (D) cpumap.c and drivers/net/tun.c should not be using this call.
+  (E) devmap.c is the main user (with multiple calls)
 
+The (A) user will see a performance drop for XDP_TX, but these driver
+should be able to instead call the page_pool APIs directly as they
+should have access to the page_pool instance.
 
-Thanks
+Users (B)+(C)+(D) simply needs cleanup.
 
+User (E): devmap is the most important+problematic user (IIRC this was
+the cause of bug[1]).  XDP redirecting into devmap and running a new
+XDP-prog (per target device) was a prime user of this call
+xdp_return_frame_rx_napi() as it gave us excellent (e.g. XDP_DROP)
+performance.
 
->
-> Thanks
-> Smita
->
-> On 10/29/2025 4:20 AM, Alejandro Lucero Palau wrote:
->>
->> On 10/7/25 13:40, Jonathan Cameron wrote:
->>> On Mon, 6 Oct 2025 11:01:09 +0100
->>> <alejandro.lucero-palau@amd.com> wrote:
->>>
->>>> From: Alejandro Lucero <alucerop@amd.com>
->>>>
->>>> In preparation for CXL accelerator drivers that have a hard 
->>>> dependency on
->>>> CXL capability initialization, arrange for the endpoint probe 
->>>> result to be
->>>> conveyed to the caller of devm_cxl_add_memdev().
->>>>
->>>> As it stands cxl_pci does not care about the attach state of the 
->>>> cxl_memdev
->>>> because all generic memory expansion functionality can be handled 
->>>> by the
->>>> cxl_core. For accelerators, that driver needs to know perform driver
->>>> specific initialization if CXL is available, or exectute a fallback 
->>>> to PCIe
->>>> only operation.
->>>>
->>>> By moving devm_cxl_add_memdev() to cxl_mem.ko it removes async module
->>>> loading as one reason that a memdev may not be attached upon return 
->>>> from
->>>> devm_cxl_add_memdev().
->>>>
->>>> The diff is busy as this moves cxl_memdev_alloc() down below the 
->>>> definition
->>>> of cxl_memdev_fops and introduces devm_cxl_memdev_add_or_reset() to
->>>> preclude needing to export more symbols from the cxl_core.
->>>>
->>>> Signed-off-by: Dan Williams <dan.j.williams@intel.com>
->>> Alejandro, SoB chain broken here which makes this currently 
->>> unmergeable.
->>>
->>> Should definitely have your SoB as you sent the patch to the list 
->>> and need
->>> to make a statement that you believe it to be fine to do so (see the 
->>> Certificate
->>> of origin stuff in the docs).  Also, From should always be one of 
->>> the authors.
->>> If Dan wrote this as the SoB suggests then From should be set to him..
->>>
->>> git commit --amend --author="Dan Williams <dan.j.williams@intel.com>"
->>>
->>> Will fix that up.  Then either you add your SoB on basis you just 
->>> 'handled'
->>> the patch but didn't make substantial changes, or your SoB and a 
->>> Codeveloped-by
->>> if you did make major changes.  If it is minor stuff you can an
->>> a sign off with # what changed
->>> comment next to it.
->>
->>
->> Understood. I'll ask Dan what he prefers.
->>
->>
->>>
->>> A few minor comments inline.
->>>
->>> Thanks,
->>>
->>> Jonathan
->>>
->>>
->>>> ---
->>>>   drivers/cxl/Kconfig       |  2 +-
->>>>   drivers/cxl/core/memdev.c | 97 
->>>> ++++++++++++++++-----------------------
->>>>   drivers/cxl/mem.c         | 30 ++++++++++++
->>>>   drivers/cxl/private.h     | 11 +++++
->>>>   4 files changed, 82 insertions(+), 58 deletions(-)
->>>>   create mode 100644 drivers/cxl/private.h
->>>>
->>>> diff --git a/drivers/cxl/Kconfig b/drivers/cxl/Kconfig
->>>> index 028201e24523..111e05615f09 100644
->>>> --- a/drivers/cxl/Kconfig
->>>> +++ b/drivers/cxl/Kconfig
->>>> @@ -22,6 +22,7 @@ if CXL_BUS
->>>>   config CXL_PCI
->>>>       tristate "PCI manageability"
->>>>       default CXL_BUS
->>>> +    select CXL_MEM
->>>>       help
->>>>         The CXL specification defines a "CXL memory device" 
->>>> sub-class in the
->>>>         PCI "memory controller" base class of devices. Device's 
->>>> identified by
->>>> @@ -89,7 +90,6 @@ config CXL_PMEM
->>>>   config CXL_MEM
->>>>       tristate "CXL: Memory Expansion"
->>>> -    depends on CXL_PCI
->>>>       default CXL_BUS
->>>>       help
->>>>         The CXL.mem protocol allows a device to act as a provider 
->>>> of "System
->>>> diff --git a/drivers/cxl/core/memdev.c b/drivers/cxl/core/memdev.c
->>>> index c569e00a511f..2bef231008df 100644
->>>> --- a/drivers/cxl/core/memdev.c
->>>> +++ b/drivers/cxl/core/memdev.c
->>>> -
->>>> -err:
->>>> -    kfree(cxlmd);
->>>> -    return ERR_PTR(rc);
->>>>   }
->>>> +EXPORT_SYMBOL_NS_GPL(devm_cxl_memdev_add_or_reset, "CXL");
->>>>   static long __cxl_memdev_ioctl(struct cxl_memdev *cxlmd, unsigned 
->>>> int cmd,
->>>>                      unsigned long arg)
->>>> @@ -1023,50 +1012,44 @@ static const struct file_operations 
->>>> cxl_memdev_fops = {
->>>>       .llseek = noop_llseek,
->>>>   };
->>>> -struct cxl_memdev *devm_cxl_add_memdev(struct device *host,
->>>> -                       struct cxl_dev_state *cxlds)
->>>> +struct cxl_memdev *cxl_memdev_alloc(struct cxl_dev_state *cxlds)
->>>>   {
->>>>       struct cxl_memdev *cxlmd;
->>>>       struct device *dev;
->>>>       struct cdev *cdev;
->>>>       int rc;
->>>> -    cxlmd = cxl_memdev_alloc(cxlds, &cxl_memdev_fops);
->>>> -    if (IS_ERR(cxlmd))
->>>> -        return cxlmd;
->>>> +    cxlmd = kzalloc(sizeof(*cxlmd), GFP_KERNEL);
->>> It's a little bit non obvious due to the device initialize mid way
->>> through this, but given there are no error paths after that you can
->>> currently just do.
->>>     struct cxl_memdev *cxlmd __free(kfree) =
->>>         cxl_memdev_alloc(cxlds, &cxl_memdev_fops);
->>> and
->>>     return_ptr(cxlmd);
->>>
->>> in the good path.  That lets you then just return rather than having
->>> the goto err: handling for the error case that currently frees this
->>> manually.
->>>
->>> Unlike the change below, this one I think is definitely worth making.
->>
->>
->> I agree so I'll do it. The below suggestion is also needed ...
->>
->>
->>>
->>>> +    if (!cxlmd)
->>>> +        return ERR_PTR(-ENOMEM);
->>>> -    dev = &cxlmd->dev;
->>>> -    rc = dev_set_name(dev, "mem%d", cxlmd->id);
->>>> -    if (rc)
->>>> +    rc = ida_alloc_max(&cxl_memdev_ida, CXL_MEM_MAX_DEVS - 1, 
->>>> GFP_KERNEL);
->>>> +    if (rc < 0)
->>>>           goto err;
->>>> -
->>>> -    /*
->>>> -     * Activate ioctl operations, no cxl_memdev_rwsem manipulation
->>>> -     * needed as this is ordered with cdev_add() publishing the 
->>>> device.
->>>> -     */
->>>> +    cxlmd->id = rc;
->>>> +    cxlmd->depth = -1;
->>>>       cxlmd->cxlds = cxlds;
->>>>       cxlds->cxlmd = cxlmd;
->>>> -    cdev = &cxlmd->cdev;
->>>> -    rc = cdev_device_add(cdev, dev);
->>>> -    if (rc)
->>>> -        goto err;
->>>> +    dev = &cxlmd->dev;
->>>> +    device_initialize(dev);
->>>> +    lockdep_set_class(&dev->mutex, &cxl_memdev_key);
->>>> +    dev->parent = cxlds->dev;
->>>> +    dev->bus = &cxl_bus_type;
->>>> +    dev->devt = MKDEV(cxl_mem_major, cxlmd->id);
->>>> +    dev->type = &cxl_memdev_type;
->>>> +    device_set_pm_not_required(dev);
->>>> +    INIT_WORK(&cxlmd->detach_work, detach_memdev);
->>>> -    rc = devm_add_action_or_reset(host, cxl_memdev_unregister, 
->>>> cxlmd);
->>>> -    if (rc)
->>>> -        return ERR_PTR(rc);
->>>> +    cdev = &cxlmd->cdev;
->>>> +    cdev_init(cdev, &cxl_memdev_fops);
->>>>       return cxlmd;
->>>>   err:
->>>> -    /*
->>>> -     * The cdev was briefly live, shutdown any ioctl operations that
->>>> -     * saw that state.
->>>> -     */
->>>> -    cxl_memdev_shutdown(dev);
->>>> -    put_device(dev);
->>>> +    kfree(cxlmd);
->>>>       return ERR_PTR(rc);
->>>>   }
->>>> -EXPORT_SYMBOL_NS_GPL(devm_cxl_add_memdev, "CXL");
->>>> +EXPORT_SYMBOL_NS_GPL(cxl_memdev_alloc, "CXL");
->>>>   static void sanitize_teardown_notifier(void *data)
->>>>   {
->>>> diff --git a/drivers/cxl/mem.c b/drivers/cxl/mem.c
->>>> index f7dc0ba8905d..144749b9c818 100644
->>>> --- a/drivers/cxl/mem.c
->>>> +++ b/drivers/cxl/mem.c
->>>> @@ -7,6 +7,7 @@
->>>>   #include "cxlmem.h"
->>>>   #include "cxlpci.h"
->>>> +#include "private.h"
->>>>   #include "core/core.h"
->>>>   /**
->>>> @@ -203,6 +204,34 @@ static int cxl_mem_probe(struct device *dev)
->>>>       return devm_add_action_or_reset(dev, enable_suspend, NULL);
->>>>   }
->>>> +/**
->>>> + * devm_cxl_add_memdev - Add a CXL memory device
->>>> + * @host: devres alloc/release context and parent for the memdev
->>>> + * @cxlds: CXL device state to associate with the memdev
->>>> + *
->>>> + * Upon return the device will have had a chance to attach to the
->>>> + * cxl_mem driver, but may fail if the CXL topology is not ready
->>>> + * (hardware CXL link down, or software platform CXL root not 
->>>> attached)
->>>> + */
->>>> +struct cxl_memdev *devm_cxl_add_memdev(struct device *host,
->>>> +                       struct cxl_dev_state *cxlds)
->>>> +{
->>>> +    struct cxl_memdev *cxlmd = cxl_memdev_alloc(cxlds);
->>> Bit marginal but you could do a DEFINE_FREE() for cxlmd
->>> similar to the one that exists for put_cxl_port
->>>
->>> You would then need to steal the pointer for the devm_ call at the
->>> end of this function.
->>
->>
->> We are not freeing cxlmd in case of errors after we got the 
->> allocation, so I think it makes sense.
->>
->>
->> Thank you.
->>
->>
->>>
->>>> +    int rc;
->>>> +
->>>> +    if (IS_ERR(cxlmd))
->>>> +        return cxlmd;
->>>> +
->>>> +    rc = dev_set_name(&cxlmd->dev, "mem%d", cxlmd->id);
->>>> +    if (rc) {
->>>> +        put_device(&cxlmd->dev);
->>>> +        return ERR_PTR(rc);
->>>> +    }
->>>> +
->>>> +    return devm_cxl_memdev_add_or_reset(host, cxlmd);
->>>> +}
->>>> +EXPORT_SYMBOL_NS_GPL(devm_cxl_add_memdev, "CXL");
->>
->
+Perhaps we should simply measure the impact on devmap + 2nd XDP-prog
+doing XDP_DROP.  Then, we can see if overhead is acceptable... ?
+
+> ... and the slow path for reference:
+> 
+>    bench_page_pool: time_bench_page_pool02_ptr_ring(): in_serving_softirq fast-path
+>    bench_page_pool: Type:tasklet_page_pool02_ptr_ring Per elem: 30 cycles(tsc) 15.395 ns (step:0)
+
+The devmap user will basically fallback to using this code path.
+
+> So the impact is small in the fast-path, but not negligible. One thing
+> to consider is the fact that the comparisons from napi_direct are
+> dropped. That means that the impact will be smaller than the
+> measurements from the benchmark.
+> 
+> [1] Commit 2b986b9e917b ("bpf, cpumap: Disable page_pool direct xdp_return need larger scope")
+> [2] Intel Xeon Platinum 8580
+> 
+> Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+> ---
+>   drivers/net/veth.c     |  2 --
+>   include/linux/filter.h | 22 ----------------------
+>   include/net/xdp.h      |  2 +-
+>   kernel/bpf/cpumap.c    |  2 --
+>   net/bpf/test_run.c     |  2 --
+>   net/core/filter.c      |  2 +-
+>   net/core/xdp.c         | 24 ++++++++++++------------
+>   7 files changed, 14 insertions(+), 42 deletions(-)
+> 
+> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+> index a3046142cb8e..6d5c1e0b05a7 100644
+> --- a/drivers/net/veth.c
+> +++ b/drivers/net/veth.c
+> @@ -975,7 +975,6 @@ static int veth_poll(struct napi_struct *napi, int budget)
+>   
+>   	bq.count = 0;
+>   
+> -	xdp_set_return_frame_no_direct();
+>   	done = veth_xdp_rcv(rq, budget, &bq, &stats);
+>   
+>   	if (stats.xdp_redirect > 0)
+> @@ -994,7 +993,6 @@ static int veth_poll(struct napi_struct *napi, int budget)
+>   
+>   	if (stats.xdp_tx > 0)
+>   		veth_xdp_flush(rq, &bq);
+> -	xdp_clear_return_frame_no_direct();
+>   
+>   	return done;
+>   }
+> diff --git a/include/linux/filter.h b/include/linux/filter.h
+> index f5c859b8131a..877e40d81a4c 100644
+> --- a/include/linux/filter.h
+> +++ b/include/linux/filter.h
+> @@ -764,7 +764,6 @@ struct bpf_nh_params {
+>   };
+>   
+>   /* flags for bpf_redirect_info kern_flags */
+> -#define BPF_RI_F_RF_NO_DIRECT	BIT(0)	/* no napi_direct on return_frame */
+>   #define BPF_RI_F_RI_INIT	BIT(1)
+>   #define BPF_RI_F_CPU_MAP_INIT	BIT(2)
+>   #define BPF_RI_F_DEV_MAP_INIT	BIT(3)
+> @@ -1163,27 +1162,6 @@ struct bpf_prog *bpf_patch_insn_single(struct bpf_prog *prog, u32 off,
+>   				       const struct bpf_insn *patch, u32 len);
+>   int bpf_remove_insns(struct bpf_prog *prog, u32 off, u32 cnt);
+>   
+> -static inline bool xdp_return_frame_no_direct(void)
+> -{
+> -	struct bpf_redirect_info *ri = bpf_net_ctx_get_ri();
+> -
+> -	return ri->kern_flags & BPF_RI_F_RF_NO_DIRECT;
+> -}
+> -
+> -static inline void xdp_set_return_frame_no_direct(void)
+> -{
+> -	struct bpf_redirect_info *ri = bpf_net_ctx_get_ri();
+> -
+> -	ri->kern_flags |= BPF_RI_F_RF_NO_DIRECT;
+> -}
+> -
+> -static inline void xdp_clear_return_frame_no_direct(void)
+> -{
+> -	struct bpf_redirect_info *ri = bpf_net_ctx_get_ri();
+> -
+> -	ri->kern_flags &= ~BPF_RI_F_RF_NO_DIRECT;
+> -}
+> -
+>   static inline int xdp_ok_fwd_dev(const struct net_device *fwd,
+>   				 unsigned int pktlen)
+>   {
+> diff --git a/include/net/xdp.h b/include/net/xdp.h
+> index aa742f413c35..2a44d84a7611 100644
+> --- a/include/net/xdp.h
+> +++ b/include/net/xdp.h
+> @@ -446,7 +446,7 @@ struct xdp_frame *xdp_convert_buff_to_frame(struct xdp_buff *xdp)
+>   }
+>   
+>   void __xdp_return(netmem_ref netmem, enum xdp_mem_type mem_type,
+> -		  bool napi_direct, struct xdp_buff *xdp);
+> +		  struct xdp_buff *xdp);
+>   void xdp_return_frame(struct xdp_frame *xdpf);
+>   void xdp_return_frame_rx_napi(struct xdp_frame *xdpf);
+>   void xdp_return_buff(struct xdp_buff *xdp);
+> diff --git a/kernel/bpf/cpumap.c b/kernel/bpf/cpumap.c
+> index 703e5df1f4ef..3ece03dc36bd 100644
+> --- a/kernel/bpf/cpumap.c
+> +++ b/kernel/bpf/cpumap.c
+> @@ -253,7 +253,6 @@ static void cpu_map_bpf_prog_run(struct bpf_cpu_map_entry *rcpu, void **frames,
+>   
+>   	rcu_read_lock();
+>   	bpf_net_ctx = bpf_net_ctx_set(&__bpf_net_ctx);
+> -	xdp_set_return_frame_no_direct();
+>   
+>   	ret->xdp_n = cpu_map_bpf_prog_run_xdp(rcpu, frames, ret->xdp_n, stats);
+>   	if (unlikely(ret->skb_n))
+> @@ -263,7 +262,6 @@ static void cpu_map_bpf_prog_run(struct bpf_cpu_map_entry *rcpu, void **frames,
+>   	if (stats->redirect)
+>   		xdp_do_flush();
+>   
+> -	xdp_clear_return_frame_no_direct();
+>   	bpf_net_ctx_clear(bpf_net_ctx);
+>   	rcu_read_unlock();
+>   
+> diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
+> index 8b7d0b90fea7..a0fe03e9e527 100644
+> --- a/net/bpf/test_run.c
+> +++ b/net/bpf/test_run.c
+> @@ -289,7 +289,6 @@ static int xdp_test_run_batch(struct xdp_test_data *xdp, struct bpf_prog *prog,
+>   	local_bh_disable();
+>   	bpf_net_ctx = bpf_net_ctx_set(&__bpf_net_ctx);
+>   	ri = bpf_net_ctx_get_ri();
+> -	xdp_set_return_frame_no_direct();
+>   
+>   	for (i = 0; i < batch_sz; i++) {
+>   		page = page_pool_dev_alloc_pages(xdp->pp);
+> @@ -352,7 +351,6 @@ static int xdp_test_run_batch(struct xdp_test_data *xdp, struct bpf_prog *prog,
+>   			err = ret;
+>   	}
+>   
+> -	xdp_clear_return_frame_no_direct();
+>   	bpf_net_ctx_clear(bpf_net_ctx);
+>   	local_bh_enable();
+>   	return err;
+> diff --git a/net/core/filter.c b/net/core/filter.c
+> index 16105f52927d..5622ec5ac19c 100644
+> --- a/net/core/filter.c
+> +++ b/net/core/filter.c
+> @@ -4187,7 +4187,7 @@ static bool bpf_xdp_shrink_data(struct xdp_buff *xdp, skb_frag_t *frag,
+>   	}
+>   
+>   	if (release) {
+> -		__xdp_return(netmem, mem_type, false, zc_frag);
+> +		__xdp_return(netmem, mem_type, zc_frag);
+>   	} else {
+>   		if (!tail)
+>   			skb_frag_off_add(frag, shrink);
+> diff --git a/net/core/xdp.c b/net/core/xdp.c
+> index 9100e160113a..cf8eab699d9a 100644
+> --- a/net/core/xdp.c
+> +++ b/net/core/xdp.c
+> @@ -431,18 +431,18 @@ EXPORT_SYMBOL_GPL(xdp_rxq_info_attach_page_pool);
+>    * of xdp_frames/pages in those cases.
+>    */
+>   void __xdp_return(netmem_ref netmem, enum xdp_mem_type mem_type,
+> -		  bool napi_direct, struct xdp_buff *xdp)
+> +		  struct xdp_buff *xdp)
+>   {
+>   	switch (mem_type) {
+>   	case MEM_TYPE_PAGE_POOL:
+>   		netmem = netmem_compound_head(netmem);
+> -		if (napi_direct && xdp_return_frame_no_direct())
+> -			napi_direct = false;
+> +
+>   		/* No need to check netmem_is_pp() as mem->type knows this a
+>   		 * page_pool page
+> +		 *
+> +		 * page_pool can detect direct recycle.
+>   		 */
+> -		page_pool_put_full_netmem(netmem_get_pp(netmem), netmem,
+> -					  napi_direct);
+> +		page_pool_put_full_netmem(netmem_get_pp(netmem), netmem, false);
+>   		break;
+>   	case MEM_TYPE_PAGE_SHARED:
+>   		page_frag_free(__netmem_address(netmem));
+> @@ -471,10 +471,10 @@ void xdp_return_frame(struct xdp_frame *xdpf)
+>   	sinfo = xdp_get_shared_info_from_frame(xdpf);
+>   	for (u32 i = 0; i < sinfo->nr_frags; i++)
+>   		__xdp_return(skb_frag_netmem(&sinfo->frags[i]), xdpf->mem_type,
+> -			     false, NULL);
+> +			     NULL);
+>   
+>   out:
+> -	__xdp_return(virt_to_netmem(xdpf->data), xdpf->mem_type, false, NULL);
+> +	__xdp_return(virt_to_netmem(xdpf->data), xdpf->mem_type, NULL);
+>   }
+>   EXPORT_SYMBOL_GPL(xdp_return_frame);
+>   
+> @@ -488,10 +488,10 @@ void xdp_return_frame_rx_napi(struct xdp_frame *xdpf)
+>   	sinfo = xdp_get_shared_info_from_frame(xdpf);
+>   	for (u32 i = 0; i < sinfo->nr_frags; i++)
+>   		__xdp_return(skb_frag_netmem(&sinfo->frags[i]), xdpf->mem_type,
+> -			     true, NULL);
+> +			     NULL);
+>   
+>   out:
+> -	__xdp_return(virt_to_netmem(xdpf->data), xdpf->mem_type, true, NULL);
+> +	__xdp_return(virt_to_netmem(xdpf->data), xdpf->mem_type, NULL);
+>   }
+>   EXPORT_SYMBOL_GPL(xdp_return_frame_rx_napi);
+
+The changed to xdp_return_frame_rx_napi() makes it equvilent to 
+xdp_return_frame().
+
+>   
+> @@ -542,7 +542,7 @@ EXPORT_SYMBOL_GPL(xdp_return_frame_bulk);
+>    */
+>   void xdp_return_frag(netmem_ref netmem, const struct xdp_buff *xdp)
+>   {
+> -	__xdp_return(netmem, xdp->rxq->mem.type, true, NULL);
+> +	__xdp_return(netmem, xdp->rxq->mem.type, NULL);
+>   }
+>   EXPORT_SYMBOL_GPL(xdp_return_frag);
+>   
+> @@ -556,10 +556,10 @@ void xdp_return_buff(struct xdp_buff *xdp)
+>   	sinfo = xdp_get_shared_info_from_buff(xdp);
+>   	for (u32 i = 0; i < sinfo->nr_frags; i++)
+>   		__xdp_return(skb_frag_netmem(&sinfo->frags[i]),
+> -			     xdp->rxq->mem.type, true, xdp);
+> +			     xdp->rxq->mem.type, xdp);
+>   
+>   out:
+> -	__xdp_return(virt_to_netmem(xdp->data), xdp->rxq->mem.type, true, xdp);
+> +	__xdp_return(virt_to_netmem(xdp->data), xdp->rxq->mem.type, xdp);
+>   }
+>   EXPORT_SYMBOL_GPL(xdp_return_buff);
+>   
+
 
