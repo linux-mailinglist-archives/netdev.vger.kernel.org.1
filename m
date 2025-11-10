@@ -1,183 +1,205 @@
-Return-Path: <netdev+bounces-237266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4E16C47E3F
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 17:19:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9041C47EAE
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 17:25:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 7FE264F9464
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 16:11:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A21E43AA51D
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 16:13:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 103FF274FC1;
-	Mon, 10 Nov 2025 16:10:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FFF523F431;
+	Mon, 10 Nov 2025 16:13:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EWgnCEPm";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="cwSUzKFb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="L1KcKtVg"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5706E22FDEC
-	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 16:10:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 547212749CF
+	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 16:13:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762791053; cv=none; b=jtVvbUKmsMDI0ge1c1VQIAeCTYIFG1/rqWdF0d6hQuKxGIiivmWmx2nVsAFMHTsle+XVzNXmI+LiykLVrVlRb80q8yNR3AdQ284ys5xr6q+G6rHIabEj7J+cnImmSR12J4L0aSzjBHwMC6El5oLBP5u3NeMZPLOb38nEq5zUSZ8=
+	t=1762791216; cv=none; b=r76Zcm0ngd2PAcUtp1QtH93mshSyPFskUSIomhGEHq3eJn94QoQqE6wNoOL1+T8tcFSgAeXyRyt8PTkmE7TbQfyzsFg3XCbaBxd4XaswrNNI3wRdpZxMKZxMvTUZ6kBlsp+Rf5laakBVh+gKqGscbEPG7pcgs8yXDK6F3G3Z35A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762791053; c=relaxed/simple;
-	bh=yWwqc79ICtjxfNEwAhdveBII+kI6tv7V46J5xGUbxqU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Beeo92fzi91vcqj+9IyHJk/Xc5S080SRHjmQI8lMCKEp+z+3yYj3IMD8i8qeO4GDRNatcdAPo6c8ELSiLSANuAkfWkwjq9hZr58T577jtlYqH9vgQMx/28Nx9vBCKmDhZGgxZXZ9C4PrhHMjq5zw46utTPi9s+ZJmgLyX2zsx9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EWgnCEPm; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=cwSUzKFb; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762791051;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BcHc3rh06YWG1Go43rMQsJeOtpbumA9Fnt4ZDm9Fg9Q=;
-	b=EWgnCEPmrLHoDP8+s8JWioZEogvHO8lMQujTWIwx128kpIMIHK/RDVU+3PdZ03gt5/s2Nd
-	N4auRo8E2LCQyWiRkZVGcY/rsf+Ig6lxCQPy2UD/WE+5mjBmFH34oq3H0F2J7cFM42JDSC
-	KAYBX43ettHPKOY35da3REicUgnKU8M=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-18-VxaD9nJlM1OkpWaF8mgONQ-1; Mon, 10 Nov 2025 11:10:49 -0500
-X-MC-Unique: VxaD9nJlM1OkpWaF8mgONQ-1
-X-Mimecast-MFC-AGG-ID: VxaD9nJlM1OkpWaF8mgONQ_1762791047
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4777a022d1fso10822155e9.0
-        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 08:10:48 -0800 (PST)
+	s=arc-20240116; t=1762791216; c=relaxed/simple;
+	bh=45YJwUQzpMWCgvBQpaBjV7Wi5IeIa2o3npqWXDnUN30=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GvdMFohyBzZelBwWgVYk/7rtccWyeMvP5dti8ZnKe0oMPgxT1lrbermbVamwl8PHyJ2HA52f7bHFXKTN0bZDfk6NAWNjArplF9MF7ntDo1Si5DguDer1If5Y+DL+jZlbtBRzdguyJClf/fmpo3A4gkbkesNRHJTa3YxzVdMpePM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=L1KcKtVg; arc=none smtp.client-ip=209.85.160.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-4ed75832448so47383491cf.2
+        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 08:13:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762791047; x=1763395847; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=BcHc3rh06YWG1Go43rMQsJeOtpbumA9Fnt4ZDm9Fg9Q=;
-        b=cwSUzKFbu6QWJx2zwwH7yz/80lSEqXyzdxeHbzpP7DPyRBWeoq2CHMZdB4BKMOA/E6
-         UyA3lA8a/rxp9ScL3wgOH2o1nyhxj7D/WB7qDP5V0oMuzHC5QEHpIpWpHYrt0IEBHEGa
-         dE53alEDjanX2H2PrqDhlGYB/1LjrHhQ8bYRHoivOdCLS+SrAHLSQD8Ixm7A6aMj1VOE
-         b4K/3+9+55lLIsOuXORXQugd/wNR3zIAmkDwV1W2MRN5tGuXqeGcmaIa4XeTtcs3UvcL
-         r5tEjBPZr26PrQ5a9bJCxgX3HmVq+jFHEatrPnZlLBtPlqMOV2PGW/ob3Ijf/GUxUeR9
-         gTyg==
+        d=google.com; s=20230601; t=1762791211; x=1763396011; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=atUanUU7v1dfMFE+26Gkh+vlNkJKIIlxRYAOvI0Qxys=;
+        b=L1KcKtVgfkPIeuvB80Pv6loWI4yMEeeWwQ4ZslRGgbP01F+CgfebOTmaYoi2adWSok
+         P3DAvy32nWlOi+qYnHe/4fPuMnUd3r9F5dCBUta1OQYMwUVPDNpxFlEyqQNKEP/Zglsm
+         6yZd/7F89w9hLa9e2zu1NaHpTh3u1jVA1lqaFzNH+FJ8hi7Zkkqm7ll5K1v79tTEB5Iv
+         FsSbJW2f/b9t4GjP2atfB3JYhMEwr0ZQrPEcgNywVH/7fIgaMepksz3SETfFdRke9Vgv
+         65gfXbpzeJ2j3Ku3iEZtC1doRYh3w1F4PVz/mieZSyKzJ9fK1y5aOr8lKo89imY4EKL9
+         ASxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762791047; x=1763395847;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BcHc3rh06YWG1Go43rMQsJeOtpbumA9Fnt4ZDm9Fg9Q=;
-        b=hc6v+MBn3wThmTSbew5m6zr1tbC0IFug0R+Xtx5sMqyW+S3ssB4lIHn9XyX/b/mKry
-         M4TY11H2vXOKvWLwrsfnFq4RqNIWiaEuG3PFM1vbzhdeXmLAk/LG5ird8Mma+DLNvggg
-         70CC+ylt6tbH9p+5JwPl1GrYllYXSlUiOlRycg9x5FN+IzYxK1DZQbWJv7DsuTIrQGGZ
-         OOdlZHZygOpG9afhayN7IVQlvd7CO5Cafaz5KWqfkgbFpaw/D3NTEnr/nWtBYfun3xFd
-         Di4xh3sCaRlUWVOU6K4h441vpfxGbMPeq9n7XHANpu1fhK1pcqXMXOgo5xk/JTIfdb8V
-         B6eg==
-X-Forwarded-Encrypted: i=1; AJvYcCUxjRIRpvIuxMImklnWfvY18E+zS0FGn/HLPtwULfai+jKIS5CIhi0abHYLiSabT4CVoETYxlo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwARR+wtacH/1QeF4JmCImkdLYFG4+mNa8ha+b+Z5uWNYmQLj1s
-	K3doPJveOBxv363evFN85mFHQz+LSxIDFFezcrpF8L0vALhiIi5Smgqhzn25icz4NmTDsx6e/hl
-	4u/2mjAZC215QtpERBuqWPdajeYRmALImfZ+fA+VzV2h3ycnvSpSnizUvrQ==
-X-Gm-Gg: ASbGncuN8dYGSsrAdf71npIbp7HOVNfh/qUYYowK2/hegomkfYA6MRXxuIbdPpMINBD
-	9hWJLJgFV4CuhrcyXt6OtlbA5tMgEqqrJRLPfhVpUkmsNSK/tGd9oOjRkBRm5LSqzlCDA7DPImx
-	FZ2IOosjs0XhLtGxgvVOQHnit++2IKygNTyH61Oss93EuupPJ2T4MTP8ouaas0jdqammkHWnNho
-	VXCRYuV6hKAgXr1NLZBHExG5TUNrBnBVPIuX3UBFSIjSQkw0MeHyhQCkUJ95hA+Fj0jSHbZLgy+
-	d/xupa7ojnl04eB+x+FVygXAl+5bJL5lJVSI7LTDUHH3bWXFFl8ZqXOla3kTjY90HvQ=
-X-Received: by 2002:a05:600c:46ce:b0:46e:4b79:551 with SMTP id 5b1f17b1804b1-47773288bbfmr90576155e9.31.1762791047359;
-        Mon, 10 Nov 2025 08:10:47 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHlSd9E64YfjmEcCoLlPhCD+mhQhwPyWeJ7FNhdbF5w48th7xgvNaehDUYwbRr0JRyKdDFjYQ==
-X-Received: by 2002:a05:600c:46ce:b0:46e:4b79:551 with SMTP id 5b1f17b1804b1-47773288bbfmr90575765e9.31.1762791046799;
-        Mon, 10 Nov 2025 08:10:46 -0800 (PST)
-Received: from redhat.com ([2a0d:6fc0:1536:2700:9203:49b4:a0d:b580])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4776bccd41bsm208552935e9.2.2025.11.10.08.10.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Nov 2025 08:10:46 -0800 (PST)
-Date: Mon, 10 Nov 2025 11:10:43 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Heng Qi <hengqi@linux.alibaba.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Alvaro Karsz <alvaro.karsz@solid-run.com>,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH net v4 3/4] virtio-net: correct hdr_len handling for
- VIRTIO_NET_F_GUEST_HDRLEN
-Message-ID: <20251110110751-mutt-send-email-mst@kernel.org>
-References: <20251029030913.20423-1-xuanzhuo@linux.alibaba.com>
- <20251029030913.20423-4-xuanzhuo@linux.alibaba.com>
- <CACGkMEu=Zs-T0WyD7mrWjuRDdufvRiz2DM=98neD+L2npP5_dQ@mail.gmail.com>
- <20251109163911-mutt-send-email-mst@kernel.org>
- <CACGkMEtxfZh=66TSTC2B8TdXWP-fsTrYFkfz5aOViYkZmmcvxg@mail.gmail.com>
- <20251110022550-mutt-send-email-mst@kernel.org>
- <CACGkMEt+czNGi_KFgnHkZteNVNmBc7ND_xh7R=uNDo-ZumFEfA@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1762791211; x=1763396011;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=atUanUU7v1dfMFE+26Gkh+vlNkJKIIlxRYAOvI0Qxys=;
+        b=NN2KVZQ32z2GPicvgiNQPKUc+6nlWTG+unYqqzyuk2KhhTCjrgdU++kh0NSPiw25RR
+         +HcvKSfhje0PVpcBYL1pyfqnheRXTVXdb1195clgPxUWdvztJzTVIL85DTHuR3urufih
+         8ymLrs3XKdSjHUYJW4OSey7P7nyKxW2wWcvhqK2jKhbSTlHw4nNXuPU/Qhs+RU39gw+X
+         24T1PcPVeHKTaIcn0A1gXTt9eIkq+jdbD1onwrB2AVjsvq+NaidnFxAgWLWmCApXpi34
+         qsOw5cUUID4khnbZA+jXPd0XQcMdbZ9vPceLIOUorfAnkvXYEV7EeFcDd8uINWF8s9zs
+         s0lQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWX7+GtVR396P4LC1fsYeDHC4JJhyI3r/h1T8UXCtSLfTqYQKc1j0yKZNiEh38IJzCiMBk2k3c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBra4yduQr4+vksm5Y4GvgN4/+jlCT18URkOV67BDMrPBpmIQX
+	+l8AyfXC/d9MHrIrxHHcTiuwLp6qtDxsT8312inyZxOvtpMPIcrPe9SGEiSKrehh4qsfYPdGURf
+	3fz+4bCFpaPxKvnFrVOp3DFjJQ2bFdsqtQ8+kvMsh
+X-Gm-Gg: ASbGncs2VvGtuUAs777cMEEpAeWcCMREWEZq4M2NTWU1Zupywza6rjOvy7ja8zul2kB
+	Xy2Di58WRrGS5Ai+9eZnBI7AZdAuNleWbSg5nKBOFIeFYIeVjzP5HRyYWgUTq9XJURom7v9Zc9p
+	R8ZgpzUmBogb1vOd/ouBlrm2ZrANJlOsV8aCliMDLhzLrkTldzw/qWWBFpCX+Po1Xwk9Puwjd7/
+	I6ySgNGFvpvJNNS45HDB2hIzqOCjK96t0ctkyjf/kdxl5x1d06/H+J8/9Wu
+X-Google-Smtp-Source: AGHT+IG7cHsqhXHV5tsGObwH5lGc09woWfwcyDlh3ucXOZsfkdPKtH1gmZUKkIehaHFN3IaV5mPZxvtBgxbbH+gDVcs=
+X-Received: by 2002:ac8:574b:0:b0:4eb:a24d:8c24 with SMTP id
+ d75a77b69052e-4eda4fd4ff6mr113946901cf.67.1762791210655; Mon, 10 Nov 2025
+ 08:13:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEt+czNGi_KFgnHkZteNVNmBc7ND_xh7R=uNDo-ZumFEfA@mail.gmail.com>
+References: <20251106111054.3288127-1-edumazet@google.com> <CADvbK_fZABufnbF9vsS_GZ6OgYfKb7nT3NDdT+iO-C7Rw9K6mw@mail.gmail.com>
+ <CANn89iLUiYteUoLV_AiZeW8rJe5ns5uu5gmQHbjmdQPD3sZy5A@mail.gmail.com> <CADvbK_ec6_YZzZ8H+2PP+XV1Y0xE-SrTFbhf0aNspsr-N-0SDw@mail.gmail.com>
+In-Reply-To: <CADvbK_ec6_YZzZ8H+2PP+XV1Y0xE-SrTFbhf0aNspsr-N-0SDw@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 10 Nov 2025 08:13:19 -0800
+X-Gm-Features: AWmQ_bkNwzgBs07kp1GTHV_WbR_tnx_0luhWJSCMpEFXxJ4G__on_Ohnw9yVmUw
+Message-ID: <CANn89i+RuN43Gy6jgd9kW3kjGkzonx6-sP0QP6PNid4_9gP4RQ@mail.gmail.com>
+Subject: Re: [PATCH net] sctp: prevent possible shift-out-of-bounds in sctp_transport_update_rto
+To: Xin Long <lucien.xin@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	syzbot+f8c46c8b2b7f6e076e99@syzkaller.appspotmail.com, 
+	Daniel Borkmann <daniel@iogearbox.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 10, 2025 at 03:39:50PM +0800, Jason Wang wrote:
-> On Mon, Nov 10, 2025 at 3:27 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+On Mon, Nov 10, 2025 at 8:10=E2=80=AFAM Xin Long <lucien.xin@gmail.com> wro=
+te:
+>
+> On Mon, Nov 10, 2025 at 10:42=E2=80=AFAM Eric Dumazet <edumazet@google.co=
+m> wrote:
 > >
-> > On Mon, Nov 10, 2025 at 03:16:08PM +0800, Jason Wang wrote:
-> > > On Mon, Nov 10, 2025 at 5:41 AM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > >
-> > > > On Thu, Oct 30, 2025 at 10:53:01AM +0800, Jason Wang wrote:
-> > > > > On Wed, Oct 29, 2025 at 11:09 AM Xuan Zhuo <xuanzhuo@linux.alibaba.com> wrote:
-> > > > > >
-> > > > > > The commit be50da3e9d4a ("net: virtio_net: implement exact header length
-> > > > > > guest feature") introduces support for the VIRTIO_NET_F_GUEST_HDRLEN
-> > > > > > feature in virtio-net.
-> > > > > >
-> > > > > > This feature requires virtio-net to set hdr_len to the actual header
-> > > > > > length of the packet when transmitting, the number of
-> > > > > > bytes from the start of the packet to the beginning of the
-> > > > > > transport-layer payload.
-> > > > > >
-> > > > > > However, in practice, hdr_len was being set using skb_headlen(skb),
-> > > > > > which is clearly incorrect. This commit fixes that issue.
-> > > > >
-> > > > > I still think it would be more safe to check the feature
-> > > >
-> > > > which feature VIRTIO_NET_F_GUEST_HDRLEN ?
-> > > >
+> > On Mon, Nov 10, 2025 at 7:36=E2=80=AFAM Xin Long <lucien.xin@gmail.com>=
+ wrote:
 > > >
-> > > Yes.
+> > > On Thu, Nov 6, 2025 at 6:10=E2=80=AFAM Eric Dumazet <edumazet@google.=
+com> wrote:
+> > > >
+> > > > syzbot reported a possible shift-out-of-bounds [1]
+> > > >
+> > > > Blamed commit added rto_alpha_max and rto_beta_max set to 1000.
+> > > >
+> > > > It is unclear if some sctp users are setting very large rto_alpha
+> > > > and/or rto_beta.
+> > > >
+> > > > In order to prevent user regression, perform the test at run time.
+> > > >
+> > > > Also add READ_ONCE() annotations as sysctl values can change under =
+us.
+> > > >
+> > > > [1]
+> > > >
+> > > > UBSAN: shift-out-of-bounds in net/sctp/transport.c:509:41
+> > > > shift exponent 64 is too large for 32-bit type 'unsigned int'
+> > > > CPU: 0 UID: 0 PID: 16704 Comm: syz.2.2320 Not tainted syzkaller #0 =
+PREEMPT(full)
+> > > > Hardware name: Google Google Compute Engine/Google Compute Engine, =
+BIOS Google 10/02/2025
+> > > > Call Trace:
+> > > >  <TASK>
+> > > >   __dump_stack lib/dump_stack.c:94 [inline]
+> > > >   dump_stack_lvl+0x16c/0x1f0 lib/dump_stack.c:120
+> > > >   ubsan_epilogue lib/ubsan.c:233 [inline]
+> > > >   __ubsan_handle_shift_out_of_bounds+0x27f/0x420 lib/ubsan.c:494
+> > > >   sctp_transport_update_rto.cold+0x1c/0x34b net/sctp/transport.c:50=
+9
+> > > >   sctp_check_transmitted+0x11c4/0x1c30 net/sctp/outqueue.c:1502
+> > > >   sctp_outq_sack+0x4ef/0x1b20 net/sctp/outqueue.c:1338
+> > > >   sctp_cmd_process_sack net/sctp/sm_sideeffect.c:840 [inline]
+> > > >   sctp_cmd_interpreter net/sctp/sm_sideeffect.c:1372 [inline]
+> > > >
+> > > > Fixes: b58537a1f562 ("net: sctp: fix permissions for rto_alpha and =
+rto_beta knobs")
+> > > > Reported-by: syzbot+f8c46c8b2b7f6e076e99@syzkaller.appspotmail.com
+> > > > Closes: https://lore.kernel.org/netdev/690c81ae.050a0220.3d0d33.014=
+e.GAE@google.com/T/#u
+> > > > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > > > Cc: Daniel Borkmann <daniel@iogearbox.net>
+> > > > ---
+> > > >  net/sctp/transport.c | 13 +++++++++----
+> > > >  1 file changed, 9 insertions(+), 4 deletions(-)
+> > > >
+> > > > diff --git a/net/sctp/transport.c b/net/sctp/transport.c
+> > > > index 0d48c61fe6adefc1a9c56ca1b8ab00072825d9e6..0c56d9673cc137e3f1a=
+64311e79bd41db2cb1282 100644
+> > > > --- a/net/sctp/transport.c
+> > > > +++ b/net/sctp/transport.c
+> > > > @@ -486,6 +486,7 @@ void sctp_transport_update_rto(struct sctp_tran=
+sport *tp, __u32 rtt)
+> > > >
+> > > >         if (tp->rttvar || tp->srtt) {
+> > > >                 struct net *net =3D tp->asoc->base.net;
+> > > > +               unsigned int rto_beta, rto_alpha;
+> > > >                 /* 6.3.1 C3) When a new RTT measurement R' is made,=
+ set
+> > > >                  * RTTVAR <- (1 - RTO.Beta) * RTTVAR + RTO.Beta * |=
+SRTT - R'|
+> > > >                  * SRTT <- (1 - RTO.Alpha) * SRTT + RTO.Alpha * R'
+> > > > @@ -497,10 +498,14 @@ void sctp_transport_update_rto(struct sctp_tr=
+ansport *tp, __u32 rtt)
+> > > >                  * For example, assuming the default value of RTO.A=
+lpha of
+> > > >                  * 1/8, rto_alpha would be expressed as 3.
+> > > >                  */
+> > > > -               tp->rttvar =3D tp->rttvar - (tp->rttvar >> net->sct=
+p.rto_beta)
+> > > > -                       + (((__u32)abs((__s64)tp->srtt - (__s64)rtt=
+)) >> net->sctp.rto_beta);
+> > > > -               tp->srtt =3D tp->srtt - (tp->srtt >> net->sctp.rto_=
+alpha)
+> > > > -                       + (rtt >> net->sctp.rto_alpha);
+> > > > +               rto_beta =3D READ_ONCE(net->sctp.rto_beta);
+> > > > +               if (rto_beta < 32)
+> > > Wouldn't be better to do:
 > > >
-> > > Thanks
+> > > rto_beta =3D min(READ_ONCE(net->sctp.rto_beta), 31U); ?
+> > >
+> > > so that when rto_alpha >=3D 32, the update will not be skipped entire=
+ly.
 > >
-> > Seems more conservative for sure, though an extra mode to maintain isn't
-> > great. Hmm?
-> 
-> Considering it's not a lot of code, it might be worth it to reduce the risk.
-> 
-> But I'm fine if you think we can go with this patch.
-> 
-> Thanks
-
-hard to say what does "not a lot of code" mean here.
-but generally if VIRTIO_NET_F_GUEST_HDRLEN is not set
-just doing a quick skb_headlen and not poking at
-the transport things sounds like a win.
-
-I'd like to at least see the patch along the lines you propose,
-and we will judge if it's too much mess to support.
-
-
+> > Skipping or not the update is a matter of taste really.
 > >
-> > --
-> > MST
+> > If someone was setting 30 or more, it was expecting tp->rttvar and
+> > tp->srtt to not change at all,
 > >
+> But you do see (u32) >> 31 can be 1, that makes the tp->rttvar/srtt
+> change slightly.
+> So the 'expecting no change' is from practical experience, right?
 
+EWMA31 on rtt is a NOP, unless rtt is more than 2^31
+
+A - (A >> 31) + (RTT >> 31)   -> A
+
+Is SCTP dealing with this level of RTT ?
+
+If yes, I would suggest switching to u64
 
