@@ -1,314 +1,163 @@
-Return-Path: <netdev+bounces-237146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27884C461E3
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 12:07:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76140C4625D
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 12:10:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E460A1885957
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 11:07:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2790F3A8DE4
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 11:10:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 175BC307486;
-	Mon, 10 Nov 2025 11:06:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lDEn1IiD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15A04302CC9;
+	Mon, 10 Nov 2025 11:10:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18ACD273F9
-	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 11:06:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D45CC301472;
+	Mon, 10 Nov 2025 11:10:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762772811; cv=none; b=O17xzk3yvwAmZvXXFvsEEGgsQ2HGQ53T5xexvNGCVf8bZQW3bG8m19fDVlwaU/a30QiiEbqQlE6flgUz8fFBl3PDnDWR6+NpX0HVLMJ8FEGrsfNHGEd3YHyVYzyO9+VZn9VDMOMIplJUuFVXrinXCI9mk9z9j6ZiZHScgvQEfkE=
+	t=1762773008; cv=none; b=LJvxV6XgX1z+24v+DgbMxGBh1LybhFON4QjapN0bCnJuralIZpqmoLJYULVid51Lyjb6ntydtZiTUhJXmAqTUoVWaQeBCfyKNxGm9p2sJHG6ZtLCwmbZ53a+hYixEIIu778hvnhOn7DUfu0hG1lCN6duS2s9dvzW3rLMRbv+J0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762772811; c=relaxed/simple;
-	bh=/jUpBnUkxmAdbYaJkKyc6YlPMjaSQv8ZF79+I1M/FCw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ejHWXRjY8cTvKyvEf9G3lZ6zCREOSl2BXq4m8W8kmbUFLhAWOpazblFKnB8jCt7w11Z2cj5f5K5Ai1ZJCc9YeybXuh/JdnSwYZ8QXWblAbrB19gZcATiLmpvpwiN6szILqMHIIPattbSj2GUrB6SbBVY47s5ZtfUMuyDGUq3Q0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lDEn1IiD; arc=none smtp.client-ip=209.85.219.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-88246676008so15090486d6.3
-        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 03:06:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762772806; x=1763377606; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TZlDwF1uZo+6iYVM/WU/KP07QPOLCz1d2Q7NhIAKrgQ=;
-        b=lDEn1IiD1iJSspe/h7oRsmkWm5uvUB8/Xk+Ekt4hnDC1QDvoIYp7DK3DZ6n2pTzKRP
-         HYSvsSecaMvCkA59ILp4BeSWb92ZFqKQADnG0Z2SDBrai97Qkz7KGfcQO/isNcgMr+dd
-         3R58af6ij/w3zmpsTPdpukGLEmte1xEws9apkNPfL92Auh++D54QHZn2cAboKBa4T+VQ
-         CCpbIhS4qc8rTFEGTchokdAelIImN6OXHNuAWZF+ZuUpg0X6pO83F8992Y2o/05kXZMl
-         ITDF/9ZmbUiMttT1XOemwV+g2909jnMj91TbqXE482XrVRK/sJZ2+W3sNAXrGheGqJzz
-         oGxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762772806; x=1763377606;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=TZlDwF1uZo+6iYVM/WU/KP07QPOLCz1d2Q7NhIAKrgQ=;
-        b=M+QZzHFnTci3wydOghv3jVskzdjj/+eHcqtgUfAmpTrYNYcU8HDmDNvvCI2kNntVqz
-         fz/4DYbo3vIUlbedLS/fMgKWZgiE3yrCGfjrLE3p9UNzBNm/T9Rt/KpsyRtmrBFRdTX2
-         p/Q4OQHwKg5L/ky6cv0i/ztM76QPDF5L/y6hcznuha14S7No+gRtLtnJE6NFz1MtARkt
-         HMs3ZAeI6QpAwhZGrcObGxhqFaJikYN/AWV25AOZUkyuMW7FLY/trnUliD8GtOWu/mj5
-         ltdkV5/46TqIJ1I+H7ElVUXe2VaxRWhZNnxLv/Jy/NKSUBTqD5DwgXHpsZcnx7QPXvXa
-         yGYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV8kC+RzXE1HBEZ5di2tUkkjRc6GTtKjrVu6UBubq0wjgZrYAcdt1ukwKACP28BzB2yIyv1aGQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxF3AsliAO20oWOXJwNA53VtssRHLebMeKz2uiwPSCa11RmsSi3
-	5nIoVpyGpFPFCZ0WSx5YgKwAUSk3DoXAfUw+F7BSactcGfkjpSZLC13CElr07QWocVFxC945InB
-	P4I+3ehN8lsqeCWkQ/hqxunDO60K8kbSSjXF2Kkj7
-X-Gm-Gg: ASbGncuNWkrVTpIS8ZAkeDywt0Yd7kQHJZ7o87diAKS0xDH+UB2JOnnL6fWkOdodHMJ
-	ZqUWKuaf82iv9fR6ioWjDfvhhNd6nwluzwEr5cxDSCLHBSCpbZno7FEYjarOLa4SEo/8RySEMJ4
-	elHZYNbXUOQlZUvWI/ogLaAa84OzZrJNxoLicNQsUwHGzSc2tL6YfwOdTtL18bwwIQkD+dcsEnW
-	M5u7MQX5rs0PTMRIeOJud/0Qb1cHz1zp6+RfYjXq66ggVWKgFirZvXDoDYpvvHoYmWsd9WI//1C
-	9SaPDkU=
-X-Google-Smtp-Source: AGHT+IErfuHZa8wEPzyF9Cfy8fvRXDoa9eur3IHCDQmPWqEk3WbCIWP2YxTN/9nJraiIUoW/zqhDmYZzy+VjBUVoXeE=
-X-Received: by 2002:a05:6214:528a:b0:80a:7bd3:e61d with SMTP id
- 6a1803df08f44-882386c6c3fmr111087866d6.34.1762772803767; Mon, 10 Nov 2025
- 03:06:43 -0800 (PST)
+	s=arc-20240116; t=1762773008; c=relaxed/simple;
+	bh=mSZ7gmoan1EeU4GVjsq0MXdF6q2IRPBWHzVnBREFK+s=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=kKlmaNf3bNT4/QLDPD0twuo7dvaYvPtQDCP5d+wD4cc7PSvQkyUdhoq2KlB3Ov3+yNEInNSTgP64V0/YMdNZ0kySwqjhSAbdncbWiPA3P09MQPuDitFVRLMyDCiGObWhUqDj+yFJWztgrWAlCCvhH3fVJKtdiaLfCb8lxflnQZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
+Received: from TWMBX01.aspeed.com (192.168.0.62) by TWMBX01.aspeed.com
+ (192.168.0.62) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1748.10; Mon, 10 Nov
+ 2025 19:09:56 +0800
+Received: from [127.0.1.1] (192.168.10.13) by TWMBX01.aspeed.com
+ (192.168.0.62) with Microsoft SMTP Server id 15.2.1748.10 via Frontend
+ Transport; Mon, 10 Nov 2025 19:09:56 +0800
+From: Jacky Chou <jacky_chou@aspeedtech.com>
+Subject: [PATCH net-next v4 0/4] Add AST2600 RGMII delay into ftgmac100
+Date: Mon, 10 Nov 2025 19:09:24 +0800
+Message-ID: <20251110-rgmii_delay_2600-v4-0-5cad32c766f7@aspeedtech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251109161215.2574081-1-edumazet@google.com> <cb568e91-9114-4e9a-ba88-eb4fc3772690@kernel.org>
-In-Reply-To: <cb568e91-9114-4e9a-ba88-eb4fc3772690@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 10 Nov 2025 03:06:32 -0800
-X-Gm-Features: AWmQ_bl7N7tZUVqrLGviAHPvf1_xcfaibwkZ2ZuZWsBBQCupUNH0Kxu2PL9Fssw
-Message-ID: <CANn89iJtEhs=sGsRF+NATcLL9-F8oKWxN_2igJehP8RvZjT-Lg@mail.gmail.com>
-Subject: Re: [PATCH net] net_sched: limit try_bulk_dequeue_skb() batches
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAOTHEWkC/32Q0WrDMAxFf6X4eQ6y1NjpnvYfowTXURpvbdLZb
+ mgo+fcaF7aHjT2Jy+UcId1F5OA5itfNXQSeffTTmMP2ZSPcYMcjS9/lLBCwVkBKhuPZ+7bjk11
+ a1ADSAhwAt40zrEXGLoF7fyvKdzFykiPfktjnZvAxTWEpu2YqfdFm72/tTBIko+1R17o3nXmz8
+ cLcJXZD5aZzMc74bYFGEWgiUBVR09RKKvlh3efSumG6/gmrH5iUyWOHWKka9Y7M//T6vDPw1zV
+ /LD2P3a/rA4EO8HpPAQAA
+X-Change-ID: 20251031-rgmii_delay_2600-a00b0248c7e6
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+	<conor+dt@kernel.org>, Po-Yu Chuang <ratbert@faraday-tech.com>, Joel Stanley
+	<joel@jms.id.au>, Andrew Jeffery <andrew@codeconstruct.com.au>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-aspeed@lists.ozlabs.org>, <taoren@meta.com>, Jacky Chou
+	<jacky_chou@aspeedtech.com>
+X-Mailer: b4 0.14.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1762772996; l=3865;
+ i=jacky_chou@aspeedtech.com; s=20251031; h=from:subject:message-id;
+ bh=mSZ7gmoan1EeU4GVjsq0MXdF6q2IRPBWHzVnBREFK+s=;
+ b=JVJatIp03PtH1be/zgyXFjCLbEZ6UugDbJ2mlEjc9L64B6RVVc4X2jTenUy6r0JzK1NSYWVcJ
+ IOdDKo1zV8jDzZ5RwMbbHMmwydpv/KiWg9M0TEjzQ70L0Y1AMMjfoWl
+X-Developer-Key: i=jacky_chou@aspeedtech.com; a=ed25519;
+ pk=8XBx7KFM1drEsfCXTH9QC2lbMlGU4XwJTA6Jt9Mabdo=
 
-On Mon, Nov 10, 2025 at 2:36=E2=80=AFAM Jesper Dangaard Brouer <hawk@kernel=
-.org> wrote:
->
->
->
-> On 09/11/2025 17.12, Eric Dumazet wrote:
-> > After commit 100dfa74cad9 ("inet: dev_queue_xmit() llist adoption")
-> > I started seeing many qdisc requeues on IDPF under high TX workload.
-> >
-> > $ tc -s qd sh dev eth1 handle 1: ; sleep 1; tc -s qd sh dev eth1 handle=
- 1:
-> > qdisc mq 1: root
-> >   Sent 43534617319319 bytes 268186451819 pkt (dropped 0, overlimits 0 r=
-equeues 3532840114)
-> >   backlog 1056Kb 6675p requeues 3532840114
-> > qdisc mq 1: root
-> >   Sent 43554665866695 bytes 268309964788 pkt (dropped 0, overlimits 0 r=
-equeues 3537737653)
-> >   backlog 781164b 4822p requeues 3537737653
-> >
-> > This is caused by try_bulk_dequeue_skb() being only limited by BQL budg=
-et.
-> >
-> > perf record -C120-239 -e qdisc:qdisc_dequeue sleep 1 ; perf script
-> > ...
-> >   netperf 75332 [146]  2711.138269: qdisc:qdisc_dequeue: dequeue ifinde=
-x=3D5 qdisc handle=3D0x80150000 parent=3D0x10013 txq_state=3D0x0 packets=3D=
-1292 skbaddr=3D0xff378005a1e9f200
-> >   netperf 75332 [146]  2711.138953: qdisc:qdisc_dequeue: dequeue ifinde=
-x=3D5 qdisc handle=3D0x80150000 parent=3D0x10013 txq_state=3D0x0 packets=3D=
-1213 skbaddr=3D0xff378004d607a500
-> >   netperf 75330 [144]  2711.139631: qdisc:qdisc_dequeue: dequeue ifinde=
-x=3D5 qdisc handle=3D0x80150000 parent=3D0x10013 txq_state=3D0x0 packets=3D=
-1233 skbaddr=3D0xff3780046be20100
-> >   netperf 75333 [147]  2711.140356: qdisc:qdisc_dequeue: dequeue ifinde=
-x=3D5 qdisc handle=3D0x80150000 parent=3D0x10013 txq_state=3D0x0 packets=3D=
-1093 skbaddr=3D0xff37800514845b00
-> >   netperf 75337 [151]  2711.141037: qdisc:qdisc_dequeue: dequeue ifinde=
-x=3D5 qdisc handle=3D0x80150000 parent=3D0x10013 txq_state=3D0x0 packets=3D=
-1353 skbaddr=3D0xff37800460753300
-> >   netperf 75337 [151]  2711.141877: qdisc:qdisc_dequeue: dequeue ifinde=
-x=3D5 qdisc handle=3D0x80150000 parent=3D0x10013 txq_state=3D0x0 packets=3D=
-1367 skbaddr=3D0xff378004e72c7b00
-> >   netperf 75330 [144]  2711.142643: qdisc:qdisc_dequeue: dequeue ifinde=
-x=3D5 qdisc handle=3D0x80150000 parent=3D0x10013 txq_state=3D0x0 packets=3D=
-1202 skbaddr=3D0xff3780045bd60000
-> > ...
-> >
-> > This is bad because :
-> >
-> > 1) Large batches hold one victim cpu for a very long time.
-> >
-> > 2) Driver often hit their own TX ring limit (all slots are used).
-> >
-> > 3) We call dev_requeue_skb()
-> >
-> > 4) Requeues are using a FIFO (q->gso_skb), breaking qdisc ability to
-> >     implement FQ or priority scheduling.
-> >
-> > 5) dequeue_skb() gets packets from q->gso_skb one skb at a time
-> >     with no xmit_more support. This is causing many spinlock games
-> >     between the qdisc and the device driver.
-> >
-> > Requeues were supposed to be very rare, lets keep them this way.
-> >
-> > Limit batch sizes to /proc/sys/net/core/dev_weight (default 64) as
-> > __qdisc_run() was designed to use.
-> >
-> > Fixes: 5772e9a3463b ("qdisc: bulk dequeue support for qdiscs with TCQ_F=
-_ONETXQUEUE")
-> > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > Cc: Jesper Dangaard Brouer <hawk@kernel.org>
-> > Cc: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> > ---
-> >   net/sched/sch_generic.c | 17 ++++++++++-------
-> >   1 file changed, 10 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
-> > index d9a98d02a55fc361a223f3201e37b6a2b698bb5e..852e603c17551ee719bf1c5=
-61848d5ef0699ab5d 100644
-> > --- a/net/sched/sch_generic.c
-> > +++ b/net/sched/sch_generic.c
-> > @@ -180,9 +180,10 @@ static inline void dev_requeue_skb(struct sk_buff =
-*skb, struct Qdisc *q)
-> >   static void try_bulk_dequeue_skb(struct Qdisc *q,
-> >                                struct sk_buff *skb,
-> >                                const struct netdev_queue *txq,
-> > -                              int *packets)
-> > +                              int *packets, int budget)
-> >   {
-> >       int bytelimit =3D qdisc_avail_bulklimit(txq) - skb->len;
-> > +     int cnt =3D 0;
->
-> You patch makes perfect sense, that we want this budget limit.
->
-> But: Why isn't bytelimit saving us?
+This patch series adds support for configuring RGMII internal delays for the
+Aspeed AST2600 FTGMAC100 Ethernet MACs. It introduces new compatible strings to
+distinguish between MAC0/1 and MAC2/3, as their delay chains and configuration
+units differ.
+The device tree bindings are updated to restrict the allowed phy-mode and delay
+properties for each MAC type. Corresponding changes are made to the device tree
+source files and the FTGMAC100 driver to support the new delay configuration.
 
-BQL can easily grow
-/sys/class/net/eth1/queues/tx-XXX/byte_queue_limits/limit to quite big
-values with MQ high speed devices.
+Summary of changes:
+- dt-bindings: net: ftgmac100: Add conditional schema for AST2600 MAC0/1 and
+  MAC2/3.
+- ARM: dts: aspeed-g6: Add aspeed,rgmii-delay-ps and aspeed,scu
+  properties.
+- ARM: dts: aspeed-ast2600-evb: Add rx/tx-internal-delay-ps properties and 
+  update phy-mode for MACs.
+- net: ftgmac100: Add driver support for configuring RGMII delay for AST2600
+  MACs via SCU.
 
-Each TX queue is usually serviced with RR, meaning that some of them
-can get a long standing queue.
+This enables precise RGMII timing configuration for AST2600-based platforms,
+improving interoperability with various PHYs
 
+To: Andrew Lunn <andrew+netdev@lunn.ch>
+To: David S. Miller <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+To: Rob Herring <robh@kernel.org>
+To: Krzysztof Kozlowski <krzk+dt@kernel.org>
+To: Conor Dooley <conor+dt@kernel.org>
+To: Po-Yu Chuang <ratbert@faraday-tech.com>
+To: Joel Stanley <joel@jms.id.au>
+To: Andrew Jeffery <andrew@codeconstruct.com.au>
+Cc: netdev@vger.kernel.org
+Cc: devicetree@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-aspeed@lists.ozlabs.org
+Cc: taoren@meta.com
 
-tjbp26:/home/edumazet# ./super_netperf 200 -H tjbp27 -l 100 &
-[1] 198996
+Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
+---
+Changes in v4:
+- Remove the compatible "aspeed,ast2600-mac01" and
+  "aspeed,ast2600-mac23"
+- Add new property to specify the RGMII delay step for each MACs
+- Add default value of rx/tx-internal-delay-ps
+- For legacy dts, a warning message reminds users to update phy-mode
+- If lack rx/tx-internal-delay-ps, driver will use default value to
+  configure the RGMII delay
+- Link to v3: https://lore.kernel.org/r/20251103-rgmii_delay_2600-v3-0-e2af2656f7d7@aspeedtech.com
 
-tjbp26:/home/edumazet# grep .
-/sys/class/net/eth1/queues/tx-*/byte_queue_limits/limit
-/sys/class/net/eth1/queues/tx-0/byte_queue_limits/limit:116826
-/sys/class/net/eth1/queues/tx-10/byte_queue_limits/limit:84534
-/sys/class/net/eth1/queues/tx-11/byte_queue_limits/limit:342924
-/sys/class/net/eth1/queues/tx-12/byte_queue_limits/limit:433302
-/sys/class/net/eth1/queues/tx-13/byte_queue_limits/limit:409254
-/sys/class/net/eth1/queues/tx-14/byte_queue_limits/limit:434112
-/sys/class/net/eth1/queues/tx-15/byte_queue_limits/limit:68304
-/sys/class/net/eth1/queues/tx-16/byte_queue_limits/limit:65610
-/sys/class/net/eth1/queues/tx-17/byte_queue_limits/limit:65772
-/sys/class/net/eth1/queues/tx-18/byte_queue_limits/limit:69822
-/sys/class/net/eth1/queues/tx-19/byte_queue_limits/limit:440634
-/sys/class/net/eth1/queues/tx-1/byte_queue_limits/limit:70308
-/sys/class/net/eth1/queues/tx-20/byte_queue_limits/limit:304824
-/sys/class/net/eth1/queues/tx-21/byte_queue_limits/limit:497856
-/sys/class/net/eth1/queues/tx-22/byte_queue_limits/limit:70308
-/sys/class/net/eth1/queues/tx-23/byte_queue_limits/limit:535408
-/sys/class/net/eth1/queues/tx-24/byte_queue_limits/limit:79419
-/sys/class/net/eth1/queues/tx-25/byte_queue_limits/limit:70170
-/sys/class/net/eth1/queues/tx-26/byte_queue_limits/limit:1595568
-/sys/class/net/eth1/queues/tx-27/byte_queue_limits/limit:579108
-/sys/class/net/eth1/queues/tx-28/byte_queue_limits/limit:430578
-/sys/class/net/eth1/queues/tx-29/byte_queue_limits/limit:647172
-/sys/class/net/eth1/queues/tx-2/byte_queue_limits/limit:345492
-/sys/class/net/eth1/queues/tx-30/byte_queue_limits/limit:612392
-/sys/class/net/eth1/queues/tx-31/byte_queue_limits/limit:344376
-/sys/class/net/eth1/queues/tx-3/byte_queue_limits/limit:154740
-/sys/class/net/eth1/queues/tx-4/byte_queue_limits/limit:60588
-/sys/class/net/eth1/queues/tx-5/byte_queue_limits/limit:71970
-/sys/class/net/eth1/queues/tx-6/byte_queue_limits/limit:70308
-/sys/class/net/eth1/queues/tx-7/byte_queue_limits/limit:695454
-/sys/class/net/eth1/queues/tx-8/byte_queue_limits/limit:101760
-/sys/class/net/eth1/queues/tx-9/byte_queue_limits/limit:65286
+Changes in v3:
+- Add new item on compatible property for new compatible strings
+- Remove the new compatible and scu handle of MAC from aspeed-g6.dtsi
+- Add new compatible and scu handle to MAC node in
+  aspeed-ast2600-evb.dts
+- Change all phy-mode of MACs to "rgmii-id"
+- Keep "aspeed,ast2600-mac" compatible in ftgmac100.c and configure the
+  rgmii delay with "aspeed,ast2600-mac01" and "aspeed,ast2600-mac23"
+- Link to v2: https://lore.kernel.org/r/20250813063301.338851-1-jacky_chou@aspeedtech.com
 
-Then if we send many small packets in a row, limit/pkt_avg_len can go
-to arbitrary values.
+Changes in v2:
+- added new compatible strings for MAC0/1 and MAC2/3
+- updated device tree bindings to restrict phy-mode and delay properties
+- refactored driver code to handle rgmii delay configuration
+- Link to v1: https://lore.kernel.org/r/20250317025922.1526937-1-jacky_chou@aspeedtech.com
 
-Thanks.
+---
+Jacky Chou (4):
+      dt-bindings: net: ftgmac100: Add delay properties for AST2600
+      ARM: dts: aspeed-g6: Add scu and rgmii delay value per step for MAC
+      ARM: dts: aspeed: ast2600-evb: Configure RGMII delay for MAC
+      net: ftgmac100: Add RGMII delay support for AST2600
 
->
->
-> Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
->
-> >       while (bytelimit > 0) {
-> >               struct sk_buff *nskb =3D q->dequeue(q);
-> > @@ -193,8 +194,10 @@ static void try_bulk_dequeue_skb(struct Qdisc *q,
-> >               bytelimit -=3D nskb->len; /* covers GSO len */
-> >               skb->next =3D nskb;
-> >               skb =3D nskb;
-> > -             (*packets)++; /* GSO counts as one pkt */
-> > +             if (++cnt >=3D budget)
-> > +                     break;
-> >       }
-> > +     (*packets) +=3D cnt;
-> >       skb_mark_not_on_list(skb);
-> >   }
-> >
-> > @@ -228,7 +231,7 @@ static void try_bulk_dequeue_skb_slow(struct Qdisc =
-*q,
-> >    * A requeued skb (via q->gso_skb) can also be a SKB list.
-> >    */
-> >   static struct sk_buff *dequeue_skb(struct Qdisc *q, bool *validate,
-> > -                                int *packets)
-> > +                                int *packets, int budget)
-> >   {
-> >       const struct netdev_queue *txq =3D q->dev_queue;
-> >       struct sk_buff *skb =3D NULL;
-> > @@ -295,7 +298,7 @@ static struct sk_buff *dequeue_skb(struct Qdisc *q,=
- bool *validate,
-> >       if (skb) {
-> >   bulk:
-> >               if (qdisc_may_bulk(q))
-> > -                     try_bulk_dequeue_skb(q, skb, txq, packets);
-> > +                     try_bulk_dequeue_skb(q, skb, txq, packets, budget=
-);
-> >               else
-> >                       try_bulk_dequeue_skb_slow(q, skb, packets);
-> >       }
-> > @@ -387,7 +390,7 @@ bool sch_direct_xmit(struct sk_buff *skb, struct Qd=
-isc *q,
-> >    *                          >0 - queue is not empty.
-> >    *
-> >    */
-> > -static inline bool qdisc_restart(struct Qdisc *q, int *packets)
-> > +static inline bool qdisc_restart(struct Qdisc *q, int *packets, int bu=
-dget)
-> >   {
-> >       spinlock_t *root_lock =3D NULL;
-> >       struct netdev_queue *txq;
-> > @@ -396,7 +399,7 @@ static inline bool qdisc_restart(struct Qdisc *q, i=
-nt *packets)
-> >       bool validate;
-> >
-> >       /* Dequeue packet */
-> > -     skb =3D dequeue_skb(q, &validate, packets);
-> > +     skb =3D dequeue_skb(q, &validate, packets, budget);
-> >       if (unlikely(!skb))
-> >               return false;
-> >
-> > @@ -414,7 +417,7 @@ void __qdisc_run(struct Qdisc *q)
-> >       int quota =3D READ_ONCE(net_hotdata.dev_tx_weight);
-> >       int packets;
-> >
-> > -     while (qdisc_restart(q, &packets)) {
-> > +     while (qdisc_restart(q, &packets, quota)) {
-> >               quota -=3D packets;
-> >               if (quota <=3D 0) {
-> >                       if (q->flags & TCQ_F_NOLOCK)
->
+ .../devicetree/bindings/net/faraday,ftgmac100.yaml |  35 +++++
+ arch/arm/boot/dts/aspeed/aspeed-ast2600-evb.dts    |  20 ++-
+ arch/arm/boot/dts/aspeed/aspeed-g6.dtsi            |   8 ++
+ drivers/net/ethernet/faraday/ftgmac100.c           | 148 +++++++++++++++++++++
+ drivers/net/ethernet/faraday/ftgmac100.h           |  20 +++
+ 5 files changed, 227 insertions(+), 4 deletions(-)
+---
+base-commit: a0c3aefb08cd81864b17c23c25b388dba90b9dad
+change-id: 20251031-rgmii_delay_2600-a00b0248c7e6
+
+Best regards,
+-- 
+Jacky Chou <jacky_chou@aspeedtech.com>
+
 
