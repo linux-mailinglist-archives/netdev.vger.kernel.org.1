@@ -1,379 +1,331 @@
-Return-Path: <netdev+bounces-237113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id E307FC4566C
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 09:42:21 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E23AC456C0
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 09:47:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 75FCD3431C1
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 08:42:20 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B5E144E1EA3
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 08:47:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 505172FD693;
-	Mon, 10 Nov 2025 08:42:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D/Hth5+r";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="WnG9aMCB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 419342FCBEF;
+	Mon, 10 Nov 2025 08:47:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtpbgjp3.qq.com (smtpbgjp3.qq.com [54.92.39.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED2BB2FB978
-	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 08:42:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BAEE2FC87E
+	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 08:47:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.92.39.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762764124; cv=none; b=rRPplZY30nryIPNe5tuAV8uJGkhg8Wip9cRXPPsSHGozMJM6QKzOMazra65BYpHiCPMM5BSZOL7RfRLkGdI+qAQ2SG9m02ZpQKD1HgObWv1Wx4Q9fsXybRmJAZkQaecJCa9bTXAVhFZ6R2pwFZIU1t3RB37yqpa73IS2hLEALG0=
+	t=1762764468; cv=none; b=EudL1Yx5ikM2fwbnXMt04NeoNMHtd3vdITUPiakd0xTzR3Bl1fY8W/k9zN32qX2KseI+yxz/USqxsOydIxbYeeSBR75SCaY9n41ZNif703Ph2IaeExAJa6DkHt+jEJghea4+A2umLHKja3jdaxyuJmqc1J7GgcliOxfV355U2YU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762764124; c=relaxed/simple;
-	bh=8t7E7C7X6/uPzLWrcNTAevURsvI8Omeu5uFxAu0WoZU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=JaEpQSPmlr0hUe/6csOPplkxM/xHb/K9AyeVft7CpNn5MvMC3Qn+/cSbfMHInsbGoNpO2M8J8KesOFQ+sc5hsqfZVWQxEbBseJ67wXJ6VErCu9expSwRKT+vbWJF2hTXYcmfFt9XktNRpPNbqMr/a05/eZtYKDGPa2n2/xP9qtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D/Hth5+r; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=WnG9aMCB; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762764119;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fZIPr6og7VmnwsjsLuonEjEHRjxzMYgAiThp8TNrGcg=;
-	b=D/Hth5+r1HiI9k68u+CYfidHeY+OO9rBgLWLDADCfwWklq1jJo5Srk2yvRrucawDvoywTQ
-	aKVytp97NF916iKr2S55xzcHDxPQqHdvI6mTOj5LIVHMbEJh3aBp+BFi1jLYOFD3h67wHQ
-	P8QcK3JNMc8wYmqrKxE9jiJUWekphRY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-484-LAE_ZcAOOWqntWqr2h5Fqg-1; Mon, 10 Nov 2025 03:41:58 -0500
-X-MC-Unique: LAE_ZcAOOWqntWqr2h5Fqg-1
-X-Mimecast-MFC-AGG-ID: LAE_ZcAOOWqntWqr2h5Fqg_1762764117
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-47775585257so11272345e9.1
-        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 00:41:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762764117; x=1763368917; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=fZIPr6og7VmnwsjsLuonEjEHRjxzMYgAiThp8TNrGcg=;
-        b=WnG9aMCBhi6x6eULSC+pTlXY9YSBmbo991Gs9fkqLVFeaalEdHxc82JWqph4CYWMhr
-         o+vVEkez/c2cRlcUY8zO4GWZP/Tn6V6zt10eZagJ3NGHAwtAGF3hW9hepE2smm9rWktU
-         009WRT92I6l4lH+Yjmj1fQFeqNhqetreZx3p4jvTlQGpcy0mtyil6fjv+NZkxFoATEhi
-         O6+TulPtTy3v++Lg/T4nNlgVtuM971wAiW11hnFz0Vs7/7UWTI/rq8MYCS8rRxjNAXlu
-         ahxSg8uBKjqCER0Bs3sSoj3nGoj1EkjHsWhK31EeLAXMRhqdHweLl7isd3ZMWg77qO5F
-         avfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762764117; x=1763368917;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fZIPr6og7VmnwsjsLuonEjEHRjxzMYgAiThp8TNrGcg=;
-        b=av9qYoG/AiXGZQVxYeyfRaN1Us34ZYgcYEvj3avubtOCwktTQNPPzr6RWPzdP6Gp2L
-         743/+D+umRkHnbQL6ulDwa2WX0lNqJpyOan7S+0IZDCZsuH2IfrnK9N+D29VWjratfm4
-         rkfEwoV9SrF7OA5pbvIU0zyHMuw5feW0JcPKTOhrgwJA4NT81HRo3knn6iZ6dbSjD89X
-         HdDXYbGkMHXiiA34dfJVxHQxWmQsahUS18SOR8D33tJa6SOnTUC51A4ihUzAGN4gtx/e
-         3o/6+lS6E+4ELJ0f39U8iFeoNDm1ca1fCSalT0SgqKP5xkOp2BuEIaIoBong1NzEL3fs
-         RmNw==
-X-Forwarded-Encrypted: i=1; AJvYcCXH7dRd78WdpRK1iEHOVEDQhAR0gPNiH9kJTykKsOW7L6fHindJd+8NNJ/nWJlKjN+mkxj94Yg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMtWrwNXwkEnDShTOzfo9/KicVM0KHdu3keWCF0STSoauhPTiU
-	8qYcyuOXZX/FhQwtTUHV+Q9TerglyZqE6j1BeVFLqh4Lx2x1Gr+p/RVCNbe06uSAITQf/Aqart1
-	nt+DPE6Bo5OyMNRnF6mC9v0Ab7J76kq2/auQ735en91TZo9Om1L2dlFX6KQ==
-X-Gm-Gg: ASbGncv3o9NsveEw9U9pHjXY4w6y5FtcUV15uBSUieFbH6g1/JFOE60Nxknot7hYXOD
-	sRWwSC0Z0ZLWR0CtSm1B5c3p3Bo5KTvGb5xN5zn8gDUqXPSxl+9VEs65Cp7K98ryLnFyomHsGcq
-	TlYYvscDUPyPiTH3mLB4pyq9HYB367YWUCG0PA7s3nu8OXNiCvEIX48Jkc0rBw8ZSmwl9MHK5vR
-	chTLKgaWh2a9kpdYdBPhbKdcbS4Ogs6Zwn+jtOGyhhRkiycXP3/6SwqXLeIyt6wubVfh3C4O9RB
-	Pe+OIjGMwuppAwQymLFT+Gmf4mFq7Rh70BMT0izKoZ36lw16EJyf90GW6WbA0IuIm6XXIdaTnXF
-	vhA==
-X-Received: by 2002:a05:600c:3b0a:b0:45d:d353:a491 with SMTP id 5b1f17b1804b1-4777322e253mr50320635e9.1.1762764117074;
-        Mon, 10 Nov 2025 00:41:57 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHJ0QrL3QV6Tjx6kZdnYroTPWXPiZ7ScepK7UVrsUPooHuy6CFFJT9ogZ9eDw/FTVHRPvtGnA==
-X-Received: by 2002:a05:600c:3b0a:b0:45d:d353:a491 with SMTP id 5b1f17b1804b1-4777322e253mr50320405e9.1.1762764116566;
-        Mon, 10 Nov 2025 00:41:56 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.155.55])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4777bba9b4esm22548985e9.8.2025.11.10.00.41.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Nov 2025 00:41:56 -0800 (PST)
-Message-ID: <327bfa84-c39c-4f6c-aaed-d9054f5d9ae6@redhat.com>
-Date: Mon, 10 Nov 2025 09:41:54 +0100
+	s=arc-20240116; t=1762764468; c=relaxed/simple;
+	bh=hGWFD59KU986RIcpnJvHO2JQ0SSAxI+NAF5/78A/C7I=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=nJp6gFawUsulRKgf5uU/cUetD6oSxvUaHpKMwIfwamfhAkFu15Z3QkYSEuelSsiyjHUF3enR/vbkDcWXaGoJjL3GYuQnQGK8XjbOvzbMCEmDrEsdVjBiPlK+zhTJ9gF1cS9+aNimBWppcr6Kgh4gwFhDK4VA+bVobIRypf9BVjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com; spf=pass smtp.mailfrom=bamaicloud.com; arc=none smtp.client-ip=54.92.39.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bamaicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bamaicloud.com
+X-QQ-mid: esmtpsz21t1762764453t673816e9
+X-QQ-Originating-IP: rKplnT7EU2V7n+XwJLMJpSBdQ/exj1W1+8ohrdwgPxE=
+Received: from smtpclient.apple ( [111.204.182.99])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 10 Nov 2025 16:47:30 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 8893434775976797232
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [syzbot] [mptcp?] possible deadlock in mptcp_subflow_shutdown (2)
-To: syzbot <syzbot+7902f127c28c701e913f@syzkaller.appspotmail.com>,
- davem@davemloft.net, edumazet@google.com, geliang@kernel.org,
- horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org,
- martineau@kernel.org, matttbe@kernel.org, mptcp@lists.linux.dev,
- netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-References: <69113ffc.a70a0220.22f260.00cd.GAE@google.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <69113ffc.a70a0220.22f260.00cd.GAE@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3826.700.81\))
+Subject: Re: [PATCH net-next v3] net: bonding: use atomic instead of
+ rtnl_mutex, to make sure peer notify updated
+From: Tonghao Zhang <tonghao@bamaicloud.com>
+In-Reply-To: <975f3126-482a-4963-a125-d51732ddcdac@blackwall.org>
+Date: Mon, 10 Nov 2025 16:47:20 +0800
+Cc: netdev@vger.kernel.org,
+ Jay Vosburgh <jv@jvosburgh.net>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ Hangbin Liu <liuhangbin@gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <7B4961BE-C847-4881-8E5A-26B76DC386B1@bamaicloud.com>
+References: <20251105142739.41833-1-tonghao@bamaicloud.com>
+ <975f3126-482a-4963-a125-d51732ddcdac@blackwall.org>
+To: Nikolay Aleksandrov <razor@blackwall.org>
+X-Mailer: Apple Mail (2.3826.700.81)
+X-QQ-SENDSIZE: 520
+Feedback-ID: esmtpsz:bamaicloud.com:qybglogicsvrsz:qybglogicsvrsz3b-0
+X-QQ-XMAILINFO: MG1k13TElWXsG0eXJtuBgayO00O6JBWUeJ+5fRzbsa5jnotT8vAQyu1/
+	aRcLPtzVxiqtf46DDlEEd7Dl+uxKeRcMXbM8DtimU6OeuXZAkq4/faRn60t1YOHo+G3OyDU
+	V5//f36lJfElQqurziKqUndIETkZETrigZt2KmW00KYy9+bkajYGtcuc3xjkOI9+8qaPNXN
+	v/iEHVnFSsJIoCw76WUMqw8JT00pJjxbTMOPXDiYPBWRf0/l+JVe9JHsl/wyDIlZyK8j3m2
+	hZMq5/R88Ujq2uTyVPSD9pFU50/mx4sgOVFulOO/Syjz28ZCwSNOvsJ5NDPBflBN5Px51YR
+	Bya6cVugwPCP177U3BKsaS7dDPdVbzKKbzHFgbChoc7q7NK2Pm7q8KxHUuiWKwm7l8VDp1Q
+	5Ndxi4WD/vnR02JCgTvPDNmOPcj4ZQOHFDBKip6OWpP4ZFyGKfIBf+Ouka6ZfqGQHDQjM/V
+	L/1SYc6zZ3jfX1soNL4w3Codsy14UywJa8HqTAd/NMzrvMIyCjlakkd0FygDNiPsJ7ZvVQM
+	2JfCUMHE8ueKnKLQ4p7n6xPBUZT0piqEzQ4C2ttHCHXKJIJ86lugjELfDFMSB1+qUP7c7Is
+	huMkBlGWAaiSW0oRgU7ZuDteEjfcyorGGAXk8sUgDeQcLw/JHkFJ7h+bn5xSgxCYmjyRsmR
+	JpetiHxKma//lU/UhkFm8TAKnpHjrpxCA4CVGnODFRohTOsPRcEYYrLTEjQEew2U1M3Demg
+	UOY5+Dz+0EaNtBf9Z9iArgCLIk08jLAn2cOxIZofqkAbnVZWbXtdM+WI4Tcm1nP8RJxOLxz
+	9RT3LadvKRpbdzvwmNC3x0f+a0awapBZajcR+PGPv0/rMe+eQxvwQnDMqH8MXyGmhXNsAcR
+	/CCmnuhjj2AJsu2B9G23YpZOVzagZkVpPI4trTTRlD6ugb/EaKMXK05Ah6+mxREU6tISYvu
+	sSLZevd2z9hKgSr9QJdcb3/tPLawhJ4J/QeLmIm0cZY6KjT70CuNPUUPeYH/WQguQqzQ=
+X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
+X-QQ-RECHKSPAM: 0
 
-On 11/10/25 2:29 AM, syzbot wrote:
-> syzbot found the following issue on:
-> 
-> HEAD commit:    dc77806cf3b4 Merge tag 'rust-fixes-6.18' of git://git.kern..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=17dd9bcd980000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=19d831c6d0386a9c
-> dashboard link: https://syzkaller.appspot.com/bug?extid=7902f127c28c701e913f
-> compiler:       gcc (Debian 12.2.0-14+deb12u1) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-> 
-> Unfortunately, I don't have any reproducer for this issue yet.
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/a1c9259ca92c/disk-dc77806c.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/98d084f2ad8b/vmlinux-dc77806c.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/c25e628e3491/bzImage-dc77806c.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+7902f127c28c701e913f@syzkaller.appspotmail.com
-> 
-> ======================================================
-> WARNING: possible circular locking dependency detected
-> syzkaller #0 Not tainted
-> ------------------------------------------------------
-> syz.7.3695/23717 is trying to acquire lock:
-> ffff888087316860 (k-sk_lock-AF_INET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1679 [inline]
-> ffff888087316860 (k-sk_lock-AF_INET){+.+.}-{0:0}, at: mptcp_subflow_shutdown+0x24/0x380 net/mptcp/protocol.c:2918
-> 
-> but task is already holding lock:
-> ffff888026899a60 (sk_lock-AF_INET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1679 [inline]
-> ffff888026899a60 (sk_lock-AF_INET){+.+.}-{0:0}, at: mptcp_close+0x1d/0xe0 net/mptcp/protocol.c:3168
-> 
-> which lock already depends on the new lock.
-> 
-> 
-> the existing dependency chain (in reverse order) is:
-> 
-> -> #7 (sk_lock-AF_INET){+.+.}-{0:0}:
->        lock_sock_nested+0x41/0xf0 net/core/sock.c:3720
->        lock_sock include/net/sock.h:1679 [inline]
->        inet_shutdown+0x67/0x440 net/ipv4/af_inet.c:907
->        nbd_mark_nsock_dead+0xae/0x5d0 drivers/block/nbd.c:319
->        recv_work+0x671/0xa80 drivers/block/nbd.c:1024
->        process_one_work+0x9cf/0x1b70 kernel/workqueue.c:3263
->        process_scheduled_works kernel/workqueue.c:3346 [inline]
->        worker_thread+0x6c8/0xf10 kernel/workqueue.c:3427
->        kthread+0x3c5/0x780 kernel/kthread.c:463
->        ret_from_fork+0x675/0x7d0 arch/x86/kernel/process.c:158
->        ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-> 
-> -> #6 (&nsock->tx_lock){+.+.}-{4:4}:
->        __mutex_lock_common kernel/locking/mutex.c:598 [inline]
->        __mutex_lock+0x193/0x1060 kernel/locking/mutex.c:760
->        nbd_handle_cmd drivers/block/nbd.c:1146 [inline]
->        nbd_queue_rq+0x423/0x12d0 drivers/block/nbd.c:1210
->        blk_mq_dispatch_rq_list+0x416/0x1e20 block/blk-mq.c:2129
->        __blk_mq_do_dispatch_sched block/blk-mq-sched.c:168 [inline]
->        blk_mq_do_dispatch_sched block/blk-mq-sched.c:182 [inline]
->        __blk_mq_sched_dispatch_requests+0xcb7/0x15f0 block/blk-mq-sched.c:307
->        blk_mq_sched_dispatch_requests+0xd8/0x1b0 block/blk-mq-sched.c:329
->        blk_mq_run_hw_queue+0x239/0x670 block/blk-mq.c:2367
->        blk_mq_dispatch_list+0x514/0x1310 block/blk-mq.c:2928
->        blk_mq_flush_plug_list block/blk-mq.c:2976 [inline]
->        blk_mq_flush_plug_list+0x130/0x600 block/blk-mq.c:2948
->        __blk_flush_plug+0x2c4/0x4b0 block/blk-core.c:1225
->        blk_finish_plug block/blk-core.c:1252 [inline]
->        blk_finish_plug block/blk-core.c:1249 [inline]
->        __submit_bio+0x545/0x690 block/blk-core.c:651
->        __submit_bio_noacct_mq block/blk-core.c:724 [inline]
->        submit_bio_noacct_nocheck+0x53d/0xc10 block/blk-core.c:755
->        submit_bio_noacct+0x5bd/0x1f60 block/blk-core.c:879
->        submit_bh fs/buffer.c:2829 [inline]
->        block_read_full_folio+0x4db/0x850 fs/buffer.c:2461
->        filemap_read_folio+0xc8/0x2a0 mm/filemap.c:2444
->        do_read_cache_folio+0x263/0x5c0 mm/filemap.c:4024
->        read_mapping_folio include/linux/pagemap.h:999 [inline]
->        read_part_sector+0xd4/0x370 block/partitions/core.c:722
->        adfspart_check_ICS+0x93/0x940 block/partitions/acorn.c:360
->        check_partition block/partitions/core.c:141 [inline]
->        blk_add_partitions block/partitions/core.c:589 [inline]
->        bdev_disk_changed+0x723/0x1520 block/partitions/core.c:693
->        blkdev_get_whole+0x187/0x290 block/bdev.c:748
->        bdev_open+0x2c7/0xe40 block/bdev.c:957
->        blkdev_open+0x34e/0x4f0 block/fops.c:701
->        do_dentry_open+0x982/0x1530 fs/open.c:965
->        vfs_open+0x82/0x3f0 fs/open.c:1097
->        do_open fs/namei.c:3975 [inline]
->        path_openat+0x1de4/0x2cb0 fs/namei.c:4134
->        do_filp_open+0x20b/0x470 fs/namei.c:4161
->        do_sys_openat2+0x11b/0x1d0 fs/open.c:1437
->        do_sys_open fs/open.c:1452 [inline]
->        __do_sys_openat fs/open.c:1468 [inline]
->        __se_sys_openat fs/open.c:1463 [inline]
->        __x64_sys_openat+0x174/0x210 fs/open.c:1463
->        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->        do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
->        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> -> #5 (&cmd->lock){+.+.}-{4:4}:
->        __mutex_lock_common kernel/locking/mutex.c:598 [inline]
->        __mutex_lock+0x193/0x1060 kernel/locking/mutex.c:760
->        nbd_queue_rq+0xbd/0x12d0 drivers/block/nbd.c:1202
->        blk_mq_dispatch_rq_list+0x416/0x1e20 block/blk-mq.c:2129
->        __blk_mq_do_dispatch_sched block/blk-mq-sched.c:168 [inline]
->        blk_mq_do_dispatch_sched block/blk-mq-sched.c:182 [inline]
->        __blk_mq_sched_dispatch_requests+0xcb7/0x15f0 block/blk-mq-sched.c:307
->        blk_mq_sched_dispatch_requests+0xd8/0x1b0 block/blk-mq-sched.c:329
->        blk_mq_run_hw_queue+0x239/0x670 block/blk-mq.c:2367
->        blk_mq_dispatch_list+0x514/0x1310 block/blk-mq.c:2928
->        blk_mq_flush_plug_list block/blk-mq.c:2976 [inline]
->        blk_mq_flush_plug_list+0x130/0x600 block/blk-mq.c:2948
->        __blk_flush_plug+0x2c4/0x4b0 block/blk-core.c:1225
->        blk_finish_plug block/blk-core.c:1252 [inline]
->        blk_finish_plug block/blk-core.c:1249 [inline]
->        __submit_bio+0x545/0x690 block/blk-core.c:651
->        __submit_bio_noacct_mq block/blk-core.c:724 [inline]
->        submit_bio_noacct_nocheck+0x53d/0xc10 block/blk-core.c:755
->        submit_bio_noacct+0x5bd/0x1f60 block/blk-core.c:879
->        submit_bh fs/buffer.c:2829 [inline]
->        block_read_full_folio+0x4db/0x850 fs/buffer.c:2461
->        filemap_read_folio+0xc8/0x2a0 mm/filemap.c:2444
->        do_read_cache_folio+0x263/0x5c0 mm/filemap.c:4024
->        read_mapping_folio include/linux/pagemap.h:999 [inline]
->        read_part_sector+0xd4/0x370 block/partitions/core.c:722
->        adfspart_check_ICS+0x93/0x940 block/partitions/acorn.c:360
->        check_partition block/partitions/core.c:141 [inline]
->        blk_add_partitions block/partitions/core.c:589 [inline]
->        bdev_disk_changed+0x723/0x1520 block/partitions/core.c:693
->        blkdev_get_whole+0x187/0x290 block/bdev.c:748
->        bdev_open+0x2c7/0xe40 block/bdev.c:957
->        blkdev_open+0x34e/0x4f0 block/fops.c:701
->        do_dentry_open+0x982/0x1530 fs/open.c:965
->        vfs_open+0x82/0x3f0 fs/open.c:1097
->        do_open fs/namei.c:3975 [inline]
->        path_openat+0x1de4/0x2cb0 fs/namei.c:4134
->        do_filp_open+0x20b/0x470 fs/namei.c:4161
->        do_sys_openat2+0x11b/0x1d0 fs/open.c:1437
->        do_sys_open fs/open.c:1452 [inline]
->        __do_sys_openat fs/open.c:1468 [inline]
->        __se_sys_openat fs/open.c:1463 [inline]
->        __x64_sys_openat+0x174/0x210 fs/open.c:1463
->        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->        do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
->        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> -> #4 (set->srcu){.+.+}-{0:0}:
->        srcu_lock_sync include/linux/srcu.h:173 [inline]
->        __synchronize_srcu+0xa1/0x290 kernel/rcu/srcutree.c:1439
->        blk_mq_wait_quiesce_done block/blk-mq.c:283 [inline]
->        blk_mq_wait_quiesce_done block/blk-mq.c:280 [inline]
->        blk_mq_quiesce_queue block/blk-mq.c:303 [inline]
->        blk_mq_quiesce_queue+0x149/0x1b0 block/blk-mq.c:298
->        elevator_switch+0x17d/0x810 block/elevator.c:588
->        elevator_change+0x391/0x5d0 block/elevator.c:691
->        elevator_set_default+0x2e9/0x380 block/elevator.c:767
->        blk_register_queue+0x384/0x4e0 block/blk-sysfs.c:942
->        __add_disk+0x74a/0xf00 block/genhd.c:528
->        add_disk_fwnode+0x13f/0x5d0 block/genhd.c:597
->        add_disk include/linux/blkdev.h:775 [inline]
->        nbd_dev_add+0x783/0xbb0 drivers/block/nbd.c:1987
->        nbd_init+0x1a2/0x3c0 drivers/block/nbd.c:2702
->        do_one_initcall+0x123/0x6e0 init/main.c:1283
->        do_initcall_level init/main.c:1345 [inline]
->        do_initcalls init/main.c:1361 [inline]
->        do_basic_setup init/main.c:1380 [inline]
->        kernel_init_freeable+0x5c8/0x920 init/main.c:1593
->        kernel_init+0x1c/0x2b0 init/main.c:1483
->        ret_from_fork+0x675/0x7d0 arch/x86/kernel/process.c:158
->        ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-> 
-> -> #3 (&q->elevator_lock){+.+.}-{4:4}:
->        __mutex_lock_common kernel/locking/mutex.c:598 [inline]
->        __mutex_lock+0x193/0x1060 kernel/locking/mutex.c:760
->        queue_requests_store+0x3a7/0x670 block/blk-sysfs.c:117
->        queue_attr_store+0x26b/0x310 block/blk-sysfs.c:869
->        sysfs_kf_write+0xf2/0x150 fs/sysfs/file.c:142
->        kernfs_fop_write_iter+0x3af/0x570 fs/kernfs/file.c:352
->        new_sync_write fs/read_write.c:593 [inline]
->        vfs_write+0x7d3/0x11d0 fs/read_write.c:686
->        ksys_write+0x12a/0x250 fs/read_write.c:738
->        do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
->        do_syscall_64+0xcd/0xfa0 arch/x86/entry/syscall_64.c:94
->        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> -> #2 (&q->q_usage_counter(io)#52){++++}-{0:0}:
->        blk_alloc_queue+0x619/0x760 block/blk-core.c:461
->        blk_mq_alloc_queue+0x172/0x280 block/blk-mq.c:4399
->        __blk_mq_alloc_disk+0x29/0x120 block/blk-mq.c:4446
->        nbd_dev_add+0x492/0xbb0 drivers/block/nbd.c:1957
->        nbd_init+0x1a2/0x3c0 drivers/block/nbd.c:2702
->        do_one_initcall+0x123/0x6e0 init/main.c:1283
->        do_initcall_level init/main.c:1345 [inline]
->        do_initcalls init/main.c:1361 [inline]
->        do_basic_setup init/main.c:1380 [inline]
->        kernel_init_freeable+0x5c8/0x920 init/main.c:1593
->        kernel_init+0x1c/0x2b0 init/main.c:1483
->        ret_from_fork+0x675/0x7d0 arch/x86/kernel/process.c:158
->        ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-> 
-> -> #1 (fs_reclaim){+.+.}-{0:0}:
->        __fs_reclaim_acquire mm/page_alloc.c:4269 [inline]
->        fs_reclaim_acquire+0x102/0x150 mm/page_alloc.c:4283
->        might_alloc include/linux/sched/mm.h:318 [inline]
->        slab_pre_alloc_hook mm/slub.c:4921 [inline]
->        slab_alloc_node mm/slub.c:5256 [inline]
->        __kmalloc_cache_noprof+0x58/0x780 mm/slub.c:5758
->        kmalloc_noprof include/linux/slab.h:957 [inline]
->        kzalloc_noprof include/linux/slab.h:1094 [inline]
->        ref_tracker_alloc+0x18e/0x5b0 lib/ref_tracker.c:271
->        __netns_tracker_alloc include/net/net_namespace.h:362 [inline]
->        netns_tracker_alloc include/net/net_namespace.h:371 [inline]
->        get_net_track include/net/net_namespace.h:388 [inline]
->        sk_net_refcnt_upgrade+0x141/0x1e0 net/core/sock.c:2384
->        rds_tcp_tune+0x23d/0x530 net/rds/tcp.c:507
->        rds_tcp_conn_path_connect+0x305/0x7f0 net/rds/tcp_connect.c:127
->        rds_connect_worker+0x1af/0x2c0 net/rds/threads.c:176
->        process_one_work+0x9cf/0x1b70 kernel/workqueue.c:3263
->        process_scheduled_works kernel/workqueue.c:3346 [inline]
->        worker_thread+0x6c8/0xf10 kernel/workqueue.c:3427
->        kthread+0x3c5/0x780 kernel/kthread.c:463
->        ret_from_fork+0x675/0x7d0 arch/x86/kernel/process.c:158
->        ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:245
-> 
-> -> #0 (k-sk_lock-AF_INET){+.+.}-{0:0}:
->        check_prev_add kernel/locking/lockdep.c:3165 [inline]
->        check_prevs_add kernel/locking/lockdep.c:3284 [inline]
->        validate_chain kernel/locking/lockdep.c:3908 [inline]
->        __lock_acquire+0x126f/0x1c90 kernel/locking/lockdep.c:5237
->        lock_acquire kernel/locking/lockdep.c:5868 [inline]
->        lock_acquire+0x179/0x350 kernel/locking/lockdep.c:5825
->        lock_sock_nested+0x41/0xf0 net/core/sock.c:3720
->        lock_sock include/net/sock.h:1679 [inline]
->        mptcp_subflow_shutdown+0x24/0x380 net/mptcp/protocol.c:2918
->        mptcp_check_send_data_fin+0x248/0x440 net/mptcp/protocol.c:3022
->        __mptcp_close+0x90e/0xbe0 net/mptcp/protocol.c:3116
->        mptcp_close+0x28/0xe0 net/mptcp/protocol.c:3170
->        inet_release+0xed/0x200 net/ipv4/af_inet.c:437
->        __sock_release+0xb3/0x270 net/socket.c:662
->        sock_close+0x1c/0x30 net/socket.c:1455
->        __fput+0x402/0xb70 fs/file_table.c:468
->        task_work_run+0x150/0x240 kernel/task_work.c:227
->        resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
->        exit_to_user_mode_loop+0xec/0x130 kernel/entry/common.c:43
->        exit_to_user_mode_prepare include/linux/irq-entry-common.h:225 [inline]
->        syscall_exit_to_user_mode_work include/linux/entry-common.h:175 [inline]
->        syscall_exit_to_user_mode include/linux/entry-common.h:210 [inline]
->        do_syscall_64+0x426/0xfa0 arch/x86/entry/syscall_64.c:100
->        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> other info that might help us debug this:
-> 
-> Chain exists of:
->   k-sk_lock-AF_INET --> &nsock->tx_lock --> sk_lock-AF_INET
 
-It looks like a false positive due to mptcp subflows and nbd connection
-sockets getting the lockdep annotation. We should possibly/likely use a
-specific lockdep key for mptcp subflows.
 
-/P
+> On Nov 5, 2025, at 22:46, Nikolay Aleksandrov <razor@blackwall.org> =
+wrote:
+>=20
+> On 11/5/25 16:27, Tonghao Zhang wrote:
+>> Using atomic to protect the send_peer_notif instead of rtnl_mutex.
+>> This approach allows safe updates in both interrupt and process
+>> contexts, while avoiding code complexity.
+>>=20
+>> In lacp mode, the rtnl might be locked, preventing =
+ad_cond_set_peer_notif()
+>> from acquiring the lock and updating send_peer_notif. This patch =
+addresses
+>> the issue by using a atomic. Since updating send_peer_notif does not
+>> require high real-time performance, such atomic updates are =
+acceptable.
+>>=20
+>> After coverting the rtnl lock for send_peer_notif to atomic, in =
+bond_mii_monitor(),
+>> we should check the should_notify_peers (rtnllock required) instead =
+of
+>> send_peer_notif. By the way, to avoid peer notify event loss, we =
+check
+>> again whether to send peer notify, such as active-backup mode =
+failover.
+>>=20
+>> Cc: Jay Vosburgh <jv@jvosburgh.net>
+>> Cc: "David S. Miller" <davem@davemloft.net>
+>> Cc: Eric Dumazet <edumazet@google.com>
+>> Cc: Jakub Kicinski <kuba@kernel.org>
+>> Cc: Paolo Abeni <pabeni@redhat.com>
+>> Cc: Simon Horman <horms@kernel.org>
+>> Cc: Jonathan Corbet <corbet@lwn.net>
+>> Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+>> Cc: Nikolay Aleksandrov <razor@blackwall.org>
+>> Cc: Hangbin Liu <liuhangbin@gmail.com>
+>> Suggested-by: Jay Vosburgh <jv@jvosburgh.net>
+>> Signed-off-by: Tonghao Zhang <tonghao@bamaicloud.com>
+>> ---
+>> v3:
+>> - add the comment, *_dec_if_positive is safe.
+>> v2:
+>> - refine the codes
+>> - check bond_should_notify_peers again in bond_mii_monitor(), to =
+avoid event loss.
+>> v1:
+>> - =
+https://patchwork.kernel.org/project/netdevbpf/patch/20251026095614.48833-=
+1-tonghao@bamaicloud.com/
+>> ---
+>> drivers/net/bonding/bond_3ad.c  |  7 ++---
+>> drivers/net/bonding/bond_main.c | 47 =
+++++++++++++++++-----------------
+>> include/net/bonding.h           |  9 ++++++-
+>> 3 files changed, 33 insertions(+), 30 deletions(-)
+>>=20
+>> diff --git a/drivers/net/bonding/bond_3ad.c =
+b/drivers/net/bonding/bond_3ad.c
+>> index 49717b7b82a2..05c573e45450 100644
+>> --- a/drivers/net/bonding/bond_3ad.c
+>> +++ b/drivers/net/bonding/bond_3ad.c
+>> @@ -999,11 +999,8 @@ static void ad_cond_set_peer_notif(struct port =
+*port)
+>> {
+>> struct bonding *bond =3D port->slave->bond;
+>>=20
+>> - if (bond->params.broadcast_neighbor && rtnl_trylock()) {
+>> - bond->send_peer_notif =3D bond->params.num_peer_notif *
+>> - max(1, bond->params.peer_notif_delay);
+>> - rtnl_unlock();
+>> - }
+>> + if (bond->params.broadcast_neighbor)
+>> + bond_peer_notify_reset(bond);
+>> }
+>>=20
+>> /**
+>> diff --git a/drivers/net/bonding/bond_main.c =
+b/drivers/net/bonding/bond_main.c
+>> index 8e592f37c28b..4da92f3b129c 100644
+>> --- a/drivers/net/bonding/bond_main.c
+>> +++ b/drivers/net/bonding/bond_main.c
+>> @@ -1167,10 +1167,11 @@ static bool bond_should_notify_peers(struct =
+bonding *bond)
+>> {
+>> struct bond_up_slave *usable;
+>> struct slave *slave =3D NULL;
+>> + int send_peer_notif;
+>>=20
+>> - if (!bond->send_peer_notif ||
+>> -    bond->send_peer_notif %
+>> -    max(1, bond->params.peer_notif_delay) !=3D 0 ||
+>> + send_peer_notif =3D atomic_read(&bond->send_peer_notif);
+>> + if (!send_peer_notif ||
+>> +    send_peer_notif % max(1, bond->params.peer_notif_delay) !=3D 0 =
+||
+>>    !netif_carrier_ok(bond->dev))
+>> return false;
+>>=20
+>> @@ -1270,8 +1271,6 @@ void bond_change_active_slave(struct bonding =
+*bond, struct slave *new_active)
+>>      BOND_SLAVE_NOTIFY_NOW);
+>>=20
+>> if (new_active) {
+>> - bool should_notify_peers =3D false;
+>> -
+>> bond_set_slave_active_flags(new_active,
+>>    BOND_SLAVE_NOTIFY_NOW);
+>>=20
+>> @@ -1280,19 +1279,17 @@ void bond_change_active_slave(struct bonding =
+*bond, struct slave *new_active)
+>>      old_active);
+>>=20
+>> if (netif_running(bond->dev)) {
+>> - bond->send_peer_notif =3D
+>> - bond->params.num_peer_notif *
+>> - max(1, bond->params.peer_notif_delay);
+>> - should_notify_peers =3D
+>> - bond_should_notify_peers(bond);
+>> + bond_peer_notify_reset(bond);
+>> +
+>> + if (bond_should_notify_peers(bond)) {
+>> + atomic_dec(&bond->send_peer_notif);
+>> + call_netdevice_notifiers(
+>> + NETDEV_NOTIFY_PEERS,
+>> + bond->dev);
+>> + }
+>> }
+>>=20
+>> call_netdevice_notifiers(NETDEV_BONDING_FAILOVER, bond->dev);
+>> - if (should_notify_peers) {
+>> - bond->send_peer_notif--;
+>> - call_netdevice_notifiers(NETDEV_NOTIFY_PEERS,
+>> - bond->dev);
+>> - }
+>> }
+>> }
+>>=20
+>> @@ -2801,7 +2798,7 @@ static void bond_mii_monitor(struct work_struct =
+*work)
+>>=20
+>> rcu_read_unlock();
+>>=20
+>> - if (commit || bond->send_peer_notif) {
+>> + if (commit || should_notify_peers) {
+>> /* Race avoidance with bond_close cancel of workqueue */
+>> if (!rtnl_trylock()) {
+>> delay =3D 1;
+>> @@ -2816,16 +2813,16 @@ static void bond_mii_monitor(struct =
+work_struct *work)
+>> bond_miimon_commit(bond);
+>> }
+>>=20
+>> - if (bond->send_peer_notif) {
+>> - bond->send_peer_notif--;
+>> - if (should_notify_peers)
+>> - call_netdevice_notifiers(NETDEV_NOTIFY_PEERS,
+>> - bond->dev);
+>> - }
+>> + /* check again to avoid send_peer_notif has been changed. */
+>> + if (bond_should_notify_peers(bond))
+>> + call_netdevice_notifiers(NETDEV_NOTIFY_PEERS, bond->dev);
+>>=20
+>> rtnl_unlock(); /* might sleep, hold no other locks */
+>> }
+>>=20
+>> + /* this's safe to *_dec_if_positive, even when peer notify =
+disabled. */
+>> + atomic_dec_if_positive(&bond->send_peer_notif);
+>> +
+>> re_arm:
+>> if (bond->params.miimon)
+>> queue_delayed_work(bond->wq, &bond->mii_work, delay);
+>> @@ -3773,7 +3770,7 @@ static void bond_activebackup_arp_mon(struct =
+bonding *bond)
+>> return;
+>>=20
+>> if (should_notify_peers) {
+>> - bond->send_peer_notif--;
+>> + atomic_dec(&bond->send_peer_notif);
+>=20
+> this can run in parallel with the active slave change and they both =
+can
+> read the same send_peer_notif count and do an unconditional decrement
+> even though only one of them should, should_notify_peers is read =
+outside
+> of the lock and can race with active slave change
+This appears to be the original issue, but I have fixed it in the next =
+version.
+>=20
+>> call_netdevice_notifiers(NETDEV_NOTIFY_PEERS,
+>> bond->dev);
+>> }
+>> @@ -4267,6 +4264,8 @@ static int bond_open(struct net_device =
+*bond_dev)
+>> queue_delayed_work(bond->wq, &bond->alb_work, 0);
+>> }
+>>=20
+>> + atomic_set(&bond->send_peer_notif, 0);
+>> +
+>> if (bond->params.miimon)  /* link check interval, in milliseconds. */
+>> queue_delayed_work(bond->wq, &bond->mii_work, 0);
+>>=20
+>> @@ -4300,7 +4299,7 @@ static int bond_close(struct net_device =
+*bond_dev)
+>> struct slave *slave;
+>>=20
+>> bond_work_cancel_all(bond);
+>> - bond->send_peer_notif =3D 0;
+>> + atomic_set(&bond->send_peer_notif, 0);
+>> if (bond_is_lb(bond))
+>> bond_alb_deinitialize(bond);
+>> bond->recv_probe =3D NULL;
+>> diff --git a/include/net/bonding.h b/include/net/bonding.h
+>> index 49edc7da0586..afdfcb5bfaf0 100644
+>> --- a/include/net/bonding.h
+>> +++ b/include/net/bonding.h
+>> @@ -236,7 +236,7 @@ struct bonding {
+>> */
+>> spinlock_t mode_lock;
+>> spinlock_t stats_lock;
+>> - u32 send_peer_notif;
+>> + atomic_t send_peer_notif;
+>> u8       igmp_retrans;
+>> #ifdef CONFIG_PROC_FS
+>> struct   proc_dir_entry *proc_entry;
+>> @@ -814,4 +814,11 @@ static inline netdev_tx_t bond_tx_drop(struct =
+net_device *dev, struct sk_buff *s
+>> return NET_XMIT_DROP;
+>> }
+>>=20
+>> +static inline void bond_peer_notify_reset(struct bonding *bond)
+>> +{
+>> + atomic_set(&bond->send_peer_notif,
+>> + bond->params.num_peer_notif *
+>> + max(1, bond->params.peer_notif_delay));
+>> +}
+>> +
+>> #endif /* _NET_BONDING_H */
+>=20
+>=20
 
 
