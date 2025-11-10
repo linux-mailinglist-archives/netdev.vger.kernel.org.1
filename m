@@ -1,85 +1,91 @@
-Return-Path: <netdev+bounces-237253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81721C47F4D
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 17:32:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D089C47C8D
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 17:09:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 035E33B6C25
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 16:01:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2BEEE18950DB
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 16:01:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AF4325A340;
-	Mon, 10 Nov 2025 16:00:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B2D274FDF;
+	Mon, 10 Nov 2025 16:01:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xz1FX7JE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MKlz0y2N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66A22147E6
-	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 16:00:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F09626FA77
+	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 16:01:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762790458; cv=none; b=ktGZ0esmyXdHO+sLEFbXfxSt3oUK6LSakRtow5bjGWaYk/rbnQ1vU38FT8pQu2rD0PFuLtTfzZKs/OO6zoxMyAGMvtPtyYt61iBqoYikULeO5LTuGmHfU2psMHdH5TIOQmiHcW99TA/NGVbqRtjpPpHQbZyDuWWk9Vnml9urThI=
+	t=1762790470; cv=none; b=ln7iUaKPcsIPmBmIlYo/QxVkEOB3fZiUsNAlyfQFVTSXsMHv6C6KVc/qvwMm0OoYc8TVGNqFqFIr4P2l1yNNWdnSma1Cd/mHe4bbfwNteJx6pfq6zCK/RyJV0d5b/bxfipXjKJccgWIfLCIl1UPW3gLg7lSgYsncayAjY/yjSvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762790458; c=relaxed/simple;
-	bh=YKy6nf/WLesO+4dyp0Fli6ZEcoUscJSJks9BpyhpdHQ=;
-	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=DrSSWAVsXN/gAls5zOLiMrwxCexRal5P0IwNVFkzugBi9tbXVwVgmTTsfsmL9eX9jbopWgbfv/4nPstgk8OUbZgelsPJyJiH68Mk3QWhvmJ+1zxdlBi3w6ANMJZuUizLp/0odwXs+U6ymjtQk2E0WQDBwFodKVxKcEPNm0duZXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xz1FX7JE; arc=none smtp.client-ip=209.85.210.172
+	s=arc-20240116; t=1762790470; c=relaxed/simple;
+	bh=HkQ4kILA9wNIWSnxvnjS6gXCu8uHOLraWRf740qpvjI=;
+	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kPcHcakWAxCbfRFLwC1pycrGPNYxq7zONKLPjYWEAvvCdqAvRJZDvAsdlklYb3ouBBR+I4cf7LzSG7hjPKs61KbiP4pN5oHsq3skOByonbVlnGaIOYdMeASeDfoIxdG94Uiv2WnMOPxYCDS6sgm+PQbW+Y0+BWkW3ATN6dVfums=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MKlz0y2N; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7af603c06easo2932033b3a.0
-        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 08:00:56 -0800 (PST)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-295548467c7so34001965ad.2
+        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 08:01:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762790456; x=1763395256; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:user-agent:message-id:date
-         :cc:to:from:subject:from:to:cc:subject:date:message-id:reply-to;
-        bh=f/vL+BwfikbSCE8G55Qulmyt0hKx4dL0IdL2jb1WbT8=;
-        b=Xz1FX7JE+cTqmGzEefIJtcP3IaUs4oCRpmJNyC2Y9q7PvU/uu7cKEnBut0aEcDwYCv
-         QrbwI86gxddiSEMGQDnLjARC8rj8VpNy/O5uISDR9O/pRexpoJeHsZsJ5HhlzWRcJtJN
-         xvTHcsSLV+k3SK5BtZLtiedczVfif+Sw0LCu3mN9t/YXpzsCG29odosMJq5RCwycXhDg
-         YuhuWTL8UCdvjnPPYjfKTCSp+KOFnZXMigjvlzGZQuy2ESph9KCE5fahfLwaVViDRSvn
-         +gnuMkvhnxGuGtiS9+gFfMk4A60WjhkWFkZDWOnq8ps/+Jj4nZDebBr8FbAoGupIKejP
-         IpMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762790456; x=1763395256;
-        h=content-transfer-encoding:mime-version:user-agent:message-id:date
-         :cc:to:from:subject:x-gm-gg:x-gm-message-state:from:to:cc:subject
+        d=gmail.com; s=20230601; t=1762790468; x=1763395268; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:message-id:date:cc:to:from:subject:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=f/vL+BwfikbSCE8G55Qulmyt0hKx4dL0IdL2jb1WbT8=;
-        b=GBuygerFJ52Y65ByS7iIVqhLAzM28G2p+bpcuOfCjcPjrk0YkLp1CHUxaKRWVl2r1i
-         023GpI+R1o3vFv4IbI5JvsqZqIK14Wya+Iyrgfp7ZyMGjahRDeWqrP1ihzEh71XUh/eL
-         AVBOXbVZv81mzlTR8gxoJgwFtFPQpZS8n9ESIwVDTtKjJvT1VuE9xPCGIaodSxgiQDH3
-         oZvhfJg8wEjmzm2emVKTCeMs58kXl2EZ28hO+9QDMyeKOzDE5+fAlg9823/cl7RWkkZZ
-         kA/weTpXci8Iqw5ocKu2RJs1udaOvAIn+AumF6HJZZNLnGiAz7fM84FMYqz0Wrt17njo
-         vWWw==
-X-Gm-Message-State: AOJu0YztcAGAmZ3a2UrkaUZvEbu5D3Rbi+uOcnGt5qKx/PRRuQ11VW5S
-	emK0rZTC/3vvfFrpPhkcy7SSF2141kTybu6Mc+VwJMhM0aZVLErKuFM1eUSwaQ==
-X-Gm-Gg: ASbGnct0HzFzHzuGrB2wYH2vgr6Hb/Tb4s3QUTs7og+zUXM0XLpYobqz+oP5YzBkGB1
-	zlqE5rulqSzl4IBvL/sLzFCtQ8sDIHGCknHxK0le1fcwTvP+YOx9fivH6n65FsmSaTqiIX8A8LN
-	fBJ7TNxay/E56d/5Q6u5oxftd6k7e+YQEJmam9tfiPKjsdi+vzKrZ3+ojDoCpPPb55zqc0oOh48
-	Udim6O4Lfh6MZ9jxxuuC++zqMkOTYFEU/zIrlaiNCQjd39gurCk56Q7LHyHQLm5epMji98h6DgQ
-	2mju2gw0BTl19z3gcrxEJwX2ZUn24eUZgORyNS7JfZgMqRGO0wdXMXEADRcMxd4FQawZhfp7hze
-	++cvdR+wMGogbAC1+qL7BpByscyCqV/t7ks18TyCOMG0DLTykTR4ZsHJLvxD2mAX0czj2OtP/Gw
-	HOUnbo1BA8QohOQ8TcfG0Ma/aQTHGFwU7vg0Ol1BE0WXre
-X-Google-Smtp-Source: AGHT+IEBSOtygxSsJANK+fchIIPKYEmhowZlPstLfF7ZMZ3KiL5Jcf1jLkiKyQkeVZycLwP0ZLVaCw==
-X-Received: by 2002:a05:6a20:4306:b0:342:1d16:80e with SMTP id adf61e73a8af0-35388831928mr11661571637.4.1762790454412;
-        Mon, 10 Nov 2025 08:00:54 -0800 (PST)
+        bh=d0GHWQNMIh3x080W5fJnrRO6tAzQzglX3ock4yg5pxk=;
+        b=MKlz0y2N+gEjiYeAII0JcKUIZAgRMySbAUmhZnXLGNbBpXSgNMUAAenvpwVb7jw3ee
+         PfQR4aCSt+pbAyjN7p0NIFLmLmaDRXYd3As9th4uFuiwPM1CCSRx06brGAkfyXTiK6q4
+         Oy33VHDpjLGPJoPVhoYVIvJEI1OKqqpNePMW8deNFVMvJqiu29fsTRT+2QI43rh/6veR
+         XOSwBQhgKhEIHqnkSzegfj8Ufv8Hj6uEO7TujDmeSUz72fReCblttQdUmt+Yk+EAn5YK
+         VtQA6/QaNs0j+tTIX5cypBx0qWRW1YAuxBSz2aaVADCIf187K/rjQIRKcjWywlPc1ffn
+         1e9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762790468; x=1763395268;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:message-id:date:cc:to:from:subject:x-gm-gg
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=d0GHWQNMIh3x080W5fJnrRO6tAzQzglX3ock4yg5pxk=;
+        b=uFjOnNh/Deb7CwJkIk7GnFK+uqDM2VjUJYJW/WHemy/mWZQlwq9av9V46cZ3LFX03N
+         MZgknEfPen63S9YJpTaC2CvYZ8dmrSx/9Asbk4JlRG+IrTg8oSUqCdHguV8jwX9e7LKY
+         Ymf2z0mYzu0x++JRMw7VSY7wOTwI/c2L9C8rRF387kP9bD+HyGTD5t+NWosyf9KZMID4
+         ok5Fz3Ihw5DCj3XWITq5+7CfxEDVkcnx985c8HNjePttnOdcOlhVM3ykNFfcOVA7AFQ0
+         1XDC9IrPushpVfvEnhqmVDwcLJB2vR9LO5B4VaCUlisePxk1sRnF6w49Is4rOLgeTXZn
+         1n/w==
+X-Gm-Message-State: AOJu0YwfhowAEH5cib0PnIVfot/LutRuU5cq2yjqv7xx+xIINesjJMpr
+	C7fKAWjuc9kXjqUiOXKQW58vjNmbIXZWudpTprnS0WSX/2cMeD6DKJTGStz74g==
+X-Gm-Gg: ASbGnctvhwRDmd66ZP3Ka3Umz7yLwex5KTiTKLbLKFEG2dG66JKhNB8x3ZrkuId7iIY
+	8infm2ir/K3mDgdwuM/jr0UuxrKxi9Jan4Ztd0z/orAEW8MbLxNiVuqQRoyw5gFLy7GszYhEy/X
+	pKGLFftysQwCmR6GzXOEmhyk0b2taP5Q1X1jAvKEVKOjxAwp0rtPx6/9Wpv1NIg8OZ2aG2zY9Ts
+	J1cVQsqUIVT6csR/H6aAPMaMFGdok7GhyLa9MiAnj0Su28zbUHJBjvxlpjOVzaoBULWzPxgCRlx
+	q1T5y96gEJrG7jQ/uk1Rk1Dl8M9SvLYu2EQR2gwgSKCgq7LMkoOnCR1tPVzqGBGsC4bBVdODrmM
+	TOqKhvm/0nVTxaxnZ5Qs4U9d0TxxYD1W+WeHLnJ6ObHqOtTPb0Fljduyqc0mdEzlNO5SzJuwIS2
+	rMLEKLL9hri64oeEbT1c1gqLMgG3c0K84FoQ==
+X-Google-Smtp-Source: AGHT+IES0NB/mpbUwKy2xxXE5+MOiVax2vgsSRwb/yh718c+rlo4jIJZ0NhLEP1ymT2wWvLe7mEvoQ==
+X-Received: by 2002:a17:903:2b06:b0:297:f5ad:6708 with SMTP id d9443c01a7336-297f5ad67dbmr87314065ad.43.1762790461819;
+        Mon, 10 Nov 2025 08:01:01 -0800 (PST)
 Received: from ahduyck-xeon-server.home.arpa ([2605:59c8:829:4c00:9e5c:8eff:fe4f:f2d0])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b0cc17784bsm12485053b3a.47.2025.11.10.08.00.53
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29651ca1eb7sm153291565ad.89.2025.11.10.08.01.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Nov 2025 08:00:53 -0800 (PST)
-Subject: [net-next PATCH v3 00/10] net: phy: Add support for fbnic PHY w/ 25G,
- 50G, and 100G support
+        Mon, 10 Nov 2025 08:01:01 -0800 (PST)
+Subject: [net-next PATCH v3 01/10] net: phy: Add support for 25,
+ 50 and 100Gbps PMA to genphy_c45_read_pma
 From: Alexander Duyck <alexander.duyck@gmail.com>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org, kernel-team@meta.com, andrew+netdev@lunn.ch,
  hkallweit1@gmail.com, linux@armlinux.org.uk, pabeni@redhat.com,
  davem@davemloft.net
-Date: Mon, 10 Nov 2025 08:00:52 -0800
+Date: Mon, 10 Nov 2025 08:00:59 -0800
 Message-ID: 
+ <176279045960.2130772.11393060400220095710.stgit@ahduyck-xeon-server.home.arpa>
+In-Reply-To: 
+ <176279018050.2130772.17812295685941097123.stgit@ahduyck-xeon-server.home.arpa>
+References: 
  <176279018050.2130772.17812295685941097123.stgit@ahduyck-xeon-server.home.arpa>
 User-Agent: StGit/1.5
 Precedence: bulk
@@ -91,73 +97,55 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 
-To transition the fbnic driver to using the XPCS driver we need to address
-the fact that we need a representation for the FW managed PMA/PMD that is
-actually a SerDes PHY to handle link bouncing during link training.
+From: Alexander Duyck <alexanderduyck@fb.com>
 
-This patch set first introduces the necessary bits to the 
-generic c45 driver code to enable it to read 25G, 50G, and 100G modes from 
-the PHY. After that we update the XPCS driver to to do the same.
+Add support for reading 25, 50, and 100G from the PMA interface for a C45
+device. By doing this we enable support for future devices that support
+higher speeds than the current limit of 10G.
 
-The rest of this patch set enables the changes to fbnic to make use of these
-interfaces and expose a PMA/PMD that can provide a necessary link delay to 
-avoid link flapping in the event that a cable is disconnected and 
-reconnected, and to correctly provide the count for the link down events.
-
-With this we have the basic groundwork laid as with this all the bits and 
-pieces are in place in terms of reading the configuration. The general plan for 
-follow-on patch sets is to start looking at enabling changing the configuration 
-in environments where that is supported.
-
-v2: Added XPCS code to the patch set
-    Dropped code adding bits for extended ability registers
-    Switched from enabling code in generic c45 to enabling code in fbnic_phy.c
-    Fixed several bugs related to phy state machine and use of resume
-    Moved PHY assignment into ndo_init/uninit
-    Renamed fbnic_swmii.c to fbnic_mdio.c
-v3: Modified XPCS to have it read link from PMA instead of using a phydev
-    Fixed naming for PCS vs PMA for CTRL1 register speed bit values
-    Added logic to XPCS to get speed from PCS CTRL1 register
-    Swapped fbnic link delay timer from tracking training start to end
-    Dropped driver code for fbnic_phy.c and phydev code from patches
-    Updated patch naming to match expectations for PCS changes
-    Cleaned up dead code and defines from earlier versions
-
+Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
 ---
+ drivers/net/phy/phy-c45.c |    9 +++++++++
+ include/uapi/linux/mdio.h |    6 ++++++
+ 2 files changed, 15 insertions(+)
 
-Alexander Duyck (10):
-      net: phy: Add support for 25, 50 and 100Gbps PMA to genphy_c45_read_pma
-      net: phy: Rename MDIO_CTRL1_SPEED for 2.5G and 5G to reflect PMA values
-      net: pcs: xpcs: Add support for 25G, 50G, and 100G interfaces
-      net: pcs: xpcs: Fix PMA identifier handling in XPCS
-      net: pcs: xpcs: Add support for FBNIC 25G, 50G, 100G PMA
-      fbnic: Rename PCS IRQ to MAC IRQ as it is actually a MAC interrupt
-      fbnic: Add logic to track PMD state via MAC/PCS signals
-      fbnic: Cleanup handling for link down event statistics
-      fbnic: Add SW shim for MDIO interface to PMA/PMD and PCS
-      fbnic: Replace use of internal PCS w/ Designware XPCS
+diff --git a/drivers/net/phy/phy-c45.c b/drivers/net/phy/phy-c45.c
+index e8e5be4684ab..1d747fbaa10c 100644
+--- a/drivers/net/phy/phy-c45.c
++++ b/drivers/net/phy/phy-c45.c
+@@ -627,6 +627,15 @@ int genphy_c45_read_pma(struct phy_device *phydev)
+ 	case MDIO_CTRL1_SPEED10G:
+ 		phydev->speed = SPEED_10000;
+ 		break;
++	case MDIO_PMA_CTRL1_SPEED25G:
++		phydev->speed = SPEED_25000;
++		break;
++	case MDIO_PMA_CTRL1_SPEED50G:
++		phydev->speed = SPEED_50000;
++		break;
++	case MDIO_PMA_CTRL1_SPEED100G:
++		phydev->speed = SPEED_100000;
++		break;
+ 	default:
+ 		phydev->speed = SPEED_UNKNOWN;
+ 		break;
+diff --git a/include/uapi/linux/mdio.h b/include/uapi/linux/mdio.h
+index 6975f182b22c..75ed41fc46c6 100644
+--- a/include/uapi/linux/mdio.h
++++ b/include/uapi/linux/mdio.h
+@@ -116,6 +116,12 @@
+ #define MDIO_CTRL1_SPEED10G		(MDIO_CTRL1_SPEEDSELEXT | 0x00)
+ /* 10PASS-TS/2BASE-TL */
+ #define MDIO_CTRL1_SPEED10P2B		(MDIO_CTRL1_SPEEDSELEXT | 0x04)
++/* 100 Gb/s */
++#define MDIO_PMA_CTRL1_SPEED100G	(MDIO_CTRL1_SPEEDSELEXT | 0x0c)
++/* 25 Gb/s */
++#define MDIO_PMA_CTRL1_SPEED25G		(MDIO_CTRL1_SPEEDSELEXT | 0x10)
++/* 50 Gb/s */
++#define MDIO_PMA_CTRL1_SPEED50G		(MDIO_CTRL1_SPEEDSELEXT | 0x14)
+ /* 2.5 Gb/s */
+ #define MDIO_CTRL1_SPEED2_5G		(MDIO_CTRL1_SPEEDSELEXT | 0x18)
+ /* 5 Gb/s */
 
-
- drivers/net/ethernet/meta/Kconfig             |   1 +
- drivers/net/ethernet/meta/fbnic/Makefile      |   1 +
- drivers/net/ethernet/meta/fbnic/fbnic.h       |  15 +-
- drivers/net/ethernet/meta/fbnic/fbnic_csr.h   |   2 +
- .../net/ethernet/meta/fbnic/fbnic_ethtool.c   |   9 +
- drivers/net/ethernet/meta/fbnic/fbnic_irq.c   |  45 +++--
- drivers/net/ethernet/meta/fbnic/fbnic_mac.c   |  71 ++++---
- drivers/net/ethernet/meta/fbnic/fbnic_mac.h   |  40 +++-
- drivers/net/ethernet/meta/fbnic/fbnic_mdio.c  | 190 ++++++++++++++++++
- .../net/ethernet/meta/fbnic/fbnic_netdev.c    |  11 +-
- .../net/ethernet/meta/fbnic/fbnic_netdev.h    |   6 +-
- drivers/net/ethernet/meta/fbnic/fbnic_pci.c   |  17 +-
- .../net/ethernet/meta/fbnic/fbnic_phylink.c   | 163 ++++++++-------
- drivers/net/pcs/pcs-xpcs.c                    | 135 ++++++++++++-
- drivers/net/phy/phy-c45.c                     |  17 +-
- include/linux/pcs/pcs-xpcs.h                  |   4 +-
- include/uapi/linux/mdio.h                     |  18 +-
- 17 files changed, 592 insertions(+), 153 deletions(-)
- create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_mdio.c
-
---
 
 
