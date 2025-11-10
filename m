@@ -1,148 +1,126 @@
-Return-Path: <netdev+bounces-237350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34323C495DB
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 22:11:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9864EC4961B
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 22:18:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E54E73A223C
-	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 21:11:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 856103A2739
+	for <lists+netdev@lfdr.de>; Mon, 10 Nov 2025 21:17:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91C062DECAA;
-	Mon, 10 Nov 2025 21:11:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61DAC2FB09A;
+	Mon, 10 Nov 2025 21:17:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nMUPst/H"
+	dkim=pass (2048-bit key) header.d=listout.xyz header.i=@listout.xyz header.b="Akeb/ucT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE192F49E9
-	for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 21:11:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDADE2FB0AE;
+	Mon, 10 Nov 2025 21:17:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762809087; cv=none; b=YMi9NTFZIRbVAJHLyJ3EedZ5MTSseF1Rt5F706SQIP1fsSQuSQJ1pyIyXYXS/6+2OfGUIAs2bIXPxIL4j5C9jTJb5zMQ0/6/giSVSfxz1rsWudJ5XsRpesAElKO1rde5Dc2/mGfpEr0AYJYYWYpth0R6W1EiS+gfanUX0Z7ySDA=
+	t=1762809425; cv=none; b=SqzW+J88Cf3AqeFkt9DeFgtijKU9KG1DUP+X7F3Xe9EIcS2dhFU9nZ0c6yWxkNMgpGAJRtA3WjG1btcdN/4UFzow50J8m0LsUrSScQ29+XWajZd3Ex+fpeL/PVbBo/qIXCHLb+M8tREP2W7WEN0zDUtlIJTz86WXNNMO7WhnqUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762809087; c=relaxed/simple;
-	bh=LrkURI0gSm8PlqcAUJbCABNYiL2cCdnxh5meaQNYxoI=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=uoR9aCzbMHtLCvcawh3Q6CNpTDcK91RRHRgTB+3S/ntSPxcJMLsYWW9riMqlq5760v/0HELBpQYaDpp/kUTLnV8T/JrUFd2MJlNXFxbxNqKN9yZdOFsITop4CDCy85E0nDedNvVGCtejQSc5vfGOe+jWf518MW7gSdg6TWDFg1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nMUPst/H; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-42b3669ca3dso863070f8f.0
-        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 13:11:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762809084; x=1763413884; darn=vger.kernel.org;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=At+ab1WSgPuU0PAsbZBhlG6un2tXeW7kWEEZOPeASes=;
-        b=nMUPst/HWpkivdwvP511vrGN2e4R1xNullgkwevG5lnsRrJ0juAgAy2Vzp/Ot6UeGj
-         6goRmUitkrAVG2BgYbabsS5i50MFFI658ThuZA99GQBqoJOO80jdS6jQ+h9DokLdI/+B
-         xj8X2OVjH9MNX0RYbNyV7HKeFjP8/IgGLToC0klwl3oxulvpLS+R0JtyqfZ6Oidm0j1c
-         08Aok1MISiBKR0kEQi+9kuN9Lq8+Sdxu/J9iZhzh/QUnt+seQH15I5RGTe0NpAVS6eFC
-         FkPiyI/8OPt9dM4YHQSEK5ZZi0rWCajpvlp1Vqur6FJXQ5w0PVAhAPMgXCFV9outrnmX
-         mBMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762809084; x=1763413884;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=At+ab1WSgPuU0PAsbZBhlG6un2tXeW7kWEEZOPeASes=;
-        b=WvbJz6Pmua6Bla4i7Rf4kI79SIEzjLST18Miwfp7IAUisL/F/dyuPs/Mf6QMKotom5
-         VFuhPIZ5BcJ8+iZAvoG5V/7TXFHFS9sS87wqDVV5SnxdeoUQyVL0K8rZmBkTsB6DgzwS
-         E3L+V72RigYeN0qn8C5YjFw7hzxsIexnpjkFnNu5/z4i3jiTxu6N6dpgEJlW/5Nf8ArQ
-         XEmXy585ROhIHFEZWw/tUUvJbhlNqW5vboUfpXaokd/wcCWGzNA8vWtIrv6zE4QDCGzJ
-         1V5lD5ufZFZUQQS2DKDtzqJqzJr5XpB5fx5SInyi+uM6JNCQ6jkrdYoo429gjhBnVQzF
-         be6A==
-X-Gm-Message-State: AOJu0YxK9ynWrb8ATG5JgS4/HfEgC+D1T43vENu1Eow8srBKXbHbmP3t
-	zJFSThkQ6bM5AvWZrDZfemvYkZJ+RU+/QuHGqv2IiA/qXKkIb1RS6zh3
-X-Gm-Gg: ASbGncu5joCpqR0t3xnWPAQi/aSq/H3ivlc+C0tTdfinVRol4fw7+5lmO3+O+69Kjbl
-	ucM9w8smKTNtV3nSD1u45EwW1WOOEY5/99XQTNGea1lGwVvVyS6rbwQ5Jo7UKE3YwYQG/dvJfJa
-	h+zbOQvCa+9k9BKs6FkBdGZgFtDEFYe1sbYntd9mwG6Lkw5W/hKpj8IN3ujzHlIdfgSUOPPKXuH
-	6jgnd9JKBBtSAiTFBTj7jrWOgeTAbqG1L897JDIEQ9GKU1J5Sao5k+FzQqRFL8AUc+Dth4dut0l
-	Gpwft2R3A9ycseTpIX+74IxNa2YKEddb2t7VZ8cytG+nZGEVZA5hGK1Nzt5XQnkaws8YY1iWic8
-	TfEMhTU1BNqvUvf8xc6ryFqJZ5lbUQvQXFt4MUmB0bsdPosJ/2+jykRoPtL87djZVSRPZHYIoK4
-	C2lziN09Ibr6FYkKmFnk4y+oe+2Y4LTkNAK+GKBJ4KP+VZipZYIjvU+qN3W8JV/ca6jeacV1SRq
-	TPhhplJCSeABwRZJDYH+3ySFW3ZtF41jA714s0AZ8M=
-X-Google-Smtp-Source: AGHT+IEyX3U+imKS93B/quTA03oSKtyWl+Yv9tcIywlwPSfp2YRZaOiQsoisUNHoJ6el0t+848DDeA==
-X-Received: by 2002:a05:6000:40cd:b0:3eb:d906:e553 with SMTP id ffacd0b85a97d-42b2dcc0ab2mr7232766f8f.55.1762809083903;
-        Mon, 10 Nov 2025 13:11:23 -0800 (PST)
-Received: from ?IPV6:2003:ea:8f33:1e00:300e:33dd:b203:22f9? (p200300ea8f331e00300e33ddb20322f9.dip0.t-ipconnect.de. [2003:ea:8f33:1e00:300e:33dd:b203:22f9])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b326a950bsm13365782f8f.8.2025.11.10.13.11.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Nov 2025 13:11:23 -0800 (PST)
-Message-ID: <ed9eb89b-8205-4ca3-9182-d7e091972846@gmail.com>
-Date: Mon, 10 Nov 2025 22:11:24 +0100
+	s=arc-20240116; t=1762809425; c=relaxed/simple;
+	bh=j/GmLtZD81Iakg1ssg53qGb/gdl098Mso9zN3dxXF8Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=DCNIhcykPtNBjV5e5Dg0Qvli/rrzm6FwQiZ6ktLZeZxX/lO426BgDDez57TwDoJvUpO3aM3A2+OwbkPNy7m3Ppf0FMcZw1Y5LSF3+9xO42ZgHWMX2O1XCeHhJo1DW2eZBt061vJ/zBPBdWV30kZKPkAgMyPiXb2a7k454qJt14Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=listout.xyz; spf=pass smtp.mailfrom=listout.xyz; dkim=pass (2048-bit key) header.d=listout.xyz header.i=@listout.xyz header.b=Akeb/ucT; arc=none smtp.client-ip=80.241.56.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=listout.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=listout.xyz
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [10.196.197.102])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4d52Y70Q67z9tgM;
+	Mon, 10 Nov 2025 22:16:59 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=listout.xyz; s=MBO0001;
+	t=1762809419;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TVpqQbrl3dN+EaWCdEE3H3CfbfxcMD+thTTN9Y4oXtk=;
+	b=Akeb/ucTn5gL0dBj/U3LkeUyBQVab++NskUlESsxW4DZf/QH1qzFbQehJjkkU+4oBrRSKh
+	7/+eIuoYtCIend49R8rzyJB0rVtjUuhESLZX91oRrD/wASrWg5DdNq/hnYhfY5n/9MfTrd
+	jxyVaD7OvGRte88EuDDGp8PieJkQZRoVNtE/vHJ8ghA5y5McSsNzEVUHj1bXz0lLRulsKP
+	75R8p8lsJuQlDPiH8lJfRGBlHuJlhKdAyF5N8/8bK/jbb4pVio10B+29/rVg3SX3md/EuZ
+	olYsyii1kGxUEFYLTpJBHuhUcRpbugJ+em9NOiFcv3MTKVtU4F5LmS0cewIZMw==
+From: Brahmajit Das <listout@listout.xyz>
+To: syzbot+d1b7fa1092def3628bd7@syzkaller.appspotmail.com
+Cc: andrii@kernel.org,
+	ast@kernel.org,
+	bpf@vger.kernel.org,
+	contact@arnaud-lcm.com,
+	daniel@iogearbox.net,
+	eddyz87@gmail.com,
+	haoluo@google.com,
+	john.fastabend@gmail.com,
+	jolsa@kernel.org,
+	kpsingh@kernel.org,
+	linux-kernel@vger.kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	sdf@fomichev.me,
+	song@kernel.org,
+	syzkaller-bugs@googlegroups.com,
+	yonghong.song@linux.dev
+Subject: [RFC bpf-next PATCH] bpf: Clamp trace length in __bpf_get_stack to fix OOB write
+Date: Tue, 11 Nov 2025 02:46:40 +0530
+Message-ID: <20251110211640.963-1-listout@listout.xyz>
+In-Reply-To: <691231dc.a70a0220.22f260.0101.GAE@google.com>
+References: <691231dc.a70a0220.22f260.0101.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Russell King - ARM Linux <linux@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- David Miller <davem@davemloft.net>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] net: phy: fixed_phy: use genphy_read_abilities to
- simplify the code
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Populating phy->supported can be achieved easier by using
-genphy_read_abilities().
+syzbot reported a stack-out-of-bounds write in __bpf_get_stack()
+triggered via bpf_get_stack() when capturing a kernel stack trace.
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+After the recent refactor that introduced stack_map_calculate_max_depth(),
+the code in stack_map_get_build_id_offset() (and related helpers) stopped
+clamping the number of trace entries (`trace_nr`) to the number of elements
+that fit into the stack map value (`num_elem`).
+
+As a result, if the captured stack contained more frames than the map value
+can hold, the subsequent memcpy() would write past the end of the buffer,
+triggering a KASAN report like:
+
+    BUG: KASAN: stack-out-of-bounds in __bpf_get_stack+0x...
+    Write of size N at addr ... by task syz-executor...
+
+Restore the missing clamp by limiting `trace_nr` to `num_elem` before
+computing the copy length. This mirrors the pre-refactor logic and ensures
+we never copy more bytes than the destination buffer can hold.
+
+No functional change intended beyond reintroducing the missing bound check.
+
+Reported-by: syzbot+d1b7fa1092def3628bd7@syzkaller.appspotmail.com
+Fixes: e17d62fedd10 ("bpf: Refactor stack map trace depth calculation into helper function")
+Signed-off-by: Brahmajit Das <listout@listout.xyz>
 ---
- drivers/net/phy/fixed_phy.c | 23 +----------------------
- 1 file changed, 1 insertion(+), 22 deletions(-)
+ kernel/bpf/stackmap.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/phy/fixed_phy.c b/drivers/net/phy/fixed_phy.c
-index 2e46b7aa6..32a9b99af 100644
---- a/drivers/net/phy/fixed_phy.c
-+++ b/drivers/net/phy/fixed_phy.c
-@@ -18,7 +18,6 @@
- #include <linux/of.h>
- #include <linux/idr.h>
- #include <linux/netdevice.h>
--#include <linux/linkmode.h>
+diff --git a/kernel/bpf/stackmap.c b/kernel/bpf/stackmap.c
+index 2365541c81dd..885130e4ab0d 100644
+--- a/kernel/bpf/stackmap.c
++++ b/kernel/bpf/stackmap.c
+@@ -480,6 +480,7 @@ static long __bpf_get_stack(struct pt_regs *regs, struct task_struct *task,
+ 	}
  
- #include "swphy.h"
+ 	trace_nr = trace->nr - skip;
++	trace_nr = min_t(u32, trace_nr, size / elem_size);
+ 	copy_len = trace_nr * elem_size;
  
-@@ -157,27 +156,7 @@ struct phy_device *fixed_phy_register(const struct fixed_phy_status *status,
- 	phy->mdio.dev.of_node = np;
- 	phy->is_pseudo_fixed_link = true;
- 
--	switch (status->speed) {
--	case SPEED_1000:
--		linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Half_BIT,
--				 phy->supported);
--		linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
--				 phy->supported);
--		fallthrough;
--	case SPEED_100:
--		linkmode_set_bit(ETHTOOL_LINK_MODE_100baseT_Half_BIT,
--				 phy->supported);
--		linkmode_set_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT,
--				 phy->supported);
--		fallthrough;
--	case SPEED_10:
--	default:
--		linkmode_set_bit(ETHTOOL_LINK_MODE_10baseT_Half_BIT,
--				 phy->supported);
--		linkmode_set_bit(ETHTOOL_LINK_MODE_10baseT_Full_BIT,
--				 phy->supported);
--	}
--
-+	genphy_read_abilities(phy);
- 	phy_advertise_supported(phy);
- 
- 	ret = phy_device_register(phy);
+ 	ips = trace->ip + skip;
 -- 
 2.51.2
 
