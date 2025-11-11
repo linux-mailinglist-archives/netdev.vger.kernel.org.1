@@ -1,104 +1,159 @@
-Return-Path: <netdev+bounces-237436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1375C4B4C7
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 04:20:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52835C4B512
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 04:27:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5927134B7F1
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:20:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B3DF3A31B3
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:26:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73F3F3346B9;
-	Tue, 11 Nov 2025 03:20:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5F0C3346B9;
+	Tue, 11 Nov 2025 03:26:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C+2ZkxNk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="arA+s8Lc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 414CC218AB0;
-	Tue, 11 Nov 2025 03:20:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D6D303CB4;
+	Tue, 11 Nov 2025 03:26:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762831244; cv=none; b=Iqjf5bnJj/ipUTlSDwAV2cqlBYccU/eFYAbf0eCwIz3biiaEPUDf5a6LWPOPx5xs1phhsBYNvEnVwtigX5VlE49Y+NpNXHjOmQhG7K4c3gk9igYPyB8gP8wr8F+PmhAlNHjjUbpB1/m6Se2+1/3mgS5qrFEMdV46ikEIpMNXZPI=
+	t=1762831596; cv=none; b=qEq8VJH4C4KoVsZ8saLYPHUEzy9GOY+4HR+hi8msBtlKG1XLHUJe3FayQ9O43ymx4BhaxIZpkLLEdH//DOzBp9QmDD/wCi+tUJreLIk+UWiwa6a8HO+9tyVkxQu9z0nYUtuZNnh4upc6ZMAcWeWprw049ZpBx7IDFHy0tWJ7AkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762831244; c=relaxed/simple;
-	bh=af4VoRSK13IIBf4mIv9ywlLxBVqvCOsooc1obp2ZNc4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=kXA7x0D6/gvyUlrpIPr5f2FA5AWnvboEl68UCYhgr8sQGqer/3oSRoPtTMv7BEtupt5tT3KuJSN6NO9lttBeNI2BzSZs1DjKTfZsD8aVD8Lxvs881KJI4EDwh6sNje5c8TzLbs+kTjh1nk37LOMwJQ8O7nTGIiKMPC+GYvFBof8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C+2ZkxNk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B660CC4CEF5;
-	Tue, 11 Nov 2025 03:20:43 +0000 (UTC)
+	s=arc-20240116; t=1762831596; c=relaxed/simple;
+	bh=SF8ejBUx63BEWVbo35HrIhmuFlhum3NF91vPz7W/S9I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HZM6UNWBKH0FlF2NIi3btEZG+m5MDLhQNAVCRVpYLgwKotyyjQJtzA4gdIjzsebNpTFgikf/oElWGeaSdhLZ2ps8C0tkLieqvI44BAnalS5A8mbfKZmg+KrNj24EnRIEf1d+sgH/iGD4q1cHNbwUm9MiZVm2mJcVlqPc311xI9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=arA+s8Lc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37601C4CEF5;
+	Tue, 11 Nov 2025 03:26:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762831243;
-	bh=af4VoRSK13IIBf4mIv9ywlLxBVqvCOsooc1obp2ZNc4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=C+2ZkxNkfCom3N6TAQsHisdfRcyb+evRpWVQoedb0fIcUVfNhU8OywsloqqAq5v4K
-	 3onPLUuEXTogeiwZR24deB4sJAC+PcnXXRk6Vrg8sTesqVtCta1y4NMN7PEq7ZD5EK
-	 8o4OvmqFKK36KXG5BR164qQMILzGM24Up4ui2nHySQKw6yyVOE80EF5rLe7/PLUJFQ
-	 H7oZzt8uPQ07GDUBnAd7pjwtf2ITXuKXZ1jrr9LpI5Eo9tnprzMb7eNMHfMnrc74sB
-	 pL1HysglyX3d1QU140E9x50+DLWt+hV3Xg6I0GeCVHpNDvurbRnXeEXJqJr4EOZXfC
-	 42q+36E1o1uvw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CB8380CFD7;
-	Tue, 11 Nov 2025 03:20:15 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1762831596;
+	bh=SF8ejBUx63BEWVbo35HrIhmuFlhum3NF91vPz7W/S9I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=arA+s8Lck9ZMVhIL7OYtfs+oWUJRLcttj4EpE7KRk7v1UFN/ft+8fCUgtsMc9gd76
+	 xbz4H/FDW92jLwUvPHG1/WqhhK/z+mVldQc2od6H+BtjiQB5JxvQ4gM5lD1vbzg+pb
+	 OIGUaErFPL8HlyvrJVGOJSgG6krBoN0V6JHOlVSp76LaFGEO6EWU5piCu0OvjblFrG
+	 F1/jjUCtMmVj/39yjWouTOw7gaRBlyA5oyUIXix6w4uHaltQIts5/VuBnRuBzJrWIH
+	 Cq/wXocuXrdrwYG9qhGNsItJ2oZ+mWg1KHT70AM/kbW2xbJC2oehFU+RZ7t/XXG9uM
+	 4U13e4tZIDmyA==
+Date: Mon, 10 Nov 2025 19:26:34 -0800
+From: Saeed Mahameed <saeed@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jiri Pirko <jiri@resnulli.us>, Daniel Zahka <daniel.zahka@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Srujana Challa <schalla@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Brett Creeley <brett.creeley@amd.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Linu Cherian <lcherian@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Jerin Jacob <jerinj@marvell.com>, hariprasad <hkelam@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
+	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+	Manish Chopra <manishc@marvell.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Roger Quadros <rogerq@kernel.org>,
+	Loic Poulain <loic.poulain@oss.qualcomm.com>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Dave Ertman <david.m.ertman@intel.com>,
+	Vlad Dumitrescu <vdumitrescu@nvidia.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Alexander Sverdlin <alexander.sverdlin@gmail.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+	linux-rdma@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-omap@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/2] net/mlx5: implement swp_l4_csum_mode via
+ devlink params
+Message-ID: <aRKs6jXqSvC3G_R0@x130>
+References: <20251107204347.4060542-1-daniel.zahka@gmail.com>
+ <20251107204347.4060542-3-daniel.zahka@gmail.com>
+ <aQ7f1T1ZFUKRLQRh@x130>
+ <jhmdihtp63rblcjiy2pibhnz2sikvbm6bhnkclq3l2ndxgbqbb@e3t23x2x2r46>
+ <20251110154643.66d15800@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v10 0/4] net: netpoll: fix memory leak and add
- comprehensive selftests
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176283121399.2866443.8746710969595986737.git-patchwork-notify@kernel.org>
-Date: Tue, 11 Nov 2025 03:20:13 +0000
-References: <20251107-netconsole_torture-v10-0-749227b55f63@debian.org>
-In-Reply-To: <20251107-netconsole_torture-v10-0-749227b55f63@debian.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org, horms@kernel.org,
- decot@googlers.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, asantostc@gmail.com, efault@gmx.de,
- calvin@wbinvd.org, kernel-team@meta.com, jv@jvosburgh.net,
- stable@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20251110154643.66d15800@kernel.org>
 
-Hello:
+On 10 Nov 15:46, Jakub Kicinski wrote:
+>On Sun, 9 Nov 2025 11:46:37 +0100 Jiri Pirko wrote:
+>> >So, I checked a couple of flows internally, and it seems this allows
+>> >some flexibility in the FW to decide later on which mode to pick,
+>> >based on other parameters, which practically means
+>> >"user has no preference on this param". Driver can only find out
+>> >after boot, when it reads the runtime capabilities, but still
+>> >this is a bug, by the time the driver reads this (in devlink), the
+>> >default value should've already been determined by FW, so FW must
+>> >return the actual runtime value. Which can only be one of the following
+>>
+>> I don't think it is correct to expose the "default" as a value.
+>>
+>> On read, user should see the configured value, either "full_csum" or
+>> "l4_only". Reporting "default" to the user does not make any sense.
+>> On write, user should pass either "full_csum" or "l4_only". Why we would
+>> ever want to pass "default"?
+>
+>FWIW I agree that this feels a bit odd. Should the default be a flag
+>attr? On get flag being present means the value is the FW default (no
+>override present). On set passing the flag means user wants to reset
+>to FW default (remove override)?
+>
+>> Regardless this patch, since this is param to be reflected on fw reboot
+>> (permanent cmode), I think it would be nice to expose indication if
+>> param value passed to user currently affects the fw, or if it is going
+>> to be applied after fw reboot. Perhaps a simple bool attr would do?
+>
+>IIUC we're basically talking about user having no information that
+>the update is pending? Could this be done by the core? Core can do
+>a ->get prior to calling ->set and if the ->set succeeds and
+>cmode != runtime record that the update is pending?
+>
 
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Could work if on GET driver reads 'current' value from FW, then it should
+be simpler if GET != SET then 'pending', one problem though is if SET was
+done by external tool or value wasn't applied after reboot, then we loose
+that information, but do we care? I think we shouldn't.
 
-On Fri, 07 Nov 2025 06:03:36 -0800 you wrote:
-> Fix a memory leak in netpoll and introduce netconsole selftests that
-> expose the issue when running with kmemleak detection enabled.
-> 
-> This patchset includes a selftest for netpoll with multiple concurrent
-> users (netconsole + bonding), which simulates the scenario from test[1]
-> that originally demonstrated the issue allegedly fixed by commit
-> efa95b01da18 ("netpoll: fix use after free") - a commit that is now
-> being reverted.
-> 
-> [...]
+>That feels very separate from the series tho, there are 3 permanent
+>params in mlx5, already. Is there something that makes this one special?
 
-Here is the summary with links:
-  - [net,v10,1/4] net: netpoll: fix incorrect refcount handling causing incorrect cleanup
-    https://git.kernel.org/netdev/net/c/49c8d2c1f94c
-  - [net,v10,2/4] selftest: netcons: refactor target creation
-    https://git.kernel.org/netdev/net/c/39acc6a95eef
-  - [net,v10,3/4] selftest: netcons: create a torture test
-    https://git.kernel.org/netdev/net/c/6701896eb909
-  - [net,v10,4/4] selftest: netcons: add test for netconsole over bonded interfaces
-    https://git.kernel.org/netdev/net/c/236682db3b6f
+In mlx5 they all have the same behavior, devlink sets 'next' value, 
+devlink reads 'next' value. The only special thing about the new param
+is that it has a 'device_default' value and when you read that from 
+'next' it will always show 'device_default' as the actual value is only
+known at run time ,e.g. 'next boot'.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+I think the only valid solution for permanent and drv_init params is to
+have 'next' and 'current' values reported by driver on read. 
+Or maybe go just with  'set' != 'get' then 'pending' as discussed above ?
 
 
