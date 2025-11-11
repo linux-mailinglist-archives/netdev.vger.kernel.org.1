@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-237509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22600C4CAED
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 10:33:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 04D3DC4CB50
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 10:38:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B716A18859D0
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 09:32:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC9CD18845D1
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 09:38:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B2942F361C;
-	Tue, 11 Nov 2025 09:32:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45AAF2EBBAF;
+	Tue, 11 Nov 2025 09:37:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="crRcL/Ix"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IfcXmORO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7051B2F28EF
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 09:32:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A514D257831
+	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 09:37:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762853530; cv=none; b=uWZOkIMHw3k59uW62AxD+lKQuaP37CkrG8S+SubvuzKLbx6cYcbbHik6gGFZAplRaZQ8j7XPJ6TsnJSUzCVoG8PoQVZgrZFVstHy0NfDInH8Cb6HYVCVK52Dy3Yp+ipIE/rYtMRzP/Kei6qPNyGYQ7mAZtowf2b579OJP41gZl0=
+	t=1762853872; cv=none; b=gSTM+BFb2nCs/GwDKExjpz0/5gZiL+zNYh8w8FwNUy/GLDZyIL19Wl/QIHG7235CQHt9N6P0niFmDlEz2diV2k+YEohY4CnfbKC8EKa4TnOL4q9CYIn8jUuFQRPJX0eUrzaJ1bwV/qu9KsAPEf3/yQOt6Tbhb3vT935YCMoXzjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762853530; c=relaxed/simple;
-	bh=Mpa2VgXh02Cw+kjVb/D0JI1fueyM91iFmcFTkpp8/ss=;
+	s=arc-20240116; t=1762853872; c=relaxed/simple;
+	bh=PGux2NR0IFPNax8NKO7ZxluButf36cG766hdCir5ZDs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=X6O1jhU0FibYBXjjPWgooEA0dMhiZIq5ZZCjXHIWv/+tA7MIrh0C+Ac8I4AHkmwqSLaPCdt4F1CL1gJ4+wuJkx1mCX3eeH0Ze2UPMWU8M7JsygK3DKsQeTIiUtl+Uo3l9EA/qa4qLDVqgHrHDwf2HO1fXbRNQdxJWX7rjMwROKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=crRcL/Ix; arc=none smtp.client-ip=209.85.160.201
+	 To:Cc:Content-Type; b=coEUt9EyS9pr1Gg4ZFrs0URenbZozgpJ4U8o3FB4z/2szuG6JkkOI1u/cMg/H651ikakBtvkMDami16kVmwI30u2gPu8kpjqI50MTTiRBcp3oFwvAUSwq0Rb6Fo4sLUF+GznBtjuMTFHFjeZvXi9PD/7G8gE5VGmEwZkTY8Rs+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IfcXmORO; arc=none smtp.client-ip=209.85.222.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-4edb366a926so27064381cf.1
-        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 01:32:09 -0800 (PST)
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-8b259f0da04so360531385a.0
+        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 01:37:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762853528; x=1763458328; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1762853869; x=1763458669; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JDtQNhsweIy/ZhBqDeh6Zf26D5O569SFFttC/9hVm/A=;
-        b=crRcL/IxzCG9NAMiTxiW1tCFhHUBZSCOC322RBZBHsPJgD+NpJsqTY30C/VMSyAaLE
-         WbgPHmyGv/j4Do0Uvk/BKCsWYNP3fncLkUwfqDx8rwfo9a36g+pyK5DbIKLL53Ry9RWn
-         pfiAYHPM1Vw+gAagoUlaV6pQYRJgIFZI8pLBgLFLa4hfrM2ypo5k3AwA1yBwtPpgULCH
-         Hy4xkmvEpNwy+WQ/mWtQVJDLK2SPsakMT1VcxTBy6KHj1SWlXZaF8Ty0Bg4hfy+riRyO
-         4THkmA0VNTYygjmj8Zf/RotRkInM5aiod4q1u9JDjWSjNYGI2aFU1P2kEh1vjVrGjISn
-         3SMg==
+        bh=iT/LuQJztWPY8htUJBN5PW7/w3kOnxLQY6YuXFmFCJY=;
+        b=IfcXmORO1Ftp5JLQ0kcSDwb/jGJVCPMoRnOZwVdoK1/zjdEeGoTVWL896z1vnOwqU/
+         kpWXsMXG0tcyJVpW1ZdvfhRcO58vMShNFTdHAdG6OtbDJiwLrHeCDhentMh5p6Nc3Hh6
+         kGGS2W9BG5qYX5CTx5vZB4A3ogeVwF45LEBOMVsvu/gXAmo0/7sgNivJqN2DWBvuEDM5
+         ggnhjzlbg60fjRR8CO+KDVF7d/u96MiIl6H2d/nJ2VngZexK69OsJ4zK4Oh0J1ft0qdr
+         V5lHtluiHxSPdniOEdQi0RhlUOqTzKopDmZagcK/syVxSiP+D7Eq96qVBtf+ixvjX4rC
+         aEtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762853528; x=1763458328;
+        d=1e100.net; s=20230601; t=1762853869; x=1763458669;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JDtQNhsweIy/ZhBqDeh6Zf26D5O569SFFttC/9hVm/A=;
-        b=EywKSeHy63rvAq8fHFI/MDcxW/w7sQS1wUF+kWumuBR9S0fcQllolLU5XPnbVTesdX
-         8rG7Nx89F6PdXoUDfs3ZQDBUSNdCncQzHefv1oZVUUQ1s3sXzW9hNQ996ZSneirRSVA/
-         6jz2+bDXJz/Fmzt9bpPh4MggL7xkfI8W5yS+H8J1lH+51Y8+blFOCRI8caBzBHPFM7tq
-         TgTJaMksuLgKm9nfFkMRQDHKmkK4hjnht6ZFmL/kxFIeZd02tRUz0Fao4lOypuZrLzae
-         hzDbzT1mzfuOqdDVGh3O44hbR69YcT6Y2ydKS9vm7nwVz+wVOclbs3oKm6KGWxcI95od
-         hwUg==
-X-Forwarded-Encrypted: i=1; AJvYcCUPocLc1CeH+zlmUpr83XqzljeMbp265GbeiTzyWTqFdgaLRbPa0JFDqFmY2zoQBOQF3Yuz3Zk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyiZdOcwf9E7Ccyz4lOJ2MfmFgRraVnWKlWJ65j/RVW+UxvbK6V
-	FcyAK4JWxTpnmllW2ZZp83jGUGkCOyVyaSSexB4l/9+qOWQQ823mZ/BrZQ+5Uiwa865Tom8FbPb
-	f703yMOd+Q5pj4g==
-X-Google-Smtp-Source: AGHT+IFsenyrymBbkOjo6F/tX1pAcHisYTZx8ctys1y8HD8erNisb1dFLo/ziTVrb5CuT6xi3TA3egjR+yksXA==
-X-Received: from qvxz14.prod.google.com ([2002:a05:6214:40e:b0:882:2f2f:a04])
+        bh=iT/LuQJztWPY8htUJBN5PW7/w3kOnxLQY6YuXFmFCJY=;
+        b=uXIHQrLq6B8Se4bot3gq8FZrvE9mP5NbdQdpasjnn2JBuZeNJQ+5+nlvarMmx1KwtM
+         whBciGIXan1LexNlcYowwsbosvilTnsveRQ4dg8xBDORCXbh1iBkhxHY9x4mVxI5l0Gh
+         N958JaEwSmc2mgP3GVScPm/8MEOUzVxb2mXtDuw7AXVfaYHkczE9g4QkYsopclI10OzA
+         l5HfWVMoTw1hrl5BHf6KzCgPQc2xKQsLzXrrEYeFDBgyAWMTzI4ACWyHtD0PXbpw9Nue
+         Z3eXUTz0w09qbYpgDgxHjvSnmIO97eC4lXRmOZoxl1/ICecE8IUhmAx+3hVtb8WRR/6H
+         32Yw==
+X-Forwarded-Encrypted: i=1; AJvYcCU35GG6d1yAwyjxdO1NZI29e9kQ+iMZ5rPlwV0sS1lV8fOXvHs0MKxeAUNatMXQ7Kutgbrw2uI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywz5iKeOYeO0AcUplnU2qx6doOQjoxx7vtcggIGeBwJLP6uPe69
+	1QXyaQmnD6l13GzfewHSrSQmf3mZMG+gFaMPE1JNINMI7qokZiWlQnDUqqaYgySh/Qc4nVZk+r2
+	fNEYVDkjzo7MVXA==
+X-Google-Smtp-Source: AGHT+IFXotGRr4Ed3Iif2CQhFwwRQO1qeDaqUR/d6EYywtlTjST6ICiLDxYPXCrCvpJECfG38tBZT2UzjSR9Ag==
+X-Received: from qvbiu13.prod.google.com ([2002:ad4:5ccd:0:b0:882:2f2f:9fe])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:5945:0:b0:4e8:bbd4:99ea with SMTP id d75a77b69052e-4eda4f7aa47mr118984351cf.44.1762853528387;
- Tue, 11 Nov 2025 01:32:08 -0800 (PST)
-Date: Tue, 11 Nov 2025 09:31:51 +0000
+ 2002:a05:6214:2a4f:b0:882:4d5c:1f36 with SMTP id 6a1803df08f44-8824d5c220amr87317166d6.28.1762853529865;
+ Tue, 11 Nov 2025 01:32:09 -0800 (PST)
+Date: Tue, 11 Nov 2025 09:31:52 +0000
 In-Reply-To: <20251111093204.1432437-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20251111093204.1432437-1-edumazet@google.com>
 X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
-Message-ID: <20251111093204.1432437-3-edumazet@google.com>
-Subject: [PATCH v2 net-next 02/14] net: init shinfo->gso_segs from qdisc_pkt_len_init()
+Message-ID: <20251111093204.1432437-4-edumazet@google.com>
+Subject: [PATCH v2 net-next 03/14] net_sched: initialize qdisc_skb_cb(skb)->pkt_segs
+ in qdisc_pkt_len_init()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -86,35 +87,78 @@ Cc: Simon Horman <horms@kernel.org>, Jamal Hadi Salim <jhs@mojatatu.com>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Qdisc use shinfo->gso_segs for their pkts stats in bstats_update(),
-but this field needs to be initialized for SKB_GSO_DODGY users.
+qdisc_pkt_len_init() is currently initalizing qdisc_skb_cb(skb)->pkt_len.
+
+Add qdisc_skb_cb(skb)->pkt_segs initialization and rename this function
+to qdisc_pkt_len_segs_init().
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/core/dev.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ net/core/dev.c       | 15 +++++++++++----
+ net/sched/sch_cake.c |  2 +-
+ 2 files changed, 12 insertions(+), 5 deletions(-)
 
 diff --git a/net/core/dev.c b/net/core/dev.c
-index 46ce6c6107805132b1322128e86634eca91e3340..dba9eef8bd83dda89b5edd870b47373722264f48 100644
+index dba9eef8bd83dda89b5edd870b47373722264f48..895c3e37e686f0f625bd5eec7079a43cbd33a7eb 100644
 --- a/net/core/dev.c
 +++ b/net/core/dev.c
-@@ -4071,7 +4071,7 @@ EXPORT_SYMBOL_GPL(validate_xmit_skb_list);
+@@ -4069,17 +4069,23 @@ struct sk_buff *validate_xmit_skb_list(struct sk_buff *skb, struct net_device *d
+ }
+ EXPORT_SYMBOL_GPL(validate_xmit_skb_list);
  
- static void qdisc_pkt_len_init(struct sk_buff *skb)
+-static void qdisc_pkt_len_init(struct sk_buff *skb)
++static void qdisc_pkt_len_segs_init(struct sk_buff *skb)
  {
--	const struct skb_shared_info *shinfo = skb_shinfo(skb);
-+	struct skb_shared_info *shinfo = skb_shinfo(skb);
+ 	struct skb_shared_info *shinfo = skb_shinfo(skb);
++	u16 gso_segs;
  
  	qdisc_skb_cb(skb)->pkt_len = skb->len;
++	if (!shinfo->gso_size) {
++		qdisc_skb_cb(skb)->pkt_segs = 1;
++		return;
++	}
++
++	qdisc_skb_cb(skb)->pkt_segs = gso_segs = shinfo->gso_segs;
  
-@@ -4112,6 +4112,7 @@ static void qdisc_pkt_len_init(struct sk_buff *skb)
- 			if (payload <= 0)
+ 	/* To get more precise estimation of bytes sent on wire,
+ 	 * we add to pkt_len the headers size of all segments
+ 	 */
+-	if (shinfo->gso_size && skb_transport_header_was_set(skb)) {
+-		u16 gso_segs = shinfo->gso_segs;
++	if (skb_transport_header_was_set(skb)) {
+ 		unsigned int hdr_len;
+ 
+ 		/* mac layer + network layer */
+@@ -4113,6 +4119,7 @@ static void qdisc_pkt_len_init(struct sk_buff *skb)
  				return;
  			gso_segs = DIV_ROUND_UP(payload, shinfo->gso_size);
-+			shinfo->gso_segs = gso_segs;
+ 			shinfo->gso_segs = gso_segs;
++			qdisc_skb_cb(skb)->pkt_segs = gso_segs;
  		}
  		qdisc_skb_cb(skb)->pkt_len += (gso_segs - 1) * hdr_len;
  	}
+@@ -4738,7 +4745,7 @@ int __dev_queue_xmit(struct sk_buff *skb, struct net_device *sb_dev)
+ 
+ 	skb_update_prio(skb);
+ 
+-	qdisc_pkt_len_init(skb);
++	qdisc_pkt_len_segs_init(skb);
+ 	tcx_set_ingress(skb, false);
+ #ifdef CONFIG_NET_EGRESS
+ 	if (static_branch_unlikely(&egress_needed_key)) {
+diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
+index 32bacfc314c260dccf94178d309ccb2be22d69e4..9213129f0de10bc67ce418f77c36fed2581f3781 100644
+--- a/net/sched/sch_cake.c
++++ b/net/sched/sch_cake.c
+@@ -1406,7 +1406,7 @@ static u32 cake_overhead(struct cake_sched_data *q, const struct sk_buff *skb)
+ 	if (!shinfo->gso_size)
+ 		return cake_calc_overhead(q, len, off);
+ 
+-	/* borrowed from qdisc_pkt_len_init() */
++	/* borrowed from qdisc_pkt_len_segs_init() */
+ 	if (!skb->encapsulation)
+ 		hdr_len = skb_transport_offset(skb);
+ 	else
 -- 
 2.52.0.rc1.455.g30608eb744-goog
 
