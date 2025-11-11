@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-237438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1A6DC4B533
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 04:30:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C363EC4B558
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 04:34:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A3C6188F957
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:30:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EADA1890F9D
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:34:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CFF360B8A;
-	Tue, 11 Nov 2025 03:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87ED8314B8E;
+	Tue, 11 Nov 2025 03:34:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="li5RAEK4"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hufOi6yw"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C4B93D6F;
-	Tue, 11 Nov 2025 03:30:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 074D12FFF9A;
+	Tue, 11 Nov 2025 03:34:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762831828; cv=none; b=FvsJ9688bkUkiyY4SDmteOjC2BvRvDvDbRu+cpIG9okOYF0Zaq7jsn6u8lDjXBQ97VNyEW4nh3Lcqtvkm4TuD9FNntw45GVT9+4R6rktsmEW+C+ynwGH9YDHetX214bXuaMbW3jiXyJMGU15KJtRDRw14zC/o8Cg4kCpKPLKlJ4=
+	t=1762832062; cv=none; b=B0kek46g+yQzTjWi+7c/DphWFUbSiAvFLYyeaY2d2vWcMC/bameYAhgPWfHMyPuB6MuGODMvNidO1VJXIWhmpY3Mp4BF7mmAv8nDu4NP26wnpoVRXMeV529YRy8ZczxcS4ZiUkqUAxvtxcD7hvJYlJxx4vY3h31ts8muszZGFfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762831828; c=relaxed/simple;
-	bh=JlYn9rIy7uyj5CmPIHlFQHH3uFeD9tk9d9asndxWrRY=;
+	s=arc-20240116; t=1762832062; c=relaxed/simple;
+	bh=LF35iIXpcL8zFGUIieGGpK9i//PdI6Tuyf9zFpaKVuM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H2WVqjuCB/Tdd3aYMHpoKWOoJPCDz+CZsBJGdSbjrhiXVe8hZEd3dhkYh610r6P4qYRPiqOG6EAnvcXIxsu4e9eBOTy0mUhJJsKFmjWX4matDESlzIBRyZopxQoKxudgBBkygiy6/5CGfcLHbEdb1xOBf37E2uTY2vUQLaYXeN8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=li5RAEK4; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=T7zJzpkEePST4l1vkosCQCxYxFMZ7Hx0rxwimu7uP/sOkcYrEGBq271KJ5Q7rYSJ9Lf94C6PCHdhmfcI5NrU93g+sByGddio4cULDF+gpoOoZvRS/eeZESnyz+C+00tvNiql6t2aFZMad//WCI8/jUntaum5mvzpRDjG/bBDh60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hufOi6yw; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,24 +36,43 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=HW5zNTSs91UiAOz4S9gU+9c/0Itm3O1nWh1VBzNeF+0=; b=li5RAEK4Ot2b7NpWpJAT6oimFX
-	aMLDZKbm/8g9ln8eSjgxmoAur9H+uT9N21oTHrluWXoNaYbc5MCcw125cH9Db11O5yCNpUgzPhc9T
-	aqwWc7sVLADrHYrrSjGGR/hHMZYjxDyaT6LC/JVlZkAYnknLzAMrBztYnwk/b7Jj6Tug=;
+	bh=MpcXH5yszQ3e8gyXiQRNSwQwQ9wARDcWwzXFsNwDh2g=; b=hufOi6ywhigtXj8q+a8/OU55N+
+	GAMZ/G4U9nAoXpnIdsvTk+js4o8xAW+gu1elpq9T+SxBd+iBua/O1WSi+tNwcvRcOKlaBRTnMLAk0
+	5Oi30dLoKHhdhqkRRCUvT7bKJr6QiYNIstYa3eMCsImtfTlAl+uls6psrCPoAFyb5tZU=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vIf5H-00DaMn-49; Tue, 11 Nov 2025 04:30:19 +0100
-Date: Tue, 11 Nov 2025 04:30:19 +0100
+	id 1vIf8x-00DaO3-99; Tue, 11 Nov 2025 04:34:07 +0100
+Date: Tue, 11 Nov 2025 04:34:07 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, aziz.sellami@nxp.com,
-	imx@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 net-next 0/3] net: enetc: add port MDIO support for
- both i.MX94 and i.MX95
-Message-ID: <4ef9d041-2572-4a8d-9eb8-ddc2c05be102@lunn.ch>
-References: <20251105043344.677592-1-wei.fang@nxp.com>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+	Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Subject: Re: [PATCH net-next v15 01/15] dt-bindings: net: Introduce the
+ ethernet-connector description
+Message-ID: <56410c74-3d0e-4cdc-87a0-230cad8f691a@lunn.ch>
+References: <20251106094742.2104099-1-maxime.chevallier@bootlin.com>
+ <20251106094742.2104099-2-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,52 +81,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251105043344.677592-1-wei.fang@nxp.com>
+In-Reply-To: <20251106094742.2104099-2-maxime.chevallier@bootlin.com>
 
-On Wed, Nov 05, 2025 at 12:33:41PM +0800, Wei Fang wrote:
-> >From the hardware perspective, NETC IP has only one external master MDIO
-> interface (eMDIO) for managing external PHYs. The EMDIO function and the
-> ENETC port MDIO are all virtual ports of the eMDIO.
+On Thu, Nov 06, 2025 at 10:47:26AM +0100, Maxime Chevallier wrote:
+> The ability to describe the physical ports of Ethernet devices is useful
+> to describe multi-port devices, as well as to remove any ambiguity with
+> regard to the nature of the port.
 > 
-> The difference is that EMDIO function is a 'global port', it can access
-> all the PHYs on the eMDIO, so it provides a means for different software
-> modules to share a single set of MDIO signals to access their PHYs.
+> Moreover, describing ports allows for a better description of features
+> that are tied to connectors, such as PoE through the PSE-PD devices.
 > 
-> But for ENETC port MDIO, each ENETC can access its set of registers to
-> initiate accesses on the MDIO and the eMDIO arbitrates between them,
-> completing one access before proceeding with the next. It is required
-> that each ENETC port MDIO has exclusive access and control of its PHY.
-> Therefore, we need to set the external PHY address for ENETCs, so that
-> its port MDIO can only access its own PHY. If the PHY address accessed
-> by the port MDIO is different from the preset PHY address, the MDIO
-> access will be invalid.
+> Introduce a binding to allow describing the ports, for now with 2
+> attributes :
 > 
-> Normally, all ENETCs use the interfaces provided by the EMDIO function
-> to access their PHYs, provided that the ENETC and EMDIO are on the same
-> OS. If an ENETC is assigned to a guest OS, it will not be able to use
-> the interfaces provided by the EMDIO function, so it must uses its port
-> MDIO to access and manage its PHY.
+>  - The number of lanes, which is a quite generic property that allows
+>    differentating between multiple similar technologies such as BaseT1
+>    and "regular" BaseT (which usually means BaseT4).
 
-I think i'm slowly starting to understand this. But i'm still missing
-some parts.
+You still use lanes here, but the implementation has moved on to
+pairs.
 
-What prevents a guest OS from setting the wrong value in its ENETC
-port MDIO and then accessing any PHY on the physical bus?
-
-I assume there is a hypervisor doing this enforcement? But if there is
-a hypervisor doing this enforcement, why does the ENETC port MDIO need
-programming? The hypervisor will block it from accessing anything it
-should not be able to access. A normal MDIO bus scan will find just
-the devices it is allowed to access.
-
-I also think the architecture is wrong. Why is the MAC driver messing
-around with the ENETC Port MDIO hardware? I assume the ENETC port MDIO
-bus driver knows it is a ENETC port MDIO device it is driving? It
-should be the one looking at the device tree description of its bus,
-checking it has one and only one device described on the bus, and
-programming itself with the device the hypervisor will let through.
-Not that i think this is actually necessary, let the hypervisor
-enforce it...
+Please add my Reviewed-by when you fix this.
 
 	Andrew
 
