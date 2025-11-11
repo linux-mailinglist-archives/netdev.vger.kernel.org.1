@@ -1,232 +1,174 @@
-Return-Path: <netdev+bounces-237724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B786C4F974
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 20:24:14 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABC63C4F9DA
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 20:35:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF24718875ED
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 19:24:38 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 87EE74E1999
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 19:35:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA2C83254A5;
-	Tue, 11 Nov 2025 19:24:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11D1F328B55;
+	Tue, 11 Nov 2025 19:35:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m9YvZbeH"
+	dkim=pass (2048-bit key) header.d=web.de header.i=zaharido@web.de header.b="WUiNw9ik"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.15.3])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 051F6325498
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 19:24:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53937328B43
+	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 19:35:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762889049; cv=none; b=kS4KnHvqJ0lBjvWQJgkct8zFrfYLmn4SAbsrYgTcGs4M3uy9OwWTogP9H4iLtBjeTWhTiwT92ECqqV9cCgYq9jCixXwgr1g+phgGw20iHCRBZG0zDjliGYe/Iv/ea3liNWrTbYARIzOmbxqJ97DTXCGedbW+Y+OJculecduhAdM=
+	t=1762889746; cv=none; b=Q966MLfdf5e3tiKmTlwB7KjhjceaJWgmmVHi82U71XWM0Ehuwkueyt56mkEwUJoubyCzlJyVSTKP5bBa141MRbd9/b3mzurNHvig9ettg7l/VlTem4aqy+9nwhQTkp9BHsdPGHJ5TWGS4/dwBlTXH8X5opW8jg5Hz/9RKMT/jkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762889049; c=relaxed/simple;
-	bh=0kVZEUry4zA5gM/6QJOrIUT0TdpY7tJ37G3Y/Rm4wD0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uDRwgNFDZUHo65OA5DIrARoly86tmBFBCnIRX6CPDxR1JHEoBz5y58n6BkErfkgJ97B7Cc75unzvl/4EL/iVqcDLzW+qKGFg/5IR0BiAE34NmqGW8rGg85XRBxWXK+ciccoibhhjl5IWh6joD/pwZgANpfTxrcMvOUZTzWfOi1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m9YvZbeH; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4ed861eb98cso815311cf.3
-        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 11:24:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762889047; x=1763493847; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NpUysYmo0ZFjhBZAlpmGn5yIqRvZt+XQSoQi1hXJ3Kk=;
-        b=m9YvZbeHTw6/C5/B7DcW7SJrnW2ua7+ZRJNjPP0DrgZQuOe9rX42fN8uBKlbYdQwuH
-         AfMzkl6GamQst+q9tAr+zPlErJZX/zcRan2okcOcJYWag5wFIY5+H8t8e1OL5qAegv5c
-         Rfdb8zqhG+Sm/oXrIojf46hE5MO8eqlJDd0wREf/yVDXbTsD+HXballxRHxTNRvg2PPu
-         NZVdoAtqIN3ZDv4YFsq+LsJbM10bM7ufgSm+yFjXZcQQC8XvAMoHgY5xCLK61OU0Y+E6
-         ETqgIO9ObZYrJZVMkm/6E3BA501sy4j2wdzpCa36D1TNOh6gc6GRdMgzLfa9B5+OShfl
-         MOKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762889047; x=1763493847;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=NpUysYmo0ZFjhBZAlpmGn5yIqRvZt+XQSoQi1hXJ3Kk=;
-        b=d/tM1FQs7NMkc/BYRIkU1k9Ob0aehLf3DsuFRRSGbeSSI8WaJduF1vlZ9Z6QResnn3
-         14H5rBnC1HQ3enTkYG03tTLV4tl8MzygVQWLc50rNY2m0El7DS17z+VLGAmqvE9sne1e
-         p8j99vJZH/Fne+cUSpjfeKWEy+oLdISccvfKMZbEzUsXw5SAhvNexIjvjw/Dry8tZE1g
-         VJmJrQFgGMwIs+Snxe6zeLypg8PfIO9yn7284RGhffEsb4kLg9BGoAAIMHiLg7Y/uCYV
-         PnMWJBeI1UcQsDiixFlwDhCxWDsRTvL4pRFrQEC6K7fMYLdFNgh3QSbcNh2lOO5lqzHK
-         K4rg==
-X-Forwarded-Encrypted: i=1; AJvYcCWfDJBC+jFkLHnAqVLYBAhFFcLVNXEKrN7QRzHzMYbKFH5Clo3qf9QaAbpETS6wiCgL78UPMAc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzGEpp5tQsZoRlbmUUvhdeMP7mc6i0aAe/hZ7uAqjyVtGaL4kuA
-	yAjY9stVESsjWJftVRYQEHjamfszJ6nk3YF54hKsBjzzjkfIryHN/yEJoJe3ZT/jVcjwDwbNpre
-	+Y0E+jktxhvnqJpuFbz05+k2WkgCNZ7EsGCMfuY69
-X-Gm-Gg: ASbGncvsdKuePvbKegpEAk9ODV8FPPI+w6GzfELgykHD3L94dNWOgXwAYu0j7Y+Kz50
-	qcwg+ec/cO0vu9pERUR+CSf2SUDn4DoVaEdE+NtlvuW8/Jfd+F4Bg/toii/iCA93JJ6M3P21+oS
-	/J12l3MHTF+Ea2+S2Ff0q8WIbORiW/mTAf1qoRuxO5aom/NaY1j0+C9kHbC7UnYtwm6HeEAk9Pf
-	lHwvZGpCgT/cxhw0A61NdGdGv+icRnCi4VE/R9m7TWl0SvmwYn7ylPpXcSO8KXTJaZ7xeEccIB/
-	ppj8Iw==
-X-Google-Smtp-Source: AGHT+IHgdffxMXk2L1+L5D0EhFqavRvZsApB6HWnfPka30SNopPchdb7ARpmkpdsMZWjHBLGKHeTt55ooRXtd0+tDxg=
-X-Received: by 2002:ac8:5741:0:b0:4e8:a0bf:f5b5 with SMTP id
- d75a77b69052e-4eddbdd8f4amr4549541cf.73.1762889046407; Tue, 11 Nov 2025
- 11:24:06 -0800 (PST)
+	s=arc-20240116; t=1762889746; c=relaxed/simple;
+	bh=OuHC9qAMvirA66L2Lom/FOaOsXgN4uQhEz9qF+uDXrg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UXymf/0lf+nGMewpVeULhTUjIpnq6SzuuGSQEJ6at8NqMtocNx2MNl9KTHZBTxbwgp8NwlE0AHWTYO52rXaehD7SeCDOr8worGoKIrBD/WGvM/CoYquCsO4p3hRJmrZZFMfaJug6wiWK0gk3uFzQycZTbJNqC/aBzPaZ4a9Khbc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=zaharido@web.de header.b=WUiNw9ik; arc=none smtp.client-ip=212.227.15.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1762889735; x=1763494535; i=zaharido@web.de;
+	bh=JUqCHbwk6UPwMJHh0uaak5h15UhJfiyKRz0NOTnL2do=;
+	h=X-UI-Sender-Class:Date:From:To:Cc:Subject:Message-ID:References:
+	 MIME-Version:Content-Type:In-Reply-To:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=WUiNw9ikl7arSpPNEbpjEtQDsiDokCDFeTTaoDWHLpYfR58yn468eigLAlRjbg54
+	 fdL/WpcGhCO8EWFVPAKXN/ZmUQKgno53Rd6Ws8+ZXMZ4V0mZ4sPRop67G3Kp/QUn5
+	 OCwwND77fYe8ZMKpewet0BAfA6/YrRWE2olHma7x8yzzlzBaS/RkfRwbLNpl1yRPn
+	 og9ejFpVEiUs4/xH3ZHjlfw8z7CTmKdvT5XWFSys4o5YBYuA5ebxmNhpUUubQsDMH
+	 5GmVBNslNAUVqv2fC8jVQUfhwps0eUCm5YhIuEhCzlHbqsh++sgZn8GZcoa0m968m
+	 xm30FF9fUR4p4bJIEg==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from hp-kozhuh ([79.100.14.1]) by smtp.web.de (mrweb006
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MBB86-1vUVHF1skw-00EYe0; Tue, 11
+ Nov 2025 20:35:35 +0100
+Date: Tue, 11 Nov 2025 21:34:28 +0200
+From: Zahari Doychev <zaharido@web.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Zahari Doychev <zahari.doychev@linux.com>, donald.hunter@gmail.com, 
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, horms@kernel.org, 
+	jacob.e.keller@intel.com, ast@fiberby.net, matttbe@kernel.org, netdev@vger.kernel.org, 
+	jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
+	johannes@sipsolutions.net
+Subject: Re: [PATCH v2 3/3] tools: ynl: ignore index 0 for indexed-arrays
+Message-ID: <xk64zrtvsbasla4winq5apbfmfcbbkfeq2td2cpqzlzwurdthx@4o3jwsoztwzt>
+References: <20251106151529.453026-1-zahari.doychev@linux.com>
+ <20251106151529.453026-4-zahari.doychev@linux.com>
+ <20251110172016.3b58437d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251111093204.1432437-1-edumazet@google.com> <6913437c.a70a0220.22f260.013b.GAE@google.com>
- <CANn89iKgYo=f+NyOVFfLjkYLczWsqopxt4F5adutf5eY9TAJmA@mail.gmail.com>
-In-Reply-To: <CANn89iKgYo=f+NyOVFfLjkYLczWsqopxt4F5adutf5eY9TAJmA@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 11 Nov 2025 11:23:55 -0800
-X-Gm-Features: AWmQ_bn3Ul8SCcs8ZoLOIGAmR_eqcxw1d18J9obuuLSR1JxaFhqsmm6gXHf1epU
-Message-ID: <CANn89iJ5p3xY_LJcexq8n2-91A6ERPV6yqjPGphD_w6wr_NHew@mail.gmail.com>
-Subject: Re: [syzbot ci] Re: net_sched: speedup qdisc dequeue
-To: syzbot ci <syzbot+ci51c71986dfbbfee2@syzkaller.appspotmail.com>, 
-	Victor Nogueira <victor@mojatatu.com>, Daniel Borkmann <daniel@iogearbox.net>
-Cc: davem@davemloft.net, eric.dumazet@gmail.com, horms@kernel.org, 
-	jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org, kuniyu@google.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com, toke@redhat.com, 
-	willemb@google.com, xiyou.wangcong@gmail.com, syzbot@lists.linux.dev, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251110172016.3b58437d@kernel.org>
+X-Provags-ID: V03:K1:n6RP21nJskT3g/A3Ibj3EyVONz8CAwEEBdTVviaOO79HJC49yre
+ eFTrLZBAZffS3vy0CW1Y8V5z5EWyRyzBAN5X0cIzGlbjfgE7HV0Vfnunupb8Bzhzb6HoRsJ
+ pB8fJkN+TEe5aiGDPf4pRymf+zRXV/ww7qyjFz8o5MbYx/ehNNLLU+Va8WwejMEiNlYTsLG
+ Lxjr7pZSQCkFiS65zktBg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:YqKx+J6vrRE=;MOtMWdjh8F5NI/dBI4d0L5SsgIA
+ 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
+ Zm+5F3oLmlDHjaJwGgBmAKb/UJKpWQK8dz8=
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 11, 2025 at 8:28=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
+On Mon, Nov 10, 2025 at 05:20:16PM -0800, Jakub Kicinski wrote:
+> On Thu,  6 Nov 2025 16:15:29 +0100 Zahari Doychev wrote:
+> > Linux tc actions expect the action order to start from index one.
+> > To accommodate this, update the code generation so array indexing
+> > begins at 1 for tc actions.
+> >=20
+> > This results in the following change:
+> >=20
+> >         array =3D ynl_attr_nest_start(nlh, TCA_FLOWER_ACT);
+> >         for (i =3D 0; i < obj->_count.act; i++)
+> > -               tc_act_attrs_put(nlh, i, &obj->act[i]);
+> > +               tc_act_attrs_put(nlh, i + 1, &obj->act[i]);
+> >         ynl_attr_nest_end(nlh, array);
+> >=20
+> > This change does not impact other indexed array attributes at
+> > the moment, as analyzed in [1].
+>=20
+> YNL does not aim to provide perfect interfaces with weird old families.
 >
-> On Tue, Nov 11, 2025 at 6:09=E2=80=AFAM syzbot ci
-> <syzbot+ci51c71986dfbbfee2@syzkaller.appspotmail.com> wrote:
-> >
-> > syzbot ci has tested the following series
-> >
-> > [v2] net_sched: speedup qdisc dequeue
-> > https://lore.kernel.org/all/20251111093204.1432437-1-edumazet@google.co=
-m
-> > * [PATCH v2 net-next 01/14] net_sched: make room for (struct qdisc_skb_=
-cb)->pkt_segs
-> > * [PATCH v2 net-next 02/14] net: init shinfo->gso_segs from qdisc_pkt_l=
-en_init()
-> > * [PATCH v2 net-next 03/14] net_sched: initialize qdisc_skb_cb(skb)->pk=
-t_segs in qdisc_pkt_len_init()
-> > * [PATCH v2 net-next 04/14] net: use qdisc_pkt_len_segs_init() in sch_h=
-andle_ingress()
-> > * [PATCH v2 net-next 05/14] net_sched: use qdisc_skb_cb(skb)->pkt_segs =
-in bstats_update()
-> > * [PATCH v2 net-next 06/14] net_sched: cake: use qdisc_pkt_segs()
-> > * [PATCH v2 net-next 07/14] net_sched: add Qdisc_read_mostly and Qdisc_=
-write groups
-> > * [PATCH v2 net-next 08/14] net_sched: sch_fq: move qdisc_bstats_update=
-() to fq_dequeue_skb()
-> > * [PATCH v2 net-next 09/14] net_sched: sch_fq: prefetch one skb ahead i=
-n dequeue()
-> > * [PATCH v2 net-next 10/14] net: prefech skb->priority in __dev_xmit_sk=
-b()
-> > * [PATCH v2 net-next 11/14] net: annotate a data-race in __dev_xmit_skb=
-()
-> > * [PATCH v2 net-next 12/14] net_sched: add tcf_kfree_skb_list() helper
-> > * [PATCH v2 net-next 13/14] net_sched: add qdisc_dequeue_drop() helper
-> > * [PATCH v2 net-next 14/14] net_sched: use qdisc_dequeue_drop() in cake=
-, codel, fq_codel
-> >
-> > and found the following issue:
-> > WARNING in sk_skb_reason_drop
-> >
-> > Full report is available here:
-> > https://ci.syzbot.org/series/a9dbee91-6b1f-4ab9-b55d-43f7f50de064
-> >
-> > ***
-> >
-> > WARNING in sk_skb_reason_drop
-> >
-> > tree:      net-next
-> > URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/net=
-dev/net-next.git
-> > base:      a0c3aefb08cd81864b17c23c25b388dba90b9dad
-> > arch:      amd64
-> > compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1=
-~exp1~20250708183702.136), Debian LLD 20.1.8
-> > config:    https://ci.syzbot.org/builds/a5059d85-d1f8-4036-a0fd-b677b59=
-45ea9/config
-> > C repro:   https://ci.syzbot.org/findings/e529fc3a-766e-4d6c-899a-c35a8=
-fdaa940/c_repro
-> > syz repro: https://ci.syzbot.org/findings/e529fc3a-766e-4d6c-899a-c35a8=
-fdaa940/syz_repro
-> >
-> > syzkaller0: entered promiscuous mode
-> > syzkaller0: entered allmulticast mode
-> > ------------[ cut here ]------------
-> > WARNING: CPU: 0 PID: 5965 at net/core/skbuff.c:1192 __sk_skb_reason_dro=
-p net/core/skbuff.c:1189 [inline]
-> > WARNING: CPU: 0 PID: 5965 at net/core/skbuff.c:1192 sk_skb_reason_drop+=
-0x76/0x170 net/core/skbuff.c:1214
-> > Modules linked in:
-> > CPU: 0 UID: 0 PID: 5965 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT=
-(full)
-> > Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-=
-1.16.2-1 04/01/2014
-> > RIP: 0010:__sk_skb_reason_drop net/core/skbuff.c:1189 [inline]
-> > RIP: 0010:sk_skb_reason_drop+0x76/0x170 net/core/skbuff.c:1214
-> > Code: 20 2e a0 f8 83 fd 01 75 26 41 8d ae 00 00 fd ff bf 01 00 fd ff 89=
- ee e8 08 2e a0 f8 81 fd 00 00 fd ff 77 32 e8 bb 29 a0 f8 90 <0f> 0b 90 eb =
-53 bf 01 00 00 00 89 ee e8 e9 2d a0 f8 85 ed 0f 8e b2
-> > RSP: 0018:ffffc9000284f3b0 EFLAGS: 00010293
-> > RAX: ffffffff891fdcd5 RBX: ffff888113587680 RCX: ffff88816e6f3a00
-> > RDX: 0000000000000000 RSI: 000000006e1a2a10 RDI: 00000000fffd0001
-> > RBP: 000000006e1a2a10 R08: ffff888113587767 R09: 1ffff110226b0eec
-> > R10: dffffc0000000000 R11: ffffed10226b0eed R12: ffff888113587764
-> > R13: dffffc0000000000 R14: 000000006e1d2a10 R15: 0000000000000000
-> > FS:  000055558e11c500(0000) GS:ffff88818eb38000(0000) knlGS:00000000000=
-00000
-> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > CR2: 0000200000002280 CR3: 000000011053c000 CR4: 00000000000006f0
-> > Call Trace:
-> >  <TASK>
-> >  kfree_skb_reason include/linux/skbuff.h:1322 [inline]
-> >  tcf_kfree_skb_list include/net/sch_generic.h:1127 [inline]
-> >  __dev_xmit_skb net/core/dev.c:4258 [inline]
-> >  __dev_queue_xmit+0x2669/0x3180 net/core/dev.c:4783
-> >  packet_snd net/packet/af_packet.c:3076 [inline]
-> >  packet_sendmsg+0x3e33/0x5080 net/packet/af_packet.c:3108
-> >  sock_sendmsg_nosec net/socket.c:727 [inline]
-> >  __sock_sendmsg+0x21c/0x270 net/socket.c:742
-> >  ____sys_sendmsg+0x505/0x830 net/socket.c:2630
-> >  ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2684
-> >  __sys_sendmsg net/socket.c:2716 [inline]
-> >  __do_sys_sendmsg net/socket.c:2721 [inline]
-> >  __se_sys_sendmsg net/socket.c:2719 [inline]
-> >  __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2719
-> >  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
-> >  do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
-> >  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> > RIP: 0033:0x7fc1a7b8efc9
-> > Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89=
- f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 =
-ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-> > RSP: 002b:00007fff4ba6d968 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-> > RAX: ffffffffffffffda RBX: 00007fc1a7de5fa0 RCX: 00007fc1a7b8efc9
-> > RDX: 0000000000000004 RSI: 00002000000000c0 RDI: 0000000000000007
-> > RBP: 00007fc1a7c11f91 R08: 0000000000000000 R09: 0000000000000000
-> > R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-> > R13: 00007fc1a7de5fa0 R14: 00007fc1a7de5fa0 R15: 0000000000000003
-> >  </TASK>
-> >
->
-> Seems that cls_bpf_classify() is able to change tc_skb_cb(skb)->drop_reas=
-on,
-> and this predates my code.
 
-struct bpf_skb_data_end {
-  struct qdisc_skb_cb qdisc_cb;
-  void *data_meta;
-   void *data_end;
-};
-
-So anytime BPF calls bpf_compute_data_pointers(), it overwrites
-tc_skb_cb(skb)->drop_reason,
-because offsetof(   ..., data_meta) =3D=3D offsetof(... drop_reason)
-
-CC Victor and Daniel
+ok, maybe it is not that bad. I think I can workaround this by creating
+a dummy action at index 0. Does it make sense to send an update of the
+example with such change?=20
 
