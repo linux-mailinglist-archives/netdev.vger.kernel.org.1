@@ -1,145 +1,78 @@
-Return-Path: <netdev+bounces-237428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77925C4B3CC
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:45:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EE50C4B3E8
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:47:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8416E188DC8F
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:45:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67DBC18908C3
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:48:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D91DB30C630;
-	Tue, 11 Nov 2025 02:45:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E750348468;
+	Tue, 11 Nov 2025 02:47:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CL+OPki3"
 X-Original-To: netdev@vger.kernel.org
-Received: from invmail4.hynix.com (exvmail4.hynix.com [166.125.252.92])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FB27346E53;
-	Tue, 11 Nov 2025 02:45:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=166.125.252.92
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E10E732E14A;
+	Tue, 11 Nov 2025 02:47:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762829116; cv=none; b=VBr3mhHnFVi0qg7M1qKpBj/GD7KG/o1KnQGC1GU5ZYi0mgsi0nDKntS+6ZFPqS/sJadbfkhucOYIBV0NIxiqRUxSLl/p8FhB0QyCm/S2JsTlkzh7NfaojOHrBF6dmLqe/t8Aa+hTSV5PUlcQePHDTuK0nPRUsQIn2ZXdxHSo1Lw=
+	t=1762829267; cv=none; b=LSbSXIOXuScwBPm7L8FpAYyNZtch2XvNumOGhep/4DVksfRyJD3mXhLQz+2qhm00s+SZSZfigimFmVzkZK3L1sAsRMMEy9Lew/yP/diG24gitiEI3faFBQE4TuSm0jW5m0afa1giRHK2zisdmZYXKp2o40WwWl2S9nIEvd8Pu+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762829116; c=relaxed/simple;
-	bh=rwaTaD8H95OEQUA2cvjGJVhLOhyYpCwkPUaKbmTZ/TY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uukIxRPQ2ipu2apLefbZQ8HoThmJNexlmP+EkY1quZFdUw0j2LDhU8jJ8oVZ5nMeJm/W+cfWm4I0JusERPImoDrsiHKkb+jryOeJCTMUKn1092AM7jtduMv5hNNIYES+vub6xnSjpXFXW1f5ROTj1uBbZeLbDCPxsnO90CoRIsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com; spf=pass smtp.mailfrom=sk.com; arc=none smtp.client-ip=166.125.252.92
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sk.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sk.com
-X-AuditID: a67dfc5b-c2dff70000001609-21-6912a3311e0d
-Date: Tue, 11 Nov 2025 11:45:00 +0900
-From: Byungchul Park <byungchul@sk.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: linux-mm@kvack.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
-	harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
-	davem@davemloft.net, hawk@kernel.org, john.fastabend@gmail.com,
-	sdf@fomichev.me, saeedm@nvidia.com, leon@kernel.org,
-	tariqt@nvidia.com, mbloch@nvidia.com, andrew+netdev@lunn.ch,
-	edumazet@google.com, pabeni@redhat.com, akpm@linux-foundation.org,
-	david@redhat.com, lorenzo.stoakes@oracle.com,
-	Liam.Howlett@oracle.com, vbabka@suse.cz, rppt@kernel.org,
-	surenb@google.com, mhocko@suse.com, horms@kernel.org,
-	jackmanb@google.com, hannes@cmpxchg.org, ziy@nvidia.com,
-	ilias.apalodimas@linaro.org, willy@infradead.org,
-	brauner@kernel.org, kas@kernel.org, yuzhao@google.com,
-	usamaarif642@gmail.com, baolin.wang@linux.alibaba.com,
-	almasrymina@google.com, toke@redhat.com, asml.silence@gmail.com,
-	bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
-	sfr@canb.auug.org.au, dw@davidwei.uk, ap420073@gmail.com,
-	dtatulea@nvidia.com
-Subject: Re: [RFC mm v5 1/2] page_pool: check nmdesc->pp to see its usage as
- page pool for net_iov not page-backed
-Message-ID: <20251111024500.GA79866@system.software.com>
-References: <20251107015902.GA3021@system.software.com>
- <20251106180810.6b06f71a@kernel.org>
- <20251107044708.GA54407@system.software.com>
- <20251107174129.62a3f39c@kernel.org>
- <20251108022458.GA65163@system.software.com>
- <20251107183712.36228f2a@kernel.org>
- <20251110010926.GA70011@system.software.com>
- <20251111014052.GA51630@system.software.com>
- <20251110175650.78902c74@kernel.org>
- <20251111021741.GB51630@system.software.com>
+	s=arc-20240116; t=1762829267; c=relaxed/simple;
+	bh=kb0U3gFuLG9ebZpEvZgiRVBGfMo6nVWwuyrudqfGv0o=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=orxJsAeVl5S8f0zdNom5AnMl57cYFsbFalucsu4G7M0lNMBZG/ifQmZ0ICQRfOGGmf/7BCQWHPwGC8dNDu9XppLPRzEvT0McmtWiC1lY8+bWT5GLfvv5KsqkA7K3XPj+bKDoo/pxFLyuaGFNwEm0y1mSBuupOZi4M82I8VNa79w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CL+OPki3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D242C4CEF5;
+	Tue, 11 Nov 2025 02:47:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762829265;
+	bh=kb0U3gFuLG9ebZpEvZgiRVBGfMo6nVWwuyrudqfGv0o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CL+OPki34UVIhGzekeTPxheEDkeQvSp5/4jpb4qMsYbN6Sf2r4x8bHT2WxS0EumhH
+	 WsFcd4RDuYsmGBxoASEPDFmRj1cImURIfjvverSYcHdgUPcHztVkOZkQq9Q1W7Eocl
+	 lcTjQq3OcTiJAgsNnB55q0AcstEv9n7H5SZWJWAKpU7L6GYnHbY4H3Frfia+frrHMK
+	 9BDsdT6h2aAq04wcchRJFXQ5SO7UHKiyMOI1gOklA0xGQUKaJ1X92Yf7zYBxZJG0ct
+	 hwSh7hNc8v8+Cm9osoiHB66+DTERKIIpPGFJsvS3nHo3wix88OCXK2wv6UeQk4wbLB
+	 JnpPODhCFkrJA==
+Date: Mon, 10 Nov 2025 18:47:43 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Fan Gong <gongfan1@huawei.com>
+Cc: Zhu Yikai <zhuyikai1@h-partners.com>, <netdev@vger.kernel.org>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Markus Elfring <Markus.Elfring@web.de>, Pavan
+ Chebbi <pavan.chebbi@broadcom.com>, ALOK TIWARI <alok.a.tiwari@oracle.com>,
+ <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>, luosifu
+ <luosifu@huawei.com>, Xin Guo <guoxin09@huawei.com>, Shen Chenyang
+ <shenchenyang1@hisilicon.com>, Zhou Shuai <zhoushuai28@huawei.com>, Wu Like
+ <wulike1@huawei.com>, Shi Jing <shijing34@huawei.com>, Luo Yang
+ <luoyang82@h-partners.com>, Meny Yossefi <meny.yossefi@huawei.com>, Gur
+ Stavi <gur.stavi@huawei.com>
+Subject: Re: [PATCH net-next v06 2/5] hinic3: Add PF management interfaces
+Message-ID: <20251110184743.72f0fe8d@kernel.org>
+In-Reply-To: <c344db0c471b6b1321994958727df1c005a65daa.1762581665.git.zhuyikai1@h-partners.com>
+References: <cover.1762581665.git.zhuyikai1@h-partners.com>
+	<c344db0c471b6b1321994958727df1c005a65daa.1762581665.git.zhuyikai1@h-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251111021741.GB51630@system.software.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SXUxTZxjH85739JzTYpPXCtsr3GxlCwlq3YgXD8n8uFlyLrZk2eKFumQW
-	OUpjqaYgHyYmZdSgBJgbmpSCGUoGWIpI0dJWMVqwaE0cw8HOglIoExT5SgXCRyfjaMy8++f/
-	/+WX5+IRsO6hKlkwWfIlq8Vo1nMaVjO94dK2jAad6bO/QglQ1+bmoGWpCJpGfCpYdk8wUOfy
-	IphfHuJhrSuE4FVPLwcvu2MIGi4tYqj73c7CQtsKBn9gAsGko5WDZ6EoDy2eryHSOM7CrbJO
-	DNGf7nNQaV/F0LU8w8OPvuZ1cYeNhz5vlQrOr/yGodM2wsPjQB0Hw+41FYwHK1l44LzCwtyF
-	HgyRqj0Qqv8AFh9OIehp62RgseIiBwM1AQZudA3wUN1fz8GYPYKgvzvKwoX4GQ5qS6oQrC6t
-	K2fOzaug9t4wv8cglsgyJ3ZPzWLx+pW/GXHQ8TMryrfDjOh3PuXFes8JsaM5XSyX+7HocZ3l
-	RE/sF158MniLE+87VlnRP5op+n2vGLGydIb7Jmm/5otsyWwqkKzbdx3U5LTJY/zxeELRZMVT
-	1oZ+VZcjtUDJDtrgucy/yyWxm5ySWfIpPdvX+qbnSBqV5WWs5ETyCbV31LDlSCNgMsdThzys
-	UoZNJJ/OzdrWIUHQEqAtbr3C6MhtTMOPXIzCaMlG+qDmH1bJmKRT+fULRuExSaFNrwWlVpNM
-	ejU4+UaZRFLpHW8vo3gomRfo9dM17NtDN9O7zTJ7DhHne1rne1rn/9p6hF1IZ7IU5BpN5h2G
-	nGKLqchw6FiuB62/WOOp+AEfivV9F0REQPoNWvn5RpNOZSzIK84NIipgfaI2nkVMOm22sfik
-	ZD32g/WEWcoLohSB1X+ozVgszNaRI8Z86agkHZes71ZGUCfbkGHrR/njB1JuVDPmsYqL+7aE
-	ptyj1ea9j1O/igQ696YeMWxvbz84/e9p9eiEeXe07NrKx/FTQyOzQ2n7rV36zKzDBT5SuM9+
-	eLbHuxCtTQ2XhVtKd0U0XkvSlzmGbefTdBma3OHEnVPXlhxZf84ntH8/EHZ/ywTWmmO9tf7M
-	0B8uPZuXY/w8HVvzjP8BjLVwBF4DAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUhTYRiGec97ds5xtTgtXYeEoPUFiyyj4LEiin70EhQagX1RrTzkaC7b
-	TLQIZg00S7MPYy4rS7Sps9UsdZZRm/nVl2jGkUxNK8tkiZk0lcoTRP27eO7rvn89HFaXK2Zx
-	BlOSaDbpjVpGSSs3rzq5OLJQbVja8mop5LtdDJT9SIGbPdUKCLr6KcgvrUQwEnzDwq/aegTf
-	6hoY+OIfRlB4fRRD/ksbDd/dYxi8Nf0IBuzlDHyo72WhzLMJuos/0vAgvQpD79lGBrJs4xhq
-	gwEWTlQ7J4crrCz4rzQpoKUyWwEXx4owVFl7WGiryWegy/VLAR99WTQ0OUpoGMqtw9CdvRbq
-	CzQw+nQQQZ27ioLRM1cYaM+roeBebTsLF1oLGOizdSNo9ffSkDuRwcDltGwE4z8mJwM5Iwq4
-	/KSLXbuEpEkSQ/yDXzG5W9JBkdf2czSRHjZTxOt4y5ICzxFS4dSRTKkVE0/pKYZ4hs+zpPP1
-	A4Y02sdp4n0XRbzV3yiSdTLARGt2KFfHiUZDsmhesmavMt4t9bGJE1NSBs68pa3oWkgmCuEE
-	frmQNnyfkZnm5wunWspZmRl+oSBJQSxzKD9PsFXk0ZlIyWF+iBXsUpdCDmbwScLQV+ukxHEq
-	HoQyl1Z21PxDLDS/KKVkR8VPF5ry3tMyY14nSD8/U7KP+XDh5k9OPofwUcIt38CfyTB+rvCo
-	soHKQSrHf23Hf23Hv3YBwqUo1GBKTtAbjCsiLAfjU02GlIj9hxI8aPKJio9PnKtGI20bfIjn
-	kHaqSvo03aBW6JMtqQk+JHBYG6qa2Mcb1Ko4fepR0Xxoj/mIUbT4UDhHa2eqNsaKe9X8AX2S
-	eFAUE0Xz35TiQmZZ0SrN7ZXKS9ZjcVHfmzft3BKo90fr5+xJT1i+8PCN29uKBnurWjQBf6F3
-	cWxOR9Gi3XWBsHXOGFNE8AlNbYBlMcGSO506e79q/fNpVzsanBej3/jO7xRjM3K53AWacGG7
-	Oia709mlm91/eL3tWbrrMcna5X6v2WJ6ZlyZsvU0sX/S0pZ4faQOmy3633ErMQVAAwAA
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 11, 2025 at 11:17:41AM +0900, Byungchul Park wrote:
-> On Mon, Nov 10, 2025 at 05:56:50PM -0800, Jakub Kicinski wrote:
-> > On Tue, 11 Nov 2025 10:40:52 +0900 Byungchul Park wrote:
-> > > > > I understand the end goal. I don't understand why patch 1 is a step
-> > > > > in that direction, and you seem incapable of explaining it. So please
-> > > > > either follow my suggestion on how to proceed with patch 2 without
-> > > >
-> > > > struct page and struct netmem_desc should keep difference information.
-> > > > Even though they are sharing some fields at the moment, it should
-> > > > eventually be decoupled, which I'm working on now.
-> > >
-> > > I'm removing the shared space between struct page and struct net_iov so
-> > > as to make struct page look its own way to be shrinked and let struct
-> > > net_iov be independent.
-> > >
-> > > Introduing a new shared space for page type is non-sense.  Still not
-> > > clear to you?
-> > 
-> > I've spent enough time reasoning with out and suggesting alternatives.
-> 
-> I'm not trying to be arguing but trying my best to understand you and
-> want to adopt your opinion.  However, it's not about objection but I
-> really don't understand what you meant.  Can anyone explain what he
-> meant who understood?
+On Sat, 8 Nov 2025 14:41:37 +0800 Fan Gong wrote:
+> +	struct semaphore                port_state_sem;
 
-If no objection against Jakub's opinion, I will resend with his
-alternaltive applied.
-
-	Byungchul
-
-> 	Byungchul
-> 
-> > If you respin this please carry:
-> > 
-> > Nacked-by: Jakub Kicinski <kuba@kernel.org>
-> > 
-> > Until I say otherwise.
+You seem to init this semaphore to 1, could you not use a mutex?
+Mutexes are faster and have better debugging. If you have a reason
+for a semaphore please document.
 
