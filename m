@@ -1,238 +1,169 @@
-Return-Path: <netdev+bounces-237581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEC5CC4D5FB
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 12:19:42 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id E70B5C4D6A3
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 12:33:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E729F3A05B2
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 11:15:53 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id AAEE74E4261
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 11:26:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83F1F2FBE03;
-	Tue, 11 Nov 2025 11:15:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 273452848AF;
+	Tue, 11 Nov 2025 11:26:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N4MQK7po";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="pP6FIubD"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="teHh3k49"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9B5A2F7AA6
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 11:15:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8267223BCEE
+	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 11:26:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762859750; cv=none; b=LcPsZmFMakiW+tDSS+RVKdlxSqX3AWMFQ2w48lCwqlA3sDuTv0F3UjfTGPTY+dSVUnj45FqRfgVlC/3JgAn5950XXoXj2Jb+2ii10w9EhlGdQIvRAk9Ay2e/1ipmIvwukR01KPz3+72YDa19Ie9KyiiLC8GkeSJUGT/sz4/zGw8=
+	t=1762860407; cv=none; b=ENY54L1Iued4COb0pv3CAvH85ornkVKDvEgQq1u3aeHJCFRc6QFQEp7hK+UQnypcHARsgLKFvi7KkMff5W8qGuTnLpxbgj7cGx2sm2hO5o1NibB6tCmyJt2IkU8ce6i/NWIgJtjH/UHSmCpJsfdhpbmI+jp3emNXDPEmdoL5jI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762859750; c=relaxed/simple;
-	bh=+a3FXns3drOomy2losT83l+6yda8JsH6yzxl2Bi9LgQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GSri5YmWg7HEzbYXlcfTJjC/7UxZzvHYFWThTPwtxwMGu5h8Ld3rRiHoPOYss4oZth7DUPENYZO7oB1++3bGqV7yM07sRzhzapwQeNGaaEKpKDc+vEPXNNJL+Inb81ddfuS5diQt13ZrTt7kapPnPXcWCCWRF3L3cdt/yc5zdY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N4MQK7po; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=pP6FIubD; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762859747;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Js25JqV/nrIrTu7LVkEMw5HQuj8XZ/095iAhtGHGsrI=;
-	b=N4MQK7poxxdvYOx9qhTnj+EUmPW5MeMFnK58n26JxEDfrP4ng+0EuW7xhLb65Ag++FelAq
-	WQGN7a7QblCBUjZWkdZnd7VbWSubMAnV6PpARO2z1GFaic6SJzbPEM76PwWOjVSqTURPFo
-	QU33yHIYdAjZOGa6n9LePeBN93VsNUk=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-688-dZqMtj09OtiKBsJgQHz6IQ-1; Tue, 11 Nov 2025 06:15:46 -0500
-X-MC-Unique: dZqMtj09OtiKBsJgQHz6IQ-1
-X-Mimecast-MFC-AGG-ID: dZqMtj09OtiKBsJgQHz6IQ_1762859745
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-429be5aee5bso1865088f8f.3
-        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 03:15:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762859745; x=1763464545; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Js25JqV/nrIrTu7LVkEMw5HQuj8XZ/095iAhtGHGsrI=;
-        b=pP6FIubD3mfAgS9zY+WfLc/TM9QGJdtJ4mtqIkd2uY9nnTtpiMygmbGpkt+kDAJsk/
-         9UNBMJtjW7s8krhcYCETkFV6aWCH+Ok7bGDbN4sqhZ6c157PN0msW5m5AKiBJi9kO2eH
-         TyvvtI0iymAR4YVtkmDWjY6n+WO7dt5NZk8u9zmgTKK2qz7LAviF37OKuw6f6sKbRUwR
-         PhXGZaKZlkvJ7+PS3wdQPnlc1nQLzt12awFy0FL6GmumIsTDY6aEtJ4ykFCUrJ8SDeoB
-         of3jUTzshGdlgsnHNqAZzscBufc/pXa0iLpuT0wzDxrXI1B+Jina8GpJGZJijGIFSIla
-         XAgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762859745; x=1763464545;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Js25JqV/nrIrTu7LVkEMw5HQuj8XZ/095iAhtGHGsrI=;
-        b=C4uKFrURv98xsntIlHVnEkxH8gKCGn92j0sBMNsVyNonbMoa7Szh5M6sZiqRZX57nP
-         hImejdk0Iij3niRyVtEbGX+Ovg0apEkPOg4+aorQfJ75GsXmpIliaXR66vBW0Mn/TWxV
-         FZto0Z1SVl8+9f2ZgGHn414J7e7RDggnKs+iS3mgJ7D7UGyHtuZivkIVsPZNALN/1Ecv
-         ld5olZeDvPJZZ1YYRymBvBunfF0BwSy03eXjNGaDQKyQAOG3T9dLxvgCiEeB/KcnyQEd
-         V/XCpmf8n5wahKy23E+p+SrUQ0sgdZmJu/cT0StS28HxkD3LVLLyRh6JSO+rJzmlRrYg
-         L9qA==
-X-Gm-Message-State: AOJu0YxhZZjf9HQnkHiCYlacVPCd0eXt7f/S3IY07QnkLCkh515TaARd
-	ZaEQaD0MKbljz+TP7wAFgPEn2v5G48Zm+8PdJoCPJqSZvDIEk41maC9ME8lWpiiNSdTq1r1uZVT
-	9TLeI0ixBmtjKfNb2tySITTsyJbjHrfdO8gt2mK7nhKDgHNPuTjtATKVBJw==
-X-Gm-Gg: ASbGncuIIHZDIE7zgVBWpNww6k1h+q57cIfJLGUqXx6muQRes6xWgD2uAq16Qt7Zg55
-	mcBm6sWlnmlkWZsPFD4iKm6e8WfpbjhGY+k12GBdSYNkxDXwP6jbmjGj+MmP2mzIlY9u3jm8+Mi
-	WM9dCH+Dc2z+dwMpEpQIziaMNBDgPmzpQZ9LISyB69RNXURUOI5xU3VUkYopORKluNAHNylDgtR
-	KF/vPVttl6e85KCSgGAS3hZTzGzQiQUwux/Le1Y1WUsDsZo9WU3lbnsk/jztuWMyLirt+ugr3vj
-	KD24ZU9TtBDdpNO8HXUhfqxBw0MHKPX2uSzmASyoth0DD7wXfZk7JryRy3N3tfIAwTQuVR4Xu+C
-	0zA==
-X-Received: by 2002:a05:6000:1a87:b0:42b:3ee9:4775 with SMTP id ffacd0b85a97d-42b3ee9654dmr5066665f8f.11.1762859745195;
-        Tue, 11 Nov 2025 03:15:45 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG5BmQVzCMGzSxTmdQQ5mIFBWicLh/gAll7NU+gJ69qiCBbPtixiG95p0b9x1OK2FuTFUowrQ==
-X-Received: by 2002:a05:6000:1a87:b0:42b:3ee9:4775 with SMTP id ffacd0b85a97d-42b3ee9654dmr5066617f8f.11.1762859744784;
-        Tue, 11 Nov 2025 03:15:44 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.155.55])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b35ad7c16sm14636974f8f.15.2025.11.11.03.15.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Nov 2025 03:15:44 -0800 (PST)
-Message-ID: <1ebaa0e4-8d7d-4340-b1de-4cb1dcf60311@redhat.com>
-Date: Tue, 11 Nov 2025 12:15:43 +0100
+	s=arc-20240116; t=1762860407; c=relaxed/simple;
+	bh=xO5vBcz1iy3ybmktXCYBxqvdxz4EbTH/F0QgFH0JFjw=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
+	 Message-Id:Date; b=daPxwo5sX5ggWi/QnK6FoDy5d/WM4OX8qKdpvFGd2ic1BYQ5S3h5el2rwDjvNsRqJ5h3TuHItKYbOq7ioqvqK5bcQysFfEJTetQ9Sj8KL5aXD0rzUV1LRneyGmyWcX3AifTvB/35LLQX0SYMQkh9Ujs//iVeVxd6mjsFXpdCTIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=teHh3k49; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=qgAfxK2MHik3nNugmeifO/rBJyY1F9RlKzlJQysCZZE=; b=teHh3k49Ca2cV+YDu4ciIA/DvO
+	kg6hvuAZ3bGw6zDo8ruejkZPLdHbqB1KpfgFl/2sX8GQHmNPh6WVxBWmozfxxmnVPRG8+9fiLJuto
+	GcKmwMyV7pp+va4OgEptejkSSPvoGzTgGnxNOO1Mzm6S+rGHqqGJj8L/06NGF/cmDokJ+skKhAKHt
+	JoDdXS2OeSxW6IQyteH/HrM3Q0tJyTv5csqOvR1Epc4VF8adpaOexLrt/0Egp4i7qv1i9niGvWFhc
+	m4xGWNaix2TM6YdM0wh029QthFNzEfIf94HIjXBg9ehdCSi18kym85CH86CVfeKLVGs3EpQR103SP
+	Rj7YP5YQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:55950 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1vImWB-000000002Tq-09lg;
+	Tue, 11 Nov 2025 11:26:35 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1vImWA-0000000DrIl-1HZY;
+	Tue, 11 Nov 2025 11:26:34 +0000
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next] net: stmmac: improve ndev->max_mtu setup readability
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/4] tools: ynltool: create skeleton for the C
- command
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
- donald.hunter@gmail.com
-Cc: netdev@vger.kernel.org, edumazet@google.com, andrew+netdev@lunn.ch,
- horms@kernel.org, sdf@fomichev.me, joe@dama.to, jstancek@redhat.com
-References: <20251107162227.980672-1-kuba@kernel.org>
- <20251107162227.980672-2-kuba@kernel.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251107162227.980672-2-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1vImWA-0000000DrIl-1HZY@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Tue, 11 Nov 2025 11:26:34 +0000
 
-On 11/7/25 5:22 PM, Jakub Kicinski wrote:
-> Based on past discussions it seems like integration of YNL into
-> iproute2 is unlikely. YNL itself is not great as a C library,
-> since it has no backward compat (we routinely change types).
-> 
-> Most of the operations can be performed with the generic Python
-> CLI directly. There is, however, a handful of operations where
-> summarization of kernel output is very useful (mostly related
-> to stats: page-pool, qstat).
-> 
-> Create a command (inspired by bpftool, I think it stood the test
+Improve the readibility of the code setting ndev->max_mtu. This depends
+on the hardware specific maximum defined by the MAC core, and also a
+platform provided maximum.
 
-FTR, it took me a little to understand that for this patch at least is
-"inspired" alike the notorious MS socket implementation ;)
+The code was originally checking that the platform specific maximum was
+between ndev->min_mtu..MAC core maximum before reducing ndev->max_mtu,
+otherwise if the platform specific maximum was less than ndev->min_mtu,
+issuing a warning.
 
-> of time reasonably well) to be able to plug the subcommands into.
-> 
-> Link: https://lore.kernel.org/1754895902-8790-1-git-send-email-ernis@linux.microsoft.com
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> v2:
->  - use kernel source version
-> v1: https://lore.kernel.org/20251104232348.1954349-3-kuba@kernel.org
-> ---
->  tools/net/ynl/Makefile              |   3 +-
->  tools/net/ynl/ynltool/Makefile      |  52 +++++
->  tools/net/ynl/ynltool/json_writer.h |  75 ++++++++
->  tools/net/ynl/ynltool/main.h        |  62 ++++++
->  tools/net/ynl/ynltool/json_writer.c | 288 ++++++++++++++++++++++++++++
->  tools/net/ynl/ynltool/main.c        | 240 +++++++++++++++++++++++
->  tools/net/ynl/ynltool/.gitignore    |   1 +
->  7 files changed, 720 insertions(+), 1 deletion(-)
->  create mode 100644 tools/net/ynl/ynltool/Makefile
->  create mode 100644 tools/net/ynl/ynltool/json_writer.h
->  create mode 100644 tools/net/ynl/ynltool/main.h
->  create mode 100644 tools/net/ynl/ynltool/json_writer.c
->  create mode 100644 tools/net/ynl/ynltool/main.c
->  create mode 100644 tools/net/ynl/ynltool/.gitignore
-> 
-> diff --git a/tools/net/ynl/Makefile b/tools/net/ynl/Makefile
-> index 211df5a93ad9..31ed20c0f3f8 100644
-> --- a/tools/net/ynl/Makefile
-> +++ b/tools/net/ynl/Makefile
-> @@ -12,10 +12,11 @@ endif
->  libdir  ?= $(prefix)/$(libdir_relative)
->  includedir ?= $(prefix)/include
->  
-> -SUBDIRS = lib generated samples
-> +SUBDIRS = lib generated samples ynltool
->  
->  all: $(SUBDIRS) libynl.a
->  
-> +ynltool: | lib generated libynl.a
->  samples: | lib generated
->  libynl.a: | lib generated
->  	@echo -e "\tAR $@"
-> diff --git a/tools/net/ynl/ynltool/Makefile b/tools/net/ynl/ynltool/Makefile
-> new file mode 100644
-> index 000000000000..cfabab3a20da
-> --- /dev/null
-> +++ b/tools/net/ynl/ynltool/Makefile
-> @@ -0,0 +1,52 @@
-> +# SPDX-License-Identifier: GPL-2.0-only
-> +
-> +include ../Makefile.deps
-> +
-> +INSTALL	?= install
-> +prefix  ?= /usr
-> +
-> +CC := gcc
-> +CFLAGS := -Wall -Wextra -Werror -O2
-> +ifeq ("$(DEBUG)","1")
-> +  CFLAGS += -g -fsanitize=address -fsanitize=leak -static-libasan
-> +endif
-> +CFLAGS += -I../lib
-> +
-> +SRC_VERSION := \
-> +	$(shell make --no-print-directory -sC ../../../.. kernelversion || \
-> +		echo "unknown")
-> +
-> +CFLAGS += -DSRC_VERSION='"$(SRC_VERSION)"'
-> +
-> +SRCS := $(wildcard *.c)
-> +OBJS := $(patsubst %.c,$(OUTPUT)%.o,$(SRCS))
-> +
-> +YNLTOOL := $(OUTPUT)ynltool
-> +
-> +include $(wildcard *.d)
-> +
-> +all: $(YNLTOOL)
-> +
-> +Q = @
-> +
-> +$(YNLTOOL): $(OBJS)
-> +	$(Q)echo -e "\tLINK $@"
-> +	$(Q)$(CC) $(CFLAGS) -o $@ $(OBJS)
-> +
-> +%.o: %.c main.h json_writer.h
-> +	$(Q)echo -e "\tCC $@"
-> +	$(Q)$(COMPILE.c) -MMD -c -o $@ $<
-> +
-> +clean:
-> +	rm -f *.o *.d *~
-> +
-> +distclean: clean
-> +	rm -f $(YNLTOOL)
-> +
-> +bindir ?= /usr/bin
-> +
-> +install: $(YNLTOOL)
-> +	install -m 0755 $(YNLTOOL) $(DESTDIR)$(bindir)/$(YNLTOOL)
+Re-order the code to handle the case where the platform specific max is
+below ndev->min_mtu, which then means that the subsequent test is
+simply reducing ndev->max_mtu.
 
-Minor nit: $(INSTALL) above?
+Update the comment, and add a few blank lines to separate the blocks of
+code.
 
-Also possibly using/including scripts/Makefile.include could avoid some
-code duplication? (or at least make the V=1 option effective)/
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 22 ++++++++++---------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
 
-/P
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index ccf383b355e7..eb4350193996 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -1392,9 +1392,9 @@ static unsigned int stmmac_rx_offset(struct stmmac_priv *priv)
+ 	return NET_SKB_PAD;
+ }
+ 
+-static int stmmac_set_bfsize(int mtu, int bufsize)
++static int stmmac_set_bfsize(int mtu)
+ {
+-	int ret = bufsize;
++	int ret;
+ 
+ 	if (mtu >= BUF_SIZE_8KiB)
+ 		ret = BUF_SIZE_16KiB;
+@@ -3958,12 +3958,13 @@ stmmac_setup_dma_desc(struct stmmac_priv *priv, unsigned int mtu)
+ 		return ERR_PTR(-ENOMEM);
+ 	}
+ 
++	/* Returns 0 or BUF_SIZE_16KiB if mtu > 8KiB and dwmac4 or ring mode */
+ 	bfsize = stmmac_set_16kib_bfsize(priv, mtu);
+ 	if (bfsize < 0)
+ 		bfsize = 0;
+ 
+ 	if (bfsize < BUF_SIZE_16KiB)
+-		bfsize = stmmac_set_bfsize(mtu, 0);
++		bfsize = stmmac_set_bfsize(mtu);
+ 
+ 	dma_conf->dma_buf_sz = bfsize;
+ 	/* Chose the tx/rx size from the already defined one in the
+@@ -7773,22 +7774,23 @@ int stmmac_dvr_probe(struct device *device,
+ 
+ 	/* MTU range: 46 - hw-specific max */
+ 	ndev->min_mtu = ETH_ZLEN - ETH_HLEN;
++
+ 	if (priv->plat->core_type == DWMAC_CORE_XGMAC)
+ 		ndev->max_mtu = XGMAC_JUMBO_LEN;
+-	else if ((priv->plat->enh_desc) || (priv->synopsys_id >= DWMAC_CORE_4_00))
++	else if (priv->plat->enh_desc || priv->synopsys_id >= DWMAC_CORE_4_00)
+ 		ndev->max_mtu = JUMBO_LEN;
+ 	else
+ 		ndev->max_mtu = SKB_MAX_HEAD(NET_SKB_PAD + NET_IP_ALIGN);
+-	/* Will not overwrite ndev->max_mtu if plat->maxmtu > ndev->max_mtu
+-	 * as well as plat->maxmtu < ndev->min_mtu which is a invalid range.
++
++	/* Warn if the platform's maxmtu is smaller than the minimum MTU,
++	 * otherwise clamp the maximum MTU above to the platform's maxmtu.
+ 	 */
+-	if ((priv->plat->maxmtu < ndev->max_mtu) &&
+-	    (priv->plat->maxmtu >= ndev->min_mtu))
+-		ndev->max_mtu = priv->plat->maxmtu;
+-	else if (priv->plat->maxmtu < ndev->min_mtu)
++	if (priv->plat->maxmtu < ndev->min_mtu)
+ 		dev_warn(priv->device,
+ 			 "%s: warning: maxmtu having invalid value (%d)\n",
+ 			 __func__, priv->plat->maxmtu);
++	else if (priv->plat->maxmtu < ndev->max_mtu)
++		ndev->max_mtu = priv->plat->maxmtu;
+ 
+ 	ndev->priv_flags |= IFF_LIVE_ADDR_CHANGE;
+ 
+-- 
+2.47.3
 
 
