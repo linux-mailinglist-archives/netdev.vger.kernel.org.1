@@ -1,133 +1,238 @@
-Return-Path: <netdev+bounces-237589-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 707F0C4D802
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 12:50:19 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE728C4D8B9
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 12:58:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13E153B1E48
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 11:46:32 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DC05D4FE75B
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 11:48:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F411C35770B;
-	Tue, 11 Nov 2025 11:46:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64BB435773F;
+	Tue, 11 Nov 2025 11:48:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NNz8XH0A";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="BBYaVrfk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U8wDzG2j"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173A2350A3F
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 11:46:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 117782FCC1D;
+	Tue, 11 Nov 2025 11:48:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762861576; cv=none; b=cBJLxzj5b4zTEnvBOZ6MPUQg94gofmigoqskgVQ228V6tTKFNKQtoBiqQnehGuxEFvjJrmf8xRdylFUAnsdAYrWaf/baCwhuXZp5UoigwHV31FTtSusQ0Yd6vFEEhTGruZ+PELKsHSLNrTqVKFZkj53/dF/Ltk7yoF5mEfz2Ix8=
+	t=1762861690; cv=none; b=cubzvfEkNEPLzbigtnaIyNsDCL6ZbHyZesuF3/PYEFWFt0k/CE0nFarz0fbW4aPxs4TVKt20eqS3YN5TwqqK8olsElk7dEVJ/ubSyaaSHNkE5kgP6XqwXOsi6WXGLtxQYW0mrNddhMIhMhMMEAJT2vEX5vbqRThsYO8ByAQULLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762861576; c=relaxed/simple;
-	bh=ms3RSg/noIjsyA8oAmHE+F2zUwrJzf14af2/m8iMuRg=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=uRhI4opO7ynrVrox5PHXRFa2pNQHoSHmvTjtwfw7ZasTNojbPaj5Blut5Tq+HSnT4/vv2Or24Nxi1xi752UupkWm7UcpglB5ZvYkdJXJN1EVdoPM+KA8pm4NuZ/XYJkvHNFyCN7nGluGpbmf//6uDep8whP+Yslx5SzB8znLUCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NNz8XH0A; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=BBYaVrfk; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762861574;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ahehZ2ApA53mtBnHWumcjmErxgQ2sCVFE4tfaIMoMwE=;
-	b=NNz8XH0AympX2Hnah8IS3X191SWoeSvFhE2T1w9hI4zDs2CMHgStizqTlzgL9s/DLdN2zc
-	kQTnU/TcdsP2NLtetCWbNcaeAvW53amgY5QXlriX7/k4xtIjnViaY3ykpRmHGz35yd3B7U
-	jiDZe9mugIc8IlyLNm2vx09POn2rLfs=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-494-9cQLZHyBMl2Wgrf15YGR1w-1; Tue, 11 Nov 2025 06:46:12 -0500
-X-MC-Unique: 9cQLZHyBMl2Wgrf15YGR1w-1
-X-Mimecast-MFC-AGG-ID: 9cQLZHyBMl2Wgrf15YGR1w_1762861571
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-42b352355a1so329519f8f.1
-        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 03:46:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762861571; x=1763466371; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ahehZ2ApA53mtBnHWumcjmErxgQ2sCVFE4tfaIMoMwE=;
-        b=BBYaVrfk5ySz27dTgnVnq+T6l28J9DGtJwRGNT6uqjmVE7MLQU3OLNbhno5CUWZb2u
-         tSePfbbzYT7JyB7V4Ci7PizDanoY1aHnVE2GdNm+qyz3OeEA3nmPsdU+/Lbu9CQK1Z5y
-         SxjIEdXZ1rSvm61yVwjLhnub69NQ7j6u/ZIdgZ5YX/L3bjLBTCRaK0VZX6EQ48rD9YRL
-         n9rCU9Yn0jmtw9JohAaSXVcDuBMuyy8GmUfh3AuR9vpfFtzaX9rzkdluXjfYZn3SZTQH
-         zjb+r9+6i/cMTBXBDxNTTv1WXtQQHTlxUeV4jr4JHF3eiRtU8Dr1lS1v/drsSuAOPn3R
-         a31A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762861571; x=1763466371;
-        h=content-transfer-encoding:in-reply-to:content-language:references
-         :cc:to:from:subject:user-agent:mime-version:date:message-id:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ahehZ2ApA53mtBnHWumcjmErxgQ2sCVFE4tfaIMoMwE=;
-        b=ZgHVcBftJ43PkFF/1srVi42eHMHRNp6Xax0c0vSRo7DhOxjZQYP1OrWlucBAnEH6UX
-         6iVbT87iKmc52x5i5pIPH+c1RTsJLUfQ3oVGaeSnYL9VwjgBLE5ly0uttKCyUA5wmLP1
-         NudeYAEEJyR+g/EykdH851xBdWkA/TbJJc5AMHCokRi7LSAzkeRzvv1WFklei2btX2xh
-         V5nYbiz5l5mQlgnI2Gnrkia8OSREP1ODLitgm1312J1zLkO1Hj64XmFexp3gl3+4/JxZ
-         o+xdupMolAOMzIFHNLua7LMAkF2YK+WmTfaqZ9smNqpIojfMf9MCxJCGbFRRiBCeGHmu
-         LG5A==
-X-Gm-Message-State: AOJu0YwvmH753pxjeNe0hA2OBdBnO5ec8yEt8lmtTLYDtf6Jv/UGgfpz
-	VvMELXsCPQQNta24Eaigww4TitQfAqLnVP35UEgTvhe0/QFjJzpIH7D0AkqyFKxCMmzmHymx8WH
-	4bKSMvn711pxsTOQ89+z+kbBs7M3hQssECn2FjfPw+JrW5Xac/7XcL0UIuA==
-X-Gm-Gg: ASbGnct+JPnmVCmocQwWAyW5vzlpA3h88jFGDYdB6ic84HNx4r1KVcCyOjzuoUCUnlw
-	iZ2M07bQ2UpxOss8vr2rJ8UtupglrKAZqV7Lyh0A6iIJ3O3Sm15PanAmzMBdYSTHXvs0eUAi3QH
-	Ip7AJaODu0lUYX9uSlAJgK8/UzkT7YRpoFyNjRDZHQknHHZ6mmkJdDO711b7iDYZ9kkwzSkIg0t
-	vK4BZ6S4vbkFRDfQCiEPJh2ktpKOWVunQACsRRQKU62F7XL0rGz2Z/OBwxRMfpjpML0zh/MwV6D
-	3TAy0SK0E1F+XLLa/AUN1LtetD8ckZUWLdaOvv6USs8XV8CE4GHdapODTs3MgDyPEyDwB+bSOxP
-	YCg==
-X-Received: by 2002:a5d:5550:0:b0:42b:47ef:1d7a with SMTP id ffacd0b85a97d-42b47ef203fmr744904f8f.20.1762861571323;
-        Tue, 11 Nov 2025 03:46:11 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEyqVLnDuF3LVtyIz/X8GkBlPs6v4NB9pPryojZkgF5MSvGjr6/u2n7BcBiKmsK3T2KXjxHLA==
-X-Received: by 2002:a5d:5550:0:b0:42b:47ef:1d7a with SMTP id ffacd0b85a97d-42b47ef203fmr744887f8f.20.1762861570895;
-        Tue, 11 Nov 2025 03:46:10 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.155.55])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b3123036bsm19473054f8f.28.2025.11.11.03.46.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Nov 2025 03:46:10 -0800 (PST)
-Message-ID: <1455f577-1dc5-436b-8a08-38a74fa17975@redhat.com>
-Date: Tue, 11 Nov 2025 12:46:08 +0100
+	s=arc-20240116; t=1762861690; c=relaxed/simple;
+	bh=jxi1Gv6OcPtGGFXGFF2QxkwKjLaMbfnLeBrhrAyU/Tg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eBb8CuLulkcRfgDBNrTtvai+z/CPZGRVItQRz7rSFsDqGRI2o6PT3i/ZB3TSNixW3FzznThFhMdiP46o2EBRIaaW8hEblvHrSJVBKgOrhbqUmb0z9fgIJtMfMLKa66ObFGY59erJygs8ZvthxnTwhG8FWxjduQxvhyv/pb6W4Sg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U8wDzG2j; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E74BC116D0;
+	Tue, 11 Nov 2025 11:47:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762861689;
+	bh=jxi1Gv6OcPtGGFXGFF2QxkwKjLaMbfnLeBrhrAyU/Tg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=U8wDzG2jhPfzS4KLy6BBXjLkq8tbdJdbZ2HLPt/oCduCWbREVPz6XahhQXZNBZvqk
+	 rL61nJbROp9KbKpanxP6Xm+RhhBC2JjGt3mq5g1Vt8UeeKM8gOKgcYiPO0I2jAA8oR
+	 2vP9zcZsjezzMSY7lXp0qcTehuQ5Bvcn5PLIyv21tVd9pJmlDNPzRzYLCVga+fJVZC
+	 exeLAcTwq2GZWVxiqi/O5Hs9YfEKaR3AZUbkmkVOA0uPAeCkVjy4pmp9+BXSwywuet
+	 qQS5xfNfqALbItTHOqCEixH82CxNQPweybJmarDGuJMjWDhzcw/4Ag1g8TdQPeJwJh
+	 M8yYB1Fdu26pw==
+Date: Tue, 11 Nov 2025 11:47:53 +0000
+From: Simon Horman <horms@kernel.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jose Abreu <joabreu@synopsys.com>, Chen-Yu Tsai <wens@kernel.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Matthew Gerlach <matthew.gerlach@altera.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Kevin Hilman <khilman@baylibre.com>,
+	Jerome Brunet <jbrunet@baylibre.com>,
+	Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+	Keguang Zhang <keguang.zhang@gmail.com>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Jan Petrous <jan.petrous@oss.nxp.com>, s32@nxp.com,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>,
+	Heiko Stuebner <heiko@sntech.de>,
+	Chen Wang <unicorn_wang@outlook.com>,
+	Inochi Amaoto <inochiama@gmail.com>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Minda Chen <minda.chen@starfivetech.com>,
+	Drew Fustini <fustini@kernel.org>, Guo Ren <guoren@kernel.org>,
+	Fu Wei <wefu@redhat.com>,
+	Nobuhiro Iwamatsu <nobuhiro.iwamatsu.x90@mail.toshiba>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Shuang Liang <liangshuang@eswincomputing.com>,
+	Zhi Li <lizhi2@eswincomputing.com>,
+	Shangjuan Wei <weishangjuan@eswincomputing.com>,
+	"G. Jaya Kumaran" <vineetha.g.jaya.kumaran@intel.com>,
+	Clark Wang <xiaoning.wang@nxp.com>, Linux Team <linux-imx@nxp.com>,
+	Frank Li <Frank.Li@nxp.com>, David Wu <david.wu@rock-chips.com>,
+	Samin Guo <samin.guo@starfivetech.com>,
+	Christophe Roullier <christophe.roullier@foss.st.com>,
+	Swathi K S <swathi.ks@samsung.com>, linux-arm-msm@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	Drew Fustini <dfustini@tenstorrent.com>,
+	linux-sunxi@lists.linux.dev, linux-amlogic@lists.infradead.org,
+	linux-mips@vger.kernel.org, imx@lists.linux.dev,
+	linux-renesas-soc@vger.kernel.org,
+	linux-rockchip@lists.infradead.org, sophgo@lists.linux.dev,
+	linux-riscv@lists.infradead.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v5 8/8] net: stmmac: qcom-ethqos: add support for sa8255p
+Message-ID: <aRMiafCQNPVDOljU@horms.kernel.org>
+References: <20251107-qcom-sa8255p-emac-v5-0-01d3e3aaf388@linaro.org>
+ <20251107-qcom-sa8255p-emac-v5-8-01d3e3aaf388@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/4] tools: ynltool: create skeleton for the C
- command
-From: Paolo Abeni <pabeni@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
- donald.hunter@gmail.com
-Cc: netdev@vger.kernel.org, edumazet@google.com, andrew+netdev@lunn.ch,
- horms@kernel.org, sdf@fomichev.me, joe@dama.to, jstancek@redhat.com
-References: <20251107162227.980672-1-kuba@kernel.org>
- <20251107162227.980672-2-kuba@kernel.org>
- <1ebaa0e4-8d7d-4340-b1de-4cb1dcf60311@redhat.com>
-Content-Language: en-US
-In-Reply-To: <1ebaa0e4-8d7d-4340-b1de-4cb1dcf60311@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251107-qcom-sa8255p-emac-v5-8-01d3e3aaf388@linaro.org>
 
-On 11/11/25 12:15 PM, Paolo Abeni wrote:
-> On 11/7/25 5:22 PM, Jakub Kicinski wrote:
->> +install: $(YNLTOOL)
->> +	install -m 0755 $(YNLTOOL) $(DESTDIR)$(bindir)/$(YNLTOOL)
-> 
-> Minor nit: $(INSTALL) above?
-> 
-> Also possibly using/including scripts/Makefile.include could avoid some
-> code duplication? (or at least make the V=1 option effective)/
+On Fri, Nov 07, 2025 at 11:29:58AM +0100, Bartosz Golaszewski wrote:
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-All very minor. I think it's better to follow-up (if agreed) than to repost.
+...
 
-/P
+> +static int qcom_ethqos_pd_init(struct platform_device *pdev, void *priv)
+> +{
+> +	struct qcom_ethqos *ethqos = priv;
+> +	int ret;
+> +
+> +	/*
+> +	 * Enable functional clock to prevent DMA reset after timeout due
+> +	 * to no PHY clock being enabled after the hardware block has been
+> +	 * power cycled. The actual configuration will be adjusted once
+> +	 * ethqos_fix_mac_speed() is called.
+> +	 */
+> +	ethqos_set_func_clk_en(ethqos);
+> +
+> +	ret = qcom_ethqos_domain_on(ethqos, ETHQOS_PD_CORE);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = qcom_ethqos_domain_on(ethqos, ETHQOS_PD_MDIO);
+> +	if (ret) {
+> +		qcom_ethqos_domain_off(ethqos, ETHQOS_PD_CORE);
+> +		return ret;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static void qcom_ethqos_pd_exit(struct platform_device *pdev, void *data)
+> +{
+> +	struct qcom_ethqos *ethqos = data;
+> +
+> +	qcom_ethqos_domain_off(ethqos, ETHQOS_PD_MDIO);
+> +	qcom_ethqos_domain_off(ethqos, ETHQOS_PD_CORE);
+> +}
+> +
+>  static void ethqos_ptp_clk_freq_config(struct stmmac_priv *priv)
+>  {
+>  	struct plat_stmmacenet_data *plat_dat = priv->plat;
 
+...
+
+> @@ -852,28 +993,63 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
+>  	ethqos->rgmii_config_loopback_en = drv_data->rgmii_config_loopback_en;
+>  	ethqos->has_emac_ge_3 = drv_data->has_emac_ge_3;
+>  	ethqos->needs_sgmii_loopback = drv_data->needs_sgmii_loopback;
+> -
+> -	ethqos->pm.link_clk = devm_clk_get(dev, clk_name);
+> -	if (IS_ERR(ethqos->pm.link_clk))
+> -		return dev_err_probe(dev, PTR_ERR(ethqos->pm.link_clk),
+> -				     "Failed to get link_clk\n");
+> -
+> -	ret = ethqos_clks_config(ethqos, true);
+> -	if (ret)
+> -		return ret;
+> -
+> -	ret = devm_add_action_or_reset(dev, ethqos_clks_disable, ethqos);
+> -	if (ret)
+> -		return ret;
+> -
+> -	ethqos->pm.serdes_phy = devm_phy_optional_get(dev, "serdes");
+> -	if (IS_ERR(ethqos->pm.serdes_phy))
+> -		return dev_err_probe(dev, PTR_ERR(ethqos->pm.serdes_phy),
+> -				     "Failed to get serdes phy\n");
+> -
+> -	ethqos->set_serdes_speed = ethqos_set_serdes_speed_phy;
+>  	ethqos->serdes_speed = SPEED_1000;
+> -	ethqos_update_link_clk(ethqos, SPEED_1000);
+> +
+> +	if (pm_data && pm_data->use_domains) {
+> +		ethqos->set_serdes_speed = ethqos_set_serdes_speed_pd;
+> +
+> +		ret = devm_pm_domain_attach_list(dev, &pm_data->pd,
+> +						 &ethqos->pd.pd_list);
+> +		if (ret < 0)
+> +			return dev_err_probe(dev, ret, "Failed to attach power domains\n");
+> +
+> +		plat_dat->clks_config = ethqos_pd_clks_config;
+> +		plat_dat->serdes_powerup = qcom_ethqos_pd_serdes_powerup;
+> +		plat_dat->serdes_powerdown = qcom_ethqos_pd_serdes_powerdown;
+> +		plat_dat->exit = qcom_ethqos_pd_exit;
+
+Hi Bartosz,
+
+It seems that the intention of this is to ensure
+that domains turned on by qcom_ethqos_pd_init()
+are turned off again on exit or clean-up in error paths.
+
+> +		plat_dat->init = qcom_ethqos_pd_init;
+> +		plat_dat->clk_ptp_rate = pm_data->clk_ptp_rate;
+> +
+> +		ret = qcom_ethqos_pd_init(pdev, ethqos);
+> +		if (ret)
+> +			return ret;
+
+And here those domains are turned on.
+
+> +
+> +		ret = qcom_ethqos_domain_on(ethqos, ETHQOS_PD_SERDES);
+> +		if (ret)
+
+But it seems that if we reach this error path then the cleanup is not
+performed. This is because plat_dat and thus it's exit callback are
+registered until the call to devm_stmmac_pltfr_probe() towards the end of
+this function.
+
+Sorry if I'm on the wrong track here. I did dig into it.
+But this was flagged by Claude Code running
+https://github.com/masoncl/review-prompts/
+
+> +			return dev_err_probe(dev, ret,
+> +					     "Failed to enable the serdes power domain\n");
+
+...
 
