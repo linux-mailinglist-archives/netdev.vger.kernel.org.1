@@ -1,95 +1,117 @@
-Return-Path: <netdev+bounces-237406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A165C4ACF7
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:43:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D0C0C4B012
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:53:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F07E11887953
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 01:38:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7D97188223A
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 01:47:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40D7C2F5A10;
-	Tue, 11 Nov 2025 01:32:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1777F344041;
+	Tue, 11 Nov 2025 01:40:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="YL1i4kv5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ej5vH736"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4851926E706;
-	Tue, 11 Nov 2025 01:32:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E76BF332ED0
+	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 01:40:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762824774; cv=none; b=G+5Pl7Zzo+i7gp/nmRMUKjGI0CdVCRQi5fZpaqyMj4vZAhlEGIrpnpOK8suVeHa5Wr3DfmM3At/CRar1gfs445MG01E0XN/3NdacJfZaiZvap1qE7+Mlj29cwCtlp7r33bZhPasUzHAj0QnzRCfkjDeWF7WT57+4zs9O0ALhUhU=
+	t=1762825258; cv=none; b=s3pp3+5sJJ/Iv4kTrBc2zDBoWoCAcUW+0nPcPdEYuWoh620gVByiLihRBKqwT7+7sfvtZ3534JST+b9PfpmpsRQ35Haa9HWH8V0+fu4X+calf4ENDaDFk3p4dBn5ygiFR7qaBTgyCXV5M7K/DOdyRfGirdLNS2jGbC4BXHo2k9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762824774; c=relaxed/simple;
-	bh=lnl+d1Dqtavd1L9x3dXhCGUyr61mK2oo+pYCb6l+Vu8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DqeWspXRsF5N1XakU6kpkrLaQgfIbPSaojlC2waG5e0MMW8e+T/PMGAvPEX19qukKhrD+eRTryNMoR9fAwnJL1zuQ3mT2JXZG8w2kXCYEfV+fokZgXn3XgRRM23Wmo4d7syejtGvQGnz+Reb0zFMjKNt+ohttyBmFe+Wj/Syt1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=YL1i4kv5; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=fLBGhKqvRZ3T84/49heIB53vWanJflY7cu0EZCUAZCI=; b=YL1i4kv5mZe5yULLj3jU/Tbz2J
-	onBNt4O8Sfw7HY34vE+XtmGLoVJ/r//fV/TiFUZPruAj6AHf4F+71fo9lcQ5SK2rYJDZo6YIbW3Lh
-	qtmuhMIG4/WElboOjdhDIXYasYDOdjUSrFd12wzGGsiO2/IKj9AlabQFDagKu+P8mZ7g=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vIdFO-00DZme-Pf; Tue, 11 Nov 2025 02:32:38 +0100
-Date: Tue, 11 Nov 2025 02:32:38 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Xu Liang <lxu@maxlinear.com>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 2/2] net: phy: mxl-gpy: add MxL862xx support
-Message-ID: <e064f831-1fe9-42d2-96fc-d901c5be66a4@lunn.ch>
-References: <92e7bdac9a581276219b5c985ab3814d65e0a7b5.1762813829.git.daniel@makrotopia.org>
- <5e61cac4897c8deec35a4032b5be8f85a5e45650.1762813829.git.daniel@makrotopia.org>
+	s=arc-20240116; t=1762825258; c=relaxed/simple;
+	bh=5fszHu+0NCe/j4FS6aCuGypK1jI8uEB60+HhsE1RoDM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=SJ/phYtWM5kClbmfjNscpLIOG+FYl5QGv6ysN4vdESaMhpJbyglH7UteSal/Zruicm4hpB9gcp3UD5i7/kBUHsHYYKMcma5Uik/oMHZNpfGcndRZO5DrICrua8t04khF6nRohSifxdw85tJQcfHd/6p93G2xVZ6+fRD5WNND2SQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ej5vH736; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 760D7C4CEFB;
+	Tue, 11 Nov 2025 01:40:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762825257;
+	bh=5fszHu+0NCe/j4FS6aCuGypK1jI8uEB60+HhsE1RoDM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ej5vH736g5NaLrNiPp3r8PZLRcIYOfQLNlEfvnPDfkI9IJSISWOA2ekr+xdlF31Zi
+	 9q5eoncrecK2zUGqVCWk3wVGtGHpnT4Vip7PtoPpWJe5wAHbbCk7XA7X1ZfQyADUxa
+	 3P851l+s5FAlKV4VLYc5MOgQ5AfQM8jvPiX9mpw3dyetXLvzToiApKSzGPIDDpNwaL
+	 l4h8BrAH8vSWPg3038O2LY0Nh49YFze0jWmJnaS5M/DnfFt1QpIMtUNfTEQSCavqab
+	 7IiuRqTmE/WO5aA3+vtoLgRRzMdfREkNVy6vR7+LkyHxW3WQQxVBRDwOfn15DF17h1
+	 FbvZ2F3a1dqmw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E2E380CFD7;
+	Tue, 11 Nov 2025 01:40:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5e61cac4897c8deec35a4032b5be8f85a5e45650.1762813829.git.daniel@makrotopia.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3 00/11] net: stmmac: ingenic: convert to
+ set_phy_intf_sel()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176282522801.2843765.16848615144063968700.git-patchwork-notify@kernel.org>
+Date: Tue, 11 Nov 2025 01:40:28 +0000
+References: <aQ2tgEu-dudzlZlg@shell.armlinux.org.uk>
+In-Reply-To: <aQ2tgEu-dudzlZlg@shell.armlinux.org.uk>
+To: Russell King (Oracle) <linux@armlinux.org.uk>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, alexandre.torgue@foss.st.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, mcoquelin.stm32@gmail.com,
+ netdev@vger.kernel.org, pabeni@redhat.com
 
-On Mon, Nov 10, 2025 at 10:35:00PM +0000, Daniel Golle wrote:
-> Add PHY driver support for Maxlinear 86252 and 86282 switches.
-> The PHYs built-into those switches are just like any other GPY 2.5G PHYs
-> with the exception of the temperature sensor data being encoded in a
-> different way.
+Hello:
 
-Is there a temperature sensor per PHY, or just one for the whole
-package?
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Marvell did something similar for there SoHo switches. The temperature
-sensor is mapped to each of internal PHYs register space, but in fact
-there is a single sensor, not one per PHY.
+On Fri, 7 Nov 2025 08:27:44 +0000 you wrote:
+> Convert ingenic to use the new ->set_phy_intf_sel() method that was
+> recently introduced in net-next.
+> 
+> This is the largest of the conversions, as there is scope for cleanups
+> along with the conversion.
+> 
+> v2: fix build warnings in patch 9 by rearranging the code
+> v3: fix smatch warning in patch 11, added Maxime's r-b.
+> 
+> [...]
 
-> @@ -541,7 +581,7 @@ static int gpy_update_interface(struct phy_device *phydev)
->  	/* Interface mode is fixed for USXGMII and integrated PHY */
->  	if (phydev->interface == PHY_INTERFACE_MODE_USXGMII ||
->  	    phydev->interface == PHY_INTERFACE_MODE_INTERNAL)
-> -		return -EINVAL;
-> +		return 0;
+Here is the summary with links:
+  - [net-next,v3,01/11] net: stmmac: ingenic: move ingenic_mac_init()
+    https://git.kernel.org/netdev/net-next/c/2dd63c364534
+  - [net-next,v3,02/11] net: stmmac: ingenic: simplify jz4775 mac_set_mode()
+    https://git.kernel.org/netdev/net-next/c/307a575775fd
+  - [net-next,v3,03/11] net: stmmac: ingenic: use PHY_INTF_SEL_x to select PHY interface
+    https://git.kernel.org/netdev/net-next/c/da6e9fd1046f
+  - [net-next,v3,04/11] net: stmmac: ingenic: use PHY_INTF_SEL_x directly
+    https://git.kernel.org/netdev/net-next/c/dbf99dc7d166
+  - [net-next,v3,05/11] net: stmmac: ingenic: prep PHY_INTF_SEL_x field after switch()
+    https://git.kernel.org/netdev/net-next/c/14497aaa5eb6
+  - [net-next,v3,06/11] net: stmmac: ingenic: use stmmac_get_phy_intf_sel()
+    https://git.kernel.org/netdev/net-next/c/0e2fa91c55c0
+  - [net-next,v3,07/11] net: stmmac: ingenic: move "MAC PHY control register" debug
+    https://git.kernel.org/netdev/net-next/c/35147b5c9e41
+  - [net-next,v3,08/11] net: stmmac: ingenic: simplify mac_set_mode() methods
+    https://git.kernel.org/netdev/net-next/c/608975d4d791
+  - [net-next,v3,09/11] net: stmmac: ingenic: simplify x2000 mac_set_mode()
+    https://git.kernel.org/netdev/net-next/c/2284cca0bced
+  - [net-next,v3,10/11] net: stmmac: ingenic: pass ingenic_mac struct rather than plat_dat
+    https://git.kernel.org/netdev/net-next/c/9352f74fd13d
+  - [net-next,v3,11/11] net: stmmac: ingenic: use ->set_phy_intf_sel()
+    https://git.kernel.org/netdev/net-next/c/34bf68a69122
 
-This change is not obvious. There is no mention of it in the commit
-message. Why has something which was an error become not an error?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-    Andrew
 
----
-pw-bot: cr
 
