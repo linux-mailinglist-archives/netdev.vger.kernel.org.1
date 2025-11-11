@@ -1,58 +1,95 @@
-Return-Path: <netdev+bounces-237592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78858C4D88C
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 12:56:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E3D26C4D8CE
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 13:00:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 059D91884E40
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 11:53:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A07918919A6
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 11:57:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBD3934CFBA;
-	Tue, 11 Nov 2025 11:52:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D195357721;
+	Tue, 11 Nov 2025 11:56:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lNMKetIT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Giy6O0F9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE36C256C8D;
-	Tue, 11 Nov 2025 11:52:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 596CA2DC77F
+	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 11:56:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762861949; cv=none; b=Cc5fz/tAupki/ul6QNtsvE+v7hNGyBivtpvPKBDvOM8xnPzIjUP1XlqNpVEQUbZ+2SxTsG7LiiTD8FPe1olv1COcRxhtyRkJyxNoMF8KCKjm4F2slApkgRU8bRcQ8mZfqGbY9i1pGiyhnE12XQzDCB42fFWnVYqi6GlZ/rIy/Fk=
+	t=1762862204; cv=none; b=HdvQN67DjJLW7u0mRdwfNLBkKBiqFOCTds52NKSleCCamWExS2uZFrdgojVGXwr+QiM3u7rLrpDS6wycVfU4sW3NKnSH9N6WlykMP1E/aRe8RczQcYWu+vDVOfxAKCNrrWA8j4RbVn0LqCvmsbnCm0NI7mhw3oohluTe7SSpDfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762861949; c=relaxed/simple;
-	bh=7EWr3lLxkrG+MopAVeZM5w/ywBZTEz3erxdYhaDu5ks=;
+	s=arc-20240116; t=1762862204; c=relaxed/simple;
+	bh=7cpCvyszEn5HOezxZLBqqcsmZ2uT7ZtZtkiuIpkUXg4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DolU6e2KbRfHzHtwF6CqGqu1c/5624LB3A1W+4Se1e5o2eFzz33vgWGwvdy1zvVjxjoDNWfML+pVr4ye4SOBtck+LPXUSL8OBkpxlM38icBee8TlSmdsmrRkZ+qNImDtcTe61mz61werLTu+rm7/Na8e/y8rsuauLiIviRNFwRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lNMKetIT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EB8AC4CEF5;
-	Tue, 11 Nov 2025 11:52:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762861949;
-	bh=7EWr3lLxkrG+MopAVeZM5w/ywBZTEz3erxdYhaDu5ks=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lNMKetITnIdI+xxdF/TA70hKOc2puba/EJVkuAHU4KEkcyHmBky9N/+8WHrn7hg7g
-	 EjYI+3A9E38ph29vGpUK0/MQCK6Uy3dNqFUy6DwyTd9YKtG3SuFlBo7bLri0P1DEg+
-	 9YWaZtitwhIXgzAk4MqX73z0jg1QuIVh/zbYIjk0IQaBPcxDcJmzYrWJg4cZdx3iTc
-	 y2ra2Yle9WZyvGkur0WAzYQ3V7U1cZsU23NxLdrqYOIcKQfa9mD+ESswcaHyJ1ZvCt
-	 gHQDvd/nmnKH7jyzdgbYYQuRAEt6APJvt1jcq1cr4Ij98MRKTr95TEg1UtR6ggUlcU
-	 U4QxcPGfnqTXg==
-Date: Tue, 11 Nov 2025 11:52:25 +0000
-From: Simon Horman <horms@kernel.org>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v3 07/11] selftests/vsock: add check_result()
- for pass/fail counting
-Message-ID: <aRMjeZVqsnc1BNr-@horms.kernel.org>
-References: <20251106-vsock-selftests-fixes-and-improvements-v3-0-519372e8a07b@meta.com>
- <20251106-vsock-selftests-fixes-and-improvements-v3-7-519372e8a07b@meta.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=bkMmSOFZzQAqxgl9By1U+iw6qY+SQv741sjdt18ZjeD7w01qk4gX9U1SgLdgAndeWXsaDSz7ygQq0hu3HfVSedEdOGypKSzQ9Zjmj8xZX1KZXxU2xuKsI5F4AF8bn8J4CgCp4xAXhrtrDUyWOj4uwm+NeqM/SIFyCRHypm3KqTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Giy6O0F9; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-42b305881a1so312006f8f.0
+        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 03:56:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762862191; x=1763466991; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=CJgHQCcCAAMF/dux7/grV0vztHoMiGEbVl3yeix1xGI=;
+        b=Giy6O0F98hm+bOKubD841CwYNu7joAPoUqyh55X85IVsqkQvraqRcWzFr24lNHUgyO
+         wvnfQXZOvtwURhzwQopBbB0D8NqI0DZlMiHVaerEuZBWABDvaEHf/z6o35jEwblBVUCQ
+         +7PTDy8qOBbTFgFX/C4VCcfiU6QV58uyiIAPXNI4G//yT8FRYnGhMSHQSEjDAgGUOW7x
+         5HtqCVENpciSPf3UETxkf9PfTniWDpsrQ5TPlPbQlOvtCwcbNRsI5v7oaCX+gjys97kO
+         sHDUBl0v1+ulaAoTxkpajUAL++4aLvoiPs8crcpuNyVG+ccC0YEnfUEiQrJOi+n9ti23
+         UfkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762862191; x=1763466991;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CJgHQCcCAAMF/dux7/grV0vztHoMiGEbVl3yeix1xGI=;
+        b=cBVCgw/v50aq5c3o4Uee+oNV+JET2u2uZuIKdZe9R08xcmAB+/9a7M6EeUHYzYkKLy
+         f764qYdgVRQBibaNH268hMppBZYklY+dtBpkmszwWhRxB9LITIHuSR6sxm4xhTmHRm8L
+         9o3Nh3oHsD7BjdMjLYsflDVMtpgpXeffaj2v/waZlAH+DS1OEt/OjvlG3fbhzSN4JvXj
+         3OrqbSQqBZWVWLVUvTn6biYXleiShpvKnVkipD0HQp1CbrKgTlH/6Yv12Uya7mYKwA3k
+         +qBWAUL1Po9uYZ9464/Ha1BWJDmPyk77Nyd1aF7aJZrlnmdF3Tx59uPGoYV14cyTA5rI
+         S4gw==
+X-Forwarded-Encrypted: i=1; AJvYcCXCIf7Vkj69yvVlxhdsnqhNibEoFm6+1fjShHgzNnug23NiDN383B8SrdvMa4/2Cn+jFC6Mmt0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+WX5kWmkPfOkMRH4JUOuOZvBuFX1neu2n4h5kxLQRgyP9G0Tr
+	gX45vQr33kED7RF2+zihJ1r2yJcfUZ02bmqpNNhQbfQ4pEDudlyNTDbM
+X-Gm-Gg: ASbGncssC+rj/HLEOFYFg08UxI/XpOKDvh8027xKP8MPsQP9zxpU1KiloDVt2RMmw+l
+	Dp1dKt3LLSxPNcEP3gQlh3jUNqsWM04ENZmzYz5+FoUhHt6Sx35B2iZQsSEEi5mQk++TzNFSfV3
+	8dfzSUVrX98tuAPxwexJr3OSK4L95iWgkFw8v2HZkHaNyGW8pSEyBA35wRGBr0wRVC1F+NMJSIC
+	NBpXSRjQ9tEUCDF4xBSE8QSDRzHK4NZWOCyytpn4RA7mQFLwFExy90Ryn83QS0w18QHX7tmTW4e
+	5pXQaCz65BmjhQEi3b7O6QHSYO+mw5vqZ9AZTGo8l1QUBI8k/psNdeQHm8llgmCF7EtT67s7825
+	U3YtYVtq3i7fqHgaeO0jDwA0dYgk84cKghKGMO+vi6pBtBpiaqRYzHF9FyKeolHOAcN8cMFUTkn
+	fcTdU=
+X-Google-Smtp-Source: AGHT+IEvZuLBPX6umhXQeZ0Rv/NcKeiOMHYrfxaoqE4DsQaZb5ViZ0h12lREx2bg/R/5zR++qTxTlQ==
+X-Received: by 2002:a05:600c:4711:b0:475:d7b8:8505 with SMTP id 5b1f17b1804b1-4777329f181mr60253945e9.7.1762862190504;
+        Tue, 11 Nov 2025 03:56:30 -0800 (PST)
+Received: from skbuf ([2a02:2f04:d104:5e00:40fe:dea4:2692:5340])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4775cdc33c8sm364910025e9.2.2025.11.11.03.56.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Nov 2025 03:56:29 -0800 (PST)
+Date: Tue, 11 Nov 2025 13:56:27 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Jonas Gorski <jonas.gorski@gmail.com>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net-next 3/3] net: dsa: deny 8021q uppers on vlan
+ unaware bridged ports
+Message-ID: <20251111115627.orks445s5o2adkbu@skbuf>
+References: <20251110214443.342103-1-jonas.gorski@gmail.com>
+ <20251110214443.342103-4-jonas.gorski@gmail.com>
+ <20251110222501.bghtbydtokuofwlr@skbuf>
+ <CAOiHx=k8q7Zyr5CEJ_emKYLRV9SOXPjrrXYkUKs6=MbF_Autxw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,82 +98,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251106-vsock-selftests-fixes-and-improvements-v3-7-519372e8a07b@meta.com>
+In-Reply-To: <CAOiHx=k8q7Zyr5CEJ_emKYLRV9SOXPjrrXYkUKs6=MbF_Autxw@mail.gmail.com>
 
-On Thu, Nov 06, 2025 at 04:49:51PM -0800, Bobby Eshleman wrote:
-> From: Bobby Eshleman <bobbyeshleman@meta.com>
+On Tue, Nov 11, 2025 at 11:06:48AM +0100, Jonas Gorski wrote:
+> But I noticed while testing that apparently b53 in filtering=0 mode
+> does not forward any tagged traffic (and I think I know why ...).
 > 
-> Add check_result() function to reuse logic for incrementing the
-> pass/fail counters. This function will get used by different callers as
-> we add different types of tests in future patches (namely, namespace and
-> non-namespace tests will be called at different places, and re-use this
-> function).
-> 
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
-> ---
-> Changes in v3:
-> - increment cnt_total directly (no intermediary var) (Stefano)
-> - pass arg to check_result() from caller, dont incidentally rely on
->   global (Stefano)
-> - use new create_pidfile() introduce in v3 of earlier patch
-> - continue with more disciplined variable quoting style
-> ---
->  tools/testing/selftests/vsock/vmtest.sh | 95 +++++++++++++++++++++++++--------
->  1 file changed, 72 insertions(+), 23 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
-> index 557f9a99a306..05cf370a3db4 100755
-> --- a/tools/testing/selftests/vsock/vmtest.sh
-> +++ b/tools/testing/selftests/vsock/vmtest.sh
-> @@ -46,6 +46,8 @@ readonly TEST_DESCS=(
->  	"Run vsock_test using the loopback transport in the VM."
->  )
->  
-> +readonly USE_SHARED_VM=(vm_server_host_client vm_client_host_server vm_loopback)
-> +
->  VERBOSE=0
->  
->  usage() {
-> @@ -79,6 +81,28 @@ die() {
->  	exit "${KSFT_FAIL}"
->  }
->  
-> +check_result() {
-> +	local rc arg
-> +
-> +	rc=$1
-> +	arg=$2
-> +
-> +	cnt_total=$(( cnt_total + 1 ))
-> +
-> +	if [[ ${rc} -eq $KSFT_PASS ]]; then
-> +		cnt_pass=$(( cnt_pass + 1 ))
-> +		echo "ok ${num} ${arg}"
-> +	elif [[ ${rc} -eq $KSFT_SKIP ]]; then
-> +		cnt_skip=$(( cnt_skip + 1 ))
-> +		echo "ok ${num} ${arg} # SKIP"
-> +	elif [[ ${rc} -eq $KSFT_FAIL ]]; then
-> +		cnt_fail=$(( cnt_fail + 1 ))
-> +		echo "not ok ${num} ${arg} # exit=$rc"
+> Is there a way to ask for a replay of the fdb (static) entries? To fix
+> this for older switches, we need to disable 802.1q mode, but this also
+> switches the ARL from IVL to SVL, which changes the hashing, and would
+> break any existing entries. So we need to flush the ARL before
+> toggling 802.1q mode, and then reprogram any static entries.
 
-Hi Bobby,
-
-Should num be cnt_total above?
-
-> +	fi
-> +
-> +	cnt_total=$(( cnt_total + 1 ))
-
-It seems that cnt_total is being incremented twice.
-Once seems like it ought to be enough.
-
-> +}
-> +
->  vm_ssh() {
->  	ssh -q -o UserKnownHostsFile=/dev/null -p ${SSH_HOST_PORT} localhost "$@"
->  	return $?
-
-I'll confess that I didn't notice these myself, but
-Claude Code with https://github.com/masoncl/review-prompts/ did.
+I'm not clear on what happens. "Broken" FDB entries in the incorrect
+bridge vlan_filtering mode sounds like normal behaviour (FDB entries
+with VID=0 while vlan_filtering=1, or FDB entries with VID!=0 while
+vlan_filtering=0). They should just sit idle in the ARL until the VLAN
+filtering mode makes them active.
 
