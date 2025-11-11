@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-237500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA3E8C4C95E
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 10:16:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0F0DC4C964
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 10:16:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5F6DD4F841C
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 09:11:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7ED01420F03
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 09:11:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C6FE262FC7;
-	Tue, 11 Nov 2025 09:11:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AFD0271462;
+	Tue, 11 Nov 2025 09:11:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bOdWjj/W"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CSHYhdnl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 573DD2BF00A
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 09:11:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D4B627C84B
+	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 09:11:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762852280; cv=none; b=NaCigCgyWMuTBQ0C8mINTKq258mNaICTPZsc4eOHh2Fk3bN0fvl9CsjGGhEV7EoyLpiYvZCztW5K+51w910Wv5/rmAFeT5dJLh1WOq9VxGKQClnlAOO3+dnwV0oZE1w8PCgjS6MRzNArsLQr+nuCqHKF7tcJQWa/EsCh9Ox3tWQ=
+	t=1762852288; cv=none; b=ba0+HJ6HAUcjzJQj4ENgsx+t6yBJ/RG1jxB/5YtxQgBNV8fum+is6uj48i19mthgXnpJWT8TuEtLspyeitGAM4O5VQV/9NxJAbp1QJFRQpQDtSMsNXp1gCwoEiE8DMEPWvW7z37WI2c6whglpDFkmzDpcAhPcx7j+TfZF7+VH8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762852280; c=relaxed/simple;
-	bh=jcWGjzMSe/bUvpkL2HB/YbFJrUOryEcY53ec7kWHavI=;
+	s=arc-20240116; t=1762852288; c=relaxed/simple;
+	bh=hi+Mbvni3sUiq7gcbfGwvOV8gqyLUJy22niIHpNMHl4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IvyAQpLK4u40FjVbpvTZssR6RRNa4HQiRGouxCgr/VdhVsBJlZK6sBY8LQRnXCuksMAHQ0KQzNzeeNPFOALsS0Lts84gqLBcA5Y3GIgeyMgGy2lxTXo4nOrex9Ig52qs0jG6qO0W0XPk4Ab2gM2WBhSnCRXgSdeO15tsZmMY09k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bOdWjj/W; arc=none smtp.client-ip=209.85.214.170
+	 MIME-Version; b=Uj0Y9ubzggytopVpaa/VdNuP+UiJ16zyBGI2xecQrfUVsT7ExgRM+cRMGwCDdWVhBMUJb26wV8WNSHROxtSte1D/ojDgTBhpEWF6SV+jiOUP0c7klX4U43kfCgTEL2JdkQXfsdSnZIUxXI7tmzzDrnq74Jj+jbchscNqVKviPyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CSHYhdnl; arc=none smtp.client-ip=209.85.214.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-297ef378069so26220405ad.3
-        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 01:11:18 -0800 (PST)
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-29555415c5fso50330355ad.1
+        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 01:11:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762852277; x=1763457077; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1762852286; x=1763457086; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=cnuSLNJpozflXXStfLE1DxUP0tpYGi8nHHaLe8eo2uk=;
-        b=bOdWjj/Was9MwOLB9+FF83rtQ2KyP45MRkPYmGxagCsm0GJGrfvYM2YfKTn/e5za2/
-         RxWllbU6FufGEKz3RTc/L4q4TBmJCke66NuUydXgOeCwE8W2r0epZuPUd4WssRA6uvGG
-         TdMRfCAlDE2QJgF85qZJbPFRVL/0sy2vFuaM332YMgsjW3M/Z4NiWfmU5ESASOTwiYeT
-         AfcpFBDNdCUDUNVA7R+SREMkeCafRWmoDpukGz7s+KgDoOTGbZQ/GRNB7aCsXjn0TPX4
-         uYvhdx2UiOwy1JkeLYJ5Y9uREgNCIkJeUP95g4o+JHJ7PNrdgj1pooSapB4OXxmcQUJq
-         g5bA==
+        bh=2OylpUqdmU6cqqZsOYqpKungxWRV/E7s8zZgt2DxW3g=;
+        b=CSHYhdnlspdmz8RjLQMgCCl2Dctd7bDiXLNNqTyFy1moiltUF9XAbDRCyW5GwF5zEg
+         pJT9bq8aLldwDzoB6jaoXvmjRA2DaGlyw2YcVLEEKTZD6/z8HW0stwtrKjrzU4XhH+ng
+         a1aaZQRfu1SfPbX6uPTADz7GW4x8yZBYBvI5/BmKmyCMQr+8t4/0PCPfklkqcMqARfbR
+         e1ed1BT2Gz1Jv9hsVHb29FwqxNk8gJIEV52ipg2YGX2edCAm8SxN5Vh8+sAwB3PnYLYC
+         0N3PbuTcw2qLxyIn65Pozwl1ASSoJbgYW8AH6jVXrE0W9UFApDdWKuiqcQ+Thy7Zflfz
+         GQGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762852277; x=1763457077;
+        d=1e100.net; s=20230601; t=1762852286; x=1763457086;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=cnuSLNJpozflXXStfLE1DxUP0tpYGi8nHHaLe8eo2uk=;
-        b=G8DrcuT3c0jw1iGyWaa+j+YWEQwRKX1fbyleyT1c4BhhPDZZTxVFBVGPmk1ePCiRZa
-         3j9Xn0LFsazrak6bUB3eDJYdrpklABRApShOpAl7D16SUPtmP5B4huWZ1gUFTsRKGGOq
-         x8dt45nIrTl6ZTIdoH2rukIhN5POtaWIi2+PPfsArgyrLvwcU82GMgK9+MWblj2FKN0o
-         Aqsgrmnw1SIHDIfMPJnaJd9nZHswlWqgsvGQcd9jbXGMc90ROBjJQltSOy9QB9F5zcWU
-         XKBqavDVaDuxaHRFbJSbWgqk5KBEb4LM5quHG/05TGxvrcG3oi1CNwv7lSC3NJ/LSzoN
-         3mEw==
-X-Gm-Message-State: AOJu0Yy01IomZNnbUbrw/X4Rfj524KTA368K83ENmiX8RDzGioeDyV5q
-	/prngCDMFU8xpDVdxLmPfREOVIN2xdmsLpoYFUghcoemKIigwEF8vsjP
-X-Gm-Gg: ASbGncvyzim9PBEkqT2i8gxEnjK2aod9UQlgWHx/7RW+CBIsie2WUmCkHfEcc2Us1w6
-	BnYOgCWUmGfKYIXzYHsn4i86jBnzmTMrWqB6A397SmXLgvdHpShzzXE7pRIrfLhUZhLcptdKtaW
-	j534T6t+C6yun44dU60p2cOE4n+tz77I7f7Y9951xAgS9ZA1yrbJ480KOwR36F79hccjLlbI/S6
-	VVluBFX2C8Ts9FvWCYKW0Oga20DVoZwrNP4WWKltre9FKBQCnUAelfXVv2ADrXif3lqkySnY8ka
-	Strzc2t1a3Pt4NJwvhdb/wFVSS4Jo7h/azc8MRc+EFq0Qfw5SUJUkajtjaeDW/Pv/wH6IarhTme
-	zYApCFGKYOB/KGMLgIsFEKlstW6ocdeAEpqMKbswOqhvC4gipTDOdAvWOG78nGzXltKO/i0DxwK
-	eLE0PYnhNuGQpX8mTaejvubVhvknHzkSWf
-X-Google-Smtp-Source: AGHT+IH5smDV0RfqJdcQPYkVf2qwjppINZBZuD7Pb0expMILc0K/ZLMG1v5REakorx9qj+6vc75s5w==
-X-Received: by 2002:a17:902:f68a:b0:298:33c9:ed9e with SMTP id d9443c01a7336-29833c9ef5dmr62150035ad.28.1762852277321;
-        Tue, 11 Nov 2025 01:11:17 -0800 (PST)
+        bh=2OylpUqdmU6cqqZsOYqpKungxWRV/E7s8zZgt2DxW3g=;
+        b=xTVNsWnxQZ+dLICXfV62N0tik/kb1SISEGCpCpjXR4ort3TQGf0LcyejHJYCaovhg4
+         MHQIo+92PxwInRcl0rAT1p+LlU4b5MzNC3MaCPBqT7u7FfQ3Pp0MXh5QXuA7ZFM0JAju
+         ze2qoo9bHK2php3L/wBo4K2mxkfKHv6fkfVOyx4b+wbDHVDKZrrjwr9vKDYlhx/6jQF2
+         xkvDoQYn/1fZfpCG06vyHlwp11h7Go6BgOsS38XQ3xZd6DlwcMCwtDcb2OX/F1mWvk5Y
+         UlqoGSudavEDnU9JAzljrrlqHrTD2hXNlJI3vsrjqKpfa0JgICvtdFkBkUFDrqulQhOz
+         j3EQ==
+X-Gm-Message-State: AOJu0YzmdAK47uExVtw8EBa/3PTZuN3CLImmScLrzIy7+CE97/wisZG9
+	BtZUflBsV7pFgfe0T53Qs1Auv32J70sB6ACPqlGfKrL8jbm3XaIoMOau
+X-Gm-Gg: ASbGncvMjq52gME8vTiBy4c7OSaIXFP9fTbq+SCUwPQiTNeVc0bubvZfCAXC+GtZ78t
+	SH/AGo4cG6Sa38adMKImMxwQiJCW2t0GnojjdDTf5tzrOYIWO3e1oC6BLonkhhqvNoG7LNSG/+X
+	lKnu8UBXL8imdgVuD4dRONq2bkveykiu+MMLvCwM4ztRseKjVFl1GsN+YnZE56gnmW9S99QQUgF
+	9R+LWAOgR1THWf0gn1KumpgfiP75oEy+9pX77Lv9vFBIWu7CJTiZHLApAbD+agAsP8er1lRkcq6
+	BZ7JVe2ekmdwIsxndtjhGGxCfK8Rz8U0RhU1T0/YqxvSrBKDoZBH/3Lq2WLfofJNCbQ+MxXeis2
+	Xj57k5UyqeXugZcft/KX17wVXYgcdF8ooUUOQ8P1oxuafpr/G4Vn3AG6tnqreAJfL2lnd5nDnwd
+	NGm90UwZtNEtG5zTAMhcoVTubhsGBBU7NG
+X-Google-Smtp-Source: AGHT+IEjzeaVZLcsNjouAs4SMLmQxhuMksaQukjQ3wGqSwDL4XCXui95c20r7KGI0KATcccgAI41EQ==
+X-Received: by 2002:a17:902:e888:b0:295:62d:5004 with SMTP id d9443c01a7336-297e564f1c9mr160328325ad.26.1762852285495;
+        Tue, 11 Nov 2025 01:11:25 -0800 (PST)
 Received: from iku.. ([2401:4900:1c06:79c0:4ab7:69ea:ca5e:a64f])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29650c5cf37sm172715415ad.35.2025.11.11.01.11.10
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-29650c5cf37sm172715415ad.35.2025.11.11.01.11.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Nov 2025 01:11:16 -0800 (PST)
+        Tue, 11 Nov 2025 01:11:23 -0800 (PST)
 From: Prabhakar <prabhakar.csengg@gmail.com>
 X-Google-Original-From: Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 To: Andrew Lunn <andrew@lunn.ch>,
@@ -93,9 +93,9 @@ Cc: netdev@vger.kernel.org,
 	Biju Das <biju.das.jz@bp.renesas.com>,
 	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
 	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: [PATCH net-next v3 2/3] net: phy: mscc: Consolidate probe functions into a common helper
-Date: Tue, 11 Nov 2025 09:10:46 +0000
-Message-ID: <20251111091047.831005-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: [PATCH net-next v3 3/3] net: phy: mscc: Add support for PHY LED control
+Date: Tue, 11 Nov 2025 09:10:47 +0000
+Message-ID: <20251111091047.831005-4-prabhakar.mahadev-lad.rj@bp.renesas.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251111091047.831005-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
 References: <20251111091047.831005-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
@@ -109,308 +109,447 @@ Content-Transfer-Encoding: 8bit
 
 From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-Unify the probe implementations of the VSC85xx PHY family into a single
-vsc85xx_probe_common() helper. The existing probe functions for the
-vsc85xx, vsc8514, vsc8574, and vsc8584 variants contained almost
-identical initialization logic, differing only in configuration
-parameters such as the number of LEDs, supported LED modes, hardware
-statistics, and PTP support.
+Add support for the PHY LED controller in the MSCC VSC85xx driver. The
+implementation provides LED brightness and hardware control through the
+LED subsystem and integrates with the standard 'netdev' trigger.
 
-Introduce a vsc85xx_probe_config structure to describe the per-variant
-parameters, and move all common setup code into the shared helper. Each
-variant's probe function now defines a constant configuration instance
-and calls vsc85xx_probe_common().
+Introduce new register definitions for the LED behavior register
+(MSCC_PHY_LED_BEHAVIOR = 30) and the LED combine disable bits, which
+control whether LEDs indicate link-only or combined link and activity
+status. Implement a helper, vsc8541_led_combine_disable_set(), to update
+these bits safely using phy_modify().
 
-Also mark the default LED mode array parameter as const to match its
-usage.
+Add support for LED brightness control and hardware mode configuration.
+The new callbacks implement the standard LED class operations, allowing
+user control through sysfs. The brightness control maps to PHY LED force
+on/off modes. The hardware control get and set functions translate
+between the PHY-specific LED mode encodings and the LED subsystem
+TRIGGER_NETDEV_* rules.
+
+The combine feature is managed automatically based on the selected
+rules. When both RX and TX activity are disabled, the combine feature is
+turned off, causing LEDs to indicate link-only status. When either RX or
+TX activity is enabled, the combine feature remains active and LEDs
+indicate combined link and activity.
+
+Register the LED callbacks for all VSC85xx PHY variants so that the LED
+subsystem can manage their indicators consistently. Existing device tree
+LED configuration and default behavior are preserved.
 
 Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 ---
 v2->v3:
-- Grouped check_rate_magic check
+- Added Reviewed-by tag.
 
 v1->v2:
-- New patch
+- Added LED control support to all VSC85xx PHY variants.
+- Renamed led callbacks to vsc85xx_* for consistency.
+- Defaulted the LEDs on probe to the default array before parsing DT.
+- Used phy_modify() in vsc85xx_led_brightness_set()
+- Return value of phy_read() checked in vsc85xx_led_hw_control_get()
+- Reverse Christmas tree in vsc85xx_led_hw_is_supported()
+- Updated the commit message to clarify the LED combine feature behavior.
 ---
- drivers/net/phy/mscc/mscc_main.c | 237 ++++++++++++++++---------------
- 1 file changed, 124 insertions(+), 113 deletions(-)
+ drivers/net/phy/mscc/mscc.h      |   4 +
+ drivers/net/phy/mscc/mscc_main.c | 246 +++++++++++++++++++++++++++++++
+ 2 files changed, 250 insertions(+)
 
+diff --git a/drivers/net/phy/mscc/mscc.h b/drivers/net/phy/mscc/mscc.h
+index 2eef5956b9cc..65c9d7bd9315 100644
+--- a/drivers/net/phy/mscc/mscc.h
++++ b/drivers/net/phy/mscc/mscc.h
+@@ -85,6 +85,10 @@ enum rgmii_clock_delay {
+ #define LED_MODE_SEL_MASK(x)		  (GENMASK(3, 0) << LED_MODE_SEL_POS(x))
+ #define LED_MODE_SEL(x, mode)		  (((mode) << LED_MODE_SEL_POS(x)) & LED_MODE_SEL_MASK(x))
+ 
++#define MSCC_PHY_LED_BEHAVIOR		  30
++#define LED_COMBINE_DIS_MASK(x)		  BIT(x)
++#define LED_COMBINE_DIS(x, dis)		  (((dis) ? 1 : 0) << (x))
++
+ #define MSCC_EXT_PAGE_CSR_CNTL_17	  17
+ #define MSCC_EXT_PAGE_CSR_CNTL_18	  18
+ 
 diff --git a/drivers/net/phy/mscc/mscc_main.c b/drivers/net/phy/mscc/mscc_main.c
-index 032050ec0bc9..0ae0199d28bb 100644
+index 0ae0199d28bb..28d558807608 100644
 --- a/drivers/net/phy/mscc/mscc_main.c
 +++ b/drivers/net/phy/mscc/mscc_main.c
-@@ -22,6 +22,24 @@
- #include "mscc_serdes.h"
- #include "mscc.h"
- 
-+struct vsc85xx_probe_config {
-+	const struct vsc85xx_hw_stat *hw_stats;
-+	u8 nleds;
-+	u16 supp_led_modes;
-+	size_t nstats;
-+	bool use_package;
-+	size_t shared_size;
-+	bool has_ptp;
-+	bool check_rate_magic;
-+};
-+
-+static const u32 vsc85xx_default_led_modes_4[] = {
-+	VSC8531_LINK_1000_ACTIVITY,
-+	VSC8531_LINK_100_ACTIVITY,
-+	VSC8531_LINK_ACTIVITY,
-+	VSC8531_DUPLEX_COLLISION
-+};
-+
- static const struct vsc85xx_hw_stat vsc85xx_hw_stats[] = {
- 	{
- 		.string	= "phy_receive_errors",
-@@ -436,7 +454,7 @@ static int vsc85xx_dt_led_mode_get(struct phy_device *phydev,
- #endif /* CONFIG_OF_MDIO */
- 
- static int vsc85xx_dt_led_modes_get(struct phy_device *phydev,
--				    u32 *default_mode)
-+				    const u32 *default_mode)
- {
- 	struct vsc8531_private *priv = phydev->priv;
- 	char led_dt_prop[28];
-@@ -2211,132 +2229,125 @@ static int vsc85xx_config_inband(struct phy_device *phydev, unsigned int modes)
- 				reg_val);
+@@ -201,6 +201,15 @@ static int vsc85xx_led_cntl_set(struct phy_device *phydev,
+ 	return phy_modify(phydev, MSCC_PHY_LED_MODE_SEL, mask, val);
  }
  
-+static int vsc85xx_probe_common(struct phy_device *phydev,
-+				const struct vsc85xx_probe_config *cfg,
-+				const u32 *default_led_mode)
++static int vsc85xx_led_combine_disable_set(struct phy_device *phydev,
++					   u8 led_num, bool combine_disable)
 +{
-+	struct vsc8531_private *vsc8531;
++	u16 mask = LED_COMBINE_DIS_MASK(led_num);
++	u16 val = LED_COMBINE_DIS(led_num, combine_disable);
++
++	return phy_modify(phydev, MSCC_PHY_LED_BEHAVIOR, mask, val);
++}
++
+ static int vsc85xx_mdix_get(struct phy_device *phydev, u8 *mdix)
+ {
+ 	u16 reg_val;
+@@ -2234,6 +2243,7 @@ static int vsc85xx_probe_common(struct phy_device *phydev,
+ 				const u32 *default_led_mode)
+ {
+ 	struct vsc8531_private *vsc8531;
++	struct device_node *np;
+ 	int ret;
+ 
+ 	vsc8531 = devm_kzalloc(&phydev->mdio.dev, sizeof(*vsc8531), GFP_KERNEL);
+@@ -2283,10 +2293,186 @@ static int vsc85xx_probe_common(struct phy_device *phydev,
+ 			return ret;
+ 	}
+ 
++	/*
++	 * Check for LED configuration in device tree if available
++	 * or fall back to default `vsc8531,led-x-mode` DT properties.
++	 */
++	np = of_get_child_by_name(phydev->mdio.dev.of_node, "leds");
++	if (np) {
++		of_node_put(np);
++
++		/* Force to defaults */
++		for (unsigned int i = 0; i < vsc8531->nleds; i++)
++			vsc8531->leds_mode[i] = default_led_mode[i];
++
++		return 0;
++	}
++
+ 	/* Parse LED modes from device tree */
+ 	return vsc85xx_dt_led_modes_get(phydev, default_led_mode);
+ }
+ 
++static int vsc85xx_led_brightness_set(struct phy_device *phydev,
++				      u8 index, enum led_brightness value)
++{
++	struct vsc8531_private *vsc8531 = phydev->priv;
++
++	if (index >= vsc8531->nleds)
++		return -EINVAL;
++
++	return vsc85xx_led_cntl_set(phydev, index, value == LED_OFF ?
++				    VSC8531_FORCE_LED_OFF : VSC8531_FORCE_LED_ON);
++}
++
++static int vsc85xx_led_hw_is_supported(struct phy_device *phydev, u8 index,
++				       unsigned long rules)
++{
++	static const unsigned long supported = BIT(TRIGGER_NETDEV_LINK_1000) |
++					       BIT(TRIGGER_NETDEV_LINK_100) |
++					       BIT(TRIGGER_NETDEV_LINK_10) |
++					       BIT(TRIGGER_NETDEV_LINK) |
++					       BIT(TRIGGER_NETDEV_RX) |
++					       BIT(TRIGGER_NETDEV_TX);
++	struct vsc8531_private *vsc8531 = phydev->priv;
++
++	if (index >= vsc8531->nleds)
++		return -EINVAL;
++
++	if (rules & ~supported)
++		return -EOPNOTSUPP;
++
++	return 0;
++}
++
++static int vsc85xx_led_hw_control_get(struct phy_device *phydev, u8 index,
++				      unsigned long *rules)
++{
++	struct vsc8531_private *vsc8531 = phydev->priv;
++	u8 mode, behavior;
++	int rc;
++
++	if (index >= vsc8531->nleds)
++		return -EINVAL;
++
++	rc = phy_read(phydev, MSCC_PHY_LED_MODE_SEL);
++	if (rc < 0)
++		return rc;
++	mode = (rc & LED_MODE_SEL_MASK(index)) >> LED_MODE_SEL_POS(index);
++
++	rc = phy_read(phydev, MSCC_PHY_LED_BEHAVIOR);
++	if (rc < 0)
++		return rc;
++	behavior = (rc & LED_COMBINE_DIS_MASK(index)) >> index;
++
++	switch (mode) {
++	case VSC8531_LINK_ACTIVITY:
++	case VSC8531_ACTIVITY:
++		*rules = BIT(TRIGGER_NETDEV_LINK);
++		break;
++
++	case VSC8531_LINK_1000_ACTIVITY:
++		*rules = BIT(TRIGGER_NETDEV_LINK_1000) |
++			 BIT(TRIGGER_NETDEV_LINK);
++		break;
++
++	case VSC8531_LINK_100_ACTIVITY:
++		*rules = BIT(TRIGGER_NETDEV_LINK_100) |
++			 BIT(TRIGGER_NETDEV_LINK);
++		break;
++
++	case VSC8531_LINK_10_ACTIVITY:
++		*rules = BIT(TRIGGER_NETDEV_LINK_10) |
++			 BIT(TRIGGER_NETDEV_LINK);
++		break;
++
++	case VSC8531_LINK_100_1000_ACTIVITY:
++		*rules = BIT(TRIGGER_NETDEV_LINK_1000) |
++			 BIT(TRIGGER_NETDEV_LINK_100) |
++			 BIT(TRIGGER_NETDEV_LINK);
++		break;
++
++	case VSC8531_LINK_10_1000_ACTIVITY:
++		*rules = BIT(TRIGGER_NETDEV_LINK_1000) |
++			 BIT(TRIGGER_NETDEV_LINK_10) |
++			 BIT(TRIGGER_NETDEV_LINK);
++		break;
++
++	case VSC8531_LINK_10_100_ACTIVITY:
++		*rules = BIT(TRIGGER_NETDEV_LINK_100) |
++			 BIT(TRIGGER_NETDEV_LINK_10) |
++			 BIT(TRIGGER_NETDEV_LINK);
++		break;
++
++	default:
++		*rules = 0;
++		break;
++	}
++
++	if (!behavior && *rules)
++		*rules |= BIT(TRIGGER_NETDEV_RX) | BIT(TRIGGER_NETDEV_TX);
++
++	return 0;
++}
++
++static int vsc85xx_led_hw_control_set(struct phy_device *phydev, u8 index,
++				      unsigned long rules)
++{
++	struct vsc8531_private *vsc8531 = phydev->priv;
++	u8 mode = VSC8531_FORCE_LED_ON;
++	bool combine_disable = false;
++	bool has_rx, has_tx;
 +	int ret;
 +
-+	vsc8531 = devm_kzalloc(&phydev->mdio.dev, sizeof(*vsc8531), GFP_KERNEL);
-+	if (!vsc8531)
-+		return -ENOMEM;
++	if (index >= vsc8531->nleds)
++		return -EINVAL;
 +
-+	phydev->priv = vsc8531;
++	if (rules & BIT(TRIGGER_NETDEV_LINK))
++		mode = VSC8531_LINK_ACTIVITY;
 +
-+	/* Check rate magic if needed (only for non-package PHYs) */
-+	if (cfg->check_rate_magic) {
-+		ret = vsc85xx_edge_rate_magic_get(phydev);
-+		if (ret < 0)
-+			return ret;
++	if (rules & BIT(TRIGGER_NETDEV_LINK_10))
++		mode = VSC8531_LINK_10_ACTIVITY;
 +
-+		vsc8531->rate_magic = ret;
-+	}
++	if (rules & BIT(TRIGGER_NETDEV_LINK_100))
++		mode = VSC8531_LINK_100_ACTIVITY;
 +
-+	/* Set up package if needed */
-+	if (cfg->use_package) {
-+		vsc8584_get_base_addr(phydev);
-+		devm_phy_package_join(&phydev->mdio.dev, phydev,
-+				      vsc8531->base_addr, cfg->shared_size);
-+	}
++	if (rules & BIT(TRIGGER_NETDEV_LINK_1000))
++		mode = VSC8531_LINK_1000_ACTIVITY;
 +
-+	/* Configure LED settings */
-+	vsc8531->nleds = cfg->nleds;
-+	vsc8531->supp_led_modes = cfg->supp_led_modes;
++	if (rules & BIT(TRIGGER_NETDEV_LINK_100) &&
++	    rules & BIT(TRIGGER_NETDEV_LINK_1000))
++		mode = VSC8531_LINK_100_1000_ACTIVITY;
 +
-+	/* Configure hardware stats */
-+	vsc8531->hw_stats = cfg->hw_stats;
-+	vsc8531->nstats = cfg->nstats;
-+	vsc8531->stats = devm_kcalloc(&phydev->mdio.dev, vsc8531->nstats,
-+				      sizeof(u64), GFP_KERNEL);
-+	if (!vsc8531->stats)
-+		return -ENOMEM;
++	if (rules & BIT(TRIGGER_NETDEV_LINK_10) &&
++	    rules & BIT(TRIGGER_NETDEV_LINK_1000))
++		mode = VSC8531_LINK_10_1000_ACTIVITY;
 +
-+	/* PTP setup for VSC8584 */
-+	if (cfg->has_ptp) {
-+		if (phy_package_probe_once(phydev)) {
-+			ret = vsc8584_ptp_probe_once(phydev);
-+			if (ret)
-+				return ret;
-+		}
++	if (rules & BIT(TRIGGER_NETDEV_LINK_10) &&
++	    rules & BIT(TRIGGER_NETDEV_LINK_100))
++		mode = VSC8531_LINK_10_100_ACTIVITY;
 +
-+		ret = vsc8584_ptp_probe(phydev);
-+		if (ret)
-+			return ret;
-+	}
++	/*
++	 * The VSC85xx PHYs provides an option to control LED behavior. By
++	 * default, the LEDx combine function is enabled, meaning the LED
++	 * will be on when there is link/activity or duplex/collision. If
++	 * the combine function is disabled, the LED will be on only for
++	 * link or duplex.
++	 *
++	 * To control this behavior, we check the selected rules. If both
++	 * RX and TX activity are not selected, the LED combine function
++	 * is disabled; otherwise, it remains enabled.
++	 */
++	has_rx = !!(rules & BIT(TRIGGER_NETDEV_RX));
++	has_tx = !!(rules & BIT(TRIGGER_NETDEV_TX));
++	if (!has_rx && !has_tx)
++		combine_disable = true;
 +
-+	/* Parse LED modes from device tree */
-+	return vsc85xx_dt_led_modes_get(phydev, default_led_mode);
++	ret = vsc85xx_led_combine_disable_set(phydev, index, combine_disable);
++	if (ret < 0)
++		return ret;
++
++	return vsc85xx_led_cntl_set(phydev, index, mode);
 +}
 +
  static int vsc8514_probe(struct phy_device *phydev)
  {
--	struct vsc8531_private *vsc8531;
--	u32 default_mode[4] = {VSC8531_LINK_1000_ACTIVITY,
--	   VSC8531_LINK_100_ACTIVITY, VSC8531_LINK_ACTIVITY,
--	   VSC8531_DUPLEX_COLLISION};
--
--	vsc8531 = devm_kzalloc(&phydev->mdio.dev, sizeof(*vsc8531), GFP_KERNEL);
--	if (!vsc8531)
--		return -ENOMEM;
--
--	phydev->priv = vsc8531;
--
--	vsc8584_get_base_addr(phydev);
--	devm_phy_package_join(&phydev->mdio.dev, phydev,
--			      vsc8531->base_addr, 0);
--
--	vsc8531->nleds = 4;
--	vsc8531->supp_led_modes = VSC85XX_SUPP_LED_MODES;
--	vsc8531->hw_stats = vsc85xx_hw_stats;
--	vsc8531->nstats = ARRAY_SIZE(vsc85xx_hw_stats);
--	vsc8531->stats = devm_kcalloc(&phydev->mdio.dev, vsc8531->nstats,
--				      sizeof(u64), GFP_KERNEL);
--	if (!vsc8531->stats)
--		return -ENOMEM;
--
--	return vsc85xx_dt_led_modes_get(phydev, default_mode);
-+	static const struct vsc85xx_probe_config vsc8514_cfg = {
-+		.nleds = 4,
-+		.supp_led_modes = VSC85XX_SUPP_LED_MODES,
-+		.hw_stats = vsc85xx_hw_stats,
-+		.nstats = ARRAY_SIZE(vsc85xx_hw_stats),
-+		.use_package = true,
-+		.shared_size = 0,
-+		.has_ptp = false,
-+		.check_rate_magic = false,
-+	};
-+
-+	return vsc85xx_probe_common(phydev, &vsc8514_cfg, vsc85xx_default_led_modes_4);
- }
- 
- static int vsc8574_probe(struct phy_device *phydev)
+ 	static const struct vsc85xx_probe_config vsc8514_cfg = {
+@@ -2380,6 +2566,10 @@ static struct phy_driver vsc85xx_driver[] = {
+ 	.get_sset_count = &vsc85xx_get_sset_count,
+ 	.get_strings    = &vsc85xx_get_strings,
+ 	.get_stats      = &vsc85xx_get_stats,
++	.led_brightness_set = vsc85xx_led_brightness_set,
++	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
++	.led_hw_control_get = vsc85xx_led_hw_control_get,
++	.led_hw_control_set = vsc85xx_led_hw_control_set,
+ },
  {
--	struct vsc8531_private *vsc8531;
--	u32 default_mode[4] = {VSC8531_LINK_1000_ACTIVITY,
--	   VSC8531_LINK_100_ACTIVITY, VSC8531_LINK_ACTIVITY,
--	   VSC8531_DUPLEX_COLLISION};
--
--	vsc8531 = devm_kzalloc(&phydev->mdio.dev, sizeof(*vsc8531), GFP_KERNEL);
--	if (!vsc8531)
--		return -ENOMEM;
--
--	phydev->priv = vsc8531;
--
--	vsc8584_get_base_addr(phydev);
--	devm_phy_package_join(&phydev->mdio.dev, phydev,
--			      vsc8531->base_addr, 0);
--
--	vsc8531->nleds = 4;
--	vsc8531->supp_led_modes = VSC8584_SUPP_LED_MODES;
--	vsc8531->hw_stats = vsc8584_hw_stats;
--	vsc8531->nstats = ARRAY_SIZE(vsc8584_hw_stats);
--	vsc8531->stats = devm_kcalloc(&phydev->mdio.dev, vsc8531->nstats,
--				      sizeof(u64), GFP_KERNEL);
--	if (!vsc8531->stats)
--		return -ENOMEM;
--
--	return vsc85xx_dt_led_modes_get(phydev, default_mode);
-+	static const struct vsc85xx_probe_config vsc8574_cfg = {
-+		.nleds = 4,
-+		.supp_led_modes = VSC8584_SUPP_LED_MODES,
-+		.hw_stats = vsc8584_hw_stats,
-+		.nstats = ARRAY_SIZE(vsc8584_hw_stats),
-+		.use_package = true,
-+		.shared_size = 0,
-+		.has_ptp = false,
-+		.check_rate_magic = false,
-+	};
-+
-+	return vsc85xx_probe_common(phydev, &vsc8574_cfg, vsc85xx_default_led_modes_4);
- }
- 
- static int vsc8584_probe(struct phy_device *phydev)
+ 	.phy_id		= PHY_ID_VSC8502,
+@@ -2404,6 +2594,10 @@ static struct phy_driver vsc85xx_driver[] = {
+ 	.get_sset_count = &vsc85xx_get_sset_count,
+ 	.get_strings    = &vsc85xx_get_strings,
+ 	.get_stats      = &vsc85xx_get_stats,
++	.led_brightness_set = vsc85xx_led_brightness_set,
++	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
++	.led_hw_control_get = vsc85xx_led_hw_control_get,
++	.led_hw_control_set = vsc85xx_led_hw_control_set,
+ },
  {
--	struct vsc8531_private *vsc8531;
--	u32 default_mode[4] = {VSC8531_LINK_1000_ACTIVITY,
--	   VSC8531_LINK_100_ACTIVITY, VSC8531_LINK_ACTIVITY,
--	   VSC8531_DUPLEX_COLLISION};
--	int ret;
--
--	vsc8531 = devm_kzalloc(&phydev->mdio.dev, sizeof(*vsc8531), GFP_KERNEL);
--	if (!vsc8531)
--		return -ENOMEM;
--
--	phydev->priv = vsc8531;
--
--	vsc8584_get_base_addr(phydev);
--	devm_phy_package_join(&phydev->mdio.dev, phydev, vsc8531->base_addr,
--			      sizeof(struct vsc85xx_shared_private));
--
--	vsc8531->nleds = 4;
--	vsc8531->supp_led_modes = VSC8584_SUPP_LED_MODES;
--	vsc8531->hw_stats = vsc8584_hw_stats;
--	vsc8531->nstats = ARRAY_SIZE(vsc8584_hw_stats);
--	vsc8531->stats = devm_kcalloc(&phydev->mdio.dev, vsc8531->nstats,
--				      sizeof(u64), GFP_KERNEL);
--	if (!vsc8531->stats)
--		return -ENOMEM;
--
--	if (phy_package_probe_once(phydev)) {
--		ret = vsc8584_ptp_probe_once(phydev);
--		if (ret)
--			return ret;
--	}
--
--	ret = vsc8584_ptp_probe(phydev);
--	if (ret)
--		return ret;
--
--	return vsc85xx_dt_led_modes_get(phydev, default_mode);
-+	static const struct vsc85xx_probe_config vsc8584_cfg = {
-+		.nleds = 4,
-+		.supp_led_modes = VSC8584_SUPP_LED_MODES,
-+		.hw_stats = vsc8584_hw_stats,
-+		.nstats = ARRAY_SIZE(vsc8584_hw_stats),
-+		.use_package = true,
-+		.shared_size = sizeof(struct vsc85xx_shared_private),
-+		.has_ptp = true,
-+		.check_rate_magic = false,
-+	};
-+
-+	return vsc85xx_probe_common(phydev, &vsc8584_cfg, vsc85xx_default_led_modes_4);
- }
- 
- static int vsc85xx_probe(struct phy_device *phydev)
+ 	.phy_id		= PHY_ID_VSC8504,
+@@ -2431,6 +2625,10 @@ static struct phy_driver vsc85xx_driver[] = {
+ 	.get_stats      = &vsc85xx_get_stats,
+ 	.inband_caps    = vsc85xx_inband_caps,
+ 	.config_inband  = vsc85xx_config_inband,
++	.led_brightness_set = vsc85xx_led_brightness_set,
++	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
++	.led_hw_control_get = vsc85xx_led_hw_control_get,
++	.led_hw_control_set = vsc85xx_led_hw_control_set,
+ },
  {
--	struct vsc8531_private *vsc8531;
--	int rate_magic;
--	u32 default_mode[2] = {VSC8531_LINK_1000_ACTIVITY,
--	   VSC8531_LINK_100_ACTIVITY};
--
--	rate_magic = vsc85xx_edge_rate_magic_get(phydev);
--	if (rate_magic < 0)
--		return rate_magic;
--
--	vsc8531 = devm_kzalloc(&phydev->mdio.dev, sizeof(*vsc8531), GFP_KERNEL);
--	if (!vsc8531)
--		return -ENOMEM;
--
--	phydev->priv = vsc8531;
--
--	vsc8531->rate_magic = rate_magic;
--	vsc8531->nleds = 2;
--	vsc8531->supp_led_modes = VSC85XX_SUPP_LED_MODES;
--	vsc8531->hw_stats = vsc85xx_hw_stats;
--	vsc8531->nstats = ARRAY_SIZE(vsc85xx_hw_stats);
--	vsc8531->stats = devm_kcalloc(&phydev->mdio.dev, vsc8531->nstats,
--				      sizeof(u64), GFP_KERNEL);
--	if (!vsc8531->stats)
--		return -ENOMEM;
--
--	return vsc85xx_dt_led_modes_get(phydev, default_mode);
-+	static const struct vsc85xx_probe_config vsc85xx_cfg = {
-+		.nleds = 2,
-+		.supp_led_modes = VSC85XX_SUPP_LED_MODES,
-+		.hw_stats = vsc85xx_hw_stats,
-+		.nstats = ARRAY_SIZE(vsc85xx_hw_stats),
-+		.use_package = false,
-+		.has_ptp = false,
-+		.check_rate_magic = true,
-+	};
-+
-+	return vsc85xx_probe_common(phydev, &vsc85xx_cfg, vsc85xx_default_led_modes_4);
+ 	.phy_id		= PHY_ID_VSC8514,
+@@ -2456,6 +2654,10 @@ static struct phy_driver vsc85xx_driver[] = {
+ 	.get_stats      = &vsc85xx_get_stats,
+ 	.inband_caps    = vsc85xx_inband_caps,
+ 	.config_inband  = vsc85xx_config_inband,
++	.led_brightness_set = vsc85xx_led_brightness_set,
++	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
++	.led_hw_control_get = vsc85xx_led_hw_control_get,
++	.led_hw_control_set = vsc85xx_led_hw_control_set,
+ },
+ {
+ 	.phy_id		= PHY_ID_VSC8530,
+@@ -2480,6 +2682,10 @@ static struct phy_driver vsc85xx_driver[] = {
+ 	.get_sset_count = &vsc85xx_get_sset_count,
+ 	.get_strings    = &vsc85xx_get_strings,
+ 	.get_stats      = &vsc85xx_get_stats,
++	.led_brightness_set = vsc85xx_led_brightness_set,
++	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
++	.led_hw_control_get = vsc85xx_led_hw_control_get,
++	.led_hw_control_set = vsc85xx_led_hw_control_set,
+ },
+ {
+ 	.phy_id		= PHY_ID_VSC8531,
+@@ -2504,6 +2710,10 @@ static struct phy_driver vsc85xx_driver[] = {
+ 	.get_sset_count = &vsc85xx_get_sset_count,
+ 	.get_strings    = &vsc85xx_get_strings,
+ 	.get_stats      = &vsc85xx_get_stats,
++	.led_brightness_set = vsc85xx_led_brightness_set,
++	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
++	.led_hw_control_get = vsc85xx_led_hw_control_get,
++	.led_hw_control_set = vsc85xx_led_hw_control_set,
+ },
+ {
+ 	.phy_id		= PHY_ID_VSC8540,
+@@ -2528,6 +2738,10 @@ static struct phy_driver vsc85xx_driver[] = {
+ 	.get_sset_count = &vsc85xx_get_sset_count,
+ 	.get_strings    = &vsc85xx_get_strings,
+ 	.get_stats      = &vsc85xx_get_stats,
++	.led_brightness_set = vsc85xx_led_brightness_set,
++	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
++	.led_hw_control_get = vsc85xx_led_hw_control_get,
++	.led_hw_control_set = vsc85xx_led_hw_control_set,
+ },
+ {
+ 	.phy_id		= PHY_ID_VSC8541,
+@@ -2552,6 +2766,10 @@ static struct phy_driver vsc85xx_driver[] = {
+ 	.get_sset_count = &vsc85xx_get_sset_count,
+ 	.get_strings    = &vsc85xx_get_strings,
+ 	.get_stats      = &vsc85xx_get_stats,
++	.led_brightness_set = vsc85xx_led_brightness_set,
++	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
++	.led_hw_control_get = vsc85xx_led_hw_control_get,
++	.led_hw_control_set = vsc85xx_led_hw_control_set,
+ },
+ {
+ 	.phy_id		= PHY_ID_VSC8552,
+@@ -2578,6 +2796,10 @@ static struct phy_driver vsc85xx_driver[] = {
+ 	.get_stats      = &vsc85xx_get_stats,
+ 	.inband_caps    = vsc85xx_inband_caps,
+ 	.config_inband  = vsc85xx_config_inband,
++	.led_brightness_set = vsc85xx_led_brightness_set,
++	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
++	.led_hw_control_get = vsc85xx_led_hw_control_get,
++	.led_hw_control_set = vsc85xx_led_hw_control_set,
+ },
+ {
+ 	PHY_ID_MATCH_EXACT(PHY_ID_VSC856X),
+@@ -2601,6 +2823,10 @@ static struct phy_driver vsc85xx_driver[] = {
+ 	.get_stats      = &vsc85xx_get_stats,
+ 	.inband_caps    = vsc85xx_inband_caps,
+ 	.config_inband  = vsc85xx_config_inband,
++	.led_brightness_set = vsc85xx_led_brightness_set,
++	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
++	.led_hw_control_get = vsc85xx_led_hw_control_get,
++	.led_hw_control_set = vsc85xx_led_hw_control_set,
+ },
+ {
+ 	.phy_id		= PHY_ID_VSC8572,
+@@ -2629,6 +2855,10 @@ static struct phy_driver vsc85xx_driver[] = {
+ 	.get_stats      = &vsc85xx_get_stats,
+ 	.inband_caps    = vsc85xx_inband_caps,
+ 	.config_inband  = vsc85xx_config_inband,
++	.led_brightness_set = vsc85xx_led_brightness_set,
++	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
++	.led_hw_control_get = vsc85xx_led_hw_control_get,
++	.led_hw_control_set = vsc85xx_led_hw_control_set,
+ },
+ {
+ 	.phy_id		= PHY_ID_VSC8574,
+@@ -2657,6 +2887,10 @@ static struct phy_driver vsc85xx_driver[] = {
+ 	.get_stats      = &vsc85xx_get_stats,
+ 	.inband_caps    = vsc85xx_inband_caps,
+ 	.config_inband  = vsc85xx_config_inband,
++	.led_brightness_set = vsc85xx_led_brightness_set,
++	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
++	.led_hw_control_get = vsc85xx_led_hw_control_get,
++	.led_hw_control_set = vsc85xx_led_hw_control_set,
+ },
+ {
+ 	PHY_ID_MATCH_EXACT(PHY_ID_VSC8575),
+@@ -2682,6 +2916,10 @@ static struct phy_driver vsc85xx_driver[] = {
+ 	.get_stats      = &vsc85xx_get_stats,
+ 	.inband_caps    = vsc85xx_inband_caps,
+ 	.config_inband  = vsc85xx_config_inband,
++	.led_brightness_set = vsc85xx_led_brightness_set,
++	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
++	.led_hw_control_get = vsc85xx_led_hw_control_get,
++	.led_hw_control_set = vsc85xx_led_hw_control_set,
+ },
+ {
+ 	PHY_ID_MATCH_EXACT(PHY_ID_VSC8582),
+@@ -2707,6 +2945,10 @@ static struct phy_driver vsc85xx_driver[] = {
+ 	.get_stats      = &vsc85xx_get_stats,
+ 	.inband_caps    = vsc85xx_inband_caps,
+ 	.config_inband  = vsc85xx_config_inband,
++	.led_brightness_set = vsc85xx_led_brightness_set,
++	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
++	.led_hw_control_get = vsc85xx_led_hw_control_get,
++	.led_hw_control_set = vsc85xx_led_hw_control_set,
+ },
+ {
+ 	PHY_ID_MATCH_EXACT(PHY_ID_VSC8584),
+@@ -2733,6 +2975,10 @@ static struct phy_driver vsc85xx_driver[] = {
+ 	.link_change_notify = &vsc85xx_link_change_notify,
+ 	.inband_caps    = vsc85xx_inband_caps,
+ 	.config_inband  = vsc85xx_config_inband,
++	.led_brightness_set = vsc85xx_led_brightness_set,
++	.led_hw_is_supported = vsc85xx_led_hw_is_supported,
++	.led_hw_control_get = vsc85xx_led_hw_control_get,
++	.led_hw_control_set = vsc85xx_led_hw_control_set,
  }
  
- static void vsc85xx_remove(struct phy_device *phydev)
+ };
 -- 
 2.43.0
 
