@@ -1,180 +1,222 @@
-Return-Path: <netdev+bounces-237395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64A68C4A72C
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:27:18 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 117FFC4A839
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:30:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 76B3418934F7
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 01:19:42 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 60DBE4F22FA
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 01:26:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82F0433E362;
-	Tue, 11 Nov 2025 01:10:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F25B534B678;
+	Tue, 11 Nov 2025 01:17:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FXa1jQBc"
+	dkim=pass (2048-bit key) header.d=minyard-net.20230601.gappssmtp.com header.i=@minyard-net.20230601.gappssmtp.com header.b="1X0bIYLP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f65.google.com (mail-oa1-f65.google.com [209.85.160.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 579D7248883;
-	Tue, 11 Nov 2025 01:10:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0140D30649C
+	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 01:17:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762823438; cv=none; b=fXYb2dmbwQH7IBahDWgCeUWo5rHJS7WyPU6n7acGwwJMiZUGwo5XPb4Qdq0kA+Yxlk1wtdBDPnC1EGVcDiRXlf1kAiwqrm1ULJ3itTi1PuXwGRBj4RXtIgPetjXdHzoNTkWckFXzRLFNIu0hF+iyOTlFGNy4krS6aPqZBh0EXG8=
+	t=1762823866; cv=none; b=LHlSwzYWZceGpfzG/8x3dAfNiW2jQieK9UZmFN7WndnQZWSYaQM37eTOGi6KMK2GTLYG9J0nu6r/xl+xJcT7QvPP3cukSIlI/SGHytM6pk2vT4Fri4R/zpiuaDYawrZSiYXb3NARFEpHvQE7U6KRhsGvSjs8ewy7rJTtf0UisfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762823438; c=relaxed/simple;
-	bh=XQVEmKUskABpebnnp2AiiV4QBBv9Qw26XAnM1za6FD8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pjrHed1gpLPGzNA1vbLAVPO1s0Na/tbLLzIO1GhNoJlsBmaE3OrAuR4nWjRCGtrByT1quD4/T44r8pPFnyv0DNi+YyLPSulAWGAkYT1WewybLMlFazL6wmV7gCrRcwprK9bMkzGeEacHCcvT3yS1oKsxbqJPeS0yYtIrPwbLfqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FXa1jQBc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 938FFC4CEFB;
-	Tue, 11 Nov 2025 01:10:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762823438;
-	bh=XQVEmKUskABpebnnp2AiiV4QBBv9Qw26XAnM1za6FD8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FXa1jQBcMYwJDQpsOVlEpQACYDBebi38yyv3QPdgkHmL39Yeq2mBlZqo9o33zmJKK
-	 RLfbnfUsKYUxdkY/s4QCMcA23fyR0/APn8MtDYbF4ATiwCtfMDlMglPVtL7FOVvwap
-	 FcKt2ZEu4R1NclkgemATZ6+Cz49fY8djRWTsgevUqPwQTcwT9DQKL8h3uHrpgxA21o
-	 V2WeEKAoysCNzQpqVbmh+b3U3TOIEWOMyGq1x4z20VfxMctEYCvoBYZkIbHd2vKmjG
-	 fHYkKqnt/zB8nIcnK2zvOvQJOV0CjxWvT45KbwdE/aYzG1GPK46N8CKTr3SVr5rs94
-	 DU9JcwSo9df5w==
-Date: Mon, 10 Nov 2025 17:10:36 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: netdev@vger.kernel.org, Doug Berger <opendmb@gmail.com>, Broadcom
- internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Antoine
- Tenart <atenart@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, Yajun
- Deng <yajun.deng@linux.dev>, linux-kernel@vger.kernel.org (open list)
-Subject: Re: [PATCH net-next v3 1/2] net: ethernet: Allow disabling pause on
- panic
-Message-ID: <20251110171036.733aa203@kernel.org>
-In-Reply-To: <20251107002510.1678369-2-florian.fainelli@broadcom.com>
-References: <20251107002510.1678369-1-florian.fainelli@broadcom.com>
-	<20251107002510.1678369-2-florian.fainelli@broadcom.com>
+	s=arc-20240116; t=1762823866; c=relaxed/simple;
+	bh=/awKTS4VkDV7YyuY2XqMrgn1/FWXuaIp1CGhvSR3qsg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YI6l9m1sDbedQg3nGWIUOR9bvWk4YRBA/9e/wn8nbsd0IvN3Ctz8tsrfgv5GFi+1Uo0tj3EzGh7iE65JXDOjoSktDn6V/dBstUa6RggUesCNUmhU4nNI15i+psa5kWqubnRYXXYtgYL/64WhQUXXeWoWCFgKbeCVD4/E5bEA/wg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=minyard.net; spf=none smtp.mailfrom=minyard.net; dkim=pass (2048-bit key) header.d=minyard-net.20230601.gappssmtp.com header.i=@minyard-net.20230601.gappssmtp.com header.b=1X0bIYLP; arc=none smtp.client-ip=209.85.160.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=minyard.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=minyard.net
+Received: by mail-oa1-f65.google.com with SMTP id 586e51a60fabf-3c9991e6ad1so180150fac.0
+        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 17:17:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=minyard-net.20230601.gappssmtp.com; s=20230601; t=1762823863; x=1763428663; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IjPKo3ybe4fdml1XQE+jQ3G55BcDMlVXlR9cl8yZWH4=;
+        b=1X0bIYLPg5FTcJXhMNg4pxmUb76wfaApB+l+loii0/FgtqX/HWlaE6aNarA3fA9Js9
+         Cwr/pnjVw/q3j5GgfUcYJJmUxw/jTInjI6MeuuAxCyfd67UbKjFyQTJeeL68hCUtpCgv
+         FiR1iNbtgqjlwBPrj2nm0cbbtIsbIvO0nK++V7ByOhJx2aJAFWsu3V+P7WutbzH2gkaJ
+         CBY9dbIIANg6ZmHz/nZ3ngHXtPb7Hj43JsC/t5rIl7DR3aQwyV19mNxAMyhHyzknHFLy
+         qjd9pzDGh7fMH3dh49XFDtb87Ae4NleYzlXTxHYnKhEGBfrmvt+33yPlDBX1ApO1D4i7
+         ip+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762823863; x=1763428663;
+        h=in-reply-to:content-disposition:mime-version:references:reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=IjPKo3ybe4fdml1XQE+jQ3G55BcDMlVXlR9cl8yZWH4=;
+        b=SanZCttB1vgxwtBbrzZUSZj+hcQDKmrui8RCEZeD/eqr7+RxS93xamMzHSYEu9OR5w
+         X7MSssEEZbyhCY4GlegA69nIZQUzTCjD0FjDoI0aiYBCwATkx4ZlizCaYhVuxTanlq8i
+         YxYzettqdQcbZQFxIUvFap0fxvIpiuVYLoQ1dxrMG3/ggDNh+WNYklhzG9nMTJLqMTjr
+         U4O+c6J0KA4zjl2Zxr4mKwcm35q0NnPGbMmKEWRBJr0YJlsT5NRvVwb/lMEV9d3/v56U
+         Ot5CRG0Bn3iDQXCSPgGQdBrv2/+FUL3Akew0YoPIyrk03UsJlg3zaZG+zy1Rj8C45OJN
+         tpPA==
+X-Forwarded-Encrypted: i=1; AJvYcCXTiLYwGQF5LKpZdF8SN+37l0Gw8X9bFbhEoznhpkgJEjI4AERcHxbdG2kcijD/uEQ8DVve/+Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyfdNVg7ouLlevXNKExAzpZWaiblG/HCWorYCALg+Qlhzb1Q8Jg
+	7Fz/aYFxV0dYdskcsC6qAi/WF69JkMZ02YxxkxmnypV4oM69IowwZO/FGqHG2rCHG9g=
+X-Gm-Gg: ASbGncvGAkDV6K4eDva8l7kZFfK0aECQ4SsNzzaR+2g24YC3MrtVw7/0ZqcGdcK8V46
+	J2vy5m0l1KUEvGc7ZAtXUdDiAUc8E8hjDBUJcd1VRp/8NzlG6TXur1gy6bw3v1PLIXmJcAcx1xn
+	7s0PqX+3vjBe1ZCw2LWSnr2FCzqco9T+Co6iTAkzdoZ+Nb1vZIjPH8Zh8bhiF1QWows+E8an3S/
+	3JRxLlUCJvEknKcByXlloycatBH3s683uKtXhAlDLeMQ2Y49oUJ/4r2UtrIyWiuj+jaqDBNAqPQ
+	4G6ya8Dcrv9SDPq0YvYJ8f2wXPuLJOQlidsFGGPjulfVRx7gqHV/MluECE2avbH10gt6cjbGroD
+	TdR6TSCfyCIBNrqlngMHrfgiUfRXDSbBiL3M88UCBd+RAoH3xkDe0lRhhWXRHBrcqfpAhc+9P9e
+	Pyjq4ALzSA6mLkEA==
+X-Google-Smtp-Source: AGHT+IHYqlJ/DqUior2uObKb688W9mKskJnwhdBfDC1sLOPoqWKjn2HRpxRv5pN7HFxTPVj3Axvofg==
+X-Received: by 2002:a05:6870:46a8:b0:3e1:d34:4283 with SMTP id 586e51a60fabf-3e815aaa2a3mr850172fac.19.1762823862970;
+        Mon, 10 Nov 2025 17:17:42 -0800 (PST)
+Received: from mail.minyard.net ([2001:470:b8f6:1b:b4e9:19a3:cdaf:7174])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3e7d6f7a27dsm4076840fac.0.2025.11.10.17.17.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Nov 2025 17:17:41 -0800 (PST)
+Date: Mon, 10 Nov 2025 19:17:35 -0600
+From: Corey Minyard <corey@minyard.net>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Christian K??nig <christian.koenig@amd.com>,
+	"Dr. David Alan Gilbert" <linux@treblig.org>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+	Rob Clark <robin.clark@oss.qualcomm.com>,
+	Matthew Brost <matthew.brost@intel.com>,
+	Hans Verkuil <hverkuil@kernel.org>,
+	Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Vitaly Lifshits <vitaly.lifshits@intel.com>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>, Calvin Owens <calvin@wbinvd.org>,
+	Sagi Maimon <maimon.sagi@gmail.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Karan Tilak Kumar <kartilak@cisco.com>,
+	Casey Schaufler <casey@schaufler-ca.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Petr Mladek <pmladek@suse.com>,
+	Max Kellermann <max.kellermann@ionos.com>,
+	Takashi Iwai <tiwai@suse.de>, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	openipmi-developer@lists.sourceforge.net,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, amd-gfx@lists.freedesktop.org,
+	linux-arm-msm@vger.kernel.org, freedreno@lists.freedesktop.org,
+	intel-xe@lists.freedesktop.org, linux-mmc@vger.kernel.org,
+	netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+	linux-pci@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
+	ceph-devel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	linux-sound@vger.kernel.org,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Dmitry Baryshkov <lumag@kernel.org>,
+	Abhinav Kumar <abhinav.kumar@linux.dev>,
+	Jessica Zhang <jesszhan0024@gmail.com>, Sean Paul <sean@poorly.run>,
+	Marijn Suijten <marijn.suijten@somainline.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	Thomas Hellstr??m <thomas.hellstrom@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Krzysztof Wilczy??ski <kwilczynski@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Rodolfo Giometti <giometti@enneenne.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Stefan Haberland <sth@linux.ibm.com>,
+	Jan Hoeppner <hoeppner@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Satish Kharat <satishkh@cisco.com>,
+	Sesidhar Baddela <sebaddel@cisco.com>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
+Subject: Re: [PATCH v1 12/23] ipmi: Switch to use %ptSp
+Message-ID: <aRKOr2hyoqTnh85-@mail.minyard.net>
+Reply-To: corey@minyard.net
+References: <20251110184727.666591-1-andriy.shevchenko@linux.intel.com>
+ <20251110184727.666591-13-andriy.shevchenko@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251110184727.666591-13-andriy.shevchenko@linux.intel.com>
 
-On Thu,  6 Nov 2025 16:25:09 -0800 Florian Fainelli wrote:
-> Development devices on a lab network might be subject to kernel panics
-> and if they have pause frame generation enabled, once the kernel panics,
-> the Ethernet controller stops being serviced. This can create a flood of
-> pause frames that certain switches are unable to handle resulting a
-> completle paralysis of the network because they broadcast to other
-> stations on that same network segment.
+On Mon, Nov 10, 2025 at 07:40:31PM +0100, Andy Shevchenko wrote:
+> Use %ptSp instead of open coded variants to print content of
+> struct timespec64 in human readable format.
 > 
-> To accomodate for such situation introduce a
-> /sys/class/net/<device>/disable_pause_on_panic knob which will disable
-> Ethernet pause frame generation upon kernel panic.
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+
+Quite a bit neater, yes.
+
+Acked-by: Corey Minyard <cminyard@mvista.com>
+
+> ---
+>  drivers/char/ipmi/ipmi_si_intf.c | 3 +--
+>  drivers/char/ipmi/ipmi_ssif.c    | 6 ++----
+>  2 files changed, 3 insertions(+), 6 deletions(-)
 > 
-> Note that device driver wishing to make use of that feature need to
-> implement ethtool_ops::set_pauseparam_panic to specifically deal with
-> that atomic context.
-
-Some basic review comments below (no promises if addressing those will
-make me for one feel any warmer towards the concept).
-
->  Documentation/ABI/testing/sysfs-class-net | 16 +++++
->  include/linux/ethtool.h                   |  3 +
->  include/linux/netdevice.h                 |  1 +
->  net/core/net-sysfs.c                      | 39 +++++++++++
->  net/ethernet/Makefile                     |  3 +-
->  net/ethernet/pause_panic.c                | 79 +++++++++++++++++++++++
-
-panic.c or shutdown.c is probably a slightly better name,
-more likely we'd add more code in that.
-
->  6 files changed, 140 insertions(+), 1 deletion(-)
->  create mode 100644 net/ethernet/pause_panic.c
+> diff --git a/drivers/char/ipmi/ipmi_si_intf.c b/drivers/char/ipmi/ipmi_si_intf.c
+> index 70e55f5ff85e..5459ffdde8dc 100644
+> --- a/drivers/char/ipmi/ipmi_si_intf.c
+> +++ b/drivers/char/ipmi/ipmi_si_intf.c
+> @@ -275,8 +275,7 @@ void debug_timestamp(struct smi_info *smi_info, char *msg)
+>  	struct timespec64 t;
+>  
+>  	ktime_get_ts64(&t);
+> -	dev_dbg(smi_info->io.dev, "**%s: %lld.%9.9ld\n",
+> -		msg, t.tv_sec, t.tv_nsec);
+> +	dev_dbg(smi_info->io.dev, "**%s: %ptSp\n", msg, &t);
+>  }
+>  #else
+>  #define debug_timestamp(smi_info, x)
+> diff --git a/drivers/char/ipmi/ipmi_ssif.c b/drivers/char/ipmi/ipmi_ssif.c
+> index 1b63f7d2fcda..ef1582a029f4 100644
+> --- a/drivers/char/ipmi/ipmi_ssif.c
+> +++ b/drivers/char/ipmi/ipmi_ssif.c
+> @@ -1083,10 +1083,8 @@ static int sender(void *send_info, struct ipmi_smi_msg *msg)
+>  		struct timespec64 t;
+>  
+>  		ktime_get_real_ts64(&t);
+> -		dev_dbg(&ssif_info->client->dev,
+> -			"**Enqueue %02x %02x: %lld.%6.6ld\n",
+> -			msg->data[0], msg->data[1],
+> -			(long long)t.tv_sec, (long)t.tv_nsec / NSEC_PER_USEC);
+> +		dev_dbg(&ssif_info->client->dev, "**Enqueue %02x %02x: %ptSp\n",
+> +			msg->data[0], msg->data[1], &t);
+>  	}
+>  	return IPMI_CC_NO_ERROR;
+>  }
+> -- 
+> 2.50.1
 > 
-> diff --git a/Documentation/ABI/testing/sysfs-class-net b/Documentation/ABI/testing/sysfs-class-net
-> index ebf21beba846..da0e4e862aca 100644
-> --- a/Documentation/ABI/testing/sysfs-class-net
-> +++ b/Documentation/ABI/testing/sysfs-class-net
-> @@ -352,3 +352,19 @@ Description:
->  		0  threaded mode disabled for this dev
->  		1  threaded mode enabled for this dev
->  		== ==================================
-> +
-> +What:		/sys/class/net/<iface>/disable_pause_on_panic
-> +Date:		Nov 2025
-> +KernelVersion:	6.20
-> +Contact:	netdev@vger.kernel.org
-> +Description:
-> +		Boolean value to control whether to disable pause frame
-> +		generation on panic. This is helpful in environments where
-> +		the link partner may incorrect respond to pause frames (e.g.:
-> +		improperly configured Ethernet switches)
-> +
-> +		Possible values:
-> +		== =====================================================
-> +		0  do not disable pause frame generation on kernel panic
-> +		1  disable pause frame generation on kernel panic
-> +		== =====================================================
-
-please no sysfs for something as niche as this feature
-
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index e808071dbb7d..2d4b07693745 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -2441,6 +2441,7 @@ struct net_device {
->  	bool			proto_down;
->  	bool			irq_affinity_auto;
->  	bool			rx_cpu_rmap_auto;
-> +	bool			disable_pause_on_panic;
-
-Warning: include/linux/netdevice.h:2567 struct member
-'disable_pause_on_panic' not described in 'net_device'
-
->  	/* priv_flags_slow, ungrouped to save space */
->  	unsigned long		see_all_hwtstamp_requests:1;
-
-> +#include <linux/kernel.h>
-> +#include <linux/init.h>
-> +#include <linux/panic_notifier.h>
-> +#include <linux/netdevice.h>
-> +#include <linux/ethtool.h>
-> +#include <linux/notifier.h>
-> +#include <linux/if_ether.h>
-> +#include <net/net_namespace.h>
-
-Alphabetical sort, please.
-
-> +/*
-> + * Disable pause/flow control on a single Ethernet device.
-> + */
-> +static void disable_pause_on_device(struct net_device *dev)
-> +{
-> +	const struct ethtool_ops *ops;
-> +
-> +	/* Only proceed if this device has the flag enabled */
-> +	if (!READ_ONCE(dev->disable_pause_on_panic))
-> +		return;
-> +
-> +	ops = dev->ethtool_ops;
-> +	if (!ops || !ops->set_pauseparam_panic)
-> +		return;
-> +
-> +	/*
-> +	 * In panic context, we're in atomic context and cannot sleep.
-> +	 */
-
-single-line comment would do?
-
-> +	ops->set_pauseparam_panic(dev);
-> +}
--- 
-pw-bot: cr
 
