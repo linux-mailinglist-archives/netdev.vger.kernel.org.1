@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-237414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71A28C4B2ED
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:16:40 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D4D0C4B2DE
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:13:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00A303A6A21
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:11:10 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F0C824F2720
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:11:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C9653469FE;
-	Tue, 11 Nov 2025 02:10:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83572346E5E;
+	Tue, 11 Nov 2025 02:10:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WWYJw75b"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jN4tl92i"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F6D23469EF;
-	Tue, 11 Nov 2025 02:10:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53E8F346E4A;
+	Tue, 11 Nov 2025 02:10:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762827044; cv=none; b=Ca29lUi5jSELwsI7KbHzGiJZXxUsb/3CqmPan6b7LxRAJ93U52T/ufwpmOGX5InNGVMcs0MVAqda1LVyE998hnGPgjXzpnEmuZ5sQjvHNd1TuXJ9LD4ZiWXkyKYdw/Fcy+/OPDdACi/868/KiGgkMGiaSlMSYQa0VsK9AKgPnsE=
+	t=1762827045; cv=none; b=MxTKC77svrE+8Ajrso9n5ECzBL6NSLL5F3hPPmvUA+OOPLLwabmpe/LgMP19XzLwlzLsBnr0e8UMA1C8ZD/Qa8//IwOPcqmoL/2xqHlTIAmiMo+CHmLuDfKXAtDhDY7M/5p/n95HtRLAV5K8g0sNNW5SJb5aGce15y5/8NEfxU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762827044; c=relaxed/simple;
-	bh=Vucgi6gs/xD/jJPBBcH7kSn3eGn5xTJkLGubZx9DDpo=;
+	s=arc-20240116; t=1762827045; c=relaxed/simple;
+	bh=ATzBksBCOTmNeMSA8xlp+L3ecCv2sI/QV4plnPjFfcg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JaREkKbQ31Xg+CdgDQhj2jZLPWpQf4ocxIvoioQIvwKKNzEoapVSGDvywCNojU4I/brI9apuYkDpsY+JogotltcJq5G3GAyU+AJ0c2IjPyxluwIyAw5wH5B3Xv/osSODB4Uv649qp4o7ll4Ii4XrGljYUsg+5dehe0foLKSeMmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WWYJw75b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCFCCC19424;
-	Tue, 11 Nov 2025 02:10:43 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=bE5gmtfwmLW8uNUN6M+dL1T6SOPcuMxXkwPkkcxnd8HrA6X14oXB9BkO0cg6qOmy4nhVvzbW6j03TuLBU+cgEp2pRKtQasaeRprNQo0ELc7dG2yICtYtF69imtl1+bU3qYZ+3RYc2vANFiZeg0Clf4Qm3U1uVQ0pZr9lUGFNHB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jN4tl92i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE2F0C4CEFB;
+	Tue, 11 Nov 2025 02:10:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762827043;
-	bh=Vucgi6gs/xD/jJPBBcH7kSn3eGn5xTJkLGubZx9DDpo=;
+	s=k20201202; t=1762827044;
+	bh=ATzBksBCOTmNeMSA8xlp+L3ecCv2sI/QV4plnPjFfcg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WWYJw75bYYDPlbhbnspGcufdAEl7lQzQeq8Y1kCw1SQ+7DweTKkSu43JO+m8gYzTr
-	 EleCX1Yfm4bguFXJIfOWNY+TqOsWME7Hzh2eau7lDkA18fAmOwiUAX47uNYX90La2H
-	 sq+2+ADMFJehj3qKTHKCKGZf1Yaadfw/uskjMgs4W85U8/b8vikpl6zw8uyx4m2eq9
-	 o9huSQj08xXzpXdVNW3MJ/CTR3PAkboWB5rClngi6QdCdbJu4V7e7JXklba/01QQNY
-	 ZRUgNAk/wXNj3C5WfLp7XWhfuLoSfiJ3qwcJdD965USl/e4zM569S0gIha5mnXSdAM
-	 r8tdEIg/y4k3Q==
+	b=jN4tl92iVUewXUBBdojgxUzuLY9Hp95hWi84vAgHKQQw7asUc8J8fJznq1oTtZWCh
+	 WTPE73heCZqMWqNfsP4JWu6UIK3d20R1yj8jxHiyF18SjuApFKcaf8M95vSii+3Ne4
+	 9ZgnNKp78Sown/rT5MD5OUEB1dSIgO69wnu+49PtAgNHgDP7SinubuBHIhrm94WGCG
+	 61YUCzXAebYgKbKYzGg2JAwqsQkwehTcMUJivYVaEAWpP01OfeEUsnPyg782uOUuOZ
+	 YhHe3gbdxWj9XKRhz6hJvmJGwejz/3Ws/c0fha7YsOSJIT0yLhghoyC5h3+48Wq/wE
+	 c3V7AYkEwKYIQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E8B380CFD7;
-	Tue, 11 Nov 2025 02:10:15 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDF5380CFD7;
+	Tue, 11 Nov 2025 02:10:16 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net/handshake: Fix memory leak in tls_handshake_accept()
+Subject: Re: [PATCH net v2] net/smc: fix mismatch between CLC header and
+ proposal
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176282701408.2852248.347346618365991178.git-patchwork-notify@kernel.org>
-Date: Tue, 11 Nov 2025 02:10:14 +0000
-References: <20251106144511.3859535-1-zilin@seu.edu.cn>
-In-Reply-To: <20251106144511.3859535-1-zilin@seu.edu.cn>
-To: Zilin Guan <zilin@seu.edu.cn>
-Cc: chuck.lever@oracle.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, jianhao.xu@seu.edu.cn
+ <176282701549.2852248.13088246510149489093.git-patchwork-notify@kernel.org>
+Date: Tue, 11 Nov 2025 02:10:15 +0000
+References: <20251107024029.88753-1-alibuda@linux.alibaba.com>
+In-Reply-To: <20251107024029.88753-1-alibuda@linux.alibaba.com>
+To: D. Wythe <alibuda@linux.alibaba.com>
+Cc: mjambigi@linux.ibm.com, wenjia@linux.ibm.com, wintera@linux.ibm.com,
+ dust.li@linux.alibaba.com, tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
+ kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org, pabeni@redhat.com,
+ edumazet@google.com, sidraya@linux.ibm.com, jaka@linux.ibm.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu,  6 Nov 2025 14:45:11 +0000 you wrote:
-> In tls_handshake_accept(), a netlink message is allocated using
-> genlmsg_new(). In the error handling path, genlmsg_cancel() is called
-> to cancel the message construction, but the message itself is not freed.
-> This leads to a memory leak.
-> 
-> Fix this by calling nlmsg_free() in the error path after genlmsg_cancel()
-> to release the allocated memory.
+On Fri,  7 Nov 2025 10:40:29 +0800 you wrote:
+> The current CLC proposal message construction uses a mix of
+> `ini->smc_type_v1/v2` and `pclc_base->hdr.typev1/v2` to decide whether
+> to include optional extensions (IPv6 prefix extension for v1, and v2
+> extension). This leads to a critical inconsistency: when
+> `smc_clc_prfx_set()` fails - for example, in IPv6-only environments with
+> only link-local addresses, or when the local IP address and the outgoing
+> interface’s network address are not in the same subnet.
 > 
 > [...]
 
 Here is the summary with links:
-  - net/handshake: Fix memory leak in tls_handshake_accept()
-    https://git.kernel.org/netdev/net/c/3072f00bba76
+  - [net,v2] net/smc: fix mismatch between CLC header and proposal
+    https://git.kernel.org/netdev/net/c/ec33f2e5a2d0
 
 You are awesome, thank you!
 -- 
