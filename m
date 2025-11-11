@@ -1,180 +1,103 @@
-Return-Path: <netdev+bounces-237601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 920A4C4DA8B
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 13:25:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BEF8C4DEF0
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 13:58:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 463821889EF4
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 12:26:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F19A03A4909
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 12:51:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAB003587D8;
-	Tue, 11 Nov 2025 12:25:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C2163A5E8F;
+	Tue, 11 Nov 2025 12:33:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="AydTrWNd"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="M81qm0j8"
 X-Original-To: netdev@vger.kernel.org
-Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11012008.outbound.protection.outlook.com [40.93.195.8])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 597A7358D19;
-	Tue, 11 Nov 2025 12:25:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.195.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762863936; cv=fail; b=ZvUfMuLSxIkuSIlv6oRqeA/uO679FOUfamIBQTxaXy+u9sVQuY1b6kBu+mipxMQDLZ5aJ2wsWU4NRKUQTFmFr9Pnk/M4CFSNsu0pCZHkPAbA5zxu5nPdHdvBrZUi2fQF2N0YH+bzZYI+bZ53h3aSMNb8nvW2kNxFCDxT3Qmyy0o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762863936; c=relaxed/simple;
-	bh=Va0ZUN8h4LZYTv/gpwvdRHTHn3ZUj2axJPrf0+NukAQ=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gO50pXLli8kjVAu3N4VnfxIJ3iheKGsU10OfVrOFMkts5HlRuUiRw5LxBGX664WufZgMQrpqO/MkbpoMlQnouXumgvZdxWtos/ZguJ3Kn2fL9CcqqRcgMk7hoppTkAwb5Nlayje8EyoIWggJOTxvcPkBwmIyZQ6u/6fcHCHQ/Ak=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=AydTrWNd; arc=fail smtp.client-ip=40.93.195.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bfTSJNhZRffivQDDmk840dDhFUSH7q7xXX2nCD9TXJkgRZRkxkxXKA7bcwJekubOR7ANoS8MRza/m4TC3S17d1WXViYAHbCaOmme2wlWvplS99z4LQLMOWkosN9TgFOWO4yfc8+2TCyNPF/4iUfhd97JFpSZzgMTqSZ0XauTxRqHGkZyUZuM3su12u5BHlxrGIRGJn6U2YSuk48lW7Ryp2H1X5uE4/x+aPYxr6RGwi81oDJf1ci3kAqzfbPbHbuFh79ufwm4hnGfOh890hQHFvu/lH2fhwsveTO8CwK2WcxFSHYlLa6Q6Wzt1XiT+SF6J1U5X9K3ekCHleQdUfi3zA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=568ZJI1t63TwE+2Vg6FBO7twsNmkVlvaTSH/AwD3Ghs=;
- b=nY8ufuyeLhR3pAmUGgQ3CEMpivCBSRrkBzTXiyfrTY1LHY0L9zhSmIpIiinA7x6P1kO/EPDvvukunP9pFUTYgYer/TNLz4OB+jyfBiV6ZHzAT6/6OBlpQFZYK8eWQsmFM8m/UmsmSDL9JJaoA/ZEFdOnMlkhocB31djuvjBNFmlb4d8w5KVWZzI9iRNTyPTebYTAjoJumNaHUuXEGCutmZKp95tmVL8PktJfJySjlF4GY3icJV7cQbSX+VTscMPjKSZKcW85tsXr1jr11F+l8lnBN4WYYFUqLthHhkX6Q+4urYdg+/sy4igKYeu+K4vIkZz2hMULxmZT43xm+P/3SQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=568ZJI1t63TwE+2Vg6FBO7twsNmkVlvaTSH/AwD3Ghs=;
- b=AydTrWNdnzpMStlbvQl/k/pq8mjbO0AfqDLNclYMpxJi7Ij4l9rS1yJsJaT369Od8iMiFgtPwBjcZxf+Ixqwp4CLNv7Fn4yGWUmPHOqCS3DyV9bZl/MuqzMtjk7wyMXOGuVOs+nvzLa8PMDP616cKmrlihIAlh7Xha8iMkkTJN9abQi5JuNDUpJAEIxy/ZjknBY8QDjjcqdoyCEyFFBemzE/hocHoibum0WtdHbs/JXfxSZJttcFTvOZDkEaPUmhBo8+uxpSo8MrUMhRwPNXcBJMlKwFCudfgLzGu34LsOFF/KM60GhOyprXApO7Gn/AC0VTwgiu0bQjaN/E/kEtBQ==
-Received: from MN0P223CA0019.NAMP223.PROD.OUTLOOK.COM (2603:10b6:208:52b::34)
- by SA1PR12MB6679.namprd12.prod.outlook.com (2603:10b6:806:252::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.16; Tue, 11 Nov
- 2025 12:25:27 +0000
-Received: from BL02EPF00021F69.namprd02.prod.outlook.com
- (2603:10b6:208:52b:cafe::cc) by MN0P223CA0019.outlook.office365.com
- (2603:10b6:208:52b::34) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9298.16 via Frontend Transport; Tue,
- 11 Nov 2025 12:25:16 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- BL02EPF00021F69.mail.protection.outlook.com (10.167.249.5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9320.13 via Frontend Transport; Tue, 11 Nov 2025 12:25:25 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 11 Nov
- 2025 04:25:18 -0800
-Received: from drhqmail202.nvidia.com (10.126.190.181) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.20; Tue, 11 Nov 2025 04:25:18 -0800
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
- (10.126.190.181) with Microsoft SMTP Server id 15.2.2562.20 via Frontend
- Transport; Tue, 11 Nov 2025 04:25:13 -0800
-From: Tariq Toukan <tariqt@nvidia.com>
-To: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>,
-	<netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
- S. Miller" <davem@davemloft.net>, Gal Pressman <gal@nvidia.com>, "Leon
- Romanovsky" <leonro@nvidia.com>, Yael Chemla <ychemla@nvidia.com>, "Moshe
- Shemesh" <moshe@nvidia.com>, Shahar Shitrit <shshitrit@nvidia.com>, "Maher
- Sanalla" <msanalla@nvidia.com>
-Subject: [PATCH mlx5-next] net/mlx5: Expose definition for 1600Gbps link mode
-Date: Tue, 11 Nov 2025 14:24:48 +0200
-Message-ID: <1762863888-1092798-1-git-send-email-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.8.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C7363A5E69;
+	Tue, 11 Nov 2025 12:33:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762864400; cv=none; b=f4W11eNd69msvA/ONwc9bNl6KSe3eppBkeJStp10NVu9TlI2Gdl/KQVTBiY1SraEimOn0KPzwxy6X9kWtyVvJyd32hCtw8cVeyUolblJkI1ezIpn3p0NT76qHnBi3NeolVQQNllh9rbIQ91CSigFwGcz5olI6pSUf0OPmGG0v2c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762864400; c=relaxed/simple;
+	bh=tUcevEml60aCxu0vcWYyki56SIwcdZnTa6MQslWRHLk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ap61QmzLeFQnMe47NrC/9d/YOEDYqQ9KEY3fxJBinMcwo8YCtV04P0xEXkgmkl3a5cCtPsNE3iZ59+yCZ1dnmghhk/erhn8U1MyGcXRM8PtlfZrnCHaOAxyZ/yYceF2Ohex/f6NFPvZ0rKlHvjdegJBcACsmHUYc38l/tFcAjWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=M81qm0j8; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Al8MnEVsZ+ylXBq1N4ofH08Ykvoq5VV8Ot/D8r7iKaM=; b=M81qm0j8/9TwbBIkmlnsL2lCaW
+	d6emkWPoeNCmU/+eMPYmiZKdlHtzNzFM6kRnbB09EzR1zeJ8Z5VCkieiPZ2B6p/DDuaKmU/dv8eVr
+	yclseV17+yjWlKtAOohKHt7uKvA1pQ6bdoqlHBr3/san1LaxiuBpFIAFx5hSHABeRC6zl6YrPj1jP
+	bPohxiAZKOU2/Xd/Ee4dyIKsTFTWTgYSm7P/oBvtMBV7AcwXwyoPgxhMFrEwG46JCEeXu43BVb3Nm
+	qiLAXuLFFd55pJZZeEShjG0fSwCNF1Vh41Xr29e60PZUlsPwDeJlTS8h2YxYTwzRGrrv/P/OeRZjI
+	O1rpM57A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50174)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vInYU-000000002aj-1tj1;
+	Tue, 11 Nov 2025 12:33:02 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vInYO-000000002wW-1jkQ;
+	Tue, 11 Nov 2025 12:32:56 +0000
+Date: Tue, 11 Nov 2025 12:32:56 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Yao Zi <ziyao@disroot.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Frank <Frank.Sae@motor-comm.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Choong Yong Liang <yong.liang.choong@linux.intel.com>,
+	Chen-Yu Tsai <wens@csie.org>, Jisheng Zhang <jszhang@kernel.org>,
+	Furong Xu <0x1207@gmail.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Mingcong Bai <jeffbai@aosc.io>,
+	Runhua He <hua@aosc.io>, Xi Ruoyao <xry111@xry111.site>
+Subject: Re: [PATCH net-next v2 2/3] net: stmmac: Add glue driver for
+ Motorcomm YT6801 ethernet controller
+Message-ID: <aRMs-B2KndX-JNks@shell.armlinux.org.uk>
+References: <20251111105252.53487-1-ziyao@disroot.org>
+ <20251111105252.53487-3-ziyao@disroot.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF00021F69:EE_|SA1PR12MB6679:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2705dddf-b262-4e2f-6865-08de211d64be
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|36860700013|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?QmltMvdEpVpfkVbqBWmKwCSM4oWQeFeklI+YzITp28nTZl1VDlvDdKfHoDMG?=
- =?us-ascii?Q?aKCD+loYMT9l2oxoyA04nOGYi6OSAh+hWUqOs3yZs0aOQTGXuGUdElYH4Okl?=
- =?us-ascii?Q?a7wadsM81Dgok6i5W89A40FIIEEq4pkhmOJNnrlNLrUnjQjwjjd+1Yhystc5?=
- =?us-ascii?Q?tUeiZo/g0NmiJkbrutWcI72w3cixJfhknaJ2AjY11/ZRYsqcMJqjpmHcqWyh?=
- =?us-ascii?Q?xJ2+fSD+k0YqNML/Q5l/N1UefMSG/IEj3vqk780G9JsXqTAL4lJg8L2OQmic?=
- =?us-ascii?Q?CEaHMDyv/0ZvSsaQ413jQE14SgUv0mRh3EgpOEVxGddBmx1+oe8vwyFyoQHT?=
- =?us-ascii?Q?v2yAv8r2KFxpfgz2ABKv6kyuKsTOxYn1vgavGnnQIqZdQVyeJOQ5DVqUy23u?=
- =?us-ascii?Q?hdrGRQLVIhO6ueMkgAlVOiffpdOpQQAdnBZ9jjt4XdVDA3w4BK/8XnO2nVzz?=
- =?us-ascii?Q?avK3yMCDUjtOLzLoOAOv0uXtflSv+f/09fOo80cA1pl8ZNgV44v5PbIK6Gn9?=
- =?us-ascii?Q?f08vkkCBUKhENxI7HzFuZChm6y2dIbDJd2gW0VnARVf8/uX/MjysWy7PaZzA?=
- =?us-ascii?Q?JahmsKaxFKnRgsolrFxJ0QhkuXJsIVtlJTzBTQj29PrJu/R9RS+YDT1Co0mb?=
- =?us-ascii?Q?3b9nI52+oySqw2JIXoDuW4WHimjHwNzYuvO9X0JJH/UaKd+EVlXSO3ZXDKER?=
- =?us-ascii?Q?Q271qLv8SPVcxghGiWLn+Sbhi90DL0lgeQ6bHBZ9vHQLhThw0hTUiPkWNr/1?=
- =?us-ascii?Q?cAEzPhKOCmvlsXxYQNNfTnxC9mvdfHpqO6kWYOYNV0TVGZLg85Sv30wtgUoH?=
- =?us-ascii?Q?3+Vwq/OG5AhNGX5WIY3wknGLgbx24w+d+qkuv+p7bNx9XnRZNMginssg9XQo?=
- =?us-ascii?Q?8Xjbudab8Wx9LuWgoHUdz5CSpLUBouTCYHSN/sq5r04pdrwZS6NVq4jjPc9/?=
- =?us-ascii?Q?SEGUCxcsj72JsiauP7J80kduaWQkxbgVlFvc4u+NfCsz5YkUGJFyFSKl7DN2?=
- =?us-ascii?Q?iZgyULO93vRqFCVtv7aE/RgVerfwIUNwmODurZc7feORIsJlIKZWjqpb4mcG?=
- =?us-ascii?Q?/DnqjiJmJ/Dn6zw6dA1jYAJOAcrE+G7Kdz9+OJ9OyQwTjUkLCeJlH6zyaYt0?=
- =?us-ascii?Q?hrSDvxzHA4HmYmVHsEdwSeEkC69Fqno1Vy3PDusWiggPCGa4uvYdrU/Y2duZ?=
- =?us-ascii?Q?g0BaBopG7Esj1twJv1781rsPY6OQvdbTDKNJCGhfWSb3X/2jg3z5GMtk0jjr?=
- =?us-ascii?Q?Nn3ar82WgruTPhD3wAODSqpXqaonPwC4I2EP9aY+L4zt1S8eRYWM89uSv4o5?=
- =?us-ascii?Q?navUOF1i0yANBeu9X3MQTC0qgiKIH0ns3Tn+3qdvDIl8Z7jU3VKKl4JeGqdo?=
- =?us-ascii?Q?/ANZysmvldDbg6LOjc+4v+7EPTYNZioI5wf9Ke5rkX67hv7w86h4J5mbJSyN?=
- =?us-ascii?Q?5LWjwTZzZKedRhBBKcw0jrdaZFXaPjI0Sk574OdFPWwpRLvqlaNrzkN87U9u?=
- =?us-ascii?Q?oYXXeNnYhmQ3a0ffaXdODRT+3kmbxi9JvEhE6JNVJRHLUjvAMom6X57b5nHV?=
- =?us-ascii?Q?dJgpo753Zb6Q1fN7yVY=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Nov 2025 12:25:25.9934
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2705dddf-b262-4e2f-6865-08de211d64be
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF00021F69.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6679
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251111105252.53487-3-ziyao@disroot.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-This patch exposes new link mode for 1600Gbps, utilizing 8 lanes at
-200Gbps per lane.
+On Tue, Nov 11, 2025 at 10:52:51AM +0000, Yao Zi wrote:
+> +	plat->bus_id		= pci_dev_id(pdev);
+> +	plat->phy_addr		= -1;
+> +	plat->phy_interface	= PHY_INTERFACE_MODE_GMII;
+> +	plat->clk_csr		= STMMAC_CSR_20_35M;
 
-Co-developed-by: Yael Chemla <ychemla@nvidia.com>
-Reviewed-by: Shahar Shitrit <shshitrit@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
----
- include/linux/mlx5/port.h | 1 +
- 1 file changed, 1 insertion(+)
+Could you include a comment indicating what the stmmac clock rate
+actually is (the rate which is used to derive this divider) ? As
+this is PCI, I'm guessing it's 33MHz, which fits with your divider
+value.
 
-diff --git a/include/linux/mlx5/port.h b/include/linux/mlx5/port.h
-index 58770b86f793..1df9d9a57bbc 100644
---- a/include/linux/mlx5/port.h
-+++ b/include/linux/mlx5/port.h
-@@ -112,6 +112,7 @@ enum mlx5e_ext_link_mode {
- 	MLX5E_400GAUI_2_400GBASE_CR2_KR2	= 17,
- 	MLX5E_800GAUI_8_800GBASE_CR8_KR8	= 19,
- 	MLX5E_800GAUI_4_800GBASE_CR4_KR4	= 20,
-+	MLX5E_1600TAUI_8_1600TBASE_CR8_KR8	= 23,
- 	MLX5E_EXT_LINK_MODES_NUMBER,
- };
- 
+Thanks.
 
-base-commit: 583b4fe1c19d978bb787e0adf9ce469cb7f68455
 -- 
-2.31.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
