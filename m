@@ -1,222 +1,81 @@
-Return-Path: <netdev+bounces-237397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 117FFC4A839
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:30:09 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3061AC4A6D5
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:26:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 60DBE4F22FA
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 01:26:46 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D02F934C211
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 01:26:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F25B534B678;
-	Tue, 11 Nov 2025 01:17:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BB4C3054D7;
+	Tue, 11 Nov 2025 01:17:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=minyard-net.20230601.gappssmtp.com header.i=@minyard-net.20230601.gappssmtp.com header.b="1X0bIYLP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FYPUZCBJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f65.google.com (mail-oa1-f65.google.com [209.85.160.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0140D30649C
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 01:17:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07953304BD5
+	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 01:17:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762823866; cv=none; b=LHlSwzYWZceGpfzG/8x3dAfNiW2jQieK9UZmFN7WndnQZWSYaQM37eTOGi6KMK2GTLYG9J0nu6r/xl+xJcT7QvPP3cukSIlI/SGHytM6pk2vT4Fri4R/zpiuaDYawrZSiYXb3NARFEpHvQE7U6KRhsGvSjs8ewy7rJTtf0UisfM=
+	t=1762823861; cv=none; b=sw1Dvik5yfRu2ehbHRUOTRcR0g0BkbGfwnNgFbkAHqolD9Dj6/g6HZgbVB6yWIuZuFeHdtGSObVzqbY7E1tZOfNJdSjiepPR4C7qpXL23FEP5YVtDfUMnvWQqsvvra6e5wsbDdh0uyazMYlbUyw0d2USY0wxzSBqh5SCCMY98Xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762823866; c=relaxed/simple;
-	bh=/awKTS4VkDV7YyuY2XqMrgn1/FWXuaIp1CGhvSR3qsg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YI6l9m1sDbedQg3nGWIUOR9bvWk4YRBA/9e/wn8nbsd0IvN3Ctz8tsrfgv5GFi+1Uo0tj3EzGh7iE65JXDOjoSktDn6V/dBstUa6RggUesCNUmhU4nNI15i+psa5kWqubnRYXXYtgYL/64WhQUXXeWoWCFgKbeCVD4/E5bEA/wg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=minyard.net; spf=none smtp.mailfrom=minyard.net; dkim=pass (2048-bit key) header.d=minyard-net.20230601.gappssmtp.com header.i=@minyard-net.20230601.gappssmtp.com header.b=1X0bIYLP; arc=none smtp.client-ip=209.85.160.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=minyard.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=minyard.net
-Received: by mail-oa1-f65.google.com with SMTP id 586e51a60fabf-3c9991e6ad1so180150fac.0
-        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 17:17:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=minyard-net.20230601.gappssmtp.com; s=20230601; t=1762823863; x=1763428663; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IjPKo3ybe4fdml1XQE+jQ3G55BcDMlVXlR9cl8yZWH4=;
-        b=1X0bIYLPg5FTcJXhMNg4pxmUb76wfaApB+l+loii0/FgtqX/HWlaE6aNarA3fA9Js9
-         Cwr/pnjVw/q3j5GgfUcYJJmUxw/jTInjI6MeuuAxCyfd67UbKjFyQTJeeL68hCUtpCgv
-         FiR1iNbtgqjlwBPrj2nm0cbbtIsbIvO0nK++V7ByOhJx2aJAFWsu3V+P7WutbzH2gkaJ
-         CBY9dbIIANg6ZmHz/nZ3ngHXtPb7Hj43JsC/t5rIl7DR3aQwyV19mNxAMyhHyzknHFLy
-         qjd9pzDGh7fMH3dh49XFDtb87Ae4NleYzlXTxHYnKhEGBfrmvt+33yPlDBX1ApO1D4i7
-         ip+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762823863; x=1763428663;
-        h=in-reply-to:content-disposition:mime-version:references:reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=IjPKo3ybe4fdml1XQE+jQ3G55BcDMlVXlR9cl8yZWH4=;
-        b=SanZCttB1vgxwtBbrzZUSZj+hcQDKmrui8RCEZeD/eqr7+RxS93xamMzHSYEu9OR5w
-         X7MSssEEZbyhCY4GlegA69nIZQUzTCjD0FjDoI0aiYBCwATkx4ZlizCaYhVuxTanlq8i
-         YxYzettqdQcbZQFxIUvFap0fxvIpiuVYLoQ1dxrMG3/ggDNh+WNYklhzG9nMTJLqMTjr
-         U4O+c6J0KA4zjl2Zxr4mKwcm35q0NnPGbMmKEWRBJr0YJlsT5NRvVwb/lMEV9d3/v56U
-         Ot5CRG0Bn3iDQXCSPgGQdBrv2/+FUL3Akew0YoPIyrk03UsJlg3zaZG+zy1Rj8C45OJN
-         tpPA==
-X-Forwarded-Encrypted: i=1; AJvYcCXTiLYwGQF5LKpZdF8SN+37l0Gw8X9bFbhEoznhpkgJEjI4AERcHxbdG2kcijD/uEQ8DVve/+Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyfdNVg7ouLlevXNKExAzpZWaiblG/HCWorYCALg+Qlhzb1Q8Jg
-	7Fz/aYFxV0dYdskcsC6qAi/WF69JkMZ02YxxkxmnypV4oM69IowwZO/FGqHG2rCHG9g=
-X-Gm-Gg: ASbGncvGAkDV6K4eDva8l7kZFfK0aECQ4SsNzzaR+2g24YC3MrtVw7/0ZqcGdcK8V46
-	J2vy5m0l1KUEvGc7ZAtXUdDiAUc8E8hjDBUJcd1VRp/8NzlG6TXur1gy6bw3v1PLIXmJcAcx1xn
-	7s0PqX+3vjBe1ZCw2LWSnr2FCzqco9T+Co6iTAkzdoZ+Nb1vZIjPH8Zh8bhiF1QWows+E8an3S/
-	3JRxLlUCJvEknKcByXlloycatBH3s683uKtXhAlDLeMQ2Y49oUJ/4r2UtrIyWiuj+jaqDBNAqPQ
-	4G6ya8Dcrv9SDPq0YvYJ8f2wXPuLJOQlidsFGGPjulfVRx7gqHV/MluECE2avbH10gt6cjbGroD
-	TdR6TSCfyCIBNrqlngMHrfgiUfRXDSbBiL3M88UCBd+RAoH3xkDe0lRhhWXRHBrcqfpAhc+9P9e
-	Pyjq4ALzSA6mLkEA==
-X-Google-Smtp-Source: AGHT+IHYqlJ/DqUior2uObKb688W9mKskJnwhdBfDC1sLOPoqWKjn2HRpxRv5pN7HFxTPVj3Axvofg==
-X-Received: by 2002:a05:6870:46a8:b0:3e1:d34:4283 with SMTP id 586e51a60fabf-3e815aaa2a3mr850172fac.19.1762823862970;
-        Mon, 10 Nov 2025 17:17:42 -0800 (PST)
-Received: from mail.minyard.net ([2001:470:b8f6:1b:b4e9:19a3:cdaf:7174])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3e7d6f7a27dsm4076840fac.0.2025.11.10.17.17.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Nov 2025 17:17:41 -0800 (PST)
-Date: Mon, 10 Nov 2025 19:17:35 -0600
-From: Corey Minyard <corey@minyard.net>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Christian K??nig <christian.koenig@amd.com>,
-	"Dr. David Alan Gilbert" <linux@treblig.org>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
-	Rob Clark <robin.clark@oss.qualcomm.com>,
-	Matthew Brost <matthew.brost@intel.com>,
-	Hans Verkuil <hverkuil@kernel.org>,
-	Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Vitaly Lifshits <vitaly.lifshits@intel.com>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Niklas Cassel <cassel@kernel.org>, Calvin Owens <calvin@wbinvd.org>,
-	Sagi Maimon <maimon.sagi@gmail.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Karan Tilak Kumar <kartilak@cisco.com>,
-	Casey Schaufler <casey@schaufler-ca.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Petr Mladek <pmladek@suse.com>,
-	Max Kellermann <max.kellermann@ionos.com>,
-	Takashi Iwai <tiwai@suse.de>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	openipmi-developer@lists.sourceforge.net,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org, amd-gfx@lists.freedesktop.org,
-	linux-arm-msm@vger.kernel.org, freedreno@lists.freedesktop.org,
-	intel-xe@lists.freedesktop.org, linux-mmc@vger.kernel.org,
-	netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-	linux-pci@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
-	ceph-devel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-	linux-sound@vger.kernel.org,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Dmitry Baryshkov <lumag@kernel.org>,
-	Abhinav Kumar <abhinav.kumar@linux.dev>,
-	Jessica Zhang <jesszhan0024@gmail.com>, Sean Paul <sean@poorly.run>,
-	Marijn Suijten <marijn.suijten@somainline.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	Thomas Hellstr??m <thomas.hellstrom@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Krzysztof Wilczy??ski <kwilczynski@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Rodolfo Giometti <giometti@enneenne.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Stefan Haberland <sth@linux.ibm.com>,
-	Jan Hoeppner <hoeppner@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Satish Kharat <satishkh@cisco.com>,
-	Sesidhar Baddela <sebaddel@cisco.com>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
-Subject: Re: [PATCH v1 12/23] ipmi: Switch to use %ptSp
-Message-ID: <aRKOr2hyoqTnh85-@mail.minyard.net>
-Reply-To: corey@minyard.net
-References: <20251110184727.666591-1-andriy.shevchenko@linux.intel.com>
- <20251110184727.666591-13-andriy.shevchenko@linux.intel.com>
+	s=arc-20240116; t=1762823861; c=relaxed/simple;
+	bh=sdV9ZurrNAbiIi2HiLHriuN3gm5NNc9koWvEKJ/pm7w=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oV8VvnpFMZCyBqmqBT+QdGJaxVl/q9+pIN07nDTuhGlx/tPYC2yTSM8yAQ678hCdmkWSqUwdYY/Ukd6y8uK3zFuxQDBYJWGg9jNH1RsmOl/kZhFnWfJD8iQwcAT+MmcZI5Nbf/qhR1ZvYkPNjzPImVQiDW4fkwHBxim/SjbVNu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FYPUZCBJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 103F8C2BC86;
+	Tue, 11 Nov 2025 01:17:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762823860;
+	bh=sdV9ZurrNAbiIi2HiLHriuN3gm5NNc9koWvEKJ/pm7w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FYPUZCBJYBbZy5p3jil/+C0I/BN7NMI7eafABvGX7kOYIY4j7FrFwxe7go8F+8PXF
+	 zIZ3YWZ5nxqHyaxiCS5fNvH8mg+5PQU3VZsPPQ3wJy6SFha2PbdQNsVrzWVcjFX89A
+	 tnJUX2u/Um2I1CCBoZWdHFbCfqxASyI1zaEFTqsB176w4RMLvAXJVqu7pi9onfN/aS
+	 m9Ad9ktYad8Ve+CkJQRR/KuABcpqiYNk3s8FrzBb25S29bVuIFTcJwlSatBnamaEHz
+	 H+/QRC8sjusyDKWvEqJMpFEsi1fu6clZdBV3kSTBtsZW42tRZXIU1dPyZ/ffRFvQSb
+	 iCX9s9vNN2KJA==
+Date: Mon, 10 Nov 2025 17:17:39 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Zahari Doychev <zahari.doychev@linux.com>
+Cc: donald.hunter@gmail.com, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org, jacob.e.keller@intel.com,
+ ast@fiberby.net, matttbe@kernel.org, netdev@vger.kernel.org,
+ jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ johannes@sipsolutions.net
+Subject: Re: [PATCH v2 1/3] ynl: samples: add tc filter example
+Message-ID: <20251110171739.6c6cf31d@kernel.org>
+In-Reply-To: <20251106151529.453026-2-zahari.doychev@linux.com>
+References: <20251106151529.453026-1-zahari.doychev@linux.com>
+	<20251106151529.453026-2-zahari.doychev@linux.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251110184727.666591-13-andriy.shevchenko@linux.intel.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Nov 10, 2025 at 07:40:31PM +0100, Andy Shevchenko wrote:
-> Use %ptSp instead of open coded variants to print content of
-> struct timespec64 in human readable format.
-> 
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+On Thu,  6 Nov 2025 16:15:27 +0100 Zahari Doychev wrote:
+> diff --git a/tools/net/ynl/Makefile.deps b/tools/net/ynl/Makefile.deps
+> index 865fd2e8519e..96c390af060e 100644
+> --- a/tools/net/ynl/Makefile.deps
+> +++ b/tools/net/ynl/Makefile.deps
+> @@ -47,4 +47,5 @@ CFLAGS_tc:= $(call get_hdr_inc,__LINUX_RTNETLINK_H,rtnetlink.h) \
+>  	$(call get_hdr_inc,_TC_MIRRED_H,tc_act/tc_mirred.h) \
+>  	$(call get_hdr_inc,_TC_SKBEDIT_H,tc_act/tc_skbedit.h) \
+>  	$(call get_hdr_inc,_TC_TUNNEL_KEY_H,tc_act/tc_tunnel_key.h)
+> +CFLAGS_tc-filter-add:=$(CFLAGS_tc)
 
-Quite a bit neater, yes.
+Why do we need this? This file is intended for families themselves,
+if sample needs flags it should be specified in samples/Makefile ?
 
-Acked-by: Corey Minyard <cminyard@mvista.com>
-
-> ---
->  drivers/char/ipmi/ipmi_si_intf.c | 3 +--
->  drivers/char/ipmi/ipmi_ssif.c    | 6 ++----
->  2 files changed, 3 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/char/ipmi/ipmi_si_intf.c b/drivers/char/ipmi/ipmi_si_intf.c
-> index 70e55f5ff85e..5459ffdde8dc 100644
-> --- a/drivers/char/ipmi/ipmi_si_intf.c
-> +++ b/drivers/char/ipmi/ipmi_si_intf.c
-> @@ -275,8 +275,7 @@ void debug_timestamp(struct smi_info *smi_info, char *msg)
->  	struct timespec64 t;
->  
->  	ktime_get_ts64(&t);
-> -	dev_dbg(smi_info->io.dev, "**%s: %lld.%9.9ld\n",
-> -		msg, t.tv_sec, t.tv_nsec);
-> +	dev_dbg(smi_info->io.dev, "**%s: %ptSp\n", msg, &t);
->  }
->  #else
->  #define debug_timestamp(smi_info, x)
-> diff --git a/drivers/char/ipmi/ipmi_ssif.c b/drivers/char/ipmi/ipmi_ssif.c
-> index 1b63f7d2fcda..ef1582a029f4 100644
-> --- a/drivers/char/ipmi/ipmi_ssif.c
-> +++ b/drivers/char/ipmi/ipmi_ssif.c
-> @@ -1083,10 +1083,8 @@ static int sender(void *send_info, struct ipmi_smi_msg *msg)
->  		struct timespec64 t;
->  
->  		ktime_get_real_ts64(&t);
-> -		dev_dbg(&ssif_info->client->dev,
-> -			"**Enqueue %02x %02x: %lld.%6.6ld\n",
-> -			msg->data[0], msg->data[1],
-> -			(long long)t.tv_sec, (long)t.tv_nsec / NSEC_PER_USEC);
-> +		dev_dbg(&ssif_info->client->dev, "**Enqueue %02x %02x: %ptSp\n",
-> +			msg->data[0], msg->data[1], &t);
->  	}
->  	return IPMI_CC_NO_ERROR;
->  }
-> -- 
-> 2.50.1
-> 
+>  CFLAGS_tcp_metrics:=$(call get_hdr_inc,_LINUX_TCP_METRICS_H,tcp_metrics.h)
 
