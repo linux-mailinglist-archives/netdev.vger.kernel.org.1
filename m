@@ -1,585 +1,272 @@
-Return-Path: <netdev+bounces-237573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0215AC4D525
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 12:10:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A2991C4D536
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 12:11:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C46F18C5D2F
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 11:03:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7F56A18E0448
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 11:04:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B09DF354AF3;
-	Tue, 11 Nov 2025 11:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 175A033FE0F;
+	Tue, 11 Nov 2025 11:02:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="R/SF8wuf";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="tyvCvYZ5";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="R/SF8wuf";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="tyvCvYZ5"
+	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="SeIq6w5u"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from PA4PR04CU001.outbound.protection.outlook.com (mail-francecentralazon11013013.outbound.protection.outlook.com [40.107.162.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39DC7354ADA
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 11:01:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762858895; cv=none; b=Ou63LZfFY169+Jok1neGlEjX31dtIu6puMLDQFizGELhLUscR2ROjVWxG0Ivgt/FXHss9WDCSxxlq8OIOY+5UD263zljGMK0vydYTZlpPYJRztt0vXI1+qvc+q1reMAFmzFtx1OzaJ23lRO15cIG6vi14W6543bvA7cy2YnpRYU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762858895; c=relaxed/simple;
-	bh=eurXhqdivXv0KRTmNXzmarIKKNOuugWm8/37QAkMAko=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oC5NK3Bibs6UHnFn5VvSnFCLuEecOkqRpmcoQb249tupQAqj0EAPvk5K75FkhANhXIxPlC0BNp8A1f8grLsD7nFpt+ps1mzZ8W5Mk3lZaxi5y6xTbUqCY1cwJCgycpdWOIk/AdE59/4hIyrsiWissKLprAsomXU5oD6Z5b1pr4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=R/SF8wuf; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=tyvCvYZ5; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=R/SF8wuf; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=tyvCvYZ5; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 840CF1F750;
-	Tue, 11 Nov 2025 11:01:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1762858890; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=q0xIfy6Adj2vTJvQP9AjqPtLnU8M8pTVdFLFRqnVOck=;
-	b=R/SF8wufIMyxCRQr4XMRcIxPtTJeWN2jnT9iLxCdg/V+eDziZBN6hCl06KqUhNn272vyuI
-	8i2m+KVM9wdnlof/wSdKV25BWTPJRNtPTyiOXlCFabklKSfrlBEwwas85EZbmVNiwtU7ro
-	pMSyBDpTpus7je5SUgz6CQ2xYjS/dHk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1762858890;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=q0xIfy6Adj2vTJvQP9AjqPtLnU8M8pTVdFLFRqnVOck=;
-	b=tyvCvYZ5PrB6TX5lw4ufWg3PufNnXuFh1izpDbnSfRJg9PYA3PHucLiBWkGoowB3vb7+Da
-	X5mmdK0p2foU7MBA==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1762858890; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=q0xIfy6Adj2vTJvQP9AjqPtLnU8M8pTVdFLFRqnVOck=;
-	b=R/SF8wufIMyxCRQr4XMRcIxPtTJeWN2jnT9iLxCdg/V+eDziZBN6hCl06KqUhNn272vyuI
-	8i2m+KVM9wdnlof/wSdKV25BWTPJRNtPTyiOXlCFabklKSfrlBEwwas85EZbmVNiwtU7ro
-	pMSyBDpTpus7je5SUgz6CQ2xYjS/dHk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1762858890;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=q0xIfy6Adj2vTJvQP9AjqPtLnU8M8pTVdFLFRqnVOck=;
-	b=tyvCvYZ5PrB6TX5lw4ufWg3PufNnXuFh1izpDbnSfRJg9PYA3PHucLiBWkGoowB3vb7+Da
-	X5mmdK0p2foU7MBA==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 625B714908;
-	Tue, 11 Nov 2025 11:01:30 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id Ys/+F4oXE2lQTQAAD6G6ig
-	(envelope-from <jack@suse.cz>); Tue, 11 Nov 2025 11:01:30 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id E492CA28C8; Tue, 11 Nov 2025 12:01:29 +0100 (CET)
-Date: Tue, 11 Nov 2025 12:01:29 +0100
-From: Jan Kara <jack@suse.cz>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Miklos Szeredi <miklos@szeredi.hu>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
-	Chuck Lever <chuck.lever@oracle.com>, Alexander Aring <alex.aring@gmail.com>, 
-	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
-	Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Danilo Krummrich <dakr@kernel.org>, David Howells <dhowells@redhat.com>, 
-	Tyler Hicks <code@tyhicks.com>, NeilBrown <neil@brown.name>, 
-	Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
-	Amir Goldstein <amir73il@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Carlos Maiolino <cem@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, 
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, netfs@lists.linux.dev, 
-	ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org, linux-xfs@vger.kernel.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v5 03/17] filelock: add struct delegated_inode
-Message-ID: <xzmaeyzqevtqmtt2nppyjmj6k7qdiu66wxytjr2hiolesxwzyb@7vz6zvpz32ob>
-References: <20251105-dir-deleg-ro-v5-0-7ebc168a88ac@kernel.org>
- <20251105-dir-deleg-ro-v5-3-7ebc168a88ac@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D4A82EAB61;
+	Tue, 11 Nov 2025 11:02:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.162.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762858974; cv=fail; b=S7lH3dBITkTw/5auu3XkfMk2EC/vfxf6rflhvYSDGWIDLCa429MfdlLceIk3RJfvUokWVBE0jxyXJrirdcOQR/XyFXKwJ2Q5YiqZGXM6Ly7Gf1Gs305CnptmqKRI8xkRGiwSQKfHa6NVErzDIrk2POqK217bMSeEEdsPx9/axvE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762858974; c=relaxed/simple;
+	bh=97rB6o63dt3y79G+ucbUVg6Ch7U1knynuWb4k8FfkAk=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=u8WkNBTOZHNWS9pP6gnrd9Au0NIyzpCu5Uv6JOACmMaitJjH+ZNYqVk8kc1Nfa7zQfvhfxWDQnT0GugewMRw0CDGvokM6LjzkyDcKxv4UjjN5A3IWBTmI36mRUZqgquaB3HpSMCaqVRHnA91ex5LJyvZudQlWjXSpfzGFEhWTRg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=SeIq6w5u; arc=fail smtp.client-ip=40.107.162.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=RyeFzosXQLQKV6ZBXqMt5p3HTf4B+Jj7nGfeswTrLlrT/x3g0FGYuj8Kb0YmxN2nmcp9iEHq1TtCJiQ0SFq1tILkWV4TJVZZNVIL8odik0u5Kp6b0wf7tT7+7BXChFhM5Oibp26V5RTa0J/odrmt8yNxmdiIj0ITyS9nJsloEN9pCazYThTu3Imk3nih0C9e719ebGKePdltDKtOOwG1gR4qzVrM/UaSWr97PyEBd+FEBtshnzdxizGnhwccHkPlmIfWXdJ0xU9fYqyJwswyWApRCGE7Spi7BG7Coiv2h6k7Zd20t7GPBMsgUcPP0aVwpC77OucssnNepEEvnrCRCw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=97rB6o63dt3y79G+ucbUVg6Ch7U1knynuWb4k8FfkAk=;
+ b=nJkz8riapdT52MJkDDXflS6SHwE2rfUuhzbcH0NsGu88we/arcDWKfIhvJtLPzciPc8QcLPT3a99qI9WRa24Yx69flNuGrEsJfWQAmqzJwWUZK+QlRaA0NO8IkGu5BTFnN5aUR0gUduypZOQEQOHDNMBSCRwO2Hb4b2nonvCe1KA+ziNjNawPgO6v7zRB1cyBoYFRnEcorajNl6adXJ9g/KpgTXdk4LCoUu84kE57oKbSReTPiWwkoSf21Gak3Xc0CO4DwerEESP+/7x5mrTh1twrjj4wOWhUbrNsmAkTiqpGHQutfVAic1nm1MDkbdZlrJ/57OLN06TlhXlcBD9hA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nokia-bell-labs.com; dmarc=pass action=none
+ header.from=nokia-bell-labs.com; dkim=pass header.d=nokia-bell-labs.com;
+ arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=97rB6o63dt3y79G+ucbUVg6Ch7U1knynuWb4k8FfkAk=;
+ b=SeIq6w5uzaf0EdjR8XZas5fCs1v+NPpsv9rFhkii4fu0S2lcYP/BYkadjhsKVt4JXj4fXKbuom7OGw/F62Pu7LvVjjREqh2JK1T2lX/sJI1ZQ7vw7/49814AMp/JgCA20amKmAC5MCyuRuw2yE1M04tpTC9a8oWEh+YJELUqZe6h5Ppqe3p4yXeWw1UNc7u5Ih/FXNlgQgC4PiuIXIsSdRJcOcZaGpeXyF5239FNq4bJ2B7s4UijBwuxKQjv47fN6UaBj1R5Xg+Qym9fJzZRbyGGU/YgI2btSn1/pWdVwk/ZYMIsgqflkAKM48DqtAAhy8FcxDt/FE23J8gILMGZNw==
+Received: from PAXPR07MB7984.eurprd07.prod.outlook.com (2603:10a6:102:133::12)
+ by VI1PR07MB6335.eurprd07.prod.outlook.com (2603:10a6:800:136::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.16; Tue, 11 Nov
+ 2025 11:02:47 +0000
+Received: from PAXPR07MB7984.eurprd07.prod.outlook.com
+ ([fe80::b7f8:dc0a:7e8d:56]) by PAXPR07MB7984.eurprd07.prod.outlook.com
+ ([fe80::b7f8:dc0a:7e8d:56%2]) with mapi id 15.20.9298.015; Tue, 11 Nov 2025
+ 11:02:47 +0000
+From: "Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>
+To: Paolo Abeni <pabeni@redhat.com>, "edumazet@google.com"
+	<edumazet@google.com>, "parav@nvidia.com" <parav@nvidia.com>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, "corbet@lwn.net"
+	<corbet@lwn.net>, "horms@kernel.org" <horms@kernel.org>, "dsahern@kernel.org"
+	<dsahern@kernel.org>, "kuniyu@google.com" <kuniyu@google.com>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "dave.taht@gmail.com" <dave.taht@gmail.com>,
+	"jhs@mojatatu.com" <jhs@mojatatu.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"stephen@networkplumber.org" <stephen@networkplumber.org>,
+	"xiyou.wangcong@gmail.com" <xiyou.wangcong@gmail.com>, "jiri@resnulli.us"
+	<jiri@resnulli.us>, "davem@davemloft.net" <davem@davemloft.net>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "donald.hunter@gmail.com"
+	<donald.hunter@gmail.com>, "ast@fiberby.net" <ast@fiberby.net>,
+	"liuhangbin@gmail.com" <liuhangbin@gmail.com>, "shuah@kernel.org"
+	<shuah@kernel.org>, "linux-kselftest@vger.kernel.org"
+	<linux-kselftest@vger.kernel.org>, "ij@kernel.org" <ij@kernel.org>,
+	"ncardwell@google.com" <ncardwell@google.com>, "Koen De Schepper (Nokia)"
+	<koen.de_schepper@nokia-bell-labs.com>, "g.white@cablelabs.com"
+	<g.white@cablelabs.com>, "ingemar.s.johansson@ericsson.com"
+	<ingemar.s.johansson@ericsson.com>, "mirja.kuehlewind@ericsson.com"
+	<mirja.kuehlewind@ericsson.com>, cheshire <cheshire@apple.com>,
+	"rs.ietf@gmx.at" <rs.ietf@gmx.at>, "Jason_Livingood@comcast.com"
+	<Jason_Livingood@comcast.com>, Vidhi Goel <vidhi_goel@apple.com>
+Subject: RE: [PATCH v5 net-next 10/14] tcp: accecn: retransmit SYN/ACK without
+ AccECN option or non-AccECN SYN/ACK
+Thread-Topic: [PATCH v5 net-next 10/14] tcp: accecn: retransmit SYN/ACK
+ without AccECN option or non-AccECN SYN/ACK
+Thread-Index: AQHcSapcgflniMzwkEOUH36l3bIQK7TlmHeAgAS10oA=
+Date: Tue, 11 Nov 2025 11:02:47 +0000
+Message-ID:
+ <PAXPR07MB7984CE5A8244BCE2D4911A0CA3CFA@PAXPR07MB7984.eurprd07.prod.outlook.com>
+References: <20251030143435.13003-1-chia-yu.chang@nokia-bell-labs.com>
+ <20251030143435.13003-11-chia-yu.chang@nokia-bell-labs.com>
+ <d1045b08-2cc9-42c7-816b-ba467c27086c@redhat.com>
+In-Reply-To: <d1045b08-2cc9-42c7-816b-ba467c27086c@redhat.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nokia-bell-labs.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PAXPR07MB7984:EE_|VI1PR07MB6335:EE_
+x-ms-office365-filtering-correlation-id: 9d753ff7-1ba2-4557-fc54-08de2111d967
+x-ld-processed: 5d471751-9675-428d-917b-70f44f9630b0,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|366016|376014|7416014|1800799024|38070700021|921020;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?MGxXUStLU05JYktncm1uVnBzeHg2TExMMWM4Y0pTSEZ5dFVOdTNRdmJvNlhW?=
+ =?utf-8?B?ZE9UcFZoek5jYW9ldHF5VFl0dmlHRXFqNWp3eFNvZlg0SFlCUHpTbk1tUEdT?=
+ =?utf-8?B?bUhZYW5kdE02c1A3YlF0WlVxQzBNTUJZZlk0SkN0bTVHZi9jMEYrbmhKWHNh?=
+ =?utf-8?B?Y1JKMG1FSU5WZFF5QTlKOHFUWk9BeE94WnZrWERIZUhoSGc1aU5UVGdacEdO?=
+ =?utf-8?B?SzRubWlIVTlzSXozbmRWVDJsby9Wbkl2NEtkVWtnRlFxN2NWVGd4bDA0c1VE?=
+ =?utf-8?B?bEt3NzVGbDNXVitYTkVxOWdHWGtUU2JPdDZXNUp5QlgwQ0NpbDRLSVJYWElO?=
+ =?utf-8?B?bE9RRzhHZ3ZMS205RzdNQ3A0SEV5ZU9kUGFpSUxta1RoZTZoTEtoRE1hdEpV?=
+ =?utf-8?B?TGIrSG9iOG5HSXZhemF5QzNhMG1hc0Fkem03blBkSWt6c3ZmbTFod1hsVGh1?=
+ =?utf-8?B?ZnpTZVU4K2wzQm1wZWlVLys1c2VHVG5RVTM3c0FBSXlmcnFGM3lCMVM2RlhH?=
+ =?utf-8?B?NU9RQXZkNVZ4bHd1dHFHSklnams4dDlqb1ViMjBObkFkQmQrcmVNUlUvakZS?=
+ =?utf-8?B?eld6M1dMQjBOanEyLy81clJiaGZGUlBaTmY4OWtsTGk5M3dpUnhOUW82ZmhB?=
+ =?utf-8?B?eFRHZVVaSlZnUjViVEUrK3NQbk9BQUV6U0tSZjdBUFgzWFQ0N00xbjh1MXpx?=
+ =?utf-8?B?bTAzeWQwa2JDMk5XTm9ETTNiYU1QREVNbWpRSEZXZllzSnROdWNuZnB4RTRu?=
+ =?utf-8?B?enNDVExmN2JLMmFJR3QvZlVFOEl6SDZBZTQ2YURqTzdsTmlkUnpDMWYyT1Jr?=
+ =?utf-8?B?Q1NYRDM3bitjS0RKdjNMVnRBUUV0QXIvdzlpcGpuZWVnR3QzQ0dGSXFoaWww?=
+ =?utf-8?B?ZEx3ZktKelptLzM2OERiWFRpd2tsV3U1MVNNTGNHd0FzczJZbWcrN0pwNTgw?=
+ =?utf-8?B?L1Z3UkVMVXNnS25WaWhPOHVyK2Z5NnJPM0kvUFBtT2Q0QjB1b3VwTXhHOXJo?=
+ =?utf-8?B?NUo2NEp3azRxZVdHMnUrVTRoaWtnVVE5QUFYYzhFcXlscXoxZGpjWVBwdGNv?=
+ =?utf-8?B?U0w4REZFYURESmVuSVZmbWJpV01ONEFIL2ZGNlJOTTBtWk91WTJBU3JTQlNO?=
+ =?utf-8?B?Y2hRaHByL1R4UUMyR3JCeU5LNzM3YVBCRm9OVUw3ME9MVGlxN3Z0QkV5YVEr?=
+ =?utf-8?B?VEo2d2ZtdWRHdkl6cWN0cXdENy9Oa2hZNWYvWG9hRXI4SUZUeWJQaTdDUzVx?=
+ =?utf-8?B?NFU2OFl1K1dXeFV2L2ZSTm1rWjMvaWN1K25VemVsQ0hOK3dEeXROWTBOTER1?=
+ =?utf-8?B?UElPT01aSXFZMkxyWUJwQjVzeW40N2NvdkxUcGRuSm9WbnpVMnpYaDNCUmxF?=
+ =?utf-8?B?MFdnU1lINUlQRCs4NE1LOVgzRnlYakJUUGlOaFZFN1V3ZmVvaWpGbFJUeE0r?=
+ =?utf-8?B?V0locnVJcEhxV095V0t4SzF4L0NMemc4N1BxUWcxeGl4ZWd5eTh4QU9GZHVY?=
+ =?utf-8?B?TUZoUElPcVRoV3I1Uzlob2JWOWMvSGJxWjl2WWt0K2hVRW9xQXgweVBlWk1r?=
+ =?utf-8?B?NzlzWjhkZEx2dkM5OXJnSldQdGVQVVRBdEhpZGhHOU5UUURjaGsyai9DYVJp?=
+ =?utf-8?B?OG9yOWlLRnJEUWpxbFJieE54bnJwVVV5Wkd3ZU0yNU5CeEorZEZGcXVPczhp?=
+ =?utf-8?B?WWJqbm9UZjFaTURiSkIybkhjR3FkbDF6b2E3bnJkWWRUMDNwSXlSYkY1ajlZ?=
+ =?utf-8?B?T0QyeUk0Tml3OXpHa0ExZXp3S2lIRWhrZk13NmZQVjhPdFk5YWZzNzZuRDJI?=
+ =?utf-8?B?ck1KbTNuWklOSERNL1YvY20zWExET2JpbjUzOGJoMzR5b1h2S2ROYTcybE5z?=
+ =?utf-8?B?dHlQd0NlM21NVkhYcVBkYjQwdDVCWkEvanpNV1RrZC83MlE3bW1VNGdEOXcw?=
+ =?utf-8?B?QW4yc1ZVaDhYSEpjaVRyMk1MWVdQbC9PZXpWMXFVU0Z2anBkQXpOU1lGUUNS?=
+ =?utf-8?B?cy9PaWs0cjRMdHMzaHZXaFd4K3llVDB6a1J4c1FvUU9oUnlkRnRHcmJYM0k5?=
+ =?utf-8?B?Y0FmZGRLS1FnckczanRSRnY2aUVxM3FvQy9BZz09?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR07MB7984.eurprd07.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(38070700021)(921020);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?VFNTNElKakJkZUdjL2xPRFZRRWs4ODZFb3loSVpJMUZIK2c2SXk3Q3hBaGZH?=
+ =?utf-8?B?WmJxNnVhaktNdXF0aWNheUkwM0Fzamx6dlY2VC83eUtITlNaa2tzVW9WdXIy?=
+ =?utf-8?B?UGFyWjNqSzE4RXBjWWhDUUJjQmpMdXU3aStwQzdxcHRmT29haXZiZGVNWno1?=
+ =?utf-8?B?TGxIdFppUUtnQ1IwRXBWQnZpNlI5aUZHODF5M25QTmo2and0eHBuakpVSVho?=
+ =?utf-8?B?dGNvYVBoUVdQUENoSjdqZ0QzRG1TdDNnYUgxRmh1NUc3c0RYRnBLNkdkSzA1?=
+ =?utf-8?B?VjY1SDRtb0FBYTdpVlhkSkE3ZTJOOG5KTmhWM1VkNEJtVkZabTJkTXRDcVI4?=
+ =?utf-8?B?WjF0Y3A2QlNyKy9LZS9WNFZiL2xzZE4yNzhXckUzaUEvanMrQkc2Nkp0ZWxa?=
+ =?utf-8?B?UTdqNUxyQkxVQW16MHNIZTJSdHpWMmRHeVJzcFNLRmNiMHBObHJrSzJ5VDRH?=
+ =?utf-8?B?bmxHMXQ3cmk5ZEI5T0U0ajdvNWYrbnZ2MzFGdEYva1hBNDA4NjVGbytBdFIz?=
+ =?utf-8?B?R2FZU0kyYytrM2JmZkJ3MmVKNFFXY3hWMHJ5TzRZUVQ2N1V3SmF2VE1xZlBm?=
+ =?utf-8?B?T2RzTlRrbWM3QWxPNFljcU1vc2JPdTNESUNtQndCRHpFcEszOGg1U0pJNGY2?=
+ =?utf-8?B?aC9MRDd0cEdHZmVJckhmS3hlc0VpT1FLamdTUU1mYVRDQ0N6enFkb25ac0JK?=
+ =?utf-8?B?ZHQvRS9pVWVxbkdGRlRwbmxkNXR4bG5IZy9aMW9DdllIVDZwS2NRdG1UZTFK?=
+ =?utf-8?B?T3JwMHRYWGtRUzE0dzB2LzY1NXltQmp4Q2VWdzh3NEZMUFlic3pSQlBvRG80?=
+ =?utf-8?B?Y09nYWd4NXIrd1B2bWVnSTRsbEVxdWhTbFdFNHBTZXE4bnlaYUYwc0w5dnZh?=
+ =?utf-8?B?Y1Q0UGZEcUtpYzk2TVBldFpvQnB2YWNRSFcvQ2l2RzVKbEhkdGVyTDNWcnJF?=
+ =?utf-8?B?Vk9zQkRkVGxsckd0ei9MN1ZaaWUyYnZLNHZseHdPbDFyUytVWHRGL1hpTGNL?=
+ =?utf-8?B?anljOHBZZDNHSko5NnVrWDI2TGs3aGFWMVB4RlFtNll1RFp3NmpycWszQm1w?=
+ =?utf-8?B?SmFad1RlNS9QSW8zaU04dnEvL0I4WnNyaU9GU2pYU3NSMWVCbXpha0c3dDFL?=
+ =?utf-8?B?ZG9uOHVoS3hQOFlwNnoyY0N3T245ZjkyWi92UWFHOEQwNGlBZm9UaGx2STBn?=
+ =?utf-8?B?emV2QllNSEZiOVJVTklyVmNVTHhQNjRYS3JDemlydXNER252ZFZHQXJWTlNL?=
+ =?utf-8?B?VGVhOUxnQ3hLbnZhdDFza2s0eW1WYXlLS1dsQ01MeS9PSlYvNXFBSUJmcVpH?=
+ =?utf-8?B?NTZPMFRRQUJVcFZCcWJsY285MjlLTFdGaUJHekZ3VTVKOUEyRldlYldYQnpD?=
+ =?utf-8?B?WFBBRUxsMUNua0prZ3FKVy9oMVBNbDB1RTRKT1BWSkFtQUU5VWliZHJyb05N?=
+ =?utf-8?B?WkFTKzBreVo5L1lpYUNOdTNxSjBjV3R0SGNSOEVhMjZFNkg2U21lTEFmRU92?=
+ =?utf-8?B?R2FxUFQycTM1eVV5RkNmUFNTV0x4QnZFbXp6M2RNZTUvaGlTdnVaMWhhMlN2?=
+ =?utf-8?B?Z2ZKVEU3SktVTjNJNkdQckprWXB0ZzVTdjdIam1HenhYZ2taRytNSFB3Y1dK?=
+ =?utf-8?B?UVc1VTg5YVZrQW5mQXp6R0lHWkYwR3RtT21YSFNLdDJYVWpXMExhS1Z6d0l4?=
+ =?utf-8?B?eVVxV2pDK1l2ditJY2hLYzVFYTc5TlU0QlYzRFA1ZlZGMktnaGZzMkxzT3cv?=
+ =?utf-8?B?b042NnBsdnR4V3A1aTRwWmEvTXBGUEp3QndhOW9aNGVTckpqNEVUWmwvaERU?=
+ =?utf-8?B?UFhXWkNVRWZIaEdLU2hnOFY1ZGczSmx0aWtZeWVZVW45NGdBYURSWDN1WGtk?=
+ =?utf-8?B?L3JYSEFpbEpaeEt5NmpTamlaZ2liNFFtVmt4Ujk4QnBwbTdKcHVDZFdiUVNP?=
+ =?utf-8?B?L3B5R3k4RDFVMkRaVi9OZlZyYWQveFo4a2xUajAxRzdocXJGVjVYdHpkOEFs?=
+ =?utf-8?B?QjB5VVB4VTBsR3dESWhiZ0N1SUlnL2tGTk0wTk82bTZlMkFhT0d4WnBlVlFP?=
+ =?utf-8?B?SE9XalNWb2p2UTJzQ0tyekFhdENwWkRDcGFTa0k3MFJZVHJkbGI3a0prTHJz?=
+ =?utf-8?B?MmF6c04yWmh1VzBWZHRVa0U2NDg2eUJXcUhQbUo5Y1VETEU3d014RVJvdWdC?=
+ =?utf-8?B?elE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251105-dir-deleg-ro-v5-3-7ebc168a88ac@kernel.org>
-X-Spamd-Result: default: False [-2.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_TLS_LAST(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	RCVD_COUNT_THREE(0.00)[3];
-	RCPT_COUNT_TWELVE(0.00)[44];
-	MIME_TRACE(0.00)[0:+];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[szeredi.hu,zeniv.linux.org.uk,kernel.org,suse.cz,oracle.com,gmail.com,samba.org,manguebit.org,microsoft.com,talpey.com,linuxfoundation.org,redhat.com,tyhicks.com,brown.name,chromium.org,google.com,davemloft.net,vger.kernel.org,lists.samba.org,lists.linux.dev];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	MISSING_XM_UA(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RL63fqwwx8ot6gmekemcs76f9d)];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.cz:email,suse.com:email]
-X-Spam-Flag: NO
-X-Spam-Score: -2.30
-X-Spam-Level: 
+X-OriginatorOrg: nokia-bell-labs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR07MB7984.eurprd07.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9d753ff7-1ba2-4557-fc54-08de2111d967
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Nov 2025 11:02:47.8434
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 5d471751-9675-428d-917b-70f44f9630b0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: YbUsWPcoeXtg5ajvq0xm4vje9N6DR3Qx9Q/h3r25sLUG6ELlma00SRO4phRLhjcXI6P+1gsUl4eVaJpW1Zsymxxvra9Bdc+KL62al4cvB8H1YMRzuZ9W34Xo8AOumIwa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR07MB6335
 
-On Wed 05-11-25 11:53:49, Jeff Layton wrote:
-> The current API requires a pointer to an inode pointer. It's easy for
-> callers to get this wrong. Add a new delegated_inode structure and use
-> that to pass back any inode that needs to be waited on.
-> 
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
-
-I didn't find anything particularly problematic with struct inode ** but I
-agree this seems a tad bit cleaner and harder to get wrong. So feel free to
-add:
-
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
-> ---
->  fs/attr.c                |  2 +-
->  fs/namei.c               | 18 +++++++++---------
->  fs/open.c                |  8 ++++----
->  fs/posix_acl.c           |  8 ++++----
->  fs/utimes.c              |  4 ++--
->  fs/xattr.c               | 12 ++++++------
->  include/linux/filelock.h | 36 +++++++++++++++++++++++++++---------
->  include/linux/fs.h       |  9 +++++----
->  include/linux/xattr.h    |  4 ++--
->  9 files changed, 60 insertions(+), 41 deletions(-)
-> 
-> diff --git a/fs/attr.c b/fs/attr.c
-> index 795f231d00e8eaaadf5b62f241655cb4b69cb507..b9ec6b47bab2fc2b561677b639633bd32994022f 100644
-> --- a/fs/attr.c
-> +++ b/fs/attr.c
-> @@ -415,7 +415,7 @@ EXPORT_SYMBOL(may_setattr);
->   * performed on the raw inode simply pass @nop_mnt_idmap.
->   */
->  int notify_change(struct mnt_idmap *idmap, struct dentry *dentry,
-> -		  struct iattr *attr, struct inode **delegated_inode)
-> +		  struct iattr *attr, struct delegated_inode *delegated_inode)
->  {
->  	struct inode *inode = dentry->d_inode;
->  	umode_t mode = inode->i_mode;
-> diff --git a/fs/namei.c b/fs/namei.c
-> index 7377020a2cba02501483020e0fc93c279fb38d3e..bf42f146f847a5330fc581595c7256af28d9db90 100644
-> --- a/fs/namei.c
-> +++ b/fs/namei.c
-> @@ -4648,7 +4648,7 @@ SYSCALL_DEFINE1(rmdir, const char __user *, pathname)
->   * raw inode simply pass @nop_mnt_idmap.
->   */
->  int vfs_unlink(struct mnt_idmap *idmap, struct inode *dir,
-> -	       struct dentry *dentry, struct inode **delegated_inode)
-> +	       struct dentry *dentry, struct delegated_inode *delegated_inode)
->  {
->  	struct inode *target = dentry->d_inode;
->  	int error = may_delete(idmap, dir, dentry, 0);
-> @@ -4706,7 +4706,7 @@ int do_unlinkat(int dfd, struct filename *name)
->  	struct qstr last;
->  	int type;
->  	struct inode *inode = NULL;
-> -	struct inode *delegated_inode = NULL;
-> +	struct delegated_inode delegated_inode = { };
->  	unsigned int lookup_flags = 0;
->  retry:
->  	error = filename_parentat(dfd, name, lookup_flags, &path, &last, &type);
-> @@ -4743,7 +4743,7 @@ int do_unlinkat(int dfd, struct filename *name)
->  	if (inode)
->  		iput(inode);	/* truncate the inode here */
->  	inode = NULL;
-> -	if (delegated_inode) {
-> +	if (is_delegated(&delegated_inode)) {
->  		error = break_deleg_wait(&delegated_inode);
->  		if (!error)
->  			goto retry_deleg;
-> @@ -4892,7 +4892,7 @@ SYSCALL_DEFINE2(symlink, const char __user *, oldname, const char __user *, newn
->   */
->  int vfs_link(struct dentry *old_dentry, struct mnt_idmap *idmap,
->  	     struct inode *dir, struct dentry *new_dentry,
-> -	     struct inode **delegated_inode)
-> +	     struct delegated_inode *delegated_inode)
->  {
->  	struct inode *inode = old_dentry->d_inode;
->  	unsigned max_links = dir->i_sb->s_max_links;
-> @@ -4968,7 +4968,7 @@ int do_linkat(int olddfd, struct filename *old, int newdfd,
->  	struct mnt_idmap *idmap;
->  	struct dentry *new_dentry;
->  	struct path old_path, new_path;
-> -	struct inode *delegated_inode = NULL;
-> +	struct delegated_inode delegated_inode = { };
->  	int how = 0;
->  	int error;
->  
-> @@ -5012,7 +5012,7 @@ int do_linkat(int olddfd, struct filename *old, int newdfd,
->  			 new_dentry, &delegated_inode);
->  out_dput:
->  	end_creating_path(&new_path, new_dentry);
-> -	if (delegated_inode) {
-> +	if (is_delegated(&delegated_inode)) {
->  		error = break_deleg_wait(&delegated_inode);
->  		if (!error) {
->  			path_put(&old_path);
-> @@ -5098,7 +5098,7 @@ int vfs_rename(struct renamedata *rd)
->  	struct inode *new_dir = d_inode(rd->new_parent);
->  	struct dentry *old_dentry = rd->old_dentry;
->  	struct dentry *new_dentry = rd->new_dentry;
-> -	struct inode **delegated_inode = rd->delegated_inode;
-> +	struct delegated_inode *delegated_inode = rd->delegated_inode;
->  	unsigned int flags = rd->flags;
->  	bool is_dir = d_is_dir(old_dentry);
->  	struct inode *source = old_dentry->d_inode;
-> @@ -5261,7 +5261,7 @@ int do_renameat2(int olddfd, struct filename *from, int newdfd,
->  	struct path old_path, new_path;
->  	struct qstr old_last, new_last;
->  	int old_type, new_type;
-> -	struct inode *delegated_inode = NULL;
-> +	struct delegated_inode delegated_inode = { };
->  	unsigned int lookup_flags = 0, target_flags =
->  		LOOKUP_RENAME_TARGET | LOOKUP_CREATE;
->  	bool should_retry = false;
-> @@ -5369,7 +5369,7 @@ int do_renameat2(int olddfd, struct filename *from, int newdfd,
->  exit3:
->  	unlock_rename(new_path.dentry, old_path.dentry);
->  exit_lock_rename:
-> -	if (delegated_inode) {
-> +	if (is_delegated(&delegated_inode)) {
->  		error = break_deleg_wait(&delegated_inode);
->  		if (!error)
->  			goto retry_deleg;
-> diff --git a/fs/open.c b/fs/open.c
-> index 3d64372ecc675e4795eb0a0deda10f8f67b95640..fdaa6f08f6f4cac5c2fefd3eafa5e430e51f3979 100644
-> --- a/fs/open.c
-> +++ b/fs/open.c
-> @@ -631,7 +631,7 @@ SYSCALL_DEFINE1(chroot, const char __user *, filename)
->  int chmod_common(const struct path *path, umode_t mode)
->  {
->  	struct inode *inode = path->dentry->d_inode;
-> -	struct inode *delegated_inode = NULL;
-> +	struct delegated_inode delegated_inode = { };
->  	struct iattr newattrs;
->  	int error;
->  
-> @@ -651,7 +651,7 @@ int chmod_common(const struct path *path, umode_t mode)
->  			      &newattrs, &delegated_inode);
->  out_unlock:
->  	inode_unlock(inode);
-> -	if (delegated_inode) {
-> +	if (is_delegated(&delegated_inode)) {
->  		error = break_deleg_wait(&delegated_inode);
->  		if (!error)
->  			goto retry_deleg;
-> @@ -756,7 +756,7 @@ int chown_common(const struct path *path, uid_t user, gid_t group)
->  	struct mnt_idmap *idmap;
->  	struct user_namespace *fs_userns;
->  	struct inode *inode = path->dentry->d_inode;
-> -	struct inode *delegated_inode = NULL;
-> +	struct delegated_inode delegated_inode = { };
->  	int error;
->  	struct iattr newattrs;
->  	kuid_t uid;
-> @@ -791,7 +791,7 @@ int chown_common(const struct path *path, uid_t user, gid_t group)
->  		error = notify_change(idmap, path->dentry, &newattrs,
->  				      &delegated_inode);
->  	inode_unlock(inode);
-> -	if (delegated_inode) {
-> +	if (is_delegated(&delegated_inode)) {
->  		error = break_deleg_wait(&delegated_inode);
->  		if (!error)
->  			goto retry_deleg;
-> diff --git a/fs/posix_acl.c b/fs/posix_acl.c
-> index 4050942ab52f95741da2df13d191ade5c5ca12a2..768f027c142811ea907fe8545155ba7abd016305 100644
-> --- a/fs/posix_acl.c
-> +++ b/fs/posix_acl.c
-> @@ -1091,7 +1091,7 @@ int vfs_set_acl(struct mnt_idmap *idmap, struct dentry *dentry,
->  	int acl_type;
->  	int error;
->  	struct inode *inode = d_inode(dentry);
-> -	struct inode *delegated_inode = NULL;
-> +	struct delegated_inode delegated_inode = { };
->  
->  	acl_type = posix_acl_type(acl_name);
->  	if (acl_type < 0)
-> @@ -1141,7 +1141,7 @@ int vfs_set_acl(struct mnt_idmap *idmap, struct dentry *dentry,
->  out_inode_unlock:
->  	inode_unlock(inode);
->  
-> -	if (delegated_inode) {
-> +	if (is_delegated(&delegated_inode)) {
->  		error = break_deleg_wait(&delegated_inode);
->  		if (!error)
->  			goto retry_deleg;
-> @@ -1212,7 +1212,7 @@ int vfs_remove_acl(struct mnt_idmap *idmap, struct dentry *dentry,
->  	int acl_type;
->  	int error;
->  	struct inode *inode = d_inode(dentry);
-> -	struct inode *delegated_inode = NULL;
-> +	struct delegated_inode delegated_inode = { };
->  
->  	acl_type = posix_acl_type(acl_name);
->  	if (acl_type < 0)
-> @@ -1249,7 +1249,7 @@ int vfs_remove_acl(struct mnt_idmap *idmap, struct dentry *dentry,
->  out_inode_unlock:
->  	inode_unlock(inode);
->  
-> -	if (delegated_inode) {
-> +	if (is_delegated(&delegated_inode)) {
->  		error = break_deleg_wait(&delegated_inode);
->  		if (!error)
->  			goto retry_deleg;
-> diff --git a/fs/utimes.c b/fs/utimes.c
-> index c7c7958e57b22f91646ca9f76d18781b64d371a3..bf9f45bdef54947de7ac55c9f873ae9d0336dafa 100644
-> --- a/fs/utimes.c
-> +++ b/fs/utimes.c
-> @@ -22,7 +22,7 @@ int vfs_utimes(const struct path *path, struct timespec64 *times)
->  	int error;
->  	struct iattr newattrs;
->  	struct inode *inode = path->dentry->d_inode;
-> -	struct inode *delegated_inode = NULL;
-> +	struct delegated_inode delegated_inode = { };
->  
->  	if (times) {
->  		if (!nsec_valid(times[0].tv_nsec) ||
-> @@ -66,7 +66,7 @@ int vfs_utimes(const struct path *path, struct timespec64 *times)
->  	error = notify_change(mnt_idmap(path->mnt), path->dentry, &newattrs,
->  			      &delegated_inode);
->  	inode_unlock(inode);
-> -	if (delegated_inode) {
-> +	if (is_delegated(&delegated_inode)) {
->  		error = break_deleg_wait(&delegated_inode);
->  		if (!error)
->  			goto retry_deleg;
-> diff --git a/fs/xattr.c b/fs/xattr.c
-> index 8851a5ef34f5ab34383975dd4cef537de3f6391e..32d445fb60aaf2aaf4b16b62934dc99bad378067 100644
-> --- a/fs/xattr.c
-> +++ b/fs/xattr.c
-> @@ -274,7 +274,7 @@ int __vfs_setxattr_noperm(struct mnt_idmap *idmap,
->  int
->  __vfs_setxattr_locked(struct mnt_idmap *idmap, struct dentry *dentry,
->  		      const char *name, const void *value, size_t size,
-> -		      int flags, struct inode **delegated_inode)
-> +		      int flags, struct delegated_inode *delegated_inode)
->  {
->  	struct inode *inode = dentry->d_inode;
->  	int error;
-> @@ -305,7 +305,7 @@ vfs_setxattr(struct mnt_idmap *idmap, struct dentry *dentry,
->  	     const char *name, const void *value, size_t size, int flags)
->  {
->  	struct inode *inode = dentry->d_inode;
-> -	struct inode *delegated_inode = NULL;
-> +	struct delegated_inode delegated_inode = { };
->  	const void  *orig_value = value;
->  	int error;
->  
-> @@ -322,7 +322,7 @@ vfs_setxattr(struct mnt_idmap *idmap, struct dentry *dentry,
->  				      flags, &delegated_inode);
->  	inode_unlock(inode);
->  
-> -	if (delegated_inode) {
-> +	if (is_delegated(&delegated_inode)) {
->  		error = break_deleg_wait(&delegated_inode);
->  		if (!error)
->  			goto retry_deleg;
-> @@ -533,7 +533,7 @@ EXPORT_SYMBOL(__vfs_removexattr);
->  int
->  __vfs_removexattr_locked(struct mnt_idmap *idmap,
->  			 struct dentry *dentry, const char *name,
-> -			 struct inode **delegated_inode)
-> +			 struct delegated_inode *delegated_inode)
->  {
->  	struct inode *inode = dentry->d_inode;
->  	int error;
-> @@ -567,7 +567,7 @@ vfs_removexattr(struct mnt_idmap *idmap, struct dentry *dentry,
->  		const char *name)
->  {
->  	struct inode *inode = dentry->d_inode;
-> -	struct inode *delegated_inode = NULL;
-> +	struct delegated_inode delegated_inode = { };
->  	int error;
->  
->  retry_deleg:
-> @@ -576,7 +576,7 @@ vfs_removexattr(struct mnt_idmap *idmap, struct dentry *dentry,
->  					 name, &delegated_inode);
->  	inode_unlock(inode);
->  
-> -	if (delegated_inode) {
-> +	if (is_delegated(&delegated_inode)) {
->  		error = break_deleg_wait(&delegated_inode);
->  		if (!error)
->  			goto retry_deleg;
-> diff --git a/include/linux/filelock.h b/include/linux/filelock.h
-> index 47da6aa28d8dc9122618d02c6608deda0f3c4d3e..208d108df2d73a9df65e5dc9968d074af385f881 100644
-> --- a/include/linux/filelock.h
-> +++ b/include/linux/filelock.h
-> @@ -486,25 +486,35 @@ static inline int break_deleg(struct inode *inode, unsigned int flags)
->  	return 0;
->  }
->  
-> -static inline int try_break_deleg(struct inode *inode, struct inode **delegated_inode)
-> +struct delegated_inode {
-> +	struct inode *di_inode;
-> +};
-> +
-> +static inline bool is_delegated(struct delegated_inode *di)
-> +{
-> +	return di->di_inode;
-> +}
-> +
-> +static inline int try_break_deleg(struct inode *inode,
-> +				  struct delegated_inode *di)
->  {
->  	int ret;
->  
->  	ret = break_deleg(inode, LEASE_BREAK_NONBLOCK);
-> -	if (ret == -EWOULDBLOCK && delegated_inode) {
-> -		*delegated_inode = inode;
-> +	if (ret == -EWOULDBLOCK && di) {
-> +		di->di_inode = inode;
->  		ihold(inode);
->  	}
->  	return ret;
->  }
->  
-> -static inline int break_deleg_wait(struct inode **delegated_inode)
-> +static inline int break_deleg_wait(struct delegated_inode *di)
->  {
->  	int ret;
->  
-> -	ret = break_deleg(*delegated_inode, 0);
-> -	iput(*delegated_inode);
-> -	*delegated_inode = NULL;
-> +	ret = break_deleg(di->di_inode, 0);
-> +	iput(di->di_inode);
-> +	di->di_inode = NULL;
->  	return ret;
->  }
->  
-> @@ -523,6 +533,13 @@ static inline int break_layout(struct inode *inode, bool wait)
->  }
->  
->  #else /* !CONFIG_FILE_LOCKING */
-> +struct delegated_inode { };
-> +
-> +static inline bool is_delegated(struct delegated_inode *di)
-> +{
-> +	return false;
-> +}
-> +
->  static inline int break_lease(struct inode *inode, bool wait)
->  {
->  	return 0;
-> @@ -533,12 +550,13 @@ static inline int break_deleg(struct inode *inode, unsigned int flags)
->  	return 0;
->  }
->  
-> -static inline int try_break_deleg(struct inode *inode, struct inode **delegated_inode)
-> +static inline int try_break_deleg(struct inode *inode,
-> +				  struct delegated_inode *delegated_inode)
->  {
->  	return 0;
->  }
->  
-> -static inline int break_deleg_wait(struct inode **delegated_inode)
-> +static inline int break_deleg_wait(struct delegated_inode *delegated_inode)
->  {
->  	BUG();
->  	return 0;
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index c895146c1444be36e0a779df55622cc38c9419ff..909a88e3979d4f1ba3104f3d05145e1096ed44d5 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -80,6 +80,7 @@ struct fs_context;
->  struct fs_parameter_spec;
->  struct file_kattr;
->  struct iomap_ops;
-> +struct delegated_inode;
->  
->  extern void __init inode_init(void);
->  extern void __init inode_init_early(void);
-> @@ -2119,10 +2120,10 @@ int vfs_mknod(struct mnt_idmap *, struct inode *, struct dentry *,
->  int vfs_symlink(struct mnt_idmap *, struct inode *,
->  		struct dentry *, const char *);
->  int vfs_link(struct dentry *, struct mnt_idmap *, struct inode *,
-> -	     struct dentry *, struct inode **);
-> +	     struct dentry *, struct delegated_inode *);
->  int vfs_rmdir(struct mnt_idmap *, struct inode *, struct dentry *);
->  int vfs_unlink(struct mnt_idmap *, struct inode *, struct dentry *,
-> -	       struct inode **);
-> +	       struct delegated_inode *);
->  
->  /**
->   * struct renamedata - contains all information required for renaming
-> @@ -2140,7 +2141,7 @@ struct renamedata {
->  	struct dentry *old_dentry;
->  	struct dentry *new_parent;
->  	struct dentry *new_dentry;
-> -	struct inode **delegated_inode;
-> +	struct delegated_inode *delegated_inode;
->  	unsigned int flags;
->  } __randomize_layout;
->  
-> @@ -3071,7 +3072,7 @@ static inline int bmap(struct inode *inode,  sector_t *block)
->  #endif
->  
->  int notify_change(struct mnt_idmap *, struct dentry *,
-> -		  struct iattr *, struct inode **);
-> +		  struct iattr *, struct delegated_inode *);
->  int inode_permission(struct mnt_idmap *, struct inode *, int);
->  int generic_permission(struct mnt_idmap *, struct inode *, int);
->  static inline int file_permission(struct file *file, int mask)
-> diff --git a/include/linux/xattr.h b/include/linux/xattr.h
-> index 86b0d47984a16d935dd1c45ca80a3b8bb5b7295b..64e9afe7d647dc38f686a4b5c6f765e061cde54c 100644
-> --- a/include/linux/xattr.h
-> +++ b/include/linux/xattr.h
-> @@ -85,12 +85,12 @@ int __vfs_setxattr_noperm(struct mnt_idmap *, struct dentry *,
->  			  const char *, const void *, size_t, int);
->  int __vfs_setxattr_locked(struct mnt_idmap *, struct dentry *,
->  			  const char *, const void *, size_t, int,
-> -			  struct inode **);
-> +			  struct delegated_inode *);
->  int vfs_setxattr(struct mnt_idmap *, struct dentry *, const char *,
->  		 const void *, size_t, int);
->  int __vfs_removexattr(struct mnt_idmap *, struct dentry *, const char *);
->  int __vfs_removexattr_locked(struct mnt_idmap *, struct dentry *,
-> -			     const char *, struct inode **);
-> +			     const char *, struct delegated_inode *);
->  int vfs_removexattr(struct mnt_idmap *, struct dentry *, const char *);
->  
->  ssize_t generic_listxattr(struct dentry *dentry, char *buffer, size_t buffer_size);
-> 
-> -- 
-> 2.51.1
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBQYW9sbyBBYmVuaSA8cGFiZW5p
+QHJlZGhhdC5jb20+IA0KPiBTZW50OiBUaHVyc2RheSwgTm92ZW1iZXIgNiwgMjAyNSAxOjA3IFBN
+DQo+IFRvOiBDaGlhLVl1IENoYW5nIChOb2tpYSkgPGNoaWEteXUuY2hhbmdAbm9raWEtYmVsbC1s
+YWJzLmNvbT47IGVkdW1hemV0QGdvb2dsZS5jb207IHBhcmF2QG52aWRpYS5jb207IGxpbnV4LWRv
+Y0B2Z2VyLmtlcm5lbC5vcmc7IGNvcmJldEBsd24ubmV0OyBob3Jtc0BrZXJuZWwub3JnOyBkc2Fo
+ZXJuQGtlcm5lbC5vcmc7IGt1bml5dUBnb29nbGUuY29tOyBicGZAdmdlci5rZXJuZWwub3JnOyBu
+ZXRkZXZAdmdlci5rZXJuZWwub3JnOyBkYXZlLnRhaHRAZ21haWwuY29tOyBqaHNAbW9qYXRhdHUu
+Y29tOyBrdWJhQGtlcm5lbC5vcmc7IHN0ZXBoZW5AbmV0d29ya3BsdW1iZXIub3JnOyB4aXlvdS53
+YW5nY29uZ0BnbWFpbC5jb207IGppcmlAcmVzbnVsbGkudXM7IGRhdmVtQGRhdmVtbG9mdC5uZXQ7
+IGFuZHJldytuZXRkZXZAbHVubi5jaDsgZG9uYWxkLmh1bnRlckBnbWFpbC5jb207IGFzdEBmaWJl
+cmJ5Lm5ldDsgbGl1aGFuZ2JpbkBnbWFpbC5jb207IHNodWFoQGtlcm5lbC5vcmc7IGxpbnV4LWtz
+ZWxmdGVzdEB2Z2VyLmtlcm5lbC5vcmc7IGlqQGtlcm5lbC5vcmc7IG5jYXJkd2VsbEBnb29nbGUu
+Y29tOyBLb2VuIERlIFNjaGVwcGVyIChOb2tpYSkgPGtvZW4uZGVfc2NoZXBwZXJAbm9raWEtYmVs
+bC1sYWJzLmNvbT47IGcud2hpdGVAY2FibGVsYWJzLmNvbTsgaW5nZW1hci5zLmpvaGFuc3NvbkBl
+cmljc3Nvbi5jb207IG1pcmphLmt1ZWhsZXdpbmRAZXJpY3Nzb24uY29tOyBjaGVzaGlyZSA8Y2hl
+c2hpcmVAYXBwbGUuY29tPjsgcnMuaWV0ZkBnbXguYXQ7IEphc29uX0xpdmluZ29vZEBjb21jYXN0
+LmNvbTsgVmlkaGkgR29lbCA8dmlkaGlfZ29lbEBhcHBsZS5jb20+DQo+IFN1YmplY3Q6IFJlOiBb
+UEFUQ0ggdjUgbmV0LW5leHQgMTAvMTRdIHRjcDogYWNjZWNuOiByZXRyYW5zbWl0IFNZTi9BQ0sg
+d2l0aG91dCBBY2NFQ04gb3B0aW9uIG9yIG5vbi1BY2NFQ04gU1lOL0FDSw0KPiANCj4gDQo+IENB
+VVRJT046IFRoaXMgaXMgYW4gZXh0ZXJuYWwgZW1haWwuIFBsZWFzZSBiZSB2ZXJ5IGNhcmVmdWwg
+d2hlbiBjbGlja2luZyBsaW5rcyBvciBvcGVuaW5nIGF0dGFjaG1lbnRzLiBTZWUgdGhlIFVSTCBu
+b2suaXQvZXh0IGZvciBhZGRpdGlvbmFsIGluZm9ybWF0aW9uLg0KPiANCj4gDQo+IA0KPiBPbiAx
+MC8zMC8yNSAzOjM0IFBNLCBjaGlhLXl1LmNoYW5nQG5va2lhLWJlbGwtbGFicy5jb20gd3JvdGU6
+DQo+ID4gRnJvbTogQ2hpYS1ZdSBDaGFuZyA8Y2hpYS15dS5jaGFuZ0Bub2tpYS1iZWxsLWxhYnMu
+Y29tPg0KPiA+DQo+ID4gRm9yIEFjY3VyYXRlIEVDTiwgdGhlIGZpcnN0IFNZTi9BQ0sgc2VudCBi
+eSB0aGUgVENQIHNlcnZlciBzaGFsbCBzZXQgDQo+ID4gdGhlIEFDRSBmbGFnIChzZWUgVGFibGUg
+MSBvZiBSRkM5NzY4KSBhbmQgdGhlIEFjY0VDTiBvcHRpb24gdG8gDQo+ID4gY29tcGxldGUgdGhl
+IGNhcGFiaWxpdHkgbmVnb3RpYXRpb24uIEhvd2V2ZXIsIGlmIHRoZSBUQ1Agc2VydmVyIG5lZWRz
+IA0KPiA+IHRvIHJldHJhbnNtaXQgc3VjaCBhIFNZTi9BQ0sgKGZvciBleGFtcGxlLCBiZWNhdXNl
+IGl0IGRpZCBub3QgcmVjZWl2ZSANCj4gPiBhbiBBQ0sgYWNrbm93bGVkZ2luZyBpdHMgU1lOL0FD
+Sywgb3IgcmVjZWl2ZWQgYSBzZWNvbmQgU1lOIHJlcXVlc3RpbmcgDQo+ID4gQWNjRUNOIHN1cHBv
+cnQpLCB0aGUgVENQIHNlcnZlciByZXRyYW5zbWl0cyB0aGUgU1lOL0FDSyB3aXRob3V0IHRoZSAN
+Cj4gPiBBY2NFQ04gb3B0aW9uLiBUaGlzIGlzIGJlY2F1c2UgdGhlIFNZTi9BQ0sgbWF5IGJlIGxv
+c3QgZHVlIHRvIA0KPiA+IGNvbmdlc3Rpb24sIG9yIGEgbWlkZGxlYm94IG1heSBibG9jayB0aGUg
+QWNjRUNOIG9wdGlvbi4gRnVydGhlcm1vcmUsIA0KPiA+IGlmIHRoaXMgcmV0cmFuc21pc3Npb24g
+YWxzbyB0aW1lcyBvdXQsIHRvIGV4cGVkaXRlIGNvbm5lY3Rpb24gDQo+ID4gZXN0YWJsaXNobWVu
+dCwgdGhlIFRDUCBzZXJ2ZXIgc2hvdWxkIHJldHJhbnNtaXQgdGhlIFNZTi9BQ0sgd2l0aA0KPiA+
+IChBRSxDV1IsRUNFKSA9ICgwLDAsMCkgYW5kIHdpdGhvdXQgdGhlIEFjY0VDTiBvcHRpb24sIHdo
+aWxlIA0KPiA+IG1haW50YWluaW5nIEFjY0VDTiBmZWVkYmFjayBtb2RlLg0KPiA+DQo+ID4gVGhp
+cyBjb21wbGllcyB3aXRoIFNlY3Rpb24gMy4yLjMuMi4yIG9mIHRoZSBBY2NFQ04gc3BlY2lmaWNh
+dGlvbiAoUkZDOTc2OCkuDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBDaGlhLVl1IENoYW5nIDxj
+aGlhLXl1LmNoYW5nQG5va2lhLWJlbGwtbGFicy5jb20+DQo+ID4gLS0tDQo+ID4gIGluY2x1ZGUv
+bmV0L3RjcF9lY24uaCB8IDE0ICsrKysrKysrKystLS0tICBuZXQvaXB2NC90Y3Bfb3V0cHV0LmMg
+fCAgMiANCj4gPiArLQ0KPiA+ICAyIGZpbGVzIGNoYW5nZWQsIDExIGluc2VydGlvbnMoKyksIDUg
+ZGVsZXRpb25zKC0pDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9uZXQvdGNwX2Vjbi5o
+IGIvaW5jbHVkZS9uZXQvdGNwX2Vjbi5oIGluZGV4IA0KPiA+IGM2NmYwZDk0NGUxYy4uOTlkMDk1
+ZWQwMWIzIDEwMDY0NA0KPiA+IC0tLSBhL2luY2x1ZGUvbmV0L3RjcF9lY24uaA0KPiA+ICsrKyBi
+L2luY2x1ZGUvbmV0L3RjcF9lY24uaA0KPiA+IEBAIC02NTEsMTAgKzY1MSwxNiBAQCBzdGF0aWMg
+aW5saW5lIHZvaWQgdGNwX2Vjbl9jbGVhcl9zeW4oc3RydWN0IHNvY2sgDQo+ID4gKnNrLCBzdHJ1
+Y3Qgc2tfYnVmZiAqc2tiKSAgc3RhdGljIGlubGluZSB2b2lkICANCj4gPiB0Y3BfZWNuX21ha2Vf
+c3luYWNrKGNvbnN0IHN0cnVjdCByZXF1ZXN0X3NvY2sgKnJlcSwgc3RydWN0IHRjcGhkciAqdGgp
+ICANCj4gPiB7DQo+ID4gLSAgICAgaWYgKHRjcF9yc2socmVxKS0+YWNjZWNuX29rKQ0KPiA+IC0g
+ICAgICAgICAgICAgdGNwX2FjY2Vjbl9lY2hvX3N5bl9lY3QodGgsIHRjcF9yc2socmVxKS0+c3lu
+X2VjdF9yY3YpOw0KPiA+IC0gICAgIGVsc2UgaWYgKGluZXRfcnNrKHJlcSktPmVjbl9vaykNCj4g
+PiAtICAgICAgICAgICAgIHRoLT5lY2UgPSAxOw0KPiA+ICsgICAgIGlmICghcmVxLT5udW1fcmV0
+cmFucyB8fCAhcmVxLT5udW1fdGltZW91dCkgew0KPiANCj4gV2h5IGBpZiAoIXJlcS0+bnVtX3Rp
+bWVvdXQpYCBpcyBub3QgYSBzdWZmaWNpZW50IGNvbmRpdGlvbiBoZXJlPw0KPiANCj4gU2ltcGxp
+ZnlpbmcgdGhlIGFib3ZlIGNvbmRpdGlvbiB3aWxsIG1ha2UgdGhlIFRDUF9TWU5BQ0tfUkVUUkFO
+UyBhbHRlcm5hdGl2ZSBzaW1wbGVyLCBJIHRoaW5rLg0KPiANCj4gL1ANCg0KSGkgUGFvbG8sDQoN
+CkFGQUlLLCByZXEtPm51bV90aW1lb3V0IHdpbGwgYmUgaW5jcmVhc2VkIGFmdGVyIHRjcF9ydHhf
+c3luYWNrKCkgaXMgZG9uZSBkdWUgdG8gdGltZW91dCwgYWJ1dCBpdCBkb2VzIG5vdCBjb3ZlciB0
+aGUgY2FzZSB3aGVuIDJuZCBTWU4gaXMgcmVjZWl2ZWQuDQoNCkJ1dCBzbyBmYXIgdGhlIEFjY0VD
+TiBzcGVjIHJlcXVlc3RzIHRvIGRvIHRoZSBzYW1lIGZhbGxiYWNrIGluIGJvdGggY2FzZXMgKGku
+ZS4sIGVpdGhlciB0aW1lb3V0IG9yIHJlY2VpdmUgMm5kIFNZTikuDQoNClNvLCBoZXJlIEkgd291
+bGQgc3RpbGwgdGhpbmsgdG8gdXNlIGVpdGhlciBudW1fcmV0cmFucyAob3IgbGlrZSB5b3Ugc3Vn
+Z2VzdGVkIHRvIHVzZSBkaWZmZXJlbnQgU1lOX0FDSyB0eXBlcz8pDQoNCkNoaWEtWXUNCg==
 
