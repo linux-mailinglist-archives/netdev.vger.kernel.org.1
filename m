@@ -1,174 +1,99 @@
-Return-Path: <netdev+bounces-237490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7974FC4C5CA
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 09:22:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FF26C4C5DF
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 09:23:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87B724216BA
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 08:14:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D1B1423A6C
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 08:15:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EBE632ED2A;
-	Tue, 11 Nov 2025 08:13:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 644AB314A85;
+	Tue, 11 Nov 2025 08:14:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=listout.xyz header.i=@listout.xyz header.b="x1GkMJjg"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Ge86m7n6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF7AA3195EB;
-	Tue, 11 Nov 2025 08:13:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFC172EAB70;
+	Tue, 11 Nov 2025 08:14:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762848800; cv=none; b=ZPCYDVxsvvq+ryTf6dtLdFt02I9GCnNkSjI7De5Wxf2t/8RQr5WKm/m6PIUhn+dN55mJSFIILCwrO8nRZPVa1JnQg4jEgy+elAqxZx2gDKds2aGlGeHtS/un1cnJqdA/rdsqfzaUnpwfHgWUI3hsctUmeoYvNpRvvzVnkxrFdh8=
+	t=1762848878; cv=none; b=Bfazboc4Ho6nsLnLyzPAU7rPT2TFJ8FsCIzSqndzCmluQWknx97KYT3bRYi/MZZxykeuCOxo05L7daT6/ML5sz/45cePKshVImGvfRiETo0HNBh5vmjrmMjJLRsSpEgEeFpQ77oZOY1jKZ5yH0wVM1jiFbQP1IIKaGewSGluPVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762848800; c=relaxed/simple;
-	bh=R/ssoBsXWb6sflro9YrhGdrY25IqwtWiz1h6+wsE/T0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mr1dB/GSTyx2dW6722pmbfd464LCcUNKC0qK+NyAApHFi9zTBmENXOsL/J1w1JqL0AGkUumsobkS4V0DMuoMAKYTytJIrAFiZpEhlgfyZUv/mqsiqv4zi66WFDR/PNE4+hpF4oAWmy2g4Eh7C8WCHGSmlA9lc7cB+t2d0qsij2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=listout.xyz; spf=pass smtp.mailfrom=listout.xyz; dkim=pass (2048-bit key) header.d=listout.xyz header.i=@listout.xyz header.b=x1GkMJjg; arc=none smtp.client-ip=80.241.56.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=listout.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=listout.xyz
-Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4d5K6H5JKcz9tKq;
-	Tue, 11 Nov 2025 09:13:11 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=listout.xyz; s=MBO0001;
-	t=1762848791;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=imzhVMup//2ffpyDtioFEjTxYvW8FouyExcfdyRpW2E=;
-	b=x1GkMJjgkJYoYbiV8LMtZu5UcfOYdsFUA3NkHmy4qTI81xd9zZaeB8K94fmi6057tKCKOJ
-	8QcP0INhKYOURMyNOyIKAswwaUQ2RXERTDFey2tIRzjVxtalpawNYy4z6fMDrMBhx7gnSP
-	9BpNCeHNkx9StWMBR9hEzqpBvz6Jle+9uRShx+rBTgjmBmvk4xnrEj8aOLracSCOOIt8+f
-	0mooEuhFSkDR9+SBBtg06urTZHATDY9YI4eB4ymcPP5V6r8A8y+LzpwbhK+AGfPGtZXxrQ
-	kJ85WFG6/WzMxXy5bOZmojJissiySNZG1FlyzXMnK29YvB6OTMLqrDxD+D2J/Q==
-Authentication-Results: outgoing_mbo_mout;
-	dkim=none;
-	spf=pass (outgoing_mbo_mout: domain of listout@listout.xyz designates 2001:67c:2050:b231:465::102 as permitted sender) smtp.mailfrom=listout@listout.xyz
-From: Brahmajit Das <listout@listout.xyz>
-To: syzbot+d1b7fa1092def3628bd7@syzkaller.appspotmail.com
-Cc: andrii@kernel.org,
-	ast@kernel.org,
-	bpf@vger.kernel.org,
-	contact@arnaud-lcm.com,
-	daniel@iogearbox.net,
-	eddyz87@gmail.com,
-	haoluo@google.com,
-	john.fastabend@gmail.com,
-	jolsa@kernel.org,
-	kpsingh@kernel.org,
-	linux-kernel@vger.kernel.org,
-	martin.lau@linux.dev,
+	s=arc-20240116; t=1762848878; c=relaxed/simple;
+	bh=Qwo3rPU9Fh7kPz/WyZaXKxKAT3VS4DQqUY/wyUb3dxI=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=jBYlBctABVssau5mV/vySM1z2SjxOll3MFv2XVE3OCf7hhT186QXFZXLcOu0k5DG3R1N+KFIC4Hnu4t7xVEUJxdjVdQeDpo4doqXbwKcDFeUZjvHFo1mAvj4yBPvja+NFIOqwiH76eXz0H742hhY/DHXWL5o7m2I7K7+tL6jWSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Ge86m7n6; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1231)
+	id 76182212AE41; Tue, 11 Nov 2025 00:14:36 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 76182212AE41
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1762848876;
+	bh=Q7YowF45bfdEhm2L9J/KmqosdLFilrexEOPDfkd4Od0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Ge86m7n6Kh9zazc627rUF17vJttULKpRkGksc+b/J3Y3JuVNn5yu3znxHyE9Q7VbE
+	 fEDBhyrFniCL6RVL7MgX71wPQhWMM/+76jNEYvzyeaZQ7AZrLanIvAP/fK2cxbt1BT
+	 jsdczkUO5eJgXoCokzm1F0wQpvO1XitIHv74Se0c=
+From: Aditya Garg <gargaditya@linux.microsoft.com>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	longli@microsoft.com,
+	kotaranov@microsoft.com,
+	horms@kernel.org,
+	shradhagupta@linux.microsoft.com,
+	ssengar@linux.microsoft.com,
+	ernis@linux.microsoft.com,
+	dipayanroy@linux.microsoft.com,
+	shirazsaleem@microsoft.com,
+	leon@kernel.org,
+	mlevitsk@redhat.com,
+	yury.norov@gmail.com,
+	linux-hyperv@vger.kernel.org,
 	netdev@vger.kernel.org,
-	sdf@fomichev.me,
-	song@kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	yonghong.song@linux.dev
-Subject: [PATCH bpf-next v3] bpf: Clamp trace length in __bpf_get_stack to fix OOB write
-Date: Tue, 11 Nov 2025 13:42:54 +0530
-Message-ID: <20251111081254.25532-1-listout@listout.xyz>
-In-Reply-To: <691231dc.a70a0220.22f260.0101.GAE@google.com>
-References: <691231dc.a70a0220.22f260.0101.GAE@google.com>
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	gargaditya@microsoft.com
+Cc: Aditya Garg <gargaditya@linux.microsoft.com>
+Subject: [PATCH net-next v3 0/2] net: mana: Enforce TX SGE limit and fix error cleanup
+Date: Tue, 11 Nov 2025 00:12:59 -0800
+Message-Id: <1762848781-357-1-git-send-email-gargaditya@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 4d5K6H5JKcz9tKq
 
-syzbot reported a stack-out-of-bounds write in __bpf_get_stack()
-triggered via bpf_get_stack() when capturing a kernel stack trace.
+Add pre-transmission checks to block SKBs that exceed the hardware's SGE 
+limit. Force software segmentation for GSO traffic and linearize non-GSO 
+packets as needed.
 
-After the recent refactor that introduced stack_map_calculate_max_depth(),
-the code in stack_map_get_build_id_offset() (and related helpers) stopped
-clamping the number of trace entries (`trace_nr`) to the number of elements
-that fit into the stack map value (`num_elem`).
+Update TX error handling to drop failed SKBs and unmap resources 
+immediately.
 
-As a result, if the captured stack contained more frames than the map value
-can hold, the subsequent memcpy() would write past the end of the buffer,
-triggering a KASAN report like:
+Aditya Garg (2):
+  net: mana: Handle SKB if TX SGEs exceed hardware limit
+  net: mana: Drop TX skb on post failure and unmap resources
 
-    BUG: KASAN: stack-out-of-bounds in __bpf_get_stack+0x...
-    Write of size N at addr ... by task syz-executor...
+ .../net/ethernet/microsoft/mana/gdma_main.c   |  1 -
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 44 ++++++++++++++++---
+ .../ethernet/microsoft/mana/mana_ethtool.c    |  2 +
+ include/net/mana/gdma.h                       |  6 ++-
+ include/net/mana/mana.h                       |  2 +
+ 5 files changed, 47 insertions(+), 8 deletions(-)
 
-Restore the missing clamp by limiting `trace_nr` to `num_elem` before
-computing the copy length. This mirrors the pre-refactor logic and ensures
-we never copy more bytes than the destination buffer can hold.
-
-No functional change intended beyond reintroducing the missing bound check.
-
-Reported-by: syzbot+d1b7fa1092def3628bd7@syzkaller.appspotmail.com
-Fixes: e17d62fedd10 ("bpf: Refactor stack map trace depth calculation into helper function")
-Signed-off-by: Brahmajit Das <listout@listout.xyz>
----
-Changes in v3:
-Revert back to num_elem based logic for setting trace_nr. This was
-suggested by bpf-ci bot, mainly pointing out the chances of underflow
-when  max_depth < skip.
-
-Quoting the bot's reply:
-The stack_map_calculate_max_depth() function can return a value less than
-skip when sysctl_perf_event_max_stack is lowered below the skip value:
-
-    max_depth = size / elem_size;
-    max_depth += skip;
-    if (max_depth > curr_sysctl_max_stack)
-        return curr_sysctl_max_stack;
-
-If sysctl_perf_event_max_stack = 10 and skip = 20, this returns 10.
-
-Then max_depth - skip = 10 - 20 underflows to 4294967286 (u32 wraps),
-causing min_t() to not limit trace_nr at all. This means the original OOB
-write is not fixed in cases where skip > max_depth.
-
-With the default sysctl_perf_event_max_stack = 127 and skip up to 255, this
-scenario is reachable even without admin changing sysctls.
-
-Changes in v2:
-- Use max_depth instead of num_elem logic, this logic is similar to what
-we are already using __bpf_get_stackid
-Link: https://lore.kernel.org/all/20251111003721.7629-1-listout@listout.xyz/
-
-Changes in v1:
-- RFC patch that restores the number of trace entries by setting
-trace_nr to trace_nr or num_elem based on whichever is the smallest.
-Link: https://lore.kernel.org/all/20251110211640.963-1-listout@listout.xyz/
----
- kernel/bpf/stackmap.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/kernel/bpf/stackmap.c b/kernel/bpf/stackmap.c
-index 2365541c81dd..cef79d9517ab 100644
---- a/kernel/bpf/stackmap.c
-+++ b/kernel/bpf/stackmap.c
-@@ -426,7 +426,7 @@ static long __bpf_get_stack(struct pt_regs *regs, struct task_struct *task,
- 			    struct perf_callchain_entry *trace_in,
- 			    void *buf, u32 size, u64 flags, bool may_fault)
- {
--	u32 trace_nr, copy_len, elem_size, max_depth;
-+	u32 trace_nr, copy_len, elem_size, num_elem, max_depth;
- 	bool user_build_id = flags & BPF_F_USER_BUILD_ID;
- 	bool crosstask = task && task != current;
- 	u32 skip = flags & BPF_F_SKIP_FIELD_MASK;
-@@ -480,6 +480,8 @@ static long __bpf_get_stack(struct pt_regs *regs, struct task_struct *task,
- 	}
- 
- 	trace_nr = trace->nr - skip;
-+	num_elem = size / elem_size;
-+	trace_nr = min_t(u32, trace_nr, num_elem);
- 	copy_len = trace_nr * elem_size;
- 
- 	ips = trace->ip + skip;
 -- 
-2.51.2
+2.43.0
 
 
