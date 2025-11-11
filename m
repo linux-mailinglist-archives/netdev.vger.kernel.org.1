@@ -1,159 +1,113 @@
-Return-Path: <netdev+bounces-237437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52835C4B512
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 04:27:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1A6DC4B533
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 04:30:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B3DF3A31B3
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:26:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A3C6188F957
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:30:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5F0C3346B9;
-	Tue, 11 Nov 2025 03:26:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CFF360B8A;
+	Tue, 11 Nov 2025 03:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="arA+s8Lc"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="li5RAEK4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D6D303CB4;
-	Tue, 11 Nov 2025 03:26:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C4B93D6F;
+	Tue, 11 Nov 2025 03:30:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762831596; cv=none; b=qEq8VJH4C4KoVsZ8saLYPHUEzy9GOY+4HR+hi8msBtlKG1XLHUJe3FayQ9O43ymx4BhaxIZpkLLEdH//DOzBp9QmDD/wCi+tUJreLIk+UWiwa6a8HO+9tyVkxQu9z0nYUtuZNnh4upc6ZMAcWeWprw049ZpBx7IDFHy0tWJ7AkY=
+	t=1762831828; cv=none; b=FvsJ9688bkUkiyY4SDmteOjC2BvRvDvDbRu+cpIG9okOYF0Zaq7jsn6u8lDjXBQ97VNyEW4nh3Lcqtvkm4TuD9FNntw45GVT9+4R6rktsmEW+C+ynwGH9YDHetX214bXuaMbW3jiXyJMGU15KJtRDRw14zC/o8Cg4kCpKPLKlJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762831596; c=relaxed/simple;
-	bh=SF8ejBUx63BEWVbo35HrIhmuFlhum3NF91vPz7W/S9I=;
+	s=arc-20240116; t=1762831828; c=relaxed/simple;
+	bh=JlYn9rIy7uyj5CmPIHlFQHH3uFeD9tk9d9asndxWrRY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HZM6UNWBKH0FlF2NIi3btEZG+m5MDLhQNAVCRVpYLgwKotyyjQJtzA4gdIjzsebNpTFgikf/oElWGeaSdhLZ2ps8C0tkLieqvI44BAnalS5A8mbfKZmg+KrNj24EnRIEf1d+sgH/iGD4q1cHNbwUm9MiZVm2mJcVlqPc311xI9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=arA+s8Lc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37601C4CEF5;
-	Tue, 11 Nov 2025 03:26:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762831596;
-	bh=SF8ejBUx63BEWVbo35HrIhmuFlhum3NF91vPz7W/S9I=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=arA+s8Lck9ZMVhIL7OYtfs+oWUJRLcttj4EpE7KRk7v1UFN/ft+8fCUgtsMc9gd76
-	 xbz4H/FDW92jLwUvPHG1/WqhhK/z+mVldQc2od6H+BtjiQB5JxvQ4gM5lD1vbzg+pb
-	 OIGUaErFPL8HlyvrJVGOJSgG6krBoN0V6JHOlVSp76LaFGEO6EWU5piCu0OvjblFrG
-	 F1/jjUCtMmVj/39yjWouTOw7gaRBlyA5oyUIXix6w4uHaltQIts5/VuBnRuBzJrWIH
-	 Cq/wXocuXrdrwYG9qhGNsItJ2oZ+mWg1KHT70AM/kbW2xbJC2oehFU+RZ7t/XXG9uM
-	 4U13e4tZIDmyA==
-Date: Mon, 10 Nov 2025 19:26:34 -0800
-From: Saeed Mahameed <saeed@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jiri Pirko <jiri@resnulli.us>, Daniel Zahka <daniel.zahka@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Srujana Challa <schalla@marvell.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Brett Creeley <brett.creeley@amd.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Sunil Goutham <sgoutham@marvell.com>,
-	Linu Cherian <lcherian@marvell.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Jerin Jacob <jerinj@marvell.com>, hariprasad <hkelam@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
-	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
-	Manish Chopra <manishc@marvell.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Roger Quadros <rogerq@kernel.org>,
-	Loic Poulain <loic.poulain@oss.qualcomm.com>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Dave Ertman <david.m.ertman@intel.com>,
-	Vlad Dumitrescu <vdumitrescu@nvidia.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Alexander Sverdlin <alexander.sverdlin@gmail.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-	linux-rdma@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-omap@vger.kernel.org
-Subject: Re: [PATCH net-next v3 2/2] net/mlx5: implement swp_l4_csum_mode via
- devlink params
-Message-ID: <aRKs6jXqSvC3G_R0@x130>
-References: <20251107204347.4060542-1-daniel.zahka@gmail.com>
- <20251107204347.4060542-3-daniel.zahka@gmail.com>
- <aQ7f1T1ZFUKRLQRh@x130>
- <jhmdihtp63rblcjiy2pibhnz2sikvbm6bhnkclq3l2ndxgbqbb@e3t23x2x2r46>
- <20251110154643.66d15800@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=H2WVqjuCB/Tdd3aYMHpoKWOoJPCDz+CZsBJGdSbjrhiXVe8hZEd3dhkYh610r6P4qYRPiqOG6EAnvcXIxsu4e9eBOTy0mUhJJsKFmjWX4matDESlzIBRyZopxQoKxudgBBkygiy6/5CGfcLHbEdb1xOBf37E2uTY2vUQLaYXeN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=li5RAEK4; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=HW5zNTSs91UiAOz4S9gU+9c/0Itm3O1nWh1VBzNeF+0=; b=li5RAEK4Ot2b7NpWpJAT6oimFX
+	aMLDZKbm/8g9ln8eSjgxmoAur9H+uT9N21oTHrluWXoNaYbc5MCcw125cH9Db11O5yCNpUgzPhc9T
+	aqwWc7sVLADrHYrrSjGGR/hHMZYjxDyaT6LC/JVlZkAYnknLzAMrBztYnwk/b7Jj6Tug=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vIf5H-00DaMn-49; Tue, 11 Nov 2025 04:30:19 +0100
+Date: Tue, 11 Nov 2025 04:30:19 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: claudiu.manoil@nxp.com, vladimir.oltean@nxp.com, xiaoning.wang@nxp.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, aziz.sellami@nxp.com,
+	imx@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 net-next 0/3] net: enetc: add port MDIO support for
+ both i.MX94 and i.MX95
+Message-ID: <4ef9d041-2572-4a8d-9eb8-ddc2c05be102@lunn.ch>
+References: <20251105043344.677592-1-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251110154643.66d15800@kernel.org>
+In-Reply-To: <20251105043344.677592-1-wei.fang@nxp.com>
 
-On 10 Nov 15:46, Jakub Kicinski wrote:
->On Sun, 9 Nov 2025 11:46:37 +0100 Jiri Pirko wrote:
->> >So, I checked a couple of flows internally, and it seems this allows
->> >some flexibility in the FW to decide later on which mode to pick,
->> >based on other parameters, which practically means
->> >"user has no preference on this param". Driver can only find out
->> >after boot, when it reads the runtime capabilities, but still
->> >this is a bug, by the time the driver reads this (in devlink), the
->> >default value should've already been determined by FW, so FW must
->> >return the actual runtime value. Which can only be one of the following
->>
->> I don't think it is correct to expose the "default" as a value.
->>
->> On read, user should see the configured value, either "full_csum" or
->> "l4_only". Reporting "default" to the user does not make any sense.
->> On write, user should pass either "full_csum" or "l4_only". Why we would
->> ever want to pass "default"?
->
->FWIW I agree that this feels a bit odd. Should the default be a flag
->attr? On get flag being present means the value is the FW default (no
->override present). On set passing the flag means user wants to reset
->to FW default (remove override)?
->
->> Regardless this patch, since this is param to be reflected on fw reboot
->> (permanent cmode), I think it would be nice to expose indication if
->> param value passed to user currently affects the fw, or if it is going
->> to be applied after fw reboot. Perhaps a simple bool attr would do?
->
->IIUC we're basically talking about user having no information that
->the update is pending? Could this be done by the core? Core can do
->a ->get prior to calling ->set and if the ->set succeeds and
->cmode != runtime record that the update is pending?
->
+On Wed, Nov 05, 2025 at 12:33:41PM +0800, Wei Fang wrote:
+> >From the hardware perspective, NETC IP has only one external master MDIO
+> interface (eMDIO) for managing external PHYs. The EMDIO function and the
+> ENETC port MDIO are all virtual ports of the eMDIO.
+> 
+> The difference is that EMDIO function is a 'global port', it can access
+> all the PHYs on the eMDIO, so it provides a means for different software
+> modules to share a single set of MDIO signals to access their PHYs.
+> 
+> But for ENETC port MDIO, each ENETC can access its set of registers to
+> initiate accesses on the MDIO and the eMDIO arbitrates between them,
+> completing one access before proceeding with the next. It is required
+> that each ENETC port MDIO has exclusive access and control of its PHY.
+> Therefore, we need to set the external PHY address for ENETCs, so that
+> its port MDIO can only access its own PHY. If the PHY address accessed
+> by the port MDIO is different from the preset PHY address, the MDIO
+> access will be invalid.
+> 
+> Normally, all ENETCs use the interfaces provided by the EMDIO function
+> to access their PHYs, provided that the ENETC and EMDIO are on the same
+> OS. If an ENETC is assigned to a guest OS, it will not be able to use
+> the interfaces provided by the EMDIO function, so it must uses its port
+> MDIO to access and manage its PHY.
 
-Could work if on GET driver reads 'current' value from FW, then it should
-be simpler if GET != SET then 'pending', one problem though is if SET was
-done by external tool or value wasn't applied after reboot, then we loose
-that information, but do we care? I think we shouldn't.
+I think i'm slowly starting to understand this. But i'm still missing
+some parts.
 
->That feels very separate from the series tho, there are 3 permanent
->params in mlx5, already. Is there something that makes this one special?
+What prevents a guest OS from setting the wrong value in its ENETC
+port MDIO and then accessing any PHY on the physical bus?
 
-In mlx5 they all have the same behavior, devlink sets 'next' value, 
-devlink reads 'next' value. The only special thing about the new param
-is that it has a 'device_default' value and when you read that from 
-'next' it will always show 'device_default' as the actual value is only
-known at run time ,e.g. 'next boot'.
+I assume there is a hypervisor doing this enforcement? But if there is
+a hypervisor doing this enforcement, why does the ENETC port MDIO need
+programming? The hypervisor will block it from accessing anything it
+should not be able to access. A normal MDIO bus scan will find just
+the devices it is allowed to access.
 
-I think the only valid solution for permanent and drv_init params is to
-have 'next' and 'current' values reported by driver on read. 
-Or maybe go just with  'set' != 'get' then 'pending' as discussed above ?
+I also think the architecture is wrong. Why is the MAC driver messing
+around with the ENETC Port MDIO hardware? I assume the ENETC port MDIO
+bus driver knows it is a ENETC port MDIO device it is driving? It
+should be the one looking at the device tree description of its bus,
+checking it has one and only one device described on the bus, and
+programming itself with the device the hypervisor will let through.
+Not that i think this is actually necessary, let the hypervisor
+enforce it...
 
+	Andrew
 
