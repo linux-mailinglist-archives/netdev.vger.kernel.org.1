@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-237403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED42AC4AD0F
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:43:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D38EC4AC8E
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:42:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C2BF44FBDE3
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 01:35:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C60A18816C6
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 01:36:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E04267B07;
-	Tue, 11 Nov 2025 01:30:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66480341AC7;
+	Tue, 11 Nov 2025 01:30:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NM204X3K"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oup1VJi+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71DC6158545
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 01:30:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E64A2DE6EF;
+	Tue, 11 Nov 2025 01:30:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762824635; cv=none; b=ir3HMFV3dazzERGdFB2GjbmnUCQ/EVlxcU8kYIQc8EXUVw5Au/p7k1lEK3R2WgXxDrAOOuHXVsTLQ2jox8QZ5Z3OeXA8MnQITJhjxp/SbnQGH+GJcdU7dV1udQXqaeSaR+DNPOWpqpwk6YGP+KDXmjdrGA6EBuQJ7TenHI17Lkg=
+	t=1762824651; cv=none; b=eNzKqBY9D6PrFW0FsbK84qKNAYrrFf1P3eiOyzJlorhPLHvX1lvdZFntfhRa1PTuu7C8FdyQbAenrfjxrvXhEF6JIDUldw4G3iUdeSkjSM5fuYK45AxjfjDSVlniU/1giPQL3ynBAAaL2aWA2fmZdiTKVyiRRXyLUXDrCxJfRq4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762824635; c=relaxed/simple;
-	bh=HgbPRmYEmAN/5YWZQeBNKs6LmTG6q9I830tW3lmN9jg=;
+	s=arc-20240116; t=1762824651; c=relaxed/simple;
+	bh=HrZb5jpUnCxROQGuuROnL3P/s67nLZ04T0l4pc3iJt0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Jkyc3aKECfAy/QUnh8T6/pa1wUlO0FjJLDw7ZIvZ+X07vVTqLSOjQYZwuyT60sknlUHCR5QsA6l2/XWiKZd0+Fsuz6vieSvbN97xZi+z9WMGc1bGsBtXzc/c3mDzB+pPJmYCEDV6IY4rB5anYEC15Ke4mwLnq3a/EK1yuyi/S5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NM204X3K; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34A08C19421;
-	Tue, 11 Nov 2025 01:30:35 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=pIWinDEFjeV/UvnGjjXVVLi66MC89HqVuVgA/6BiiUsoXMTDwWsm2xZ7ShrxO8PV/VfpzhAAO/7S1u1ewg2mGiyVFlqJzxAeHpeLbjMb0Llzle2OdtB+XWQdAxRSgEFdiY349kks8RhDLF5AuFFJ5al7qEP3wcCmL/RDTFzLeZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oup1VJi+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE3A4C19424;
+	Tue, 11 Nov 2025 01:30:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762824635;
-	bh=HgbPRmYEmAN/5YWZQeBNKs6LmTG6q9I830tW3lmN9jg=;
+	s=k20201202; t=1762824650;
+	bh=HrZb5jpUnCxROQGuuROnL3P/s67nLZ04T0l4pc3iJt0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=NM204X3K1+70xC7wEirW6kQQsFVxTzeoPLHWeQ453kK4/pNZ0xF7Iivb+oBcTD4/U
-	 +X4pAERDBjX2VJzn43qw6ALPmbeLxiKFb3zovk0W1W/5l2P9xuRPW7YYWGQ5uXzfcA
-	 VY5horpdi/OF2ngg5qS4t9FV/YtL6+JiM4rsMAWZsSZz+ksO5aQw7yBT4q/Z5UKlP5
-	 XyDdQhaRR+cQzIMIgeD36Z+cN6e+FOYf9sf+xxXXs2KdL5V2tIiXpAhw8vVB0JI1zg
-	 kCi+0TwDatsi7jBvDfXsSa5YRdRceqiQUXScWIU8O0sV1dq6kJ8F6OzBgFIIphULNd
-	 P08OYSFnBPFxw==
+	b=oup1VJi+6v6e7L9G9TMYYymkg4m7O8kar0BcFlZLlA9uSeoq0ngVpIv12+5gKxRd8
+	 D3FNBJCyeKHFg+hEzQl4/n4VQfqZsyXQEHzeLXvmGNBbYpcBjZ26d9JspLUuEtW0Ly
+	 F3mLUw0Ftz0j0dukgu8kgzJ0K3g1pY77mtWsiCk6VG6I9k8SirfYZ4UrMmHVHhdMFr
+	 j7BQqtKmDuHNLOW3kh9stx8D6IRiRmnMWPgsS6R6FmaxIEuaccdlw02+O9e6BCaYD/
+	 C36kviTBVhC4/a03cbtN5bfv2TAqKr57P9xGX7ggzyUlZ9sBDbUbm+nrBepxxwQeBS
+	 ARxahVMn9+kvQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB126380CFD7;
-	Tue, 11 Nov 2025 01:30:06 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADFD4380CFD7;
+	Tue, 11 Nov 2025 01:30:21 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,48 +52,54 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 0/3] ynl: Fix tc filters with actions
+Subject: Re: [PATCH net-next 0/8] net: dsa: b53: add support for BCM5389/97/98
+ and
+ BCM63XX ARL formats
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176282460576.2841507.5529895194461903454.git-patchwork-notify@kernel.org>
-Date: Tue, 11 Nov 2025 01:30:05 +0000
-References: <20251106151529.453026-1-zahari.doychev@linux.com>
-In-Reply-To: <20251106151529.453026-1-zahari.doychev@linux.com>
-To: Zahari Doychev <zahari.doychev@linux.com>
-Cc: donald.hunter@gmail.com, kuba@kernel.org, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
- jacob.e.keller@intel.com, ast@fiberby.net, matttbe@kernel.org,
- netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, johannes@sipsolutions.net
+ <176282462024.2841507.15060077817611607078.git-patchwork-notify@kernel.org>
+Date: Tue, 11 Nov 2025 01:30:20 +0000
+References: <20251107080749.26936-1-jonas.gorski@gmail.com>
+In-Reply-To: <20251107080749.26936-1-jonas.gorski@gmail.com>
+To: Jonas Gorski <jonas.gorski@gmail.com>
+Cc: florian.fainelli@broadcom.com, andrew@lunn.ch, olteanv@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu,  6 Nov 2025 16:15:26 +0100 you wrote:
-> The first patch in this series introduces an example tool that
-> creates, shows and deletes flower filter with two VLAN actions.
-> The subsequent patches address various issues to ensure the tool
-> operates as intended.
+On Fri,  7 Nov 2025 09:07:41 +0100 you wrote:
+> Currently b53 assumes that all switches apart from BCM5325/5365 use the
+> same ARL formats, but there are actually multiple formats in use.
 > 
-> ---
-> v2:
-> - extend the sampe tool to show and delete the filter
-> - drop fix for ynl_attr_put_str as already fixed by:
->   Link: https://lore.kernel.org/netdev/20251024132438.351290-1-poros@redhat.com/
-> - make indexed-arrays to start from index 1.
->   Link: https://lore.kernel.org/netdev/20251022182701.250897-1-ast@fiberby.net/
+> Older switches use a format apparently introduced with BCM5387/BCM5389,
+> while newer chips use a format apparently introduced with BCM5395.
+> 
+> Note that these numbers are not linear, BCM5397/BCM5398 use the older
+> format.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,1/3] ynl: samples: add tc filter example
-    (no matching commit)
-  - [v2,2/3] tools: ynl: call nested attribute free function for indexed arrays
-    https://git.kernel.org/netdev/net/c/41d0c31be29f
-  - [v2,3/3] tools: ynl: ignore index 0 for indexed-arrays
-    (no matching commit)
+  - [net-next,1/8] net: dsa: b53: b53_arl_read{,25}(): use the entry for comparision
+    https://git.kernel.org/netdev/net-next/c/a6e4fd38bf2f
+  - [net-next,2/8] net: dsa: b53: move reading ARL entries into their own function
+    https://git.kernel.org/netdev/net-next/c/4a291fe72267
+  - [net-next,3/8] net: dsa: b53: move writing ARL entries into their own functions
+    https://git.kernel.org/netdev/net-next/c/bf6e9d2ae1db
+  - [net-next,4/8] net: dsa: b53: provide accessors for accessing ARL_SRCH_CTL
+    https://git.kernel.org/netdev/net-next/c/1716be6db04a
+  - [net-next,5/8] net: dsa: b53: split reading search entry into their own functions
+    https://git.kernel.org/netdev/net-next/c/e0c476f325a8
+  - [net-next,6/8] net: dsa: b53: move ARL entry functions into ops struct
+    https://git.kernel.org/netdev/net-next/c/a7e73339ad46
+  - [net-next,7/8] net: dsa: b53: add support for 5389/5397/5398 ARL entry format
+    https://git.kernel.org/netdev/net-next/c/300f78e8b6b7
+  - [net-next,8/8] net: dsa: b53: add support for bcm63xx ARL entry format
+    https://git.kernel.org/netdev/net-next/c/2b3013ac0302
 
 You are awesome, thank you!
 -- 
