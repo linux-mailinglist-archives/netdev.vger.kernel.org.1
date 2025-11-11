@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-237454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D3CBC4B70E
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 05:15:25 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id F20B2C4B6E1
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 05:13:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04E4A3BC0C0
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 04:09:12 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6B94B4F2460
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 04:11:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8881534AB09;
-	Tue, 11 Nov 2025 04:08:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2E3B334687;
+	Tue, 11 Nov 2025 04:11:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XKCQsOF0"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="JZPytzXF"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F30223148D8;
-	Tue, 11 Nov 2025 04:08:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD9C33987;
+	Tue, 11 Nov 2025 04:11:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762834084; cv=none; b=epAMzLTAHtHpmxd/FsSjHAglZ+iTHaFF7fEr5RvLub5IC4peJR5mmas5v53C4R7jcjWLSOtxuG1NwTm/HSwtphgdGVCOR0tgoboXBVoCE330SuN24CjXzV/qOciJ+p4UQyTfUv0wjz41eGfuobO5YeGUz/sqppoLdhBHNNe7F24=
+	t=1762834303; cv=none; b=OkjCflzG/5O1z0DbIenlPhDk+YTSHw0m/zzBNm7MT2lG7o45MHUpYAtxJfXfc42uKRN42agz+qVe4K076rKr4gAGK0aQSvENGyrMMEeFXrsWQDoWb0FuEIkZ5KC1CYMjnENn/NE6IJArdmelbd8aakdOf/w3u3dbVKrbMOZZkXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762834084; c=relaxed/simple;
-	bh=3kzAFjCM6HbXSpkV+jQ9TGQC4bAtu1w924qOSfk6wzY=;
+	s=arc-20240116; t=1762834303; c=relaxed/simple;
+	bh=CobPXz5uURwOv386V1OmSFqu0LXr8SDsWHn+XUgopdY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QNJ53D/romk9mg1oONbm0NkveiMuE05ByW85xPRgvD+iVLmP5zn9bxkcSUnpMvAE4gxxrnmq+c/dDdqxFkG+vWjgAQdHTeoZO2mG3tMfDWM8WTbwX//TCshMED7Bn6o+27hijK/4m2uYJ2sOO7H1ixUnIdlFlGhwJGPvK0qozOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XKCQsOF0; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=Bj7IGl8KKh4KhIPXvaGicMfTF+5NEIA3q7Ull3W4QomUtwnkjz/8lKSvp2DsgQKrY3xlWEeNnb3CuJK8axiCzNBWv2ZUnsmxsGWMmLwcmLJudBc3S2wJauQx4eKK1+PM9F45aC7G8VJVmyjfLQ2XFLB8H0AboDw3i6AQH/0FsD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=JZPytzXF; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Gd10wbrN2noGIROSPOS+j8rDV/mJIhsf3ducn3FrnCU=; b=XKCQsOF0NRdKSrpk3e7LM+5zvv
-	GgeuD3o+ZS9X2X7xT3/GmwP4i1mldHv/nitvF0SI7Cxqkl9F+FI2Eti85pSauTvRN0LQ880Jumv8D
-	M5c6TK0hNPIICFUQtcCHLaQmFvrhqexWyIgWLRxGge3rHIx1kloJOb0QuchsDZ36/sHE=;
+	bh=/Fo1e2aPtAR+InvmfqQJdNsNmWu5GCVuPvozKsi/Gns=; b=JZPytzXFYtcpQGrQwbgkIwH0m0
+	VKA3+fKZLAGVdrCi0UpOlZGbPUcrHmEjK9okLNhU2kBqDNBsNoCMsT5bDrzBhZaCr3dZOpIufWU+D
+	Y47RDT/7/U11rttqiY/n+Bg/AQAQ+vIGCULi/35Z2FZJDMlG99z2kQMOAcbjV4qpwdpM=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vIffd-00Dae4-0p; Tue, 11 Nov 2025 05:07:53 +0100
-Date: Tue, 11 Nov 2025 05:07:53 +0100
+	id 1vIfj8-00DafP-0v; Tue, 11 Nov 2025 05:11:30 +0100
+Date: Tue, 11 Nov 2025 05:11:30 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Maxime Chevallier <maxime.chevallier@bootlin.com>
 Cc: davem@davemloft.net, netdev@vger.kernel.org,
@@ -68,11 +68,11 @@ Cc: davem@davemloft.net, netdev@vger.kernel.org,
 	Romain Gantois <romain.gantois@bootlin.com>,
 	Daniel Golle <daniel@makrotopia.org>,
 	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: Re: [PATCH net-next v15 14/15] net: phy: dp83822: Add SFP support
- through the phy_port interface
-Message-ID: <5b9a42b0-e2f8-490a-be5a-21c998717074@lunn.ch>
+Subject: Re: [PATCH net-next v15 15/15] Documentation: networking: Document
+ the phy_port infrastructure
+Message-ID: <8faf0011-c272-4b30-a657-7bdbd2ad18e9@lunn.ch>
 References: <20251106094742.2104099-1-maxime.chevallier@bootlin.com>
- <20251106094742.2104099-15-maxime.chevallier@bootlin.com>
+ <20251106094742.2104099-16-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,17 +81,14 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251106094742.2104099-15-maxime.chevallier@bootlin.com>
+In-Reply-To: <20251106094742.2104099-16-maxime.chevallier@bootlin.com>
 
-On Thu, Nov 06, 2025 at 10:47:39AM +0100, Maxime Chevallier wrote:
-> The DP83822 can support 100BaseFX. This mode was only accessible through
-> custom DT properties, but there also exist SFP modules that support
-> these modes. As this only requires setting the relevant supported
-> interface in the driver, expose the port capability with the new
-> phy_port API, allowing SFP support.
-> 
-> Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> +This model however starts showing its limitations when we consider devices that
+> +have more than one media interface. In such a case, only information about the
+> +actively used interface is reported, and it's not possible to know what the
+> +other interfaces can do. In fact, we have very few information about whether or
+
+'very little information' would be the more normal English phrase.
 
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
