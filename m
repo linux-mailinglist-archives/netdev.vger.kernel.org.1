@@ -1,92 +1,74 @@
-Return-Path: <netdev+bounces-237416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D0BAC4B2CF
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:12:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE459C4B2DB
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:13:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0DAE218818F7
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:12:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 869ED18835FC
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:13:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2F39346A0C;
-	Tue, 11 Nov 2025 02:10:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DC3B341677;
+	Tue, 11 Nov 2025 02:13:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b5ZIcIsy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rabwyA/Y"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD4CE346FB0
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 02:10:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1282819CCFD;
+	Tue, 11 Nov 2025 02:13:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762827046; cv=none; b=jrsCZuwOGvdB7C1I1JRddIJfLb1+DQ4lN0o8IBQsSjGAO9aBP/kTRLyYPxZW4rWUt26e5fU8Ym40QdZLVpZpFf+A23l9061Hj18AybVAkZK6nNxXkyNoAcaOs2uOr7XvgQ7fYSxd7Eb5dDR7az60UFahHvpnBbJLnPJeEwUy8+A=
+	t=1762827188; cv=none; b=Lxe1OAeuWiMcCNYc2f9hAJVvOVbnaMCWXgJFtDSQlhrdWw+nhioa1ix6msop0XFZz7TShEzdUm16Q2eILyjWiyiMANq4RNURwy2+0Fp9MQrFWasNkiHMJyju/Yzzacg9P/g14THjsQEXvrPc+hWBNj9siHnGH+Chx/PwG15sIOg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762827046; c=relaxed/simple;
-	bh=U3Ja5ES1D5EBP9e+28kMHLJhR0ZR4ly9zioTm7hHRLQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jKqbwc84bf7Dvbo6woHn8BCg2lLY1VHNdSYmIpvaIgQnOx+UZrUVoOuXSXrQXqGVIp1q4HnYP5G8A7jQL1EugGO6+XogqfN/bdUHMZoy0oiUGArH+/FfV2iv7jnATYhoaVJrlCCX43WqrrD8RqXvNHj9F9Tln6NFGJuMGPSj30k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b5ZIcIsy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8919EC19425;
-	Tue, 11 Nov 2025 02:10:46 +0000 (UTC)
+	s=arc-20240116; t=1762827188; c=relaxed/simple;
+	bh=1Ri0DfcRggwPTmFPolyws/NpIVbil0D6j3dsoakvaOo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WM9Sr78GdTEMSk+atISCeCCvqg8tDprvoCW+84Ss0nEBIxvhNwEKPeshnFHeUGFNuzjiiTdd7SDOR5u6OESt3Fje5XTLRSg3/07Y/jhzXks/vOmxEatB6mdUQBDMxKcuyLFkUP0/q2otLAnUZZQxWfNCOds/WSV6yW5yznBn5XA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rabwyA/Y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0271AC116D0;
+	Tue, 11 Nov 2025 02:13:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762827046;
-	bh=U3Ja5ES1D5EBP9e+28kMHLJhR0ZR4ly9zioTm7hHRLQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=b5ZIcIsyaz55ZK0tkI38uqxiYuZ6DxNtPYsA6bjCT2dPQNIALmvHBS3piN44UctwU
-	 pHrZYit+3UlXt95Fydg4LkqYW40r/PS7xcskDc783NAVsQO/kMk3yJN8mzoT4JMDZT
-	 dyMCZyI1wOR4LpZkhnM0M4LNzYzK9eTYcW31jr8ov4rdhmXGxziDCKjdWa8f+u+gAE
-	 8KcD0J/I+UoeCyPMlSh3Hj1/70+uLw6ltb80UHIDxKnXXpUbA+WDr0UIHEnLqQdHmy
-	 CtDaCWzba/wxrrNaHU9WMUKWKYAsxuhSHoahl0YsDPr3rzj3QefK/0diQNnNrMN4VK
-	 47x9xUHSG8i/w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C54380CFD7;
-	Tue, 11 Nov 2025 02:10:18 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1762827187;
+	bh=1Ri0DfcRggwPTmFPolyws/NpIVbil0D6j3dsoakvaOo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=rabwyA/YOj9GBdzd/l5+5I0nsonxaTedvc1+h+OFRTS2e/9iuhgRkrDIl/iFoGs73
+	 fKlEsCCjtXJaLtY4oInzY1p/71NFEz6eXmHEkvk2lzmLWjDSSDc/Cfpug+F4tMi1CU
+	 n///74+11iemO04SbLa6Yu45L3yk57S9HkFvAV306QNDlyUC843QAGFUX7PIwgC+iH
+	 tSsQRed2Vw7rN/7FoTQPW26vLVXEeW1Wbkc4/qONNtHibmXpTtcAE6QZVbS7KZLRaH
+	 n7G3FPTyy4ZVX2iC04MDKpWMEgvjKSD3h44zdzluf/hfF9MAm1LVNM4ojU9WVhgse4
+	 IIVnHjKxHcWzw==
+Date: Mon, 10 Nov 2025 18:13:06 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: andrew+netdev@lunn.ch
+Cc: Wei Fang <wei.fang@nxp.com>, claudiu.manoil@nxp.com,
+ vladimir.oltean@nxp.com, xiaoning.wang@nxp.com, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, aziz.sellami@nxp.com,
+ imx@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 net-next 0/3] net: enetc: add port MDIO support for
+ both i.MX94 and i.MX95
+Message-ID: <20251110181306.5b5a553f@kernel.org>
+In-Reply-To: <20251105043344.677592-1-wei.fang@nxp.com>
+References: <20251105043344.677592-1-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] bonding: fix mii_status when slave is down
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176282701674.2852248.18073773842117907078.git-patchwork-notify@kernel.org>
-Date: Tue, 11 Nov 2025 02:10:16 +0000
-References: <20251106180252.3974772-1-nicolas.dichtel@6wind.com>
-In-Reply-To: <20251106180252.3974772-1-nicolas.dichtel@6wind.com>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, jv@jvosburgh.net, andrew+netdev@lunn.ch,
- sdf@fomichev.me, netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Wed,  5 Nov 2025 12:33:41 +0800 Wei Fang wrote:
+> v2 changes:
+> Improve the commit message.
+> v1 link: https://lore.kernel.org/imx/20251030091538.581541-1-wei.fang@nxp.com/
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Andrew, is the explanation good enough? 
 
-On Thu,  6 Nov 2025 19:02:52 +0100 you wrote:
-> netif_carrier_ok() doesn't check if the slave is up. Before the below
-> commit, netif_running() was also checked.
-> 
-> Fixes: 23a6037ce76c ("bonding: Remove support for use_carrier")
-> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-> ---
->  drivers/net/bonding/bond_main.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-
-Here is the summary with links:
-  - [net] bonding: fix mii_status when slave is down
-    https://git.kernel.org/netdev/net/c/2554559aba88
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+If the feature is inherently not safe to use with existing Linux
+locking scheme we can't support it upstream..
 
