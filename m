@@ -1,98 +1,83 @@
-Return-Path: <netdev+bounces-237400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7B41C4AA7E
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:35:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A0DDC4AAB2
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:36:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC2283B3C15
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 01:29:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F293F3B8079
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 01:28:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 614E9341661;
-	Tue, 11 Nov 2025 01:20:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BBE72C324C;
+	Tue, 11 Nov 2025 01:20:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IsZ5Vzr2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RY4pBeMs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DD0C34165A
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 01:20:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0642C2BE7B8
+	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 01:20:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762824040; cv=none; b=sCmCPV2n8NmnTlZ8TuRTf7CLVGRVMvM6xuc6u8x3veSQX4FHR6ByFAyRxNEDgSsUm+0sCvE0DVhfSEoTeBskKGl+OBNl1jmzNZe1OkvvG8+7jyYagxiZWDhGfpoLqNgpq5i6O4AhH0G+7UqGmGedGo+rr3LuRDhtz4EAUMovNYA=
+	t=1762824018; cv=none; b=MjsZtnJ06PQmFq9NA3cI12sZkUGwYPd3wX5ehiy2VsjcfALBhMeO28JnntpNIOZSLWJKoQdiCN2vv68ADXwfl2GjTXYWDWLdUWAfan2Jn3dTJn3G0Y2pYRi/WlvpVLFtuIwwY+abEh5fjCWyymEDd/YnnpThTrqqrvEKUTLvP34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762824040; c=relaxed/simple;
-	bh=Hs/caOKcz7dDsvbKz6ieBxxnISBDRnSvj9nRCyfK5AE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=IOXKcEIVeh/OsLFQxY+/SilQjUp6d8M0GPT+YSYE5QNNr2ADcu2fuK5VH7NxkWzM3cu+3s0kg389UaONH5pds5go54GO6jQnLpQKRDOlM9eIKJ+3KLMss8fa3ti6DZvxokcmf/QVMCwcfJP/rQHvrnKlCdQkp8lCTtQb1T28wUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IsZ5Vzr2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7375C4CEF5;
-	Tue, 11 Nov 2025 01:20:39 +0000 (UTC)
+	s=arc-20240116; t=1762824018; c=relaxed/simple;
+	bh=yyT0ioEruyJ11OspHhKh4heetYZvFinXE3ocWm04cbA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bXAZRVo5a+IeQfDdn5dOvhUBfnNbqXRxI7xAQDbJZpxwQD7rq7TOCKeKEAsiu1P6ySEHucRxsp8iAqXQbC5JzYEIv1g0BKnmAJzmlhysuxlHdLXl596eytSixzC68BYZvnbDsO/fCcLR4PA1zxcvfEGEW6n+DpeeOPo6AWG7+vY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RY4pBeMs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A74EC116D0;
+	Tue, 11 Nov 2025 01:20:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762824039;
-	bh=Hs/caOKcz7dDsvbKz6ieBxxnISBDRnSvj9nRCyfK5AE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=IsZ5Vzr2v3K+TirqR6+NZGVlNrBQMN0aF1TiZqa7+ncD8jozEc+KAl0sXYs6DUY+/
-	 Q1UBz2jXqUfemuGPeKxTUvz8n5i3Zj8L52bk5X/WExjMD/MXfo66vQBKM+KLzoy0uP
-	 EyzSIvTJNUSYeMpMh7QT/gzue2GdWnIaC1S8pY7uUdDSPQl2H+R+DicUemw40iOxWW
-	 Yt2t9ovrBIVaogf7LsuknNpXdvqM4KtqJsLadtSH5jGT+6Gzh+82TP4XcS1UDARrin
-	 U+ikV1BSG/ljSoUQv5QrK2m1Qnrd7xpuWb7bs8ekWyvhDV/bfwNoneixMgBTk+vk10
-	 w9z00Div/yaZg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE224380CFD7;
-	Tue, 11 Nov 2025 01:20:11 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1762824017;
+	bh=yyT0ioEruyJ11OspHhKh4heetYZvFinXE3ocWm04cbA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RY4pBeMsqzD9CPOrlJrLX+nK74a8luZJklsulf23378hpnaNoYAkhUdpO4gr1s10w
+	 yZvcpq0yXXi36TQSyyYEVgJDGGrMPh+gB2z3A7zHfNtScUvPBXl9+OH/JP4qUnOma5
+	 k1NjZB0fIqEFxSG864opO64Wpsuok435OeJW671DZG7jfGYke7k9LDhvSPERj5/+s5
+	 CYpYnHTT8eq/oOeQyBuxv60nJqUr1K/7xf5kbhdwQ34yEyL5EPSyTrByZm186jpPb4
+	 hQfyXGcrk5OkNj/e3czsgnn0vOZAaTXr6bMZas7tz2ndRxB7Gvt/CaaQNzkPvoHG9W
+	 OFX40VT8zI0Fw==
+Date: Mon, 10 Nov 2025 17:20:16 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Zahari Doychev <zahari.doychev@linux.com>
+Cc: donald.hunter@gmail.com, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, horms@kernel.org, jacob.e.keller@intel.com,
+ ast@fiberby.net, matttbe@kernel.org, netdev@vger.kernel.org,
+ jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ johannes@sipsolutions.net
+Subject: Re: [PATCH v2 3/3] tools: ynl: ignore index 0 for indexed-arrays
+Message-ID: <20251110172016.3b58437d@kernel.org>
+In-Reply-To: <20251106151529.453026-4-zahari.doychev@linux.com>
+References: <20251106151529.453026-1-zahari.doychev@linux.com>
+	<20251106151529.453026-4-zahari.doychev@linux.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/2] net/sched: Abort __tc_modify_qdisc if parent is a
- clsact/ingress qdisc
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176282401024.2838761.18211030225410260090.git-patchwork-notify@kernel.org>
-Date: Tue, 11 Nov 2025 01:20:10 +0000
-References: <20251106205621.3307639-1-victor@mojatatu.com>
-In-Reply-To: <20251106205621.3307639-1-victor@mojatatu.com>
-To: Victor Nogueira <victor@mojatatu.com>
-Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, netdev@vger.kernel.org, wangliang74@huawei.com,
- pctammela@mojatatu.ai
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu,  6 Nov 2025 17:56:20 -0300 you wrote:
-> Wang reported an illegal configuration [1] where the user attempts to add a
-> child qdisc to the ingress qdisc as follows:
+On Thu,  6 Nov 2025 16:15:29 +0100 Zahari Doychev wrote:
+> Linux tc actions expect the action order to start from index one.
+> To accommodate this, update the code generation so array indexing
+> begins at 1 for tc actions.
 > 
-> tc qdisc add dev eth0 handle ffff:0 ingress
-> tc qdisc add dev eth0 handle ffe0:0 parent ffff:a fq
+> This results in the following change:
 > 
-> To solve this, we reject any configuration attempt to add a child qdisc to
-> ingress or clsact.
+>         array = ynl_attr_nest_start(nlh, TCA_FLOWER_ACT);
+>         for (i = 0; i < obj->_count.act; i++)
+> -               tc_act_attrs_put(nlh, i, &obj->act[i]);
+> +               tc_act_attrs_put(nlh, i + 1, &obj->act[i]);
+>         ynl_attr_nest_end(nlh, array);
 > 
-> [...]
+> This change does not impact other indexed array attributes at
+> the moment, as analyzed in [1].
 
-Here is the summary with links:
-  - [net,1/2] net/sched: Abort __tc_modify_qdisc if parent is a clsact/ingress qdisc
-    https://git.kernel.org/netdev/net/c/e781122d76f0
-  - [net,2/2] selftests/tc-testing: Create tests trying to add children to clsact/ingress qdiscs
-    https://git.kernel.org/netdev/net/c/60260ad93586
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+YNL does not aim to provide perfect interfaces with weird old families.
 
