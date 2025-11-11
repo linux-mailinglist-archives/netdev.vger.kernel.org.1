@@ -1,171 +1,144 @@
-Return-Path: <netdev+bounces-237495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 520EFC4C73B
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 09:47:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D31EBC4C75F
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 09:51:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BF163B438E
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 08:47:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD944188748C
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 08:51:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4A4A2ED846;
-	Tue, 11 Nov 2025 08:47:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DEFD253932;
+	Tue, 11 Nov 2025 08:51:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A5S3yRZh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VjSEX8+B"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FA03238166
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 08:47:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECE2F757EA
+	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 08:50:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762850847; cv=none; b=JXt6UfUqOwA6oop5deP+XyY7KbWPfLhqJyU4QLzttDr5xhYFtus3HUbCmtC1vgZeihcGY/2rifpj4TouX35tR2PnmNWNw5Sj6PxFliwCM6H7kMxQyineDapCH8Yjnx8iRrKhJ6C8JaxrPJpT3YagBOKQG2xPKMeNz5jCjdCc9qg=
+	t=1762851060; cv=none; b=VBjTXwr2zA0gZRqHKnsAwI8tykGOs5QTFofs3btdnDvcTYxrOLCZaxN11yQ6zxieeAAjtCBGyi+pnO0MrKubA8b2U0EnYG7Htx98ZEny59Rq8LEpSss6JCbzR93IoTFc61aB1ffWDtJEsUpu9DOICRhy5a0K7vLCOyPeO+HdwvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762850847; c=relaxed/simple;
-	bh=2uauu+e7e2Iijj+hzAEHLbjoZXgVM4D+TCNpdSDVIvk=;
+	s=arc-20240116; t=1762851060; c=relaxed/simple;
+	bh=0YRsrI6lk/jpE/TQxXFHe1uone6HcJRymeuTM22KPDU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MHriov78QCFIjE1n9dVkiAbxkmjBIiMDpI1rIYBYY9y0dF82GhXNYWQ/jgob//YHTQBp/+nAhhEUwfPEkHBRJxD5Zkt8mzoqK42LTCtalQD89riJiV5xMZq5PSN5D3MHGiLaFsL0vAj1xIdWdSooW7ffKsBiKTai+YkgZekI8RE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A5S3yRZh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36EACC4AF09
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 08:47:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762850847;
-	bh=2uauu+e7e2Iijj+hzAEHLbjoZXgVM4D+TCNpdSDVIvk=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=A5S3yRZhFBu0wHm9MDRF54snByCb7yRvJN+IghIeEnl0az/uWltKMf49/IiHIKUgt
-	 NLfT6LjuzE+8PqUtqaoGCWwy04UDjirQ332jvtfLJPEY2nWaPVwgIy8vzHqDPP8qAH
-	 SomxdZMNB12E/MUtFSg1WY2U46anQJQrxjzc7awkxVE5fqmEj+yWl923bPcNOffa5j
-	 CVc2XkemaPMmX3ATKY5pfn8czep/BHFtssZS4aOBgRZPmscpuiUz8yWAg8qQXA6s+t
-	 OkXE31wJGm0mrQhmvuf1dGuDjcSiGe5aMg8j5V4FKaEZbm11Ey+um00pWfDEHv1BQx
-	 lryPZCA/TTiEg==
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-6407e617ad4so1204222a12.0
-        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 00:47:27 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUx5OpZc/sSswp4EusVRp17peBr7LQX2eG87qS+2Yab0Smsj4MU1iOhcpr1U1dYQOGSYgRaXAI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw1wCo5O6hOMK0yjTCB8MybIuLGIm8ChDpwHysiU2LX39qS8ffr
-	DxN8Dr+4UCWXwWVipxy8WsRYQB+ythBgJS5Q8aeWT6qxUZgA6OVcamTs+AszjDHcQtv6hlgMCEk
-	iHAuUX9KV9EMOlV37tWrPhM7s3o6vUSc=
-X-Google-Smtp-Source: AGHT+IHkQyqpu8uY/c9UPfomQHwGFx66iPjBHykE3hl/2cQehAkvE3KYP9MR7fZUJQfYxuuZp8VE4LWQAJGNO0qnxpw=
-X-Received: by 2002:a05:6402:208e:20b0:640:cf58:47f9 with SMTP id
- 4fb4d7f45d1cf-642e276c72emr2011860a12.9.1762850845770; Tue, 11 Nov 2025
- 00:47:25 -0800 (PST)
+	 To:Cc:Content-Type; b=YrRzxh5t/Vq2l+bJkrguM8lPW0HLuxX75JxqojuazTIeT0BIhObD4/HuD21Jnvcc/3fjKxCIWCNzvDZHX4HCNDT8lZTdH6ia7I1ZVc90DhZXuAPG/RZfo5uxsIfIjfE0leqq4ujtF9piYYueXR0lAKX7Zbf6CGzXNUtrIs+qlGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VjSEX8+B; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-42b3d7c1321so1027522f8f.3
+        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 00:50:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762851057; x=1763455857; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4AFOtj9BBWikbvrk76I+BOfuLhZBC12T4UuFnubfgtU=;
+        b=VjSEX8+Bau2Yqc5otfkaZpmWy+ce/jsNVbJnZj6sY4wpQ/xq83Q5Iu3wDuoUGxbCWX
+         rHKBgVT08CtErkBqV+fIvf4d/JYvj3pDyAbltVr+STZ/HgWF6u4LTHx9yfg+HXE2ig+x
+         c+fTJA3eFrZpUgphQWqa6o3FwpKKMlGmwKliaKi15QzlC7jiitUSXwRy13x5druPLLrs
+         nGlBETdxjtdcBUUrxewtKAFdignBI+oz2B00rBTSpJ1kV4WSIDPWCbYl5ZfpDLYrFvVw
+         NgEJ6HfeAEF9kiTAkYuYkSwsK19FogYlgdbNMVyV/Z34ZQRyiOCsl1KTRHmsovFi7mT1
+         vFOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762851057; x=1763455857;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=4AFOtj9BBWikbvrk76I+BOfuLhZBC12T4UuFnubfgtU=;
+        b=KMWYVB98ePBqExwHS5XGKOUPZjTgDyq8l2r1gxVFQCzoN151quf6ZXYbtFpxg/mt4Z
+         Hafwn+8u8sKfNaLQbgc7dYQr+JbKE25GWRlIfzwjISsgpm3GcG2gahTHg+DxKyinLJVp
+         kaowWF+5HkyJfRH6p1fM5HE5emEJRDWDvxx5WS4QGJzhaRGS5ro7WOwAJeseHQkUQoX5
+         mI7GyWqqqi/6Tkt3a2k4X4yTXtfu3jfULaPL/ITI5drdfSR3tEqRqpU2lIjgYQ0FF0Zc
+         vNVc+IGRYikTE86gf3Wrii7jX4P1QPCTSQFm6m8YFPXka2m/nd+6tM9eZ3GV7NNDDwHE
+         XK1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVe2cxw1bcvkBoWAjxHAKdK1IJ6+yWDpMI4KkQUNVAvxgrHSZU+8RvUSCq6xyH3IJFrRl9RnxY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+pyIlxtrjdtixrdTIbJDiYEOgG3ReCpFXEdMegofr5bNuWxbF
+	g3/3XrLIwuwcx9Kfm7vx8+tssXwXOm7UE4yeYXwoM2XVB+djBgVOuUM4KQ66rDi2Q2dbYsBq1Gj
+	4P+9x/6z6NJIv1b6iJUZVnZu+uvhDRqk=
+X-Gm-Gg: ASbGnctj/Ql7e/Sn+2EmwkOVz3eO+woK+cafRdgVcFbHCdygNp3YxhZT1gaHJPmKmIz
+	Yu8tCyFmJDVniyhK2XVxKQJfmBv8inW9iSwxTkOh3lq7Ljiy/io06rdJY0Ef2kV0Tk/6fL3u0o5
+	c0WwjkpwbKthPqjFRcv6tNFV8DRP094avEfQNMBTIsK3O2K42GlUWyFdHDBi0/jpLgpVc1QAT7X
+	0QTeuTZzxVTZPFG9MfTZcvvX7YdlA3T6QPWCnKoo+DddibufbiXADePtq8M+g==
+X-Google-Smtp-Source: AGHT+IE+da+1r+jgi0DXyIDNB8MGdp+Nzp4Lqz4ylhf8uYWKyvAt57QPmxdapcBrV4Tm8KD8ARq3BHLCSjO12/WC1Hc=
+X-Received: by 2002:adf:9d83:0:b0:42b:3083:55a2 with SMTP id
+ ffacd0b85a97d-42b308356e2mr6996138f8f.63.1762851057106; Tue, 11 Nov 2025
+ 00:50:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251030064736.24061-1-dqfext@gmail.com> <2516ed5d-fed2-47a3-b1eb-656d79d242f3@samba.org>
- <10da0cb9-8c92-413d-b8df-049279100458@samba.org> <CALW65jav2wiWzz6q6vdnjL88GJB1eWJtLVzH3M1CkOHbdgSDWw@mail.gmail.com>
-In-Reply-To: <CALW65jav2wiWzz6q6vdnjL88GJB1eWJtLVzH3M1CkOHbdgSDWw@mail.gmail.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Tue, 11 Nov 2025 17:47:13 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd8pcBaTjVpG9HQuLRqNT8yxpZmKvJypSA=EyfzyWDjAfg@mail.gmail.com>
-X-Gm-Features: AWmQ_bkmXcuPhr7pfdB3NLP7MMVOO0QH8k5h9CXEl-rTvXG_N4UNf9xAwgxokSQ
-Message-ID: <CAKYAXd8pcBaTjVpG9HQuLRqNT8yxpZmKvJypSA=EyfzyWDjAfg@mail.gmail.com>
-Subject: Re: [PATCH] ksmbd: server: avoid busy polling in accept loop
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: Stefan Metzmacher <metze@samba.org>, Steve French <smfrench@gmail.com>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>, 
-	Ronnie Sahlberg <lsahlber@redhat.com>, Hyunchul Lee <hyc.lee@gmail.com>, linux-cifs@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20251107201232.282152-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20251107201232.282152-3-prabhakar.mahadev-lad.rj@bp.renesas.com> <ec28d950-f7ef-4708-88aa-58c2b9b0b92a@lunn.ch>
+In-Reply-To: <ec28d950-f7ef-4708-88aa-58c2b9b0b92a@lunn.ch>
+From: "Lad, Prabhakar" <prabhakar.csengg@gmail.com>
+Date: Tue, 11 Nov 2025 08:50:31 +0000
+X-Gm-Features: AWmQ_blqCCNNMwhN5TO78-IZrSmoQkRYNb4dIksXog2xpI2Up-_qLjDEx3kShQY
+Message-ID: <CA+V-a8uLC5OJ7g1MbJVcJeCS9wPVYDoCDUW7i8keUftQLkmmLg@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 2/3] net: phy: mscc: Consolidate probe
+ functions into a common helper
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Horatiu Vultur <horatiu.vultur@microchip.com>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Vladimir Oltean <vladimir.oltean@nxp.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
+	Maxime Chevallier <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org, 
+	Biju Das <biju.das.jz@bp.renesas.com>, 
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 11, 2025 at 5:03=E2=80=AFPM Qingfang Deng <dqfext@gmail.com> wr=
-ote:
+Hi Andrew,
+
+Thank you for the review.
+
+
+On Tue, Nov 11, 2025 at 2:50=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
 >
-> Hi Stefan,
+> diff(1) has not made this easy...
 >
-> On Tue, Nov 11, 2025 at 3:16=E2=80=AFPM Stefan Metzmacher <metze@samba.or=
-g> wrote:
-> > >> Also remove:
-> > >>    - TCP_NODELAY, which has no effect on a listening socket.
-> > >>    - sk_rcvtimeo and sk_sndtimeo assignments, which only caused acce=
-pt()
-> > >>      to return -EAGAIN prematurely.
-> > >
-> > > Aren't these inherited to the accepted sockets?
-> > > So we need to apply them to the accepted sockets now
-> > > instead of dropping them completely?
+I agree, --diff-algorithm=3Dpatience option for format-patch gives a
+better result. I'll send a v3 with this option.
+
+> > +static int vsc85xx_probe_common(struct phy_device *phydev,
+> > +                             const struct vsc85xx_probe_config *cfg,
+> > +                             const u32 *default_led_mode)
+> > +     int ret;
 >
-> You're right, TCP_NODELAY of a new accepted socket is inherited from
-> the listen socket, so it should not be removed.
+> > +     /* Check rate magic if needed (only for non-package PHYs) */
+> > +     if (cfg->check_rate_magic) {
+> > +             ret =3D vsc85xx_edge_rate_magic_get(phydev);
+> > +             if (ret < 0)
+> > +                     return ret;
+> > +     }
+> >
+> >       vsc8531 =3D devm_kzalloc(&phydev->mdio.dev, sizeof(*vsc8531), GFP=
+_KERNEL);
+> >       if (!vsc8531)
+> >               return -ENOMEM;
 >
-> >
-> > Actually the timeouts are added to the client connection,
-> > but not the TCP_NODELAY.
-> >
-> > But looking at it more detailed I'm wondering if this might
-> > introduce a deadlock.
-> >
-> > We have this in the accepting thread:
-> >
-> >          while (!kthread_should_stop()) {
-> >                  mutex_lock(&iface->sock_release_lock);
-> >                  if (!iface->ksmbd_socket) {
-> >                          mutex_unlock(&iface->sock_release_lock);
-> >                          break;
-> >                  }
-> >                  ret =3D kernel_accept(iface->ksmbd_socket, &client_sk,=
- 0);
-> >                  mutex_unlock(&iface->sock_release_lock);
-> >                  if (ret)
-> >                          continue;
-> >
-> >
-> > And in the stopping code this:
-> >
-> >          case NETDEV_DOWN:
-> >                  iface =3D ksmbd_find_netdev_name_iface_list(netdev->na=
-me);
-> >                  if (iface && iface->state =3D=3D IFACE_STATE_CONFIGURE=
-D) {
-> >                          ksmbd_debug(CONN, "netdev-down event: netdev(%=
-s) is going down\n",
-> >                                          iface->name);
-> >                          tcp_stop_kthread(iface->ksmbd_kthread);
-> >                          iface->ksmbd_kthread =3D NULL;
-> >                          mutex_lock(&iface->sock_release_lock);
-> >                          tcp_destroy_socket(iface->ksmbd_socket);
-> >                          iface->ksmbd_socket =3D NULL;
-> >                          mutex_unlock(&iface->sock_release_lock);
-> >
-> >                          iface->state =3D IFACE_STATE_DOWN;
-> >                          break;
-> >                  }
-> >
-> >
-> >
-> > I guess that now kernel_accept() call waits forever holding iface->sock=
-_release_lock
-> > and tcp_stop_kthread(iface->ksmbd_kthread); doesn't have any impact any=
-more
-> > as we may never reach kthread_should_stop() anymore.
-> >
-> > We may want to do a kernel_sock_shutdown(ksmbd_socket, SHUT_RDWR) after
-> > tcp_stop_kthread(iface->ksmbd_kthread); but before mutex_lock(&iface->s=
-ock_release_lock);
-> > so that kernel_accept() hopefully returns directly.
-> > And we only call sock_release(ksmbd_socket); under the iface->sock_rele=
-ase_lock mutex.
+> > +     /* Store rate magic if it was checked */
+> > +     if (cfg->check_rate_magic)
+> > +             vsc8531->rate_magic =3D ret;
 >
-> In kernel v6.1 or later, kthread_stop() in tcp_stop_kthread() will
-> send a signal to the ksmbd kthread so accept() will return -EINTR.
-> Before v6.1 it can actually get stuck, as accept() will block forever.
 >
-> If you're fixing the issue when this patch was backported to versions
-> before v6.1, this will not work, because kthread_stop() blocks until
-> the target kthread returns, so shutdown() will never get called. The
-> sock_release_lock mutex seems redundant because of that.
-> Instead, shutdown() can be called _before_ kthread_stop() so accept()
-> will return -EINVAL.
+> I think we end up with something like the above?
 >
-> Namjae, should I send a v2 with both issues addressed?
-Yes, please send the v2 patch.
-Thanks.
+> I would move the vsc85xx_edge_rate_magic_get() after kzalloc() just to
+> keep it all together.
 >
-> -- Qingfang
+Ok, I will group that under single if.
+
+Cheers,
+Prabhakar
 
