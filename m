@@ -1,201 +1,94 @@
-Return-Path: <netdev+bounces-237684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A22DC4EC01
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 16:20:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5533C4EC5E
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 16:26:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 259FE34C9BB
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 15:20:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A276188E637
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 15:23:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC7D9364EB4;
-	Tue, 11 Nov 2025 15:19:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FCB4364EB4;
+	Tue, 11 Nov 2025 15:23:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gfPf0wyZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M198SEPd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F29DD33EB01
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 15:19:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BEB32586E8
+	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 15:23:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762874397; cv=none; b=q5mgaWAMjzsgxP16vnRow8xvAQf17rQytdG/zNOWyb44RZ2WaiYkZejQomGmBHFym8cd/BG6Cx5bopW7ZZCNq5Y/m7VYf3paAiAG+TPo7aOm13neafEI8KWsxRYj0sFPRKNAOW5K8i1z0Oub+G4VnIIbNTgD2pH2ZOagGGf4CHo=
+	t=1762874592; cv=none; b=l9SQ/rl3Jxwa6VHgqe8U0adS8CRIJz7XN+QGaabRygshZzB1kNWI7fpwpmrAnEfS7x8XA134/83WhVFNm1xdXB320BY8zgCVAoPQ2a8FfMIhDM+pBJBAZVjncyEjY1ilgxx1z4oHF0vS9Xm6dtvUc5jJV9FQhbLNA3mAdsXz2xk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762874397; c=relaxed/simple;
-	bh=94GtY5KZjXmZPjl12JvyfDt0aWegthwLuMtBUxxbiGI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cPv7Wc7hB5vZoncp8QVc1EZ97Jrftpy97tGN3domuW/uqQMtLFtarZXVau4vp7OTiRZs+bPQMyqxkC2NILmwptKt2DJZRoi1HDKhFc0OdpZBZMhks6CxGCC+twMqXWdi9h5I/rCAagYlfn0xtG3AJN+Yy0YVbjMgNp6J0Hu4TGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gfPf0wyZ; arc=none smtp.client-ip=209.85.219.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-8804650ca32so42449176d6.0
-        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 07:19:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762874395; x=1763479195; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=A5SVOaFDlCV2uNNJy3v3HZSAyck/afp0AOlD6vgrWKk=;
-        b=gfPf0wyZuFA8eXSbBfB6sx8zsYhWsjzbtWIuwEJV9QsCbdj4lXEiwvy14oPL+BLR2i
-         QoEiHfQzIwTYN7EOvavJICHoG90ewvQHqv2A5+mZTlcQVHT0Bwq8BeuHKaiiY2YIkfH6
-         NoONLltZShp6fB6OmgBJrTPgxGV30KCdEVYtKj4fg7C1Zv3oIsahUCJUvUqDH36SPkiY
-         +DyJtYml+nBfyd+3kh4/vrh3arhdTbJLi+O5KNgKBtcOphhOTksm0+o/xDNaRzuzMLrc
-         229Jgt2BIDuxOfk5BW7pXpQtjKh/X3gF2Wz784UJx/Dsofz3nIyK2Xo20SAtmnA+VQ6B
-         0vgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762874395; x=1763479195;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=A5SVOaFDlCV2uNNJy3v3HZSAyck/afp0AOlD6vgrWKk=;
-        b=K/+Y0kt6bnPPzyj5E3B6f5yU1y11h5HWq7Z4sAbLmtIWAwdQ3j1Uz/NGXjD+4XGZhy
-         R+OvfQDXJiX1lrBEF1rRnuo6UjfqH5LCIN3WqwvbblKCCjBlFaPT0vcamxkZuwVXKAfF
-         gnOUdGlWYrjAJNgqLtLwTM7ONZgEVnvG1snqGjfRXgnYvwBvgSsI+mL8CM5gc88tbcnK
-         ucudD7r/9fCdBSVZxobU3NRgCEhmpohC5Lq37qnBTl87E7Ta4FHvVbmnr4fDpQSPy3K/
-         QVADZk0MONMRpTUWeJZIIr9/tz+4KTFbMxIr1kV+79KP77dQwUlUu3Gp98jWxBBq7hBz
-         WfuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUAyLPPpaZxQTMpEERZwiujVyRn8PXD52GVdtOChotbVqYWE+FAYqkJzqLQHg3cYmgRUDnl9WY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFyVUwlaEc+bfqVvRJUh7GYh1VT5GB1KuDUz+EtGQ+Ddi6uVPW
-	jWsac0tQNBYzBjwC1RpQzplbzdfpwDGqCnfoADLm7NRWP7txLyXrJ2Zi
-X-Gm-Gg: ASbGncv2vGuP4kR2gD47NUq7xsC0HkPrADeVuD+fG3GrQ5eN9wSfsT1g0bsOnqV2wqp
-	SCZJJupWuO3cTUrMtqRd0Xk59T2P+wE/VdPBnNWp7jD6AH2GrowwN+iwft38ETZ5GVEhyThVqnC
-	s1vrAqbeJ0m2jbg9c0EmDg9AUMurLgTJBO6vFxddcK/vvNXOCEKumzMjiGkAk4UFeCPql7zKjt8
-	qujppEjT8Z+5Xyt26DXGHzoyUvwVCzgH4D5v5jhB+IA6Z5E7H7351Ug1f93wPa0Ws48a79VYMdq
-	6V3DlOCAMDvnbGaRmB88bnDbjlUrrqTgciKm315Uru+ZruniNRiXJGWi08RMha/6U39ozzgTeEx
-	2nxubPvgLgPSjU0aTFjO8pDhVNiebd62Lok399oJfMM/qTG2zVl9+S4wyNpIv3iUpFVULSIcBKD
-	wO/FWXNDgxWvga1CJUc8q7RWwy
-X-Google-Smtp-Source: AGHT+IFAbbyQhephY+AI/cqoiVmNsBG/fPVAb6kdOEXVVnWOQfxDiV/20VWcE/IFvlGD21yeGrFzgA==
-X-Received: by 2002:a05:6214:21c4:b0:880:5636:6241 with SMTP id 6a1803df08f44-88238769402mr175766236d6.65.1762874394765;
-        Tue, 11 Nov 2025 07:19:54 -0800 (PST)
-Received: from ?IPV6:2620:10d:c0a8:11d1::1065? ([2620:10d:c091:400::5:ddc])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-88238b4c3c0sm72793516d6.33.2025.11.11.07.19.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Nov 2025 07:19:54 -0800 (PST)
-Message-ID: <9fed6ab9-e748-4a78-b45b-5e6b3cc58006@gmail.com>
-Date: Tue, 11 Nov 2025 10:19:51 -0500
+	s=arc-20240116; t=1762874592; c=relaxed/simple;
+	bh=XUy4hSmlzm6KI7tov+MvNF+BYxrjNy5JOMDQ4JgFQno=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mM9ofBdqk4O19jMx46wY3wcDdo8fri1S5ACnunBgYqKXLniWdPBlweGunjfKNiuxxYKAZjGLLJUIK6cqR/U/Xy9PK7j53bwUpGOgrO1RDij7XZ3D18RwCP4gwxJPsQOhJfBcUU1wKBPRwMKcJAIHgykexGo4WfjWuCSpyxx3z5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M198SEPd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1B50C4CEF7;
+	Tue, 11 Nov 2025 15:23:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762874592;
+	bh=XUy4hSmlzm6KI7tov+MvNF+BYxrjNy5JOMDQ4JgFQno=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=M198SEPd8rZBf+lbxJGy6pXdCqEuFkrmxQgIzK6/a1sHxhJ5fP2Xu/ofJblC4zeOf
+	 m0U+3w+3XsQjMLV79XVuwjtbfcIFjoL/DnP4as/TQgVCvibay40ALt83O1PbeIrluh
+	 QSYA6TMDKpSThbqvjlLnXgaoZWq3ef6hIk4Mcv8WM6LpkhgUbxs7daexuD5xS0iW1+
+	 i6a/pA6V6bxhTqVaV3de5o6CMOBShOVA1gBac9QDdo2rngEejxFIg7k6Rww0FJeB9J
+	 qWJ7SAnBcLAgLwElLYC/IO1c599RxkiWl6F2pOJZZxa4tuq6y4gbwJVnBB/kfqxkRX
+	 wMD+E6E+j8aDg==
+Date: Tue, 11 Nov 2025 07:23:10 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Duyck <alexander.duyck@gmail.com>, kernel-team@meta.com,
+ andrew+netdev@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, netdev@vger.kernel.org
+Subject: Re: [net-next PATCH v3 00/10] net: phy: Add support for fbnic PHY
+ w/ 25G, 50G, and 100G support
+Message-ID: <20251111072310.5af24441@kernel.org>
+In-Reply-To: <6037c80a-ab5b-45ca-ae5a-31ded090e262@redhat.com>
+References: <176279018050.2130772.17812295685941097123.stgit@ahduyck-xeon-server.home.arpa>
+	<6037c80a-ab5b-45ca-ae5a-31ded090e262@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 2/2] net/mlx5: implement swp_l4_csum_mode via
- devlink params
-To: Saeed Mahameed <saeed@kernel.org>, Jakub Kicinski <kuba@kernel.org>
-Cc: Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Srujana Challa <schalla@marvell.com>, Bharat Bhushan
- <bbhushan2@marvell.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- Brett Creeley <brett.creeley@amd.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Michael Chan <michael.chan@broadcom.com>,
- Pavan Chebbi <pavan.chebbi@broadcom.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Sunil Goutham <sgoutham@marvell.com>, Linu Cherian <lcherian@marvell.com>,
- Geetha sowjanya <gakula@marvell.com>, Jerin Jacob <jerinj@marvell.com>,
- hariprasad <hkelam@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>,
- Tariq Toukan <tariqt@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
- Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
- Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
- Manish Chopra <manishc@marvell.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Siddharth Vadapalli <s-vadapalli@ti.com>, Roger Quadros <rogerq@kernel.org>,
- Loic Poulain <loic.poulain@oss.qualcomm.com>,
- Sergey Ryazanov <ryazanov.s.a@gmail.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- Vladimir Oltean <olteanv@gmail.com>,
- Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
- Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
- Dave Ertman <david.m.ertman@intel.com>,
- Vlad Dumitrescu <vdumitrescu@nvidia.com>,
- "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Alexander Sverdlin <alexander.sverdlin@gmail.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
- linux-rdma@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-omap@vger.kernel.org
-References: <20251107204347.4060542-1-daniel.zahka@gmail.com>
- <20251107204347.4060542-3-daniel.zahka@gmail.com> <aQ7f1T1ZFUKRLQRh@x130>
- <jhmdihtp63rblcjiy2pibhnz2sikvbm6bhnkclq3l2ndxgbqbb@e3t23x2x2r46>
- <20251110154643.66d15800@kernel.org> <aRKs6jXqSvC3G_R0@x130>
-Content-Language: en-US
-From: Daniel Zahka <daniel.zahka@gmail.com>
-In-Reply-To: <aRKs6jXqSvC3G_R0@x130>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Tue, 11 Nov 2025 15:23:21 +0100 Paolo Abeni wrote:
+> Traceback (most recent call last):
+>    File
+> "/home/virtme/testing/wt-25/tools/testing/selftests/drivers/net/./xdp.py",
+> line 810, in <module>
+>      main()
+>    File
+> "/home/virtme/testing/wt-25/tools/testing/selftests/drivers/net/./xdp.py",
+> line 786, in main
+>      with NetDrvEpEnv(__file__) as cfg:
+>    File
+> "/home/virtme/testing/wt-25/tools/testing/selftests/drivers/net/lib/py/env.py",
+> line 59, in __enter__
+>      wait_file(f"/sys/class/net/{self.dev['ifname']}/carrier",
+>    File
+> "/home/virtme/testing/wt-25/tools/testing/selftests/net/lib/py/utils.py",
+> line 273, in wait_file
+>      raise TimeoutError("Wait for file contents failed", fname)
+> TimeoutError: [Errno Wait for file contents failed]
+> /sys/class/net/enp1s0/carrier
+> not ok 1 selftests: drivers/net: xdp.py # exit=1
+> 
+> even if I wild guess the root cause is the removal from the nipa tree of
+> "nipa: fbnic: link up on QEMU" (which IIRC is a local patch from Jakub
+> to make the tests happy with the nipa setup).
 
-
-On 11/10/25 10:26 PM, Saeed Mahameed wrote:
-> On 10 Nov 15:46, Jakub Kicinski wrote:
->> On Sun, 9 Nov 2025 11:46:37 +0100 Jiri Pirko wrote:
->>> >So, I checked a couple of flows internally, and it seems this allows
->>> >some flexibility in the FW to decide later on which mode to pick,
->>> >based on other parameters, which practically means
->>> >"user has no preference on this param". Driver can only find out
->>> >after boot, when it reads the runtime capabilities, but still
->>> >this is a bug, by the time the driver reads this (in devlink), the
->>> >default value should've already been determined by FW, so FW must
->>> >return the actual runtime value. Which can only be one of the 
->>> following
->>>
->>> I don't think it is correct to expose the "default" as a value.
->>>
->>> On read, user should see the configured value, either "full_csum" or
->>> "l4_only". Reporting "default" to the user does not make any sense.
->>> On write, user should pass either "full_csum" or "l4_only". Why we 
->>> would
->>> ever want to pass "default"?
->>
->> FWIW I agree that this feels a bit odd. Should the default be a flag
->> attr? On get flag being present means the value is the FW default (no
->> override present). On set passing the flag means user wants to reset
->> to FW default (remove override)?
->>
->>> Regardless this patch, since this is param to be reflected on fw reboot
->>> (permanent cmode), I think it would be nice to expose indication if
->>> param value passed to user currently affects the fw, or if it is going
->>> to be applied after fw reboot. Perhaps a simple bool attr would do?
->>
->> IIUC we're basically talking about user having no information that
->> the update is pending? Could this be done by the core? Core can do
->> a ->get prior to calling ->set and if the ->set succeeds and
->> cmode != runtime record that the update is pending?
->>
->
-> Could work if on GET driver reads 'current' value from FW, then it should
-> be simpler if GET != SET then 'pending', one problem though is if SET was
-> done by external tool or value wasn't applied after reboot, then we loose
-> that information, but do we care? I think we shouldn't.
->
->> That feels very separate from the series tho, there are 3 permanent
->> params in mlx5, already. Is there something that makes this one special?
->
-> In mlx5 they all have the same behavior, devlink sets 'next' value, 
-> devlink reads 'next' value. The only special thing about the new param
-> is that it has a 'device_default' value and when you read that from 
-> 'next' it will always show 'device_default' as the actual value is only
-> known at run time ,e.g. 'next boot'.
->
-> I think the only valid solution for permanent and drv_init params is to
-> have 'next' and 'current' values reported by driver on read. Or maybe 
-> go just with  'set' != 'get' then 'pending' as discussed above ?
->
-
-The driver reporting 'current' and 'next' makes the most sense to me. 
-'pending' would just be implied then. The 'set' != 'get' then 'pending' 
-approach would not work on my multi host CX7 system, where rebooting the 
-hosts individually does not trigger a fw reset.
-
-To be clear, are we willing to go forward with treating swp_l4_csum_mode 
-like other permanent params in nv_param.c in this series, and then defer 
-the 'pending' solution to another series?
-
+Yes, let me queue up a version of that patch which applies on top of
+Alex's series. QEMU does not seem to get link up. I need to get around
+to updating the build at some point..
 
