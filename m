@@ -1,64 +1,65 @@
-Return-Path: <netdev+bounces-237700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18085C4F206
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 17:52:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A1C7C4F218
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 17:53:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 92C9E341D92
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 16:52:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE7AF1888E96
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 16:53:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E7E434DB75;
-	Tue, 11 Nov 2025 16:52:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06F64393DD6;
+	Tue, 11 Nov 2025 16:52:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oJCqxhFK"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FOQL980j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4287F1A3BD7;
-	Tue, 11 Nov 2025 16:52:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A0D9377E93;
+	Tue, 11 Nov 2025 16:52:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762879959; cv=none; b=r4BsSxrJIugq1/Ac7hGw95ZeE2yyLrYBRQ4GRkkqOPPX1rUKRR937knsP4sZ6QrKmFBk8ESy9qpX9uCC9v2voSPhC1jOK7+coeXQIkHDqlNbWuyGehz+sC5xJmGJbIjITPO0SEHvroXx4Vha8P6RApR73czZK/a4gCUwezTJwHI=
+	t=1762879961; cv=none; b=U4GshyT7rSiLKD94Z4Zll5AbGOlGSBex/WETeXch8GuPtRk1udw6EORqd5r7ItPyWxlRbIOjBilFCG9jAV1JrwfmPQIhrU+N2qVh3OT6y3fq9Dv2E8V4GAYRpjhSlsMdbxVS/2x9aoXLXYPiyEcI/OY4A+pGzaVOjm0M8AAjTnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762879959; c=relaxed/simple;
-	bh=+o7Dsa54j3yc4bj/q2KwDheMl1c9jBMwsS8FQ0e+N1Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sYopqwf7uR3Zh5sgeAvHkry8LmdhgyXQXRkkSynV+d2c31+Ee4WxtKD7IMi5o0C0I1xWQ84DDn8MWTqq1zqbGXwgAB0oL3LXc3OEmKOzWh3K2NffC2zdKfqtgrzWr2DYv79rDZw5YlKJHIiVRc2VsPGnVNQxUDzSHQQInppStW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oJCqxhFK; arc=none smtp.client-ip=198.175.65.13
+	s=arc-20240116; t=1762879961; c=relaxed/simple;
+	bh=n21JxC+PX1CB9sFEWjSyHhZRgvxqQIKCXsnZMj5jQ5g=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=OF2AKoFNwpKE2BYp17WwhsPS2q+3y5S1zgxkS0jhbOF3iWl6235p2zIheariuTYYp2ZSgwYb2ub5RMdsDNqjxRWz/KSjyum5jsaKd+EGQN/4BmYaEEeRtxhBLRljxrli8f/4XNSIExXSXPeuqhBqt8GaKryq3miicEeBeXlSaRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FOQL980j; arc=none smtp.client-ip=198.175.65.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762879957; x=1794415957;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=+o7Dsa54j3yc4bj/q2KwDheMl1c9jBMwsS8FQ0e+N1Y=;
-  b=oJCqxhFKUn+FaRGn4kHUkMQ8A/7xQF42KO8d8VvxIykieMRZBTTRSrKh
-   K6tqxgL1ixUJUdsn+AJbGvq6rk0lBSgeT3VE9rPlPjbZZFzDND/54ulfb
-   oTthuz7RHLF58I3ihj03UFcbRbYmXkEZJHBHJSs2Rr4jINroaXFD+1QwE
-   Rh/DFkJ6zMZgCJQVQ5TKo2bMg3ybpL6B7hlkPsIHRP5Sqc4/StM1VzxmJ
-   MJrcPDoa1kEs5ntJC23Tg4aA8uzRMAiCG2VJ3eoQNkxUDCkjySnRt/5YR
-   2fuJLNI+vbd5U6Nu1a8N/CkXwzp0Qzm0i4Nuv0LXiIm/q4pRgJ/usUkWB
-   A==;
-X-CSE-ConnectionGUID: hGpxbHH9TFOCqo74iW8+Tg==
-X-CSE-MsgGUID: m5brwx7rT1KevTmHpJbrGQ==
-X-IronPort-AV: E=McAfee;i="6800,10657,11610"; a="76049247"
+  t=1762879959; x=1794415959;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=n21JxC+PX1CB9sFEWjSyHhZRgvxqQIKCXsnZMj5jQ5g=;
+  b=FOQL980jxHXZaJPip1GmIOxeES7wRDcp5j8+9taYosGv75ptz+G6zrMA
+   h/vpylrx/6dnLdef3BUmHjk6mijWIWwytvetTefpxllEiIT6QpD1u5ZZF
+   V06TsH4V/Q8CUr3ciLu8FaicRFS5ZoCgbHRUGox6NbJMXC9J8Nxe/tOD6
+   1NYj+VE9llL+lc7wZhy0cEN0O3ieAKQlylEbOZN8nWthPn78G+Rru6UPa
+   Phgncz2SLbNW0VQO+686NxmtDMtFd7m29394Ojv71gGAuhQTUrUf00tqi
+   1SGvNwXG0py416haOVFiNiGFl+kOUbjXTeCaoEit9XQJ79EkCumU5kfg9
+   Q==;
+X-CSE-ConnectionGUID: mtGWuR4jRUSN2rFrL5tGXw==
+X-CSE-MsgGUID: yuH18ebBRJGJX+/6bcrzbA==
+X-IronPort-AV: E=McAfee;i="6800,10657,11610"; a="64647258"
 X-IronPort-AV: E=Sophos;i="6.19,297,1754982000"; 
-   d="scan'208";a="76049247"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2025 08:52:36 -0800
-X-CSE-ConnectionGUID: h2NluEQMTiWF2a5Xfc9L4w==
-X-CSE-MsgGUID: V0xj0IIgRseOWhCjl4biMQ==
+   d="scan'208";a="64647258"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2025 08:52:36 -0800
+X-CSE-ConnectionGUID: Bv1dFJReTe6BgsPFmYhpbw==
+X-CSE-MsgGUID: H6esjo8CRDKTya+62MwoYQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.19,297,1754982000"; 
-   d="scan'208";a="193112851"
+   d="scan'208";a="194202544"
 Received: from black.igk.intel.com ([10.91.253.5])
-  by orviesa003.jf.intel.com with ESMTP; 11 Nov 2025 08:52:35 -0800
+  by orviesa005.jf.intel.com with ESMTP; 11 Nov 2025 08:52:34 -0800
 Received: by black.igk.intel.com (Postfix, from userid 1003)
-	id 687DB96; Tue, 11 Nov 2025 17:52:33 +0100 (CET)
+	id 6C5B097; Tue, 11 Nov 2025 17:52:33 +0100 (CET)
 From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
 To: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
@@ -71,10 +72,12 @@ Cc: Richard Cochran <richardcochran@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH v1 0/7] ptp: ocp: A fix and refactoring
-Date: Tue, 11 Nov 2025 17:52:07 +0100
-Message-ID: <20251111165232.1198222-1-andriy.shevchenko@linux.intel.com>
+Subject: [PATCH net-next v1 1/7] ptp: ocp: Refactor signal_show() and fix %ptT misuse
+Date: Tue, 11 Nov 2025 17:52:08 +0100
+Message-ID: <20251111165232.1198222-2-andriy.shevchenko@linux.intel.com>
 X-Mailer: git-send-email 2.50.1
+In-Reply-To: <20251111165232.1198222-1-andriy.shevchenko@linux.intel.com>
+References: <20251111165232.1198222-1-andriy.shevchenko@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,24 +86,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Here is the fix for incorrect use of %ptT with the associated
-refactoring and additional cleanups.
+Refactor signal_show() to avoid sequential calls to sysfs_emit*()
+and use the same pattern to get the index of a signal as it's done
+in signal_store().
 
-Note, %ptS, which is introduced in another series, doesn't fit
-here, that's why this fix is separated from that series.
+While at it, fix wrong use of %ptT against struct timespec64.
+It's kinda lucky that it worked just because the first member
+there 64-bit and it's of time64_t type. Now with %ptS it may
+be used correctly.
 
-Andy Shevchenko (7):
-  ptp: ocp: Refactor signal_show() and fix %ptT misuse
-  ptp: ocp: Make ptp_ocp_unregister_ext() NULL-aware
-  ptp: ocp: Refactor ptp_ocp_i2c_notifier_call()
-  ptp: ocp: Apply standard pattern for cleaning up loop
-  ptp: ocp: Reuse META's PCI vendor ID
-  ptp: ocp: Sort headers alphabetically
-  ptp: ocp: don't use "proxy" headers
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ drivers/ptp/ptp_ocp.c | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
 
- drivers/ptp/ptp_ocp.c | 128 +++++++++++++++++++++++-------------------
- 1 file changed, 70 insertions(+), 58 deletions(-)
-
+diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+index eeebe4d149f7..95889f85ffb2 100644
+--- a/drivers/ptp/ptp_ocp.c
++++ b/drivers/ptp/ptp_ocp.c
+@@ -3250,20 +3250,16 @@ signal_show(struct device *dev, struct device_attribute *attr, char *buf)
+ 	struct dev_ext_attribute *ea = to_ext_attr(attr);
+ 	struct ptp_ocp *bp = dev_get_drvdata(dev);
+ 	struct ptp_ocp_signal *signal;
++	int gen = (uintptr_t)ea->var;
+ 	struct timespec64 ts;
+-	ssize_t count;
+-	int i;
+ 
+-	i = (uintptr_t)ea->var;
+-	signal = &bp->signal[i];
+-
+-	count = sysfs_emit(buf, "%llu %d %llu %d", signal->period,
+-			   signal->duty, signal->phase, signal->polarity);
++	signal = &bp->signal[gen];
+ 
+ 	ts = ktime_to_timespec64(signal->start);
+-	count += sysfs_emit_at(buf, count, " %ptT TAI\n", &ts);
+ 
+-	return count;
++	return sysfs_emit(buf, "%llu %d %llu %d %ptT TAI\n",
++			  signal->period, signal->duty, signal->phase, signal->polarity,
++			  &ts.tv_sec);
+ }
+ static EXT_ATTR_RW(signal, signal, 0);
+ static EXT_ATTR_RW(signal, signal, 1);
 -- 
 2.50.1
 
