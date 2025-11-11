@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-237432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA017C4B429
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:56:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14486C4B472
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 04:05:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 926471893453
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:56:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B56DF3AFF2C
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:05:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E15934AAEA;
-	Tue, 11 Nov 2025 02:56:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BC82313278;
+	Tue, 11 Nov 2025 03:05:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UFDLEKUi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kkKncGeC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D64734AAE0;
-	Tue, 11 Nov 2025 02:56:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C3A30F7FA;
+	Tue, 11 Nov 2025 03:05:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762829778; cv=none; b=IsbWmRCeEDgizPZsVKHwOoq+tPkkkbz6jEEDVn6ffaKyfmA3fmNd1w5UDMpc/FdpwCmHflz6WebMTs2GbVZag1F+2DG6fAf2YitAgV2HbLfjGxOCk23D82EMS2Kys+/cfV5aF/Tu0Q4ptx4X0xr3TGfOUQgcZhqa4VxDvPwxSbc=
+	t=1762830301; cv=none; b=aTpsbq1rUmjD6ghNBVD7W8EixNGGGZHT51UsdkDJBF2co2MTHm1n9KW8F2Zwd7+hKF/C2l8ecWHNdNjA/BIc2mlxPT3+2NfyjYtj7FSGnzNWoC5giUnYHUDak5a2lZq4XJpVtIU+Ua2vKORjcw7DCh1bWIozv6j+IIFdCX/37do=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762829778; c=relaxed/simple;
-	bh=avMl0/hyasDM6lzNjTwQPpDMsdmwlerEdCd6tKurR6U=;
+	s=arc-20240116; t=1762830301; c=relaxed/simple;
+	bh=IdEozLKYvHaOq3HzdNOAAfYq9jXios/DLpMqxSgeiLw=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BBA5lp/U0mZx4Ga6PZ17XuYtkjK7fWooMXpTgVzfv5NKyWtiCbci+usY/3r0b0viDoXgCX6fSyl7c24R3bIejkeEQDCnhAWGLJI4+HDd/V4VN30GFF1urpSNDiRN+YzctjiMQ8vV0KA5EeYzcP871745aeoBNSkHp8vaCV9bEEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UFDLEKUi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97899C19425;
-	Tue, 11 Nov 2025 02:56:16 +0000 (UTC)
+	 MIME-Version:Content-Type; b=GaE5NWkzArHSJ/QRR0aYJL0tif47xZPrJcfu2cTY53iuJO4nuhotB8G7KyQGEqYtQ6MyDXF2A+MGlaYHD/e68nn/1UR+fTnrVMWhH/galcFxpMSwdfdla22+gSEMqRFWBN4QAxOjWNnPfKDbFMd2XHW7n6P0Ho7ZBsmNVzCEfEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kkKncGeC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82ABDC116B1;
+	Tue, 11 Nov 2025 03:05:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762829777;
-	bh=avMl0/hyasDM6lzNjTwQPpDMsdmwlerEdCd6tKurR6U=;
+	s=k20201202; t=1762830301;
+	bh=IdEozLKYvHaOq3HzdNOAAfYq9jXios/DLpMqxSgeiLw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UFDLEKUiSvsNgwzb4IGo7ylNeYHj3RlOrOF7dNdEQFtSc9XbkmrStCRFLAKdV7x6D
-	 AVxNc+pyoELYoYKOeTVrBDQLhGK8nBhy4TxB3mel3eR9sqW97oL5PYrr5anou9Xh+4
-	 h0CoyRI107PeO9phMOuBMHBjxbwXmIKoEiq4kJGGZQmJFjzYMcjeKIYiEUB2JUxYNe
-	 q17TPGLlh27wPFiq/KHDjB37OaVexkfC4axKFFDWddnaxhdf1Ri0IENV5mvVijj1GF
-	 yZeYWP8Lbfjsw/dtyOwn5LrXVRkR2BoJ5KppMkW7LMKG/TRSmkFK0zz+bRdL5VlLL8
-	 8mPm1YYjd3NOg==
-Date: Mon, 10 Nov 2025 18:56:15 -0800
+	b=kkKncGeCAD69n3dgHD3JJrUvtPdJS6SpLkKgSyvpT2TcF8sqUYHTw8X5Sfh1wwI+E
+	 PjRz+I7JFOBRqVDZ+pS3Zs8CzlPEkPl9HywOVILeNtSavkn5U08DWJxR8Yf6amWOvN
+	 DyZ0wl6yWUlRMzx5BoFh7/NFmNzvCXemjV3wjUoSeQNIRKevhLJvjfoyvfuDej5EW6
+	 wQ2voYLBqJVAOj0+uTG8/clwhAya/8K5sPUMsa56WLaknbe6GINExLPHILqWbUR6By
+	 fZcQ6vxJLe24ZvzImqcLnI/yz+VkfIBM/jPkNCez8CVG/cKsGOx5u6sKqY4jb4K3lm
+	 gbtFCXcSnSLyA==
+Date: Mon, 10 Nov 2025 19:04:59 -0800
 From: Jakub Kicinski <kuba@kernel.org>
 To: Fan Gong <gongfan1@huawei.com>
 Cc: Zhu Yikai <zhuyikai1@h-partners.com>, <netdev@vger.kernel.org>, "David
@@ -55,11 +55,11 @@ Cc: Zhu Yikai <zhuyikai1@h-partners.com>, <netdev@vger.kernel.org>, "David
  <wulike1@huawei.com>, Shi Jing <shijing34@huawei.com>, Luo Yang
  <luoyang82@h-partners.com>, Meny Yossefi <meny.yossefi@huawei.com>, Gur
  Stavi <gur.stavi@huawei.com>
-Subject: Re: [PATCH net-next v06 3/5] hinic3: Add NIC configuration ops
-Message-ID: <20251110185615.631a6462@kernel.org>
-In-Reply-To: <2b5253f63c4f6ba5b7deccf4aa2b15dc32da6589.1762581665.git.zhuyikai1@h-partners.com>
+Subject: Re: [PATCH net-next v06 5/5] hinic3: Add netdev register interfaces
+Message-ID: <20251110190459.1e67306d@kernel.org>
+In-Reply-To: <992e9004fe0c32964a3d32a298dc9d869c00d6cb.1762581665.git.zhuyikai1@h-partners.com>
 References: <cover.1762581665.git.zhuyikai1@h-partners.com>
-	<2b5253f63c4f6ba5b7deccf4aa2b15dc32da6589.1762581665.git.zhuyikai1@h-partners.com>
+	<992e9004fe0c32964a3d32a298dc9d869c00d6cb.1762581665.git.zhuyikai1@h-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,79 +69,39 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sat, 8 Nov 2025 14:41:38 +0800 Fan Gong wrote:
-> Add ops to configure NIC feature(lro, vlan, csum...).
+On Sat, 8 Nov 2025 14:41:40 +0800 Fan Gong wrote:
+> Add netdev notifier to accept netdev event.
+> Refine port event type to change link status.
 
-This patch really does too many things at once, please split it.
-You are allowed to have up to 15 patches in a series, having a list 
-of things in a commit message is a strong indication that the patch 
-is doing too many things at once.
+Please explain the "why", why is this patch needed.
+This commit message is woefully inadequate for this patch.
+Plus the patch seems to, again, be doing multiple things.
 
-> +static void hinic3_auto_moderation_work(struct work_struct *work)
+> +static int hinic3_netdev_event(struct notifier_block *notifier,
+> +			       unsigned long event, void *ptr)
 > +{
-> +	u64 rx_packets, rx_bytes, rx_pkt_diff, rx_rate, avg_pkt_size;
-> +	u64 tx_packets, tx_bytes, tx_pkt_diff, tx_rate;
-> +	struct hinic3_nic_dev *nic_dev;
-> +	struct delayed_work *delay;
-> +	struct net_device *netdev;
-> +	unsigned long period;
-> +	u16 qid;
-
-Please use the DIM infrastructure kernel already has.
-If it's not good enough - improve it.
-
-> +static void hinic3_tx_timeout(struct net_device *netdev, unsigned int txqueue)
-> +{
-> +	struct hinic3_nic_dev *nic_dev = netdev_priv(netdev);
-> +	struct hinic3_io_queue *sq;
-> +	bool hw_err = false;
-> +	u16 sw_pi, hw_ci;
-> +	u8 q_id;
+> +	struct net_device *ndev = netdev_notifier_info_to_dev(ptr);
+> +	struct hinic3_nic_dev *nic_dev = netdev_priv(ndev);
+> +	u16 vlan_depth;
 > +
-> +	HINIC3_NIC_STATS_INC(nic_dev, netdev_tx_timeout);
-
-kernel already has a counter for this
-
-> +	netdev_err(netdev, "Tx timeout\n");
-
-and prints an error
-
-Please don't duplicate.
-
-> +	for (q_id = 0; q_id < nic_dev->q_params.num_qps; q_id++) {
-> +		if (!netif_xmit_stopped(netdev_get_tx_queue(netdev, q_id)))
-> +			continue;
-
-Why are you scanning the queues? kernel passes @txqueue to tell you
-which queue has stalled.
-
-> +		sq = nic_dev->txqs[q_id].sq;
-> +		sw_pi = hinic3_get_sq_local_pi(sq);
-> +		hw_ci = hinic3_get_sq_hw_ci(sq);
-> +		netdev_dbg(netdev,
-> +			   "txq%u: sw_pi: %u, hw_ci: %u, sw_ci: %u, napi->state: 0x%lx.\n",
-> +			   q_id, sw_pi, hw_ci, hinic3_get_sq_local_ci(sq),
-> +			   nic_dev->q_params.irq_cfg[q_id].napi.state);
+> +	if (!is_vlan_dev(ndev))
+> +		return NOTIFY_DONE;
 > +
-> +		if (sw_pi != hw_ci)
-> +			hw_err = true;
-> +	}
+> +	netdev_hold(ndev, &nic_dev->tracker, GFP_ATOMIC);
 > +
-> +	if (hw_err)
-> +		set_bit(HINIC3_EVENT_WORK_TX_TIMEOUT, &nic_dev->event_flag);
-> +}
+> +	switch (event) {
+> +	case NETDEV_REGISTER:
+> +		vlan_depth = hinic3_get_vlan_depth(ndev);
+> +		if (vlan_depth == HINIC3_MAX_VLAN_DEPTH_OFFLOAD_SUPPORT) {
+> +			ndev->vlan_features &= (~HINIC3_VLAN_CLEAR_OFFLOAD);
+> +		} else if (vlan_depth > HINIC3_MAX_VLAN_DEPTH_OFFLOAD_SUPPORT) {
+> +			ndev->hw_features &= (~HINIC3_VLAN_CLEAR_OFFLOAD);
+> +			ndev->features &= (~HINIC3_VLAN_CLEAR_OFFLOAD);
+> +		}
 
-> +struct hinic3_nic_stats {
-> +	u64                   netdev_tx_timeout;
-> +
-> +	/* Subdivision statistics show in private tool */
-> +	u64                   tx_carrier_off_drop;
-> +	u64                   tx_invalid_qid;
-
-I don't see these being used in the series.
-
-> +	struct u64_stats_sync syncp;
-> +};
--- 
-pw-bot: cr
+Why are you doing this? Are vlan_features inherited across multiple
+layers of vlan devices? Vlan tags can be pushed in multiple ways, not
+just by stacking a device on top. If your device can't handle stacked
+vlans and (somehow?) the stack is serving you multi-vlan frames I think
+you need to fix it in ndo_features_check
 
