@@ -1,191 +1,104 @@
-Return-Path: <netdev+bounces-237402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AB3AC4ACAF
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:42:41 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED42AC4AD0F
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:43:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EA2674FB31E
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 01:34:40 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C2BF44FBDE3
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 01:35:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74082335081;
-	Tue, 11 Nov 2025 01:29:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E04267B07;
+	Tue, 11 Nov 2025 01:30:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="X4TlHS5+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NM204X3K"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CF1B333452
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 01:29:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71DC6158545
+	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 01:30:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762824549; cv=none; b=ED/IVIj0NBQhSmgm49iTNAgyGNQo2FK6KP0r+7YfXLj332uw4VjEkS1UGzeOMWLZ6VcLNcuMjkFmWmvY6TxYhm2JqHhK3CuuQGZSxV/8S6OsJbpAOhqHdfML7tZxPf3ex+WVvRKL8bNz9wRaNVsr5XDJ9szBVn/QGPpkBkb5fec=
+	t=1762824635; cv=none; b=ir3HMFV3dazzERGdFB2GjbmnUCQ/EVlxcU8kYIQc8EXUVw5Au/p7k1lEK3R2WgXxDrAOOuHXVsTLQ2jox8QZ5Z3OeXA8MnQITJhjxp/SbnQGH+GJcdU7dV1udQXqaeSaR+DNPOWpqpwk6YGP+KDXmjdrGA6EBuQJ7TenHI17Lkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762824549; c=relaxed/simple;
-	bh=JniPNzR2zrzCfTZJfDvwxJryTw6qwXKnH7duhMCvPKI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VDtA2CkGFgaByCS92xdqCJ+wu2du64EDpAP+9YgOW1IntxOmxEs2H6sB82bDi2za6og06DtLyuXLVHm3SmYcjqIV4ixGr/OKWL4hyz2Is9QRAwo4Ju3xDllFTNq4dapjJ0RGgm6CVTp7QMZix0YZ7j95w6TWcsGw+4EPkAIlLxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=X4TlHS5+; arc=none smtp.client-ip=95.215.58.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1762824534;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jkCMn6326n5t3YdXIXOy3mMQo+0cpCyiOzgcX5JM5n4=;
-	b=X4TlHS5+5+xX48of/7wvV+4pRZbxJ6vbhmMX8oHZjqDozXm4cUR5/ieDih6LJeK7X4K+/r
-	fKx0kjVXNlgxsIxhATRBHjECnDn/V3065eVGpNu0DDq4ilwNkir6lyWYNoaZ2nnLdHBwJO
-	Ob2bzVZl7fQIwwNUj9uuHfFLyods9Ms=
-From: Menglong Dong <menglong.dong@linux.dev>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: sjenning@redhat.com, Peter Zijlstra <peterz@infradead.org>,
- Menglong Dong <menglong8.dong@gmail.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
- Eduard <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- David Ahern <dsahern@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>,
- "H. Peter Anvin" <hpa@zytor.com>, jiang.biao@linux.dev,
- bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>,
- LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH bpf-next] bpf,x86: do RSB balance for trampoline
-Date: Tue, 11 Nov 2025 09:28:11 +0800
-Message-ID: <5025905.GXAFRqVoOG@7950hx>
-In-Reply-To:
- <CAADnVQKQ2Pqhb9wNjRuEP5AoGc6-MfLhQLD++gQPf3VB_rV+fQ@mail.gmail.com>
-References:
- <20251104104913.689439-1-dongml2@chinatelecom.cn>
- <13884259.uLZWGnKmhe@7950hx>
- <CAADnVQKQ2Pqhb9wNjRuEP5AoGc6-MfLhQLD++gQPf3VB_rV+fQ@mail.gmail.com>
+	s=arc-20240116; t=1762824635; c=relaxed/simple;
+	bh=HgbPRmYEmAN/5YWZQeBNKs6LmTG6q9I830tW3lmN9jg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Jkyc3aKECfAy/QUnh8T6/pa1wUlO0FjJLDw7ZIvZ+X07vVTqLSOjQYZwuyT60sknlUHCR5QsA6l2/XWiKZd0+Fsuz6vieSvbN97xZi+z9WMGc1bGsBtXzc/c3mDzB+pPJmYCEDV6IY4rB5anYEC15Ke4mwLnq3a/EK1yuyi/S5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NM204X3K; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34A08C19421;
+	Tue, 11 Nov 2025 01:30:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762824635;
+	bh=HgbPRmYEmAN/5YWZQeBNKs6LmTG6q9I830tW3lmN9jg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=NM204X3K1+70xC7wEirW6kQQsFVxTzeoPLHWeQ453kK4/pNZ0xF7Iivb+oBcTD4/U
+	 +X4pAERDBjX2VJzn43qw6ALPmbeLxiKFb3zovk0W1W/5l2P9xuRPW7YYWGQ5uXzfcA
+	 VY5horpdi/OF2ngg5qS4t9FV/YtL6+JiM4rsMAWZsSZz+ksO5aQw7yBT4q/Z5UKlP5
+	 XyDdQhaRR+cQzIMIgeD36Z+cN6e+FOYf9sf+xxXXs2KdL5V2tIiXpAhw8vVB0JI1zg
+	 kCi+0TwDatsi7jBvDfXsSa5YRdRceqiQUXScWIU8O0sV1dq6kJ8F6OzBgFIIphULNd
+	 P08OYSFnBPFxw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB126380CFD7;
+	Tue, 11 Nov 2025 01:30:06 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 0/3] ynl: Fix tc filters with actions
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176282460576.2841507.5529895194461903454.git-patchwork-notify@kernel.org>
+Date: Tue, 11 Nov 2025 01:30:05 +0000
+References: <20251106151529.453026-1-zahari.doychev@linux.com>
+In-Reply-To: <20251106151529.453026-1-zahari.doychev@linux.com>
+To: Zahari Doychev <zahari.doychev@linux.com>
+Cc: donald.hunter@gmail.com, kuba@kernel.org, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
+ jacob.e.keller@intel.com, ast@fiberby.net, matttbe@kernel.org,
+ netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, johannes@sipsolutions.net
 
-On 2025/11/11 00:32, Alexei Starovoitov wrote:
-> On Mon, Nov 10, 2025 at 3:43=E2=80=AFAM Menglong Dong <menglong.dong@linu=
-x.dev> wrote:
-> >
-> >
-> > Do you think if it is worth to implement the livepatch with
-> > bpf trampoline by introduce the CONFIG_LIVEPATCH_BPF?
-> > It's easy to achieve it, I have a POC for it, and the performance
-> > of the livepatch increase from 99M/s to 200M/s according to
-> > my bench testing.
->=20
-> what do you mean exactly?
+Hello:
 
-This is totally another thing, and we can talk about it later. Let
-me have a simple describe here.
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-I mean to implement the livepatch by bpf trampoline. For now,
-the livepatch is implemented with ftrace, which will break the
-RSB and has more overhead in x86_64.
+On Thu,  6 Nov 2025 16:15:26 +0100 you wrote:
+> The first patch in this series introduces an example tool that
+> creates, shows and deletes flower filter with two VLAN actions.
+> The subsequent patches address various issues to ensure the tool
+> operates as intended.
+> 
+> ---
+> v2:
+> - extend the sampe tool to show and delete the filter
+> - drop fix for ynl_attr_put_str as already fixed by:
+>   Link: https://lore.kernel.org/netdev/20251024132438.351290-1-poros@redhat.com/
+> - make indexed-arrays to start from index 1.
+>   Link: https://lore.kernel.org/netdev/20251022182701.250897-1-ast@fiberby.net/
+> 
+> [...]
 
-It can be easily implemented by replace the "origin_call" with the
-address that livepatch offered.
+Here is the summary with links:
+  - [v2,1/3] ynl: samples: add tc filter example
+    (no matching commit)
+  - [v2,2/3] tools: ynl: call nested attribute free function for indexed arrays
+    https://git.kernel.org/netdev/net/c/41d0c31be29f
+  - [v2,3/3] tools: ynl: ignore index 0 for indexed-arrays
+    (no matching commit)
 
-> I don't want to add more complexity to bpf trampoline.
-
-If you mean the arch-specification, it won't add the complexity.
-Otherwise, it can make it a little more simple in x86_64 with following
-patch:
-
-=2D-- a/arch/x86/net/bpf_jit_comp.c
-+++ b/arch/x86/net/bpf_jit_comp.c
-@@ -3176,7 +3176,7 @@ static int __arch_prepare_bpf_trampoline(struct bpf_t=
-ramp_image *im, void *rw_im
- 					 void *rw_image_end, void *image,
- 					 const struct btf_func_model *m, u32 flags,
- 					 struct bpf_tramp_links *tlinks,
-=2D					 void *func_addr)
-+					 void *func_addr, void *origin_call_param)
- {
- 	int i, ret, nr_regs =3D m->nr_args, stack_size =3D 0;
- 	int regs_off, nregs_off, ip_off, run_ctx_off, arg_stack_off, rbx_off;
-@@ -3280,6 +3280,7 @@ static int __arch_prepare_bpf_trampoline(struct bpf_t=
-ramp_image *im, void *rw_im
- 			orig_call +=3D ENDBR_INSN_SIZE;
- 		orig_call +=3D X86_PATCH_SIZE;
- 	}
-+	orig_call =3D origin_call_param ?: orig_call;
-=20
- 	prog =3D rw_image;
-=20
-@@ -3369,15 +3370,10 @@ static int __arch_prepare_bpf_trampoline(struct bpf=
-_tramp_image *im, void *rw_im
- 			LOAD_TRAMP_TAIL_CALL_CNT_PTR(stack_size);
- 		}
-=20
-=2D		if (flags & BPF_TRAMP_F_ORIG_STACK) {
-=2D			emit_ldx(&prog, BPF_DW, BPF_REG_6, BPF_REG_FP, 8);
-=2D			EMIT2(0xff, 0xd3); /* call *rbx */
-=2D		} else {
-=2D			/* call original function */
-=2D			if (emit_rsb_call(&prog, orig_call, image + (prog - (u8 *)rw_image)))=
- {
-=2D				ret =3D -EINVAL;
-=2D				goto cleanup;
-=2D			}
-+		/* call original function */
-+		if (emit_rsb_call(&prog, orig_call, image + (prog - (u8 *)rw_image))) {
-+			ret =3D -EINVAL;
-+			goto cleanup;
- 		}
- 		/* remember return value in a stack for bpf prog to access */
- 		emit_stx(&prog, BPF_DW, BPF_REG_FP, BPF_REG_0, -8);
-
-> Improve current livepatching logic ? jmp vs call isn't special.
-
-Some kind. According to my testing, the performance of bpf
-trampoline is much better than ftrace trampoline, so if we
-can implement it with bpf trampoline, the performance can be
-improved. Of course, the bpf trampoline need to offer a API
-to the livepatch for this propose.
-
-Any way, let me finish the work in this patch first. After that,
-I can send a RFC of the proposal.
-
-Thanks!
-Menglong Dong
-
->=20
-> > The results above is tested with return-trunk disabled. With the
-> > return-trunk enabled, the performance decrease from 58M/s to
-> > 52M/s. The main performance improvement comes from the RSB,
-> > and the return-trunk will always break the RSB, which makes it has
-> > no improvement. The calling to per-cpu-ref get and put make
-> > the bpf trampoline based livepatch has a worse performance
-> > than ftrace based.
-> >
-> > Thanks!
-> > Menglong Dong
-> >
-> > >
-> >
-> >
-> >
-> >
->=20
->=20
-
-
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
