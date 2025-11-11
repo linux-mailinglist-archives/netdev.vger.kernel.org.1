@@ -1,118 +1,180 @@
-Return-Path: <netdev+bounces-237394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8175C4A62C
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:24:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64A68C4A72C
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:27:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 962603B68C8
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 01:17:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 76B3418934F7
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 01:19:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B050A30498E;
-	Tue, 11 Nov 2025 01:08:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82F0433E362;
+	Tue, 11 Nov 2025 01:10:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="M5SY1sfN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FXa1jQBc"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8AB325F797;
-	Tue, 11 Nov 2025 01:08:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 579D7248883;
+	Tue, 11 Nov 2025 01:10:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762823295; cv=none; b=a2cZBpMRJlB5rRbRa2MT/aJXSDwWoGoX0+++V/IkV1CltnOAs/F2S1lh5sGKdNWG+HMKsW4MLg2lJa5ok0hAP0HQ6DkIXkM77XQNhRGMYrfRhihSsctKOuXGsms0jEMLIxlVu3KwnDKa/ZgLSwrBA2XVG5GJHco/sMJRixZ0XqQ=
+	t=1762823438; cv=none; b=fXYb2dmbwQH7IBahDWgCeUWo5rHJS7WyPU6n7acGwwJMiZUGwo5XPb4Qdq0kA+Yxlk1wtdBDPnC1EGVcDiRXlf1kAiwqrm1ULJ3itTi1PuXwGRBj4RXtIgPetjXdHzoNTkWckFXzRLFNIu0hF+iyOTlFGNy4krS6aPqZBh0EXG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762823295; c=relaxed/simple;
-	bh=o/hg+KyedW2eySkuBO60GXlJsLQqgZU9PY78iUvzmoU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=siA+5ZUPlswgNrXG8ER70xjaI95xW7b1ItkpujLSMG31RjH46t4eTZupTcTqr+6LDAByGoqmI1oGjNpf2+m7Zhmr90n1e/aFwhuijSiWukDhfr0fzduxhGWsNiwWcioQJqk9jfQZ0G8eyzJi6bDwMFrSe3BS/JayDntq+FU//6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=M5SY1sfN; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=UP7n5DTXu20VR6JoQ4QouP6cCSz8dSa6+wGE4YoaNSU=; b=M5SY1sfN54vs876zAOmtc1Nd3N
-	VXUlJEiNNbY1nfVNgvIUXicL6A0mk7SxranbK2tI9uifnPsmlzgewZgOoBqRIxy2Om79ZPvmL9Sb+
-	BhWJ+Sg/QaYmb4MxHOz/q7zAZ7ZeLLzdpNiZ7F+cHo1L6CGrp2840VlrNT52WgEU9EJk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vIcrd-00DZdb-QE; Tue, 11 Nov 2025 02:08:05 +0100
-Date: Tue, 11 Nov 2025 02:08:05 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 3/3] net: phy: dp83869: Support 1000Base-X SFP
-Message-ID: <924891c9-fd34-4e7a-bca9-007c80bc327f@lunn.ch>
-References: <20251110-sfp-1000basex-v2-0-dd5e8c1f5652@bootlin.com>
- <20251110-sfp-1000basex-v2-3-dd5e8c1f5652@bootlin.com>
+	s=arc-20240116; t=1762823438; c=relaxed/simple;
+	bh=XQVEmKUskABpebnnp2AiiV4QBBv9Qw26XAnM1za6FD8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pjrHed1gpLPGzNA1vbLAVPO1s0Na/tbLLzIO1GhNoJlsBmaE3OrAuR4nWjRCGtrByT1quD4/T44r8pPFnyv0DNi+YyLPSulAWGAkYT1WewybLMlFazL6wmV7gCrRcwprK9bMkzGeEacHCcvT3yS1oKsxbqJPeS0yYtIrPwbLfqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FXa1jQBc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 938FFC4CEFB;
+	Tue, 11 Nov 2025 01:10:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762823438;
+	bh=XQVEmKUskABpebnnp2AiiV4QBBv9Qw26XAnM1za6FD8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FXa1jQBcMYwJDQpsOVlEpQACYDBebi38yyv3QPdgkHmL39Yeq2mBlZqo9o33zmJKK
+	 RLfbnfUsKYUxdkY/s4QCMcA23fyR0/APn8MtDYbF4ATiwCtfMDlMglPVtL7FOVvwap
+	 FcKt2ZEu4R1NclkgemATZ6+Cz49fY8djRWTsgevUqPwQTcwT9DQKL8h3uHrpgxA21o
+	 V2WeEKAoysCNzQpqVbmh+b3U3TOIEWOMyGq1x4z20VfxMctEYCvoBYZkIbHd2vKmjG
+	 fHYkKqnt/zB8nIcnK2zvOvQJOV0CjxWvT45KbwdE/aYzG1GPK46N8CKTr3SVr5rs94
+	 DU9JcwSo9df5w==
+Date: Mon, 10 Nov 2025 17:10:36 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: netdev@vger.kernel.org, Doug Berger <opendmb@gmail.com>, Broadcom
+ internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Antoine
+ Tenart <atenart@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, Yajun
+ Deng <yajun.deng@linux.dev>, linux-kernel@vger.kernel.org (open list)
+Subject: Re: [PATCH net-next v3 1/2] net: ethernet: Allow disabling pause on
+ panic
+Message-ID: <20251110171036.733aa203@kernel.org>
+In-Reply-To: <20251107002510.1678369-2-florian.fainelli@broadcom.com>
+References: <20251107002510.1678369-1-florian.fainelli@broadcom.com>
+	<20251107002510.1678369-2-florian.fainelli@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251110-sfp-1000basex-v2-3-dd5e8c1f5652@bootlin.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> +static void dp83869_module_remove(void *upstream)
+On Thu,  6 Nov 2025 16:25:09 -0800 Florian Fainelli wrote:
+> Development devices on a lab network might be subject to kernel panics
+> and if they have pause frame generation enabled, once the kernel panics,
+> the Ethernet controller stops being serviced. This can create a flood of
+> pause frames that certain switches are unable to handle resulting a
+> completle paralysis of the network because they broadcast to other
+> stations on that same network segment.
+> 
+> To accomodate for such situation introduce a
+> /sys/class/net/<device>/disable_pause_on_panic knob which will disable
+> Ethernet pause frame generation upon kernel panic.
+> 
+> Note that device driver wishing to make use of that feature need to
+> implement ethtool_ops::set_pauseparam_panic to specifically deal with
+> that atomic context.
+
+Some basic review comments below (no promises if addressing those will
+make me for one feel any warmer towards the concept).
+
+>  Documentation/ABI/testing/sysfs-class-net | 16 +++++
+>  include/linux/ethtool.h                   |  3 +
+>  include/linux/netdevice.h                 |  1 +
+>  net/core/net-sysfs.c                      | 39 +++++++++++
+>  net/ethernet/Makefile                     |  3 +-
+>  net/ethernet/pause_panic.c                | 79 +++++++++++++++++++++++
+
+panic.c or shutdown.c is probably a slightly better name,
+more likely we'd add more code in that.
+
+>  6 files changed, 140 insertions(+), 1 deletion(-)
+>  create mode 100644 net/ethernet/pause_panic.c
+> 
+> diff --git a/Documentation/ABI/testing/sysfs-class-net b/Documentation/ABI/testing/sysfs-class-net
+> index ebf21beba846..da0e4e862aca 100644
+> --- a/Documentation/ABI/testing/sysfs-class-net
+> +++ b/Documentation/ABI/testing/sysfs-class-net
+> @@ -352,3 +352,19 @@ Description:
+>  		0  threaded mode disabled for this dev
+>  		1  threaded mode enabled for this dev
+>  		== ==================================
+> +
+> +What:		/sys/class/net/<iface>/disable_pause_on_panic
+> +Date:		Nov 2025
+> +KernelVersion:	6.20
+> +Contact:	netdev@vger.kernel.org
+> +Description:
+> +		Boolean value to control whether to disable pause frame
+> +		generation on panic. This is helpful in environments where
+> +		the link partner may incorrect respond to pause frames (e.g.:
+> +		improperly configured Ethernet switches)
+> +
+> +		Possible values:
+> +		== =====================================================
+> +		0  do not disable pause frame generation on kernel panic
+> +		1  disable pause frame generation on kernel panic
+> +		== =====================================================
+
+please no sysfs for something as niche as this feature
+
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index e808071dbb7d..2d4b07693745 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -2441,6 +2441,7 @@ struct net_device {
+>  	bool			proto_down;
+>  	bool			irq_affinity_auto;
+>  	bool			rx_cpu_rmap_auto;
+> +	bool			disable_pause_on_panic;
+
+Warning: include/linux/netdevice.h:2567 struct member
+'disable_pause_on_panic' not described in 'net_device'
+
+>  	/* priv_flags_slow, ungrouped to save space */
+>  	unsigned long		see_all_hwtstamp_requests:1;
+
+> +#include <linux/kernel.h>
+> +#include <linux/init.h>
+> +#include <linux/panic_notifier.h>
+> +#include <linux/netdevice.h>
+> +#include <linux/ethtool.h>
+> +#include <linux/notifier.h>
+> +#include <linux/if_ether.h>
+> +#include <net/net_namespace.h>
+
+Alphabetical sort, please.
+
+> +/*
+> + * Disable pause/flow control on a single Ethernet device.
+> + */
+> +static void disable_pause_on_device(struct net_device *dev)
 > +{
-> +	struct phy_device *phydev = upstream;
+> +	const struct ethtool_ops *ops;
 > +
-> +	phydev_info(phydev, "SFP module removed\n");
+> +	/* Only proceed if this device has the flag enabled */
+> +	if (!READ_ONCE(dev->disable_pause_on_panic))
+> +		return;
+> +
+> +	ops = dev->ethtool_ops;
+> +	if (!ops || !ops->set_pauseparam_panic)
+> +		return;
+> +
+> +	/*
+> +	 * In panic context, we're in atomic context and cannot sleep.
+> +	 */
 
-I think this should probably be downgraded to phydev_dbg().
+single-line comment would do?
 
-> +static int dp83869_module_insert(void *upstream, const struct sfp_eeprom_id *id)
-> +{
-> +	struct phy_device *phydev = upstream;
-> +	const struct sfp_module_caps *caps;
-> +	struct dp83869_private *dp83869;
-> +	int ret;
-> +
-> +	caps = sfp_get_module_caps(phydev->sfp_bus);
-> +
-> +	if (!linkmode_test_bit(ETHTOOL_LINK_MODE_1000baseX_Full_BIT,
-> +			       caps->link_modes)) {
-> +		phydev_err(phydev, "incompatible SFP module inserted\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	dp83869 = phydev->priv;
-> +
-> +	dp83869->mode = DP83869_RGMII_1000_BASE;
-> +	phydev->port = PORT_FIBRE;
-> +
-> +	ret = dp83869_configure_mode(phydev, dp83869);
-> +	if (ret)
-> +		return ret;
-> +
-> +	/* Reconfigure advertisement */
-> +	if (mutex_trylock(&phydev->lock)) {
-> +		ret = dp83869_config_aneg(phydev);
-> +		mutex_unlock(&phydev->lock);
-
-Why is it safe to call dp83869_configure_mode() without the lock, but
-dp83869_config_aneg() does need the lock? And what are the
-consequences of not being able to get the lock and so aneg is not
-configured?
-
-Some comments would be good here.
-
-    Andrew
-
----
+> +	ops->set_pauseparam_panic(dev);
+> +}
+-- 
 pw-bot: cr
 
