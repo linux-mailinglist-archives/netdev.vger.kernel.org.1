@@ -1,190 +1,132 @@
-Return-Path: <netdev+bounces-237743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95219C4FC9A
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 22:05:15 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83BD9C4FCC4
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 22:08:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1A46C34DB96
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 21:05:15 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2F1CC4F787C
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 21:04:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC44235CBAA;
-	Tue, 11 Nov 2025 21:04:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2346A326929;
+	Tue, 11 Nov 2025 21:02:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="1ipUoqJt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jQ2PcjmO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D50A435CBAB
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 21:04:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BFDB2BEFF8
+	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 21:02:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762895097; cv=none; b=MHX4OuBHUaA/hobbomZ944lcjWe74hPubs5zQii7coCFzV/suun8XSimLjjNMKydUQ9c0/RIs0Uz1aTF7JruH029Q5WQ01vmHxD0WHwdWqEHqM3UzjDDRRA5UEhdDJ64+15mFDUX4NTeWfxzJuLHhWEpqxQLt6SKx/rSBfBKKlY=
+	t=1762894961; cv=none; b=NtKzWrhZKPyrMRqqm91Pg/qjqh9mk26CvZBmS/ySRfcttGNL0RjXNHSp3md7rKN/kc2UQbDs2lO1+ga06OFWePRLVwxJ3GDIzjva/o4w40cdzimKLuQPTDlcEFC3HcNIkQayznMekCtqcYEY8fhOP3znGlRalVbp6MLRzdU8Wwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762895097; c=relaxed/simple;
-	bh=0ANGAKyfk0XacrpbOjrV4oYrYM4NHQcvpLeYTqVpFhE=;
+	s=arc-20240116; t=1762894961; c=relaxed/simple;
+	bh=oON1JhPqjwjhg7G9S0lDlzyPRkRNc3w2DTMTGVj9WQc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tus+jQkWfh0q+A8voXJ/jkhnsY+C/bhAuylsLlc0nFgEsx62HtS6VAjvfDXH54XMrCEltCoPeZYU/YsYzcmkVzkrEqMUG2hBXGzbJjM94vibhYY+MKkoh6UACM+9lis7s04Tq//Yy2Ea0YAuIpkiM8/p7gfXPLaPbjN5l6DDlpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=1ipUoqJt; arc=none smtp.client-ip=209.85.128.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-71d71bcab6fso1543737b3.0
-        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 13:04:55 -0800 (PST)
+	 To:Cc:Content-Type; b=JmTVOV+GXVc9ii3zjqTcAsXhYptAHxNAxTAeEs52t1gYrH0k0alJTxbFsZCSQo2GI46du1ZIKA/vrNGA/SBYvWKlNtmwdPGAT01bYklt3Jvm8Gpt02FKTH6VieMs55njyTt9JSMLOzFDxMcZmd3T8qjAt9838Dw/7xaaS86Ave4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jQ2PcjmO; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-297d6c0fe27so133485ad.2
+        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 13:02:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1762895095; x=1763499895; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1762894959; x=1763499759; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0Rff8D2bE9OY4iP9W0vlt5rdkV0idApAURH+0R2bNBo=;
-        b=1ipUoqJtIAO2STVrZaTJ8VewLFI/APChdrT96XyC282wG4q71HIX6M+dkYdyuqynsB
-         WuxTuUMtdn6vCxwKBUaCaeUE/p+EwxChpoPcC1F0cDN/1z4BSq2gy11c+0UwykR12GZP
-         LWf2SNN7jeY5fNnbwJjZ3E+T3tknvZZILpTdycLeX/kqy5jRnG8SyPahkKXgWUbTsxas
-         g5EeY+UpN8xp1/1c+1PnDcUhkcf+lnQpLgSXeTWEJ6A349wGkOR18negCV5UsOkw6v8v
-         T4Xlkons6Q2O76BbsxUjYOu/sqH/uS4cVz5ZLh28nnBWsmmGIaeQuW0wMoHBy3jKb/Fp
-         tfkg==
+        bh=QwP6Mm7gy1ZK8oeG4x4mgYN5Qt7fbG4Gah1TecksR98=;
+        b=jQ2PcjmOeqfPM/H74bOl2teruU5Viaz3bkXIWghhZzkMn2ivW3tl75mVkGM0gvFqFp
+         M0yKWW+nzADwJBQsqmEOevp8ACmNwClFgtcRwNyvpAbN25NuBDbkAxA3MmqoDCsGfmtB
+         +mCE8TYsoYm7hm60gwuilPdN58rMepqhS4F2WKslFKey62I+cDHCcZTeYunywAzUYQPI
+         ZOivc+rEow3Rq9Zvw8HFbWhEgzI0fF9XHQF3Rx96SZxVq8vh9jN//wuDL1hVdhJpIzJU
+         celcmpODoMvcfWdXY97rEMRbr9/jmLkcFFpwqDA82U8QMykXW9mtIYXEPwv/C1OY1+65
+         xM+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762895095; x=1763499895;
+        d=1e100.net; s=20230601; t=1762894959; x=1763499759;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=0Rff8D2bE9OY4iP9W0vlt5rdkV0idApAURH+0R2bNBo=;
-        b=Fu3muULmAmsVwmRSH7uRz+Jo10veiN1dzLfCTjWcSzEb/btU9qStPu6OkY8X64OhA7
-         8Mf+PckjCFSZ10jJD1KRW71ucBAJPU9ap/3fIiugVpNBjY3ZrGOdNYaBDn8JFxwnyk7w
-         ZgFKCVs223UJRJiiOFcAqpRY58g+koIaxmWP0cC1L0NFQxsxvZjSjL3+VSPsRzpLnXne
-         E7P1/dDsg2/ZahjWVZgAvqx2A4yGDJTzMdBbVwuygV0kWr+l+0iIlLk/C4DgFPeKrSbc
-         cL1Sxos6Jvhsi6jTmZI/puO1F0WxmNM8YG0JyL7bhc69FWNgQ9cAGQzus0C+xzI/SSji
-         +1gA==
-X-Forwarded-Encrypted: i=1; AJvYcCVKFX/Sj3zFRUlWP1WyON71GwHGG5vzlBl/vC14Y8g/sSbHYYVN6tgBwX6EEmbQEete6B6s4L8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwF+5Q/dMLAKlOkngl7NAsnEKlOihRzDaD79oiGMoP3IxiBwDQ
-	In2TMqGKmkMTbLyX57oW/A5DwTiRtzjWJEBrHB2DZvQaLtUASzHAhpbXr+XEf71tSVSUnkHQfNK
-	MxabOSS/NeO0gJW6CZ0Rj9Gg93PsNFpf5kBD0c3b6
-X-Gm-Gg: ASbGnctajReo2sVx5HvKcF858kxEt26lMADeRdOSxiCa0+16K9uRCY7BTQstPnyt6jn
-	pvmiHFqrwTIKMcag41WkUR0ucnZJNCvgN2T3EhA9Oeasq/sUgev6GTsH/PFOGQzThNQQYenCc3X
-	ousMWD5XJRctrBlBwYeB8waDHlIu4rewCupx5qXN5KFUHnupiWv3FakrxdtlWxO//C/fJdc6ur9
-	CCQQog4xD9f0UU6ZapJ1ys/yXfWkPj+o0MCAdDjV7xg6ayN4Fk2zUgY3uOYg+RBoU8Mb/jwrZg=
-X-Google-Smtp-Source: AGHT+IF8+WaQjjhdoqDmDzA6o7MOUw6Bcr7AID3NwciJiO09oN4GC/yXdrw2LwzQikWa/McrC31ZxchNTlf2AmTi8PU=
-X-Received: by 2002:a81:8a02:0:b0:787:e5bb:fb83 with SMTP id
- 00721157ae682-788136a8ed4mr3083177b3.32.1762895094747; Tue, 11 Nov 2025
- 13:04:54 -0800 (PST)
+        bh=QwP6Mm7gy1ZK8oeG4x4mgYN5Qt7fbG4Gah1TecksR98=;
+        b=ZGyxsal8H+AYSw3QeY/7zGM9eipXslWUe4zllxa1b/TEhyRkp2Dz6zkjbvwzt8Snm6
+         PRc1FSnedPzxtIR9DPEXlilg5y2j4CsjQBw1wZig4rVzuyqgh4OtgIqnS43IbMe+xVJ6
+         ePrdO/BmL+/5Hft0WJcOuJyeINtL8Ng8fFcs59MqWWvVUhUo7S4YNxNiioozvccvo8K/
+         L318BCFA2470W3RUR2kAYXWiQDzOL69lQq8ed7wM4KWMBY2e52wtdbAutLq3QQ7mlYTr
+         1i0TzIvpZqakpwOSeZ6y93W2wQcE6WlJUFKPQ+heVjNjBY03iZwJJyrynFLt1xWjUWqu
+         144w==
+X-Forwarded-Encrypted: i=1; AJvYcCWH0FT8q2hmQgcAUJ/I9IUMu5H4UEjmhOaQNHC+GVlbbTgBnNY4oFqHXaD0fZJPN/vVxAds79k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyk+3sCd+S2BJJpVfj03XvafomHVdcunF/3HNqD4evDwNCrHgYP
+	nuCq5vR33B4ZZsIBkt+lmlKf+iHjMzNgnJdCVXJcPlIfFtRoSkA4luAi5Fv5EsyAmV4fiVcx9Kr
+	CjQmHXYBkw5+mGM9LleFsEtsW8ZhOdVE=
+X-Gm-Gg: ASbGncsNFipz6HDVopHHWKQin4eTMEcAPDw1urjUgkFzrf8urTzyLlhck8emXF/ae1G
+	7uYYKdyyPFlzZv7E/tiydqQFpe9h6xdMvLX0Blq/O3G1OzXhadOK3YVeMTkKW8YsZtoPIGcjvuM
+	SxSpYLax5n5E9MrgDRkb5cgxMtyLh0HTwqBF0fPfT1tzvv+f73AqHpKAZMp08sNZ7W9O1n+DuN2
+	ZVVO3KAHLEzt7cM8OdgxmD2jIjcCK8Tj6wv4fb6uxpAlGcY7yIeS7h1ApgEoOwguaQwig8Tuslh
+	4O2gCCJLF908HmENs9nOwe0WBYa4dqJVOkdxY1wxgJaEQmLVoBRbsqiAR30CntWFOQYutpfjFyQ
+	Gx0o=
+X-Google-Smtp-Source: AGHT+IFsOytGgnt1U92UtoUky/1wulIEh+Pmaa8W6gEGOIHALbiKUTckaUZPy8kghTMbfkFxlO7xNvj5AdbhpE8EjaQ=
+X-Received: by 2002:a17:902:f551:b0:297:d825:bf22 with SMTP id
+ d9443c01a7336-2984eda386emr4468665ad.5.1762894958907; Tue, 11 Nov 2025
+ 13:02:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251111093204.1432437-1-edumazet@google.com> <6913437c.a70a0220.22f260.013b.GAE@google.com>
- <CANn89iKgYo=f+NyOVFfLjkYLczWsqopxt4F5adutf5eY9TAJmA@mail.gmail.com>
- <CANn89iJ5p3xY_LJcexq8n2-91A6ERPV6yqjPGphD_w6wr_NHew@mail.gmail.com> <CANn89iKLDetsEpMrFU4F_XbTF_N0ranLkzJvf1qG=o-ecfseZg@mail.gmail.com>
-In-Reply-To: <CANn89iKLDetsEpMrFU4F_XbTF_N0ranLkzJvf1qG=o-ecfseZg@mail.gmail.com>
-From: Victor Nogueira <victor@mojatatu.com>
-Date: Tue, 11 Nov 2025 18:04:43 -0300
-X-Gm-Features: AWmQ_ble_zMFtuh4sJpY_p-zd95UkdHrGxhVK0Z7iNNjnMXOCKxYj_htacYxTxk
-Message-ID: <CA+NMeC9boCccv944JsADbbkp8T8rRDy_ce__m_ETut0059o7DQ@mail.gmail.com>
-Subject: Re: [syzbot ci] Re: net_sched: speedup qdisc dequeue
-To: Eric Dumazet <edumazet@google.com>
-Cc: syzbot ci <syzbot+ci51c71986dfbbfee2@syzkaller.appspotmail.com>, 
-	Daniel Borkmann <daniel@iogearbox.net>, davem@davemloft.net, eric.dumazet@gmail.com, 
-	horms@kernel.org, jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org, 
-	kuniyu@google.com, netdev@vger.kernel.org, pabeni@redhat.com, toke@redhat.com, 
-	willemb@google.com, xiyou.wangcong@gmail.com, syzbot@lists.linux.dev, 
-	syzkaller-bugs@googlegroups.com
+References: <20251110122223.1677654-1-ojeda@kernel.org> <20251110122223.1677654-2-ojeda@kernel.org>
+ <20251111.083413.2270464617525340597.fujita.tomonori@gmail.com>
+In-Reply-To: <20251111.083413.2270464617525340597.fujita.tomonori@gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Tue, 11 Nov 2025 22:02:26 +0100
+X-Gm-Features: AWmQ_bm-YuisXj51ok0HAEEwIhVZdnLtQdiqb_sOWGEJwZXB-OjiypMxPqOmm74
+Message-ID: <CANiq72=_KAgUZ9u5YY-iw7kyA9R1Nv6eNzZqMLSwOLQk6sR7kw@mail.gmail.com>
+Subject: Re: [PATCH 2/3] rust: net: phy: make example buildable
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: ojeda@kernel.org, alex.gaynor@gmail.com, tmgross@umich.edu, 
+	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, boqun.feng@gmail.com, 
+	gary@garyguo.net, bjorn3_gh@protonmail.com, lossin@kernel.org, 
+	a.hindborg@kernel.org, aliceryhl@google.com, dakr@kernel.org, 
+	linux-kernel@vger.kernel.org, patches@lists.linux.dev, 
+	Guillaume Gomez <guillaume1.gomez@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Eric,
+On Tue, Nov 11, 2025 at 12:34=E2=80=AFAM FUJITA Tomonori
+<fujita.tomonori@gmail.com> wrote:
+>
+> I think that some code begin lines with # for use lines in a "#
+> Examples" section, while others do not. Which style is recommended?
 
-On Tue, Nov 11, 2025 at 4:44=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Tue, Nov 11, 2025 at 11:23=E2=80=AFAM Eric Dumazet <edumazet@google.co=
-m> wrote:
-> >
-> > On Tue, Nov 11, 2025 at 8:28=E2=80=AFAM Eric Dumazet <edumazet@google.c=
-om> wrote:
-> > >
-> > > On Tue, Nov 11, 2025 at 6:09=E2=80=AFAM syzbot ci
-> > > <syzbot+ci51c71986dfbbfee2@syzkaller.appspotmail.com> wrote:
-> > > >
-> > > > syzbot ci has tested the following series
-> > > >
-> > > > [v2] net_sched: speedup qdisc dequeue
-> > > > [...]
-> > > > and found the following issue:
-> > > > WARNING in sk_skb_reason_drop
-> > > >
-> > > > Full report is available here:
-> > > > https://ci.syzbot.org/series/a9dbee91-6b1f-4ab9-b55d-43f7f50de064
-> > > >
-> > > > ***
-> > > >
-> > > > WARNING in sk_skb_reason_drop
-> > > > [...]
-> > struct bpf_skb_data_end {
-> >   struct qdisc_skb_cb qdisc_cb;
-> >   void *data_meta;
-> >    void *data_end;
-> > };
-> >
-> > So anytime BPF calls bpf_compute_data_pointers(), it overwrites
-> > tc_skb_cb(skb)->drop_reason,
-> > because offsetof(   ..., data_meta) =3D=3D offsetof(... drop_reason)
-> >
-> > CC Victor and Daniel
->
-> Quick and dirty patch to save/restore the space.
->
-> diff --git a/net/sched/cls_bpf.c b/net/sched/cls_bpf.c
-> index 7fbe42f0e5c2b7aca0a28c34cd801c3a767c804e..004d8fe2f29d89bd7df82d90b=
-7a1e2881f7a463b
-> 100644
-> --- a/net/sched/cls_bpf.c
-> +++ b/net/sched/cls_bpf.c
-> @@ -82,11 +82,16 @@ TC_INDIRECT_SCOPE int cls_bpf_classify(struct sk_buff=
- *skb,
->                                        const struct tcf_proto *tp,
->                                        struct tcf_result *res)
->  {
-> +       struct bpf_skb_data_end *cb =3D (struct bpf_skb_data_end *)skb->c=
-b;
->         struct cls_bpf_head *head =3D rcu_dereference_bh(tp->root);
->         bool at_ingress =3D skb_at_tc_ingress(skb);
->         struct cls_bpf_prog *prog;
-> +       void *save[2];
->         int ret =3D -1;
->
-> +       save[0] =3D cb->data_meta;
-> +       save[1] =3D cb->data_end;
-> +
->         list_for_each_entry_rcu(prog, &head->plist, link) {
->                 int filter_res;
->
-> @@ -133,7 +138,8 @@ TC_INDIRECT_SCOPE int cls_bpf_classify(struct sk_buff=
- *skb,
->
->                 break;
->         }
-> -
-> +       cb->data_meta =3D save[0];
-> +       cb->data_end =3D save[1];
->         return ret;
->  }
+There is no hard rule for all cases -- we typically hide things that
+are not important for the example (e.g. fake `mod bindings` that are
+used to support the example but aren't important and would bloat the
+example or confuse the reader).
 
-I think you are on the right track.
-Maybe we can create helper functions for this.
-Something like bpf_compute_and_save_data_end [1] and
-and bpf_restore_data_end [2], but for data_meta as well.
-Also, I think we might have the same issue in tcf_bpf_act [3].
+For imports, some people prefer to see them, others don't. Here, for
+instance, it may be interesting to show the paths (e.g. that the
+`Device` is a `net::phy::` one, or where `C22` is coming from), so we
+could unhide it. So up to you!
 
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/tree/inc=
-lude/linux/filter.h#n907
-[2] https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/tree/inc=
-lude/linux/filter.h#n917
-[3] https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/tree/net=
-/sched/act_bpf.c#n50
+So I think the rule is really: if it is something that we think people
+should see to actually understand the example, then we should show it.
 
-cheers,
-Victor
+And if it is something that would confuse them more than help, or that
+generally should not be used in real code (like the fake bindings),
+then we should hide it.
+
+Ideally `rustdoc` could perhaps support showing the hidden parts with
+the click of a button or similar -- there was e.g.:
+
+    https://github.com/rust-lang/rust/pull/86892
+
+On the other hand, there is already a "Source" button nearby that one
+can click to see it, so it is not too bad. But, yeah, if they need to
+do that, it is likely it shouldn't have been hidden to begin with.
+
+Cheers,
+Miguel
 
