@@ -1,78 +1,62 @@
-Return-Path: <netdev+bounces-237446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18DEFC4B62A
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 05:00:43 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26D5EC4B639
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 05:01:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 98CDD34DC3C
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 04:00:42 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 453554EFEAE
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 04:01:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45F5642049;
-	Tue, 11 Nov 2025 04:00:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA9D62222A1;
+	Tue, 11 Nov 2025 04:01:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Y8e97wOi"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="fK+/gHvx"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CE1C20ED;
-	Tue, 11 Nov 2025 04:00:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E4DB20ED;
+	Tue, 11 Nov 2025 04:01:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762833638; cv=none; b=CoM/0giMbStvONiyEgShnE1ypK7YUPodbvP7NF5kP9h1zlsRhv+F9xZfVYmssbNnRMYEJmyhLw4cVuqnD2UqnsAjNk3DJnEcKzbv637l4icB6DNbmtENYC6YmlK3zSXfywxYcH7hkb4BYG+zGPn8b3Y8t2BdT6ySNl2VzmNAUGI=
+	t=1762833664; cv=none; b=ICve0a1wcJwTkWN9Mey2fcVB83mPsBp3t2jPN6k05zjtIzJUDqRpu1SNb6xEL97ZLr+GTLb32RNYORljVSeo2EG5meewbRhFojO6vesGvxhCDDHoM4RLGkOXt/UgKzCXxESURMoEROEz40dqoqXGna0X2wxxbCFZQPpFAn9nBPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762833638; c=relaxed/simple;
-	bh=FS82Du6xPjxsf7+cs8yITjrHqmV2wtHo8A3L6219qHo=;
+	s=arc-20240116; t=1762833664; c=relaxed/simple;
+	bh=ggSgjAcoNf7FxKfZiKtIwpW5SQUWLlQNX1+T5IszGgE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tzfDuRUAohXnrkSytOwbRfJiOq25tBekPCj+l3Ir6wvMcxZG0WB7mRqDlnV6gcJf3iTySObd64LeTwAoglRVvGv0GhN5En/XYMWCi+fNfzU+8QNblh9ggTHiKe+hfZXuVeiZchzt121RpW4I5eTxgRE6LAWrJ3lMCKvHf9qm8rE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Y8e97wOi; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Y2U2Nk8OC9pdQsbe0WYQ+B3AeQ1vBG9SlV20DmuzAjY=; b=Y8e97wOiB3gptVW8uHMc+bI7T0
-	zaTgOInWASr6H075QJbzk/4+CmBUCH/uDTavbfz00hz9tJ1aBF18jVLbvH5GXV/aG3ZUNQfYXjSy1
-	iohPjtCt3nHjtqZ1f8OHvlSPkoeDUW9ddOmaNAbwnzhGLNz51JubfTjjHCZYq2eWDKpk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vIfYO-00DaXu-1Y; Tue, 11 Nov 2025 05:00:24 +0100
-Date: Tue, 11 Nov 2025 05:00:24 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
-	Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: Re: [PATCH net-next v15 08/15] net: phy: marvell-88x2222: Support
- SFP through phy_port interface
-Message-ID: <0a4ce50b-3117-465e-8f6f-1228ea5bac2e@lunn.ch>
-References: <20251106094742.2104099-1-maxime.chevallier@bootlin.com>
- <20251106094742.2104099-9-maxime.chevallier@bootlin.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=uoCLXbXXaO7F/8HJWO+BKPA9jfeitz0nyq5gXmi9TLsUBsVhpffcfb7pwfLnz6szfAOBHEkqI28h1S1iXLxAgUzp95ezyFRqmsPgZiM7KvBW+0qDJD/oevp6PZB+gI3vDTOETGocQcJzYuBsxzgMwwhhyXOF2xA1I+JSUlYjJa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=fK+/gHvx; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1173)
+	id 0273F212AE23; Mon, 10 Nov 2025 20:01:01 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 0273F212AE23
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1762833661;
+	bh=fQdRoB1FdK12L43euj9oIv38cdQLrb5d46fVsXFtj1g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fK+/gHvxNJu7T5HhRbJCFIlVxhYY8xIcnsSxwIL8xghRqfaf1xN1oT1cNPbvQBtwY
+	 ZaB1wapQqiYTo6VNywWhtZz5unWpMQJ5LZDFZ1tj3NHlPLoQ8OoJvd2d/r449MbkxX
+	 QbUUgsmDbelS+6AzKMFG2U6qHljrUsEqsKkjnlhA=
+Date: Mon, 10 Nov 2025 20:01:00 -0800
+From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, longli@microsoft.com,
+	kotaranov@microsoft.com, horms@kernel.org,
+	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+	dipayanroy@linux.microsoft.com, shirazsaleem@microsoft.com,
+	rosenp@gmail.com, linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/2] net: mana: Refactor GF stats to use
+ global mana_context
+Message-ID: <20251111040100.GA3548@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1761734272-32055-1-git-send-email-ernis@linux.microsoft.com>
+ <1761734272-32055-2-git-send-email-ernis@linux.microsoft.com>
+ <20251031160632.41c1167f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,17 +65,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251106094742.2104099-9-maxime.chevallier@bootlin.com>
+In-Reply-To: <20251031160632.41c1167f@kernel.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Thu, Nov 06, 2025 at 10:47:33AM +0100, Maxime Chevallier wrote:
-> The 88x2222 PHY from Marvell only supports serialised modes as its
-> line-facing interfaces. Convert that driver to the generic phylib SFP
-> handling.
+On Fri, Oct 31, 2025 at 04:06:32PM -0700, Jakub Kicinski wrote:
+> On Wed, 29 Oct 2025 03:37:51 -0700 Erni Sri Satya Vennela wrote:
+> > Refactor mana_query_gf_stats() to use mana_context instead of per-port,
+> > enabling single query for all VFs.
 > 
-> Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> What does "single query for all VFs" mean?
+> All types? All within the host?
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Considering the case where there are multiple ports for a single VF,
+the details of the Hardware Counters (HC) requested from the hardware
+is same across all ports. That is why we have moved the those stats from
+mana_port_context (port) to mana_context (VF). I will reframe the commit
+message for more readability.
+> 
+> Coincidentally I don't know what HC and GF stand for.
+> Please explain things in more detail, all atypical acronyms 
+> (for *Linux* networking).
+> 
 
-    Andrew
+HC stands for Hardware Counters and MANA_QUERY_GF_STAT is a hardware
+command code for GDMA tx LSO packets and bytes count. I will mention it
+clearly in the next version.
+
+> > Isolate hardware counter stats by introducing mana_ethtool_hc_stats
+> > in mana_context and update the code to ensure all stats are properly
+> > reported via ethtool -S <interface>, maintaining consistency with
+> > previous behavior.
+> 
+> > -void mana_query_gf_stats(struct mana_port_context *apc)
+> > +void mana_query_gf_stats(struct mana_context *ac)
+> >  {
+> >  	struct mana_query_gf_stat_resp resp = {};
+> >  	struct mana_query_gf_stat_req req = {};
+> > -	struct net_device *ndev = apc->ndev;
+> > +	struct gdma_context *gc = ac->gdma_dev->gdma_context;
+> 
+> reverse xmas tree, please
+> 
+Thanks for pointing out. I will make this change in next version.
+> > +	struct device *dev = gc->dev;
+> >  	int err;
 
