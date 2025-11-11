@@ -1,179 +1,185 @@
-Return-Path: <netdev+bounces-237462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CD64C4BB8A
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 07:45:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B10D2C4BBEA
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 07:54:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FCED1882B54
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 06:45:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7F84188E491
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 06:54:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78877314B85;
-	Tue, 11 Nov 2025 06:44:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B9CE346A1B;
+	Tue, 11 Nov 2025 06:54:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PghJRMm/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XBEaOfZQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E35CA25783C
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 06:44:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D58D2874F1;
+	Tue, 11 Nov 2025 06:53:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762843497; cv=none; b=dRCmtXDvRJ8Z4fFJS8hGu8F+1qGShdmo8ytFJOP34VuJKRj3fqCfrOooJR/peLpmSnoh6sWk6lv8W1LVolKs8/vBsYQkApIi0g45ZnQJNt7QH8G7jqPMm7oIwm9yU6RHhTTOzvWD9jY2EVL9xpZfkb+gWZweT2I6IEArlUMOL0g=
+	t=1762844041; cv=none; b=PRvTwJB0MeK+gjFaFdO24yth4OrFouTsR9MGQyOVMciE6Qvi16DoBsd3O/l1FcF0phRu3/Rsef+U+/Kmf3pkQ/nQY7IO6JZylRp1vgD7X4WKvcia4B0vtRwHAP8KkhKuFNGBBZIEYwgkYDDx/8O26k5VY4hoGVfG1eCzPvlohtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762843497; c=relaxed/simple;
-	bh=H45lOcTSAtMgo+EmX/n0VzDUtwq2OFEo3xSTYKVecVA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DY437RSGuss04F+KEqhc4c93ATJYRCIhctKRcILxbJd83P30zD3hSgOL26YZm4TsqBegi2UYK53fpnHAukfirveed+ZPaDCBvSs+WmuhClEtryzX5JIX51Fn3CqKi49MIHuAw77SL7nwg3FTfqCxECrQY1BqzFxz+wY7NLcyo64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PghJRMm/; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-b608df6d2a0so2987464a12.1
-        for <netdev@vger.kernel.org>; Mon, 10 Nov 2025 22:44:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762843495; x=1763448295; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=K1zJFRsAiK3pdg0if+VvxTy8sqPxZLBPEDWV0WcU7gw=;
-        b=PghJRMm/2+YFedsexSXIqdAp3zCkE9G77EdYVZpUndWCKzBQt07gSVVU8Js2k1PgnJ
-         PnHz/C6YfX83m/6pLtW5hXqvpYWw52wu+VujRg8e2Q7AQov9r5e6af/YmmG7EU8hdRS/
-         h5ekIcZFArGH/7PGmCnZG0ljq61y6kPYpyeTAjKqc8MoaEoiswp1QU/5xWI5+/SKptrr
-         JSlOHSCSOimmdoYAIl8ZfSqUZCY2RPQibCv4yX7PU/UuOLu4KaCZFbjAj7FMipPzmBY5
-         FpuJMPcYgEFW3D3j6oVGV0jvMaJ3MK4PbmKWpkr6SNnENNPZ9YZoXf5Bg/JbPQqrg38t
-         HoHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762843495; x=1763448295;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=K1zJFRsAiK3pdg0if+VvxTy8sqPxZLBPEDWV0WcU7gw=;
-        b=w/7qapnrnAOeHi++qGZXrBEwEiOTkKMyiI0FROL7kg/mqlYp0z+9cU/szZ40rqDLhW
-         6iTmp2q3xrLXonTKGZ0noUfsN2oeJD+SQZ6W577vAWXx+nUQoF5nhZbWMyH/tNp2roPt
-         xfIQCYZM8HNyxviJfUErwyO/vvauoK/YRjBw1Gii8bZaOTBjzHnH5GcvmQnCaeZqWNTg
-         mCATU+7zaomP96T6xx3zpCp+5J1dmN29fKmkobjeWimagZiczDMkFnF6Hie0uoYSjGNO
-         /CR+OYFckzXCKLY1ihhzeR2W9OeECbRXw0sPFjeKpGpjvaF4b4ATLSXLejqiujSeyL5D
-         wu1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXW4QNY7ca63l26icSaGA/MMkvvY/wHBrjRMPnXA74uCTAsk65fzHVIalTxMm2gW67KGWWvuwc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcDnyEeWzcwe8RoheejZgDiEWzPZiv+AusJrwXyhxQqBLOmmMh
-	JPD9/TLOS19PzJSH8hhEkeeHkCnthKLy56SnLNs3+brvaEnO7B5xWT8n
-X-Gm-Gg: ASbGncvkmndzoWz5HE1WL5pfpJPlN8mtI3cL+ZupsJtiKSATvsa3HSK8OJ43JBvZ59O
-	DTVwBEH2fuJWOGz8DPB4HOYoTSxXwT7l0bqHIC6lJEFGYKYFu5JoO9yyDUno9LZGX+pyRrdqX7f
-	jvJe9q5i9SaPT9Zrgltzn+3GnrfpYKnNPa1G/7yMY3Dp6GjoluxI3JMQDhVHoe0sNCFe1XZMrCL
-	v+blpNLlJgPg8AooZ2JLZVbg7oXDghYwVpYpuFjPDQ4rAeWnviC0qpd9EkktqZ1c9RxklWoymuX
-	4+l1TtrAddM56874Tzb4tCmkyEFlWP/1D4cM8yHr00RvUD5Ek7Nf7iCtghnvlwKx4ucNiz9YRWU
-	nYcNM2Ed7PE+Pr7GGrMEYyv/L9ekHzNJW39VL1DbXGQ60tIzdbXkNnK5LXANEU0V/rm1w/OU5HM
-	1p500BrG1q0QTGK4oqwMrtgfnSNZ10hpFuEeJz+w==
-X-Google-Smtp-Source: AGHT+IGZjkzeenTM4AWU7s1CLf+GaRSSpWdmQcFkLH83i6KqyKtQqF5GhsLYfhlBk2XgbJ7fvxelGg==
-X-Received: by 2002:a17:902:da4b:b0:265:47:a7bd with SMTP id d9443c01a7336-297e53e7ce6mr126106965ad.4.1762843495053;
-        Mon, 10 Nov 2025 22:44:55 -0800 (PST)
-Received: from localhost.localdomain ([116.232.109.229])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-297e2484bfbsm104161735ad.26.2025.11.10.22.44.49
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 10 Nov 2025 22:44:54 -0800 (PST)
-From: Chuang Wang <nashuiliang@gmail.com>
-To: 
-Cc: Chuang Wang <nashuiliang@gmail.com>,
-	stable@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
+	s=arc-20240116; t=1762844041; c=relaxed/simple;
+	bh=1ohHqJy3GtnFE3r4lHSgWNj8+fSVY8Y9eoPnFFJARb0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qHN/F2cwEYPTVff6vRCbB1PPVa8dv1yOmJmjgrHQq62ESwhqMPUhO7AtzzOMuytXiL3FCmp7OvKCfiINJ5bXgAfIJ8TQyq8So3edSQGi4/kZg9URGvf9z+0wHR2AxmTBciw8TBhZ+TX6OS1eefNEDL7QsD5PKxubSWhrU+GRLsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XBEaOfZQ; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1762844039; x=1794380039;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=1ohHqJy3GtnFE3r4lHSgWNj8+fSVY8Y9eoPnFFJARb0=;
+  b=XBEaOfZQY4t4SGAKPSwKmj1mJ8CQX4lgeKALHX7A2pSzrNqudqujJ8Ef
+   P7abXLXPXHvzq3AFKQhVRrQRaCq0GN2+/ADDx15AKs8xVCxNogeRsbe8I
+   jslNZBaXsf8VuJqVK+oQ8SQCaTiVGNgX2pWxu+OCyojQvl8SdNEShMTPp
+   qBc/k1QoN/0R65ZoWxdF7kKok2TgAUkDcIdaIN79riXAvKymAPyr+n5Qh
+   Fw163Buye7nXAREFKUhSvh79iadWDsJa0NtZse6rL69HMYaHVLQBXcjM7
+   xYMDoImqmJRaksYzTILYu53JegF8Ed9ksT8p+mbBqItc1rENUbwA7PV9V
+   A==;
+X-CSE-ConnectionGUID: B6XHsDO3S9u1rV+bnfHzfQ==
+X-CSE-MsgGUID: XJ2s1zR8Ro+oyrwfdLJ2cw==
+X-IronPort-AV: E=McAfee;i="6800,10657,11609"; a="76250134"
+X-IronPort-AV: E=Sophos;i="6.19,295,1754982000"; 
+   d="scan'208";a="76250134"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2025 22:53:59 -0800
+X-CSE-ConnectionGUID: 7VwVqiR7RH+xabLrGDwc9g==
+X-CSE-MsgGUID: xrDE0GSYTLmtCPbuDM4V6A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,295,1754982000"; 
+   d="scan'208";a="188145796"
+Received: from lkp-server01.sh.intel.com (HELO 7b01c990427b) ([10.239.97.150])
+  by orviesa006.jf.intel.com with ESMTP; 10 Nov 2025 22:53:56 -0800
+Received: from kbuild by 7b01c990427b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1vIiGH-0002sF-1h;
+	Tue, 11 Nov 2025 06:53:53 +0000
+Date: Tue, 11 Nov 2025 14:52:53 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Petr Oros <poros@redhat.com>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>, Michal Schmidt <mschmidt@redhat.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net v1] ipv4: route: Prevent rt_bind_exception() from rebinding stale fnhe
-Date: Tue, 11 Nov 2025 14:43:24 +0800
-Message-ID: <20251111064328.24440-1-nashuiliang@gmail.com>
-X-Mailer: git-send-email 2.50.1
+Subject: Re: [PATCH net-next 4/6] dpll: zl3073x: Cache all reference
+ properties in zl3073x_ref
+Message-ID: <202511111402.yEyMEeLb-lkp@intel.com>
+References: <20251110175818.1571610-5-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251110175818.1571610-5-ivecera@redhat.com>
 
-The sit driver's packet transmission path calls: sit_tunnel_xmit() ->
-update_or_create_fnhe(), which lead to fnhe_remove_oldest() being called
-to delete entries exceeding FNHE_RECLAIM_DEPTH+random.
+Hi Ivan,
 
-The race window is between fnhe_remove_oldest() selecting fnheX for
-deletion and the subsequent kfree_rcu(). During this time, the
-concurrent path's __mkroute_output() -> find_exception() can fetch the
-soon-to-be-deleted fnheX, and rt_bind_exception() then binds it with a
-new dst using a dst_hold(). When the original fnheX is freed via RCU,
-the dst reference remains permanently leaked.
+kernel test robot noticed the following build warnings:
 
-CPU 0                             CPU 1
-__mkroute_output()
-  find_exception() [fnheX]
-                                  update_or_create_fnhe()
-                                    fnhe_remove_oldest() [fnheX]
-  rt_bind_exception() [bind dst]
-                                  RCU callback [fnheX freed, dst leak]
+[auto build test WARNING on net-next/main]
 
-This issue manifests as a device reference count leak and a warning in
-dmesg when unregistering the net device:
+url:    https://github.com/intel-lab-lkp/linux/commits/Ivan-Vecera/dpll-zl3073x-Store-raw-register-values-instead-of-parsed-state/20251111-020236
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20251110175818.1571610-5-ivecera%40redhat.com
+patch subject: [PATCH net-next 4/6] dpll: zl3073x: Cache all reference properties in zl3073x_ref
+config: x86_64-randconfig-161-20251111 (https://download.01.org/0day-ci/archive/20251111/202511111402.yEyMEeLb-lkp@intel.com/config)
+compiler: gcc-14 (Debian 14.2.0-19) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251111/202511111402.yEyMEeLb-lkp@intel.com/reproduce)
 
-  unregister_netdevice: waiting for sitX to become free. Usage count = N
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202511111402.yEyMEeLb-lkp@intel.com/
 
-Ido Schimmel provided the simple test validation method [1].
+All warnings (new ones prefixed by >>):
 
-The fix clears 'oldest->fnhe_daddr' before calling fnhe_flush_routes().
-Since rt_bind_exception() checks this field, setting it to zero prevents
-the stale fnhe from being reused and bound to a new dst just before it
-is freed.
+   drivers/dpll/zl3073x/dpll.c: In function 'zl3073x_dpll_pin_phase_offset_check':
+>> drivers/dpll/zl3073x/dpll.c:1850:35: warning: variable 'ref' set but not used [-Wunused-but-set-variable]
+    1850 |         const struct zl3073x_ref *ref;
+         |                                   ^~~
 
-[1]
-ip netns add ns1
-ip -n ns1 link set dev lo up
-ip -n ns1 address add 192.0.2.1/32 dev lo
-ip -n ns1 link add name dummy1 up type dummy
-ip -n ns1 route add 192.0.2.2/32 dev dummy1
-ip -n ns1 link add name gretap1 up arp off type gretap \
-    local 192.0.2.1 remote 192.0.2.2
-ip -n ns1 route add 198.51.0.0/16 dev gretap1
-taskset -c 0 ip netns exec ns1 mausezahn gretap1 \
-    -A 198.51.100.1 -B 198.51.0.0/16 -t udp -p 1000 -c 0 -q &
-taskset -c 2 ip netns exec ns1 mausezahn gretap1 \
-    -A 198.51.100.1 -B 198.51.0.0/16 -t udp -p 1000 -c 0 -q &
-sleep 10
-ip netns pids ns1 | xargs kill
-ip netns del ns1
 
-Cc: stable@vger.kernel.org
-Fixes: 67d6d681e15b ("ipv4: make exception cache less predictible")
-Signed-off-by: Chuang Wang <nashuiliang@gmail.com>
----
-v0 -> v1:
-- Expanded commit description to fully document the race condition,
-  including the sit driver's call chain and stack trace.
-- Added Ido Schimmel's validation method.
----
+vim +/ref +1850 drivers/dpll/zl3073x/dpll.c
 
- net/ipv4/route.c | 5 +++++
- 1 file changed, 5 insertions(+)
+  1836	
+  1837	/**
+  1838	 * zl3073x_dpll_pin_phase_offset_check - check for pin phase offset change
+  1839	 * @pin: pin to check
+  1840	 *
+  1841	 * Check for the change of DPLL to connected pin phase offset change.
+  1842	 *
+  1843	 * Return: true on phase offset change, false otherwise
+  1844	 */
+  1845	static bool
+  1846	zl3073x_dpll_pin_phase_offset_check(struct zl3073x_dpll_pin *pin)
+  1847	{
+  1848		struct zl3073x_dpll *zldpll = pin->dpll;
+  1849		struct zl3073x_dev *zldev = zldpll->dev;
+> 1850		const struct zl3073x_ref *ref;
+  1851		unsigned int reg;
+  1852		s64 phase_offset;
+  1853		u8 ref_id;
+  1854		int rc;
+  1855	
+  1856		ref_id = zl3073x_input_pin_ref_get(pin->id);
+  1857		ref = zl3073x_ref_state_get(zldev, ref_id);
+  1858	
+  1859		/* No phase offset if the ref monitor reports signal errors */
+  1860		if (!zl3073x_dev_ref_is_status_ok(zldev, ref_id))
+  1861			return false;
+  1862	
+  1863		/* Select register to read phase offset value depending on pin and
+  1864		 * phase monitor state:
+  1865		 * 1) For connected pin use dpll_phase_err_data register
+  1866		 * 2) For other pins use appropriate ref_phase register if the phase
+  1867		 *    monitor feature is enabled.
+  1868		 */
+  1869		if (pin->pin_state == DPLL_PIN_STATE_CONNECTED)
+  1870			reg = ZL_REG_DPLL_PHASE_ERR_DATA(zldpll->id);
+  1871		else if (zldpll->phase_monitor)
+  1872			reg = ZL_REG_REF_PHASE(ref_id);
+  1873		else
+  1874			return false;
+  1875	
+  1876		/* Read measured phase offset value */
+  1877		rc = zl3073x_read_u48(zldev, reg, &phase_offset);
+  1878		if (rc) {
+  1879			dev_err(zldev->dev, "Failed to read ref phase offset: %pe\n",
+  1880				ERR_PTR(rc));
+  1881	
+  1882			return false;
+  1883		}
+  1884	
+  1885		/* Convert to ps */
+  1886		phase_offset = div_s64(sign_extend64(phase_offset, 47), 100);
+  1887	
+  1888		/* Compare with previous value */
+  1889		if (phase_offset != pin->phase_offset) {
+  1890			dev_dbg(zldev->dev, "%s phase offset changed: %lld -> %lld\n",
+  1891				pin->label, pin->phase_offset, phase_offset);
+  1892			pin->phase_offset = phase_offset;
+  1893	
+  1894			return true;
+  1895		}
+  1896	
+  1897		return false;
+  1898	}
+  1899	
 
-diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index 6d27d3610c1c..b549d6a57307 100644
---- a/net/ipv4/route.c
-+++ b/net/ipv4/route.c
-@@ -607,6 +607,11 @@ static void fnhe_remove_oldest(struct fnhe_hash_bucket *hash)
- 			oldest_p = fnhe_p;
- 		}
- 	}
-+
-+	/* Clear oldest->fnhe_daddr to prevent this fnhe from being
-+	 * rebound with new dsts in rt_bind_exception().
-+	 */
-+	oldest->fnhe_daddr = 0;
- 	fnhe_flush_routes(oldest);
- 	*oldest_p = oldest->fnhe_next;
- 	kfree_rcu(oldest, rcu);
 -- 
-2.47.3
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
