@@ -1,391 +1,208 @@
-Return-Path: <netdev+bounces-237634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83354C4E1EC
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 14:32:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29242C4E35B
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 14:42:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B0391881F5C
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 13:32:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 458B418987CD
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 13:41:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7688D26E158;
-	Tue, 11 Nov 2025 13:31:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DA8033ADBF;
+	Tue, 11 Nov 2025 13:41:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RCPAL+0K"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="dmSaZr40"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11013036.outbound.protection.outlook.com [40.93.196.36])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77CFA76025
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 13:31:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762867897; cv=none; b=VKD05AITDh+A00EdVi3ZMEzLSVHvteH1OxdCSuYzbSwMyyXjZTJHN2wIYaV1jYM1lwP+aJhlDijUQWYLAWz8QEoiICf8NcvAv/ZBG4RmCAvxiO2xmi9LvKxX826w2EKuXNFtRXssVMx7Sue/zrhR5EzHkjzuzAZDLPTd8ukAFvc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762867897; c=relaxed/simple;
-	bh=DMi6sCuXS3Pie01FqNU1xC+xLKXgOJZdV4/enTeinIA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=StrGTxSmrsYtVZIaQ8KwEnTMXANa5B1mYg2e0qeOzWtqO3GxZKtdWxit5ahhw5jHSWLxVLPcnM9AZJDLEceO35OIrMmjxpv6fN/nYs/92R+RgJtKqVz9nXjTXs8iLk8qdfNiph4mizQRrwlZ3BOaNLsdRfq4o1SLsjiqbhARVH4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RCPAL+0K; arc=none smtp.client-ip=209.85.128.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-787eb2d86bfso23898517b3.2
-        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 05:31:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762867894; x=1763472694; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CyIN+7ErQ3P8PMyjPjpHzOQvi0mWhG2I97HzcBXrsS0=;
-        b=RCPAL+0K12huSMKHR75RzG09vvh+iD3ZxpuKAG2Xw46vTYapLkctkAJKfZxB7NeBtx
-         VX7fLqYoNS2famkSQi0q4UteIm2SiLqaZ+2RvYMLOgSlc9ABNYUAt+XiKCw7YFX9cePt
-         Yy0mRKyXQWYOQ8S3YITYVJl9RXyO8Up2Dx5X71dyVIO9tSu3hG6/ENOD7nUKfCX/9bkC
-         POJzDax/6XJjMUZo0wtBih6i7S5QYcl/LJWXp9U2QlBj329a9lyNP2tlWIFZ2ZG1yNlV
-         cWR8ii8mi9tI3lhyl8PyfCW096oqL5o5VUNsXVDmlhC7+aPhKXbkd+0xUCNYWq+ntJHb
-         PVow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762867894; x=1763472694;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=CyIN+7ErQ3P8PMyjPjpHzOQvi0mWhG2I97HzcBXrsS0=;
-        b=WKLWEHsxmdyvVazODfzAnMKoGS54M03DgjgeaSXQ8PE1MBFFgJdgk/MyiHS4gRy0PI
-         RNPQ5syAocbQ29Oe4dRAf4obdrdnmmXEkgx1Odv/NuN3GSvRiuBZioyGQu30LbClmFdu
-         lsX1RZMRv/dSwxch0ismZCIrWk54iqkBuEaSoXBNIr74irNbkaX+U4GhI7KVoze9yUaF
-         DB0ZsdO8jlhrH8Ztk3ouZlHGuSzhinsXGZUf1v7t2Eykil4uyaOEFUj1S4YuXAaNfKT6
-         8Aihy8ct1TtnpwskY6jL0gvCyVl4YuG8lgTveNxvBWUr/merhwvUZjhYK0vzXzm+MC0I
-         FRow==
-X-Forwarded-Encrypted: i=1; AJvYcCVx5bltFztepGaaNBe4aH9NcXxiw+6EGV0HSQb9+cLn9hbGxhQHZh9COyqzLXqRHwssfloWl4I=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzWbcjWtV/QHJUjBruHZAx+xXq/GiclPJGduwz+DiZ01JRVyKFQ
-	oEW3xK1X6WWItfrCww4vjBgvwHS+Hj4BC56uEDdn7zozZKxUzr3WZNjkglriY0lqEGHDviWRI3k
-	KtEJmrfdjcnbg4CraqxhCs16DmjLiGro=
-X-Gm-Gg: ASbGncvXsV/6+GyujcEJivGYQW/HNCM7fV6vwtHRZD7nIv0g+s0SgXsnTyCGo8GG/aR
-	x6MMyp+/w/07nKEKEmHxJoNI8nr1LgqoXND5pm+A+RKHNTOvS8hsHeQHp9B/H9lWaKLKkqMSQq+
-	0UFqaSUlUYeiNFByxW2YdK4LCO4OAx3LqHrLXpFUilvhoTb5cv6gPzcdW8lJeh9IzyxmXoc1fu0
-	aRKDo9SM9l9dsACgR3gj2p0G9FQPtnPPlWzUCC95WHz502wwTQRx2CbNxE=
-X-Google-Smtp-Source: AGHT+IGwkYrVAfEPvPzmef5jJqS38L9lJaVwkQydaYvZjea3LT5SMI81HU8S/HyP1/tg1jhbH8fXF3m3QwxFxO5RPkA=
-X-Received: by 2002:a05:690c:670a:b0:787:de81:35c2 with SMTP id
- 00721157ae682-787de8137a6mr97165477b3.42.1762867894275; Tue, 11 Nov 2025
- 05:31:34 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7159A33ADB2
+	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 13:41:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.196.36
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762868471; cv=fail; b=uJ1WeTsGUFinynzmAj7vFYXEIt2ONOwIUH3c3lo9KoYofbPjbxZZFXSULSQh5Zsdril1cDY1uSFVwvIwlSTGlncO2o+65QMsQwYjMDDVFQBd1TqHR4+LmsQdz6MFs+/iQVEtBE9hGDMhAvs8BtdEdQVm2J4LIbDyVeJYBoRqMGA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762868471; c=relaxed/simple;
+	bh=TJJumqpFF2rwvTCiXVrHVXL5cHc1f5Xqmv1TPBNu2sw=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=KHJ3As+6W5uFOBeogMMHeXs9nqZ7Z4iWaMMwmhWY+Z0PqqqnOvZ43GN/UaIzP4bQdxQWXeo34AnuCXQjcUnaNvQ9kVMxyNmIXByqL2ZrxSPK96bsC+9enu9RIKapXigYPHoIs5NaxiygOsHZL9GeXQ820UOhe+wqDbjt0cziA5U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=dmSaZr40; arc=fail smtp.client-ip=40.93.196.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=QR7y7lta5u/PqR/xVxHkMJ3QHayDDqj69cl+3scdYOywvtw2mxGbuHxTAfJH3cCM9NF68q9HS+Yg8kdCRvhnf/qogA3qZ/Oc8VeC484+EknGTwxZ4tOD0K63KQ8XUShOLq1FgcpL8Bt9uCogmZGzRU2RYBcqTeUjCXeFhfom7lXF3KYn1EriyuzIGYu4KSVnjZ4lQp/bpWS7ROJyOWXrstnUbpPer1hUgSKfkJLnwe+hRxPv2CrSWm4z3lC0Gyqk9SwYYC23ngw14XplgDss6+OPIDtAFBqRTVELdbUp7hKTwF+IoqE7o2ffclkaY5ywF74NfAsgCx9OFw8JQUDxTg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=r4jZVqp+0LP25Sz81jIE6U6DBkfgLUZ8KzXinMDmwJs=;
+ b=kP/+NGDux0TOkMsPOZc8NaleveBnEvlFQHIlkv9Zbv4bxkeCUyFIdpPYxtZSgI/Znh09sGNP83rXep5RFUZHf6RMmusZtuxcq+BsGXRmvdnMhkQotc4oMPefBMXHjR9+0EvSkEI+YPf1Z54S/nLUC7lcih95vIoEgV1Pu4JfwbUeev88TQIDhmYYywgIzJHR6gJffMEb6pl8liu5bmKL1DZkXeqTEXGGPcgfeOjKuacEGXNCcQqozysnYp7sftASm+SlsuX8Us9PzaNiKnSSMBApiF/C5duRSMbW4ijdV+Px8wg//jEfgedeja74qD2+f0qJoC6IuwW9+GD3yY7ZPg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=r4jZVqp+0LP25Sz81jIE6U6DBkfgLUZ8KzXinMDmwJs=;
+ b=dmSaZr40JXZHhlz6JHKaLp9a5Y338385npI+eN4d96zXGNGl/LtOO2jQFN6dJsMxlhCxJs/2Gmqf9AHOxe+NvHp4lvUxZL2gMPfpGBkb69m0stzG/Za2TZ4mNLWKZik8NyeoNoWKHFMoh4/Bn9VRW/lVteFGhV66+Fp/IJC45HXqFXqT1F8F0UXGryBaC0mDzSzyKxrE84C6bf9QElzBHG6RBpHIHQe6EHcBE9Ele45g+yKEuL7/EZz+7NzRCS6tR3u3V4Vc9wbpv+Qutx3jJlQZY4qekEQFNVkw/SuH26a1eWhoTVvzAc6HkXMcPrGmHNP05nM++YN0jNbI/IpvHg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MW4PR12MB7309.namprd12.prod.outlook.com (2603:10b6:303:22f::17)
+ by MW4PR12MB7382.namprd12.prod.outlook.com (2603:10b6:303:222::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9253.18; Tue, 11 Nov
+ 2025 13:41:05 +0000
+Received: from MW4PR12MB7309.namprd12.prod.outlook.com
+ ([fe80::ea00:2082:ce2d:74c]) by MW4PR12MB7309.namprd12.prod.outlook.com
+ ([fe80::ea00:2082:ce2d:74c%5]) with mapi id 15.20.9298.015; Tue, 11 Nov 2025
+ 13:41:05 +0000
+Message-ID: <c0bdabe1-afeb-434a-83f6-707acc941f5e@nvidia.com>
+Date: Tue, 11 Nov 2025 07:41:02 -0600
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 05/12] virtio_net: Query and set flow filter
+ caps
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, mst@redhat.com,
+ jasowang@redhat.com
+Cc: virtualization@lists.linux.dev, parav@nvidia.com, shshitrit@nvidia.com,
+ yohadt@nvidia.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
+ shameerali.kolothum.thodi@huawei.com, jgg@ziepe.ca, kevin.tian@intel.com,
+ kuba@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com
+References: <20251107041523.1928-1-danielj@nvidia.com>
+ <20251107041523.1928-6-danielj@nvidia.com>
+ <ee527a09-6e6e-4184-8a0c-46aacb11302f@redhat.com>
+ <e1d7d4c1-263f-4f2e-b1c0-6672ce6d7d58@redhat.com>
+Content-Language: en-US
+From: Dan Jurgens <danielj@nvidia.com>
+In-Reply-To: <e1d7d4c1-263f-4f2e-b1c0-6672ce6d7d58@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN6PR08CA0034.namprd08.prod.outlook.com
+ (2603:10b6:805:66::47) To MW4PR12MB7309.namprd12.prod.outlook.com
+ (2603:10b6:303:22f::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251110214443.342103-1-jonas.gorski@gmail.com>
- <20251110230124.7pzmkhrkxvtgzh5k@skbuf> <CAOiHx==ymTyVbs7UmNH28UgxcfnMQBtt6qA=ZnKvEF3QLe_z8w@mail.gmail.com>
- <20251111102951.lkexwdk5btdqdt46@skbuf>
-In-Reply-To: <20251111102951.lkexwdk5btdqdt46@skbuf>
-From: Jonas Gorski <jonas.gorski@gmail.com>
-Date: Tue, 11 Nov 2025 14:31:23 +0100
-X-Gm-Features: AWmQ_bmr5IDtv6w6cEpkS5D8nNOKqP2MIR1pY5E2JtuklDEL_-BgBruAkQ4BDR0
-Message-ID: <CAOiHx==CEztXuq5o+-OEpK4nkGA+EVFuX7uU6WKnrkeXU6x6BA@mail.gmail.com>
-Subject: Re: [PATCH RFC net-next 0/3] net: dsa: deny unsupported 8021q uppers
- on bridge ports
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Florian Fainelli <f.fainelli@gmail.com>, 
-	Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR12MB7309:EE_|MW4PR12MB7382:EE_
+X-MS-Office365-Filtering-Correlation-Id: f8ab8dcb-592e-41cc-ce80-08de2127f610
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?bzlTbUFPT1UzekxaVEQzZXlaTTA5UlRqZWlqdmRUNW9hOERZcjdWTEN6QUUv?=
+ =?utf-8?B?Mlg3eUNubFM1MVFFR2I2UHZrZjRNR0FRVmRaa1lmcFZQcVltTHYzT2dHZnJX?=
+ =?utf-8?B?R2R4NUo0UjF2UkRpdm9Ha281VW55ZkRBZGFRc21VNGlydTdCWFNsS3VERzRR?=
+ =?utf-8?B?VFowbEprdE9OZjNYNStIR1pHcGNHSEhDUWdYc2E2UWdRZC9HR0oxSEt2YjhF?=
+ =?utf-8?B?UHRLZUZJaGtDNEsyZGk2UFpkc3ZlQmM2RVVlVFlhSmF5S1dnMWs1aEJwUEMy?=
+ =?utf-8?B?cnFUa2RmeG4zYlYwTVMxcmJES2VxOFVtQnFLNU9pQ0lYSTBTTlFMQWFzSmdU?=
+ =?utf-8?B?RTlvd2g3dEpTZTFiY1U3N1V2eTMxb1Q3RlF5MDhRdnM3VkV0UlcrUzU0VmY0?=
+ =?utf-8?B?WEFMWWdCRCs0NkZnbGJoVXJ1STQ4aGhlSitXYzh3UDJ3cEJRckZLUy82TnBn?=
+ =?utf-8?B?dm85SUlGcFhjSkFkVWo1TFBCMGNobHY0TS9yQU1LV3picUdHWXgrVGJVdk1n?=
+ =?utf-8?B?eVd5blhRUG5nQ0xjdUxJa2ZMSHMvNXQvMjAvUTV1ZW1JYlBRQ3MwSjlhV0ZQ?=
+ =?utf-8?B?clFtVjEweU1jemljUmtrcExnbHNhQmVWazFFcURrSm9JWnVIZ1pkT2hMMXYy?=
+ =?utf-8?B?V2pBWlk2VVZIRWVDRTg3WlBIbkhpZS9CNW5TZ3NaSCtVK2hDV0hpUzNSRi9s?=
+ =?utf-8?B?K1JNVkR2QlRXS3pzT2xOaE1ZWUFKQzRva2FTWGI5SDJGM1pxdE5DNXJzZVUw?=
+ =?utf-8?B?M0IxREhlWmRnMkhETEFzNzBEZXBKWjZPM2xXNFZTSHhBNklPcGVQOVNhMHpW?=
+ =?utf-8?B?KzZ4ZjVnTTB6SlNYb3R5VWRLQmh0Z3JBbGtVaFYzb2x4ZDJJbHRwcGhkTzdT?=
+ =?utf-8?B?Y25adGNqREFReHUrVnpPRjZ2WGkwNThUTWFBTHhNWTJ6S25oWk5KaEFTWGJq?=
+ =?utf-8?B?NUhURENWeHJ3S3Z5d3pIOFpjdlBhM29KTjRoVWhHcVg4a1FrRFlPaThJWTI2?=
+ =?utf-8?B?MDhkcHFBTjU0TXZIcDlyVjNOR2ZXNnJFS1dkZlIyNXU3dFNReFRscVppV1I0?=
+ =?utf-8?B?QjIyVnBDVG8vNUVHeC82RUhSR0lOVEgvMlM4dFQ4YlhPYzJUbkJtcVZJello?=
+ =?utf-8?B?YU1qQ1BsLy81YmU4U2RGNjFXaE0wQmJ4SGtIM1ZQYm1XUHJad3R4bnVVRWtF?=
+ =?utf-8?B?UVA5WnZ1bHFXOW1FTGRSckx5aTJJenBkV0R6cUZWOFJ2cWFHRFJKT2FwckJE?=
+ =?utf-8?B?aUVGSDh2aWVWVWpNejFkWXZNVmlTc0dMekxBc3VHSUdSSWpZT1N1UTFhZlh0?=
+ =?utf-8?B?eG4xRHFpT0llQ2plQ2lqdGtmeWlobVRtNndnNldjc0NEMW9wL3kyTjdUMjNS?=
+ =?utf-8?B?ajVydVhwUjVGdW1ZeGU4TjEvaHhRc1AwSkU4bmJUMzhVWm4wbGozSU1LcW8v?=
+ =?utf-8?B?RWl0VU9qRkZ2d1JSVjBKejNKTU45QjRoaHR0RDMwQWpMWkh5MVV6ajQyYm1y?=
+ =?utf-8?B?MkhRQ04xQys0NUtWNTlWeUxMQlBNS0lRNjJLV1JwTFo5QitneDlGNGo5eWY0?=
+ =?utf-8?B?ZFZ5Mzdjay8vT3BReW9GNDFVekVZY0NHaTFYQm1GNDFxT1VmanYrUDJ1aXZE?=
+ =?utf-8?B?WmRYYTkxVmZDelZVbm1WVHljTWR3NFRxczIzWC9KRE85bDlUNkVHdVZjVVla?=
+ =?utf-8?B?Y005UDlVU3A5bCtHamNBSTd5dkRKZDZtVGhXTEZhNzN1VUgwNGU4ZGxhWDB5?=
+ =?utf-8?B?MVg2ZVd1cjRSSUNiWmxYQWFLcS9RVlkzb2tDK2FDcGtoZ1FabWZNSnY5cWZ2?=
+ =?utf-8?B?bDMxa1pOWmJ3WkpIZ0orVGhYS3pzbGt3a1RoOXVIdk14T0RGSEFoNFE1THdQ?=
+ =?utf-8?B?cGFoOFNNeXFZNVJuK3BPM09jdVVTRUZmRzhHc0NiSEpNVGxtUCtGcm9pM2xz?=
+ =?utf-8?Q?FlddQOu9WJuRmeaVeRA1YokQh/XqqHlj?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR12MB7309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Yi9uaGtyd3NDdG5CTk0razRxNTkvSlhQeTZvV05oOVJmMUFzRmNDRWNabEZK?=
+ =?utf-8?B?WE9ENnllQ29vZWNmMURVWVRYdEhOa3Fkbm5uZkJBbkpMaGF4NCtPeEJNRjRH?=
+ =?utf-8?B?dStySERLZUd0d210cmpRR1ZVWUJVS1gyL2pEUmJyRHVuUTVEUWV4ZGZvemFn?=
+ =?utf-8?B?bGY3dnNBQk96d3IvbFU2K2g5QVlRNEJ6Y3B1UkVVRzB5OWVEOHVmcG40bVh4?=
+ =?utf-8?B?QTU2VGxBK2VlVUJMRTI2Y1ltOTlRWnhWem9sQWY0d20xcVR5RGNzS2pGUXpV?=
+ =?utf-8?B?Q1ZsT293amIydk5DQmtVMVpzcVBKbU13ZWg0NksxUitiekxoT3ZPNHV6L3ZM?=
+ =?utf-8?B?VW5hd3kwUHkrby9XYVFqMzJpcjRFUVJtdTM0NVZvWm42ZXdqMkFiUU9vOTlZ?=
+ =?utf-8?B?SGpweGlyQ0ZyQ25IU0xKUXU1YW1JQVdSOFR1OFlkY0ovYUJIZFlqM09zcU8z?=
+ =?utf-8?B?VU9aalloQTZvVXZEdGU5OTlrR3l2NWlONEV0ZWNjN3JQbHU3YTlWTXg4d0ZR?=
+ =?utf-8?B?YmNnNm1iZ2hDNDd1ekRCZEpFdVR3bzRER1FHL0FyeS90a2FxR2l3SG9xS0dN?=
+ =?utf-8?B?MmEyWVQ4RUpsRWUxWnNCQUt3MDJIQW1QU0RrL3RheHMwaUlHY0JRT3RhczBO?=
+ =?utf-8?B?eW9od3VoUlNlV1VNZjkzYkgzUWprQlNjKytpeXdXc3pDQjdrM28yRTQxMURD?=
+ =?utf-8?B?L2VNbVQ0VVBleXdoMmdKamtCQjQ3ekJPb3NQS1RoYmtQTklTNUxOdHhZTmFH?=
+ =?utf-8?B?WWtQSTdQRS95NmRlMWdJTCtjeXBwbVJjVXZGVFZ1TDhKUzRlYXZhOHRsbHlq?=
+ =?utf-8?B?UlFZakdjMllmNE54Z2M5Nkg3YWt3aXBiTEp3b3NsczRqSVI2Z1lhVnhoQUNy?=
+ =?utf-8?B?ZGs4L0xSSXdXNzIrbWY3VnVua0UzbHlIWTVXNWJ3blRWa3NTWkRaL0ZCY3hL?=
+ =?utf-8?B?TmFRR1NpVFk2QmZ6azJLMzg3RTJqZlFkYUc2Qm9LZ1NsNG90YVl2K3VTaE5U?=
+ =?utf-8?B?VloxNGF0WkgrQXBFUnkySTcrTG9rSitRV1BEL3hHMDRUaG9MSUd5bHpSQTJn?=
+ =?utf-8?B?SkFINU54Nk9tTlhpUlB4TlYwSW9PTVZzN1RZQ3RDblV1RVRQRVNwRjUwSEcv?=
+ =?utf-8?B?ZUk5VnlPSllQMXFDbm5VdFVEcWh3bUJXY05Rdjd4cVRMbHkrV1gwdGd3NmNB?=
+ =?utf-8?B?c2ExNjRtR3htRTRkTWgzbFJFRjFpekQvYTFxa2k3aEFPM1BKcDljZDgwb25i?=
+ =?utf-8?B?d2FOOE1yV3ZEMEJ5Q281T2pqSndmUE5rZ0hORzN5QUNRSmgrQkFiQkpVS05T?=
+ =?utf-8?B?c0ozSEZNZ0NRbGVoVnFZZUNMNzdsQk1UazJzeWUzNUhDZU9yMWtDczR2Tm4w?=
+ =?utf-8?B?L0tJckdleENQUTgzSWJ6ZU9RcS9FZGEwanQ0elp1YkJJWHRNZ3dkUC9CUzVr?=
+ =?utf-8?B?NUV2UEhEcW9zeTRIMUpCV1kxbmcxOGVISU1Kd3diYjNOS1lkNWowUnloOTlK?=
+ =?utf-8?B?d3dDNUwxbTdkVDZjOTljMndHUTNUUURLc0l3YnVnTWhUY1lneXFwVVI4NGNY?=
+ =?utf-8?B?b0FTTDdrSENSRWcyQmFnbm5jYWJQNVUyZTJxMEF0N0FhZGZhRkluOG9KRjJG?=
+ =?utf-8?B?cTRYR0txSzY2K2cwZXJFN1pRb1l6UWFBd2N3d1lQK0JheVArR0NlejNxZ0to?=
+ =?utf-8?B?UWlreVg4YWM5OUpsTVhDTFcrSTFjOGZXaSt1WXdYekUrSjhQR3hJaU5jSEgw?=
+ =?utf-8?B?YmE0eDBnZU5RRDNNSkR0d2FrcVlGbkxhY0xIOW5hS1QwSDFaaGJtTkcyOVZ2?=
+ =?utf-8?B?RFFNSmNEN1prUmlVWGl1aHpjdS9nM2EvcEJyd3ZHQjlRMERwMk5qeHd6cXNT?=
+ =?utf-8?B?cGtnYWU2bnFZQ2R5bTVXWlk2bW1RWjVLYURXcE9JWHBZNjYwYzYyQTBqNlNx?=
+ =?utf-8?B?M0RtQ2ROV0xjSmtaWHlGeklxZnpSS1hBOTFWZ1FnU0lTTThxbWhxd0xUL09v?=
+ =?utf-8?B?SW8xR3hxOVBUdUpXeHNIL3BsNHFvNUNhSlVsZGlpMThncmdhaWF6cE9ITEp6?=
+ =?utf-8?B?TmZqdml5TkdwYzAvMUFheGhOc3JoZWNSSnNFRFpzR2tqdEVMZHJUOUlhYWI2?=
+ =?utf-8?Q?Gz7Kljb4WWXjKrct+NI5FkhWP?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f8ab8dcb-592e-41cc-ce80-08de2127f610
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR12MB7309.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Nov 2025 13:41:05.0698
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sSzUYNwqEPbIDu4ESRf/3/ywjE94EMdIKs4o5DgPHVU3DnuDhMOo+JUbw7Kp2SIIqteLEcNFS1RrLmw+YDRevA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7382
 
-On Tue, Nov 11, 2025 at 11:29=E2=80=AFAM Vladimir Oltean <olteanv@gmail.com=
-> wrote:
->
-> On Tue, Nov 11, 2025 at 10:53:00AM +0100, Jonas Gorski wrote:
-> > Hi Vladimir,
-> >
-> > On Tue, Nov 11, 2025 at 12:01=E2=80=AFAM Vladimir Oltean <olteanv@gmail=
-.com> wrote:
-> > >
-> > > Hi Jonas,
-> > >
-> > > On Mon, Nov 10, 2025 at 10:44:40PM +0100, Jonas Gorski wrote:
-> > > > Documentation/networking/switchdev.rst is quite strict on how VLAN
-> > > > uppers on bridged ports should work:
-> > > >
-> > > > - with VLAN filtering turned off, the bridge will process all ingre=
-ss traffic
-> > > >   for the port, except for the traffic tagged with a VLAN ID destin=
-ed for a
-> > > >   VLAN upper. (...)
-> > > >
-> > > > - with VLAN filtering turned on, these VLAN devices can be created =
-as long as
-> > > >   the bridge does not have an existing VLAN entry with the same VID=
- on any
-> > > >   bridge port. (...)
-> > > >
-> > > > Presumably with VLAN filtering on, the bridge should also not proce=
-ss
-> > > > (i.e. forward) traffic destined for a VLAN upper.
-> > > >
-> > > > But currently, there is no way to tell dsa drivers that a VLAN on a
-> > > > bridged port is for a VLAN upper and should not be processed by the
-> > > > bridge.
-> > >
-> > > You say this as if it mattered. We can add a distinguishing mechanism
-> > > (for example we can pass a struct dsa_db to .port_vlan_add(), set to
-> > > DSA_DB_PORT for VLAN RX filtering and DSA_DB_BRIDGE for bridge VLANs)=
-,
-> > > but the premise was that drivers don't need to care, because HW won't=
- do
-> > > anything useful with that information.
-> >
-> > It matters in the case of VLAN uppers on bridged ports. It does not
-> > matter for VLAN uppers on standalone ports.
->
-> Ok, and what would a driver do with the info that a port_vlan_add() call
-> came from 8021q and not from the bridge?
+On 11/11/25 4:48 AM, Paolo Abeni wrote:
+> On 11/11/25 11:42 AM, Paolo Abeni wrote:
+>> On 11/7/25 5:15 AM, Daniel Jurgens wrote:
+>>> @@ -7121,6 +7301,15 @@ static int virtnet_probe(struct virtio_device *vdev)
+>>>  	}
+>>>  	vi->guest_offloads_capable = vi->guest_offloads;
+>>>  
+>>> +	/* Initialize flow filters. Not supported is an acceptable and common
+>>> +	 * return code
+>>> +	 */
+>>> +	err = virtnet_ff_init(&vi->ff, vi->vdev);
+>>> +	if (err && err != -EOPNOTSUPP) {
+>>> +		rtnl_unlock();
+>>> +		goto free_unregister_netdev;
+>>
+>> I'm sorry for not noticing the following earlier, but it looks like that
+>> the code could error out on ENOMEM even if the feature is not really
+>> supported,  when `cap_id_list` allocation fails, which in turn looks a
+>> bit bad, as the allocated chunk is not that small (32K if I read
+>> correctly).
+> What about considering even ENOMEM not fatal here?
+> 
+> /P
+> 
 
-Prevent forwarding of that VID on that port and instead send/redirect
-it to the CPU port, if it can do it. Or reject the configuration (e.g.
-with not supported).
-
-And if DSA sees the rejection it can decide to switch the port to
-standalone mode, so it works.
-
-> > > > Both adding a VLAN to a bridge port and adding a VLAN upper to a br=
-idged
-> > > > port will call dsa_switch_ops::port_vlan_add(), with no way for the
-> > > > driver to know which is which. But even so, most devices likely wou=
-ld
-> > > > not support configuring forwarding per VLAN.
-> > >
-> > > Yes, this is why the status quo is that DSA tries to ensure that VLAN
-> > > uppers do not cause ports to forward packets between each other.
-> > > You are not really changing the status quo in any way, just fixing so=
-me
-> > > bugs where that didn't happen effectively. Perhaps you could make tha=
-t a
-> > > bit more clear.
-> >
-> > Right, I'm trying to prevent situations where the forwarding will
-> > happen despite not being supposed to happen.
-> >
-> > > > So in order to prevent the configuration of configurations with
-> > > > unintended forwarding between ports:
-> > > >
-> > > > * deny configuring more than one VLAN upper on bridged ports per VL=
-AN on
-> > > >   VLAN filtering bridges
-> > > > * deny configuring any VLAN uppers on bridged ports on VLAN non
-> > > >   filtering bridges
-> > > > * And consequently, disallow disabling filtering as long as there a=
-re
-> > > >   any VLAN uppers configured on bridged ports
-> > >
-> > > First bullet makes some sense, bullets 2 and 3 not so much.
-> > >
-> > > The first bullet makes just "some" sense because I don't understand w=
-hy
-> > > limit to just bridged ports. We should extend to all NETIF_F_HW_VLAN_=
-CTAG_FILTER
-> > > ports as per the dsa_user_manage_vlan_filtering() definitions.
-> >
-> > Standalone ports are isolated from each other, so the configured VLAN
-> > uppers do not matter for forwarding. They will (should) never forward
-> > traffic to other ports, regardless of any VLAN (filtering)
-> > configuration on the bridge, so there is no issue here (pending
-> > correct programming of the switch). Usually isolation trumps any VLAN
-> > memberships.
->
-> So we would hope, that standalone ports are completely isolated from
-> each other, but unless drivers implement ds->fdb_isolation, that isn't a
-> given fact. Forwarding might be prevented, but FDB lookups might still
-> take place, so when you have this setup:
->
-> swp1.100     br0
->  |         /     \
-> swp1     swp2    swp3  (bridge vlan add dev swp3 vid 100 master)
->
-> and you ping station 00:01:02:03:04:05 from swp1.100, you'd expect it
-> goes out the wire on swp1. But if swp3 had previously learned 00:01:02:03=
-:04:05,
-> I wouldn't be surprised if the switch tried to forward it in that
-> direction instead (failing of course, but dropping the packet in that
-> process). We would be saved if the tagger's xmit() would force the
-> packet to bypass FDB lookup, but that isn't a given either...
->
-> As I'm saying, swp1 can have NETIF_F_HW_VLAN_CTAG_FILTER set due to any
-> of the quirks described in dsa_user_manage_vlan_filtering().
->
-> It might be a moot point because I haven't verified what are the drivers
-> which fulfill all conditions for this to be a practical problem. It might
-> as well be the empty set. For example, sja1105 fulfills them all, but
-> sja1105_prechangeupper() rejects all 8021q uppers so it is not affected.
-
-There doesn't need to be a VLAN upper, it's enough if the native VLAN
-of standalone ports overlaps with the VLANs used in the bridge.
-
-AFAICT that is at least an issue for those that use 8021q taggers. And
-there is the opposite direction, where a similar issue can occur:
-
-If swp1 receives a packet with 00:01:02:03:04:05 the switch may try to
-forward it to swp3 (and drop it) instead of delivering it to the host.
-
-But at least for b53 these are not an issue. The xmit header overrides
-any fdb lookups, and non-bridged ports are configured to trap all
-traffic to the cpu port, skipping fdb lookups. And since they do not
-learn, they have no fdb entries configured, so the bridged ports
-should never attempt to forward to them.
-
-> > This is purely about unintended/forbidden forwarding between bridged po=
-rts.
-> >
-> > > Bullets 2 and 3 don't make sense because it isn't explained how VLAN
-> > > non-filtering bridge ports could gain the NETIF_F_HW_VLAN_CTAG_FILTER
-> > > feature required for them to see RX filtering VLANs programmed to
-> > > hardware in the first place.
-> >
-> > Let me try with an example:
-> >
-> > let's say we have swp1 - swp4, standalone.
-> >
-> > allowed forward destinations for all are the cpu port, no filtering.
-> >
-> > now we create a bridge between swp2 and swp3.
-> >
-> > now swp2 may also forward to swp3, and swp3 to swp2.
-> >
-> > swp1 and swp4 may still only forward to cpu (and this doesn't change
-> > here. We can ignore them).
-> >
-> > Bullet point 1:
-> >
-> > If vlan_filtering is enabled, swp2 and swp3 will only forward configure=
-d VLANs.
-> >
-> > swp2 and swp3 will have NETIF_F_HW_VLAN_CTAG_FILTER (as VLAN filtering
-> > is enabled on these ports).
-> >
-> > If we enable VID 10 on both ports, the driver will be called with
-> > port_vlan_add(.. vid =3D 10), and they forward VLAN 10 between each
-> > other.
-> > If we instead create uppers for VID 10 for both ports, the driver will
-> > be called with port_vlan_add(... vid =3D 10) (as
-> > NETIF_F_HW_VLAN_CTAG_FILTER is is set), and they forward VLAN 10
-> > between each other (oops).
->
-> I didn't contest that, and the bridged port example is clear. I just
-> said I don't think you're seeing the picture broadly enough on this
-> bullet point. I may be wrong though - just want to clarify what I'm
-> saying.
->
-> > Bullet point 2:
-> >
-> > If vlan_filtering is disabled, swp2 and swp3 forward any VID between ea=
-ch other.
-> >
-> > swp2 and swp3 won't have NETIF_F_HW_VLAN_CTAG_FILTER (as vlan
-> > filtering is disabled on these ports).
-> >
-> > If we now create an upper for VID 10 on swp2, then VLAN 10 should not
-> > be forwarded to swp3 anymore (as VLAN 10 is now "consumed" by the host
-> > on this port).
-> >
-> > But since there is no port_vlan_add() call due to filtering disabled
-> > (NETIF_F_HW_VLAN_CTAG_FILTER not set), the dsa driver does not know
-> > that the forwarding should be inhibited between these ports, and VLAN
-> > 10 is still forwarded from swp2 to swp3 (oops).
->
-> Is this the behaviour with veth bridge ports (that VID 10 packets are
-> trapped as opposed to bridged)? I need a software-based reference to
-> clearly understand the gap vs DSA's hardware offload.  I don't think
-> there's any test for that, but it is good to have one.
-
-It's at least written that way in switchdev.rst (I admit I haven't
-verified that this is true):
-
-"When there is a VLAN device (e.g: sw0p1.100) configured on top of a switch=
-dev
-network device which is a bridge port member, the behavior of the software
-network stack must be preserved, or the configuration must be refused if th=
-at
-is not possible.
-
-- with VLAN filtering turned off, the bridge will process all ingress traff=
-ic
-  for the port, except for the traffic tagged with a VLAN ID destined for a
-  VLAN upper. The VLAN upper interface (which consumes the VLAN tag) can ev=
-en
-  be added to a second bridge, which includes other switch ports or softwar=
-e
-  interfaces. Some approaches to ensure that the forwarding domain for traf=
-fic
-  belonging to the VLAN upper interfaces are managed properly:
-
-    * If forwarding destinations can be managed per VLAN, the hardware coul=
-d be
-      configured to map all traffic, except the packets tagged with a VID
-      belonging to a VLAN upper interface, to an internal VID corresponding=
- to
-      untagged packets. This internal VID spans all ports of the VLAN-unawa=
-re
-      bridge. The VID corresponding to the VLAN upper interface spans the
-      physical port of that VLAN interface, as well as the other ports that
-      might be bridged with it. ..."
-
-This very clearly says to me: if there is a VLAN upper on a bridged
-port, then any packets tagged with this VLAN must not be forwarded to
-other ports, unless the upper is part of a different bridge.
-
-The text for filtering bridges isn't super clear though:
-
-"- with VLAN filtering turned on, these VLAN devices can be created as long=
- as
-  the bridge does not have an existing VLAN entry with the same VID on any
-  bridge port. These VLAN devices cannot be enslaved into the bridge since =
-they
-  duplicate functionality/use case with the bridge's VLAN data path process=
-ing."
-
-But I understand this as "same behavior, but no bridging them."
-
-So I don't think that DSA in its current form can support/describe
-VLAN uppers on bridged ports (of a non filtering bridge).
-
-And bridging VLAN uppers with physical ports becomes even more fun: I
-verified that having e.g. eth1.100 and eth2 in a non-ffiltering
-bridge, if if a VLAN tagged packet ingresses on eth2, it will egress
-as double tagged on eth1.
-
-Maybe we should just ban non-filtering bridges, would make things so
-much easier (j/k).
-
-> > Bullet point 3:
-> > And since having uppers on a bridged ports on a non-filtering bridge
-> > does not inhibit forwarding at all, we cannot allow disabling
-> > filtering as long as VLAN uppers on bridged ports exist.
-> >
-> > Does this now make it clearer what situations I am talking about?
-> >
-> > The easy way is to disallow these configurations, which is what I try
-> > to attempt (explicitly allowed by switchdev.rst).
-> >
-> > One other more expensive options are making bridge ports with VLAN
-> > uppers (or more than one upper for a VLAN) standalone and disable
-> > forwarding, and only do forwarding in software.
-> >
-> > Or add the above mentioned DSA_DB_PORT for vlan uppers on (bridged)
-> > ports, regardless of filtering being enabled, and then let the dsa
-> > driver handle forwarding per VLAN.
->
-> But you still won't get ndo_vlan_rx_add_vid() calls from the 8021q layer
-> if you're under a VLAN-unaware bridge, so it doesn't help case #2.
-> You'd have to remove the ndo_vlan_rx_add_vid() handling and manually
-> track CHANGEUPPER events from 8021q interfaces.
-
-Right, that would be prerequisite for that, which is probably quite a
-bit of work. That's why I'm for now trying to reject this as it is
-broken, instead trying to make this work (if it even can be made to
-work).
-
-Best regards,
-Jonas
+If we're just excluding the most likely errors I'd rather switch it back
+to void.
 
