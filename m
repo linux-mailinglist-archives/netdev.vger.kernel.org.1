@@ -1,119 +1,81 @@
-Return-Path: <netdev+bounces-237559-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237560-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D2A6C4D20C
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 11:43:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C723C4D257
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 11:46:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AC653AA139
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 10:37:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04ABE3ACEEB
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 10:42:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28B7834F247;
-	Tue, 11 Nov 2025 10:37:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E974434F46B;
+	Tue, 11 Nov 2025 10:42:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="ABmQSe0O";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="jkz/qW7s";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="VntBozyr";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="T2bebI6e"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GRA2sHHO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5588D34EF07
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 10:37:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A7BD34F24D;
+	Tue, 11 Nov 2025 10:42:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762857462; cv=none; b=pcl5we6wIfTr4CXB/BME66icoL4yGFawwxW2X5tskfFpIQ+/jYD1vNgsSYyh0XdJ2uvODBE0MWGtz01xyAHqb+xEJ0rste0l9xlvud3HCG8R+scEwg7TzunJrgGOwNGYPjFCrb2MWZzZslXsDF0e2dmcnN5RyURJJBSYzQCMLVk=
+	t=1762857745; cv=none; b=BTLZLiSKdSRZ0zi5NOba+BVArVo3daFTmEB/rfh3T7YF6b2bBPURUg2TyX3ws6pDh+EtPvusKauRFDxVPb7a+H9PkbDy/5UXGboxzxIp3q8FsgGUTthvaJgL3bFPKLv3U5WY5ADhp4ydn6d+lvjXEEfaKHiaIg2uxE5LP0wBoBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762857462; c=relaxed/simple;
-	bh=hyNCHdMdIEMpcB1iHJpcmtHhO0cY+NOEEI3eHb/ZxTw=;
+	s=arc-20240116; t=1762857745; c=relaxed/simple;
+	bh=EvBQ+nafnKKdJuiEBqoaBt041KfoiKj53G5fHkyybXs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ljXIu7FvoHVYB37HjCYaOk9g5mVxQr7HVf6JoyOZ+UPp3a3EmcRYctBnRD2laWJyH63TepGZVHb7N3vxxBPLfJgE9Qy4uVIGeFjCfEBZ5+wDmfLE8dGks4rbm2lKkxwx7/nQpOn3Vq4ApK/yrJjoCXc//PkjZqgTURN05lkUL2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=ABmQSe0O; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=jkz/qW7s; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=VntBozyr; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=T2bebI6e; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id E1E551F750;
-	Tue, 11 Nov 2025 10:37:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1762857457; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TEc5BMTgakLjP2lCVtIyTqJLSeq6a+T/g0/3T6sOX5U=;
-	b=ABmQSe0O1DSmwu4YW8RIxEoGNBGD+4SQhQzJNFk7ZIK/wi1vrlGnLIPVriMj95Ui3+p9mx
-	Yd9UGrSajO0qV2Bht3YikO09LuHTEssfjHksnNrnqdIMybRvVPBE2k7viEu7oL10CxU7Wp
-	zZEbIsiQ2mLyhAEHZgq5Jy4hmevTtak=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1762857457;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TEc5BMTgakLjP2lCVtIyTqJLSeq6a+T/g0/3T6sOX5U=;
-	b=jkz/qW7s9eoNvg0Y9NyoTKRl1CvNA7QZbsZl15s/0xIal0ZkL87Xv+ZpSBJWNabgCS/cBA
-	sSwA+bE4gBgZFbCA==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=VntBozyr;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=T2bebI6e
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1762857456; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TEc5BMTgakLjP2lCVtIyTqJLSeq6a+T/g0/3T6sOX5U=;
-	b=VntBozyrZOAwKMhMIiNgxjR0KRGEpKVeRCJN7GjFlWWR3GAVTLaBB12PQhXoalsSNvR29T
-	eJAe4uA/CLjC/RkCVPY1m/Z0HuNeRSv2ONIkwfnmCBZ7yfZsVyA36iQF4JOwCbXzwqXCJV
-	4rlGyoMFfgMKp2cuB4/q0PLoHrmRCrY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1762857456;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TEc5BMTgakLjP2lCVtIyTqJLSeq6a+T/g0/3T6sOX5U=;
-	b=T2bebI6e2BNXdytzddpspO6C6YUZ4uUPoYnCUJiePajNoGohIT8FiWbGYBMGrmJPUekWob
-	EW3tQuc1bsO/icAQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CF8A1148F0;
-	Tue, 11 Nov 2025 10:37:36 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id IuCoMvARE2kbNQAAD6G6ig
-	(envelope-from <jack@suse.cz>); Tue, 11 Nov 2025 10:37:36 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 8D536A28C8; Tue, 11 Nov 2025 11:37:36 +0100 (CET)
-Date: Tue, 11 Nov 2025 11:37:36 +0100
-From: Jan Kara <jack@suse.cz>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Miklos Szeredi <miklos@szeredi.hu>, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
-	Chuck Lever <chuck.lever@oracle.com>, Alexander Aring <alex.aring@gmail.com>, 
-	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
-	Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.org>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Tom Talpey <tom@talpey.com>, Bharath SM <bharathsm@microsoft.com>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
-	Danilo Krummrich <dakr@kernel.org>, David Howells <dhowells@redhat.com>, 
-	Tyler Hicks <code@tyhicks.com>, NeilBrown <neil@brown.name>, 
-	Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
-	Amir Goldstein <amir73il@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Steve French <smfrench@gmail.com>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
-	Carlos Maiolino <cem@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, 
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, netfs@lists.linux.dev, 
-	ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org, linux-xfs@vger.kernel.org, 
-	netdev@vger.kernel.org, NeilBrown <neilb@ownmail.net>
-Subject: Re: [PATCH v5 09/17] vfs: clean up argument list for vfs_create()
-Message-ID: <g3si4zuuhxleat2gkebyhnokq5eiymatgi36ad25datcbvinfs@nsk4fop6sz5f>
-References: <20251105-dir-deleg-ro-v5-0-7ebc168a88ac@kernel.org>
- <20251105-dir-deleg-ro-v5-9-7ebc168a88ac@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=p/LGH8fOkRmjUtxuk2v0zGMpIfgbv2s1p7cK5ro3QCiCVFi9SIYrwZBzBL3+ZLQwHq2Abr1vlk7ebCWAZPEJdlOGfeSi0O/sVd9X/sR1VcwCeAmLVAwPi8P3ehtz1NcKwXLUDTGv15mmhnA9dHlo2jqwTywJUwi1Y6d4II9Fo9k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GRA2sHHO; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1762857744; x=1794393744;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=EvBQ+nafnKKdJuiEBqoaBt041KfoiKj53G5fHkyybXs=;
+  b=GRA2sHHOTqocavXMsjP04KpBD/D67ZJIm84YxITXVXdIuYKbwLTOD8PX
+   zhgake1BdaMfqBb/yoIJRwBe3Kvx5s5wjZstI0OV6HvIErnAJbQYCLSej
+   TfwKKvl7wgGpYWFI7zkHLAqA+sJJjLTtaiABUUc4YeRjEa1payzmt5D3d
+   06Gda5eyCsfNkZDfMgvmHehJHBTYCZtsuJ3Dk7bDGgboZF6WP6/pi53H5
+   /S8G7TZBcdxYhyBr0g/2Sl0WcJct8XMLgnFRmWNqB2k9fshBPMQ/dqRJV
+   t/m1mEzGVP2sU46RVmzxAmvrjsT2PZMgoXT0GpqCyL14Fvvq/nJauBeOd
+   A==;
+X-CSE-ConnectionGUID: Nh7+Fk0aR6KcXk9iXhoNsw==
+X-CSE-MsgGUID: 6wPvfnXpQhm0Ktp2JAXVlg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11609"; a="90388553"
+X-IronPort-AV: E=Sophos;i="6.19,296,1754982000"; 
+   d="scan'208";a="90388553"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2025 02:42:23 -0800
+X-CSE-ConnectionGUID: bic6vsxET96kWEWmZy4Shw==
+X-CSE-MsgGUID: RrZPJKBeTIucI3ym3xcs/A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,296,1754982000"; 
+   d="scan'208";a="189195161"
+Received: from lkp-server01.sh.intel.com (HELO 7b01c990427b) ([10.239.97.150])
+  by fmviesa008.fm.intel.com with ESMTP; 11 Nov 2025 02:42:20 -0800
+Received: from kbuild by 7b01c990427b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1vIlpJ-00033P-36;
+	Tue, 11 Nov 2025 10:42:17 +0000
+Date: Tue, 11 Nov 2025 18:42:15 +0800
+From: kernel test robot <lkp@intel.com>
+To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Petr Oros <poros@redhat.com>,
+	Prathosh Satish <Prathosh.Satish@microchip.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>, Michal Schmidt <mschmidt@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 5/6] dpll: zl3073x: Cache all output properties
+ in zl3073x_out
+Message-ID: <202511111809.FLxbtr0Z-lkp@intel.com>
+References: <20251110175818.1571610-6-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -122,227 +84,118 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251105-dir-deleg-ro-v5-9-7ebc168a88ac@kernel.org>
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Rspamd-Queue-Id: E1E551F750
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-2.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCVD_TLS_LAST(0.00)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	RCVD_COUNT_THREE(0.00)[3];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[45];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	MIME_TRACE(0.00)[0:+];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com,ownmail.net];
-	FREEMAIL_CC(0.00)[szeredi.hu,zeniv.linux.org.uk,kernel.org,suse.cz,oracle.com,gmail.com,samba.org,manguebit.org,microsoft.com,talpey.com,linuxfoundation.org,redhat.com,tyhicks.com,brown.name,chromium.org,google.com,davemloft.net,vger.kernel.org,lists.samba.org,lists.linux.dev,ownmail.net];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	TAGGED_RCPT(0.00)[];
-	R_RATELIMIT(0.00)[to_ip_from(RLpnapcpkwxdkc5mopt1ezhhna)];
-	MISSING_XM_UA(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo,suse.com:email]
-X-Spam-Score: -2.51
+In-Reply-To: <20251110175818.1571610-6-ivecera@redhat.com>
 
-On Wed 05-11-25 11:53:55, Jeff Layton wrote:
-> As Neil points out:
-> 
-> "I would be in favour of dropping the "dir" arg because it is always
-> d_inode(dentry->d_parent) which is stable."
-> 
-> ...and...
-> 
-> "Also *every* caller of vfs_create() passes ".excl = true".  So maybe we
-> don't need that arg at all."
-> 
-> Drop both arguments from vfs_create() and fix up the callers.
-> 
-> Suggested-by: NeilBrown <neilb@ownmail.net>
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+Hi Ivan,
 
-Looks good. Feel free to add:
+kernel test robot noticed the following build warnings:
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+[auto build test WARNING on net-next/main]
 
-								Honza
+url:    https://github.com/intel-lab-lkp/linux/commits/Ivan-Vecera/dpll-zl3073x-Store-raw-register-values-instead-of-parsed-state/20251111-020236
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20251110175818.1571610-6-ivecera%40redhat.com
+patch subject: [PATCH net-next 5/6] dpll: zl3073x: Cache all output properties in zl3073x_out
+config: sparc64-allmodconfig (https://download.01.org/0day-ci/archive/20251111/202511111809.FLxbtr0Z-lkp@intel.com/config)
+compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project 996639d6ebb86ff15a8c99b67f1c2e2117636ae7)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251111/202511111809.FLxbtr0Z-lkp@intel.com/reproduce)
 
-> ---
->  fs/ecryptfs/inode.c      |  3 +--
->  fs/namei.c               | 11 ++++-------
->  fs/nfsd/nfs3proc.c       |  2 +-
->  fs/nfsd/vfs.c            |  3 +--
->  fs/open.c                |  4 +---
->  fs/overlayfs/overlayfs.h |  2 +-
->  fs/smb/server/vfs.c      |  3 +--
->  include/linux/fs.h       |  3 +--
->  8 files changed, 11 insertions(+), 20 deletions(-)
-> 
-> diff --git a/fs/ecryptfs/inode.c b/fs/ecryptfs/inode.c
-> index 88631291b32535f623a3fbe4ea9b6ed48a306ca0..d109e3763a88150bfe64cd2d5564dc9802ef3386 100644
-> --- a/fs/ecryptfs/inode.c
-> +++ b/fs/ecryptfs/inode.c
-> @@ -188,8 +188,7 @@ ecryptfs_do_create(struct inode *directory_inode,
->  
->  	rc = lock_parent(ecryptfs_dentry, &lower_dentry, &lower_dir);
->  	if (!rc)
-> -		rc = vfs_create(&nop_mnt_idmap, lower_dir,
-> -				lower_dentry, mode, true);
-> +		rc = vfs_create(&nop_mnt_idmap, lower_dentry, mode);
->  	if (rc) {
->  		printk(KERN_ERR "%s: Failure to create dentry in lower fs; "
->  		       "rc = [%d]\n", __func__, rc);
-> diff --git a/fs/namei.c b/fs/namei.c
-> index f439429bdfa271ccc64c937771ef4175597feb53..9586c6aba6eae05a9fc3c103b8501d98767bef53 100644
-> --- a/fs/namei.c
-> +++ b/fs/namei.c
-> @@ -3461,10 +3461,8 @@ static inline umode_t vfs_prepare_mode(struct mnt_idmap *idmap,
->  /**
->   * vfs_create - create new file
->   * @idmap:	idmap of the mount the inode was found from
-> - * @dir:	inode of the parent directory
->   * @dentry:	dentry of the child file
->   * @mode:	mode of the child file
-> - * @want_excl:	whether the file must not yet exist
->   *
->   * Create a new file.
->   *
-> @@ -3474,9 +3472,9 @@ static inline umode_t vfs_prepare_mode(struct mnt_idmap *idmap,
->   * On non-idmapped mounts or if permission checking is to be performed on the
->   * raw inode simply pass @nop_mnt_idmap.
->   */
-> -int vfs_create(struct mnt_idmap *idmap, struct inode *dir,
-> -	       struct dentry *dentry, umode_t mode, bool want_excl)
-> +int vfs_create(struct mnt_idmap *idmap, struct dentry *dentry, umode_t mode)
->  {
-> +	struct inode *dir = d_inode(dentry->d_parent);
->  	int error;
->  
->  	error = may_create(idmap, dir, dentry);
-> @@ -3490,7 +3488,7 @@ int vfs_create(struct mnt_idmap *idmap, struct inode *dir,
->  	error = security_inode_create(dir, dentry, mode);
->  	if (error)
->  		return error;
-> -	error = dir->i_op->create(idmap, dir, dentry, mode, want_excl);
-> +	error = dir->i_op->create(idmap, dir, dentry, mode, true);
->  	if (!error)
->  		fsnotify_create(dir, dentry);
->  	return error;
-> @@ -4383,8 +4381,7 @@ static int do_mknodat(int dfd, struct filename *name, umode_t mode,
->  	idmap = mnt_idmap(path.mnt);
->  	switch (mode & S_IFMT) {
->  		case 0: case S_IFREG:
-> -			error = vfs_create(idmap, path.dentry->d_inode,
-> -					   dentry, mode, true);
-> +			error = vfs_create(idmap, dentry, mode);
->  			if (!error)
->  				security_path_post_mknod(idmap, dentry);
->  			break;
-> diff --git a/fs/nfsd/nfs3proc.c b/fs/nfsd/nfs3proc.c
-> index b6d03e1ef5f7a5e8dd111b0d56c061f1e91abff7..30ea7ffa2affdb9a959b0fd15a630de056d6dc3c 100644
-> --- a/fs/nfsd/nfs3proc.c
-> +++ b/fs/nfsd/nfs3proc.c
-> @@ -344,7 +344,7 @@ nfsd3_create_file(struct svc_rqst *rqstp, struct svc_fh *fhp,
->  	status = fh_fill_pre_attrs(fhp);
->  	if (status != nfs_ok)
->  		goto out;
-> -	host_err = vfs_create(&nop_mnt_idmap, inode, child, iap->ia_mode, true);
-> +	host_err = vfs_create(&nop_mnt_idmap, child, iap->ia_mode);
->  	if (host_err < 0) {
->  		status = nfserrno(host_err);
->  		goto out;
-> diff --git a/fs/nfsd/vfs.c b/fs/nfsd/vfs.c
-> index c400ea94ff2e837fd59719bf2c4b79ef1d064743..464fd54675f3b16fce9ae5f05ad22e0e6b363eb3 100644
-> --- a/fs/nfsd/vfs.c
-> +++ b/fs/nfsd/vfs.c
-> @@ -1552,8 +1552,7 @@ nfsd_create_locked(struct svc_rqst *rqstp, struct svc_fh *fhp,
->  	err = 0;
->  	switch (type) {
->  	case S_IFREG:
-> -		host_err = vfs_create(&nop_mnt_idmap, dirp, dchild,
-> -				      iap->ia_mode, true);
-> +		host_err = vfs_create(&nop_mnt_idmap, dchild, iap->ia_mode);
->  		if (!host_err)
->  			nfsd_check_ignore_resizing(iap);
->  		break;
-> diff --git a/fs/open.c b/fs/open.c
-> index fdaa6f08f6f4cac5c2fefd3eafa5e430e51f3979..e440f58e3ce81e137aabdf00510d839342a19219 100644
-> --- a/fs/open.c
-> +++ b/fs/open.c
-> @@ -1171,9 +1171,7 @@ struct file *dentry_create(const struct path *path, int flags, umode_t mode,
->  	if (IS_ERR(f))
->  		return f;
->  
-> -	error = vfs_create(mnt_idmap(path->mnt),
-> -			   d_inode(path->dentry->d_parent),
-> -			   path->dentry, mode, true);
-> +	error = vfs_create(mnt_idmap(path->mnt), path->dentry, mode);
->  	if (!error)
->  		error = vfs_open(path, f);
->  
-> diff --git a/fs/overlayfs/overlayfs.h b/fs/overlayfs/overlayfs.h
-> index d215d7349489686b66bb66e939b27046f7d836f6..2bdc434941ebc70f6d4f57cca4f68125112a7bc4 100644
-> --- a/fs/overlayfs/overlayfs.h
-> +++ b/fs/overlayfs/overlayfs.h
-> @@ -235,7 +235,7 @@ static inline int ovl_do_create(struct ovl_fs *ofs,
->  				struct inode *dir, struct dentry *dentry,
->  				umode_t mode)
->  {
-> -	int err = vfs_create(ovl_upper_mnt_idmap(ofs), dir, dentry, mode, true);
-> +	int err = vfs_create(ovl_upper_mnt_idmap(ofs), dentry, mode);
->  
->  	pr_debug("create(%pd2, 0%o) = %i\n", dentry, mode, err);
->  	return err;
-> diff --git a/fs/smb/server/vfs.c b/fs/smb/server/vfs.c
-> index c5f0f3170d586cb2dc4d416b80948c642797fb82..83ece2de4b23bf9209137e7ca414a72439b5cc2e 100644
-> --- a/fs/smb/server/vfs.c
-> +++ b/fs/smb/server/vfs.c
-> @@ -188,8 +188,7 @@ int ksmbd_vfs_create(struct ksmbd_work *work, const char *name, umode_t mode)
->  	}
->  
->  	mode |= S_IFREG;
-> -	err = vfs_create(mnt_idmap(path.mnt), d_inode(path.dentry),
-> -			 dentry, mode, true);
-> +	err = vfs_create(mnt_idmap(path.mnt), dentry, mode);
->  	if (!err) {
->  		ksmbd_vfs_inherit_owner(work, d_inode(path.dentry),
->  					d_inode(dentry));
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index 12873214e1c7811735ea5d2dee3d57e2a5604d8f..21876ef1fec90181b9878372c7c7e710773aae9f 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -2111,8 +2111,7 @@ bool inode_owner_or_capable(struct mnt_idmap *idmap,
->  /*
->   * VFS helper functions..
->   */
-> -int vfs_create(struct mnt_idmap *, struct inode *,
-> -	       struct dentry *, umode_t, bool);
-> +int vfs_create(struct mnt_idmap *, struct dentry *, umode_t);
->  struct dentry *vfs_mkdir(struct mnt_idmap *, struct inode *,
->  			 struct dentry *, umode_t, struct delegated_inode *);
->  int vfs_mknod(struct mnt_idmap *, struct inode *, struct dentry *,
-> 
-> -- 
-> 2.51.1
-> 
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202511111809.FLxbtr0Z-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/dpll/zl3073x/dpll.c:1488:43: warning: variable 'name' is uninitialized when used here [-Wuninitialized]
+    1488 |                                 "%s%u is driven by different DPLL\n", name,
+         |                                                                       ^~~~
+   drivers/dpll/zl3073x/dpll.c:1467:18: note: initialize the variable 'name' to silence this warning
+    1467 |         const char *name;
+         |                         ^
+         |                          = NULL
+   drivers/dpll/zl3073x/dpll.c:1651:28: warning: variable 'ref' set but not used [-Wunused-but-set-variable]
+    1651 |         const struct zl3073x_ref *ref;
+         |                                   ^
+   2 warnings generated.
+
+
+vim +/name +1488 drivers/dpll/zl3073x/dpll.c
+
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1446  
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1447  /**
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1448   * zl3073x_dpll_pin_is_registrable - check if the pin is registrable
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1449   * @zldpll: pointer to zl3073x_dpll structure
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1450   * @dir: pin direction
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1451   * @index: pin index
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1452   *
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1453   * Checks if the given pin can be registered to given DPLL. For both
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1454   * directions the pin can be registered if it is enabled. In case of
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1455   * differential signal type only P-pin is reported as registrable.
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1456   * And additionally for the output pin, the pin can be registered only
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1457   * if it is connected to synthesizer that is driven by given DPLL.
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1458   *
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1459   * Return: true if the pin is registrable, false if not
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1460   */
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1461  static bool
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1462  zl3073x_dpll_pin_is_registrable(struct zl3073x_dpll *zldpll,
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1463  				enum dpll_pin_direction dir, u8 index)
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1464  {
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1465  	struct zl3073x_dev *zldev = zldpll->dev;
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1466  	bool is_diff, is_enabled;
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1467  	const char *name;
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1468  
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1469  	if (dir == DPLL_PIN_DIRECTION_INPUT) {
+b35db42141ccf2a Ivan Vecera 2025-11-10  1470  		u8 ref_id = zl3073x_input_pin_ref_get(index);
+b35db42141ccf2a Ivan Vecera 2025-11-10  1471  		const struct zl3073x_ref *ref;
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1472  
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1473  		/* Skip the pin if the DPLL is running in NCO mode */
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1474  		if (zldpll->refsel_mode == ZL_DPLL_MODE_REFSEL_MODE_NCO)
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1475  			return false;
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1476  
+b35db42141ccf2a Ivan Vecera 2025-11-10  1477  		name = "REF";
+b35db42141ccf2a Ivan Vecera 2025-11-10  1478  		ref = zl3073x_ref_state_get(zldev, ref_id);
+b35db42141ccf2a Ivan Vecera 2025-11-10  1479  		is_diff = zl3073x_ref_is_diff(ref);
+b35db42141ccf2a Ivan Vecera 2025-11-10  1480  		is_enabled = zl3073x_ref_is_enabled(ref);
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1481  	} else {
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1482  		/* Output P&N pair shares single HW output */
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1483  		u8 out = zl3073x_output_pin_out_get(index);
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1484  
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1485  		/* Skip the pin if it is connected to different DPLL channel */
+65b8e8e3bf41fda Ivan Vecera 2025-11-10  1486  		if (zl3073x_dev_out_dpll_get(zldev, out) != zldpll->id) {
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1487  			dev_dbg(zldev->dev,
+75a71ecc24125f9 Ivan Vecera 2025-07-04 @1488  				"%s%u is driven by different DPLL\n", name,
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1489  				out);
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1490  
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1491  			return false;
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1492  		}
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1493  
+11e61915b41b996 Ivan Vecera 2025-11-10  1494  		name = "OUT";
+65b8e8e3bf41fda Ivan Vecera 2025-11-10  1495  		is_diff = zl3073x_dev_out_is_diff(zldev, out);
+65b8e8e3bf41fda Ivan Vecera 2025-11-10  1496  		is_enabled = zl3073x_dev_output_pin_is_enabled(zldev, index);
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1497  	}
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1498  
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1499  	/* Skip N-pin if the corresponding input/output is differential */
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1500  	if (is_diff && zl3073x_is_n_pin(index)) {
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1501  		dev_dbg(zldev->dev, "%s%u is differential, skipping N-pin\n",
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1502  			name, index / 2);
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1503  
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1504  		return false;
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1505  	}
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1506  
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1507  	/* Skip the pin if it is disabled */
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1508  	if (!is_enabled) {
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1509  		dev_dbg(zldev->dev, "%s%u%c is disabled\n", name, index / 2,
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1510  			zl3073x_is_p_pin(index) ? 'P' : 'N');
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1511  
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1512  		return false;
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1513  	}
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1514  
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1515  	return true;
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1516  }
+75a71ecc24125f9 Ivan Vecera 2025-07-04  1517  
+
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
