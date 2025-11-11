@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-237413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70D24C4B2C0
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:10:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71A28C4B2ED
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:16:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 177CC34CB62
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:10:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00A303A6A21
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:11:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC9AC3451A9;
-	Tue, 11 Nov 2025 02:10:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C9653469FE;
+	Tue, 11 Nov 2025 02:10:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bo5SkH+J"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WWYJw75b"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B26C53446DE;
-	Tue, 11 Nov 2025 02:10:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F6D23469EF;
+	Tue, 11 Nov 2025 02:10:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762827042; cv=none; b=HMA6ipMtFHdjmJq6Bffw3cssujAPpXuvW41SJze3aRPZMd+Ax70Vq22oKpwZ5qxNh/EZLjHT8ofRNu6pA6VvE7rCTYKRQ8z040Z459lxUvJJttZ+SZemWOj9Ljw5fZ+rc1lgsNEpkWmbtyVDt6nKeFxrrC8YXXATrtdzipYj364=
+	t=1762827044; cv=none; b=Ca29lUi5jSELwsI7KbHzGiJZXxUsb/3CqmPan6b7LxRAJ93U52T/ufwpmOGX5InNGVMcs0MVAqda1LVyE998hnGPgjXzpnEmuZ5sQjvHNd1TuXJ9LD4ZiWXkyKYdw/Fcy+/OPDdACi/868/KiGgkMGiaSlMSYQa0VsK9AKgPnsE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762827042; c=relaxed/simple;
-	bh=IKEQAlJZoREk/NrfDa65WIzZm/3aEo39YvimRdcQcW4=;
+	s=arc-20240116; t=1762827044; c=relaxed/simple;
+	bh=Vucgi6gs/xD/jJPBBcH7kSn3eGn5xTJkLGubZx9DDpo=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LGTMJxomtzRHsMPRbaoo2Nd9EgKaFDVvRZwwFwK6uPmGXJaE58sfY6wdGiAIyXGcvC1TNtIy6GqfghGuuV+bdCDO39xEOYbQFD7schL6SYVSy2r0zXIbz2M9gtnoDQThJiNPOC9x2+iANtNW9fB7AUOIIEsMsYoluxC/CSF34iM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bo5SkH+J; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 326F6C113D0;
-	Tue, 11 Nov 2025 02:10:42 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=JaREkKbQ31Xg+CdgDQhj2jZLPWpQf4ocxIvoioQIvwKKNzEoapVSGDvywCNojU4I/brI9apuYkDpsY+JogotltcJq5G3GAyU+AJ0c2IjPyxluwIyAw5wH5B3Xv/osSODB4Uv649qp4o7ll4Ii4XrGljYUsg+5dehe0foLKSeMmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WWYJw75b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCFCCC19424;
+	Tue, 11 Nov 2025 02:10:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762827042;
-	bh=IKEQAlJZoREk/NrfDa65WIzZm/3aEo39YvimRdcQcW4=;
+	s=k20201202; t=1762827043;
+	bh=Vucgi6gs/xD/jJPBBcH7kSn3eGn5xTJkLGubZx9DDpo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Bo5SkH+Jf/7SP1OCS5FU14aMxtCb7sAB31uWTCvZ/FvdZ7/3CtAwYkwzlsfH8Fkgo
-	 ZbyKl7Lk8BPzv11da9FSLkeL9bzYvUbohHAQpchq7JZUYOzyq3+2G+y4lwHba+aaX5
-	 V2woENx5hOJsBVRaiYRSIFF02vNaTeQ+tTE1QdqIQECYneJgwAts4keDiu+/Ag+xxI
-	 be0ST40TsXpM7FYiWgpIeMDpGgQPGiAqw9NiBEb3dtigA9ymTHlrS/VKdPgTnHQQB8
-	 397krPx9aWDzqz2BH1YIMOBZzOnMw+JZ0nLodsKAbq+kMRWxLp84sTo+HBJm2fWmm0
-	 7Am5APBFbbwcQ==
+	b=WWYJw75bYYDPlbhbnspGcufdAEl7lQzQeq8Y1kCw1SQ+7DweTKkSu43JO+m8gYzTr
+	 EleCX1Yfm4bguFXJIfOWNY+TqOsWME7Hzh2eau7lDkA18fAmOwiUAX47uNYX90La2H
+	 sq+2+ADMFJehj3qKTHKCKGZf1Yaadfw/uskjMgs4W85U8/b8vikpl6zw8uyx4m2eq9
+	 o9huSQj08xXzpXdVNW3MJ/CTR3PAkboWB5rClngi6QdCdbJu4V7e7JXklba/01QQNY
+	 ZRUgNAk/wXNj3C5WfLp7XWhfuLoSfiJ3qwcJdD965USl/e4zM569S0gIha5mnXSdAM
+	 r8tdEIg/y4k3Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB064380CFD7;
-	Tue, 11 Nov 2025 02:10:13 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E8B380CFD7;
+	Tue, 11 Nov 2025 02:10:15 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/2] Fix IET verification implementation for CPSW
- driver
+Subject: Re: [PATCH] net/handshake: Fix memory leak in tls_handshake_accept()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176282701275.2852248.9515452073916446665.git-patchwork-notify@kernel.org>
-Date: Tue, 11 Nov 2025 02:10:12 +0000
-References: <20251106092305.1437347-1-a-garg7@ti.com>
-In-Reply-To: <20251106092305.1437347-1-a-garg7@ti.com>
-To: Aksh Garg <a-garg7@ti.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, andrew+netdev@lunn.ch, edumazet@google.com,
- linux-kernel@vger.kernel.org, c-vankar@ti.com, s-vadapalli@ti.com,
- danishanwar@ti.com
+ <176282701408.2852248.347346618365991178.git-patchwork-notify@kernel.org>
+Date: Tue, 11 Nov 2025 02:10:14 +0000
+References: <20251106144511.3859535-1-zilin@seu.edu.cn>
+In-Reply-To: <20251106144511.3859535-1-zilin@seu.edu.cn>
+To: Zilin Guan <zilin@seu.edu.cn>
+Cc: chuck.lever@oracle.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, jianhao.xu@seu.edu.cn
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 6 Nov 2025 14:53:03 +0530 you wrote:
-> The CPSW module supports Intersperse Express Traffic (IET) and allows
-> the MAC layer to verify whether the peer supports IET through its MAC
-> merge sublayer, by sending a verification packet and waiting for its
-> response until the timeout. As defined in IEEE 802.3 Clause 99, the
-> verification process involves up to 3 verification attempts to
-> establish support.
+On Thu,  6 Nov 2025 14:45:11 +0000 you wrote:
+> In tls_handshake_accept(), a netlink message is allocated using
+> genlmsg_new(). In the error handling path, genlmsg_cancel() is called
+> to cancel the message construction, but the message itself is not freed.
+> This leads to a memory leak.
+> 
+> Fix this by calling nlmsg_free() in the error path after genlmsg_cancel()
+> to release the allocated memory.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/2] net: ethernet: ti: am65-cpsw-qos: fix IET verify/response timeout
-    https://git.kernel.org/netdev/net/c/49b391646517
-  - [net,2/2] net: ethernet: ti: am65-cpsw-qos: fix IET verify retry mechanism
-    https://git.kernel.org/netdev/net/c/d4b00d132d7c
+  - net/handshake: Fix memory leak in tls_handshake_accept()
+    https://git.kernel.org/netdev/net/c/3072f00bba76
 
 You are awesome, thank you!
 -- 
