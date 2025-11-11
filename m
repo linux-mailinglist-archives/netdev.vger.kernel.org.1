@@ -1,78 +1,111 @@
-Return-Path: <netdev+bounces-237429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EE50C4B3E8
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:47:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DA04C4B3F9
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:50:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67DBC18908C3
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:48:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC8573AEC40
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:50:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E750348468;
-	Tue, 11 Nov 2025 02:47:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AB113491F4;
+	Tue, 11 Nov 2025 02:50:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CL+OPki3"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5S6erjir"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E10E732E14A;
-	Tue, 11 Nov 2025 02:47:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD1D6347FC0;
+	Tue, 11 Nov 2025 02:50:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762829267; cv=none; b=LSbSXIOXuScwBPm7L8FpAYyNZtch2XvNumOGhep/4DVksfRyJD3mXhLQz+2qhm00s+SZSZfigimFmVzkZK3L1sAsRMMEy9Lew/yP/diG24gitiEI3faFBQE4TuSm0jW5m0afa1giRHK2zisdmZYXKp2o40WwWl2S9nIEvd8Pu+M=
+	t=1762829425; cv=none; b=tV0+9y9kLeg1RV7xEt1KkwzXXzKW8Tqf65yp8Iq6QBYmY+d6R1Xv3nfr0qG2FTcDNH7nMRQBXs2y8RrPzFqTUcKUitBymAiNHtwHddujIArrDNJSCj5MDm+/uisISCaviAdWJaCvp8RJXgHfkSXYdHS6O61oIRnnUFQ0ReWadwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762829267; c=relaxed/simple;
-	bh=kb0U3gFuLG9ebZpEvZgiRVBGfMo6nVWwuyrudqfGv0o=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=orxJsAeVl5S8f0zdNom5AnMl57cYFsbFalucsu4G7M0lNMBZG/ifQmZ0ICQRfOGGmf/7BCQWHPwGC8dNDu9XppLPRzEvT0McmtWiC1lY8+bWT5GLfvv5KsqkA7K3XPj+bKDoo/pxFLyuaGFNwEm0y1mSBuupOZi4M82I8VNa79w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CL+OPki3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D242C4CEF5;
-	Tue, 11 Nov 2025 02:47:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762829265;
-	bh=kb0U3gFuLG9ebZpEvZgiRVBGfMo6nVWwuyrudqfGv0o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CL+OPki34UVIhGzekeTPxheEDkeQvSp5/4jpb4qMsYbN6Sf2r4x8bHT2WxS0EumhH
-	 WsFcd4RDuYsmGBxoASEPDFmRj1cImURIfjvverSYcHdgUPcHztVkOZkQq9Q1W7Eocl
-	 lcTjQq3OcTiJAgsNnB55q0AcstEv9n7H5SZWJWAKpU7L6GYnHbY4H3Frfia+frrHMK
-	 9BDsdT6h2aAq04wcchRJFXQ5SO7UHKiyMOI1gOklA0xGQUKaJ1X92Yf7zYBxZJG0ct
-	 hwSh7hNc8v8+Cm9osoiHB66+DTERKIIpPGFJsvS3nHo3wix88OCXK2wv6UeQk4wbLB
-	 JnpPODhCFkrJA==
-Date: Mon, 10 Nov 2025 18:47:43 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Fan Gong <gongfan1@huawei.com>
-Cc: Zhu Yikai <zhuyikai1@h-partners.com>, <netdev@vger.kernel.org>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Markus Elfring <Markus.Elfring@web.de>, Pavan
- Chebbi <pavan.chebbi@broadcom.com>, ALOK TIWARI <alok.a.tiwari@oracle.com>,
- <linux-kernel@vger.kernel.org>, <linux-doc@vger.kernel.org>, luosifu
- <luosifu@huawei.com>, Xin Guo <guoxin09@huawei.com>, Shen Chenyang
- <shenchenyang1@hisilicon.com>, Zhou Shuai <zhoushuai28@huawei.com>, Wu Like
- <wulike1@huawei.com>, Shi Jing <shijing34@huawei.com>, Luo Yang
- <luoyang82@h-partners.com>, Meny Yossefi <meny.yossefi@huawei.com>, Gur
- Stavi <gur.stavi@huawei.com>
-Subject: Re: [PATCH net-next v06 2/5] hinic3: Add PF management interfaces
-Message-ID: <20251110184743.72f0fe8d@kernel.org>
-In-Reply-To: <c344db0c471b6b1321994958727df1c005a65daa.1762581665.git.zhuyikai1@h-partners.com>
-References: <cover.1762581665.git.zhuyikai1@h-partners.com>
-	<c344db0c471b6b1321994958727df1c005a65daa.1762581665.git.zhuyikai1@h-partners.com>
+	s=arc-20240116; t=1762829425; c=relaxed/simple;
+	bh=Ehkextsnb3H1bI4S73h04f+Wm9Tj3KpfitAGNJx3ZzM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WGA1aw2UbarelRfL0SqAnyoTigcsF0r2sGBKc6zZv+VALuEDyu7xhb0bdPVmcsuRStztqGQcjoBJUWo3WAPO81Y//kcWZ8xyfL4NoPdur67IgMApHo1G1yu3ukssho/cd5uK1ix4frH15TDoKpkuPvf+1NQbjHFFMKAIRtoTYyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5S6erjir; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=EwS1vYGPntoB14ZBNepjn6wd0Qs2O/QKzmssltxVrc4=; b=5S6erjirSqsiHal63K5sq2xzv/
+	m/zJ5YJL77xPIVaNB1mENr7DhEUFA651SzaVNff4vdOv9rzZFvh+x3gZ1wol9kL/KJYHkyx71RX1N
+	IeoQgyy9W3a/W2JKaLIA4+uNHvxl7OIEWdb6d2FGBxh/M6ayOMLdzT//HJ4luLpo6yVg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vIeSR-00DaBn-5m; Tue, 11 Nov 2025 03:50:11 +0100
+Date: Tue, 11 Nov 2025 03:50:11 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Prabhakar <prabhakar.csengg@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: Re: [PATCH net-next v2 2/3] net: phy: mscc: Consolidate probe
+ functions into a common helper
+Message-ID: <ec28d950-f7ef-4708-88aa-58c2b9b0b92a@lunn.ch>
+References: <20251107201232.282152-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+ <20251107201232.282152-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251107201232.282152-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
 
-On Sat, 8 Nov 2025 14:41:37 +0800 Fan Gong wrote:
-> +	struct semaphore                port_state_sem;
+diff(1) has not made this easy...
 
-You seem to init this semaphore to 1, could you not use a mutex?
-Mutexes are faster and have better debugging. If you have a reason
-for a semaphore please document.
+> +static int vsc85xx_probe_common(struct phy_device *phydev,
+> +				const struct vsc85xx_probe_config *cfg,
+> +				const u32 *default_led_mode)
+> +	int ret;
+
+> +	/* Check rate magic if needed (only for non-package PHYs) */
+> +	if (cfg->check_rate_magic) {
+> +		ret = vsc85xx_edge_rate_magic_get(phydev);
+> +		if (ret < 0)
+> +			return ret;
+> +	}
+>  
+>  	vsc8531 = devm_kzalloc(&phydev->mdio.dev, sizeof(*vsc8531), GFP_KERNEL);
+>  	if (!vsc8531)
+> 		return -ENOMEM;
+
+> +	/* Store rate magic if it was checked */
+> +	if (cfg->check_rate_magic)
+> +		vsc8531->rate_magic = ret;
+
+
+I think we end up with something like the above?
+
+I would move the vsc85xx_edge_rate_magic_get() after kzalloc() just to
+keep it all together.
+
+    Andrew
+
+---
+pw-bot: cr
+
 
