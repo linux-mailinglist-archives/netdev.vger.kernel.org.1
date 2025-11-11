@@ -1,78 +1,62 @@
-Return-Path: <netdev+bounces-237449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id A96D1C4B64E
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 05:03:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04492C4B666
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 05:04:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 570CD34D7CD
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 04:03:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A92E3B7666
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 04:03:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68623246BC5;
-	Tue, 11 Nov 2025 04:03:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3E902571AD;
+	Tue, 11 Nov 2025 04:03:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LwmDUyON"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="Hoswz3Y/"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDF6320ED;
-	Tue, 11 Nov 2025 04:03:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A31820ED;
+	Tue, 11 Nov 2025 04:03:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762833817; cv=none; b=HHRaDu4b15K4emhEH9QUHuX8yCkIwhes0AwZOY0zIX4YuQhm/+9R1QjlYUvU5QRL3CkAIUhSqtBhI/PALi3rlf0xyxhaloZ58aH9/rJ/ioryaY9ah60Ih/5mvSz6/k6Yxn0DlGSBys0FmuUOVlNCgjrC3bilB2AEyWHT4Qva1qo=
+	t=1762833823; cv=none; b=iZ2TY29vocj39kxZ0jiX2T30BynuLF9DzKvP5DAKnGsTrDssJRCV9c1OgaVDKIcyzND59hrs/HxA2OHkzRB3Ee+ps6S4g+Ju2wC3lOThOT1Hev3kJ/Y7lb+JZnvED7PHPl34jkHsMkND0yDXIO/4k/cByCbPl+wGDDFrr4iYNyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762833817; c=relaxed/simple;
-	bh=RE0vv8UkeUfdxSTKXH+ylxEdakNDDWR5nViAQdL94W0=;
+	s=arc-20240116; t=1762833823; c=relaxed/simple;
+	bh=BqbibIjmIBvoptyL9956H5Lx4AaV2x5z8jLGWNeHdaA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Brz/Rue0u1L2MKz9Eni+FBN3FWzPV/gnNFtFB9MUxg8iEXc17pFC3vt7UfXMdY1riCJbvgeT1Ok5oeaPGifhkkMhQ70PJ3DfGdr7mCYN20Y8TWJoYY5t3cVfJfRNQ1fXgQQnK9v+4xU/kuuqfFhZvfWjd7xivc+BbiD2ZCkyx0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LwmDUyON; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=WamB7IrVQXbNC1AWUtZflj8xdjdIjLDhhoTJ27g6W6Q=; b=LwmDUyONmHSmFUPTYR0jq+8zYn
-	Jz6/D/dxempI/NaRiCTkcC14KGwzk7kEVpGdcjNCAQoCntAsi+wFMJo2NKK2VulHnYkGOwkYSSXVW
-	AB6dXr0NyNsSp8SmWyid3ng7BTrSVZT/YgOjwjO9jnwcdCibWzpF6CVGdwYME96vQYTQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vIfbJ-00DaaN-Js; Tue, 11 Nov 2025 05:03:25 +0100
-Date: Tue, 11 Nov 2025 05:03:25 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
-	Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: Re: [PATCH net-next v15 10/15] net: phy: marvell10g: Support SFP
- through phy_port
-Message-ID: <5c41cea9-e268-43bc-af3a-13eb1ba5d4c9@lunn.ch>
-References: <20251106094742.2104099-1-maxime.chevallier@bootlin.com>
- <20251106094742.2104099-11-maxime.chevallier@bootlin.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ERx0Nw0q8omkoFHbb8ISnE9rb26zok5y/71m5BRb1HxNPcji5FT4oqFC1rSr+Ef/elHu6AHXUKy26EEw3QlFtT4bB7THnPrU7xuH/eoFEoJCzkqV3nGn+KJKCEQRdOE1+COE9ydpB9cX4Oh4j+wA00F4E/QZtHv2+n2RaqFZaTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=Hoswz3Y/; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1173)
+	id F3B50212AE23; Mon, 10 Nov 2025 20:03:41 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com F3B50212AE23
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1762833822;
+	bh=4inJCO+mmtz4c98ESvhku4VxP3CaeaFoBhLGjd6rC44=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Hoswz3Y/566Cw1bmvGOMeg70i3HGrhqAruCMrcy7NqOYYcC8ZpcGWBmM6IBc0TLj9
+	 a4szfWyXewqs73SOLjFdSZ5/7pAIXrRQKsLjRLHiDUJzxOdJX2dnxfEV3RavmPTuNY
+	 JE8b5y8WHidiwxJeVwy8fL6hvn5JsOeWXwPIcR7c=
+Date: Mon, 10 Nov 2025 20:03:41 -0800
+From: Erni Sri Satya Vennela <ernis@linux.microsoft.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, longli@microsoft.com,
+	kotaranov@microsoft.com, horms@kernel.org,
+	shradhagupta@linux.microsoft.com, ssengar@linux.microsoft.com,
+	dipayanroy@linux.microsoft.com, shirazsaleem@microsoft.com,
+	rosenp@gmail.com, linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: Re: [PATCH net-next v2 2/2] net: mana: Add standard counter
+ rx_missed_errors
+Message-ID: <20251111040341.GA3750@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1761734272-32055-1-git-send-email-ernis@linux.microsoft.com>
+ <1761734272-32055-3-git-send-email-ernis@linux.microsoft.com>
+ <20251031161723.057e4770@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,20 +65,88 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251106094742.2104099-11-maxime.chevallier@bootlin.com>
+In-Reply-To: <20251031161723.057e4770@kernel.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Thu, Nov 06, 2025 at 10:47:35AM +0100, Maxime Chevallier wrote:
-> Convert the Marvell10G driver to use the generic SFP handling, through a
-> dedicated .attach_port() handler to populate the port's supported
-> interfaces.
+On Fri, Oct 31, 2025 at 04:17:23PM -0700, Jakub Kicinski wrote:
+> On Wed, 29 Oct 2025 03:37:52 -0700 Erni Sri Satya Vennela wrote:
+> > diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > index 009e869ef296..48df44889f05 100644
+> > --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+> > @@ -494,6 +494,11 @@ static void mana_get_stats64(struct net_device *ndev,
+> >  
+> >  	netdev_stats_to_stats64(st, &ndev->stats);
+> >  
+> > +	if (apc->ac->hwc_timeout_occurred)
+> > +		netdev_warn_once(ndev, "HWC timeout occurred\n");
 > 
-> As the 88x3310 supports multiple MDI, the .attach_port() logic handles
-> both SFP attach with 10GBaseR support, and support for the "regular"
-> port that usually is a BaseT port.
+> I don't think there's much value in this print.
+
+This print is added because, if the user tries to run 
+"ip -s link interface" for multiple times, he should be warned about 
+the time out. I will add more info into the print to let the user
+know that it is from this action.
 > 
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> > +#define MANA_GF_STATS_PERIOD (2 * HZ)
+> > +
+> > +static void mana_gf_stats_work_handler(struct work_struct *work)
+> > +{
+> > +	struct mana_context *ac =
+> > +		container_of(to_delayed_work(work), struct mana_context, gf_stats_work);
+> > +	int err;
+> > +
+> > +	err = mana_query_gf_stats(ac);
+> > +	if (err == -ETIMEDOUT) {
+> > +		/* HWC timeout detected - reset stats and stop rescheduling */
+> > +		ac->hwc_timeout_occurred = true;
+> > +		memset(&ac->hc_stats, 0, sizeof(ac->hc_stats));
+> 
+> Not sure I've seen another device using this approach but I can't
+> really tell what's the best strategy. The device is unusable if it
+> can't provide stats..
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+In the case where the HWC becomes unresponsive,
+there will be a brief interval needed for the driver to recover. 
+During this period, if users request ethtool stats, they would 
+receive outdated information. To address this, we proactively 
+reset the stats to zero, ensuring users do not see stale data.
 
-    Andrew
+> 
+> > +		return;
+> > +	}
+> > +	queue_delayed_work(ac->gf_stats_wq, &ac->gf_stats_work, MANA_GF_STATS_PERIOD);
+> > +}
+> > +
+> >  int mana_probe(struct gdma_dev *gd, bool resuming)
+> >  {
+> >  	struct gdma_context *gc = gd->gdma_context;
+> > @@ -3478,6 +3503,15 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
+> >  	}
+> >  
+> >  	err = add_adev(gd, "eth");
+> > +	ac->gf_stats_wq = create_singlethread_workqueue("mana_gf_stats");
+> 
+> Why are you creating a workqueue? You can use system queues.
+Thankyou for the suggestion. I will integrate it in the next version.
+> 
+> > +	queue_delayed_work(ac->gf_stats_wq, &ac->gf_stats_work, MANA_GF_STATS_PERIOD);
+> 
+> ls wrap long lines at 80 chars.
+I will make this change for the next verison.
+> 
+> > diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> > index 3dfd96146424..99e811208683 100644
+> > --- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> > +++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
+> > @@ -213,8 +213,6 @@ static void mana_get_ethtool_stats(struct net_device *ndev,
+> >  
+> >  	if (!apc->port_is_up)
+> >  		return;
+> > -	/* we call mana function to update stats from GDMA */
+> > -	mana_query_gf_stats(apc->ac);
+> 
+> Why delete this? We can get fresh stats for the user in this context.
+We want to prevent some user that run ethtool too frequently, like
+thousands of times / sec, to overwhelm the HW channel. 
 
