@@ -1,177 +1,116 @@
-Return-Path: <netdev+bounces-237472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17973C4C434
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 09:09:42 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA43BC4C4DA
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 09:13:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1EFC53A4007
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 08:05:23 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id EA4314F9906
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 08:09:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 552F32DC335;
-	Tue, 11 Nov 2025 08:05:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AAE12FD7A3;
+	Tue, 11 Nov 2025 08:08:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NUIP1don"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="cTiTNXOL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8A0215E8B;
-	Tue, 11 Nov 2025 08:05:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8D012BE051;
+	Tue, 11 Nov 2025 08:08:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762848314; cv=none; b=ej8srO2g8TjIHDWLl42Nvj70+0RWFQMnasY7D0dFK85PvBjXwmVxRwuyPXr7SoC3CtkAOmJNzLzddtbkLCQ1pERJecraYkO5wH4o4yEHrUI6DjAcwDwgFGXvX3Bx+Lrnc+coN8V/BMsZBB9QOogVbNAtFGwOAM8CK/flVf+MKmg=
+	t=1762848527; cv=none; b=cmYwboiamrrT4NG7l9sUkE1H6mL43Bx5bvDjIIsPQDptQOe/f1EYnvHU21G3Amkdb36ayu2ZjEk1ClWc8g/pqN2VUH4qHFXs/SvikjH4osEaGH8erNnSAQMj98cDqb8aM3E4fcfIUmqWthaa789Iy7+HPM/NvBx+zSVDevQZzaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762848314; c=relaxed/simple;
-	bh=L5yMR8hp8K6n3p5Uz6MrsGqp/GNA0slthJowCoOHAbM=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=eYhoLeowCf3pzF6ET1EsxgubJs7+mQTI5loNCoqSqrslgDgAJSYTPLCwMxmGcoy+L6TJ+NXS8lcDUtNGzn0JhB8DvG9Tfl54r0bTdtUGApy03+C5hhPpAGacsudad1qMwMMkTZScUIVszuMANPq2dxeYCKruTUDK6GSISxTOXt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NUIP1don; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 758BFC116D0;
-	Tue, 11 Nov 2025 08:04:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762848312;
-	bh=L5yMR8hp8K6n3p5Uz6MrsGqp/GNA0slthJowCoOHAbM=;
-	h=Date:From:Subject:To:Cc:References:In-Reply-To:From;
-	b=NUIP1don/7EEjqY/+TuMC7+CtmpG/nW2STT6PfNtEFuFU+HXZKqLbbnEAMH/X/3JJ
-	 WVWvR5dg7fblvx/9940inFYgR2C5Gv8VCu1k/MG3tLYRY2844vpHtjrgDZFeK1fdOO
-	 JM9vzH3/AWqsGZIFSz7EL/soDKXXUbKHVx/PFFqkGRFYGIzvUKJH2LfpLXAxaji/IR
-	 Vs8kH4VSFB0ma/R7k8kHRT0ZJzgV8pEkXXgoavVjbaLi01h+sab77WCI8dWWJ+fyMQ
-	 Px0GCJGzWonU67OPy+OHOih22E625vhqYo9ne3sB2zFxHcVeAaZEH4KOlSEdxaEekL
-	 55nfUGgl/CXGw==
-Message-ID: <fd47654d-c4cc-4cbc-95da-824f1e6bbbf9@kernel.org>
-Date: Tue, 11 Nov 2025 09:04:55 +0100
+	s=arc-20240116; t=1762848527; c=relaxed/simple;
+	bh=i+Q4ioBM7V607WyaisEADmcCyphXU4ueLjNTwlUPufA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n8pCN9uW7ceRa2R9idGiIFA3keTeGA7wAkx0vlPWxYBFsGi82p0SAS9V5BS0siv++dUxg6JqiA/GkNrWU0LS+aMnCgbagedZH7xIeAAIyRaCua4mh0+ReSBnfplFaGegKWM74Uu5pAkSZtWnR5K+eTY50xiEqHCrhYRRwIwi6pg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=cTiTNXOL; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=R4v0T/jYSK8ngu6ACLcnRSLuWsTH7J+YbIQLDPezMxs=; b=cTiTNXOLW3RqLXigzxvsker54y
+	g9a8LCpbcringQVyc8/mHLO9Z+VijvZ62PYOuEJse/aNKrHo6DsdD2JifuRBNEHBMytboM/zxuZ8o
+	W2JevlUfztmI2Iuio2DXqM22dOh6BKWHhjoxD4eU6wSpwQ+2SKVaA+WJ59lZglIMZNQX7mmVyt+2i
+	+7skzzvbhN32GpXwbgX0bz7F2UwpvdlK3rrifLlHPydqJ70EKS4hgK0dvWDc7RcH9+aLMZsqSHA7y
+	Y+oEu6jocsY/myOZkIHq0qT4zN3pQbMjfB7rQQmnRBa46IVHomT/wYF1hQw2lqT6EQVNdbKi21SzW
+	GBKafOTw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37306)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vIjQV-0000000028e-3t9d;
+	Tue, 11 Nov 2025 08:08:32 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vIjQM-000000002m9-2KCm;
+	Tue, 11 Nov 2025 08:08:22 +0000
+Date: Tue, 11 Nov 2025 08:08:22 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Keguang Zhang <keguang.zhang@gmail.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-mips@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Minda Chen <minda.chen@starfivetech.com>, netdev@vger.kernel.org,
+	Nobuhiro Iwamatsu <nobuhiro.iwamatsu.x90@mail.toshiba>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next 00/13] net: stmmac: convert glue drivers to use
+ stmmac_get_phy_intf_sel()
+Message-ID: <aRLu9qdfUnizqJRR@shell.armlinux.org.uk>
+References: <aQ4ByErmsnAPSHIL@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Hans Verkuil <hverkuil+cisco@kernel.org>
-Subject: Re: [PATCH v1 14/23] media: v4l2-ioctl: Switch to use %ptSp
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Corey Minyard <corey@minyard.net>, =?UTF-8?Q?Christian_K=C3=B6nig?=
- <christian.koenig@amd.com>, "Dr. David Alan Gilbert" <linux@treblig.org>,
- Alex Deucher <alexander.deucher@amd.com>,
- Thomas Zimmermann <tzimmermann@suse.de>,
- Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
- Rob Clark <robin.clark@oss.qualcomm.com>,
- Matthew Brost <matthew.brost@intel.com>, Hans Verkuil <hverkuil@kernel.org>,
- Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>,
- Ulf Hansson <ulf.hansson@linaro.org>,
- Vitaly Lifshits <vitaly.lifshits@intel.com>,
- Manivannan Sadhasivam <mani@kernel.org>, Niklas Cassel <cassel@kernel.org>,
- Calvin Owens <calvin@wbinvd.org>, Sagi Maimon <maimon.sagi@gmail.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Karan Tilak Kumar <kartilak@cisco.com>,
- Casey Schaufler <casey@schaufler-ca.com>,
- Steven Rostedt <rostedt@goodmis.org>, Petr Mladek <pmladek@suse.com>,
- Max Kellermann <max.kellermann@ionos.com>, Takashi Iwai <tiwai@suse.de>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- openipmi-developer@lists.sourceforge.net, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
- amd-gfx@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
- freedreno@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
- linux-mmc@vger.kernel.org, netdev@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, linux-pci@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
- linux-staging@lists.linux.dev, ceph-devel@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, linux-sound@vger.kernel.org
-Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>,
- Sergey Senozhatsky <senozhatsky@chromium.org>,
- Jonathan Corbet <corbet@lwn.net>, Sumit Semwal <sumit.semwal@linaro.org>,
- Gustavo Padovan <gustavo@padovan.org>, David Airlie <airlied@gmail.com>,
- Simona Vetter <simona@ffwll.ch>,
- Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Dmitry Baryshkov <lumag@kernel.org>,
- Abhinav Kumar <abhinav.kumar@linux.dev>,
- Jessica Zhang <jesszhan0024@gmail.com>, Sean Paul <sean@poorly.run>,
- Marijn Suijten <marijn.suijten@somainline.org>,
- Konrad Dybcio <konradybcio@kernel.org>,
- Lucas De Marchi <lucas.demarchi@intel.com>,
- =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
- Rodrigo Vivi <rodrigo.vivi@intel.com>,
- Mauro Carvalho Chehab <mchehab@kernel.org>,
- Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
- Kishon Vijay Abraham I <kishon@kernel.org>,
- Bjorn Helgaas <bhelgaas@google.com>, Rodolfo Giometti
- <giometti@enneenne.com>, Jonathan Lemon <jonathan.lemon@gmail.com>,
- Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Richard Cochran <richardcochran@gmail.com>,
- Stefan Haberland <sth@linux.ibm.com>, Jan Hoeppner <hoeppner@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, Satish Kharat <satishkh@cisco.com>,
- Sesidhar Baddela <sebaddel@cisco.com>,
- "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Xiubo Li
- <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
- Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- Andrew Morton <akpm@linux-foundation.org>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>
-References: <20251110184727.666591-1-andriy.shevchenko@linux.intel.com>
- <20251110184727.666591-15-andriy.shevchenko@linux.intel.com>
-Content-Language: en-US, nl
-In-Reply-To: <20251110184727.666591-15-andriy.shevchenko@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <aQ4ByErmsnAPSHIL@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 10/11/2025 19:40, Andy Shevchenko wrote:
-> Use %ptSp instead of open coded variants to print content of
-> struct timespec64 in human readable format.
-> 
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> ---
->  drivers/media/v4l2-core/v4l2-ioctl.c | 5 ++---
->  1 file changed, 2 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/media/v4l2-core/v4l2-ioctl.c b/drivers/media/v4l2-core/v4l2-ioctl.c
-> index 01cf52c3ea33..edc4d97b4161 100644
-> --- a/drivers/media/v4l2-core/v4l2-ioctl.c
-> +++ b/drivers/media/v4l2-core/v4l2-ioctl.c
-> @@ -791,9 +791,8 @@ static void v4l_print_event(const void *arg, bool write_only)
->  	const struct v4l2_event *p = arg;
->  	const struct v4l2_event_ctrl *c;
->  
-> -	pr_cont("type=0x%x, pending=%u, sequence=%u, id=%u, timestamp=%llu.%9.9llu\n",
-> -			p->type, p->pending, p->sequence, p->id,
-> -			p->timestamp.tv_sec, p->timestamp.tv_nsec);
-> +	pr_cont("type=0x%x, pending=%u, sequence=%u, id=%u, timestamp=%ptSp\n",
-> +		p->type, p->pending, p->sequence, p->id, &p->timestamp);
+This series converts the remaining glue drivers that support
+multi-interface to use stmmac_get_phy_intf_sel(). The reason these
+drivers are not converted to the set_phy_intf_sel() method is
+because it is unclear whether there are ordering dependencies that
+would prevent it.
 
-Hmm, p->timestamp is a struct __kernel_timespec, but that's not quite the
-same thing as struct timespec64:
+For example, reading the stm32mp2 documentation, it is required to
+set the ETH1_SEL field while the dwmac core is in reset and before
+clocks are enabled. This requirement can not be satsified at the
+moment (but could with further changes.)
 
-struct __kernel_timespec {
-        __kernel_time64_t       tv_sec;                 /* seconds */
-        long long               tv_nsec;                /* nanoseconds */
-};
+v2:
+- sending meson8b seperately
+- updated a number of commit descriptions: PHY_INTF_SEL_xxx ->
+  PHY_INTF_SEL_x, added note where GMII no longer errors out.
 
-vs:
+ .../net/ethernet/stmicro/stmmac/dwmac-loongson1.c  | 18 ++---
+ .../net/ethernet/stmicro/stmmac/dwmac-mediatek.c   | 77 ++++++++--------------
+ .../net/ethernet/stmicro/stmmac/dwmac-starfive.c   | 24 ++-----
+ drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c  | 44 +++++++------
+ .../net/ethernet/stmicro/stmmac/dwmac-visconti.c   | 26 ++------
+ 5 files changed, 70 insertions(+), 119 deletions(-)
 
-struct timespec64 {
-        time64_t        tv_sec;                 /* seconds */
-        long            tv_nsec;                /* nanoseconds */
-};
-
-So I'm not sure this will work.
-
-Regards,
-
-	Hans
-
->  	switch (p->type) {
->  	case V4L2_EVENT_VSYNC:
->  		printk(KERN_DEBUG "field=%s\n",
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
