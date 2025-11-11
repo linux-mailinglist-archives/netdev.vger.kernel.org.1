@@ -1,152 +1,238 @@
-Return-Path: <netdev+bounces-237580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C1A4C4D5D7
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 12:17:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEC5CC4D5FB
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 12:19:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 760AD1886FC4
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 11:13:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E729F3A05B2
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 11:15:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0782354AE4;
-	Tue, 11 Nov 2025 11:12:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83F1F2FBE03;
+	Tue, 11 Nov 2025 11:15:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Ri6iFxC5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N4MQK7po";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="pP6FIubD"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3E0A351FDF
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 11:12:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9B5A2F7AA6
+	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 11:15:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762859548; cv=none; b=cXZMpvxPsX1p8JumH9OVjZYdKcoZGWd3Aj7pE3/IlidxfJ3jO8LjSP+RrvPgfGdqYCmeF7fFIL8DJdjMxnZcOBBYoU/cNCs79n3X9e3ueF3j691LmQsu2FoPeeZeYiQjTb7fjKMoVJrQZhYFQ2gW/lXjOEe8Hk5QnkgorCD73SM=
+	t=1762859750; cv=none; b=LcPsZmFMakiW+tDSS+RVKdlxSqX3AWMFQ2w48lCwqlA3sDuTv0F3UjfTGPTY+dSVUnj45FqRfgVlC/3JgAn5950XXoXj2Jb+2ii10w9EhlGdQIvRAk9Ay2e/1ipmIvwukR01KPz3+72YDa19Ie9KyiiLC8GkeSJUGT/sz4/zGw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762859548; c=relaxed/simple;
-	bh=QKrLGEqMpIX6F2+C13PujYAUK9wkItB14mX2nA0jTks=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=UHkv0s1RXSje7ovFQm0VVxq1UWYIWlw/fRumth4D7UOEGerQJOiPJFQW1xj3V+X8yNdLLOKO0rI66dJa9v0xBxY7hmwPEDLtmcMmvc24/oeC4QmytDCsmX8sXr7H/EM+q96GJ1CMMyz5oAmM/e88zACbfjf6AkQCbW/pe0e38Rk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Ri6iFxC5; arc=none smtp.client-ip=115.124.30.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1762859536; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=ZIudUGKGeWaGvoL3nliZIihGbTlmfrlvqzddtIqLUFc=;
-	b=Ri6iFxC5Du/RGw1Marb8eY9Y1myz+sRQHTSY0y7a8DMl2/c+EwDg+XsB3BqaAJn8h6s021UB1peV6CiFhlTNAiotO8vFbcrXyUt1K+GLk+uN2io8FjuGeC4wr7zF1F2/qbyRYVcUeIG/dkGu+UUDKLnVCCcztocpGrXT72wlocQ=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WsBStOH_1762859534 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 11 Nov 2025 19:12:14 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: netdev@vger.kernel.org
-Cc: Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Alvaro Karsz <alvaro.karsz@solid-run.com>,
-	linux-um@lists.infradead.org,
-	virtualization@lists.linux.dev
-Subject: [PATCH net v5 2/2] virtio-net: correct hdr_len handling for tunnel gso
-Date: Tue, 11 Nov 2025 19:12:12 +0800
-Message-Id: <20251111111212.102083-3-xuanzhuo@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20251111111212.102083-1-xuanzhuo@linux.alibaba.com>
-References: <20251111111212.102083-1-xuanzhuo@linux.alibaba.com>
+	s=arc-20240116; t=1762859750; c=relaxed/simple;
+	bh=+a3FXns3drOomy2losT83l+6yda8JsH6yzxl2Bi9LgQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GSri5YmWg7HEzbYXlcfTJjC/7UxZzvHYFWThTPwtxwMGu5h8Ld3rRiHoPOYss4oZth7DUPENYZO7oB1++3bGqV7yM07sRzhzapwQeNGaaEKpKDc+vEPXNNJL+Inb81ddfuS5diQt13ZrTt7kapPnPXcWCCWRF3L3cdt/yc5zdY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N4MQK7po; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=pP6FIubD; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762859747;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Js25JqV/nrIrTu7LVkEMw5HQuj8XZ/095iAhtGHGsrI=;
+	b=N4MQK7poxxdvYOx9qhTnj+EUmPW5MeMFnK58n26JxEDfrP4ng+0EuW7xhLb65Ag++FelAq
+	WQGN7a7QblCBUjZWkdZnd7VbWSubMAnV6PpARO2z1GFaic6SJzbPEM76PwWOjVSqTURPFo
+	QU33yHIYdAjZOGa6n9LePeBN93VsNUk=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-688-dZqMtj09OtiKBsJgQHz6IQ-1; Tue, 11 Nov 2025 06:15:46 -0500
+X-MC-Unique: dZqMtj09OtiKBsJgQHz6IQ-1
+X-Mimecast-MFC-AGG-ID: dZqMtj09OtiKBsJgQHz6IQ_1762859745
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-429be5aee5bso1865088f8f.3
+        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 03:15:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1762859745; x=1763464545; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Js25JqV/nrIrTu7LVkEMw5HQuj8XZ/095iAhtGHGsrI=;
+        b=pP6FIubD3mfAgS9zY+WfLc/TM9QGJdtJ4mtqIkd2uY9nnTtpiMygmbGpkt+kDAJsk/
+         9UNBMJtjW7s8krhcYCETkFV6aWCH+Ok7bGDbN4sqhZ6c157PN0msW5m5AKiBJi9kO2eH
+         TyvvtI0iymAR4YVtkmDWjY6n+WO7dt5NZk8u9zmgTKK2qz7LAviF37OKuw6f6sKbRUwR
+         PhXGZaKZlkvJ7+PS3wdQPnlc1nQLzt12awFy0FL6GmumIsTDY6aEtJ4ykFCUrJ8SDeoB
+         of3jUTzshGdlgsnHNqAZzscBufc/pXa0iLpuT0wzDxrXI1B+Jina8GpJGZJijGIFSIla
+         XAgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762859745; x=1763464545;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Js25JqV/nrIrTu7LVkEMw5HQuj8XZ/095iAhtGHGsrI=;
+        b=C4uKFrURv98xsntIlHVnEkxH8gKCGn92j0sBMNsVyNonbMoa7Szh5M6sZiqRZX57nP
+         hImejdk0Iij3niRyVtEbGX+Ovg0apEkPOg4+aorQfJ75GsXmpIliaXR66vBW0Mn/TWxV
+         FZto0Z1SVl8+9f2ZgGHn414J7e7RDggnKs+iS3mgJ7D7UGyHtuZivkIVsPZNALN/1Ecv
+         ld5olZeDvPJZZ1YYRymBvBunfF0BwSy03eXjNGaDQKyQAOG3T9dLxvgCiEeB/KcnyQEd
+         V/XCpmf8n5wahKy23E+p+SrUQ0sgdZmJu/cT0StS28HxkD3LVLLyRh6JSO+rJzmlRrYg
+         L9qA==
+X-Gm-Message-State: AOJu0YxhZZjf9HQnkHiCYlacVPCd0eXt7f/S3IY07QnkLCkh515TaARd
+	ZaEQaD0MKbljz+TP7wAFgPEn2v5G48Zm+8PdJoCPJqSZvDIEk41maC9ME8lWpiiNSdTq1r1uZVT
+	9TLeI0ixBmtjKfNb2tySITTsyJbjHrfdO8gt2mK7nhKDgHNPuTjtATKVBJw==
+X-Gm-Gg: ASbGncuIIHZDIE7zgVBWpNww6k1h+q57cIfJLGUqXx6muQRes6xWgD2uAq16Qt7Zg55
+	mcBm6sWlnmlkWZsPFD4iKm6e8WfpbjhGY+k12GBdSYNkxDXwP6jbmjGj+MmP2mzIlY9u3jm8+Mi
+	WM9dCH+Dc2z+dwMpEpQIziaMNBDgPmzpQZ9LISyB69RNXURUOI5xU3VUkYopORKluNAHNylDgtR
+	KF/vPVttl6e85KCSgGAS3hZTzGzQiQUwux/Le1Y1WUsDsZo9WU3lbnsk/jztuWMyLirt+ugr3vj
+	KD24ZU9TtBDdpNO8HXUhfqxBw0MHKPX2uSzmASyoth0DD7wXfZk7JryRy3N3tfIAwTQuVR4Xu+C
+	0zA==
+X-Received: by 2002:a05:6000:1a87:b0:42b:3ee9:4775 with SMTP id ffacd0b85a97d-42b3ee9654dmr5066665f8f.11.1762859745195;
+        Tue, 11 Nov 2025 03:15:45 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG5BmQVzCMGzSxTmdQQ5mIFBWicLh/gAll7NU+gJ69qiCBbPtixiG95p0b9x1OK2FuTFUowrQ==
+X-Received: by 2002:a05:6000:1a87:b0:42b:3ee9:4775 with SMTP id ffacd0b85a97d-42b3ee9654dmr5066617f8f.11.1762859744784;
+        Tue, 11 Nov 2025 03:15:44 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.55])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b35ad7c16sm14636974f8f.15.2025.11.11.03.15.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Nov 2025 03:15:44 -0800 (PST)
+Message-ID: <1ebaa0e4-8d7d-4340-b1de-4cb1dcf60311@redhat.com>
+Date: Tue, 11 Nov 2025 12:15:43 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Git-Hash: feb36a32054d
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/4] tools: ynltool: create skeleton for the C
+ command
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+ donald.hunter@gmail.com
+Cc: netdev@vger.kernel.org, edumazet@google.com, andrew+netdev@lunn.ch,
+ horms@kernel.org, sdf@fomichev.me, joe@dama.to, jstancek@redhat.com
+References: <20251107162227.980672-1-kuba@kernel.org>
+ <20251107162227.980672-2-kuba@kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251107162227.980672-2-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The commit a2fb4bc4e2a6a03 ("net: implement virtio helpers to handle UDP
-GSO tunneling.") introduces support for the UDP GSO tunnel feature in
-virtio-net.
+On 11/7/25 5:22 PM, Jakub Kicinski wrote:
+> Based on past discussions it seems like integration of YNL into
+> iproute2 is unlikely. YNL itself is not great as a C library,
+> since it has no backward compat (we routinely change types).
+> 
+> Most of the operations can be performed with the generic Python
+> CLI directly. There is, however, a handful of operations where
+> summarization of kernel output is very useful (mostly related
+> to stats: page-pool, qstat).
+> 
+> Create a command (inspired by bpftool, I think it stood the test
 
-The virtio spec says:
+FTR, it took me a little to understand that for this patch at least is
+"inspired" alike the notorious MS socket implementation ;)
 
-    If the \field{gso_type} has the VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV4 bit or
-    VIRTIO_NET_HDR_GSO_UDP_TUNNEL_IPV6 bit set, \field{hdr_len} accounts for
-    all the headers up to and including the inner transport.
+> of time reasonably well) to be able to plug the subcommands into.
+> 
+> Link: https://lore.kernel.org/1754895902-8790-1-git-send-email-ernis@linux.microsoft.com
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> v2:
+>  - use kernel source version
+> v1: https://lore.kernel.org/20251104232348.1954349-3-kuba@kernel.org
+> ---
+>  tools/net/ynl/Makefile              |   3 +-
+>  tools/net/ynl/ynltool/Makefile      |  52 +++++
+>  tools/net/ynl/ynltool/json_writer.h |  75 ++++++++
+>  tools/net/ynl/ynltool/main.h        |  62 ++++++
+>  tools/net/ynl/ynltool/json_writer.c | 288 ++++++++++++++++++++++++++++
+>  tools/net/ynl/ynltool/main.c        | 240 +++++++++++++++++++++++
+>  tools/net/ynl/ynltool/.gitignore    |   1 +
+>  7 files changed, 720 insertions(+), 1 deletion(-)
+>  create mode 100644 tools/net/ynl/ynltool/Makefile
+>  create mode 100644 tools/net/ynl/ynltool/json_writer.h
+>  create mode 100644 tools/net/ynl/ynltool/main.h
+>  create mode 100644 tools/net/ynl/ynltool/json_writer.c
+>  create mode 100644 tools/net/ynl/ynltool/main.c
+>  create mode 100644 tools/net/ynl/ynltool/.gitignore
+> 
+> diff --git a/tools/net/ynl/Makefile b/tools/net/ynl/Makefile
+> index 211df5a93ad9..31ed20c0f3f8 100644
+> --- a/tools/net/ynl/Makefile
+> +++ b/tools/net/ynl/Makefile
+> @@ -12,10 +12,11 @@ endif
+>  libdir  ?= $(prefix)/$(libdir_relative)
+>  includedir ?= $(prefix)/include
+>  
+> -SUBDIRS = lib generated samples
+> +SUBDIRS = lib generated samples ynltool
+>  
+>  all: $(SUBDIRS) libynl.a
+>  
+> +ynltool: | lib generated libynl.a
+>  samples: | lib generated
+>  libynl.a: | lib generated
+>  	@echo -e "\tAR $@"
+> diff --git a/tools/net/ynl/ynltool/Makefile b/tools/net/ynl/ynltool/Makefile
+> new file mode 100644
+> index 000000000000..cfabab3a20da
+> --- /dev/null
+> +++ b/tools/net/ynl/ynltool/Makefile
+> @@ -0,0 +1,52 @@
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +
+> +include ../Makefile.deps
+> +
+> +INSTALL	?= install
+> +prefix  ?= /usr
+> +
+> +CC := gcc
+> +CFLAGS := -Wall -Wextra -Werror -O2
+> +ifeq ("$(DEBUG)","1")
+> +  CFLAGS += -g -fsanitize=address -fsanitize=leak -static-libasan
+> +endif
+> +CFLAGS += -I../lib
+> +
+> +SRC_VERSION := \
+> +	$(shell make --no-print-directory -sC ../../../.. kernelversion || \
+> +		echo "unknown")
+> +
+> +CFLAGS += -DSRC_VERSION='"$(SRC_VERSION)"'
+> +
+> +SRCS := $(wildcard *.c)
+> +OBJS := $(patsubst %.c,$(OUTPUT)%.o,$(SRCS))
+> +
+> +YNLTOOL := $(OUTPUT)ynltool
+> +
+> +include $(wildcard *.d)
+> +
+> +all: $(YNLTOOL)
+> +
+> +Q = @
+> +
+> +$(YNLTOOL): $(OBJS)
+> +	$(Q)echo -e "\tLINK $@"
+> +	$(Q)$(CC) $(CFLAGS) -o $@ $(OBJS)
+> +
+> +%.o: %.c main.h json_writer.h
+> +	$(Q)echo -e "\tCC $@"
+> +	$(Q)$(COMPILE.c) -MMD -c -o $@ $<
+> +
+> +clean:
+> +	rm -f *.o *.d *~
+> +
+> +distclean: clean
+> +	rm -f $(YNLTOOL)
+> +
+> +bindir ?= /usr/bin
+> +
+> +install: $(YNLTOOL)
+> +	install -m 0755 $(YNLTOOL) $(DESTDIR)$(bindir)/$(YNLTOOL)
 
-The commit did not update the hdr_len to include the inner transport.
+Minor nit: $(INSTALL) above?
 
-I observed that the "hdr_len" is 116 for this packet:
+Also possibly using/including scripts/Makefile.include could avoid some
+code duplication? (or at least make the V=1 option effective)/
 
-    17:36:18.241105 52:55:00:d1:27:0a > 2e:2c:df:46:a9:e1, ethertype IPv4 (0x0800), length 2912: (tos 0x0, ttl 64, id 45197, offset 0, flags [none], proto UDP (17), length 2898)
-        192.168.122.100.50613 > 192.168.122.1.4789: [bad udp cksum 0x8106 -> 0x26a0!] VXLAN, flags [I] (0x08), vni 1
-    fa:c3:ba:82:05:ee > ce:85:0c:31:77:e5, ethertype IPv4 (0x0800), length 2862: (tos 0x0, ttl 64, id 14678, offset 0, flags [DF], proto TCP (6), length 2848)
-        192.168.3.1.49880 > 192.168.3.2.9898: Flags [P.], cksum 0x9266 (incorrect -> 0xaa20), seq 515667:518463, ack 1, win 64, options [nop,nop,TS val 2990048824 ecr 2798801412], length 2796
-
-116 = 14(mac) + 20(ip) + 8(udp) + 8(vxlan) + 14(inner mac) + 20(inner ip) + 32(innner tcp)
-
-Fixes: a2fb4bc4e2a6a03 ("net: implement virtio helpers to handle UDP GSO tunneling.")
-Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
----
- include/linux/virtio_net.h | 24 ++++++++++++++++--------
- 1 file changed, 16 insertions(+), 8 deletions(-)
-
-diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
-index 3cd8b2ebc197..432b17979d17 100644
---- a/include/linux/virtio_net.h
-+++ b/include/linux/virtio_net.h
-@@ -232,12 +232,23 @@ static inline int virtio_net_hdr_from_skb(const struct sk_buff *skb,
- 			return -EINVAL;
- 
- 		if (hdrlen_negotiated) {
--			hdr_len = skb_transport_offset(skb);
-+			if (sinfo->gso_type & (SKB_GSO_UDP_TUNNEL |
-+					       SKB_GSO_UDP_TUNNEL_CSUM)) {
-+				hdr_len = skb_inner_transport_offset(skb);
-+
-+				if (hdr->gso_type == VIRTIO_NET_HDR_GSO_UDP_L4)
-+					hdr_len += sizeof(struct udphdr);
-+				else
-+					hdr_len += inner_tcp_hdrlen(skb);
-+			} else {
-+				hdr_len = skb_transport_offset(skb);
-+
-+				if (hdr->gso_type == VIRTIO_NET_HDR_GSO_UDP_L4)
-+					hdr_len += sizeof(struct udphdr);
-+				else
-+					hdr_len += tcp_hdrlen(skb);
-+			}
- 
--			if (hdr->gso_type == VIRTIO_NET_HDR_GSO_UDP_L4)
--				hdr_len += sizeof(struct udphdr);
--			else
--				hdr_len += tcp_hdrlen(skb);
- 		} else {
- 			/* This is a hint as to how much should be linear. */
- 			hdr_len = skb_headlen(skb);
-@@ -421,11 +432,8 @@ virtio_net_hdr_tnl_from_skb(const struct sk_buff *skb,
-         vhdr->hash_hdr.hash_report = 0;
-         vhdr->hash_hdr.padding = 0;
- 
--	/* Let the basic parsing deal with plain GSO features. */
--	skb_shinfo(skb)->gso_type &= ~tnl_gso_type;
- 	ret = virtio_net_hdr_from_skb(skb, hdr, true, false, hdrlen_negotiated,
- 				      vlan_hlen);
--	skb_shinfo(skb)->gso_type |= tnl_gso_type;
- 	if (ret)
- 		return ret;
- 
--- 
-2.32.0.3.g01195cf9f
+/P
 
 
