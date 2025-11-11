@@ -1,98 +1,98 @@
-Return-Path: <netdev+bounces-237421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54795C4B366
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:28:45 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8040FC4B36C
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:30:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2F97C4E2DF8
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:28:44 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 1A1F534C598
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:30:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43E5A347BA7;
-	Tue, 11 Nov 2025 02:28:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60CEF3054CE;
+	Tue, 11 Nov 2025 02:30:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M4RdiADJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rA7dzTdE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B6DB32E6A6;
-	Tue, 11 Nov 2025 02:28:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35F1C7082A;
+	Tue, 11 Nov 2025 02:30:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762828121; cv=none; b=VjjiwUj/U+rOycle3saCypKTZE5e+lItMDraIqG45kYYDceFaGYcTi3aINNH11BfC7nHhS5g6QDswFBsAT9KzAhlpFWJDB1G6OlRvYzoMzk+XX8UtvV/Fj9G+td4g7oNfRPnX7q4bwKQyeeGXDGhCuRhZpx9wWWRJOlqyNaF44w=
+	t=1762828237; cv=none; b=UeNXS75rz6FYI+xLLTjlqWW6uXhCoN0Cuf30j6sMn6P9WCq+WCWnkl7nxNtpsjPrrKIbSYj3vQBYW+YKPysXpjsgHnNVW52rPmOlX7XIQRY8jEgffr145J6+lTaa2CQkeAPEzF8Osf6Xj9HWg6dKX58eGcnxvqdF5QwPRIdqY4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762828121; c=relaxed/simple;
-	bh=4bxxtNfvFtf2kuusWfaBT0tTTl9BsCBqjmM9OzoUpVk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XX27t/Ld5cfxbqUB6O3teW6ezroJkPvQePTeit/0M4JgHQAwE8f63Au8NrTP8abxPLYeycCO1OlewuG0Nu3JiMNESZuThApE3xZrnKtl3MeFUjVXCgteIDjYf6TAa4G4IOrW+K4owH3RBb5/kt3xII9LJiArTSmQnqW3gxTP17Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M4RdiADJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5803BC16AAE;
-	Tue, 11 Nov 2025 02:28:40 +0000 (UTC)
+	s=arc-20240116; t=1762828237; c=relaxed/simple;
+	bh=GgV9Iv0esINc2xmUnKv9b395UQpf4cgOVLAgAe8BYeo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Jp4ZPi9r0LbEKF/7FmnlmsAsVArzCSQYyEus4mVMZZO3/i0ECeUFFw4vZsqabC0o5EkHSqcyt4/vYSnPVbj0zZbPKtja4v1NVb7+gK15hXXG1OQJFcINMpCrI6M9zMr0rMMI76qiHFqUApOOHfKhcDcxOeGEWoUQxpzKX+FPZXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rA7dzTdE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA668C113D0;
+	Tue, 11 Nov 2025 02:30:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762828121;
-	bh=4bxxtNfvFtf2kuusWfaBT0tTTl9BsCBqjmM9OzoUpVk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=M4RdiADJtkg5A8SpLb3XYsWG8upCWva80A9sqkRGMVFM3b9cfH6cJ3y/jHm4eFlXa
-	 HaiLEF3kem3ojtD8q/+ofNZtp1Gq2kUO3k7uxYF8zw8vaZRrCaNlj2k8Vwm0rlZwAk
-	 BA8aPYzNyp4wN4ovvwopWqXEwxzZ5WHc+Zb5fDzEr8L0BosGOhKRQ6Wa1LEkWiiVBt
-	 KvJWmXEsAO6QwpDnaVioUbc3nGninPTLbUtyeSvIBChqT0YJUCfkxq53l2OopGYvsr
-	 5fJ3C2XKrDh2lIri1LkPlmr0VI3ZNjYOB+2CXwznbnZsKbry+bdUuTUbJSN0wYUZpH
-	 K5cTyOaNM1E2A==
-Date: Mon, 10 Nov 2025 18:28:39 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
-Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Arun
- Ramadoss <arun.ramadoss@microchip.com>, Pascal Eberhard
- <pascal.eberhard@se.com>, =?UTF-8?B?TWlxdcOobA==?= Raynal
- <miquel.raynal@bootlin.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2 3/4] net: dsa: microchip: Ensure a ksz_irq is
- initialized before freeing it
-Message-ID: <20251110182839.3dfb68bf@kernel.org>
-In-Reply-To: <20251106-ksz-fix-v2-3-07188f608873@bootlin.com>
-References: <20251106-ksz-fix-v2-0-07188f608873@bootlin.com>
-	<20251106-ksz-fix-v2-3-07188f608873@bootlin.com>
+	s=k20201202; t=1762828236;
+	bh=GgV9Iv0esINc2xmUnKv9b395UQpf4cgOVLAgAe8BYeo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=rA7dzTdEnsMtlUI/BO6+bJRyZQkbU01fQaFDAxTZ9MGaXz/OxgFFRRYB87O5pFUaA
+	 ZYZYjC9Xin0Sq1fzVTH40owmL03Lsxwsc6zx5q7ET4CQS4P6ofdDpG7ZZm2svNxjkg
+	 afSbOpno0TdBclf7KlBUPcFCZhXAYyQZ8cJJlqBKXnWRvWakHjGQ2dWWAUTGahmaoU
+	 0JE8+ys1cPZQakoxIifP3biAKkxN/lbYgE6XlIjT6H8WfKGSePI1nkgsYWtiRUSrlm
+	 eFoS+a6s/hvii7RIH4wVT6L4XuRkzkhS9K5o+C/Hz/B/TZSC7LUp2hXM/VR/HaEh25
+	 UYd4R1tsY7Yow==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F1A380CFD7;
+	Tue, 11 Nov 2025 02:30:08 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: mdio: fix resource leak in
+ mdiobus_register_device()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176282820725.2856551.7984445263108394336.git-patchwork-notify@kernel.org>
+Date: Tue, 11 Nov 2025 02:30:07 +0000
+References: 
+ <4b419377f8dd7d2f63f919d0f74a336c734f8fff.1762584481.git.buday.csaba@prolan.hu>
+In-Reply-To: 
+ <4b419377f8dd7d2f63f919d0f74a336c734f8fff.1762584481.git.buday.csaba@prolan.hu>
+To: Buday Csaba <buday.csaba@prolan.hu>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ mail@david-bauer.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, 06 Nov 2025 13:53:10 +0100 Bastien Curutchet (Schneider
-Electric) wrote:
-> diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-> index 3a4516d32aa5f99109853ed400e64f8f7e2d8016..4f5e2024442692adefc69d47e82381a3c3bda184 100644
-> --- a/drivers/net/dsa/microchip/ksz_common.c
-> +++ b/drivers/net/dsa/microchip/ksz_common.c
-> @@ -2858,14 +2858,16 @@ static void ksz_irq_free(struct ksz_irq *kirq)
->  {
->  	int irq, virq;
->  
-> -	free_irq(kirq->irq_num, kirq);
-> +	if (kirq->irq_num)
-> +		free_irq(kirq->irq_num, kirq);
->  
->  	for (irq = 0; irq < kirq->nirqs; irq++) {
+Hello:
 
-if the domain may not be registered is it okay to try to find mappings
-in it? From the init path it seems that kirq->nirqs is set to the port
-count before registration so it will not be 0 if domain is NULL.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
->  		virq = irq_find_mapping(kirq->domain, irq);
->  		irq_dispose_mapping(virq);
->  	}
->  
-> -	irq_domain_remove(kirq->domain);
-> +	if (kirq->domain)
-> +		irq_domain_remove(kirq->domain);
+On Sat, 8 Nov 2025 07:49:22 +0100 you wrote:
+> Fix a possible leak in mdiobus_register_device() when both a
+> reset-gpio and a reset-controller are present.
+> Clean up the already claimed reset-gpio, when the registration of
+> the reset-controller fails, so when an error code is returned, the
+> device retains its state before the registration attempt.
+> 
+> Link: https://lore.kernel.org/all/20251106144603.39053c81@kernel.org/
+> Fixes: 71dd6c0dff51 ("net: phy: add support for reset-controller")
+> Signed-off-by: Buday Csaba <buday.csaba@prolan.hu>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] net: mdio: fix resource leak in mdiobus_register_device()
+    https://git.kernel.org/netdev/net/c/e6ca8f533ed4
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
