@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-237415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D4D0C4B2DE
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:13:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D0BAC4B2CF
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:12:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F0C824F2720
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:11:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0DAE218818F7
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:12:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83572346E5E;
-	Tue, 11 Nov 2025 02:10:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2F39346A0C;
+	Tue, 11 Nov 2025 02:10:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jN4tl92i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b5ZIcIsy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53E8F346E4A;
-	Tue, 11 Nov 2025 02:10:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD4CE346FB0
+	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 02:10:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762827045; cv=none; b=MxTKC77svrE+8Ajrso9n5ECzBL6NSLL5F3hPPmvUA+OOPLLwabmpe/LgMP19XzLwlzLsBnr0e8UMA1C8ZD/Qa8//IwOPcqmoL/2xqHlTIAmiMo+CHmLuDfKXAtDhDY7M/5p/n95HtRLAV5K8g0sNNW5SJb5aGce15y5/8NEfxU4=
+	t=1762827046; cv=none; b=jrsCZuwOGvdB7C1I1JRddIJfLb1+DQ4lN0o8IBQsSjGAO9aBP/kTRLyYPxZW4rWUt26e5fU8Ym40QdZLVpZpFf+A23l9061Hj18AybVAkZK6nNxXkyNoAcaOs2uOr7XvgQ7fYSxd7Eb5dDR7az60UFahHvpnBbJLnPJeEwUy8+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762827045; c=relaxed/simple;
-	bh=ATzBksBCOTmNeMSA8xlp+L3ecCv2sI/QV4plnPjFfcg=;
+	s=arc-20240116; t=1762827046; c=relaxed/simple;
+	bh=U3Ja5ES1D5EBP9e+28kMHLJhR0ZR4ly9zioTm7hHRLQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=bE5gmtfwmLW8uNUN6M+dL1T6SOPcuMxXkwPkkcxnd8HrA6X14oXB9BkO0cg6qOmy4nhVvzbW6j03TuLBU+cgEp2pRKtQasaeRprNQo0ELc7dG2yICtYtF69imtl1+bU3qYZ+3RYc2vANFiZeg0Clf4Qm3U1uVQ0pZr9lUGFNHB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jN4tl92i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DE2F0C4CEFB;
-	Tue, 11 Nov 2025 02:10:44 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=jKqbwc84bf7Dvbo6woHn8BCg2lLY1VHNdSYmIpvaIgQnOx+UZrUVoOuXSXrQXqGVIp1q4HnYP5G8A7jQL1EugGO6+XogqfN/bdUHMZoy0oiUGArH+/FfV2iv7jnATYhoaVJrlCCX43WqrrD8RqXvNHj9F9Tln6NFGJuMGPSj30k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b5ZIcIsy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8919EC19425;
+	Tue, 11 Nov 2025 02:10:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762827044;
-	bh=ATzBksBCOTmNeMSA8xlp+L3ecCv2sI/QV4plnPjFfcg=;
+	s=k20201202; t=1762827046;
+	bh=U3Ja5ES1D5EBP9e+28kMHLJhR0ZR4ly9zioTm7hHRLQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jN4tl92iVUewXUBBdojgxUzuLY9Hp95hWi84vAgHKQQw7asUc8J8fJznq1oTtZWCh
-	 WTPE73heCZqMWqNfsP4JWu6UIK3d20R1yj8jxHiyF18SjuApFKcaf8M95vSii+3Ne4
-	 9ZgnNKp78Sown/rT5MD5OUEB1dSIgO69wnu+49PtAgNHgDP7SinubuBHIhrm94WGCG
-	 61YUCzXAebYgKbKYzGg2JAwqsQkwehTcMUJivYVaEAWpP01OfeEUsnPyg782uOUuOZ
-	 YhHe3gbdxWj9XKRhz6hJvmJGwejz/3Ws/c0fha7YsOSJIT0yLhghoyC5h3+48Wq/wE
-	 c3V7AYkEwKYIQ==
+	b=b5ZIcIsyaz55ZK0tkI38uqxiYuZ6DxNtPYsA6bjCT2dPQNIALmvHBS3piN44UctwU
+	 pHrZYit+3UlXt95Fydg4LkqYW40r/PS7xcskDc783NAVsQO/kMk3yJN8mzoT4JMDZT
+	 dyMCZyI1wOR4LpZkhnM0M4LNzYzK9eTYcW31jr8ov4rdhmXGxziDCKjdWa8f+u+gAE
+	 8KcD0J/I+UoeCyPMlSh3Hj1/70+uLw6ltb80UHIDxKnXXpUbA+WDr0UIHEnLqQdHmy
+	 CtDaCWzba/wxrrNaHU9WMUKWKYAsxuhSHoahl0YsDPr3rzj3QefK/0diQNnNrMN4VK
+	 47x9xUHSG8i/w==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADDF5380CFD7;
-	Tue, 11 Nov 2025 02:10:16 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C54380CFD7;
+	Tue, 11 Nov 2025 02:10:18 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,40 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net/smc: fix mismatch between CLC header and
- proposal
+Subject: Re: [PATCH net] bonding: fix mii_status when slave is down
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176282701549.2852248.13088246510149489093.git-patchwork-notify@kernel.org>
-Date: Tue, 11 Nov 2025 02:10:15 +0000
-References: <20251107024029.88753-1-alibuda@linux.alibaba.com>
-In-Reply-To: <20251107024029.88753-1-alibuda@linux.alibaba.com>
-To: D. Wythe <alibuda@linux.alibaba.com>
-Cc: mjambigi@linux.ibm.com, wenjia@linux.ibm.com, wintera@linux.ibm.com,
- dust.li@linux.alibaba.com, tonylu@linux.alibaba.com, guwen@linux.alibaba.com,
- kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org, pabeni@redhat.com,
- edumazet@google.com, sidraya@linux.ibm.com, jaka@linux.ibm.com
+ <176282701674.2852248.18073773842117907078.git-patchwork-notify@kernel.org>
+Date: Tue, 11 Nov 2025 02:10:16 +0000
+References: <20251106180252.3974772-1-nicolas.dichtel@6wind.com>
+In-Reply-To: <20251106180252.3974772-1-nicolas.dichtel@6wind.com>
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, jv@jvosburgh.net, andrew+netdev@lunn.ch,
+ sdf@fomichev.me, netdev@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri,  7 Nov 2025 10:40:29 +0800 you wrote:
-> The current CLC proposal message construction uses a mix of
-> `ini->smc_type_v1/v2` and `pclc_base->hdr.typev1/v2` to decide whether
-> to include optional extensions (IPv6 prefix extension for v1, and v2
-> extension). This leads to a critical inconsistency: when
-> `smc_clc_prfx_set()` fails - for example, in IPv6-only environments with
-> only link-local addresses, or when the local IP address and the outgoing
-> interface’s network address are not in the same subnet.
+On Thu,  6 Nov 2025 19:02:52 +0100 you wrote:
+> netif_carrier_ok() doesn't check if the slave is up. Before the below
+> commit, netif_running() was also checked.
 > 
-> [...]
+> Fixes: 23a6037ce76c ("bonding: Remove support for use_carrier")
+> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+> ---
+>  drivers/net/bonding/bond_main.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 
 Here is the summary with links:
-  - [net,v2] net/smc: fix mismatch between CLC header and proposal
-    https://git.kernel.org/netdev/net/c/ec33f2e5a2d0
+  - [net] bonding: fix mii_status when slave is down
+    https://git.kernel.org/netdev/net/c/2554559aba88
 
 You are awesome, thank you!
 -- 
