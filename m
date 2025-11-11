@@ -1,153 +1,174 @@
-Return-Path: <netdev+bounces-237488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1C94C4C5AF
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 09:21:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7974FC4C5CA
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 09:22:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D1CE3A892A
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 08:14:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87B724216BA
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 08:14:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C6353019D8;
-	Tue, 11 Nov 2025 08:13:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EBE632ED2A;
+	Tue, 11 Nov 2025 08:13:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="oqR3/Wsd"
+	dkim=pass (2048-bit key) header.d=listout.xyz header.i=@listout.xyz header.b="x1GkMJjg"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [80.241.56.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79AE62EC54A;
-	Tue, 11 Nov 2025 08:13:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF7AA3195EB;
+	Tue, 11 Nov 2025 08:13:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762848784; cv=none; b=WRuemWAe8CQU7yiMEjEdZIqPnXfSaZe7D8uipmP5cxJfMEYCroUSYl7I/miiKsOsPUhhLsP2pB+1+5py99T29WvbiSNjbo1XrExujEWV11DSE/aR1V1jDs7jMIcEfqIgi/u2mD4BORxE7O8qxKGxisLC0OkkMfF8mUK3ZwLy3Ck=
+	t=1762848800; cv=none; b=ZPCYDVxsvvq+ryTf6dtLdFt02I9GCnNkSjI7De5Wxf2t/8RQr5WKm/m6PIUhn+dN55mJSFIILCwrO8nRZPVa1JnQg4jEgy+elAqxZx2gDKds2aGlGeHtS/un1cnJqdA/rdsqfzaUnpwfHgWUI3hsctUmeoYvNpRvvzVnkxrFdh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762848784; c=relaxed/simple;
-	bh=BSnHCWtNGCsB4IRZUuulxMnJu4hOw0SfW2UgZLVzAVM=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=mrBNn5lwNY1wZBQ5BUmaR6JxI0yIHfusAcGM5JDIIcjYuBaUy4JHGQ9MilQjeSSihP9y1q2edA/Kj4axzks1Fx5Fq6cRR8+aRmLiCQzXlriNB4gdzwAAn68m1nOhP4YW3Pj5ppDNAWcIky3v2qQhgFBjv6p9nmbqULtm+oCLkms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=oqR3/Wsd; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=n+f2vnS/DsYTAF+aCbY0rqGLNCQaEV2shwak8otAGeo=; b=oqR3/Wsd8N0S/3HfZbMbmvWL3j
-	d7tO7FSkJl45JDD9AOLv1j9Ha402wc4sTtZvB3jMFc1rf/pr60y1RHESw8CgFJrG1SbuSawksAtSr
-	DX4bS1e6LoA5pAC6ZhwUtNzmTBtoytDvJnxblGJ7IStzwr8yLfmsYGJCyy3+2SsE/qQ5iau7hMIY/
-	r2dlFbF6VYauGcpjC9Z59DLb5F2+EqcavYLSlanhI6MTihq2nX0bp0edHEom1w6pni/BxidNA6zR3
-	26A7EOR8OCno4U++jV0ZFWlSXgzowF+JXyhxo9VBPpv+IT+tyOvtnpEm4VvIiJ+LP0wJmDH5bQhGm
-	8eONkoHw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:48894 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.98.2)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1vIjUg-000000002DZ-2AyO;
-	Tue, 11 Nov 2025 08:12:50 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.98.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1vIjUe-0000000DquB-3JDY;
-	Tue, 11 Nov 2025 08:12:48 +0000
-In-Reply-To: <aRLvrfx6tOa-RhrY@shell.armlinux.org.uk>
-References: <aRLvrfx6tOa-RhrY@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Emil Renner Berthing <kernel@esmil.dk>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Keguang Zhang <keguang.zhang@gmail.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	linux-mips@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Minda Chen <minda.chen@starfivetech.com>,
+	s=arc-20240116; t=1762848800; c=relaxed/simple;
+	bh=R/ssoBsXWb6sflro9YrhGdrY25IqwtWiz1h6+wsE/T0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=mr1dB/GSTyx2dW6722pmbfd464LCcUNKC0qK+NyAApHFi9zTBmENXOsL/J1w1JqL0AGkUumsobkS4V0DMuoMAKYTytJIrAFiZpEhlgfyZUv/mqsiqv4zi66WFDR/PNE4+hpF4oAWmy2g4Eh7C8WCHGSmlA9lc7cB+t2d0qsij2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=listout.xyz; spf=pass smtp.mailfrom=listout.xyz; dkim=pass (2048-bit key) header.d=listout.xyz header.i=@listout.xyz header.b=x1GkMJjg; arc=none smtp.client-ip=80.241.56.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=listout.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=listout.xyz
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4d5K6H5JKcz9tKq;
+	Tue, 11 Nov 2025 09:13:11 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=listout.xyz; s=MBO0001;
+	t=1762848791;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=imzhVMup//2ffpyDtioFEjTxYvW8FouyExcfdyRpW2E=;
+	b=x1GkMJjgkJYoYbiV8LMtZu5UcfOYdsFUA3NkHmy4qTI81xd9zZaeB8K94fmi6057tKCKOJ
+	8QcP0INhKYOURMyNOyIKAswwaUQ2RXERTDFey2tIRzjVxtalpawNYy4z6fMDrMBhx7gnSP
+	9BpNCeHNkx9StWMBR9hEzqpBvz6Jle+9uRShx+rBTgjmBmvk4xnrEj8aOLracSCOOIt8+f
+	0mooEuhFSkDR9+SBBtg06urTZHATDY9YI4eB4ymcPP5V6r8A8y+LzpwbhK+AGfPGtZXxrQ
+	kJ85WFG6/WzMxXy5bOZmojJissiySNZG1FlyzXMnK29YvB6OTMLqrDxD+D2J/Q==
+Authentication-Results: outgoing_mbo_mout;
+	dkim=none;
+	spf=pass (outgoing_mbo_mout: domain of listout@listout.xyz designates 2001:67c:2050:b231:465::102 as permitted sender) smtp.mailfrom=listout@listout.xyz
+From: Brahmajit Das <listout@listout.xyz>
+To: syzbot+d1b7fa1092def3628bd7@syzkaller.appspotmail.com
+Cc: andrii@kernel.org,
+	ast@kernel.org,
+	bpf@vger.kernel.org,
+	contact@arnaud-lcm.com,
+	daniel@iogearbox.net,
+	eddyz87@gmail.com,
+	haoluo@google.com,
+	john.fastabend@gmail.com,
+	jolsa@kernel.org,
+	kpsingh@kernel.org,
+	linux-kernel@vger.kernel.org,
+	martin.lau@linux.dev,
 	netdev@vger.kernel.org,
-	Nobuhiro Iwamatsu <nobuhiro.iwamatsu.x90@mail.toshiba>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next v2 13/13] net: stmmac: visconti: use
- stmmac_get_phy_intf_sel()
+	sdf@fomichev.me,
+	song@kernel.org,
+	syzkaller-bugs@googlegroups.com,
+	yonghong.song@linux.dev
+Subject: [PATCH bpf-next v3] bpf: Clamp trace length in __bpf_get_stack to fix OOB write
+Date: Tue, 11 Nov 2025 13:42:54 +0530
+Message-ID: <20251111081254.25532-1-listout@listout.xyz>
+In-Reply-To: <691231dc.a70a0220.22f260.0101.GAE@google.com>
+References: <691231dc.a70a0220.22f260.0101.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1vIjUe-0000000DquB-3JDY@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 11 Nov 2025 08:12:48 +0000
+X-Rspamd-Queue-Id: 4d5K6H5JKcz9tKq
 
-Use stmmac_get_phy_intf_sel() to decode the PHY interface mode to the
-phy_intf_sel value, validate the result and use that to set the
-control register to select the operating mode for the DWMAC core.
+syzbot reported a stack-out-of-bounds write in __bpf_get_stack()
+triggered via bpf_get_stack() when capturing a kernel stack trace.
 
-Note that this will allow GMII as well as MII as the phy_intf_sel
-value is the same for both.
+After the recent refactor that introduced stack_map_calculate_max_depth(),
+the code in stack_map_get_build_id_offset() (and related helpers) stopped
+clamping the number of trace entries (`trace_nr`) to the number of elements
+that fit into the stack map value (`num_elem`).
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+As a result, if the captured stack contained more frames than the map value
+can hold, the subsequent memcpy() would write past the end of the buffer,
+triggering a KASAN report like:
+
+    BUG: KASAN: stack-out-of-bounds in __bpf_get_stack+0x...
+    Write of size N at addr ... by task syz-executor...
+
+Restore the missing clamp by limiting `trace_nr` to `num_elem` before
+computing the copy length. This mirrors the pre-refactor logic and ensures
+we never copy more bytes than the destination buffer can hold.
+
+No functional change intended beyond reintroducing the missing bound check.
+
+Reported-by: syzbot+d1b7fa1092def3628bd7@syzkaller.appspotmail.com
+Fixes: e17d62fedd10 ("bpf: Refactor stack map trace depth calculation into helper function")
+Signed-off-by: Brahmajit Das <listout@listout.xyz>
 ---
- .../ethernet/stmicro/stmmac/dwmac-visconti.c  | 26 +++++--------------
- 1 file changed, 6 insertions(+), 20 deletions(-)
+Changes in v3:
+Revert back to num_elem based logic for setting trace_nr. This was
+suggested by bpf-ci bot, mainly pointing out the chances of underflow
+when  max_depth < skip.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c
-index 7b6b048e1be0..9497b13a5753 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-visconti.c
-@@ -42,10 +42,6 @@
- 
- #define ETHER_CLK_SEL_RX_TX_CLK_EN (ETHER_CLK_SEL_RX_CLK_EN | ETHER_CLK_SEL_TX_CLK_EN)
- 
--#define ETHER_CONFIG_INTF_MII	PHY_INTF_SEL_GMII_MII
--#define ETHER_CONFIG_INTF_RGMII	PHY_INTF_SEL_RGMII
--#define ETHER_CONFIG_INTF_RMII	PHY_INTF_SEL_RMII
--
- struct visconti_eth {
- 	void __iomem *reg;
- 	struct clk *phy_ref_clk;
-@@ -150,22 +146,12 @@ static int visconti_eth_init_hw(struct platform_device *pdev, struct plat_stmmac
+Quoting the bot's reply:
+The stack_map_calculate_max_depth() function can return a value less than
+skip when sysctl_perf_event_max_stack is lowered below the skip value:
+
+    max_depth = size / elem_size;
+    max_depth += skip;
+    if (max_depth > curr_sysctl_max_stack)
+        return curr_sysctl_max_stack;
+
+If sysctl_perf_event_max_stack = 10 and skip = 20, this returns 10.
+
+Then max_depth - skip = 10 - 20 underflows to 4294967286 (u32 wraps),
+causing min_t() to not limit trace_nr at all. This means the original OOB
+write is not fixed in cases where skip > max_depth.
+
+With the default sysctl_perf_event_max_stack = 127 and skip up to 255, this
+scenario is reachable even without admin changing sysctls.
+
+Changes in v2:
+- Use max_depth instead of num_elem logic, this logic is similar to what
+we are already using __bpf_get_stackid
+Link: https://lore.kernel.org/all/20251111003721.7629-1-listout@listout.xyz/
+
+Changes in v1:
+- RFC patch that restores the number of trace entries by setting
+trace_nr to trace_nr or num_elem based on whichever is the smallest.
+Link: https://lore.kernel.org/all/20251110211640.963-1-listout@listout.xyz/
+---
+ kernel/bpf/stackmap.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/kernel/bpf/stackmap.c b/kernel/bpf/stackmap.c
+index 2365541c81dd..cef79d9517ab 100644
+--- a/kernel/bpf/stackmap.c
++++ b/kernel/bpf/stackmap.c
+@@ -426,7 +426,7 @@ static long __bpf_get_stack(struct pt_regs *regs, struct task_struct *task,
+ 			    struct perf_callchain_entry *trace_in,
+ 			    void *buf, u32 size, u64 flags, bool may_fault)
  {
- 	struct visconti_eth *dwmac = plat_dat->bsp_priv;
- 	unsigned int clk_sel_val;
--	u32 phy_intf_sel;
--
--	switch (plat_dat->phy_interface) {
--	case PHY_INTERFACE_MODE_RGMII:
--	case PHY_INTERFACE_MODE_RGMII_ID:
--	case PHY_INTERFACE_MODE_RGMII_RXID:
--	case PHY_INTERFACE_MODE_RGMII_TXID:
--		phy_intf_sel = ETHER_CONFIG_INTF_RGMII;
--		break;
--	case PHY_INTERFACE_MODE_MII:
--		phy_intf_sel = ETHER_CONFIG_INTF_MII;
--		break;
--	case PHY_INTERFACE_MODE_RMII:
--		phy_intf_sel = ETHER_CONFIG_INTF_RMII;
--		break;
--	default:
-+	int phy_intf_sel;
-+
-+	phy_intf_sel = stmmac_get_phy_intf_sel(plat_dat->phy_interface);
-+	if (phy_intf_sel != PHY_INTF_SEL_GMII_MII &&
-+	    phy_intf_sel != PHY_INTF_SEL_RGMII &&
-+	    phy_intf_sel != PHY_INTF_SEL_RMII) {
- 		dev_err(&pdev->dev, "Unsupported phy-mode (%d)\n", plat_dat->phy_interface);
- 		return -EOPNOTSUPP;
+-	u32 trace_nr, copy_len, elem_size, max_depth;
++	u32 trace_nr, copy_len, elem_size, num_elem, max_depth;
+ 	bool user_build_id = flags & BPF_F_USER_BUILD_ID;
+ 	bool crosstask = task && task != current;
+ 	u32 skip = flags & BPF_F_SKIP_FIELD_MASK;
+@@ -480,6 +480,8 @@ static long __bpf_get_stack(struct pt_regs *regs, struct task_struct *task,
  	}
+ 
+ 	trace_nr = trace->nr - skip;
++	num_elem = size / elem_size;
++	trace_nr = min_t(u32, trace_nr, num_elem);
+ 	copy_len = trace_nr * elem_size;
+ 
+ 	ips = trace->ip + skip;
 -- 
-2.47.3
+2.51.2
 
 
