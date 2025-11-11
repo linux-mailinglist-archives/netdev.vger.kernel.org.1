@@ -1,182 +1,212 @@
-Return-Path: <netdev+bounces-237544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E2DDC4CEF8
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 11:13:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15922C4D00D
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 11:25:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D687C18884DB
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 10:14:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D1CD422229
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 10:15:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACDD4334C11;
-	Tue, 11 Nov 2025 10:13:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7564234886B;
+	Tue, 11 Nov 2025 10:15:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P8oPiluu";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hhk+fUfW"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="kdHVOZWO"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from SJ2PR03CU001.outbound.protection.outlook.com (mail-westusazon11012051.outbound.protection.outlook.com [52.101.43.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81928304BD0
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 10:13:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762856018; cv=none; b=DAVbkDzD5JRAk0RNy3tBqacIqR2nhJWnHQFVo9e4SeZj1SnNgXDmrahyqnx65FLMN2uVXy8v5N25Cc6PNO3kUnSG4Mb2vLJSQaHH95hamC7MH9hSnEokdiym18QEOFzveJq0rDqU5CcVESX8NP2MVDvRrTlyTB5Skt38XN9PYFI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762856018; c=relaxed/simple;
-	bh=WkyJ7wXlU3Y179InlLzeaIBiSRKrxBNojZPNLGg/meM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MyIk0r0+sY6YgVAkINdm4eUpkU5JAV6vMFpDbBrhXdqmVjpkFBCAanQIgQwW1xjWJvbBfi4jEMrknk5QfnU7IaE41uQOsThG5EMSJAfjfFwNQFYuhfuLoumr2Td2VjOEy+il+fE1TELeGns4qx1TjzVKu8wZHBWiRrN/OQs9snY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P8oPiluu; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Hhk+fUfW; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762856015;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tWIdabjoIl/GpEWbTxxG5QL1xcrQ2UzLO8Uh5MSiqpM=;
-	b=P8oPiluujwFirZxq47Ph5F1aRuEUKMCLsIB+Jjd13TnnEAWzDb1vWdwnoCg9cVIuVYvgmj
-	RLKE2TD1KcMHbXAbJsakmV/Tm98mLk+dgCmWsBRYokDrykJ/XdIvKFztYxWd4pN7QyfzIA
-	96qxBSyul2syB7qEte6zAnDLTDANWm8=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-623-wtnilTFNOB6CcE6dllAlYw-1; Tue, 11 Nov 2025 05:13:34 -0500
-X-MC-Unique: wtnilTFNOB6CcE6dllAlYw-1
-X-Mimecast-MFC-AGG-ID: wtnilTFNOB6CcE6dllAlYw_1762856013
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-477771366cbso13974075e9.0
-        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 02:13:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762856013; x=1763460813; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tWIdabjoIl/GpEWbTxxG5QL1xcrQ2UzLO8Uh5MSiqpM=;
-        b=Hhk+fUfWuPqsLZlVLn2tAxCbJjOjZ0OyTIwpZCpBzegKXXaVsiFnimDj3diFAyOqsr
-         eRiElkPy7DDEC8uGiNVaWpgzROoPZDiUBJ5J1yT8wVPgtg9wUn2m0FKZkTT8M5J4srn0
-         ujAPebkKgtUr+l/lzlnxPHLVInuGK6l+84oZY2gD+fB59i7E9WnxR96h4/0w5RoMSXtN
-         yPCFEgnCNXR3o7VoGGj5TNEoJmw76DXDpwwSDajxdF9quFZ+IZRczptw4g3/XyTuNl/b
-         n6QyDN6k7W5lTkm2QrKEf4X7Ob02PzCRxAVhhbxt3p/+HMNYEzr5ovbdEhPokHZDoUgm
-         lg0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762856013; x=1763460813;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tWIdabjoIl/GpEWbTxxG5QL1xcrQ2UzLO8Uh5MSiqpM=;
-        b=iY4gD6Hj1k616iUabT/OtCxFv/wXEGArTbZZECCEoXTvV6Wl7ASFSwIxqcKZWBU0Qf
-         i/EzDmWIA6gUQsU4VNNGFRfNHwodvr5A59AvWM/1JkSR5N7CXmQBUakofIhMLvj/0wgk
-         5rDhRG1SgpRJjsh8k8GpUOE/hXyM8lYPf6VQqF2RNnysX6ZPw5d1GMmtHRPD2ZCRMxeI
-         KKBCS4QgLr8lwfvTlzzwGVqPVDx67ZRhWtsT4Qyo5TU7BrbJM33viQWhC8HDXf6CqS4L
-         2veVov4UzHBL/E5X/uslm8oI9yVUUDC0V4eIv+mU3oeaqkYBPD2K6wfQhQEEkDFEmqfz
-         3Rnw==
-X-Forwarded-Encrypted: i=1; AJvYcCXSrb4PbKDLGO3fTqlSxaYz02WLk/nlram8wcTZVcLqJvm/jE0tj5erYJUBV4Z+80K/PDzZ4nA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwS/cHH1iDy3rzW2CMhgUHODo3GszF8s7E5KHwE0N47L3kq/Z3f
-	wQZTg0I5p8PbDpul+01RdlPkp2/0APGi7hB1hh+6TqIN45IDTqQ2LCRpxWt7ZzU5BF3k3sVDsnM
-	VFDm16w22HeioX1QHTRIUYRWOghBX1S/wGb/txY298hkkBNs0JCBHQQW7yw==
-X-Gm-Gg: ASbGncue8lgdY2lwDd8vWREo9TSjCnJy82zOdMrYHLcgIKEcB7C/8p1hJuygEdIHX0y
-	Mxd/4g0qAea5eICxdKw8g62pDvwzdTMnAKOW76ATnHBGhmrVo0mGC+2wx2mCwI06UcmdYRNuzeE
-	mfpDbcf92zYw1pozB+WyTFRLzb3RAvIMF7HGXf7HWiUm6F9YBj5oM2IFo4P+6N48wvMK9ERzevG
-	8+D1vhjvOA9Cq+vc9YA1SHNmOC/DMeqfMX0RvxcpK95/9yRlM9yh/WYQlT6XKDOz+gOgUH9YDAx
-	j4MfdIccpckIFAZskttDmotmZeG1wuhuXqHeGqJzd8S3IAcAyQmaK8qJZoiQVPcjAN5xx5+W3Ng
-	J9A==
-X-Received: by 2002:a05:600c:474c:b0:477:55c9:c3ea with SMTP id 5b1f17b1804b1-4777329747emr91118645e9.35.1762856012895;
-        Tue, 11 Nov 2025 02:13:32 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGwju2eerJqJ/sKKgP7LErOCpNGcS4xksJ9Dc99yY2BVV7WFCIJNXdq55bjtbk5k9a7KTteNg==
-X-Received: by 2002:a05:600c:474c:b0:477:55c9:c3ea with SMTP id 5b1f17b1804b1-4777329747emr91118435e9.35.1762856012407;
-        Tue, 11 Nov 2025 02:13:32 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.155.55])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4778289c036sm12751605e9.1.2025.11.11.02.13.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Nov 2025 02:13:32 -0800 (PST)
-Message-ID: <a9db02a3-f774-4a81-b641-24f76290ed74@redhat.com>
-Date: Tue, 11 Nov 2025 11:13:30 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E4BA347BC1;
+	Tue, 11 Nov 2025 10:15:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.43.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762856143; cv=fail; b=P0Xi9bciXkUvER0vaqlUjzQpRXSXt9ukEWX81/WzXJGMmcvEt2VvZezEUIiy1v+oEDttzxb2SfcqdBb7aGJOsyaxUCf+RHOHCIcDqDJS3tRDFLP3UpYPOv7XZbVx2RH4ItLXh4jizc9jNoCSt174FLPltBAbsv1xG3yyM/B9A3s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762856143; c=relaxed/simple;
+	bh=IGkX09IZ33U8pvPbgZO+pPmd69QGth4oNYUkIVHtbfQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eWr95FUsY9xfxBNon0iHR0LBB1pvTIPdjhhn1fF8dX/Vef5fTKlYNQUtCPp0BJODAcI7brQMTlld50Y6M0N1x75U42fvRw7fvcX+XYuF/PzrUz8gCBv2MC+XmRj+fxDnJL9uwv3Jad1V/kx1NcOKKYekA4t3vowg+DROAb4sNr4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=kdHVOZWO; arc=fail smtp.client-ip=52.101.43.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=HLyDF9r+bMnMZQF+tiodsEfJTweWh11PfMW4ITjEnnYVn8VlToL88DJnjiuU+tWHqw9pFWv+yt9t/UXwtdlqB3uod4SO6CLYLU6kWxB2zU2dcfyDXfUoUUhttpe8yx4JvOEwpNp2z4LXz7Ig+bjvWYz52JJN8xCvIAMXPf+ere9+9AX36fZoRON6TwyLd1mRrSNvJ5eXyYR4gIXmEwM1Yu/qEFGTEnDDsXC3Idg7A2INJuVeL0xhrcXxde2O0Zvf86p5h0BBPo7yOO1zXdxchDVtUzZio4OTmsG1lgNnQi6BYB6WZTIWZWe1JXOiB2PQhLgE6qY457mYCUxR6XfKxg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=u/g10OXeyFVYDRWSv01A8reEIOYXEZwVJLGHlt+4yIc=;
+ b=MOGUcK6Qc3rGqQjJSFn1F7Xl2cqwoeExp3KfArkEvZdh6A7yeW5mmoBnV3PW+mPOlALv6wIzS4z1bypVIiUTchAb6nPbWjgV/fuKy1RpYDBn84EDvp8YWVJoUWo1+hIBWbC5dtlwhJLTMzf2w5gCWyHoJQ0LbjNlfh154lK3byVkwvF+9Ja659RWQW6Tc+Ie56tBcmsEyWn/E9bUOjIr+XLenGMYXTHB85PZFXiEOA0AVfOQMlTVxXgrOmT5bWN/ZESTsDgKt84Fo6HZpmTe1sygfZK7OZPpqIli5O82+Nu+KSXuAbNZMFakDsBJSZCLLlc/r2eK8q6p/LGb8jtThg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 198.47.23.194) smtp.rcpttodomain=kernel.org smtp.mailfrom=ti.com; dmarc=pass
+ (p=quarantine sp=none pct=100) action=none header.from=ti.com; dkim=none
+ (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=u/g10OXeyFVYDRWSv01A8reEIOYXEZwVJLGHlt+4yIc=;
+ b=kdHVOZWOE52EMXpEkLvx5cbUkSE/YxJZ8yOIEDpyB2hBkU1AeRQuD4iUimhZjguzNsELnSAoJF1Ms1XpJToG2ojJFOpEVhbVv1QEEsevOgPlLi/UN7G6mpgVF4q1mKb+PRMu79RSuKrO40UA5GsFFYBu1BE565dW6dbhy0twn6w=
+Received: from BY3PR05CA0042.namprd05.prod.outlook.com (2603:10b6:a03:39b::17)
+ by SA1PR10MB7815.namprd10.prod.outlook.com (2603:10b6:806:3ac::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.16; Tue, 11 Nov
+ 2025 10:15:37 +0000
+Received: from SJ1PEPF00002311.namprd03.prod.outlook.com
+ (2603:10b6:a03:39b:cafe::86) by BY3PR05CA0042.outlook.office365.com
+ (2603:10b6:a03:39b::17) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.9320.15 via Frontend Transport; Tue,
+ 11 Nov 2025 10:15:18 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 198.47.23.194)
+ smtp.mailfrom=ti.com; dkim=none (message not signed) header.d=none;dmarc=pass
+ action=none header.from=ti.com;
+Received-SPF: Pass (protection.outlook.com: domain of ti.com designates
+ 198.47.23.194 as permitted sender) receiver=protection.outlook.com;
+ client-ip=198.47.23.194; helo=lewvzet200.ext.ti.com; pr=C
+Received: from lewvzet200.ext.ti.com (198.47.23.194) by
+ SJ1PEPF00002311.mail.protection.outlook.com (10.167.242.165) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.9320.13 via Frontend Transport; Tue, 11 Nov 2025 10:15:37 +0000
+Received: from DLEE211.ent.ti.com (157.170.170.113) by lewvzet200.ext.ti.com
+ (10.4.14.103) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 11 Nov
+ 2025 04:15:29 -0600
+Received: from DLEE207.ent.ti.com (157.170.170.95) by DLEE211.ent.ti.com
+ (157.170.170.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Tue, 11 Nov
+ 2025 04:15:29 -0600
+Received: from lelvem-mr05.itg.ti.com (10.180.75.9) by DLEE207.ent.ti.com
+ (157.170.170.95) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20 via Frontend
+ Transport; Tue, 11 Nov 2025 04:15:29 -0600
+Received: from fllv0122.itg.ti.com (fllv0122.itg.ti.com [10.247.120.72])
+	by lelvem-mr05.itg.ti.com (8.18.1/8.18.1) with ESMTP id 5ABAFTkb751480;
+	Tue, 11 Nov 2025 04:15:29 -0600
+Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
+	by fllv0122.itg.ti.com (8.14.7/8.14.7) with ESMTP id 5ABAFRQj011888;
+	Tue, 11 Nov 2025 04:15:28 -0600
+From: Meghana Malladi <m-malladi@ti.com>
+To: <horms@kernel.org>, <namcao@linutronix.de>, <vadim.fedorenko@linux.dev>,
+	<jacob.e.keller@intel.com>, <m-malladi@ti.com>, <christian.koenig@amd.com>,
+	<sumit.semwal@linaro.org>, <sdf@fomichev.me>, <john.fastabend@gmail.com>,
+	<hawk@kernel.org>, <daniel@iogearbox.net>, <ast@kernel.org>,
+	<pabeni@redhat.com>, <kuba@kernel.org>, <edumazet@google.com>,
+	<davem@davemloft.net>, <andrew+netdev@lunn.ch>
+CC: <linaro-mm-sig@lists.linaro.org>, <dri-devel@lists.freedesktop.org>,
+	<linux-media@vger.kernel.org>, <bpf@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-arm-kernel@lists.infradead.org>, <srk@ti.com>, Vignesh Raghavendra
+	<vigneshr@ti.com>, Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
+Subject: [PATCH net-next v5 0/6] Add AF_XDP zero copy support
+Date: Tue, 11 Nov 2025 15:45:17 +0530
+Message-ID: <20251111101523.3160680-1-m-malladi@ti.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/ipv6: fix lookup for ::/0 (non-)subtree
- route
-To: David Lamparter <equinox@diac24.net>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- Lorenzo Colitti <lorenzo@google.com>, Patrick Rohr <prohr@google.com>,
- =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
-References: <20251105145446.10001-1-equinox@diac24.net>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251105145446.10001-1-equinox@diac24.net>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00002311:EE_|SA1PR10MB7815:EE_
+X-MS-Office365-Filtering-Correlation-Id: 31d7b8c4-9d52-4619-f3d5-08de210b4235
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|36860700013|1800799024|82310400026|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?AWnrbSmOnAhZNlFv1GCQqafgr3yS/7mxg4Uiy4F14sbk26IU/i905lp0KFOL?=
+ =?us-ascii?Q?vbz7R3Ex+hgrRxfnpWvSyji41Lz4jVlZQrznReRn449O8s5o6C0nwyLF7pEk?=
+ =?us-ascii?Q?GC5G5t3tQNLEEd0u1jF+64gdybHnQV5MA5oQY4ksptdtour1OGLz3+4dZ/6w?=
+ =?us-ascii?Q?rDw8KhZn+XXvI/wQa13nUMc1kX0uNwtkgdVZ4qKwk3qv8V99S2XdjgupUzoC?=
+ =?us-ascii?Q?E9kalPbkJE0Mae+bDx54Nz0FIUS41Yfz/IX8WgiiUk658T1tIfN1vbU4mE8w?=
+ =?us-ascii?Q?zVvfv7JlJiZSgf83+wchL7lNM9MBF5hiEyYrDSR8b3Eu4Cr3UmPTzoCwBGq8?=
+ =?us-ascii?Q?MS1n4MmJGqG6CqycgyZ9w5cXiAP7CEODeBsQOEtfJPNFTU5PGV9DCK2GgAIT?=
+ =?us-ascii?Q?Hjzr3mmhotiX0iEAZ3uRD5gAqTFy/8aFtK2FkBokaPd4PHDZXNBQ7qm6Gn+N?=
+ =?us-ascii?Q?D+bCrpy1zkpZUq1j5PL25MOiANbioiDN2H/XTuRu9pJQB99uoq29JbIpfZkh?=
+ =?us-ascii?Q?7Jj2CBpkx/4jrih/vAapHZOFuJDfR9Bo/0zTTJf6RObdb/FUrv/a02Uo/cCk?=
+ =?us-ascii?Q?HAQ51b4YEFwqwRhdwqAA+t65IfuSIT5/oLroSt0U1pSDcSYYa3eVcUviyhS0?=
+ =?us-ascii?Q?mXhudZl+u85zvFS3HTv8VO1ULeAKk/8a3GCdN2mR4bF3WbJtSb58Smxlmekk?=
+ =?us-ascii?Q?cHJlJO0D3tPaUMGEEhikUJQMNp1iaUElEJvIB8VJ04aIuPvFcLmYXn/HVgot?=
+ =?us-ascii?Q?HHPTY0SvxvxrHsUioJulwro7RXz6Dg33LHmiTFHSw2ttrom4JavU2Flb9pVZ?=
+ =?us-ascii?Q?2rJFTNPT5Re3x0UY++wFV0WCGVc7bbLjvtnpW43WtoXaStMHRxvDLmGG+yrt?=
+ =?us-ascii?Q?qYI8iCRgikye0q4g4pXhnLC3yh/q47jFXnfPIm0teyMY8opZ61EQXGW3pp1l?=
+ =?us-ascii?Q?yUfOzpLW+Qq0pfz1JCUNeTd+HR/Sc/m0dIxzH+EI3TrYYgba/M1fB3dQYt9f?=
+ =?us-ascii?Q?hm5/jQo3QP8rwMKhlxFJZhbQEcEd0k7CJsnR/iMamkAD5j60uAZYzXRl4uiD?=
+ =?us-ascii?Q?ymitTdyebvjbjN6kZrs6V1aH14VVEqL6IZbUqDTX2qZ79Vc6QQyGf4nJopNd?=
+ =?us-ascii?Q?Etcdg0kZyaMY28nkLqYYXqQlRXIcVTSOGN4YgBNKOWOWdNSpMF1hKrN7Xdsk?=
+ =?us-ascii?Q?pLHdY620AN6L5N5gp2ZfIufj9AMF+JErWcGqwMeHJg9vO4rQQSGeJcwGLkIK?=
+ =?us-ascii?Q?vV+7eHJVE1gwDaMLd+RmZYhLqjzuq8m/knAMM5ltycubzU1VHzNA9OaOizV8?=
+ =?us-ascii?Q?1M7Hn8Z+HjzPZdsQVREG1LGniURf6blZ/DGl+yq+ZKn5Fn/XOhgZbY6CId8f?=
+ =?us-ascii?Q?+6+N3XIu+uaIe7/+x/HZQn75H0ppB7SOCSzCtGEKJKjNxYt/1KjgxsBPMRQT?=
+ =?us-ascii?Q?ZLfzj/pXwpi+7WymZ2rQsx0Nk/qUDFbtCgztuze/7RhR+BCWroYMmxbOE7xO?=
+ =?us-ascii?Q?D5AnzxinHh4lJtL2ZZwtsKWD2Rgin6ROKl6CfmCxaGlO1fhIxpZsZ7yShqSi?=
+ =?us-ascii?Q?NXLP2hud5pRMLgUDBBIkHiaUz7mgGGXKvG6QtbIz?=
+X-Forefront-Antispam-Report:
+	CIP:198.47.23.194;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:lewvzet200.ext.ti.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(376014)(36860700013)(1800799024)(82310400026)(921020);DIR:OUT;SFP:1101;
+X-OriginatorOrg: ti.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Nov 2025 10:15:37.1722
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 31d7b8c4-9d52-4619-f3d5-08de210b4235
+X-MS-Exchange-CrossTenant-Id: e5b49634-450b-4709-8abb-1e2b19b982b7
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=e5b49634-450b-4709-8abb-1e2b19b982b7;Ip=[198.47.23.194];Helo=[lewvzet200.ext.ti.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00002311.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR10MB7815
 
-On 11/5/25 3:54 PM, David Lamparter wrote:
-> Assume a scenario with something like the following routes:
-> default via fe80::1 dev dummy0
-> 2001:db8:1::/48 via fe80::10 dev dummy0
-> 2001:db8:1::/48 from 2001:db8:1:2::/64 via fe80::12 dev dummy0
-> 
-> Now if a lookup happens for 2001:db8:1::2345, but with a source address
-> *not* covered by the third route, the expectation is to hit the second
-> one.  Unfortunately, this was broken since the code, on failing the
-> lookup in the subtree, didn't consider the node itself which the subtree
-> is attached to, i.e. route #2 above.
-> 
-> The fix is simple, check if the subtree is attached to a node that is
-> itself a valid route before backtracking to less specific destination
-> prefixes.
-> 
-> This case is somewhat rare for several reasons.  To begin with, subtree
-> routes are most commonly attached to the default destination.
-> Additionally, in the rare cases where a non-default destination prefix
-> is host to subtree routes, the fallback on not hitting any subtree route
-> is commonly a default route (or a subtree route on that).
-> 
-> (Note that this was working for the "::/0 from ::/0" case since the root
-> node is special-cased.  The issue was discovered during RFC 6724 rule
-> 5.5 testing, trying to find edge cases.)
-> 
-> Signed-off-by: David Lamparter <equinox@diac24.net>
-> Cc: Lorenzo Colitti <lorenzo@google.com>
-> Cc: Patrick Rohr <prohr@google.com>
-> Cc: Maciej Żenczykowski <maze@google.com>
-> ---
->  net/ipv6/ip6_fib.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-> index 02c16909f618..c18e9331770d 100644
-> --- a/net/ipv6/ip6_fib.c
-> +++ b/net/ipv6/ip6_fib.c
-> @@ -1650,8 +1650,11 @@ static struct fib6_node *fib6_node_lookup_1(struct fib6_node *root,
->  					struct fib6_node *sfn;
->  					sfn = fib6_node_lookup_1(subtree,
->  								 args + 1);
-> -					if (!sfn)
-> +					if (!sfn) {
-> +						if (fn->fn_flags & RTN_RTINFO)
-> +							return fn;
->  						goto backtrack;
-> +					}
->  					fn = sfn;
->  				}
->  #endif
+This series adds AF_XDP zero coppy support to icssg driver.
 
-The patch LGTM, and I agree this should go via net-next, given that it's
-really a corner case and I could miss nasty side-effects.
+Tests were performed on AM64x-EVM with xdpsock application [1].
 
-It looks like you have some testing scenario handy: it would be great to
-include it as a paired self-test; could you please add it?
+A clear improvement is seen Transmit (txonly) and receive (rxdrop)
+for 64 byte packets. 1500 byte test seems to be limited by line
+rate (1G link) so no improvement seen there in packet rate
 
-Thanks,
+Having some issue with l2fwd as the benchmarking numbers show 0
+for 64 byte packets after forwading first batch packets and I am
+currently looking into it.
 
-Paolo
+AF_XDP performance using 64 byte packets in Kpps.
+AF_XDP performance using 64 byte packets in Kpps.
+Benchmark:	XDP-SKB		XDP-Native	XDP-Native(ZeroCopy)
+rxdrop		253		473		656
+txonly		350		354		855
+l2fwd 		178		240		0
+
+AF_XDP performance using 1500 byte packets in Kpps.
+Benchmark:	XDP-SKB		XDP-Native	XDP-Native(ZeroCopy)
+rxdrop		82		82		82
+txonly		81		82		82
+l2fwd 		81		82		82
+
+[1]: https://github.com/xdp-project/bpf-examples/tree/master/AF_XDP-example
+v4: https://lore.kernel.org/all/20251023093927.1878411-1-m-malladi@ti.com/
+
+v5-v4:
+- Rebased to the latest tip
+- Collected Reviewed-by from Jacob Keller <jacob.e.keller@intel.com>
+
+Meghana Malladi (6):
+  net: ti: icssg-prueth: Add functions to create and destroy Rx/Tx
+    queues
+  net: ti: icssg-prueth: Add XSK pool helpers
+  net: ti: icssg-prueth: Add AF_XDP zero copy for TX
+  net: ti: icssg-prueth: Make emac_run_xdp function independent of page
+  net: ti: icssg-prueth: Add AF_XDP zero copy for RX
+  net: ti: icssg-prueth: Enable zero copy in XDP features
+
+ drivers/net/ethernet/ti/icssg/icssg_common.c | 471 ++++++++++++++++---
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c | 394 +++++++++++++---
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h |  25 +-
+ 3 files changed, 741 insertions(+), 149 deletions(-)
+
+
+base-commit: b981e100c19dcd91ce8cca8562c3cdabd4fcf28c
+-- 
+2.43.0
 
 
