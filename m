@@ -1,186 +1,253 @@
-Return-Path: <netdev+bounces-237678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C906DC4EAC4
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 16:07:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25903C4EB36
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 16:11:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 723BD4FF9A1
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 14:57:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64CF518851C2
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 15:04:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE3C530FC15;
-	Tue, 11 Nov 2025 14:57:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2EE2357A2C;
+	Tue, 11 Nov 2025 15:04:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a6jrN+0X"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Wr3VZuHa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBD5625C818
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 14:57:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 332B52FB60E
+	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 15:03:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762873023; cv=none; b=OgwiL7jcSggtecoGyztldHAeYO+rPO91tWx+A3YlBFnb8DA3VBCmIpg/QnVZBy+pF7mq6LOzCpPjfAllyL1ZRo5zpLl4AcXTScdhtqYn31a4XXAWSxhqB8DZUv5vzXXaZQYDrymKs6P3/gtj7JhwmqP71+feB7lEVeJWLCUIXSs=
+	t=1762873441; cv=none; b=fnbBClVbkZgF6rBYLhDB/VIHvYanc4SzL76V4UD6/X3wPkEgKQSv9t2LKNqriDx+qKhTub7804YPrSnweeZ0GncivHLqZ4spOrrQExqIJHAsBP3Dg6FreXMbojhyVkyr5reB36AyBPq8lJHJV1Yt7hGn6D9MfX+jbhFIHHmRE1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762873023; c=relaxed/simple;
-	bh=vKLyZ1/WPsSmzpJ2BPEEFpoo3aKBulZYZQJo6Fa1tqA=;
+	s=arc-20240116; t=1762873441; c=relaxed/simple;
+	bh=ftiPYvx9c/Uo7f5Ce7Yzxcg1QUwJlxqYP2TiKTcKQ1Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dFMpN3RY6t4Mqf/RLeDckQcSz7/t5RQtnpQEBYKUqv71mtuNBwwEOI2QoBtx4F6hd60M+46r2JozKvnlHqS7aNfcsW93i80OF/8JC9MQlMMT/K4LImQ3vS0ZMMWwTcS8/Al49aWncDIlZ8TudE5ZRFNaTjyuKJOX/IJUp9SyRDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a6jrN+0X; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-47776c366ccso2204495e9.1
-        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 06:57:01 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ijMX1VUkQDwakUEkqcKp8thYVE4LzQDKYy3lmaseTgU8ulTGLjk9BUaZlhssTizchdN7F4bzModPLJedGfdVhuRBkxaJDMHBP9rCGwOvTKf/0a3DTRIU3OH4DLFS8seMUlvWW5kSJkf44Mpx7j34IdHxq18BteS8e7e8P1kbHbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Wr3VZuHa; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b3c2db014easo774059066b.0
+        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 07:03:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762873020; x=1763477820; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=UHlTUvZj92x7RcHxGH3QRIo+y7WwDlRAXV6qXNutD24=;
-        b=a6jrN+0Xrqa63kjVB9WHV1tvYA3S7fX9p3P5H+I7x+l7QEdFzTOuUQWmMl5iv0UD4G
-         SzjV9dVPQrqoqqBZVdC2h0HRpmDINA/ETP5rnJzvqo3a0e9qo046ERMqRtFZZGKdzaZs
-         HaHUWWwunmkMDvSNT2pVlQMOuF6g8F+plZ5on4DodhHUo8C06Vy/VSKxFu2Z/pc0muMe
-         Vfc8YKYXQqYqnXyODA6zN3IL7NR7IpKjYjQ2s5JloNLL0UJN4H1REb27D6RKFTQeM1aS
-         mDGuqAMl7/bgCjEgolYYuRh+yxdIipHSGiOiAbFimG7FXuKl3R+E7JjiPpieyMuXMEiX
-         ja8w==
+        d=suse.com; s=google; t=1762873437; x=1763478237; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wi+5dbYm5JIgaP/t7Nx547fFCD450JcmYNBqfgVm42E=;
+        b=Wr3VZuHacnX19+kU8w1BvT68Xtso8bA8jlTRBVCYJ1QSuvBs90fW594AJGYD/sbcE7
+         zxfKSkMaz4WysTITq4/7YriC+cQSmhKybush57z8b7uRuaTcbHBANmIDfT/kvFehUGbD
+         sa2WDGvCupBaFLVNib0xm7M88OsMK+KVbkGvRv4wvS4KHLvTYQG7EePJTLqW1aHI85zL
+         INKcGCRRzF6J7N7BmrhtW9M7UhXv6JUTmkrQzq4x8G7ZqU0H7eSS+ojS9/DTLkAN67Bj
+         1wDhCFVl0BccErhxh7JzXNm1WChW2BMRTVSKywdBU4Q8uuZOXEejQRVPSvQONAdw7x2q
+         TGYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762873020; x=1763477820;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:x-gm-gg
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UHlTUvZj92x7RcHxGH3QRIo+y7WwDlRAXV6qXNutD24=;
-        b=BoMGHGLWtbsxPGC+MUwmtjp9gHRB8JsbjFUp20/RKmOFWgobe0AwcbLPRKxIa+0IPD
-         froYsct0oln061Rdo8SHFYvUAr8HQ4Z100oUUjhbvwo2bDX6lLbbBTHnf6E4Z8jnoDhz
-         tAc+OhykdqiRDtkB+iCVqsYHZQVtYDRDA9Np1GrJQ4eQEz+60KOdfj4Q6mZSDae86K13
-         m7EGJHlLKuYUNDJyg+w5f1TynTN+ronRDnYl58DShRRJsIuEcdyylg2ABwkWNIptr5Zv
-         YYJ4p3iwCZmueuCKLnYPruFtc0qeDs/p+C/6DOq4aZoTg7VWy9x8GVseWYZ0MvBgq8ea
-         WEDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUQ7MD5UzpoNKlp9XwscftC+W2g9qno5m+rjQBemqm3oicRU+pZswSDfryrfs8P87ZVe2CvKpo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyAdIGyU46pS/LUhwzWrr1TMlX28eohYPG+sFnMfvDpxmWDWrR/
-	+1bcGKNiCCc2zALfbxKpJz4IlqOzmj6gjr4lkfwumfr0pLoZN+ro5OA/
-X-Gm-Gg: ASbGncvDaM/36bIO5eDrSAB+XomqPBzgKNSF4JQU7jp9bcBTmzt2EKFLpyjqOMavVRu
-	nMI7s+YjQQGu3EtZkvS5UsPjjuabG7islq6VbrIwDn/hRbGG+Uz1eViiUNvFgdCwfUP/zWdTXaO
-	kzqBwt955YqzsOWQ7BNLMFPoi1WHNVut4XT88TXoO4moANn+2zmwC0BypYBQhze6Zyy0efECeoi
-	SigQmTpzO+G2crcERrfKo28JYzZsPCRyuRPdONLSUt18+F8J1VcxeQbY/aEXjqtblDyFouu2hZj
-	R9403hUZZ4J6Lm2iU63uA4anEOQhbLlz0G5dORpbJNeYATiKa9OdFboJLPmLCaRPJuejFNLRKBS
-	BjwKWB4zM0rdcOcPwYbIV0a734sEOSCN6aoJ2jdJvlbKRD5c+phAencxeWK1PuKndDVLFDBcjds
-	UWn7I=
-X-Google-Smtp-Source: AGHT+IHsw/1UR7CCCNbfBvlessezxYC2Txq569BxsyavfnqoxbTIchMBkQqP/NHUkOUYRkwBcT2zPw==
-X-Received: by 2002:a05:600c:4ecf:b0:477:7a95:b96b with SMTP id 5b1f17b1804b1-4777a95bbe9mr41805785e9.1.1762873019837;
-        Tue, 11 Nov 2025 06:56:59 -0800 (PST)
-Received: from skbuf ([2a02:2f04:d104:5e00:40fe:dea4:2692:5340])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b30f1cc4esm19171541f8f.36.2025.11.11.06.56.58
+        d=1e100.net; s=20230601; t=1762873437; x=1763478237;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wi+5dbYm5JIgaP/t7Nx547fFCD450JcmYNBqfgVm42E=;
+        b=IzzDj58apDVtsmoo2p4hEiswfa0cLCoiOBw9almjmmuu51CNx64G6lXb6t8hdhdigM
+         lwB0muDJOU/7mpcx51zN6vOmZ4DIa+Wzm1MYERTaZnBNUhjJ4HQLtILXfvC3mIf+LNJR
+         RV2eVK6lI84IkFs4FOb4s3/5VaUEMhBlxsoLur+C+PMdH8uRlGgsTD6JX2adnQpSYxPo
+         ObQeoEMzNuNwHauvquEC9KR68Pz5B6fKHGz+iBjgBuvoK0dhBbmSXwjTc+GAS/2Lr1J2
+         M/eRiTrcyboKvZllkiOzjcJ+5g5GWZ6aGRMO2TaNlU+g45+2zLK6vDtVEx2y60yKF2+N
+         PjqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWLwIgvoBgPdq+R9LNVOrQS3ZYbiwxEGBRoR2cpMEDZXcdUdvvG+Viop3FfgWQE3nf7kLG3wFs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwrRACmta3Mrvm+Y6yj9H2KKJCLR2vJhnw7Si/WNr8gT4d921Oo
+	7n+GXF3Hy9wZgjVOg7qlM4SGIA8htAewylSjFoXKc/afm1SYBwLzNvMiLsk4+SKul9c=
+X-Gm-Gg: ASbGncsPCNUzrBBzy7WJtsF5OEohRxOdv/heSmRgrQAgFFQ78nljJSH5tA997CQDiVz
+	MJU+s3Gc0/aogdyjqyY6fjBCtW+8LwFF4iZ40wUNK/SN/DejIoLGC1w/vWuU475MMq623ikptDO
+	Un6KvnoJFZPUQ7s5u8isBeve66zT+qL5b/jbsG3sfeCyYEqN2b7uYX1iSCqcuRwOOExdoVQLeII
+	5cf4IPZjI+wcRrRSp0BAR80l7oL/nn/Yu3PO94KID1CS4pJZn7vLLhg00l5oaRACPpjuvBRhNXb
+	HrPad3ovCCrXHtfM3qc1s3IzuG39atOmqd37kzN/gsFvGZ+qT/3iAho+1DbbNgUofddtENaSosF
+	7WvqTA5cunZVu/6I3KYSFyTNCT9xqp+8/u6N2OA933RKCPdTVk8lh41jSOM4pppH4FnjslJ1/Ck
+	6e20ecIQypcC7+OyQjRw==
+X-Google-Smtp-Source: AGHT+IGWUxoIalLG5xLZllX+zCkekRXIo7e3xykwl2APS2wZQPGHNLqastwX+dw6XlJnfwm9Fe+bGg==
+X-Received: by 2002:a17:906:f590:b0:b71:cec2:d54 with SMTP id a640c23a62f3a-b72e04e4ebemr1306841566b.57.1762873437355;
+        Tue, 11 Nov 2025 07:03:57 -0800 (PST)
+Received: from pathway (nat2.prg.suse.com. [195.250.132.146])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b72bdbc9656sm1374243166b.7.2025.11.11.07.03.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Nov 2025 06:56:59 -0800 (PST)
-Date: Tue, 11 Nov 2025 16:56:56 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Jonas Gorski <jonas.gorski@gmail.com>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, Andrew Lunn <andrew@lunn.ch>,
+        Tue, 11 Nov 2025 07:03:56 -0800 (PST)
+Date: Tue, 11 Nov 2025 16:03:53 +0100
+From: Petr Mladek <pmladek@suse.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Corey Minyard <corey@minyard.net>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	"Dr. David Alan Gilbert" <linux@treblig.org>,
+	Alex Deucher <alexander.deucher@amd.com>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+	Rob Clark <robin.clark@oss.qualcomm.com>,
+	Matthew Brost <matthew.brost@intel.com>,
+	Ulf Hansson <ulf.hansson@linaro.org>,
+	Vitaly Lifshits <vitaly.lifshits@intel.com>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Niklas Cassel <cassel@kernel.org>, Calvin Owens <calvin@wbinvd.org>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Sagi Maimon <maimon.sagi@gmail.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Karan Tilak Kumar <kartilak@cisco.com>,
+	Hans Verkuil <hverkuil+cisco@kernel.org>,
+	Casey Schaufler <casey@schaufler-ca.com>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Viacheslav Dubeyko <Slava.Dubeyko@ibm.com>,
+	Max Kellermann <max.kellermann@ionos.com>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	openipmi-developer@lists.sourceforge.net,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linaro-mm-sig@lists.linaro.org, amd-gfx@lists.freedesktop.org,
+	linux-arm-msm@vger.kernel.org, freedreno@lists.freedesktop.org,
+	intel-xe@lists.freedesktop.org, linux-mmc@vger.kernel.org,
+	netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+	linux-pci@vger.kernel.org, linux-s390@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
+	ceph-devel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Maxime Ripard <mripard@kernel.org>,
+	Dmitry Baryshkov <lumag@kernel.org>,
+	Abhinav Kumar <abhinav.kumar@linux.dev>,
+	Jessica Zhang <jesszhan0024@gmail.com>, Sean Paul <sean@poorly.run>,
+	Marijn Suijten <marijn.suijten@somainline.org>,
+	Konrad Dybcio <konradybcio@kernel.org>,
+	Lucas De Marchi <lucas.demarchi@intel.com>,
+	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
+	Rodrigo Vivi <rodrigo.vivi@intel.com>,
+	Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC net-next 3/3] net: dsa: deny 8021q uppers on vlan
- unaware bridged ports
-Message-ID: <20251111145656.3lmaul35cfswan5k@skbuf>
-References: <20251110222501.bghtbydtokuofwlr@skbuf>
- <CAOiHx=k8q7Zyr5CEJ_emKYLRV9SOXPjrrXYkUKs6=MbF_Autxw@mail.gmail.com>
- <20251111115627.orks445s5o2adkbu@skbuf>
- <20251110214443.342103-1-jonas.gorski@gmail.com>
- <20251110214443.342103-4-jonas.gorski@gmail.com>
- <20251110222501.bghtbydtokuofwlr@skbuf>
- <CAOiHx=k8q7Zyr5CEJ_emKYLRV9SOXPjrrXYkUKs6=MbF_Autxw@mail.gmail.com>
- <20251111115627.orks445s5o2adkbu@skbuf>
- <CAOiHx=naX6RbV0qBFZP3QhpKCnZ2KWdq8L23rUh4D7xwmGARbw@mail.gmail.com>
- <CAOiHx=naX6RbV0qBFZP3QhpKCnZ2KWdq8L23rUh4D7xwmGARbw@mail.gmail.com>
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Rodolfo Giometti <giometti@enneenne.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Stefan Haberland <sth@linux.ibm.com>,
+	Jan Hoeppner <hoeppner@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Satish Kharat <satishkh@cisco.com>,
+	Sesidhar Baddela <sebaddel@cisco.com>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v2 01/21] lib/vsprintf: Add specifier for printing struct
+ timespec64
+Message-ID: <aRNQWc8O2y94zoj8@pathway>
+References: <20251111122735.880607-1-andriy.shevchenko@linux.intel.com>
+ <20251111122735.880607-2-andriy.shevchenko@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAOiHx=naX6RbV0qBFZP3QhpKCnZ2KWdq8L23rUh4D7xwmGARbw@mail.gmail.com>
- <CAOiHx=naX6RbV0qBFZP3QhpKCnZ2KWdq8L23rUh4D7xwmGARbw@mail.gmail.com>
+In-Reply-To: <20251111122735.880607-2-andriy.shevchenko@linux.intel.com>
 
-On Tue, Nov 11, 2025 at 03:09:08PM +0100, Jonas Gorski wrote:
-> On Tue, Nov 11, 2025 at 12:56 PM Vladimir Oltean <olteanv@gmail.com> wrote:
-> >
-> > On Tue, Nov 11, 2025 at 11:06:48AM +0100, Jonas Gorski wrote:
-> > > But I noticed while testing that apparently b53 in filtering=0 mode
-> > > does not forward any tagged traffic (and I think I know why ...).
-> > >
-> > > Is there a way to ask for a replay of the fdb (static) entries? To fix
-> > > this for older switches, we need to disable 802.1q mode, but this also
-> > > switches the ARL from IVL to SVL, which changes the hashing, and would
-> > > break any existing entries. So we need to flush the ARL before
-> > > toggling 802.1q mode, and then reprogram any static entries.
-> >
-> > I'm not clear on what happens. "Broken" FDB entries in the incorrect
-> > bridge vlan_filtering mode sounds like normal behaviour (FDB entries
-> > with VID=0 while vlan_filtering=1, or FDB entries with VID!=0 while
-> > vlan_filtering=0). They should just sit idle in the ARL until the VLAN
-> > filtering mode makes them active.
+On Tue 2025-11-11 13:20:01, Andy Shevchenko wrote:
+> A handful drivers want to print a content of the struct timespec64
+> in a format of %lld:%09ld. In order to make their lives easier, add
+> the respecting specifier directly to the printf() implementation.
 > 
-> When in SVL mode (vlan disabled), the ARL switches from mac+vid to
-> just mac for hashing ARL entries. And I don't know if mac+vid=0 yields
-> the same hash as only mac. It would it the switch uses vid=0 when not
-> vlan aware, but if it skips the vid then it wouldn't.
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> ---
+>  Documentation/core-api/printk-formats.rst | 11 ++++++++--
+>  lib/tests/printf_kunit.c                  |  4 ++++
+>  lib/vsprintf.c                            | 25 +++++++++++++++++++++++
+>  3 files changed, 38 insertions(+), 2 deletions(-)
 > 
-> And we automatically install static entries for the MAC addresses of
-> ports (and maybe other non-dsa bridged devices), so we may need to
-> have these twice in the ARL table (once for non-filtering, once for
-> filtering).
-> 
-> If the hash is not the same, this can happen:
-> 
-> vlan_enabled=1, ARL hashing uses mac+vid
-> add static entry mac=abc,vid=0 for port 1 => hash(mac, vid) -> entry 123
-> vlan_enabled => 0, ARL hashing uses only mac
-> packet received on port 2 for mac=abc => hash(mac) => entry 456 => no
-> entry found => flood (which may not include port 1).
-> 
-> when trying to delete the static entry => lookup for mac=abc,vid=0 =>
-> hash(mac) => entry 456 => no such entry.
-> 
-> Then maybe we ignore the error, but the moment we enable vlan again,
-> the hashing changes back to mac+vid, so the "deleted" static entry
-> becomes active again (despite the linux fdb not knowing about it
-> anymore).
-> 
-> And even if the hash is the same, it would mean we cannot interact
-> with any preexisting entries for vid!=1 that were added with vlan
-> filtering = 1. So we cannot delete them when e.g. removing a port from
-> the bridge, or deleting the bridge.
-> 
-> So the safest would be to remove all static entries before changing
-> vlan filtering, and then re-adding them afterwards.
-> 
-> Best regards,
-> Jonas
+> diff --git a/Documentation/core-api/printk-formats.rst b/Documentation/core-api/printk-formats.rst
+> index 7f2f11b48286..c0b1b6089307 100644
+> --- a/Documentation/core-api/printk-formats.rst
+> +++ b/Documentation/core-api/printk-formats.rst
+> @@ -547,11 +547,13 @@ Time and date
+>  	%pt[RT]s		YYYY-mm-dd HH:MM:SS
+>  	%pt[RT]d		YYYY-mm-dd
+>  	%pt[RT]t		HH:MM:SS
+> -	%pt[RT][dt][r][s]
+> +	%ptSp			<seconds>.<nanoseconds>
 
-If you just want to debug whether this is the case or not, then as I
-understand, for the moment you only care about static FDB entries on the
-CPU port, not on user ports added with 'bridge fdb add ... master static".
-If so, these FDB entries are available in the cpu_dp->fdbs list. For
-user ports we don't bother keeping track.
+I know that that there was no good choice. But I am curious.
+Does the 'p' stands for some particular word, for example, "plain" ?
 
-Regarding switchdev FDB replay, it's possible but has very high
-complexity. The base call would be to switchdev_bridge_port_replay(),
-then you'd need to set up two parallel notifier blocks through which
-you're informed of the existing objects (not the usual dsa_user_switchdev_notifier
-and dsa_user_switchdev_blocking_notifier), whose internal processing is
-partly similar (the event filtering and replication) and partly different:
-instead of calling dsa_schedule_work() to program the FDB entries to
-hardware, you just add them to a list that is kept in a context
-structure, which is passed to the caller once the replay is over and the
-list is complete.
+I do not want to start bike shedding but I think about
+using 'n' as "number".
 
-For the moment, dp->fdbs should be sufficient to prove/disprove a point.
+> +	%pt[RST][dt][r][s]
+>  
+>  For printing date and time as represented by::
+>  
+> -	R  struct rtc_time structure
+> +	R  content of struct rtc_time
+> +	S  content of struct timespec64
+>  	T  time64_t type
+>  
+>  in human readable format.
+> @@ -563,6 +565,11 @@ The %pt[RT]s (space) will override ISO 8601 separator by using ' ' (space)
+>  instead of 'T' (Capital T) between date and time. It won't have any effect
+>  when date or time is omitted.
+>  
+> +The %ptSp is equivalent to %lld.%09ld for the content of the struct timespec64.
+> +When the other specifiers are given, it becomes the respective equivalent of
+> +%ptT[dt][r][s].%09ld. In other words, the seconds are being printed in
+> +the human readable format followed by a dot and nanoseconds.
+> +
+>  Passed by reference.
+>  
+>  struct clk
+> diff --git a/lib/vsprintf.c b/lib/vsprintf.c
+> index 3f99834fd788..fdd06e8957a3 100644
+> --- a/lib/vsprintf.c
+> +++ b/lib/vsprintf.c
+> @@ -2464,6 +2488,7 @@ early_param("no_hash_pointers", no_hash_pointers_enable);
+>   * - 'g' For block_device name (gendisk + partition number)
+>   * - 't[RT][dt][r][s]' For time and date as represented by:
+
+We should add 'S' here as well:
+
+   * - 't[RST][dt][r][s]' For time and date as represented by:
+
+That said, I am not sure about the optional '[p]'. We could
+either do:
+
+   * - 't[RST][p][dt][r][s]' For time and date as represented by:
+
+or
+
+   * - 'tSp'	For time represented by struct timespec64 printed
+		as seconds.nanoseconds
+   * - 't[RST][dt][r][s]' For time and date as represented by:
+
+>   *      R    struct rtc_time
+> + *      S    struct timespec64
+>   *      T    time64_t
+>   * - 'C' For a clock, it prints the name (Common Clock Framework) or address
+>   *       (legacy clock framework) of the clock
+
+Otherwise, it looks good.
+
+Best Regards,
+Petr
 
