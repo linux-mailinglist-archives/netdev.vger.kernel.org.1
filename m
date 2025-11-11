@@ -1,193 +1,232 @@
-Return-Path: <netdev+bounces-237723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CCE4C4F957
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 20:21:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B786C4F974
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 20:24:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6CAB718C1A79
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 19:21:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF24718875ED
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 19:24:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE568325730;
-	Tue, 11 Nov 2025 19:18:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA2C83254A5;
+	Tue, 11 Nov 2025 19:24:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PATnYtYT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m9YvZbeH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16901325717
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 19:18:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 051F6325498
+	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 19:24:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762888732; cv=none; b=RisoKxr0GEkozwWwbJyG/7uyBXFcLe075B2xsd09qnGFIQf9mJGYqEfV95oIDmHCrPW4/RkjiPehwbhHWv+leWRA3sN2rFZOHdBnhOyWGbJ/qvCSXDKThMOcDVuh737FmnFZgbHEb8DnLgF0NH1fCIKr55fdi+Gb4i7GkIg+zBo=
+	t=1762889049; cv=none; b=kS4KnHvqJ0lBjvWQJgkct8zFrfYLmn4SAbsrYgTcGs4M3uy9OwWTogP9H4iLtBjeTWhTiwT92ECqqV9cCgYq9jCixXwgr1g+phgGw20iHCRBZG0zDjliGYe/Iv/ea3liNWrTbYARIzOmbxqJ97DTXCGedbW+Y+OJculecduhAdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762888732; c=relaxed/simple;
-	bh=WrkIgi+zshvGxhLfLIup6m0PxGHGcR8zBqwWWiSJGUA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a0O0NXpfnbmaOvhWKSbxNQcP6no+HpkiipYV9kap8aKetR4F5RCkhEW5kDBWsm4Fp33ETg10pTd59Ny+PMaPXOW40eH3ABFWz3+UJ4h44u6Hg51EM2DeyQ0HNAPcSDOfNBpJWwY8WwtOlhR+7MYT0CGU/vhWF6fk9jR56ZHxLLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PATnYtYT; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-42b2a0c18caso12536f8f.1
-        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 11:18:50 -0800 (PST)
+	s=arc-20240116; t=1762889049; c=relaxed/simple;
+	bh=0kVZEUry4zA5gM/6QJOrIUT0TdpY7tJ37G3Y/Rm4wD0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uDRwgNFDZUHo65OA5DIrARoly86tmBFBCnIRX6CPDxR1JHEoBz5y58n6BkErfkgJ97B7Cc75unzvl/4EL/iVqcDLzW+qKGFg/5IR0BiAE34NmqGW8rGg85XRBxWXK+ciccoibhhjl5IWh6joD/pwZgANpfTxrcMvOUZTzWfOi1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m9YvZbeH; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4ed861eb98cso815311cf.3
+        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 11:24:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762888729; x=1763493529; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3g2GDGj5AAay/k4tJ+VCCSovbtJsKk41E0hucw1Xl2I=;
-        b=PATnYtYTHXDllw9nDBdkh11UnLM9SWJSGe82d1Qs1Nv2d7LDMNZNWlP+e9NhTWk83/
-         dB0f1wGo+2KoAFgTptXGAPOrFEHgJxZqXr6znIyisCpz878Ff/P5qDr0i15KjbMME0Wj
-         fByCFLGPvMqbk4HWqML8u7tjuxgp/Lgzg0iOzK2ZLyFCl8Vz11WXOxx8oPf+y/DrKhRD
-         Tlkbvj7JKmczlof4RmFiL3WS1qAxKLyS71g9+T9/ifo9FyDWcwPLNPOGXO4fGjn4l7ju
-         Fu72hdKkD1Wn1BoDEvQm/H9JaaKNWCNjFK0XtfSLpI30epVECPIPCEUCoM/IYu6Ok3oa
-         tn+w==
+        d=google.com; s=20230601; t=1762889047; x=1763493847; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NpUysYmo0ZFjhBZAlpmGn5yIqRvZt+XQSoQi1hXJ3Kk=;
+        b=m9YvZbeHTw6/C5/B7DcW7SJrnW2ua7+ZRJNjPP0DrgZQuOe9rX42fN8uBKlbYdQwuH
+         AfMzkl6GamQst+q9tAr+zPlErJZX/zcRan2okcOcJYWag5wFIY5+H8t8e1OL5qAegv5c
+         Rfdb8zqhG+Sm/oXrIojf46hE5MO8eqlJDd0wREf/yVDXbTsD+HXballxRHxTNRvg2PPu
+         NZVdoAtqIN3ZDv4YFsq+LsJbM10bM7ufgSm+yFjXZcQQC8XvAMoHgY5xCLK61OU0Y+E6
+         ETqgIO9ObZYrJZVMkm/6E3BA501sy4j2wdzpCa36D1TNOh6gc6GRdMgzLfa9B5+OShfl
+         MOKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762888729; x=1763493529;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3g2GDGj5AAay/k4tJ+VCCSovbtJsKk41E0hucw1Xl2I=;
-        b=QsQYzZasS9zRiuClI7BcBylsgnb+7oPIcgaRBqrZNZfx6yaanhziJvF8wDWoRI4fTc
-         nMAHKvRzz2ev/SX8jehTsaOvctdAmyVDUedx1ycPUr7WT/HEY1XnmnbUZX5a0UXr7nyk
-         QZjgybxPq25u1v03UlAe4PwFeGhlE4apYcIafEvhdwKO2EKudvR89szQr8yCjlIpDFYs
-         ZiL6K3IdSDisizE+B5gW7dUcaPiyXyVdMWiD5Qu/mMe/d6sFSworxcGgpWCB3Rr77eA7
-         Mo7d2j3tgQoXTqyw6SgJ4LimKActmJNx+0oTdsFk5aCW1a3B8ihva6zrDgy4B3xWbbl3
-         /Zhg==
-X-Forwarded-Encrypted: i=1; AJvYcCUrRqZCUGLu3QpVk7mX2CA8HQzFCnRnJR859nwaPpjSuUVGliza8bTDBMgUpBVdwZlaLQitq7o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzScCbkTdpjyQJld5bZK/XnczMXWGiU5bo+bLlMXkm7Sd/8/K14
-	HV5OXOtqhDpMO2nrEQ1a7imkcim9Lw51vtzBP6jTkaq6rG3xMCyJmZeB
-X-Gm-Gg: ASbGnctZ9Hu1gd3ZUshAf5uXxmXgxQ8ymtIBHAT9yZGBHcvON3iN97AQY57gxgI9xZI
-	9Bd4XxnOmks2dvgBWQnUTMsk5tooLc8w8E7rERuMEJfnLL2IYsDYCzJ2i6dAqunaOtSA6WPY9Tb
-	Krc1EKIkDM93uJ/fV+zTfQD/O0GC5R9ACNyO02jdSJ4MeXtrPGFFIh4BD07zb9Bax0/aL6/PHtz
-	UUZc7CA+x3JIlRa8ZHMEC/ScJYQnCxzcWMU64pAAIwQ3UJQIJLfC0oUyE75YJsFRUnEifTqUvP+
-	gL3cVM5RHcWQ5kUfNnRvhFRWQlPjcyeu07RhwV3yHmIsb4MB2S+uCrCVdrpwOPsyDQY06BdHada
-	zcTG4R9NdCqPHNy5drh680FRbVFEMvKIRURG+JcD+TO4IoyHEfkzy4As5ortvtYOnZqKpHJ3gKu
-	hsFlI5MCY=
-X-Google-Smtp-Source: AGHT+IEIg14BCh/MvTFM8zMUPDwzSAPlSz5/+0VBZJxt8k8qV9/8IPFlPxgvs5CsxqfGwfmV9u0z9w==
-X-Received: by 2002:a05:6000:401e:b0:42b:3dbe:3a54 with SMTP id ffacd0b85a97d-42b4bb98aa5mr278784f8f.17.1762888729119;
-        Tue, 11 Nov 2025 11:18:49 -0800 (PST)
-Received: from archlinux ([143.58.192.81])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42abe62bf40sm28745773f8f.9.2025.11.11.11.18.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Nov 2025 11:18:48 -0800 (PST)
-Date: Tue, 11 Nov 2025 19:18:46 +0000
-From: Andre Carvalho <asantostc@gmail.com>
-To: Breno Leitao <leitao@debian.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v3 5/6] netconsole: resume previously
- deactivated target
-Message-ID: <h5tdoarzjg2b5v3bvkmrlwgquejlhr5xjbrb6hn2ro4s46dpfs@4clrqzup6szk>
-References: <20251109-netcons-retrigger-v3-0-1654c280bbe6@gmail.com>
- <20251109-netcons-retrigger-v3-5-1654c280bbe6@gmail.com>
- <e4loxbog76cspufl7hu37uhdc54dtqjqryikwsnktdncpqvonb@mu6rsa3qbtvk>
+        d=1e100.net; s=20230601; t=1762889047; x=1763493847;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=NpUysYmo0ZFjhBZAlpmGn5yIqRvZt+XQSoQi1hXJ3Kk=;
+        b=d/tM1FQs7NMkc/BYRIkU1k9Ob0aehLf3DsuFRRSGbeSSI8WaJduF1vlZ9Z6QResnn3
+         14H5rBnC1HQ3enTkYG03tTLV4tl8MzygVQWLc50rNY2m0El7DS17z+VLGAmqvE9sne1e
+         p8j99vJZH/Fne+cUSpjfeKWEy+oLdISccvfKMZbEzUsXw5SAhvNexIjvjw/Dry8tZE1g
+         VJmJrQFgGMwIs+Snxe6zeLypg8PfIO9yn7284RGhffEsb4kLg9BGoAAIMHiLg7Y/uCYV
+         PnMWJBeI1UcQsDiixFlwDhCxWDsRTvL4pRFrQEC6K7fMYLdFNgh3QSbcNh2lOO5lqzHK
+         K4rg==
+X-Forwarded-Encrypted: i=1; AJvYcCWfDJBC+jFkLHnAqVLYBAhFFcLVNXEKrN7QRzHzMYbKFH5Clo3qf9QaAbpETS6wiCgL78UPMAc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGEpp5tQsZoRlbmUUvhdeMP7mc6i0aAe/hZ7uAqjyVtGaL4kuA
+	yAjY9stVESsjWJftVRYQEHjamfszJ6nk3YF54hKsBjzzjkfIryHN/yEJoJe3ZT/jVcjwDwbNpre
+	+Y0E+jktxhvnqJpuFbz05+k2WkgCNZ7EsGCMfuY69
+X-Gm-Gg: ASbGncvsdKuePvbKegpEAk9ODV8FPPI+w6GzfELgykHD3L94dNWOgXwAYu0j7Y+Kz50
+	qcwg+ec/cO0vu9pERUR+CSf2SUDn4DoVaEdE+NtlvuW8/Jfd+F4Bg/toii/iCA93JJ6M3P21+oS
+	/J12l3MHTF+Ea2+S2Ff0q8WIbORiW/mTAf1qoRuxO5aom/NaY1j0+C9kHbC7UnYtwm6HeEAk9Pf
+	lHwvZGpCgT/cxhw0A61NdGdGv+icRnCi4VE/R9m7TWl0SvmwYn7ylPpXcSO8KXTJaZ7xeEccIB/
+	ppj8Iw==
+X-Google-Smtp-Source: AGHT+IHgdffxMXk2L1+L5D0EhFqavRvZsApB6HWnfPka30SNopPchdb7ARpmkpdsMZWjHBLGKHeTt55ooRXtd0+tDxg=
+X-Received: by 2002:ac8:5741:0:b0:4e8:a0bf:f5b5 with SMTP id
+ d75a77b69052e-4eddbdd8f4amr4549541cf.73.1762889046407; Tue, 11 Nov 2025
+ 11:24:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e4loxbog76cspufl7hu37uhdc54dtqjqryikwsnktdncpqvonb@mu6rsa3qbtvk>
+References: <20251111093204.1432437-1-edumazet@google.com> <6913437c.a70a0220.22f260.013b.GAE@google.com>
+ <CANn89iKgYo=f+NyOVFfLjkYLczWsqopxt4F5adutf5eY9TAJmA@mail.gmail.com>
+In-Reply-To: <CANn89iKgYo=f+NyOVFfLjkYLczWsqopxt4F5adutf5eY9TAJmA@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 11 Nov 2025 11:23:55 -0800
+X-Gm-Features: AWmQ_bn3Ul8SCcs8ZoLOIGAmR_eqcxw1d18J9obuuLSR1JxaFhqsmm6gXHf1epU
+Message-ID: <CANn89iJ5p3xY_LJcexq8n2-91A6ERPV6yqjPGphD_w6wr_NHew@mail.gmail.com>
+Subject: Re: [syzbot ci] Re: net_sched: speedup qdisc dequeue
+To: syzbot ci <syzbot+ci51c71986dfbbfee2@syzkaller.appspotmail.com>, 
+	Victor Nogueira <victor@mojatatu.com>, Daniel Borkmann <daniel@iogearbox.net>
+Cc: davem@davemloft.net, eric.dumazet@gmail.com, horms@kernel.org, 
+	jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org, kuniyu@google.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, toke@redhat.com, 
+	willemb@google.com, xiyou.wangcong@gmail.com, syzbot@lists.linux.dev, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 11, 2025 at 02:12:26AM -0800, Breno Leitao wrote:
-> > + *		disabled. Internally, although both STATE_DISABLED and
-> > + *		STATE_DEACTIVATED correspond to inactive netpoll the latter is>
-> > + *		due to interface state changes and may recover automatically.
-> 
->  *		disabled. Internally, although both STATE_DISABLED and
->  *		STATE_DEACTIVATED correspond to inactive targets, the latter is
->  *		due to automatic interface state changes and will try
->  *		recover automatically, if the interface comes back
->  *		online.
-> 
+On Tue, Nov 11, 2025 at 8:28=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Tue, Nov 11, 2025 at 6:09=E2=80=AFAM syzbot ci
+> <syzbot+ci51c71986dfbbfee2@syzkaller.appspotmail.com> wrote:
+> >
+> > syzbot ci has tested the following series
+> >
+> > [v2] net_sched: speedup qdisc dequeue
+> > https://lore.kernel.org/all/20251111093204.1432437-1-edumazet@google.co=
+m
+> > * [PATCH v2 net-next 01/14] net_sched: make room for (struct qdisc_skb_=
+cb)->pkt_segs
+> > * [PATCH v2 net-next 02/14] net: init shinfo->gso_segs from qdisc_pkt_l=
+en_init()
+> > * [PATCH v2 net-next 03/14] net_sched: initialize qdisc_skb_cb(skb)->pk=
+t_segs in qdisc_pkt_len_init()
+> > * [PATCH v2 net-next 04/14] net: use qdisc_pkt_len_segs_init() in sch_h=
+andle_ingress()
+> > * [PATCH v2 net-next 05/14] net_sched: use qdisc_skb_cb(skb)->pkt_segs =
+in bstats_update()
+> > * [PATCH v2 net-next 06/14] net_sched: cake: use qdisc_pkt_segs()
+> > * [PATCH v2 net-next 07/14] net_sched: add Qdisc_read_mostly and Qdisc_=
+write groups
+> > * [PATCH v2 net-next 08/14] net_sched: sch_fq: move qdisc_bstats_update=
+() to fq_dequeue_skb()
+> > * [PATCH v2 net-next 09/14] net_sched: sch_fq: prefetch one skb ahead i=
+n dequeue()
+> > * [PATCH v2 net-next 10/14] net: prefech skb->priority in __dev_xmit_sk=
+b()
+> > * [PATCH v2 net-next 11/14] net: annotate a data-race in __dev_xmit_skb=
+()
+> > * [PATCH v2 net-next 12/14] net_sched: add tcf_kfree_skb_list() helper
+> > * [PATCH v2 net-next 13/14] net_sched: add qdisc_dequeue_drop() helper
+> > * [PATCH v2 net-next 14/14] net_sched: use qdisc_dequeue_drop() in cake=
+, codel, fq_codel
+> >
+> > and found the following issue:
+> > WARNING in sk_skb_reason_drop
+> >
+> > Full report is available here:
+> > https://ci.syzbot.org/series/a9dbee91-6b1f-4ab9-b55d-43f7f50de064
+> >
+> > ***
+> >
+> > WARNING in sk_skb_reason_drop
+> >
+> > tree:      net-next
+> > URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/net=
+dev/net-next.git
+> > base:      a0c3aefb08cd81864b17c23c25b388dba90b9dad
+> > arch:      amd64
+> > compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1=
+~exp1~20250708183702.136), Debian LLD 20.1.8
+> > config:    https://ci.syzbot.org/builds/a5059d85-d1f8-4036-a0fd-b677b59=
+45ea9/config
+> > C repro:   https://ci.syzbot.org/findings/e529fc3a-766e-4d6c-899a-c35a8=
+fdaa940/c_repro
+> > syz repro: https://ci.syzbot.org/findings/e529fc3a-766e-4d6c-899a-c35a8=
+fdaa940/syz_repro
+> >
+> > syzkaller0: entered promiscuous mode
+> > syzkaller0: entered allmulticast mode
+> > ------------[ cut here ]------------
+> > WARNING: CPU: 0 PID: 5965 at net/core/skbuff.c:1192 __sk_skb_reason_dro=
+p net/core/skbuff.c:1189 [inline]
+> > WARNING: CPU: 0 PID: 5965 at net/core/skbuff.c:1192 sk_skb_reason_drop+=
+0x76/0x170 net/core/skbuff.c:1214
+> > Modules linked in:
+> > CPU: 0 UID: 0 PID: 5965 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT=
+(full)
+> > Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-=
+1.16.2-1 04/01/2014
+> > RIP: 0010:__sk_skb_reason_drop net/core/skbuff.c:1189 [inline]
+> > RIP: 0010:sk_skb_reason_drop+0x76/0x170 net/core/skbuff.c:1214
+> > Code: 20 2e a0 f8 83 fd 01 75 26 41 8d ae 00 00 fd ff bf 01 00 fd ff 89=
+ ee e8 08 2e a0 f8 81 fd 00 00 fd ff 77 32 e8 bb 29 a0 f8 90 <0f> 0b 90 eb =
+53 bf 01 00 00 00 89 ee e8 e9 2d a0 f8 85 ed 0f 8e b2
+> > RSP: 0018:ffffc9000284f3b0 EFLAGS: 00010293
+> > RAX: ffffffff891fdcd5 RBX: ffff888113587680 RCX: ffff88816e6f3a00
+> > RDX: 0000000000000000 RSI: 000000006e1a2a10 RDI: 00000000fffd0001
+> > RBP: 000000006e1a2a10 R08: ffff888113587767 R09: 1ffff110226b0eec
+> > R10: dffffc0000000000 R11: ffffed10226b0eed R12: ffff888113587764
+> > R13: dffffc0000000000 R14: 000000006e1d2a10 R15: 0000000000000000
+> > FS:  000055558e11c500(0000) GS:ffff88818eb38000(0000) knlGS:00000000000=
+00000
+> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > CR2: 0000200000002280 CR3: 000000011053c000 CR4: 00000000000006f0
+> > Call Trace:
+> >  <TASK>
+> >  kfree_skb_reason include/linux/skbuff.h:1322 [inline]
+> >  tcf_kfree_skb_list include/net/sch_generic.h:1127 [inline]
+> >  __dev_xmit_skb net/core/dev.c:4258 [inline]
+> >  __dev_queue_xmit+0x2669/0x3180 net/core/dev.c:4783
+> >  packet_snd net/packet/af_packet.c:3076 [inline]
+> >  packet_sendmsg+0x3e33/0x5080 net/packet/af_packet.c:3108
+> >  sock_sendmsg_nosec net/socket.c:727 [inline]
+> >  __sock_sendmsg+0x21c/0x270 net/socket.c:742
+> >  ____sys_sendmsg+0x505/0x830 net/socket.c:2630
+> >  ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2684
+> >  __sys_sendmsg net/socket.c:2716 [inline]
+> >  __do_sys_sendmsg net/socket.c:2721 [inline]
+> >  __se_sys_sendmsg net/socket.c:2719 [inline]
+> >  __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2719
+> >  do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+> >  do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+> >  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> > RIP: 0033:0x7fc1a7b8efc9
+> > Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89=
+ f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 =
+ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+> > RSP: 002b:00007fff4ba6d968 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+> > RAX: ffffffffffffffda RBX: 00007fc1a7de5fa0 RCX: 00007fc1a7b8efc9
+> > RDX: 0000000000000004 RSI: 00002000000000c0 RDI: 0000000000000007
+> > RBP: 00007fc1a7c11f91 R08: 0000000000000000 R09: 0000000000000000
+> > R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+> > R13: 00007fc1a7de5fa0 R14: 00007fc1a7de5fa0 R15: 0000000000000003
+> >  </TASK>
+> >
+>
+> Seems that cls_bpf_classify() is able to change tc_skb_cb(skb)->drop_reas=
+on,
+> and this predates my code.
 
-This is much clearer, thanks for the suggestion. 
+struct bpf_skb_data_end {
+  struct qdisc_skb_cb qdisc_cb;
+  void *data_meta;
+   void *data_end;
+};
 
-> > +	ret = __netpoll_setup_hold(&nt->np, ndev);
-> > +	if (ret) {
-> > +		/* netpoll fails setup once, do not try again. */
-> > +		nt->state = STATE_DISABLED;
-> > +	} else {
-> > +		nt->state = STATE_ENABLED;
-> > +		pr_info("network logging resumed on interface %s\n",
-> > +			nt->np.dev_name);
-> > +	}
-> > +}
-> 
-> I am not sure that helper is useful, I would simplify the last patch
-> with this one and write something like:
-> 
+So anytime BPF calls bpf_compute_data_pointers(), it overwrites
+tc_skb_cb(skb)->drop_reason,
+because offsetof(   ..., data_meta) =3D=3D offsetof(... drop_reason)
 
-The main reason why I opted for a helper in netpoll was to keep reference
-tracking for these devices strictly inside netpoll and have simmetry between
-setup and cleanup. Having said that, this might be an overkill and I'm fine with 
-dropping the helper and taking your suggestion.
-
-> > +
-> > +/* Check if the target was bound by mac address. */
-> > +static bool bound_by_mac(struct netconsole_target *nt)
-> > +{
-> > +	return is_valid_ether_addr(nt->np.dev_mac);
-> > +}
-> 
-> Awesome. I liked this helper. It might be useful it some other places, and
-> eventually transformed into a specific type in the target (in case we need to
-> in the future)
-> 
-> Can we use it egress_dev also? If so, please separate this in a separate patch.
-
-In order to do that, we'd need to move bound_by_mac to netpolland make it available
-to be called by netconsole. Let me know if you'd like me to do this in this series,
-otherwise I'm also happy to refactor this separately from this series.
-
-> > +		if (nt->state == STATE_DEACTIVATED && event == NETDEV_UP &&
-> > +		    target_match(nt, dev))
-> > +			list_move(&nt->list, &resume_list);
-> 
-> I think it would be better to move the nt->state == STATE_DEACTIVATED to target_match and use
-> the case above. As the following:
-> 
-> 	if (nt->np.dev == dev) {
-> 		switch (event) {
-> 		case NETDEV_CHANGENAME:
-> 		....
-> 		case NETDEV_UP:
-> 			if (target_match(nt, dev))
-> 				list_move(&nt->list, &resume_list);
-> 
-
-We are not able to handle this inside this switch because when target got deactivated, 
-do_netpoll_cleanup sets nt->np.dev = NULL. Having said that, I can still move nt->state == STATE_DEACTIVATED
-to inside target_match (maybe calling it deactivated_target_match) to make this slightly more readable. 
-
-> >  		netconsole_target_put(nt);
-> >  	}
-> >  	spin_unlock_irqrestore(&target_list_lock, flags);
-> >  	mutex_unlock(&target_cleanup_list_lock);
-> >  
-> 
-> Write a comment saying that maybe_resume_target() might be called with IRQ
-> enabled.
-
-Ack.
-
-> Also, extract the code below in a static function. Similar to
-> netconsole_process_cleanups_core(), but passing resume_list argument.
-> 
-> Let's try to keep netconsole_netdev_event() simple to read and reason about.
-
-Ack.
-
-Thanks for the review!
-
--- 
-Andre Carvalho
+CC Victor and Daniel
 
