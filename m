@@ -1,150 +1,230 @@
-Return-Path: <netdev+bounces-237493-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89479C4C600
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 09:24:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1535C4C648
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 09:27:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0693A424A0E
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 08:16:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1496F3BC8EA
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 08:19:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66511332908;
-	Tue, 11 Nov 2025 08:14:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 106E4242D9B;
+	Tue, 11 Nov 2025 08:19:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="P+CjRbeD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a+L3Fe9p"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D82C032E14A;
-	Tue, 11 Nov 2025 08:14:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF608A944;
+	Tue, 11 Nov 2025 08:19:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762848884; cv=none; b=nM5FnaZ3Hh/O4JOCVU8GuJVl7oF047ue2YGpZFJ1JVxmCae7e1Z7IC7Q0TEWjODqLGv1Iv2sVX9FGGcgUGOjFhBfGj4AoOIW6OctJLpKzeqoOUBJW6RbgXCKr0DaM3y/97abNIFk/BF6iStN6VIAyyFn0VWdUqVzCKPg39WgV0A=
+	t=1762849172; cv=none; b=bmG8ZqTOAFGOtHeexalIMvI3lNTyJBuSA2vcPyFVjI3ho8d0VDd2BoaYraMEckNCw06zsIlkI2Ac1+ffKdP1+c1mlDloCBMchxQS+IgCOc8YlGPuluJzDNc1MCDnXcDSEr2A3jySVw9aj8owp9im+WxhsCczY8G6PFkqE3k27oU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762848884; c=relaxed/simple;
-	bh=papQpdMxZeZiO6Qt8EOXXoWcGPBUIrAgpmOX1fAOG5Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=aYa8lPHP1YUt1OBk6TqA0mRbhRqjGApHux3OFJf4WHDY1mj3ydwFGMA12JXFx1693BmdFaC7Mekg2YtE4RdM0Y4QhL3/3GZqhRDrmnOXUWFk6ZwrN8N+2221lOhPmbPGg7EFvYQVBRs1zTGEzlTkH7lDYXhxxMi+7RtiwX8KFCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=P+CjRbeD; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1231)
-	id 8DFF2212AE4B; Tue, 11 Nov 2025 00:14:42 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 8DFF2212AE4B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1762848882;
-	bh=T4NA8arxo+rcogMEzVL17or5uDR3MncUC/lGtD/Hn6o=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=P+CjRbeD4IJ74AlXQL5IEVSDdThbsyK9diqgJLhxKXRlqw6uiwy76aLAgeYvOE8+L
-	 vt1nvE9/X854hHkksfeDNluXdVfClT4HMio9HMYo/OFQsaT4/dLISssPrX6sf/IBNp
-	 Z2sMVAMqpUFxmeDPPOG3YT+ImPixe+sh88yZ2M/Q=
-From: Aditya Garg <gargaditya@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	longli@microsoft.com,
-	kotaranov@microsoft.com,
-	horms@kernel.org,
-	shradhagupta@linux.microsoft.com,
-	ssengar@linux.microsoft.com,
-	ernis@linux.microsoft.com,
-	dipayanroy@linux.microsoft.com,
-	shirazsaleem@microsoft.com,
-	leon@kernel.org,
-	mlevitsk@redhat.com,
-	yury.norov@gmail.com,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	gargaditya@microsoft.com
-Cc: Aditya Garg <gargaditya@linux.microsoft.com>
-Subject: [PATCH net-next v3 2/2] net: mana: Drop TX skb on post_work_request failure and unmap resources
-Date: Tue, 11 Nov 2025 00:13:01 -0800
-Message-Id: <1762848781-357-3-git-send-email-gargaditya@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1762848781-357-1-git-send-email-gargaditya@linux.microsoft.com>
-References: <1762848781-357-1-git-send-email-gargaditya@linux.microsoft.com>
+	s=arc-20240116; t=1762849172; c=relaxed/simple;
+	bh=VstIjK1vfnpN7gjRmI8dp01MjG9QpTrz0bVPQw+b3VU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=EG8nAsfVpUaTwNCUJzX+4nG1bKfoQ+dyU36ht9WEl7iQSBHYOtMyUUSej9jmqzckTyaw4Vs14W3EhPtwKvKxBEnZ+o6sSv4W9iQ7OycgcFjNRYqzOcNI7XUK1Z/dP9HoznQGcMZPmLQUvX4gAkPoC+RoHqpbyygoNVYbyGY6Mf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a+L3Fe9p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EE8BC19423;
+	Tue, 11 Nov 2025 08:19:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762849171;
+	bh=VstIjK1vfnpN7gjRmI8dp01MjG9QpTrz0bVPQw+b3VU=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=a+L3Fe9pxBPaiamQhdm4lNYcibp3HHiPit3IntdyKfPq3efKSDEXdR/myFYriVM7h
+	 2db9dgrICZ2s7FqFF6m2snCIbTcImEhP4sWEpY1DspRRgRdG0hEEm/soA+EgCcSW1h
+	 G9Wekk6tMFakRC9/BvaA7OlKQBOfM7QD/s2/EsTgtWnltCqdjiL5J/0d9WtM77EiYm
+	 xx8lvh4Etx51gd1YxfsJ3tZs4M2hWh3uMBVl8ZvilqKGyrs25RdV/2f07g0zgnbLYR
+	 u/ab6rkP6WBQYapqxeQFIlqAqc8AcLyvQCFlqwwI7G5ffCTtrC41iICedumfZTm8DZ
+	 UR+Lqx46UC2Eg==
+Message-ID: <31caf9ecda9335a4377f383404b2609a24c8caeb.camel@kernel.org>
+Subject: Re: [PATCH net 6/6] selftests: mptcp: join: properly kill
+ background tasks
+From: Geliang Tang <geliang@kernel.org>
+To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, Mat Martineau
+ <martineau@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Shuah Khan
+ <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	stable@vger.kernel.org
+Date: Tue, 11 Nov 2025 16:19:25 +0800
+In-Reply-To: <20251110-net-mptcp-sft-join-unstable-v1-6-a4332c714e10@kernel.org>
+References: 
+	<20251110-net-mptcp-sft-join-unstable-v1-0-a4332c714e10@kernel.org>
+	 <20251110-net-mptcp-sft-join-unstable-v1-6-a4332c714e10@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Drop TX packets when posting the work request fails and ensure DMA
-mappings are always cleaned up.
+Hi Matt,
 
-Signed-off-by: Aditya Garg <gargaditya@linux.microsoft.com>
----
- drivers/net/ethernet/microsoft/mana/gdma_main.c | 1 -
- drivers/net/ethernet/microsoft/mana/mana_en.c   | 7 +++----
- include/net/mana/mana.h                         | 1 +
- 3 files changed, 4 insertions(+), 5 deletions(-)
+On Mon, 2025-11-10 at 19:23 +0100, Matthieu Baerts (NGI0) wrote:
+> The 'run_tests' function is executed in the background, but killing
+> its
+> associated PID would not kill the children tasks running in the
+> background.
+> 
+> To properly kill all background tasks, 'kill -- -PID' could be used,
+> but
+> this requires kill from procps-ng. Instead, all children tasks are
+> listed using 'ps', and 'kill' is called with all PIDs of this group.
+> 
+> Fixes: 31ee4ad86afd ("selftests: mptcp: join: stop transfer when
+> check is done (part 1)")
+> Cc: stable@vger.kernel.org
+> Fixes: 04b57c9e096a ("selftests: mptcp: join: stop transfer when
+> check is done (part 2)")
+> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index effe0a2f207a..65dd8060c7f4 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -1332,7 +1332,6 @@ int mana_gd_post_work_request(struct gdma_queue *wq,
- 
- 	if (wq->monitor_avl_buf && wqe_size > mana_gd_wq_avail_space(wq)) {
- 		gc = wq->gdma_dev->gdma_context;
--		dev_err(gc->dev, "unsuccessful flow control!\n");
- 		return -ENOSPC;
- 	}
- 
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index 67ae5421f9ee..066d822f68f0 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -491,9 +491,9 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
- 
- 	if (err) {
- 		(void)skb_dequeue_tail(&txq->pending_skbs);
-+		mana_unmap_skb(skb, apc);
- 		netdev_warn(ndev, "Failed to post TX OOB: %d\n", err);
--		err = NETDEV_TX_BUSY;
--		goto tx_busy;
-+		goto free_sgl_ptr;
- 	}
- 
- 	err = NETDEV_TX_OK;
-@@ -513,7 +513,6 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
- 	tx_stats->bytes += len + ((num_gso_seg - 1) * gso_hs);
- 	u64_stats_update_end(&tx_stats->syncp);
- 
--tx_busy:
- 	if (netif_tx_queue_stopped(net_txq) && mana_can_tx(gdma_sq)) {
- 		netif_tx_wake_queue(net_txq);
- 		apc->eth_stats.wake_queue++;
-@@ -1679,7 +1678,7 @@ static int mana_move_wq_tail(struct gdma_queue *wq, u32 num_units)
- 	return 0;
- }
- 
--static void mana_unmap_skb(struct sk_buff *skb, struct mana_port_context *apc)
-+void mana_unmap_skb(struct sk_buff *skb, struct mana_port_context *apc)
- {
- 	struct mana_skb_head *ash = (struct mana_skb_head *)skb->head;
- 	struct gdma_context *gc = apc->ac->gdma_dev->gdma_context;
-diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-index 50a532fb30d6..d05457d3e1ab 100644
---- a/include/net/mana/mana.h
-+++ b/include/net/mana/mana.h
-@@ -585,6 +585,7 @@ int mana_set_bw_clamp(struct mana_port_context *apc, u32 speed,
- void mana_query_phy_stats(struct mana_port_context *apc);
- int mana_pre_alloc_rxbufs(struct mana_port_context *apc, int mtu, int num_queues);
- void mana_pre_dealloc_rxbufs(struct mana_port_context *apc);
-+void mana_unmap_skb(struct sk_buff *skb, struct mana_port_context *apc);
- 
- extern const struct ethtool_ops mana_ethtool_ops;
- extern struct dentry *mana_debugfs_root;
--- 
-2.43.0
+This patch looks good to me.
+
+    Reviewed-by: Geliang Tang <geliang@kernel.org>
+
+Thanks,
+-Geliang
+
+> ---
+>  tools/testing/selftests/net/mptcp/mptcp_join.sh | 18 +++++++++------
+> ---
+>  tools/testing/selftests/net/mptcp/mptcp_lib.sh  | 21
+> +++++++++++++++++++++
+>  2 files changed, 30 insertions(+), 9 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/net/mptcp/mptcp_join.sh
+> b/tools/testing/selftests/net/mptcp/mptcp_join.sh
+> index 01273abfdc89..41503c241989 100755
+> --- a/tools/testing/selftests/net/mptcp/mptcp_join.sh
+> +++ b/tools/testing/selftests/net/mptcp/mptcp_join.sh
+> @@ -3831,7 +3831,7 @@ userspace_tests()
+>  		chk_mptcp_info subflows 0 subflows 0
+>  		chk_subflows_total 1 1
+>  		kill_events_pids
+> -		mptcp_lib_kill_wait $tests_pid
+> +		mptcp_lib_kill_group_wait $tests_pid
+>  	fi
+>  
+>  	# userspace pm create destroy subflow
+> @@ -3859,7 +3859,7 @@ userspace_tests()
+>  		chk_mptcp_info subflows 0 subflows 0
+>  		chk_subflows_total 1 1
+>  		kill_events_pids
+> -		mptcp_lib_kill_wait $tests_pid
+> +		mptcp_lib_kill_group_wait $tests_pid
+>  	fi
+>  
+>  	# userspace pm create id 0 subflow
+> @@ -3880,7 +3880,7 @@ userspace_tests()
+>  		chk_mptcp_info subflows 1 subflows 1
+>  		chk_subflows_total 2 2
+>  		kill_events_pids
+> -		mptcp_lib_kill_wait $tests_pid
+> +		mptcp_lib_kill_group_wait $tests_pid
+>  	fi
+>  
+>  	# userspace pm remove initial subflow
+> @@ -3904,7 +3904,7 @@ userspace_tests()
+>  		chk_mptcp_info subflows 1 subflows 1
+>  		chk_subflows_total 1 1
+>  		kill_events_pids
+> -		mptcp_lib_kill_wait $tests_pid
+> +		mptcp_lib_kill_group_wait $tests_pid
+>  	fi
+>  
+>  	# userspace pm send RM_ADDR for ID 0
+> @@ -3930,7 +3930,7 @@ userspace_tests()
+>  		chk_mptcp_info subflows 1 subflows 1
+>  		chk_subflows_total 1 1
+>  		kill_events_pids
+> -		mptcp_lib_kill_wait $tests_pid
+> +		mptcp_lib_kill_group_wait $tests_pid
+>  	fi
+>  }
+>  
+> @@ -3960,7 +3960,7 @@ endpoint_tests()
+>  		pm_nl_add_endpoint $ns2 10.0.2.2 flags signal
+>  		pm_nl_check_endpoint "modif is allowed" \
+>  			$ns2 10.0.2.2 id 1 flags signal
+> -		mptcp_lib_kill_wait $tests_pid
+> +		mptcp_lib_kill_group_wait $tests_pid
+>  	fi
+>  
+>  	if reset_with_tcp_filter "delete and re-add" ns2 10.0.3.2
+> REJECT OUTPUT &&
+> @@ -4015,7 +4015,7 @@ endpoint_tests()
+>  			chk_mptcp_info subflows 3 subflows 3
+>  		done
+>  
+> -		mptcp_lib_kill_wait $tests_pid
+> +		mptcp_lib_kill_group_wait $tests_pid
+>  
+>  		kill_events_pids
+>  		chk_evt_nr ns1 MPTCP_LIB_EVENT_LISTENER_CREATED 1
+> @@ -4089,7 +4089,7 @@ endpoint_tests()
+>  		wait_mpj $ns2
+>  		chk_subflow_nr "after re-re-add ID 0" 3
+>  		chk_mptcp_info subflows 3 subflows 3
+> -		mptcp_lib_kill_wait $tests_pid
+> +		mptcp_lib_kill_group_wait $tests_pid
+>  
+>  		kill_events_pids
+>  		chk_evt_nr ns1 MPTCP_LIB_EVENT_LISTENER_CREATED 1
+> @@ -4137,7 +4137,7 @@ endpoint_tests()
+>  		wait_mpj $ns2
+>  		pm_nl_add_endpoint $ns1 10.0.3.1 id 2 flags signal
+>  		wait_mpj $ns2
+> -		mptcp_lib_kill_wait $tests_pid
+> +		mptcp_lib_kill_group_wait $tests_pid
+>  
+>  		join_syn_tx=3 join_connect_err=1 \
+>  			chk_join_nr 2 2 2
+> diff --git a/tools/testing/selftests/net/mptcp/mptcp_lib.sh
+> b/tools/testing/selftests/net/mptcp/mptcp_lib.sh
+> index d62e653d48b0..f4388900016a 100644
+> --- a/tools/testing/selftests/net/mptcp/mptcp_lib.sh
+> +++ b/tools/testing/selftests/net/mptcp/mptcp_lib.sh
+> @@ -350,6 +350,27 @@ mptcp_lib_kill_wait() {
+>  	wait "${1}" 2>/dev/null
+>  }
+>  
+> +# $1: PID
+> +mptcp_lib_pid_list_children() {
+> +	local curr="${1}"
+> +	# evoke 'ps' only once
+> +	local pids="${2:-"$(ps o pid,ppid)"}"
+> +
+> +	echo "${curr}"
+> +
+> +	local pid
+> +	for pid in $(echo "${pids}" | awk "\$2 == ${curr} { print
+> \$1 }"); do
+> +		mptcp_lib_pid_list_children "${pid}" "${pids}"
+> +	done
+> +}
+> +
+> +# $1: PID
+> +mptcp_lib_kill_group_wait() {
+> +	# Some users might not have procps-ng: cannot use "kill -- -
+> PID"
+> +	mptcp_lib_pid_list_children "${1}" | xargs -r kill
+> &>/dev/null
+> +	wait "${1}" 2>/dev/null
+> +}
+> +
+>  # $1: IP address
+>  mptcp_lib_is_v6() {
+>  	[ -z "${1##*:*}" ]
+> 
 
 
