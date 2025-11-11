@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-237644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77ED3C4E4EF
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 15:11:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A457C4E543
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 15:14:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CF88B4E86DB
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 14:10:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D8C33B4C52
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 14:11:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5DB8332909;
-	Tue, 11 Nov 2025 14:10:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FB00342528;
+	Tue, 11 Nov 2025 14:10:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JSes4h+q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fExFan+R"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A11E32D0C0;
-	Tue, 11 Nov 2025 14:10:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB77D341678;
+	Tue, 11 Nov 2025 14:10:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762870245; cv=none; b=s5cB3dSVLPFpQFNImbuETjFDzm0VtkY1iU5TuyowsjiMxUDmizb3zdmL+xxrcX5hzt7KHnf9pARqz0FMRUxjgAkN+pSVxCtbuxRMSdqYo0oaaO9pAnwcdi9+2EC7IQLaD6572OSBzVQx46P1MlAZcLaw+qHDZRfD60GZhqMWiiI=
+	t=1762870247; cv=none; b=je4X7fQMmv+qRyU56TP3SlxxXHkv+e21LSmwJ3qXqnJpIHNduHjuQ+iXlJDjcpj/o8fCXBImVk7ftPN5rgV9nJwNKSdDe8sooJwERxI4YrjTZGUJKkACvOi0r3vSzQ7bVofh9mncR4/7DuKYMZ6xetpopJb66mtZzwH1DVSYlS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762870245; c=relaxed/simple;
-	bh=c2JxMe0Ll+HQtPVbv5Ys63HP4gmrS1IoooEa3rm6o7g=;
+	s=arc-20240116; t=1762870247; c=relaxed/simple;
+	bh=AMwr8pk0zm8H2SuijsXtu51hQ2CfQt6DuQAHmonpzi8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=U6sPmo0/yekuZ+1BG2Q9Wa/53GWbGOVGvzIUMLW1w2YAfeOukfx7r9VgwG9p+dm0RpUl6D1MfAPcONkWub/RPS0RFc8wD5o1m00vxyOeVmx2tY93GH55OFCFtIAXU6GeQoicuccSKzxpUcRedS9S+Oa1EXNpzZs6XEfSTSwGUJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JSes4h+q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0531C4CEF5;
-	Tue, 11 Nov 2025 14:10:44 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=KMy+5H0wle8qCFV3KVXZ/LR6dJUUsWyKVNuovWEb9ECleH1F5Kd8A0xC7Uup+7JS37niuTMZeLYL0rpY03ONbRH+QXEs4m9Nd1cAEJefxglG6oo+U2z+4TFwYMpCxuuX/h9Zh+v6s7pQwqzlUXQk2PQAD7Izenlms6Zd7jCoRDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fExFan+R; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 703E8C19421;
+	Tue, 11 Nov 2025 14:10:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762870245;
-	bh=c2JxMe0Ll+HQtPVbv5Ys63HP4gmrS1IoooEa3rm6o7g=;
+	s=k20201202; t=1762870246;
+	bh=AMwr8pk0zm8H2SuijsXtu51hQ2CfQt6DuQAHmonpzi8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=JSes4h+qb6XoYDRT6MZDlWtKJKb0l+ZFUMmGkTTvyKcu/hU3qF0PPKykTdq9tjJia
-	 4QTYkFyYd2CIa9rwCW65QiPvzb34oXxP8tR56idLspGavJJfV/HQvQzacDIwiNMSck
-	 C7XjwfL5uSUErjdcJt52opMTYNrFRykMwWrNgVSc42MnZLs/yos6M1YGWdo2nbP8Xx
-	 c0Qsa7W3r431kXSXJFfHLPEkSEq8smfvOPjB1M2HiU2cMUclphblLgxozAw6RilItV
-	 9utpT6TWNPz1lZRBzzGWNQoFhZXfNWA4pHLjDAO5GN+t8m+zvqJDHf3xGmgUbN41Pp
-	 pUrOymLrWBW2g==
+	b=fExFan+RQkgrFFg7ZaPt95NgCFkXSkL9hseHWN9g9+JAKFmLiulIwyQkuBG89GcdY
+	 4vHdDDMbk3sYu35ShvCK/c9Z2sN+uEzIV6KgeUUX+4CdYI3+LzwvYxXqJn543hU2sb
+	 HFTEkoOomtgA2PPwxyDcj6F1TALSA1umHlqLruYKATF4uzRBz1X26r91dX9YPLtbzt
+	 fZUpneMcwRj/xVlhgIE2C9La51OfjsrML2eXtH/+wxvaTp8zhaq58HPCD9Ep2YiG6/
+	 hEjoCrXO/bRTCqiMfSW8U3NuVWuoe8U/jKC4GxGj8dV0T00cFBWygYg+A2OSCr8BFw
+	 GMwEwKlotv+Kw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CD7380CFFB;
-	Tue, 11 Nov 2025 14:10:16 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB017380CFFB;
+	Tue, 11 Nov 2025 14:10:17 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,46 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/5] mlx5e misc fixes 2025-11-09
+Subject: Re: [PATCH v4 net 0/2] net: sched: initialize struct tc_ife to fix
+ kernel-infoleak
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <176287021525.3454241.13761058812147958076.git-patchwork-notify@kernel.org>
-Date: Tue, 11 Nov 2025 14:10:15 +0000
-References: <1762681073-1084058-1-git-send-email-tariqt@nvidia.com>
-In-Reply-To: <1762681073-1084058-1-git-send-email-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, saeedm@nvidia.com,
- leon@kernel.org, mbloch@nvidia.com, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org, gal@nvidia.com
+ <176287021649.3454241.10927980913848832965.git-patchwork-notify@kernel.org>
+Date: Tue, 11 Nov 2025 14:10:16 +0000
+References: <20251109091336.9277-1-vnranganath.20@gmail.com>
+In-Reply-To: <20251109091336.9277-1-vnranganath.20@gmail.com>
+To: Ranganath V N <vnranganath.20@gmail.com>
+Cc: edumazet@google.com, davem@davemloft.net, david.hunter.linux@gmail.com,
+ horms@kernel.org, jhs@mojatatu.com, jiri@resnulli.us, khalid@kernel.org,
+ kuba@kernel.org, pabeni@redhat.com, xiyou.wangcong@gmail.com,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ skhan@linuxfoundation.org,
+ syzbot+0c85cae3350b7d486aee@syzkaller.appspotmail.com
 
 Hello:
 
 This series was applied to netdev/net.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Sun, 9 Nov 2025 11:37:48 +0200 you wrote:
-> Hi,
+On Sun,  9 Nov 2025 14:43:34 +0530 you wrote:
+> This series addresses the uninitialization of the struct which has
+> 2 bytes of padding. And copying this uninitialized data to userspace
+> can leak info from kernel memory.
 > 
-> This patchset provides misc bug fixes from the team to the mlx5 Eth
-> driver.
-> 
-> Thanks,
-> Tariq.
+> This series ensures all members and padding are cleared prior to
+> begin copied.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/5] net/mlx5e: Fix missing error assignment in mlx5e_xfrm_add_state()
-    https://git.kernel.org/netdev/net/c/0bcd5b3b50cc
-  - [net,2/5] net/mlx5e: Trim the length of the num_doorbell error
-    https://git.kernel.org/netdev/net/c/2dc768c05217
-  - [net,3/5] net/mlx5e: Fix maxrate wraparound in threshold between units
-    https://git.kernel.org/netdev/net/c/a7bf4d5063c7
-  - [net,4/5] net/mlx5e: Fix wraparound in rate limiting for values above 255 Gbps
-    https://git.kernel.org/netdev/net/c/43b27d1bd88a
-  - [net,5/5] net/mlx5e: Fix potentially misleading debug message
-    https://git.kernel.org/netdev/net/c/9fcc2b6c1052
+  - [net,v4,1/2] net: sched: act_connmark: initialize struct tc_ife to fix kernel leak
+    https://git.kernel.org/netdev/net/c/62b656e43eae
+  - [net,v4,2/2] net: sched: act_ife: initialize struct tc_ife to fix KMSAN kernel-infoleak
+    https://git.kernel.org/netdev/net/c/ce50039be49e
 
 You are awesome, thank you!
 -- 
