@@ -1,162 +1,173 @@
-Return-Path: <netdev+bounces-237624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1F88C4DE30
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 13:53:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE9ECC4DDCA
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 13:50:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id BAC784EDD34
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 12:47:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB49D18C06E0
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 12:44:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46B593A5E75;
-	Tue, 11 Nov 2025 12:33:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A7093AA194;
+	Tue, 11 Nov 2025 12:37:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HaT6A4Kb";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="qMSKEmH5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TZwCK1es";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="mPwuRNGr"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E76A3A5E6D
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 12:33:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51E683AA19E
+	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 12:36:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762864399; cv=none; b=V7z+UXqI05lAxq0dQlphiRHTfaSM2ZsaQ7Du7m/vqsayaU1Xdy8arEIEDZaS/8N5e2t3zhOKj9bvYY2j9Gron86YvRmDZJzvEXozkGjUKMFk6c7/NV2AFuzqifSIjfjV7l22PON/UIKovZ7fj/+1q/NCTg10YEcP4P/Mu4qTmGM=
+	t=1762864622; cv=none; b=pHElTDvJBzVOfdXGawMh7OIJBAizRZgq9+UQakIx+mAWMcAE7o1hkMw++BrjxtWjZRrcXmrOMDKtxLDHikrs3OerrCgWhqs+xTYcsCsK7wonFrPLqfeI+Ksom7QIWQny/3XuGTbUK9S7EBCS6DSRvrVbdbqIQ0IozUlER+KecJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762864399; c=relaxed/simple;
-	bh=iOWBNEkhaYulz60fd9nqYbYaUth2lUkhdRV+MRZ+GSk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=G1KIRlrPxORwrBmIsqrk/v8whHZyMbV76Qukhcc97Phsh2ltK3zxq9p5Z2CGPGoiS/Nq2jpi6iWte8bq23CiqjdsQ+0FeLbZBlNveHWbup1rUe6VwFhOSQF/AMYI7ea4AYBz/NhIOJUhpvy9p7YLHsB8Ij7B5FGae17udUJiBn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HaT6A4Kb; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=qMSKEmH5; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1762864622; c=relaxed/simple;
+	bh=5dqdNo3mNkTyuVVJxOfXWQlM4vdL2fXY/f6lg8rt8x8=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=c/MZHF9xsIkB6JJ4B6ApAzys+uq29NAXXp80eG5zOF78enWyREZQf2tAkBJ1J50r7JHSFP62GAZX0lbn1bO/aI803z21dFDDcfILzBqcdytaTRrX84p2TM9WU/MUuw2cuPVoapiISGP3JaQJLxwzcVKwqMnsBL5PZs6iC6L1Iug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TZwCK1es; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=mPwuRNGr; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762864396;
+	s=mimecast20190719; t=1762864619;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=TEMqTiIls3GK+BcBgDdLsrWg6wcMid5JirlC8x4cCJQ=;
-	b=HaT6A4KbAtUPsaV3KjuB6fdoIR80uKtD7yDGnJjr6MhJDzPxajOECkbaprtSAD/H5hn8pv
-	K3BTCvd87F8qBpvTs8rsvyI8m6630wqK98zjKcFXfO3nAhq1D4fd2i/8nuqiyd+0PGU5pv
-	bAIwJf/bqfiuPYCOM5oJWUT14/9sHKc=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=HJil3CsSx+8fOj31OoVJWOQNTlYu8I58IHhwpqoKvHs=;
+	b=TZwCK1esLLli0aDh7V2YSGTPgz0m4hTSIZoK4lnwbj8By0MYbmbK+3JmrxdU/EJgmv55VI
+	W+EVoLXV1ux6tcniMc9G+ZsZpPNTtuifS5rtuDACfJCmkDprtBwXmclMmmaSiMWLRchWFs
+	FQywiFLLWNk8K+msvj7nkg9Sm+pQvGk=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-574-uJhHqeYgPBKj2JncLGQiig-1; Tue, 11 Nov 2025 07:33:15 -0500
-X-MC-Unique: uJhHqeYgPBKj2JncLGQiig-1
-X-Mimecast-MFC-AGG-ID: uJhHqeYgPBKj2JncLGQiig_1762864394
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-42b3d7c1377so1192808f8f.2
-        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 04:33:14 -0800 (PST)
+ us-mta-660--DJa_-hwP3KkXRIhxLCJdw-1; Tue, 11 Nov 2025 07:36:57 -0500
+X-MC-Unique: -DJa_-hwP3KkXRIhxLCJdw-1
+X-Mimecast-MFC-AGG-ID: -DJa_-hwP3KkXRIhxLCJdw_1762864616
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-6409849320cso858518a12.0
+        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 04:36:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762864394; x=1763469194; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TEMqTiIls3GK+BcBgDdLsrWg6wcMid5JirlC8x4cCJQ=;
-        b=qMSKEmH5zh3ctqKDwnt6cCK2+TpyDorwqW+f8NzcPEqfJ4MLx0ndMhrwyL7zZLp1zt
-         16zSbtXJ0s2I2KcT6CiFZNzRLm2KJOFSuj0BHYqi51ODGXmNF3qxzivmpGQrYbKbCuES
-         3wJy/skHPhdtEAk4Kw7EkNtROAvRgIlLxDZpD5GZURWN6EUGEKEV5npVlLk0/h10kjq4
-         BeN+znXsUmWfOEDrJK2NmRGjJ9sa+3EqHdM5feeSgyzjeHSlfq+arBRMCZVBZdD0ZhR2
-         VFnnE+6qwQewC7Ta9i81j70XtYWHLJdQ0V8GKCQNzF4+t+HH+780qPkFILuFjgN/WSc6
-         QDQg==
+        d=redhat.com; s=google; t=1762864616; x=1763469416; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HJil3CsSx+8fOj31OoVJWOQNTlYu8I58IHhwpqoKvHs=;
+        b=mPwuRNGraz2FloDjjZW58TFYOKa2vusLMVu2/EYH0Gymc8KlQT2pYKbbk4XC2Y428e
+         lpLqp24A1/XZXJd6sOCvVp9gJgywdeDaC8f7CymMHBRegn/MrFQFC3iByhmlm8eptHu+
+         ja0MhL4V+xcCybVrQa8TJ8n/mJ4xFESUQ58iNhPQQancjm9MzaHgWqTvfwTRYDIQjzxJ
+         tiE6jNRCe+4Qlh8dRwYbzJ3ExmvXZsSdH4CCQ5ZmdfSnCWMLkaWIFt0SGyejFTEVb9pY
+         G63DQnBVg8LM6ccu1aHLaiLxN/8uZEf7Caslm38yROvZlluqj3oPK12z3COQUfhTL9Kh
+         qASg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762864394; x=1763469194;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1762864616; x=1763469416;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=TEMqTiIls3GK+BcBgDdLsrWg6wcMid5JirlC8x4cCJQ=;
-        b=C/YXv2IPPn4sGl8Ss//OflbZPmXXQQgx5WQgzrqCjCD4pTC1mW/HQMY9TkUVIdp4F9
-         qKJfFaZoPNSe8wCSFDCd412mknFPqNpC/g+KQ3tXVqAVpHpZ97Wx8S2iGs5ecW7/ZDEP
-         inop7mgcYxIOWrf4gSTyAfuoXLEf8nIs+kw/fDxuhUiQxDxrjFZ2f/g5jpvrI+Sg6IFt
-         Q3X03/v+e4pvF/PY1pztyJF5pGpCguuYllouU2AdrTIV3qjdoXB30k4zJ1A98LhXL3T0
-         AXVu+E5dwN/dshmw1jbH2ZHogvmp0MfY2ZNdZcTpSXfHrx6mk3Ub7sirb7p4bkijViWh
-         rNCA==
-X-Forwarded-Encrypted: i=1; AJvYcCWKOEDHF9uBhA0XhLgUM67Hoqn9ozf/zvyQ4+A/B1sA1vOxx33B5rl6S8p8ZS4Qwd1NhgisgHk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkGTVhHZT2IxUOgfH9epCBh22xfgBPutFdKUJk23c3/dW11oYu
-	vZ00Wy78l5hOFh7i+JbrmwjJY1aR8pGghRC3WYw1+4JY/bE6IzpSQf9GJD0JkBQT1YY7cp8j+US
-	Jd3xnFHPGHUW6vOPSkyC8wjGQkFFFQIE5boJTwFbeBNu2kea6islk5OUdrA==
-X-Gm-Gg: ASbGnct+FqoYiJMQv4m80khsvmdq1yLN4xWf04rOuiYrtGInZJM0QrFHGvcG07J/XQO
-	HuwAd/LM5IMdbWu3RML/kYtDSl53Vfo2NuEtDDqpCxuohl9pkSmnHudHL2LpYiSy2qAdSWpJRqp
-	XcFCyGODKvcfFKJiIs1qGYK23R2M4LnxFx7ZNiZHw3x83ko6gAdz5rK2I8TJDO4LUulOupaUxya
-	/6ygfq/ODKrQrc9JzoH1f0K4vfFkB/OpaLevey/soGhGDgijn4NxzDa4cLKuVNtm1YQpTsNNZp5
-	diVy7ZPcQszsdY9ZDzyaQaUie9aQZ9VMENWfaOWsJ8irLuTsrD9QGk5rdHGoNPEBpkMuNyZd6Pf
-	e+A==
-X-Received: by 2002:a5d:5f53:0:b0:42b:32c3:3949 with SMTP id ffacd0b85a97d-42b32c341e4mr8571487f8f.31.1762864393733;
-        Tue, 11 Nov 2025 04:33:13 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEogtUOY4yTdf1DuIqascBGW9c45+fo19oaNrpbIqMX41Hc32xWFtKascZRxunxinjoalWo2A==
-X-Received: by 2002:a5d:5f53:0:b0:42b:32c3:3949 with SMTP id ffacd0b85a97d-42b32c341e4mr8571452f8f.31.1762864393278;
-        Tue, 11 Nov 2025 04:33:13 -0800 (PST)
-Received: from [192.168.88.32] ([212.105.155.55])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42ac6794f6esm31385653f8f.41.2025.11.11.04.33.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Nov 2025 04:33:12 -0800 (PST)
-Message-ID: <d19c7bea-9b4d-4f00-a6bc-35247011e788@redhat.com>
-Date: Tue, 11 Nov 2025 13:33:11 +0100
+        bh=HJil3CsSx+8fOj31OoVJWOQNTlYu8I58IHhwpqoKvHs=;
+        b=A9YPW3ZG/XNlFhk21XYMI9jVqJQ1uQlCD+373rdB+qOutg8z/ZjMRBCx+LDdLco5IL
+         wcQuIYKhIE72qd2Y+9H9V6PiMYIbv5WD/l1oAK9BsHNY0Q4J+hKG3FUwdVOSOOe+JY1T
+         0nc2qfd+LwW6tUR21jHJZjuSYkzpM4UTLh2FIQKVjKEsDuBui413qlhxwu5AvkxJdnYR
+         QrV15F9FS//ofAnd9rxLj3THZpIJk8KQ9UD7D59kdHgsfpUF1thGEYWg7iWvrkobebqx
+         Q7eecpbRXXIbz7sPmQ1QhsioDOgsUvp5IBgdiaHI1zgfO5r0jUWzxhUiSXmcYo5KblFp
+         TAEA==
+X-Forwarded-Encrypted: i=1; AJvYcCXlIe2de4tZJf9BFTOvQMXuEUz3ty5UCZrVl8nBWIV36D/Cv96JJwvm86dwp8R08UcbF66I8Ig=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAZ5Tl7MLXfF6wPVGkYv+QdTK8Eb/RJMMznxmjnHresz9CEkOK
+	DN8yuFDFUKAj5u0T7/0xyPUYzbGyYgA9OB7sB8KD3D4FHCV7PGme2zsfEVuP9D4Tysm3wEVe+C+
+	gbMPkVA9U9cZI8oWyX9O3UNka1d3ibM6mQyT1Twj1VtJrkdsUot8rROJQ2g==
+X-Gm-Gg: ASbGncsNL9mohtBaMGOgJOL06vNMtrsBT1u3bgz5p56mr3Zz2LPbuXgxSUhv11udrxN
+	ipYV8GeaxM5NH0AmQ7RR3TZkIouGWMlN+/jW9xnZIyqzqqUGy/qIpVDjVb6aWgjG4u3JpF7yufg
+	+3N+JJpR9RbggnDPPXsP6leX3+b2Fwns/CmiN2VAHQUWkITolWTk7C9FxBT6Rt4TXjYV7EEFa0y
+	5Q5YWtOEiR970y8AWk8pNeraXKIqJtpY2X2XrubCkpMZjuD7XzN5CR3lo95NxskhvFp+HWntcjJ
+	NkPps60DKlFCH2YYG87pCx2/38ksTdbOfF9eBjPkl0R1eBUXUZXWf5DrHEvAmjcvuZocHhJhCEx
+	baWuy2pwaTERn9DbPdKDOV7XJ+Q==
+X-Received: by 2002:a05:6402:5189:b0:641:6b44:75de with SMTP id 4fb4d7f45d1cf-642e275ace8mr2893719a12.5.1762864615765;
+        Tue, 11 Nov 2025 04:36:55 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGfkAwSb/V5JIwU5moExHjbeMcWwrXGoX+mdVUHDtdTxf3WoXuBjDbonnmfpi475Ak1gHNtpA==
+X-Received: by 2002:a05:6402:5189:b0:641:6b44:75de with SMTP id 4fb4d7f45d1cf-642e275ace8mr2893656a12.5.1762864615046;
+        Tue, 11 Nov 2025 04:36:55 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk (alrua-x1.borgediget.toke.dk. [2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-6411f814164sm13449948a12.13.2025.11.11.04.36.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Nov 2025 04:36:54 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 83146329590; Tue, 11 Nov 2025 13:36:51 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Byungchul Park <byungchul@sk.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: linux-mm@kvack.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel_team@skhynix.com,
+ harry.yoo@oracle.com, ast@kernel.org, daniel@iogearbox.net,
+ davem@davemloft.net, hawk@kernel.org, john.fastabend@gmail.com,
+ sdf@fomichev.me, saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
+ mbloch@nvidia.com, andrew+netdev@lunn.ch, edumazet@google.com,
+ pabeni@redhat.com, akpm@linux-foundation.org, david@redhat.com,
+ lorenzo.stoakes@oracle.com, Liam.Howlett@oracle.com, vbabka@suse.cz,
+ rppt@kernel.org, surenb@google.com, mhocko@suse.com, horms@kernel.org,
+ jackmanb@google.com, hannes@cmpxchg.org, ziy@nvidia.com,
+ ilias.apalodimas@linaro.org, willy@infradead.org, brauner@kernel.org,
+ kas@kernel.org, yuzhao@google.com, usamaarif642@gmail.com,
+ baolin.wang@linux.alibaba.com, almasrymina@google.com,
+ asml.silence@gmail.com, bpf@vger.kernel.org, linux-rdma@vger.kernel.org,
+ sfr@canb.auug.org.au, dw@davidwei.uk, ap420073@gmail.com,
+ dtatulea@nvidia.com
+Subject: Re: [RFC mm v5 1/2] page_pool: check nmdesc->pp to see its usage as
+ page pool for net_iov not page-backed
+In-Reply-To: <20251111024500.GA79866@system.software.com>
+References: <20251107015902.GA3021@system.software.com>
+ <20251106180810.6b06f71a@kernel.org>
+ <20251107044708.GA54407@system.software.com>
+ <20251107174129.62a3f39c@kernel.org>
+ <20251108022458.GA65163@system.software.com>
+ <20251107183712.36228f2a@kernel.org>
+ <20251110010926.GA70011@system.software.com>
+ <20251111014052.GA51630@system.software.com>
+ <20251110175650.78902c74@kernel.org>
+ <20251111021741.GB51630@system.software.com>
+ <20251111024500.GA79866@system.software.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Tue, 11 Nov 2025 13:36:51 +0100
+Message-ID: <87346kn3to.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 00/12] selftests/vsock: refactor and improve
- vmtest infrastructure
-To: Bobby Eshleman <bobbyeshleman@gmail.com>,
- Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>
-Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- Simon Horman <horms@kernel.org>, Bobby Eshleman <bobbyeshleman@meta.com>
-References: <20251108-vsock-selftests-fixes-and-improvements-v4-0-d5e8d6c87289@meta.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20251108-vsock-selftests-fixes-and-improvements-v4-0-d5e8d6c87289@meta.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On 11/8/25 5:00 PM, Bobby Eshleman wrote:
-> This patch series refactors the vsock selftest VM infrastructure to
-> improve test run times, improve logging, and prepare for future tests
-> which make heavy usage of these refactored functions and have new
-> requirements such as simultaneous QEMU processes.
-> 
-> These patches were broken off from this prior series:
-> https://lore.kernel.org/all/20251021-vsock-vmtest-v7-0-0661b7b6f081@meta.com/
-> 
-> To: Stefano Garzarella <sgarzare@redhat.com>
-> To: Shuah Khan <shuah@kernel.org>
-> Cc: virtualization@lists.linux.dev
-> Cc: netdev@vger.kernel.org
-> Cc: linux-kselftest@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: Simon Horman <horms@kernel.org>
-> 
-> Changes in v4:
-> - fix messed up rebase (wrt check_result() and shared_vm_test() patches)
-> - more consistent variable quotes style
-> - use associative array for pidfiles, remove after terminate
-> - Link to v3: https://lore.kernel.org/r/20251106-vsock-selftests-fixes-and-improvements-v3-0-519372e8a07b@meta.com
-> 
-> Changes in v3:
-> - see per-patch changes
-> - Link to v2: https://lore.kernel.org/all/20251104-vsock-selftests-fixes-and-improvements-v2-0-ca2070fd1601@meta.com
-> 
-> Changes in v2:
-> - remove "Fixes" for some patches because they do not fix bugs in
->   kselftest runs (some fix bugs only when using bash args that kselftest
->   does not use or otherwise prepare functions for new usage)
-> - broke out one fixes patch for "net"
-> - per-patch changes
-> - add patch for shellcheck declaration to disable false positives
-> - Link to v1: https://lore.kernel.org/r/20251022-vsock-selftests-fixes-and-improvements-v1-0-edeb179d6463@meta.com
+Byungchul Park <byungchul@sk.com> writes:
 
-Series LGTM, but let's wait a little bit more for explicit ack from Stefano.
+> On Tue, Nov 11, 2025 at 11:17:41AM +0900, Byungchul Park wrote:
+>> On Mon, Nov 10, 2025 at 05:56:50PM -0800, Jakub Kicinski wrote:
+>> > On Tue, 11 Nov 2025 10:40:52 +0900 Byungchul Park wrote:
+>> > > > > I understand the end goal. I don't understand why patch 1 is a step
+>> > > > > in that direction, and you seem incapable of explaining it. So please
+>> > > > > either follow my suggestion on how to proceed with patch 2 without
+>> > > >
+>> > > > struct page and struct netmem_desc should keep difference information.
+>> > > > Even though they are sharing some fields at the moment, it should
+>> > > > eventually be decoupled, which I'm working on now.
+>> > >
+>> > > I'm removing the shared space between struct page and struct net_iov so
+>> > > as to make struct page look its own way to be shrinked and let struct
+>> > > net_iov be independent.
+>> > >
+>> > > Introduing a new shared space for page type is non-sense.  Still not
+>> > > clear to you?
+>> > 
+>> > I've spent enough time reasoning with out and suggesting alternatives.
+>> 
+>> I'm not trying to be arguing but trying my best to understand you and
+>> want to adopt your opinion.  However, it's not about objection but I
+>> really don't understand what you meant.  Can anyone explain what he
+>> meant who understood?
+>
+> If no objection against Jakub's opinion, I will resend with his
+> alternaltive applied.
 
-Thanks,
+No objection from me :)
 
-Paolo
+-Toke
 
 
