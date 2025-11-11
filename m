@@ -1,127 +1,131 @@
-Return-Path: <netdev+bounces-237440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21B88C4B56F
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 04:35:42 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 267B8C4B587
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 04:38:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF34D3B0314
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:34:44 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C7F0E34B5A2
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:38:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A98F346E60;
-	Tue, 11 Nov 2025 03:34:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEF06347FEC;
+	Tue, 11 Nov 2025 03:38:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NbJY+8Ou"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dn0Wswuu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC5BB313526;
-	Tue, 11 Nov 2025 03:34:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E29B52F25F6;
+	Tue, 11 Nov 2025 03:38:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762832082; cv=none; b=G62nFeM9K42yusM1avXNCVbkMKRvd7Ke7aCxdqrrB7mK3eaX16qxwuJYprIsNJFA3P9gSgKB2n2GAcYbJRWU4X6jOfdO/PMP/pyU/B5l4uXd/KutdHji7eGSXFtVKkAaxeFm46pRom96oE/0a6OJbAwow1PkamemvJw5qRORXsw=
+	t=1762832293; cv=none; b=U0H5XXkTUfVVcOgCcTmrAc8zcUdeioit1a4Oq2e7wNc/aXYNytISSVs7H2IvLrrQ3jPzW6vrME5bLe5MdqJLp+xTfPD9TyUG6MjWZ5196oHUmXZNy+l2UyKQIcqeUOm+aijuTpDAEeMuTLnjA+z/GinkB9fyNghDUWs5D3ZXAKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762832082; c=relaxed/simple;
-	bh=rl4quI5CP3hR4drgVFblTgTJWg1WQ4rTS/8XInVRBRs=;
+	s=arc-20240116; t=1762832293; c=relaxed/simple;
+	bh=JnjR3ccdOgFUFdsqe6dQDe53y5GKhqvyQm58YKJGcBE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uB5PqkXGXLZdHiCrzrDTupqyOqy6Rs+HTanCdDC61dIyjJWvWYklPLXdvO8OM6bITBgOjFFLWNJlFDqQ6v6LewXPXCxgF2SB4i19PQZrJ/82xdonb5N+46Mw8dpeBKIdIv4j0R77RbuwlSibgvScJpOE98yVM0LUMrNy5cdFA90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NbJY+8Ou; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2054FC16AAE;
-	Tue, 11 Nov 2025 03:34:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762832082;
-	bh=rl4quI5CP3hR4drgVFblTgTJWg1WQ4rTS/8XInVRBRs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NbJY+8OuCVAtsk/Qd+DQWuoyHMS9NkjdFKRoJpxSnvZSQFA/3FKgriuCuQ1hTdk6Z
-	 VjuCJv1ZBON+kwFu3S0k4zhP38utHIs06bxZk/JxbAL4MgY4WZ0b0K66OKFnUgq+Y8
-	 na1I/6IureNbUb3dwmULna0Fv/98r43yq4TloLeCSGlwnK6LXR8Ab2BJu7lVc8lFno
-	 wtCf1NiGMqYg2vS4c9AvQiH0rVaCy3zm03oauR/L3PhKsqwYnqFnrGy9EZ8rIKpYJc
-	 dh1MzY663AuvvZCqkzxOkymtEHga8UogMw9P81gLVBAMYDeOTuCflwVQRDTzh9isAq
-	 sc2+TiU77i4ig==
-Date: Mon, 10 Nov 2025 19:34:40 -0800
-From: Saeed Mahameed <saeed@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Daniel Zahka <daniel.zahka@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=TvUvIFYYgc1zBH5/JCQpC2idfbj41rcIvQyqQb4NZq7PEAt9WWno4wFzaCcSf70OwxMrZInmTtW55m0WGf38lz7JcewUd7gFAqfAQDsxZk/2rSE3OysUp3y+WezO0Fe8XiYbwBJxp3i7mnUJ3Veq+x2/QUMnAkQb0qcliUd7O3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dn0Wswuu; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=0r//aGWrlmi6Dku4SGylGdOm8j4QEiQNTC0qV/wOxJc=; b=dn0WswuuraMNIHUtJcky8SsfHD
+	lYIF25aVVaICooOnwK6+1PhUjbAamJyARyDAbXGu23yIu3Ji7VCSMdoZoeArPgiHPP2RbbwUC4nnH
+	QFDYH0MFaWvFlkZznzTej00KZ9EL9ucvBHfCt8FyHwRAH9hk+DJELfuWxhdzwBv2b7W8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vIfCf-00DaPh-BJ; Tue, 11 Nov 2025 04:37:57 +0100
+Date: Tue, 11 Nov 2025 04:37:57 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
 	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Srujana Challa <schalla@marvell.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Brett Creeley <brett.creeley@amd.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Sunil Goutham <sgoutham@marvell.com>,
-	Linu Cherian <lcherian@marvell.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Jerin Jacob <jerinj@marvell.com>, hariprasad <hkelam@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
-	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
-	Manish Chopra <manishc@marvell.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Roger Quadros <rogerq@kernel.org>,
-	Loic Poulain <loic.poulain@oss.qualcomm.com>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Dave Ertman <david.m.ertman@intel.com>,
-	Vlad Dumitrescu <vdumitrescu@nvidia.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Alexander Sverdlin <alexander.sverdlin@gmail.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-	linux-rdma@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-omap@vger.kernel.org
-Subject: Re: [PATCH net-next v3 2/2] net/mlx5: implement swp_l4_csum_mode via
- devlink params
-Message-ID: <aRKu0Iknk0jftv2Z@x130>
-References: <20251107204347.4060542-1-daniel.zahka@gmail.com>
- <20251107204347.4060542-3-daniel.zahka@gmail.com>
- <aQ7f1T1ZFUKRLQRh@x130>
- <20251110150133.04a2e905@kernel.org>
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+	Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Subject: Re: [PATCH net-next v15 02/15] net: ethtool: Introduce
+ ETHTOOL_LINK_MEDIUM_* values
+Message-ID: <71c1c7a9-db8b-4efe-94fe-0f7f9ef00840@lunn.ch>
+References: <20251106094742.2104099-1-maxime.chevallier@bootlin.com>
+ <20251106094742.2104099-3-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251110150133.04a2e905@kernel.org>
+In-Reply-To: <20251106094742.2104099-3-maxime.chevallier@bootlin.com>
 
-On 10 Nov 15:01, Jakub Kicinski wrote:
->On Fri, 7 Nov 2025 22:14:45 -0800 Saeed Mahameed wrote:
->> >+	err = mlx5_nv_param_read_sw_accelerate_conf(dev, mnvda, sizeof(mnvda));
->> >+	if (err) {
->> >+		NL_SET_ERR_MSG_MOD(extack,
->> >+				   "Failed to read sw_accelerate_conf mnvda reg");
->>
->> Plug in the err, NL_SET_ERR_MSG_FMT_MOD(.., .., err);
->> other locations as well.
->
->Incorrect. extack should basically be passed to perror()
->IOW user space will add strerror(errno) after, anyway.
->Adding the errno inside the string is pointless and ugly.
+On Thu, Nov 06, 2025 at 10:47:27AM +0100, Maxime Chevallier wrote:
+> In an effort to have a better representation of Ethernet ports,
+> introduce enumeration values representing the various ethernet Mediums.
+> 
+> This is part of the 802.3 naming convention, for example :
+> 
+> 1000 Base T 4
+>  |    |   | |
+>  |    |   | \_ pairs (4)
+>  |    |   \___ Medium (T == Twisted Copper Pairs)
+>  |    \_______ Baseband transmission
+>  \____________ Speed
+> 
+>  Other example :
+> 
+> 10000 Base K X 4
+>            | | \_ lanes (4)
+>            | \___ encoding (BaseX is 8b/10b while BaseR is 66b/64b)
+>            \_____ Medium (K is backplane ethernet)
+> 
+> In the case of representing a physical port, only the medium and number
+> of pairs should be relevant. One exception would be 1000BaseX, which is
+> currently also used as a medium in what appears to be any of
+> 1000BaseSX, 1000BaseCX and 1000BaseLX. This was reflected in the mediums
+> associated with the 1000BaseX linkmode.
+> 
+> These mediums are set in the net/ethtool/common.c lookup table that
+> maintains a list of all linkmodes with their number of lanes, medium,
+> encoding, speed and duplex.
+> 
+> One notable exception to this is 100M BaseT Ethernet. 100BaseTX is a
+> 2-lanes protocol but it will also work on 4-lanes cables, so the lookup
+> table contains 2 sets of lane numbers, indicating the min number of lanes
+> for a protocol to work and the "nominal" number of lanes as well.
+> 
+> Another set of exceptions are linkmodes such 100000baseLR4_ER4, where
+> the same link mode seems to represent 100GBaseLR4 and 100GBaseER4. The
+> macro __DEFINE_LINK_MODE_PARAMS_MEDIUMS is here used to populate the
+> .mediums bitfield with all appropriate mediums.
+> 
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-ernno set by stack. err set by driver. we can't assume err will propagate
-to errno, this is up to the stack.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-And not at all ugly, very useful debug hint to the user, unless you
-guarantee err == errno.
-
-
+    Andrew
 
