@@ -1,143 +1,94 @@
-Return-Path: <netdev+bounces-237465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59703C4C0BC
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 08:16:41 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C8DDC4C210
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 08:36:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 0618234F44C
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 07:16:41 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 289B234EBB9
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 07:36:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AFA1212FB9;
-	Tue, 11 Nov 2025 07:16:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C87C31A06C;
+	Tue, 11 Nov 2025 07:36:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="uPwfVwpY"
+	dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b="kuZ/33BO"
 X-Original-To: netdev@vger.kernel.org
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from mail-m16.yeah.net (mail-m16.yeah.net [220.197.32.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED1B534D38B;
-	Tue, 11 Nov 2025 07:16:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9853A29DB6A;
+	Tue, 11 Nov 2025 07:36:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.32.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762845396; cv=none; b=iYLHVQNRBy6RHlXX8HpFjjO29ZGNHd/R9w7DAUvkpv+tIQALlTI1MYnU2blO/m+j8ZN3W2Oq65jY+cmRXIm7Dl5ce18FV+mu0s3gfAB/BGGEu2HwOCcn2WTSI0fAbg/Vme0w03R92OyiWF5nBWusZjN4wiiKLdWgcsSVcrjU198=
+	t=1762846586; cv=none; b=DcyZSgZOpaMNun7Ha34inEV24++dHAtk3wrhyPnRwT7OiTV4AeHAvSp2V7mVYxd/DnTUnjJGXi1QYIXu4zc8c7KHaSaeutrYFN2lnYyiO5OeSITfWS5LpBFgnkb55cIaJv/R1Ykm+tKtorUC5JPMaexJo9CX6VRFPtwGz/b47Pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762845396; c=relaxed/simple;
-	bh=tgRN+3Ff01SBIW4c46omJ2zyYnVI86tEs2SnSuHespA=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=DGygfqex3fSSsTDTsoPIS3V/QDu7+W1aquE7mZP+GDKMtb1SbYAvOqlSZI9fZlP98rw7TFTV7UtRH2VrkAghY7PoqiX1seZhp5TMM0SxM7ZVzvSezYreIN2SI5mpd7LXrcun5/s8QOjhAbJHT8uXlCN7YHiGwH1FgLzzicumIF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=uPwfVwpY; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=Cc:To:From:Date:Message-ID;
-	bh=w+EJWcxfCKB7hHIJqXC79RKDukiV8IvOIbkLhkk22F0=; b=uPwfVwpY9mYy7lFIUV0vGENAdl
-	ho3zdIXXQvIa+h/tDfeGfNMnmCeZy7+/ePzXMowqVr7uBjiRoL3c/YadnaPn7IWAxfkQkE7NWGR2X
-	8/03QlTNBVbUChKI7/WbBGPcySPewpd9I7VBE9j6ynA5R3uj9ZTzAVHy7vcbBpxYT/Nji8ZEAUzvb
-	iwLVsG2ws2zJmchL9saRKRT59HnK/mWZ30glO8GDx8NqoiycodCNocXwH3Gg2l/r3x3wkjHqLo6RL
-	OubPU/Q++hrl/9tLyUr8y94kJ2jsGLyJcBVbCkY8tmYswnZO5BIM5e82Wjdumih2gVLhysrcZXeKh
-	qFJ7a28W62MVFKPmWkpSufDcdsvpj3vlOZYojeG1BnrdOtMr9JnIR03VVmOgAZ8Jyu52OovXuRfno
-	PDtmvkXvLfEB1a2YNvzAKk+irt+UM14UWl2qpSEMlWpPs0WZ3wLvS/l2QQgz4bWC/V7IKrO0QBPFC
-	yKvJdutZWBcnrqB/k8u5sg6O;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1vIic9-00DZNA-36;
-	Tue, 11 Nov 2025 07:16:31 +0000
-Message-ID: <10da0cb9-8c92-413d-b8df-049279100458@samba.org>
-Date: Tue, 11 Nov 2025 08:16:29 +0100
+	s=arc-20240116; t=1762846586; c=relaxed/simple;
+	bh=mIuHHzikhcqxzo0qmM5Y2Ye5IRQ2X29fODs7frPKlNE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nab/3JZ5BLaAa8o/yCfL9gKjuXGbk9CL3oygy1AmG+zOI4LuyBslGMOFLm2L9OmD4VdOqftKEwptCmHb+1a2e5lErG2o3i6Y21ZE0mhPcDt3EIys1M1upJh0GHx21pZarXbflekswblph4Qb1uciFbjtnIlwMlDjBbrebwLxnJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net; spf=pass smtp.mailfrom=yeah.net; dkim=pass (1024-bit key) header.d=yeah.net header.i=@yeah.net header.b=kuZ/33BO; arc=none smtp.client-ip=220.197.32.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yeah.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yeah.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yeah.net;
+	s=s110527; h=Date:From:To:Subject:Message-ID:MIME-Version:
+	Content-Type; bh=DXSbtNa/8HGcN26NDfFmNPbrsVA0ceNG7FgLoJ6Ziys=;
+	b=kuZ/33BO1A5NZNYEaLRHjhouKPLdrH7xX6pZHYgBgZKhpT/Q5SoGP8/CZTh+SM
+	R81shMTV6w0+O/8jxL4woap2+7cqN9vGzsuIal3uN0f9yT8voCbd+dX7O+mHUhZs
+	eUon3+QD+qriOHSny9y3lZ2pD8SGBR6HLIFbjaAp3h1VM=
+Received: from dragon (unknown [])
+	by gzsmtp3 (Coremail) with SMTP id M88vCgAHhmfi5BJp+fTBAQ--.5059S3;
+	Tue, 11 Nov 2025 15:25:24 +0800 (CST)
+Date: Tue, 11 Nov 2025 15:25:22 +0800
+From: Shawn Guo <shawnguo2@yeah.net>
+To: Frank Li <Frank.Li@nxp.com>
+Cc: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	devicetree@vger.kernel.org, imx@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 0/8] arm64: dts: imx8dxl related fix and minor update
+Message-ID: <aRLk4uAnXFyMAzEf@dragon>
+References: <20251022-dxl_dts-v1-0-8159dfdef8c5@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] ksmbd: server: avoid busy polling in accept loop
-From: Stefan Metzmacher <metze@samba.org>
-To: Qingfang Deng <dqfext@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>,
- Steve French <smfrench@gmail.com>,
- Sergey Senozhatsky <senozhatsky@chromium.org>, Tom Talpey <tom@talpey.com>,
- Ronnie Sahlberg <lsahlber@redhat.com>, Hyunchul Lee <hyc.lee@gmail.com>,
- linux-cifs@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: netdev@vger.kernel.org
-References: <20251030064736.24061-1-dqfext@gmail.com>
- <2516ed5d-fed2-47a3-b1eb-656d79d242f3@samba.org>
-Content-Language: en-US
-In-Reply-To: <2516ed5d-fed2-47a3-b1eb-656d79d242f3@samba.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251022-dxl_dts-v1-0-8159dfdef8c5@nxp.com>
+X-CM-TRANSID:M88vCgAHhmfi5BJp+fTBAQ--.5059S3
+X-Coremail-Antispam: 1Uf129KBjvdXoW7Jw1rJF45trWfAF15XFWrXwb_yoWxKFg_u3
+	90gF1ku3yUtr4fJw42van5u34UKw48Ar1DWryFg397X343XF15ua4vv395W3yxXFW3Zr1D
+	CFyUJw1xXa15WjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUbzVbPUUUUU==
+X-CM-SenderInfo: pvkd40hjxrjqh1hdxhhqhw/1tbiOQVRtmkS5OUapgAA3d
 
-Am 11.11.25 um 07:55 schrieb Stefan Metzmacher:
-> Am 30.10.25 um 07:47 schrieb Qingfang Deng:
->> The ksmbd listener thread was using busy waiting on a listening socket by
->> calling kernel_accept() with SOCK_NONBLOCK and retrying every 100ms on
->> -EAGAIN. Since this thread is dedicated to accepting new connections,
->> there is no need for non-blocking mode.
->>
->> Switch to a blocking accept() call instead, allowing the thread to sleep
->> until a new connection arrives. This avoids unnecessary wakeups and CPU
->> usage.
->>
->> Also remove:
->>    - TCP_NODELAY, which has no effect on a listening socket.
->>    - sk_rcvtimeo and sk_sndtimeo assignments, which only caused accept()
->>      to return -EAGAIN prematurely.
+On Wed, Oct 22, 2025 at 12:50:20PM -0400, Frank Li wrote:
+> imx8dxl dts some fixes and minor update.
 > 
-> Aren't these inherited to the accepted sockets?
-> So we need to apply them to the accepted sockets now
-> instead of dropping them completely?
+> Signed-off-by: Frank Li <Frank.Li@nxp.com>
+> ---
+> Frank Li (7):
+>       arm64: dts: imx8dxl: Correct pcie-ep interrupt number
+>       arm64: dts: imx8dxl-ss-conn: swap interrupts number of eqos
+>       arm64: dts: imx8dxl-evk: add bt information for lpuart1
+>       arm64: dts: imx8dxl-evk: add state_100mhz and state_200mhz for usdhc
+>       arm64: dts: imx8-ss-conn: add fsl,tuning-step for usdhc1 and usdhc2
+>       arm64: dts: imx8-ss-conn: add missed clock enet_2x_txclk for fec[1,2]
+>       arm64: dts: imx8dxl-ss-conn: delete usb3_lpcg node
+> 
+> Shenwei Wang (1):
+>       arm64: dts: imx8: add default clock rate for usdhc
 
-Actually the timeouts are added to the client connection,
-but not the TCP_NODELAY.
+Applied all, thanks!
 
-But looking at it more detailed I'm wondering if this might
-introduce a deadlock.
-
-We have this in the accepting thread:
-
-         while (!kthread_should_stop()) {
-                 mutex_lock(&iface->sock_release_lock);
-                 if (!iface->ksmbd_socket) {
-                         mutex_unlock(&iface->sock_release_lock);
-                         break;
-                 }
-                 ret = kernel_accept(iface->ksmbd_socket, &client_sk, 0);
-                 mutex_unlock(&iface->sock_release_lock);
-                 if (ret)
-                         continue;
-
-
-And in the stopping code this:
-
-         case NETDEV_DOWN:
-                 iface = ksmbd_find_netdev_name_iface_list(netdev->name);
-                 if (iface && iface->state == IFACE_STATE_CONFIGURED) {
-                         ksmbd_debug(CONN, "netdev-down event: netdev(%s) is going down\n",
-                                         iface->name);
-                         tcp_stop_kthread(iface->ksmbd_kthread);
-                         iface->ksmbd_kthread = NULL;
-                         mutex_lock(&iface->sock_release_lock);
-                         tcp_destroy_socket(iface->ksmbd_socket);
-                         iface->ksmbd_socket = NULL;
-                         mutex_unlock(&iface->sock_release_lock);
-
-                         iface->state = IFACE_STATE_DOWN;
-                         break;
-                 }
-
-
-
-I guess that now kernel_accept() call waits forever holding iface->sock_release_lock
-and tcp_stop_kthread(iface->ksmbd_kthread); doesn't have any impact anymore
-as we may never reach kthread_should_stop() anymore.
-
-We may want to do a kernel_sock_shutdown(ksmbd_socket, SHUT_RDWR) after
-tcp_stop_kthread(iface->ksmbd_kthread); but before mutex_lock(&iface->sock_release_lock);
-so that kernel_accept() hopefully returns directly.
-And we only call sock_release(ksmbd_socket); under the iface->sock_release_lock mutex.
-
-metze
 
