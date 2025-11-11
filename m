@@ -1,253 +1,113 @@
-Return-Path: <netdev+bounces-237679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25903C4EB36
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 16:11:33 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F7FFC4EBEF
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 16:18:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64CF518851C2
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 15:04:31 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 110074E8A1E
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 15:12:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2EE2357A2C;
-	Tue, 11 Nov 2025 15:04:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E558935F8B4;
+	Tue, 11 Nov 2025 15:12:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="Wr3VZuHa"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cvg0QShI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 332B52FB60E
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 15:03:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 609B635F8AA
+	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 15:12:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762873441; cv=none; b=fnbBClVbkZgF6rBYLhDB/VIHvYanc4SzL76V4UD6/X3wPkEgKQSv9t2LKNqriDx+qKhTub7804YPrSnweeZ0GncivHLqZ4spOrrQExqIJHAsBP3Dg6FreXMbojhyVkyr5reB36AyBPq8lJHJV1Yt7hGn6D9MfX+jbhFIHHmRE1g=
+	t=1762873959; cv=none; b=cRUUEeOj7ZMHofdzUW7hxiu2Hqs/b6DQc4amugmf3+IX/w7XWkwDwltluAGXl2dqUL6F6QcAHBE3dQ6Q++/5TIBOm8LXek+Gq5+VR0QDrKo/dkgTh6zJmzTEVZYt3CNsF8xpzvsuD9h4mwpxkOpZxu5MLwQ2QNpPDgNoU8kPx2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762873441; c=relaxed/simple;
-	bh=ftiPYvx9c/Uo7f5Ce7Yzxcg1QUwJlxqYP2TiKTcKQ1Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ijMX1VUkQDwakUEkqcKp8thYVE4LzQDKYy3lmaseTgU8ulTGLjk9BUaZlhssTizchdN7F4bzModPLJedGfdVhuRBkxaJDMHBP9rCGwOvTKf/0a3DTRIU3OH4DLFS8seMUlvWW5kSJkf44Mpx7j34IdHxq18BteS8e7e8P1kbHbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=Wr3VZuHa; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-b3c2db014easo774059066b.0
-        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 07:03:59 -0800 (PST)
+	s=arc-20240116; t=1762873959; c=relaxed/simple;
+	bh=79OC/+FRv2DJBSmzD5tzI2NUzkyGf6LEhQqlvzyTndI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=VZGMMgAd8i2tklZikg3kY/Uiv87bczqPyISlZNPvSWZN3px//acUqrMYUzNA4HOxrKTQQModCe0EeRVjmFJZm2cEaFN9jG4xooL1dlFcHN19kJ3JzAxe7jdLxTmMKeqJlQM8XM2ZlZWkRiZQoH2RzzGeYsuDdAz7qBGg+LUjEVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cvg0QShI; arc=none smtp.client-ip=209.85.219.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-88050bdc2abso135474626d6.2
+        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 07:12:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1762873437; x=1763478237; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wi+5dbYm5JIgaP/t7Nx547fFCD450JcmYNBqfgVm42E=;
-        b=Wr3VZuHacnX19+kU8w1BvT68Xtso8bA8jlTRBVCYJ1QSuvBs90fW594AJGYD/sbcE7
-         zxfKSkMaz4WysTITq4/7YriC+cQSmhKybush57z8b7uRuaTcbHBANmIDfT/kvFehUGbD
-         sa2WDGvCupBaFLVNib0xm7M88OsMK+KVbkGvRv4wvS4KHLvTYQG7EePJTLqW1aHI85zL
-         INKcGCRRzF6J7N7BmrhtW9M7UhXv6JUTmkrQzq4x8G7ZqU0H7eSS+ojS9/DTLkAN67Bj
-         1wDhCFVl0BccErhxh7JzXNm1WChW2BMRTVSKywdBU4Q8uuZOXEejQRVPSvQONAdw7x2q
-         TGYA==
+        d=google.com; s=20230601; t=1762873957; x=1763478757; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=yp0KzIAbRX4RNvIKY0LsBbBAAPBH7tRFuwc0+mDIspI=;
+        b=cvg0QShInF3orSl7IxzJ6S7fNmoQFB9GxuoGHkpcbUJIKdFVb74PZ6PJ7zQ3hQrnot
+         01VuCVvzBJSV1UPiwRUSwWVF4Njv+vTV4ZZlQR0KowBcPsvHbkB+gcUsDwCNtrDK+ZO7
+         Yhy6HWLMr2/JKvKO9Z+YM/VcIVNlQcNNtH8YqqqEMD9TnqO2qzK8bdKYa1LwfYT7fsf1
+         16dJKiIrmdJBi0awmyjpg2aVw6201+1J083pzdXmgwR7AwKCjhlkgS+NgWdXGrBH01LC
+         4nuaXSONKrcnnuIj8xaOPhiUqiTDLTQJSDqBKa3u71BID5ol5VznZutus22pCpBfx4IS
+         KWAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762873437; x=1763478237;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wi+5dbYm5JIgaP/t7Nx547fFCD450JcmYNBqfgVm42E=;
-        b=IzzDj58apDVtsmoo2p4hEiswfa0cLCoiOBw9almjmmuu51CNx64G6lXb6t8hdhdigM
-         lwB0muDJOU/7mpcx51zN6vOmZ4DIa+Wzm1MYERTaZnBNUhjJ4HQLtILXfvC3mIf+LNJR
-         RV2eVK6lI84IkFs4FOb4s3/5VaUEMhBlxsoLur+C+PMdH8uRlGgsTD6JX2adnQpSYxPo
-         ObQeoEMzNuNwHauvquEC9KR68Pz5B6fKHGz+iBjgBuvoK0dhBbmSXwjTc+GAS/2Lr1J2
-         M/eRiTrcyboKvZllkiOzjcJ+5g5GWZ6aGRMO2TaNlU+g45+2zLK6vDtVEx2y60yKF2+N
-         PjqQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWLwIgvoBgPdq+R9LNVOrQS3ZYbiwxEGBRoR2cpMEDZXcdUdvvG+Viop3FfgWQE3nf7kLG3wFs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrRACmta3Mrvm+Y6yj9H2KKJCLR2vJhnw7Si/WNr8gT4d921Oo
-	7n+GXF3Hy9wZgjVOg7qlM4SGIA8htAewylSjFoXKc/afm1SYBwLzNvMiLsk4+SKul9c=
-X-Gm-Gg: ASbGncsPCNUzrBBzy7WJtsF5OEohRxOdv/heSmRgrQAgFFQ78nljJSH5tA997CQDiVz
-	MJU+s3Gc0/aogdyjqyY6fjBCtW+8LwFF4iZ40wUNK/SN/DejIoLGC1w/vWuU475MMq623ikptDO
-	Un6KvnoJFZPUQ7s5u8isBeve66zT+qL5b/jbsG3sfeCyYEqN2b7uYX1iSCqcuRwOOExdoVQLeII
-	5cf4IPZjI+wcRrRSp0BAR80l7oL/nn/Yu3PO94KID1CS4pJZn7vLLhg00l5oaRACPpjuvBRhNXb
-	HrPad3ovCCrXHtfM3qc1s3IzuG39atOmqd37kzN/gsFvGZ+qT/3iAho+1DbbNgUofddtENaSosF
-	7WvqTA5cunZVu/6I3KYSFyTNCT9xqp+8/u6N2OA933RKCPdTVk8lh41jSOM4pppH4FnjslJ1/Ck
-	6e20ecIQypcC7+OyQjRw==
-X-Google-Smtp-Source: AGHT+IGWUxoIalLG5xLZllX+zCkekRXIo7e3xykwl2APS2wZQPGHNLqastwX+dw6XlJnfwm9Fe+bGg==
-X-Received: by 2002:a17:906:f590:b0:b71:cec2:d54 with SMTP id a640c23a62f3a-b72e04e4ebemr1306841566b.57.1762873437355;
-        Tue, 11 Nov 2025 07:03:57 -0800 (PST)
-Received: from pathway (nat2.prg.suse.com. [195.250.132.146])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b72bdbc9656sm1374243166b.7.2025.11.11.07.03.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Nov 2025 07:03:56 -0800 (PST)
-Date: Tue, 11 Nov 2025 16:03:53 +0100
-From: Petr Mladek <pmladek@suse.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Corey Minyard <corey@minyard.net>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	"Dr. David Alan Gilbert" <linux@treblig.org>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
-	Rob Clark <robin.clark@oss.qualcomm.com>,
-	Matthew Brost <matthew.brost@intel.com>,
-	Ulf Hansson <ulf.hansson@linaro.org>,
-	Vitaly Lifshits <vitaly.lifshits@intel.com>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Niklas Cassel <cassel@kernel.org>, Calvin Owens <calvin@wbinvd.org>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Sagi Maimon <maimon.sagi@gmail.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Karan Tilak Kumar <kartilak@cisco.com>,
-	Hans Verkuil <hverkuil+cisco@kernel.org>,
-	Casey Schaufler <casey@schaufler-ca.com>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Viacheslav Dubeyko <Slava.Dubeyko@ibm.com>,
-	Max Kellermann <max.kellermann@ionos.com>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	openipmi-developer@lists.sourceforge.net,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	linaro-mm-sig@lists.linaro.org, amd-gfx@lists.freedesktop.org,
-	linux-arm-msm@vger.kernel.org, freedreno@lists.freedesktop.org,
-	intel-xe@lists.freedesktop.org, linux-mmc@vger.kernel.org,
-	netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-	linux-pci@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
-	ceph-devel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	David Airlie <airlied@gmail.com>, Simona Vetter <simona@ffwll.ch>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Dmitry Baryshkov <lumag@kernel.org>,
-	Abhinav Kumar <abhinav.kumar@linux.dev>,
-	Jessica Zhang <jesszhan0024@gmail.com>, Sean Paul <sean@poorly.run>,
-	Marijn Suijten <marijn.suijten@somainline.org>,
-	Konrad Dybcio <konradybcio@kernel.org>,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	Thomas =?iso-8859-1?Q?Hellstr=F6m?= <thomas.hellstrom@linux.intel.com>,
-	Rodrigo Vivi <rodrigo.vivi@intel.com>,
-	Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Rodolfo Giometti <giometti@enneenne.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Stefan Haberland <sth@linux.ibm.com>,
-	Jan Hoeppner <hoeppner@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Satish Kharat <satishkh@cisco.com>,
-	Sesidhar Baddela <sebaddel@cisco.com>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v2 01/21] lib/vsprintf: Add specifier for printing struct
- timespec64
-Message-ID: <aRNQWc8O2y94zoj8@pathway>
-References: <20251111122735.880607-1-andriy.shevchenko@linux.intel.com>
- <20251111122735.880607-2-andriy.shevchenko@linux.intel.com>
+        d=1e100.net; s=20230601; t=1762873957; x=1763478757;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=yp0KzIAbRX4RNvIKY0LsBbBAAPBH7tRFuwc0+mDIspI=;
+        b=YogMnmsN7Op19L4YuT7gBn8Jpoa9P3cCv7WoTOW04T+w6hJT4MvRKv6vPlcfZveJjM
+         yZaUnJk/91BqZo2iT9rCbE4Q2UCp/mr6807if8mzI/ZVcqNfjErm+IKEZakEcjpOM4v1
+         22rp9gnwo2PubHRzdRpl6gNTdNoJOj6lXpcsLIe8zLzL+lhAiB5ucAaYS26nizZagFRh
+         2nVJyx+itMoRnsvUJ0z/uwwByOeKoFpDdhLbfJKSmjoh3p9KJKvHgo7wBn48wRtWpz+f
+         FOpXcGktxoavKP9Gag4cTP8N61XMCi0XWmAr9Cmpmev63+dep4y/hRWWpiyFlhM5jtar
+         W91A==
+X-Forwarded-Encrypted: i=1; AJvYcCXDddqt6hk6jjTrfk1sct/CY6QO1A9GKy44CFyKxeHJK9SfcbxJsc+s/XC9Hj2snwo3wwqNeA8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyJzvkLGq6jy0wKO4kZw2aDCMXIdC2O2rhF9Q7sNCyxUO03fWvT
+	s/nQS6vwHz+3D36S7ZL0k0qhTqp9ZOLfaFO86CGIzLi0y4w+Bt3ER7K2bGVQBqdmG3vytkZm1CD
+	7ed2CT0bpZfdoUQ==
+X-Google-Smtp-Source: AGHT+IGXUOfw4hrYdgoeecFeBbBjgMupa4tR7oHBcavDdww0XkExBf3oGFzGzzRbbeyBg1YoiRbe8kpfsdfUTg==
+X-Received: from qvblb25.prod.google.com ([2002:a05:6214:3199:b0:882:3ada:c127])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6214:20ef:b0:87c:f97:7acf with SMTP id 6a1803df08f44-88238703304mr211849196d6.62.1762873957305;
+ Tue, 11 Nov 2025 07:12:37 -0800 (PST)
+Date: Tue, 11 Nov 2025 15:12:35 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251111122735.880607-2-andriy.shevchenko@linux.intel.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.52.0.rc1.455.g30608eb744-goog
+Message-ID: <20251111151235.1903659-1-edumazet@google.com>
+Subject: [PATCH net-next] net: clear skb->sk in skb_release_head_state()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>, 
+	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue 2025-11-11 13:20:01, Andy Shevchenko wrote:
-> A handful drivers want to print a content of the struct timespec64
-> in a format of %lld:%09ld. In order to make their lives easier, add
-> the respecting specifier directly to the printf() implementation.
-> 
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> ---
->  Documentation/core-api/printk-formats.rst | 11 ++++++++--
->  lib/tests/printf_kunit.c                  |  4 ++++
->  lib/vsprintf.c                            | 25 +++++++++++++++++++++++
->  3 files changed, 38 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/core-api/printk-formats.rst b/Documentation/core-api/printk-formats.rst
-> index 7f2f11b48286..c0b1b6089307 100644
-> --- a/Documentation/core-api/printk-formats.rst
-> +++ b/Documentation/core-api/printk-formats.rst
-> @@ -547,11 +547,13 @@ Time and date
->  	%pt[RT]s		YYYY-mm-dd HH:MM:SS
->  	%pt[RT]d		YYYY-mm-dd
->  	%pt[RT]t		HH:MM:SS
-> -	%pt[RT][dt][r][s]
-> +	%ptSp			<seconds>.<nanoseconds>
+skb_release_head_state() inlines skb_orphan().
 
-I know that that there was no good choice. But I am curious.
-Does the 'p' stands for some particular word, for example, "plain" ?
+We need to clear skb->sk otherwise we can freeze TCP flows
+on a mostly idle host, because skb_fclone_busy() would
+return true as long as the packet is not yet processed by
+skb_defer_free_flush().
 
-I do not want to start bike shedding but I think about
-using 'n' as "number".
+Fixes: 1fcf572211da ("net: allow skb_release_head_state() to be called multiple times")
+Fixes: e20dfbad8aab ("net: fix napi_consume_skb() with alien skbs")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/core/skbuff.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> +	%pt[RST][dt][r][s]
->  
->  For printing date and time as represented by::
->  
-> -	R  struct rtc_time structure
-> +	R  content of struct rtc_time
-> +	S  content of struct timespec64
->  	T  time64_t type
->  
->  in human readable format.
-> @@ -563,6 +565,11 @@ The %pt[RT]s (space) will override ISO 8601 separator by using ' ' (space)
->  instead of 'T' (Capital T) between date and time. It won't have any effect
->  when date or time is omitted.
->  
-> +The %ptSp is equivalent to %lld.%09ld for the content of the struct timespec64.
-> +When the other specifiers are given, it becomes the respective equivalent of
-> +%ptT[dt][r][s].%09ld. In other words, the seconds are being printed in
-> +the human readable format followed by a dot and nanoseconds.
-> +
->  Passed by reference.
->  
->  struct clk
-> diff --git a/lib/vsprintf.c b/lib/vsprintf.c
-> index 3f99834fd788..fdd06e8957a3 100644
-> --- a/lib/vsprintf.c
-> +++ b/lib/vsprintf.c
-> @@ -2464,6 +2488,7 @@ early_param("no_hash_pointers", no_hash_pointers_enable);
->   * - 'g' For block_device name (gendisk + partition number)
->   * - 't[RT][dt][r][s]' For time and date as represented by:
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 4f4d7ab7057f16bcf88f29827a45a9f4a8f43d5c..f34372666e67cee5329d3ba1d3c86f8622facac3 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -1152,6 +1152,7 @@ void skb_release_head_state(struct sk_buff *skb)
+ 
+ #endif
+ 		skb->destructor = NULL;
++		skb->sk = NULL;
+ 	}
+ 	nf_reset_ct(skb);
+ 	skb_ext_reset(skb);
+-- 
+2.52.0.rc1.455.g30608eb744-goog
 
-We should add 'S' here as well:
-
-   * - 't[RST][dt][r][s]' For time and date as represented by:
-
-That said, I am not sure about the optional '[p]'. We could
-either do:
-
-   * - 't[RST][p][dt][r][s]' For time and date as represented by:
-
-or
-
-   * - 'tSp'	For time represented by struct timespec64 printed
-		as seconds.nanoseconds
-   * - 't[RST][dt][r][s]' For time and date as represented by:
-
->   *      R    struct rtc_time
-> + *      S    struct timespec64
->   *      T    time64_t
->   * - 'C' For a clock, it prints the name (Common Clock Framework) or address
->   *       (legacy clock framework) of the clock
-
-Otherwise, it looks good.
-
-Best Regards,
-Petr
 
