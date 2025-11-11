@@ -1,92 +1,81 @@
-Return-Path: <netdev+bounces-237419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1F06C4B315
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:20:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50A23C4B35D
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:27:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AAB8218904B2
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:21:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EB113B5F5A
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 02:27:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98413347BA7;
-	Tue, 11 Nov 2025 02:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCD34347FF8;
+	Tue, 11 Nov 2025 02:27:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LmmjEy7F"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rs5pmNMk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70210306B30;
-	Tue, 11 Nov 2025 02:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1EF7347FEE;
+	Tue, 11 Nov 2025 02:27:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762827636; cv=none; b=aoh57N0Co+Hzd9LLWIXL374FSiY6GMPNUwxI4+zfdNw1/hHPH7dxvnqHsdOScCZP4tmyfiHqSgB5tnXfkwSrquQZVBpm6FgP8fp7ok3Ln3xNej0OGS2Q9GAci1y6TUP06F0GMYDfWnUjOvWZalHq+T1jfk+8WIRO8xFy1CdgEf0=
+	t=1762828034; cv=none; b=VsOsvSxNOiSbG9JX5VbRr+to1JpmrcYSKpDEZcTgUw/oZllf/l+XQUdNW22cm2QPTFJAMhgZtnsIUuGC4ZQkZwyU7NH7QQ0hTp36S+N7DaAdJsSjXM58yKNSyTOhfEKbhGUbNiIsy7aHrw3Z7pHy08+iBdhBXLzDM8mXSnidn9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762827636; c=relaxed/simple;
-	bh=OuI+VnSlq1DV3oVrG2pT1LX+5NsSnni2+vwvOlKzX7Y=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=dsTwu0z1PGgeSSleGvfJM4uoM0r46qVq3OEbo3km6dJjn2FTIO9JcSy0+i/1fQcvEQjzzSQLHLVCMn8Yppn48QMbaBBNyWVLP+dNn/uEWeJJc8LOQ6XbQSJMI9v2RKYjzPoEDzoYWriyxLt8S6PTZb9hqPaF2gY7p30hrRgRn+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LmmjEy7F; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F03F9C113D0;
-	Tue, 11 Nov 2025 02:20:35 +0000 (UTC)
+	s=arc-20240116; t=1762828034; c=relaxed/simple;
+	bh=EXEPUIrCk23PzLW6+OrAcmyL7ffWgKY5kAQbaMJeAf8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nig+K9GrFmCdvG0bd9t5iuPS9Y+PnSe7EHJrd81zabrkiZ1ATvQEsQ8FPKgCc0BYIILktrmfjrxTYixylxjcxPB5tnUyTyuKNdM2WbVTVBR2HxT6ksOiradAjJPhWG8nZWOpXA8b6V0NItaxZi7obXM2Sf+lhSfQHU3u/Yt94Oc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rs5pmNMk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0637C4CEFB;
+	Tue, 11 Nov 2025 02:27:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762827636;
-	bh=OuI+VnSlq1DV3oVrG2pT1LX+5NsSnni2+vwvOlKzX7Y=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LmmjEy7FRWjN6IEbFt7mY3uhs7s5GimDKDh0YcM3ls72E+j9k8ef+DeNA8axn9Az9
-	 6LezMsqWcfLbKsAMlYHvM4atHKjSGP7EWDSRQfCnYisJaJxaBxtBCHHAmEi2q6jys9
-	 Ss4mcI4ol+n5NpITrxDUlP+jVyASN8kLskw64qIafopmRh8DnR8gQwzvUpVtMa8A2X
-	 ofNnDZuwesc+YkNYD0aFDVxKzteQCvjSnARw2aCLN+aKc3gYP9JqGJD5P2yJJcuqpX
-	 n5O0ZVglN675G2u312ZIv2YgjhQuSb1D0qyb/quLl1GY41CfGEGSqN7B9qugVrfSYv
-	 0HI8uOTO28O2A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE046380CFD7;
-	Tue, 11 Nov 2025 02:20:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1762828034;
+	bh=EXEPUIrCk23PzLW6+OrAcmyL7ffWgKY5kAQbaMJeAf8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Rs5pmNMkPq7/dtA/2HnBx0/Md/GwkbU7r2mCYg8MhfBLR8KJw9BUNS1KKPe/SloNZ
+	 4iaBSrrO1W9oCbj7bLOvQXVsh5/SIWCFq4lyjvJ7FNEyHZadhmwFmXVpT3HaN7+ZJd
+	 WRjhPEe0x1J8pJhWuhbigU4L/RHAdglJNMHlessgaMeORynGM91/ObOsNeX1YCN/MN
+	 4wWjHWKvvOdgZNKcx5KSWnjQlTdn4PUvBSkSkuOVBdNjSU8JQrP0Bt2HQyCd3dwwQi
+	 ykyGUx58b8rlZIXP9CGDPYJ989O+1lox39VUFd9hyAzu0Jnh8PbUdq8B/KoIjaU38G
+	 2j8zT0iyxVaSw==
+Date: Mon, 10 Nov 2025 18:27:13 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Bastien Curutchet (Schneider Electric)" <bastien.curutchet@bootlin.com>
+Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Arun
+ Ramadoss <arun.ramadoss@microchip.com>, Pascal Eberhard
+ <pascal.eberhard@se.com>, =?UTF-8?B?TWlxdcOobA==?= Raynal
+ <miquel.raynal@bootlin.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2 1/4] net: dsa: microchip: common: Fix checks on
+ irq_find_mapping()
+Message-ID: <20251110182713.221a058d@kernel.org>
+In-Reply-To: <20251106-ksz-fix-v2-1-07188f608873@bootlin.com>
+References: <20251106-ksz-fix-v2-0-07188f608873@bootlin.com>
+	<20251106-ksz-fix-v2-1-07188f608873@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] isdn: kcapi: add WQ_PERCPU to alloc_workqueue users
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176282760651.2854334.15711207363793586593.git-patchwork-notify@kernel.org>
-Date: Tue, 11 Nov 2025 02:20:06 +0000
-References: <20251107134452.198378-1-marco.crivellari@suse.com>
-In-Reply-To: <20251107134452.198378-1-marco.crivellari@suse.com>
-To: Marco Crivellari <marco.crivellari@suse.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, tj@kernel.org,
- jiangshanlai@gmail.com, frederic@kernel.org, bigeasy@linutronix.de,
- mhocko@suse.com, isdn@linux-pingi.de
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu, 06 Nov 2025 13:53:08 +0100 Bastien Curutchet (Schneider
+Electric) wrote:
+> Fixes: ff319a644829 ("net: dsa: microchip: move interrupt handling logic from lan937x to ksz_common")
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri,  7 Nov 2025 14:44:52 +0100 you wrote:
-> Currently if a user enqueues a work item using schedule_delayed_work() the
-> used wq is "system_wq" (per-cpu wq) while queue_delayed_work() use
-> WORK_CPU_UNBOUND (used when a cpu is not specified). The same applies to
-> schedule_work() that is using system_wq and queue_work(), that makes use
-> again of WORK_CPU_UNBOUND.
-> This lack of consistency cannot be addressed without refactoring the API.
-> 
-> [...]
-
-Here is the summary with links:
-  - isdn: kcapi: add WQ_PERCPU to alloc_workqueue users
-    https://git.kernel.org/netdev/net-next/c/e483a615a609
-
-You are awesome, thank you!
+This commit just moves the buggy code around, the fixes tag should
+point at the commit which introduced the buggy code (first commit
+in which the bug could be reproduced). I think other commits suffer
+from a similar issue. Please look a little deeper into the history.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot:  cr
 
