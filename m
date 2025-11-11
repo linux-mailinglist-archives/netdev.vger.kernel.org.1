@@ -1,107 +1,127 @@
-Return-Path: <netdev+bounces-237439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C363EC4B558
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 04:34:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21B88C4B56F
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 04:35:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9EADA1890F9D
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:34:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF34D3B0314
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 03:34:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87ED8314B8E;
-	Tue, 11 Nov 2025 03:34:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A98F346E60;
+	Tue, 11 Nov 2025 03:34:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hufOi6yw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NbJY+8Ou"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 074D12FFF9A;
-	Tue, 11 Nov 2025 03:34:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC5BB313526;
+	Tue, 11 Nov 2025 03:34:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762832062; cv=none; b=B0kek46g+yQzTjWi+7c/DphWFUbSiAvFLYyeaY2d2vWcMC/bameYAhgPWfHMyPuB6MuGODMvNidO1VJXIWhmpY3Mp4BF7mmAv8nDu4NP26wnpoVRXMeV529YRy8ZczxcS4ZiUkqUAxvtxcD7hvJYlJxx4vY3h31ts8muszZGFfo=
+	t=1762832082; cv=none; b=G62nFeM9K42yusM1avXNCVbkMKRvd7Ke7aCxdqrrB7mK3eaX16qxwuJYprIsNJFA3P9gSgKB2n2GAcYbJRWU4X6jOfdO/PMP/pyU/B5l4uXd/KutdHji7eGSXFtVKkAaxeFm46pRom96oE/0a6OJbAwow1PkamemvJw5qRORXsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762832062; c=relaxed/simple;
-	bh=LF35iIXpcL8zFGUIieGGpK9i//PdI6Tuyf9zFpaKVuM=;
+	s=arc-20240116; t=1762832082; c=relaxed/simple;
+	bh=rl4quI5CP3hR4drgVFblTgTJWg1WQ4rTS/8XInVRBRs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T7zJzpkEePST4l1vkosCQCxYxFMZ7Hx0rxwimu7uP/sOkcYrEGBq271KJ5Q7rYSJ9Lf94C6PCHdhmfcI5NrU93g+sByGddio4cULDF+gpoOoZvRS/eeZESnyz+C+00tvNiql6t2aFZMad//WCI8/jUntaum5mvzpRDjG/bBDh60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hufOi6yw; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=MpcXH5yszQ3e8gyXiQRNSwQwQ9wARDcWwzXFsNwDh2g=; b=hufOi6ywhigtXj8q+a8/OU55N+
-	GAMZ/G4U9nAoXpnIdsvTk+js4o8xAW+gu1elpq9T+SxBd+iBua/O1WSi+tNwcvRcOKlaBRTnMLAk0
-	5Oi30dLoKHhdhqkRRCUvT7bKJr6QiYNIstYa3eMCsImtfTlAl+uls6psrCPoAFyb5tZU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vIf8x-00DaO3-99; Tue, 11 Nov 2025 04:34:07 +0100
-Date: Tue, 11 Nov 2025 04:34:07 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=uB5PqkXGXLZdHiCrzrDTupqyOqy6Rs+HTanCdDC61dIyjJWvWYklPLXdvO8OM6bITBgOjFFLWNJlFDqQ6v6LewXPXCxgF2SB4i19PQZrJ/82xdonb5N+46Mw8dpeBKIdIv4j0R77RbuwlSibgvScJpOE98yVM0LUMrNy5cdFA90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NbJY+8Ou; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2054FC16AAE;
+	Tue, 11 Nov 2025 03:34:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762832082;
+	bh=rl4quI5CP3hR4drgVFblTgTJWg1WQ4rTS/8XInVRBRs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NbJY+8OuCVAtsk/Qd+DQWuoyHMS9NkjdFKRoJpxSnvZSQFA/3FKgriuCuQ1hTdk6Z
+	 VjuCJv1ZBON+kwFu3S0k4zhP38utHIs06bxZk/JxbAL4MgY4WZ0b0K66OKFnUgq+Y8
+	 na1I/6IureNbUb3dwmULna0Fv/98r43yq4TloLeCSGlwnK6LXR8Ab2BJu7lVc8lFno
+	 wtCf1NiGMqYg2vS4c9AvQiH0rVaCy3zm03oauR/L3PhKsqwYnqFnrGy9EZ8rIKpYJc
+	 dh1MzY663AuvvZCqkzxOkymtEHga8UogMw9P81gLVBAMYDeOTuCflwVQRDTzh9isAq
+	 sc2+TiU77i4ig==
+Date: Mon, 10 Nov 2025 19:34:40 -0800
+From: Saeed Mahameed <saeed@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Daniel Zahka <daniel.zahka@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
-	Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: Re: [PATCH net-next v15 01/15] dt-bindings: net: Introduce the
- ethernet-connector description
-Message-ID: <56410c74-3d0e-4cdc-87a0-230cad8f691a@lunn.ch>
-References: <20251106094742.2104099-1-maxime.chevallier@bootlin.com>
- <20251106094742.2104099-2-maxime.chevallier@bootlin.com>
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Srujana Challa <schalla@marvell.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Brett Creeley <brett.creeley@amd.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Michael Chan <michael.chan@broadcom.com>,
+	Pavan Chebbi <pavan.chebbi@broadcom.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Linu Cherian <lcherian@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Jerin Jacob <jerinj@marvell.com>, hariprasad <hkelam@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Mark Bloch <mbloch@nvidia.com>,
+	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
+	Manish Chopra <manishc@marvell.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Siddharth Vadapalli <s-vadapalli@ti.com>,
+	Roger Quadros <rogerq@kernel.org>,
+	Loic Poulain <loic.poulain@oss.qualcomm.com>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Dave Ertman <david.m.ertman@intel.com>,
+	Vlad Dumitrescu <vdumitrescu@nvidia.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Alexander Sverdlin <alexander.sverdlin@gmail.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+	linux-rdma@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-omap@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/2] net/mlx5: implement swp_l4_csum_mode via
+ devlink params
+Message-ID: <aRKu0Iknk0jftv2Z@x130>
+References: <20251107204347.4060542-1-daniel.zahka@gmail.com>
+ <20251107204347.4060542-3-daniel.zahka@gmail.com>
+ <aQ7f1T1ZFUKRLQRh@x130>
+ <20251110150133.04a2e905@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20251106094742.2104099-2-maxime.chevallier@bootlin.com>
+In-Reply-To: <20251110150133.04a2e905@kernel.org>
 
-On Thu, Nov 06, 2025 at 10:47:26AM +0100, Maxime Chevallier wrote:
-> The ability to describe the physical ports of Ethernet devices is useful
-> to describe multi-port devices, as well as to remove any ambiguity with
-> regard to the nature of the port.
-> 
-> Moreover, describing ports allows for a better description of features
-> that are tied to connectors, such as PoE through the PSE-PD devices.
-> 
-> Introduce a binding to allow describing the ports, for now with 2
-> attributes :
-> 
->  - The number of lanes, which is a quite generic property that allows
->    differentating between multiple similar technologies such as BaseT1
->    and "regular" BaseT (which usually means BaseT4).
+On 10 Nov 15:01, Jakub Kicinski wrote:
+>On Fri, 7 Nov 2025 22:14:45 -0800 Saeed Mahameed wrote:
+>> >+	err = mlx5_nv_param_read_sw_accelerate_conf(dev, mnvda, sizeof(mnvda));
+>> >+	if (err) {
+>> >+		NL_SET_ERR_MSG_MOD(extack,
+>> >+				   "Failed to read sw_accelerate_conf mnvda reg");
+>>
+>> Plug in the err, NL_SET_ERR_MSG_FMT_MOD(.., .., err);
+>> other locations as well.
+>
+>Incorrect. extack should basically be passed to perror()
+>IOW user space will add strerror(errno) after, anyway.
+>Adding the errno inside the string is pointless and ugly.
 
-You still use lanes here, but the implementation has moved on to
-pairs.
+ernno set by stack. err set by driver. we can't assume err will propagate
+to errno, this is up to the stack.
 
-Please add my Reviewed-by when you fix this.
+And not at all ugly, very useful debug hint to the user, unless you
+guarantee err == errno.
 
-	Andrew
+
 
