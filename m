@@ -1,269 +1,182 @@
-Return-Path: <netdev+bounces-237543-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237544-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37B75C4CEDD
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 11:13:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E2DDC4CEF8
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 11:13:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F4B31894BFB
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 10:13:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D687C18884DB
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 10:14:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB7F22F7ADD;
-	Tue, 11 Nov 2025 10:12:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACDD4334C11;
+	Tue, 11 Nov 2025 10:13:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P8oPiluu";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hhk+fUfW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04D8F302774
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 10:12:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81928304BD0
+	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 10:13:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762855953; cv=none; b=OSpCw47NySikXZo3Ba5yrzjO60vMiIV5QsJ8gnWEHn+mQnX1aNl5gCAbj9J6y9N3oId9hKVubJyM0NNdClN+cNUBhnBmgeiUBOy+U+56fFPHWe65rCQjQeUiKG6zgUngPe9TAzhWahsOuTSKuPcNU/ytH5Gi3FBoJ1AazITtG6Y=
+	t=1762856018; cv=none; b=DAVbkDzD5JRAk0RNy3tBqacIqR2nhJWnHQFVo9e4SeZj1SnNgXDmrahyqnx65FLMN2uVXy8v5N25Cc6PNO3kUnSG4Mb2vLJSQaHH95hamC7MH9hSnEokdiym18QEOFzveJq0rDqU5CcVESX8NP2MVDvRrTlyTB5Skt38XN9PYFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762855953; c=relaxed/simple;
-	bh=WAj76DydZj4CIC9aQ/rvGOUH+A9Zbu1Qohl7CV2gKcc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K0PIDy2319DJC1v/yiQz6dIbsbMOqorLfOI/p5tLopIh6P0b8zz54f6okxDm4Nv1ZNYTbWRTKEC1n9lGAEmu70LfoCkGF7MRfmORKNRVRuKhu3+EfplEbSv105JqAawFxXkzP/xTFOvmhgjqGEGw5PRwRV5p/7gGBa0p+m/4dXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-44fe6771b2dso476352b6e.1
-        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 02:12:31 -0800 (PST)
+	s=arc-20240116; t=1762856018; c=relaxed/simple;
+	bh=WkyJ7wXlU3Y179InlLzeaIBiSRKrxBNojZPNLGg/meM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MyIk0r0+sY6YgVAkINdm4eUpkU5JAV6vMFpDbBrhXdqmVjpkFBCAanQIgQwW1xjWJvbBfi4jEMrknk5QfnU7IaE41uQOsThG5EMSJAfjfFwNQFYuhfuLoumr2Td2VjOEy+il+fE1TELeGns4qx1TjzVKu8wZHBWiRrN/OQs9snY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P8oPiluu; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Hhk+fUfW; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762856015;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tWIdabjoIl/GpEWbTxxG5QL1xcrQ2UzLO8Uh5MSiqpM=;
+	b=P8oPiluujwFirZxq47Ph5F1aRuEUKMCLsIB+Jjd13TnnEAWzDb1vWdwnoCg9cVIuVYvgmj
+	RLKE2TD1KcMHbXAbJsakmV/Tm98mLk+dgCmWsBRYokDrykJ/XdIvKFztYxWd4pN7QyfzIA
+	96qxBSyul2syB7qEte6zAnDLTDANWm8=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-623-wtnilTFNOB6CcE6dllAlYw-1; Tue, 11 Nov 2025 05:13:34 -0500
+X-MC-Unique: wtnilTFNOB6CcE6dllAlYw-1
+X-Mimecast-MFC-AGG-ID: wtnilTFNOB6CcE6dllAlYw_1762856013
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-477771366cbso13974075e9.0
+        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 02:13:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1762856013; x=1763460813; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tWIdabjoIl/GpEWbTxxG5QL1xcrQ2UzLO8Uh5MSiqpM=;
+        b=Hhk+fUfWuPqsLZlVLn2tAxCbJjOjZ0OyTIwpZCpBzegKXXaVsiFnimDj3diFAyOqsr
+         eRiElkPy7DDEC8uGiNVaWpgzROoPZDiUBJ5J1yT8wVPgtg9wUn2m0FKZkTT8M5J4srn0
+         ujAPebkKgtUr+l/lzlnxPHLVInuGK6l+84oZY2gD+fB59i7E9WnxR96h4/0w5RoMSXtN
+         yPCFEgnCNXR3o7VoGGj5TNEoJmw76DXDpwwSDajxdF9quFZ+IZRczptw4g3/XyTuNl/b
+         n6QyDN6k7W5lTkm2QrKEf4X7Ob02PzCRxAVhhbxt3p/+HMNYEzr5ovbdEhPokHZDoUgm
+         lg0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762855951; x=1763460751;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=d93P9SBrZbsmx5OIoldWG9QXDZwaWCjQ8D5gNZLMBrU=;
-        b=UralPUMn2Bc1k2TAWgqQlazXWm22QBO6UXu17ysOMPOhwf6QPuwJL1Jxm20Nd7XdOL
-         TObfez7ZhALrQNzHhYmNXLnnOersZiP/Lw/mHbZ60cQPrl4FN2VBD/UglOjdBdBgh8Ii
-         YRVk9f+LCGctJmnFCAoB4TZSkmcA192nBuG6SpOEG24gePRByh/TtnWsq+u+b0uF2P3w
-         cjH3HchBh7hqNVlr2z5qQfY+YrtjHSDp7Nlt5GpoQ34uIM0kLLhQJThZiyarRVWnkJud
-         JesQNCmbX1bW8JU8on/etq8wDXUHQFXTjKxktW4esIQi0oYDprtth6W2Imbm9NM2270S
-         cZGw==
-X-Forwarded-Encrypted: i=1; AJvYcCVEWY6U6399pC+e/mRavclN5I2hQRl218kUtABJMlKh5RjwbMHxRk9Z5Pp/w78PLdLZYRd/9Lc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxUN9xM4fcHmH3KPoilVqBso9klR94w1X+9qVUYdsdjvucOhQAa
-	wa1vPizffKg/sSj+k1HlqUI/m9gIYDmZ81UuGEte8w43H3gtjHdUQSwL
-X-Gm-Gg: ASbGncuwLEgRUvvyMj7zpcwvzmZIQz1pDT4HVR1Az08HanqxTZ10P98rYb9K10Kqj/0
-	kA7An42Kqk7ZQ7aiFdk+vdAR2bNiNtNOC2nLtIdZqv0xG+87caEWdTzvcHFySqyGU+i5cuf9Drh
-	URKYmScdnZMgFejqN9m5awhy9PDcM6cg1ubIrAPQj5p6Ko4jwN8bvdg46cGRkg2/koiUIRTnV0q
-	bAFbHcIOze8ulXphH/xLMSP7JnqM/GqHnerqR791dm8/+W5GmhOLdCr7yCE4ExpEZh4CGlCPJrO
-	SLX6ss/H78OmJ8gts0be4MoYVScU3gVVfMi5OytW4tfQAfsEsZAbFsrsQr0KUluRGlAjnrkjyhO
-	1xqTzpyvLMm8gR19U7amUkUavKGixyMWcyo3Izgzn8R3kUCIQolXo5lCtSOnI9X7DWzDHzIp3cd
-	L1rGguMTF4UHEeNA==
-X-Google-Smtp-Source: AGHT+IH7+LY6boZXNhSOAKanHLT9JkTRtS0g/6VaSLyR6710lVl+xvo91GwsE75JjB1doJnEGSLx6A==
-X-Received: by 2002:a05:6808:1924:b0:43f:2140:c5b7 with SMTP id 5614622812f47-4502a1d129amr5768112b6e.19.1762855950943;
-        Tue, 11 Nov 2025 02:12:30 -0800 (PST)
-Received: from gmail.com ([2a03:2880:10ff:42::])
-        by smtp.gmail.com with ESMTPSA id 006d021491bc7-656c5713288sm6875102eaf.5.2025.11.11.02.12.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Nov 2025 02:12:30 -0800 (PST)
-Date: Tue, 11 Nov 2025 02:12:26 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Andre Carvalho <asantostc@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v3 5/6] netconsole: resume previously
- deactivated target
-Message-ID: <e4loxbog76cspufl7hu37uhdc54dtqjqryikwsnktdncpqvonb@mu6rsa3qbtvk>
-References: <20251109-netcons-retrigger-v3-0-1654c280bbe6@gmail.com>
- <20251109-netcons-retrigger-v3-5-1654c280bbe6@gmail.com>
+        d=1e100.net; s=20230601; t=1762856013; x=1763460813;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tWIdabjoIl/GpEWbTxxG5QL1xcrQ2UzLO8Uh5MSiqpM=;
+        b=iY4gD6Hj1k616iUabT/OtCxFv/wXEGArTbZZECCEoXTvV6Wl7ASFSwIxqcKZWBU0Qf
+         i/EzDmWIA6gUQsU4VNNGFRfNHwodvr5A59AvWM/1JkSR5N7CXmQBUakofIhMLvj/0wgk
+         5rDhRG1SgpRJjsh8k8GpUOE/hXyM8lYPf6VQqF2RNnysX6ZPw5d1GMmtHRPD2ZCRMxeI
+         KKBCS4QgLr8lwfvTlzzwGVqPVDx67ZRhWtsT4Qyo5TU7BrbJM33viQWhC8HDXf6CqS4L
+         2veVov4UzHBL/E5X/uslm8oI9yVUUDC0V4eIv+mU3oeaqkYBPD2K6wfQhQEEkDFEmqfz
+         3Rnw==
+X-Forwarded-Encrypted: i=1; AJvYcCXSrb4PbKDLGO3fTqlSxaYz02WLk/nlram8wcTZVcLqJvm/jE0tj5erYJUBV4Z+80K/PDzZ4nA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwS/cHH1iDy3rzW2CMhgUHODo3GszF8s7E5KHwE0N47L3kq/Z3f
+	wQZTg0I5p8PbDpul+01RdlPkp2/0APGi7hB1hh+6TqIN45IDTqQ2LCRpxWt7ZzU5BF3k3sVDsnM
+	VFDm16w22HeioX1QHTRIUYRWOghBX1S/wGb/txY298hkkBNs0JCBHQQW7yw==
+X-Gm-Gg: ASbGncue8lgdY2lwDd8vWREo9TSjCnJy82zOdMrYHLcgIKEcB7C/8p1hJuygEdIHX0y
+	Mxd/4g0qAea5eICxdKw8g62pDvwzdTMnAKOW76ATnHBGhmrVo0mGC+2wx2mCwI06UcmdYRNuzeE
+	mfpDbcf92zYw1pozB+WyTFRLzb3RAvIMF7HGXf7HWiUm6F9YBj5oM2IFo4P+6N48wvMK9ERzevG
+	8+D1vhjvOA9Cq+vc9YA1SHNmOC/DMeqfMX0RvxcpK95/9yRlM9yh/WYQlT6XKDOz+gOgUH9YDAx
+	j4MfdIccpckIFAZskttDmotmZeG1wuhuXqHeGqJzd8S3IAcAyQmaK8qJZoiQVPcjAN5xx5+W3Ng
+	J9A==
+X-Received: by 2002:a05:600c:474c:b0:477:55c9:c3ea with SMTP id 5b1f17b1804b1-4777329747emr91118645e9.35.1762856012895;
+        Tue, 11 Nov 2025 02:13:32 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGwju2eerJqJ/sKKgP7LErOCpNGcS4xksJ9Dc99yY2BVV7WFCIJNXdq55bjtbk5k9a7KTteNg==
+X-Received: by 2002:a05:600c:474c:b0:477:55c9:c3ea with SMTP id 5b1f17b1804b1-4777329747emr91118435e9.35.1762856012407;
+        Tue, 11 Nov 2025 02:13:32 -0800 (PST)
+Received: from [192.168.88.32] ([212.105.155.55])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4778289c036sm12751605e9.1.2025.11.11.02.13.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Nov 2025 02:13:32 -0800 (PST)
+Message-ID: <a9db02a3-f774-4a81-b641-24f76290ed74@redhat.com>
+Date: Tue, 11 Nov 2025 11:13:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251109-netcons-retrigger-v3-5-1654c280bbe6@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net/ipv6: fix lookup for ::/0 (non-)subtree
+ route
+To: David Lamparter <equinox@diac24.net>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+ Lorenzo Colitti <lorenzo@google.com>, Patrick Rohr <prohr@google.com>,
+ =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
+References: <20251105145446.10001-1-equinox@diac24.net>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20251105145446.10001-1-equinox@diac24.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sun, Nov 09, 2025 at 11:05:55AM +0000, Andre Carvalho wrote:
-> Attempt to resume a previously deactivated target when the associated
-> interface comes back (NETDEV_UP event is received) by calling
-> __netpoll_setup_hold on the device.
+On 11/5/25 3:54 PM, David Lamparter wrote:
+> Assume a scenario with something like the following routes:
+> default via fe80::1 dev dummy0
+> 2001:db8:1::/48 via fe80::10 dev dummy0
+> 2001:db8:1::/48 from 2001:db8:1:2::/64 via fe80::12 dev dummy0
 > 
-> Depending on how the target was setup (by mac or interface name), the
-> corresponding field is compared with the device being brought up.
+> Now if a lookup happens for 2001:db8:1::2345, but with a source address
+> *not* covered by the third route, the expectation is to hit the second
+> one.  Unfortunately, this was broken since the code, on failing the
+> lookup in the subtree, didn't consider the node itself which the subtree
+> is attached to, i.e. route #2 above.
 > 
-> Targets that are candidates for resuming are removed from the target list
-> and added to a temporarily list, as __netpoll_setup_hold might allocate.
-> __netpoll_setup_hold assumes RTNL is held (which is guaranteed to be the
-> case when handling the event) and holds a reference to the device in case
-> of success. This reference will be removed upon target (or netconsole)
-> removal by netpoll_cleanup.
+> The fix is simple, check if the subtree is attached to a node that is
+> itself a valid route before backtracking to less specific destination
+> prefixes.
 > 
-> Target transitions to STATE_DISABLED in case of failures resuming it to
-> avoid retrying the same target indefinitely.
+> This case is somewhat rare for several reasons.  To begin with, subtree
+> routes are most commonly attached to the default destination.
+> Additionally, in the rare cases where a non-default destination prefix
+> is host to subtree routes, the fallback on not hitting any subtree route
+> is commonly a default route (or a subtree route on that).
 > 
-> Signed-off-by: Andre Carvalho <asantostc@gmail.com>
+> (Note that this was working for the "::/0 from ::/0" case since the root
+> node is special-cased.  The issue was discovered during RFC 6724 rule
+> 5.5 testing, trying to find edge cases.)
+> 
+> Signed-off-by: David Lamparter <equinox@diac24.net>
+> Cc: Lorenzo Colitti <lorenzo@google.com>
+> Cc: Patrick Rohr <prohr@google.com>
+> Cc: Maciej Żenczykowski <maze@google.com>
 > ---
->  drivers/net/netconsole.c | 62 +++++++++++++++++++++++++++++++++++++++++++-----
->  1 file changed, 56 insertions(+), 6 deletions(-)
+>  net/ipv6/ip6_fib.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-> index 5a374e6d178d..50d6df101c20 100644
-> --- a/drivers/net/netconsole.c
-> +++ b/drivers/net/netconsole.c
-> @@ -135,10 +135,12 @@ enum target_state {
->   * @stats:	Packet send stats for the target. Used for debugging.
->   * @state:	State of the target.
->   *		Visible from userspace (read-write).
-> - *		We maintain a strict 1:1 correspondence between this and
-> - *		whether the corresponding netpoll is active or inactive.
-> + *		From a userspace perspective, the target is either enabled or
-> + *		disabled. Internally, although both STATE_DISABLED and
-> + *		STATE_DEACTIVATED correspond to inactive netpoll the latter is>
-> + *		due to interface state changes and may recover automatically.
+> diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
+> index 02c16909f618..c18e9331770d 100644
+> --- a/net/ipv6/ip6_fib.c
+> +++ b/net/ipv6/ip6_fib.c
+> @@ -1650,8 +1650,11 @@ static struct fib6_node *fib6_node_lookup_1(struct fib6_node *root,
+>  					struct fib6_node *sfn;
+>  					sfn = fib6_node_lookup_1(subtree,
+>  								 args + 1);
+> -					if (!sfn)
+> +					if (!sfn) {
+> +						if (fn->fn_flags & RTN_RTINFO)
+> +							return fn;
+>  						goto backtrack;
+> +					}
+>  					fn = sfn;
+>  				}
+>  #endif
 
- *		disabled. Internally, although both STATE_DISABLED and
- *		STATE_DEACTIVATED correspond to inactive targets, the latter is
- *		due to automatic interface state changes and will try
- *		recover automatically, if the interface comes back
- *		online.
+The patch LGTM, and I agree this should go via net-next, given that it's
+really a corner case and I could miss nasty side-effects.
 
->   *		Also, other parameters of a target may be modified at
-> - *		runtime only when it is disabled (state == STATE_DISABLED).
-> + *		runtime only when it is disabled (state != STATE_ENABLED).
->   * @extended:	Denotes whether console is extended or not.
->   * @release:	Denotes whether kernel release version should be prepended
->   *		to the message. Depends on extended console.
-> @@ -1445,17 +1447,50 @@ static int prepare_extradata(struct netconsole_target *nt)
->  }
->  #endif	/* CONFIG_NETCONSOLE_DYNAMIC */
->  
-> +/* Attempts to resume logging to a deactivated target. */
-> +static void maybe_resume_target(struct netconsole_target *nt,
-> +				struct net_device *ndev)
-> +{
-> +	int ret;
-> +
-> +	ret = __netpoll_setup_hold(&nt->np, ndev);
-> +	if (ret) {
-> +		/* netpoll fails setup once, do not try again. */
-> +		nt->state = STATE_DISABLED;
-> +	} else {
-> +		nt->state = STATE_ENABLED;
-> +		pr_info("network logging resumed on interface %s\n",
-> +			nt->np.dev_name);
-> +	}
-> +}
+It looks like you have some testing scenario handy: it would be great to
+include it as a paired self-test; could you please add it?
 
-I am not sure that helper is useful, I would simplify the last patch
-with this one and write something like:
+Thanks,
 
+Paolo
 
-	/* Attempts to resume logging to a deactivated target. */
-	static void maybe_resume_target(struct netconsole_target *nt,
-					struct net_device *ndev)
-	{
-		int ret;
-
-		ret = __netpoll_setup_hold(&nt->np, ndev);
-		if (ret) {
-			/* netpoll fails setup once, do not try again. */
-			nt->state = STATE_DISABLED;
-			return;
-		}
-
-		netdev_hold(ndev, &np->dev_tracker, GFP_KERNEL);
-		nt->state = STATE_ENABLED;
-		pr_info("network logging resumed on interface %s\n",
-			nt->np.dev_name);
-	}
-
-> +
-> +/* Check if the target was bound by mac address. */
-> +static bool bound_by_mac(struct netconsole_target *nt)
-> +{
-> +	return is_valid_ether_addr(nt->np.dev_mac);
-> +}
-
-Awesome. I liked this helper. It might be useful it some other places, and
-eventually transformed into a specific type in the target (in case we need to
-in the future)
-
-Can we use it egress_dev also? If so, please separate this in a separate patch.
-
-> +/* Checks if a target matches a device. */
-> +static bool target_match(struct netconsole_target *nt, struct net_device *ndev)
-> +{
-> +	if (bound_by_mac(nt))
-> +		return !memcmp(nt->np.dev_mac, ndev->dev_addr, ETH_ALEN);
-> +	return !strncmp(nt->np.dev_name, ndev->name, IFNAMSIZ);
-> +}
-> +
->  /* Handle network interface device notifications */
->  static int netconsole_netdev_event(struct notifier_block *this,
->  				   unsigned long event, void *ptr)
->  {
-> -	unsigned long flags;
-> -	struct netconsole_target *nt, *tmp;
->  	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
-> +	struct netconsole_target *nt, *tmp;
-> +	LIST_HEAD(resume_list);
->  	bool stopped = false;
-> +	unsigned long flags;
->  
->  	if (!(event == NETDEV_CHANGENAME || event == NETDEV_UNREGISTER ||
-> -	      event == NETDEV_RELEASE || event == NETDEV_JOIN))
-> +	      event == NETDEV_RELEASE || event == NETDEV_JOIN ||
-> +	      event == NETDEV_UP))
->  		goto done;
->  
->  	mutex_lock(&target_cleanup_list_lock);
-> @@ -1475,11 +1510,26 @@ static int netconsole_netdev_event(struct notifier_block *this,
->  				stopped = true;
->  			}
->  		}
-> +		if (nt->state == STATE_DEACTIVATED && event == NETDEV_UP &&
-> +		    target_match(nt, dev))
-> +			list_move(&nt->list, &resume_list);
-
-I think it would be better to move the nt->state == STATE_DEACTIVATED to target_match and use
-the case above. As the following:
-
-	if (nt->np.dev == dev) {
-		switch (event) {
-		case NETDEV_CHANGENAME:
-		....
-		case NETDEV_UP:
-			if (target_match(nt, dev))
-				list_move(&nt->list, &resume_list);
-
-
->  		netconsole_target_put(nt);
->  	}
->  	spin_unlock_irqrestore(&target_list_lock, flags);
->  	mutex_unlock(&target_cleanup_list_lock);
->  
-
-Write a comment saying that maybe_resume_target() might be called with IRQ
-enabled.
-
-
-> +	list_for_each_entry_safe(nt, tmp, &resume_list, list) {
-> +		maybe_resume_target(nt, dev);
-> +
-> +		/* At this point the target is either enabled or disabled and
-> +		 * was cleaned up before getting deactivated. Either way, add it
-> +		 * back to target list.
-> +		 */
-> +		spin_lock_irqsave(&target_list_lock, flags);
-> +		list_move(&nt->list, &target_list);
-> +		spin_unlock_irqrestore(&target_list_lock, flags);
-> +	}
-> +
->  	if (stopped) {
->  		const char *msg = "had an event";
->  
-Also, extract the code below in a static function. Similar to
-netconsole_process_cleanups_core(), but passing resume_list argument.
-
-Let's try to keep netconsole_netdev_event() simple to read and reason about.
 
