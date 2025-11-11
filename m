@@ -1,169 +1,136 @@
-Return-Path: <netdev+bounces-237387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FEBBC49E16
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 01:34:07 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98CDDC49E22
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 01:37:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1D50F4E423A
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 00:34:06 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 58CF74E2492
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 00:37:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF5AA2264BD;
-	Tue, 11 Nov 2025 00:34:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1B4324466D;
+	Tue, 11 Nov 2025 00:37:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N9FX4d3j"
+	dkim=pass (2048-bit key) header.d=listout.xyz header.i=@listout.xyz header.b="v17SCKU7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B294223DF0;
-	Tue, 11 Nov 2025 00:34:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE2334D38D;
+	Tue, 11 Nov 2025 00:37:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762821243; cv=none; b=oIEoZ6lJGhXKIlZgJTIsPrZW8NHLpkoypxxTGZuxZAN+xLxuhOjUCzW0b5Szik2WU0hDBc+W0ioQnmFhzC/hmzud5et9Vn/8U6EiIeKN5P3yfSQWszUieWCYFNY4ldPtY1yiH1vwXXAxAZmrTHoGCAVmZJhaPCayewZkKxAE21A=
+	t=1762821471; cv=none; b=NEEr7hAznofbIpZtQY27jWhZPM43iQK9/yTopuVv3Mejvkidvrzgcpgfgec/tzd0N/KhIMGXYF+kxQwbZx8FSvxXcTOAMYLcKcTShTy+YbBUoMl3vVGM9BDV+f4OCpgEy4kijCdkLHRH6upLZ9dmLHv1wc3lRpb4iOZxfHRf75o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762821243; c=relaxed/simple;
-	bh=FN4CweFd1C3K2bDEXrQI2FrcndJARFnGCMf20zgvu1Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hiYz8GelN2qoP8Jbleh86dOdLqkE0JDkxgDtvJshrBrfsEfBChlTTHRHWAqsZyzXJlJtTM8jG8XN+gFVgfPoFzT6X7FSEr2p00AEuSRwO0Qv5ZlBhxnYmDq5WZ3O4vZrZVPA8aDtVX7hhaBZrGREflAnGg7Ob57b4thmQy1/0XY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N9FX4d3j; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762821242; x=1794357242;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=FN4CweFd1C3K2bDEXrQI2FrcndJARFnGCMf20zgvu1Y=;
-  b=N9FX4d3j8bfY76J5jMxcVaXPPMpeVLD+PxVCmHKgDV1xWD386hafL9Ll
-   aVrLz2mD79zHrRg6BkTHt+NtE5dk3Kx2VA3FcWp+qU0+QqkxLYTyT+/3w
-   NL4Am7Vc7u2iXnfGsxBFEIvAo5ESCB683ujwEw1RsA5ZAh5x2yDVRSJf4
-   Zgu8lZU1pj1Lzzv6dXIPbAaYv3uHYnEOKy2tID3gdM71+kCzUazbXzX7x
-   uiP+l5FK67Yz1Zl8KoqTySzOVHoMv92JRAxbRYOvb4jxnbm39Iby8oO9V
-   jRDH6ao2NzCIBDtQyEKPowQpHlvmaz2ytd3MeKPEJsNO2BW9xkDRF5Uv0
-   Q==;
-X-CSE-ConnectionGUID: FOCneySvSkS3u9CqAUoy0g==
-X-CSE-MsgGUID: bynp3tFtRW2liu3yXrKw2g==
-X-IronPort-AV: E=McAfee;i="6800,10657,11609"; a="52435523"
-X-IronPort-AV: E=Sophos;i="6.19,295,1754982000"; 
-   d="scan'208";a="52435523"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Nov 2025 16:34:01 -0800
-X-CSE-ConnectionGUID: gia5D1ZLTXaavUo3tBquPQ==
-X-CSE-MsgGUID: R6VyaGQBT6+ndZWr6l0zkw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,295,1754982000"; 
-   d="scan'208";a="193069502"
-Received: from lkp-server01.sh.intel.com (HELO 7b01c990427b) ([10.239.97.150])
-  by fmviesa005.fm.intel.com with ESMTP; 10 Nov 2025 16:33:57 -0800
-Received: from kbuild by 7b01c990427b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1vIcKa-0001A3-24;
-	Tue, 11 Nov 2025 00:33:56 +0000
-Date: Tue, 11 Nov 2025 08:33:07 +0800
-From: kernel test robot <lkp@intel.com>
-To: Dmitry Skorodumov <skorodumov.dmitry@huawei.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, andrey.bokhanko@huawei.com,
-	Dmitry Skorodumov <skorodumov.dmitry@huawei.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next 07/14] ipvlan: Support IPv6 for learnable
- l2-bridge
-Message-ID: <202511110823.oBrdGTfa-lkp@intel.com>
-References: <20251105161450.1730216-8-skorodumov.dmitry@huawei.com>
+	s=arc-20240116; t=1762821471; c=relaxed/simple;
+	bh=CXUca8YX0lqu5nzun2xmmizNpx8K/emG0bVPAISOubw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Ua/yabWCBqnLLJBTfz9Rm/kLMm4v71ovsRJNzqT+91U1557ecSbP6qdQhOCZsPYh3TiLbRCgNm3nASAaq4SiQzts0hVqe2SrrBbF3uNZPaPvj1+P+wlcY/v5X6jQI76gMuKlUtsM11YK7YNzr5AJ8jktBjNh3X1sscnTS72YAIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=listout.xyz; spf=pass smtp.mailfrom=listout.xyz; dkim=pass (2048-bit key) header.d=listout.xyz header.i=@listout.xyz header.b=v17SCKU7; arc=none smtp.client-ip=80.241.56.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=listout.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=listout.xyz
+Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4d570g0Z3vz9t7M;
+	Tue, 11 Nov 2025 01:37:39 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=listout.xyz; s=MBO0001;
+	t=1762821459;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=EuZRMwi3IQuVG4xNekc3Mlt/5lCSesgrsdugH2WI734=;
+	b=v17SCKU7lI2YxrvALwwN5vaDSCmgNUkQ8omYw6b2hWo/KGwT1T43RNMQXAAAQ3U+qm7+pv
+	m9xjAria+e9+ctG8aOLpp0/1kpXze/ENKP+cB0IUiTQg51vnbRX4Uyx4c4hMI3VVrZvLjq
+	kpiYRW0Kuzq00YOJQaPCS5nORTfqphVscfysXSJtScnDU986waoeP/bDVxo7llLcULM13b
+	xnJg0kFqbvSL7ocazO5yGkaCMWJIm4d77ZyiYSzvdu5m7IGR3eIzrJkISXIlM5zErgWmaa
+	IPb0NM7Y+GA0aB1bR0R38el4WdPQX5qrKQ5LWgoVHv5A+1agvET3gGw5S6aKZA==
+From: Brahmajit Das <listout@listout.xyz>
+To: syzbot+d1b7fa1092def3628bd7@syzkaller.appspotmail.com
+Cc: andrii@kernel.org,
+	ast@kernel.org,
+	bpf@vger.kernel.org,
+	contact@arnaud-lcm.com,
+	daniel@iogearbox.net,
+	eddyz87@gmail.com,
+	haoluo@google.com,
+	john.fastabend@gmail.com,
+	jolsa@kernel.org,
+	kpsingh@kernel.org,
+	linux-kernel@vger.kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	sdf@fomichev.me,
+	song@kernel.org,
+	syzkaller-bugs@googlegroups.com,
+	yonghong.song@linux.dev
+Subject: [PATCH bpf-next v2] bpf: Clamp trace length in __bpf_get_stack to fix OOB write
+Date: Tue, 11 Nov 2025 06:07:21 +0530
+Message-ID: <20251111003721.7629-1-listout@listout.xyz>
+In-Reply-To: <691231dc.a70a0220.22f260.0101.GAE@google.com>
+References: <691231dc.a70a0220.22f260.0101.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251105161450.1730216-8-skorodumov.dmitry@huawei.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Dmitry,
+syzbot reported a stack-out-of-bounds write in __bpf_get_stack()
+triggered via bpf_get_stack() when capturing a kernel stack trace.
 
-kernel test robot noticed the following build warnings:
+After the recent refactor that introduced stack_map_calculate_max_depth(),
+the code in stack_map_get_build_id_offset() (and related helpers) stopped
+clamping the number of trace entries (`trace_nr`) to the number of elements
+that fit into the stack map value (`num_elem`).
 
-[auto build test WARNING on net-next/main]
+As a result, if the captured stack contained more frames than the map value
+can hold, the subsequent memcpy() would write past the end of the buffer,
+triggering a KASAN report like:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Dmitry-Skorodumov/ipvlan-Preparation-to-support-mac-nat/20251106-004449
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20251105161450.1730216-8-skorodumov.dmitry%40huawei.com
-patch subject: [PATCH net-next 07/14] ipvlan: Support IPv6 for learnable l2-bridge
-config: um-randconfig-r123-20251110 (https://download.01.org/0day-ci/archive/20251111/202511110823.oBrdGTfa-lkp@intel.com/config)
-compiler: clang version 22.0.0git (https://github.com/llvm/llvm-project 93d445cba39f4dd3dcda4fa1433eca825cf8fc09)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20251111/202511110823.oBrdGTfa-lkp@intel.com/reproduce)
+    BUG: KASAN: stack-out-of-bounds in __bpf_get_stack+0x...
+    Write of size N at addr ... by task syz-executor...
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202511110823.oBrdGTfa-lkp@intel.com/
+Restore the missing clamp by limiting `trace_nr` to `num_elem` before
+computing the copy length. This mirrors the pre-refactor logic and ensures
+we never copy more bytes than the destination buffer can hold.
 
-sparse warnings: (new ones prefixed by >>)
-   drivers/net/ipvlan/ipvlan_core.c:56:36: sparse: sparse: incorrect type in argument 1 (different base types) @@     expected unsigned int [usertype] a @@     got restricted __be32 const [usertype] s_addr @@
-   drivers/net/ipvlan/ipvlan_core.c:56:36: sparse:     expected unsigned int [usertype] a
-   drivers/net/ipvlan/ipvlan_core.c:56:36: sparse:     got restricted __be32 const [usertype] s_addr
->> drivers/net/ipvlan/ipvlan_core.c:794:23: sparse: sparse: incorrect type in argument 1 (different base types) @@     expected unsigned short [usertype] val @@     got restricted __be16 [usertype] payload_len @@
-   drivers/net/ipvlan/ipvlan_core.c:794:23: sparse:     expected unsigned short [usertype] val
-   drivers/net/ipvlan/ipvlan_core.c:794:23: sparse:     got restricted __be16 [usertype] payload_len
-   drivers/net/ipvlan/ipvlan_core.c:794:23: sparse: sparse: cast from restricted __be16
-   drivers/net/ipvlan/ipvlan_core.c:794:23: sparse: sparse: cast from restricted __be16
-   drivers/net/ipvlan/ipvlan_core.c:794:19: sparse: sparse: cast from restricted __be16
-   drivers/net/ipvlan/ipvlan_core.c:854:23: sparse: sparse: incorrect type in argument 1 (different base types) @@     expected unsigned short [usertype] val @@     got restricted __be16 [usertype] payload_len @@
-   drivers/net/ipvlan/ipvlan_core.c:854:23: sparse:     expected unsigned short [usertype] val
-   drivers/net/ipvlan/ipvlan_core.c:854:23: sparse:     got restricted __be16 [usertype] payload_len
-   drivers/net/ipvlan/ipvlan_core.c:854:23: sparse: sparse: cast from restricted __be16
-   drivers/net/ipvlan/ipvlan_core.c:854:23: sparse: sparse: cast from restricted __be16
-   drivers/net/ipvlan/ipvlan_core.c:854:19: sparse: sparse: cast from restricted __be16
+No functional change intended beyond reintroducing the missing bound check.
 
-vim +794 drivers/net/ipvlan/ipvlan_core.c
+Reported-by: syzbot+d1b7fa1092def3628bd7@syzkaller.appspotmail.com
+Fixes: e17d62fedd10 ("bpf: Refactor stack map trace depth calculation into helper function")
+Signed-off-by: Brahmajit Das <listout@listout.xyz>
+---
+Changes in v2:
+- Use max_depth instead of num_elem logic, this logic is similar to what
+we are already using __bpf_get_stackid
 
-   785	
-   786	static u8 *ipvlan_search_icmp6_ll_addr(struct sk_buff *skb, u8 icmp_option)
-   787	{
-   788		/* skb is ensured to pullable for all ipv6 payload_len by caller */
-   789		struct ipv6hdr *ip6h = ipv6_hdr(skb);
-   790		struct icmp6hdr *icmph;
-   791		int ndsize, curr_off;
-   792	
-   793		icmph = (struct icmp6hdr *)(ip6h + 1);
- > 794		ndsize = (int)htons(ip6h->payload_len);
-   795		curr_off = sizeof(*icmph);
-   796	
-   797		if (icmph->icmp6_type != NDISC_ROUTER_SOLICITATION)
-   798			curr_off += sizeof(struct in6_addr);
-   799	
-   800		while ((curr_off + 2) < ndsize) {
-   801			u8  *data = (u8 *)icmph + curr_off;
-   802			u32 opt_len = data[1] << 3;
-   803	
-   804			if (unlikely(opt_len == 0))
-   805				return NULL;
-   806	
-   807			if (data[0] != icmp_option) {
-   808				curr_off += opt_len;
-   809				continue;
-   810			}
-   811	
-   812			if (unlikely(opt_len < ETH_ALEN + 2))
-   813				return NULL;
-   814	
-   815			if (unlikely(curr_off + opt_len > ndsize))
-   816				return NULL;
-   817	
-   818			return data + 2;
-   819		}
-   820	
-   821		return NULL;
-   822	}
-   823	
+Changes in v1:
+- RFC patch that restores the number of trace entries by setting
+trace_nr to trace_nr or num_elem based on whichever is the smallest.
+Link: https://lore.kernel.org/all/20251110211640.963-1-listout@listout.xyz/
+---
+ kernel/bpf/stackmap.c | 1 +
+ 1 file changed, 1 insertion(+)
 
+diff --git a/kernel/bpf/stackmap.c b/kernel/bpf/stackmap.c
+index 2365541c81dd..f9081de43689 100644
+--- a/kernel/bpf/stackmap.c
++++ b/kernel/bpf/stackmap.c
+@@ -480,6 +480,7 @@ static long __bpf_get_stack(struct pt_regs *regs, struct task_struct *task,
+ 	}
+ 
+ 	trace_nr = trace->nr - skip;
++	trace_nr = min_t(u32, trace_nr, max_depth - skip);
+ 	copy_len = trace_nr * elem_size;
+ 
+ 	ips = trace->ip + skip;
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.51.2
+
 
