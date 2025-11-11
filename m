@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-237469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFE5EC4C31A
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 08:54:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D469C4C375
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 09:00:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE4953B74D7
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 07:54:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D3271893366
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 07:58:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 231012DAFD2;
-	Tue, 11 Nov 2025 07:54:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE09F2D6E5B;
+	Tue, 11 Nov 2025 07:58:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RUN8D2pK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ch1k3nWP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC3902D8780;
-	Tue, 11 Nov 2025 07:54:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FF3015E8B;
+	Tue, 11 Nov 2025 07:58:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762847686; cv=none; b=M4Mekz4fJ/6HMqjebF/uFrejfXFbEQCQ7roDHQ4/zMFOEwwLQUG/hh+7vEqQa+l+JHJdyxlFGfr80oRr6D73PvxY4oBrPftsblLh5XHZH50+TcuFRi04oOIZy8+tOfpPRZsUleUTFOGZVtSvgEE0q2ytN/q/STLcMECmkwRDCqw=
+	t=1762847882; cv=none; b=eZKZjEKMN9mOhEY2V0ziQLm7n3Pg4kKKA465ZuyjldvniYjnr1iHR4kduPqpesPO9GTSvCQb7Ip+O6ksgBWjjTh/3SBQsjaGBDtnKU6ujtXtKP2DfXfXxSiu8w9qviIldyqIQw/SB+/Yw1L8R3anq0Ek62tlJJXWURrEDpHtQ3Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762847686; c=relaxed/simple;
-	bh=cab3bFbXC1ctOtMaRskBvsdtCVCk3ww3mrmpzidCyhM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DZ9QsJvFP6fqPEsb78PYi4iCF3j3AuR03hhNTuGxW10R8iJXNmR5EXwyb20pKIpYhCTCThOW6cGX39N2o1kSRy5r/GOGM9RdSJS9yfnEgDzU5QtJ0cuB6HrAE9ri6rDFpv+tuBx0XKuoS0VjNtrXHwLYs6nAGoPDbixkzaQD+1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RUN8D2pK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF60AC116B1;
-	Tue, 11 Nov 2025 07:54:39 +0000 (UTC)
+	s=arc-20240116; t=1762847882; c=relaxed/simple;
+	bh=5Uaa5nwFjVAGS3f1mHP+LmUtuVFBDubmN+xdr/NpZiU=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=QMpjdDxN+/6mX0/eB6d9HgpEsG02z037IrRnN32V1imj+Q0EBDxuRmDVJpDUNRwijPJK9vHIbOPC9j2xAbMUA7zppMrDfakOy3i+XqOwgBnvpYeT5O3TOu42+gDJHaMCS0OQXogbRmuVspjnOARReoRg5UkP7GyhUOke1IroFY8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ch1k3nWP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85862C4CEF7;
+	Tue, 11 Nov 2025 07:57:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762847685;
-	bh=cab3bFbXC1ctOtMaRskBvsdtCVCk3ww3mrmpzidCyhM=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=RUN8D2pKjUTFlWlrN27hScipRg8okNOcXZCebtbIACpvVOO+GnlGvC5zIAfjNos4Z
-	 yfnVKR4dhj+HccU5SKFwZDK9p4YRqJHvUyhajiPyPyGSC9quYW9RZKc2xibHxMtli8
-	 68xXpXzacZKY2oGiGYebk/ysm5RWVfDy5Nw/U+B6aChpW0sNBvWdRPVvYgVNVg+cbP
-	 vNJiLemRuikhXcSHE/zXKjISiwwrrzJ/XgEyOa3Xpj39N3CrKrr7BsRnPUuGO7tOnF
-	 beW2BTlMXW9eDWT5sXtcsW5A5Lu1zWGA1o25O0K9+s0YaKZuP77N57htvnq4M1CIiq
-	 J/4RpPuuBUPPg==
-Message-ID: <58b50903-7969-46bd-bd73-60629c00f057@kernel.org>
-Date: Tue, 11 Nov 2025 08:54:37 +0100
+	s=k20201202; t=1762847880;
+	bh=5Uaa5nwFjVAGS3f1mHP+LmUtuVFBDubmN+xdr/NpZiU=;
+	h=Date:From:Subject:To:Cc:References:In-Reply-To:From;
+	b=Ch1k3nWPMj6UEosM8Ssp+W11+ShFdJNgTHl19OiSOLt8ohzsfcyx1e1F7RmTDjV4h
+	 6nfm81zuqwh2U/1g+oysD3nb8RJ03+yxk6skIyzw3M3W3e/J9HtiabAgh4+xEFmu37
+	 l5MKqXDSdixGL84XrPmyQATSqs91LuFiI1HHYTjBcRMgp9dE7vdCjaftzIMHr0cVLk
+	 +CWgU4tpn3OvWPaoyx3SvYKWIXApBzibkh3iBOdzwx5+bk+s2HOEUiW5d50gYtDEsM
+	 lw10x7RmKw7oaN9Q1I5bh42iwHcHv5ipPInJZkoHKozkZTco3mSCA83d6op32oom8H
+	 eoL8yv1NXmTAw==
+Message-ID: <9f461bf7-3651-4be4-b6f9-20853cdc4c90@kernel.org>
+Date: Tue, 11 Nov 2025 08:57:43 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,189 +50,110 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 2/2] xdp: Delegate fast path return decision to page_pool
-To: Dragos Tatulea <dtatulea@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Simon Horman <horms@kernel.org>,
- Toshiaki Makita <toshiaki.makita1@gmail.com>,
- David Ahern <dsahern@kernel.org>, Toke Hoiland Jorgensen <toke@redhat.com>
-Cc: Tariq Toukan <tariqt@nvidia.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- Martin KaFai Lau <martin.lau@linux.dev>, KP Singh <kpsingh@kernel.org>
-References: <20251107102853.1082118-2-dtatulea@nvidia.com>
- <20251107102853.1082118-5-dtatulea@nvidia.com>
- <d0fc4c6a-c4d7-4d62-9e6f-6c05c96a51de@kernel.org>
- <4eusyirzvomxwkzib5tqfyrcgjcxoplrsf7jctytvyvrfvi5fr@f3lvd5h2kb2p>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <4eusyirzvomxwkzib5tqfyrcgjcxoplrsf7jctytvyvrfvi5fr@f3lvd5h2kb2p>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Hans Verkuil <hverkuil+cisco@kernel.org>
+Subject: Re: [PATCH v1 13/23] media: av7110: Switch to use %ptSp
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Corey Minyard <corey@minyard.net>, =?UTF-8?Q?Christian_K=C3=B6nig?=
+ <christian.koenig@amd.com>, "Dr. David Alan Gilbert" <linux@treblig.org>,
+ Alex Deucher <alexander.deucher@amd.com>,
+ Thomas Zimmermann <tzimmermann@suse.de>,
+ Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>,
+ Rob Clark <robin.clark@oss.qualcomm.com>,
+ Matthew Brost <matthew.brost@intel.com>, Hans Verkuil <hverkuil@kernel.org>,
+ Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>,
+ Ulf Hansson <ulf.hansson@linaro.org>,
+ Vitaly Lifshits <vitaly.lifshits@intel.com>,
+ Manivannan Sadhasivam <mani@kernel.org>, Niklas Cassel <cassel@kernel.org>,
+ Calvin Owens <calvin@wbinvd.org>, Sagi Maimon <maimon.sagi@gmail.com>,
+ "Martin K. Petersen" <martin.petersen@oracle.com>,
+ Karan Tilak Kumar <kartilak@cisco.com>,
+ Casey Schaufler <casey@schaufler-ca.com>,
+ Steven Rostedt <rostedt@goodmis.org>, Petr Mladek <pmladek@suse.com>,
+ Max Kellermann <max.kellermann@ionos.com>, Takashi Iwai <tiwai@suse.de>,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ openipmi-developer@lists.sourceforge.net, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
+ amd-gfx@lists.freedesktop.org, linux-arm-msm@vger.kernel.org,
+ freedreno@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
+ linux-mmc@vger.kernel.org, netdev@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, linux-pci@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
+ linux-staging@lists.linux.dev, ceph-devel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, linux-sound@vger.kernel.org
+Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+ Sergey Senozhatsky <senozhatsky@chromium.org>,
+ Jonathan Corbet <corbet@lwn.net>, Sumit Semwal <sumit.semwal@linaro.org>,
+ Gustavo Padovan <gustavo@padovan.org>, David Airlie <airlied@gmail.com>,
+ Simona Vetter <simona@ffwll.ch>,
+ Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+ Maxime Ripard <mripard@kernel.org>, Dmitry Baryshkov <lumag@kernel.org>,
+ Abhinav Kumar <abhinav.kumar@linux.dev>,
+ Jessica Zhang <jesszhan0024@gmail.com>, Sean Paul <sean@poorly.run>,
+ Marijn Suijten <marijn.suijten@somainline.org>,
+ Konrad Dybcio <konradybcio@kernel.org>,
+ Lucas De Marchi <lucas.demarchi@intel.com>,
+ =?UTF-8?Q?Thomas_Hellstr=C3=B6m?= <thomas.hellstrom@linux.intel.com>,
+ Rodrigo Vivi <rodrigo.vivi@intel.com>,
+ Mauro Carvalho Chehab <mchehab@kernel.org>,
+ Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ =?UTF-8?Q?Krzysztof_Wilczy=C5=84ski?= <kwilczynski@kernel.org>,
+ Kishon Vijay Abraham I <kishon@kernel.org>,
+ Bjorn Helgaas <bhelgaas@google.com>, Rodolfo Giometti
+ <giometti@enneenne.com>, Jonathan Lemon <jonathan.lemon@gmail.com>,
+ Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Stefan Haberland <sth@linux.ibm.com>, Jan Hoeppner <hoeppner@linux.ibm.com>,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Satish Kharat <satishkh@cisco.com>,
+ Sesidhar Baddela <sebaddel@cisco.com>,
+ "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Xiubo Li
+ <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
+ Masami Hiramatsu <mhiramat@kernel.org>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>
+References: <20251110184727.666591-1-andriy.shevchenko@linux.intel.com>
+ <20251110184727.666591-14-andriy.shevchenko@linux.intel.com>
+Content-Language: en-US, nl
+In-Reply-To: <20251110184727.666591-14-andriy.shevchenko@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-
-
-On 10/11/2025 19.51, Dragos Tatulea wrote:
-> On Mon, Nov 10, 2025 at 12:06:08PM +0100, Jesper Dangaard Brouer wrote:
->>
->>
->> On 07/11/2025 11.28, Dragos Tatulea wrote:
->>> XDP uses the BPF_RI_F_RF_NO_DIRECT flag to mark contexts where it is not
->>> allowed to do direct recycling, even though the direct flag was set by
->>> the caller. This is confusing and can lead to races which are hard to
->>> detect [1].
->>>
->>> Furthermore, the page_pool already contains an internal
->>> mechanism which checks if it is safe to switch the direct
->>> flag from off to on.
->>>
->>> This patch drops the use of the BPF_RI_F_RF_NO_DIRECT flag and always
->>> calls the page_pool release with the direct flag set to false. The
->>> page_pool will decide if it is safe to do direct recycling. This
->>> is not free but it is worth it to make the XDP code safer. The
->>> next paragrapsh are discussing the performance impact.
->>>
->>> Performance wise, there are 3 cases to consider. Looking from
->>> __xdp_return() for MEM_TYPE_PAGE_POOL case:
->>>
->>> 1) napi_direct == false:
->>>     - Before: 1 comparison in __xdp_return() + call of
->>>       page_pool_napi_local() from page_pool_put_unrefed_netmem().
->>>     - After: Only one call to page_pool_napi_local().
->>>
->>> 2) napi_direct == true && BPF_RI_F_RF_NO_DIRECT
->>>     - Before: 2 comparisons in __xdp_return() + call of
->>>       page_pool_napi_local() from page_pool_put_unrefed_netmem().
->>>     - After: Only one call to page_pool_napi_local().
->>>
->>> 3) napi_direct == true && !BPF_RI_F_RF_NO_DIRECT
->>>     - Before: 2 comparisons in __xdp_return().
->>>     - After: One call to page_pool_napi_local()
->>>
->>> Case 1 & 2 are the slower paths and they only have to gain.
->>> But they are slow anyway so the gain is small.
->>>
->>> Case 3 is the fast path and is the one that has to be considered more
->>> closely. The 2 comparisons from __xdp_return() are swapped for the more
->>> expensive page_pool_napi_local() call.
->>>
->>> Using the page_pool benchmark between the fast-path and the
->>> newly-added NAPI aware mode to measure [2] how expensive
->>> page_pool_napi_local() is:
->>>
->>>     bench_page_pool: time_bench_page_pool01_fast_path(): in_serving_softirq fast-path
->>>     bench_page_pool: Type:tasklet_page_pool01_fast_path Per elem: 15 cycles(tsc) 7.537 ns (step:0)
->>>
->>>     bench_page_pool: time_bench_page_pool04_napi_aware(): in_serving_softirq fast-path
->>>     bench_page_pool: Type:tasklet_page_pool04_napi_aware Per elem: 20 cycles(tsc) 10.490 ns (step:0)
->>>
->>
->> IMHO fast-path slowdown is significant.  This fast-path is used for the
->> XDP_DROP use-case in drivers.  The fast-path is competing with the speed
->> of updating an (per-cpu) array and a function-call overhead. The
->> performance target for XDP_DROP is NIC *wirespeed* which at 100Gbit/s is
->> 148Mpps (or 6.72ns between packets).
->>
->> I still want to seriously entertain this idea, because (1) because the
->> bug[1] was hard to find, and (2) this is mostly an XDP API optimization
->> that isn't used by drivers (they call page_pool APIs directly for
->> XDP_DROP case).
->> Drivers can do this because they have access to the page_pool instance.
->>
->> Thus, this isn't a XDP_DROP use-case.
->>   - This is either XDP_REDIRECT or XDP_TX use-case.
->>
->> The primary change in this patch is, changing the XDP API call
->> xdp_return_frame_rx_napi() effectively to xdp_return_frame().
->>
->> Looking at code users of this call:
->>   (A) Seeing a number of drivers using this to speed up XDP_TX when
->> *completing* packets from TX-ring.
->>   (B) drivers/net/xen-netfront.c use looks incorrect.
->>   (C) drivers/net/virtio_net.c use can easily be removed.
->>   (D) cpumap.c and drivers/net/tun.c should not be using this call.
->>   (E) devmap.c is the main user (with multiple calls)
->>
->> The (A) user will see a performance drop for XDP_TX, but these driver
->> should be able to instead call the page_pool APIs directly as they
->> should have access to the page_pool instance.
->>
->> Users (B)+(C)+(D) simply needs cleanup.
->>
->> User (E): devmap is the most important+problematic user (IIRC this was
->> the cause of bug[1]).  XDP redirecting into devmap and running a new
->> XDP-prog (per target device) was a prime user of this call
->> xdp_return_frame_rx_napi() as it gave us excellent (e.g. XDP_DROP)
->> performance.
->>
-> Thanks for the analysis Jesper.
-
-Thanks for working on this! It is long over due, that we clean this up.
-I think I spotted another bug in veth related to
-xdp_clear_return_frame_no_direct() and when NAPI exits.
-
->> Perhaps we should simply measure the impact on devmap + 2nd XDP-prog
->> doing XDP_DROP.  Then, we can see if overhead is acceptable... ?
->>
-> Will try. Just to make sure we are on the same page, AFAIU the setup
-> would be:
-> XDP_REDIRECT NIC1 -> veth ingress side and XDP_DROP veth egress side?
-
-No, this isn't exactly what I meant. But the people that wrote this
-blogpost ([1] https://loopholelabs.io/blog/xdp-for-egress-traffic ) is
-dependent on the performance for that scenario with veth pairs.
-
-When doing redirect-map, then you can attach a 2nd XDP-prog per map
-target "egress" device.  That 2nd XDP-prog should do a XDP_DROP as that
-will allow us to measure the code path we are talking about. I want test
-to hit this code line [2].
-[2] https://elixir.bootlin.com/linux/v6.17.7/source/kernel/bpf/
-devmap.c#L368.
-
-The xdp-bench[3] tool unfortunately support program-mode for 2nd XDP-
-prog, so I did this code change:
-
-diff --git a/xdp-bench/xdp_redirect_devmap.bpf.c 
-b/xdp-bench/xdp_redirect_devmap.bpf.c
-index 0212e824e2fa..39a24f8834e8 100644
---- a/xdp-bench/xdp_redirect_devmap.bpf.c
-+++ b/xdp-bench/xdp_redirect_devmap.bpf.c
-@@ -76,6 +76,8 @@ int xdp_redirect_devmap_egress(struct xdp_md *ctx)
-         struct ethhdr *eth = data;
-         __u64 nh_off;
-
-+       return XDP_DROP;
-+
-         nh_off = sizeof(*eth);
-         if (data + nh_off > data_end)
-                 return XDP_DROP;
-
-[3] https://github.com/xdp-project/xdp-tools/tree/main/xdp-bench
-
-And then you can run thus command:
-  sudo ./xdp-bench redirect-map --load-egress mlx5p1 mlx5p1
-
-Toke (and I) will appreciate if you added code for this to xdp-bench.
-Supporting a --program-mode like 'redirect-cpu' does.
-
-
+On 10/11/2025 19:40, Andy Shevchenko wrote:
+> Use %ptSp instead of open coded variants to print content of
+> struct timespec64 in human readable format.
 > 
->>> ... and the slow path for reference:
->>>
->>>     bench_page_pool: time_bench_page_pool02_ptr_ring(): in_serving_softirq fast-path
->>>     bench_page_pool: Type:tasklet_page_pool02_ptr_ring Per elem: 30 cycles(tsc) 15.395 ns (step:0)
->>
->> The devmap user will basically fallback to using this code path.
->>
-> Yes, if the page_pool is not NAPI aware.
+> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+
+Acked-by: Hans Verkuil <hverkuil+cisco@kernel.org>
+
+Regards,
+
+	Hans
+
+> ---
+>  drivers/staging/media/av7110/av7110.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Thanks,
-> Dragos
+> diff --git a/drivers/staging/media/av7110/av7110.c b/drivers/staging/media/av7110/av7110.c
+> index bc9a2a40afcb..602342d1174f 100644
+> --- a/drivers/staging/media/av7110/av7110.c
+> +++ b/drivers/staging/media/av7110/av7110.c
+> @@ -321,7 +321,7 @@ static inline void print_time(char *s)
+>  	struct timespec64 ts;
+>  
+>  	ktime_get_real_ts64(&ts);
+> -	pr_info("%s(): %lld.%09ld\n", s, (s64)ts.tv_sec, ts.tv_nsec);
+> +	pr_info("%s(): %ptSp\n", s, &ts);
+>  #endif
+>  }
+>  
 
 
