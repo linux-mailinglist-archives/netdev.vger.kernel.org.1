@@ -1,170 +1,154 @@
-Return-Path: <netdev+bounces-237642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1F7AC4E4CE
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 15:09:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BE2DC4E519
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 15:12:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B98174E2BA2
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 14:09:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EED6A3B3B7F
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 14:09:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30F1830E0F6;
-	Tue, 11 Nov 2025 14:09:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3D4232D7CC;
+	Tue, 11 Nov 2025 14:09:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A9niyACQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AE6530BF66
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 14:09:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2487532827A
+	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 14:09:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762870143; cv=none; b=OV+oZdqLFFlv0aX0fsXhqF+2cmb/rdSw33l+nLDGRGFfPFXz+XzOT5Veh+BL3UQmX37mcbGBvtGuNUlcBYClAnWiAy813GLFWzf/+sFlDmA11UrrgtdeXffBIU6cbdKt2YBKH7NiHLVyZYTKGw06ctURyEZXQQHyHVJSa6e7tEQ=
+	t=1762870161; cv=none; b=nLvSG66i9ETH7PEXzECLJB12EWp4NnJEIRoVPAgB1nsCbSX8KVqiDWoKL3ooiDulM04tiJBd9R4eBXo7+xi2U9SeXQNnIpE0XvlixuvW/Q5GBO+GRR1Y78DBFNs5X1vFHu/Uv7wVyKY3s+Ulay+AYFHSpbV3x6zngLRRRLJUB7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762870143; c=relaxed/simple;
-	bh=ArxyiOFu7/8nPuiBy4ho5ISc1baKmkk5k3bM0YU9jAo=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=Jz63Jl7OCZJdkzDvq/TupNyL5FUdWdZMtO0udtW4D8hMwQP6TbvuvXfby9UrF0CxP9BF3+lVmP7GfOLE7ijSVoSbv3Fvx6bkxzwey8q8F4ByoExWSytmW0g4hUMFMAGcXRcpxdhZFdTWusyGZTwD4a0jtZbIIWZcyBLS+PPgxUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-43300f41682so38524185ab.1
-        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 06:09:01 -0800 (PST)
+	s=arc-20240116; t=1762870161; c=relaxed/simple;
+	bh=lKvYpwqQnJ6dGU4fs+Qweyj9XLovb4ksA8r4FMq9T/Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uk9Xs1NVZPgdtvTTrwZ4ohxpPynk30EZU0iNfn0kQtzDz9hynGxpcC/+nQRRguGmdVYCE2rv3di+l5yYK6ZR2a4bJYpVu3b3HQLzMofHJ1ICOHuLX6xRf2nkMmR5Wv1/qgy5m0xHdB0LE0RdwkHbybTWsJgWsQ9LLG8ROwpJbfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A9niyACQ; arc=none smtp.client-ip=209.85.128.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-786943affbaso32212277b3.0
+        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 06:09:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762870159; x=1763474959; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lKvYpwqQnJ6dGU4fs+Qweyj9XLovb4ksA8r4FMq9T/Q=;
+        b=A9niyACQ1CLEipFyQLELij2zugvYSaUJu6P9KO5RKH1enUV0S3keqSAtlyCBLo0ywG
+         JiGxAyd2XIPcFrMifcM1kW6uMkagAA5GxUae14lU22xPzZ5oM31AKlUo5OVpb7gOUFPM
+         ewY1QQajAajEup61GSjV1Tr7d81z0UdVyDfvHznjyntxVaXT4qGDVBEwz71UXfVCR9iF
+         cseTOXrLyqcmenyod4owQ4U1LIIn+uen4AYnK8WMy9DEXaAEXEdAuF4xUioAw1m2cBgZ
+         5RWWbfBczsaSmAmgoklE8hdfT1J5Dm9Itcm10Gp5SYgUSUhOA9LmNtdY07YpAcVFyXz1
+         DJIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762870140; x=1763474940;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PaHLk+lw4hWVTyNp1Y0Jwl5O/xRGp4qKtAJp6UDcmMs=;
-        b=tKfgZitVeE3AZXMraUQ2k1quxrpvj4JppgfU7tXyvsAU00KP46a1tLhLOJKx+XGvxA
-         Bpv551SW2HT6VNx/JNWH2bZkV6pTRu0VCifBprCe2BPSyecdMO8CZ8YM89G1c40GnBdr
-         1nxU9ugblHWOgrdWEmKpc1ku+2iSwdyzsY4QrcYLUbNipCTrgeFjFnTNxSCzNJg+SY4Q
-         uJsSoDcy090aXST09S0+sA4oviW473OhFYgxylg3YRWXD3Pvz4YZj2ZjV9iifd6/hP32
-         8jpPTrNQaSZxicuoBVSSSJHcV3bdmUXLJsRev/36sx9J3cAX0YfESlxsRmuhKXVEGhKH
-         cU+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWoyIUQQZ4GTFC9DX/VsMroyT7cX28AdFz8ZDjcrfsAj7WcoyXkpnaOgvR57WUpW0xfH/713ls=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxZRdewTA30mHaMAjbh/amgOGWuLjgowkLaT6XOwk5g8z2CzVDp
-	Ygr8H/ecW47K1vgcyJwogk9e7psLof4+sEAe4y2IyznM9PB6EZoOkqKt5tuCX/jBB4o0u8y/kJ5
-	IaBB4yg0tBt1nsQQ8G/vJpSAvquyhkHWXJDwNqm8WUijeL+hY57rn9wF/G4E=
-X-Google-Smtp-Source: AGHT+IE7DtU6V4dhm/rWWcNSb5/hQIvNn1t/ULtONi24IfVW4Jych9CAA/Xz4bqSTtPjaX1/qcCkWQ658GMba752eB1QKUSMu8X0
+        d=1e100.net; s=20230601; t=1762870159; x=1763474959;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=lKvYpwqQnJ6dGU4fs+Qweyj9XLovb4ksA8r4FMq9T/Q=;
+        b=osa7pUXI2Bl2sSLUiwcmLUF2uCDCV9Lkq0q6VSkWk85jB4RA7RaXV1apnXZL6yMmVZ
+         VlzftJbmOB4dgN8uA9E46lddFTQqzMG/VhsUJIULBzBXOI7JnkSzgqd4rKvLKtjPcAI5
+         3w68iyvk/TPOgiQXTwloeGTyXvoCXZXtwbAu5El3DC0ubh5GNrbooK9DwPcN9PZwftTV
+         TJ/ZRByoY6lORpf+0IZ86XAjRLJ8sVWcLCAjGTxOvjbNyP8gS2oFZWYGIe4ZELa0chdw
+         TrHIirL41m9T8i5sxbMBQmnFhgow0hangmhmz8RDoJT5XePSfoLYFRijfOqeeGnrawjn
+         W2vg==
+X-Forwarded-Encrypted: i=1; AJvYcCUSMZgZ21gCyqeX/N7nZQ56N8Bu8nIbSMHwyV0+XpFxjn6ZyLgbGQ3CF3kG4GMhGcAycKxOmok=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxc4BaXNzE1pQ+8u3jNg5b5n9DJA9CtDUBpLsGBuXPZ6OAsuFK/
+	lJyAtldrT3KaD9wZl1fj1HVvU/pn6fuC6rymJhktedwtJ+1kYAnnoXnlO2f5Y2OQNFqgwGBGilb
+	OaAmFR0jncR62FPRyEuPXDLYJbRe8FdI=
+X-Gm-Gg: ASbGncsi6VlO4HuDCQbyd0LL7rjT+/EBs5EXBRfZLrmGfWTRBdY9GWSQ6KPl+oOH6PD
+	dYOo2vWR9YiqhKR/JUt3MaauWp4VIE3uSzq4d0H3A/DUdHtEnRnoDHT+6XBe9vunYBWx79hTo5d
+	vG7/b2pysQj7Vipm36btwH/qSZfz6qZ8lL+t0voyb/pq3gmlQ2FRAVqHp51oGt1/diD6QI4+8qC
+	J7VzVH76YsePHOKI5yBBnlhGcEACK9eTjzNEwA23nmJZ2XaJkpCKyPX7jW7iEU/tGT6yg==
+X-Google-Smtp-Source: AGHT+IEReJBfVSAk0eoYfnzdrR93k21w91Zsnv9N733OFz6C+DIbne/NcUIcbDC568iFDoZTIzaULrqDzX2W1sQibCc=
+X-Received: by 2002:a0d:e7c5:0:b0:786:3ee8:6703 with SMTP id
+ 00721157ae682-787d54288f9mr99307027b3.48.1762870159175; Tue, 11 Nov 2025
+ 06:09:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1b01:b0:433:5736:96a2 with SMTP id
- e9e14a558f8ab-43367e25667mr203330615ab.12.1762870140567; Tue, 11 Nov 2025
- 06:09:00 -0800 (PST)
-Date: Tue, 11 Nov 2025 06:09:00 -0800
-In-Reply-To: <20251111093204.1432437-1-edumazet@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6913437c.a70a0220.22f260.013b.GAE@google.com>
-Subject: [syzbot ci] Re: net_sched: speedup qdisc dequeue
-From: syzbot ci <syzbot+ci51c71986dfbbfee2@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, eric.dumazet@gmail.com, 
-	horms@kernel.org, jhs@mojatatu.com, jiri@resnulli.us, kuba@kernel.org, 
-	kuniyu@google.com, netdev@vger.kernel.org, pabeni@redhat.com, toke@redhat.com, 
-	willemb@google.com, xiyou.wangcong@gmail.com
-Cc: syzbot@lists.linux.dev, syzkaller-bugs@googlegroups.com
+References: <20251110214443.342103-1-jonas.gorski@gmail.com>
+ <20251110214443.342103-4-jonas.gorski@gmail.com> <20251110222501.bghtbydtokuofwlr@skbuf>
+ <CAOiHx=k8q7Zyr5CEJ_emKYLRV9SOXPjrrXYkUKs6=MbF_Autxw@mail.gmail.com> <20251111115627.orks445s5o2adkbu@skbuf>
+In-Reply-To: <20251111115627.orks445s5o2adkbu@skbuf>
+From: Jonas Gorski <jonas.gorski@gmail.com>
+Date: Tue, 11 Nov 2025 15:09:08 +0100
+X-Gm-Features: AWmQ_bl0mnwrpftQx5GbB_wrINGDGSTdQZRRKJwrjBBVitFGV3hI3aNAoZlnpDc
+Message-ID: <CAOiHx=naX6RbV0qBFZP3QhpKCnZ2KWdq8L23rUh4D7xwmGARbw@mail.gmail.com>
+Subject: Re: [PATCH RFC net-next 3/3] net: dsa: deny 8021q uppers on vlan
+ unaware bridged ports
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Vladimir Oltean <vladimir.oltean@nxp.com>, Andrew Lunn <andrew@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-syzbot ci has tested the following series
+On Tue, Nov 11, 2025 at 12:56=E2=80=AFPM Vladimir Oltean <olteanv@gmail.com=
+> wrote:
+>
+> On Tue, Nov 11, 2025 at 11:06:48AM +0100, Jonas Gorski wrote:
+> > But I noticed while testing that apparently b53 in filtering=3D0 mode
+> > does not forward any tagged traffic (and I think I know why ...).
+> >
+> > Is there a way to ask for a replay of the fdb (static) entries? To fix
+> > this for older switches, we need to disable 802.1q mode, but this also
+> > switches the ARL from IVL to SVL, which changes the hashing, and would
+> > break any existing entries. So we need to flush the ARL before
+> > toggling 802.1q mode, and then reprogram any static entries.
+>
+> I'm not clear on what happens. "Broken" FDB entries in the incorrect
+> bridge vlan_filtering mode sounds like normal behaviour (FDB entries
+> with VID=3D0 while vlan_filtering=3D1, or FDB entries with VID!=3D0 while
+> vlan_filtering=3D0). They should just sit idle in the ARL until the VLAN
+> filtering mode makes them active.
 
-[v2] net_sched: speedup qdisc dequeue
-https://lore.kernel.org/all/20251111093204.1432437-1-edumazet@google.com
-* [PATCH v2 net-next 01/14] net_sched: make room for (struct qdisc_skb_cb)->pkt_segs
-* [PATCH v2 net-next 02/14] net: init shinfo->gso_segs from qdisc_pkt_len_init()
-* [PATCH v2 net-next 03/14] net_sched: initialize qdisc_skb_cb(skb)->pkt_segs in qdisc_pkt_len_init()
-* [PATCH v2 net-next 04/14] net: use qdisc_pkt_len_segs_init() in sch_handle_ingress()
-* [PATCH v2 net-next 05/14] net_sched: use qdisc_skb_cb(skb)->pkt_segs in bstats_update()
-* [PATCH v2 net-next 06/14] net_sched: cake: use qdisc_pkt_segs()
-* [PATCH v2 net-next 07/14] net_sched: add Qdisc_read_mostly and Qdisc_write groups
-* [PATCH v2 net-next 08/14] net_sched: sch_fq: move qdisc_bstats_update() to fq_dequeue_skb()
-* [PATCH v2 net-next 09/14] net_sched: sch_fq: prefetch one skb ahead in dequeue()
-* [PATCH v2 net-next 10/14] net: prefech skb->priority in __dev_xmit_skb()
-* [PATCH v2 net-next 11/14] net: annotate a data-race in __dev_xmit_skb()
-* [PATCH v2 net-next 12/14] net_sched: add tcf_kfree_skb_list() helper
-* [PATCH v2 net-next 13/14] net_sched: add qdisc_dequeue_drop() helper
-* [PATCH v2 net-next 14/14] net_sched: use qdisc_dequeue_drop() in cake, codel, fq_codel
+When in SVL mode (vlan disabled), the ARL switches from mac+vid to
+just mac for hashing ARL entries. And I don't know if mac+vid=3D0 yields
+the same hash as only mac. It would it the switch uses vid=3D0 when not
+vlan aware, but if it skips the vid then it wouldn't.
 
-and found the following issue:
-WARNING in sk_skb_reason_drop
+And we automatically install static entries for the MAC addresses of
+ports (and maybe other non-dsa bridged devices), so we may need to
+have these twice in the ARL table (once for non-filtering, once for
+filtering).
 
-Full report is available here:
-https://ci.syzbot.org/series/a9dbee91-6b1f-4ab9-b55d-43f7f50de064
+If the hash is not the same, this can happen:
 
-***
+vlan_enabled=3D1, ARL hashing uses mac+vid
+add static entry mac=3Dabc,vid=3D0 for port 1 =3D> hash(mac, vid) -> entry =
+123
+vlan_enabled =3D> 0, ARL hashing uses only mac
+packet received on port 2 for mac=3Dabc =3D> hash(mac) =3D> entry 456 =3D> =
+no
+entry found =3D> flood (which may not include port 1).
 
-WARNING in sk_skb_reason_drop
+when trying to delete the static entry =3D> lookup for mac=3Dabc,vid=3D0 =
+=3D>
+hash(mac) =3D> entry 456 =3D> no such entry.
 
-tree:      net-next
-URL:       https://kernel.googlesource.com/pub/scm/linux/kernel/git/netdev/net-next.git
-base:      a0c3aefb08cd81864b17c23c25b388dba90b9dad
-arch:      amd64
-compiler:  Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
-config:    https://ci.syzbot.org/builds/a5059d85-d1f8-4036-a0fd-b677b5945ea9/config
-C repro:   https://ci.syzbot.org/findings/e529fc3a-766e-4d6c-899a-c35a8fdaa940/c_repro
-syz repro: https://ci.syzbot.org/findings/e529fc3a-766e-4d6c-899a-c35a8fdaa940/syz_repro
+Then maybe we ignore the error, but the moment we enable vlan again,
+the hashing changes back to mac+vid, so the "deleted" static entry
+becomes active again (despite the linux fdb not knowing about it
+anymore).
 
-syzkaller0: entered promiscuous mode
-syzkaller0: entered allmulticast mode
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5965 at net/core/skbuff.c:1192 __sk_skb_reason_drop net/core/skbuff.c:1189 [inline]
-WARNING: CPU: 0 PID: 5965 at net/core/skbuff.c:1192 sk_skb_reason_drop+0x76/0x170 net/core/skbuff.c:1214
-Modules linked in:
-CPU: 0 UID: 0 PID: 5965 Comm: syz.0.17 Not tainted syzkaller #0 PREEMPT(full) 
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-RIP: 0010:__sk_skb_reason_drop net/core/skbuff.c:1189 [inline]
-RIP: 0010:sk_skb_reason_drop+0x76/0x170 net/core/skbuff.c:1214
-Code: 20 2e a0 f8 83 fd 01 75 26 41 8d ae 00 00 fd ff bf 01 00 fd ff 89 ee e8 08 2e a0 f8 81 fd 00 00 fd ff 77 32 e8 bb 29 a0 f8 90 <0f> 0b 90 eb 53 bf 01 00 00 00 89 ee e8 e9 2d a0 f8 85 ed 0f 8e b2
-RSP: 0018:ffffc9000284f3b0 EFLAGS: 00010293
-RAX: ffffffff891fdcd5 RBX: ffff888113587680 RCX: ffff88816e6f3a00
-RDX: 0000000000000000 RSI: 000000006e1a2a10 RDI: 00000000fffd0001
-RBP: 000000006e1a2a10 R08: ffff888113587767 R09: 1ffff110226b0eec
-R10: dffffc0000000000 R11: ffffed10226b0eed R12: ffff888113587764
-R13: dffffc0000000000 R14: 000000006e1d2a10 R15: 0000000000000000
-FS:  000055558e11c500(0000) GS:ffff88818eb38000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000200000002280 CR3: 000000011053c000 CR4: 00000000000006f0
-Call Trace:
- <TASK>
- kfree_skb_reason include/linux/skbuff.h:1322 [inline]
- tcf_kfree_skb_list include/net/sch_generic.h:1127 [inline]
- __dev_xmit_skb net/core/dev.c:4258 [inline]
- __dev_queue_xmit+0x2669/0x3180 net/core/dev.c:4783
- packet_snd net/packet/af_packet.c:3076 [inline]
- packet_sendmsg+0x3e33/0x5080 net/packet/af_packet.c:3108
- sock_sendmsg_nosec net/socket.c:727 [inline]
- __sock_sendmsg+0x21c/0x270 net/socket.c:742
- ____sys_sendmsg+0x505/0x830 net/socket.c:2630
- ___sys_sendmsg+0x21f/0x2a0 net/socket.c:2684
- __sys_sendmsg net/socket.c:2716 [inline]
- __do_sys_sendmsg net/socket.c:2721 [inline]
- __se_sys_sendmsg net/socket.c:2719 [inline]
- __x64_sys_sendmsg+0x19b/0x260 net/socket.c:2719
- do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
- do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fc1a7b8efc9
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fff4ba6d968 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fc1a7de5fa0 RCX: 00007fc1a7b8efc9
-RDX: 0000000000000004 RSI: 00002000000000c0 RDI: 0000000000000007
-RBP: 00007fc1a7c11f91 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fc1a7de5fa0 R14: 00007fc1a7de5fa0 R15: 0000000000000003
- </TASK>
+And even if the hash is the same, it would mean we cannot interact
+with any preexisting entries for vid!=3D1 that were added with vlan
+filtering =3D 1. So we cannot delete them when e.g. removing a port from
+the bridge, or deleting the bridge.
 
+So the safest would be to remove all static entries before changing
+vlan filtering, and then re-adding them afterwards.
 
-***
-
-If these findings have caused you to resend the series or submit a
-separate fix, please add the following tag to your commit message:
-  Tested-by: syzbot@syzkaller.appspotmail.com
-
----
-This report is generated by a bot. It may contain errors.
-syzbot ci engineers can be reached at syzkaller@googlegroups.com.
+Best regards,
+Jonas
 
