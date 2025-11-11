@@ -1,136 +1,70 @@
-Return-Path: <netdev+bounces-237388-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237389-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98CDDC49E22
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 01:37:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAC20C49E46
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 01:43:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 58CF74E2492
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 00:37:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B3DC418869EC
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 00:43:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1B4324466D;
-	Tue, 11 Nov 2025 00:37:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9442424BBEB;
+	Tue, 11 Nov 2025 00:43:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=listout.xyz header.i=@listout.xyz header.b="v17SCKU7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="utCl2ZYh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [80.241.56.152])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE2334D38D;
-	Tue, 11 Nov 2025 00:37:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A91B247DE1;
+	Tue, 11 Nov 2025 00:43:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762821471; cv=none; b=NEEr7hAznofbIpZtQY27jWhZPM43iQK9/yTopuVv3Mejvkidvrzgcpgfgec/tzd0N/KhIMGXYF+kxQwbZx8FSvxXcTOAMYLcKcTShTy+YbBUoMl3vVGM9BDV+f4OCpgEy4kijCdkLHRH6upLZ9dmLHv1wc3lRpb4iOZxfHRf75o=
+	t=1762821803; cv=none; b=d/+jpEu1nDc5g//UGE1/MM/sh8xBVxvc/w6eKwSg6uiH+jf4jyhf2lRtnmxkaRxgrVkNV33Y7tyCgmdg4NfqAFPfEf9j8uAgb77kZxwAm0P30EqQIycCjcahTbPWExlG4DBSR9ktWGtXtaj7D3EHMwO18toArggTN363wZdCfgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762821471; c=relaxed/simple;
-	bh=CXUca8YX0lqu5nzun2xmmizNpx8K/emG0bVPAISOubw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ua/yabWCBqnLLJBTfz9Rm/kLMm4v71ovsRJNzqT+91U1557ecSbP6qdQhOCZsPYh3TiLbRCgNm3nASAaq4SiQzts0hVqe2SrrBbF3uNZPaPvj1+P+wlcY/v5X6jQI76gMuKlUtsM11YK7YNzr5AJ8jktBjNh3X1sscnTS72YAIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=listout.xyz; spf=pass smtp.mailfrom=listout.xyz; dkim=pass (2048-bit key) header.d=listout.xyz header.i=@listout.xyz header.b=v17SCKU7; arc=none smtp.client-ip=80.241.56.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=listout.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=listout.xyz
-Received: from smtp2.mailbox.org (smtp2.mailbox.org [10.196.197.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4d570g0Z3vz9t7M;
-	Tue, 11 Nov 2025 01:37:39 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=listout.xyz; s=MBO0001;
-	t=1762821459;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EuZRMwi3IQuVG4xNekc3Mlt/5lCSesgrsdugH2WI734=;
-	b=v17SCKU7lI2YxrvALwwN5vaDSCmgNUkQ8omYw6b2hWo/KGwT1T43RNMQXAAAQ3U+qm7+pv
-	m9xjAria+e9+ctG8aOLpp0/1kpXze/ENKP+cB0IUiTQg51vnbRX4Uyx4c4hMI3VVrZvLjq
-	kpiYRW0Kuzq00YOJQaPCS5nORTfqphVscfysXSJtScnDU986waoeP/bDVxo7llLcULM13b
-	xnJg0kFqbvSL7ocazO5yGkaCMWJIm4d77ZyiYSzvdu5m7IGR3eIzrJkISXIlM5zErgWmaa
-	IPb0NM7Y+GA0aB1bR0R38el4WdPQX5qrKQ5LWgoVHv5A+1agvET3gGw5S6aKZA==
-From: Brahmajit Das <listout@listout.xyz>
-To: syzbot+d1b7fa1092def3628bd7@syzkaller.appspotmail.com
-Cc: andrii@kernel.org,
-	ast@kernel.org,
-	bpf@vger.kernel.org,
-	contact@arnaud-lcm.com,
-	daniel@iogearbox.net,
-	eddyz87@gmail.com,
-	haoluo@google.com,
-	john.fastabend@gmail.com,
-	jolsa@kernel.org,
-	kpsingh@kernel.org,
-	linux-kernel@vger.kernel.org,
-	martin.lau@linux.dev,
-	netdev@vger.kernel.org,
-	sdf@fomichev.me,
-	song@kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	yonghong.song@linux.dev
-Subject: [PATCH bpf-next v2] bpf: Clamp trace length in __bpf_get_stack to fix OOB write
-Date: Tue, 11 Nov 2025 06:07:21 +0530
-Message-ID: <20251111003721.7629-1-listout@listout.xyz>
-In-Reply-To: <691231dc.a70a0220.22f260.0101.GAE@google.com>
-References: <691231dc.a70a0220.22f260.0101.GAE@google.com>
+	s=arc-20240116; t=1762821803; c=relaxed/simple;
+	bh=aQeArqxKyqiMvXQolsDGd3I5R4aXdcaJRVDoflzRUiQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iO8cqsWOvUZxWWoiB2l9bbnVB4wAHiwT9VnM8wXJUYi1gUUcRSwFCqtR5nbk1bAicNtafDmF4VKgn117QAqHjYbAtgb82i2lOEOfzvnzMv+JLXEobXcdsC8psMSYGPezsW8FSCX/oXNsSyHsuM5CtKj4Xvxb2RNfIudHDQVU8Y4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=utCl2ZYh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B717BC16AAE;
+	Tue, 11 Nov 2025 00:43:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762821803;
+	bh=aQeArqxKyqiMvXQolsDGd3I5R4aXdcaJRVDoflzRUiQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=utCl2ZYhJ/7Jr4dl+PurPoGTgIo6nfwBkRevMjf0q2UP6dFcG+MMW6NGEz1VJNpMf
+	 g889g5TOVPnEQFvinZb0cSZYEXxHG5Kn9k4b43l8ziuG/hF2sWqGB/xnd+I+pbH7+4
+	 jBHWq+71RT/S+bwZ0jHO7h7dMUPcH8keu70U+cQ023iUc60o+3pQ28M23xHV2XKk9g
+	 5Xet84Ih8z/ulgy9uqcvTGibCT51SKN3QTI4PS4C+L9Z3zzA06XtRISZ8bERiMrGmz
+	 LDaSG959XK6tgIFk+i0r0vwv8XeS3JM6nzdjJBfantJJGevhW7YtaOCKphLeSa89Pg
+	 dcmkcu0VYJ7Dw==
+Date: Mon, 10 Nov 2025 16:43:21 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [GIT PULL] bluetooth 2025-11-10
+Message-ID: <20251110164321.75f7edec@kernel.org>
+In-Reply-To: <20251110214453.1843138-1-luiz.dentz@gmail.com>
+References: <20251110214453.1843138-1-luiz.dentz@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-syzbot reported a stack-out-of-bounds write in __bpf_get_stack()
-triggered via bpf_get_stack() when capturing a kernel stack trace.
+On Mon, 10 Nov 2025 16:44:53 -0500 Luiz Augusto von Dentz wrote:
+>       Bluetooth: hci_event: Fix not handling PA Sync Lost event
 
-After the recent refactor that introduced stack_map_calculate_max_depth(),
-the code in stack_map_get_build_id_offset() (and related helpers) stopped
-clamping the number of trace entries (`trace_nr`) to the number of elements
-that fit into the stack map value (`num_elem`).
+nit: sparse says:
 
-As a result, if the captured stack contained more frames than the map value
-can hold, the subsequent memcpy() would write past the end of the buffer,
-triggering a KASAN report like:
+net/bluetooth/hci_event.c:5850:22: warning: cast to restricted __le16
 
-    BUG: KASAN: stack-out-of-bounds in __bpf_get_stack+0x...
-    Write of size N at addr ... by task syz-executor...
-
-Restore the missing clamp by limiting `trace_nr` to `num_elem` before
-computing the copy length. This mirrors the pre-refactor logic and ensures
-we never copy more bytes than the destination buffer can hold.
-
-No functional change intended beyond reintroducing the missing bound check.
-
-Reported-by: syzbot+d1b7fa1092def3628bd7@syzkaller.appspotmail.com
-Fixes: e17d62fedd10 ("bpf: Refactor stack map trace depth calculation into helper function")
-Signed-off-by: Brahmajit Das <listout@listout.xyz>
----
-Changes in v2:
-- Use max_depth instead of num_elem logic, this logic is similar to what
-we are already using __bpf_get_stackid
-
-Changes in v1:
-- RFC patch that restores the number of trace entries by setting
-trace_nr to trace_nr or num_elem based on whichever is the smallest.
-Link: https://lore.kernel.org/all/20251110211640.963-1-listout@listout.xyz/
----
- kernel/bpf/stackmap.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/kernel/bpf/stackmap.c b/kernel/bpf/stackmap.c
-index 2365541c81dd..f9081de43689 100644
---- a/kernel/bpf/stackmap.c
-+++ b/kernel/bpf/stackmap.c
-@@ -480,6 +480,7 @@ static long __bpf_get_stack(struct pt_regs *regs, struct task_struct *task,
- 	}
- 
- 	trace_nr = trace->nr - skip;
-+	trace_nr = min_t(u32, trace_nr, max_depth - skip);
- 	copy_len = trace_nr * elem_size;
- 
- 	ips = trace->ip + skip;
--- 
-2.51.2
-
+(I haven't looked if the cast is correct but if so it needs a __force)
 
