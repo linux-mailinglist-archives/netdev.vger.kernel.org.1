@@ -1,129 +1,178 @@
-Return-Path: <netdev+bounces-237595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27468C4D98E
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 13:09:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A392C4D49E
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 12:06:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 586F43B3108
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 12:06:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D4E6189F9F4
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 11:00:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87287357A4F;
-	Tue, 11 Nov 2025 12:06:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE240357703;
+	Tue, 11 Nov 2025 10:54:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Opy0Fl+m"
+	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="VZE9KAt0";
+	dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b="Q+UnbB4E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C197F2E8E06
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 12:06:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36B0E3570BF
+	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 10:54:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762862773; cv=none; b=r438F/5kJqKwC8iA7ZqEwemtbkv/hexwAg2h0mdkvkhBQvOIF8IPF8TrBbiS5vMbDeK05IKkiBr+CKiBIA/Gtm7QzozxawZhZ1f8xXcYCvZzh7SSXC2/9okxqFz6j61oq/H6svZhKnireHVgWQHCDckCm6xeY9SHikTvx4VLa2k=
+	t=1762858483; cv=none; b=kAezOToh93NtEzcXwa4lBpyOECsw+4Pb2Fkbdu38rEqCtDtUm8tYjS0CPtn6kgwLc8a7kH5aPULAH/XgMbV6ONww5Tb75hrFMfIf5m21UiJxkspPwgpUrpDx7yV1hh8bSL7Mm7kkTJayCutmFr9hFszpMr04KTSzdN5QujEOlB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762862773; c=relaxed/simple;
-	bh=PJfKGTHGMO4B/tz3afQroGNMYkZc/dI4F7dfZZ5badE=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=EBGIA0gzHJaJoY1cYTQeYfALdbrMayCuUpsaZGvUZWWLL1JJQMM2JF/bOqql4efhZgERyeysdbQ88cMfdbB1ylRj1ybJaZ3rg3MBOocd8vxz1LGI/nQlcZ1/wzynQX2Amm81EKzoBWOqjkbbahjMtAaEbVBChp1ijWZ1rnI6/+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Opy0Fl+m; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-477770019e4so33292795e9.3
-        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 04:06:11 -0800 (PST)
+	s=arc-20240116; t=1762858483; c=relaxed/simple;
+	bh=uX2FRXbwwZCCv1tYbHwS7dtnDr3CH51sdbhNp9wWUD8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Rc4CgINp++1UThzQhgBol6CAM6BZF46VXtsDzmVwwh8MkajhDCC/7yJWRkJdDl9S+5lDsHkJdbgPWT0Bo7Ta3UhCxSuKDPWuhlFSoTLOO+4NcwHL0+DZoCmmErd28kikLg5qUbbWFFk4nPijLofLWBu/PuyGolFrK2kcJEhbdZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=VZE9KAt0; dkim=pass (2048-bit key) header.d=oss.qualcomm.com header.i=@oss.qualcomm.com header.b=Q+UnbB4E; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.11/8.18.1.11) with ESMTP id 5AB7k85k1583025
+	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 10:54:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=bjzJGvDc5zRS1OfTZQSifCpq
+	YpVSEVlEOhF0L9KjMqA=; b=VZE9KAt0/uqTpHpUQlsHtUrGzV2Xaiq2acFdXg9B
+	0Oldk1XNUX+M1FOafQpV5D6QJ3w7vkE3cuvA4gyK0ZaWgcnfsbRbLDqWuydJgUSD
+	TUwTc7wXaXDRna/cAp+lomRL8nBE5FmtQokVflqaVpOufdXbfX3PAdSl1BP+qeQ4
+	gInKNEuGfpxRdqveezwIyNsQoWkxys2ksQh2mu0KL8Gc2yIArPBAgMObTxnc8o6H
+	CUq29WUP4BccXcwNsc72oo7yfgMws46TrdCv0uPKImHQyhKAEr1EV5Kw8B2uT7Ct
+	Kr4hhxoosmF8uKkkZZhjGFGSDyBAEwM7XSB48SLrxiDYDQ==
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com [209.85.160.197])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 4ac11x0j3v-1
+	(version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NOT)
+	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 10:54:40 +0000 (GMT)
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-4ed6855557aso16431151cf.1
+        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 02:54:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762862770; x=1763467570; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=tT7bnLXzfMu67NErihZLpcxDP2Pl9Q0RxSNbOgMwrHo=;
-        b=Opy0Fl+mrik04dHT9e7Nwiak8J+cGjwZpdMNFO4/q039V+gbZ5XpffQ4EC3WY+hw4l
-         hBBUzkmjbJXpX23Z3lv5s0z5O1HIVZ/QiRfOaAJOfncJYEu3FThcWCGfzU27SXT1WQ0t
-         H7xbSJ4hVuvq68dfAuNQY4CZk7KsXNP3wCN63R5MLJopqwJ7xRTOh7bdMppEX41DYcfK
-         O/IbFb3sfyCmrvRU1CZXauErlVfjETMam4lMTpbNPtwszLktJN5j65OpF0U5bd5H1BBM
-         YFjDhLZ/vZ+uT4My48/deM+mPSLqjdIJ/O3CTrJEYZdbxSwjELpUU12px1pk7bIBv4pG
-         5s1Q==
+        d=oss.qualcomm.com; s=google; t=1762858479; x=1763463279; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bjzJGvDc5zRS1OfTZQSifCpqYpVSEVlEOhF0L9KjMqA=;
+        b=Q+UnbB4Ewj2XeOZajBcSkjqCzmU4qlhJZkbBDIcJ4bUqtniuBEJ9lOJMnNLIw92FAr
+         VtueYJeLxyh+pc8bDLDyaDK+o0dmbDLHAuf5P1ZoPGbJ5jyKGDOK3SD1pBjdwx9WqFk6
+         MTFM0K4nuJypr3CwvJkDQYUTCbIEV2OUMu2hP/gqL7Rq6Zhhk9UObdgYVq+HXe3+siNQ
+         1cvV0xulJiMPNQ4kX3PfssHujeO0lG+i3DnljgLjF9kqrCEHcLYPSYS3jZnJ67qwip60
+         DKz7kMsBU8b2o3/bYcI9RIwR0PLxuTaqJS/8wbbwnjFt0XTabzOhuG21j9I4ph0ew0LZ
+         qQWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762862770; x=1763467570;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=tT7bnLXzfMu67NErihZLpcxDP2Pl9Q0RxSNbOgMwrHo=;
-        b=VzQFCIAYJqegkayhRC8UHZ1nTXz0W5DO+jF2bYOr0WQBJDLHefQliKVvSQtogAzaHI
-         k+22mxqg2HUDg4gxWoYq+A4paza+KRcXSyLicp0QB9MDwnzpKCc2bAvTxZ+xpDpuhpTf
-         XtcfxJJXdcW9PD6QXBMcSeksE2AMTXPRWC0a1GdBBOXPZMat89xQPo3csQwTeHF9Gcgh
-         EZ1OasX2/F6S57sLIDBpupOWscdr3rxYHkvMwiiRPfZQjMzlvR7uVggMU8VhaoinpE6A
-         EnjXg1khHfZM4qky7MSGM4h3BQQGr3zXuXSryjIZACWdt/ux36cW2hvyNXG6JK5wZv4K
-         rA/A==
-X-Gm-Message-State: AOJu0YyRTKlb3PPwQsd9fflRcqGBNCjaf98HPd6apaKamojXHkaYFi4c
-	6aEPdN4W6foLLh/xAHB0UbeqYoCi1ed1eCQ4MPzjhx4JICKRqhmBbm5H
-X-Gm-Gg: ASbGncu33sxkDrOtyZbEbTpycedP8s6LKiT3YR2coWMvS+PqgV35actERaSvJb81YWy
-	NDDZlv6udG3fbUO79T/3YaqZkWUMZS/RiOpQM/93yVUMVpEGEy3SjjSc/b4JvKF3qsDAlB3tJmn
-	PD/OW9EuuvQPCcxPZ3M0hgjF2H2izoTekk4hL9DDZjnbyqS+UD8Bbb8E9e6KzZUVlcC1FiE2SPE
-	2sbrqSiVi79RtAADw2yPQsHqJ3wxOOxal69Q+k7NywSjxPZwg/Wipr55KFskAU80AE0oEGWc727
-	eekgvMiHHJ4AxjuOneFlsg/QVQS44TNl4zmhV5BJpIJgbQxoV8Q1iGUddGcV0cwLFrRHbVD4Cty
-	b1PUTXms6hZs53+4utj8HJ3LOZt8f1WQ4vd+75w/44RVsSw8KAM6nzdUpFEaoFzLERpNkdH/m0i
-	CUxoaggKBDZZew6RCdBsLnzXM=
-X-Google-Smtp-Source: AGHT+IGT4s2UC3Gd4AKGQvCZDeCXUtMZ0syHOqqJnB+gmPCJPQiplZnyHvbxPq4w+G1wtB3LxYmmgA==
-X-Received: by 2002:a05:600c:1c1c:b0:475:dac3:699f with SMTP id 5b1f17b1804b1-4777322f0c4mr108561915e9.9.1762862769852;
-        Tue, 11 Nov 2025 04:06:09 -0800 (PST)
-Received: from imac ([2a02:8010:60a0:0:f46d:4de5:f20a:a3c4])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4775ce211d8sm386246165e9.11.2025.11.11.04.06.08
+        d=1e100.net; s=20230601; t=1762858479; x=1763463279;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bjzJGvDc5zRS1OfTZQSifCpqYpVSEVlEOhF0L9KjMqA=;
+        b=JsAV8Ad4p+WYOT5eZoKH8HFMdq/VYHPbW2prBSYKJ53S8kresY1nQq2GlMLLN/yfwy
+         s1XEESVfzOyb/W/pPtVESaJ5BvSCllxDiRKuDIxuTZ0RnkxaEZJwgY0rsN8NypYH1+VS
+         aHRKaLabm3iqadODDXwi97Sr/f7SDpEW9DvEfXv0ENDqIGiM/uEWYqMRDhtJ+42jZD//
+         0cpxFMg/Io2JlaejRr0+0m3vBl+lzEGonQMByrvFGPG8j1zGINtqoBdiLHh+iginXyaf
+         trNrFuEyZ7bQqJVKxaupYkrBVaMuZqfDmSmytvhiEdcf1xI7PwYEi45rfJN8BmadoRpA
+         deow==
+X-Forwarded-Encrypted: i=1; AJvYcCUkixdoo53yxUdO0plAEkq7N3W+OKXMOP3kCYtt/i0x6jsIu7U2AqSNgQxWujfdpEZO6fPIfwU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzgopRbIXFm+OUEBtexjR2HPDqWy5FSnb5tGYuM3INJ+V5PzBR6
+	+3l1bmmV96yViPczs53owyloczlhqChf/fsATEDD1dWp4CSojjBi7ld8rrQQfqoQg/Iyvpj1Cf5
+	MTmBUutDiFpYsvC+MJo3RB8TfYuB2oVIPeJunvDlXxQ3PLgnUXZoMwvJQyrs=
+X-Gm-Gg: ASbGncsKo4GZVRaF+bYn8R9xnjn2Kp3mZ2txQrprylswHNuxKD945inbkVwZslg9AUv
+	DE7+i+nKLSdewY4TCYfPi2qzxoQ2MULKSHi9pLXJUmruspD7driiB0rzNwJBdgM49rm6lRDNEge
+	8fDxkOzOkNkJWVV84Gskrm/WNmqWr1LrvOHWmRHpl4IT76DPg1owKhs3c96rHG+zXWDOT5Z976k
+	d9pqEnzJaWlZGwNR8FEn5w93/aekAiSLPRmgRMpj1zhMQn4Ftv0RRaL38knSnQ4CVuwthYU5MsY
+	qYVl3PU3kBxg3USrJ2AeEMzzE+jdj6QEAxMngJDwAhsRpfIDlYtB7hXq88DMC/0hVvpGpN7PAWP
+	E2yCAQMnii5pVT1CRy02xGZ9zeQO3buyUsvmjOcee0y2KCBMDy65M+Rwq9d7Wm0l/h8y2V2sjlh
+	9/8feXzqSRmLa8
+X-Received: by 2002:a05:622a:188e:b0:4e6:ded9:6b29 with SMTP id d75a77b69052e-4edcaaa3ea4mr32888441cf.3.1762858479352;
+        Tue, 11 Nov 2025 02:54:39 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGlDf0js8yY75bKRYmabDEAq0elXP2pI/iZd6RI90nqeKsx02RoVZL9jJHhTzE+f6l/HKMiwg==
+X-Received: by 2002:a05:622a:188e:b0:4e6:ded9:6b29 with SMTP id d75a77b69052e-4edcaaa3ea4mr32888181cf.3.1762858478897;
+        Tue, 11 Nov 2025 02:54:38 -0800 (PST)
+Received: from umbar.lan (2001-14ba-a0c3-3a00-264b-feff-fe8b-be8a.rev.dnainternet.fi. [2001:14ba:a0c3:3a00:264b:feff:fe8b:be8a])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-5944a0b74b6sm4784539e87.64.2025.11.11.02.54.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Nov 2025 04:06:09 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org,  Jakub Kicinski <kuba@kernel.org>,  "David S.
- Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Paolo
- Abeni <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,  Jan Stancek
- <jstancek@redhat.com>,  "Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
-  =?utf-8?Q?Asbj=C3=B8rn?= Sloth =?utf-8?Q?T=C3=B8nnesen?=
- <ast@fiberby.net>,  Stanislav Fomichev
- <sdf@fomichev.me>,  Ido Schimmel <idosch@nvidia.com>,  Guillaume Nault
- <gnault@redhat.com>,  Sabrina Dubroca <sd@queasysnail.net>,  Petr Machata
- <petrm@nvidia.com>
-Subject: Re: [PATCHv3 net-next 2/3] netlink: specs: support ipv4-or-v6 for
- dual-stack fields
-In-Reply-To: <20251110100000.3837-3-liuhangbin@gmail.com>
-Date: Tue, 11 Nov 2025 10:38:57 +0000
-Message-ID: <m2bjl8q2f2.fsf@gmail.com>
-References: <20251110100000.3837-1-liuhangbin@gmail.com>
-	<20251110100000.3837-3-liuhangbin@gmail.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        Tue, 11 Nov 2025 02:54:38 -0800 (PST)
+Date: Tue, 11 Nov 2025 12:54:36 +0200
+From: Dmitry Baryshkov <dmitry.baryshkov@oss.qualcomm.com>
+To: Vivek Pernamitta <vivek.pernamitta@oss.qualcomm.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Manivannan Sadhasivam <mani@kernel.org>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mhi@lists.linux.dev,
+        linux-arm-msm@vger.kernel.org
+Subject: Re: [PATCH v5 2/3] net: mhi: Add MHI IP_SW1, ETH0 and ETH1 interface
+Message-ID: <ljrvtl447meb34zfgzef3dw4oqfp6j3ixxwoooewxxvqsi23tz@fbg4zkpctddn>
+References: <20251106-vdev_next-20251106_eth-v5-0-bbc0f7ff3a68@quicinc.com>
+ <20251106-vdev_next-20251106_eth-v5-2-bbc0f7ff3a68@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251106-vdev_next-20251106_eth-v5-2-bbc0f7ff3a68@quicinc.com>
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTExMDA4NSBTYWx0ZWRfXxG6qib3ruNgw
+ jIWtmQ88d6m6I9PF5os+BKz4srMLEHPgfJW16Ro4d8N1Hdzrdjf6KGBgG3svW4Wb0dnj1yeHTYs
+ NyuEdLRo2qSSc+/naAjxWaJtDlinlMt6tNiNELnjKSKx5p7gKqBMxwLUzyLR4yWkBpQEP5/3joT
+ jfiwThUhgYXKXaQnGcMas5Z/ZPvYumfu/zPcn8CNqeSEU0sA42aI0T0OUwi1cV1g2leT761HCRr
+ DCheXLQP5i4yqR3fv9/N+gjZ6a8VyrbQCjepjt5rUFdlU7qEYqW9EjP/0IBM4dGnAlFZPWVx4b1
+ L311GrUj5IzaS9VWERU/xvExwpEd4vPsyfqM188cVbA0lcTNjaByO2d1BXglkAJxwXn5UZmMwhx
+ PtOelJOhWaxVCvT8w/F6EXqoE2pt5g==
+X-Proofpoint-ORIG-GUID: tkIWbVgU4exdz5W3zOv0Hlhy6kj3UDxl
+X-Authority-Analysis: v=2.4 cv=L94QguT8 c=1 sm=1 tr=0 ts=691315f0 cx=c_pps
+ a=EVbN6Ke/fEF3bsl7X48z0g==:117 a=xqWC_Br6kY4A:10 a=kj9zAlcOel0A:10
+ a=6UeiqGixMTsA:10 a=s4-Qcg_JpJYA:10 a=VkNPw1HP01LnGYTKEx00:22
+ a=EUspDBNiAAAA:8 a=bC9JWDkrhmRD4PJ24AEA:9 a=CjuIK1q_8ugA:10
+ a=a_PwQJl-kcHnX1M80qC6:22
+X-Proofpoint-GUID: tkIWbVgU4exdz5W3zOv0Hlhy6kj3UDxl
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-11_02,2025-11-11_02,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0 bulkscore=0 adultscore=0 phishscore=0 suspectscore=0
+ clxscore=1011 priorityscore=1501 malwarescore=0 spamscore=0 impostorscore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.22.0-2510240001 definitions=main-2511110085
 
-Hangbin Liu <liuhangbin@gmail.com> writes:
+On Thu, Nov 06, 2025 at 06:58:09PM +0530, Vivek Pernamitta wrote:
+> From: Vivek Pernamitta <vivek.pernamitta@oss.qualcomm.com>
+> 
+> Add IP_SW1, ETH0 and ETH1 network interfaces are required
+> for M-plane, Nefconf and S-plane component.
 
-> Since commit 1b255e1beabf ("tools: ynl: add ipv4-or-v6 display hint"), we
-> can display either IPv4 or IPv6 addresses for a single field based on the
-> address family. However, most dual-stack fields still use the ipv4 display
-> hint. This update changes them to use the new ipv4-or-v6 display hint and
-> converts IPv4-only fields to use the u32 type.
->
-> Field changes:
->   - v4-or-v6
->     - IFA_ADDRESS, IFA_LOCAL
->     - IFLA_GRE_LOCAL, IFLA_GRE_REMOTE
->     - IFLA_VTI_LOCAL, IFLA_VTI_REMOTE
->     - IFLA_IPTUN_LOCAL, IFLA_IPTUN_REMOTE
->     - NDA_DST
->     - RTA_DST, RTA_SRC, RTA_GATEWAY, RTA_PREFSRC
->     - FRA_SRC, FRA_DST
->   - ipv4
->     - IFA_BROADCAST
->     - IFLA_GENEVE_REMOTE
->     - IFLA_IPTUN_6RD_RELAY_PREFIX
->
-> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+This is a very useful, totally uncryptic message.
 
-Thanks for all the fixes!
+> 
+> Signed-off-by: Vivek Pernamitta <vivek.pernamitta@oss.qualcomm.com>
+> ---
+>  drivers/net/mhi_net.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/net/mhi_net.c b/drivers/net/mhi_net.c
+> index aeb2d67aeb238e520dbd2a83b35602a7e5144fa2..7fca7b1ec7b8250fca5b99ba6d1be470fed87995 100644
+> --- a/drivers/net/mhi_net.c
+> +++ b/drivers/net/mhi_net.c
+> @@ -449,6 +449,9 @@ static const struct mhi_device_id mhi_net_id_table[] = {
+>  	{ .chan = "IP_HW0", .driver_data = (kernel_ulong_t)&mhi_hwip0 },
+>  	/* Software data PATH (to modem CPU) */
+>  	{ .chan = "IP_SW0", .driver_data = (kernel_ulong_t)&mhi_swip0 },
+> +	{ .chan = "IP_SW1", .driver_data = (kernel_ulong_t)&mhi_swip0 },
+> +	{ .chan = "IP_ETH0", .driver_data = (kernel_ulong_t)&mhi_eth0 },
+> +	{ .chan = "IP_ETH1", .driver_data = (kernel_ulong_t)&mhi_eth0 },
+>  	{}
+>  };
+>  MODULE_DEVICE_TABLE(mhi, mhi_net_id_table);
+> 
+> -- 
+> 2.34.1
+> 
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+-- 
+With best wishes
+Dmitry
 
