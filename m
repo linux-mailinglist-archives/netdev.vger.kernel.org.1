@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-237451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69F97C4B6AC
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 05:09:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BA8FC4B6E4
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 05:13:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C81764F3478
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 04:07:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0793F3BA0CB
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 04:08:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1612314D3B;
-	Tue, 11 Nov 2025 04:05:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5094131A55B;
+	Tue, 11 Nov 2025 04:06:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zh3SjUq1"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="kIJQogxE"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BC5126ED36;
-	Tue, 11 Nov 2025 04:05:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A2D26ED36;
+	Tue, 11 Nov 2025 04:06:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762833941; cv=none; b=SCatlsDFNzKPqTiyX/UYm2ylsVDQUPyeE+hIwlVGyuay+27jrlDkV4UahGpM0aTfK14JosFgG65Gb84mAIMqMlMJ5NQhz9qmfSA7C99EjU9xNMFaRyCaeSD9eIN94tPDqcLc9JVT1mTlgXP38IY4h8k3BUnHPf1g9iOzNRSnjcw=
+	t=1762833994; cv=none; b=oDxSy0jlVSFoiG0idVdSaOah0Ufcl7+EvnZOMpmJNl7Gy+kO+zksTwG6sObNYPqhT0CM/oHzIU9wm5/gbI4xfsNUI4Vg4Y3tTt8rK0ZhcDaYMoolmhdqWLgHUswKNUSc+PRCKvYnfSdLleDLP6u6bblxkVwHiEr/v2WiexbiIU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762833941; c=relaxed/simple;
-	bh=ZLdGp5BcV9TxJfrMwhm0UFY8Mo7Iqc3UJOw84uI20Mc=;
+	s=arc-20240116; t=1762833994; c=relaxed/simple;
+	bh=X4m/8txw4qvLTjcfIDw7zPWD3dyH1I8XrpGEO7vVXrg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QKoINKnJItfUQTKSKzhRPVluu926Eag36H+lP8QEfPVsxDNw4l2lJfhc5DZ2XaQSErRmoYHPhKM9aVF6jdA86Q77Jb4k33zt09/ew54mz8NlAiYJzLobMPMklw2G/7VIR8c2EmWseOtcU77DXsmgi7GMhqkjpJDcEQZSXBbcNds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zh3SjUq1; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=sI8SNnE3N30h8/Bkym+p1OxupjsnCkRbdaKt0u2+3WQu+AlBovkCLQmKZqQmBJU0RPEZghs/ugRib222J0pkUepJsf/+20s7uLSfQPLsr/NrZOg46Pj/SJ+C7TgqxVjgNT4SLcIfA0euOAc5eSN0KTvNFdM1OpSF0IH/OKUqhlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=kIJQogxE; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=qbK2bCNaM2/+FmjtVO79+LIO+q1WyuCbe2JrCCHlvho=; b=zh3SjUq1cqg3OOq+e+V6JpH13Z
-	1IDElN2EFxQO4Yh3rP9qUUmcK0zUh9NlZYjAy3PiTCy0lVoQlo0D+y1OrqsS7c5T3bknja4dbBghy
-	DhPdVRJ4FkTDvR0g4Txk3M3hB1EjgrKnmzIk71SGuj42jSmxQucNWhrXrHj0PmtQQRMs=;
+	bh=e43Mw9XYBP4YftlCJIlT61yxyiHaExE3+CHDtUjIQM8=; b=kIJQogxEZjSBtul0GXnj5VJp2R
+	KcuSDFid5ZtBvAEp0yHVtNu9hSRlS1pezFsDKLk/p5HMWL9XO4UrBs66hQj18vihrIB56VhvFbG1F
+	r16REZfkTPWWyv/qBXcEo6Ly2tC/s+TzsG7NpCWTUygkMq9chs6l09+eUsSiqMM5pm34=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vIfdJ-00Dabl-Nj; Tue, 11 Nov 2025 05:05:29 +0100
-Date: Tue, 11 Nov 2025 05:05:29 +0100
+	id 1vIfeA-00DacX-G0; Tue, 11 Nov 2025 05:06:22 +0100
+Date: Tue, 11 Nov 2025 05:06:22 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Maxime Chevallier <maxime.chevallier@bootlin.com>
 Cc: davem@davemloft.net, netdev@vger.kernel.org,
@@ -68,11 +68,11 @@ Cc: davem@davemloft.net, netdev@vger.kernel.org,
 	Romain Gantois <romain.gantois@bootlin.com>,
 	Daniel Golle <daniel@makrotopia.org>,
 	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-Subject: Re: [PATCH net-next v15 11/15] net: phy: at803x: Support SFP through
- phy_port interface
-Message-ID: <9cf8558d-a1d4-475f-b552-eedfe3cba363@lunn.ch>
+Subject: Re: [PATCH net-next v15 12/15] net: phy: qca807x: Support SFP
+ through phy_port interface
+Message-ID: <e2455f29-8709-4628-bd54-566b87143646@lunn.ch>
 References: <20251106094742.2104099-1-maxime.chevallier@bootlin.com>
- <20251106094742.2104099-12-maxime.chevallier@bootlin.com>
+ <20251106094742.2104099-13-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,16 +81,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20251106094742.2104099-12-maxime.chevallier@bootlin.com>
+In-Reply-To: <20251106094742.2104099-13-maxime.chevallier@bootlin.com>
 
-On Thu, Nov 06, 2025 at 10:47:36AM +0100, Maxime Chevallier wrote:
-> Convert the at803x driver to use the generic phylib SFP handling, via a
-> dedicated .attach_port() callback, populating the supported interfaces.
+On Thu, Nov 06, 2025 at 10:47:37AM +0100, Maxime Chevallier wrote:
+> QCA8072/8075 may be used as combo-port PHYs, with Serdes (100/1000BaseX)
+>  and Copper interfaces. The PHY has the ability to read the configuration
+> it's in.  If the configuration indicates the PHY is in combo mode, allow
+> registering up to 2 ports.
 > 
-> As these devices are limited to 1000BaseX, a workaround is used to also
-> support, in a very limited way, copper modules. This is done by
-> supporting SGMII but limiting it to 1G full duplex (in which case it's
-> somewhat compatible with 1000BaseX).
+> Register a dedicated set of port ops to handle the serdes port, and rely
+> on generic phylib SFP support for the SFP handling.
 > 
 > Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
 > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
