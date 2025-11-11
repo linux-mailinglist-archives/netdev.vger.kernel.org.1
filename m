@@ -1,91 +1,91 @@
-Return-Path: <netdev+bounces-237733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F5ACC4FC4C
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 22:00:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0932CC4FC52
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 22:01:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id E8E5234D7DB
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 21:00:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B726D3AC229
+	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 21:01:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93C493A9C0B;
-	Tue, 11 Nov 2025 20:59:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BA8B35E54D;
+	Tue, 11 Nov 2025 20:59:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="TMYpUiCO"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="MoTx3tVc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f225.google.com (mail-pg1-f225.google.com [209.85.215.225])
+Received: from mail-il1-f225.google.com (mail-il1-f225.google.com [209.85.166.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8983232693B
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 20:59:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C8C435E52F
+	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 20:59:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762894765; cv=none; b=MM1uMfQu/Fu6T8F2AZjcDa1KYCQOZx4I7ux3F8P4+SfFBEuN92X7ig2iYgvCwZoiq+9+N4Ex+9mePgPjvsQ9I2gJi3GPXcgF7pa8LRwh8VdHVPBl2mD/0XbKOhreEtL4o6bpKbb0EDOVZ5PtF23zEmSYhZDcsOsqBKE8XLCI39E=
+	t=1762894770; cv=none; b=r56QLoP1ayRPLmL2mVYLCiHwBuRs2gfFFQE29GnWHqVkgcPMSb/TVWbTz0Fkf9Ql7H4KqS8O9xdSNPxa+SN30BiT/6wxZ3mjjrYJgu8zpFFERvI3NYg62IFZv9ovHLE4T0k03zb1mF3x+oZotu6tfpHeTkGAZtw1mQ+ESuf6AIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762894765; c=relaxed/simple;
-	bh=Iwjczw9beXjRj9E6SX4nWlISxcIUOvAE/o02X60/VCk=;
+	s=arc-20240116; t=1762894770; c=relaxed/simple;
+	bh=genLZqocSwQxlZnEboq+3NUJb1mdBKEdszUDHkHDsSc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AQSv6QMfY7k+Li2qf2tHHiT/CqctYV+cdFzHhz1cj3OFF6FIscf2SAXMO9UQ+xLHwRdYFm3CBhh5f7nsoKFHklSbxcbATptxOBBGj8kObAZHLITxznsPuZBxxkNLgQTcD2pP881T3ybg2KEsrjgMLVIG9Fr3fFSpGrm9QaMWWbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=TMYpUiCO; arc=none smtp.client-ip=209.85.215.225
+	 MIME-Version; b=Us3AtOoR4RpgOZNRsPFp3LBX7AOLQR0KHF+Krrz3A3+++oegINlruO9Z38tkMIlEc9/WIxm0QMwYmN+pK32gLaYugcTB0tcHLYtbau9kUgpSTRskpHAaS5Bw0njp8d3M5R79M5vt3ApGkmvoGnSdq5+Z2oijAM/gr7gBBlfrRJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=MoTx3tVc; arc=none smtp.client-ip=209.85.166.225
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pg1-f225.google.com with SMTP id 41be03b00d2f7-ba599137cf7so128620a12.0
-        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 12:59:23 -0800 (PST)
+Received: by mail-il1-f225.google.com with SMTP id e9e14a558f8ab-4330dfb6ea3so522915ab.0
+        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 12:59:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762894763; x=1763499563;
+        d=1e100.net; s=20230601; t=1762894766; x=1763499566;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:dkim-signature:x-gm-gg
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HkHGo9+pcK8tzXXGxYpPqBwlsVjdn8XLBmrKR6FmCF4=;
-        b=H1msGd9otZgtcrZe9iPafGz04zsorKk72wO17whYPA7yf0t6OTWQjT6iH0DBw6CTmG
-         +Ehfu8dlWXsDX3QLP8yDGJ4xKAXGNOF8z4jTOxssm7ZYM++lykug0HwQ4wSOrAfgUIKJ
-         HvtrLK7/wKg8URMERRAIRhkyDyzliYL2uLlcX5YfGV8LW1T4OJ3GqqFWBo8Gi2yt2xKo
-         8unWpAEScn6QCxHtmHT6phovULSmWGusWXV3fSMt8Q/ak/z027CHs6vbArGvJ9N6pzIh
-         GMxXq+oTuU1wdIMjKG3raxEcIGYwiZBoUijJw01UmSfRTKS577w7U6W1mWzzAzbDI0Xn
-         KVaw==
-X-Gm-Message-State: AOJu0YxbO7nM8rOKQ194Ha4IQlIWARhE4hllSt14eLR+8N86ndJ35+WA
-	/T2Png1m3XMT4yqm22E/h43EkO6ya8lEMG1AIPmYHlOmSO/z19bLMO41JBCY7pvWqeg69LmEarU
-	dfBpVLTbWRf/FT8etDBeUDkq8qoJ0xtLn7KdiIQZcQT5qQKv9Q60g8G2mq/rhUuWctfYySMGreM
-	JiK37SIO9ULOZ9geNXQDKpxsIQdMVlRHHk3OKNGdu4f7g3k4r7pNAbnMQbyTp888AKLLAnN14DO
-	iEL5lnPSkSvHKjumocY
-X-Gm-Gg: ASbGnctN5l6DUdaHIPXgi2x6X5PFN+hHYCV2wjPAiLbwsGSt7OqCn6BOuqSNmVTJ0u9
-	SbqM4qrdSCgvedD8vNSnPzrMtsQyHUXOBihTbLrxqeMsEzxMkCFJ2BVVswlHhVUuCxH09F6pChP
-	j4bD02e2a90aqktT2Vt9gP/YA9e/UbtJGBp96ilTBzjBMj95+AwagZCkeFMa5x5QVfOtyzdjlwo
-	2dXGA8itTWFK76CsawSW2XqdMjnLyN7mmoG0P79CQnC/fB0l6O5Rkhd1/LfmnvTQ1YcgQGYJvRa
-	2N11YGvcp3FwiTETktMzl7a777+OQRg+zn5ymrJ6y4aQafK4r5BhaoZ59rF+kniL2TMf+afDmGa
-	7ruJPH35Jx1uS80oQm0//tEsQ+DW7qwQq7ZuohCog5cFXEYh2kZ6N1SQ7xsS1hmO/sFR64t232R
-	yBFJn7lZbyCHgHuwLNcV+ta2y1E1d5inn5w5rB3oePhCw=
-X-Google-Smtp-Source: AGHT+IGkfndMCg9P1Oaroe2UjAI4w4BMyA58myOxzYPAa6AudpXLwpVFb7Q+Q4NVxTnxiSu1Aohtu8/ngVX7
-X-Received: by 2002:a17:903:37cd:b0:295:8c51:64ff with SMTP id d9443c01a7336-2984ede9865mr8888055ad.29.1762894762597;
-        Tue, 11 Nov 2025 12:59:22 -0800 (PST)
-Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-101.dlp.protect.broadcom.com. [144.49.247.101])
-        by smtp-relay.gmail.com with ESMTPS id d9443c01a7336-2984dd34860sm701785ad.48.2025.11.11.12.59.22
+        bh=TBEatJrYViFT545+/aoVpFeK11myHI7JC0xCcrfj9YI=;
+        b=QnSKvnAnotXkLukO2e95H/ao+85pW+9JdERRnlF7GDLJCPRxm66ix0xCo5rS4QIorW
+         EZyv80dbnyYeItEzYAcY2Aa7PCQlNLK7Us9osNFHo3cmuid+F2Z5k+3LpXKlt7XWNmXS
+         gP/sh/oGyrxjyIR7k5BsjNjAWkiKSdi4TqHlZRYA3RILAY9PcQFlIIxdpMJI8GRD3IQS
+         phi9cTMSwdfNS9jFhEm6d22gnrVOVpHmR57bXf/ghkeKcxqBmyahi4iNztO1lv27XiJd
+         L1OQs5vWYl25IPjOm1V23tgyoRWuveouOAba9WKVwAEHrvJ515W4PouJ0TB9nUFiLsHm
+         mWdg==
+X-Gm-Message-State: AOJu0Yxu2FVAHUhE++0XmfxsfLSfhHqa2kKu+pSxI9NN5GFHhMW2HHYe
+	W4hNNbiICem43GwSQtqKVAn1QAGZ6BqICSJdPrmUxPx/8h96Ddzp61UONDOYzKc2ksrCkKFG1S3
+	T1d0RjOiltZtYq/JDr3CNf/AzaVhd71fxw1EgQmZ9AL9/7F7Xwi0v77A9P2HCggB1AHeBk3Dp4i
+	596XuEGh4DsbYe3mLlB8PbEWPtFngx7m0ZJ21AiClRzVowlb152/VNuM6fd0cpWnhi868XXud39
+	RqmsAaxWLFoT6cDucZA
+X-Gm-Gg: ASbGncvbh8uwUVqG0GHK1xiTo/D7eFyyQPBe+NQI4tTimbpx0Mj9hvLdkz774O+yi/e
+	02cdFsmPZvEsM0qY/vM4KHqjHXbDhicA79ZTpoyvsBAg+BLeu1gDZ8O1VgwPZCvUoXOQO7j3PSk
+	5MwRkAWNeX27GAlHes3MxecD6D4sVikWoktu6VZgXMdUz0POodG4K606Lz7koBiVE7kfCj5u4UM
+	2vQTl5rgMbLithJR1VWbmDVnGS3hzoyd9J1I5u8+VKf300PTvkbO46RvC2KF+EAL4+kQvzp4QVP
+	YqHNH4+CYsPKlurujk0n8O4wpEkSPfc6O5oIiYuiJMwlCV+kC6/eSBOCr1WMJsQIoFbQqOX8t0C
+	MxMQ0/2FgqME5Im/hor8Q3n0YQztAxdTyGkM7nqPaVehCH2oE3biGU+YcJDm1TPMfvCf12nzAs0
+	dzcXvWaToZjKGTLn45on4UG7Vkw2Ba852yFf1gAmaq
+X-Google-Smtp-Source: AGHT+IG5ekxDFAmSsSeHf97ilu5dCrkVcfDG6MLJRkNuSVE59nvnORs66EyeVMqdt1RFnEPV1HKRaXrqLn+g
+X-Received: by 2002:a05:6e02:1522:b0:42d:878b:6e40 with SMTP id e9e14a558f8ab-43473d1b64dmr8709865ab.13.1762894766490;
+        Tue, 11 Nov 2025 12:59:26 -0800 (PST)
+Received: from smtp-us-east1-p01-i01-si01.dlp.protect.broadcom.com (address-144-49-247-14.dlp.protect.broadcom.com. [144.49.247.14])
+        by smtp-relay.gmail.com with ESMTPS id 8926c6da1cb9f-5b7aaf97bb9sm60914173.15.2025.11.11.12.59.26
         for <netdev@vger.kernel.org>
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 11 Nov 2025 12:59:22 -0800 (PST)
+        Tue, 11 Nov 2025 12:59:26 -0800 (PST)
 X-Relaying-Domain: broadcom.com
 X-CFilter-Loop: Reflected
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-3418ad76023so324029a91.0
-        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 12:59:21 -0800 (PST)
+Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-b969f3f5bb1so374693a12.0
+        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 12:59:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1762894761; x=1763499561; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1762894765; x=1763499565; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HkHGo9+pcK8tzXXGxYpPqBwlsVjdn8XLBmrKR6FmCF4=;
-        b=TMYpUiCOYv7eiTMKO6EvWmaqHm+V40BNtiVmUAEi4/NguizmLyZjzzbABqMVDDZdTB
-         OCVr+kRxMCxVjX5Hkj0KgCSsyGaUpXn/J2W85dmvMD+VoZx0p2r6Pw6uEQj7PW+bM0Kq
-         SMV+gBDVgqbxPCD6nuF0J+m0SC3rHPCxsEuQM=
-X-Received: by 2002:a17:90b:3881:b0:339:d1f0:c740 with SMTP id 98e67ed59e1d1-343dddee66emr731608a91.1.1762894760542;
-        Tue, 11 Nov 2025 12:59:20 -0800 (PST)
-X-Received: by 2002:a17:90b:3881:b0:339:d1f0:c740 with SMTP id 98e67ed59e1d1-343dddee66emr731596a91.1.1762894760084;
-        Tue, 11 Nov 2025 12:59:20 -0800 (PST)
+        bh=TBEatJrYViFT545+/aoVpFeK11myHI7JC0xCcrfj9YI=;
+        b=MoTx3tVcpx8Pih8a3fjqxn0GFTPSAmPFT3C/rAwmeHrldl+b30L9fuA7asEqlSn5SL
+         IC8dPC5xlt+KM4sWMN/GW/IajY+epJmoC6d/eiIaVuiBt3eyReD27bqeY2X9FkDEPT7e
+         NCECDl5FCgX3tIFb8RJksqR/s5OKsChpfjAyk=
+X-Received: by 2002:a05:6a20:12c4:b0:347:9ae1:cffb with SMTP id adf61e73a8af0-35909c711a9mr603858637.24.1762894764883;
+        Tue, 11 Nov 2025 12:59:24 -0800 (PST)
+X-Received: by 2002:a05:6a20:12c4:b0:347:9ae1:cffb with SMTP id adf61e73a8af0-35909c711a9mr603834637.24.1762894764469;
+        Tue, 11 Nov 2025 12:59:24 -0800 (PST)
 Received: from localhost.localdomain ([192.19.203.250])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-bbf18b53574sm497131a12.38.2025.11.11.12.59.16
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-bbf18b53574sm497131a12.38.2025.11.11.12.59.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Nov 2025 12:59:19 -0800 (PST)
+        Tue, 11 Nov 2025 12:59:24 -0800 (PST)
 From: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -101,9 +101,9 @@ Cc: netdev@vger.kernel.org,
 	vikas.gupta@broadcom.com,
 	Bhargava Marreddy <bhargava.marreddy@broadcom.com>,
 	Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
-Subject: [net-next 05/12] bng_en: Add TX support
-Date: Wed, 12 Nov 2025 02:27:55 +0530
-Message-ID: <20251111205829.97579-6-bhargava.marreddy@broadcom.com>
+Subject: [net-next 06/12] bng_en: Add support to handle AGG events
+Date: Wed, 12 Nov 2025 02:27:56 +0530
+Message-ID: <20251111205829.97579-7-bhargava.marreddy@broadcom.com>
 X-Mailer: git-send-email 2.47.3
 In-Reply-To: <20251111205829.97579-1-bhargava.marreddy@broadcom.com>
 References: <20251111205829.97579-1-bhargava.marreddy@broadcom.com>
@@ -116,628 +116,409 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-DetectorID-Processed: b00c1d49-9d2e-4205-b15f-d015386d3d5e
 
-Add functions to support xmit along with TSO/GSO.
-Also, add functions to handle TX completion events in the NAPI context.
-This commit introduces the fundamental transmit data path
+Add AGG event handling in the RX path to receive packet data
+on AGG rings. This enables Jumbo and HDS functionality.
 
 Signed-off-by: Bhargava Marreddy <bhargava.marreddy@broadcom.com>
 Reviewed-by: Vikas Gupta <vikas.gupta@broadcom.com>
 Reviewed-by: Rajashekar Hudumula <rajashekar.hudumula@broadcom.com>
 ---
- .../net/ethernet/broadcom/bnge/bnge_netdev.c  |  99 ++++-
- .../net/ethernet/broadcom/bnge/bnge_netdev.h  |   2 +
- .../net/ethernet/broadcom/bnge/bnge_txrx.c    | 370 +++++++++++++++++-
- .../net/ethernet/broadcom/bnge/bnge_txrx.h    |  34 ++
- 4 files changed, 495 insertions(+), 10 deletions(-)
+ .../net/ethernet/broadcom/bnge/bnge_hw_def.h  |  13 ++
+ .../net/ethernet/broadcom/bnge/bnge_netdev.c  |  17 +-
+ .../net/ethernet/broadcom/bnge/bnge_netdev.h  |   8 +
+ .../net/ethernet/broadcom/bnge/bnge_txrx.c    | 216 +++++++++++++++++-
+ .../net/ethernet/broadcom/bnge/bnge_txrx.h    |   1 +
+ 5 files changed, 247 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-index 86f37ca9762..fa85ff2234e 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
-@@ -394,9 +394,60 @@ static void bnge_free_rx_ring_pair_bufs(struct bnge_net *bn)
- 		bnge_free_one_rx_ring_pair_bufs(bn, &bn->rx_ring[i]);
- }
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_hw_def.h b/drivers/net/ethernet/broadcom/bnge/bnge_hw_def.h
+index d0b3d4bea93..a41f4b00003 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge_hw_def.h
++++ b/drivers/net/ethernet/broadcom/bnge/bnge_hw_def.h
+@@ -4,6 +4,19 @@
+ #ifndef _BNGE_HW_DEF_H_
+ #define _BNGE_HW_DEF_H_
  
-+static void bnge_free_tx_skbs(struct bnge_net *bn)
-+{
-+	struct bnge_dev *bd = bn->bd;
-+	u16 max_idx;
-+	int i;
-+
-+	max_idx = bn->tx_nr_pages * TX_DESC_CNT;
-+	for (i = 0; i < bd->tx_nr_rings; i++) {
-+		struct bnge_tx_ring_info *txr = &bn->tx_ring[i];
-+		int j;
-+
-+		if (!txr->tx_buf_ring)
-+			continue;
-+
-+		for (j = 0; j < max_idx;) {
-+			struct bnge_sw_tx_bd *tx_buf = &txr->tx_buf_ring[j];
-+			struct sk_buff *skb;
-+			int k, last;
-+
-+			skb = tx_buf->skb;
-+			if (!skb) {
-+				j++;
-+				continue;
-+			}
-+
-+			tx_buf->skb = NULL;
-+
-+			dma_unmap_single(bd->dev,
-+					 dma_unmap_addr(tx_buf, mapping),
-+					 skb_headlen(skb),
-+					 DMA_TO_DEVICE);
-+
-+			last = tx_buf->nr_frags;
-+			j += 2;
-+			for (k = 0; k < last; k++, j++) {
-+				int ring_idx = j & bn->tx_ring_mask;
-+				skb_frag_t *frag = &skb_shinfo(skb)->frags[k];
-+
-+				tx_buf = &txr->tx_buf_ring[ring_idx];
-+				dma_unmap_page(bd->dev,
-+					       dma_unmap_addr(tx_buf, mapping),
-+					       skb_frag_size(frag),
-+					       DMA_TO_DEVICE);
-+			}
-+			dev_kfree_skb(skb);
-+		}
-+		netdev_tx_reset_queue(netdev_get_tx_queue(bd->netdev, i));
-+	}
-+}
-+
- static void bnge_free_all_rings_bufs(struct bnge_net *bn)
- {
- 	bnge_free_rx_ring_pair_bufs(bn);
-+	bnge_free_tx_skbs(bn);
- }
- 
- static void bnge_free_rx_rings(struct bnge_net *bn)
-@@ -2235,6 +2286,44 @@ static int bnge_init_nic(struct bnge_net *bn)
- 	return rc;
- }
- 
-+static void bnge_tx_disable(struct bnge_net *bn)
-+{
-+	struct bnge_tx_ring_info *txr;
-+	int i;
-+
-+	if (bn->tx_ring) {
-+		for (i = 0; i < bn->bd->tx_nr_rings; i++) {
-+			txr = &bn->tx_ring[i];
-+			WRITE_ONCE(txr->dev_state, BNGE_DEV_STATE_CLOSING);
-+		}
-+	}
-+	/* Make sure napi polls see @dev_state change */
-+	synchronize_net();
-+
-+	if (!bn->netdev)
-+		return;
-+	/* Drop carrier first to prevent TX timeout */
-+	netif_carrier_off(bn->netdev);
-+	/* Stop all TX queues */
-+	netif_tx_disable(bn->netdev);
-+}
-+
-+static void bnge_tx_enable(struct bnge_net *bn)
-+{
-+	struct bnge_tx_ring_info *txr;
-+	int i;
-+
-+	for (i = 0; i < bn->bd->tx_nr_rings; i++) {
-+		txr = &bn->tx_ring[i];
-+		WRITE_ONCE(txr->dev_state, 0);
-+	}
-+	/* Make sure napi polls see @dev_state change */
-+	synchronize_net();
-+	netif_tx_wake_all_queues(bn->netdev);
-+	if (BNGE_LINK_IS_UP(bn->bd))
-+		netif_carrier_on(bn->netdev);
-+}
-+
- static int bnge_open_core(struct bnge_net *bn)
- {
- 	struct bnge_dev *bd = bn->bd;
-@@ -2284,6 +2373,7 @@ static int bnge_open_core(struct bnge_net *bn)
- 	set_bit(BNGE_STATE_OPEN, &bd->state);
- 
- 	bnge_enable_int(bn);
-+	bnge_tx_enable(bn);
- 	/* Poll link status and check for SFP+ module status */
- 	mutex_lock(&bd->link_lock);
- 	bnge_get_port_module_status(bn);
-@@ -2298,13 +2388,6 @@ static int bnge_open_core(struct bnge_net *bn)
- 	return rc;
- }
- 
--static netdev_tx_t bnge_start_xmit(struct sk_buff *skb, struct net_device *dev)
--{
--	dev_kfree_skb_any(skb);
--
--	return NETDEV_TX_OK;
--}
--
- static int bnge_open(struct net_device *dev)
- {
- 	struct bnge_net *bn = netdev_priv(dev);
-@@ -2327,6 +2410,8 @@ static void bnge_close_core(struct bnge_net *bn)
- {
- 	struct bnge_dev *bd = bn->bd;
- 
-+	bnge_tx_disable(bn);
-+
- 	clear_bit(BNGE_STATE_OPEN, &bd->state);
- 	bnge_shutdown_nic(bn);
- 	bnge_disable_napi(bn);
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
-index 8a881ed800e..43fda076969 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
-@@ -248,6 +248,8 @@ struct bnge_net {
- 
- 	unsigned long           state;
- #define BNGE_STATE_NAPI_DISABLED	0
-+
-+	u32			msg_enable;
- };
- 
- #define BNGE_DEFAULT_RX_RING_SIZE	511
-diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_txrx.c b/drivers/net/ethernet/broadcom/bnge/bnge_txrx.c
-index 68ff9a8e277..f02ac71447f 100644
---- a/drivers/net/ethernet/broadcom/bnge/bnge_txrx.c
-+++ b/drivers/net/ethernet/broadcom/bnge/bnge_txrx.c
-@@ -381,9 +381,82 @@ static int bnge_force_rx_discard(struct bnge_net *bn,
- 	return rc;
- }
- 
-+static bool __bnge_tx_int(struct bnge_net *bn, struct bnge_tx_ring_info *txr,
-+			  int budget)
-+{
-+	struct netdev_queue *txq =
-+		netdev_get_tx_queue(bn->netdev, txr->txq_index);
-+	u16 hw_cons = txr->tx_hw_cons;
-+	struct bnge_dev *bd = bn->bd;
-+	unsigned int tx_bytes = 0;
-+	unsigned int tx_pkts = 0;
-+	u16 cons = txr->tx_cons;
-+	skb_frag_t *frag;
-+	bool rc = false;
-+
-+	while (RING_TX(bn, cons) != hw_cons) {
-+		struct bnge_sw_tx_bd *tx_buf;
-+		struct sk_buff *skb;
-+		int j, last;
-+
-+		tx_buf = &txr->tx_buf_ring[RING_TX(bn, cons)];
-+		skb = tx_buf->skb;
-+
-+		cons = NEXT_TX(cons);
-+		tx_pkts++;
-+		tx_bytes += skb->len;
-+		tx_buf->skb = NULL;
-+
-+		dma_unmap_single(bd->dev, dma_unmap_addr(tx_buf, mapping),
-+				 skb_headlen(skb), DMA_TO_DEVICE);
-+		last = tx_buf->nr_frags;
-+
-+		for (j = 0; j < last; j++) {
-+			frag = &skb_shinfo(skb)->frags[j];
-+			cons = NEXT_TX(cons);
-+			tx_buf = &txr->tx_buf_ring[RING_TX(bn, cons)];
-+			netmem_dma_unmap_page_attrs(bd->dev,
-+						    dma_unmap_addr(tx_buf,
-+								   mapping),
-+						    skb_frag_size(frag),
-+						    DMA_TO_DEVICE, 0);
-+		}
-+
-+		cons = NEXT_TX(cons);
-+
-+		dev_consume_skb_any(skb);
-+	}
-+
-+	WRITE_ONCE(txr->tx_cons, cons);
-+
-+	__netif_txq_completed_wake(txq, tx_pkts, tx_bytes,
-+				   bnge_tx_avail(bn, txr), bn->tx_wake_thresh,
-+				   (READ_ONCE(txr->dev_state) ==
-+				    BNGE_DEV_STATE_CLOSING));
-+
-+	return rc;
-+}
-+
-+static void bnge_tx_int(struct bnge_net *bn, struct bnge_napi *bnapi,
-+			int budget)
-+{
-+	struct bnge_tx_ring_info *txr;
-+	bool more = false;
-+	int i;
-+
-+	bnge_for_each_napi_tx(i, bnapi, txr) {
-+		if (txr->tx_hw_cons != RING_TX(bn, txr->tx_cons))
-+			more |= __bnge_tx_int(bn, txr, budget);
-+	}
-+	if (!more)
-+		bnapi->events &= ~BNGE_TX_CMP_EVENT;
-+}
-+
- static void __bnge_poll_work_done(struct bnge_net *bn, struct bnge_napi *bnapi,
- 				  int budget)
- {
-+	if ((bnapi->events & BNGE_TX_CMP_EVENT))
-+		bnge_tx_int(bn, bnapi, budget);
- 	if ((bnapi->events & BNGE_RX_EVENT)) {
- 		struct bnge_rx_ring_info *rxr = bnapi->rx_ring;
- 
-@@ -458,9 +531,26 @@ static int __bnge_poll_work(struct bnge_net *bn, struct bnge_cp_ring_info *cpr,
- 		cmp_type = TX_CMP_TYPE(txcmp);
- 		if (cmp_type == CMP_TYPE_TX_L2_CMP ||
- 		    cmp_type == CMP_TYPE_TX_L2_COAL_CMP) {
--			/*
--			 * Tx Compl Processng
--			 */
-+			u32 opaque = txcmp->tx_cmp_opaque;
-+			struct bnge_tx_ring_info *txr;
-+			u16 tx_freed;
-+
-+			txr = bnapi->tx_ring[TX_OPAQUE_RING(opaque)];
-+			event |= BNGE_TX_CMP_EVENT;
-+			if (cmp_type == CMP_TYPE_TX_L2_COAL_CMP)
-+				txr->tx_hw_cons = TX_CMP_SQ_CONS_IDX(txcmp);
-+			else
-+				txr->tx_hw_cons = TX_OPAQUE_PROD(bn, opaque);
-+			tx_freed = ((txr->tx_hw_cons - txr->tx_cons) &
-+				    bn->tx_ring_mask);
-+			/* return full budget so NAPI will complete. */
-+			if (unlikely(tx_freed >= bn->tx_wake_thresh)) {
-+				rx_pkts = budget;
-+				raw_cons = NEXT_RAW_CMP(raw_cons);
-+				if (budget)
-+					cpr->has_more_work = 1;
-+				break;
-+			}
- 		} else if (cmp_type >= CMP_TYPE_RX_L2_CMP &&
- 			   cmp_type <= CMP_TYPE_RX_L2_TPA_START_V3_CMP) {
- 			if (likely(budget))
-@@ -613,3 +703,277 @@ int bnge_napi_poll(struct napi_struct *napi, int budget)
- poll_done:
- 	return work_done;
- }
-+
-+static u16 bnge_xmit_get_cfa_action(struct sk_buff *skb)
-+{
-+	struct metadata_dst *md_dst = skb_metadata_dst(skb);
-+
-+	if (!md_dst || md_dst->type != METADATA_HW_PORT_MUX)
-+		return 0;
-+
-+	return md_dst->u.port_info.port_id;
-+}
-+
-+const u16 bnge_lhint_arr[] = {
-+	TX_BD_FLAGS_LHINT_512_AND_SMALLER,
-+	TX_BD_FLAGS_LHINT_512_TO_1023,
-+	TX_BD_FLAGS_LHINT_1024_TO_2047,
-+	TX_BD_FLAGS_LHINT_1024_TO_2047,
-+	TX_BD_FLAGS_LHINT_2048_AND_LARGER,
-+	TX_BD_FLAGS_LHINT_2048_AND_LARGER,
-+	TX_BD_FLAGS_LHINT_2048_AND_LARGER,
-+	TX_BD_FLAGS_LHINT_2048_AND_LARGER,
-+	TX_BD_FLAGS_LHINT_2048_AND_LARGER,
-+	TX_BD_FLAGS_LHINT_2048_AND_LARGER,
-+	TX_BD_FLAGS_LHINT_2048_AND_LARGER,
-+	TX_BD_FLAGS_LHINT_2048_AND_LARGER,
-+	TX_BD_FLAGS_LHINT_2048_AND_LARGER,
-+	TX_BD_FLAGS_LHINT_2048_AND_LARGER,
-+	TX_BD_FLAGS_LHINT_2048_AND_LARGER,
-+	TX_BD_FLAGS_LHINT_2048_AND_LARGER,
-+	TX_BD_FLAGS_LHINT_2048_AND_LARGER,
-+	TX_BD_FLAGS_LHINT_2048_AND_LARGER,
-+	TX_BD_FLAGS_LHINT_2048_AND_LARGER,
++struct rx_agg_cmp {
++	__le32 rx_agg_cmp_len_flags_type;
++	#define RX_AGG_CMP_TYPE					(0x3f << 0)
++	#define RX_AGG_CMP_LEN					(0xffff << 16)
++	 #define RX_AGG_CMP_LEN_SHIFT				 16
++	u32 rx_agg_cmp_opaque;
++	__le32 rx_agg_cmp_v;
++	#define RX_AGG_CMP_V					(1 << 0)
++	#define RX_AGG_CMP_AGG_ID				(0xffff << 16)
++	 #define RX_AGG_CMP_AGG_ID_SHIFT			 16
++	__le32 rx_agg_cmp_unused;
 +};
 +
-+static void bnge_txr_db_kick(struct bnge_net *bn, struct bnge_tx_ring_info *txr,
-+			     u16 prod)
+ struct tx_bd_ext {
+ 	__le32 tx_bd_hsize_lflags;
+ 	#define TX_BD_FLAGS_TCP_UDP_CHKSUM			(1 << 0)
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
+index fa85ff2234e..87b5b2163e5 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
++++ b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.c
+@@ -10,6 +10,9 @@
+ #include <linux/list.h>
+ #include <linux/pci.h>
+ #include <linux/netdevice.h>
++#include <net/netdev_lock.h>
++#include <net/netdev_queues.h>
++#include <net/netdev_rx_queue.h>
+ #include <linux/etherdevice.h>
+ #include <linux/if.h>
+ #include <net/ip.h>
+@@ -980,9 +983,9 @@ static netmem_ref __bnge_alloc_rx_netmem(struct bnge_net *bn,
+ 	return netmem;
+ }
+ 
+-static u8 *__bnge_alloc_rx_frag(struct bnge_net *bn, dma_addr_t *mapping,
+-				struct bnge_rx_ring_info *rxr,
+-				gfp_t gfp)
++u8 *__bnge_alloc_rx_frag(struct bnge_net *bn, dma_addr_t *mapping,
++			 struct bnge_rx_ring_info *rxr,
++			 gfp_t gfp)
+ {
+ 	unsigned int offset;
+ 	struct page *page;
+@@ -1049,7 +1052,7 @@ static int bnge_alloc_one_rx_ring_bufs(struct bnge_net *bn,
+ 	return 0;
+ }
+ 
+-static u16 bnge_find_next_agg_idx(struct bnge_rx_ring_info *rxr, u16 idx)
++u16 bnge_find_next_agg_idx(struct bnge_rx_ring_info *rxr, u16 idx)
+ {
+ 	u16 next, max = rxr->rx_agg_bmap_size;
+ 
+@@ -1059,9 +1062,9 @@ static u16 bnge_find_next_agg_idx(struct bnge_rx_ring_info *rxr, u16 idx)
+ 	return next;
+ }
+ 
+-static int bnge_alloc_rx_netmem(struct bnge_net *bn,
+-				struct bnge_rx_ring_info *rxr,
+-				u16 prod, gfp_t gfp)
++int bnge_alloc_rx_netmem(struct bnge_net *bn,
++			 struct bnge_rx_ring_info *rxr,
++			 u16 prod, gfp_t gfp)
+ {
+ 	struct bnge_sw_rx_agg_bd *rx_agg_buf;
+ 	u16 sw_prod = rxr->rx_sw_agg_prod;
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
+index 43fda076969..781cba50bdc 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
++++ b/drivers/net/ethernet/broadcom/bnge/bnge_netdev.h
+@@ -518,4 +518,12 @@ u16 bnge_cp_ring_for_tx(struct bnge_tx_ring_info *txr);
+ void bnge_fill_hw_rss_tbl(struct bnge_net *bn, struct bnge_vnic_info *vnic);
+ int bnge_alloc_rx_data(struct bnge_net *bn, struct bnge_rx_ring_info *rxr,
+ 		       u16 prod, gfp_t gfp);
++inline int bnge_alloc_rx_page(struct bnge_net *bn,
++			      struct bnge_rx_ring_info *rxr,
++			      u16 prod, gfp_t gfp);
++inline u16 bnge_find_next_agg_idx(struct bnge_rx_ring_info *rxr, u16 idx);
++inline u8 *__bnge_alloc_rx_frag(struct bnge_net *bn, dma_addr_t *mapping,
++				struct bnge_rx_ring_info *rxr, gfp_t gfp);
++int bnge_alloc_rx_netmem(struct bnge_net *bn, struct bnge_rx_ring_info *rxr,
++			 u16 prod, gfp_t gfp);
+ #endif /* _BNGE_NETDEV_H_ */
+diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_txrx.c b/drivers/net/ethernet/broadcom/bnge/bnge_txrx.c
+index f02ac71447f..ccfccb8fcf1 100644
+--- a/drivers/net/ethernet/broadcom/bnge/bnge_txrx.c
++++ b/drivers/net/ethernet/broadcom/bnge/bnge_txrx.c
+@@ -13,6 +13,7 @@
+ #include <linux/etherdevice.h>
+ #include <linux/if.h>
+ #include <net/ip.h>
++#include <net/tcp.h>
+ #include <linux/skbuff.h>
+ #include <net/page_pool/helpers.h>
+ #include <linux/if_vlan.h>
+@@ -39,6 +40,186 @@ irqreturn_t bnge_msix(int irq, void *dev_instance)
+ 	return IRQ_HANDLED;
+ }
+ 
++static struct rx_agg_cmp *bnge_get_agg(struct bnge_net *bn,
++				       struct bnge_cp_ring_info *cpr,
++				       u16 cp_cons, u16 curr)
 +{
-+	/* Sync BD data before updating doorbell */
-+	wmb();
-+	bnge_db_write(bn->bd, &txr->tx_db, prod);
-+	txr->kick_pending = 0;
++	struct rx_agg_cmp *agg;
++
++	cp_cons = RING_CMP(bn, ADV_RAW_CMP(cp_cons, curr));
++	agg = (struct rx_agg_cmp *)
++		&cpr->desc_ring[CP_RING(cp_cons)][CP_IDX(cp_cons)];
++	return agg;
 +}
 +
-+netdev_tx_t bnge_start_xmit(struct sk_buff *skb, struct net_device *dev)
++static void bnge_reuse_rx_agg_bufs(struct bnge_cp_ring_info *cpr, u16 idx,
++				   u16 start, u32 agg_bufs)
 +{
-+	u32 len, free_size, vlan_tag_flags, cfa_action, flags;
-+	struct bnge_net *bn = netdev_priv(dev);
-+	struct bnge_tx_ring_info *txr;
-+	struct bnge_dev *bd = bn->bd;
-+	unsigned int length, pad = 0;
-+	struct bnge_sw_tx_bd *tx_buf;
-+	struct tx_bd *txbd, *txbd0;
-+	struct netdev_queue *txq;
-+	struct tx_bd_ext *txbd1;
-+	u16 prod, last_frag;
-+	dma_addr_t mapping;
-+	__le32 lflags = 0;
-+	skb_frag_t *frag;
-+	int i;
++	struct bnge_napi *bnapi = cpr->bnapi;
++	struct bnge_rx_ring_info *rxr = bnapi->rx_ring;
++	u16 sw_prod = rxr->rx_sw_agg_prod;
++	struct bnge_net *bn = bnapi->bn;
++	u16 prod = rxr->rx_agg_prod;
++	u32 i;
 +
-+	i = skb_get_queue_mapping(skb);
-+	if (unlikely(i >= bd->tx_nr_rings)) {
-+		dev_kfree_skb_any(skb);
-+		dev_core_stats_tx_dropped_inc(dev);
-+		return NETDEV_TX_OK;
-+	}
++	for (i = 0; i < agg_bufs; i++) {
++		struct bnge_sw_rx_agg_bd *cons_rx_buf, *prod_rx_buf;
++		struct rx_agg_cmp *agg;
++		struct rx_bd *prod_bd;
++		netmem_ref netmem;
++		u16 cons;
 +
-+	txq = netdev_get_tx_queue(dev, i);
-+	txr = &bn->tx_ring[bn->tx_ring_map[i]];
-+	prod = txr->tx_prod;
++		agg = bnge_get_agg(bn, cpr, idx, start + i);
++		cons = agg->rx_agg_cmp_opaque;
++		__clear_bit(cons, rxr->rx_agg_bmap);
 +
-+#if (MAX_SKB_FRAGS > TX_MAX_FRAGS)
-+	if (skb_shinfo(skb)->nr_frags > TX_MAX_FRAGS) {
-+		netdev_warn_once(dev, "SKB has too many (%d) fragments, max supported is %d.  SKB will be linearized.\n",
-+				 skb_shinfo(skb)->nr_frags, TX_MAX_FRAGS);
-+		if (skb_linearize(skb)) {
-+			dev_kfree_skb_any(skb);
-+			dev_core_stats_tx_dropped_inc(dev);
-+			return NETDEV_TX_OK;
-+		}
-+	}
-+#endif
-+	free_size = bnge_tx_avail(bn, txr);
-+	if (unlikely(free_size < skb_shinfo(skb)->nr_frags + 2)) {
-+		/* We must have raced with NAPI cleanup */
-+		if (net_ratelimit() && txr->kick_pending)
-+			netif_warn(bn, tx_err, dev,
-+				   "bnxt: ring busy w/ flush pending!\n");
-+		if (!netif_txq_try_stop(txq, bnge_tx_avail(bn, txr),
-+					bn->tx_wake_thresh))
-+			return NETDEV_TX_BUSY;
-+	}
++		if (unlikely(test_bit(sw_prod, rxr->rx_agg_bmap)))
++			sw_prod = bnge_find_next_agg_idx(rxr, sw_prod);
 +
-+	if (unlikely(ipv6_hopopt_jumbo_remove(skb)))
-+		goto tx_free;
++		__set_bit(sw_prod, rxr->rx_agg_bmap);
++		prod_rx_buf = &rxr->rx_agg_buf_ring[sw_prod];
++		cons_rx_buf = &rxr->rx_agg_buf_ring[cons];
 +
-+	length = skb->len;
-+	len = skb_headlen(skb);
-+	last_frag = skb_shinfo(skb)->nr_frags;
-+
-+	txbd = &txr->tx_desc_ring[TX_RING(bn, prod)][TX_IDX(prod)];
-+
-+	tx_buf = &txr->tx_buf_ring[RING_TX(bn, prod)];
-+	tx_buf->skb = skb;
-+	tx_buf->nr_frags = last_frag;
-+
-+	vlan_tag_flags = 0;
-+	cfa_action = bnge_xmit_get_cfa_action(skb);
-+	if (skb_vlan_tag_present(skb)) {
-+		vlan_tag_flags = TX_BD_CFA_META_KEY_VLAN |
-+				 skb_vlan_tag_get(skb);
-+		/* Currently supports 8021Q, 8021AD vlan offloads
-+		 * QINQ1, QINQ2, QINQ3 vlan headers are deprecated
++		/* It is possible for sw_prod to be equal to cons, so
++		 * set cons_rx_buf->netmem to 0 first.
 +		 */
-+		if (skb->vlan_proto == htons(ETH_P_8021Q))
-+			vlan_tag_flags |= 1 << TX_BD_CFA_META_TPID_SHIFT;
++		netmem = cons_rx_buf->netmem;
++		cons_rx_buf->netmem = 0;
++		prod_rx_buf->netmem = netmem;
++
++		prod_rx_buf->mapping = cons_rx_buf->mapping;
++
++		prod_bd = &rxr->rx_agg_desc_ring[RX_AGG_RING(bn, prod)]
++					[RX_IDX(prod)];
++
++		prod_bd->rx_bd_haddr = cpu_to_le64(cons_rx_buf->mapping);
++		prod_bd->rx_bd_opaque = sw_prod;
++
++		prod = NEXT_RX_AGG(prod);
++		sw_prod = RING_RX_AGG(bn, NEXT_RX_AGG(sw_prod));
 +	}
-+
-+	if (unlikely(skb->no_fcs))
-+		lflags |= cpu_to_le32(TX_BD_FLAGS_NO_CRC);
-+
-+	if (length < BNGE_MIN_PKT_SIZE) {
-+		pad = BNGE_MIN_PKT_SIZE - length;
-+		if (skb_pad(skb, pad))
-+			/* SKB already freed. */
-+			goto tx_kick_pending;
-+		length = BNGE_MIN_PKT_SIZE;
-+	}
-+
-+	mapping = dma_map_single(bd->dev, skb->data, len, DMA_TO_DEVICE);
-+
-+	if (unlikely(dma_mapping_error(bd->dev, mapping)))
-+		goto tx_free;
-+
-+	dma_unmap_addr_set(tx_buf, mapping, mapping);
-+	flags = (len << TX_BD_LEN_SHIFT) | TX_BD_TYPE_LONG_TX_BD |
-+		TX_BD_CNT(last_frag + 2);
-+
-+	txbd->tx_bd_haddr = cpu_to_le64(mapping);
-+	txbd->tx_bd_opaque = SET_TX_OPAQUE(bn, txr, prod, 2 + last_frag);
-+
-+	prod = NEXT_TX(prod);
-+	txbd1 = (struct tx_bd_ext *)
-+		&txr->tx_desc_ring[TX_RING(bn, prod)][TX_IDX(prod)];
-+
-+	txbd1->tx_bd_hsize_lflags = lflags;
-+	if (skb_is_gso(skb)) {
-+		bool udp_gso = !!(skb_shinfo(skb)->gso_type & SKB_GSO_UDP_L4);
-+		u32 hdr_len;
-+
-+		if (skb->encapsulation) {
-+			if (udp_gso)
-+				hdr_len = skb_inner_transport_offset(skb) +
-+					  sizeof(struct udphdr);
-+			else
-+				hdr_len = skb_inner_tcp_all_headers(skb);
-+		} else if (udp_gso) {
-+			hdr_len = skb_transport_offset(skb) +
-+				  sizeof(struct udphdr);
-+		} else {
-+			hdr_len = skb_tcp_all_headers(skb);
-+		}
-+
-+		txbd1->tx_bd_hsize_lflags |= cpu_to_le32(TX_BD_FLAGS_LSO |
-+					TX_BD_FLAGS_T_IPID |
-+					(hdr_len << (TX_BD_HSIZE_SHIFT - 1)));
-+		length = skb_shinfo(skb)->gso_size;
-+		txbd1->tx_bd_mss = cpu_to_le32(length);
-+		length += hdr_len;
-+	} else if (skb->ip_summed == CHECKSUM_PARTIAL) {
-+		txbd1->tx_bd_hsize_lflags |=
-+			cpu_to_le32(TX_BD_FLAGS_TCP_UDP_CHKSUM);
-+		txbd1->tx_bd_mss = 0;
-+	}
-+
-+	length >>= 9;
-+	if (unlikely(length >= ARRAY_SIZE(bnge_lhint_arr))) {
-+		dev_warn_ratelimited(bd->dev, "Dropped oversize %d bytes TX packet.\n",
-+				     skb->len);
-+		i = 0;
-+		goto tx_dma_error;
-+	}
-+	flags |= bnge_lhint_arr[length];
-+	txbd->tx_bd_len_flags_type = cpu_to_le32(flags);
-+
-+	txbd1->tx_bd_cfa_meta = cpu_to_le32(vlan_tag_flags);
-+	txbd1->tx_bd_cfa_action =
-+			cpu_to_le32(cfa_action << TX_BD_CFA_ACTION_SHIFT);
-+	txbd0 = txbd;
-+	for (i = 0; i < last_frag; i++) {
-+		frag = &skb_shinfo(skb)->frags[i];
-+
-+		prod = NEXT_TX(prod);
-+		txbd = &txr->tx_desc_ring[TX_RING(bn, prod)][TX_IDX(prod)];
-+
-+		len = skb_frag_size(frag);
-+		mapping = skb_frag_dma_map(bd->dev, frag, 0, len,
-+					   DMA_TO_DEVICE);
-+
-+		if (unlikely(dma_mapping_error(bd->dev, mapping)))
-+			goto tx_dma_error;
-+
-+		tx_buf = &txr->tx_buf_ring[RING_TX(bn, prod)];
-+		netmem_dma_unmap_addr_set(skb_frag_netmem(frag), tx_buf,
-+					  mapping, mapping);
-+
-+		txbd->tx_bd_haddr = cpu_to_le64(mapping);
-+
-+		flags = len << TX_BD_LEN_SHIFT;
-+		txbd->tx_bd_len_flags_type = cpu_to_le32(flags);
-+	}
-+
-+	flags &= ~TX_BD_LEN;
-+	txbd->tx_bd_len_flags_type =
-+		cpu_to_le32(((len + pad) << TX_BD_LEN_SHIFT) | flags |
-+			    TX_BD_FLAGS_PACKET_END);
-+
-+	netdev_tx_sent_queue(txq, skb->len);
-+
-+	prod = NEXT_TX(prod);
-+	WRITE_ONCE(txr->tx_prod, prod);
-+
-+	if (!netdev_xmit_more() || netif_xmit_stopped(txq)) {
-+		bnge_txr_db_kick(bn, txr, prod);
-+	} else {
-+		if (free_size >= bn->tx_wake_thresh)
-+			txbd0->tx_bd_len_flags_type |=
-+				cpu_to_le32(TX_BD_FLAGS_NO_CMPL);
-+		txr->kick_pending = 1;
-+	}
-+
-+	if (unlikely(bnge_tx_avail(bn, txr) <= MAX_SKB_FRAGS + 1)) {
-+		if (netdev_xmit_more()) {
-+			txbd0->tx_bd_len_flags_type &=
-+				cpu_to_le32(~TX_BD_FLAGS_NO_CMPL);
-+			bnge_txr_db_kick(bn, txr, prod);
-+		}
-+
-+		netif_txq_try_stop(txq, bnge_tx_avail(bn, txr),
-+				   bn->tx_wake_thresh);
-+	}
-+	return NETDEV_TX_OK;
-+
-+tx_dma_error:
-+	last_frag = i;
-+
-+	/* start back at beginning and unmap skb */
-+	prod = txr->tx_prod;
-+	tx_buf = &txr->tx_buf_ring[RING_TX(bn, prod)];
-+	dma_unmap_single(bd->dev, dma_unmap_addr(tx_buf, mapping),
-+			 skb_headlen(skb), DMA_TO_DEVICE);
-+	prod = NEXT_TX(prod);
-+
-+	/* unmap remaining mapped pages */
-+	for (i = 0; i < last_frag; i++) {
-+		prod = NEXT_TX(prod);
-+		tx_buf = &txr->tx_buf_ring[RING_TX(bn, prod)];
-+		frag = &skb_shinfo(skb)->frags[i];
-+		netmem_dma_unmap_page_attrs(bd->dev,
-+					    dma_unmap_addr(tx_buf, mapping),
-+					    skb_frag_size(frag),
-+					    DMA_TO_DEVICE, 0);
-+	}
-+
-+tx_free:
-+	dev_kfree_skb_any(skb);
-+
-+tx_kick_pending:
-+	if (txr->kick_pending)
-+		bnge_txr_db_kick(bn, txr, txr->tx_prod);
-+	txr->tx_buf_ring[RING_TX(bn, txr->tx_prod)].skb = NULL;
-+	dev_core_stats_tx_dropped_inc(dev);
-+	return NETDEV_TX_OK;
++	rxr->rx_agg_prod = prod;
++	rxr->rx_sw_agg_prod = sw_prod;
 +}
 +
++static int bnge_agg_bufs_valid(struct bnge_net *bn,
++			       struct bnge_cp_ring_info *cpr,
++			       u8 agg_bufs, u32 *raw_cons)
++{
++	struct rx_agg_cmp *agg;
++	u16 last;
++
++	*raw_cons = ADV_RAW_CMP(*raw_cons, agg_bufs);
++	last = RING_CMP(bn, *raw_cons);
++	agg = (struct rx_agg_cmp *)
++		&cpr->desc_ring[CP_RING(last)][CP_IDX(last)];
++	return RX_AGG_CMP_VALID(agg, *raw_cons);
++}
++
++static int bnge_discard_rx(struct bnge_net *bn, struct bnge_cp_ring_info *cpr,
++			   u32 *raw_cons, void *cmp)
++{
++	u32 tmp_raw_cons = *raw_cons;
++	struct rx_cmp *rxcmp = cmp;
++	u8 cmp_type, agg_bufs = 0;
++
++	cmp_type = RX_CMP_TYPE(rxcmp);
++
++	if (cmp_type == CMP_TYPE_RX_L2_CMP) {
++		agg_bufs = (le32_to_cpu(rxcmp->rx_cmp_misc_v1) &
++			    RX_CMP_AGG_BUFS) >>
++			   RX_CMP_AGG_BUFS_SHIFT;
++	}
++
++	if (agg_bufs) {
++		if (!bnge_agg_bufs_valid(bn, cpr, agg_bufs, &tmp_raw_cons))
++			return -EBUSY;
++	}
++	*raw_cons = tmp_raw_cons;
++	return 0;
++}
++
++static u32 __bnge_rx_agg_netmems(struct bnge_net *bn,
++				 struct bnge_cp_ring_info *cpr,
++				 u16 idx, u32 agg_bufs,
++				 struct sk_buff *skb)
++{
++	struct bnge_napi *bnapi = cpr->bnapi;
++	struct skb_shared_info *shinfo;
++	struct bnge_rx_ring_info *rxr;
++	u32 i, total_frag_len = 0;
++	u16 prod;
++
++	rxr = bnapi->rx_ring;
++	prod = rxr->rx_agg_prod;
++	shinfo = skb_shinfo(skb);
++
++	for (i = 0; i < agg_bufs; i++) {
++		struct bnge_sw_rx_agg_bd *cons_rx_buf;
++		struct rx_agg_cmp *agg;
++		u16 cons, frag_len;
++		netmem_ref netmem;
++
++		agg = bnge_get_agg(bn, cpr, idx, i);
++		cons = agg->rx_agg_cmp_opaque;
++		frag_len = (le32_to_cpu(agg->rx_agg_cmp_len_flags_type) &
++			    RX_AGG_CMP_LEN) >> RX_AGG_CMP_LEN_SHIFT;
++
++		cons_rx_buf = &rxr->rx_agg_buf_ring[cons];
++		skb_add_rx_frag_netmem(skb, i, cons_rx_buf->netmem, 0,
++				       frag_len, BNGE_RX_PAGE_SIZE);
++		__clear_bit(cons, rxr->rx_agg_bmap);
++
++		/* It is possible for bnge_alloc_rx_netmem() to allocate
++		 * a sw_prod index that equals the cons index, so we
++		 * need to clear the cons entry now.
++		 */
++		netmem = cons_rx_buf->netmem;
++		cons_rx_buf->netmem = 0;
++
++		if (bnge_alloc_rx_netmem(bn, rxr, prod, GFP_ATOMIC) != 0) {
++			skb->len -= frag_len;
++			skb->data_len -= frag_len;
++			skb->truesize -= BNGE_RX_PAGE_SIZE;
++
++			--shinfo->nr_frags;
++			cons_rx_buf->netmem = netmem;
++
++			/* Update prod since possibly some netmems have been
++			 * allocated already.
++			 */
++			rxr->rx_agg_prod = prod;
++			bnge_reuse_rx_agg_bufs(cpr, idx, i, agg_bufs - i);
++			return 0;
++		}
++
++		page_pool_dma_sync_netmem_for_cpu(rxr->page_pool, netmem, 0,
++						  BNGE_RX_PAGE_SIZE);
++
++		total_frag_len += frag_len;
++		prod = NEXT_RX_AGG(prod);
++	}
++	rxr->rx_agg_prod = prod;
++	return total_frag_len;
++}
++
++static struct sk_buff *bnge_rx_agg_netmems_skb(struct bnge_net *bn,
++					       struct bnge_cp_ring_info *cpr,
++					       struct sk_buff *skb, u16 idx,
++					       u32 agg_bufs)
++{
++	u32 total_frag_len = 0;
++
++	total_frag_len = __bnge_rx_agg_netmems(bn, cpr, idx, agg_bufs, skb);
++	if (!total_frag_len) {
++		skb_mark_for_recycle(skb);
++		dev_kfree_skb(skb);
++		return NULL;
++	}
++
++	return skb;
++}
++
+ static void bnge_sched_reset_rxr(struct bnge_net *bn,
+ 				 struct bnge_rx_ring_info *rxr)
+ {
+@@ -210,6 +391,7 @@ static int bnge_rx_pkt(struct bnge_net *bn, struct bnge_cp_ring_info *cpr,
+ 	dma_addr_t dma_addr;
+ 	struct sk_buff *skb;
+ 	unsigned int len;
++	u8 agg_bufs;
+ 	void *data;
+ 	int rc = 0;
+ 
+@@ -239,11 +421,15 @@ static int bnge_rx_pkt(struct bnge_net *bn, struct bnge_cp_ring_info *cpr,
+ 
+ 	cons = rxcmp->rx_cmp_opaque;
+ 	if (unlikely(cons != rxr->rx_next_cons)) {
++		int rc1 = bnge_discard_rx(bn, cpr, &tmp_raw_cons, rxcmp);
++
+ 		/* 0xffff is forced error, don't print it */
+ 		if (rxr->rx_next_cons != 0xffff)
+ 			netdev_warn(bn->netdev, "RX cons %x != expected cons %x\n",
+ 				    cons, rxr->rx_next_cons);
+ 		bnge_sched_reset_rxr(bn, rxr);
++		if (rc1)
++			return rc1;
+ 		goto next_rx_no_prod_no_len;
+ 	}
+ 	rx_buf = &rxr->rx_buf_ring[cons];
+@@ -252,11 +438,22 @@ static int bnge_rx_pkt(struct bnge_net *bn, struct bnge_cp_ring_info *cpr,
+ 	prefetch(data_ptr);
+ 
+ 	misc = le32_to_cpu(rxcmp->rx_cmp_misc_v1);
++	agg_bufs = (misc & RX_CMP_AGG_BUFS) >> RX_CMP_AGG_BUFS_SHIFT;
++
++	if (agg_bufs) {
++		if (!bnge_agg_bufs_valid(bn, cpr, agg_bufs, &tmp_raw_cons))
++			return -EBUSY;
++
++		cp_cons = NEXT_CMP(bn, cp_cons);
++		*event |= BNGE_AGG_EVENT;
++	}
+ 	*event |= BNGE_RX_EVENT;
+ 
+ 	rx_buf->data = NULL;
+ 	if (rxcmp1->rx_cmp_cfa_code_errors_v2 & RX_CMP_L2_ERRORS) {
+ 		bnge_reuse_rx_data(rxr, cons, data);
++		if (agg_bufs)
++			bnge_reuse_rx_agg_bufs(cpr, cp_cons, 0, agg_bufs);
+ 		rc = -EIO;
+ 		goto next_rx_no_len;
+ 	}
+@@ -268,8 +465,12 @@ static int bnge_rx_pkt(struct bnge_net *bn, struct bnge_cp_ring_info *cpr,
+ 	if (len <= bn->rx_copybreak) {
+ 		skb = bnge_copy_skb(bnapi, data_ptr, len, dma_addr);
+ 		bnge_reuse_rx_data(rxr, cons, data);
+-		if (!skb)
++		if (!skb) {
++			if (agg_bufs)
++				bnge_reuse_rx_agg_bufs(cpr, cp_cons, 0,
++						       agg_bufs);
+ 			goto oom_next_rx;
++		}
+ 	} else {
+ 		u32 payload;
+ 
+@@ -283,6 +484,13 @@ static int bnge_rx_pkt(struct bnge_net *bn, struct bnge_cp_ring_info *cpr,
+ 			goto oom_next_rx;
+ 	}
+ 
++	if (agg_bufs) {
++		skb = bnge_rx_agg_netmems_skb(bn, cpr, skb, cp_cons,
++					      agg_bufs);
++		if (!skb)
++			goto oom_next_rx;
++	}
++
+ 	if (RX_CMP_HASH_VALID(rxcmp)) {
+ 		enum pkt_hash_types type;
+ 
+@@ -463,6 +671,12 @@ static void __bnge_poll_work_done(struct bnge_net *bn, struct bnge_napi *bnapi,
+ 		bnge_db_write(bn->bd, &rxr->rx_db, rxr->rx_prod);
+ 		bnapi->events &= ~BNGE_RX_EVENT;
+ 	}
++	if (bnapi->events & BNGE_AGG_EVENT) {
++		struct bnge_rx_ring_info *rxr = bnapi->rx_ring;
++
++		bnge_db_write(bn->bd, &rxr->rx_agg_db, rxr->rx_agg_prod);
++		bnapi->events &= ~BNGE_AGG_EVENT;
++	}
+ }
+ 
+ static void
 diff --git a/drivers/net/ethernet/broadcom/bnge/bnge_txrx.h b/drivers/net/ethernet/broadcom/bnge/bnge_txrx.h
-index f3e08064add..db699ce86b4 100644
+index db699ce86b4..d2c9e6f2e7f 100644
 --- a/drivers/net/ethernet/broadcom/bnge/bnge_txrx.h
 +++ b/drivers/net/ethernet/broadcom/bnge/bnge_txrx.h
-@@ -7,6 +7,34 @@
- #include <linux/bnxt/hsi.h>
- #include "bnge_netdev.h"
- 
-+static inline u32 bnge_tx_avail(struct bnge_net *bn,
-+				const struct bnge_tx_ring_info *txr)
-+{
-+	u32 used = READ_ONCE(txr->tx_prod) - READ_ONCE(txr->tx_cons);
-+
-+	return bn->tx_ring_size - (used & bn->tx_ring_mask);
-+}
-+
-+static inline void bnge_writeq_relaxed(struct bnge_dev *bd, u64 val,
-+				       volatile void __iomem *addr)
-+{
-+#if BITS_PER_LONG == 32
-+	spin_lock(&bd->db_lock);
-+	lo_hi_writeq_relaxed(val, addr);
-+	spin_unlock(&bd->db_lock);
-+#else
-+	writeq_relaxed(val, addr);
-+#endif
-+}
-+
-+/* For TX and RX ring doorbells with no ordering guarantee*/
-+static inline void bnge_db_write_relaxed(struct bnge_net *bn,
-+					 struct bnge_db_info *db, u32 idx)
-+{
-+	bnge_writeq_relaxed(bn->bd, db->db_key64 | DB_RING_IDX(db, idx),
-+			    db->doorbell);
-+}
-+
- #define BNGE_MIN_PKT_SIZE	52
- 
- #define TX_OPAQUE_IDX_MASK	0x0000ffff
-@@ -26,6 +54,11 @@
- 				 TX_OPAQUE_BDS_SHIFT)
- #define TX_OPAQUE_PROD(bn, opq)	((TX_OPAQUE_IDX(opq) + TX_OPAQUE_BDS(opq)) &\
- 				 (bn)->tx_ring_mask)
-+#define TX_BD_CNT(n)	(((n) << TX_BD_FLAGS_BD_CNT_SHIFT) & TX_BD_FLAGS_BD_CNT)
-+
-+#define TX_MAX_BD_CNT	32
-+
-+#define TX_MAX_FRAGS		(TX_MAX_BD_CNT - 2)
- 
- /* Minimum TX BDs for a TX packet with MAX_SKB_FRAGS + 1.  We need one extra
-  * BD because the first TX BD is always a long BD.
-@@ -78,6 +111,7 @@
+@@ -109,6 +109,7 @@ static inline void bnge_db_write_relaxed(struct bnge_net *bn,
+ #define ADV_RAW_CMP(idx, n)	((idx) + (n))
+ #define NEXT_RAW_CMP(idx)	ADV_RAW_CMP(idx, 1)
  #define RING_CMP(bn, idx)	((idx) & (bn)->cp_ring_mask)
++#define NEXT_CMP(bn, idx)	RING_CMP(bn, ADV_RAW_CMP(idx, 1))
  
  irqreturn_t bnge_msix(int irq, void *dev_instance);
-+netdev_tx_t bnge_start_xmit(struct sk_buff *skb, struct net_device *dev);
- void bnge_reuse_rx_data(struct bnge_rx_ring_info *rxr, u16 cons, void *data);
- int bnge_napi_poll(struct napi_struct *napi, int budget);
- #endif /* _BNGE_TXRX_H_ */
+ netdev_tx_t bnge_start_xmit(struct sk_buff *skb, struct net_device *dev);
 -- 
 2.47.3
 
