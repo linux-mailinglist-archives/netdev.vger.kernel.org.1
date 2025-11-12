@@ -1,219 +1,116 @@
-Return-Path: <netdev+bounces-238489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-239669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27B0BC5998B
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 20:04:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DA331C6B37B
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 19:32:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 853A04EAECC
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 18:59:17 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 224E44E72A2
+	for <lists+netdev@lfdr.de>; Tue, 18 Nov 2025 18:31:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEA3131814A;
-	Thu, 13 Nov 2025 18:59:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 456EF2DAFA9;
+	Tue, 18 Nov 2025 18:31:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E+QQjDeD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l1cyRrxZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yx1-f49.google.com (mail-yx1-f49.google.com [74.125.224.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C17DE2E0406
-	for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 18:59:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.125.224.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 913AA2DA746;
+	Tue, 18 Nov 2025 18:31:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1763060347; cv=none; b=eGfRgvvwHmAH0djRo8U13bl41aCA0N2PFWLJHuODvj8JtuBcS4oepWfUztjRBheuMoPyg6LFm0CgEmq/8AWZGli+SJxR0zUuVp9FBf3KtAhS460jYn+Dfcwjpt2SE6ZckFHo13Ln9q7Wuz6o730hgQxdLVZf0F0HTSJIdaHF7ds=
+	t=1763490675; cv=none; b=FFbP7/dorqZCGnMBMEuFaUduvM7IkW5jixjg1STj+fa0trFe/2T3hm9zLbi4BuHduvj3ueLcMVsFp/ROSuw900YMqyg3/fGJMqnvLzYiOPGfnVYdQiJtl2iuSEAZV725XutyIyYvDwXMAfloTJ3bt4EhaQabf+9CqJqNihjZUYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1763060347; c=relaxed/simple;
-	bh=d1u1H2ZRU0IOG/4fnAH17I7UPen6WkIeSIzyTu38lHI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=e5TiCjUjcmfqhYAiSIFsBSfdzTXB/Y6ArZhr1enY39qhWRU17DvKImi6pfDsnJLmg8cGqAC5ybZcPtJA09kmvpI3ZW8FlPxj9P+gO0d/yoilzUUj/x8+8tUFnJWsqERxxgYAk6+QntwHkRshgbL7XL1KOKwpnmUwNpp4mRq9XVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E+QQjDeD; arc=none smtp.client-ip=74.125.224.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yx1-f49.google.com with SMTP id 956f58d0204a3-640c857ce02so1115346d50.0
-        for <netdev@vger.kernel.org>; Thu, 13 Nov 2025 10:59:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1763060343; x=1763665143; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b+PqzGsvaBbEVuwQLOu7NOnLSs/K4dFo0izdUCpkZ8U=;
-        b=E+QQjDeD8K5nZ7hEN7IVbUUb/m8LzmyyxbfVj0DYPio1OmCpq0mGqS0yO4+o5tfUn9
-         hoj+/kmy0Zm4csMf7r17B8KfZRH6ZhVx+GuQ3X049Lzs2ehV+aSQ1i42tbaWJ78FBsZy
-         kWmWz35Zd0fEwSRGpFuFwhIB+TRlRK4S9h2XJMNB2Wi7uB3Qs8oe4yYvxlKjw84d51H0
-         pmiXRdRSMMLYVKeKNZ8vgL/7cOuPFU3WS2DurL+lZqjAmEEK7jY8lrriRLTF8fdmOPE+
-         qy2eGM+PB5lQjnKesO3WMF+tAazs+ILV/KCxDL4pyR0vdhgM9q9TEuAQxY1yD2fhCsHg
-         580A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1763060343; x=1763665143;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=b+PqzGsvaBbEVuwQLOu7NOnLSs/K4dFo0izdUCpkZ8U=;
-        b=ID4dUnaqccXOfr//CJY3gBlz6vYN9DbFzzV6uxHEEXunMZsT9C+bjKXGDhpJ9NNW5z
-         3FlG3jLly5VMc3lhfIc5tVqMHqU07Ya1o2FAtNWBuK98DEiB69egWp+ZwW88kkupi5Av
-         bjuhqqTIRItYYGwcpCOB+UdIHtD2fk9zmQBJZq9bcT6+bhQL8hehKJ+kXE0zvOjI74Lc
-         YWcIPl1Kk8PsE9fIYFliQf7hliywHuRo5OpYByhCUL5mIlLJ2YmJHvwsyKUwwVyRR5Dx
-         TU0L47U7cqJY7a8RLDkyTES13bm5OhNKiGve+mXZAqIzCMIGq0y/yLQ+pf/o63NJHYSk
-         qrMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX0XL4Q6IE7Lh68XEaxBStIinysSbzyJGfrGtlHY+0qVWk1D52rNrHBwcl4aRMUYp6ZH0poo/s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwjfHZTshbHSiUX3xYE++lY3EUpvzoI8kbdruJokkA7OGCjhEgK
-	5XLVjztfEzm/6nRWqEZrpvT/qsNR5FD0DN1UHvLRN7TfA89qb3hmWFTfvLO6cSs1eJjPEHcRjMI
-	dMdICRrotv2W1O3ipjAIP4mIPOLOu3O8=
-X-Gm-Gg: ASbGncufaIRO1BhjZhnq0RCGH/mfiitD6xohw/pFM0qkXRO7Exk57qjOW0ma8vmm4jv
-	Us8rxJ9lfoP3Erp7KsB4aVgv1ikh8aI/dpSBMa0rP7GEVda6LsR+fel4+raREONZ13PxWaX/5Kq
-	gwbMPlLqTXiYhH7lRMFFn3/4K1X2GinkzyCcKk2cUu9L9m/J1kAEugWjruJXNb9fKr2sLQRUWjV
-	Q9O3IxYRPxkcI9cBgAC/K/Ars7p3fX/efk5PLMiLsVmOasQ1tZUqrI+5PO0peB2oWHaCKF85RHo
-X-Google-Smtp-Source: AGHT+IEXQzo33dyZnCkOfn9zRECc/mLPfHXcqe0IhYY8U0QN71UCSdhRKuo0/0MxZjGnYXGTqvTfpdqZUZ3YWilGlYI=
-X-Received: by 2002:a05:690e:c45:b0:63c:f5a6:f30f with SMTP id
- 956f58d0204a3-641e76b2bb9mr364296d50.57.1763060342994; Thu, 13 Nov 2025
- 10:59:02 -0800 (PST)
+	s=arc-20240116; t=1763490675; c=relaxed/simple;
+	bh=WHE6fEbSFB+M4z+84cWisGXo1CFTEI0Z2qy8Hupts14=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fUla7mokaz3hDmFUVSW0QmFCeS69wjqqW0hA2AY7bIdM2J9uEKYPiGfcxqr4plQ50Z7OvP4bLBs5vlPhruNMyQxuMh6ZxQVzLm4NHdcvdONleLZihgl0Hh6HplAfA/Y/EVIzNu0YLogKOvFfCg7+M2Jm4KS3Ug/hIvvPlDqLNu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l1cyRrxZ; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1763490674; x=1795026674;
+  h=resent-from:resent-date:resent-message-id:resent-to:date:
+   from:to:cc:subject:message-id:references:mime-version:
+   in-reply-to;
+  bh=WHE6fEbSFB+M4z+84cWisGXo1CFTEI0Z2qy8Hupts14=;
+  b=l1cyRrxZ61MwheN4oU6AIS3yOJ62tdqGYq061QabGjvB/Ud9YLwh8z57
+   LyaCV+mZAccNXHzpwzOq0BK1RB+JcQK1HNNYlVA78xaNJeldVmr8J+TuG
+   nUEjZ6keuMg6OUZKs5QXdoETtGgTT0b3KtQSe1SZD7bNkETFlyXP4TsH1
+   pdgSIyh7EyN3kLrbevNWF1cWnchhiqyi3D4Bw4e3oMHplPyujdyp1KmKh
+   Cm1caP9XD+IQCCuy5DQUrh+yD0KYzy4xlNFDrV5QQiOtSFKeu3BAZPY9l
+   E+X/AgEZzQR1iOgQBu7eeIzGetNuBuI9Hiy2qpaECKLgyOjSRPA3Luxwz
+   w==;
+X-CSE-ConnectionGUID: /q9o71FqRS+p4276zjJRgQ==
+X-CSE-MsgGUID: 4veCIHmiSAaApCkId4Vl1A==
+X-IronPort-AV: E=McAfee;i="6800,10657,11617"; a="69373908"
+X-IronPort-AV: E=Sophos;i="6.19,314,1754982000"; 
+   d="scan'208";a="69373908"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2025 10:31:13 -0800
+X-CSE-ConnectionGUID: pTHrSlRPTG2ZUlamUEpGiQ==
+X-CSE-MsgGUID: d8aRJePhS4OhK7hiw9dsvw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,314,1754982000"; 
+   d="scan'208";a="190862538"
+Received: from dalessan-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.245.97])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Nov 2025 10:31:11 -0800
+Resent-From: Andy Shevchenko <andriy.shevchenko@intel.com>
+Resent-Date: Tue, 18 Nov 2025 20:31:08 +0200
+Resent-Message-ID: <aRy7bNwTm9ODIBXM@ashevche-desk.local>
+Resent-To: vadim.fedorenko@linux.dev, netdev@vger.kernel.org,
+	andrew+netdev@lunn.ch, kuba@kernel.org, pabeni@redhat.com,
+	davem@davemloft.net, linux-kernel@vger.kernel.org
+Date: Wed, 12 Nov 2025 17:04:29 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Richard Cochran <richardcochran@gmail.com>,
+	Jonathan Lemon <jonathan.lemon@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v1 3/7] ptp: ocp: Refactor
+ ptp_ocp_i2c_notifier_call()
+Message-ID: <aRSh_dNeOPFRjXyD@smile.fi.intel.com>
+References: <20251111165232.1198222-1-andriy.shevchenko@linux.intel.com>
+ <20251111165232.1198222-4-andriy.shevchenko@linux.intel.com>
+ <7ae9b0c0-c84a-4c2c-b2ee-9252e9c411b0@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251112175939.2365295-1-ameryhung@gmail.com> <20251112175939.2365295-3-ameryhung@gmail.com>
- <CAADnVQ+2OXNo99B2krjwOb5XeFhi6GUagotcyf36xvLDoHqmjw@mail.gmail.com>
- <CAMB2axM0-NF5F=O6Lq1WPbb8PJtdZrQaOTFKWApWEhfT7MD4hw@mail.gmail.com>
- <CAADnVQKWKC3oh6ycxE+tstYupwVsdbhYHOncnfTOFWLL2DmJjw@mail.gmail.com>
- <CAMB2axOEauSyi13-acjDJUB--8+V7ZUG+r2V=fATwZHDQjFH4w@mail.gmail.com> <CAADnVQL1aocxXXsrdy1RAPf+LGX_jVKe8sVXmC9cWCktUzS+aQ@mail.gmail.com>
-In-Reply-To: <CAADnVQL1aocxXXsrdy1RAPf+LGX_jVKe8sVXmC9cWCktUzS+aQ@mail.gmail.com>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Thu, 13 Nov 2025 10:58:49 -0800
-X-Gm-Features: AWmQ_bmd4hCjP_bcUU1UoKkHhwWqMzT6jyzjpRLFnN19VFBV5QWwj94-F5jQ3kw
-Message-ID: <CAMB2axN8AajFkQUKpUwT6PrdHEa+CKUECBWC1dUQ=_67VBb4Eg@mail.gmail.com>
-Subject: Re: [PATCH RFC bpf-next 2/2] bpf: Use kmalloc_nolock() in local
- storage unconditionally
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Martin KaFai Lau <martin.lau@kernel.org>, Kumar Kartikeya Dwivedi <memxor@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, Song Liu <song@kernel.org>, 
-	Kernel Team <kernel-team@meta.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7ae9b0c0-c84a-4c2c-b2ee-9252e9c411b0@linux.dev>
+Organization: Intel Finland Oy - BIC 0357606-4 - c/o Alberga Business Park, 6
+ krs, Bertel Jungin Aukio 5, 02600 Espoo
 
-On Wed, Nov 12, 2025 at 5:08=E2=80=AFPM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
-> On Wed, Nov 12, 2025 at 1:15=E2=80=AFPM Amery Hung <ameryhung@gmail.com> =
-wrote:
-> >
-> > On Wed, Nov 12, 2025 at 12:05=E2=80=AFPM Alexei Starovoitov
-> > <alexei.starovoitov@gmail.com> wrote:
-> > >
-> > > On Wed, Nov 12, 2025 at 11:51=E2=80=AFAM Amery Hung <ameryhung@gmail.=
-com> wrote:
-> > > >
-> > > > On Wed, Nov 12, 2025 at 11:35=E2=80=AFAM Alexei Starovoitov
-> > > > <alexei.starovoitov@gmail.com> wrote:
-> > > > >
-> > > > > On Wed, Nov 12, 2025 at 9:59=E2=80=AFAM Amery Hung <ameryhung@gma=
-il.com> wrote:
-> > > > > >
-> > > > > > @@ -80,23 +80,12 @@ bpf_selem_alloc(struct bpf_local_storage_ma=
-p *smap, void *owner,
-> > > > > >         if (mem_charge(smap, owner, smap->elem_size))
-> > > > > >                 return NULL;
-> > > > > >
-> > > > > > -       if (smap->bpf_ma) {
-> > > > > > -               selem =3D bpf_mem_cache_alloc_flags(&smap->sele=
-m_ma, gfp_flags);
-> > > > > > -               if (selem)
-> > > > > > -                       /* Keep the original bpf_map_kzalloc be=
-havior
-> > > > > > -                        * before started using the bpf_mem_cac=
-he_alloc.
-> > > > > > -                        *
-> > > > > > -                        * No need to use zero_map_value. The b=
-pf_selem_free()
-> > > > > > -                        * only does bpf_mem_cache_free when th=
-ere is
-> > > > > > -                        * no other bpf prog is using the selem=
-.
-> > > > > > -                        */
-> > > > > > -                       memset(SDATA(selem)->data, 0, smap->map=
-.value_size);
-> > > > > > -       } else {
-> > > > > > -               selem =3D bpf_map_kzalloc(&smap->map, smap->ele=
-m_size,
-> > > > > > -                                       gfp_flags | __GFP_NOWAR=
-N);
-> > > > > > -       }
-> > > > > > +       selem =3D bpf_map_kmalloc_nolock(&smap->map, smap->elem=
-_size, gfp_flags, NUMA_NO_NODE);
-> > > > >
-> > > > >
-> > > > > Pls enable CONFIG_DEBUG_VM=3Dy then you'll see that the above tri=
-ggers:
-> > > > > void *kmalloc_nolock_noprof(size_t size, gfp_t gfp_flags, int nod=
-e)
-> > > > > {
-> > > > >         gfp_t alloc_gfp =3D __GFP_NOWARN | __GFP_NOMEMALLOC | gfp=
-_flags;
-> > > > > ...
-> > > > >         VM_WARN_ON_ONCE(gfp_flags & ~(__GFP_ACCOUNT | __GFP_ZERO =
-|
-> > > > >                                       __GFP_NO_OBJ_EXT));
-> > > > >
-> > > > > and benchmarking numbers have to be redone, since with
-> > > > > unsupported gfp flags kmalloc_nolock() is likely doing something =
-wrong.
-> > > >
-> > > > I see. Thanks for pointing it out. Currently the verifier determine=
-s
-> > > > the flag and rewrites the program based on if the caller of
-> > > > storage_get helpers is sleepable. I will remove it and redo the
-> > > > benchmark.
-> > >
-> > > yes. that part of the verifier can be removed too.
-> > > First I would redo the benchmark numbers with s/gfp_flags/0 in the ab=
-ove line.
-> >
-> > Here are the new numbers after setting gfp_flags =3D __GFP_ZERO and
-> > removing memset(0). BTW, the test is done on a physical machine. The
-> > numbers for sk local storage can change =C2=B11-2. I will try to increa=
-se
-> > the test iteration or kill other unnecessary things running on the
-> > machine to see if the number fluctuates less.
->
-> fyi gfp_zero is pretty much the same memset().
-> Shouldn't be any difference between __GFP_ZERO vs manual memset() after a=
-lloc.
->
-> > Socket local storage
-> > memory alloc     batch  creation speed              creation speed diff
-> > ---------------  ----   ------------------                         ----
-> > kzalloc           16    104.217 =C2=B1 0.974k/s  4.15 kmallocs/create
-> > (before)          32    104.355 =C2=B1 0.606k/s  4.13 kmallocs/create
-> >                   64    103.611 =C2=B1 0.707k/s  4.15 kmallocs/create
-> >
-> > kmalloc_nolock    16    100.402 =C2=B1 1.282k/s  1.11 kmallocs/create  =
--3.7%
-> > (after)           32    101.592 =C2=B1 0.861k/s  1.07 kmallocs/create  =
--2.6%
-> >                   64     98.995 =C2=B1 0.868k/s  1.07 kmallocs/create  =
--4.6%
->
-> could you perf record/report both to see where the difference comes from?
-> The only reason I could explain the difference is that kfree_nolock()
-> is hitting defer_free() case, but that shouldn't happen
-> in this microbenchmark. But if you see free_deferred_objects()
-> in perf report that would explain it.
+On Wed, Nov 12, 2025 at 01:45:31PM +0000, Vadim Fedorenko wrote:
+> On 11/11/2025 16:52, Andy Shevchenko wrote:
+> > Refactor ptp_ocp_i2c_notifier_call() to avoid unneeded local variable.
 
-Updated numbers and next step:
+...
 
-A new perf result shows ~10% creation speed decrease (130k/s vs
-142k/s) for socket local storage after stopping a service that is also
-creating it for every connection.
+> the reason we've done it is to avoid iterating over devices and do
+> string comparisons for actions we don't care about. We can still avoid
+> local variable by changing if condition later in the code, but I'm not
+> sure this refactor gives any benefits.
 
-The performance hit did come from defer_free() and the loss of
-batching with kfree_rcu().
+This is definitely a slow path and having less LoCs and straightforward code
+flow is important for readability and maintenance. I find my proposed change
+useful.
 
-Hence, kmalloc_nolock() is not ready in this case to replace
-kzalloc(). The next respin will only replace BPF memory allocator in
-local storage with kmalloc_nolock().
+-- 
+With Best Regards,
+Andy Shevchenko
+
+
 
