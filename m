@@ -1,203 +1,163 @@
-Return-Path: <netdev+bounces-237960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D944C520CF
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 12:45:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 005EEC51D95
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 12:11:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96E013B534E
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 11:40:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8C253ABC1C
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 11:02:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0421F3126D9;
-	Wed, 12 Nov 2025 11:40:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 250003002A9;
+	Wed, 12 Nov 2025 11:01:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=rosa.ru header.i=@rosa.ru header.b="Y1pyWHhg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RLdAT8aH";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="FnKeUs6D"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward101a.mail.yandex.net (forward101a.mail.yandex.net [178.154.239.84])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E76B03126A6;
-	Wed, 12 Nov 2025 11:39:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CAF22D29AC
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 11:01:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762947600; cv=none; b=oH9lrUEfIzM8dxWcDIS6lcqzchV4NdbMbgsINP/Btscaz9OLlO+inBZW7jOhwEVuHq+W3/gbkm8aNgRKDv09jJvaqnhEdeeEa/l9tQsf1SHUf6551lENzlt6TCIxzXUiJ/C1OkjA82+95hTDgTFAn1y5WG/9aGA/TWU+nTmTOK8=
+	t=1762945318; cv=none; b=Rah5W/0GA0Ou5Cuhsa6c/C6QO49yUyd6LiIgcisEMuZjFErbsLXs4w1IVzaKpQVOlFaiBlUSkVPN/2So4/2oACV90v5gj5tlI3BjInYpnhrdwQf1NQ8727JV0Evsb0rNCxz1sP05ktgPm7tifrieN9HSOZ78pX/0G9GUPvxhc+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762947600; c=relaxed/simple;
-	bh=ZJBlgVQUds5GbyehGat4CZz2u1xDcxYPkHK+oVc1SLk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jsnQI5Eap9yAEm6hiE9l46gSpf77eqPTTDYTAb6KZ9n/8TMve0VUEEASAE0HN9OjrPJpbvV6a1bWycSnYwOpkbwR6PzdMCSu81YChz7Q5jOjDfAv5PcmxbOGjVrIJoIi2I76zbBHAdxG09tZZDdetQPs+bNJ3eLhae4T3NvkM84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosa.ru; spf=pass smtp.mailfrom=rosa.ru; dkim=pass (1024-bit key) header.d=rosa.ru header.i=@rosa.ru header.b=Y1pyWHhg; arc=none smtp.client-ip=178.154.239.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosa.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rosa.ru
-Received: from mail-nwsmtp-smtp-production-main-64.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-64.vla.yp-c.yandex.net [IPv6:2a02:6b8:c1d:5a89:0:640:b4ed:0])
-	by forward101a.mail.yandex.net (Yandex) with ESMTPS id 54F5F80A01;
-	Wed, 12 Nov 2025 14:39:45 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-64.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id gdNvH92LqmI0-1AOLtqeG;
-	Wed, 12 Nov 2025 14:39:44 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rosa.ru; s=mail;
-	t=1762947584; bh=Y3mu0Zw6QST5qSBBo3gTy6QNByaLKy+gd37sFxTRevU=;
-	h=Message-ID:Date:Cc:Subject:To:From;
-	b=Y1pyWHhgSLhZzpPR+vk8mZ/95k6LYQhXGM9iDjRZ27GGV5gbV3w1JSVwg0Lttd7Fy
-	 2ykih7JOhIhIdZtNT4RyCLr6hafvQH7xqoRzl5icHCepx4h66+mBzesJLGQryVeLCX
-	 XmHH2/8XMjlepTcz0//bNumUuLAGf6ygk+rYgtrw=
-Authentication-Results: mail-nwsmtp-smtp-production-main-64.vla.yp-c.yandex.net; dkim=pass header.i=@rosa.ru
-From: Mikhail Lobanov <m.lobanov@rosa.ru>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Mikhail Lobanov <m.lobanov@rosa.ru>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemb@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: [PATCH net] net: fix double dst_release() on sk_dst_cache race
-Date: Tue, 11 Nov 2025 19:42:02 +0300
-Message-ID: <20251111164205.77229-1-m.lobanov@rosa.ru>
-X-Mailer: git-send-email 2.47.2
+	s=arc-20240116; t=1762945318; c=relaxed/simple;
+	bh=Rix2gXstzQVRwOGYgiRM4iKbc06GNtYlO3k6N6sx0es=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=n8y8Fo9HU7AEFDtAZbGhONXLPFnF4Vfs6W4KWxkvR8jqf9KlkBu9mruVIwKqEwWDYbdXSICyV3pCtkkC/IHIgFw9lDPEyGYY7iUnO3wTOiuwr62+BoLf/jjzIEzO+CviBpFjxpBdgxH7/AcrKVwNxpTb2tUe170raKxzxWNkBo0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RLdAT8aH; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=FnKeUs6D; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762945315;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cswzeVpxbdbCvh5KzTG9nqWXaEdEbGjvIsS3PCeAQjI=;
+	b=RLdAT8aHzZCw4c0Ybp1ZpbHyEGqFs1ovI9R9UKD48HCPN9JGjntKURDThfw4loJYIMICuj
+	Z9i4/UnsiiYsRxGNNsb5LUjvWEi5IfDJ1j44uD/68nrWIS/42giwuwSFOUiYsj17xW07hB
+	uSlkfCAJ2GCxXYBevkMzbIB1eCdCRSI=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-25-j8RnuzIRMpOERufEKttJZw-1; Wed, 12 Nov 2025 06:01:54 -0500
+X-MC-Unique: j8RnuzIRMpOERufEKttJZw-1
+X-Mimecast-MFC-AGG-ID: j8RnuzIRMpOERufEKttJZw_1762945313
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4775d110fabso7307865e9.1
+        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 03:01:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1762945313; x=1763550113; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cswzeVpxbdbCvh5KzTG9nqWXaEdEbGjvIsS3PCeAQjI=;
+        b=FnKeUs6DuZzNuR47IVo0jorH+O2Im0eTJyMLIeP26Rjqez7035wfLjk/iyo9X+jmVL
+         yqX7m79YMDPSXdA/6H5jHCmk1mNmpFXlvOTuUrCj50RiAA2CyW/S+N4GRYGRYtBQmdju
+         zggh35ZXThJi68hCqV9+N+i1XRM3MvqRkcBbCwcx/4wGmDfmERlZ17+dbHpEaMPY605M
+         Zyuz014BrsMyy/EOuzO4Rz5ccBXcu0pa55K5WHfIUtN0QHN52/pTjv/iJDY5nx9thjlk
+         f3AfLK/QYA6Ljd4DZAV7IK7Ufktm4j92/IvjEkZCP2hRKFdjcvqQlZZ4DbiAlMzMnboH
+         u/1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762945313; x=1763550113;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cswzeVpxbdbCvh5KzTG9nqWXaEdEbGjvIsS3PCeAQjI=;
+        b=MGqflnyCRgJREt8z2h5o1VXLfrLaPi2VeiRbeZN1CAnMED94rWV1WwWjZqAipumFPf
+         71iVld/92xYg9vfs+BYspV1DKZviJ0ZK6vpI6o6ySf93fZKJFGvEYzo2+Zktaci08Rzh
+         CllK0YvF+EpSiSpqBTeKjvVdVrpxvo7yG+esDuIJifCIwuEMCAIkWf7uRhCEDdohaiXD
+         Grl1+GAKwKU++vzEp8KuUIh8Wj3vAXU/sLVT8rvmhalUXzoFISoMi61ekLsOZYed5gQQ
+         Sa4N3cJuzKlwPEOKL2F6ksIUrBlT9L3MFPznVdpDXMGXNI8WxG0Tbom2WaLZ0yq91hPt
+         /3uA==
+X-Gm-Message-State: AOJu0YyV0q3a2VlghtoxxchPTOheZbAtI6Bihy2FYMxC1svPNLPaPTdn
+	AQ8MdRDMdyaPbeac+Bnb1kYhQiVWyvoCoIDmviQoMJXAl0pftIazlOOE5DMJ5zMQ5TgjQVNU7qg
+	/8fDp/2SHvdFf1610Ct4j7rnBKg2X6bJ1TzZcFDKHfSUTBC6xzuzPReMXjg==
+X-Gm-Gg: ASbGnctu8wwgEtECB3syIwYMdElI4e/9O8QZ1tiTIuTbCGG/xAld3GzGZmeySPL1dVz
+	QUULVUXwE75UmHFG6YjDkyNDD20Pup0SoBVe0VufveyJjKYoW0p6XZppTSpdb6+ECYPrrfHO/uX
+	rg/Zv0h3agwjFH7wWighYTCcPzQDLnXPntZcqU8J/JVnyeuWSkBT4cfhfL7zcsdNRCQ6pRrHO8o
+	HHBy6s3jD66xjOtq/N5wKgt3j6ZoFu2e1x6ldUf0XZKgNljwoX+iSMnAAXOFewniYhpJO6zK8Ry
+	oOYwKFcxXY0JCmlEUjZUPJUbQ75xGMMsLXVdwIRhgM5lJpZ8AHN4kah8Dhknmt65lvlmU60F3Ps
+	3e/uLDEz4Hp1l7fIDJHQSQskZfG2IZlu6ZwjS4RjEwPVUerdsbYby/5sjGimasWS/OjE/ycuoEs
+	ARr4Dg6j/v5K5xYs+jm8DlW3moJIUy
+X-Received: by 2002:a05:600c:4fc9:b0:45b:7d77:b592 with SMTP id 5b1f17b1804b1-4778704a06fmr22996155e9.12.1762945312921;
+        Wed, 12 Nov 2025 03:01:52 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFXRgReKc50wSF4ICL66IGbn/jrWNevyyfHDJ6IgSi6BNsvLdnT/6VUyKWvleSg4ag9ik+zfg==
+X-Received: by 2002:a05:600c:4fc9:b0:45b:7d77:b592 with SMTP id 5b1f17b1804b1-4778704a06fmr22995785e9.12.1762945312413;
+        Wed, 12 Nov 2025 03:01:52 -0800 (PST)
+Received: from ?IPV6:2003:cc:9f0f:f0f1:37d7:b7e5:eda1:1fa0? (p200300cc9f0ff0f137d7b7e5eda11fa0.dip0.t-ipconnect.de. [2003:cc:9f0f:f0f1:37d7:b7e5:eda1:1fa0])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47787e2ad4csm29921335e9.1.2025.11.12.03.01.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Nov 2025 03:01:51 -0800 (PST)
+Message-ID: <4cb6fcd6-4e0f-47eb-a826-c1af712d33ab@redhat.com>
+Date: Wed, 12 Nov 2025 12:01:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 2/2] hsr: Follow standard for HSRv0 supervision frames
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, liuhangbin@gmail.com,
+ m-karicheri2@ti.com, arvid.brodin@alten.se
+References: <cover.1762876095.git.fmaurer@redhat.com>
+ <ea0d5133cd593856b2fa673d6e2067bf1d4d1794.1762876095.git.fmaurer@redhat.com>
+ <20251112102405.8xxcDBuT@linutronix.de>
+Content-Language: en-US
+From: Felix Maurer <fmaurer@redhat.com>
+In-Reply-To: <20251112102405.8xxcDBuT@linutronix.de>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-A reproducible rcuref - imbalanced put() warning is observed under
-IPv6 L2TP (pppol2tp) traffic with blackhole routes, indicating an
-imbalance in dst reference counting for routes cached in
-sk->sk_dst_cache and pointing to a subtle lifetime/synchronization
-issue between the helpers that validate and drop cached dst entries.
+On 12.11.25 11:24, Sebastian Andrzej Siewior wrote:
+> On 2025-11-11 17:29:33 [+0100], Felix Maurer wrote:
+>> For HSRv0, the path_id has the following meaning:
+>> - 0000: PRP supervision frame
+>> - 0001-1001: HSR ring identifier
+>> - 1010-1011: Frames from PRP network (A/B, with RedBoxes)
+>> - 1111: HSR supervision frame
+> 
+> Where do you have this from?
+> I have here IEC 62439-3:2021 (Edition 4.0 2021-12).
+> From the 4 bits of path_id, the three most significant bits are NetId
+> with 0 for HSR and 1 to 6 for the PTP network and 7 reserved.
+> The list significant bit for PRP indicates Redbox A/B while for HSR it
+> indicates port A/B.
+> 
+> You say HSRv0 while I don't see this mentioned at all. And you limit the
+> change to prot_version == 0. So maybe this was once and removed from the
+> standard.
 
-rcuref - imbalanced put()
-WARNING: CPU: 0 PID: 899 at lib/rcuref.c:266 rcuref_put_slowpath+0x1ce/0x240 lib/rcuref.c:266
-Modules linked in:
-CPSocket connected tcp:127.0.0.1:48148,server=on <-> 127.0.0.1:33750
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-RIP: 0010:rcuref_put_slowpath+0x1ce/0x240 lib/rcuref.c:266
+My description for the path_id is from IEC 62439-3:2010. As far as I
+know, the HSRv0/HSRv1 terminology is only used in the kernel. AFAIK, our
+version 0/1 refers to the value in the SupVersion field of the HSR
+supervision frames. The SupVersion is defined as 0 in IEC 62439-3:2010
+and defined as 1 in IEC 62439-3:2012 and following.
 
-Call Trace:
- <TASK>
- __rcuref_put include/linux/rcuref.h:97 [inline]
- rcuref_put include/linux/rcuref.h:153 [inline]
- dst_release+0x291/0x310 net/core/dst.c:167
- __sk_dst_check+0x2d4/0x350 net/core/sock.c:604
- __inet6_csk_dst_check net/ipv6/inet6_connection_sock.c:76 [inline]
- inet6_csk_route_socket+0x6ed/0x10c0 net/ipv6/inet6_connection_sock.c:104
- inet6_csk_xmit+0x12f/0x740 net/ipv6/inet6_connection_sock.c:121
- l2tp_xmit_queue net/l2tp/l2tp_core.c:1214 [inline]
- l2tp_xmit_core net/l2tp/l2tp_core.c:1309 [inline]
- l2tp_xmit_skb+0x1404/0x1910 net/l2tp/l2tp_core.c:1325
- pppol2tp_sendmsg+0x3ca/0x550 net/l2tp/l2tp_ppp.c:302
- sock_sendmsg_nosec net/socket.c:729 [inline]
- __sock_sendmsg net/socket.c:744 [inline]
- ____sys_sendmsg+0xab2/0xc70 net/socket.c:2609
- ___sys_sendmsg+0x11d/0x1c0 net/socket.c:2663
- __sys_sendmmsg+0x188/0x450 net/socket.c:2749
- __do_sys_sendmmsg net/socket.c:2778 [inline]
- __se_sys_sendmmsg net/socket.c:2775 [inline]
- __x64_sys_sendmmsg+0x98/0x100 net/socket.c:2775
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x64/0x140 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
-RIP: 0033:0x7fe6960ec719
- </TASK>
+The definition for the SupVersion field also states: "Implementation of
+version X of the protocol shall interpret [...] version <=X frames
+exactly as specified for the version concerned." (in IEC
+62439-3:{2010,2012,2016,2021})
 
-The race occurs between the lockless UDPv6 transmit path
-(udpv6_sendmsg() -> sk_dst_check()) and the locked L2TP/pppol2tp
-transmit path (pppol2tp_sendmsg() -> l2tp_xmit_skb() ->
-... -> inet6_csk_xmit() → __sk_dst_check()), when both handle
-the same obsolete dst from sk->sk_dst_cache: the UDPv6 side takes
-an extra reference and atomically steals and releases the cached
-dst, while the L2TP side, using a stale cached pointer, still
-calls dst_release() on it, and together these updates produce
-an extra final dst_release() on that dst, triggering
-rcuref - imbalanced put().
+I read from this that if we implement HSRv0 we should follow the latest
+specification for this version, i.e., the latest specification with
+SupVersion defined as 0 (which would be IEC 62439-3:2010). This is also
+why I limited the change to prot_version == 0 (maybe we should have some
+helpers like hsr_is_v{0,1}() to make these conditions a bit more self
+explanatory).
 
-The Race Condition:
+> Since this is limited to v0:
+> Reviewed-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
-Initial:
-  sk->sk_dst_cache = dst
-  ref(dst) = 1   
-
-Thread 1: sk_dst_check()                Thread 2: __sk_dst_check()
-------------------------               ----------------------------
-sk_dst_get(sk):
-  rcu_read_lock()
-  dst = rcu_dereference(sk->sk_dst_cache)
-  rcuref_get(dst) succeeds
-  rcu_read_unlock()
-  // ref = 2  
-
-                                            dst = __sk_dst_get(sk)
-                                    // reads same dst from sk_dst_cache
-                                    // ref still = 2 (no extra get)
-
-[both see dst obsolete & check() == NULL]
-
-sk_dst_reset(sk):
-  old = xchg(&sk->sk_dst_cache, NULL)
-    // old = dst
-  dst_release(old)
-    // drop cached ref
-    // ref: 2 -> 1 
-
-                                  RCU_INIT_POINTER(sk->sk_dst_cache, NULL)
-                                  // cache already NULL after xchg
-                                            dst_release(dst)
-                                              // ref: 1 -> 0
-
-  dst_release(dst)
-  // tries to drop its own ref after final put
-  // rcuref_put_slowpath() -> "rcuref - imbalanced put()"
-
-Fix this by making the locked __sk_dst_check() use the same “steal
-from sk->sk_dst_cache” pattern as the lockless path: instead of
-clearing the cache and releasing a potentially stale local dst,
-it atomically exchanges sk->sk_dst_cache with NULL and only calls
-dst_release() on the pointer returned from that exchange. This
-guarantees that, for any given cached dst, at most one of the
-competing helpers (sk_dst_check() or __sk_dst_check()) can acquire
-and drop the cache-owned reference, so they can no longer
-double-release the same entry; the atomic operation runs only in the
-obsolete path and should not affect the main path.
-
-Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
-
-Fixes: d14730b8e911 ("ipv6: use RCU in inet6_csk_xmit()")
-Signed-off-by: Mikhail Lobanov <m.lobanov@rosa.ru>
----
- net/core/sock.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/net/core/sock.c b/net/core/sock.c
-index dc03d4b5909a..7f356f976627 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -607,14 +607,15 @@ INDIRECT_CALLABLE_DECLARE(struct dst_entry *ipv4_dst_check(struct dst_entry *,
- struct dst_entry *__sk_dst_check(struct sock *sk, u32 cookie)
- {
- 	struct dst_entry *dst = __sk_dst_get(sk);
-+	struct dst_entry *old_dst;
- 
- 	if (dst && READ_ONCE(dst->obsolete) &&
- 	    INDIRECT_CALL_INET(dst->ops->check, ip6_dst_check, ipv4_dst_check,
- 			       dst, cookie) == NULL) {
- 		sk_tx_queue_clear(sk);
- 		WRITE_ONCE(sk->sk_dst_pending_confirm, 0);
--		RCU_INIT_POINTER(sk->sk_dst_cache, NULL);
--		dst_release(dst);
-+		old_dst = unrcu_pointer(xchg(&sk->sk_dst_cache, RCU_INITIALIZER(NULL)));
-+		dst_release(old_dst);
- 		return NULL;
- 	}
- 
--- 
-2.47.2
+Thanks,
+   Felix
 
 
