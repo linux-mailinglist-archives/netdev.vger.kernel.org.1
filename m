@@ -1,252 +1,239 @@
-Return-Path: <netdev+bounces-237831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 228F7C50AA3
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 07:01:18 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id C28FCC50A91
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 07:00:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 677A33B5198
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 06:01:02 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id A25334E34DF
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 06:00:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BFDF2D5A14;
-	Wed, 12 Nov 2025 06:01:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CDD1277023;
+	Wed, 12 Nov 2025 06:00:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Bbm6mPuy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg150.qq.com (smtpbg150.qq.com [18.132.163.193])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FFCF15D1
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 06:00:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.132.163.193
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762927260; cv=none; b=GKPnN0unJoGLnQ3Eh5rU34pzPMLMxTlMHskXn7aSSwAjmg0oxgaXZ58DAQkpYMe8RfBh8o7hBb9PXT4eXph3qcpZKMX4J25ElG7nubxFyD6NjUmXBWz9MOxFS+JISaD3nxZrc3402Ju99YVTnjGs71E2j3NzPBUmSHQTCwMdIKY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762927260; c=relaxed/simple;
-	bh=GxJUactct2dIKP0grOK2LnNcokr5mn86Q7N5+YCYco0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GaDfdvxs532uuOjuTjVNvXElNa9WBgMAL2x7nDfBIcgGzubpbrw9Q/QVAvchNbKKVMDxojn1HJekboQEHc2XpGE9cNZBId/zuOktqXfoCU1TOshjdi3VfBKUP9BoZCXieOgb+y7VxE2/bAp57x/6J5ReAMmS4MXtuvFwg5LAzhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=18.132.163.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: zesmtpgz9t1762927142t6a933574
-X-QQ-Originating-IP: 8LnMsNR/hAokFugCTvoCg6WUANtdn8Brke8nm9DeLBM=
-Received: from lap-jiawenwu.trustnetic.com ( [115.200.224.204])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 12 Nov 2025 13:59:00 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 0
-X-BIZMAIL-ID: 2237260100047043363
-EX-QQ-RecipientCnt: 12
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: netdev@vger.kernel.org,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Simon Horman <horms@kernel.org>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net-next 5/5] net: txgbe: support getting module EEPROM by page
-Date: Wed, 12 Nov 2025 13:58:41 +0800
-Message-Id: <20251112055841.22984-6-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.21.0.windows.1
-In-Reply-To: <20251112055841.22984-1-jiawenwu@trustnetic.com>
-References: <20251112055841.22984-1-jiawenwu@trustnetic.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FD472DC78F;
+	Wed, 12 Nov 2025 06:00:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762927215; cv=fail; b=aGE/DWx/0PPEt0CC4acOUmnCOyci/dSR00LWVWHLTrQBLm9gMv36I7TAR9F/7WFWUi0SG8mRDcWP/yfbH7Un+wDeAE0ZkmKOIGITPVq2kbTJAsfl7uJHBOS7eerIiDkXt7c+1dH6zPt/MAL7q7rfMPMo7/4DVZspY6aZRW4+PI4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762927215; c=relaxed/simple;
+	bh=k3MwpVBL0daMhBLnbHi8++1ZT4JJ1A5mk8zu7CytfqE=;
+	h=Date:From:To:CC:Subject:Message-ID:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=eFXBi8CHMb6yY7DkbTfVM5j4nPPY42GODErTfCl9xBEpI1hUHsH81beLKH3VCk5/WQu7Szw9K5OYF/ejzW1fgFL22Etj44Gd5h5B6e1UJ2WiDb9nnPqXHq2sUKWh5H5gjUSCxHH/dnxOvP7l9i8rfi/rQsfOrwByLZNGh6c0o4c=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Bbm6mPuy; arc=fail smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1762927213; x=1794463213;
+  h=date:from:to:cc:subject:message-id:in-reply-to:
+   mime-version;
+  bh=k3MwpVBL0daMhBLnbHi8++1ZT4JJ1A5mk8zu7CytfqE=;
+  b=Bbm6mPuyekyZfyTMSR+5CqAAJFrp2R8nyhRE3Y+q7QTRX1LD/5AYiNxt
+   6iJ1qpOPnpKcaiFyG1//N24Ew/w365EY1XKjRLc7Z+/y/OQGQhqaux/TE
+   nGn/jvehU5TYMzPXEDRmDERjuvnZDahOkrMxeqZPq+9shOgwbVF2+oxNC
+   kiZX6EEFTlE4nOJXe2Fobj/jerNg+aA8+s/e/2Ov8TT984E4GtrjDRx1s
+   UlshsUjuxxEaqy0bpxijWKAMXu7055TrD1fUizuKSgrneIMjOShLFV8Uy
+   MEDsvaSsvW2TxDCFpjEKj6YlWeYYz4OHYGytEJE7jEWI2+09m3ofMzP8c
+   A==;
+X-CSE-ConnectionGUID: vkoOAx/NQXSCP3V4MrCHEQ==
+X-CSE-MsgGUID: a7b3gvCVTWWQzelKJGncAg==
+X-IronPort-AV: E=McAfee;i="6800,10657,11531"; a="64919700"
+X-IronPort-AV: E=Sophos;i="6.17,312,1747724400"; 
+   d="scan'208";a="64919700"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2025 22:00:08 -0800
+X-CSE-ConnectionGUID: KWWmdLyPR6G0XvzPx6HfIw==
+X-CSE-MsgGUID: 5zK9TzYRTj6cwr1Ve4zIKQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.19,298,1754982000"; 
+   d="scan'208";a="188393706"
+Received: from orsmsx901.amr.corp.intel.com ([10.22.229.23])
+  by orviesa006.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Nov 2025 22:00:04 -0800
+Received: from ORSMSX901.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Tue, 11 Nov 2025 22:00:04 -0800
+Received: from ORSEDG901.ED.cps.intel.com (10.7.248.11) by
+ ORSMSX901.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27 via Frontend Transport; Tue, 11 Nov 2025 22:00:04 -0800
+Received: from BYAPR05CU005.outbound.protection.outlook.com (52.101.85.33) by
+ edgegateway.intel.com (134.134.137.111) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.2562.27; Tue, 11 Nov 2025 22:00:04 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=nroZ7kVNIT1qMBvzGMeCgXUY63FzaGpk/WeOmfETqvu/HmzDVC7sx7ghwc3BT3uQR3aBu5eL/yrnD8t9l23/rRuldqNcRrTGEXNkT8jePxmZXCZJ8AtyRAvfoZopF5szZBo7lHa7OMXWZBZ8cwk/BecQwa52stVPS0BDIgHbtxXsA2+qxrJbxTGesw+k6RmGqYFtmkP5ls/xoNFuWnovEx17gKmXtOveGnh48z52iEy7JHEZa6+Qob476ce337KPSMNB+rLANKoy80cfqB5tj7r/IPx2URW4nJeUWAf9Ld3DXb/vJXUwksb4IyfAaelazZ4KYJYcffXAWImH+/UjxQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BFSIsiYMBKo96/Ep69Noz+GKnkM9anDv4rTE9Mp1WRg=;
+ b=qEXvXPtbkwcdAOZups0cAv4CKrjjDp3v20CRPrHiGLCKHpV5S9jeokqITekxg4EJ6Cx+FRseuRQgyOt8cStpcVvboqJCkKSpBudxeOymPOCoK/Qnr8c/CR3gahDAQ9OdxmI+gXJFngMafXaGcnkos7IZCG+6x55Wtn+y/uJkSiNV+W3uXo5ndtFOZqvm3SDTRs46byUVkeEqdwbkUpFlZpCCnCo9osJoGaoq9i0JwU6obRTejKRq3gv+J/SCNJO/TeNg/YxSs6Up7UUQa5GfUL2cH17STu979Vmgu9IU35CXDnxxeTbRCZ6ukfkshLOsSPQX2GT+CtIpOf8EjF6bgw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from LV3PR11MB8603.namprd11.prod.outlook.com (2603:10b6:408:1b6::9)
+ by MW4PR11MB6690.namprd11.prod.outlook.com (2603:10b6:303:1e8::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.15; Wed, 12 Nov
+ 2025 06:00:02 +0000
+Received: from LV3PR11MB8603.namprd11.prod.outlook.com
+ ([fe80::4622:29cf:32b:7e5c]) by LV3PR11MB8603.namprd11.prod.outlook.com
+ ([fe80::4622:29cf:32b:7e5c%5]) with mapi id 15.20.9320.013; Wed, 12 Nov 2025
+ 06:00:02 +0000
+Date: Wed, 12 Nov 2025 13:59:49 +0800
+From: kernel test robot <oliver.sang@intel.com>
+To: Ma Ke <make24@iscas.ac.cn>
+CC: <oe-lkp@lists.linux.dev>, <lkp@intel.com>, <netdev@vger.kernel.org>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <horms@kernel.org>, <sdf@fomichev.me>,
+	<atenart@kernel.org>, <kuniyu@google.com>, <yajun.deng@linux.dev>,
+	<gregkh@suse.de>, <ebiederm@xmission.com>, <linux-kernel@vger.kernel.org>,
+	<akpm@linux-foundation.org>, Ma Ke <make24@iscas.ac.cn>,
+	<stable@vger.kernel.org>, <oliver.sang@intel.com>
+Subject: Re: [PATCH] net: Fix error handling in netdev_register_kobject
+Message-ID: <202511121347.b3f6c2a3-lkp@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20251107080117.15099-1-make24@iscas.ac.cn>
+X-ClientProxiedBy: SG2PR02CA0126.apcprd02.prod.outlook.com
+ (2603:1096:4:188::11) To LV3PR11MB8603.namprd11.prod.outlook.com
+ (2603:10b6:408:1b6::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: zesmtpgz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz6b-0
-X-QQ-XMAILINFO: MYcyYH/A/+tC0q64et/8mKSmjDewIRDAL5uQz8/tw2PyaeMNCDAhTTc5
-	Y0K/AmRtPkFzmUm3cQiU5nhPjU4hj+S6crk+YIcjjf1pFOKLKC2Cm7ZUfRjGoHFNUJRU18y
-	wGuvHo/Z/02AhRB8E9X4w00EnOmPOfxTtZfzFLA25Zn/uoEqH01hNy2S2RDxruRRnGoxEL/
-	pPuzHuKLAE36rxEXzYhKXE4lkloxHmCHudYHor+1e1G4XudqWyNMWcEV9OKEtLMXU/yBD8c
-	MlB3QGVBoK2vUZNDudHq4/cmD64zcYmuQPf7ZQibIaJUKqV9ULUQqNmN33fow5KYVA8MObc
-	5KcyJ/Pkfz28+gLf642qHthVfzm69d6I9bu7cKRuZNR9HRScJyHhqdIM5qsQpTuk55KuzXc
-	4yvt2AofPhXCv3lxPGRp9nVVka72jj8qzaIpGCSUTHAfFI+LtjSpmb1owXV4MF8r+f84DXU
-	edfo3AgcC79gNc3puAshyalvtI9W3jxICEYkOmbHPwn6UPAjphrJ5IL99T6zhFy4yh4MGbV
-	9yvdCaNUc2OpZjdI9uwY9S4PDjJHSMAe//Iu15ISakD9Nc8ZX7/9z0ozVbfiUSDmWPgimG0
-	jOtxGY/VXJ0g32VztlX8nnTMeZL60M4/vp6CBI5PP3p+EaCMnhCb3R0ERy/NNKVKNR1CQtp
-	KjxGgIIlHK+zTPUdyIe815I83EHw/OEmAFFhxjT1K7OwrzoQnYxiqvwnHCZijV018SBVIPV
-	kydx4RLIC+z6YwWaCI6sqEd84SYJEpL8JPPVLD+OABeisbUCOTIMuvTIcdUYuEC2gHufSYY
-	B/+ZWKPDAcBv2It0rggMj5m79c4IUSEgzaCuna4M+rZIOIDSXKUUo4OxJqv9H/+7FHR68tS
-	sFQtFbhKfeEj4+P+R8BfUUPHqbb6vzqKpRULgfJEw7mWRoJbhqX2dewyUvMbKkxd4S6LHXr
-	zMMBngvycdy+yc2LWiXfBa13cOcRPWyz9yvKuc1XbP+oAcHcXnkbPUBs2m8WzIDydvgA3wD
-	kDG8cMaXFIsEi5e391XvkscmC78RDIrkAAcSRawo8RfAgThsFnrY/LWTf+LLBG27WQjbMaH
-	ufKf1cqlsoXPriQiueFZTs=
-X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
-X-QQ-RECHKSPAM: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV3PR11MB8603:EE_|MW4PR11MB6690:EE_
+X-MS-Office365-Filtering-Correlation-Id: ea82fba9-9312-4ad3-e139-08de21b0b813
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014|7053199007;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?aPZTAvMJT8mlMmxLKlDRpwqzk+n6cvJKa1ZLoksltIrj0acRamuJzdf2muV5?=
+ =?us-ascii?Q?LMyqASdA48CxqdLgcuWRay+6RRVVwkfOsfppxfr6Jple0AIUDSsPBPDe3Syc?=
+ =?us-ascii?Q?Ixl3es2VMzvG4D5FrYf6GLORzZWFKTPC5IucmHNVkLiSKLInHd+dt2JzZb2r?=
+ =?us-ascii?Q?zaJVWdDrIq03yvfHcBc2tZJ05lKEx4IEpXU9eXxcroyn4DqRnqxRp5nWyjNP?=
+ =?us-ascii?Q?inSE8VKtV7t2TKM0xErSPkcOM7N4fSTgk6k/dunMCJlsCJqe1ji929zT5Eb7?=
+ =?us-ascii?Q?hoF9/XJxzwKBWVfH/VLiw+DdPOFNjzwhyf/MwNrB9krnLz/JMrziZo0kRqz7?=
+ =?us-ascii?Q?gbkuEK7XRSaujxkKQtbIXmFJm+UuE0Wm9cZtuQNZgM+gfuk7S8bIKsBX3UmC?=
+ =?us-ascii?Q?9jiSns+QnD38oK3H3O5/5rNfS7LTU7RMHafkeb6wwBPIN3SngpeprXCcUAhO?=
+ =?us-ascii?Q?WKZKPROAUbm/FiCTL1wLf6HtuIxPMnjXSgTUZbR6813FBFs+0+eGbyu3GBv1?=
+ =?us-ascii?Q?i1qNNJFmcVrtFXts7VZbB3mSBUMO7c21ctisXCrDP0MpY7OqziK5SAe5ez6X?=
+ =?us-ascii?Q?1FnVFgZwfDU2KVCJz0Eaf2f3hdkTfck0QC0i8tYTepeSucY+22RKsWqk6Rqb?=
+ =?us-ascii?Q?2jDBAGAPt+/kV5sN3mrQlbFkKEUiSSYpznqC3kmfnPxAygTBwC/kb0+669RQ?=
+ =?us-ascii?Q?aLkqNWgD5Xl8bMIJOrLyewwlc8WGZJAGb3sJwl/mUTXXDqRXd4YPlds34ztP?=
+ =?us-ascii?Q?8A99ZcJEYUUVwb5bQWgaNHBgfzt8+Tdf/fCR/u1tgpPsUtRIZjsqVd2HA4HD?=
+ =?us-ascii?Q?PH/YRok5OCCKt+dOBjYe+m/PYcSAYVxMTILDq0CBjqdh5YLudgET1+dMxARo?=
+ =?us-ascii?Q?dMZK+sI/19LnyhsoMCl5k2Qz4owRZExelHsODdQjtYvkVFh+ecT0Lbn0/hoX?=
+ =?us-ascii?Q?27uhn+ShK6HPJdfdq9kGsItp/5X9UTx+5VlxHqDazP+VpNpLX4Z2Pagrdhbn?=
+ =?us-ascii?Q?cQ6J7DUR7TUh4/6sgkP9ExKpodAOKPOPgF9zQp/t27zeQQKx45LgYmf3SYZ1?=
+ =?us-ascii?Q?/0LQx2anSglETPl6A0d4CufTOqOQjlyWeJ6pT/0ebx6IbSh/KddMzzUXCsOB?=
+ =?us-ascii?Q?inl82LfcEfyrhWyNOyU4Fo1mRMKwXnNfHc1qLFF5r8vH6JaeRArY1bKb4zTT?=
+ =?us-ascii?Q?GjICN/+oRpTtqzQVTvi2qpmeVhhLlD6H7zV6dOZsiDzDgCDYR19tvzWS0eWO?=
+ =?us-ascii?Q?PXjhTHrSkx3+7lOjBF3zWgKxWc2t/8jiFSIxHIPMT+alAlWeyMKZFpj8KNI3?=
+ =?us-ascii?Q?INIX994tnnQ/crytCSFPnaqDqUM0KVBjtBSztLcVyqbVbsaMWBb+jgKaX8fy?=
+ =?us-ascii?Q?CgLS+74ocUemkGsIycMndxYp4vgigWhsZRnOAV+pcfw8XXkktw=3D=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV3PR11MB8603.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?G5IrA8JpVmhUFOY1HgqI7eRNJG85kt4BZBwF2bhbF3W0w0g2u2tlIRJ+uJ1X?=
+ =?us-ascii?Q?YgJ72CwBgwcr675oaNWzPSiftMSoTn3kdSIB6Dp25+lo6qGcqO74fou94rgT?=
+ =?us-ascii?Q?NHjeVaFNEikXf/95OFmSFkBWPxZRT29mrIg6xSnl/BHOsRuLGMPmbUmRrKFx?=
+ =?us-ascii?Q?w1z0g5mQcCcQFcikGrESQ96ATKe8vqu/U43UPqD7p9twhQbbDav3VFA8nsaO?=
+ =?us-ascii?Q?6rvuJNIrTs2JKov/jotLty/3ScxXLfq9l9A8j2D/q+GYHhn5UjNU+1IuEdCN?=
+ =?us-ascii?Q?p+P6XJiP/ssTKidbAPirKlNKrKp0vsFeNm9Tbh7MBq4YBtEJo8aoDvFtwFRm?=
+ =?us-ascii?Q?GxDrc5q3U5JI7u/BEf8ICXs+jgXL8wKxkwpDz3lle+RrG05BYK35U4r6uAyt?=
+ =?us-ascii?Q?s8zFdG0qbhYUrultyL1p4IHUZnwwUDP+TnLzKYnSq0gmPEWjWSBXqjxuyVVV?=
+ =?us-ascii?Q?2L4fwSGMm8U2AxFL5nS/DavFLKiQPirHvUepyWk97uCqRtslInGH11GJPFhY?=
+ =?us-ascii?Q?s/0FJskikKiaUhUVHxwfMM7t0EnC8L5m6j3e0HTw5w1A1JFHncQWcTTeORk2?=
+ =?us-ascii?Q?O4PjwXqpTcGwcZwZdU51ExPOUFKHIv6TGQiyKg8Rxyhm2kodfE9kMXkUVGjg?=
+ =?us-ascii?Q?fAKlBWn2hNpJcv5MZe/VnkH3lzpCUHjvbAqPtJg88WR9lmO1As9YS9ZvvVID?=
+ =?us-ascii?Q?xx5pGGmlq0pu7Wlyu81Jf9nw9vH+wVkwnlNUCYDcmd6he8s79gQu+eWOuPjW?=
+ =?us-ascii?Q?PbUQV0AvQ6tgTBIngXoXArm4fj1WPwh0jDYPoT8MDIFeyZ1PmemKNshi1J+P?=
+ =?us-ascii?Q?q5aiWZel29lRoIaUGdnM18exJmBBPF25qGaqLQtr9P+juB23AeqPSF5p9kv7?=
+ =?us-ascii?Q?8DLR6okyjQO4W7p4MjboSfV7v6fVFi6Z1fhBGVjrSK3npycQOrgolLAch89X?=
+ =?us-ascii?Q?rWHktBkdlKMhuzYC8qDPERXoC82+wVMe9GbpLj1KUjFPgnrfzQhBSsnXNVBf?=
+ =?us-ascii?Q?iy/ODhY4rTIFS3TTv1VodrXj6cKWCMxr82pPsNxZak/qC9Zn8rYKHlo7FqfM?=
+ =?us-ascii?Q?xQcwx7gqA57ZFcbpAMyML/h+irAVL8CH+KYz/DtiDLkayfC98Immd0zAcyEe?=
+ =?us-ascii?Q?jbjWjrrifqJAx7wOzMdDQiudNVyBIFY/ZHR7cRWmKNR2oFyUMZ4yFgZYq7/M?=
+ =?us-ascii?Q?TqiXQELNGnlGspnEj0PwIIQQ1haNskQpuh20TT4/jKqmVrlj7hkLDwkqR97Y?=
+ =?us-ascii?Q?Srn2aHBVSNF06oYZbgOpZ73L56S2r6Uywbp47QrVDIxYOquDxEozCvhS8OV5?=
+ =?us-ascii?Q?PKkim/dwaRbfYfT/ZNo0NfKADTMmu3FNiP6Vx89ywt5yUoldMyZwjotpVEKP?=
+ =?us-ascii?Q?yzsiDEN53K1fA00lIAPFLXAOjtjarbMlaAdxYUxtxgBmH7mVK2vPrBz7RIx1?=
+ =?us-ascii?Q?+5oLw7Av3q6GjfOKgGUD/O64HjjoTXdoOtVPznPOnkASs4z9xQ7xQT3XpeHE?=
+ =?us-ascii?Q?nE1fE+9ZUGUGkQa7xlygmUaMbOq0W/orfkK5fT+aTxRoA7ZEN4D6wPOILCgy?=
+ =?us-ascii?Q?nTe7N1FJhPIBomJ5mJ8zlJPrKvrtx5XnGxhpPRkUPfER3u9ibwml2u1NfdAD?=
+ =?us-ascii?Q?jQ=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: ea82fba9-9312-4ad3-e139-08de21b0b813
+X-MS-Exchange-CrossTenant-AuthSource: LV3PR11MB8603.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Nov 2025 06:00:02.1797
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: GoRqYpBGMcZSyXs0mriyLD5EflHVcS30h0sDHERcBtbJ6DxjCnL2i/eleR2iFKWgH3I9YXp+UTevVb+C1TsBxg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB6690
+X-OriginatorOrg: intel.com
 
-Getting module EEPROM has been supported in TXGBE SP devices, since SFP
-driver has already implemented it.
 
-Now add support to read module EEPROM for AML devices. Towards this, add
-a new firmware mailbox command to get the page data.
+Hello,
 
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
----
- .../net/ethernet/wangxun/txgbe/txgbe_aml.c    | 37 +++++++++++++++++++
- .../net/ethernet/wangxun/txgbe/txgbe_aml.h    |  3 ++
- .../ethernet/wangxun/txgbe/txgbe_ethtool.c    | 30 +++++++++++++++
- .../net/ethernet/wangxun/txgbe/txgbe_type.h   | 11 ++++++
- 4 files changed, 81 insertions(+)
+kernel test robot noticed "BUG_kmalloc-#k:Object_corrupt" on:
 
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
-index 3b6ea456fbf7..12900abfa91a 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.c
-@@ -73,6 +73,43 @@ int txgbe_test_hostif(struct wx *wx)
- 					WX_HI_COMMAND_TIMEOUT, true);
- }
- 
-+int txgbe_read_eeprom_hostif(struct wx *wx,
-+			     struct txgbe_hic_i2c_read *buffer,
-+			     u32 length, u8 *data)
-+{
-+	u32 buf_size = sizeof(struct txgbe_hic_i2c_read) - sizeof(u8);
-+	u32 total_len = buf_size + length;
-+	u32 dword_len, value, i;
-+	u8 local_data[256];
-+	int err;
-+
-+	if (total_len > sizeof(local_data))
-+		return -EINVAL;
-+
-+	buffer->hdr.cmd = FW_READ_EEPROM_CMD;
-+	buffer->hdr.buf_len = sizeof(struct txgbe_hic_i2c_read) -
-+			      sizeof(struct wx_hic_hdr);
-+	buffer->hdr.cmd_or_resp.cmd_resv = FW_CEM_CMD_RESERVED;
-+
-+	err = wx_host_interface_command(wx, (u32 *)buffer,
-+					sizeof(struct txgbe_hic_i2c_read),
-+					WX_HI_COMMAND_TIMEOUT, false);
-+	if (err != 0)
-+		return err;
-+
-+	dword_len = (total_len + 3) / 4;
-+
-+	for (i = 0; i < dword_len; i++) {
-+		value = rd32a(wx, WX_FW2SW_MBOX, i);
-+		le32_to_cpus(&value);
-+
-+		memcpy(&local_data[i * 4], &value, 4);
-+	}
-+
-+	memcpy(data, &local_data[buf_size], length);
-+	return 0;
-+}
-+
- static int txgbe_identify_module_hostif(struct wx *wx,
- 					struct txgbe_hic_get_module_info *buffer)
- {
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.h
-index 7c8fa48e68d3..4f6df0ee860b 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.h
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_aml.h
-@@ -7,6 +7,9 @@
- void txgbe_gpio_init_aml(struct wx *wx);
- irqreturn_t txgbe_gpio_irq_handler_aml(int irq, void *data);
- int txgbe_test_hostif(struct wx *wx);
-+int txgbe_read_eeprom_hostif(struct wx *wx,
-+			     struct txgbe_hic_i2c_read *buffer,
-+			     u32 length, u8 *data);
- int txgbe_set_phy_link(struct wx *wx);
- int txgbe_identify_module(struct wx *wx);
- void txgbe_setup_link(struct wx *wx);
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-index f553ec5f8238..1f60121fe73c 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
-@@ -10,6 +10,7 @@
- #include "../libwx/wx_lib.h"
- #include "txgbe_type.h"
- #include "txgbe_fdir.h"
-+#include "txgbe_aml.h"
- #include "txgbe_ethtool.h"
- 
- int txgbe_get_link_ksettings(struct net_device *netdev,
-@@ -534,6 +535,34 @@ static int txgbe_set_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd)
- 	return ret;
- }
- 
-+static int
-+txgbe_get_module_eeprom_by_page(struct net_device *netdev,
-+				const struct ethtool_module_eeprom *page_data,
-+				struct netlink_ext_ack *extack)
-+{
-+	struct wx *wx = netdev_priv(netdev);
-+	struct txgbe_hic_i2c_read buffer;
-+	int err;
-+
-+	if (!test_bit(WX_FLAG_SWFW_RING, wx->flags))
-+		return -EOPNOTSUPP;
-+
-+	buffer.length = (__force u32)cpu_to_be32(page_data->length);
-+	buffer.offset = (__force u32)cpu_to_be32(page_data->offset);
-+	buffer.page = page_data->page;
-+	buffer.bank = page_data->bank;
-+	buffer.i2c_address = page_data->i2c_address;
-+
-+	err = txgbe_read_eeprom_hostif(wx, &buffer, page_data->length,
-+				       page_data->data);
-+	if (err) {
-+		wx_err(wx, "Failed to read module EEPROM\n");
-+		return err;
-+	}
-+
-+	return page_data->length;
-+}
-+
- static const struct ethtool_ops txgbe_ethtool_ops = {
- 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
- 				     ETHTOOL_COALESCE_TX_MAX_FRAMES_IRQ |
-@@ -568,6 +597,7 @@ static const struct ethtool_ops txgbe_ethtool_ops = {
- 	.set_msglevel		= wx_set_msglevel,
- 	.get_ts_info		= wx_get_ts_info,
- 	.get_ts_stats		= wx_get_ptp_stats,
-+	.get_module_eeprom_by_page	= txgbe_get_module_eeprom_by_page,
- };
- 
- void txgbe_set_ethtool_ops(struct net_device *netdev)
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-index e72edb9ef084..3d1bec39d74c 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-@@ -353,6 +353,7 @@ void txgbe_do_reset(struct net_device *netdev);
- #define FW_PHY_GET_LINK_CMD             0xC0
- #define FW_PHY_SET_LINK_CMD             0xC1
- #define FW_GET_MODULE_INFO_CMD          0xC5
-+#define FW_READ_EEPROM_CMD              0xC6
- 
- struct txgbe_sff_id {
- 	u8 identifier;		/* A0H 0x00 */
-@@ -394,6 +395,16 @@ struct txgbe_hic_ephy_getlink {
- 	u8 resv[6];
- };
- 
-+struct txgbe_hic_i2c_read {
-+	struct wx_hic_hdr hdr;
-+	u32 offset;
-+	u32 length;
-+	u8 page;
-+	u8 bank;
-+	u8 i2c_address;
-+	u8 data;
-+};
-+
- #define NODE_PROP(_NAME, _PROP)			\
- 	(const struct software_node) {		\
- 		.name = _NAME,			\
+commit: 6e383382971f4573e29f0e85c6e5667c8f5f46d6 ("[PATCH] net: Fix error handling in netdev_register_kobject")
+url: https://github.com/intel-lab-lkp/linux/commits/Ma-Ke/net-Fix-error-handling-in-netdev_register_kobject/20251107-160348
+base: https://git.kernel.org/cgit/linux/kernel/git/davem/net-next.git 6fc33710cd6c55397e606eeb544bdf56ee87aae5
+patch link: https://lore.kernel.org/all/20251107080117.15099-1-make24@iscas.ac.cn/
+patch subject: [PATCH] net: Fix error handling in netdev_register_kobject
+
+in testcase: boot
+
+config: i386-randconfig-014-20251110
+compiler: gcc-14
+test machine: qemu-system-i386 -enable-kvm -cpu SandyBridge -smp 2 -m 4G
+
+(please refer to attached dmesg/kmsg for entire log/backtrace)
+
+
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <oliver.sang@intel.com>
+| Closes: https://lore.kernel.org/oe-lkp/202511121347.b3f6c2a3-lkp@intel.com
+
+
+[  OK  ] Started /etc/rc.local Compatibility.
+LKP: ttyS0: 250: skip deploy intel ucode as no ucode is specified
+[   15.199659] rc.local[250]: LKP: stdout: 250: skip deploy intel ucode as no ucode is specified
+[   15.508990][    T1] [Poison overwritten] 0xf5e12370-0xf5e12370 @offset=9072. First byte 0x6a instead of 0x6b
+[   15.511968][    T1] =============================================================================
+[   15.514232][    T1] BUG kmalloc-2k (Tainted: G S                 ): Object corrupt
+[   15.516308][    T1] -----------------------------------------------------------------------------
+[   15.516308][    T1]
+[   15.519187][    T1] Allocated in alloc_netdev_mqs+0x7d/0x470 age=517 cpu=1 pid=191
+[   15.521218][    T1]  __slab_alloc+0x53/0x80
+[   15.522561][    T1]  __kvmalloc_node_noprof (kbuild/src/consumer/mm/slub.c:4846 kbuild/src/consumer/mm/slub.c:5268 kbuild/src/consumer/mm/slub.c:5641 kbuild/src/consumer/mm/slub.c:7100)
+
+
+The kernel config and materials to reproduce are available at:
+https://download.01.org/0day-ci/archive/20251112/202511121347.b3f6c2a3-lkp@intel.com
+
+
+
 -- 
-2.48.1
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
 
