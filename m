@@ -1,119 +1,113 @@
-Return-Path: <netdev+bounces-238122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 152A2C54697
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 21:19:39 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43C27C5462D
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 21:14:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8A20F4E7DC5
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 20:12:21 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8B81F34344C
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 20:13:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FD1A29DB64;
-	Wed, 12 Nov 2025 20:12:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99116280329;
+	Wed, 12 Nov 2025 20:13:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="ujCFF9vV"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GqehtCo0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 510D319F137
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 20:12:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B508419F137;
+	Wed, 12 Nov 2025 20:13:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762978339; cv=none; b=c4NTl//2TXHz4vmLw+yZpqtDPXdwcejDzczin2e6ALiBP1SvwZRynepS1mtoHa0wsNOKrYjgwt0/yT2dYN2VOUXUJCvi4+qhoeN+5hc01+FJBUStjUAZMyVdQl54BItlb9mrNb5Us+rjP7Zun4hQHwxTEthDFzcGbhoZF+FVPq0=
+	t=1762978409; cv=none; b=cNUyFrl0nT7eCP5aXIV0C0BxvYMuuFmpFCQGuyUYtSZLTNgBoOZG9TqK1YjJerPOIJIkX2SJzf7V7J3Oe8RsifbWSAlj2L5EwX4st+f8KPmuLCjuvOpQiD1Yxhch4VcX/o4fRLfHIlETBHlzM9Vtc5MgDtGRt+62aTryYDmUdvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762978339; c=relaxed/simple;
-	bh=gsP4RuV0SX74Q4sn2qalh8C+3yPvQoVzq/xVfun11BQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eEpqeO06PSDMlw8zoEDB2gC2Hllq+A9ZU7E01LSDoLjJ9QwprJzeLYyASaLXYs33b0wiXxdLoMxY2+z/sNRWIwfZRuKPNUv6tCOZkEGgTU85hqkQJvd9rGYq1WwZHMb6qqjCL+zZD6SnGLJk2TrTzQqVRckykVF7aIVAIAObnY4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=ujCFF9vV; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7acd9a03ba9so20045b3a.1
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 12:12:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1762978336; x=1763583136; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gsP4RuV0SX74Q4sn2qalh8C+3yPvQoVzq/xVfun11BQ=;
-        b=ujCFF9vVRnLXzvMS2k3iAG8SDEEJO5uSSvMq6Esy8L5kuhwMHCaOZFqZZ4qtAIUy1d
-         XQ44qIYBcNuxiyQaIUFIZ6GjH5pWkxSjWTOg96GlX+cz7yS9iQ5szPdiD74Xccj1mZQr
-         50W6mg62KC7dH2JGkSwXBA1vpVi4pEw6t9QrQzbJEs5WvNZ0UDBx2OUgb7Mt7XPJuIya
-         y3farylFxhsdp9NHRhQyljRBhHH09c/B44PWG/kXG6MaEJRZOJImesuFbni2tXeQVeLU
-         X1SR6hyYhRZKP76LN5coM6vSBCScVuoSZzCiqP1wjRufdbyQkLToFe7X7ACvKFDWdMnj
-         UWwA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762978336; x=1763583136;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=gsP4RuV0SX74Q4sn2qalh8C+3yPvQoVzq/xVfun11BQ=;
-        b=KJWiqncQOGgA8iujvpU6YrbqmEv2Fwh+weWhqG0qn/J4v28MEZHvV0Wnj7tCxzVnyt
-         JW6qGtkEXb0IWch1TpPjfhkYYXt+K8oxAvWG9jKByOOATs75xpp4f8/iyu15R7+hMF6S
-         Y4p9yMiMN+JTZtFWRg1GmR2TQNzPFFFUus4ovZHs+qfEuLN4nfoedz4ouNFtFDUPwq1H
-         mLm1ChRdz7zMN4B3HD3cuougAwDhl0JAn4G9bgH/EjHFlYwBU3AXnY1LrzrPigG1SB/f
-         2Tq2F7UI0RjjO4fIyvbRNoNYRYv+tl7wr+SV0vtST6cmYCvsln2OlNKhNIdwLDCQzWp6
-         jyLQ==
-X-Gm-Message-State: AOJu0Yypon/VKOyuiNKKvj5WYF2vIkFFbLNG9ZxuxdCi+L482THTCw6h
-	HgHb/+GOszMlIUmxSy7nd+WIopN+9yP7OVMegGHTLHJYy3PEopGw9/CdCtIk6X9KF7hhiMOpfqq
-	Qqvah
-X-Gm-Gg: ASbGncvEsEOJh+HnboSeqSWhJJa0jZWW7XNjPE8AIgsPor/jQ/xlwY3gsPqELfR2gG2
-	mh2gtqO01Id92N9RwWsbsjJmuMpfmB5INwXzZ9c+DBQpJcIaNHJhbacZnvg2l+rhJ5US+5mnseA
-	Ypd377t4w/l7mFV2qQlBpPQFw/5pg+7U3xD3TWKNCIJDgcH9fXFQl/CCkB5wyxGu1juhwZ0jnAu
-	Ng1e8yyNHTAiLdIpaMc+NXVyTsZr/3gEH0gSa741f1ZBgUFGjj3RtyAZXdTXZceAp+cy1vvyT4i
-	AEVIwrMeWmt1+CfGpiHY2qFYtspyzlqFlwhEHiNsBHeE9y0jdl85aETZ5xVfKqNpg4TUlFFsnPB
-	NXVR7ZbPzTMCdn+Tvlyh5fAMa8BDvY09WG9YA3AbRV4ca0h1DucAln3hYGvZKtb8EK/fevPSbY9
-	BETbRl9WtR9hRZlDKRNQx758fBpHmX3w+Oyg==
-X-Google-Smtp-Source: AGHT+IG0T8LAB89N+NLBKJi4tziCPLU6tUuh6eDgoooLFm7itDIrTgHFde48cWwu0NOkAzvIltUARQ==
-X-Received: by 2002:a05:6a00:4616:b0:7a9:f465:f25 with SMTP id d2e1a72fcca58-7b7a52c74b9mr4620225b3a.27.1762978335682;
-        Wed, 12 Nov 2025 12:12:15 -0800 (PST)
-Received: from phoenix (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b0c9ff8538sm19700242b3a.28.2025.11.12.12.12.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Nov 2025 12:12:15 -0800 (PST)
-Date: Wed, 12 Nov 2025 12:12:12 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
- linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH iproute2-next v2] lib/bpf_legacy: Use userspace SHA-1
- code instead of AF_ALG
-Message-ID: <20251112121212.66e15a2d@phoenix>
-In-Reply-To: <20250929194648.145585-1-ebiggers@kernel.org>
-References: <20250929194648.145585-1-ebiggers@kernel.org>
+	s=arc-20240116; t=1762978409; c=relaxed/simple;
+	bh=jKookoDhnVybNYrtm2DQ1GPIqnubMpj/CdSHLOtCdHM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rowhEvnOpQxZtZd0mKiB16SIOWGeW/juyytVFwFBsZEAb4CMt+SIVbNiOqvkTtSee7AVEjzh4QrDwHKq5/JTQ4hPLtZ3O/z2+WnDHzbX0HtGgI4SLXRoe1a7J+6p1DaAcSDYzuUWuCGi1Yau/OC6Knt2SKVksDPOVQsQ/8c7hWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GqehtCo0; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=4vxYXcF2Pj0hRrrKxi4gDBrIQdytgM6fvDVm0un7Y3E=; b=GqehtCo02TKWsD53JUWrfBT+hp
+	m7qITRl/Kxu7S8YdH0uELYUt5I+7EcXhf77vFlLdffkBB7UKcoy3bZXGsWqbGWSW9Slk/gmFdHvMX
+	QwG6xSVqaKfABi9lUhkJHKmw/bGzpIhx0yui/OfMXBWl4M+JF28sFBGssfWph9y5cu6I=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vJHDO-00DmiF-38; Wed, 12 Nov 2025 21:13:14 +0100
+Date: Wed, 12 Nov 2025 21:13:14 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: shenwei.wang@nxp.com, xiaoning.wang@nxp.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, eric@nelint.com, imx@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 1/5] net: fec: remove useless conditional
+ preprocessor directives
+Message-ID: <28badd8f-8c76-4e88-bcb2-49ed5026c1af@lunn.ch>
+References: <20251111100057.2660101-1-wei.fang@nxp.com>
+ <20251111100057.2660101-2-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251111100057.2660101-2-wei.fang@nxp.com>
 
-On Mon, 29 Sep 2025 12:46:48 -0700
-Eric Biggers <ebiggers@kernel.org> wrote:
+On Tue, Nov 11, 2025 at 06:00:53PM +0800, Wei Fang wrote:
+> The conditional preprocessor directive "#if !defined(CONFIG_M5272)" was
+> added due to build errors on MCF5272 platform, see commit d13919301d9a
+> ("net: fec: Fix build for MCF5272"). The compilation error was caused by
+> some register macros not being defined on the MCF5272 platform. However,
+> this preprocessor directive is not needed in some parts of the driver.
+> First, removing it will not cause compilation errors. Second, these parts
+> will check quirks, which do not exist on the MCF7527 platform. Therefore,
+> we can safely delete these useless preprocessor directives.
 
-> diff --git a/lib/sha1.c b/lib/sha1.c
-> new file mode 100644
-> index 00000000..1aa8fd83
-> --- /dev/null
-> +++ b/lib/sha1.c
-> @@ -0,0 +1,108 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-> +/*
-> + * SHA-1 message digest algorithm
-> + *
-> + * Copyright 2025 Google LLC
-> + */
+> @@ -2515,9 +2513,7 @@ static int fec_enet_mii_probe(struct net_device *ndev)
+>  		phy_set_max_speed(phy_dev, 1000);
+>  		phy_remove_link_mode(phy_dev,
+>  				     ETHTOOL_LINK_MODE_1000baseT_Half_BIT);
+> -#if !defined(CONFIG_M5272)
+>  		phy_support_sym_pause(phy_dev);
+> -#endif
+>  	}
 
-Not a big fan of having actual crypto in iproute2.
-It creates even more technical debt.
-Is there another crypto library that could be used?
+I think the explanation could be better.
 
+I assume the M5272 only supported Fast Ethernet, so fep->quirks &
+FEC_QUIRK_HAS_GBIT was never true?
 
-Better yet, is there a reason legacy BPF code needs to still exist
-in current iproute2? When was the cut over.
+>  	else
+>  		phy_set_max_speed(phy_dev, 100);
+> @@ -4400,11 +4396,9 @@ fec_probe(struct platform_device *pdev)
+>  	fep->num_rx_queues = num_rx_qs;
+>  	fep->num_tx_queues = num_tx_qs;
+>  
+> -#if !defined(CONFIG_M5272)
+>  	/* default enable pause frame auto negotiation */
+>  	if (fep->quirks & FEC_QUIRK_HAS_GBIT)
+>  		fep->pause_flag |= FEC_PAUSE_FLAG_AUTONEG;
+> -#endif
+
+Same here?
+
+Maybe the commit message should actually say that M5272 only supported
+Fast Ethernet, so these conditions cannot be true, and so the #ifdef
+guard can be removed.
+
+    Andrew
+
+---
+pw-bot: cr
 
