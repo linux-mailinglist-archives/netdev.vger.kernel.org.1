@@ -1,90 +1,175 @@
-Return-Path: <netdev+bounces-237810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 580F6C507BA
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 05:08:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3FAAC507EE
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 05:18:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE373189B87C
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 04:08:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81FBA3B0F71
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 04:18:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 881702D47E1;
-	Wed, 12 Nov 2025 04:07:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D65101B87C9;
+	Wed, 12 Nov 2025 04:18:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XsQa5b7u"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K6TpItMZ";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="AUcDTRZ5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DE0C2820DB;
-	Wed, 12 Nov 2025 04:07:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34AA71494DB
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 04:18:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762920443; cv=none; b=k8ZEdbGtCrzHMQFkMtFBd833VEf4kxyoN75njzXcV3vVGideGaGcLeYkJQ0YFmBrMvtfjSJ/SeCSRLCg4FVKQPWywDeB7XXhDIwYhK7RtAJO387qrAlxv9Z2rtN9rDwVwe/QXhHdp6JuNYxGMIpVszen+9K6HyJvtZjz2DNifEc=
+	t=1762921129; cv=none; b=bkxOjf+WaiNH2f+Elmlj/1/9hmlbClESKRong5s8t9j7oR7CYL8FYQ7Mxu0E4+vczCz9ybDvHEiKsq5ad2N2qyDYPOilLdfbde6JFYBRcYwv+6na2SKBwKzba5iw8ZOH59NCzIw6mryYPwLQej6+AeA9tX1SFXmuwKWsvhpcSD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762920443; c=relaxed/simple;
-	bh=m3plAV8OHJtWBsWMLz9UPId3Nq/viGgfVBH4/ctoAG0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HKZRhOGOvNb9arvUcsplMU2bNFolZ1jIV4/TANVOVNUOAgPaNHj0pOCNWuUhx8rbSk0Qngj08AKb0bZqkj1STzWIKGU5n6FydsuPgtWUuMtHe3HjYZHaq7MyCxZVNDWGJSS4hcjzXWzpmk4Jz5LGidYv8Gl8i5ToPB8fVgKt54U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XsQa5b7u; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E819C116B1;
-	Wed, 12 Nov 2025 04:07:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762920441;
-	bh=m3plAV8OHJtWBsWMLz9UPId3Nq/viGgfVBH4/ctoAG0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XsQa5b7u3/JQQxE2ic9zBaNt/Ct3YlRuJiMdgvg2qjVjZBe6UXk+ab23VSlVEH7Rn
-	 x56n6rgTiqDJSH2zMgqQCmXTSWkTrwBKaHaGMPFZCYV1cuCKQqCsNF2w2kNjWSTqsC
-	 Q2/q59MDofR4D+WiIlCgj7onOhmOi6mr7vC7y8OKANfTf8+Kqyi3/kX7O+ON2Un98c
-	 NrZcl3egV7u1m9tj05LTrvmYZkolMlz8Dx3Kqm3fxB4X8EvH2Rhhi97Hk1RBLOVRv6
-	 gLMJiFyh2rvh0kxTUK2tIJ+U5yOxtwf6JDtaQLyQnREbQItr1j9563lR2hhzZyRMPV
-	 slKlaPfyk+GFA==
-Date: Wed, 12 Nov 2025 04:07:19 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: Stephen Hemminger <stephen@networkplumber.org>,
-	David Ahern <dsahern@kernel.org>
-Cc: linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-	netdev@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH iproute2-next v2] lib/bpf_legacy: Use userspace SHA-1
- code instead of AF_ALG
-Message-ID: <20251112040719.GB2832160@google.com>
-References: <20250929194648.145585-1-ebiggers@kernel.org>
+	s=arc-20240116; t=1762921129; c=relaxed/simple;
+	bh=9IE8nIXiEWSBXXZ68CaiTh5yjeL/PHvQVU9lErYD0NU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=q6RCx/hI1BQgIdMQl4pKr3N7MXrrakxSwZjn5pfQLTksKRGtniSOBEDv/FnskKtyf8mFIstKGZCIvTPLovhr510WkAh8TgmcFjTFt0mRRu500VQGurje1fd8xcgl1D855NxVdrWpfyvPQhv4RpFz3UQqH1p2oXMEDY5hxteXqgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K6TpItMZ; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=AUcDTRZ5; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762921126;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eivNhWwruPOyJV5JjaV0gz6hcEE2lC6++XL21K7iprA=;
+	b=K6TpItMZtQAWy1n+6H91AkWvUxDba/jBeb0t3CqELsV779UfjT3AXCqDIOBSh4S9Sp+Aip
+	Sdy4JH1+nJFvbSKLzzglsDZshLGkM4Yh3AFVZqRKUzXv10E1sSEkJdk28zD+YkOfHmu2EP
+	hvJ/QbyT1ZNkogJlYjI223Zg8yBlpS0=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-60-5ka0c81MOaSg8eSZ6januQ-1; Tue, 11 Nov 2025 23:18:43 -0500
+X-MC-Unique: 5ka0c81MOaSg8eSZ6januQ-1
+X-Mimecast-MFC-AGG-ID: 5ka0c81MOaSg8eSZ6januQ_1762921123
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-29846a9efa5so10543105ad.0
+        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 20:18:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1762921123; x=1763525923; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eivNhWwruPOyJV5JjaV0gz6hcEE2lC6++XL21K7iprA=;
+        b=AUcDTRZ5xICj4tHLl0tP5MVkpDCgM1ovCbger3LmmmvinZ0iwBMRHWacEKP4b6+fqs
+         7YiHJmnHFI7mGoQ5Jzatafv/2J4wSaIqyCBCn4pzFGUYtaPrWddbGCBgseQOYbUOqAeE
+         rlf8NdWzISLWJe3loxi+3pFFRGCpYOa/T+zaRcv9zTaPAg1wJYE/Ir9T5kt1OTLdVLuQ
+         ZOHkE4L+kvnSWoL+JTzkI1/sX1I6XnRxpQWgZ2sTmMtJ8eFAjlyw5a/WobrzipWZmpn5
+         dGtdCTqOUkoKcuFpygWuI40n0UQe0SnbCYpJhuZLfuu3fMyzKtXVEu+L42y+56rYA1N+
+         cvOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762921123; x=1763525923;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=eivNhWwruPOyJV5JjaV0gz6hcEE2lC6++XL21K7iprA=;
+        b=VpvqCri5hRuxUmruWCu44I4jAflJQFqoqmm1zel4J1snYPrS1ti1CVkd5hLEzVCgrM
+         IP60BCzOgDRK3ggzlH7UHSOlHIBy5URG4w0EKySkEZJ2NnlJLRAgqp5eOUXNOEP99WTX
+         AFG8nykC0d1rJ0ac8kTvqun8LneENVZpd44ESUlLQfBDxnpTKt6KYsw4ANOu4IxDCfd5
+         qT7KUFNMRUPasSLZW2kRYHDVOkctzYAxzOHAPDOsFwjtPXJcG0cgd+nJxkYWnnEeMTX7
+         0uLr9DwgywIWwuMNnVdz+ezhUvaSO5lc8T2mZ/xZVapZgeA3Y4fqcHs5kLyojJbEZL9G
+         lPkw==
+X-Forwarded-Encrypted: i=1; AJvYcCVcuH4IGmJYMYZ6Wz+7CjbIWyjpIx7XZIhiUEz3B0AqEHAZnVEhOOXD84CoyQDLMFn4LchyI+I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwabYxAnKKy1zWAOC3tFdq9CNG1IdiVmcDc7WFA5EJn1zuW5R7z
+	gwbSaG5pJPzerbYTaTrZxqv6ytSMDo0gvQVp+GzTIPWsVTud5U1ZN++fkPKjEJf74VjhlKsEBfc
+	81bBvWSffqFiOY3XG+Nz+5kxXzCqV2B1yEowmDNLkWCKIStxDjPY9hkei8xPYYLcWP8guX4+R5Q
+	iR7hHG5+g4XhstHtahUQ2xeFofc9Fmt/v4
+X-Gm-Gg: ASbGncucr0RDaH1P1/KPEIH4Z9xZcLpzSkg9j/6qCF75hYd181MC5vqU/m30JPVu4Fj
+	GPAMmi3+tzNPtj0IM6P3SJD3OQZE84Gr1N6Jql4Wk8i3cxIXO49kRv+r9PUICJnqd5H8xinXVzm
+	LUi3hYQZlefUVWOi/1XL5AesoijNyE7bq6OzPqzRBbsFCT9W7qBjajLLw6
+X-Received: by 2002:a17:902:da8f:b0:295:7b89:cb8f with SMTP id d9443c01a7336-2984ec7cd40mr23356095ad.0.1762921122797;
+        Tue, 11 Nov 2025 20:18:42 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IESILra4ewxIe3nH6ffWXaekvytV9hW/5+bzDzS8duVHEbPHdwG317ziSru+7icCcrZ0vO0wEgPXJaHoTKIbrg=
+X-Received: by 2002:a17:902:da8f:b0:295:7b89:cb8f with SMTP id
+ d9443c01a7336-2984ec7cd40mr23355825ad.0.1762921122401; Tue, 11 Nov 2025
+ 20:18:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250929194648.145585-1-ebiggers@kernel.org>
+References: <20251107041523.1928-1-danielj@nvidia.com> <20251107041523.1928-6-danielj@nvidia.com>
+ <ee527a09-6e6e-4184-8a0c-46aacb11302f@redhat.com> <CACGkMEt2SEWY-hUKv2=PwLZr+NNGSobr4i-XQ_qDtGk+tNw8Gw@mail.gmail.com>
+ <443232ac-2e4f-4893-a956-cf9185bc3ac1@nvidia.com>
+In-Reply-To: <443232ac-2e4f-4893-a956-cf9185bc3ac1@nvidia.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 12 Nov 2025 12:18:30 +0800
+X-Gm-Features: AWmQ_bmlbBUx93bV2lthjjocX_fnCnHJp0eUq6ipUa6aaey2HEa7eyVusHutp1E
+Message-ID: <CACGkMEtMP2XfXFmuhoAkMrcgJD8JiRTc-tuq1i7xxxzA43A4mg@mail.gmail.com>
+Subject: Re: [PATCH net-next v9 05/12] virtio_net: Query and set flow filter caps
+To: Dan Jurgens <danielj@nvidia.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, mst@redhat.com, 
+	virtualization@lists.linux.dev, parav@nvidia.com, shshitrit@nvidia.com, 
+	yohadt@nvidia.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com, 
+	shameerali.kolothum.thodi@huawei.com, jgg@ziepe.ca, kevin.tian@intel.com, 
+	kuba@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-[Adding David Ahern.  I overlooked that iproute2 has separate
-maintainers for the main tree and the next tree.]
+On Wed, Nov 12, 2025 at 11:02=E2=80=AFAM Dan Jurgens <danielj@nvidia.com> w=
+rote:
+>
+> On 11/11/25 7:00 PM, Jason Wang wrote:
+> > On Tue, Nov 11, 2025 at 6:42=E2=80=AFPM Paolo Abeni <pabeni@redhat.com>=
+ wrote:
+> >>
+> >> On 11/7/25 5:15 AM, Daniel Jurgens wrote:
+> >>> @@ -7121,6 +7301,15 @@ static int virtnet_probe(struct virtio_device =
+*vdev)
+> >>>       }
+> >>>       vi->guest_offloads_capable =3D vi->guest_offloads;
+> >>>
+> >>> +     /* Initialize flow filters. Not supported is an acceptable and =
+common
+> >>> +      * return code
+> >>> +      */
+> >>> +     err =3D virtnet_ff_init(&vi->ff, vi->vdev);
+> >>> +     if (err && err !=3D -EOPNOTSUPP) {
+> >>> +             rtnl_unlock();
+> >>> +             goto free_unregister_netdev;
+> >>
+> >> I'm sorry for not noticing the following earlier, but it looks like th=
+at
+> >> the code could error out on ENOMEM even if the feature is not really
+> >> supported,  when `cap_id_list` allocation fails, which in turn looks a
+> >> bit bad, as the allocated chunk is not that small (32K if I read
+> >> correctly).
+> >>
+> >> @Jason, @Micheal: WDYT?
+> >
+> > I agree. I think virtnet_ff_init() should be only called when the
+> > feature is negotiated.
+> >
+> > Thanks
+> >
+>
+> Are you suggesting we wait to call init until get/set_rxnfc is called? I
+> don't like that idea. Probe is the right time to do feature discovery.
 
-On Mon, Sep 29, 2025 at 12:46:48PM -0700, Eric Biggers wrote:
-> Add a basic SHA-1 implementation to lib/, and make lib/bpf_legacy.c use
-> it to calculate SHA-1 digests instead of the previous AF_ALG-based code.
-> 
-> This eliminates the dependency on AF_ALG, specifically the kernel config
-> options CONFIG_CRYPTO_USER_API_HASH and CONFIG_CRYPTO_SHA1.
-> 
-> Over the years AF_ALG has been very problematic, and it is also not
-> supported on all kernels.  Escalating to the kernel's privileged
-> execution context merely to calculate software algorithms, which can be
-> done in userspace instead, is not something that should have ever been
-> supported.  Even on kernels that support it, the syscall overhead of
-> AF_ALG means that it is often slower than userspace code.
-> 
-> Let's do the right thing here, and allow people to disable AF_ALG
-> support (or not enable it) on systems where iproute2 is the only user.
-> 
-> Acked-by: Ard Biesheuvel <ardb@kernel.org>
-> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
+Nope I meant it might be better:
 
-Stephen and David, any interest in applying this patch?
+1) embed virtio_admin_cmd_query_cap_id_result in virtnet_info to avoid
+dynamic allocation
 
-- Eric
+Or
+
+2) at least check if there's an adminq before trying to call virtnet_ff_ini=
+t()?
+
+Thanks
+
+>
+>
+> >>
+> >> /P
+> >>
+> >
+>
+
 
