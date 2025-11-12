@@ -1,313 +1,138 @@
-Return-Path: <netdev+bounces-237946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237947-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CE2CC51F0D
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 12:24:46 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E47EC5201B
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 12:35:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF7FC18E0A94
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 11:21:29 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DDA8D4F130E
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 11:22:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C2FE3009D2;
-	Wed, 12 Nov 2025 11:19:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23CCC2E8B83;
+	Wed, 12 Nov 2025 11:22:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DMO8Lprp";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="oUWVdXcu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hG2M5sZH"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BEF1274B28
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 11:19:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE3ABA45
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 11:22:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762946396; cv=none; b=Ilo0uiOf/uj0oa3vxKpfMiSIx8UZWxaU1oeIlSkEMbkVZc9trcl7Wi6SjETLvdg8fB69kKXolfbkd8BJC0Gd0SH3gjxP0r3GwdtlNTp2XQaG0dLGc9IKw/VbePo1qMp8s1EVMIeh2bzwtMQWwMEULUBE8wi0d4zKVH08ZPv3UG4=
+	t=1762946534; cv=none; b=FY8573pXnGtRi6dl60kKlTU2Kv6OYp+doeKYvOcsSB+NMFIVx8tz30gmu/XMu7Gg9fbJUJyOvWjjdkeq9EIAn/Wy2v0sVHbz+nicE5yzzE9n0Fd7ZTlbaoZm60BQb8gohrLbroRU6tQpMiEDvD2mEGb+7x/fqZgxELBR3/gWFv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762946396; c=relaxed/simple;
-	bh=OKClyKv8Ey4yyuKqx+8b/7B4wt73VZkmnz6uZGpZgUI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VBIqS+gra4KIJtKaPYuHPmWc7rBIabjV3EFdfrEtBxT38XwRLLu3W3XGMkDFLDchBScsOgLfDntu1uXeiq8box4cFd+6vg/x8aiQCandL9XNVmLXKuHBcU2SiI1Xnf/zwk2DxR6otOhxGXlod51l5CITO3ni/hx+7Ke3efdp96k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DMO8Lprp; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=oUWVdXcu; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762946393;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5FDYwKVcD0dlATlv10YwLZFZcLbAZEaa4NsDrv83O14=;
-	b=DMO8LprpeCMvGkiN1r2bMLNGq4XPClpPe1sKWaXDoTh+SeS096bb9V8UhnKS4i510hSXUT
-	z35WTYT0vv+iLm5rRR2hg1QC/IUp2NMTpqZXtLviB9E/cy0LIdxyuM+onKozulBZaU6BvP
-	I8/z31aEvgo2AdguN1ZFQHks3R7QmCE=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-331-C3lABX7DMb6yW6FuTtG5Jg-1; Wed, 12 Nov 2025 06:19:52 -0500
-X-MC-Unique: C3lABX7DMb6yW6FuTtG5Jg-1
-X-Mimecast-MFC-AGG-ID: C3lABX7DMb6yW6FuTtG5Jg_1762946392
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-8b29da49583so141020585a.0
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 03:19:52 -0800 (PST)
+	s=arc-20240116; t=1762946534; c=relaxed/simple;
+	bh=7fKSQVBgMwJc5c/cBdPn9hKClzr6/00FUMqvOCg7+Ds=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mM31tVDkr8OD2ONBnLuXP2QCSol2/SMA+uzmMiFh1oj229MKHimMe2II3WPGPwCrYeVPkREXGMDxLq5wSRzDHy3VkGenPYa/QCrLtLXIzcyeewOdEZkMY38DOxLXyahtu+g4tkv3Ujx5grgWCOp46YGyGgT0ODRAxDTQkr0Qi8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hG2M5sZH; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-4ed946ed3cdso5690731cf.3
+        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 03:22:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762946392; x=1763551192; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5FDYwKVcD0dlATlv10YwLZFZcLbAZEaa4NsDrv83O14=;
-        b=oUWVdXcuWlLdzSqM9bBs5gBvaZTB4jI8NQYQ7uwfDWEMuSVP8cQuE6OvPFne3IJYxH
-         T2GNbC0iy7uXB2IpFxfxAh/dDxyh85SlEhBHGT9RoHsrR0b7BvLMwbE85+lYgzNvPfx2
-         bbF/CIq0pvXXqzzIJmszgUNsB0MJj/VnnaxPIJFZM64lYBpt7p9dW25rnvQF4edmEm3Y
-         bLTBYHRkOhEtGj4GV9CGNV+yQl4gwRca8yXIzMHW2jx8A7T9sHByWP3y+D1/k4xwb4RY
-         UIQ/5S1x0eBsn8BnwSoNWIHa6l/w7QE2ckyjNU9qHVLv7aUV6fqGd9wgjt9/8sawTCcV
-         4a6w==
+        d=google.com; s=20230601; t=1762946530; x=1763551330; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1v6KitHP0mrijsIIMG/ScW6pRmmdbLhHEWbmOep/FJY=;
+        b=hG2M5sZHisTvhDkuvOKTUY6ZGzSOj5RSZxOAxAkBkKV0RUhTyqpCbrxwjyLcTj/p4V
+         2oiEJpcVMJO3JcqEHjIHaCiH2xLTXcksFbvvVUnhtsx/QxCjzbh1jEVha3U5eG8TuZBN
+         wDfx298mhvfiG9cAFtNSRXnAWpTJXwz5NZ8t183RvaeYkgcPmrJUS7fENiGt7h/QzSaZ
+         EBY7IArpTnAIVxibPT7Onowv7dEx2ojtXlIuBzLALzH2y3AKKTlwyMV/FGBDQonvz1R+
+         RXFo8ivMsge5KcGj1O3GgTvg572pS/Bh2MDLpkfASs4novgk3Bq2g7XhYzoUgKgsrRPt
+         sO8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762946392; x=1763551192;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5FDYwKVcD0dlATlv10YwLZFZcLbAZEaa4NsDrv83O14=;
-        b=RLvMhPtTMWvvhWdo7ohAOiUUGDP4wpBbZgy+zbIIC2Td+yMRONaYSgVKdU1gLFJvM7
-         ZgoM0C6fTOk/4xA65KRuZV2wSyNDJzTBnUjtBqTxlcHQ1ENvS0Glzc/bSmjqj9P0xbCv
-         2h5Z/aiWoouGOxCrd6p/CsNqalU939pgAqNhPJnX2Tj8maGcwQx8FcUe5KYo9QoL6HBn
-         YOAJl8Fr344wxFf4Z2HEoiqFWUBbMq3hXqpjxhwD42R7eb4r4qjWWHZ5PJkhLqc+QzUF
-         mI2NPjJyP1GkmwIpHRiswKOBOY76eG2uzAqEohBoDPjHxPd05z8G554tCJiV0HmVaTl3
-         1M3g==
-X-Forwarded-Encrypted: i=1; AJvYcCWtq65XxhOmF/ZSEAPsVHeSWBAU4fRH7hjp+smtZQd55RCULFkOIbmiIZzCTpk5woRoOIYgQwo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxpjEmTvu86lmcJmmLqvOiTGyTZ0UWX5h3Vz87JB/dSLHk5v7JH
-	74i2lvwEyhEYxMpcfRZ5PUO0nJJYoV6QQgHX5vETQSwBaBMTrLFFJowkDOXdp91Ur9jbN7cziRD
-	4CEQkTdjeLLuZu3vgC5irL0rc0wRt6ieG57rJEzu2Q4lYI2Bx+0cvVph1Tw==
-X-Gm-Gg: ASbGncvviKT5SZfvmCEp9ruxz3S2x5vGUsT18vqEybIvtnQeoQklFXrk/04TE4pIsqT
-	qinK5ItJkutQ3mCwUk/oa/HswnhbXSjuyIS/kZ+56BJPf/cdyxwe9khFo0Hq2JWJeMPwDV9kwmp
-	/0ZJ5u0Vv6d1LHVWfqy72Rrd02FS31/AqolVlyw2A2HcMsAiFET1IcFe485bpeLCnrBq/klQrLw
-	v5/Hrt2vg58fNS5N/4BncOSMJvKFHDsEbpVYWx/ikbBDJRVEqpevhJsDZPzw0DFSfpm5xbV5F2B
-	+8mM23+tNfrrGbHhlYgmsaKOd7/7zoVltvw58ob1dILoAgGtIlqVOnccCDgSUpgBBWRib01pn+n
-	UfNvl2F4O19laqt2jXhpla+ahI24KV2o/OkmRqXcECpThj6NkBz0=
-X-Received: by 2002:a05:620a:199f:b0:8b2:1fa8:4684 with SMTP id af79cd13be357-8b29b567d9dmr336594285a.2.1762946392106;
-        Wed, 12 Nov 2025 03:19:52 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHJO/67hI3KgrbQB/aVYyZeSEB0IiwCxk5hDgSYA6vjxGWk6oN9tzaQ+qo21OHmRNB+WCUySA==
-X-Received: by 2002:a05:620a:199f:b0:8b2:1fa8:4684 with SMTP id af79cd13be357-8b29b567d9dmr336591285a.2.1762946391690;
-        Wed, 12 Nov 2025 03:19:51 -0800 (PST)
-Received: from sgarzare-redhat (host-79-46-200-153.retail.telecomitalia.it. [79.46.200.153])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b29a9e6f2fsm171012785a.33.2025.11.12.03.19.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Nov 2025 03:19:50 -0800 (PST)
-Date: Wed, 12 Nov 2025 12:19:46 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Shuah Khan <shuah@kernel.org>, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Simon Horman <horms@kernel.org>, Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v4 03/12] selftests/vsock: reuse logic for
- vsock_test through wrapper functions
-Message-ID: <ydpi67iu224lkrmwzq7ibpupnllvwhsdp4nxtmdjsoyvotsdug@p3rtp4f4fulg>
-References: <20251108-vsock-selftests-fixes-and-improvements-v4-0-d5e8d6c87289@meta.com>
- <20251108-vsock-selftests-fixes-and-improvements-v4-3-d5e8d6c87289@meta.com>
+        d=1e100.net; s=20230601; t=1762946530; x=1763551330;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=1v6KitHP0mrijsIIMG/ScW6pRmmdbLhHEWbmOep/FJY=;
+        b=JM1RqmDD5dhacfpS8FCFYkXOShhAVt/qtQ+kTIzmvQ7P3RZWt8XkZQ0ddVEPgsrb9g
+         kLTTOyfLj8Pk8Vv/rEI5ns4scVh6ABVXPnHgL/kG21+Tjsi1lZ6kNrE8JvfwcpM8I/Av
+         jmez73LVWICzoN398Bfhv2khtfGuhy6Fylnn+ruc1ZPOilbK5wG9VAeY39TxvpgdIt63
+         0yCkRUgl/zoRzP8ZBiTM4JI4lUpNmLn2Ru/YJJ8LazZMEfzTJugQ4rTO7IXQkCMqWSVI
+         qC46LxuwAxgsVg061Tc/gg6YRMAjgWV5kKwLtfjFsPlee1OtBdQ7eurkkhp08z62+DDb
+         iD/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWGebqKbXcTSzmSdelkvmQGPbODsP6ZFd5AP27QjDzyOZhKzgz72yWW99GE0+Yf5JazW8qeYmQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBvi35gwLnS5sELBLfXI2CeSpKINBNvGvg+mgmZwdqo4RGEcFv
+	2XbydT1t4udWSSCODi64a+tXyWg1VnimAuCmJGUJCNGYsXcJfZLQtik25/tV2B2GSqaMVYoQsR9
+	RfEDnj3Nf+AtxSISKKXkG9tJ968oYF957wW7a8Xv1
+X-Gm-Gg: ASbGncuncFFiAl9oFPqAaYziY71e+TZVcEoiiOihCL2Ocj6Pw6bmPeS1/Wumrg2W4gc
+	d9g/wyTXuD6gWor+lkGiIdaczYr9GzAscFLxc+77AVyihSchuYQ92Xw+TGu0LK5RuUe7KWmV9iR
+	JU/coKLrdaZJsPo74rZgqrrhveCv0WgE5N2gAcCjWRneyzevwTm1SLSWVqY4hAL021Zb+YdYzQd
+	3OfJZ45tjS/EX/5HSWfRWVhn46Bz8ztZEVdpuIYtUMaDwyU6ORds1PJWvDojAOIQm3vgM0WacC7
+	5ZlphIA=
+X-Google-Smtp-Source: AGHT+IEi/wjI+xrJUaMuyZe1e3y0m/e+M123Su+osrkMJXNF0rNPuV4s7x8o2Z9UBWiUvIehotFH9n9tk2ngeQzkAR4=
+X-Received: by 2002:ac8:5f93:0:b0:4ed:6782:12d5 with SMTP id
+ d75a77b69052e-4eddbc4df29mr29148541cf.3.1762946529958; Wed, 12 Nov 2025
+ 03:22:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20251108-vsock-selftests-fixes-and-improvements-v4-3-d5e8d6c87289@meta.com>
+References: <20251109161215.2574081-1-edumazet@google.com> <176291340626.3636068.18318642966807737508.git-patchwork-notify@kernel.org>
+ <CAM0EoMkSBrbCxdai6Hn=aaeReqRpAcrZ4mA7J+t6dSEe8aM_dQ@mail.gmail.com>
+In-Reply-To: <CAM0EoMkSBrbCxdai6Hn=aaeReqRpAcrZ4mA7J+t6dSEe8aM_dQ@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 12 Nov 2025 03:21:58 -0800
+X-Gm-Features: AWmQ_bnn4jGoe2fGISwliX4RILxlWCphKfwWUPxCUkxV7BonBsMAFjZ4WeZS8-M
+Message-ID: <CANn89iJHVEbq_Cz8C6TGqOUig9xvC=joOeh_Anb+4uTW=Nyx6w@mail.gmail.com>
+Subject: Re: [PATCH net] net_sched: limit try_bulk_dequeue_skb() batches
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com, horms@kernel.org, 
+	xiyou.wangcong@gmail.com, jiri@resnulli.us, kuniyu@google.com, 
+	willemb@google.com, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	hawk@kernel.org, patchwork-bot+netdevbpf@kernel.org, toke@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Nov 08, 2025 at 08:00:54AM -0800, Bobby Eshleman wrote:
->From: Bobby Eshleman <bobbyeshleman@meta.com>
+On Wed, Nov 12, 2025 at 2:48=E2=80=AFAM Jamal Hadi Salim <jhs@mojatatu.com>=
+ wrote:
 >
->Add wrapper functions vm_vsock_test() and host_vsock_test() to invoke
->the vsock_test binary. This encapsulates several items of repeat logic,
->such as waiting for the server to reach listening state and
->enabling/disabling the bash option pipefail to avoid pipe-style logging
->from hiding failures.
+> On Tue, Nov 11, 2025 at 9:10=E2=80=AFPM <patchwork-bot+netdevbpf@kernel.o=
+rg> wrote:
+> >
+> > Hello:
+> >
+> > This patch was applied to netdev/net.git (main)
+> > by Jakub Kicinski <kuba@kernel.org>:
+> >
+> > On Sun,  9 Nov 2025 16:12:15 +0000 you wrote:
+> > > After commit 100dfa74cad9 ("inet: dev_queue_xmit() llist adoption")
+> > > I started seeing many qdisc requeues on IDPF under high TX workload.
+> > >
+> > > $ tc -s qd sh dev eth1 handle 1: ; sleep 1; tc -s qd sh dev eth1 hand=
+le 1:
+> > > qdisc mq 1: root
+> > >  Sent 43534617319319 bytes 268186451819 pkt (dropped 0, overlimits 0 =
+requeues 3532840114)
+> > >  backlog 1056Kb 6675p requeues 3532840114
+> > > qdisc mq 1: root
+> > >  Sent 43554665866695 bytes 268309964788 pkt (dropped 0, overlimits 0 =
+requeues 3537737653)
+> > >  backlog 781164b 4822p requeues 3537737653
+> > >
 >
->Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
->---
->Changes in v4:
->- remember to disable pipefail before returning from host_vsock_test()
+> Hrm. Should this have gone into net-next instead of net? Given that
+> the changes causing regression are still in net-next.
+> Dont think its a big deal if the merge is about to happen and i can
+> manually apply it since i was going to run some tests today.
 >
->Changes in v3:
->- Add port input parameter to host_wait_for_listener() to accept port
->  from host_vsock_test() (Stefano)
->- Change host_wait_for_listener() call-site to pass in parameter
->---
-> tools/testing/selftests/vsock/vmtest.sh | 135 ++++++++++++++++++++++----------
-> 1 file changed, 95 insertions(+), 40 deletions(-)
-
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-
->
->diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
->index 01ce16523afb..3bccd9b84e4a 100755
->--- a/tools/testing/selftests/vsock/vmtest.sh
->+++ b/tools/testing/selftests/vsock/vmtest.sh
->@@ -272,8 +272,81 @@ EOF
-> }
->
-> host_wait_for_listener() {
->-	wait_for_listener "${TEST_HOST_PORT_LISTENER}" "${WAIT_PERIOD}" "${WAIT_PERIOD_MAX}"
->+	local port=$1
->
->+	wait_for_listener "${port}" "${WAIT_PERIOD}" "${WAIT_PERIOD_MAX}"
->+}
->+
->+vm_vsock_test() {
->+	local host=$1
->+	local cid=$2
->+	local port=$3
->+	local rc
->+
->+	# log output and use pipefail to respect vsock_test errors
->+	set -o pipefail
->+	if [[ "${host}" != server ]]; then
->+		vm_ssh -- "${VSOCK_TEST}" \
->+			--mode=client \
->+			--control-host="${host}" \
->+			--peer-cid="${cid}" \
->+			--control-port="${port}" \
->+			2>&1 | log_guest
->+		rc=$?
->+	else
->+		vm_ssh -- "${VSOCK_TEST}" \
->+			--mode=server \
->+			--peer-cid="${cid}" \
->+			--control-port="${port}" \
->+			2>&1 | log_guest &
->+		rc=$?
->+
->+		if [[ $rc -ne 0 ]]; then
->+			set +o pipefail
->+			return $rc
->+		fi
->+
->+		vm_wait_for_listener "${port}"
->+		rc=$?
->+	fi
->+	set +o pipefail
->+
->+	return $rc
->+}
->+
->+host_vsock_test() {
->+	local host=$1
->+	local cid=$2
->+	local port=$3
->+	local rc
->+
->+	# log output and use pipefail to respect vsock_test errors
->+	set -o pipefail
->+	if [[ "${host}" != server ]]; then
->+		${VSOCK_TEST} \
->+			--mode=client \
->+			--peer-cid="${cid}" \
->+			--control-host="${host}" \
->+			--control-port="${port}" 2>&1 | log_host
->+		rc=$?
->+	else
->+		${VSOCK_TEST} \
->+			--mode=server \
->+			--peer-cid="${cid}" \
->+			--control-port="${port}" 2>&1 | log_host &
->+		rc=$?
->+
->+		if [[ $rc -ne 0 ]]; then
->+			set +o pipefail
->+			return $rc
->+		fi
->+
->+		host_wait_for_listener "${port}"
->+		rc=$?
->+	fi
->+	set +o pipefail
->+
->+	return $rc
-> }
->
-> log() {
->@@ -312,59 +385,41 @@ log_guest() {
-> }
->
-> test_vm_server_host_client() {
->+	if ! vm_vsock_test "server" 2 "${TEST_GUEST_PORT}"; then
->+		return "${KSFT_FAIL}"
->+	fi
->
->-	vm_ssh -- "${VSOCK_TEST}" \
->-		--mode=server \
->-		--control-port="${TEST_GUEST_PORT}" \
->-		--peer-cid=2 \
->-		2>&1 | log_guest &
->-
->-	vm_wait_for_listener "${TEST_GUEST_PORT}"
->-
->-	${VSOCK_TEST} \
->-		--mode=client \
->-		--control-host=127.0.0.1 \
->-		--peer-cid="${VSOCK_CID}" \
->-		--control-port="${TEST_HOST_PORT}" 2>&1 | log_host
->+	if ! host_vsock_test "127.0.0.1" "${VSOCK_CID}" "${TEST_HOST_PORT}"; then
->+		return "${KSFT_FAIL}"
->+	fi
->
->-	return $?
->+	return "${KSFT_PASS}"
-> }
->
-> test_vm_client_host_server() {
->+	if ! host_vsock_test "server" "${VSOCK_CID}" "${TEST_HOST_PORT_LISTENER}"; then
->+		return "${KSFT_FAIL}"
->+	fi
->
->-	${VSOCK_TEST} \
->-		--mode "server" \
->-		--control-port "${TEST_HOST_PORT_LISTENER}" \
->-		--peer-cid "${VSOCK_CID}" 2>&1 | log_host &
->-
->-	host_wait_for_listener
->-
->-	vm_ssh -- "${VSOCK_TEST}" \
->-		--mode=client \
->-		--control-host=10.0.2.2 \
->-		--peer-cid=2 \
->-		--control-port="${TEST_HOST_PORT_LISTENER}" 2>&1 | log_guest
->+	if ! vm_vsock_test "10.0.2.2" 2 "${TEST_HOST_PORT_LISTENER}"; then
->+		return "${KSFT_FAIL}"
->+	fi
->
->-	return $?
->+	return "${KSFT_PASS}"
-> }
->
-> test_vm_loopback() {
-> 	local port=60000 # non-forwarded local port
->
->-	vm_ssh -- "${VSOCK_TEST}" \
->-		--mode=server \
->-		--control-port="${port}" \
->-		--peer-cid=1 2>&1 | log_guest &
->-
->-	vm_wait_for_listener "${port}"
->+	if ! vm_vsock_test "server" 1 "${port}"; then
->+		return "${KSFT_FAIL}"
->+	fi
->
->-	vm_ssh -- "${VSOCK_TEST}" \
->-		--mode=client \
->-		--control-host="127.0.0.1" \
->-		--control-port="${port}" \
->-		--peer-cid=1 2>&1 | log_guest
->+	if ! vm_vsock_test "127.0.0.1" 1 "${port}"; then
->+		return "${KSFT_FAIL}"
->+	fi
->
->-	return $?
->+	return "${KSFT_PASS}"
-> }
->
-> run_test() {
->
->-- 
->2.47.3
+> cheers,
+> jamal
 >
 
+Let me clarify : Before my recent work, I also had requeues but did
+not care much.
+
+Since then, I am trying to reduce the cost of TX, and latencies.
+
+This try_bulk_dequeue_skb() was a major issue, I guess nobody caught it bef=
+ore.
 
