@@ -1,151 +1,114 @@
-Return-Path: <netdev+bounces-238147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF6F9C54A8F
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 22:53:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DF26C54ABC
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 23:00:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 45CED4E20CA
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 21:52:36 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id B42FD4E0291
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 21:58:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A1AF2D7DE2;
-	Wed, 12 Nov 2025 21:52:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A6FE2E6CA0;
+	Wed, 12 Nov 2025 21:58:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vzl19eoj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oiByVJTn"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36D8F2E7BDF
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 21:52:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 184462E5B0D;
+	Wed, 12 Nov 2025 21:58:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762984355; cv=none; b=D9K/FekxwFQTxMdmiCcELbQy97hmi712o+ojsXmYa3NSxP4KUb+xumzzGfEQ8SwoylkcA1mVhck0SotO1eNTZjQvkHYrJwO+hyOD1PXhNCKN+dHqUcHEzCSTB9ejFrL3n26wKPqUmtJjJVkPdVMi9MPZu6NB2GeKSY0tn443HAg=
+	t=1762984709; cv=none; b=hQdSUyt8AAfuogggaOSIYAQGltWOcNQe6UyDiKcLT/BKmtY77tvs+sjYpu/bhTLsp4gSpdMA81Yh34H0RKDZoiohV1VfMqp5c04MCVlOqh4qJ9sEGlef2D6UvnGHNP77rJSe0CoPy4lP9L4PF1IT7I2pzG46trd4318mNnFyXzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762984355; c=relaxed/simple;
-	bh=eJOZTJq2+oQmdJH8pJU2buDGVe5UizvYAN/062DgeDw=;
+	s=arc-20240116; t=1762984709; c=relaxed/simple;
+	bh=DCH5YBw66ErM1uxNNoYc8WJxzsfE8ZpJahysVMrqAkU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=X1Me6f3qfG/LQGCqJrErQzFtFtiTEuNJc23yELu1/vbCiClX+k0XaajvOHExxy9JeKz2303CS8r3XzAWwBABTW7yqxuG3Uby/RNMeK4Vz6USniBqWxozZbR1jJbyCuAgQEvb3/RbNVM5s0CUyE6e84Y0ajl5VW+6cJGYjPo0HvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vzl19eoj; arc=none smtp.client-ip=95.215.58.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <e73e0e22-ff06-4e64-a2fd-c930ca1943c0@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1762984336;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sA0/GOtiqtvKxJBnC3sdby934G85/g09THmVfQyevd4=;
-	b=vzl19eojHa96bSiblkZWGnwDJ1zSohI/RK7glANwck3X1pWD0jcUjsdAQVx7k6dMKyRa7p
-	rIiVhmtdT498wsUROuuIom+0BpkWuatjh/4G6tL+NiFOzJXIO9bGYilLKpHup+uBk75SIp
-	/acy5uw2BP6154LKSZaHqiXk1zjXUhA=
-Date: Wed, 12 Nov 2025 21:52:13 +0000
+	 In-Reply-To:Content-Type; b=Hxqshhjba5mE7PIgnYCLb+02JiBId14tiFS+4oWgkwCj5EW8QPNF4WAVVt5cwtVG0WozBJeDzAMRlAnRxMK9HrM4YGYEYaus/HmpbKVBDZS4y7nwK/fwY6nHQnv6myXO1wXE5LTaAjv+8F7GQjrHlvaqrHVKgUFyjVAr8/G5su8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oiByVJTn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A965AC19423;
+	Wed, 12 Nov 2025 21:58:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762984708;
+	bh=DCH5YBw66ErM1uxNNoYc8WJxzsfE8ZpJahysVMrqAkU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=oiByVJTnWtO3RGPuzsmVE4E2uE/UfTblS478WXOkC0X6nxJ04o4iYt40TAukSmtzM
+	 b9LjYsPnXMBkDmACHOOjmm+zPI6GlG8BVFMZ/BbVVkrwXCk0fM+OYtixdNnylkimVG
+	 i+/E/UN8DriSWpPQR9nP/eEzoEHPcfm3AmmhuWMzlvK/fJAB6l4bg/wcqXi2tZxha6
+	 ydiIQOZf886r2mu/1FfxaVQ4sdGVWWPcML1X3WB+XAgPk16zytV9u170+XMXXONFx/
+	 s2lGF8aKLMP7rPymB7B6IYBACriIQPv1lknibV0I139ZO3Y2oxU044TziB1secfV/p
+	 rlx8c+ZIzYF8w==
+Message-ID: <69451eb5-a36e-4443-8e34-7a06627b087d@kernel.org>
+Date: Wed, 12 Nov 2025 22:58:23 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v2 1/6] dpll: zl3073x: Store raw register values
- instead of parsed state
-To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
-Cc: Petr Oros <poros@redhat.com>,
- Prathosh Satish <Prathosh.Satish@microchip.com>,
- Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, Michal Schmidt <mschmidt@redhat.com>,
- linux-kernel@vger.kernel.org
-References: <20251111181243.4570-1-ivecera@redhat.com>
- <20251111181243.4570-2-ivecera@redhat.com>
- <886723c3-ff9e-43cf-a1da-021f1ff088ab@linux.dev>
- <45a93065-eaaa-4b18-90e0-e1d9cceb91b4@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net V3 1/2] veth: enable dev_watchdog for detecting
+ stalled TXQs
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
+ <toke@toke.dk>, Eric Dumazet <eric.dumazet@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ ihor.solodrai@linux.dev, "Michael S. Tsirkin" <mst@redhat.com>,
+ makita.toshiaki@lab.ntt.co.jp, toshiaki.makita1@gmail.com,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kernel-team@cloudflare.com
+References: <176236363962.30034.10275956147958212569.stgit@firesoul>
+ <176236369293.30034.1875162194564877560.stgit@firesoul>
+ <20251106172919.24540443@kernel.org>
+ <b9f01e64-f7cc-4f5a-9716-5767b37e2245@kernel.org>
+ <20251107175445.58eba452@kernel.org>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <45a93065-eaaa-4b18-90e0-e1d9cceb91b4@redhat.com>
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20251107175445.58eba452@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 7bit
 
-On 12/11/2025 19:24, Ivan Vecera wrote:
-> On 11/12/25 3:12 PM, Vadim Fedorenko wrote:
->> On 11/11/2025 18:12, Ivan Vecera wrote:
->>> The zl3073x_ref, zl3073x_out and zl3073x_synth structures
->>> previously stored state that was parsed from register reads. This
->>> included values like boolean 'enabled' flags, synthesizer selections,
->>> and pre-calculated frequencies.
->>>
->>> This commit refactors the state management to store the raw register
->>> values directly in these structures. The various inline helper functions
->>> are updated to parse these raw values on-demand using FIELD_GET.
->>>
->>> Reviewed-by: Petr Oros <poros@redhat.com>
->>> Tested-by: Prathosh Satish <Prathosh.Satish@microchip.com>
->>> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
->>> ---
->>>   drivers/dpll/zl3073x/core.c | 81 ++++++++++++-------------------------
->>>   drivers/dpll/zl3073x/core.h | 61 ++++++++++++++++------------
->>>   2 files changed, 60 insertions(+), 82 deletions(-)
->>>
->>> diff --git a/drivers/dpll/zl3073x/core.c b/drivers/dpll/zl3073x/core.c
->>> index e42e527813cf8..50c1fe59bc7f0 100644
->>> --- a/drivers/dpll/zl3073x/core.c
->>> +++ b/drivers/dpll/zl3073x/core.c
->>> @@ -598,25 +598,22 @@ int zl3073x_write_hwreg_seq(struct zl3073x_dev 
->>> *zldev,
->>>    * @zldev: pointer to zl3073x_dev structure
->>>    * @index: input reference index to fetch state for
->>>    *
->>> - * Function fetches information for the given input reference that are
->>> - * invariant and stores them for later use.
->>> + * Function fetches state for the given input reference and stores 
->>> it for
->>> + * later user.
->>>    *
->>>    * Return: 0 on success, <0 on error
->>>    */
->>>   static int
->>>   zl3073x_ref_state_fetch(struct zl3073x_dev *zldev, u8 index)
->>>   {
->>> -    struct zl3073x_ref *input = &zldev->ref[index];
->>> -    u8 ref_config;
->>> +    struct zl3073x_ref *ref = &zldev->ref[index];
->>>       int rc;
->>>       /* If the input is differential then the configuration for N-pin
->>>        * reference is ignored and P-pin config is used for both.
->>>        */
->>> -    if (zl3073x_is_n_pin(index) &&
->>> -        zl3073x_ref_is_diff(zldev, index - 1)) {
->>> -        input->enabled = zl3073x_ref_is_enabled(zldev, index - 1);
->>> -        input->diff = true;
->>> +    if (zl3073x_is_n_pin(index) && zl3073x_ref_is_diff(zldev, index 
->>> - 1)) {
->>> +        memcpy(ref, &zldev->ref[index - 1], sizeof(*ref));
+
+
+On 08/11/2025 02.54, Jakub Kicinski wrote:
+> On Fri, 7 Nov 2025 14:42:58 +0100 Jesper Dangaard Brouer wrote:
+>>> I think this belongs in net-next.. Fail safe is not really a bug fix.
+>>> I'm slightly worried we're missing a corner case and will cause
+>>> timeouts to get printed for someone's config.
 >>
->> Oh, it's not obvious from the code that it's actually safe, unless
->> reviewer remembers that N-pins have only even indexes.
+>> This is a recovery fix.  If the race condition fix isn't 100% then this
+>> patch will allow veth to recover.  Thus, to me it makes sense to group
+>> these two patches together.
+>>
+>> I'm more worried that we we're missing a corner case that we cannot
+>> recover from. Than triggering timeouts to get printed, for a config
+>> where NAPI consumer veth_poll() takes more that 5 seconds to run (budget
+>> max 64 packets this needs to consume packets at a rate less than 12.8
+>> pps). It might be good to get some warnings if the system is operating
+>> this slow.
+>>
+>> Also remember this is not the default config that most people use.
+>> The code is only activated if attaching a qdisc to veth, which isn't
+>> default. Plus, NAPI mode need to be activated, where in normal NAPI mode
+>> the producer and consumer usually runs on the same CPU, which makes it
+>> impossible to overflow the ptr_ring.  The veth backpressure is primarily
+>> needed when running with threaded-NAPI, where it is natural that
+>> producer and consumer runs on different CPUs. In our production setup
+>> the consumer is always slower than the producer (as the product inside
+>> the namespace have installed too many nftables rules).
 > 
-> Would it be helpful to add here the comment describing that is safe and
-> why?
+> I understand all of this, but IMO the fix is in patch 2.
+> This is a resiliency improvement, not a fix.
 
-Yes, comment would be great to have.
+As maintainer you have the final say, so I send a [V4]. Notice that
+doing it this way will cause a merge conflict once net and net-next gets
+merged.
 
-> 
->> Have you thought of adding an abstraction for differential pair pins?
-> 
-> No, zl3073x_ref represents mailbox for HW reference... Here, I’m just
-> following the datasheet, which states: "If the P-pin is marked as
-> differential then some content of the mailbox for N-pin is ignored and
-> is inherited from the P-pin".
-> For now, the content of zl3073x_ref is the inherited one, but this may
-> change in the future.
-> 
-> The abstraction for differential pin pairs is actually handled in
-> dpll.c, where only a single dpll_pin is registered for each such pair.
-> 
-> Ivan
-> 
+[V4] 
+https://lore.kernel.org/all/176295319819.307447.6162285688886096284.stgit@firesoul/
 
+--Jesper
 
