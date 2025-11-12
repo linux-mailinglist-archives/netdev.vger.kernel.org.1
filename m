@@ -1,124 +1,134 @@
-Return-Path: <netdev+bounces-237962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92C94C5213E
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 12:49:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1265C521EC
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 12:55:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9747C3A651F
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 11:43:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8513A3BFC16
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 11:47:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2F2727AC3A;
-	Wed, 12 Nov 2025 11:43:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C8AD313E21;
+	Wed, 12 Nov 2025 11:46:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b="hwgqECDs"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="OZ6Prb2I"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BFD830E857
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 11:43:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F8762D6E7E;
+	Wed, 12 Nov 2025 11:46:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762947794; cv=none; b=hsWCfPMXwqSkqaQ6jJsJx9637Dov3fHhqrcGfhsBucO/i4puxLcFhMDUIDpbwa+rM7EZ+1OIkdZOqLtkJ02V+ndTxWW85bVxx9chOPjBgnDxCQO3g6YRNDrHmt/2Ic9xJQuK8DaRW5pTUB7UA2Tho3TTjkeoyNhZj41gnV5obyQ=
+	t=1762947991; cv=none; b=puwFANAv8d3UPaS2SJ4OwR+2eWOdCCrxEoJKFkSxs2ZeZPGssgGRcc9wRRKc19ixVpJcws1ThQ+1m8QyNESZEB1JtpZ9sZV9NoQXiSbTXxtiAX4sclTF2qKLB5tcneD04CRNqF199/QOGIihSvuKnLScZx7hKMh8bWbi2sBaxQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762947794; c=relaxed/simple;
-	bh=JH9RQWDlZksP3A5WjT/Tdcm9mFgNLOafV5repVUVXmQ=;
-	h=MIME-Version:In-Reply-To:References:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WEuU6BG5x7dHX9ajkydzaRJXWstRsWTfyHWY+VLxoX8IkjPhu4ndBMIgsYl4fYElGKCGtjl3CaIir1CYyJsLNZKFm4BoVnVd6HtFIx69kT49mS3xA6tWr+pauOcfCfdLx86YjdUF4rYKRp/Uo1M8I4OtD/cdRj8UBg2ul9Bj2hM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (4096-bit key) header.d=canonical.com header.i=@canonical.com header.b=hwgqECDs; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com [209.85.218.70])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 2E7C43FE52
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 11:43:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20251003; t=1762947790;
-	bh=JH9RQWDlZksP3A5WjT/Tdcm9mFgNLOafV5repVUVXmQ=;
-	h=MIME-Version:In-Reply-To:References:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type;
-	b=hwgqECDsQzlV6AkQZet/s6MW6kquiGQf88sNdGh4gEQ7/0u/341o10m6Eqjcp7YTT
-	 YJ3n4dwsOFKkuRkFZHFQ9I1IYTKpFj2NdNAHKZvw+UoxmQJKWcvGZKhkf11Dpl1N2F
-	 3dxvIw9MweMvZCrUSK3IB1aoiJBnHhvj7VwNQLivzJXVWF+AN0bqIuPKwZghteRu9I
-	 uLUk+KidzELo/6A2YP0z6l756KVR2cT2SBgxK2gPerQhcSyfVGLTcMreYhVJzBYMd9
-	 PNbc/p7Mmh9KVomp3OL6t6ihENY3c3jQsoN0Nz/X73BKLxcWftalvCZlkC/nnHpn21
-	 ZCjG8WNfi9xOUzNOauBCld4Tq0aH5rgmmymdHgzHElJOorZ4uS0wqlpYsqlWRGFujp
-	 QA+N/+hjJICMLh4+b9hmIwDVwTBIeya8e9R9ex1kmLdkpLI3QV2xbO34DZSBbqX2vr
-	 pMZo1w7onvqDEnXdvW9ZxpiaD9l14LaYZATkY7sESRzlHwSalawuNFriZ+mJPBS9IQ
-	 qbf8JkdWJ6gM/xiWCdt5kzzdamWTsUHJAUDzVXy+KL9xPkoQhF3QX6pMtrWHOD0YQR
-	 2PuxYpi8pj5+7POz6rIgi6To+YSRht4s+TV89jY4e9pNpkhxwdAy+BMNRSYBtnkBTc
-	 l5urrNTKcGbtH5AH9HpRTfes=
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-b70a978cd51so77286266b.3
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 03:43:10 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762947789; x=1763552589;
-        h=cc:to:subject:message-id:date:user-agent:from:references
-         :in-reply-to:mime-version:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JH9RQWDlZksP3A5WjT/Tdcm9mFgNLOafV5repVUVXmQ=;
-        b=aQstIKfBwUJDKPvz7gSblt0U+yAhiIHl4hNRDywaQawOmyo7HkseAyy+p+En2Iipkw
-         ezZvEpAHOBJds/Cog08woAsnKVGXvQhPC2T43Gojjd6S8z+216nMql5s9BtKiUAsvFy6
-         HR7auNMdC4mxpu9lcf6belh9fVqvnEqW7TZueO8d652TpcY0XpSCVa+X4B4LWAeKSVny
-         MjTydyZzanSafFvpWVb2vUhU/9WaCRgQno5KFSFzk36tzuZKjIWECHGidTevm3EWOR1+
-         zvqIUA1kSsuLmr4bnkj74XbvWll5W+JAmAmYHK6RbiIzookYqmnj7HLHB/LPE8zAXURK
-         3r7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUvJi+pA38yg9OlsBCY2PUCnONxSMspCWahLz5la1tc28LxhqmRAphCesbu0wXJeC5Yr/2XgI0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxzib+KIR3mrrgM0e93DoNrVbm2p8NwLBYpR+QMTYCdGiiLy+rg
-	jE7AWPh3RHivFUIh9/noaDD2NbSrjVxh/8FQHau/4ycyPMoXqNN+ee1A7Yc9xqtiGQ0+SmiP1Mz
-	8X+jMwjtKyUPNNRi1KqTbki1r3csmUckaf1bld+OMKV+kkvQo7Gf6+z14jlR9tOaSt/nm/hDY2G
-	/S0DEe3Y1SWjZy68nYMo8LKY7PU3wJThINWU5TYwJuZYM11Ukx
-X-Gm-Gg: ASbGncvDKpm62/MGXRHcoEz8zM4ws99ya98yFrs3z59IU/0c0Ns/flzcM05yBfV12Jv
-	wAMMVBAsjoo0E5+5MCxPRY5wZaTMHLJTZmovIvm/dbSSzstenrwhw3JhFnpPWj+J+cax5/0szAI
-	2JAil5TKcntKwH/4nN2CN0w7iCaALJe3yUmzrhh/m91oS24R0nG1VzeVAGZgLw3HCZYFvZg1JtI
-	MvxUVTJH7v6
-X-Received: by 2002:a17:907:9713:b0:b72:5a54:1720 with SMTP id a640c23a62f3a-b7331ae8bbbmr239080166b.57.1762947789526;
-        Wed, 12 Nov 2025 03:43:09 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEACqB0mCN3EX0p95RUNEAUTyaZ39pandxW0+rdirFn7EUt3COrqPK8HKamiHijsSU/fq2Kt0hi/1uzUL2rjsY=
-X-Received: by 2002:a17:907:9713:b0:b72:5a54:1720 with SMTP id
- a640c23a62f3a-b7331ae8bbbmr239077666b.57.1762947789084; Wed, 12 Nov 2025
- 03:43:09 -0800 (PST)
-Received: from 753933720722 named unknown by gmailapi.google.com with
- HTTPREST; Wed, 12 Nov 2025 03:43:08 -0800
-Received: from 753933720722 named unknown by gmailapi.google.com with
- HTTPREST; Wed, 12 Nov 2025 03:43:08 -0800
+	s=arc-20240116; t=1762947991; c=relaxed/simple;
+	bh=TKLE4KJ2DnftHA0ZLvrF4UANQmpXCg9qPqzhuwVOhfM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LPJ419QQXrdh9FqfPMq1ttgTDQdk9Holv5mxypv+ChCLrgVeT6pOk5t0MTd6ca8/BRLjbtT6/pue9cd9CYxFj334PsNrSOOFuxUoBR/4ApW5k9eBzdg/7dwd52ciwYS/uVXazOj/Kro2w1UB/HYheDdj9jawTJr/O0XFUh5/NhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=OZ6Prb2I; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
+	Resent-Message-ID:In-Reply-To:References;
+	bh=el1H+VwEaoSVHTBYapEN6dATz+Faz5AfCW5KT0gELP8=; t=1762947989; x=1764157589; 
+	b=OZ6Prb2I4ld/+H1lpuyrlsdPpoGlPfGMeDsMv4dvS8EyYO/v3yzZa4tUfbQ43Wp+nMrPGCR/BsA
+	BapEZpFVGgJR662he8kMiEwEalDq6Gla/r8R8VPz6DZiVUt0Un60FsVw9m7CASBwF6M6fQ/uss1ce
+	Dcu1mGYjNsTH0xsl8ENNGJkP71TjFqJrTxVNIfpqKnDb8mkPVr5wbUhcx1b8Ayofhvrh5HIv7nwUI
+	+8lizJQtQ23wDO+I9DoxuS24QsuEBnos6Dp06Q64u2Q9RxXDd8FRrxCXKMK+SWqTik+yhKe2JIplp
+	nOzpphvdfyKpFc9Tdg+RGfT4BAjkjv4/9qAg==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98.2)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1vJ9Iu-00000001BZW-2AV2;
+	Wed, 12 Nov 2025 12:46:25 +0100
+From: Johannes Berg <johannes@sipsolutions.net>
+To: netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Subject: [GIT PULL] wireless-2025-11-12
+Date: Wed, 12 Nov 2025 12:45:38 +0100
+Message-ID: <20251112114621.15716-5-johannes@sipsolutions.net>
+X-Mailer: git-send-email 2.51.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <E1vIjUF-0000000Dqth-0gwD@rmk-PC.armlinux.org.uk>
-References: <aRLvrfx6tOa-RhrY@shell.armlinux.org.uk> <E1vIjUF-0000000Dqth-0gwD@rmk-PC.armlinux.org.uk>
-From: Emil Renner Berthing <emil.renner.berthing@canonical.com>
-User-Agent: alot/0.0.0
-Date: Wed, 12 Nov 2025 03:43:08 -0800
-X-Gm-Features: AWmQ_bkenMvacX26pAHg6nt10w-7MV8cO1nbkR5cqs-fMNBqO4TpuSWeehZ0dCc
-Message-ID: <CAJM55Z9O3BTejaAnTH4nTXT3VcRU701BWdSusRNArt-9vkCFYg@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 08/13] net: stmmac: starfive: use stmmac_get_phy_intf_sel()
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Keguang Zhang <keguang.zhang@gmail.com>, 
-	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
-	linux-mips@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	Matthias Brugger <matthias.bgg@gmail.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Minda Chen <minda.chen@starfivetech.com>, netdev@vger.kernel.org, 
-	Nobuhiro Iwamatsu <nobuhiro.iwamatsu.x90@mail.toshiba>, Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Quoting Russell King (Oracle) (2025-11-11 09:12:23)
-> Use stmmac_get_phy_intf_sel() to decode the PHY interface mode to the
-> phy_intf_sel value, validate the result and use that to set the
-> control register to select the operating mode for the DWMAC core.
->
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Hi,
 
-Reviewed-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
+And we have another set for net/rc6. Basically just
+more driver fixes trickling in, various small issues.
+
+Please pull and let us know if there's any problem.
+
+Thanks,
+johannes
+
+
+
+The following changes since commit c2c2ccfd4ba72718266a56f3ecc34c989cb5b7a0:
+
+  Merge tag 'net-6.18-rc5' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-11-06 08:52:30 -0800)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2025-11-12
+
+for you to fetch changes up to a35f64a216ca1c9e3c3f0f91fdb54ef9515a7fe7:
+
+  Merge tag 'iwlwifi-fixes-2025-11-12' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next (2025-11-12 09:51:05 +0100)
+
+----------------------------------------------------------------
+Couple more fixes:
+ - mwl8k: work around FW expecting a DSSS element in beacons
+ - ath11k: report correct TX status
+ - iwlwifi: avoid toggling links due to wrong element use
+ - iwlwifi: fix beacon template rate on older devices
+ - iwlwifi: fix loop iterator being used after loop
+ - mac80211: disallow address changes while using the address
+ - mac80211: avoid bad rate warning in monitor/sniffer mode
+ - hwsim: fix potential NULL deref (on monitor injection)
+
+----------------------------------------------------------------
+Benjamin Berg (1):
+      wifi: mac80211: skip rate verification for not captured PSDUs
+
+Ilan Peer (1):
+      wifi: mac80211_hwsim: Fix possible NULL dereference
+
+Johannes Berg (4):
+      wifi: mac80211: reject address change while connecting
+      Merge tag 'ath-current-20251110' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath
+      wifi: iwlwifi: mvm: fix beacon template/fixed rate
+      Merge tag 'iwlwifi-fixes-2025-11-12' of https://git.kernel.org/pub/scm/linux/kernel/git/iwlwifi/iwlwifi-next
+
+Junjie Cao (1):
+      wifi: iwlwifi: fix aux ROC time event iterator usage
+
+Miri Korenblit (1):
+      wifi: iwlwifi: mld: always take beacon ies in link grading
+
+Nicolas Escande (1):
+      wifi: ath11k: zero init info->status in wmi_process_mgmt_tx_comp()
+
+Pawel Dembicki (1):
+      wifi: mwl8k: inject DSSS Parameter Set element into beacons if missing
+
+ drivers/net/wireless/ath/ath11k/wmi.c              |  3 +
+ drivers/net/wireless/intel/iwlwifi/mld/link.c      |  7 +--
+ drivers/net/wireless/intel/iwlwifi/mvm/mac-ctxt.c  | 13 +---
+ .../net/wireless/intel/iwlwifi/mvm/time-event.c    | 14 ++---
+ drivers/net/wireless/intel/iwlwifi/mvm/utils.c     | 12 +++-
+ drivers/net/wireless/marvell/mwl8k.c               | 71 ++++++++++++++++++++--
+ drivers/net/wireless/virtual/mac80211_hwsim.c      | 14 +++--
+ net/mac80211/iface.c                               | 14 ++++-
+ net/mac80211/rx.c                                  | 10 ++-
+ 9 files changed, 117 insertions(+), 41 deletions(-)
 
