@@ -1,765 +1,146 @@
-Return-Path: <netdev+bounces-237933-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237934-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 836C5C51AF3
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 11:35:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29748C51BDA
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 11:44:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C68764FC7EA
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 10:26:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 336433A9DBF
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 10:35:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B20A303A03;
-	Wed, 12 Nov 2025 10:26:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44CA3303A23;
+	Wed, 12 Nov 2025 10:35:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="sOa+d6dA";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="sOa+d6dA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="djVxInjL";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="O/xEfp7Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADCE43019A2
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 10:26:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 827782777E0
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 10:35:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762943178; cv=none; b=loNN1oUSMLs3Ewh7TLKW2hz67xYjYfAy0Jtk+jXHzQjVTUppFLmoEQoHHuccxwznMgWRjF+lXniDbzUw+TzYg7AJkH9ChqODWsUTP6JDvOQidjKZcizQ+V1jXI+tfgQ+Pa+KVbDda86jknu+VrHU6WkBxAVj9ANva0YScOEwozE=
+	t=1762943714; cv=none; b=lFSNqWr3+a6PIraLwjuzJDsp1ciK0ZYzgWykd1XXOHWRIEdTRLAeomi8fWM2ABqLuagHDyvCrRMJ5+vTUVR67j5FIHx4CD7jIx7uDpW8Jxjdn0nMtm+HqdpRi2vwV22Hz48DW0wPj0WzFUfpRRMi9UI82QPBUfrp2BjZiyP8b5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762943178; c=relaxed/simple;
-	bh=YvoNd64pzl5ss9nn0rssJbnU35KZXGmEAjwcd0ohukA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mgrfngDeiCSLtMq+hQYY8+14K54DCZQiwgRZ69ozYUqZmdXCi6QCCA32+BN+jDJfMVZ7fIkeh2IZr/Ev7r6oeUwfkpE3iGPtq5wHCJGjE0uP4V54iFxNiOv7M7Gsb7RP5ivMbRL//hwfXgdObI1F4jaF53NJ0bFuvhOnOp9HHT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=sOa+d6dA; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=sOa+d6dA; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id BFACE21B88;
-	Wed, 12 Nov 2025 10:26:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1762943173; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=M2yHZQB89iinIDJsvYvno2OLlMNlzc2IAST5uE5DI+g=;
-	b=sOa+d6dAVwicKw8S2kY3BByQlJMAa0sle6l5ronk9sgE8dJXys+rIVwKUGtSn4EKItPZTy
-	80TL0Fksxg1+qecLFa/cpid1+JnN0v8JOCdat6B/6dDljsc72Gv3wZTXFd4PeITjuyFbaF
-	i3objAF15p6h15JCBvkIGkAdBWQOass=
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1762943173; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=M2yHZQB89iinIDJsvYvno2OLlMNlzc2IAST5uE5DI+g=;
-	b=sOa+d6dAVwicKw8S2kY3BByQlJMAa0sle6l5ronk9sgE8dJXys+rIVwKUGtSn4EKItPZTy
-	80TL0Fksxg1+qecLFa/cpid1+JnN0v8JOCdat6B/6dDljsc72Gv3wZTXFd4PeITjuyFbaF
-	i3objAF15p6h15JCBvkIGkAdBWQOass=
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 870D73EA61;
-	Wed, 12 Nov 2025 10:26:13 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id h1fPH8VgFGlMOgAAD6G6ig
-	(envelope-from <oneukum@suse.com>); Wed, 12 Nov 2025 10:26:13 +0000
-From: Oliver Neukum <oneukum@suse.com>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org
-Cc: Oliver Neukum <oneukum@suse.com>
-Subject: [PATCH net-next v1 1/1] net: usb: usbnet: adhere to style
-Date: Wed, 12 Nov 2025 11:25:00 +0100
-Message-ID: <20251112102610.281565-1-oneukum@suse.com>
-X-Mailer: git-send-email 2.51.1
+	s=arc-20240116; t=1762943714; c=relaxed/simple;
+	bh=E+tvlKSlf/4Wz9KSvYrxWC/QgGC9Mmj94VvKntU4n/A=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=MsIWCHxxRUnH7QiRho4VChg+kBkkJiJcejlKwtEBfeEA39CtrxmMixM+OOoMPbHVTPcJ2tz2tuUf1zN6ouzKxJ9RnBS53sr2dzz4uW2ewWH52SqVq6DcRt2hUknxk56IzljCOGXy5wOrW+hyG42UlQTSfx4AhdDuSEgd0LWa/pI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=djVxInjL; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=O/xEfp7Y; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762943711;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=E+tvlKSlf/4Wz9KSvYrxWC/QgGC9Mmj94VvKntU4n/A=;
+	b=djVxInjLuLu9rPixoAOJG3jcdCyUpkESYda4kSVX+m5f7FB2FM69sLZ51a6bZAJN5gPTYo
+	DuyOeF8mYB5A1buDhgq64TZM21lGzORUKgofE9zieK6orpUtF6cM7GqPwKut0D41k/gkas
+	HgOvn5IZGjB0A6shTbovZsR7SCLTtx8=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-615-8EeHDCxBOtePY0sgHbodbw-1; Wed, 12 Nov 2025 05:35:10 -0500
+X-MC-Unique: 8EeHDCxBOtePY0sgHbodbw-1
+X-Mimecast-MFC-AGG-ID: 8EeHDCxBOtePY0sgHbodbw_1762943709
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-b733a653a8cso24588666b.3
+        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 02:35:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1762943709; x=1763548509; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=E+tvlKSlf/4Wz9KSvYrxWC/QgGC9Mmj94VvKntU4n/A=;
+        b=O/xEfp7YWmTmvHPNePKBPS7LOLgpU6Rh/qjwQolnaee3YDJcfoNHYlc6hLUklp/WQm
+         0cDIiAV5Tg8D6Kgk5Rvdz1/B0rxC9x7xim1rvQ6giiIAZxM7/tYTc5NbyFlClqu4q8Ns
+         D0AelqmdOAZQRFfxLYfgndSoJdfUrd/vlgnypx58P3WqFkz4OdYn6ZFUWxRXp9GYrQtb
+         RciT85XY9v7bTFkaWoI2GCj3AEL7Oo0orIKqtF5YI3DZDyK8xR8HAdl7SrsnacjTm9ir
+         mu88aBxtMmysQSaqE10yFZdNCWrb45I8Bd/Vq0A2JI/Pv8YKnLt8yobxlNa1+568bDG8
+         NxLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762943709; x=1763548509;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=E+tvlKSlf/4Wz9KSvYrxWC/QgGC9Mmj94VvKntU4n/A=;
+        b=T6ymiziUtg5+iO2cd2NHs216y71wz4hB1QBzH7j4GSPrQB7T4/RGcn97Z/2BHK6I7q
+         /vnYXEQIohLqno6yRVOFVkB6ea4agy36iVIGl4c6JmntG9QfZC3IMXWLPttjVDuMSgXL
+         Y4fnAx9LQxCYYt+c70Z+NPVJDQ8cXRCKyyavwdJ0Q2wExM/BjQNraBd7pJd6y2eJ9GRw
+         9ZhVix0Q7UWCXX4CP8GmYIPl2CyUF05iuF29tC+F+Ax7lFB8YnYsChCf1RoxFjYRHDm8
+         BYpxHrErebFyK2yFJIe3pPjgrVv0uBKVSht3Io/p0fMwkf0c24MxBwfaL22I3iRSt/wz
+         vTlA==
+X-Forwarded-Encrypted: i=1; AJvYcCUWcGBkLsnUMx82I8veZs97ZYzHRVvncHGlS2k2dJZzrouKSOXGy76F2niV7EFDE7i8WQhIqeY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwudaiHBaRYC96z0h31CMQLUO4eF7fPOTXuIB2Kmdyal7qc2+Qt
+	ZgzyclqjwI0QRo/uPBrDcQ8ykSj4QaoR3qiu6qWEkont3AMf2w/qHJIN1M6Jfwjyk2w7FrZLt8E
+	zsfPLwlfOm/asvLdT2n7C8QQPRQhirLVAkWHdpWFkoRVqVev7xwVAg8+vCg==
+X-Gm-Gg: ASbGncuRv/Lk/6wojEWCIbcP0EBEnd83ouccL0rFryruNrjdqOBQtboT5Yc/EWp+pR+
+	oFN5OqH7O8Q9+ys0+EhyH2DcI0RhmVtcSz6w3nqiUG352jilYSOFHL+bRBig+R1+cuECgQfeF8o
+	vujDcyYNYDgLYUYPoTtZrx9pL3EkMWpU6OjlWSsM1gxa7hGHZUbK4lsyZOoxXDuB3jPisPcPe03
+	keczuwyBuiSPA5cyaJw1dA3ZGgaJF0yA67qfDj7xZtznPwYwg0vgUJKu4+bUOE01YLoJT/wtDSI
+	NXWLlNdCJl8966kdptMJI9xuGidEwS/+/uxgQkAxuBurDb+1V9Ejhl9dCwzQS60avfE/cMf+LTN
+	As9IxYsylJM7Kitea4QS1NMY=
+X-Received: by 2002:a17:907:c1c:b0:b49:5103:c0b4 with SMTP id a640c23a62f3a-b7331ace073mr291846966b.56.1762943709058;
+        Wed, 12 Nov 2025 02:35:09 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE0/W7QILhc20zuI/PbypJ8sMQLsdF6TH22S7u7UG3VgCM2TlPgQLQWKEl5Bf/jjsWA11F+4Q==
+X-Received: by 2002:a17:907:c1c:b0:b49:5103:c0b4 with SMTP id a640c23a62f3a-b7331ace073mr291842966b.56.1762943708631;
+        Wed, 12 Nov 2025 02:35:08 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-64179499189sm8607152a12.8.2025.11.12.02.35.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Nov 2025 02:35:07 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 2C7A2329674; Wed, 12 Nov 2025 11:29:54 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew
+ Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Mark Bloch <mbloch@nvidia.com>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, Gal Pressman <gal@nvidia.com>, Leon Romanovsky
+ <leonro@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>, William Tu
+ <witu@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>, Nimrod Oren
+ <noren@nvidia.com>, Alex Lazar <alazar@nvidia.com>
+Subject: Re: [PATCH net-next 6/6] net/mlx5e: Support XDP target xmit with
+ dummy program
+In-Reply-To: <1762939749-1165658-7-git-send-email-tariqt@nvidia.com>
+References: <1762939749-1165658-1-git-send-email-tariqt@nvidia.com>
+ <1762939749-1165658-7-git-send-email-tariqt@nvidia.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Wed, 12 Nov 2025 11:29:54 +0100
+Message-ID: <877bvvlf19.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spamd-Result: default: False [-1.30 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	MID_CONTAINS_FROM(1.00)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_MISSING_CHARSET(0.50)[];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	TAGGED_RCPT(0.00)[netdev];
-	MIME_TRACE(0.00)[0:+];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	FUZZY_RATELIMITED(0.00)[rspamd.com];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[8];
-	DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:mid,suse.com:email];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_TLS_ALL(0.00)[]
-X-Spam-Flag: NO
-X-Spam-Score: -1.30
-X-Spam-Level: 
+Content-Type: text/plain
 
-This satisfies the coding style.
+Tariq Toukan <tariqt@nvidia.com> writes:
 
-Signed-off-by: Oliver Neukum <oneukum@suse.com>
----
- drivers/net/usb/usbnet.c | 233 ++++++++++++++++++++-------------------
- 1 file changed, 120 insertions(+), 113 deletions(-)
+> Save per-channel resources in default.
+>
+> As no better API exist, make the XDP-redirect-target SQ available by
+> loading a dummy XDP program.
 
-diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
-index 3d10cf791c51..1d9faa70ba3b 100644
---- a/drivers/net/usb/usbnet.c
-+++ b/drivers/net/usb/usbnet.c
-@@ -142,16 +142,16 @@ int usbnet_get_endpoints(struct usbnet *dev, struct usb_interface *intf)
- 
- 	if (alt->desc.bAlternateSetting != 0 ||
- 	    !(dev->driver_info->flags & FLAG_NO_SETINT)) {
--		tmp = usb_set_interface (dev->udev, alt->desc.bInterfaceNumber,
--				alt->desc.bAlternateSetting);
-+		tmp = usb_set_interface(dev->udev, alt->desc.bInterfaceNumber,
-+					alt->desc.bAlternateSetting);
- 		if (tmp < 0)
- 			return tmp;
- 	}
- 
--	dev->in = usb_rcvbulkpipe (dev->udev,
--			in->desc.bEndpointAddress & USB_ENDPOINT_NUMBER_MASK);
--	dev->out = usb_sndbulkpipe (dev->udev,
--			out->desc.bEndpointAddress & USB_ENDPOINT_NUMBER_MASK);
-+	dev->in = usb_rcvbulkpipe(dev->udev,
-+				  in->desc.bEndpointAddress & USB_ENDPOINT_NUMBER_MASK);
-+	dev->out = usb_sndbulkpipe(dev->udev,
-+				   out->desc.bEndpointAddress & USB_ENDPOINT_NUMBER_MASK);
- 	dev->status = status;
- 	return 0;
- }
-@@ -163,7 +163,7 @@ int usbnet_get_ethernet_addr(struct usbnet *dev, int iMACAddress)
- 	int 		tmp = -1, ret;
- 	unsigned char	buf [13];
- 
--	ret = usb_string(dev->udev, iMACAddress, buf, sizeof buf);
-+	ret = usb_string(dev->udev, iMACAddress, buf, sizeof(buf));
- 	if (ret == 12)
- 		tmp = hex2bin(addr, buf, 6);
- 	if (tmp < 0) {
-@@ -215,7 +215,7 @@ static void intr_complete(struct urb *urb)
- 		break;
- 	}
- 
--	status = usb_submit_urb (urb, GFP_ATOMIC);
-+	status = usb_submit_urb(urb, GFP_ATOMIC);
- 	if (status != 0)
- 		netif_err(dev, timer, dev->net,
- 			  "intr resubmit --> %d\n", status);
-@@ -231,24 +231,24 @@ static int init_status(struct usbnet *dev, struct usb_interface *intf)
- 	if (!dev->driver_info->status)
- 		return 0;
- 
--	pipe = usb_rcvintpipe (dev->udev,
--			dev->status->desc.bEndpointAddress
--				& USB_ENDPOINT_NUMBER_MASK);
-+	pipe = usb_rcvintpipe(dev->udev,
-+			      dev->status->desc.bEndpointAddress
-+			      & USB_ENDPOINT_NUMBER_MASK);
- 	maxp = usb_maxpacket(dev->udev, pipe);
- 
- 	/* avoid 1 msec chatter:  min 8 msec poll rate */
- 	period = max ((int) dev->status->desc.bInterval,
- 		(dev->udev->speed == USB_SPEED_HIGH) ? 7 : 3);
- 
--	buf = kmalloc (maxp, GFP_KERNEL);
-+	buf = kmalloc(maxp, GFP_KERNEL);
- 	if (buf) {
--		dev->interrupt = usb_alloc_urb (0, GFP_KERNEL);
-+		dev->interrupt = usb_alloc_urb(0, GFP_KERNEL);
- 		if (!dev->interrupt) {
--			kfree (buf);
-+			kfree(buf);
- 			return -ENOMEM;
- 		} else {
- 			usb_fill_int_urb(dev->interrupt, dev->udev, pipe,
--				buf, maxp, intr_complete, dev, period);
-+					 buf, maxp, intr_complete, dev, period);
- 			dev->interrupt->transfer_flags |= URB_FREE_BUFFER;
- 			dev_dbg(&intf->dev,
- 				"status ep%din, %d bytes period %d\n",
-@@ -339,7 +339,7 @@ void usbnet_skb_return(struct usbnet *dev, struct sk_buff *skb)
- 
- 	/* only update if unset to allow minidriver rx_fixup override */
- 	if (skb->protocol == 0)
--		skb->protocol = eth_type_trans (skb, dev->net);
-+		skb->protocol = eth_type_trans(skb, dev->net);
- 
- 	flags = u64_stats_update_begin_irqsave(&stats64->syncp);
- 	u64_stats_inc(&stats64->rx_packets);
-@@ -347,8 +347,8 @@ void usbnet_skb_return(struct usbnet *dev, struct sk_buff *skb)
- 	u64_stats_update_end_irqrestore(&stats64->syncp, flags);
- 
- 	netif_dbg(dev, rx_status, dev->net, "< rx, len %zu, type 0x%x\n",
--		  skb->len + sizeof (struct ethhdr), skb->protocol);
--	memset (skb->cb, 0, sizeof (struct skb_data));
-+		  skb->len + sizeof(struct ethhdr), skb->protocol);
-+	memset(skb->cb, 0, sizeof(struct skb_data));
- 
- 	if (skb_defer_rx_timestamp(skb))
- 		return;
-@@ -511,8 +511,8 @@ static int rx_submit(struct usbnet *dev, struct urb *urb, gfp_t flags)
- 		skb = __netdev_alloc_skb_ip_align(dev->net, size, flags);
- 	if (!skb) {
- 		netif_dbg(dev, rx_err, dev->net, "no rx skb\n");
--		usbnet_defer_kevent (dev, EVENT_RX_MEMORY);
--		usb_free_urb (urb);
-+		usbnet_defer_kevent(dev, EVENT_RX_MEMORY);
-+		usb_free_urb(urb);
- 		return -ENOMEM;
- 	}
- 
-@@ -521,27 +521,27 @@ static int rx_submit(struct usbnet *dev, struct urb *urb, gfp_t flags)
- 	entry->dev = dev;
- 	entry->length = 0;
- 
--	usb_fill_bulk_urb (urb, dev->udev, dev->in,
--		skb->data, size, rx_complete, skb);
-+	usb_fill_bulk_urb(urb, dev->udev, dev->in,
-+			  skb->data, size, rx_complete, skb);
- 
--	spin_lock_irqsave (&dev->rxq.lock, lockflags);
-+	spin_lock_irqsave(&dev->rxq.lock, lockflags);
- 
--	if (netif_running (dev->net) &&
--	    netif_device_present (dev->net) &&
-+	if (netif_running(dev->net) &&
-+	    netif_device_present(dev->net) &&
- 	    test_bit(EVENT_DEV_OPEN, &dev->flags) &&
--	    !test_bit (EVENT_RX_HALT, &dev->flags) &&
--	    !test_bit (EVENT_DEV_ASLEEP, &dev->flags) &&
-+	    !test_bit(EVENT_RX_HALT, &dev->flags) &&
-+	    !test_bit(EVENT_DEV_ASLEEP, &dev->flags) &&
- 	    !usbnet_going_away(dev)) {
--		switch (retval = usb_submit_urb (urb, GFP_ATOMIC)) {
-+		switch (retval = usb_submit_urb(urb, GFP_ATOMIC)) {
- 		case -EPIPE:
--			usbnet_defer_kevent (dev, EVENT_RX_HALT);
-+			usbnet_defer_kevent(dev, EVENT_RX_HALT);
- 			break;
- 		case -ENOMEM:
--			usbnet_defer_kevent (dev, EVENT_RX_MEMORY);
-+			usbnet_defer_kevent(dev, EVENT_RX_MEMORY);
- 			break;
- 		case -ENODEV:
- 			netif_dbg(dev, ifdown, dev->net, "device gone\n");
--			netif_device_detach (dev->net);
-+			netif_device_detach(dev->net);
- 			break;
- 		case -EHOSTUNREACH:
- 			retval = -ENOLINK;
-@@ -558,10 +558,10 @@ static int rx_submit(struct usbnet *dev, struct urb *urb, gfp_t flags)
- 		netif_dbg(dev, ifdown, dev->net, "rx: stopped\n");
- 		retval = -ENOLINK;
- 	}
--	spin_unlock_irqrestore (&dev->rxq.lock, lockflags);
-+	spin_unlock_irqrestore(&dev->rxq.lock, lockflags);
- 	if (retval) {
--		dev_kfree_skb_any (skb);
--		usb_free_urb (urb);
-+		dev_kfree_skb_any(skb);
-+		usb_free_urb(urb);
- 	}
- 	return retval;
- }
-@@ -572,7 +572,7 @@ static int rx_submit(struct usbnet *dev, struct urb *urb, gfp_t flags)
- static inline int rx_process(struct usbnet *dev, struct sk_buff *skb)
- {
- 	if (dev->driver_info->rx_fixup &&
--	    !dev->driver_info->rx_fixup (dev, skb)) {
-+	    !dev->driver_info->rx_fixup(dev, skb)) {
- 		/* With RX_ASSEMBLE, rx_fixup() must update counters */
- 		if (!(dev->driver_info->flags & FLAG_RX_ASSEMBLE))
- 			dev->net->stats.rx_errors++;
-@@ -605,7 +605,7 @@ static void rx_complete(struct urb *urb)
- 	int			urb_status = urb->status;
- 	enum skb_state		state;
- 
--	skb_put (skb, urb->actual_length);
-+	skb_put(skb, urb->actual_length);
- 	state = rx_done;
- 	entry->urb = NULL;
- 
-@@ -621,7 +621,7 @@ static void rx_complete(struct urb *urb)
- 	 */
- 	case -EPIPE:
- 		dev->net->stats.rx_errors++;
--		usbnet_defer_kevent (dev, EVENT_RX_HALT);
-+		usbnet_defer_kevent(dev, EVENT_RX_HALT);
- 		fallthrough;
- 
- 	/* software-driven interface shutdown */
-@@ -639,8 +639,8 @@ static void rx_complete(struct urb *urb)
- 	case -ETIME:
- 	case -EILSEQ:
- 		dev->net->stats.rx_errors++;
--		if (!timer_pending (&dev->delay)) {
--			mod_timer (&dev->delay, jiffies + THROTTLE_JIFFIES);
-+		if (!timer_pending(&dev->delay)) {
-+			mod_timer(&dev->delay, jiffies + THROTTLE_JIFFIES);
- 			netif_dbg(dev, link, dev->net,
- 				  "rx throttle %d\n", urb_status);
- 		}
-@@ -676,14 +676,14 @@ static void rx_complete(struct urb *urb)
- 	state = defer_bh(dev, skb, &dev->rxq, state);
- 
- 	if (urb) {
--		if (netif_running (dev->net) &&
--		    !test_bit (EVENT_RX_HALT, &dev->flags) &&
-+		if (netif_running(dev->net) &&
-+		    !test_bit(EVENT_RX_HALT, &dev->flags) &&
- 		    state != unlink_start) {
--			rx_submit (dev, urb, GFP_ATOMIC);
-+			rx_submit(dev, urb, GFP_ATOMIC);
- 			usb_mark_last_busy(dev->udev);
- 			return;
- 		}
--		usb_free_urb (urb);
-+		usb_free_urb(urb);
- 	}
- 	netif_dbg(dev, rx_err, dev->net, "no read resubmitted\n");
- }
-@@ -761,7 +761,7 @@ static int unlink_urbs(struct usbnet *dev, struct sk_buff_head *q)
- 		spin_unlock_irqrestore(&q->lock, flags);
- 		// during some PM-driven resume scenarios,
- 		// these (async) unlinks complete immediately
--		retval = usb_unlink_urb (urb);
-+		retval = usb_unlink_urb(urb);
- 		if (retval != -EINPROGRESS && retval != 0)
- 			netdev_dbg(dev->net, "unlink urb err, %d\n", retval);
- 		else
-@@ -769,7 +769,7 @@ static int unlink_urbs(struct usbnet *dev, struct sk_buff_head *q)
- 		usb_put_urb(urb);
- 		spin_lock_irqsave(&q->lock, flags);
- 	}
--	spin_unlock_irqrestore (&q->lock, flags);
-+	spin_unlock_irqrestore(&q->lock, flags);
- 	return count;
- }
- 
-@@ -830,7 +830,7 @@ int usbnet_stop(struct net_device *net)
- 	int			retval, pm, mpn;
- 
- 	clear_bit(EVENT_DEV_OPEN, &dev->flags);
--	netif_stop_queue (net);
-+	netif_stop_queue(net);
- 	netdev_reset_queue(net);
- 
- 	netif_info(dev, ifdown, dev->net,
-@@ -910,23 +910,29 @@ int usbnet_open(struct net_device *net)
- 	}
- 
- 	// put into "known safe" state
--	if (info->reset && (retval = info->reset (dev)) < 0) {
--		netif_info(dev, ifup, dev->net,
--			   "open reset fail (%d) usbnet usb-%s-%s, %s\n",
--			   retval,
--			   dev->udev->bus->bus_name,
--			   dev->udev->devpath,
--			   info->description);
--		goto done;
-+	if (info->reset) {
-+		retval = info->reset(dev);
-+		if (retval < 0) {
-+			netif_info(dev, ifup, dev->net,
-+				   "open reset fail (%d) usbnet usb-%s-%s, %s\n",
-+				   retval,
-+				   dev->udev->bus->bus_name,
-+				   dev->udev->devpath,
-+				   info->description);
-+			goto done;
-+		}
- 	}
- 
- 	/* hard_mtu or rx_urb_size may change in reset() */
- 	usbnet_update_max_qlen(dev);
- 
- 	// insist peer be connected
--	if (info->check_connect && (retval = info->check_connect (dev)) < 0) {
--		netif_err(dev, ifup, dev->net, "can't open; %d\n", retval);
--		goto done;
-+	if (info->check_connect) {
-+		retval = info->check_connect(dev);
-+		if (retval < 0) {
-+			netif_err(dev, ifup, dev->net, "can't open; %d\n", retval);
-+			goto done;
-+		}
- 	}
- 
- 	/* start any status interrupt transfer */
-@@ -1056,7 +1062,7 @@ u32 usbnet_get_link(struct net_device *net)
- 
- 	/* If a check_connect is defined, return its result */
- 	if (dev->driver_info->check_connect)
--		return dev->driver_info->check_connect (dev) == 0;
-+		return dev->driver_info->check_connect(dev) == 0;
- 
- 	/* if the device has mii operations, use those */
- 	if (dev->mii.mdio_read)
-@@ -1085,7 +1091,7 @@ void usbnet_get_drvinfo(struct net_device *net, struct ethtool_drvinfo *info)
- 	strscpy(info->driver, dev->driver_name, sizeof(info->driver));
- 	strscpy(info->fw_version, dev->driver_info->description,
- 		sizeof(info->fw_version));
--	usb_make_path (dev->udev, info->bus_info, sizeof info->bus_info);
-+	usb_make_path(dev->udev, info->bus_info, sizeof(info->bus_info));
- }
- EXPORT_SYMBOL_GPL(usbnet_get_drvinfo);
- 
-@@ -1175,64 +1181,64 @@ usbnet_deferred_kevent(struct work_struct *work)
- 	int			status;
- 
- 	/* usb_clear_halt() needs a thread context */
--	if (test_bit (EVENT_TX_HALT, &dev->flags)) {
--		unlink_urbs (dev, &dev->txq);
-+	if (test_bit(EVENT_TX_HALT, &dev->flags)) {
-+		unlink_urbs(dev, &dev->txq);
- 		status = usb_autopm_get_interface(dev->intf);
- 		if (status < 0)
- 			goto fail_pipe;
--		status = usb_clear_halt (dev->udev, dev->out);
-+		status = usb_clear_halt(dev->udev, dev->out);
- 		usb_autopm_put_interface(dev->intf);
- 		if (status < 0 &&
- 		    status != -EPIPE &&
- 		    status != -ESHUTDOWN) {
--			if (netif_msg_tx_err (dev))
-+			if (netif_msg_tx_err(dev))
- fail_pipe:
- 				netdev_err(dev->net, "can't clear tx halt, status %d\n",
- 					   status);
- 		} else {
--			clear_bit (EVENT_TX_HALT, &dev->flags);
-+			clear_bit(EVENT_TX_HALT, &dev->flags);
- 			if (status != -ESHUTDOWN)
--				netif_wake_queue (dev->net);
-+				netif_wake_queue(dev->net);
- 		}
- 	}
--	if (test_bit (EVENT_RX_HALT, &dev->flags)) {
--		unlink_urbs (dev, &dev->rxq);
-+	if (test_bit(EVENT_RX_HALT, &dev->flags)) {
-+		unlink_urbs(dev, &dev->rxq);
- 		status = usb_autopm_get_interface(dev->intf);
- 		if (status < 0)
- 			goto fail_halt;
--		status = usb_clear_halt (dev->udev, dev->in);
-+		status = usb_clear_halt(dev->udev, dev->in);
- 		usb_autopm_put_interface(dev->intf);
- 		if (status < 0 &&
- 		    status != -EPIPE &&
- 		    status != -ESHUTDOWN) {
--			if (netif_msg_rx_err (dev))
-+			if (netif_msg_rx_err(dev))
- fail_halt:
- 				netdev_err(dev->net, "can't clear rx halt, status %d\n",
- 					   status);
- 		} else {
--			clear_bit (EVENT_RX_HALT, &dev->flags);
-+			clear_bit(EVENT_RX_HALT, &dev->flags);
- 			if (!usbnet_going_away(dev))
- 				queue_work(system_bh_wq, &dev->bh_work);
- 		}
- 	}
- 
- 	/* work could resubmit itself forever if memory is tight */
--	if (test_bit (EVENT_RX_MEMORY, &dev->flags)) {
-+	if (test_bit(EVENT_RX_MEMORY, &dev->flags)) {
- 		struct urb	*urb = NULL;
- 		int resched = 1;
- 
--		if (netif_running (dev->net))
--			urb = usb_alloc_urb (0, GFP_KERNEL);
-+		if (netif_running(dev->net))
-+			urb = usb_alloc_urb(0, GFP_KERNEL);
- 		else
--			clear_bit (EVENT_RX_MEMORY, &dev->flags);
-+			clear_bit(EVENT_RX_MEMORY, &dev->flags);
- 		if (urb != NULL) {
--			clear_bit (EVENT_RX_MEMORY, &dev->flags);
-+			clear_bit(EVENT_RX_MEMORY, &dev->flags);
- 			status = usb_autopm_get_interface(dev->intf);
- 			if (status < 0) {
- 				usb_free_urb(urb);
- 				goto fail_lowmem;
- 			}
--			if (rx_submit (dev, urb, GFP_KERNEL) == -ENOLINK)
-+			if (rx_submit(dev, urb, GFP_KERNEL) == -ENOLINK)
- 				resched = 0;
- 			usb_autopm_put_interface(dev->intf);
- fail_lowmem:
-@@ -1246,7 +1252,7 @@ usbnet_deferred_kevent(struct work_struct *work)
- 		const struct driver_info *info = dev->driver_info;
- 		int			retval = 0;
- 
--		clear_bit (EVENT_LINK_RESET, &dev->flags);
-+		clear_bit(EVENT_LINK_RESET, &dev->flags);
- 		status = usb_autopm_get_interface(dev->intf);
- 		if (status < 0)
- 			goto skip_reset;
-@@ -1266,10 +1272,10 @@ usbnet_deferred_kevent(struct work_struct *work)
- 		__handle_link_change(dev);
- 	}
- 
--	if (test_bit (EVENT_LINK_CHANGE, &dev->flags))
-+	if (test_bit(EVENT_LINK_CHANGE, &dev->flags))
- 		__handle_link_change(dev);
- 
--	if (test_bit (EVENT_SET_RX_MODE, &dev->flags))
-+	if (test_bit(EVENT_SET_RX_MODE, &dev->flags))
- 		__handle_set_rx_mode(dev);
- 
- 
-@@ -1298,7 +1304,7 @@ static void tx_complete(struct urb *urb)
- 
- 		switch (urb->status) {
- 		case -EPIPE:
--			usbnet_defer_kevent (dev, EVENT_TX_HALT);
-+			usbnet_defer_kevent(dev, EVENT_TX_HALT);
- 			break;
- 
- 		/* software-driven interface shutdown */
-@@ -1313,13 +1319,13 @@ static void tx_complete(struct urb *urb)
- 		case -ETIME:
- 		case -EILSEQ:
- 			usb_mark_last_busy(dev->udev);
--			if (!timer_pending (&dev->delay)) {
--				mod_timer (&dev->delay,
--					jiffies + THROTTLE_JIFFIES);
-+			if (!timer_pending(&dev->delay)) {
-+				mod_timer(&dev->delay,
-+					  jiffies + THROTTLE_JIFFIES);
- 				netif_dbg(dev, link, dev->net,
- 					  "tx throttle %d\n", urb->status);
- 			}
--			netif_stop_queue (dev->net);
-+			netif_stop_queue(dev->net);
- 			break;
- 		default:
- 			netif_dbg(dev, tx_err, dev->net,
-@@ -1338,7 +1344,7 @@ void usbnet_tx_timeout(struct net_device *net, unsigned int txqueue)
- {
- 	struct usbnet		*dev = netdev_priv(net);
- 
--	unlink_urbs (dev, &dev->txq);
-+	unlink_urbs(dev, &dev->txq);
- 	queue_work(system_bh_wq, &dev->bh_work);
- 	/* this needs to be handled individually because the generic layer
- 	 * doesn't know what is sufficient and could not restore private
-@@ -1400,7 +1406,7 @@ netdev_tx_t usbnet_start_xmit(struct sk_buff *skb, struct net_device *net)
- 	// some devices want funky USB-level framing, for
- 	// win32 driver (usually) and/or hardware quirks
- 	if (info->tx_fixup) {
--		skb = info->tx_fixup (dev, skb, GFP_ATOMIC);
-+		skb = info->tx_fixup(dev, skb, GFP_ATOMIC);
- 		if (!skb) {
- 			/* packet collected; minidriver waiting for more */
- 			if (info->flags & FLAG_MULTI_PACKET)
-@@ -1410,7 +1416,8 @@ netdev_tx_t usbnet_start_xmit(struct sk_buff *skb, struct net_device *net)
- 		}
- 	}
- 
--	if (!(urb = usb_alloc_urb (0, GFP_ATOMIC))) {
-+	urb = usb_alloc_urb(0, GFP_ATOMIC);
-+	if (!urb) {
- 		netif_dbg(dev, tx_err, dev->net, "no urb\n");
- 		goto drop;
- 	}
-@@ -1419,8 +1426,8 @@ netdev_tx_t usbnet_start_xmit(struct sk_buff *skb, struct net_device *net)
- 	entry->urb = urb;
- 	entry->dev = dev;
- 
--	usb_fill_bulk_urb (urb, dev->udev, dev->out,
--			skb->data, skb->len, tx_complete, skb);
-+	usb_fill_bulk_urb(urb, dev->udev, dev->out,
-+			  skb->data, skb->len, tx_complete, skb);
- 	if (dev->can_dma_sg) {
- 		if (build_dma_sg(skb, urb) < 0)
- 			goto drop;
-@@ -1490,8 +1497,8 @@ netdev_tx_t usbnet_start_xmit(struct sk_buff *skb, struct net_device *net)
- 
- 	switch ((retval = usb_submit_urb (urb, GFP_ATOMIC))) {
- 	case -EPIPE:
--		netif_stop_queue (net);
--		usbnet_defer_kevent (dev, EVENT_TX_HALT);
-+		netif_stop_queue(net);
-+		usbnet_defer_kevent(dev, EVENT_TX_HALT);
- 		usb_autopm_put_interface_async(dev->intf);
- 		break;
- 	default:
-@@ -1506,7 +1513,7 @@ netdev_tx_t usbnet_start_xmit(struct sk_buff *skb, struct net_device *net)
- 		if (dev->txq.qlen >= TX_QLEN (dev))
- 			netif_stop_queue (net);
- 	}
--	spin_unlock_irqrestore (&dev->txq.lock, flags);
-+	spin_unlock_irqrestore(&dev->txq.lock, flags);
- 
- 	if (retval) {
- 		netif_dbg(dev, tx_err, dev->net, "drop, code %d\n", retval);
-@@ -1514,7 +1521,7 @@ netdev_tx_t usbnet_start_xmit(struct sk_buff *skb, struct net_device *net)
- 		dev->net->stats.tx_dropped++;
- not_drop:
- 		if (skb)
--			dev_kfree_skb_any (skb);
-+			dev_kfree_skb_any(skb);
- 		if (urb) {
- 			kfree(urb->sg);
- 			usb_free_urb(urb);
-@@ -1625,7 +1632,7 @@ static void usbnet_bh(struct timer_list *t)
- 				queue_work(system_bh_wq, &dev->bh_work);
- 		}
- 		if (dev->txq.qlen < TX_QLEN (dev))
--			netif_wake_queue (dev->net);
-+			netif_wake_queue(dev->net);
- 	}
- }
- 
-@@ -1658,7 +1665,7 @@ void usbnet_disconnect(struct usb_interface *intf)
- 		return;
- 	usbnet_mark_going_away(dev);
- 
--	xdev = interface_to_usbdev (intf);
-+	xdev = interface_to_usbdev(intf);
- 
- 	netif_info(dev, probe, dev->net, "unregister '%s' usb-%s-%s, %s\n",
- 		   intf->dev.driver->name,
-@@ -1666,7 +1673,7 @@ void usbnet_disconnect(struct usb_interface *intf)
- 		   dev->driver_info->description);
- 
- 	net = dev->net;
--	unregister_netdev (net);
-+	unregister_netdev(net);
- 
- 	cancel_work_sync(&dev->kevent);
- 
-@@ -1737,7 +1744,7 @@ usbnet_probe(struct usb_interface *udev, const struct usb_device_id *prod)
- 		dev_dbg (&udev->dev, "blacklisted by %s\n", name);
- 		return -ENODEV;
- 	}
--	xdev = interface_to_usbdev (udev);
-+	xdev = interface_to_usbdev(udev);
- 	interface = udev->cur_altsetting;
- 
- 	status = -ENOMEM;
-@@ -1767,10 +1774,10 @@ usbnet_probe(struct usb_interface *udev, const struct usb_device_id *prod)
- 	skb_queue_head_init(&dev->rxq_pause);
- 	spin_lock_init(&dev->bql_spinlock);
- 	INIT_WORK(&dev->bh_work, usbnet_bh_work);
--	INIT_WORK (&dev->kevent, usbnet_deferred_kevent);
-+	INIT_WORK(&dev->kevent, usbnet_deferred_kevent);
- 	init_usb_anchor(&dev->deferred);
- 	timer_setup(&dev->delay, usbnet_bh, 0);
--	mutex_init (&dev->phy_mutex);
-+	mutex_init(&dev->phy_mutex);
- 	mutex_init(&dev->interrupt_mutex);
- 	dev->interrupt_count = 0;
- 
-@@ -1792,7 +1799,7 @@ usbnet_probe(struct usb_interface *udev, const struct usb_device_id *prod)
- 	// allow device-specific bind/init procedures
- 	// NOTE net->name still not usable ...
- 	if (info->bind) {
--		status = info->bind (dev, udev);
-+		status = info->bind(dev, udev);
- 		if (status < 0)
- 			goto out1;
- 
-@@ -1817,18 +1824,18 @@ usbnet_probe(struct usb_interface *udev, const struct usb_device_id *prod)
- 		if (net->mtu > (dev->hard_mtu - net->hard_header_len))
- 			net->mtu = dev->hard_mtu - net->hard_header_len;
- 	} else if (!info->in || !info->out)
--		status = usbnet_get_endpoints (dev, udev);
-+		status = usbnet_get_endpoints(dev, udev);
- 	else {
- 		u8 ep_addrs[3] = {
- 			info->in + USB_DIR_IN, info->out + USB_DIR_OUT, 0
- 		};
- 
--		dev->in = usb_rcvbulkpipe (xdev, info->in);
--		dev->out = usb_sndbulkpipe (xdev, info->out);
-+		dev->in = usb_rcvbulkpipe(xdev, info->in);
-+		dev->out = usb_sndbulkpipe(xdev, info->out);
- 		if (!(info->flags & FLAG_NO_SETINT))
--			status = usb_set_interface (xdev,
--				interface->desc.bInterfaceNumber,
--				interface->desc.bAlternateSetting);
-+			status = usb_set_interface(xdev,
-+						   interface->desc.bInterfaceNumber,
-+						   interface->desc.bAlternateSetting);
- 		else
- 			status = 0;
- 
-@@ -1836,7 +1843,7 @@ usbnet_probe(struct usb_interface *udev, const struct usb_device_id *prod)
- 			status = -EINVAL;
- 	}
- 	if (status >= 0 && dev->status)
--		status = init_status (dev, udev);
-+		status = init_status(dev, udev);
- 	if (status < 0)
- 		goto out3;
- 
-@@ -1870,7 +1877,7 @@ usbnet_probe(struct usb_interface *udev, const struct usb_device_id *prod)
- 		}
- 	}
- 
--	status = register_netdev (net);
-+	status = register_netdev(net);
- 	if (status)
- 		goto out5;
- 	netif_info(dev, probe, dev->net,
-@@ -1881,9 +1888,9 @@ usbnet_probe(struct usb_interface *udev, const struct usb_device_id *prod)
- 		   net->dev_addr);
- 
- 	// ok, it's ready to go.
--	usb_set_intfdata (udev, dev);
-+	usb_set_intfdata(udev, dev);
- 
--	netif_device_attach (net);
-+	netif_device_attach(net);
- 
- 	if (dev->driver_info->flags & FLAG_LINK_INTR)
- 		usbnet_link_change(dev, 0, 0);
-@@ -1896,7 +1903,7 @@ usbnet_probe(struct usb_interface *udev, const struct usb_device_id *prod)
- 	usb_free_urb(dev->interrupt);
- out3:
- 	if (info->unbind)
--		info->unbind (dev, udev);
-+		info->unbind(dev, udev);
- out1:
- 	/* subdrivers must undo all they did in bind() if they
- 	 * fail it, but we may fail later and a deferred kevent
-@@ -1938,7 +1945,7 @@ int usbnet_suspend(struct usb_interface *intf, pm_message_t message)
- 		 * accelerate emptying of the rx and queues, to avoid
- 		 * having everything error out.
- 		 */
--		netif_device_detach (dev->net);
-+		netif_device_detach(dev->net);
- 		usbnet_terminate_urbs(dev);
- 		__usbnet_status_stop_force(dev);
- 
-@@ -1946,7 +1953,7 @@ int usbnet_suspend(struct usb_interface *intf, pm_message_t message)
- 		 * reattach so runtime management can use and
- 		 * wake the device
- 		 */
--		netif_device_attach (dev->net);
-+		netif_device_attach(dev->net);
- 	}
- 	return 0;
- }
--- 
-2.51.1
+This is a user-visible change, though, no? I.e., after this patch
+xdp_redirect mlx5 devices will no longer work as an xdp_redirect target
+out of the box?
+
+We have userspace code listing the driver support in various places
+(e.g., here in xdp-tools:
+https://github.com/xdp-project/xdp-tools/commit/1dad1d6e0ccb086b8a31496931f21a165b42b700);
+I'm sure there will be other places. Since such code would up until now
+assume that mlx5 just works, this will end up being a regression in such
+cases, no?
+
+-Toke
 
 
