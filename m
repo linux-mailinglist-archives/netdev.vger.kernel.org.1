@@ -1,287 +1,159 @@
-Return-Path: <netdev+bounces-238001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24B69C529A4
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 15:05:16 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4032CC52A01
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 15:12:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 5DF984EFB11
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 13:55:29 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 90D6C4EC596
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 13:59:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46B5523F42D;
-	Wed, 12 Nov 2025 13:55:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F297433343F;
+	Wed, 12 Nov 2025 13:57:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fzxacDtT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fkQAr3bH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5F196A33B
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 13:55:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75CFF247291
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 13:57:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762955724; cv=none; b=ZPJSsIuN4eebGRTQuQuSfvfmI3cDMCUh1M+186wULWB2d0uCUoRYhDNgEn0HbqAdGiS8PKd0oTwvU98BQtl/ZNITmPa4XSLHNrgc/4DeXVh1rtp6Pti1nq7Zf+CSeyaO9rJyzIfFavRztnJZzPkYq10eJXFFKIDjE3ctJgbpJOo=
+	t=1762955855; cv=none; b=ipFpCvDnnPP5T436QkTKEMvByCTGuShN5svRJntrVlQi5F+qQOLkjHx0ktGB0TpwNVVQy4iE0DRQF59uGIlIbaABDf4p9dXEXd3K9S/Gk7H9IEeMQzwnx+3CvYtXL/JDOs7CYl258/FYe5Xv7q5OjH0Ab2xOhrzXFJ8m581VBu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762955724; c=relaxed/simple;
-	bh=mQTO3qMBrrbrec+vOaxyEQHikAOjUWJdth7psxqKQd8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eOBZ79HRiN+++WM7iU6verkcqbMsuphVGSOM03OYzr/V42W51dLrA+ltRJ8CiBPLcLLwf2bikKcCdAdeGsbx+iwvnJl9EfcsupRWBXJZLM+xxXyLfkp0PD3GzNID7SUMMkapvEbsS+XlEmtUxFPXL0Dpr88jTfAnEa6UUIU2GaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fzxacDtT; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4ed9c1924adso7362441cf.1
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 05:55:21 -0800 (PST)
+	s=arc-20240116; t=1762955855; c=relaxed/simple;
+	bh=k2G+UAOlxryfN7Ts6BKG6DLQwr8X02cUPkX0Arp69f0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r59UORJHj+IC9/+AC2puxqha8nXUvr7RdsYDVU/jqshWP/C97heou8aVK9RHI2bKgRi3UQdXmLQT77uF+6o4qJGfA480si7FtBl9Jqq2g8NkbrPg62+6EwF8FM7l48KtxyCRUj4iLvfiFuVSQI21XymC9nJoBWbBgIU5VQ7akEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fkQAr3bH; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-7a59ec9bef4so1085880b3a.2
+        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 05:57:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762955721; x=1763560521; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=olHOzv1HDFcRoKcRPLEDHq3xryx1qVQZjsYC+KidFkM=;
-        b=fzxacDtTVBYEo2ig08MTouQLS7EZwDZWtN79+J7Y3ueIH6+g2jBz3ciIGxzFFe+qPf
-         cvHJeMVlJEj66XqA++SQKpwKEp2atrNZhwUnCrIYYbjSjyZe+sM5Jh3QWzmD+tAy8nyF
-         ne5W0rKBRlNVylPNt4VRIVKl1MBKS4Rn1YTZF7W3dazXrzndxjQBQJ9AOcROgxAHxDH7
-         go8wydTVQPpnRFX3QnTfxGNhM9XCe9A0nq5xCq9uUmqHktOnuWKAIj+cbQGxRjVyV9Ng
-         jrNSUkdkChDcrf7ItxeyNY+DC+Fr7jT7f4kE1hz/VCq1aS+70H+iZofrnmgdY4fbZQwY
-         Lo+w==
+        d=gmail.com; s=20230601; t=1762955853; x=1763560653; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Lt/l+8Leq/bLhALiuQnMosDsUZRfKXTeoOFBaF6JTLw=;
+        b=fkQAr3bH3AuLuM0DP7CIc02Zg9Iq30NQIVufcrlpZTNRJisyIoHQu0IH88lHd2OtvW
+         fxIKN/UFOiaJMoJ7uK0huTo0Nc3tSZ482+NC1P3hm9Lrl7pmeBbG9TEzKn2eaoyW6Xnf
+         ipWc+7HAg/cWq1sbT91iLPpKRzJfByYX8d5LOTGrNfTFZHUluCdYuvILV2g6Jfp4m+rp
+         nelLGlEmNzpmLhMKKruPNID52ikJIOabNbhcI2Yc48Tr5/gSqn1Vo4/S8mLQfqUrgfMb
+         ny7VR4kKGeL9/34SUfi/jhIy5kaFkAliBx4GmBUpTQaEekLftmJ8kzdc+cYjScV1BYSs
+         JTqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762955721; x=1763560521;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=olHOzv1HDFcRoKcRPLEDHq3xryx1qVQZjsYC+KidFkM=;
-        b=t2hTXkSKsdjc033ie6o7zIjGNTi1PvnRvPdB8ZeWmRX6z0ae7Bdpa2YVlZKWab72zV
-         SlwQTa52UVwgLBT5+TmpyEmUxvwp2vfXq2g3ekIAJxSaeaHOEGhmaFuUNhl0Te4gxLxz
-         9XeQXC1duyR3RjcSy8H9ctz4tEmbeYP2yDq+nbI25YuEEQufZnwd05lDRyj4shJXmdes
-         NB7aDevfDFmixjcRIIHVq2Mv30X6uVb4y/1NlKR1ZRavjlkiGeECOm0p2kF/Oaf6EZ4q
-         zz+W8hknBaIRCFZGwnu07ibOWPUW2yFV+stJiGv5BDpbG+NB59Cw7zdGR3ziSvvKDkpO
-         rPvw==
-X-Forwarded-Encrypted: i=1; AJvYcCWlhtEIGpDYe9DOL1GIffcSBIPSlE7LJYTLJi+VGz4BcUONhMxt9l18rr2DBL3tfwBm2JM4vxA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmUJUFgvgnTdgHMBMlyGWROdsyWWVU/j579tbB/9dqF3rsUwUd
-	wLvRu4Bf7oFE7ZeEWQRbEdRamEg5aClZuuOVqUn9wgqGMo+WSdr56aAkA5+jnzQnMupkofqYY2f
-	gxWXdJaxQDo4K225fnZ6qYzfETy7RPJWshU6IiKA+
-X-Gm-Gg: ASbGncvbJ9XM4B4hQhjEnl1ekiIwmmdgRNwgjqHuiZT1OCmfvdlAsNypZFyanbWQzpj
-	VvPvZUKHG/kso2KZTX3wZi0eIOpk0mcBlulqFi5abvAPdz7MHudF7VplMrtGWdsFDVqb3f+VyCu
-	OISJvUz3PQlBDInLUSq0AYRnyS/qx2O65JGHqDWTRhwd4Gcg2cM6e/yokkcuT7hbZk88Nh6jZr6
-	lruLP39G4DYZO8OcR9dzlikgLqirjrI7EZ97TnkRkD8D0tpXQuJjEHuPquD9ZT/QkW0V+8V
-X-Google-Smtp-Source: AGHT+IH5mtOTw5ql/3tyCPfaJIqRYelbwEuY2GxwU9SpSn2Er1u7sqEWL7WpBlKzBs9sxmpYzFu7SfnMl4N6pUgTzCk=
-X-Received: by 2002:a05:622a:54e:b0:4ec:f07c:3e73 with SMTP id
- d75a77b69052e-4eddbe1c28amr37326511cf.76.1762955720119; Wed, 12 Nov 2025
- 05:55:20 -0800 (PST)
+        d=1e100.net; s=20230601; t=1762955853; x=1763560653;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Lt/l+8Leq/bLhALiuQnMosDsUZRfKXTeoOFBaF6JTLw=;
+        b=NqFFwRnRNP4r2HKG6Ijz8IYpWKHN2ziOu+wUc/Hut6GX7IlO9IKEqM/c8EW0WmzH7r
+         zW/kcOtyQbrA7ssZr7MT2QCOGLhvsw2aVdoYGYvOJnGV52TF8wyDq9Vivb2LevGnQfl2
+         tEA/TttDHi5AssJiBPi692xHTanPqgJTphx2ga5RNRo1wse3y1uepgIYrjQVXV1IHrbN
+         6L+bWXzfu0Y8uAdIWO8hyEak0IwVoieBqNNGfNCMZgr+Ca5Z0bIB7kV6/cokkNzMZ5zr
+         h/r8J96lSiUeZlaNdd/VmpuuFixuxauB0Rn0+5z95RT6R3m7PR+TM/vwvbdePj1FGf18
+         U/AQ==
+X-Gm-Message-State: AOJu0Yz6vuNATd53Dc7FtH/k7kdoHdJGEwUs9b7aIsnRjWdKDdjXns7J
+	ng8r0L45dJQSU4m6npxbXI75pd2z87+fvM0Ppz7IKhUp2hy9S/7KjQrj
+X-Gm-Gg: ASbGncuqPXZCU6ZFQjlLGFHHhJcToaSUe5nj+4rZcQR63XPptkh7Cn2HkcGZ7WMs6Cp
+	qAIie6ze/kklauRLbpRC0Z6tirO0l62MuXg+Tmqj1o5fIoJXghFTJciHJbfAucOVryriWHkHaK7
+	tfWJGAx7WpOgVF43BPzHWhWG/rhZ3r0fvF/kUke4GqMiJ+48h+/JJn0kG6IP48NWEnVDoU5QFNg
+	hzWOTq2YoZFi4AeBkCfDIEG4buRQJejrvKoS/fAB/i404Dmi2nankQpxwgSOlDsFmV+Qe0AZ3yX
+	t1zMKG+jyeXfcXFNJmYYgSZGpKO/4LyCQSKJNrtC7ktzqbPa3e6Cc4n6kNNcGER8vMihQIWJH4N
+	kuegTXU2zPpjvYNMElbI8YJq3y7hFKqweNCtRgFHqut0gctpjoZKHNpcsghmGUaYtAOMKUuY/BO
+	BuUwQZSEa83+tYTdq76R9g
+X-Google-Smtp-Source: AGHT+IHZ/VsvfL1qBauYYeHFVM1I2oce6UrmCkeGZ0waGhdgmzOFEbz48XMrpfJQfxZr/VfEUub6bA==
+X-Received: by 2002:a05:6a00:124e:b0:7b8:758c:7e86 with SMTP id d2e1a72fcca58-7b8759bc702mr941901b3a.15.1762955852653;
+        Wed, 12 Nov 2025 05:57:32 -0800 (PST)
+Received: from iku.. ([2401:4900:1c07:5748:1c6:5ce6:4f04:5b55])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b0f9aabfc0sm18361299b3a.13.2025.11.12.05.57.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Nov 2025 05:57:31 -0800 (PST)
+From: Prabhakar <prabhakar.csengg@gmail.com>
+X-Google-Original-From: Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Parthiban.Veerasooran@microchip.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	Prabhakar <prabhakar.csengg@gmail.com>,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
+	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+Subject: [PATCH net-next v4 0/4] net: phy: mscc: Add support for PHY LED control
+Date: Wed, 12 Nov 2025 13:57:11 +0000
+Message-ID: <20251112135715.1017117-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1762952506-23593-1-git-send-email-gargaditya@linux.microsoft.com> <1762952506-23593-2-git-send-email-gargaditya@linux.microsoft.com>
-In-Reply-To: <1762952506-23593-2-git-send-email-gargaditya@linux.microsoft.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 12 Nov 2025 05:55:07 -0800
-X-Gm-Features: AWmQ_bluu1-AEflxU_3suMcewGFMw8kM6f7K2JJf4BGWU2evk1xj6w6Ga79O0hY
-Message-ID: <CANn89iL-RJ84WB9W8SoZn6_UMko8sLBb_FEGjjGZTEO+9KOpAg@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 1/2] net: mana: Handle SKB if TX SGEs exceed
- hardware limit
-To: Aditya Garg <gargaditya@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org, 
-	decui@microsoft.com, andrew+netdev@lunn.ch, davem@davemloft.net, 
-	kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com, 
-	kotaranov@microsoft.com, horms@kernel.org, shradhagupta@linux.microsoft.com, 
-	ssengar@linux.microsoft.com, ernis@linux.microsoft.com, 
-	dipayanroy@linux.microsoft.com, shirazsaleem@microsoft.com, leon@kernel.org, 
-	mlevitsk@redhat.com, yury.norov@gmail.com, sbhatta@marvell.com, 
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	gargaditya@microsoft.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 12, 2025 at 5:11=E2=80=AFAM Aditya Garg
-<gargaditya@linux.microsoft.com> wrote:
->
-> The MANA hardware supports a maximum of 30 scatter-gather entries (SGEs)
-> per TX WQE. Exceeding this limit can cause TX failures.
-> Add ndo_features_check() callback to validate SKB layout before
-> transmission. For GSO SKBs that would exceed the hardware SGE limit, clea=
-r
-> NETIF_F_GSO_MASK to enforce software segmentation in the stack.
-> Add a fallback in mana_start_xmit() to linearize non-GSO SKBs that still
-> exceed the SGE limit.
->
-> Also, Add ethtool counter for SKBs linearized
->
-> Co-developed-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-> Signed-off-by: Dipayaan Roy <dipayanroy@linux.microsoft.com>
-> Signed-off-by: Aditya Garg <gargaditya@linux.microsoft.com>
-> ---
->  drivers/net/ethernet/microsoft/mana/mana_en.c | 37 ++++++++++++++++++-
->  .../ethernet/microsoft/mana/mana_ethtool.c    |  2 +
->  include/net/mana/gdma.h                       |  6 ++-
->  include/net/mana/mana.h                       |  1 +
->  4 files changed, 43 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/=
-ethernet/microsoft/mana/mana_en.c
-> index cccd5b63cee6..67ae5421f9ee 100644
-> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> @@ -11,6 +11,7 @@
->  #include <linux/mm.h>
->  #include <linux/pci.h>
->  #include <linux/export.h>
-> +#include <linux/skbuff.h>
->
->  #include <net/checksum.h>
->  #include <net/ip6_checksum.h>
-> @@ -329,6 +330,20 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, str=
-uct net_device *ndev)
->         cq =3D &apc->tx_qp[txq_idx].tx_cq;
->         tx_stats =3D &txq->stats;
->
-> +       if (MAX_SKB_FRAGS + 2 > MAX_TX_WQE_SGL_ENTRIES &&
-> +           skb_shinfo(skb)->nr_frags + 2 > MAX_TX_WQE_SGL_ENTRIES) {
-> +               /* GSO skb with Hardware SGE limit exceeded is not expect=
-ed here
-> +                * as they are handled in mana_features_check() callback
-> +                */
-> +               if (skb_linearize(skb)) {
-> +                       netdev_warn_once(ndev, "Failed to linearize skb w=
-ith nr_frags=3D%d and is_gso=3D%d\n",
-> +                                        skb_shinfo(skb)->nr_frags,
-> +                                        skb_is_gso(skb));
-> +                       goto tx_drop_count;
-> +               }
-> +               apc->eth_stats.linear_pkt_tx_cnt++;
-> +       }
-> +
->         pkg.tx_oob.s_oob.vcq_num =3D cq->gdma_id;
->         pkg.tx_oob.s_oob.vsq_frame =3D txq->vsq_frame;
->
-> @@ -442,8 +457,6 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, stru=
-ct net_device *ndev)
->                 }
->         }
->
-> -       WARN_ON_ONCE(pkg.wqe_req.num_sge > MAX_TX_WQE_SGL_ENTRIES);
-> -
->         if (pkg.wqe_req.num_sge <=3D ARRAY_SIZE(pkg.sgl_array)) {
->                 pkg.wqe_req.sgl =3D pkg.sgl_array;
->         } else {
-> @@ -518,6 +531,25 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, str=
-uct net_device *ndev)
->         return NETDEV_TX_OK;
->  }
->
+From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
 
+Hi All,
 
-#if MAX_SKB_FRAGS + 2 > MAX_TX_WQE_SGL_ENTRIES
+This patch series adds support for controlling the PHY LEDs on the
+VSC85xx family of PHYs from Microsemi (now part of Renesas).
+The first two patches simplify and consolidate existing probe code
+the third patch introduces the LED control functionality.
+The LED control feature allows users to configure the LED behavior
+based on link activity, speed, and other criteria.
 
-> +static netdev_features_t mana_features_check(struct sk_buff *skb,
-> +                                            struct net_device *ndev,
-> +                                            netdev_features_t features)
-> +{
-> +       if (MAX_SKB_FRAGS + 2 > MAX_TX_WQE_SGL_ENTRIES &&
-> +           skb_shinfo(skb)->nr_frags + 2 > MAX_TX_WQE_SGL_ENTRIES) {
-> +               /* Exceeds HW SGE limit.
-> +                * GSO case:
-> +                *   Disable GSO so the stack will software-segment the s=
-kb
-> +                *   into smaller skbs that fit the SGE budget.
-> +                * Non-GSO case:
-> +                *   The xmit path will attempt skb_linearize() as a fall=
-back.
-> +                */
-> +               if (skb_is_gso(skb))
+v3->v4:
+- Sorted the members of vsc85xx_probe_config struct to avoid the
+  holes
+- Fixed Reverse Christmas tree in vsc85xx_led_combine_disable_set()
+- Added Reviewed-by tag
+- Added new patch 4/4 to handle devm_phy_package_join()
+  failure in vsc85xx_probe_common()
 
-No need to test skb_is_gso(skb), you can clear bits, this will be a
-NOP if the packet is non GSO anyway.
+v2->v3:
+- Added Reviewed-by tag to patches 1/3 and 3/3.
+- Grouped check_rate_magic check in patch 2/3.
+- Formatted the patches with `--diff-algorithm=patience` option to
+  improve readability.
 
-> +                       features &=3D ~NETIF_F_GSO_MASK;
-> +       }
-> +       return features;
-> +}
+v1->v2:
+- Patches 1/3 and 2/3 are new.
+- Added LED control support to all VSC85xx PHY variants.
+- Renamed led callbacks to vsc85xx_* for consistency.
+- Defaulted the LEDs on probe to the default array before parsing DT.
+- Used phy_modify() in vsc85xx_led_brightness_set()
+- Return value of phy_read() checked in vsc85xx_led_hw_control_get()
+- Reverse Christmas tree in vsc85xx_led_hw_is_supported()
+- Updated the commit message to clarify the LED combine feature behavior.
 
-#endif
+Cheers,
+Prabhakar
 
-> +
->  static void mana_get_stats64(struct net_device *ndev,
->                              struct rtnl_link_stats64 *st)
->  {
-> @@ -878,6 +910,7 @@ static const struct net_device_ops mana_devops =3D {
->         .ndo_open               =3D mana_open,
->         .ndo_stop               =3D mana_close,
->         .ndo_select_queue       =3D mana_select_queue,
-> +       .ndo_features_check     =3D mana_features_check,
+Lad Prabhakar (4):
+  net: phy: mscc: Simplify LED mode update using phy_modify()
+  net: phy: mscc: Consolidate probe functions into a common helper
+  net: phy: mscc: Add support for PHY LED control
+  net: phy: mscc: Handle devm_phy_package_join() failure in
+    vsc85xx_probe_common()
 
-Note that if your mana_features_check() is a nop if MAX_SKB_FRAGS is
-small enough,
-you could set a non NULL .ndo_features_check based on a preprocessor condit=
-ion
+ drivers/net/phy/mscc/mscc.h      |   4 +
+ drivers/net/phy/mscc/mscc_main.c | 497 +++++++++++++++++++++++--------
+ 2 files changed, 379 insertions(+), 122 deletions(-)
 
-#if MAX_SKB_FRAGS + 2 > MAX_TX_WQE_SGL_ENTRIES
-    .ndo_features_check =3D ....
-#endif
+-- 
+2.43.0
 
-This would avoid an expensive indirect call when possible.
-
-
->         .ndo_start_xmit         =3D mana_start_xmit,
->         .ndo_validate_addr      =3D eth_validate_addr,
->         .ndo_get_stats64        =3D mana_get_stats64,
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c b/drivers=
-/net/ethernet/microsoft/mana/mana_ethtool.c
-> index a1afa75a9463..fa5e1a2f06a9 100644
-> --- a/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> +++ b/drivers/net/ethernet/microsoft/mana/mana_ethtool.c
-> @@ -71,6 +71,8 @@ static const struct mana_stats_desc mana_eth_stats[] =
-=3D {
->         {"tx_cq_err", offsetof(struct mana_ethtool_stats, tx_cqe_err)},
->         {"tx_cqe_unknown_type", offsetof(struct mana_ethtool_stats,
->                                         tx_cqe_unknown_type)},
-> +       {"linear_pkt_tx_cnt", offsetof(struct mana_ethtool_stats,
-> +                                       linear_pkt_tx_cnt)},
->         {"rx_coalesced_err", offsetof(struct mana_ethtool_stats,
->                                         rx_coalesced_err)},
->         {"rx_cqe_unknown_type", offsetof(struct mana_ethtool_stats,
-> diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h
-> index 637f42485dba..84614ebe0f4c 100644
-> --- a/include/net/mana/gdma.h
-> +++ b/include/net/mana/gdma.h
-> @@ -592,6 +592,9 @@ enum {
->  #define GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE BIT(17)
->  #define GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE BIT(6)
->
-> +/* Driver supports linearizing the skb when num_sge exceeds hardware lim=
-it */
-> +#define GDMA_DRV_CAP_FLAG_1_SKB_LINEARIZE BIT(20)
-> +
->  #define GDMA_DRV_CAP_FLAGS1 \
->         (GDMA_DRV_CAP_FLAG_1_EQ_SHARING_MULTI_VPORT | \
->          GDMA_DRV_CAP_FLAG_1_NAPI_WKDONE_FIX | \
-> @@ -601,7 +604,8 @@ enum {
->          GDMA_DRV_CAP_FLAG_1_DYNAMIC_IRQ_ALLOC_SUPPORT | \
->          GDMA_DRV_CAP_FLAG_1_SELF_RESET_ON_EQE | \
->          GDMA_DRV_CAP_FLAG_1_HANDLE_RECONFIG_EQE | \
-> -        GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE)
-> +        GDMA_DRV_CAP_FLAG_1_HW_VPORT_LINK_AWARE | \
-> +        GDMA_DRV_CAP_FLAG_1_SKB_LINEARIZE)
->
->  #define GDMA_DRV_CAP_FLAGS2 0
->
-> diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-> index 8906901535f5..50a532fb30d6 100644
-> --- a/include/net/mana/mana.h
-> +++ b/include/net/mana/mana.h
-> @@ -404,6 +404,7 @@ struct mana_ethtool_stats {
->         u64 hc_tx_err_gdma;
->         u64 tx_cqe_err;
->         u64 tx_cqe_unknown_type;
-> +       u64 linear_pkt_tx_cnt;
->         u64 rx_coalesced_err;
->         u64 rx_cqe_unknown_type;
->  };
-> --
-> 2.43.0
->
 
