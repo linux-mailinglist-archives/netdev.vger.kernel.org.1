@@ -1,257 +1,172 @@
-Return-Path: <netdev+bounces-237930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A81EC51A66
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 11:29:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A236BC51A3C
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 11:27:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 265423A903A
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 10:23:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1FD618E1729
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 10:24:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7DE82E03E4;
-	Wed, 12 Nov 2025 10:23:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="V5pZCm25"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79284303A2C;
+	Wed, 12 Nov 2025 10:24:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from BL2PR02CU003.outbound.protection.outlook.com (mail-eastusazon11011021.outbound.protection.outlook.com [52.101.52.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f49.google.com (mail-oa1-f49.google.com [209.85.160.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 149812594BD
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 10:23:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.21
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762943019; cv=fail; b=gLYv5vj6zgm0WS3qGSKIbTaUGEhR7I58K5Krd5lEf+fD0ZDlW2Ln6kVfNBJAMjV2pDObRUhBeC5kLlvQFrclxquFA0spn5l9qkFIKAkSyIie05Uco+3AWMM7pgaV+f4Fr6y8nVLup8b4ie6J+tXTF8K9/fv4yNq/WnRkK9W+kEE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762943019; c=relaxed/simple;
-	bh=s7fyfQ0fca/8WPJbZ2T7t4pHwJSp2ybUIFYjro5THKQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Bf1lZLb1cQpjg9tNyf2x/uK4p4Jp84NFDlGjTSvUXAsn1k4B1mbbbNtbjGXGHUaWkG9lE8vOYwTWwsumIJZ3jP0njh39BCyuwU8Q2Oq7E7XUQNoleA87isjTlRZiEjE7tP6zsVTy3Q+TB6ARZo1N/3vNANsiwNVbhIHuMnOgpeQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=V5pZCm25; arc=fail smtp.client-ip=52.101.52.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=heLK92w3f6+8nl31oPNxGykHjaFnlUQwpW2h3WDzCwBgbFx56KR9tcDGwlyfu1QMk/ThCJ+VNv4vZM55WzrdX0Gbl58ELtPlh2AD9x84Gdgchxn0oMLCTQmfGHz59NPQxsF0PLFNRChZ+wFVa3eHs0+i4EFElkO8qXT+HNOKd5zrftVjPnqj7IFDNbD1GFjUBM2FwHzUpsb7VbLjk1i+YpzDOek4vkc9ftvpNW4VTuwLG4JWp489e0Qf/K6kthu0tLQ6qOOdZqE9jP1qTNj97/7KAkqennKM42OQJ8Q7hd25n9yt3tSNQ7qFKrv4nmpK7Vd17fRcISTKuzl/kitRfA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HLtoGXXlZewtpCF3XG4k1KMilkYhGkzli22mMJQHGW4=;
- b=InSrg8D7IoqudoN6INKRdiKi5XXb3NcmOpFSGie672O00Hgkozt39a3/jhv33VhFDsxLXhrzScNfiwWIoHEMKvQnePTTQ+zVXCKJmMEjMUA+nFyFp9p/U3/+c9VPlvRJVPW0Uo8Di/hUiMoj+2sH0dZy25CHRzR2GSdbHMYNB/nDFlRj00znu5gW2Fv1Vy9ZboxfaLnZ8vtiuyJaGW+6xnbT5sXGNTeZfltpkh9bwHL5cvZ0wuxqwUGGg8W6VQUgXX1FfNCNRWB0UBAQ1Ll6iuSE4dLG7QU4pHJhiSJvwotIpV273FteCxsNRFMHDZbCRNXyVKL1hxAsktyr7r8jYA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HLtoGXXlZewtpCF3XG4k1KMilkYhGkzli22mMJQHGW4=;
- b=V5pZCm255VObY4hx6XwhVcsujx44nFIgPmEAth61WjotSFRKxzdWhtYv9IddiL8b9EpdISVFd7f++i2BDPbr9FNmvqJ5rHfofQEOvNUZMTuvZ1/hZN1Kn2khOoQRcJAuah4ALekbgFF6GntZdAEmG1IxxwGFiXmbMSpivVMZeKlMTqKs4eZ2pXCLxofxa/Ah0L5FM5vqWLu5a+XNHokD/VrtZIVBxpOW30K+Je7NKn6AkPHBmCmp7rKZUX5m/2JPbz3ilypnWJVXxJRuvURghpEFMCa/rq3jh/jvZLlI8wFsmz8DMzIrsShOP5HeBlo4zu5Rs7JM2kaaS7WKWENr1Q==
-Received: from CH2PR05CA0033.namprd05.prod.outlook.com (2603:10b6:610::46) by
- MN0PR12MB5953.namprd12.prod.outlook.com (2603:10b6:208:37c::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.16; Wed, 12 Nov
- 2025 10:23:33 +0000
-Received: from CH1PEPF0000AD75.namprd04.prod.outlook.com
- (2603:10b6:610:0:cafe::db) by CH2PR05CA0033.outlook.office365.com
- (2603:10b6:610::46) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.9320.15 via Frontend Transport; Wed,
- 12 Nov 2025 10:23:32 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CH1PEPF0000AD75.mail.protection.outlook.com (10.167.244.54) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.9320.13 via Frontend Transport; Wed, 12 Nov 2025 10:23:32 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.2562.20; Wed, 12 Nov
- 2025 02:23:17 -0800
-Received: from c-237-113-240-247.mtl.labs.mlnx (10.126.230.35) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.2562.20; Wed, 12 Nov 2025 02:23:13 -0800
-From: Cosmin Ratiu <cratiu@nvidia.com>
-To: <netdev@vger.kernel.org>
-CC: Jay Vosburgh <jv@jvosburgh.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Simon
- Horman" <horms@kernel.org>, Taehee Yoo <ap420073@gmail.com>, Jianbo Liu
-	<jianbol@nvidia.com>, Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, Leon Romanovsky
-	<leonro@nvidia.com>, Cosmin Ratiu <cratiu@nvidia.com>
-Subject: [PATCH ipsec 2/2] bond: Use a separate xfrm_active_slave pointer
-Date: Wed, 12 Nov 2025 12:22:45 +0200
-Message-ID: <20251112102245.1237408-2-cratiu@nvidia.com>
-X-Mailer: git-send-email 2.45.0
-In-Reply-To: <20251112102245.1237408-1-cratiu@nvidia.com>
-References: <20251112102245.1237408-1-cratiu@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B95703019DF
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 10:24:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762943045; cv=none; b=XckxvMmUHR9HQz2TIHn6fD9ws8qcKvdN+tRlW25emNNECHy5ectoGzLCJgKstsr7pvMcfJf9qyHJMT6JbJJQxjsTcOaxDeVco51Dfs1KINqO7A28CZ0kCIrndVAb4To6dT1BIF+dTwYjsmDCf5RhjNgiExClnL4bGVeLJDLSL/c=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762943045; c=relaxed/simple;
+	bh=7buZIml+vYNlKuOKSsFWE1hHtW5O4S3qAolR1oHcodI=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=L43sjnDGbSQHP288n4a5r+dNNoWdYM9ENhyn3oiRCoBLNq9ixXj7UuMybe7EQKb/YtciOztBANhNqpoPEJsTsFjzLxvXi5sJVCXrsnNa06tj+F+ILRNUSQGNjDBtcQWvCm9WvCrFzvWNLQNr16IBU2UH8KGkf23AXsFekFvIJO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f49.google.com with SMTP id 586e51a60fabf-3e0f19a38d0so412572fac.0
+        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 02:24:02 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762943042; x=1763547842;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gmjMGG+9uwYrdBaFaG40pgpWI5m/ssDILFCqYef0GKw=;
+        b=TskS9QO1QZ2Aa43hSwGL5PSQuzf29icl2690F4run+wVbrCF4RBD6QPldGelg0N0Te
+         vGNvkKRvEfX/YnpP7zDEhormDMmCfot2dKF2LprY0eqF3ABO8232fwct1kejWKBLHGOf
+         W7ol3/wCkHClb+Cf74oKT6fAxXrdIDY/SLhOncI0zl04vcXdWHq7xwn2jMPtZTapR75z
+         ofD4jZdRfz2kRMkBF48uh0hxWkZ4fA2yUvzmH49fMP29d+z6Fp150JXkjxchc1xoaHk2
+         GJo9xrDOivrGEAYuO8QiNJAgEBc4XBls3C7YJKQAQl3WT3n2jEpyfoZbeaqXECN0zCDn
+         iGtg==
+X-Forwarded-Encrypted: i=1; AJvYcCWcsZVZyxyk4T5hSulDlyGtCDJR7Ir0TcSp5dqSzYQNJZSP2JIWWapdHK7v9hv381/ferN5JMU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyuR6q8IWfeIbFVIAZWElyJ9Nu/O3uqwjHRoe9JhScX3804r6zi
+	hsi6PSNvJ0ASvcejg30zKpaeuXA3jAkz95JYJj/eDe03D63T3PrXjeAj
+X-Gm-Gg: ASbGncuqi3nKZcevYNVhct8Wqy4KkVTxxjxpnHU0I77fkYhAFsKfe8dniuNE7Mh56CS
+	fLIZzHYT3zpcXfAna4cmR6q5eX4BjPwz3sPW1BpG4jGO4lO7tb3JUjQZka8ZDfsVUfagztvqpW3
+	LPodSCS3GAfjw6nmrO7yCNZ/qbrJ/ASA1HGnSxvK8ym/0qZr5wpImnFewvaElY3T1bvT3BkybqW
+	eJ9Eu8/N7fPv/C6fdZeDFlCo+P6+wVIGN1DYjQA8zQPdN2XfFa4NxDN33yEKukL5lHWfuZbLUfo
+	Yj6PVDLHdvgJneUrkKcq6LK/cjG8FBx6BpYUFK6j/zvdCZNemkfbq+s3zAswDAEQp9l2kZefPmt
+	UkmpA8z/c9dmsecUULWaLOsuLrgt1Cff57wPiLN+Yo+tUHfccNb4I/ysVvYRYzGI94I/M8RnI0o
+	Jf1Ms=
+X-Google-Smtp-Source: AGHT+IFFIe5XwMM0YpIX3Lc90l+/3mxxUxY0eH6uX9Bidfv2T/GEpqWLRifC3V1aiew7ppov4DZUmA==
+X-Received: by 2002:a05:6870:a913:b0:3d8:9e0d:17da with SMTP id 586e51a60fabf-3e833f7baadmr924714fac.7.1762943041721;
+        Wed, 12 Nov 2025 02:24:01 -0800 (PST)
+Received: from localhost ([2a03:2880:10ff:71::])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-3e41f1c5675sm9255065fac.17.2025.11.12.02.24.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Nov 2025 02:24:01 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+Date: Wed, 12 Nov 2025 02:23:04 -0800
+Subject: [PATCH net-next] net: ixgbe: convert to use .get_rx_ring_count
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD75:EE_|MN0PR12MB5953:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4af0fd72-8127-4193-acd4-08de21d58827
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|7416014|82310400026|36860700013|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?IuSNvxK2hPUd6YK4BX+6fuPBWlz65zbRKeS0pGwuwIJ1lq+Li62TemWBF67L?=
- =?us-ascii?Q?/QA7oGE4xrgplDtd3l8rdTFcJOt1Q3Y6JPIB8SdH+bG+C6BcZyBGCCU02U2Z?=
- =?us-ascii?Q?rGxG+q1Kefiu3k7n7MTqcGcdk7nftZNoR69tTxAluJFAidn29oVYB6/IKdKL?=
- =?us-ascii?Q?nkoUrSq1ZJtFcj6+QL0MY6t8aAXnvj8mJsspt/1Zbs+FDxovToUnDyni46go?=
- =?us-ascii?Q?X0FHTXByuwOnP5Lw0kr/YKcOhYHCdRHf3UxqcSz4ThyH680dnITRVDhka2k7?=
- =?us-ascii?Q?FanpBOs7eGKw6fcC7YlD0ooGGZVlOoWsFmikAUh4LK+R8+piP8R7UV5Go+3I?=
- =?us-ascii?Q?8v3BwbdGGHFxhPD3dAJqCshfQXES4IEw6j7EzzBkK9QIZT745CTp/QZFDc/q?=
- =?us-ascii?Q?lO1+/6fUQouztPX7z8DosfwIg+maJFOz4Qoibld4068CVYwRaiaE/2Qa1b20?=
- =?us-ascii?Q?v6bpOHTkxoBE+xMCWnca3tHXYWUKP+S1y6TyAPUeFfPz564QvrKgn8jEtOZm?=
- =?us-ascii?Q?H26A2ClfBMcC0Gb3IoaejZOxq+0zFQB46CcxS+vgS2Wt03z5nDeGs7Rlwkcn?=
- =?us-ascii?Q?5T0IMoASxGYAX19cge+BxGtgnbXHQp/r8gV6XuaCo9l/y/UQ0UuGedb7UaXG?=
- =?us-ascii?Q?knzooJbkb4fYFWKNctG+b71nu0TineKUdAX9P0KhrCndq4M/g0JaZx60TT4p?=
- =?us-ascii?Q?4g87gniwo3+TsREBmzpRbTFHs5PWWbk+x7LeuXRdrEkFwy7rWDEpfQqHvPlQ?=
- =?us-ascii?Q?Kem6eTWYX3yKfOX6yuCNLhk/uXLd0Yx4DGuG5XCW26xCjDGOnD/4PtEbQZa8?=
- =?us-ascii?Q?y4rJmG7PYKX+XyVUZyeX0kibO7WVemzZw7wiQTJdkho3t9n8y9lJjImwWaX/?=
- =?us-ascii?Q?rsnE2kMrkBnD+x8bFaykoQAaJE7I5aaGnmo7PkEE5HgqC4cFUX4gO2F6r+zp?=
- =?us-ascii?Q?E5rqk2MfBzSWFiHP5I7ny8lGgJ5NyfcO25GY8VTSHoVrg8Fe8010Uv8TiY59?=
- =?us-ascii?Q?RdCerXal6lq5aBPrYpDoY2T+iTpsOYsRWiQLfCQgSRUcJNFhIxk2/yPtzB/K?=
- =?us-ascii?Q?Fe2AaxkwFCCM7E+7TvrhVOaxNa886+RC8qUNZ5EOIjSq43WDiHW+ginJOdIm?=
- =?us-ascii?Q?9bAN2qrFKMtRPY3099LJsE1oFzHeBo9oeoKlRlJjLpX6UDJHxbuZjDIc0Jls?=
- =?us-ascii?Q?cxHsyUEtngSZkLoHSNsdtNVPK45/ZT0mnzo321TmQe/oH+A+IVDuztcfzh6C?=
- =?us-ascii?Q?cHOYr9XLcxWBB3ajjB5rsCvOiLrQKuKlcXphmdSw+Ei3XNqAN3B4Uflr+Kcn?=
- =?us-ascii?Q?mQKxrWs56LTSi3Jy9zMzwYXfZYxAEVlCCihu1uj5yDEzkSpOchViwlAE4m90?=
- =?us-ascii?Q?QTeb0MtbllOqXpKok2o5pz/sDrHJu1p24Od2IfG8LjYJlHNhCQmIKLzc7byO?=
- =?us-ascii?Q?HU4IZlLcurENGkOdFYDb+USSizY1vAm5QDeDeqWMjY/muIvXQVXoJeBG5o12?=
- =?us-ascii?Q?PEjV37z2VdgWE3sWf5qCnzpuNcYc/j1F8YBwftVc64ZVzvFmORDLQjJIWlmo?=
- =?us-ascii?Q?FPprFUKd37Pk0EoC0ho=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(7416014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Nov 2025 10:23:32.7574
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4af0fd72-8127-4193-acd4-08de21d58827
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH1PEPF0000AD75.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5953
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20251112-ixgbe_gxrings-v1-1-960e139697fa@debian.org>
+X-B4-Tracking: v=1; b=H4sIAAdgFGkC/x3MSwqAMAwFwKuEt7ZgCir0KiLiJ9ZsorQiBfHug
+ nOAeZAlqWQEepDk1qyHIRBXhGWfLIrTFYHga98ws3da4ixjLEktZtfy0m4drx37GRXhTLJp+b8
+ eJpczKReG9/0A+T47lmkAAAA=
+X-Change-ID: 20251112-ixgbe_gxrings-61c6f71d712b
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, kernel-team@meta.com, 
+ Breno Leitao <leitao@debian.org>
+X-Mailer: b4 0.15-dev-a6db3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2569; i=leitao@debian.org;
+ h=from:subject:message-id; bh=7buZIml+vYNlKuOKSsFWE1hHtW5O4S3qAolR1oHcodI=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpFGBAd+OmxF+aCLlLNOP1At7YER2YtTmmHxYWP
+ s2PX5WCRp+JAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaRRgQAAKCRA1o5Of/Hh3
+ bZpgEACglF3dSw3Lu5l7IIR19b2hXkkRgxiqC8O+6j9IHaK989ZfaP+mdimCb3DPYCTp9bYYUbf
+ 3hGX8CS/H9UQaESFMunujdFlhXSEIs36x5YoLCrb3QxtEEEsmI7ZQBdr/Ld8lsS5i3BrlH+8U2M
+ bYRRQaWrsb0rENrQrfiDTru9l3qZyE2TaXMoZUpvm63qOVmnSQv2vJVwxk+owSDyr8K5FVmUX+J
+ EO08J/K2Up72F1ntL4BZf+Z1lcwaajZvD5mjbLTFOXYOrkbYlb1sfNHtYD/Gtq6GTwFVbvK8BTg
+ nFR3Gmu7nRcKa9T3HioT0gh2OB5rNRre5OM2BMFH8eJlJfMBDwXe/QPrE+1PXlP+xLHDFNlUaZR
+ OVlXIJ+JrCIo2Yg7+unJHVxJE3YfAiejGUPgBfsh/chHUjEIne9Sfeiq0d062XqeY9I+o0DuStl
+ V6YVV/NJGXSVCR/OvAYJKEhbIpt5JR/iwWA1iEgPlDGqAmOHfCKCG1NrZ2oGTR4Hfd/XjxUAm1O
+ WpepxzVqr1xmJM38mef+S4czustgWXbKuDsgqjdWIlWlmU8FrB4M7xHOYnBdgmXGMB8nCwMYNDv
+ D4j4KpU5/WpDPOskzbn9i1CWn2Euk4IRm43n4LN2lDDgOKkJzpiG4cWkFFlZXAiHhSnp9PgEnr8
+ ZkSISIkzrjDcTiw==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-Offloaded xfrm states are currently added to a new device after
-curr_active_slave is updated to direct traffic to it. This could result
-in the following race, which could lead to unencrypted IPSec packets on
-the wire:
+Convert the ixgbe driver to use the new .get_rx_ring_count ethtool
+operation for handling ETHTOOL_GRXRINGS command. This simplifies the
+code by extracting the ring count logic into a dedicated callback.
 
-CPU1 (xfrm_output)                   CPU2 (bond_change_active_slave)
-bond_ipsec_offload_ok -> true
-                                     bond->curr_active_slave = new_dev
-                                     bond_ipsec_migrate_sa_all
-bond_xmit_activebackup
-bond_dev_queue_xmit
-dev_queue_xmit on new_dev
-				     bond_ipsec_migrate_sa_all finishes
+The new callback provides the same functionality in a more direct way,
+following the ongoing ethtool API modernization.
 
-So the packet can make it out to new_dev before its xfrm_state is
-offloaded to it. The result: an unencrypted IPSec packet on the wire.
-
-This patch closes this race by introducing a new pointer in the bond
-device, named 'xfrm_active_slave'. All xfrm_states offloaded to the bond
-device get offloaded to it. Changing the current active slave will now
-first update this new pointer, then migrate all xfrm states on the bond
-device, then flip curr_active_slave. This closes the above race and
-makes sure that any IPSec packets transmitted on the new device will
-find an offloaded xfrm_state on the device.
-
-Issue: 4378999
-Fixes: 9a5605505d9c ("bonding: Add struct bond_ipesc to manage SA")
-Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
-Change-Id: I24a2945db8c4450a9abaceb5ec4379e85f10db84
+Signed-off-by: Breno Leitao <leitao@debian.org>
 ---
- drivers/net/bonding/bond_main.c | 15 ++++++++-------
- include/net/bonding.h           |  2 ++
- 2 files changed, 10 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index e45e89179236..98d5f9974086 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -438,7 +438,7 @@ static struct net_device *bond_ipsec_dev(struct xfrm_state *xs)
- 	if (BOND_MODE(bond) != BOND_MODE_ACTIVEBACKUP)
- 		return NULL;
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+index 2d660e9edb80..2ad81f687a84 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+@@ -2805,6 +2805,14 @@ static int ixgbe_rss_indir_tbl_max(struct ixgbe_adapter *adapter)
+ 		return 64;
+ }
  
--	slave = rcu_dereference(bond->curr_active_slave);
-+	slave = rcu_dereference(bond->xfrm_active_slave);
- 	if (!slave)
- 		return NULL;
- 
-@@ -474,7 +474,7 @@ static int bond_ipsec_add_sa(struct net_device *bond_dev,
- 
- 	rcu_read_lock();
- 	bond = netdev_priv(bond_dev);
--	slave = rcu_dereference(bond->curr_active_slave);
-+	slave = rcu_dereference(bond->xfrm_active_slave);
- 	real_dev = slave ? slave->dev : NULL;
- 	netdev_hold(real_dev, &tracker, GFP_ATOMIC);
- 	rcu_read_unlock();
-@@ -515,7 +515,7 @@ static int bond_ipsec_add_sa(struct net_device *bond_dev,
- 
- static void bond_ipsec_migrate_sa_all(struct bonding *bond)
- {
--	struct slave *new_active = rtnl_dereference(bond->curr_active_slave);
-+	struct slave *new_active = rtnl_dereference(bond->xfrm_active_slave);
- 	struct net_device *bond_dev = bond->dev;
- 	struct net *net = dev_net(bond_dev);
- 	struct bond_ipsec *ipsec, *tmp;
-@@ -1216,6 +1216,11 @@ void bond_change_active_slave(struct bonding *bond, struct slave *new_active)
- 	if (bond_uses_primary(bond))
- 		bond_hw_addr_swap(bond, new_active, old_active);
- 
-+#ifdef CONFIG_XFRM_OFFLOAD
-+	rcu_assign_pointer(bond->xfrm_active_slave, new_active);
-+	bond_ipsec_migrate_sa_all(bond);
-+#endif
++static u32 ixgbe_get_rx_ring_count(struct net_device *dev)
++{
++	struct ixgbe_adapter *adapter = ixgbe_from_netdev(dev);
 +
- 	if (bond_is_lb(bond)) {
- 		bond_alb_handle_active_change(bond, new_active);
- 		if (old_active)
-@@ -1228,10 +1233,6 @@ void bond_change_active_slave(struct bonding *bond, struct slave *new_active)
- 		rcu_assign_pointer(bond->curr_active_slave, new_active);
- 	}
++	return min_t(u32, adapter->num_rx_queues,
++		     ixgbe_rss_indir_tbl_max(adapter));
++}
++
+ static int ixgbe_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd,
+ 			   u32 *rule_locs)
+ {
+@@ -2812,11 +2820,6 @@ static int ixgbe_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *cmd,
+ 	int ret = -EOPNOTSUPP;
  
--#ifdef CONFIG_XFRM_OFFLOAD
--	bond_ipsec_migrate_sa_all(bond);
--#endif
--
- 	if (BOND_MODE(bond) == BOND_MODE_ACTIVEBACKUP) {
- 		if (old_active)
- 			bond_set_slave_inactive_flags(old_active,
-diff --git a/include/net/bonding.h b/include/net/bonding.h
-index 49edc7da0586..256fe96fcfda 100644
---- a/include/net/bonding.h
-+++ b/include/net/bonding.h
-@@ -260,6 +260,8 @@ struct bonding {
- #endif /* CONFIG_DEBUG_FS */
- 	struct rtnl_link_stats64 bond_stats;
- #ifdef CONFIG_XFRM_OFFLOAD
-+	/* The device where new xfrm states will be offloaded */
-+	struct slave __rcu *xfrm_active_slave;
- 	struct list_head ipsec_list;
- 	/* protecting ipsec_list */
- 	struct mutex ipsec_lock;
--- 
-2.45.0
+ 	switch (cmd->cmd) {
+-	case ETHTOOL_GRXRINGS:
+-		cmd->data = min_t(int, adapter->num_rx_queues,
+-				  ixgbe_rss_indir_tbl_max(adapter));
+-		ret = 0;
+-		break;
+ 	case ETHTOOL_GRXCLSRLCNT:
+ 		cmd->rule_cnt = adapter->fdir_filter_count;
+ 		ret = 0;
+@@ -3743,6 +3746,7 @@ static const struct ethtool_ops ixgbe_ethtool_ops = {
+ 	.get_ethtool_stats      = ixgbe_get_ethtool_stats,
+ 	.get_coalesce           = ixgbe_get_coalesce,
+ 	.set_coalesce           = ixgbe_set_coalesce,
++	.get_rx_ring_count	= ixgbe_get_rx_ring_count,
+ 	.get_rxnfc		= ixgbe_get_rxnfc,
+ 	.set_rxnfc		= ixgbe_set_rxnfc,
+ 	.get_rxfh_indir_size	= ixgbe_rss_indir_size,
+@@ -3791,6 +3795,7 @@ static const struct ethtool_ops ixgbe_ethtool_ops_e610 = {
+ 	.get_ethtool_stats      = ixgbe_get_ethtool_stats,
+ 	.get_coalesce           = ixgbe_get_coalesce,
+ 	.set_coalesce           = ixgbe_set_coalesce,
++	.get_rx_ring_count	= ixgbe_get_rx_ring_count,
+ 	.get_rxnfc		= ixgbe_get_rxnfc,
+ 	.set_rxnfc		= ixgbe_set_rxnfc,
+ 	.get_rxfh_indir_size	= ixgbe_rss_indir_size,
+
+---
+base-commit: bde974ef62569a7da12aa71d182a760cd6223c36
+change-id: 20251112-ixgbe_gxrings-61c6f71d712b
+
+Best regards,
+--  
+Breno Leitao <leitao@debian.org>
 
 
