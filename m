@@ -1,295 +1,249 @@
-Return-Path: <netdev+bounces-237821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 167E3C50978
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 06:14:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 540A1C5097E
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 06:16:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id CFD1C4E4548
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 05:14:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D2113B1921
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 05:16:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CB6D2D73B9;
-	Wed, 12 Nov 2025 05:14:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E52D02405E7;
+	Wed, 12 Nov 2025 05:16:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="QNmjdWZX"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="sOafgz+5"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C3D32D5936
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 05:14:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762924477; cv=none; b=MKYpMQZdoLc5RWyHhIevbWPjYb5kFcnBw6Ybfb64M4bYCbQRIluBTMtYgmxuGnVydDaxDgMUNcej8+L9zNVcr/AjUTADbxfUR1z6UW5gPnnC/XehTth3mhVfyuSltPqSMmLbYm4cC6SpsJ3zLqDVcc/pi3tAJSt2SfIpHrXRC+A=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762924477; c=relaxed/simple;
-	bh=8aY4Q5FbrKjnoe3TKvkhKx36Ir+taoVdCyNadkhw484=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sE4/IiWaAhAE64Yv2NzMBFfeNliqf5GUUHxXDxdUcNmBLiZuIKqx9NNFhEIc1kpyojyriUZGPLk7qfkZNgK6dOZ7Dv0ShNHkYp4/lb0dO5c1xJ7WDLDlbcmwYrEBRw2BISuVkSkMi2I01zRx3qbmradvhC4Flg61t65nigUS9KQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=QNmjdWZX; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from [10.18.184.99] (unknown [167.220.238.131])
-	by linux.microsoft.com (Postfix) with ESMTPSA id B9A1C20120AA;
-	Tue, 11 Nov 2025 21:14:31 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B9A1C20120AA
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1762924474;
-	bh=sjhNLUr/wLRi31ek5npBg3DiXup3HJlhPcEd+jr7tCc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=QNmjdWZXynpSoOl4cA/OSjVWP8p8nWyD5aNAe4jZaSF4s3Ezyq1NBZQfJW3jljDiJ
-	 vNUD+/o6YWBe2U6LdzSGdknSM3/MgKTneMps1HUi95n7SsBUwETt83/Uiy2z2KbxnP
-	 cH/7wPCsPWFEWOvU581yjUX42SdOWNXSMJBopwXE=
-Message-ID: <c6e3a182-b326-4a6d-901d-c445d95643eb@linux.microsoft.com>
-Date: Wed, 12 Nov 2025 10:44:28 +0530
+Received: from BL0PR03CU003.outbound.protection.outlook.com (mail-eastusazon11012027.outbound.protection.outlook.com [52.101.53.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 159E744C63
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 05:16:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.53.27
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762924563; cv=fail; b=CCkSev078zjjhAG3GmmY0q/jwPSpe9ferB+17JbRrjfARQ/6KXZehqOwFoIyqk1whgenG5bV0RLfVR/l85yWrCskY0Khzs+65DfgPz2lwKY9Da3YuKrpQL9KSfSA5rb3vgcrwmLq1yamNKKT2plOlSwPSrjrwCqJnXO2Mw3CTz0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762924563; c=relaxed/simple;
+	bh=G8Ro4aIT7T2Mr9uQSN5ZgdjMeLRHXCOW70Pbn6Q0Z50=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=PUBBBIseXXo6ZXf/tyRJrQitHbZAM8ObLxMdR/Vw3sPExIdkZj/2C+lQa15zlmmbThObHnXutQgHtmLyNl/39tLLgGBUUprwt/gGQqeCbk8WvxrpgPdxd0kPXShunsQUk+6smzDyIDPJA5wu6cRW8ofuqWZRk2XBc7BsjX3EpJo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=sOafgz+5; arc=fail smtp.client-ip=52.101.53.27
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Y2Wm9nOeJjUwAbezEXn68UBzjaadP7TrVHnUCvBTYb05c9svURRPZNJpo2AS/BgHie7MK0MVq8xrS1JWXHepd/CJSBwS9OZ5S8zXi7Knf/Im9xVb3wqBQBzvLIc+ccs/Qup/q3noJoxwOAgvmbN7NLpxoSa6L4cfXVPcN45ZgDZBqlR0k2CcSHIpbGbcKOry/6oVIaHJaqGsCRLoeYfWrfvh+WpFsn7EDFuI+OSNFi+bKRMy4yQRuUdfeUvHjfoba+wrjWLm/JU0rG+wjXs9ysWeDBh2Ne6KkFNp56XNAutwUWGImOkg/PVpUHqRp9s3LgB6ubGeO+XmkuvsrnEFvw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FCpFv+AH6Ijht+yc2WLDCywxy07bNyn8ah+nVgwdkOA=;
+ b=PRNq7GZRqcO2wfhf1xJmfJ/WxgbooX1gnrJR1RxMP1Rru14x18EZD+3SVUaKvqMliwHSGLuxzIaFOH6SqN3t05aGLBCeT5tBassf3U9RBlCrZTaFTIf1s8lRsQXWcI2aw/OqY8BBZ4FKcEn1topjjnlj3syKYbx6+jwzbSPxLqUzjpqynGZfIp/MVRZjeBVkZutFjRy1wU+mh+iJg9xMdI2Eyzr/grfO6wzVOLuLIcLVTiR1EuTGkKJy4N1uxavPrV5UcdCujUOSXhuoRVK2cZi1W0cEPh/8BsX1394gCOQRmzC49ArDcE8XcL6oSlatpC3zHTh4Jo8zejq/yOjSyg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FCpFv+AH6Ijht+yc2WLDCywxy07bNyn8ah+nVgwdkOA=;
+ b=sOafgz+5ZUwVhU3QbsZWPdviYWzJy890NNgIXvezFcihUxZfNmsuoSWIUTGxnIJ+kbWA/VezYqsppaJIK2RdI6TJjRsSS7BZcauuoffGtLKG91jZLCfRD/HFPFA9uHlECz8ZEVePgJbBGRRxYbilb8Y4D/F68gP6vCta1yvj545fHgzmUih3aBT/XAD72qZTWSgjhns6SP6u561oktj5dhCj8ed1oW++NUNGe/+yl6k0Q+dY1nqf5RawuDSbsJ4IBeKm0+3AYahZPse4c1z4xL4VWqNst4Y/Ij2mKZG03e0CbkrzZapWF+AIbIgaLuVtaZzIa9L25ChukV+74SXmdg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from MW4PR12MB7309.namprd12.prod.outlook.com (2603:10b6:303:22f::17)
+ by CH3PR12MB9028.namprd12.prod.outlook.com (2603:10b6:610:123::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.15; Wed, 12 Nov
+ 2025 05:15:58 +0000
+Received: from MW4PR12MB7309.namprd12.prod.outlook.com
+ ([fe80::ea00:2082:ce2d:74c]) by MW4PR12MB7309.namprd12.prod.outlook.com
+ ([fe80::ea00:2082:ce2d:74c%5]) with mapi id 15.20.9298.015; Wed, 12 Nov 2025
+ 05:15:58 +0000
+Message-ID: <ada8b5c4-2a9e-45d9-a9e1-28fa50afce8d@nvidia.com>
+Date: Tue, 11 Nov 2025 23:15:55 -0600
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 05/12] virtio_net: Query and set flow filter
+ caps
+To: Jason Wang <jasowang@redhat.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, mst@redhat.com,
+ virtualization@lists.linux.dev, parav@nvidia.com, shshitrit@nvidia.com,
+ yohadt@nvidia.com, xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
+ shameerali.kolothum.thodi@huawei.com, jgg@ziepe.ca, kevin.tian@intel.com,
+ kuba@kernel.org, andrew+netdev@lunn.ch, edumazet@google.com
+References: <20251107041523.1928-1-danielj@nvidia.com>
+ <20251107041523.1928-6-danielj@nvidia.com>
+ <ee527a09-6e6e-4184-8a0c-46aacb11302f@redhat.com>
+ <CACGkMEt2SEWY-hUKv2=PwLZr+NNGSobr4i-XQ_qDtGk+tNw8Gw@mail.gmail.com>
+ <443232ac-2e4f-4893-a956-cf9185bc3ac1@nvidia.com>
+ <CACGkMEtMP2XfXFmuhoAkMrcgJD8JiRTc-tuq1i7xxxzA43A4mg@mail.gmail.com>
+Content-Language: en-US
+From: Dan Jurgens <danielj@nvidia.com>
+In-Reply-To: <CACGkMEtMP2XfXFmuhoAkMrcgJD8JiRTc-tuq1i7xxxzA43A4mg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SA1P222CA0080.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:806:35e::17) To MW4PR12MB7309.namprd12.prod.outlook.com
+ (2603:10b6:303:22f::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/3] net: fix napi_consume_skb() with alien skbs
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@google.com>,
- Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org,
- eric.dumazet@gmail.com, ssengar@linux.microsoft.com, gargaditya@microsoft.com
-References: <20251106202935.1776179-1-edumazet@google.com>
- <20251106202935.1776179-3-edumazet@google.com>
- <20251111165622.GA30112@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <CANn89i+e2XDw4b_iHaj_LPTeg6M2+-+vroECks21Fs7Hfg2Aow@mail.gmail.com>
-Content-Language: en-US
-From: Aditya Garg <gargaditya@linux.microsoft.com>
-In-Reply-To: <CANn89i+e2XDw4b_iHaj_LPTeg6M2+-+vroECks21Fs7Hfg2Aow@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR12MB7309:EE_|CH3PR12MB9028:EE_
+X-MS-Office365-Filtering-Correlation-Id: 66922202-416d-4779-6315-08de21aa9039
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?UjNSOTFpSlZiRGtXeityTjVWZlF0bGdNLyttZkRyMWRDakhpbFhaMklYQ0RJ?=
+ =?utf-8?B?WVVrSG8vVlgwL3M4K2hpeEhZQk1qcFNtbHZDTHBKWEVIcnM2NHVJTHpZNzQy?=
+ =?utf-8?B?c01ZRkdaYzVta25sNHhVVDVTVUtSYVUrU3JhVUwvYXRWejZzOXE2Zm52ZU5x?=
+ =?utf-8?B?TVkvSHZ3emVWQk55V2h5L0h0ckZQQ0dGMmVad2ZuZXBndnRnWTJQaEVWaDJJ?=
+ =?utf-8?B?cmM0WjNzTS9vbHprVDcxYjNWTWxvaVBzL251ZWZtTElZQlY4aDZuaDFTeUhq?=
+ =?utf-8?B?SWhOb2NiUkZPVHZMTGllZmtlbGxXM0NaMlZqQXZvMmRCKy9tdUJ2dmd6Q2lY?=
+ =?utf-8?B?N2MvS2JQZnBTRTR2VkYxZHZIaHBub3BndW5tWWtGNjM2ZG01UzRXMjIzZ2cw?=
+ =?utf-8?B?N3RhUEtKMkgzNmF1QTJidkVLbUg0T2JYSE1YQ2Z6Z0ZFcjFMWGpkMzR3dzEy?=
+ =?utf-8?B?YW5NZ0M0TFFXWFRPS0Yrb1BENnJXZkxiSGV6KzY3bkVSWGxFMytRejRIVWF1?=
+ =?utf-8?B?U2dMNkdkUFlNM210cGpiNk0rRERvUStXTitEcWV5QkwxZUFsQUV6Z2NPOXg3?=
+ =?utf-8?B?Tm5MSUQ3M0FsT1NlVmhrbC9ScWJyR3Bod0lpR2NZWWpyRithVnZ4bGlidFVM?=
+ =?utf-8?B?Qmg2dCtrSDFVSWhvbGg1MHpBeXVJU1VyQnkxRGw3RmNtM1A5V2ZTTHVWWjlG?=
+ =?utf-8?B?L29ucWVkUExqbFdpMk9KOVFFRjcvaDlhVFdJc3BGa1RxWGs3MkFRSzZqNUhG?=
+ =?utf-8?B?OTNiV1pZMGxTVnhrMHBMYkRwVmdLMVArcmVUeUI1ODBRLzkydUM2YVQ5VkJ4?=
+ =?utf-8?B?ZEFiZm1LQ0F5WERTOHNGbGpBR3JDMW16VjdUTGx6SjdXaEphTld2YjBCcy9W?=
+ =?utf-8?B?T05YSmFIYTI5VlFqa2lIaUtibkg2OTloQWxSNXpwVDNHOGRiY2gwRHM4TnlW?=
+ =?utf-8?B?VENOS0JxM1pBb29NbFRtNEdxd1dkUExGam8rSFhMck1CaXZ2Wi9LVU1NRC9W?=
+ =?utf-8?B?T1c0UkNGc0ZsTGRuajBrM255UFM5ZHBzQlpKam16MkQwcnllc1pUcGI3YjZS?=
+ =?utf-8?B?WlNqeUo1bHUzM01va1l1WVA3Y2xhdjdXMnFYYit0NjkvVWJoOURRMlZyNFc4?=
+ =?utf-8?B?Wk45VlFBbHd3aE92QSthOWJpT1Buc0tpeTg3VWFPOGIzZUVLMVpNU3lkaUxo?=
+ =?utf-8?B?aXQxUUFRV3hkc2hmTWxtUGt3eE5RcUo0UHNVUjBGaXNRN1pEeThSUG9hSmJN?=
+ =?utf-8?B?NjNmRXF2alZWaUpQbHgyOVh0V1l0aEppVllXazZXZ1JScjRxamZFZU5MYm1L?=
+ =?utf-8?B?UlJ6VnpuckFjeE1iLzBsejVCMCtqbEMyMjVHTWpVcmptT3BMbktuSmRzZWtj?=
+ =?utf-8?B?ME8wQms5a1IyK0I0RmtUblU5LzI1Q2lmMHVyby8rcTNuRFZITEVVZWoxMGVq?=
+ =?utf-8?B?MWxzVGhFUHA2SWk5aDlRdUtPazdFcS8yWEtmKzN1NDVQRDYxMFhMT3F4M0xm?=
+ =?utf-8?B?aEZ5cTh2akUyMExMa040VDR3SFRleXYvK0NKdW5ZVFRjeS94SXNZUnNxTjBz?=
+ =?utf-8?B?M3BUbTBjTEFwUndMV013RXp5blpCaXdaOE8xdmdXMVNNNWZENFprSDlpYmsv?=
+ =?utf-8?B?QnJIYnhqUTI1elBPcDlJd1dQOUhJcmJvbk9uaFErRy9FUEYvOTZIS2cxdU4x?=
+ =?utf-8?B?ODE1YTI0NFhGd1VrbThKVzdQTXFFVVlKQ25DYnpMakQ0RjFtT1B4K2gzZ0hw?=
+ =?utf-8?B?Y25USEZhUjNGOW5VSVdFRzBuVFFXVmRxZnRTWW1QcXBNV284L2gxM2FjUVVy?=
+ =?utf-8?B?S0Z2a0NNdDN6NzFDMFlrNXh0T2dzeU9TTzBQa1pBSENSc09ScWN3bmNrdkJQ?=
+ =?utf-8?B?QmdlVUkwdktvMk1xY2hDamUxNHNCWVRGanNyVm1rTUJqN01IN1hDQlBZVTBj?=
+ =?utf-8?Q?ZTzipk2PjUn09+SFyI+e1CtKXq7Wqze4?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR12MB7309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?aWw3cFVxQ1BkRDRuTFFJdkNuM0R5Vk1mZmhMSktpZ0RiWG1tODV1d0FMVlNX?=
+ =?utf-8?B?WWlab1RTUVJwdXRiS2JBOTlWVmRGWVNOejFXaWhDYnVjRHZsWnlBc0FIVEEy?=
+ =?utf-8?B?endUS0xleUgwOW1seml6MzlpOWQ2TFM0TlNwaGZnK0Z1ZmIxeUNSOEdpancx?=
+ =?utf-8?B?eVdIZ1Q3NXNCMGI0bTlNMFhTSjNKZWd4NURFN2NnWncrdlZFYVkveGZ5NGY2?=
+ =?utf-8?B?eXAyc1pyWUJHMXpjOUR4YjZnUWFLZHRYUDBpaFBmN3FBTXlIM2QzTXkvdGtG?=
+ =?utf-8?B?WWRQR0F6M0NFWUtuaC9Cbk40Mmk2MHhWK2NqSnJiOE5kY2ZvRU9ueWxEcGpu?=
+ =?utf-8?B?NGdVQ2Q5VThSRmNHS3Q0V0Z6U1JCK2tJSC9yZ0R2Q293ZFphaXRmM0EvbjBJ?=
+ =?utf-8?B?dDZDR0p2ODJUcjU3b21NdFNKd2p0MENGczQ2OERFMkN5bU9wOWowWGlvaytB?=
+ =?utf-8?B?aTJRK0JzMzl2MnErbnBocSsxU1ZSMzdMU2IwWVJQNnBKQ0NuVGxaVzU3QWYy?=
+ =?utf-8?B?QWpzajFIVkNzU1BKRktZU1NXcjFMTmJkRDZUUi9uTG10VkdFbWRWaFZZSkVm?=
+ =?utf-8?B?Y01KUzFSZkc3LzA0ZGRMSDlxRHRnMlBaZlRYRFVjNnVBSTErMUUwNmUyc1Y0?=
+ =?utf-8?B?RUxpNDZJOGxmZnEwbEhNMzJ4TmpzM2MxSkR1M1hPU3N5VnlDdUl0Y3lvbzdT?=
+ =?utf-8?B?N2NtdHJmS0VUUmVyeTl6SjNMYXB0MC91Zzh5SFNtczFUQjJYS0lTZUZ3Zisv?=
+ =?utf-8?B?M3hiZ294SUt2T0NXcHQrOUI4NEZyaGhld2hDeldGT1hGbEdTdUl0Ri9Ydkxt?=
+ =?utf-8?B?TTlmMHhTR2t5QUkvMk9TNFFVZkZsdVlnT0UveFdTck5MZ2JZMGJhd2JnM2pB?=
+ =?utf-8?B?SkRzODZ2MWFWczc2OWZyUEh0d0pERnlNZmlYSDJ5QXI2YTllSk55alhLWlhM?=
+ =?utf-8?B?REp6NU1TeFhLYWpzV0NncndGby9IM2VjWWkwRjBPWGcvVmxPRkl0VUF1cjBN?=
+ =?utf-8?B?UlJDRHVaYWtBekVRSnZRb0xMZDRDTTNNelYwdEVXK20wOHZYVVN0WVA4dUNz?=
+ =?utf-8?B?a0FTcEt6bmhDanVUd3ZhcG5TcnNFeXExUmFLT1cyMG5ETy90VmJFNUtidmRP?=
+ =?utf-8?B?NWN4bW41V3pFMHdRd2ZVUHphb0dzZDNkVzVEanZXUDJxb1p4dGxyMmYwN3pF?=
+ =?utf-8?B?am1LWGZHb1BBcFlGRldvR2gxSUhUQ1FVZmcrR1RLZjl3dzRpeEVvcVBKTEFT?=
+ =?utf-8?B?d2VWZFpiUmRIOEhyaldsZDRMSzdFNGJUblQ4c3hDSXJadWJqb3dkdDRIcW9N?=
+ =?utf-8?B?YzkrcklLY05pTW9NNVlibi9ISEgvVlZ3blg5d2U1N2RRa0ljTFJ6SUlhU01o?=
+ =?utf-8?B?TmRqMDh5Tzcwc3pUNUZIZUdXNWtkcUVBQmp5NEZoQkZXSC9XVkJaS0hweXJj?=
+ =?utf-8?B?L0FjUVhueDdVbnNRVm1YTDBsTk5PTUlITklTeFA5NDVFbi9TVURsbUtRdFFV?=
+ =?utf-8?B?cDJmTGxYSlRvKzhiVFRvNGw1bFBNam81bTNjRjZLUmsvQnphREVVQTZTSUFK?=
+ =?utf-8?B?aURhU0g1dU80S0NVN2UxM3dmcURxQkRacUo3OGdTYVJRY3J6VTE4dTFVZVlV?=
+ =?utf-8?B?cmgvQ3VJZE5MZVVyV0pMUGlrU1dha3o0V0tJWG04RklMMFVCU3paYURHVW45?=
+ =?utf-8?B?R1lKbmMybDBzcmdiN21XVzZPcmVhb0lDdE9pZjgvdDlUZkZia1RmYU9rUGt5?=
+ =?utf-8?B?b3RGaXdEUFpLU2dqUzZ5SWFRZmNsQUQ1cnllclVFVFVEaGl3SzhPN3lNUDJa?=
+ =?utf-8?B?WkRDRGMzSEZyWFR3cjF3aU1HS0RsRk8vUDYvTS9VK092R0dCcGRmYU8zdTJR?=
+ =?utf-8?B?QWxjdFUxenVzQlJxOU92R0svLzhvbEkrZHFhZE5vZDhWMFNUSzJMd2luYjAw?=
+ =?utf-8?B?eDNrNE1EVk5hYTc3emg4Uk5tSStzRUhzaFlWTWtoeHpyWjR3U0U0Zzl3NTRB?=
+ =?utf-8?B?NmtJb3Z5MFBRZDVtTVlkYWRHQzVhSnJOTEpka0V4UnBGRUVJV1NlcUM3NWZy?=
+ =?utf-8?B?R0VWQU04RER6eVZuVDAzR1R6TERqdjhqSDlUNWpSeUkvbFdmMGJNM2VqMkR2?=
+ =?utf-8?Q?BqqqVoVJq7U2dScSvlL3ihCPT?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 66922202-416d-4779-6315-08de21aa9039
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR12MB7309.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Nov 2025 05:15:58.2840
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tY8Tf6LIMTlWju6boG5SpWMmqCFbPvl4ezTBY/Cepxn6c3uVdUBkTFHnJw607CwYJlf9GJ/Qs66kGGvwYMCkqQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9028
 
-On 11-11-2025 22:47, Eric Dumazet wrote:
-> On Tue, Nov 11, 2025 at 8:56 AM Aditya Garg
-> <gargaditya@linux.microsoft.com> wrote:
+On 11/11/25 10:18 PM, Jason Wang wrote:
+> On Wed, Nov 12, 2025 at 11:02 AM Dan Jurgens <danielj@nvidia.com> wrote:
 >>
->> On Thu, Nov 06, 2025 at 08:29:34PM +0000, Eric Dumazet wrote:
->>> There is a lack of NUMA awareness and more generally lack
->>> of slab caches affinity on TX completion path.
+>> On 11/11/25 7:00 PM, Jason Wang wrote:
+>>> On Tue, Nov 11, 2025 at 6:42 PM Paolo Abeni <pabeni@redhat.com> wrote:
+>>>>
+>>>> On 11/7/25 5:15 AM, Daniel Jurgens wrote:
+>>>>> @@ -7121,6 +7301,15 @@ static int virtnet_probe(struct virtio_device *vdev)
+>>>>>       }
+>>>>>       vi->guest_offloads_capable = vi->guest_offloads;
+>>>>>
+>>>>> +     /* Initialize flow filters. Not supported is an acceptable and common
+>>>>> +      * return code
+>>>>> +      */
+>>>>> +     err = virtnet_ff_init(&vi->ff, vi->vdev);
+>>>>> +     if (err && err != -EOPNOTSUPP) {
+>>>>> +             rtnl_unlock();
+>>>>> +             goto free_unregister_netdev;
+>>>>
+>>>> I'm sorry for not noticing the following earlier, but it looks like that
+>>>> the code could error out on ENOMEM even if the feature is not really
+>>>> supported,  when `cap_id_list` allocation fails, which in turn looks a
+>>>> bit bad, as the allocated chunk is not that small (32K if I read
+>>>> correctly).
+>>>>
+>>>> @Jason, @Micheal: WDYT?
 >>>
->>> Modern drivers are using napi_consume_skb(), hoping to cache sk_buff
->>> in per-cpu caches so that they can be recycled in RX path.
+>>> I agree. I think virtnet_ff_init() should be only called when the
+>>> feature is negotiated.
 >>>
->>> Only use this if the skb was allocated on the same cpu,
->>> otherwise use skb_attempt_defer_free() so that the skb
->>> is freed on the original cpu.
->>>
->>> This removes contention on SLUB spinlocks and data structures.
->>>
->>> After this patch, I get ~50% improvement for an UDP tx workload
->>> on an AMD EPYC 9B45 (IDPF 200Gbit NIC with 32 TX queues).
->>>
->>> 80 Mpps -> 120 Mpps.
->>>
->>> Profiling one of the 32 cpus servicing NIC interrupts :
->>>
->>> Before:
->>>
->>> mpstat -P 511 1 1
->>>
->>> Average:     CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest  %gnice   %idle
->>> Average:     511    0.00    0.00    0.00    0.00    0.00   98.00    0.00    0.00    0.00    2.00
->>>
->>>      31.01%  ksoftirqd/511    [kernel.kallsyms]  [k] queued_spin_lock_slowpath
->>>      12.45%  swapper          [kernel.kallsyms]  [k] queued_spin_lock_slowpath
->>>       5.60%  ksoftirqd/511    [kernel.kallsyms]  [k] __slab_free
->>>       3.31%  ksoftirqd/511    [kernel.kallsyms]  [k] idpf_tx_clean_buf_ring
->>>       3.27%  ksoftirqd/511    [kernel.kallsyms]  [k] idpf_tx_splitq_clean_all
->>>       2.95%  ksoftirqd/511    [kernel.kallsyms]  [k] idpf_tx_splitq_start
->>>       2.52%  ksoftirqd/511    [kernel.kallsyms]  [k] fq_dequeue
->>>       2.32%  ksoftirqd/511    [kernel.kallsyms]  [k] read_tsc
->>>       2.25%  ksoftirqd/511    [kernel.kallsyms]  [k] build_detached_freelist
->>>       2.15%  ksoftirqd/511    [kernel.kallsyms]  [k] kmem_cache_free
->>>       2.11%  swapper          [kernel.kallsyms]  [k] __slab_free
->>>       2.06%  ksoftirqd/511    [kernel.kallsyms]  [k] idpf_features_check
->>>       2.01%  ksoftirqd/511    [kernel.kallsyms]  [k] idpf_tx_splitq_clean_hdr
->>>       1.97%  ksoftirqd/511    [kernel.kallsyms]  [k] skb_release_data
->>>       1.52%  ksoftirqd/511    [kernel.kallsyms]  [k] sock_wfree
->>>       1.34%  swapper          [kernel.kallsyms]  [k] idpf_tx_clean_buf_ring
->>>       1.23%  swapper          [kernel.kallsyms]  [k] idpf_tx_splitq_clean_all
->>>       1.15%  ksoftirqd/511    [kernel.kallsyms]  [k] dma_unmap_page_attrs
->>>       1.11%  swapper          [kernel.kallsyms]  [k] idpf_tx_splitq_start
->>>       1.03%  swapper          [kernel.kallsyms]  [k] fq_dequeue
->>>       0.94%  swapper          [kernel.kallsyms]  [k] kmem_cache_free
->>>       0.93%  swapper          [kernel.kallsyms]  [k] read_tsc
->>>       0.81%  ksoftirqd/511    [kernel.kallsyms]  [k] napi_consume_skb
->>>       0.79%  swapper          [kernel.kallsyms]  [k] idpf_tx_splitq_clean_hdr
->>>       0.77%  ksoftirqd/511    [kernel.kallsyms]  [k] skb_free_head
->>>       0.76%  swapper          [kernel.kallsyms]  [k] idpf_features_check
->>>       0.72%  swapper          [kernel.kallsyms]  [k] skb_release_data
->>>       0.69%  swapper          [kernel.kallsyms]  [k] build_detached_freelist
->>>       0.58%  ksoftirqd/511    [kernel.kallsyms]  [k] skb_release_head_state
->>>       0.56%  ksoftirqd/511    [kernel.kallsyms]  [k] __put_partials
->>>       0.55%  ksoftirqd/511    [kernel.kallsyms]  [k] kmem_cache_free_bulk
->>>       0.48%  swapper          [kernel.kallsyms]  [k] sock_wfree
->>>
->>> After:
->>>
->>> mpstat -P 511 1 1
->>>
->>> Average:     CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest  %gnice   %idle
->>> Average:     511    0.00    0.00    0.00    0.00    0.00   51.49    0.00    0.00    0.00   48.51
->>>
->>>      19.10%  swapper          [kernel.kallsyms]  [k] idpf_tx_splitq_clean_hdr
->>>      13.86%  swapper          [kernel.kallsyms]  [k] idpf_tx_clean_buf_ring
->>>      10.80%  swapper          [kernel.kallsyms]  [k] skb_attempt_defer_free
->>>      10.57%  swapper          [kernel.kallsyms]  [k] idpf_tx_splitq_clean_all
->>>       7.18%  swapper          [kernel.kallsyms]  [k] queued_spin_lock_slowpath
->>>       6.69%  swapper          [kernel.kallsyms]  [k] sock_wfree
->>>       5.55%  swapper          [kernel.kallsyms]  [k] dma_unmap_page_attrs
->>>       3.10%  swapper          [kernel.kallsyms]  [k] fq_dequeue
->>>       3.00%  swapper          [kernel.kallsyms]  [k] skb_release_head_state
->>>       2.73%  swapper          [kernel.kallsyms]  [k] read_tsc
->>>       2.48%  swapper          [kernel.kallsyms]  [k] idpf_tx_splitq_start
->>>       1.20%  swapper          [kernel.kallsyms]  [k] idpf_features_check
->>>       1.13%  swapper          [kernel.kallsyms]  [k] napi_consume_skb
->>>       0.93%  swapper          [kernel.kallsyms]  [k] idpf_vport_splitq_napi_poll
->>>       0.64%  swapper          [kernel.kallsyms]  [k] native_send_call_func_single_ipi
->>>       0.60%  swapper          [kernel.kallsyms]  [k] acpi_processor_ffh_cstate_enter
->>>       0.53%  swapper          [kernel.kallsyms]  [k] io_idle
->>>       0.43%  swapper          [kernel.kallsyms]  [k] netif_skb_features
->>>       0.41%  swapper          [kernel.kallsyms]  [k] __direct_call_cpuidle_state_enter2
->>>       0.40%  swapper          [kernel.kallsyms]  [k] native_irq_return_iret
->>>       0.40%  swapper          [kernel.kallsyms]  [k] idpf_tx_buf_hw_update
->>>       0.36%  swapper          [kernel.kallsyms]  [k] sched_clock_noinstr
->>>       0.34%  swapper          [kernel.kallsyms]  [k] handle_softirqs
->>>       0.32%  swapper          [kernel.kallsyms]  [k] net_rx_action
->>>       0.32%  swapper          [kernel.kallsyms]  [k] dql_completed
->>>       0.32%  swapper          [kernel.kallsyms]  [k] validate_xmit_skb
->>>       0.31%  swapper          [kernel.kallsyms]  [k] skb_network_protocol
->>>       0.29%  swapper          [kernel.kallsyms]  [k] skb_csum_hwoffload_help
->>>       0.29%  swapper          [kernel.kallsyms]  [k] x2apic_send_IPI
->>>       0.28%  swapper          [kernel.kallsyms]  [k] ktime_get
->>>       0.24%  swapper          [kernel.kallsyms]  [k] __qdisc_run
->>>
->>> Signed-off-by: Eric Dumazet <edumazet@google.com>
->>> ---
->>>   net/core/skbuff.c | 5 +++++
->>>   1 file changed, 5 insertions(+)
->>>
->>> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
->>> index eeddb9e737ff28e47c77739db7b25ea68e5aa735..7ac5f8aa1235a55db02b40b5a0f51bb3fa53fa03 100644
->>> --- a/net/core/skbuff.c
->>> +++ b/net/core/skbuff.c
->>> @@ -1476,6 +1476,11 @@ void napi_consume_skb(struct sk_buff *skb, int budget)
->>>
->>>        DEBUG_NET_WARN_ON_ONCE(!in_softirq());
->>>
->>> +     if (skb->alloc_cpu != smp_processor_id() && !skb_shared(skb)) {
->>> +             skb_release_head_state(skb);
->>> +             return skb_attempt_defer_free(skb);
->>> +     }
->>> +
->>>        if (!skb_unref(skb))
->>>                return;
->>>
->>> --
->>> 2.51.2.1041.gc1ab5b90ca-goog
+>>> Thanks
 >>>
 >>
->> I ran these tests on latest net-next for MANA driver and I am observing a regression here.
->>
->> lisatest@lisa--747-e0-n0:~$ iperf3 -c 10.0.0.4 -t 30 -l 1048576
->> Connecting to host 10.0.0.4, port 5201
->> [  5] local 10.0.0.5 port 48692 connected to 10.0.0.4 port 5201
->> [ ID] Interval           Transfer     Bitrate         Retr  Cwnd
->> [  5]   0.00-1.00   sec  4.57 GBytes  39.2 Gbits/sec  586   1.04 MBytes
->> [  5]   1.00-2.00   sec  4.74 GBytes  40.7 Gbits/sec  520   1.13 MBytes
->> [  5]   2.00-3.00   sec  5.16 GBytes  44.3 Gbits/sec  191   1.20 MBytes
->> [  5]   3.00-4.00   sec  5.13 GBytes  44.1 Gbits/sec  520   1.11 MBytes
->> [  5]   4.00-5.00   sec   678 MBytes  5.69 Gbits/sec   93   1.37 KBytes
->> [  5]   5.00-6.00   sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
->> [  5]   6.00-7.00   sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
->> [  5]   7.00-8.00   sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
->> [  5]   8.00-9.00   sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
->> [  5]   9.00-10.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
->> [  5]  10.00-11.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
->> [  5]  11.00-12.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
->> [  5]  12.00-13.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
->> [  5]  13.00-14.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
->> [  5]  14.00-15.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
->> [  5]  15.00-16.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
->> [  5]  16.00-17.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
->> [  5]  17.00-18.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
->> [  5]  18.00-19.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
->> [  5]  19.00-20.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
->> [  5]  20.00-21.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
->> [  5]  21.00-22.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
->> [  5]  22.00-23.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
->> [  5]  23.00-24.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
->> [  5]  24.00-25.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
->> [  5]  25.00-26.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
->> [  5]  26.00-27.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
->> [  5]  27.00-28.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
->> [  5]  28.00-29.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
->> [  5]  29.00-30.00  sec  0.00 Bytes  0.00 bits/sec    0   1.37 KBytes
->> - - - - - - - - - - - - - - - - - - - - - - - - -
->> [ ID] Interval           Transfer     Bitrate         Retr
->> [  5]   0.00-30.00  sec  20.3 GBytes  5.80 Gbits/sec  1910             sender
->> [  5]   0.00-30.00  sec  20.3 GBytes  5.80 Gbits/sec                  receiver
->>
->> iperf Done.
->>
->>
->> I tested again by reverting this patch and regression was not there.
->>
->> lisatest@lisa--747-e0-n0:~/net-next$ iperf3 -c 10.0.0.4 -t 30 -l 1048576
->> Connecting to host 10.0.0.4, port 5201
->> [  5] local 10.0.0.5 port 58188 connected to 10.0.0.4 port 5201
->> [ ID] Interval           Transfer     Bitrate         Retr  Cwnd
->> [  5]   0.00-1.00   sec  4.95 GBytes  42.5 Gbits/sec  541   1.10 MBytes
->> [  5]   1.00-2.00   sec  4.92 GBytes  42.3 Gbits/sec  599    878 KBytes
->> [  5]   2.00-3.00   sec  4.51 GBytes  38.7 Gbits/sec  438    803 KBytes
->> [  5]   3.00-4.00   sec  4.69 GBytes  40.3 Gbits/sec  647   1.17 MBytes
->> [  5]   4.00-5.00   sec  4.18 GBytes  35.9 Gbits/sec  1183    715 KBytes
->> [  5]   5.00-6.00   sec  5.05 GBytes  43.4 Gbits/sec  484    975 KBytes
->> [  5]   6.00-7.00   sec  5.32 GBytes  45.7 Gbits/sec  520    836 KBytes
->> [  5]   7.00-8.00   sec  5.29 GBytes  45.5 Gbits/sec  436   1.10 MBytes
->> [  5]   8.00-9.00   sec  5.27 GBytes  45.2 Gbits/sec  464   1.30 MBytes
->> [  5]   9.00-10.00  sec  5.25 GBytes  45.1 Gbits/sec  425   1.13 MBytes
->> [  5]  10.00-11.00  sec  5.29 GBytes  45.4 Gbits/sec  268   1.19 MBytes
->> [  5]  11.00-12.00  sec  4.98 GBytes  42.8 Gbits/sec  711    793 KBytes
->> [  5]  12.00-13.00  sec  3.80 GBytes  32.6 Gbits/sec  1255    801 KBytes
->> [  5]  13.00-14.00  sec  3.80 GBytes  32.7 Gbits/sec  1130    642 KBytes
->> [  5]  14.00-15.00  sec  4.31 GBytes  37.0 Gbits/sec  1024   1.11 MBytes
->> [  5]  15.00-16.00  sec  5.18 GBytes  44.5 Gbits/sec  359   1.25 MBytes
->> [  5]  16.00-17.00  sec  5.23 GBytes  44.9 Gbits/sec  265    900 KBytes
->> [  5]  17.00-18.00  sec  4.70 GBytes  40.4 Gbits/sec  769    715 KBytes
->> [  5]  18.00-19.00  sec  3.77 GBytes  32.4 Gbits/sec  1841    889 KBytes
->> [  5]  19.00-20.00  sec  3.77 GBytes  32.4 Gbits/sec  1084    827 KBytes
->> [  5]  20.00-21.00  sec  5.01 GBytes  43.0 Gbits/sec  558    994 KBytes
->> [  5]  21.00-22.00  sec  5.27 GBytes  45.3 Gbits/sec  450   1.25 MBytes
->> [  5]  22.00-23.00  sec  5.25 GBytes  45.1 Gbits/sec  338   1.18 MBytes
->> [  5]  23.00-24.00  sec  5.29 GBytes  45.4 Gbits/sec  200   1.14 MBytes
->> [  5]  24.00-25.00  sec  5.29 GBytes  45.5 Gbits/sec  518   1.02 MBytes
->> [  5]  25.00-26.00  sec  4.28 GBytes  36.7 Gbits/sec  1258    792 KBytes
->> [  5]  26.00-27.00  sec  3.87 GBytes  33.2 Gbits/sec  1365    799 KBytes
->> [  5]  27.00-28.00  sec  4.77 GBytes  41.0 Gbits/sec  530   1.09 MBytes
->> [  5]  28.00-29.00  sec  5.31 GBytes  45.6 Gbits/sec  419   1.06 MBytes
->> [  5]  29.00-30.00  sec  5.32 GBytes  45.7 Gbits/sec  222   1.10 MBytes
->> - - - - - - - - - - - - - - - - - - - - - - - - -
->> [ ID] Interval           Transfer     Bitrate         Retr
->> [  5]   0.00-30.00  sec   144 GBytes  41.2 Gbits/sec  20301             sender
->> [  5]   0.00-30.00  sec   144 GBytes  41.2 Gbits/sec                  receiver
->>
->> iperf Done.
->>
->>
->> I am still figuring out technicalities of this patch, but wanted to share initial findings for your input. Please let me know your thoughts on this!
+>> Are you suggesting we wait to call init until get/set_rxnfc is called? I
+>> don't like that idea. Probe is the right time to do feature discovery.
 > 
-> Perhaps try : https://patchwork.kernel.org/project/netdevbpf/patch/20251111151235.1903659-1-edumazet@google.com/
+> Nope I meant it might be better:
 > 
-> Thanks !
+> 1) embed virtio_admin_cmd_query_cap_id_result in virtnet_info to avoid
+> dynamic allocation
+> 
+> Or
+> 
+> 2) at least check if there's an adminq before trying to call virtnet_ff_init()?
 
-Thanks Eric, it works fine after above fix.
+I could do a check like this:
 
-Regards,
-Aditya
+        if (!vdev->config->admin_cmd_exec)
+                return -EOPNOTSUPP;
+
+Or would you prefer it added to the virtio_admin_command api?
+
+bool virtio_admin_supported(struct virtio_device *vdev);
+
+> 
+> Thanks
+> 
+>>
+>>
+>>>>
+>>>> /P
+>>>>
+>>>
+>>
+> 
+
 
