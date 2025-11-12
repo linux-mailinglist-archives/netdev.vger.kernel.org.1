@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-237988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 982A0C527B0
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 14:30:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34794C527FA
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 14:35:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5122D3A3044
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 13:20:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DB803AD427
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 13:25:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F02633358C3;
-	Wed, 12 Nov 2025 13:20:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA00C33711D;
+	Wed, 12 Nov 2025 13:25:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0uvMUYbc"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dA3ow4En"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D55A0307AD1;
-	Wed, 12 Nov 2025 13:20:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ACEB30C34A;
+	Wed, 12 Nov 2025 13:25:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762953611; cv=none; b=UN7V1IxntZbHzjhPka80WX2MmiUpFTkfIiWoFyU+d0YlV4P1lb/2YQ4zgh3Cx5jHW8T75Yy76LMcUGA9JfYuZFvAoeWkzIQELKoRp+7sBX+MjKf1TUNFAjEHcdFyFyaZcOcWZuS2MMc5U+52BRJcfQwcrPgI5EBFY4Cve7eK5mI=
+	t=1762953923; cv=none; b=G6QKt1HGO08hpLHQ2eVcuHrZ6CqnsZ5pcxE1O4ZnuXDSjI5HQS/ukQdsfZcw1Cjz0y0Jsgqk/4o5+SzcFeeHJK4HAGeAIQO6dTq7xNjrE2p/e85jWw9XsXQ8sDAvM11hD1SFfWEQE5AGhCUYWhdN2k0GYcdNKQvD+PRStNW0lNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762953611; c=relaxed/simple;
-	bh=BZpnM5upHTZ7qUgZkigoHN2kYvZMnoyTTsUw6eJIxdk=;
+	s=arc-20240116; t=1762953923; c=relaxed/simple;
+	bh=O7/lmhrEnSM5nvlYJelxb/eMu9DoLXJrh4JFzJ/R9NI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U5qFc2C1dxmIsS8jNkADpnsXPd1pbaIHNKGo0/R/3r2HSedGRtAQd2EA8B425qrimqM7h6HH++IXHJxg4oHF0X72JUY6KMIBjEzk0E9ssDOhzWuEg/x+3FvzqSLbY7FFcMInCg/MJ3cErB7IRZ4N+LefHNu1brSMI5079cSp3fo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0uvMUYbc; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=AOiIwaar2a1GZp5mG209ceNCLfTduDyjGxWlWXBOftUpU34KbeuMZtOJdagt5K7bXTYxv/Tr07FELg2W6tSUKCgaPXu3Ww+C/3pja5Si6Xz0GVNfa3viHPpKZJ46TKsgZ/atcpHy5qiSkhIlG2Goy451I+9DnJXulw9PuZPW9AA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dA3ow4En; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,38 +36,44 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=xu5J2YUVmO+KaIFCwe3YTQ+9UN97u6v/RSU7wP6bNI8=; b=0uvMUYbckaKxc9ZGTp6DGbg3YN
-	LALnRa7NcqVeGPt4nB5iXP1V4HqFy8LBFW7/xewuahRQ+6gPCw2f4WaEhI9ijAyzq6xNrwf7/E+M8
-	UvW05os7ZPsFzkNKwfIlPDFicG82Pb+eeBdJi4Lf92Ogx+Yp8YwTCJ6bJaypmP2LJ6A0=;
+	bh=UaY7KqekpaEMhTYRhO2ZoYZ8i2O52YuClMxZhBCoR7I=; b=dA3ow4EnKu9JWOlLIY40GL+xLV
+	5mYhKMR9yXmdr4PTcNUsQlOWynfniRaBzrDNzML+nZF4S39boswZrujC6IreXKOO6ODGPgjY2DYFq
+	+msb2tpUCrG/SPk4gvhuPLYVTatZLpD2JUQ+4QoYXkB5bvBn1xs5/9BJcHjab9lkxuvI=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1vJAl1-00DkSt-Dv; Wed, 12 Nov 2025 14:19:31 +0100
-Date: Wed, 12 Nov 2025 14:19:31 +0100
+	id 1vJAqQ-00DkWD-BY; Wed, 12 Nov 2025 14:25:06 +0100
+Date: Wed, 12 Nov 2025 14:25:06 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Jacky Chou <jacky_chou@aspeedtech.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+To: Rob Herring <robh@kernel.org>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, thomas.petazzoni@bootlin.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+	Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
 	Conor Dooley <conor+dt@kernel.org>,
-	Po-Yu Chuang <ratbert@faraday-tech.com>,
-	Joel Stanley <joel@jms.id.au>,
-	Andrew Jeffery <andrew@codeconstruct.com.au>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
-	"taoren@meta.com" <taoren@meta.com>
-Subject: Re: [PATCH net-next v4 4/4] net: ftgmac100: Add RGMII delay support
- for AST2600
-Message-ID: <3af52caa-88a7-4b88-bd92-fd47421cc81a@lunn.ch>
-References: <20251110-rgmii_delay_2600-v4-0-5cad32c766f7@aspeedtech.com>
- <20251110-rgmii_delay_2600-v4-4-5cad32c766f7@aspeedtech.com>
- <68f10ee1-d4c8-4498-88b0-90c26d606466@lunn.ch>
- <SEYPR06MB5134EBA2235B3D4BE39B19359DCCA@SEYPR06MB5134.apcprd06.prod.outlook.com>
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Romain Gantois <romain.gantois@bootlin.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+Subject: Re: [PATCH net-next v15 01/15] dt-bindings: net: Introduce the
+ ethernet-connector description
+Message-ID: <dd29e395-8074-4259-8563-062e5e1b6216@lunn.ch>
+References: <20251106094742.2104099-1-maxime.chevallier@bootlin.com>
+ <20251106094742.2104099-2-maxime.chevallier@bootlin.com>
+ <20251112124355.GA1269790-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,37 +82,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <SEYPR06MB5134EBA2235B3D4BE39B19359DCCA@SEYPR06MB5134.apcprd06.prod.outlook.com>
+In-Reply-To: <20251112124355.GA1269790-robh@kernel.org>
 
-> > This is an optional property. If it does not exist, you have an old DT blob. It is
-> > not an error. So you need to do different things depending on what the error
-> > code is. If it does not exist, just return 0 and leave the hardware alone. If it is
-> > some other error report it, and abort the probe.
-> > 
+> > +  pairs:
+> > +    description:
+> > +      Defines the number of BaseT pairs that are used on the connector.
+> > +    $ref: /schemas/types.yaml#/definitions/uint32
 > 
-> Based on this for next version, I want to move the "aspeed,scu" from dtsi to dts.
-> Change it to optional and accord it whether existed to decide it is old or new DT 
-> blob.
+> Constraints? Wouldn't 4 pairs be the max?
 
-I think that is the easy way out, not necessarily the correct way.
-
-All systems have the aspeed,scu, so it should really be in the .dtsi
-file.
-
-What are you really trying to solve? That the DT blob says "rgmii",
-but the bootloader has configured the MAC to add delays? You should be
-able to test for that condition. If it is found, issue as warning, and
-treat phy-mode as 'rgmii-id'. If the DT blob says 'rgmii-id' and the
-MAC is configured to add the delays, the system is at least
-consistent, no need for a warning, disable the MAC delays and pass
-_RGMII_ID to the PHY. And if the blob says 'rgmii-id' and the MAC is
-not adding delays, no need to touch the MAC delay, and pass _RGMII_ID
-to the PHY.
-
-Are there any mainline DT .dts files which say rgmii-txid, or
-rgmii-rxid? They would be rather odd, but occasionally you see them.
-Assuming there are not lots of them, i would probably just leave
-everything as is.
+[1, 2, 4];
 
 	Andrew
 
