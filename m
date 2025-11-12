@@ -1,87 +1,88 @@
-Return-Path: <netdev+bounces-237776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77757C501DE
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 01:19:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB777C501E1
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 01:19:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E2113B2370
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 00:18:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C3743B275A
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 00:18:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6532A1C84D7;
-	Wed, 12 Nov 2025 00:18:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFCEC1DE2A5;
+	Wed, 12 Nov 2025 00:18:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="aOKjRYqW"
+	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="Bza38wBF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C211B4244
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 00:18:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 380E31C84B8
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 00:18:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762906688; cv=none; b=GbGqK+PcXcleRh0gU8RI8iESr+kIDJvBpmqjLYT7IYsT4GKhfp6UgyUGaOS6VbmE8Ltwf6w5RCr3anTUNfCEFq9Nbvl3Ypdk9dozAhv+YAAb4fHM9CfV3qZ3E73ijxYBPUcBzc0cCkUTvFpLxvOkwYlTnPZztbwZibB0i5mo1gQ=
+	t=1762906689; cv=none; b=DFDrPWqyL3FVFrLkGBV9FPD+VJw67xGjGMoHyySLT0VKI8bwvnObt0SMA+UUHGIT/Y24HgR6T2veqDtEU42FAkF5R/TkQUlcIgUrkeAJYm5HdPYKyusYZWrj+WEfpIiznXJFGL6KuDNAz8gPoUFyNafmcKXgHzR1DGzsQfvZnro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762906688; c=relaxed/simple;
-	bh=89nQblDme8wE0iaTDko19h+OYOCH2Lz9bsEE8dabZgc=;
+	s=arc-20240116; t=1762906689; c=relaxed/simple;
+	bh=kUrSiXw+9BASOphE8896OeaX0ILPFEG/1yBCQcdTw+Q=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QRaPCNmxkNjqicOpEqLKhgsFGo2hK3zlSNcqIkYzW6PZ5qa8BcxYZ+cFFUUdPMStLvAQH4C9jyzF41WcxjVTVVlx69AJhTM56o7A0DkXvkQ/vI477VFvNJDhCzAlwNedExHw/+ugkWKi+tZomlfxfMTrrTot7HccAW7UnQikyI4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=aOKjRYqW; arc=none smtp.client-ip=209.85.210.175
+	 MIME-Version; b=Wgb8nQeiBxZ2I1Pz/VxxBvwQCs89f2dAWgh27txd1Ldw5Y0ifSvtDee4BV/Df+jJKnR3qfBQbj64SoIWeqi2DW1UxNQn2ic5PzqMIQFXr+74KzMrkAwh72DXYWgAeQyUHQPeDHzgXJ2f9FnY8meNlW2R6zPWExrrEvlMZSFuHKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=Bza38wBF; arc=none smtp.client-ip=209.85.210.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-7acd9a03ba9so213412b3a.1
-        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 16:18:06 -0800 (PST)
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-7aace33b75bso250845b3a.1
+        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 16:18:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=herbertland.com; s=google; t=1762906686; x=1763511486; darn=vger.kernel.org;
+        d=herbertland.com; s=google; t=1762906687; x=1763511487; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=eimYjHX5fk2d/1kuQRVtRmu5ghsTLXELxJun9RdyGEk=;
-        b=aOKjRYqWt5ZdhC6YNRPrh4DOqOYJLdWvdktWZFcibR1MMlj2kwc/Coj8yWiXUUm8S7
-         ly0GW/JlY+Er5f98VU0zSSUKlM9tUvKKDQwmsDadPpdCKH2fmTkMTmnn/ZdRHgHtQQyW
-         HiaGUJXD0XY6amKQZcQ6ct835y4sgBJt/ORE2/hANqCatinJy9Vmr5Fd8SLmOMDy+Mwa
-         jgbZ2HbBe6VFfvmqUXvzDK1E2iZQO1IUdzkhPXtNfM4tguRgakbaI59FFcD2toJIvjne
-         WVNrg/nJrSGF6GBgEUMYVOEevjrPp16QqGC/S4IWgopAi4Mv/C7v3jO0J2TqqLuQsT6S
-         HraA==
+        bh=IRfdslyxqvIb4bjNZjJVEK1Cw+XE/zO+WTGcOzJubCA=;
+        b=Bza38wBFb4ARTA1YBhWHJkeuYZA7qwNa90uBkrcD/rtmZz7t1p2xmffTMFQ/sBQAW5
+         vl0Tr52jMNfWI2XvVD86C0IzRaQIQ75XAEWhIP0lNTYHwh2n7z+zFu0E8D+wlIDrrp7D
+         SCDQ2Uny2C5TzrZV/1mtalLPuVzOO5h75kA1CmAteGCUTj/B04nyZ3BNF1w4IASB/xrO
+         RR/B64zN2x5vp82UVWEkO/3huYraG0rw0R4VGkK8GvuAeZz2+wtPngL1AtlIJK6RYm+p
+         WKPQJcKq0PKVyolYIEQZr6/P7EFgG8SDX0Ep5IKJcylmnHb17m4HlrbM1ma8loXPaK1p
+         KKlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762906686; x=1763511486;
+        d=1e100.net; s=20230601; t=1762906687; x=1763511487;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=eimYjHX5fk2d/1kuQRVtRmu5ghsTLXELxJun9RdyGEk=;
-        b=W4NSh+SrFgtoeU8zItPxjLdX/LSMufka6c7fDhhaN6+QgPzJS4+6+5KA+S2UBAcKkc
-         kG1iW3o4syDs+uvR25AKhKLignP7VlJa4PpBsONV79Udiz2wjtk/UwcgPjVSaGHLPyWK
-         Za4gx0WqUI0Y0ShczTcxPsdFMtQ7mpPGchy8R08wRGHku4+Zf3sgvZnPIoF3QJno9Kcr
-         MSNa97roy+O7HmBSYv4YBw201trGerfCdfBV1ClnQbYmpmZEx2evF9VLpWRdoe+KtHM7
-         v8eNoXgTLQ3f/YwLAmSTusrU5FKNBArXB0rdDztB5l+z1X1KVFCVAgsdL/3MvICWyEAE
-         cfow==
-X-Forwarded-Encrypted: i=1; AJvYcCUnIOi4HMqBCzfUnnUgEAOPn/boARfEpjWqiS3FGT5D+sz7O+GSnHNp+PU9Hb3gmssZTG0Qyrg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtQKS8VROuDMvE8lEH8nsk93NyzlrHV7oCnevQB6KZhyxFzIvQ
-	+74J3rQW+XWMHu6d3Xx8ptBqp0727BjT4CPAY3xF7BfOoO630o7MhYa3HeheeTBIQw==
-X-Gm-Gg: ASbGncu2F5WZjiSAAPm6GyZAyNW6W6DRXDgBru1tacei9pKciuCcqTJmz7LSwcjYdW4
-	q39IkI42FGVIZuOW9+PBMYQ/Jhwf1OgKj/4THuFpuPDbNuMxRRIFTh5lM+yFRqh2ohSF2bDvzzf
-	Fo9gf6LokPmOVGZGRkvRvYPfL5HNqIvGnlu6yw9tyfbuxC1E2GvZ60ZD0cOQfAHeEz1NBGh65zt
-	9q7LHz2/fYtgojuy27vLRZFgESSEj89FBcXOT/P1zUBeK48Y/+OBzXSjZAhlqOFglhmLNuL6ctJ
-	595C7X37C6mrlX5ddkeUzmvnhgueIyJ1effXVX5uqwFMV/oFhCluDrArFcBNTS2wbCZqnh5YJax
-	ZlCZo1tKhYy4kl0cgFd8CX/wCg/U7G4VV/hyepyAoFV/jxr8JglWRg/je8vYbLPSt6sLNfsfznI
-	ILeun2S2HuVu+bI11WOYNLSGRQZu5AlCDqFcHhudAv4Iys9Q==
-X-Google-Smtp-Source: AGHT+IEz64zNS1IfM0Ywxs3kkEPtu1tjVk3mebjtI0O94UhKB5/Q5BR0rxJiWqV3zI6gvUJXk657NQ==
-X-Received: by 2002:a05:6a20:9186:b0:358:dc7d:a2d0 with SMTP id adf61e73a8af0-359090919dcmr1111053637.7.1762906686021;
-        Tue, 11 Nov 2025 16:18:06 -0800 (PST)
+        bh=IRfdslyxqvIb4bjNZjJVEK1Cw+XE/zO+WTGcOzJubCA=;
+        b=oEEUJ9jp5d083tH6YwPKtU+oU1wRHR3HxY75ogfLwraU1C8ISFPoM+t6eOiV2XYWt/
+         YnZ6vlBB8ejjhCsVF4t1Vu3sd0yaTKdcUGxzY/QTsn9BwnrdfQw5ubBbO/Ow+gikKx9j
+         25tUt43UoSfIvPyhgzFRkSGxV6A0Qx1C9ZsBESgl9MFvxIXGypNgLSz2tnfi2rO8iNLl
+         qBRk5n3vVvwhyKtwieKyNaQWfpDO5Ltp2A/nVB3ayS6MLzWJEJe5385+hpBbJrOrLH7T
+         ezYtv0Hu/PV5yi7V6D3oLXJT1sQGls/sDorGJUPNoA+QTEm086nQbvDRbiE30ptktOyH
+         cHkw==
+X-Forwarded-Encrypted: i=1; AJvYcCVJE2CcQkbTMO6JcE8SLRtcpIHp5yLYHhSzYDxrwLv+8baSzelp0W8rt2AUaDPak/HYfF3XJIE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzhUAnqdD0PssnMbFCJbCGByM78Mj2E7MnM3SXXDrpuaWBRmGvt
+	fvB66af2CKvk7FgyyoNDQzBf1ON3Ddc94zW54qYABhXuP5Pb7GJTZZf3yUKZz3jByFakUZi0QgE
+	piJwXZA==
+X-Gm-Gg: ASbGnct7f+Mu97LUhR2qnmrig6R/ibGQkc+7jgoUfpfaODt0mz3XaNhcm/MJMBw6+W0
+	n4UzEa7y+wpTpArgIFdue5BTqjCQ4kLqO+F3bJ3s3FfCtm+IyuYJXHMbU16Hgd8+qiW5fEFdrzF
+	8BatjnJYGE/nQEjmqFzIOMQPvEu6+dLStJEXn1tV6zaSaWbDs7wfPa20w2YTWUkGWalAD0NyJ3D
+	zdqDfqvUpKZNtGzTvswOshBrMgd9lO1HecP52eXEX7HHGmrdwBqRf79ZVHSy7ZJ6c3T6WFJ6+X2
+	iK9K74h/sn//UXU3KIpWP9kXQSZMfN10KQ4MS4JsfWtxld1FC1L0t5qlkAi8IXRCdqidYwKfstB
+	oqOc3TQtaZzYm8p1RkCyQew7e3Efge3ib2NpljwlB9DXZCWyZnQBUeavn4lZNqXP33RyX4e0+fQ
+	ftYSaieOc9GwG8dghlExy6E/uWA6qiz2A2ZXZM4TdyNHc5LA==
+X-Google-Smtp-Source: AGHT+IHmI1R4gs3Q3bcaYl40SAePPr3k/kHLti58OfZIp6L6aMKJMgVxLzvviCC1uAOzpRhSRfZTMw==
+X-Received: by 2002:a05:6a20:4305:b0:33d:5e7b:2f2b with SMTP id adf61e73a8af0-3590b524197mr1129898637.44.1762906687190;
+        Tue, 11 Nov 2025 16:18:07 -0800 (PST)
 Received: from pong.herbertland.com ([2601:646:8980:b330:8c01:13c7:88d7:93c8])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-bbf1782bed9sm754222a12.27.2025.11.11.16.18.03
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-bbf1782bed9sm754222a12.27.2025.11.11.16.18.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Nov 2025 16:18:04 -0800 (PST)
+        Tue, 11 Nov 2025 16:18:06 -0800 (PST)
 From: Tom Herbert <tom@herbertland.com>
 To: tom@herbertland.com,
 	davem@davemloft.net,
 	kuba@kernel.org,
 	netdev@vger.kernel.org
-Subject: [RFC net-next 2/3] ipv6: Disable IPv6 Destination Options RX processing by default
-Date: Tue, 11 Nov 2025 16:16:00 -0800
-Message-ID: <20251112001744.24479-3-tom@herbertland.com>
+Subject: [RFC net-next 3/3] ipv6: Document defauit of zero for max_dst_opts_number
+Date: Tue, 11 Nov 2025 16:16:01 -0800
+Message-ID: <20251112001744.24479-4-tom@herbertland.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20251112001744.24479-1-tom@herbertland.com>
 References: <20251112001744.24479-1-tom@herbertland.com>
@@ -93,65 +94,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Set IP6_DEFAULT_MAX_HBH_OPTS_CNT to zero. This disables
-processing of Destinations Options extension headers by default.
-Processing can be enabled by setting the net.ipv6.max_dst_opts_number
-to a non-zero value.
-
-The rationale for this is that Destination Options pose a serious risk
-of Denial off Service attack. The problem is that even if the
-default limit is set to a small number (previously it was eight) there
-is still the possibility of a DoS attack. All an attacker needs to do
-is create and MTU size packet filled  with 8 bytes Destination Options
-Extension Headers. Each Destination EH simply contains a single
-padding option with six bytes of zeroes.
-
-In a 1500 byte MTU size packet, 182 of these dummy Destination
-Options headers can be placed in a packet. Per RFC8200, a host must
-accept and process a packet with any number of Destination Options
-extension headers. So when the stack processes such a packet it is
-a lot of work and CPU cycles that provide zero benefit. The packet
-can be designed such that every byte after the IP header requires
-a conditional check and branch prediction can be rendered useless
-for that. This also may mean over twenty cache misses per packet.
-In other words, these packets filled with dummy Destination Options
-extension headers are the basis for what would be an effective DoS
-attack.
-
-Disabling Destination Options is not a major issue for the following
-reasons:
-
-* Linux kernel only supports one Destination Option (Home Address
-  Option). There is no evidence this has seen any real world use
-* On the Internet packets with Destination Options are dropped with
-  a high enough rate such that use of Destination Options is not
-  feasible
-* It is unknown however quite possible that no one anywhere is using
-  Destination Options for anything but experiments, class projects,
-  or DoS. If someone is using them in their private network then
-  it's easy enough to configure a non-zero limit for their use case
+Add a note and rationalization for setting the default maximum number
+of Destination options to zero. This means by default Destination
+Options extension headers are not processed on receive and packets
+with Destination Options extension headers are dropped
 ---
- include/net/ipv6.h | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ Documentation/networking/ip-sysctl.rst | 38 ++++++++++++++++++--------
+ 1 file changed, 27 insertions(+), 11 deletions(-)
 
-diff --git a/include/net/ipv6.h b/include/net/ipv6.h
-index 74fbf1ad8065..723a254c0b90 100644
---- a/include/net/ipv6.h
-+++ b/include/net/ipv6.h
-@@ -86,8 +86,11 @@ struct ip_tunnel_info;
-  * silently discarded.
-  */
+diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
+index 7cd35bfd39e6..2acaad94c475 100644
+--- a/Documentation/networking/ip-sysctl.rst
++++ b/Documentation/networking/ip-sysctl.rst
+@@ -2454,20 +2454,36 @@ mld_qrv - INTEGER
+ 	Minimum: 1 (as specified by RFC6636 4.5)
  
--/* Default limits for Hop-by-Hop and Destination options */
--#define IP6_DEFAULT_MAX_DST_OPTS_CNT	 8
-+/* Default limits for Hop-by-Hop and Destination options. By default
-+ * packets received with Destination Options headers are dropped to thwart
-+ * Denial of Service attacks (see sysctl documention)
-+ */
-+#define IP6_DEFAULT_MAX_DST_OPTS_CNT	 0
- #define IP6_DEFAULT_MAX_HBH_OPTS_CNT	 8
- #define IP6_DEFAULT_MAX_DST_OPTS_LEN	 INT_MAX /* No limit */
- #define IP6_DEFAULT_MAX_HBH_OPTS_LEN	 INT_MAX /* No limit */
+ max_dst_opts_number - INTEGER
+-	Maximum number of non-padding TLVs allowed in a Destination
+-	options extension header. If this value is less than zero
+-	then unknown options are disallowed and the number of known
+-	TLVs allowed is the absolute value of this number.
+-
+-	Default: 8
++        Maximum number of non-padding TLVs allowed in a Destination
++        options extension header. If this value is zero then receive
++        Destination Options processing is disabled in which case packets
++        with the Destination Options extension header are dropped. If
++        this value is less than zero then unknown options are disallowed
++        and the number of known TLVs allowed is the absolute value of
++        this number.
++
++        The default is zero which means the all received packets with
++        Destination Options extension header are dropped. The rationale is that
++        for the vast majority of hosts, Destination Options serve no purpose.
++        In the thirty years of IPv6 no broadly useful IPv6 Destination options
++        have been defined, they have no security or even checksum protection,
++        latest data shows the Destination have drop rates on the Internet
++        from ten percent to more than thirty percent (depending on the size of
++        the extension header). They also have the potential to be used as a
++        Denial of Service attack.
++
++        Default: 0
+ 
+ max_hbh_opts_number - INTEGER
+ 	Maximum number of non-padding TLVs allowed in a Hop-by-Hop
+-	options extension header. If this value is less than zero
+-	then unknown options are disallowed and the number of known
+-	TLVs allowed is the absolute value of this number.
+-
+-	Default: 8
++	options extension header. If this value is zero then receive
++        Hop-by-Hop Options processing is disabled in which case packets
++        with the Hop-by-Hop Options extension header are dropped.
++        If this value is less than zero then unknown options are disallowed
++        and the number of known TLVs allowed is the absolute value of this
++        number.
++
++        Default: 8
+ 
+ max_dst_opts_length - INTEGER
+ 	Maximum length allowed for a Destination options extension
 -- 
 2.43.0
 
