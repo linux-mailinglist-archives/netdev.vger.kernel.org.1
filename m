@@ -1,155 +1,119 @@
-Return-Path: <netdev+bounces-238121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238122-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 828CEC5459D
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 21:08:11 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 152A2C54697
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 21:19:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id D6DD134B1A1
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 20:05:39 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 8A20F4E7DC5
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 20:12:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 117C527B359;
-	Wed, 12 Nov 2025 20:05:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FD1A29DB64;
+	Wed, 12 Nov 2025 20:12:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bzjijuJz"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="ujCFF9vV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45F05212FB9
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 20:05:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 510D319F137
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 20:12:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762977903; cv=none; b=MMTGH9GZPF43BnyGfjeXM3NAh8yX0FEiwFKP9gGgmnkS/cUXpE5UGSea41Kx/Kd7iNNReYlWkCkfX5S1wqebpW5Usduc2CcoXMitQAJmGlBsYKyi55e9L4yl9NENIiYZYPzExaMMwN9U3deAAb0a33O4WVPYms2zdWXXAZqw4V0=
+	t=1762978339; cv=none; b=c4NTl//2TXHz4vmLw+yZpqtDPXdwcejDzczin2e6ALiBP1SvwZRynepS1mtoHa0wsNOKrYjgwt0/yT2dYN2VOUXUJCvi4+qhoeN+5hc01+FJBUStjUAZMyVdQl54BItlb9mrNb5Us+rjP7Zun4hQHwxTEthDFzcGbhoZF+FVPq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762977903; c=relaxed/simple;
-	bh=9rDP7WFt6h3HMM5ZZSqB17XM5Av/Jk9Zj4KggaoDnWQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rICBleSlKny0t5evLXVDSqoA0lBLfMkzkjXKsiMjmhPIVNIcg87QDOY2Rk+FTMxjhQ0bYutHroI7xmFicGthh9MLSzGy1pI+jA2pdimMfb28J4jcsOgJemKHyXCxa4qyAJOxRhDJqun+x1g1WZbDT30RhBkRvGB6izYpby+s18I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bzjijuJz; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-477770019e4so905355e9.3
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 12:05:00 -0800 (PST)
+	s=arc-20240116; t=1762978339; c=relaxed/simple;
+	bh=gsP4RuV0SX74Q4sn2qalh8C+3yPvQoVzq/xVfun11BQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eEpqeO06PSDMlw8zoEDB2gC2Hllq+A9ZU7E01LSDoLjJ9QwprJzeLYyASaLXYs33b0wiXxdLoMxY2+z/sNRWIwfZRuKPNUv6tCOZkEGgTU85hqkQJvd9rGYq1WwZHMb6qqjCL+zZD6SnGLJk2TrTzQqVRckykVF7aIVAIAObnY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=ujCFF9vV; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-7acd9a03ba9so20045b3a.1
+        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 12:12:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762977899; x=1763582699; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1762978336; x=1763583136; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7i1blxOxdeWMBKsoLhp/+DSxr57RwLSHutTSzz4//F4=;
-        b=bzjijuJzBxnJlOPijEH/jtcIvwur8s3g0Kk7elI2Sw80BmVOt9MH0kvyy9+S4nNZqK
-         H0Y/c9on9OAIqMcBIQ+Ja5BdTBUFCXDPdeWhvKodcsPFqZSNJ4H6ZWNA2N8O7V8HDdJ+
-         0+A5hWutfNb1jvrDrVQuPxxz8z3zedZV+CgdOUpYOVhihF78mgHx+saZ1mQSrNKA0bHQ
-         RY/l7LWijSZi5O0skhppStq3aeNgbobOffKdBUzo/QYNlsTC6WhW3yvAGIVhA0U32d2q
-         aIYzI8UWeASa90SJFQl3/RLgCsdvhuZDeJfhrk1k+QmsgFqipQ+yl853Buhw5S7thamB
-         /bpQ==
+        bh=gsP4RuV0SX74Q4sn2qalh8C+3yPvQoVzq/xVfun11BQ=;
+        b=ujCFF9vVRnLXzvMS2k3iAG8SDEEJO5uSSvMq6Esy8L5kuhwMHCaOZFqZZ4qtAIUy1d
+         XQ44qIYBcNuxiyQaIUFIZ6GjH5pWkxSjWTOg96GlX+cz7yS9iQ5szPdiD74Xccj1mZQr
+         50W6mg62KC7dH2JGkSwXBA1vpVi4pEw6t9QrQzbJEs5WvNZ0UDBx2OUgb7Mt7XPJuIya
+         y3farylFxhsdp9NHRhQyljRBhHH09c/B44PWG/kXG6MaEJRZOJImesuFbni2tXeQVeLU
+         X1SR6hyYhRZKP76LN5coM6vSBCScVuoSZzCiqP1wjRufdbyQkLToFe7X7ACvKFDWdMnj
+         UWwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762977899; x=1763582699;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+        d=1e100.net; s=20230601; t=1762978336; x=1763583136;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from
          :to:cc:subject:date:message-id:reply-to;
-        bh=7i1blxOxdeWMBKsoLhp/+DSxr57RwLSHutTSzz4//F4=;
-        b=i3REoRCbkKUonUkwuTrp0X2li2CtIgucDkZqaNn4ZD96UweIKyFoLABzm8pZfzhIYd
-         hrfWcDHxWUPb8fRG51an50ThZA/Up/FYmMCHtw1plI9VnUIE3rm5bjcHIJnhI8LvhoSs
-         oKnoJDW2RqgqRaT5Z7AMgMd7g4yfQV2mjb5SN/4tVEHn5JAECDBHHbeL5AOMTctY1CLA
-         9Hk6T994tBW1jaE9RIHR8q/lpxMn+yz/6SayYSSj0UeigD2TmXD8+Bo589YlCuapWdM8
-         Pe+0ZLIpMtKEdTlZcy6fr3yJw62PtTovQobZAN+hEJTMKFmc7uPulfr2kV8CPDao1A8Q
-         9z+w==
-X-Forwarded-Encrypted: i=1; AJvYcCVwDTbFKyDdsxyjCzrCpPbj/d4OJI/6PgffJRsAzTVbkEvTVXTDZBN8pABmFo9E8Mqe9RM3CXo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy0ad82fGIXsyFX/x4MUp6NcwYPcVrEUZAZ8NZct54hksuYZUrZ
-	eVHvOZnz28HPH97QPFUR9EyOgt4yXesvPxt2ytHKrVQdcf/BkwWAiDg4u/rUaX1yYP5PwnqGVuA
-	pMIYykrPfFL7ACQxRavKJpqUm2gIg52c=
-X-Gm-Gg: ASbGnctG/zzesN0PUR+mZ+K9W1PF4+4DoMQq0f3kSfhtKxCVfu/74bju81BHVHlQNHV
-	e5H7mJoCGj+MIMyC3KgWzaT4o/3kCS6TR4J0CyYtOgh/whoMegLER4LVEDEKUFBQ6Nzbla84jbK
-	DCBvbY1w65xlVNjWSgztxjGNuOYG8geB8BvnFP0c/gqcJlt/KZ4rDp1jHRii5314LwEmaZjNuv1
-	8nQHD1i179yaAkAosXTmDgWiHngjXvXxRGPyMTx7gZR6pv6YU8bm0vflo8VvNnISBNIOj+4/k/p
-	JZWVS7ixih43bqN1gg==
-X-Google-Smtp-Source: AGHT+IFT+9fXgwsbAD9vCMeqMd3K0+NF3yAvEotSOT0bUnU8stxpPM2iGhYOmowDB/Y/EvjjPHdpb7/6NCzVd/Ex1vg=
-X-Received: by 2002:a05:600c:1d10:b0:477:5486:ec73 with SMTP id
- 5b1f17b1804b1-477870b953emr39722905e9.39.1762977899441; Wed, 12 Nov 2025
- 12:04:59 -0800 (PST)
+        bh=gsP4RuV0SX74Q4sn2qalh8C+3yPvQoVzq/xVfun11BQ=;
+        b=KJWiqncQOGgA8iujvpU6YrbqmEv2Fwh+weWhqG0qn/J4v28MEZHvV0Wnj7tCxzVnyt
+         JW6qGtkEXb0IWch1TpPjfhkYYXt+K8oxAvWG9jKByOOATs75xpp4f8/iyu15R7+hMF6S
+         Y4p9yMiMN+JTZtFWRg1GmR2TQNzPFFFUus4ovZHs+qfEuLN4nfoedz4ouNFtFDUPwq1H
+         mLm1ChRdz7zMN4B3HD3cuougAwDhl0JAn4G9bgH/EjHFlYwBU3AXnY1LrzrPigG1SB/f
+         2Tq2F7UI0RjjO4fIyvbRNoNYRYv+tl7wr+SV0vtST6cmYCvsln2OlNKhNIdwLDCQzWp6
+         jyLQ==
+X-Gm-Message-State: AOJu0Yypon/VKOyuiNKKvj5WYF2vIkFFbLNG9ZxuxdCi+L482THTCw6h
+	HgHb/+GOszMlIUmxSy7nd+WIopN+9yP7OVMegGHTLHJYy3PEopGw9/CdCtIk6X9KF7hhiMOpfqq
+	Qqvah
+X-Gm-Gg: ASbGncvEsEOJh+HnboSeqSWhJJa0jZWW7XNjPE8AIgsPor/jQ/xlwY3gsPqELfR2gG2
+	mh2gtqO01Id92N9RwWsbsjJmuMpfmB5INwXzZ9c+DBQpJcIaNHJhbacZnvg2l+rhJ5US+5mnseA
+	Ypd377t4w/l7mFV2qQlBpPQFw/5pg+7U3xD3TWKNCIJDgcH9fXFQl/CCkB5wyxGu1juhwZ0jnAu
+	Ng1e8yyNHTAiLdIpaMc+NXVyTsZr/3gEH0gSa741f1ZBgUFGjj3RtyAZXdTXZceAp+cy1vvyT4i
+	AEVIwrMeWmt1+CfGpiHY2qFYtspyzlqFlwhEHiNsBHeE9y0jdl85aETZ5xVfKqNpg4TUlFFsnPB
+	NXVR7ZbPzTMCdn+Tvlyh5fAMa8BDvY09WG9YA3AbRV4ca0h1DucAln3hYGvZKtb8EK/fevPSbY9
+	BETbRl9WtR9hRZlDKRNQx758fBpHmX3w+Oyg==
+X-Google-Smtp-Source: AGHT+IG0T8LAB89N+NLBKJi4tziCPLU6tUuh6eDgoooLFm7itDIrTgHFde48cWwu0NOkAzvIltUARQ==
+X-Received: by 2002:a05:6a00:4616:b0:7a9:f465:f25 with SMTP id d2e1a72fcca58-7b7a52c74b9mr4620225b3a.27.1762978335682;
+        Wed, 12 Nov 2025 12:12:15 -0800 (PST)
+Received: from phoenix (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7b0c9ff8538sm19700242b3a.28.2025.11.12.12.12.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 12 Nov 2025 12:12:15 -0800 (PST)
+Date: Wed, 12 Nov 2025 12:12:12 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>
+Subject: Re: [PATCH iproute2-next v2] lib/bpf_legacy: Use userspace SHA-1
+ code instead of AF_ALG
+Message-ID: <20251112121212.66e15a2d@phoenix>
+In-Reply-To: <20250929194648.145585-1-ebiggers@kernel.org>
+References: <20250929194648.145585-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251112175939.2365295-1-ameryhung@gmail.com> <20251112175939.2365295-3-ameryhung@gmail.com>
- <CAADnVQ+2OXNo99B2krjwOb5XeFhi6GUagotcyf36xvLDoHqmjw@mail.gmail.com> <CAMB2axM0-NF5F=O6Lq1WPbb8PJtdZrQaOTFKWApWEhfT7MD4hw@mail.gmail.com>
-In-Reply-To: <CAMB2axM0-NF5F=O6Lq1WPbb8PJtdZrQaOTFKWApWEhfT7MD4hw@mail.gmail.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Wed, 12 Nov 2025 12:04:47 -0800
-X-Gm-Features: AWmQ_bl1hNz8FdEtKYHEH1VSS8S9DBhuGihUCXyvFJrS_suogQ5asfWjIHtASsg
-Message-ID: <CAADnVQKWKC3oh6ycxE+tstYupwVsdbhYHOncnfTOFWLL2DmJjw@mail.gmail.com>
-Subject: Re: [PATCH RFC bpf-next 2/2] bpf: Use kmalloc_nolock() in local
- storage unconditionally
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Martin KaFai Lau <martin.lau@kernel.org>, Kumar Kartikeya Dwivedi <memxor@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, Song Liu <song@kernel.org>, 
-	Kernel Team <kernel-team@meta.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 12, 2025 at 11:51=E2=80=AFAM Amery Hung <ameryhung@gmail.com> w=
-rote:
->
-> On Wed, Nov 12, 2025 at 11:35=E2=80=AFAM Alexei Starovoitov
-> <alexei.starovoitov@gmail.com> wrote:
-> >
-> > On Wed, Nov 12, 2025 at 9:59=E2=80=AFAM Amery Hung <ameryhung@gmail.com=
-> wrote:
-> > >
-> > > @@ -80,23 +80,12 @@ bpf_selem_alloc(struct bpf_local_storage_map *sma=
-p, void *owner,
-> > >         if (mem_charge(smap, owner, smap->elem_size))
-> > >                 return NULL;
-> > >
-> > > -       if (smap->bpf_ma) {
-> > > -               selem =3D bpf_mem_cache_alloc_flags(&smap->selem_ma, =
-gfp_flags);
-> > > -               if (selem)
-> > > -                       /* Keep the original bpf_map_kzalloc behavior
-> > > -                        * before started using the bpf_mem_cache_all=
-oc.
-> > > -                        *
-> > > -                        * No need to use zero_map_value. The bpf_sel=
-em_free()
-> > > -                        * only does bpf_mem_cache_free when there is
-> > > -                        * no other bpf prog is using the selem.
-> > > -                        */
-> > > -                       memset(SDATA(selem)->data, 0, smap->map.value=
-_size);
-> > > -       } else {
-> > > -               selem =3D bpf_map_kzalloc(&smap->map, smap->elem_size=
-,
-> > > -                                       gfp_flags | __GFP_NOWARN);
-> > > -       }
-> > > +       selem =3D bpf_map_kmalloc_nolock(&smap->map, smap->elem_size,=
- gfp_flags, NUMA_NO_NODE);
-> >
-> >
-> > Pls enable CONFIG_DEBUG_VM=3Dy then you'll see that the above triggers:
-> > void *kmalloc_nolock_noprof(size_t size, gfp_t gfp_flags, int node)
-> > {
-> >         gfp_t alloc_gfp =3D __GFP_NOWARN | __GFP_NOMEMALLOC | gfp_flags=
-;
-> > ...
-> >         VM_WARN_ON_ONCE(gfp_flags & ~(__GFP_ACCOUNT | __GFP_ZERO |
-> >                                       __GFP_NO_OBJ_EXT));
-> >
-> > and benchmarking numbers have to be redone, since with
-> > unsupported gfp flags kmalloc_nolock() is likely doing something wrong.
->
-> I see. Thanks for pointing it out. Currently the verifier determines
-> the flag and rewrites the program based on if the caller of
-> storage_get helpers is sleepable. I will remove it and redo the
-> benchmark.
+On Mon, 29 Sep 2025 12:46:48 -0700
+Eric Biggers <ebiggers@kernel.org> wrote:
 
-yes. that part of the verifier can be removed too.
-First I would redo the benchmark numbers with s/gfp_flags/0 in the above li=
-ne.
+> diff --git a/lib/sha1.c b/lib/sha1.c
+> new file mode 100644
+> index 00000000..1aa8fd83
+> --- /dev/null
+> +++ b/lib/sha1.c
+> @@ -0,0 +1,108 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * SHA-1 message digest algorithm
+> + *
+> + * Copyright 2025 Google LLC
+> + */
+
+Not a big fan of having actual crypto in iproute2.
+It creates even more technical debt.
+Is there another crypto library that could be used?
+
+
+Better yet, is there a reason legacy BPF code needs to still exist
+in current iproute2? When was the cut over.
 
