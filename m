@@ -1,224 +1,187 @@
-Return-Path: <netdev+bounces-238034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53466C52FF0
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 16:24:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E639C536A2
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 17:34:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 841C635797F
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 15:09:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D7F1563D40
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 15:15:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9738634EF0B;
-	Wed, 12 Nov 2025 15:02:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E144340274;
+	Wed, 12 Nov 2025 15:10:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="IA1sAoQ5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f68.google.com (mail-ed1-f68.google.com [209.85.208.68])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DM1PR04CU001.outbound.protection.outlook.com (mail-centralusazon11010039.outbound.protection.outlook.com [52.101.61.39])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A29B33FE09
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 15:02:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.68
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762959738; cv=none; b=GP4xu79Zfr87HT65ekV2EFmxPLMtH8BwDNSJvG+9r3RU3el/wxgcfJRILTrZUdRXrBdYlyVmTeCwQvar+sscayJub2M8bmmkIFYjpz03qzouwU1N8F7gyX1jBFxBtgj5EAlp6+7n5stGf/v0MI3UU9bTGm7TlpN5/jQ6eKLSrhc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762959738; c=relaxed/simple;
-	bh=76WOkOFmx5HcPz2/+WOxmZx3STvSda5HgKEFtk9Msys=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=bz2MclyIgVxWNwFav6FfJKixgqxPfpyjOudEPS3OqHGCqqGGCFuwtwxoGPeUx5z/CTbCsaCG9GCu2k4bgYsbdQytj1zP3Uu2SA8S9BTqf02gWxZrNzuj/+ZRFdnGfhiEfof6rrP85w4e6pPNCrLQhrlMeBqd7Q2EyzTiqAwOs60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f68.google.com with SMTP id 4fb4d7f45d1cf-6419e6dab7fso1321910a12.2
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 07:02:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762959735; x=1763564535;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:cc:user-agent:mime-version
-         :date:message-id:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pst5SkWia0cZgdHzFsRJJzRo6QJIMQW2fySl9P02AaE=;
-        b=BbTpmVQqTbgK1BKAUzrTfgE3QNOs4rVVo+u15WexQhXLRWqRSg5cNftugNsLpmYB++
-         pgoGh1mYs9jinNHTSthZnkV2I9OuP+XzPBRW0TOOKL5V3XC3sQfpgJ+Q/o4OE2PVRPBt
-         VaMdz2us+Sxfr91Z6EmSbthvjznjHXY8bcYoitbjZndjMC3xXTeTdHgciob5EOXOzFnd
-         48HmMt299WNLXtB6sP8eDoPMDqt8eDJYs4x0pC8BAqpMqF5+aI9+HckT5bzAx8zYzw8y
-         PBjjAlNvWxcRuwpV799rfGeelxDKBzkdUD2FwXNLnq0u9GEOgrxYzv/1G2R6vC5g9Tm3
-         xqxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWTMKUQJMCr4mPgO82FVvv08K5HNY5kBqjJEDCaSfT7fp+oDeqf+7/Vq7BQrKSsjVv23u/Yx1c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywaj34BU8cPzeKfaTuDbmF18NZ3Dc9NxxFEBj+OGLsO1XuBhysk
-	S+f48i1jq2AwbHIQOD1V0khbDK1qNbzMEWzQyN4Pgpc7poThUfewpuBx
-X-Gm-Gg: ASbGncslkfq7AwIDLcJmtyvFDZF3GYg9Y+vL72yJzbKUOrkSnooBujG2uJoduiuuTrh
-	kBcAQGGnzP+0UzCTMDhruOeUYneheCusXoej5wqs8UcOalswdzHh35NIt0fENPdNG1euv9XZvQg
-	bfo0IlX3cLK7Q7l5N8EBbbQsFBBs6VWp4bsDDHFq1TPD86hIIv+/5wkeDNqv5YJi0Bb2YlLLU1U
-	pk0Y3j6NDFq7ii+j6L850vqNhUVh4JhXPDQIgKtKgd3p2cvAh2XQ1faDUAv92m4QRvWIFC3HpVe
-	VbAH/siyNYjychFQAucQkE1seLy0lmXPBdx6LJdmivZbfrNvYmhp621pE1DpZrdCKY3LQvYckH3
-	YDXkRyQ65uvnBIT74CCnX0YM4TZ5bc0jXHF1w99pV1oYxoTxaoPhwVXVAoZILih7s5GqgZ9SdyQ
-	onprVCn4+vL9EfvznG0ecsROqqNndODx8Y
-X-Google-Smtp-Source: AGHT+IHzAExwmrSf2pmu8F5uvYvSiYIwYH5UZpdI88bJJRdLJg1EV9wMU4FYm3KyF6GjRxoYGQ385w==
-X-Received: by 2002:a17:907:1c9f:b0:b6d:c44a:b69b with SMTP id a640c23a62f3a-b7331a6f6ffmr327471466b.35.1762959732872;
-        Wed, 12 Nov 2025 07:02:12 -0800 (PST)
-Received: from [192.168.88.248] (89-24-34-247.nat.epc.tmcz.cz. [89.24.34.247])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b72bf97d3c0sm1675933966b.36.2025.11.12.07.02.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Nov 2025 07:02:11 -0800 (PST)
-Message-ID: <76c06786-ba21-494e-a0bb-eccf1f547b28@ovn.org>
-Date: Wed, 12 Nov 2025 16:02:07 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69FA233F8D7
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 15:10:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.61.39
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762960249; cv=fail; b=BR4zoPDW3egr5xZzAizrImek+6/n5naw1M37yoLRq1+hSO3OjQixjlwzPcJqNjC/cUCSAj25XgTuXD3uSlqxGde6d8P3d/piJ+tVmD4INSFAwmCf6dDK0vrudM2h/0JKNxmnoomXTcz7WIYBlfhIL7M0Z6mrLL9jTrERFux7l30=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762960249; c=relaxed/simple;
+	bh=DTjdK2fEEKY18jVbnJ99jd+/vgQLj7l/HDtjMdXIA+Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=m7YGq7/4gbRM9EWpM1ZvCLyOiFpfxIy69DjvjEPXGl/kCqNvaVhTrLVq4CHXnQ2Sh/XnCPCOG74h7jHMgzsWSwEB/8xVrwXMfJBrn0kPX+NNTCcLhveRIFycvCK+xaSd6i0lBJ9TRygmQRCW+1WotM0D5JRYhdU1CKZy5F0AAKM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=IA1sAoQ5; arc=fail smtp.client-ip=52.101.61.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=uozYgV9rEAxDMC/DYFNzfrpAWNOgFm26T+eK68956d0oR+mk9oM3S96J/QD8q933c6XN0Hs3LCVFRUT8zT84Ym5laP13tvOkTAja49Y/1B8X8f4iPsFVuC4us4xXlNp6EzxH02fXHXp1hGaeq416L4/45DFWBoD7e0Xpf3HjUxOU4T+EMeIvRe/H0h7FZP263IxbOcYuPeZg9vgvvEmpUGNDHY3Mr0pgINftzVJqR1hiYBvd0enBFLcoxB7eqcLXC8P+7/p7F9v7cT2rg5MkVgUFF+CLG/Cvs7dZ5otkIlgCLzNg6FRgrmeFHvLhMQOaiY4OqmEc3emAy0tkMMhMtw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=VfIFGXUCYnebZxQNIcBufmv73037if0PZS7+W4K27qA=;
+ b=CjK5Dy8QnRNjch3tOn/y2Uv4pqrW1pquYWstKoAZY0OlsmM4X67wfJPNJJnDVKsy00igwuSye2psx0Vl3RTgWjsVknnzzGrdVbFkfb11dIHJevhDAzKysfH3pA0JrpqodWd9KtZX+wl7fFWRCemz7fwQ/0JMI5FuWVMAXm27BPdUSbp84rOKwIB9WziAL3s3j7J8VV8dTl/WVzqJBwH7PhnlsRH5WurScTUAoXhMp1/AwfePsN+rjKZLM5wgOsmPnYAPFGB3p6SZBinJIAup7QELRe0SZiOC2iOiKAoQo0OpBbvoTVOtMnYzxtRdcJBwmAA8lPo/MKKnAZGSR6clYQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=VfIFGXUCYnebZxQNIcBufmv73037if0PZS7+W4K27qA=;
+ b=IA1sAoQ5je2+IMCcPfeXwjPafn1recKsTEX5u/yh4nfutwlihxdoB+otRq3r2IKbSLXP1703guNA46/CMf5k7SCw1R58yDopxTsLMQJEbM9Neze+Z+18LspFi6FszZQP+BXmJd03PdAFRqG/9tCiDnNrM+sjpCJACG3no2rTWoTY1U2gT2lQ1YyCK7j05m80KUqfSFTJzVbEssh3hP+l1jeWJ1aTUz0nS6C1rFbemOxBvjOYVbRmqcF9Ouee7eOXbbX8/QI5YjkDYWrUiSNeQ/lV5efjPykl7GAbsjJL5S07UENWADZ0K0JczB6N4uObL2wHvPaongtNu/4AEQOZlA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DS0PR12MB7900.namprd12.prod.outlook.com (2603:10b6:8:14e::10)
+ by CH3PR12MB8753.namprd12.prod.outlook.com (2603:10b6:610:178::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9320.15; Wed, 12 Nov
+ 2025 15:10:44 +0000
+Received: from DS0PR12MB7900.namprd12.prod.outlook.com
+ ([fe80::3033:67fc:3646:c62f]) by DS0PR12MB7900.namprd12.prod.outlook.com
+ ([fe80::3033:67fc:3646:c62f%4]) with mapi id 15.20.9320.013; Wed, 12 Nov 2025
+ 15:10:44 +0000
+Date: Wed, 12 Nov 2025 17:10:33 +0200
+From: Ido Schimmel <idosch@nvidia.com>
+To: Baruch Siach <baruch@tkos.co.il>
+Cc: Nikolay Aleksandrov <razor@blackwall.org>, bridge@lists.linux.dev,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH] MAINTAINERS: Remove eth bridge website
+Message-ID: <aRSjaUw6rA7eQXYx@shredder>
+References: <0a32aaf7fa4473e7574f7327480e8fbc4fef2741.1762946223.git.baruch@tkos.co.il>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <0a32aaf7fa4473e7574f7327480e8fbc4fef2741.1762946223.git.baruch@tkos.co.il>
+X-ClientProxiedBy: TL2P290CA0021.ISRP290.PROD.OUTLOOK.COM
+ (2603:1096:950:3::15) To DS0PR12MB7900.namprd12.prod.outlook.com
+ (2603:10b6:8:14e::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: i.maximets@ovn.org, netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
- dev@openvswitch.org, Eelco Chaudron <echaudro@redhat.com>,
- Willy Tarreau <w@1wt.eu>, LePremierHomme <kwqcheii@proton.me>,
- Junvy Yang <zhuque@tencent.com>
-Subject: Re: [PATCH net] net: openvswitch: remove never-working support for
- setting nsh fields
-To: Aaron Conole <aconole@redhat.com>
-References: <20251112112246.95064-1-i.maximets@ovn.org>
- <f7ty0obfgg2.fsf@redhat.com>
-Content-Language: en-US
-From: Ilya Maximets <i.maximets@ovn.org>
-Autocrypt: addr=i.maximets@ovn.org; keydata=
- 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
-In-Reply-To: <f7ty0obfgg2.fsf@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB7900:EE_|CH3PR12MB8753:EE_
+X-MS-Office365-Filtering-Correlation-Id: 98f27be2-cf3c-48de-4b21-08de21fda6bd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?WTB0YkxacTAzRDdsNTl4Y1RTYTA0WDZGSU9RZWRYbEkwRWZ1NE9oNy9YVWxn?=
+ =?utf-8?B?UCtsSHY2TGY3Ym84TE5yR2JqVThWcktWQjBFT01HSVZMU2Y1TnBQdFdlMGNV?=
+ =?utf-8?B?dmJldkpwY0hBNExoZjJ6dlFSSGhRc21TTno3dDBaTkJhK1Vvek0wRENJOGFY?=
+ =?utf-8?B?WEN0ODdyM3RUUHhFUW9ZcE4rYTBJRlVsWWxNdXIrTWNHK1V0U3pWR3k1YU44?=
+ =?utf-8?B?WWt3NVRPU0I4VEpjZ1E2MUt4UzZMVmhrcWNaS2xQc0RxSXIrUzdBMGFsSjhv?=
+ =?utf-8?B?RGRFMXdKQnQ0QXFLMTJvdU4vVENBQ0t4SEZva0V4QVRuOFdGTlhXU204MktF?=
+ =?utf-8?B?NFVyRGpGWnhwRnMvWlJadkswOU9lU21idHBVelVzTk5YbVRDKzQ1aGZja21h?=
+ =?utf-8?B?Zm5FZkxuQlI5M1Z0S3FORk90anY3QWl1TzR3QUpxVEFjVVBsc0duUTY0a20y?=
+ =?utf-8?B?MWduS0RkY2ZDcEsyaUJiZ1ZGQ0hFUEEwdnVCbFBQWWE0Vkk3WVNvR3ZCLzdK?=
+ =?utf-8?B?YnY1RzFnazNMUlJUbGhkR2hnZWJnRy9nRVYwTmNrellQQUthR1RoWkxqV253?=
+ =?utf-8?B?eEZpdS9TeTVyVG1hSG5EUDI1dDJZMGtMbkR2ek0rMjIxQXIxMlU4eVJjRjcw?=
+ =?utf-8?B?L0JqWDZKeTFpeWtQMDhxcVlaWEIvMmY2M3ZSTURYRmlvSlhvbWV5UUl2ZVZm?=
+ =?utf-8?B?SEwwRjhuK2p6cWhVY2ZOUFZlZkNpZTlBSEE4RVZBZlpHZmMvWmxNbDQ4Vy9v?=
+ =?utf-8?B?aE5POTlxYUwyalJacEZEbi9OWGtWT0ZQVVdBT3hTWk5vTDNldk9LWlBNUmhj?=
+ =?utf-8?B?VFRaWlhVcUIvUEllcTQrS3hCOGpaaFhQVHFya2FZbGpqUUhuTjdTVWdxWHFR?=
+ =?utf-8?B?M04xOHFJODZpVWswenZmcmw1WVpZdlB2Qi9wMUlKK2VGZlJZaUZHZVdYclVI?=
+ =?utf-8?B?dU9pK21iUnFjNEtsZ3IzSENDWFhaRFBLVXMxRnJrb3dHZ044anB3SjArUys2?=
+ =?utf-8?B?Wnl2bUMvcmtDemU0SVdoZS9sUXVFRmtpYkR1UHk4MVYxWnVLQzhaY0pIMms3?=
+ =?utf-8?B?Q3lsR0xGUittcCtHSWZ6S012M3hCQ3Zxd2RsanlVWGxsWmdZU0FscU1QZkZa?=
+ =?utf-8?B?bmFKMG4zWTRUSmh5VVRGTGc0R3ljVjkzTUdaWlJ1OG16emJaRFpFVzFDcW1D?=
+ =?utf-8?B?Q3RuWHhleWM5b1JzQ3ZGRDVoMjdpWWpqYWdJMmhYY0pyRWhZQ3BPVjB2djdC?=
+ =?utf-8?B?VjhPS0srSU1CaVV3MnRQaUlJT1BGSWNJNmwrVm5kVng0elBKaU9ablQzQkJD?=
+ =?utf-8?B?Z2svemQyS0NJUXBiYkxKRTFOLzlYMmZMdkNQbHVKZ2dMK3BVT1FrZWpWMzls?=
+ =?utf-8?B?YnVYQ0xPWENtU2ZBaWR1Nkt3TUs2MXZIeHJjQXFlcnZjVjVGT1ZnVXVFRlI3?=
+ =?utf-8?B?UG5NdW1OZmdSYjVCVXB0cUpqZlVFalBPakpCZnJ6V0V6TSsxRlNBSGxqOThu?=
+ =?utf-8?B?NzZsd0MvSHBWRzYvS0lmUnRuU2NqWW91UitkUGR2UkwyUHFZNW9lditYQzk5?=
+ =?utf-8?B?MWt3RlNyZGdzRVJWdFB3NThoUC9ZcVBNRERnMWRmK3lHOVBWVjlBRHRxQTJ4?=
+ =?utf-8?B?ZzVQVXdMeFh4a2psRTFjMXM0Rk93MVJEa1FDTFNENzAxRmEwN1I1S1ZpY2xU?=
+ =?utf-8?B?WENWQ1V1UlhlOHJTZUFVSUQ2cDVRcmR5ODVGL3JHVVBFZ3RNWnowTnB2MnVr?=
+ =?utf-8?B?R2l2V09HNTAxNGNsYis0T2hpSTVReEpDdjZFZ2VvOFBCSTF1L2xmd2NCVDBY?=
+ =?utf-8?B?T1hKVFlhRFJxR2NqR0pQczVVeUE4UnU3MUJHVitpaCtTZGJDTUZqalVuSHJl?=
+ =?utf-8?B?eHgyN2dnV2VoZ2Rva0tKeXRHa0dRZittZFFZR1hrMElDWDlCalhTZy9uN3g1?=
+ =?utf-8?Q?qv7VZ2Fmg9+LjBHIpJssayOYcNMQQmeA?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB7900.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?NnpGZ0J5eW9RSlBwamJVbkNwOXRxbHA1ZEt0WkNWUWF4NnVvYnc1UXBOMDJh?=
+ =?utf-8?B?QUh2M2ljeEVXbFNaOGNxK3JVVXZMTXdEOE00YXd4cG1UN3R0cEkwWTc5MGV3?=
+ =?utf-8?B?TEllT3l3T3pFYVZLYlBQalZwRnpaMkJZVEg4SlVuY1ZqdnpOb1N5cG1vaEdL?=
+ =?utf-8?B?L1p5OUtLdHZ4TTVtcm9pb3lIV0E0TmpzUkdxbWtQNlFjR3pyQ05uQTRjY2pB?=
+ =?utf-8?B?RGNTd3U5ZG1idVhwNnEyRWhzTlhFWWtQQjFKVzdVd1d5U3I3YTdtL0RQNG1T?=
+ =?utf-8?B?S2dBMWZnbzZLdzlmZThwTWFvbFNtVmRSSUJQbE5yc3UxZHNSeVdiaEd0NGZn?=
+ =?utf-8?B?RmlzZW9BWktvODh1QVZlSkdHKzVrU0ZNU1g3NFdpOVVraEFmbStCMXgycjdE?=
+ =?utf-8?B?Rmp1SmtnZENaM1ErL3duM2N2dUpQZ1JGUURtcmF0YjlkUTg0MXh6VEtEUzVl?=
+ =?utf-8?B?ZzZYeXZwck1aRTVpQTVZYTAxVm94eEdJaEZtbk5jWlZpRC9BVFJOeWw0aU45?=
+ =?utf-8?B?cXVOOUNjeXE4L3dyaG9uQlNuNEZVbVZLWlgxYjhnVnJHaFFONHFvUkZUb200?=
+ =?utf-8?B?ZmJreENoQUpZMENlbDVXMk9tQVhZeEJvNDZuY0c3ck5IZGZqL0kzY2wrNWFC?=
+ =?utf-8?B?cWhHUzAzTGFUWDVya01ubURtbHM4SjZ5eEhuVUYvNUNkOWRLZ1dhN0xNNTZn?=
+ =?utf-8?B?Z2JJVEYwMGpQQXBBbHF3czA4YnFNYld0UHIzeHljaE5helVxdTRtSC9uSUVt?=
+ =?utf-8?B?MHlGd1hVc09WRFkxR05vaForUW0xZW5aRkF5ZDFuanN6Y2tiNHJFdkZCZGMy?=
+ =?utf-8?B?UW1wUnd3M1lpMGo0NHQrcUJ1VTZZZERvUysrenBjYzRjOGVSQ1A3emY1VGJM?=
+ =?utf-8?B?K3FBdTBXZ01XNnNFWjFPSjAxaGREM2UzTEMyRm5wbElpRXdHeXR3c0JhRXds?=
+ =?utf-8?B?YWtGamhteGlSUklrUkljaCtFK1ZzaUF1Sitpc3JpeTY1V2FWYXY5aVJjVyt2?=
+ =?utf-8?B?a1Y4MUhWL2E5L0JyL3VoQ0p1eWkwa1ZoM0l5V1B2WEFLOXRxemtFTlVvVnYv?=
+ =?utf-8?B?Yk43YXZlRFJwbFZaS2ZPODdSc0NOSm9IaVJQN2lRZk11RFM5bWVKdndVTXhw?=
+ =?utf-8?B?OU1QdnB5Vmo3SGdkbXA3YWw5SWN3YjdlaHZKVUZVSVptdFhJb1VQdURqSTBL?=
+ =?utf-8?B?bXQ0bGlZUlVYSFJ4dUM4SlV0YVNmenlZWFhWNkVteldXbWlxM2dEMURLN1c3?=
+ =?utf-8?B?S25tOWlPaWVMUGRzY3BoUUV6bGliKys0NTdWNUZBUVh4OE93MzU4bUpHdXla?=
+ =?utf-8?B?M1ozZG5HY3lKL3lwdSsvZmYwakpEMjduTUx5d1JhU0xIZ1FjeUh6ZzUzZVkw?=
+ =?utf-8?B?UFVMQ2RmbFZHQmFleUlPVU15MHNZMzJXYkUxd0VsVGRZTzNTd2VIc0N4UEd1?=
+ =?utf-8?B?cUVEMHEyT2tvSk5iREx6MElnYXFJanZLaHVIN0JKeWYram1TV21RcThDQjEw?=
+ =?utf-8?B?c2ljOHdUTGZ0NWZGclRiODNIYW5VaTdWSEZ0bHQyTElHTVpRQ3MrdkZEK2dZ?=
+ =?utf-8?B?L0xjWnh5U3NyaXhmUjY3ZzMwc21KaHJaQ3Z4S2JXVGpEMnByTkRVbjRpSG9F?=
+ =?utf-8?B?RDdqYXhwWWJVdHlMK3Q5QVRzSzZLQk9WMXhqU09tOGQreGpTd0M2RTdyalEv?=
+ =?utf-8?B?RENCbTRYRzVjbXIyRU1ZbE8rTytlY25OUms3TzYzdU9NMFRIamdERmNHNVZz?=
+ =?utf-8?B?TU9vcnYvM1Y3M3A3Mkx3UVg1Y2NtWlJVcmhZbUllWEFyMC9XTitUdTRCRzJP?=
+ =?utf-8?B?aUtxZTFjWmI0Q3M2SDEwekhxME9MV2w1QUh5UDBzOU9qWjYxNW55WmcyME95?=
+ =?utf-8?B?T1V1R3c0QmJObEtNY3VjZThXZGw5RzRQL2V1MFhBRG5CYlVIQWtLSkh1aXZm?=
+ =?utf-8?B?RVFyZFdMQWsxR3VHVm9KUkNBZ1hSeXB5S2RrazJKeERzdnNlTElnRmZ4QjBT?=
+ =?utf-8?B?dWhIdTBkeEZ0S3NSY0FxWnVFSldSTEFPNXdtbjBCQkIzV05OT2JHNlFSR21G?=
+ =?utf-8?B?b3l5OXRQcUZzMTRGcC9vWFR2Q3FYTzZoQXNPRHA4dUJ4YWVqTGE3c2RsUnFo?=
+ =?utf-8?Q?gGbXOGdOEEgE9tIk2LelgaVnx?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 98f27be2-cf3c-48de-4b21-08de21fda6bd
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB7900.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Nov 2025 15:10:44.3438
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ATQAcH6f/tw/n9k3cuyhvra6a5MGiM0XbYmJaJYul9VMDZfJQiFzdIdfJT5wBBPSIajZCu+lJd1gCFmOcxXaZw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8753
 
-On 11/12/25 3:55 PM, Aaron Conole wrote:
-> Ilya Maximets <i.maximets@ovn.org> writes:
+On Wed, Nov 12, 2025 at 01:17:03PM +0200, Baruch Siach wrote:
+> Ethernet bridge website URL shows "This page isn’t available".
 > 
->> The validation of the set(nsh(...)) action is completely wrong.
->> It runs through the nsh_key_put_from_nlattr() function that is the
->> same function that validates NSH keys for the flow match and the
->> push_nsh() action.  However, the set(nsh(...)) has a very different
->> memory layout.  Nested attributes in there are doubled in size in
->> case of the masked set().  That makes proper validation impossible.
->>
->> There is also confusion in the code between the 'masked' flag, that
->> says that the nested attributes are doubled in size containing both
->> the value and the mask, and the 'is_mask' that says that the value
->> we're parsing is the mask.  This is causing kernel crash on trying to
->> write into mask part of the match with SW_FLOW_KEY_PUT() during
->> validation, while validate_nsh() doesn't allocate any memory for it:
->>
->>   BUG: kernel NULL pointer dereference, address: 0000000000000018
->>   #PF: supervisor read access in kernel mode
->>   #PF: error_code(0x0000) - not-present page
->>   PGD 1c2383067 P4D 1c2383067 PUD 20b703067 PMD 0
->>   Oops: Oops: 0000 [#1] SMP NOPTI
->>   CPU: 8 UID: 0 Kdump: loaded Not tainted 6.17.0-rc4+ #107 PREEMPT(voluntary)
->>   RIP: 0010:nsh_key_put_from_nlattr+0x19d/0x610 [openvswitch]
->>   Call Trace:
->>    <TASK>
->>    validate_nsh+0x60/0x90 [openvswitch]
->>    validate_set.constprop.0+0x270/0x3c0 [openvswitch]
->>    __ovs_nla_copy_actions+0x477/0x860 [openvswitch]
->>    ovs_nla_copy_actions+0x8d/0x100 [openvswitch]
->>    ovs_packet_cmd_execute+0x1cc/0x310 [openvswitch]
->>    genl_family_rcv_msg_doit+0xdb/0x130
->>    genl_family_rcv_msg+0x14b/0x220
->>    genl_rcv_msg+0x47/0xa0
->>    netlink_rcv_skb+0x53/0x100
->>    genl_rcv+0x24/0x40
->>    netlink_unicast+0x280/0x3b0
->>    netlink_sendmsg+0x1f7/0x430
->>    ____sys_sendmsg+0x36b/0x3a0
->>    ___sys_sendmsg+0x87/0xd0
->>    __sys_sendmsg+0x6d/0xd0
->>    do_syscall_64+0x7b/0x2c0
->>    entry_SYSCALL_64_after_hwframe+0x76/0x7e
->>
->> The third issue with this process is that while trying to convert
->> the non-masked set into masked one, validate_set() copies and doubles
->> the size of the OVS_KEY_ATTR_NSH as if it didn't have any nested
->> attributes.  It should be copying each nested attribute and doubling
->> them in size independently.  And the process must be properly reversed
->> during the conversion back from masked to a non-masked variant during
->> the flow dump.
->>
->> In the end, the only two outcomes of trying to use this action are
->> either validation failure or a kernel crash.  And if somehow someone
->> manages to install a flow with such an action, it will most definitely
->> not do what it is supposed to, since all the keys and the masks are
->> mixed up.
->>
->> Fixing all the issues is a complex task as it requires re-writing
->> most of the validation code.
->>
->> Given that and the fact that this functionality never worked since
->> introduction, let's just remove it altogether.  It's better to
->> re-introduce it later with a proper implementation instead of trying
->> to fix it in stable releases.
->>
->> Fixes: b2d0f5d5dc53 ("openvswitch: enable NSH support")
->> Reported-by: Junvy Yang <zhuque@tencent.com>
->> Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
->> ---
-> 
-> Thanks, this makes sense to me.  As you noted, the "fix" (I don't really
-> know if it is the right word since the functionality never worked) is
-> quite complex, and still might not be 'good enough' to not have further
-> issues.  It makes more sense not to try and support something that never
-> worked to begin with - especially since even in the userspace side we
-> never really did a set(nsh()) thing (because it doesn't exist as
-> functionality).
+> Signed-off-by: Baruch Siach <baruch@tkos.co.il>
 
-The functionality exists in userspace, ovs-vswitchd is able to create
-set(nsh()) actions when set_field OpenFlow actions are used.  It doesn't
-work with the kernel datapath, since the implementation inside the kernel
-is broken, but it works with userspace datapath.  So, just to clarify,
-the implementation on userspace side does exist.  It's not ideal, has its
-own bugs and doesn't work for kernel datapath, obviously, but it exists.
+I guess the correct link is:
 
-Best regards, Ilya Maximets.
+https://wiki.linuxfoundation.org/networking/bridge
 
-> 
-> Reviewed-by: Aaron Conole <aconole@redhat.com>
+But it's outdated, so it's probably best to just remove the URL.
+
+For net:
+
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
