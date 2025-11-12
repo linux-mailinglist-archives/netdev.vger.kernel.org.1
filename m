@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-238045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53415C53897
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 17:57:59 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B6E1C535B2
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 17:21:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 6C3C0541ABA
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 15:48:42 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C1341501301
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 15:49:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2E9C341661;
-	Wed, 12 Nov 2025 15:47:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 936FC33F39C;
+	Wed, 12 Nov 2025 15:48:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="VPNbNVWd"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="LnZMVGfY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtpout-04.galae.net (smtpout-04.galae.net [185.171.202.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E0D8339B36;
-	Wed, 12 Nov 2025 15:47:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7270833F368
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 15:48:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.171.202.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762962454; cv=none; b=Uis3Mzn0OUB0u/IlSUgKh/MRKR1D/hcMJPiW7zIW3kI5/7T9WfLuiR75jtRyxR/Mu5OoVvobH++KvxcaVDuw+E3El8wLxKE3clU56s72JU2SAwi3ooOJMoOdL980eUSVB+ttVYh0sPJJvGugmHwXE7Tq8ZBQ/seIETLfVaxt0HE=
+	t=1762962483; cv=none; b=lPpqk1h0FH4JGzhl5gbbBvNepyumvJ/EPw8DLyVlL2XAYEMVMIY0p9dB4eTX+2Byq2ttMw533L5cscmvjKKySPJX5nm/t6Yiw1w9gXXf504bkignhTG6Z/494I6AJU+35OBX4MWcBUcbZLsS4F1GxkV+VhfOU5gn4wBjlxd563s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762962454; c=relaxed/simple;
-	bh=grhClpwYxRL7qRrt3KerIXRZPEHir6/BUz91D1OlEzk=;
+	s=arc-20240116; t=1762962483; c=relaxed/simple;
+	bh=ygELS8hZslFMTCZ+0LcZV2QXKG/NdeYcYSa6ECGENCM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VXpFsxXLs5j6UduL5Thx2QhqS39IRfXpVWHdK6dYXkY01uLk7TNnRMVKh1G2NsUhVUW0ZUczL7TeTR5ReyPt2h7Cxbzgjl93LvpOqRZ/KAyjTkA0FyoEDdHeY2wKmyk9QcovZ7USyig2pUt8RDQkM+XqCuhUMUQkljdtzSusVyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=VPNbNVWd; arc=none smtp.client-ip=185.171.202.116
+	 In-Reply-To:Content-Type; b=ZTEmJDd/w83T0EhV2N5HSSJ7v2XCPraJCGQllHvOa0pVqVC9MzdpSoZX2oL/E523cYclMm+FFhK62PDNEgqvhnGgRDo2r7gjpSWvu3pSAg1n2c+L5OrkjxKzGsKRtVo1lYiOY3TffICzPkZV0RSWffvWrBLCqjmD3wlu2FBTBPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=LnZMVGfY; arc=none smtp.client-ip=185.171.202.116
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
 Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-04.galae.net (Postfix) with ESMTPS id 35151C0F56F;
-	Wed, 12 Nov 2025 15:47:09 +0000 (UTC)
+	by smtpout-04.galae.net (Postfix) with ESMTPS id 4E0B1C0F56F;
+	Wed, 12 Nov 2025 15:47:38 +0000 (UTC)
 Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id CC4FD6070B;
-	Wed, 12 Nov 2025 15:47:30 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id A6690102F192F;
-	Wed, 12 Nov 2025 16:47:25 +0100 (CET)
+	by smtpout-01.galae.net (Postfix) with ESMTPS id E7C2F6070B;
+	Wed, 12 Nov 2025 15:47:59 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id BC440102F1C26;
+	Wed, 12 Nov 2025 16:47:53 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1762962449; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	t=1762962478; h=from:subject:date:message-id:to:cc:mime-version:content-type:
 	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=VhJK/nv+0ASiIHxO+Y11CbUntTVgMQKT69rk/ES1NxI=;
-	b=VPNbNVWd/yU7bWsjlIzkW2w0EhFc/4gP4SYgqNN3fnjEQhk4Y3ArPU1hKZ9Uq4/z50CEYc
-	IYtLbtP2csSaEN2yWQoWXFRrO/lnICI045SU4ETVnzYqK+g38R2Dijoo9xrCK55VYPTqJI
-	sOjYXOdnanpEpY9uMu8zOENWzXrX91lnr48zJAHFEtDEqaw1tEraWOVoxNlawKwmD0xIjA
-	y3DdwNG+xrrXceNfju/SKobXyCVYums5BCJDe+KyG8Z8ozXqssCvpFaf/BhMMbBL5CpxDK
-	RqjOPD/uUBkVMe5SSiG4mEwV2CEHln8G34NxaHxPG8jPeYtZ7eZ4/KklYf8y1g==
-Message-ID: <8ee62480-88bc-4b1c-a7d4-fd86819d0441@bootlin.com>
-Date: Wed, 12 Nov 2025 16:47:25 +0100
+	bh=p+HInJWYvj2EbsQSrQ08qaFvego5yMYy0Y/L5C536i8=;
+	b=LnZMVGfYx4JIkgZ0Ij0YvUWtCZRvN4HKk6pXwIobuWFpTpxcBI9lfc8Tws8Zg4Dyd8b3k5
+	LkzMbtgJ4Ef0ZgmANMNlmp6ENJAd+NpZ2ry/lM3aDENQytAuaRMP4GqLSei6QX63BvSGJ2
+	eTSC/cw2nM6U2nWghrBpDforF1L5XcCQM866onJDZZecaj2TCiHCr/KbO8cVsZFA7jAnA/
+	0Kdc2b4kVJeYheJNGtqM5yQxaBqdVzYAXirqATeEpI4AbKw7nGo578gTSvdFcJ0FCMWmvY
+	x6s7BtQEM0BWunfkg/k8BALQhE6PXrlszHy4zMGP18q5B9MKxMZ7nbJsUC/hKA==
+Message-ID: <69d274c0-8133-4646-bbac-d30e6573dda8@bootlin.com>
+Date: Wed, 12 Nov 2025 16:47:53 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,8 +57,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 02/13] net: stmmac: loongson1: use
- PHY_INTF_SEL_x directly
+Subject: Re: [PATCH net-next v2 03/13] net: stmmac: loongson1: use
+ stmmac_get_phy_intf_sel()
 To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
  Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
 Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
@@ -75,10 +75,10 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
  Nobuhiro Iwamatsu <nobuhiro.iwamatsu.x90@mail.toshiba>,
  Paolo Abeni <pabeni@redhat.com>
 References: <aRLvrfx6tOa-RhrY@shell.armlinux.org.uk>
- <E1vIjTk-0000000Dqt6-1gN9@rmk-PC.armlinux.org.uk>
+ <E1vIjTp-0000000DqtC-2DmI@rmk-PC.armlinux.org.uk>
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 Content-Language: en-US
-In-Reply-To: <E1vIjTk-0000000Dqt6-1gN9@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1vIjTp-0000000DqtC-2DmI@rmk-PC.armlinux.org.uk>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Last-TLS-Session-Version: TLSv1.3
@@ -86,9 +86,12 @@ X-Last-TLS-Session-Version: TLSv1.3
 
 
 On 11/11/2025 09:11, Russell King (Oracle) wrote:
-> Use the PHY_INTF_SEL_xx values directly in ls1c_dwmac_syscon_init(),
-> converting them to the PHY_INTF_SELI bitfield when calling
-> regmap_update_bits().
+> Use stmmac_get_phy_intf_sel() to decode the PHY interface mode to the
+> phy_intf_sel value, validate the result and use that to set the
+> control register to select the operating mode for the DWMAC core.
+> 
+> Note that this will allow GMII as well as MII as the phy_intf_sel
+> value is the same for both.
 > 
 > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
@@ -97,49 +100,30 @@ Reviewed-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 Maxime
 
 > ---
->  drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c | 11 +++++------
->  1 file changed, 5 insertions(+), 6 deletions(-)
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c | 11 +++--------
+>  1 file changed, 3 insertions(+), 8 deletions(-)
 > 
 > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c
-> index 09e2af1d778a..5f9f66fbc191 100644
+> index 5f9f66fbc191..894ee66f5c9b 100644
 > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c
 > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson1.c
-> @@ -38,8 +38,6 @@
->  #define GMAC_SHUT		BIT(6)
->  
->  #define PHY_INTF_SELI		GENMASK(30, 28)
-> -#define PHY_INTF_MII		FIELD_PREP(PHY_INTF_SELI, PHY_INTF_SEL_GMII_MII)
-> -#define PHY_INTF_RMII		FIELD_PREP(PHY_INTF_SELI, PHY_INTF_SEL_RMII)
->  
->  struct ls1x_dwmac {
->  	struct plat_stmmacenet_data *plat_dat;
-> @@ -140,15 +138,14 @@ static int ls1c_dwmac_syscon_init(struct platform_device *pdev, void *priv)
->  	struct ls1x_dwmac *dwmac = priv;
->  	struct plat_stmmacenet_data *plat = dwmac->plat_dat;
+> @@ -140,14 +140,9 @@ static int ls1c_dwmac_syscon_init(struct platform_device *pdev, void *priv)
 >  	struct regmap *regmap = dwmac->regmap;
-> +	int phy_intf_sel;
+>  	int phy_intf_sel;
 >  
->  	switch (plat->phy_interface) {
->  	case PHY_INTERFACE_MODE_MII:
-> -		regmap_update_bits(regmap, LS1X_SYSCON1, PHY_INTF_SELI,
-> -				   PHY_INTF_MII);
-> +		phy_intf_sel = PHY_INTF_SEL_GMII_MII;
->  		break;
->  	case PHY_INTERFACE_MODE_RMII:
-> -		regmap_update_bits(regmap, LS1X_SYSCON1, PHY_INTF_SELI,
-> -				   PHY_INTF_RMII);
-> +		phy_intf_sel = PHY_INTF_SEL_RMII;
->  		break;
->  	default:
+> -	switch (plat->phy_interface) {
+> -	case PHY_INTERFACE_MODE_MII:
+> -		phy_intf_sel = PHY_INTF_SEL_GMII_MII;
+> -		break;
+> -	case PHY_INTERFACE_MODE_RMII:
+> -		phy_intf_sel = PHY_INTF_SEL_RMII;
+> -		break;
+> -	default:
+> +	phy_intf_sel = stmmac_get_phy_intf_sel(plat->phy_interface);
+> +	if (phy_intf_sel != PHY_INTF_SEL_GMII_MII &&
+> +	    phy_intf_sel != PHY_INTF_SEL_RMII) {
 >  		dev_err(&pdev->dev, "Unsupported PHY-mode %u\n",
-> @@ -156,6 +153,8 @@ static int ls1c_dwmac_syscon_init(struct platform_device *pdev, void *priv)
+>  			plat->phy_interface);
 >  		return -EOPNOTSUPP;
->  	}
->  
-> +	regmap_update_bits(regmap, LS1X_SYSCON1, PHY_INTF_SELI,
-> +			   FIELD_PREP(PHY_INTF_SELI, phy_intf_sel));
->  	regmap_update_bits(regmap, LS1X_SYSCON0, GMAC0_SHUT, 0);
->  
->  	return 0;
 
 
