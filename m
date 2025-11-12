@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-238094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4201C53FFE
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 19:51:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CACD6C54031
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 19:53:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 58B054F1F5C
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 18:44:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47A5E3B541A
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 18:44:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F19034C80C;
-	Wed, 12 Nov 2025 18:44:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9499734B413;
+	Wed, 12 Nov 2025 18:44:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E32B34A77D
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 18:44:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AEA134575A
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 18:44:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762973049; cv=none; b=iaq4fBq/aDPpac6L+Wjc9f3sghNZR47NbIYZcsd5BnaGAkxUoMjiY3wLVKY/lu/t9yNL4CgxP1tKPNE/FWUDTbflMefxorcXpQW1x/cAIBOLfkYuXMHYdNVIJfEL0fQNiJCqllVf5Q4pGdVJJGZHQUqCKFZfUrW/dRnwTkjfqG8=
+	t=1762973047; cv=none; b=C9g+xTacb7xcD5UGl9n0raV4igU/SYVHIFY3XofuwrjAZyGZtY78EQu8a23MtMychE2nE87fTJGbR2hfVc9j6IgFKaFccTqkYBwWfHV3vML5vuWFMtSgWgdblhjXqpWEZf+3he7PjyB8GnAHAkZvy0a1kFepHnfYaGwe5+pz88Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762973049; c=relaxed/simple;
-	bh=e9q/DXjN/b4dCjtBvvpqQ1JR+MgtPisyQN5gCDgUTO8=;
+	s=arc-20240116; t=1762973047; c=relaxed/simple;
+	bh=151qXbDBRgiCeL2kp8PMB/MWWMxdf34qSLFk+65pyeE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ChGWmdZtxP4nXMf+wUIrbu2B65/DD3X+wQRyMHbq5R0KYCamPHFWf1AZSqceIxYJhOk5yW6ka8FO/vRkOVNtF/CnxG2/hDyeInClgt79/pH2DWhc9Jp9mrsPXeAB71dc0e6ab61b5OYeTgmi2QuaZvo+8uLauND4BoArnDyWY0Y=
+	 MIME-Version; b=up/TpbSlwDr+X1Z9h4PCXZEOzxU7FjR5UJWRIQM1b5qVRB8KIBMDbozvrYkBQK5qUsvzWMUpd7Q9YvbdwviH1OeVIm8fI+Aifm4YaFpBgpauSv2Pzh6VpIeO/yOhJFovpg/hXOc20AtpEovG859mqB0q78BmVuK/73gPcAle69E=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,19 +33,19 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1vJFos-0006t8-Dc; Wed, 12 Nov 2025 19:43:50 +0100
+	id 1vJFos-0006tE-Dd; Wed, 12 Nov 2025 19:43:50 +0100
 Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1vJFor-0008Ce-22;
+	id 1vJFor-0008Cg-2H;
 	Wed, 12 Nov 2025 19:43:49 +0100
 Received: from blackshift.org (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
 	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 5378849E0C8;
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 704AA49E0C9;
 	Wed, 12 Nov 2025 18:43:49 +0000 (UTC)
 From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
@@ -57,9 +57,9 @@ Cc: davem@davemloft.net,
 	Viken Dadhaniya <viken.dadhaniya@oss.qualcomm.com>,
 	Manivannan Sadhasivam <mani@kernel.org>,
 	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net-next 06/11] can: mcp251xfd: utilize gather_write function for all non-CRC writes
-Date: Wed, 12 Nov 2025 19:40:25 +0100
-Message-ID: <20251112184344.189863-7-mkl@pengutronix.de>
+Subject: [PATCH net-next 07/11] can: mcp251xfd: add workaround for errata 5
+Date: Wed, 12 Nov 2025 19:40:26 +0100
+Message-ID: <20251112184344.189863-8-mkl@pengutronix.de>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251112184344.189863-1-mkl@pengutronix.de>
 References: <20251112184344.189863-1-mkl@pengutronix.de>
@@ -77,82 +77,160 @@ X-PTX-Original-Recipient: netdev@vger.kernel.org
 
 From: Gregor Herburger <gregor.herburger@ew.tq-group.com>
 
-This is a preparation patch to add errata workaround for non crc writes.
+According to Errata DS80000789E 5 writing IOCON register using one SPI
+write command clears LAT0/LAT1.
 
-Currently for non-crc writes to the chip can go through the
-.gather_write, .write or the reg_update_bits callback.
+Errata Fix/Work Around suggests to write registers with single byte write
+instructions. However, it seems that every write to the second byte
+causes the overwrite of LAT0/LAT1.
 
-To allow the addition of the errata fix at a single location use
-mcp251xfd_regmap_nocrc_gather_write for all non-CRC write instructions,
-similar to the crc regmap.
+Never write byte 2 of IOCON register to avoid clearing of LAT0/LAT1.
 
 Signed-off-by: Gregor Herburger <gregor.herburger@ew.tq-group.com>
 Tested-by: Viken Dadhaniya <viken.dadhaniya@oss.qualcomm.com>
 Signed-off-by: Viken Dadhaniya <viken.dadhaniya@oss.qualcomm.com>
 Reviewed-by: Manivannan Sadhasivam <mani@kernel.org>
-Link: https://patch.msgid.link/20251001091006.4003841-3-viken.dadhaniya@oss.qualcomm.com
+Link: https://patch.msgid.link/20251001091006.4003841-4-viken.dadhaniya@oss.qualcomm.com
+[mkl: add missing MCP251XFD_REG_IOCON_GPIO_MASK]
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
- .../net/can/spi/mcp251xfd/mcp251xfd-regmap.c  | 25 ++++++++++---------
- 1 file changed, 13 insertions(+), 12 deletions(-)
+ .../net/can/spi/mcp251xfd/mcp251xfd-regmap.c  | 89 +++++++++++++++++--
+ drivers/net/can/spi/mcp251xfd/mcp251xfd.h     |  1 +
+ 2 files changed, 84 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd-regmap.c b/drivers/net/can/spi/mcp251xfd/mcp251xfd-regmap.c
-index 8c5be8d1c519..e61cbd209955 100644
+index e61cbd209955..70d5ff0ae7ac 100644
 --- a/drivers/net/can/spi/mcp251xfd/mcp251xfd-regmap.c
 +++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd-regmap.c
-@@ -12,14 +12,6 @@
- 
+@@ -13,9 +13,9 @@
  static const struct regmap_config mcp251xfd_regmap_crc;
  
--static int
--mcp251xfd_regmap_nocrc_write(void *context, const void *data, size_t count)
--{
--	struct spi_device *spi = context;
--
--	return spi_write(spi, data, count);
--}
--
  static int
- mcp251xfd_regmap_nocrc_gather_write(void *context,
- 				    const void *reg, size_t reg_len,
-@@ -47,6 +39,15 @@ mcp251xfd_regmap_nocrc_gather_write(void *context,
+-mcp251xfd_regmap_nocrc_gather_write(void *context,
+-				    const void *reg, size_t reg_len,
+-				    const void *val, size_t val_len)
++_mcp251xfd_regmap_nocrc_gather_write(void *context,
++				     const void *reg, size_t reg_len,
++				     const void *val, size_t val_len)
+ {
+ 	struct spi_device *spi = context;
+ 	struct mcp251xfd_priv *priv = spi_get_drvdata(spi);
+@@ -39,6 +39,45 @@ mcp251xfd_regmap_nocrc_gather_write(void *context,
  	return spi_sync_transfer(spi, xfer, ARRAY_SIZE(xfer));
  }
  
 +static int
-+mcp251xfd_regmap_nocrc_write(void *context, const void *data, size_t count)
++mcp251xfd_regmap_nocrc_gather_write(void *context,
++				    const void *reg_p, size_t reg_len,
++				    const void *val, size_t val_len)
 +{
-+	const size_t data_offset = sizeof(__be16);
++	const u16 byte_exclude = MCP251XFD_REG_IOCON +
++				 mcp251xfd_first_byte_set(MCP251XFD_REG_IOCON_GPIO_MASK);
++	u16 reg = be16_to_cpu(*(__be16 *)reg_p) & MCP251XFD_SPI_ADDRESS_MASK;
++	int ret;
 +
-+	return mcp251xfd_regmap_nocrc_gather_write(context, data, data_offset,
-+						   data + data_offset, count - data_offset);
++	/* Never write to bits 16..23 of IOCON register to avoid clearing of LAT0/LAT1
++	 *
++	 * According to MCP2518FD Errata DS80000789E 5 writing IOCON register using one
++	 * SPI write command clears LAT0/LAT1.
++	 *
++	 * Errata Fix/Work Around suggests to write registers with single byte
++	 * write instructions. However, it seems that the byte at 0xe06(IOCON[23:16])
++	 * is for read-only access and writing to it causes the clearing of LAT0/LAT1.
++	 */
++	if (reg <= byte_exclude && reg + val_len > byte_exclude) {
++		size_t len = byte_exclude - reg;
++
++		/* Write up to 0xe05 */
++		ret = _mcp251xfd_regmap_nocrc_gather_write(context, reg_p, reg_len, val, len);
++		if (ret)
++			return ret;
++
++		/* Write from 0xe07 on */
++		reg += len + 1;
++		reg = (__force unsigned short)cpu_to_be16(MCP251XFD_SPI_INSTRUCTION_WRITE | reg);
++		return _mcp251xfd_regmap_nocrc_gather_write(context, &reg, reg_len,
++							    val + len + 1,
++							    val_len - len - 1);
++	}
++
++	return _mcp251xfd_regmap_nocrc_gather_write(context, reg_p, reg_len,
++						  val, val_len);
 +}
 +
- static inline bool
- mcp251xfd_update_bits_read_reg(const struct mcp251xfd_priv *priv,
- 			       unsigned int reg)
-@@ -64,6 +65,7 @@ mcp251xfd_update_bits_read_reg(const struct mcp251xfd_priv *priv,
- 	case MCP251XFD_REG_CON:
- 	case MCP251XFD_REG_OSC:
- 	case MCP251XFD_REG_ECCCON:
-+	case MCP251XFD_REG_IOCON:
- 		return true;
- 	default:
- 		mcp251xfd_for_each_rx_ring(priv, ring, n) {
-@@ -139,10 +141,9 @@ mcp251xfd_regmap_nocrc_update_bits(void *context, unsigned int reg,
- 	tmp_le32 = orig_le32 & ~mask_le32;
- 	tmp_le32 |= val_le32 & mask_le32;
- 
--	mcp251xfd_spi_cmd_write_nocrc(&buf_tx->cmd, reg + first_byte);
--	memcpy(buf_tx->data, &tmp_le32, len);
--
--	return spi_write(spi, buf_tx, sizeof(buf_tx->cmd) + len);
-+	reg += first_byte;
-+	mcp251xfd_spi_cmd_write_nocrc(&buf_tx->cmd, reg);
-+	return mcp251xfd_regmap_nocrc_gather_write(context, &buf_tx->cmd, 2, &tmp_le32, len);
+ static int
+ mcp251xfd_regmap_nocrc_write(void *context, const void *data, size_t count)
+ {
+@@ -197,9 +236,9 @@ mcp251xfd_regmap_nocrc_read(void *context,
  }
  
  static int
+-mcp251xfd_regmap_crc_gather_write(void *context,
+-				  const void *reg_p, size_t reg_len,
+-				  const void *val, size_t val_len)
++_mcp251xfd_regmap_crc_gather_write(void *context,
++				   const void *reg_p, size_t reg_len,
++				   const void *val, size_t val_len)
+ {
+ 	struct spi_device *spi = context;
+ 	struct mcp251xfd_priv *priv = spi_get_drvdata(spi);
+@@ -230,6 +269,44 @@ mcp251xfd_regmap_crc_gather_write(void *context,
+ 	return spi_sync_transfer(spi, xfer, ARRAY_SIZE(xfer));
+ }
+ 
++static int
++mcp251xfd_regmap_crc_gather_write(void *context,
++				  const void *reg_p, size_t reg_len,
++				  const void *val, size_t val_len)
++{
++	const u16 byte_exclude = MCP251XFD_REG_IOCON +
++				 mcp251xfd_first_byte_set(MCP251XFD_REG_IOCON_GPIO_MASK);
++	u16 reg = *(u16 *)reg_p;
++	int ret;
++
++	/* Never write to bits 16..23 of IOCON register to avoid clearing of LAT0/LAT1
++	 *
++	 * According to MCP2518FD Errata DS80000789E 5 writing IOCON register using one
++	 * SPI write command clears LAT0/LAT1.
++	 *
++	 * Errata Fix/Work Around suggests to write registers with single byte
++	 * write instructions. However, it seems that the byte at 0xe06(IOCON[23:16])
++	 * is for read-only access and writing to it causes the clearing of LAT0/LAT1.
++	 */
++	if (reg <= byte_exclude  && reg + val_len > byte_exclude) {
++		size_t len = byte_exclude - reg;
++
++		/* Write up to 0xe05 */
++		ret = _mcp251xfd_regmap_crc_gather_write(context, &reg, reg_len, val, len);
++		if (ret)
++			return ret;
++
++		/* Write from 0xe07 on */
++		reg += len + 1;
++		return _mcp251xfd_regmap_crc_gather_write(context, &reg, reg_len,
++							  val + len + 1,
++							  val_len - len - 1);
++	}
++
++	return _mcp251xfd_regmap_crc_gather_write(context, reg_p, reg_len,
++						  val, val_len);
++}
++
+ static int
+ mcp251xfd_regmap_crc_write(void *context,
+ 			   const void *data, size_t count)
+diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd.h b/drivers/net/can/spi/mcp251xfd/mcp251xfd.h
+index dcbbd2b2fae8..e63034fd5947 100644
+--- a/drivers/net/can/spi/mcp251xfd/mcp251xfd.h
++++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd.h
+@@ -337,6 +337,7 @@
+ #define MCP251XFD_REG_IOCON_PM0 BIT(24)
+ #define MCP251XFD_REG_IOCON_GPIO1 BIT(17)
+ #define MCP251XFD_REG_IOCON_GPIO0 BIT(16)
++#define MCP251XFD_REG_IOCON_GPIO_MASK GENMASK(17, 16)
+ #define MCP251XFD_REG_IOCON_LAT1 BIT(9)
+ #define MCP251XFD_REG_IOCON_LAT0 BIT(8)
+ #define MCP251XFD_REG_IOCON_XSTBYEN BIT(6)
 -- 
 2.51.0
 
