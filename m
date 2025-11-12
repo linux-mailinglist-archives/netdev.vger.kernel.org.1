@@ -1,242 +1,137 @@
-Return-Path: <netdev+bounces-238083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6244C53DCC
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 19:11:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 87D97C53E78
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 19:24:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 698124E4CCD
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 18:04:40 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id C96774E1CA2
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 18:17:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB90F347FED;
-	Wed, 12 Nov 2025 18:04:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m1bO5TAF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8A3C2F3C09;
+	Wed, 12 Nov 2025 18:17:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA0CE33CEA1
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 18:04:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9ED9348866
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 18:17:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762970677; cv=none; b=Urx4HboCJQnCIMdDq22CubCw+m4pV2MLdurskLJQFnpyrU0plGplf40TTzJzavpIBYDPGLyj/8KI+t73Ry2vpJwIDWCcpW/BJOnExtu6FjtkRWjU6HY/28GMaB+Ng1HcZWpXP3UA6vUHU6EMvjpI5rbfXCMvFQ9gIzYHvfjInao=
+	t=1762971441; cv=none; b=CChR3S+KWK9yYy8xV7sBogUEvmwywYUxIYHiFxbIlkzbBrBZtfHiVdwdNFSv+ftTYN+YFSrN+swoADO1y3348CxaIIGlp3651+ZzZ3/16DiqzPjy4VT7CMhnLwyFULG38JAFjQrVb8DwDIwcNzEP1ehySR5Qa02nxNJaGzb7rsM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762970677; c=relaxed/simple;
-	bh=35PnpAEJSKZMmmhjKvYkQ215RwpMHnVFMt8P/XdW7lY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Wf/ZxC+whnT7nHaJcxkCRqisdGILM/cS49QiAJdxqbw4alcJwM4JWkkm5OGGcU+dTSZpIXI+tVOTfXYo6i0afXDOr7MME3R8HeI41hbf/0A2pC02t+Gyla1Xy30992veFRAcbkh6QJAVwYa+q8ZS1b2VFqnTbILkXfI+pmulkns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m1bO5TAF; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-429c7e438a8so983663f8f.2
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 10:04:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762970674; x=1763575474; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=cjs87PRrJ2JNr9G8+c1Tv8wLpCpPRdNvapIiVHZg5Aw=;
-        b=m1bO5TAForDqWwyl1V9RFjfiFrlWeTvXxSIR5gY7VLAC0xHlzRxWjmHt9cClIPx50Y
-         rC1EX/qXz9tkQGs1THJ5Ir9gGVhGbCGY/OI+IPwhp8N6vBbsrW14WyDJY1KqR9JKElW2
-         f79vAWgNzB7trBK5zghYNUaDIhQzavMep4UF2unjjRUnvAdLvbtdrAahlCX3UWzMeBfi
-         hnB/aXoyk8NuWgbQzT1YyM3ySApxgiLnZMhHlevWfLExlG+ehHaVQ7EfPbA5a1+/uCzJ
-         jvOuB+gT+ZpiALqhlpGN02SvSTh+1lHBA+JwCc9FL8zX3RqWNLqmrLY6bNmbr1BixVGh
-         q65g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762970674; x=1763575474;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cjs87PRrJ2JNr9G8+c1Tv8wLpCpPRdNvapIiVHZg5Aw=;
-        b=TktJTEXwulifFnXLuzYoIMtoP/kBrtE6+cj0hxBjee95W8x+NBb7SFGQTH//0E4NUQ
-         0IcYoauzhN5vRGG0ghi+SPmY2O9SYPsIDbFlO/xq7nBN0ZiN+gNETPv53K4pW/Ej736M
-         nrCJEbz7bcvQaylUBpIsnScCrAGvFmhbm4hocZugwS0a4sVy24e1DfResF2vD//wcUfl
-         1We/8foZHhFkZbJ60HZoWqO8jtLwpujoEePXfota6Bu1GRRTXlHbip3m9KFI13WUuY26
-         Kc8jkaRCMwlIykvwU68g3M0agjj1/HB70v57Jv+OQQgy4d6mOR6yEqs5Gzb1AqV4vHFa
-         D9rA==
-X-Gm-Message-State: AOJu0YxkD4Hii1n5a5jMKJZT+xQCN1z4xr6rmJqxNcQbukVUpS6FIzOS
-	DiNu4lPFDML52iTXgGeSwk/tjKht46RGYSBF5P9+CBjTyf453j3aTECAI/tV9cX5
-X-Gm-Gg: ASbGncujVuKJwdRlJbDIINGic6lFE3+d/2NiW7X+etzzwVQ6yCe7CkEtTZWAkN87PWv
-	l6gk7gkEGrPTgjlUofH+bPB6iAt9WdTSKnxgmIyCT0ccIZqdFpII0SsEA9r6bzjbugvs+KpBlFh
-	u0fRQEtQt5SovqU3fFkSI5Rtd0eO0IJWOVltRPWItVhpUdJsvf8briJVZiccmmOTIZr+cyufZFg
-	kOVujNwpAxlEDb2KWxnmwoQbRioOirGrG+KDzP4VZ8o9zGj65Z7rZoFuKgiRMYJqRl7VSNzoEt/
-	5cETGZmu1UEaTNN8fbEPDV3qeuB7YM0ISFV2st3LDE3NxjKz+xAbtgfmM1XLw4l+kJQfNllaAjO
-	Ah4ZcSKi/gI+0t1Idy9+Hv9ob7o2KJvHRDDT29zxTLJLFH6HbXd2vhkpLU2rGMMXgaMmWW8qo
-X-Google-Smtp-Source: AGHT+IHeyVjIewk2nxGI2f/Yo9rnAFD++Txt9J+ZHHi3v+ztQpzxrSPqRixtOX/wT6+GIL73xHFCeQ==
-X-Received: by 2002:a05:6000:26c7:b0:42b:3ab7:b8b9 with SMTP id ffacd0b85a97d-42b4bb981f9mr3973943f8f.20.1762970673365;
-        Wed, 12 Nov 2025 10:04:33 -0800 (PST)
-Received: from localhost ([2a03:2880:31ff:3::])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b316775f2sm25285170f8f.16.2025.11.12.10.04.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Nov 2025 10:04:32 -0800 (PST)
-From: Mohsin Bashir <mohsin.bashr@gmail.com>
-To: netdev@vger.kernel.org
-Cc: alexanderduyck@fb.com,
-	almasrymina@google.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	horms@kernel.org,
-	kernel-team@meta.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux@armlinux.org.uk,
-	mohsin.bashr@gmail.com,
-	pabeni@redhat.com,
-	rmk+kernel@armlinux.org.uk
-Subject: [PATCH net-next] eth: fbnic: Configure RDE settings for pause frame
-Date: Wed, 12 Nov 2025 10:04:27 -0800
-Message-ID: <20251112180427.2904990-1-mohsin.bashr@gmail.com>
-X-Mailer: git-send-email 2.47.3
+	s=arc-20240116; t=1762971441; c=relaxed/simple;
+	bh=f+b1rrPMukVeazYs5PAqtwAi/LNAlAX9ZDZNA/6oTgk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dMKZeWRl1IHXDMUGSWvhOVDKD8IzJeaMno5BFKoLlVE+v4erAt2MhYouQGYw9juFw+Jicio03oWnrK12ISTik4Ur+K/k26olTs7GCDfuiegC0ARXQgGgaukxaYkcGLyvx3TjB9MEoSCi2mAkKuS77HiK52lxMQYSb6kv4diGMWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vJFOx-00032v-CC; Wed, 12 Nov 2025 19:17:03 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vJFOv-000862-2Y;
+	Wed, 12 Nov 2025 19:17:01 +0100
+Received: from pengutronix.de (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 7829949E099;
+	Wed, 12 Nov 2025 18:17:01 +0000 (UTC)
+Date: Wed, 12 Nov 2025 19:17:01 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, linux-can@vger.kernel.org, 
+	kernel@pengutronix.de, Gregor Herburger <gregor.herburger@ew.tq-group.com>, 
+	Viken Dadhaniya <viken.dadhaniya@oss.qualcomm.com>, Manivannan Sadhasivam <mani@kernel.org>
+Subject: Re: [PATCH net-next 07/11] can: mcp251xfd: add workaround for errata
+ 5
+Message-ID: <20251112-gainful-sturdy-bird-296956-mkl@pengutronix.de>
+References: <20251112091734.74315-1-mkl@pengutronix.de>
+ <20251112091734.74315-8-mkl@pengutronix.de>
+ <20251112092800.290282eb@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="pigoegfevrzrnn2g"
+Content-Disposition: inline
+In-Reply-To: <20251112092800.290282eb@kernel.org>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-fbnic supports pause frames. When pause frames are enabled presumably
-user expects lossless operation from the NIC. Make sure we configure
-RDE (Rx DMA Engine) to DROP_NEVER mode to avoid discards due to delays
-in fetching Rx descriptors from the host.
 
-While at it enable DROP_NEVER when NIC only has a single queue
-configured. In this case the NIC acts as a FIFO so there's no risk
-of head-of-line blocking other queues by making RDE wait. If pause
-is disabled this just moves the packet loss from the DMA engine to
-the Rx buffer.
+--pigoegfevrzrnn2g
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net-next 07/11] can: mcp251xfd: add workaround for errata
+ 5
+MIME-Version: 1.0
 
-Remove redundant call to fbnic_config_drop_mode_rcq(), introduced by
-commit 0cb4c0a13723 ("eth: fbnic: Implement Rx queue
-alloc/start/stop/free"). This call does not add value as
-fbnic_enable_rcq(), which is called immediately afterward, already
-handles this.
+On 12.11.2025 09:28:00, Jakub Kicinski wrote:
+> On Wed, 12 Nov 2025 10:13:47 +0100 Marc Kleine-Budde wrote:
+> > +static int
+> > +mcp251xfd_regmap_nocrc_gather_write(void *context,
+> > +				    const void *reg_p, size_t reg_len,
+> > +				    const void *val, size_t val_len)
+> > +{
+> > +	const u16 byte_exclude =3D MCP251XFD_REG_IOCON +
+> > +				 mcp251xfd_first_byte_set(MCP251XFD_REG_IOCON_GPIO_MASK);
+>
+> Looks like this is added by the next patch :(
+>
+> drivers/net/can/spi/mcp251xfd/mcp251xfd-regmap.c:48:59: error: =E2=80=98M=
+CP251XFD_REG_IOCON_GPIO_MASK=E2=80=99 undeclared (first use in this functio=
+n); did you mean =E2=80=98MCP251XFD_REG_IOCON_GPIO0=E2=80=99?
+>    48 |                                  mcp251xfd_first_byte_set(MCP251X=
+FD_REG_IOCON_GPIO_MASK);
+>       |                                                           ^~~~~~~=
+~~~~~~~~~~~~~~~~~~~~~~
+>       |                                                           MCP251X=
+FD_REG_IOCON_GPIO0
+>
+> Do you do rebases or do we have to take it as is?
 
-Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- .../net/ethernet/meta/fbnic/fbnic_netdev.h    |  2 ++
- .../net/ethernet/meta/fbnic/fbnic_phylink.c   |  8 +++++-
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.c  | 26 ++++++++++++++++---
- drivers/net/ethernet/meta/fbnic/fbnic_txrx.h  |  1 +
- 4 files changed, 32 insertions(+), 5 deletions(-)
+I'll fix it and send a new PR.
 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-index b0a87c57910f..e6ca23a9957d 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.h
-@@ -73,6 +73,8 @@ struct fbnic_net {
- 
- 	/* Time stamping filter config */
- 	struct kernel_hwtstamp_config hwtstamp_config;
-+
-+	bool tx_pause;
- };
- 
- int __fbnic_open(struct fbnic_net *fbn);
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-index 7ce3fdd25282..c9ed13e37d62 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_phylink.c
-@@ -36,8 +36,13 @@ int fbnic_phylink_set_pauseparam(struct net_device *netdev,
- 				 struct ethtool_pauseparam *pause)
- {
- 	struct fbnic_net *fbn = netdev_priv(netdev);
-+	int err;
-+
-+	err = phylink_ethtool_set_pauseparam(fbn->phylink, pause);
-+	if (!err)
-+		fbn->tx_pause = pause->tx_pause ? true : false;
- 
--	return phylink_ethtool_set_pauseparam(fbn->phylink, pause);
-+	return err;
- }
- 
- static void
-@@ -208,6 +213,7 @@ fbnic_phylink_mac_link_up(struct phylink_config *config,
- 	struct fbnic_net *fbn = netdev_priv(netdev);
- 	struct fbnic_dev *fbd = fbn->fbd;
- 
-+	fbnic_config_drop_mode(fbn, tx_pause);
- 	fbd->mac->link_up(fbd, tx_pause, rx_pause);
- }
- 
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-index 57e18a68f5d2..c2d7b67fec28 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.c
-@@ -2574,11 +2574,15 @@ static void fbnic_enable_bdq(struct fbnic_ring *hpq, struct fbnic_ring *ppq)
- }
- 
- static void fbnic_config_drop_mode_rcq(struct fbnic_napi_vector *nv,
--				       struct fbnic_ring *rcq)
-+				       struct fbnic_ring *rcq, bool tx_pause)
- {
-+	struct fbnic_net *fbn = netdev_priv(nv->napi.dev);
- 	u32 drop_mode, rcq_ctl;
- 
--	drop_mode = FBNIC_QUEUE_RDE_CTL0_DROP_IMMEDIATE;
-+	if (!tx_pause && fbn->num_rx_queues > 1)
-+		drop_mode = FBNIC_QUEUE_RDE_CTL0_DROP_IMMEDIATE;
-+	else
-+		drop_mode = FBNIC_QUEUE_RDE_CTL0_DROP_NEVER;
- 
- 	/* Specify packet layout */
- 	rcq_ctl = FIELD_PREP(FBNIC_QUEUE_RDE_CTL0_DROP_MODE_MASK, drop_mode) |
-@@ -2588,6 +2592,21 @@ static void fbnic_config_drop_mode_rcq(struct fbnic_napi_vector *nv,
- 	fbnic_ring_wr32(rcq, FBNIC_QUEUE_RDE_CTL0, rcq_ctl);
- }
- 
-+void fbnic_config_drop_mode(struct fbnic_net *fbn, bool tx_pause)
-+{
-+	int i, t;
-+
-+	for (i = 0; i < fbn->num_napi; i++) {
-+		struct fbnic_napi_vector *nv = fbn->napi[i];
-+
-+		for (t = 0; t < nv->rxt_count; t++) {
-+			struct fbnic_q_triad *qt = &nv->qt[nv->txt_count + t];
-+
-+			fbnic_config_drop_mode_rcq(nv, &qt->cmpl, tx_pause);
-+		}
-+	}
-+}
-+
- static void fbnic_config_rim_threshold(struct fbnic_ring *rcq, u16 nv_idx, u32 rx_desc)
- {
- 	u32 threshold;
-@@ -2637,7 +2656,7 @@ static void fbnic_enable_rcq(struct fbnic_napi_vector *nv,
- 	u32 hds_thresh = fbn->hds_thresh;
- 	u32 rcq_ctl = 0;
- 
--	fbnic_config_drop_mode_rcq(nv, rcq);
-+	fbnic_config_drop_mode_rcq(nv, rcq, fbn->tx_pause);
- 
- 	/* Force lower bound on MAX_HEADER_BYTES. Below this, all frames should
- 	 * be split at L4. It would also result in the frames being split at
-@@ -2700,7 +2719,6 @@ static void __fbnic_nv_enable(struct fbnic_napi_vector *nv)
- 						  &nv->napi);
- 
- 		fbnic_enable_bdq(&qt->sub0, &qt->sub1);
--		fbnic_config_drop_mode_rcq(nv, &qt->cmpl);
- 		fbnic_enable_rcq(nv, &qt->cmpl);
- 	}
- }
-diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
-index ca37da5a0b17..27776e844e29 100644
---- a/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
-+++ b/drivers/net/ethernet/meta/fbnic/fbnic_txrx.h
-@@ -184,6 +184,7 @@ void fbnic_reset_netif_queues(struct fbnic_net *fbn);
- irqreturn_t fbnic_msix_clean_rings(int irq, void *data);
- void fbnic_napi_enable(struct fbnic_net *fbn);
- void fbnic_napi_disable(struct fbnic_net *fbn);
-+void fbnic_config_drop_mode(struct fbnic_net *fbn, bool tx_pause);
- void fbnic_enable(struct fbnic_net *fbn);
- void fbnic_disable(struct fbnic_net *fbn);
- void fbnic_flush(struct fbnic_net *fbn);
--- 
-2.47.3
+Sorry for the noise,
+Marc
 
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--pigoegfevrzrnn2g
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmkUzxkACgkQDHRl3/mQ
+kZwWUwf/T4SnjyuObdK3U+JHwEGHJbtfd8udkIN+lM8HfPSUMv6c4M2fo+3y1nKy
+mwqNW/1WISOlhwPSW4GvOWGsEmWQVkRc0fgu3BVl5f528qHR5lc6Yc5hpxQ647Iz
++GXv6I8Htkmhyq/QQUO4vso9XfGB4P/ugupDNfjpEIqL8b4f0AfIoR6dQYf4MuOL
+h/lJIlx5R9gLGGOQVGWjI9WxgchteCmnAQv7unDuTQA0va2vVyH4zOhqqs8USeL6
+6IUyMTDuu/T99ETzGPZUW/FVRs0ocu1J69OIuIc/nPqcXdWlTHP2Ym410Cbwkn7H
+JIwFv6f0YpWpyxLqfsKbnJfDvMwRtA==
+=Abwd
+-----END PGP SIGNATURE-----
+
+--pigoegfevrzrnn2g--
 
