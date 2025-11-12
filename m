@@ -1,224 +1,151 @@
-Return-Path: <netdev+bounces-237806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37692C506EE
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 04:45:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 099EFC5071B
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 04:49:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E83E6188CA3D
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 03:46:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93D973A72E5
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 03:49:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBF7B1D5AC0;
-	Wed, 12 Nov 2025 03:45:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D66C22370D;
+	Wed, 12 Nov 2025 03:49:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=aspeedtech.com header.i=@aspeedtech.com header.b="LF4ZfE/O"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EOuR5qiQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from SEYPR02CU001.outbound.protection.outlook.com (mail-koreacentralazon11023080.outbound.protection.outlook.com [40.107.44.80])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F90335CBA3;
-	Wed, 12 Nov 2025 03:45:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.44.80
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762919131; cv=fail; b=s0DTzIuho/5HnAxfB5fIMlu6NXOg+FVR608MO3m2BH912cDGLi1hZnvWnVAWvpEJcXFlKhz97paFNG5g7ccKkKiGBqEiiQcUrlSoDe+JKlQuJkabnnjWGswBa0dWJMXChRm8B50FZ7jHZU7Jap6ge1rfIhHIOnFwUMP1w7Qyd88=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762919131; c=relaxed/simple;
-	bh=J8X8OazPSPJggTjHLr9r86MYDNpp1kNrMkcskWrfEdo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=b6jRND3bQYEKMG+d110tRpt37JDchrPgzAH5Lj3U6FoOoc3L/um2UrpMCTOs/UR7CWwdr3czMe3BmeoX+0UxsFl9WHOkALJowvF1YzkAdC8KsEKI+MPO+7D5SHVKG/vytWnKDk85Gvvw2wgU98iE0W2HRRG+lIrcNM+neLtACIY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; dkim=pass (2048-bit key) header.d=aspeedtech.com header.i=@aspeedtech.com header.b=LF4ZfE/O; arc=fail smtp.client-ip=40.107.44.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=HSa7JJAI13j67PDi4Y+ds+C3ZB1Q4s24ATCfog90xMKqAj7uhHOh3t5rSKJlxQioa+MvxMn8sAqJ/OMSt4XQKBBOk2hajAtgtPhDPOaEiOIDZD53/EGwlC6WmFLmIn2VSc57LK5H5lLXfpPKFBY+M+57po7ZNSlFT0x1nlpllxrvlKD7gI346HGmnkPoIJOAZA20BhiqPsPHtAOaM8iimSIuftRUrkX8MCnECgQPcGl+plC821QxIDupXhM1wp4imEA6tgNHvD45GuuiYg5Fr7K06RD3M9oC/5k/zk6fQjo/lmKf30x+EmIBStJWJtscOHpKaaZD7NZm6UcKOf2nkA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7cQ5E/HjbHLANNGSa0Xiks5Ouj9LdjAKoH7zxdXDfIE=;
- b=Q2+XiVIyZwirSj9gz5pc67fxrdsFgS04xmnTsiLbcWbQwB5l/wzqrnVy5e4argb4+slqqZG/fgIn00zZcZJYXBqc2eGYmYExNQh3+kGiPcpQZJeMf1wsdfunzWvOID8B60y2bDSseH8I66iwbhgqmgkQsLKWCANHcAidD2kXURz70EULk4V8rEE5RsfweBpVX663Rp6DQl1zjnsuhmFrzseNFLJIv/4cl+/MMU/crkUyyEukDB7UXSBv5SOVEGaTlB/pyxSZe0uPlBFCjgttzmGlq3taVpXCegBIKF0eVmQb5gvaggiMiJkGuFLIlIpwTHo50Tfus4+nXkQ/vVuoxQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=aspeedtech.com; dmarc=pass action=none
- header.from=aspeedtech.com; dkim=pass header.d=aspeedtech.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aspeedtech.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7cQ5E/HjbHLANNGSa0Xiks5Ouj9LdjAKoH7zxdXDfIE=;
- b=LF4ZfE/O2wGTxS4GtiVn3Amub3NuFLNjxOJhvBybsXwHk9BHmMxFuPL5YIy1+Qcm5Vl8qZrEPVjLcns32lSGzv8PBJnSojKdj0ufD8w+UTHP697JX5o/DaQ2D2igHauLNm6QtCGo2mesq3P6GwS2FlBZifBOZipJeQtInDLmQnshmcN91CvZdrPGmX1gvmVd+apfeWWfn/nD7N6db/2rW0xYt6X3YSg88u9eUnJ4yJMNOlX09prrV+KRrEr2VwdJFSFS1LEAR2zf+nzWuJoanoPTDTn0Fm29LyQ6UDgSfu1QdYZX1m4vxc0OFgvLz4/DiKxtn977I/856UNq0cmmdw==
-Received: from SEYPR06MB5134.apcprd06.prod.outlook.com (2603:1096:101:5a::12)
- by SEZPR06MB6088.apcprd06.prod.outlook.com (2603:1096:101:ef::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.9298.16; Wed, 12 Nov
- 2025 03:45:23 +0000
-Received: from SEYPR06MB5134.apcprd06.prod.outlook.com
- ([fe80::6b58:6014:be6e:2f28]) by SEYPR06MB5134.apcprd06.prod.outlook.com
- ([fe80::6b58:6014:be6e:2f28%6]) with mapi id 15.20.9320.013; Wed, 12 Nov 2025
- 03:45:23 +0000
-From: Jacky Chou <jacky_chou@aspeedtech.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
-	<conor+dt@kernel.org>, Po-Yu Chuang <ratbert@faraday-tech.com>, Joel Stanley
-	<joel@jms.id.au>, Andrew Jeffery <andrew@codeconstruct.com.au>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-aspeed@lists.ozlabs.org"
-	<linux-aspeed@lists.ozlabs.org>, "taoren@meta.com" <taoren@meta.com>
-Subject: [PATCH net-next v4 4/4] net: ftgmac100: Add RGMII delay support for
- AST2600
-Thread-Topic: [PATCH net-next v4 4/4] net: ftgmac100: Add RGMII delay support
- for AST2600
-Thread-Index: AQHcUjKRp/5wUPPeG0Wo2Pz9fS4A+7TsCtCAgAJeVpA=
-Date: Wed, 12 Nov 2025 03:45:23 +0000
-Message-ID:
- <SEYPR06MB5134EBA2235B3D4BE39B19359DCCA@SEYPR06MB5134.apcprd06.prod.outlook.com>
-References: <20251110-rgmii_delay_2600-v4-0-5cad32c766f7@aspeedtech.com>
- <20251110-rgmii_delay_2600-v4-4-5cad32c766f7@aspeedtech.com>
- <68f10ee1-d4c8-4498-88b0-90c26d606466@lunn.ch>
-In-Reply-To: <68f10ee1-d4c8-4498-88b0-90c26d606466@lunn.ch>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=aspeedtech.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SEYPR06MB5134:EE_|SEZPR06MB6088:EE_
-x-ms-office365-filtering-correlation-id: 8f473c3a-84dc-43ea-d427-08de219de8dc
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|7416014|376014|366016|38070700021;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?8Je+0FVGvFLMRbHkMqPwmglCztHUb0Y2iZy8osQ215PwESZ4YuwyB3BhZ8jC?=
- =?us-ascii?Q?TqPvJll/W45H/HbE86gEnYHV8CrJ8i//EqUoBVJF5sn046q/y9UDSHc55E25?=
- =?us-ascii?Q?gEiikIZanKuo84ziADp2PAV3xX5HnoOzZJn4gpXTJULmAiAScUpGFCfVLmjj?=
- =?us-ascii?Q?0O/tBPAtZK6n3iFYcZK2FbVnPYke5XZvlRU8k4WCDe3ojV8+2z7dnulK+cVm?=
- =?us-ascii?Q?VibT+ruuPCPKVxjjS0WCqNo6Pi3LM2Tce6M+EpMZy7vI7/gzRXsZ3R6UjNmI?=
- =?us-ascii?Q?x1SMsdhUMsOl7Ibs/yM7bEwMk7ELBjJM2jBkQC5YMPlShQYyhvw+ZoSgAme7?=
- =?us-ascii?Q?4GrRvoK7nvAl38CivaOTd1B9xjsGLL5P5q9cu9q93OJlMmanmbUpILfpdrnZ?=
- =?us-ascii?Q?Olt46vDwst7CcvO6eTYHUWR1gFkfSbwtugAz993XZTloMwgpm9eD/hFPIMxq?=
- =?us-ascii?Q?4VN02bOzqXR+J3cDWWoKQyYbeY+6cG5OMa4wdtzzfIZKwHDev1/9DcAQEQvw?=
- =?us-ascii?Q?jzO8/vhTwjUyhqvvwmfbDTm7McCrjSpEt5TnLetg15Z2tgcJTLZnwgXMKcPa?=
- =?us-ascii?Q?bav8Rlvo/5gaBgRwz4q56Dq2HGziA2dr8h+4vtG7O5X8gb9E8LKzFXeOGUmq?=
- =?us-ascii?Q?Q7+AgwF6kuQlPVGg20EhxxU9QGUpNInbI+889fXRhJi2iIpbVUw+hBnS2v/8?=
- =?us-ascii?Q?GB1bt6DJEplvjUPNR1JGCzUmdEz4SbqOuKHH7hkKnSggzq541OlZaX4VsKWi?=
- =?us-ascii?Q?CLvOhGCLBrb0CfTQuBhAHPQHfXRv9AIc6tOhfJBiRjajcs8ppLU207v+iDLv?=
- =?us-ascii?Q?1zeLSAFFTT5BynSn1r49dtlGlqkcSY00rbvExAWHbsaFrKgGYDV0ChzupSpw?=
- =?us-ascii?Q?5IeIVR6mXFtafp4OWbkyBq0HIkK4iuQ14QHExlDHODhXZGzvsGzBLw0bf4LS?=
- =?us-ascii?Q?+yDjlSf11Y8MfM8Gtz1ro+lUfLFwb6CFukKeonqk2ANoGK2y1+8FXQr6Hf/i?=
- =?us-ascii?Q?/XIXL4ZqLJYajLQHxKAt0bJAsIhNja0d5bXUoyJDrcgELkrmFa5yUp8wjy+X?=
- =?us-ascii?Q?HyiAaPDvJtyHU582JNjjVIKD7ieOJQc9FOxoTHD3sQ/v87EOfuuTJGAUp1ib?=
- =?us-ascii?Q?o8zAHwNtTUIAO354s/kAuUMQMdmZe2yAI0yhYUNM8W/q+Lm3sncvWU42scyw?=
- =?us-ascii?Q?AhTJU6SulMkMNA6VisHz+ft86+ZWy3sFhb/pVifnioxDuIEhYODZofs81I6R?=
- =?us-ascii?Q?I/Nb6tyy6SvfhNxw1yD1t7XqIIgnv0F1GUW8Z66zmVc4fN2xyRefTs2S0OV/?=
- =?us-ascii?Q?0uwBgqS8Fu1BI2onqA+HDn3jzoiFyeNZUGUxYhTUk5t7S9RBEgpfpS6ZQfDr?=
- =?us-ascii?Q?nqfGhXJXluoVMj5tGV+aO58c1qCdeZvWKjp4A7lRl2JPxOZ5qrTFaBG8KSM2?=
- =?us-ascii?Q?T3TnFetbmeR80HMOdOVbB577ammlrpG4o/BjPdhs916VMQL5lUVy3FlQpjLe?=
- =?us-ascii?Q?yWmwtrPUwSDShGO37r1rN11REdxP3EQwCJjU?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SEYPR06MB5134.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(38070700021);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?BXe9MwUTkPdqAUb46W8e4cXxcpo5YucZCiEL/lHG7n+7BhURvKfCTjQAOM1J?=
- =?us-ascii?Q?f/nSR6zjNWniLa4fcHyFjPBEcba8ERCbcOwv7L/Lk4nTlwalBumUaMnUmUK5?=
- =?us-ascii?Q?0oFHYkG4pUKEwsJmqtpj7qL2wp5HR1/zSQOxbi312ZsqeiDae+5MGC/DwMer?=
- =?us-ascii?Q?fMTWMeYteWLLN22kOD1/PyKymvXTgkYqWZIQhdhi++euGWDNo+3ZkLPKO9eV?=
- =?us-ascii?Q?cwEBRnQ/Z1I+hxGtzNGN3w0pVVP2wr6eaidSjyg+Jer+pWwvOMGg7y07Co12?=
- =?us-ascii?Q?8Q82axi4sCshEwUa36eDK9J55q3ZVXj51Z7o24XEDtFxvjbLQ2FMxnUqDpNl?=
- =?us-ascii?Q?kRbqZeE2WOPe0/He2mu4Bt8VC9OefD6yICVLodikG+0oASXnPPdN5KHN0fKS?=
- =?us-ascii?Q?imlg7mxc7jDx5MkzAv37E95VkydaF5k9d29viP79PPLS1cp4nj6CaCdnn7Ap?=
- =?us-ascii?Q?L9tiQrlrPbJyc8wy2mMLmkKIkoaArE+slP3PuZphRuDpRVe98fL3AHwRsn8n?=
- =?us-ascii?Q?r9E66Uzv2J3HiqdQk+5pd8lOihV7KBAYuUWxd2fyUa80NT+ZwX/dgWU8Mja7?=
- =?us-ascii?Q?ePV26bSBEiwvsQPNn9LILa3Ari7sWZMXFgUhVcYsoRLJc1xDZIKrKKC7yWh7?=
- =?us-ascii?Q?uLB7SvB/B3G64zfcZPFZUccFL9NWKjauNDczzzcuTHmKlB/e3uiAbygOjoQb?=
- =?us-ascii?Q?7fALs4dYIOzQhkjE3VfNLmk64LRqjqZNfbcdFUwYeFmAp+6Cx4boqOZNg8/p?=
- =?us-ascii?Q?s5jS7bcBoMCCHm47d1xTYpA9nnFa/NbMUxPquKnl/q3gINXDFknpQgkcdv8Z?=
- =?us-ascii?Q?9DSI3xxwsngYGb6r/cvsiLtrwvcMzhIqborO9QFzHViNol2umOAyHCo2OTYB?=
- =?us-ascii?Q?W9tQF1fYvNqmxEWsyKIpjlIxrU64ItLfdajleXhJSO4NemKGtNIB8zXR4uQN?=
- =?us-ascii?Q?15prZeF/nfuYOvKxcsnTcfbB8p1iN6uXeWP2vcKDz3J5UR0qwfE7yRpnIMtL?=
- =?us-ascii?Q?VzobaNMA9Zs060U3TGNa1GsYUt2xcdnToGcswrfQOTOMJ2diPwqbxCrUSRPI?=
- =?us-ascii?Q?QVGhwfoi++agGLp3DUqJkWic+QM/PipIgOwfGHVMMtTZqBAysgXkBxQEF3pL?=
- =?us-ascii?Q?4eqmGuE0nvOf5PKYzUWB811mghjWUKTF3h0Mwee/kqcp2FPcbPy8tKskmV42?=
- =?us-ascii?Q?/NyJHU1CJjviSCRHQeIKmbx94f69ZJXAhfiq4lv4MkAT0iLRHeCUGv1vVqgc?=
- =?us-ascii?Q?dFBS9mNyCuNmR2WDV4A1XWeiF3CYGgKXD88NyLDY1JwU5ayoFpa+qiyqTUhN?=
- =?us-ascii?Q?qLiYYRa5+NuUk0ajHDhndx1OdyrOo9ZobWHQy30hrfj9svKkiRk2pPvm94P3?=
- =?us-ascii?Q?skPR3WpsDh7BGDF+w0gWQN10QQUGXVLUE7mfhDzd6tIESqSXtpi5sJLM9Wji?=
- =?us-ascii?Q?7T4aWwwfnXlWjg4Eh3jXDYNxKjoTxcJYemG79a8fcxKeDtaRFtQ6x3kXcA3S?=
- =?us-ascii?Q?IGlYJI66DONzwxOm4VJ5bIH2XnTe/d9U044D3i/cSemk3APPBfsuOcP2lFS5?=
- =?us-ascii?Q?cDM+JT+LpAM8N0EWMLw/qCb7K0sFk1NspuIcJArB?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E6CF1DE8B5
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 03:49:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1762919352; cv=none; b=CEbAUT8YSjkRXZIpF1a6JkaJ23Le0+zOUpPGNZfClOsZ4RODcvHsY6eSyqDLhUhtHPKwZ5YDaed4uUTGl+VwKFgp8zovq7RB4225vBJIgmdb8Ca2vcbPFrm1razdev2bPiUJd9Pw9ik8AKnJQMGYvhQ3mmjGMuzAbeHEEYT3Yic=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1762919352; c=relaxed/simple;
+	bh=Q2l5zlCZ7FCDU8QIZlCsM68JImgcEXzwIGSEqEutYXE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KOAPsHguWSq3oLRc3zyMQObEbKZLMW4UukoWpq3dzmhnk/LNsgHaqeVBDNjNV5CJaigl1Eu8IUlv2sgDxCcj2F3XPEGMtJoSnKVaBXCBKEciwcXzWVST3wDAItfwG09BDVLTpQx4PvegZ5wCNiv0p75HjyOPMx8v8JzkG6nZqpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EOuR5qiQ; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-298145fe27eso4277805ad.1
+        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 19:49:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1762919348; x=1763524148; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xl5bz9l18gUMHjozAgMW1FH8sHXRwkJVM8xIbme4eWg=;
+        b=EOuR5qiQwudEjaYBK2yf/F3+cwuJPXrx4mLpPT1eMy99LAZcadiD7+vLUp6kjnCjec
+         a0YQx82AOY9nWHTQuIGHnwon/Nmb2TnZaKjBlob9OQR6EIageNjK8i6JPSusSpd4Hh3+
+         l+MyGkU9nra0BlroLCvizOZydyash9yTpuEcmh1k5CqKKFipLYDZu/bC37wYD4ktRZB5
+         hWt+3Bl41I/IR8K7DM9KdnT+7ssUlDAYy/yWD8BhR0fZ9W6xTxPpb/y2zeA5B/mQEZgA
+         KtLoX8pgnRulQOVY6DbTTOFYDjuKWWkIUgZRLdS473YfztbYcNu8oMP7kpiw6RpvZTGl
+         Xp+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762919348; x=1763524148;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=xl5bz9l18gUMHjozAgMW1FH8sHXRwkJVM8xIbme4eWg=;
+        b=NV49KThRixH5yMl0VqOulcAHYALQzeo+yHPOb7rZHmKBezNMJb73ER8B2pvhKPDtMX
+         zGZWQfylq4gp2vF9WBVA/MXib43MHhqkD1G7iLAphyryCHhT9zs7P0JK+rSDxHw3UKNB
+         am8S4xuU2ez+Jawgd/u+XPIfJvevMLeEp4bnvCYjCHROLmtsEPFaJKX9+AEnaSUyEon1
+         GyYtjTf1lFjpQX300/jiKSHPwjcHHigK2avWd57iqIhUcfPJnlZjhiCWovh6aZ2tHKNB
+         N29AmwwpwjUHHCYiP2iHaNEIUEQ/zKLw3DZkkDYXACU/1hv/clNpWcP9PFGABd9g7h1m
+         dYMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVsnxDvhT/At/SuOhFeunQx9va5iRy3+Hsi0treKUzvC+3O8slhs8Su+abbxb6VMpN7BKdYzTo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyAVKPDYz2oEP91VF9i7qBvMklgMNQ3sE+tgPaZRPARIdPuWfHw
+	+s4R5FPfLOg0frOUuHW8HHiTnx/3iDUCLuGQtgXPk39mpcbH2JLDGDqDkCtM8W2evzQguuM8SK9
+	AN1z4hvVNeEbfLp0xeuKdMSMQYQoD8VlaWY9gtcLI
+X-Gm-Gg: ASbGncvX3vvs72raNajOkA7Bh3iknijV+ZL66Fc4mw2Xi2F5EeO20OXZvonlH1zLcRj
+	c/u8gferzyVOJXPjo0jiyF/0JEGwYp1UAabM+EnSR+o+izsAqGxv9CvMlWxMQDDTn6pC5A4dfwe
+	96h4B83eBBXKmSt2R0w8EOJp39jJatyxRhVyGwbRsyy+JdO/yjHc1tS2OjUcHMuSZQuKBgbYrTG
+	NsL6acnFLFZuii7s+lLy2enj9QQcg0gf4cYg5ys0WZTFPwDKniRM3iRCRN2oKNornJNLNR3OkWS
+	vRu63kTRZhVtw0O0uxTNlR9kVFzWChACEcRrN90=
+X-Google-Smtp-Source: AGHT+IEWFQGvRzmLS/N4HSZcLtU6qcOMbA11o7ZpmqpIAJa0d40w6VUsOE6JiUb4JwMVV3n5KsbaCopmdrftgRLN0BQ=
+X-Received: by 2002:a17:902:ce83:b0:295:9e4e:4092 with SMTP id
+ d9443c01a7336-2984ee05655mr22604605ad.56.1762919347616; Tue, 11 Nov 2025
+ 19:49:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: aspeedtech.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SEYPR06MB5134.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8f473c3a-84dc-43ea-d427-08de219de8dc
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Nov 2025 03:45:23.2984
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43d4aa98-e35b-4575-8939-080e90d5a249
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: kNl4FaijuCtWz1GzwmzK0WDM+2Gr8JW6vHJiKLFEiQMP7OOjGlqmhEyA6CTBb5C8wdgUDPmAL/uNUfwihnGTmAHuZ0vZcHUr2fBd9jE7gg8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZPR06MB6088
+References: <20251106071050.494080-1-kuniyu@google.com> <aRJJaCVk181ErQWJ@pop-os.localdomain>
+ <CAAVpQUDi8hLHa6nps9PyNbxqLUEm4znO8xF8M=rER5UAEN7ghw@mail.gmail.com>
+In-Reply-To: <CAAVpQUDi8hLHa6nps9PyNbxqLUEm4znO8xF8M=rER5UAEN7ghw@mail.gmail.com>
+From: Kuniyuki Iwashima <kuniyu@google.com>
+Date: Tue, 11 Nov 2025 19:48:56 -0800
+X-Gm-Features: AWmQ_blMwCXO_hOrZTBHrD3s9de6uaaehNcBSSAUkMC1mSEHrAzTpvNL0EZY-vY
+Message-ID: <CAAVpQUDxg_BjyJ5ZPYAwCiWwZ=pgb4x+uymc=x_yPs8_hiSbzw@mail.gmail.com>
+Subject: Re: [PATCH v1 net] net: sched: sch_qfq: Fix use-after-free in qfq_reset_qdisc().
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Jiri Pirko <jiri@resnulli.us>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Paolo Valente <paolo.valente@unimore.it>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	syzbot+ec7176504e5bcc33ca4e@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Andrew,
+On Tue, Nov 11, 2025 at 7:07=E2=80=AFPM Kuniyuki Iwashima <kuniyu@google.co=
+m> wrote:
+>
+> On Mon, Nov 10, 2025 at 12:22=E2=80=AFPM Cong Wang <xiyou.wangcong@gmail.=
+com> wrote:
+> >
+> > On Thu, Nov 06, 2025 at 07:10:49AM +0000, Kuniyuki Iwashima wrote:
+> > >  static int qfq_change_class(struct Qdisc *sch, u32 classid, u32 pare=
+ntid,
+> > >                           struct nlattr **tca, unsigned long *arg,
+> > >                           struct netlink_ext_ack *extack)
+> > > @@ -511,6 +541,10 @@ static int qfq_change_class(struct Qdisc *sch, u=
+32 classid, u32 parentid,
+> > >               new_agg =3D kzalloc(sizeof(*new_agg), GFP_KERNEL);
+> > >               if (new_agg =3D=3D NULL) {
+> > >                       err =3D -ENOBUFS;
+> > > +
+> > > +                     if (existing)
+> > > +                             goto delete_class;
+> > > +
+> > >                       gen_kill_estimator(&cl->rate_est);
+> > >                       goto destroy_class;
+> > >               }
+> > > @@ -528,40 +562,14 @@ static int qfq_change_class(struct Qdisc *sch, =
+u32 classid, u32 parentid,
+> > >       *arg =3D (unsigned long)cl;
+> > >       return 0;
+> > >
+> > > -destroy_class:
+> > > -     qdisc_put(cl->qdisc);
+> > > -     kfree(cl);
+> > > +delete_class:
+> > > +     qfq_delete_class(sch, (unsigned long)cl, extack);
+> > >       return err;
+> >
+> > Is it better to just call qfq_delete_class() directly? Two reasons:
+> > 1) It is only used by this code path
+> > 2) It reads odd to place a 'return' above 'destroy_class' label below.
+> >
+> > And, what about the error patch of gen_new_estimator()? 'existing' coul=
+d
+> > be true for that case too, which I assume requires the same error
+> > handling?
+>
+> Ah right, the path also needs qfq_delete_class().
 
-Thank you for your reply.
+Oh no.  Just to be sure, I assume you meant
+gen_replace_estimator() (and gen_new_estimator() in it), right ?
+Otherwise 'existing' can't be true for the other gen_new_estimator().
 
-> > +	/* Add a warning to notify the existed dts based on AST2600. It is
-> > +	 * recommended to update the dts to add the rx/tx-internal-delay-ps t=
-o
-> > +	 * specify the RGMII delay and we recommend using the "rgmii-id" for
-> > +	 * phy-mode property to tell the PHY enables TX/RX internal delay and
-> > +	 * add the corresponding rx/tx-internal-delay-ps properties.
-> > +	 */
->=20
-> I would not say that exactly. Normally you don't need rx/tx-internal-dela=
-y-ps. It
-> is only requires for badly designed boards where the designer did not cor=
-rectly
-> balance the line lengths.  So i would word this such that it is recommend=
-ed to
-> use "rgmii-id", and if necessary, add small "rx/tx-internal-delay-ps" val=
-ues.
->=20
+In case gen_replace_estimator () fails, we just return an error
+without destroying the existing one because we can still use it
+without reverting gen_replace_estimator().
 
-Agreed.
-I will update this comment in next version.
-
-> > +	scu =3D syscon_regmap_lookup_by_phandle(np, "aspeed,scu");
-> > +	if (IS_ERR(scu)) {
-> > +		dev_err(dev, "failed to get aspeed,scu");
-> > +		return PTR_ERR(scu);
-> > +	}
->=20
-> This is an optional property. If it does not exist, you have an old DT bl=
-ob. It is
-> not an error. So you need to do different things depending on what the er=
-ror
-> code is. If it does not exist, just return 0 and leave the hardware alone=
-. If it is
-> some other error report it, and abort the probe.
->=20
-
-Based on this for next version, I want to move the "aspeed,scu" from dtsi t=
-o dts.
-Change it to optional and accord it whether existed to decide it is old or =
-new DT=20
-blob.
-
-Thanks,
-Jacky
-
+So I think we don't need extra error handling for that case.
 
