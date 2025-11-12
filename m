@@ -1,97 +1,123 @@
-Return-Path: <netdev+bounces-237801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFE28C50541
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 03:20:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1EEFC5059D
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 03:36:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 037983B25A2
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 02:20:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CF633B250A
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 02:36:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F8751917F1;
-	Wed, 12 Nov 2025 02:20:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="giOWRU/W"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7C47298991;
+	Wed, 12 Nov 2025 02:36:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from r9204.ps.combzmail.jp (r9204.ps.combzmail.jp [160.16.62.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65DF922301;
-	Wed, 12 Nov 2025 02:20:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A030035CBDC
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 02:36:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=160.16.62.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762914040; cv=none; b=llJ3xmS9rNc6EKVzmjBQklodmbsqgCj0X1WesMfvDB+vy9TGa6+JSDqtvJZgkT4a+Aa8tgdFhhoyXVdQUWA2nwl6UQV0e0yP9Ey9pMntswBukkOn857fw6jYLfvb72N347Lhz8loS6UMf7tipQjnvjB685S3fNubYEbMa2nSlXE=
+	t=1762914976; cv=none; b=jRqACBngiN5PCHmHiglQG3WCGOfAP1q7uuxeCmWwc4boC1+r4FXAdqOcmI/A4Ig4ElzrIazrZkheI4EtEYhIZPopUD5MAOVpTdq4q1kpRTjxkGXUvc0Y7XMrjsGIqcBrdKS6cnyQcuUatTCpWgk8zM/4S9Ufyp8xzDxOslSGKqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762914040; c=relaxed/simple;
-	bh=PKFt6Yalq58XwDx0B7O/4lvJWYHogc48BPfJjedBd7M=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gdui62P28Tcp4wCuWSCS5kylgzph36jv40HSEd05DOq03lvCioV7eIFm85DSbqpDVN91okQ7IdKkVo3cn2cotnholA4w0NN1JLn9ilFJZ3FcUiGCksV4O/c2dWlz0WnIQgGPG5ddz33/lqvQHoJoukPFXbFeZeq0QYE2PbA2/Zo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=giOWRU/W; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB561C4CEFB;
-	Wed, 12 Nov 2025 02:20:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762914040;
-	bh=PKFt6Yalq58XwDx0B7O/4lvJWYHogc48BPfJjedBd7M=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=giOWRU/WSP2OMU59905oSZ9RuACnDeC40ubBUVrWy9edarQsNyto/s+2ayQkdgAGs
-	 HZy66tFZQUl1Q9GpT1AZt7Um8f4D7dyEFGTITIS+EXsRdNOgpEDzRr41Ef1o1gp3Mr
-	 1KUo4nllZMwoatg3e1O345bWADAXXbMbonDuyvUJRvsTY8Tf+z9xHl7ZlfV2q5lUjR
-	 8MqyQe/lvAK9aHU5F+6tofYjNdrM0mz3sP5tt3NNQ1qexba0afJpEPiDmWrwrzHZSz
-	 /u9wdGoIdfcjrZFAANWpHy9B+KZPhu096pYqe08etjdcEi6FibAldL8eJP/5d5/Z9H
-	 Edff8NmTBLgcw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E47380DBCD;
-	Wed, 12 Nov 2025 02:20:11 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1762914976; c=relaxed/simple;
+	bh=okEnYFBMjoPo+i4RQRYTcj/jfvTJ/HRJDOaMy79sJMw=;
+	h=To:From:Subject:Mime-Version:Content-Type:Message-Id:Date; b=aKfggth8WV2mYPIIfsdkgGGFMVTm+56qHzXx1iRxw4fCpr0kwxTuJYT2pA/9U97zgTD48hQ1PzOCv+J9m4eO1fGneTXgL8CvFamnUV2U4GvLN9MUdGqvJi9B+YS1472ZLINZdhfY541oaIFP/Ie5Lp9jYpZurzGIGdb+/GWltJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fc-session.jp; spf=pass smtp.mailfrom=magerr.combzmail.jp; arc=none smtp.client-ip=160.16.62.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fc-session.jp
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=magerr.combzmail.jp
+Received: by r9204.ps.combzmail.jp (Postfix, from userid 99)
+	id A50341030C4; Wed, 12 Nov 2025 11:24:28 +0900 (JST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 r9204.ps.combzmail.jp A50341030C4
+To: netdev@vger.kernel.org
+From: =?ISO-2022-JP?B?GyRCNjUwaSVVJWklcyVBJWMlJCU6JTslXyVKITw7dkwzNkkbKEI=?= <info@fc-session.jp>
+X-Ip: 267008555586481
+X-Ip-source: k85gj7ra48dnsa5pu0p6gd
+Precedence: bulk
+List-Unsubscribe-Post: List-Unsubscribe=One-Click
+Subject: =?ISO-2022-JP?B?GyRCPi87UjI9JE9ESSQkSXchIzwhQCRCZSROGyhC?=
+ =?ISO-2022-JP?B?GyRCNjUwaSVTJTglTSU5GyhC?=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net: sparx5/lan969x: populate netdev of_node
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <176291401005.3638373.13399980583922372117.git-patchwork-notify@kernel.org>
-Date: Wed, 12 Nov 2025 02:20:10 +0000
-References: <20251110124342.199216-1-robert.marko@sartura.hr>
-In-Reply-To: <20251110124342.199216-1-robert.marko@sartura.hr>
-To: Robert Marko <robert.marko@sartura.hr>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, Steen.Hegelund@microchip.com,
- daniel.machon@microchip.com, UNGLinuxDriver@microchip.com,
- horatiu.vultur@microchip.com, rmk+kernel@armlinux.org.uk,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, luka.perkov@sartura.hr
+Mime-Version: 1.0
+Content-Type: text/plain; charset=iso-2022-jp
+Content-Transfer-Encoding: 7bit
+X-MagazineId: ra5p
+X-uId: 6763325040485967654270211015
+X-Sender: CombzMailSender
+X-Url: http://www.combzmail.jp/
+Message-Id: <20251112022441.A50341030C4@r9204.ps.combzmail.jp>
+Date: Wed, 12 Nov 2025 11:24:28 +0900 (JST)
 
-Hello:
+　
+　いつもお世話になります。
+　
+　少子化が進む中で、多くの企業が 「教育市場は縮小する」 と考えています。
+　
+　しかし実際には、一人あたりの教育支出は年々微増しており、
+　教育業界はむしろ堅調に成長を続けています。
+　
+　今回は、地域貢献と収益性を両立できる
+　次世代型の教育事業をテーマに、
+　
+　新規事業での収益づくりをお考えの法人様向けに
+　オンライン説明会を開催いたします。
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+　11月18日（火）16：00〜17：00　オンライン開催
+----------------------------------------------------------
 
-On Mon, 10 Nov 2025 13:42:53 +0100 you wrote:
-> Populate of_node for the port netdevs, to make the individual ports
-> of_nodes available in sysfs.
-> 
-> Signed-off-by: Robert Marko <robert.marko@sartura.hr>
-> ---
-> Changes in v2:
-> * Per Daniels suggestion, set it directly in sparx5_create_port()
-> instead of doing it in the dedicated netdev registration function.
-> 
-> [...]
+　　　　　◆フランチャイズ事業　WEB説明会◆
 
-Here is the summary with links:
-  - [net-next,v2] net: sparx5/lan969x: populate netdev of_node
-    https://git.kernel.org/netdev/net-next/c/fc6aa0e470e0
+　　　　　“プログラミング教育×個別指導”
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+　　　　　 不況に強く、少子化でも成長する
+　　　　　　　 ハイブリッド型の教育事業
+
+　　　　　　　　　▼  視聴予約 ▼
+　　　　　　 https://wam-edu-fc.jp/wam2/
+
+　  　　　　　　　◆　ご案内事業　◆
+　　　　　　　　　　 個別指導 WAM
+
+　　　　　　　　　◇　　 提供 　　◇
+　　　　　　　  エイチ・エム・グループ
+
+----------------------------------------------------------
+
+　『少子化なのに、教育事業？』と思うかもしれませんが、
+　実は子ども一人にかける教育費の増加に伴い、市場は成長し続けています。
+
+　また、教育費は不況時でも削減されにくいため
+　コロナ下でも大きく落ち込むことなく底堅さを見せました。
+
+　幼児教育無償化などの国策もあり、今後も教育投資の増加が予想されます。
+
+　そこでご紹介するのが、「プログラミング×個別指導」の
+　ハイブリッド教育事業です。
+
+　プログラミングは小学校で必修化されたため、保護者の関心も高まっています。
+
+　本事業のスタートは業界未経験・社員１名で可能です。
+　新たな事業収益づくりをお考えの方は、是非ご参加ください。
 
 
+　11月18日（火）16：00〜17：00　オンライン開催
+　▼  視聴予約はこちら
+　https://wam-edu-fc.jp/wam2/
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+　教育事業FCセミナー事務局
+　電話：0120-891-893
+　住所：東京都中央区銀座7-13-6
+―――――――――――――――――――――――――――――――
+　本メールのご不要な方には大変ご迷惑をおかけいたしました。
+　今後ご案内が不要な方は下記URLよりお手続きをお願いいたします。
+　┗　https://wam-edu-fc.jp/mail/
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
