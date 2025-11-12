@@ -1,156 +1,147 @@
-Return-Path: <netdev+bounces-237887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237889-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B6B9C51347
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 09:53:42 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9A81C513AD
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 09:58:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DE083BB13C
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 08:50:28 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 1D64E4F6E08
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 08:53:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47B752FFDDA;
-	Wed, 12 Nov 2025 08:49:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64D992FD680;
+	Wed, 12 Nov 2025 08:53:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="OiWs0GN9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D2F52FD672
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 08:49:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 265E12FD7B4
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 08:53:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762937384; cv=none; b=GBFRxaTE6IMf8g/OfpAZcvEAmT5kVRtbG650RawlQ32LYZKsmdwDLVY7cL86iEsuDy/RGyfrPXaMkeKgmUUL95RvnzE7gDs5jN705Pxn5KlVqN9HPoVrt2K87VrER0hs2S5yWAmhDKkj11LnV7McXTcvNMp6n5MuVYM8m3+ZzLA=
+	t=1762937621; cv=none; b=Cw9rbfmwGR83BqYFaEnq249Jcbp7GYjNDG9x+T4X5alTbgMMWjqp2Ms39iAltRIfhOt3Op5/673KEjtaWpSWdl5uiTxFZodziNA/PcfLRWsqh7LPsa7qHAdivoDXKBLq5k4yjUixA06QeTNmQ/cPEk3LQbOIaBKfo+OekD57o9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762937384; c=relaxed/simple;
-	bh=GEPcxScTlNQXWLN1NkRTChaD1+/VaqI0xZxACdHRNZA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XBH4zACCNiBNMiYAzg699bICNLOMnPDxMroa2WtdXd3z5AQ0zMbLLTevEegOzcJ91CIvAXnw4OaqvhZ8hz2cS5JUPa2vQi0ih19hSAltB6eoPVLJR1jhAoGdpNiJGSbCQayBzGfjW3me8h6TEWXwJvXoPEfWOWjcy7u97EYvbIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.221.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f173.google.com with SMTP id 71dfb90a1353d-55965c96fd7so167965e0c.0
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 00:49:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762937380; x=1763542180;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QRuYUt97/AAYUOVBqnw5NKTwDWHex1IdJ959zTzv1gA=;
-        b=bai7RI1AcUuVBjzGv6h3YOjqCOPHZ6is1XJ1mVKJa+JsSvUnT9NHXScBRk3PXMGo7b
-         5lxqCBO+403C6cKQK+285ULPnY7iVFlznkWRpcE4huIO2W1XzKcsVuQj6OAqsEsrWF47
-         PE/o86fJ14VYaEr6c6jlMoFIVQGg+58BRKKioETB7Do+M+caBh41BRZAgJFgD5UwUpWJ
-         E1kYXG6jlp8mDnUNitHTmRkFXBKgr+QaloS7kz76zTwNwRK+oG8EakecgoOtWMmoujq2
-         T2lwPC9HCJz/qZS+fj+SxyZ8cvSfaJfMdx0F8i8veu+IUxntguJFVJvQ38UCn+KoKCoL
-         B70g==
-X-Forwarded-Encrypted: i=1; AJvYcCWbVPS8giN1xDH+9lnMG3wdl98n5nReGSIdejvCJP5ei0cSiyNB4CQIyJLIpnn95HPnH5n7oFc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6pLovEpT0AV0HNB/VDfwQnrKfWTNtyGs+BlcZJPYJ3bjShnBL
-	ycgTM10aZk7M+9dYXXfWLvEVj/KPo/EFhLGwUaOSI4Osv5eylPB6/1A2Z2GjVDnZ
-X-Gm-Gg: ASbGnctiiUEoWkdLYsy8OAlwZiyTA0uTBQWAsiG0Gi+9lnTxMYIkuZJfTe6zt08FbcS
-	YrdPp2p4wb8t13BTsc83l+yzYrfkcFMeT7IU08nBJEb61wTXRn2sjT9qtm0dxPM6Wnx+ih0za+h
-	nVfk2CL1HvTuuYtIHqUBhYYhKIwpg5/7BypI6lN1F2gBK1HOzMhUJhetEufH8StUZNYYOMAZwq4
-	7vdmcEcHBQHsrPvs3foPNsHSxDi9sfAb1alBLHeocFq9ZLbSSXHE00XSYtbmOaUBHbPZ1/Lpdyu
-	JqPi4Z2PyMgf80VT5kjjD8q9dZOnxCK0WsSpLd8PctPEJeybjrb0JC50PUuxTU0roRCu5ImUgHT
-	CQ2ufDSjdmlfZcLn8QpD9JyOK/7KbNKB2+0Co0m+DwhcdySWRsv4gsinPMviphL2jw7V+SaJK4O
-	Sm34NanGLiHh/PLAnSimbDaib27za2MhXh6juwpQ==
-X-Google-Smtp-Source: AGHT+IEPxwc1KYwCpI9/S3A6cNmFwCKA5A+9kz7sm26Md/a2ZjXBVljMEyOYgGEPzQNQaLfw2NJ5wA==
-X-Received: by 2002:a05:6122:16aa:b0:54b:c83b:9299 with SMTP id 71dfb90a1353d-559e7cdd3f1mr723092e0c.10.1762937379791;
-        Wed, 12 Nov 2025 00:49:39 -0800 (PST)
-Received: from mail-vs1-f52.google.com (mail-vs1-f52.google.com. [209.85.217.52])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-559968c29a1sm9252222e0c.3.2025.11.12.00.49.38
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 12 Nov 2025 00:49:39 -0800 (PST)
-Received: by mail-vs1-f52.google.com with SMTP id ada2fe7eead31-5d61f261ebfso240293137.2
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 00:49:38 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWHWpZO5WfwUIXAcevq18elUC/HS6SrDi65HYpLI2bcgKM9DsHj4G/9jLHo7iIAr8eGpYoGbzg=@vger.kernel.org
-X-Received: by 2002:a05:6102:3a0a:b0:5d7:bb3c:d5dc with SMTP id
- ada2fe7eead31-5de07f16d04mr501696137.41.1762937378500; Wed, 12 Nov 2025
- 00:49:38 -0800 (PST)
+	s=arc-20240116; t=1762937621; c=relaxed/simple;
+	bh=YrID8xgom0oeLwXTd8gUy9iNAW09Ehe680L1mi2dhSw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=X5Dmw7xR/h2ouc5E8NYwSdUfEIx+bCfXUHchTfEnN/0Icn8v7mNCg+Ry/56hloTO957oMnBZUrfvPvgO34nNjM5Y0WkALb6Kz3BoawEv4SIeaRucaaR4CyF7H38NZPDcYGWMXce+lXWpZ2f7w5vKgaQupQKWKjtJyVBIFgyuBCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=OiWs0GN9; arc=none smtp.client-ip=185.246.85.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
+	by smtpout-03.galae.net (Postfix) with ESMTPS id 79A6A4E41664;
+	Wed, 12 Nov 2025 08:53:36 +0000 (UTC)
+Received: from mail.galae.net (mail.galae.net [212.83.136.155])
+	by smtpout-01.galae.net (Postfix) with ESMTPS id 4DE366070B;
+	Wed, 12 Nov 2025 08:53:36 +0000 (UTC)
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9B229103717C1;
+	Wed, 12 Nov 2025 09:53:32 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
+	t=1762937615; h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:content-language:in-reply-to:references;
+	bh=3RctqkjWwYDn/e1i2YI8kBYKvwlm+AX0rudk05BCUko=;
+	b=OiWs0GN9nSDRW3sLIHBv0EgA+oG1Ldegpv+eBIIdvRwxHUSWSC5kuH2E6y6qKdREVjEWyF
+	i3OCs6109YXv4KtttHG2TI28Zrm/ue71aQZhJUXb3Ox44c9PBG4PjpFXUxwPxMSboL5kHU
+	4vRhW2TyA5ttSwQsD4Dej+hPs4DugkrguSpJQ5Jeq6VZJ7cieF7b2E/cLJhXCwEwbhQkti
+	9uZTK2Xm+V/nSvok5/3zrQ01XlkRlBKiWdxY1laYyBVgdHKSEusxS14kvJqYyUTU+taKCg
+	ItGZM5gMaW/Ia/F4rHXuoF+8eiP9D71xnL4IFuiOe6RZAfgYrB8L53pDE7JMXA==
+Message-ID: <20523422-7328-4803-940c-9ef1031f05fc@bootlin.com>
+Date: Wed, 12 Nov 2025 09:53:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251111091047.831005-1-prabhakar.mahadev-lad.rj@bp.renesas.com> <20251111091047.831005-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
-In-Reply-To: <20251111091047.831005-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 12 Nov 2025 09:49:27 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdUv7tOc-QC8N_ie7739t07Y5A_6HQPMVR9fxW-jo_d9Ng@mail.gmail.com>
-X-Gm-Features: AWmQ_bnWiYGIV8O5vMXPYGxK5G9F49mp_eGvUmhrBRrD8EAR2kAYVwJHFvxANG8
-Message-ID: <CAMuHMdUv7tOc-QC8N_ie7739t07Y5A_6HQPMVR9fxW-jo_d9Ng@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 2/3] net: phy: mscc: Consolidate probe
- functions into a common helper
-To: Prabhakar <prabhakar.csengg@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Horatiu Vultur <horatiu.vultur@microchip.com>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Vladimir Oltean <vladimir.oltean@nxp.com>, Vadim Fedorenko <vadim.fedorenko@linux.dev>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, Biju Das <biju.das.jz@bp.renesas.com>, 
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>, 
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next PATCH v3 02/10] net: phy: Rename MDIO_CTRL1_SPEED for
+ 2.5G and 5G to reflect PMA values
+To: Alexander Duyck <alexander.duyck@gmail.com>, netdev@vger.kernel.org
+Cc: kuba@kernel.org, kernel-team@meta.com, andrew+netdev@lunn.ch,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, pabeni@redhat.com,
+ davem@davemloft.net
+References: <176279018050.2130772.17812295685941097123.stgit@ahduyck-xeon-server.home.arpa>
+ <176279047080.2130772.6017646787024578804.stgit@ahduyck-xeon-server.home.arpa>
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <176279047080.2130772.6017646787024578804.stgit@ahduyck-xeon-server.home.arpa>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-Hi Prabhakar,
+Hi Alexander,
 
-On Tue, 11 Nov 2025 at 10:11, Prabhakar <prabhakar.csengg@gmail.com> wrote:
-> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
->
-> Unify the probe implementations of the VSC85xx PHY family into a single
-> vsc85xx_probe_common() helper. The existing probe functions for the
-> vsc85xx, vsc8514, vsc8574, and vsc8584 variants contained almost
-> identical initialization logic, differing only in configuration
-> parameters such as the number of LEDs, supported LED modes, hardware
-> statistics, and PTP support.
->
-> Introduce a vsc85xx_probe_config structure to describe the per-variant
-> parameters, and move all common setup code into the shared helper. Each
-> variant's probe function now defines a constant configuration instance
-> and calls vsc85xx_probe_common().
->
-> Also mark the default LED mode array parameter as const to match its
-> usage.
->
-> Signed-off-by: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
+On 10/11/2025 17:01, Alexander Duyck wrote:
+> From: Alexander Duyck <alexanderduyck@fb.com>
+> 
+> The 2.5G and 5G values are not consistent between the PCS CTRL1 and PMA
+> CTRL1 values. In order to avoid confusion between the two I am updating the
+> values to include "PMA" in the name similar to values used in similar
+> places.
+> 
+> Signed-off-by: Alexander Duyck <alexanderduyck@fb.com>
 > ---
-> v2->v3:
-> - Grouped check_rate_magic check
+>  drivers/net/phy/phy-c45.c |    8 ++++----
+>  include/uapi/linux/mdio.h |    4 ++--
+>  2 files changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/phy/phy-c45.c b/drivers/net/phy/phy-c45.c
+> index 1d747fbaa10c..d161fe3fee75 100644
+> --- a/drivers/net/phy/phy-c45.c
+> +++ b/drivers/net/phy/phy-c45.c
+> @@ -148,12 +148,12 @@ int genphy_c45_pma_setup_forced(struct phy_device *phydev)
+>  		ctrl2 |= MDIO_PMA_CTRL2_1000BT;
+>  		break;
+>  	case SPEED_2500:
+> -		ctrl1 |= MDIO_CTRL1_SPEED2_5G;
+> +		ctrl1 |= MDIO_PMA_CTRL1_SPEED2_5G;
+>  		/* Assume 2.5Gbase-T */
+>  		ctrl2 |= MDIO_PMA_CTRL2_2_5GBT;
+>  		break;
+>  	case SPEED_5000:
+> -		ctrl1 |= MDIO_CTRL1_SPEED5G;
+> +		ctrl1 |= MDIO_PMA_CTRL1_SPEED5G;
+>  		/* Assume 5Gbase-T */
+>  		ctrl2 |= MDIO_PMA_CTRL2_5GBT;
+>  		break;
+> @@ -618,10 +618,10 @@ int genphy_c45_read_pma(struct phy_device *phydev)
+>  	case MDIO_PMA_CTRL1_SPEED1000:
+>  		phydev->speed = SPEED_1000;
+>  		break;
+> -	case MDIO_CTRL1_SPEED2_5G:
+> +	case MDIO_PMA_CTRL1_SPEED2_5G:
+>  		phydev->speed = SPEED_2500;
+>  		break;
+> -	case MDIO_CTRL1_SPEED5G:
+> +	case MDIO_PMA_CTRL1_SPEED5G:
+>  		phydev->speed = SPEED_5000;
+>  		break;
+>  	case MDIO_CTRL1_SPEED10G:
+> diff --git a/include/uapi/linux/mdio.h b/include/uapi/linux/mdio.h
+> index 75ed41fc46c6..c33aa864ef66 100644
+> --- a/include/uapi/linux/mdio.h
+> +++ b/include/uapi/linux/mdio.h
+> @@ -123,9 +123,9 @@
+>  /* 50 Gb/s */
+>  #define MDIO_PMA_CTRL1_SPEED50G		(MDIO_CTRL1_SPEEDSELEXT | 0x14)
+>  /* 2.5 Gb/s */
+> -#define MDIO_CTRL1_SPEED2_5G		(MDIO_CTRL1_SPEEDSELEXT | 0x18)
+> +#define MDIO_PMA_CTRL1_SPEED2_5G	(MDIO_CTRL1_SPEEDSELEXT | 0x18)
+>  /* 5 Gb/s */
+> -#define MDIO_CTRL1_SPEED5G		(MDIO_CTRL1_SPEEDSELEXT | 0x1c)
+> +#define MDIO_PMA_CTRL1_SPEED5G		(MDIO_CTRL1_SPEEDSELEXT | 0x1c)
+>  
+>  /* Status register 1. */
+>  #define MDIO_STAT1_LPOWERABLE		0x0002	/* Low-power ability */
 
-Thanks for your patch!
+This is UAPI, I guess it's too late to rename that :(
 
-> --- a/drivers/net/phy/mscc/mscc_main.c
-> +++ b/drivers/net/phy/mscc/mscc_main.c
-> @@ -22,6 +22,24 @@
->  #include "mscc_serdes.h"
->  #include "mscc.h"
->
-> +struct vsc85xx_probe_config {
-> +       const struct vsc85xx_hw_stat *hw_stats;
-> +       u8 nleds;
-> +       u16 supp_led_modes;
-> +       size_t nstats;
-> +       bool use_package;
-> +       size_t shared_size;
-> +       bool has_ptp;
-> +       bool check_rate_magic;
-> +};
+Maxime
+> 
+> 
+> 
 
-Please sort by decreasing size, to reduce holes:
-  1. pointer and size_t,
-  2. u16,
-  3. u8 and bool.
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
 
