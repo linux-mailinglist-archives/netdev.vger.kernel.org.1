@@ -1,167 +1,106 @@
-Return-Path: <netdev+bounces-237894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5342DC513F0
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 10:01:20 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8F76C5140B
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 10:03:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id C610634DCFF
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 09:01:19 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 2E0854F118B
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 08:59:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE9E52FDC5E;
-	Wed, 12 Nov 2025 09:01:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65A462ECD37;
+	Wed, 12 Nov 2025 08:59:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sdP5jmGf"
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="eBIRplON";
+	dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b="eBIRplON"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61E302BE02C;
-	Wed, 12 Nov 2025 09:01:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6DD22C026D;
+	Wed, 12 Nov 2025 08:59:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762938072; cv=none; b=IbYqAGKwh0FIc+WIaGoSRnsxDMeIwtQR++IM/bFQeC+SVB1Mv0/o1vOkvMTr6w8O6JHhYn3BODfjMQNl+yI2nd7HCQ68FH7uKHg8IiMZRZ8NDovJaaPXg8lL6liQtdl12lKZBs8kg7+LXAycG7qurliYK88PVmny8iaziEBimqo=
+	t=1762937972; cv=none; b=SfrhynyePARJm29yQjjzQQP3ioko0e9RascI+jzcZ/h2yqVERaXz3Gp36OJRaWfNsmBwpqJA3XEepkajLcKzxxd3zFvZA0KjXxuLDZmN8JmSipGf4u3z/oMgwCgXWFG+3/YZo5MBI92FVz2V3UxiZJ1orfTWfDhzSH/s9BAGIzk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762938072; c=relaxed/simple;
-	bh=NmxT3e9rVD+Vk0gwGiTwEsfo+VbVQUJ9eVtsypMNXuc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kjIRRlg54TReeS1MKEdXqZMJlYz4sTsQ14Evn9NObmG+g9VbSGcYYnj5EgTSrPT7sDHFa8coyGKrkoem+DiMeIT6HR/0UrRv7k/L1mQ9OunOXBG7JqH6rBSM+hkTbxc577N+IxKQRVERNzGp/D/mL7fm7KeRTsxGW8obojUksYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sdP5jmGf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6871C4CEF5;
-	Wed, 12 Nov 2025 09:01:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762938071;
-	bh=NmxT3e9rVD+Vk0gwGiTwEsfo+VbVQUJ9eVtsypMNXuc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=sdP5jmGfLM+SqEuBX/RsMGAmFa8GSx+5s3qlPF12YVUgFuFMpcff20Xhp8BQtu318
-	 XA2RUpFBp4/3lodTcuJD9YOxWBHcqQMk3h0u5+ME/+CzWeA+bk0+dKlaisCTBqHd6o
-	 T355kOHQKyPmjbq0GoHZQNmcLvQtYngvT4iiH2Yz4Pxoon6WrwLqGla9zLz5WNvIde
-	 cx9FOyjZdSQNY97ifMj9UKI2ssD71LcFv7Xa9qcxmE1cNFEdtAm9HMRRMZLh6u0A5a
-	 AD1vXlXRa/op+Ax2MTk3mKPyO0SMhntbfLDp2az621cBgWCihv3p++dBVMO0VEQrwn
-	 3SDY/PgaVZE9g==
-From: Christian Brauner <brauner@kernel.org>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Christian Brauner <brauner@kernel.org>,
-	linux-fsdevel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	netfs@lists.linux.dev,
-	ecryptfs@vger.kernel.org,
-	linux-unionfs@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-api@vger.kernel.org,
-	Miklos Szeredi <miklos@szeredi.hu>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Alexander Aring <alex.aring@gmail.com>,
-	Trond Myklebust <trondmy@kernel.org>,
-	Anna Schumaker <anna@kernel.org>,
-	Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.org>,
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Bharath SM <bharathsm@microsoft.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Danilo Krummrich <dakr@kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	Tyler Hicks <code@tyhicks.com>,
-	NeilBrown <neil@brown.name>,
-	Olga Kornievskaia <okorniev@redhat.com>,
-	Dai Ngo <Dai.Ngo@oracle.com>,
-	Amir Goldstein <amir73il@gmail.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <smfrench@gmail.com>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Carlos Maiolino <cem@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH v6 00/17] vfs: recall-only directory delegations for knfsd
-Date: Wed, 12 Nov 2025 10:00:47 +0100
-Message-ID: <20251112-allesamt-ursprung-7581bf774318@brauner>
-X-Mailer: git-send-email 2.47.3
-In-Reply-To: <20251111-dir-deleg-ro-v6-0-52f3feebb2f2@kernel.org>
-References: <20251111-dir-deleg-ro-v6-0-52f3feebb2f2@kernel.org>
+	s=arc-20240116; t=1762937972; c=relaxed/simple;
+	bh=PHnnkaO19JvgvLObhrULFV6oSIZSftfgUoBzbq4qieY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JETt44W6hHGAC2VhBVzOIJ8mBgTCcDExHLSOrjO9nMIl60MvuMWW77E8a0o7N3DInheZLrAU1uylAf4KbD9suxyidE13qnhbYJwJNmumy4VEX8v3bUYxPkWWX4/x9eoiJAglbJPBq4A5uaaOz2b9Mf5wtwFxU95CZ1Du0eANf3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=eBIRplON; dkim=pass (1024-bit key) header.d=huawei.com header.i=@huawei.com header.b=eBIRplON; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=DtmNzYi5JFbr/28DJPf5U2A+MzUDv+eLIejQD94XcTs=;
+	b=eBIRplONbiLFvbqtiY/JnfS9MTJXqUGJ3JsM8fbOclYjRB1894FGLq2vhdBANWzEF6ANr0j+D
+	BAPVOkFxZhOb8h9cYCyVLP06ins5W44xzJPcBLwIklyVTXYp4HNm2GcvJ+zUgw0PjXiovwTF82m
+	8NDNzoz/aHrzM3etq1Q+ZQQ=
+Received: from canpmsgout10.his.huawei.com (unknown [172.19.92.130])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTPS id 4d5y4f1Yh5z1BH9l;
+	Wed, 12 Nov 2025 16:58:58 +0800 (CST)
+dkim-signature: v=1; a=rsa-sha256; d=huawei.com; s=dkim;
+	c=relaxed/relaxed; q=dns/txt;
+	h=From;
+	bh=DtmNzYi5JFbr/28DJPf5U2A+MzUDv+eLIejQD94XcTs=;
+	b=eBIRplONbiLFvbqtiY/JnfS9MTJXqUGJ3JsM8fbOclYjRB1894FGLq2vhdBANWzEF6ANr0j+D
+	BAPVOkFxZhOb8h9cYCyVLP06ins5W44xzJPcBLwIklyVTXYp4HNm2GcvJ+zUgw0PjXiovwTF82m
+	8NDNzoz/aHrzM3etq1Q+ZQQ=
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by canpmsgout10.his.huawei.com (SkyGuard) with ESMTPS id 4d5y340cy1z1K9YM;
+	Wed, 12 Nov 2025 16:57:36 +0800 (CST)
+Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
+	by mail.maildlp.com (Postfix) with ESMTPS id E88441402CF;
+	Wed, 12 Nov 2025 16:59:13 +0800 (CST)
+Received: from huawei.com (10.50.85.128) by dggpemf500002.china.huawei.com
+ (7.185.36.57) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 12 Nov
+ 2025 16:59:03 +0800
+From: Yue Haibing <yuehaibing@huawei.com>
+To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <idosch@nvidia.com>,
+	<razor@blackwall.org>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<yuehaibing@huawei.com>
+Subject: [PATCH net-next] vxlan: Remove unused declarations eth_vni_hash() and fdb_head_index()
+Date: Wed, 12 Nov 2025 17:20:55 +0800
+Message-ID: <20251112092055.3546703-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3125; i=brauner@kernel.org; h=from:subject:message-id; bh=NmxT3e9rVD+Vk0gwGiTwEsfo+VbVQUJ9eVtsypMNXuc=; b=owGbwMvMwCU28Zj0gdSKO4sYT6slMWSK+Jx86vPs+ErnB/wb72nN1on3KMp9zX7dQSQ82GOlr L4T45e1HaUsDGJcDLJiiiwO7Sbhcst5KjYbZWrAzGFlAhnCwMUpABN5uY/hn/2qqoNLZz+dwN+8 MaJT8c46z87PsQEvsjp28yya0xLDk8bwTylL6cEuZvNOz6YbIjsbtC63ni4K0TY9cPOZxLVsp4t dPAA=
-X-Developer-Key: i=brauner@kernel.org; a=openpgp; fpr=4880B8C9BD0E5106FC070F4F7B3C391EFEA93624
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: kwepems100001.china.huawei.com (7.221.188.238) To
+ dggpemf500002.china.huawei.com (7.185.36.57)
 
-On Tue, 11 Nov 2025 09:12:41 -0500, Jeff Layton wrote:
-> Behold, another version of the directory delegation patchset. This
-> version contains support for recall-only delegations. Support for
-> CB_NOTIFY will be forthcoming (once the client-side patches have caught
-> up).
-> 
-> The main changes here are in response to Jan's comments. I also changed
-> struct delegation use to fixed-with integer types.
-> 
-> [...]
+Commit 1f763fa808e9 ("vxlan: Convert FDB table to rhashtable") removed the
+implementations but leave declarations.
 
-Applied to the vfs-6.19.directory.delegations branch of the vfs/vfs.git tree.
-Patches in the vfs-6.19.directory.delegations branch should appear in linux-next soon.
+Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
+---
+ drivers/net/vxlan/vxlan_private.h | 2 --
+ 1 file changed, 2 deletions(-)
 
-Please report any outstanding bugs that were missed during review in a
-new review to the original patch series allowing us to drop it.
+diff --git a/drivers/net/vxlan/vxlan_private.h b/drivers/net/vxlan/vxlan_private.h
+index 99fe772ad679..b1eec2216360 100644
+--- a/drivers/net/vxlan/vxlan_private.h
++++ b/drivers/net/vxlan/vxlan_private.h
+@@ -188,8 +188,6 @@ int __vxlan_fdb_delete(struct vxlan_dev *vxlan,
+ 		       const unsigned char *addr, union vxlan_addr ip,
+ 		       __be16 port, __be32 src_vni, __be32 vni,
+ 		       u32 ifindex, bool swdev_notify);
+-u32 eth_vni_hash(const unsigned char *addr, __be32 vni);
+-u32 fdb_head_index(struct vxlan_dev *vxlan, const u8 *mac, __be32 vni);
+ int vxlan_fdb_update(struct vxlan_dev *vxlan,
+ 		     const u8 *mac, union vxlan_addr *ip,
+ 		     __u16 state, __u16 flags,
+-- 
+2.34.1
 
-It's encouraged to provide Acked-bys and Reviewed-bys even though the
-patch has now been applied. If possible patch trailers will be updated.
-
-Note that commit hashes shown below are subject to change due to rebase,
-trailer updates or similar. If in doubt, please check the listed branch.
-
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/vfs/vfs.git
-branch: vfs-6.19.directory.delegations
-
-[01/17] filelock: make lease_alloc() take a flags argument
-        https://git.kernel.org/vfs/vfs/c/6fc5f2b19e75
-[02/17] filelock: rework the __break_lease API to use flags
-        https://git.kernel.org/vfs/vfs/c/4be9f3cc582a
-[03/17] filelock: add struct delegated_inode
-        https://git.kernel.org/vfs/vfs/c/6976ed2dd0d5
-[04/17] filelock: push the S_ISREG check down to ->setlease handlers
-        https://git.kernel.org/vfs/vfs/c/e6d28ebc17eb
-[05/17] vfs: add try_break_deleg calls for parents to vfs_{link,rename,unlink}
-        https://git.kernel.org/vfs/vfs/c/b46ebf9a768d
-[06/17] vfs: allow mkdir to wait for delegation break on parent
-        https://git.kernel.org/vfs/vfs/c/e12d203b8c88
-[07/17] vfs: allow rmdir to wait for delegation break on parent
-        https://git.kernel.org/vfs/vfs/c/4fa76319cd0c
-[08/17] vfs: break parent dir delegations in open(..., O_CREAT) codepath
-        https://git.kernel.org/vfs/vfs/c/134796f43a5e
-[09/17] vfs: clean up argument list for vfs_create()
-        https://git.kernel.org/vfs/vfs/c/85bbffcad730
-[10/17] vfs: make vfs_create break delegations on parent directory
-        https://git.kernel.org/vfs/vfs/c/c826229c6a82
-[11/17] vfs: make vfs_mknod break delegations on parent directory
-        https://git.kernel.org/vfs/vfs/c/e8960c1b2ee9
-[12/17] vfs: make vfs_symlink break delegations on parent dir
-        https://git.kernel.org/vfs/vfs/c/92bf53577f01
-[13/17] filelock: lift the ban on directory leases in generic_setlease
-        https://git.kernel.org/vfs/vfs/c/d0eab9fc1047
-[14/17] nfsd: allow filecache to hold S_IFDIR files
-        https://git.kernel.org/vfs/vfs/c/544a0ee152f0
-[15/17] nfsd: allow DELEGRETURN on directories
-        https://git.kernel.org/vfs/vfs/c/80c8afddc8b1
-[16/17] nfsd: wire up GET_DIR_DELEGATION handling
-        https://git.kernel.org/vfs/vfs/c/8b99f6a8c116
-[17/17] vfs: expose delegation support to userland
-        https://git.kernel.org/vfs/vfs/c/1602bad16d7d
 
