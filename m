@@ -1,91 +1,95 @@
-Return-Path: <netdev+bounces-237777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB777C501E1
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 01:19:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4BCAC50211
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 01:35:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C3743B275A
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 00:18:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FB08189651F
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 00:35:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFCEC1DE2A5;
-	Wed, 12 Nov 2025 00:18:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3C271DC198;
+	Wed, 12 Nov 2025 00:35:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b="Bza38wBF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lLRxDIeq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 380E31C84B8
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 00:18:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0499A1B808
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 00:35:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762906689; cv=none; b=DFDrPWqyL3FVFrLkGBV9FPD+VJw67xGjGMoHyySLT0VKI8bwvnObt0SMA+UUHGIT/Y24HgR6T2veqDtEU42FAkF5R/TkQUlcIgUrkeAJYm5HdPYKyusYZWrj+WEfpIiznXJFGL6KuDNAz8gPoUFyNafmcKXgHzR1DGzsQfvZnro=
+	t=1762907710; cv=none; b=exq99gCrmvpMjiAWe637rDyKzVrriAlImojRAA0b+9gXbD9DdbC1Q2j8LiJHnQF4hptIlQvCuGLBMlwJB/+7zOEcuUZby8LSTdnYjuCzVK7kBDeuR+sjEBhDqqkuIpZ0GcRmvJIgdkqOl7RQo/tucf6jk7WPLK6TaxzTtZj2M7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762906689; c=relaxed/simple;
-	bh=kUrSiXw+9BASOphE8896OeaX0ILPFEG/1yBCQcdTw+Q=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Wgb8nQeiBxZ2I1Pz/VxxBvwQCs89f2dAWgh27txd1Ldw5Y0ifSvtDee4BV/Df+jJKnR3qfBQbj64SoIWeqi2DW1UxNQn2ic5PzqMIQFXr+74KzMrkAwh72DXYWgAeQyUHQPeDHzgXJ2f9FnY8meNlW2R6zPWExrrEvlMZSFuHKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com; spf=pass smtp.mailfrom=herbertland.com; dkim=pass (2048-bit key) header.d=herbertland.com header.i=@herbertland.com header.b=Bza38wBF; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=herbertland.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=herbertland.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-7aace33b75bso250845b3a.1
-        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 16:18:07 -0800 (PST)
+	s=arc-20240116; t=1762907710; c=relaxed/simple;
+	bh=/uddJhBBzzW8L+E3X13d+vydY17/3a+z2ohQB6rVS6M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Dn3wgaS/NK4LnXwFU/aK/Kn8ZZbDvXQjhhSgrIpPnnJGC6oUSXWExSDoPHeut+666VkznEV0+6nhLTuln+DJc7vVmlIruwf2n6bxQTeva/ogPpvo7zIdKlCXw09avTv/AIwVYHmMWOCSyG67p6HLiaPt+uHeUVqFFnxiawBb9FM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lLRxDIeq; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-b733707e0b5so1818966b.2
+        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 16:35:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=herbertland.com; s=google; t=1762906687; x=1763511487; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IRfdslyxqvIb4bjNZjJVEK1Cw+XE/zO+WTGcOzJubCA=;
-        b=Bza38wBFb4ARTA1YBhWHJkeuYZA7qwNa90uBkrcD/rtmZz7t1p2xmffTMFQ/sBQAW5
-         vl0Tr52jMNfWI2XvVD86C0IzRaQIQ75XAEWhIP0lNTYHwh2n7z+zFu0E8D+wlIDrrp7D
-         SCDQ2Uny2C5TzrZV/1mtalLPuVzOO5h75kA1CmAteGCUTj/B04nyZ3BNF1w4IASB/xrO
-         RR/B64zN2x5vp82UVWEkO/3huYraG0rw0R4VGkK8GvuAeZz2+wtPngL1AtlIJK6RYm+p
-         WKPQJcKq0PKVyolYIEQZr6/P7EFgG8SDX0Ep5IKJcylmnHb17m4HlrbM1ma8loXPaK1p
-         KKlQ==
+        d=gmail.com; s=20230601; t=1762907704; x=1763512504; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q8bA5fyqCC+W6u0vk7OwR/d5lvOlTqdfez3AJaemrP4=;
+        b=lLRxDIeqpWVSjy4aNVeVN/KjYWHErAt+n6I2YfgUZK1vsm0QKU9D4XExHJWxxYQM98
+         ZCPQqfZ+bf4uqq7tU0EldzfQbVl/Ss4E4AZYLgDZ8Kv20O3WU313bIo+YD/JdSe7CVwe
+         Fwkk5tnKwmJ8BH8d5C4lwrwj4IDVQ+/+eyZUyMBlD8WGLQeim89f6UqQ60qi/KlG349N
+         mj30GspfrfyAGlHxi5n0aNCSoAWAqWowEaacIBoAJ7CZDisa6j2DIxe4ELP6JPYOgiow
+         K+yJJYUs4+LNhOgHZb4yCtyxhX/GxM5Kcb0T7BRTwr1174lfI9SKmCZ+4Z1L1GwJ/JtL
+         7XwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762906687; x=1763511487;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:to:from:x-gm-gg:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=IRfdslyxqvIb4bjNZjJVEK1Cw+XE/zO+WTGcOzJubCA=;
-        b=oEEUJ9jp5d083tH6YwPKtU+oU1wRHR3HxY75ogfLwraU1C8ISFPoM+t6eOiV2XYWt/
-         YnZ6vlBB8ejjhCsVF4t1Vu3sd0yaTKdcUGxzY/QTsn9BwnrdfQw5ubBbO/Ow+gikKx9j
-         25tUt43UoSfIvPyhgzFRkSGxV6A0Qx1C9ZsBESgl9MFvxIXGypNgLSz2tnfi2rO8iNLl
-         qBRk5n3vVvwhyKtwieKyNaQWfpDO5Ltp2A/nVB3ayS6MLzWJEJe5385+hpBbJrOrLH7T
-         ezYtv0Hu/PV5yi7V6D3oLXJT1sQGls/sDorGJUPNoA+QTEm086nQbvDRbiE30ptktOyH
-         cHkw==
-X-Forwarded-Encrypted: i=1; AJvYcCVJE2CcQkbTMO6JcE8SLRtcpIHp5yLYHhSzYDxrwLv+8baSzelp0W8rt2AUaDPak/HYfF3XJIE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhUAnqdD0PssnMbFCJbCGByM78Mj2E7MnM3SXXDrpuaWBRmGvt
-	fvB66af2CKvk7FgyyoNDQzBf1ON3Ddc94zW54qYABhXuP5Pb7GJTZZf3yUKZz3jByFakUZi0QgE
-	piJwXZA==
-X-Gm-Gg: ASbGnct7f+Mu97LUhR2qnmrig6R/ibGQkc+7jgoUfpfaODt0mz3XaNhcm/MJMBw6+W0
-	n4UzEa7y+wpTpArgIFdue5BTqjCQ4kLqO+F3bJ3s3FfCtm+IyuYJXHMbU16Hgd8+qiW5fEFdrzF
-	8BatjnJYGE/nQEjmqFzIOMQPvEu6+dLStJEXn1tV6zaSaWbDs7wfPa20w2YTWUkGWalAD0NyJ3D
-	zdqDfqvUpKZNtGzTvswOshBrMgd9lO1HecP52eXEX7HHGmrdwBqRf79ZVHSy7ZJ6c3T6WFJ6+X2
-	iK9K74h/sn//UXU3KIpWP9kXQSZMfN10KQ4MS4JsfWtxld1FC1L0t5qlkAi8IXRCdqidYwKfstB
-	oqOc3TQtaZzYm8p1RkCyQew7e3Efge3ib2NpljwlB9DXZCWyZnQBUeavn4lZNqXP33RyX4e0+fQ
-	ftYSaieOc9GwG8dghlExy6E/uWA6qiz2A2ZXZM4TdyNHc5LA==
-X-Google-Smtp-Source: AGHT+IHmI1R4gs3Q3bcaYl40SAePPr3k/kHLti58OfZIp6L6aMKJMgVxLzvviCC1uAOzpRhSRfZTMw==
-X-Received: by 2002:a05:6a20:4305:b0:33d:5e7b:2f2b with SMTP id adf61e73a8af0-3590b524197mr1129898637.44.1762906687190;
-        Tue, 11 Nov 2025 16:18:07 -0800 (PST)
-Received: from pong.herbertland.com ([2601:646:8980:b330:8c01:13c7:88d7:93c8])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-bbf1782bed9sm754222a12.27.2025.11.11.16.18.06
+        d=1e100.net; s=20230601; t=1762907704; x=1763512504;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Q8bA5fyqCC+W6u0vk7OwR/d5lvOlTqdfez3AJaemrP4=;
+        b=ead3EBVAUyDYZ53MEKi23BBQQh6DK3Na2QEFT2VgkONPP7KS4WtAdff2F2K9+xfLr5
+         ntWEXE/Rqm5KiAozjuJhNZa7kKdh+7cW6YeUvOUoz56QgqJhygfogGhBAiH5T774oSdA
+         UJpyDus5PFdIfcjjLBZomMCaS4XTIDaEXn3iuF3nGGbND6QpewSvPer7ggqz6Bk7neu6
+         /+P3XBptpPwQLDB9lh0zq+JQJM8qum9nG+TAsNgsv+wIxE8y0btZ7kfdny5rPi/spfrX
+         py3TWreO+DfaskKhjeKMtsDiAXQRGLj0m68WPwzEsyE4at0OnVShbf6JOmZi40Z0ofOF
+         YU1Q==
+X-Gm-Message-State: AOJu0YwBy4VJTMnmKod/aFiRW+7w7Yw0id3GWvBrjZLYTWtTSWlVvTRz
+	B+bWtZp+oEc1n7hS7ljGAPozE9Js4jr0PncS73n5g6jWgpyjhUsAo9+7
+X-Gm-Gg: ASbGncvVDBK4OFt+IkQLqF2TLIcEtQaVFCq0FTFPYbHAsAccO4qivhDDcq/FSITlLLC
+	t4BI6L5x5qIqmphJOxDw2r+/dIPKx7J8HO2LvcwFNk/SyuA+XsmWfzxIqqXtckoGsfzJ8n+CHuJ
+	1LLDkbRNniIEHQ/UAU0AGbORzT+u8EwSxXT/woCqR3/ifscGxcVa+uPg1TjEIs+QQH2f5OIdhKG
+	eSafno+2LvpYNju15EM5/3nvDUfd1DM7fKDJZACIf0aqFsDM5vC/9v73t0zNOzUngyiF57Rp6m7
+	PfzDHXRzEV/D+mf8RpxSQ8a7+WoWtQHu4a/NBa9v+w5kmJne94f+AsHR/b+W8m4GERw/6kaQYQ9
+	ePvV8XAhwX8aVe0jrNumKCa/BXLfB6PK4r3Nh/0M0y7WFJkonPPm/3qIIzZaAZ151YLBI/WG3KF
+	wLdrkc5onegSY=
+X-Google-Smtp-Source: AGHT+IGqrNbW7Y2frs0SjkA276j6v0NPZI9klOiEtgkLEjlg+yLRP1GOA3gr1+LqrmTZn0GT7QZWpQ==
+X-Received: by 2002:a17:907:3e1e:b0:b6f:9da9:4b46 with SMTP id a640c23a62f3a-b7331bb64cdmr106614966b.43.1762907704029;
+        Tue, 11 Nov 2025 16:35:04 -0800 (PST)
+Received: from localhost.localdomain ([46.10.223.24])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b72bdbcb0aasm1434568666b.11.2025.11.11.16.35.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Nov 2025 16:18:06 -0800 (PST)
-From: Tom Herbert <tom@herbertland.com>
-To: tom@herbertland.com,
+        Tue, 11 Nov 2025 16:35:03 -0800 (PST)
+From: "Nikola Z. Ivanov" <zlatistiv@gmail.com>
+To: jiri@resnulli.us,
+	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
+	edumazet@google.com,
 	kuba@kernel.org,
-	netdev@vger.kernel.org
-Subject: [RFC net-next 3/3] ipv6: Document defauit of zero for max_dst_opts_number
-Date: Tue, 11 Nov 2025 16:16:01 -0800
-Message-ID: <20251112001744.24479-4-tom@herbertland.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20251112001744.24479-1-tom@herbertland.com>
-References: <20251112001744.24479-1-tom@herbertland.com>
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	skhan@linuxfoundation.org,
+	david.hunter.linux@gmail.com,
+	khalid@kernel.org,
+	linux-kernel-mentees@lists.linuxfoundation.org,
+	"Nikola Z. Ivanov" <zlatistiv@gmail.com>,
+	syzbot+a2a3b519de727b0f7903@syzkaller.appspotmail.com
+Subject: [PATCH net] team: Move team device type change at the end of team_port_add
+Date: Wed, 12 Nov 2025 02:34:44 +0200
+Message-ID: <20251112003444.2465-1-zlatistiv@gmail.com>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,67 +98,90 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a note and rationalization for setting the default maximum number
-of Destination options to zero. This means by default Destination
-Options extension headers are not processed on receive and packets
-with Destination Options extension headers are dropped
----
- Documentation/networking/ip-sysctl.rst | 38 ++++++++++++++++++--------
- 1 file changed, 27 insertions(+), 11 deletions(-)
+Attempting to add a port device that is already up will expectedly fail,
+but not before modifying the team device header_ops.
 
-diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
-index 7cd35bfd39e6..2acaad94c475 100644
---- a/Documentation/networking/ip-sysctl.rst
-+++ b/Documentation/networking/ip-sysctl.rst
-@@ -2454,20 +2454,36 @@ mld_qrv - INTEGER
- 	Minimum: 1 (as specified by RFC6636 4.5)
+In the case of the syzbot reproducer the gre0 device is
+already in state UP when it attempts to add it as a
+port device of team0, this fails but before that
+header_ops->create of team0 is changed from eth_header to ipgre_header
+in the call to team_dev_type_check_change.
+
+Later when we end up in ipgre_header() struct *ip_tunnel points to nonsense
+as the private data of the device still holds a struct team.
+
+Move team_dev_type_check_change down where all other checks have passed
+as it changes the dev type with no way to restore it in case
+one of the checks that follow it fail.
+
+Also make sure to preserve the origial mtu assignment:
+  - If port_dev is not the same type as dev, dev takes mtu from port_dev
+  - If port_dev is the same type as dev, port_dev takes mtu from dev
+
+Testing:
+  - team device driver in-tree selftests
+  - Add/remove various devices as slaves of team device
+  - syzbot
+
+Reported-by: syzbot+a2a3b519de727b0f7903@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=a2a3b519de727b0f7903
+Signed-off-by: Nikola Z. Ivanov <zlatistiv@gmail.com>
+---
+ drivers/net/team/team_core.c | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
+index 29dc04c299a3..94c149e89231 100644
+--- a/drivers/net/team/team_core.c
++++ b/drivers/net/team/team_core.c
+@@ -1134,10 +1134,6 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
+ 		return -EPERM;
+ 	}
  
- max_dst_opts_number - INTEGER
--	Maximum number of non-padding TLVs allowed in a Destination
--	options extension header. If this value is less than zero
--	then unknown options are disallowed and the number of known
--	TLVs allowed is the absolute value of this number.
+-	err = team_dev_type_check_change(dev, port_dev);
+-	if (err)
+-		return err;
 -
--	Default: 8
-+        Maximum number of non-padding TLVs allowed in a Destination
-+        options extension header. If this value is zero then receive
-+        Destination Options processing is disabled in which case packets
-+        with the Destination Options extension header are dropped. If
-+        this value is less than zero then unknown options are disallowed
-+        and the number of known TLVs allowed is the absolute value of
-+        this number.
-+
-+        The default is zero which means the all received packets with
-+        Destination Options extension header are dropped. The rationale is that
-+        for the vast majority of hosts, Destination Options serve no purpose.
-+        In the thirty years of IPv6 no broadly useful IPv6 Destination options
-+        have been defined, they have no security or even checksum protection,
-+        latest data shows the Destination have drop rates on the Internet
-+        from ten percent to more than thirty percent (depending on the size of
-+        the extension header). They also have the potential to be used as a
-+        Denial of Service attack.
-+
-+        Default: 0
+ 	if (port_dev->flags & IFF_UP) {
+ 		NL_SET_ERR_MSG(extack, "Device is up. Set it down before adding it as a team port");
+ 		netdev_err(dev, "Device %s is up. Set it down before adding it as a team port\n",
+@@ -1155,10 +1151,12 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
+ 	INIT_LIST_HEAD(&port->qom_list);
  
- max_hbh_opts_number - INTEGER
- 	Maximum number of non-padding TLVs allowed in a Hop-by-Hop
--	options extension header. If this value is less than zero
--	then unknown options are disallowed and the number of known
--	TLVs allowed is the absolute value of this number.
--
--	Default: 8
-+	options extension header. If this value is zero then receive
-+        Hop-by-Hop Options processing is disabled in which case packets
-+        with the Hop-by-Hop Options extension header are dropped.
-+        If this value is less than zero then unknown options are disallowed
-+        and the number of known TLVs allowed is the absolute value of this
-+        number.
-+
-+        Default: 8
+ 	port->orig.mtu = port_dev->mtu;
+-	err = dev_set_mtu(port_dev, dev->mtu);
+-	if (err) {
+-		netdev_dbg(dev, "Error %d calling dev_set_mtu\n", err);
+-		goto err_set_mtu;
++	if (dev->type == port_dev->type) {
++		err = dev_set_mtu(port_dev, dev->mtu);
++		if (err) {
++			netdev_dbg(dev, "Error %d calling dev_set_mtu\n", err);
++			goto err_set_mtu;
++		}
+ 	}
  
- max_dst_opts_length - INTEGER
- 	Maximum length allowed for a Destination options extension
+ 	memcpy(port->orig.dev_addr, port_dev->dev_addr, port_dev->addr_len);
+@@ -1233,6 +1231,10 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
+ 		}
+ 	}
+ 
++	err = team_dev_type_check_change(dev, port_dev);
++	if (err)
++		goto err_set_dev_type;
++
+ 	if (dev->flags & IFF_UP) {
+ 		netif_addr_lock_bh(dev);
+ 		dev_uc_sync_multiple(port_dev, dev);
+@@ -1251,6 +1253,7 @@ static int team_port_add(struct team *team, struct net_device *port_dev,
+ 
+ 	return 0;
+ 
++err_set_dev_type:
+ err_set_slave_promisc:
+ 	__team_option_inst_del_port(team, port);
+ 
 -- 
-2.43.0
+2.51.0
 
 
