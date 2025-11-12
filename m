@@ -1,85 +1,52 @@
-Return-Path: <netdev+bounces-237869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86347C50F8F
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 08:40:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3DDCC50F29
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 08:31:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id B804534CFBA
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 07:40:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B95F23A9511
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 07:29:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3FEA2D8DC4;
-	Wed, 12 Nov 2025 07:40:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="ru7imzey"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4595E2C15B4;
+	Wed, 12 Nov 2025 07:29:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic304-47.consmr.mail.ne1.yahoo.com (sonic304-47.consmr.mail.ne1.yahoo.com [66.163.191.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26D7F2C029D
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 07:40:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.163.191.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F27B2C21F3;
+	Wed, 12 Nov 2025 07:28:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762933233; cv=none; b=UHvsx+oXlvbMaShg/8Y+c4PU3i1WJgSVKc+WT0fAnSZb+bET1I/V07UzUHm5z7LBP9LBGCHBQERuPbuORi+o0WvSwMyFvkVcvl2O3Vt2NavAnkrLm5glIeBYXFNEVlm8AfQj1nLW2DKs/XBYtK4CCADO45F5/Xlhe965t8AVWSQ=
+	t=1762932544; cv=none; b=QurhiTF2cMKDrw5Dxf/U/IKvicfCAfMBw/b9cLqn6gUcbf/hKjzSjAy5kj/c8pcE4eKb2LqofmC0M5h9Nt9qpmqHMdIjLfW/oajrAKvC9FjTZaoqt0b/PjqcJ++vALQQhsTlx/JOALcBMuNw00SFI0Z7+juiSoEZiZCPXXM62Qw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762933233; c=relaxed/simple;
-	bh=OoJ/zJzrLIWKOMxGyXCLacqQaA90FKj7x6cwln09UA8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rcugIXvR5DreTvCcCEvLtMQMrNg/3eh59WCYi5Kg/48hOyJh8mzR8/Amj0lOkUtv9bG/h6Az1dz9FE6cV5v4hxh4W0+hNg8j6S1oy5FUv7YVeolBPex2DtiB/Mx7Rn8Zo9Q3zOkzv0UAEVNfrrYAFKK2fQTsI5LXpOr0GjC4oo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=ru7imzey; arc=none smtp.client-ip=66.163.191.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1762933231; bh=gQFK6/pqdltDR1oJK5uX3W6URmzRoO1lVHSeZ0hYKgE=; h=From:To:Cc:Subject:Date:In-Reply-To:References:From:Subject:Reply-To; b=ru7imzeyHJpe5X6ETeHtRsMhIspMZUv0sSFhdI2U1g6mEX2rFAHPy2oWvRN1BLtlixqvO06iZrCzfRXeA5EZ8t71INgsGvl2/b80Vr/dIdzSoBT/dWlM2i/P2chSafUlYWOXEempIM4Dt93fHVVhs4564IRYCJ4WxTO87PY3ccuB6h10QQMk5TGFzd04REM+QHyE17kvRaDI6flpmiTmvI7YupPq8uDvRbCAvKgbqFe1Cn4DdrIvQG8oXXC0+zE3TtyRiZ084+gxHyZiclVI4V5i90d8HS98sf+5mTsiwUiRST4X4A78795nGAzStRgzT8KOdWQzhzKY4Utl4zOypw==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1762933231; bh=Vxo0nwEaFAD3T9Y4jyxX5e32RzBCCm32wcDz869KGPt=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=ZxjkbKhI9+QYRmv4MRaDmGRkxYldzkAnJSkcjfuMMJ0PA3mD3JAqycMIfDpKMc/ibikL/CTYWyz7Zy6mjbKaebU58hc15W6LdyKXJab8HtyoG29ZRTX5OFQIKUKFGDtN3DPrXIoCInUrU1bw6rm8MRS1SmTYQYWPOlYZKpEOcI8zZH4fPfEZHlI4aL690jKiA5jMzgZYu4Dsb9Vk40pyZA2+uK9HBLOgoHFTCuBPVKs/UG8+ft+ScHmWR+YO250aEe1EwCNykJubF/CRkqsSVcOg0aI/auWxkfopIEehNacgtjMM7SQuMMUiZxlqC51ymx6Dz+iqer169a8cKhzx8Q==
-X-YMail-OSG: zHnUMqcVM1nt_VuQx5rK2KG792.OkFlG2EbifgA8bfDUSor216B3n9iggIG1TkD
- aCYUM8sW3IgswBabJm9U61CAOxVj3Dr1XpXFJ9MPVZ.1Jk6AUQW_TF76QbAUSQF2eWdfJJ_J7WJk
- mIJlWKeLnKK66kKkyk6GYtteb11_KKt2a3bjM1_oR2CWlB0Lp6LxgFH2fYGAVB1LeFmt5s0_3mF.
- xAJpSmuA14gV0JnNBCePe0aydGaRdm3OaHHfNxwqRXu8S2Kkgdb80WCrxMKljLbtenUbgbXatiJ_
- CXZwP1wXsvZxWNsEhOayL5wNrl8Uh_xW5oCHtQLiLPIKqaj3vXlz3z9A4XeWR2NX1dtaXI3UQxXr
- USBrRMM1zuSZ1MtvYe1S6.OBzUB4kqiKIj1wyKLqcmBHTJwe4vRtJEMSC8OFQ60OdpN3cP.ZnE.M
- JLFrn0thxR0cxxkhGoLxK6j9VaGpBrbRR4QDRqNGOKbN3.h33Nea2UZM.dsz.kb4LZMZtHAebjEv
- 2Tlf2BRIn2VNJWRzxzvwt1dn7PV13kAXkJIipFzy8EVAs0Wq2rpP0XStCfZqa0aYEt3rL0G_mTMG
- CEt_MsodiupCqDSuppdEpCswgSLQCzsiJWpPlXdvxptSsMoQZ9d_fTtMH3CgNtP1gdn6CuV35JeL
- CV3_nI854DxHceqHhC_X_JVOWAKj.7aJYBlcms4TVxprDGonHOXxLOvBBGXZnz70H9I5DYklI6.K
- XBwE2D9DOtArLKx7QH5JKSC5LByiOrZPNWX86v0M1bi.n_.Yte.Y8RJZaVwCF2XUfDQr55jIULj.
- JehjZO5YyqlUfmLC_5Xt5KhlK0t2YgUqHCQgdBAJB.qPVWxPNATvbVWOVXe3k74mKA8r2LZfjkpX
- bA3bbsn5YYOz_wQO028pkJd4os_JGfft73hVE2Xh9f5GVOukHkc0pfivOm6LKS7rJAmIZeBivPBC
- qMUE9ESwOjrtFRbs4xgIH48_INKZ.zAGLT7dLhreTgjwTRUw5tKYrjWLuMdC3V.Nv3ixxzKOVhEB
- g6WMIRbHCslhtVlt_dhpbgYfDpGR7XCbIhQ14sCDAtnjRcYnOMwG5wz8D6IQzWLFmJ_7Okk3lava
- XQl1KogEBntf.VCjBdDyJI8SJlqjdl2pdjRUHHd3W9d07uSqBpUhNmPUTvqA0g.YDOq7dMpDmwVl
- XgXQofgQX26a57Vo7WURwzjnD6pb73Rcg6UZPmJGu9cfQEGxqI1kY1Q6N1_6EDxywxxMhpWjl9Ls
- Ua8GTgQIQbSn8TFslH2stY7UcdK2Smp4_wF4nrfVwXxTass1XXqbwXH61IkZZde65ymGfGoikzc3
- ajTW9MaeNrU.Wcd4Jwr8f5dD9nkga_5sp5j81TqhF0vR0M5zKzyXiDKxR.eyru9XMpcWkp3TKtB9
- g.fzs4l4GZX69qOcpeg9OpD.o9KMBuzopgV7jql3SVBX9s3cxdpt.hNLp8fgCrydVDLCAtdbsqEh
- iavCZbyxPeAtgMNfWu0YVUivqQny1s7Av5BAjL48u1aah.C5VFia63Gq3La_N4LoIEdRfx2vjXu5
- a7SUXMVD0J5JlB8Pj.C_Gy0iDXfk7nDbUENMjedkPd6t4ngUf.lQtAAXMTOd24F2UCPjJBZbiRB8
- mGOzpbLiIE4fahiaBseJLIROfTsnhMf0tTKoA__MgoKPWeQYTd5Kl21yLr7uR2aFc6KTQEn2Er75
- 1Pcyn.WIzD3Le38Nwl3P68s.s3pQSEmZnw9j8D4Jfmfq3DbSOOpqqzYp5ICOF1Ju9SGIuM4MWDth
- FhCQlINEcfBSSXAX1D.n3oDKt_yg151.QcOYSgUtu_JSNSfAJEPIlil1OR1IErxrSxgvWwtpRC6P
- 0BZ5Xwt5LOeOXXGM4.aAGAzon3ikGlPo3QC2GIkeyZZDoxF5u_1kczB2_IbvClYqHF83u0PGveLW
- 1tkGeYS0JmY.742SpPIYS8bcqHbZUtGSagOqHPO7TfeThstnhkm20giQEcN3nT2hDMlgIlscYp5l
- SmaeKgYta6uZtM23z9cjRDEpTbOIonsmlgog8EMfu8aNTxrSeTFq3MtRlbnep2FC0RSkY.YqV1RC
- mWn4eVggT3qAB8bDKHL7DBkh6lx7Y0IVLlLjQ4OjlE.Wbl5UiVXJe0s66DyigpmN3tIPed3pUePe
- OA3gQTIWkx73DWntOI8VXO1jI6Ind9eMqGDS3l3.e5NhxV08z5EceD5V2AMXCmFy9vTXowsHSRPw
- HByjd
-X-Sonic-MF: <mmietus97@yahoo.com>
-X-Sonic-ID: e846969f-424a-4b5a-9b68-29e0e667ec84
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic304.consmr.mail.ne1.yahoo.com with HTTP; Wed, 12 Nov 2025 07:40:31 +0000
-Received: by hermes--production-ir2-5fcfdd8d7f-2cnbk (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID ce2e5d13638178c4daec60c4681fbbb6;
-          Wed, 12 Nov 2025 07:28:21 +0000 (UTC)
-From: Marek Mietus <mmietus97@yahoo.com>
-To: netdev@vger.kernel.org,
-	sd@queasysnail.net,
-	kuba@kernel.org
-Cc: Marek Mietus <mmietus97@yahoo.com>
-Subject: [PATCH net-next v4 03/14] net: skb: rename skb_dstref_restore to skb_dstref_set
-Date: Wed, 12 Nov 2025 08:27:09 +0100
-Message-ID: <20251112072720.5076-4-mmietus97@yahoo.com>
-X-Mailer: git-send-email 2.51.0
-In-Reply-To: <20251112072720.5076-1-mmietus97@yahoo.com>
-References: <20251112072720.5076-1-mmietus97@yahoo.com>
+	s=arc-20240116; t=1762932544; c=relaxed/simple;
+	bh=e28E9DEW384uAUF90lF74MBOLOLdTU36ftx2KeFRstI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=e4urPSXwurL5jxSOrxZ2zwQbCpf4nvnlkShQuXL1xiJAByHn3w4VOCk4HY8DBFgAy4Otz2jUZud+d448c44jMXL/AEJpt7TbF+E3Ptl+iKbW2dWj5iTVwbojlm9r8Uh9Shv/79j8BFfmc9zo9aUoaioDyjmjAxHfst4BRPfFd50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost (unknown [124.16.138.129])
+	by APP-01 (Coremail) with SMTP id qwCowABX8M8tNxRp_apxAA--.8506S2;
+	Wed, 12 Nov 2025 15:28:45 +0800 (CST)
+From: Chen Ni <nichen@iscas.ac.cn>
+To: jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Chen Ni <nichen@iscas.ac.cn>
+Subject: [PATCH] net/sched: act_ife: convert comma to semicolon
+Date: Wed, 12 Nov 2025 15:27:09 +0800
+Message-Id: <20251112072709.73755-1-nichen@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,136 +54,58 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qwCowABX8M8tNxRp_apxAA--.8506S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7Gr4rCw4kuw4kuw1xGrW3ZFb_yoWDKFc_Ww
+	1S9ws7C3W0qrn8tan7Zr4YvFWFgayIyryrWr1v9a4Yk3Wrt34DursYvFn7Gr1UCFW7uF13
+	Grn5XF1jka1xujkaLaAFLSUrUUUUbb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbTkFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+	A2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
+	Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v26rxl6s
+	0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+	jxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr
+	1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E8cxa
+	n2IY04v7MxkF7I0En4kS14v26r1q6r43MxkIecxEwVAFwVW8CwCF04k20xvY0x0EwIxGrw
+	CFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE
+	14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2
+	IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Gr0_Cr1lIxAIcVCF04k26cxK
+	x2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI
+	0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUB6wZUUUUU=
+X-CM-SenderInfo: xqlfxv3q6l2u1dvotugofq/
 
-After changing skbuff to use the newly introduced dstref object,
-skb_dstref_restore is essentially just a setter for the dstref
-field.
+Replace comma between expressions with semicolons.
 
-Rename the skb_dstref_restore function to skb_dstref_set.
+Using a ',' in place of a ';' can have unintended side effects.
+Although that is not the case here, it is seems best to use ';'
+unless ',' is intended.
 
-Signed-off-by: Marek Mietus <mmietus97@yahoo.com>
+Found by inspection.
+No functional change intended.
+Compile tested only.
+
+Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
 ---
- include/linux/skbuff.h                  | 6 +++---
- include/net/tcp.h                       | 2 +-
- net/ieee802154/6lowpan/reassembly.c     | 2 +-
- net/ipv4/icmp.c                         | 2 +-
- net/ipv4/ip_fragment.c                  | 2 +-
- net/ipv4/ip_options.c                   | 2 +-
- net/ipv6/netfilter/nf_conntrack_reasm.c | 2 +-
- net/ipv6/reassembly.c                   | 2 +-
- 8 files changed, 10 insertions(+), 10 deletions(-)
+ net/sched/act_ife.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index c46f817897a4..b71251372600 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -1176,11 +1176,11 @@ static inline dstref_t skb_dstref_steal(struct sk_buff *skb)
- }
+diff --git a/net/sched/act_ife.c b/net/sched/act_ife.c
+index 7c6975632fc2..1dfdda6c2d4c 100644
+--- a/net/sched/act_ife.c
++++ b/net/sched/act_ife.c
+@@ -649,9 +649,9 @@ static int tcf_ife_dump(struct sk_buff *skb, struct tc_action *a, int bind,
  
- /**
-- * skb_dstref_restore() - restore skb dstref removed via skb_dstref_steal()
-+ * skb_dstref_set() - sets skb dstref
-  * @skb: buffer
-- * @dstref: dstref object from a call to skb_dstref_steal()
-+ * @dstref: dstref object
-  */
--static inline void skb_dstref_restore(struct sk_buff *skb, dstref_t dstref)
-+static inline void skb_dstref_set(struct sk_buff *skb, dstref_t dstref)
- {
- 	skb_dst_check_unset(skb);
- 	skb->_dstref = dstref;
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index e684f246e798..7a7408ad76fb 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -2103,7 +2103,7 @@ static inline void tcp_skb_tsorted_anchor_cleanup(struct sk_buff *skb)
- 	dstref_t _dstref_save = skb_dstref_steal(skb);
+ 	memset(&opt, 0, sizeof(opt));
  
- #define tcp_skb_tsorted_restore(skb)		\
--	skb_dstref_restore(skb, _dstref_save);	\
-+	skb_dstref_set(skb, _dstref_save);	\
- }
+-	opt.index = ife->tcf_index,
+-	opt.refcnt = refcount_read(&ife->tcf_refcnt) - ref,
+-	opt.bindcnt = atomic_read(&ife->tcf_bindcnt) - bind,
++	opt.index = ife->tcf_index;
++	opt.refcnt = refcount_read(&ife->tcf_refcnt) - ref;
++	opt.bindcnt = atomic_read(&ife->tcf_bindcnt) - bind;
  
- void tcp_write_queue_purge(struct sock *sk);
-diff --git a/net/ieee802154/6lowpan/reassembly.c b/net/ieee802154/6lowpan/reassembly.c
-index eb23c70c7416..183fb3f95809 100644
---- a/net/ieee802154/6lowpan/reassembly.c
-+++ b/net/ieee802154/6lowpan/reassembly.c
-@@ -146,7 +146,7 @@ static int lowpan_frag_queue(struct lowpan_frag_queue *fq,
- 		int res;
- 
- 		res = lowpan_frag_reasm(fq, skb, prev_tail, ldev, refs);
--		skb_dstref_restore(skb, dstref);
-+		skb_dstref_set(skb, dstref);
- 		return res;
- 	}
- 	skb_dst_drop(skb);
-diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-index 6b19a0ffea21..bb6c0128a66b 100644
---- a/net/ipv4/icmp.c
-+++ b/net/ipv4/icmp.c
-@@ -553,7 +553,7 @@ static struct rtable *icmp_route_lookup(struct net *net, struct flowi4 *fl4,
- 		rt2 = skb_rtable(skb_in);
- 		/* steal dst entry from skb_in, don't drop refcnt */
- 		skb_dstref_steal(skb_in);
--		skb_dstref_restore(skb_in, dstref);
-+		skb_dstref_set(skb_in, dstref);
- 	}
- 
- 	if (err)
-diff --git a/net/ipv4/ip_fragment.c b/net/ipv4/ip_fragment.c
-index 33080c5350ed..a077070240b8 100644
---- a/net/ipv4/ip_fragment.c
-+++ b/net/ipv4/ip_fragment.c
-@@ -368,7 +368,7 @@ static int ip_frag_queue(struct ipq *qp, struct sk_buff *skb, int *refs)
- 		dstref_t dstref = skb_dstref_steal(skb);
- 
- 		err = ip_frag_reasm(qp, skb, prev_tail, dev, refs);
--		skb_dstref_restore(skb, dstref);
-+		skb_dstref_set(skb, dstref);
- 		if (err)
- 			inet_frag_kill(&qp->q, refs);
- 		return err;
-diff --git a/net/ipv4/ip_options.c b/net/ipv4/ip_options.c
-index d6c712269052..9e247ec9aa97 100644
---- a/net/ipv4/ip_options.c
-+++ b/net/ipv4/ip_options.c
-@@ -621,7 +621,7 @@ int ip_options_rcv_srr(struct sk_buff *skb, struct net_device *dev)
- 		rt2 = skb_rtable(skb);
- 		if (err || (rt2->rt_type != RTN_UNICAST && rt2->rt_type != RTN_LOCAL)) {
- 			skb_dst_drop(skb);
--			skb_dstref_restore(skb, dstref);
-+			skb_dstref_set(skb, dstref);
- 			return -EINVAL;
- 		}
- 		dstref_drop(dstref);
-diff --git a/net/ipv6/netfilter/nf_conntrack_reasm.c b/net/ipv6/netfilter/nf_conntrack_reasm.c
-index 9fab51fb9497..c03ede44cfc7 100644
---- a/net/ipv6/netfilter/nf_conntrack_reasm.c
-+++ b/net/ipv6/netfilter/nf_conntrack_reasm.c
-@@ -289,7 +289,7 @@ static int nf_ct_frag6_queue(struct frag_queue *fq, struct sk_buff *skb,
- 		dstref_t dstref = skb_dstref_steal(skb);
- 
- 		err = nf_ct_frag6_reasm(fq, skb, prev, dev, refs);
--		skb_dstref_restore(skb, dstref);
-+		skb_dstref_set(skb, dstref);
- 
- 		/* After queue has assumed skb ownership, only 0 or
- 		 * -EINPROGRESS must be returned.
-diff --git a/net/ipv6/reassembly.c b/net/ipv6/reassembly.c
-index aa8427f56ff3..016ca7344427 100644
---- a/net/ipv6/reassembly.c
-+++ b/net/ipv6/reassembly.c
-@@ -221,7 +221,7 @@ static int ip6_frag_queue(struct net *net,
- 		dstref_t dstref = skb_dstref_steal(skb);
- 
- 		err = ip6_frag_reasm(fq, skb, prev_tail, dev, refs);
--		skb_dstref_restore(skb, dstref);
-+		skb_dstref_set(skb, dstref);
- 		return err;
- 	}
- 
+ 	spin_lock_bh(&ife->tcf_lock);
+ 	opt.action = ife->tcf_action;
 -- 
-2.51.0
+2.25.1
 
 
