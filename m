@@ -1,107 +1,315 @@
-Return-Path: <netdev+bounces-237834-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237835-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63CADC50B64
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 07:30:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E308BC50BFA
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 07:44:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 909E53B5D66
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 06:29:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E6D93A3D2B
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 06:42:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2D8A2D7818;
-	Wed, 12 Nov 2025 06:29:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DF6D2D8764;
+	Wed, 12 Nov 2025 06:42:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LZQG0qpQ"
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="LVZTWTl5";
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="xgSAa4FE"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from bkemail.birger-koblitz.de (bkemail.birger-koblitz.de [23.88.97.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87D3320FAAB;
-	Wed, 12 Nov 2025 06:29:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D48F21990C7;
+	Wed, 12 Nov 2025 06:42:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.97.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762928958; cv=none; b=E4jREeujFrr5alZ0d/9KsfeHvQvr/2MTJKsgbfBHmesU19EPSLPiFqEEBkAPD1xBlXKZcCfMvb8tJGPGIjrQQZLlODn/2Hr/E9V0VDI4t5R77ta1/WNnSDHtpkowH90/AHjW0ydHwqhMPWXNJiFqdwnbknn7u4BZgl45fw59SFk=
+	t=1762929762; cv=none; b=EZOKlS9lACzvCZKKweXfYfNRiv+dRhbAqK4zV3PRw0x3YPW4NRlbEjhZ5xb8Cu9/QSDpPA0BYqS9qpD9Qylw3I94dloVenS0sO9GNVtJu3R4J49Q3MG/4FmjFgg+N8T/X1N+oGd5biO8ir3K91GVGCmKgSDY6KUV/noG0XdfP3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762928958; c=relaxed/simple;
-	bh=JG9x+e5n7R2dZhtSVSqiTD2CUBvVVGzeebp+BBYllpg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZAANrBDKGIcbTq9dCBRnpgpGtPA4Y9ajQVEGbmsrW3rKulVyTTTVttuka+Ld0uuS4aOrrwp67mk/WTF/wla13L+1v/FHLK+uUn9ePT2WsLntmkbc/rOA4fMu9g0mlGDSP/C1q+1+mix6sZSpKWAD9C4umBSpjn3P+0v9zUAGcxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=LZQG0qpQ; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=+qa8gFmdR8BIIHF8YjhgDKCxqeddRDsKLTr6w3bjkdY=; b=LZQG0qpQ2v5DOOTQZJozyvmzz9
-	+h4rzynKsI99YJaxQ8Jm74fTWcvCA4eDxD1s3Z9G06ODLoib+qgkuLge3EN6azbyTEWiOwm9h12NF
-	WKqhXPFUb/5mGNFG5mXbJG0zeWzrww9aat6S/ldmIcFRqGN8taHcS4p4N7j2z4455rJiDhimd6uey
-	2I5c0T2ZxvkdoYg1LniLMGm3IaHGQ/PdC5z5jdOILIAPIFJyy8e/Ps4xvcG1no+qcKotl80wDzawl
-	xthpdDszDEQvsJvYNulVHQ9c2zqsaltbD7dc7v6FTIv4oH5B+j0ZW1+TCPQ/miPDbPITvnBM2CtCM
-	WSlS41qw==;
-Received: from [50.53.43.113] (helo=bombadil.infradead.org)
-	by bombadil.infradead.org with esmtpsa (Exim 4.98.2 #2 (Red Hat Linux))
-	id 1vJ4Lt-00000008COO-22C1;
-	Wed, 12 Nov 2025 06:29:09 +0000
-From: Randy Dunlap <rdunlap@infradead.org>
-To: netdev@vger.kernel.org
-Cc: Randy Dunlap <rdunlap@infradead.org>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH] RDMA/cm: correct typedef and bad line warnings
-Date: Tue, 11 Nov 2025 22:29:08 -0800
-Message-ID: <20251112062908.2711007-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.51.1
+	s=arc-20240116; t=1762929762; c=relaxed/simple;
+	bh=MR+W2xs0MEU9a8GMC7b+h4/FrmDMwMIKo6V4o6PhWUY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=r1h7ItSiIjV9CJSIsxe5+odW5yjrb0FhswikF9PBvTHS/4TIszaemloFhvtKmrYkojVxgKD/ujL4exKSwPg914J6G998eFVnzs4zq8C+pR4JY6RgEkVFEve2D+5+f+Ssg8MwHWAZYP3W4zxquBgtcJv0Yxdwd3KfGj4Nq81GURQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=LVZTWTl5; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=xgSAa4FE; arc=none smtp.client-ip=23.88.97.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1762929279;
+	bh=MR+W2xs0MEU9a8GMC7b+h4/FrmDMwMIKo6V4o6PhWUY=;
+	h=From:Date:Subject:To:Cc:From;
+	b=LVZTWTl5GQMzPHyWuQuQ8lLWBzRn+kUjE6TCLvVVnnDgtF95cVBs7EMxVNDO1q4lF
+	 VVztr5LTyvLquikgwugb/+MDisogUhVisiFk6nf2Er9v508sR2ffKHFe17HPOBZ2gr
+	 kCX9XgaGagibcluVe7D3k5gHk+2RZoa003x1/ySIRbWynmGQtCN05Q4bVTmvW6IB5z
+	 WpzGYyBmyF8gv7pyIP2my9vOR119PtMgxOnu1rawpPPhfK/rtaBcRBSod0EeFsqa4J
+	 06pVVvq2ZqidruWBfHLH8Pwd+HEEUq8jejmEonpImArvfBeFibt5AmtiOJ6S4PUs58
+	 kIe/L7Lpj2YIw==
+Received: by bkemail.birger-koblitz.de (Postfix, from userid 109)
+	id 5ED09493D3; Wed, 12 Nov 2025 06:34:39 +0000 (UTC)
+X-Spam-Level: 
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=birger-koblitz.de;
+	s=default; t=1762929277;
+	bh=MR+W2xs0MEU9a8GMC7b+h4/FrmDMwMIKo6V4o6PhWUY=;
+	h=From:Date:Subject:To:Cc:From;
+	b=xgSAa4FEPceRmV8qXMKWM7zRt7yCtxkCwLu3KO7JEZTlfFjfnN17pZIAoAhLKFsCR
+	 pMOUxLfl8ZQ/rFf+BvIW9A0TR4/06+SCcIhXnBKK+s1MUnPmJ0Jp8KAfM8x22VK/PZ
+	 UEHT7qN/whD5LyXH4Pu+11Ent3oFaaW5hdsrcm66TE3Ih7da0DJWH7cw648lfCbnrB
+	 B9u8X0xOqpM5NJVAEfYnP9SVMcopI+11OYci1kiZjRoHddisGBj5DdtVKTUScPRANw
+	 yUVTI+isFYeofC4QNa72fUcgwxvSHlDS4cop8Sr86QWM9olOZGupvSsIcLb0+3/kDL
+	 YwGrw5/OhcoIQ==
+Received: from AMDDesktop.lan (unknown [IPv6:2a00:6020:47a3:e800:94d3:d213:724a:4e07])
+	by bkemail.birger-koblitz.de (Postfix) with ESMTPSA id 83F5F493BF;
+	Wed, 12 Nov 2025 06:34:37 +0000 (UTC)
+From: Birger Koblitz <mail@birger-koblitz.de>
+Date: Wed, 12 Nov 2025 07:34:34 +0100
+Subject: [PATCH net-next v5] ixgbe: Add 10G-BX support
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20251112-10gbx-v5-1-12cab4060bc8@birger-koblitz.de>
+X-B4-Tracking: v=1; b=H4sIAHkqFGkC/3WOyw6CMBBFf8V0bU2ntFhc+R/GRR8DNhoxhRCU8
+ O8ORBIWuLw3c87cgTWYIjbstBtYwi42sX5S0Psd8zf7rJDHQJlJITUIkBxE5XpunTLSa4SgFaP
+ bV8Iy9rPncqV8i01bp/es7WBqF0P2M3TAgTSFKXJbZkGbs4upwsTvtXvE9nMIyCZTJ9e0Wmgaw
+ gsjvJYKAPD4j842aRrBtfDBmlweofj7W63pfKFJw4X1VLtS59Zv0eM4fgHdSVtvXAEAAA==
+X-Change-ID: 20251012-10gbx-ab482c5e1d54
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, Birger Koblitz <mail@birger-koblitz.de>, 
+ Andrew Lunn <andrew@lunn.ch>, Paul Menzel <pmenzel@molgen.mpg.de>, 
+ Aleksandr Loktionov <aleksandr.loktionov@intel.com>, 
+ Rinitha S <sx.rinitha@intel.com>
+X-Mailer: b4 0.14.2
 
-In include/rdma/ib_cm.h:
+Add support for 10G-BX modules, i.e. 10GBit Ethernet over a single strand
+Single-Mode fiber.
+The initialization of a 10G-BX SFP+ is the same as for a 10G SX/LX module,
+and is identified according to SFF-8472 table 5-3, footnote 3 by the
+10G Ethernet Compliance Codes field being empty, the Nominal Bit
+Rate being compatible with 12.5GBit, and the module being a fiber module
+with a Single Mode fiber link length.
 
-Correct a typedef's kernel-doc notation by adding the 'typedef' keyword
-to it to avoid a warning.
-Add a leading " *" to a kernel-doc line to avoid a warning.
+This was tested using a Lightron WSPXG-HS3LC-IEA 1270/1330nm 10km
+transceiver:
+$ sudo ethtool -m enp1s0f1
+   Identifier                          : 0x03 (SFP)
+   Extended identifier                 : 0x04 (GBIC/SFP defined by 2-wire interface ID)
+   Connector                           : 0x07 (LC)
+   Transceiver codes                   : 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00
+   Encoding                            : 0x01 (8B/10B)
+   BR Nominal                          : 10300MBd
+   Rate identifier                     : 0x00 (unspecified)
+   Length (SMF)                        : 10km
+   Length (OM2)                        : 0m
+   Length (OM1)                        : 0m
+   Length (Copper or Active cable)     : 0m
+   Length (OM3)                        : 0m
+   Laser wavelength                    : 1330nm
+   Vendor name                         : Lightron Inc.
+   Vendor OUI                          : 00:13:c5
+   Vendor PN                           : WSPXG-HS3LC-IEA
+   Vendor rev                          : 0000
+   Option values                       : 0x00 0x1a
+   Option                              : TX_DISABLE implemented
+   BR margin max                       : 0%
+   BR margin min                       : 0%
+   Vendor SN                           : S142228617
+   Date code                           : 140611
+   Optical diagnostics support         : Yes
 
-Warning: ib_cm.h:289 function parameter 'ib_cm_handler' not described
- in 'int'
-Warning: ib_cm.h:289 expecting prototype for ib_cm_handler().  Prototype
- was for int() instead
-Warning: ib_cm.h:484 bad line: connection message in case duplicates
- are received.
-
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Signed-off-by: Birger Koblitz <mail@birger-koblitz.de>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Tested-by: Rinitha S <sx.rinitha@intel.com>
 ---
-Cc: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Leon Romanovsky <leonro@nvidia.com>
-Cc: linux-rdma@vger.kernel.org
----
- include/rdma/ib_cm.h |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Changes in v5:
+  Added "Tested-by" 
+- Link to v4: https://lore.kernel.org/r/20251016-10gbx-v4-1-0ac202bf56ac@birger-koblitz.de
 
---- linux-next-20251110.orig/include/rdma/ib_cm.h
-+++ linux-next-20251110/include/rdma/ib_cm.h
-@@ -271,7 +271,7 @@ struct ib_cm_event {
- #define CM_APR_ATTR_ID		cpu_to_be16(0x001A)
+Changes in v4:
+  Added "Reviewed-bys".
+  Slight rewording of commit message.
+- Link to v3: https://lore.kernel.org/r/20251014-10gbx-v3-1-50cda8627198@birger-koblitz.de
+
+Changes in v3:
+  Added "Reviewed-by". There also was a possible mailserver DKIM misconfiguration
+  that may have prevented recipients to recieve the previous mails 
+- Link to v2: https://lore.kernel.org/r/20251014-10gbx-v2-1-980c524111e7@birger-koblitz.de
+
+Changes in v2:
+  Allow also modules with only Byte 15 (100m SM link length) set to
+  be identified as BX
+---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c   |  7 ++++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c |  2 ++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c     | 43 +++++++++++++++++++++---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h     |  2 ++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_type.h    |  2 ++
+ 5 files changed, 51 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c
+index d5b1b974b4a33e7dd51b7cfe5ea211ff038a36f0..892a73a4bc6b0bb1c976ca95bf874059b987054f 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c
+@@ -342,6 +342,13 @@ static int ixgbe_get_link_capabilities_82599(struct ixgbe_hw *hw,
+ 		return 0;
+ 	}
  
- /**
-- * ib_cm_handler - User-defined callback to process communication events.
-+ * typedef ib_cm_handler - User-defined callback to process communication events.
-  * @cm_id: Communication identifier associated with the reported event.
-  * @event: Information about the communication event.
-  *
-@@ -482,7 +482,7 @@ int ib_send_cm_rej(struct ib_cm_id *cm_i
++	if (hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core0 ||
++	    hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core1) {
++		*speed = IXGBE_LINK_SPEED_10GB_FULL;
++		*autoneg = false;
++		return 0;
++	}
++
+ 	/*
+ 	 * Determine link capabilities based on the stored value of AUTOC,
+ 	 * which represents EEPROM defaults.  If AUTOC value has not been
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+index 2d660e9edb80af8fc834e097703dfd6a82b8c45b..76edf02bc47e5dd24bb0936f730f036181f6dc2a 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+@@ -351,6 +351,8 @@ static int ixgbe_get_link_ksettings(struct net_device *netdev,
+ 		case ixgbe_sfp_type_1g_lx_core1:
+ 		case ixgbe_sfp_type_1g_bx_core0:
+ 		case ixgbe_sfp_type_1g_bx_core1:
++		case ixgbe_sfp_type_10g_bx_core0:
++		case ixgbe_sfp_type_10g_bx_core1:
+ 			ethtool_link_ksettings_add_link_mode(cmd, supported,
+ 							     FIBRE);
+ 			ethtool_link_ksettings_add_link_mode(cmd, advertising,
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
+index 2449e4cf2679ddf3277f4ada7619303eb618d393..ad6a1eae6042bb16e329fb817bcfcb87e9008ce8 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
+@@ -1541,6 +1541,8 @@ int ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
+ 	u8 identifier = 0;
+ 	u8 cable_tech = 0;
+ 	u8 cable_spec = 0;
++	u8 sm_length_km = 0;
++	u8 sm_length_100m = 0;
+ 	int status;
  
- /**
-  * ib_prepare_cm_mra - Prepares to send a message receipt acknowledgment to a
--     connection message in case duplicates are received.
-+ *   connection message in case duplicates are received.
-  * @cm_id: Connection identifier associated with the connection message.
-  */
- int ib_prepare_cm_mra(struct ib_cm_id *cm_id);
+ 	if (hw->mac.ops.get_media_type(hw) != ixgbe_media_type_fiber) {
+@@ -1678,6 +1680,31 @@ int ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
+ 			else
+ 				hw->phy.sfp_type =
+ 					ixgbe_sfp_type_1g_bx_core1;
++		/* Support Ethernet 10G-BX, checking the Bit Rate
++		 * Nominal Value as per SFF-8472 to be 12.5 Gb/s (67h) and
++		 * Single Mode fibre with at least 1km link length
++		 */
++		} else if ((!comp_codes_10g) && (bitrate_nominal == 0x67) &&
++			   (!(cable_tech & IXGBE_SFF_DA_PASSIVE_CABLE)) &&
++			   (!(cable_tech & IXGBE_SFF_DA_ACTIVE_CABLE))) {
++			status = hw->phy.ops.read_i2c_eeprom(hw,
++					    IXGBE_SFF_SM_LENGTH_KM,
++					    &sm_length_km);
++			if (status != 0)
++				goto err_read_i2c_eeprom;
++			status = hw->phy.ops.read_i2c_eeprom(hw,
++					    IXGBE_SFF_SM_LENGTH_100M,
++					    &sm_length_100m);
++			if (status != 0)
++				goto err_read_i2c_eeprom;
++			if (sm_length_km > 0 || sm_length_100m >= 10) {
++				if (hw->bus.lan_id == 0)
++					hw->phy.sfp_type =
++						ixgbe_sfp_type_10g_bx_core0;
++				else
++					hw->phy.sfp_type =
++						ixgbe_sfp_type_10g_bx_core1;
++			}
+ 		} else {
+ 			hw->phy.sfp_type = ixgbe_sfp_type_unknown;
+ 		}
+@@ -1768,7 +1795,9 @@ int ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
+ 	      hw->phy.sfp_type == ixgbe_sfp_type_1g_sx_core0 ||
+ 	      hw->phy.sfp_type == ixgbe_sfp_type_1g_sx_core1 ||
+ 	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core0 ||
+-	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core1)) {
++	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core1 ||
++	      hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core0 ||
++	      hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core1)) {
+ 		hw->phy.type = ixgbe_phy_sfp_unsupported;
+ 		return -EOPNOTSUPP;
+ 	}
+@@ -1786,7 +1815,9 @@ int ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
+ 	      hw->phy.sfp_type == ixgbe_sfp_type_1g_sx_core0 ||
+ 	      hw->phy.sfp_type == ixgbe_sfp_type_1g_sx_core1 ||
+ 	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core0 ||
+-	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core1)) {
++	      hw->phy.sfp_type == ixgbe_sfp_type_1g_bx_core1 ||
++	      hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core0 ||
++	      hw->phy.sfp_type == ixgbe_sfp_type_10g_bx_core1)) {
+ 		/* Make sure we're a supported PHY type */
+ 		if (hw->phy.type == ixgbe_phy_sfp_intel)
+ 			return 0;
+@@ -2016,20 +2047,22 @@ int ixgbe_get_sfp_init_sequence_offsets(struct ixgbe_hw *hw,
+ 		return -EOPNOTSUPP;
+ 
+ 	/*
+-	 * Limiting active cables and 1G Phys must be initialized as
++	 * Limiting active cables, 10G BX and 1G Phys must be initialized as
+ 	 * SR modules
+ 	 */
+ 	if (sfp_type == ixgbe_sfp_type_da_act_lmt_core0 ||
+ 	    sfp_type == ixgbe_sfp_type_1g_lx_core0 ||
+ 	    sfp_type == ixgbe_sfp_type_1g_cu_core0 ||
+ 	    sfp_type == ixgbe_sfp_type_1g_sx_core0 ||
+-	    sfp_type == ixgbe_sfp_type_1g_bx_core0)
++	    sfp_type == ixgbe_sfp_type_1g_bx_core0 ||
++	    sfp_type == ixgbe_sfp_type_10g_bx_core0)
+ 		sfp_type = ixgbe_sfp_type_srlr_core0;
+ 	else if (sfp_type == ixgbe_sfp_type_da_act_lmt_core1 ||
+ 		 sfp_type == ixgbe_sfp_type_1g_lx_core1 ||
+ 		 sfp_type == ixgbe_sfp_type_1g_cu_core1 ||
+ 		 sfp_type == ixgbe_sfp_type_1g_sx_core1 ||
+-		 sfp_type == ixgbe_sfp_type_1g_bx_core1)
++		 sfp_type == ixgbe_sfp_type_1g_bx_core1 ||
++		 sfp_type == ixgbe_sfp_type_10g_bx_core1)
+ 		sfp_type = ixgbe_sfp_type_srlr_core1;
+ 
+ 	/* Read offset to PHY init contents */
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
+index 81179c60af4e0199a8b9d0fcdf34654b02eedfac..039ba4b6c120f3e824c93cb00fdd9483e7cf9cba 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h
+@@ -32,6 +32,8 @@
+ #define IXGBE_SFF_QSFP_1GBE_COMP	0x86
+ #define IXGBE_SFF_QSFP_CABLE_LENGTH	0x92
+ #define IXGBE_SFF_QSFP_DEVICE_TECH	0x93
++#define IXGBE_SFF_SM_LENGTH_KM		0xE
++#define IXGBE_SFF_SM_LENGTH_100M	0xF
+ 
+ /* Bitmasks */
+ #define IXGBE_SFF_DA_PASSIVE_CABLE		0x4
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
+index b1bfeb21537acc44c31aedcb0584374e8f6ecd45..61f2ef67defddeab9ff4aa83c8f017819594996b 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
+@@ -3286,6 +3286,8 @@ enum ixgbe_sfp_type {
+ 	ixgbe_sfp_type_1g_lx_core1 = 14,
+ 	ixgbe_sfp_type_1g_bx_core0 = 15,
+ 	ixgbe_sfp_type_1g_bx_core1 = 16,
++	ixgbe_sfp_type_10g_bx_core0 = 17,
++	ixgbe_sfp_type_10g_bx_core1 = 18,
+ 
+ 	ixgbe_sfp_type_not_present = 0xFFFE,
+ 	ixgbe_sfp_type_unknown = 0xFFFF
+
+---
+base-commit: 67029a49db6c1f21106a1b5fcdd0ea234a6e0711
+change-id: 20251012-10gbx-ab482c5e1d54
+
+Best regards,
+-- 
+Birger Koblitz <mail@birger-koblitz.de>
+
 
