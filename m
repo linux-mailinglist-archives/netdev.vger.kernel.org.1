@@ -1,167 +1,123 @@
-Return-Path: <netdev+bounces-238155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38970C54C83
-	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 00:11:31 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id F39D1C54CCF
+	for <lists+netdev@lfdr.de>; Thu, 13 Nov 2025 00:24:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C34193AEF66
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 23:11:02 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 8107C3476AD
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 23:24:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FC0C2EA481;
-	Wed, 12 Nov 2025 23:11:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5141E2F0661;
+	Wed, 12 Nov 2025 23:24:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="vR41GOMo"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="FtabXl5d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78CD32550AF;
-	Wed, 12 Nov 2025 23:10:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E02F2475CE
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 23:24:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762989061; cv=none; b=KF8L4/TMl783qXidzsGdFOdB7EnjmDL8FZhYzX4aMGouIWjWr3j2SU4vnQp72LEyG8bIznDTnJDPC660PTbSoSBxXTWsrNxxEpyKq6P94M6tB1NU3/vWAB9vFeyc1fWQcPs5wpftKXQRX8J7Z3NtxSVLRJaKZ/sBa85DV3FfQkU=
+	t=1762989861; cv=none; b=KPOUr87xupUkbLrM2Mo9698sitiewWe+id6pMVbO5VfQiMa4qIbvgjM44Nr8PSyICjMJVFzZW5bjDQUn3wmWeSG+cW68GICwi0+Dg7JgqeJ3tJEGqU/MkTFgt2N5NN7Au9C1s1niS9SABJaR00HTYARthZ26tYDwhTR7x/S26P0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762989061; c=relaxed/simple;
-	bh=g8HQwyvosRqrj/H5ZyB6qV1fxoG9t+H6fK+shkMMQMk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WSWV6/SFiDI9ZZn6n03EXV+4EDZAj05zWailyXPFY6m+PgUHaZEwmL7jomwbZzZqDpEQcMLe1aQnHAa9YfLBv/GtU0QxyEmPzIztvzJJiLnIke4Lips/8CYTsN3WSK8lEr4hLmB09dkkrW0A9FY3CJ9bBDvg4DDZuE6/EX9YlPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=vR41GOMo; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: from netfilter.org (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id D61D660279;
-	Thu, 13 Nov 2025 00:10:53 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1762989054;
-	bh=lhBJqy6zMtIHmZv4N86dc6RbKyZHbbHAvF6rboVN0/g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=vR41GOMoghr4+WpMVNC79Tgs9adVJXTC7MiVSbI1MsYwFPGkMA0/G7VyciUBy+TSc
-	 rV0XXcGZqg6yR3CeUXUGWPKay+TEKHmjuBfzkRDCi/xk4oSMyRQJBVeRjVmyveAwXa
-	 64uYjyOHV7p7Z6c4Ql5jQm+P9/WhH+m6JSTOrnjq3Pdraes7nLpCHe+y0JUe+pDNhb
-	 OiQCIQl9N0fSSzP3PzMg/bJhshi1SvQ5XoA/zYgA02pDS14SECX3IMPFGs7iu0CbRM
-	 94wLf++lBqa3uxR7VaUMX1hJl549O7a2NXGCsoBYrtTIGijfmhdsZWWLkh/GEGEfII
-	 2Unzs70yGSZhA==
-Date: Thu, 13 Nov 2025 00:10:50 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Shuah Khan <shuah@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Phil Sutter <phil@nwl.cc>, Florian Westphal <fw@strlen.de>,
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH nf-next v9 2/3] net: netfilter: Add IPIP flowtable tx sw
- acceleration
-Message-ID: <aRUT-tFXYbwfZYUk@calendula>
-References: <20251107-nf-flowtable-ipip-v9-0-7cbc4090dfcb@kernel.org>
- <20251107-nf-flowtable-ipip-v9-2-7cbc4090dfcb@kernel.org>
- <aRSDjkzMx4Ba7IW8@calendula>
- <aRSvnfdhO2G1DXJI@lore-desk>
+	s=arc-20240116; t=1762989861; c=relaxed/simple;
+	bh=/rrqrWefr6Be8/0xwOqC6LYKV/EgTwyOcbreEBWCCuM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FIE8xW/NML/jneWbsK6HZpLpJJ0uBkdZogkNYaYLWViGHzvGN1375RVeJa3Rsxu3bWrsPxHeLE0XszeUsybRPb12LnurCox2YGFT+eWYiH5nv+gDLVyZI5N/r7HkkeeSVfJrcbEPv+4FGRAou1iCjSggdSh2J5u5tC7vp2msFTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=FtabXl5d; arc=none smtp.client-ip=95.215.58.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1762989847;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Ae3Y9wLC7e7ztA80BXItavwEzFGlDsl4crb0Mx/OgXA=;
+	b=FtabXl5dLrk+jCbT6Y9bZm8NdSH0StZRFNjxqiKkDpSgpmpCI9EB50QX4Dwn2Mh/JQDXhq
+	uWDxxdkvrvANJfd10xVkxqTeU50xPvEzJiajee/TgnLeecoyB+rnHi0QW2bzmewAZ/LdaZ
+	YW/WvQwZILBFJcHBucFPNmuRsQgSvtQ=
+From: Martin KaFai Lau <martin.lau@linux.dev>
+To: bpf@vger.kernel.org
+Cc: 'Alexei Starovoitov ' <ast@kernel.org>,
+	'Andrii Nakryiko ' <andrii@kernel.org>,
+	'Daniel Borkmann ' <daniel@iogearbox.net>,
+	netdev@vger.kernel.org,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Kaiyan Mei <M202472210@hust.edu.cn>,
+	Yinhao Hu <dddddd@hust.edu.cn>
+Subject: [PATCH bpf-next 1/2] bpf: Check skb->transport_header is set in bpf_skb_check_mtu
+Date: Wed, 12 Nov 2025 15:23:30 -0800
+Message-ID: <20251112232331.1566074-1-martin.lau@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <aRSvnfdhO2G1DXJI@lore-desk>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi Lorenzo,
+From: Martin KaFai Lau <martin.lau@kernel.org>
 
-On Wed, Nov 12, 2025 at 05:02:37PM +0100, Lorenzo Bianconi wrote:
-[...]
-> > On Fri, Nov 07, 2025 at 12:14:47PM +0100, Lorenzo Bianconi wrote:
-> > [...]
-> > > @@ -565,8 +622,9 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buff *skb,
-> > >  
-> > >  	dir = tuplehash->tuple.dir;
-> > >  	flow = container_of(tuplehash, struct flow_offload, tuplehash[dir]);
-> > > +	other_tuple = &flow->tuplehash[!dir].tuple;
-> > >  
-> > > -	if (nf_flow_encap_push(skb, &flow->tuplehash[!dir].tuple) < 0)
-> > > +	if (nf_flow_encap_push(state->net, skb, other_tuple))
-> > >  		return NF_DROP;
-> > >  
-> > >  	switch (tuplehash->tuple.xmit_type) {
-> > > @@ -577,7 +635,9 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buff *skb,
-> > >  			flow_offload_teardown(flow);
-> > >  			return NF_DROP;
-> > >  		}
-> > > -		neigh = ip_neigh_gw4(rt->dst.dev, rt_nexthop(rt, flow->tuplehash[!dir].tuple.src_v4.s_addr));
-> > > +		dest = other_tuple->tun_num ? other_tuple->tun.src_v4.s_addr
-> > > +					    : other_tuple->src_v4.s_addr;
-> > 
-> > I think this can be simplified if my series use the ip_hdr(skb)->daddr
-> > for rt_nexthop(), see attached patch. This would be fetched _before_
-> > pushing the tunnel and layer 2 encapsulation headers. Then, there is
-> > no need to fetch other_tuple and check if tun_num is greater than
-> > zero.
-> > 
-> > See my sketch patch, I am going to give this a try, if this is
-> > correct, I would need one more iteration from you.
-> >
-> > diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_table_ip.c
-> > index 8b74fb34998e..ff2b6c16c715 100644
-> > --- a/net/netfilter/nf_flow_table_ip.c
-> > +++ b/net/netfilter/nf_flow_table_ip.c
-> > @@ -427,6 +427,7 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buff *skb,
-> >  	struct flow_offload *flow;
-> >  	struct neighbour *neigh;
-> >  	struct rtable *rt;
-> > +	__be32 ip_dst;
-> >  	int ret;
-> >  
-> >  	tuplehash = nf_flow_offload_lookup(&ctx, flow_table, skb);
-> > @@ -449,6 +450,7 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buff *skb,
-> >  
-> >  	dir = tuplehash->tuple.dir;
-> >  	flow = container_of(tuplehash, struct flow_offload, tuplehash[dir]);
-> > +	ip_dst = ip_hdr(skb)->daddr;
-> 
-> I agree this patch will simplify my series (thx :)) but I guess we should move
-> ip_dst initialization after nf_flow_encap_push() since we need to route the
-> traffic according to the tunnel dst IP address, right?
+The bpf_skb_check_mtu helper needs to use skb->transport_header when
+the BPF_MTU_CHK_SEGS flag is used:
 
-Right, I made a quick edit, it looks like this:
+	bpf_skb_check_mtu(skb, ifindex, &mtu_len, 0, BPF_MTU_CHK_SEGS)
 
-@@ -566,9 +624,14 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buff *skb,
- 
-        dir = tuplehash->tuple.dir;
-        flow = container_of(tuplehash, struct flow_offload, tuplehash[dir]);
-+       other_tuple = &flow->tuplehash[!dir].tuple;
-+
-+       if (nf_flow_tunnel_push(skb, other_tuple) < 0)
-+               return NF_DROP;
-+
-        ip_daddr = ip_hdr(skb)->daddr;
- 
--       if (nf_flow_encap_push(skb, &flow->tuplehash[!dir].tuple) < 0)
-+       if (nf_flow_encap_push(skb, other_tuple) < 0)
-                return NF_DROP;
- 
-        switch (tuplehash->tuple.xmit_type) {
+The transport_header is not always set. There is a WARN_ON_ONCE
+report when CONFIG_DEBUG_NET is enabled + skb->gso_size is set +
+bpf_prog_test_run is used:
 
-That is, after tunnel header push but before pushing l2 encap (that
-could possibly modify skb_network_header pointer), fetch the
-destination address.
+WARNING: CPU: 1 PID: 2216 at ./include/linux/skbuff.h:3071
+ skb_gso_validate_network_len
+ bpf_skb_check_mtu
+ bpf_prog_3920e25740a41171_tc_chk_segs_flag # A test in the next patch
+ bpf_test_run
+ bpf_prog_test_run_skb
 
-I made a few more comestic edits on your series and I pushed them out
-to this branch:
+For a normal ingress skb (not test_run), skb_reset_transport_header
+is performed but there is plan to avoid setting it as described in
+commit 2170a1f09148 ("net: no longer reset transport_header in __netif_receive_skb_core()").
 
-https://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git/log/?h=flowtable-consolidate-xmit%2bipip
+This patch fixes the bpf helper by checking
+skb_transport_header_was_set(). The check is done just before
+skb->transport_header is used, to avoid breaking the existing bpf prog.
+The WARN_ON_ONCE is limited to bpf_prog_test_run, so targeting bpf-next.
 
-I just noticed, in nf_flow_tunnel_ipip_push(), that this can be removed:
+Fixes: 34b2021cc616 ("bpf: Add BPF-helper for MTU checking")
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>
+Reported-by: Kaiyan Mei <M202472210@hust.edu.cn>
+Reported-by: Yinhao Hu <dddddd@hust.edu.cn>
+Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
+---
+ net/core/filter.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-        memset(IPCB(skb), 0, sizeof(*IPCB(skb)));
+diff --git a/net/core/filter.c b/net/core/filter.c
+index 1efec0d70d78..df6ce85e48dc 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -6429,9 +6429,12 @@ BPF_CALL_5(bpf_skb_check_mtu, struct sk_buff *, skb,
+ 	 */
+ 	if (skb_is_gso(skb)) {
+ 		ret = BPF_MTU_CHK_RET_SUCCESS;
+-		if (flags & BPF_MTU_CHK_SEGS &&
+-		    !skb_gso_validate_network_len(skb, mtu))
+-			ret = BPF_MTU_CHK_RET_SEGS_TOOBIG;
++		if (flags & BPF_MTU_CHK_SEGS) {
++			if (!skb_transport_header_was_set(skb))
++				return -EINVAL;
++			if (!skb_gso_validate_network_len(skb, mtu))
++				ret = BPF_MTU_CHK_RET_SEGS_TOOBIG;
++		}
+ 	}
+ out:
+ 	*mtu_len = mtu;
+-- 
+2.47.3
 
-because this packet never entered the IP layer, the flowtable takes it
-before it can get there.
 
