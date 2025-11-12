@@ -1,167 +1,169 @@
-Return-Path: <netdev+bounces-237923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97FAFC5191D
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 11:09:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE151C5185A
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 10:59:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4018424D89
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 09:51:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA84618820F3
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 09:57:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74AFE3002A6;
-	Wed, 12 Nov 2025 09:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B47C33002A9;
+	Wed, 12 Nov 2025 09:56:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F0882FE59F
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 09:50:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 586F82FF663;
+	Wed, 12 Nov 2025 09:56:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762941029; cv=none; b=Yvyl4jdRHlA/X2nuQt2D2IDO9qpwG6e+ZwLQd/L06KPJEo5kyKnVkARwm3d5X1G2ampGjkseRmiKiu8gRAun4TWcDP5aPk3t/YjclXg5Qt66T6LWru06OLKmlOMMslZ2oXUyA7+QmQZly+HXhdaJGp32+LJ50Pi71stf5Pb0GJY=
+	t=1762941386; cv=none; b=BvMDMgLem2ZfztCZfVRa5xwPEKgEVrVGGAUHKNzlVlwQT7a/tkwGQ301i3lzbW9vvIezYhr+BSZgpYWjmyPIO0fAE9Ws8QspxHdj/15NEMnZK8G4/GTthhq26gtUOKxNq8Y1l73gSYqTXohuFZftRK6rtQaX1VDgAEOSgPdUdn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762941029; c=relaxed/simple;
-	bh=beH0aNDGKuJ+32YpmQmMT5gL32xJIZYbDXbe936SAvg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=EeNJ0f4BV17Dg/STm/p9awsDgSjtg8Twr+UaaB/2cqdwyisHVQLSh/I3zcPLybR7K9esD4bEK7p/is4Q+z3/qY846Jx/++GyXzkMG2qEmZg3aTux+HK1urhpuptc5Entpm/JtJZT7xyJQxqj7Ss9pA2hukc2N8Lywsyzwztaub0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-4505b05e7b5so158529b6e.2
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 01:50:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762941026; x=1763545826;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DpXwwzHOaxXlBoIFLoYYIaNOb3AgpnrR/uWR9cK9DAI=;
-        b=uX1Jo2tCtRoBXiqN8Gu3PCdeb5WVw1O9L/cjyjttjnhjFAxUssTyhGGk0CuvMFKXvh
-         Q1eha/mz1ZTTaVSiMrr7rcGufCam/wXETOx0nJUD8cAf6p99S6FW2Zm7DQwqzNMo8CkI
-         vrLmeUpIzRGOKszisde+LytZSaiNUqsaPF4T1HMB+hlk3+yTkDzCQW/HCJwQ7u9eodAI
-         ZJXOoaDBZR0cUpuzC8H4cnGK9SG1h6jc2PTNC7Vh0VW738bcBi/N8me4y+A+kpL2uyFY
-         lG77JChHeQazorWmN2gdi6cPV4DQ1SGha70KqqX9/FmrXuVwJEQ+GkPDa/jYvkzUzmNf
-         c4XA==
-X-Gm-Message-State: AOJu0YwxL32mAwMV7ZcjQIJi4U5BXHBWU4zIPvzkFfXk6amJojR1u5N7
-	2oUI1byc6w9eK7NR3OvVDHnj9rd7N0sq5pUkQjWbUf6r4oVP9KZl4SrH
-X-Gm-Gg: ASbGncssvtrv3TU2540WGl4Fi3UabaAWR36wL8oWXdnL+Ove/NeJXfkfy6g6buHYrse
-	cibA47kcce7ns2bKX0Rs1aMdK0KwoYWjv0ScM+vmUh3njDRoTlZQcErRYtPdWaQxE7545RYhncd
-	1sFW3C2EMjJB6JRfpGb3eq3zvMwGA2M8wLgpnNH8rEwLZ/VLHv/SIHm4qBO5YIR5U6FbR7/A9xa
-	rwxSQYcVl4cUSxbBkwj4qbol7ohSTclvx6d4PC+43BDYxEKac3a9jSyYUAssdtPPLiFe91+YcPo
-	bOOn/EJfCciCJIbjFk/VtWtHLjwgtFbVu4YOdUUtIQF95UOQRhPlZICOZJjWfFs7085MEzKewDr
-	UVIa/zSb/7n628Kvww7Cyph/5y7O207Ch6yFgZrOWthx8hzufS1pM6AABMbxhY7v3/Zrley2UZC
-	5Jq44=
-X-Google-Smtp-Source: AGHT+IHtHCFbCH8j0aKNtBOwFbMViba6SRutkgYrQJRH1tU0LDhiR1WN8lt5sDOpUMv6IklQY4noQw==
-X-Received: by 2002:a05:6808:22a6:b0:44d:af21:bf34 with SMTP id 5614622812f47-4507444e54fmr991030b6e.2.1762941025668;
-        Wed, 12 Nov 2025 01:50:25 -0800 (PST)
-Received: from localhost ([2a03:2880:10ff:49::])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-4500280856fsm8065047b6e.24.2025.11.12.01.50.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Nov 2025 01:50:25 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-Date: Wed, 12 Nov 2025 01:50:23 -0800
-Subject: [PATCH net-next] net: bnx2x: convert to use get_rx_ring_count
+	s=arc-20240116; t=1762941386; c=relaxed/simple;
+	bh=cslFZpQ7jV9CKrGaEhC7YVXSe928JWEpLIJ3j4lGY2w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cx/Bw8NFM+erSD2i/VF35ln603SeprQtNFiw0fV7HloljSeJ2Bm6bWBNDw0wJjjPnGZA8soMgTi3SatZ4gxwCgrxBM5LQUU7uPTzmTdZNWAlhEOtr6WntDp56eYX8ROdsK3q5U/hRfTnKZ6buKhxFtMGLO4YM6xY1mfxJzleXCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.2.215] (p57bd98fa.dip0.t-ipconnect.de [87.189.152.250])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 854F561CC3FD1;
+	Wed, 12 Nov 2025 10:56:02 +0100 (CET)
+Message-ID: <472c08c3-046a-4f16-ae88-c101ff6b7262@molgen.mpg.de>
+Date: Wed, 12 Nov 2025 10:55:58 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20251112-bnx_grxrings-v1-1-1c2cb73979e2@debian.org>
-X-B4-Tracking: v=1; b=H4sIAF5YFGkC/x3MUQrCMAwG4KuE/3mFNTqQXkVE1jareYmSDimM3
- V3wO8B3oIurdCQ64PLVrm9DojgRymu1JkErEoFnXmKMHLKNZ/Phaq2HOZdSr5zrjS+YCB+XTce
- /u8NkDyZjx+M8fx7dJm9oAAAA
-X-Change-ID: 20251112-bnx_grxrings-0bccd42bd823
-To: Sudarsana Kalluru <skalluru@marvell.com>, 
- Manish Chopra <manishc@marvell.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- kernel-team@meta.com, Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.15-dev-a6db3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2471; i=leitao@debian.org;
- h=from:subject:message-id; bh=beH0aNDGKuJ+32YpmQmMT5gL32xJIZYbDXbe936SAvg=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBpFFhgjgMAx8QI7DUEZko2QkT4Y3jl+kfC2Jz2u
- e04QWGWqwqJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCaRRYYAAKCRA1o5Of/Hh3
- bT3dD/0b4Mgi2kgPBK1La5cXRsiG7Nx78A+Bgs05IeE6ZcjjqvPEVpBLQD/yPu4p0Q7oT01yu1z
- riiUlyQdOTWf6AR3uOY+ggqqCfPH2wkbG3OoJL2FGSQ4GXNP7Tux7BIST2APfgTvvZcx0g7VfA4
- i2DeZr9s3GDUoQdyG5FWTj6uyQZT7W4Fbe+ejoJ7OClrXmSGu9fJ3W4aIvdS2tIBSf/BWTkjwyk
- eqfl4DMNZ1gvcNyDN6f1zDGphzp51lJp1hkXsXGAFNnFrp7KzCCUOW7Lm3cmDTqWYXaSKkylBbr
- VkIGJWD/tbrk+3XxnEJZmhWOAFcjXP/VXl8JAz4UfIBQkQRA3OeC3bSXeIVKppnkeIHlwovn037
- AT6PhYDx+ATjnaOqGIdbzbvh0XUDyxymJgdg3B2JzMTZLOlCDvmTxaQ+SGFbplHikUAwrUnErT6
- Zxn3ojkdt66fkHHg4uggDnXu1yCdFUvH/DXBzd9EgIadjLueNOmGzdqO7Hupn+fzcYceQkdLwyF
- UzITPv61FC43K+Q6fsnbLhHCYe02/SsRem8zSbg/YXvLw5q6SNuAuDBCIdJH5/wl64SkahEzleV
- YTFnWT2WD3uSGHkrWG8prq78P0s8tENIm9Fioehm33Dak2DwpFSx1Lb5k/TbY6oqRE60Orxgv+L
- CnOGj43T6BdmXsw==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] Bluetooth: Process Read Remote Version evt
+To: Gongwei Li <13875017792@163.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Gongwei Li <ligongwei@kylinos.cn>
+References: <20251112094843.173238-1-13875017792@163.com>
+ <20251112094843.173238-2-13875017792@163.com>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20251112094843.173238-2-13875017792@163.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Convert the bnx2x driver to use the new .get_rx_ring_count ethtool
-operation instead of implementing .get_rxnfc solely for handling
-ETHTOOL_GRXRINGS command. This simplifies the code by replacing the
-switch statement with a direct return of the queue count.
+Dear Gongwei,
 
-The new callback provides the same functionality in a more direct way,
-following the ongoing ethtool API modernization.
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c | 16 ++++------------
- 1 file changed, 4 insertions(+), 12 deletions(-)
+Thank you for your patch. I’d spell out event in the commit message 
+summary/title.
 
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
-index fc8dec37a9e4..3d853eeb976f 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
-@@ -3355,19 +3355,11 @@ static int bnx2x_get_rxfh_fields(struct net_device *dev,
- 	return 0;
- }
- 
--static int bnx2x_get_rxnfc(struct net_device *dev, struct ethtool_rxnfc *info,
--			   u32 *rules __always_unused)
-+static u32 bnx2x_get_rx_ring_count(struct net_device *dev)
- {
- 	struct bnx2x *bp = netdev_priv(dev);
- 
--	switch (info->cmd) {
--	case ETHTOOL_GRXRINGS:
--		info->data = BNX2X_NUM_ETH_QUEUES(bp);
--		return 0;
--	default:
--		DP(BNX2X_MSG_ETHTOOL, "Command parameters not supported\n");
--		return -EOPNOTSUPP;
--	}
-+	return BNX2X_NUM_ETH_QUEUES(bp);
- }
- 
- static int bnx2x_set_rxfh_fields(struct net_device *dev,
-@@ -3674,7 +3666,7 @@ static const struct ethtool_ops bnx2x_ethtool_ops = {
- 	.get_strings		= bnx2x_get_strings,
- 	.set_phys_id		= bnx2x_set_phys_id,
- 	.get_ethtool_stats	= bnx2x_get_ethtool_stats,
--	.get_rxnfc		= bnx2x_get_rxnfc,
-+	.get_rx_ring_count	= bnx2x_get_rx_ring_count,
- 	.get_rxfh_indir_size	= bnx2x_get_rxfh_indir_size,
- 	.get_rxfh		= bnx2x_get_rxfh,
- 	.set_rxfh		= bnx2x_set_rxfh,
-@@ -3702,7 +3694,7 @@ static const struct ethtool_ops bnx2x_vf_ethtool_ops = {
- 	.get_sset_count		= bnx2x_get_sset_count,
- 	.get_strings		= bnx2x_get_strings,
- 	.get_ethtool_stats	= bnx2x_get_ethtool_stats,
--	.get_rxnfc		= bnx2x_get_rxnfc,
-+	.get_rx_ring_count	= bnx2x_get_rx_ring_count,
- 	.get_rxfh_indir_size	= bnx2x_get_rxfh_indir_size,
- 	.get_rxfh		= bnx2x_get_rxfh,
- 	.set_rxfh		= bnx2x_set_rxfh,
+Am 12.11.25 um 10:48 schrieb Gongwei Li:
+> From: Gongwei Li <ligongwei@kylinos.cn>
+> 
+> Add processing for HCI Process Read Remote Version event.
+> Used to query the lmp version of remote devices.
 
----
-base-commit: 37eb4c8985f12ea1c5b62defc673346ac4a113cd
-change-id: 20251112-bnx_grxrings-0bccd42bd823
+How did you test it?
 
-Best regards,
---  
-Breno Leitao <leitao@debian.org>
+> Signed-off-by: Gongwei Li <ligongwei@kylinos.cn>
+> ---
+>   include/net/bluetooth/hci_core.h |  1 +
+>   net/bluetooth/hci_event.c        | 23 +++++++++++++++++++++++
+>   net/bluetooth/mgmt.c             |  5 +++++
+>   3 files changed, 29 insertions(+)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 32b1c08c8bba..bdd5e6ef3616 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -749,6 +749,7 @@ struct hci_conn {
+>   
+>   	__u8		remote_cap;
+>   	__u8		remote_auth;
+> +	__u8		remote_ver;
+>   
+>   	unsigned int	sent;
+>   
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index f20c826509b6..7f8e3f8ec01e 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -3737,6 +3737,26 @@ static void hci_remote_features_evt(struct hci_dev *hdev, void *data,
+>   	hci_dev_unlock(hdev);
+>   }
+>   
+> +static void hci_remote_version_evt(struct hci_dev *hdev, void *data,
+> +				   struct sk_buff *skb)
+> +{
+> +	struct hci_ev_remote_version *ev = (void *)skb->data;
+> +	struct hci_conn *conn;
+> +
+> +	BT_DBG("%s", hdev->name);
+> +
+> +	hci_dev_lock(hdev);
+> +
+> +	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
+> +	if (!conn)
+> +		goto unlock;
+> +
+> +	conn->remote_ver = ev->lmp_ver;
+> +
+> +unlock:
+> +	hci_dev_unlock(hdev);
+> +}
+> +
+>   static inline void handle_cmd_cnt_and_timer(struct hci_dev *hdev, u8 ncmd)
+>   {
+>   	cancel_delayed_work(&hdev->cmd_timer);
+> @@ -7448,6 +7468,9 @@ static const struct hci_ev {
+>   	/* [0x0b = HCI_EV_REMOTE_FEATURES] */
+>   	HCI_EV(HCI_EV_REMOTE_FEATURES, hci_remote_features_evt,
+>   	       sizeof(struct hci_ev_remote_features)),
+> +	/* [0x0c = HCI_EV_REMOTE_VERSION] */
+> +	HCI_EV(HCI_EV_REMOTE_VERSION, hci_remote_version_evt,
+> +	       sizeof(struct hci_ev_remote_version)),
+>   	/* [0x0e = HCI_EV_CMD_COMPLETE] */
+>   	HCI_EV_REQ_VL(HCI_EV_CMD_COMPLETE, hci_cmd_complete_evt,
+>   		      sizeof(struct hci_ev_cmd_complete), HCI_MAX_EVENT_SIZE),
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 79762bfaea5f..c0bab45648f3 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -9728,6 +9728,9 @@ void mgmt_device_connected(struct hci_dev *hdev, struct hci_conn *conn,
+>   {
+>   	struct sk_buff *skb;
+>   	struct mgmt_ev_device_connected *ev;
+> +	struct hci_cp_read_remote_version cp;
+> +
+> +	memset(&cp, 0, sizeof(cp));
+>   	u16 eir_len = 0;
+>   	u32 flags = 0;
+>   
+> @@ -9774,6 +9777,8 @@ void mgmt_device_connected(struct hci_dev *hdev, struct hci_conn *conn,
+>   	ev->eir_len = cpu_to_le16(eir_len);
+>   
+>   	mgmt_event_skb(skb, NULL);
+> +
+> +	hci_send_cmd(hdev, HCI_OP_READ_REMOTE_VERSION, sizeof(cp), &cp);
+>   }
+>   
+>   static void unpair_device_rsp(struct mgmt_pending_cmd *cmd, void *data)
 
+The diff looks good. Please feel free to add:
+
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+
+
+Kind regards,
+
+Paul
 
