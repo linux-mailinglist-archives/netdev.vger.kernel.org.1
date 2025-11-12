@@ -1,60 +1,66 @@
-Return-Path: <netdev+bounces-237781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237782-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63F2FC502EC
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 02:13:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 312F8C502FF
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 02:18:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 189363AE034
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 01:13:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0C8E1895B48
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 01:19:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4423A21A457;
-	Wed, 12 Nov 2025 01:13:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07C2422370D;
+	Wed, 12 Nov 2025 01:18:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rfj0GrFe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TLPc63+d"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C44F155757;
-	Wed, 12 Nov 2025 01:13:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9145146A66;
+	Wed, 12 Nov 2025 01:18:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762910024; cv=none; b=Rann5wqhSl617wWq8z2PBzOIj9kCLzuEJcuA7ZFalk5VeyLOyibBON3Tv321rWKq1T4FP2hv+AgrcCAL4SYI6K9mKdVS97YPDw4a77mm541N6k1qYD+/ZMkiNE9HWa7B2oIoxY0mr8sQ1mB00Gb2t9r+LPFC2Ykm6uxtDBmNKrI=
+	t=1762910331; cv=none; b=u0NOcJ/5i1aJVpS5uPcSibiI62KUgrz3AU7UkbT1CEH5T2g+TvrNBMZzCzNRrPaSKW0q6hH8dm8NdMwZRcNFOMLbxXvquCXDk4DbqBTuSM61vn1Ofbn++CJ6/gDg/Ja3gQg1Gl24CgSJfPfMue3ImwkLmfemDj+AFyRRX1wBoIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762910024; c=relaxed/simple;
-	bh=oDl1WfrAghq+RE9pFio7UD5bjLDfO6Rlsgm4KgrcWl4=;
+	s=arc-20240116; t=1762910331; c=relaxed/simple;
+	bh=97xU45qdEBpW2fivb5PGMD/llcOzvONkpb6RqID0mCE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=j0Mu6Z5vcFsZ+A4idLS5yCIh6ArAXwiOll5ZvnZlm1I+6zD9ukfq+TWMaMrw3DIl7xGliRpW6Tj15ngjGCRw2nX+k7NEDQIn/6QgVdDifFy7VORiUcCLB8LLDQfrZZ8s2nqtv8Zy5PIpVsKbl04tMNaiFUzjchufkrDeRnVGmUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rfj0GrFe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6B04C4CEF5;
-	Wed, 12 Nov 2025 01:13:42 +0000 (UTC)
+	 MIME-Version:Content-Type; b=cgj73TtJgUrJJrKF6rCXlDnGhefWRfLLKJ6Dpr9+74GJe5Xo3tkI2SizkQ49gj7wMJRkgYihFDJeso/806uR+WnrNi59HMs4TnWmDTR+MrX8J9ZC3qqHu2U2MtXpC/zemO1nrlD3IO8p+oVL5zyemPyQslVEGQuEJ60O/MZRXpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TLPc63+d; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B678C4CEF5;
+	Wed, 12 Nov 2025 01:18:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762910023;
-	bh=oDl1WfrAghq+RE9pFio7UD5bjLDfO6Rlsgm4KgrcWl4=;
+	s=k20201202; t=1762910330;
+	bh=97xU45qdEBpW2fivb5PGMD/llcOzvONkpb6RqID0mCE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rfj0GrFe/hv7wIbYG9qd9byNFSuj7ayLnIGNwAkNADVc7oNrOLtZrrnz/hoQ6ODGI
-	 phdKmiLSry0/IkvyCxN7WyY8eQS+TAIJxP2P4gx1nXVGwCm46CvCdyEHBkABEy37SY
-	 NbvKyrNAz1yonoh1SCJcTm00ccmjeiuKKFb2K686WJ/rPnqD2fSZDo121GFoNKZDC3
-	 OLmIuaB1MNlBBKNdhoq9DcK3uRhQNHvtFwLkOEQWrZFmdTOuzkHaHldrwJ1ku6Iii8
-	 l4uzpXbhRtOgKEivbZye67n5ky4YBZ1TSY7SZyqdfmxO12VoSTllOxRvgKuzIIVvQ2
-	 aSqTD8/vkRZNw==
-Date: Tue, 11 Nov 2025 17:13:41 -0800
+	b=TLPc63+dMvlBPnRfG3N925Xo9BAPQn4nhuvICt7vX/ogkcFEEN5FSjfLzWsafcs3B
+	 GdGLo8ylkJMcxrzw6Z5FZjYEDnhTUV4BCC5ciI2Dg3rRy2pW1UTw+wzO58PyzHh5UD
+	 Yiib+/YdGwGcgVHWYD3oDSt9AESHDpAGpZV5Odn0t7wEK7GmXVhwxO3IQEcKKIvpmQ
+	 xFNI1jij7O84TF632Q+3tOuHvTo2QLvYzhtrsXvwRBzslAj3FMI/vvvORx8/g2xkIU
+	 woBXRh6PHna01qzjnYUi+jWSguds+VpSYdCzIKALeSux0JOr2HiFoNcBpvdASddpVL
+	 gt7o9OCHfd7KA==
+Date: Tue, 11 Nov 2025 17:18:48 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: "Nikola Z. Ivanov" <zlatistiv@gmail.com>
-Cc: jiri@resnulli.us, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
- david.hunter.linux@gmail.com, khalid@kernel.org,
- linux-kernel-mentees@lists.linuxfoundation.org,
- syzbot+a2a3b519de727b0f7903@syzkaller.appspotmail.com
-Subject: Re: [PATCH net] team: Move team device type change at the end of
- team_port_add
-Message-ID: <20251111171341.4c6d69be@kernel.org>
-In-Reply-To: <20251112003444.2465-1-zlatistiv@gmail.com>
-References: <20251112003444.2465-1-zlatistiv@gmail.com>
+To: Roger Quadros <rogerq@kernel.org>
+Cc: Siddharth Vadapalli <s-vadapalli@ti.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Sumit Semwal <sumit.semwal@linaro.org>,
+ Christian =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>, Stanislav
+ Fomichev <sdf@fomichev.me>, Simon Horman <horms@kernel.org>, srk@ti.com,
+ Meghana Malladi <m-malladi@ti.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linaro-mm-sig@lists.linaro.org
+Subject: Re: [PATCH net-next v2 0/7] net: ethernet: ti: am65-cpsw: add
+ AF_XDP zero copy support
+Message-ID: <20251111171848.1a4c8c03@kernel.org>
+In-Reply-To: <20251109-am65-cpsw-xdp-zc-v2-0-858f60a09d12@kernel.org>
+References: <20251109-am65-cpsw-xdp-zc-v2-0-858f60a09d12@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,29 +70,22 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 12 Nov 2025 02:34:44 +0200 Nikola Z. Ivanov wrote:
-> Attempting to add a port device that is already up will expectedly fail,
-> but not before modifying the team device header_ops.
+On Sun, 09 Nov 2025 23:37:50 +0200 Roger Quadros wrote:
+> This series adds AF_XDP zero coppy support to am65-cpsw driver.
 > 
-> In the case of the syzbot reproducer the gre0 device is
-> already in state UP when it attempts to add it as a
-> port device of team0, this fails but before that
-> header_ops->create of team0 is changed from eth_header to ipgre_header
-> in the call to team_dev_type_check_change.
+> Tests were performed on AM62x-sk with xdpsock application [1].
 > 
-> Later when we end up in ipgre_header() struct *ip_tunnel points to nonsense
-> as the private data of the device still holds a struct team.
+> A clear improvement is seen in 64 byte packets on Transmit (txonly)
+> and receive (rxdrop).
+> 1500 byte test seems to be limited by line rate (1G link) so no
+> improvement seen there in packet rate. A test on higher speed link
+> (or PHY-less setup) might be worthwile.
 > 
-> Move team_dev_type_check_change down where all other checks have passed
-> as it changes the dev type with no way to restore it in case
-> one of the checks that follow it fail.
+> There is some issue during l2fwd with 64 byte packets and benchmark
+> results show 0. This issue needs to be debugged further.
+> A 512 byte l2fwd test result has been added to compare instead.
 
-Since this is a bug fix it must have a Fixes tag pointing to first
-commit where the issue could be reproduced.
-
-Please make sure to have a quick read of (at least the tl;dr of)
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
-before reposting.
--- 
-pw-bot: cr
+It appears that the drivers/net/ethernet/ti/am65-* files do not fall
+under any MAINTAINERS entry. Please add one or extend the existing CPSW
+entry as the first patch of the series.
 
