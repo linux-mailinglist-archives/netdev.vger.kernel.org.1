@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-237906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2ADDC5159A
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 10:28:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A8129C5155E
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 10:25:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 978B63BAD12
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 09:18:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6F953B9800
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 09:18:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E8A2301011;
-	Wed, 12 Nov 2025 09:18:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 302F12FF170;
+	Wed, 12 Nov 2025 09:18:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6387283FEE
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 09:17:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E0DC2FFDE4
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 09:17:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762939081; cv=none; b=SqCGxtuOZoO+J1VxwW9uonInILcXx6NxiMjqWaKt573+e354fRaZ6hiLL63zezqNzP35C9sLYduftfAfyov6h4LS7HNb5SsDuOAlEbEohqRhUqooaRH/0HIVJ4TBuWUkCcQmBdoGNbxI1G4Xnx7RXUZsF3OfABNmDnA04nQ8WFo=
+	t=1762939080; cv=none; b=WRbKDWd2+a3TFbqG4p8UvgN6jxkXYXr5UwYmzE59cd4X6ObGf9gaq+FPacyb0entdHbrpmATNg/mNd1tupYMkzmOXYojhlIgrSqiwquFzC4Kk9es3mu7/sDFQHaQbR/2rigeoqifAkIsujy3SjOl0AKXx9uX3F/0TSXI0ptTU6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762939081; c=relaxed/simple;
-	bh=ttV04zQsArWRH3tRexUGjN8wwUarfCZf7YZOTNPG7yQ=;
+	s=arc-20240116; t=1762939080; c=relaxed/simple;
+	bh=AW7kgSmkrxzbFDoWM68dq4FFV6JmO+GBvqwkcwA7z3M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Qz8jZo7GjIIQlRvy+Xqdf9dWBIYhFVtbcNekk4YxCAJ3pDrco5V9lo4xK3yO/Y2flDKCb8mTkDwnTlgdutrWClSuIAI7Wd9gByP2nVrp0I5nvD0o+Y0ku8IhEYttfR40Up1jQr2eBZ1zJ/EuhKk8tAEO/uxoWeshhkAc9F1QKGk=
+	 MIME-Version; b=keuUPT/baGY5nYvItgMohWcO0wY+JhVKKj9AEPxfiYFoR5hd2UvJIwxY6cCHkeyxZ7AkUb2fFrmQMA4whEuwIoaT+kYqfWzzDIaxlFWaxE+BMQgSG9lm2s+/H+IRJIx16n3qDFNef8SXvveZBewpibOIGPmrin2eO5Cm5baBUC0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,19 +33,19 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1vJ6yw-0007V4-Fs; Wed, 12 Nov 2025 10:17:38 +0100
+	id 1vJ6yw-0007V5-Fw; Wed, 12 Nov 2025 10:17:38 +0100
 Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1vJ6yv-0003cK-2V;
+	id 1vJ6yv-0003cL-2a;
 	Wed, 12 Nov 2025 10:17:37 +0100
 Received: from blackshift.org (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
 	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 71C9149D999;
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 8099B49D99A;
 	Wed, 12 Nov 2025 09:17:37 +0000 (UTC)
 From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
@@ -57,9 +57,9 @@ Cc: davem@davemloft.net,
 	Kory Maincent <kory.maincent@bootlin.com>,
 	Vincent Mailhol <mailhol@kernel.org>,
 	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net-next 02/11] can: peak_canfd: convert to use ndo_hwtstamp callbacks
-Date: Wed, 12 Nov 2025 10:13:42 +0100
-Message-ID: <20251112091734.74315-3-mkl@pengutronix.de>
+Subject: [PATCH net-next 03/11] can: peak_usb: convert to use ndo_hwtstamp callbacks
+Date: Wed, 12 Nov 2025 10:13:43 +0100
+Message-ID: <20251112091734.74315-4-mkl@pengutronix.de>
 X-Mailer: git-send-email 2.51.0
 In-Reply-To: <20251112091734.74315-1-mkl@pengutronix.de>
 References: <20251112091734.74315-1-mkl@pengutronix.de>
@@ -83,23 +83,23 @@ ndo_eth_ioctl handler does nothing after conversion - remove it.
 Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 Reviewed-by: Kory Maincent <kory.maincent@bootlin.com>
 Reviewed-by: Vincent Mailhol <mailhol@kernel.org>
-Link: https://patch.msgid.link/20251029231620.1135640-3-vadim.fedorenko@linux.dev
+Link: https://patch.msgid.link/20251029231620.1135640-4-vadim.fedorenko@linux.dev
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
- drivers/net/can/peak_canfd/peak_canfd.c | 35 +++++++++++--------------
+ drivers/net/can/usb/peak_usb/pcan_usb_core.c | 35 +++++++++-----------
  1 file changed, 16 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/net/can/peak_canfd/peak_canfd.c b/drivers/net/can/peak_canfd/peak_canfd.c
-index a53c9d347b7b..06cb2629f66a 100644
---- a/drivers/net/can/peak_canfd/peak_canfd.c
-+++ b/drivers/net/can/peak_canfd/peak_canfd.c
-@@ -743,36 +743,33 @@ static netdev_tx_t peak_canfd_start_xmit(struct sk_buff *skb,
- 	return NETDEV_TX_OK;
+diff --git a/drivers/net/can/usb/peak_usb/pcan_usb_core.c b/drivers/net/can/usb/peak_usb/pcan_usb_core.c
+index 94b1d7f15d27..cf48bb26d46d 100644
+--- a/drivers/net/can/usb/peak_usb/pcan_usb_core.c
++++ b/drivers/net/can/usb/peak_usb/pcan_usb_core.c
+@@ -784,36 +784,33 @@ static int peak_usb_set_data_bittiming(struct net_device *netdev)
+ 	return 0;
  }
  
 -static int peak_eth_ioctl(struct net_device *netdev, struct ifreq *ifr, int cmd)
-+static int peak_eth_hwtstamp_get(struct net_device *netdev,
-+				 struct kernel_hwtstamp_config *config)
++static int peak_hwtstamp_get(struct net_device *netdev,
++			     struct kernel_hwtstamp_config *config)
  {
 -	struct hwtstamp_config hwts_cfg = { 0 };
 +	config->tx_type = HWTSTAMP_TX_OFF;
@@ -121,9 +121,9 @@ index a53c9d347b7b..06cb2629f66a 100644
 -		hwts_cfg.rx_filter = HWTSTAMP_FILTER_ALL;
 -		if (copy_to_user(ifr->ifr_data, &hwts_cfg, sizeof(hwts_cfg)))
 -			return -EFAULT;
-+static int peak_eth_hwtstamp_set(struct net_device *netdev,
-+				 struct kernel_hwtstamp_config *config,
-+				 struct netlink_ext_ack *extack)
++static int peak_hwtstamp_set(struct net_device *netdev,
++			     struct kernel_hwtstamp_config *config,
++			     struct netlink_ext_ack *extack)
 +{
 +	if (config->tx_type == HWTSTAMP_TX_OFF &&
 +	    config->rx_filter == HWTSTAMP_FILTER_ALL)
@@ -136,16 +136,16 @@ index a53c9d347b7b..06cb2629f66a 100644
 +	return -ERANGE;
  }
  
- static const struct net_device_ops peak_canfd_netdev_ops = {
- 	.ndo_open = peak_canfd_open,
- 	.ndo_stop = peak_canfd_close,
+ static const struct net_device_ops peak_usb_netdev_ops = {
+ 	.ndo_open = peak_usb_ndo_open,
+ 	.ndo_stop = peak_usb_ndo_stop,
 -	.ndo_eth_ioctl = peak_eth_ioctl,
- 	.ndo_start_xmit = peak_canfd_start_xmit,
-+	.ndo_hwtstamp_get = peak_eth_hwtstamp_get,
-+	.ndo_hwtstamp_set = peak_eth_hwtstamp_set,
+ 	.ndo_start_xmit = peak_usb_ndo_start_xmit,
++	.ndo_hwtstamp_get = peak_hwtstamp_get,
++	.ndo_hwtstamp_set = peak_hwtstamp_set,
  };
  
- static int peak_get_ts_info(struct net_device *dev,
+ /* CAN-USB devices generally handle 32-bit CAN channel IDs.
 -- 
 2.51.0
 
