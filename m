@@ -1,159 +1,151 @@
-Return-Path: <netdev+bounces-238146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A21FC54A47
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 22:42:18 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF6F9C54A8F
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 22:53:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 885E2341BA5
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 21:42:10 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 45CED4E20CA
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 21:52:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E4672E22BA;
-	Wed, 12 Nov 2025 21:42:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A1AF2D7DE2;
+	Wed, 12 Nov 2025 21:52:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PhDS0fOT"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vzl19eoj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 008772D6E76
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 21:42:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36D8F2E7BDF
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 21:52:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762983727; cv=none; b=imZFOA/JHww2MOxnMoSVCCgxH+/u8Fb1zqjEZLollhgS/uYyl6rvcV2kCfHZI793PxQPgG+Jt9NzXWSEcl3XyPA1sHcyS4nTGIheYX4VHtar5jrpoh72J04XzyO40kcOQOKSs0vQuWwgD6QfkXZoY/liGZKBxZBVPtV492VL49k=
+	t=1762984355; cv=none; b=D9K/FekxwFQTxMdmiCcELbQy97hmi712o+ojsXmYa3NSxP4KUb+xumzzGfEQ8SwoylkcA1mVhck0SotO1eNTZjQvkHYrJwO+hyOD1PXhNCKN+dHqUcHEzCSTB9ejFrL3n26wKPqUmtJjJVkPdVMi9MPZu6NB2GeKSY0tn443HAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762983727; c=relaxed/simple;
-	bh=nuB61kww3NYzARmWzyj3/JWtL1K+5aUzT9fCLeONkXM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=H1rvNbbh5maqZLQSo+gpHtJu3HSvcyC636c7rJxWJk6Qdpa28zMIeNCM3bFH1mqgumNgNStMAOXf8hqhDfhvDUotMuu5ZD0w+OgIKM2zdkTQiUgKluzGj+2Rbqi2wKUvGGa2K5xhJJs4E30KmwEhUd6OIDRyL4fMilcjssXavGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PhDS0fOT; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1762983726; x=1794519726;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=nuB61kww3NYzARmWzyj3/JWtL1K+5aUzT9fCLeONkXM=;
-  b=PhDS0fOT4DHjTb0Y1lJyJrpZTJEMTRmC7Lbha4y71l96i38+rAg2+pCv
-   cOkx2au1/G04BkmAX42ZtaKZ/rwg/wWm8PiR9jPgQaxpQ++SLSSamEB4D
-   yykr/ikrGxgFfKlEtAhkJcxkeLFNEl2cRA9FG13Ok+I7QZgPn3r8chxsG
-   zABN9D+1M09Kc6tytqPMVXf+QiPmfawKe5DjJxKD08bWrCjGG+ekrDDgZ
-   63fDmQRp2NJTVqk4fZ+UAu8nQANbG7VO7782TlX+pD84E1WgCXCyz3+r1
-   HUMnSp7dwvE3Y8oRhbG+gxsdYrwtf/18R8LlG3lBl4hoGeuT5LMPIph7h
-   w==;
-X-CSE-ConnectionGUID: GCfc7daaQW+mq0cxWxx6wQ==
-X-CSE-MsgGUID: ZH7XyIGnQzCd5Mgs1HiqAw==
-X-IronPort-AV: E=McAfee;i="6800,10657,11611"; a="68690802"
-X-IronPort-AV: E=Sophos;i="6.19,300,1754982000"; 
-   d="scan'208";a="68690802"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2025 13:42:06 -0800
-X-CSE-ConnectionGUID: pDCoAjLJS8S/Rxb6WZ+AUA==
-X-CSE-MsgGUID: 93od+bRgTFWGXIxSQcb8rQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.19,300,1754982000"; 
-   d="scan'208";a="189183119"
-Received: from vcostago-desk1.jf.intel.com (HELO vcostago-desk1) ([10.88.27.140])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Nov 2025 13:42:05 -0800
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Kurt Kanzenbach <kurt@linutronix.de>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Sebastian Andrzej
- Siewior <bigeasy@linutronix.de>, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, Kurt Kanzenbach <kurt@linutronix.de>
-Subject: Re: [PATCH iwl-next] igc: Restore default Qbv schedule when
- changing channels
-In-Reply-To: <20251107-igc_mqprio_channels-v1-1-42415562d0f8@linutronix.de>
-References: <20251107-igc_mqprio_channels-v1-1-42415562d0f8@linutronix.de>
-Date: Wed, 12 Nov 2025 13:42:06 -0800
-Message-ID: <87ldkblyhd.fsf@intel.com>
+	s=arc-20240116; t=1762984355; c=relaxed/simple;
+	bh=eJOZTJq2+oQmdJH8pJU2buDGVe5UizvYAN/062DgeDw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=X1Me6f3qfG/LQGCqJrErQzFtFtiTEuNJc23yELu1/vbCiClX+k0XaajvOHExxy9JeKz2303CS8r3XzAWwBABTW7yqxuG3Uby/RNMeK4Vz6USniBqWxozZbR1jJbyCuAgQEvb3/RbNVM5s0CUyE6e84Y0ajl5VW+6cJGYjPo0HvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vzl19eoj; arc=none smtp.client-ip=95.215.58.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <e73e0e22-ff06-4e64-a2fd-c930ca1943c0@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1762984336;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sA0/GOtiqtvKxJBnC3sdby934G85/g09THmVfQyevd4=;
+	b=vzl19eojHa96bSiblkZWGnwDJ1zSohI/RK7glANwck3X1pWD0jcUjsdAQVx7k6dMKyRa7p
+	rIiVhmtdT498wsUROuuIom+0BpkWuatjh/4G6tL+NiFOzJXIO9bGYilLKpHup+uBk75SIp
+	/acy5uw2BP6154LKSZaHqiXk1zjXUhA=
+Date: Wed, 12 Nov 2025 21:52:13 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Subject: Re: [PATCH net-next v2 1/6] dpll: zl3073x: Store raw register values
+ instead of parsed state
+To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
+Cc: Petr Oros <poros@redhat.com>,
+ Prathosh Satish <Prathosh.Satish@microchip.com>,
+ Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Michal Schmidt <mschmidt@redhat.com>,
+ linux-kernel@vger.kernel.org
+References: <20251111181243.4570-1-ivecera@redhat.com>
+ <20251111181243.4570-2-ivecera@redhat.com>
+ <886723c3-ff9e-43cf-a1da-021f1ff088ab@linux.dev>
+ <45a93065-eaaa-4b18-90e0-e1d9cceb91b4@redhat.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <45a93065-eaaa-4b18-90e0-e1d9cceb91b4@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi,
+On 12/11/2025 19:24, Ivan Vecera wrote:
+> On 11/12/25 3:12 PM, Vadim Fedorenko wrote:
+>> On 11/11/2025 18:12, Ivan Vecera wrote:
+>>> The zl3073x_ref, zl3073x_out and zl3073x_synth structures
+>>> previously stored state that was parsed from register reads. This
+>>> included values like boolean 'enabled' flags, synthesizer selections,
+>>> and pre-calculated frequencies.
+>>>
+>>> This commit refactors the state management to store the raw register
+>>> values directly in these structures. The various inline helper functions
+>>> are updated to parse these raw values on-demand using FIELD_GET.
+>>>
+>>> Reviewed-by: Petr Oros <poros@redhat.com>
+>>> Tested-by: Prathosh Satish <Prathosh.Satish@microchip.com>
+>>> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+>>> ---
+>>>   drivers/dpll/zl3073x/core.c | 81 ++++++++++++-------------------------
+>>>   drivers/dpll/zl3073x/core.h | 61 ++++++++++++++++------------
+>>>   2 files changed, 60 insertions(+), 82 deletions(-)
+>>>
+>>> diff --git a/drivers/dpll/zl3073x/core.c b/drivers/dpll/zl3073x/core.c
+>>> index e42e527813cf8..50c1fe59bc7f0 100644
+>>> --- a/drivers/dpll/zl3073x/core.c
+>>> +++ b/drivers/dpll/zl3073x/core.c
+>>> @@ -598,25 +598,22 @@ int zl3073x_write_hwreg_seq(struct zl3073x_dev 
+>>> *zldev,
+>>>    * @zldev: pointer to zl3073x_dev structure
+>>>    * @index: input reference index to fetch state for
+>>>    *
+>>> - * Function fetches information for the given input reference that are
+>>> - * invariant and stores them for later use.
+>>> + * Function fetches state for the given input reference and stores 
+>>> it for
+>>> + * later user.
+>>>    *
+>>>    * Return: 0 on success, <0 on error
+>>>    */
+>>>   static int
+>>>   zl3073x_ref_state_fetch(struct zl3073x_dev *zldev, u8 index)
+>>>   {
+>>> -    struct zl3073x_ref *input = &zldev->ref[index];
+>>> -    u8 ref_config;
+>>> +    struct zl3073x_ref *ref = &zldev->ref[index];
+>>>       int rc;
+>>>       /* If the input is differential then the configuration for N-pin
+>>>        * reference is ignored and P-pin config is used for both.
+>>>        */
+>>> -    if (zl3073x_is_n_pin(index) &&
+>>> -        zl3073x_ref_is_diff(zldev, index - 1)) {
+>>> -        input->enabled = zl3073x_ref_is_enabled(zldev, index - 1);
+>>> -        input->diff = true;
+>>> +    if (zl3073x_is_n_pin(index) && zl3073x_ref_is_diff(zldev, index 
+>>> - 1)) {
+>>> +        memcpy(ref, &zldev->ref[index - 1], sizeof(*ref));
+>>
+>> Oh, it's not obvious from the code that it's actually safe, unless
+>> reviewer remembers that N-pins have only even indexes.
+> 
+> Would it be helpful to add here the comment describing that is safe and
+> why?
 
-Kurt Kanzenbach <kurt@linutronix.de> writes:
+Yes, comment would be great to have.
 
-> The MQPRIO (and ETF) offload utilizes the TSN Tx mode. This mode is always
-> coupled to Qbv. Therefore, the driver sets a default Qbv schedule of all gates
-> opened and a cycle time of 1s. This schedule is set during probe.
->
-> However, the following sequence of events lead to Tx issues:
->
->  - Boot a dual core system
->    probe():
->      igc_tsn_clear_schedule():
->        -> Default Schedule is set
->        Note: At this point the driver has allocated two Tx/Rx queues, because
->        there are only two CPU(s).
->
->  - ethtool -L enp3s0 combined 4
->    igc_ethtool_set_channels():
->      igc_reinit_queues()
->        -> Default schedule is gone, per Tx ring start and end time are zero
->
->   - tc qdisc replace dev enp3s0 handle 100 parent root mqprio \
->       num_tc 4 map 3 3 2 2 0 1 1 1 3 3 3 3 3 3 3 3 \
->       queues 1@0 1@1 1@2 1@3 hw 1
->     igc_tsn_offload_apply():
->       igc_tsn_enable_offload():
->         -> Writes zeros to IGC_STQT(i) and IGC_ENDQT(i) -> Boom
->
-> Therefore, restore the default Qbv schedule after changing the amount of
-> channels.
->
+> 
+>> Have you thought of adding an abstraction for differential pair pins?
+> 
+> No, zl3073x_ref represents mailbox for HW reference... Here, I’m just
+> following the datasheet, which states: "If the P-pin is marked as
+> differential then some content of the mailbox for N-pin is ignored and
+> is inherited from the P-pin".
+> For now, the content of zl3073x_ref is the inherited one, but this may
+> change in the future.
+> 
+> The abstraction for differential pin pairs is actually handled in
+> dpll.c, where only a single dpll_pin is registered for each such pair.
+> 
+> Ivan
+> 
 
-Couple of questions:
- - Would it make sense to mark this patch as a fix?
-
- - What would happen if the user added a Qbv schedule (not the default
-   one) and then changed the number of queues? My concern is that 'tc
-   qdisc' would show the custom user schedule and the hardware would be
-   "running" the default schedule, this inconsistency is not ideal. In
-   any case, it would be a separate patch.
-
-
-> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
-> ---
->  drivers/net/ethernet/intel/igc/igc_main.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-> index 728d7ca5338bf27c3ce50a2a497b238c38cfa338..e4200fcb2682ccd5b57abb0d2b8e4eb30df117df 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_main.c
-> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
-> @@ -7761,6 +7761,8 @@ int igc_reinit_queues(struct igc_adapter *adapter)
->  	if (netif_running(netdev))
->  		err = igc_open(netdev);
->  
-> +	igc_tsn_clear_schedule(adapter);
-> +
->  	return err;
->  }
->  
->
-> ---
-> base-commit: 6fc33710cd6c55397e606eeb544bdf56ee87aae5
-> change-id: 20251107-igc_mqprio_channels-2329166e898b
->
-> Best regards,
-> -- 
-> Kurt Kanzenbach <kurt@linutronix.de>
->
-
-
-Cheers,
--- 
-Vinicius
 
