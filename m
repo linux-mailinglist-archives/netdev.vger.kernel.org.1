@@ -1,109 +1,146 @@
-Return-Path: <netdev+bounces-237893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FF35C51489
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 10:10:15 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68EA0C51507
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 10:21:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8DE54213FE
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 09:00:25 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id F34E44EFADD
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 09:17:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CBD92FDC38;
-	Wed, 12 Nov 2025 09:00:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AAAe2lRk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEC982BF017;
+	Wed, 12 Nov 2025 09:17:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6C612FD7A8
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 09:00:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E69A9476
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 09:17:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762938023; cv=none; b=Vg6AECt2FLrpX2JB9O9dbZzB4Xk/E9Y/wWn0dgBFjyOky5QwU8BMxkze9Vb1g//z3C2/b5ecLPAp3T/WdVGPmaNZ8wWvWi/yITyn3rhrfOz+yhq+tbz1pERHXfxI1NryBRVhvhfLOTilwz7BaSh9IMMJ+ggIaqgNIu0RsUbdr6U=
+	t=1762939071; cv=none; b=QF/dh1MbNJ7KZ5c/TfckxivGeKPwYV9h2G1omGVBwVPOqeIcGxWLOss2EOF3/+kv1sD265lAu2jvBIdTFTTOhbkX77qxVcnZNelY+0E6JJbX15O1Axi6fesa3T9iJCZTOl7YQUrfFdbomQtHoLNV2bx30M4HD2zd18T1gf5ZDKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762938023; c=relaxed/simple;
-	bh=v/Krp1Ed64Q4lcPqqFr5goeJ3YqOL6srgIYEriymza4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CdAfdZM/oNZAYJxQiUWlAKapSyp/EsIWQnv+8RsaAlWFTVvMUT29we3A4jy6bpFbXBvOnU0PllVSTQ0lFOTENOHPys83EsX8+LKUiUtdzanY/L+z23cJEi3SCGdiygVH21/n/W9JW8m+T9K+0qSMqFZDueju44D+kbjgfBhUKUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AAAe2lRk; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4eddceccb89so5166101cf.0
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 01:00:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1762938020; x=1763542820; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v/Krp1Ed64Q4lcPqqFr5goeJ3YqOL6srgIYEriymza4=;
-        b=AAAe2lRkFqxOg2bTtykVWUzUmNzwc7iUqQq62/g3bpVBJE2xcTNhFzoyethPS4vLO3
-         fC5X0Eo/h2+cmwYmdCtpBiQPcxHX7ByNwGfCKKaV5o3VgLGRPVJARtNoTwLPynLHk9Ol
-         CAjx00vQyqu5cLkvx3C3nRYJjh1/4TFysAj0xm3l0qffTlqfpo66EMvKUwUSTW5KAEFS
-         HOMxGyae3ZvwNoxdfEokjDVWsII2Dhukf79z7Ix8uiEvFiMu0evg/iwngrj5jD/6LbF7
-         n4oLYEuSSeImF3scQI/EUs2G9j4HBptgKyTl92+rwbXvNKGqTTAuzH0Gmmjs/Xb+kTln
-         nC1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762938020; x=1763542820;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=v/Krp1Ed64Q4lcPqqFr5goeJ3YqOL6srgIYEriymza4=;
-        b=NhA6YDxF/D95Szr2Rnw4kRm5FNURukd5XO9Loqw6nGNda2Lnlf8nIigaXwxFl50gB1
-         GMWI40ItnuGI6jig0m5pXnLo0yYfC48etVESISO7ElwKYN2xxcfWRCrHAo/+YD3A1aV8
-         ewtXeQ+R39L55AlTzyw4saUzd4VBFLlnHdtUguHcPpUOKim+c/NJQCDxChnO2T/ZTARc
-         LhMJNcDeB60yFmGs+OI5GK+a6ZlSXVnFGBaj1Xwl7JSBbWx4rMwlpFTXXQGeS3BfstKL
-         PR+q+BqyJ2oltyd7khL+0i+3CRuEtplky9AlrOVJiC+58GuUBYgEDBQqhBH/JebsCtM7
-         U4Og==
-X-Forwarded-Encrypted: i=1; AJvYcCVfXikitQcGHbnpk5MKnlvqKB+ER3ZCzOqv59RGFwKaMXNAGpOd/7hNfI/sMEqk3DXfjWl4ZQE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzcoq+adE8Kh3XMpG5DkBf/WiBvUL1PVfY2VNdoPaJNVN7CNNji
-	ZJBtHAueKfhYD29x2V293g2Zsj2AIrX4mS/e8TNxFJorULJx4HebYCvO0IDAyzcZbnOY2VZ3nma
-	Nweq1PSB9SyNAJf2cvNnMA6PD9CrL3ip2VyPwGazk
-X-Gm-Gg: ASbGncuzMYVBzWarzhGxrYyZAOXMxMm4o9lrVBKf+7sGbV4j7ClmV7LHNI1DCOLjnKG
-	RKdRIQv1xacitHBtCymXCQfQWeQditkQdgHxk7lhgQKKzjQ57vaGgzKJEEjRVPSSrpCAp1jlYsi
-	W+sd8wd9vucYGZd2J+K8+MDl03q+cFLJ0hwdFzC3Zb5rRfczBYF74jXSTM/1Ibri5M0eXAqu0pX
-	mW2GR69YSAiwOCqv3YcvW4pSiX02nAB6M810bUncjA9KWm5Ol/7infHkdIbiTUNxqe9APqw1zNJ
-	Ef5Rdak=
-X-Google-Smtp-Source: AGHT+IEzCQ3YNHW4UtVKvqkX2yjhSogviPzmTzb9PXWyqz3RlNdC+8kFSE+KOjdjnU93CyVP7UU5sqx6RahkBBvzCq0=
-X-Received: by 2002:a05:622a:d0:b0:4ed:b8d6:e0e8 with SMTP id
- d75a77b69052e-4eddbc9aab1mr30299041cf.22.1762938018726; Wed, 12 Nov 2025
- 01:00:18 -0800 (PST)
+	s=arc-20240116; t=1762939071; c=relaxed/simple;
+	bh=DS9XNu0+sV4N1jZQNGIhcpbWVrqHJgFpyHZN6M8aoDM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kBleQjYNAK2GJhEBt2Ekq0XUauOKSQ2MbkxONBKItenjYIh8N1wXj64Fd3IUIaL26HE/EDJloN9HaNDoH0JlVP0XOe1YxaRFXjvVI80ihKPxQoEFzFY1FVUJslCLSBI7elbNTSQDiuDmvVIbeAhYULT1e4Pn4AN2vGaQVS7BOs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vJ6yw-0007V2-B2; Wed, 12 Nov 2025 10:17:38 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1vJ6yv-0003cG-1a;
+	Wed, 12 Nov 2025 10:17:37 +0100
+Received: from blackshift.org (p54b152ce.dip0.t-ipconnect.de [84.177.82.206])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange x25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 3215D49D997;
+	Wed, 12 Nov 2025 09:17:37 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net-next 0/11] pull-request: can-next 2025-11-12
+Date: Wed, 12 Nov 2025 10:13:40 +0100
+Message-ID: <20251112091734.74315-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20251111064328.24440-1-nashuiliang@gmail.com> <aRQ3NYERGcHJ4rZP@shredder>
-In-Reply-To: <aRQ3NYERGcHJ4rZP@shredder>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 12 Nov 2025 01:00:07 -0800
-X-Gm-Features: AWmQ_blEvxDrUtRwU9ZZmEwZxbCjv9hVvyWPhviWRL9cCYxauIr8WxQDUJlUNqg
-Message-ID: <CANn89iKjuRZjeLbZ9v0TcCUEqah3pQbq0-tBPJveavwK=G1ziw@mail.gmail.com>
-Subject: Re: [PATCH net v1] ipv4: route: Prevent rt_bind_exception() from
- rebinding stale fnhe
-To: Ido Schimmel <idosch@idosch.org>
-Cc: Chuang Wang <nashuiliang@gmail.com>, stable@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Tue, Nov 11, 2025 at 11:28=E2=80=AFPM Ido Schimmel <idosch@idosch.org> w=
-rote:
->
-> On Tue, Nov 11, 2025 at 02:43:24PM +0800, Chuang Wang wrote:
-> > The sit driver's packet transmission path calls: sit_tunnel_xmit() ->
-> > update_or_create_fnhe(), which lead to fnhe_remove_oldest() being calle=
-d
-> > to delete entries exceeding FNHE_RECLAIM_DEPTH+random.
-...
-> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Hello netdev-team,
 
-Thanks !
+this is a pull request of 11 patches for net-next/main.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+The first 3 patches are by Vadim Fedorenko and convert the CAN drivers
+to use the ndo_hwtstamp callbacks.
+
+Maud Spierings contributes a patch to the mcp251x driver that converts
+it to use dev_err_probe()
+
+The remaining patches target the mcp251xfd driver and are by Gregor
+Herburger and me. They add GPIO controller functionality to the
+driver.
+
+regards,
+Marc
+
+---
+
+The following changes since commit ea7d0d60ebc9bddf3ad768557dfa1495bc032bf6:
+
+  Merge branch 'add-cn20k-nix-and-npa-contexts' (2025-10-30 10:44:12 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can-next.git tags/linux-can-next-for-6.19-20251112
+
+for you to fetch changes up to 5bce93417a62b1da306a33f1e7ebb12bc915a80e:
+
+  can: bxcan: Fix a typo error for assign (2025-11-12 09:48:07 +0100)
+
+----------------------------------------------------------------
+linux-can-next-for-6.19-20251112
+
+----------------------------------------------------------------
+Chu Guangqing (1):
+      can: bxcan: Fix a typo error for assign
+
+Gregor Herburger (5):
+      can: mcp251xfd: utilize gather_write function for all non-CRC writes
+      can: mcp251xfd: add workaround for errata 5
+      can: mcp251xfd: only configure PIN1 when rx_int is set
+      can: mcp251xfd: add gpio functionality
+      dt-bindings: can: mcp251xfd: add gpio-controller property
+
+Marc Kleine-Budde (3):
+      Merge patch series "convert can drivers to use ndo_hwtstamp callbacks"
+      can: mcp251xfd: move chip sleep mode into runtime pm
+      Merge patch series "can: mcp251xfd: add gpio functionality"
+
+Maud Spierings (1):
+      can: mcp251x: mcp251x_can_probe(): use dev_err_probe()
+
+Vadim Fedorenko (3):
+      can: convert generic HW timestamp ioctl to ndo_hwtstamp callbacks
+      can: peak_canfd: convert to use ndo_hwtstamp callbacks
+      can: peak_usb: convert to use ndo_hwtstamp callbacks
+
+ .../bindings/net/can/microchip,mcp251xfd.yaml      |   5 +
+ drivers/net/can/bxcan.c                            |   2 +-
+ drivers/net/can/dev/dev.c                          |  45 ++--
+ drivers/net/can/esd/esd_402_pci-core.c             |   3 +-
+ drivers/net/can/kvaser_pciefd/kvaser_pciefd_core.c |   3 +-
+ drivers/net/can/peak_canfd/peak_canfd.c            |  35 ++-
+ drivers/net/can/spi/mcp251x.c                      |  31 ++-
+ drivers/net/can/spi/mcp251xfd/Kconfig              |   1 +
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-core.c     | 284 +++++++++++++++++----
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-regmap.c   | 114 +++++++--
+ drivers/net/can/spi/mcp251xfd/mcp251xfd.h          |   8 +
+ drivers/net/can/usb/etas_es58x/es58x_core.c        |   3 +-
+ drivers/net/can/usb/gs_usb.c                       |  20 +-
+ drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c   |   3 +-
+ drivers/net/can/usb/peak_usb/pcan_usb_core.c       |  35 ++-
+ include/linux/can/dev.h                            |   6 +-
+ 16 files changed, 446 insertions(+), 152 deletions(-)
 
