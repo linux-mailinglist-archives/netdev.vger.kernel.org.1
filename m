@@ -1,102 +1,92 @@
-Return-Path: <netdev+bounces-237789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E9BBC503B0
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 02:45:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 249FEC503CE
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 02:50:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F46E3B324E
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 01:45:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD8403B2F1D
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 01:50:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AE8C28A1D5;
-	Wed, 12 Nov 2025 01:45:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE2EB28C037;
+	Wed, 12 Nov 2025 01:50:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dXvcihTj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pRKdqopH"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39AD628689F
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 01:45:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837C5289E13;
+	Wed, 12 Nov 2025 01:50:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762911913; cv=none; b=apHg8pdCUdw27pNC7cCI2pfW0SdumEE4E1MEY36y/b5plnMUvFTWmjorJNofAnVafpo71CXn3MhkDa12yJM5gyNEsmJ6ahIGsxtlh9TZ+/6C1rSe7FwuXQSdGwPqwylLH1nb6qGgw6FgFKF4HSBd5kciJtww+zPThy6t3CImOLA=
+	t=1762912242; cv=none; b=niRrdiS0rcUZamxgkmvBVolrXzrVjmAzwWrNSpuhOZ31VWSLwj99+6vw4Xgs4P1cykpP+KPuS7/L4URIoHL+bag0pWQTW7cCWPSyBKHAZkm2yktcysAjV90cnPoq9G96xrGpaKrAKHhrB28rsaBH0W5okdizIIZAO+1Fj1gORxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762911913; c=relaxed/simple;
-	bh=kqsnlqjSa4IhOrl9lShbvf9SEWNTMIYvIgS6Hka5KSc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NS27pssrqkRIFNbrvsw3JqsHuK/xR1/3ml4iEs49RPM+IMCb/zFHTeN86w40T9C13hatm5U+oWhyeZwYQ/NTbHCeA2kAT5rggBXtpJDSM5WXZSo0YaoiEepM45D3hqnb4SiQC1ZbstzV9a7ZpfOg2aiMD+OGCRNVVet3SsguVXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dXvcihTj; arc=none smtp.client-ip=91.218.175.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <a85e262d-0e04-41d9-9420-56a1ee1aeed5@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1762911899;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GPXmbSUrivLtKg3Q34VPnZo217pp+kGwg6tsDxXR0ts=;
-	b=dXvcihTjaPEol0gaKNaafEuJl1ZGcBR4ln4HQke9wnnZPgJTSmjEyH4cuCGESkGMZbFISe
-	ArnYcsnP6PHmie2ZK2i9duAq6VRkxpfIdEC+XlbdT9Vs/I57MZyML+uyb1crP480vVJrtt
-	oelXpEIIzWySypYTVhFIj7UG774mHIY=
-Date: Tue, 11 Nov 2025 17:44:45 -0800
+	s=arc-20240116; t=1762912242; c=relaxed/simple;
+	bh=KkwuvI78EihEIi5RalJzEZsOL4ZxkGqGL3GSyewok8U=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=rqq3Mnc5iglOd0btmVs88R9lBJlk5p279661xKRdn90Y3k4KEreA7FagPuPxYSTT+9iInFnLmGSdqvBwmV5m41BdxZAwdTaaIprLhiA2JrqFDPc/io34gKxScMvBpyQE8nC5RlU4J0ywisvS0UPXT0EGtFEjJAG1Mia41qGdCzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pRKdqopH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0B66C4CEF5;
+	Wed, 12 Nov 2025 01:50:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762912242;
+	bh=KkwuvI78EihEIi5RalJzEZsOL4ZxkGqGL3GSyewok8U=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=pRKdqopHLQt7falOid5Kssl5+USFXmO+F9gKG/mutKIwVD9+zi037QHqZRcZPfHZM
+	 qDj3vVdWKlvRFW/EGOnyJmAcSddQlAFFKAuntHK/fYtAwtUr+f0xnvrXU2mjuE2ilk
+	 PSayfQBp1ZKu0Qci4cLbUb6TvgauWwVJ01yoBE0y7PNPl/xpePbHYOtPta9ADITuzZ
+	 75wf/QTaIvQ6XiRu93T4PwscWBVeoJuZ3gjFsq2k/DvMisvLbbzsES6FRmuh/kiUqE
+	 AXncU9/YGvwdriCVcqyTpFQIqugo5ig/4rN+aQCNJQ74Qi9Sc+aWMwMgpfg+9e69ae
+	 maFgbZCLlwkvw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33F30380DBCD;
+	Wed, 12 Nov 2025 01:50:13 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v3] bpf: Clamp trace length in __bpf_get_stack to
- fix OOB write
-Content-Language: en-GB
-To: Brahmajit Das <listout@listout.xyz>,
- syzbot+d1b7fa1092def3628bd7@syzkaller.appspotmail.com
-Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
- contact@arnaud-lcm.com, daniel@iogearbox.net, eddyz87@gmail.com,
- haoluo@google.com, john.fastabend@gmail.com, jolsa@kernel.org,
- kpsingh@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev,
- netdev@vger.kernel.org, sdf@fomichev.me, song@kernel.org,
- syzkaller-bugs@googlegroups.com
-References: <691231dc.a70a0220.22f260.0101.GAE@google.com>
- <20251111081254.25532-1-listout@listout.xyz>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yonghong Song <yonghong.song@linux.dev>
-In-Reply-To: <20251111081254.25532-1-listout@listout.xyz>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Subject: Re: [GIT PULL] bluetooth 2025-11-11
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <176291221201.3630231.13400766152163840519.git-patchwork-notify@kernel.org>
+Date: Wed, 12 Nov 2025 01:50:12 +0000
+References: <20251111141357.1983153-1-luiz.dentz@gmail.com>
+In-Reply-To: <20251111141357.1983153-1-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
 
+Hello:
 
+This pull request was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On 11/11/25 12:12 AM, Brahmajit Das wrote:
-> syzbot reported a stack-out-of-bounds write in __bpf_get_stack()
-> triggered via bpf_get_stack() when capturing a kernel stack trace.
->
-> After the recent refactor that introduced stack_map_calculate_max_depth(),
-> the code in stack_map_get_build_id_offset() (and related helpers) stopped
-> clamping the number of trace entries (`trace_nr`) to the number of elements
-> that fit into the stack map value (`num_elem`).
->
-> As a result, if the captured stack contained more frames than the map value
-> can hold, the subsequent memcpy() would write past the end of the buffer,
-> triggering a KASAN report like:
->
->      BUG: KASAN: stack-out-of-bounds in __bpf_get_stack+0x...
->      Write of size N at addr ... by task syz-executor...
->
-> Restore the missing clamp by limiting `trace_nr` to `num_elem` before
-> computing the copy length. This mirrors the pre-refactor logic and ensures
-> we never copy more bytes than the destination buffer can hold.
->
-> No functional change intended beyond reintroducing the missing bound check.
->
-> Reported-by: syzbot+d1b7fa1092def3628bd7@syzkaller.appspotmail.com
-> Fixes: e17d62fedd10 ("bpf: Refactor stack map trace depth calculation into helper function")
-> Signed-off-by: Brahmajit Das <listout@listout.xyz>
+On Tue, 11 Nov 2025 09:13:57 -0500 you wrote:
+> The following changes since commit 96a9178a29a6b84bb632ebeb4e84cf61191c73d5:
+> 
+>   net: phy: micrel: lan8814 fix reset of the QSGMII interface (2025-11-07 19:00:38 -0800)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-11-11
+> 
+> [...]
 
-Acked-by: Yonghong Song <yonghong.song@linux.dev>
+Here is the summary with links:
+  - [GIT,PULL] bluetooth 2025-11-11
+    https://git.kernel.org/netdev/net/c/27bcc05b8869
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
