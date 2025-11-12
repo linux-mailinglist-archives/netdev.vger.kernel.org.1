@@ -1,462 +1,190 @@
-Return-Path: <netdev+bounces-237819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F197C5087E
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 05:31:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B059C5090B
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 05:52:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23D0C3B4127
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 04:29:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E6DDE1899F22
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 04:52:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54A7D2D97B5;
-	Wed, 12 Nov 2025 04:28:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nEKSnbU2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7FA02D29C2;
+	Wed, 12 Nov 2025 04:52:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 647542E6127
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 04:28:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1CE727F01E
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 04:52:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762921725; cv=none; b=iflvr0oGVY0xM7RrsvFJubUhoVuqJE5+7nRDbM7eYM7pz2PPPr8RW3DfquxdSsF7mCXNr+jMkY007vKp1WA5y+F9dlKWdgYuKV6FzQR/dB8Dk1Egerg6eql1OcgNeu8vGb43fs9AN74gmIwyHNRJojKQkpJwZvvXTzHMZxdEnOc=
+	t=1762923149; cv=none; b=Ocvdzshrb37ZHOaeVz+Jk9Ou0Q9FedMUO3ZjX7Y3QtzFcd2365OgKoMLYntacX3Df8TA2n9DLA1dAFD2tCsgqFdcYBQSUUS+WdAbyP9iJhTihXuziCIvJfu8zLNJHInGz46LyEbM5jUN2KVsNQNNktQgFjEiy8mSM9jOJRS2spI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762921725; c=relaxed/simple;
-	bh=jCDpx8M8k0FKY4eSBRvHYTTF69BLGw4kLu44e9Ryamc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UZIq3AnzJsrQOlvCV/h5by+hneuEJKF8HnCP8EfXkY1DUcAkNspcZw/DzBFb7LlbHh0V9k5a3jdiRr1AbItm2sEslTKTia+2L4w7w/TjZ8EDJWw9/O1d3kJk1E+se7yVueEsEUHaG1GhVYidlQgv2+VuPmkJUHVdzmZg9wwXar0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nEKSnbU2; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-3434700be69so579678a91.1
-        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 20:28:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762921723; x=1763526523; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bypbKJSNdfzMIo5PJqXm9z2sZhPniVXZs5eZRTP+WOQ=;
-        b=nEKSnbU2JVPJe8mg2mQEPIZJlETYi07y8OyyipoUX8RXUqjupW0KuGMInnX0H44kVL
-         WFw3fK4ti9RSjJedsu/bA7G0X/q/mkrmsF/4OQ1fWJ+ZmoMN+m8gdcPkWf2t3FuUEmP8
-         X8jAl0keiTZOnkgu50MI1mATgeef0a5r56GlEwi5V6sN5ELNB2OVtGUyW8Q+9g430eLG
-         NZfDtjC7nfKXioqIUeLE8B81wr6JCGkVippy5PNSq4HzC9aKPKy/yao3fAwAs6QtyJNz
-         0TcSi1H+die+YJFFt3X9GMeiIcJM66VhYLjeQ1nkUCr7qOweRSuiw7zdXEOWmJZOuloO
-         B6/Q==
+	s=arc-20240116; t=1762923149; c=relaxed/simple;
+	bh=CIvLkOUS047TucL7cgNJmviXjqebQR1vjTOiVoJgcGA=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=Vmd+UTCjIwz8g3BvfespyG62Pzr8c+onwu0DXVH3PkvhfzPQEHcqb0PDeNsbS4quXT63UDjv9RNDchOUi5m2CznBUPOWpXquAADBbwDHQByIBJHGyeIP61DEKpHzZDyoMIDiBrdgSOldmAv4BbldtXyo/esGSL2FIAD1eWK8koA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-43300f41682so4050955ab.1
+        for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 20:52:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762921723; x=1763526523;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-gg:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=bypbKJSNdfzMIo5PJqXm9z2sZhPniVXZs5eZRTP+WOQ=;
-        b=Iwjc7ahUTfo136Z0x/kQPKso756Om3mKiobtl8xbUBIDktPEJ6N9TSKXBhCPrK4wUT
-         +/u8g2FfHfuNqT7cwLbVxmfvvgYG4H6Ohk47+v+OGOiVrFGMetbqKQzzkBLRrP4QGPPd
-         qIcUuN+cyjwffuHTK2VoGHJp7w2Ht1Gwfu31yfqNtooJ8qdp1vseqC9iOlAIz9kDvaEo
-         Fl+HZcVgGBqYMSm07PyKMTa2PhUbbY87gt6efDJCCXzIE4ogwUTcEsmTpXfqZukhdjPu
-         VIDftA8P6kY+4uE9jYjDm+ksxNZmnf8iaD5JwNfMnUoDyywtEs03xki+iEAx6vLYTWZz
-         A1+w==
-X-Forwarded-Encrypted: i=1; AJvYcCUqVys/oCPMfzZ9gC1DaIMJjmv4Wo8x2l9bNI+RF6Hrz6SI83OHUStgryMl4KsrWuAbVCeJa3M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDNEvwmgQ+IwzE2eDSzhS0S7TbQMFrdF5iGRnwqNUlgA0DWDgo
-	it963iHbaVt25GeJs9qQtPF4AckFE8487QXIuqWFu0eNT1TfZJLKqJDy
-X-Gm-Gg: ASbGncstTmHzfBinr+Y4BirlQGkLtqJwzYxdtDVBZB3Kv5vwD3UzOM7OWuJaDbFPwIT
-	Y1Igivz4ivbVoSnPXb8ThhZ4Z51DiwqJ/x5+uRSPit7MUxcJeA7MxqCdRrEXAlAdOQ+zxBrTN7P
-	3aEEFWO5JJh8NVDkRvfiWyfIKWxtq0Wzfb9OZAc41I8boZbIDzmLpzvtAsw8rVtJ5hWjRMWenkn
-	Mthl69KWp6WNt6S1AiKX0XmWh6QDpMmPWYyUNuFAlG6hG78KGU7izjN2kiPV81TaVvBxBP5YPjJ
-	f5wuogqmu4UGWcsNIxu5dDHaFEhFdIl+XI+sGFk45xLTpXHS9K2pqkL1IghWz3Snqe2SJyX52iI
-	1WKjaWGhlDp9KnNWL5r61px3QuVwNLy5sgG7Nk/0MnZBQPOhB88phDbouRc8omWtNTXRRxdzhki
-	NDnBvYU1MwJ1KaGLUmuTrG4mamjMojqnkNXl2jrx4xg/FSShSTWA3hyH3yRaWMpzmU2Ws3ib7E5
-	uTULuq7DQ==
-X-Google-Smtp-Source: AGHT+IEk3fmOmPuZqt1xGOcbomb+tiqKdW76DJidL9Gpiy8ngxFNpe36IzIVYCCq1TjDctRIbXHwUg==
-X-Received: by 2002:a17:90b:1dce:b0:341:d326:7354 with SMTP id 98e67ed59e1d1-343ddeff608mr2144322a91.37.1762921722670;
-        Tue, 11 Nov 2025 20:28:42 -0800 (PST)
-Received: from toolbx.alistair23.me (2403-580b-97e8-0-82ce-f179-8a79-69f4.ip6.aussiebb.net. [2403:580b:97e8:0:82ce:f179:8a79:69f4])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-343e06fbc0dsm854681a91.2.2025.11.11.20.28.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Nov 2025 20:28:42 -0800 (PST)
-From: alistair23@gmail.com
-X-Google-Original-From: alistair.francis@wdc.com
-To: chuck.lever@oracle.com,
-	hare@kernel.org,
-	kernel-tls-handshake@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-nvme@lists.infradead.org,
-	linux-nfs@vger.kernel.org
-Cc: kbusch@kernel.org,
-	axboe@kernel.dk,
-	hch@lst.de,
-	sagi@grimberg.me,
-	kch@nvidia.com,
-	hare@suse.de,
-	alistair23@gmail.com,
-	Alistair Francis <alistair.francis@wdc.com>
-Subject: [PATCH v5 6/6] nvmet-tcp: Support KeyUpdate
-Date: Wed, 12 Nov 2025 14:27:20 +1000
-Message-ID: <20251112042720.3695972-7-alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.51.1
-In-Reply-To: <20251112042720.3695972-1-alistair.francis@wdc.com>
-References: <20251112042720.3695972-1-alistair.francis@wdc.com>
+        d=1e100.net; s=20230601; t=1762923147; x=1763527947;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/xR/S0akTM9IizGbyH/pcTSsfCiAbNA5aO/SzN0S+qc=;
+        b=dUOXHnfei/wa9+mieSt5D9OAfbb67nTqGWSTMx1893ov0DRODkpj18874jPasZBvR/
+         H3jp6+YpWM2XMLol/kapMRg4Rd2P6/GsZv3lk9Ui7xoUen33sCn7OkkTo1o3D4k28MQ8
+         ALMJw3fUBuHm/skSXZnWcCL+7+pyf/LqY9TsxQW4dSkQJ8UzROrXWLij8z5OWeB9LVRS
+         pNhqAF/5uXu/xbQj56ZyozYkK3KpDiOD9uD6ImnYj8VZ+4LYBdxW2EUuo5uRtiBlAx2E
+         dZ7ZrmTQoTihYOdlrsN1o1ogYWcYZwU+qXTtEKlnSbnjtnrwPzGOZcs86r2NXdweckK5
+         GIog==
+X-Forwarded-Encrypted: i=1; AJvYcCWgqTjVNI3nghupi4r7lFT0Vg86JEL5vCm7l/J1cAn6MudN4/oo3L3MoGYmWc5qVefUCV8QM6o=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxm8Y6d5ZGntygDuv4q9BC57e8hDsEE7O5EQloYmz+4PWj63qxV
+	AUrkOo2ia1VkyqafAOUREZCE/BILZg1MV8HI9gSQuyDThFAxCxURFL5L+BdP9lzyDEEUkrXvTq6
+	61rwDx7rOkV8Hr1TPnMMBTZU0E7VHl9dDXGx2IqrgTaH6Pt6ml0Nb9JDjfEU=
+X-Google-Smtp-Source: AGHT+IEalNLm4nKk8fLi4y0xYX+5Nao4o3HK0geVhuKlrQfqUMB7hx94C8r2EruYYup9yM47XvRjz6EN4BkpAlS+Fzf0/eO5s8G7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:1fcc:b0:433:7a2f:a40a with SMTP id
+ e9e14a558f8ab-43473cff396mr21170735ab.4.1762923147120; Tue, 11 Nov 2025
+ 20:52:27 -0800 (PST)
+Date: Tue, 11 Nov 2025 20:52:27 -0800
+In-Reply-To: <68af39ae.a70a0220.3cafd4.002c.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <6914128b.050a0220.417c2.0004.GAE@google.com>
+Subject: Re: [syzbot] [hams?] WARNING: ODEBUG bug in handle_softirqs
+From: syzbot <syzbot+60db000b8468baeddbb1@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, kuba@kernel.org, linux-hams@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	peterz@infradead.org, syzkaller-bugs@googlegroups.com, tglx@linutronix.de
+Content-Type: text/plain; charset="UTF-8"
 
-From: Alistair Francis <alistair.francis@wdc.com>
+syzbot has found a reproducer for the following issue on:
 
-If the nvmet_tcp_try_recv() function return EKEYEXPIRED or if we receive
-a KeyUpdate handshake type then the underlying TLS keys need to be
-updated.
+HEAD commit:    2666975a8905 Add linux-next specific files for 20251111
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=13748212580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e82ba9dc816af74c
+dashboard link: https://syzkaller.appspot.com/bug?extid=60db000b8468baeddbb1
+compiler:       Debian clang version 20.1.8 (++20250708063551+0c9f909b7976-1~exp1~20250708183702.136), Debian LLD 20.1.8
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10646b42580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=133eec12580000
 
-If the NVMe Host (TLS client) initiates a KeyUpdate this patch will
-allow the NVMe layer to process the KeyUpdate request and forward the
-request to userspace. Userspace must then update the key to keep the
-connection alive.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/26ac789d9bdd/disk-2666975a.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/fabfe7978a23/vmlinux-2666975a.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/82f010d50b37/bzImage-2666975a.xz
 
-This patch allows us to handle the NVMe host sending a KeyUpdate
-request without aborting the connection. At this time we don't support
-initiating a KeyUpdate.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+60db000b8468baeddbb1@syzkaller.appspotmail.com
 
-Link: https://datatracker.ietf.org/doc/html/rfc8446#section-4.6.3
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+------------[ cut here ]------------
+ODEBUG: free active (active state 0) object: ffff888028ee8090 object type: timer_list hint: rose_t0timer_expiry+0x0/0x350 net/rose/rose_link.c:-1
+WARNING: lib/debugobjects.c:615 at debug_print_object+0x16b/0x1e0 lib/debugobjects.c:612, CPU#1: syz.2.1147/9544
+Modules linked in:
+CPU: 1 UID: 0 PID: 9544 Comm: syz.2.1147 Not tainted syzkaller #0 PREEMPT(full) 
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/25/2025
+RIP: 0010:debug_print_object+0x16b/0x1e0 lib/debugobjects.c:612
+Code: 4c 89 ff e8 d7 19 86 fd 4d 8b 0f 48 c7 c7 80 1b e1 8b 48 8b 34 24 4c 89 ea 89 e9 4d 89 f0 41 54 e8 0a 38 e2 fc 48 83 c4 08 90 <0f> 0b 90 90 ff 05 47 22 1e 0b 48 83 c4 08 5b 41 5c 41 5d 41 5e 41
+RSP: 0018:ffffc90000a08a00 EFLAGS: 00010296
+RAX: cfc2b002eab41900 RBX: dffffc0000000000 RCX: ffff888031311e80
+RDX: 0000000000000100 RSI: 0000000000000000 RDI: 0000000000000002
+RBP: 0000000000000000 R08: 0000000000000003 R09: 0000000000000004
+R10: dffffc0000000000 R11: fffffbfff1c3a744 R12: ffffffff8a5327d0
+R13: ffffffff8be11d00 R14: ffff888028ee8090 R15: ffffffff8b8cf8e0
+FS:  00007fda22dbb6c0(0000) GS:ffff888125b82000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000020000000d000 CR3: 0000000078a42000 CR4: 00000000003526f0
+Call Trace:
+ <IRQ>
+ __debug_check_no_obj_freed lib/debugobjects.c:1099 [inline]
+ debug_check_no_obj_freed+0x3a2/0x470 lib/debugobjects.c:1129
+ slab_free_hook mm/slub.c:2470 [inline]
+ slab_free mm/slub.c:6661 [inline]
+ kfree+0x10c/0x6e0 mm/slub.c:6869
+ rose_neigh_put include/net/rose.h:166 [inline]
+ rose_timer_expiry+0x4cb/0x600 net/rose/rose_timer.c:183
+ call_timer_fn+0x16e/0x600 kernel/time/timer.c:1747
+ expire_timers kernel/time/timer.c:1798 [inline]
+ __run_timers kernel/time/timer.c:2372 [inline]
+ __run_timer_base+0x61a/0x860 kernel/time/timer.c:2384
+ run_timer_base kernel/time/timer.c:2393 [inline]
+ run_timer_softirq+0xb7/0x180 kernel/time/timer.c:2403
+ handle_softirqs+0x27d/0x880 kernel/softirq.c:626
+ __do_softirq kernel/softirq.c:660 [inline]
+ invoke_softirq kernel/softirq.c:496 [inline]
+ __irq_exit_rcu+0xca/0x1f0 kernel/softirq.c:727
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:743
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1055 [inline]
+ sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1055
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:697
+RIP: 0010:lock_release+0x2ac/0x3d0 kernel/locking/lockdep.c:5893
+Code: 51 48 c7 44 24 20 00 00 00 00 9c 8f 44 24 20 f7 44 24 20 00 02 00 00 75 56 f7 c3 00 02 00 00 74 01 fb 65 48 8b 05 64 98 1b 11 <48> 3b 44 24 28 0f 85 8b 00 00 00 48 83 c4 30 5b 41 5c 41 5d 41 5e
+RSP: 0018:ffffc90004e8f918 EFLAGS: 00000206
+RAX: cfc2b002eab41900 RBX: 0000000000000283 RCX: cfc2b002eab41900
+RDX: 0000000000000000 RSI: ffffffff8dc71e5c RDI: ffffffff8be111e0
+RBP: ffff8880313129b0 R08: 0000000000000000 R09: ffffffff820eec00
+R10: dffffc0000000000 R11: fffffbfff1f7eeef R12: 0000000000000000
+R13: 0000000000000000 R14: ffff888034a18ca0 R15: ffff888031311e80
+ _inline_copy_from_user include/linux/uaccess.h:169 [inline]
+ _copy_from_user+0x28/0xb0 lib/usercopy.c:18
+ copy_from_user include/linux/uaccess.h:219 [inline]
+ snd_rawmidi_kernel_write1+0x3ab/0x650 sound/core/rawmidi.c:1560
+ snd_rawmidi_write+0x5a8/0xbc0 sound/core/rawmidi.c:1629
+ do_loop_readv_writev fs/read_write.c:850 [inline]
+ vfs_writev+0x4b6/0x960 fs/read_write.c:1059
+ do_writev+0x14d/0x2d0 fs/read_write.c:1103
+ do_syscall_x64 arch/x86/entry/syscall_64.c:63 [inline]
+ do_syscall_64+0xfa/0xfa0 arch/x86/entry/syscall_64.c:94
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fda21f8f6c9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fda22dbb038 EFLAGS: 00000246 ORIG_RAX: 0000000000000014
+RAX: ffffffffffffffda RBX: 00007fda221e5fa0 RCX: 00007fda21f8f6c9
+RDX: 0000000000000002 RSI: 0000200000000840 RDI: 0000000000000004
+RBP: 00007fda22011f91 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fda221e6038 R14: 00007fda221e5fa0 R15: 00007ffd404da6b8
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	51                   	push   %rcx
+   1:	48 c7 44 24 20 00 00 	movq   $0x0,0x20(%rsp)
+   8:	00 00
+   a:	9c                   	pushf
+   b:	8f 44 24 20          	pop    0x20(%rsp)
+   f:	f7 44 24 20 00 02 00 	testl  $0x200,0x20(%rsp)
+  16:	00
+  17:	75 56                	jne    0x6f
+  19:	f7 c3 00 02 00 00    	test   $0x200,%ebx
+  1f:	74 01                	je     0x22
+  21:	fb                   	sti
+  22:	65 48 8b 05 64 98 1b 	mov    %gs:0x111b9864(%rip),%rax        # 0x111b988e
+  29:	11
+* 2a:	48 3b 44 24 28       	cmp    0x28(%rsp),%rax <-- trapping instruction
+  2f:	0f 85 8b 00 00 00    	jne    0xc0
+  35:	48 83 c4 30          	add    $0x30,%rsp
+  39:	5b                   	pop    %rbx
+  3a:	41 5c                	pop    %r12
+  3c:	41 5d                	pop    %r13
+  3e:	41 5e                	pop    %r14
+
+
 ---
-v5:
- - No change
-v4:
- - Restructure code to avoid #ifdefs and forward declarations
- - Use a helper function for checking -EKEYEXPIRED
- - Remove all support for initiating KeyUpdate
- - Use helper function for restoring callbacks
-v3:
- - Use a write lock for sk_user_data
- - Fix build with CONFIG_NVME_TARGET_TCP_TLS disabled
- - Remove unused variable
-v2:
- - Use a helper function for KeyUpdates
- - Ensure keep alive timer is stopped
- - Wait for TLS KeyUpdate to complete
-
- drivers/nvme/target/tcp.c | 203 ++++++++++++++++++++++++++------------
- 1 file changed, 142 insertions(+), 61 deletions(-)
-
-diff --git a/drivers/nvme/target/tcp.c b/drivers/nvme/target/tcp.c
-index 818efdeccef1..486ea7bb0056 100644
---- a/drivers/nvme/target/tcp.c
-+++ b/drivers/nvme/target/tcp.c
-@@ -175,6 +175,7 @@ struct nvmet_tcp_queue {
- 
- 	/* TLS state */
- 	key_serial_t		tls_pskid;
-+	key_serial_t		handshake_session_id;
- 	struct delayed_work	tls_handshake_tmo_work;
- 
- 	unsigned long           poll_end;
-@@ -186,6 +187,8 @@ struct nvmet_tcp_queue {
- 	struct sockaddr_storage	sockaddr_peer;
- 	struct work_struct	release_work;
- 
-+	struct completion       tls_complete;
-+
- 	int			idx;
- 	struct list_head	queue_list;
- 
-@@ -214,6 +217,10 @@ static struct workqueue_struct *nvmet_tcp_wq;
- static const struct nvmet_fabrics_ops nvmet_tcp_ops;
- static void nvmet_tcp_free_cmd(struct nvmet_tcp_cmd *c);
- static void nvmet_tcp_free_cmd_buffers(struct nvmet_tcp_cmd *cmd);
-+#ifdef CONFIG_NVME_TARGET_TCP_TLS
-+static int nvmet_tcp_tls_handshake(struct nvmet_tcp_queue *queue,
-+				   enum handshake_key_update_type keyupdate);
-+#endif
- 
- static inline u16 nvmet_tcp_cmd_tag(struct nvmet_tcp_queue *queue,
- 		struct nvmet_tcp_cmd *cmd)
-@@ -832,6 +839,23 @@ static int nvmet_tcp_try_send_one(struct nvmet_tcp_queue *queue,
- 	return 1;
- }
- 
-+#ifdef CONFIG_NVME_TARGET_TCP_TLS
-+static bool nvmet_tls_key_expired(struct nvmet_tcp_queue *queue, int ret)
-+{
-+	if (ret == -EKEYEXPIRED &&
-+	    queue->state != NVMET_TCP_Q_DISCONNECTING &&
-+	    queue->state != NVMET_TCP_Q_TLS_HANDSHAKE)
-+					return true;
-+
-+	return false;
-+}
-+#else
-+static bool nvmet_tls_key_expired(struct nvmet_tcp_queue *queue, int ret)
-+{
-+	return false;
-+}
-+#endif
-+
- static int nvmet_tcp_try_send(struct nvmet_tcp_queue *queue,
- 		int budget, int *sends)
- {
-@@ -1106,6 +1130,103 @@ static inline bool nvmet_tcp_pdu_valid(u8 type)
- 	return false;
- }
- 
-+static void nvmet_tcp_release_queue(struct kref *kref)
-+{
-+	struct nvmet_tcp_queue *queue =
-+		container_of(kref, struct nvmet_tcp_queue, kref);
-+
-+	WARN_ON(queue->state != NVMET_TCP_Q_DISCONNECTING);
-+	queue_work(nvmet_wq, &queue->release_work);
-+}
-+
-+static void nvmet_tcp_schedule_release_queue(struct nvmet_tcp_queue *queue)
-+{
-+	spin_lock_bh(&queue->state_lock);
-+	if (queue->state == NVMET_TCP_Q_TLS_HANDSHAKE) {
-+		/* Socket closed during handshake */
-+		tls_handshake_cancel(queue->sock->sk);
-+	}
-+	if (queue->state != NVMET_TCP_Q_DISCONNECTING) {
-+		queue->state = NVMET_TCP_Q_DISCONNECTING;
-+		kref_put(&queue->kref, nvmet_tcp_release_queue);
-+	}
-+	spin_unlock_bh(&queue->state_lock);
-+}
-+
-+static void nvmet_tcp_restore_socket_callbacks(struct nvmet_tcp_queue *queue)
-+{
-+	struct socket *sock = queue->sock;
-+
-+	if (!queue->state_change)
-+		return;
-+
-+	write_lock_bh(&sock->sk->sk_callback_lock);
-+	sock->sk->sk_data_ready =  queue->data_ready;
-+	sock->sk->sk_state_change = queue->state_change;
-+	sock->sk->sk_write_space = queue->write_space;
-+	sock->sk->sk_user_data = NULL;
-+	write_unlock_bh(&sock->sk->sk_callback_lock);
-+}
-+
-+#ifdef CONFIG_NVME_TARGET_TCP_TLS
-+static void nvmet_tcp_tls_handshake_timeout(struct work_struct *w)
-+{
-+	struct nvmet_tcp_queue *queue = container_of(to_delayed_work(w),
-+			struct nvmet_tcp_queue, tls_handshake_tmo_work);
-+
-+	pr_warn("queue %d: TLS handshake timeout\n", queue->idx);
-+	/*
-+	 * If tls_handshake_cancel() fails we've lost the race with
-+	 * nvmet_tcp_tls_handshake_done() */
-+	if (!tls_handshake_cancel(queue->sock->sk))
-+		return;
-+	spin_lock_bh(&queue->state_lock);
-+	if (WARN_ON(queue->state != NVMET_TCP_Q_TLS_HANDSHAKE)) {
-+		spin_unlock_bh(&queue->state_lock);
-+		return;
-+	}
-+	queue->state = NVMET_TCP_Q_FAILED;
-+	spin_unlock_bh(&queue->state_lock);
-+	nvmet_tcp_schedule_release_queue(queue);
-+	kref_put(&queue->kref, nvmet_tcp_release_queue);
-+}
-+
-+static int update_tls_keys(struct nvmet_tcp_queue *queue)
-+{
-+	int ret;
-+
-+	cancel_work(&queue->io_work);
-+	queue->state = NVMET_TCP_Q_TLS_HANDSHAKE;
-+
-+	nvmet_tcp_restore_socket_callbacks(queue);
-+
-+	INIT_DELAYED_WORK(&queue->tls_handshake_tmo_work,
-+			  nvmet_tcp_tls_handshake_timeout);
-+
-+	ret = nvmet_tcp_tls_handshake(queue, HANDSHAKE_KEY_UPDATE_TYPE_RECEIVED);
-+
-+	if (ret < 0)
-+		return ret;
-+
-+	ret = wait_for_completion_interruptible_timeout(&queue->tls_complete,
-+							10 * HZ);
-+
-+	if (ret <= 0) {
-+		tls_handshake_cancel(queue->sock->sk);
-+		return ret;
-+	}
-+
-+	queue->state = NVMET_TCP_Q_LIVE;
-+
-+	return 0;
-+}
-+#else
-+static int update_tls_keys(struct nvmet_tcp_queue *queue)
-+{
-+	return -EPFNOSUPPORT;
-+}
-+#endif
-+
- static int nvmet_tcp_tls_record_ok(struct nvmet_tcp_queue *queue,
- 		struct msghdr *msg, char *cbuf)
- {
-@@ -1131,6 +1252,9 @@ static int nvmet_tcp_tls_record_ok(struct nvmet_tcp_queue *queue,
- 			ret = -EAGAIN;
- 		}
- 		break;
-+	case TLS_RECORD_TYPE_HANDSHAKE:
-+		ret = -EAGAIN;
-+		break;
- 	default:
- 		/* discard this record type */
- 		pr_err("queue %d: TLS record %d unhandled\n",
-@@ -1340,6 +1464,8 @@ static int nvmet_tcp_try_recv(struct nvmet_tcp_queue *queue,
- 	for (i = 0; i < budget; i++) {
- 		ret = nvmet_tcp_try_recv_one(queue);
- 		if (unlikely(ret < 0)) {
-+			if (nvmet_tls_key_expired(queue, ret))
-+					goto done;
- 			nvmet_tcp_socket_error(queue, ret);
- 			goto done;
- 		} else if (ret == 0) {
-@@ -1351,29 +1477,6 @@ static int nvmet_tcp_try_recv(struct nvmet_tcp_queue *queue,
- 	return ret;
- }
- 
--static void nvmet_tcp_release_queue(struct kref *kref)
--{
--	struct nvmet_tcp_queue *queue =
--		container_of(kref, struct nvmet_tcp_queue, kref);
--
--	WARN_ON(queue->state != NVMET_TCP_Q_DISCONNECTING);
--	queue_work(nvmet_wq, &queue->release_work);
--}
--
--static void nvmet_tcp_schedule_release_queue(struct nvmet_tcp_queue *queue)
--{
--	spin_lock_bh(&queue->state_lock);
--	if (queue->state == NVMET_TCP_Q_TLS_HANDSHAKE) {
--		/* Socket closed during handshake */
--		tls_handshake_cancel(queue->sock->sk);
--	}
--	if (queue->state != NVMET_TCP_Q_DISCONNECTING) {
--		queue->state = NVMET_TCP_Q_DISCONNECTING;
--		kref_put(&queue->kref, nvmet_tcp_release_queue);
--	}
--	spin_unlock_bh(&queue->state_lock);
--}
--
- static inline void nvmet_tcp_arm_queue_deadline(struct nvmet_tcp_queue *queue)
- {
- 	queue->poll_end = jiffies + usecs_to_jiffies(idle_poll_period_usecs);
-@@ -1404,8 +1507,12 @@ static void nvmet_tcp_io_work(struct work_struct *w)
- 		ret = nvmet_tcp_try_recv(queue, NVMET_TCP_RECV_BUDGET, &ops);
- 		if (ret > 0)
- 			pending = true;
--		else if (ret < 0)
-+		else if (ret < 0) {
-+			if (ret == -EKEYEXPIRED)
-+				break;
-+
- 			return;
-+		}
- 
- 		ret = nvmet_tcp_try_send(queue, NVMET_TCP_SEND_BUDGET, &ops);
- 		if (ret > 0)
-@@ -1415,6 +1522,11 @@ static void nvmet_tcp_io_work(struct work_struct *w)
- 
- 	} while (pending && ops < NVMET_TCP_IO_WORK_BUDGET);
- 
-+	if (ret == -EKEYEXPIRED) {
-+		update_tls_keys(queue);
-+		pending = true;
-+	}
-+
- 	/*
- 	 * Requeue the worker if idle deadline period is in progress or any
- 	 * ops activity was recorded during the do-while loop above.
-@@ -1517,21 +1629,6 @@ static void nvmet_tcp_free_cmds(struct nvmet_tcp_queue *queue)
- 	kfree(cmds);
- }
- 
--static void nvmet_tcp_restore_socket_callbacks(struct nvmet_tcp_queue *queue)
--{
--	struct socket *sock = queue->sock;
--
--	if (!queue->state_change)
--		return;
--
--	write_lock_bh(&sock->sk->sk_callback_lock);
--	sock->sk->sk_data_ready =  queue->data_ready;
--	sock->sk->sk_state_change = queue->state_change;
--	sock->sk->sk_write_space = queue->write_space;
--	sock->sk->sk_user_data = NULL;
--	write_unlock_bh(&sock->sk->sk_callback_lock);
--}
--
- static void nvmet_tcp_uninit_data_in_cmds(struct nvmet_tcp_queue *queue)
- {
- 	struct nvmet_tcp_cmd *cmd = queue->cmds;
-@@ -1794,6 +1891,7 @@ static void nvmet_tcp_tls_handshake_done(void *data, int status,
- 	}
- 	if (!status) {
- 		queue->tls_pskid = peerid;
-+		queue->handshake_session_id = handshake_session_id;
- 		queue->state = NVMET_TCP_Q_CONNECTING;
- 	} else
- 		queue->state = NVMET_TCP_Q_FAILED;
-@@ -1809,28 +1907,7 @@ static void nvmet_tcp_tls_handshake_done(void *data, int status,
- 	else
- 		nvmet_tcp_set_queue_sock(queue);
- 	kref_put(&queue->kref, nvmet_tcp_release_queue);
--}
--
--static void nvmet_tcp_tls_handshake_timeout(struct work_struct *w)
--{
--	struct nvmet_tcp_queue *queue = container_of(to_delayed_work(w),
--			struct nvmet_tcp_queue, tls_handshake_tmo_work);
--
--	pr_warn("queue %d: TLS handshake timeout\n", queue->idx);
--	/*
--	 * If tls_handshake_cancel() fails we've lost the race with
--	 * nvmet_tcp_tls_handshake_done() */
--	if (!tls_handshake_cancel(queue->sock->sk))
--		return;
--	spin_lock_bh(&queue->state_lock);
--	if (WARN_ON(queue->state != NVMET_TCP_Q_TLS_HANDSHAKE)) {
--		spin_unlock_bh(&queue->state_lock);
--		return;
--	}
--	queue->state = NVMET_TCP_Q_FAILED;
--	spin_unlock_bh(&queue->state_lock);
--	nvmet_tcp_schedule_release_queue(queue);
--	kref_put(&queue->kref, nvmet_tcp_release_queue);
-+	complete(&queue->tls_complete);
- }
- 
- static int nvmet_tcp_tls_handshake(struct nvmet_tcp_queue *queue,
-@@ -1852,11 +1929,15 @@ static int nvmet_tcp_tls_handshake(struct nvmet_tcp_queue *queue,
- 	args.ta_data = queue;
- 	args.ta_keyring = key_serial(queue->port->nport->keyring);
- 	args.ta_timeout_ms = tls_handshake_timeout * 1000;
-+	args.handshake_session_id = queue->handshake_session_id;
-+
-+	init_completion(&queue->tls_complete);
- 
- 	if (keyupdate == HANDSHAKE_KEY_UPDATE_TYPE_UNSPEC)
- 		ret = tls_server_hello_psk(&args, GFP_KERNEL);
- 	else
- 		ret = tls_server_keyupdate_psk(&args, GFP_KERNEL, keyupdate);
-+
- 	if (ret) {
- 		kref_put(&queue->kref, nvmet_tcp_release_queue);
- 		pr_err("failed to start TLS, err=%d\n", ret);
--- 
-2.51.1
-
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
