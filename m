@@ -1,107 +1,90 @@
-Return-Path: <netdev+bounces-237808-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95EEFC50778
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 05:00:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 580F6C507BA
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 05:08:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 3A25234C280
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 03:59:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE373189B87C
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 04:08:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66B782D47E1;
-	Wed, 12 Nov 2025 03:59:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 881702D47E1;
+	Wed, 12 Nov 2025 04:07:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="NbWJLtfI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XsQa5b7u"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CF9F207A20;
-	Wed, 12 Nov 2025 03:59:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DE0C2820DB;
+	Wed, 12 Nov 2025 04:07:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762919978; cv=none; b=jsVyeHQaBHARHJxa+sxFn4dixqHHmx63eyy3I97ow2chLSIAQzxzZ7HkuDAf5Yo1/sNoNlhB9NKT2Rg9S1QZ/6n15oepkuLtqehMEoR/XOA2TXAvw0JEtdoF7N8lwE/JYUkVigIBCDZjlkmZQTkQnqc1Bfc2gWzmj7gj9u3ghGY=
+	t=1762920443; cv=none; b=k8ZEdbGtCrzHMQFkMtFBd833VEf4kxyoN75njzXcV3vVGideGaGcLeYkJQ0YFmBrMvtfjSJ/SeCSRLCg4FVKQPWywDeB7XXhDIwYhK7RtAJO387qrAlxv9Z2rtN9rDwVwe/QXhHdp6JuNYxGMIpVszen+9K6HyJvtZjz2DNifEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762919978; c=relaxed/simple;
-	bh=bIAGdTcC7bpTcOl7PjaMaeS9W7RV/cb5sccRrrTqMhQ=;
+	s=arc-20240116; t=1762920443; c=relaxed/simple;
+	bh=m3plAV8OHJtWBsWMLz9UPId3Nq/viGgfVBH4/ctoAG0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nuj1NL8fqxsLEjjRqk+Xx13zctH4LcQDXHqNb7A8jATJk2mhP/xb5TeVv/0hpHo+5eCfMWE5W6794+AAloF/Nf/+m2gbG08VDTQ2GAF1J0ABi7IVCx7AQnayvxa7rUOyqLwGzZqIOx1Fzf1l2G2CSxdbkKIbCyz64yUmSP/hRq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=NbWJLtfI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 31972C19421;
-	Wed, 12 Nov 2025 03:59:36 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="NbWJLtfI"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1762919974;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SxXWxdAurGNlts2UI7BG2pMBJD/v4/R/0QSS/5mHhO8=;
-	b=NbWJLtfIl5vOr7JIVEepRq7aXMOaTK2EU09MeOEXJf1MFZoZu5+LygsMZ47pHYy1s9DLch
-	EoT71SxziJ+GYmCpfS2wlyS58S68bUsS/e8iSLoyX7HtXJLTVL61R8dCcNPKnjXamarzYa
-	kQQAnJZkq33/afjw+d6mn3ajwmA/fqk=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 148d9f60 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Wed, 12 Nov 2025 03:59:33 +0000 (UTC)
-Date: Wed, 12 Nov 2025 04:59:30 +0100
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: =?utf-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, wireguard@lists.zx2c4.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Jordan Rife <jordan@jrife.io>
-Subject: Re: [PATCH net-next v3 00/11] wireguard: netlink: ynl conversion
-Message-ID: <aRQGIhazVqTdS2R_@zx2c4.com>
-References: <20251105183223.89913-1-ast@fiberby.net>
- <20251110180746.4074a9ca@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=HKZRhOGOvNb9arvUcsplMU2bNFolZ1jIV4/TANVOVNUOAgPaNHj0pOCNWuUhx8rbSk0Qngj08AKb0bZqkj1STzWIKGU5n6FydsuPgtWUuMtHe3HjYZHaq7MyCxZVNDWGJSS4hcjzXWzpmk4Jz5LGidYv8Gl8i5ToPB8fVgKt54U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XsQa5b7u; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E819C116B1;
+	Wed, 12 Nov 2025 04:07:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1762920441;
+	bh=m3plAV8OHJtWBsWMLz9UPId3Nq/viGgfVBH4/ctoAG0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XsQa5b7u3/JQQxE2ic9zBaNt/Ct3YlRuJiMdgvg2qjVjZBe6UXk+ab23VSlVEH7Rn
+	 x56n6rgTiqDJSH2zMgqQCmXTSWkTrwBKaHaGMPFZCYV1cuCKQqCsNF2w2kNjWSTqsC
+	 Q2/q59MDofR4D+WiIlCgj7onOhmOi6mr7vC7y8OKANfTf8+Kqyi3/kX7O+ON2Un98c
+	 NrZcl3egV7u1m9tj05LTrvmYZkolMlz8Dx3Kqm3fxB4X8EvH2Rhhi97Hk1RBLOVRv6
+	 gLMJiFyh2rvh0kxTUK2tIJ+U5yOxtwf6JDtaQLyQnREbQItr1j9563lR2hhzZyRMPV
+	 slKlaPfyk+GFA==
+Date: Wed, 12 Nov 2025 04:07:19 +0000
+From: Eric Biggers <ebiggers@kernel.org>
+To: Stephen Hemminger <stephen@networkplumber.org>,
+	David Ahern <dsahern@kernel.org>
+Cc: linux-crypto@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
+	netdev@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH iproute2-next v2] lib/bpf_legacy: Use userspace SHA-1
+ code instead of AF_ALG
+Message-ID: <20251112040719.GB2832160@google.com>
+References: <20250929194648.145585-1-ebiggers@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20251110180746.4074a9ca@kernel.org>
+In-Reply-To: <20250929194648.145585-1-ebiggers@kernel.org>
 
-On Mon, Nov 10, 2025 at 06:07:46PM -0800, Jakub Kicinski wrote:
-> On Wed,  5 Nov 2025 18:32:09 +0000 Asbjørn Sloth Tønnesen wrote:
-> > This series completes the implementation of YNL for wireguard,
-> > as previously announced[1].
-> > 
-> > This series consist of 5 parts:
-> > 1) Patch 01-03 - Misc. changes
-> > 2) Patch    04 - Add YNL specification for wireguard
-> > 3) Patch 05-07 - Transition to a generated UAPI header
-> > 4) Patch    08 - Adds a sample program for the generated C library
-> > 5) Patch 09-11 - Transition to generated netlink policy code
-> > 
-> > The main benefit of having a YNL specification is unlocked after the
-> > first 2 parts, the RFC version seems to already have spawned a new
-> > Rust netlink binding[2] using wireguard as it's main example.
-> > 
-> > Part 3 and 5 validates that the specification is complete and aligned,
-> > the generated code might have a few warts, but they don't matter too
-> > much, and are mostly a transitional problem[3].
-> > 
-> > Part 4 is possible after part 2, but is ordered after part 3,
-> > as it needs to duplicate the UAPI header in tools/include.
+[Adding David Ahern.  I overlooked that iproute2 has separate
+maintainers for the main tree and the next tree.]
+
+On Mon, Sep 29, 2025 at 12:46:48PM -0700, Eric Biggers wrote:
+> Add a basic SHA-1 implementation to lib/, and make lib/bpf_legacy.c use
+> it to calculate SHA-1 digests instead of the previous AF_ALG-based code.
 > 
-> These LGTM, now.
+> This eliminates the dependency on AF_ALG, specifically the kernel config
+> options CONFIG_CRYPTO_USER_API_HASH and CONFIG_CRYPTO_SHA1.
 > 
-> Jason what's your feeling here? AFAICT the changes to the wg code
-> are quite minor now. 
+> Over the years AF_ALG has been very problematic, and it is also not
+> supported on all kernels.  Escalating to the kernel's privileged
+> execution context merely to calculate software algorithms, which can be
+> done in userspace instead, is not something that should have ever been
+> supported.  Even on kernels that support it, the syscall overhead of
+> AF_ALG means that it is often slower than userspace code.
+> 
+> Let's do the right thing here, and allow people to disable AF_ALG
+> support (or not enable it) on systems where iproute2 is the only user.
+> 
+> Acked-by: Ard Biesheuvel <ardb@kernel.org>
+> Signed-off-by: Eric Biggers <ebiggers@kernel.org>
 
-Reviewing it this week. Thanks for bumping this in my queue.
+Stephen and David, any interest in applying this patch?
 
-Jason
+- Eric
 
