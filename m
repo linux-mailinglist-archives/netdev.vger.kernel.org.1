@@ -1,209 +1,112 @@
-Return-Path: <netdev+bounces-237987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B7E9C52788
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 14:26:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 982A0C527B0
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 14:30:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 556113A4038
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 13:14:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5122D3A3044
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 13:20:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A148A336EEE;
-	Wed, 12 Nov 2025 13:13:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F02633358C3;
+	Wed, 12 Nov 2025 13:20:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VyzUnRyR"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="0uvMUYbc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 754A930C364;
-	Wed, 12 Nov 2025 13:13:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D55A0307AD1;
+	Wed, 12 Nov 2025 13:20:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762953238; cv=none; b=RZWZvfmuInBOii/8M1LceiOr0tmlXoCGpH1DOJ1pJBwvfDan4gdQcRJkw5BbK822ChwxfM3bo6h6uy8JnkH5/594cfpGZ72qmTU1pElIb70rhEz/YYrQ+MBfW+v0BNaZMntAiYLWgbNrzKwuy5XcWSm+zf1Vtm4cinB+ZAkjqaY=
+	t=1762953611; cv=none; b=UN7V1IxntZbHzjhPka80WX2MmiUpFTkfIiWoFyU+d0YlV4P1lb/2YQ4zgh3Cx5jHW8T75Yy76LMcUGA9JfYuZFvAoeWkzIQELKoRp+7sBX+MjKf1TUNFAjEHcdFyFyaZcOcWZuS2MMc5U+52BRJcfQwcrPgI5EBFY4Cve7eK5mI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762953238; c=relaxed/simple;
-	bh=g/hCSCz8UW7Ak3GFbCgq4SkrVi+5Q4UPDbF7Z+QI8iU=;
-	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=r05YkCYU4FgxoSRPwFlA/tmHjevc7Lr7auh9SV/DaZ4IxPFeteGCQa1n4GPaQF/cHNkRW92QoqP+dz9EZVcDJa8ic+Lp7scnnBUW4G8d8ffLjlIQP/F/57WgvBPyQ0I5QptlXpvCA/7Z9lpKVsAtrn0wDbx3oz9yAgQ3UA25Mas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VyzUnRyR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21223C116B1;
-	Wed, 12 Nov 2025 13:13:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762953238;
-	bh=g/hCSCz8UW7Ak3GFbCgq4SkrVi+5Q4UPDbF7Z+QI8iU=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=VyzUnRyRSST6mi+GzmZldbjEtiFujFcgzeyB2RdB2rgLYY/orYZGLODLOmtgHXgUb
-	 6LqEb0s5285Bv5cO61uv/GPb5CugYgdkLak9IlyzfA4mqIXKNaFr5InKPyNZNVRlPR
-	 trCmrZYfE6OECJy311URv/S9VQxbRRUVyZiilGsZynm8oYv9MGQcGdGWB/xZgsTNIf
-	 vShakHj2rK49z/BMxLXs2MP5c5Zvb2jE6Us4wcHHU4MkWoqln3Ea6GWL5NuyS9ETZE
-	 EcPsn6rb8gNVvWty2ozZ/Ah+g0DzP4aNyYWSe7tpdj3Seq3rAFg7I8ZxYW0CfeAEJn
-	 C9r2M3FPunkdg==
-Subject: [PATCH net V4] veth: more robust handing of race to avoid txq getting
- stuck
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-To: netdev@vger.kernel.org,
- =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
- Eric Dumazet <eric.dumazet@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, ihor.solodrai@linux.dev,
- "Michael S. Tsirkin" <mst@redhat.com>, makita.toshiaki@lab.ntt.co.jp,
- toshiaki.makita1@gmail.com, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kernel-team@cloudflare.com
-Date: Wed, 12 Nov 2025 14:13:52 +0100
-Message-ID: <176295323282.307447.14790015927673763094.stgit@firesoul>
-In-Reply-To: <176295319819.307447.6162285688886096284.stgit@firesoul>
-References: <176295319819.307447.6162285688886096284.stgit@firesoul>
-User-Agent: StGit/1.5
+	s=arc-20240116; t=1762953611; c=relaxed/simple;
+	bh=BZpnM5upHTZ7qUgZkigoHN2kYvZMnoyTTsUw6eJIxdk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U5qFc2C1dxmIsS8jNkADpnsXPd1pbaIHNKGo0/R/3r2HSedGRtAQd2EA8B425qrimqM7h6HH++IXHJxg4oHF0X72JUY6KMIBjEzk0E9ssDOhzWuEg/x+3FvzqSLbY7FFcMInCg/MJ3cErB7IRZ4N+LefHNu1brSMI5079cSp3fo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=0uvMUYbc; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=xu5J2YUVmO+KaIFCwe3YTQ+9UN97u6v/RSU7wP6bNI8=; b=0uvMUYbckaKxc9ZGTp6DGbg3YN
+	LALnRa7NcqVeGPt4nB5iXP1V4HqFy8LBFW7/xewuahRQ+6gPCw2f4WaEhI9ijAyzq6xNrwf7/E+M8
+	UvW05os7ZPsFzkNKwfIlPDFicG82Pb+eeBdJi4Lf92Ogx+Yp8YwTCJ6bJaypmP2LJ6A0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1vJAl1-00DkSt-Dv; Wed, 12 Nov 2025 14:19:31 +0100
+Date: Wed, 12 Nov 2025 14:19:31 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jacky Chou <jacky_chou@aspeedtech.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Po-Yu Chuang <ratbert@faraday-tech.com>,
+	Joel Stanley <joel@jms.id.au>,
+	Andrew Jeffery <andrew@codeconstruct.com.au>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
+	"taoren@meta.com" <taoren@meta.com>
+Subject: Re: [PATCH net-next v4 4/4] net: ftgmac100: Add RGMII delay support
+ for AST2600
+Message-ID: <3af52caa-88a7-4b88-bd92-fd47421cc81a@lunn.ch>
+References: <20251110-rgmii_delay_2600-v4-0-5cad32c766f7@aspeedtech.com>
+ <20251110-rgmii_delay_2600-v4-4-5cad32c766f7@aspeedtech.com>
+ <68f10ee1-d4c8-4498-88b0-90c26d606466@lunn.ch>
+ <SEYPR06MB5134EBA2235B3D4BE39B19359DCCA@SEYPR06MB5134.apcprd06.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <SEYPR06MB5134EBA2235B3D4BE39B19359DCCA@SEYPR06MB5134.apcprd06.prod.outlook.com>
 
-Commit dc82a33297fc ("veth: apply qdisc backpressure on full ptr_ring to
-reduce TX drops") introduced a race condition that can lead to a permanently
-stalled TXQ. This was observed in production on ARM64 systems (Ampere Altra
-Max).
+> > This is an optional property. If it does not exist, you have an old DT blob. It is
+> > not an error. So you need to do different things depending on what the error
+> > code is. If it does not exist, just return 0 and leave the hardware alone. If it is
+> > some other error report it, and abort the probe.
+> > 
+> 
+> Based on this for next version, I want to move the "aspeed,scu" from dtsi to dts.
+> Change it to optional and accord it whether existed to decide it is old or new DT 
+> blob.
 
-The race occurs in veth_xmit(). The producer observes a full ptr_ring and
-stops the queue (netif_tx_stop_queue()). The subsequent conditional logic,
-intended to re-wake the queue if the consumer had just emptied it (if
-(__ptr_ring_empty(...)) netif_tx_wake_queue()), can fail. This leads to a
-"lost wakeup" where the TXQ remains stopped (QUEUE_STATE_DRV_XOFF) and
-traffic halts.
+I think that is the easy way out, not necessarily the correct way.
 
-This failure is caused by an incorrect use of the __ptr_ring_empty() API
-from the producer side. As noted in kernel comments, this check is not
-guaranteed to be correct if a consumer is operating on another CPU. The
-empty test is based on ptr_ring->consumer_head, making it reliable only for
-the consumer. Using this check from the producer side is fundamentally racy.
+All systems have the aspeed,scu, so it should really be in the .dtsi
+file.
 
-This patch fixes the race by adopting the more robust logic from an earlier
-version V4 of the patchset, which always flushed the peer:
+What are you really trying to solve? That the DT blob says "rgmii",
+but the bootloader has configured the MAC to add delays? You should be
+able to test for that condition. If it is found, issue as warning, and
+treat phy-mode as 'rgmii-id'. If the DT blob says 'rgmii-id' and the
+MAC is configured to add the delays, the system is at least
+consistent, no need for a warning, disable the MAC delays and pass
+_RGMII_ID to the PHY. And if the blob says 'rgmii-id' and the MAC is
+not adding delays, no need to touch the MAC delay, and pass _RGMII_ID
+to the PHY.
 
-(1) In veth_xmit(), the racy conditional wake-up logic and its memory barrier
-are removed. Instead, after stopping the queue, we unconditionally call
-__veth_xdp_flush(rq). This guarantees that the NAPI consumer is scheduled,
-making it solely responsible for re-waking the TXQ.
-  This handles the race where veth_poll() consumes all packets and completes
-NAPI *before* veth_xmit() on the producer side has called netif_tx_stop_queue.
-The __veth_xdp_flush(rq) will observe rx_notify_masked is false and schedule
-NAPI.
+Are there any mainline DT .dts files which say rgmii-txid, or
+rgmii-rxid? They would be rather odd, but occasionally you see them.
+Assuming there are not lots of them, i would probably just leave
+everything as is.
 
-(2) On the consumer side, the logic for waking the peer TXQ is moved out of
-veth_xdp_rcv() and placed at the end of the veth_poll() function. This
-placement is part of fixing the race, as the netif_tx_queue_stopped() check
-must occur after rx_notify_masked is potentially set to false during NAPI
-completion.
-  This handles the race where veth_poll() consumes all packets, but haven't
-finished (rx_notify_masked is still true). The producer veth_xmit() stops the
-TXQ and __veth_xdp_flush(rq) will observe rx_notify_masked is true, meaning
-not starting NAPI.  Then veth_poll() change rx_notify_masked to false and
-stops NAPI.  Before exiting veth_poll() will observe TXQ is stopped and wake
-it up.
-
-Fixes: dc82a33297fc ("veth: apply qdisc backpressure on full ptr_ring to reduce TX drops")
-Reviewed-by: Toshiaki Makita <toshiaki.makita1@gmail.com>
-Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
----
- drivers/net/veth.c |   38 ++++++++++++++++++++------------------
- 1 file changed, 20 insertions(+), 18 deletions(-)
-
-diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-index 87a63c4bee77..056f7f79f13d 100644
---- a/drivers/net/veth.c
-+++ b/drivers/net/veth.c
-@@ -392,14 +392,12 @@ static netdev_tx_t veth_xmit(struct sk_buff *skb, struct net_device *dev)
- 		}
- 		/* Restore Eth hdr pulled by dev_forward_skb/eth_type_trans */
- 		__skb_push(skb, ETH_HLEN);
--		/* Depend on prior success packets started NAPI consumer via
--		 * __veth_xdp_flush(). Cancel TXQ stop if consumer stopped,
--		 * paired with empty check in veth_poll().
--		 */
- 		netif_tx_stop_queue(txq);
--		smp_mb__after_atomic();
--		if (unlikely(__ptr_ring_empty(&rq->xdp_ring)))
--			netif_tx_wake_queue(txq);
-+		/* Makes sure NAPI peer consumer runs. Consumer is responsible
-+		 * for starting txq again, until then ndo_start_xmit (this
-+		 * function) will not be invoked by the netstack again.
-+		 */
-+		__veth_xdp_flush(rq);
- 		break;
- 	case NET_RX_DROP: /* same as NET_XMIT_DROP */
- drop:
-@@ -900,17 +898,9 @@ static int veth_xdp_rcv(struct veth_rq *rq, int budget,
- 			struct veth_xdp_tx_bq *bq,
- 			struct veth_stats *stats)
- {
--	struct veth_priv *priv = netdev_priv(rq->dev);
--	int queue_idx = rq->xdp_rxq.queue_index;
--	struct netdev_queue *peer_txq;
--	struct net_device *peer_dev;
- 	int i, done = 0, n_xdpf = 0;
- 	void *xdpf[VETH_XDP_BATCH];
- 
--	/* NAPI functions as RCU section */
--	peer_dev = rcu_dereference_check(priv->peer, rcu_read_lock_bh_held());
--	peer_txq = peer_dev ? netdev_get_tx_queue(peer_dev, queue_idx) : NULL;
--
- 	for (i = 0; i < budget; i++) {
- 		void *ptr = __ptr_ring_consume(&rq->xdp_ring);
- 
-@@ -959,9 +949,6 @@ static int veth_xdp_rcv(struct veth_rq *rq, int budget,
- 	rq->stats.vs.xdp_packets += done;
- 	u64_stats_update_end(&rq->stats.syncp);
- 
--	if (peer_txq && unlikely(netif_tx_queue_stopped(peer_txq)))
--		netif_tx_wake_queue(peer_txq);
--
- 	return done;
- }
- 
-@@ -969,12 +956,20 @@ static int veth_poll(struct napi_struct *napi, int budget)
- {
- 	struct veth_rq *rq =
- 		container_of(napi, struct veth_rq, xdp_napi);
-+	struct veth_priv *priv = netdev_priv(rq->dev);
-+	int queue_idx = rq->xdp_rxq.queue_index;
-+	struct netdev_queue *peer_txq;
- 	struct veth_stats stats = {};
-+	struct net_device *peer_dev;
- 	struct veth_xdp_tx_bq bq;
- 	int done;
- 
- 	bq.count = 0;
- 
-+	/* NAPI functions as RCU section */
-+	peer_dev = rcu_dereference_check(priv->peer, rcu_read_lock_bh_held());
-+	peer_txq = peer_dev ? netdev_get_tx_queue(peer_dev, queue_idx) : NULL;
-+
- 	xdp_set_return_frame_no_direct();
- 	done = veth_xdp_rcv(rq, budget, &bq, &stats);
- 
-@@ -996,6 +991,13 @@ static int veth_poll(struct napi_struct *napi, int budget)
- 		veth_xdp_flush(rq, &bq);
- 	xdp_clear_return_frame_no_direct();
- 
-+	/* Release backpressure per NAPI poll */
-+	smp_rmb(); /* Paired with netif_tx_stop_queue set_bit */
-+	if (peer_txq && netif_tx_queue_stopped(peer_txq)) {
-+		txq_trans_cond_update(peer_txq);
-+		netif_tx_wake_queue(peer_txq);
-+	}
-+
- 	return done;
- }
- 
-
-
+	Andrew
 
