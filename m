@@ -1,207 +1,192 @@
-Return-Path: <netdev+bounces-237990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C5DBC5281F
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 14:38:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D09A0C5283B
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 14:41:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C33DB3BBD40
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 13:26:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 642943BEED4
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 13:29:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 028D4333455;
-	Wed, 12 Nov 2025 13:25:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F217F338901;
+	Wed, 12 Nov 2025 13:29:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=rosa.ru header.i=@rosa.ru header.b="Jo17uctE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HEXok792";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="bAaBmfgR"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward102a.mail.yandex.net (forward102a.mail.yandex.net [178.154.239.85])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D22D53385A1;
-	Wed, 12 Nov 2025 13:25:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.85
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FA9C3358C3
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 13:29:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762953940; cv=none; b=FP6FHCncpNKgKT9HD22ei2z4GT0T9uhCQaBeBmCdhL+JJPPXcxKZfva1njBwJ8rZFtN19SrLc9NETe4AlLqyH8g2hRnGmS/x9+vRjQvyQLU2FMm+6UD1N183G7fiXEtCgVw5KALmMDQqeRvEzNw1PdU38SA/Bzmg9L/1S0RrkBg=
+	t=1762954145; cv=none; b=BOmCVsSZTO1LTZpFKw0qB3aXwYTrM2K19FrvK5a3ie+WNqf6KOrX/0M7a1gdrGjEKA7ysLCsfl7oKqLLtf5Om7D7pKqs87UXZ4rmN3Do4skGuIH6LsiNcPaCqPTPN+qO6OMP92Few6kLN8O7r4KaiBBe8x0A1CeMGc9bHXvgGkk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762953940; c=relaxed/simple;
-	bh=2eyWQc0PHxHbSfEFosVIwVUxvbpEC45cpmuWplx7m+Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kdvDK82vUNFdO0m6S5z4qain0hbYdAnFna760+0OxvROagib3Xi2c+KT+4PKfPXVPMBcyh7pkqcl9tstgxVMxul0M7sF/04DjkhxtPsoG69tQnzfpjVseH2SoQ+SzbTDcFb9ayXKXtpgdzRls5eeIGFg6n2jzLP3mkpv+1BIoH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosa.ru; spf=pass smtp.mailfrom=rosa.ru; dkim=pass (1024-bit key) header.d=rosa.ru header.i=@rosa.ru header.b=Jo17uctE; arc=none smtp.client-ip=178.154.239.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosa.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rosa.ru
-Received: from mail-nwsmtp-smtp-production-main-55.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-55.vla.yp-c.yandex.net [IPv6:2a02:6b8:c1f:582e:0:640:200:0])
-	by forward102a.mail.yandex.net (Yandex) with ESMTPS id 7E76EC0081;
-	Wed, 12 Nov 2025 16:25:22 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-55.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id JPPd5Z0LHGk0-D5yWJtsG;
-	Wed, 12 Nov 2025 16:25:21 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rosa.ru; s=mail;
-	t=1762953921; bh=ja4ImBaXqFzFgnOefTZ8D4ovCR7A4+mf1CFqUd1T6z8=;
-	h=Message-ID:Date:Cc:Subject:To:From;
-	b=Jo17uctEkU0P7vKa81EopsDm1wAzAg+1bt4dTfXPDA5/B86PV0OnMsqExhd6rpql6
-	 mCKIifxJ4Ne/wlTnaqHB2U6CgNXjX9PnhLBiFXMIEVzSEiahjXYfFWrJYnFa1xjFNg
-	 uW5QjWoZqlJWRatqx+e3gPmiD+T4bllsFodLNiss=
-Authentication-Results: mail-nwsmtp-smtp-production-main-55.vla.yp-c.yandex.net; dkim=pass header.i=@rosa.ru
-From: Mikhail Lobanov <m.lobanov@rosa.ru>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>
-Cc: Mikhail Lobanov <m.lobanov@rosa.ru>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	James Chapman <jchapman@katalix.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: [PATCH net v2] l2tp: fix double dst_release() on sk_dst_cache race
-Date: Wed, 12 Nov 2025 16:25:12 +0300
-Message-ID: <20251112132514.17364-1-m.lobanov@rosa.ru>
-X-Mailer: git-send-email 2.47.2
+	s=arc-20240116; t=1762954145; c=relaxed/simple;
+	bh=2hiXwZOx9q/AQWzpz41tgoiVkCduyG6fAWQFbExNFcg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eDPVxEvdiiqzREFdrcMOU5zuB7voGPkqk3ev6bpL1saTNwpJFWa3PxpYHLzr0gw8waPLzcUe5pAyxE/FlkIFdOw2jyFSxF/TjYugiwgc0uSHxMGahkfBfk9Vm9C4U1QX75t8uhHm1m5QA7E495OsdqNFBCiwbtANdRI+fxIb3nM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HEXok792; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=bAaBmfgR; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762954143;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CrKEYgoIA+04HmwcyGlHc2lcud53I+xZFpr5fUVn1yg=;
+	b=HEXok792UsAk3So/WtDRZLYhz36k6Ax10vpK3b+5YWpfuQUU4gvpap5h+SJX2fltKWzO1V
+	i9ITKhxDY9n/scOL/WJO1z/Q5hBeoQJ2HDyErvo9NblbDgsA3qcOGKfkb1sNe4Jnuqub8I
+	9vHqG99kp92+lC85yYlgRwa+eQJqQ1M=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-596-1RfgcvJ5MTKCXQnQRsLuyg-1; Wed, 12 Nov 2025 08:29:01 -0500
+X-MC-Unique: 1RfgcvJ5MTKCXQnQRsLuyg-1
+X-Mimecast-MFC-AGG-ID: 1RfgcvJ5MTKCXQnQRsLuyg_1762954141
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-b70b974b818so93563866b.1
+        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 05:29:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1762954140; x=1763558940; darn=vger.kernel.org;
+        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CrKEYgoIA+04HmwcyGlHc2lcud53I+xZFpr5fUVn1yg=;
+        b=bAaBmfgRMtFedBBt0UMTiNPVZ4ZHLkVi+TAgNEwzAWvCnb5rPA9gAGclJab3s4tOyu
+         d1pxw/aUlSnQqn8xaYlvpLvZHtbLz2UO7JikFDZ1P1ofg57Ew4VFTGTDuSBebqLoOj8M
+         u9HO4bwq6OiQOHz7dz5niyhkcIwdEfzgohZo8gSI2fy3iflKEeXms7dOdAqUKmHOlml+
+         ex1TRDrc4BhlgU8xiLeQ7xRRl4Bt4hAfbDtDObPturjPYssyxvJsmosECwC8cBrIHWET
+         jeE4BXSPn+LPpMRrtWagro3rILAlw59zc6LPPA2KaaI+4v11AdAr9cc7J5YhxCQAOyOd
+         oNtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762954140; x=1763558940;
+        h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
+         :from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CrKEYgoIA+04HmwcyGlHc2lcud53I+xZFpr5fUVn1yg=;
+        b=xS+drr0pLRc0Hy+dpkjFr+O+kkhn4lfQEGhwE5lcJ+ViCVeUKDqFkzvf6AsLiHddne
+         jgr+jLVw1fud5ZQjycGiV+p1HQ2LIkzg36ad4b7A506ACQY2G7k6qTM2lEbv8hH9DC70
+         3K8XO2Ydywfrt99XpAz1qVUpZHfU9HFFU3KiOcNhpLEQj2qanOWXwbqe6/yw8TyT7ZTc
+         +atIit9Fakp7Rv7SPwv3gDW317zWd1NfwjLu/l+k0uSPGT8AqYtGsIY+6U77La1oSvuc
+         4jrBYG6EtwpTtgtLxgxpVF+Bmznt1oqLwV5WtT3dKLLnIqB4Ry9qxnZie6IYDyA3U/tC
+         yfHA==
+X-Gm-Message-State: AOJu0YwhATwqiI9bSwqK+scNB6QK9YOp/dwyaTOfg8wXZP3VETm2trl+
+	4iO1G4f3VmqH5gNneOUVVRHI5xaf6EDlcxuz8P3x1/5njwOh4Vb2T3udB+9k+CepUduM6PTJglD
+	PPgivP8l9Y26gcjh865LcmYs2IxZn6DRS18mZTf1ml3q3ssLYHS7Oj+Vusw==
+X-Gm-Gg: ASbGncsV+5OsrQlGQ1Gnlh+CSNFG4LZhGWqvYAMQhhBHSkpS8XL5ttGy6t1E7NSY4Dm
+	+QFye3O7uk+gg4DFC3YmXyg0z1TegOsWkQ6vgMiTS3azy0jLB+3z0BndM5H3T4T/drDW4Rflj55
+	7N2U3RZJ+QgehuGTpxIy6V5L0K+vwKg2Jje9W4TAoqayUxaV4Fv2WG4dcVlG3J8t/eHdbLVHGUW
+	3WC5cC/1BY04ky/Iq+GVIpnKrX99CVuTctT6m39KBEV7bwYP5LxE7ZEc2ZrpzpdRBEqpMSSA9vL
+	wXgOajolz563e5vbQZRFVomgn2jZUPC27lO2nRpEdMiftjSJ9Lsp5+BZ/IBjvVgbj7Vlsxr2zDf
+	D1IjNWg3ZtP5vk6hWg6TTG2W9Zg9sdfH8WL5GF7PWBFsEU8TvnvTGj99SBKsRky2RxX+X6WVXAR
+	sUDTZLGIdYv08wZxqPDhnk4ktHLzaM/9RmYOY=
+X-Received: by 2002:a17:906:6a1b:b0:b72:dbf2:afb8 with SMTP id a640c23a62f3a-b7331b3a223mr266281066b.65.1762954140613;
+        Wed, 12 Nov 2025 05:29:00 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF+yX1s77nIKTurGOrwJJg1rBXxjO/ilJ/UOB7GklIbKi9xnjuh020vX/d/xVMJoB8aTAx3PQ==
+X-Received: by 2002:a17:906:6a1b:b0:b72:dbf2:afb8 with SMTP id a640c23a62f3a-b7331b3a223mr266277866b.65.1762954140119;
+        Wed, 12 Nov 2025 05:29:00 -0800 (PST)
+Received: from [10.45.224.224] (5920ab7b.static.cust.trined.nl. [89.32.171.123])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b72bf9bcd59sm1580794366b.53.2025.11.12.05.28.59
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 12 Nov 2025 05:28:59 -0800 (PST)
+From: Eelco Chaudron <echaudro@redhat.com>
+To: Ilya Maximets <i.maximets@ovn.org>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ linux-kernel@vger.kernel.org, dev@openvswitch.org,
+ Aaron Conole <aconole@redhat.com>, Willy Tarreau <w@1wt.eu>,
+ LePremierHomme <kwqcheii@proton.me>, Junvy Yang <zhuque@tencent.com>
+Subject: Re: [PATCH net] net: openvswitch: remove never-working support for
+ setting nsh fields
+Date: Wed, 12 Nov 2025 14:28:58 +0100
+X-Mailer: MailMate (2.0r6290)
+Message-ID: <E12AC26C-AB1F-489C-9BC0-A35593FD03D5@redhat.com>
+In-Reply-To: <20251112112246.95064-1-i.maximets@ovn.org>
+References: <20251112112246.95064-1-i.maximets@ovn.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-A reproducible rcuref - imbalanced put() warning is observed under
-IPv6 L2TP (pppol2tp) traffic with blackhole routes, indicating an
-imbalance in dst reference counting for routes cached in
-sk->sk_dst_cache and pointing to a subtle lifetime/synchronization
-issue between the helpers that validate and drop cached dst entries.
 
-rcuref - imbalanced put()
-WARNING: CPU: 0 PID: 899 at lib/rcuref.c:266 rcuref_put_slowpath+0x1ce/0x240 lib/rcuref.c:266
-Modules linked in:
-CPSocket connected tcp:127.0.0.1:48148,server=on <-> 127.0.0.1:33750
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-RIP: 0010:rcuref_put_slowpath+0x1ce/0x240 lib/rcuref.c:266
 
-Call Trace:
- <TASK>
- __rcuref_put include/linux/rcuref.h:97 [inline]
- rcuref_put include/linux/rcuref.h:153 [inline]
- dst_release+0x291/0x310 net/core/dst.c:167
- __sk_dst_check+0x2d4/0x350 net/core/sock.c:604
- __inet6_csk_dst_check net/ipv6/inet6_connection_sock.c:76 [inline]
- inet6_csk_route_socket+0x6ed/0x10c0 net/ipv6/inet6_connection_sock.c:104
- inet6_csk_xmit+0x12f/0x740 net/ipv6/inet6_connection_sock.c:121
- l2tp_xmit_queue net/l2tp/l2tp_core.c:1214 [inline]
- l2tp_xmit_core net/l2tp/l2tp_core.c:1309 [inline]
- l2tp_xmit_skb+0x1404/0x1910 net/l2tp/l2tp_core.c:1325
- pppol2tp_sendmsg+0x3ca/0x550 net/l2tp/l2tp_ppp.c:302
- sock_sendmsg_nosec net/socket.c:729 [inline]
- __sock_sendmsg net/socket.c:744 [inline]
- ____sys_sendmsg+0xab2/0xc70 net/socket.c:2609
- ___sys_sendmsg+0x11d/0x1c0 net/socket.c:2663
- __sys_sendmmsg+0x188/0x450 net/socket.c:2749
- __do_sys_sendmmsg net/socket.c:2778 [inline]
- __se_sys_sendmmsg net/socket.c:2775 [inline]
- __x64_sys_sendmmsg+0x98/0x100 net/socket.c:2775
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x64/0x140 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
-RIP: 0033:0x7fe6960ec719
- </TASK>
+On 12 Nov 2025, at 12:14, Ilya Maximets wrote:
 
-The race occurs between the lockless UDPv6 transmit path
-(udpv6_sendmsg() -> sk_dst_check()) and the locked L2TP/pppol2tp
-transmit path (pppol2tp_sendmsg() -> l2tp_xmit_skb() ->
-... -> inet6_csk_xmit() → __sk_dst_check()), when both handle
-the same obsolete dst from sk->sk_dst_cache: the UDPv6 side takes
-an extra reference and atomically steals and releases the cached
-dst, while the L2TP side, using a stale cached pointer, still
-calls dst_release() on it, and together these updates produce
-an extra final dst_release() on that dst, triggering
-rcuref - imbalanced put().
+> The validation of the set(nsh(...)) action is completely wrong.
+> It runs through the nsh_key_put_from_nlattr() function that is the
+> same function that validates NSH keys for the flow match and the
+> push_nsh() action.  However, the set(nsh(...)) has a very different
+> memory layout.  Nested attributes in there are doubled in size in
+> case of the masked set().  That makes proper validation impossible.
+>
+> There is also confusion in the code between the 'masked' flag, that
+> says that the nested attributes are doubled in size containing both
+> the value and the mask, and the 'is_mask' that says that the value
+> we're parsing is the mask.  This is causing kernel crash on trying to
+> write into mask part of the match with SW_FLOW_KEY_PUT() during
+> validation, while validate_nsh() doesn't allocate any memory for it:
+>
+>   BUG: kernel NULL pointer dereference, address: 0000000000000018
+>   #PF: supervisor read access in kernel mode
+>   #PF: error_code(0x0000) - not-present page
+>   PGD 1c2383067 P4D 1c2383067 PUD 20b703067 PMD 0
+>   Oops: Oops: 0000 [#1] SMP NOPTI
+>   CPU: 8 UID: 0 Kdump: loaded Not tainted 6.17.0-rc4+ #107 PREEMPT(voluntary)
+>   RIP: 0010:nsh_key_put_from_nlattr+0x19d/0x610 [openvswitch]
+>   Call Trace:
+>    <TASK>
+>    validate_nsh+0x60/0x90 [openvswitch]
+>    validate_set.constprop.0+0x270/0x3c0 [openvswitch]
+>    __ovs_nla_copy_actions+0x477/0x860 [openvswitch]
+>    ovs_nla_copy_actions+0x8d/0x100 [openvswitch]
+>    ovs_packet_cmd_execute+0x1cc/0x310 [openvswitch]
+>    genl_family_rcv_msg_doit+0xdb/0x130
+>    genl_family_rcv_msg+0x14b/0x220
+>    genl_rcv_msg+0x47/0xa0
+>    netlink_rcv_skb+0x53/0x100
+>    genl_rcv+0x24/0x40
+>    netlink_unicast+0x280/0x3b0
+>    netlink_sendmsg+0x1f7/0x430
+>    ____sys_sendmsg+0x36b/0x3a0
+>    ___sys_sendmsg+0x87/0xd0
+>    __sys_sendmsg+0x6d/0xd0
+>    do_syscall_64+0x7b/0x2c0
+>    entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>
+> The third issue with this process is that while trying to convert
+> the non-masked set into masked one, validate_set() copies and doubles
+> the size of the OVS_KEY_ATTR_NSH as if it didn't have any nested
+> attributes.  It should be copying each nested attribute and doubling
+> them in size independently.  And the process must be properly reversed
+> during the conversion back from masked to a non-masked variant during
+> the flow dump.
+>
+> In the end, the only two outcomes of trying to use this action are
+> either validation failure or a kernel crash.  And if somehow someone
+> manages to install a flow with such an action, it will most definitely
+> not do what it is supposed to, since all the keys and the masks are
+> mixed up.
+>
+> Fixing all the issues is a complex task as it requires re-writing
+> most of the validation code.
+>
+> Given that and the fact that this functionality never worked since
+> introduction, let's just remove it altogether.  It's better to
+> re-introduce it later with a proper implementation instead of trying
+> to fix it in stable releases.
+>
+> Fixes: b2d0f5d5dc53 ("openvswitch: enable NSH support")
+> Reported-by: Junvy Yang <zhuque@tencent.com>
+> Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
 
-The Race Condition:
+Hi Ilya, thanks for taking the time to look into this issue.
 
-Initial:
-  sk->sk_dst_cache = dst
-  ref(dst) = 1   
-
-Thread 1: sk_dst_check()                Thread 2: __sk_dst_check()
-------------------------               ----------------------------
-sk_dst_get(sk):
-  rcu_read_lock()
-  dst = rcu_dereference(sk->sk_dst_cache)
-  rcuref_get(dst) succeeds
-  rcu_read_unlock()
-  // ref = 2  
-
-                                            dst = __sk_dst_get(sk)
-                                    // reads same dst from sk_dst_cache
-                                    // ref still = 2 (no extra get)
-
-[both see dst obsolete & check() == NULL]
-
-sk_dst_reset(sk):
-  old = xchg(&sk->sk_dst_cache, NULL)
-    // old = dst
-  dst_release(old)
-    // drop cached ref
-    // ref: 2 -> 1 
-
-                                  RCU_INIT_POINTER(sk->sk_dst_cache, NULL)
-                                  // cache already NULL after xchg
-                                            dst_release(dst)
-                                              // ref: 1 -> 0
-
-  dst_release(dst)
-  // tries to drop its own ref after final put
-  // rcuref_put_slowpath() -> "rcuref - imbalanced put()"
-
-The fix is applied locally in L2TP’s IPv6 transmit path before calling
-inet6_csk_xmit(). First, it performs a lockless pre-validation of the
-socket route cache via sk_dst_check(), so that any obsolete cached dst
-is atomically removed from sk->sk_dst_cache by the lockless helper
-(through its xchg() path); this prevents the locked __sk_dst_check()
-inside inet6_csk_xmit() from issuing a second dst_release() on the same
-cache-owned reference. Second, it takes an additional reference to the
-current cached dst with sk_dst_get() and drops it after inet6_csk_xmit()
-returns, ensuring the dst lifetime is guarded while L2TP transmits, even
-if the cache is concurrently updated. Together these steps eliminate the
-double-release race without changing sock-core semantics.
-
-Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
-
-Fixes: d14730b8e911 ("ipv6: use RCU in inet6_csk_xmit()")
-Signed-off-by: Mikhail Lobanov <m.lobanov@rosa.ru>
----
-v2: move fix to L2TP as suggested by Eric Dumazet.
-
- net/l2tp/l2tp_core.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/net/l2tp/l2tp_core.c b/net/l2tp/l2tp_core.c
-index 369a2f2e459c..93dafac9117f 100644
---- a/net/l2tp/l2tp_core.c
-+++ b/net/l2tp/l2tp_core.c
-@@ -1210,9 +1210,17 @@ static int l2tp_xmit_queue(struct l2tp_tunnel *tunnel, struct sk_buff *skb, stru
- 	skb->ignore_df = 1;
- 	skb_dst_drop(skb);
- #if IS_ENABLED(CONFIG_IPV6)
--	if (l2tp_sk_is_v6(tunnel->sock))
-+	if (l2tp_sk_is_v6(tunnel->sock)) {
-+		struct dst_entry *pre_dst, *hold_dst;
-+
-+		pre_dst = sk_dst_check(tunnel->sock, 0);
-+		if (pre_dst)
-+			dst_release(pre_dst);
-+		hold_dst = sk_dst_get(tunnel->sock);
- 		err = inet6_csk_xmit(tunnel->sock, skb, NULL);
--	else
-+		if (hold_dst)
-+			dst_release(hold_dst);
-+	} else
- #endif
- 		err = ip_queue_xmit(tunnel->sock, skb, fl);
- 
--- 
-2.47.2
+Acked-by: Eelco Chaudron <echaudro@redhat.com>
 
 
