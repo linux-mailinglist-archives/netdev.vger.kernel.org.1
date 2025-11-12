@@ -1,162 +1,175 @@
-Return-Path: <netdev+bounces-237880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67314C51168
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 09:23:37 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA784C511A6
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 09:28:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1E683B4718
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 08:23:35 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 5449234C181
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 08:28:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C301F2D5C7A;
-	Wed, 12 Nov 2025 08:23:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="g3Mg4xdX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50DB62F5A05;
+	Wed, 12 Nov 2025 08:28:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpout-03.galae.net (smtpout-03.galae.net [185.246.85.4])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB49827EFE9;
-	Wed, 12 Nov 2025 08:23:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.246.85.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45308272801
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 08:28:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762935812; cv=none; b=jn/NL7fjMcpVp5OSTaSbkDkkbGt3thjtee+7+jRf5x6RpWulXzHg9DheLqYmrQPiDTJtyYW+HI7XDszW/eg+GI/HlZXNhJok0Xm6nuL6Vjl10z5qeflDTNQtebQHlb5RDUdPiyaSF21pPMqt4vgtcHnM/gWbdCZxCQQbcIy0TsY=
+	t=1762936086; cv=none; b=dUIOpUaHcP4rjcCu9NP0vHSYIYhaq49oBxDLFnrwH3eMGIrOZPjg2A7miULyGJJT+gGL2NDrxIDglYbLln+70KQhFzhucP1uiW+91uY/4JwIOMV8DRw9IlXMGILmj5o5ntlNWoEFqO+zpcMK7wHH7YHJsGQC//1/wBTYBC5LsEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762935812; c=relaxed/simple;
-	bh=leHrsHC3HX5T+UeIMtqLU31BJdR5MqyeYMo8G7lur0k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MVXTYgfBaxdBYam9rMbnh2BKxqhs4IrVc74EujgzzHAxE9OqB2SZ4wQxqpFvx4r04xia9XvrRg454PbSV0CzVERlLkOo84wG6irNv8WNsVPSnoFsJ8h5gIOJBYJ2aLwXxV33+sWwixEYl7vtGukK/oyBafIyijU9nUdiAc/yWVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=g3Mg4xdX; arc=none smtp.client-ip=185.246.85.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: from smtpout-01.galae.net (smtpout-01.galae.net [212.83.139.233])
-	by smtpout-03.galae.net (Postfix) with ESMTPS id 22F7C4E4165C;
-	Wed, 12 Nov 2025 08:23:29 +0000 (UTC)
-Received: from mail.galae.net (mail.galae.net [212.83.136.155])
-	by smtpout-01.galae.net (Postfix) with ESMTPS id E7F976070B;
-	Wed, 12 Nov 2025 08:23:28 +0000 (UTC)
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 3728B1037196F;
-	Wed, 12 Nov 2025 09:23:22 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=dkim;
-	t=1762935807; h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:content-language:in-reply-to:references;
-	bh=rTnbgSuE6RgEYpYQF2xhT+pvJdvD6WChCNxRoxD+Pr4=;
-	b=g3Mg4xdXi7Vo0r1FgrG9Rjot6Ej08ydVfBPOwi8fdXDBWr5eT9S6lnTvA26SsxaTHQ9gx4
-	BFaeeJOaIuWS80K+dWG1DJtjToCM74e59oy4iMKORNxT5ehTm7Aw9jIW0q9OjQ9292A7Ki
-	Pl4MUmnLn79fRrj9sFOmIkberIWtNCbPlj/sdUydxvgUsd4/XwUV0H7E6dX/B/6Wo104bM
-	io/Vmu5l+cCK2zU8bMrnt2Dk6RgfCqQLBohwNnbyt4blColBHfqaVsWwmnjjzL1MpUdx3f
-	qyVc/l0tHLVm+gq7dX2oL4rdXTWFHjYKftqfCgZms2gUK2eK9bvvnK5rb734Dg==
-Message-ID: <33bad77f-8468-4e4a-a60d-adf9e1145816@bootlin.com>
-Date: Wed, 12 Nov 2025 09:23:21 +0100
+	s=arc-20240116; t=1762936086; c=relaxed/simple;
+	bh=hEKDfoHAz3HWg9OEPKFxHDA9Sp8BHYLJvQrKnjMLZ64=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jSPkZefGj8Vm5lyLDvi9oqoqV3nni8ibk5KvDenRb14bfYv9s/d/45rEDLooOStUWj52ezPTTXqzE1ruDVYI9oplU0u52wdOUuiUbd31bCFCMQKb2kXunznqHwQKbLTUa5Odx/EtHgYxuRs7EucoI0LLsL744UcQdX3h19Q/ZT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vJ6Cr-0008J0-WD; Wed, 12 Nov 2025 09:27:58 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vJ6Cr-0003BZ-1m;
+	Wed, 12 Nov 2025 09:27:57 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1vJ6Cr-00GPqH-1Q;
+	Wed, 12 Nov 2025 09:27:57 +0100
+Date: Wed, 12 Nov 2025 09:27:57 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Emanuele Ghidoli <ghidoliemanuele@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Fabio Estevam <festevam@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+	netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 2/2] net: phy: TI PHYs use
+ phy_get_features_no_eee()
+Message-ID: <aRRFDUewyw9x7teC@pengutronix.de>
+References: <aRMgLmIU1XqLZq4i@shell.armlinux.org.uk>
+ <E1vImhv-0000000DrQi-49UR@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v15 03/15] net: phy: Introduce PHY ports
- representation
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
- =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
- Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
- Antoine Tenart <atenart@kernel.org>, devicetree@vger.kernel.org,
- Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>,
- Romain Gantois <romain.gantois@bootlin.com>,
- Daniel Golle <daniel@makrotopia.org>,
- Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-References: <20251106094742.2104099-1-maxime.chevallier@bootlin.com>
- <20251106094742.2104099-4-maxime.chevallier@bootlin.com>
- <fc89e17f-c6f5-4a84-8780-737969ed2e22@lunn.ch>
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Content-Language: en-US
-In-Reply-To: <fc89e17f-c6f5-4a84-8780-737969ed2e22@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Last-TLS-Session-Version: TLSv1.3
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <E1vImhv-0000000DrQi-49UR@rmk-PC.armlinux.org.uk>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-
-
-On 11/11/2025 04:53, Andrew Lunn wrote:
->> +/**
->> + * phy_caps_medium_get_supported() - Returns linkmodes supported on a given medium
->> + * @supported: After this call, contains all possible linkmodes on a given medium,
->> + *	       and with the given number of lanes, or less.
+On Tue, Nov 11, 2025 at 11:38:43AM +0000, Russell King (Oracle) wrote:
+> As TI Gigabit PHYs do not support EEE, use the newly introduced
+> phy_get_features_no_eee() to read the features but mark EEE as
+> disabled.
 > 
-> lanes -> pairs?
-
-indeed :(
-
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+>  drivers/net/phy/dp83822.c   | 3 +++
+>  drivers/net/phy/dp83867.c   | 1 +
+>  drivers/net/phy/dp83869.c   | 1 +
+>  drivers/net/phy/dp83tc811.c | 1 +
+>  4 files changed, 6 insertions(+)
 > 
->> +	/* The PHY driver might have added, removed or set medium/lanes info,
->> +	 * so update the port supported accordingly.
-> 
-> lanes -> pairs?
+> diff --git a/drivers/net/phy/dp83822.c b/drivers/net/phy/dp83822.c
+> index 33db21251f2e..20caf9a5faa7 100644
+> --- a/drivers/net/phy/dp83822.c
+> +++ b/drivers/net/phy/dp83822.c
+> @@ -1160,6 +1160,7 @@ static int dp83822_led_hw_control_get(struct phy_device *phydev, u8 index,
+>  		.name		= (_name),			\
+>  		/* PHY_BASIC_FEATURES */			\
+>  		.probe          = dp83822_probe,		\
+> +		.get_features	= phy_get_features_no_eee,	\
+>  		.soft_reset	= dp83822_phy_reset,		\
+>  		.config_init	= dp83822_config_init,		\
+>  		.read_status	= dp83822_read_status,		\
+> @@ -1180,6 +1181,7 @@ static int dp83822_led_hw_control_get(struct phy_device *phydev, u8 index,
+>  		.name		= (_name),			\
+>  		/* PHY_BASIC_FEATURES */			\
+>  		.probe          = dp8382x_probe,		\
+> +		.get_features	= phy_get_features_no_eee,	\
+>  		.soft_reset	= dp83822_phy_reset,		\
+>  		.config_init	= dp83825_config_init,		\
+>  		.get_wol = dp83822_get_wol,			\
+> @@ -1196,6 +1198,7 @@ static int dp83822_led_hw_control_get(struct phy_device *phydev, u8 index,
+>  		.name		= (_name),			\
+>  		/* PHY_BASIC_FEATURES */			\
+>  		.probe          = dp83826_probe,		\
+> +		.get_features	= phy_get_features_no_eee,	\
+>  		.soft_reset	= dp83822_phy_reset,		\
+>  		.config_init	= dp83826_config_init,		\
+>  		.get_wol = dp83822_get_wol,			\
 
-yes true :(
-> 
->> +struct phy_port *phy_of_parse_port(struct device_node *dn)
->> +{
->> +	struct fwnode_handle *fwnode = of_fwnode_handle(dn);
->> +	enum ethtool_link_medium medium;
->> +	struct phy_port *port;
->> +	const char *med_str;
->> +	u32 pairs = 0, mediums = 0;
->> +	int ret;
->> +
->> +	ret = fwnode_property_read_u32(fwnode, "pairs", &pairs);
->> +	if (ret)
->> +		return ERR_PTR(ret);
->> +
-> 
-> I think this needs to come later. It is not critical now, but when we
-> come to add other medium, it will need moving. If we add say -K, and
-> need lanes, we don't want to error out here because pairs is missing.
+The DP83822/25/26 are all 100 Mbit variants. They all officially claim
+EEE support. Maybe it is too early to give up here?
 
-Ack, I'll relax the check
+> diff --git a/drivers/net/phy/dp83867.c b/drivers/net/phy/dp83867.c
+> index 36a0c1b7f59c..da055ff861be 100644
+> --- a/drivers/net/phy/dp83867.c
+> +++ b/drivers/net/phy/dp83867.c
+> @@ -1124,6 +1124,7 @@ static struct phy_driver dp83867_driver[] = {
+>  		/* PHY_GBIT_FEATURES */
+>  
+>  		.probe          = dp83867_probe,
+> +		.get_features	= phy_get_features_no_eee,
+>  		.config_init	= dp83867_config_init,
+>  		.soft_reset	= dp83867_phy_reset,
 
-> 
->> +	ret = fwnode_property_read_string(fwnode, "media", &med_str);
->> +	if (ret)
->> +		return ERR_PTR(ret);
->> +
->> +	medium = ethtool_str_to_medium(med_str);
->> +	if (medium == ETHTOOL_LINK_MEDIUM_NONE)
->> +		return ERR_PTR(-EINVAL);
-> 
->> +	if (pairs && medium != ETHTOOL_LINK_MEDIUM_BASET) {
->> +		pr_err("pairs property is only compatible with BaseT medium\n");
->> +		return ERR_PTR(-EINVAL);
->> +	}
-> 
-> This i think needs changing, if medium == ETHTOOL_LINK_MEDIUM_BASET
-> then get pairs, and validate it. I would probably also test it is 1,
-> 2, or 4.
+ACK
 
-That's fine by me :) I'll update the binding as well then, as having 3
-pairs will never be correct.
+> diff --git a/drivers/net/phy/dp83869.c b/drivers/net/phy/dp83869.c
+> index 1f381d7b13ff..4400654b0f72 100644
+> --- a/drivers/net/phy/dp83869.c
+> +++ b/drivers/net/phy/dp83869.c
+> @@ -906,6 +906,7 @@ static int dp83869_phy_reset(struct phy_device *phydev)
+>  	PHY_ID_MATCH_MODEL(_id),				\
+>  	.name		= (_name),				\
+>  	.probe          = dp83869_probe,			\
+> +	.get_features	= phy_get_features_no_eee,		\
+>  	.config_init	= dp83869_config_init,			\
+>  	.soft_reset	= dp83869_phy_reset,			\
+>  	.config_intr	= dp83869_config_intr,			\
 
-Thanks a lot for looking at this !
+ACK
 
-Maxime
+> diff --git a/drivers/net/phy/dp83tc811.c b/drivers/net/phy/dp83tc811.c
+> index e480c2a07450..92c5f3cfee9e 100644
+> --- a/drivers/net/phy/dp83tc811.c
+> +++ b/drivers/net/phy/dp83tc811.c
+> @@ -390,6 +390,7 @@ static struct phy_driver dp83811_driver[] = {
+>  		.phy_id_mask = 0xfffffff0,
+>  		.name = "TI DP83TC811",
+>  		/* PHY_BASIC_FEATURES */
+> +		.get_features = phy_get_features_no_eee,
+>  		.config_init = dp83811_config_init,
+>  		.config_aneg = dp83811_config_aneg,
+>  		.soft_reset = dp83811_phy_reset,
 
-> 
-> 	Andrew
+Not sure about this one. It is 100BaseT1 without autoneg support.
 
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
