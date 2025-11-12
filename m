@@ -1,384 +1,331 @@
-Return-Path: <netdev+bounces-237949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3602C51EC8
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 12:23:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D9FDC51E95
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 12:22:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id DC89234D259
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 11:23:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A6AF3AA449
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 11:15:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7CF8303A1E;
-	Wed, 12 Nov 2025 11:23:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA6382E6CC7;
+	Wed, 12 Nov 2025 11:15:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZXZv+oCI";
+	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="B2iZv6jk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f65.google.com (mail-ej1-f65.google.com [209.85.218.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC80C304962
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 11:23:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC1C535CBB7
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 11:15:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762946587; cv=none; b=AF5RJ+JD2q8vZcXT5URgTuovmcbvTAqLCBkP95/VSlN/ao/Hx4IS0Ljx3MAuv5BrRIZ12HSwk6qE7RJiODOo7zyXHxGGETisrrJaJ80fjMIu7Gk2nVoOe5tYJiqOb3KLQKlDnhuQ0QGW1oz5b3wxHR4mtl7LBfn3OpIBTzYSWyQ=
+	t=1762946114; cv=none; b=jFMwSBLsnDYGWldPlXiXh+Q5FI276M37HjjqRgOnpuqOn9FHWREjNjbFJgzXP02Sxk3fbtcbd+LL6CuhM8caBaD3JMshrhAQmJVC4+j97E+AekBp78SwOO6n7BPI2LK0qx9B+mSW+hxwqwES0w/O0wr5Wf3yqcjVavYFR1As4s4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762946587; c=relaxed/simple;
-	bh=eGRfvoI+MOkv+mAK9sRVJNkwPQNp6iUcCJWWz9cilmo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MZ/liBP3J99BwMtfc8lXNHxa00QHj+ZTE/wgUDOsEvWBCcV4BfiwJLdhS6p3IvuitN6it7npGW4mw0IPw8jKks0HQBbKtwAcRoMdhGLq2PZBMW2407Wd45DSPR5xoJKJ25gANMoPHCIW/lw2v8hMALQO37IiI9P4seSosd39/+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f65.google.com with SMTP id a640c23a62f3a-b728a43e410so140853366b.1
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 03:23:05 -0800 (PST)
+	s=arc-20240116; t=1762946114; c=relaxed/simple;
+	bh=QJ7RsItWW94sQLYSWk24Ndul83P/s6M1Pj6x+zsl1P0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jCrDGeT/1bIl40+wwbKaSPYH5B/gOvIRPwDu51Zsc41LPiAGUv0H7svTCYOU3hgHdV7oRQpGL/9XnXQS5BP1xa/MKhPj6uLhyVSSX4oLPko/aP5go07FXwPHSMZ/2Kq9Bqa+0Qq/vhZ2sX3OChBgDF3JthC9s65X63zcAplgDoU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZXZv+oCI; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=B2iZv6jk; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1762946112;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZkPHyOZo9yzOxxQpkBZ/awKCWdH75xgCHLmw72fGjXc=;
+	b=ZXZv+oCIIO5Kkt3mn6nRV6yk1WtRYRKBxuwP+MoNP3mw9pXtJWF4UtV9/Y/6ppmnS7YVj/
+	MEj+pDIPA8deSkdtuVhIbcRHxU1noiG9RE3P0pqB6lReMYWwntxScFjjQ6LMtWKeaocpcq
+	YOCgsJWXPeBOTfxzOIqL8KTw4swC4bg=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-383-4YKdq3zKOaKETRouljKpoA-1; Wed, 12 Nov 2025 06:15:10 -0500
+X-MC-Unique: 4YKdq3zKOaKETRouljKpoA-1
+X-Mimecast-MFC-AGG-ID: 4YKdq3zKOaKETRouljKpoA_1762946110
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-8b225760181so76797685a.2
+        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 03:15:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=redhat.com; s=google; t=1762946110; x=1763550910; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZkPHyOZo9yzOxxQpkBZ/awKCWdH75xgCHLmw72fGjXc=;
+        b=B2iZv6jkd/5HO4LZRYErbuKpHm1UwabumFpGY9l5LNAUnm3EIVRPwlgEpK+8oaTtpo
+         tyi0By9GTba40ichXEcMm+GvefbGaGVgPtMNG8ZjCci79IBeyoKedmai0COaJ6F1GNnb
+         Vkkd1pKzem1btV/d0HkGiiRBKIP8AFq/gvQ3WdCdQb9nKPYf4WN4rZplnhDYC85+EPcT
+         9iR7Y6AmXjgqVyHRysMOlu8Gj12HEPz6g/JDrYNHhzI0maiI8QDN1MmAhV8qgY7prkzS
+         Rny1FXTURllBsW7RtCaTF/WLWXoOr/sCJIrs36onezB4S/r9BuMoudBpPfBHFV+Eae5m
+         toLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762946584; x=1763551384;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-gg:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NfXUW2hDOILChCEHt+EepC/hcfBLAxrken+StjOWht0=;
-        b=OOQzbnuYc7fjZg1IY9cSB+Z6tjfTMoarYGj3VYdTnyxJDR+oiygL7sDPFwshi11vFa
-         4lVxh0WU9i3IPZSmWNopFfOnevjyANRhwxAzjMKlG8hxllYbccPUYgUe48nVNXlgkFIH
-         otsC1eWAzSqI+Rap/fGbC+qUajPHJkhq/RrqAgvvh26jUeADN7VCdUR0do6t7vZRtmUy
-         gba1BrgKechtNOB7W3mXt8rJEAZMdMjS9xd0PQJ+hb5i6rd4AOELElv+KVMHWNauotzd
-         vwOc0gZEl3W2GjkC99dmnToHWJiEPPlv+2NYDEEJGAUkjXE6IEdFIzIqOAWiOVPizSC4
-         0dMQ==
-X-Gm-Message-State: AOJu0Yx7zHXaEVTOokNfr+XHfL5ffFw07wvEpgaJyMEZPXDuzytYuJZL
-	noqagfubc8gX2nTznEKud9b1HwlEySYw2/Bt5F4YMMr04YbZVvmw5tgJRiRxMvol
-X-Gm-Gg: ASbGncvSzBJzpiV2Ib5KXa+4bWAeq/EYyChCkAfLZCn5854RH5p9+2dkXbmuamVBFTk
-	U2EtXElrytdO9f5mbFgIwLPtSXP89boFvvkikYlnFHYe80ATQCIQfS6v4iSRyCZkJvl6PxgeY0u
-	2VXWCfmvrQ83ffd81DoNGJpRAHii4lxgCLZRhG279a6YaGTYFlZbNJXKDlrG6bPArSLRszSQ0IM
-	a8bbg3UK6DjeOSe5g/VHtrjdWptVZrVbbstChHQyhMNfO5J77Qvbku4XLlJFaGJFGRnOzWIX9fg
-	yYIxAjLQ38bSyWBtT83VhWMLEJ0gc1yeMtE/iazPZltvGdVavYKhSIEUOmb8jtsmmRkMIGgECAz
-	REN3Al0GBevgSc3OrajNqaiIwbh6Uj1/lSdJGjNytPFEc3a22a2Fm6jtwzahiq4Jj3YlNbzzjuv
-	7DNAot+VOQ4+1Ty0bb9DX/fybFOws4XeTF8XQu
-X-Google-Smtp-Source: AGHT+IFFGyzFqGpSXqAFvyKh8Jy52j0nqH7fJrPownyA4IhnfsXvri289iEMhImS/AGTgYahNbXPdw==
-X-Received: by 2002:a17:906:4fcf:b0:b40:5752:16b7 with SMTP id a640c23a62f3a-b7331ac5fdbmr303287566b.51.1762946583889;
-        Wed, 12 Nov 2025 03:23:03 -0800 (PST)
-Received: from im-t490s.redhat.com (89-24-34-247.nat.epc.tmcz.cz. [89.24.34.247])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-b72bfa11367sm1554779266b.68.2025.11.12.03.23.02
+        d=1e100.net; s=20230601; t=1762946110; x=1763550910;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZkPHyOZo9yzOxxQpkBZ/awKCWdH75xgCHLmw72fGjXc=;
+        b=SbLOc/x/USJiQtfR8L9Bx7C/g1u99+dp8t8jAJ84jEqok1LDXOHPza+ErTxMlTSvdF
+         skk3vqBCMC+3zaP19z3uGwLElwXhIjBbPc6yVV2ZwDOjbhvBwSuoggypcWJhg6puau+O
+         biz8kjcEbx7UCPtxIRJO7oJ2vH/1TxVsPV+DRr/RFS2kDimE7na+r3PeJIzZO84BlBd4
+         mDM+jZfUxFvMTCNzxyMNKmVKIRG8ggntRvJoTVLM+164qd5zMTYihZyXrq+ZiOTNnbUZ
+         7Lc2XykVT3AtZ3ZeTkxDr6+5lmFilfXoIMKfoVehSSQSMscO/iOIKWMfXOxHUn+/LND8
+         5PmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWXmf7CNIqXn6Na+f/aAyFbOND3Qxs6u5VcK1A3bJrcNlu+t+1cX2yhNcFkeKPUIYi7m2YPWX4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyFfE7DF8aXsPvB4CQVRP8Dm820nuHgm9LTott/kJ2ArRuYw0Ph
+	EnG35AmYssxh5NB7aGQ4tdlxi1FO1DTRkRSbjo3Lz7EW4HT6jaG3Tzp+FrWOrH7uQov/XQRPN+w
+	Rpm5SHoaP2FsyYkkqnIZm313dVs/nm1Dw27xkn2ky690NZyjZa9jOj7fCjA==
+X-Gm-Gg: ASbGnctilgD/nA4YGGzOngYE9Hps+Jq78Ny3uEBCRA9aHFqmZrNLS1VOfopuEgCkfqV
+	mq181ZQJUG/U7dS9jukfJB5CFYyRCt5Te5iRMBI8vnsfZ/X2cvo//B2UcDQXh/ei9imjqpI6/Cq
+	jpafAh5OLXnN+1+h3qzw0QzKwFc8vl154fRIKpNmzwa/pHM2/FhVv6AQzE4AAMwJT0+cuNPSn9Y
+	jMvpp1Ny3uoxVhdi4nNsnaSvQd3NOPDOZGZqLoMX4xeBwmOxUwhuWcLkwFlmiiXZPt17mF3Tcnr
+	P2kzUCe/oY0RAulg7wgyo46v69SDKhaQ6/QgmljKH4jSHcNtJFPVVmqRmHcbk8mM/tpn+R6GeDW
+	Iz6+2tQxFn3MTjKjWWY7E6ZhiQnVxmz64WKd39ah7jTfRgmkPlf8=
+X-Received: by 2002:a05:620a:44ca:b0:8b2:6606:edaf with SMTP id af79cd13be357-8b29b78a980mr307073685a.37.1762946109819;
+        Wed, 12 Nov 2025 03:15:09 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFtAKTvMbP3cFM+QNIMi0izCHSApoyYNJQFMwUCPX7a0E+uO7ILp2ns+ST+uoNT4M7IO7oCPw==
+X-Received: by 2002:a05:620a:44ca:b0:8b2:6606:edaf with SMTP id af79cd13be357-8b29b78a980mr307070285a.37.1762946109277;
+        Wed, 12 Nov 2025 03:15:09 -0800 (PST)
+Received: from sgarzare-redhat (host-79-46-200-153.retail.telecomitalia.it. [79.46.200.153])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b29aa277ecsm170269385a.58.2025.11.12.03.15.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Nov 2025 03:23:03 -0800 (PST)
-From: Ilya Maximets <i.maximets@ovn.org>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	dev@openvswitch.org,
-	Eelco Chaudron <echaudro@redhat.com>,
-	Aaron Conole <aconole@redhat.com>,
-	Willy Tarreau <w@1wt.eu>,
-	LePremierHomme <kwqcheii@proton.me>,
-	Ilya Maximets <i.maximets@ovn.org>,
-	Junvy Yang <zhuque@tencent.com>
-Subject: [PATCH net] net: openvswitch: remove never-working support for setting nsh fields
-Date: Wed, 12 Nov 2025 12:14:03 +0100
-Message-ID: <20251112112246.95064-1-i.maximets@ovn.org>
-X-Mailer: git-send-email 2.51.0
+        Wed, 12 Nov 2025 03:15:08 -0800 (PST)
+Date: Wed, 12 Nov 2025 12:15:03 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Shuah Khan <shuah@kernel.org>, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Simon Horman <horms@kernel.org>, Bobby Eshleman <bobbyeshleman@meta.com>
+Subject: Re: [PATCH net-next v4 01/12] selftests/vsock: improve logging in
+ vmtest.sh
+Message-ID: <kitbuqe5a2tyjbtjcyijcpqioidmrxa4b3iq7kulmbngofyt4l@d73gmgipbiid>
+References: <20251108-vsock-selftests-fixes-and-improvements-v4-0-d5e8d6c87289@meta.com>
+ <20251108-vsock-selftests-fixes-and-improvements-v4-1-d5e8d6c87289@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20251108-vsock-selftests-fixes-and-improvements-v4-1-d5e8d6c87289@meta.com>
 
-The validation of the set(nsh(...)) action is completely wrong.
-It runs through the nsh_key_put_from_nlattr() function that is the
-same function that validates NSH keys for the flow match and the
-push_nsh() action.  However, the set(nsh(...)) has a very different
-memory layout.  Nested attributes in there are doubled in size in
-case of the masked set().  That makes proper validation impossible.
+On Sat, Nov 08, 2025 at 08:00:52AM -0800, Bobby Eshleman wrote:
+>From: Bobby Eshleman <bobbyeshleman@meta.com>
+>
+>Improve usability of logging functions. Remove the test name prefix from
+>logging functions so that logging calls can be made deeper into the call
+>stack without passing down the test name or setting some global. Teach
+>log function to accept a LOG_PREFIX variable to avoid unnecessary
+>argument shifting.
+>
+>Remove log_setup() and instead use log_host(). The host/guest prefixes
+>are useful to show whether a failure happened on the guest or host side,
+>but "setup" doesn't really give additional useful information. Since all
+>log_setup() calls happen on the host, lets just use log_host() instead.
+>
+>Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
+>---
+>Changes in v4:
+>- add quotes to "${redirect}" for consistency
+>
+>Changes in v2:
+>- add quotes around $@ in log_{host,guest} (Simon)
+>- remove unnecessary cat for piping into awk (Simon)
+>
+>Changes from previous series:
+>- do not use log levels, keep as on/off switch, after revising the other
+>  patch series the levels became unnecessary.
+>---
+> tools/testing/selftests/vsock/vmtest.sh | 69 ++++++++++++++-------------------
+> 1 file changed, 29 insertions(+), 40 deletions(-)
 
-There is also confusion in the code between the 'masked' flag, that
-says that the nested attributes are doubled in size containing both
-the value and the mask, and the 'is_mask' that says that the value
-we're parsing is the mask.  This is causing kernel crash on trying to
-write into mask part of the match with SW_FLOW_KEY_PUT() during
-validation, while validate_nsh() doesn't allocate any memory for it:
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-  BUG: kernel NULL pointer dereference, address: 0000000000000018
-  #PF: supervisor read access in kernel mode
-  #PF: error_code(0x0000) - not-present page
-  PGD 1c2383067 P4D 1c2383067 PUD 20b703067 PMD 0
-  Oops: Oops: 0000 [#1] SMP NOPTI
-  CPU: 8 UID: 0 Kdump: loaded Not tainted 6.17.0-rc4+ #107 PREEMPT(voluntary)
-  RIP: 0010:nsh_key_put_from_nlattr+0x19d/0x610 [openvswitch]
-  Call Trace:
-   <TASK>
-   validate_nsh+0x60/0x90 [openvswitch]
-   validate_set.constprop.0+0x270/0x3c0 [openvswitch]
-   __ovs_nla_copy_actions+0x477/0x860 [openvswitch]
-   ovs_nla_copy_actions+0x8d/0x100 [openvswitch]
-   ovs_packet_cmd_execute+0x1cc/0x310 [openvswitch]
-   genl_family_rcv_msg_doit+0xdb/0x130
-   genl_family_rcv_msg+0x14b/0x220
-   genl_rcv_msg+0x47/0xa0
-   netlink_rcv_skb+0x53/0x100
-   genl_rcv+0x24/0x40
-   netlink_unicast+0x280/0x3b0
-   netlink_sendmsg+0x1f7/0x430
-   ____sys_sendmsg+0x36b/0x3a0
-   ___sys_sendmsg+0x87/0xd0
-   __sys_sendmsg+0x6d/0xd0
-   do_syscall_64+0x7b/0x2c0
-   entry_SYSCALL_64_after_hwframe+0x76/0x7e
-
-The third issue with this process is that while trying to convert
-the non-masked set into masked one, validate_set() copies and doubles
-the size of the OVS_KEY_ATTR_NSH as if it didn't have any nested
-attributes.  It should be copying each nested attribute and doubling
-them in size independently.  And the process must be properly reversed
-during the conversion back from masked to a non-masked variant during
-the flow dump.
-
-In the end, the only two outcomes of trying to use this action are
-either validation failure or a kernel crash.  And if somehow someone
-manages to install a flow with such an action, it will most definitely
-not do what it is supposed to, since all the keys and the masks are
-mixed up.
-
-Fixing all the issues is a complex task as it requires re-writing
-most of the validation code.
-
-Given that and the fact that this functionality never worked since
-introduction, let's just remove it altogether.  It's better to
-re-introduce it later with a proper implementation instead of trying
-to fix it in stable releases.
-
-Fixes: b2d0f5d5dc53 ("openvswitch: enable NSH support")
-Reported-by: Junvy Yang <zhuque@tencent.com>
-Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
----
- net/openvswitch/actions.c      | 68 +---------------------------------
- net/openvswitch/flow_netlink.c | 64 ++++----------------------------
- net/openvswitch/flow_netlink.h |  2 -
- 3 files changed, 9 insertions(+), 125 deletions(-)
-
-diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-index 2832e0794197..792ca44a461d 100644
---- a/net/openvswitch/actions.c
-+++ b/net/openvswitch/actions.c
-@@ -572,69 +572,6 @@ static int set_ipv6(struct sk_buff *skb, struct sw_flow_key *flow_key,
- 	return 0;
- }
- 
--static int set_nsh(struct sk_buff *skb, struct sw_flow_key *flow_key,
--		   const struct nlattr *a)
--{
--	struct nshhdr *nh;
--	size_t length;
--	int err;
--	u8 flags;
--	u8 ttl;
--	int i;
--
--	struct ovs_key_nsh key;
--	struct ovs_key_nsh mask;
--
--	err = nsh_key_from_nlattr(a, &key, &mask);
--	if (err)
--		return err;
--
--	/* Make sure the NSH base header is there */
--	if (!pskb_may_pull(skb, skb_network_offset(skb) + NSH_BASE_HDR_LEN))
--		return -ENOMEM;
--
--	nh = nsh_hdr(skb);
--	length = nsh_hdr_len(nh);
--
--	/* Make sure the whole NSH header is there */
--	err = skb_ensure_writable(skb, skb_network_offset(skb) +
--				       length);
--	if (unlikely(err))
--		return err;
--
--	nh = nsh_hdr(skb);
--	skb_postpull_rcsum(skb, nh, length);
--	flags = nsh_get_flags(nh);
--	flags = OVS_MASKED(flags, key.base.flags, mask.base.flags);
--	flow_key->nsh.base.flags = flags;
--	ttl = nsh_get_ttl(nh);
--	ttl = OVS_MASKED(ttl, key.base.ttl, mask.base.ttl);
--	flow_key->nsh.base.ttl = ttl;
--	nsh_set_flags_and_ttl(nh, flags, ttl);
--	nh->path_hdr = OVS_MASKED(nh->path_hdr, key.base.path_hdr,
--				  mask.base.path_hdr);
--	flow_key->nsh.base.path_hdr = nh->path_hdr;
--	switch (nh->mdtype) {
--	case NSH_M_TYPE1:
--		for (i = 0; i < NSH_MD1_CONTEXT_SIZE; i++) {
--			nh->md1.context[i] =
--			    OVS_MASKED(nh->md1.context[i], key.context[i],
--				       mask.context[i]);
--		}
--		memcpy(flow_key->nsh.context, nh->md1.context,
--		       sizeof(nh->md1.context));
--		break;
--	case NSH_M_TYPE2:
--		memset(flow_key->nsh.context, 0,
--		       sizeof(flow_key->nsh.context));
--		break;
--	default:
--		return -EINVAL;
--	}
--	skb_postpush_rcsum(skb, nh, length);
--	return 0;
--}
--
- /* Must follow skb_ensure_writable() since that can move the skb data. */
- static void set_tp_port(struct sk_buff *skb, __be16 *port,
- 			__be16 new_port, __sum16 *check)
-@@ -1130,10 +1067,6 @@ static int execute_masked_set_action(struct sk_buff *skb,
- 				   get_mask(a, struct ovs_key_ethernet *));
- 		break;
- 
--	case OVS_KEY_ATTR_NSH:
--		err = set_nsh(skb, flow_key, a);
--		break;
--
- 	case OVS_KEY_ATTR_IPV4:
- 		err = set_ipv4(skb, flow_key, nla_data(a),
- 			       get_mask(a, struct ovs_key_ipv4 *));
-@@ -1170,6 +1103,7 @@ static int execute_masked_set_action(struct sk_buff *skb,
- 	case OVS_KEY_ATTR_CT_LABELS:
- 	case OVS_KEY_ATTR_CT_ORIG_TUPLE_IPV4:
- 	case OVS_KEY_ATTR_CT_ORIG_TUPLE_IPV6:
-+	case OVS_KEY_ATTR_NSH:
- 		err = -EINVAL;
- 		break;
- 	}
-diff --git a/net/openvswitch/flow_netlink.c b/net/openvswitch/flow_netlink.c
-index ad64bb9ab5e2..1cb4f97335d8 100644
---- a/net/openvswitch/flow_netlink.c
-+++ b/net/openvswitch/flow_netlink.c
-@@ -1305,6 +1305,11 @@ static int metadata_from_nlattrs(struct net *net, struct sw_flow_match *match,
- 	return 0;
- }
- 
-+/*
-+ * Constructs NSH header 'nh' from attributes of OVS_ACTION_ATTR_PUSH_NSH,
-+ * where 'nh' points to a memory block of 'size' bytes.  It's assumed that
-+ * attributes were previously validated with validate_push_nsh().
-+ */
- int nsh_hdr_from_nlattr(const struct nlattr *attr,
- 			struct nshhdr *nh, size_t size)
- {
-@@ -1314,8 +1319,6 @@ int nsh_hdr_from_nlattr(const struct nlattr *attr,
- 	u8 ttl = 0;
- 	int mdlen = 0;
- 
--	/* validate_nsh has check this, so we needn't do duplicate check here
--	 */
- 	if (size < NSH_BASE_HDR_LEN)
- 		return -ENOBUFS;
- 
-@@ -1359,46 +1362,6 @@ int nsh_hdr_from_nlattr(const struct nlattr *attr,
- 	return 0;
- }
- 
--int nsh_key_from_nlattr(const struct nlattr *attr,
--			struct ovs_key_nsh *nsh, struct ovs_key_nsh *nsh_mask)
--{
--	struct nlattr *a;
--	int rem;
--
--	/* validate_nsh has check this, so we needn't do duplicate check here
--	 */
--	nla_for_each_nested(a, attr, rem) {
--		int type = nla_type(a);
--
--		switch (type) {
--		case OVS_NSH_KEY_ATTR_BASE: {
--			const struct ovs_nsh_key_base *base = nla_data(a);
--			const struct ovs_nsh_key_base *base_mask = base + 1;
--
--			nsh->base = *base;
--			nsh_mask->base = *base_mask;
--			break;
--		}
--		case OVS_NSH_KEY_ATTR_MD1: {
--			const struct ovs_nsh_key_md1 *md1 = nla_data(a);
--			const struct ovs_nsh_key_md1 *md1_mask = md1 + 1;
--
--			memcpy(nsh->context, md1->context, sizeof(*md1));
--			memcpy(nsh_mask->context, md1_mask->context,
--			       sizeof(*md1_mask));
--			break;
--		}
--		case OVS_NSH_KEY_ATTR_MD2:
--			/* Not supported yet */
--			return -ENOTSUPP;
--		default:
--			return -EINVAL;
--		}
--	}
--
--	return 0;
--}
--
- static int nsh_key_put_from_nlattr(const struct nlattr *attr,
- 				   struct sw_flow_match *match, bool is_mask,
- 				   bool is_push_nsh, bool log)
-@@ -2839,17 +2802,13 @@ static int validate_and_copy_set_tun(const struct nlattr *attr,
- 	return err;
- }
- 
--static bool validate_nsh(const struct nlattr *attr, bool is_mask,
--			 bool is_push_nsh, bool log)
-+static bool validate_push_nsh(const struct nlattr *attr, bool log)
- {
- 	struct sw_flow_match match;
- 	struct sw_flow_key key;
--	int ret = 0;
- 
- 	ovs_match_init(&match, &key, true, NULL);
--	ret = nsh_key_put_from_nlattr(attr, &match, is_mask,
--				      is_push_nsh, log);
--	return !ret;
-+	return !nsh_key_put_from_nlattr(attr, &match, false, true, log);
- }
- 
- /* Return false if there are any non-masked bits set.
-@@ -2997,13 +2956,6 @@ static int validate_set(const struct nlattr *a,
- 
- 		break;
- 
--	case OVS_KEY_ATTR_NSH:
--		if (eth_type != htons(ETH_P_NSH))
--			return -EINVAL;
--		if (!validate_nsh(nla_data(a), masked, false, log))
--			return -EINVAL;
--		break;
--
- 	default:
- 		return -EINVAL;
- 	}
-@@ -3437,7 +3389,7 @@ static int __ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
- 					return -EINVAL;
- 			}
- 			mac_proto = MAC_PROTO_NONE;
--			if (!validate_nsh(nla_data(a), false, true, true))
-+			if (!validate_push_nsh(nla_data(a), log))
- 				return -EINVAL;
- 			break;
- 
-diff --git a/net/openvswitch/flow_netlink.h b/net/openvswitch/flow_netlink.h
-index fe7f77fc5f18..ff8cdecbe346 100644
---- a/net/openvswitch/flow_netlink.h
-+++ b/net/openvswitch/flow_netlink.h
-@@ -65,8 +65,6 @@ int ovs_nla_put_actions(const struct nlattr *attr,
- void ovs_nla_free_flow_actions(struct sw_flow_actions *);
- void ovs_nla_free_flow_actions_rcu(struct sw_flow_actions *);
- 
--int nsh_key_from_nlattr(const struct nlattr *attr, struct ovs_key_nsh *nsh,
--			struct ovs_key_nsh *nsh_mask);
- int nsh_hdr_from_nlattr(const struct nlattr *attr, struct nshhdr *nh,
- 			size_t size);
- 
--- 
-2.51.0
+>
+>diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
+>index 8ceeb8a7894f..bc16b13cdbe3 100755
+>--- a/tools/testing/selftests/vsock/vmtest.sh
+>+++ b/tools/testing/selftests/vsock/vmtest.sh
+>@@ -271,60 +271,51 @@ EOF
+>
+> host_wait_for_listener() {
+> 	wait_for_listener "${TEST_HOST_PORT_LISTENER}" "${WAIT_PERIOD}" "${WAIT_PERIOD_MAX}"
+>-}
+>-
+>-__log_stdin() {
+>-	cat | awk '{ printf "%s:\t%s\n","'"${prefix}"'", $0 }'
+>-}
+>
+>-__log_args() {
+>-	echo "$*" | awk '{ printf "%s:\t%s\n","'"${prefix}"'", $0 }'
+> }
+>
+> log() {
+>-	local prefix="$1"
+>+	local redirect
+>+	local prefix
+>
+>-	shift
+>-	local redirect=
+> 	if [[ ${VERBOSE} -eq 0 ]]; then
+> 		redirect=/dev/null
+> 	else
+> 		redirect=/dev/stdout
+> 	fi
+>
+>+	prefix="${LOG_PREFIX:-}"
+>+
+> 	if [[ "$#" -eq 0 ]]; then
+>-		__log_stdin | tee -a "${LOG}" > ${redirect}
+>+		if [[ -n "${prefix}" ]]; then
+>+			awk -v prefix="${prefix}" '{printf "%s: %s\n", prefix, $0}'
+>+		else
+>+			cat
+>+		fi
+> 	else
+>-		__log_args "$@" | tee -a "${LOG}" > ${redirect}
+>-	fi
+>-}
+>-
+>-log_setup() {
+>-	log "setup" "$@"
+>+		if [[ -n "${prefix}" ]]; then
+>+			echo "${prefix}: " "$@"
+>+		else
+>+			echo "$@"
+>+		fi
+>+	fi | tee -a "${LOG}" > "${redirect}"
+> }
+>
+> log_host() {
+>-	local testname=$1
+>-
+>-	shift
+>-	log "test:${testname}:host" "$@"
+>+	LOG_PREFIX=host log "$@"
+> }
+>
+> log_guest() {
+>-	local testname=$1
+>-
+>-	shift
+>-	log "test:${testname}:guest" "$@"
+>+	LOG_PREFIX=guest log "$@"
+> }
+>
+> test_vm_server_host_client() {
+>-	local testname="${FUNCNAME[0]#test_}"
+>
+> 	vm_ssh -- "${VSOCK_TEST}" \
+> 		--mode=server \
+> 		--control-port="${TEST_GUEST_PORT}" \
+> 		--peer-cid=2 \
+>-		2>&1 | log_guest "${testname}" &
+>+		2>&1 | log_guest &
+>
+> 	vm_wait_for_listener "${TEST_GUEST_PORT}"
+>
+>@@ -332,18 +323,17 @@ test_vm_server_host_client() {
+> 		--mode=client \
+> 		--control-host=127.0.0.1 \
+> 		--peer-cid="${VSOCK_CID}" \
+>-		--control-port="${TEST_HOST_PORT}" 2>&1 | log_host "${testname}"
+>+		--control-port="${TEST_HOST_PORT}" 2>&1 | log_host
+>
+> 	return $?
+> }
+>
+> test_vm_client_host_server() {
+>-	local testname="${FUNCNAME[0]#test_}"
+>
+> 	${VSOCK_TEST} \
+> 		--mode "server" \
+> 		--control-port "${TEST_HOST_PORT_LISTENER}" \
+>-		--peer-cid "${VSOCK_CID}" 2>&1 | log_host "${testname}" &
+>+		--peer-cid "${VSOCK_CID}" 2>&1 | log_host &
+>
+> 	host_wait_for_listener
+>
+>@@ -351,19 +341,18 @@ test_vm_client_host_server() {
+> 		--mode=client \
+> 		--control-host=10.0.2.2 \
+> 		--peer-cid=2 \
+>-		--control-port="${TEST_HOST_PORT_LISTENER}" 2>&1 | log_guest "${testname}"
+>+		--control-port="${TEST_HOST_PORT_LISTENER}" 2>&1 | log_guest
+>
+> 	return $?
+> }
+>
+> test_vm_loopback() {
+>-	local testname="${FUNCNAME[0]#test_}"
+> 	local port=60000 # non-forwarded local port
+>
+> 	vm_ssh -- "${VSOCK_TEST}" \
+> 		--mode=server \
+> 		--control-port="${port}" \
+>-		--peer-cid=1 2>&1 | log_guest "${testname}" &
+>+		--peer-cid=1 2>&1 | log_guest &
+>
+> 	vm_wait_for_listener "${port}"
+>
+>@@ -371,7 +360,7 @@ test_vm_loopback() {
+> 		--mode=client \
+> 		--control-host="127.0.0.1" \
+> 		--control-port="${port}" \
+>-		--peer-cid=1 2>&1 | log_guest "${testname}"
+>+		--peer-cid=1 2>&1 | log_guest
+>
+> 	return $?
+> }
+>@@ -399,25 +388,25 @@ run_test() {
+>
+> 	host_oops_cnt_after=$(dmesg | grep -i 'Oops' | wc -l)
+> 	if [[ ${host_oops_cnt_after} -gt ${host_oops_cnt_before} ]]; then
+>-		echo "FAIL: kernel oops detected on host" | log_host "${name}"
+>+		echo "FAIL: kernel oops detected on host" | log_host
+> 		rc=$KSFT_FAIL
+> 	fi
+>
+> 	host_warn_cnt_after=$(dmesg --level=warn | grep -c -i 'vsock')
+> 	if [[ ${host_warn_cnt_after} -gt ${host_warn_cnt_before} ]]; then
+>-		echo "FAIL: kernel warning detected on host" | log_host "${name}"
+>+		echo "FAIL: kernel warning detected on host" | log_host
+> 		rc=$KSFT_FAIL
+> 	fi
+>
+> 	vm_oops_cnt_after=$(vm_ssh -- dmesg | grep -i 'Oops' | wc -l)
+> 	if [[ ${vm_oops_cnt_after} -gt ${vm_oops_cnt_before} ]]; then
+>-		echo "FAIL: kernel oops detected on vm" | log_host "${name}"
+>+		echo "FAIL: kernel oops detected on vm" | log_host
+> 		rc=$KSFT_FAIL
+> 	fi
+>
+> 	vm_warn_cnt_after=$(vm_ssh -- dmesg --level=warn | grep -c -i 'vsock')
+> 	if [[ ${vm_warn_cnt_after} -gt ${vm_warn_cnt_before} ]]; then
+>-		echo "FAIL: kernel warning detected on vm" | log_host "${name}"
+>+		echo "FAIL: kernel warning detected on vm" | log_host
+> 		rc=$KSFT_FAIL
+> 	fi
+>
+>@@ -452,10 +441,10 @@ handle_build
+>
+> echo "1..${#ARGS[@]}"
+>
+>-log_setup "Booting up VM"
+>+log_host "Booting up VM"
+> vm_start
+> vm_wait_for_ssh
+>-log_setup "VM booted up"
+>+log_host "VM booted up"
+>
+> cnt_pass=0
+> cnt_fail=0
+>
+>-- 
+>2.47.3
+>
 
 
