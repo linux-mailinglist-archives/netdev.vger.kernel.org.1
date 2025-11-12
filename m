@@ -1,93 +1,157 @@
-Return-Path: <netdev+bounces-238136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7A21C54890
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 22:01:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 401AEC548A8
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 22:06:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id DA54C4E04C8
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 21:01:07 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 30AD64E04F3
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 21:06:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A771C27E049;
-	Wed, 12 Nov 2025 21:01:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 727E628031D;
+	Wed, 12 Nov 2025 21:06:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5+xIqgv9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JsWmcfv9"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A0BA274FE3;
-	Wed, 12 Nov 2025 21:01:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8954F21CFF7
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 21:06:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762981264; cv=none; b=j256s2HrWpwXH+CyfCkxiZyMUzHUQt9hR40un9rvKkRr5vKhGKYoTqT3XKeD7MKJljdKfh7VmuCYaNYduXZOiq3OLjstqixWQPIjjt2GnNEbp6h4e5iAVaPz2iXm31SOteBrjxKwR65QpBwj1IwJTMjYVdzX8aVhJAsSFkhWR9w=
+	t=1762981577; cv=none; b=IFtl5YQEnNZW3GHqd5wwR/gm2/DhStVURk+pZHhN+8rj15kpZcdUM/giDUmSv0Vkti6XZnGYMaAP9pe1bUnYaWxxowwAkkEoTXeKwSQW5hDXmXInLKUIP2ZiaCVygy6tcNRLlaLK48A9/sqDuBiQWn/hOI5K81PCkI4vp6cqEks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762981264; c=relaxed/simple;
-	bh=EsOwvL4Thqhjhc0+Ra5s4vQ2wmDA8xgL4cIEKhwJBqk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kiEkK5xniLazhWvUIMJ8kgGV6ClKaw6bjJUquzNn/Q38OWIf9Dg/Ca/lMTFGj04O06Nro82UXQxxUom/kkLX91qaDBOp2xnQ+GQ5PBwfId/hh+zfgHPgYULVYCf6Jn8Qp+nJSk9MV6FHaaX3dIJrJxed4b1sM4OGEmNV44ETBmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5+xIqgv9; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=98pe/V5DMvJsxOpsKIQ5YwqunEzOsM5MU9xGKZX2zjM=; b=5+xIqgv9wPuJGa6U7WSrqf6gWr
-	r8OuKDUIdsAQKh3PEVOFiUGHx+9P3I7C02S4OKd6BmE1D4avUGzXa1kwFztegzbLRdIfItXmYRyoL
-	z+GMu30esK3PThRvrk0S3oKFCyysoGX53Wrlvi56Li9Dzc3ndGPe8iHXr1DRTc+MF5vw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1vJHxS-00DmvF-Ss; Wed, 12 Nov 2025 22:00:50 +0100
-Date: Wed, 12 Nov 2025 22:00:50 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Prabhakar <prabhakar.csengg@gmail.com>
-Cc: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Magnus Damm <magnus.damm@gmail.com>,
-	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	Fabrizio Castro <fabrizio.castro.jz@renesas.com>,
-	Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-Subject: Re: [PATCH net-next 2/2] net: pcs: rzn1-miic: Add support for PHY
- link active-level configuration
-Message-ID: <686d84c6-c2ea-4055-897a-6377eec1fca0@lunn.ch>
-References: <20251112201937.1336854-1-prabhakar.mahadev-lad.rj@bp.renesas.com>
- <20251112201937.1336854-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
+	s=arc-20240116; t=1762981577; c=relaxed/simple;
+	bh=0NUZzNJ831SOSmKTwYtBymzpUuiMmfMLsWGUVbC8qK8=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=K+x9Y2fHCQJV17kzN7OHTOtwXJlRZns2VSC1oGVrFk6kgz5C7UFD/E3y+IMr+doPlnCKStU3VBTideQ7/S3RSSWqln98Y0aY2myfsKKAVnR5Tg/pr96AfOxgRJ7hBGVUdRuT7v3mkXggrHtsG9ecMZhV5uvDLhIhgYeZGPYqC+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JsWmcfv9; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-47721743fd0so816215e9.2
+        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 13:06:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1762981572; x=1763586372; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:from:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3CExdMeFTXeQXWVMXk35yOhT2Ezt8HRdUhVu0ILjAnY=;
+        b=JsWmcfv9mO+HbwpFTstANBPJMDKvnjIx9vp1sSJUUQktPyVHXGUa4vybbWpiQrT59v
+         lkS1TZHnw4LJ7xAieNv33fqFY6BQxnjm1XrlulD4sEEYPCfo+UbYs+EMRWBP6EU4a7Lb
+         yzRI5DfcEDCY9XZ5bZwed4Zc5up6mcTfI3IxfjRZulS3Rsi3o9WHCJDab2B7nYdoZ0pk
+         3BB4ZVL3jnIAFztsIwhG1OBh6GKduf4IoyI3qqTSYCj/6xUrd0Sfc2w8Yr8AL1XkZXGM
+         QoIIJt+Ri2FVgM1zxh9/bYUooN3nBXUdv8aPit/NuXflWuQ4lVUO4JcBWhLsG3D9ZfGS
+         Whbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762981572; x=1763586372;
+        h=content-transfer-encoding:cc:to:subject:from:content-language
+         :user-agent:mime-version:date:message-id:x-gm-gg:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3CExdMeFTXeQXWVMXk35yOhT2Ezt8HRdUhVu0ILjAnY=;
+        b=BBaOGcI340gT4TbaWW+tqctkaSGbmL1c3rCPh41C7+b6ZgVRifnnlZdnHEnincrale
+         UsdgMLamjFUVoF3tTSUN1k4A4CWZRBFyUk9KupHDmS6/UmoELB8WTy+B16oIKV/ZiErJ
+         KN7GUNWssYSIs6irJ16G4fzw35CIOtyETVNPOP+Y8YuG25yfd2cqxYkeB8FigXckhm+f
+         lJ5aoOuXAV1RHtGWbNNe0oQ4ZHZBG1HVS1aP8RUhnVDkVdfrSpTb/7tuZSI8V07cirZi
+         k8f5bRuNu6RrG2vdM0dY4LzDHuIloeXennpnXwzM8ivjh5boHffjWsX1knhN2PgTGUfG
+         4fnw==
+X-Gm-Message-State: AOJu0Yz44Y5fj0MFpObv4o/nm7dh97/gB4NGjiGFmd87remarAqnXeg8
+	S7bC6TJb5oDhUZtflmQpGPTfMX7pT19C+5ZWsOat3H1kyJmFT/+rF7X4
+X-Gm-Gg: ASbGncuycvY0cEIVUa5+siGQJqhGv1IVQ23wyLFZk4Y8ZAu6ImmvHpZQB7beT2/AvN8
+	gZUJZlir19+8YdNVh86QANZnR029q3shefQAhf8gBjIKKTYmeXnhDiaX2FWQPh4H5igWB6H/WEY
+	poYNCivVkyphSnPfJzXqbOilDPk5DAtPATWjuDEZO4//V/bar+21Du9lmKXom14OeYLak+WfGNi
+	wHmp0bRThjlU6ueQd8tw3K8Qi51+7Ubi0tiZM2Lyb1i6oCLwkM80jD8xhmBCmWGKrCYANbD5E1/
+	z1ZbukeEz4COwarRVZqQBHFO5FM3AObNDErZOHzdIBkBHXZvmuRXWA23fKbLeD3MKac8SF0i/jd
+	+Vu55mnSDdt2UTP2X5WCEqrbsaSvFvqXQTCJGgclnZxUOLiYCKYr/aERnBZDTlx8yGeobxTrJZV
+	bOehzVvb+oG409Er7t/KpI5nKnxqvlWKgMGcHKrWyV/XAqkGUm2XE3k+ZmIslFXUtNvbY/0aFI2
+	GJThjiOsLD3m54T7s8dNjJqxn7MdMDVO4YQhXKbjwE=
+X-Google-Smtp-Source: AGHT+IEBAb6KLEu4dZTKlIdVkKZXOQ6clzSYSKmogg7ZnW7ECOMmDOHdHHo5cuDbY88fNQTruczWag==
+X-Received: by 2002:a05:6000:609:b0:42b:40b5:e665 with SMTP id ffacd0b85a97d-42b4bdb080fmr4169565f8f.31.1762981571736;
+        Wed, 12 Nov 2025 13:06:11 -0800 (PST)
+Received: from ?IPV6:2003:ea:8f26:f700:b18b:e3d1:83c0:fb24? (p200300ea8f26f700b18be3d183c0fb24.dip0.t-ipconnect.de. [2003:ea:8f26:f700:b18b:e3d1:83c0:fb24])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-42b32ecf522sm24811675f8f.45.2025.11.12.13.06.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Nov 2025 13:06:11 -0800 (PST)
+Message-ID: <3abaa3c5-fbb9-4052-9346-6cb096a25878@gmail.com>
+Date: Wed, 12 Nov 2025 22:06:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20251112201937.1336854-3-prabhakar.mahadev-lad.rj@bp.renesas.com>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next] net: phy: fixed_phy: remove setting
+ supported/advertised modes from fixed_phy_register
+To: Russell King - ARM Linux <linux@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 12, 2025 at 08:19:37PM +0000, Prabhakar wrote:
-> From: Lad Prabhakar <prabhakar.mahadev-lad.rj@bp.renesas.com>
-> 
-> Add support to configure the PHY link signal active level per converter
-> using the DT property "renesas,miic-phylink-active-low".
-> 
-> Introduce the MIIC_PHYLINK register definition and extend the MIIC driver
-> with a new `phylink`
+This code was added with 34b31da486a5 ("phy: fixed_phy: Set supported
+speed in phydev") 10 yrs ago. The commit message of this change
+mentions a use case involving callback adjust_link of struct
+dsa_switch_driver. This struct doesn't exist any longer, and in general
+usage of the legacy fixed PHY has been removed from DSA with the switch
+to phylink.
 
-You probably want to avoid the name phylink. It is well know that is
-all about PHYs , SPFs, PCS, etc.
+Note: Supported and advertised modes are now set by phy_probe() when
+the fixed PHY is attached to the netdev and bound to the genphy driver.
 
-	Andrew
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+ drivers/net/phy/fixed_phy.c | 24 ------------------------
+ 1 file changed, 24 deletions(-)
+
+diff --git a/drivers/net/phy/fixed_phy.c b/drivers/net/phy/fixed_phy.c
+index 715f0356f..1ad77f542 100644
+--- a/drivers/net/phy/fixed_phy.c
++++ b/drivers/net/phy/fixed_phy.c
+@@ -19,7 +19,6 @@
+ #include <linux/of.h>
+ #include <linux/idr.h>
+ #include <linux/netdevice.h>
+-#include <linux/linkmode.h>
+ 
+ #include "swphy.h"
+ 
+@@ -184,29 +183,6 @@ struct phy_device *fixed_phy_register(const struct fixed_phy_status *status,
+ 	phy->mdio.dev.of_node = np;
+ 	phy->is_pseudo_fixed_link = true;
+ 
+-	switch (status->speed) {
+-	case SPEED_1000:
+-		linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Half_BIT,
+-				 phy->supported);
+-		linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
+-				 phy->supported);
+-		fallthrough;
+-	case SPEED_100:
+-		linkmode_set_bit(ETHTOOL_LINK_MODE_100baseT_Half_BIT,
+-				 phy->supported);
+-		linkmode_set_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT,
+-				 phy->supported);
+-		fallthrough;
+-	case SPEED_10:
+-	default:
+-		linkmode_set_bit(ETHTOOL_LINK_MODE_10baseT_Half_BIT,
+-				 phy->supported);
+-		linkmode_set_bit(ETHTOOL_LINK_MODE_10baseT_Full_BIT,
+-				 phy->supported);
+-	}
+-
+-	phy_advertise_supported(phy);
+-
+ 	ret = phy_device_register(phy);
+ 	if (ret) {
+ 		phy_device_free(phy);
+-- 
+2.51.2
+
 
