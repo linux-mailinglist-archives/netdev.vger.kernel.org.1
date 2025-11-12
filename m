@@ -1,163 +1,89 @@
-Return-Path: <netdev+bounces-237944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E30D7C51E11
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 12:17:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2621EC51EFD
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 12:24:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FFE618862C4
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 11:16:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D7523A28D3
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 11:17:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E319035CBB7;
-	Wed, 12 Nov 2025 11:15:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2909E2BE7CD;
+	Wed, 12 Nov 2025 11:17:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DxnbJJSX";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="COdfgtHA"
+	dkim=pass (2048-bit key) header.d=tkos.co.il header.i=@tkos.co.il header.b="SZ82cxxu"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail.tkos.co.il (hours.tkos.co.il [84.110.109.230])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FFBB25D208
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 11:15:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6151B2E8B83
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 11:17:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.110.109.230
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762946138; cv=none; b=VORzSRRBBm4LfQdO/j+JhFBob943Bz6G4uiQEyc1qRMx/skLx5gkVUA4NIV0KeAw/UT8JCg83XQY8BgOhoiUHFaOOaGlCRMtlnEJXUv0tW4gN9CkfAWukQxfROzgTSkURrQWrf7OGqVyaOv7jpKWHfinQrZJky6HwdIcxq3O7HE=
+	t=1762946247; cv=none; b=JE2AVKxetO+EYXfaaDxucWV8ET2al6rrg+w7237OLWVxtmacirOJT1NygSgA1OC6Z6SugSBK9Cv3NtyYmNV/eKHbAf01fLnsPtpmhH84dPcT6mJTzrd1R75BPCPYFnuWm7SgO5DWBU6N6TJpIs/2OSzJdXUqo0KiI72+LtrOM+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762946138; c=relaxed/simple;
-	bh=KV9j6tjQ5QXn5f8pxeC8kmzLrI6wkQRac7WkDx7/HyU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pJ9wqnnT/EMYb5Iuf958mQFL5bQsbkHw7soIygUsbjyHPm7JDBJl6bYk3yInrcCLX/32o2cDfC6ApL+oV6bHKi7Dk+cava54IXHSOgs6ZYnGl8zFMNFeSCvFmy9WI7Zd7YkXozNTAoYezkWxmGvw0+VR3vl/a6o0z8AvKCRAnXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DxnbJJSX; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=COdfgtHA; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762946136;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6VmL1OVkwxFNMuOuahfScs6JqfQbzrAAR04/d20fU04=;
-	b=DxnbJJSXU4oHRChdVs+LYgGOWb8JGQlYEj75q9KE9oj5gHs13Yo8htEpA4XXFURv6d53ha
-	kXMNq9Uva5GF0D46CIQvom5ki/Z+5TVm72bVIP/Z8SXkz2hD9dwe5XixLL5lmjqfw+ftsV
-	PLB9YlqIKxUX1I+frLPjtMJRegLLDmI=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-126-x7JYj-rpMPGWSR0MGw9o7Q-1; Wed, 12 Nov 2025 06:15:35 -0500
-X-MC-Unique: x7JYj-rpMPGWSR0MGw9o7Q-1
-X-Mimecast-MFC-AGG-ID: x7JYj-rpMPGWSR0MGw9o7Q_1762946135
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-4e88947a773so26505131cf.2
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 03:15:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762946134; x=1763550934; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6VmL1OVkwxFNMuOuahfScs6JqfQbzrAAR04/d20fU04=;
-        b=COdfgtHAszEd5Dj1x/EbjnDEZFSAzdwvZ0DtOrep6HOyGys8ISoSJyZB1z8lmeGgt3
-         nOQFQAzXGEj8/J0LrjwTcB1VBCxrgKobr9exmijFRTW6Ei17vzhq45HeKbrVo2AoLN5e
-         az7ZYMrQ/kn9ac4+TSj1LB9jGYlVz20rbmfymjJ4QEdmi9RuKdTlFtJdqThBVS0o10fD
-         kxEgetbwsbRY/6Z6GmPVGiQKIcegyB/0YU6yVtDJdsptKMq17Q95zREIHt+barJrfgof
-         FRnvmrzelMEwlwY0SfakHCR7Um9iHagm6pFFgqF8au6dj1yvLDUr1GX7XwPD/fBOQGWd
-         eyzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762946134; x=1763550934;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6VmL1OVkwxFNMuOuahfScs6JqfQbzrAAR04/d20fU04=;
-        b=ZsliSdqsSOcN/9UQQ3RaGAgILSvI17KL7LhkyIrAlsnumVORowojvYAs2CuU/OV2XK
-         XWxUBySyS0++mANU6jb/v9qMSeSsGlZuq8sPkMPMcTeS7fg+4k2vLa24xLdzP4APBWRr
-         RvuEc41UhKp0F2lcsTPgWB2uP63bVgPXqU5Ym3gFkEhVAHqR2TcYp0+IQWtITI8vN7c8
-         BDWcVqFKwDsG2AEhjudUpkfu/t3bn4Ullhc4Apfe5DGo2d1X9FEPw33bUaq15OKVD6bF
-         mmPfG/or5AI4+AhnW34Pn0pmtxjPfbad5aZL//JhrB1GhyoP2atE9GUrn7+R9QW0QZL3
-         MR+w==
-X-Forwarded-Encrypted: i=1; AJvYcCWkdbkUGgNv8ALaDwOTRU8vpCUxlmD5SkdM6ktp1FnSvzQTram6AwiUURGMkPcI8L3iWPOFqvI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/ovGLw1ybxsH+yGndBzCTwUcLndtetKe+fl9aC2EBV1Ijz88A
-	oPCLjjlsivCAomNXnJpWCeFBLNqbTHVWe2cnOMIEY/9ZQ8DW7eZfFfZAw2aaTAFrd0qM2ayzdhO
-	MVJD0ljMNCpPffb+fT68hkzHDGJq9lLhdiFS5UZeQ2lr/3twaUnRkHq+L9fqeJUVEKQ==
-X-Gm-Gg: ASbGnct8wW7FGMhwO5rm3/J7o3NGwA+qdHg52oIrlE0/0axYav2Jdw6K4JRWsvmQ06x
-	eLoAbC2sQV11F8xDhJKa9JKgda0/zlhTlzTttYQhVEVcv/VPaeNuTT0FG2f0ZyyVrpUhlQ2HbL6
-	AnLewFezm+zyoeU6UjP5hWkvSqFLRyqWgBvK+csrVV0qiu8LOkXbw+UUshXu8foP/xZPJIJFpp6
-	SGgIZ8udxnPTmFhwq5OJQ7CXe38T2srZZb7E4vyTrr0opkHGhmuSVPTIsaYzS0BWPtOGZPOqBzw
-	GMvfOHkD0qqlGErNKJyNEFIylmBRjgwX2jSvGXJQ4x8cSmBwJ+QYU387uRn80K3VCisvwujDY85
-	Ng8ZqhxkyIP9lbVEW86ZZ/cOS/0MH1qCF75YGhIm6hbsZcy87OYk=
-X-Received: by 2002:a05:622a:54:b0:4ed:69c2:3b13 with SMTP id d75a77b69052e-4eddbc6a48bmr30774371cf.9.1762946134032;
-        Wed, 12 Nov 2025 03:15:34 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFzBmGdmGhOlYiVIRlWZU30TyBg9MVhguagEmUrNtm3qfqZ/uALNevR67J4XeGgywzJuDlfEw==
-X-Received: by 2002:a05:622a:54:b0:4ed:69c2:3b13 with SMTP id d75a77b69052e-4eddbc6a48bmr30774101cf.9.1762946133569;
-        Wed, 12 Nov 2025 03:15:33 -0800 (PST)
-Received: from sgarzare-redhat (host-79-46-200-153.retail.telecomitalia.it. [79.46.200.153])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4ede379ef71sm2086971cf.0.2025.11.12.03.15.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Nov 2025 03:15:32 -0800 (PST)
-Date: Wed, 12 Nov 2025 12:15:26 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Shuah Khan <shuah@kernel.org>, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Simon Horman <horms@kernel.org>, Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v4 02/12] selftests/vsock: make
- wait_for_listener() work even if pipefail is on
-Message-ID: <wlflavm4wt3focsl6w4ylu2p2itwz7jl3hbcnczuyi5mfew7nu@rd6wflle5gjt>
-References: <20251108-vsock-selftests-fixes-and-improvements-v4-0-d5e8d6c87289@meta.com>
- <20251108-vsock-selftests-fixes-and-improvements-v4-2-d5e8d6c87289@meta.com>
+	s=arc-20240116; t=1762946247; c=relaxed/simple;
+	bh=5LFo/MPV5qIXlFzvyYlpX+RzaHRnyvm9DLr7lV1nwws=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UNZBW/sMD7LbcNCjFVV508AU6xe9ylXv4ueNocXmbk4ysadEmE7w0vcXCLuV/YipTuxGNBGBs/aRI5L0i66V27WZmYpbnlYMGKqAIw/0rNqtVU1RLNd2cwMMnu3Qeq37syv4vOT0A6TShOZYOqb7Rt8ycO1igOC2xdKtxJ4F8OU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tkos.co.il; spf=pass smtp.mailfrom=tkos.co.il; dkim=pass (2048-bit key) header.d=tkos.co.il header.i=@tkos.co.il header.b=SZ82cxxu; arc=none smtp.client-ip=84.110.109.230
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tkos.co.il
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tkos.co.il
+Received: from tarshish.tkos.co.il (unknown [10.0.8.2])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail.tkos.co.il (Postfix) with ESMTPS id 55961440A92;
+	Wed, 12 Nov 2025 13:15:32 +0200 (IST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tkos.co.il;
+	s=default; t=1762946132;
+	bh=5LFo/MPV5qIXlFzvyYlpX+RzaHRnyvm9DLr7lV1nwws=;
+	h=From:To:Cc:Subject:Date:From;
+	b=SZ82cxxuN5DTfh6QET1/KVYGq6ErKntjbDHDnPhvxQNm6alRsnVwWAD4MXN0DLUX1
+	 vaT/AFJgvoh1kWuyVWbv0SmVztV/I5CktiFXtyVEkGchAkh3NhqakcZWUGzZqL5Zzq
+	 7kXU3aIjvsaQXNM3GZYKHIEgkqLle5qmxmD4UZDqpMe2B8TwV8BPInKfzlr7dWkX88
+	 V+kZ7We/+U7uMe+zjWsB32g8Kez1rSLHULMvFU7ZKqtNQNloqAqLJIujsgFgqlHIR9
+	 UUq48y+J2sZqVVWY7EjRrSxFV8APFzClsD3c2DT65nrSXQuPbEhDV5Gzd93bXb7f1Q
+	 oiy8OcRMJCkag==
+From: Baruch Siach <baruch@tkos.co.il>
+To: Nikolay Aleksandrov <razor@blackwall.org>,
+	Ido Schimmel <idosch@nvidia.com>
+Cc: bridge@lists.linux.dev,
+	netdev@vger.kernel.org,
+	Baruch Siach <baruch@tkos.co.il>
+Subject: [PATCH] MAINTAINERS: Remove eth bridge website
+Date: Wed, 12 Nov 2025 13:17:03 +0200
+Message-ID: <0a32aaf7fa4473e7574f7327480e8fbc4fef2741.1762946223.git.baruch@tkos.co.il>
+X-Mailer: git-send-email 2.51.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20251108-vsock-selftests-fixes-and-improvements-v4-2-d5e8d6c87289@meta.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sat, Nov 08, 2025 at 08:00:53AM -0800, Bobby Eshleman wrote:
->From: Bobby Eshleman <bobbyeshleman@meta.com>
->
->Rewrite wait_for_listener()'s pattern matching to avoid tripping the
->if-condition when pipefail is on.
->
->awk doesn't gracefully handle SIGPIPE with a non-zero exit code, so grep
->exiting upon finding a match causes false-positives when the pipefail
->option is used (grep exits, SIGPIPE emits, and awk complains with a
->non-zero exit code). Instead, move all of the pattern matching into awk
->so that SIGPIPE cannot happen and the correct exit code is returned.
->
->Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
->---
->Changes in v2:
->- use awk-only tcp port lookup
->- remove fixes tag because this problem is only introduced when a later
->  patch enables pipefail for other reasons (not yet in tree)
->---
-> tools/testing/selftests/vsock/vmtest.sh | 6 ++++--
-> 1 file changed, 4 insertions(+), 2 deletions(-)
+Ethernet bridge website URL shows "This page isn’t available".
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Baruch Siach <baruch@tkos.co.il>
+---
+ MAINTAINERS | 1 -
+ 1 file changed, 1 deletion(-)
 
->
->diff --git a/tools/testing/selftests/vsock/vmtest.sh b/tools/testing/selftests/vsock/vmtest.sh
->index bc16b13cdbe3..01ce16523afb 100755
->--- a/tools/testing/selftests/vsock/vmtest.sh
->+++ b/tools/testing/selftests/vsock/vmtest.sh
->@@ -251,9 +251,11 @@ wait_for_listener()
->
-> 	# for tcp protocol additionally check the socket state
-> 	[ "${protocol}" = "tcp" ] && pattern="${pattern}0A"
->+
-> 	for i in $(seq "${max_intervals}"); do
->-		if awk '{print $2" "$4}' /proc/net/"${protocol}"* | \
->-		   grep -q "${pattern}"; then
->+		if awk -v pattern="${pattern}" \
->+			'BEGIN {rc=1} $2" "$4 ~ pattern {rc=0} END {exit rc}' \
->+			/proc/net/"${protocol}"*; then
-> 			break
-> 		fi
-> 		sleep "${interval}"
->
->-- 
->2.47.3
->
+diff --git a/MAINTAINERS b/MAINTAINERS
+index f0c8b85baa6b..c79c182aab41 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -9264,7 +9264,6 @@ M:	Ido Schimmel <idosch@nvidia.com>
+ L:	bridge@lists.linux.dev
+ L:	netdev@vger.kernel.org
+ S:	Maintained
+-W:	http://www.linuxfoundation.org/en/Net:Bridge
+ F:	include/linux/if_bridge.h
+ F:	include/uapi/linux/if_bridge.h
+ F:	include/linux/netfilter_bridge/
+-- 
+2.51.0
 
 
