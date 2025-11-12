@@ -1,115 +1,104 @@
-Return-Path: <netdev+bounces-237764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53313C5018F
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 00:54:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C254AC501A7
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 01:03:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 3AB254E5EE9
-	for <lists+netdev@lfdr.de>; Tue, 11 Nov 2025 23:54:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 707491897130
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 00:03:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A5892D2384;
-	Tue, 11 Nov 2025 23:54:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C76B635;
+	Wed, 12 Nov 2025 00:03:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W46XS3lW"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="gUTRhoTV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD26E2EDD72
-	for <netdev@vger.kernel.org>; Tue, 11 Nov 2025 23:54:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BF749460
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 00:03:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762905266; cv=none; b=XsMJgcVvsobgIs8D3A3v/TIzUltMEwM98Eioq2PEp4SoKUzCEcG4ORZQaDXNL6Q+84+NLDTPW7/obnGMrVRJ4UWZiSR6neQ4xcOTBAjDehTujwRA92K8toOUbZobhMiV4R1YeNRtmIhB1f1gfvGghLrOEtEbFeKzNGkD1CzASLE=
+	t=1762905799; cv=none; b=Woiszk2sDIbyRLNa+iSrOxTIKZ9vSMtO5vZTJ4GIF1d7ZqNBDdUr0jcYIPImKFvfrsTQv1wfgoQKAvaCbQDeC6L8aLD2CxVPVF3yZhqu887D31732CMZVjGVzkdI2Y9Bu4b6q01ikRjaRtdp4udbg8QpmI1Qc8bBANtVZMMKVDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762905266; c=relaxed/simple;
-	bh=u+ovaC1ARD6Fvm+tYmUCYvXu6TqIrjCRlHqStvU7Ycc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=I/rOW4VA58aqioaUBr1JE1iGkrBBz3h971XmBheQdprwUvuUkSnOjTP8ruwk/QhnC7JAX7j1+37WyGNg4CHZCGqk3lCuzlPIHg9OojQ/XghRP/tcazB7dturPEV3/ZIOGY+8iSxQEBGWsg1dU98c6H6K26puW7GfniNG47liMF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W46XS3lW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BF65C4CEF5;
-	Tue, 11 Nov 2025 23:54:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762905266;
-	bh=u+ovaC1ARD6Fvm+tYmUCYvXu6TqIrjCRlHqStvU7Ycc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=W46XS3lWdvFj10af/Q1LBpRI82vhqGVYB3LOR0ocdaXWq4mu1WTZ+GyvOsaa0w65S
-	 kUx/yfaa7V+plx8G32sUKd8ySqDT2jujwpR3QTXrMD+RgIVkX9Bw2TKo7KEu98NkPj
-	 9qkf7/ghY0sDSo797yUYQi2OsbeRLGCl7YWW7RPUrSaq/GCibj3lCbQPOjTlSHQmSy
-	 D79niSIGba/tWweF537CrEJJbljAYVq7WFrmrC/O+zYAdH69Q/NSH/YIaPqhtkUvR0
-	 Evnq/98yrlGoHC+aZ5gjUDRTlIWyyRMlkbOerkcl6wHu1zdJGLQodM8bBecX72zx8l
-	 6a7a3YIimkADg==
-Date: Tue, 11 Nov 2025 15:54:24 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Zahari Doychev <zaharido@web.de>
-Cc: Zahari Doychev <zahari.doychev@linux.com>, donald.hunter@gmail.com,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- horms@kernel.org, jacob.e.keller@intel.com, ast@fiberby.net,
- matttbe@kernel.org, netdev@vger.kernel.org, jhs@mojatatu.com,
- xiyou.wangcong@gmail.com, jiri@resnulli.us, johannes@sipsolutions.net
-Subject: Re: [PATCH v2 1/3] ynl: samples: add tc filter example
-Message-ID: <20251111155424.68f085a6@kernel.org>
-In-Reply-To: <cgsea6u5h26klyzcqcbbhhfs2a5zee54b2ixedbrlh6utjgsbn@wnrqu3pnapu5>
-References: <20251106151529.453026-1-zahari.doychev@linux.com>
-	<20251106151529.453026-2-zahari.doychev@linux.com>
-	<20251110171739.6c6cf31d@kernel.org>
-	<cgsea6u5h26klyzcqcbbhhfs2a5zee54b2ixedbrlh6utjgsbn@wnrqu3pnapu5>
+	s=arc-20240116; t=1762905799; c=relaxed/simple;
+	bh=5tRwX1ZyBbGLGS0218yZVh6e9ryaGCci+L/zAEZYdmc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Qdx2mKegGXQSxgWdUBg+TA8gEvwpYHZx4vggRdIQ6k1HnuZsbY+dNF9djuXCV+Q7DGRZElf334qeV2Qx6Psl8csloIWbZTCbONFKaHpy/+Whp8qnLvl+4fUIQKrKaQhNc29zjoEXmav19TcSzs9oitc0jDgTNNqi2MFjUkAKpUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=gUTRhoTV; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1762905792;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=KhkEFcSQrxxs6n0r4G3H04NTx7kGDHcOSt41o3NSJ7w=;
+	b=gUTRhoTVvqSL5D+ejvGN/LaTI1/bODZCts6QdGrygi+tCA6SiK0WohLikVQwaW+MGeAeLf
+	O1uhSDDiiz0tiJq8c6gukGo4N+PXWY5HusK983tN1T1uOZJ69ZkLjEyerE9ikHMItmc7dw
+	05I1ZBkbnjhIikw4OTKl9FWg+DIghF4=
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrei Botila <andrei.botila@oss.nxp.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>
+Cc: Simon Horman <horms@kernel.org>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	bcm-kernel-feedback-list@broadcom.com,
+	netdev@vger.kernel.org,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>
+Subject: [PATCH net-next 0/8] add hwtstamp_get callback to phy drivers
+Date: Wed, 12 Nov 2025 00:02:49 +0000
+Message-ID: <20251112000257.1079049-1-vadim.fedorenko@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 11 Nov 2025 21:09:11 +0200 Zahari Doychev wrote:
-> On Mon, Nov 10, 2025 at 05:17:39PM -0800, Jakub Kicinski wrote:
-> > On Thu,  6 Nov 2025 16:15:27 +0100 Zahari Doychev wrote:  
-> > > diff --git a/tools/net/ynl/Makefile.deps b/tools/net/ynl/Makefile.deps
-> > > index 865fd2e8519e..96c390af060e 100644
-> > > --- a/tools/net/ynl/Makefile.deps
-> > > +++ b/tools/net/ynl/Makefile.deps
-> > > @@ -47,4 +47,5 @@ CFLAGS_tc:= $(call get_hdr_inc,__LINUX_RTNETLINK_H,rtnetlink.h) \
-> > >  	$(call get_hdr_inc,_TC_MIRRED_H,tc_act/tc_mirred.h) \
-> > >  	$(call get_hdr_inc,_TC_SKBEDIT_H,tc_act/tc_skbedit.h) \
-> > >  	$(call get_hdr_inc,_TC_TUNNEL_KEY_H,tc_act/tc_tunnel_key.h)
-> > > +CFLAGS_tc-filter-add:=$(CFLAGS_tc)  
-> > 
-> > Why do we need this? This file is intended for families themselves,
-> > if sample needs flags it should be specified in samples/Makefile ?  
-> 
-> I am getting compile errors as without the CFLAGS my system
-> headers files are used and not the ones in the kernel tree.
-> As samples/Makfile is passing the CFLAGS_tc-filter-add when
-> compiling I thought this was the way to do this similiar to the
-> other examples.
-> 
-> Actually the following flags are fixing my problem:
->  -D__LINUX_PKT_SCHED_H -include ../../../../include/uapi//linux/pkt_sched.h
->  -D__LINUX_PKT_CLS_H -include ../../../../include/uapi//linux/pkt_cls.h
-> 
-> If I need to fix this in samples/Makefile then I probably need to create
-> a new target. Is this really the expectation?
+PHY drivers are able to configure HW time stamping and are not able to
+report configuration back to user space. Add callback to report
+configuration like it's done for net_device and add implementation to
+the drivers.
 
-I meant:
+Vadim Fedorenko (8):
+  phy: add hwtstamp_get callback to retrieve config
+  net: phy: broadcom: add HW timestamp configuration reporting
+  net: phy: dp83640: add HW timestamp configuration reporting
+  net: phy: micrel: add HW timestamp configuration reporting
+  net: phy: microchip_rds_ptp: add HW timestamp configuration reporting
+  phy: mscc: add HW timestamp configuration reporting
+  net: phy: nxp-c45-tja11xx: add HW timestamp configuration reporting
+  ptp: ptp_ines: add HW timestamp configuration reporting
 
-diff --git a/tools/net/ynl/samples/Makefile b/tools/net/ynl/samples/Makefile
-index c9494a564da4..552356473b68 100644
---- a/tools/net/ynl/samples/Makefile
-+++ b/tools/net/ynl/samples/Makefile
-@@ -19,6 +19,7 @@ include $(wildcard *.d)
- all: $(BINS)
- 
- CFLAGS_page-pool=$(CFLAGS_netdev)
-+CFLAGS_tc-filter-add=$(CFLAGS_tc)
- 
- $(BINS): ../lib/ynl.a ../generated/protos.a $(SRCS)
-        @echo -e '\tCC sample $@'
+ drivers/net/phy/bcm-phy-ptp.c       | 21 +++++++++++---
+ drivers/net/phy/dp83640.c           | 29 +++++++++++++------
+ drivers/net/phy/micrel.c            | 43 +++++++++++++++++++++++------
+ drivers/net/phy/microchip_rds_ptp.c | 21 +++++++++++---
+ drivers/net/phy/mscc/mscc_ptp.c     | 21 +++++++++++---
+ drivers/net/phy/nxp-c45-tja11xx.c   | 22 ++++++++++++---
+ drivers/net/phy/phy.c               | 30 ++++++++++++++++----
+ drivers/ptp/ptp_ines.c              | 31 ++++++++++++++++++---
+ include/linux/mii_timestamper.h     | 13 ++++++---
+ include/linux/phy.h                 |  4 +--
+ 10 files changed, 188 insertions(+), 47 deletions(-)
 
+-- 
+2.47.3
 
-I could be missing something, I have 6.17 headers installed so it 
-builds for me without any extra flags :(
 
