@@ -1,189 +1,244 @@
-Return-Path: <netdev+bounces-237964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAF3DC5222B
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 12:59:23 +0100 (CET)
+Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [142.0.200.124])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD7E6C52204
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 12:57:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3F8E3ABB97
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 11:51:34 +0000 (UTC)
+	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 82C194F38E5
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 11:51:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CBCB313E0B;
-	Wed, 12 Nov 2025 11:51:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18F73313E0B;
+	Wed, 12 Nov 2025 11:51:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="oetBiFmq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EFnED4kS"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f174.google.com (mail-qt1-f174.google.com [209.85.160.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D45BB2FD684;
-	Wed, 12 Nov 2025 11:51:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D6FC3093CF
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 11:51:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762948292; cv=none; b=hSpmPSRI2KKIHzuLWAKIM6dmH36CBg5f6wOYZAjBIn5p19J4SMEwWIyGH+CciiUvhl1sMT46RrbqsD+MIRfMSBjYhLnWOvvH0614Ua8CzROKppcCNdxp87JAJmwPU4iulFLCQ2TGDWsM5lFQmC6HIChL3WLu63f8zL8WO5LcGtY=
+	t=1762948311; cv=none; b=tvrrEdFBrJbRSMvjJUDk1mmOCNw9AZsvqqhzP+EHDojNO1huVIrgIP5PK/FRI7089qg7Twh+834KX324+f3s22G+Z04nwQnsUKJajDc1I3l21I6GHDGajTZNPF+rInI+9RAIcwOgAlaW+wy7mw4ERbb5LOMBep7ObJBoIcwwrSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762948292; c=relaxed/simple;
-	bh=Y+iMD70VypAUzl02NICb5IqHFNnGm8eBBPfehbkZgw0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HkAeOgLp2mRk5qGhgaon080DyH/B7L0lc094DbJVXx3V7UIjp4F6EGE/o+MG8D9u0OZpR3gpRw/56rraR+WMe1LVdW1LCGDOPPCEcNUUFbVdvQN9Lq5BM+dJqC3p3S6YDAksjaa90910e0L2s+j1ttUzeS68KLgpDE/CLOsFuUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=oetBiFmq; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-	Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
-	Resent-Message-ID:In-Reply-To:References;
-	bh=uSqtUxqoSTeI2ScF7umWBQZMcaL6Cd1hNoT1xrRtbIY=; t=1762948290; x=1764157890; 
-	b=oetBiFmqGFvB95wnnJAg1GdBYNeyC6OJ5spGq2j4LteUfC20wH4agZaydzy3hwhWfgAGRsqMHi1
-	ll+aO1UEbdjNsDLfmZ30Nt1I9NQY/9/ktbm2RD8f/vX5JRwhZqAZ5jRqwHjfc40dbNm6cSssVxoWC
-	zzv7K6thQ8Zxm5NI9UITmi+D5Vfet1sRS4ypeBRLxJQr8OiZ4K1YcDawYRAjlZm3oSOT8vxgWallv
-	6C0K+RURipn70mi+rLTBGeWB4M7ZswUuFJyf5hVjZDtvIm7uqlSWYEUnijpEAeTUuI+VEQLIXUc5O
-	kcr4UTEgaYxi87b4b25BFzzDalCTr5FOpNzA==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98.2)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1vJ9No-00000001CTN-2CPZ;
-	Wed, 12 Nov 2025 12:51:28 +0100
-From: Johannes Berg <johannes@sipsolutions.net>
-To: netdev@vger.kernel.org
-Cc: linux-wireless@vger.kernel.org
-Subject: [GIT PULL] wireless-next-2025-11-12
-Date: Wed, 12 Nov 2025 12:50:29 +0100
-Message-ID: <20251112115126.16223-4-johannes@sipsolutions.net>
-X-Mailer: git-send-email 2.51.1
+	s=arc-20240116; t=1762948311; c=relaxed/simple;
+	bh=b1rILryB2M3fbQ634EIP/osVeulPKMjm/jpw3Ez0zjM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=g2Iiodozeklb3c1uxbWo6hyzApI3PE3uuj52/uHX/L9jHHBTH67l8mfkNGiSJZjjwTTfqaKPrBVBtuMyPpMnOk77RqE5pMd3AA0VNLORX8VYM7EKEDbB6wlB/QkiTUqjLQNDGldFeEXzm9lbFr6M8Ce+b2zvq4QEittsr1OL9+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EFnED4kS; arc=none smtp.client-ip=209.85.160.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f174.google.com with SMTP id d75a77b69052e-4ed7024c8c5so5921641cf.3
+        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 03:51:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1762948308; x=1763553108; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7SHnnORyfGe29KbIMnvLbNalHewh1m61HuorXDqf++c=;
+        b=EFnED4kSlRnGAjvhkINDDoLqRPjKTKea0sZh8xnMoRcGz2lP8Q1RokIC0vmEX4xV03
+         rSlHOAcFic345MFd9G03mzqooKDbvj9ZAvI+HGNK7oXkjSx5YibqcgfL3OP9DP5EiduC
+         pvzPDCXa9rUCXAxwr8ML6dmScuFqonUlm/kdr4GZhYEFf1ZbdhTiSSkh4SmkNlDPvljv
+         siXFVS84hJim2UF+jFLOoHah6xBjevHtzCc9QFr98rrgxFz5sQwL04PPMVh8HEdouN2f
+         KJ6WjlMN/ZdsY+kK9jT0kBthA1BRTNj3MnqMzpb6WDAIcdm/U4FBNccDRmTwBgzADI+P
+         8SBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1762948308; x=1763553108;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-gg:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=7SHnnORyfGe29KbIMnvLbNalHewh1m61HuorXDqf++c=;
+        b=Ve3CiZ7782TXV8kj7oiASjL9HYSaWn4eSfirr2r/nWLFKt9FGJ+AznNkWv9gVDRS9I
+         3E1NeFqeL7ya8LHmviM07q5n5qTwMjtUAuKSPJ+6EZy40jhoesYvGQ7hge6CY/Wivq2Z
+         bQwDwDPxwzZGUoEqM2Po//2ZUyjsj4GYBgM1dhGTMrwnW3GJ1BKheIwLBCaJbOx9Cr7k
+         58K2V+W05vOZor8tlcsFwgPFQ1f7X5FwzCN8cH09YhBgHiWQ0EcD7NivvbqZg0mIPCg+
+         XwvavGu43WwFq66cQ5HRoC8W32LAajJhXyuaEHgYVdEdOcu3v+W0TurQ8AJYo+HvZTqY
+         lffQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVs6Qu73xWTEul1TJnDhY1KHO5i0dvct3IX+TSOD3WpJs0KwLNjDkYgOW+RZc9fLXjTDw+FBjw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAPUKR87BOCX/6XbaA0rWz2LpmB8PdCe4k84uimyMOw70lyhPt
+	dNBH5+s+Lt4bQFRiIy7hFnytQsfe47EwqFJEXHsp6qII8wu1ws3R6eCtPcozQSWDimp6HudUpqg
+	yRE7F6EcaD9FV/GuXMdyIvu4XeTMQv9B1FgLZGUbO
+X-Gm-Gg: ASbGnctV6f7yEQNHSwaIlT5NpPEDEPNFg6oS0PP5EmyOes9AHaQ/d4IAPdqWaXNaenv
+	6384DeEs/fpPeOoPRdzlgPSna/XxwlZef60iVD3sQF2do4YhsDcIzn1uRBMYp2+Fpnt8730WmBQ
+	uy1+nMSwhF58x2/6xwz3CQz3VqzLwZBjgdrvWYHRZgLmFS05Wt/BzgHfgvRbmiMfVP7M6Tg71lO
+	4nBxRdjfWL5cL9DGYNHz1bw1IQCbZqsz9t8ZXA8KErEv7WXQl95wdYPlwfOIzmQpV5Pl/Vo
+X-Google-Smtp-Source: AGHT+IFEItPI7vSPRRHkiLmJY63z1/ByvM74LRYVl9zPbVKDpOXr+k9akJ9znapxG2LuAr/FlYJkD2JD0iARiVXxn5w=
+X-Received: by 2002:a05:622a:552:b0:4e8:a51e:cdbc with SMTP id
+ d75a77b69052e-4eddbdab80emr29447671cf.43.1762948307682; Wed, 12 Nov 2025
+ 03:51:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20251111164205.77229-1-m.lobanov@rosa.ru>
+In-Reply-To: <20251111164205.77229-1-m.lobanov@rosa.ru>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 12 Nov 2025 03:51:36 -0800
+X-Gm-Features: AWmQ_bnDD_Nqi7mF-JEZnEFKUvg8l_pC0pT8ENximYQLAL7RG-EOvRY8jzzXLGs
+Message-ID: <CANn89iJ_FtPGg-a8s-2QY+KxJVYku4BMcK7dE=-NnMu5ufvHLQ@mail.gmail.com>
+Subject: Re: [PATCH net] net: fix double dst_release() on sk_dst_cache race
+To: Mikhail Lobanov <m.lobanov@rosa.ru>
+Cc: Kuniyuki Iwashima <kuniyu@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Wed, Nov 12, 2025 at 3:39=E2=80=AFAM Mikhail Lobanov <m.lobanov@rosa.ru>=
+ wrote:
+>
+> A reproducible rcuref - imbalanced put() warning is observed under
+> IPv6 L2TP (pppol2tp) traffic with blackhole routes, indicating an
+> imbalance in dst reference counting for routes cached in
+> sk->sk_dst_cache and pointing to a subtle lifetime/synchronization
+> issue between the helpers that validate and drop cached dst entries.
+>
+> rcuref - imbalanced put()
+> WARNING: CPU: 0 PID: 899 at lib/rcuref.c:266 rcuref_put_slowpath+0x1ce/0x=
+240 lib/rcuref.c:266
+> Modules linked in:
+> CPSocket connected tcp:127.0.0.1:48148,server=3Don <-> 127.0.0.1:33750
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian=
+-1.16.3-2 04/01/2014
+> RIP: 0010:rcuref_put_slowpath+0x1ce/0x240 lib/rcuref.c:266
+>
+> Call Trace:
+>  <TASK>
+>  __rcuref_put include/linux/rcuref.h:97 [inline]
+>  rcuref_put include/linux/rcuref.h:153 [inline]
+>  dst_release+0x291/0x310 net/core/dst.c:167
+>  __sk_dst_check+0x2d4/0x350 net/core/sock.c:604
+>  __inet6_csk_dst_check net/ipv6/inet6_connection_sock.c:76 [inline]
+>  inet6_csk_route_socket+0x6ed/0x10c0 net/ipv6/inet6_connection_sock.c:104
+>  inet6_csk_xmit+0x12f/0x740 net/ipv6/inet6_connection_sock.c:121
+>  l2tp_xmit_queue net/l2tp/l2tp_core.c:1214 [inline]
+>  l2tp_xmit_core net/l2tp/l2tp_core.c:1309 [inline]
+>  l2tp_xmit_skb+0x1404/0x1910 net/l2tp/l2tp_core.c:1325
+>  pppol2tp_sendmsg+0x3ca/0x550 net/l2tp/l2tp_ppp.c:302
+>  sock_sendmsg_nosec net/socket.c:729 [inline]
+>  __sock_sendmsg net/socket.c:744 [inline]
+>  ____sys_sendmsg+0xab2/0xc70 net/socket.c:2609
+>  ___sys_sendmsg+0x11d/0x1c0 net/socket.c:2663
+>  __sys_sendmmsg+0x188/0x450 net/socket.c:2749
+>  __do_sys_sendmmsg net/socket.c:2778 [inline]
+>  __se_sys_sendmmsg net/socket.c:2775 [inline]
+>  __x64_sys_sendmmsg+0x98/0x100 net/socket.c:2775
+>  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>  do_syscall_64+0x64/0x140 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> RIP: 0033:0x7fe6960ec719
+>  </TASK>
+>
+> The race occurs between the lockless UDPv6 transmit path
+> (udpv6_sendmsg() -> sk_dst_check()) and the locked L2TP/pppol2tp
+> transmit path (pppol2tp_sendmsg() -> l2tp_xmit_skb() ->
+> ... -> inet6_csk_xmit() =E2=86=92 __sk_dst_check()), when both handle
+> the same obsolete dst from sk->sk_dst_cache: the UDPv6 side takes
+> an extra reference and atomically steals and releases the cached
+> dst, while the L2TP side, using a stale cached pointer, still
+> calls dst_release() on it, and together these updates produce
+> an extra final dst_release() on that dst, triggering
+> rcuref - imbalanced put().
+>
+> The Race Condition:
+>
+> Initial:
+>   sk->sk_dst_cache =3D dst
+>   ref(dst) =3D 1
+>
+> Thread 1: sk_dst_check()                Thread 2: __sk_dst_check()
+> ------------------------               ----------------------------
+> sk_dst_get(sk):
+>   rcu_read_lock()
+>   dst =3D rcu_dereference(sk->sk_dst_cache)
+>   rcuref_get(dst) succeeds
+>   rcu_read_unlock()
+>   // ref =3D 2
+>
+>                                             dst =3D __sk_dst_get(sk)
+>                                     // reads same dst from sk_dst_cache
+>                                     // ref still =3D 2 (no extra get)
+>
+> [both see dst obsolete & check() =3D=3D NULL]
+>
+> sk_dst_reset(sk):
+>   old =3D xchg(&sk->sk_dst_cache, NULL)
+>     // old =3D dst
+>   dst_release(old)
+>     // drop cached ref
+>     // ref: 2 -> 1
+>
+>                                   RCU_INIT_POINTER(sk->sk_dst_cache, NULL=
+)
+>                                   // cache already NULL after xchg
+>                                             dst_release(dst)
+>                                               // ref: 1 -> 0
+>
+>   dst_release(dst)
+>   // tries to drop its own ref after final put
+>   // rcuref_put_slowpath() -> "rcuref - imbalanced put()"
+>
+> Fix this by making the locked __sk_dst_check() use the same =E2=80=9Cstea=
+l
+> from sk->sk_dst_cache=E2=80=9D pattern as the lockless path: instead of
+> clearing the cache and releasing a potentially stale local dst,
+> it atomically exchanges sk->sk_dst_cache with NULL and only calls
+> dst_release() on the pointer returned from that exchange. This
+> guarantees that, for any given cached dst, at most one of the
+> competing helpers (sk_dst_check() or __sk_dst_check()) can acquire
+> and drop the cache-owned reference, so they can no longer
+> double-release the same entry; the atomic operation runs only in the
+> obsolete path and should not affect the main path.
+>
+> Found by Linux Verification Center (linuxtesting.org) with Syzkaller.
+>
+> Fixes: d14730b8e911 ("ipv6: use RCU in inet6_csk_xmit()")
+> Signed-off-by: Mikhail Lobanov <m.lobanov@rosa.ru>
+> ---
+>  net/core/sock.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index dc03d4b5909a..7f356f976627 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -607,14 +607,15 @@ INDIRECT_CALLABLE_DECLARE(struct dst_entry *ipv4_ds=
+t_check(struct dst_entry *,
+>  struct dst_entry *__sk_dst_check(struct sock *sk, u32 cookie)
+>  {
+>         struct dst_entry *dst =3D __sk_dst_get(sk);
+> +       struct dst_entry *old_dst;
+>
+>         if (dst && READ_ONCE(dst->obsolete) &&
+>             INDIRECT_CALL_INET(dst->ops->check, ip6_dst_check, ipv4_dst_c=
+heck,
+>                                dst, cookie) =3D=3D NULL) {
+>                 sk_tx_queue_clear(sk);
+>                 WRITE_ONCE(sk->sk_dst_pending_confirm, 0);
+> -               RCU_INIT_POINTER(sk->sk_dst_cache, NULL);
+> -               dst_release(dst);
+> +               old_dst =3D unrcu_pointer(xchg(&sk->sk_dst_cache, RCU_INI=
+TIALIZER(NULL)));
+> +               dst_release(old_dst);
+>                 return NULL;
+>         }
+>
 
-And a little bit more stuff for -next as well, but
-Jeff informs me that Qualcomm has a lot pending from
-their refactor side-branch that reworks the ath12k
-driver architecture towards their WiFi8 chipsets,
-which will come soon.
+This is not a correct fix.
 
-Please pull and let us know if there's any problem.
+Please take a look at sk_dst_check() vs __sk_dst_check() , and why we have =
+both.
+(Same for __sk_dst_get() vs sk_dst_get())
 
-Thanks,
-johannes
+inet6_csk_xmit() is reserved for sockets holding their socket lock.
 
+Please fix l2tp instead.
 
-
-The following changes since commit 1ec9871fbb80ba7db84f868f6aa40d38bc43f0e0:
-
-  Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-11-06 09:27:40 -0800)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next.git tags/wireless-next-2025-11-12
-
-for you to fetch changes up to 0eb272033b64ef05fffa30288284659c33e17830:
-
-  Merge tag 'ath-next-20251111' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath (2025-11-12 09:56:28 +0100)
-
-----------------------------------------------------------------
-More -next material, notably:
- - split ieee80211.h file, it's way too big
- - mac80211: initial chanctx work towards NAN
- - mac80211: MU-MIMO sniffer improvements
- - ath12k: statistics improvements
-
-----------------------------------------------------------------
-Abdun Nihaal (1):
-      wifi: cw1200: Fix potential memory leak in cw1200_bh_rx_helper()
-
-Benjamin Berg (2):
-      wifi: mac80211: track MU-MIMO configuration on disabled interfaces
-      wifi: mac80211: make monitor link info check more specific
-
-Chien Wong (1):
-      wifi: cfg80211: fix doc of struct key_params
-
-Emmanuel Grumbach (1):
-      wifi: cfg80211: use a C99 initializer in wiphy_register
-
-Johannes Berg (18):
-      wifi: ieee80211: split mesh definitions out
-      wifi: ieee80211: split HT definitions out
-      wifi: ieee80211: split VHT definitions out
-      wifi: ieee80211: split HE definitions out
-      wifi: ieee80211: split EHT definitions out
-      wifi: ieee80211: split S1G definitions out
-      wifi: ieee80211: split P2P definitions out
-      wifi: ieee80211: split NAN definitions out
-      wifi: cfg80211: fix EHT typo
-      wifi: mac80211: fix EHT typo
-      wifi: mac80211: make link iteration safe for 'break'
-      wifi: mac80211: remove chanctx to link back-references
-      wifi: mac80211: simplify ieee80211_recalc_chanctx_min_def() API
-      wifi: mac80211: add and use chanctx usage iteration
-      wifi: mac80211: remove "disabling VHT" message
-      wifi: mac80211: pass frame type to element parsing
-      wifi: mac80211: remove unnecessary vlan NULL check
-      Merge tag 'ath-next-20251111' of git://git.kernel.org/pub/scm/linux/kernel/git/ath/ath
-
-Manish Dharanenthiran (2):
-      wifi: ath12k: Make firmware stats reset caller-driven
-      wifi: ath12k: Fix timeout error during beacon stats retrieval
-
-Pagadala Yesu Anjaneyulu (2):
-      wifi: cfg80211/mac80211: clean up duplicate ap_power handling
-      wifi: cfg80211/mac80211: Add fallback mechanism for INDOOR_SP connection
-
- drivers/net/wireless/ath/ath12k/core.c    |    2 -
- drivers/net/wireless/ath/ath12k/core.h    |    1 -
- drivers/net/wireless/ath/ath12k/debugfs.c |    9 +-
- drivers/net/wireless/ath/ath12k/mac.c     |   15 +-
- drivers/net/wireless/ath/ath12k/wmi.c     |   12 +-
- drivers/net/wireless/st/cw1200/bh.c       |    6 +-
- include/linux/ieee80211-eht.h             | 1182 +++++++++++
- include/linux/ieee80211-he.h              |  824 +++++++
- include/linux/ieee80211-ht.h              |  292 +++
- include/linux/ieee80211-mesh.h            |  230 ++
- include/linux/ieee80211-nan.h             |   35 +
- include/linux/ieee80211-p2p.h             |   71 +
- include/linux/ieee80211-s1g.h             |  575 +++++
- include/linux/ieee80211-vht.h             |  236 ++
- include/linux/ieee80211.h                 | 3308 +----------------------------
- include/net/cfg80211.h                    |   34 +-
- include/net/mac80211.h                    |    2 +-
- net/mac80211/agg-rx.c                     |    7 +-
- net/mac80211/cfg.c                        |   47 +-
- net/mac80211/chan.c                       |  397 ++--
- net/mac80211/driver-ops.c                 |    8 +-
- net/mac80211/he.c                         |    6 +-
- net/mac80211/ibss.c                       |   14 +-
- net/mac80211/ieee80211_i.h                |   50 +-
- net/mac80211/iface.c                      |   46 +-
- net/mac80211/link.c                       |    5 -
- net/mac80211/main.c                       |    3 +-
- net/mac80211/mesh.c                       |   26 +-
- net/mac80211/mesh_hwmp.c                  |    7 +-
- net/mac80211/mesh_plink.c                 |    7 +-
- net/mac80211/mlme.c                       |   71 +-
- net/mac80211/parse.c                      |   30 +-
- net/mac80211/scan.c                       |    6 +-
- net/mac80211/tdls.c                       |   12 +-
- net/mac80211/tests/elems.c                |    4 +-
- net/mac80211/util.c                       |   37 +-
- net/wireless/core.c                       |   12 +-
- net/wireless/core.h                       |    3 +-
- net/wireless/nl80211.c                    |    4 +-
- net/wireless/scan.c                       |   20 +-
- 40 files changed, 4003 insertions(+), 3653 deletions(-)
- create mode 100644 include/linux/ieee80211-eht.h
- create mode 100644 include/linux/ieee80211-he.h
- create mode 100644 include/linux/ieee80211-ht.h
- create mode 100644 include/linux/ieee80211-mesh.h
- create mode 100644 include/linux/ieee80211-nan.h
- create mode 100644 include/linux/ieee80211-p2p.h
- create mode 100644 include/linux/ieee80211-s1g.h
- create mode 100644 include/linux/ieee80211-vht.h
+Thank you.
 
