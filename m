@@ -1,97 +1,86 @@
-Return-Path: <netdev+bounces-238053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B988C5391D
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 18:04:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 851D4C53690
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 17:33:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2393A501939
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 15:56:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C91F742557D
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 15:58:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D520033D6F8;
-	Wed, 12 Nov 2025 15:52:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38EA8341648;
+	Wed, 12 Nov 2025 15:55:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="BdPMQ8BF"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5270345CCE;
-	Wed, 12 Nov 2025 15:52:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D67ED33D6EC
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 15:55:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762962762; cv=none; b=ScKHj0MBMcA0OYDV1P1aiG4fmWjlsXAX50Y1p0dbMsku1xGFPvKZqeT2fH19vV4a6ZxoLgnSlIC9NkbdkKLYrwX7SDzp8RbyPDn/l5WNgFrH33AuYxR9ZXcSiJX3SaWCLMa8LEpis18qIVgALMCPQ+/fOch9Da5mhwfuR3nzEWk=
+	t=1762962954; cv=none; b=pMQqztDMjVrKDcDoQ1uDRvM8+5+uTwlTu5eiUhSsUyZOBl2+vlYA1ghPWbydXPZcXC3+b7m3dfW8DNvg00gvnvOjOTdx5Ra0kNVmm9PPUu33c0++MGeu+BGEycbrS8VErHSz6QVaSQ6NyKX0AgO3T0HU+Nuc7ETIwnW/6GLZ4BM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762962762; c=relaxed/simple;
-	bh=tJQmVMBzXqzfy2F5Zr9Z3nKiABV7RFJ9zHRHQMzsY8I=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QsHmwmFjd0m8Lk90t4LxAfOdCQ4XnbT4Iz38qVDOb8tsYsmoA/cHRUsMfK2pVViJTFOEiyOKYZR5sM56I9W10oxMWVaVNgn6tz2cvyCjKhsGt6GtnPFHw6AHm6Db0J94Oh3yVHFwOjaWJhV3IrJ5qaHjrgZ6exQfdxnguelcoyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4d67FK5GtFzJ46dm;
-	Wed, 12 Nov 2025 23:52:05 +0800 (CST)
-Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
-	by mail.maildlp.com (Postfix) with ESMTPS id 6FAF414038F;
-	Wed, 12 Nov 2025 23:52:38 +0800 (CST)
-Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
- (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 12 Nov
- 2025 15:52:37 +0000
-Date: Wed, 12 Nov 2025 15:52:36 +0000
-From: Jonathan Cameron <jonathan.cameron@huawei.com>
-To: <alejandro.lucero-palau@amd.com>
-CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
-	<dave.jiang@intel.com>, Alejandro Lucero <alucerop@amd.com>, Ben Cheatham
-	<benjamin.cheatham@amd.com>
-Subject: Re: [PATCH v20 07/22] cxl/sfc: Map cxl component regs
-Message-ID: <20251112155236.00006e84@huawei.com>
-In-Reply-To: <20251112154504.00007eb8@huawei.com>
-References: <20251110153657.2706192-1-alejandro.lucero-palau@amd.com>
-	<20251110153657.2706192-8-alejandro.lucero-palau@amd.com>
-	<20251112154504.00007eb8@huawei.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1762962954; c=relaxed/simple;
+	bh=sy7RM1ynApjR9oHxBXwGPgxqq1j6rQIWu1zSMYe9TF8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DSibfOLcDyp9wKxCdodVbKNqCkgbUZh5YUemri/NxuACTbpCr60K+VUKSuGNAROHvq4M5NG6hse1WCAMOcuMbXL8WPBHs5oKbw/wpvSt+8QfQsUdUPZFcAtTNA891QYFUZuwnivnxyQlNnzI4Y7D/68WXLxUyMJiJA4B9WjXdy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=BdPMQ8BF; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=elLG3G1DYO7aJGMInpk4Xr+4Jq3CjkQn2oipPw9V8e4=; b=BdPMQ8BF+p1MrAFNnU+Tu9tYhK
+	W7Gqfac9RLZqD1i7+jzsrUb2Gc7VWnTqMMZSDt1LQ+f5U7hypKcVD7/dOwvBZ2rUqVfXVlCQ+bZfp
+	IH2kE2HRILxSEnV1jgw1cMajNwaxKvITU/zkY40lvrSVT4pt+NzniOr3dKk1D4Vmbktib031Gq+Qe
+	GYuL1N04dYzatuIv3xIaLEv70WiyLeH1Xw0a1cIoHJyPvZmGi7BfV6kDs+rvj81VeoNZVT0o4fvLk
+	ppRKvXJ2CqCCK0PBmPwFOqNk7lY2y9y4AJmFYQFIXtiLy1Nqgr1KithJYhZKciSACOEN+WHP2oWGD
+	g+eVubXQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56438)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.98.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1vJDCH-000000004Cm-2WaU;
+	Wed, 12 Nov 2025 15:55:49 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.98.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1vJDCG-0000000040M-1dym;
+	Wed, 12 Nov 2025 15:55:48 +0000
+Date: Wed, 12 Nov 2025 15:55:48 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH] net: dp83822/dp83tc811: do not blacklist EEE for now
+Message-ID: <aRSuBOxAZf3tN-hk@shell.armlinux.org.uk>
+References: <aRRGbAR26GuyKKZl@shell.armlinux.org.uk>
+ <20251112135935.266945-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100011.china.huawei.com (7.191.174.247) To
- dubpeml100005.china.huawei.com (7.214.146.113)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20251112135935.266945-1-o.rempel@pengutronix.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Wed, 12 Nov 2025 15:45:04 +0000
-Jonathan Cameron <jonathan.cameron@huawei.com> wrote:
+On Wed, Nov 12, 2025 at 02:59:35PM +0100, Oleksij Rempel wrote:
+> Note: dp83tc811 wires phydev->autoneg to control SGMII autoneg, which
+> can't be proper decision. But it is a different issue.
 
-> On Mon, 10 Nov 2025 15:36:42 +0000
-> alejandro.lucero-palau@amd.com wrote:
-> 
-> > From: Alejandro Lucero <alucerop@amd.com>
-> > 
-> > Export cxl core functions for a Type2 driver being able to discover and
-> > map the device component registers.
-> > 
-> > Use it in sfc driver cxl initialization.
-> > 
-> > Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> > Reviewed-by: Dan Williams <dan.j.williams@intel.com>
-> > Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> > Reviewed-by: Dave Jiang <dave.jiang@intel.com>
-> > Reviewed-by: Ben Cheatham <benjamin.cheatham@amd.com>  
-> 
-> Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
-> 
-> > ---  
-> Side note that it would be really handy when we are down to this last
-> version or so before merge to have a short change log in each patch
-> (here under the ---)  Saves a bunch of reviewer time checking back on what
-> we need to look out for when it might be trivial:
-> such as the patch description change in this one
-Oops. Replied to wrong patch.  This was meant to be on 08.
+Yep, that is just wrong. You didn't state whether you are happy with my
+plan to squash this into my patch. What would you like to happen with
+authorship etc?
 
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
