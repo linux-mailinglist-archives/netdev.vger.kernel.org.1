@@ -1,92 +1,84 @@
-Return-Path: <netdev+bounces-238030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [IPv6:2a01:60a::1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67C97C52ECD
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 16:15:13 +0100 (CET)
+Received: from ams.mirrors.kernel.org (ams.mirrors.kernel.org [213.196.21.55])
+	by mail.lfdr.de (Postfix) with ESMTPS id D46F8C52EEA
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 16:16:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ams.mirrors.kernel.org (Postfix) with ESMTPS id 2AE1135389B
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 15:04:29 +0000 (UTC)
+	by ams.mirrors.kernel.org (Postfix) with ESMTPS id A6571356E2A
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 15:05:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE7EB33D6F8;
-	Wed, 12 Nov 2025 14:57:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NATvYEnD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 412B5347FCA;
+	Wed, 12 Nov 2025 14:57:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B544933BBA4;
-	Wed, 12 Nov 2025 14:57:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12DE4347BC9;
+	Wed, 12 Nov 2025 14:57:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762959442; cv=none; b=s/vYBAKCPQd4vd3oXL03IStH/A6NiVr3mIWIlGaZpnhn3gZQh6zQT0MeYGtpKcB0O3q6n2Gts5/tYtn35AsYcIaONeG5GUOsxEkvSFyP1x7z4p7IqA1ynBzWShGNjv8vbgrybccOdzyVjvU7QhGeAadhhewm6Y5uRdo9/rKbqqo=
+	t=1762959471; cv=none; b=Egpi3kPnKli2UUGrqVQRmK1F/3KeIThpXfSJTcTRSOzrQ2ANG45Q4eLx9FyFBH5hR2JoAkHHPn//HDsSWbYbKQtUHTVUZHl3HU3y8c04Y8kFHTSiGXP7l23PKcwL7hOPkixMdjKske4iKTy/yQ4ESW78rBLBO1KztCUnLZShwRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762959442; c=relaxed/simple;
-	bh=5xBz4HsC6lNkPpfpPsm7ohmMixPyiH3CxITYUK1Do08=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=N474olH4baySBzSZf/9GMKNCIucAeiHQBBUXrgI78jilB5AJAbXInnIDwd+3Q4T68HLAUNKk+5HhQax28Q1tSLN4pCBh67vRVCoGLjZe0gYaV50Rpnkm67HroyUfAWP1ESAbhmNZH6+pdoz2fXn3OVOzjYHPNCy8jDqKFMaW8BE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NATvYEnD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC66DC19421;
-	Wed, 12 Nov 2025 14:57:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1762959442;
-	bh=5xBz4HsC6lNkPpfpPsm7ohmMixPyiH3CxITYUK1Do08=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NATvYEnDqpBXuxiSQBGqf7jsc0R7JWOZmMQcmRHdjZUnMICciuBiEOqIqeQ21/abT
-	 G3r21SoZ+Jy6VUOQs2xU6OdnM8nM+wVCP7f26ggFL60i8bUjAqfgwVPFfiYu5zDT6o
-	 ukPrQ5jDJ7+n0TTlLmv1/7qLrGmqgPRNKZDfnb6Yryy3D7z8rQTCltzHgwYHtgDmZR
-	 nya41DN0KieLgENo1Zk70cgpXhwHscCUGLxAVtpze+Hf+FVSEXpAbdQym1MxVfcxl6
-	 i+QyVv6OG0S00f/fmgUEE1BABsOlKGytSf23Sp9NkVvSZJAeT61bXB/fuHNuEuH1sm
-	 /oZAtkDarT/Zw==
-Date: Wed, 12 Nov 2025 06:57:20 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Yao Zi <ziyao@disroot.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Yanteng Si <si.yanteng@linux.dev>, Huacai Chen
- <chenhuacai@kernel.org>, "Russell King (Oracle)"
- <rmk+kernel@armlinux.org.uk>, Philipp Stanner <phasta@kernel.org>, Tiezhu
- Yang <yangtiezhu@loongson.cn>, Qunqin Zhao <zhaoqunqin@loongson.cn>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, Furong Xu <0x1207@gmail.com>,
- Kunihiko Hayashi <hayashi.kunihiko@socionext.com>, Jacob Keller
- <jacob.e.keller@intel.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v4 1/3] net: stmmac: Add generic suspend/resume
- helper for PCI-based controllers
-Message-ID: <20251112065720.017c4d07@kernel.org>
-In-Reply-To: <20251111100727.15560-3-ziyao@disroot.org>
-References: <20251111100727.15560-2-ziyao@disroot.org>
-	<20251111100727.15560-3-ziyao@disroot.org>
+	s=arc-20240116; t=1762959471; c=relaxed/simple;
+	bh=aTwqvPfWOeYJQqqzPM5NDZoXgiN4DjHpYrR/AV+lr5M=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=V971PUpCuHxUJyhRoHPMaTZLnaEpe66kvx+Ewh6NZOYalMnM+b937rnOMuMjciR6N6t+iP0GaT899h+OIwPoo9iQasnKoGK/gUOEDJTszXZ9vhITtIXfhlZghyFNJwyIZq5pwdG6Q+bmT7zHzeYZ88K1ZcTbiOekCeCr+YdAD6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTPS id 4d662H4kKXzHnH8m;
+	Wed, 12 Nov 2025 22:57:27 +0800 (CST)
+Received: from dubpeml100005.china.huawei.com (unknown [7.214.146.113])
+	by mail.maildlp.com (Postfix) with ESMTPS id E0042140371;
+	Wed, 12 Nov 2025 22:57:46 +0800 (CST)
+Received: from localhost (10.203.177.15) by dubpeml100005.china.huawei.com
+ (7.214.146.113) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.36; Wed, 12 Nov
+ 2025 14:57:46 +0000
+Date: Wed, 12 Nov 2025 14:57:44 +0000
+From: Jonathan Cameron <jonathan.cameron@huawei.com>
+To: <alejandro.lucero-palau@amd.com>
+CC: <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
+	<dave.jiang@intel.com>
+Subject: Re: [PATCH v20 02/22] cxl/port: Arrange for always synchronous
+ endpoint attach
+Message-ID: <20251112145744.0000595f@huawei.com>
+In-Reply-To: <20251110153657.2706192-3-alejandro.lucero-palau@amd.com>
+References: <20251110153657.2706192-1-alejandro.lucero-palau@amd.com>
+	<20251110153657.2706192-3-alejandro.lucero-palau@amd.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100009.china.huawei.com (7.191.174.83) To
+ dubpeml100005.china.huawei.com (7.214.146.113)
 
-On Tue, 11 Nov 2025 10:07:26 +0000 Yao Zi wrote:
-> +config STMMAC_LIBPCI
-> +	tristate "STMMAC PCI helper library"
-> +	depends on PCI
-> +	default y
-> +	help
-> +	  This selects the PCI bus helpers for the stmmac driver. If you
-> +	  have a controller with PCI interface, say Y or M here.
+On Mon, 10 Nov 2025 15:36:37 +0000
+alejandro.lucero-palau@amd.com wrote:
 
-I didn't pay enough attention to the discussion on v2, sorry.
-I understand that there's precedent for a library symbol hiding
-real symbols in this driver but it really makes for a poor user
-experience.
+> From: Dan Williams <dan.j.williams@intel.com>
+> 
+> Make it so that upon return from devm_cxl_add_endpoint() that
+> cxl_mem_probe() can assume that the endpoint has had a chance to complete
+> cxl_port_probe().
+> 
+> I.e. cxl_port module loading has completed prior to device registration.
+> 
+> MODULE_SOFTDEP() is not sufficient for this purpose, but a hard link-time
+> dependency is reliable.
+> 
+> Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+Reviewed-by: Jonathan Cameron <jonathan.cameron@huawei.com>
 
-The symbol should be hidden, and select'ed by what needs it.
-With the PCI dependency on the real symbol, not here.
-
-The "default y" may draw the attention of the Superior Penguin.
-He may have quite a lot to criticize in this area, so let's
-not risk it..
 
