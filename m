@@ -1,282 +1,155 @@
-Return-Path: <netdev+bounces-238085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-238086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4803BC53F0E
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 19:41:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 383C8C53F29
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 19:42:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D2B93B3D84
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 18:37:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6397A3B466A
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 18:38:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D5B534D92E;
-	Wed, 12 Nov 2025 18:27:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E57234DCC5;
+	Wed, 12 Nov 2025 18:27:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nz4nFM7R"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="pZESgGhG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EF6E347BB6
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 18:27:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED48234B410;
+	Wed, 12 Nov 2025 18:27:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762972043; cv=none; b=by2czXY2hCKux7Hr8wrHIKwkrcmhU6ejEMgqZ0OeBHamS3IpOgyZ5kR/EoPhovXN170puqi+9Q4Oh9HgRUCvkDopUIVGdGv7DoOEin68YGg+Oa1KD4wHJmgEUYRotPC+bZuvzcCk/FjfUkaFttknjwDgEtZFCnKGCNS4EgxgTJw=
+	t=1762972060; cv=none; b=lYYM1v9EZk+cOrbnB1xwMbzmfotDWj8LeZ3pu2Yj4WmIySkkCy2Ped0yTlYcTtyBHyUH32Ww8TSRifh3H3RTQ2m6TU6QNNugTBEy5Of9XWFbnPUkRs71TbkrKb6vWK8gqC8hyJyp1Y7OpL9lsfn6wgOTwk0aIDxobphsVy9WCFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762972043; c=relaxed/simple;
-	bh=t9WH0uIA0Kd5iVPDGi3VBM9RJJsL30m93Ocqn2bvwTY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GFdB2NAaX5NIYmW7LdJgjpjKX/5a5KDsnYsvZHMsdsw8G0dL8jMdplLUGP4Vs1Ry5T9ToHtdnVFnqhvBD2d15x6N/9m2mEutUvCI6ZN0Mfz6yfQtAMJo9AyCcm6KDEBicQLxe76EKbkZ1ON9+RqMOOa474kGibnlOsnBAHQIQ7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nz4nFM7R; arc=none smtp.client-ip=209.85.128.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-78665368a5cso12099847b3.3
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 10:27:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1762972040; x=1763576840; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kn4iJ576u/8r69eAmbE1/5rsoTHMVU1gXmFF80Gkt/s=;
-        b=Nz4nFM7RRsGZORcMyP1ZJXgR+glf+eHfJUMWYH7nhtTojAIbFV+StSznpgQRZ+LzDW
-         jedLyy66Zg6EJszrHY1H7xC9gns4OxbZ2OS5waC/QNs1hu+xLnuVpZE+rPq1SCfBmJg6
-         HYZ+db6bIBtckenS4UV0FRHxOlnrWGtCiQrHbzJ4pUquQNglGJE8ReSIwk7EWUvd84vP
-         Z1oRS1bKpl3C2El95gc/4Z4fGE5SM9iMUujCGf22D3VsBLMcqRrupynAuJpWv+iovRFA
-         xKpqhpoWk6fcSyBgnx1k14bwPEy0jGgdorls+Maps6I3lZ2t2vprvvVacKG4lENkOm6v
-         nPUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762972040; x=1763576840;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Kn4iJ576u/8r69eAmbE1/5rsoTHMVU1gXmFF80Gkt/s=;
-        b=osv/d7Q1kYb0L5XQ5wUqwE5CXoERuDnzakoFNJ3F6dmA++DBWxiOmjkWF2YY3tjIHZ
-         AfGeGY3fOI8QEM/ams8Ng347fx8bMvf7zxjXT6nZP3w7zNjN4cQjwzc8mQH2IzbjYRDT
-         12mIuPx/K+5Y5glo7Dm6WbEaBlQT+Sxr7vPFhsKuenqmF0R08dmIOhlndMa80SsMnnUg
-         v1Re1NVkjf68P4i+KyVj79hdbYDBYSNwsW6B9NVfcbaPMz5OKnuP1UdJFGPuE0tu/Se9
-         Y8b6jLFytM/KvKHaRufld/5al2BtDnpOYi+tuA30AiVYTruXiD2p78UDMb/j5jneY5vS
-         DEsg==
-X-Forwarded-Encrypted: i=1; AJvYcCWafJPCk79pCrQRGKpKgj3vP0lNUL20KrghBFwqO9OLjSU9s5/VbGKPEBzp9k6faC36cktbuTE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXhNQJRUmfmL2ufN81xQbEwWEb0J8PmfZyXWJRdBNVGqFaFxF7
-	XQLRV7iragN5mYY/eaOJOxpsLkkxTJbsDTEYGQgOHsLTLcmVj6WxEOSx
-X-Gm-Gg: ASbGnctICZEu6GXvkIPzxg1SUvo9n7i4N2gHn3yfaVx7qkhbzLPYQ8pN/rSTAvSjTo3
-	fs21q1McQqMNIn3YZJrDH4VPoirgBesqRETbVfHc9s9qM6zPZ4rgq0/FOBBkTCK+oRrPTGhXQC7
-	FmBn0oyAzZ3F/xS0UvEoWTzPjyyRN5n0a5zARxaB1WZ/GPh++iR52vYIR/V2gl4uD5DLeLYzSs3
-	MnZ13YAFzCdnBQQ8DhMsHnZ9xXwaVFMZVyEWm/ncmhFrDW/LEaLNspzRF0nOA2e6n6CJ8bpXB8x
-	I6znHqReqJUSxad32PZD43oyh2n+v6YEGcgBhDAfoNkDVtkzUo2esgmRY3Znbc98t7A8rlhcsrm
-	y7G7wNnqJ4VxZA69vh4ZU9OYhhvHwMAOMiDD/jZ+vClIaA6vmgRNNNHDWHASlDA7kUmaZtX0dNL
-	kP7VB5ltF/wp5kJ3O834Vb9XjTUTdDRymuNEnTM7VoCz7tY2A=
-X-Google-Smtp-Source: AGHT+IFtItqGMv7c9zs0jQHS1j4i/TwYkKYfFZ78q75Lc+7yrpynqEhiYQ57+QLFTujVr5ZJ9SSG/A==
-X-Received: by 2002:a05:690c:a9a:b0:786:82fc:ab57 with SMTP id 00721157ae682-788136f832emr34080737b3.67.1762972040554;
-        Wed, 12 Nov 2025 10:27:20 -0800 (PST)
-Received: from devvm11784.nha0.facebook.com ([2a03:2880:25ff:5e::])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-787d69e9dbesm44067957b3.42.2025.11.12.10.27.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Nov 2025 10:27:19 -0800 (PST)
-Date: Wed, 12 Nov 2025 10:27:18 -0800
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Shuah Khan <shuah@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryan-bt.tan@broadcom.com>,
-	Vishnu Dasa <vishnu.dasa@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	Sargun Dhillon <sargun@sargun.me>, berrange@redhat.com,
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v9 06/14] vsock/loopback: add netns support
-Message-ID: <aRTRhk/ok06YKTEu@devvm11784.nha0.facebook.com>
-References: <20251111-vsock-vmtest-v9-0-852787a37bed@meta.com>
- <20251111-vsock-vmtest-v9-6-852787a37bed@meta.com>
- <g6bxp6hketbjrddzni2ln37gsezqvxbu2orheorzh7fs66roll@hhcrgsos3ui3>
+	s=arc-20240116; t=1762972060; c=relaxed/simple;
+	bh=hpR5/eJy84xl7p8JuOygWtFX0UiA00tX14otHuZG1bg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pq4QFejgHotAOXvuoc+gJN18wJeTkoJSJgsI3+O2sfvQ9L9dRZNF9YLlOULnTcouXuzsD7k30Y0zQY5BEL4AoDghadnltzj4K+gzwA4RYbDBMTaYCd2pzUmwwSHaf+KYYl9GlxweMgpeGA4OegYaoLhNnrfaDhuHc1IWc/oYgP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=pZESgGhG; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5ACEacDX003733;
+	Wed, 12 Nov 2025 18:27:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=yL4OSp/QnzWt3dJWOnGVF2xym4tQkPDmZN3+yy/+K
+	mo=; b=pZESgGhGrmWK+EJK4wtGfxGlyoMYV4NlzQuG2rKqy4vAbu4QlnMhbON3h
+	gJkp+HuRtUKO8lu2b5qWP2abAFHljUn1YaYxprwIIqW+6IJH2jntdWywhShHtMt3
+	5GdDMuwgvyiMK/Dj9TmwFJVRKPnClw0q0hqvpZHarWITaWrk6jEKQ7/n7OToFJwf
+	WVlZipQgxX5p4Z+GZoa5aSMYGfgeOdW+qyz99z/dRLcf8CgvwGXE5HzPJqrqrwqu
+	gDjd2Ir8NbO44YjDsESmOXN9FEG+7aqCQ2CDnMDF8QJN8LHkkustm1O29yVRH+JN
+	fvJ92hWoD2obT4x7Ofl3NbppUKBAQ==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aa5cjaygm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Nov 2025 18:27:30 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.1.12/8.18.0.8) with ESMTP id 5ACIP80i025729;
+	Wed, 12 Nov 2025 18:27:29 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4aa5cjaygg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Nov 2025 18:27:29 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 5ACGNmTc007298;
+	Wed, 12 Nov 2025 18:27:28 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 4aajdjhn8r-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 12 Nov 2025 18:27:28 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 5ACIRPBu42991956
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 12 Nov 2025 18:27:25 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id F1FEC20040;
+	Wed, 12 Nov 2025 18:27:24 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B272620043;
+	Wed, 12 Nov 2025 18:27:24 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 12 Nov 2025 18:27:24 +0000 (GMT)
+From: Aswin Karuvally <aswin@linux.ibm.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Alexandra Winter <wintera@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>,
+        Aleksei Nikiforov <aleksei.nikiforov@linux.ibm.com>
+Subject: [PATCH net-next] s390/ctcm: Fix double-kfree
+Date: Wed, 12 Nov 2025 19:27:24 +0100
+Message-ID: <20251112182724.1109474-1-aswin@linux.ibm.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <g6bxp6hketbjrddzni2ln37gsezqvxbu2orheorzh7fs66roll@hhcrgsos3ui3>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Authority-Analysis: v=2.4 cv=Ss+dKfO0 c=1 sm=1 tr=0 ts=6914d192 cx=c_pps
+ a=AfN7/Ok6k8XGzOShvHwTGQ==:117 a=AfN7/Ok6k8XGzOShvHwTGQ==:17
+ a=6UeiqGixMTsA:10 a=VkNPw1HP01LnGYTKEx00:22 a=VnNF1IyMAAAA:8
+ a=mK5E5EQbiCHRqPeLpLsA:9 a=cPQSjfK2_nFv0Q5t_7PE:22
+X-Proofpoint-Spam-Details-Enc: AW1haW4tMjUxMTA4MDA5NSBTYWx0ZWRfX9rWG15lTk1A8
+ SGd8iwaDnTt5D4pmlz4zCd4erdbczTnElyVt23794RW4CsWRzsrkFA1y9zmxcRmF5jjzuVIEo/4
+ 8EScwxFJF0RY1CgRJ1stg+ecp5rwi2ZBgbMxCnz07xsxOzEGKPCkdFdWpdnjAuRXEnc8TUZ1+il
+ wNt5pWusvFvNdFRN68dbHSO3lBFUrf6hwM0omO8W2AfGGZiGu38FzC/RJtR1Vu8qpARjVHeBC5V
+ 2s2qd5wj//Puuod/mKUypsOHsJWWESfrd903J8VXAHYCLrMsSpm3CKipAvN8N2BfKv0dnAtrHyV
+ r/naOdRlFB++0oaS0pOmF3r9elHudvvQGFQ1YaCNNy9wgblpV2uY1rWOGWMv+t9S9GJFnz70cL6
+ N1Zg0tUxtTyvk83QB/oWT/YMtlGaHA==
+X-Proofpoint-GUID: N5Q1zVAlqHOIsiTAnsxT2r7BkCD5uw0P
+X-Proofpoint-ORIG-GUID: MPLBTN_jhWxzU3KlOT2xzl11XveEXbMB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1121,Hydra:6.1.9,FMLib:17.12.100.49
+ definitions=2025-11-12_06,2025-11-11_03,2025-10-01_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1015 suspectscore=0 impostorscore=0 bulkscore=0 phishscore=0
+ lowpriorityscore=0 adultscore=0 priorityscore=1501 spamscore=0 malwarescore=0
+ classifier=typeunknown authscore=0 authtc= authcc= route=outbound adjust=0
+ reason=mlx scancount=1 engine=8.19.0-2510240000 definitions=main-2511080095
 
-On Wed, Nov 12, 2025 at 03:19:47PM +0100, Stefano Garzarella wrote:
-> On Tue, Nov 11, 2025 at 10:54:48PM -0800, Bobby Eshleman wrote:
-> > From: Bobby Eshleman <bobbyeshleman@meta.com>
-> > 
-> > Add NS support to vsock loopback. Sockets in a global mode netns
-> > communicate with each other, regardless of namespace. Sockets in a local
-> > mode netns may only communicate with other sockets within the same
-> > namespace.
-> > 
-> > Signed-off-by: Bobby Eshleman <bobbyeshleman@meta.com>
-> > ---
-> > Changes in v9:
-> > - remove per-netns vsock_loopback and workqueues, just re-using
-> >  the net and net_mode in skb->cb achieved the same result in a simpler
-> >  way. Also removed need for pernet_subsys.
-> > - properly track net references
-> > 
-> > Changes in v7:
-> > - drop for_each_net() init/exit, drop net_rwsem, the pernet registration
-> >  handles this automatically and race-free
-> > - flush workqueue before destruction, purge pkt list
-> > - remember net_mode instead of current net mode
-> > - keep space after INIT_WORK()
-> > - change vsock_loopback in netns_vsock to ->priv void ptr
-> > - rename `orig_net_mode` to `net_mode`
-> > - remove useless comment
-> > - protect `register_pernet_subsys()` with `net_rwsem`
-> > - do cleanup before releasing `net_rwsem` when failure happens
-> > - call `unregister_pernet_subsys()` in `vsock_loopback_exit()`
-> > - call `vsock_loopback_deinit_vsock()` in `vsock_loopback_exit()`
-> > 
-> > Changes in v6:
-> > - init pernet ops for vsock_loopback module
-> > - vsock_loopback: add space in struct to clarify lock protection
-> > - do proper cleanup/unregister on vsock_loopback_exit()
-> > - vsock_loopback: use virtio_vsock_skb_net()
-> > 
-> > Changes in v5:
-> > - add callbacks code to avoid reverse dependency
-> > - add logic for handling vsock_loopback setup for already existing
-> >  namespaces
-> > ---
-> > net/vmw_vsock/vsock_loopback.c | 41 ++++++++++++++++++++++++++++++++++++++++-
-> > 1 file changed, 40 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
-> > index d3ac056663ea..e62f6c516992 100644
-> > --- a/net/vmw_vsock/vsock_loopback.c
-> > +++ b/net/vmw_vsock/vsock_loopback.c
-> > @@ -32,6 +32,9 @@ static int vsock_loopback_send_pkt(struct sk_buff *skb, struct net *net,
-> > 	struct vsock_loopback *vsock = &the_vsock_loopback;
-> > 	int len = skb->len;
-> > 
-> > +	virtio_vsock_skb_set_net(skb, net);
-> > +	virtio_vsock_skb_set_net_mode(skb, net_mode);
-> > +
-> > 	virtio_vsock_skb_queue_tail(&vsock->pkt_queue, skb);
-> > 	queue_work(vsock->workqueue, &vsock->pkt_work);
-> > 
-> > @@ -116,8 +119,10 @@ static void vsock_loopback_work(struct work_struct *work)
-> > {
-> > 	struct vsock_loopback *vsock =
-> > 		container_of(work, struct vsock_loopback, pkt_work);
-> > +	enum vsock_net_mode net_mode;
-> > 	struct sk_buff_head pkts;
-> > 	struct sk_buff *skb;
-> > +	struct net *net;
-> > 
-> > 	skb_queue_head_init(&pkts);
-> > 
-> > @@ -131,7 +136,41 @@ static void vsock_loopback_work(struct work_struct *work)
-> > 		 */
-> > 		virtio_transport_consume_skb_sent(skb, false);
-> > 		virtio_transport_deliver_tap_pkt(skb);
-> > -		virtio_transport_recv_pkt(&loopback_transport, skb, NULL, 0);
-> > +
-> > +		/* In the case of virtio_transport_reset_no_sock(), the skb
-> > +		 * does not hold a reference on the socket, and so does not
-> > +		 * transitively hold a reference on the net.
-> > +		 *
-> > +		 * There is an ABA race condition in this sequence:
-> > +		 * 1. the sender sends a packet
-> > +		 * 2. worker calls virtio_transport_recv_pkt(), using the
-> > +		 *    sender's net
-> > +		 * 3. virtio_transport_recv_pkt() uses t->send_pkt() passing the
-> > +		 *    sender's net
-> > +		 * 4. virtio_transport_recv_pkt() free's the skb, dropping the
-> > +		 *    reference to the socket
-> > +		 * 5. the socket closes, frees its reference to the net
-> > +		 * 6. Finally, the worker for the second t->send_pkt() call
-> > +		 *    processes the skb, and uses the now stale net pointer for
-> > +		 *    socket lookups.
-> > +		 *
-> > +		 * To prevent this, we acquire a net reference in vsock_loopback_send_pkt()
-> > +		 * and hold it until virtio_transport_recv_pkt() completes.
-> > +		 *
-> > +		 * Additionally, we must grab a reference on the skb before
-> > +		 * calling virtio_transport_recv_pkt() to prevent it from
-> > +		 * freeing the skb before we have a chance to release the net.
-> > +		 */
-> > +		net_mode = virtio_vsock_skb_net_mode(skb);
-> > +		net = virtio_vsock_skb_net(skb);
-> 
-> Wait, we are adding those just for loopback (in theory used only for
-> testing/debugging)? And only to support virtio_transport_reset_no_sock() use
-> case?
+From: Aleksei Nikiforov <aleksei.nikiforov@linux.ibm.com>
 
-Yes, exactly, only loopback + reset_no_sock(). The issue doesn't exist
-for vhost-vsock because vhost_vsock holds a net reference, and it
-doesn't exist for non-reset_no_sock calls because after looking up the
-socket we transfer skb ownership to it, which holds down the skb -> sk ->
-net reference chain.
+The function 'mpc_rcvd_sweep_req(mpcginfo)' is called conditionally
+from function 'ctcmpc_unpack_skb'. It frees passed mpcginfo.
+After that a call to function 'kfree' in function 'ctcmpc_unpack_skb'
+frees it again.
 
-> 
-> Honestly I don't like this, do we have any alternative?
-> 
-> I'll also try to think something else.
-> 
-> Stefano
+Remove 'kfree' call in function 'mpc_rcvd_sweep_req(mpcginfo)'.
 
+Bug detected by the clang static analyzer.
 
-I've been thinking about this all morning... maybe
-we can do something like this:
+Fixes: 0c0b20587b9f25a2 ("s390/ctcm: fix potential memory leak")
+Reviewed-by: Aswin Karuvally <aswin@linux.ibm.com>
+Signed-off-by: Aleksei Nikiforov <aleksei.nikiforov@linux.ibm.com>
+Signed-off-by: Aswin Karuvally <aswin@linux.ibm.com>
+---
+ drivers/s390/net/ctcm_mpc.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-```
+diff --git a/drivers/s390/net/ctcm_mpc.c b/drivers/s390/net/ctcm_mpc.c
+index 0aeafa772fb1..407b7c516658 100644
+--- a/drivers/s390/net/ctcm_mpc.c
++++ b/drivers/s390/net/ctcm_mpc.c
+@@ -701,7 +701,6 @@ static void mpc_rcvd_sweep_req(struct mpcg_info *mpcginfo)
+ 
+ 	grp->sweep_req_pend_num--;
+ 	ctcmpc_send_sweep_resp(ch);
+-	kfree(mpcginfo);
+ 	return;
+ }
+ 
+-- 
+2.48.1
 
-virtio_transport_recv_pkt(...,  struct sock *reply_sk) {... }
-
-virtio_transport_reset_no_sock(..., reply_sk)
-{
-	if (reply_sk)
-		skb_set_owner_sk_safe(reply, reply_sk)
-
-	t->send_pkt(reply);
-}
-
-vsock_loopback_work(...)
-{
-	virtio_transport_recv_pkt(..., skb, skb->sk);
-}
-
-
-for other transports:
-
-	virtio_transport_recv_pkt(..., skb, NULL);
-
-```
-
-This way 'reply' keeps the sk and sk->net alive even after
-virtio_transport_recv_pkt() frees 'skb'. The net won't be released until
-after 'reply' is freed back on the other side, removing the race.
-
-It makes semantic sense too... for loopback, we already know which sk
-the reply is going back to. For other transports, we don't because
-they're across the virt boundary.
-
-WDYT?
-
-I hate to suggest this, but another option might be to just do nothing?
-In order for this race to have any real effect, a loopback socket must
-send a pkt to a non-existent socket, immediately close(), then the
-namespace deleted, a new namespace created with the same pointer
-address, and finally a new socket with the same port created in that
-namespace, all before the reply RST reaches recv_pkt()... at which point
-the newly created socket would wrongfully receive the RST.
-
-Best,
-Bobby
 
