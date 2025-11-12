@@ -1,161 +1,135 @@
-Return-Path: <netdev+bounces-237958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-237959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from dfw.mirrors.kernel.org (dfw.mirrors.kernel.org [IPv6:2605:f480:58:1:0:1994:3:14])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3353C52072
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 12:41:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91C6BC5203C
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 12:37:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by dfw.mirrors.kernel.org (Postfix) with ESMTPS id 275FB4F6015
-	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 11:29:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E77413A6AA7
+	for <lists+netdev@lfdr.de>; Wed, 12 Nov 2025 11:30:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58A9230DEA7;
-	Wed, 12 Nov 2025 11:29:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9B2A30EF71;
+	Wed, 12 Nov 2025 11:30:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NviFA56M";
-	dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bs7AuGmc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BjVdOQYk"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A133430DD04
-	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 11:29:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CFB430C347
+	for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 11:30:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1762946965; cv=none; b=XEkhjYFE+jhpU6bbWXaLomhvTR1QMrbBOzDvwFmmSqZFle30NMy/XRyFmXh8pbL+xhs1g8cAd4LORiekcAUNwqpvr2h66046VyXKIP29EDAoYbTOiiiVi6ET5GlX2nL9wtOXFONzf7KWZt9cvs614g6D6YukT+AtsNiZFEc35dw=
+	t=1762947037; cv=none; b=o2v2Dxp/8eUOalAliq3j2GpUKsrE+u+X1/Y25vGF4BpjZ+TDv4XuIw7bWVAcbT4s5XXpKpD8byANhTAr3CbfQLMKNJD6OmmBCs+F1WGZOvjhXuG9beHKEIhv7EbQl5QbbMPSjRacmyvMJyey6G/02RWuhjUArincIf1slFd3KqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1762946965; c=relaxed/simple;
-	bh=yRKl92YIodipSDJpj5FM6SuTiPvUzBXwPijlqgd2Fgo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nVOaj32psDAY2glwp1F1gQSYNnV6uc4gnUDQoZn0V8zjrY56IE7gVvGg26J4TS1TbPGqIGA9V+Pt11EWMtTiVWh5tVM1MPEZpZ3VHiXY+Tf9ku5QtcJtKnCTsf/4M44biLp3AKxJBIBK7DZ2HmmLAgvO4pkof7mdHFhhSQMy9nU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NviFA56M; dkim=pass (2048-bit key) header.d=redhat.com header.i=@redhat.com header.b=Bs7AuGmc; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1762946962;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=g+0n/gIH659cLeiKRT95CYm5fjgEisAw12N4OwZEDpM=;
-	b=NviFA56MR+NxgJ+t3DyrYH9JWhLv1VHwW4lL2DTSgl50rqaY9qoxHqKVim4gl53XQ5ofhF
-	IC66nUOh8TNHQV4eFfG2ozk2geHHcFFrPbO11knGLNgFD5vh2h1ul3dG30IedZK3FYNPEK
-	HmUFDr29yhSMHnVUkWAKGMCG0lTQWII=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-563-ZL6Yz-7xNQmoDbq8EKCTBQ-1; Wed, 12 Nov 2025 06:29:21 -0500
-X-MC-Unique: ZL6Yz-7xNQmoDbq8EKCTBQ-1
-X-Mimecast-MFC-AGG-ID: ZL6Yz-7xNQmoDbq8EKCTBQ_1762946961
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-8b2619f07aeso355264885a.0
-        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 03:29:21 -0800 (PST)
+	s=arc-20240116; t=1762947037; c=relaxed/simple;
+	bh=iTAh58xsSTK/DPrCrA9XXO9oOUT/gyUSwdPtMZDZRY4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=STvXr1VDi7jlEm6VGs2IA7ttLxO6l2P02kUu7I4TCLOEbufUrPwEGAi4ynqwuIM4YKdbQdNu8glS4yrq6YYl4YIbKMdAGXIVF/KE5hzZ9SlgYvGn5D9FGBTJsOBVXMmPhNQ9PQYgL4JPy8km1Q4pQOHE4BkkOMeErWHKR6lY8LU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BjVdOQYk; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-47775fb6cb4so5145455e9.0
+        for <netdev@vger.kernel.org>; Wed, 12 Nov 2025 03:30:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=redhat.com; s=google; t=1762946960; x=1763551760; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=g+0n/gIH659cLeiKRT95CYm5fjgEisAw12N4OwZEDpM=;
-        b=Bs7AuGmc0EYmV/rdwxPhAIiv4aHBX4oPjPvVYVLVn//QhJzZsLgOr1IlWvu33IO/Re
-         jq/mO/bb/l+QNylESDtj65grUiUIrhB2lAuPZtdOH10L7fk2dJ3HhBgDBqn+V6In64WA
-         pJo0fJrfNSv/oxMH0CEe+LauEI9ruchQGDQsvadYOLsxdhFGXiDERZ0/2rPkevM0pk1w
-         ZaNBazMPeb9mSAojr3ZfEMAbpBWeUSKpAaDAiZ7ViV1jjWUl6i3TjZBEWrgr+QqOkDi3
-         mCdnt2aIhTzrxirDAfdtmR2j2fqFYJzlmeeyefhdyXu3TkrrE24h3JiVeuczxoZRdeqG
-         nPGA==
+        d=gmail.com; s=20230601; t=1762947034; x=1763551834; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=l/oUH46h86/olGMZU+XghYpDhfAZ96DwWr356lECM4A=;
+        b=BjVdOQYkNn1GugyEtpXSuZbkJ+6NMebvOiOl+vQATSk4DKzy9dP0IzIfF7t7DTxIc0
+         h79Cayo4rd1tZHnm3UF6iP16NquA/XmQD1sqR08B0brtBRUm4ITnOXvc+1xwtwV2k7jX
+         IqISyf0r5iDNq2JTyIpuefvmlX6xXMDkd9TrEWPtwqTgWsn4oyqRRTyIYNo4RHtFR6mP
+         09DYULt2CWaTGcv8PemxgkCUZjwV0kIiNzt5YSy402YM+Flyd34wvMhjIH7WNREJLZoB
+         3ZNkEHdsDRfFf3C6aBNo8t5pZGT8AXJXDZZepxyvwuUsqBbgn11CFPp+iptlcxfzy8jr
+         FszA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1762946960; x=1763551760;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-gg:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=g+0n/gIH659cLeiKRT95CYm5fjgEisAw12N4OwZEDpM=;
-        b=wOZT4XxMxc/VY4NkUBvP85mff4TCyZvZ7VrKBPGb23fd65wz3lg8k0liFIjVB1cl6F
-         dXCMlK7BTiVhQsjvg61u/pvN9/WlT8FJqITyGZaskowmiTE4hnRIrrux6wqlJTBxDhfX
-         a2z7TCaoQES2gB5X1MMNp06ebDsr3GZ3A7Xc9IMbqWkX5WtJff++0aOYXBwOrnhDLYzL
-         2THWMDMxL9Mj1DYGNeced8nszrq+DPpWsnMpis6gEQQRo2hwUEsMbdFqUP5hk9sE+vUx
-         UGsVoIdN7PiZN2sqmqrSz+nVaQXdp6177ZBj4O2i2zQaBEu3Tq7az0xKRf45+EhbgYO2
-         m2hA==
-X-Forwarded-Encrypted: i=1; AJvYcCU+w3jBd1vfI4WwStBTeyjLnA+YIAtglxwzO4xiVc170MenvnfvhwCwXSH3SIketEU+sakrLLw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxP0RKVLYjcOgZWOM5cu7fJpprAX31qY0f9SSGkjBGJnRRPlmw7
-	uB3o6MvtNdBOnhlklot+Ja57c4osoAzEvyId4y8yDFCh/aiwIeirLB8xBnQuXKEtUF66dvagVsZ
-	anLX/GKBUv3GnWX7mY2p0xgChzDKMsGbq2jyKcccpCnZ7bZRJvScN0JxF7g==
-X-Gm-Gg: ASbGnctK2RrlvjQp1tAXHJzaQw4MoAGlaP+w00nux50VE8+u5WAYlJ/8qksBvDVyKSA
-	jmHW+RxPpW+i/7LnKexKxypYIdYoMJ4HeHeOnJ+usAvl2sjSKaBWunq6UKCB9D5wp2zAf8krvfw
-	2yrmqwYLj26x848bZ22J5J9Hn2kVR4zu9cYCYvVKXtZzscIKnm9meahlVAvXarqK4Nf0I+p6voZ
-	WZDj2iwbMM1Aa7ayRFuBaRJ2FAH77tECJs0U+AKL6Dm6E2mpY8OL8eBYNNXp7PrloTUjoZTIcQr
-	gciG9mfXCPMuzbwQqiwRXHh4w4iIi7qXfkjCN+9k1ciSZwhSqyKSihFMel1hzcDMSs83+y39BNM
-	l3x94K+I/lnKggIzpLe6WrGhInQpwIn9E4YVcIKZcv+pM/VZfk10=
-X-Received: by 2002:a05:620a:288d:b0:854:b9a1:b478 with SMTP id af79cd13be357-8b29b764a91mr352965585a.18.1762946960683;
-        Wed, 12 Nov 2025 03:29:20 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHUJFxOJbDQYyH5iAisGFENmrwrjD8S/tLmssJoauTGvGRsQ2OlHPKZyUfeC9cCLoY0kaU2QQ==
-X-Received: by 2002:a05:620a:288d:b0:854:b9a1:b478 with SMTP id af79cd13be357-8b29b764a91mr352963785a.18.1762946960297;
-        Wed, 12 Nov 2025 03:29:20 -0800 (PST)
-Received: from sgarzare-redhat (host-79-46-200-153.retail.telecomitalia.it. [79.46.200.153])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-8b29a9e7059sm172313385a.38.2025.11.12.03.29.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 Nov 2025 03:29:19 -0800 (PST)
-Date: Wed, 12 Nov 2025 12:29:12 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Bobby Eshleman <bobbyeshleman@gmail.com>, 
-	Shuah Khan <shuah@kernel.org>, virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, Simon Horman <horms@kernel.org>, 
-	Bobby Eshleman <bobbyeshleman@meta.com>
-Subject: Re: [PATCH net-next v4 00/12] selftests/vsock: refactor and improve
- vmtest infrastructure
-Message-ID: <3htkg6jotej6ev35jyc7edo6jtoo6tm7ciivnzvd7rd4my4nsp@47nbily4raoi>
-References: <20251108-vsock-selftests-fixes-and-improvements-v4-0-d5e8d6c87289@meta.com>
- <d19c7bea-9b4d-4f00-a6bc-35247011e788@redhat.com>
+        d=1e100.net; s=20230601; t=1762947034; x=1763551834;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-gg:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=l/oUH46h86/olGMZU+XghYpDhfAZ96DwWr356lECM4A=;
+        b=hW3acGOTbvEQadPq7yssqLcXJb+tadagtuemd9EAqIEhbP0KEKG7FsDWeN+ON8nefR
+         aY2UX2GqiwEWt/KRRZ45Rv5t1PbIq1b6taZmUQaqqLTFE31WB4TqhPeBmwG7C4oGSYyS
+         wnPmY5mOGBJfnIYX9rJ8gk2HunYYKGK0jASTG33haRzMYYuRI6HpXiz3reNzpe6xpkuq
+         Asr/7VrDP8Fr+mm8ST3ilTJLYAPZLQH48B6kx+R/UOobX9dpR/+thoqyYZODY+gztpWk
+         Oe1Wogo0WyGgvNCvfh7rQENf9Rf0oX8ulLN7QwLcqVeBUUHOl4LIu8ojrQcstKOSV9IG
+         874Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXEtWBRg+65ggfmKGb3qk8DpP7QsUZanchyXx6n3rz8zOA8ZGpO8KlxbR2+t2eUeftGhHdZjvw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXbjxIpxMHCm53pIGURJiZxe481xmruVr9dUwwrTV0Rb8dah0D
+	VnOLgUsj0I94oZEnumYbR55NGRjORivEF5UO9bjt3zO/I//gONIU+UH/
+X-Gm-Gg: ASbGncthj5cLxEYviy8dIoPu+eE5QeY3Wu9vjrRLmZhFxDSR9pjNB+Clxpzm2X+/t8b
+	UOIXxCF8/O8OebjqirWBEsMap5e48hpDqf6yDEW2p5Rj0V0Tgdz6P5CsOkIVDYq0MQwjpS0kIaK
+	1JEJw+bPtWbTcK84G3FGXQQwxYMGMsIA5xm7g4IPCG6WsFTfdVUDAJ5qRJKVaH7vtucSMSp2lCz
+	LMPJhWtYb67+Ytb24XOam3cbuaHnvouaNquEm93ywDa7mBr4umEoiNswhM8sYVPYcs+KMI7IdAD
+	4umIg3D9t3EaNIM0gsOH7Sw3oijvBa93jwfbw5JcDTJ61qFIsLbtgSLKn7lnKxeY5r2k4UXKyBx
+	zdXwl0VvZXFta/4XRy6BaZeFt34PnU6RcKYZKCthmbpSD39K17WXELoRuV43ZOHB9fLDs5lkuy6
+	CIZ+LxV5KFzqUUENEck17FZpU=
+X-Google-Smtp-Source: AGHT+IFzZn82+HqmV7Z5oaduLfvBaDy2CYnyKKDWs/rhY5yLhynN3LzPM9CdU2cQ0vUhoC+2FQjWgA==
+X-Received: by 2002:a05:600c:4f93:b0:477:bcb:24cd with SMTP id 5b1f17b1804b1-47787095d98mr24817395e9.22.1762947034215;
+        Wed, 12 Nov 2025 03:30:34 -0800 (PST)
+Received: from [10.125.200.88] ([165.85.126.46])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-47787e2ad4csm31122115e9.1.2025.11.12.03.30.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 12 Nov 2025 03:30:33 -0800 (PST)
+Message-ID: <89e33ec4-051d-4ca5-8fcd-f500362dee91@gmail.com>
+Date: Wed, 12 Nov 2025 13:30:32 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <d19c7bea-9b4d-4f00-a6bc-35247011e788@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/6] net/mlx5e: Speedup channel configuration
+ operations
+To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ Tariq Toukan <tariqt@nvidia.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Mark Bloch <mbloch@nvidia.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
+ Leon Romanovsky <leonro@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>,
+ William Tu <witu@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>,
+ Nimrod Oren <noren@nvidia.com>, Alex Lazar <alazar@nvidia.com>
+References: <1762939749-1165658-1-git-send-email-tariqt@nvidia.com>
+ <874iqzldvq.fsf@toke.dk>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <874iqzldvq.fsf@toke.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 11, 2025 at 01:33:11PM +0100, Paolo Abeni wrote:
->On 11/8/25 5:00 PM, Bobby Eshleman wrote:
->> This patch series refactors the vsock selftest VM infrastructure to
->> improve test run times, improve logging, and prepare for future tests
->> which make heavy usage of these refactored functions and have new
->> requirements such as simultaneous QEMU processes.
->>
->> These patches were broken off from this prior series:
->> https://lore.kernel.org/all/20251021-vsock-vmtest-v7-0-0661b7b6f081@meta.com/
->>
->> To: Stefano Garzarella <sgarzare@redhat.com>
->> To: Shuah Khan <shuah@kernel.org>
->> Cc: virtualization@lists.linux.dev
->> Cc: netdev@vger.kernel.org
->> Cc: linux-kselftest@vger.kernel.org
->> Cc: linux-kernel@vger.kernel.org
->> Cc: Simon Horman <horms@kernel.org>
->>
->> Changes in v4:
->> - fix messed up rebase (wrt check_result() and shared_vm_test() patches)
->> - more consistent variable quotes style
->> - use associative array for pidfiles, remove after terminate
->> - Link to v3: https://lore.kernel.org/r/20251106-vsock-selftests-fixes-and-improvements-v3-0-519372e8a07b@meta.com
->>
->> Changes in v3:
->> - see per-patch changes
->> - Link to v2: https://lore.kernel.org/all/20251104-vsock-selftests-fixes-and-improvements-v2-0-ca2070fd1601@meta.com
->>
->> Changes in v2:
->> - remove "Fixes" for some patches because they do not fix bugs in
->>   kselftest runs (some fix bugs only when using bash args that kselftest
->>   does not use or otherwise prepare functions for new usage)
->> - broke out one fixes patch for "net"
->> - per-patch changes
->> - add patch for shellcheck declaration to disable false positives
->> - Link to v1: https://lore.kernel.org/r/20251022-vsock-selftests-fixes-and-improvements-v1-0-edeb179d6463@meta.com
->
->Series LGTM, but let's wait a little bit more for explicit ack from Stefano.
 
-Sorry for the delay, yep it LGTM too and I should replied with my R-b to 
-all patches. In any case, it can go IMO.
 
-Thanks,
-Stefano
+On 12/11/2025 12:54, Toke Høiland-Jørgensen wrote:
+> Tariq Toukan <tariqt@nvidia.com> writes:
+> 
+>> Hi,
+>>
+>> This series significantly improves the latency of channel configuration
+>> operations, like interface up (create channels), interface down (destroy
+>> channels), and channels reconfiguration (create new set, destroy old
+>> one).
+> 
+> On the topic of improving ifup/ifdown times, I noticed at some point
+> that mlx5 will call synchronize_net() once for every queue when they are
+> deactivated (in mlx5e_deactivate_txqsq()). Have you considered changing
+> that to amortise the sync latency over the full interface bringdown? :)
+> 
+> -Toke
+> 
+> 
 
+Correct!
+This can be improved and I actually have WIP patches for this, as I'm 
+revisiting this code area recently.
 
